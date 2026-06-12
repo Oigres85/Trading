@@ -1,0 +1,1052 @@
+{
+ "updated_at": "2026-06-12T14:25:57Z",
+ "eurusd": 1.1573,
+ "totals": {
+  "usd_value": 313979.9,
+  "usd_gain": 179578.44,
+  "usd_gain_pct": 133.61,
+  "eur_value": 312544.22,
+  "eur_gain": 156407.92,
+  "eur_gain_pct": 100.17
+ },
+ "portfolio": [
+  {
+   "ticker": "NVDA",
+   "name": "NVIDIA",
+   "qty": 270,
+   "pmc": 87.17,
+   "currency": "USD",
+   "price": 205.86,
+   "change_pct": 0.48,
+   "value": 55582.2,
+   "gain": 32046.3,
+   "gain_pct": 136.16,
+   "pe": 31.5,
+   "ath": 236.26,
+   "ath_dist_pct": -12.9,
+   "support": 199.34,
+   "resistance": 232.01,
+   "rsi": 46.0,
+   "volume": 27571310,
+   "vol_ratio": 0.17,
+   "signal": "Neutrale",
+   "signal_class": "neutral",
+   "spark": [
+    198.22,
+    198.25,
+    196.27,
+    207.59,
+    211.25,
+    214.95,
+    219.18,
+    220.52,
+    225.57,
+    235.47,
+    225.06,
+    222.06,
+    220.35,
+    223.21,
+    219.25,
+    215.08,
+    214.61,
+    212.35,
+    214.0,
+    210.89,
+    224.1,
+    222.56,
+    214.5,
+    218.66,
+    205.1,
+    208.64,
+    208.19,
+    200.42,
+    204.87,
+    205.86
+   ]
+  },
+  {
+   "ticker": "AMD",
+   "name": "AMD",
+   "qty": 125,
+   "pmc": 153.92,
+   "currency": "USD",
+   "price": 515.28,
+   "change_pct": 5.49,
+   "value": 64410.59,
+   "gain": 45170.59,
+   "gain_pct": 234.77,
+   "pe": 172.9,
+   "ath": 546.44,
+   "ath_dist_pct": -5.7,
+   "support": 393.36,
+   "resistance": 546.44,
+   "rsi": 61.0,
+   "volume": 10244502,
+   "vol_ratio": 0.28,
+   "signal": "Trend rialzista",
+   "signal_class": "good",
+   "spark": [
+    360.54,
+    341.54,
+    355.26,
+    421.39,
+    408.46,
+    455.19,
+    458.79,
+    448.29,
+    445.5,
+    449.7,
+    424.1,
+    420.99,
+    414.05,
+    447.58,
+    449.59,
+    467.51,
+    503.89,
+    495.54,
+    518.09,
+    516.1,
+    510.13,
+    521.54,
+    542.52,
+    523.2,
+    466.38,
+    490.33,
+    475.51,
+    452.4,
+    488.45,
+    515.28
+   ]
+  },
+  {
+   "ticker": "MU",
+   "name": "Micron",
+   "qty": 90,
+   "pmc": 87.63,
+   "currency": "USD",
+   "price": 998.42,
+   "change_pct": 0.26,
+   "value": 89858.25,
+   "gain": 81971.55,
+   "gain_pct": 1039.36,
+   "pe": 47.1,
+   "ath": 1089.29,
+   "ath_dist_pct": -8.3,
+   "support": 652.21,
+   "resistance": 1089.29,
+   "rsi": 62.3,
+   "volume": 14852887,
+   "vol_ratio": 0.27,
+   "signal": "Trend rialzista",
+   "signal_class": "good",
+   "spark": [
+    542.21,
+    576.45,
+    640.2,
+    666.59,
+    646.63,
+    746.81,
+    795.33,
+    766.58,
+    803.63,
+    776.01,
+    724.66,
+    681.54,
+    698.74,
+    731.99,
+    762.1,
+    751.0,
+    895.88,
+    928.41,
+    923.52,
+    971.0,
+    1035.5,
+    1064.1,
+    1079.57,
+    996.0,
+    864.01,
+    949.28,
+    935.89,
+    891.88,
+    995.87,
+    998.42
+   ]
+  },
+  {
+   "ticker": "INTC",
+   "name": "Intel",
+   "qty": 380,
+   "pmc": 25.75,
+   "currency": "USD",
+   "price": 121.88,
+   "change_pct": 4.21,
+   "value": 46314.4,
+   "gain": 36529.4,
+   "gain_pct": 373.32,
+   "pe": 79.1,
+   "ath": 132.75,
+   "ath_dist_pct": -8.2,
+   "support": 98.33,
+   "resistance": 126.64,
+   "rsi": 60.9,
+   "volume": 41521480,
+   "vol_ratio": 0.31,
+   "signal": "Trend rialzista",
+   "signal_class": "good",
+   "spark": [
+    99.62,
+    95.78,
+    108.15,
+    113.01,
+    109.62,
+    124.92,
+    129.44,
+    120.61,
+    120.29,
+    115.93,
+    108.77,
+    108.17,
+    110.8,
+    118.96,
+    118.5,
+    119.84,
+    123.52,
+    121.77,
+    120.89,
+    114.68,
+    109.33,
+    107.93,
+    112.71,
+    111.78,
+    99.17,
+    110.27,
+    107.92,
+    107.04,
+    116.96,
+    121.88
+   ]
+  },
+  {
+   "ticker": "TSLA",
+   "name": "Tesla",
+   "qty": 60,
+   "pmc": 358.22,
+   "currency": "USD",
+   "price": 396.8,
+   "change_pct": -0.59,
+   "value": 23808.0,
+   "gain": 2314.8,
+   "gain_pct": 10.77,
+   "pe": 367.5,
+   "ath": 498.83,
+   "ath_dist_pct": -20.5,
+   "support": 380.15,
+   "resistance": 445.6,
+   "rsi": 45.5,
+   "volume": 13897879,
+   "vol_ratio": 0.28,
+   "signal": "Trend debole",
+   "signal_class": "bad",
+   "spark": [
+    390.82,
+    392.51,
+    389.37,
+    398.73,
+    411.79,
+    428.35,
+    445.0,
+    433.45,
+    445.27,
+    443.3,
+    422.24,
+    409.99,
+    404.11,
+    417.26,
+    417.85,
+    426.01,
+    433.59,
+    440.36,
+    442.1,
+    435.79,
+    415.88,
+    423.74,
+    423.7,
+    418.45,
+    391.0,
+    408.95,
+    396.68,
+    381.59,
+    399.15,
+    396.8
+   ]
+  },
+  {
+   "ticker": "MSTR",
+   "name": "Strategy",
+   "qty": 123,
+   "pmc": 210.22,
+   "currency": "USD",
+   "price": 122.17,
+   "change_pct": 1.68,
+   "value": 15026.91,
+   "gain": -10830.15,
+   "gain_pct": -41.88,
+   "pe": 27.4,
+   "ath": 543.0,
+   "ath_dist_pct": -77.5,
+   "support": 113.27,
+   "resistance": 182.23,
+   "rsi": 35.9,
+   "volume": 2912365,
+   "vol_ratio": 0.17,
+   "signal": "Trend debole",
+   "signal_class": "bad",
+   "spark": [
+    177.17,
+    183.8,
+    186.9,
+    186.82,
+    179.84,
+    187.59,
+    195.94,
+    184.42,
+    178.03,
+    186.97,
+    177.42,
+    166.63,
+    164.63,
+    165.81,
+    164.85,
+    159.89,
+    159.93,
+    154.2,
+    151.64,
+    159.09,
+    149.78,
+    136.08,
+    126.55,
+    129.37,
+    120.44,
+    127.2,
+    117.02,
+    115.35,
+    120.15,
+    122.17
+   ]
+  },
+  {
+   "ticker": "RGTI",
+   "name": "Rigetti",
+   "qty": 515,
+   "pmc": 27.3,
+   "currency": "USD",
+   "price": 21.24,
+   "change_pct": 2.94,
+   "value": 10936.75,
+   "gain": -3122.75,
+   "gain_pct": -22.21,
+   "pe": -104.4,
+   "ath": 58.15,
+   "ath_dist_pct": -63.5,
+   "support": 15.46,
+   "resistance": 28.06,
+   "rsi": 50.1,
+   "volume": 9056513,
+   "vol_ratio": 0.18,
+   "signal": "Sopra SMA50",
+   "signal_class": "good",
+   "spark": [
+    17.5,
+    17.7,
+    18.27,
+    20.09,
+    18.34,
+    18.94,
+    20.51,
+    19.07,
+    18.42,
+    19.27,
+    17.85,
+    16.62,
+    15.96,
+    16.88,
+    22.04,
+    26.42,
+    25.07,
+    24.62,
+    27.03,
+    25.54,
+    25.63,
+    26.88,
+    24.09,
+    24.16,
+    20.68,
+    21.76,
+    19.69,
+    19.44,
+    20.63,
+    21.24
+   ]
+  },
+  {
+   "ticker": "OKLO",
+   "name": "Oklo",
+   "qty": 120,
+   "pmc": 72.43,
+   "currency": "USD",
+   "price": 58.01,
+   "change_pct": 0.27,
+   "value": 6961.8,
+   "gain": -1729.8,
+   "gain_pct": -19.9,
+   "pe": -69.6,
+   "ath": 193.84,
+   "ath_dist_pct": -70.1,
+   "support": 53.01,
+   "resistance": 73.86,
+   "rsi": 43.5,
+   "volume": 1920775,
+   "vol_ratio": 0.14,
+   "signal": "Trend debole",
+   "signal_class": "bad",
+   "spark": [
+    70.4,
+    68.6,
+    68.38,
+    79.62,
+    71.83,
+    72.51,
+    78.13,
+    73.63,
+    69.66,
+    67.21,
+    62.25,
+    58.56,
+    55.88,
+    62.58,
+    65.09,
+    65.88,
+    68.7,
+    67.82,
+    68.09,
+    66.88,
+    66.89,
+    73.47,
+    65.21,
+    65.39,
+    58.09,
+    58.94,
+    56.48,
+    54.02,
+    57.86,
+    58.01
+   ]
+  },
+  {
+   "ticker": "ARBE",
+   "name": "Arbe Robotics",
+   "qty": 1150,
+   "pmc": 3.35,
+   "currency": "USD",
+   "price": 0.94,
+   "change_pct": 2.4,
+   "value": 1081.0,
+   "gain": -2771.5,
+   "gain_pct": -71.94,
+   "pe": -7.2,
+   "ath": 17.27,
+   "ath_dist_pct": -94.6,
+   "support": 0.82,
+   "resistance": 1.4,
+   "rsi": 47.8,
+   "volume": 242141,
+   "vol_ratio": 0.07,
+   "signal": "Sopra SMA50",
+   "signal_class": "good",
+   "spark": [
+    0.84,
+    0.84,
+    0.82,
+    0.87,
+    0.8,
+    0.8,
+    0.9,
+    0.87,
+    1.01,
+    1.15,
+    1.05,
+    1.0,
+    0.93,
+    1.0,
+    1.19,
+    1.13,
+    1.15,
+    1.23,
+    1.21,
+    1.1,
+    1.25,
+    1.13,
+    1.08,
+    1.07,
+    0.91,
+    0.88,
+    0.85,
+    0.86,
+    0.92,
+    0.94
+   ]
+  },
+  {
+   "ticker": "BTP-V28",
+   "name": "BTP Valore Ott 2028",
+   "isin": "IT0005565400",
+   "qty": 40000,
+   "pmc": 100.0,
+   "currency": "EUR",
+   "price": 103.09,
+   "change_pct": null,
+   "value": 41234.2,
+   "gain": 1234.2,
+   "gain_pct": 3.09,
+   "pe": null,
+   "ath": null,
+   "ath_dist_pct": null,
+   "support": null,
+   "resistance": null,
+   "rsi": null,
+   "volume": null,
+   "vol_ratio": null,
+   "signal": "Cedola 4,10/4,50%",
+   "signal_class": "info",
+   "spark": []
+  }
+ ],
+ "macro": {
+  "fear_greed": {
+   "score": 32,
+   "rating": "fear",
+   "prev_close": 30,
+   "week_ago": 42,
+   "month_ago": 66
+  },
+  "vix": {
+   "value": 18.78,
+   "change_pct": -3.4,
+   "spark": [
+    18.29,
+    17.38,
+    17.39,
+    17.08,
+    17.19,
+    18.38,
+    17.99,
+    17.87,
+    17.26,
+    18.43,
+    17.82,
+    18.06,
+    17.44,
+    16.76,
+    16.7,
+    16.59,
+    17.01,
+    16.29,
+    15.74,
+    15.32,
+    16.05,
+    15.77,
+    16.06,
+    15.4,
+    21.51,
+    18.92,
+    19.87,
+    22.22,
+    19.44,
+    18.78
+   ]
+  },
+  "indicators": [
+   {
+    "key": "cpi",
+    "label": "Inflazione CPI (a/a)",
+    "value": "4.3%",
+    "date": "2026-05-01"
+   },
+   {
+    "key": "pce",
+    "label": "Inflazione PCE (a/a)",
+    "value": "3.8%",
+    "date": "2026-04"
+   },
+   {
+    "key": "gdp",
+    "label": "PIL USA (t/t ann.)",
+    "value": "1.6%",
+    "date": "2026-Q1"
+   },
+   {
+    "key": "nfp",
+    "label": "Non-Farm Payrolls",
+    "value": "+172K",
+    "date": "2026-05-01"
+   },
+   {
+    "key": "unemp",
+    "label": "Disoccupazione",
+    "value": "4.3%",
+    "date": "2026-05-01"
+   }
+  ]
+ },
+ "news": [
+  {
+   "source": "Investing.com",
+   "title": "Why is HUTCHMED stock climbing today?",
+   "link": "https://www.investing.com/news/stock-market-news/why-is-hutchmed-stock-climbing-today-93CH-4739913",
+   "published": "2026-06-12T14:37:01Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "New York is in the Money With Knicks’ Historic Run",
+   "link": "https://www.bloomberg.com/news/videos/2026-06-12/new-york-is-in-the-money-with-knicks-historic-run",
+   "published": "2026-06-12T14:34:33Z",
+   "tickers": []
+  },
+  {
+   "source": "Investing.com",
+   "title": "India regulator to review delisting rules, SEBI chief says",
+   "link": "https://www.investing.com/news/stock-market-news/india-regulator-to-review-delisting-rules-sebi-chief-says-93CH-4739906",
+   "published": "2026-06-12T14:32:34Z",
+   "tickers": []
+  },
+  {
+   "source": "Investing.com",
+   "title": "AMD, SanDisk among market cap stock movers on Friday",
+   "link": "https://www.investing.com/news/stock-market-news/amd-sandisk-among-market-cap-stock-movers-on-friday-93CH-4739904",
+   "published": "2026-06-12T14:31:58Z",
+   "tickers": []
+  },
+  {
+   "source": "Investing.com",
+   "title": "SailPoint downgraded by BofA on growth concerns as identity security market shifts",
+   "link": "https://www.investing.com/news/stock-market-news/sailpoint-downgraded-by-bofa-on-growth-concerns-as-identity-security-market-shifts-4739902",
+   "published": "2026-06-12T14:31:29Z",
+   "tickers": []
+  },
+  {
+   "source": "Investing.com",
+   "title": "BofA reinstates Williams-Sonoma at Buy, cites structural share gains",
+   "link": "https://www.investing.com/news/stock-market-news/bofa-reinstates-williamssonoma-at-buy-cites-structural-share-gains-4739896",
+   "published": "2026-06-12T14:29:56Z",
+   "tickers": []
+  },
+  {
+   "source": "Investing.com",
+   "title": "Volvo AB options trading surges with 11,192 contracts",
+   "link": "https://www.investing.com/news/stock-market-news/volvo-ab-options-trading-surges-with-11192-contracts-93CH-4739894",
+   "published": "2026-06-12T14:26:11Z",
+   "tickers": []
+  },
+  {
+   "source": "Investing.com",
+   "title": "BlackRock gets fresh chance to keep NYC pension assets despite climate concerns",
+   "link": "https://www.investing.com/news/stock-market-news/blackrock-gets-fresh-chance-to-keep-nyc-pension-assets-despite-climate-concerns-4739850",
+   "published": "2026-06-12T14:25:00Z",
+   "tickers": []
+  },
+  {
+   "source": "Investing.com",
+   "title": "Porsche options trading jumps with put contracts",
+   "link": "https://www.investing.com/news/stock-market-news/porsche-options-trading-jumps-with-put-contracts-93CH-4739892",
+   "published": "2026-06-12T14:24:25Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Middle East Fuel Exports Rebound as Tankers Slip Through Hormuz",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/middle-east-fuel-exports-rebound-as-tankers-slip-through-hormuz",
+   "published": "2026-06-12T14:24:21Z",
+   "tickers": []
+  },
+  {
+   "source": "Investing.com",
+   "title": "SpaceX set to surge past $2 trillion valuation in blockbuster Nasdaq debut",
+   "link": "https://www.investing.com/news/stock-market-news/after-record-ipo-musks-spacex-faces-next-test-in-market-debut-4739027",
+   "published": "2026-06-12T14:19:09Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Virgin Galactic Craters 24%, Rocket Lab Drops 8%, AST SpaceMobile Falls 10% as SpaceX Hype Triggers a Space-Stock Shakeout",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/virgin-galactic-craters-24-rocket-141846645.html",
+   "published": "2026-06-12T14:18:46Z",
+   "tickers": []
+  },
+  {
+   "source": "Investing.com",
+   "title": "SpaceX stock indicated to open 30% higher from its IPO price",
+   "link": "https://www.investing.com/news/stock-market-news/spacex-breaks-wall-street-as-record-ipo-values-company-at-177-trillion-4738222",
+   "published": "2026-06-12T14:18:39Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Charles Cole indicted for defrauding Napster out of 239M shares",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/charles-cole-indicted-defrauding-napster-141830038.html",
+   "published": "2026-06-12T14:18:30Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Did the Fed Just Get a Reprieve? Report of Iran Deal Could Put Rate Hikes on Hold",
+   "link": "https://finance.yahoo.com/economy/policy/articles/did-fed-just-reprieve-report-141744802.html",
+   "published": "2026-06-12T14:17:44Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "NVIDIA (NVDA): A Key Part of Harvard University AI Stock Picks",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-key-part-harvard-141344552.html",
+   "published": "2026-06-12T14:13:44Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Is Booking (BKNG) The Best Travel Stock in Harvard University Stock Portfolio?",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/booking-bkng-best-travel-stock-141151624.html",
+   "published": "2026-06-12T14:11:51Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Oracle Has a Debt Fever & the Only Prescription is More Debt",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/oracle-debt-fever-only-prescription-140741343.html",
+   "published": "2026-06-12T14:07:41Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Uber Weighs Delivery Hero Asset Sales to Smooth Full Takeover",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/uber-weighs-delivery-hero-asset-sales-to-smooth-full-takeover",
+   "published": "2026-06-12T14:03:49Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Citi’s Kaiser Sees Capital Demand Pressuring Markets",
+   "link": "https://www.bloomberg.com/news/videos/2026-06-12/citi-s-kaiser-sees-capital-demand-pressuring-markets-video",
+   "published": "2026-06-12T14:02:17Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Is Broadcom (AVGO) Still Undervalued?",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/broadcom-avgo-still-undervalued-140200331.html",
+   "published": "2026-06-12T14:02:00Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "Why Goldman Is Cautious on Micron Stock Ahead of Earnings - Barron's",
+   "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQMDMtcmE5RkdOSlpnQ2QxbXd0UzhDLUR2M2RuT3pxb0xya3dwckIxcUE1RXJPZmpZN3Rjc0p6TXNFTXhlSVlma2pEb0lFYjRfX0JURTJJZkY1b2xPdWZ6akFjeDRNQm5JTVlnLW84bjNaREtENDJpTTZWeldhc1p4d1lZN0JMM3l1VXE3Yw?oc=5",
+   "published": "2026-06-12T14:01:00Z",
+   "tickers": [
+    "MU"
+   ]
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Can Microsoft (MSFT) Stock Rebound in 2026?",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/microsoft-msft-stock-rebound-2026-135726509.html",
+   "published": "2026-06-12T13:57:26Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Harvard University AI Stock Portfolio: Alphabet (GOOGL)",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/harvard-university-ai-stock-portfolio-135649828.html",
+   "published": "2026-06-12T13:56:49Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "ECB’s Kazimir Says Rates Must Be Lifted More to Tackle Inflation",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/ecb-s-kazimir-says-rates-must-be-lifted-more-to-tackle-inflation",
+   "published": "2026-06-12T13:56:47Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Harvard University’s Favorite AI Stock Pick: Taiwan Semiconductor (TSM)",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/harvard-university-favorite-ai-stock-135554831.html",
+   "published": "2026-06-12T13:55:54Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "SpaceX’s Record IPO Is Said to Draw Over $350 Billion in Demand",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/spacex-s-record-ipo-is-said-to-draw-over-350-billion-in-demand",
+   "published": "2026-06-12T13:43:25Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "AMD Stock Upgraded To Buy On GPU Upside - Investor's Business Daily",
+   "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNWXNSdDF2VnlDbHJzYkVpNVdtOURpbmF4cWp3Z1VkNERSSjRyYVI5QkY0NHpJUzRlbDlFWHNWS212WlhreGktZElTWUFpWE5iMmJ4b0JWakQyMlhuUEVHLUY2bU5pT0NjeDhrNWxkcFFjaDJuOXZlZkFYNHlnRGZ5VHlDaFdUQ3R6X3c?oc=5",
+   "published": "2026-06-12T13:17:00Z",
+   "tickers": [
+    "AMD"
+   ]
+  },
+  {
+   "source": "Google News",
+   "title": "Nvidia Strikes Major AI Deal. This Stock Is Exploding Higher - TradingView",
+   "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNamdGYXFVWW5LNjc1aUIyN2tkcU8zN0tjeXp2dkdrT21ZejFlbldpRlY3S05YcHlwYWcyR3NyV3FNYTZwbkZHVnVUT2pxSTEyZmdnM3JwckRCWEZtdXNhUEpteGpYbmxKQk9VbHJaN3ZWR3dNbGFTeTBtT0hnYUFyeV9pN3ROV1VOX3ZTdXFTZ0pZUDVoZHFtV0JtN2trdTJodFlSODZMVk1WRXNPcWlRV2hKQ2NoQU1NNWFz?oc=5",
+   "published": "2026-06-12T13:14:47Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
+   "source": "Bloomberg",
+   "title": "What Stock Traders Can Expect From SpaceX’s Trading Debut",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/what-stock-traders-can-expect-from-spacex-s-trading-debut",
+   "published": "2026-06-12T13:11:15Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Ken Leech Pleads Guilty to Obstructing SEC Probe Into His Trades",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/ken-leech-to-plead-guilty-in-us-cherry-picking-fraud-case",
+   "published": "2026-06-12T13:09:36Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "From London to Sydney, Traders Ready to Watch SpaceX’s Debut",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/from-sydney-to-london-traders-ready-to-watch-spacex-s-debut",
+   "published": "2026-06-12T13:01:16Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "Chip Stocks Are Tumbling. Is It Time to Sell Cerebras, Broadcom, and Nvidia? - The Motley Fool",
+   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOMUhoQ0J3ZVJwUnJLejlHQnc4N3R6VnRjT3pPRDFxbmR5Z3doZVpXdW9Mbjh1Mm0xTGhoQVVOU1Vrd2szTGNuZU51UWtuTWh0OXJLdmpKaDJJbXFKbUlUczhXQ3A5MDJZekZwYjJ2czdGLWV6Z0l4Rk45amRWTTc5aXA4T0UxM2JybzQxXzhEVmFQR2tYQ0pxUA?oc=5",
+   "published": "2026-06-12T12:54:19Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Gensler Says Kalshi Is Flat Wrong: Sports Bets Aren’t Swaps",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/gary-gensler-says-kalshi-is-flat-wrong-sports-bets-aren-t-swaps",
+   "published": "2026-06-12T12:31:13Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "How Nvidia Is a Big Winner If SpaceX Stock Soars - Barron's",
+   "link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOZVgtZGNUckRxLXpucGoxM1c3S3pidDh2di1iU2tLYkl0UU5oOW9RSW9VNkYxdGNOdUZxdWxmdm1aVm1sakdCOWdFVVV2Y2NCLXFiRzdiblgyRGg0UGVHT3RGZVFuMTBfc2RKNTN6NjlrX0YzNTBscTFOVUZsMVBtN0p2bFdfanc?oc=5",
+   "published": "2026-06-12T11:57:00Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
+   "source": "Bloomberg",
+   "title": "S&amp;P 500 Flips to Modest Gain With All Eyes on SpaceX, Iran Hopes",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/us-futures-rally-with-all-eyes-on-spacex-iran-war-peace-hopes",
+   "published": "2026-06-12T11:37:49Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Analyst Report: Oracle Corp",
+   "link": "https://finance.yahoo.com/research/reports/ARGUS_3282_AnalystReport_1781263588000?yptr=yahoo&ncid=yahooproperties_plusresear_nm5q6ze1cei",
+   "published": "2026-06-12T11:26:28Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Analyst Report: Thor Industries Inc",
+   "link": "https://finance.yahoo.com/research/reports/ARGUS_3443_AnalystReport_1781263588000?yptr=yahoo&ncid=yahooproperties_plusresear_nm5q6ze1cei",
+   "published": "2026-06-12T11:26:28Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "Former Tesla board member says SpaceX needs to achieve 2 of its 3 moonshots to keep its valuation - CNBC",
+   "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxOdmRCeEVkeXk5bjR5NGF0TjRtOEJFak1SdUpxYUV6d2VhR3Q3T3QyTHdUOTRsYi05dy1rUEE2T3V0czZ0a0lqajZpTEFyV3N1bHVyV0N3NHNDX2pjd2hHQVR0M2FOT1BSalQ5dnlGdVJHYkY4ZUFZMlFUMnkwbjNDOWlB0gGHAUFVX3lxTE1HWVpqNW03U3VvamNKN08taFBsbWNUcElJVzRGV3dBRm90Qk84SmlITFpubjNPbkZiUTVwMGxwcTZJdVJhMnEwMjJMMDdCeTdoMTl4TUtZNEN5MnJIYmJKQlRDUVhBMWdFU1I1SkpFZWpPUGExMzU0M0xPRUt2cHQ2dTZUZjI3SQ?oc=5",
+   "published": "2026-06-12T11:22:37Z",
+   "tickers": [
+    "TSLA"
+   ]
+  },
+  {
+   "source": "Google News",
+   "title": "SpaceX's president hints at a Tesla merger: 'That might make Elon's life a little easier' - Business Insider",
+   "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQX191c3U4REFBY3BweW45S1A5cU5aQWRIRmpxdThSWUdTNzBuemM1QlJZXzh0aDNlcm0zUVBqdUxQZjZWZ3FyeTdkU3JOdmtWaDlnSFdvZzhpZWdUR1pkZVBzelBKcFdHOWhMeEpoZUlBSG5HbXYzX1VvM1hTVVNJYnRIVFg1YldjMzZSUw?oc=5",
+   "published": "2026-06-12T11:06:00Z",
+   "tickers": [
+    "TSLA"
+   ]
+  },
+  {
+   "source": "Google News",
+   "title": "2 Popular AI Stocks to Sell Before They Drop 44% and 60%, According to Wall Street - The Motley Fool",
+   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPVmpnZ0JPd1N1WVp1OGR5Sm9kVWV1UkR6U3dKTUxxNmpONUpxQkk5dFM3bUI1OHFqV2tjM0cxVDZqVlN6RU1HeWVVWDNoMHl2cWtsZEYzTE5hWDhDdkpZSWlNU2ZFTGJmSXQtaEJScEVSQ1ROUHFWQ01xaEJkNFUzcy0wcUVRUHdaVGd2WlZPVGlidHFnSmc?oc=5",
+   "published": "2026-06-12T10:12:00Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "What's Going On With NVIDIA Stock Friday? - NVIDIA (NASDAQ:NVDA) - Benzinga",
+   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPaE51MzgwMFdUT0ZqQS1VOEFUWlYwWGR6YXFQSDE5Z0pLb1dHYnlQdzdEZzFvbjV6cER6NzMyUmR1UnRmV0hsOUp2aVNzcU9oM2VIaTViaTlGWjhIRUxUM084cjVEd0ljZG9SdGRXenNWSFlWc0N2RUdhdDRDSDN1RDE1bGVxY2k1LXA0U1IySVNydTRNTkV5MzZ1eE9ibkZha09SSWdWS1luemhKVHc?oc=5",
+   "published": "2026-06-12T10:06:33Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
+   "source": "Google News",
+   "title": "U.S. Stock Market Braces for New Federal Reserve Era - Devdiscourse",
+   "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOWGVnS2FfQlNLaUxCWkx1VzloT2dOOHFrVThlblpZQllQS1hBb2xJY01lcWFpNjRDcHRmZDJZeWQyckxfYWw1d2lETGlpY2VxQXV5ZTFpWlVSSE91eHBSNTFWVWlNZW1JcGNrN3hwNklLYkVmTktKdFRyc1hrOHh0NFR0U2Q2T0hLQWlveVp4S2hEazBMcW9jZ3FiR2k5V0VBLXNHOFJna9IBrAFBVV95cUxPTDgyS2pVWXhFVEZPcXAtaThuVnJ1QVNqcW11cFpycWJ5Q01neFp6WkZrTTMzR3FCNGp4dUtBZ3gxeVhXVjhONmpIVFVXcHlKS2ZMeWlpRWNITzFMc0t4aDhTTXJaMGd4anJidjA3aDVSYjRKNTBDcmstbTByQzd1RkFrTmw4dEFSZWRobVJIZnpXM3ZXeWNtMGlCZUN4bHNIbHJtMWd3RTBtbDV2?oc=5",
+   "published": "2026-06-12T10:01:36Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "AMD denies researcher a $10,000 bug bounty after fixing critical auto-updater vulnerability — security flaw took 124 days to patch - Tom's Hardware",
+   "link": "https://news.google.com/rss/articles/CBMilwJBVV95cUxNcXg2QnVGYU9YQUJoRmJYd3AzcC04eEtQTHhOdG1VYlJLdkpuZFllZEQ2Z0VqVlg2bk5aZDFuc0VPX19FMFYxcnBZQ3FHcGQzV2hTUE4yYVlVNHJ2MHp0dTZZWllSWV9OUGpQd2p3NlZINkpxMUlSbEZjM0x5d2JrbXUzZ3lHV3hGZ2F4UDFFM016ZUxRdlQxZnBTcHdneElVSmZ0OV9DYXU1UTRtSWViWlVuMkxBWFJaSWtvRHAyV0NRTUcya3ktNGJlMGFCcVZMNDZBbUZ0eGdUZnRlbHVJNjNfU3NNS0RXelpHUlhfcjRmTVZnZDc4aEl1bFp0WWh6aVVGa0FVRkdPT1RBc2N4NHgyenFYU1E?oc=5",
+   "published": "2026-06-12T10:00:00Z",
+   "tickers": [
+    "AMD"
+   ]
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Sleep Number Files Bankruptcy to Sell Itself, Blames Tariffs",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/sleep-number-files-for-bankruptcy-sale-to-sleep-country-canada",
+   "published": "2026-06-12T09:27:35Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "4 reasons investors should buckle up for a stretch of big stock-market swings - Business Insider",
+   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOc0VVaDRldEFoV0ZueVJOSWJKekNTb1YwVjFuRTRHMW9keDV2MEJCbG5DUHNUV3doLUszZ1YxZm90UHRYVi0zM3VXekk1bFRudWZWcTRmRTNKWWlORzhhY29uN3ZkX3M1cnoyeG10QXhwUUFrR2JTUXFtbnlzdUUwT1U0LS1SQk10eElNQkNfQ2dkZkZwWXpObzR1QlFhcENPbmx5VENuYmgzNVFRR05aQkNrRQ?oc=5",
+   "published": "2026-06-12T09:20:11Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "SpaceX Shares Poised to Jump Following Record $75 Billion IPO",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/spacex-ipo-spcx-prepares-for-debut-after-75-billion-ipo-smashes-record",
+   "published": "2026-06-12T09:00:21Z",
+   "tickers": []
+  },
+  {
+   "source": "CNBC",
+   "title": "UK economy shrank 0.1% in April as Iran conflict weighed on growth",
+   "link": "https://www.cnbc.com/2026/06/12/uk-gdp-april-iran-war-growth.html",
+   "published": "2026-06-12T07:01:15Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "Exclusive: Nvidia begins Vera CPU sales pitch to Chinese clients, sources say - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPR2Z6dFV3WHhOamNSbFQ1VmxlNk5iNHR4bjJDdWE1d28tM3VEX01aOVVWMkNRYlZ3aUlQWXgxNi1VbGdtQ3FoNkY2MEZLSzZKZHBLcHFfNlhSTlhlYm5CbFNoaHdyOFM4UUVjQzIyU0o4VmNuaHo1cTg0cFgwSGdMdFctdGZCQnVwamdHZEdRQkJ5Umw0U1ZPTldxZ2ZRWE9Yc05xM2EtNFlwb1l5alBV?oc=5",
+   "published": "2026-06-12T06:19:00Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
+   "source": "Google News",
+   "title": "Cramer Calls Intel the \"Number One Name\" and \"More Important Than NVIDIA.\" The Stock Soars Today After a Massive Double Upgrade. - 24/7 Wall St.",
+   "link": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxOYndCTnZFVHU4TDRBaDh6NkU1UlI4aS1NLUVhYXpZR2F5UmJRSnQ4d1pTNjNHY3paUWRUNDJ5cnVvaTlaTlUxYmlBa0JGM2JpaDMtbXpoN2d0QlIwOVU2QkFNWDhSeXZoOFBLMGxvUnM1eXJjSmgzYlhieWFBMXI4MTlmM2FRaEphTm1MUjhrTUVwaldLdkhyTHREZ01jREFNQ1ZCbHF2ZmlqbmNWU1ZuNlItUUJteVFCa1dUZ0hQbGFRRmtWQmhoaHpDOWFLczdlaDZ6Y09xaXBHeTlKelZtaTFLZTFCZzNBLWFIT3VOZk5sWkc2UXNyYnNR?oc=5",
+   "published": "2026-06-12T01:47:18Z",
+   "tickers": [
+    "NVDA",
+    "INTC"
+   ]
+  },
+  {
+   "source": "CNBC",
+   "title": "A Chinese start-up's unfolding dilemma exposes cracks in Beijing's tech funding machine",
+   "link": "https://www.cnbc.com/2026/06/12/a-chinese-start-ups-dilemma-exposes-cracks-in-beijings-tech-funding.html",
+   "published": "2026-06-12T01:21:00Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "U.S. Stock Market Today – Thursday, June 11, 2026 - stl.news",
+   "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBBSzVTVEtYVHRJN0V3NEFSS1BROE5jbVBuV19yRkdGeEpmaXVoWW9zQ3VCOWVjS2ZQcENYZ0ZBTFhkNEEtOTk3c2NKejlZQi1NZ1VfYkhyVGVQY3p4Z0VQREFfcDFyLVZjRnFPVk1MRVZ3ZnBC?oc=5",
+   "published": "2026-06-12T00:41:39Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Stock market today: Dow, S&P 500, Nasdaq fade in wait for historic SpaceX debut",
+   "link": "https://finance.yahoo.com/markets/live/stock-market-today-friday-june-12-dow-sp-500-nasdaq-spacex-ipo-230015001.html",
+   "published": "2026-06-11T23:00:15Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "Nvidia hires veteran lobbyist Bruce Andrews to head government affairs - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNU2IwWUZ1blZEWlhKNEdYU3lIMWlwZXBTRVRfNURoNTR6M0UyT01zaHdXS3U3ME5GRVhaRjVuVk94NFpFOFlNTDRObnowdGdYcHR6cEc3WjN3VDhRN2hua3o2MlhlNk41RFVvZVdseU9iMmQ4eUdBNTdUTTM3NVZsRGdKVkdzLTB0dlhuMDR5TjhhMnd0dmtzbUJsNUczYUFaLWp5enQ4TTA2SWNBLVZ3R2UxeTdBWFo1cm1HOW5hWWZfZw?oc=5",
+   "published": "2026-06-11T22:21:00Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Oil and Gas Decline on Optimism US and Iran Are Close to a Deal",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-11/latest-oil-market-news-and-analysis-for-june-12",
+   "published": "2026-06-11T22:04:43Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Stocks Advance After Consumer Sentiment Report: Markets Wrap",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-11/asian-stocks-to-gain-as-trump-signals-us-iran-deal-markets-wrap",
+   "published": "2026-06-11T22:03:20Z",
+   "tickers": []
+  },
+  {
+   "source": "Google News",
+   "title": "Intel Bear Turns Bull. Here's Why. - Investor's Business Daily",
+   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNcVRLWkkwTUhzWGRudUlYNXRHNE8xYkJXS0FuUEh6azVNNDYzUGZmNnI1VWc0YTlsM29PXzFyNGk1X19hd1VxYjNoYW5YQ2NLamNBT3Vfb291RTZHbTZTY1VlVHlZLWluVWdsVDJQazdVUVBMLTY1a0c3UG9BUG1jOGc0WXd4ZzhXVmpFVW1WMmJ0UQ?oc=5",
+   "published": "2026-06-11T21:05:00Z",
+   "tickers": [
+    "INTC"
+   ]
+  },
+  {
+   "source": "Google News",
+   "title": "Investors Awoke to 'A Dip Buyer's Dream' Today. But Next Week's Fed Meeting Looms Large - Investopedia",
+   "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPMDFwM1dfTHZha0ZpVVBkMWdxQjhwQ2ppVkJZeFhweXE0QmREbS1rU2t3VWRVWFJpRUZtUjN1dVR1Y0tmMFBzbFNxVzZFTkV1M29jMmFZMzQyMWVpdlJFX2E2d0l6dkloQXNRd19XTDlibGJLVHB6RVRjM1N3STZfWml0QW50LVExX0hyWUtwZ3pPOEttUzhoTS1OZFM0OE5YQzFMX0dWSmNReFdRTGxDV2JWUmVNbllmTWVlUVphTQ?oc=5",
+   "published": "2026-06-11T18:30:44Z",
+   "tickers": []
+  },
+  {
+   "source": "CNBC",
+   "title": "Wholesale prices rose 1.1% in May, more than expected, on surge in energy",
+   "link": "https://www.cnbc.com/2026/06/11/producer-price-index-may-2026-.html",
+   "published": "2026-06-11T16:25:00Z",
+   "tickers": []
+  },
+  {
+   "source": "CNBC",
+   "title": "ECB hikes interest rates for first time since 2023 as Iran war ramps up energy costs",
+   "link": "https://www.cnbc.com/2026/06/11/ecb-hikes-interest-rates.html",
+   "published": "2026-06-11T13:57:33Z",
+   "tickers": []
+  }
+ ]
+}

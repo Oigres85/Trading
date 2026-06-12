@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Dashboard — Portafoglio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=3">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📈</text></svg>">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-icon">📈</span>
+    <div>
+      <h1>Trading Dashboard</h1>
+      <div class="updated">Ultimo aggiornamento: <span id="updated-at">—</span></div>
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-ghost" href="https://fical.net/it/calcolatore-prezzo-medio" target="_blank" rel="noopener" title="Calcolatore prezzo medio di carico">🧮 Calc. PMC</a>
+    <button class="btn btn-ghost" id="btn-prompt" title="Copia un prompt con tutti i dati da incollare in Claude">🤖 Prompt AI</button>
+    <button class="btn btn-primary" id="btn-refresh" title="Ricarica i dati">⟳ Aggiorna</button>
+  </div>
+</header>
+
+<main>
+  <!-- KPI -->
+  <section class="kpi-grid" id="kpi-grid"></section>
+
+  <!-- MACRO -->
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-head"><h2>Indicatori di mercato</h2></div>
+      <div class="gauges" id="gauges"></div>
+    </section>
+    <section class="card">
+      <div class="card-head"><h2>Dati macro USA</h2></div>
+      <div class="macro-grid" id="macro-grid"></div>
+    </section>
+  </div>
+
+  <!-- PORTAFOGLIO -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Portafoglio &amp; Dati Tecnici</h2>
+      <span class="muted" id="fx-note"></span>
+    </div>
+    <div class="table-wrap">
+      <table id="ptf-table">
+        <thead>
+          <tr>
+            <th class="sticky-col">Titolo</th>
+            <th class="num">Qtà</th>
+            <th class="num">PMC</th>
+            <th class="num">Prezzo</th>
+            <th class="num">Oggi</th>
+            <th class="num">Valore</th>
+            <th class="num">Guadagno</th>
+            <th class="num">Guad. %</th>
+            <th class="num">P/E</th>
+            <th class="num">Max storico</th>
+            <th class="num">Supporto</th>
+            <th class="num">Resistenza</th>
+            <th class="num">RSI 14</th>
+            <th class="num">Vol / media</th>
+            <th>Segnale</th>
+            <th>30 gg</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- NEWS -->
+  <section class="card">
+    <div class="card-head">
+      <h2>News</h2>
+      <div class="news-filters" id="news-filters">
+        <button class="chip chip-active" data-filter="all">Tutte</button>
+        <button class="chip" data-filter="portfolio">Portafoglio</button>
+      </div>
+    </div>
+    <ul class="news-list" id="news-list"></ul>
+  </section>
+
+  <footer>
+    Dati: Yahoo Finance · CNN Fear &amp; Greed · FRED · DBnomics · Borsa Italiana · RSS (CNBC, Bloomberg, Yahoo, Investing, Google News).
+    Aggiornamento automatico ogni ~20 min in orario di mercato via GitHub Actions. Non è consulenza finanziaria.
+  </footer>
+</main>
+
+<!-- Modal prompt AI -->
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h3>🤖 Prompt per Claude</h3>
+      <button class="btn btn-ghost" id="modal-close">✕</button>
+    </div>
+    <p class="muted">Prompt copiato negli appunti — incollalo in una chat di Claude per l'analisi AI del portafoglio.</p>
+    <textarea id="prompt-text" readonly></textarea>
+    <div class="modal-foot">
+      <button class="btn btn-primary" id="btn-copy">📋 Copia di nuovo</button>
+      <a class="btn btn-ghost" href="https://claude.ai/new" target="_blank" rel="noopener">Apri Claude ↗</a>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js?v=3"></script>
+</body>
+</html>
