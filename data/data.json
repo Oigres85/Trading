@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-12T21:31:15Z",
+ "updated_at": "2026-06-12T23:03:31Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 313378.66,
@@ -1855,8 +1855,8 @@
    {
     "key": "BTC-USD",
     "label": "Bitcoin",
-    "value": "$63,504",
-    "change_pct": -0.09,
+    "value": "$63,424",
+    "change_pct": -0.21,
     "suffix": "%"
    },
    {
@@ -1934,7 +1934,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 49
+     "score": 48
     },
     {
      "label": "Treasury 10A",
@@ -1948,6 +1948,33 @@
   }
  },
  "news": [
+  {
+   "source": "Google News",
+   "title": "NVIDIA Blackwell Leads on First Agentic AI Infrastructure Benchmark - NVIDIA Blog",
+   "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNTzlCUENpZ0ZzMVFZSDV1NnlMSVlSZ2ZHOFR3YmRtWWk0cl9XS0dmV0toTFdESmNEa2JFQUNuS0o0Y3lZNnM2OE5zM1hhNElTWW9zMWxWSmJGUmdETjZGSFZ5NVV6NGMzMWQ5a2pXUGtqQjktZmJ3WDhqb1FmcW9YN3RjTQ?oc=5",
+   "published": "2026-06-12T21:22:30Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
+   "source": "Google News",
+   "title": "NVIDIA Achieves Leading Agentic Coding Performance on First Agentic AI Benchmark | NVIDIA Technical Blog - NVIDIA Developer",
+   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOVmRyeDI4RWZPamRkOFZFejNSaHpZM2RRWmZGem5jeWp1YlRJclhuOE9Oa3VKZms3SGN0LXZJVWVldktxU1NyQmFXc3BHQjlGVUpfVEo1S2owc25oX0NWUEFPdFRIaUx1dkF5TjdjRVJVR0x1dXJQbUtEdlg1cnJOTHJGZF9KS2hnQzFuQ3B3MU1BdWdKbWdoUVJWUUdkUURkWFR3czI3blU0aVltelNjNmhIamRvQQ?oc=5",
+   "published": "2026-06-12T21:14:20Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
+   "source": "Google News",
+   "title": "Why Goldman Is Cautious on Micron Stock Ahead of Earnings - Barron's",
+   "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQMDMtcmE5RkdOSlpnQ2QxbXd0UzhDLUR2M2RuT3pxb0xya3dwckIxcUE1RXJPZmpZN3Rjc0p6TXNFTXhlSVlma2pEb0lFYjRfX0JURTJJZkY1b2xPdWZ6akFjeDRNQm5JTVlnLW84bjNaREtENDJpTTZWeldhc1p4d1lZN0JMM3l1VXE3Yw?oc=5",
+   "published": "2026-06-12T20:49:00Z",
+   "tickers": [
+    "MU"
+   ]
+  },
   {
    "source": "Google News",
    "title": "How Nvidia Can Benefit From SpaceX Stock’s Performance - Barron's",
@@ -1968,11 +1995,11 @@
   },
   {
    "source": "Google News",
-   "title": "Tesla stock gains after SpaceX's historic debut - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxOT25zRFpGTUVYUFRSRk5sTUxXREtQTU91MVhPSDR0Sm9uOURaV0hFSHdNbENCNGZISkV6NmluZmNZOEdqUXRBeU50R0EwTV92TDRfTlNpNHg0cjBOeVNDTy1EU0YxSEU1TVVzOFl6cFBLUGNXckx2QzJrNTRJeGIxSWFuWlZSRXNrSDhLZUVWNkx4ckpYcUxoLTZDZ0JzM2tQSXVfQXF3?oc=5",
-   "published": "2026-06-12T20:18:23Z",
+   "title": "AMD Stock Upgraded To Buy On GPU Upside - Investor's Business Daily",
+   "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNWXNSdDF2VnlDbHJzYkVpNVdtOURpbmF4cWp3Z1VkNERSSjRyYVI5QkY0NHpJUzRlbDlFWHNWS212WlhreGktZElTWUFpWE5iMmJ4b0JWakQyMlhuUEVHLUY2bU5pT0NjeDhrNWxkcFFjaDJuOXZlZkFYNHlnRGZ5VHlDaFdUQ3R6X3c?oc=5",
+   "published": "2026-06-12T20:20:00Z",
    "tickers": [
-    "TSLA"
+    "AMD"
    ]
   },
   {
@@ -1980,15 +2007,6 @@
    "title": "Is it too late to buy SpaceX’s stock? Here’s how Tesla’s did after one day — and five years. - MarketWatch",
    "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQWWR5OHlLWk1UeHJWbVIxejdrc1piNFZmbU12ZnA3MWhoUzdKNFFHci1nRHpIaXpoVUJNYm45aFd4b0drRm4wVllGMzVMeVVGeEJkNjh6QklLRWN6UE1BOW94ejgwYXQ0QTFFRjR6Q0lLaHhpd0NhcXhwSFoybVM5dTFwcjFvUUhuQkxadDhwSU9laTY2Z3V1RHp5UWdxUHpSb243bU5hMlJmTmVpUEhlcFBRV2V0V0NTZ1BnSGtVdTY4U3ZXRUVN?oc=5",
    "published": "2026-06-12T20:06:00Z",
-   "tickers": [
-    "TSLA"
-   ]
-  },
-  {
-   "source": "Bloomberg",
-   "title": "Musk Aiming For 'Holy Grail of Space Flight' in Reusability, Says Loren Grush",
-   "link": "https://www.bloomberg.com/news/videos/2026-06-12/musk-aiming-for-holy-grail-of-space-flight-grush-video",
-   "published": "2026-06-12T20:01:17Z",
    "tickers": [
     "TSLA"
    ]
@@ -2078,16 +2096,6 @@
   },
   {
    "source": "Google News",
-   "title": "Nvidia vs AMD: The Better AI Stock Is A Better Buy This June - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNVG92aklMUkoyUThISTRyTUNjVzdqTDEtOTFhZVptdXpwZE5UVjJ5NnRSbDRkOFM0VzRHajZoRXdxaFRKZGxidTllcWZvYjBkYXJRcGdXVVFwM1l6RGU3bkIweDBHMnFyUUlaZjR1MXdYc0VlRkRnSnVwaDNqSVp0MEtNX0JJRVYtUkxJeFRiU1dEZw?oc=5",
-   "published": "2026-06-12T16:53:02Z",
-   "tickers": [
-    "NVDA",
-    "AMD"
-   ]
-  },
-  {
-   "source": "Google News",
    "title": "Abridge partners with Eli Lilly, Nvidia as AI scribe eyes expansion - Healthcare Dive",
    "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOQlBpbWZwU0RLSmZ5N1J2NGRvU3pudG9VNmdmejJqYzlLT0xfcTllQTBkT2ZiSERUQmU4X2YzOWhqRGlkQ0ZTYVhVcTdFQkVxQm55LUM3NjBfX2liblA5Vm9rMUlTYWo5OTBXd1J3Nk9mSlQxOWQ1Rk5meWo3VkVfVU85NllUZHRjTWxLMzVoMlN5cF8tajFpdXRXaUgzMGdhcXZj?oc=5",
    "published": "2026-06-12T16:32:37Z",
@@ -2111,15 +2119,6 @@
    "published": "2026-06-12T16:25:18Z",
    "tickers": [
     "TSLA"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "Why Goldman Is Cautious on Micron Stock Ahead of Earnings - Barron's",
-   "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQMDMtcmE5RkdOSlpnQ2QxbXd0UzhDLUR2M2RuT3pxb0xya3dwckIxcUE1RXJPZmpZN3Rjc0p6TXNFTXhlSVlma2pEb0lFYjRfX0JURTJJZkY1b2xPdWZ6akFjeDRNQm5JTVlnLW84bjNaREtENDJpTTZWeldhc1p4d1lZN0JMM3l1VXE3Yw?oc=5",
-   "published": "2026-06-12T16:24:00Z",
-   "tickers": [
-    "MU"
    ]
   },
   {
@@ -2151,6 +2150,15 @@
   },
   {
    "source": "Google News",
+   "title": "Tested: The 2026 Tesla Model 3 Performance Is Affordable Speed - MotorTrend",
+   "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQRHBoYnZfRU5UbHhCbmVoUUpkcDhGQUJtOHBucGFrQjBucHRHME83MlVYVFpBeW8ybEpmSEZtWl9McUZ2U0xScVpTb29WWm5PeVp1OUgwc1FyVnd1NnNwbDNVNHVZZndQdHItVERzMGhsZXk3OENIak1KMzlnU3d2WnBn?oc=5",
+   "published": "2026-06-12T15:39:51Z",
+   "tickers": [
+    "TSLA"
+   ]
+  },
+  {
+   "source": "Google News",
    "title": "Gabbard rescinds Biden-era intel assessments that were skeptical about ‘Havana Syndrome’ - CNN",
    "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOQ1BCYUJJREhDZ3BEOVE2RHRtazVvWHBJV2lXeGVnZXUwSmZwUEhsaDBBWnFZcndVc29CSkVicHU4Q0hOTm85TmxGTjV4ejhMSUVkYnVVTlJhNUc3aWRJbU8tZXJXclZmd2gxeUoxcVdEYmFTR2lrbFMzdnNySFV2dXc1MTRJTGo4TlFUeHNCVlVyV2h0TS13SFpLMjRmZDFPSWgxNmVyX2VrVXVfdlRrQUowRHVnd3VCczZhV2ZzVURvSmJl?oc=5",
    "published": "2026-06-12T15:33:54Z",
@@ -2165,15 +2173,6 @@
    "published": "2026-06-12T15:33:01Z",
    "tickers": [
     "OKLO"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "Here’s Our AMD Price Target as Top-Ranked Analyst Upgrades Stock - TheStreet Pro",
-   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQd3FwbldHZFU0c3FWM3N1UEpSOHJDendFbEJXaC1RRnBSTVR5dTNNR1dHSGZfOGozdjYxakVLTFZicGJqb092M1hZZjVsSnRrLWJyVExwcEdtMmpIRWVpYUloV2hsbExOSjFuWUdUajJicENpaEVPMUJsT3BqMFdPQjQ2MktYWEJxZEVjWFQ5TVFnR0Z6WTZSNF8tY2F6SFVnQUFJ?oc=5",
-   "published": "2026-06-12T15:15:00Z",
-   "tickers": [
-    "AMD"
    ]
   },
   {
@@ -2196,6 +2195,15 @@
   },
   {
    "source": "Google News",
+   "title": "Jim Cramer on NVIDIA: “It Is Being Slaughtered Like Everything Else” - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQQmxCSndwQllDLXlBc1IzdXFMc1RacENQTUk5djYtQnVwNlpEUlI1bEdoTTNHUHJqSzhBX2JZVlpHc21mNGkxclNadzdNeDZNTWdqRE9NY2hIT0xLOS05Ri00UlNTbnpZV2YyTUNPNlI2M1p0QXY3WUo3b0VuVHVHeWlyZGlZZEYtWkJuWFplcEhnMGthbVpoVXdicVR4OHVBQ0E?oc=5",
+   "published": "2026-06-12T14:45:09Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
+   "source": "Google News",
    "title": "Rigetti Computing Stock (RGTI) Opinions on Quantum Computing Momentum - Quiver Quantitative",
    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQV2VfUEx5ZHg3RVpCMEliRlVvOGtZbGlHMG5EQTFGdU5ncVgzb29aM3JxNFlJbGRKbEJ3SnRCMThKNjM3OFdkNTNuY1FoRndpTEdwOEVEeUVBTVZtWTNlNnpEY2RKREx3NFE4U0pSR0YtRFpHbURGR3ItdnU1dDZWS0NNXzdBR25EY1VOWWxISmpWSFhDRlhKMWlOa05BVGE3X3p1MXlBM284dw?oc=5",
    "published": "2026-06-12T14:04:00Z",
@@ -2205,11 +2213,11 @@
   },
   {
    "source": "Google News",
-   "title": "AMD Stock Upgraded To Buy On GPU Upside - Investor's Business Daily",
-   "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNWXNSdDF2VnlDbHJzYkVpNVdtOURpbmF4cWp3Z1VkNERSSjRyYVI5QkY0NHpJUzRlbDlFWHNWS212WlhreGktZElTWUFpWE5iMmJ4b0JWakQyMlhuUEVHLUY2bU5pT0NjeDhrNWxkcFFjaDJuOXZlZkFYNHlnRGZ5VHlDaFdUQ3R6X3c?oc=5",
-   "published": "2026-06-12T13:17:00Z",
+   "title": "This AI Stock Is Australia’s Answer to CoreWeave. It Just Notched a Deal With Nvidia. - Barron's",
+   "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5PVmNqVXJSVXE2aGp4aEF3ZlAyMVpuTkFBZHZoUEVHalBGSGpKaU1zSUVFR08xcGhkbnZuRlVqREx1VHF6TjkzUFlCZjJVVXdvNDNUeUpreGlXSlh5LTVMc2V0TXhiV01SZllUcm9xdWx5aGxT?oc=5",
+   "published": "2026-06-12T13:58:00Z",
    "tickers": [
-    "AMD"
+    "NVDA"
    ]
   },
   {
@@ -2300,15 +2308,6 @@
    "published": "2026-06-11T15:10:00Z",
    "tickers": [
     "RGTI"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "U.S. Department of Energy Approves Preliminary Documented Safety Analysis for Aurora Powerhouse at Idaho National Laboratory - Oklo Inc.",
-   "link": "https://news.google.com/rss/articles/CBMijgJBVV95cUxPNURJWGlMb1N6YjFYMkxhSFlDeS1WRS1FNTZvblgtSUxURnNDMEJ4UEN3allkQ0k5bXlIZGlEODdjTzF1WDY3blpiQ2VrU0c5QmxWX3gtVHVOMlFYZzVHaHNCNE1mZlpTQjlsb2JMMlhObHQ5SmV5ODlJMkU4N1gwS3B6RndLVDBkOXY3eGM5VXFYbExKQmdWeWVtbzVuQXBodmRURDAzYXR6MXJkWHF5aXE2dHBWT3k5dWhCcndxOF94blFUajdiaWwzUHB3NlRYYXlUR2FKWWxWeVlXWnU0NGdkMWcyODd1WElZTk9oLVdzai1rSmRCdWVGWDlLS2NzVnJ6VlEwMkt2cUJtVEE?oc=5",
-   "published": "2026-06-11T14:13:46Z",
-   "tickers": [
-    "OKLO"
    ]
   }
  ]
