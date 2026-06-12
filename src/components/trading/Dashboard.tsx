@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import type { MarketDataResponse, NewsResponse } from '@/types/trading'
+import { fetchMarketData, fetchNews } from '@/lib/marketFetch'
 import { MarketStatusBar } from './MarketStatusBar'
 import { IndexCards } from './IndexCards'
 import { WatchlistTable } from './WatchlistTable'
@@ -16,30 +17,20 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [newsLoading, setNewsLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  const fetchMarket = useCallback(async () => {
+  const loadMarket = useCallback(async () => {
     try {
-      const res = await fetch('/api/market-data', { cache: 'no-store' })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data: MarketDataResponse = await res.json()
+      const data = await fetchMarketData()
       setMarket(data)
-      setError(null)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load market data')
-    } finally {
+    } catch { /* fallback already handled inside fetchMarketData */ } finally {
       setLoading(false)
     }
   }, [])
 
-  const fetchNews = useCallback(async () => {
+  const loadNews = useCallback(async () => {
     try {
-      const res = await fetch('/api/market-data/news', { cache: 'no-store' })
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data: NewsResponse = await res.json()
+      const data = await fetchNews()
       setNews(data)
-    } catch {
-      // news failure is non-critical
     } finally {
       setNewsLoading(false)
     }
@@ -47,55 +38,23 @@ export function Dashboard() {
 
   const refresh = useCallback(async () => {
     setRefreshing(true)
-    await Promise.all([fetchMarket(), fetchNews()])
+    await Promise.all([loadMarket(), loadNews()])
     setRefreshing(false)
-  }, [fetchMarket, fetchNews])
+  }, [loadMarket, loadNews])
 
-  // Initial load
-  useEffect(() => {
-    fetchMarket()
-    fetchNews()
-  }, [fetchMarket, fetchNews])
+  useEffect(() => { loadMarket(); loadNews() }, [loadMarket, loadNews])
 
-  // Polling
   useEffect(() => {
-    const id = setInterval(() => {
-      fetchMarket()
-    }, REFRESH_INTERVAL)
+    const id = setInterval(loadMarket, REFRESH_INTERVAL)
     return () => clearInterval(id)
-  }, [fetchMarket])
+  }, [loadMarket])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-[#0a0e1a]">
         <div className="text-center">
-          <div className="text-3xl text-[#3b7dd8] font-bold tracking-widest mb-2">TECH/SEMI</div>
+          <div className="text-3xl font-bold tracking-widest text-[#3b7dd8] mb-2">TECH/SEMI</div>
           <div className="text-xs text-[#4a5a7a] tracking-widest">LOADING MARKET DATA…</div>
-          <div className="mt-4 flex justify-center gap-1">
-            {[0, 1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="w-1 h-4 bg-[#3b7dd8] rounded-full opacity-0 animate-[pulse_1.2s_ease-in-out_infinite]"
-                style={{ animationDelay: `${i * 0.15}s` }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error && !market) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[#0a0e1a]">
-        <div className="text-center">
-          <div className="text-[#ff4d4d] text-sm mb-2">⚠ {error}</div>
-          <button
-            onClick={fetchMarket}
-            className="text-xs text-[#3b7dd8] hover:text-blue-300 underline"
-          >
-            Retry
-          </button>
         </div>
       </div>
     )
@@ -105,7 +64,6 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col h-screen bg-[#0a0e1a] overflow-hidden">
-      {/* Top status bar */}
       <MarketStatusBar
         status={market.marketStatus}
         lastUpdated={market.lastUpdated}
@@ -113,11 +71,7 @@ export function Dashboard() {
         onRefresh={refresh}
         refreshing={refreshing}
       />
-
-      {/* Index cards row */}
       <IndexCards indices={market.indices} />
-
-      {/* Main content: watchlist + news */}
       <div className="flex flex-1 overflow-hidden">
         <div className="flex flex-col flex-1 overflow-hidden">
           <WatchlistTable stocks={market.stocks} />
