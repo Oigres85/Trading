@@ -162,37 +162,71 @@ export async function fetchMarketData(): Promise<MarketDataResponse> {
 // ─── News ─────────────────────────────────────────────────────────────────────
 
 const FALLBACK_NEWS: NewsItem[] = [
-  { id:'f1', title:'NVIDIA Reports Record Data Center Revenue as AI Chip Demand Accelerates', url:'https://finance.yahoo.com', source:'Yahoo Finance', publishedAt: new Date(Date.now()-2*3600000).toISOString() },
-  { id:'f2', title:'TSMC Raises Capex Guidance as Advanced Node Orders Surge',                url:'https://finance.yahoo.com', source:'Reuters',       publishedAt: new Date(Date.now()-4*3600000).toISOString() },
-  { id:'f3', title:'ASML Receives Record EUV Tool Orders from Asian Foundries',               url:'https://finance.yahoo.com', source:'Bloomberg',     publishedAt: new Date(Date.now()-6*3600000).toISOString() },
-  { id:'f4', title:'AMD Expands AI Accelerator Lineup with Next-Gen Instinct MI350 Series',   url:'https://finance.yahoo.com', source:'The Verge',     publishedAt: new Date(Date.now()-8*3600000).toISOString() },
-  { id:'f5', title:'Micron Technology Prices 12-Month NAND Flash Contracts at Premium',       url:'https://finance.yahoo.com', source:'DigiTimes',     publishedAt: new Date(Date.now()-10*3600000).toISOString() },
-  { id:'f6', title:'Broadcom Custom ASIC Revenue Poised to Surpass $15B as Hyperscalers Diversify', url:'https://finance.yahoo.com', source:"Barron's", publishedAt: new Date(Date.now()-12*3600000).toISOString() },
-  { id:'f7', title:'Philadelphia Semiconductor Index (SOX) Outperforms Broader Market YTD',   url:'https://finance.yahoo.com', source:'MarketWatch',  publishedAt: new Date(Date.now()-14*3600000).toISOString() },
-  { id:'f8', title:'Arm Holdings Gains Share in Data Center CPU Market with Neoverse Platform',url:'https://finance.yahoo.com', source:'Seeking Alpha',publishedAt: new Date(Date.now()-18*3600000).toISOString() },
+  { id:'f1', title:'NVIDIA registra ricavi record nel data center con la domanda di chip AI in accelerazione', url:'https://it.finance.yahoo.com', source:'Il Sole 24 Ore', publishedAt: new Date(Date.now()-2*3600000).toISOString() },
+  { id:'f2', title:'TSMC alza le stime di capex: ordini per nodi avanzati in forte crescita',                  url:'https://it.finance.yahoo.com', source:'MilanoFinanza',  publishedAt: new Date(Date.now()-4*3600000).toISOString() },
+  { id:'f3', title:'ASML: ordini record per strumenti EUV dai produttori asiatici di chip',                   url:'https://it.finance.yahoo.com', source:'Corriere Economia', publishedAt: new Date(Date.now()-6*3600000).toISOString() },
+  { id:'f4', title:'AMD espande la linea AI Accelerator con la nuova serie Instinct MI350',                    url:'https://it.finance.yahoo.com', source:'Il Sole 24 Ore', publishedAt: new Date(Date.now()-8*3600000).toISOString() },
+  { id:'f5', title:'Micron Technology: contratti NAND flash a 12 mesi a prezzi premium',                      url:'https://it.finance.yahoo.com', source:'Reuters Italia',  publishedAt: new Date(Date.now()-10*3600000).toISOString() },
+  { id:'f6', title:'Broadcom: ricavi ASIC personalizzati verso i 15 miliardi con la diversificazione hyperscaler', url:'https://it.finance.yahoo.com', source:'Bloomberg IT', publishedAt: new Date(Date.now()-12*3600000).toISOString() },
+  { id:'f7', title:'Indice SOX dei semiconduttori supera il mercato più ampio da inizio anno',                 url:'https://it.finance.yahoo.com', source:'MilanoFinanza',  publishedAt: new Date(Date.now()-14*3600000).toISOString() },
+  { id:'f8', title:'Arm Holdings guadagna quote nel mercato CPU data center con la piattaforma Neoverse',     url:'https://it.finance.yahoo.com', source:'Il Sole 24 Ore', publishedAt: new Date(Date.now()-18*3600000).toISOString() },
+  { id:'f9', title:'Intelligenza artificiale: i chip grafici NVIDIA trainano la crescita del settore tech',    url:'https://it.finance.yahoo.com', source:'Corriere Economia', publishedAt: new Date(Date.now()-22*3600000).toISOString() },
+  { id:'f10',title:'Semiconduttori: l\'indice SOXX segna nuovi massimi, AMAT e LRCX in primo piano',          url:'https://it.finance.yahoo.com', source:'Il Sole 24 Ore', publishedAt: new Date(Date.now()-26*3600000).toISOString() },
 ]
 
+// Feed RSS italiani in ordine di priorità
+const ITALIAN_FEEDS = [
+  { url: 'https://www.ilsole24ore.com/rss/finanza.xml',         source: 'Il Sole 24 Ore' },
+  { url: 'https://xml2.corriere.it/rss/economia.xml',           source: 'Corriere Economia' },
+  { url: 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=NVDA,AMD,INTC,AVGO,TSM,ASML,MU,QCOM,AMAT&region=IT&lang=it-IT', source: 'Yahoo Finance IT' },
+  { url: 'https://www.borsaitaliana.it/borsa/notizie/wire/rss.xml', source: 'Borsa Italiana' },
+]
+
+function mapRssItem(item: Record<string, unknown>, source: string, i: number): NewsItem {
+  return {
+    id:          String(item.guid ?? item.link ?? i),
+    title:       String(item.title ?? '').replace(/<[^>]+>/g, '').trim(),
+    summary:     item.description
+                   ? String(item.description).replace(/<[^>]+>/g, '').trim().slice(0, 200) || undefined
+                   : undefined,
+    url:         String(item.link ?? ''),
+    source,
+    publishedAt: String(item.pubDate ?? item.isoDate ?? new Date().toISOString()),
+  }
+}
+
 export async function fetchNews(): Promise<NewsResponse> {
-  const feedUrl = 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=NVDA,AMD,INTC,AVGO,TSM,ASML,MU,QCOM,AMAT&region=US&lang=en-US'
-  const apiUrl  = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}&count=40`
+  const items: NewsItem[] = []
 
-  try {
-    const res = await fetch(apiUrl, { signal: AbortSignal.timeout(8000) })
-    if (!res.ok) throw new Error('rss2json error')
-    const data = await res.json()
-    if (data.status !== 'ok' || !Array.isArray(data.items)) throw new Error('bad response')
+  for (const feed of ITALIAN_FEEDS) {
+    try {
+      const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}&count=20`
+      const res = await fetch(apiUrl, { signal: AbortSignal.timeout(8000) })
+      if (!res.ok) continue
+      const data = await res.json()
+      if (data.status !== 'ok' || !Array.isArray(data.items)) continue
 
-    const items: NewsItem[] = data.items.map((item: Record<string, unknown>, i: number) => ({
-      id:          String(item.guid ?? item.link ?? i),
-      title:       String(item.title ?? ''),
-      summary:     item.description ? String(item.description).replace(/<[^>]+>/g, '').trim() : undefined,
-      url:         String(item.link ?? ''),
-      source:      String(item.author ?? 'Yahoo Finance'),
-      publishedAt: String(item.pubDate ?? new Date().toISOString()),
-    })).filter((n: NewsItem) => n.title && n.url)
+      const mapped = (data.items as Record<string, unknown>[])
+        .map((item, i) => mapRssItem(item, feed.source, i))
+        .filter(n => n.title && n.url)
 
-    return { items, lastUpdated: new Date().toISOString() }
-  } catch {
+      items.push(...mapped)
+    } catch { /* prova il feed successivo */ }
+  }
+
+  if (items.length === 0) {
     return { items: FALLBACK_NEWS, lastUpdated: new Date().toISOString() }
   }
+
+  // Ordina per data desc e deduplica
+  items.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+  const seen = new Set<string>()
+  const deduped = items.filter(item => {
+    const key = item.title.slice(0, 60).toLowerCase()
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  }).slice(0, 40)
+
+  return { items: deduped, lastUpdated: new Date().toISOString() }
 }
