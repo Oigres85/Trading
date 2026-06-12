@@ -11,6 +11,7 @@ Fonti (tutte gratuite):
 """
 import json
 import math
+import os
 import re
 import sys
 import time
@@ -190,6 +191,21 @@ def fetch_btp():
 
 
 def fred_series(series_id, n=14):
+    # con FRED_API_KEY (gratuita, https://fred.stlouisfed.org/docs/api/api_key.html)
+    # usa l'API ufficiale, molto più affidabile del csv pubblico
+    key = os.environ.get("FRED_API_KEY")
+    if key:
+        r = http_get("https://api.stlouisfed.org/fred/series/observations"
+                     f"?series_id={series_id}&api_key={key}&file_type=json"
+                     f"&sort_order=desc&limit={n + 4}")
+        obs = r.json()["observations"]
+        out = []
+        for o in reversed(obs):
+            try:
+                out.append((o["date"], float(o["value"])))
+            except ValueError:
+                continue
+        return out[-n:]
     r = http_get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}")
     out = []
     for line in r.text.strip().splitlines()[1:]:

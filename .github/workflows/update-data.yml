@@ -32,6 +32,8 @@ jobs:
       - run: pip install -r scripts/requirements.txt
 
       - run: python scripts/update_data.py
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
 
       - name: Commit dati aggiornati
         run: |

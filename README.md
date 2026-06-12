@@ -26,6 +26,10 @@ Dashboard del portafoglio con dati tecnici, indicatori macro e news, pubblicata 
 - **🤖 Prompt AI** — genera e copia un prompt con il riepilogo completo dei dati da incollare in Claude per l'analisi
 - **🧮 Calc. PMC** — link al [calcolatore prezzo medio](https://fical.net/it/calcolatore-prezzo-medio)
 
+## FRED API key (consigliato)
+
+Il csv pubblico di FRED a volte blocca le richieste. Con una chiave gratuita (https://fred.stlouisfed.org/docs/api/api_key.html) salvata come secret `FRED_API_KEY` del repo (Settings → Secrets and variables → Actions), la pipeline usa l'API ufficiale e tutti gli indicatori (incluse vendite al dettaglio e fiducia consumatori) diventano affidabili.
+
 ## Modificare il portafoglio
 
 Le posizioni sono in `scripts/update_data.py` (lista `PORTFOLIO` e dict `BTP`). Dopo la modifica, lanciare il workflow *Aggiorna dati dashboard* da Actions o attendere il prossimo run.
