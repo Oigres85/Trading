@@ -33,19 +33,19 @@ export function WatchlistPanel({ quotes, selectedSymbol, onSelect, onWatchlistCh
     return DEFAULT_WATCHLIST
   })
 
-  const [adding, setAdding]       = useState(false)
-  const [inputVal, setInputVal]   = useState('')
+  const [adding, setAdding]         = useState(false)
+  const [inputVal, setInputVal]     = useState('')
   const [hoveredSym, setHoveredSym] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Persist watchlist to localStorage whenever it changes
+  // Persist to localStorage whenever watchlist changes
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(watchlist))
     } catch { /* ignore */ }
   }, [watchlist])
 
-  // Focus input when adding mode starts
+  // Focus input when add mode starts
   useEffect(() => {
     if (adding) inputRef.current?.focus()
   }, [adding])
@@ -102,7 +102,9 @@ export function WatchlistPanel({ quotes, selectedSymbol, onSelect, onWatchlistCh
               className={`
                 relative flex items-center px-3 py-2 cursor-pointer select-none
                 hover:bg-[#0f1629] transition-colors
-                ${isSelected ? 'bg-[#0f1629] border-l-2 border-[#3b7dd8]' : 'border-l-2 border-transparent'}
+                ${isSelected
+                  ? 'bg-[#0f1629] border-l-2 border-[#3b7dd8]'
+                  : 'border-l-2 border-transparent'}
               `}
             >
               <div className="flex-1 min-w-0">

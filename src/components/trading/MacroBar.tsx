@@ -21,11 +21,11 @@ function sign(v: number): string {
 
 export function MacroBar({ indices }: Props) {
   return (
-    <div className="bg-[#0f1629] border-b border-[#1e2d4a] overflow-x-auto">
+    <div className="bg-[#0f1629] border-b border-[#1e2d4a] overflow-x-auto shrink-0">
       <div className="flex items-stretch min-w-max px-3 py-0">
         {indices.map((idx, i) => {
-          const isPos = idx.changePercent >= 0
-          const nickname = NICKNAME_MAP[idx.symbol] ?? idx.symbol
+          const isPos     = idx.changePercent >= 0
+          const nickname  = NICKNAME_MAP[idx.symbol] ?? idx.symbol
 
           return (
             <div key={idx.symbol} className="flex items-center">
