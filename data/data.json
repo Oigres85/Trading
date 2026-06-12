@@ -1,29 +1,29 @@
 {
- "updated_at": "2026-06-12T17:04:56Z",
+ "updated_at": "2026-06-12T17:21:41Z",
  "eurusd": 1.1578,
  "totals": {
-  "usd_value": 315220.35,
-  "usd_gain": 180818.89,
-  "usd_gain_pct": 134.54,
-  "eur_value": 313490.0,
-  "eur_gain": 157407.47,
-  "eur_gain_pct": 100.85
+  "usd_value": 316417.36,
+  "usd_gain": 182015.9,
+  "usd_gain_pct": 135.43,
+  "eur_value": 314523.86,
+  "eur_gain": 158441.32,
+  "eur_gain_pct": 101.51
  },
  "portfolio": [
   {
    "ticker": "NVDA",
    "name": "NVIDIA",
    "currency": "USD",
-   "price": 204.81,
-   "change_pct": -0.03,
-   "pe": 31.3,
+   "price": 205.2,
+   "change_pct": 0.16,
+   "pe": 31.4,
    "ath": 236.26,
-   "ath_dist_pct": -13.3,
+   "ath_dist_pct": -13.1,
    "support": 199.34,
    "resistance": 232.01,
-   "rsi": 45.1,
-   "volume": 60725851,
-   "vol_ratio": 0.37,
+   "rsi": 45.4,
+   "volume": 63626288,
+   "vol_ratio": 0.38,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -57,7 +57,7 @@
      208.19,
      200.42,
      204.87,
-     204.81
+     205.2
     ],
     "y1": [
      144.81,
@@ -133,7 +133,8 @@
      205.07,
      205.08,
      204.57,
-     204.79
+     204.82,
+     205.21
     ]
    },
    "earnings_date": "2026-08-26",
@@ -141,29 +142,29 @@
     "key": "strong_buy",
     "n": 59,
     "target": 298.93,
-    "upside_pct": 46.0
+    "upside_pct": 45.7
    },
    "health": 54,
    "qty": 270,
    "pmc": 87.17,
-   "value": 55298.7,
-   "gain": 31762.8,
-   "gain_pct": 134.95
+   "value": 55404.0,
+   "gain": 31868.1,
+   "gain_pct": 135.4
   },
   {
    "ticker": "AMD",
    "name": "AMD",
    "currency": "USD",
-   "price": 513.34,
-   "change_pct": 5.1,
-   "pe": 172.3,
+   "price": 517.08,
+   "change_pct": 5.86,
+   "pe": 173.5,
    "ath": 546.44,
-   "ath_dist_pct": -6.1,
+   "ath_dist_pct": -5.4,
    "support": 393.36,
    "resistance": 546.44,
-   "rsi": 60.7,
-   "volume": 18419293,
-   "vol_ratio": 0.5,
+   "rsi": 61.2,
+   "volume": 19389897,
+   "vol_ratio": 0.53,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -197,7 +198,7 @@
      475.51,
      452.4,
      488.45,
-     513.34
+     517.08
     ],
     "y1": [
      118.5,
@@ -273,7 +274,8 @@
      512.23,
      513.5,
      510.72,
-     513.4
+     513.24,
+     516.0
     ]
    },
    "earnings_date": "2026-08-04",
@@ -281,29 +283,29 @@
     "key": "strong_buy",
     "n": 48,
     "target": 483.94,
-    "upside_pct": -5.7
+    "upside_pct": -6.4
    },
    "health": 87,
    "qty": 125,
    "pmc": 153.92,
-   "value": 64167.5,
-   "gain": 44927.5,
-   "gain_pct": 233.51
+   "value": 64635.0,
+   "gain": 45395.0,
+   "gain_pct": 235.94
   },
   {
    "ticker": "MU",
    "name": "Micron",
    "currency": "USD",
-   "price": 999.66,
-   "change_pct": 0.38,
-   "pe": 47.1,
+   "price": 1001.6,
+   "change_pct": 0.58,
+   "pe": 47.2,
    "ath": 1089.29,
-   "ath_dist_pct": -8.2,
+   "ath_dist_pct": -8.1,
    "support": 652.21,
    "resistance": 1089.29,
-   "rsi": 62.3,
-   "volume": 28333976,
-   "vol_ratio": 0.51,
+   "rsi": 62.4,
+   "volume": 29334584,
+   "vol_ratio": 0.53,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -337,7 +339,7 @@
      935.89,
      891.88,
      995.87,
-     999.66
+     1001.6
     ],
     "y1": [
      115.9,
@@ -413,7 +415,8 @@
      989.73,
      994.58,
      992.63,
-     999.66
+     998.86,
+     998.69
     ]
    },
    "earnings_date": "2026-06-24",
@@ -421,29 +424,29 @@
     "key": "strong_buy",
     "n": 40,
     "target": 828.73,
-    "upside_pct": -17.1
+    "upside_pct": -17.3
    },
    "health": 87,
    "qty": 90,
    "pmc": 87.63,
-   "value": 89969.4,
-   "gain": 82082.7,
-   "gain_pct": 1040.77
+   "value": 90144.0,
+   "gain": 82257.3,
+   "gain_pct": 1042.99
   },
   {
    "ticker": "INTC",
    "name": "Intel",
    "currency": "USD",
-   "price": 125.07,
-   "change_pct": 6.93,
-   "pe": 81.2,
+   "price": 125.42,
+   "change_pct": 7.23,
+   "pe": 81.3,
    "ath": 132.75,
-   "ath_dist_pct": -5.8,
+   "ath_dist_pct": -5.5,
    "support": 98.33,
    "resistance": 126.64,
-   "rsi": 62.7,
-   "volume": 88882551,
-   "vol_ratio": 0.65,
+   "rsi": 62.9,
+   "volume": 92695496,
+   "vol_ratio": 0.68,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -477,7 +480,7 @@
      107.92,
      107.04,
      116.96,
-     125.07
+     125.42
     ],
     "y1": [
      20.77,
@@ -553,7 +556,8 @@
      123.85,
      124.79,
      124.69,
-     125.17
+     125.14,
+     125.28
     ]
    },
    "earnings_date": "2026-07-23",
@@ -561,29 +565,29 @@
     "key": "hold",
     "n": 41,
     "target": 93.12,
-    "upside_pct": -25.5
+    "upside_pct": -25.8
    },
    "health": 88,
    "qty": 380,
    "pmc": 25.75,
-   "value": 47526.6,
-   "gain": 37741.6,
-   "gain_pct": 385.71
+   "value": 47659.6,
+   "gain": 37874.6,
+   "gain_pct": 387.07
   },
   {
    "ticker": "TSLA",
    "name": "Tesla",
    "currency": "USD",
-   "price": 398.54,
-   "change_pct": -0.15,
-   "pe": 369.0,
+   "price": 404.28,
+   "change_pct": 1.29,
+   "pe": 374.2,
    "ath": 498.83,
-   "ath_dist_pct": -20.1,
+   "ath_dist_pct": -19.0,
    "support": 380.15,
    "resistance": 445.6,
-   "rsi": 46.1,
-   "volume": 35480147,
-   "vol_ratio": 0.7,
+   "rsi": 48.1,
+   "volume": 38842008,
+   "vol_ratio": 0.77,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -617,7 +621,7 @@
      396.68,
      381.59,
      399.15,
-     398.54
+     404.28
     ],
     "y1": [
      319.11,
@@ -693,7 +697,8 @@
      392.88,
      396.06,
      396.16,
-     398.58
+     398.43,
+     401.02
     ]
    },
    "earnings_date": "2026-07-22",
@@ -701,29 +706,29 @@
     "key": "buy",
     "n": 41,
     "target": 419.94,
-    "upside_pct": 5.4
+    "upside_pct": 3.9
    },
-   "health": 59,
+   "health": 62,
    "qty": 60,
    "pmc": 358.22,
-   "value": 23912.4,
-   "gain": 2419.2,
-   "gain_pct": 11.26
+   "value": 24256.8,
+   "gain": 2763.6,
+   "gain_pct": 12.86
   },
   {
    "ticker": "MSTR",
    "name": "Strategy",
    "currency": "USD",
-   "price": 125.3,
-   "change_pct": 4.29,
-   "pe": 28.1,
+   "price": 125.12,
+   "change_pct": 4.14,
+   "pe": 28.0,
    "ath": 543.0,
-   "ath_dist_pct": -76.9,
+   "ath_dist_pct": -77.0,
    "support": 113.27,
    "resistance": 182.23,
-   "rsi": 38.2,
-   "volume": 9994125,
-   "vol_ratio": 0.57,
+   "rsi": 38.1,
+   "volume": 10335169,
+   "vol_ratio": 0.59,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -757,7 +762,7 @@
      117.02,
      115.35,
      120.15,
-     125.3
+     125.12
     ],
     "y1": [
      379.76,
@@ -833,7 +838,8 @@
      124.33,
      124.39,
      125.0,
-     125.31
+     125.18,
+     125.35
     ]
    },
    "earnings_date": "2026-07-30",
@@ -841,29 +847,29 @@
     "key": "strong_buy",
     "n": 13,
     "target": 351.54,
-    "upside_pct": 180.6
+    "upside_pct": 180.9
    },
    "health": 19,
    "qty": 123,
    "pmc": 210.22,
-   "value": 15411.9,
-   "gain": -10445.16,
-   "gain_pct": -40.4
+   "value": 15389.76,
+   "gain": -10467.3,
+   "gain_pct": -40.48
   },
   {
    "ticker": "RGTI",
    "name": "Rigetti",
    "currency": "USD",
-   "price": 21.35,
-   "change_pct": 3.49,
+   "price": 21.36,
+   "change_pct": 3.54,
    "pe": null,
    "ath": 58.15,
    "ath_dist_pct": -63.3,
    "support": 15.46,
    "resistance": 28.06,
    "rsi": 50.4,
-   "volume": 23496920,
-   "vol_ratio": 0.45,
+   "volume": 24347256,
+   "vol_ratio": 0.47,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -897,7 +903,7 @@
      19.69,
      19.44,
      20.63,
-     21.35
+     21.36
     ],
     "y1": [
      12.1,
@@ -973,7 +979,8 @@
      21.31,
      21.51,
      21.33,
-     21.35
+     21.27,
+     21.33
     ]
    },
    "earnings_date": null,
@@ -981,29 +988,29 @@
     "key": "buy",
     "n": 12,
     "target": 29.24,
-    "upside_pct": 37.0
+    "upside_pct": 36.9
    },
    "health": 73,
    "qty": 515,
    "pmc": 27.3,
-   "value": 10995.25,
-   "gain": -3064.25,
-   "gain_pct": -21.79
+   "value": 11000.4,
+   "gain": -3059.1,
+   "gain_pct": -21.76
   },
   {
    "ticker": "OKLO",
    "name": "Oklo",
    "currency": "USD",
-   "price": 57.53,
-   "change_pct": -0.57,
+   "price": 57.44,
+   "change_pct": -0.72,
    "pe": null,
    "ath": 193.84,
-   "ath_dist_pct": -70.3,
+   "ath_dist_pct": -70.4,
    "support": 53.01,
    "resistance": 73.86,
-   "rsi": 43.0,
-   "volume": 4869323,
-   "vol_ratio": 0.35,
+   "rsi": 42.9,
+   "volume": 5091001,
+   "vol_ratio": 0.36,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -1037,7 +1044,7 @@
      56.48,
      54.02,
      57.86,
-     57.53
+     57.44
     ],
     "y1": [
      64.48,
@@ -1113,7 +1120,8 @@
      57.38,
      57.65,
      57.53,
-     57.53
+     57.5,
+     57.44
     ]
    },
    "earnings_date": "2026-08-10",
@@ -1121,29 +1129,29 @@
     "key": "buy",
     "n": 19,
     "target": 88.63,
-    "upside_pct": 54.1
+    "upside_pct": 54.3
    },
    "health": 21,
    "qty": 120,
    "pmc": 72.43,
-   "value": 6903.6,
-   "gain": -1788.0,
-   "gain_pct": -20.57
+   "value": 6892.8,
+   "gain": -1798.8,
+   "gain_pct": -20.7
   },
   {
    "ticker": "ARBE",
    "name": "Arbe Robotics",
    "currency": "USD",
    "price": 0.9,
-   "change_pct": -1.92,
+   "change_pct": -2.14,
    "pe": null,
    "ath": 17.27,
    "ath_dist_pct": -94.8,
    "support": 0.82,
    "resistance": 1.4,
-   "rsi": 45.4,
-   "volume": 670458,
-   "vol_ratio": 0.18,
+   "rsi": 45.3,
+   "volume": 691517,
+   "vol_ratio": 0.19,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -1253,6 +1261,7 @@
      0.89,
      0.9,
      0.89,
+     0.9,
      0.9
     ]
    },
@@ -1261,7 +1270,7 @@
     "key": "buy",
     "n": 2,
     "target": 2.5,
-    "upside_pct": 177.7
+    "upside_pct": 178.3
    },
    "health": 67,
    "qty": 1150,
@@ -1303,16 +1312,16 @@
    "ticker": "OKLO",
    "name": "Oklo Inc.",
    "currency": "USD",
-   "price": 57.53,
-   "change_pct": -0.57,
+   "price": 57.44,
+   "change_pct": -0.72,
    "pe": null,
    "ath": 193.84,
-   "ath_dist_pct": -70.3,
+   "ath_dist_pct": -70.4,
    "support": 53.01,
    "resistance": 73.86,
-   "rsi": 43.0,
-   "volume": 4869323,
-   "vol_ratio": 0.35,
+   "rsi": 42.9,
+   "volume": 5091001,
+   "vol_ratio": 0.36,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -1346,7 +1355,7 @@
      56.48,
      54.02,
      57.86,
-     57.53
+     57.44
     ],
     "y1": [
      64.48,
@@ -1422,7 +1431,8 @@
      57.38,
      57.65,
      57.53,
-     57.53
+     57.5,
+     57.44
     ]
    },
    "earnings_date": "2026-08-10",
@@ -1430,7 +1440,7 @@
     "key": "buy",
     "n": 19,
     "target": 88.63,
-    "upside_pct": 54.1
+    "upside_pct": 54.3
    },
    "health": 21
   },
@@ -1438,22 +1448,22 @@
    "ticker": "SPCX",
    "name": "Space Exploration Technol…",
    "currency": "USD",
-   "price": 169.93,
-   "change_pct": 25.87,
+   "price": 176.29,
+   "change_pct": 30.58,
    "pe": null,
-   "ath": 169.95,
-   "ath_dist_pct": -0.0,
+   "ath": 135.0,
+   "ath_dist_pct": 30.6,
    "support": 135.0,
-   "resistance": 169.95,
+   "resistance": 176.49,
    "rsi": null,
-   "volume": 277977880,
+   "volume": 316257169,
    "vol_ratio": 2.0,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
     "m1": [
      135.0,
-     169.93
+     176.29
     ],
     "y1": [
      135.0
@@ -1465,7 +1475,9 @@
      165.47,
      164.97,
      167.99,
-     168.74
+     168.74,
+     173.74,
+     176.29
     ]
    },
    "earnings_date": null,
@@ -1473,7 +1485,7 @@
     "key": "sell",
     "n": 3,
     "target": 139.33,
-    "upside_pct": -18.0
+    "upside_pct": -21.0
    },
    "health": 60
   },
@@ -1481,16 +1493,16 @@
    "ticker": "CBRS",
    "name": "Cerebras Systems Inc.",
    "currency": "USD",
-   "price": 214.52,
-   "change_pct": -5.31,
-   "pe": 498.9,
+   "price": 214.6,
+   "change_pct": -5.28,
+   "pe": 499.1,
    "ath": 386.34,
    "ath_dist_pct": -44.5,
    "support": 196.73,
    "resistance": 338.33,
    "rsi": 24.2,
-   "volume": 3171192,
-   "vol_ratio": 0.38,
+   "volume": 3292814,
+   "vol_ratio": 0.39,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -1515,14 +1527,14 @@
      226.82,
      237.33,
      226.55,
-     214.52
+     214.6
     ],
     "y1": [
      311.07,
      281.86,
      236.99,
      201.01,
-     214.52
+     214.6
     ],
     "d1": [
      223.32,
@@ -1545,7 +1557,8 @@
      212.63,
      213.48,
      214.96,
-     214.52
+     214.6,
+     214.46
     ]
    },
    "earnings_date": "2026-06-23",
@@ -1560,15 +1573,15 @@
  ],
  "macro": {
   "fear_greed": {
-   "score": 33,
+   "score": 34,
    "rating": "fear",
    "prev_close": 30,
    "week_ago": 42,
    "month_ago": 65
   },
   "vix": {
-   "value": 18.85,
-   "change_pct": -3.03,
+   "value": 18.67,
+   "change_pct": -3.96,
    "spark": [
     18.29,
     17.38,
@@ -1599,7 +1612,7 @@
     19.87,
     22.22,
     19.44,
-    18.85
+    18.67
    ]
   },
   "fedwatch": {
@@ -1643,15 +1656,15 @@
    {
     "key": "BTC-USD",
     "label": "Bitcoin",
-    "value": "$63,955",
-    "change_pct": 0.62,
+    "value": "$63,824",
+    "change_pct": 0.41,
     "suffix": "%"
    },
    {
     "key": "CL=F",
     "label": "Petrolio WTI",
-    "value": "$84.64",
-    "change_pct": -3.5,
+    "value": "$84.83",
+    "change_pct": -3.28,
     "suffix": "%"
    },
    {
@@ -1664,8 +1677,8 @@
    {
     "key": "^IXIC",
     "label": "Nasdaq Composite",
-    "value": "25,916",
-    "change_pct": 0.41,
+    "value": "25,935",
+    "change_pct": 0.49,
     "suffix": "%"
    },
    {
@@ -1685,8 +1698,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "185.46",
-    "change_pct": 0.15,
+    "value": "185.42",
+    "change_pct": 0.13,
     "suffix": "%"
    }
   ],
@@ -1694,27 +1707,27 @@
    "us10": 4.48,
    "jp10": 2.68,
    "spread": 1.8,
-   "usdjpy": 160.22,
-   "usdjpy_chg_1m": 1.9
+   "usdjpy": 160.19,
+   "usdjpy_chg_1m": 1.88
   },
   "putcall": {
    "symbol": "BSX",
    "name": "Boston Scientific",
-   "ratio": 0.6,
-   "puts": 10099,
-   "calls": 16811
+   "ratio": 0.61,
+   "puts": 10259,
+   "calls": 16878
   },
   "risk_sentiment": {
-   "score": 56,
+   "score": 57,
    "label": "Neutrale",
    "components": [
     {
      "label": "Fear & Greed",
-     "score": 33
+     "score": 34
     },
     {
      "label": "VIX",
-     "score": 70
+     "score": 71
     },
     {
      "label": "Put/Call",
@@ -1722,7 +1735,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 56
+     "score": 54
     },
     {
      "label": "Treasury 10A",
@@ -1737,18 +1750,37 @@
  },
  "news": [
   {
-   "source": "Yahoo Finance",
-   "title": "Tesla vs BYD: The Better EV Stock To Buy In June",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/tesla-vs-byd-better-ev-164202732.html",
-   "published": "2026-06-12T16:42:02Z",
+   "source": "Investing.com",
+   "title": "Musk becomes first trillionaire as SpaceX pops nearly 30% on Nasdaq debut",
+   "link": "https://www.investing.com/news/stock-market-news/spacex-breaks-wall-street-as-record-ipo-values-company-at-177-trillion-4738222",
+   "published": "2026-06-12T17:09:09Z",
    "tickers": [
     "TSLA"
    ]
   },
   {
+   "source": "Investing.com",
+   "title": "Nvidia develops 6G radio chip as data center shifts stay on track - Jefferies",
+   "link": "https://www.investing.com/news/stock-market-news/nvidia-develops-6g-radio-chip-as-data-center-shifts-stay-on-track--jefferies-93CH-4740119",
+   "published": "2026-06-12T17:04:38Z",
+   "tickers": [
+    "NVDA"
+   ]
+  },
+  {
    "source": "Yahoo Finance",
-   "title": "Tesla stock declines after SpaceX's opening trade",
-   "link": "https://finance.yahoo.com/markets/article/tesla-stock-declines-after-spacexs-opening-trade-163253660.html",
+   "title": "Nvidia vs AMD: The Better AI Stock Is A Better Buy This June",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/nvidia-vs-amd-better-ai-165302797.html",
+   "published": "2026-06-12T16:53:02Z",
+   "tickers": [
+    "NVDA",
+    "AMD"
+   ]
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Tesla stock muted after SpaceX's opening trade",
+   "link": "https://finance.yahoo.com/markets/article/tesla-stock-muted-after-spacexs-opening-trade-163253474.html",
    "published": "2026-06-12T16:32:53Z",
    "tickers": [
     "TSLA"
@@ -1770,6 +1802,15 @@
    "published": "2026-06-12T16:25:18Z",
    "tickers": [
     "TSLA"
+   ]
+  },
+  {
+   "source": "Google News",
+   "title": "Why Goldman Is Cautious on Micron Stock Ahead of Earnings - Barron's",
+   "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQMDMtcmE5RkdOSlpnQ2QxbXd0UzhDLUR2M2RuT3pxb0xya3dwckIxcUE1RXJPZmpZN3Rjc0p6TXNFTXhlSVlma2pEb0lFYjRfX0JURTJJZkY1b2xPdWZ6akFjeDRNQm5JTVlnLW84bjNaREtENDJpTTZWeldhc1p4d1lZN0JMM3l1VXE3Yw?oc=5",
+   "published": "2026-06-12T16:24:00Z",
+   "tickers": [
+    "MU"
    ]
   },
   {
@@ -1846,15 +1887,6 @@
   },
   {
    "source": "Google News",
-   "title": "Why Goldman Is Cautious on Micron Stock Ahead of Earnings - Barron's",
-   "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQMDMtcmE5RkdOSlpnQ2QxbXd0UzhDLUR2M2RuT3pxb0xya3dwckIxcUE1RXJPZmpZN3Rjc0p6TXNFTXhlSVlma2pEb0lFYjRfX0JURTJJZkY1b2xPdWZ6akFjeDRNQm5JTVlnLW84bjNaREtENDJpTTZWeldhc1p4d1lZN0JMM3l1VXE3Yw?oc=5",
-   "published": "2026-06-12T14:01:00Z",
-   "tickers": [
-    "MU"
-   ]
-  },
-  {
-   "source": "Google News",
    "title": "How Many People Have Access to Tesla FSD? - Not a Tesla App",
    "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNS0NfSXRMS1R5dTUzcU1XVUdnandNMEY1YmIxQmRsRnVXSWV3NlB3ZTdQQ09rTnpUcHlIekhOSkVEWjJNS2dTd09Odm1QM2owU3VGZm83Nm4xU1VaWW5Ha3RPMWgyRS1MTDJFc1NCQUZjVzFnZXRDMWU4VDVvd3l4eWM0b29UZw?oc=5",
    "published": "2026-06-12T14:00:00Z",
@@ -1887,15 +1919,6 @@
    "published": "2026-06-12T13:17:00Z",
    "tickers": [
     "AMD"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "Nvidia Strikes Major AI Deal. This Stock Is Exploding Higher - TradingView",
-   "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNamdGYXFVWW5LNjc1aUIyN2tkcU8zN0tjeXp2dkdrT21ZejFlbldpRlY3S05YcHlwYWcyR3NyV3FNYTZwbkZHVnVUT2pxSTEyZmdnM3JwckRCWEZtdXNhUEpteGpYbmxKQk9VbHJaN3ZWR3dNbGFTeTBtT0hnYUFyeV9pN3ROV1VOX3ZTdXFTZ0pZUDVoZHFtV0JtN2trdTJodFlSODZMVk1WRXNPcWlRV2hKQ2NoQU1NNWFz?oc=5",
-   "published": "2026-06-12T13:14:47Z",
-   "tickers": [
-    "NVDA"
    ]
   },
   {
@@ -2045,6 +2068,15 @@
   },
   {
    "source": "Google News",
+   "title": "Intel Bear Turns Bull. Here's Why. - Investor's Business Daily",
+   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNcVRLWkkwTUhzWGRudUlYNXRHNE8xYkJXS0FuUEh6azVNNDYzUGZmNnI1VWc0YTlsM29PXzFyNGk1X19hd1VxYjNoYW5YQ2NLamNBT3Vfb291RTZHbTZTY1VlVHlZLWluVWdsVDJQazdVUVBMLTY1a0c3UG9BUG1jOGc0WXd4ZzhXVmpFVW1WMmJ0UQ?oc=5",
+   "published": "2026-06-11T21:05:00Z",
+   "tickers": [
+    "INTC"
+   ]
+  },
+  {
+   "source": "Google News",
    "title": "[144] Rigetti Computing, Inc. SEC Filing - Stock Titan",
    "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQVGFTZWtiWlUtdE9MUEpZWjg5dkZOeHoxamVpT1FTcnljUWY3bzdLb054Rl9oZGxxWXRzZlIxZDFYOWwydmJERF9sVW1LcWJfX0FuSDJ2TW1CaWxPbnNWV1dWUWVEV2daX3c3UXdIN09TRkRMU3ZqZWhfQlJOZUlnZjlYblpxekhSV3NtRXZVaVFFS09ZOTFkM0VSVjZqbEE?oc=5",
    "published": "2026-06-11T20:48:25Z",
@@ -2072,29 +2104,11 @@
   },
   {
    "source": "Google News",
-   "title": "MicroStrategy CEO discloses 3 reasons behind Bitcoin sale - Yahoo Finance Singapore",
-   "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOZTFnWVl2djlBSTFSZnhIcXhwZ3ZPSHhMRTdobDN2SGNabWJ6cTdSS0FHV19vQ29LR2hXR1ZYSTk0TFFCaFgzM2Flcmc2bElneEpjRkZRdmVFSXd0aG5pVnc0cnZGQ0I2UlJ1V25pelMxdlBSQjR0Qmw1eHRtZkdPeEdKOTRXemZQOHhNazRQbw?oc=5",
-   "published": "2026-06-11T17:51:40Z",
-   "tickers": [
-    "MSTR"
-   ]
-  },
-  {
-   "source": "Google News",
    "title": "DOE approval milestone for Oklo reactor - World Nuclear News",
    "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPY19PT3dhbUpmcHRiNi1wWGFvclVZbTlxSUtCdzJWREdxazlsYzhCTmY3RjZtbWNObG9TUXUzRjRVZEFPVndVTGhzdnlVMkd6V25MUURtaFRTSzNJekQyc0NIYkExWlZLLTRMcDBaZkM0OVl2SXJ2ZExxcUUyeFFZNDdXcHZXMDVUenIw?oc=5",
    "published": "2026-06-11T15:34:55Z",
    "tickers": [
     "OKLO"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "The Zacks Analyst Blog Highlights IonQ, D-Wave Quantum and Rigetti Computing - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNLVgtTlhXd1YzbmROeE1saDNwZHNjSGNZVHNvZktmQmpDQ0R0clJHMTZkaHFjVjBIVklGZzltZHZmTVV6Q2lqVzBfaUFmNjJ4bTVBV2dxdXZabG5wOUF3cFVCanhObGI2bUpUMGNGdWd4OE9GQjRhUjVtVHcyRzB5UTRNUWYzcWo1UjBXS3FhbHBETjJhMVJVdjZ5THdhTEFD?oc=5",
-   "published": "2026-06-11T15:10:00Z",
-   "tickers": [
-    "RGTI"
    ]
   }
  ]
