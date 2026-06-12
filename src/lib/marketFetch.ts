@@ -53,7 +53,11 @@ async function yahooFetch(symbols: string[]): Promise<Record<string, unknown>[]>
   const base = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${qs}&formatted=false&lang=en-US&region=US`
 
   const attempts = [
+    // Server-side Netlify proxy — no CORS issues
+    () => fetch(`/.netlify/functions/quotes?symbols=${encodeURIComponent(qs)}`, { signal: AbortSignal.timeout(10000) }),
+    // Direct (works in Node/SSG, blocked in browser)
     () => fetch(base, { signal: AbortSignal.timeout(5000) }),
+    // CORS proxy fallbacks
     () => fetch(`https://corsproxy.io/?${encodeURIComponent(base)}`, { signal: AbortSignal.timeout(8000) }),
     () => fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`, { signal: AbortSignal.timeout(8000) }),
   ]

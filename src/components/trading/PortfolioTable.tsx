@@ -116,7 +116,17 @@ export function PortfolioTable({ stocks, selectedSymbol, onSelect }: Props) {
               <td className="px-2 py-2 text-white tabular-nums">
                 ${Math.round(pos.shares * price).toLocaleString()}
               </td>
-              <td className="px-3 py-2 text-[#8a9ab8] tabular-nums">{weight.toFixed(1)}%</td>
+              <td className="px-3 py-2 min-w-[80px]">
+                <div className="flex items-center gap-1.5">
+                  <div className="flex-1 h-1.5 bg-[#1e2d4a] rounded-full overflow-hidden min-w-[36px]">
+                    <div
+                      className={`h-full rounded-full ${pnlDollar >= 0 ? 'bg-[#3b7dd8]/70' : 'bg-[#6b7fa3]/50'}`}
+                      style={{ width: `${Math.min(weight, 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-[9px] text-[#8a9ab8] tabular-nums w-7 text-right shrink-0">{weight.toFixed(1)}%</span>
+                </div>
+              </td>
             </tr>
           )
         })}
@@ -147,7 +157,7 @@ export function PortfolioTable({ stocks, selectedSymbol, onSelect }: Props) {
           <td className="px-2 py-2 text-white tabular-nums font-bold">
             ${Math.round(totalCurrentValue).toLocaleString()}
           </td>
-          <td className="px-3 py-2 text-[#8a9ab8]">100%</td>
+          <td className="px-3 py-2 text-[#8a9ab8] text-[9px]">100%</td>
         </tr>
       </tfoot>
     </table>

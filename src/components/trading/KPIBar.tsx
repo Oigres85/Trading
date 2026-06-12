@@ -43,24 +43,25 @@ interface CardProps {
 }
 
 function KPICard({ label, value, sub, positive, subColor }: CardProps) {
-  const borderTopClass =
-    positive === true
-      ? 'border-t-2 border-t-[#00c875]'
-      : positive === false
-      ? 'border-t-2 border-t-[#ff4d4d]'
-      : 'border-t-2 border-t-transparent'
+  const accent =
+    positive === true  ? '#00c875' :
+    positive === false ? '#ff4d4d' : '#2a3d5a'
 
   return (
     <div
-      className={`bg-[#0d1829] rounded-xl border border-[#1e2d4a] px-4 py-3 flex-1 min-w-0 ${borderTopClass}`}
+      className="rounded-xl border border-[#1e2d4a] px-4 py-3 flex-1 min-w-0 relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, #0d1829 0%, #0a1220 100%)',
+        borderTop: `2px solid ${accent}`,
+      }}
     >
-      <div className="text-[9px] font-bold tracking-widest text-[#4a5a7a] uppercase mb-1">
-        {label}
-      </div>
-      <div className="text-xl font-bold text-white tabular-nums truncate">{value}</div>
+      {/* subtle glow on the top accent line */}
+      <div className="absolute top-0 left-0 right-0 h-px opacity-30" style={{ background: accent }} />
+      <div className="text-[9px] font-semibold tracking-widest text-[#4a5a7a] uppercase mb-1">{label}</div>
+      <div className="text-lg font-bold text-white tabular-nums truncate leading-tight">{value}</div>
       {sub && (
         <div
-          className="text-[10px] font-semibold mt-0.5 truncate"
+          className="text-[10px] font-medium mt-0.5 truncate"
           style={{ color: subColor ?? (positive === true ? '#00c875' : positive === false ? '#ff4d4d' : '#4a5a7a') }}
         >
           {sub}
@@ -133,16 +134,17 @@ export function KPIBar({ indices, stocks }: Props) {
       {/* Fear & Greed */}
       {fearGreed ? (
         <div
-          className={`bg-[#0d1829] rounded-xl border border-[#1e2d4a] px-4 py-3 flex-1 min-w-0 border-t-2`}
-          style={{ borderTopColor: fearGreedColor(fearGreed.value) }}
+          className="rounded-xl border border-[#1e2d4a] px-4 py-3 flex-1 min-w-0 relative overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, #0d1829 0%, #0a1220 100%)',
+            borderTop: `2px solid ${fearGreedColor(fearGreed.value)}`,
+          }}
         >
-          <div className="text-[9px] font-bold tracking-widest text-[#4a5a7a] uppercase mb-1">
-            Fear &amp; Greed
-          </div>
-          <div className="text-xl font-bold tabular-nums" style={{ color: fearGreedColor(fearGreed.value) }}>
+          <div className="text-[9px] font-semibold tracking-widest text-[#4a5a7a] uppercase mb-1">Fear &amp; Greed</div>
+          <div className="text-lg font-bold tabular-nums leading-tight" style={{ color: fearGreedColor(fearGreed.value) }}>
             {fearGreed.value}
           </div>
-          <div className="text-[10px] font-semibold mt-0.5" style={{ color: fearGreedColor(fearGreed.value) }}>
+          <div className="text-[10px] font-medium mt-0.5" style={{ color: fearGreedColor(fearGreed.value) }}>
             {fearGreedLabel(fearGreed.value)}
           </div>
         </div>
