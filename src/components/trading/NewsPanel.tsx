@@ -37,7 +37,7 @@ export function NewsPanel({ items, loading }: Props) {
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block px-4 py-3 hover:bg-[#0f1629] transition-colors group"
+            className={`block px-4 py-3 hover:bg-[#0f1629] transition-colors group ${item.portfolioMention ? 'border-l-2 border-l-amber-400' : ''}`}
           >
             <p className="text-xs text-[#c8d6f0] group-hover:text-white leading-4 line-clamp-3 mb-1.5 transition-colors">
               {item.title}
@@ -49,6 +49,9 @@ export function NewsPanel({ items, loading }: Props) {
             )}
             <div className="flex items-center gap-2 text-[9px] text-[#4a5a7a]">
               <span className="text-[#3b7dd8]">{item.source}</span>
+              {item.portfolioMention && (
+                <span className="text-amber-400 text-[10px] leading-none" title="Portfolio mention">●</span>
+              )}
               <span>·</span>
               <span>{timeAgo(item.publishedAt)}</span>
             </div>
