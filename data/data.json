@@ -1,13 +1,13 @@
 {
- "updated_at": "2026-06-12T14:25:57Z",
- "eurusd": 1.1573,
+ "updated_at": "2026-06-12T14:46:18Z",
+ "eurusd": 1.1577,
  "totals": {
-  "usd_value": 313979.9,
-  "usd_gain": 179578.44,
-  "usd_gain_pct": 133.61,
-  "eur_value": 312544.22,
-  "eur_gain": 156407.92,
-  "eur_gain_pct": 100.17
+  "usd_value": 311480.46,
+  "usd_gain": 177079.0,
+  "usd_gain_pct": 131.75,
+  "eur_value": 310291.02,
+  "eur_gain": 154195.04,
+  "eur_gain_pct": 98.78
  },
  "portfolio": [
   {
@@ -16,19 +16,19 @@
    "qty": 270,
    "pmc": 87.17,
    "currency": "USD",
-   "price": 205.86,
-   "change_pct": 0.48,
-   "value": 55582.2,
-   "gain": 32046.3,
-   "gain_pct": 136.16,
-   "pe": 31.5,
+   "price": 204.6,
+   "change_pct": -0.13,
+   "value": 55242.0,
+   "gain": 31706.1,
+   "gain_pct": 134.71,
+   "pe": 31.3,
    "ath": 236.26,
-   "ath_dist_pct": -12.9,
+   "ath_dist_pct": -13.4,
    "support": 199.34,
    "resistance": 232.01,
-   "rsi": 46.0,
-   "volume": 27571310,
-   "vol_ratio": 0.17,
+   "rsi": 44.9,
+   "volume": 32080036,
+   "vol_ratio": 0.19,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "spark": [
@@ -61,7 +61,7 @@
     208.19,
     200.42,
     204.87,
-    205.86
+    204.6
    ]
   },
   {
@@ -70,19 +70,19 @@
    "qty": 125,
    "pmc": 153.92,
    "currency": "USD",
-   "price": 515.28,
-   "change_pct": 5.49,
-   "value": 64410.59,
-   "gain": 45170.59,
-   "gain_pct": 234.77,
-   "pe": 172.9,
+   "price": 510.93,
+   "change_pct": 4.6,
+   "value": 63866.87,
+   "gain": 44626.87,
+   "gain_pct": 231.95,
+   "pe": 171.5,
    "ath": 546.44,
-   "ath_dist_pct": -5.7,
+   "ath_dist_pct": -6.5,
    "support": 393.36,
    "resistance": 546.44,
-   "rsi": 61.0,
-   "volume": 10244502,
-   "vol_ratio": 0.28,
+   "rsi": 60.4,
+   "volume": 11777512,
+   "vol_ratio": 0.32,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "spark": [
@@ -115,7 +115,7 @@
     475.51,
     452.4,
     488.45,
-    515.28
+    510.93
    ]
   },
   {
@@ -124,19 +124,19 @@
    "qty": 90,
    "pmc": 87.63,
    "currency": "USD",
-   "price": 998.42,
-   "change_pct": 0.26,
-   "value": 89858.25,
-   "gain": 81971.55,
-   "gain_pct": 1039.36,
-   "pe": 47.1,
+   "price": 982.79,
+   "change_pct": -1.31,
+   "value": 88451.1,
+   "gain": 80564.4,
+   "gain_pct": 1021.52,
+   "pe": 46.3,
    "ath": 1089.29,
-   "ath_dist_pct": -8.3,
+   "ath_dist_pct": -9.8,
    "support": 652.21,
    "resistance": 1089.29,
-   "rsi": 62.3,
-   "volume": 14852887,
-   "vol_ratio": 0.27,
+   "rsi": 60.9,
+   "volume": 17688680,
+   "vol_ratio": 0.32,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "spark": [
@@ -169,7 +169,7 @@
     935.89,
     891.88,
     995.87,
-    998.42
+    982.79
    ]
   },
   {
@@ -178,19 +178,19 @@
    "qty": 380,
    "pmc": 25.75,
    "currency": "USD",
-   "price": 121.88,
-   "change_pct": 4.21,
-   "value": 46314.4,
-   "gain": 36529.4,
-   "gain_pct": 373.32,
-   "pe": 79.1,
+   "price": 121.15,
+   "change_pct": 3.58,
+   "value": 46037.0,
+   "gain": 36252.0,
+   "gain_pct": 370.49,
+   "pe": 78.6,
    "ath": 132.75,
-   "ath_dist_pct": -8.2,
+   "ath_dist_pct": -8.7,
    "support": 98.33,
    "resistance": 126.64,
-   "rsi": 60.9,
-   "volume": 41521480,
-   "vol_ratio": 0.31,
+   "rsi": 60.5,
+   "volume": 49026976,
+   "vol_ratio": 0.36,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "spark": [
@@ -223,7 +223,7 @@
     107.92,
     107.04,
     116.96,
-    121.88
+    121.15
    ]
   },
   {
@@ -232,19 +232,19 @@
    "qty": 60,
    "pmc": 358.22,
    "currency": "USD",
-   "price": 396.8,
-   "change_pct": -0.59,
-   "value": 23808.0,
-   "gain": 2314.8,
-   "gain_pct": 10.77,
-   "pe": 367.5,
+   "price": 394.21,
+   "change_pct": -1.24,
+   "value": 23652.9,
+   "gain": 2159.7,
+   "gain_pct": 10.05,
+   "pe": 365.0,
    "ath": 498.83,
-   "ath_dist_pct": -20.5,
+   "ath_dist_pct": -21.0,
    "support": 380.15,
    "resistance": 445.6,
-   "rsi": 45.5,
-   "volume": 13897879,
-   "vol_ratio": 0.28,
+   "rsi": 44.7,
+   "volume": 16670974,
+   "vol_ratio": 0.33,
    "signal": "Trend debole",
    "signal_class": "bad",
    "spark": [
@@ -277,7 +277,7 @@
     396.68,
     381.59,
     399.15,
-    396.8
+    394.21
    ]
   },
   {
@@ -286,19 +286,19 @@
    "qty": 123,
    "pmc": 210.22,
    "currency": "USD",
-   "price": 122.17,
-   "change_pct": 1.68,
-   "value": 15026.91,
-   "gain": -10830.15,
-   "gain_pct": -41.88,
-   "pe": 27.4,
+   "price": 124.56,
+   "change_pct": 3.67,
+   "value": 15320.27,
+   "gain": -10536.79,
+   "gain_pct": -40.75,
+   "pe": 27.9,
    "ath": 543.0,
-   "ath_dist_pct": -77.5,
+   "ath_dist_pct": -77.1,
    "support": 113.27,
    "resistance": 182.23,
-   "rsi": 35.9,
-   "volume": 2912365,
-   "vol_ratio": 0.17,
+   "rsi": 37.6,
+   "volume": 4609206,
+   "vol_ratio": 0.27,
    "signal": "Trend debole",
    "signal_class": "bad",
    "spark": [
@@ -331,7 +331,7 @@
     117.02,
     115.35,
     120.15,
-    122.17
+    124.56
    ]
   },
   {
@@ -342,8 +342,8 @@
    "currency": "USD",
    "price": 21.24,
    "change_pct": 2.94,
-   "value": 10936.75,
-   "gain": -3122.75,
+   "value": 10936.54,
+   "gain": -3122.96,
    "gain_pct": -22.21,
    "pe": -104.4,
    "ath": 58.15,
@@ -351,8 +351,8 @@
    "support": 15.46,
    "resistance": 28.06,
    "rsi": 50.1,
-   "volume": 9056513,
-   "vol_ratio": 0.18,
+   "volume": 11427559,
+   "vol_ratio": 0.22,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "spark": [
@@ -394,19 +394,19 @@
    "qty": 120,
    "pmc": 72.43,
    "currency": "USD",
-   "price": 58.01,
-   "change_pct": 0.27,
-   "value": 6961.8,
-   "gain": -1729.8,
-   "gain_pct": -19.9,
-   "pe": -69.6,
+   "price": 57.51,
+   "change_pct": -0.61,
+   "value": 6900.6,
+   "gain": -1791.0,
+   "gain_pct": -20.61,
+   "pe": -69.0,
    "ath": 193.84,
-   "ath_dist_pct": -70.1,
+   "ath_dist_pct": -70.3,
    "support": 53.01,
    "resistance": 73.86,
-   "rsi": 43.5,
-   "volume": 1920775,
-   "vol_ratio": 0.14,
+   "rsi": 42.9,
+   "volume": 2306615,
+   "vol_ratio": 0.17,
    "signal": "Trend debole",
    "signal_class": "bad",
    "spark": [
@@ -439,7 +439,7 @@
     56.48,
     54.02,
     57.86,
-    58.01
+    57.51
    ]
   },
   {
@@ -448,19 +448,19 @@
    "qty": 1150,
    "pmc": 3.35,
    "currency": "USD",
-   "price": 0.94,
-   "change_pct": 2.4,
-   "value": 1081.0,
-   "gain": -2771.5,
-   "gain_pct": -71.94,
+   "price": 0.93,
+   "change_pct": 1.66,
+   "value": 1073.18,
+   "gain": -2779.32,
+   "gain_pct": -72.14,
    "pe": -7.2,
    "ath": 17.27,
    "ath_dist_pct": -94.6,
    "support": 0.82,
    "resistance": 1.4,
-   "rsi": 47.8,
-   "volume": 242141,
-   "vol_ratio": 0.07,
+   "rsi": 47.4,
+   "volume": 284852,
+   "vol_ratio": 0.08,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "spark": [
@@ -493,7 +493,7 @@
     0.85,
     0.86,
     0.92,
-    0.94
+    0.93
    ]
   },
   {
@@ -523,15 +523,15 @@
  ],
  "macro": {
   "fear_greed": {
-   "score": 32,
+   "score": 33,
    "rating": "fear",
    "prev_close": 30,
    "week_ago": 42,
    "month_ago": 66
   },
   "vix": {
-   "value": 18.78,
-   "change_pct": -3.4,
+   "value": 18.94,
+   "change_pct": -2.57,
    "spark": [
     18.29,
     17.38,
@@ -562,8 +562,13 @@
     19.87,
     22.22,
     19.44,
-    18.78
+    18.94
    ]
+  },
+  "fedwatch": {
+   "target_range": "3.50–3.75%",
+   "implied_rate": 3.74,
+   "delta_bp": 12
   },
   "indicators": [
    {
@@ -600,10 +605,94 @@
  },
  "news": [
   {
-   "source": "Investing.com",
-   "title": "Why is HUTCHMED stock climbing today?",
-   "link": "https://www.investing.com/news/stock-market-news/why-is-hutchmed-stock-climbing-today-93CH-4739913",
-   "published": "2026-06-12T14:37:01Z",
+   "source": "Bloomberg",
+   "title": "US Consumer Sentiment Rises as Gasoline Prices Ease",
+   "link": "https://www.bloomberg.com/news/videos/2026-06-12/us-consumer-sentiment-rises-as-gasoline-prices-ease-video",
+   "published": "2026-06-12T14:53:08Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Wbg eyes 30% tax fee rise from VAT drive and regional expansion",
+   "link": "https://finance.yahoo.com/economy/policy/articles/wbg-eyes-30-tax-fee-144935624.html",
+   "published": "2026-06-12T14:49:35Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Half of Hormuz Stoppages Restored, US Energy Chief Says",
+   "link": "https://www.bloomberg.com/news/videos/2026-06-12/half-of-hormuz-stoppages-restored-us-energy-chief-says-video",
+   "published": "2026-06-12T14:47:50Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer Says He Likes Carnival But Leans More Toward Viking Holdings",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-says-likes-carnival-144525163.html",
+   "published": "2026-06-12T14:45:25Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer on Nebius: “Let It Come Down”",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-nebius-let-come-144522077.html",
+   "published": "2026-06-12T14:45:22Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer on Ondas: “I Can’t Get Behind a Meme Stock”",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-ondas-t-behind-144520793.html",
+   "published": "2026-06-12T14:45:20Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer on Cloudflare: “Look at the Longer-Term Direction Because It’s Pretty Fabulous”",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-cloudflare-look-longer-144514148.html",
+   "published": "2026-06-12T14:45:14Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer on Broadcom: “It Can Make a Comeback”",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-broadcom-comeback-144512858.html",
+   "published": "2026-06-12T14:45:12Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer Says He Likes Drug Stocks Here As He Discusses Johnson & Johnson",
+   "link": "https://finance.yahoo.com/sectors/healthcare/articles/jim-cramer-says-likes-drug-144508888.html",
+   "published": "2026-06-12T14:45:08Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer Says He Can “Make a Case” That Companies Like Meta “Might Want to Sell Some Equity”",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-says-case-companies-144504822.html",
+   "published": "2026-06-12T14:45:04Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer Says “I Want to Buy Netflix”",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-says-want-buy-144503369.html",
+   "published": "2026-06-12T14:45:03Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Flos B&B Group’s Sale of Vanguard Lighting Manufacturer Louis Poulsen Will Help Pay Debts",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/flos-b-b-group-sale-144457970.html",
+   "published": "2026-06-12T14:44:57Z",
+   "tickers": []
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Bitcoin Bottom Hunters Are Eyeing Up AI Frenzy and SpaceX IPO",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-12/bitcoin-bottom-hunters-are-eyeing-up-ai-frenzy-and-spacex-ipo",
+   "published": "2026-06-12T14:38:29Z",
    "tickers": []
   },
   {
@@ -611,6 +700,13 @@
    "title": "New York is in the Money With Knicks’ Historic Run",
    "link": "https://www.bloomberg.com/news/videos/2026-06-12/new-york-is-in-the-money-with-knicks-historic-run",
    "published": "2026-06-12T14:34:33Z",
+   "tickers": []
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Demand-Driven Rally Lifted Element Solutions Inc (ESI) in Q1",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/demand-driven-rally-lifted-element-143334756.html",
+   "published": "2026-06-12T14:33:34Z",
    "tickers": []
   },
   {
@@ -677,13 +773,6 @@
    "tickers": []
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Virgin Galactic Craters 24%, Rocket Lab Drops 8%, AST SpaceMobile Falls 10% as SpaceX Hype Triggers a Space-Stock Shakeout",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/virgin-galactic-craters-24-rocket-141846645.html",
-   "published": "2026-06-12T14:18:46Z",
-   "tickers": []
-  },
-  {
    "source": "Investing.com",
    "title": "SpaceX stock indicated to open 30% higher from its IPO price",
    "link": "https://www.investing.com/news/stock-market-news/spacex-breaks-wall-street-as-record-ipo-values-company-at-177-trillion-4738222",
@@ -691,40 +780,10 @@
    "tickers": []
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Charles Cole indicted for defrauding Napster out of 239M shares",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/charles-cole-indicted-defrauding-napster-141830038.html",
-   "published": "2026-06-12T14:18:30Z",
-   "tickers": []
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Did the Fed Just Get a Reprieve? Report of Iran Deal Could Put Rate Hikes on Hold",
-   "link": "https://finance.yahoo.com/economy/policy/articles/did-fed-just-reprieve-report-141744802.html",
-   "published": "2026-06-12T14:17:44Z",
-   "tickers": []
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "NVIDIA (NVDA): A Key Part of Harvard University AI Stock Picks",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/nvidia-nvda-key-part-harvard-141344552.html",
-   "published": "2026-06-12T14:13:44Z",
-   "tickers": [
-    "NVDA"
-   ]
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Is Booking (BKNG) The Best Travel Stock in Harvard University Stock Portfolio?",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/booking-bkng-best-travel-stock-141151624.html",
-   "published": "2026-06-12T14:11:51Z",
-   "tickers": []
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Oracle Has a Debt Fever & the Only Prescription is More Debt",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/oracle-debt-fever-only-prescription-140741343.html",
-   "published": "2026-06-12T14:07:41Z",
+   "source": "Investing.com",
+   "title": "Nasdaq Anticipates SpaceX IPO To Open For Trading Shortly - Bloomberg",
+   "link": "https://www.investing.com/news/stock-market-news/nasdaq-anticipates-spacex-ipo-to-open-for-trading-shortly--bloomberg-432SI-4739862",
+   "published": "2026-06-12T14:13:07Z",
    "tickers": []
   },
   {
@@ -742,13 +801,6 @@
    "tickers": []
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Is Broadcom (AVGO) Still Undervalued?",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/broadcom-avgo-still-undervalued-140200331.html",
-   "published": "2026-06-12T14:02:00Z",
-   "tickers": []
-  },
-  {
    "source": "Google News",
    "title": "Why Goldman Is Cautious on Micron Stock Ahead of Earnings - Barron's",
    "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxQMDMtcmE5RkdOSlpnQ2QxbXd0UzhDLUR2M2RuT3pxb0xya3dwckIxcUE1RXJPZmpZN3Rjc0p6TXNFTXhlSVlma2pEb0lFYjRfX0JURTJJZkY1b2xPdWZ6akFjeDRNQm5JTVlnLW84bjNaREtENDJpTTZWeldhc1p4d1lZN0JMM3l1VXE3Yw?oc=5",
@@ -758,38 +810,10 @@
    ]
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Can Microsoft (MSFT) Stock Rebound in 2026?",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/microsoft-msft-stock-rebound-2026-135726509.html",
-   "published": "2026-06-12T13:57:26Z",
-   "tickers": []
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Harvard University AI Stock Portfolio: Alphabet (GOOGL)",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/harvard-university-ai-stock-portfolio-135649828.html",
-   "published": "2026-06-12T13:56:49Z",
-   "tickers": []
-  },
-  {
    "source": "Bloomberg",
    "title": "ECB’s Kazimir Says Rates Must Be Lifted More to Tackle Inflation",
    "link": "https://www.bloomberg.com/news/articles/2026-06-12/ecb-s-kazimir-says-rates-must-be-lifted-more-to-tackle-inflation",
    "published": "2026-06-12T13:56:47Z",
-   "tickers": []
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Harvard University’s Favorite AI Stock Pick: Taiwan Semiconductor (TSM)",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/harvard-university-favorite-ai-stock-135554831.html",
-   "published": "2026-06-12T13:55:54Z",
-   "tickers": []
-  },
-  {
-   "source": "Bloomberg",
-   "title": "SpaceX’s Record IPO Is Said to Draw Over $350 Billion in Demand",
-   "link": "https://www.bloomberg.com/news/articles/2026-06-12/spacex-s-record-ipo-is-said-to-draw-over-350-billion-in-demand",
-   "published": "2026-06-12T13:43:25Z",
    "tickers": []
   },
   {
@@ -809,20 +833,6 @@
    "tickers": [
     "NVDA"
    ]
-  },
-  {
-   "source": "Bloomberg",
-   "title": "What Stock Traders Can Expect From SpaceX’s Trading Debut",
-   "link": "https://www.bloomberg.com/news/articles/2026-06-12/what-stock-traders-can-expect-from-spacex-s-trading-debut",
-   "published": "2026-06-12T13:11:15Z",
-   "tickers": []
-  },
-  {
-   "source": "Bloomberg",
-   "title": "Ken Leech Pleads Guilty to Obstructing SEC Probe Into His Trades",
-   "link": "https://www.bloomberg.com/news/articles/2026-06-12/ken-leech-to-plead-guilty-in-us-cherry-picking-fraud-case",
-   "published": "2026-06-12T13:09:36Z",
-   "tickers": []
   },
   {
    "source": "Bloomberg",
@@ -848,15 +858,6 @@
    "tickers": []
   },
   {
-   "source": "Google News",
-   "title": "How Nvidia Is a Big Winner If SpaceX Stock Soars - Barron's",
-   "link": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOZVgtZGNUckRxLXpucGoxM1c3S3pidDh2di1iU2tLYkl0UU5oOW9RSW9VNkYxdGNOdUZxdWxmdm1aVm1sakdCOWdFVVV2Y2NCLXFiRzdiblgyRGg0UGVHT3RGZVFuMTBfc2RKNTN6NjlrX0YzNTBscTFOVUZsMVBtN0p2bFdfanc?oc=5",
-   "published": "2026-06-12T11:57:00Z",
-   "tickers": [
-    "NVDA"
-   ]
-  },
-  {
    "source": "Bloomberg",
    "title": "S&amp;P 500 Flips to Modest Gain With All Eyes on SpaceX, Iran Hopes",
    "link": "https://www.bloomberg.com/news/articles/2026-06-12/us-futures-rally-with-all-eyes-on-spacex-iran-war-peace-hopes",
@@ -865,8 +866,8 @@
   },
   {
    "source": "Yahoo Finance",
-   "title": "Analyst Report: Oracle Corp",
-   "link": "https://finance.yahoo.com/research/reports/ARGUS_3282_AnalystReport_1781263588000?yptr=yahoo&ncid=yahooproperties_plusresear_nm5q6ze1cei",
+   "title": "Analyst Report: BJ's Wholesale Club Hldg Inc",
+   "link": "https://finance.yahoo.com/research/reports/ARGUS_2775_AnalystReport_1781263588000?yptr=yahoo&ncid=yahooproperties_plusresear_nm5q6ze1cei",
    "published": "2026-06-12T11:26:28Z",
    "tickers": []
   },
@@ -893,6 +894,15 @@
    "published": "2026-06-12T11:06:00Z",
    "tickers": [
     "TSLA"
+   ]
+  },
+  {
+   "source": "Google News",
+   "title": "AMD Stock Pops After Buy Upgrade. It’s More Than a CPU Play. - Barron's",
+   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE54aU1xUUJwUmFXZlliR09UZGhwb1JSRzNrSnl2YkhxbVpZNGRqcl8tVmEydGhuRnJGQmlpOFRRLXVib1Ayb1NBTURaN0pHaTRBck1WRldUS05ibVhlT3h1YkFuZUJtUjJEeXItTDBGUkJLQUQ0c1E?oc=5",
+   "published": "2026-06-12T10:53:00Z",
+   "tickers": [
+    "AMD"
    ]
   },
   {
@@ -1013,7 +1023,7 @@
   },
   {
    "source": "Bloomberg",
-   "title": "Stocks Advance After Consumer Sentiment Report: Markets Wrap",
+   "title": "Stock Rally Stalls as Trump Scolds Iran Over Leaks: Markets Wrap",
    "link": "https://www.bloomberg.com/news/articles/2026-06-11/asian-stocks-to-gain-as-trump-signals-us-iran-deal-markets-wrap",
    "published": "2026-06-11T22:03:20Z",
    "tickers": []
@@ -1026,13 +1036,6 @@
    "tickers": [
     "INTC"
    ]
-  },
-  {
-   "source": "Google News",
-   "title": "Investors Awoke to 'A Dip Buyer's Dream' Today. But Next Week's Fed Meeting Looms Large - Investopedia",
-   "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPMDFwM1dfTHZha0ZpVVBkMWdxQjhwQ2ppVkJZeFhweXE0QmREbS1rU2t3VWRVWFJpRUZtUjN1dVR1Y0tmMFBzbFNxVzZFTkV1M29jMmFZMzQyMWVpdlJFX2E2d0l6dkloQXNRd19XTDlibGJLVHB6RVRjM1N3STZfWml0QW50LVExX0hyWUtwZ3pPOEttUzhoTS1OZFM0OE5YQzFMX0dWSmNReFdRTGxDV2JWUmVNbllmTWVlUVphTQ?oc=5",
-   "published": "2026-06-11T18:30:44Z",
-   "tickers": []
   },
   {
    "source": "CNBC",
