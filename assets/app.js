@@ -1,12 +1,17 @@
 /* Trading Dashboard — rendering lato client di data/data.json */
+const REPO = "Oigres85/Trading";
 let DATA = null;
-let newsFilter = "all";
+let sparkRange = "m1";   // 1G | 1M | 1A
 
 const $ = (sel) => document.querySelector(sel);
 const fmtEUR = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 const fmtUSD = new Intl.NumberFormat("it-IT", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const fmtNum = new Intl.NumberFormat("it-IT", { maximumFractionDigits: 2 });
 
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
 function cur(row) { return row.currency === "EUR" ? "€" : "$"; }
 function signCls(v) { return v > 0 ? "pos" : v < 0 ? "neg" : ""; }
 function signTxt(v, suffix = "%") {
@@ -30,12 +35,69 @@ async function loadData(showSpin = false) {
   }
 }
 
+/* Rigenera TUTTI i dati: lancia il workflow GitHub e attende il nuovo data.json.
+   Serve un token GitHub (fine-grained, repo Oigres85/Trading, permesso Actions
+   read&write), chiesto una sola volta e salvato solo in questo browser. */
+async function refreshAll() {
+  const btn = $("#btn-refresh");
+  let token = localStorage.getItem("gh_token");
+  if (!token) {
+    token = window.prompt(
+      "Per rigenerare i dati in tempo reale serve un token GitHub del repo " + REPO +
+      " (fine-grained, permesso Actions: read & write).\n" +
+      "Viene salvato solo in questo browser.\n\n" +
+      "Incolla il token, oppure Annulla per ricaricare gli ultimi dati pubblicati:");
+    if (token) localStorage.setItem("gh_token", token.trim());
+  }
+  if (!token) { await loadData(true); return; }
+
+  btn.classList.add("spinning");
+  btn.textContent = "⏳ Rigenero…";
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/update-data.yml/dispatches`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token.trim()}`, "Accept": "application/vnd.github+json" },
+      body: JSON.stringify({ ref: "main" }),
+    });
+    if (res.status === 401 || res.status === 403 || res.status === 404) {
+      localStorage.removeItem("gh_token");
+      toast("Token non valido o senza permessi — rimosso, riprova");
+      return;
+    }
+    if (res.status !== 204) { toast(`Errore nell'avvio dell'aggiornamento (HTTP ${res.status})`); return; }
+
+    toast("Aggiornamento avviato — i nuovi dati arrivano tra ~2-3 minuti");
+    const prev = DATA?.updated_at;
+    for (let i = 0; i < 24; i++) {          // massimo ~6 minuti
+      await new Promise(r => setTimeout(r, 15000));
+      try {
+        const d = await (await fetch(`data/data.json?t=${Date.now()}`, { cache: "no-store" })).json();
+        if (d.updated_at !== prev) {
+          DATA = d;
+          renderAll();
+          toast("Dati rigenerati ✓");
+          return;
+        }
+      } catch { /* tentativo successivo */ }
+    }
+    toast("L'aggiornamento è ancora in corso — riprova ⟳ tra qualche minuto");
+  } catch (e) {
+    console.error(e);
+    toast("Errore di rete durante l'aggiornamento");
+  } finally {
+    btn.classList.remove("spinning");
+    btn.textContent = "⟳ Aggiorna";
+  }
+}
+
 function renderAll() {
   const d = new Date(DATA.updated_at);
   $("#updated-at").textContent = d.toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short" });
   $("#fx-note").textContent = `EUR/USD ${fmtNum.format(DATA.eurusd)} — azioni in USD, BTP in EUR`;
   renderKPI();
+  renderEarnings();
   renderTable();
+  renderWatchlist();
   renderGauges();
   renderMacro();
   renderNews();
@@ -45,12 +107,10 @@ function renderAll() {
 function renderKPI() {
   const t = DATA.totals;
   const kpis = [
-    { label: "Valore totale (€)", value: fmtEUR.format(t.eur_value), sub: `${signTxt(t.eur_gain_pct)} dal carico`, subCls: signCls(t.eur_gain), accent: "var(--blue)" },
-    { label: "Guadagno totale (€)", value: signTxt(Math.round(t.eur_gain), " €"), sub: `${signTxt(t.eur_gain_pct)}`, subCls: signCls(t.eur_gain), accent: t.eur_gain >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(t.eur_gain) },
-    { label: "Azioni USA ($)", value: fmtUSD.format(t.usd_value), sub: `${signTxt(t.usd_gain_pct)} (${signTxt(t.usd_gain, " $")})`, subCls: signCls(t.usd_gain), accent: "var(--purple)" },
+    { label: "Valore totale (€)", value: fmtEUR.format(t.eur_value), sub: `di cui azioni USA ${fmtUSD.format(t.usd_value)}`, accent: "var(--blue)" },
+    { label: "Guadagno totale (€)", value: signTxt(Math.round(t.eur_gain), " €"), sub: `${signTxt(t.eur_gain_pct)} dal carico`, subCls: signCls(t.eur_gain), accent: t.eur_gain >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(t.eur_gain) },
+    { label: "Guadagno azioni USA ($)", value: signTxt(Math.round(t.usd_gain), " $"), sub: `${signTxt(t.usd_gain_pct)} dal carico`, subCls: signCls(t.usd_gain), accent: "var(--purple)", valueCls: signCls(t.usd_gain) },
   ];
-  const vix = DATA.macro?.vix;
-  if (vix) kpis.push({ label: "VIX", value: fmtNum.format(vix.value), sub: signTxt(vix.change_pct), subCls: signCls(-vix.change_pct), accent: "var(--yellow)" });
 
   $("#kpi-grid").innerHTML = kpis.map(k => `
     <div class="kpi" style="--accent:${k.accent}">
@@ -97,11 +157,46 @@ function volBar(ratio) {
   return meterBar((ratio / 3) * 100, color, `${fmtNum.format(ratio)}×`);
 }
 
+const RATING_LABELS = {
+  strong_buy: ["Strong Buy", "good"], buy: ["Buy", "good"],
+  hold: ["Hold", "neutral"], underperform: ["Underperf.", "bad"],
+  sell: ["Sell", "bad"], strong_sell: ["Strong Sell", "bad"],
+};
+
+function ratingBadge(r) {
+  if (!r || !r.key) return "—";
+  const [label, cls] = RATING_LABELS[r.key] || [r.key, "neutral"];
+  const n = r.n ? ` title="${r.n} analisti — target medio ${fmtNum.format(r.target)}"` : "";
+  return `<span class="badge ${cls}"${n}>${label}</span>`;
+}
+
+function targetBar(r) {
+  if (!r || r.upside_pct === null || r.upside_pct === undefined) return "—";
+  const u = r.upside_pct;
+  const color = u >= 15 ? "var(--green)" : u >= 0 ? "var(--yellow)" : "var(--red)";
+  return meterBar(Math.abs(u) * 2, color, signTxt(u));
+}
+
+function techCells(r) {
+  const c = cur(r);
+  const pe = (r.pe && r.pe > 0) ? fmtNum.format(r.pe) : "—";
+  const ath = r.ath ? `${fmtNum.format(r.ath)} <span class="muted">(${signTxt(r.ath_dist_pct)})</span>` : "—";
+  return `
+      <td class="num">${pe}</td>
+      <td class="num">${ath}</td>
+      <td class="num">${r.support ? c + fmtNum.format(r.support) : "—"}</td>
+      <td class="num">${r.resistance ? c + fmtNum.format(r.resistance) : "—"}</td>
+      <td class="num">${rsiBar(r.rsi)}</td>
+      <td class="num">${volBar(r.vol_ratio)}</td>
+      <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
+      <td>${ratingBadge(r.rating)}</td>
+      <td class="num">${targetBar(r.rating)}</td>
+      <td>${sparkline((r.sparks || {})[sparkRange])}</td>`;
+}
+
 function renderTable() {
   const rows = DATA.portfolio.map(r => {
     const c = cur(r);
-    const pe = (r.pe && r.pe > 0) ? fmtNum.format(r.pe) : "—";
-    const ath = r.ath ? `${fmtNum.format(r.ath)} <span class="muted">(${signTxt(r.ath_dist_pct)})</span>` : "—";
     return `<tr>
       <td class="name-cell">${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
@@ -111,14 +206,7 @@ function renderTable() {
       <td class="num">${c}${fmtNum.format(Math.round(r.value))}</td>
       <td class="num ${signCls(r.gain)}">${signTxt(Math.round(r.gain), ` ${c}`)}</td>
       <td class="num ${signCls(r.gain_pct)}"><b>${signTxt(r.gain_pct)}</b></td>
-      <td class="num">${pe}</td>
-      <td class="num">${ath}</td>
-      <td class="num">${r.support ? c + fmtNum.format(r.support) : "—"}</td>
-      <td class="num">${r.resistance ? c + fmtNum.format(r.resistance) : "—"}</td>
-      <td class="num">${rsiBar(r.rsi)}</td>
-      <td class="num">${volBar(r.vol_ratio)}</td>
-      <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
-      <td>${sparkline(r.spark)}</td>
+      ${techCells(r)}
     </tr>`;
   }).join("");
 
@@ -128,9 +216,33 @@ function renderTable() {
     <td class="num">${fmtEUR.format(t.eur_value)}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="8"></td>
+    <td colspan="10"></td>
   </tr>`;
   $("#ptf-table tbody").innerHTML = rows + totalRow;
+}
+
+function renderWatchlist() {
+  const list = DATA.watchlist || [];
+  $("#wl-table tbody").innerHTML = list.length ? list.map(r => `<tr>
+      <td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+      <td class="num"><b>$${fmtNum.format(r.price)}</b></td>
+      <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
+      ${techCells(r)}
+    </tr>`).join("") : '<tr><td colspan="13" class="muted">Nessun dato</td></tr>';
+}
+
+/* ---------------- trimestrali ---------------- */
+function renderEarnings() {
+  const items = DATA.portfolio
+    .filter(r => r.earnings_date)
+    .map(r => ({ ...r, days: Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) }))
+    .sort((a, b) => a.days - b.days);
+  $("#earnings-strip").innerHTML = items.length ? "📅 <b>Prossime trimestrali:</b> " + items.map(r => {
+    const d = new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
+    const urgent = r.days <= 7 ? " earn-urgent" : "";
+    const when = r.days <= 0 ? "oggi" : r.days === 1 ? "domani" : `tra ${r.days} gg`;
+    return `<span class="earn-chip${urgent}" title="${r.name} — ${d}">${r.ticker} ${when} (${d})</span>`;
+  }).join("") : "";
 }
 
 /* ---------------- gauges ---------------- */
@@ -194,20 +306,78 @@ function renderGauges() {
     </div>`);
   }
 
+  if (m.carry) {
+    const cy = m.carry;
+    // spread 0–5% mappato 0–100: più ampio = carry più favorevole
+    const pct = Math.max(0, Math.min(100, cy.spread / 5 * 100));
+    const color = cy.spread >= 3 ? "var(--green)" : cy.spread >= 1.5 ? "var(--yellow)" : "var(--red)";
+    cards.push(`<div class="gauge-card">
+      <div class="g-title">Carry USA–Giappone</div>
+      ${gaugeSVG(pct, color)}
+      <div class="gauge-value">${fmtNum.format(cy.spread)} pp</div>
+      <div class="gauge-sub">US10A ${fmtNum.format(cy.us10)}% − JGB10A ${fmtNum.format(cy.jp10)}%<br>
+      USD/JPY ${fmtNum.format(cy.usdjpy)} (${signTxt(cy.usdjpy_chg_1m)} 1 mese)</div>
+    </div>`);
+  }
+
+  if (m.putcall) {
+    const pc = m.putcall;
+    // ratio 0–2 mappato 0–100: alto = prevalgono put
+    const pct = Math.max(0, Math.min(100, pc.ratio / 2 * 100));
+    const color = pc.ratio <= 0.8 ? "var(--green)" : pc.ratio <= 1.1 ? "var(--yellow)" : "var(--red)";
+    cards.push(`<div class="gauge-card">
+      <div class="g-title">Put/Call ${pc.symbol}</div>
+      ${gaugeSVG(pct, color)}
+      <div class="gauge-value">${fmtNum.format(pc.ratio)}</div>
+      <div class="gauge-sub"><b>${pc.ratio > 1 ? "Prevalgono PUT" : "Prevalgono CALL"}</b> (${esc(pc.name)})<br>
+      put ${pc.puts.toLocaleString("it-IT")} · call ${pc.calls.toLocaleString("it-IT")}</div>
+    </div>`);
+  }
+
+  if (m.risk_sentiment) {
+    const rs = m.risk_sentiment;
+    const color = rs.score >= 60 ? "var(--green)" : rs.score <= 40 ? "var(--red)" : "var(--yellow)";
+    const detail = (rs.components || []).map(cp => `${esc(cp.label)} ${cp.score}`).join(" · ");
+    cards.unshift(`<div class="gauge-card">
+      <div class="g-title">Sentiment globale</div>
+      ${gaugeSVG(rs.score, color)}
+      <div class="gauge-value">${rs.score}</div>
+      <div class="gauge-sub"><b>${rs.label}</b><br><span title="${detail}">composito F&amp;G · VIX · P/C · BTC · 10A</span></div>
+    </div>`);
+  }
+
+  if (m.thermometer) {
+    const th = m.thermometer;
+    const color = th.score >= 60 ? "var(--green)" : th.score <= 40 ? "var(--red)" : "var(--yellow)";
+    cards.push(`<div class="gauge-card">
+      <div class="g-title">Termometro portafoglio</div>
+      ${gaugeSVG(th.score, color)}
+      <div class="gauge-value">${th.score}</div>
+      <div class="gauge-sub"><b>${th.label}</b><br>media RSI + trend + momentum dei titoli</div>
+    </div>`);
+  }
+
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
 }
 
 /* ---------------- macro ---------------- */
-const MACRO_ACCENTS = { cpi: "var(--red)", pce: "var(--yellow)", gdp: "var(--blue)", retail: "var(--purple)", nfp: "var(--green)", unemp: "var(--cyan)", pmi: "var(--blue)" };
+const MACRO_ACCENTS = { cpi: "var(--red)", pce: "var(--yellow)", gdp: "var(--blue)", retail: "var(--purple)", nfp: "var(--green)", unemp: "var(--cyan)", pmi: "var(--blue)", "BTC-USD": "var(--yellow)", "CL=F": "var(--purple)", "^KS11": "var(--cyan)", "^IXIC": "var(--blue)" };
 
 function renderMacro() {
-  const list = DATA.macro?.indicators || [];
-  $("#macro-grid").innerHTML = list.length ? list.map(i => `
+  const markets = (DATA.macro?.markets || []).map(m => `
+    <div class="macro-item" style="--accent:${MACRO_ACCENTS[m.key] || "var(--blue)"}">
+      <div class="m-label">${m.label}</div>
+      <div class="m-value">${m.value}</div>
+      <div class="m-sub ${signCls(m.change_pct)}">${signTxt(m.change_pct, m.suffix || "%")} oggi</div>
+    </div>`);
+  const indicators = (DATA.macro?.indicators || []).map(i => `
     <div class="macro-item" style="--accent:${MACRO_ACCENTS[i.key] || "var(--purple)"}">
       <div class="m-label">${i.label}</div>
       <div class="m-value">${i.value}</div>
       <div class="m-date">${i.date}</div>
-    </div>`).join("") : '<span class="muted">Dati non disponibili</span>';
+    </div>`);
+  const cells = markets.concat(indicators);
+  $("#macro-grid").innerHTML = cells.length ? cells.join("") : '<span class="muted">Dati non disponibili</span>';
 }
 
 /* ---------------- news ---------------- */
@@ -220,17 +390,16 @@ function timeAgo(iso) {
 }
 
 function renderNews() {
-  let list = DATA.news || [];
-  if (newsFilter === "portfolio") list = list.filter(n => n.tickers.length);
+  const list = DATA.news || [];
   $("#news-list").innerHTML = list.length ? list.map(n => `
     <li class="news-item">
-      <a href="${n.link}" target="_blank" rel="noopener">${n.title}</a>
+      <a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a>
       <div class="news-meta">
-        <span class="news-src">${n.source}</span>
+        <span class="news-src">${esc(n.source)}</span>
         <span class="news-time">${timeAgo(n.published)}</span>
         ${n.tickers.map(t => `<span class="news-tk">${t}</span>`).join("")}
       </div>
-    </li>`).join("") : '<li class="muted">Nessuna news per il filtro selezionato</li>';
+    </li>`).join("") : '<li class="muted">Nessuna news recente sui titoli in portafoglio</li>';
 }
 
 /* ---------------- prompt AI ---------------- */
@@ -243,29 +412,43 @@ function buildPrompt() {
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   lines.push("");
   lines.push(`PORTAFOGLIO (totale ${fmtEUR.format(t.eur_value)}, guadagno ${signTxt(Math.round(t.eur_gain), " €")} / ${signTxt(t.eur_gain_pct)}):`);
-  DATA.portfolio.forEach(r => {
+  const stockLine = (r) => {
     const c = cur(r);
-    let l = `- ${r.name} (${r.ticker}): ${fmtNum.format(r.qty)} @ PMC ${c}${fmtNum.format(r.pmc)} | prezzo ${c}${fmtNum.format(r.price)} | oggi ${signTxt(r.change_pct)} | guadagno ${signTxt(r.gain_pct)}`;
-    if (r.rsi !== null) l += ` | RSI ${r.rsi}`;
+    let l = `- ${r.name} (${r.ticker}): prezzo ${c}${fmtNum.format(r.price)} | oggi ${signTxt(r.change_pct)}`;
+    if (r.qty) l = `- ${r.name} (${r.ticker}): ${fmtNum.format(r.qty)} @ PMC ${c}${fmtNum.format(r.pmc)} | prezzo ${c}${fmtNum.format(r.price)} | oggi ${signTxt(r.change_pct)} | guadagno ${signTxt(r.gain_pct)}`;
+    if (r.rsi !== null && r.rsi !== undefined) l += ` | RSI ${r.rsi}`;
     if (r.support) l += ` | supporto ${c}${fmtNum.format(r.support)} / resistenza ${c}${fmtNum.format(r.resistance)}`;
     if (r.pe && r.pe > 0) l += ` | P/E ${fmtNum.format(r.pe)}`;
+    if (r.rating?.key) l += ` | rating analisti: ${r.rating.key} (target ${c}${fmtNum.format(r.rating.target)}, ${signTxt(r.rating.upside_pct)} dal prezzo)`;
+    if (r.earnings_date) l += ` | prossima trimestrale: ${r.earnings_date}`;
     l += ` | segnale: ${r.signal}`;
-    lines.push(l);
-  });
+    return l;
+  };
+  DATA.portfolio.forEach(r => lines.push(stockLine(r)));
+  if ((DATA.watchlist || []).length) {
+    lines.push("");
+    lines.push("WATCHLIST (nessuna posizione):");
+    DATA.watchlist.forEach(r => lines.push(stockLine(r)));
+  }
   lines.push("");
   lines.push("QUADRO MACRO:");
+  if (m.risk_sentiment) lines.push(`- Sentiment globale: ${m.risk_sentiment.label} (${m.risk_sentiment.score}/100)`);
+  if (m.thermometer) lines.push(`- Termometro tecnico del portafoglio: ${m.thermometer.label} (${m.thermometer.score}/100)`);
   if (m.fear_greed) lines.push(`- Fear & Greed: ${m.fear_greed.score} (${FG_LABELS[m.fear_greed.rating] || m.fear_greed.rating}), 1 settimana fa ${m.fear_greed.week_ago}, 1 mese fa ${m.fear_greed.month_ago}`);
   if (m.vix) lines.push(`- VIX: ${m.vix.value} (${signTxt(m.vix.change_pct)} oggi)`);
   if (m.fedwatch) lines.push(`- Fed: range ${m.fedwatch.target_range}, tasso implicito futures ${m.fedwatch.implied_rate}%`);
+  if (m.carry) lines.push(`- Carry USA-Giappone: spread ${fmtNum.format(m.carry.spread)} pp (US10A ${m.carry.us10}%, JGB10A ${m.carry.jp10}%), USD/JPY ${m.carry.usdjpy} (${signTxt(m.carry.usdjpy_chg_1m)} 1 mese)`);
+  if (m.putcall) lines.push(`- Put/Call ${m.putcall.symbol} (${m.putcall.name}): ${m.putcall.ratio} (put ${m.putcall.puts}, call ${m.putcall.calls})`);
+  (m.markets || []).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (${i.date})`));
   lines.push("");
-  lines.push("ULTIME NEWS RILEVANTI:");
-  (DATA.news || []).filter(n => n.tickers.length).slice(0, 10).forEach(n => lines.push(`- [${n.tickers.join(",")}] ${n.title} (${n.source})`));
-  (DATA.news || []).filter(n => !n.tickers.length).slice(0, 8).forEach(n => lines.push(`- ${n.title} (${n.source})`));
+  lines.push("ULTIME NEWS SUI TITOLI IN PORTAFOGLIO:");
+  (DATA.news || []).slice(0, 14).forEach(n => lines.push(`- [${n.tickers.join(",")}] ${n.title} (${n.source})`));
   return lines.join("\n");
 }
 
 function toast(msg) {
+  document.querySelectorAll(".toast").forEach(t => t.remove());
   const el = document.createElement("div");
   el.className = "toast";
   el.textContent = msg;
@@ -284,7 +467,7 @@ async function showPrompt() {
 }
 
 /* ---------------- eventi ---------------- */
-$("#btn-refresh").addEventListener("click", () => loadData(true));
+$("#btn-refresh").addEventListener("click", refreshAll);
 $("#btn-prompt").addEventListener("click", showPrompt);
 $("#modal-close").addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
@@ -292,12 +475,13 @@ $("#btn-copy").addEventListener("click", async () => {
   await navigator.clipboard.writeText($("#prompt-text").value);
   toast("Copiato ✓");
 });
-document.querySelectorAll("#news-filters .chip").forEach(ch => {
+document.querySelectorAll("#spark-toggle .chip").forEach(ch => {
   ch.addEventListener("click", () => {
-    document.querySelectorAll("#news-filters .chip").forEach(c => c.classList.remove("chip-active"));
+    document.querySelectorAll("#spark-toggle .chip").forEach(c => c.classList.remove("chip-active"));
     ch.classList.add("chip-active");
-    newsFilter = ch.dataset.filter;
-    renderNews();
+    sparkRange = ch.dataset.range;
+    renderTable();
+    renderWatchlist();
   });
 });
 

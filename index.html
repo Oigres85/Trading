@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=3">
+<link rel="stylesheet" href="assets/style.css?v=5">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📈</text></svg>">
 </head>
 <body>
@@ -30,24 +30,25 @@
   <!-- KPI -->
   <section class="kpi-grid" id="kpi-grid"></section>
 
-  <!-- MACRO -->
-  <div class="grid-2">
-    <section class="card">
-      <div class="card-head"><h2>Indicatori di mercato</h2></div>
-      <div class="gauges" id="gauges"></div>
-    </section>
-    <section class="card">
-      <div class="card-head"><h2>Dati macro USA</h2></div>
-      <div class="macro-grid" id="macro-grid"></div>
-    </section>
-  </div>
+  <!-- MACRO & MERCATI -->
+  <section class="card">
+    <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
+    <div class="gauges" id="gauges"></div>
+    <div class="macro-grid macro-grid-below" id="macro-grid"></div>
+  </section>
 
   <!-- PORTAFOGLIO -->
   <section class="card">
     <div class="card-head">
       <h2>Portafoglio &amp; Dati Tecnici</h2>
+      <div class="spark-toggle" id="spark-toggle">
+        <button class="chip" data-range="d1">1G</button>
+        <button class="chip chip-active" data-range="m1">1M</button>
+        <button class="chip" data-range="y1">1A</button>
+      </div>
       <span class="muted" id="fx-note"></span>
     </div>
+    <div class="earnings-strip" id="earnings-strip"></div>
     <div class="table-wrap">
       <table id="ptf-table">
         <thead>
@@ -67,7 +68,39 @@
             <th class="num">RSI 14</th>
             <th class="num">Vol / media</th>
             <th>Segnale</th>
-            <th>30 gg</th>
+            <th>Rating</th>
+            <th class="num">Target Δ</th>
+            <th>Grafico</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- WATCHLIST -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Watchlist</h2>
+      <span class="muted">Stessi dati tecnici, nessuna posizione</span>
+    </div>
+    <div class="table-wrap">
+      <table id="wl-table">
+        <thead>
+          <tr>
+            <th class="sticky-col">Titolo</th>
+            <th class="num">Prezzo</th>
+            <th class="num">Oggi</th>
+            <th class="num">P/E</th>
+            <th class="num">Max storico</th>
+            <th class="num">Supporto</th>
+            <th class="num">Resistenza</th>
+            <th class="num">RSI 14</th>
+            <th class="num">Vol / media</th>
+            <th>Segnale</th>
+            <th>Rating</th>
+            <th class="num">Target Δ</th>
+            <th>Grafico</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -78,17 +111,13 @@
   <!-- NEWS -->
   <section class="card">
     <div class="card-head">
-      <h2>News</h2>
-      <div class="news-filters" id="news-filters">
-        <button class="chip chip-active" data-filter="all">Tutte</button>
-        <button class="chip" data-filter="portfolio">Portafoglio</button>
-      </div>
+      <h2>News sul portafoglio</h2>
     </div>
     <ul class="news-list" id="news-list"></ul>
   </section>
 
   <footer>
-    Dati: Yahoo Finance · CNN Fear &amp; Greed · FRED · DBnomics · Borsa Italiana · RSS (CNBC, Bloomberg, Yahoo, Investing, Google News).
+    Dati: Yahoo Finance · CNN Fear &amp; Greed · FRED/BLS/DBnomics · NY Fed · MOF Giappone · Borsa Italiana · RSS (CNBC, Bloomberg, Yahoo, Investing, Google News).
     Aggiornamento automatico ogni ~20 min in orario di mercato via GitHub Actions. Non è consulenza finanziaria.
   </footer>
 </main>
@@ -109,6 +138,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=3"></script>
+<script src="assets/app.js?v=5"></script>
 </body>
 </html>

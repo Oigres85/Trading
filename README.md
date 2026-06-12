@@ -14,17 +14,22 @@ Dashboard del portafoglio con dati tecnici, indicatori macro e news, pubblicata 
 
 | Dato | Fonte |
 |---|---|
-| Quotazioni, storico, P/E, volumi, VIX, EUR/USD, futures Fed Funds | Yahoo Finance (yfinance) |
+| Quotazioni, storico, P/E, volumi, rating analisti, trimestrali, opzioni put/call, VIX, Treasury 10A, FX, BTC, WTI, KOSPI, Nasdaq, futures Fed Funds | Yahoo Finance (yfinance) |
 | Fear & Greed Index | CNN |
-| CPI, PCE, PIL, vendite al dettaglio, NFP, disoccupazione, fiducia consumatori, tassi Fed | FRED (csv pubblico), con fallback BLS API / DBnomics (BEA) |
+| CPI, PCE, PIL, vendite al dettaglio, NFP, disoccupazione, fiducia consumatori, tassi Fed | FRED (csv pubblico), con fallback BLS API / DBnomics (BEA) / NY Fed |
+| Rendimento JGB 10 anni (carry USA-Giappone) | MOF Giappone (csv ufficiale) |
 | Prezzo BTP Valore Ott 2028 (IT0005565400) | Borsa Italiana |
-| News | RSS: CNBC, Bloomberg, Yahoo Finance, Investing.com, Google News |
+| News (solo titoli in portafoglio) | RSS: CNBC, Bloomberg, Yahoo Finance, Investing.com, Google News |
+
+Sezioni: KPI, *Macro & Mercati* (gauge sentiment risk-on/off, Fear & Greed, VIX, FedWatch, carry USA-Giappone, put/call BSX, termometro tecnico del portafoglio + indicatori macro e mercati), portafoglio con dati tecnici, rating analisti, target price, prossime trimestrali e mini-grafici commutabili 1G/1M/1A, watchlist (OKLO, SPCX, CBRS), news.
 
 ## Funzioni della pagina
 
-- **⟳ Aggiorna** — ricarica `data.json` (i dati si rigenerano comunque da soli via Actions)
+- **⟳ Aggiorna** — rigenera TUTTI i dati in tempo reale: lancia il workflow GitHub e ricarica la pagina appena i nuovi dati sono pubblicati (~2-3 min). Alla prima pressione chiede un token GitHub (fine-grained, solo questo repo, permesso *Actions: read & write* — si crea su https://github.com/settings/personal-access-tokens), salvato solo nel browser. Senza token, ricarica gli ultimi dati pubblicati.
 - **🤖 Prompt AI** — genera e copia un prompt con il riepilogo completo dei dati da incollare in Claude per l'analisi
 - **🧮 Calc. PMC** — link al [calcolatore prezzo medio](https://fical.net/it/calcolatore-prezzo-medio)
+
+Le news mostrano solo le notizie correlate ai titoli in portafoglio. La sezione *Macro & Mercati* include anche Bitcoin, petrolio WTI, KOSPI e Nasdaq.
 
 ## FRED API key (consigliato)
 
