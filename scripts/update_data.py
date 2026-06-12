@@ -263,8 +263,12 @@ def fetch_macro():
 
     # FedWatch (tassi impliciti dai futures Fed Funds 30-day)
     try:
-        target = fred_series("DFEDTARU", 1)[-1][1]
-        target_low = fred_series("DFEDTARL", 1)[-1][1]
+        try:
+            target = fred_series("DFEDTARU", 1)[-1][1]
+            target_low = fred_series("DFEDTARL", 1)[-1][1]
+        except Exception:  # noqa: BLE001 — FRED bloccato: range obiettivo dalla NY Fed
+            rr = http_get("https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json").json()["refRates"][0]
+            target, target_low = float(rr["targetRateTo"]), float(rr["targetRateFrom"])
         zq = yf.Ticker("ZQ=F").fast_info.last_price
         implied = round(100 - float(zq), 2)
         mid = (target + target_low) / 2
