@@ -10,16 +10,18 @@ import type {
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
-const INDICES = ['^GSPC', '^NDX', '^SOX', '^VIX']
+const INDICES = ['^GSPC', '^NDX', '^SOX', '^VIX', 'USDJPY=X']
 const INDEX_NAMES: Record<string, string> = {
   '^GSPC': 'S&P 500',
   '^NDX': 'Nasdaq 100',
   '^SOX': 'SOX Index',
   '^VIX': 'VIX',
+  'USDJPY=X': 'USD/JPY',
 }
 const STOCKS = [
   'NVDA','AMD','AVGO','TSM','ASML','QCOM','INTC','MU','ARM','AMAT',
   'LRCX','KLAC','MRVL','ON','TXN','MCHP','AAPL','MSFT','GOOGL','META',
+  'TSLA','MSTR','RGTI','OKLO','ARBE',
 ]
 const SECTOR_ETFS = [
   { symbol: 'SMH',  name: 'VanEck Semiconductors',   category: 'semi' as const },
@@ -77,6 +79,7 @@ function getMock(): Record<string, Record<string, unknown>> {
     '^NDX':  { regularMarketPrice:20850.4, regularMarketChange:102.76, regularMarketChangePercent:0.50,  regularMarketVolume:890000000,  shortName:'Nasdaq 100',            regularMarketTime:ts },
     '^SOX':  { regularMarketPrice:5210.38, regularMarketChange:87.22,  regularMarketChangePercent:1.70,  regularMarketVolume:320000000,  shortName:'PHLX Semiconductor',    regularMarketTime:ts },
     '^VIX':  { regularMarketPrice:13.82,   regularMarketChange:-0.45,  regularMarketChangePercent:-3.15, regularMarketVolume:0,          shortName:'CBOE Volatility Index', regularMarketTime:ts },
+    'USDJPY=X': { regularMarketPrice:157.342, regularMarketChange:0.215, regularMarketChangePercent:0.137, regularMarketVolume:0, shortName:'USD/JPY', regularMarketTime:ts },
     'NVDA':  { regularMarketPrice:1087.45, regularMarketChange:23.12,  regularMarketChangePercent:2.17,  regularMarketVolume:42800000, shortName:'NVIDIA Corporation',      marketCap:2.68e12,  trailingPE:72.4,  fiftyTwoWeekHigh:1241, fiftyTwoWeekLow:462,  regularMarketTime:ts },
     'AMD':   { regularMarketPrice:163.78,  regularMarketChange:2.45,   regularMarketChangePercent:1.52,  regularMarketVolume:38200000, shortName:'Advanced Micro Devices',  marketCap:2.65e11,  trailingPE:145.2, fiftyTwoWeekHigh:227.3,fiftyTwoWeekLow:122.7,regularMarketTime:ts },
     'AVGO':  { regularMarketPrice:1892.34, regularMarketChange:-12.56, regularMarketChangePercent:-0.66, regularMarketVolume:5900000,  shortName:'Broadcom Inc.',           marketCap:8.8e11,   trailingPE:58.3,  fiftyTwoWeekHigh:2415, fiftyTwoWeekLow:1252, regularMarketTime:ts },
@@ -97,6 +100,11 @@ function getMock(): Record<string, Record<string, unknown>> {
     'MSFT':  { regularMarketPrice:442.57,  regularMarketChange:3.21,   regularMarketChangePercent:0.73,  regularMarketVolume:18700000, shortName:'Microsoft Corporation',   marketCap:3.29e12,  trailingPE:37.8,  fiftyTwoWeekHigh:468.3,fiftyTwoWeekLow:344.8,regularMarketTime:ts },
     'GOOGL': { regularMarketPrice:198.47,  regularMarketChange:1.87,   regularMarketChangePercent:0.95,  regularMarketVolume:25100000, shortName:'Alphabet Inc.',           marketCap:2.48e12,  trailingPE:22.4,  fiftyTwoWeekHigh:207,  fiftyTwoWeekLow:142.7,regularMarketTime:ts },
     'META':  { regularMarketPrice:598.34,  regularMarketChange:8.92,   regularMarketChangePercent:1.51,  regularMarketVolume:12600000, shortName:'Meta Platforms Inc.',     marketCap:1.52e12,  trailingPE:27.9,  fiftyTwoWeekHigh:740.9,fiftyTwoWeekLow:373.9,regularMarketTime:ts },
+    'TSLA':  { regularMarketPrice:248.50,  regularMarketChange:-3.72,  regularMarketChangePercent:-1.47, regularMarketVolume:87200000, shortName:'Tesla Inc.',              marketCap:7.93e11,  trailingPE:62.1,  fiftyTwoWeekHigh:488.5,fiftyTwoWeekLow:138.8,regularMarketTime:ts },
+    'MSTR':  { regularMarketPrice:385.40,  regularMarketChange:12.45,  regularMarketChangePercent:3.34,  regularMarketVolume:9400000,  shortName:'MicroStrategy Inc.',      marketCap:7.8e10,   trailingPE:null,  fiftyTwoWeekHigh:473.8,fiftyTwoWeekLow:107.4,regularMarketTime:ts },
+    'RGTI':  { regularMarketPrice:14.82,   regularMarketChange:-0.63,  regularMarketChangePercent:-4.08, regularMarketVolume:42100000, shortName:'Rigetti Computing Inc.',  marketCap:2.5e9,    trailingPE:null,  fiftyTwoWeekHigh:21.95,fiftyTwoWeekLow:0.925,regularMarketTime:ts },
+    'OKLO':  { regularMarketPrice:55.12,   regularMarketChange:1.87,   regularMarketChangePercent:3.51,  regularMarketVolume:3600000,  shortName:'Oklo Inc.',               marketCap:5.1e9,    trailingPE:null,  fiftyTwoWeekHigh:56.80,fiftyTwoWeekLow:5.28, regularMarketTime:ts },
+    'ARBE':  { regularMarketPrice:2.87,    regularMarketChange:-0.08,  regularMarketChangePercent:-2.71, regularMarketVolume:820000,   shortName:'Arbe Robotics Ltd.',      marketCap:2.8e8,    trailingPE:null,  fiftyTwoWeekHigh:5.79, fiftyTwoWeekLow:1.60, regularMarketTime:ts },
     'SMH':   { regularMarketPrice:258.43,  regularMarketChange:5.12,   regularMarketChangePercent:2.02,  regularMarketVolume:5800000,  shortName:'VanEck Semiconductor ETF',regularMarketTime:ts },
     'SOXX':  { regularMarketPrice:224.17,  regularMarketChange:4.23,   regularMarketChangePercent:1.92,  regularMarketVolume:2300000,  shortName:'iShares Semiconductor ETF',regularMarketTime:ts },
     'XLK':   { regularMarketPrice:223.56,  regularMarketChange:1.34,   regularMarketChangePercent:0.60,  regularMarketVolume:7100000,  shortName:'Technology Select Sector SPDR',regularMarketTime:ts },
@@ -159,6 +167,26 @@ export async function fetchMarketData(): Promise<MarketDataResponse> {
   return { indices, stocks, sectors, lastUpdated: new Date().toISOString(), marketStatus: getMarketStatus(), isLive }
 }
 
+// ─── Fear & Greed ─────────────────────────────────────────────────────────────
+
+export interface FearGreed {
+  value: number
+  classification: string
+}
+
+export async function fetchFearGreed(): Promise<FearGreed | null> {
+  try {
+    const res = await fetch('https://api.alternative.me/fng/?limit=1', {
+      signal: AbortSignal.timeout(5000),
+    })
+    if (!res.ok) return null
+    const json = await res.json()
+    const d = json?.data?.[0]
+    if (!d) return null
+    return { value: parseInt(d.value, 10), classification: String(d.value_classification) }
+  } catch { return null }
+}
+
 // ─── News ─────────────────────────────────────────────────────────────────────
 
 const FALLBACK_NEWS: NewsItem[] = [
@@ -176,6 +204,9 @@ const FALLBACK_NEWS: NewsItem[] = [
 
 // Feed RSS italiani in ordine di priorità
 const ITALIAN_FEEDS = [
+  { url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html', source: 'CNBC Markets' },
+  { url: 'https://it.investing.com/rss/news.rss',                 source: 'Investing.com IT' },
+  { url: 'https://www.cnbc.com/id/19854910/device/rss/rss.html',  source: 'CNBC Tech' },
   { url: 'https://www.ilsole24ore.com/rss/finanza.xml',         source: 'Il Sole 24 Ore' },
   { url: 'https://xml2.corriere.it/rss/economia.xml',           source: 'Corriere Economia' },
   { url: 'https://feeds.finance.yahoo.com/rss/2.0/headline?s=NVDA,AMD,INTC,AVGO,TSM,ASML,MU,QCOM,AMAT&region=IT&lang=it-IT', source: 'Yahoo Finance IT' },
@@ -206,9 +237,16 @@ export async function fetchNews(): Promise<NewsResponse> {
       const data = await res.json()
       if (data.status !== 'ok' || !Array.isArray(data.items)) continue
 
-      const mapped = (data.items as Record<string, unknown>[])
+      const rawMapped = (data.items as Record<string, unknown>[])
         .map((item, i) => mapRssItem(item, feed.source, i))
         .filter(n => n.title && n.url)
+
+      // Dopo la .filter() dei news items, aggiungi campo portfolioMention
+      const mapped = rawMapped.map(n => ({
+        ...n,
+        portfolioMention: ['NVDA','AMD','MU','INTC','TSLA','MSTR','RGTI','OKLO','ARBE']
+          .some(t => n.title.toUpperCase().includes(t)),
+      }))
 
       items.push(...mapped)
     } catch { /* prova il feed successivo */ }

@@ -42,6 +42,7 @@ export interface NewsItem {
   url: string
   source: string
   publishedAt: string
+  portfolioMention?: boolean
 }
 
 export type MarketStatus = 'open' | 'closed' | 'pre-market' | 'after-hours'
