@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-13T11:18:10Z",
+ "updated_at": "2026-06-13T13:27:56Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -3072,16 +3072,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63890.66,
-   "change_pct": 0.55,
+   "price": 64164.81,
+   "change_pct": 0.98,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.4,
+   "ath_dist_pct": -49.2,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 34.4,
-   "volume": 20979281920,
-   "vol_ratio": 0.62,
+   "rsi": 35.5,
+   "volume": 21488461824,
+   "vol_ratio": 0.64,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -3090,7 +3090,7 @@
      61449.29,
      63561.05,
      63543.2,
-     63890.66
+     64164.81
     ],
     "m1": [
      76673.37,
@@ -3114,7 +3114,7 @@
      61449.29,
      63561.05,
      63543.2,
-     63890.66
+     64164.81
     ],
     "m3": [
      71767.83,
@@ -3182,7 +3182,7 @@
      61449.29,
      63561.05,
      63543.2,
-     63890.66
+     64164.81
     ],
     "y1": [
      106090.97,
@@ -3258,7 +3258,7 @@
      73372.52,
      64014.37,
      63090.59,
-     63890.66
+     64164.81
     ],
     "d1": [
      63525.67,
@@ -3328,7 +3328,20 @@
      63821.43,
      63805.62,
      63824.26,
-     63870.78
+     63870.78,
+     63920.0,
+     63875.86,
+     63869.76,
+     63869.0,
+     63915.21,
+     63900.02,
+     63896.54,
+     63972.25,
+     63960.75,
+     64071.15,
+     64068.42,
+     64133.88,
+     64169.17
     ]
    },
    "earnings_date": null,
@@ -3342,22 +3355,22 @@
     "w1": {
      "support": 60756.69,
      "resistance": 64334.02,
-     "change_pct": 3.64
+     "change_pct": 4.09
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.67
+     "change_pct": -16.31
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -10.98
+     "change_pct": -10.59
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.27
+     "change_pct": -48.05
     }
    }
   },
@@ -5347,7 +5360,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 56
+     "score": 60
     },
     {
      "label": "Treasury 10A",
@@ -5432,6 +5445,39 @@
  "news": [
   {
    "source": "Google News",
+   "title": "Nvidia Stock Just Did Something for the First Time in More Than 5 Years. Here's What History Says Happens Next. - The Motley Fool",
+   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPZllUVm1rZHo3WDNUazFjdkc0blhXNGlKZFJYMWNaN2ZCYVVTVU5VLVhDclNiZW5OZEFpcm9XdFl0ZTNUdnh1Ym0tcnFrUUJINHJOSkgwTTk1VTExRXVVUndRN2Uwbjc5R1lxUGlzUm80Z0xIQU5qMm80aXE0a3VjLWR3dzV3M2h0TlJFR0lCXzRSNHI2cDMwcA?oc=5",
+   "published": "2026-06-13T13:00:14Z",
+   "tickers": [
+    "NVDA"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Le azioni Nvidia hanno fatto qualcosa per la prima volta in più di 5 anni. Ecco cosa dice la storia che accadrà dopo. - Il pazzo eterogeneo"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Dow Jones Futures: Market Has Wild Week, 5 Stocks In Buy Areas; SpaceX's Next Test",
+   "link": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-market-wild-week-5-stocks-buy-areas-spacex-next-test/?src=A00220&yptr=yahoo",
+   "published": "2026-06-13T12:47:44Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Futures Dow Jones: il mercato ha una settimana selvaggia, 5 titoli in aree di acquisto; Il prossimo test di SpaceX"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "CNBC anchor stunned by $107B US trade deficit drop: ‘Buckle up, this is unreal!’ Are Trump’s tariffs a triumph?",
+   "link": "https://finance.yahoo.com/economy/policy/articles/cnbc-anchor-stunned-107b-us-120000399.html",
+   "published": "2026-06-13T12:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "bear",
+   "title_it": "Il conduttore della CNBC sbalordito dal calo del deficit commerciale statunitense di 107 miliardi di dollari: “Allacciate le cinture, è irreale!” I dazi di Trump sono un trionfo?"
+  },
+  {
+   "source": "Google News",
    "title": "Nvidia CEO Jensen Huang Says This Will Be the Next $1 Trillion Company - The Motley Fool",
    "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNSUxqTnZRX20wR3I3ei03UlRRczB5aEM4djV1UHg1RjA5dXRweG1JWV9ROFdWUVNaTXdPLTVJSUpLUWV1ZEluN0FYaV80QW84MW5JUVk2TTdDWlRGOHhueENqaVdSeHoyYnNob20wRjZ3aU1NaFVMck5UUGhpa3JJNm1yUTNaT3Y5YTk5YlVMTVJ6NzhaNXMyVg?oc=5",
    "published": "2026-06-13T11:14:32Z",
@@ -5443,25 +5489,14 @@
   },
   {
    "source": "Google News",
-   "title": "Chad Rigetti: The Definitive 2026 Profile Of A Quantum Pioneer - Quantum Zeitgeist",
-   "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5nLTJQMmlIeUZWMnZzUTUxN1RGa0QtS3l0QkNXTEphTXhKR29MUmVHckxpNDMtUFoxaHFTR0htdzc4emJsS19BMXZWMjJHM2p3aTZTWA?oc=5",
-   "published": "2026-06-13T10:35:59Z",
+   "title": "Lumentum Nvidia Deal Highlights AI Optics Growth And Valuation Opportunity - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxObTU4dmQ4aGRuWTRZZVhyRlFrOUw5MTV5Y1U5QmJWS2JqYnM3TFlxTnJjSl9IczRhSThoSkk3VE80eTRQWmUtMlMzbXlQZGd6WDBZOGZaNVpwUGo0S2p4Y3VSUTkyTDBRNzAxaEJLdWsxQzlkLUMwdEoxUVlJQ2VqSnF1UVVxYTlqNzlTQ3R2WnNzMFpvWVp1SnU5dm5iR2Nt?oc=5",
+   "published": "2026-06-13T11:12:44Z",
    "tickers": [
-    "RGTI"
+    "NVDA"
    ],
-   "sentiment": "neutral",
-   "title_it": "Chad Rigetti: il profilo definitivo di un pioniere quantistico per il 2026 - Quantum Zeitgeist"
-  },
-  {
-   "source": "Google News",
-   "title": "Mag 7? MANGOS? SpaceX forces name rethink on Wall Street's tech-stock moniker - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOVFh2RmJuX1poQlE4QVhNMG1kYjNaeUVhQmx3T2lEU002bTluMC1kbmhIUWR0eG5EYnRycEVvc2NWUGM5WFNDY3BwM3hhZzdzc2pzQW1pMHlsaHpkYVBteHZKSDAxajF5UVNXV0ZIdlpLcWFjSlM2ZFg3YlFscDRseHpMdURVOEJicWRtdVdGUXEtYVR0dklLbzN4bjV5XzBfeHl5VEVmaWN1OXFMUzVNQVdlRWlqNGNZUXRlS1dGQllFSTlrRUE?oc=5",
-   "published": "2026-06-13T10:23:46Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral",
-   "title_it": "Mag7? MANGO? SpaceX costringe a riconsiderare il nome del titolo tecnologico di Wall Street - Reuters"
+   "sentiment": "bull",
+   "title_it": "L'accordo Lumentum con Nvidia evidenzia le opportunità di crescita e di valutazione di AI Optics - Yahoo Finanza"
   },
   {
    "source": "Bloomberg",
@@ -5498,6 +5533,17 @@
   },
   {
    "source": "Google News",
+   "title": "Mag 7? MANGOS? SpaceX forces name rethink on Wall Street's tech-stock moniker - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPb2RZM1NuSGtNYTU0YThDRkNVM2E3QkN1dXk4djR2aHc3Y2UzZ2FVU0FtakdWTUZYdUx1Ty1OTmtFczR2WHlKYzdZNTBWY2VwWGhRT05HalFjVXFHVUg4UTZXZWRQQ3FJSFhsT2NscjBVX0lQYjcwQnVwNWpaSmthN180Zmt2aGliSGhfZmJ5Qld4TTBfamc?oc=5",
+   "published": "2026-06-13T10:02:40Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Mag7? MANGO? SpaceX impone un ripensamento del nome sul soprannome di azioni tecnologiche di Wall Street - Yahoo Finanza"
+  },
+  {
+   "source": "Google News",
    "title": "SpaceX, Super Micro Computer, Micron And More: 5 Stocks Investors Couldn't Stop Buzzing About This Week - Benzinga",
    "link": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxPcGJVRGdIUlh3dWd0NVZET01PMFMwa0VmSEU1QWZZRW5wVThUaXRINE9rNFc4bFUxUC0zeEcxUEpyelNpSWMySGk0d0hnaHpnYkI5UHpuQnR3VE54R216a2FJQi0taWk1U0lGcmhEZ29UajYtY2UybmZ3UGF4b1FBVmJZZVF4cHR1dE9QcWtuTlJnNU1DYlYzVjhJSTNaUDNqNVhYVjZqNDE5NV9pRDloTHhSMUZuckhuVC1zV1czX3VGUG12ZGJoX0dVdXNKRzJCYTJfYUw4V3VSb2FiTjR4dXBiZW10aG8wUmJoMw?oc=5",
    "published": "2026-06-13T10:01:26Z",
@@ -5505,7 +5551,7 @@
     "MU"
    ],
    "sentiment": "neutral",
-   "title_it": "SpaceX, Super Micro Computer, Micron e altro ancora: 5 investitori azionari di cui non si può fare a meno questa settimana - Benzinga"
+   "title_it": "SpaceX, Super Micro Computer, Micron e altro: 5 investitori azionari che non riescono a smettere di parlare di sé questa settimana - Benzinga"
   },
   {
    "source": "Google News",
@@ -5530,43 +5576,21 @@
    "title_it": "Come Wall Street ha realizzato la più grande IPO della storia per SpaceX - Financial Times"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Mortgage and refinance interest rates today, Saturday, June 13, 2026: All rates moving lower",
-   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/mortgage-refinance-interest-rates-today-saturday-june-13-2026-100000307.html",
+   "source": "Google News",
+   "title": "Rivian’s CEO on Tesla’s Cybertruck, Ferrari’s Luce, and What Happens If the R2 Fails - WIRED",
+   "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE43ZUkydUMyNktYM0NyNE44c1BFRHR5SGRxdGhRT1dOZ0hRZ0F5MHBPTkotaTlQbHByT2pRRlhEdFowWGh6LTNqYjFqYUhDbV9PWFNGUURUZDFUZlZ2YzJibXZYS05xT0otcTFLWHNfR0tfQk5s?oc=5",
    "published": "2026-06-13T10:00:00Z",
    "tickers": [
-    "MACRO"
+    "TSLA"
    ],
    "sentiment": "neutral",
-   "title_it": "Tassi di interesse ipotecari e di rifinanziamento oggi, sabato 13 giugno 2026: tutti i tassi in ribasso"
-  },
-  {
-   "source": "Google News",
-   "title": "Iran war is a smokescreen for a looming oil market crunch - The Telegraph",
-   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQaHVDUGFGNHY4RnRMY2ZPdFRoMkFIbHlsNzNHcFhZS3dFWWt4ekZ6RWw0Qy05WHlyYkVvTHUxT0xfOEE3TlJMODVCTDNoWS1iZkZhY2FORnliby0xQi1ZTlBmOW1xc0twbTVzSDR5TXAydjJtT2R1Vkh6aDRTbXlxUnJTd1YwUlZQZm5lUlVyTl80Q0VwSTdvazVpcjdzYWRZ?oc=5",
-   "published": "2026-06-13T10:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "bear",
-   "title_it": "La guerra in Iran è una cortina di fumo per l’incombente crisi del mercato petrolifero – The Telegraph"
-  },
-  {
-   "source": "Google News",
-   "title": "Tracker: The Federal Reserve’s Balance Sheet Assets - The American Action Forum",
-   "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNR2NrRDdoQ1MwS0paZFliV01BelV0MS1tQkNMSEdJYmYweWctanpzZU5hMllmVUtjQWR2cXBPSVhFeFluSFlMbi1ZVTg1ZS1TYzRMam81MFlRbWxockRRN2RpeEk2OGhpYWVXUVpsX3lvcUx4QUFERERGQVdkeVRndHJNeExJTU9DLS1GRW9GTW0?oc=5",
-   "published": "2026-06-13T09:55:58Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral",
-   "title_it": "Tracker: le attività di bilancio della Federal Reserve - The American Action Forum"
+   "title_it": "Il CEO di Rivian parla del Cybertruck di Tesla, della Luce della Ferrari e di cosa succede se l'R2 fallisce - WIRED"
   },
   {
    "source": "Google News",
    "title": "SpaceX Stock Will Be Worth More Than Nvidia, According to Certain Wall Street Experts - The Motley Fool",
    "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxONEZha0FhNndrY2Rlb0c2MmdyOWRVTTQtZDhMSDg3akVSVURZVDU2aHZacmt6aXpnY3dUdXEySG1jWkU5aHRLTUFHenM4UFppOGN4UmpvbGVseWNmcm5PdS0waTlaWnZ4MU9tZ3FudkI4aWpvSmlQMFRidHlxanh3ZUY2cGN2YVlxdm1YYWh1SUNLRVhRV0E?oc=5",
-   "published": "2026-06-13T09:23:44Z",
+   "published": "2026-06-13T09:48:00Z",
    "tickers": [
     "MACRO",
     "NVDA"
@@ -5599,14 +5623,14 @@
   },
   {
    "source": "Google News",
-   "title": "Charting the Global Economy: War Pushes Up Prices, Dents Growth - Bloomberg",
+   "title": "Charting the Global Economy: War Pushes Up Prices, Dents Growth - Bloomberg.com",
    "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNMzdZTEdhUnZTTGpoSmpiUWJPOEdHYnlaaGRyaWdtR1lmV0dvc0dYRFB1TDRyeDdFM0xic0w3RDZXaUQ3T19QdENXb1NnTmt1ZkZCcEFLYi0tcU1mQklDaTI0MXBydU1UbmNRV2piWHVWcTlIYjB4bnVGeHJUQkdhc21VcWZEVjd6SlFrcmxfLXJ2VGljeWVzX2d1N3I1SGNpR1FlTEVRTk1wTGhaMXpJS3Rn?oc=5",
    "published": "2026-06-13T09:00:00Z",
    "tickers": [
     "MACRO"
    ],
    "sentiment": "neutral",
-   "title_it": "Tracciare l'economia globale: la guerra fa salire i prezzi, intacca la crescita - Bloomberg"
+   "title_it": "Tracciare l'economia globale: la guerra fa salire i prezzi, intacca la crescita - Bloomberg.com"
   },
   {
    "source": "Google News",
@@ -5653,6 +5677,28 @@
    "title_it": "La Cina è “fortemente insoddisfatta” della mossa del Pentagono contro le principali aziende tecnologiche cinesi"
   },
   {
+   "source": "Bloomberg",
+   "title": "US and Iran Move Closer to Deal Despite Hormuz Skirmishes",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-13/us-strikes-iranian-drones-while-talks-continue-for-interim-deal",
+   "published": "2026-06-13T06:49:51Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Stati Uniti e Iran si avvicinano all’accordo nonostante le schermaglie di Hormuz"
+  },
+  {
+   "source": "Google News",
+   "title": "US stocks rise after oil prices ease and SpaceX soars in its debut on Wall Street - JHNewsAndGuide.com",
+   "link": "https://news.google.com/rss/articles/CBMikAJBVV95cUxQSGlHXzlDaWY2NnN2djNYbVNrcnpqX01VNG96bmdQSzRiSlBGVmNWM0d3Uy1MUUlFbGVvMU1FemN2QWRRQjlFQnVEMjlUWXNCTUZYX19hLWloTVNPWmQ0NjA2SmpkeWNYeV9tTmVNQ1ZZVlRhOGN0ZHBNaTVwOVVnSHpiVTBCd0FOU0NZaTU3YXNYdU1NdG1XN2xFbFlUUU8yQmUwN3Jub3I2SkdvM19rQ3VpR20xX0czaU9KbE1kSGgxNjJKOHJJTFhDNXd5ZkIzS0pNdDI4b1pEZXRjZFl3RlFPUnExYlAxVG5WaEdGOXVWamJwM0czbU05TXFYUURnR280QlJhWUQtRmliUlRtWQ?oc=5",
+   "published": "2026-06-13T06:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "bull",
+   "title_it": "Le azioni statunitensi salgono dopo il calo dei prezzi del petrolio e SpaceX vola al suo debutto a Wall Street - JHNewsAndGuide.com"
+  },
+  {
    "source": "Google News",
    "title": "Meet the Medtech Stock Wall Street Thinks Will Soar 65% Over the Next 12 Months - The Motley Fool",
    "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxObWpDbEhHS2IzbHRhbllacllFMlkwMURFYzViVEFXbUdrRzM2RzhQTHlIM05zcXVJdEJSVnE5M1VsTXZBczV0ZVNCUE5aNi04dE42NkNZcVhiZVhuZUVob3gtVWdUT0tTMEZZUUZnRVBGQ1NnMXlpbGY2U3VaR0xyMWd4X1ZiY2V0Z1AyVVJfUGlOclUyeFhWeA?oc=5",
@@ -5678,7 +5724,7 @@
    "source": "Google News",
    "title": "AI is revolutionising the stock market - Financial Times",
    "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQUk00bUtwTlNha3puNm0zOE5QRzFhNnpsN2VqNm80VEl1OTRtY05tRmRjbW9DcERDY0VXMmVKUGpaN3VkWThUV1V3SzBJMDA5a1JmdHNuUXNIWjhSSy1RSW4tMVNDdjNDd0hVLU5IVFUzVE9TOXY5Q0hwNmg0emQ4ZEdjWlk?oc=5",
-   "published": "2026-06-13T04:00:23Z",
+   "published": "2026-06-13T04:01:35Z",
    "tickers": [
     "MACRO"
    ],
@@ -5709,14 +5755,14 @@
   },
   {
    "source": "Google News",
-   "title": "SpaceX stock soars in Wall Street debut - NBC Bay Area",
-   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQV19MMkxoanB2RFprREUzOTJJSWRXM0UtYXY1bHZiTENFa0Rtdm1jR2pEQ3d2Mm1sVGRvNWVsSnU0a1ktbkFkSktzLVBfN3Q2eEM5UWtuU19oTV9uNDlIblJNRlpfTkF2OFgwN1Zpa3Q2M241OFQwMVJCcUtadW1pbnlIMVI2S1d0ZUw5dnUxUnlDQdIBmgFBVV95cUxQTkhUbE1waU82bXl0NlJzaFBDN3BLb0o4azMwZFJVZ094Nl9JdGoxV0RkQWZpVnFvSUZ2dlluY3lYSmt3cWRONFBvdWhfWnZaQXgtYi1YQmVoY2NuU285T3JKblRrQlpmNHVkTGdkN216YV9SbXVsa1JEMlpDbmZMQV9Sb3c2TDZxcXp0UFBVTlc2bVBQNmpLOW9R?oc=5",
-   "published": "2026-06-13T00:18:18Z",
+   "title": "China has the most smokers in the world. Is it harming the economy? - South China Morning Post",
+   "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQWklndHUxRE0zTGF4bmE4YWhKN3BIcXRhblk3blN5bVpOTGQyeG1iRzN5MXpUdm0ybzZ5ZWZUMU5nV2llMzY0SVF0b0RxTWVSa3V0THpHUy1ZZkpFSGRGM3lrOHVpanU3Q2VFT1BqNnVRZDNnY1NjcVo1RVNxcFUxbThuNUZSYXhPTXYwRl9PdS1qbnU1WXBQdzFTMGgzZEVfY05iQTFScV85OUY4RFJHRWZtQWxLMWNNLTNPS3R30gG-AUFVX3lxTFBBOFBlU25yYnBhSkp1Um5LMzlseWZGWVFuemxodFZnTE1BbWdXbDV1LWxmOWxMbFAyUXZQOC1aTmNHc085U21wS3VJZmFCbVJlXzE2WG1GX2M5c3J0SXNTMzdzd3VzSmZ2NGFjVWg0elA5TUJXb0xKT2dubW0wazBjamZhNXgyMlh3bmpUN3BTVDFCcTFPUHdHcDR0UWJNRUtTNERtaHRKUWFqeHRYWUtjR2lZNnJLWDFhdGlMWXc?oc=5",
+   "published": "2026-06-13T01:00:13Z",
    "tickers": [
     "MACRO"
    ],
    "sentiment": "neutral",
-   "title_it": "Le azioni di SpaceX volano al debutto a Wall Street - NBC Bay Area"
+   "title_it": "La Cina è il paese con il maggior numero di fumatori al mondo. Sta danneggiando l’economia? - Posto del mattino della Cina meridionale"
   },
   {
    "source": "Google News",
@@ -5727,7 +5773,7 @@
     "MACRO"
    ],
    "sentiment": "neutral",
-   "title_it": "Wall Street chiude in rialzo mentre domina il debutto sul mercato di SpaceX - Reuters"
+   "title_it": "Wall Street chiude in rialzo, domina il debutto sul mercato di SpaceX - Reuters"
   },
   {
    "source": "Google News",
@@ -5764,14 +5810,14 @@
   },
   {
    "source": "Google News",
-   "title": "Why Realty Income Corp. (O) Outpaced the Stock Market Today - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOeTJXNHJ5OXBoWWh1MENHdkFZZTc3X21iLWk0dlNYVDRDYk1PazE4X3UwekxDVC02U1NiX2I5VnN1c0FRM0M4WmN5V0dnSGc0aGxkT3JWX1Fsc2pyOGYtaF9QMFRFby0wcUdTZTVfVFlBOWxWNFdfQV9rV0s4ejZvNi1XdTNiWHRZRFVMOWFMWmkxYnM?oc=5",
-   "published": "2026-06-12T21:45:04Z",
+   "title": "Wall Street ends up on Iran war peace deal hopes, SpaceX’s historic debut - Virginia Business",
+   "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFB4eUlDbUZ0d0xsUnlfX002ODB3c3hqNUVHM3NGSGF3RVBIVEZzVFdicHNJWUZydFVvemxxbzlwbmhpeElJZUtlWll2bWY2UE5JSmtiY2N3RTJ6dHpCeHlVNloxX2UtVFJwSV9MamE1RHhUdw?oc=5",
+   "published": "2026-06-12T21:28:46Z",
    "tickers": [
     "MACRO"
    ],
-   "sentiment": "neutral",
-   "title_it": "Perché oggi Realty Income Corp. (O) ha superato il mercato azionario - Yahoo Finanza"
+   "sentiment": "bear",
+   "title_it": "Wall Street finisce con le speranze di un accordo di pace sulla guerra con l’Iran, lo storico debutto di SpaceX – Virginia Business"
   },
   {
    "source": "Google News",
@@ -5808,6 +5854,17 @@
   },
   {
    "source": "Google News",
+   "title": "Wall St Week Ahead Newly led Fed poses wildcard for rockier US indexes - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPd0hPaE5BT1VkR0h3QzkydWFxU3Jvd3R1RVRzcEl3SjBPTmctMFNQZXpFVE1CX0pjM184MHRIMGVsMkUxWHgtdWU5Q1luQVhHY0R4ejhpMHV5cW1qeFhzTDZyUi10ajE1QkRleE8taVRhcHNBVUR0MkxXZlhPVXBibzYyUVFqUUNtdWFwV3FpTm5GNFI5cUw3dEl5Y3U5bWR5TkprQVJHUnVGV0tjQXZBV1hmSDF5U2dwX2V2TGdpWXAwSS1KX2c?oc=5",
+   "published": "2026-06-12T21:12:50Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Wall Street settimana in anticipo La Fed, recentemente guidata, rappresenta un jolly per gli indici statunitensi più rock - Reuters"
+  },
+  {
+   "source": "Google News",
    "title": "Brent Oil Drops Below $90 as the U.S. Closes in on a Peace Deal With Iran. What it Means for Oil Stocks. - The Motley Fool",
    "link": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxPajFhRFQtSkJzcXJqTktUa0M5cEpFaWVxNkh6ZnFmZ2dCNEhIT1ZSTEVkRDZ6LVhiUmJpeldKMjJpMENNU2p2SDE1VGxtUnllZXBOa0xDMnp2dGJUcVZUNjk4eDNwRUdfZkQzOGRTNmdLRmszdnZNUnU5WklQM19Wa1l2SVBwVktsQ2Q1X2ZxY3U4VnAwa0tnWUdULTZGd2dqRENWWjJNSlBLVEM3Y0RIYmZxZHpwQmVLSXNSX2JtWUpnTE9qVWg1TTBQYTFZNjA5WS1CVnJaNnJhUQ?oc=5",
    "published": "2026-06-12T20:56:00Z",
@@ -5816,17 +5873,6 @@
    ],
    "sentiment": "bear",
    "title_it": "Il petrolio Brent scende sotto i 90 dollari mentre gli Stati Uniti stringono un accordo di pace con l’Iran. Cosa significa per i titoli petroliferi. - Il pazzo eterogeneo"
-  },
-  {
-   "source": "Google News",
-   "title": "Stock Market Today: Dow Ends Higher On Iran Deal Hopes; SpaceX Rockets 19% In Debut - Investor's Business Daily",
-   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQaEU0MUxrV1lSbzE4SXoxYVRTMTN6M0pqVFBLUHFLcXBvUnpJS3VVbW1ubnhuOW13Nmk0UHJxUnotSUthcTBEUnN3M2N4V2trWGlpalg0WHphSG1hOFNTSzdHdWtiZS0ydjdkSkU5R3M2MkkzY25XNENETllaQ3BaN1N3NUg1UGFobmp3N05yWWdFdXBJNGV0eFN3S1k4NzJPRkhhNnV5dEVYS1pGZ283eGpKYw?oc=5",
-   "published": "2026-06-12T20:51:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral",
-   "title_it": "Mercato azionario oggi: il Dow chiude in rialzo grazie alle speranze di un accordo con l'Iran; I razzi SpaceX aumentano del 19% al debutto - Investor's Business Daily"
   },
   {
    "source": "Google News",
@@ -5860,39 +5906,6 @@
    ],
    "sentiment": "neutral",
    "title_it": "Le azioni AMD sono migliorate per essere acquistate grazie al rialzo della GPU - Investor's Business Daily"
-  },
-  {
-   "source": "Google News",
-   "title": "Oklo secures DOE PDSA approval - American Nuclear Society -- ANS",
-   "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBxa1h1dnJ2dkJqeWdOc0FZYkpvUFRiZ3pWYmNSTnBkblVkdGQ0NVcyWnVFcEZnQmpwS3F6X0Q2bUE2SVljMGJPYmo5YnRsR0Q3ZHJReFFsaHZDTElFNnFuZVoyRDZ6NmFnREdiZWdlR3kycEFpSE85Nw?oc=5",
-   "published": "2026-06-12T20:17:16Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "bull",
-   "title_it": "Oklo ottiene l'approvazione del DOE PDSA - American Nuclear Society -- ANS"
-  },
-  {
-   "source": "Google News",
-   "title": "Oil Falls, Stocks Rise as Trump Signals Iran Peace Deal Takes Shape - The New York Times",
-   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTFAtbEFYSXZCM1RNYXRCbTllT0Y0SFpLcnhUd21idmFVMHJKMHdKZUx0STdlYnlpTHZrM1RiWnE5UjRHTzBWTk9mUFoxLW04SWZURWZWcEhOLW8xdVZFcHRpek1lYlNRWWtBd093X2k1OVJFOW9CMXc?oc=5",
-   "published": "2026-06-12T20:14:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral",
-   "title_it": "Crollo del petrolio, rialzo delle azioni mentre Trump segnala che l'accordo di pace con l'Iran sta prendendo forma - The New York Times"
-  },
-  {
-   "source": "Google News",
-   "title": "Where Trump has lost support with independents, according to AP-NORC polling - PBS",
-   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOeEoxY2lpTktjakJJSmRkbWx2TkVzRHEzcEMyOGp2THBUMXp0RzN1ZDlkVks1cHpXUXdCMVJGdVA3WE5QOXZBZFNERkE0TVQ3ZXlSOTMzWFRzMFBNc1UzajR1ZkM0dklMZER0UE5xNGx6U1NqTlZvRnRsOU9DcTVLbDVXWlExSkpKZVdRdHFTV3kzUjBfLW8xbjJCazAyOEhRRnVCb3FkSmFtOGMzbUF6QVpCWdIBuAFBVV95cUxQa1ZxUXJSVkhtc1VXN01qZG40cWxtVkNkTU8zMlZPRHZGZEZZLWpBVWNtWGxsY0JwNEYtLVhZcTh6U0I0RzhVOHNVVDVzLUhJTW1IbWpTZVVUV1VLa2hlaGNGMEhJUTAtalBmY1BVaWtTRlRYRHo5ZVZpWkRoemVmamdEdkFvT1RrZzRVMElWeEtWbURFV2JIdE5mSXpyMjVrRmdETkNhbFJPRzhUa01zUVcyWGdycHlR?oc=5",
-   "published": "2026-06-12T19:15:55Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral",
-   "title_it": "Dove Trump ha perso il sostegno degli indipendenti, secondo il sondaggio AP-NORC - PBS"
   }
  ]
 }
