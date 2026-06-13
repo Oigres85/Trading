@@ -6,7 +6,7 @@ let sparkRange = "m1";   // 1G | 1M | 1A
 /* ordinamento tabelle: click su intestazione → desc → asc → default */
 const SORT_FIELDS = {
   "ptf-table": ["name", "qty", "pmc", "change_pct", "change_pct", "prepost_chg", "volume",
-                "gain", "gain_pct", "pe", "eps", "beta", "ath_dist_pct", "support",
+                "value", "gain", "gain_pct", "pe", "eps", "beta", "ath_dist_pct", "support",
                 "resistance", "rsi", "vol_ratio", "health", "upside_pct", "upside_pct", null],
   "wl-table": ["name", "change_pct", "change_pct", "prepost_chg", "volume", "pe", "eps",
                "beta", "ath_dist_pct", "support", "resistance", "rsi", "vol_ratio",
@@ -132,28 +132,19 @@ async function waitForNewData(prev, tries = 28) {
   return false;
 }
 
+/* Aggiorna SENZA token: prezzi live all'istante + ricarica gli ultimi dati pubblicati
+   (tecnici/news/macro si rigenerano da soli ogni ~20 min via workflow). */
 async function refreshAll() {
   const btn = $("#btn-refresh");
-  const token = getToken();
-  if (!token) { await loadData(true); return; }
-
   btn.classList.add("spinning");
-  btn.textContent = "⏳ Rigenero…";
+  btn.textContent = "⏳ Aggiorno…";
   try {
-    const res = await dispatchWorkflow(token);
-    if ([401, 403, 404].includes(res.status)) {
-      localStorage.removeItem("gh_token");
-      toast("Token non valido o senza permessi — rimosso, riprova");
-      return;
-    }
-    if (res.status !== 204) { toast(`Errore nell'avvio dell'aggiornamento (HTTP ${res.status})`); return; }
-    toast("Aggiornamento avviato — i nuovi dati arrivano tra ~2-3 minuti");
-    if (!await waitForNewData(DATA?.updated_at))
-      toast("L'aggiornamento è ancora in corso — riprova ⟳ tra qualche minuto");
-    else toast("Dati rigenerati ✓");
+    await loadData(false);     // ultimi dati del workflow
+    await livePrices();        // prezzi correnti dal vivo
+    toast("Aggiornato ✓");
   } catch (e) {
     console.error(e);
-    toast("Errore di rete durante l'aggiornamento");
+    toast("Errore durante l'aggiornamento");
   } finally {
     btn.classList.remove("spinning");
     btn.textContent = "⟳ Aggiorna";
@@ -165,14 +156,15 @@ const editMode = { portfolio: false, watchlist: false };
 
 async function editHoldings(section, mutate) {
   const token = getToken();
-  if (!token) { toast("Serve il token GitHub per modificare le posizioni"); return; }
+  if (!token) { toast("Serve un token GitHub (permessi Actions + Contents) per modificare le posizioni"); return; }
   toast("Salvo la modifica…");
   try {
     // 1) leggi config/holdings.json con il suo SHA
     const path = "config/holdings.json";
     const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: ghHeaders(token), cache: "no-store" });
     if (!r.ok) {
-      if ([401, 403, 404].includes(r.status)) { localStorage.removeItem("gh_token"); toast("Token non valido/insufficiente — rimosso, riprova"); }
+      if ([401, 403].includes(r.status)) { localStorage.removeItem("gh_token"); toast("Token senza permesso Contents/Actions — rimosso. Creane uno con quei permessi e riprova"); }
+      else if (r.status === 404) { toast("config/holdings.json non trovato sul repo"); }
       else toast(`Errore lettura config (HTTP ${r.status})`);
       return;
     }
@@ -556,21 +548,24 @@ function renderTable() {
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
-      <td class="num ${signCls(r.gain)}" title="valore posizione ${c}${fmtNum.format(Math.round(r.value))}">${signTxt(Math.round(r.gain), ` ${c}`)}</td>
+      <td class="num"><b>${c}${fmtNum.format(Math.round(r.value))}</b></td>
+      <td class="num ${signCls(r.gain)}">${signTxt(Math.round(r.gain), ` ${c}`)}</td>
       <td class="num ${signCls(r.gain_pct)}"><b>${signTxt(r.gain_pct)}</b></td>
       ${techCells(r)}
     </tr>`;
   }).join("");
 
   const t = DATA.totals;
+  const usdValue = DATA.portfolio.filter(r => r.currency === "USD").reduce((s, r) => s + r.value, 0);
   const totalRow = `<tr class="total-row">
-    <td class="name-cell" colspan="7">TOTALE — valore ${fmtEUR.format(t.eur_value)}</td>
+    <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
+    <td class="num">${fmtEUR.format(t.eur_value)}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
     <td colspan="12" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="21"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="22"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
 }
 
