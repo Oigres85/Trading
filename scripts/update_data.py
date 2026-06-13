@@ -102,6 +102,8 @@ NEWS_FEEDS = [
     ("Google News", "https://news.google.com/rss/search?q=Nvidia+OR+AMD+OR+Micron+OR+Intel+OR+Tesla&hl=en-US&gl=US&ceid=US:en"),
     ("Google News", "https://news.google.com/rss/search?q=MicroStrategy+OR+%22Rigetti+Computing%22+OR+%22Oklo%22+OR+%22Arbe+Robotics%22+OR+%22BTP+Valore%22&hl=en-US&gl=US&ceid=US:en"),
     ("Google News", "https://news.google.com/rss/search?q=%22Federal+Reserve%22+OR+%22US+inflation%22+OR+%22White+House%22+economy+OR+tariffs&hl=en-US&gl=US&ceid=US:en"),
+    ("Google News", "https://news.google.com/rss/search?q=(Trump+OR+Iran+OR+Israel+OR+war+OR+China+OR+OPEC+OR+oil)+(market+OR+stocks+OR+economy+OR+Fed)&hl=en-US&gl=US&ceid=US:en"),
+    ("Google News", "https://news.google.com/rss/search?q=when:2d+stock+market+OR+wall+street+OR+%22federal+reserve%22&hl=en-US&gl=US&ceid=US:en"),
     ("Reddit", "https://www.reddit.com/r/stocks/.rss"),
     ("Reddit", "https://www.reddit.com/r/wallstreetbets/.rss"),
 ]
@@ -113,10 +115,20 @@ PORTFOLIO_KEYWORDS = {
     "MSTR": [r"\bmicrostrategy\b", r"\bstrategy inc\b", r"\bmstr\b", r"\bsaylor\b"],
     "RGTI": [r"\brigetti\b"], "OKLO": [r"\boklo\b"], "ARBE": [r"\barbe\b"],
     "BTP-V28": [r"\bbtp\b", r"italian bond", r"italy bond"],
-    # macro e politica USA
-    "MACRO": [r"\bfed\b", r"federal reserve", r"\binflation\b", r"\bcpi\b", r"\btariff",
-              r"white house", r"\btrump\b", r"\bcongress\b", r"\btreasur", r"\bgdp\b",
-              r"\bpowell\b", r"rate cut", r"interest rate", r"\bjobs report\b", r"payrolls"],
+    # macro, politica USA e geopolitica (notizie che muovono i mercati)
+    "MACRO": [
+        # politica monetaria / macro USA
+        r"\bfed\b", r"federal reserve", r"\binflation\b", r"\bcpi\b", r"\bpce\b",
+        r"\btariff", r"white house", r"\btrump\b", r"\bcongress\b", r"\btreasur",
+        r"\bgdp\b", r"\bpowell\b", r"rate cut", r"rate hike", r"interest rate",
+        r"\bjobs report\b", r"payrolls", r"unemployment", r"recession", r"debt ceiling",
+        r"government shutdown", r"\bsenate\b", r"\bbiden\b", r"stimulus", r"\bopec\b",
+        # geopolitica e mercati globali
+        r"\biran\b", r"\bisrael\b", r"\bgaza\b", r"middle east", r"\bwar\b", r"conflict",
+        r"\brussia\b", r"\bukraine\b", r"\bchina\b", r"sanction", r"geopolit",
+        r"oil price", r"crude oil", r"\bnato\b", r"strait of hormuz", r"nuclear",
+        r"stock market", r"wall street", r"\bs&p 500\b", r"\bdow\b", r"selloff", r"rally",
+    ],
 }
 
 

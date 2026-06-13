@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-13T08:40:29Z",
+ "updated_at": "2026-06-13T08:54:59Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -1998,15 +1998,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63823.75,
-   "change_pct": 0.44,
+   "price": 63775.48,
+   "change_pct": 0.37,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.4,
+   "ath_dist_pct": -49.5,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 34.1,
-   "volume": 23154063360,
+   "rsi": 33.9,
+   "volume": 22943893504,
    "vol_ratio": 0.68,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -2041,7 +2041,7 @@
      61449.29,
      63561.05,
      63543.2,
-     63823.75
+     63775.48
     ],
     "y1": [
      106090.97,
@@ -2117,7 +2117,7 @@
      73372.52,
      64014.37,
      63090.59,
-     63823.75
+     63775.48
     ],
     "d1": [
      63525.66,
@@ -2172,7 +2172,8 @@
      63751.53,
      63724.63,
      63771.29,
-     63823.75
+     63837.94,
+     63775.48
     ]
    },
    "earnings_date": null,
@@ -3252,6 +3253,57 @@
  "news": [
   {
    "source": "Google News",
+   "title": "SpaceX Stock Will Be Worth More Than Nvidia, According to Certain Wall Street Experts - The Motley Fool",
+   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxONEZha0FhNndrY2Rlb0c2MmdyOWRVTTQtZDhMSDg3akVSVURZVDU2aHZacmt6aXpnY3dUdXEySG1jWkU5aHRLTUFHenM4UFppOGN4UmpvbGVseWNmcm5PdS0waTlaWnZ4MU9tZ3FudkI4aWpvSmlQMFRidHlxanh3ZUY2cGN2YVlxdm1YYWh1SUNLRVhRV0E?oc=5",
+   "published": "2026-06-13T08:48:37Z",
+   "tickers": [
+    "NVDA",
+    "MACRO"
+   ],
+   "title_it": "Le azioni di SpaceX varranno più di Nvidia, secondo alcuni esperti di Wall Street - The Motley Fool"
+  },
+  {
+   "source": "Google News",
+   "title": "Inflation Just Did Something It Hasn't Done Since 2023, and It Could Trigger a Big Move in Interest Rates (and the Stock Market) - The Motley Fool",
+   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOY0hDaDFKeXNHMUJuREdHbUFjUFYwZl8xXzBnbzBJdV9Kd1hZVE9kcklCclZxRHo4OTh6LVllZzFEd0JiSDl0cGx1YjdWRnJhS3M4ekNoNDl0TkNwMTJycGV3UlZ1OEFsdHRZOFYzVHdaN1c4M19EZ2xncXdhbThYUm1CM3Z4eUNIZDRQUEhvZkVBNElCeGRkNw?oc=5",
+   "published": "2026-06-13T08:41:42Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "L’inflazione ha fatto qualcosa che non faceva dal 2023 e potrebbe innescare un grande movimento nei tassi di interesse (e nel mercato azionario) – The Motley Fool"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Prices Likely to Stay Higher Even If Conflict Ends, Nagel Says",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-13/prices-likely-to-stay-higher-even-if-conflict-ends-nagel-says",
+   "published": "2026-06-13T08:23:17Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "I prezzi probabilmente rimarranno più alti anche se il conflitto finisse, dice Nagel"
+  },
+  {
+   "source": "Google News",
+   "title": "Bank of America warns stock market may face a 1994-style shock - thestreet.com",
+   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPWk10TDQxUjVQaWJPUUx0b3lZMkNOWGdERGFzZS1IcE5mai1GWmhPT2lCZU1DRXFpNTZnQXhQcHQ1ekliQVpIdVBBLXotUWlvenpUTDVwYUtiQVdrN0ZvXzFSOEJPWkdHWTNJdnVsdTJLZ3RsWE5zQ21lMUpIVEtQRDFGUnJoMnFiVDFlWlZlX2F3WERFMU1wMmxkZnNxcWc?oc=5",
+   "published": "2026-06-13T08:03:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Bank of America avverte che il mercato azionario potrebbe subire uno shock simile a quello del 1994 - thestreet.com"
+  },
+  {
+   "source": "Investing.com",
+   "title": "China ’strongly dissatisfied’ with Pentagon move against top Chinese tech firms",
+   "link": "https://www.investing.com/news/stock-market-news/china-strongly-dissatisfied-with-pentagon-move-against-top-chinese-tech-firms-4740894",
+   "published": "2026-06-13T07:48:49Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "La Cina è “fortemente insoddisfatta” della mossa del Pentagono contro le principali aziende tecnologiche cinesi"
+  },
+  {
+   "source": "Google News",
    "title": "Exclusive | Nvidia Is Developing an AI Healthcare Model With Startup Abridge - WSJ",
    "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOWHZKLWFpLUZyOWlkZmdQenBKWUdhZ1UzUUlWNnh3TkFqd3oxOWJnMDBXT19FS1Naa3BNNkdBSXc5M0lTTHdtR3B3QzlreU1lUXBfM3V0QWlZQkRwSGZIS0hlbXotX05HNGVnTTZ0aE9sYVhjekxGR0M2aGZHT05BWEpCdjRDRVN2VWR2blhqX1JlZDRMd2xRY1BGOHZ6M2ROQ3lZeHlMeFI?oc=5",
    "published": "2026-06-13T07:31:16Z",
@@ -3259,6 +3311,76 @@
     "NVDA"
    ],
    "title_it": "Esclusivo | Nvidia sta sviluppando un modello sanitario basato sull'intelligenza artificiale con la startup Abridge - WSJ"
+  },
+  {
+   "source": "Google News",
+   "title": "Cipher Digital (CIFR) Mimics Market Rally as US-Iran Tensions Subside - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQVkg0am51dUs0NWc0Yk5xSk94OUZXY3RNdlAtdFZNSFRlU2NmOHFUbjFMVlFELVhBWUF4WmtXdnd0NXA4MnlXUVM1OF9FWlNJT2tSQVRVZHQ2VThmTDN1TGdGc09KREwyaUdBNWp0QjhaQnhfVXRWZUxsbUdOSTBPTjR3QU5oQnRSb2JXaGttdVo4T2NfUmF2SWVoSEZjYmM?oc=5",
+   "published": "2026-06-13T05:52:18Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Cipher Digital (CIFR) imita il rally del mercato mentre le tensioni tra Stati Uniti e Iran si attenuano - Yahoo Finanza"
+  },
+  {
+   "source": "Google News",
+   "title": "Meet the Medtech Stock Wall Street Thinks Will Soar 65% Over the Next 12 Months - The Motley Fool",
+   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxObWpDbEhHS2IzbHRhbllacllFMlkwMURFYzViVEFXbUdrRzM2RzhQTHlIM05zcXVJdEJSVnE5M1VsTXZBczV0ZVNCUE5aNi04dE42NkNZcVhiZVhuZUVob3gtVWdUT0tTMEZZUUZnRVBGQ1NnMXlpbGY2U3VaR0xyMWd4X1ZiY2V0Z1AyVVJfUGlOclUyeFhWeA?oc=5",
+   "published": "2026-06-13T04:50:42Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Ecco le azioni Medtech che secondo Wall Street aumenteranno del 65% nei prossimi 12 mesi - The Motley Fool"
+  },
+  {
+   "source": "Google News",
+   "title": "Meet the Medtech Stock Wall Street Thinks Will Soar 65% Over the Next 12 Months - AOL.com",
+   "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE1ibDVqNnlrSkxub3RRcEo1RHdGYm9kaWJBM0ZlbmNDMzZabnVBVl9nYXhZVFVIUnhIaWNNT1Jrdk5MUS0xWjN0bUNwZGZMWUV6WUo2Z2ppdG1rd19nOS15bkVvOUg2Ry1Ccld0UDFFZmJGVlNnVGFPTlYyWUl5RU0?oc=5",
+   "published": "2026-06-13T04:49:08Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Ecco le azioni Medtech che secondo Wall Street aumenteranno del 65% nei prossimi 12 mesi - AOL.com"
+  },
+  {
+   "source": "Google News",
+   "title": "Meet the Medtech Stock Wall Street Thinks Will Soar 65% Over the Next 12 Months - The Globe and Mail",
+   "link": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxQbFEzazZvUGJPSmJMcVdfRmhFRmNLTlliMW1Ma3hTRVFDMmRhZEtyWUxVVmRKX3BFQUQ0QUYzWUN2N1E2bEhkVmg5a2tlUVEtVHZjdWl1VnJlVDJKVWRORVdDYjNhdWFfenpwYTFiWS1WT29uZTljbnN3UTNVbkJ6TWs5SlFtWC1rcXhMZS1qWU9IUENpaG94NDdONGhVc0M3S0hXY0NONEoxNnBUNl9VczZGMmpFcm5PYmtxRlE2d090NDRocThHbDhWQm9UV2ZvRTVUVEVXaDNMTjdIVnRGUVpweGpIclc2ZFhVdGdHSzgyRGRsQzR3?oc=5",
+   "published": "2026-06-13T04:35:20Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Ecco le azioni Medtech che secondo Wall Street aumenteranno del 65% nei prossimi 12 mesi - The Globe and Mail"
+  },
+  {
+   "source": "Google News",
+   "title": "US stocks rise after oil prices ease and SpaceX soars in its debut on Wall Street - Indiana Gazette Online",
+   "link": "https://news.google.com/rss/articles/CBMi-wFBVV95cUxOczJlQkQxTHFCdndPNmplWF9pWkI4Mk53TzVCQjBjU1FVdUxkZFlJb2xsaG41NTYybk1rUmZOZjM1MGRHa1poMGU0TWFpaVZOVy1KUkZhck50TXFTYTNUNzUwdjQyRVNnRVJBWWlaaHE5RENPaHB0QldjN2hhZ1lEcFBoVkdQbEZDaFhXTXhDNk9KQ19UaUc4V0JOYTVsczJISVdKeExiUHZ4Sms3Nzlxb3NuNjB6dDROdE41NXQ3RVhtRWxXdGx0UmdZWlNYZGwwVzBPdUhuXzhWZF94T1VXU09JbVp5RjNUQS02NXNFWEMweE03SFFyN2w4NA?oc=5",
+   "published": "2026-06-13T04:30:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Le azioni statunitensi salgono dopo che i prezzi del petrolio si sono allentati e SpaceX vola al suo debutto a Wall Street - Indiana Gazette Online"
+  },
+  {
+   "source": "Google News",
+   "title": "AI is revolutionising the stock market - Financial Times",
+   "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQUk00bUtwTlNha3puNm0zOE5QRzFhNnpsN2VqNm80VEl1OTRtY05tRmRjbW9DcERDY0VXMmVKUGpaN3VkWThUV1V3SzBJMDA5a1JmdHNuUXNIWjhSSy1RSW4tMVNDdjNDd0hVLU5IVFUzVE9TOXY5Q0hwNmg0emQ4ZEdjWlk?oc=5",
+   "published": "2026-06-13T04:01:35Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "L'intelligenza artificiale sta rivoluzionando il mercato azionario - Financial Times"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "China Rebukes US Over ‘Military’ Labeling of Its Top Firms",
+   "link": "https://www.bloomberg.com/news/articles/2026-06-13/china-rebukes-us-over-military-labeling-of-its-top-firms",
+   "published": "2026-06-13T02:31:09Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "La Cina rimprovera gli Stati Uniti per l’etichettatura “militare” delle sue migliori aziende"
   },
   {
    "source": "Bloomberg",
@@ -3281,6 +3403,16 @@
    "title_it": "Una sovvenzione NVIDIA potenzia la ricerca di UH Mānoa nelle reti wireless basate sull'intelligenza artificiale - Sistema dell'Università delle Hawaii"
   },
   {
+   "source": "Google News",
+   "title": "SpaceX stock soars in Wall Street debut - NBC Bay Area",
+   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQV19MMkxoanB2RFprREUzOTJJSWRXM0UtYXY1bHZiTENFa0Rtdm1jR2pEQ3d2Mm1sVGRvNWVsSnU0a1ktbkFkSktzLVBfN3Q2eEM5UWtuU19oTV9uNDlIblJNRlpfTkF2OFgwN1Zpa3Q2M241OFQwMVJCcUtadW1pbnlIMVI2S1d0ZUw5dnUxUnlDQdIBmgFBVV95cUxQTkhUbE1waU82bXl0NlJzaFBDN3BLb0o4azMwZFJVZ094Nl9JdGoxV0RkQWZpVnFvSUZ2dlluY3lYSmt3cWRONFBvdWhfWnZaQXgtYi1YQmVoY2NuU285T3JKblRrQlpmNHVkTGdkN216YV9SbXVsa1JEMlpDbmZMQV9Sb3c2TDZxcXp0UFBVTlc2bVBQNmpLOW9R?oc=5",
+   "published": "2026-06-13T00:18:18Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Le azioni di SpaceX volano al debutto a Wall Street - NBC Bay Area"
+  },
+  {
    "source": "Investing.com",
    "title": "US EPA sends California emissions rules to Congress for potential reversal",
    "link": "https://www.investing.com/news/stock-market-news/us-epa-sends-california-emissions-rules-to-congress-for-potential-reversal-4740231",
@@ -3298,7 +3430,47 @@
    "tickers": [
     "TSLA"
    ],
-   "title_it": "Dentro SpaceX e l’IPO da 75 miliardi di dollari di Elon Musk"
+   "title_it": "All’interno di SpaceX e dell’IPO da 75 miliardi di dollari di Elon Musk"
+  },
+  {
+   "source": "Google News",
+   "title": "With smooth SpaceX debut, Wall Street sets new template for mega IPOs - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOT2J4aHNyYmVuNHZjLXVpY283NUMtMjAxY2dyV25waUxybjkxWFktd29FWVVmaWh4a0lOTUxBOHI0YUJxanZkVldmdkpkdVVqc1ZfRlBrdmo3d3BGdTlsMjZ4bkk3czRFUDRQdTR5R25DRGZYX2tybEdRMlJCUTJZMnhNMHJ6YUxENl91ODJSNXFrSVRsTXBHeFBpVERjd3MtVEtxd3cyczJNVXJsUnlsVjF3bkUwalA0YlRBMg?oc=5",
+   "published": "2026-06-12T23:14:53Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Con il regolare debutto di SpaceX, Wall Street stabilisce un nuovo modello per mega IPO - Reuters"
+  },
+  {
+   "source": "Google News",
+   "title": "Wall Street ends higher as SpaceX's market debut dominates - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQeXNKNzNQRjdTSU90RjJ6d0JSM1FNVHRUQ1Q3VTM1VTlRSWZfVkoxcU9DRzQxRkE5R2JNdk9QelpoS3RoS29rNGVJTzNpWnVydDdweHhlcEVpd2hWNFVKcV9JUWNpODNzdGVSVlRTUVNKenhMdWpIZGd2RlRwWlBSNS1lWkNfRkRUdFBlUzNYemNtclNFcTdRR2Q4eWMyaERXV3dLc1VMQWQwdVAyUzVvNQ?oc=5",
+   "published": "2026-06-12T23:01:47Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Wall Street chiude in rialzo mentre domina il debutto sul mercato di SpaceX - Reuters"
+  },
+  {
+   "source": "Google News",
+   "title": "The Oil Market Could Be Weeks From a Breaking Point - Crude Oil Prices Today | OilPrice.com",
+   "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNU2pWZ1Q4eEhYaTJXOFRrUFNYRnVtMWtDTWtZOEYxVXNVZUZTV2Z4MklPOGg2eVdaZFUwa0FNRmtURXlienQ5b01YYl9DUnpnWS1SdWdLTkNOQzlmbEQ1S0dVNXNfVVh4T3JxalFRQ0pVRDhndWhKV0dqeFVXd2gyWGZGdFNnSFh2aS1ZeVNyVVRuWEkzR1ZoQkln0gGfAUFVX3lxTE41aWJ2VWxLeF9BLVhCRVdfZk80cGFBc1VNeWprOUtnNDJOTWR2Yk81ZFUydkNUY25uTG9HSXN4cnBTYmRBY0dUajFhSWZvbmg4V3hIMXZXRXh4RjBXRS1zcjRUU2RvSmJlYTkycmdBcTZORFBLellqNzNHTDZsMC1jZUt5MmtjbWFOam04bWNxbXBKZVRhcVlMOHJNWlFjYw?oc=5",
+   "published": "2026-06-12T23:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Il mercato petrolifero potrebbe essere a settimane dal punto di rottura - Prezzi del petrolio greggio oggi | OilPrice.com"
+  },
+  {
+   "source": "Google News",
+   "title": "SpaceX stock soars in debut and makes Elon Musk the first trillionaire - AP News",
+   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxORjJYREd6U2x6SkRDTmgxdkV6b2dUSVo4c0t0NzJFeVA2czRKT0F2dXdTc0hLQkNDLXRxUVRHbnMwS0NtVmtOd3dqM3ZBQUpOYktVZzY1SEFSd2p4WG4xN3RpdVJDSmVqeTlQVDN4SHBFVzU1Um1pU1NsMFNFNnJfa2FaRE9zSFhNbDk0SDN2UllsUUpqWGd3Wm9hMkppYXJBRjg3dDl4Tk9fRklUWVBGWnJTcV9OZ0JSZEd5Qw?oc=5",
+   "published": "2026-06-12T22:57:00Z",
+   "tickers": [
+    "TSLA"
+   ],
+   "title_it": "Le azioni di SpaceX volano al debutto e fanno di Elon Musk il primo trilionario - AP News"
   },
   {
    "source": "Google News",
@@ -3322,6 +3494,16 @@
   },
   {
    "source": "Google News",
+   "title": "Why Realty Income Corp. (O) Outpaced the Stock Market Today - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOeTJXNHJ5OXBoWWh1MENHdkFZZTc3X21iLWk0dlNYVDRDYk1PazE4X3UwekxDVC02U1NiX2I5VnN1c0FRM0M4WmN5V0dnSGc0aGxkT3JWX1Fsc2pyOGYtaF9QMFRFby0wcUdTZTVfVFlBOWxWNFdfQV9rV0s4ejZvNi1XdTNiWHRZRFVMOWFMWmkxYnM?oc=5",
+   "published": "2026-06-12T21:45:04Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Perché oggi Realty Income Corp. (O) ha superato il mercato azionario - Yahoo Finanza"
+  },
+  {
+   "source": "Google News",
    "title": "Tesla vs. SpaceX: Which Elon Musk Stock Will Be Worth More? - Barron's",
    "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQV1Y2TE9kTElPcnlOUHhIYVczQ2xmODIzZVJDbE5GWGk2dklNamphdDdNbURHdUI2WTVIT1dnd1Q0OWtKaVZaRTc3YVR0YjdINGVjdFpDb0IzT2tFWm84c3RXMVU2eThBRHUwUUxEY1FQdTg5cXlYek1GYzNyVDB4SjlES00xbThjamc?oc=5",
    "published": "2026-06-12T21:32:00Z",
@@ -3332,13 +3514,13 @@
   },
   {
    "source": "Google News",
-   "title": "SpaceX president Gwynne Shotwell floats Tesla merger on IPO day - qz.com",
-   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE54TEVycjdWTm9OVnBBelFva2YzTlN1T1pGeGxkT3MtcWp5Y0o3RTEwa0ktT3hnZ2M1QVFPbGNWeHEtVzNvSkpoN0VRWlktZzRYLTlVS1VLRWszM3dWb0JoWGFKZUNadXFsaXlxbWhB?oc=5",
-   "published": "2026-06-12T21:26:02Z",
+   "title": "US stocks rise after oil prices ease and SpaceX soars in its debut on Wall Street - AP News",
+   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNSnp2SzRDVFVBdVBxWWo5ajd4QzJ4SVE5bXZCOFM0LWdRRDVPaVliQkkwVGQwYVZJMk9adHdZZFB2NW1QSnBybExuSV9MLXcyTTQxY0x1SlF4eDQzTk1kRGVnUXk3cllzdjhOZ3hkdnBVMXN2dWdlTk84RXpBX2I0MGVzeTlvVTZVcUVsYlV5TUl4VC1iZ3Iw?oc=5",
+   "published": "2026-06-12T21:26:00Z",
    "tickers": [
-    "TSLA"
+    "MACRO"
    ],
-   "title_it": "Il presidente di SpaceX Gwynne Shotwell propone una fusione con Tesla il giorno dell'IPO - qz.com"
+   "title_it": "Le azioni statunitensi salgono dopo che i prezzi del petrolio si sono allentati e SpaceX vola al suo debutto a Wall Street - AP News"
   },
   {
    "source": "Google News",
@@ -3358,7 +3540,37 @@
    "tickers": [
     "NVDA"
    ],
-   "title_it": "NVIDIA raggiunge prestazioni leader nella codifica agentica sul primo benchmark AI agentic | Blog tecnico NVIDIA - Sviluppatore NVIDIA"
+   "title_it": "NVIDIA ottiene prestazioni di codifica agentic leader nel primo benchmark AI agentic | Blog tecnico NVIDIA - Sviluppatore NVIDIA"
+  },
+  {
+   "source": "Google News",
+   "title": "Wall St Week Ahead Newly led Fed poses wildcard for rockier US indexes - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPd0hPaE5BT1VkR0h3QzkydWFxU3Jvd3R1RVRzcEl3SjBPTmctMFNQZXpFVE1CX0pjM184MHRIMGVsMkUxWHgtdWU5Q1luQVhHY0R4ejhpMHV5cW1qeFhzTDZyUi10ajE1QkRleE8taVRhcHNBVUR0MkxXZlhPVXBibzYyUVFqUUNtdWFwV3FpTm5GNFI5cUw3dEl5Y3U5bWR5TkprQVJHUnVGV0tjQXZBV1hmSDF5U2dwX2V2TGdpWXAwSS1KX2c?oc=5",
+   "published": "2026-06-12T21:12:50Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Wall Street settimana in anticipo La Fed recentemente guidata rappresenta un jolly per gli indici statunitensi più rock - Reuters"
+  },
+  {
+   "source": "Google News",
+   "title": "Brent Oil Drops Below $90 as the U.S. Closes in on a Peace Deal With Iran. What it Means for Oil Stocks. - The Motley Fool",
+   "link": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxPajFhRFQtSkJzcXJqTktUa0M5cEpFaWVxNkh6ZnFmZ2dCNEhIT1ZSTEVkRDZ6LVhiUmJpeldKMjJpMENNU2p2SDE1VGxtUnllZXBOa0xDMnp2dGJUcVZUNjk4eDNwRUdfZkQzOGRTNmdLRmszdnZNUnU5WklQM19Wa1l2SVBwVktsQ2Q1X2ZxY3U4VnAwa0tnWUdULTZGd2dqRENWWjJNSlBLVEM3Y0RIYmZxZHpwQmVLSXNSX2JtWUpnTE9qVWg1TTBQYTFZNjA5WS1CVnJaNnJhUQ?oc=5",
+   "published": "2026-06-12T20:56:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Il petrolio Brent scende sotto i 90 dollari mentre gli Stati Uniti stringono un accordo di pace con l’Iran. Cosa significa per i titoli petroliferi. - Il pazzo eterogeneo"
+  },
+  {
+   "source": "Google News",
+   "title": "Stock Market Today: Dow Ends Higher On Iran Deal Hopes; SpaceX Rockets 19% In Debut - Investor's Business Daily",
+   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQaEU0MUxrV1lSbzE4SXoxYVRTMTN6M0pqVFBLUHFLcXBvUnpJS3VVbW1ubnhuOW13Nmk0UHJxUnotSUthcTBEUnN3M2N4V2trWGlpalg0WHphSG1hOFNTSzdHdWtiZS0ydjdkSkU5R3M2MkkzY25XNENETllaQ3BaN1N3NUg1UGFobmp3N05yWWdFdXBJNGV0eFN3S1k4NzJPRkhhNnV5dEVYS1pGZ283eGpKYw?oc=5",
+   "published": "2026-06-12T20:51:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "Mercato azionario oggi: il Dow chiude in rialzo grazie alle speranze di un accordo con l'Iran; I razzi SpaceX aumentano del 19% al debutto - Investor's Business Daily"
   },
   {
    "source": "Google News",
@@ -3396,7 +3608,8 @@
    "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBxa1h1dnJ2dkJqeWdOc0FZYkpvUFRiZ3pWYmNSTnBkblVkdGQ0NVcyWnVFcEZnQmpwS3F6X0Q2bUE2SVljMGJPYmo5YnRsR0Q3ZHJReFFsaHZDTElFNnFuZVoyRDZ6NmFnREdiZWdlR3kycEFpSE85Nw?oc=5",
    "published": "2026-06-12T20:17:16Z",
    "tickers": [
-    "OKLO"
+    "OKLO",
+    "MACRO"
    ],
    "title_it": "Oklo ottiene l'approvazione del DOE PDSA - American Nuclear Society -- ANS"
   },
@@ -3421,237 +3634,24 @@
    "title_it": "L'IPO di SpaceX porta in delirio i fan di Musk"
   },
   {
-   "source": "Google News",
-   "title": "Micron vs. NVIDIA: One AI Stock Is a Clear Buy Right Now - Zacks Investment Research",
-   "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNYjdjV3kwUXFpN0R1cmRzYnNCeW1kQXpfRDNaLUd2UHZxTnhreURsZ2prYlc0aVFxclhwLUJ1VmlwOUY0TXBIeTlRUkNLMVZ3V3Ryd19VbDNla19qcVpiMWxhQkh3NHlIV3B5WG5qeHlMVzQ1Z3ZDbDFoRWFBWDBUMTF2dENEV3dvcmx1MVFkNExrME1ZM0VNZ0RyZw?oc=5",
-   "published": "2026-06-12T18:30:29Z",
-   "tickers": [
-    "NVDA",
-    "MU"
-   ],
-   "title_it": "Micron contro NVIDIA: un titolo AI è un chiaro acquisto in questo momento - Zacks Investment Research"
-  },
-  {
-   "source": "Google News",
-   "title": "AMD Stock Pops After Buy Upgrade. It’s More Than a CPU Play. - Barron's",
-   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE54aU1xUUJwUmFXZlliR09UZGhwb1JSRzNrSnl2YkhxbVpZNGRqcl8tVmEydGhuRnJGQmlpOFRRLXVib1Ayb1NBTURaN0pHaTRBck1WRldUS05ibVhlT3h1YkFuZUJtUjJEeXItTDBGUkJLQUQ0c1E?oc=5",
-   "published": "2026-06-12T18:07:00Z",
-   "tickers": [
-    "AMD"
-   ],
-   "title_it": "Le azioni AMD aumentano dopo l'aggiornamento all'acquisto. È più di un gioco con la CPU. - Barron"
-  },
-  {
-   "source": "Google News",
-   "title": "Oklo (NYSE: OKLO) Stock Price Poised for Gains After DOE Issues Safety Clearance For Aurora Reactor - foreignpolicyjournal.com",
-   "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxPZE9FdEZFRjctMzFlNUVEUWVYZDg2ZWFtdXl5MUFkWUNwQVVLOGpxNC1FT1hibG5leGFNaE9QMTB5d2RQMFVUYTZyaXZZdHkzMFAyeC01aWRrR1Q3Rkx2eW10UV9YWFVCWElsb1RlanBtY3BibnhZUHVTQVRaLXVXdG1kVF9PUG1ySlVjdGVIbDhHNmdfQWplX0hoTXRRVV9RdVc3am13VkNEbGxmbHJodmNqM21WcU1kNVNSb1owWXI5ZWx3M1R5cUVaMXFKX3BGVk1zVU9sSkhIWkVQaVE?oc=5",
-   "published": "2026-06-12T18:00:00Z",
-   "tickers": [
-    "OKLO"
-   ],
-   "title_it": "Il prezzo delle azioni Oklo (NYSE:OKLO) è pronto a guadagnare dopo che il DOE ha rilasciato l'autorizzazione di sicurezza per il reattore Aurora - foreignpolicyjournal.com"
-  },
-  {
-   "source": "Google News",
-   "title": "Chinese Drivers Are Using Tiny Plastic Heads to Fool Tesla’s Autopilot Safeguards - WIRED",
-   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOMmtXUGpXYXJERmV6VkZZTUxfMy1YYVcyanFpWHJDRzVQaXpJY2ZrQ09LMDhadlB4NFdtZndtVWlKTzFrQ3A1MDhqOTRuVG9zY3h3V29uVWpDY2VKVk5la1paMlJvSUFzNklCa0dBZmV1ZHlwN0dBcHhZNDMwUVlpalZnLUpfQXVBUXBLSUpJUUZPYUs4YUQxNTdpZXlKMkZTeU52TmZMWU9ndGFYWmc?oc=5",
-   "published": "2026-06-12T17:57:00Z",
-   "tickers": [
-    "TSLA"
-   ],
-   "title_it": "Gli automobilisti cinesi utilizzano minuscole teste di plastica per ingannare le protezioni del pilota automatico di Tesla - WIRED"
-  },
-  {
-   "source": "Google News",
-   "title": "Intel Is Up 8% Today: Is It Outperforming Other Chip Stocks Like AMD and NVIDIA? - 24/7 Wall St.",
-   "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxOMmZraGthM1NZSHdVbm1nSlVJYmlJdTJvemEtakZ1MjFwbzJoNmhMa3lBTVFBMlpnMHhtekwxQUh0R1BzMGZOTXcyc2l1NnhnbGZKMDJTc3lIMkNfRHBRYlVOZkxXaVVKaV9Xalg4S1p2bHBmZEszQWF5QVFJV0loLUJqeDgtU1QtWmc1aWhxMnNRUHR2X1dmTVF2dFk5UG5ZdkhELWV0U0JxU280SVA0ZTl5TGtGcnEwZFljLVBR?oc=5",
-   "published": "2026-06-12T17:36:17Z",
-   "tickers": [
-    "NVDA",
-    "AMD",
-    "INTC"
-   ],
-   "title_it": "Intel è in rialzo dell'8% oggi: sta sovraperformando altri titoli di chip come AMD e NVIDIA? - Wall Street 24 ore su 24, 7 giorni su 7."
-  },
-  {
-   "source": "Google News",
-   "title": "SpaceX president hints at Tesla merger post-IPO: ‘That might make Elon Musk’s life a little easier’ - Fortune",
-   "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQRkVadXNzN25vMFNaQ1ZDek9xMEpfTlNsZkdUdGpMTndWX0x3VWJSR19QdER0RThWOHlobzM3cko3YnZSZ3E5UjZwZ3piT2JKT011eUtPUXJBU3J3VkZNVmtOZGd6MnlUa0NadXNCNmFycjBUOUNGQUliYnFGalhtWTBkSGVKT0N0dmlIODRGQjQ?oc=5",
-   "published": "2026-06-12T17:35:00Z",
-   "tickers": [
-    "TSLA"
-   ],
-   "title_it": "Il presidente di SpaceX accenna alla fusione di Tesla post-IPO: “Ciò potrebbe rendere la vita di Elon Musk un po’ più semplice” - Fortune"
-  },
-  {
-   "source": "Google News",
-   "title": "Abridge partners with Eli Lilly, Nvidia as AI scribe eyes expansion - Healthcare Dive",
-   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOQlBpbWZwU0RLSmZ5N1J2NGRvU3pudG9VNmdmejJqYzlLT0xfcTllQTBkT2ZiSERUQmU4X2YzOWhqRGlkQ0ZTYVhVcTdFQkVxQm55LUM3NjBfX2liblA5Vm9rMUlTYWo5OTBXd1J3Nk9mSlQxOWQ1Rk5meWo3VkVfVU85NllUZHRjTWxLMzVoMlN5cF8tajFpdXRXaUgzMGdhcXZj?oc=5",
-   "published": "2026-06-12T16:32:37Z",
-   "tickers": [
-    "NVDA"
-   ],
-   "title_it": "Abridge collabora con Eli Lilly, Nvidia come espansione degli occhi dello scriba dell'intelligenza artificiale - Healthcare Dive"
-  },
-  {
-   "source": "Google News",
-   "title": "SpaceX COO Shotwell says Tesla tie-up ‘might make Elon’s life a little easier’ - CNBC",
-   "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNcklnZk9SZFhjc19KNEUwcXhsZVZuaVdPbnlRWmdBdXh1eTAtNG94aVNDNE1QcFBNei1RME9WZE9VWmFUM2UwM2NfdXQxUXFhcS1EZUdKV183Y2g0TURiVEZwOW0wYmc0T0wyZU9WLTBreEs4dlFEYVFSdmtZZUlTLVhFUUtwVWowb0NuOVZXWkVQTm9KeU90NnpldWZnWWUyV2fSAacBQVVfeXFMUHJfOGhpQUVObG0yM01MTHk5RUVjV0diQ1U3anBleUVvV3YtWmVUSVFPWFlaT2FGUER4bkxOVEtVX3NXejJheVF6MVhOTlNBMVRvVEphWjVtbTQ2ZUNnT3pIMHdwaGRySkNvTXFNQkc0SV9tX0R3d0RDc0JRNENkZHhlVXhlU0pWUmhyZHdzc1BhTnNuMzBobDJ6emdUdXc3YldEODhZcTA?oc=5",
-   "published": "2026-06-12T16:25:18Z",
-   "tickers": [
-    "TSLA"
-   ],
-   "title_it": "Il COO di SpaceX Shotwell afferma che il collegamento con Tesla \"potrebbe rendere la vita di Elon un po' più semplice\" - CNBC"
-  },
-  {
-   "source": "Google News",
-   "title": "Micron Technology (MU) Stock Valuation After AI Megafab Partnership And Bullish Analyst Upgrades - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOa1JjZk1QRjRDZ010WnhCaEg2ZWUwZjlwZnRxN19NaFFPUjQwYWY0NGhzbldDV2JxcXFPMW9vNW1hUEtiU2NSOVVuTzdaY3JmUTVFMncyQUtBRVI4ZnZucW5FUkFoaUlCS2tOWDR4SXFST1p1WXE2ZTA4eEhIcGNreE9pdFRXM0VRSVJfUWgxeXdURGd4S2VaY0VfeUhGeGtMTlJj?oc=5",
-   "published": "2026-06-12T16:14:32Z",
-   "tickers": [
-    "MU"
-   ],
-   "title_it": "Valutazione dei titoli di Micron Technology (MU) dopo la partnership con AI Megafab e gli aggiornamenti rialzisti degli analisti - Yahoo Finanza"
-  },
-  {
-   "source": "Google News",
-   "title": "Oklo’s Advanced Nuclear Reactor “Aurora” Gets U.S. Design Approval - Tomorrow's World Today",
-   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPSENKYjBkS0Z1NktVeXJvcVNfTUxnc0trSWRsLUtVc0xFSmFxemEtV0U0QzhJZWtUM09FdnZoT2pXMU83VW91cGpmbTJsbGJONFlvekxTT0phZVlzd1VJOHV4ZFJuU3NCdWQ4R1JfWG5RcmRkcTNiSFh3UDdqTUFkZkRkZElLOGVucUxZdEtfM1V1SE12cGprVGgxOXUweGhwQk0xYVAwRVI?oc=5",
-   "published": "2026-06-12T15:43:42Z",
-   "tickers": [
-    "OKLO"
-   ],
-   "title_it": "Il reattore nucleare avanzato \"Aurora\" di Oklo ottiene l'approvazione del progetto negli Stati Uniti - Tomorrow's World Today"
-  },
-  {
-   "source": "Google News",
-   "title": "Opinion: SpaceX is no Tesla - GeekWire",
-   "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5IY25EWXdwbkh2cEhpamxlaG9QX2l5cnVpMFhvc2huNHZFMGJWS2UyVHdKZjRZMnNjNVV3Wmx4VFNaOTVvZndxS1M2MXRYdEhfVlQ2aHcwNE1mNmhVMXU1Tlg0V1pONFBN?oc=5",
-   "published": "2026-06-12T15:12:43Z",
-   "tickers": [
-    "TSLA"
-   ],
-   "title_it": "Opinione: SpaceX non è Tesla - GeekWire"
-  },
-  {
-   "source": "Google News",
-   "title": "Jim Cramer on NVIDIA: “It Is Being Slaughtered Like Everything Else” - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQQmxCSndwQllDLXlBc1IzdXFMc1RacENQTUk5djYtQnVwNlpEUlI1bEdoTTNHUHJqSzhBX2JZVlpHc21mNGkxclNadzdNeDZNTWdqRE9NY2hIT0xLOS05Ri00UlNTbnpZV2YyTUNPNlI2M1p0QXY3WUo3b0VuVHVHeWlyZGlZZEYtWkJuWFplcEhnMGthbVpoVXdicVR4OHVBQ0E?oc=5",
-   "published": "2026-06-12T14:45:09Z",
-   "tickers": [
-    "NVDA"
-   ],
-   "title_it": "Jim Cramer su NVIDIA: \"Viene massacrato come tutto il resto\" - Yahoo Finance"
-  },
-  {
-   "source": "Google News",
-   "title": "Rigetti Computing Stock (RGTI) Opinions on Quantum Computing Momentum - Quiver Quantitative",
-   "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQV2VfUEx5ZHg3RVpCMEliRlVvOGtZbGlHMG5EQTFGdU5ncVgzb29aM3JxNFlJbGRKbEJ3SnRCMThKNjM3OFdkNTNuY1FoRndpTEdwOEVEeUVBTVZtWTNlNnpEY2RKREx3NFE4U0pSR0YtRFpHbURGR3ItdnU1dDZWS0NNXzdBR25EY1VOWWxISmpWSFhDRlhKMWlOa05BVGE3X3p1MXlBM284dw?oc=5",
-   "published": "2026-06-12T14:04:00Z",
-   "tickers": [
-    "RGTI"
-   ],
-   "title_it": "Opinioni di Rigetti Computing Stock (RGTI) sul Quantum Computing Momentum - Quiver Quantitative"
-  },
-  {
-   "source": "Google News",
-   "title": "3 Reasons It Might Be Time Buy the Dip in NVIDIA Stock - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQWS1aR2UwbXBZRlNWdERWZ0tudFJDV1VlU2E0QW9ybElLOEt5Q0d3QVA1SHJBYmlKWHFUdlQ5dHFXMUNLVTBITl9CcVUzVU1TSWNpd2RlWWlQc3VUV0lQT3FGR1JJUGt5c0tiMHNoR3dnYnJiMVR6eDh6VmRFYXpHNkZXRjlJdl9TX2tTNzM1WkhPZ1k?oc=5",
-   "published": "2026-06-12T13:41:10Z",
-   "tickers": [
-    "NVDA"
-   ],
-   "title_it": "3 motivi per cui potrebbe essere giunto il momento di acquistare il calo delle azioni NVIDIA - Yahoo Finanza"
-  },
-  {
-   "source": "Google News",
-   "title": "Oklo Strengthens Aurora-INL Path With DOE's PDSA Clearance - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxOem9KUmcyXzNfVFdNY1BvQzBFdW9lY3cwcFVlZF93YXdfeHVmcDlsZE9hR1pOTU1TQmk3a3hyR0o0NUFETjhuSi15THc1NUdSUkZXTldxTFVWbWFic0lFZmV2QjRsWGFxMmZSZFZWX3RfcTVtQzg2R21zSGZjS2FHX0FvN1lxYkZVR21YZ2drX0FuNUxpRloyWlJKTTdOdw?oc=5",
-   "published": "2026-06-12T12:01:00Z",
-   "tickers": [
-    "OKLO"
-   ],
-   "title_it": "Oklo rafforza il percorso Aurora-INL con l'autorizzazione PDSA del DOE - Yahoo Finanza"
-  },
-  {
-   "source": "Google News",
-   "title": "DOE Approves Key Safety Analysis For Oklo Aurora Nuclear Plant In Idaho - NucNet",
-   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPYU9hQ040ZzktOUZpbWMtTXRpNGJCempESWk1NXdNZE9jaFA1QWdfMkJrRm9oR1IwYmFJV0Q1eGVhcC01S21kbUpOdEsxRE5YVDFaVWFMUmJIU044ckpSZ3N5ck1BZUhlenJFYU84TktWUThLNUstQWhxTmpra05mckVVd3N0X3EzaVdRcGlMYTNWWGtZV1dKSmk4Q0FiNTBtekNlRUlUQ1FVRG9F?oc=5",
-   "published": "2026-06-12T11:09:47Z",
-   "tickers": [
-    "OKLO"
-   ],
-   "title_it": "Il DOE approva l'analisi chiave sulla sicurezza per la centrale nucleare di Oklo Aurora in Idaho - NucNet"
-  },
-  {
-   "source": "Google News",
-   "title": "Does Oklo’s (OKLO) DOE Safety Milestone Quietly Redefine Its Path From Pilot To Fleet? - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQQkpwa1VIbDdTbTk4NW8xcGNKWnF5M2Y3ZUpacnVyaVZqeFdBLVJfcWNhVWZuT0F3LXpaSFpRSERaZHNibzJORTBiUVo4WV9TTzJReHZkd2ZhaEFya2tRTVc1QnlzeGtqQ1N3MDhsd25kRUNkYk44NS1VcWRoSnV4dFhURDNtcWtKdEc0TjVuZzZhZFBC?oc=5",
-   "published": "2026-06-12T03:11:00Z",
-   "tickers": [
-    "OKLO"
-   ],
-   "title_it": "Il traguardo della sicurezza DOE di Oklo (OKLO) ridefinisce silenziosamente il suo percorso dal pilota alla flotta? - Yahoo Finanza"
-  },
-  {
-   "source": "Google News",
-   "title": "Why Oklo Stock Powered Higher Today - The Motley Fool",
-   "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxQUnVyOWl3MUUtLVRMR29SLUJNLW1KNG1CTktlTnVOOFYwTEZNYXpsdmEyNFBTTFZYZi1IbTZDZ3FVdGdmakpLN1pFS1BRQUMwTlpqYzFiNjJSajAwZGNPR1NpUGo2Ym9za1NGakl6Tkd2cHRSRE44VmcxMWYtbzVkcHpNMnQ?oc=5",
-   "published": "2026-06-11T22:34:00Z",
-   "tickers": [
-    "OKLO"
-   ],
-   "title_it": "Perché le azioni Oklo sono aumentate oggi - The Motley Fool"
-  },
-  {
-   "source": "Google News",
-   "title": "Why Oklo Stock Powered Higher Today - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOYmVJd29Celo4eHpMekNSX0VfMkp1UTcxVVhOXzZiSWZMM0kxQTdBZVF0TXVlSXpJWjl6U1VOa29TcThtX0NXTnowaHhyMHM2UDZaWWFmRnB1SDNobU04WGNRdDFEMmtmdzRmR3NyTE56QjdlWmRFVTNnYUtRdHJvMkZGMlc0MkV1TXhyNjJpTlJGWUhaMDRSSURB?oc=5",
-   "published": "2026-06-11T21:54:19Z",
-   "tickers": [
-    "OKLO"
-   ],
-   "title_it": "Perché le azioni Oklo sono aumentate oggi - Yahoo Finanza"
-  },
-  {
-   "source": "Google News",
-   "title": "DOE Approves Oklo Aurora Safety Analysis Under Pilot Program - Environment+Energy Leader",
-   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPbUdhdlM4Z3AyRHctRmN1dlNvMjU2ZU5iMGYzelpoc0VlQ3ctbjNmQmxlSFFUZG8zRXU2Q2xYMzd0aWdFckRZM0VTSHJEVkZzN0s0MTFPTnk5WENWSjZjNklrRThkV19sX3d5R3lEMnlabW1EU0k0NDdTNXpyVjBfNFBTVURPN0pzRmNyaVlzdm1fWFFUaHQ0d0tvRnVreTVGN252SWJ5SEFxaEN3V25vMzJWamE1Zw?oc=5",
-   "published": "2026-06-11T18:00:00Z",
-   "tickers": [
-    "OKLO"
-   ],
-   "title_it": "Il DOE approva l'analisi sulla sicurezza di Oklo Aurora nell'ambito del programma pilota - Leader in Ambiente+Energia"
-  },
-  {
-   "source": "Google News",
-   "title": "Federal Reserve to resist the urge to hike US rates - ING THINK economic and financial analysis | ING THINK",
-   "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTFBKQVRNUkxyQ1Jyc0xuendKMDV5dnFDeGRPVmhpSEtzWEVQUWI5Z2cxNld0YzhQOGVGNVdmc2NzYzFrNXpRQWR3RDdwbHFoN1JrLWhXZXBtWi1ySXBRQ284aXJfM3RzWUZhTEZsSTA3TDA1Q1ExaFlrNDEwcw?oc=5",
-   "published": "2026-06-11T16:09:07Z",
+   "source": "Polymarket",
+   "title": "Will LeBron James win the 2028 US Presidential Election? — probabilità Sì 1%",
+   "link": "https://polymarket.com/event/will-lebron-james-win-the-2028-us-presidential-election",
+   "published": "2026-06-13T08:55:59Z",
    "tickers": [
     "MACRO"
    ],
-   "title_it": "La Federal Reserve resiste all'impulso di aumentare i tassi statunitensi - ING THINK analisi economica e finanziaria | PENSA"
+   "title_it": null
   },
   {
-   "source": "Google News",
-   "title": "DOE approval milestone for Oklo reactor - World Nuclear News",
-   "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPY19PT3dhbUpmcHRiNi1wWGFvclVZbTlxSUtCdzJWREdxazlsYzhCTmY3RjZtbWNObG9TUXUzRjRVZEFPVndVTGhzdnlVMkd6V25MUURtaFRTSzNJekQyc0NIYkExWlZLLTRMcDBaZkM0OVl2SXJ2ZExxcUUyeFFZNDdXcHZXMDVUenIw?oc=5",
-   "published": "2026-06-11T15:34:55Z",
-   "tickers": [
-    "OKLO"
-   ],
-   "title_it": "Pietra miliare dell'approvazione del DOE per il reattore Oklo - World Nuclear News"
-  },
-  {
-   "source": "Google News",
-   "title": "AI Boom Stokes Inflation With Memory Chips at ‘Insane’ Prices - Bloomberg.com",
-   "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPUHVGNVZGRnVFcWdIbU5zV2VOYk5zb054ekxlM016amM0V0FmNktMaFhQb1NicUtjTkllMXdwQkFqVG9ZTVBldEt3NUVxR2E5NUZrVk0yUjVuSG83R3dYaXNSeWlTOGtrZlNXdDRDTUhyUHF5cjA3alRvN1Y3TU5sNEZ4enowUmpjMzgzbjI4ME45OFZ6d3NabGhfbG5Da0g2b01hTG5NRDRMWDZET3RKSw?oc=5",
-   "published": "2026-06-11T14:34:54Z",
+   "source": "Polymarket",
+   "title": "Will Tim Walz win the 2028 US Presidential Election? — probabilità Sì 1%",
+   "link": "https://polymarket.com/event/will-tim-walz-win-the-2028-us-presidential-election",
+   "published": "2026-06-13T08:55:59Z",
    "tickers": [
     "MACRO"
    ],
-   "title_it": "Il boom dell’intelligenza artificiale alimenta l’inflazione con chip di memoria a prezzi “folli” - Bloomberg.com"
+   "title_it": null
   }
  ]
 }
