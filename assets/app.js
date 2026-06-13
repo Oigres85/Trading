@@ -132,16 +132,27 @@ async function waitForNewData(prev, tries = 28) {
   return false;
 }
 
-/* Aggiorna SENZA token: prezzi live all'istante + ricarica gli ultimi dati pubblicati
-   (tecnici/news/macro si rigenerano da soli ogni ~20 min via workflow). */
+/* Aggiorna: prezzi live all'istante + rigenerazione completa via workflow (col token,
+   chiesto una sola volta). Senza token resta comunque utile (prezzi live + reload). */
 async function refreshAll() {
   const btn = $("#btn-refresh");
   btn.classList.add("spinning");
   btn.textContent = "⏳ Aggiorno…";
   try {
-    await loadData(false);     // ultimi dati del workflow
-    await livePrices();        // prezzi correnti dal vivo
-    toast("Aggiornato ✓");
+    livePrices();              // prezzi correnti subito (non blocca)
+    const token = getToken();
+    if (!token) { await loadData(false); toast("Prezzi aggiornati ✓ (token assente: niente rigenerazione completa)"); return; }
+    const res = await dispatchWorkflow(token);
+    if ([401, 403, 404].includes(res.status)) {
+      localStorage.removeItem("gh_token");
+      toast("Token senza permesso Actions — rimosso. Creane uno con Actions: read & write e riprova");
+      return;
+    }
+    if (res.status !== 204) { toast(`Errore avvio aggiornamento (HTTP ${res.status})`); return; }
+    btn.textContent = "⏳ Rigenero…";
+    toast("Rigenerazione avviata — nuovi dati tra ~2-3 minuti");
+    if (await waitForNewData(DATA?.updated_at)) toast("Dati rigenerati ✓");
+    else toast("Ancora in corso — i dati arriveranno a breve");
   } catch (e) {
     console.error(e);
     toast("Errore durante l'aggiornamento");
@@ -267,7 +278,7 @@ function recomputeTotals() {
     tax_est: tax, eur_gain_net: eurGain - tax,
   });
   DATA.allocation = DATA.portfolio.map(r => ({
-    ticker: r.ticker, name: r.name,
+    ticker: r.ticker, name: r.name, sector: r.sector || "Altro",
     value_eur: r.currency === "EUR" ? r.value : r.value / eurusd,
   })).sort((a, b) => b.value_eur - a.value_eur);
 }
@@ -313,6 +324,7 @@ function renderAll() {
   renderMacro();
   renderTopCaps();
   renderNews();
+  renderPredictions();
   pmcInit();
 }
 
@@ -338,56 +350,88 @@ function renderKPI() {
 }
 
 /* ---------------- andamento portafoglio ---------------- */
-let histRange = "y1";   // m1 | y1 | all
+let histRange = "y1";   // w1 | m1 | m3 | y1 | y5 | all
+let histBench = false;  // sovrapponi Nasdaq
 
 function renderHistory() {
   const h = DATA.history && DATA.history[histRange];
   const box = $("#hist-chart");
   if (!h || h.values.length < 2) { box.innerHTML = '<div class="muted" style="padding:40px 0;text-align:center">Storico non disponibile</div>'; $("#hist-summary").textContent = ""; return; }
   const vals = h.values, dates = h.dates;
-  const W = 560, H = 200, pad = { l: 56, r: 12, t: 12, b: 22 };
-  const min = Math.min(...vals), max = Math.max(...vals);
-  const range = max - min || 1;
+  const bench = histBench && h.nasdaq && h.nasdaq.length === vals.length ? h.nasdaq : null;
+  const W = 560, H = 210, pad = { l: 56, r: 12, t: 12, b: 22 };
+  const allv = bench ? vals.concat(bench) : vals;
+  const min = Math.min(...allv), max = Math.max(...allv), range = max - min || 1;
   const x = i => pad.l + i / (vals.length - 1) * (W - pad.l - pad.r);
   const y = v => pad.t + (1 - (v - min) / range) * (H - pad.t - pad.b);
-  const line = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
-  const area = `${pad.l},${y(min)} ${line} ${x(vals.length - 1)},${y(min)}`;
+  const poly = arr => arr.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const area = `${pad.l},${y(min)} ${poly(vals)} ${x(vals.length - 1)},${y(min)}`;
   const up = vals[vals.length - 1] >= vals[0];
   const col = up ? "var(--green)" : "var(--red)";
-  // griglia 4 livelli
   const grid = [0, .25, .5, .75, 1].map(f => {
     const gv = min + range * f, gy = y(gv);
     return `<line x1="${pad.l}" y1="${gy.toFixed(1)}" x2="${W - pad.r}" y2="${gy.toFixed(1)}" stroke="var(--border)" stroke-width="1"/>
       <text x="${pad.l - 6}" y="${(gy + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--muted)">${fmtNum.format(Math.round(gv / 1000))}k</text>`;
   }).join("");
-  // etichette x: prima, metà, ultima
   const xl = [0, Math.floor(vals.length / 2), vals.length - 1].map(i => {
-    const dt = new Date(dates[i]).toLocaleDateString("it-IT", { month: "short", year: "2-digit" });
+    const dt = new Date(dates[i]).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "2-digit" });
     return `<text x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="middle" font-size="9" fill="var(--muted)">${dt}</text>`;
   }).join("");
-  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:200px">
+  const benchLine = bench ? `<polyline points="${poly(bench)}" fill="none" stroke="var(--cyan)" stroke-width="1.6" stroke-dasharray="4 3" opacity="0.85"/>` : "";
+  box.innerHTML = `<svg id="hist-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:210px">
     <defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="${col}" stop-opacity="0.28"/>
       <stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
     ${grid}
     <polygon points="${area}" fill="url(#hg)"/>
-    <polyline points="${line}" fill="none" stroke="${col}" stroke-width="2"/>
-    ${xl}
-  </svg>`;
-  const first = vals[0], last = vals[vals.length - 1];
-  const chg = (last / first - 1) * 100;
-  $("#hist-summary").innerHTML = `${fmtEUR.format(first)} → <b>${fmtEUR.format(last)}</b>
-    <span class="${signCls(chg)}">${signTxt(Math.round(chg * 100) / 100)}</span>
-    nel periodo · min ${fmtEUR.format(min)} · max ${fmtEUR.format(max)}`;
+    <polyline points="${poly(vals)}" fill="none" stroke="${col}" stroke-width="2"/>
+    ${benchLine}
+    <line id="hist-cursor" x1="0" y1="${pad.t}" x2="0" y2="${H - pad.b}" stroke="var(--text)" stroke-width="1" opacity="0"/>
+    <circle id="hist-dot" r="3.5" fill="${col}" opacity="0"/>
+    <rect id="hist-hit" x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}" fill="transparent"/>
+  </svg>${bench ? '<div class="bench-leg"><span class="leg-dash"></span> Nasdaq (riscalato)</div>' : ""}`;
+  const first = vals[0], last = vals[vals.length - 1], chg = (last / first - 1) * 100;
+  let benchTxt = "";
+  if (bench) { const bchg = (bench[bench.length - 1] / bench[0] - 1) * 100; benchTxt = ` · Nasdaq ${signTxt(Math.round(bchg * 10) / 10)} (${chg >= bchg ? "sovra" : "sotto"}performance ${signTxt(Math.round((chg - bchg) * 10) / 10)})`; }
+  $("#hist-summary").innerHTML = `<span id="hist-tip">${fmtEUR.format(first)} → <b>${fmtEUR.format(last)}</b>
+    <span class="${signCls(chg)}">${signTxt(Math.round(chg * 100) / 100)}</span> nel periodo${benchTxt}</span>`;
+
+  // tooltip al passaggio del mouse
+  const svg = $("#hist-svg"), hit = $("#hist-hit"), cursor = $("#hist-cursor"), dot = $("#hist-dot"), tip = $("#hist-tip");
+  const baseTip = tip.innerHTML;
+  const move = (ev) => {
+    const r = svg.getBoundingClientRect();
+    const px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
+    const i = Math.max(0, Math.min(vals.length - 1, Math.round((px / r.width * W - pad.l) / (W - pad.l - pad.r) * (vals.length - 1))));
+    const vx = x(i), vy = y(vals[i]);
+    cursor.setAttribute("x1", vx); cursor.setAttribute("x2", vx); cursor.setAttribute("opacity", ".4");
+    dot.setAttribute("cx", vx); dot.setAttribute("cy", vy); dot.setAttribute("opacity", "1");
+    const dchg = (vals[i] / first - 1) * 100;
+    tip.innerHTML = `${new Date(dates[i]).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}: <b>${fmtEUR.format(vals[i])}</b> <span class="${signCls(dchg)}">${signTxt(Math.round(dchg * 100) / 100)}</span> dal primo giorno`;
+  };
+  const leave = () => { cursor.setAttribute("opacity", "0"); dot.setAttribute("opacity", "0"); tip.innerHTML = baseTip; };
+  hit.addEventListener("mousemove", move);
+  hit.addEventListener("touchmove", move);
+  hit.addEventListener("mouseleave", leave);
 }
 
 /* ---------------- asset allocation (donut) ---------------- */
+let allocMode = "ticker";   // ticker | sector
 const ALLOC_COLORS = ["#4c8dff", "#8b5cf6", "#22c55e", "#f59e0b", "#ef4444", "#22d3ee",
   "#ec4899", "#14b8a6", "#a3a3a3", "#eab308", "#6366f1"];
 
 function renderAllocation() {
-  const list = DATA.allocation || [];
-  if (!list.length) { $("#alloc-donut").innerHTML = ""; $("#alloc-legend").innerHTML = ""; return; }
+  const src = DATA.allocation || [];
+  if (!src.length) { $("#alloc-donut").innerHTML = ""; $("#alloc-legend").innerHTML = ""; return; }
+  let list;
+  if (allocMode === "sector") {
+    const by = {};
+    src.forEach(x => { const s = x.sector || "Altro"; by[s] = (by[s] || 0) + x.value_eur; });
+    list = Object.entries(by).map(([name, value_eur]) => ({ name, ticker: "", value_eur }))
+      .sort((a, b) => b.value_eur - a.value_eur);
+  } else {
+    list = src;
+  }
   const total = list.reduce((s, x) => s + x.value_eur, 0);
   const R = 70, r = 44, cx = 80, cy = 80;
   let a0 = -Math.PI / 2;
@@ -400,7 +444,7 @@ function renderAllocation() {
     a0 = a1;
     return `<path d="${d}" fill="${ALLOC_COLORS[i % ALLOC_COLORS.length]}"><title>${esc(x.name)}: ${fmtEUR.format(x.value_eur)} (${(frac * 100).toFixed(1)}%)</title></path>`;
   }).join("");
-  $("#alloc-donut").innerHTML = `<svg viewBox="0 0 160 160" width="160" height="160">
+  $("#alloc-donut").innerHTML = `<svg viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Ripartizione del portafoglio">
     ${arcs}
     <text x="80" y="76" text-anchor="middle" font-size="11" fill="var(--muted)">Totale</text>
     <text x="80" y="92" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">${fmtEUR.format(Math.round(total))}</text>
@@ -409,7 +453,7 @@ function renderAllocation() {
     const pct = (x.value_eur / total * 100).toFixed(1);
     return `<li class="alloc-item">
       <span class="alloc-dot" style="background:${ALLOC_COLORS[i % ALLOC_COLORS.length]}"></span>
-      <span class="alloc-name">${esc(x.name)} <span class="tk">${x.ticker}</span></span>
+      <span class="alloc-name">${esc(x.name)} ${x.ticker ? `<span class="tk">${x.ticker}</span>` : ""}</span>
       <span class="alloc-pct">${pct}%</span>
       <span class="alloc-val muted">${fmtEUR.format(Math.round(x.value_eur))}</span>
     </li>`;
@@ -517,13 +561,17 @@ function fmtVolume(v) {
 
 function techCells(r) {
   const c = cur(r);
+  // supporto/resistenza cambiano con il range selezionato (1S/1M/3M/1A)
+  const tw = (r.tech_by_range || {})[sparkRange];
+  const support = tw ? tw.support : r.support;
+  const resistance = tw ? tw.resistance : r.resistance;
   return `
       <td class="num">${peBar(r.pe)}</td>
       <td class="num">${epsBar(r.eps)}</td>
       <td class="num">${betaBar(r.beta)}</td>
       <td class="num">${athBar(r)}</td>
-      <td class="num">${r.support ? c + fmtNum.format(r.support) : "—"}</td>
-      <td class="num">${r.resistance ? c + fmtNum.format(r.resistance) : "—"}</td>
+      <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
+      <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
       <td class="num">${rsiBar(r.rsi)}</td>
       <td class="num">${volBar(r.vol_ratio)}</td>
       <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
@@ -537,11 +585,21 @@ function delBtn(section, ticker) {
     ? `<button class="row-del" data-sec="${section}" data-tk="${ticker}" title="Rimuovi ${ticker}">×</button>` : "";
 }
 
+/* 🔔 quando il prezzo è entro il 5% da supporto o resistenza */
+function alertBell(r) {
+  if (!r.support || !r.resistance || !r.price) return "";
+  const dS = Math.abs(r.price / r.support - 1) * 100;
+  const dR = Math.abs(r.price / r.resistance - 1) * 100;
+  if (dR <= 5) return `<span class="bell" title="Vicino alla resistenza ${fmtNum.format(r.resistance)} (${dR.toFixed(1)}%)">🔔</span>`;
+  if (dS <= 5) return `<span class="bell" title="Vicino al supporto ${fmtNum.format(r.support)} (${dS.toFixed(1)}%)">🔔</span>`;
+  return "";
+}
+
 function renderTable() {
   const rows = sortRows(DATA.portfolio, "ptf-table").map(r => {
     const c = cur(r);
     return `<tr>
-      <td class="name-cell">${delBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell">${delBtn("portfolio", r.ticker)}${r.name}${alertBell(r)}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${c}${fmtNum.format(r.price)}</b></td>
@@ -573,7 +631,7 @@ function renderWatchlist() {
   const list = sortRows(DATA.watchlist || [], "wl-table");
   const c = (r) => r.currency === "PTS" ? "" : "$";
   const rows = list.length ? list.map(r => `<tr>
-      <td class="name-cell">${delBtn("watchlist", r.ticker)}${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell">${delBtn("watchlist", r.ticker)}<button class="row-add" data-tk="${r.ticker}" data-price="${r.price}" title="Aggiungi ${r.ticker} al portafoglio">➕</button>${esc(r.name)}${alertBell(r)}<span class="tk">${r.ticker}</span></td>
       <td class="num"><b>${c(r)}${fmtNum.format(r.price)}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${prepostCell(r.prepost)}</td>
@@ -785,17 +843,55 @@ function timeAgo(iso) {
   return `${Math.round(mins / 1440)} gg fa`;
 }
 
-function renderNews() {
+const SENT = { bull: ["🟢", "Letta positivamente dal mercato"], bear: ["🔴", "Letta negativamente dal mercato"], neutral: ["⚪", "Neutrale"] };
+let newsFilter = null;   // ticker/argomento selezionato dai chip Trending
+
+function renderTrending() {
   const list = DATA.news || [];
-  $("#news-list").innerHTML = list.length ? list.map(n => `
-    <li class="news-item">
-      <a href="${esc(n.link)}" target="_blank" rel="noopener" title="${esc(n.title)}">${esc(n.title_it || n.title)}</a>
-      <div class="news-meta">
-        <span class="news-src">${esc(n.source)}</span>
-        <span class="news-time">${timeAgo(n.published)}</span>
-        ${n.tickers.map(t => `<span class="news-tk">${t}</span>`).join("")}
+  const counts = {};
+  list.forEach(n => (n.tickers || []).forEach(t => { counts[t] = (counts[t] || 0) + 1; }));
+  const top = Object.entries(counts).filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const label = t => t === "MACRO" ? "Macro" : t;
+  const chips = top.map(([t, c]) =>
+    `<button class="trend-chip ${newsFilter === t ? "active" : ""}" data-topic="${t}">${label(t)} <span>${c}</span></button>`).join("");
+  $("#news-trending").innerHTML = top.length
+    ? `<span class="trend-label">Trending:</span>${chips}${newsFilter ? '<button class="trend-chip clear" data-topic="">✕</button>' : ""}` : "";
+}
+
+function renderNews() {
+  renderTrending();
+  let list = DATA.news || [];
+  if (newsFilter) list = list.filter(n => (n.tickers || []).includes(newsFilter));
+  $("#news-list").innerHTML = list.length ? list.map(n => {
+    const [emo, stip] = SENT[n.sentiment] || SENT.neutral;
+    return `<li class="news-item">
+      <span class="sent" title="${stip}">${emo}</span>
+      <div class="news-body">
+        <a href="${esc(n.link)}" target="_blank" rel="noopener" title="${esc(n.title)}">${esc(n.title_it || n.title)}</a>
+        <div class="news-meta">
+          <span class="news-src">${esc(n.source)}</span>
+          <span class="news-time">${timeAgo(n.published)}</span>
+          ${n.tickers.map(t => `<span class="news-tk">${t === "MACRO" ? "Macro" : t}</span>`).join("")}
+        </div>
       </div>
-    </li>`).join("") : '<li class="muted">Nessuna news recente sui titoli in portafoglio</li>';
+    </li>`;
+  }).join("") : '<li class="muted">Nessuna news per il filtro selezionato</li>';
+}
+
+/* ---------------- sentiment & dati alternativi (Polymarket) ---------------- */
+function renderPredictions() {
+  const list = DATA.predictions || [];
+  const card = $("#altdata-card");
+  if (!list.length) { if (card) card.style.display = "none"; return; }
+  if (card) card.style.display = "";
+  $("#pred-list").innerHTML = list.map(p => {
+    const col = p.yes >= 60 ? "var(--green)" : p.yes >= 40 ? "var(--yellow)" : "var(--red)";
+    return `<li class="pred-item">
+      <a href="${esc(p.link)}" target="_blank" rel="noopener">${esc(p.question)}</a>
+      <div class="pred-bar"><span style="width:${p.yes}%;background:${col}"></span></div>
+      <span class="pred-pct" style="color:${col}">${p.yes}%</span>
+    </li>`;
+  }).join("");
 }
 
 /* ---------------- prompt AI ---------------- */
@@ -808,26 +904,20 @@ function buildPrompt() {
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   lines.push("");
   lines.push(`PORTAFOGLIO (totale ${fmtEUR.format(t.eur_value)}, guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} / ${signTxt(t.eur_gain_pct)}${t.eur_gain_net !== undefined ? `, netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}):`);
-  const stockLine = (r) => {
+  const f = (v, d = 2) => v === null || v === undefined ? "—" : fmtNum.format(v);
+  const mdRow = (r) => {
     const c = cur(r);
-    let l = `- ${r.name} (${r.ticker}): prezzo ${c}${fmtNum.format(r.price)} | oggi ${signTxt(r.change_pct)}`;
-    if (r.qty) l = `- ${r.name} (${r.ticker}): ${fmtNum.format(r.qty)} @ PMC ${c}${fmtNum.format(r.pmc)} | prezzo ${c}${fmtNum.format(r.price)} | oggi ${signTxt(r.change_pct)} | guadagno ${signTxt(r.gain_pct)}`;
-    if (r.rsi !== null && r.rsi !== undefined) l += ` | RSI ${r.rsi}`;
-    if (r.support) l += ` | supporto ${c}${fmtNum.format(r.support)} / resistenza ${c}${fmtNum.format(r.resistance)}`;
-    if (r.pe && r.pe > 0) l += ` | P/E ${fmtNum.format(r.pe)}`;
-    if (r.eps !== null && r.eps !== undefined) l += ` | EPS ${fmtNum.format(r.eps)}`;
-    if (r.beta !== null && r.beta !== undefined) l += ` | beta ${fmtNum.format(r.beta)}`;
-    if (r.prepost?.price) l += ` | ${r.prepost.label}-market ${c}${fmtNum.format(r.prepost.price)} (${signTxt(r.prepost.change_pct)})`;
-    if (r.rating?.key) l += ` | rating analisti: ${r.rating.key} (target ${c}${fmtNum.format(r.rating.target)}, ${signTxt(r.rating.upside_pct)} dal prezzo)`;
-    if (r.earnings_date) l += ` | prossima trimestrale: ${r.earnings_date}`;
-    l += ` | segnale: ${r.signal}`;
-    return l;
+    return `| ${r.name} (${r.ticker}) | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${r.support ? c + f(r.support) : "—"} | ${r.resistance ? c + f(r.resistance) : "—"} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(r.beta)} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"} | ${r.signal} |`;
   };
-  DATA.portfolio.forEach(r => lines.push(stockLine(r)));
+  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | Supp. | Resist. | P/E | EPS | Beta | Target Δ | Trimestrale | Segnale |";
+  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
+  lines.push(head); lines.push(sep);
+  DATA.portfolio.forEach(r => lines.push(mdRow(r)));
   if ((DATA.watchlist || []).length) {
     lines.push("");
     lines.push("WATCHLIST (nessuna posizione):");
-    DATA.watchlist.forEach(r => lines.push(stockLine(r)));
+    lines.push(head); lines.push(sep);
+    DATA.watchlist.forEach(r => lines.push(mdRow(r)));
   }
   lines.push("");
   lines.push("QUADRO MACRO:");
@@ -845,9 +935,17 @@ function buildPrompt() {
     lines.push("TOP 10 CAPITALIZZAZIONI MONDIALI:");
     DATA.top_caps.forEach((x, i) => lines.push(`${i + 1}. ${x.name} (${x.ticker}): ${fmtMcap(x.mcap_usd)} (${signTxt(x.change_pct)} oggi)`));
   }
+  if ((DATA.predictions || []).length) {
+    lines.push("");
+    lines.push("MERCATI DI PREVISIONE (Polymarket, prob. Sì):");
+    DATA.predictions.forEach(p => lines.push(`- ${p.question}: ${p.yes}%`));
+  }
   lines.push("");
-  lines.push("ULTIME NEWS (portafoglio + macro/politica USA):");
-  (DATA.news || []).slice(0, 16).forEach(n => lines.push(`- [${n.tickers.join(",")}] ${n.title} (${n.source})`));
+  lines.push("ULTIME NEWS (sentiment | titolo | fonte):");
+  (DATA.news || []).slice(0, 18).forEach(n => {
+    const s = n.sentiment === "bull" ? "🟢" : n.sentiment === "bear" ? "🔴" : "⚪";
+    lines.push(`- ${s} [${n.tickers.join(",")}] ${n.title} (${n.source})`);
+  });
   return lines.join("\n");
 }
 
@@ -941,6 +1039,21 @@ document.querySelectorAll("#hist-toggle .chip").forEach(ch => {
     renderHistory();
   });
 });
+$("#bench-nasdaq").addEventListener("change", (e) => { histBench = e.target.checked; renderHistory(); });
+document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {
+  ch.addEventListener("click", () => {
+    document.querySelectorAll("#alloc-toggle .chip").forEach(c => c.classList.remove("chip-active"));
+    ch.classList.add("chip-active");
+    allocMode = ch.dataset.mode;
+    renderAllocation();
+  });
+});
+$("#news-trending").addEventListener("click", (e) => {
+  const chip = e.target.closest(".trend-chip");
+  if (!chip) return;
+  newsFilter = chip.dataset.topic || null;
+  renderNews();
+});
 
 /* modifica posizioni */
 $("#ptf-edit").addEventListener("click", () => {
@@ -956,9 +1069,35 @@ $("#wl-edit").addEventListener("click", () => {
 document.addEventListener("click", (e) => {
   const del = e.target.closest(".row-del");
   if (del) { removeHolding(del.dataset.sec, del.dataset.tk); return; }
+  const add = e.target.closest(".row-add");
+  if (add) { quickAddFromWatchlist(add.dataset.tk, parseFloat(add.dataset.price)); return; }
   if (e.target.id === "ptf-add") addPortfolio();
   if (e.target.id === "wl-add") addWatchlist();
 });
+
+/* dalla watchlist al calcolatore PMC / aggiungi al portafoglio */
+function quickAddFromWatchlist(ticker, price) {
+  const pmc = $("#pmc-calc");
+  pmc.scrollIntoView({ behavior: "smooth" });
+  $("#pmc-q1").value = "";
+  $("#pmc-p1").value = price || "";
+  $("#pmc-p2").value = price || "";
+  $("#pmc-q2").value = "";
+  pmcCompute();
+  toast(`${ticker} caricato nel calcolatore PMC — inserisci la quantità`);
+  if (confirm(`Vuoi aggiungere ${ticker} direttamente al portafoglio?`)) {
+    const qty = parseFloat(window.prompt(`Quantità di ${ticker}:`) || "");
+    const p = parseFloat(window.prompt(`Prezzo medio di carico (PMC) di ${ticker} in USD:`, price || "") || "");
+    if (qty > 0 && p > 0) {
+      editHoldings("portfolio", cfg => {
+        cfg.portfolio = cfg.portfolio || [];
+        if (cfg.portfolio.some(x => x.ticker === ticker)) { toast(`${ticker} è già in portafoglio`); return false; }
+        cfg.portfolio.push({ ticker, name: ticker, qty, pmc: p });
+        return true;
+      });
+    }
+  }
+}
 
 initSorting("ptf-table", renderTable);
 initSorting("wl-table", renderWatchlist);

@@ -205,9 +205,11 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     vol = float(hist["Volume"].iloc[-1])
     vol_avg30 = float(hist["Volume"].tail(30).mean())
 
-    # sparkline su tre orizzonti: 1 giorno (5 min), 1 mese (giornaliero), 1 anno
+    # sparkline su più orizzonti: 1g (5m), 1 settimana, 1 mese, 3 mesi, 1 anno
     sparks = {
-        "m1": [round(float(c), 2) for c in closes.tail(30)],
+        "w1": [round(float(c), 2) for c in closes.tail(5)],
+        "m1": [round(float(c), 2) for c in closes.tail(22)],
+        "m3": [round(float(c), 2) for c in closes.tail(66)],
         "y1": [round(float(c), 2) for c in closes[::5]],
         "d1": [],
     }
@@ -217,6 +219,18 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             sparks["d1"] = [round(float(c), 2) for c in h1[::2]]
     except Exception:  # noqa: BLE001
         pass
+
+    # supporto/resistenza/performance per orizzonte (cambiano col range scelto)
+    def tech_window(n):
+        h = hist.tail(n)
+        if h.empty:
+            return None
+        c0 = float(h["Close"].iloc[0]); c1 = float(h["Close"].iloc[-1])
+        return {"support": round(float(h["Low"].min()), 2),
+                "resistance": round(float(h["High"].max()), 2),
+                "change_pct": round((c1 / c0 - 1) * 100, 2) if c0 else None}
+    tech_by_range = {k: tech_window(n) for k, n in
+                     (("w1", 5), ("m1", 22), ("m3", 66), ("y1", 252))}
 
     # prossima trimestrale
     earnings_date = None
@@ -291,6 +305,8 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "eps": round(float(eps), 2) if eps is not None else None,
         "beta": round(float(beta), 2) if beta is not None else None,
         "prepost": prepost,
+        "sector": info.get("sector") or info.get("quoteType") or "Altro",
+        "tech_by_range": tech_by_range,
     }
 
 
@@ -348,6 +364,7 @@ def fetch_btp():
         "signal": "Cedola 4,10/4,50%", "signal_class": "info",
         "sparks": {}, "earnings_date": None, "rating": None, "health": None,
         "eps": None, "beta": None, "prepost": None,
+        "sector": "Obbligazioni", "tech_by_range": {},
     }
 
 
@@ -646,34 +663,42 @@ def translate_it(text):
 
 
 def fetch_portfolio_history(btp_value_eur):
-    """Ricostruisce il valore del portafoglio (in EUR) nel tempo, a parità di
-    composizione attuale, usando i prezzi storici. Restituisce serie 1M / 12M / Max."""
+    """Valore del portafoglio (EUR) nel tempo, a composizione attuale, con benchmark
+    Nasdaq sovrapponibile. Serie: 1S / 1M / 3M / 12M / 5A / Max."""
     tickers = [p["ticker"] for p in PORTFOLIO]
     qty = {p["ticker"]: p["qty"] for p in PORTFOLIO}
     try:
-        data = yf.download(tickers, period="5y", interval="1d",
+        data = yf.download(tickers + ["^IXIC"], period="5y", interval="1d",
                            auto_adjust=True, progress=False)["Close"]
         if isinstance(data, pd.Series):
             data = data.to_frame()
         fx = yf.Ticker("EURUSD=X").history(period="5y")["Close"]
         fx.index = fx.index.tz_localize(None)
         data.index = pd.to_datetime(data.index).tz_localize(None)
-        df = data.dropna()                       # parte da quando tutti i titoli esistono
+        nasdaq = data["^IXIC"] if "^IXIC" in data.columns else None
+        df = data[tickers].dropna()              # parte da quando tutti i titoli esistono
         if df.empty:
             return None
         eur = fx.reindex(df.index, method="ffill").bfill()
         usd_val = sum(df[t] * qty[t] for t in tickers if t in df.columns)
-        total = usd_val / eur + btp_value_eur    # BTP ~ costante
-        total = total.dropna()
+        total = (usd_val / eur + btp_value_eur).dropna()
+        ndq = nasdaq.reindex(total.index, method="ffill") if nasdaq is not None else None
 
         def series(window):
             s = total if window is None else total.tail(window)
-            step = max(1, len(s) // 120)         # max ~120 punti per serie
+            step = max(1, len(s) // 120)
             s = s.iloc[::step]
-            return {"dates": [d.strftime("%Y-%m-%d") for d in s.index],
-                    "values": [round(float(v)) for v in s.values]}
+            out = {"dates": [d.strftime("%Y-%m-%d") for d in s.index],
+                   "values": [round(float(v)) for v in s.values]}
+            if ndq is not None:                  # Nasdaq normalizzato al valore iniziale del periodo
+                n = ndq.reindex(s.index, method="ffill")
+                base_p, base_n = float(s.iloc[0]), float(n.iloc[0]) if len(n) and n.iloc[0] else None
+                if base_n:
+                    out["nasdaq"] = [round(float(x) / base_n * base_p) for x in n.values]
+            return out
 
-        return {"m1": series(22), "y1": series(252), "all": series(None)}
+        return {"w1": series(5), "m1": series(22), "m3": series(66),
+                "y1": series(252), "y5": series(None), "all": series(None)}
     except Exception as e:  # noqa: BLE001
         print(f"!! storico portafoglio: {e}", file=sys.stderr)
         return None
@@ -734,23 +759,26 @@ def parse_feed_entries(url):
     return out
 
 
-def fetch_predictions(limit=5):
-    """Mercati di previsione Polymarket su temi macro/finanza/politica USA."""
-    try:
-        ms = http_get("https://gamma-api.polymarket.com/markets"
-                      "?closed=false&order=volumeNum&ascending=false&limit=60").json()
-    except Exception as e:  # noqa: BLE001
-        print(f"!! polymarket: {e}", file=sys.stderr)
-        return []
-    out, now = [], datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    pat = re.compile(r"\bfed\b|rate cut|interest rate|inflation|recession|\btrump\b|election|"
-                     r"s&p|nasdaq|bitcoin|\beth\b|gdp|tariff|economy|powell|government shutdown|"
-                     r"\bcpi\b|jobs report|debt ceiling", re.I)
+def fetch_predictions(limit=6):
+    """Mercati di previsione Polymarket su temi macro/finanza (sezione separata)."""
+    ms = []
+    for order in ("volume24hr", "volumeNum"):   # i più attivi oggi sono i macro reali
+        try:
+            ms += http_get("https://gamma-api.polymarket.com/markets"
+                           f"?closed=false&active=true&order={order}&ascending=false&limit=150").json()
+        except Exception as e:  # noqa: BLE001
+            print(f"!! polymarket ({order}): {e}", file=sys.stderr)
+    # macro/finanza puri (Fed, inflazione, recessione, mercati, crypto)
+    pat = re.compile(r"\bfed\b|rate cut|interest rate|\binflation\b|recession|s&p|nasdaq|"
+                     r"\bbitcoin\b|ethereum|\bgdp\b|tariff|powell|shutdown|\bcpi\b|jobs report|"
+                     r"debt ceiling|stock market|\bnvidia\b|\btesla\b|\beconomy\b|jerome", re.I)
     skip = re.compile(r"world cup|fifa|super bowl|oscar|grammy|nba|nfl|soccer|jesus|"
-                      r"oprah|taylor swift|champions league", re.I)
+                      r"oprah|taylor swift|champions league|lebron|movie|album|"
+                      r"\bufc\b|tennis|olympic|nobel|miss universe|grand slam", re.I)
+    out, seen = [], set()
     for m in ms:
         q = (m.get("question") or "").strip()
-        if not q or not pat.search(q) or skip.search(q):
+        if not q or q in seen or not pat.search(q) or skip.search(q):
             continue
         try:
             pr = m.get("outcomePrices")
@@ -758,35 +786,73 @@ def fetch_predictions(limit=5):
             yes = round(float(pr[0]) * 100)
         except Exception:  # noqa: BLE001
             continue
+        if yes < 2:                             # scarta solo i mercati quasi impossibili
+            continue
+        seen.add(q)
         slug = m.get("slug", "")
-        out.append({"source": "Polymarket", "title": f"{q} — probabilità Sì {yes}%",
-                    "link": f"https://polymarket.com/event/{slug}" if slug else "https://polymarket.com",
-                    "published": now, "tickers": ["MACRO"], "title_it": None})
+        out.append({"question": q, "yes": yes,
+                    "link": f"https://polymarket.com/event/{slug}" if slug else "https://polymarket.com"})
         if len(out) >= limit:
             break
     return out
 
 
+# lessico per il sentiment rule-based delle news (mercato)
+BULL_WORDS = re.compile(r"\b(surge|soar|rally|jump|beat|beats|record|高|gain|gains|upgrade|"
+                        r"bullish|outperform|tops|wins|approval|breakthrough|strong|boost|"
+                        r"rises?|climb|optimis|profit|growth|cut rates?)\b", re.I)
+BEAR_WORDS = re.compile(r"\b(plunge|slump|crash|fall|falls|drop|drops|miss|misses|downgrade|"
+                        r"bearish|underperform|warning|warns|lawsuit|probe|recall|cut[s]? guidance|"
+                        r"layoff|tariff|sanction|war|conflict|fear|selloff|loss|losses|weak|slowdown|ban)\b", re.I)
+
+
+def news_sentiment(title):
+    b = len(BULL_WORDS.findall(title))
+    s = len(BEAR_WORDS.findall(title))
+    if b > s:
+        return "bull"
+    if s > b:
+        return "bear"
+    return "neutral"
+
+
+def build_keywords():
+    """Parole chiave news: macro fisso + ticker/nome di ogni posizione (così le news
+    si adattano automaticamente quando aggiungi/rimuovi titoli)."""
+    kw = {"MACRO": PORTFOLIO_KEYWORDS["MACRO"]}
+    for p in PORTFOLIO:
+        tk = p["ticker"]
+        if tk == "BTP-V28":
+            kw[tk] = [r"\bbtp\b", r"italian bond", r"italy bond"]
+            continue
+        terms = [re.escape(tk.lower())]
+        nm = (p.get("name") or "").lower().split(" ")[0]
+        if len(nm) >= 3 and nm not in ("the", "inc", "corp"):
+            terms.append(re.escape(nm))
+        kw[tk] = [rf"\b{t}\b" for t in terms]
+    return kw
+
+
 def fetch_news():
-    """News sui titoli in portafoglio + macro/politica USA, titolo tradotto in italiano."""
+    """News sui titoli in portafoglio (dinamiche) + macro/politica USA, tradotte."""
+    keywords = build_keywords()
     items, seen = [], set()
     for source, url in NEWS_FEEDS:
         for title, link, ts in parse_feed_entries(url):
             if not title or title.lower() in seen:
                 continue
-            tickers = [tk for tk, kws in PORTFOLIO_KEYWORDS.items()
+            tickers = [tk for tk, kws in keywords.items()
                        if any(re.search(kw, title.lower()) for kw in kws)]
             if not tickers:
                 continue
             seen.add(title.lower())
             items.append({"source": source, "title": title, "link": link,
-                          "published": ts, "tickers": tickers})
+                          "published": ts, "tickers": tickers,
+                          "sentiment": news_sentiment(title)})
     items.sort(key=lambda x: x["published"] or "", reverse=True)
-    items = items[:38]
+    items = items[:42]
     for it in items:
         it["title_it"] = translate_it(it["title"])
-    # mercati di previsione in coda (probabilità già in italiano)
-    items += fetch_predictions()
     return items
 
 
@@ -820,13 +886,14 @@ def main():
     tax = TAX_STOCK * max(0, stock_gain_eur) + TAX_BTP * max(0, btp["gain"])
     eur_gain = total_eur - cost_eur
 
-    # asset allocation dettagliata (valore in EUR per posizione)
+    # asset allocation dettagliata (valore in EUR per posizione, con settore)
     allocation = []
     for r in equities:
         allocation.append({"ticker": r["ticker"], "name": r["name"],
-                           "value_eur": round(r["value"] / eurusd, 2)})
+                           "value_eur": round(r["value"] / eurusd, 2),
+                           "sector": r.get("sector") or "Altro"})
     allocation.append({"ticker": btp["ticker"], "name": btp["name"],
-                       "value_eur": round(btp["value"], 2)})
+                       "value_eur": round(btp["value"], 2), "sector": "Obbligazioni"})
     allocation.sort(key=lambda x: x["value_eur"], reverse=True)
 
     data = {
@@ -848,6 +915,7 @@ def main():
         "history": fetch_portfolio_history(btp["value"]),
         "macro": macro,
         "top_caps": fetch_top_caps(),
+        "predictions": fetch_predictions(),
         "news": fetch_news(),
     }
 

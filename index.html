@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=15">
+<link rel="stylesheet" href="assets/style.css?v=16">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📈</text></svg>">
 </head>
 <body>
@@ -20,8 +20,8 @@
     </div>
   </div>
   <div class="actions">
-    <button class="btn btn-ghost" id="btn-prompt" title="Copia un prompt con tutti i dati da incollare in Claude">🤖 Prompt AI</button>
-    <button class="btn btn-primary" id="btn-refresh" title="Aggiorna prezzi live e ricarica i dati (nessun token richiesto)">⟳ Aggiorna</button>
+    <button class="btn btn-ghost" id="btn-prompt" aria-label="Genera e copia un prompt con tutti i dati per l'analisi AI" title="Copia un prompt con tutti i dati da incollare in Claude">🤖 Prompt AI</button>
+    <button class="btn btn-primary" id="btn-refresh" aria-label="Aggiorna prezzi live e rigenera i dati" title="Aggiorna prezzi live e rigenera i dati (col token)">⟳ Aggiorna</button>
   </div>
 </header>
 
@@ -34,17 +34,27 @@
     <section class="card">
       <div class="card-head">
         <h2>Andamento portafoglio</h2>
-        <div class="spark-toggle" id="hist-toggle">
-          <button class="chip" data-range="m1">1M</button>
-          <button class="chip chip-active" data-range="y1">12M</button>
-          <button class="chip" data-range="all">Max</button>
+        <div class="spark-toggle" id="hist-toggle" role="group" aria-label="Intervallo temporale andamento">
+          <button class="chip" data-range="w1" aria-label="Una settimana">1S</button>
+          <button class="chip" data-range="m1" aria-label="Un mese">1M</button>
+          <button class="chip" data-range="m3" aria-label="Tre mesi">3M</button>
+          <button class="chip chip-active" data-range="y1" aria-label="Dodici mesi">12M</button>
+          <button class="chip" data-range="y5" aria-label="Cinque anni">5A</button>
+          <button class="chip" data-range="all" aria-label="Massimo">Max</button>
         </div>
+        <label class="bench-toggle"><input type="checkbox" id="bench-nasdaq"> vs Nasdaq</label>
       </div>
       <div id="hist-chart"></div>
       <div class="hist-summary muted" id="hist-summary"></div>
     </section>
     <section class="card">
-      <div class="card-head"><h2>Asset allocation</h2></div>
+      <div class="card-head">
+        <h2>Asset allocation</h2>
+        <div class="spark-toggle" id="alloc-toggle" role="group" aria-label="Vista allocazione">
+          <button class="chip chip-active" data-mode="ticker">Per titolo</button>
+          <button class="chip" data-mode="sector">Per settore</button>
+        </div>
+      </div>
       <div class="alloc-wrap">
         <div id="alloc-donut"></div>
         <ul class="alloc-legend" id="alloc-legend"></ul>
@@ -64,16 +74,18 @@
   <section class="card">
     <div class="card-head">
       <h2>Portafoglio &amp; Dati Tecnici</h2>
-      <div class="spark-toggle" id="spark-toggle">
-        <button class="chip" data-range="d1">1G</button>
-        <button class="chip chip-active" data-range="m1">1M</button>
-        <button class="chip" data-range="y1">1A</button>
+      <div class="spark-toggle" id="spark-toggle" role="group" aria-label="Intervallo analisi tecnica e mini-grafico">
+        <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
+        <button class="chip" data-range="w1" aria-label="Una settimana">1S</button>
+        <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
+        <button class="chip" data-range="m3" aria-label="Tre mesi">3M</button>
+        <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
       </div>
-      <button class="btn btn-ghost btn-sm" id="ptf-edit" title="Aggiungi o rimuovi titoli">✎ Modifica</button>
+      <button class="btn btn-ghost btn-sm" id="ptf-edit" aria-label="Aggiungi o rimuovi titoli dal portafoglio" title="Aggiungi o rimuovi titoli">✎ Modifica</button>
     </div>
-    <div class="earnings-strip" id="earnings-strip"></div>
+    <div class="earnings-strip" id="earnings-strip" aria-label="Prossime trimestrali"></div>
     <div class="table-wrap">
-      <table id="ptf-table">
+      <table id="ptf-table" aria-label="Portafoglio con prezzi, valore, guadagno e analisi tecnica">
         <thead>
           <tr>
             <th class="sticky-col">Titolo</th>
@@ -109,10 +121,10 @@
   <section class="card">
     <div class="card-head">
       <h2>Watchlist</h2>
-      <button class="btn btn-ghost btn-sm" id="wl-edit" title="Aggiungi o rimuovi titoli">✎ Modifica</button>
+      <button class="btn btn-ghost btn-sm" id="wl-edit" aria-label="Aggiungi o rimuovi titoli dalla watchlist" title="Aggiungi o rimuovi titoli">✎ Modifica</button>
     </div>
     <div class="table-wrap">
-      <table id="wl-table">
+      <table id="wl-table" aria-label="Watchlist con prezzi e analisi tecnica">
         <thead>
           <tr>
             <th class="sticky-col">Titolo</th>
@@ -143,8 +155,18 @@
   <section class="card">
     <div class="card-head">
       <h2>News — portafoglio &amp; macro USA</h2>
+      <div class="news-trending" id="news-trending" aria-label="Argomenti di tendenza"></div>
     </div>
-    <ul class="news-list" id="news-list"></ul>
+    <ul class="news-list" id="news-list" aria-label="Elenco notizie"></ul>
+  </section>
+
+  <!-- SENTIMENT & DATI ALTERNATIVI -->
+  <section class="card" id="altdata-card">
+    <div class="card-head">
+      <h2>Sentiment &amp; Dati Alternativi</h2>
+      <span class="muted">Mercati di previsione Polymarket (probabilità “Sì”)</span>
+    </div>
+    <ul class="pred-list" id="pred-list" aria-label="Mercati di previsione"></ul>
   </section>
 
   <!-- CALCOLATORE PMC -->
@@ -198,6 +220,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=15"></script>
+<script src="assets/app.js?v=16"></script>
 </body>
 </html>

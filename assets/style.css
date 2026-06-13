@@ -270,6 +270,47 @@ th.sortable:hover { color: var(--text); }
 /* ---------- toggle sparkline ---------- */
 .spark-toggle { display: flex; gap: 6px; }
 
+/* ---------- andamento: overlay Nasdaq + tooltip ---------- */
+.bench-toggle { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.bench-leg { font-size: 11px; color: var(--cyan); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+.leg-dash { display: inline-block; width: 18px; height: 0; border-top: 2px dashed var(--cyan); }
+#hist-hit { cursor: crosshair; }
+
+/* ---------- 🔔 alert e ➕ watchlist ---------- */
+.bell { margin-left: 5px; font-size: 12px; animation: pulse 1.8s infinite; }
+.row-add {
+  background: rgba(34,197,94,.15); color: var(--green); border: none; cursor: pointer;
+  width: 18px; height: 18px; border-radius: 4px; font-size: 11px; line-height: 1;
+  margin-right: 6px; font-weight: 700; vertical-align: middle;
+}
+.row-add:hover { background: var(--green); color: #fff; }
+
+/* ---------- news: sentiment + trending ---------- */
+.news-item { display: flex; gap: 10px; align-items: flex-start; }
+.news-body { flex: 1; }
+.sent { font-size: 13px; line-height: 1.5; flex-shrink: 0; }
+.news-trending { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.trend-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.trend-chip {
+  background: var(--card-2); border: 1px solid var(--border); color: var(--text);
+  border-radius: 20px; padding: 3px 10px; font-size: 11.5px; cursor: pointer; font-weight: 600;
+}
+.trend-chip span { color: var(--muted); }
+.trend-chip:hover { border-color: var(--blue); }
+.trend-chip.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+.trend-chip.active span { color: #cfe0ff; }
+.trend-chip.clear { color: var(--red); }
+
+/* ---------- dati alternativi (Polymarket) ---------- */
+.pred-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 22px; }
+@media (max-width: 760px) { .pred-list { grid-template-columns: 1fr; } }
+.pred-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+.pred-item a { flex: 1; color: var(--text); text-decoration: none; }
+.pred-item a:hover { color: var(--blue); }
+.pred-bar { width: 70px; height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; flex-shrink: 0; }
+.pred-bar span { display: block; height: 100%; border-radius: 3px; }
+.pred-pct { font-family: var(--mono); font-weight: 700; min-width: 38px; text-align: right; }
+
 /* ---------- calcolatore PMC ---------- */
 .pmc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
 .pmc-block {
