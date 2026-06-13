@@ -19,6 +19,7 @@ import os
 import re
 import sys
 import time
+import urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -43,11 +44,19 @@ PORTFOLIO = [
     {"ticker": "TSLA", "name": "Tesla",          "qty": 60,   "pmc": 358.22},
     {"ticker": "MSTR", "name": "Strategy",       "qty": 123,  "pmc": 210.22},
     {"ticker": "RGTI", "name": "Rigetti",        "qty": 515,  "pmc": 27.30},
-    {"ticker": "OKLO", "name": "Oklo",           "qty": 120,  "pmc": 72.43},
     {"ticker": "ARBE", "name": "Arbe Robotics",  "qty": 1150, "pmc": 3.35},
 ]
 
-WATCHLIST = ["OKLO", "SPCX", "CBRS"]
+# (ticker, nome forzato, valuta) — valuta "PTS" = indice in punti, senza simbolo
+WATCHLIST = [
+    ("OKLO", None, "USD"),
+    ("SPCX", None, "USD"),
+    ("CBRS", None, "USD"),
+    ("^KS11", "KOSPI", "PTS"),
+    ("^IXIC", "Nasdaq Composite", "PTS"),
+    ("BTC-USD", "Bitcoin", "USD"),
+    ("CL=F", "Petrolio WTI", "USD"),
+]
 
 BTP = {
     "ticker": "BTP-V28", "name": "BTP Valore Ott 2028", "isin": "IT0005565400",
@@ -56,6 +65,19 @@ BTP = {
 
 PUTCALL_SYMBOL = ("BSX", "Boston Scientific")
 
+# aliquote per la stima del guadagno netto
+TAX_STOCK = 0.26   # capital gain azioni
+TAX_BTP = 0.125    # titoli di Stato (aliquota agevolata 12,5%)
+
+# candidati per la classifica delle maggiori capitalizzazioni mondiali
+TOP_CAP_CANDIDATES = {
+    "NVDA": "NVIDIA", "MSFT": "Microsoft", "AAPL": "Apple", "GOOGL": "Alphabet",
+    "AMZN": "Amazon", "META": "Meta", "AVGO": "Broadcom", "TSLA": "Tesla",
+    "TSM": "TSMC", "BRK-B": "Berkshire", "LLY": "Eli Lilly", "WMT": "Walmart",
+    "JPM": "JPMorgan", "V": "Visa", "XOM": "Exxon", "ORCL": "Oracle",
+    "MA": "Mastercard", "COST": "Costco", "ASML": "ASML", "2222.SR": "Saudi Aramco",
+}
+
 NEWS_FEEDS = [
     ("CNBC", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258"),
     ("Bloomberg", "https://feeds.bloomberg.com/markets/news.rss"),
@@ -63,6 +85,7 @@ NEWS_FEEDS = [
     ("Investing.com", "https://www.investing.com/rss/news_25.rss"),
     ("Google News", "https://news.google.com/rss/search?q=Nvidia+OR+AMD+OR+Micron+OR+Intel+OR+Tesla&hl=en-US&gl=US&ceid=US:en"),
     ("Google News", "https://news.google.com/rss/search?q=MicroStrategy+OR+%22Rigetti+Computing%22+OR+%22Oklo%22+OR+%22Arbe+Robotics%22+OR+%22BTP+Valore%22&hl=en-US&gl=US&ceid=US:en"),
+    ("Google News", "https://news.google.com/rss/search?q=%22Federal+Reserve%22+OR+%22US+inflation%22+OR+%22White+House%22+economy+OR+tariffs&hl=en-US&gl=US&ceid=US:en"),
 ]
 
 # pattern regex (word boundary) per associare le news ai titoli
@@ -72,6 +95,10 @@ PORTFOLIO_KEYWORDS = {
     "MSTR": [r"\bmicrostrategy\b", r"\bstrategy inc\b", r"\bmstr\b", r"\bsaylor\b"],
     "RGTI": [r"\brigetti\b"], "OKLO": [r"\boklo\b"], "ARBE": [r"\barbe\b"],
     "BTP-V28": [r"\bbtp\b", r"italian bond", r"italy bond"],
+    # macro e politica USA
+    "MACRO": [r"\bfed\b", r"federal reserve", r"\binflation\b", r"\bcpi\b", r"\btariff",
+              r"white house", r"\btrump\b", r"\bcongress\b", r"\btreasur", r"\bgdp\b",
+              r"\bpowell\b", r"rate cut", r"interest rate", r"\bjobs report\b", r"payrolls"],
 }
 
 
@@ -118,7 +145,7 @@ def signal_label(price, sma50, sma200, rsi):
     return "Neutrale", "neutral"
 
 
-def fetch_symbol(ticker, name=None):
+def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
     t = yf.Ticker(ticker)
     hist = t.history(period="1y", interval="1d", auto_adjust=True)
@@ -184,6 +211,18 @@ def fetch_symbol(ticker, name=None):
             "upside_pct": round((float(tgt) / price - 1) * 100, 1) if tgt else None,
         }
 
+    # quotazione pre/after market (se la sessione la espone)
+    prepost = None
+    for pk, lab in (("preMarketPrice", "pre"), ("postMarketPrice", "after")):
+        p = info.get(pk)
+        if p:
+            prepost = {"label": lab, "price": round(float(p), 2),
+                       "change_pct": round((float(p) / price - 1) * 100, 2)}
+            break
+
+    eps = info.get("trailingEps")
+    beta = info.get("beta")
+
     # salute tecnica 0-100 (per il termometro di portafoglio)
     parts = []
     if rsi is not None:
@@ -202,7 +241,7 @@ def fetch_symbol(ticker, name=None):
     return {
         "ticker": ticker,
         "name": name or auto_name,
-        "currency": "USD",
+        "currency": currency,
         "price": round(price, 2),
         "change_pct": round((price / prev - 1) * 100, 2),
         "pe": round(float(pe), 1) if pe and pe > 0 else None,
@@ -219,6 +258,9 @@ def fetch_symbol(ticker, name=None):
         "earnings_date": earnings_date,
         "rating": rating,
         "health": health,
+        "eps": round(float(eps), 2) if eps is not None else None,
+        "beta": round(float(beta), 2) if beta is not None else None,
+        "prepost": prepost,
     }
 
 
@@ -242,8 +284,8 @@ def fetch_equities():
 
 def fetch_watchlist():
     rows = []
-    for ticker in WATCHLIST:
-        row = fetch_symbol(ticker)
+    for ticker, name, currency in WATCHLIST:
+        row = fetch_symbol(ticker, name, currency)
         if row:
             rows.append(row)
     return rows
@@ -275,6 +317,7 @@ def fetch_btp():
         "volume": None, "vol_ratio": None,
         "signal": "Cedola 4,10/4,50%", "signal_class": "info",
         "sparks": {}, "earnings_date": None, "rating": None, "health": None,
+        "eps": None, "beta": None, "prepost": None,
     }
 
 
@@ -384,14 +427,19 @@ def fetch_macro():
 
     # FedWatch (tassi impliciti dai futures Fed Funds 30-day)
     try:
-        try:
-            target = fred_series("DFEDTARU", 1)[-1][1]
-            target_low = fred_series("DFEDTARL", 1)[-1][1]
-        except Exception:  # noqa: BLE001 — FRED bloccato: range obiettivo dalla NY Fed
-            rr = http_get("https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json").json()["refRates"][0]
-            target, target_low = float(rr["targetRateTo"]), float(rr["targetRateFrom"])
         zq = yf.Ticker("ZQ=F").fast_info.last_price
         implied = round(100 - float(zq), 2)
+        target = target_low = None
+        try:                                        # 1) FRED
+            target = fred_series("DFEDTARU", 1)[-1][1]
+            target_low = fred_series("DFEDTARL", 1)[-1][1]
+        except Exception:  # noqa: BLE001
+            try:                                    # 2) NY Fed
+                rr = http_get("https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json").json()["refRates"][0]
+                target, target_low = float(rr["targetRateTo"]), float(rr["targetRateFrom"])
+            except Exception:  # noqa: BLE001        # 3) fascia ricavata dal tasso implicito
+                target_low = math.floor(implied / 0.25) * 0.25
+                target = target_low + 0.25
         mid = (target + target_low) / 2
         macro["fedwatch"] = {
             "target_range": f"{target_low:.2f}–{target:.2f}%",
@@ -408,59 +456,66 @@ def fetch_macro():
     def mom(series):
         return round((series[-1][1] / series[-2][1] - 1) * 100, 1), series[-1][0]
 
+    # impact: 0 = molto negativo per i mercati, 100 = molto positivo
     indicators = []
     try:
         v, d = yoy(series_fallback("cpi", lambda: fred_series("CPIAUCSL"),
                                    lambda: bls_series("CUSR0000SA0")))
-        indicators.append({"key": "cpi", "label": "Inflazione CPI (a/a)", "value": f"{v}%", "date": d})
+        indicators.append({"key": "cpi", "label": "Inflazione CPI (a/a)", "value": f"{v}%", "date": d,
+                           "impact": round(clamp(100 - abs(v - 2) * 30))})
     except Exception as e:  # noqa: BLE001
         print(f"!! cpi: {e}", file=sys.stderr)
     try:
         v, d = yoy(series_fallback("pce", lambda: fred_series("PCEPI"),
                                    lambda: dbnomics_series("BEA/NIPA-T20804/DPCERG-M")))
-        indicators.append({"key": "pce", "label": "Inflazione PCE (a/a)", "value": f"{v}%", "date": d})
+        indicators.append({"key": "pce", "label": "Inflazione PCE (a/a)", "value": f"{v}%", "date": d,
+                           "impact": round(clamp(100 - abs(v - 2) * 30))})
     except Exception as e:  # noqa: BLE001
         print(f"!! pce: {e}", file=sys.stderr)
     try:
         s = series_fallback("gdp", lambda: fred_series("A191RL1Q225SBEA", 2),
                             lambda: dbnomics_series("BEA/NIPA-T10101/A191RL-Q", 2))
-        indicators.append({"key": "gdp", "label": "PIL USA (t/t ann.)", "value": f"{s[-1][1]}%", "date": s[-1][0]})
+        v = s[-1][1]
+        indicators.append({"key": "gdp", "label": "PIL USA (t/t ann.)", "value": f"{v}%", "date": s[-1][0],
+                           "impact": round(clamp(50 + (v - 1.5) * 25))})
     except Exception as e:  # noqa: BLE001
         print(f"!! gdp: {e}", file=sys.stderr)
     try:
         v, d = mom(fred_series("RSAFS"))
-        indicators.append({"key": "retail", "label": "Vendite al dettaglio (m/m)", "value": f"{v}%", "date": d})
+        indicators.append({"key": "retail", "label": "Vendite al dettaglio (m/m)", "value": f"{v}%", "date": d,
+                           "impact": round(clamp(50 + v * 40))})
     except Exception as e:  # noqa: BLE001
         print(f"!! retail: {e}", file=sys.stderr)
     try:
         s = series_fallback("nfp", lambda: fred_series("PAYEMS", 3),
                             lambda: bls_series("CES0000000001", 3))
         delta = round((s[-1][1] - s[-2][1]))
-        indicators.append({"key": "nfp", "label": "Non-Farm Payrolls", "value": f"{delta:+d}K", "date": s[-1][0]})
+        indicators.append({"key": "nfp", "label": "Non-Farm Payrolls", "value": f"{delta:+d}K", "date": s[-1][0],
+                           "impact": round(clamp(50 + (delta - 100) / 4))})
     except Exception as e:  # noqa: BLE001
         print(f"!! nfp: {e}", file=sys.stderr)
     try:
         s = series_fallback("unemp", lambda: fred_series("UNRATE", 2),
                             lambda: bls_series("LNS14000000", 2))
-        indicators.append({"key": "unemp", "label": "Disoccupazione", "value": f"{s[-1][1]}%", "date": s[-1][0]})
+        v = s[-1][1]
+        indicators.append({"key": "unemp", "label": "Disoccupazione", "value": f"{v}%", "date": s[-1][0],
+                           "impact": round(clamp(100 - (v - 3.5) * 40))})
     except Exception as e:  # noqa: BLE001
         print(f"!! unrate: {e}", file=sys.stderr)
     try:
         s = fred_series("UMCSENT", 2)
+        v = s[-1][1]
         indicators.append({"key": "pmi", "label": "Fiducia consumatori (UMich)",
-                           "value": f"{s[-1][1]}", "date": s[-1][0]})
+                           "value": f"{v}", "date": s[-1][0],
+                           "impact": round(clamp((v - 40) * 1.7))})
     except Exception as e:  # noqa: BLE001
         print(f"!! umcsent: {e}", file=sys.stderr)
 
     macro["indicators"] = indicators
 
-    # Mercati di riferimento
+    # Mercati di riferimento (BTC, WTI, KOSPI e Nasdaq sono in watchlist)
     markets = []
     for sym, label, fmt, decimals, suffix in [
-        ("BTC-USD", "Bitcoin", "${v:,.0f}", 2, "%"),
-        ("CL=F", "Petrolio WTI", "${v:,.2f}", 2, "%"),
-        ("^KS11", "KOSPI", "{v:,.0f}", 2, "%"),
-        ("^IXIC", "Nasdaq Composite", "{v:,.0f}", 2, "%"),
         ("^TNX", "Treasury USA 10A", "{v:.2f}%", 2, " pp"),
         ("EURUSD=X", "EUR/USD", "{v:.4f}", 2, "%"),
         ("EURJPY=X", "EUR/JPY", "{v:.2f}", 2, "%"),
@@ -520,9 +575,12 @@ def fetch_macro():
     pc_r = macro.get("putcall", {}).get("ratio")
     if pc_r:
         comps.append(("Put/Call", clamp((1.3 - pc_r) / 0.6 * 100), .15))
-    btc = next((m for m in markets if m["key"] == "BTC-USD"), None)
-    if btc:
-        comps.append(("Bitcoin", clamp(50 + btc["change_pct"] * 10), .10))
+    try:
+        hb = yf.Ticker("BTC-USD").history(period="5d")["Close"].dropna()
+        btc_chg = (float(hb.iloc[-1]) / float(hb.iloc[-2]) - 1) * 100
+        comps.append(("Bitcoin", clamp(50 + btc_chg * 10), .10))
+    except Exception as e:  # noqa: BLE001
+        print(f"!! risk btc: {e}", file=sys.stderr)
     tnx = next((m for m in markets if m["key"] == "^TNX"), None)
     if tnx:
         comps.append(("Treasury 10A", clamp(50 - tnx["change_pct"] * 300), .15))
@@ -538,8 +596,43 @@ def fetch_macro():
     return macro
 
 
+def translate_it(text):
+    """Traduzione gratuita via endpoint pubblico di Google Translate."""
+    try:
+        url = ("https://translate.googleapis.com/translate_a/single"
+               "?client=gtx&sl=auto&tl=it&dt=t&q=" + urllib.parse.quote(text))
+        seg = http_get(url, tries=1, timeout=10).json()[0]
+        out = "".join(s[0] for s in seg if s and s[0]).strip()
+        return out or None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def fetch_top_caps(n=10):
+    """Classifica delle aziende più capitalizzate (candidati noti, ordinati per market cap)."""
+    rows, fx = [], {}
+    for sym, name in TOP_CAP_CANDIDATES.items():
+        try:
+            fi = yf.Ticker(sym).fast_info
+            mc = fi.market_cap
+            if not mc:
+                continue
+            curr = (fi.currency or "USD").upper()
+            if curr != "USD":
+                if curr not in fx:
+                    fx[curr] = float(yf.Ticker(f"{curr}USD=X").fast_info.last_price)
+                mc *= fx[curr]
+            chg = (float(fi.last_price) / float(fi.previous_close) - 1) * 100
+            rows.append({"ticker": sym, "name": name,
+                         "mcap_usd": round(mc), "change_pct": round(chg, 2)})
+        except Exception as e:  # noqa: BLE001
+            print(f"!! topcap {sym}: {e}", file=sys.stderr)
+    rows.sort(key=lambda x: x["mcap_usd"], reverse=True)
+    return rows[:n]
+
+
 def fetch_news():
-    """Solo news correlate ai titoli in portafoglio."""
+    """Solo news correlate ai titoli in portafoglio, con titolo tradotto in italiano."""
     items, seen = [], set()
     for source, url in NEWS_FEEDS:
         try:
@@ -565,7 +658,12 @@ def fetch_news():
         except Exception as e:  # noqa: BLE001
             print(f"!! feed {source}: {e}", file=sys.stderr)
     items.sort(key=lambda x: x["published"] or "", reverse=True)
-    return items[:40]
+    items = items[:40]
+    misses = 0
+    for it in items:
+        it["title_it"] = translate_it(it["title"]) if misses < 3 else None
+        misses = misses + 1 if it["title_it"] is None else 0
+    return items
 
 
 def main():
@@ -593,6 +691,11 @@ def main():
     total_eur = usd_value / eurusd + btp["value"]
     cost_eur = usd_cost / eurusd + BTP["nominal"] * BTP["pmc"] / 100
 
+    # stima tasse sul capital gain (solo plusvalenze)
+    stock_gain_eur = (usd_value - usd_cost) / eurusd
+    tax = TAX_STOCK * max(0, stock_gain_eur) + TAX_BTP * max(0, btp["gain"])
+    eur_gain = total_eur - cost_eur
+
     data = {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "eurusd": round(eurusd, 4),
@@ -601,12 +704,15 @@ def main():
             "usd_gain": round(usd_value - usd_cost, 2),
             "usd_gain_pct": round((usd_value / usd_cost - 1) * 100, 2),
             "eur_value": round(total_eur, 2),
-            "eur_gain": round(total_eur - cost_eur, 2),
+            "eur_gain": round(eur_gain, 2),
             "eur_gain_pct": round((total_eur / cost_eur - 1) * 100, 2),
+            "tax_est": round(tax, 2),
+            "eur_gain_net": round(eur_gain - tax, 2),
         },
         "portfolio": equities + [btp],
         "watchlist": watchlist,
         "macro": macro,
+        "top_caps": fetch_top_caps(),
         "news": fetch_news(),
     }
 

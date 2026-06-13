@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=5">
+<link rel="stylesheet" href="assets/style.css?v=9">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📈</text></svg>">
 </head>
 <body>
@@ -20,7 +20,7 @@
     </div>
   </div>
   <div class="actions">
-    <a class="btn btn-ghost" href="https://fical.net/it/calcolatore-prezzo-medio" target="_blank" rel="noopener" title="Calcolatore prezzo medio di carico">🧮 Calc. PMC</a>
+    <a class="btn btn-ghost" href="#pmc-calc" title="Vai al calcolatore prezzo medio">🧮 Calc. PMC</a>
     <button class="btn btn-ghost" id="btn-prompt" title="Copia un prompt con tutti i dati da incollare in Claude">🤖 Prompt AI</button>
     <button class="btn btn-primary" id="btn-refresh" title="Ricarica i dati">⟳ Aggiorna</button>
   </div>
@@ -35,6 +35,7 @@
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
     <div class="gauges" id="gauges"></div>
     <div class="macro-grid macro-grid-below" id="macro-grid"></div>
+    <div class="topcaps" id="topcaps"></div>
   </section>
 
   <!-- PORTAFOGLIO -->
@@ -58,10 +59,13 @@
             <th class="num">PMC</th>
             <th class="num">Prezzo</th>
             <th class="num">Oggi</th>
-            <th class="num">Valore</th>
+            <th class="num">Pre/After</th>
+            <th class="num">Volume</th>
             <th class="num">Guadagno</th>
             <th class="num">Guad. %</th>
             <th class="num">P/E</th>
+            <th class="num">EPS</th>
+            <th class="num">Beta</th>
             <th class="num">Max storico</th>
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
@@ -91,7 +95,11 @@
             <th class="sticky-col">Titolo</th>
             <th class="num">Prezzo</th>
             <th class="num">Oggi</th>
+            <th class="num">Pre/After</th>
+            <th class="num">Volume</th>
             <th class="num">P/E</th>
+            <th class="num">EPS</th>
+            <th class="num">Beta</th>
             <th class="num">Max storico</th>
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
@@ -111,9 +119,38 @@
   <!-- NEWS -->
   <section class="card">
     <div class="card-head">
-      <h2>News sul portafoglio</h2>
+      <h2>News — portafoglio &amp; macro USA</h2>
     </div>
     <ul class="news-list" id="news-list"></ul>
+  </section>
+
+  <!-- CALCOLATORE PMC -->
+  <section class="card" id="pmc-calc">
+    <div class="card-head">
+      <h2>🧮 Calcolatore prezzo medio (PMC)</h2>
+      <select id="pmc-select" class="pmc-input pmc-select" title="Precompila con una posizione del portafoglio">
+        <option value="">— scegli un titolo o inserisci a mano —</option>
+      </select>
+    </div>
+    <div class="pmc-grid">
+      <div class="pmc-block">
+        <div class="m-label">Posizione attuale</div>
+        <label>Quantità <input type="number" id="pmc-q1" class="pmc-input" min="0" step="any" placeholder="es. 270"></label>
+        <label>PMC <input type="number" id="pmc-p1" class="pmc-input" min="0" step="any" placeholder="es. 87,17"></label>
+      </div>
+      <div class="pmc-block">
+        <div class="m-label">Nuovo acquisto</div>
+        <label>Quantità <input type="number" id="pmc-q2" class="pmc-input" min="0" step="any" placeholder="es. 50"></label>
+        <label>Prezzo <input type="number" id="pmc-p2" class="pmc-input" min="0" step="any" placeholder="es. 120"></label>
+      </div>
+      <div class="pmc-block pmc-result">
+        <div class="m-label">Risultato</div>
+        <div class="pmc-out">Nuovo PMC: <b id="pmc-new">—</b></div>
+        <div class="pmc-out muted">Quantità totale: <span id="pmc-qty">—</span></div>
+        <div class="pmc-out muted">Investimento totale: <span id="pmc-cost">—</span></div>
+        <div class="pmc-out muted">Variazione PMC: <span id="pmc-delta">—</span></div>
+      </div>
+    </div>
   </section>
 
   <footer>
@@ -138,6 +175,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=5"></script>
+<script src="assets/app.js?v=9"></script>
 </body>
 </html>

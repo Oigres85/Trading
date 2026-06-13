@@ -98,9 +98,19 @@ th {
 }
 td { font-family: var(--mono); font-size: 13px; }
 td.name-cell { font-family: "Inter", sans-serif; font-weight: 600; }
-td.name-cell .tk { color: var(--muted); font-size: 11px; font-family: var(--mono); margin-left: 6px; }
+td.name-cell .tk { color: var(--muted); font-size: 11px; font-family: var(--mono); margin-left: 6px; display: block; margin-top: 2px; }
 .num { text-align: right; }
 td.num { text-align: right; }
+
+/* prima colonna (nome titolo) bloccata in orizzontale */
+th.sticky-col, td.name-cell {
+  position: sticky; left: 0; background: var(--card);
+  z-index: 2; box-shadow: 1px 0 0 var(--border);
+}
+th.sticky-col { z-index: 3; }
+tbody tr:hover td.name-cell { background: #161b28; }
+tbody tr.total-row td.name-cell { background: var(--card-2); }
+
 tbody tr:hover { background: rgba(76, 141, 255, .05); }
 tbody tr.total-row { background: var(--card-2); font-weight: 700; }
 .pos { color: var(--green); }
@@ -127,30 +137,37 @@ tbody tr.total-row { background: var(--card-2); font-weight: 700; }
 }
 .meter-fill { display: block; height: 100%; border-radius: 4px; }
 
-/* ---------- gauges ---------- */
-.gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+/* ---------- gauges (compatti) ---------- */
+.gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(138px, 1fr)); gap: 10px; }
 .gauge-card {
   background: var(--card-2); border: 1px solid var(--border); border-radius: 10px;
-  padding: 14px; text-align: center;
+  padding: 10px 8px; text-align: center;
 }
-.gauge-card .g-title { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
-.gauge-card svg { width: 100%; max-width: 170px; }
-.gauge-value { font-family: var(--mono); font-size: 22px; font-weight: 700; }
-.gauge-sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+.gauge-card .g-title { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 5px; }
+.gauge-card svg { width: 100%; max-width: 110px; }
+.gauge-value { font-family: var(--mono); font-size: 17px; font-weight: 700; }
+.gauge-sub { font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
 
-/* ---------- macro ---------- */
-.macro-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+/* ---------- macro (compatti) ---------- */
+.macro-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 9px; }
 .macro-item {
   background: var(--card-2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px 14px; position: relative; overflow: hidden;
+  border-radius: 10px; padding: 9px 11px; position: relative; overflow: hidden;
 }
 .macro-item::before {
   content: ""; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
   background: var(--accent, var(--purple));
 }
-.macro-item .m-label { color: var(--muted); font-size: 11px; margin-bottom: 6px; }
-.macro-item .m-value { font-family: var(--mono); font-size: 19px; font-weight: 700; }
-.macro-item .m-date { color: var(--muted); font-size: 10.5px; margin-top: 4px; font-family: var(--mono); }
+.macro-item .m-label { color: var(--muted); font-size: 10.5px; margin-bottom: 4px; }
+.macro-item .m-value { font-family: var(--mono); font-size: 16px; font-weight: 700; }
+.macro-item .m-date { color: var(--muted); font-size: 10px; margin-top: 3px; font-family: var(--mono); }
+
+/* termometro d'impatto nei box macro */
+.impact {
+  margin-top: 6px; height: 5px; border-radius: 3px; background: var(--border);
+  overflow: hidden;
+}
+.impact-fill { display: block; height: 100%; border-radius: 3px; }
 
 /* ---------- news ---------- */
 .news-filters { display: flex; gap: 6px; }
@@ -181,16 +198,56 @@ tbody tr.total-row { background: var(--card-2); font-weight: 700; }
 footer { color: var(--muted); font-size: 11.5px; text-align: center; line-height: 1.7; padding-top: 6px; }
 
 /* ---------- trimestrali ---------- */
-.earnings-strip { font-size: 12.5px; color: var(--muted); margin: -4px 0 12px; line-height: 2.1; }
-.earn-chip {
-  display: inline-block; margin-left: 6px; padding: 2px 10px; border-radius: 20px;
-  background: var(--card-2); border: 1px solid var(--border); color: var(--text);
-  font-family: var(--mono); font-size: 11.5px;
+.earnings-strip {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 8px; margin: 0 0 14px;
 }
-.earn-chip.earn-urgent { border-color: var(--yellow); color: var(--yellow); font-weight: 700; }
+.earn-card {
+  background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 9px;
+}
+.earn-top { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; }
+.earn-tk { font-family: var(--mono); font-weight: 700; font-size: 12px; }
+.earn-when { color: var(--muted); font-size: 10px; white-space: nowrap; }
+.earn-date { font-family: var(--mono); font-size: 11px; color: var(--muted); margin: 2px 0 4px; }
+
+/* ---------- top capitalizzazioni ---------- */
+.topcap-list { list-style: none; columns: 2; column-gap: 26px; }
+@media (max-width: 800px) { .topcap-list { columns: 1; } }
+.topcap-item {
+  display: flex; align-items: baseline; gap: 8px; break-inside: avoid;
+  padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12.5px;
+}
+.topcap-rank { font-family: var(--mono); color: var(--muted); width: 16px; font-size: 11px; }
+.topcap-name { flex: 1; font-weight: 600; }
+.topcap-name .tk { color: var(--muted); font-family: var(--mono); font-size: 10.5px; }
+.topcap-mcap { font-family: var(--mono); font-weight: 700; }
+.topcap-chg { font-family: var(--mono); font-size: 11.5px; min-width: 76px; text-align: right; }
+
+/* ---------- ordinamento colonne ---------- */
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--text); }
+.sort-arrow { color: var(--blue); }
 
 /* ---------- toggle sparkline ---------- */
 .spark-toggle { display: flex; gap: 6px; }
+
+/* ---------- calcolatore PMC ---------- */
+.pmc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.pmc-block {
+  background: var(--card-2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px; display: flex; flex-direction: column; gap: 10px;
+}
+.pmc-block label { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--muted); }
+.pmc-input {
+  background: var(--bg); color: var(--text); border: 1px solid var(--border);
+  border-radius: 7px; padding: 7px 10px; font-family: var(--mono); font-size: 13px; width: 130px;
+}
+.pmc-select { width: auto; font-family: "Inter", sans-serif; }
+.pmc-result { justify-content: center; }
+.pmc-out { font-size: 13px; }
+.pmc-out b, .pmc-out span { font-family: var(--mono); }
+#pmc-new { font-size: 18px; color: var(--blue); }
 
 /* ---------- sparkline ---------- */
 .spark { width: 110px; height: 30px; }

@@ -3,6 +3,66 @@ const REPO = "Oigres85/Trading";
 let DATA = null;
 let sparkRange = "m1";   // 1G | 1M | 1A
 
+/* ordinamento tabelle: click su intestazione → desc → asc → default */
+const SORT_FIELDS = {
+  "ptf-table": ["name", "qty", "pmc", "change_pct", "change_pct", "prepost_chg", "volume",
+                "gain", "gain_pct", "pe", "eps", "beta", "ath_dist_pct", "support",
+                "resistance", "rsi", "vol_ratio", "health", "upside_pct", "upside_pct", null],
+  "wl-table": ["name", "change_pct", "change_pct", "prepost_chg", "volume", "pe", "eps",
+               "beta", "ath_dist_pct", "support", "resistance", "rsi", "vol_ratio",
+               "health", "upside_pct", "upside_pct", null],
+};
+const sortState = { "ptf-table": { field: null, dir: 0 }, "wl-table": { field: null, dir: 0 } };
+
+function sortVal(r, field) {
+  if (field === "prepost_chg") return r.prepost?.change_pct ?? null;
+  if (field === "upside_pct") return r.rating?.upside_pct ?? null;
+  return r[field] ?? null;
+}
+
+function sortRows(rows, tableId) {
+  const { field, dir } = sortState[tableId];
+  if (!field || !dir) return rows;
+  return [...rows].sort((a, b) => {
+    const va = sortVal(a, field), vb = sortVal(b, field);
+    if (va === null && vb === null) return 0;
+    if (va === null) return 1;          // i valori mancanti sempre in fondo
+    if (vb === null) return -1;
+    if (typeof va === "string") return dir === 1 ? vb.localeCompare(va) : va.localeCompare(vb);
+    return dir === 1 ? vb - va : va - vb;
+  });
+}
+
+function updateSortArrows(tableId) {
+  const { field, dir } = sortState[tableId];
+  document.querySelectorAll(`#${tableId} thead th`).forEach((th, i) => {
+    th.querySelector(".sort-arrow")?.remove();
+    const f = SORT_FIELDS[tableId][i];
+    if (f && f === field && dir) {
+      const s = document.createElement("span");
+      s.className = "sort-arrow";
+      s.textContent = dir === 1 ? " ▼" : " ▲";
+      th.appendChild(s);
+    }
+  });
+}
+
+function initSorting(tableId, rerender) {
+  document.querySelectorAll(`#${tableId} thead th`).forEach((th, i) => {
+    const f = SORT_FIELDS[tableId][i];
+    if (!f) return;
+    th.classList.add("sortable");
+    th.addEventListener("click", () => {
+      const st = sortState[tableId];
+      if (st.field !== f) { st.field = f; st.dir = 1; }
+      else st.dir = (st.dir + 1) % 3;     // desc → asc → default
+      if (!st.dir) st.field = null;
+      rerender();
+      updateSortArrows(tableId);
+    });
+  });
+}
+
 const $ = (sel) => document.querySelector(sel);
 const fmtEUR = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 const fmtUSD = new Intl.NumberFormat("it-IT", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -12,7 +72,7 @@ function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, c =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
-function cur(row) { return row.currency === "EUR" ? "€" : "$"; }
+function cur(row) { return row.currency === "EUR" ? "€" : row.currency === "PTS" ? "" : "$"; }
 function signCls(v) { return v > 0 ? "pos" : v < 0 ? "neg" : ""; }
 function signTxt(v, suffix = "%") {
   if (v === null || v === undefined) return "—";
@@ -100,16 +160,22 @@ function renderAll() {
   renderWatchlist();
   renderGauges();
   renderMacro();
+  renderTopCaps();
   renderNews();
+  pmcInit();
 }
 
 /* ---------------- KPI ---------------- */
 function renderKPI() {
   const t = DATA.totals;
+  const net = t.eur_gain_net ?? t.eur_gain;
   const kpis = [
-    { label: "Valore totale (€)", value: fmtEUR.format(t.eur_value), sub: `di cui azioni USA ${fmtUSD.format(t.usd_value)}`, accent: "var(--blue)" },
-    { label: "Guadagno totale (€)", value: signTxt(Math.round(t.eur_gain), " €"), sub: `${signTxt(t.eur_gain_pct)} dal carico`, subCls: signCls(t.eur_gain), accent: t.eur_gain >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(t.eur_gain) },
-    { label: "Guadagno azioni USA ($)", value: signTxt(Math.round(t.usd_gain), " $"), sub: `${signTxt(t.usd_gain_pct)} dal carico`, subCls: signCls(t.usd_gain), accent: "var(--purple)", valueCls: signCls(t.usd_gain) },
+    { label: "Guadagno netto tasse (€)", value: signTxt(Math.round(net), " €"),
+      sub: t.tax_est ? `tasse stimate −${fmtEUR.format(Math.round(t.tax_est))} (26% azioni, 12,5% BTP)` : "",
+      subCls: signCls(net), accent: net >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(net) },
+    { label: "Guadagno totale lordo (€)", value: signTxt(Math.round(t.eur_gain), " €"),
+      sub: `${signTxt(t.eur_gain_pct)} dal carico — valore ${fmtEUR.format(t.eur_value)}`,
+      subCls: signCls(t.eur_gain), accent: "var(--blue)", valueCls: signCls(t.eur_gain) },
   ];
 
   $("#kpi-grid").innerHTML = kpis.map(k => `
@@ -177,13 +243,55 @@ function targetBar(r) {
   return meterBar(Math.abs(u) * 2, color, signTxt(u));
 }
 
+function peBar(pe) {
+  if (!pe || pe <= 0) return "—";
+  const color = pe <= 18 ? "var(--green)" : pe <= 35 ? "var(--yellow)" : "var(--red)";
+  return meterBar(Math.min(pe, 60) / 60 * 100, color, fmtNum.format(pe));
+}
+
+function epsBar(eps) {
+  if (eps === null || eps === undefined) return "—";
+  const color = eps > 0 ? "var(--green)" : "var(--red)";
+  return meterBar(Math.min(Math.abs(eps), 15) / 15 * 100, color, fmtNum.format(eps));
+}
+
+function betaBar(beta) {
+  if (beta === null || beta === undefined) return "—";
+  const color = beta <= 1 ? "var(--green)" : beta <= 1.6 ? "var(--yellow)" : "var(--red)";
+  return meterBar(Math.min(beta, 3) / 3 * 100, color, fmtNum.format(beta));
+}
+
+function athBar(r) {
+  if (!r.ath) return "—";
+  const closeness = Math.max(0, 100 + r.ath_dist_pct);   // 100 = sul massimo storico
+  const color = closeness >= 90 ? "var(--green)" : closeness >= 70 ? "var(--yellow)" : "var(--red)";
+  return `<div class="meter" title="Max storico ${fmtNum.format(r.ath)}">
+    <span class="meter-txt">${signTxt(r.ath_dist_pct)}</span>
+    <span class="meter-track"><span class="meter-fill" style="width:${Math.max(3, closeness)}%;background:${color}"></span></span>
+  </div>`;
+}
+
+function prepostCell(pp) {
+  if (!pp || !pp.price) return '<span class="muted">—</span>';
+  return `<span class="muted" style="font-size:10px">${pp.label}</span> ${fmtNum.format(pp.price)}
+    <span class="${signCls(pp.change_pct)}">${signTxt(pp.change_pct)}</span>`;
+}
+
+function fmtVolume(v) {
+  if (!v) return "—";
+  if (v >= 1e9) return fmtNum.format(v / 1e9) + "B";
+  if (v >= 1e6) return fmtNum.format(v / 1e6) + "M";
+  if (v >= 1e3) return fmtNum.format(v / 1e3) + "K";
+  return String(v);
+}
+
 function techCells(r) {
   const c = cur(r);
-  const pe = (r.pe && r.pe > 0) ? fmtNum.format(r.pe) : "—";
-  const ath = r.ath ? `${fmtNum.format(r.ath)} <span class="muted">(${signTxt(r.ath_dist_pct)})</span>` : "—";
   return `
-      <td class="num">${pe}</td>
-      <td class="num">${ath}</td>
+      <td class="num">${peBar(r.pe)}</td>
+      <td class="num">${epsBar(r.eps)}</td>
+      <td class="num">${betaBar(r.beta)}</td>
+      <td class="num">${athBar(r)}</td>
       <td class="num">${r.support ? c + fmtNum.format(r.support) : "—"}</td>
       <td class="num">${r.resistance ? c + fmtNum.format(r.resistance) : "—"}</td>
       <td class="num">${rsiBar(r.rsi)}</td>
@@ -195,7 +303,7 @@ function techCells(r) {
 }
 
 function renderTable() {
-  const rows = DATA.portfolio.map(r => {
+  const rows = sortRows(DATA.portfolio, "ptf-table").map(r => {
     const c = cur(r);
     return `<tr>
       <td class="name-cell">${r.name}<span class="tk">${r.ticker}</span></td>
@@ -203,8 +311,9 @@ function renderTable() {
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${c}${fmtNum.format(r.price)}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
-      <td class="num">${c}${fmtNum.format(Math.round(r.value))}</td>
-      <td class="num ${signCls(r.gain)}">${signTxt(Math.round(r.gain), ` ${c}`)}</td>
+      <td class="num">${prepostCell(r.prepost)}</td>
+      <td class="num">${fmtVolume(r.volume)}</td>
+      <td class="num ${signCls(r.gain)}" title="valore posizione ${c}${fmtNum.format(Math.round(r.value))}">${signTxt(Math.round(r.gain), ` ${c}`)}</td>
       <td class="num ${signCls(r.gain_pct)}"><b>${signTxt(r.gain_pct)}</b></td>
       ${techCells(r)}
     </tr>`;
@@ -212,23 +321,24 @@ function renderTable() {
 
   const t = DATA.totals;
   const totalRow = `<tr class="total-row">
-    <td class="name-cell">TOTALE (€)</td><td></td><td></td><td></td><td></td>
-    <td class="num">${fmtEUR.format(t.eur_value)}</td>
+    <td class="name-cell" colspan="7">TOTALE — valore ${fmtEUR.format(t.eur_value)}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="10"></td>
+    <td colspan="12" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   $("#ptf-table tbody").innerHTML = rows + totalRow;
 }
 
 function renderWatchlist() {
-  const list = DATA.watchlist || [];
+  const list = sortRows(DATA.watchlist || [], "wl-table");
   $("#wl-table tbody").innerHTML = list.length ? list.map(r => `<tr>
       <td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
       <td class="num"><b>$${fmtNum.format(r.price)}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
+      <td class="num">${prepostCell(r.prepost)}</td>
+      <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="13" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="17" class="muted">Nessun dato</td></tr>';
 }
 
 /* ---------------- trimestrali ---------------- */
@@ -237,11 +347,17 @@ function renderEarnings() {
     .filter(r => r.earnings_date)
     .map(r => ({ ...r, days: Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) }))
     .sort((a, b) => a.days - b.days);
-  $("#earnings-strip").innerHTML = items.length ? "📅 <b>Prossime trimestrali:</b> " + items.map(r => {
+  $("#earnings-strip").innerHTML = items.length ? items.map(r => {
     const d = new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
-    const urgent = r.days <= 7 ? " earn-urgent" : "";
     const when = r.days <= 0 ? "oggi" : r.days === 1 ? "domani" : `tra ${r.days} gg`;
-    return `<span class="earn-chip${urgent}" title="${r.name} — ${d}">${r.ticker} ${when} (${d})</span>`;
+    // termometro: più vicina = barra più piena e più "calda"
+    const pct = Math.max(6, Math.min(100, 100 - r.days * 1.1));
+    const color = r.days <= 7 ? "var(--red)" : r.days <= 21 ? "var(--yellow)" : "var(--green)";
+    return `<div class="earn-card" title="${esc(r.name)} — trimestrale il ${d}">
+      <div class="earn-top"><span class="earn-tk">${r.ticker}</span><span class="earn-when">${when}</span></div>
+      <div class="earn-date">${d}</div>
+      <div class="impact"><span class="impact-fill" style="width:${pct}%;background:${color}"></span></div>
+    </div>`;
   }).join("") : "";
 }
 
@@ -363,21 +479,57 @@ function renderGauges() {
 /* ---------------- macro ---------------- */
 const MACRO_ACCENTS = { cpi: "var(--red)", pce: "var(--yellow)", gdp: "var(--blue)", retail: "var(--purple)", nfp: "var(--green)", unemp: "var(--cyan)", pmi: "var(--blue)", "BTC-USD": "var(--yellow)", "CL=F": "var(--purple)", "^KS11": "var(--cyan)", "^IXIC": "var(--blue)" };
 
+function impactBar(score, titleTxt) {
+  if (score === null || score === undefined) return "";
+  const color = score >= 60 ? "var(--green)" : score >= 40 ? "var(--yellow)" : "var(--red)";
+  return `<div class="impact" title="${titleTxt || "impatto sul mercato"}: ${score}/100">
+    <span class="impact-fill" style="width:${Math.max(4, score)}%;background:${color}"></span>
+  </div>`;
+}
+
+function marketImpact(m) {
+  // variazione giornaliera → impatto 0-100 (rendimenti in pp: salita = restrittivo)
+  if (m.change_pct === null || m.change_pct === undefined) return null;
+  if (m.suffix === " pp") return Math.round(Math.max(0, Math.min(100, 50 - m.change_pct * 300)));
+  return Math.round(Math.max(0, Math.min(100, 50 + m.change_pct * 12)));
+}
+
 function renderMacro() {
   const markets = (DATA.macro?.markets || []).map(m => `
     <div class="macro-item" style="--accent:${MACRO_ACCENTS[m.key] || "var(--blue)"}">
       <div class="m-label">${m.label}</div>
       <div class="m-value">${m.value}</div>
       <div class="m-sub ${signCls(m.change_pct)}">${signTxt(m.change_pct, m.suffix || "%")} oggi</div>
+      ${impactBar(marketImpact(m), "impatto della variazione odierna")}
     </div>`);
   const indicators = (DATA.macro?.indicators || []).map(i => `
     <div class="macro-item" style="--accent:${MACRO_ACCENTS[i.key] || "var(--purple)"}">
       <div class="m-label">${i.label}</div>
       <div class="m-value">${i.value}</div>
       <div class="m-date">${i.date}</div>
+      ${impactBar(i.impact, "impatto sul mercato")}
     </div>`);
   const cells = markets.concat(indicators);
   $("#macro-grid").innerHTML = cells.length ? cells.join("") : '<span class="muted">Dati non disponibili</span>';
+}
+
+/* ---------------- top capitalizzazioni ---------------- */
+function fmtMcap(v) {
+  if (v >= 1e12) return "$" + fmtNum.format(Math.round(v / 1e10) / 100) + "T";
+  return "$" + fmtNum.format(Math.round(v / 1e9)) + "B";
+}
+
+function renderTopCaps() {
+  const list = DATA.top_caps || [];
+  if (!list.length) { $("#topcaps").innerHTML = ""; return; }
+  $("#topcaps").innerHTML = `<div class="m-label" style="margin:14px 0 8px">🏆 Top 10 capitalizzazioni mondiali</div>
+    <ol class="topcap-list">` + list.map((x, i) => `
+      <li class="topcap-item">
+        <span class="topcap-rank">${i + 1}</span>
+        <span class="topcap-name">${esc(x.name)} <span class="tk">${x.ticker}</span></span>
+        <span class="topcap-mcap">${fmtMcap(x.mcap_usd)}</span>
+        <span class="topcap-chg ${signCls(x.change_pct)}">${x.change_pct >= 0 ? "▲" : "▼"} ${signTxt(x.change_pct)}</span>
+      </li>`).join("") + "</ol>";
 }
 
 /* ---------------- news ---------------- */
@@ -393,7 +545,7 @@ function renderNews() {
   const list = DATA.news || [];
   $("#news-list").innerHTML = list.length ? list.map(n => `
     <li class="news-item">
-      <a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a>
+      <a href="${esc(n.link)}" target="_blank" rel="noopener" title="${esc(n.title)}">${esc(n.title_it || n.title)}</a>
       <div class="news-meta">
         <span class="news-src">${esc(n.source)}</span>
         <span class="news-time">${timeAgo(n.published)}</span>
@@ -411,7 +563,7 @@ function buildPrompt() {
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   lines.push("");
-  lines.push(`PORTAFOGLIO (totale ${fmtEUR.format(t.eur_value)}, guadagno ${signTxt(Math.round(t.eur_gain), " €")} / ${signTxt(t.eur_gain_pct)}):`);
+  lines.push(`PORTAFOGLIO (totale ${fmtEUR.format(t.eur_value)}, guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} / ${signTxt(t.eur_gain_pct)}${t.eur_gain_net !== undefined ? `, netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}):`);
   const stockLine = (r) => {
     const c = cur(r);
     let l = `- ${r.name} (${r.ticker}): prezzo ${c}${fmtNum.format(r.price)} | oggi ${signTxt(r.change_pct)}`;
@@ -419,6 +571,9 @@ function buildPrompt() {
     if (r.rsi !== null && r.rsi !== undefined) l += ` | RSI ${r.rsi}`;
     if (r.support) l += ` | supporto ${c}${fmtNum.format(r.support)} / resistenza ${c}${fmtNum.format(r.resistance)}`;
     if (r.pe && r.pe > 0) l += ` | P/E ${fmtNum.format(r.pe)}`;
+    if (r.eps !== null && r.eps !== undefined) l += ` | EPS ${fmtNum.format(r.eps)}`;
+    if (r.beta !== null && r.beta !== undefined) l += ` | beta ${fmtNum.format(r.beta)}`;
+    if (r.prepost?.price) l += ` | ${r.prepost.label}-market ${c}${fmtNum.format(r.prepost.price)} (${signTxt(r.prepost.change_pct)})`;
     if (r.rating?.key) l += ` | rating analisti: ${r.rating.key} (target ${c}${fmtNum.format(r.rating.target)}, ${signTxt(r.rating.upside_pct)} dal prezzo)`;
     if (r.earnings_date) l += ` | prossima trimestrale: ${r.earnings_date}`;
     l += ` | segnale: ${r.signal}`;
@@ -441,9 +596,14 @@ function buildPrompt() {
   if (m.putcall) lines.push(`- Put/Call ${m.putcall.symbol} (${m.putcall.name}): ${m.putcall.ratio} (put ${m.putcall.puts}, call ${m.putcall.calls})`);
   (m.markets || []).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (${i.date})`));
+  if ((DATA.top_caps || []).length) {
+    lines.push("");
+    lines.push("TOP 10 CAPITALIZZAZIONI MONDIALI:");
+    DATA.top_caps.forEach((x, i) => lines.push(`${i + 1}. ${x.name} (${x.ticker}): ${fmtMcap(x.mcap_usd)} (${signTxt(x.change_pct)} oggi)`));
+  }
   lines.push("");
-  lines.push("ULTIME NEWS SUI TITOLI IN PORTAFOGLIO:");
-  (DATA.news || []).slice(0, 14).forEach(n => lines.push(`- [${n.tickers.join(",")}] ${n.title} (${n.source})`));
+  lines.push("ULTIME NEWS (portafoglio + macro/politica USA):");
+  (DATA.news || []).slice(0, 16).forEach(n => lines.push(`- [${n.tickers.join(",")}] ${n.title} (${n.source})`));
   return lines.join("\n");
 }
 
@@ -475,6 +635,51 @@ $("#btn-copy").addEventListener("click", async () => {
   await navigator.clipboard.writeText($("#prompt-text").value);
   toast("Copiato ✓");
 });
+/* ---------------- calcolatore PMC ---------------- */
+function pmcCompute() {
+  const v = (id) => parseFloat($(id).value) || 0;
+  const q1 = v("#pmc-q1"), p1 = v("#pmc-p1"), q2 = v("#pmc-q2"), p2 = v("#pmc-p2");
+  const qty = q1 + q2, cost = q1 * p1 + q2 * p2;
+  if (qty <= 0 || cost <= 0) {
+    ["#pmc-new", "#pmc-qty", "#pmc-cost", "#pmc-delta"].forEach(id => { $(id).textContent = "—"; });
+    return;
+  }
+  const pmc = cost / qty;
+  $("#pmc-new").textContent = fmtNum.format(Math.round(pmc * 10000) / 10000);
+  $("#pmc-qty").textContent = fmtNum.format(qty);
+  $("#pmc-cost").textContent = fmtNum.format(Math.round(cost * 100) / 100);
+  const el = $("#pmc-delta");
+  if (p1 > 0) {
+    const d = (pmc / p1 - 1) * 100;
+    el.textContent = signTxt(Math.round(d * 100) / 100);
+    el.className = signCls(d);
+  } else {
+    el.textContent = "—"; el.className = "";
+  }
+}
+
+function pmcInit() {
+  const sel = $("#pmc-select");
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— scegli un titolo o inserisci a mano —</option>' +
+    (DATA.portfolio || []).filter(r => r.currency === "USD").map(r =>
+      `<option value="${r.ticker}">${esc(r.name)} (${r.ticker})</option>`).join("");
+  sel.value = current;   // non perdere la selezione sull'auto-refresh
+}
+
+$("#pmc-select").addEventListener("change", () => {
+  const r = (DATA?.portfolio || []).find(x => x.ticker === $("#pmc-select").value);
+  if (r) {
+    $("#pmc-q1").value = r.qty;
+    $("#pmc-p1").value = r.pmc;
+    $("#pmc-p2").value = r.price;
+    $("#pmc-q2").focus();
+  }
+  pmcCompute();
+});
+["#pmc-q1", "#pmc-p1", "#pmc-q2", "#pmc-p2"].forEach(id =>
+  $(id).addEventListener("input", pmcCompute));
+
 document.querySelectorAll("#spark-toggle .chip").forEach(ch => {
   ch.addEventListener("click", () => {
     document.querySelectorAll("#spark-toggle .chip").forEach(c => c.classList.remove("chip-active"));
@@ -484,6 +689,9 @@ document.querySelectorAll("#spark-toggle .chip").forEach(ch => {
     renderWatchlist();
   });
 });
+
+initSorting("ptf-table", renderTable);
+initSorting("wl-table", renderWatchlist);
 
 loadData();
 // auto-refresh ogni 5 minuti
