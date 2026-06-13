@@ -1,13 +1,15 @@
 {
- "updated_at": "2026-06-12T23:03:31Z",
+ "updated_at": "2026-06-13T07:07:10Z",
  "eurusd": 1.1573,
  "totals": {
-  "usd_value": 313378.66,
-  "usd_gain": 178977.2,
-  "usd_gain_pct": 133.17,
-  "eur_value": 312024.68,
-  "eur_gain": 155888.39,
-  "eur_gain_pct": 99.84
+  "usd_value": 306479.86,
+  "usd_gain": 180770.0,
+  "usd_gain_pct": 143.8,
+  "eur_value": 306063.43,
+  "eur_gain": 157437.55,
+  "eur_gain_pct": 105.93,
+  "tax_est": 40767.15,
+  "eur_gain_net": 116670.4
  },
  "portfolio": [
   {
@@ -22,8 +24,8 @@
    "support": 199.34,
    "resistance": 232.01,
    "rsi": 45.4,
-   "volume": 105436612,
-   "vol_ratio": 0.63,
+   "volume": 112001800,
+   "vol_ratio": 0.67,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -162,6 +164,13 @@
     "upside_pct": 45.7
    },
    "health": 54,
+   "eps": 6.53,
+   "beta": 2.2,
+   "prepost": {
+    "label": "after",
+    "price": 205.42,
+    "change_pct": 0.11
+   },
    "qty": 270,
    "pmc": 87.17,
    "value": 55401.3,
@@ -174,14 +183,14 @@
    "currency": "USD",
    "price": 511.57,
    "change_pct": 4.73,
-   "pe": 171.7,
+   "pe": 169.4,
    "ath": 546.44,
    "ath_dist_pct": -6.4,
    "support": 393.36,
    "resistance": 546.44,
    "rsi": 60.5,
-   "volume": 30791619,
-   "vol_ratio": 0.83,
+   "volume": 31553100,
+   "vol_ratio": 0.85,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -320,6 +329,13 @@
     "upside_pct": -5.4
    },
    "health": 87,
+   "eps": 3.02,
+   "beta": 2.49,
+   "prepost": {
+    "label": "after",
+    "price": 514.87,
+    "change_pct": 0.64
+   },
    "qty": 125,
    "pmc": 153.92,
    "value": 63946.25,
@@ -338,7 +354,7 @@
    "support": 652.21,
    "resistance": 1089.29,
    "rsi": 60.8,
-   "volume": 40309461,
+   "volume": 40785200,
    "vol_ratio": 0.73,
    "signal": "Trend rialzista",
    "signal_class": "good",
@@ -478,6 +494,13 @@
     "upside_pct": -15.6
    },
    "health": 87,
+   "eps": 21.2,
+   "beta": 2.17,
+   "prepost": {
+    "label": "after",
+    "price": 989.6,
+    "change_pct": 0.81
+   },
    "qty": 90,
    "pmc": 87.63,
    "value": 88344.9,
@@ -496,8 +519,8 @@
    "support": 98.33,
    "resistance": 127.6,
    "rsi": 62.4,
-   "volume": 148537475,
-   "vol_ratio": 1.07,
+   "volume": 151169400,
+   "vol_ratio": 1.09,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -636,6 +659,13 @@
     "upside_pct": -25.2
    },
    "health": 87,
+   "eps": -0.6,
+   "beta": 2.23,
+   "prepost": {
+    "label": "after",
+    "price": 125.38,
+    "change_pct": 0.65
+   },
    "qty": 380,
    "pmc": 25.75,
    "value": 47336.6,
@@ -648,14 +678,14 @@
    "currency": "USD",
    "price": 406.43,
    "change_pct": 1.82,
-   "pe": 376.3,
+   "pe": 369.5,
    "ath": 498.83,
    "ath_dist_pct": -18.5,
    "support": 380.15,
    "resistance": 445.6,
    "rsi": 48.9,
-   "volume": 62460127,
-   "vol_ratio": 1.21,
+   "volume": 63514500,
+   "vol_ratio": 1.23,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -790,10 +820,17 @@
    "rating": {
     "key": "buy",
     "n": 41,
-    "target": 419.94,
-    "upside_pct": 3.3
+    "target": 420.55,
+    "upside_pct": 3.5
    },
    "health": 63,
+   "eps": 1.1,
+   "beta": 1.8,
+   "prepost": {
+    "label": "after",
+    "price": 406.1,
+    "change_pct": -0.08
+   },
    "qty": 60,
    "pmc": 358.22,
    "value": 24385.8,
@@ -812,7 +849,7 @@
    "support": 113.27,
    "resistance": 182.23,
    "rsi": 37.2,
-   "volume": 16726789,
+   "volume": 16772200,
    "vol_ratio": 0.94,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -952,6 +989,13 @@
     "upside_pct": 183.6
    },
    "health": 19,
+   "eps": -36.99,
+   "beta": 3.47,
+   "prepost": {
+    "label": "after",
+    "price": 124.39,
+    "change_pct": 0.33
+   },
    "qty": 123,
    "pmc": 210.22,
    "value": 15248.31,
@@ -970,7 +1014,7 @@
    "support": 15.46,
    "resistance": 28.06,
    "rsi": 49.4,
-   "volume": 34602156,
+   "volume": 34662800,
    "vol_ratio": 0.66,
    "signal": "Sopra SMA50",
    "signal_class": "good",
@@ -1110,6 +1154,13 @@
     "upside_pct": 39.4
    },
    "health": 73,
+   "eps": -0.89,
+   "beta": 1.9,
+   "prepost": {
+    "label": "after",
+    "price": 21.1,
+    "change_pct": 0.57
+   },
    "qty": 515,
    "pmc": 27.3,
    "value": 10804.7,
@@ -1117,8 +1168,205 @@
    "gain_pct": -23.15
   },
   {
+   "ticker": "ARBE",
+   "name": "Arbe Robotics",
+   "currency": "USD",
+   "price": 0.88,
+   "change_pct": -4.36,
+   "pe": null,
+   "ath": 17.27,
+   "ath_dist_pct": -94.9,
+   "support": 0.82,
+   "resistance": 1.4,
+   "rsi": 44.2,
+   "volume": 1128200,
+   "vol_ratio": 0.31,
+   "signal": "Trend debole",
+   "signal_class": "bad",
+   "sparks": {
+    "m1": [
+     0.84,
+     0.84,
+     0.82,
+     0.87,
+     0.8,
+     0.8,
+     0.9,
+     0.87,
+     1.01,
+     1.15,
+     1.05,
+     1.0,
+     0.93,
+     1.0,
+     1.19,
+     1.13,
+     1.15,
+     1.23,
+     1.21,
+     1.1,
+     1.25,
+     1.13,
+     1.08,
+     1.07,
+     0.91,
+     0.88,
+     0.85,
+     0.86,
+     0.92,
+     0.88
+    ],
+    "y1": [
+     1.54,
+     1.48,
+     1.78,
+     1.63,
+     1.51,
+     1.48,
+     1.38,
+     1.38,
+     1.34,
+     1.2,
+     1.38,
+     1.25,
+     1.28,
+     1.4,
+     1.86,
+     1.69,
+     2.69,
+     2.5,
+     1.89,
+     1.93,
+     1.75,
+     1.63,
+     1.3,
+     1.43,
+     1.62,
+     1.32,
+     1.15,
+     1.03,
+     1.3,
+     1.37,
+     1.18,
+     1.45,
+     1.17,
+     1.15,
+     1.09,
+     1.03,
+     0.83,
+     0.83,
+     0.76,
+     0.65,
+     0.64,
+     0.65,
+     0.81,
+     0.75,
+     0.86,
+     0.8,
+     1.15,
+     1.19,
+     1.1,
+     0.91,
+     0.88
+    ],
+    "d1": [
+     0.92,
+     0.91,
+     0.92,
+     0.93,
+     0.93,
+     0.94,
+     0.94,
+     0.94,
+     0.94,
+     0.93,
+     0.93,
+     0.93,
+     0.92,
+     0.9,
+     0.9,
+     0.89,
+     0.89,
+     0.89,
+     0.9,
+     0.89,
+     0.9,
+     0.9,
+     0.89,
+     0.89,
+     0.89,
+     0.9,
+     0.89,
+     0.89,
+     0.9,
+     0.88,
+     0.88,
+     0.88,
+     0.88,
+     0.87,
+     0.88,
+     0.88,
+     0.88,
+     0.88,
+     0.88
+    ]
+   },
+   "earnings_date": "2026-08-06",
+   "rating": {
+    "key": "buy",
+    "n": 2,
+    "target": 2.5,
+    "upside_pct": 184.7
+   },
+   "health": 46,
+   "eps": -0.37,
+   "beta": 1.07,
+   "prepost": {
+    "label": "after",
+    "price": 0.89,
+    "change_pct": 1.37
+   },
+   "qty": 1150,
+   "pmc": 3.35,
+   "value": 1012.0,
+   "gain": -2840.5,
+   "gain_pct": -73.73
+  },
+  {
+   "ticker": "BTP-V28",
+   "name": "BTP Valore Ott 2028",
+   "isin": "IT0005565400",
+   "qty": 40000,
+   "pmc": 100.0,
+   "currency": "EUR",
+   "price": 103.09,
+   "change_pct": null,
+   "value": 41234.2,
+   "gain": 1234.2,
+   "gain_pct": 3.09,
+   "pe": null,
+   "ath": null,
+   "ath_dist_pct": null,
+   "support": null,
+   "resistance": null,
+   "rsi": null,
+   "volume": null,
+   "vol_ratio": null,
+   "signal": "Cedola 4,10/4,50%",
+   "signal_class": "info",
+   "sparks": {},
+   "earnings_date": null,
+   "rating": null,
+   "health": null,
+   "eps": null,
+   "beta": null,
+   "prepost": null
+  }
+ ],
+ "watchlist": [
+  {
    "ticker": "OKLO",
-   "name": "Oklo",
+   "name": "Oklo Inc.",
    "currency": "USD",
    "price": 57.49,
    "change_pct": -0.64,
@@ -1128,8 +1376,8 @@
    "support": 53.01,
    "resistance": 73.86,
    "rsi": 42.9,
-   "volume": 7383061,
-   "vol_ratio": 0.52,
+   "volume": 8129000,
+   "vol_ratio": 0.57,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -1268,375 +1516,36 @@
     "upside_pct": 54.2
    },
    "health": 21,
-   "qty": 120,
-   "pmc": 72.43,
-   "value": 6898.8,
-   "gain": -1792.8,
-   "gain_pct": -20.63
-  },
-  {
-   "ticker": "ARBE",
-   "name": "Arbe Robotics",
-   "currency": "USD",
-   "price": 0.88,
-   "change_pct": -4.39,
-   "pe": null,
-   "ath": 17.27,
-   "ath_dist_pct": -94.9,
-   "support": 0.82,
-   "resistance": 1.4,
-   "rsi": 44.2,
-   "volume": 1113857,
-   "vol_ratio": 0.3,
-   "signal": "Trend debole",
-   "signal_class": "bad",
-   "sparks": {
-    "m1": [
-     0.84,
-     0.84,
-     0.82,
-     0.87,
-     0.8,
-     0.8,
-     0.9,
-     0.87,
-     1.01,
-     1.15,
-     1.05,
-     1.0,
-     0.93,
-     1.0,
-     1.19,
-     1.13,
-     1.15,
-     1.23,
-     1.21,
-     1.1,
-     1.25,
-     1.13,
-     1.08,
-     1.07,
-     0.91,
-     0.88,
-     0.85,
-     0.86,
-     0.92,
-     0.88
-    ],
-    "y1": [
-     1.54,
-     1.48,
-     1.78,
-     1.63,
-     1.51,
-     1.48,
-     1.38,
-     1.38,
-     1.34,
-     1.2,
-     1.38,
-     1.25,
-     1.28,
-     1.4,
-     1.86,
-     1.69,
-     2.69,
-     2.5,
-     1.89,
-     1.93,
-     1.75,
-     1.63,
-     1.3,
-     1.43,
-     1.62,
-     1.32,
-     1.15,
-     1.03,
-     1.3,
-     1.37,
-     1.18,
-     1.45,
-     1.17,
-     1.15,
-     1.09,
-     1.03,
-     0.83,
-     0.83,
-     0.76,
-     0.65,
-     0.64,
-     0.65,
-     0.81,
-     0.75,
-     0.86,
-     0.8,
-     1.15,
-     1.19,
-     1.1,
-     0.91,
-     0.88
-    ],
-    "d1": [
-     0.92,
-     0.91,
-     0.92,
-     0.93,
-     0.93,
-     0.94,
-     0.94,
-     0.94,
-     0.94,
-     0.93,
-     0.93,
-     0.93,
-     0.92,
-     0.9,
-     0.9,
-     0.89,
-     0.89,
-     0.89,
-     0.9,
-     0.89,
-     0.9,
-     0.9,
-     0.89,
-     0.89,
-     0.89,
-     0.9,
-     0.89,
-     0.89,
-     0.9,
-     0.88,
-     0.88,
-     0.88,
-     0.88,
-     0.87,
-     0.88,
-     0.88,
-     0.88,
-     0.88,
-     0.88
-    ]
-   },
-   "earnings_date": "2026-08-06",
-   "rating": {
-    "key": "buy",
-    "n": 2,
-    "target": 2.5,
-    "upside_pct": 184.8
-   },
-   "health": 46,
-   "qty": 1150,
-   "pmc": 3.35,
-   "value": 1012.0,
-   "gain": -2840.5,
-   "gain_pct": -73.73
-  },
-  {
-   "ticker": "BTP-V28",
-   "name": "BTP Valore Ott 2028",
-   "isin": "IT0005565400",
-   "qty": 40000,
-   "pmc": 100.0,
-   "currency": "EUR",
-   "price": 103.09,
-   "change_pct": null,
-   "value": 41234.2,
-   "gain": 1234.2,
-   "gain_pct": 3.09,
-   "pe": null,
-   "ath": null,
-   "ath_dist_pct": null,
-   "support": null,
-   "resistance": null,
-   "rsi": null,
-   "volume": null,
-   "vol_ratio": null,
-   "signal": "Cedola 4,10/4,50%",
-   "signal_class": "info",
-   "sparks": {},
-   "earnings_date": null,
-   "rating": null,
-   "health": null
-  }
- ],
- "watchlist": [
-  {
-   "ticker": "OKLO",
-   "name": "Oklo Inc.",
-   "currency": "USD",
-   "price": 57.49,
-   "change_pct": -0.64,
-   "pe": null,
-   "ath": 193.84,
-   "ath_dist_pct": -70.3,
-   "support": 53.01,
-   "resistance": 73.86,
-   "rsi": 42.9,
-   "volume": 7383061,
-   "vol_ratio": 0.52,
-   "signal": "Trend debole",
-   "signal_class": "bad",
-   "sparks": {
-    "m1": [
-     70.4,
-     68.6,
-     68.38,
-     79.62,
-     71.83,
-     72.51,
-     78.13,
-     73.63,
-     69.66,
-     67.21,
-     62.25,
-     58.56,
-     55.88,
-     62.58,
-     65.09,
-     65.88,
-     68.7,
-     67.82,
-     68.09,
-     66.88,
-     66.89,
-     73.47,
-     65.21,
-     65.39,
-     58.09,
-     58.94,
-     56.48,
-     54.02,
-     57.86,
-     57.49
-    ],
-    "y1": [
-     63.66,
-     55.11,
-     55.99,
-     53.52,
-     60.95,
-     61.32,
-     71.01,
-     84.09,
-     78.47,
-     65.41,
-     74.31,
-     72.23,
-     73.75,
-     95.29,
-     131.17,
-     115.93,
-     134.77,
-     171.56,
-     120.12,
-     143.42,
-     121.23,
-     111.17,
-     102.86,
-     88.72,
-     111.65,
-     103.0,
-     77.72,
-     76.92,
-     89.34,
-     102.5,
-     89.93,
-     85.27,
-     78.0,
-     69.47,
-     67.39,
-     66.32,
-     65.65,
-     62.76,
-     56.7,
-     55.27,
-     48.07,
-     47.75,
-     64.21,
-     76.46,
-     72.5,
-     71.83,
-     67.21,
-     65.09,
-     66.88,
-     58.09,
-     57.49
-    ],
-    "d1": [
-     57.19,
-     55.88,
-     56.58,
-     57.45,
-     57.71,
-     57.73,
-     57.96,
-     57.48,
-     57.71,
-     58.06,
-     58.33,
-     58.38,
-     57.83,
-     57.29,
-     57.0,
-     56.54,
-     57.49,
-     57.38,
-     57.65,
-     57.53,
-     57.42,
-     57.44,
-     57.49,
-     57.38,
-     57.43,
-     57.66,
-     57.81,
-     57.62,
-     57.47,
-     57.28,
-     57.31,
-     57.35,
-     57.32,
-     57.37,
-     57.39,
-     57.35,
-     57.4,
-     57.42,
-     57.38
-    ]
-   },
-   "earnings_date": "2026-08-10",
-   "rating": {
-    "key": "buy",
-    "n": 19,
-    "target": 88.63,
-    "upside_pct": 54.2
-   },
-   "health": 21
+   "eps": -0.84,
+   "beta": 1.11,
+   "prepost": {
+    "label": "after",
+    "price": 57.85,
+    "change_pct": 0.63
+   }
   },
   {
    "ticker": "SPCX",
    "name": "Space Exploration Technol…",
    "currency": "USD",
    "price": 160.95,
-   "change_pct": 19.22,
+   "change_pct": 0.0,
    "pe": null,
    "ath": 176.52,
    "ath_dist_pct": -8.8,
-   "support": 135.0,
+   "support": 149.34,
    "resistance": 176.52,
    "rsi": null,
-   "volume": 503893811,
-   "vol_ratio": 2.0,
+   "volume": 519234800,
+   "vol_ratio": 1.0,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
     "m1": [
-     135.0,
      160.95
     ],
     "y1": [
-     135.0
+     160.95
     ],
     "d1": [
      161.99,
@@ -1669,12 +1578,19 @@
    },
    "earnings_date": null,
    "rating": {
-    "key": "sell",
-    "n": 3,
-    "target": 139.33,
-    "upside_pct": -13.4
+    "key": "buy",
+    "n": 5,
+    "target": 164.0,
+    "upside_pct": 1.9
    },
-   "health": 60
+   "health": 20,
+   "eps": -0.68,
+   "beta": null,
+   "prepost": {
+    "label": "after",
+    "price": 166.83,
+    "change_pct": 3.66
+   }
   },
   {
    "ticker": "CBRS",
@@ -1688,8 +1604,8 @@
    "support": 196.73,
    "resistance": 338.33,
    "rsi": 24.1,
-   "volume": 4584031,
-   "vol_ratio": 0.54,
+   "volume": 4717100,
+   "vol_ratio": 0.56,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -1772,7 +1688,702 @@
     "target": 294.0,
     "upside_pct": 37.4
    },
-   "health": 15
+   "health": 15,
+   "eps": 0.43,
+   "beta": null,
+   "prepost": {
+    "label": "after",
+    "price": 216.25,
+    "change_pct": 1.05
+   }
+  },
+  {
+   "ticker": "^KS11",
+   "name": "KOSPI",
+   "currency": "PTS",
+   "price": 8123.62,
+   "change_pct": 4.63,
+   "pe": null,
+   "ath": 8933.62,
+   "ath_dist_pct": -9.1,
+   "support": 7053.84,
+   "resistance": 8933.62,
+   "rsi": 55.9,
+   "volume": 493400,
+   "vol_ratio": 0.75,
+   "signal": "Trend rialzista",
+   "signal_class": "good",
+   "sparks": {
+    "m1": [
+     6641.02,
+     6690.9,
+     6598.87,
+     6936.99,
+     7384.56,
+     7490.05,
+     7498.0,
+     7822.24,
+     7643.15,
+     7844.01,
+     7981.41,
+     7493.18,
+     7516.04,
+     7271.66,
+     7208.95,
+     7815.59,
+     7847.71,
+     8047.51,
+     8228.7,
+     8185.29,
+     8476.15,
+     8788.38,
+     8801.49,
+     8639.41,
+     8160.59,
+     7484.41,
+     8096.93,
+     7730.82,
+     7763.95,
+     8123.62
+    ],
+    "y1": [
+     2920.03,
+     2977.74,
+     3079.56,
+     3116.27,
+     3183.23,
+     3192.29,
+     3190.45,
+     3245.44,
+     3227.68,
+     3225.66,
+     3168.73,
+     3186.01,
+     3205.12,
+     3395.54,
+     3445.24,
+     3386.05,
+     3610.6,
+     3748.89,
+     3941.59,
+     4107.5,
+     3953.76,
+     4011.57,
+     3853.26,
+     3926.59,
+     4100.05,
+     4167.16,
+     4020.55,
+     4220.56,
+     4551.06,
+     4723.1,
+     4909.93,
+     5170.81,
+     5371.1,
+     5354.49,
+     5846.09,
+     5791.91,
+     5532.59,
+     5640.48,
+     5553.92,
+     5052.46,
+     5494.78,
+     5967.75,
+     6388.47,
+     6641.02,
+     7490.05,
+     7981.41,
+     7815.59,
+     8476.15,
+     7484.41
+    ],
+    "d1": [
+     8293.48,
+     8351.6,
+     8368.21,
+     8397.1,
+     8407.19,
+     8390.46,
+     8374.56,
+     8361.59,
+     8320.84,
+     8335.01,
+     8295.05,
+     8346.56,
+     8362.45,
+     8354.56,
+     8364.09,
+     8347.94,
+     8367.24,
+     8389.02,
+     8393.06,
+     8391.01,
+     8374.72,
+     8402.76,
+     8418.97,
+     8411.07,
+     8405.4,
+     8400.94,
+     8415.77,
+     8421.8,
+     8430.27,
+     8419.93,
+     8385.02,
+     8381.51,
+     8360.24,
+     8325.15,
+     8194.69,
+     8195.26
+    ]
+   },
+   "earnings_date": null,
+   "rating": null,
+   "health": 85,
+   "eps": null,
+   "beta": null,
+   "prepost": null
+  },
+  {
+   "ticker": "^IXIC",
+   "name": "Nasdaq Composite",
+   "currency": "PTS",
+   "price": 25888.84,
+   "change_pct": 0.31,
+   "pe": null,
+   "ath": 27190.21,
+   "ath_dist_pct": -4.8,
+   "support": 24980.38,
+   "resistance": 27190.21,
+   "rsi": 49.6,
+   "volume": 10337400000,
+   "vol_ratio": 1.07,
+   "signal": "Trend rialzista",
+   "signal_class": "good",
+   "sparks": {
+    "m1": [
+     25114.44,
+     25067.8,
+     25326.13,
+     25838.94,
+     25806.2,
+     26247.08,
+     26274.13,
+     26088.2,
+     26402.34,
+     26635.22,
+     26225.14,
+     26090.73,
+     25870.71,
+     26270.36,
+     26293.1,
+     26343.97,
+     26656.18,
+     26674.73,
+     26917.47,
+     26972.62,
+     27086.81,
+     27093.9,
+     26853.98,
+     26830.96,
+     25709.43,
+     25929.66,
+     25678.82,
+     25169.5,
+     25809.66,
+     25888.84
+    ],
+    "y1": [
+     19406.83,
+     19630.97,
+     20369.73,
+     20418.46,
+     20677.8,
+     20892.69,
+     21098.29,
+     20916.55,
+     21681.9,
+     21314.95,
+     21544.27,
+     21497.73,
+     21886.06,
+     22261.33,
+     22497.86,
+     22755.16,
+     23043.38,
+     22670.08,
+     22740.4,
+     23958.47,
+     23499.8,
+     23406.46,
+     22564.23,
+     23214.69,
+     23505.14,
+     23593.86,
+     23006.36,
+     23593.1,
+     23395.82,
+     23733.9,
+     22954.32,
+     23817.1,
+     23255.19,
+     23102.47,
+     22753.63,
+     23152.08,
+     22807.48,
+     22716.13,
+     22152.42,
+     21929.82,
+     21840.95,
+     22822.42,
+     24102.7,
+     24438.5,
+     24892.31,
+     25806.2,
+     26635.22,
+     26293.1,
+     26972.62,
+     25709.43,
+     25888.84
+    ],
+    "d1": [
+     25710.34,
+     25638.73,
+     25632.13,
+     25746.64,
+     25805.45,
+     25785.28,
+     25813.94,
+     25713.16,
+     25856.3,
+     25889.43,
+     25947.55,
+     26004.05,
+     25941.75,
+     25841.19,
+     25824.9,
+     25745.91,
+     25839.52,
+     25838.39,
+     25859.48,
+     25834.8,
+     25869.0,
+     25914.62,
+     25899.22,
+     25932.43,
+     25892.29,
+     25893.63,
+     25900.51,
+     25865.01,
+     25867.46,
+     25838.27,
+     25881.79,
+     25908.46,
+     25897.79,
+     25898.77,
+     25880.57,
+     25885.04,
+     25839.76,
+     25857.92,
+     25873.38
+    ]
+   },
+   "earnings_date": null,
+   "rating": null,
+   "health": 72,
+   "eps": null,
+   "beta": null,
+   "prepost": null
+  },
+  {
+   "ticker": "BTC-USD",
+   "name": "Bitcoin",
+   "currency": "USD",
+   "price": 63687.48,
+   "change_pct": 0.23,
+   "pe": null,
+   "ath": 126198.07,
+   "ath_dist_pct": -49.5,
+   "support": 59108.92,
+   "resistance": 77990.87,
+   "rsi": 33.5,
+   "volume": 24416061440,
+   "vol_ratio": 0.72,
+   "signal": "Trend debole",
+   "signal_class": "bad",
+   "sparks": {
+    "m1": [
+     79065.68,
+     78131.44,
+     77429.35,
+     76954.17,
+     76750.91,
+     77457.77,
+     77539.17,
+     75488.24,
+     76673.37,
+     76981.12,
+     77279.93,
+     75825.73,
+     74344.7,
+     73536.55,
+     73372.52,
+     73754.84,
+     73579.69,
+     71319.77,
+     66703.66,
+     64014.37,
+     63801.57,
+     60922.67,
+     60867.41,
+     63239.52,
+     63090.59,
+     61643.78,
+     61449.29,
+     63561.05,
+     63543.2,
+     63687.48
+    ],
+    "y1": [
+     106090.97,
+     104883.33,
+     105577.77,
+     107327.7,
+     109647.98,
+     108950.27,
+     119116.12,
+     118003.23,
+     118754.96,
+     117924.48,
+     112526.91,
+     117496.9,
+     120172.91,
+     117453.06,
+     116874.09,
+     111222.06,
+     109250.59,
+     110224.7,
+     115507.54,
+     116843.19,
+     115306.09,
+     109712.83,
+     118648.93,
+     124752.53,
+     110807.88,
+     108186.04,
+     108476.89,
+     114472.45,
+     109556.16,
+     103891.84,
+     105996.59,
+     95549.15,
+     86631.9,
+     87341.89,
+     90394.31,
+     89387.76,
+     92020.95,
+     86419.78,
+     88344.0,
+     87234.74,
+     88430.13,
+     91413.49,
+     90513.1,
+     96929.33,
+     92553.59,
+     89110.73,
+     84561.59,
+     75633.55,
+     70264.73,
+     68857.84,
+     66425.32,
+     64616.74,
+     66995.86,
+     70841.12,
+     69926.92,
+     72789.91,
+     70522.59,
+     71309.88,
+     66691.45,
+     67290.52,
+     71767.83,
+     74181.61,
+     73856.35,
+     77455.31,
+     75776.13,
+     79827.91,
+     80664.37,
+     81051.25,
+     76750.91,
+     76981.12,
+     73372.52,
+     64014.37,
+     63090.59,
+     63687.48
+    ],
+    "d1": [
+     63525.67,
+     63553.49,
+     63533.99,
+     63517.56,
+     63549.96,
+     63567.13,
+     63584.97,
+     63620.54,
+     63583.19,
+     63642.15,
+     63713.87,
+     63773.43,
+     63755.34,
+     63752.18,
+     63716.0,
+     63684.03,
+     63586.68,
+     63550.96,
+     63653.31,
+     63619.43,
+     63543.96,
+     63462.23,
+     63471.12,
+     63520.58,
+     63496.94,
+     63480.46,
+     63514.25,
+     63554.39,
+     63583.09,
+     63581.3,
+     63508.73,
+     63526.55,
+     63525.65,
+     63526.83,
+     63546.02,
+     63488.0,
+     63531.82,
+     63546.16,
+     63562.93,
+     63640.51,
+     63637.32,
+     63687.47
+    ]
+   },
+   "earnings_date": null,
+   "rating": null,
+   "health": 18,
+   "eps": null,
+   "beta": null,
+   "prepost": null
+  },
+  {
+   "ticker": "CL=F",
+   "name": "Petrolio WTI",
+   "currency": "USD",
+   "price": 84.88,
+   "change_pct": -3.23,
+   "pe": null,
+   "ath": 147.27,
+   "ath_dist_pct": -42.4,
+   "support": 83.2,
+   "resistance": 109.47,
+   "rsi": 38.0,
+   "volume": 317151,
+   "vol_ratio": 1.18,
+   "signal": "Neutrale",
+   "signal_class": "neutral",
+   "sparks": {
+    "m1": [
+     101.94,
+     106.42,
+     102.27,
+     95.08,
+     94.81,
+     95.42,
+     98.07,
+     102.18,
+     101.02,
+     101.17,
+     105.42,
+     108.66,
+     107.77,
+     98.26,
+     96.35,
+     96.6,
+     93.89,
+     88.68,
+     88.9,
+     87.36,
+     92.16,
+     93.76,
+     96.02,
+     93.04,
+     90.54,
+     91.3,
+     88.2,
+     90.03,
+     87.71,
+     84.88
+    ],
+    "y1": [
+     72.98,
+     68.51,
+     65.11,
+     67.93,
+     66.98,
+     67.2,
+     66.71,
+     66.29,
+     63.96,
+     63.42,
+     64.8,
+     65.59,
+     62.63,
+     64.52,
+     63.41,
+     62.37,
+     61.73,
+     58.7,
+     57.82,
+     60.15,
+     60.56,
+     61.04,
+     60.74,
+     57.95,
+     58.95,
+     58.46,
+     55.94,
+     58.35,
+     57.32,
+     59.12,
+     59.44,
+     60.63,
+     62.14,
+     64.36,
+     62.33,
+     65.63,
+     74.56,
+     83.45,
+     96.21,
+     92.35,
+     101.38,
+     94.41,
+     91.29,
+     92.96,
+     106.88,
+     95.08,
+     101.02,
+     98.26,
+     88.9,
+     93.04,
+     87.71
+    ],
+    "d1": [
+     86.3,
+     86.11,
+     86.22,
+     86.16,
+     86.23,
+     86.21,
+     86.01,
+     86.0,
+     86.06,
+     86.08,
+     85.8,
+     85.77,
+     85.92,
+     86.04,
+     85.87,
+     85.91,
+     86.0,
+     86.0,
+     86.21,
+     86.34,
+     86.03,
+     85.89,
+     85.66,
+     85.47,
+     85.0,
+     84.38,
+     83.81,
+     83.78,
+     83.75,
+     83.94,
+     83.64,
+     83.77,
+     83.91,
+     83.61,
+     83.85,
+     84.06,
+     84.18,
+     84.2,
+     84.32,
+     85.01,
+     84.75,
+     84.76,
+     84.69,
+     84.39,
+     84.08,
+     84.52,
+     84.44,
+     84.78,
+     85.02,
+     84.91,
+     85.19,
+     85.37,
+     85.45,
+     85.37,
+     85.19,
+     85.39,
+     85.39,
+     85.56,
+     86.24,
+     86.77,
+     86.81,
+     86.43,
+     86.59,
+     86.5,
+     86.44,
+     85.32,
+     84.88,
+     84.61,
+     84.31,
+     84.58,
+     84.49,
+     84.22,
+     84.54,
+     84.48,
+     84.61,
+     84.74,
+     84.75,
+     84.64,
+     84.84,
+     84.82,
+     84.69,
+     84.64,
+     84.78,
+     84.84,
+     85.02,
+     84.93,
+     84.86,
+     84.76,
+     84.36,
+     84.42,
+     84.38,
+     84.52,
+     84.5,
+     84.54,
+     84.56,
+     84.38,
+     84.36,
+     84.39,
+     84.28,
+     84.28,
+     84.27,
+     84.22
+    ]
+   },
+   "earnings_date": null,
+   "rating": null,
+   "health": 29,
+   "eps": null,
+   "beta": null,
+   "prepost": null
   }
  ],
  "macro": {
@@ -1819,67 +2430,49 @@
     17.68
    ]
   },
+  "fedwatch": {
+   "target_range": "3.50–3.75%",
+   "implied_rate": 3.62,
+   "delta_bp": 0
+  },
   "indicators": [
    {
     "key": "cpi",
     "label": "Inflazione CPI (a/a)",
     "value": "4.3%",
-    "date": "2026-05-01"
+    "date": "2026-05-01",
+    "impact": 31
    },
    {
     "key": "pce",
     "label": "Inflazione PCE (a/a)",
     "value": "3.8%",
-    "date": "2026-04"
+    "date": "2026-04",
+    "impact": 46
    },
    {
     "key": "gdp",
     "label": "PIL USA (t/t ann.)",
     "value": "1.6%",
-    "date": "2026-Q1"
+    "date": "2026-Q1",
+    "impact": 52
    },
    {
     "key": "nfp",
     "label": "Non-Farm Payrolls",
     "value": "+172K",
-    "date": "2026-05-01"
+    "date": "2026-05-01",
+    "impact": 68
    },
    {
     "key": "unemp",
     "label": "Disoccupazione",
     "value": "4.3%",
-    "date": "2026-05-01"
+    "date": "2026-05-01",
+    "impact": 68
    }
   ],
   "markets": [
-   {
-    "key": "BTC-USD",
-    "label": "Bitcoin",
-    "value": "$63,424",
-    "change_pct": -0.21,
-    "suffix": "%"
-   },
-   {
-    "key": "CL=F",
-    "label": "Petrolio WTI",
-    "value": "$84.29",
-    "change_pct": -3.9,
-    "suffix": "%"
-   },
-   {
-    "key": "^KS11",
-    "label": "KOSPI",
-    "value": "7,764",
-    "change_pct": 0.43,
-    "suffix": "%"
-   },
-   {
-    "key": "^IXIC",
-    "label": "Nasdaq Composite",
-    "value": "25,889",
-    "change_pct": 0.31,
-    "suffix": "%"
-   },
    {
     "key": "^TNX",
     "label": "Treasury USA 10A",
@@ -1912,9 +2505,9 @@
   "putcall": {
    "symbol": "BSX",
    "name": "Boston Scientific",
-   "ratio": 0.5,
-   "puts": 9124,
-   "calls": 18100
+   "ratio": 0.48,
+   "puts": 8179,
+   "calls": 16998
   },
   "risk_sentiment": {
    "score": 57,
@@ -1934,7 +2527,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 48
+     "score": 52
     },
     {
      "label": "Treasury 10A",
@@ -1943,19 +2536,152 @@
    ]
   },
   "thermometer": {
-   "score": 60,
+   "score": 64,
    "label": "Forte"
   }
  },
+ "top_caps": [
+  {
+   "ticker": "NVDA",
+   "name": "NVIDIA",
+   "mcap_usd": 4969907049133,
+   "change_pct": -0.38
+  },
+  {
+   "ticker": "GOOGL",
+   "name": "Alphabet",
+   "mcap_usd": 4386274211690,
+   "change_pct": -0.14
+  },
+  {
+   "ticker": "AAPL",
+   "name": "Apple",
+   "mcap_usd": 4275930023996,
+   "change_pct": -1.58
+  },
+  {
+   "ticker": "MSFT",
+   "name": "Microsoft",
+   "mcap_usd": 2902586503698,
+   "change_pct": -0.51
+  },
+  {
+   "ticker": "AMZN",
+   "name": "Amazon",
+   "mcap_usd": 2566108488786,
+   "change_pct": -1.55
+  },
+  {
+   "ticker": "TSM",
+   "name": "TSMC",
+   "mcap_usd": 2198701890344,
+   "change_pct": 0.46
+  },
+  {
+   "ticker": "AVGO",
+   "name": "Broadcom",
+   "mcap_usd": 1817728701095,
+   "change_pct": -0.85
+  },
+  {
+   "ticker": "2222.SR",
+   "name": "Saudi Aramco",
+   "mcap_usd": 1752036577782,
+   "change_pct": 0.52
+  },
+  {
+   "ticker": "TSLA",
+   "name": "Tesla",
+   "mcap_usd": 1526438825383,
+   "change_pct": 1.86
+  },
+  {
+   "ticker": "META",
+   "name": "Meta",
+   "mcap_usd": 1439235195323,
+   "change_pct": -1.02
+  }
+ ],
  "news": [
+  {
+   "source": "Bloomberg",
+   "title": "Why Musk Raced to Take SpaceX Public in the World’s Biggest IPO",
+   "link": "https://www.bloomberg.com/news/features/2026-06-13/inside-the-spacex-ipo-why-elon-musk-raced-to-take-spacex-public",
+   "published": "2026-06-13T01:46:07Z",
+   "tickers": [
+    "TSLA"
+   ],
+   "title_it": "Perché Musk ha corso per rendere pubblica SpaceX nella più grande IPO del mondo"
+  },
+  {
+   "source": "Google News",
+   "title": "NVIDIA grant boosts UH Mānoa research in AI-powered wireless networks - University of Hawaii System",
+   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTE8yV01sNzRfejUyMWI1ZEluaUs4SGd6Q3J0dENCV0hpOWpiZVBVM01oOHk2V3BBeThEUnAzSFM2MUo1N0FYR2dsRGpFcmY5YkZxS3FoT1hOQTQ5VHhWMTExb2lhSEh0VThHUFVHYnJmUi1sR0FJZXdF?oc=5",
+   "published": "2026-06-13T01:10:46Z",
+   "tickers": [
+    "NVDA"
+   ],
+   "title_it": "Una sovvenzione NVIDIA potenzia la ricerca di UH Mānoa nelle reti wireless basate sull'intelligenza artificiale - Sistema dell'Università delle Hawaii"
+  },
+  {
+   "source": "Investing.com",
+   "title": "US EPA sends California emissions rules to Congress for potential reversal",
+   "link": "https://www.investing.com/news/stock-market-news/us-epa-sends-california-emissions-rules-to-congress-for-potential-reversal-4740231",
+   "published": "2026-06-12T23:36:25Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "title_it": "L’EPA statunitense invia le norme sulle emissioni della California al Congresso per una potenziale inversione"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Inside SpaceX and Elon Musk’s $75 Billion IPO",
+   "link": "https://www.bloomberg.com/news/videos/2026-06-12/inside-spacex-and-elon-musk-s-75-billion-ipo-video",
+   "published": "2026-06-12T23:32:47Z",
+   "tickers": [
+    "TSLA"
+   ],
+   "title_it": "Dentro SpaceX e l’IPO da 75 miliardi di dollari di Elon Musk"
+  },
+  {
+   "source": "Google News",
+   "title": "Tested: The 2026 Tesla Model 3 Performance Is Affordable Speed - MotorTrend",
+   "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQRHBoYnZfRU5UbHhCbmVoUUpkcDhGQUJtOHBucGFrQjBucHRHME83MlVYVFpBeW8ybEpmSEZtWl9McUZ2U0xScVpTb29WWm5PeVp1OUgwc1FyVnd1NnNwbDNVNHVZZndQdHItVERzMGhsZXk3OENIak1KMzlnU3d2WnBn?oc=5",
+   "published": "2026-06-12T22:46:53Z",
+   "tickers": [
+    "TSLA"
+   ],
+   "title_it": "Testato: le prestazioni della Tesla Model 3 2026 sono una velocità accessibile - MotorTrend"
+  },
+  {
+   "source": "Google News",
+   "title": "Why AMD (AMD) Stock Is Up Today - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOOXdtZFM2aUJtT1JsYVU5ZkoyT0JFYlFUdjJLZjBCTnU4bXpuYlJ5U3BpcG9mdGFEWmhtSjllcHZONHFpeElRRDczQmsxM0hoV0ctbEZjbXY5VDB5MXRGelZjb1kwUGVuMXZ2U1FvVnFZOWhPbTcwQWtWUktfUi1sSm1BemlQTlR1akwtOHA1MXF1Zw?oc=5",
+   "published": "2026-06-12T21:57:20Z",
+   "tickers": [
+    "AMD"
+   ],
+   "title_it": "Perché le azioni AMD (AMD) sono in rialzo oggi - Yahoo Finanza"
+  },
+  {
+   "source": "Google News",
+   "title": "Tesla vs. SpaceX: Which Elon Musk Stock Will Be Worth More? - Barron's",
+   "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQV1Y2TE9kTElPcnlOUHhIYVczQ2xmODIzZVJDbE5GWGk2dklNamphdDdNbURHdUI2WTVIT1dnd1Q0OWtKaVZaRTc3YVR0YjdINGVjdFpDb0IzT2tFWm84c3RXMVU2eThBRHUwUUxEY1FQdTg5cXlYek1GYzNyVDB4SjlES00xbThjamc?oc=5",
+   "published": "2026-06-12T21:32:00Z",
+   "tickers": [
+    "TSLA"
+   ],
+   "title_it": "Tesla vs SpaceX: quali azioni di Elon Musk varranno di più? - Barron"
+  },
   {
    "source": "Google News",
    "title": "NVIDIA Blackwell Leads on First Agentic AI Infrastructure Benchmark - NVIDIA Blog",
    "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNTzlCUENpZ0ZzMVFZSDV1NnlMSVlSZ2ZHOFR3YmRtWWk0cl9XS0dmV0toTFdESmNEa2JFQUNuS0o0Y3lZNnM2OE5zM1hhNElTWW9zMWxWSmJGUmdETjZGSFZ5NVV6NGMzMWQ5a2pXUGtqQjktZmJ3WDhqb1FmcW9YN3RjTQ?oc=5",
-   "published": "2026-06-12T21:22:30Z",
+   "published": "2026-06-12T21:24:03Z",
    "tickers": [
     "NVDA"
-   ]
+   ],
+   "title_it": "NVIDIA Blackwell è alla guida del primo benchmark dell'infrastruttura AI Agentic - Blog NVIDIA"
   },
   {
    "source": "Google News",
@@ -1964,7 +2690,8 @@
    "published": "2026-06-12T21:14:20Z",
    "tickers": [
     "NVDA"
-   ]
+   ],
+   "title_it": "NVIDIA raggiunge prestazioni leader nella codifica agentica sul primo benchmark AI agentic | Blog tecnico NVIDIA - Sviluppatore NVIDIA"
   },
   {
    "source": "Google News",
@@ -1973,7 +2700,8 @@
    "published": "2026-06-12T20:49:00Z",
    "tickers": [
     "MU"
-   ]
+   ],
+   "title_it": "Perché Goldman è cauta sulle azioni Micron in vista degli utili - Barron's"
   },
   {
    "source": "Google News",
@@ -1982,16 +2710,8 @@
    "published": "2026-06-12T20:38:00Z",
    "tickers": [
     "NVDA"
-   ]
-  },
-  {
-   "source": "Bloomberg",
-   "title": "SpaceX, Tesla Merger A 'Forgone Conclusion,' Says Ross Gerber",
-   "link": "https://www.bloomberg.com/news/videos/2026-06-12/spacex-tesla-merger-a-forgone-conclusion-says-gerber-video",
-   "published": "2026-06-12T20:33:40Z",
-   "tickers": [
-    "TSLA"
-   ]
+   ],
+   "title_it": "Come Nvidia può trarre vantaggio dalle prestazioni di SpaceX Stock - Barron's"
   },
   {
    "source": "Google News",
@@ -2000,25 +2720,18 @@
    "published": "2026-06-12T20:20:00Z",
    "tickers": [
     "AMD"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "Is it too late to buy SpaceX’s stock? Here’s how Tesla’s did after one day — and five years. - MarketWatch",
-   "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQWWR5OHlLWk1UeHJWbVIxejdrc1piNFZmbU12ZnA3MWhoUzdKNFFHci1nRHpIaXpoVUJNYm45aFd4b0drRm4wVllGMzVMeVVGeEJkNjh6QklLRWN6UE1BOW94ejgwYXQ0QTFFRjR6Q0lLaHhpd0NhcXhwSFoybVM5dTFwcjFvUUhuQkxadDhwSU9laTY2Z3V1RHp5UWdxUHpSb243bU5hMlJmTmVpUEhlcFBRV2V0V0NTZ1BnSGtVdTY4U3ZXRUVN?oc=5",
-   "published": "2026-06-12T20:06:00Z",
-   "tickers": [
-    "TSLA"
-   ]
+   ],
+   "title_it": "Le azioni AMD sono migliorate per essere acquistate grazie al rialzo della GPU - Investor's Business Daily"
   },
   {
    "source": "Google News",
    "title": "Oklo secures DOE PDSA approval - American Nuclear Society -- ANS",
    "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBxa1h1dnJ2dkJqeWdOc0FZYkpvUFRiZ3pWYmNSTnBkblVkdGQ0NVcyWnVFcEZnQmpwS3F6X0Q2bUE2SVljMGJPYmo5YnRsR0Q3ZHJReFFsaHZDTElFNnFuZVoyRDZ6NmFnREdiZWdlR3kycEFpSE85Nw?oc=5",
-   "published": "2026-06-12T19:38:24Z",
+   "published": "2026-06-12T20:17:14Z",
    "tickers": [
     "OKLO"
-   ]
+   ],
+   "title_it": "Oklo ottiene l'approvazione del DOE PDSA - American Nuclear Society -- ANS"
   },
   {
    "source": "Google News",
@@ -2027,7 +2740,8 @@
    "published": "2026-06-12T19:28:31Z",
    "tickers": [
     "TSLA"
-   ]
+   ],
+   "title_it": "Il presidente di SpaceX Gwynne Shotwell ha appena dato un altro accenno a una fusione tra Tesla: TechCrunch"
   },
   {
    "source": "Bloomberg",
@@ -2036,7 +2750,29 @@
    "published": "2026-06-12T19:24:08Z",
    "tickers": [
     "TSLA"
-   ]
+   ],
+   "title_it": "L'IPO di SpaceX porta in delirio i fan di Musk"
+  },
+  {
+   "source": "Google News",
+   "title": "SpaceX president Gwynne Shotwell floats Tesla merger on IPO day - qz.com",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE54TEVycjdWTm9OVnBBelFva2YzTlN1T1pGeGxkT3MtcWp5Y0o3RTEwa0ktT3hnZ2M1QVFPbGNWeHEtVzNvSkpoN0VRWlktZzRYLTlVS1VLRWszM3dWb0JoWGFKZUNadXFsaXlxbWhB?oc=5",
+   "published": "2026-06-12T19:24:01Z",
+   "tickers": [
+    "TSLA"
+   ],
+   "title_it": "Il presidente di SpaceX Gwynne Shotwell propone una fusione con Tesla il giorno dell'IPO - qz.com"
+  },
+  {
+   "source": "Google News",
+   "title": "Micron vs. NVIDIA: One AI Stock Is a Clear Buy Right Now - Zacks Investment Research",
+   "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNYjdjV3kwUXFpN0R1cmRzYnNCeW1kQXpfRDNaLUd2UHZxTnhreURsZ2prYlc0aVFxclhwLUJ1VmlwOUY0TXBIeTlRUkNLMVZ3V3Ryd19VbDNla19qcVpiMWxhQkh3NHlIV3B5WG5qeHlMVzQ1Z3ZDbDFoRWFBWDBUMTF2dENEV3dvcmx1MVFkNExrME1ZM0VNZ0RyZw?oc=5",
+   "published": "2026-06-12T18:30:29Z",
+   "tickers": [
+    "NVDA",
+    "MU"
+   ],
+   "title_it": "Micron contro NVIDIA: un titolo AI è un chiaro acquisto in questo momento - Zacks Investment Research"
   },
   {
    "source": "Google News",
@@ -2045,7 +2781,8 @@
    "published": "2026-06-12T18:07:00Z",
    "tickers": [
     "AMD"
-   ]
+   ],
+   "title_it": "Le azioni AMD aumentano dopo l'aggiornamento all'acquisto. È più di un gioco con la CPU. - Barron"
   },
   {
    "source": "Google News",
@@ -2054,7 +2791,18 @@
    "published": "2026-06-12T18:00:00Z",
    "tickers": [
     "OKLO"
-   ]
+   ],
+   "title_it": "Il prezzo delle azioni Oklo (NYSE:OKLO) è pronto a guadagnare dopo che il DOE ha rilasciato l'autorizzazione di sicurezza per il reattore Aurora - foreignpolicyjournal.com"
+  },
+  {
+   "source": "Google News",
+   "title": "Chinese Drivers Are Using Tiny Plastic Heads to Fool Tesla’s Autopilot Safeguards - WIRED",
+   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOMmtXUGpXYXJERmV6VkZZTUxfMy1YYVcyanFpWHJDRzVQaXpJY2ZrQ09LMDhadlB4NFdtZndtVWlKTzFrQ3A1MDhqOTRuVG9zY3h3V29uVWpDY2VKVk5la1paMlJvSUFzNklCa0dBZmV1ZHlwN0dBcHhZNDMwUVlpalZnLUpfQXVBUXBLSUpJUUZPYUs4YUQxNTdpZXlKMkZTeU52TmZMWU9ndGFYWmc?oc=5",
+   "published": "2026-06-12T17:57:00Z",
+   "tickers": [
+    "TSLA"
+   ],
+   "title_it": "Gli automobilisti cinesi utilizzano minuscole teste di plastica per ingannare le protezioni del pilota automatico di Tesla - WIRED"
   },
   {
    "source": "Google News",
@@ -2065,7 +2813,8 @@
     "NVDA",
     "AMD",
     "INTC"
-   ]
+   ],
+   "title_it": "Intel è cresciuta dell'8% oggi: sta sovraperformando altri titoli di chip come AMD e NVIDIA? - Wall Street 24 ore su 24, 7 giorni su 7."
   },
   {
    "source": "Google News",
@@ -2074,25 +2823,8 @@
    "published": "2026-06-12T17:35:00Z",
    "tickers": [
     "TSLA"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "Why Are Intel (INTC) Shares Soaring Today - StockStory",
-   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNazIxUTNiUzdMYXdpM00xZEdvRXFQLWZwMmpRTll6NnpUWEF4eDdsMzFlcTd2YWgzaXZXYWtUYnhsRTRSM2pNLVpUbzhPQUlTNE9raWZtRFFDejNmYTlSS3N0d3B1RnNvNmFMeVozOG9reGtUTXl1NWpDb0tXc1pqWjA4cHZtaV9uNGxiMXl2R3FJZnNKVmp4NVZIVUhIemVNNzBWTEZB?oc=5",
-   "published": "2026-06-12T17:22:40Z",
-   "tickers": [
-    "INTC"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "SpaceX IPO goes live. What it means for Tesla stock and investors - USA Today",
-   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPM1JJRXFZdGJBTzB5YlFrcXJHa3hjWkZCSTh6bFBwbFB4OFU5R2lDQnNXbFE5alVJdzE3UkNUVkJOcnFfNTNhNnR2TkJ6bzhUSW5PeU9YSEU3Q2Q3TV9JVThqazdtRW9vZ2tETlBaOUUySXJnQVVmR1g4aGxyZktmUXBxVU5LVTdyWjRUSlpXeVd1MldIRlh0NWhORkdWT0M4WFJxTE9qTTVVaDFs?oc=5",
-   "published": "2026-06-12T17:14:00Z",
-   "tickers": [
-    "TSLA"
-   ]
+   ],
+   "title_it": "Il presidente di SpaceX accenna alla fusione di Tesla post-IPO: “Ciò potrebbe rendere la vita di Elon Musk un po’ più semplice” - Fortune"
   },
   {
    "source": "Google News",
@@ -2101,16 +2833,8 @@
    "published": "2026-06-12T16:32:37Z",
    "tickers": [
     "NVDA"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "Nvidia, Abridge collaborate to develop healthcare-specific AI model - Fierce Healthcare",
-   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPZEo0S0t2SGt1NGM1azFfMmpvRERvcG9DWFFocUtpMUFxMlN4Q0VoZEJJdjAzZ1E5YVh4djA5Sy1SMmhSVXVCbUVjNnJfdlNZREZUN0J6eXQ3LWRCYnNRc1BPSjR5SzJzbzdmR2hGbkREbk16UFlGdkdidkprMzRjUExkcUlaR1dVWWR6aTh2TnBjV2o4Vlc4S1VKMVBDekNmeUhKYzRJVGZKVmh4bHJxTWZ5YzJWaGd3a2RZYg?oc=5",
-   "published": "2026-06-12T16:30:00Z",
-   "tickers": [
-    "NVDA"
-   ]
+   ],
+   "title_it": "Abridge collabora con Eli Lilly, Nvidia come espansione degli occhi dello scriba dell'intelligenza artificiale - Healthcare Dive"
   },
   {
    "source": "Google News",
@@ -2119,7 +2843,8 @@
    "published": "2026-06-12T16:25:18Z",
    "tickers": [
     "TSLA"
-   ]
+   ],
+   "title_it": "Il COO di SpaceX Shotwell afferma che il collegamento con Tesla \"potrebbe rendere la vita di Elon un po' più semplice\" - CNBC"
   },
   {
    "source": "Google News",
@@ -2128,7 +2853,8 @@
    "published": "2026-06-12T16:14:32Z",
    "tickers": [
     "MU"
-   ]
+   ],
+   "title_it": "Valutazione dei titoli di Micron Technology (MU) dopo la partnership con AI Megafab e gli aggiornamenti rialzisti degli analisti - Yahoo Finanza"
   },
   {
    "source": "Google News",
@@ -2137,7 +2863,8 @@
    "published": "2026-06-12T15:43:42Z",
    "tickers": [
     "OKLO"
-   ]
+   ],
+   "title_it": "Il reattore nucleare avanzato \"Aurora\" di Oklo ottiene l'approvazione del progetto negli Stati Uniti - Tomorrow's World Today"
   },
   {
    "source": "Bloomberg",
@@ -2146,25 +2873,8 @@
    "published": "2026-06-12T15:40:47Z",
    "tickers": [
     "TSLA"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "Tested: The 2026 Tesla Model 3 Performance Is Affordable Speed - MotorTrend",
-   "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQRHBoYnZfRU5UbHhCbmVoUUpkcDhGQUJtOHBucGFrQjBucHRHME83MlVYVFpBeW8ybEpmSEZtWl9McUZ2U0xScVpTb29WWm5PeVp1OUgwc1FyVnd1NnNwbDNVNHVZZndQdHItVERzMGhsZXk3OENIak1KMzlnU3d2WnBn?oc=5",
-   "published": "2026-06-12T15:39:51Z",
-   "tickers": [
-    "TSLA"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "Gabbard rescinds Biden-era intel assessments that were skeptical about ‘Havana Syndrome’ - CNN",
-   "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOQ1BCYUJJREhDZ3BEOVE2RHRtazVvWHBJV2lXeGVnZXUwSmZwUEhsaDBBWnFZcndVc29CSkVicHU4Q0hOTm85TmxGTjV4ejhMSUVkYnVVTlJhNUc3aWRJbU8tZXJXclZmd2gxeUoxcVdEYmFTR2lrbFMzdnNySFV2dXc1MTRJTGo4TlFUeHNCVlVyV2h0TS13SFpLMjRmZDFPSWgxNmVyX2VrVXVfdlRrQUowRHVnd3VCczZhV2ZzVURvSmJl?oc=5",
-   "published": "2026-06-12T15:33:54Z",
-   "tickers": [
-    "INTC"
-   ]
+   ],
+   "title_it": "Le azioni spaziali crollano mentre gli investitori corrono verso l’IPO di Musk"
   },
   {
    "source": "Google News",
@@ -2173,7 +2883,8 @@
    "published": "2026-06-12T15:33:01Z",
    "tickers": [
     "OKLO"
-   ]
+   ],
+   "title_it": "Attività insolita sulle opzioni: OKLO, LRCX e altri attirano scommesse di mercato, il rapporto V/OI di OKLO raggiunge 523,8 - Moomoo"
   },
   {
    "source": "Google News",
@@ -2182,16 +2893,8 @@
    "published": "2026-06-12T15:12:43Z",
    "tickers": [
     "TSLA"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "Bank of America makes major reset to Intel stock price target - thestreet.com",
-   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPazJJbHQ1SFByLW1WVmY3dGljcEtRRlhXWXVwZldRNlFENVEyVUpvRjJIOUM5Z0xSWVBpZEpxT2h1c3M5dTRoOEVlV1BQWVY3WjhxMjlOcWtPanI4YnJNdC1yVG9fa3FfZ0VDZm9ZVmY4Mno5Zm0tQjBubzlqcWw2QmxkcF9YYlJwVmpjZXJ4cHN5dWVHMFVyMnhfeFJ0ejg?oc=5",
-   "published": "2026-06-12T15:03:00Z",
-   "tickers": [
-    "INTC"
-   ]
+   ],
+   "title_it": "Opinione: SpaceX non è Tesla - GeekWire"
   },
   {
    "source": "Google News",
@@ -2200,7 +2903,8 @@
    "published": "2026-06-12T14:45:09Z",
    "tickers": [
     "NVDA"
-   ]
+   ],
+   "title_it": "Jim Cramer su NVIDIA: \"Verrà massacrato come tutto il resto\" - Yahoo Finance"
   },
   {
    "source": "Google News",
@@ -2209,34 +2913,38 @@
    "published": "2026-06-12T14:04:00Z",
    "tickers": [
     "RGTI"
-   ]
+   ],
+   "title_it": "Opinioni di Rigetti Computing Stock (RGTI) sul Quantum Computing Momentum - Quiver Quantitative"
   },
   {
    "source": "Google News",
-   "title": "This AI Stock Is Australia’s Answer to CoreWeave. It Just Notched a Deal With Nvidia. - Barron's",
-   "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5PVmNqVXJSVXE2aGp4aEF3ZlAyMVpuTkFBZHZoUEVHalBGSGpKaU1zSUVFR08xcGhkbnZuRlVqREx1VHF6TjkzUFlCZjJVVXdvNDNUeUpreGlXSlh5LTVMc2V0TXhiV01SZllUcm9xdWx5aGxT?oc=5",
-   "published": "2026-06-12T13:58:00Z",
+   "title": "3 Reasons It Might Be Time Buy the Dip in NVIDIA Stock - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQWS1aR2UwbXBZRlNWdERWZ0tudFJDV1VlU2E0QW9ybElLOEt5Q0d3QVA1SHJBYmlKWHFUdlQ5dHFXMUNLVTBITl9CcVUzVU1TSWNpd2RlWWlQc3VUV0lQT3FGR1JJUGt5c0tiMHNoR3dnYnJiMVR6eDh6VmRFYXpHNkZXRjlJdl9TX2tTNzM1WkhPZ1k?oc=5",
+   "published": "2026-06-12T13:41:10Z",
    "tickers": [
     "NVDA"
-   ]
+   ],
+   "title_it": "3 motivi per cui potrebbe essere giunto il momento di acquistare il calo delle azioni NVIDIA - Yahoo Finanza"
   },
   {
    "source": "Google News",
-   "title": "SpaceX president Gwynne Shotwell floats Tesla merger on IPO day - qz.com",
-   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE54TEVycjdWTm9OVnBBelFva2YzTlN1T1pGeGxkT3MtcWp5Y0o3RTEwa0ktT3hnZ2M1QVFPbGNWeHEtVzNvSkpoN0VRWlktZzRYLTlVS1VLRWszM3dWb0JoWGFKZUNadXFsaXlxbWhB?oc=5",
-   "published": "2026-06-12T13:14:45Z",
+   "title": "Wall Street Bullish on Nvidia (NVDA), Is It a Good Stock to Buy? - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPZHZMa3N1SXdHdDhtZUdqTXBwcDgxTjJYLWVERHBvVkxxRms1OTVtd2tmbVh4M3pUYXNVczgyZkJoajVoVW13dlg3T0hTSmRxc0cwN3pWQ3BrTGFBNDlZQWNWbzB3QWh2WFViSnRuTlc3N0g3dTNVNGU0dy1VQXlsZnhKanV4UDhYRnpPV0JnbDdvbDM5bDN1U2RQT1U?oc=5",
+   "published": "2026-06-12T13:08:28Z",
    "tickers": [
-    "TSLA"
-   ]
+    "NVDA"
+   ],
+   "title_it": "Wall Street rialzista su Nvidia (NVDA), è una buona azione da acquistare? - Yahoo Finanza"
   },
   {
    "source": "Google News",
-   "title": "Former Tesla board member says SpaceX needs to achieve 2 of its 3 moonshots to keep its valuation - CNBC",
-   "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxOdmRCeEVkeXk5bjR5NGF0TjRtOEJFak1SdUpxYUV6d2VhR3Q3T3QyTHdUOTRsYi05dy1rUEE2T3V0czZ0a0lqajZpTEFyV3N1bHVyV0N3NHNDX2pjd2hHQVR0M2FOT1BSalQ5dnlGdVJHYkY4ZUFZMlFUMnkwbjNDOWlB0gGHAUFVX3lxTE1HWVpqNW03U3VvamNKN08taFBsbWNUcElJVzRGV3dBRm90Qk84SmlITFpubjNPbkZiUTVwMGxwcTZJdVJhMnEwMjJMMDdCeTdoMTl4TUtZNEN5MnJIYmJKQlRDUVhBMWdFU1I1SkpFZWpPUGExMzU0M0xPRUt2cHQ2dTZUZjI3SQ?oc=5",
-   "published": "2026-06-12T11:22:37Z",
+   "title": "Oklo Strengthens Aurora-INL Path With DOE's PDSA Clearance - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxOem9KUmcyXzNfVFdNY1BvQzBFdW9lY3cwcFVlZF93YXdfeHVmcDlsZE9hR1pOTU1TQmk3a3hyR0o0NUFETjhuSi15THc1NUdSUkZXTldxTFVWbWFic0lFZmV2QjRsWGFxMmZSZFZWX3RfcTVtQzg2R21zSGZjS2FHX0FvN1lxYkZVR21YZ2drX0FuNUxpRloyWlJKTTdOdw?oc=5",
+   "published": "2026-06-12T12:01:00Z",
    "tickers": [
-    "TSLA"
-   ]
+    "OKLO"
+   ],
+   "title_it": "Oklo rafforza il percorso Aurora-INL con l'autorizzazione PDSA del DOE - Yahoo Finanza"
   },
   {
    "source": "Google News",
@@ -2245,16 +2953,8 @@
    "published": "2026-06-12T11:09:47Z",
    "tickers": [
     "OKLO"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "Exclusive: Nvidia begins Vera CPU sales pitch to Chinese clients, sources say - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPR2Z6dFV3WHhOamNSbFQ1VmxlNk5iNHR4bjJDdWE1d28tM3VEX01aOVVWMkNRYlZ3aUlQWXgxNi1VbGdtQ3FoNkY2MEZLSzZKZHBLcHFfNlhSTlhlYm5CbFNoaHdyOFM4UUVjQzIyU0o4VmNuaHo1cTg0cFgwSGdMdFctdGZCQnVwamdHZEdRQkJ5Umw0U1ZPTldxZ2ZRWE9Yc05xM2EtNFlwb1l5alBV?oc=5",
-   "published": "2026-06-12T06:19:00Z",
-   "tickers": [
-    "NVDA"
-   ]
+   ],
+   "title_it": "Il DOE approva l'analisi chiave sulla sicurezza per la centrale nucleare di Oklo Aurora in Idaho - NucNet"
   },
   {
    "source": "Google News",
@@ -2263,7 +2963,8 @@
    "published": "2026-06-12T03:11:00Z",
    "tickers": [
     "OKLO"
-   ]
+   ],
+   "title_it": "Il traguardo della sicurezza DOE di Oklo (OKLO) ridefinisce silenziosamente il suo percorso dal pilota alla flotta? - Yahoo Finanza"
   },
   {
    "source": "Google News",
@@ -2272,7 +2973,8 @@
    "published": "2026-06-11T22:34:00Z",
    "tickers": [
     "OKLO"
-   ]
+   ],
+   "title_it": "Perché le azioni Oklo sono aumentate oggi - The Motley Fool"
   },
   {
    "source": "Google News",
@@ -2281,16 +2983,18 @@
    "published": "2026-06-11T21:54:19Z",
    "tickers": [
     "OKLO"
-   ]
+   ],
+   "title_it": "Perché le azioni Oklo sono aumentate oggi - Yahoo Finanza"
   },
   {
    "source": "Google News",
-   "title": "DOE Approves Oklo Aurora Safety Analysis Under Pilot Program - Environment+Energy Leader",
-   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPbUdhdlM4Z3AyRHctRmN1dlNvMjU2ZU5iMGYzelpoc0VlQ3ctbjNmQmxlSFFUZG8zRXU2Q2xYMzd0aWdFckRZM0VTSHJEVkZzN0s0MTFPTnk5WENWSjZjNklrRThkV19sX3d5R3lEMnlabW1EU0k0NDdTNXpyVjBfNFBTVURPN0pzRmNyaVlzdm1fWFFUaHQ0d0tvRnVreTVGN252SWJ5SEFxaEN3V25vMzJWamE1Zw?oc=5",
-   "published": "2026-06-11T18:00:00Z",
+   "title": "Federal Reserve to resist the urge to hike US rates - ING THINK economic and financial analysis | ING THINK",
+   "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTFBKQVRNUkxyQ1Jyc0xuendKMDV5dnFDeGRPVmhpSEtzWEVQUWI5Z2cxNld0YzhQOGVGNVdmc2NzYzFrNXpRQWR3RDdwbHFoN1JrLWhXZXBtWi1ySXBRQ284aXJfM3RzWUZhTEZsSTA3TDA1Q1ExaFlrNDEwcw?oc=5",
+   "published": "2026-06-11T16:09:07Z",
    "tickers": [
-    "OKLO"
-   ]
+    "MACRO"
+   ],
+   "title_it": "La Federal Reserve resiste all'impulso di aumentare i tassi statunitensi - ING THINK analisi economica e finanziaria | PENSA"
   },
   {
    "source": "Google News",
@@ -2299,16 +3003,8 @@
    "published": "2026-06-11T15:34:55Z",
    "tickers": [
     "OKLO"
-   ]
-  },
-  {
-   "source": "Google News",
-   "title": "The Zacks Analyst Blog Highlights IonQ, D-Wave Quantum and Rigetti Computing - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNLVgtTlhXd1YzbmROeE1saDNwZHNjSGNZVHNvZktmQmpDQ0R0clJHMTZkaHFjVjBIVklGZzltZHZmTVV6Q2lqVzBfaUFmNjJ4bTVBV2dxdXZabG5wOUF3cFVCanhObGI2bUpUMGNGdWd4OE9GQjRhUjVtVHcyRzB5UTRNUWYzcWo1UjBXS3FhbHBETjJhMVJVdjZ5THdhTEFD?oc=5",
-   "published": "2026-06-11T15:10:00Z",
-   "tickers": [
-    "RGTI"
-   ]
+   ],
+   "title_it": "Pietra miliare dell'approvazione del DOE per il reattore Oklo - World Nuclear News"
   }
  ]
 }
