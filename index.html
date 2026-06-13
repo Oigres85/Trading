@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=16">
+<link rel="stylesheet" href="assets/style.css?v=17">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📈</text></svg>">
 </head>
 <body>
@@ -43,9 +43,11 @@
           <button class="chip" data-range="all" aria-label="Massimo">Max</button>
         </div>
         <label class="bench-toggle"><input type="checkbox" id="bench-nasdaq"> vs Nasdaq</label>
+        <button class="btn btn-ghost btn-sm" id="hist-zoom" aria-label="Ingrandisci il grafico" title="Ingrandisci">🔍</button>
       </div>
       <div id="hist-chart"></div>
       <div class="hist-summary muted" id="hist-summary"></div>
+      <div class="broker-row" id="broker-row"></div>
     </section>
     <section class="card">
       <div class="card-head">
@@ -160,15 +162,6 @@
     <ul class="news-list" id="news-list" aria-label="Elenco notizie"></ul>
   </section>
 
-  <!-- SENTIMENT & DATI ALTERNATIVI -->
-  <section class="card" id="altdata-card">
-    <div class="card-head">
-      <h2>Sentiment &amp; Dati Alternativi</h2>
-      <span class="muted">Mercati di previsione Polymarket (probabilità “Sì”)</span>
-    </div>
-    <ul class="pred-list" id="pred-list" aria-label="Mercati di previsione"></ul>
-  </section>
-
   <!-- CALCOLATORE PMC -->
   <section class="card" id="pmc-calc">
     <div class="card-head">
@@ -198,11 +191,47 @@
     </div>
   </section>
 
+  <!-- CALCOLO VENDITE (PLUS/MINUS) -->
+  <section class="card" id="sell-calc">
+    <div class="card-head">
+      <h2>💸 Calcolo vendite (plus/minusvalenze)</h2>
+      <span class="muted">Imposta quante azioni vendere per stimare il risultato netto e le tasse</span>
+    </div>
+    <div class="table-wrap">
+      <table id="sell-table" aria-label="Simulazione vendite">
+        <thead>
+          <tr>
+            <th class="sticky-col">Titolo</th>
+            <th class="num">Possedute</th>
+            <th class="num">PMC</th>
+            <th class="num">Prezzo</th>
+            <th class="num">Vendi qtà</th>
+            <th class="num">Plus/Minus (€)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="sell-summary" id="sell-summary"></div>
+  </section>
+
   <footer>
     Prezzi live lato client (Yahoo via proxy CORS, ogni 60s) · dati tecnici/macro/news rigenerati dal workflow ogni ~20 min.<br>
     Fonti: Yahoo Finance · CNN Fear &amp; Greed · FRED/BLS/DBnomics · NY Fed · MOF Giappone · Borsa Italiana · RSS (CNBC, Bloomberg, Yahoo, Investing, Google News, Reddit) · Polymarket. Non è consulenza finanziaria.
   </footer>
 </main>
+
+<!-- Modal zoom grafico -->
+<div class="modal-backdrop" id="chart-modal" hidden>
+  <div class="modal modal-chart">
+    <div class="modal-head">
+      <h3 id="chart-modal-title">Grafico</h3>
+      <button class="btn btn-ghost" id="chart-modal-close" aria-label="Chiudi grafico">✕</button>
+    </div>
+    <div id="chart-modal-body"></div>
+    <div class="muted" id="chart-modal-tip" style="margin-top:8px;font-size:13px"></div>
+  </div>
+</div>
 
 <!-- Modal prompt AI -->
 <div class="modal-backdrop" id="modal" hidden>
@@ -220,6 +249,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=16"></script>
+<script src="assets/app.js?v=17"></script>
 </body>
 </html>

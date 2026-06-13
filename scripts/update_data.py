@@ -66,13 +66,13 @@ def load_holdings():
         cfg = json.loads(CONFIG.read_text())
         pf = cfg.get("portfolio") or DEFAULT_PORTFOLIO
         wl = cfg.get("watchlist") or DEFAULT_WATCHLIST
-        return pf, wl
+        return pf, wl, cfg.get("broker")
     except Exception as e:  # noqa: BLE001
         print(f"!! config holdings non leggibile, uso default: {e}", file=sys.stderr)
-        return DEFAULT_PORTFOLIO, DEFAULT_WATCHLIST
+        return DEFAULT_PORTFOLIO, DEFAULT_WATCHLIST, None
 
 
-PORTFOLIO, WATCHLIST = load_holdings()
+PORTFOLIO, WATCHLIST, BROKER = load_holdings()
 
 BTP = {
     "ticker": "BTP-V28", "name": "BTP Valore Ott 2028", "isin": "IT0005565400",
@@ -103,10 +103,19 @@ NEWS_FEEDS = [
     ("Google News", "https://news.google.com/rss/search?q=MicroStrategy+OR+%22Rigetti+Computing%22+OR+%22Oklo%22+OR+%22Arbe+Robotics%22+OR+%22BTP+Valore%22&hl=en-US&gl=US&ceid=US:en"),
     ("Google News", "https://news.google.com/rss/search?q=%22Federal+Reserve%22+OR+%22US+inflation%22+OR+%22White+House%22+economy+OR+tariffs&hl=en-US&gl=US&ceid=US:en"),
     ("Google News", "https://news.google.com/rss/search?q=(Trump+OR+Iran+OR+Israel+OR+war+OR+China+OR+OPEC+OR+oil)+(market+OR+stocks+OR+economy+OR+Fed)&hl=en-US&gl=US&ceid=US:en"),
+    ("Google News", "https://news.google.com/rss/search?q=when:3d+(Iran+OR+Israel+OR+Ukraine+OR+Russia+OR+China+OR+tariffs+OR+%22Trump%22)+when:3d&hl=en-US&gl=US&ceid=US:en"),
     ("Google News", "https://news.google.com/rss/search?q=when:2d+stock+market+OR+wall+street+OR+%22federal+reserve%22&hl=en-US&gl=US&ceid=US:en"),
+    ("Yahoo Finance", "https://finance.yahoo.com/news/rssindex"),
+    ("CNBC", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664"),
+    ("Reuters", "https://news.google.com/rss/search?q=when:3d+site:reuters.com+(markets+OR+economy+OR+Fed+OR+Iran+OR+stocks)&hl=en-US&gl=US&ceid=US:en"),
     ("Reddit", "https://www.reddit.com/r/stocks/.rss"),
     ("Reddit", "https://www.reddit.com/r/wallstreetbets/.rss"),
 ]
+
+# domini a pagamento (le notizie non leggibili senza abbonamento vanno escluse)
+PAYWALL_DOMAINS = ("wsj.com", "ft.com", "barrons.com", "economist.com", "seekingalpha.com",
+                   "bloomberg.com", "nytimes.com", "thetimes", "telegraph.co.uk",
+                   "businessinsider.com", "theinformation.com", "forbes.com")
 
 # pattern regex (word boundary) per associare le news ai titoli
 PORTFOLIO_KEYWORDS = {
@@ -697,8 +706,18 @@ def fetch_portfolio_history(btp_value_eur):
                     out["nasdaq"] = [round(float(x) / base_n * base_p) for x in n.values]
             return out
 
-        return {"w1": series(5), "m1": series(22), "m3": series(66),
-                "y1": series(252), "y5": series(None), "all": series(None)}
+        out = {"w1": series(5), "m1": series(22), "m3": series(66),
+               "y1": series(252), "y5": series(None), "all": series(None)}
+        # àncora la curva al controvalore reale del broker (l'ultimo punto = valore reale)
+        if BROKER and BROKER.get("controvalore_totale"):
+            real = float(BROKER["controvalore_totale"])
+            for s in out.values():
+                if s["values"]:
+                    k = real / s["values"][-1]
+                    s["values"] = [round(v * k) for v in s["values"]]
+                    if "nasdaq" in s:
+                        s["nasdaq"] = [round(v * k) for v in s["nasdaq"]]
+        return out
     except Exception as e:  # noqa: BLE001
         print(f"!! storico portafoglio: {e}", file=sys.stderr)
         return None
@@ -833,26 +852,63 @@ def build_keywords():
     return kw
 
 
+STOPWORDS = set("the a an of to in on for and or with at by from is are be as has have new "
+                "il lo la i gli le di a da in con su per tra fra e o un una che è ha "
+                "after before says will would could after amid over into out up down "
+                "us usa dopo prima oltre verso più meno come".split())
+
+
+def topic_key(title):
+    """Parole significative del titolo, per riconoscere notizie sullo stesso argomento."""
+    words = re.findall(r"[a-zàèéìòù0-9]{4,}", title.lower())
+    return {w for w in words if w not in STOPWORDS}
+
+
+def is_duplicate_topic(key, kept_keys):
+    for k in kept_keys:
+        union = key | k
+        if union and len(key & k) / len(union) >= 0.5:   # >=50% di parole in comune
+            return True
+    return False
+
+
 def fetch_news():
-    """News sui titoli in portafoglio (dinamiche) + macro/politica USA, tradotte."""
+    """News sui titoli in portafoglio (dinamiche) + macro/politica/geopolitica, tradotte.
+    Esclude articoli a pagamento e doppioni sullo stesso argomento. Include Polymarket."""
     keywords = build_keywords()
-    items, seen = [], set()
+    items, seen_titles, kept_keys, per_source = [], set(), [], {}
     for source, url in NEWS_FEEDS:
         for title, link, ts in parse_feed_entries(url):
-            if not title or title.lower() in seen:
+            if not title or title.lower() in seen_titles:
+                continue
+            if any(d in (link or "").lower() for d in PAYWALL_DOMAINS):   # niente paywall
                 continue
             tickers = [tk for tk, kws in keywords.items()
                        if any(re.search(kw, title.lower()) for kw in kws)]
             if not tickers:
                 continue
-            seen.add(title.lower())
+            key = topic_key(title)
+            if is_duplicate_topic(key, kept_keys):     # niente doppioni di argomento
+                continue
+            if per_source.get(source, 0) >= 12:        # varietà tra le fonti
+                continue
+            seen_titles.add(title.lower())
+            kept_keys.append(key)
+            per_source[source] = per_source.get(source, 0) + 1
             items.append({"source": source, "title": title, "link": link,
                           "published": ts, "tickers": tickers,
                           "sentiment": news_sentiment(title)})
     items.sort(key=lambda x: x["published"] or "", reverse=True)
-    items = items[:42]
+    items = items[:46]
     for it in items:
         it["title_it"] = translate_it(it["title"])
+    # mercati di previsione Polymarket, integrati nelle news
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    for p in fetch_predictions():
+        items.append({"source": "Polymarket", "title": p["question"],
+                      "title_it": f"{p['question']} — probabilità Sì {p['yes']}%",
+                      "link": p["link"], "published": now,
+                      "tickers": ["MACRO"], "sentiment": "neutral"})
     return items
 
 
@@ -914,6 +970,7 @@ def main():
         "allocation": allocation,
         "history": fetch_portfolio_history(btp["value"]),
         "macro": macro,
+        "broker": BROKER,
         "top_caps": fetch_top_caps(),
         "predictions": fetch_predictions(),
         "news": fetch_news(),

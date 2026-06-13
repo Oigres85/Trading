@@ -324,7 +324,8 @@ function renderAll() {
   renderMacro();
   renderTopCaps();
   renderNews();
-  renderPredictions();
+  renderBroker();
+  renderSellCalc();
   pmcInit();
 }
 
@@ -413,6 +414,25 @@ function renderHistory() {
   hit.addEventListener("mousemove", move);
   hit.addEventListener("touchmove", move);
   hit.addEventListener("mouseleave", leave);
+}
+
+/* ---------------- rendimenti reali (broker) ---------------- */
+function renderBroker() {
+  const b = DATA.broker;
+  const box = $("#broker-row");
+  if (!box) return;
+  if (!b) { box.innerHTML = ""; return; }
+  const cell = (lab, val, cls = "") => `<div class="bk-cell"><div class="bk-lab">${lab}</div><div class="bk-val ${cls}">${val}</div></div>`;
+  box.innerHTML = `<div class="bk-title">📒 Rendimenti reali (broker, ${new Date(b.as_of).toLocaleDateString("it-IT")})</div>
+    <div class="bk-grid">
+      ${cell("Controvalore", fmtEUR.format(b.controvalore_totale))}
+      ${cell("Profitto totale", `${signTxt(b.profitto_totale_pct)} · ${signTxt(Math.round(b.profitto_totale_eur), " €")}`, "pos")}
+      ${cell("YTD", signTxt(b.ytd_pct), "pos")}
+      ${cell("12 mesi", signTxt(b.y1_pct), "pos")}
+      ${cell("Dall'inizio", signTxt(b.inception_pct), "pos")}
+      ${cell("Profitto $ (azioni)", `${signTxt(b.profitto_usd_pct)} · ${signTxt(Math.round(b.profitto_usd), " $")}`, "pos")}
+      ${cell("Cedole BTP incassate", fmtEUR.format(b.cedole_btp))}
+    </div>`;
 }
 
 /* ---------------- asset allocation (donut) ---------------- */
@@ -577,29 +597,67 @@ function techCells(r) {
       <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
       <td>${ratingBadge(r.rating)}</td>
       <td class="num">${targetBar(r.rating)}</td>
-      <td>${sparkline((r.sparks || {})[sparkRange])}</td>`;
+      <td class="spark-cell" data-tk="${r.ticker}" title="Clicca per ingrandire">${sparkline((r.sparks || {})[sparkRange])}</td>`;
 }
+
+/* ---------------- zoom grafico (modale, touch + mouse) ---------------- */
+function openChartModal(title, vals, dates, fmt) {
+  if (!vals || vals.length < 2) { toast("Grafico non disponibile per questo intervallo"); return; }
+  fmt = fmt || (v => fmtNum.format(v));
+  const W = 900, H = 380, pad = { l: 64, r: 16, t: 16, b: 28 };
+  const min = Math.min(...vals), max = Math.max(...vals), range = max - min || 1;
+  const x = i => pad.l + i / (vals.length - 1) * (W - pad.l - pad.r);
+  const y = v => pad.t + (1 - (v - min) / range) * (H - pad.t - pad.b);
+  const line = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const up = vals[vals.length - 1] >= vals[0], col = up ? "var(--green)" : "var(--red)";
+  const grid = [0, .25, .5, .75, 1].map(f => {
+    const gv = min + range * f, gy = y(gv);
+    return `<line x1="${pad.l}" y1="${gy.toFixed(1)}" x2="${W - pad.r}" y2="${gy.toFixed(1)}" stroke="var(--border)"/>
+      <text x="${pad.l - 8}" y="${(gy + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(gv)}</text>`;
+  }).join("");
+  $("#chart-modal-title").textContent = title;
+  $("#chart-modal-body").innerHTML = `<svg id="cm-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
+    <defs><linearGradient id="cmg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${col}" stop-opacity="0.25"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}
+    <polygon points="${pad.l},${y(min)} ${line} ${x(vals.length - 1)},${y(min)}" fill="url(#cmg)"/>
+    <polyline points="${line}" fill="none" stroke="${col}" stroke-width="2.5"/>
+    <line id="cm-cur" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--text)" opacity="0"/>
+    <circle id="cm-dot" r="4.5" fill="${col}" opacity="0"/>
+    <rect id="cm-hit" x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}" fill="transparent"/>
+  </svg>`;
+  const first = vals[0], last = vals[vals.length - 1], chg = (last / first - 1) * 100;
+  const baseTip = `${fmt(first)} → ${fmt(last)} · <span class="${signCls(chg)}">${signTxt(Math.round(chg * 100) / 100)}</span> nel periodo`;
+  const tip = $("#chart-modal-tip"); tip.innerHTML = baseTip;
+  $("#chart-modal").hidden = false;
+  const svg = $("#cm-svg"), hit = $("#cm-hit"), cur = $("#cm-cur"), dot = $("#cm-dot");
+  const move = ev => {
+    const r = svg.getBoundingClientRect();
+    const px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
+    const i = Math.max(0, Math.min(vals.length - 1, Math.round((px / r.width * W - pad.l) / (W - pad.l - pad.r) * (vals.length - 1))));
+    cur.setAttribute("x1", x(i)); cur.setAttribute("x2", x(i)); cur.setAttribute("opacity", ".4");
+    dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(vals[i])); dot.setAttribute("opacity", "1");
+    const d = dates && dates[i] ? new Date(dates[i]).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" }) + ": " : "";
+    const dchg = (vals[i] / first - 1) * 100;
+    tip.innerHTML = `${d}<b>${fmt(vals[i])}</b> <span class="${signCls(dchg)}">${signTxt(Math.round(dchg * 100) / 100)}</span>`;
+  };
+  hit.addEventListener("mousemove", move);
+  hit.addEventListener("touchmove", ev => { ev.preventDefault(); move(ev); }, { passive: false });
+  hit.addEventListener("touchstart", move);
+}
+function closeChartModal() { $("#chart-modal").hidden = true; }
 
 function delBtn(section, ticker) {
   return editMode[section] && ticker !== "BTP-V28"
     ? `<button class="row-del" data-sec="${section}" data-tk="${ticker}" title="Rimuovi ${ticker}">×</button>` : "";
 }
 
-/* 🔔 quando il prezzo è entro il 5% da supporto o resistenza */
-function alertBell(r) {
-  if (!r.support || !r.resistance || !r.price) return "";
-  const dS = Math.abs(r.price / r.support - 1) * 100;
-  const dR = Math.abs(r.price / r.resistance - 1) * 100;
-  if (dR <= 5) return `<span class="bell" title="Vicino alla resistenza ${fmtNum.format(r.resistance)} (${dR.toFixed(1)}%)">🔔</span>`;
-  if (dS <= 5) return `<span class="bell" title="Vicino al supporto ${fmtNum.format(r.support)} (${dS.toFixed(1)}%)">🔔</span>`;
-  return "";
-}
 
 function renderTable() {
   const rows = sortRows(DATA.portfolio, "ptf-table").map(r => {
     const c = cur(r);
     return `<tr>
-      <td class="name-cell">${delBtn("portfolio", r.ticker)}${r.name}${alertBell(r)}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell">${delBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${c}${fmtNum.format(r.price)}</b></td>
@@ -631,7 +689,7 @@ function renderWatchlist() {
   const list = sortRows(DATA.watchlist || [], "wl-table");
   const c = (r) => r.currency === "PTS" ? "" : "$";
   const rows = list.length ? list.map(r => `<tr>
-      <td class="name-cell">${delBtn("watchlist", r.ticker)}<button class="row-add" data-tk="${r.ticker}" data-price="${r.price}" title="Aggiungi ${r.ticker} al portafoglio">➕</button>${esc(r.name)}${alertBell(r)}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell">${delBtn("watchlist", r.ticker)}<button class="row-add" data-tk="${r.ticker}" data-price="${r.price}" title="Aggiungi ${r.ticker} al portafoglio">➕</button>${esc(r.name)}<span class="tk">${r.ticker}</span></td>
       <td class="num"><b>${c(r)}${fmtNum.format(r.price)}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${prepostCell(r.prepost)}</td>
@@ -693,8 +751,12 @@ function renderGauges() {
     const fg = m.fear_greed;
     cards.push(`<div class="gauge-card">
       <div class="g-title">Fear &amp; Greed</div>
-      ${gaugeSVG(fg.score, fgColor(fg.score))}
-      <div class="gauge-value">${fg.score}</div>
+      <div class="thermo">
+        <div class="thermo-scale"></div>
+        <div class="thermo-marker" style="left:${fg.score}%"></div>
+      </div>
+      <div class="thermo-ends"><span>Paura</span><span>Avidità</span></div>
+      <div class="gauge-value" style="color:${fgColor(fg.score)}">${fg.score}</div>
       <div class="gauge-sub"><b>${FG_LABELS[fg.rating] || fg.rating}</b><br>
       1 sett. fa: ${fg.week_ago} · 1 mese fa: ${fg.month_ago}</div>
     </div>`);
@@ -843,7 +905,6 @@ function timeAgo(iso) {
   return `${Math.round(mins / 1440)} gg fa`;
 }
 
-const SENT = { bull: ["🟢", "Letta positivamente dal mercato"], bear: ["🔴", "Letta negativamente dal mercato"], neutral: ["⚪", "Neutrale"] };
 let newsFilter = null;   // ticker/argomento selezionato dai chip Trending
 
 function renderTrending() {
@@ -862,37 +923,17 @@ function renderNews() {
   renderTrending();
   let list = DATA.news || [];
   if (newsFilter) list = list.filter(n => (n.tickers || []).includes(newsFilter));
-  $("#news-list").innerHTML = list.length ? list.map(n => {
-    const [emo, stip] = SENT[n.sentiment] || SENT.neutral;
-    return `<li class="news-item">
-      <span class="sent" title="${stip}">${emo}</span>
-      <div class="news-body">
-        <a href="${esc(n.link)}" target="_blank" rel="noopener" title="${esc(n.title)}">${esc(n.title_it || n.title)}</a>
-        <div class="news-meta">
-          <span class="news-src">${esc(n.source)}</span>
-          <span class="news-time">${timeAgo(n.published)}</span>
-          ${n.tickers.map(t => `<span class="news-tk">${t === "MACRO" ? "Macro" : t}</span>`).join("")}
-        </div>
+  $("#news-list").innerHTML = list.length ? list.map(n => `
+    <li class="news-item">
+      <a href="${esc(n.link)}" target="_blank" rel="noopener" title="${esc(n.title)}">${esc(n.title_it || n.title)}</a>
+      <div class="news-meta">
+        <span class="news-src ${n.source === "Polymarket" ? "src-poly" : ""}">${esc(n.source)}</span>
+        <span class="news-time">${timeAgo(n.published)}</span>
+        ${n.tickers.map(t => `<span class="news-tk">${t === "MACRO" ? "Macro" : t}</span>`).join("")}
       </div>
-    </li>`;
-  }).join("") : '<li class="muted">Nessuna news per il filtro selezionato</li>';
+    </li>`).join("") : '<li class="muted">Nessuna news per il filtro selezionato</li>';
 }
 
-/* ---------------- sentiment & dati alternativi (Polymarket) ---------------- */
-function renderPredictions() {
-  const list = DATA.predictions || [];
-  const card = $("#altdata-card");
-  if (!list.length) { if (card) card.style.display = "none"; return; }
-  if (card) card.style.display = "";
-  $("#pred-list").innerHTML = list.map(p => {
-    const col = p.yes >= 60 ? "var(--green)" : p.yes >= 40 ? "var(--yellow)" : "var(--red)";
-    return `<li class="pred-item">
-      <a href="${esc(p.link)}" target="_blank" rel="noopener">${esc(p.question)}</a>
-      <div class="pred-bar"><span style="width:${p.yes}%;background:${col}"></span></div>
-      <span class="pred-pct" style="color:${col}">${p.yes}%</span>
-    </li>`;
-  }).join("");
-}
 
 /* ---------------- prompt AI ---------------- */
 function buildPrompt() {
@@ -977,6 +1018,74 @@ $("#btn-copy").addEventListener("click", async () => {
   await navigator.clipboard.writeText($("#prompt-text").value);
   toast("Copiato ✓");
 });
+/* ---------------- calcolo vendite (plus/minusvalenze) ---------------- */
+function sellRows() {
+  const eur = DATA.eurusd || 1.08;
+  return DATA.portfolio.map(r => {
+    const toEur = r.currency === "EUR" ? 1 : 1 / eur;
+    const plPerShare = (r.price - r.pmc) * toEur;   // utile/perdita per azione in €
+    return { ...r, plPerShare, taxRate: r.ticker === "BTP-V28" ? 0.125 : 0.26 };
+  });
+}
+
+function renderSellCalc() {
+  const rows = sellRows();
+  $("#sell-table tbody").innerHTML = rows.map(r => {
+    const c = cur(r);
+    const qty = r.ticker === "BTP-V28" ? r.qty : r.qty;
+    return `<tr data-tk="${r.ticker}">
+      <td class="name-cell">${r.name}<span class="tk">${r.ticker}</span></td>
+      <td class="num">${fmtNum.format(r.qty)}</td>
+      <td class="num">${c}${fmtNum.format(r.pmc)}</td>
+      <td class="num">${c}${fmtNum.format(r.price)}</td>
+      <td class="num"><input type="number" class="sell-in" data-tk="${r.ticker}" min="0" max="${r.qty}" step="any" placeholder="0" style="width:90px"></td>
+      <td class="num sell-pl" data-tk="${r.ticker}">—</td>
+    </tr>`;
+  }).join("");
+  document.querySelectorAll(".sell-in").forEach(i => i.addEventListener("input", computeSell));
+  computeSell();
+}
+
+function computeSell() {
+  const rows = sellRows();
+  const byTk = Object.fromEntries(rows.map(r => [r.ticker, r]));
+  let gains = 0, losses = 0, taxStock = 0, taxBtp = 0, stockNet = 0, btpNet = 0;
+  document.querySelectorAll(".sell-in").forEach(inp => {
+    const r = byTk[inp.dataset.tk];
+    const q = Math.min(parseFloat(inp.value) || 0, r.qty);
+    const pl = r.plPerShare * q;
+    const cell = document.querySelector(`.sell-pl[data-tk="${inp.dataset.tk}"]`);
+    cell.textContent = q ? signTxt(Math.round(pl), " €") : "—";
+    cell.className = `num sell-pl ${signCls(pl)}`;
+    if (q) { if (pl >= 0) gains += pl; else losses += pl; }
+    if (r.ticker === "BTP-V28") btpNet += pl; else stockNet += pl;
+  });
+  // minusvalenze compensano le plusvalenze; tassa solo sul netto positivo
+  taxStock = 0.26 * Math.max(0, stockNet);
+  taxBtp = 0.125 * Math.max(0, btpNet);
+  const net = gains + losses;          // losses è negativo
+  const tax = taxStock + taxBtp;
+  const afterTax = net - tax;
+  // grafico a barre: plus (verde), minus (rosso), netto
+  const maxAbs = Math.max(gains, Math.abs(losses), Math.abs(net), 1);
+  const bar = (v, col) => `<div class="sb-row"><span class="sb-lab">${v < 0 ? "Minusvalenze" : v === net ? "Netto" : "Plusvalenze"}</span>
+    <span class="sb-track"><span class="sb-fill" style="width:${Math.abs(v) / maxAbs * 100}%;background:${col}"></span></span>
+    <span class="sb-val ${signCls(v)}">${signTxt(Math.round(v), " €")}</span></div>`;
+  $("#sell-summary").innerHTML = `
+    <div class="sell-bars">
+      ${bar(gains, "var(--green)")}
+      ${bar(losses, "var(--red)")}
+      ${bar(net, net >= 0 ? "var(--blue)" : "var(--red)")}
+    </div>
+    <div class="sell-totals">
+      <div><span class="muted">Plusvalenze</span> <b class="pos">${signTxt(Math.round(gains), " €")}</b></div>
+      <div><span class="muted">Minusvalenze</span> <b class="neg">${signTxt(Math.round(losses), " €")}</b></div>
+      <div><span class="muted">Risultato lordo</span> <b class="${signCls(net)}">${signTxt(Math.round(net), " €")}</b></div>
+      <div><span class="muted">Tasse stimate (26% az. / 12,5% BTP, al netto delle minus)</span> <b class="neg">−${fmtEUR.format(Math.round(tax))}</b></div>
+      <div><span class="muted">Incasso netto stimato</span> <b class="${signCls(afterTax)}">${signTxt(Math.round(afterTax), " €")}</b></div>
+    </div>`;
+}
+
 /* ---------------- calcolatore PMC ---------------- */
 function pmcCompute() {
   const v = (id) => parseFloat($(id).value) || 0;
@@ -1053,6 +1162,23 @@ $("#news-trending").addEventListener("click", (e) => {
   if (!chip) return;
   newsFilter = chip.dataset.topic || null;
   renderNews();
+});
+
+/* zoom grafici */
+$("#hist-zoom").addEventListener("click", () => {
+  const h = DATA.history && DATA.history[histRange];
+  if (h) openChartModal(`Andamento portafoglio — ${histRange.toUpperCase()}`, h.values, h.dates, v => fmtEUR.format(Math.round(v)));
+});
+$("#chart-modal-close").addEventListener("click", closeChartModal);
+$("#chart-modal").addEventListener("click", e => { if (e.target.id === "chart-modal") closeChartModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeChartModal(); });
+document.addEventListener("click", (e) => {
+  const cell = e.target.closest(".spark-cell");
+  if (!cell) return;
+  const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
+  const r = all.find(x => x.ticker === cell.dataset.tk);
+  if (r) openChartModal(`${r.name} (${r.ticker}) — ${sparkRange.toUpperCase()}`, (r.sparks || {})[sparkRange], null,
+    v => (r.currency === "PTS" ? "" : r.currency === "EUR" ? "€" : "$") + fmtNum.format(v));
 });
 
 /* modifica posizioni */

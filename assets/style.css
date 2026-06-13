@@ -285,10 +285,39 @@ th.sortable:hover { color: var(--text); }
 }
 .row-add:hover { background: var(--green); color: #fff; }
 
-/* ---------- news: sentiment + trending ---------- */
-.news-item { display: flex; gap: 10px; align-items: flex-start; }
-.news-body { flex: 1; }
-.sent { font-size: 13px; line-height: 1.5; flex-shrink: 0; }
+/* ---------- F&G termometro ---------- */
+.thermo { position: relative; height: 12px; margin: 14px 4px 4px; }
+.thermo-scale { height: 8px; border-radius: 5px; background: linear-gradient(90deg,#ef4444,#f59e0b,#a3a3a3,#22c55e,#22d3ee); }
+.thermo-marker { position: absolute; top: -3px; width: 4px; height: 14px; border-radius: 2px; background: var(--text); transform: translateX(-50%); box-shadow: 0 0 0 2px var(--card); }
+.thermo-ends { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin: 2px 4px 0; }
+
+/* ---------- rendimenti reali broker ---------- */
+.broker-row { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px; }
+.bk-title { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.bk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.bk-cell { background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+.bk-lab { font-size: 10.5px; color: var(--muted); }
+.bk-val { font-family: var(--mono); font-weight: 700; font-size: 14px; margin-top: 3px; }
+
+/* ---------- calcolo vendite ---------- */
+.sell-in { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; font-family: var(--mono); }
+.sell-summary { margin-top: 16px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
+@media (max-width: 760px) { .sell-summary { grid-template-columns: 1fr; } }
+.sb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.sb-lab { width: 110px; font-size: 12px; color: var(--muted); }
+.sb-track { flex: 1; height: 14px; background: var(--card-2); border-radius: 7px; overflow: hidden; }
+.sb-fill { display: block; height: 100%; border-radius: 7px; }
+.sb-val { font-family: var(--mono); font-weight: 700; min-width: 90px; text-align: right; }
+.sell-totals div { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.sell-totals b { font-family: var(--mono); }
+
+/* ---------- zoom grafico ---------- */
+.spark-cell { cursor: pointer; }
+.modal-chart { max-width: 920px; width: 94vw; }
+#cm-hit { cursor: crosshair; }
+.src-poly { background: rgba(139,92,246,.2); color: var(--purple); padding: 1px 6px; border-radius: 4px; }
+
+/* ---------- news: trending ---------- */
 .news-trending { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .trend-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
 .trend-chip {

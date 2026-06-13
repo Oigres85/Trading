@@ -17,5 +17,20 @@
   {"ticker": "^IXIC", "name": "Nasdaq Composite", "currency": "PTS"},
   {"ticker": "BTC-USD", "name": "Bitcoin", "currency": "USD"},
   {"ticker": "CL=F", "name": "Petrolio WTI", "currency": "USD"}
- ]
+ ],
+ "broker": {
+  "as_of": "2026-06-13",
+  "controvalore_totale": 307846.68,
+  "profitto_totale_pct": 96.41,
+  "profitto_totale_eur": 150968.07,
+  "controvalore_azioni": 266266.68,
+  "profitto_usd_pct": 141.72,
+  "profitto_usd": 180574.05,
+  "ytd_pct": 59.88,
+  "y1_pct": 101.02,
+  "inception_pct": 172.55,
+  "controvalore_iniziale_1y": 136008.35,
+  "investimenti": 55995.8,
+  "cedole_btp": 1505.0
+ }
 }
