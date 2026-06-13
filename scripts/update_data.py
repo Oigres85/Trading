@@ -94,28 +94,51 @@ TOP_CAP_CANDIDATES = {
     "MA": "Mastercard", "COST": "Costco", "ASML": "ASML", "2222.SR": "Saudi Aramco",
 }
 
-NEWS_FEEDS = [
-    ("CNBC", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258"),
-    ("Bloomberg", "https://feeds.bloomberg.com/markets/news.rss"),
-    ("Yahoo Finance", "https://finance.yahoo.com/news/rssindex"),
-    ("Investing.com", "https://www.investing.com/rss/news_25.rss"),
-    ("Google News", "https://news.google.com/rss/search?q=Nvidia+OR+AMD+OR+Micron+OR+Intel+OR+Tesla&hl=en-US&gl=US&ceid=US:en"),
-    ("Google News", "https://news.google.com/rss/search?q=MicroStrategy+OR+%22Rigetti+Computing%22+OR+%22Oklo%22+OR+%22Arbe+Robotics%22+OR+%22BTP+Valore%22&hl=en-US&gl=US&ceid=US:en"),
-    ("Google News", "https://news.google.com/rss/search?q=%22Federal+Reserve%22+OR+%22US+inflation%22+OR+%22White+House%22+economy+OR+tariffs&hl=en-US&gl=US&ceid=US:en"),
-    ("Google News", "https://news.google.com/rss/search?q=(Trump+OR+Iran+OR+Israel+OR+war+OR+China+OR+OPEC+OR+oil)+(market+OR+stocks+OR+economy+OR+Fed)&hl=en-US&gl=US&ceid=US:en"),
-    ("Google News", "https://news.google.com/rss/search?q=when:3d+(Iran+OR+Israel+OR+Ukraine+OR+Russia+OR+China+OR+tariffs+OR+%22Trump%22)+when:3d&hl=en-US&gl=US&ceid=US:en"),
-    ("Google News", "https://news.google.com/rss/search?q=when:2d+stock+market+OR+wall+street+OR+%22federal+reserve%22&hl=en-US&gl=US&ceid=US:en"),
-    ("Yahoo Finance", "https://finance.yahoo.com/news/rssindex"),
-    ("CNBC", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664"),
-    ("Reuters", "https://news.google.com/rss/search?q=when:3d+site:reuters.com+(markets+OR+economy+OR+Fed+OR+Iran+OR+stocks)&hl=en-US&gl=US&ceid=US:en"),
-    ("Reddit", "https://www.reddit.com/r/stocks/.rss"),
-    ("Reddit", "https://www.reddit.com/r/wallstreetbets/.rss"),
-]
+def gnews(query):
+    return ("https://news.google.com/rss/search?q="
+            + urllib.parse.quote(f"{query} when:4d") + "&hl=en-US&gl=US&ceid=US:en")
 
-# domini a pagamento (le notizie non leggibili senza abbonamento vanno escluse)
+
+def build_feeds():
+    """Feed costruiti dinamicamente: fonti dirette diverse + un feed per ogni titolo in
+    portafoglio/watchlist (così le news si adattano e variano)."""
+    feeds = [
+        # testate dirette (feed nativi)
+        ("CNBC", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114"),
+        ("CNBC Markets", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258"),
+        ("Yahoo Finance", "https://finance.yahoo.com/news/rssindex"),
+        ("Investing.com", "https://www.investing.com/rss/news_25.rss"),
+        ("MarketWatch", "https://feeds.content.dowjones.io/public/rss/mw_topstories"),
+        ("Bloomberg", "https://feeds.bloomberg.com/markets/news.rss"),
+        ("Reddit", "https://www.reddit.com/r/stocks/.rss"),
+        ("Reddit", "https://www.reddit.com/r/investing/.rss"),
+        # macro / geopolitica (per fonte, via Google con site:)
+        ("Reuters", gnews("site:reuters.com (markets OR economy OR Fed OR Iran OR stocks OR tariffs)")),
+        ("AP", gnews("site:apnews.com (economy OR markets OR Iran OR Fed OR Trump OR China)")),
+        ("CNBC", gnews("site:cnbc.com (Fed OR inflation OR market OR earnings)")),
+        ("Google News", gnews("Federal Reserve OR US inflation OR White House economy OR tariffs OR jobs report")),
+        ("Google News", gnews("Iran OR Israel OR Ukraine OR Russia OR China trade OR OPEC oil (markets OR economy OR war)")),
+    ]
+    # un feed dedicato per ogni posizione e titolo in watchlist
+    for p in PORTFOLIO + WATCHLIST:
+        nm = (p.get("name") or p["ticker"])
+        if p["ticker"] in ("BTC-USD",):
+            q = "Bitcoin OR crypto"
+        elif p["ticker"] == "BTP-V28":
+            q = '"BTP Valore" OR "Italian bonds" OR BTP'
+        elif p.get("currency") == "PTS":
+            continue
+        else:
+            q = f'"{nm}" OR {p["ticker"]} stock'
+        feeds.append(("Google News", gnews(q)))
+    return feeds
+
+
+# domini a pagamento: le loro notizie restano, ma il link punta a una ricerca Google
+# (così trovi una versione leggibile gratis invece del paywall)
 PAYWALL_DOMAINS = ("wsj.com", "ft.com", "barrons.com", "economist.com", "seekingalpha.com",
                    "bloomberg.com", "nytimes.com", "thetimes", "telegraph.co.uk",
-                   "businessinsider.com", "theinformation.com", "forbes.com")
+                   "businessinsider.com", "theinformation.com")
 
 # pattern regex (word boundary) per associare le news ai titoli
 PORTFOLIO_KEYWORDS = {
@@ -877,12 +900,13 @@ def fetch_news():
     Esclude articoli a pagamento e doppioni sullo stesso argomento. Include Polymarket."""
     keywords = build_keywords()
     items, seen_titles, kept_keys, per_source = [], set(), [], {}
-    for source, url in NEWS_FEEDS:
+    for source, url in build_feeds():
         for title, link, ts in parse_feed_entries(url):
             if not title or title.lower() in seen_titles:
                 continue
-            if any(d in (link or "").lower() for d in PAYWALL_DOMAINS):   # niente paywall
-                continue
+            # paywall: non scartare, ma punta a una ricerca Google (versione gratuita)
+            if any(d in (link or "").lower() for d in PAYWALL_DOMAINS):
+                link = "https://news.google.com/search?q=" + urllib.parse.quote(title)
             tickers = [tk for tk, kws in keywords.items()
                        if any(re.search(kw, title.lower()) for kw in kws)]
             if not tickers:
@@ -890,7 +914,7 @@ def fetch_news():
             key = topic_key(title)
             if is_duplicate_topic(key, kept_keys):     # niente doppioni di argomento
                 continue
-            if per_source.get(source, 0) >= 12:        # varietà tra le fonti
+            if per_source.get(source, 0) >= 8:         # varietà tra le fonti
                 continue
             seen_titles.add(title.lower())
             kept_keys.append(key)

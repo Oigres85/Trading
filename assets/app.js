@@ -601,7 +601,7 @@ function techCells(r) {
 }
 
 /* ---------------- zoom grafico (modale, touch + mouse) ---------------- */
-function openChartModal(title, vals, dates, fmt) {
+function openChartModal(title, vals, dates, fmt, controlsHTML) {
   if (!vals || vals.length < 2) { toast("Grafico non disponibile per questo intervallo"); return; }
   fmt = fmt || (v => fmtNum.format(v));
   const W = 900, H = 380, pad = { l: 64, r: 16, t: 16, b: 28 };
@@ -616,7 +616,7 @@ function openChartModal(title, vals, dates, fmt) {
       <text x="${pad.l - 8}" y="${(gy + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(gv)}</text>`;
   }).join("");
   $("#chart-modal-title").textContent = title;
-  $("#chart-modal-body").innerHTML = `<svg id="cm-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
+  $("#chart-modal-body").innerHTML = (controlsHTML || "") + `<svg id="cm-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
     <defs><linearGradient id="cmg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="${col}" stop-opacity="0.25"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
     ${grid}
@@ -646,6 +646,95 @@ function openChartModal(title, vals, dates, fmt) {
   hit.addEventListener("touchstart", move);
 }
 function closeChartModal() { $("#chart-modal").hidden = true; }
+
+/* zoom del grafico di un singolo titolo, con selettore range e date sul punto */
+let cmTicker = null, cmRange = "m1";
+const CM_RANGES = [["d1", "1G"], ["w1", "1S"], ["m1", "1M"], ["m3", "3M"], ["y1", "1A"]];
+const CM_SPAN = { d1: 1, w1: 7, m1: 31, m3: 92, y1: 365 };   // giorni coperti (per le date)
+
+function synthDates(range, n) {
+  const span = CM_SPAN[range] || 30, today = Date.now(), out = [];
+  for (let i = 0; i < n; i++) out.push(new Date(today - (n - 1 - i) * (span / (n - 1 || 1)) * 86400000).toISOString().slice(0, 10));
+  return out;
+}
+
+function drawTickerChart() {
+  const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
+  const r = all.find(x => x.ticker === cmTicker);
+  if (!r) return;
+  const vals = (r.sparks || {})[cmRange];
+  const sym = r.currency === "PTS" ? "" : r.currency === "EUR" ? "€" : "$";
+  const controls = `<div class="spark-toggle cm-ranges">` +
+    CM_RANGES.map(([k, lab]) => `<button class="chip cm-range ${k === cmRange ? "chip-active" : ""}" data-range="${k}">${lab}</button>`).join("") + `</div>`;
+  openChartModal(`${r.name} (${r.ticker})`, vals, synthDates(cmRange, (vals || []).length),
+    v => sym + fmtNum.format(v), controls);
+}
+
+function openTickerChart(ticker) {
+  cmTicker = ticker; cmRange = sparkRange in CM_SPAN ? sparkRange : "m1";
+  drawTickerChart();
+}
+
+/* ---------------- popup informativi (macro / trimestrali) ---------------- */
+function relatedNews(rx, n = 6) {
+  const list = (DATA.news || []).filter(x => rx.test(x.title_it || x.title)).slice(0, n);
+  if (!list.length) return '<div class="muted">Nessuna notizia correlata recente.</div>';
+  return '<ul class="news-list" style="columns:1">' + list.map(x =>
+    `<li class="news-item"><a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title_it || x.title)}</a>
+     <div class="news-meta"><span class="news-src">${esc(x.source)}</span><span class="news-time">${timeAgo(x.published)}</span></div></li>`).join("") + "</ul>";
+}
+
+// descrizione + cadenza pubblicazione (indicativa) per indicatore/box
+const MACRO_INFO = {
+  "in:cpi": ["Inflazione CPI (a/a)", "Indice prezzi al consumo USA. Sopra il target Fed del 2% alimenta pressioni sui tassi.", "Pubblicazione mensile, ~10–15 del mese (BLS)", /inflaz|inflation|\bcpi\b|prezzi/i],
+  "in:pce": ["Inflazione PCE (a/a)", "Misura d'inflazione preferita dalla Fed.", "Mensile, fine mese (BEA)", /\bpce\b|inflaz|inflation/i],
+  "in:gdp": ["PIL USA", "Crescita economica trimestrale annualizzata.", "Trimestrale (3 stime: anticipata, seconda, finale)", /\bpil\b|\bgdp\b|economia|economy|crescita/i],
+  "in:retail": ["Vendite al dettaglio", "Spesa dei consumatori, indicatore di domanda.", "Mensile, ~metà mese (Census)", /vendite|retail|consum/i],
+  "in:nfp": ["Non-Farm Payrolls", "Nuovi posti di lavoro USA, market mover sui tassi.", "Mensile, primo venerdì (BLS)", /payroll|lavoro|jobs|occupa/i],
+  "in:unemp": ["Disoccupazione", "Tasso di disoccupazione USA.", "Mensile, primo venerdì (BLS)", /disoccupa|unemploy|jobs/i],
+  "in:pmi": ["Fiducia consumatori", "Sentiment delle famiglie USA (Univ. Michigan).", "Mensile (preliminare + finale)", /fiducia|sentiment|consumer|michigan/i],
+  "in:curve": ["Curva 10A-2A", "Spread dei rendimenti; se negativo (inversione) storico segnale di recessione.", "Aggiornato in continuo", /curva|treasur|yield|recess|rendiment/i],
+  "mk:^TNX": ["Treasury USA 10 anni", "Rendimento del decennale USA: sale = condizioni più restrittive.", "Mercato aperto USA", /treasur|10.?anni|yield|rendiment|bond/i],
+  "mk:EURUSD=X": ["Cambio EUR/USD", "Euro contro dollaro: incide sul valore in € delle azioni USA.", "Continuo (forex)", /euro|dollar|eur.?usd|cambio|fx/i],
+  "mk:EURJPY=X": ["Cambio EUR/JPY", "Euro contro yen.", "Continuo (forex)", /yen|jpy|euro|cambio/i],
+  fear_greed: ["Fear & Greed Index", "Sentiment di mercato CNN: 0 paura estrema, 100 avidità estrema.", "Aggiornato giornalmente", /sentiment|fear|greed|paura|avidit|rally|selloff/i],
+  vix: ["VIX — Volatilità", "Indice della volatilità attesa S&P500 (\"indice della paura\").", "Mercato aperto USA", /vix|volatil|selloff|panic|paura/i],
+  fedwatch: ["FedWatch", "Aspettative di mercato sui tassi Fed dai futures sui Fed Funds.", "Riunioni FOMC ~ogni 6 settimane", /fed|powell|tass|rate|fomc|interest/i],
+  carry: ["Carry USA–Giappone", "Differenziale di rendimento USA-Giappone, motore del carry trade su USD/JPY.", "Continuo", /carry|yen|jpy|japan|giappone|boj/i],
+  putcall: ["Put/Call ratio", "Rapporto opzioni put/call: alto = copertura/pessimismo.", "Mercato aperto USA", /option|put|call|hedge/i],
+  sentiment: ["Sentiment globale", "Indicatore composito risk-on/risk-off.", "Aggiornato a ogni refresh", /sentiment|risk|rally|selloff|market/i],
+  thermometer: ["Termometro portafoglio", "Media della salute tecnica (RSI, trend, momentum) dei tuoi titoli.", "Aggiornato a ogni refresh", /(?!)/],
+};
+
+function openInfoModal(title, bodyHTML) {
+  $("#chart-modal-title").textContent = title;
+  $("#chart-modal-body").innerHTML = bodyHTML;
+  $("#chart-modal-tip").innerHTML = "";
+  $("#chart-modal").hidden = false;
+}
+
+function openMacroInfo(key) {
+  const info = MACRO_INFO[key];
+  if (!info) return;
+  const [name, desc, cadence, rx] = info;
+  openInfoModal(name, `<p style="margin:0 0 10px">${desc}</p>
+    <div class="info-line">📅 <b>Prossima pubblicazione:</b> ${cadence}</div>
+    <div class="info-line muted" style="margin-bottom:12px">Le date esatte possono variare; consulta un calendario economico per la conferma.</div>
+    <h4 style="margin:6px 0">Notizie correlate</h4>${relatedNews(rx)}`);
+}
+
+function openEarningsInfo(ticker) {
+  const r = (DATA.portfolio || []).find(x => x.ticker === ticker);
+  if (!r) return;
+  const days = r.earnings_date ? Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) : null;
+  const rx = new RegExp(`${ticker}|${(r.name || "").split(" ")[0]}|earnings|trimestral|utili|risultati`, "i");
+  openInfoModal(`${r.name} (${ticker}) — Trimestrale`, `
+    <div class="info-line">📅 <b>Data attesa:</b> ${r.earnings_date ? new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "n/d"} ${days != null ? `(tra ${days} gg)` : ""}</div>
+    ${r.eps != null ? `<div class="info-line"><b>EPS (ultimo):</b> ${fmtNum.format(r.eps)}</div>` : ""}
+    ${r.rating?.target ? `<div class="info-line"><b>Target analisti:</b> ${cur(r)}${fmtNum.format(r.rating.target)} (${signTxt(r.rating.upside_pct)})</div>` : ""}
+    <div class="info-line muted" style="margin-bottom:12px">Confronta i risultati con le attese degli analisti per valutare beat/miss.</div>
+    <h4 style="margin:6px 0">Notizie correlate</h4>${relatedNews(rx)}`);
+}
 
 function delBtn(section, ticker) {
   return editMode[section] && ticker !== "BTP-V28"
@@ -713,7 +802,7 @@ function renderEarnings() {
     // termometro: più vicina = barra più piena e più "calda"
     const pct = Math.max(6, Math.min(100, 100 - r.days * 1.1));
     const color = r.days <= 7 ? "var(--red)" : r.days <= 21 ? "var(--yellow)" : "var(--green)";
-    return `<div class="earn-card" title="${esc(r.name)} — trimestrale il ${d}">
+    return `<div class="earn-card" data-earn="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per dettagli">
       <div class="earn-top"><span class="earn-tk">${r.ticker}</span><span class="earn-when">${when}</span></div>
       <div class="earn-date">${d}</div>
       <div class="impact"><span class="impact-fill" style="width:${pct}%;background:${color}"></span></div>
@@ -743,98 +832,70 @@ function fgColor(score) {
 
 const FG_LABELS = { "extreme fear": "Paura estrema", fear: "Paura", neutral: "Neutrale", greed: "Avidità", "extreme greed": "Avidità estrema" };
 
+/* colore sfumato verde(100)→arancio(50)→rosso(0) */
+function scoreColor(s) {
+  const h = Math.max(0, Math.min(120, (s / 100) * 120));   // 0=rosso, 60=giallo, 120=verde
+  return `hsl(${h.toFixed(0)} 75% 47%)`;
+}
+function thermoBar(score, ends) {
+  const s = Math.max(0, Math.min(100, score));
+  return `<div class="thermo"><div class="thermo-scale"></div>
+    <div class="thermo-marker" style="left:${s}%"></div></div>
+    ${ends ? `<div class="thermo-ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>` : ""}`;
+}
+/* card termometro uniforme; score 0-100 (100=positivo/verde). key per il popup */
+function thermoCard(key, title, score, valueText, subText, ends) {
+  return `<div class="gauge-card" data-gauge="${key}" tabindex="0" role="button" title="Clicca per dettagli e news">
+    <div class="g-title">${title}</div>
+    ${thermoBar(score, ends)}
+    <div class="gauge-value" style="color:${scoreColor(score)}">${valueText}</div>
+    <div class="gauge-sub">${subText}</div>
+  </div>`;
+}
+
 function renderGauges() {
   const m = DATA.macro || {};
   const cards = [];
 
-  if (m.fear_greed) {
-    const fg = m.fear_greed;
-    cards.push(`<div class="gauge-card">
-      <div class="g-title">Fear &amp; Greed</div>
-      <div class="thermo">
-        <div class="thermo-scale"></div>
-        <div class="thermo-marker" style="left:${fg.score}%"></div>
-      </div>
-      <div class="thermo-ends"><span>Paura</span><span>Avidità</span></div>
-      <div class="gauge-value" style="color:${fgColor(fg.score)}">${fg.score}</div>
-      <div class="gauge-sub"><b>${FG_LABELS[fg.rating] || fg.rating}</b><br>
-      1 sett. fa: ${fg.week_ago} · 1 mese fa: ${fg.month_ago}</div>
-    </div>`);
-  }
-
-  if (m.vix) {
-    const vixPct = Math.min(100, (m.vix.value / 50) * 100);
-    const vixColor = m.vix.value < 17 ? "var(--green)" : m.vix.value < 25 ? "var(--yellow)" : "var(--red)";
-    cards.push(`<div class="gauge-card">
-      <div class="g-title">VIX — Volatilità</div>
-      ${gaugeSVG(vixPct, vixColor)}
-      <div class="gauge-value">${fmtNum.format(m.vix.value)}</div>
-      <div class="gauge-sub">${signTxt(m.vix.change_pct)} oggi<br>
-      ${m.vix.value < 17 ? "Mercato calmo" : m.vix.value < 25 ? "Tensione moderata" : "Alta volatilità"}</div>
-    </div>`);
-  }
-
-  if (m.fedwatch) {
-    const fw = m.fedwatch;
-    const dir = fw.delta_bp <= -10 ? `tagli prezzati (~${Math.abs(fw.delta_bp)} bp)` :
-                fw.delta_bp >= 10 ? `rialzi prezzati (~${fw.delta_bp} bp)` : "tassi fermi attesi";
-    cards.push(`<div class="gauge-card">
-      <div class="g-title">FedWatch (futures FF)</div>
-      <div style="padding:14px 0 6px"><div class="gauge-value">${fw.target_range}</div></div>
-      <div class="gauge-sub">Range obiettivo Fed attuale<br>
-      Tasso implicito: <b>${fmtNum.format(fw.implied_rate)}%</b><br>${dir}</div>
-    </div>`);
-  }
-
-  if (m.carry) {
-    const cy = m.carry;
-    // spread 0–5% mappato 0–100: più ampio = carry più favorevole
-    const pct = Math.max(0, Math.min(100, cy.spread / 5 * 100));
-    const color = cy.spread >= 3 ? "var(--green)" : cy.spread >= 1.5 ? "var(--yellow)" : "var(--red)";
-    cards.push(`<div class="gauge-card">
-      <div class="g-title">Carry USA–Giappone</div>
-      ${gaugeSVG(pct, color)}
-      <div class="gauge-value">${fmtNum.format(cy.spread)} pp</div>
-      <div class="gauge-sub">US10A ${fmtNum.format(cy.us10)}% − JGB10A ${fmtNum.format(cy.jp10)}%<br>
-      USD/JPY ${fmtNum.format(cy.usdjpy)} (${signTxt(cy.usdjpy_chg_1m)} 1 mese)</div>
-    </div>`);
-  }
-
-  if (m.putcall) {
-    const pc = m.putcall;
-    // ratio 0–2 mappato 0–100: alto = prevalgono put
-    const pct = Math.max(0, Math.min(100, pc.ratio / 2 * 100));
-    const color = pc.ratio <= 0.8 ? "var(--green)" : pc.ratio <= 1.1 ? "var(--yellow)" : "var(--red)";
-    cards.push(`<div class="gauge-card">
-      <div class="g-title">Put/Call ${pc.symbol}</div>
-      ${gaugeSVG(pct, color)}
-      <div class="gauge-value">${fmtNum.format(pc.ratio)}</div>
-      <div class="gauge-sub"><b>${pc.ratio > 1 ? "Prevalgono PUT" : "Prevalgono CALL"}</b> (${esc(pc.name)})<br>
-      put ${pc.puts.toLocaleString("it-IT")} · call ${pc.calls.toLocaleString("it-IT")}</div>
-    </div>`);
-  }
-
   if (m.risk_sentiment) {
     const rs = m.risk_sentiment;
-    const color = rs.score >= 60 ? "var(--green)" : rs.score <= 40 ? "var(--red)" : "var(--yellow)";
-    const detail = (rs.components || []).map(cp => `${esc(cp.label)} ${cp.score}`).join(" · ");
-    cards.unshift(`<div class="gauge-card">
-      <div class="g-title">Sentiment globale</div>
-      ${gaugeSVG(rs.score, color)}
-      <div class="gauge-value">${rs.score}</div>
-      <div class="gauge-sub"><b>${rs.label}</b><br><span title="${detail}">composito F&amp;G · VIX · P/C · BTC · 10A</span></div>
-    </div>`);
+    cards.push(thermoCard("sentiment", "Sentiment globale", rs.score, rs.score,
+      `<b>${rs.label}</b><br>composito F&amp;G · VIX · P/C · BTC · 10A`, ["Risk-off", "Risk-on"]));
   }
-
+  if (m.fear_greed) {
+    const fg = m.fear_greed;
+    cards.push(thermoCard("fear_greed", "Fear &amp; Greed", fg.score, fg.score,
+      `<b>${FG_LABELS[fg.rating] || fg.rating}</b><br>1 sett: ${fg.week_ago} · 1 mese: ${fg.month_ago}`, ["Paura", "Avidità"]));
+  }
+  if (m.vix) {
+    const score = Math.max(0, Math.min(100, 100 - m.vix.value / 50 * 100));   // VIX basso = verde
+    cards.push(thermoCard("vix", "VIX — Volatilità", score, fmtNum.format(m.vix.value),
+      `${signTxt(m.vix.change_pct)} oggi<br>${m.vix.value < 17 ? "Mercato calmo" : m.vix.value < 25 ? "Tensione moderata" : "Alta volatilità"}`, ["Calmo", "Panico"]));
+  }
+  if (m.fedwatch) {
+    const fw = m.fedwatch;
+    const score = Math.max(0, Math.min(100, 50 - fw.delta_bp));   // tagli prezzati = verde
+    const dir = fw.delta_bp <= -10 ? `tagli prezzati (~${Math.abs(fw.delta_bp)} bp)` :
+                fw.delta_bp >= 10 ? `rialzi prezzati (~${fw.delta_bp} bp)` : "tassi fermi attesi";
+    cards.push(thermoCard("fedwatch", "FedWatch (futures FF)", score, fw.target_range,
+      `implicito <b>${fmtNum.format(fw.implied_rate)}%</b> · ${dir}`, ["Restrittivo", "Accomodante"]));
+  }
+  if (m.carry) {
+    const cy = m.carry;
+    const score = Math.max(0, Math.min(100, cy.spread / 5 * 100));
+    cards.push(thermoCard("carry", "Carry USA–Giappone", score, `${fmtNum.format(cy.spread)} pp`,
+      `US10A ${fmtNum.format(cy.us10)}% − JGB ${fmtNum.format(cy.jp10)}%<br>USD/JPY ${fmtNum.format(cy.usdjpy)} (${signTxt(cy.usdjpy_chg_1m)} 1m)`, ["Basso", "Alto"]));
+  }
+  if (m.putcall) {
+    const pc = m.putcall;
+    const score = Math.max(0, Math.min(100, 100 - pc.ratio / 2 * 100));   // più call = verde
+    cards.push(thermoCard("putcall", `Put/Call ${pc.symbol}`, score, fmtNum.format(pc.ratio),
+      `<b>${pc.ratio > 1 ? "Prevalgono PUT" : "Prevalgono CALL"}</b><br>put ${pc.puts.toLocaleString("it-IT")} · call ${pc.calls.toLocaleString("it-IT")}`, ["Call", "Put"]));
+  }
   if (m.thermometer) {
     const th = m.thermometer;
-    const color = th.score >= 60 ? "var(--green)" : th.score <= 40 ? "var(--red)" : "var(--yellow)";
-    cards.push(`<div class="gauge-card">
-      <div class="g-title">Termometro portafoglio</div>
-      ${gaugeSVG(th.score, color)}
-      <div class="gauge-value">${th.score}</div>
-      <div class="gauge-sub"><b>${th.label}</b><br>media RSI + trend + momentum dei titoli</div>
-    </div>`);
+    cards.push(thermoCard("thermometer", "Termometro portafoglio", th.score, th.score,
+      `<b>${th.label}</b><br>media RSI + trend + momentum`, ["Debole", "Forte"]));
   }
 
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
@@ -845,9 +906,8 @@ const MACRO_ACCENTS = { cpi: "var(--red)", pce: "var(--yellow)", gdp: "var(--blu
 
 function impactBar(score, titleTxt) {
   if (score === null || score === undefined) return "";
-  const color = score >= 60 ? "var(--green)" : score >= 40 ? "var(--yellow)" : "var(--red)";
   return `<div class="impact" title="${titleTxt || "impatto sul mercato"}: ${score}/100">
-    <span class="impact-fill" style="width:${Math.max(4, score)}%;background:${color}"></span>
+    <span class="impact-fill" style="width:${Math.max(4, score)}%;background:${scoreColor(score)}"></span>
   </div>`;
 }
 
@@ -860,14 +920,14 @@ function marketImpact(m) {
 
 function renderMacro() {
   const markets = (DATA.macro?.markets || []).map(m => `
-    <div class="macro-item" style="--accent:${MACRO_ACCENTS[m.key] || "var(--blue)"}">
+    <div class="macro-item" data-macro="mk:${m.key}" tabindex="0" role="button" title="Clicca per dettagli e news" style="--accent:${MACRO_ACCENTS[m.key] || "var(--blue)"}">
       <div class="m-label">${m.label}</div>
       <div class="m-value">${m.value}</div>
       <div class="m-sub ${signCls(m.change_pct)}">${signTxt(m.change_pct, m.suffix || "%")} oggi</div>
       ${impactBar(marketImpact(m), "impatto della variazione odierna")}
     </div>`);
   const indicators = (DATA.macro?.indicators || []).map(i => `
-    <div class="macro-item" style="--accent:${MACRO_ACCENTS[i.key] || "var(--purple)"}">
+    <div class="macro-item" data-macro="in:${i.key}" tabindex="0" role="button" title="Clicca per dettagli e news" style="--accent:${MACRO_ACCENTS[i.key] || "var(--purple)"}">
       <div class="m-label">${i.label}</div>
       <div class="m-value">${i.value}</div>
       <div class="m-date">${i.date}</div>
@@ -886,7 +946,7 @@ function fmtMcap(v) {
 function renderTopCaps() {
   const list = DATA.top_caps || [];
   if (!list.length) { $("#topcaps").innerHTML = ""; return; }
-  $("#topcaps").innerHTML = `<div class="m-label" style="margin:14px 0 8px">🏆 Top 10 capitalizzazioni mondiali</div>
+  $("#topcaps").innerHTML = `<div class="m-label" style="margin:14px 0 8px">Top 10 capitalizzazioni mondiali</div>
     <ol class="topcap-list">` + list.map((x, i) => `
       <li class="topcap-item">
         <span class="topcap-rank">${i + 1}</span>
@@ -1170,15 +1230,21 @@ $("#hist-zoom").addEventListener("click", () => {
   if (h) openChartModal(`Andamento portafoglio — ${histRange.toUpperCase()}`, h.values, h.dates, v => fmtEUR.format(Math.round(v)));
 });
 $("#chart-modal-close").addEventListener("click", closeChartModal);
-$("#chart-modal").addEventListener("click", e => { if (e.target.id === "chart-modal") closeChartModal(); });
+$("#chart-modal").addEventListener("click", e => {
+  if (e.target.id === "chart-modal") { closeChartModal(); return; }
+  const rb = e.target.closest(".cm-range");
+  if (rb) { cmRange = rb.dataset.range; drawTickerChart(); }
+});
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeChartModal(); });
 document.addEventListener("click", (e) => {
   const cell = e.target.closest(".spark-cell");
-  if (!cell) return;
-  const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
-  const r = all.find(x => x.ticker === cell.dataset.tk);
-  if (r) openChartModal(`${r.name} (${r.ticker}) — ${sparkRange.toUpperCase()}`, (r.sparks || {})[sparkRange], null,
-    v => (r.currency === "PTS" ? "" : r.currency === "EUR" ? "€" : "$") + fmtNum.format(v));
+  if (cell) { openTickerChart(cell.dataset.tk); return; }
+  const macro = e.target.closest("[data-macro]");
+  if (macro) { openMacroInfo(macro.dataset.macro); return; }
+  const gauge = e.target.closest("[data-gauge]");
+  if (gauge) { openMacroInfo(gauge.dataset.gauge); return; }
+  const earn = e.target.closest("[data-earn]");
+  if (earn) { openEarningsInfo(earn.dataset.earn); return; }
 });
 
 /* modifica posizioni */
