@@ -28,7 +28,9 @@ import pandas as pd
 import requests
 import yfinance as yf
 
-OUT = Path(__file__).resolve().parent.parent / "data" / "data.json"
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "data" / "data.json"
+CONFIG = ROOT / "config" / "holdings.json"
 
 UA = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -36,7 +38,8 @@ UA = {
     "Accept": "*/*",
 }
 
-PORTFOLIO = [
+# posizioni di default (usate se config/holdings.json manca)
+DEFAULT_PORTFOLIO = [
     {"ticker": "NVDA", "name": "NVIDIA",         "qty": 270,  "pmc": 87.17},
     {"ticker": "AMD",  "name": "AMD",            "qty": 125,  "pmc": 153.92},
     {"ticker": "MU",   "name": "Micron",         "qty": 90,   "pmc": 87.63},
@@ -46,17 +49,30 @@ PORTFOLIO = [
     {"ticker": "RGTI", "name": "Rigetti",        "qty": 515,  "pmc": 27.30},
     {"ticker": "ARBE", "name": "Arbe Robotics",  "qty": 1150, "pmc": 3.35},
 ]
-
-# (ticker, nome forzato, valuta) — valuta "PTS" = indice in punti, senza simbolo
-WATCHLIST = [
-    ("OKLO", None, "USD"),
-    ("SPCX", None, "USD"),
-    ("CBRS", None, "USD"),
-    ("^KS11", "KOSPI", "PTS"),
-    ("^IXIC", "Nasdaq Composite", "PTS"),
-    ("BTC-USD", "Bitcoin", "USD"),
-    ("CL=F", "Petrolio WTI", "USD"),
+DEFAULT_WATCHLIST = [
+    {"ticker": "OKLO", "name": None, "currency": "USD"},
+    {"ticker": "SPCX", "name": None, "currency": "USD"},
+    {"ticker": "CBRS", "name": None, "currency": "USD"},
+    {"ticker": "^KS11", "name": "KOSPI", "currency": "PTS"},
+    {"ticker": "^IXIC", "name": "Nasdaq Composite", "currency": "PTS"},
+    {"ticker": "BTC-USD", "name": "Bitcoin", "currency": "USD"},
+    {"ticker": "CL=F", "name": "Petrolio WTI", "currency": "USD"},
 ]
+
+
+def load_holdings():
+    """Legge le posizioni da config/holdings.json (modificabile da UI), con fallback ai default."""
+    try:
+        cfg = json.loads(CONFIG.read_text())
+        pf = cfg.get("portfolio") or DEFAULT_PORTFOLIO
+        wl = cfg.get("watchlist") or DEFAULT_WATCHLIST
+        return pf, wl
+    except Exception as e:  # noqa: BLE001
+        print(f"!! config holdings non leggibile, uso default: {e}", file=sys.stderr)
+        return DEFAULT_PORTFOLIO, DEFAULT_WATCHLIST
+
+
+PORTFOLIO, WATCHLIST = load_holdings()
 
 BTP = {
     "ticker": "BTP-V28", "name": "BTP Valore Ott 2028", "isin": "IT0005565400",
@@ -284,8 +300,8 @@ def fetch_equities():
 
 def fetch_watchlist():
     rows = []
-    for ticker, name, currency in WATCHLIST:
-        row = fetch_symbol(ticker, name, currency)
+    for w in WATCHLIST:
+        row = fetch_symbol(w["ticker"], w.get("name"), w.get("currency", "USD"))
         if row:
             rows.append(row)
     return rows
@@ -510,6 +526,13 @@ def fetch_macro():
                            "impact": round(clamp((v - 40) * 1.7))})
     except Exception as e:  # noqa: BLE001
         print(f"!! umcsent: {e}", file=sys.stderr)
+    try:
+        s = fred_series("T10Y2Y", 1)            # spread curva 10A-2A (segnale recessione)
+        v = s[-1][1]
+        indicators.append({"key": "curve", "label": "Curva 10A-2A", "value": f"{v:+.2f} pp",
+                           "date": s[-1][0], "impact": round(clamp(50 + v * 40))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! curve: {e}", file=sys.stderr)
 
     macro["indicators"] = indicators
 
@@ -608,6 +631,40 @@ def translate_it(text):
         return None
 
 
+def fetch_portfolio_history(btp_value_eur):
+    """Ricostruisce il valore del portafoglio (in EUR) nel tempo, a parità di
+    composizione attuale, usando i prezzi storici. Restituisce serie 1M / 12M / Max."""
+    tickers = [p["ticker"] for p in PORTFOLIO]
+    qty = {p["ticker"]: p["qty"] for p in PORTFOLIO}
+    try:
+        data = yf.download(tickers, period="5y", interval="1d",
+                           auto_adjust=True, progress=False)["Close"]
+        if isinstance(data, pd.Series):
+            data = data.to_frame()
+        fx = yf.Ticker("EURUSD=X").history(period="5y")["Close"]
+        fx.index = fx.index.tz_localize(None)
+        data.index = pd.to_datetime(data.index).tz_localize(None)
+        df = data.dropna()                       # parte da quando tutti i titoli esistono
+        if df.empty:
+            return None
+        eur = fx.reindex(df.index, method="ffill").bfill()
+        usd_val = sum(df[t] * qty[t] for t in tickers if t in df.columns)
+        total = usd_val / eur + btp_value_eur    # BTP ~ costante
+        total = total.dropna()
+
+        def series(window):
+            s = total if window is None else total.tail(window)
+            step = max(1, len(s) // 120)         # max ~120 punti per serie
+            s = s.iloc[::step]
+            return {"dates": [d.strftime("%Y-%m-%d") for d in s.index],
+                    "values": [round(float(v)) for v in s.values]}
+
+        return {"m1": series(22), "y1": series(252), "all": series(None)}
+    except Exception as e:  # noqa: BLE001
+        print(f"!! storico portafoglio: {e}", file=sys.stderr)
+        return None
+
+
 def fetch_top_caps(n=10):
     """Classifica delle aziende più capitalizzate (candidati noti, ordinati per market cap)."""
     rows, fx = [], {}
@@ -696,6 +753,15 @@ def main():
     tax = TAX_STOCK * max(0, stock_gain_eur) + TAX_BTP * max(0, btp["gain"])
     eur_gain = total_eur - cost_eur
 
+    # asset allocation dettagliata (valore in EUR per posizione)
+    allocation = []
+    for r in equities:
+        allocation.append({"ticker": r["ticker"], "name": r["name"],
+                           "value_eur": round(r["value"] / eurusd, 2)})
+    allocation.append({"ticker": btp["ticker"], "name": btp["name"],
+                       "value_eur": round(btp["value"], 2)})
+    allocation.sort(key=lambda x: x["value_eur"], reverse=True)
+
     data = {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "eurusd": round(eurusd, 4),
@@ -711,6 +777,8 @@ def main():
         },
         "portfolio": equities + [btp],
         "watchlist": watchlist,
+        "allocation": allocation,
+        "history": fetch_portfolio_history(btp["value"]),
         "macro": macro,
         "top_caps": fetch_top_caps(),
         "news": fetch_news(),

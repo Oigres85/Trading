@@ -95,52 +95,61 @@ async function loadData(showSpin = false) {
   }
 }
 
-/* Rigenera TUTTI i dati: lancia il workflow GitHub e attende il nuovo data.json.
-   Serve un token GitHub (fine-grained, repo Oigres85/Trading, permesso Actions
-   read&write), chiesto una sola volta e salvato solo in questo browser. */
-async function refreshAll() {
-  const btn = $("#btn-refresh");
+/* Token GitHub (fine-grained, repo Oigres85/Trading, permessi Actions:read&write +
+   Contents:read&write), chiesto UNA SOLA VOLTA e salvato solo in questo browser. */
+function getToken() {
   let token = localStorage.getItem("gh_token");
   if (!token) {
     token = window.prompt(
-      "Per rigenerare i dati in tempo reale serve un token GitHub del repo " + REPO +
-      " (fine-grained, permesso Actions: read & write).\n" +
-      "Viene salvato solo in questo browser.\n\n" +
-      "Incolla il token, oppure Annulla per ricaricare gli ultimi dati pubblicati:");
-    if (token) localStorage.setItem("gh_token", token.trim());
+      "Una sola volta: incolla un token GitHub del repo " + REPO +
+      " (fine-grained, permessi Actions e Contents: read & write).\n" +
+      "Resta salvato solo in questo browser, non te lo chiederà più.");
+    if (token) { token = token.trim(); localStorage.setItem("gh_token", token); }
   }
+  return token;
+}
+
+function ghHeaders(token) {
+  return { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" };
+}
+
+async function dispatchWorkflow(token) {
+  return fetch(`https://api.github.com/repos/${REPO}/actions/workflows/update-data.yml/dispatches`, {
+    method: "POST", headers: ghHeaders(token), body: JSON.stringify({ ref: "main" }),
+  });
+}
+
+/* attende il nuovo data.json (updated_at diverso dal precedente) */
+async function waitForNewData(prev, tries = 28) {
+  for (let i = 0; i < tries; i++) {
+    await new Promise(r => setTimeout(r, 15000));
+    try {
+      const d = await (await fetch(`data/data.json?t=${Date.now()}`, { cache: "no-store" })).json();
+      if (d.updated_at !== prev) { DATA = d; renderAll(); return true; }
+    } catch { /* riprova */ }
+  }
+  return false;
+}
+
+async function refreshAll() {
+  const btn = $("#btn-refresh");
+  const token = getToken();
   if (!token) { await loadData(true); return; }
 
   btn.classList.add("spinning");
   btn.textContent = "⏳ Rigenero…";
   try {
-    const res = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/update-data.yml/dispatches`, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${token.trim()}`, "Accept": "application/vnd.github+json" },
-      body: JSON.stringify({ ref: "main" }),
-    });
-    if (res.status === 401 || res.status === 403 || res.status === 404) {
+    const res = await dispatchWorkflow(token);
+    if ([401, 403, 404].includes(res.status)) {
       localStorage.removeItem("gh_token");
       toast("Token non valido o senza permessi — rimosso, riprova");
       return;
     }
     if (res.status !== 204) { toast(`Errore nell'avvio dell'aggiornamento (HTTP ${res.status})`); return; }
-
     toast("Aggiornamento avviato — i nuovi dati arrivano tra ~2-3 minuti");
-    const prev = DATA?.updated_at;
-    for (let i = 0; i < 24; i++) {          // massimo ~6 minuti
-      await new Promise(r => setTimeout(r, 15000));
-      try {
-        const d = await (await fetch(`data/data.json?t=${Date.now()}`, { cache: "no-store" })).json();
-        if (d.updated_at !== prev) {
-          DATA = d;
-          renderAll();
-          toast("Dati rigenerati ✓");
-          return;
-        }
-      } catch { /* tentativo successivo */ }
-    }
-    toast("L'aggiornamento è ancora in corso — riprova ⟳ tra qualche minuto");
+    if (!await waitForNewData(DATA?.updated_at))
+      toast("L'aggiornamento è ancora in corso — riprova ⟳ tra qualche minuto");
+    else toast("Dati rigenerati ✓");
   } catch (e) {
     console.error(e);
     toast("Errore di rete durante l'aggiornamento");
@@ -150,11 +159,87 @@ async function refreshAll() {
   }
 }
 
+/* ---------------- aggiungi/rimuovi titoli ---------------- */
+const editMode = { portfolio: false, watchlist: false };
+
+async function editHoldings(section, mutate) {
+  const token = getToken();
+  if (!token) { toast("Serve il token GitHub per modificare le posizioni"); return; }
+  toast("Salvo la modifica…");
+  try {
+    // 1) leggi config/holdings.json con il suo SHA
+    const path = "config/holdings.json";
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: ghHeaders(token), cache: "no-store" });
+    if (!r.ok) {
+      if ([401, 403, 404].includes(r.status)) { localStorage.removeItem("gh_token"); toast("Token non valido/insufficiente — rimosso, riprova"); }
+      else toast(`Errore lettura config (HTTP ${r.status})`);
+      return;
+    }
+    const file = await r.json();
+    const cfg = JSON.parse(decodeURIComponent(escape(atob(file.content))));
+    if (!mutate(cfg)) return;                 // mutate ritorna false se annullato/invalido
+    // 2) scrivi il nuovo config
+    const body = {
+      message: `Aggiorna posizioni (${section})`,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(cfg, null, 1)))),
+      sha: file.sha,
+    };
+    const put = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+      method: "PUT", headers: ghHeaders(token), body: JSON.stringify(body),
+    });
+    if (!put.ok) { toast(`Errore salvataggio (HTTP ${put.status})`); return; }
+    // 3) rigenera i dati
+    await dispatchWorkflow(token);
+    toast("Posizione aggiornata — rigenero i dati (~2-3 min)…");
+    if (await waitForNewData(DATA?.updated_at)) toast("Fatto ✓");
+    else toast("Modifica salvata, i dati si aggiornano a breve");
+  } catch (e) {
+    console.error(e);
+    toast("Errore durante la modifica");
+  }
+}
+
+function addPortfolio() {
+  const ticker = (window.prompt("Ticker da aggiungere al portafoglio (es. AAPL):") || "").trim().toUpperCase();
+  if (!ticker) return;
+  const qty = parseFloat(window.prompt(`Quantità di ${ticker}:`) || "");
+  const pmc = parseFloat(window.prompt(`Prezzo medio di carico (PMC) di ${ticker} in USD:`) || "");
+  if (!(qty > 0) || !(pmc > 0)) { toast("Quantità/PMC non validi"); return; }
+  editHoldings("portfolio", cfg => {
+    cfg.portfolio = cfg.portfolio || [];
+    if (cfg.portfolio.some(p => p.ticker === ticker)) { toast(`${ticker} è già in portafoglio`); return false; }
+    cfg.portfolio.push({ ticker, name: ticker, qty, pmc });
+    return true;
+  });
+}
+
+function addWatchlist() {
+  const ticker = (window.prompt("Ticker da aggiungere alla watchlist (es. AAPL, ^GSPC, BTC-USD):") || "").trim().toUpperCase();
+  if (!ticker) return;
+  editHoldings("watchlist", cfg => {
+    cfg.watchlist = cfg.watchlist || [];
+    if (cfg.watchlist.some(p => p.ticker === ticker)) { toast(`${ticker} è già in watchlist`); return false; }
+    cfg.watchlist.push({ ticker, name: null, currency: ticker.startsWith("^") ? "PTS" : "USD" });
+    return true;
+  });
+}
+
+function removeHolding(section, ticker) {
+  if (!window.confirm(`Rimuovere ${ticker} da ${section === "portfolio" ? "portafoglio" : "watchlist"}?`)) return;
+  editHoldings(section, cfg => {
+    const arr = cfg[section] || [];
+    const n = arr.length;
+    cfg[section] = arr.filter(p => p.ticker !== ticker);
+    return cfg[section].length < n;
+  });
+}
+
 function renderAll() {
   const d = new Date(DATA.updated_at);
   $("#updated-at").textContent = d.toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short" });
-  $("#fx-note").textContent = `EUR/USD ${fmtNum.format(DATA.eurusd)} — azioni in USD, BTP in EUR`;
   renderKPI();
+  renderHistory();
+  renderAllocation();
   renderEarnings();
   renderTable();
   renderWatchlist();
@@ -170,12 +255,12 @@ function renderKPI() {
   const t = DATA.totals;
   const net = t.eur_gain_net ?? t.eur_gain;
   const kpis = [
-    { label: "Guadagno netto tasse (€)", value: signTxt(Math.round(net), " €"),
-      sub: t.tax_est ? `tasse stimate −${fmtEUR.format(Math.round(t.tax_est))} (26% azioni, 12,5% BTP)` : "",
-      subCls: signCls(net), accent: net >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(net) },
     { label: "Guadagno totale lordo (€)", value: signTxt(Math.round(t.eur_gain), " €"),
       sub: `${signTxt(t.eur_gain_pct)} dal carico — valore ${fmtEUR.format(t.eur_value)}`,
       subCls: signCls(t.eur_gain), accent: "var(--blue)", valueCls: signCls(t.eur_gain) },
+    { label: "Guadagno netto tasse (€)", value: signTxt(Math.round(net), " €"),
+      sub: t.tax_est ? `tasse stimate −${fmtEUR.format(Math.round(t.tax_est))} (26% azioni, 12,5% BTP)` : "",
+      subCls: signCls(net), accent: net >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(net) },
   ];
 
   $("#kpi-grid").innerHTML = kpis.map(k => `
@@ -184,6 +269,85 @@ function renderKPI() {
       <div class="value ${k.valueCls || ""}">${k.value}</div>
       <div class="sub ${k.subCls || ""}">${k.sub || ""}</div>
     </div>`).join("");
+}
+
+/* ---------------- andamento portafoglio ---------------- */
+let histRange = "y1";   // m1 | y1 | all
+
+function renderHistory() {
+  const h = DATA.history && DATA.history[histRange];
+  const box = $("#hist-chart");
+  if (!h || h.values.length < 2) { box.innerHTML = '<div class="muted" style="padding:40px 0;text-align:center">Storico non disponibile</div>'; $("#hist-summary").textContent = ""; return; }
+  const vals = h.values, dates = h.dates;
+  const W = 560, H = 200, pad = { l: 56, r: 12, t: 12, b: 22 };
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const range = max - min || 1;
+  const x = i => pad.l + i / (vals.length - 1) * (W - pad.l - pad.r);
+  const y = v => pad.t + (1 - (v - min) / range) * (H - pad.t - pad.b);
+  const line = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const area = `${pad.l},${y(min)} ${line} ${x(vals.length - 1)},${y(min)}`;
+  const up = vals[vals.length - 1] >= vals[0];
+  const col = up ? "var(--green)" : "var(--red)";
+  // griglia 4 livelli
+  const grid = [0, .25, .5, .75, 1].map(f => {
+    const gv = min + range * f, gy = y(gv);
+    return `<line x1="${pad.l}" y1="${gy.toFixed(1)}" x2="${W - pad.r}" y2="${gy.toFixed(1)}" stroke="var(--border)" stroke-width="1"/>
+      <text x="${pad.l - 6}" y="${(gy + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--muted)">${fmtNum.format(Math.round(gv / 1000))}k</text>`;
+  }).join("");
+  // etichette x: prima, metà, ultima
+  const xl = [0, Math.floor(vals.length / 2), vals.length - 1].map(i => {
+    const dt = new Date(dates[i]).toLocaleDateString("it-IT", { month: "short", year: "2-digit" });
+    return `<text x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="middle" font-size="9" fill="var(--muted)">${dt}</text>`;
+  }).join("");
+  box.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:200px">
+    <defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${col}" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}
+    <polygon points="${area}" fill="url(#hg)"/>
+    <polyline points="${line}" fill="none" stroke="${col}" stroke-width="2"/>
+    ${xl}
+  </svg>`;
+  const first = vals[0], last = vals[vals.length - 1];
+  const chg = (last / first - 1) * 100;
+  $("#hist-summary").innerHTML = `${fmtEUR.format(first)} → <b>${fmtEUR.format(last)}</b>
+    <span class="${signCls(chg)}">${signTxt(Math.round(chg * 100) / 100)}</span>
+    nel periodo · min ${fmtEUR.format(min)} · max ${fmtEUR.format(max)}`;
+}
+
+/* ---------------- asset allocation (donut) ---------------- */
+const ALLOC_COLORS = ["#4c8dff", "#8b5cf6", "#22c55e", "#f59e0b", "#ef4444", "#22d3ee",
+  "#ec4899", "#14b8a6", "#a3a3a3", "#eab308", "#6366f1"];
+
+function renderAllocation() {
+  const list = DATA.allocation || [];
+  if (!list.length) { $("#alloc-donut").innerHTML = ""; $("#alloc-legend").innerHTML = ""; return; }
+  const total = list.reduce((s, x) => s + x.value_eur, 0);
+  const R = 70, r = 44, cx = 80, cy = 80;
+  let a0 = -Math.PI / 2;
+  const arcs = list.map((x, i) => {
+    const frac = x.value_eur / total;
+    const a1 = a0 + frac * 2 * Math.PI;
+    const large = frac > 0.5 ? 1 : 0;
+    const p = (ang, rad) => `${(cx + rad * Math.cos(ang)).toFixed(2)},${(cy + rad * Math.sin(ang)).toFixed(2)}`;
+    const d = `M ${p(a0, R)} A ${R} ${R} 0 ${large} 1 ${p(a1, R)} L ${p(a1, r)} A ${r} ${r} 0 ${large} 0 ${p(a0, r)} Z`;
+    a0 = a1;
+    return `<path d="${d}" fill="${ALLOC_COLORS[i % ALLOC_COLORS.length]}"><title>${esc(x.name)}: ${fmtEUR.format(x.value_eur)} (${(frac * 100).toFixed(1)}%)</title></path>`;
+  }).join("");
+  $("#alloc-donut").innerHTML = `<svg viewBox="0 0 160 160" width="160" height="160">
+    ${arcs}
+    <text x="80" y="76" text-anchor="middle" font-size="11" fill="var(--muted)">Totale</text>
+    <text x="80" y="92" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">${fmtEUR.format(Math.round(total))}</text>
+  </svg>`;
+  $("#alloc-legend").innerHTML = list.map((x, i) => {
+    const pct = (x.value_eur / total * 100).toFixed(1);
+    return `<li class="alloc-item">
+      <span class="alloc-dot" style="background:${ALLOC_COLORS[i % ALLOC_COLORS.length]}"></span>
+      <span class="alloc-name">${esc(x.name)} <span class="tk">${x.ticker}</span></span>
+      <span class="alloc-pct">${pct}%</span>
+      <span class="alloc-val muted">${fmtEUR.format(Math.round(x.value_eur))}</span>
+    </li>`;
+  }).join("");
 }
 
 /* ---------------- tabella ---------------- */
@@ -302,11 +466,16 @@ function techCells(r) {
       <td>${sparkline((r.sparks || {})[sparkRange])}</td>`;
 }
 
+function delBtn(section, ticker) {
+  return editMode[section] && ticker !== "BTP-V28"
+    ? `<button class="row-del" data-sec="${section}" data-tk="${ticker}" title="Rimuovi ${ticker}">×</button>` : "";
+}
+
 function renderTable() {
   const rows = sortRows(DATA.portfolio, "ptf-table").map(r => {
     const c = cur(r);
     return `<tr>
-      <td class="name-cell">${r.name}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell">${delBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${c}${fmtNum.format(r.price)}</b></td>
@@ -326,19 +495,25 @@ function renderTable() {
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
     <td colspan="12" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
-  $("#ptf-table tbody").innerHTML = rows + totalRow;
+  const addRow = editMode.portfolio
+    ? `<tr class="add-row"><td colspan="21"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+  $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
 }
 
 function renderWatchlist() {
   const list = sortRows(DATA.watchlist || [], "wl-table");
-  $("#wl-table tbody").innerHTML = list.length ? list.map(r => `<tr>
-      <td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
-      <td class="num"><b>$${fmtNum.format(r.price)}</b></td>
+  const c = (r) => r.currency === "PTS" ? "" : "$";
+  const rows = list.length ? list.map(r => `<tr>
+      <td class="name-cell">${delBtn("watchlist", r.ticker)}${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+      <td class="num"><b>${c(r)}${fmtNum.format(r.price)}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
     </tr>`).join("") : '<tr><td colspan="17" class="muted">Nessun dato</td></tr>';
+  const addRow = editMode.watchlist
+    ? `<tr class="add-row"><td colspan="17"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+  $("#wl-table tbody").innerHTML = rows + addRow;
 }
 
 /* ---------------- trimestrali ---------------- */
@@ -688,6 +863,32 @@ document.querySelectorAll("#spark-toggle .chip").forEach(ch => {
     renderTable();
     renderWatchlist();
   });
+});
+document.querySelectorAll("#hist-toggle .chip").forEach(ch => {
+  ch.addEventListener("click", () => {
+    document.querySelectorAll("#hist-toggle .chip").forEach(c => c.classList.remove("chip-active"));
+    ch.classList.add("chip-active");
+    histRange = ch.dataset.range;
+    renderHistory();
+  });
+});
+
+/* modifica posizioni */
+$("#ptf-edit").addEventListener("click", () => {
+  editMode.portfolio = !editMode.portfolio;
+  $("#ptf-edit").classList.toggle("chip-active", editMode.portfolio);
+  renderTable();
+});
+$("#wl-edit").addEventListener("click", () => {
+  editMode.watchlist = !editMode.watchlist;
+  $("#wl-edit").classList.toggle("chip-active", editMode.watchlist);
+  renderWatchlist();
+});
+document.addEventListener("click", (e) => {
+  const del = e.target.closest(".row-del");
+  if (del) { removeHolding(del.dataset.sec, del.dataset.tk); return; }
+  if (e.target.id === "ptf-add") addPortfolio();
+  if (e.target.id === "wl-add") addWatchlist();
 });
 
 initSorting("ptf-table", renderTable);

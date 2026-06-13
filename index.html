@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=9">
+<link rel="stylesheet" href="assets/style.css?v=11">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📈</text></svg>">
 </head>
 <body>
@@ -20,15 +20,37 @@
     </div>
   </div>
   <div class="actions">
-    <a class="btn btn-ghost" href="#pmc-calc" title="Vai al calcolatore prezzo medio">🧮 Calc. PMC</a>
     <button class="btn btn-ghost" id="btn-prompt" title="Copia un prompt con tutti i dati da incollare in Claude">🤖 Prompt AI</button>
-    <button class="btn btn-primary" id="btn-refresh" title="Ricarica i dati">⟳ Aggiorna</button>
+    <button class="btn btn-primary" id="btn-refresh" title="Rigenera i dati in tempo reale">⟳ Aggiorna</button>
   </div>
 </header>
 
 <main>
   <!-- KPI -->
   <section class="kpi-grid" id="kpi-grid"></section>
+
+  <!-- ANDAMENTO & ALLOCAZIONE -->
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-head">
+        <h2>Andamento portafoglio</h2>
+        <div class="spark-toggle" id="hist-toggle">
+          <button class="chip" data-range="m1">1M</button>
+          <button class="chip chip-active" data-range="y1">12M</button>
+          <button class="chip" data-range="all">Max</button>
+        </div>
+      </div>
+      <div id="hist-chart"></div>
+      <div class="hist-summary muted" id="hist-summary"></div>
+    </section>
+    <section class="card">
+      <div class="card-head"><h2>Asset allocation</h2></div>
+      <div class="alloc-wrap">
+        <div id="alloc-donut"></div>
+        <ul class="alloc-legend" id="alloc-legend"></ul>
+      </div>
+    </section>
+  </div>
 
   <!-- MACRO & MERCATI -->
   <section class="card">
@@ -47,7 +69,7 @@
         <button class="chip chip-active" data-range="m1">1M</button>
         <button class="chip" data-range="y1">1A</button>
       </div>
-      <span class="muted" id="fx-note"></span>
+      <button class="btn btn-ghost btn-sm" id="ptf-edit" title="Aggiungi o rimuovi titoli">✎ Modifica</button>
     </div>
     <div class="earnings-strip" id="earnings-strip"></div>
     <div class="table-wrap">
@@ -86,7 +108,7 @@
   <section class="card">
     <div class="card-head">
       <h2>Watchlist</h2>
-      <span class="muted">Stessi dati tecnici, nessuna posizione</span>
+      <button class="btn btn-ghost btn-sm" id="wl-edit" title="Aggiungi o rimuovi titoli">✎ Modifica</button>
     </div>
     <div class="table-wrap">
       <table id="wl-table">
@@ -175,6 +197,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=9"></script>
+<script src="assets/app.js?v=11"></script>
 </body>
 </html>
