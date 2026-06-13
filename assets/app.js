@@ -808,7 +808,7 @@ function buildPrompt() {
   const t = DATA.totals;
   const m = DATA.macro || {};
   const lines = [];
-  lines.push("Sei un analista finanziario esperto. Analizza il mio portafoglio con i dati di mercato qui sotto e fornisci: 1) valutazione sintetica della situazione, 2) titoli a rischio o con segnali tecnici rilevanti (RSI, supporti/resistenze), 3) impatto del quadro macro, 4) eventuali azioni da considerare (non è una richiesta di consulenza, voglio un'analisi ragionata).");
+  lines.push("Sei un analista finanziario esperto. PRIMA di analizzare, usa la RICERCA WEB per verificare i prezzi di oggi dei titoli elencati e le ultime notizie macro/societarie (i dati qui sotto potrebbero avere qualche minuto di ritardo). Poi analizza il mio portafoglio e fornisci: 1) valutazione sintetica della situazione, 2) titoli a rischio o con segnali tecnici rilevanti (RSI, supporti/resistenze), 3) impatto del quadro macro e dei mercati di previsione, 4) eventuali azioni da considerare (non è una richiesta di consulenza, voglio un'analisi ragionata).");
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   lines.push("");
