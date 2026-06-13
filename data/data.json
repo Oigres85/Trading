@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-13T11:07:00Z",
+ "updated_at": "2026-06-13T11:18:10Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -3072,15 +3072,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63835.92,
-   "change_pct": 0.46,
+   "price": 63890.66,
+   "change_pct": 0.55,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.4,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 34.1,
-   "volume": 21055385600,
+   "rsi": 34.4,
+   "volume": 20979281920,
    "vol_ratio": 0.62,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -3090,7 +3090,7 @@
      61449.29,
      63561.05,
      63543.2,
-     63835.92
+     63890.66
     ],
     "m1": [
      76673.37,
@@ -3114,7 +3114,7 @@
      61449.29,
      63561.05,
      63543.2,
-     63835.92
+     63890.66
     ],
     "m3": [
      71767.83,
@@ -3182,7 +3182,7 @@
      61449.29,
      63561.05,
      63543.2,
-     63835.92
+     63890.66
     ],
     "y1": [
      106090.97,
@@ -3258,32 +3258,32 @@
      73372.52,
      64014.37,
      63090.59,
-     63835.92
+     63890.66
     ],
     "d1": [
-     63525.66,
-     63556.29,
-     63528.39,
+     63525.67,
+     63553.49,
+     63533.99,
      63517.56,
      63549.96,
      63567.13,
-     63584.98,
-     63620.55,
-     63603.03,
-     63616.17,
+     63584.97,
+     63620.54,
+     63583.19,
+     63642.15,
      63713.87,
-     63773.1,
+     63773.43,
      63755.34,
-     63752.17,
-     63716.01,
-     63674.48,
+     63752.18,
+     63716.0,
+     63684.03,
      63586.68,
-     63550.94,
-     63653.3,
-     63620.99,
+     63550.96,
+     63653.31,
+     63619.43,
      63543.96,
      63462.23,
-     63471.13,
+     63471.12,
      63520.58,
      63496.94,
      63480.46,
@@ -3293,33 +3293,33 @@
      63581.3,
      63508.73,
      63526.55,
-     63522.19,
-     63505.63,
-     63513.36,
+     63525.65,
+     63526.83,
+     63546.02,
      63488.0,
      63531.82,
      63546.16,
-     63559.21,
+     63562.93,
      63640.51,
-     63641.01,
+     63637.32,
      63687.47,
      63659.64,
-     63685.99,
+     63685.98,
      63685.91,
      63719.16,
-     63770.72,
+     63787.93,
      63807.78,
      63769.05,
      63751.53,
      63724.63,
-     63771.29,
-     63837.94,
+     63776.75,
+     63837.56,
      63768.0,
      63770.01,
      63773.48,
      63810.0,
      63754.92,
-     63787.3,
+     63784.0,
      63726.61,
      63690.55,
      63748.37,
@@ -3327,7 +3327,8 @@
      63809.3,
      63821.43,
      63805.62,
-     63824.26
+     63824.26,
+     63870.78
     ]
    },
    "earnings_date": null,
@@ -3341,22 +3342,22 @@
     "w1": {
      "support": 60756.69,
      "resistance": 64334.02,
-     "change_pct": 3.56
+     "change_pct": 3.64
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.74
+     "change_pct": -16.67
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -11.05
+     "change_pct": -10.98
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.32
+     "change_pct": -48.27
     }
    }
   },
@@ -5346,7 +5347,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 55
+     "score": 56
     },
     {
      "label": "Treasury 10A",
@@ -5431,6 +5432,28 @@
  "news": [
   {
    "source": "Google News",
+   "title": "Nvidia CEO Jensen Huang Says This Will Be the Next $1 Trillion Company - The Motley Fool",
+   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNSUxqTnZRX20wR3I3ei03UlRRczB5aEM4djV1UHg1RjA5dXRweG1JWV9ROFdWUVNaTXdPLTVJSUpLUWV1ZEluN0FYaV80QW84MW5JUVk2TTdDWlRGOHhueENqaVdSeHoyYnNob20wRjZ3aU1NaFVMck5UUGhpa3JJNm1yUTNaT3Y5YTk5YlVMTVJ6NzhaNXMyVg?oc=5",
+   "published": "2026-06-13T11:14:32Z",
+   "tickers": [
+    "NVDA"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Il CEO di Nvidia Jensen Huang afferma che questa sarà la prossima azienda da mille miliardi di dollari - The Motley Fool"
+  },
+  {
+   "source": "Google News",
+   "title": "Chad Rigetti: The Definitive 2026 Profile Of A Quantum Pioneer - Quantum Zeitgeist",
+   "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE5nLTJQMmlIeUZWMnZzUTUxN1RGa0QtS3l0QkNXTEphTXhKR29MUmVHckxpNDMtUFoxaHFTR0htdzc4emJsS19BMXZWMjJHM2p3aTZTWA?oc=5",
+   "published": "2026-06-13T10:35:59Z",
+   "tickers": [
+    "RGTI"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Chad Rigetti: il profilo definitivo di un pioniere quantistico per il 2026 - Quantum Zeitgeist"
+  },
+  {
+   "source": "Google News",
    "title": "Mag 7? MANGOS? SpaceX forces name rethink on Wall Street's tech-stock moniker - Reuters",
    "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxOVFh2RmJuX1poQlE4QVhNMG1kYjNaeUVhQmx3T2lEU002bTluMC1kbmhIUWR0eG5EYnRycEVvc2NWUGM5WFNDY3BwM3hhZzdzc2pzQW1pMHlsaHpkYVBteHZKSDAxajF5UVNXV0ZIdlpLcWFjSlM2ZFg3YlFscDRseHpMdURVOEJicWRtdVdGUXEtYVR0dklLbzN4bjV5XzBfeHl5VEVmaWN1OXFMUzVNQVdlRWlqNGNZUXRlS1dGQllFSTlrRUE?oc=5",
    "published": "2026-06-13T10:23:46Z",
@@ -5471,7 +5494,7 @@
     "MACRO"
    ],
    "sentiment": "neutral",
-   "title_it": "Mag7? MANGO? SpaceX impone un ripensamento del nome sul soprannome di azioni tecnologiche di Wall Street"
+   "title_it": "Mag7? MANGO? SpaceX impone un ripensamento del nome sul soprannome di titoli tecnologici di Wall Street"
   },
   {
    "source": "Google News",
@@ -5482,7 +5505,7 @@
     "MU"
    ],
    "sentiment": "neutral",
-   "title_it": "SpaceX, Super Micro Computer, Micron e altro: 5 investitori azionari che non riescono a smettere di parlare di sé questa settimana - Benzinga"
+   "title_it": "SpaceX, Super Micro Computer, Micron e altro ancora: 5 investitori azionari di cui non si può fare a meno questa settimana - Benzinga"
   },
   {
    "source": "Google News",
@@ -5507,6 +5530,17 @@
    "title_it": "Come Wall Street ha realizzato la più grande IPO della storia per SpaceX - Financial Times"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Mortgage and refinance interest rates today, Saturday, June 13, 2026: All rates moving lower",
+   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/mortgage-refinance-interest-rates-today-saturday-june-13-2026-100000307.html",
+   "published": "2026-06-13T10:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Tassi di interesse ipotecari e di rifinanziamento oggi, sabato 13 giugno 2026: tutti i tassi in ribasso"
+  },
+  {
    "source": "Google News",
    "title": "Iran war is a smokescreen for a looming oil market crunch - The Telegraph",
    "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQaHVDUGFGNHY4RnRMY2ZPdFRoMkFIbHlsNzNHcFhZS3dFWWt4ekZ6RWw0Qy05WHlyYkVvTHUxT0xfOEE3TlJMODVCTDNoWS1iZkZhY2FORnliby0xQi1ZTlBmOW1xc0twbTVzSDR5TXAydjJtT2R1Vkh6aDRTbXlxUnJTd1YwUlZQZm5lUlVyTl80Q0VwSTdvazVpcjdzYWRZ?oc=5",
@@ -5516,6 +5550,17 @@
    ],
    "sentiment": "bear",
    "title_it": "La guerra in Iran è una cortina di fumo per l’incombente crisi del mercato petrolifero – The Telegraph"
+  },
+  {
+   "source": "Google News",
+   "title": "Tracker: The Federal Reserve’s Balance Sheet Assets - The American Action Forum",
+   "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNR2NrRDdoQ1MwS0paZFliV01BelV0MS1tQkNMSEdJYmYweWctanpzZU5hMllmVUtjQWR2cXBPSVhFeFluSFlMbi1ZVTg1ZS1TYzRMam81MFlRbWxockRRN2RpeEk2OGhpYWVXUVpsX3lvcUx4QUFERERGQVdkeVRndHJNeExJTU9DLS1GRW9GTW0?oc=5",
+   "published": "2026-06-13T09:55:58Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Tracker: le attività di bilancio della Federal Reserve - The American Action Forum"
   },
   {
    "source": "Google News",
@@ -5554,14 +5599,14 @@
   },
   {
    "source": "Google News",
-   "title": "Charting the Global Economy: War Pushes Up Prices, Dents Growth - Bloomberg.com",
+   "title": "Charting the Global Economy: War Pushes Up Prices, Dents Growth - Bloomberg",
    "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNMzdZTEdhUnZTTGpoSmpiUWJPOEdHYnlaaGRyaWdtR1lmV0dvc0dYRFB1TDRyeDdFM0xic0w3RDZXaUQ3T19QdENXb1NnTmt1ZkZCcEFLYi0tcU1mQklDaTI0MXBydU1UbmNRV2piWHVWcTlIYjB4bnVGeHJUQkdhc21VcWZEVjd6SlFrcmxfLXJ2VGljeWVzX2d1N3I1SGNpR1FlTEVRTk1wTGhaMXpJS3Rn?oc=5",
    "published": "2026-06-13T09:00:00Z",
    "tickers": [
     "MACRO"
    ],
    "sentiment": "neutral",
-   "title_it": "Tracciare l'economia globale: la guerra fa salire i prezzi, intacca la crescita - Bloomberg.com"
+   "title_it": "Tracciare l'economia globale: la guerra fa salire i prezzi, intacca la crescita - Bloomberg"
   },
   {
    "source": "Google News",
@@ -5606,17 +5651,6 @@
    ],
    "sentiment": "neutral",
    "title_it": "La Cina è “fortemente insoddisfatta” della mossa del Pentagono contro le principali aziende tecnologiche cinesi"
-  },
-  {
-   "source": "Google News",
-   "title": "Cipher Digital (CIFR) Mimics Market Rally as US-Iran Tensions Subside - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQVkg0am51dUs0NWc0Yk5xSk94OUZXY3RNdlAtdFZNSFRlU2NmOHFUbjFMVlFELVhBWUF4WmtXdnd0NXA4MnlXUVM1OF9FWlNJT2tSQVRVZHQ2VThmTDN1TGdGc09KREwyaUdBNWp0QjhaQnhfVXRWZUxsbUdOSTBPTjR3QU5oQnRSb2JXaGttdVo4T2NfUmF2SWVoSEZjYmM?oc=5",
-   "published": "2026-06-13T05:52:18Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "bull",
-   "title_it": "Cipher Digital (CIFR) imita il rally del mercato mentre le tensioni tra Stati Uniti e Iran si attenuano - Yahoo Finanza"
   },
   {
    "source": "Google News",
@@ -5693,7 +5727,7 @@
     "MACRO"
    ],
    "sentiment": "neutral",
-   "title_it": "Wall Street chiude in rialzo, domina il debutto sul mercato di SpaceX - Reuters"
+   "title_it": "Wall Street chiude in rialzo mentre domina il debutto sul mercato di SpaceX - Reuters"
   },
   {
    "source": "Google News",
@@ -5760,17 +5794,6 @@
    ],
    "sentiment": "neutral",
    "title_it": "NVIDIA Blackwell è alla guida del primo benchmark dell'infrastruttura AI Agentic - Blog NVIDIA"
-  },
-  {
-   "source": "Google News",
-   "title": "Wall Street ends higher as SpaceX's market debut dominates - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOMHBvWHhXM0xONFNScXZaN3VXLTUwZUZyN012aFZEVE9sb29iU3BncWFLX08zTHRBcmhPSURoUTBBTTFfZ3ZKblU1akNCazlqeTQzbEVaN0J4empnSVMyLXZsVmMtUG11My1SbnFWbGZvT2NVeVA4cUVTb1ZPaG9qUTJLTnN2NEVBdW5JQjdhM21XMDIyWDBkSA?oc=5",
-   "published": "2026-06-12T21:17:41Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral",
-   "title_it": "Wall Street chiude in rialzo mentre domina il debutto sul mercato di SpaceX - Yahoo Finance"
   },
   {
    "source": "Google News",
@@ -5858,18 +5881,7 @@
     "MACRO"
    ],
    "sentiment": "neutral",
-   "title_it": "Il petrolio crolla, le azioni salgono mentre Trump segnala che l'accordo di pace con l'Iran sta prendendo forma - The New York Times"
-  },
-  {
-   "source": "Google News",
-   "title": "SpaceX president Gwynne Shotwell just gave another hint at a Tesla merger - TechCrunch",
-   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOX1VZNUFpY0x4OG5lNW53X1paQWtLWWtGNFRBd2l5LWEyVmJMOTNNRFAzMmI4dWxQV2xURmd0cUNQV0lBM05OZWtjU2xickd4WlJjUUgxTnRJeHZ6Vlhwd3hYNW51TmF2ZDBYcmd2YVJURXJZTTlZd0xsM0R0RXFIbnpFcUJnTWd1Q1drTDlLemJ0WmNKNXV5UVVIam5HYS1xcC1manphNGtKRnho?oc=5",
-   "published": "2026-06-12T19:28:31Z",
-   "tickers": [
-    "TSLA"
-   ],
-   "sentiment": "neutral",
-   "title_it": "Il presidente di SpaceX Gwynne Shotwell ha appena dato un altro accenno a una fusione tra Tesla: TechCrunch"
+   "title_it": "Crollo del petrolio, rialzo delle azioni mentre Trump segnala che l'accordo di pace con l'Iran sta prendendo forma - The New York Times"
   },
   {
    "source": "Google News",
@@ -5881,18 +5893,6 @@
    ],
    "sentiment": "neutral",
    "title_it": "Dove Trump ha perso il sostegno degli indipendenti, secondo il sondaggio AP-NORC - PBS"
-  },
-  {
-   "source": "Google News",
-   "title": "Micron vs. NVIDIA: One AI Stock Is a Clear Buy Right Now - Zacks Investment Research",
-   "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNYjdjV3kwUXFpN0R1cmRzYnNCeW1kQXpfRDNaLUd2UHZxTnhreURsZ2prYlc0aVFxclhwLUJ1VmlwOUY0TXBIeTlRUkNLMVZ3V3Ryd19VbDNla19qcVpiMWxhQkh3NHlIV3B5WG5qeHlMVzQ1Z3ZDbDFoRWFBWDBUMTF2dENEV3dvcmx1MVFkNExrME1ZM0VNZ0RyZw?oc=5",
-   "published": "2026-06-12T18:30:29Z",
-   "tickers": [
-    "NVDA",
-    "MU"
-   ],
-   "sentiment": "neutral",
-   "title_it": "Micron contro NVIDIA: un titolo AI è un chiaro acquisto in questo momento - Zacks Investment Research"
   }
  ]
 }
