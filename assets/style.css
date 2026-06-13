@@ -304,7 +304,8 @@ th.sortable:hover { color: var(--text); }
 .thermo-ends { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin: 2px 4px 0; }
 
 /* ---------- rendimenti reali broker ---------- */
-.broker-row { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px; }
+.broker-card { padding-top: 14px; }
+.broker-row { }
 .bk-title { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
 .bk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
 .bk-cell { background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }

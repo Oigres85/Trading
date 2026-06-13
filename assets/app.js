@@ -351,7 +351,7 @@ function renderKPI() {
 }
 
 /* ---------------- andamento portafoglio ---------------- */
-let histRange = "y1";   // w1 | m1 | m3 | y1 | y5 | all
+let histRange = "all";  // w1 | m1 | m3 | y1 | y5 | all — default: dall'inizio
 let histBench = false;  // sovrapponi Nasdaq
 
 function renderHistory() {
@@ -417,21 +417,29 @@ function renderHistory() {
 }
 
 /* ---------------- rendimenti reali (broker) ---------------- */
+const RANGE_LABEL = { w1: "1 settimana", m1: "1 mese", m3: "3 mesi", y1: "12 mesi", y5: "5 anni", all: "dall'inizio" };
+function brokerPeriodReturn(b) {
+  if (histRange === "all" || histRange === "y5") return b.inception_pct;
+  if (histRange === "y1") return b.y1_pct;
+  const h = DATA.history && DATA.history[histRange];
+  if (h && h.values.length > 1) return Math.round((h.values[h.values.length - 1] / h.values[0] - 1) * 1000) / 10;
+  return b.inception_pct;
+}
+
 function renderBroker() {
   const b = DATA.broker;
   const box = $("#broker-row");
   if (!box) return;
   if (!b) { box.innerHTML = ""; return; }
+  const ret = brokerPeriodReturn(b);
   const cell = (lab, val, cls = "") => `<div class="bk-cell"><div class="bk-lab">${lab}</div><div class="bk-val ${cls}">${val}</div></div>`;
-  box.innerHTML = `<div class="bk-title">📒 Rendimenti reali (broker, ${new Date(b.as_of).toLocaleDateString("it-IT")})</div>
+  box.innerHTML = `<div class="bk-title">Rendimenti reali (broker, ${new Date(b.as_of).toLocaleDateString("it-IT")})</div>
     <div class="bk-grid">
+      ${cell(`Rendimento (${RANGE_LABEL[histRange] || "periodo"})`, signTxt(ret), signCls(ret))}
       ${cell("Controvalore", fmtEUR.format(b.controvalore_totale))}
-      ${cell("Profitto totale", `${signTxt(b.profitto_totale_pct)} · ${signTxt(Math.round(b.profitto_totale_eur), " €")}`, "pos")}
-      ${cell("YTD", signTxt(b.ytd_pct), "pos")}
-      ${cell("12 mesi", signTxt(b.y1_pct), "pos")}
-      ${cell("Dall'inizio", signTxt(b.inception_pct), "pos")}
-      ${cell("Profitto $ (azioni)", `${signTxt(b.profitto_usd_pct)} · ${signTxt(Math.round(b.profitto_usd), " $")}`, "pos")}
-      ${cell("Cedole BTP incassate", fmtEUR.format(b.cedole_btp))}
+      ${cell("Profitto totale", `${signTxt(b.profitto_totale_pct)} · ${signTxt(Math.round(b.profitto_totale_eur), " €")}`, signCls(b.profitto_totale_pct))}
+      ${cell("Profitto azioni ($)", `${signTxt(b.profitto_usd_pct)} · ${signTxt(Math.round(b.profitto_usd), " $")}`, signCls(b.profitto_usd_pct))}
+      ${cell("Cedole BTP", fmtEUR.format(b.cedole_btp))}
     </div>`;
 }
 
@@ -504,9 +512,8 @@ function meterBar(pct, color, text) {
 
 function rsiBar(rsi) {
   if (rsi === null || rsi === undefined) return "—";
-  // verde nella zona neutrale, giallo verso 30/70, rosso agli estremi
-  const dist = Math.abs(rsi - 50);
-  const color = dist <= 10 ? "var(--green)" : dist <= 20 ? "var(--yellow)" : "var(--red)";
+  // ipervenduto (<30) = verde (opportunità) · ipercomprato (>70) = rosso (rischio)
+  const color = scoreColor(100 - rsi);
   return meterBar(rsi, color, fmtNum.format(rsi));
 }
 
@@ -649,8 +656,8 @@ function closeChartModal() { $("#chart-modal").hidden = true; }
 
 /* zoom del grafico di un singolo titolo, con selettore range e date sul punto */
 let cmTicker = null, cmRange = "m1";
-const CM_RANGES = [["d1", "1G"], ["w1", "1S"], ["m1", "1M"], ["m3", "3M"], ["y1", "1A"]];
-const CM_SPAN = { d1: 1, w1: 7, m1: 31, m3: 92, y1: 365 };   // giorni coperti (per le date)
+const CM_RANGES = [["d1", "1G"], ["w1", "1S"], ["m1", "1M"], ["m3", "3M"], ["m6", "6M"], ["y1", "1A"], ["all", "ALL"]];
+const CM_SPAN = { d1: 1, w1: 7, m1: 31, m3: 92, m6: 183, y1: 365, all: 365 * 5 };   // giorni coperti (per le date)
 
 function synthDates(range, n) {
   const span = CM_SPAN[range] || 30, today = Date.now(), out = [];
@@ -718,7 +725,7 @@ function openMacroInfo(key) {
   if (!info) return;
   const [name, desc, cadence, rx] = info;
   openInfoModal(name, `<p style="margin:0 0 10px">${desc}</p>
-    <div class="info-line">📅 <b>Prossima pubblicazione:</b> ${cadence}</div>
+    <div class="info-line"><b>Prossima pubblicazione:</b> ${cadence}</div>
     <div class="info-line muted" style="margin-bottom:12px">Le date esatte possono variare; consulta un calendario economico per la conferma.</div>
     <h4 style="margin:6px 0">Notizie correlate</h4>${relatedNews(rx)}`);
 }
@@ -729,7 +736,7 @@ function openEarningsInfo(ticker) {
   const days = r.earnings_date ? Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) : null;
   const rx = new RegExp(`${ticker}|${(r.name || "").split(" ")[0]}|earnings|trimestral|utili|risultati`, "i");
   openInfoModal(`${r.name} (${ticker}) — Trimestrale`, `
-    <div class="info-line">📅 <b>Data attesa:</b> ${r.earnings_date ? new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "n/d"} ${days != null ? `(tra ${days} gg)` : ""}</div>
+    <div class="info-line"><b>Data attesa:</b> ${r.earnings_date ? new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "n/d"} ${days != null ? `(tra ${days} gg)` : ""}</div>
     ${r.eps != null ? `<div class="info-line"><b>EPS (ultimo):</b> ${fmtNum.format(r.eps)}</div>` : ""}
     ${r.rating?.target ? `<div class="info-line"><b>Target analisti:</b> ${cur(r)}${fmtNum.format(r.rating.target)} (${signTxt(r.rating.upside_pct)})</div>` : ""}
     <div class="info-line muted" style="margin-bottom:12px">Confronta i risultati con le attese degli analisti per valutare beat/miss.</div>
@@ -1206,6 +1213,7 @@ document.querySelectorAll("#hist-toggle .chip").forEach(ch => {
     ch.classList.add("chip-active");
     histRange = ch.dataset.range;
     renderHistory();
+    renderBroker();   // il rendimento reale segue il range selezionato
   });
 });
 $("#bench-nasdaq").addEventListener("change", (e) => { histBench = e.target.checked; renderHistory(); });

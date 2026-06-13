@@ -218,8 +218,11 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     price = float(closes.iloc[-1])
     prev = float(closes.iloc[-2]) if len(closes) > 1 else price
 
+    monthly = None
     try:
-        ath = float(t.history(period="max", interval="1mo")["High"].max())
+        mh = t.history(period="max", interval="1mo")
+        ath = float(mh["High"].max())
+        monthly = mh["Close"].dropna()
     except Exception:  # noqa: BLE001
         ath = float(hist["High"].max())
 
@@ -237,9 +240,11 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     vol = float(hist["Volume"].iloc[-1])
     vol_avg30 = float(hist["Volume"].tail(30).mean())
 
-    # sparkline su più orizzonti: 1g (5m), 1 settimana, 1 mese, 3 mesi, 1 anno
+    # sparkline su più orizzonti: 1g (5m), 1 settimana, 1 mese, 3 mesi, 6 mesi, 1 anno, all
     sparks = {
         "w1": [round(float(c), 2) for c in closes.tail(5)],
+        "m6": [round(float(c), 2) for c in closes.tail(126)],
+        "all": [round(float(c), 2) for c in monthly] if monthly is not None and len(monthly) > 2 else [round(float(c), 2) for c in closes[::5]],
         "m1": [round(float(c), 2) for c in closes.tail(22)],
         "m3": [round(float(c), 2) for c in closes.tail(66)],
         "y1": [round(float(c), 2) for c in closes[::5]],
