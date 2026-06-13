@@ -102,6 +102,8 @@ NEWS_FEEDS = [
     ("Google News", "https://news.google.com/rss/search?q=Nvidia+OR+AMD+OR+Micron+OR+Intel+OR+Tesla&hl=en-US&gl=US&ceid=US:en"),
     ("Google News", "https://news.google.com/rss/search?q=MicroStrategy+OR+%22Rigetti+Computing%22+OR+%22Oklo%22+OR+%22Arbe+Robotics%22+OR+%22BTP+Valore%22&hl=en-US&gl=US&ceid=US:en"),
     ("Google News", "https://news.google.com/rss/search?q=%22Federal+Reserve%22+OR+%22US+inflation%22+OR+%22White+House%22+economy+OR+tariffs&hl=en-US&gl=US&ceid=US:en"),
+    ("Reddit", "https://www.reddit.com/r/stocks/.rss"),
+    ("Reddit", "https://www.reddit.com/r/wallstreetbets/.rss"),
 ]
 
 # pattern regex (word boundary) per associare le news ai titoli
@@ -688,38 +690,91 @@ def fetch_top_caps(n=10):
     return rows[:n]
 
 
+def parse_feed_entries(url):
+    """Restituisce [(title, link, ts)] da un feed RSS; se bloccato usa rss2json."""
+    out = []
+    try:
+        r = http_get(url, timeout=20)
+        feed = feedparser.parse(r.content)
+        for e in feed.entries[:25]:
+            ts = None
+            for k in ("published_parsed", "updated_parsed"):
+                if e.get(k):
+                    ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", e[k])
+                    break
+            out.append((e.get("title", "").strip(), e.get("link", ""), ts))
+    except Exception as e:  # noqa: BLE001
+        print(f"!! feed diretto ko ({url[:40]}): {e}", file=sys.stderr)
+    if not out:  # fallback gratuito rss2json
+        try:
+            j = http_get("https://api.rss2json.com/v1/api.json?rss_url="
+                         + urllib.parse.quote(url), timeout=20).json()
+            for e in (j.get("items") or [])[:25]:
+                ts = None
+                if e.get("pubDate"):
+                    try:
+                        ts = datetime.strptime(e["pubDate"][:19], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%dT%H:%M:%SZ")
+                    except ValueError:
+                        ts = None
+                out.append((e.get("title", "").strip(), e.get("link", ""), ts))
+        except Exception as e:  # noqa: BLE001
+            print(f"!! rss2json ko ({url[:40]}): {e}", file=sys.stderr)
+    return out
+
+
+def fetch_predictions(limit=5):
+    """Mercati di previsione Polymarket su temi macro/finanza/politica USA."""
+    try:
+        ms = http_get("https://gamma-api.polymarket.com/markets"
+                      "?closed=false&order=volumeNum&ascending=false&limit=60").json()
+    except Exception as e:  # noqa: BLE001
+        print(f"!! polymarket: {e}", file=sys.stderr)
+        return []
+    out, now = [], datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    pat = re.compile(r"\bfed\b|rate cut|interest rate|inflation|recession|\btrump\b|election|"
+                     r"s&p|nasdaq|bitcoin|\beth\b|gdp|tariff|economy|powell|government shutdown|"
+                     r"\bcpi\b|jobs report|debt ceiling", re.I)
+    skip = re.compile(r"world cup|fifa|super bowl|oscar|grammy|nba|nfl|soccer|jesus|"
+                      r"oprah|taylor swift|champions league", re.I)
+    for m in ms:
+        q = (m.get("question") or "").strip()
+        if not q or not pat.search(q) or skip.search(q):
+            continue
+        try:
+            pr = m.get("outcomePrices")
+            pr = json.loads(pr) if isinstance(pr, str) else pr
+            yes = round(float(pr[0]) * 100)
+        except Exception:  # noqa: BLE001
+            continue
+        slug = m.get("slug", "")
+        out.append({"source": "Polymarket", "title": f"{q} — probabilità Sì {yes}%",
+                    "link": f"https://polymarket.com/event/{slug}" if slug else "https://polymarket.com",
+                    "published": now, "tickers": ["MACRO"], "title_it": None})
+        if len(out) >= limit:
+            break
+    return out
+
+
 def fetch_news():
-    """Solo news correlate ai titoli in portafoglio, con titolo tradotto in italiano."""
+    """News sui titoli in portafoglio + macro/politica USA, titolo tradotto in italiano."""
     items, seen = [], set()
     for source, url in NEWS_FEEDS:
-        try:
-            r = http_get(url, timeout=20)
-            feed = feedparser.parse(r.content)
-            for e in feed.entries[:25]:
-                title = e.get("title", "").strip()
-                if not title or title.lower() in seen:
-                    continue
-                tickers = [tk for tk, kws in PORTFOLIO_KEYWORDS.items()
-                           if any(re.search(kw, title.lower()) for kw in kws)]
-                if not tickers:
-                    continue
-                seen.add(title.lower())
-                ts = None
-                for k in ("published_parsed", "updated_parsed"):
-                    if e.get(k):
-                        ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", e[k])
-                        break
-                items.append({"source": source, "title": title,
-                              "link": e.get("link", ""), "published": ts,
-                              "tickers": tickers})
-        except Exception as e:  # noqa: BLE001
-            print(f"!! feed {source}: {e}", file=sys.stderr)
+        for title, link, ts in parse_feed_entries(url):
+            if not title or title.lower() in seen:
+                continue
+            tickers = [tk for tk, kws in PORTFOLIO_KEYWORDS.items()
+                       if any(re.search(kw, title.lower()) for kw in kws)]
+            if not tickers:
+                continue
+            seen.add(title.lower())
+            items.append({"source": source, "title": title, "link": link,
+                          "published": ts, "tickers": tickers})
     items.sort(key=lambda x: x["published"] or "", reverse=True)
-    items = items[:40]
-    misses = 0
+    items = items[:38]
     for it in items:
-        it["title_it"] = translate_it(it["title"]) if misses < 3 else None
-        misses = misses + 1 if it["title_it"] is None else 0
+        it["title_it"] = translate_it(it["title"])
+    # mercati di previsione in coda (probabilità già in italiano)
+    items += fetch_predictions()
     return items
 
 

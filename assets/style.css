@@ -39,6 +39,12 @@ main { max-width: 1500px; margin: 0 auto; padding: 0 20px 40px; }
 .brand-icon { font-size: 26px; }
 .brand h1 { font-size: 18px; font-weight: 700; letter-spacing: .2px; }
 .updated { color: var(--muted); font-size: 12px; }
+.live { color: var(--green); font-weight: 600; }
+.live-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green); margin-right: 4px; animation: pulse 1.6s infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .btn {
@@ -113,13 +119,13 @@ main { max-width: 1500px; margin: 0 auto; padding: 0 20px 40px; }
 .macro-item .m-sub { font-size: 12px; margin-top: 4px; font-family: var(--mono); }
 
 /* ---------- tabella ---------- */
-.table-wrap { overflow-x: auto; }
+.table-wrap { max-height: 80vh; overflow: auto; }
 table { border-collapse: collapse; width: 100%; white-space: nowrap; }
 th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--border); }
 th {
   color: var(--muted); font-size: 11px; text-transform: uppercase;
   letter-spacing: .6px; font-weight: 600; position: sticky; top: 0;
-  background: var(--card);
+  background: var(--card); z-index: 2;
 }
 td { font-family: var(--mono); font-size: 13px; }
 td.name-cell { font-family: "Inter", sans-serif; font-weight: 600; }
@@ -130,9 +136,10 @@ td.num { text-align: right; }
 /* prima colonna (nome titolo) bloccata in orizzontale */
 th.sticky-col, td.name-cell {
   position: sticky; left: 0; background: var(--card);
-  z-index: 2; box-shadow: 1px 0 0 var(--border);
+  box-shadow: 1px 0 0 var(--border);
 }
-th.sticky-col { z-index: 3; }
+td.name-cell { z-index: 1; }
+th.sticky-col { z-index: 4; }   /* angolo: sopra header e colonna */
 tbody tr:hover td.name-cell { background: #161b28; }
 tbody tr.total-row td.name-cell { background: var(--card-2); }
 

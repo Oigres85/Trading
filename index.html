@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=11">
+<link rel="stylesheet" href="assets/style.css?v=13">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📈</text></svg>">
 </head>
 <body>
@@ -16,7 +16,7 @@
     <span class="brand-icon">📈</span>
     <div>
       <h1>Trading Dashboard</h1>
-      <div class="updated">Ultimo aggiornamento: <span id="updated-at">—</span></div>
+      <div class="updated">Dati workflow: <span id="updated-at">—</span> · <span class="live" id="live-badge"></span></div>
     </div>
   </div>
   <div class="actions">
@@ -176,8 +176,8 @@
   </section>
 
   <footer>
-    Dati: Yahoo Finance · CNN Fear &amp; Greed · FRED/BLS/DBnomics · NY Fed · MOF Giappone · Borsa Italiana · RSS (CNBC, Bloomberg, Yahoo, Investing, Google News).
-    Aggiornamento automatico ogni ~20 min in orario di mercato via GitHub Actions. Non è consulenza finanziaria.
+    Prezzi live lato client (Yahoo via proxy CORS, ogni 60s) · dati tecnici/macro/news rigenerati dal workflow ogni ~20 min.<br>
+    Fonti: Yahoo Finance · CNN Fear &amp; Greed · FRED/BLS/DBnomics · NY Fed · MOF Giappone · Borsa Italiana · RSS (CNBC, Bloomberg, Yahoo, Investing, Google News, Reddit) · Polymarket. Non è consulenza finanziaria.
   </footer>
 </main>
 
@@ -197,6 +197,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=11"></script>
+<script src="assets/app.js?v=13"></script>
 </body>
 </html>

@@ -86,6 +86,7 @@ async function loadData(showSpin = false) {
     const res = await fetch(`data/data.json?t=${Date.now()}`, { cache: "no-store" });
     DATA = await res.json();
     renderAll();
+    livePrices();              // sovrappone i prezzi live ai dati del workflow
     if (showSpin) toast("Dati ricaricati ✓");
   } catch (e) {
     console.error(e);
@@ -232,6 +233,79 @@ function removeHolding(section, ticker) {
     cfg[section] = arr.filter(p => p.ticker !== ticker);
     return cfg[section].length < n;
   });
+}
+
+/* ---------------- prezzi live lato client (CORS proxy → Yahoo) ---------------- */
+const CORS_PROXIES = [
+  u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://thingproxy.freeboard.io/fetch/${u}`,
+];
+
+async function fetchQuote(symbol) {
+  const yurl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=1d&interval=1d`;
+  for (const make of CORS_PROXIES) {
+    try {
+      const r = await fetch(make(yurl), { cache: "no-store" });
+      if (!r.ok) continue;
+      const j = await r.json();
+      const m = j && j.chart && j.chart.result && j.chart.result[0] && j.chart.result[0].meta;
+      if (m && m.regularMarketPrice) {
+        return { price: +m.regularMarketPrice, prev: +(m.chartPreviousClose ?? m.previousClose ?? m.regularMarketPrice) };
+      }
+    } catch { /* prova il proxy successivo */ }
+  }
+  return null;
+}
+
+function recomputeTotals() {
+  const eq = DATA.portfolio.filter(r => r.currency === "USD");
+  const btp = DATA.portfolio.find(r => r.ticker === "BTP-V28");
+  const usdValue = eq.reduce((s, r) => s + r.value, 0);
+  const usdCost = eq.reduce((s, r) => s + r.pmc * r.qty, 0);
+  const eurusd = DATA.eurusd || 1.08;
+  const btpVal = btp ? btp.value : 0, btpGain = btp ? btp.gain : 0;
+  const totalEur = usdValue / eurusd + btpVal;
+  const costEur = usdCost / eurusd + (btp ? btp.pmc * btp.qty / 100 : 0);
+  const eurGain = totalEur - costEur;
+  const tax = 0.26 * Math.max(0, (usdValue - usdCost) / eurusd) + 0.125 * Math.max(0, btpGain);
+  Object.assign(DATA.totals, {
+    usd_value: usdValue, usd_gain: usdValue - usdCost, usd_gain_pct: (usdValue / usdCost - 1) * 100,
+    eur_value: totalEur, eur_gain: eurGain, eur_gain_pct: (totalEur / costEur - 1) * 100,
+    tax_est: tax, eur_gain_net: eurGain - tax,
+  });
+  DATA.allocation = DATA.portfolio.map(r => ({
+    ticker: r.ticker, name: r.name,
+    value_eur: r.currency === "EUR" ? r.value : r.value / eurusd,
+  })).sort((a, b) => b.value_eur - a.value_eur);
+}
+
+async function livePrices() {
+  if (!DATA) return;
+  const syms = [...new Set([
+    ...DATA.portfolio.filter(r => r.ticker !== "BTP-V28").map(r => r.ticker),
+    ...(DATA.watchlist || []).map(r => r.ticker),
+  ])];
+  const res = await Promise.allSettled(syms.map(s => fetchQuote(s).then(q => [s, q])));
+  const map = {}; let any = false;
+  res.forEach(x => { if (x.status === "fulfilled" && x.value[1]) { map[x.value[0]] = x.value[1]; any = true; } });
+  if (!any) return;
+  const upd = (r) => {
+    const q = map[r.ticker]; if (!q) return;
+    r.price = Math.round(q.price * 100) / 100;
+    r.change_pct = Math.round((q.price / q.prev - 1) * 10000) / 100;
+    if (r.currency === "USD" && r.qty) {
+      r.value = r.price * r.qty;
+      r.gain = r.value - r.pmc * r.qty;
+      r.gain_pct = Math.round((r.value / (r.pmc * r.qty) - 1) * 10000) / 100;
+    }
+  };
+  DATA.portfolio.forEach(upd);
+  (DATA.watchlist || []).forEach(upd);
+  recomputeTotals();
+  renderKPI(); renderTable(); renderWatchlist(); renderAllocation();
+  const el = $("#live-badge");
+  if (el) el.innerHTML = `<span class="live-dot"></span> prezzi live · ${new Date().toLocaleTimeString("it-IT")}`;
 }
 
 function renderAll() {
@@ -895,5 +969,7 @@ initSorting("ptf-table", renderTable);
 initSorting("wl-table", renderWatchlist);
 
 loadData();
-// auto-refresh ogni 5 minuti
+// ricarica completa (tecnici, news, storico) ogni 5 minuti
 setInterval(() => loadData(), 5 * 60 * 1000);
+// prezzi live ogni 60 secondi
+setInterval(() => livePrices(), 60 * 1000);
