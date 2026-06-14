@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-14T10:35:28Z",
+ "updated_at": "2026-06-14T10:42:19Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -8209,15 +8209,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64626.82,
-   "change_pct": 0.32,
+   "price": 64581.69,
+   "change_pct": 0.25,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -48.8,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 37.4,
-   "volume": 17552922624,
+   "rsi": 37.3,
+   "volume": 17568356352,
    "vol_ratio": 0.53,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -8227,7 +8227,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64626.82
+     64581.69
     ],
     "m6": [
      70120.78,
@@ -8355,7 +8355,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64626.82
+     64581.69
     ],
     "all": [
      386.94,
@@ -8499,7 +8499,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64626.82
+     64581.69
     ],
     "m1": [
      76981.12,
@@ -8523,7 +8523,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64626.82
+     64581.69
     ],
     "m3": [
      72979.05,
@@ -8591,7 +8591,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64626.82
+     64581.69
     ],
     "y1": [
      105472.41,
@@ -8667,7 +8667,7 @@
      73754.84,
      63801.57,
      61643.78,
-     64626.82
+     64581.69
     ],
     "d1": [
      64390.14,
@@ -8733,7 +8733,8 @@
      64517.38,
      64492.5,
      64591.83,
-     64619.88
+     64619.88,
+     64581.69
     ]
    },
    "earnings_date": null,
@@ -8747,22 +8748,22 @@
     "w1": {
      "support": 60788.02,
      "resistance": 64700.88,
-     "change_pct": 5.17
+     "change_pct": 5.1
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.05
+     "change_pct": -16.11
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -11.44
+     "change_pct": -11.51
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.2
+     "change_pct": -48.23
     }
    },
    "financials": [],
@@ -10336,7 +10337,7 @@
     182060,
     179547,
     177687,
-    179861,
+    179860,
     180937,
     179782,
     179778,
@@ -10454,7 +10455,7 @@
     175250,
     175607,
     177102,
-    177838,
+    177837,
     177090,
     173614,
     175317,
@@ -10526,7 +10527,7 @@
     190167,
     190458,
     190977,
-    190306,
+    190305,
     193322,
     191450,
     189718,
@@ -11071,7 +11072,7 @@
     193835,
     194978,
     188874,
-    190387,
+    190388,
     187651,
     181623,
     188531,
@@ -11713,7 +11714,7 @@
     193835,
     194978,
     188874,
-    190387,
+    190388,
     187651,
     181623,
     188531,
@@ -12083,7 +12084,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 53
+     "score": 52
     },
     {
      "label": "Treasury 10A",
@@ -12191,7 +12192,7 @@
   "inception_pct": 172.55,
   "controvalore_iniziale_1y": 136008.35,
   "investimenti": 55995.8,
-  "cedole_btp": 1505.0
+  "cedole_btp": 1505
  },
  "top_caps": [
   {
@@ -12311,7 +12312,7 @@
    ],
    "priority": 0,
    "sentiment": "bull",
-   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment cripto"
+   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment delle criptovalute"
   },
   {
    "source": "Investing.com",
@@ -12666,7 +12667,7 @@
    ],
    "priority": 1,
    "sentiment": "neutral",
-   "title_it": "Trump e Macron si incontreranno a cena al palazzo di Versailles dopo il vertice del G7 in Francia - AP News"
+   "title_it": "Trump e Macron si incontreranno a cena al Palazzo di Versailles dopo il vertice del G7 in Francia - AP News"
   },
   {
    "source": "CNBC",
@@ -12829,31 +12830,7 @@
    ],
    "priority": 1,
    "sentiment": "neutral",
-   "title_it": "Mag7? MANGO? SpaceX impone un ripensamento del nome sul soprannome di titoli tecnologici di Wall Street"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Mortgage and refinance interest rates today, Saturday, June 13, 2026: All rates moving lower",
-   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/mortgage-refinance-interest-rates-today-saturday-june-13-2026-100000307.html",
-   "published": "2026-06-13T10:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Tassi di interesse ipotecari e di rifinanziamento oggi, sabato 13 giugno 2026: tutti i tassi in ribasso"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "HELOC and home equity loan rates Saturday, June 13, 2026: Fed meets next week - don't wait for HELOC rates to rise",
-   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/heloc-home-equity-loan-interest-rates-today-saturday-june-13-2026-100000110.html",
-   "published": "2026-06-13T10:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "bull",
-   "title_it": "HELOC e tassi sui prestiti immobiliari sabato 13 giugno 2026: la Fed si riunirà la prossima settimana: non aspettare che i tassi HELOC aumentino"
+   "title_it": "Mag7? MANGO? SpaceX impone un ripensamento del nome sul soprannome di azioni tecnologiche di Wall Street"
   },
   {
    "source": "Yahoo Finance",
@@ -12868,11 +12845,35 @@
    "title_it": "I migliori tassi di interesse di risparmio ad alto rendimento oggi, sabato 13 giugno 2026: guadagna fino al 4,1% APY"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Mortgage and refinance interest rates today, Saturday, June 13, 2026: All rates moving lower",
+   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/mortgage-refinance-interest-rates-today-saturday-june-13-2026-100000307.html",
+   "published": "2026-06-13T10:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Tassi di interesse ipotecari e di rifinanziamento oggi, sabato 13 giugno 2026: tutti i tassi in calo"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "HELOC and home equity loan rates Saturday, June 13, 2026: Fed meets next week - don't wait for HELOC rates to rise",
+   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/heloc-home-equity-loan-interest-rates-today-saturday-june-13-2026-100000110.html",
+   "published": "2026-06-13T10:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "bull",
+   "title_it": "HELOC e tassi sui prestiti immobiliari sabato 13 giugno 2026: la Fed si riunirà la prossima settimana: non aspettare che i tassi HELOC aumentino"
+  },
+  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 99%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-14T10:36:21Z",
+   "published": "2026-06-14T10:43:13Z",
    "tickers": [
     "MACRO"
    ],
