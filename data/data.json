@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-14T16:20:43Z",
+ "updated_at": "2026-06-14T17:05:49Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -2260,7 +2260,7 @@
      69.23,
      67.49,
      82.04,
-     90.97,
+     90.98,
      80.43,
      86.88,
      76.15,
@@ -8209,16 +8209,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64061.12,
-   "change_pct": -0.56,
+   "price": 63971.47,
+   "change_pct": -0.7,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.2,
+   "ath_dist_pct": -49.3,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 35.7,
-   "volume": 16668748800,
-   "vol_ratio": 0.51,
+   "rsi": 35.5,
+   "volume": 16170362880,
+   "vol_ratio": 0.49,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -8227,7 +8227,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64061.12
+     63971.47
     ],
     "m6": [
      70120.78,
@@ -8355,7 +8355,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64061.12
+     63971.47
     ],
     "all": [
      386.94,
@@ -8499,7 +8499,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64061.12
+     63971.47
     ],
     "m1": [
      76981.12,
@@ -8523,7 +8523,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64061.12
+     63971.47
     ],
     "m3": [
      72979.05,
@@ -8591,7 +8591,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64061.12
+     63971.47
     ],
     "y1": [
      105472.41,
@@ -8667,113 +8667,117 @@
      73754.84,
      63801.57,
      61643.78,
-     64061.12
+     63971.47
     ],
     "d1": [
-     64390.4,
+     64390.14,
      64398.0,
-     64436.59,
-     64511.01,
-     64535.78,
+     64438.2,
+     64511.02,
+     64533.48,
      64514.93,
-     64511.26,
-     64605.32,
-     64623.57,
+     64506.17,
+     64600.18,
+     64623.6,
      64557.4,
      64538.0,
-     64598.74,
-     64568.82,
+     64598.04,
+     64568.86,
      64587.94,
-     64534.89,
+     64541.71,
      64528.0,
-     64482.89,
+     64482.88,
      64455.0,
-     64466.71,
+     64466.72,
      64465.84,
      64491.15,
-     64509.84,
-     64459.08,
+     64485.71,
+     64457.15,
      64484.62,
-     64495.12,
+     64501.17,
      64469.28,
      64467.47,
      64435.17,
      64364.63,
      64318.94,
-     64344.17,
-     64348.92,
+     64344.16,
+     64349.72,
      64315.99,
-     64284.94,
-     64338.0,
+     64287.26,
+     64329.28,
      64348.67,
      64398.84,
-     64444.37,
-     64336.29,
+     64444.36,
+     64345.48,
      64285.92,
-     64226.13,
-     64240.72,
+     64224.27,
+     64240.73,
      64256.16,
-     64210.86,
+     64205.14,
      64334.34,
      64301.19,
      64272.23,
      64380.17,
-     64352.06,
-     64407.23,
+     64358.24,
+     64413.28,
      64466.8,
      64436.47,
-     64425.48,
+     64426.6,
      64438.0,
      64439.01,
      64390.17,
-     64279.75,
+     64293.66,
      64420.87,
      64508.02,
-     64562.05,
+     64562.04,
      64517.38,
      64492.5,
-     64597.33,
-     64619.39,
+     64591.83,
+     64619.88,
      64570.73,
-     64525.52,
+     64525.53,
      64446.05,
      64523.63,
      64522.87,
      64588.11,
      64575.1,
-     64560.99,
-     64503.01,
-     64439.25,
-     64458.82,
-     64355.34,
-     64321.99,
+     64555.99,
+     64507.99,
+     64438.0,
+     64458.81,
+     64355.33,
+     64322.0,
      64270.71,
-     64298.97,
+     64294.23,
      64324.51,
-     64294.75,
-     64252.35,
-     64327.02,
-     64278.99,
-     64304.75,
+     64294.73,
+     64264.25,
+     64328.62,
+     64269.49,
+     64292.31,
      64273.04,
-     64235.69,
-     63975.94,
-     63908.12,
-     63892.72,
-     64095.85,
-     64072.53,
-     64041.15,
-     63976.09,
-     63995.94,
-     64029.23,
-     63985.31,
-     64068.88,
-     64061.12
+     64231.17,
+     63961.99,
+     63908.11,
+     63884.0,
+     64095.84,
+     64075.86,
+     64041.16,
+     64009.25,
+     63999.41,
+     64029.24,
+     63993.27,
+     64068.89,
+     64132.52,
+     64142.03,
+     64122.01,
+     63924.02,
+     63969.71
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 19,
+   "health": 18,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -8782,22 +8786,22 @@
     "w1": {
      "support": 60788.02,
      "resistance": 64700.88,
-     "change_pct": 4.25
+     "change_pct": 4.1
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.78
+     "change_pct": -16.9
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -12.22
+     "change_pct": -12.34
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.65
+     "change_pct": -48.72
     }
    },
    "financials": [],
@@ -10371,7 +10375,7 @@
     182060,
     179547,
     177687,
-    179860,
+    179861,
     180937,
     179782,
     179778,
@@ -10489,7 +10493,7 @@
     175250,
     175607,
     177102,
-    177837,
+    177838,
     177090,
     173614,
     175317,
@@ -10561,7 +10565,7 @@
     190167,
     190458,
     190977,
-    190305,
+    190306,
     193322,
     191450,
     189718,
@@ -11106,7 +11110,7 @@
     193835,
     194978,
     188874,
-    190388,
+    190387,
     187651,
     181623,
     188531,
@@ -11176,7 +11180,7 @@
     110907,
     105554,
     109142,
-    104665,
+    104664,
     112199,
     113569,
     117475,
@@ -11748,7 +11752,7 @@
     193835,
     194978,
     188874,
-    190388,
+    190387,
     187651,
     181623,
     188531,
@@ -11818,7 +11822,7 @@
     110907,
     105554,
     109142,
-    104665,
+    104664,
     112199,
     113569,
     117475,
@@ -12118,7 +12122,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 44
+     "score": 43
     },
     {
      "label": "Treasury 10A",
@@ -12300,11 +12304,6 @@
    "question": "Will the price of Bitcoin be above $64,000 on June 14?",
    "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-above-64k-on-june-14-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $62,000 on June 14?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-14-2026"
   }
  ],
  "news": [
@@ -12394,7 +12393,7 @@
    ],
    "priority": 0,
    "sentiment": "bull",
-   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment cripto"
+   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment delle criptovalute"
   },
   {
    "source": "Investing.com",
@@ -12435,6 +12434,68 @@
    "title_it": "Amphenol collega la rivoluzione dell'intelligenza artificiale mentre Nvidia si concentra sui riflettori"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Gold vs. the S&P 500: With Inflation at a 3-Year High, Which Does History Say Wins?",
+   "link": "https://finance.yahoo.com/markets/commodities/articles/gold-vs-p-500-inflation-164850280.html",
+   "published": "2026-06-14T16:48:50Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "bull",
+   "title_it": "Oro contro S&P 500: con l'inflazione ai massimi di 3 anni, secondo la storia quale vince?"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Dow Jones Futures Due With Market At Key Levels; Iran Deal In Focus, SpaceX's Next Test",
+   "link": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-trump-iran-deal-spacex/?src=A00220&yptr=yahoo",
+   "published": "2026-06-14T16:46:56Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Futures Dow Jones in scadenza con il mercato a livelli chiave; Focus sull'accordo con l'Iran, il prossimo test di SpaceX"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Gasoline Prices Are Still High, but This Inflation Reading Could Be Even More Worrisome for Nike Stock.",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/gasoline-prices-still-high-inflation-163500480.html",
+   "published": "2026-06-14T16:35:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "I prezzi della benzina sono ancora alti, ma questa lettura dell’inflazione potrebbe essere ancora più preoccupante per le azioni Nike."
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Bank of America revisits Oracle stock price target after post-earnings selloff",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/bank-america-revisits-oracle-stock-163300959.html",
+   "published": "2026-06-14T16:33:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "bear",
+   "title_it": "Bank of America rivisita il target di prezzo delle azioni Oracle dopo la svendita post-utili"
+  },
+  {
+   "source": "AP",
+   "title": "Trump celebrates turning 80 with a UFC cage-fighting event while big issues loom over his presidency - AP News",
+   "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPdHdQdXJGbW04c2tKcV9KYnRmWVd0ZVpLOWVYM3lTeFZjeW5aY0wwYnJHSmtnbHY5MmxVU2V2ekV5ZkZudHVVY2R0Wk5sSGJ2VVZqel9xemtjYVdRSjN1STgwS1gzcE0yNlZkMl95UHlkRE9ZOTdqTlBqY29EWWw0VXd6UERIbGVvd3pJTk9YRm5IcWs?oc=5",
+   "published": "2026-06-14T16:20:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Trump festeggia i suoi 80 anni con un evento di combattimento in gabbia UFC mentre grandi problemi incombono sulla sua presidenza - AP News"
+  },
+  {
    "source": "CNBC",
    "title": "U.S. peace deal with Iran in question as Israel strikes Lebanon, Trump warns not to 'blow it'",
    "link": "https://www.cnbc.com/2026/06/14/iran-deal-teeters-israel-strikes-lebanon.html",
@@ -12445,20 +12506,7 @@
    ],
    "priority": 1,
    "sentiment": "bear",
-   "title_it": "L’accordo di pace degli Stati Uniti con l’Iran è in discussione mentre Israele attacca il Libano, Trump avverte di non “mandarlo all’aria”"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Dow Jones Futures Due With Market At Key Levels; Iran Deal In Focus, SpaceX's Next Test",
-   "link": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-trump-iran-deal-spacex/?src=A00220&yptr=yahoo",
-   "published": "2026-06-14T16:05:57Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Futures Dow Jones in scadenza con il mercato a livelli chiave; Focus sull'accordo con l'Iran, il prossimo test di SpaceX"
+   "title_it": "L'accordo di pace degli Stati Uniti con l'Iran è in discussione mentre Israele attacca il Libano, Trump avverte di non \"mandarlo all'aria\""
   },
   {
    "source": "Reuters",
@@ -12472,18 +12520,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Israele attacca obiettivi di Hezbollah nella periferia sud di Beirut - Reuters"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Google Is Paying $920 Million Per Month to SpaceX. Here's Why Nvidia Is the Quiet Winner Nobody's Talking About.",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/google-paying-920-million-per-160100054.html",
-   "published": "2026-06-14T16:01:00Z",
-   "tickers": [
-    "NVDA"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Google paga 920 milioni di dollari al mese a SpaceX. Ecco perché Nvidia è il vincitore silenzioso di cui nessuno parla"
   },
   {
    "source": "Bloomberg",
@@ -12601,6 +12637,18 @@
    "title_it": "SpaceX dimostra che gli investitori vogliono ancora i viaggi sulla Luna. La Fed potrebbe testare questa teoria questa settimana."
   },
   {
+   "source": "Google News",
+   "title": "You Decide: What To Expect From The New Federal Reserve? - JoCo Report",
+   "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPY251S3dxTnI1cmRfX3FtSXNfTFo2SHh3VXFaN200SGdaLXp3bFlheW55aF9POFZ0WXhTOEV1SU14dGczbEFUMVk3SXI0QllGQmhJM0E0UEdXWFNUNVpzemh3MXhYdUQ1eGw4UkVwcVlDNnJVdkZ3R3dSNFJzbkItVTRRQ2U?oc=5",
+   "published": "2026-06-14T12:50:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Decidi tu: cosa aspettarti dalla nuova Federal Reserve? - Rapporto JoCo"
+  },
+  {
    "source": "CNBC",
    "title": "Top Wall Street analysts are confident about the growth prospects of these 3 stocks",
    "link": "https://www.cnbc.com/2026/06/14/top-analysts-are-confident-about-the-prospects-of-these-3-stocks.html",
@@ -12663,6 +12711,19 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Trump si dirige al vertice del G7 in Francia mentre il mondo attende l’accordo con l’Iran"
+  },
+  {
+   "source": "Reuters",
+   "title": "In Tijuana, Iran's tiny diaspora agrees on little — except Team Melli - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxOZFJ4RE8zYXgybG1hUm1tejBnSzNXYm9uNS1rOWkzZGlHcjhvUW1fVWZaNVh2aGJuTzRQNEpKcjN0U2NLTV9QbVlRa0hRUllHaEVja19fZ3c3NTZfbHBZN3FseXppLXJVam8zeVVfN2JzV2FDRGYtWlBOWEZDWEczM1RabW9BZ01ZWWJwanp3c25RaWlSSE55dVJzYXZCWkJJb3NsVUVlZDVMVWd6bVMw?oc=5",
+   "published": "2026-06-14T11:07:46Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "A Tijuana, la piccola diaspora iraniana è d'accordo su poco, tranne sul Team Melli - Reuters"
   },
   {
    "source": "CNBC",
@@ -12755,19 +12816,6 @@
   },
   {
    "source": "AP",
-   "title": "Trump turns 80 with a showstopping spectacle of cage fights at the White House. But big issues loom - AP News",
-   "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPdHdQdXJGbW04c2tKcV9KYnRmWVd0ZVpLOWVYM3lTeFZjeW5aY0wwYnJHSmtnbHY5MmxVU2V2ekV5ZkZudHVVY2R0Wk5sSGJ2VVZqel9xemtjYVdRSjN1STgwS1gzcE0yNlZkMl95UHlkRE9ZOTdqTlBqY29EWWw0VXd6UERIbGVvd3pJTk9YRm5IcWs?oc=5",
-   "published": "2026-06-14T04:02:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Trump compie 80 anni con uno spettacolo mozzafiato di combattimenti in gabbia alla Casa Bianca. Ma grossi problemi incombono - AP News"
-  },
-  {
-   "source": "AP",
    "title": "An octagon on the White House lawn for Trump's 80th birthday and the nation's 250th, in photos - AP News",
    "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOb1pwUXR4RGRvbXIwUmhMS1EtME1sZUJTSDI3WWpMSlpmOWs0M1ZkNjB0UFM0elRJVjFua1MzOUk2NkxlQmtOU2ZqUF94d3prMWJ6OEZWcktHRExSTUdMRjlFVVVOYm51ZjF4VXJET0o4MUpkWEJ4MGVLZk5VQ29mVTZDNXdsX1czVDRPdGZqV1RqVXE1aE5rR1VGR3p6YVJZUWNnamRSZEdNWkNWRWc?oc=5",
    "published": "2026-06-14T02:57:00Z",
@@ -12831,18 +12879,6 @@
    "title_it": "L'Iran affronterà la Nuova Zelanda nella partita d'apertura politicamente carica di Los Angeles - Reuters"
   },
   {
-   "source": "Google News",
-   "title": "America In Focus: Inflation hits 3-year high, Wall Street rallies and Musk becomes a trillionaire - The Washington Post",
-   "link": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxOU3VucllCRmQ0ZVBvQkJTVHVERmROTTN3MHJRZjN6Y1BySUxDRlhVVXlBUTZpdDg4OFRwOHhHaFRXVUlTUEh6RDV2WjE3SGU2ak1Hc2tHT1htUnhFem5KWGVERkVEN05NYzd0bFNtNXdXTTE5Unprb19iNjgxVWJ1OWY0V2d5T2ZVcVVEOGtqQ0VMb3ViNVU0SldTZHFQRjdNLXlVdVFkZHpzM3FrSzBhU1BQZ1praGVWRzJXQ21JTmFuNmJadG0xMGVYU0tUTE5wcmFiZ3FUS2draEZzanFBaTJWb09rVXVZU1FRMw?oc=5",
-   "published": "2026-06-13T21:11:08Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Focus America: l'inflazione tocca il massimo degli ultimi 3 anni, Wall Street in rialzo e Musk diventa un miliardario - The Washington Post"
-  },
-  {
    "source": "Bloomberg",
    "title": "Fed and BOE Stay Guarded After 100 Days of Iran War",
    "link": "https://news.google.com/search?q=Fed%20and%20BOE%20Stay%20Guarded%20After%20100%20Days%20of%20Iran%20War",
@@ -12856,17 +12892,16 @@
    "title_it": "Fed e BOE restano vigilanti dopo 100 giorni di guerra con l'Iran"
   },
   {
-   "source": "Reuters",
-   "title": "Trump says Iran deal to be signed on Sunday - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPYnc0RjByemVUM1FIQkhJVkFuVExTTDlYZUVqbFo4dWVSY3ZvZGgydUMtSjcydy15d3JkVThlQVpxblFZYVBKNmdDeTVSSXlYbV9OY1l5R25tUlhrVmtSNDQ4azVFY0w2X2tpbkNkcXBURk1XckFmRG1BbWFJQ3I2UUQ4OFNORWxDSk03dTdKWVhCNDFEb3c?oc=5",
-   "published": "2026-06-13T17:00:09Z",
+   "source": "Reddit",
+   "title": "Why the S&P 500 and some other index funds require seasoning and apply “free float”",
+   "link": "https://www.reddit.com/r/investing/comments/1u4xlzl/why_the_sp_500_and_some_other_index_funds_require/",
+   "published": "2026-06-13T17:59:26Z",
    "tickers": [
-    "MACRO",
-    "POL"
+    "MACRO"
    ],
    "priority": 1,
    "sentiment": "neutral",
-   "title_it": "Trump afferma che l'accordo con l'Iran sarà firmato domenica - Reuters"
+   "title_it": "Perché l’S&P 500 e alcuni altri fondi indicizzati richiedono un aggiustamento e applicano il “flottante”"
   },
   {
    "source": "Reddit",
@@ -12881,48 +12916,11 @@
    "title_it": "Chi è autorizzato a vendere SPCX in questo momento?"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Amazon Just Made Its Graviton5 Processor Generally Available to Customers. What This Means for AMZN Stock.",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/amazon-just-made-graviton5-processor-150003012.html",
-   "published": "2026-06-13T15:00:03Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Amazon ha appena reso il suo processore Graviton5 generalmente disponibile per i clienti. Cosa significa questo per le azioni AMZN."
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Cadence Deal With Intel Backs Bullish Thesis on Cadence’s Agentic AI",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/cadence-deal-intel-backs-bullish-150002851.html",
-   "published": "2026-06-13T15:00:02Z",
-   "tickers": [
-    "INTC"
-   ],
-   "priority": 1,
-   "sentiment": "bull",
-   "title_it": "L'accordo di Cadence con Intel sostiene la tesi rialzista sull'intelligenza artificiale di Cadence"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "51% of Americans are 'financially conflicted,' Gallup finds — how to tell which of the 3 money personalities fits you",
-   "link": "https://finance.yahoo.com/markets/articles/51-americans-financially-conflicted-gallup-143000572.html",
-   "published": "2026-06-13T14:30:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Il 51% degli americani è \"in conflitto finanziario\", rileva Gallup: come capire quale delle 3 personalità finanziarie è adatta a te"
-  },
-  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-14T16:21:19Z",
+   "published": "2026-06-14T17:06:38Z",
    "tickers": [
     "MACRO"
    ],
@@ -12933,18 +12931,7 @@
    "title": "Will the price of Bitcoin be above $64,000 on June 14?",
    "title_it": "Will the price of Bitcoin be above $64,000 on June 14? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-64k-on-june-14-2026",
-   "published": "2026-06-14T16:21:19Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the price of Bitcoin be above $62,000 on June 14?",
-   "title_it": "Will the price of Bitcoin be above $62,000 on June 14? — probabilità Sì 100%",
-   "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-14-2026",
-   "published": "2026-06-14T16:21:19Z",
+   "published": "2026-06-14T17:06:38Z",
    "tickers": [
     "MACRO"
    ],
