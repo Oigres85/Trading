@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-14T16:01:12Z",
+ "updated_at": "2026-06-14T16:20:43Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -8209,16 +8209,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63991.03,
-   "change_pct": -0.67,
+   "price": 64061.12,
+   "change_pct": -0.56,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.3,
+   "ath_dist_pct": -49.2,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 35.5,
-   "volume": 17034532864,
-   "vol_ratio": 0.52,
+   "rsi": 35.7,
+   "volume": 16668748800,
+   "vol_ratio": 0.51,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -8227,7 +8227,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63991.03
+     64061.12
     ],
     "m6": [
      70120.78,
@@ -8355,7 +8355,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63991.03
+     64061.12
     ],
     "all": [
      386.94,
@@ -8499,7 +8499,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63991.03
+     64061.12
     ],
     "m1": [
      76981.12,
@@ -8523,7 +8523,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63991.03
+     64061.12
     ],
     "m3": [
      72979.05,
@@ -8591,7 +8591,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63991.03
+     64061.12
     ],
     "y1": [
      105472.41,
@@ -8667,7 +8667,7 @@
      73754.84,
      63801.57,
      61643.78,
-     63991.03
+     64061.12
     ],
     "d1": [
      64390.4,
@@ -8766,12 +8766,14 @@
      63976.09,
      63995.94,
      64029.23,
-     63991.03
+     63985.31,
+     64068.88,
+     64061.12
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 18,
+   "health": 19,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -8780,22 +8782,22 @@
     "w1": {
      "support": 60788.02,
      "resistance": 64700.88,
-     "change_pct": 4.14
+     "change_pct": 4.25
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.87
+     "change_pct": -16.78
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -12.32
+     "change_pct": -12.22
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.71
+     "change_pct": -48.65
     }
    },
    "financials": [],
@@ -12295,12 +12297,30 @@
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting"
   },
   {
+   "question": "Will the price of Bitcoin be above $64,000 on June 14?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-64k-on-june-14-2026"
+  },
+  {
    "question": "Will the price of Bitcoin be above $62,000 on June 14?",
    "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-14-2026"
   }
  ],
  "news": [
+  {
+   "source": "Investing.com",
+   "title": "Trump says Israeli strike on Lebanon should not have happened, but Iran deal close",
+   "link": "https://www.investing.com/news/world-news/us-iran-inch-closer-to-deal-timing-remains-unclear-4741054",
+   "published": "2026-06-14T16:06:49Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 0,
+   "sentiment": "neutral",
+   "title_it": "Trump afferma che l’attacco israeliano al Libano non avrebbe dovuto avvenire, ma l’accordo con l’Iran è vicino"
+  },
   {
    "source": "Investing.com",
    "title": "Protesters smash windows and set Tesla ablaze in anti-G7 march in Geneva",
@@ -12338,19 +12358,6 @@
    "priority": 0,
    "sentiment": "neutral",
    "title_it": "Il fuoco israeliano uccide sei persone a Gaza nonostante i nuovi sforzi per salvare la tregua"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Iran questions US commitment to peace moves as Israel strikes Lebanon",
-   "link": "https://www.investing.com/news/world-news/us-iran-inch-closer-to-deal-timing-remains-unclear-4741054",
-   "published": "2026-06-14T14:36:28Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 0,
-   "sentiment": "neutral",
-   "title_it": "L’Iran mette in dubbio l’impegno degli Stati Uniti verso iniziative di pace mentre Israele colpisce il Libano"
   },
   {
    "source": "Investing.com",
@@ -12431,7 +12438,7 @@
    "source": "CNBC",
    "title": "U.S. peace deal with Iran in question as Israel strikes Lebanon, Trump warns not to 'blow it'",
    "link": "https://www.cnbc.com/2026/06/14/iran-deal-teeters-israel-strikes-lebanon.html",
-   "published": "2026-06-14T15:34:05Z",
+   "published": "2026-06-14T16:11:08Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -12442,16 +12449,41 @@
   },
   {
    "source": "Yahoo Finance",
-   "title": "Dow Jones Futures: Trump, Iran Deal In Focus; Five Stocks In Buy Areas, SpaceX's Next Test",
-   "link": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-market-wild-week-5-stocks-buy-areas-spacex-next-test/?src=A00220&yptr=yahoo",
-   "published": "2026-06-14T15:31:13Z",
+   "title": "Dow Jones Futures Due With Market At Key Levels; Iran Deal In Focus, SpaceX's Next Test",
+   "link": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-trump-iran-deal-spacex/?src=A00220&yptr=yahoo",
+   "published": "2026-06-14T16:05:57Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "priority": 1,
    "sentiment": "neutral",
-   "title_it": "Futures Dow Jones: Trump e l'accordo con l'Iran al centro dell'attenzione; Cinque titoli in area di acquisto, il prossimo test di SpaceX"
+   "title_it": "Futures Dow Jones in scadenza con il mercato a livelli chiave; Focus sull'accordo con l'Iran, il prossimo test di SpaceX"
+  },
+  {
+   "source": "Reuters",
+   "title": "Israel attacks Hezbollah targets in Beirut's southern suburbs - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxNb0dtcHdBNDdCYXg2eGVXYTJ5MGlRQ0ZVM1I2UnN3MTlXZEh0eHA5QmJNMGQxMF9fbHFQVnBkMzVNbW1CY003X0l3TFFSX1VrZVBzSl95QVRjZFVkdmZ3VENOR21xM2xLbTdnbHY3ZkNSMkgwTHl5WVJuRXhoNEQwQ29BM1RGNkxab3FIbFAyQ3V0bWwxalcxX1BtRkZ1NmVfWFN1dm9HbVd1RHoxTW5qN2JkN0dWWEhxSFBrdVJuYmJlNFNZdE80ag?oc=5",
+   "published": "2026-06-14T16:03:43Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Israele attacca obiettivi di Hezbollah nella periferia sud di Beirut - Reuters"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Google Is Paying $920 Million Per Month to SpaceX. Here's Why Nvidia Is the Quiet Winner Nobody's Talking About.",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/google-paying-920-million-per-160100054.html",
+   "published": "2026-06-14T16:01:00Z",
+   "tickers": [
+    "NVDA"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Google paga 920 milioni di dollari al mese a SpaceX. Ecco perché Nvidia è il vincitore silenzioso di cui nessuno parla"
   },
   {
    "source": "Bloomberg",
@@ -12607,19 +12639,6 @@
    "title_it": "L'Iran afferma che la bozza di accordo statunitense include la rinuncia alle sanzioni petrolifere, limiti al nucleare e il rilascio di asset - Reuters"
   },
   {
-   "source": "Reuters",
-   "title": "Israel attacks Hezbollah targets in Beirut's southern suburbs - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxNb0dtcHdBNDdCYXg2eGVXYTJ5MGlRQ0ZVM1I2UnN3MTlXZEh0eHA5QmJNMGQxMF9fbHFQVnBkMzVNbW1CY003X0l3TFFSX1VrZVBzSl95QVRjZFVkdmZ3VENOR21xM2xLbTdnbHY3ZkNSMkgwTHl5WVJuRXhoNEQwQ29BM1RGNkxab3FIbFAyQ3V0bWwxalcxX1BtRkZ1NmVfWFN1dm9HbVd1RHoxTW5qN2JkN0dWWEhxSFBrdVJuYmJlNFNZdE80ag?oc=5",
-   "published": "2026-06-14T12:18:06Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Israele attacca obiettivi di Hezbollah nella periferia sud di Beirut - Reuters"
-  },
-  {
    "source": "Google News",
    "title": "Trump says 'I love the inflation' as US prices rise at fastest rate in three years - AOL.com",
    "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE85dll2MHJmaElaS2FTT3dwTk9Ub0RRMnhWUWFBODlFd3o1TzJFUmxKWHlPMVBZdWhISzIyVG1Obi1Vdm1teWdoT3pBTDEwUFdLZkRGZUpnT1ZlSXE3RFVsSzZUSUVtRlRPM1RyRXZPWVVnd0pLNU4yazlqV25NMGM?oc=5",
@@ -12761,6 +12780,19 @@
    "title_it": "Un ottagono sul prato della Casa Bianca per l'80esimo compleanno di Trump e il 250esimo della nazione, in foto - AP News"
   },
   {
+   "source": "Reuters",
+   "title": "Iran questions US commitment to peace moves as Israel strikes Lebanon - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPSXA2RmM1Y0lOSlBJSHJpd285cFViUGlLNFRUa0FTZWxBbC1DdUdVM1hSbUY5Z1A4R3poZEI3QjNGbFFzSlZpalRkbnVGWVFMNzYzQXlJbXhMTjdaRjFLQlk0b3FXZVIzcVVDbm9YVmd4RmtRTWVGcndQN1VJaEZRUEppeGlUZWJGaUx6WEI1OUtoeDRpbGdNbF8xRVFRTlY3Tk9Fcg?oc=5",
+   "published": "2026-06-14T01:53:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "L'Iran mette in dubbio l'impegno americano verso iniziative di pace mentre Israele colpisce il Libano - Reuters"
+  },
+  {
    "source": "Google News",
    "title": "Federal Reserve Chair Kevin Warsh Holds First Briefing on U.S. Economy - C-SPAN",
    "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOV0NXQUFNMFdRX3lpaXdNU3Vtd1JXQlZYY1gzSlVRbko3b0xCckZhbFg1T3ByUmxYcF81azF0STVXQnk1UUNwMUVRYjdxRUNmTUlPTldCaDF5M2dOdnI4M01NSEpVSTJWaEtDb0w3bXFweU1NVnBDdTNSb0dta2J2ZnBxbE91bXFvQW13Q2ZxTERlU0gxU09mRE9DU1R6N1JHUjJNWlRwdlBlbndnaEZBLVp6SVVxZVNLSURSaQ?oc=5",
@@ -12825,19 +12857,6 @@
   },
   {
    "source": "Reuters",
-   "title": "UK's Starmer, Trump discuss efforts to end Iran conflict - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNQWk5VjRaVlZrNXBaVWF1TGpXZ04zQnhyLTNYNkhORTJkYjhMSVhRUS1ndW9sTmRJZ2VxR1phNjA2QS1ic0o3QnE5RHRNMXRTaUktYkctYzhWRkg3Zy02WTRxTFdjV3Axb185ZDdfeDlxZWhFU3Z5MUNQSE9XVERuVTZOazVtc0VIWjd3d2czM1pHREJ3Z1BtT3RoYXZZUXBaQ0NqQWxNVEM?oc=5",
-   "published": "2026-06-13T17:15:43Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "bear",
-   "title_it": "Starmer e Trump del Regno Unito discutono degli sforzi per porre fine al conflitto iraniano - Reuters"
-  },
-  {
-   "source": "Reuters",
    "title": "Trump says Iran deal to be signed on Sunday - Reuters",
    "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPYnc0RjByemVUM1FIQkhJVkFuVExTTDlYZUVqbFo4dWVSY3ZvZGgydUMtSjcydy15d3JkVThlQVpxblFZYVBKNmdDeTVSSXlYbV9OY1l5R25tUlhrVmtSNDQ4azVFY0w2X2tpbkNkcXBURk1XckFmRG1BbWFJQ3I2UUQ4OFNORWxDSk03dTdKWVhCNDFEb3c?oc=5",
    "published": "2026-06-13T17:00:09Z",
@@ -12899,24 +12918,22 @@
    "title_it": "Il 51% degli americani è \"in conflitto finanziario\", rileva Gallup: come capire quale delle 3 personalità finanziarie è adatta a te"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Jim Cramer Returns To ConocoPhillips (COP) As Oil Prices Touch $96",
-   "link": "https://finance.yahoo.com/sectors/energy/articles/jim-cramer-returns-conocophillips-cop-140706706.html",
-   "published": "2026-06-13T14:07:06Z",
-   "tickers": [
-    "MACRO",
-    "CL=F"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Jim Cramer torna a ConocoPhillips (COP) mentre i prezzi del petrolio toccano i 96 dollari"
-  },
-  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-14T16:02:27Z",
+   "published": "2026-06-14T16:21:19Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Will the price of Bitcoin be above $64,000 on June 14?",
+   "title_it": "Will the price of Bitcoin be above $64,000 on June 14? — probabilità Sì 100%",
+   "link": "https://polymarket.com/event/bitcoin-above-64k-on-june-14-2026",
+   "published": "2026-06-14T16:21:19Z",
    "tickers": [
     "MACRO"
    ],
@@ -12927,7 +12944,7 @@
    "title": "Will the price of Bitcoin be above $62,000 on June 14?",
    "title_it": "Will the price of Bitcoin be above $62,000 on June 14? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-14-2026",
-   "published": "2026-06-14T16:02:27Z",
+   "published": "2026-06-14T16:21:19Z",
    "tickers": [
     "MACRO"
    ],
