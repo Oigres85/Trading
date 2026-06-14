@@ -169,11 +169,11 @@ tbody tr.total-row { background: var(--card-2); font-weight: 700; }
 }
 .meter-fill { display: block; height: 100%; border-radius: 4px; }
 
-/* ---------- gauges (compatti) ---------- */
-.gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(138px, 1fr)); gap: 10px; }
+/* ---------- gauges (compatti) — flex-wrap così l'ultima riga riempie lo spazio ---------- */
+.gauges { display: flex; flex-wrap: wrap; gap: 10px; }
 .gauge-card {
   background: var(--card-2); border: 1px solid var(--border); border-radius: 10px;
-  padding: 10px 8px; text-align: center;
+  padding: 10px 8px; text-align: center; flex: 1 1 150px; min-width: 140px;
 }
 .gauge-card .g-title { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 5px; }
 .gauge-card svg { width: 100%; max-width: 110px; }
@@ -194,11 +194,11 @@ tbody tr.total-row { background: var(--card-2); font-weight: 700; }
 .macro-item .m-value { font-family: var(--mono); font-size: 16px; font-weight: 700; }
 .macro-item .m-date { color: var(--muted); font-size: 10px; margin-top: 3px; font-family: var(--mono); }
 
-/* seconda sezione macro: tutto su una sola riga (scorrevole se troppo stretta) */
+/* seconda sezione macro: a capo riempiendo tutta la larghezza (niente spazi vuoti) */
 .macro-grid.macro-grid-below {
-  display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 9px; padding-bottom: 4px;
+  display: flex; flex-wrap: wrap; gap: 9px;
 }
-.macro-grid.macro-grid-below .macro-item { flex: 1 0 auto; min-width: 120px; }
+.macro-grid.macro-grid-below .macro-item { flex: 1 1 130px; min-width: 120px; }
 
 /* termometro d'impatto nei box macro */
 .impact {
@@ -237,12 +237,11 @@ footer { color: var(--muted); font-size: 11.5px; text-align: center; line-height
 
 /* ---------- trimestrali ---------- */
 .earnings-strip {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-  gap: 6px; margin: 0 0 10px;
+  display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px;
 }
 .earn-card {
   background: var(--card-2); border: 1px solid var(--border); border-radius: 7px;
-  padding: 5px 7px; cursor: pointer;
+  padding: 4px 8px; cursor: pointer; flex: 1 1 84px; min-width: 80px;
 }
 .earn-card:hover { border-color: var(--blue); }
 .earn-top { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; }
@@ -253,6 +252,7 @@ footer { color: var(--muted); font-size: 11.5px; text-align: center; line-height
 /* barra range sotto le trimestrali */
 .range-bar { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; flex-wrap: wrap; }
 .range-lab { font-size: 11.5px; color: var(--muted); }
+.range-bar #ptf-edit, .range-bar #wl-edit { margin-left: auto; }
 
 /* box macro e gauge cliccabili */
 .macro-item, .gauge-card { cursor: pointer; }
@@ -283,8 +283,13 @@ th.sortable:hover { color: var(--text); }
 .spark-toggle { display: flex; gap: 6px; }
 
 /* ---------- info BTP (riga unica) ---------- */
-.btp-info { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 9px 14px; margin: -6px 0 20px; font-size: 12.5px; color: var(--muted); }
+.btp-info { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin: -6px 0 20px; font-size: 12.5px; color: var(--muted); }
 .btp-info:empty { display: none; }
+.cap-line { display: flex; flex-wrap: wrap; gap: 6px 28px; margin-bottom: 6px; }
+.cap-line .cap-lab { color: var(--muted); font-size: 11px; }
+.cap-line b { font-family: var(--mono); font-size: 14px; color: var(--text); }
+.cap-line b.pos { color: var(--green); } .cap-line b.neg { color: var(--red); }
+.btp-line { border-top: 1px solid var(--border); padding-top: 6px; }
 
 /* ---------- cash box ---------- */
 .cash-box { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
@@ -325,7 +330,7 @@ th.sortable:hover { color: var(--text); }
 
 /* ---------- F&G termometro ---------- */
 .thermo { position: relative; height: 12px; margin: 14px 4px 4px; }
-.thermo-scale { height: 8px; border-radius: 5px; background: linear-gradient(90deg,#ef4444,#f59e0b,#eab308,#22c55e); }
+.thermo-scale { height: 8px; border-radius: 5px; background: linear-gradient(90deg,#22c55e,#eab308,#f59e0b,#ef4444); }
 .thermo-marker { position: absolute; top: -3px; width: 4px; height: 14px; border-radius: 2px; background: var(--text); transform: translateX(-50%); box-shadow: 0 0 0 2px var(--card); }
 .thermo-ends { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin: 2px 4px 0; }
 
@@ -384,8 +389,18 @@ th.sortable:hover { color: var(--text); }
 
 /* ---------- zoom grafico ---------- */
 .spark-cell { cursor: pointer; }
-.modal-chart { max-width: 920px; width: 94vw; }
+.modal-chart { max-width: 920px; width: 94vw; max-height: 88vh; overflow-y: auto; }
 #cm-hit { cursor: crosshair; }
+
+/* griglia statistiche chiave nel popup finanziario */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.stat-cell {
+  background: var(--card-2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 2px;
+}
+.stat-cell:hover { border-color: var(--blue); }
+.stat-lab { font-size: 10.5px; color: var(--muted); }
+.stat-val { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--text); }
 .src-poly { background: rgba(139,92,246,.2); color: var(--purple); padding: 1px 6px; border-radius: 4px; }
 
 /* ---------- news: trending ---------- */

@@ -340,6 +340,38 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         except Exception as e:  # noqa: BLE001
             print(f"!! financials {ticker}: {e}", file=sys.stderr)
 
+    # statistiche chiave (come scheda "Più dati finanziari") + stime
+    stats = None
+    if currency == "USD" and ticker not in ("BTC-USD", "CL=F"):
+        g = info.get
+        def num(*keys):
+            for k in keys:
+                v = g(k)
+                if v is not None and not (isinstance(v, float) and math.isnan(v)):
+                    return float(v)
+            return None
+        stats = {
+            "market_cap": num("marketCap"),
+            "shares": num("sharesOutstanding", "impliedSharesOutstanding"),
+            "avg_volume_30d": num("averageVolume", "averageDailyVolume10Day"),
+            "pe_ttm": num("trailingPE"),
+            "forward_pe": num("forwardPE"),
+            "eps_ttm": num("trailingEps"),
+            "eps_forward": num("forwardEps"),
+            "revenue_fy": num("totalRevenue"),
+            "net_income_fy": num("netIncomeToCommon"),
+            "revenue_growth": num("revenueGrowth"),
+            "earnings_growth": num("earningsGrowth", "earningsQuarterlyGrowth"),
+            "profit_margin": num("profitMargins"),
+            "roe": num("returnOnEquity"),
+            "debt_to_equity": num("debtToEquity"),
+            "dividend_yield": num("dividendYield"),
+            "price_to_book": num("priceToBook"),
+            "target_mean": num("targetMeanPrice"),
+            "fcf": num("freeCashflow"),
+        }
+        stats = {k: (round(v, 4) if v is not None else None) for k, v in stats.items()}
+
     # salute tecnica 0-100 (per il termometro di portafoglio)
     parts = []
     if rsi is not None:
@@ -379,6 +411,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "beta": round(float(beta), 2) if beta is not None else None,
         "prepost": prepost,
         "sector": info.get("sector") or info.get("quoteType") or "Altro",
+        "stats": stats,
         "tech_by_range": tech_by_range,
         "financials": financials,
         "fin_health": fin_health,
@@ -439,7 +472,7 @@ def fetch_btp():
         "signal": "Cedola 4,10/4,50%", "signal_class": "info",
         "sparks": {}, "earnings_date": None, "rating": None, "health": None,
         "eps": None, "beta": None, "prepost": None,
-        "sector": "Obbligazioni", "tech_by_range": {},
+        "sector": "Obbligazioni", "tech_by_range": {}, "stats": None,
         "financials": [], "fin_health": None,
     }
 
@@ -711,10 +744,20 @@ def fetch_macro():
         hj = yf.Ticker("JPY=X").history(period="1mo")["Close"].dropna()
         usdjpy = float(hj.iloc[-1])
         usdjpy_chg_1m = round((usdjpy / float(hj.iloc[0]) - 1) * 100, 2)
+        spread = round(us10 - float(jp10), 2)
+        # prossime riunioni Bank of Japan (calendario 2026)
+        boj = [d for d in ("2026-01-23", "2026-03-19", "2026-04-30", "2026-06-17",
+                           "2026-07-31", "2026-09-18", "2026-10-30", "2026-12-18")
+               if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")][:3]
         macro["carry"] = {
-            "us10": round(us10, 2), "jp10": round(float(jp10), 2),
-            "spread": round(us10 - float(jp10), 2),
+            "us10": round(us10, 2), "jp10": round(float(jp10), 2), "spread": spread,
             "usdjpy": round(usdjpy, 2), "usdjpy_chg_1m": usdjpy_chg_1m,
+            "boj_meetings": boj,
+            "note": ("Spread ampio e yen debole: carry trade USD/JPY favorevole (capitali verso il dollaro). "
+                     "Un rialzo dei tassi BoJ o un rafforzamento dello yen può innescare l'unwind del carry, "
+                     "con vendite sui mercati azionari globali." if spread >= 2.5 else
+                     "Spread in compressione: il carry trade USD/JPY è meno conveniente; "
+                     "attenzione a possibili rientri di capitali verso lo yen."),
         }
     except Exception as e:  # noqa: BLE001
         print(f"!! carry: {e}", file=sys.stderr)
