@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-14T17:05:49Z",
+ "updated_at": "2026-06-14T17:22:26Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -2260,7 +2260,7 @@
      69.23,
      67.49,
      82.04,
-     90.98,
+     90.97,
      80.43,
      86.88,
      76.15,
@@ -8209,15 +8209,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63971.47,
-   "change_pct": -0.7,
+   "price": 63912.68,
+   "change_pct": -0.79,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.3,
+   "ath_dist_pct": -49.4,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 35.5,
-   "volume": 16170362880,
+   "rsi": 35.3,
+   "volume": 16202618880,
    "vol_ratio": 0.49,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -8227,7 +8227,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63971.47
+     63912.68
     ],
     "m6": [
      70120.78,
@@ -8355,7 +8355,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63971.47
+     63912.68
     ],
     "all": [
      386.94,
@@ -8499,7 +8499,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63971.47
+     63912.68
     ],
     "m1": [
      76981.12,
@@ -8523,7 +8523,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63971.47
+     63912.68
     ],
     "m3": [
      72979.05,
@@ -8591,7 +8591,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63971.47
+     63912.68
     ],
     "y1": [
      105472.41,
@@ -8667,112 +8667,114 @@
      73754.84,
      63801.57,
      61643.78,
-     63971.47
+     63912.68
     ],
     "d1": [
-     64390.14,
+     64390.4,
      64398.0,
-     64438.2,
-     64511.02,
-     64533.48,
+     64436.59,
+     64511.01,
+     64535.78,
      64514.93,
-     64506.17,
-     64600.18,
-     64623.6,
+     64511.26,
+     64605.32,
+     64623.57,
      64557.4,
      64538.0,
-     64598.04,
-     64568.86,
+     64598.74,
+     64568.82,
      64587.94,
-     64541.71,
+     64534.89,
      64528.0,
-     64482.88,
+     64482.89,
      64455.0,
-     64466.72,
+     64466.71,
      64465.84,
      64491.15,
-     64485.71,
-     64457.15,
+     64509.84,
+     64459.08,
      64484.62,
-     64501.17,
+     64495.12,
      64469.28,
      64467.47,
      64435.17,
      64364.63,
      64318.94,
-     64344.16,
-     64349.72,
+     64344.17,
+     64348.92,
      64315.99,
-     64287.26,
-     64329.28,
+     64284.94,
+     64338.0,
      64348.67,
      64398.84,
-     64444.36,
-     64345.48,
+     64444.37,
+     64336.29,
      64285.92,
-     64224.27,
-     64240.73,
+     64226.13,
+     64240.72,
      64256.16,
-     64205.14,
+     64210.86,
      64334.34,
      64301.19,
      64272.23,
      64380.17,
-     64358.24,
-     64413.28,
+     64352.06,
+     64407.23,
      64466.8,
      64436.47,
-     64426.6,
+     64425.48,
      64438.0,
      64439.01,
      64390.17,
-     64293.66,
+     64279.75,
      64420.87,
      64508.02,
-     64562.04,
+     64562.05,
      64517.38,
      64492.5,
-     64591.83,
-     64619.88,
+     64597.33,
+     64619.39,
      64570.73,
-     64525.53,
+     64525.52,
      64446.05,
      64523.63,
      64522.87,
      64588.11,
      64575.1,
-     64555.99,
-     64507.99,
-     64438.0,
-     64458.81,
-     64355.33,
-     64322.0,
+     64560.99,
+     64503.01,
+     64439.25,
+     64458.82,
+     64355.34,
+     64321.99,
      64270.71,
-     64294.23,
+     64298.97,
      64324.51,
-     64294.73,
-     64264.25,
-     64328.62,
-     64269.49,
-     64292.31,
+     64294.75,
+     64252.35,
+     64327.02,
+     64278.99,
+     64304.75,
      64273.04,
-     64231.17,
-     63961.99,
-     63908.11,
-     63884.0,
-     64095.84,
-     64075.86,
-     64041.16,
-     64009.25,
-     63999.41,
-     64029.24,
-     63993.27,
-     64068.89,
-     64132.52,
-     64142.03,
-     64122.01,
+     64235.69,
+     63975.94,
+     63908.12,
+     63892.72,
+     64095.85,
+     64072.53,
+     64041.15,
+     63976.09,
+     63995.94,
+     64029.23,
+     63985.31,
+     64068.88,
+     64132.47,
+     64142.04,
+     64123.97,
      63924.02,
-     63969.71
+     63969.72,
+     63922.7,
+     63912.68
     ]
    },
    "earnings_date": null,
@@ -8786,22 +8788,22 @@
     "w1": {
      "support": 60788.02,
      "resistance": 64700.88,
-     "change_pct": 4.1
+     "change_pct": 4.01
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.9
+     "change_pct": -16.98
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -12.34
+     "change_pct": -12.42
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.72
+     "change_pct": -48.77
     }
    },
    "financials": [],
@@ -10375,7 +10377,7 @@
     182060,
     179547,
     177687,
-    179861,
+    179860,
     180937,
     179782,
     179778,
@@ -10493,7 +10495,7 @@
     175250,
     175607,
     177102,
-    177838,
+    177837,
     177090,
     173614,
     175317,
@@ -10565,7 +10567,7 @@
     190167,
     190458,
     190977,
-    190306,
+    190305,
     193322,
     191450,
     189718,
@@ -11110,7 +11112,7 @@
     193835,
     194978,
     188874,
-    190387,
+    190388,
     187651,
     181623,
     188531,
@@ -11752,7 +11754,7 @@
     193835,
     194978,
     188874,
-    190387,
+    190388,
     187651,
     181623,
     188531,
@@ -12122,7 +12124,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 43
+     "score": 42
     },
     {
      "label": "Treasury 10A",
@@ -12311,7 +12313,7 @@
    "source": "Investing.com",
    "title": "Trump says Israeli strike on Lebanon should not have happened, but Iran deal close",
    "link": "https://www.investing.com/news/world-news/us-iran-inch-closer-to-deal-timing-remains-unclear-4741054",
-   "published": "2026-06-14T16:06:49Z",
+   "published": "2026-06-14T16:54:29Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -12393,7 +12395,7 @@
    ],
    "priority": 0,
    "sentiment": "bull",
-   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment delle criptovalute"
+   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment cripto"
   },
   {
    "source": "Investing.com",
@@ -12506,7 +12508,7 @@
    ],
    "priority": 1,
    "sentiment": "bear",
-   "title_it": "L'accordo di pace degli Stati Uniti con l'Iran è in discussione mentre Israele attacca il Libano, Trump avverte di non \"mandarlo all'aria\""
+   "title_it": "L’accordo di pace degli Stati Uniti con l’Iran è in discussione mentre Israele attacca il Libano, Trump avverte di non “mandarlo all’aria”"
   },
   {
    "source": "Reuters",
@@ -12520,6 +12522,18 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Israele attacca obiettivi di Hezbollah nella periferia sud di Beirut - Reuters"
+  },
+  {
+   "source": "Google News",
+   "title": "Fed chair Warsh to lead a difficult first rate meeting - Taipei Times",
+   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9XQl80QWFuUVl0SFkyY1k3THJZTnozMThoSTJMcllHb3FTMV9ZOVUwcW5iNHYwWklyZGV1dmdpQ1FCSVdFMmc3d0JLUnJ3WExMZWE5X3l5cVJrbHhZNk1OMUk5cWFRVzUya1pNa2hMTlBxN0dMNkE?oc=5",
+   "published": "2026-06-14T16:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Il presidente della Fed Warsh condurrà un difficile incontro di prim'ordine - Taipei Times"
   },
   {
    "source": "Bloomberg",
@@ -12588,6 +12602,18 @@
   },
   {
    "source": "Bloomberg",
+   "title": "Equity Funding Squeeze Driven By AI Rally, SpaceX IPO Stretches Banks",
+   "link": "https://news.google.com/search?q=Equity%20Funding%20Squeeze%20Driven%20By%20AI%20Rally%2C%20SpaceX%20IPO%20Stretches%20Banks",
+   "published": "2026-06-14T14:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "bull",
+   "title_it": "La stretta sui finanziamenti azionari guidata dal rally dell’intelligenza artificiale, l’IPO di SpaceX allunga le banche"
+  },
+  {
+   "source": "Bloomberg",
    "title": "Fed Chair Warsh Faces Challenging Debut",
    "link": "https://news.google.com/search?q=Fed%20Chair%20Warsh%20Faces%20Challenging%20Debut",
    "published": "2026-06-14T13:49:21Z",
@@ -12637,18 +12663,6 @@
    "title_it": "SpaceX dimostra che gli investitori vogliono ancora i viaggi sulla Luna. La Fed potrebbe testare questa teoria questa settimana."
   },
   {
-   "source": "Google News",
-   "title": "You Decide: What To Expect From The New Federal Reserve? - JoCo Report",
-   "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPY251S3dxTnI1cmRfX3FtSXNfTFo2SHh3VXFaN200SGdaLXp3bFlheW55aF9POFZ0WXhTOEV1SU14dGczbEFUMVk3SXI0QllGQmhJM0E0UEdXWFNUNVpzemh3MXhYdUQ1eGw4UkVwcVlDNnJVdkZ3R3dSNFJzbkItVTRRQ2U?oc=5",
-   "published": "2026-06-14T12:50:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Decidi tu: cosa aspettarti dalla nuova Federal Reserve? - Rapporto JoCo"
-  },
-  {
    "source": "CNBC",
    "title": "Top Wall Street analysts are confident about the growth prospects of these 3 stocks",
    "link": "https://www.cnbc.com/2026/06/14/top-analysts-are-confident-about-the-prospects-of-these-3-stocks.html",
@@ -12659,19 +12673,6 @@
    "priority": 1,
    "sentiment": "bull",
    "title_it": "I principali analisti di Wall Street sono fiduciosi sulle prospettive di crescita di questi 3 titoli"
-  },
-  {
-   "source": "Bloomberg",
-   "title": "G7 Summit Overshadowed by Uncertain US-Iran Deal",
-   "link": "https://news.google.com/search?q=G7%20Summit%20Overshadowed%20by%20Uncertain%20US-Iran%20Deal",
-   "published": "2026-06-14T12:18:51Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Il vertice del G7 è messo in ombra dall’incerto accordo USA-Iran"
   },
   {
    "source": "Reuters",
@@ -12685,19 +12686,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "L'Iran afferma che la bozza di accordo statunitense include la rinuncia alle sanzioni petrolifere, limiti al nucleare e il rilascio di asset - Reuters"
-  },
-  {
-   "source": "Google News",
-   "title": "Trump says 'I love the inflation' as US prices rise at fastest rate in three years - AOL.com",
-   "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE85dll2MHJmaElaS2FTT3dwTk9Ub0RRMnhWUWFBODlFd3o1TzJFUmxKWHlPMVBZdWhISzIyVG1Obi1Vdm1teWdoT3pBTDEwUFdLZkRGZUpnT1ZlSXE3RFVsSzZUSUVtRlRPM1RyRXZPWVVnd0pLNU4yazlqV25NMGM?oc=5",
-   "published": "2026-06-14T12:00:14Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "bull",
-   "title_it": "Trump dice \"Adoro l'inflazione\" mentre i prezzi negli Stati Uniti aumentano al ritmo più veloce degli ultimi tre anni - AOL.com"
   },
   {
    "source": "CNBC",
@@ -12879,6 +12867,18 @@
    "title_it": "L'Iran affronterà la Nuova Zelanda nella partita d'apertura politicamente carica di Los Angeles - Reuters"
   },
   {
+   "source": "Google News",
+   "title": "America In Focus: Inflation hits 3-year high, Wall Street rallies and Musk becomes a trillionaire - The Washington Post",
+   "link": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxOU3VucllCRmQ0ZVBvQkJTVHVERmROTTN3MHJRZjN6Y1BySUxDRlhVVXlBUTZpdDg4OFRwOHhHaFRXVUlTUEh6RDV2WjE3SGU2ak1Hc2tHT1htUnhFem5KWGVERkVEN05NYzd0bFNtNXdXTTE5Unprb19iNjgxVWJ1OWY0V2d5T2ZVcVVEOGtqQ0VMb3ViNVU0SldTZHFQRjdNLXlVdVFkZHpzM3FrSzBhU1BQZ1praGVWRzJXQ21JTmFuNmJadG0xMGVYU0tUTE5wcmFiZ3FUS2draEZzanFBaTJWb09rVXVZU1FRMw?oc=5",
+   "published": "2026-06-13T21:11:08Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Focus America: l'inflazione tocca il massimo degli ultimi 3 anni, Wall Street in rialzo e Musk diventa un miliardario - The Washington Post"
+  },
+  {
    "source": "Bloomberg",
    "title": "Fed and BOE Stay Guarded After 100 Days of Iran War",
    "link": "https://news.google.com/search?q=Fed%20and%20BOE%20Stay%20Guarded%20After%20100%20Days%20of%20Iran%20War",
@@ -12893,18 +12893,6 @@
   },
   {
    "source": "Reddit",
-   "title": "Why the S&P 500 and some other index funds require seasoning and apply “free float”",
-   "link": "https://www.reddit.com/r/investing/comments/1u4xlzl/why_the_sp_500_and_some_other_index_funds_require/",
-   "published": "2026-06-13T17:59:26Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Perché l’S&P 500 e alcuni altri fondi indicizzati richiedono un aggiustamento e applicano il “flottante”"
-  },
-  {
-   "source": "Reddit",
    "title": "Who is even allowed to sell SPCX right now?",
    "link": "https://www.reddit.com/r/stocks/comments/1u4v5va/who_is_even_allowed_to_sell_spcx_right_now/",
    "published": "2026-06-13T16:21:39Z",
@@ -12916,11 +12904,23 @@
    "title_it": "Chi è autorizzato a vendere SPCX in questo momento?"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Amtagvi Approval Boosted Iovance Biotherapeutics, Inc. (IOVA), But Can the Rally Last?",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/amtagvi-approval-boosted-iovance-biotherapeutics-153057776.html",
+   "published": "2026-06-13T15:30:57Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "bull",
+   "title_it": "L'approvazione di Amtagvi ha rafforzato la Iovance Biotherapeutics, Inc. (IOVA), ma la manifestazione può durare?"
+  },
+  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-14T17:06:38Z",
+   "published": "2026-06-14T17:36:57Z",
    "tickers": [
     "MACRO"
    ],
@@ -12931,7 +12931,7 @@
    "title": "Will the price of Bitcoin be above $64,000 on June 14?",
    "title_it": "Will the price of Bitcoin be above $64,000 on June 14? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-64k-on-june-14-2026",
-   "published": "2026-06-14T17:06:38Z",
+   "published": "2026-06-14T17:36:57Z",
    "tickers": [
     "MACRO"
    ],
