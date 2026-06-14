@@ -334,7 +334,7 @@ function renderAll() {
   renderMiniCards();
   renderTopCaps();
   renderNews();
-  renderBroker();
+  renderBtpInfo();
   renderSellCalc();
   pmcInit();
 }
@@ -493,46 +493,23 @@ function renderHistory() {
   hit.addEventListener("mouseleave", leave);
 }
 
-/* ---------------- rendimenti reali (broker) ---------------- */
-const RANGE_LABEL = { w1: "1 settimana", m1: "1 mese", m3: "3 mesi", y1: "12 mesi", y5: "5 anni", all: "dall'inizio" };
-function brokerPeriodReturn(b) {
-  if (histRange === "all" || histRange === "y5") return b.inception_pct;
-  if (histRange === "y1") return b.y1_pct;
-  const h = DATA.history && DATA.history[histRange];
-  if (h && h.values.length > 1) return Math.round((h.values[h.values.length - 1] / h.values[0] - 1) * 1000) / 10;
-  return b.inception_pct;
-}
-
-function renderBroker() {
-  const b = DATA.broker;
-  const box = $("#broker-row");
+/* ---------------- info BTP (riga unica sotto i KPI) ---------------- */
+function renderBtpInfo() {
+  const box = $("#btp-info");
   if (!box) return;
-  if (!b) { box.innerHTML = ""; return; }
-  const ret = brokerPeriodReturn(b);
-  const cell = (lab, val, cls = "") => `<div class="bk-cell"><div class="bk-lab">${lab}</div><div class="bk-val ${cls}">${val}</div></div>`;
+  const cedoleInc = DATA.broker?.cedole_btp;
   // BTP Valore Ott 2028: cedola trimestrale (10 gen/apr/lug/ott), 4,10% fino a ott 2026 poi 4,50%
-  const nominal = 40000;
-  const now = new Date();
-  const coupMonths = [0, 3, 6, 9];   // gen, apr, lug, ott
+  const nominal = 40000, now = new Date();
   let next = null;
   for (let y = now.getFullYear(); y <= now.getFullYear() + 1 && !next; y++)
-    for (const mth of coupMonths) {
+    for (const mth of [0, 3, 6, 9]) {
       const d = new Date(y, mth, 10);
       if (d > now) { next = d; break; }
     }
   const rate = next && next < new Date(2026, 9, 11) ? 0.041 : 0.045;
-  const grossQ = nominal * rate / 4;
-  const netQ = grossQ * (1 - 0.125);
+  const grossQ = Math.round(nominal * rate / 4), netQ = Math.round(grossQ * (1 - 0.125));
   const nextStr = next ? next.toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "—";
-  box.innerHTML = `<div class="bk-title">Rendimenti reali (broker, ${new Date(b.as_of).toLocaleDateString("it-IT")})</div>
-    <div class="bk-grid">
-      ${cell(`Rendimento (${RANGE_LABEL[histRange] || "periodo"})`, signTxt(ret), signCls(ret))}
-      ${cell("Controvalore", fmtEUR.format(b.controvalore_totale))}
-      ${cell("Profitto totale", `${signTxt(b.profitto_totale_pct)} · ${signTxt(Math.round(b.profitto_totale_eur), " €")}`, signCls(b.profitto_totale_pct))}
-      ${cell("Profitto azioni ($)", `${signTxt(b.profitto_usd_pct)} · ${signTxt(Math.round(b.profitto_usd), " $")}`, signCls(b.profitto_usd_pct))}
-      ${cell("Cedole BTP incassate (lorde)", fmtEUR.format(b.cedole_btp))}
-      ${cell("Prossima cedola BTP", `${nextStr} · ${fmtEUR.format(Math.round(grossQ))} lordi (${fmtEUR.format(Math.round(netQ))} netti)`)}
-    </div>`;
+  box.innerHTML = `BTP Valore Ott 2028 — ${cedoleInc != null ? `cedole incassate ${fmtEUR.format(cedoleInc)} lorde · ` : ""}prossima cedola ${nextStr}: ${fmtEUR.format(grossQ)} lordi (${fmtEUR.format(netQ)} netti, tassazione 12,5%).`;
 }
 
 /* ---------------- asset allocation (donut) ---------------- */
@@ -729,23 +706,34 @@ function openFinancialsModal(ticker) {
   const r = [...(DATA.portfolio || []), ...(DATA.watchlist || [])].find(x => x.ticker === ticker);
   if (!r || !(r.financials || []).length) { toast("Dati di bilancio non disponibili per " + ticker); return; }
   const f = r.financials;
+  // sintesi + previsione anno prossimo (stima dai trend)
+  const yrs = f.length;
+  const cagr = f[0].revenue > 0 ? ((f[yrs - 1].revenue / f[0].revenue) ** (1 / Math.max(1, yrs - 1)) - 1) : null;
+  const niCagr = f[0].net_income > 0 && f[yrs - 1].net_income > 0 ? ((f[yrs - 1].net_income / f[0].net_income) ** (1 / Math.max(1, yrs - 1)) - 1) * 100 : null;
+  const avgMargin = f.reduce((s, x) => s + x.margin, 0) / yrs;
+  let forecast = null;
+  if (cagr != null) {
+    const g = Math.max(-0.3, Math.min(0.6, cagr));   // clamp crescita stimata
+    const fr = Math.round(f[yrs - 1].revenue * (1 + g));
+    forecast = { year: f[yrs - 1].year + 1, revenue: fr, net_income: Math.round(fr * avgMargin / 100), margin: Math.round(avgMargin * 10) / 10, est: true };
+  }
+  const draw = forecast ? f.concat([forecast]) : f;
   const W = 560, H = 280, pad = { l: 50, r: 44, t: 16, b: 28 };
-  const maxRev = Math.max(...f.map(x => Math.abs(x.revenue)), 1);
-  const margins = f.map(x => x.margin);
-  const mMax = Math.max(40, ...margins.map(Math.abs));
-  const n = f.length, bw = (W - pad.l - pad.r) / n;
+  const maxRev = Math.max(...draw.map(x => Math.abs(x.revenue)), 1);
+  const mMax = Math.max(40, ...draw.map(x => Math.abs(x.margin)));
+  const n = draw.length, bw = (W - pad.l - pad.r) / n;
   const yRev = v => pad.t + (1 - v / maxRev) * (H - pad.t - pad.b);
   const yM = v => pad.t + (1 - (v + mMax) / (2 * mMax)) * (H - pad.t - pad.b);
   const fmtB = v => Math.abs(v) >= 1e9 ? (v / 1e9).toFixed(1) + "B" : (v / 1e6).toFixed(0) + "M";
   let bars = "", line = "", labels = "";
-  f.forEach((x, i) => {
-    const cx = pad.l + bw * i, w = bw * 0.32;
-    bars += `<rect x="${cx + bw * 0.12}" y="${yRev(Math.max(0, x.revenue))}" width="${w}" height="${Math.abs(yRev(x.revenue) - yRev(0))}" fill="#4c8dff"><title>Ricavi ${x.year}: ${fmtB(x.revenue)}</title></rect>`;
-    bars += `<rect x="${cx + bw * 0.12 + w}" y="${yRev(Math.max(0, x.net_income))}" width="${w}" height="${Math.abs(yRev(x.net_income) - yRev(0))}" fill="#1e40af"><title>Utile ${x.year}: ${fmtB(x.net_income)}</title></rect>`;
+  draw.forEach((x, i) => {
+    const cx = pad.l + bw * i, w = bw * 0.32, op = x.est ? 0.45 : 1;
+    bars += `<rect x="${cx + bw * 0.12}" y="${yRev(Math.max(0, x.revenue))}" width="${w}" height="${Math.abs(yRev(x.revenue) - yRev(0))}" fill="#4c8dff" opacity="${op}"><title>Ricavi ${x.year}${x.est ? " (stima)" : ""}: ${fmtB(x.revenue)}</title></rect>`;
+    bars += `<rect x="${cx + bw * 0.12 + w}" y="${yRev(Math.max(0, x.net_income))}" width="${w}" height="${Math.abs(yRev(x.net_income) - yRev(0))}" fill="#1e40af" opacity="${op}"><title>Utile ${x.year}${x.est ? " (stima)" : ""}: ${fmtB(x.net_income)}</title></rect>`;
     const px = cx + bw / 2, py = yM(x.margin);
     line += `${px.toFixed(1)},${py.toFixed(1)} `;
-    labels += `<text x="${px.toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="10" fill="var(--muted)">${x.year}</text>`;
-    labels += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="#f59e0b"><title>Margine ${x.year}: ${x.margin}%</title></circle>`;
+    labels += `<text x="${px.toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="10" fill="var(--muted)">${x.year}${x.est ? "*" : ""}</text>`;
+    labels += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="#f59e0b" opacity="${op}"><title>Margine ${x.year}: ${x.margin}%</title></circle>`;
   });
   const svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:280px">
     <line x1="${pad.l}" y1="${yRev(0)}" x2="${W - pad.r}" y2="${yRev(0)}" stroke="var(--border)"/>
@@ -757,19 +745,18 @@ function openFinancialsModal(ticker) {
     <text x="${W - pad.r + 6}" y="${yM(-mMax) + 4}" font-size="9" fill="#f59e0b">−${Math.round(mMax)}%</text>
   </svg>
   <div class="cm-legend"><span><i style="background:#4c8dff"></i>Ricavi</span><span><i style="background:#1e40af"></i>Utile netto</span><span><i class="round" style="background:#f59e0b"></i>Margine netto %</span></div>`;
-  // tabella annuale + sintesi
-  const yrs = f.length;
-  const cagr = f[0].revenue > 0 ? ((f[yrs - 1].revenue / f[0].revenue) ** (1 / Math.max(1, yrs - 1)) - 1) * 100 : null;
-  const niCagr = f[0].net_income > 0 && f[yrs - 1].net_income > 0 ? ((f[yrs - 1].net_income / f[0].net_income) ** (1 / Math.max(1, yrs - 1)) - 1) * 100 : null;
-  const avgMargin = f.reduce((s, x) => s + x.margin, 0) / yrs;
-  const rows = f.slice().reverse().map(x => `<tr><td>${x.year}</td><td>${fmtB(x.revenue)}</td><td class="${signCls(x.net_income)}">${fmtB(x.net_income)}</td><td class="${signCls(x.margin)}">${x.margin}%</td></tr>`).join("");
+  // tabella annuale + sintesi + previsione
+  const cagrPct = cagr != null ? cagr * 100 : null;
+  const rows = draw.slice().reverse().map(x => `<tr${x.est ? ' style="opacity:.7"' : ""}><td>${x.year}${x.est ? " (stima)" : ""}</td><td>${fmtB(x.revenue)}</td><td class="${signCls(x.net_income)}">${fmtB(x.net_income)}</td><td class="${signCls(x.margin)}">${x.margin}%</td></tr>`).join("");
   const table = `<table class="info-table"><thead><tr><th>Anno</th><th>Ricavi</th><th>Utile netto</th><th>Margine</th></tr></thead><tbody>${rows}</tbody></table>`;
   const extra = `<div class="info-line" style="margin-top:8px">
-    <b>CAGR ricavi (${yrs}a):</b> <span class="${signCls(cagr)}">${cagr != null ? signTxt(Math.round(cagr * 10) / 10) : "—"}</span>
+    <b>CAGR ricavi (${yrs}a):</b> <span class="${signCls(cagrPct)}">${cagrPct != null ? signTxt(Math.round(cagrPct * 10) / 10) : "—"}</span>
     · <b>CAGR utile:</b> <span class="${signCls(niCagr)}">${niCagr != null ? signTxt(Math.round(niCagr * 10) / 10) : "—"}</span>
     · <b>Margine medio:</b> ${avgMargin.toFixed(1)}%${r.pe && r.pe > 0 ? ` · <b>P/E:</b> ${fmtNum.format(r.pe)}` : ""}${r.eps != null ? ` · <b>EPS:</b> ${fmtNum.format(r.eps)}` : ""}</div>`;
+  const fcast = forecast ? `<div class="info-line"><b>Previsione ${forecast.year} (stima dai trend):</b> ricavi ~${fmtB(forecast.revenue)} · utile ~${fmtB(forecast.net_income)} · margine ~${forecast.margin}%</div>
+    <div class="info-line muted" style="font-size:11px">* stima estrapolata da crescita ricavi e margine medio storici, non una previsione ufficiale.</div>` : "";
   openInfoModal(`${r.name} (${ticker}) — Conto economico`,
-    `${svg}${extra}${table}<div class="info-line muted" style="margin-top:8px">Financial Health Score: <b style="color:${scoreColor(r.fin_health)}">${r.fin_health ?? "—"}/100</b> · pesato su crescita ricavi, costanza utili e stabilità del margine.</div>`);
+    `${svg}${extra}${fcast}${table}<div class="info-line muted" style="margin-top:8px">Financial Health Score: <b style="color:${scoreColor(r.fin_health)}">${r.fin_health ?? "—"}/100</b> · pesato su crescita ricavi, costanza utili e stabilità del margine.</div>`);
 }
 
 /* ---------------- zoom grafico (modale, touch + mouse) ---------------- */
@@ -1292,70 +1279,9 @@ async function showPrompt() {
   } catch { /* clipboard non disponibile: l'utente può copiare dal box */ }
 }
 
-/* ---------------- analisi AI (Gemini) ---------------- */
-// la chiave resta SOLO nel browser (localStorage), mai nel repo pubblico
-function getGeminiKey() {
-  let k = localStorage.getItem("gemini_key");
-  if (!k) {
-    k = window.prompt("Incolla la tua API key Google Gemini (resta salvata solo in questo browser, una volta sola):");
-    if (k) { k = k.trim(); localStorage.setItem("gemini_key", k); }
-  }
-  return k;
-}
-
-function mdToHtml(md) {
-  return esc(md)
-    .replace(/^### (.*)$/gm, "<h4>$1</h4>")
-    .replace(/^## (.*)$/gm, "<h3>$1</h3>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/^\s*[-*] (.*)$/gm, "<li>$1</li>")
-    .replace(/(<li>[\s\S]*?<\/li>)/g, "<ul>$1</ul>")
-    .replace(/\n{2,}/g, "<br><br>").replace(/\n/g, "<br>");
-}
-
-async function analyzeAI() {
-  const modal = $("#ai-modal"), loading = $("#ai-loading"), content = $("#ai-content");
-  const key = getGeminiKey();
-  if (!key) return;
-  modal.hidden = false; loading.style.display = "block"; content.innerHTML = "";
-  const prompt = "Sei un analista finanziario quantitativo esperto di analisi tecnica e macroeconomia. "
-    + "Analizza i dati seguenti (portafoglio con tecnici, macro, news) e fornisci un report in Markdown con: "
-    + "1) Sintesi macro e sentiment, 2) Analisi tecnica del portafoglio (ipercomprato/ipervenduto, supporti/resistenze, volumi anomali), "
-    + "3) Indicazioni operative (coperture, prese di beneficio, possibili acquisti). Usa elenchi puntati e grassetti.\n\nDATI:\n" + buildPrompt();
-  try {
-    let res, lastErr = "";
-    for (const model of ["gemini-2.0-flash", "gemini-flash-latest", "gemini-1.5-flash"]) {
-      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=` + encodeURIComponent(key), {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      });
-      if (res.ok) break;
-      lastErr = "HTTP " + res.status;
-      if ([400, 401, 403].includes(res.status)) {
-        localStorage.removeItem("gemini_key");
-        throw new Error("Chiave Gemini non valida/non autorizzata (rimossa). Crea una API key gratuita su aistudio.google.com/apikey — deve iniziare con \"AIza\" — e riprova.");
-      }
-      // 404 → modello non disponibile per questa chiave: provo il prossimo
-    }
-    if (!res.ok) throw new Error(lastErr + " — nessun modello Gemini disponibile per questa chiave");
-    const data = await res.json();
-    const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!txt) throw new Error("Risposta vuota dall'AI");
-    content.innerHTML = mdToHtml(txt);
-  } catch (e) {
-    content.innerHTML = `<p class="neg">Errore nell'analisi AI: ${esc(e.message)}</p>
-      <p class="muted">Puoi comunque usare "Copia prompt" e incollarlo in Claude o Gemini manualmente.</p>`;
-  } finally {
-    loading.style.display = "none";
-  }
-}
-
 /* ---------------- eventi ---------------- */
 $("#btn-refresh").addEventListener("click", refreshAll);
 $("#btn-prompt").addEventListener("click", showPrompt);
-$("#btn-analyze-ai").addEventListener("click", analyzeAI);
-$("#ai-modal-close").addEventListener("click", () => { $("#ai-modal").hidden = true; });
-$("#ai-modal").addEventListener("click", (e) => { if (e.target.id === "ai-modal") $("#ai-modal").hidden = true; });
 $("#modal-close").addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
 $("#btn-copy").addEventListener("click", async () => {
@@ -1510,7 +1436,6 @@ document.querySelectorAll("#hist-toggle .chip").forEach(ch => {
     ch.classList.add("chip-active");
     histRange = ch.dataset.range;
     renderHistory();
-    renderBroker();   // il rendimento reale segue il range selezionato
   });
 });
 $("#bench-select").addEventListener("change", (e) => { histBenchKey = e.target.value; renderHistory(); });
