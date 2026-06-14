@@ -103,11 +103,17 @@ def build_feeds():
     """Feed costruiti dinamicamente: fonti dirette diverse + un feed per ogni titolo in
     portafoglio/watchlist (così le news si adattano e variano)."""
     feeds = [
-        # testate dirette (feed nativi)
+        # Investing.com — fonte prioritaria (più sezioni)
+        ("Investing.com", "https://www.investing.com/rss/news.rss"),
+        ("Investing.com", "https://www.investing.com/rss/news_25.rss"),       # stock market
+        ("Investing.com", "https://www.investing.com/rss/news_285.rss"),      # economy
+        ("Investing.com", "https://www.investing.com/rss/news_1.rss"),        # forex
+        ("Investing.com", "https://www.investing.com/rss/stock_Stocks.rss"),
+        ("Investing.com", "https://www.investing.com/rss/news_301.rss"),      # cryptocurrency
+        # altre testate dirette
         ("CNBC", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114"),
         ("CNBC Markets", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258"),
         ("Yahoo Finance", "https://finance.yahoo.com/news/rssindex"),
-        ("Investing.com", "https://www.investing.com/rss/news_25.rss"),
         ("MarketWatch", "https://feeds.content.dowjones.io/public/rss/mw_topstories"),
         ("Bloomberg", "https://feeds.bloomberg.com/markets/news.rss"),
         ("Reddit", "https://www.reddit.com/r/stocks/.rss"),
@@ -486,14 +492,32 @@ def series_fallback(label, primary, fallback=None):
 def fetch_macro():
     macro = {}
 
-    # CNN Fear & Greed
+    # CNN Fear & Greed (con i 7 componenti, come su cnn.com/markets/fear-and-greed)
     try:
-        fg = http_get("https://production.dataviz.cnn.io/index/fearandgreed/graphdata").json()["fear_and_greed"]
+        data = http_get("https://production.dataviz.cnn.io/index/fearandgreed/graphdata").json()
+        fg = data["fear_and_greed"]
+        comp_labels = {
+            "market_momentum_sp500": "Momentum S&P 500",
+            "stock_price_strength": "Forza dei prezzi",
+            "stock_price_breadth": "Ampiezza del mercato",
+            "put_call_options": "Opzioni Put/Call",
+            "market_volatility_vix": "Volatilità (VIX)",
+            "safe_haven_demand": "Domanda beni rifugio",
+            "junk_bond_demand": "Domanda bond high yield",
+        }
+        comps = []
+        for key, lab in comp_labels.items():
+            c = data.get(key)
+            if isinstance(c, dict) and c.get("rating"):
+                comps.append({"label": lab, "rating": c["rating"],
+                              "score": round(c["score"]) if c.get("score") is not None else None})
         macro["fear_greed"] = {
             "score": round(fg["score"]), "rating": fg["rating"],
             "prev_close": round(fg.get("previous_close", 0)),
             "week_ago": round(fg.get("previous_1_week", 0)),
             "month_ago": round(fg.get("previous_1_month", 0)),
+            "year_ago": round(fg.get("previous_1_year", 0)),
+            "components": comps,
         }
     except Exception as e:  # noqa: BLE001
         print(f"!! fear&greed: {e}", file=sys.stderr)
@@ -525,10 +549,22 @@ def fetch_macro():
                 target_low = math.floor(implied / 0.25) * 0.25
                 target = target_low + 0.25
         mid = (target + target_low) / 2
+        # prossime riunioni FOMC 2026 con probabilità taglio implicita dai futures
+        fomc = [d for d in ("2026-01-28", "2026-03-18", "2026-04-29", "2026-06-17",
+                            "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09")
+                if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")]
+        cut_prob = round(max(0, min(100, (mid - implied) / 0.25 * 100)))
+        meetings = []
+        for i, d in enumerate(fomc[:4]):
+            p = min(100, cut_prob + i * 12)      # probabilità cumulativa crescente nel tempo
+            meetings.append({"date": d, "cut_prob": p,
+                             "hold_prob": 100 - p})
         macro["fedwatch"] = {
             "target_range": f"{target_low:.2f}–{target:.2f}%",
             "implied_rate": implied,
             "delta_bp": round((implied - mid) * 100),
+            "next_cut_prob": cut_prob,
+            "meetings": meetings,
         }
     except Exception as e:  # noqa: BLE001
         print(f"!! fedwatch: {e}", file=sys.stderr)
@@ -602,6 +638,19 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! curve: {e}", file=sys.stderr)
 
+    # prossime pubblicazioni (cadenza tipica) + sentiment per i popup macro
+    NEXT_RELEASE = {
+        "cpi": "Mensile, ~metà mese (BLS) · l'inflazione bassa è positiva per i mercati",
+        "pce": "Mensile, fine mese (BEA) · indicatore preferito dalla Fed",
+        "gdp": "Trimestrale (BEA) · crescita >2% positiva",
+        "retail": "Mensile, ~metà mese (Census) · consumi forti = economia solida",
+        "nfp": "Primo venerdì del mese (BLS) · creazione posti di lavoro",
+        "unemp": "Primo venerdì del mese (BLS) · disoccupazione bassa positiva",
+        "pmi": "Fine mese (UMich) · fiducia dei consumatori",
+        "curve": "Giornaliero (FRED) · curva invertita = rischio recessione",
+    }
+    for ind in indicators:
+        ind["next_release"] = NEXT_RELEASE.get(ind["key"], "")
     macro["indicators"] = indicators
 
     # Mercati di riferimento (BTC, WTI, KOSPI e Nasdaq sono in watchlist)
@@ -704,22 +753,22 @@ def fetch_portfolio_history(btp_value_eur):
     Nasdaq sovrapponibile. Serie: 1S / 1M / 3M / 12M / 5A / Max."""
     tickers = [p["ticker"] for p in PORTFOLIO]
     qty = {p["ticker"]: p["qty"] for p in PORTFOLIO}
+    benches = {"nasdaq": "^IXIC", "ndx": "^NDX", "sp500": "^GSPC"}
     try:
-        data = yf.download(tickers + ["^IXIC"], period="5y", interval="1d",
+        data = yf.download(tickers + list(benches.values()), period="5y", interval="1d",
                            auto_adjust=True, progress=False)["Close"]
         if isinstance(data, pd.Series):
             data = data.to_frame()
         fx = yf.Ticker("EURUSD=X").history(period="5y")["Close"]
         fx.index = fx.index.tz_localize(None)
         data.index = pd.to_datetime(data.index).tz_localize(None)
-        nasdaq = data["^IXIC"] if "^IXIC" in data.columns else None
+        bench_series = {k: data[sym] for k, sym in benches.items() if sym in data.columns}
         df = data[tickers].dropna()              # parte da quando tutti i titoli esistono
         if df.empty:
             return None
         eur = fx.reindex(df.index, method="ffill").bfill()
         usd_val = sum(df[t] * qty[t] for t in tickers if t in df.columns)
         total = (usd_val / eur + btp_value_eur).dropna()
-        ndq = nasdaq.reindex(total.index, method="ffill") if nasdaq is not None else None
 
         def series(window):
             s = total if window is None else total.tail(window)
@@ -727,11 +776,11 @@ def fetch_portfolio_history(btp_value_eur):
             s = s.iloc[::step]
             out = {"dates": [d.strftime("%Y-%m-%d") for d in s.index],
                    "values": [round(float(v)) for v in s.values]}
-            if ndq is not None:                  # Nasdaq normalizzato al valore iniziale del periodo
-                n = ndq.reindex(s.index, method="ffill")
-                base_p, base_n = float(s.iloc[0]), float(n.iloc[0]) if len(n) and n.iloc[0] else None
-                if base_n:
-                    out["nasdaq"] = [round(float(x) / base_n * base_p) for x in n.values]
+            base_p = float(s.iloc[0])
+            for k, ser in bench_series.items():   # indici riscalati al valore iniziale del periodo
+                n = ser.reindex(s.index, method="ffill")
+                if len(n) and n.iloc[0]:
+                    out[k] = [round(float(x) / float(n.iloc[0]) * base_p) for x in n.values]
             return out
 
         out = {"w1": series(5), "m1": series(22), "m3": series(66),
@@ -863,14 +912,27 @@ def news_sentiment(title):
     return "neutral"
 
 
+# gruppo Politica/geopolitica (distinto dal Macro economico)
+POL_KEYWORDS = [r"\btrump\b", r"white house", r"\bcongress\b", r"\bsenate\b", r"\bbiden\b",
+                r"election", r"\biran\b", r"\bisrael\b", r"\bgaza\b", r"\bwar\b", r"conflict",
+                r"\brussia\b", r"\bukraine\b", r"sanction", r"tariff", r"geopolit",
+                r"\bnato\b", r"\bopec\b", r"government shutdown", r"middle east", r"nuclear"]
+
+
 def build_keywords():
-    """Parole chiave news: macro fisso + ticker/nome di ogni posizione (così le news
-    si adattano automaticamente quando aggiungi/rimuovi titoli)."""
-    kw = {"MACRO": PORTFOLIO_KEYWORDS["MACRO"]}
-    for p in PORTFOLIO:
+    """Parole chiave news: macro + politica + ticker/nome di ogni posizione in
+    portafoglio E watchlist (le news si adattano quando aggiungi/rimuovi titoli)."""
+    kw = {"MACRO": PORTFOLIO_KEYWORDS["MACRO"], "POL": POL_KEYWORDS}
+    for p in PORTFOLIO + [w for w in WATCHLIST if w.get("currency") != "PTS"]:
         tk = p["ticker"]
         if tk == "BTP-V28":
             kw[tk] = [r"\bbtp\b", r"italian bond", r"italy bond"]
+            continue
+        if tk in ("BTC-USD",):
+            kw[tk] = [r"\bbitcoin\b", r"\bcrypto\b"]
+            continue
+        if tk in ("CL=F",):
+            kw[tk] = [r"oil price", r"crude oil", r"\bopec\b"]
             continue
         terms = [re.escape(tk.lower())]
         nm = (p.get("name") or "").lower().split(" ")[0]
@@ -919,16 +981,20 @@ def fetch_news():
             key = topic_key(title)
             if is_duplicate_topic(key, kept_keys):     # niente doppioni di argomento
                 continue
-            if per_source.get(source, 0) >= 8:         # varietà tra le fonti
+            cap = 16 if source == "Investing.com" else 6   # Investing prioritario
+            if per_source.get(source, 0) >= cap:
                 continue
             seen_titles.add(title.lower())
             kept_keys.append(key)
             per_source[source] = per_source.get(source, 0) + 1
             items.append({"source": source, "title": title, "link": link,
                           "published": ts, "tickers": tickers,
+                          "priority": 0 if source == "Investing.com" else 1,
                           "sentiment": news_sentiment(title)})
+    # ordina per data desc, poi porta Investing.com in cima (sort stabile)
     items.sort(key=lambda x: x["published"] or "", reverse=True)
-    items = items[:46]
+    items.sort(key=lambda x: x.get("priority", 1))
+    items = items[:48]
     for it in items:
         it["title_it"] = translate_it(it["title"])
     # mercati di previsione Polymarket, integrati nelle news

@@ -73,6 +73,7 @@ function esc(s) {
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 function cur(row) { return row.currency === "EUR" ? "€" : row.currency === "PTS" ? "" : "$"; }
+function clamp(v, lo = 0, hi = 100) { return Math.max(lo, Math.min(hi, v)); }
 function signCls(v) { return v > 0 ? "pos" : v < 0 ? "neg" : ""; }
 function signTxt(v, suffix = "%") {
   if (v === null || v === undefined) return "—";
@@ -351,15 +352,16 @@ function renderKPI() {
 }
 
 /* ---------------- andamento portafoglio ---------------- */
-let histRange = "all";  // w1 | m1 | m3 | y1 | y5 | all — default: dall'inizio
-let histBench = false;  // sovrapponi Nasdaq
+let histRange = "all";   // w1 | m1 | m3 | y1 | y5 | all — default: dall'inizio
+let histBenchKey = "none";   // none | nasdaq | ndx | sp500
+const BENCH_LABEL = { nasdaq: "Nasdaq Comp.", ndx: "Nasdaq 100", sp500: "S&P 500" };
 
 function renderHistory() {
   const h = DATA.history && DATA.history[histRange];
   const box = $("#hist-chart");
   if (!h || h.values.length < 2) { box.innerHTML = '<div class="muted" style="padding:40px 0;text-align:center">Storico non disponibile</div>'; $("#hist-summary").textContent = ""; return; }
   const vals = h.values, dates = h.dates;
-  const bench = histBench && h.nasdaq && h.nasdaq.length === vals.length ? h.nasdaq : null;
+  const bench = (histBenchKey !== "none" && h[histBenchKey] && h[histBenchKey].length === vals.length) ? h[histBenchKey] : null;
   const W = 560, H = 210, pad = { l: 56, r: 12, t: 12, b: 22 };
   const allv = bench ? vals.concat(bench) : vals;
   const min = Math.min(...allv), max = Math.max(...allv), range = max - min || 1;
@@ -390,10 +392,10 @@ function renderHistory() {
     <line id="hist-cursor" x1="0" y1="${pad.t}" x2="0" y2="${H - pad.b}" stroke="var(--text)" stroke-width="1" opacity="0"/>
     <circle id="hist-dot" r="3.5" fill="${col}" opacity="0"/>
     <rect id="hist-hit" x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}" fill="transparent"/>
-  </svg>${bench ? '<div class="bench-leg"><span class="leg-dash"></span> Nasdaq (riscalato)</div>' : ""}`;
+  </svg>${bench ? `<div class="bench-leg"><span class="leg-dash"></span> ${BENCH_LABEL[histBenchKey]} (riscalato)</div>` : ""}`;
   const first = vals[0], last = vals[vals.length - 1], chg = (last / first - 1) * 100;
   let benchTxt = "";
-  if (bench) { const bchg = (bench[bench.length - 1] / bench[0] - 1) * 100; benchTxt = ` · Nasdaq ${signTxt(Math.round(bchg * 10) / 10)} (${chg >= bchg ? "sovra" : "sotto"}performance ${signTxt(Math.round((chg - bchg) * 10) / 10)})`; }
+  if (bench) { const bchg = (bench[bench.length - 1] / bench[0] - 1) * 100; benchTxt = ` · ${BENCH_LABEL[histBenchKey]} ${signTxt(Math.round(bchg * 10) / 10)} (${chg >= bchg ? "sovra" : "sotto"}performance ${signTxt(Math.round((chg - bchg) * 10) / 10)})`; }
   $("#hist-summary").innerHTML = `<span id="hist-tip">${fmtEUR.format(first)} → <b>${fmtEUR.format(last)}</b>
     <span class="${signCls(chg)}">${signTxt(Math.round(chg * 100) / 100)}</span> nel periodo${benchTxt}</span>`;
 
@@ -470,13 +472,24 @@ function renderAllocation() {
     const p = (ang, rad) => `${(cx + rad * Math.cos(ang)).toFixed(2)},${(cy + rad * Math.sin(ang)).toFixed(2)}`;
     const d = `M ${p(a0, R)} A ${R} ${R} 0 ${large} 1 ${p(a1, R)} L ${p(a1, r)} A ${r} ${r} 0 ${large} 0 ${p(a0, r)} Z`;
     a0 = a1;
-    return `<path d="${d}" fill="${ALLOC_COLORS[i % ALLOC_COLORS.length]}"><title>${esc(x.name)}: ${fmtEUR.format(x.value_eur)} (${(frac * 100).toFixed(1)}%)</title></path>`;
+    return `<path d="${d}" fill="${ALLOC_COLORS[i % ALLOC_COLORS.length]}" class="alloc-arc" style="cursor:pointer"
+      data-name="${esc(x.name)}" data-pct="${(frac * 100).toFixed(1)}" data-val="${Math.round(x.value_eur)}">
+      <title>${esc(x.name)}: ${fmtEUR.format(x.value_eur)} (${(frac * 100).toFixed(1)}%)</title></path>`;
   }).join("");
   $("#alloc-donut").innerHTML = `<svg viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Ripartizione del portafoglio">
     ${arcs}
-    <text x="80" y="76" text-anchor="middle" font-size="11" fill="var(--muted)">Totale</text>
-    <text x="80" y="92" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)">${fmtEUR.format(Math.round(total))}</text>
+    <text x="80" y="74" text-anchor="middle" font-size="10" fill="var(--muted)" id="alloc-c1">Totale</text>
+    <text x="80" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)" id="alloc-c2">${fmtEUR.format(Math.round(total))}</text>
+    <text x="80" y="104" text-anchor="middle" font-size="9" fill="var(--muted)" id="alloc-c3"></text>
   </svg>`;
+  $("#alloc-donut").querySelectorAll(".alloc-arc").forEach(pth => {
+    pth.addEventListener("click", () => {
+      $("#alloc-c1").textContent = pth.dataset.name;
+      $("#alloc-c2").textContent = pth.dataset.pct + "%";
+      $("#alloc-c3").textContent = fmtEUR.format(+pth.dataset.val);
+      toast(`${pth.dataset.name}: ${pth.dataset.pct}% · ${fmtEUR.format(+pth.dataset.val)}`);
+    });
+  });
   $("#alloc-legend").innerHTML = list.map((x, i) => {
     const pct = (x.value_eur / total * 100).toFixed(1);
     return `<li class="alloc-item">
@@ -519,9 +532,8 @@ function rsiBar(rsi) {
 
 function volBar(ratio) {
   if (!ratio) return "—";
-  // volume vs media 30gg: verde = normale, rosso = anomalo
-  const color = ratio < 1.2 ? "var(--green)" : ratio < 2 ? "var(--yellow)" : "var(--red)";
-  return meterBar((ratio / 3) * 100, color, `${fmtNum.format(ratio)}×`);
+  // volume vs media 30gg: normale = verde, anomalo = rosso (gradiente)
+  return meterBar((ratio / 3) * 100, scoreColor(clamp(100 - (ratio - 1) * 60)), `${fmtNum.format(ratio)}×`);
 }
 
 const RATING_LABELS = {
@@ -539,36 +551,31 @@ function ratingBadge(r) {
 
 function targetBar(r) {
   if (!r || r.upside_pct === null || r.upside_pct === undefined) return "—";
-  const u = r.upside_pct;
-  const color = u >= 15 ? "var(--green)" : u >= 0 ? "var(--yellow)" : "var(--red)";
-  return meterBar(Math.abs(u) * 2, color, signTxt(u));
+  const u = r.upside_pct;   // upside alto = verde, negativo = rosso
+  return meterBar(Math.abs(u) * 2, scoreColor(clamp(50 + u * 2.5)), signTxt(u));
 }
 
 function peBar(pe) {
-  if (!pe || pe <= 0) return "—";
-  const color = pe <= 18 ? "var(--green)" : pe <= 35 ? "var(--yellow)" : "var(--red)";
-  return meterBar(Math.min(pe, 60) / 60 * 100, color, fmtNum.format(pe));
+  if (!pe || pe <= 0) return "—";   // P/E basso = verde (economico), alto = rosso
+  return meterBar(Math.min(pe, 60) / 60 * 100, scoreColor(clamp(100 - pe * 2.2)), fmtNum.format(pe));
 }
 
 function epsBar(eps) {
-  if (eps === null || eps === undefined) return "—";
-  const color = eps > 0 ? "var(--green)" : "var(--red)";
-  return meterBar(Math.min(Math.abs(eps), 15) / 15 * 100, color, fmtNum.format(eps));
+  if (eps === null || eps === undefined) return "—";   // utili positivi = verde
+  return meterBar(Math.min(Math.abs(eps), 15) / 15 * 100, scoreColor(clamp(50 + eps * 6)), fmtNum.format(eps));
 }
 
 function betaBar(beta) {
-  if (beta === null || beta === undefined) return "—";
-  const color = beta <= 1 ? "var(--green)" : beta <= 1.6 ? "var(--yellow)" : "var(--red)";
-  return meterBar(Math.min(beta, 3) / 3 * 100, color, fmtNum.format(beta));
+  if (beta === null || beta === undefined) return "—";   // beta basso = verde (meno rischio)
+  return meterBar(Math.min(beta, 3) / 3 * 100, scoreColor(clamp(100 - (beta - 0.5) * 55)), fmtNum.format(beta));
 }
 
 function athBar(r) {
   if (!r.ath) return "—";
-  const closeness = Math.max(0, 100 + r.ath_dist_pct);   // 100 = sul massimo storico
-  const color = closeness >= 90 ? "var(--green)" : closeness >= 70 ? "var(--yellow)" : "var(--red)";
+  const closeness = Math.max(0, 100 + r.ath_dist_pct);   // 100 = sul massimo storico = verde
   return `<div class="meter" title="Max storico ${fmtNum.format(r.ath)}">
     <span class="meter-txt">${signTxt(r.ath_dist_pct)}</span>
-    <span class="meter-track"><span class="meter-fill" style="width:${Math.max(3, closeness)}%;background:${color}"></span></span>
+    <span class="meter-track"><span class="meter-fill" style="width:${Math.max(3, closeness)}%;background:${scoreColor(closeness)}"></span></span>
   </div>`;
 }
 
@@ -724,10 +731,42 @@ function openMacroInfo(key) {
   const info = MACRO_INFO[key];
   if (!info) return;
   const [name, desc, cadence, rx] = info;
-  openInfoModal(name, `<p style="margin:0 0 10px">${desc}</p>
-    <div class="info-line"><b>Prossima pubblicazione:</b> ${cadence}</div>
-    <div class="info-line muted" style="margin-bottom:12px">Le date esatte possono variare; consulta un calendario economico per la conferma.</div>
-    <h4 style="margin:6px 0">Notizie correlate</h4>${relatedNews(rx)}`);
+  const m = DATA.macro || {};
+  let extra = "";
+
+  // valore attuale + data + sentiment per gli indicatori macro
+  if (key.startsWith("in:")) {
+    const ind = (m.indicators || []).find(i => "in:" + i.key === key);
+    if (ind) {
+      const sent = ind.impact >= 60 ? '<span class="pos">favorevole ai mercati</span>'
+        : ind.impact <= 40 ? '<span class="neg">sfavorevole ai mercati</span>' : "neutro";
+      extra = `<div class="info-line"><b>Valore attuale:</b> ${ind.value} <span class="muted">(${ind.date})</span></div>
+        <div class="info-line"><b>Impatto:</b> ${sent}</div>
+        ${ind.next_release ? `<div class="info-line"><b>Prossima uscita:</b> ${ind.next_release}</div>` : ""}`;
+    }
+  } else if (key === "fedwatch" && m.fedwatch) {
+    const fw = m.fedwatch;
+    extra = `<div class="info-line"><b>Range attuale:</b> ${fw.target_range} · implicito ${fmtNum.format(fw.implied_rate)}%</div>
+      <div class="info-line"><b>Probabilità taglio prossima riunione:</b> ${fw.next_cut_prob}%</div>`;
+    if ((fw.meetings || []).length) {
+      extra += `<table class="info-table"><thead><tr><th>Riunione FOMC</th><th>Taglio</th><th>Invariato</th></tr></thead><tbody>`
+        + fw.meetings.map(mt => `<tr><td>${new Date(mt.date).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}</td>
+          <td class="pos">${mt.cut_prob}%</td><td>${mt.hold_prob}%</td></tr>`).join("")
+        + `</tbody></table><div class="info-line muted" style="font-size:11px">Probabilità stimate dai futures sui Fed Funds (stile CME FedWatch).</div>`;
+    }
+  } else if (key === "fear_greed" && m.fear_greed) {
+    const fg = m.fear_greed;
+    extra = `<div class="info-line"><b>Oggi:</b> ${fg.score} (${FG_LABELS[fg.rating] || fg.rating}) · 1 sett ${fg.week_ago} · 1 mese ${fg.month_ago}${fg.year_ago ? ` · 1 anno ${fg.year_ago}` : ""}</div>`;
+    if ((fg.components || []).length) {
+      extra += `<h4 style="margin:10px 0 4px">I 7 componenti</h4>` + fg.components.map(c =>
+        `<div class="info-line" style="display:flex;justify-content:space-between"><span>${c.label}</span><span class="muted">${c.rating}${c.score != null ? ` (${c.score})` : ""}</span></div>`).join("");
+    }
+  } else {
+    extra = `<div class="info-line"><b>Aggiornamento:</b> ${cadence}</div>`;
+  }
+
+  openInfoModal(name, `<p style="margin:0 0 10px">${desc}</p>${extra}
+    <h4 style="margin:10px 0 4px">Notizie correlate</h4>${relatedNews(rx)}`);
 }
 
 function openEarningsInfo(ticker) {
@@ -744,8 +783,12 @@ function openEarningsInfo(ticker) {
 }
 
 function delBtn(section, ticker) {
-  return editMode[section] && ticker !== "BTP-V28"
+  if (!editMode[section]) return "";
+  const mv = `<button class="row-move" data-sec="${section}" data-tk="${ticker}" data-dir="-1" title="Sposta su" aria-label="Sposta su">▲</button>
+    <button class="row-move" data-sec="${section}" data-tk="${ticker}" data-dir="1" title="Sposta giù" aria-label="Sposta giù">▼</button>`;
+  const del = ticker !== "BTP-V28"
     ? `<button class="row-del" data-sec="${section}" data-tk="${ticker}" title="Rimuovi ${ticker}">×</button>` : "";
+  return mv + del;
 }
 
 
@@ -761,7 +804,7 @@ function renderTable() {
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
       <td class="num"><b>${c}${fmtNum.format(Math.round(r.value))}</b></td>
-      <td class="num ${signCls(r.gain)}">${signTxt(Math.round(r.gain), ` ${c}`)}</td>
+      <td class="num ${signCls(r.gain)}">${signTxt(Math.round(r.gain), ` ${c}`)}${r.currency === "USD" ? `<br><span class="sub-eur">${signTxt(Math.round(r.gain / (DATA.eurusd || 1.08)), " €")}</span>` : ""}</td>
       <td class="num ${signCls(r.gain_pct)}"><b>${signTxt(r.gain_pct)}</b></td>
       ${techCells(r)}
     </tr>`;
@@ -974,29 +1017,41 @@ function timeAgo(iso) {
 
 let newsFilter = null;   // ticker/argomento selezionato dai chip Trending
 
+const TOPIC_LABEL = t => t === "MACRO" ? "Macro" : t === "POL" ? "Politica" : t;
+
 function renderTrending() {
   const list = DATA.news || [];
   const counts = {};
   list.forEach(n => (n.tickers || []).forEach(t => { counts[t] = (counts[t] || 0) + 1; }));
-  const top = Object.entries(counts).filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).slice(0, 8);
-  const label = t => t === "MACRO" ? "Macro" : t;
+  // mostra tutti gli argomenti con news (ticker pf+wl, Macro, Politica)
+  const top = Object.entries(counts).filter(([, c]) => c >= 1).sort((a, b) => b[1] - a[1]).slice(0, 14);
   const chips = top.map(([t, c]) =>
-    `<button class="trend-chip ${newsFilter === t ? "active" : ""}" data-topic="${t}">${label(t)} <span>${c}</span></button>`).join("");
+    `<button class="trend-chip ${newsFilter === t ? "active" : ""}" data-topic="${t}">${TOPIC_LABEL(t)} <span>${c}</span></button>`).join("");
   $("#news-trending").innerHTML = top.length
-    ? `<span class="trend-label">Trending:</span>${chips}${newsFilter ? '<button class="trend-chip clear" data-topic="">✕</button>' : ""}` : "";
+    ? `<span class="trend-label">Trending:</span>${chips}${newsFilter ? '<button class="trend-chip clear" data-topic="">✕ tutte</button>' : ""}` : "";
 }
 
 function renderNews() {
   renderTrending();
   let list = DATA.news || [];
-  if (newsFilter) list = list.filter(n => (n.tickers || []).includes(newsFilter));
+  if (newsFilter) {
+    list = list.filter(n => (n.tickers || []).includes(newsFilter));
+  } else {
+    // raggruppa: max 3 news per argomento dominante nel feed (il resto via i chip Trending)
+    const seen = {};
+    list = list.filter(n => {
+      const t = (n.tickers || [])[0] || "?";
+      seen[t] = (seen[t] || 0) + 1;
+      return seen[t] <= 3;
+    });
+  }
   $("#news-list").innerHTML = list.length ? list.map(n => `
     <li class="news-item">
       <a href="${esc(n.link)}" target="_blank" rel="noopener" title="${esc(n.title)}">${esc(n.title_it || n.title)}</a>
       <div class="news-meta">
         <span class="news-src ${n.source === "Polymarket" ? "src-poly" : ""}">${esc(n.source)}</span>
         <span class="news-time">${timeAgo(n.published)}</span>
-        ${n.tickers.map(t => `<span class="news-tk">${t === "MACRO" ? "Macro" : t}</span>`).join("")}
+        ${n.tickers.map(t => `<span class="news-tk">${TOPIC_LABEL(t)}</span>`).join("")}
       </div>
     </li>`).join("") : '<li class="muted">Nessuna news per il filtro selezionato</li>';
 }
@@ -1076,9 +1131,61 @@ async function showPrompt() {
   } catch { /* clipboard non disponibile: l'utente può copiare dal box */ }
 }
 
+/* ---------------- analisi AI (Gemini) ---------------- */
+// la chiave resta SOLO nel browser (localStorage), mai nel repo pubblico
+function getGeminiKey() {
+  let k = localStorage.getItem("gemini_key");
+  if (!k) {
+    k = window.prompt("Incolla la tua API key Google Gemini (resta salvata solo in questo browser, una volta sola):");
+    if (k) { k = k.trim(); localStorage.setItem("gemini_key", k); }
+  }
+  return k;
+}
+
+function mdToHtml(md) {
+  return esc(md)
+    .replace(/^### (.*)$/gm, "<h4>$1</h4>")
+    .replace(/^## (.*)$/gm, "<h3>$1</h3>")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/^\s*[-*] (.*)$/gm, "<li>$1</li>")
+    .replace(/(<li>[\s\S]*?<\/li>)/g, "<ul>$1</ul>")
+    .replace(/\n{2,}/g, "<br><br>").replace(/\n/g, "<br>");
+}
+
+async function analyzeAI() {
+  const modal = $("#ai-modal"), loading = $("#ai-loading"), content = $("#ai-content");
+  const key = getGeminiKey();
+  if (!key) return;
+  modal.hidden = false; loading.style.display = "block"; content.innerHTML = "";
+  const prompt = "Sei un analista finanziario quantitativo esperto di analisi tecnica e macroeconomia. "
+    + "Analizza i dati seguenti (portafoglio con tecnici, macro, news) e fornisci un report in Markdown con: "
+    + "1) Sintesi macro e sentiment, 2) Analisi tecnica del portafoglio (ipercomprato/ipervenduto, supporti/resistenze, volumi anomali), "
+    + "3) Indicazioni operative (coperture, prese di beneficio, possibili acquisti). Usa elenchi puntati e grassetti.\n\nDATI:\n" + buildPrompt();
+  try {
+    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=" + encodeURIComponent(key), {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+    });
+    if (res.status === 400 || res.status === 403) { localStorage.removeItem("gemini_key"); throw new Error("Chiave non valida o senza permessi (rimossa, riprova)"); }
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!txt) throw new Error("Risposta vuota dall'AI");
+    content.innerHTML = mdToHtml(txt);
+  } catch (e) {
+    content.innerHTML = `<p class="neg">Errore nell'analisi AI: ${esc(e.message)}</p>
+      <p class="muted">Puoi comunque usare "Copia prompt" e incollarlo in Claude o Gemini manualmente.</p>`;
+  } finally {
+    loading.style.display = "none";
+  }
+}
+
 /* ---------------- eventi ---------------- */
 $("#btn-refresh").addEventListener("click", refreshAll);
 $("#btn-prompt").addEventListener("click", showPrompt);
+$("#btn-analyze-ai").addEventListener("click", analyzeAI);
+$("#ai-modal-close").addEventListener("click", () => { $("#ai-modal").hidden = true; });
+$("#ai-modal").addEventListener("click", (e) => { if (e.target.id === "ai-modal") $("#ai-modal").hidden = true; });
 $("#modal-close").addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
 $("#btn-copy").addEventListener("click", async () => {
@@ -1198,15 +1305,20 @@ $("#pmc-select").addEventListener("change", () => {
 ["#pmc-q1", "#pmc-p1", "#pmc-q2", "#pmc-p2"].forEach(id =>
   $(id).addEventListener("input", pmcCompute));
 
-document.querySelectorAll("#spark-toggle .chip").forEach(ch => {
+// due barre range (sopra portafoglio e sopra watchlist) sincronizzate
+function syncSparkToggles() {
+  document.querySelectorAll("#spark-toggle .chip, #spark-toggle-wl .chip").forEach(c =>
+    c.classList.toggle("chip-active", c.dataset.range === sparkRange));
+}
+document.querySelectorAll("#spark-toggle .chip, #spark-toggle-wl .chip").forEach(ch => {
   ch.addEventListener("click", () => {
-    document.querySelectorAll("#spark-toggle .chip").forEach(c => c.classList.remove("chip-active"));
-    ch.classList.add("chip-active");
     sparkRange = ch.dataset.range;
+    syncSparkToggles();
     renderTable();
     renderWatchlist();
   });
 });
+$("#wl-add-top").addEventListener("click", addWatchlist);
 document.querySelectorAll("#hist-toggle .chip").forEach(ch => {
   ch.addEventListener("click", () => {
     document.querySelectorAll("#hist-toggle .chip").forEach(c => c.classList.remove("chip-active"));
@@ -1216,7 +1328,7 @@ document.querySelectorAll("#hist-toggle .chip").forEach(ch => {
     renderBroker();   // il rendimento reale segue il range selezionato
   });
 });
-$("#bench-nasdaq").addEventListener("change", (e) => { histBench = e.target.checked; renderHistory(); });
+$("#bench-select").addEventListener("change", (e) => { histBenchKey = e.target.value; renderHistory(); });
 document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {
   ch.addEventListener("click", () => {
     document.querySelectorAll("#alloc-toggle .chip").forEach(c => c.classList.remove("chip-active"));
@@ -1269,34 +1381,51 @@ $("#wl-edit").addEventListener("click", () => {
 document.addEventListener("click", (e) => {
   const del = e.target.closest(".row-del");
   if (del) { removeHolding(del.dataset.sec, del.dataset.tk); return; }
+  const mv = e.target.closest(".row-move");
+  if (mv) { moveHolding(mv.dataset.sec, mv.dataset.tk, +mv.dataset.dir); return; }
   const add = e.target.closest(".row-add");
   if (add) { quickAddFromWatchlist(add.dataset.tk, parseFloat(add.dataset.price)); return; }
-  if (e.target.id === "ptf-add") addPortfolio();
-  if (e.target.id === "wl-add") addWatchlist();
+  if (e.target.id === "ptf-add" || e.target.id === "wl-add") {
+    (e.target.id === "ptf-add" ? addPortfolio : addWatchlist)(); return;
+  }
+  // clic su un nome in watchlist → calcolatore PMC
+  const nameCell = e.target.closest("#wl-table .name-cell");
+  if (nameCell && !e.target.closest("button")) {
+    const tr = nameCell.closest("tr");
+    const tk = tr.querySelector(".tk")?.textContent;
+    const row = (DATA.watchlist || []).find(w => w.ticker === tk);
+    if (row) quickAddFromWatchlist(tk, row.price);
+  }
 });
 
+/* sposta una posizione su (-1) o giù (+1); aggiorna subito e salva su config */
+function moveHolding(section, ticker, dir) {
+  const arr = DATA[section];
+  const i = arr.findIndex(r => r.ticker === ticker);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= arr.length) return;
+  [arr[i], arr[j]] = [arr[j], arr[i]];          // riordina subito (feedback istantaneo)
+  section === "portfolio" ? renderTable() : renderWatchlist();
+  editHoldings(section, cfg => {                 // persiste l'ordine su config/holdings.json
+    const a = cfg[section] || [];
+    const x = a.findIndex(r => r.ticker === ticker);
+    const y = x + dir;
+    if (x < 0 || y < 0 || y >= a.length) return false;
+    [a[x], a[y]] = [a[y], a[x]];
+    return true;
+  });
+}
+
 /* dalla watchlist al calcolatore PMC / aggiungi al portafoglio */
+// clic su un titolo della watchlist → precompila il "Nuovo acquisto" nel calcolatore PMC
 function quickAddFromWatchlist(ticker, price) {
-  const pmc = $("#pmc-calc");
-  pmc.scrollIntoView({ behavior: "smooth" });
-  $("#pmc-q1").value = "";
-  $("#pmc-p1").value = price || "";
-  $("#pmc-p2").value = price || "";
+  $("#pmc-q1").value = 0;        // posizione attuale: nessuna (è in watchlist)
+  $("#pmc-p1").value = 0;
   $("#pmc-q2").value = "";
+  $("#pmc-p2").value = price || "";   // prezzo del nuovo acquisto
   pmcCompute();
-  toast(`${ticker} caricato nel calcolatore PMC — inserisci la quantità`);
-  if (confirm(`Vuoi aggiungere ${ticker} direttamente al portafoglio?`)) {
-    const qty = parseFloat(window.prompt(`Quantità di ${ticker}:`) || "");
-    const p = parseFloat(window.prompt(`Prezzo medio di carico (PMC) di ${ticker} in USD:`, price || "") || "");
-    if (qty > 0 && p > 0) {
-      editHoldings("portfolio", cfg => {
-        cfg.portfolio = cfg.portfolio || [];
-        if (cfg.portfolio.some(x => x.ticker === ticker)) { toast(`${ticker} è già in portafoglio`); return false; }
-        cfg.portfolio.push({ ticker, name: ticker, qty, pmc: p });
-        return true;
-      });
-    }
-  }
+  $("#pmc-calc").scrollIntoView({ behavior: "smooth" });
+  toast(`${ticker} caricato nel calcolatore PMC — inserisci la quantità da simulare`);
 }
 
 initSorting("ptf-table", renderTable);
