@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-14T12:33:50Z",
+ "updated_at": "2026-06-14T15:23:40Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -2260,7 +2260,7 @@
      69.23,
      67.49,
      82.04,
-     90.98,
+     90.97,
      80.43,
      86.88,
      76.15,
@@ -8209,16 +8209,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64352.25,
-   "change_pct": -0.11,
+   "price": 64032.69,
+   "change_pct": -0.6,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.0,
+   "ath_dist_pct": -49.3,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 36.4,
-   "volume": 16712737792,
-   "vol_ratio": 0.51,
+   "rsi": 35.6,
+   "volume": 17254246400,
+   "vol_ratio": 0.52,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -8227,7 +8227,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64352.25
+     64032.69
     ],
     "m6": [
      70120.78,
@@ -8355,7 +8355,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64352.25
+     64032.69
     ],
     "all": [
      386.94,
@@ -8499,7 +8499,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64352.25
+     64032.69
     ],
     "m1": [
      76981.12,
@@ -8523,7 +8523,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64352.25
+     64032.69
     ],
     "m3": [
      72979.05,
@@ -8591,7 +8591,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64352.25
+     64032.69
     ],
     "y1": [
      105472.41,
@@ -8667,7 +8667,7 @@
      73754.84,
      63801.57,
      61643.78,
-     64352.25
+     64032.69
     ],
     "d1": [
      64390.14,
@@ -8745,7 +8745,24 @@
      64507.99,
      64438.0,
      64458.81,
-     64352.25
+     64355.33,
+     64322.0,
+     64270.71,
+     64294.23,
+     64324.51,
+     64294.73,
+     64264.25,
+     64328.62,
+     64269.49,
+     64292.31,
+     64273.04,
+     64231.17,
+     63961.99,
+     63908.11,
+     63884.0,
+     64095.84,
+     64075.86,
+     64032.69
     ]
    },
    "earnings_date": null,
@@ -8759,22 +8776,22 @@
     "w1": {
      "support": 60788.02,
      "resistance": 64700.88,
-     "change_pct": 4.72
+     "change_pct": 4.2
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.41
+     "change_pct": -16.82
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -11.82
+     "change_pct": -12.26
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.42
+     "change_pct": -48.67
     }
    },
    "financials": [],
@@ -10348,7 +10365,7 @@
     182060,
     179547,
     177687,
-    179861,
+    179860,
     180937,
     179782,
     179778,
@@ -10466,7 +10483,7 @@
     175250,
     175607,
     177102,
-    177838,
+    177837,
     177090,
     173614,
     175317,
@@ -10538,7 +10555,7 @@
     190167,
     190458,
     190977,
-    190306,
+    190305,
     193322,
     191450,
     189718,
@@ -11153,7 +11170,7 @@
     110907,
     105554,
     109142,
-    104665,
+    104664,
     112199,
     113569,
     117475,
@@ -11795,7 +11812,7 @@
     110907,
     105554,
     109142,
-    104665,
+    104664,
     112199,
     113569,
     117475,
@@ -12095,7 +12112,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 49
+     "score": 44
     },
     {
      "label": "Treasury 10A",
@@ -12272,27 +12289,67 @@
    "question": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "yes": 100,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $62,000 on June 14?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-14-2026"
+  },
+  {
+   "question": "Bitcoin Up or Down on June 14?",
+   "yes": 20,
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-june-14-2026"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $60,000 on June 14?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-60k-on-june-14-2026"
   }
  ],
  "news": [
   {
    "source": "Investing.com",
-   "title": "US and Iran inch closer to deal, Trump says Sunday but timing is unclear",
-   "link": "https://www.investing.com/news/world-news/us-iran-inch-closer-to-deal-timing-remains-unclear-4741054",
-   "published": "2026-06-14T11:24:24Z",
+   "title": "Israeli fire kills six in Gaza despite new effort to salvage truce",
+   "link": "https://www.investing.com/news/world-news/israeli-fire-kills-six-in-gaza-despite-new-effort-to-salvage-truce-4741095",
+   "published": "2026-06-14T14:54:27Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "priority": 0,
    "sentiment": "neutral",
-   "title_it": "Stati Uniti e Iran si avvicinano sempre più all’accordo, dice Trump domenica, ma i tempi non sono chiari"
+   "title_it": "Il fuoco israeliano uccide sei persone a Gaza nonostante i nuovi sforzi per salvare la tregua"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Iran questions US commitment to peace moves as Israel strikes Lebanon",
+   "link": "https://www.investing.com/news/world-news/us-iran-inch-closer-to-deal-timing-remains-unclear-4741054",
+   "published": "2026-06-14T14:36:28Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 0,
+   "sentiment": "neutral",
+   "title_it": "L’Iran mette in dubbio l’impegno degli Stati Uniti verso iniziative di pace mentre Israele colpisce il Libano"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Another 3% S&P 500 drop may trigger more systematic selling: BofA",
+   "link": "https://www.investing.com/news/stock-market-news/another-3-sp-500-drop-may-trigger-more-systematic-selling-bofa-4741094",
+   "published": "2026-06-14T14:31:06Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 0,
+   "sentiment": "bear",
+   "title_it": "Un altro calo del 3% dell’S&P 500 potrebbe innescare vendite più sistematiche: BofA"
   },
   {
    "source": "Investing.com",
    "title": "Iran reveals final draft deal includes nuclear restrictions, asset release",
    "link": "https://www.investing.com/news/economy-news/trump-says-iran-deal-could-be-signed-sunday-tehran-disputes-timing-4741061",
-   "published": "2026-06-14T11:17:12Z",
+   "published": "2026-06-14T12:55:36Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -12303,16 +12360,15 @@
   },
   {
    "source": "Investing.com",
-   "title": "In Tijuana, Iran’s tiny diaspora agrees on little — except Team Melli",
-   "link": "https://www.investing.com/news/world-news/in-tijuana-irans-tiny-diaspora-agrees-on-little--except-team-melli-4741079",
-   "published": "2026-06-14T11:12:48Z",
+   "title": "Newly led Fed poses wildcard for rockier US indexes",
+   "link": "https://www.investing.com/news/economy-news/newly-led-fed-poses-wildcard-for-rockier-us-indexes-4741088",
+   "published": "2026-06-14T12:48:57Z",
    "tickers": [
-    "MACRO",
-    "POL"
+    "MACRO"
    ],
    "priority": 0,
    "sentiment": "neutral",
-   "title_it": "A Tijuana, la piccola diaspora iraniana è d’accordo su poco, tranne che sul Team Melli"
+   "title_it": "La Fed appena guidata rappresenta un jolly per gli indici statunitensi più oscillanti"
   },
   {
    "source": "Investing.com",
@@ -12349,7 +12405,7 @@
    ],
    "priority": 0,
    "sentiment": "bull",
-   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment delle criptovalute"
+   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment cripto"
   },
   {
    "source": "Investing.com",
@@ -12362,30 +12418,6 @@
    "priority": 0,
    "sentiment": "neutral",
    "title_it": "Bitcoin preme la resistenza di 64.700 dollari nella zona di compressione: livelli live"
-  },
-  {
-   "source": "Investing.com",
-   "title": "South Korea’s stock rally shifts focus to potential MSCI market upgrade",
-   "link": "https://www.investing.com/news/stock-market-news/south-koreas-stock-rally-shifts-focus-to-potential-msci-market-upgrade-4741053",
-   "published": "2026-06-14T01:19:47Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 0,
-   "sentiment": "bull",
-   "title_it": "Il rally azionario della Corea del Sud sposta l’attenzione sul potenziale miglioramento del mercato MSCI"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Goldman looks at the impact of the AI capex boom on S&P 500 return on equity",
-   "link": "https://www.investing.com/news/stock-market-news/goldman-looks-at-the-impact-of-the-ai-capex-boom-on-sp-500-return-on-equity-4741052",
-   "published": "2026-06-14T00:50:38Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 0,
-   "sentiment": "neutral",
-   "title_it": "Goldman esamina l’impatto del boom delle spese in conto capitale dell’intelligenza artificiale sul rendimento del capitale proprio dell’indice S&P 500"
   },
   {
    "source": "Investing.com",
@@ -12414,6 +12446,184 @@
    "title_it": "Amphenol collega la rivoluzione dell'intelligenza artificiale mentre Nvidia si concentra sui riflettori"
   },
   {
+   "source": "CNBC",
+   "title": "U.S. peace deal with Iran in question as Israel strikes Lebanon, Trump warns not to 'blow it'",
+   "link": "https://www.cnbc.com/2026/06/14/iran-deal-teeters-israel-strikes-lebanon.html",
+   "published": "2026-06-14T15:05:53Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "bear",
+   "title_it": "L’accordo di pace degli Stati Uniti con l’Iran è in discussione mentre Israele attacca il Libano, Trump avverte di non “mandarlo all’aria”"
+  },
+  {
+   "source": "AP",
+   "title": "Trump endorses Collins in Georgia Senate runoff. It's his latest 'MAGA' pick in Republican primaries - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPdHVMYldqRVNuMlJLN1BzZHBRNzJOSXhaajU4VUVBTi1KclBYVGh1LTRqdUpxNEthcjdid1hmSUdRbFV2a05NaXZYSVYxYUZTRUI1eTBKNjVETXRyQTVOVGpBaWV3UVZ6UXBfNnhQSWw2allGMWVPRzgzWG5tWUFha2lYQTRpQVg4bVh4cHJUdkUtcWI3RUJ2amhsZWV2bkRmWlk2dnNpZmk3VXM?oc=5",
+   "published": "2026-06-14T14:44:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Trump sostiene Collins nel ballottaggio del Senato della Georgia. È la sua ultima scelta \"MAGA\" alle primarie repubblicane - AP News"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Rep. Olszewski Expresses Skepticism Over Iran MOU Details",
+   "link": "https://news.google.com/search?q=Rep.%20Olszewski%20Expresses%20Skepticism%20Over%20Iran%20MOU%20Details",
+   "published": "2026-06-14T14:42:11Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Il deputato Olszewski esprime scetticismo sui dettagli del MOU sull'Iran"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "3 Uranium Stocks Worth Buying as Nuclear Heats up in June",
+   "link": "https://finance.yahoo.com/sectors/energy/articles/3-uranium-stocks-worth-buying-143050326.html",
+   "published": "2026-06-14T14:30:50Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "3 titoli di uranio che vale la pena acquistare mentre il nucleare si surriscalda a giugno"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "SpaceX IPO afterglow, Kevin Warsh's first Fed meeting, and a potential US-Iran deal: What to watch this week",
+   "link": "https://finance.yahoo.com/markets/article/spacex-ipo-afterglow-kevin-warshs-first-fed-meeting-and-a-potential-us-iran-deal-what-to-watch-this-week-142500418.html",
+   "published": "2026-06-14T14:25:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Il postumi dell'IPO di SpaceX, il primo incontro della Fed di Kevin Warsh e un potenziale accordo tra Stati Uniti e Iran: cosa guardare questa settimana"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Bitcoin is Falling, But $273 Billion in Stablecoins Isn’t Leaving",
+   "link": "https://finance.yahoo.com/markets/crypto/articles/bitcoin-falling-273-billion-stablecoins-142413774.html",
+   "published": "2026-06-14T14:24:13Z",
+   "tickers": [
+    "BTC-USD"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Bitcoin sta crollando, ma 273 miliardi di dollari in stablecoin non se ne vanno"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Fed Chair Warsh Faces Challenging Debut",
+   "link": "https://news.google.com/search?q=Fed%20Chair%20Warsh%20Faces%20Challenging%20Debut",
+   "published": "2026-06-14T13:49:21Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Il presidente della Fed Warsh affronta un debutto impegnativo"
+  },
+  {
+   "source": "CNBC",
+   "title": "Can Trump Accounts help close the wealth gap? Here's what experts say stands in the way",
+   "link": "https://www.cnbc.com/2026/06/14/trump-accounts-wealth-gap.html",
+   "published": "2026-06-14T13:30:01Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "I conti Trump possono aiutare a colmare il divario di ricchezza? Ecco cosa secondo gli esperti si frappone"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Compressed Timeline for US-Iran Nuclear Deal Could Lead to Later Unraveling",
+   "link": "https://news.google.com/search?q=Compressed%20Timeline%20for%20US-Iran%20Nuclear%20Deal%20Could%20Lead%20to%20Later%20Unraveling",
+   "published": "2026-06-14T13:24:34Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "La tempistica ridotta per l’accordo nucleare tra Stati Uniti e Iran potrebbe portare a un successivo disfacimento"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Dow Jones Futures: No Iran Deal Yet; Five Stocks In Buy Areas, SpaceX's Next Test",
+   "link": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-market-wild-week-5-stocks-buy-areas-spacex-next-test/?src=A00220&yptr=yahoo",
+   "published": "2026-06-14T13:16:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Futures Dow Jones: ancora nessun accordo con l'Iran; Cinque titoli in area di acquisto, il prossimo test di SpaceX"
+  },
+  {
+   "source": "MarketWatch",
+   "title": "SpaceX shows investors still want moonshots. The Fed may test that theory this week.",
+   "link": "https://www.marketwatch.com/story/spacex-shows-investors-still-want-moonshots-the-fed-may-test-that-theory-this-week-d7771f3a?mod=mw_rss_topstories",
+   "published": "2026-06-14T13:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "SpaceX dimostra che gli investitori vogliono ancora i viaggi sulla Luna. La Fed potrebbe testare questa teoria questa settimana."
+  },
+  {
+   "source": "AP",
+   "title": "Israeli military strikes Beirut suburbs in the lead-up to anticipated US-Iran deal - AP News",
+   "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQdVZrMms1bUJyekVvUnptMmhBSE9sLUFRT05xSTAyci1SaEdXSUhXTjNLWEt6Ry1qX1k5Z2ROeXZNUkFIYTJsWkFYRzdSWXQ4M294ZHRLcXU2RmJEVzZPNmNwd2ZacWMzVFdJdW5Bb2wybFZpV2g1bTBQY1FaRTBneHgxSVZ2cVkxall4QU9nWQ?oc=5",
+   "published": "2026-06-14T12:55:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "L'esercito israeliano attacca la periferia di Beirut in vista dell'atteso accordo tra Stati Uniti e Iran - AP News"
+  },
+  {
+   "source": "CNBC",
+   "title": "Top Wall Street analysts are confident about the growth prospects of these 3 stocks",
+   "link": "https://www.cnbc.com/2026/06/14/top-analysts-are-confident-about-the-prospects-of-these-3-stocks.html",
+   "published": "2026-06-14T12:49:35Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "bull",
+   "title_it": "I principali analisti di Wall Street sono fiduciosi sulle prospettive di crescita di questi 3 titoli"
+  },
+  {
+   "source": "Reuters",
+   "title": "Trump's support in rural America slips as fuel and food prices climb, Reuters/Ipsos poll shows - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOOGNGbW1FWnpRa3BkcF9tUW90bzlmQVprRlVsRmRWZThFM0toVmJ2RFJTTDJmS3dfYXF4M25EZzRsQThpeTZQMnVoOURXekJYQkhPTmxTUk5pTkMybjF0d2VSUC13aV9Kd3JGOGoyUl9QUC1ubzNzR2NaSVlfQjNyTjNtaVZuRkoyVTJiSGwxZVdiSzAxblhVV0Q0dUkyb1Q3WldGVU5xVmR3VThRbDFFR1VqMlB0dVBZWGpsVw?oc=5",
+   "published": "2026-06-14T12:30:49Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "bull",
+   "title_it": "Il sostegno di Trump nelle zone rurali dell'America diminuisce con l'aumento dei prezzi di carburante e cibo, mostra un sondaggio Reuters/Ipsos - Reuters"
+  },
+  {
    "source": "Bloomberg",
    "title": "G7 Summit Overshadowed by Uncertain US-Iran Deal",
    "link": "https://news.google.com/search?q=G7%20Summit%20Overshadowed%20by%20Uncertain%20US-Iran%20Deal",
@@ -12427,17 +12637,30 @@
    "title_it": "Il vertice del G7 è messo in ombra dall’incerto accordo USA-Iran"
   },
   {
-   "source": "CNBC",
-   "title": "Israel says its military attacked Hezbollah targets in Beirut's southern suburbs",
-   "link": "https://www.cnbc.com/2026/06/14/israel-says-military-attacks-hezbollah-targets-in-southern-beirut.html",
-   "published": "2026-06-14T12:11:12Z",
+   "source": "Reuters",
+   "title": "Israel attacks Hezbollah targets in Beirut's southern suburbs - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxNb0dtcHdBNDdCYXg2eGVXYTJ5MGlRQ0ZVM1I2UnN3MTlXZEh0eHA5QmJNMGQxMF9fbHFQVnBkMzVNbW1CY003X0l3TFFSX1VrZVBzSl95QVRjZFVkdmZ3VENOR21xM2xLbTdnbHY3ZkNSMkgwTHl5WVJuRXhoNEQwQ29BM1RGNkxab3FIbFAyQ3V0bWwxalcxX1BtRkZ1NmVfWFN1dm9HbVd1RHoxTW5qN2JkN0dWWEhxSFBrdVJuYmJlNFNZdE80ag?oc=5",
+   "published": "2026-06-14T12:18:06Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "priority": 1,
    "sentiment": "neutral",
-   "title_it": "Israele afferma che i suoi militari hanno attaccato obiettivi di Hezbollah nella periferia meridionale di Beirut"
+   "title_it": "Israele attacca obiettivi di Hezbollah nella periferia sud di Beirut - Reuters"
+  },
+  {
+   "source": "Google News",
+   "title": "Trump says 'I love the inflation' as US prices rise at fastest rate in three years - AOL.com",
+   "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE85dll2MHJmaElaS2FTT3dwTk9Ub0RRMnhWUWFBODlFd3o1TzJFUmxKWHlPMVBZdWhISzIyVG1Obi1Vdm1teWdoT3pBTDEwUFdLZkRGZUpnT1ZlSXE3RFVsSzZUSUVtRlRPM1RyRXZPWVVnd0pLNU4yazlqV25NMGM?oc=5",
+   "published": "2026-06-14T12:00:14Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "bull",
+   "title_it": "Trump dice \"Adoro l'inflazione\" mentre i prezzi negli Stati Uniti aumentano al ritmo più veloce degli ultimi tre anni - AOL.com"
   },
   {
    "source": "CNBC",
@@ -12465,55 +12688,17 @@
    "title_it": "In che modo Bitcoin non è solo un amuleto digitale?"
   },
   {
-   "source": "Google News",
-   "title": "What should investors expect from Kevin Warsh’s first Fed meeting? - Financial Times",
-   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9VNTZmT0hLSFFjdjkzcVpsb2gzMVpDUTVuSk42T0ZOcjl6NnFJTW9UVzVUalhLRVZtX3Bvc0JLU0NGQVhPLTNZS2p4QzdGSzVwRXRNTi1XdVNhM0FlZ0xEeEsxaF94eGE3bENaTWZWaFU?oc=5",
-   "published": "2026-06-14T11:00:10Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Cosa dovrebbero aspettarsi gli investitori dal primo incontro della Fed di Kevin Warsh? -Financial Times"
-  },
-  {
-   "source": "CNBC",
-   "title": "Trump says peace deal will be signed Sunday after Iran said it remains cautious on timing",
-   "link": "https://www.cnbc.com/2026/06/13/trump-iran-deal-strait-of-hormuz.html",
-   "published": "2026-06-14T09:48:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Trump afferma che l’accordo di pace sarà firmato domenica dopo che l’Iran ha affermato di rimanere cauto sui tempi"
-  },
-  {
    "source": "AP",
-   "title": "Qatari mediators travel to Tehran for final touches on a possible deal to end war - AP News",
-   "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQdVZrMms1bUJyekVvUnptMmhBSE9sLUFRT05xSTAyci1SaEdXSUhXTjNLWEt6Ry1qX1k5Z2ROeXZNUkFIYTJsWkFYRzdSWXQ4M294ZHRLcXU2RmJEVzZPNmNwd2ZacWMzVFdJdW5Bb2wybFZpV2g1bTBQY1FaRTBneHgxSVZ2cVkxall4QU9nWQ?oc=5",
-   "published": "2026-06-14T09:48:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "bear",
-   "title_it": "I mediatori del Qatar si recano a Teheran per gli ultimi ritocchi su un possibile accordo per porre fine alla guerra - AP News"
-  },
-  {
-   "source": "CNBC",
-   "title": "UK forces board sanctioned Russian shadow fleet oil tanker",
-   "link": "https://www.cnbc.com/2026/06/14/uk-forces-board-sanctioned-russian-shadow-fleet-oil-tanker.html",
-   "published": "2026-06-14T09:32:40Z",
+   "title": "Trump tried to block state AI regulations, but some states are forging ahead - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNTGVrczZyYVlrd1VhQWQ5X29Td20wakZoVWRHeXZZUWY5MlBpOEtzZ0ozaHlRcnZOTzBoT2Z4WUpiTF9GZHBqcDJfY1B4b3VmU3J1WlNJbWdoSDk4emNjQ19lcUszeVhIM1Noam14a0RJeEthVzV4NjQ4TDlUa2NHRWtNaERwM1FPcjBrWVBpYzJXR3oycERUSklVWmJrb3UwZlVv?oc=5",
+   "published": "2026-06-14T09:07:00Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "priority": 1,
    "sentiment": "neutral",
-   "title_it": "Le forze del Regno Unito salgono a bordo di una petroliera della flotta ombra russa sanzionata"
+   "title_it": "Trump ha cercato di bloccare le normative statali sull’intelligenza artificiale, ma alcuni stati stanno andando avanti – AP News"
   },
   {
    "source": "Bloomberg",
@@ -12591,18 +12776,6 @@
    "title_it": "Perché Trump e gli altri leader del G7 si incontrano senza la Cina potrebbe essere un errore – AP News"
   },
   {
-   "source": "Bloomberg",
-   "title": "Mongolia Reaffirms One China Policy at Meeting, China Says",
-   "link": "https://news.google.com/search?q=Mongolia%20Reaffirms%20One%20China%20Policy%20at%20Meeting%2C%20China%20Says",
-   "published": "2026-06-14T04:17:13Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "La Mongolia riafferma una politica cinese durante l'incontro, afferma la Cina"
-  },
-  {
    "source": "AP",
    "title": "Trump turns 80 with a showstopping spectacle of cage fights at the White House. But big issues loom - AP News",
    "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPdHdQdXJGbW04c2tKcV9KYnRmWVd0ZVpLOWVYM3lTeFZjeW5aY0wwYnJHSmtnbHY5MmxVU2V2ekV5ZkZudHVVY2R0Wk5sSGJ2VVZqel9xemtjYVdRSjN1STgwS1gzcE0yNlZkMl95UHlkRE9ZOTdqTlBqY29EWWw0VXd6UERIbGVvd3pJTk9YRm5IcWs?oc=5",
@@ -12639,18 +12812,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Il presidente della Federal Reserve Kevin Warsh tiene il primo briefing sull'economia statunitense - C-SPAN"
-  },
-  {
-   "source": "Bloomberg",
-   "title": "South Korea’s World-Beating Stock Market Eyes Its MSCI Moment",
-   "link": "https://news.google.com/search?q=South%20Korea%E2%80%99s%20World-Beating%20Stock%20Market%20Eyes%20Its%20MSCI%20Moment",
-   "published": "2026-06-14T00:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Il mercato azionario della Corea del Sud, leader a livello mondiale, punta sul momento MSCI"
   },
   {
    "source": "Reddit",
@@ -12716,30 +12877,17 @@
    "title_it": "Perché l’S&P 500 e alcuni altri fondi indicizzati richiedono un aggiustamento e applicano il “flottante”"
   },
   {
-   "source": "AP",
-   "title": "Judge orders Trump administration to restore National Park changes at sites that 'disparaged' US - AP News",
-   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOLTRJMm9tLTdpMDdGdUh3UEpYZGEzNlBralBxZ3YtbjFEM3RjamtBY3B0U2pWS1UxMDh0elRMb0hib1c0VHloM09lNXdwQzBPZTB3WVNjVEZBbDRPazNwQzhCUmMyTFgtWkZSSFZHbGJ0ME92NFA1VUI5dEJ5dlR1dFBJSHpvOEFuU2VyT18wV296dw?oc=5",
-   "published": "2026-06-13T17:47:00Z",
+   "source": "Reuters",
+   "title": "UK's Starmer, Trump discuss efforts to end Iran conflict - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNQWk5VjRaVlZrNXBaVWF1TGpXZ04zQnhyLTNYNkhORTJkYjhMSVhRUS1ndW9sTmRJZ2VxR1phNjA2QS1ic0o3QnE5RHRNMXRTaUktYkctYzhWRkg3Zy02WTRxTFdjV3Axb185ZDdfeDlxZWhFU3Z5MUNQSE9XVERuVTZOazVtc0VIWjd3d2czM1pHREJ3Z1BtT3RoYXZZUXBaQ0NqQWxNVEM?oc=5",
+   "published": "2026-06-13T17:15:43Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Il giudice ordina all'amministrazione Trump di ripristinare le modifiche del Parco Nazionale nei siti che \"denigrano\" gli Stati Uniti - AP News"
-  },
-  {
-   "source": "AP",
-   "title": "Trump and Macron will meet over dinner at Versailles palace after G7 summit in France - AP News",
-   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPWGt1SHZaNFhSdjhybGZxS0RNaVRFcGd4cENlcV9yMG9saFBfZDlMbElIeHNBNWRDM25rLWZxdk1KeDFGT0thWDg1cFRCRDZBel9TUmZCQnQxdUpyaVd3ZTFueEJkeV9SR0MxTWhINmJYeW9MMEFEQ3NFdG92NF96QUlETGZROVRYYzFzSTBqR01WdGo5b2ZDQXM4TGstYkt5NzBZeUdnakI3ekJS?oc=5",
-   "published": "2026-06-13T17:30:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Trump e Macron si incontreranno a cena al Palazzo di Versailles dopo il vertice del G7 in Francia - AP News"
+   "sentiment": "bear",
+   "title_it": "Starmer e Trump del Regno Unito discutono degli sforzi per porre fine al conflitto iraniano - Reuters"
   },
   {
    "source": "Reuters",
@@ -12767,124 +12915,44 @@
    "title_it": "Chi è autorizzato a vendere SPCX in questo momento?"
   },
   {
-   "source": "Bloomberg",
-   "title": "US and Iran Move Closer to Deal Despite Hormuz Skirmishes",
-   "link": "https://news.google.com/search?q=US%20and%20Iran%20Move%20Closer%20to%20Deal%20Despite%20Hormuz%20Skirmishes",
-   "published": "2026-06-13T15:50:57Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Stati Uniti e Iran si avvicinano all’accordo nonostante le schermaglie di Hormuz"
-  },
-  {
-   "source": "Reuters",
-   "title": "Iran peace deal, SpaceX IPO and World Cup concerns - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxPUUFnQU9XVWFUMnpwaUNNZy1YaWF5SGZSTnlwZm9XTjA2UnNDeG4zdGsyaV9zQUYxOURwVWtEN0g1RUF4LVhqbkdCQk81SGxjWlRpeFdHYWdQM1VQZmphY3AzaF9lRlZiY3k5TFkzLTlnbHNWN3V6NEVQU09yLWNiR1dyUEhBYWZ6X3ZCVUM2UzVjSjNt?oc=5",
-   "published": "2026-06-13T14:54:24Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Accordo di pace con l'Iran, IPO di SpaceX e preoccupazioni per la Coppa del Mondo - Reuters"
-  },
-  {
-   "source": "Reddit",
-   "title": "401k elections, S&P 500, Russell 2000, and International Index",
-   "link": "https://www.reddit.com/r/investing/comments/1u4t05g/401k_elections_sp_500_russell_2000_and/",
-   "published": "2026-06-13T14:53:45Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Elezioni 401k, S&P 500, Russell 2000 e indice internazionale"
-  },
-  {
-   "source": "CNBC",
-   "title": "Goldman says stocks like Nvidia have more room to run",
-   "link": "https://www.cnbc.com/2026/06/13/stocks-with-upside-include-nvidia-goldman-says.html",
-   "published": "2026-06-13T13:43:54Z",
-   "tickers": [
-    "NVDA"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Goldman afferma che titoli come Nvidia hanno più spazio per correre"
-  },
-  {
-   "source": "Reuters",
-   "title": "Iran says signing of Islamabad memorandum will not take place on Sunday - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOM0QyenI2aldGY2QzNVRVbnJ5ejkxZmY3VXpTa2o4QkM5dDRTVVoyeEZMampXN3BVc1A2ODIzUmt3cGdVbl9XVkRJam5tVHl4c0xtbkdEcFo0QzdDemZEaEd0dWtSWjM2RG95YmI2bG5Zc2o1SlpKNTI2SDdvMzd3eDV6QkJiamFBUjBVblZ1dm5XS0ZIRDRnOVRQZGEzRURmMm1mM3psMmQ0bXZPUU9oeklCNDREc2hMeXRv?oc=5",
-   "published": "2026-06-13T13:08:01Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "L'Iran afferma che la firma del memorandum di Islamabad non avrà luogo domenica - Reuters"
-  },
-  {
-   "source": "Reuters",
-   "title": "Funeral for Iran's late Supreme Leader Khamenei to begin July 4, burial set for July 9 - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPWWljdFRvWXh3cEM0ODgyOFF1LUVuSTJFSklLNXlPVWxyZks4d0pKQmVVY1RBX0lNSHZ3Vzk1MlZOZHl0bTRRdFAteDEtLWptUnpiMEY2djh4cDNYZHFheFUwaFVCa0hpdU1YMWd4UDFwTnc1Z1kzcGZQNF9SUDVTZGI0VUE3VzRzQWM1OFU0RXJKQXBpMjQxZDNoMldScWNYQnlzaGE4aGtxaFo3RlY3RmJyMnJGdG4xTW9nSHJKM2tPZDN2UUZaX0QzYw?oc=5",
-   "published": "2026-06-13T12:46:04Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "I funerali del defunto leader supremo iraniano Khamenei inizieranno il 4 luglio, la sepoltura sarà fissata per il 9 luglio - Reuters"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Nvidia CEO Jensen Huang Says This Will Be the Next $1 Trillion Company",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/nvidia-ceo-jensen-huang-says-110500206.html",
-   "published": "2026-06-13T11:05:00Z",
-   "tickers": [
-    "NVDA"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Il CEO di Nvidia Jensen Huang afferma che questa sarà la prossima azienda da trilioni di dollari"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Bank of America warns stock market may face a 1994-style shock",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/bank-america-warns-stock-market-110300110.html",
-   "published": "2026-06-13T11:03:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "bear",
-   "title_it": "La Bank of America avverte che il mercato azionario potrebbe trovarsi ad affrontare uno shock simile a quello del 1994"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Mag 7? MANGOS? SpaceX forces name rethink on Wall Street's tech-stock moniker",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/mag-7-mangos-spacex-forces-100240387.html",
-   "published": "2026-06-13T10:02:40Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Mag7? MANGO? SpaceX impone un ripensamento del nome sul soprannome di azioni tecnologiche di Wall Street"
-  },
-  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-14T12:34:14Z",
+   "published": "2026-06-14T15:24:40Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Will the price of Bitcoin be above $62,000 on June 14?",
+   "title_it": "Will the price of Bitcoin be above $62,000 on June 14? — probabilità Sì 100%",
+   "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-14-2026",
+   "published": "2026-06-14T15:24:40Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Bitcoin Up or Down on June 14?",
+   "title_it": "Bitcoin Up or Down on June 14? — probabilità Sì 20%",
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-june-14-2026",
+   "published": "2026-06-14T15:24:40Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Will the price of Bitcoin be above $60,000 on June 14?",
+   "title_it": "Will the price of Bitcoin be above $60,000 on June 14? — probabilità Sì 100%",
+   "link": "https://polymarket.com/event/bitcoin-above-60k-on-june-14-2026",
+   "published": "2026-06-14T15:24:40Z",
    "tickers": [
     "MACRO"
    ],
