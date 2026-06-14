@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-14T10:42:19Z",
+ "updated_at": "2026-06-14T11:25:11Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -8209,15 +8209,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64581.69,
-   "change_pct": 0.25,
+   "price": 64522.86,
+   "change_pct": 0.16,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -48.8,
+   "ath_dist_pct": -48.9,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 37.3,
-   "volume": 17568356352,
+   "rsi": 37.0,
+   "volume": 17514291200,
    "vol_ratio": 0.53,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -8227,7 +8227,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64581.69
+     64522.86
     ],
     "m6": [
      70120.78,
@@ -8355,7 +8355,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64581.69
+     64522.86
     ],
     "all": [
      386.94,
@@ -8499,7 +8499,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64581.69
+     64522.86
     ],
     "m1": [
      76981.12,
@@ -8523,7 +8523,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64581.69
+     64522.86
     ],
     "m3": [
      72979.05,
@@ -8591,7 +8591,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64581.69
+     64522.86
     ],
     "y1": [
      105472.41,
@@ -8667,7 +8667,7 @@
      73754.84,
      63801.57,
      61643.78,
-     64581.69
+     64522.86
     ],
     "d1": [
      64390.14,
@@ -8734,7 +8734,11 @@
      64492.5,
      64591.83,
      64619.88,
-     64581.69
+     64570.73,
+     64525.53,
+     64446.05,
+     64523.63,
+     64522.87
     ]
    },
    "earnings_date": null,
@@ -8748,22 +8752,22 @@
     "w1": {
      "support": 60788.02,
      "resistance": 64700.88,
-     "change_pct": 5.1
+     "change_pct": 5.0
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.11
+     "change_pct": -16.18
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -11.51
+     "change_pct": -11.59
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.23
+     "change_pct": -48.28
     }
    },
    "financials": [],
@@ -12067,7 +12071,7 @@
    "calls": 16998
   },
   "risk_sentiment": {
-   "score": 58,
+   "score": 57,
    "label": "Neutrale",
    "components": [
     {
@@ -12240,8 +12244,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1726252399898,
-   "change_pct": -1.25
+   "mcap_usd": 1731409235475,
+   "change_pct": -0.96
   },
   {
    "ticker": "TSLA",
@@ -12259,7 +12263,7 @@
  "predictions": [
   {
    "question": "Will there be no change in Fed interest rates after the June 2026 meeting?",
-   "yes": 99,
+   "yes": 100,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting"
   }
  ],
@@ -12304,18 +12308,6 @@
   },
   {
    "source": "Investing.com",
-   "title": "Bitcoin tops $64,000 as ETF inflows rebound, SpaceX boosts crypto sentiment",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-advances-as-spacexs-13-billion-crypto-reserve-draws-attention-4741070",
-   "published": "2026-06-14T08:55:02Z",
-   "tickers": [
-    "BTC-USD"
-   ],
-   "priority": 0,
-   "sentiment": "bull",
-   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment delle criptovalute"
-  },
-  {
-   "source": "Investing.com",
    "title": "South Korea’s stock rally shifts focus to potential MSCI market upgrade",
    "link": "https://www.investing.com/news/stock-market-news/south-koreas-stock-rally-shifts-focus-to-potential-msci-market-upgrade-4741053",
    "published": "2026-06-14T01:19:47Z",
@@ -12340,16 +12332,29 @@
   },
   {
    "source": "Investing.com",
-   "title": "Russia stocks lower at close of trade; MOEX Russia Index unchanged",
-   "link": "https://www.investing.com/news/stock-market-news/russia-stocks-lower-at-close-of-trade-moex-russia-index-unchanged-4741045",
-   "published": "2026-06-13T21:20:03Z",
+   "title": "Dollar set for weekly loss as Iran peace hopes surge; eyes on central bank deluge",
+   "link": "https://www.investing.com/news/forex-news/asia-fx-mixed-as-traders-assess-iran-peace-prospects-rupee-top-gainer-4738906",
+   "published": "2026-06-12T20:52:30Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "priority": 0,
    "sentiment": "neutral",
-   "title_it": "Le azioni russe crollano alla chiusura delle contrattazioni; Indice MOEX Russia invariato"
+   "title_it": "Dollaro in perdita settimanale mentre aumentano le speranze di pace in Iran; occhi puntati sul diluvio delle banche centrali"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Eurozone bonds rise on prospects of Iran-U.S. diplomatic breakthrough",
+   "link": "https://www.investing.com/news/forex-news/eurozone-bonds-rise-on-prospects-of-iranus-diplomatic-breakthrough-4739018",
+   "published": "2026-06-12T07:51:57Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 0,
+   "sentiment": "bull",
+   "title_it": "I bond dell’Eurozona salgono sulle prospettive del rapporto Iran-USA. svolta diplomatica"
   },
   {
    "source": "Investing.com",
@@ -12467,6 +12472,19 @@
    "title_it": "Salto nelle azioni Tesla guidato principalmente da \"spirito animale/slancio\", afferma UBS"
   },
   {
+   "source": "Reuters",
+   "title": "Iran says draft US deal includes oil sanctions waiver, nuclear limits and asset release - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQTHJ5S3lQbnk2ck1TeGlCeGh2V0k3cXJQSnVwLVNSUEM3cDNIcUVFazFZazBSLW1oQzJQWHJldGo4RHp3b2NaQXQ2OUxJTjdPTVNjZEZQdUxPT1ZfaGVLWWt1MmtQa0taaUNfZnIzUVRqS3R4WFp2UUM1dFFUZlNkY3ZtZ2xOaDE3UW1uQVpFcGQ4MThHUGs4X3JETmg3SWRWdmEwa28zazRGR0dJX0VWMDBJWXd3Z2Izd19OLUNDb01OejE2?oc=5",
+   "published": "2026-06-14T10:43:43Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "L'Iran afferma che la bozza di accordo statunitense include la rinuncia alle sanzioni petrolifere, limiti al nucleare e il rilascio di asset - Reuters"
+  },
+  {
    "source": "Reddit",
    "title": "EPAM just got dropped from the S&P 500",
    "link": "https://www.reddit.com/r/stocks/comments/1u5h3p0/epam_just_got_dropped_from_the_sp_500/",
@@ -12490,6 +12508,19 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Trump afferma che l’accordo di pace sarà firmato domenica dopo che l’Iran ha affermato di rimanere cauto sui tempi"
+  },
+  {
+   "source": "AP",
+   "title": "Qatari mediators travel to Tehran for final touches on a possible deal to end war - AP News",
+   "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQdVZrMms1bUJyekVvUnptMmhBSE9sLUFRT05xSTAyci1SaEdXSUhXTjNLWEt6Ry1qX1k5Z2ROeXZNUkFIYTJsWkFYRzdSWXQ4M294ZHRLcXU2RmJEVzZPNmNwd2ZacWMzVFdJdW5Bb2wybFZpV2g1bTBQY1FaRTBneHgxSVZ2cVkxall4QU9nWQ?oc=5",
+   "published": "2026-06-14T09:48:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "bear",
+   "title_it": "I mediatori del Qatar si recano a Teheran per gli ultimi ritocchi su un possibile accordo per porre fine alla guerra - AP News"
   },
   {
    "source": "CNBC",
@@ -12582,7 +12613,7 @@
   },
   {
    "source": "Reuters",
-   "title": "US, Iran inch closer to deal, Trump says Sunday but timing remains unclear - Reuters",
+   "title": "US and Iran inch closer to deal, Trump says Sunday but timing is unclear - Reuters",
    "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPSXA2RmM1Y0lOSlBJSHJpd285cFViUGlLNFRUa0FTZWxBbC1DdUdVM1hSbUY5Z1A4R3poZEI3QjNGbFFzSlZpalRkbnVGWVFMNzYzQXlJbXhMTjdaRjFLQlk0b3FXZVIzcVVDbm9YVmd4RmtRTWVGcndQN1VJaEZRUEppeGlUZWJGaUx6WEI1OUtoeDRpbGdNbF8xRVFRTlY3Tk9Fcg?oc=5",
    "published": "2026-06-14T01:53:00Z",
    "tickers": [
@@ -12591,7 +12622,7 @@
    ],
    "priority": 1,
    "sentiment": "neutral",
-   "title_it": "Stati Uniti e Iran sempre più vicini all'accordo, dice Trump domenica, ma i tempi restano poco chiari - Reuters"
+   "title_it": "Stati Uniti e Iran sono sempre più vicini all'accordo, dice Trump domenica, ma i tempi non sono chiari - Reuters"
   },
   {
    "source": "Bloomberg",
@@ -12733,19 +12764,6 @@
    "title_it": "Elezioni 401k, S&P 500, Russell 2000 e indice internazionale"
   },
   {
-   "source": "AP",
-   "title": "Time to rage in the cage at the White House. UFC the main event at Trump's 80th birthday bash - AP News",
-   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQaGFVdlItOWVHTTRrWmtBRy1mc2UwOFZvQkgycVRSRlBMWEFhcG1CUjNUbnhJdWd0ZTFRekJGUnBad2lwM3hNM2pPcXRxRTNOeGZCeVhqQmphRENPWUpBMnFnZkRKRkhVUkI4YkZQUXgyVnZ1YldxcTFod0dvRTdDM1Q5UVNLUlBCbmM2eU1ZUFVnV2UtS0VLUA?oc=5",
-   "published": "2026-06-13T14:15:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "È ora di infuriarsi nella gabbia della Casa Bianca. UFC l'evento principale della festa per l'ottantesimo compleanno di Trump - AP News"
-  },
-  {
    "source": "CNBC",
    "title": "These stocks are the most overbought or oversold after a choppy week on Wall Street",
    "link": "https://www.cnbc.com/2026/06/13/these-stocks-are-most-overbought-or-oversold-after-choppy-market-week.html",
@@ -12781,19 +12799,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "L'Iran afferma che la firma del memorandum di Islamabad non avrà luogo domenica - Reuters"
-  },
-  {
-   "source": "Reuters",
-   "title": "Funeral for Iran's late Supreme Leader Khamenei to begin July 4, burial set for July 9 - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPWWljdFRvWXh3cEM0ODgyOFF1LUVuSTJFSklLNXlPVWxyZks4d0pKQmVVY1RBX0lNSHZ3Vzk1MlZOZHl0bTRRdFAteDEtLWptUnpiMEY2djh4cDNYZHFheFUwaFVCa0hpdU1YMWd4UDFwTnc1Z1kzcGZQNF9SUDVTZGI0VUE3VzRzQWM1OFU0RXJKQXBpMjQxZDNoMldScWNYQnlzaGE4aGtxaFo3RlY3RmJyMnJGdG4xTW9nSHJKM2tPZDN2UUZaX0QzYw?oc=5",
-   "published": "2026-06-13T12:46:04Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "I funerali del defunto leader supremo iraniano Khamenei inizieranno il 4 luglio, la sepoltura sarà fissata per il 9 luglio - Reuters"
   },
   {
    "source": "Reuters",
@@ -12834,6 +12839,18 @@
   },
   {
    "source": "Yahoo Finance",
+   "title": "Elon Musk's SpaceX To List At What Price? Here's What Crypto Bettors Are Wagering On",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/elon-musks-spacex-list-price-100122717.html",
+   "published": "2026-06-13T10:01:22Z",
+   "tickers": [
+    "BTC-USD"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "SpaceX di Elon Musk in listino a quale prezzo? Ecco cosa scommettono gli scommettitori di criptovalute"
+  },
+  {
+   "source": "Yahoo Finance",
    "title": "Best high-yield savings interest rates today, Saturday, June 13, 2026: Earn up to 4.1% APY",
    "link": "https://finance.yahoo.com/personal-finance/banking/article/best-high-yield-savings-interest-rates-today-saturday-june-13-2026-100000943.html",
    "published": "2026-06-13T10:00:00Z",
@@ -12857,23 +12874,11 @@
    "title_it": "Tassi di interesse ipotecari e di rifinanziamento oggi, sabato 13 giugno 2026: tutti i tassi in calo"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "HELOC and home equity loan rates Saturday, June 13, 2026: Fed meets next week - don't wait for HELOC rates to rise",
-   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/heloc-home-equity-loan-interest-rates-today-saturday-june-13-2026-100000110.html",
-   "published": "2026-06-13T10:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "bull",
-   "title_it": "HELOC e tassi sui prestiti immobiliari sabato 13 giugno 2026: la Fed si riunirà la prossima settimana: non aspettare che i tassi HELOC aumentino"
-  },
-  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
-   "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 99%",
+   "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-14T10:43:13Z",
+   "published": "2026-06-14T11:25:48Z",
    "tickers": [
     "MACRO"
    ],
