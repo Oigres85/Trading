@@ -262,6 +262,8 @@ async function fetchQuote(symbol) {
   return null;
 }
 
+let cashEur = parseFloat(localStorage.getItem("cash_eur")) || 0;
+
 function recomputeTotals() {
   const eq = DATA.portfolio.filter(r => r.currency === "USD");
   const btp = DATA.portfolio.find(r => r.ticker === "BTP-V28");
@@ -269,19 +271,23 @@ function recomputeTotals() {
   const usdCost = eq.reduce((s, r) => s + r.pmc * r.qty, 0);
   const eurusd = DATA.eurusd || 1.08;
   const btpVal = btp ? btp.value : 0, btpGain = btp ? btp.gain : 0;
-  const totalEur = usdValue / eurusd + btpVal;
+  const investedEur = usdValue / eurusd + btpVal;
+  const totalEur = investedEur + cashEur;          // include la liquidità
   const costEur = usdCost / eurusd + (btp ? btp.pmc * btp.qty / 100 : 0);
-  const eurGain = totalEur - costEur;
+  const eurGain = investedEur - costEur;           // il guadagno è solo sull'investito
   const tax = 0.26 * Math.max(0, (usdValue - usdCost) / eurusd) + 0.125 * Math.max(0, btpGain);
   Object.assign(DATA.totals, {
     usd_value: usdValue, usd_gain: usdValue - usdCost, usd_gain_pct: (usdValue / usdCost - 1) * 100,
-    eur_value: totalEur, eur_gain: eurGain, eur_gain_pct: (totalEur / costEur - 1) * 100,
+    eur_value: totalEur, eur_invested: investedEur, cash: cashEur,
+    eur_gain: eurGain, eur_gain_pct: (totalEur / costEur - 1) * 100,
     tax_est: tax, eur_gain_net: eurGain - tax,
   });
   DATA.allocation = DATA.portfolio.map(r => ({
     ticker: r.ticker, name: r.name, sector: r.sector || "Altro",
     value_eur: r.currency === "EUR" ? r.value : r.value / eurusd,
-  })).sort((a, b) => b.value_eur - a.value_eur);
+  }));
+  if (cashEur > 0) DATA.allocation.push({ ticker: "CASH", name: "Liquidità", sector: "Liquidità", value_eur: cashEur });
+  DATA.allocation.sort((a, b) => b.value_eur - a.value_eur);
 }
 
 async function livePrices() {
@@ -315,6 +321,8 @@ async function livePrices() {
 function renderAll() {
   const d = new Date(DATA.updated_at);
   $("#updated-at").textContent = d.toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short" });
+  recomputeTotals();            // include la liquidità nei totali/allocazione
+  renderCash();
   renderKPI();
   renderHistory();
   renderAllocation();
@@ -323,6 +331,7 @@ function renderAll() {
   renderWatchlist();
   renderGauges();
   renderMacro();
+  renderMiniCards();
   renderTopCaps();
   renderNews();
   renderBroker();
@@ -330,14 +339,80 @@ function renderAll() {
   pmcInit();
 }
 
+/* ---------------- liquidità (cash) ---------------- */
+function renderCash() {
+  const inp = $("#cash-input");
+  if (inp && document.activeElement !== inp) inp.value = cashEur || "";
+  const note = $("#cash-note");
+  if (note) note.textContent = cashEur > 0 ? `inclusa nel totale e nell'allocazione (${fmtEUR.format(cashEur)})` : "";
+}
+function saveCash() {
+  cashEur = parseFloat($("#cash-input").value) || 0;
+  localStorage.setItem("cash_eur", cashEur);
+  recomputeTotals();
+  renderCash(); renderKPI(); renderAllocation();
+  toast("Liquidità salvata ✓");
+}
+
+/* ---------------- mini-card: direzione mercato + BofA signposts ---------------- */
+function marketDirectionScore() {
+  const m = DATA.macro || {};
+  const parts = [];
+  if (m.risk_sentiment) parts.push(m.risk_sentiment.score);
+  if (m.thermometer) parts.push(m.thermometer.score);
+  if (m.fear_greed) parts.push(m.fear_greed.score);
+  if (m.vix) parts.push(clamp(100 - m.vix.value / 50 * 100));
+  if (m.buffett) parts.push(m.buffett.score);
+  if (m.signposts) parts.push(100 - m.signposts.pct);   // più segnali ribassisti = direzione peggiore
+  if (!parts.length) return null;
+  return Math.round(parts.reduce((a, b) => a + b, 0) / parts.length);
+}
+
+function renderMiniCards() {
+  const m = DATA.macro || {};
+  const dir = marketDirectionScore();
+  const dBox = $("#market-direction");
+  if (dBox && dir != null) {
+    const lab = dir >= 60 ? "Rialzista" : dir <= 40 ? "Ribassista" : "Laterale";
+    dBox.innerHTML = `<div class="mc-title">Direzione mercato</div>
+      ${thermoBar(dir, ["Ribasso", "Rialzo"])}
+      <div class="mc-value" style="color:${scoreColor(dir)}">${dir}% · ${lab}</div>
+      <div class="mc-sub muted">media di tutti i segnali tecnici e macro</div>`;
+  }
+  const sp = m.signposts, sBox = $("#signposts-box");
+  if (sBox && sp) {
+    const risk = sp.pct >= 70 ? "Rischio alto" : sp.pct >= 40 ? "Rischio medio" : "Rischio basso";
+    sBox.innerHTML = `<div class="mc-title">BofA Bear-Market Signposts</div>
+      ${thermoBar(100 - sp.pct, ["Ribassista", "Solido"])}
+      <div class="mc-value" style="color:${scoreColor(100 - sp.pct)}">${sp.active}/${sp.total} attivi · ${risk}</div>
+      <div class="mc-sub muted">clicca per il dettaglio dei 10 segnali</div>`;
+  }
+}
+
+function openSignpostsModal() {
+  const sp = (DATA.macro || {}).signposts;
+  if (!sp) return;
+  const rows = sp.items.map(it => `<tr>
+    <td>${esc(it.name)}</td><td class="muted">${it.category}</td>
+    <td><span class="badge ${it.status ? "bad" : "good"}">${it.status ? "Attivo" : "Stabile"}</span></td>
+    <td class="muted" title="${esc(it.desc)}">${esc(it.source)}</td></tr>`).join("");
+  openInfoModal(`BofA Bear-Market Signposts — ${sp.active}/${sp.total} attivi (${sp.pct}%)`,
+    `<p class="muted" style="margin:0 0 8px">Più segnali attivi = mercato più vicino a una fase ribassista. Fonti gratuite indicate per la verifica.</p>
+     <table class="info-table"><thead><tr><th>Segnale</th><th>Categoria</th><th>Stato</th><th>Fonte</th></tr></thead><tbody>${rows}</tbody></table>`);
+}
+
 /* ---------------- KPI ---------------- */
 function renderKPI() {
   const t = DATA.totals;
   const net = t.eur_gain_net ?? t.eur_gain;
+  const patrimonio = t.eur_value;   // investito + liquidità
   const kpis = [
+    { label: "Patrimonio totale (€)", value: fmtEUR.format(patrimonio),
+      sub: `investito ${fmtEUR.format(t.eur_invested ?? patrimonio)}${cashEur > 0 ? ` + liquidità ${fmtEUR.format(cashEur)}` : ""}`,
+      accent: "var(--blue)" },
     { label: "Guadagno totale lordo (€)", value: signTxt(Math.round(t.eur_gain), " €"),
-      sub: `${signTxt(t.eur_gain_pct)} dal carico — valore ${fmtEUR.format(t.eur_value)}`,
-      subCls: signCls(t.eur_gain), accent: "var(--blue)", valueCls: signCls(t.eur_gain) },
+      sub: `${signTxt(t.eur_gain_pct)} dal carico`,
+      subCls: signCls(t.eur_gain), accent: t.eur_gain >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(t.eur_gain) },
     { label: "Guadagno netto tasse (€)", value: signTxt(Math.round(net), " €"),
       sub: t.tax_est ? `tasse stimate −${fmtEUR.format(Math.round(t.tax_est))} (26% azioni, 12,5% BTP)` : "",
       subCls: signCls(net), accent: net >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(net) },
@@ -476,12 +551,19 @@ function renderAllocation() {
       data-name="${esc(x.name)}" data-pct="${(frac * 100).toFixed(1)}" data-val="${Math.round(x.value_eur)}">
       <title>${esc(x.name)}: ${fmtEUR.format(x.value_eur)} (${(frac * 100).toFixed(1)}%)</title></path>`;
   }).join("");
+  const totalTxt = fmtEUR.format(Math.round(total));
   $("#alloc-donut").innerHTML = `<svg viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Ripartizione del portafoglio">
     ${arcs}
-    <text x="80" y="74" text-anchor="middle" font-size="10" fill="var(--muted)" id="alloc-c1">Totale</text>
-    <text x="80" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)" id="alloc-c2">${fmtEUR.format(Math.round(total))}</text>
-    <text x="80" y="104" text-anchor="middle" font-size="9" fill="var(--muted)" id="alloc-c3"></text>
+    <circle cx="80" cy="80" r="44" fill="transparent" id="alloc-center" style="cursor:pointer"><title>Clicca al centro per tornare al totale</title></circle>
+    <text x="80" y="74" text-anchor="middle" font-size="10" fill="var(--muted)" id="alloc-c1" pointer-events="none">Totale</text>
+    <text x="80" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)" id="alloc-c2" pointer-events="none">${totalTxt}</text>
+    <text x="80" y="104" text-anchor="middle" font-size="9" fill="var(--muted)" id="alloc-c3" pointer-events="none"></text>
   </svg>`;
+  const resetCenter = () => {
+    $("#alloc-c1").textContent = "Totale";
+    $("#alloc-c2").textContent = totalTxt;
+    $("#alloc-c3").textContent = "";
+  };
   $("#alloc-donut").querySelectorAll(".alloc-arc").forEach(pth => {
     pth.addEventListener("click", () => {
       $("#alloc-c1").textContent = pth.dataset.name;
@@ -490,6 +572,7 @@ function renderAllocation() {
       toast(`${pth.dataset.name}: ${pth.dataset.pct}% · ${fmtEUR.format(+pth.dataset.val)}`);
     });
   });
+  $("#alloc-center").addEventListener("click", resetCenter);
   $("#alloc-legend").innerHTML = list.map((x, i) => {
     const pct = (x.value_eur / total * 100).toFixed(1);
     return `<li class="alloc-item">
@@ -611,7 +694,56 @@ function techCells(r) {
       <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
       <td>${ratingBadge(r.rating)}</td>
       <td class="num">${targetBar(r.rating)}</td>
+      <td class="num">${finHealthBar(r)}</td>
       <td class="spark-cell" data-tk="${r.ticker}" title="Clicca per ingrandire">${sparkline((r.sparks || {})[sparkRange])}</td>`;
+}
+
+function finHealthBar(r) {
+  if (r.fin_health === null || r.fin_health === undefined) return "—";
+  const m3 = (r.financials || []).slice(-3).map(f => f.margin);
+  const avgM = m3.length ? (m3.reduce((a, b) => a + b, 0) / m3.length).toFixed(1) : "—";
+  const lab = r.fin_health >= 71 ? "Eccellente" : r.fin_health > 40 ? "Solido" : "Debole";
+  return `<button class="fin-health" data-fin="${r.ticker}" title="${lab} — margine netto medio 3 anni: ${avgM}%">
+    <span class="meter-txt">${r.fin_health}</span>
+    <span class="meter-track"><span class="meter-fill" style="width:${Math.max(4, r.fin_health)}%;background:${scoreColor(r.fin_health)}"></span></span>
+  </button>`;
+}
+
+/* modale "Conto economico": barre ricavi/utile + linea margine netto */
+function openFinancialsModal(ticker) {
+  const r = [...(DATA.portfolio || []), ...(DATA.watchlist || [])].find(x => x.ticker === ticker);
+  if (!r || !(r.financials || []).length) { toast("Dati di bilancio non disponibili per " + ticker); return; }
+  const f = r.financials;
+  const W = 560, H = 280, pad = { l: 50, r: 44, t: 16, b: 28 };
+  const maxRev = Math.max(...f.map(x => Math.abs(x.revenue)), 1);
+  const margins = f.map(x => x.margin);
+  const mMax = Math.max(40, ...margins.map(Math.abs));
+  const n = f.length, bw = (W - pad.l - pad.r) / n;
+  const yRev = v => pad.t + (1 - v / maxRev) * (H - pad.t - pad.b);
+  const yM = v => pad.t + (1 - (v + mMax) / (2 * mMax)) * (H - pad.t - pad.b);
+  const fmtB = v => Math.abs(v) >= 1e9 ? (v / 1e9).toFixed(1) + "B" : (v / 1e6).toFixed(0) + "M";
+  let bars = "", line = "", labels = "";
+  f.forEach((x, i) => {
+    const cx = pad.l + bw * i, w = bw * 0.32;
+    bars += `<rect x="${cx + bw * 0.12}" y="${yRev(Math.max(0, x.revenue))}" width="${w}" height="${Math.abs(yRev(x.revenue) - yRev(0))}" fill="#4c8dff"><title>Ricavi ${x.year}: ${fmtB(x.revenue)}</title></rect>`;
+    bars += `<rect x="${cx + bw * 0.12 + w}" y="${yRev(Math.max(0, x.net_income))}" width="${w}" height="${Math.abs(yRev(x.net_income) - yRev(0))}" fill="#1e40af"><title>Utile ${x.year}: ${fmtB(x.net_income)}</title></rect>`;
+    const px = cx + bw / 2, py = yM(x.margin);
+    line += `${px.toFixed(1)},${py.toFixed(1)} `;
+    labels += `<text x="${px.toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="10" fill="var(--muted)">${x.year}</text>`;
+    labels += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="#f59e0b"><title>Margine ${x.year}: ${x.margin}%</title></circle>`;
+  });
+  const svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:280px">
+    <line x1="${pad.l}" y1="${yRev(0)}" x2="${W - pad.r}" y2="${yRev(0)}" stroke="var(--border)"/>
+    ${bars}
+    <polyline points="${line}" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    ${labels}
+    <text x="${pad.l - 6}" y="${pad.t + 4}" text-anchor="end" font-size="9" fill="var(--muted)">${fmtB(maxRev)}</text>
+    <text x="${W - pad.r + 6}" y="${yM(mMax) + 4}" font-size="9" fill="#f59e0b">+${Math.round(mMax)}%</text>
+    <text x="${W - pad.r + 6}" y="${yM(-mMax) + 4}" font-size="9" fill="#f59e0b">−${Math.round(mMax)}%</text>
+  </svg>
+  <div class="cm-legend"><span><i style="background:#4c8dff"></i>Ricavi</span><span><i style="background:#1e40af"></i>Utile netto</span><span><i class="round" style="background:#f59e0b"></i>Margine netto %</span></div>`;
+  openInfoModal(`${r.name} (${ticker}) — Conto economico`,
+    `${svg}<div class="info-line muted" style="margin-top:8px">Financial Health Score: <b style="color:${scoreColor(r.fin_health)}">${r.fin_health ?? "—"}/100</b> · pesato su crescita ricavi, costanza utili e stabilità margine.</div>`);
 }
 
 /* ---------------- zoom grafico (modale, touch + mouse) ---------------- */
@@ -717,6 +849,7 @@ const MACRO_INFO = {
   carry: ["Carry USA–Giappone", "Differenziale di rendimento USA-Giappone, motore del carry trade su USD/JPY.", "Continuo", /carry|yen|jpy|japan|giappone|boj/i],
   putcall: ["Put/Call ratio", "Rapporto opzioni put/call: alto = copertura/pessimismo.", "Mercato aperto USA", /option|put|call|hedge/i],
   sentiment: ["Sentiment globale", "Indicatore composito risk-on/risk-off.", "Aggiornato a ogni refresh", /sentiment|risk|rally|selloff|market/i],
+  buffett: ["Buffett Indicator", "Capitalizzazione totale del mercato USA rapportata al PIL: sopra ~150% storicamente indica sopravvalutazione.", "Aggiornato a ogni refresh", /valuation|buffett|overvalu|gdp|market cap|bolla|bubble/i],
   thermometer: ["Termometro portafoglio", "Media della salute tecnica (RSI, trend, momentum) dei tuoi titoli.", "Aggiornato a ogni refresh", /(?!)/],
 };
 
@@ -817,10 +950,10 @@ function renderTable() {
     <td class="num">${fmtEUR.format(t.eur_value)}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="12" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="13" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="22"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
 }
 
@@ -834,7 +967,7 @@ function renderWatchlist() {
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="17" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="18" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
     ? `<tr class="add-row"><td colspan="17"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
@@ -946,6 +1079,11 @@ function renderGauges() {
     const th = m.thermometer;
     cards.push(thermoCard("thermometer", "Termometro portafoglio", th.score, th.score,
       `<b>${th.label}</b><br>media RSI + trend + momentum`, ["Debole", "Forte"]));
+  }
+  if (m.buffett) {
+    const bf = m.buffett;
+    cards.push(thermoCard("buffett", "Buffett Indicator", bf.score, `${fmtNum.format(bf.ratio)}%`,
+      `<b>${bf.label}</b><br>capitalizzazione USA / PIL`, ["Caro", "Conveniente"]));
   }
 
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
@@ -1304,6 +1442,21 @@ $("#pmc-select").addEventListener("change", () => {
 });
 ["#pmc-q1", "#pmc-p1", "#pmc-q2", "#pmc-p2"].forEach(id =>
   $(id).addEventListener("input", pmcCompute));
+
+/* liquidità + mini-card */
+$("#cash-save").addEventListener("click", saveCash);
+$("#cash-input").addEventListener("keydown", e => { if (e.key === "Enter") saveCash(); });
+$("#signposts-box").addEventListener("click", openSignpostsModal);
+$("#market-direction").addEventListener("click", () => {
+  const d = marketDirectionScore();
+  openInfoModal("Direzione di mercato", `<p>Stima sintetica della direzione del mercato: <b style="color:${scoreColor(d)}">${d}%</b> (media di sentiment, Fear &amp; Greed, VIX, Buffett indicator e segnali BofA).</p>
+    <p class="muted">Sopra 60% = intonazione rialzista, sotto 40% = ribassista, in mezzo = laterale. Indicazione probabilistica, non una certezza.</p>`);
+});
+// click sul termometro Financial Health → modale Conto economico
+document.addEventListener("click", e => {
+  const fh = e.target.closest(".fin-health");
+  if (fh) { openFinancialsModal(fh.dataset.fin); }
+});
 
 // due barre range (sopra portafoglio e sopra watchlist) sincronizzate
 function syncSparkToggles() {

@@ -282,6 +282,27 @@ th.sortable:hover { color: var(--text); }
 /* ---------- toggle sparkline ---------- */
 .spark-toggle { display: flex; gap: 6px; }
 
+/* ---------- cash box ---------- */
+.cash-box { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
+.cash-box label { font-size: 12.5px; color: var(--muted); }
+.cash-box input { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; font-family: var(--mono); width: 130px; }
+
+/* ---------- mini-card direzione/segnali ---------- */
+.mini-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+@media (max-width: 700px) { .mini-cards { grid-template-columns: 1fr; } }
+.mini-card { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; cursor: pointer; }
+.mini-card:hover { border-color: var(--blue); }
+.mc-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.mc-value { font-family: var(--mono); font-weight: 700; font-size: 15px; margin-top: 2px; }
+.mc-sub { font-size: 11px; }
+
+/* ---------- financial health ---------- */
+.fin-health { display: inline-flex; align-items: center; gap: 6px; min-width: 86px; background: none; border: none; cursor: pointer; padding: 0; }
+.fin-health:hover .meter-fill { filter: brightness(1.15); }
+.cm-legend { display: flex; gap: 18px; justify-content: center; margin-top: 8px; font-size: 12px; color: var(--muted); }
+.cm-legend i { display: inline-block; width: 11px; height: 11px; margin-right: 5px; vertical-align: middle; border-radius: 2px; }
+.cm-legend i.round { border-radius: 50%; }
+
 /* ---------- andamento: overlay Nasdaq + tooltip ---------- */
 .bench-toggle { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; cursor: pointer; }
 .bench-leg { font-size: 11px; color: var(--cyan); margin-top: 4px; display: flex; align-items: center; gap: 6px; }

@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=20">
+<link rel="stylesheet" href="assets/style.css?v=22">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📈</text></svg>">
 </head>
 <body>
@@ -26,7 +26,13 @@
 </header>
 
 <main>
-  <!-- KPI -->
+  <!-- CASH + KPI -->
+  <section class="cash-box">
+    <label for="cash-input">Liquidità disponibile (€)</label>
+    <input type="number" id="cash-input" min="0" step="any" placeholder="es. 20000" aria-label="Liquidità disponibile in euro">
+    <button class="btn btn-primary btn-sm" id="cash-save">Salva</button>
+    <span class="muted" id="cash-note"></span>
+  </section>
   <section class="kpi-grid" id="kpi-grid"></section>
 
   <!-- ANDAMENTO & ALLOCAZIONE -->
@@ -78,6 +84,10 @@
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
     <div class="gauges" id="gauges"></div>
     <div class="macro-grid macro-grid-below" id="macro-grid"></div>
+    <div class="mini-cards">
+      <div class="mini-card" id="market-direction" tabindex="0" role="button" title="Direzione di mercato — media di tutti i segnali"></div>
+      <div class="mini-card" id="signposts-box" tabindex="0" role="button" title="BofA Bear Market Signposts — clicca per il dettaglio"></div>
+    </div>
     <div class="topcaps" id="topcaps"></div>
   </section>
 
@@ -123,6 +133,7 @@
             <th>Segnale</th>
             <th>Rating</th>
             <th class="num">Target Δ</th>
+            <th class="num">Financial Health</th>
             <th>Grafico</th>
           </tr>
         </thead>
@@ -168,6 +179,7 @@
             <th>Segnale</th>
             <th>Rating</th>
             <th class="num">Target Δ</th>
+            <th class="num">Financial Health</th>
             <th>Grafico</th>
           </tr>
         </thead>
@@ -287,6 +299,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=20"></script>
+<script src="assets/app.js?v=22"></script>
 </body>
 </html>

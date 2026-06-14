@@ -310,6 +310,36 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     eps = info.get("trailingEps")
     beta = info.get("beta")
 
+    # conto economico annuale (ricavi, utile netto, margine) + Financial Health Score
+    financials, fin_health = [], None
+    if currency == "USD" and ticker not in ("BTC-USD", "CL=F"):
+        try:
+            inc = t.income_stmt
+            rev_row = inc.loc["Total Revenue"] if "Total Revenue" in inc.index else None
+            ni_row = inc.loc["Net Income"] if "Net Income" in inc.index else None
+            if rev_row is not None and ni_row is not None:
+                for col in list(inc.columns)[:5]:
+                    rev, ni = rev_row.get(col), ni_row.get(col)
+                    if rev and not pd.isna(rev) and ni is not None and not pd.isna(ni):
+                        financials.append({"year": int(pd.Timestamp(col).year),
+                                           "revenue": round(float(rev)),
+                                           "net_income": round(float(ni)),
+                                           "margin": round(float(ni) / float(rev) * 100, 1)})
+                financials.sort(key=lambda x: x["year"])
+            if len(financials) >= 2:
+                revs = [f["revenue"] for f in financials]
+                margins = [f["margin"] for f in financials]
+                growth = (revs[-1] / revs[0]) ** (1 / max(1, len(revs) - 1)) - 1 if revs[0] > 0 else 0
+                pos_years = sum(1 for f in financials if f["net_income"] > 0) / len(financials)
+                margin_avg = sum(margins) / len(margins)
+                margin_std = (sum((mm - margin_avg) ** 2 for mm in margins) / len(margins)) ** 0.5
+                fin_health = round(clamp(
+                    clamp(50 + growth * 250) * 0.4 +       # crescita ricavi
+                    pos_years * 100 * 0.3 +                 # costanza utili
+                    clamp(100 - margin_std * 4) * 0.3))     # stabilità margine
+        except Exception as e:  # noqa: BLE001
+            print(f"!! financials {ticker}: {e}", file=sys.stderr)
+
     # salute tecnica 0-100 (per il termometro di portafoglio)
     parts = []
     if rsi is not None:
@@ -350,6 +380,8 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "prepost": prepost,
         "sector": info.get("sector") or info.get("quoteType") or "Altro",
         "tech_by_range": tech_by_range,
+        "financials": financials,
+        "fin_health": fin_health,
     }
 
 
@@ -408,6 +440,7 @@ def fetch_btp():
         "sparks": {}, "earnings_date": None, "rating": None, "health": None,
         "eps": None, "beta": None, "prepost": None,
         "sector": "Obbligazioni", "tech_by_range": {},
+        "financials": [], "fin_health": None,
     }
 
 
@@ -733,7 +766,68 @@ def fetch_macro():
             "components": [{"label": l, "score": round(s)} for l, s, _ in comps],
         }
 
+    # Buffett Indicator (capitalizzazione totale USA / PIL)
+    try:
+        w5000 = float(yf.Ticker("^W5000").history(period="5d")["Close"].dropna().iloc[-1])  # ~ market cap in $B
+        gdp = fred_series("GDP", 1)[-1][1]                                                   # PIL annualizzato $B
+        ratio = round(w5000 / gdp * 100, 1)
+        macro["buffett"] = {
+            "ratio": ratio,
+            "score": round(clamp(100 - (ratio - 75) / 1.5)),   # alto = sopravvalutato = rosso
+            "label": "Sopravvalutato" if ratio >= 150 else "Sottovalutato" if ratio <= 90 else "Equo",
+        }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! buffett: {e}", file=sys.stderr)
+
+    macro["signposts"] = fetch_signposts()
     return macro
+
+
+# BofA "Bear Market Signposts" — baseline maggio 2026; i derivabili si aggiornano da FRED
+SIGNPOSTS_BASE = [
+    ("Fiducia consumatori > 100", "Sentiment", False, "Consumer confidence >100", "FRED UMCSENT"),
+    ("Aspettative sui prezzi azionari", "Sentiment", True, "Stock price expectations", "BofA Sentiment"),
+    ("Sell-Side Indicator BofA", "Sentiment", False, "Indicatore contrarian BofA", "BofA SSI"),
+    ("Aspettative crescita utili LT", "Sentiment", True, "Long-term growth expectations", "S&P 500 Growth"),
+    ("Volume operazioni M&A", "Sentiment", True, "Number of M&A deals", "TradingEconomics"),
+    ("Regola del 20 (P/E + CPI)", "Valutazione", True, "P/E + inflazione", "Current Mkt Valuation"),
+    ("Divario titoli costosi/economici", "Valutazione", True, "Cheap vs expensive stocks", "Growth vs Value"),
+    ("Curva dei rendimenti invertita", "Macro", False, "Inverted yield curve", "FRED T10Y2Y"),
+    ("Stress sul credito", "Macro", True, "Credit stress indicator", "FRED STLFSI3"),
+    ("Inasprimento criteri di prestito", "Macro", True, "Tightening lending standards", "FRED SLOOS"),
+]
+
+
+def fetch_signposts():
+    """10 segnali BofA: aggiorna da FRED quelli calcolabili, mantiene la baseline per gli altri."""
+    items = [{"name": n, "category": c, "status": s, "desc": d, "source": src}
+             for n, c, s, d, src in SIGNPOSTS_BASE]
+    def setstatus(name, val):
+        for it in items:
+            if it["name"] == name:
+                it["status"] = bool(val)
+    try:  # fiducia consumatori > 100
+        setstatus("Fiducia consumatori > 100", fred_series("UMCSENT", 1)[-1][1] > 100)
+    except Exception:  # noqa: BLE001
+        pass
+    try:  # curva invertita (10A-2A < 0)
+        setstatus("Curva dei rendimenti invertita", fred_series("T10Y2Y", 1)[-1][1] < 0)
+    except Exception:  # noqa: BLE001
+        pass
+    try:  # stress sul credito (St. Louis Fed Financial Stress > 0)
+        setstatus("Stress sul credito", fred_series("STLFSI4", 1)[-1][1] > 0)
+    except Exception:  # noqa: BLE001
+        try:
+            setstatus("Stress sul credito", fred_series("STLFSI3", 1)[-1][1] > 0)
+        except Exception:  # noqa: BLE001
+            pass
+    try:  # banche che inaspriscono i criteri (SLOOS > 0)
+        setstatus("Inasprimento criteri di prestito", fred_series("DRTSCILM", 1)[-1][1] > 0)
+    except Exception:  # noqa: BLE001
+        pass
+    active = sum(1 for it in items if it["status"])
+    return {"items": items, "active": active, "total": len(items),
+            "pct": round(active / len(items) * 100)}
 
 
 def translate_it(text):
