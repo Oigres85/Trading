@@ -1,15 +1,15 @@
 {
- "updated_at": "2026-06-14T21:22:14Z",
- "eurusd": 1.1581,
+ "updated_at": "2026-06-14T22:02:08Z",
+ "eurusd": 1.1613,
  "totals": {
   "usd_value": 306479.86,
   "usd_gain": 180770.0,
   "usd_gain_pct": 143.8,
-  "eur_value": 305879.56,
-  "eur_gain": 157329.09,
-  "eur_gain_pct": 105.91,
-  "tax_est": 40738.95,
-  "eur_gain_net": 116590.15
+  "eur_value": 305144.01,
+  "eur_gain": 156895.25,
+  "eur_gain_pct": 105.83,
+  "tax_est": 40626.15,
+  "eur_gain_net": 116269.1
  },
  "portfolio": [
   {
@@ -8432,16 +8432,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64641.73,
-   "change_pct": 0.34,
+   "price": 65424.0,
+   "change_pct": 1.56,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -48.8,
+   "ath_dist_pct": -48.2,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 37.5,
-   "volume": 16290208768,
-   "vol_ratio": 0.5,
+   "rsi": 40.6,
+   "volume": 18687440896,
+   "vol_ratio": 0.57,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -8450,7 +8450,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64641.73
+     65424.0
     ],
     "m6": [
      70120.78,
@@ -8578,7 +8578,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64641.73
+     65424.0
     ],
     "all": [
      386.94,
@@ -8722,7 +8722,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64641.73
+     65424.0
     ],
     "m1": [
      76981.12,
@@ -8746,7 +8746,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64641.73
+     65424.0
     ],
     "m3": [
      72979.05,
@@ -8814,7 +8814,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64641.73
+     65424.0
     ],
     "y1": [
      105472.41,
@@ -8890,143 +8890,147 @@
      73754.84,
      63801.57,
      61643.78,
-     64641.73
+     65424.0
     ],
     "d1": [
-     64390.4,
+     64390.14,
      64398.0,
-     64436.59,
-     64511.01,
-     64535.78,
+     64438.2,
+     64511.02,
+     64533.48,
      64514.93,
-     64511.26,
-     64605.32,
-     64623.57,
+     64506.17,
+     64600.18,
+     64623.6,
      64557.4,
      64538.0,
-     64598.74,
-     64568.82,
+     64598.04,
+     64568.86,
      64587.94,
-     64534.89,
+     64541.71,
      64528.0,
-     64482.89,
+     64482.88,
      64455.0,
-     64466.71,
+     64466.72,
      64465.84,
      64491.15,
-     64509.84,
-     64459.08,
+     64485.71,
+     64457.15,
      64484.62,
-     64495.12,
+     64501.17,
      64469.28,
      64467.47,
      64435.17,
      64364.63,
      64318.94,
-     64344.17,
-     64348.92,
+     64344.16,
+     64349.72,
      64315.99,
-     64284.94,
-     64338.0,
+     64287.26,
+     64329.28,
      64348.67,
      64398.84,
-     64444.37,
-     64336.29,
+     64444.36,
+     64345.48,
      64285.92,
-     64226.13,
-     64240.72,
+     64224.27,
+     64240.73,
      64256.16,
-     64210.86,
+     64205.14,
      64334.34,
      64301.19,
      64272.23,
      64380.17,
-     64352.06,
-     64407.23,
+     64358.24,
+     64413.28,
      64466.8,
      64436.47,
-     64425.48,
+     64426.6,
      64438.0,
      64439.01,
      64390.17,
-     64279.75,
+     64293.66,
      64420.87,
      64508.02,
-     64562.05,
+     64562.04,
      64517.38,
      64492.5,
-     64597.33,
-     64619.39,
+     64591.83,
+     64619.88,
      64570.73,
-     64525.52,
+     64525.53,
      64446.05,
      64523.63,
      64522.87,
      64588.11,
      64575.1,
-     64560.99,
-     64503.01,
-     64439.25,
-     64458.82,
-     64355.34,
-     64321.99,
+     64555.99,
+     64507.99,
+     64438.0,
+     64458.81,
+     64355.33,
+     64322.0,
      64270.71,
-     64298.97,
+     64294.23,
      64324.51,
-     64294.75,
-     64252.35,
-     64327.02,
-     64278.99,
-     64304.75,
+     64294.73,
+     64264.25,
+     64328.62,
+     64269.49,
+     64292.31,
      64273.04,
-     64235.69,
-     63975.94,
-     63908.12,
-     63892.72,
-     64095.85,
-     64072.53,
-     64041.15,
-     63976.09,
-     63995.94,
-     64029.23,
-     63985.31,
-     64068.88,
-     64132.47,
-     64142.04,
-     64123.97,
+     64231.17,
+     63961.99,
+     63908.11,
+     63884.0,
+     64095.84,
+     64075.86,
+     64041.16,
+     64009.25,
+     63999.41,
+     64029.24,
+     63993.27,
+     64068.89,
+     64132.52,
+     64142.03,
+     64122.01,
      63924.02,
-     63969.72,
-     63922.7,
+     63969.71,
+     63922.69,
      63890.02,
-     63902.42,
+     63906.04,
      63802.81,
      63712.89,
-     63743.87,
-     63689.59,
+     63743.86,
+     63691.18,
      63697.41,
-     63703.56,
+     63703.57,
      63736.21,
      63759.66,
-     63781.02,
-     63748.58,
+     63781.03,
+     63746.29,
      63774.93,
-     63791.99,
-     63725.77,
+     63786.16,
+     63725.76,
      63743.99,
      63792.81,
-     63779.81,
-     63880.0,
-     63934.37,
+     63779.8,
+     63880.01,
+     63937.17,
      64007.63,
-     64002.24,
-     63987.13,
+     64005.53,
+     63987.12,
      64065.52,
-     64641.73
+     64756.03,
+     64917.02,
+     65236.49,
+     65411.2,
+     65424.0
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 19,
+   "health": 20,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -9035,23 +9039,23 @@
    "tech_by_range": {
     "w1": {
      "support": 60788.02,
-     "resistance": 64700.88,
-     "change_pct": 5.2
+     "resistance": 65391.52,
+     "change_pct": 6.47
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.03
+     "change_pct": -15.01
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -11.42
+     "change_pct": -10.35
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.18
+     "change_pct": -47.56
     }
    },
    "financials": [],
@@ -9661,19 +9665,19 @@
   {
    "ticker": "MU",
    "name": "Micron",
-   "value_eur": 76285.82,
+   "value_eur": 76073.79,
    "sector": "Technology"
   },
   {
    "ticker": "AMD",
    "name": "AMD",
-   "value_eur": 55217.59,
+   "value_eur": 55064.12,
    "sector": "Technology"
   },
   {
    "ticker": "NVDA",
    "name": "NVIDIA",
-   "value_eur": 47839.02,
+   "value_eur": 47706.06,
    "sector": "Technology"
   },
   {
@@ -9685,31 +9689,31 @@
   {
    "ticker": "INTC",
    "name": "Intel",
-   "value_eur": 40875.15,
+   "value_eur": 40761.55,
    "sector": "Technology"
   },
   {
    "ticker": "TSLA",
    "name": "Tesla",
-   "value_eur": 21057.14,
+   "value_eur": 20998.61,
    "sector": "Consumer Cyclical"
   },
   {
    "ticker": "MSTR",
    "name": "Strategy",
-   "value_eur": 13166.92,
+   "value_eur": 13130.32,
    "sector": "Technology"
   },
   {
    "ticker": "RGTI",
    "name": "Rigetti",
-   "value_eur": 9329.86,
+   "value_eur": 9303.93,
    "sector": "Technology"
   },
   {
    "ticker": "ARBE",
    "name": "Arbe Robotics",
-   "value_eur": 873.86,
+   "value_eur": 871.43,
    "sector": "Technology"
   }
  ],
@@ -12329,15 +12333,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1581",
-    "change_pct": 0.04,
+    "value": "1.1613",
+    "change_pct": 0.32,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "185.20",
-    "change_pct": -0.09,
+    "value": "185.45",
+    "change_pct": 0.04,
     "suffix": "%"
    }
   ],
@@ -12345,8 +12349,8 @@
    "us10": 4.49,
    "jp10": 2.68,
    "spread": 1.8,
-   "usdjpy": 160.02,
-   "usdjpy_chg_1m": 1.77,
+   "usdjpy": 159.79,
+   "usdjpy_chg_1m": 1.63,
    "boj_meetings": [
     "2026-06-17",
     "2026-07-31",
@@ -12362,7 +12366,7 @@
    "calls": 16998
   },
   "risk_sentiment": {
-   "score": 58,
+   "score": 59,
    "label": "Neutrale",
    "components": [
     {
@@ -12379,7 +12383,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 54
+     "score": 66
     },
     {
      "label": "Treasury 10A",
@@ -12561,6 +12565,32 @@
  "news": [
   {
    "source": "Investing.com",
+   "title": "US, Iran reach peace deal, signing set for Friday, Pakistan says",
+   "link": "https://www.investing.com/news/world-news/us-iran-reach-peace-deal-signing-set-for-friday-pakistan-says-4741116",
+   "published": "2026-06-14T21:42:25Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 0,
+   "sentiment": "neutral",
+   "title_it": "Stati Uniti e Iran raggiungono un accordo di pace, firma prevista per venerdì, dice il Pakistan"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Trump says deal with Iran now complete,  Strait of Hormuz to reopen",
+   "link": "https://www.investing.com/news/economy-news/trump-says-iran-deal-could-be-signed-sunday-tehran-disputes-timing-4741061",
+   "published": "2026-06-14T21:39:03Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 0,
+   "sentiment": "neutral",
+   "title_it": "Trump afferma che l’accordo con l’Iran è ormai concluso, lo Stretto di Hormuz riaprirà"
+  },
+  {
+   "source": "Investing.com",
    "title": "Russia stocks lower at close of trade; MOEX Russia Index unchanged",
    "link": "https://www.investing.com/news/stock-market-news/russia-stocks-lower-at-close-of-trade-moex-russia-index-unchanged-4741115",
    "published": "2026-06-14T21:20:04Z",
@@ -12571,19 +12601,6 @@
    "priority": 0,
    "sentiment": "neutral",
    "title_it": "Le azioni russe crollano alla chiusura delle contrattazioni; Indice MOEX Russia invariato"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Trump says U.S. has agreed to deal with Iran – Report",
-   "link": "https://www.investing.com/news/economy-news/trump-says-iran-deal-could-be-signed-sunday-tehran-disputes-timing-4741061",
-   "published": "2026-06-14T21:19:24Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 0,
-   "sentiment": "neutral",
-   "title_it": "Trump afferma che gli Stati Uniti hanno accettato di trattare con l’Iran – Rapporto"
   },
   {
    "source": "Investing.com",
@@ -12612,19 +12629,6 @@
   },
   {
    "source": "Investing.com",
-   "title": "Trump says he is against FISA extension if voting bill not attached",
-   "link": "https://www.investing.com/news/politics-news/trump-says-he-is-against-fisa-extension-if-voting-bill-not-attached-4741109",
-   "published": "2026-06-14T18:36:24Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 0,
-   "sentiment": "neutral",
-   "title_it": "Trump afferma di essere contrario all’estensione della FISA se il disegno di legge elettorale non viene allegato"
-  },
-  {
-   "source": "Investing.com",
    "title": "Another 3% S&P 500 drop may trigger more systematic selling: BofA",
    "link": "https://www.investing.com/news/stock-market-news/another-3-sp-500-drop-may-trigger-more-systematic-selling-bofa-4741094",
    "published": "2026-06-14T14:31:06Z",
@@ -12645,7 +12649,7 @@
    ],
    "priority": 0,
    "sentiment": "bull",
-   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment cripto"
+   "title_it": "Il Bitcoin supera i 64.000 dollari mentre gli afflussi di ETF rimbalzano, SpaceX aumenta il sentiment delle criptovalute"
   },
   {
    "source": "Investing.com",
@@ -12661,6 +12665,58 @@
   },
   {
    "source": "CNBC",
+   "title": "U.S. and Iran agree on peace deal to end the war, Trump and Pakistan say",
+   "link": "https://www.cnbc.com/2026/06/14/us-iran-war-peace-deal.html",
+   "published": "2026-06-14T21:59:52Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "bear",
+   "title_it": "Stati Uniti e Iran concordano un accordo di pace per porre fine alla guerra, affermano Trump e Pakistan"
+  },
+  {
+   "source": "Reuters",
+   "title": "Iran says draft US deal includes oil sanctions waiver, nuclear limits and asset release - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQTHJ5S3lQbnk2ck1TeGlCeGh2V0k3cXJQSnVwLVNSUEM3cDNIcUVFazFZazBSLW1oQzJQWHJldGo4RHp3b2NaQXQ2OUxJTjdPTVNjZEZQdUxPT1ZfaGVLWWt1MmtQa0taaUNfZnIzUVRqS3R4WFp2UUM1dFFUZlNkY3ZtZ2xOaDE3UW1uQVpFcGQ4MThHUGs4X3JETmg3SWRWdmEwa28zazRGR0dJX0VWMDBJWXd3Z2Izd19OLUNDb01OejE2?oc=5",
+   "published": "2026-06-14T21:52:50Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "L'Iran afferma che la bozza di accordo statunitense include la rinuncia alle sanzioni petrolifere, limiti al nucleare e il rilascio di asset - Reuters"
+  },
+  {
+   "source": "AP",
+   "title": "Trump says deal reached with Iran and he has authorized that naval blockade leave Strait of Hormuz - AP News",
+   "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQdVZrMms1bUJyekVvUnptMmhBSE9sLUFRT05xSTAyci1SaEdXSUhXTjNLWEt6Ry1qX1k5Z2ROeXZNUkFIYTJsWkFYRzdSWXQ4M294ZHRLcXU2RmJEVzZPNmNwd2ZacWMzVFdJdW5Bb2wybFZpV2g1bTBQY1FaRTBneHgxSVZ2cVkxall4QU9nWQ?oc=5",
+   "published": "2026-06-14T21:43:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Trump afferma che è stato raggiunto un accordo con l'Iran e ha autorizzato il blocco navale sullo Stretto di Hormuz - AP News"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Dow Jones Futures Due As Trump Announces Iran Deal, Hormuz To Open; SpaceX's Next Test",
+   "link": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-trump-iran-deal-spacex/?src=A00220&yptr=yahoo",
+   "published": "2026-06-14T21:42:57Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "I futures del Dow Jones scadono mentre Trump annuncia l'accordo con l'Iran, Hormuz apre; Il prossimo test di SpaceX"
+  },
+  {
+   "source": "CNBC",
    "title": "Trump celebrates turning 80 with a UFC cage-fighting event while big issues loom over his presidency",
    "link": "https://www.cnbc.com/2026/06/14/trump-turns-80-with-a-ufc-event-while-big-issues-loom-over-presidency.html",
    "published": "2026-06-14T21:21:00Z",
@@ -12670,20 +12726,7 @@
    ],
    "priority": 1,
    "sentiment": "neutral",
-   "title_it": "Trump festeggia i suoi 80 anni con un evento di combattimento in gabbia della UFC mentre grandi problemi incombono sulla sua presidenza"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Dow Jones Futures Due With Iran Deal In Focus, SpaceX's Next Test",
-   "link": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-trump-iran-deal-spacex/?src=A00220&yptr=yahoo",
-   "published": "2026-06-14T21:08:37Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Futures Dow Jones in scadenza con l'accordo con l'Iran in primo piano, il prossimo test di SpaceX"
+   "title_it": "Trump festeggia i suoi 80 anni con un evento di combattimento in gabbia UFC mentre grandi problemi incombono sulla sua presidenza"
   },
   {
    "source": "MarketWatch",
@@ -12698,6 +12741,18 @@
    "title_it": "Il vero Kevin Warsh, per favore, si alzerà? In vista del suo primo incontro con la Fed, gli economisti onestamente non sanno cosa aspettarsi."
   },
   {
+   "source": "Bloomberg",
+   "title": "Bond Funds Chase Australian Debt on Peak RBA Interest Rate Bets",
+   "link": "https://news.google.com/search?q=Bond%20Funds%20Chase%20Australian%20Debt%20on%20Peak%20RBA%20Interest%20Rate%20Bets",
+   "published": "2026-06-14T21:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "I fondi obbligazionari inseguono il debito australiano sulle scommesse sui tassi di interesse massimi della RBA"
+  },
+  {
    "source": "Yahoo Finance",
    "title": "Tech Shakeup on the S&P 500",
    "link": "https://finance.yahoo.com/markets/stocks/articles/tech-shakeup-p-500-205357142.html",
@@ -12708,19 +12763,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Scossa tecnologica sullo S&P 500"
-  },
-  {
-   "source": "CNBC",
-   "title": "Charlie Javice reportedly seeking a pardon from Trump",
-   "link": "https://www.cnbc.com/2026/06/14/charlie-javice-reportedly-seeking-a-pardon-from-trump-.html",
-   "published": "2026-06-14T20:29:12Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Secondo quanto riferito, Charlie Javice chiede la grazia a Trump"
   },
   {
    "source": "Reuters",
@@ -12734,6 +12776,19 @@
    "priority": 1,
    "sentiment": "bear",
    "title_it": "Trump dice a Putin che è pronto a contribuire a porre fine al conflitto in Ucraina, dice il consigliere del Cremlino - Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "Putin, Zelenskyy speak with Trump by phone as drone strikes kill 2 in Russia and UK detains tanker",
+   "link": "https://www.cnbc.com/2026/06/14/putin-zelenskyy-talk-with-trump-by-phone-drones-kill-2-in-russia.html",
+   "published": "2026-06-14T19:52:24Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Putin e Zelenskyj parlano al telefono con Trump mentre gli attacchi dei droni uccidono 2 persone in Russia e il Regno Unito trattiene una petroliera"
   },
   {
    "source": "Google News",
@@ -12758,19 +12813,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "SpaceX e OpenAI stanno mettendo fine all’era di scarsità di azioni di Wall Street"
-  },
-  {
-   "source": "CNBC",
-   "title": "U.S. peace deal with Iran in question as Israel strikes Lebanon, Trump warns not to 'blow it'",
-   "link": "https://www.cnbc.com/2026/06/14/iran-deal-teeters-israel-strikes-lebanon.html",
-   "published": "2026-06-14T17:40:13Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "bear",
-   "title_it": "L’accordo di pace degli Stati Uniti con l’Iran è in discussione mentre Israele attacca il Libano, Trump avverte di non “mandarlo all’aria”"
   },
   {
    "source": "Reuters",
@@ -12809,19 +12851,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Il presidente della Fed Warsh condurrà un difficile incontro di prim'ordine - Taipei Times"
-  },
-  {
-   "source": "Google News",
-   "title": "Donald Trump's legacy rests in the hands of federal courts - USA Today",
-   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOZ0gteHF2RDE5ZEJYdXRZVUdqc1VaUk5QTy1JWHRPcVNod3ZyNUg1UGhwYjl0bnBoQ25WSmZRQmtVZTZ1MUpscFJudklTOGNjWDhDdUU5Q1MtNVV0elVvdUtJSVJjeEUwcnptYmNiRHZ5Z05yOU5iSDVPWmg5RG12SGhMSnBiNjAwaC1wdXAyRU00ZGg3dUdydlFpOUVDSUYzaGJUVUlENTQ1N0huN2VRZjRiU084QQ?oc=5",
-   "published": "2026-06-14T15:32:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "L'eredità di Donald Trump è nelle mani dei tribunali federali - USA Today"
   },
   {
    "source": "Bloomberg",
@@ -12866,7 +12895,7 @@
    "source": "AP",
    "title": "Donald Trump turns 80 and celebrates with UFC cage fighting on the White House lawn - AP News",
    "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOZ2d0Y1NJSkU1T01KdUxBazhMdnNFWVB1UHc2NVQ0b1VnY2VGUF8wRzdRUTZCS2dyYlBoTjNZLWR1T2VYYlhRVmFwdFVQakV0QkV3b1Q0b2lTSUJldFdHbDdzWng4bTAxcHV0TjlRRG1XZWExS2FPemZyTmFCdnI2S2wzeDdWWDBFVDU0LWoyVQ?oc=5",
-   "published": "2026-06-14T14:23:00Z",
+   "published": "2026-06-14T14:30:09Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -12888,16 +12917,16 @@
    "title_it": "La stretta sui finanziamenti azionari guidata dal rally dell’intelligenza artificiale, l’IPO di SpaceX allunga le banche"
   },
   {
-   "source": "Bloomberg",
-   "title": "Fed Chair Warsh Faces Challenging Debut",
-   "link": "https://news.google.com/search?q=Fed%20Chair%20Warsh%20Faces%20Challenging%20Debut",
-   "published": "2026-06-14T13:49:21Z",
+   "source": "Google News",
+   "title": "May jobs report crushes estimates — and any hopes for a Fed rate cut - MSN",
+   "link": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxPNUJoQUdEYnY5bE1FeTVyQk5wbFVETVpGYklfR1BLOVM5czQ5WXVQT1Jjelpjdi1zTUpMV25HVnFhTnNueC1BOXI2UTczd2pHMEtQVFo1ZkFCeUZtQzRsRVp6aE83dDNMVGd1cjRCR214b2VwRzNQQW5Xb0kzVHlkajV3RzRXc3d1cGlIYXJiR3QyTnIwQ0VLRWFJUlRaTm1TenVqalRCazdacjdvYVhDTkdYM0hiX1BSenE0SmpUdDJ1OHkyOTl5WkViMTJ0Wmk3ZFFLaFBTcDVGdjN5?oc=5",
+   "published": "2026-06-14T13:51:42Z",
    "tickers": [
     "MACRO"
    ],
    "priority": 1,
    "sentiment": "neutral",
-   "title_it": "Il presidente della Fed Warsh affronta un debutto impegnativo"
+   "title_it": "Il rapporto sull'occupazione di maggio schiaccia le stime e ogni speranza di un taglio dei tassi della Fed - MSN"
   },
   {
    "source": "CNBC",
@@ -12935,19 +12964,6 @@
    "priority": 1,
    "sentiment": "bull",
    "title_it": "I principali analisti di Wall Street sono fiduciosi sulle prospettive di crescita di questi 3 titoli"
-  },
-  {
-   "source": "Reuters",
-   "title": "Iran says draft US deal includes oil sanctions waiver, nuclear limits and asset release - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQTHJ5S3lQbnk2ck1TeGlCeGh2V0k3cXJQSnVwLVNSUEM3cDNIcUVFazFZazBSLW1oQzJQWHJldGo4RHp3b2NaQXQ2OUxJTjdPTVNjZEZQdUxPT1ZfaGVLWWt1MmtQa0taaUNfZnIzUVRqS3R4WFp2UUM1dFFUZlNkY3ZtZ2xOaDE3UW1uQVpFcGQ4MThHUGs4X3JETmg3SWRWdmEwa28zazRGR0dJX0VWMDBJWXd3Z2Izd19OLUNDb01OejE2?oc=5",
-   "published": "2026-06-14T12:18:30Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "L'Iran afferma che la bozza di accordo statunitense include la rinuncia alle sanzioni petrolifere, limiti al nucleare e il rilascio di asset - Reuters"
   },
   {
    "source": "CNBC",
@@ -13026,19 +13042,6 @@
    "title_it": "Perché Trump e gli altri leader del G7 si incontrano senza la Cina potrebbe essere un errore – AP News"
   },
   {
-   "source": "AP",
-   "title": "An octagon on the White House lawn for Trump's 80th birthday and the nation's 250th, in photos - AP News",
-   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOb1pwUXR4RGRvbXIwUmhMS1EtME1sZUJTSDI3WWpMSlpmOWs0M1ZkNjB0UFM0elRJVjFua1MzOUk2NkxlQmtOU2ZqUF94d3prMWJ6OEZWcktHRExSTUdMRjlFVVVOYm51ZjF4VXJET0o4MUpkWEJ4MGVLZk5VQ29mVTZDNXdsX1czVDRPdGZqV1RqVXE1aE5rR1VGR3p6YVJZUWNnamRSZEdNWkNWRWc?oc=5",
-   "published": "2026-06-14T02:57:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Un ottagono sul prato della Casa Bianca per l'80esimo compleanno di Trump e il 250esimo della nazione, in foto - AP News"
-  },
-  {
    "source": "Google News",
    "title": "Federal Reserve Chair Kevin Warsh Holds First Briefing on U.S. Economy - C-SPAN",
    "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOV0NXQUFNMFdRX3lpaXdNU3Vtd1JXQlZYY1gzSlVRbko3b0xCckZhbFg1T3ByUmxYcF81azF0STVXQnk1UUNwMUVRYjdxRUNmTUlPTldCaDF5M2dOdnI4M01NSEpVSTJWaEtDb0w3bXFweU1NVnBDdTNSb0dta2J2ZnBxbE91bXFvQW13Q2ZxTERlU0gxU09mRE9DU1R6N1JHUjJNWlRwdlBlbndnaEZBLVp6SVVxZVNLSURSaQ?oc=5",
@@ -13062,19 +13065,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Il nome di Trump è scomparso dalla facciata del Kennedy Center, dice il funzionario - AP News"
-  },
-  {
-   "source": "Reddit",
-   "title": "Odds on Warsh/Fed meeting is the primary reason for Trump to sign the Iran agreement this weekend",
-   "link": "https://www.reddit.com/r/investing/comments/1u543tm/odds_on_warshfed_meeting_is_the_primary_reason/",
-   "published": "2026-06-13T22:31:08Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Le probabilità dell’incontro Warsh/Fed sono il motivo principale per cui Trump ha firmato l’accordo con l’Iran questo fine settimana"
   },
   {
    "source": "Reuters",
@@ -13119,7 +13109,7 @@
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-14T21:22:57Z",
+   "published": "2026-06-14T22:03:09Z",
    "tickers": [
     "MACRO"
    ],
