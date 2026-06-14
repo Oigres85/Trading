@@ -96,7 +96,7 @@ TOP_CAP_CANDIDATES = {
 
 def gnews(query):
     return ("https://news.google.com/rss/search?q="
-            + urllib.parse.quote(f"{query} when:4d") + "&hl=en-US&gl=US&ceid=US:en")
+            + urllib.parse.quote(f"{query} when:1d") + "&hl=en-US&gl=US&ceid=US:en")
 
 
 def build_feeds():
@@ -1060,10 +1060,21 @@ def fetch_news():
     """News sui titoli in portafoglio (dinamiche) + macro/politica/geopolitica, tradotte.
     Esclude articoli a pagamento e doppioni sullo stesso argomento. Include Polymarket."""
     keywords = build_keywords()
+    # solo notizie delle ultime 30 ore (≈1 giorno)
+    cutoff = datetime.now(timezone.utc).timestamp() - 30 * 3600
+    def fresh(ts):
+        if not ts:
+            return True   # senza data: tenuta (molti feed sono comunque recenti)
+        try:
+            return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp() >= cutoff
+        except ValueError:
+            return True
     items, seen_titles, kept_keys, per_source = [], set(), [], {}
     for source, url in build_feeds():
         for title, link, ts in parse_feed_entries(url):
             if not title or title.lower() in seen_titles:
+                continue
+            if not fresh(ts):                      # niente notizie più vecchie di ~1 giorno
                 continue
             # paywall: non scartare, ma punta a una ricerca Google (versione gratuita)
             if any(d in (link or "").lower() for d in PAYWALL_DOMAINS):

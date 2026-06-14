@@ -181,7 +181,7 @@ async function editHoldings(section, mutate) {
       return;
     }
     const file = await r.json();
-    const cfg = JSON.parse(decodeURIComponent(escape(atob(file.content))));
+    const cfg = JSON.parse(decodeURIComponent(escape(atob((file.content || "").replace(/\s/g, "")))));
     if (!mutate(cfg)) return;                 // mutate ritorna false se annullato/invalido
     // 2) scrivi il nuovo config
     const body = {
@@ -510,13 +510,28 @@ function renderBroker() {
   if (!b) { box.innerHTML = ""; return; }
   const ret = brokerPeriodReturn(b);
   const cell = (lab, val, cls = "") => `<div class="bk-cell"><div class="bk-lab">${lab}</div><div class="bk-val ${cls}">${val}</div></div>`;
+  // BTP Valore Ott 2028: cedola trimestrale (10 gen/apr/lug/ott), 4,10% fino a ott 2026 poi 4,50%
+  const nominal = 40000;
+  const now = new Date();
+  const coupMonths = [0, 3, 6, 9];   // gen, apr, lug, ott
+  let next = null;
+  for (let y = now.getFullYear(); y <= now.getFullYear() + 1 && !next; y++)
+    for (const mth of coupMonths) {
+      const d = new Date(y, mth, 10);
+      if (d > now) { next = d; break; }
+    }
+  const rate = next && next < new Date(2026, 9, 11) ? 0.041 : 0.045;
+  const grossQ = nominal * rate / 4;
+  const netQ = grossQ * (1 - 0.125);
+  const nextStr = next ? next.toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "—";
   box.innerHTML = `<div class="bk-title">Rendimenti reali (broker, ${new Date(b.as_of).toLocaleDateString("it-IT")})</div>
     <div class="bk-grid">
       ${cell(`Rendimento (${RANGE_LABEL[histRange] || "periodo"})`, signTxt(ret), signCls(ret))}
       ${cell("Controvalore", fmtEUR.format(b.controvalore_totale))}
       ${cell("Profitto totale", `${signTxt(b.profitto_totale_pct)} · ${signTxt(Math.round(b.profitto_totale_eur), " €")}`, signCls(b.profitto_totale_pct))}
       ${cell("Profitto azioni ($)", `${signTxt(b.profitto_usd_pct)} · ${signTxt(Math.round(b.profitto_usd), " $")}`, signCls(b.profitto_usd_pct))}
-      ${cell("Cedole BTP", fmtEUR.format(b.cedole_btp))}
+      ${cell("Cedole BTP incassate (lorde)", fmtEUR.format(b.cedole_btp))}
+      ${cell("Prossima cedola BTP", `${nextStr} · ${fmtEUR.format(Math.round(grossQ))} lordi (${fmtEUR.format(Math.round(netQ))} netti)`)}
     </div>`;
 }
 
@@ -742,8 +757,19 @@ function openFinancialsModal(ticker) {
     <text x="${W - pad.r + 6}" y="${yM(-mMax) + 4}" font-size="9" fill="#f59e0b">−${Math.round(mMax)}%</text>
   </svg>
   <div class="cm-legend"><span><i style="background:#4c8dff"></i>Ricavi</span><span><i style="background:#1e40af"></i>Utile netto</span><span><i class="round" style="background:#f59e0b"></i>Margine netto %</span></div>`;
+  // tabella annuale + sintesi
+  const yrs = f.length;
+  const cagr = f[0].revenue > 0 ? ((f[yrs - 1].revenue / f[0].revenue) ** (1 / Math.max(1, yrs - 1)) - 1) * 100 : null;
+  const niCagr = f[0].net_income > 0 && f[yrs - 1].net_income > 0 ? ((f[yrs - 1].net_income / f[0].net_income) ** (1 / Math.max(1, yrs - 1)) - 1) * 100 : null;
+  const avgMargin = f.reduce((s, x) => s + x.margin, 0) / yrs;
+  const rows = f.slice().reverse().map(x => `<tr><td>${x.year}</td><td>${fmtB(x.revenue)}</td><td class="${signCls(x.net_income)}">${fmtB(x.net_income)}</td><td class="${signCls(x.margin)}">${x.margin}%</td></tr>`).join("");
+  const table = `<table class="info-table"><thead><tr><th>Anno</th><th>Ricavi</th><th>Utile netto</th><th>Margine</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const extra = `<div class="info-line" style="margin-top:8px">
+    <b>CAGR ricavi (${yrs}a):</b> <span class="${signCls(cagr)}">${cagr != null ? signTxt(Math.round(cagr * 10) / 10) : "—"}</span>
+    · <b>CAGR utile:</b> <span class="${signCls(niCagr)}">${niCagr != null ? signTxt(Math.round(niCagr * 10) / 10) : "—"}</span>
+    · <b>Margine medio:</b> ${avgMargin.toFixed(1)}%${r.pe && r.pe > 0 ? ` · <b>P/E:</b> ${fmtNum.format(r.pe)}` : ""}${r.eps != null ? ` · <b>EPS:</b> ${fmtNum.format(r.eps)}` : ""}</div>`;
   openInfoModal(`${r.name} (${ticker}) — Conto economico`,
-    `${svg}<div class="info-line muted" style="margin-top:8px">Financial Health Score: <b style="color:${scoreColor(r.fin_health)}">${r.fin_health ?? "—"}/100</b> · pesato su crescita ricavi, costanza utili e stabilità margine.</div>`);
+    `${svg}${extra}${table}<div class="info-line muted" style="margin-top:8px">Financial Health Score: <b style="color:${scoreColor(r.fin_health)}">${r.fin_health ?? "—"}/100</b> · pesato su crescita ricavi, costanza utili e stabilità del margine.</div>`);
 }
 
 /* ---------------- zoom grafico (modale, touch + mouse) ---------------- */
@@ -860,6 +886,21 @@ function openInfoModal(title, bodyHTML) {
   $("#chart-modal").hidden = false;
 }
 
+// data stimata della prossima pubblicazione (calendario tipico USA)
+function nextReleaseDate(key) {
+  const now = new Date(), fmt = d => d.toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" });
+  const firstFriday = (y, mth) => { const d = new Date(y, mth, 1); while (d.getDay() !== 5) d.setDate(d.getDate() + 1); return d; };
+  const nextMonthDay = day => { let d = new Date(now.getFullYear(), now.getMonth(), day); if (d <= now) d = new Date(now.getFullYear(), now.getMonth() + 1, day); return d; };
+  if (key === "nfp" || key === "unemp") {        // primo venerdì del mese
+    let d = firstFriday(now.getFullYear(), now.getMonth()); if (d <= now) d = firstFriday(now.getFullYear(), now.getMonth() + 1); return fmt(d);
+  }
+  if (key === "cpi") return fmt(nextMonthDay(12));
+  if (key === "pce") return fmt(nextMonthDay(28));
+  if (key === "retail") return fmt(nextMonthDay(16));
+  if (key === "pmi") return fmt(nextMonthDay(27));
+  return null;   // gdp/curve: continui o trimestrali variabili
+}
+
 function openMacroInfo(key) {
   const info = MACRO_INFO[key];
   if (!info) return;
@@ -873,9 +914,11 @@ function openMacroInfo(key) {
     if (ind) {
       const sent = ind.impact >= 60 ? '<span class="pos">favorevole ai mercati</span>'
         : ind.impact <= 40 ? '<span class="neg">sfavorevole ai mercati</span>' : "neutro";
+      const nd = nextReleaseDate(ind.key);
       extra = `<div class="info-line"><b>Valore attuale:</b> ${ind.value} <span class="muted">(${ind.date})</span></div>
         <div class="info-line"><b>Impatto:</b> ${sent}</div>
-        ${ind.next_release ? `<div class="info-line"><b>Prossima uscita:</b> ${ind.next_release}</div>` : ""}`;
+        ${nd ? `<div class="info-line"><b>Prossima pubblicazione stimata:</b> ${nd}</div>` : ""}
+        ${ind.next_release ? `<div class="info-line muted">${ind.next_release}</div>` : ""}`;
     }
   } else if (key === "fedwatch" && m.fedwatch) {
     const fw = m.fedwatch;
@@ -1020,17 +1063,20 @@ function scoreColor(s) {
   const h = Math.max(0, Math.min(120, (s / 100) * 120));   // 0=rosso, 60=giallo, 120=verde
   return `hsl(${h.toFixed(0)} 75% 47%)`;
 }
-function thermoBar(score, ends) {
+function thermoBar(score, ends, rev) {
   const s = Math.max(0, Math.min(100, score));
-  return `<div class="thermo"><div class="thermo-scale"></div>
-    <div class="thermo-marker" style="left:${s}%"></div></div>
+  // rev = scala invertita verde(sx)→rosso(dx); il marker resta alla posizione "bontà"
+  const scale = rev ? `<div class="thermo-scale" style="background:linear-gradient(90deg,#22c55e,#eab308,#f59e0b,#ef4444)"></div>` : `<div class="thermo-scale"></div>`;
+  const pos = rev ? 100 - s : s;
+  return `<div class="thermo">${scale}
+    <div class="thermo-marker" style="left:${pos}%"></div></div>
     ${ends ? `<div class="thermo-ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>` : ""}`;
 }
 /* card termometro uniforme; score 0-100 (100=positivo/verde). key per il popup */
-function thermoCard(key, title, score, valueText, subText, ends) {
+function thermoCard(key, title, score, valueText, subText, ends, rev) {
   return `<div class="gauge-card" data-gauge="${key}" tabindex="0" role="button" title="Clicca per dettagli e news">
     <div class="g-title">${title}</div>
-    ${thermoBar(score, ends)}
+    ${thermoBar(score, ends, rev)}
     <div class="gauge-value" style="color:${scoreColor(score)}">${valueText}</div>
     <div class="gauge-sub">${subText}</div>
   </div>`;
@@ -1083,7 +1129,7 @@ function renderGauges() {
   if (m.buffett) {
     const bf = m.buffett;
     cards.push(thermoCard("buffett", "Buffett Indicator", bf.score, `${fmtNum.format(bf.ratio)}%`,
-      `<b>${bf.label}</b><br>capitalizzazione USA / PIL`, ["Caro", "Conveniente"]));
+      `<b>${bf.label}</b><br>capitalizzazione USA / PIL`, ["Conveniente", "Caro"], true));
   }
 
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
@@ -1153,36 +1199,13 @@ function timeAgo(iso) {
   return `${Math.round(mins / 1440)} gg fa`;
 }
 
-let newsFilter = null;   // ticker/argomento selezionato dai chip Trending
-
 const TOPIC_LABEL = t => t === "MACRO" ? "Macro" : t === "POL" ? "Politica" : t;
 
-function renderTrending() {
-  const list = DATA.news || [];
-  const counts = {};
-  list.forEach(n => (n.tickers || []).forEach(t => { counts[t] = (counts[t] || 0) + 1; }));
-  // mostra tutti gli argomenti con news (ticker pf+wl, Macro, Politica)
-  const top = Object.entries(counts).filter(([, c]) => c >= 1).sort((a, b) => b[1] - a[1]).slice(0, 14);
-  const chips = top.map(([t, c]) =>
-    `<button class="trend-chip ${newsFilter === t ? "active" : ""}" data-topic="${t}">${TOPIC_LABEL(t)} <span>${c}</span></button>`).join("");
-  $("#news-trending").innerHTML = top.length
-    ? `<span class="trend-label">Trending:</span>${chips}${newsFilter ? '<button class="trend-chip clear" data-topic="">✕ tutte</button>' : ""}` : "";
-}
-
 function renderNews() {
-  renderTrending();
-  let list = DATA.news || [];
-  if (newsFilter) {
-    list = list.filter(n => (n.tickers || []).includes(newsFilter));
-  } else {
-    // raggruppa: max 3 news per argomento dominante nel feed (il resto via i chip Trending)
-    const seen = {};
-    list = list.filter(n => {
-      const t = (n.tickers || [])[0] || "?";
-      seen[t] = (seen[t] || 0) + 1;
-      return seen[t] <= 3;
-    });
-  }
+  // solo notizie delle ultime 24 ore (oltre a quanto già filtrato dalla pipeline)
+  const cutoff = Date.now() - 26 * 3600 * 1000;
+  let list = (DATA.news || []).filter(n => !n.published || new Date(n.published).getTime() >= cutoff);
+  if (!list.length) list = DATA.news || [];   // fallback: se tutte vecchie, mostra comunque
   $("#news-list").innerHTML = list.length ? list.map(n => `
     <li class="news-item">
       <a href="${esc(n.link)}" target="_blank" rel="noopener" title="${esc(n.title)}">${esc(n.title_it || n.title)}</a>
@@ -1191,7 +1214,7 @@ function renderNews() {
         <span class="news-time">${timeAgo(n.published)}</span>
         ${n.tickers.map(t => `<span class="news-tk">${TOPIC_LABEL(t)}</span>`).join("")}
       </div>
-    </li>`).join("") : '<li class="muted">Nessuna news per il filtro selezionato</li>';
+    </li>`).join("") : '<li class="muted">Nessuna news recente</li>';
 }
 
 
@@ -1300,12 +1323,21 @@ async function analyzeAI() {
     + "1) Sintesi macro e sentiment, 2) Analisi tecnica del portafoglio (ipercomprato/ipervenduto, supporti/resistenze, volumi anomali), "
     + "3) Indicazioni operative (coperture, prese di beneficio, possibili acquisti). Usa elenchi puntati e grassetti.\n\nDATI:\n" + buildPrompt();
   try {
-    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=" + encodeURIComponent(key), {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-    });
-    if (res.status === 400 || res.status === 403) { localStorage.removeItem("gemini_key"); throw new Error("Chiave non valida o senza permessi (rimossa, riprova)"); }
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    let res, lastErr = "";
+    for (const model of ["gemini-2.0-flash", "gemini-flash-latest", "gemini-1.5-flash"]) {
+      res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=` + encodeURIComponent(key), {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      });
+      if (res.ok) break;
+      lastErr = "HTTP " + res.status;
+      if ([400, 401, 403].includes(res.status)) {
+        localStorage.removeItem("gemini_key");
+        throw new Error("Chiave Gemini non valida/non autorizzata (rimossa). Crea una API key gratuita su aistudio.google.com/apikey — deve iniziare con \"AIza\" — e riprova.");
+      }
+      // 404 → modello non disponibile per questa chiave: provo il prossimo
+    }
+    if (!res.ok) throw new Error(lastErr + " — nessun modello Gemini disponibile per questa chiave");
     const data = await res.json();
     const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!txt) throw new Error("Risposta vuota dall'AI");
@@ -1489,12 +1521,6 @@ document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {
     allocMode = ch.dataset.mode;
     renderAllocation();
   });
-});
-$("#news-trending").addEventListener("click", (e) => {
-  const chip = e.target.closest(".trend-chip");
-  if (!chip) return;
-  newsFilter = chip.dataset.topic || null;
-  renderNews();
 });
 
 /* zoom grafici */
