@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-14T17:22:26Z",
+ "updated_at": "2026-06-14T17:39:47Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -8209,16 +8209,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63912.68,
-   "change_pct": -0.79,
+   "price": 63739.52,
+   "change_pct": -1.06,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.4,
+   "ath_dist_pct": -49.5,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 35.3,
-   "volume": 16202618880,
-   "vol_ratio": 0.49,
+   "rsi": 35.0,
+   "volume": 15605339136,
+   "vol_ratio": 0.47,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -8227,7 +8227,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63912.68
+     63739.52
     ],
     "m6": [
      70120.78,
@@ -8355,7 +8355,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63912.68
+     63739.52
     ],
     "all": [
      386.94,
@@ -8499,7 +8499,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63912.68
+     63739.52
     ],
     "m1": [
      76981.12,
@@ -8523,7 +8523,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63912.68
+     63739.52
     ],
     "m3": [
      72979.05,
@@ -8591,7 +8591,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63912.68
+     63739.52
     ],
     "y1": [
      105472.41,
@@ -8667,7 +8667,7 @@
      73754.84,
      63801.57,
      61643.78,
-     63912.68
+     63739.52
     ],
     "d1": [
      64390.4,
@@ -8774,7 +8774,8 @@
      63924.02,
      63969.72,
      63922.7,
-     63912.68
+     63890.02,
+     63902.42
     ]
    },
    "earnings_date": null,
@@ -8788,22 +8789,22 @@
     "w1": {
      "support": 60788.02,
      "resistance": 64700.88,
-     "change_pct": 4.01
+     "change_pct": 3.73
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.98
+     "change_pct": -17.2
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -12.42
+     "change_pct": -12.66
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.77
+     "change_pct": -48.91
     }
    },
    "financials": [],
@@ -12107,7 +12108,7 @@
    "calls": 16998
   },
   "risk_sentiment": {
-   "score": 57,
+   "score": 56,
    "label": "Neutrale",
    "components": [
     {
@@ -12124,7 +12125,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 42
+     "score": 39
     },
     {
      "label": "Treasury 10A",
@@ -12301,14 +12302,21 @@
    "question": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "yes": 100,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $64,000 on June 14?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-64k-on-june-14-2026"
   }
  ],
  "news": [
+  {
+   "source": "Investing.com",
+   "title": "Protesters set Tesla ablaze, smash UN office’s windows in Geneva anti-G7 march",
+   "link": "https://www.investing.com/news/world-news/protesters-smash-windows-and-set-tesla-ablaze-in-antig7-march-in-geneva-4741099",
+   "published": "2026-06-14T17:06:45Z",
+   "tickers": [
+    "TSLA"
+   ],
+   "priority": 0,
+   "sentiment": "neutral",
+   "title_it": "I manifestanti danno fuoco a Tesla e distruggono le finestre dell’ufficio delle Nazioni Unite durante la marcia anti-G7 di Ginevra"
+  },
   {
    "source": "Investing.com",
    "title": "Trump says Israeli strike on Lebanon should not have happened, but Iran deal close",
@@ -12321,18 +12329,6 @@
    "priority": 0,
    "sentiment": "neutral",
    "title_it": "Trump afferma che l’attacco israeliano al Libano non avrebbe dovuto avvenire, ma l’accordo con l’Iran è vicino"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Protesters smash windows and set Tesla ablaze in anti-G7 march in Geneva",
-   "link": "https://www.investing.com/news/world-news/protesters-smash-windows-and-set-tesla-ablaze-in-antig7-march-in-geneva-4741099",
-   "published": "2026-06-14T15:43:01Z",
-   "tickers": [
-    "TSLA"
-   ],
-   "priority": 0,
-   "sentiment": "neutral",
-   "title_it": "I manifestanti spaccano finestre e danno fuoco a Tesla durante la marcia anti-G7 a Ginevra"
   },
   {
    "source": "Investing.com",
@@ -12436,6 +12432,19 @@
    "title_it": "Amphenol collega la rivoluzione dell'intelligenza artificiale mentre Nvidia si concentra sui riflettori"
   },
   {
+   "source": "CNBC",
+   "title": "Trump celebrates turning 80 with a UFC cage-fighting event while big issues loom over his presidency",
+   "link": "https://www.cnbc.com/2026/06/14/trump-turns-80-with-a-ufc-event-while-big-issues-loom-over-presidency.html",
+   "published": "2026-06-14T17:36:42Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Trump festeggia i suoi 80 anni con un evento di combattimento in gabbia della UFC mentre grandi problemi incombono sulla sua presidenza"
+  },
+  {
    "source": "Yahoo Finance",
    "title": "Gold vs. the S&P 500: With Inflation at a 3-Year High, Which Does History Say Wins?",
    "link": "https://finance.yahoo.com/markets/commodities/articles/gold-vs-p-500-inflation-164850280.html",
@@ -12459,43 +12468,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Futures Dow Jones in scadenza con il mercato a livelli chiave; Focus sull'accordo con l'Iran, il prossimo test di SpaceX"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Gasoline Prices Are Still High, but This Inflation Reading Could Be Even More Worrisome for Nike Stock.",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/gasoline-prices-still-high-inflation-163500480.html",
-   "published": "2026-06-14T16:35:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "I prezzi della benzina sono ancora alti, ma questa lettura dell’inflazione potrebbe essere ancora più preoccupante per le azioni Nike."
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Bank of America revisits Oracle stock price target after post-earnings selloff",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/bank-america-revisits-oracle-stock-163300959.html",
-   "published": "2026-06-14T16:33:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "priority": 1,
-   "sentiment": "bear",
-   "title_it": "Bank of America rivisita il target di prezzo delle azioni Oracle dopo la svendita post-utili"
-  },
-  {
-   "source": "AP",
-   "title": "Trump celebrates turning 80 with a UFC cage-fighting event while big issues loom over his presidency - AP News",
-   "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPdHdQdXJGbW04c2tKcV9KYnRmWVd0ZVpLOWVYM3lTeFZjeW5aY0wwYnJHSmtnbHY5MmxVU2V2ekV5ZkZudHVVY2R0Wk5sSGJ2VVZqel9xemtjYVdRSjN1STgwS1gzcE0yNlZkMl95UHlkRE9ZOTdqTlBqY29EWWw0VXd6UERIbGVvd3pJTk9YRm5IcWs?oc=5",
-   "published": "2026-06-14T16:20:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Trump festeggia i suoi 80 anni con un evento di combattimento in gabbia UFC mentre grandi problemi incombono sulla sua presidenza - AP News"
   },
   {
    "source": "CNBC",
@@ -12676,6 +12648,19 @@
   },
   {
    "source": "Reuters",
+   "title": "Trump's support in rural America slips as fuel and food prices climb, Reuters/Ipsos poll shows - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOOGNGbW1FWnpRa3BkcF9tUW90bzlmQVprRlVsRmRWZThFM0toVmJ2RFJTTDJmS3dfYXF4M25EZzRsQThpeTZQMnVoOURXekJYQkhPTmxTUk5pTkMybjF0d2VSUC13aV9Kd3JGOGoyUl9QUC1ubzNzR2NaSVlfQjNyTjNtaVZuRkoyVTJiSGwxZVdiSzAxblhVV0Q0dUkyb1Q3WldGVU5xVmR3VThRbDFFR1VqMlB0dVBZWGpsVw?oc=5",
+   "published": "2026-06-14T12:30:49Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "bull",
+   "title_it": "Il sostegno di Trump nelle zone rurali dell'America diminuisce con l'aumento dei prezzi di carburante e cibo, mostra un sondaggio Reuters/Ipsos - Reuters"
+  },
+  {
+   "source": "Reuters",
    "title": "Iran says draft US deal includes oil sanctions waiver, nuclear limits and asset release - Reuters",
    "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQTHJ5S3lQbnk2ck1TeGlCeGh2V0k3cXJQSnVwLVNSUEM3cDNIcUVFazFZazBSLW1oQzJQWHJldGo4RHp3b2NaQXQ2OUxJTjdPTVNjZEZQdUxPT1ZfaGVLWWt1MmtQa0taaUNfZnIzUVRqS3R4WFp2UUM1dFFUZlNkY3ZtZ2xOaDE3UW1uQVpFcGQ4MThHUGs4X3JETmg3SWRWdmEwa28zazRGR0dJX0VWMDBJWXd3Z2Izd19OLUNDb01OejE2?oc=5",
    "published": "2026-06-14T12:18:30Z",
@@ -12712,19 +12697,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "A Tijuana, la piccola diaspora iraniana è d'accordo su poco, tranne sul Team Melli - Reuters"
-  },
-  {
-   "source": "CNBC",
-   "title": "UK forces board sanctioned Russian shadow fleet oil tanker",
-   "link": "https://www.cnbc.com/2026/06/14/uk-forces-board-sanctioned-russian-shadow-fleet-oil-tanker.html",
-   "published": "2026-06-14T09:32:40Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "Le forze del Regno Unito salgono a bordo di una petroliera della flotta ombra russa sanzionata"
   },
   {
    "source": "AP",
@@ -12816,19 +12788,6 @@
    "title_it": "Un ottagono sul prato della Casa Bianca per l'80esimo compleanno di Trump e il 250esimo della nazione, in foto - AP News"
   },
   {
-   "source": "Reuters",
-   "title": "Iran questions US commitment to peace moves as Israel strikes Lebanon - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPSXA2RmM1Y0lOSlBJSHJpd285cFViUGlLNFRUa0FTZWxBbC1DdUdVM1hSbUY5Z1A4R3poZEI3QjNGbFFzSlZpalRkbnVGWVFMNzYzQXlJbXhMTjdaRjFLQlk0b3FXZVIzcVVDbm9YVmd4RmtRTWVGcndQN1VJaEZRUEppeGlUZWJGaUx6WEI1OUtoeDRpbGdNbF8xRVFRTlY3Tk9Fcg?oc=5",
-   "published": "2026-06-14T01:53:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "L'Iran mette in dubbio l'impegno americano verso iniziative di pace mentre Israele colpisce il Libano - Reuters"
-  },
-  {
    "source": "Google News",
    "title": "Federal Reserve Chair Kevin Warsh Holds First Briefing on U.S. Economy - C-SPAN",
    "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOV0NXQUFNMFdRX3lpaXdNU3Vtd1JXQlZYY1gzSlVRbko3b0xCckZhbFg1T3ByUmxYcF81azF0STVXQnk1UUNwMUVRYjdxRUNmTUlPTldCaDF5M2dOdnI4M01NSEpVSTJWaEtDb0w3bXFweU1NVnBDdTNSb0dta2J2ZnBxbE91bXFvQW13Q2ZxTERlU0gxU09mRE9DU1R6N1JHUjJNWlRwdlBlbndnaEZBLVp6SVVxZVNLSURSaQ?oc=5",
@@ -12839,6 +12798,19 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Il presidente della Federal Reserve Kevin Warsh tiene il primo briefing sull'economia statunitense - C-SPAN"
+  },
+  {
+   "source": "AP",
+   "title": "Trump’s name is gone from the Kennedy Center’s facade, official says - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQM3U0X1VGVVRtcUNOSlE0Ykl6SnAxSGF1YWd2dUMtZTIzVUxyX1lCc3RZZXRQZmhNVnJtYnI2aVR1WVRnZTc5RlFTb0xNYmlUMl93UlJ1RTZrR0tOalFaR042RFllcnBsRE5QLWU1MTVSTVMxMlRfcUdOa09KR3YxdXJTUWdMVXRoTlpmd0JoTHdkQ3VTbDFFSjB5QWdqUXBVRDFZdUUxSnhUbGVleEV6a3ctaGtsZkgwcjNSTGNPTlE?oc=5",
+   "published": "2026-06-14T00:12:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "Il nome di Trump è scomparso dalla facciata del Kennedy Center, dice il funzionario - AP News"
   },
   {
    "source": "Reddit",
@@ -12904,34 +12876,23 @@
    "title_it": "Chi è autorizzato a vendere SPCX in questo momento?"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Amtagvi Approval Boosted Iovance Biotherapeutics, Inc. (IOVA), But Can the Rally Last?",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/amtagvi-approval-boosted-iovance-biotherapeutics-153057776.html",
-   "published": "2026-06-13T15:30:57Z",
+   "source": "CNBC",
+   "title": "These stocks are the most overbought or oversold after a choppy week on Wall Street",
+   "link": "https://www.cnbc.com/2026/06/13/these-stocks-are-most-overbought-or-oversold-after-choppy-market-week.html",
+   "published": "2026-06-13T13:46:24Z",
    "tickers": [
     "MACRO"
    ],
    "priority": 1,
-   "sentiment": "bull",
-   "title_it": "L'approvazione di Amtagvi ha rafforzato la Iovance Biotherapeutics, Inc. (IOVA), ma la manifestazione può durare?"
+   "sentiment": "neutral",
+   "title_it": "Questi titoli sono i più ipercomprati o ipervenduti dopo una settimana instabile a Wall Street"
   },
   {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-14T17:36:57Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the price of Bitcoin be above $64,000 on June 14?",
-   "title_it": "Will the price of Bitcoin be above $64,000 on June 14? — probabilità Sì 100%",
-   "link": "https://polymarket.com/event/bitcoin-above-64k-on-june-14-2026",
-   "published": "2026-06-14T17:36:57Z",
+   "published": "2026-06-14T17:40:35Z",
    "tickers": [
     "MACRO"
    ],
