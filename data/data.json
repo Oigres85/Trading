@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-14T17:39:47Z",
+ "updated_at": "2026-06-14T17:43:51Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -8209,16 +8209,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63739.52,
-   "change_pct": -1.06,
+   "price": 63816.11,
+   "change_pct": -0.94,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.5,
+   "ath_dist_pct": -49.4,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 35.0,
-   "volume": 15605339136,
-   "vol_ratio": 0.47,
+   "rsi": 35.1,
+   "volume": 16121384960,
+   "vol_ratio": 0.49,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -8227,7 +8227,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63739.52
+     63816.11
     ],
     "m6": [
      70120.78,
@@ -8355,7 +8355,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63739.52
+     63816.11
     ],
     "all": [
      386.94,
@@ -8499,7 +8499,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63739.52
+     63816.11
     ],
     "m1": [
      76981.12,
@@ -8523,7 +8523,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63739.52
+     63816.11
     ],
     "m3": [
      72979.05,
@@ -8591,7 +8591,7 @@
      63561.05,
      63543.2,
      64421.32,
-     63739.52
+     63816.11
     ],
     "y1": [
      105472.41,
@@ -8667,115 +8667,116 @@
      73754.84,
      63801.57,
      61643.78,
-     63739.52
+     63816.11
     ],
     "d1": [
-     64390.4,
+     64390.14,
      64398.0,
-     64436.59,
-     64511.01,
-     64535.78,
+     64438.2,
+     64511.02,
+     64533.48,
      64514.93,
-     64511.26,
-     64605.32,
-     64623.57,
+     64506.17,
+     64600.18,
+     64623.6,
      64557.4,
      64538.0,
-     64598.74,
-     64568.82,
+     64598.04,
+     64568.86,
      64587.94,
-     64534.89,
+     64541.71,
      64528.0,
-     64482.89,
+     64482.88,
      64455.0,
-     64466.71,
+     64466.72,
      64465.84,
      64491.15,
-     64509.84,
-     64459.08,
+     64485.71,
+     64457.15,
      64484.62,
-     64495.12,
+     64501.17,
      64469.28,
      64467.47,
      64435.17,
      64364.63,
      64318.94,
-     64344.17,
-     64348.92,
+     64344.16,
+     64349.72,
      64315.99,
-     64284.94,
-     64338.0,
+     64287.26,
+     64329.28,
      64348.67,
      64398.84,
-     64444.37,
-     64336.29,
+     64444.36,
+     64345.48,
      64285.92,
-     64226.13,
-     64240.72,
+     64224.27,
+     64240.73,
      64256.16,
-     64210.86,
+     64205.14,
      64334.34,
      64301.19,
      64272.23,
      64380.17,
-     64352.06,
-     64407.23,
+     64358.24,
+     64413.28,
      64466.8,
      64436.47,
-     64425.48,
+     64426.6,
      64438.0,
      64439.01,
      64390.17,
-     64279.75,
+     64293.66,
      64420.87,
      64508.02,
-     64562.05,
+     64562.04,
      64517.38,
      64492.5,
-     64597.33,
-     64619.39,
+     64591.83,
+     64619.88,
      64570.73,
-     64525.52,
+     64525.53,
      64446.05,
      64523.63,
      64522.87,
      64588.11,
      64575.1,
-     64560.99,
-     64503.01,
-     64439.25,
-     64458.82,
-     64355.34,
-     64321.99,
+     64555.99,
+     64507.99,
+     64438.0,
+     64458.81,
+     64355.33,
+     64322.0,
      64270.71,
-     64298.97,
+     64294.23,
      64324.51,
-     64294.75,
-     64252.35,
-     64327.02,
-     64278.99,
-     64304.75,
+     64294.73,
+     64264.25,
+     64328.62,
+     64269.49,
+     64292.31,
      64273.04,
-     64235.69,
-     63975.94,
-     63908.12,
-     63892.72,
-     64095.85,
-     64072.53,
-     64041.15,
-     63976.09,
-     63995.94,
-     64029.23,
-     63985.31,
-     64068.88,
-     64132.47,
-     64142.04,
-     64123.97,
+     64231.17,
+     63961.99,
+     63908.11,
+     63884.0,
+     64095.84,
+     64075.86,
+     64041.16,
+     64009.25,
+     63999.41,
+     64029.24,
+     63993.27,
+     64068.89,
+     64132.52,
+     64142.03,
+     64122.01,
      63924.02,
-     63969.72,
-     63922.7,
+     63969.71,
+     63922.69,
      63890.02,
-     63902.42
+     63906.04,
+     63816.11
     ]
    },
    "earnings_date": null,
@@ -8789,22 +8790,22 @@
     "w1": {
      "support": 60788.02,
      "resistance": 64700.88,
-     "change_pct": 3.73
+     "change_pct": 3.85
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -17.2
+     "change_pct": -17.1
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -12.66
+     "change_pct": -12.56
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.91
+     "change_pct": -48.85
     }
    },
    "financials": [],
@@ -12125,7 +12126,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 39
+     "score": 40
     },
     {
      "label": "Treasury 10A",
@@ -12433,6 +12434,19 @@
   },
   {
    "source": "CNBC",
+   "title": "U.S. peace deal with Iran in question as Israel strikes Lebanon, Trump warns not to 'blow it'",
+   "link": "https://www.cnbc.com/2026/06/14/iran-deal-teeters-israel-strikes-lebanon.html",
+   "published": "2026-06-14T17:40:13Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "bear",
+   "title_it": "L’accordo di pace degli Stati Uniti con l’Iran è in discussione mentre Israele attacca il Libano, Trump avverte di non “mandarlo all’aria”"
+  },
+  {
+   "source": "CNBC",
    "title": "Trump celebrates turning 80 with a UFC cage-fighting event while big issues loom over his presidency",
    "link": "https://www.cnbc.com/2026/06/14/trump-turns-80-with-a-ufc-event-while-big-issues-loom-over-presidency.html",
    "published": "2026-06-14T17:36:42Z",
@@ -12442,7 +12456,20 @@
    ],
    "priority": 1,
    "sentiment": "neutral",
-   "title_it": "Trump festeggia i suoi 80 anni con un evento di combattimento in gabbia della UFC mentre grandi problemi incombono sulla sua presidenza"
+   "title_it": "Trump festeggia i suoi 80 anni con un evento di combattimento in gabbia UFC mentre grandi problemi incombono sulla sua presidenza"
+  },
+  {
+   "source": "Reuters",
+   "title": "In Tijuana, Iran's tiny diaspora agrees on little — except Team Melli - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxOZFJ4RE8zYXgybG1hUm1tejBnSzNXYm9uNS1rOWkzZGlHcjhvUW1fVWZaNVh2aGJuTzRQNEpKcjN0U2NLTV9QbVlRa0hRUllHaEVja19fZ3c3NTZfbHBZN3FseXppLXJVam8zeVVfN2JzV2FDRGYtWlBOWEZDWEczM1RabW9BZ01ZWWJwanp3c25RaWlSSE55dVJzYXZCWkJJb3NsVUVlZDVMVWd6bVMw?oc=5",
+   "published": "2026-06-14T17:31:01Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "neutral",
+   "title_it": "A Tijuana, la piccola diaspora iraniana è d'accordo su poco, tranne sul Team Melli - Reuters"
   },
   {
    "source": "Yahoo Finance",
@@ -12468,19 +12495,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Futures Dow Jones in scadenza con il mercato a livelli chiave; Focus sull'accordo con l'Iran, il prossimo test di SpaceX"
-  },
-  {
-   "source": "CNBC",
-   "title": "U.S. peace deal with Iran in question as Israel strikes Lebanon, Trump warns not to 'blow it'",
-   "link": "https://www.cnbc.com/2026/06/14/iran-deal-teeters-israel-strikes-lebanon.html",
-   "published": "2026-06-14T16:11:08Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "bear",
-   "title_it": "L’accordo di pace degli Stati Uniti con l’Iran è in discussione mentre Israele attacca il Libano, Trump avverte di non “mandarlo all’aria”"
   },
   {
    "source": "Reuters",
@@ -12648,19 +12662,6 @@
   },
   {
    "source": "Reuters",
-   "title": "Trump's support in rural America slips as fuel and food prices climb, Reuters/Ipsos poll shows - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOOGNGbW1FWnpRa3BkcF9tUW90bzlmQVprRlVsRmRWZThFM0toVmJ2RFJTTDJmS3dfYXF4M25EZzRsQThpeTZQMnVoOURXekJYQkhPTmxTUk5pTkMybjF0d2VSUC13aV9Kd3JGOGoyUl9QUC1ubzNzR2NaSVlfQjNyTjNtaVZuRkoyVTJiSGwxZVdiSzAxblhVV0Q0dUkyb1Q3WldGVU5xVmR3VThRbDFFR1VqMlB0dVBZWGpsVw?oc=5",
-   "published": "2026-06-14T12:30:49Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "bull",
-   "title_it": "Il sostegno di Trump nelle zone rurali dell'America diminuisce con l'aumento dei prezzi di carburante e cibo, mostra un sondaggio Reuters/Ipsos - Reuters"
-  },
-  {
-   "source": "Reuters",
    "title": "Iran says draft US deal includes oil sanctions waiver, nuclear limits and asset release - Reuters",
    "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQTHJ5S3lQbnk2ck1TeGlCeGh2V0k3cXJQSnVwLVNSUEM3cDNIcUVFazFZazBSLW1oQzJQWHJldGo4RHp3b2NaQXQ2OUxJTjdPTVNjZEZQdUxPT1ZfaGVLWWt1MmtQa0taaUNfZnIzUVRqS3R4WFp2UUM1dFFUZlNkY3ZtZ2xOaDE3UW1uQVpFcGQ4MThHUGs4X3JETmg3SWRWdmEwa28zazRGR0dJX0VWMDBJWXd3Z2Izd19OLUNDb01OejE2?oc=5",
    "published": "2026-06-14T12:18:30Z",
@@ -12684,19 +12685,6 @@
    "priority": 1,
    "sentiment": "neutral",
    "title_it": "Trump si dirige al vertice del G7 in Francia mentre il mondo attende l’accordo con l’Iran"
-  },
-  {
-   "source": "Reuters",
-   "title": "In Tijuana, Iran's tiny diaspora agrees on little — except Team Melli - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxOZFJ4RE8zYXgybG1hUm1tejBnSzNXYm9uNS1rOWkzZGlHcjhvUW1fVWZaNVh2aGJuTzRQNEpKcjN0U2NLTV9QbVlRa0hRUllHaEVja19fZ3c3NTZfbHBZN3FseXppLXJVam8zeVVfN2JzV2FDRGYtWlBOWEZDWEczM1RabW9BZ01ZWWJwanp3c25RaWlSSE55dVJzYXZCWkJJb3NsVUVlZDVMVWd6bVMw?oc=5",
-   "published": "2026-06-14T11:07:46Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "priority": 1,
-   "sentiment": "neutral",
-   "title_it": "A Tijuana, la piccola diaspora iraniana è d'accordo su poco, tranne sul Team Melli - Reuters"
   },
   {
    "source": "AP",
@@ -12813,6 +12801,19 @@
    "title_it": "Il nome di Trump è scomparso dalla facciata del Kennedy Center, dice il funzionario - AP News"
   },
   {
+   "source": "Reuters",
+   "title": "Trump says deal to end war will be signed on Sunday, Iran questions timing - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPOFNVaW1EQjcyVjlOZGtnLTdLXzctb2RqaXlFY0RfQ2FscHk3Y2NvYUkzZms3TGk1NHhoaGJGY21fV3hDa2VYYm4zRnVOTHpMYXJhOXk0UUdycFJMNlRNQ09SRFhXRTZvS2JiMDhtNlkzc2pIMWVrdm1mWGp0OUlIdHYwbGVDOGhUeW5FeFQ5ekdiY0RobFZjTDkyVnJONEhXM01TX1FKcE5INUg2RDlxWHpBa3RNRDEyX1J2SGlHd1pEVl9ZLUMw?oc=5",
+   "published": "2026-06-13T23:45:11Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "priority": 1,
+   "sentiment": "bear",
+   "title_it": "Trump dice che l'accordo per porre fine alla guerra sarà firmato domenica, l'Iran dubita dei tempi - Reuters"
+  },
+  {
    "source": "Reddit",
    "title": "Odds on Warsh/Fed meeting is the primary reason for Trump to sign the Iran agreement this weekend",
    "link": "https://www.reddit.com/r/investing/comments/1u543tm/odds_on_warshfed_meeting_is_the_primary_reason/",
@@ -12892,7 +12893,7 @@
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-14T17:40:35Z",
+   "published": "2026-06-14T17:44:32Z",
    "tickers": [
     "MACRO"
    ],
