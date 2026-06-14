@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-14T07:43:50Z",
+ "updated_at": "2026-06-14T08:28:51Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 306479.86,
@@ -7937,16 +7937,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64280.01,
-   "change_pct": -0.22,
+   "price": 64446.62,
+   "change_pct": 0.04,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.1,
+   "ath_dist_pct": -48.9,
    "support": 59108.92,
    "resistance": 77990.87,
-   "rsi": 36.2,
-   "volume": 17806637056,
-   "vol_ratio": 0.54,
+   "rsi": 36.7,
+   "volume": 17413423104,
+   "vol_ratio": 0.53,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -7955,7 +7955,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64280.01
+     64446.62
     ],
     "m6": [
      70120.78,
@@ -8083,7 +8083,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64280.01
+     64446.62
     ],
     "all": [
      386.94,
@@ -8227,7 +8227,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64280.01
+     64446.62
     ],
     "m1": [
      76981.12,
@@ -8251,7 +8251,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64280.01
+     64446.62
     ],
     "m3": [
      72979.05,
@@ -8319,7 +8319,7 @@
      63561.05,
      63543.2,
      64421.32,
-     64280.01
+     64446.62
     ],
     "y1": [
      105472.41,
@@ -8395,7 +8395,7 @@
      73754.84,
      63801.57,
      61643.78,
-     64280.01
+     64446.62
     ],
     "d1": [
      64390.14,
@@ -8444,7 +8444,11 @@
      64205.14,
      64334.34,
      64301.19,
-     64280.01
+     64272.23,
+     64380.17,
+     64358.24,
+     64413.28,
+     64466.8
     ]
    },
    "earnings_date": null,
@@ -8458,22 +8462,22 @@
     "w1": {
      "support": 60788.02,
      "resistance": 64700.88,
-     "change_pct": 4.61
+     "change_pct": 4.88
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -16.5
+     "change_pct": -16.28
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -11.92
+     "change_pct": -11.69
     },
     "y1": {
      "support": 59108.92,
      "resistance": 126198.07,
-     "change_pct": -48.47
+     "change_pct": -48.34
     }
    }
   },
@@ -8489,8 +8493,8 @@
    "support": 83.2,
    "resistance": 109.47,
    "rsi": 38.0,
-   "volume": 317151,
-   "vol_ratio": 1.18,
+   "volume": 207640,
+   "vol_ratio": 0.78,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -8632,16 +8636,13 @@
     "all": [
      33.1,
      30.86,
-     32.69,
      33.8,
      26.8,
      28.7,
      27.42,
      26.4,
-     28.46,
      28.37,
      26.25,
-     26.35,
      27.2,
      23.43,
      21.18,
@@ -8655,16 +8656,13 @@
      26.86,
      27.02,
      28.98,
-     30.47,
      27.22,
      26.89,
-     31.2,
      33.51,
      36.6,
      31.04,
      25.8,
      29.56,
-     30.19,
      30.54,
      31.57,
      29.2,
@@ -8672,13 +8670,11 @@
      30.41,
      32.52,
      33.05,
-     36.16,
      35.76,
      37.38,
      39.88,
      37.05,
      43.8,
-     42.12,
      49.64,
      51.76,
      49.13,
@@ -8687,7 +8683,6 @@
      51.75,
      55.4,
      49.72,
-     51.97,
      56.5,
      60.57,
      68.94,
@@ -8695,7 +8690,6 @@
      59.76,
      57.32,
      61.04,
-     67.92,
      61.41,
      66.63,
      71.88,
@@ -8704,16 +8698,13 @@
      74.4,
      70.26,
      62.91,
-     58.73,
      63.13,
      61.05,
      58.14,
      61.79,
      65.87,
-     65.71,
      64.01,
      70.68,
-     78.21,
      74.04,
      81.66,
      94.53,
@@ -8724,7 +8715,6 @@
      101.58,
      113.46,
      127.35,
-     140.0,
      124.08,
      115.46,
      100.64,
@@ -8732,8 +8722,6 @@
      54.43,
      44.6,
      41.68,
-     44.76,
-     49.66,
      51.12,
      66.31,
      69.89,
@@ -8741,7 +8729,6 @@
      69.96,
      70.61,
      77.0,
-     77.28,
      79.36,
      72.89,
      79.66,
@@ -8750,7 +8737,6 @@
      73.97,
      75.63,
      78.95,
-     71.92,
      79.97,
      81.43,
      84.11,
@@ -8759,7 +8745,6 @@
      96.97,
      106.72,
      113.93,
-     102.7,
      95.42,
      95.7,
      88.81,
@@ -8767,13 +8752,10 @@
      93.19,
      100.36,
      98.83,
-     98.48,
      107.07,
      103.02,
-     104.87,
      86.53,
      84.96,
-     88.06,
      96.47,
      92.19,
      86.24,
@@ -8787,16 +8769,13 @@
      96.56,
      105.03,
      107.65,
-     102.33,
      96.38,
      92.72,
-     98.42,
      97.49,
      102.59,
      101.58,
      99.74,
      102.71,
-     105.37,
      98.17,
      95.96,
      91.16,
@@ -8804,8 +8783,6 @@
      66.15,
      53.27,
      48.24,
-     49.76,
-     47.6,
      59.63,
      60.3,
      59.47,
@@ -8813,13 +8790,11 @@
      49.2,
      45.09,
      46.59,
-     41.65,
      37.04,
      33.62,
      33.75,
      38.34,
      45.92,
-     49.1,
      48.33,
      41.6,
      44.7,
@@ -8827,7 +8802,6 @@
      46.86,
      49.44,
      53.72,
-     52.81,
      54.01,
      50.6,
      49.33,
@@ -8836,16 +8810,13 @@
      50.17,
      47.23,
      51.67,
-     54.38,
      57.4,
      60.42,
      64.73,
      61.64,
      64.94,
-     68.57,
      67.04,
      74.15,
-     68.76,
      69.8,
      73.25,
      65.31,
@@ -8859,13 +8830,10 @@
      58.47,
      58.58,
      55.1,
-     54.07,
      54.18,
      55.17,
-     61.06,
      51.56,
      44.76,
-     20.48,
      18.84,
      35.49,
      39.27,
@@ -8873,7 +8841,6 @@
      42.61,
      40.22,
      35.79,
-     45.34,
      48.52,
      52.2,
      61.5,
@@ -8882,7 +8849,6 @@
      66.32,
      73.47,
      73.95,
-     68.5,
      75.03,
      83.57,
      66.18,
@@ -8891,7 +8857,6 @@
      95.72,
      100.28,
      104.69,
-     114.67,
      105.76,
      98.62,
      89.55,
@@ -8899,7 +8864,6 @@
      86.53,
      80.55,
      80.26,
-     78.87,
      77.05,
      75.67,
      76.78,
@@ -8908,7 +8872,6 @@
      81.8,
      83.63,
      90.79,
-     81.02,
      75.96,
      71.65,
      75.85,
@@ -8919,16 +8882,13 @@
      81.54,
      77.91,
      73.55,
-     68.17,
      69.26,
      68.0,
-     71.72,
      72.53,
      69.76,
      71.48,
      58.21,
      60.79,
-     65.11,
      69.26,
      64.01,
      62.37,
@@ -8936,8 +8896,6 @@
      58.55,
      57.42,
      65.21,
-     67.02,
-     101.38,
      105.07,
      87.36,
      84.88
@@ -9095,7 +9053,7 @@
    "eps": null,
    "beta": null,
    "prepost": null,
-   "sector": "ALTSYMBOL",
+   "sector": "FUTURE",
    "tech_by_range": {
     "w1": {
      "support": 83.2,
@@ -10801,7 +10759,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 48
+     "score": 50
     },
     {
      "label": "Treasury 10A",
@@ -10875,8 +10833,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1719806324690,
-   "change_pct": -1.62
+   "mcap_usd": 1721095564321,
+   "change_pct": -1.55
   },
   {
    "ticker": "TSLA",
@@ -10950,14 +10908,14 @@
   },
   {
    "source": "Reuters",
-   "title": "US, Iran inch closer to deal, timing remains unclear - Reuters",
+   "title": "US, Iran inch closer to deal, Trump says Sunday but timing remains unclear - Reuters",
    "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPSXA2RmM1Y0lOSlBJSHJpd285cFViUGlLNFRUa0FTZWxBbC1DdUdVM1hSbUY5Z1A4R3poZEI3QjNGbFFzSlZpalRkbnVGWVFMNzYzQXlJbXhMTjdaRjFLQlk0b3FXZVIzcVVDbm9YVmd4RmtRTWVGcndQN1VJaEZRUEppeGlUZWJGaUx6WEI1OUtoeDRpbGdNbF8xRVFRTlY3Tk9Fcg?oc=5",
    "published": "2026-06-14T01:53:00Z",
    "tickers": [
     "MACRO"
    ],
    "sentiment": "neutral",
-   "title_it": "Stati Uniti e Iran sempre più vicini all'accordo, i tempi restano poco chiari - Reuters"
+   "title_it": "Stati Uniti e Iran sempre più vicini all'accordo, dice Trump domenica, ma i tempi restano poco chiari - Reuters"
   },
   {
    "source": "Investing.com",
@@ -11081,6 +11039,17 @@
    "title_it": "Il COLA della Social Security potrebbe attestarsi al 4,7% nel 2027 poiché l’inflazione raggiunge il livello più alto degli ultimi 3 anni"
   },
   {
+   "source": "Reddit",
+   "title": "Why the S&P 500 and some other index funds require seasoning and apply “free float”",
+   "link": "https://www.reddit.com/r/investing/comments/1u4xlzl/why_the_sp_500_and_some_other_index_funds_require/",
+   "published": "2026-06-13T17:59:26Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Perché l’S&P 500 e alcuni altri fondi indicizzati richiedono un aggiustamento e applicano il “flottante”"
+  },
+  {
    "source": "AP",
    "title": "Trump and Macron will meet over dinner at Versailles palace after G7 summit in France - AP News",
    "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPWGt1SHZaNFhSdjhybGZxS0RNaVRFcGd4cENlcV9yMG9saFBfZDlMbElIeHNBNWRDM25rLWZxdk1KeDFGT0thWDg1cFRCRDZBel9TUmZCQnQxdUpyaVd3ZTFueEJkeV9SR0MxTWhINmJYeW9MMEFEQ3NFdG92NF96QUlETGZROVRYYzFzSTBqR01WdGo5b2ZDQXM4TGstYkt5NzBZeUdnakI3ekJS?oc=5",
@@ -11089,7 +11058,7 @@
     "MACRO"
    ],
    "sentiment": "neutral",
-   "title_it": "Trump e Macron si incontreranno a cena al palazzo di Versailles dopo il vertice del G7 in Francia - AP News"
+   "title_it": "Trump e Macron si incontreranno a cena al Palazzo di Versailles dopo il vertice del G7 in Francia - AP News"
   },
   {
    "source": "CNBC",
@@ -11145,6 +11114,17 @@
    ],
    "sentiment": "neutral",
    "title_it": "Accordo di pace con l'Iran, IPO di SpaceX e preoccupazioni per la Coppa del Mondo - Reuters"
+  },
+  {
+   "source": "Reddit",
+   "title": "401k elections, S&P 500, Russell 2000, and International Index",
+   "link": "https://www.reddit.com/r/investing/comments/1u4t05g/401k_elections_sp_500_russell_2000_and/",
+   "published": "2026-06-13T14:53:45Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral",
+   "title_it": "Elezioni 401k, S&P 500, Russell 2000 e indice internazionale"
   },
   {
    "source": "CNBC",
@@ -11268,6 +11248,28 @@
    "title_it": "I prezzi probabilmente rimarranno più alti anche se il conflitto finisse, dice Nagel della BCE"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Cipher Digital (CIFR) Mimics Market Rally as US-Iran Tensions Subside",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/cipher-digital-cifr-mimics-market-055218314.html",
+   "published": "2026-06-13T05:52:18Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "bull",
+   "title_it": "Cipher Digital (CIFR) imita il rally del mercato mentre le tensioni tra Stati Uniti e Iran si attenuano"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "South Korea Has a Chip Conundrum—Huge Profits and a Serious Selloff",
+   "link": "https://news.google.com/search?q=South%20Korea%20Has%20a%20Chip%20Conundrum%E2%80%94Huge%20Profits%20and%20a%20Serious%20Selloff",
+   "published": "2026-06-13T02:44:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "bear",
+   "title_it": "La Corea del Sud ha un enigma relativo alle chip: enormi profitti e una grave svendita"
+  },
+  {
    "source": "Reuters",
    "title": "Iran team chief slams FIFA’s 'lack of coordination' on visa issues - Reuters",
    "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQUHRxMTh1ODhKYUFzZk5Gd1dWY1IxSVpCTm1Oa1BybHMwbFA4S0xXWUhvbzZMMm54YjFScjdiZ0xMSjY0TFlYMXE3aEl6czdrWVdYN05YdnA0MEpPc0d5NnlvaEl5UDJZVW5KNUY1SFNERUxZbm1SYjdsQWJZbm5YUU1mWDZ5TklhNWJtU1lRQ2RCQjlwOXFrVHdwNTJabnJxVXhOdGlXZ0VoNVk?oc=5",
@@ -11299,6 +11301,17 @@
    ],
    "sentiment": "neutral",
    "title_it": "Esclusivo: gli Emirati Arabi Uniti sbloccheranno miliardi di dollari per l'Iran, dicono fonti - Reuters"
+  },
+  {
+   "source": "Reddit",
+   "title": "SpaceX IPO could be the biggest stock market gamble in history",
+   "link": "https://www.reddit.com/r/investing/comments/1u3tp1d/spacex_ipo_could_be_the_biggest_stock_market/",
+   "published": "2026-06-12T12:20:18Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral",
+   "title_it": "L’IPO di SpaceX potrebbe essere la più grande scommessa del mercato azionario della storia"
   },
   {
    "source": "CNBC Markets",
@@ -11356,66 +11369,11 @@
    "title_it": "La Bce aumenta i tassi di interesse per la prima volta dal 2023 mentre la guerra con l’Iran fa lievitare i costi energetici"
   },
   {
-   "source": "Google News",
-   "title": "Trump says 'I love the inflation' as US prices rise at fastest rate in three years - BBC",
-   "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE9kcHJ2M1lvRzZMQVhoT216aTFBVjNXQ1EyUkEzaWtnWWE4YTczb05vRWRhQXR1dFlZUHFaZkF0UXZWalVZQjNMZVJmZE9WcllOQUhjUy1MbmhTZw?oc=5",
-   "published": "2026-06-11T09:14:13Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "bull",
-   "title_it": "Trump dice \"Adoro l'inflazione\" mentre i prezzi negli Stati Uniti aumentano al ritmo più veloce degli ultimi tre anni - BBC"
-  },
-  {
-   "source": "Google News",
-   "title": "Interest rates and monetary policy: Economic indicators - The House of Commons Library",
-   "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE92Wm8yQUtBUUMySFA5VHVva05qYlNhMkNTTHY5RThzOVE0VUdsZnRJOUFtYlcyODk3Y0RBWERCV2pSWXlST0xWWUpRX3B4V3JDX3k3am8wenJLcVdzTDh4MDhfM3VpUnllTW5QU19Nc3dCQQ?oc=5",
-   "published": "2026-06-11T07:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral",
-   "title_it": "Tassi di interesse e politica monetaria: indicatori economici - Biblioteca della Camera dei Comuni"
-  },
-  {
-   "source": "Google News",
-   "title": "Inflation rises to a 3-year high on spiking gas prices, highlighting affordability challenges - PBS",
-   "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOdEFrWGMyV3lqU2czUk1rQmt6dHYyeGJlcUV3UE9FRi03bjZPZEdIT2pBaHowRkR0WG5SOHZrWjU3cmp3dnJxZkx0MG9wb1dTR1pia2UybFUxNXFPeHlRWmRFSk9jclJpRGRob3ItRHhFNnc3dG1vVmNsTWx6ZDVCcHBrNy0xV3ZDMHpzOU5YX19wc0hIMWRDak9zZGlYUnk1ejI0eGdWd25sVkZyeEs5eFQ2SlQ4RlFmZDJ2M0Qwa3Nua3ZvMEtHUNIBzgFBVV95cUxNX3FZa09zUVBLSndyWk5PYzdhZVFXNm1BTnpFamQwU1IzcnFIV3Qwc002ZTBPT1RCYWU0em5ydExHb1dVblRMclViY0U0dGpuOWdKbVJ4aVM3bGU0TWgzX3poRGZ0WkV0eGd2dFNjaGgzWlU5am1VeHBuRGx0Z2FXbzlQMHQ2cjJsczZGNDI0UmlHZVI2dXZ4dThQWEg1TTBUOEdKY0EtRG1sSmNyaWU0MUg3b2NxZTFhdnZVaGdpOUs3ekFyQkJpdVJqZmVTQQ?oc=5",
-   "published": "2026-06-10T14:27:06Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "bull",
-   "title_it": "L'inflazione sale ai massimi da 3 anni a causa dell'impennata dei prezzi del gas, evidenziando le sfide in termini di accessibilità economica - PBS"
-  },
-  {
-   "source": "Google News",
-   "title": "Here's the inflation breakdown for May 2026 — in one chart - CNBC",
-   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPa1Q3UXRpYXdzVFptMEZ4cU5mRjBLLUZacUNSQkxuaU9MMEhaWjg5RnVuX2tjdmFYTUxNS3JOSVA3VTlwOEdUSWctVTRrbURGRFJZT3doRGVFLU1GWXlxQW4yRnpab1RpLUxpMm8zZ1ZxZGZ2MENFckFCblQ0dzFJN1dTdU9QekJHbHc1bFNSYU1mUkxfUkVN0gGcAUFVX3lxTFBuQk5yZUZ6VGtPT0pZYWhSXzBlZmJZdFdyZkcyV2J6SmZlNDJ2SEVldGYzUnVzVm9oNWFwSUZVNVNybnlDbHNCQzc3ZXZWZms0VldqcVVRVld6WTIwX1lJV0thdXdmTGVsbm5JdFNibzdnck96cGtPeUdjZWdfY1JyaC1CdGR4MEFHYUtxWThGMk9QY3Axd3ZqNGZRZg?oc=5",
-   "published": "2026-06-10T14:14:51Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral",
-   "title_it": "Ecco la ripartizione dell'inflazione per maggio 2026 – in un grafico – CNBC"
-  },
-  {
-   "source": "Google News",
-   "title": "A Hot Inflation Report and a Strong Jobs Report Just Trapped Trump’s New Fed Chair - 24/7 Wall St.",
-   "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxONGZkaHJpZTY0QXpQZXlMN0lkaXllLVZtT1B6akdxV0tycUVUM05uSnZlN1JsdmxnOXZEYnc3NXBESThjUUgza2daY2VQWlJwdmlmMTBrREtZWGotREYzdnpqNXhhTnUyZ1RvMFNmNW9ZRFRJQjRZTHBvQjV0SEh5UUUwV1BUNFFTQWQzRzZQdjBxb1oxbk13YjR4UWN5OEwzcVIwdk5FeGdEd0oyc25ZbkFvWDlKcDV5Tkp1SkI1ZDZ6SG8?oc=5",
-   "published": "2026-06-10T13:48:29Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "bull",
-   "title_it": "Un forte rapporto sull’inflazione e un forte rapporto sull’occupazione hanno appena intrappolato il nuovo presidente della Fed di Trump – 24 ore su 24, 7 giorni su 7 Wall St."
-  },
-  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 99%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-14T07:44:57Z",
+   "published": "2026-06-14T08:29:29Z",
    "tickers": [
     "MACRO"
    ],
@@ -11426,7 +11384,7 @@
    "title": "Will the price of Bitcoin be above $60,000 on June 14?",
    "title_it": "Will the price of Bitcoin be above $60,000 on June 14? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-60k-on-june-14-2026",
-   "published": "2026-06-14T07:44:57Z",
+   "published": "2026-06-14T08:29:29Z",
    "tickers": [
     "MACRO"
    ],
