@@ -86,9 +86,14 @@
    "currency": "USD"
   },
   {
-   "ticker": "APPLE",
+   "ticker": "AAPL",
    "name": null,
    "currency": "USD"
+  },
+  {
+   "ticker": "^RUT",
+   "name": "Russell 2000",
+   "currency": "PTS"
   }
  ],
  "broker": {

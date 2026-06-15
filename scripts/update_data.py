@@ -20,7 +20,7 @@ import re
 import sys
 import time
 import urllib.parse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import feedparser
@@ -359,9 +359,13 @@ def fetch_symbol(ticker, name=None, currency="USD"):
                 if v is not None and not (isinstance(v, float) and math.isnan(v)):
                     return float(v)
             return None
+        shares_out = num("sharesOutstanding", "impliedSharesOutstanding")
+        float_sh = num("floatShares")
         stats = {
             "market_cap": num("marketCap"),
-            "shares": num("sharesOutstanding", "impliedSharesOutstanding"),
+            "shares": shares_out,
+            "float_shares": float_sh,
+            "float_pct": round(float_sh / shares_out * 100, 1) if float_sh and shares_out else None,
             "avg_volume_30d": num("averageVolume", "averageDailyVolume10Day"),
             "pe_ttm": num("trailingPE"),
             "forward_pe": num("forwardPE"),
@@ -586,6 +590,15 @@ def fetch_macro():
             if isinstance(c, dict) and c.get("rating"):
                 comps.append({"label": lab, "rating": c["rating"],
                               "score": round(c["score"]) if c.get("score") is not None else None})
+        # FOMO derivato: avidità + momentum recente S&P 500 (più sale forte, più FOMO)
+        fomo = None
+        try:
+            sp = yf.Ticker("^GSPC").history(period="1mo")["Close"].dropna()
+            mom = (float(sp.iloc[-1]) / float(sp.iloc[0]) - 1) * 100
+            fomo = round(max(0, min(100, 0.6 * fg["score"] + 0.4 * (50 + mom * 6))))
+        except Exception:  # noqa: BLE001
+            fomo = round(fg["score"])
+        fomo_label = "FOMO elevata" if fomo >= 70 else "FOMO moderata" if fomo >= 50 else "Nessuna FOMO"
         macro["fear_greed"] = {
             "score": round(fg["score"]), "rating": fg["rating"],
             "prev_close": round(fg.get("previous_close", 0)),
@@ -593,6 +606,7 @@ def fetch_macro():
             "month_ago": round(fg.get("previous_1_month", 0)),
             "year_ago": round(fg.get("previous_1_year", 0)),
             "components": comps,
+            "fomo": fomo, "fomo_label": fomo_label,
         }
     except Exception as e:  # noqa: BLE001
         print(f"!! fear&greed: {e}", file=sys.stderr)
@@ -640,6 +654,14 @@ def fetch_macro():
             "delta_bp": round((implied - mid) * 100),
             "next_cut_prob": cut_prob,
             "meetings": meetings,
+            # Dot Plot: mediana SEP (Summary of Economic Projections) — da aggiornare a ogni SEP
+            "dot_plot": [
+                {"year": "2026", "median": 3.6},
+                {"year": "2027", "median": 3.4},
+                {"year": "2028", "median": 3.1},
+                {"year": "Lungo periodo", "median": 3.0},
+            ],
+            "dot_plot_note": "Mediana proiezioni FOMC (SEP). Fonte: federalreserve.gov",
         }
     except Exception as e:  # noqa: BLE001
         print(f"!! fedwatch: {e}", file=sys.stderr)
@@ -832,7 +854,63 @@ def fetch_macro():
         print(f"!! buffett: {e}", file=sys.stderr)
 
     macro["signposts"] = fetch_signposts()
+    macro["tilt"] = fetch_sector_tilt()
+    macro["witching"] = quadruple_witching()
     return macro
+
+
+SECTOR_ETF = {
+    "XLK": "Tecnologia", "XLF": "Finanziari", "XLE": "Energia", "XLV": "Salute",
+    "XLY": "Consumi discr.", "XLP": "Consumi difens.", "XLI": "Industriali",
+    "XLU": "Utilities", "XLB": "Materiali", "XLRE": "Immobiliare", "XLC": "Comunicazioni",
+}
+
+
+def fetch_sector_tilt():
+    """Rotazione settoriale USA: momentum 1M e 3M degli ETF SPDR di settore.
+    I settori in cima sono quelli su cui ruotare (overweight)."""
+    rows = []
+    try:
+        data = yf.download(list(SECTOR_ETF), period="6mo", interval="1d",
+                           auto_adjust=True, progress=False)["Close"]
+        for sym, name in SECTOR_ETF.items():
+            try:
+                s = data[sym].dropna()
+                m1 = (float(s.iloc[-1]) / float(s.iloc[-22]) - 1) * 100
+                m3 = (float(s.iloc[-1]) / float(s.iloc[-66]) - 1) * 100
+                rows.append({"ticker": sym, "name": name,
+                             "m1": round(m1, 1), "m3": round(m3, 1),
+                             "score": round(clamp(50 + (m1 * 0.6 + m3 * 0.4) * 2.5))})
+            except Exception:  # noqa: BLE001
+                continue
+        rows.sort(key=lambda x: x["m1"] + x["m3"], reverse=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"!! sector tilt: {e}", file=sys.stderr)
+    return rows
+
+
+def quadruple_witching():
+    """Le 'quattro streghe': 3° venerdì di mar/giu/set/dic (scadenza simultanea di
+    opzioni e futures su indici e su singole azioni)."""
+    def third_friday(y, m):
+        d = datetime(y, m, 1)
+        # primo venerdì
+        d += timedelta(days=(4 - d.weekday()) % 7)
+        return d + timedelta(days=14)
+    today = datetime.now(timezone.utc).replace(tzinfo=None)
+    dates = []
+    for y in (today.year, today.year + 1):
+        for m in (3, 6, 9, 12):
+            tf = third_friday(y, m)
+            if tf >= today:
+                dates.append(tf.strftime("%Y-%m-%d"))
+    nxt = dates[0] if dates else None
+    days = (datetime.strptime(nxt, "%Y-%m-%d") - today).days if nxt else None
+    return {
+        "next": nxt, "days": days, "upcoming": dates[:4],
+        "contracts": ["Opzioni su indici azionari", "Futures su indici azionari",
+                      "Opzioni su singole azioni", "Futures su singole azioni"],
+    }
 
 
 # BofA "Bear Market Signposts" — baseline maggio 2026; i derivabili si aggiornano da FRED
@@ -899,7 +977,7 @@ def fetch_portfolio_history(btp_value_eur):
     Nasdaq sovrapponibile. Serie: 1S / 1M / 3M / 12M / 5A / Max."""
     tickers = [p["ticker"] for p in PORTFOLIO]
     qty = {p["ticker"]: p["qty"] for p in PORTFOLIO}
-    benches = {"nasdaq": "^IXIC", "ndx": "^NDX", "sp500": "^GSPC"}
+    benches = {"nasdaq": "^IXIC", "ndx": "^NDX", "sp500": "^GSPC", "russell": "^RUT"}
     try:
         data = yf.download(tickers + list(benches.values()), period="5y", interval="1d",
                            auto_adjust=True, progress=False)["Close"]

@@ -387,6 +387,47 @@ function renderMiniCards() {
       <div class="mc-value" style="color:${scoreColor(100 - sp.pct)}">${sp.active}/${sp.total} attivi · ${risk}</div>
       <div class="mc-sub muted">clicca per il dettaglio dei 10 segnali</div>`;
   }
+  // Rotazione settoriale (Tilt): settore leader (overweight) e fanalino
+  const tilt = m.tilt, tBox = $("#tilt-box");
+  if (tBox && tilt && tilt.length) {
+    const top = tilt[0], bot = tilt[tilt.length - 1];
+    tBox.innerHTML = `<div class="mc-title">Rotazione settoriale (Tilt)</div>
+      ${thermoBar(top.score, ["Difensivo", "Aggressivo"])}
+      <div class="mc-value">Sovrappeso: <b style="color:var(--green)">${esc(top.name)}</b> ${signTxt(top.m1)}</div>
+      <div class="mc-sub muted">debole: ${esc(bot.name)} ${signTxt(bot.m1)} · clicca per il dettaglio</div>`;
+  }
+  // Quadruple Witching (4 streghe)
+  const w = m.witching, wBox = $("#witching-box");
+  if (wBox && w && w.next) {
+    wBox.innerHTML = `<div class="mc-title">Quadruple Witching (4 streghe)</div>
+      <div class="mc-value">${new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</div>
+      <div class="mc-sub muted">tra ${w.days} gg · scadenza simultanea di opzioni e futures · clicca</div>`;
+  }
+}
+
+function openTiltModal() {
+  const tilt = (DATA.macro || {}).tilt;
+  if (!tilt || !tilt.length) return;
+  const rows = tilt.map((s, i) => `<tr>
+    <td>${i + 1}. ${esc(s.name)} <span class="muted">${s.ticker}</span></td>
+    <td class="${signCls(s.m1)}">${signTxt(s.m1)}</td>
+    <td class="${signCls(s.m3)}">${signTxt(s.m3)}</td>
+    <td>${meterBar(s.score, scoreColor(s.score), String(s.score))}</td></tr>`).join("");
+  openInfoModal("Rotazione settoriale USA (Tilt)",
+    `<p class="muted" style="margin:0 0 8px">Momentum degli ETF settoriali SPDR. I settori in cima sono i più forti: indicano dove sta ruotando il mercato (overweight). Fonte: Yahoo Finance.</p>
+     <table class="info-table"><thead><tr><th>Settore</th><th>1M</th><th>3M</th><th>Forza</th></tr></thead><tbody>${rows}</tbody></table>`);
+}
+
+function openWitchingModal() {
+  const w = (DATA.macro || {}).witching;
+  if (!w) return;
+  const dates = (w.upcoming || []).map(d => `<li>${new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</li>`).join("");
+  const contracts = (w.contracts || []).map(c => `<li>${esc(c)}</li>`).join("");
+  openInfoModal("Quadruple Witching — le quattro streghe",
+    `<p class="muted" style="margin:0 0 8px">Quattro volte l'anno (3° venerdì di marzo, giugno, settembre, dicembre) scadono contemporaneamente quattro tipi di derivati: spesso aumentano volumi e volatilità.</p>
+     <div class="info-line"><b>Prossima:</b> ${w.next ? new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "—"} (tra ${w.days} giorni)</div>
+     <h4 style="margin:10px 0 4px">Prossime date</h4><ul style="margin:0 0 8px 18px">${dates}</ul>
+     <h4 style="margin:10px 0 4px">Contratti che scadono</h4><ul style="margin:0 0 0 18px">${contracts}</ul>`);
 }
 
 function openSignpostsModal() {
@@ -429,7 +470,7 @@ function renderKPI() {
 /* ---------------- andamento portafoglio ---------------- */
 let histRange = "all";   // w1 | m1 | m3 | y1 | y5 | all — default: dall'inizio
 let histBenchKey = "none";   // none | nasdaq | ndx | sp500
-const BENCH_LABEL = { nasdaq: "Nasdaq Comp.", ndx: "Nasdaq 100", sp500: "S&P 500" };
+const BENCH_LABEL = { nasdaq: "Nasdaq Comp.", ndx: "Nasdaq 100", sp500: "S&P 500", russell: "Russell 2000" };
 
 function renderHistory() {
   const h = DATA.history && DATA.history[histRange];
@@ -728,6 +769,8 @@ const STAT_META = {
   dividend_yield: ["Dividend yield", fmtPctF, "Rendimento da dividendo annuo."],
   price_to_book: ["Prezzo/Valore contabile", fmtN2, "Prezzo rispetto al patrimonio netto contabile."],
   shares: ["Azioni circolanti", fmtBig, "Numero di azioni in circolazione."],
+  float_shares: ["Flottante", fmtBig, "Azioni effettivamente negoziabili sul mercato (escluse quelle vincolate di insider/società)."],
+  float_pct: ["Flottante %", v => fmtN2(v) + "%", "Quota di azioni in libera circolazione: più è basso, più il titolo può essere volatile."],
   avg_volume_30d: ["Volume medio", fmtBig, "Volume di scambi medio giornaliero."],
   target_mean: ["Target medio analisti", v => "$" + fmtN2(v), "Prezzo obiettivo medio degli analisti."],
   fcf: ["Free cash flow", v => "$" + fmtBig(v), "Liquidità generata al netto degli investimenti."],
@@ -1051,9 +1094,22 @@ function openMacroInfo(key) {
           <td class="pos">${mt.cut_prob}%</td><td>${mt.hold_prob}%</td></tr>`).join("")
         + `</tbody></table><div class="info-line muted" style="font-size:11px">Probabilità stimate dai futures sui Fed Funds (stile CME FedWatch).</div>`;
     }
+    if ((fw.dot_plot || []).length) {            // Dot Plot: mediana proiezioni FOMC
+      const mx = Math.max(...fw.dot_plot.map(d => d.median));
+      extra += `<h4 style="margin:12px 0 4px">Dot Plot — mediana proiezioni FOMC</h4>
+        <div class="dotplot">` + fw.dot_plot.map(d =>
+        `<div class="dp-col"><div class="dp-bar-wrap"><div class="dp-bar" style="height:${Math.round(d.median / mx * 100)}%"></div></div>
+           <div class="dp-val">${fmtNum.format(d.median)}%</div><div class="dp-year">${d.year}</div></div>`).join("")
+        + `</div><div class="info-line muted" style="font-size:11px">${esc(fw.dot_plot_note || "")}</div>`;
+    }
   } else if (key === "fear_greed" && m.fear_greed) {
     const fg = m.fear_greed;
     extra = `<div class="info-line"><b>Oggi:</b> ${fg.score} (${FG_LABELS[fg.rating] || fg.rating}) · 1 sett ${fg.week_ago} · 1 mese ${fg.month_ago}${fg.year_ago ? ` · 1 anno ${fg.year_ago}` : ""}</div>`;
+    if (fg.fomo != null) {
+      extra += `<div class="info-line"><b>FOMO:</b> <span style="color:${scoreColor(100 - fg.fomo)}">${fg.fomo}/100 — ${fg.fomo_label}</span></div>
+        ${meterBar(fg.fomo, scoreColor(100 - fg.fomo), fg.fomo + "")}
+        <div class="info-line muted" style="font-size:11px">Indice derivato (avidità + momentum S&P 500): alto = rischio di inseguire il rialzo.</div>`;
+    }
     if ((fg.components || []).length) {
       extra += `<h4 style="margin:10px 0 4px">I 7 componenti</h4>` + fg.components.map(c =>
         `<div class="info-line" style="display:flex;justify-content:space-between"><span>${c.label}</span><span class="muted">${c.rating}${c.score != null ? ` (${c.score})` : ""}</span></div>`).join("");
@@ -1550,6 +1606,8 @@ $("#pmc-select").addEventListener("change", () => {
 $("#cash-save").addEventListener("click", saveCash);
 $("#cash-input").addEventListener("keydown", e => { if (e.key === "Enter") saveCash(); });
 $("#signposts-box").addEventListener("click", openSignpostsModal);
+$("#tilt-box").addEventListener("click", openTiltModal);
+$("#witching-box").addEventListener("click", openWitchingModal);
 $("#market-direction").addEventListener("click", () => {
   const d = marketDirectionScore();
   openInfoModal("Direzione di mercato", `<p>Stima sintetica della direzione del mercato: <b style="color:${scoreColor(d)}">${d}%</b> (media di sentiment, Fear &amp; Greed, VIX, Buffett indicator e segnali BofA).</p>
