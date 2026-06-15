@@ -213,8 +213,17 @@ def signal_label(price, sma50, sma200, rsi):
     return "Neutrale", "neutral"
 
 
+# nomi comuni → ticker corretti (per chi inserisce "APPLE" invece di "AAPL")
+TICKER_ALIAS = {
+    "APPLE": "AAPL", "GOOGLE": "GOOGL", "ALPHABET": "GOOGL", "AMAZON": "AMZN",
+    "MICROSOFT": "MSFT", "FACEBOOK": "META", "NVIDIA": "NVDA", "TESLA": "TSLA",
+    "NETFLIX": "NFLX", "MICRON": "MU", "INTEL": "INTC", "BITCOIN": "BTC-USD",
+}
+
+
 def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
+    ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
     t = yf.Ticker(ticker)
     hist = t.history(period="1y", interval="1d", auto_adjust=True)
     if hist.empty:

@@ -762,31 +762,40 @@ function openFinancialsModal(ticker) {
     forecast = { year: f[yrs - 1].year + 1, revenue: fr, net_income: Math.round(fr * avgMargin / 100), margin: Math.round(avgMargin * 10) / 10, est: true };
   }
   const draw = forecast ? f.concat([forecast]) : f;
-  const W = 560, H = 280, pad = { l: 50, r: 44, t: 16, b: 28 };
-  const maxRev = Math.max(...draw.map(x => Math.abs(x.revenue)), 1);
-  const mMax = Math.max(40, ...draw.map(x => Math.abs(x.margin)));
+  const W = 580, H = 300, pad = { l: 52, r: 48, t: 30, b: 30 };
+  // scala simmetrica che include sia ricavi sia utili (così gli utili negativi non escono dal grafico)
+  const vMax = Math.max(...draw.map(x => Math.max(Math.abs(x.revenue), Math.abs(x.net_income))), 1);
+  const mMax = Math.min(100, Math.max(40, ...draw.map(x => Math.abs(x.margin))));   // asse margine limitato
+  const clampM = v => Math.max(-mMax, Math.min(mMax, v));
   const n = draw.length, bw = (W - pad.l - pad.r) / n;
-  const yRev = v => pad.t + (1 - v / maxRev) * (H - pad.t - pad.b);
-  const yM = v => pad.t + (1 - (v + mMax) / (2 * mMax)) * (H - pad.t - pad.b);
+  const yV = v => pad.t + (1 - (v + vMax) / (2 * vMax)) * (H - pad.t - pad.b);
+  const yM = v => pad.t + (1 - (clampM(v) + mMax) / (2 * mMax)) * (H - pad.t - pad.b);
   const fmtB = v => Math.abs(v) >= 1e9 ? (v / 1e9).toFixed(1) + "B" : (v / 1e6).toFixed(0) + "M";
+  const y0 = yV(0);
   let bars = "", line = "", labels = "";
   draw.forEach((x, i) => {
-    const cx = pad.l + bw * i, w = bw * 0.32, op = x.est ? 0.45 : 1;
-    bars += `<rect x="${cx + bw * 0.12}" y="${yRev(Math.max(0, x.revenue))}" width="${w}" height="${Math.abs(yRev(x.revenue) - yRev(0))}" fill="#4c8dff" opacity="${op}"><title>Ricavi ${x.year}${x.est ? " (stima)" : ""}: ${fmtB(x.revenue)}</title></rect>`;
-    bars += `<rect x="${cx + bw * 0.12 + w}" y="${yRev(Math.max(0, x.net_income))}" width="${w}" height="${Math.abs(yRev(x.net_income) - yRev(0))}" fill="#1e40af" opacity="${op}"><title>Utile ${x.year}${x.est ? " (stima)" : ""}: ${fmtB(x.net_income)}</title></rect>`;
+    const cx = pad.l + bw * i, w = bw * 0.30, op = x.est ? 0.5 : 1;
+    const rb = `<rect x="${cx + bw * 0.14}" y="${Math.min(y0, yV(x.revenue)).toFixed(1)}" width="${w.toFixed(1)}" height="${Math.abs(yV(x.revenue) - y0).toFixed(1)}" fill="#4c8dff" opacity="${op}"><title>Ricavi ${x.year}${x.est ? " (stima)" : ""}: ${fmtB(x.revenue)}</title></rect>`;
+    const nb = `<rect x="${(cx + bw * 0.14 + w).toFixed(1)}" y="${Math.min(y0, yV(x.net_income)).toFixed(1)}" width="${w.toFixed(1)}" height="${Math.abs(yV(x.net_income) - y0).toFixed(1)}" fill="#1e40af" opacity="${op}"><title>Utile ${x.year}${x.est ? " (stima)" : ""}: ${fmtB(x.net_income)}</title></rect>`;
+    bars += rb + nb;
+    // etichette valore sopra/sotto le barre (incluse le previsioni)
+    labels += `<text x="${(cx + bw * 0.14 + w / 2).toFixed(1)}" y="${(Math.min(y0, yV(x.revenue)) - 3).toFixed(1)}" text-anchor="middle" font-size="8.5" fill="#4c8dff">${fmtB(x.revenue)}</text>`;
+    const niY = x.net_income >= 0 ? yV(x.net_income) - 3 : yV(x.net_income) + 9;
+    labels += `<text x="${(cx + bw * 0.14 + w * 1.5).toFixed(1)}" y="${niY.toFixed(1)}" text-anchor="middle" font-size="8.5" fill="#7aa0ff">${fmtB(x.net_income)}</text>`;
     const px = cx + bw / 2, py = yM(x.margin);
     line += `${px.toFixed(1)},${py.toFixed(1)} `;
-    labels += `<text x="${px.toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="10" fill="var(--muted)">${x.year}${x.est ? "*" : ""}</text>`;
+    labels += `<text x="${px.toFixed(1)}" y="${(H - 12).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--muted)">${x.year}${x.est ? "*" : ""}</text>`;
     labels += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="#f59e0b" opacity="${op}"><title>Margine ${x.year}: ${x.margin}%</title></circle>`;
   });
-  const svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:280px">
-    <line x1="${pad.l}" y1="${yRev(0)}" x2="${W - pad.r}" y2="${yRev(0)}" stroke="var(--border)"/>
+  const svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:300px">
+    <line x1="${pad.l}" y1="${y0.toFixed(1)}" x2="${W - pad.r}" y2="${y0.toFixed(1)}" stroke="var(--border)"/>
     ${bars}
     <polyline points="${line}" fill="none" stroke="#f59e0b" stroke-width="2"/>
     ${labels}
-    <text x="${pad.l - 6}" y="${pad.t + 4}" text-anchor="end" font-size="9" fill="var(--muted)">${fmtB(maxRev)}</text>
-    <text x="${W - pad.r + 6}" y="${yM(mMax) + 4}" font-size="9" fill="#f59e0b">+${Math.round(mMax)}%</text>
-    <text x="${W - pad.r + 6}" y="${yM(-mMax) + 4}" font-size="9" fill="#f59e0b">−${Math.round(mMax)}%</text>
+    <text x="${pad.l - 6}" y="${(yV(vMax) + 4).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--muted)">${fmtB(vMax)}</text>
+    <text x="${pad.l - 6}" y="${(yV(-vMax) + 4).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--muted)">−${fmtB(vMax)}</text>
+    <text x="${W - pad.r + 6}" y="${(yM(mMax) + 4).toFixed(1)}" font-size="9" fill="#f59e0b">+${Math.round(mMax)}%</text>
+    <text x="${W - pad.r + 6}" y="${(yM(-mMax) + 4).toFixed(1)}" font-size="9" fill="#f59e0b">−${Math.round(mMax)}%</text>
   </svg>
   <div class="cm-legend"><span><i style="background:#4c8dff"></i>Ricavi</span><span><i style="background:#1e40af"></i>Utile netto</span><span><i class="round" style="background:#f59e0b"></i>Margine netto %</span></div>`;
   // tabella annuale + sintesi + previsione
@@ -861,16 +870,97 @@ function synthDates(range, n) {
   return out;
 }
 
-function drawTickerChart() {
+// mappa range → parametri Yahoo (range, interval) per i dati OHLC reali
+const CM_YF = {
+  d1: ["1d", "5m"], w1: ["5d", "15m"], m1: ["1mo", "1d"], m3: ["3mo", "1d"],
+  m6: ["6mo", "1d"], y1: ["1y", "1d"], all: ["max", "1wk"],
+};
+
+async function fetchOHLC(symbol, range, interval) {
+  const yurl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}`;
+  for (const make of CORS_PROXIES) {
+    try {
+      const r = await fetch(make(yurl), { cache: "no-store" });
+      if (!r.ok) continue;
+      const j = await r.json();
+      const res = j?.chart?.result?.[0];
+      const q = res?.indicators?.quote?.[0];
+      if (!res?.timestamp || !q) continue;
+      const out = [];
+      for (let i = 0; i < res.timestamp.length; i++) {
+        if (q.open[i] == null || q.close[i] == null) continue;
+        out.push({ t: res.timestamp[i] * 1000, o: q.open[i], h: q.high[i], l: q.low[i], c: q.close[i] });
+      }
+      if (out.length > 1) return out;
+    } catch { /* prossimo proxy */ }
+  }
+  return null;
+}
+
+async function drawTickerChart() {
   const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
   const r = all.find(x => x.ticker === cmTicker);
   if (!r) return;
-  const vals = (r.sparks || {})[cmRange];
   const sym = r.currency === "PTS" ? "" : r.currency === "EUR" ? "€" : "$";
   const controls = `<div class="spark-toggle cm-ranges">` +
     CM_RANGES.map(([k, lab]) => `<button class="chip cm-range ${k === cmRange ? "chip-active" : ""}" data-range="${k}">${lab}</button>`).join("") + `</div>`;
-  openChartModal(`${r.name} (${r.ticker})`, vals, synthDates(cmRange, (vals || []).length),
-    v => sym + fmtNum.format(v), controls);
+  $("#chart-modal-title").textContent = `${r.name} (${r.ticker})`;
+  $("#chart-modal-body").innerHTML = controls + `<div class="muted" style="padding:40px 0;text-align:center" id="cm-loading">Carico le candele…</div>`;
+  $("#chart-modal-tip").innerHTML = "";
+  $("#chart-modal").hidden = false;
+  const [yr, yi] = CM_YF[cmRange] || ["1mo", "1d"];
+  const ohlc = await fetchOHLC(r.ticker, yr, yi);
+  if (cmTicker !== r.ticker) return;          // l'utente ha cambiato nel frattempo
+  if (ohlc) {
+    drawCandleChart(ohlc, v => sym + fmtNum.format(v), controls);
+  } else {                                    // fallback: linea dai dati salvati
+    const vals = (r.sparks || {})[cmRange];
+    openChartModal(`${r.name} (${r.ticker})`, vals, synthDates(cmRange, (vals || []).length), v => sym + fmtNum.format(v), controls);
+  }
+}
+
+/* grafico a candele: verde se chiude >= apre, rosso se scende */
+function drawCandleChart(data, fmt, controlsHTML) {
+  const W = 900, H = 380, pad = { l: 64, r: 16, t: 16, b: 28 };
+  const lo = Math.min(...data.map(d => d.l)), hi = Math.max(...data.map(d => d.h));
+  const range = hi - lo || 1;
+  const x = i => pad.l + (i + 0.5) / data.length * (W - pad.l - pad.r);
+  const y = v => pad.t + (1 - (v - lo) / range) * (H - pad.t - pad.b);
+  const cw = Math.max(1.2, Math.min(14, (W - pad.l - pad.r) / data.length * 0.65));
+  const grid = [0, .25, .5, .75, 1].map(f => {
+    const gv = lo + range * f, gy = y(gv);
+    return `<line x1="${pad.l}" y1="${gy.toFixed(1)}" x2="${W - pad.r}" y2="${gy.toFixed(1)}" stroke="var(--border)"/>
+      <text x="${pad.l - 8}" y="${(gy + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(gv)}</text>`;
+  }).join("");
+  const candles = data.map((d, i) => {
+    const up = d.c >= d.o, col = up ? "var(--green)" : "var(--red)";
+    const cx = x(i), yo = y(d.o), yc = y(d.c);
+    const top = Math.min(yo, yc), bh = Math.max(1, Math.abs(yc - yo));
+    return `<line x1="${cx.toFixed(1)}" y1="${y(d.h).toFixed(1)}" x2="${cx.toFixed(1)}" y2="${y(d.l).toFixed(1)}" stroke="${col}" stroke-width="1"/>
+      <rect x="${(cx - cw / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${cw.toFixed(1)}" height="${bh.toFixed(1)}" fill="${col}"/>`;
+  }).join("");
+  const xl = [0, Math.floor(data.length / 2), data.length - 1].map(i =>
+    `<text x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--muted)">${new Date(data[i].t).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "2-digit" })}</text>`).join("");
+  $("#chart-modal-body").innerHTML = (controlsHTML || "") + `<svg id="cm-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
+    ${grid}${candles}${xl}
+    <line id="cm-cur" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--text)" opacity="0"/>
+    <rect id="cm-hit" x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}" fill="transparent"/>
+  </svg>`;
+  const first = data[0].c, last = data[data.length - 1].c, chg = (last / first - 1) * 100;
+  const baseTip = `${fmt(first)} → ${fmt(last)} · <span class="${signCls(chg)}">${signTxt(Math.round(chg * 100) / 100)}</span> nel periodo`;
+  const tip = $("#chart-modal-tip"); tip.innerHTML = baseTip;
+  const svg = $("#cm-svg"), hit = $("#cm-hit"), cur = $("#cm-cur");
+  const move = ev => {
+    const rc = svg.getBoundingClientRect();
+    const px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rc.left;
+    const i = Math.max(0, Math.min(data.length - 1, Math.floor((px / rc.width * W - pad.l) / (W - pad.l - pad.r) * data.length)));
+    const d = data[i]; cur.setAttribute("x1", x(i)); cur.setAttribute("x2", x(i)); cur.setAttribute("opacity", ".4");
+    const cls = d.c >= d.o ? "pos" : "neg";
+    tip.innerHTML = `${new Date(d.t).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })} · A ${fmt(d.o)} · Max ${fmt(d.h)} · Min ${fmt(d.l)} · <b class="${cls}">C ${fmt(d.c)}</b>`;
+  };
+  hit.addEventListener("mousemove", move);
+  hit.addEventListener("touchmove", ev => { ev.preventDefault(); move(ev); }, { passive: false });
+  hit.addEventListener("touchstart", move);
 }
 
 function openTickerChart(ticker) {
