@@ -74,6 +74,7 @@ function esc(s) {
 }
 function cur(row) { return row.currency === "EUR" ? "€" : row.currency === "PTS" ? "" : "$"; }
 function clamp(v, lo = 0, hi = 100) { return Math.max(lo, Math.min(hi, v)); }
+function priceTxt(r, c) { return r.price == null ? "…" : (c ?? cur(r)) + fmtNum.format(r.price); }
 function signCls(v) { return v > 0 ? "pos" : v < 0 ? "neg" : ""; }
 function signTxt(v, suffix = "%") {
   if (v === null || v === undefined) return "—";
@@ -193,26 +194,30 @@ async function editHoldings(section, mutate) {
       method: "PUT", headers: ghHeaders(token), body: JSON.stringify(body),
     });
     if (!put.ok) { toast(`Errore salvataggio (HTTP ${put.status})`); return; }
-    // 3) rigenera i dati
-    await dispatchWorkflow(token);
-    toast("Posizione aggiornata — rigenero i dati (~2-3 min)…");
-    if (await waitForNewData(DATA?.updated_at)) toast("Fatto ✓");
-    else toast("Modifica salvata, i dati si aggiornano a breve");
+    // 3) rigenera i dati in background (NON blocca la UI: la modifica è già visibile)
+    dispatchWorkflow(token).catch(() => {});
+    toast("Salvato ✓ — dati completi tra ~2-3 min");
+    waitForNewData(DATA?.updated_at).then(ok => { if (ok) toast("Dati aggiornati ✓"); });
   } catch (e) {
     console.error(e);
-    toast("Errore durante la modifica");
+    toast("Errore durante il salvataggio della modifica");
   }
 }
 
 function addPortfolio() {
   const ticker = (window.prompt("Ticker da aggiungere al portafoglio (es. AAPL):") || "").trim().toUpperCase();
   if (!ticker) return;
+  if ((DATA.portfolio || []).some(p => p.ticker === ticker)) { toast(`${ticker} è già in portafoglio`); return; }
   const qty = parseFloat(window.prompt(`Quantità di ${ticker}:`) || "");
   const pmc = parseFloat(window.prompt(`Prezzo medio di carico (PMC) di ${ticker} in USD:`) || "");
   if (!(qty > 0) || !(pmc > 0)) { toast("Quantità/PMC non validi"); return; }
+  // aggiunta ottimistica: la riga compare subito, i dati completi arrivano col workflow
+  const row = placeholderRow(ticker, "USD", { qty, pmc });
+  DATA.portfolio.splice(DATA.portfolio.length - 1, 0, row);   // prima del BTP
+  renderTable(); fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); });
   editHoldings("portfolio", cfg => {
     cfg.portfolio = cfg.portfolio || [];
-    if (cfg.portfolio.some(p => p.ticker === ticker)) { toast(`${ticker} è già in portafoglio`); return false; }
+    if (cfg.portfolio.some(p => p.ticker === ticker)) return false;
     cfg.portfolio.push({ ticker, name: ticker, qty, pmc });
     return true;
   });
@@ -221,16 +226,54 @@ function addPortfolio() {
 function addWatchlist() {
   const ticker = (window.prompt("Ticker da aggiungere alla watchlist (es. AAPL, ^GSPC, BTC-USD):") || "").trim().toUpperCase();
   if (!ticker) return;
+  if ((DATA.watchlist || []).some(p => p.ticker === ticker)) { toast(`${ticker} è già in watchlist`); return; }
+  const currency = ticker.startsWith("^") ? "PTS" : "USD";
+  const row = placeholderRow(ticker, currency, {});
+  (DATA.watchlist = DATA.watchlist || []).push(row);
+  renderWatchlist(); fillLivePrice(row, renderWatchlist);
+  toast(`${ticker} aggiunto ✓`);
   editHoldings("watchlist", cfg => {
     cfg.watchlist = cfg.watchlist || [];
-    if (cfg.watchlist.some(p => p.ticker === ticker)) { toast(`${ticker} è già in watchlist`); return false; }
-    cfg.watchlist.push({ ticker, name: null, currency: ticker.startsWith("^") ? "PTS" : "USD" });
+    if (cfg.watchlist.some(p => p.ticker === ticker)) return false;
+    cfg.watchlist.push({ ticker, name: null, currency });
     return true;
+  });
+}
+
+// riga segnaposto finché il workflow non porta i dati tecnici completi
+function placeholderRow(ticker, currency, extra) {
+  return {
+    ticker, name: ticker, currency, price: null, change_pct: null,
+    value: 0, gain: 0, gain_pct: null, pe: null, eps: null, beta: null,
+    ath: null, ath_dist_pct: null, support: null, resistance: null, rsi: null,
+    volume: null, vol_ratio: null, signal: "in caricamento…", signal_class: "neutral",
+    sparks: {}, tech_by_range: {}, rating: null, prepost: null, stats: null,
+    earnings_date: null, fin_health: null, sector: "—", _loading: true, ...extra,
+  };
+}
+
+function fillLivePrice(row, after) {
+  fetchQuote(row.ticker).then(q => {
+    if (!q) return;
+    row.price = Math.round(q.price * 100) / 100;
+    row.change_pct = Math.round((q.price / q.prev - 1) * 10000) / 100;
+    if (row.currency === "USD" && row.qty) {
+      row.value = row.price * row.qty;
+      row.gain = row.value - row.pmc * row.qty;
+      row.gain_pct = Math.round((row.value / (row.pmc * row.qty) - 1) * 10000) / 100;
+    }
+    row._loading = false;
+    if (after) after();
   });
 }
 
 function removeHolding(section, ticker) {
   if (!window.confirm(`Rimuovere ${ticker} da ${section === "portfolio" ? "portafoglio" : "watchlist"}?`)) return;
+  // rimozione ottimistica immediata
+  DATA[section] = (DATA[section] || []).filter(p => p.ticker !== ticker);
+  if (section === "portfolio") { recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); }
+  else renderWatchlist();
+  toast(`${ticker} rimosso ✓`);
   editHoldings(section, cfg => {
     const arr = cfg[section] || [];
     const n = arr.length;
@@ -355,17 +398,30 @@ function saveCash() {
 }
 
 /* ---------------- mini-card: direzione mercato + BofA signposts ---------------- */
-function marketDirectionScore() {
+// aggregatore: raccoglie TUTTI i segnali del sistema con etichetta e punteggio 0-100
+function directionComponents() {
   const m = DATA.macro || {};
-  const parts = [];
-  if (m.risk_sentiment) parts.push(m.risk_sentiment.score);
-  if (m.thermometer) parts.push(m.thermometer.score);
-  if (m.fear_greed) parts.push(m.fear_greed.score);
-  if (m.vix) parts.push(clamp(100 - m.vix.value / 50 * 100));
-  if (m.buffett) parts.push(m.buffett.score);
-  if (m.signposts) parts.push(100 - m.signposts.pct);   // più segnali ribassisti = direzione peggiore
-  if (!parts.length) return null;
-  return Math.round(parts.reduce((a, b) => a + b, 0) / parts.length);
+  const c = [];
+  if (m.risk_sentiment) c.push(["Sentiment globale", m.risk_sentiment.score]);
+  if (m.thermometer) c.push(["Termometro portafoglio", m.thermometer.score]);
+  if (m.fear_greed) c.push(["Fear & Greed", m.fear_greed.score]);
+  if (m.vix) c.push(["Volatilità (VIX)", clamp(100 - m.vix.value / 50 * 100)]);
+  if (m.buffett) c.push(["Valutazione (Buffett)", m.buffett.score]);
+  if (m.signposts) c.push(["Segnali ribassisti BofA", 100 - m.signposts.pct]);
+  if (m.macroquant) c.push(["MacroQuant (ciclo)", m.macroquant.score]);
+  if (m.fedwatch && m.fedwatch.next_cut_prob != null) c.push(["Politica Fed (tagli attesi)", clamp(40 + m.fedwatch.next_cut_prob * 0.6)]);
+  if (m.carry) c.push(["Carry USA-Giappone", clamp(50 + (m.carry.spread - 2) * 15)]);
+  // media impatto degli indicatori macro (CPI, NFP, curva, ecc.)
+  const imp = (m.indicators || []).filter(i => i.impact != null).map(i => i.impact);
+  if (imp.length) c.push(["Dati macro USA (media)", Math.round(imp.reduce((a, b) => a + b, 0) / imp.length)]);
+  // rotazione settoriale: settori ciclici forti = pro-rischio
+  if ((m.tilt || []).length) c.push(["Rotazione settoriale", Math.round(m.tilt.reduce((a, s) => a + s.score, 0) / m.tilt.length)]);
+  return c.map(([label, score]) => ({ label, score: Math.round(score) }));
+}
+function marketDirectionScore() {
+  const c = directionComponents();
+  if (!c.length) return null;
+  return Math.round(c.reduce((a, b) => a + b.score, 0) / c.length);
 }
 
 function renderMiniCards() {
@@ -403,6 +459,26 @@ function renderMiniCards() {
       <div class="mc-value">${new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</div>
       <div class="mc-sub muted">tra ${w.days} gg · scadenza simultanea di opzioni e futures · clicca</div>`;
   }
+  // MacroQuant (stile BCA)
+  const mq = m.macroquant, mqBox = $("#macroquant-box");
+  if (mqBox && mq) {
+    mqBox.innerHTML = `<div class="mc-title">MacroQuant (stile BCA)</div>
+      ${thermoBar(mq.score, ["Contrazione", "Espansione"])}
+      <div class="mc-value" style="color:${scoreColor(mq.score)}">${mq.score}% · ${mq.label}</div>
+      <div class="mc-sub muted">composito ciclo economico · clicca per il dettaglio</div>`;
+  }
+}
+
+function openMacroQuantModal() {
+  const mq = (DATA.macro || {}).macroquant;
+  if (!mq) return;
+  const rows = (mq.components || []).map(c =>
+    `<tr><td>${esc(c.label)}</td><td style="min-width:120px">${meterBar(c.score, scoreColor(c.score), String(c.score))}</td></tr>`).join("");
+  openInfoModal(`MacroQuant (stile BCA) — ${mq.score}% · ${mq.label}`,
+    `<p class="muted" style="margin:0 0 8px">${esc(mq.note || "")}</p>
+     <div class="info-line">Punteggio: <b style="color:${scoreColor(mq.score)}">${mq.score}/100</b> (alto = ciclo espansivo/risk-on, basso = rischio recessione).</div>
+     <h4 style="margin:10px 0 4px">Componenti</h4>
+     <table class="info-table"><tbody>${rows}</tbody></table>`);
 }
 
 function openTiltModal() {
@@ -1163,7 +1239,7 @@ function renderTable() {
       <td class="name-cell">${delBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
-      <td class="num"><b>${c}${fmtNum.format(r.price)}</b></td>
+      <td class="num"><b>${priceTxt(r, c)}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
@@ -1193,7 +1269,7 @@ function renderWatchlist() {
   const c = (r) => r.currency === "PTS" ? "" : "$";
   const rows = list.length ? list.map(r => `<tr>
       <td class="name-cell">${delBtn("watchlist", r.ticker)}<button class="row-add" data-tk="${r.ticker}" data-price="${r.price}" title="Aggiungi ${r.ticker} al portafoglio">➕</button>${esc(r.name)}<span class="tk">${r.ticker}</span></td>
-      <td class="num"><b>${c(r)}${fmtNum.format(r.price)}</b></td>
+      <td class="num"><b>${priceTxt(r, c(r))}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
@@ -1608,10 +1684,17 @@ $("#cash-input").addEventListener("keydown", e => { if (e.key === "Enter") saveC
 $("#signposts-box").addEventListener("click", openSignpostsModal);
 $("#tilt-box").addEventListener("click", openTiltModal);
 $("#witching-box").addEventListener("click", openWitchingModal);
+$("#macroquant-box").addEventListener("click", openMacroQuantModal);
 $("#market-direction").addEventListener("click", () => {
   const d = marketDirectionScore();
-  openInfoModal("Direzione di mercato", `<p>Stima sintetica della direzione del mercato: <b style="color:${scoreColor(d)}">${d}%</b> (media di sentiment, Fear &amp; Greed, VIX, Buffett indicator e segnali BofA).</p>
-    <p class="muted">Sopra 60% = intonazione rialzista, sotto 40% = ribassista, in mezzo = laterale. Indicazione probabilistica, non una certezza.</p>`);
+  const comps = directionComponents();
+  const lab = d >= 60 ? "Rialzista" : d <= 40 ? "Ribassista" : "Laterale";
+  const rows = comps.map(c =>
+    `<tr><td>${esc(c.label)}</td><td style="min-width:130px">${meterBar(c.score, scoreColor(c.score), String(c.score))}</td></tr>`).join("");
+  openInfoModal("Direzione di mercato — sintesi di tutti i segnali",
+    `<div class="info-line">Punteggio aggregato: <b style="color:${scoreColor(d)}">${d}% · ${lab}</b></div>
+     <p class="muted" style="margin:4px 0 8px">Media di TUTTI gli indicatori del sistema (sentiment, F&amp;G, VIX, valutazione, BofA, MacroQuant, Fed, carry, dati macro, rotazione settoriale). >60% rialzista, <40% ribassista.</p>
+     <table class="info-table"><thead><tr><th>Segnale</th><th>Punteggio (0–100)</th></tr></thead><tbody>${rows}</tbody></table>`);
 });
 // click sul termometro Financial Health → modale Conto economico
 document.addEventListener("click", e => {

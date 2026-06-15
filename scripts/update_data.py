@@ -124,6 +124,7 @@ def build_feeds():
         ("CNBC", gnews("site:cnbc.com (Fed OR inflation OR market OR earnings)")),
         ("Google News", gnews("Federal Reserve OR US inflation OR White House economy OR tariffs OR jobs report")),
         ("Google News", gnews("Iran OR Israel OR Ukraine OR Russia OR China trade OR OPEC oil (markets OR economy OR war)")),
+        ("Google News", gnews('"BCA Research" OR MacroQuant OR "recession probability" OR "business cycle" market outlook')),
     ]
     # un feed dedicato per ogni posizione e titolo in watchlist
     for p in PORTFOLIO + WATCHLIST:
@@ -856,6 +857,30 @@ def fetch_macro():
     macro["signposts"] = fetch_signposts()
     macro["tilt"] = fetch_sector_tilt()
     macro["witching"] = quadruple_witching()
+
+    # MacroQuant (riproduzione trasparente stile BCA): composito del ciclo/risk dai
+    # fattori macro disponibili. NON è il dato proprietario BCA Research.
+    mq = []
+    for i in macro.get("indicators", []):
+        if i.get("impact") is not None:
+            mq.append((i["label"], i["impact"]))
+    if macro.get("buffett"):
+        mq.append(("Valutazione (Buffett)", macro["buffett"]["score"]))
+    if macro.get("signposts"):
+        mq.append(("Segnali ribassisti BofA", 100 - macro["signposts"]["pct"]))
+    if macro.get("fear_greed"):
+        mq.append(("Fear & Greed", macro["fear_greed"]["score"]))
+    if macro.get("vix"):
+        mq.append(("Volatilità (VIX)", round(clamp(100 - macro["vix"]["value"] / 50 * 100))))
+    if mq:
+        score = round(sum(s for _, s in mq) / len(mq))
+        macro["macroquant"] = {
+            "score": score,
+            "label": "Espansione" if score >= 60 else "Contrazione" if score <= 40 else "Rallentamento",
+            "components": [{"label": l, "score": round(s)} for l, s in mq],
+            "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici "
+                    "(il MacroQuant ufficiale di BCA Research è proprietario e a pagamento).",
+        }
     return macro
 
 
