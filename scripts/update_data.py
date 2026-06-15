@@ -1247,13 +1247,25 @@ def fetch_news():
             seen_titles.add(title.lower())
             kept_keys.append(key)
             per_source[source] = per_source.get(source, 0) + 1
+            # priorità ARGOMENTO: macro/politica (0) > portafoglio (1) > watchlist (2) > resto (3)
+            pf_tk = {p["ticker"] for p in PORTFOLIO}
+            wl_tk = {w["ticker"] for w in WATCHLIST}
+            if "MACRO" in tickers or "POL" in tickers:
+                topic_pri = 0
+            elif any(t in pf_tk for t in tickers):
+                topic_pri = 1
+            elif any(t in wl_tk for t in tickers):
+                topic_pri = 2
+            else:
+                topic_pri = 3
             items.append({"source": source, "title": title, "link": link,
                           "published": ts, "tickers": tickers,
-                          "priority": 0 if source == "Investing.com" else 1,
+                          "topic_pri": topic_pri, "inv": source == "Investing.com",
                           "sentiment": news_sentiment(title)})
-    # ordina per data desc, poi porta Investing.com in cima (sort stabile)
+    # ordina: prima per argomento (macro/politica→portafoglio→watchlist→resto),
+    # dentro ogni gruppo Investing.com in cima e poi per data
     items.sort(key=lambda x: x["published"] or "", reverse=True)
-    items.sort(key=lambda x: x.get("priority", 1))
+    items.sort(key=lambda x: (x["topic_pri"], 0 if x["inv"] else 1))
     items = items[:48]
     for it in items:
         it["title_it"] = translate_it(it["title"])

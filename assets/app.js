@@ -358,7 +358,7 @@ async function livePrices() {
   recomputeTotals();
   renderKPI(); renderTable(); renderWatchlist(); renderAllocation();
   const el = $("#live-badge");
-  if (el) el.innerHTML = `<span class="live-dot"></span> prezzi live · ${new Date().toLocaleTimeString("it-IT")}`;
+  if (el) el.textContent = `prezzi aggiornati alle ${new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
 function renderAll() {
@@ -406,7 +406,6 @@ function directionComponents() {
   if (m.thermometer) c.push(["Termometro portafoglio", m.thermometer.score]);
   if (m.fear_greed) c.push(["Fear & Greed", m.fear_greed.score]);
   if (m.vix) c.push(["Volatilità (VIX)", clamp(100 - m.vix.value / 50 * 100)]);
-  if (m.buffett) c.push(["Valutazione (Buffett)", m.buffett.score]);
   if (m.signposts) c.push(["Segnali ribassisti BofA", 100 - m.signposts.pct]);
   if (m.macroquant) c.push(["MacroQuant (ciclo)", m.macroquant.score]);
   if (m.fedwatch && m.fedwatch.next_cut_prob != null) c.push(["Politica Fed (tagli attesi)", clamp(40 + m.fedwatch.next_cut_prob * 0.6)]);
@@ -545,7 +544,7 @@ function renderKPI() {
 
 /* ---------------- andamento portafoglio ---------------- */
 let histRange = "all";   // w1 | m1 | m3 | y1 | y5 | all — default: dall'inizio
-let histBenchKey = "none";   // none | nasdaq | ndx | sp500
+let histBenchKey = "ndx";   // none | nasdaq | ndx | sp500 — default: confronto con Nasdaq 100
 const BENCH_LABEL = { nasdaq: "Nasdaq Comp.", ndx: "Nasdaq 100", sp500: "S&P 500", russell: "Russell 2000" };
 
 function renderHistory() {
@@ -1387,13 +1386,9 @@ function renderGauges() {
   }
   if (m.thermometer) {
     const th = m.thermometer;
-    cards.push(thermoCard("thermometer", "Termometro portafoglio", th.score, th.score,
-      `<b>${th.label}</b><br>media RSI + trend + momentum`, ["Forte", "Debole"]));
-  }
-  if (m.buffett) {
-    const bf = m.buffett;
-    cards.push(thermoCard("buffett", "Buffett Indicator", bf.score, `${fmtNum.format(bf.ratio)}%`,
-      `<b>${bf.label}</b><br>capitalizzazione USA / PIL`, ["Conveniente", "Caro"]));
+    const lab = th.score >= 60 ? "Tranquillo" : th.score <= 40 ? "Da monitorare" : "Equilibrato";
+    cards.push(thermoCard("thermometer", "Salute portafoglio", th.score, th.score,
+      `<b>${lab}</b><br>salute tecnica media dei tuoi titoli`, ["Preoccupazione", "Serenità"]));
   }
 
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
@@ -1487,7 +1482,14 @@ function buildPrompt() {
   const t = DATA.totals;
   const m = DATA.macro || {};
   const lines = [];
-  lines.push("Sei un analista finanziario esperto. PRIMA di analizzare, usa la RICERCA WEB per verificare i prezzi di oggi dei titoli elencati e le ultime notizie macro/societarie (i dati qui sotto potrebbero avere qualche minuto di ritardo). Poi analizza il mio portafoglio e fornisci: 1) valutazione sintetica della situazione, 2) titoli a rischio o con segnali tecnici rilevanti (RSI, supporti/resistenze), 3) impatto del quadro macro e dei mercati di previsione, 4) eventuali azioni da considerare (non è una richiesta di consulenza, voglio un'analisi ragionata).");
+  lines.push("Sei un analista finanziario quantitativo esperto di analisi tecnica, macro e gestione del rischio. PRIMA di analizzare, usa la RICERCA WEB per: (a) verificare i prezzi di oggi dei titoli elencati, (b) leggere le ultime notizie/risultati su questi titoli e sul quadro macro-politico, (c) trovare 2-3 titoli alternativi NON in portafoglio interessanti per diversificare. I dati sotto sono il contesto completo della mia dashboard (portafoglio, watchlist, macro, news, mercati di previsione).");
+  lines.push("");
+  lines.push("FORNISCI UN REPORT STRUTTURATO (solo a scopo informativo, non consulenza personalizzata) con:");
+  lines.push("1) Sintesi macro e sentiment di mercato (rischio rialzista/ribassista nel breve e nel lungo periodo).");
+  lines.push("2) Analisi tecnica titolo per titolo: ipercomprato/ipervenduto (RSI), vicinanza a supporti/resistenze, volumi anomali, trend.");
+  lines.push("3) INDICAZIONI OPERATIVE CONCRETE: per ogni titolo da alleggerire indica QUANTE azioni vendere e a CHE PREZZO (target tecnico), stimando la plus/minusvalenza; suggerisci come COMPENSARE le minusvalenze con le plusvalenze (in Italia: azioni 26%, BTP 12,5%; le minus compensano le plus entro 4 anni).");
+  lines.push("4) ROTAZIONE: il portafoglio è molto concentrato sul TECH/semiconduttori — proponi come ridurre questa intensità e verso quali settori/titoli ruotare (anche nomi nuovi trovati sul web), con possibili punti d'ingresso.");
+  lines.push("5) Ottica BREVE periodo (settimane) e LUNGO periodo (mesi/anni), separate.");
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   lines.push("");
@@ -1518,6 +1520,17 @@ function buildPrompt() {
   if (m.putcall) lines.push(`- Put/Call ${m.putcall.symbol} (${m.putcall.name}): ${m.putcall.ratio} (put ${m.putcall.puts}, call ${m.putcall.calls})`);
   (m.markets || []).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (${i.date})`));
+  if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
+  if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
+  if (m.fedwatch && (m.fedwatch.meetings || []).length) lines.push(`- FedWatch prossima riunione ${m.fedwatch.meetings[0].date}: prob. taglio ${m.fedwatch.meetings[0].cut_prob}%`);
+  if ((m.tilt || []).length) {
+    const top = m.tilt.slice(0, 3).map(s => s.name).join(", ");
+    const bot = m.tilt.slice(-3).map(s => s.name).join(", ");
+    lines.push(`- Rotazione settoriale USA — forti: ${top}; deboli: ${bot}`);
+  }
+  if (m.witching) lines.push(`- Prossime "4 streghe" (quadruple witching): ${m.witching}`);
+  // liquidità e capitale
+  if (t.cash) lines.push(`- Liquidità disponibile: ${fmtEUR.format(t.cash)} · capitale investito: ${fmtEUR.format(t.eur_invested)}`);
   if ((DATA.top_caps || []).length) {
     lines.push("");
     lines.push("TOP 10 CAPITALIZZAZIONI MONDIALI:");
