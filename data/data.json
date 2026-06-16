@@ -1,31 +1,31 @@
 {
- "updated_at": "2026-06-16T18:55:29Z",
+ "updated_at": "2026-06-16T19:38:56Z",
  "eurusd": 1.1612,
  "totals": {
-  "usd_value": 310799.91,
-  "usd_gain": 185090.05,
-  "usd_gain_pct": 147.24,
-  "eur_value": 309030.68,
-  "eur_gain": 160769.35,
-  "eur_gain_pct": 108.44,
-  "tax_est": 41615.11,
-  "eur_gain_net": 119154.24
+  "usd_value": 310142.23,
+  "usd_gain": 184432.37,
+  "usd_gain_pct": 146.71,
+  "eur_value": 308464.28,
+  "eur_gain": 160202.95,
+  "eur_gain_pct": 108.05,
+  "tax_est": 41467.85,
+  "eur_gain_net": 118735.11
  },
  "portfolio": [
   {
    "ticker": "NVDA",
    "name": "NVIDIA",
    "currency": "USD",
-   "price": 209.01,
-   "change_pct": -1.62,
-   "pe": 32.1,
+   "price": 208.55,
+   "change_pct": -1.84,
+   "pe": 32.0,
    "ath": 236.26,
-   "ath_dist_pct": -11.5,
+   "ath_dist_pct": -11.7,
    "support": 199.34,
    "resistance": 232.01,
-   "rsi": 48.7,
-   "volume": 75870832,
-   "vol_ratio": 0.45,
+   "rsi": 48.3,
+   "volume": 83471268,
+   "vol_ratio": 0.5,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -34,7 +34,7 @@
      204.87,
      205.19,
      212.45,
-     209.01
+     208.55
     ],
     "m6": [
      176.08,
@@ -162,7 +162,7 @@
      204.87,
      205.19,
      212.45,
-     209.01
+     208.55
     ],
     "all": [
      0.04,
@@ -494,7 +494,7 @@
      174.19,
      199.34,
      210.89,
-     209.01
+     212.2
     ],
     "m1": [
      225.06,
@@ -518,7 +518,7 @@
      204.87,
      205.19,
      212.45,
-     209.01
+     208.55
     ],
     "m3": [
      180.04,
@@ -586,7 +586,7 @@
      204.87,
      205.19,
      212.45,
-     209.01
+     208.55
     ],
     "y1": [
      144.5,
@@ -674,7 +674,11 @@
      209.37,
      209.25,
      208.92,
-     209.0
+     208.99,
+     209.31,
+     208.61,
+     208.81,
+     208.64
     ]
    },
    "earnings_date": "2026-08-26",
@@ -682,7 +686,7 @@
     "key": "strong_buy",
     "n": 59,
     "target": 298.93,
-    "upside_pct": 43.0
+    "upside_pct": 43.3
    },
    "health": 54,
    "eps": 6.52,
@@ -690,13 +694,13 @@
    "prepost": null,
    "sector": "Technology",
    "stats": {
-    "market_cap": 5062188859392.0,
+    "market_cap": 5051289436160.0,
     "shares": 24221000000.0,
     "float_shares": 23225466000.0,
     "float_pct": 95.9,
     "avg_volume_30d": 164287125.0,
-    "pe_ttm": 32.0552,
-    "forward_pe": 16.4216,
+    "pe_ttm": 31.9862,
+    "forward_pe": 16.3862,
     "eps_ttm": 6.52,
     "eps_forward": 12.7271,
     "revenue_fy": 253491003392.0,
@@ -707,7 +711,7 @@
     "roe": 1.1429,
     "debt_to_equity": 6.555,
     "dividend_yield": 0.47,
-    "price_to_book": 25.8984,
+    "price_to_book": 25.8426,
     "target_mean": 298.9322,
     "fcf": 46335873024.0
    },
@@ -715,22 +719,22 @@
     "w1": {
      "support": 199.54,
      "resistance": 212.71,
-     "change_pct": 4.29
+     "change_pct": 4.06
     },
     "m1": {
      "support": 199.34,
      "resistance": 232.01,
-     "change_pct": -7.13
+     "change_pct": -7.33
     },
     "m3": {
      "support": 164.08,
      "resistance": 236.26,
-     "change_pct": 16.09
+     "change_pct": 15.84
     },
     "y1": {
      "support": 141.84,
      "resistance": 236.26,
-     "change_pct": 44.65
+     "change_pct": 44.33
     }
    },
    "financials": [
@@ -762,24 +766,24 @@
    "fin_health": 80,
    "qty": 270,
    "pmc": 87.17,
-   "value": 56432.7,
-   "gain": 32896.8,
-   "gain_pct": 139.77
+   "value": 56308.5,
+   "gain": 32772.6,
+   "gain_pct": 139.25
   },
   {
    "ticker": "AMD",
    "name": "AMD",
    "currency": "USD",
-   "price": 516.41,
-   "change_pct": -5.64,
-   "pe": 171.6,
+   "price": 513.9,
+   "change_pct": -6.1,
+   "pe": 170.7,
    "ath": 558.37,
-   "ath_dist_pct": -7.5,
+   "ath_dist_pct": -8.0,
    "support": 393.36,
    "resistance": 558.37,
-   "rsi": 58.6,
-   "volume": 17815766,
-   "vol_ratio": 0.49,
+   "rsi": 58.2,
+   "volume": 19891979,
+   "vol_ratio": 0.55,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -788,7 +792,7 @@
      488.45,
      511.57,
      547.26,
-     516.41
+     513.9
     ],
     "m6": [
      207.58,
@@ -916,7 +920,7 @@
      488.45,
      511.57,
      547.26,
-     516.41
+     513.9
     ],
     "all": [
      17.56,
@@ -1416,7 +1420,7 @@
      203.43,
      354.49,
      516.1,
-     516.41
+     513.9
     ],
     "m1": [
      424.1,
@@ -1440,7 +1444,7 @@
      488.45,
      511.57,
      547.26,
-     516.41
+     513.9
     ],
     "m3": [
      193.39,
@@ -1508,7 +1512,7 @@
      488.45,
      511.57,
      547.26,
-     516.41
+     513.9
     ],
     "y1": [
      126.39,
@@ -1596,7 +1600,11 @@
      518.79,
      517.65,
      517.59,
-     516.41
+     516.54,
+     519.63,
+     514.61,
+     515.84,
+     516.61
     ]
    },
    "earnings_date": "2026-08-04",
@@ -1604,7 +1612,7 @@
     "key": "strong_buy",
     "n": 48,
     "target": 486.33,
-    "upside_pct": -5.8
+    "upside_pct": -5.4
    },
    "health": 86,
    "eps": 3.01,
@@ -1612,13 +1620,13 @@
    "prepost": null,
    "sector": "Technology",
    "stats": {
-    "market_cap": 842058366976.0,
+    "market_cap": 837965643776.0,
     "shares": 1630600639.0,
     "float_shares": 1622023680.0,
     "float_pct": 99.5,
     "avg_volume_30d": 37698487.0,
-    "pe_ttm": 171.5648,
-    "forward_pe": 39.4101,
+    "pe_ttm": 170.7309,
+    "forward_pe": 39.2185,
     "eps_ttm": 3.01,
     "eps_forward": 13.1035,
     "revenue_fy": 37454000128.0,
@@ -1629,7 +1637,7 @@
     "roe": 0.0806,
     "debt_to_equity": 6.005,
     "dividend_yield": null,
-    "price_to_book": 13.0581,
+    "price_to_book": 12.9947,
     "target_mean": 486.3333,
     "fcf": 7173374976.0
    },
@@ -1637,22 +1645,22 @@
     "w1": {
      "support": 448.33,
      "resistance": 558.37,
-     "change_pct": 14.15
+     "change_pct": 13.59
     },
     "m1": {
      "support": 393.36,
      "resistance": 558.37,
-     "change_pct": 21.77
+     "change_pct": 21.17
     },
     "m3": {
      "support": 192.27,
      "resistance": 558.37,
-     "change_pct": 167.03
+     "change_pct": 165.73
     },
     "y1": {
      "support": 117.78,
      "resistance": 558.37,
-     "change_pct": 308.58
+     "change_pct": 306.6
     }
    },
    "financials": [
@@ -1684,24 +1692,24 @@
    "fin_health": 90,
    "qty": 125,
    "pmc": 153.92,
-   "value": 64551.25,
-   "gain": 45311.25,
-   "gain_pct": 235.51
+   "value": 64237.5,
+   "gain": 44997.5,
+   "gain_pct": 233.87
   },
   {
    "ticker": "MU",
    "name": "Micron",
    "currency": "USD",
-   "price": 1034.65,
-   "change_pct": -4.9,
+   "price": 1036.05,
+   "change_pct": -4.77,
    "pe": 48.8,
-   "ath": 1110.4,
-   "ath_dist_pct": -6.8,
+   "ath": 1097.47,
+   "ath_dist_pct": -5.6,
    "support": 652.21,
    "resistance": 1110.4,
-   "rsi": 61.6,
-   "volume": 33818723,
-   "vol_ratio": 0.61,
+   "rsi": 61.8,
+   "volume": 37064777,
+   "vol_ratio": 0.67,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -1710,7 +1718,7 @@
      995.87,
      981.61,
      1087.99,
-     1034.65
+     1036.05
     ],
     "m6": [
      237.3,
@@ -1838,7 +1846,7 @@
      995.87,
      981.61,
      1087.99,
-     1034.65
+     1036.05
     ],
     "all": [
      2.3,
@@ -2284,7 +2292,7 @@
      69.23,
      67.49,
      82.04,
-     90.98,
+     90.97,
      80.43,
      86.88,
      76.15,
@@ -2338,7 +2346,7 @@
      337.7,
      517.16,
      971.0,
-     1034.65
+     1087.99
     ],
     "m1": [
      724.66,
@@ -2362,7 +2370,7 @@
      995.87,
      981.61,
      1087.99,
-     1034.65
+     1036.05
     ],
     "m3": [
      425.95,
@@ -2430,7 +2438,7 @@
      995.87,
      981.61,
      1087.99,
-     1034.65
+     1036.05
     ],
     "y1": [
      119.55,
@@ -2518,7 +2526,11 @@
      1043.21,
      1039.11,
      1037.54,
-     1034.65
+     1034.46,
+     1043.51,
+     1031.82,
+     1033.88,
+     1040.54
     ]
    },
    "earnings_date": "2026-06-24",
@@ -2526,7 +2538,7 @@
     "key": "strong_buy",
     "n": 40,
     "target": 866.6,
-    "upside_pct": -16.2
+    "upside_pct": -16.4
    },
    "health": 87,
    "eps": 21.22,
@@ -2534,13 +2546,13 @@
    "prepost": null,
    "sector": "Technology",
    "stats": {
-    "market_cap": 1166809890816.0,
+    "market_cap": 1168479092736.0,
     "shares": 1127734051.0,
     "float_shares": 1123572712.0,
     "float_pct": 99.6,
     "avg_volume_30d": 51225522.0,
-    "pe_ttm": 48.7582,
-    "forward_pe": 9.0907,
+    "pe_ttm": 48.828,
+    "forward_pe": 9.1037,
     "eps_ttm": 21.22,
     "eps_forward": 113.8136,
     "revenue_fy": 58119000064.0,
@@ -2551,7 +2563,7 @@
     "roe": 0.3982,
     "debt_to_equity": 14.902,
     "dividend_yield": 0.06,
-    "price_to_book": 16.1068,
+    "price_to_book": 16.1298,
     "target_mean": 866.6,
     "fcf": 2893499904.0
    },
@@ -2559,22 +2571,22 @@
     "w1": {
      "support": 883.25,
      "resistance": 1110.4,
-     "change_pct": 16.01
+     "change_pct": 16.16
     },
     "m1": {
      "support": 652.21,
      "resistance": 1110.4,
-     "change_pct": 42.78
+     "change_pct": 42.97
     },
     "m3": {
      "support": 311.49,
      "resistance": 1110.4,
-     "change_pct": 142.9
+     "change_pct": 143.23
     },
     "y1": {
      "support": 103.23,
      "resistance": 1110.4,
-     "change_pct": 765.43
+     "change_pct": 766.6
     }
    },
    "financials": [
@@ -2606,24 +2618,24 @@
    "fin_health": 49,
    "qty": 90,
    "pmc": 87.63,
-   "value": 93118.5,
-   "gain": 85231.8,
-   "gain_pct": 1080.7
+   "value": 93244.5,
+   "gain": 85357.8,
+   "gain_pct": 1082.3
   },
   {
    "ticker": "INTC",
    "name": "Intel",
    "currency": "USD",
-   "price": 119.19,
-   "change_pct": -6.78,
-   "pe": 77.3,
+   "price": 118.4,
+   "change_pct": -7.4,
+   "pe": 76.8,
    "ath": 132.75,
-   "ath_dist_pct": -10.2,
+   "ath_dist_pct": -10.8,
    "support": 98.33,
    "resistance": 132.61,
-   "rsi": 56.5,
-   "volume": 91254186,
-   "vol_ratio": 0.66,
+   "rsi": 55.8,
+   "volume": 101653480,
+   "vol_ratio": 0.74,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -2632,7 +2644,7 @@
      116.96,
      124.57,
      127.86,
-     119.19
+     118.4
     ],
     "m6": [
      37.51,
@@ -2760,7 +2772,7 @@
      116.96,
      124.57,
      127.86,
-     119.19
+     118.4
     ],
     "all": [
      0.36,
@@ -3260,7 +3272,7 @@
      44.13,
      94.48,
      114.68,
-     119.19
+     118.4
     ],
     "m1": [
      108.77,
@@ -3284,7 +3296,7 @@
      116.96,
      124.57,
      127.86,
-     119.19
+     118.4
     ],
     "m3": [
      45.77,
@@ -3352,7 +3364,7 @@
      116.96,
      124.57,
      127.86,
-     119.19
+     118.4
     ],
     "y1": [
      20.74,
@@ -3440,7 +3452,11 @@
      119.78,
      119.62,
      119.59,
-     119.19
+     119.19,
+     119.93,
+     118.81,
+     119.12,
+     119.5
     ]
    },
    "earnings_date": "2026-07-23",
@@ -3448,21 +3464,21 @@
     "key": "hold",
     "n": 41,
     "target": 93.12,
-    "upside_pct": -21.9
+    "upside_pct": -21.4
    },
-   "health": 85,
+   "health": 83,
    "eps": -0.6,
    "beta": 2.23,
    "prepost": null,
    "sector": "Technology",
    "stats": {
-    "market_cap": 599048454144.0,
+    "market_cap": 595178881024.0,
     "shares": 5026000000.0,
     "float_shares": 5016601380.0,
     "float_pct": 99.8,
     "avg_volume_30d": 129582479.0,
     "pe_ttm": null,
-    "forward_pe": 77.3147,
+    "forward_pe": 76.8153,
     "eps_ttm": -0.6,
     "eps_forward": 1.5416,
     "revenue_fy": 53762998272.0,
@@ -3473,7 +3489,7 @@
     "roe": -0.0291,
     "debt_to_equity": 36.028,
     "dividend_yield": null,
-    "price_to_book": 5.3745,
+    "price_to_book": 5.3398,
     "target_mean": 93.1171,
     "fcf": -8301250048.0
    },
@@ -3481,22 +3497,22 @@
     "w1": {
      "support": 104.92,
      "resistance": 132.61,
-     "change_pct": 11.35
+     "change_pct": 10.61
     },
     "m1": {
      "support": 98.33,
      "resistance": 132.61,
-     "change_pct": 9.58
+     "change_pct": 8.85
     },
     "m3": {
      "support": 40.63,
      "resistance": 132.75,
-     "change_pct": 160.41
+     "change_pct": 158.68
     },
     "y1": {
      "support": 18.97,
      "resistance": 132.75,
-     "change_pct": 474.69
+     "change_pct": 470.88
     }
    },
    "financials": [
@@ -3528,24 +3544,24 @@
    "fin_health": 38,
    "qty": 380,
    "pmc": 25.75,
-   "value": 45292.2,
-   "gain": 35507.2,
-   "gain_pct": 362.87
+   "value": 44992.0,
+   "gain": 35207.0,
+   "gain_pct": 359.81
   },
   {
    "ticker": "TSLA",
    "name": "Tesla",
    "currency": "USD",
-   "price": 404.89,
-   "change_pct": -1.52,
-   "pe": 364.7,
+   "price": 405.8,
+   "change_pct": -1.3,
+   "pe": 365.6,
    "ath": 498.83,
-   "ath_dist_pct": -18.8,
+   "ath_dist_pct": -18.6,
    "support": 380.15,
    "resistance": 445.6,
-   "rsi": 48.3,
-   "volume": 31491618,
-   "vol_ratio": 0.63,
+   "rsi": 48.6,
+   "volume": 33939278,
+   "vol_ratio": 0.67,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -3554,7 +3570,7 @@
      399.15,
      406.43,
      411.15,
-     404.89
+     405.8
     ],
     "m6": [
      475.31,
@@ -3682,7 +3698,7 @@
      399.15,
      406.43,
      411.15,
-     404.89
+     405.8
     ],
     "all": [
      1.59,
@@ -3877,7 +3893,7 @@
      371.75,
      381.63,
      435.79,
-     404.86
+     405.8
     ],
     "m1": [
      422.24,
@@ -3901,7 +3917,7 @@
      399.15,
      406.43,
      411.15,
-     404.89
+     405.8
     ],
     "m3": [
      391.2,
@@ -3969,7 +3985,7 @@
      399.15,
      406.43,
      411.15,
-     404.89
+     405.8
     ],
     "y1": [
      329.13,
@@ -4057,7 +4073,11 @@
      405.64,
      405.46,
      404.96,
-     404.86
+     404.86,
+     405.3,
+     405.36,
+     406.6,
+     406.51
     ]
    },
    "earnings_date": "2026-07-22",
@@ -4065,21 +4085,21 @@
     "key": "buy",
     "n": 41,
     "target": 420.55,
-    "upside_pct": 3.9
+    "upside_pct": 3.6
    },
-   "health": 49,
+   "health": 50,
    "eps": 1.11,
    "beta": 1.8,
    "prepost": null,
    "sector": "Consumer Cyclical",
    "stats": {
-    "market_cap": 1520542285824.0,
+    "market_cap": 1524072710144.0,
     "shares": 3755723871.0,
     "float_shares": 2815891530.0,
     "float_pct": 75.0,
     "avg_volume_30d": 58765230.0,
-    "pe_ttm": 364.7387,
-    "forward_pe": 161.9472,
+    "pe_ttm": 365.5856,
+    "forward_pe": 162.3232,
     "eps_ttm": 1.11,
     "eps_forward": 2.5,
     "revenue_fy": 97878999040.0,
@@ -4090,7 +4110,7 @@
     "roe": 0.049,
     "debt_to_equity": 18.738,
     "dividend_yield": null,
-    "price_to_book": 18.4893,
+    "price_to_book": 18.5322,
     "target_mean": 420.5463,
     "fcf": 5251999744.0
    },
@@ -4098,22 +4118,22 @@
     "w1": {
      "support": 380.15,
      "resistance": 416.0,
-     "change_pct": 6.11
+     "change_pct": 6.34
     },
     "m1": {
      "support": 380.15,
      "resistance": 445.6,
-     "change_pct": -4.11
+     "change_pct": -3.89
     },
     "m3": {
      "support": 337.24,
      "resistance": 453.4,
-     "change_pct": 3.5
+     "change_pct": 3.73
     },
     "y1": {
      "support": 288.77,
      "resistance": 498.83,
-     "change_pct": 23.02
+     "change_pct": 23.29
     }
    },
    "financials": [
@@ -4145,24 +4165,24 @@
    "fin_health": 79,
    "qty": 60,
    "pmc": 358.22,
-   "value": 24293.4,
-   "gain": 2800.2,
-   "gain_pct": 13.03
+   "value": 24348.0,
+   "gain": 2854.8,
+   "gain_pct": 13.28
   },
   {
    "ticker": "MSTR",
    "name": "Strategy",
    "currency": "USD",
-   "price": 124.57,
-   "change_pct": -5.01,
+   "price": 124.31,
+   "change_pct": -5.21,
    "pe": 27.9,
    "ath": 543.0,
    "ath_dist_pct": -77.1,
    "support": 113.27,
    "resistance": 169.23,
-   "rsi": 39.2,
-   "volume": 10061634,
-   "vol_ratio": 0.58,
+   "rsi": 39.1,
+   "volume": 11394663,
+   "vol_ratio": 0.65,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -4171,7 +4191,7 @@
      120.15,
      123.97,
      131.14,
-     124.57
+     124.31
     ],
     "m6": [
      162.08,
@@ -4299,7 +4319,7 @@
      120.15,
      123.97,
      131.14,
-     124.57
+     124.31
     ],
     "all": [
      14.12,
@@ -4638,7 +4658,7 @@
      124.8,
      165.45,
      159.09,
-     124.6
+     124.31
     ],
     "m1": [
      177.42,
@@ -4662,7 +4682,7 @@
      120.15,
      123.97,
      131.14,
-     124.57
+     124.31
     ],
     "m3": [
      139.67,
@@ -4730,7 +4750,7 @@
      120.15,
      123.97,
      131.14,
-     124.57
+     124.31
     ],
     "y1": [
      382.25,
@@ -4818,7 +4838,11 @@
      125.45,
      125.44,
      124.55,
-     124.61
+     124.61,
+     124.29,
+     124.19,
+     123.91,
+     124.34
     ]
    },
    "earnings_date": "2026-07-30",
@@ -4826,7 +4850,7 @@
     "key": "strong_buy",
     "n": 13,
     "target": 351.54,
-    "upside_pct": 182.2
+    "upside_pct": 182.8
    },
    "health": 20,
    "eps": -36.99,
@@ -4834,13 +4858,13 @@
    "prepost": null,
    "sector": "Technology",
    "stats": {
-    "market_cap": 44023812096.0,
+    "market_cap": 43919581184.0,
     "shares": 333680884.0,
     "float_shares": 329887095.0,
     "float_pct": 98.9,
     "avg_volume_30d": 18503341.0,
     "pe_ttm": null,
-    "forward_pe": 27.9249,
+    "forward_pe": 27.8588,
     "eps_ttm": -36.99,
     "eps_forward": 4.462,
     "revenue_fy": 490467008.0,
@@ -4851,7 +4875,7 @@
     "roe": -0.3076,
     "debt_to_equity": 18.094,
     "dividend_yield": null,
-    "price_to_book": 1.176,
+    "price_to_book": 1.1732,
     "target_mean": 351.5385,
     "fcf": -8699502592.0
    },
@@ -4859,22 +4883,22 @@
     "w1": {
      "support": 113.27,
      "resistance": 136.25,
-     "change_pct": 7.99
+     "change_pct": 7.76
     },
     "m1": {
      "support": 113.27,
      "resistance": 182.23,
-     "change_pct": -29.79
+     "change_pct": -29.94
     },
     "m3": {
      "support": 113.27,
      "resistance": 197.0,
-     "change_pct": -10.81
+     "change_pct": -11.0
     },
     "y1": {
      "support": 104.17,
      "resistance": 457.22,
-     "change_pct": -67.41
+     "change_pct": -67.48
     }
    },
    "financials": [
@@ -4906,24 +4930,24 @@
    "fin_health": 26,
    "qty": 123,
    "pmc": 210.22,
-   "value": 15322.11,
-   "gain": -10534.95,
-   "gain_pct": -40.74
+   "value": 15290.13,
+   "gain": -10566.93,
+   "gain_pct": -40.87
   },
   {
    "ticker": "RGTI",
    "name": "Rigetti",
    "currency": "USD",
-   "price": 20.95,
-   "change_pct": -7.71,
+   "price": 20.84,
+   "change_pct": -8.17,
    "pe": null,
    "ath": 58.15,
-   "ath_dist_pct": -64.0,
+   "ath_dist_pct": -64.2,
    "support": 15.46,
    "resistance": 28.06,
-   "rsi": 49.1,
-   "volume": 24986826,
-   "vol_ratio": 0.47,
+   "rsi": 48.8,
+   "volume": 27434818,
+   "vol_ratio": 0.51,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -4932,7 +4956,7 @@
      20.63,
      20.98,
      22.7,
-     20.95
+     20.84
     ],
     "m6": [
      23.53,
@@ -5060,7 +5084,7 @@
      20.63,
      20.98,
      22.7,
-     20.95
+     20.84
     ],
     "all": [
      9.93,
@@ -5125,7 +5149,7 @@
      14.04,
      17.45,
      25.54,
-     20.95
+     20.84
     ],
     "m1": [
      17.85,
@@ -5149,7 +5173,7 @@
      20.63,
      20.98,
      22.7,
-     20.95
+     20.84
     ],
     "m3": [
      16.17,
@@ -5217,7 +5241,7 @@
      20.63,
      20.98,
      22.7,
-     20.95
+     20.84
     ],
     "y1": [
      12.16,
@@ -5305,7 +5329,11 @@
      21.09,
      21.05,
      21.02,
-     20.94
+     20.94,
+     20.95,
+     20.8,
+     20.83,
+     20.92
     ]
    },
    "earnings_date": null,
@@ -5313,7 +5341,7 @@
     "key": "buy",
     "n": 12,
     "target": 29.24,
-    "upside_pct": 39.6
+    "upside_pct": 40.3
    },
    "health": 73,
    "eps": -0.89,
@@ -5321,13 +5349,13 @@
    "prepost": null,
    "sector": "Technology",
    "stats": {
-    "market_cap": 6960431616.0,
+    "market_cap": 6928852992.0,
     "shares": 332398807.0,
     "float_shares": 327559080.0,
     "float_pct": 98.5,
     "avg_volume_30d": 40181798.0,
     "pe_ttm": null,
-    "forward_pe": -102.9853,
+    "forward_pe": -102.5181,
     "eps_ttm": -0.89,
     "eps_forward": -0.2033,
     "revenue_fy": 10016000.0,
@@ -5338,7 +5366,7 @@
     "roe": -0.5709,
     "debt_to_equity": 1.162,
     "dividend_yield": null,
-    "price_to_book": 11.9248,
+    "price_to_book": 11.8707,
     "target_mean": 29.2425,
     "fcf": -6209875.0
    },
@@ -5346,22 +5374,22 @@
     "w1": {
      "support": 19.16,
      "resistance": 23.57,
-     "change_pct": 7.74
+     "change_pct": 7.2
     },
     "m1": {
      "support": 15.46,
      "resistance": 28.06,
-     "change_pct": 17.37
+     "change_pct": 16.78
     },
     "m3": {
      "support": 12.53,
      "resistance": 28.06,
-     "change_pct": 29.56
+     "change_pct": 28.91
     },
     "y1": {
      "support": 10.3,
      "resistance": 58.15,
-     "change_pct": 72.29
+     "change_pct": 71.42
     }
    },
    "financials": [
@@ -5393,24 +5421,24 @@
    "fin_health": 1,
    "qty": 515,
    "pmc": 27.3,
-   "value": 10789.25,
-   "gain": -3270.25,
-   "gain_pct": -23.26
+   "value": 10732.6,
+   "gain": -3326.9,
+   "gain_pct": -23.66
   },
   {
    "ticker": "ARBE",
    "name": "Arbe Robotics",
    "currency": "USD",
-   "price": 0.87,
-   "change_pct": -2.09,
+   "price": 0.86,
+   "change_pct": -2.81,
    "pe": null,
    "ath": 17.27,
    "ath_dist_pct": -95.0,
    "support": 0.82,
    "resistance": 1.4,
-   "rsi": 43.7,
-   "volume": 1070797,
-   "vol_ratio": 0.29,
+   "rsi": 43.3,
+   "volume": 1159579,
+   "vol_ratio": 0.31,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -5419,7 +5447,7 @@
      0.92,
      0.88,
      0.88,
-     0.87
+     0.86
     ],
     "m6": [
      1.21,
@@ -5547,7 +5575,7 @@
      0.92,
      0.88,
      0.88,
-     0.87
+     0.86
     ],
     "all": [
      9.65,
@@ -5618,7 +5646,7 @@
      0.61,
      0.86,
      1.1,
-     0.87
+     0.86
     ],
     "m1": [
      1.05,
@@ -5642,7 +5670,7 @@
      0.92,
      0.88,
      0.88,
-     0.87
+     0.86
     ],
     "m3": [
      0.76,
@@ -5710,7 +5738,7 @@
      0.92,
      0.88,
      0.88,
-     0.87
+     0.86
     ],
     "y1": [
      1.57,
@@ -5798,7 +5826,11 @@
      0.87,
      0.87,
      0.86,
-     0.87
+     0.87,
+     0.87,
+     0.86,
+     0.86,
+     0.86
     ]
    },
    "earnings_date": "2026-08-06",
@@ -5806,7 +5838,7 @@
     "key": "buy",
     "n": 2,
     "target": 2.5,
-    "upside_pct": 188.5
+    "upside_pct": 190.7
    },
    "health": 21,
    "eps": -0.37,
@@ -5814,13 +5846,13 @@
    "prepost": null,
    "sector": "Technology",
    "stats": {
-    "market_cap": 106276008.0,
+    "market_cap": 105491040.0,
     "shares": 122649743.0,
     "float_shares": 97241574.0,
     "float_pct": 79.3,
     "avg_volume_30d": 2349577.0,
     "pe_ttm": null,
-    "forward_pe": -6.6654,
+    "forward_pe": -6.6162,
     "eps_ttm": -0.37,
     "eps_forward": -0.13,
     "revenue_fy": 1447000.0,
@@ -5831,7 +5863,7 @@
     "roe": -0.7355,
     "debt_to_equity": 52.866,
     "dividend_yield": null,
-    "price_to_book": 2.1881,
+    "price_to_book": 2.172,
     "target_mean": 2.5,
     "fcf": -37326500.0
    },
@@ -5839,22 +5871,22 @@
     "w1": {
      "support": 0.84,
      "resistance": 0.96,
-     "change_pct": 1.11
+     "change_pct": 0.36
     },
     "m1": {
      "support": 0.82,
      "resistance": 1.4,
-     "change_pct": -17.48
+     "change_pct": -18.09
     },
     "m3": {
      "support": 0.55,
      "resistance": 1.4,
-     "change_pct": 14.31
+     "change_pct": 13.47
     },
     "y1": {
      "support": 0.55,
      "resistance": 2.88,
-     "change_pct": -44.81
+     "change_pct": -45.22
     }
    },
    "financials": [
@@ -5886,9 +5918,9 @@
    "fin_health": 0,
    "qty": 1150,
    "pmc": 3.35,
-   "value": 1000.5,
-   "gain": -2852.0,
-   "gain_pct": -74.03
+   "value": 989.0,
+   "gain": -2863.5,
+   "gain_pct": -74.33
   },
   {
    "ticker": "BTP-V28",
@@ -5931,16 +5963,16 @@
    "ticker": "OKLO",
    "name": "Oklo Inc.",
    "currency": "USD",
-   "price": 58.43,
-   "change_pct": -3.8,
+   "price": 57.96,
+   "change_pct": -4.58,
    "pe": null,
    "ath": 193.84,
-   "ath_dist_pct": -69.9,
+   "ath_dist_pct": -70.1,
    "support": 53.01,
    "resistance": 73.86,
-   "rsi": 44.6,
-   "volume": 5884173,
-   "vol_ratio": 0.42,
+   "rsi": 44.1,
+   "volume": 6512726,
+   "vol_ratio": 0.46,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -5949,7 +5981,7 @@
      57.86,
      57.49,
      60.74,
-     58.43
+     57.96
     ],
     "m6": [
      82.33,
@@ -6077,7 +6109,7 @@
      57.86,
      57.49,
      60.74,
-     58.43
+     57.96
     ],
     "all": [
      9.85,
@@ -6139,7 +6171,7 @@
      49.59,
      72.5,
      66.88,
-     58.43
+     57.96
     ],
     "m1": [
      62.25,
@@ -6163,7 +6195,7 @@
      57.86,
      57.49,
      60.74,
-     58.43
+     57.96
     ],
     "m3": [
      58.37,
@@ -6231,7 +6263,7 @@
      57.86,
      57.49,
      60.74,
-     58.43
+     57.96
     ],
     "y1": [
      65.45,
@@ -6319,7 +6351,11 @@
      58.76,
      58.63,
      58.6,
-     58.43
+     58.43,
+     58.44,
+     58.17,
+     58.2,
+     58.14
     ]
    },
    "earnings_date": "2026-08-10",
@@ -6327,21 +6363,21 @@
     "key": "buy",
     "n": 19,
     "target": 88.63,
-    "upside_pct": 51.7
+    "upside_pct": 52.9
    },
-   "health": 28,
+   "health": 27,
    "eps": -0.84,
    "beta": 1.11,
    "prepost": null,
    "sector": "Utilities",
    "stats": {
-    "market_cap": 10164553728.0,
+    "market_cap": 10084517888.0,
     "shares": 173990987.0,
     "float_shares": 161759421.0,
     "float_pct": 93.0,
     "avg_volume_30d": 13478334.0,
     "pe_ttm": null,
-    "forward_pe": -70.0698,
+    "forward_pe": -69.5181,
     "eps_ttm": -0.84,
     "eps_forward": -0.8337,
     "revenue_fy": null,
@@ -6352,7 +6388,7 @@
     "roe": -0.0887,
     "debt_to_equity": 0.099,
     "dividend_yield": null,
-    "price_to_book": 3.8495,
+    "price_to_book": 3.8192,
     "target_mean": 88.6316,
     "fcf": -100000128.0
    },
@@ -6360,22 +6396,22 @@
     "w1": {
      "support": 53.42,
      "resistance": 61.98,
-     "change_pct": 8.16
+     "change_pct": 7.29
     },
     "m1": {
      "support": 53.01,
      "resistance": 73.86,
-     "change_pct": -6.14
+     "change_pct": -6.89
     },
     "m3": {
      "support": 44.88,
      "resistance": 81.5,
-     "change_pct": 0.1
+     "change_pct": -0.7
     },
     "y1": {
      "support": 44.88,
      "resistance": 193.84,
-     "change_pct": -10.73
+     "change_pct": -11.44
     }
    },
    "financials": [],
@@ -6385,28 +6421,28 @@
    "ticker": "SPCX",
    "name": "Space Exploration Technol…",
    "currency": "USD",
-   "price": 208.61,
-   "change_pct": 8.37,
+   "price": 200.66,
+   "change_pct": 4.24,
    "pe": null,
    "ath": 225.64,
-   "ath_dist_pct": -7.5,
+   "ath_dist_pct": -11.1,
    "support": 149.34,
    "resistance": 225.64,
    "rsi": null,
-   "volume": 259317942,
-   "vol_ratio": 0.76,
+   "volume": 285677408,
+   "vol_ratio": 0.81,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
     "w1": [
      160.95,
      192.5,
-     208.61
+     200.66
     ],
     "m6": [
      160.95,
      192.5,
-     208.61
+     200.66
     ],
     "all": [
      160.95
@@ -6414,12 +6450,12 @@
     "m1": [
      160.95,
      192.5,
-     208.61
+     200.66
     ],
     "m3": [
      160.95,
      192.5,
-     208.61
+     200.66
     ],
     "y1": [
      160.95
@@ -6457,7 +6493,11 @@
      212.62,
      211.68,
      209.8,
-     208.65
+     208.65,
+     206.71,
+     204.46,
+     202.32,
+     202.43
     ]
    },
    "earnings_date": null,
@@ -6465,7 +6505,7 @@
     "key": "buy",
     "n": 5,
     "target": 164.0,
-    "upside_pct": -21.4
+    "upside_pct": -18.3
    },
    "health": 60,
    "eps": -0.67,
@@ -6473,13 +6513,13 @@
    "prepost": null,
    "sector": "Industrials",
    "stats": {
-    "market_cap": 2732061097984.0,
+    "market_cap": 2625763540992.0,
     "shares": 7488063555.0,
     "float_shares": 2919745600.0,
     "float_pct": 39.0,
     "avg_volume_30d": 384879900.0,
     "pe_ttm": null,
-    "forward_pe": -2318.8887,
+    "forward_pe": -2228.6665,
     "eps_ttm": -0.67,
     "eps_forward": -0.09,
     "revenue_fy": 19300999168.0,
@@ -6490,7 +6530,7 @@
     "roe": null,
     "debt_to_equity": 73.597,
     "dividend_yield": null,
-    "price_to_book": 35.0403,
+    "price_to_book": 33.677,
     "target_mean": 164.0,
     "fcf": null
    },
@@ -6498,22 +6538,22 @@
     "w1": {
      "support": 149.34,
      "resistance": 225.64,
-     "change_pct": 29.61
+     "change_pct": 24.67
     },
     "m1": {
      "support": 149.34,
      "resistance": 225.64,
-     "change_pct": 29.61
+     "change_pct": 24.67
     },
     "m3": {
      "support": 149.34,
      "resistance": 225.64,
-     "change_pct": 29.61
+     "change_pct": 24.67
     },
     "y1": {
      "support": 149.34,
      "resistance": 225.64,
-     "change_pct": 29.61
+     "change_pct": 24.67
     }
    },
    "financials": [
@@ -6542,16 +6582,16 @@
    "ticker": "CBRS",
    "name": "Cerebras Systems Inc.",
    "currency": "USD",
-   "price": 213.54,
-   "change_pct": -2.06,
-   "pe": 520.8,
+   "price": 213.32,
+   "change_pct": -2.16,
+   "pe": 520.3,
    "ath": 386.34,
-   "ath_dist_pct": -44.7,
+   "ath_dist_pct": -44.8,
    "support": 196.73,
    "resistance": 338.33,
-   "rsi": 24.9,
-   "volume": 3765611,
-   "vol_ratio": 0.46,
+   "rsi": 24.8,
+   "volume": 4035670,
+   "vol_ratio": 0.5,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -6560,7 +6600,7 @@
      226.55,
      214.0,
      218.03,
-     213.54
+     213.32
     ],
     "m6": [
      311.07,
@@ -6585,7 +6625,7 @@
      226.55,
      214.0,
      218.03,
-     213.54
+     213.32
     ],
     "all": [
      311.07,
@@ -6616,7 +6656,7 @@
      226.55,
      214.0,
      218.03,
-     213.54
+     213.32
     ],
     "m3": [
      311.07,
@@ -6641,7 +6681,7 @@
      226.55,
      214.0,
      218.03,
-     213.54
+     213.32
     ],
     "y1": [
      311.07,
@@ -6683,7 +6723,11 @@
      213.42,
      213.26,
      213.91,
-     213.5
+     213.5,
+     213.48,
+     213.04,
+     213.44,
+     213.45
     ]
    },
    "earnings_date": "2026-06-23",
@@ -6691,7 +6735,7 @@
     "key": "strong_buy",
     "n": 10,
     "target": 294.0,
-    "upside_pct": 37.7
+    "upside_pct": 37.8
    },
    "health": 15,
    "eps": 0.41,
@@ -6699,13 +6743,13 @@
    "prepost": null,
    "sector": "Technology",
    "stats": {
-    "market_cap": 46895591424.0,
+    "market_cap": 46848376832.0,
     "shares": 34500000.0,
     "float_shares": 8670606.0,
     "float_pct": 25.1,
     "avg_volume_30d": 8310868.0,
-    "pe_ttm": 520.8293,
-    "forward_pe": 253.3517,
+    "pe_ttm": 520.3049,
+    "forward_pe": 253.0966,
     "eps_ttm": 0.41,
     "eps_forward": 0.8429,
     "revenue_fy": 509991008.0,
@@ -6716,7 +6760,7 @@
     "roe": 0.3842,
     "debt_to_equity": 19.498,
     "dividend_yield": null,
-    "price_to_book": -21.0405,
+    "price_to_book": -21.0193,
     "target_mean": 294.0,
     "fcf": -622919744.0
    },
@@ -6724,22 +6768,22 @@
     "w1": {
      "support": 202.28,
      "resistance": 253.52,
-     "change_pct": -10.02
+     "change_pct": -10.11
     },
     "m1": {
      "support": 196.73,
      "resistance": 338.33,
-     "change_pct": -23.66
+     "change_pct": -23.74
     },
     "m3": {
      "support": 196.73,
      "resistance": 386.34,
-     "change_pct": -31.35
+     "change_pct": -31.42
     },
     "y1": {
      "support": 196.73,
      "resistance": 386.34,
-     "change_pct": -31.35
+     "change_pct": -31.42
     }
    },
    "financials": [
@@ -6782,8 +6826,8 @@
    "support": 7053.84,
    "resistance": 8933.62,
    "rsi": 60.8,
-   "volume": 0,
-   "vol_ratio": 0.0,
+   "volume": 516600,
+   "vol_ratio": 0.82,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -7472,7 +7516,7 @@
    "tech_by_range": {
     "w1": {
      "support": 7394.46,
-     "resistance": 8545.98,
+     "resistance": 8603.48,
      "change_pct": 5.55
     },
     "m1": {
@@ -7498,16 +7542,16 @@
    "ticker": "^IXIC",
    "name": "Nasdaq Composite",
    "currency": "PTS",
-   "price": 26510.4,
-   "change_pct": -0.65,
+   "price": 26424.84,
+   "change_pct": -0.97,
    "pe": null,
    "ath": 27190.21,
-   "ath_dist_pct": -2.5,
+   "ath_dist_pct": -2.8,
    "support": 24980.38,
    "resistance": 27190.21,
-   "rsi": 56.4,
-   "volume": 7759948000,
-   "vol_ratio": 0.79,
+   "rsi": 55.3,
+   "volume": 8470233000,
+   "vol_ratio": 0.86,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -7516,7 +7560,7 @@
      25809.66,
      25888.84,
      26683.94,
-     26510.4
+     26424.84
     ],
     "m6": [
      23057.41,
@@ -7644,7 +7688,7 @@
      25809.66,
      25888.84,
      26683.94,
-     26510.4
+     26424.84
     ],
     "all": [
      278.7,
@@ -8144,7 +8188,7 @@
      21590.63,
      24892.31,
      26972.62,
-     26510.4
+     26683.94
     ],
     "m1": [
      26225.14,
@@ -8168,7 +8212,7 @@
      25809.66,
      25888.84,
      26683.94,
-     26510.4
+     26424.84
     ],
     "m3": [
      22105.36,
@@ -8236,7 +8280,7 @@
      25809.66,
      25888.84,
      26683.94,
-     26510.4
+     26424.84
     ],
     "y1": [
      19701.21,
@@ -8324,12 +8368,16 @@
      26532.2,
      26519.72,
      26525.31,
-     26510.92
+     26510.92,
+     26512.97,
+     26457.42,
+     26467.36,
+     26451.87
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 71,
+   "health": 70,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -8339,22 +8387,22 @@
     "w1": {
      "support": 25109.39,
      "resistance": 26788.62,
-     "change_pct": 5.33
+     "change_pct": 4.99
     },
     "m1": {
      "support": 24980.38,
      "resistance": 27190.21,
-     "change_pct": 1.09
+     "change_pct": 0.76
     },
     "m3": {
      "support": 20690.25,
      "resistance": 27190.21,
-     "change_pct": 19.93
+     "change_pct": 19.54
     },
     "y1": {
      "support": 19334.98,
      "resistance": 27190.21,
-     "change_pct": 34.56
+     "change_pct": 34.13
     }
    },
    "financials": [],
@@ -8364,15 +8412,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 65806.94,
-   "change_pct": -0.73,
+   "price": 65546.71,
+   "change_pct": -1.12,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -47.9,
+   "ath_dist_pct": -48.1,
    "support": 59108.92,
    "resistance": 74460.12,
-   "rsi": 42.4,
-   "volume": 26583836672,
+   "rsi": 41.7,
+   "volume": 26324254720,
    "vol_ratio": 0.79,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -8382,7 +8430,7 @@
      64421.32,
      65710.4,
      66289.5,
-     65806.94
+     65546.71
     ],
     "m6": [
      66991.97,
@@ -8510,7 +8558,7 @@
      64421.32,
      65710.4,
      66289.5,
-     65806.94
+     65546.71
     ],
     "all": [
      386.94,
@@ -8654,7 +8702,7 @@
      68233.31,
      76304.32,
      73579.69,
-     65806.94
+     65546.71
     ],
     "m1": [
      75825.73,
@@ -8678,7 +8726,7 @@
      64421.32,
      65710.4,
      66289.5,
-     65806.94
+     65546.71
     ],
     "m3": [
      70753.41,
@@ -8746,7 +8794,7 @@
      64421.32,
      65710.4,
      66289.5,
-     65806.94
+     65546.71
     ],
     "y1": [
      106796.76,
@@ -8822,7 +8870,7 @@
      71319.77,
      60867.41,
      63561.05,
-     65806.94
+     65546.71
     ],
     "d1": [
      66272.96,
@@ -8938,7 +8986,11 @@
      65858.71,
      65863.6,
      65780.52,
-     65808.09
+     65808.09,
+     65653.95,
+     65604.1,
+     65624.6,
+     65634.47
     ]
    },
    "earnings_date": null,
@@ -8953,22 +9005,22 @@
     "w1": {
      "support": 62778.79,
      "resistance": 67248.13,
-     "change_pct": 3.56
+     "change_pct": 3.15
     },
     "m1": {
      "support": 59108.92,
      "resistance": 77990.87,
-     "change_pct": -13.21
+     "change_pct": -13.56
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -6.99
+     "change_pct": -7.36
     },
     "y1": {
      "support": 59108.92,
      "resistance": 124167.09,
-     "change_pct": -46.65
+     "change_pct": -46.86
     }
    },
    "financials": [],
@@ -8978,25 +9030,25 @@
    "ticker": "CL=F",
    "name": "Petrolio WTI",
    "currency": "USD",
-   "price": 75.68,
-   "change_pct": -6.28,
+   "price": 76.29,
+   "change_pct": -5.52,
    "pe": null,
    "ath": 147.27,
-   "ath_dist_pct": -48.6,
+   "ath_dist_pct": -48.2,
    "support": 74.74,
    "resistance": 109.24,
-   "rsi": 29.8,
-   "volume": 203250,
-   "vol_ratio": 0.78,
-   "signal": "Ipervenduto",
-   "signal_class": "info",
+   "rsi": 30.3,
+   "volume": 212624,
+   "vol_ratio": 0.81,
+   "signal": "Neutrale",
+   "signal_class": "neutral",
    "sparks": {
     "w1": [
      90.03,
      87.71,
      84.88,
      80.75,
-     75.68
+     76.29
     ],
     "m6": [
      56.82,
@@ -9124,7 +9176,7 @@
      87.71,
      84.88,
      80.75,
-     75.68
+     76.29
     ],
     "all": [
      33.1,
@@ -9391,7 +9443,7 @@
      65.21,
      105.07,
      87.36,
-     75.68
+     76.29
     ],
     "m1": [
      105.42,
@@ -9415,7 +9467,7 @@
      87.71,
      84.88,
      80.75,
-     75.68
+     76.29
     ],
     "m3": [
      98.71,
@@ -9483,7 +9535,7 @@
      87.71,
      84.88,
      80.75,
-     75.68
+     76.29
     ],
     "y1": [
      71.77,
@@ -9627,7 +9679,11 @@
      74.96,
      75.21,
      75.27,
-     75.65
+     75.65,
+     75.57,
+     75.68,
+     75.93,
+     76.24
     ]
    },
    "earnings_date": null,
@@ -9642,22 +9698,22 @@
     "w1": {
      "support": 74.74,
      "resistance": 93.64,
-     "change_pct": -15.94
+     "change_pct": -15.26
     },
     "m1": {
      "support": 74.74,
      "resistance": 109.47,
-     "change_pct": -28.21
+     "change_pct": -27.63
     },
     "m3": {
      "support": 74.74,
      "resistance": 117.63,
-     "change_pct": -23.33
+     "change_pct": -22.71
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 1.12
+     "change_pct": 1.94
     }
    },
    "financials": [],
@@ -9667,16 +9723,16 @@
    "ticker": "AAPL",
    "name": "Apple Inc.",
    "currency": "USD",
-   "price": 299.33,
-   "change_pct": 0.98,
-   "pe": 36.2,
+   "price": 298.55,
+   "change_pct": 0.72,
+   "pe": 36.1,
    "ath": 317.4,
-   "ath_dist_pct": -5.7,
+   "ath_dist_pct": -5.9,
    "support": 287.38,
    "resistance": 317.4,
-   "rsi": 52.2,
-   "volume": 23103987,
-   "vol_ratio": 0.47,
+   "rsi": 51.5,
+   "volume": 25556425,
+   "vol_ratio": 0.52,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -9685,7 +9741,7 @@
      295.63,
      291.13,
      296.42,
-     299.33
+     298.55
     ],
     "m6": [
      273.6,
@@ -9813,7 +9869,7 @@
      295.63,
      291.13,
      296.42,
-     299.33
+     298.55
     ],
     "all": [
      0.1,
@@ -10313,7 +10369,7 @@
      253.56,
      271.1,
      311.77,
-     299.33
+     298.55
     ],
     "m1": [
      300.23,
@@ -10337,7 +10393,7 @@
      295.63,
      291.13,
      296.42,
-     299.33
+     298.55
     ],
     "m3": [
      249.89,
@@ -10405,7 +10461,7 @@
      295.63,
      291.13,
      296.42,
-     299.33
+     298.55
     ],
     "y1": [
      197.64,
@@ -10493,7 +10549,11 @@
      298.68,
      298.71,
      299.54,
-     299.3
+     299.3,
+     298.87,
+     298.92,
+     298.47,
+     298.39
     ]
    },
    "earnings_date": "2026-07-30",
@@ -10501,21 +10561,21 @@
     "key": "buy",
     "n": 43,
     "target": 312.72,
-    "upside_pct": 4.5
+    "upside_pct": 4.7
    },
-   "health": 67,
+   "health": 66,
    "eps": 8.27,
    "beta": 1.09,
    "prepost": null,
    "sector": "Technology",
    "stats": {
-    "market_cap": 4396366168064.0,
+    "market_cap": 4385057013760.0,
     "shares": 14687356000.0,
     "float_shares": 14662534368.0,
     "float_pct": 99.8,
     "avg_volume_30d": 46909392.0,
-    "pe_ttm": 36.1947,
-    "forward_pe": 31.1965,
+    "pe_ttm": 36.1016,
+    "forward_pe": 31.1162,
     "eps_ttm": 8.27,
     "eps_forward": 9.595,
     "revenue_fy": 451442016256.0,
@@ -10526,7 +10586,7 @@
     "roe": 1.4147,
     "debt_to_equity": 79.548,
     "dividend_yield": 0.36,
-    "price_to_book": 41.23,
+    "price_to_book": 41.124,
     "target_mean": 312.7163,
     "fcf": 101090746368.0
    },
@@ -10534,22 +10594,22 @@
     "w1": {
      "support": 287.38,
      "resistance": 300.48,
-     "change_pct": 2.66
+     "change_pct": 2.39
     },
     "m1": {
      "support": 287.38,
      "resistance": 317.4,
-     "change_pct": -0.3
+     "change_pct": -0.56
     },
     "m3": {
      "support": 245.28,
      "resistance": 317.4,
-     "change_pct": 19.78
+     "change_pct": 19.47
     },
     "y1": {
      "support": 194.3,
      "resistance": 317.4,
-     "change_pct": 51.46
+     "change_pct": 51.06
     }
    },
    "financials": [
@@ -10584,14 +10644,14 @@
    "ticker": "^RUT",
    "name": "Russell 2000",
    "currency": "PTS",
-   "price": 2955.72,
-   "change_pct": -0.32,
+   "price": 2947.98,
+   "change_pct": -0.58,
    "pe": null,
    "ath": 2996.42,
-   "ath_dist_pct": -1.4,
+   "ath_dist_pct": -1.6,
    "support": 2722.85,
    "resistance": 2996.42,
-   "rsi": 60.1,
+   "rsi": 59.1,
    "volume": 0,
    "vol_ratio": 0.0,
    "signal": "Trend rialzista",
@@ -10602,7 +10662,7 @@
      2921.03,
      2943.99,
      2965.09,
-     2955.72
+     2947.98
     ],
     "m6": [
      2530.67,
@@ -10730,7 +10790,7 @@
      2921.03,
      2943.99,
      2965.09,
-     2955.72
+     2947.98
     ],
     "all": [
      170.81,
@@ -11198,7 +11258,7 @@
      2496.37,
      2799.91,
      2919.34,
-     2955.72
+     2947.98
     ],
     "m1": [
      2793.3,
@@ -11222,7 +11282,7 @@
      2921.03,
      2943.99,
      2965.09,
-     2955.72
+     2947.98
     ],
     "m3": [
      2480.05,
@@ -11290,7 +11350,7 @@
      2921.03,
      2943.99,
      2965.09,
-     2955.72
+     2947.98
     ],
     "y1": [
      2124.13,
@@ -11377,12 +11437,16 @@
      2958.22,
      2957.74,
      2956.09,
-     2955.72
+     2955.66,
+     2954.13,
+     2953.17,
+     2948.18,
+     2947.98
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 80,
+   "health": 79,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -11392,22 +11456,22 @@
     "w1": {
      "support": 2833.47,
      "resistance": 2996.42,
-     "change_pct": 4.24
+     "change_pct": 3.97
     },
     "m1": {
      "support": 2722.85,
      "resistance": 2996.42,
-     "change_pct": 5.81
+     "change_pct": 5.54
     },
     "m3": {
      "support": 2404.99,
      "resistance": 2996.42,
-     "change_pct": 19.18
+     "change_pct": 18.87
     },
     "y1": {
      "support": 2088.07,
      "resistance": 2996.42,
-     "change_pct": 39.15
+     "change_pct": 38.79
     }
    },
    "financials": [],
@@ -11418,19 +11482,19 @@
   {
    "ticker": "MU",
    "name": "Micron",
-   "value_eur": 80193.65,
+   "value_eur": 80302.16,
    "sector": "Technology"
   },
   {
    "ticker": "AMD",
    "name": "AMD",
-   "value_eur": 55591.54,
+   "value_eur": 55321.33,
    "sector": "Technology"
   },
   {
    "ticker": "NVDA",
    "name": "NVIDIA",
-   "value_eur": 48599.84,
+   "value_eur": 48492.88,
    "sector": "Technology"
   },
   {
@@ -11442,31 +11506,31 @@
   {
    "ticker": "INTC",
    "name": "Intel",
-   "value_eur": 39005.64,
+   "value_eur": 38747.11,
    "sector": "Technology"
   },
   {
    "ticker": "TSLA",
    "name": "Tesla",
-   "value_eur": 20921.48,
+   "value_eur": 20968.5,
    "sector": "Consumer Cyclical"
   },
   {
    "ticker": "MSTR",
    "name": "Strategy",
-   "value_eur": 13195.4,
+   "value_eur": 13167.86,
    "sector": "Technology"
   },
   {
    "ticker": "RGTI",
    "name": "Rigetti",
-   "value_eur": 9291.7,
+   "value_eur": 9242.91,
    "sector": "Technology"
   },
   {
    "ticker": "ARBE",
    "name": "Arbe Robotics",
-   "value_eur": 861.63,
+   "value_eur": 851.73,
    "sector": "Technology"
   }
  ],
@@ -11480,39 +11544,39 @@
     "2026-06-16"
    ],
    "values": [
-    282944,
-    301225,
-    305164,
-    321132,
+    283250,
+    301551,
+    305495,
+    321480,
     307847
    ],
    "nasdaq": [
-    282944,
-    290140,
-    291031,
-    299968,
-    298033
+    283250,
+    290455,
+    291346,
+    300293,
+    297344
    ],
    "ndx": [
     283834,
     293174,
     295064,
     304104,
-    299751
+    299165
    ],
    "sp500": [
     283834,
     288806,
     290258,
     295055,
-    294047
+    293547
    ],
    "russell": [
     283834,
     292400,
     294698,
     296810,
-    295848
+    295125
    ]
   },
   "m1": {
@@ -11541,52 +11605,52 @@
     "2026-06-16"
    ],
    "values": [
-    278776,
-    272833,
-    272190,
-    283918,
-    287412,
-    289807,
-    305430,
-    305592,
-    309023,
-    308622,
-    312538,
-    314860,
-    316023,
-    308499,
-    280820,
-    298505,
-    292178,
-    282944,
-    301225,
-    305164,
-    321132,
+    279078,
+    273128,
+    272485,
+    284225,
+    287723,
+    290121,
+    305761,
+    305923,
+    309358,
+    308956,
+    312876,
+    315201,
+    316365,
+    308833,
+    281124,
+    298828,
+    292494,
+    283250,
+    301551,
+    305495,
+    321480,
     307847
    ],
    "nasdaq": [
-    278776,
-    277347,
-    275008,
-    279257,
-    279498,
-    280039,
-    283358,
-    283555,
-    286135,
-    286721,
-    287935,
-    288011,
-    285460,
-    285216,
-    273293,
-    275635,
-    272968,
-    267554,
-    274359,
-    275201,
-    283653,
-    281822
+    279078,
+    277647,
+    275306,
+    279559,
+    279800,
+    280342,
+    283665,
+    283862,
+    286445,
+    287032,
+    288247,
+    288323,
+    285769,
+    285525,
+    273589,
+    275933,
+    273264,
+    267844,
+    274656,
+    275499,
+    283960,
+    281172
    ],
    "ndx": [
     279653,
@@ -11610,7 +11674,7 @@
     282735,
     284557,
     293275,
-    289077
+    288512
    ],
    "sp500": [
     279653,
@@ -11634,7 +11698,7 @@
     279117,
     280519,
     285156,
-    284181
+    283698
    ],
    "russell": [
     279653,
@@ -11658,7 +11722,7 @@
     292440,
     294739,
     296852,
-    295889
+    295167
    ]
   },
   "m3": {
@@ -11731,140 +11795,140 @@
     "2026-06-16"
    ],
    "values": [
-    195562,
-    200080,
-    200373,
-    198494,
-    197691,
-    190775,
-    191823,
-    190508,
-    193013,
-    185393,
-    182703,
-    177601,
-    184963,
-    188259,
-    188785,
-    191675,
-    191244,
-    196245,
-    199645,
-    201647,
-    204370,
-    210041,
-    213205,
-    216874,
-    220479,
-    219364,
-    217833,
-    225342,
-    223408,
-    236441,
-    239568,
-    234826,
-    238781,
-    240701,
-    245609,
-    245885,
-    256799,
-    270899,
-    266234,
-    286869,
-    295088,
-    286580,
-    290881,
-    291837,
-    278776,
-    272833,
-    272190,
-    283918,
-    287412,
-    289807,
-    305430,
-    305592,
-    309023,
-    308622,
-    312538,
-    314860,
-    316023,
-    308499,
-    280820,
-    298505,
-    292178,
-    282944,
-    301225,
-    305164,
-    321132,
+    195774,
+    200296,
+    200590,
+    198709,
+    197905,
+    190981,
+    192030,
+    190714,
+    193222,
+    185594,
+    182901,
+    177794,
+    185163,
+    188463,
+    188990,
+    191883,
+    191452,
+    196457,
+    199861,
+    201865,
+    204591,
+    210269,
+    213436,
+    217109,
+    220718,
+    219602,
+    218069,
+    225586,
+    223650,
+    236697,
+    239828,
+    235081,
+    239039,
+    240961,
+    245875,
+    246151,
+    257077,
+    271192,
+    266522,
+    287179,
+    295407,
+    286890,
+    291196,
+    292153,
+    279078,
+    273128,
+    272485,
+    284225,
+    287723,
+    290121,
+    305761,
+    305923,
+    309358,
+    308956,
+    312876,
+    315201,
+    316365,
+    308833,
+    281124,
+    298828,
+    292494,
+    283250,
+    301551,
+    305495,
+    321480,
     307847
    ],
    "nasdaq": [
-    195562,
-    197939,
-    198871,
-    195978,
-    195432,
-    191512,
-    194158,
-    192523,
-    194009,
-    189393,
-    185326,
-    183966,
-    191008,
-    193222,
-    193561,
-    194597,
-    194787,
-    200247,
-    201905,
-    202618,
-    205102,
-    209130,
-    212465,
-    213231,
-    216468,
-    215901,
-    214623,
-    218141,
-    216203,
-    219725,
-    220171,
-    218196,
-    218279,
-    220217,
-    222182,
-    221769,
-    224055,
-    228592,
-    228302,
-    232203,
-    232442,
-    230797,
-    233576,
-    235637,
-    232008,
-    230819,
-    228873,
-    232409,
-    232609,
-    233060,
-    235822,
-    235986,
-    238133,
-    238621,
-    239631,
-    239694,
-    237572,
-    237368,
-    227447,
-    229394,
-    227175,
-    222670,
-    228333,
-    229034,
-    236067,
-    234543
+    195774,
+    198154,
+    199087,
+    196190,
+    195644,
+    191719,
+    194369,
+    192732,
+    194219,
+    189598,
+    185527,
+    184166,
+    191215,
+    193431,
+    193771,
+    194808,
+    194998,
+    200464,
+    202124,
+    202837,
+    205324,
+    209357,
+    212695,
+    213462,
+    216702,
+    216135,
+    214855,
+    218377,
+    216437,
+    219963,
+    220410,
+    218432,
+    218516,
+    220456,
+    222423,
+    222010,
+    224298,
+    228839,
+    228549,
+    232454,
+    232694,
+    231047,
+    233829,
+    235892,
+    232259,
+    231069,
+    229121,
+    232661,
+    232861,
+    233312,
+    236078,
+    236241,
+    238391,
+    238880,
+    239891,
+    239954,
+    237829,
+    237625,
+    227693,
+    229643,
+    227421,
+    222911,
+    228580,
+    229282,
+    236323,
+    234003
    ],
    "ndx": [
     196177,
@@ -11932,7 +11996,7 @@
     236935,
     238462,
     245768,
-    242250
+    241777
    ],
    "sp500": [
     196177,
@@ -12000,7 +12064,7 @@
     218720,
     219819,
     223452,
-    222688
+    222310
    ],
    "russell": [
     196177,
@@ -12068,7 +12132,7 @@
     231059,
     232875,
     234544,
-    233784
+    233213
    ]
   },
   "y1": {
@@ -14384,7 +14448,7 @@
  },
  "macro": {
   "fear_greed": {
-   "score": 40,
+   "score": 39,
    "rating": "fear",
    "prev_close": 41,
    "week_ago": 32,
@@ -14394,7 +14458,7 @@
     {
      "label": "Momentum S&P 500",
      "rating": "extreme greed",
-     "score": 82
+     "score": 81
     },
     {
      "label": "Forza dei prezzi",
@@ -14404,7 +14468,7 @@
     {
      "label": "Ampiezza del mercato",
      "rating": "fear",
-     "score": 26
+     "score": 25
     },
     {
      "label": "Opzioni Put/Call",
@@ -14419,7 +14483,7 @@
     {
      "label": "Domanda beni rifugio",
      "rating": "fear",
-     "score": 39
+     "score": 38
     },
     {
      "label": "Domanda bond high yield",
@@ -14427,12 +14491,12 @@
      "score": 7
     }
    ],
-   "fomo": 48,
+   "fomo": 47,
    "fomo_label": "Nessuna FOMO"
   },
   "vix": {
-   "value": 15.83,
-   "change_pct": -2.28,
+   "value": 16.06,
+   "change_pct": -0.86,
    "spark": [
     17.39,
     17.08,
@@ -14463,7 +14527,7 @@
     19.44,
     17.68,
     16.2,
-    15.83
+    16.06
    ]
   },
   "fedwatch": {
@@ -14597,8 +14661,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "186.27",
-    "change_pct": 0.36,
+    "value": "186.23",
+    "change_pct": 0.34,
     "suffix": "%"
    }
   ],
@@ -14606,8 +14670,8 @@
    "us10": 4.43,
    "jp10": 2.59,
    "spread": 1.84,
-   "usdjpy": 160.45,
-   "usdjpy_chg_1m": 1.01,
+   "usdjpy": 160.43,
+   "usdjpy_chg_1m": 1.0,
    "boj_meetings": [
     "2026-06-17",
     "2026-07-31",
@@ -14619,20 +14683,20 @@
    "symbol": "BSX",
    "name": "Boston Scientific",
    "ratio": 1.86,
-   "puts": 3748,
+   "puts": 3757,
    "calls": 2017
   },
   "risk_sentiment": {
-   "score": 49,
+   "score": 48,
    "label": "Neutrale",
    "components": [
     {
      "label": "Fear & Greed",
-     "score": 40
+     "score": 39
     },
     {
      "label": "VIX",
-     "score": 83
+     "score": 82
     },
     {
      "label": "Put/Call",
@@ -14640,7 +14704,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 43
+     "score": 39
     },
     {
      "label": "Treasury 10A",
@@ -14734,42 +14798,42 @@
    {
     "ticker": "XLK",
     "name": "Tecnologia",
-    "m1": 6.5,
-    "m3": 37.4,
-    "score": 97
+    "m1": 6.3,
+    "m3": 37.1,
+    "score": 96
    },
    {
     "ticker": "XLF",
     "name": "Finanziari",
-    "m1": 6.2,
-    "m3": 11.6,
+    "m1": 6.1,
+    "m3": 11.5,
     "score": 71
    },
    {
     "ticker": "XLI",
     "name": "Industriali",
-    "m1": 5.4,
-    "m3": 10.0,
+    "m1": 5.2,
+    "m3": 9.8,
     "score": 68
    },
    {
     "ticker": "XLB",
     "name": "Materiali",
-    "m1": 4.8,
-    "m3": 7.7,
+    "m1": 4.7,
+    "m3": 7.6,
     "score": 65
    },
    {
     "ticker": "XLRE",
     "name": "Immobiliare",
-    "m1": 4.3,
-    "m3": 7.5,
-    "score": 64
+    "m1": 4.1,
+    "m3": 7.3,
+    "score": 63
    },
    {
     "ticker": "XLY",
     "name": "Consumi discr.",
-    "m1": 1.8,
+    "m1": 1.7,
     "m3": 7.2,
     "score": 60
    },
@@ -14783,30 +14847,30 @@
    {
     "ticker": "XLP",
     "name": "Consumi difens.",
-    "m1": 1.0,
-    "m3": 1.5,
-    "score": 53
+    "m1": 0.8,
+    "m3": 1.3,
+    "score": 52
    },
    {
     "ticker": "XLU",
     "name": "Utilities",
-    "m1": 2.7,
-    "m3": -3.3,
-    "score": 51
+    "m1": 2.5,
+    "m3": -3.6,
+    "score": 50
    },
    {
     "ticker": "XLC",
     "name": "Comunicazioni",
-    "m1": -3.2,
-    "m3": -1.6,
-    "score": 44
+    "m1": -3.6,
+    "m3": -1.9,
+    "score": 43
    },
    {
     "ticker": "XLE",
     "name": "Energia",
-    "m1": -7.1,
-    "m3": -3.7,
-    "score": 36
+    "m1": -7.3,
+    "m3": -3.9,
+    "score": 35
    }
   ],
   "witching": {
@@ -14871,7 +14935,7 @@
     },
     {
      "label": "Fear & Greed",
-     "score": 40
+     "score": 39
     },
     {
      "label": "Volatilità (VIX)",
@@ -14904,44 +14968,44 @@
   {
    "ticker": "NVDA",
    "name": "NVIDIA",
-   "mcap_usd": 5061099099350,
-   "change_pct": -1.41
+   "mcap_usd": 5048625299133,
+   "change_pct": -1.65
   },
   {
    "ticker": "GOOGL",
    "name": "Alphabet",
-   "mcap_usd": 4558637105679,
-   "change_pct": 1.16
+   "mcap_usd": 4543262116764,
+   "change_pct": 0.81
   },
   {
    "ticker": "AAPL",
    "name": "Apple",
-   "mcap_usd": 4397322581150,
-   "change_pct": 1.02
+   "mcap_usd": 4384763385742,
+   "change_pct": 0.74
   },
   {
    "ticker": "MSFT",
    "name": "Microsoft",
-   "mcap_usd": 2922048966350,
-   "change_pct": -1.5
+   "mcap_usd": 2923349078442,
+   "change_pct": -1.46
   },
   {
    "ticker": "AMZN",
    "name": "Amazon",
-   "mcap_usd": 2650991759958,
-   "change_pct": -0.72
+   "mcap_usd": 2645495844808,
+   "change_pct": -0.93
   },
   {
    "ticker": "TSM",
    "name": "TSMC",
-   "mcap_usd": 2231636506818,
-   "change_pct": -2.37
+   "mcap_usd": 2214779991440,
+   "change_pct": -3.11
   },
   {
    "ticker": "AVGO",
    "name": "Broadcom",
-   "mcap_usd": 1809997633274,
-   "change_pct": -3.64
+   "mcap_usd": 1802932551181,
+   "change_pct": -4.01
   },
   {
    "ticker": "2222.SR",
@@ -14950,16 +15014,16 @@
    "change_pct": 0.83
   },
   {
-   "ticker": "META",
-   "name": "Meta",
-   "mcap_usd": 1523460061958,
-   "change_pct": 1.21
-  },
-  {
    "ticker": "TSLA",
    "name": "Tesla",
-   "mcap_usd": 1520430102728,
-   "change_pct": -1.01
+   "mcap_usd": 1524185368137,
+   "change_pct": -0.77
+  },
+  {
+   "ticker": "META",
+   "name": "Meta",
+   "mcap_usd": 1518078616948,
+   "change_pct": 0.85
   }
  ],
  "predictions": [
@@ -14972,9 +15036,9 @@
  "news": [
   {
    "source": "Investing.com",
-   "title": "Iran deal includes $300 billion fund, more than half of which already committed, source says",
-   "link": "https://www.investing.com/news/stock-market-news/exclusiveiran-deal-includes-300-billion-fund-more-than-half-of-which-already-committed-source-says-4745500",
-   "published": "2026-06-16T18:07:29Z",
+   "title": "G7 leaders express optimism for peace after Trump’s ’very good’ Zelenskiy meeting",
+   "link": "https://www.investing.com/news/world-news/europeans-to-test-trump-on-iran-deal-risks-urge-ukraine-rethink-at-g7-4743933",
+   "published": "2026-06-16T19:06:31Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -14982,7 +15046,20 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "L’accordo con l’Iran prevede un fondo di 300 miliardi di dollari, più della metà dei quali già impegnati, dice la fonte"
+   "title_it": "I leader del G7 esprimono ottimismo per la pace dopo l’”ottimo” incontro di Trump con Zelenskiy"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Nasdaq, S&P 500 slip while Dow hits record high",
+   "link": "https://www.investing.com/news/economy-news/nasdaq-sp-500-slip-while-dow-hits-record-high-4745561",
+   "published": "2026-06-16T19:00:56Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "bull",
+   "title_it": "Nasdaq e S&P 500 in calo mentre il Dow tocca livelli record"
   },
   {
    "source": "Investing.com",
@@ -15072,22 +15149,37 @@
   },
   {
    "source": "CNBC",
-   "title": "Dow jumps 450 points as oil drop fuels economy bets; Chip rollover knocks Nasdaq: Live updates",
+   "title": "Dow jumps 350 points as oil drop fuels economy bets; Chip rollover knocks Nasdaq: Live updates",
    "link": "https://www.cnbc.com/2026/06/15/stock-market-today-live-updates.html",
-   "published": "2026-06-16T18:46:28Z",
+   "published": "2026-06-16T19:20:44Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "Dow balza di 450 punti mentre il calo del petrolio alimenta le scommesse economiche; Il rollover delle fiches bussa al Nasdaq: aggiornamenti in tempo reale"
+   "title_it": "Dow balza di 350 punti mentre il calo del petrolio alimenta le scommesse economiche; Il rollover delle fiches bussa al Nasdaq: aggiornamenti in tempo reale"
+  },
+  {
+   "source": "MarketWatch",
+   "title": "Global oil prices end below $80 for the first time since the Iran war began. Ships still aren’t passing through Hormuz.",
+   "link": "https://www.marketwatch.com/story/global-oil-prices-break-below-80-for-the-first-time-since-the-iran-war-began-ships-still-arent-passing-through-hormuz-83aa3e1e?mod=mw_rss_topstories",
+   "published": "2026-06-16T19:19:00Z",
+   "tickers": [
+    "MACRO",
+    "POL",
+    "CL=F"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "I prezzi globali del petrolio scendono sotto gli 80 dollari per la prima volta dall’inizio della guerra con l’Iran. Le navi continuano a non passare per Hormuz."
   },
   {
    "source": "CNBC",
    "title": "Fed Chair Warsh expected to withhold 'dot' from central bank's interest rate outlook",
    "link": "https://www.cnbc.com/2026/06/16/fed-chair-warsh-expected-to-withhold-dot-from-central-banks-interest-rate-outlook.html",
-   "published": "2026-06-16T18:43:59Z",
+   "published": "2026-06-16T19:12:13Z",
    "tickers": [
     "MACRO"
    ],
@@ -15095,6 +15187,60 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Il presidente della Fed Warsh prevede di tralasciare il \"punto\" dalle prospettive sui tassi di interesse della banca centrale"
+  },
+  {
+   "source": "Google News",
+   "title": "24 Hours Until the Fed’s Big Announcement: Here’s What We Know as of Now - 24/7 Wall St.",
+   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNcmdwUzZsdnBzQi1EVDFyUDdxSEVSUUtJTzhYTmJzWXU4TFBwejJUMzNQdlc0Wm1pemZOU3VlN2U0ZHFSSHY1U09JNm95ektobnNqVXZlcHNPdDBFRVJTX0NrZk5xVXgzeXhrU1FDZU0xa0VlTmlmb1RKWlpRVENseFFYaE5KSmlfT1ZXMlh5RjlFSjkzVkRmbGFOempYX2YtTnBhWmsxOGFHOFZuWU5DMTNFWQ?oc=5",
+   "published": "2026-06-16T19:07:59Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Mancano 24 ore al grande annuncio della Fed: ecco cosa sappiamo adesso - 24 ore su 24, 7 giorni su 7 Wall St."
+  },
+  {
+   "source": "AP",
+   "title": "Iran says the deal to end the war with the US requires Israel to withdraw from Lebanon - AP News",
+   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxOMU9UVU0xalpEMWRiaWd2TmRycmtVR0x4aXhhOUFEaTZpbzFRY3l0YzRqb0NxcVZDa2NDX3NscUJfeDNrbkh0bXA4OXNtaEFCU0t0X0w3Q2lfMDNlWUY2SDhDMnRrTVdVUENVQnNmWXRqZ0sydXBVVmU3aEExX3NKOEdaUFo5b0FFWUZTRl9Ia09QQy1IUlBpNW5FaUVUd1lKajRnXy1B?oc=5",
+   "published": "2026-06-16T18:59:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "L'Iran afferma che l'accordo per porre fine alla guerra con gli Stati Uniti richiede che Israele si ritiri dal Libano - AP News"
+  },
+  {
+   "source": "CNBC",
+   "title": "Trump signals he could send details of Iran deal to Congress",
+   "link": "https://www.cnbc.com/2026/06/16/trump-iran-deal-congress.html",
+   "published": "2026-06-16T18:57:14Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump segnala che potrebbe inviare i dettagli dell’accordo con l’Iran al Congresso"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Citadel Securities Sees Risk of Fed Starting Hiking in September",
+   "link": "https://news.google.com/search?q=Citadel%20Securities%20Sees%20Risk%20of%20Fed%20Starting%20Hiking%20in%20September",
+   "published": "2026-06-16T18:53:15Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Citadel Securities prevede il rischio che la Fed inizi un rialzo a settembre"
   },
   {
    "source": "Bloomberg",
@@ -15111,20 +15257,6 @@
    "title_it": "L’Iran sta spostando le sue petroliere in vista della firma dell’accordo con gli Stati Uniti"
   },
   {
-   "source": "CNBC",
-   "title": "Trump signals he could send details of Iran deal to Congress",
-   "link": "https://www.cnbc.com/2026/06/16/trump-iran-deal-congress.html",
-   "published": "2026-06-16T18:31:40Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Trump segnala che potrebbe inviare i dettagli dell’accordo con l’Iran al Congresso"
-  },
-  {
    "source": "Google News",
    "title": "Kevin Warsh faces first major test as Federal Reserve chair - Northeastern Global News",
    "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNY25WMHMwbHFrLVp2RmFyUHNhc29lczZXLUZ6Vk80M0RGVkJxeG9xNUVVSXkyTURsU1lqaE5UU2p4SmIyOEJCN18zRnBXVkozQkgyYWo3bWhub0ZKOU9Cc256c2hkRzhVdmNVekV6OXZ5S0R2bkJzdXd1V0xaMThCX0tGTQ?oc=5",
@@ -15136,6 +15268,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Kevin Warsh affronta la prima prova importante come presidente della Federal Reserve - Northeastern Global News"
+  },
+  {
+   "source": "Reuters",
+   "title": "Exclusive: Iran deal includes $300 billion fund, more than half of which already committed, source says - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPWUQ2ODdpWjF3UzYxRTVRUi1hMkZRMEw3S3pDR0VWSzY5bjVWeE1TXzJZUUp1SWQ4QXFjVUJBNzRDcFp2cnJoMVBSQU45Vkp6YjdDanJLMlNiVFRTMm1KNnhlLWkxOXFLQUJmeTJkOThzTmlQMlpuVHlybW9SMnczd2lIWXJBcHI4Uk94R2RwUVg5aHJxR1ptNGppUVRSV1pneUp3WkN1elRrN1FSd0EwZ05kZDVEMTRpX0VGeHFwOVlvTmV3b3c?oc=5",
+   "published": "2026-06-16T18:19:53Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Esclusivo: l'accordo con l'Iran comprende un fondo di 300 miliardi di dollari, più della metà dei quali già impegnati, dice una fonte - Reuters"
   },
   {
    "source": "MarketWatch",
@@ -15166,18 +15312,32 @@
    "title_it": "Trump sposta la supervisione dell’istruzione speciale e dei diritti civili fuori dal Dipartimento dell’Istruzione – AP News"
   },
   {
-   "source": "AP",
-   "title": "Iran says the deal to end the war with the US requires Israel to withdraw from Lebanon - AP News",
-   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxOMU9UVU0xalpEMWRiaWd2TmRycmtVR0x4aXhhOUFEaTZpbzFRY3l0YzRqb0NxcVZDa2NDX3NscUJfeDNrbkh0bXA4OXNtaEFCU0t0X0w3Q2lfMDNlWUY2SDhDMnRrTVdVUENVQnNmWXRqZ0sydXBVVmU3aEExX3NKOEdaUFo5b0FFWUZTRl9Ia09QQy1IUlBpNW5FaUVUd1lKajRnXy1B?oc=5",
-   "published": "2026-06-16T17:38:00Z",
+   "source": "Reuters",
+   "title": "Tehran can immediately sell oil upon signing US-Iran deal, US official says - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQMF8zSlRJcE1kRDQ1Y0VlSmRwMEV1YmYzbi1jZS1Ha2lPd0hocXBMMThndVRPRVk1dXlGQlhYam14c1VUTmUzaTBKQllGdkw1Zlo4bGFhRFRiU3p2b2Y2T05MY3Nfcm5Ja1BDX2gwTlhPbzFubnczOENYaWZrY0RzeTd5QlNRRTV5UmYtZDlsMDJyaTFFTXFreFRNTXpzaW1CUGxnZUg1UGpuTzU3ZUdYQQ?oc=5",
+   "published": "2026-06-16T17:53:04Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bear",
-   "title_it": "L'Iran afferma che l'accordo per porre fine alla guerra con gli Stati Uniti richiede che Israele si ritiri dal Libano - AP News"
+   "sentiment": "neutral",
+   "title_it": "Teheran può vendere immediatamente petrolio dopo la firma dell'accordo USA-Iran, dice un funzionario americano - Reuters"
+  },
+  {
+   "source": "CNBC",
+   "title": "FBI says it disrupted alleged plot targeting UFC event at White House",
+   "link": "https://www.cnbc.com/2026/06/16/fbi-alleged-plot-targeting-ufc-event-white-house-trump.html",
+   "published": "2026-06-16T17:40:05Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L'FBI afferma di aver interrotto un presunto complotto contro l'evento UFC alla Casa Bianca"
   },
   {
    "source": "CNBC",
@@ -15194,21 +15354,6 @@
    "title_it": "L’accordo con l’Iran non risolverà i problemi della fornitura di petrolio dall’oggi al domani. Barclays mantiene una previsione di $ 100"
   },
   {
-   "source": "MarketWatch",
-   "title": "Global oil prices break below $80 for the first time since the Iran war began. Ships still aren’t passing through Hormuz.",
-   "link": "https://www.marketwatch.com/story/global-oil-prices-break-below-80-for-the-first-time-since-the-iran-war-began-ships-still-arent-passing-through-hormuz-83aa3e1e?mod=mw_rss_topstories",
-   "published": "2026-06-16T16:50:00Z",
-   "tickers": [
-    "MACRO",
-    "POL",
-    "CL=F"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "I prezzi globali del petrolio scendono sotto gli 80 dollari per la prima volta dall’inizio della guerra con l’Iran. Le navi continuano a non passare per Hormuz."
-  },
-  {
    "source": "Reuters",
    "title": "Dow hits record high as oil slides; SpaceX soars - Reuters",
    "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxONEpZcjB1UUpuN05zN283anhrUE9FaHJWOGRPTnF6VWdLcEkwT3U5OWhjM05VckRjMFpnS2dDR2dtdXNDc0pYdkhxdXpnbExoM2loNmRsN29qLXVEYUdpZEI2cEpISFJXZkJXeGNzV292S0tCUVhZd2lRX1hlNFdaOXp2dEJ2LUh1dm9reFE3VlFnZE5salNHUXlmS3A4WlkwNVZ5aHhZZ29ENnExMEVkQjVB?oc=5",
@@ -15220,20 +15365,6 @@
    "inv": false,
    "sentiment": "bull",
    "title_it": "Dow tocca livelli record mentre il petrolio scivola; SpaceX vola - Reuters"
-  },
-  {
-   "source": "Reuters",
-   "title": "US-Iran deal allows Tehran to immediately sell oil upon signing, says US official - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQMF8zSlRJcE1kRDQ1Y0VlSmRwMEV1YmYzbi1jZS1Ha2lPd0hocXBMMThndVRPRVk1dXlGQlhYam14c1VUTmUzaTBKQllGdkw1Zlo4bGFhRFRiU3p2b2Y2T05MY3Nfcm5Ja1BDX2gwTlhPbzFubnczOENYaWZrY0RzeTd5QlNRRTV5UmYtZDlsMDJyaTFFTXFreFRNTXpzaW1CUGxnZUg1UGpuTzU3ZUdYQQ?oc=5",
-   "published": "2026-06-16T16:48:18Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'accordo USA-Iran consente a Teheran di vendere immediatamente petrolio dopo la firma, afferma un funzionario statunitense - Reuters"
   },
   {
    "source": "Bloomberg",
@@ -15264,19 +15395,6 @@
    "title_it": "L’aumento dei prezzi del gas, dei generi alimentari e dei voli probabilmente sopravviverà alla guerra con l’Iran – AP News"
   },
   {
-   "source": "Bloomberg",
-   "title": "Stanford's Wallace Says US Recession Is Not a Certainty",
-   "link": "https://news.google.com/search?q=Stanford%27s%20Wallace%20Says%20US%20Recession%20Is%20Not%20a%20Certainty",
-   "published": "2026-06-16T16:04:02Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Wallace di Stanford afferma che la recessione negli Stati Uniti non è una certezza"
-  },
-  {
    "source": "Google News",
    "title": "Will interest rates change? What to expect from June's Fed meeting - USA Today",
    "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNWFVVdzdFTEtDQVBwcW1iUTFFT1lOMjZ5N2R2dUlfZk5GdWhDNVVDR0ljcE0wSWV6OXpUVVAwTU1wZXhwckZKOW1WcVRFdTBuVnFnN3RVaUpjX3dhMXR4Q0VGazdnUEFxcFVGS00xMUZmUS1Mb25jZkdlelVyVmtiTDZQSmlPQ0ZaTHJublpqLWE5OHl2WVNnZ054YllaX2NiaWc3YktR?oc=5",
@@ -15288,33 +15406,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "I tassi di interesse cambieranno? Cosa aspettarsi dalla riunione della Fed di giugno - USA Today"
-  },
-  {
-   "source": "MarketWatch",
-   "title": "Here’s when gas prices will come down if the U.S. deal to end the Iran war pans out",
-   "link": "https://www.marketwatch.com/story/heres-when-gas-prices-will-go-down-now-that-theres-a-deal-to-end-the-iran-war-6a482f4d?mod=mw_rss_topstories",
-   "published": "2026-06-16T15:41:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Ecco quando i prezzi del gas scenderanno se l’accordo degli Stati Uniti per porre fine alla guerra con l’Iran avrà successo"
-  },
-  {
-   "source": "MarketWatch",
-   "title": "Oil may move through the Strait of Hormuz first, leaving fertilizer supplies stranded",
-   "link": "https://www.marketwatch.com/story/oil-may-move-through-the-strait-of-hormuz-first-leaving-fertilizer-supplies-stranded-0897742c?mod=mw_rss_topstories",
-   "published": "2026-06-16T15:39:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il petrolio potrebbe spostarsi prima attraverso lo Stretto di Hormuz, lasciando bloccate le scorte di fertilizzanti"
   },
   {
    "source": "Reddit",
@@ -15356,7 +15447,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Riflettori giornalieri: stime del PIL in aumento"
+   "title_it": "Daily Spotlight: stima del PIL in aumento"
   },
   {
    "source": "Google News",
@@ -15382,7 +15473,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L’indice forex emergente è in rialzo grazie all’accordo di pace in vista della riunione della Fed"
+   "title_it": "L’indice forex emergente si avvicina all’accordo di pace in vista della riunione della Fed"
   },
   {
    "source": "Google News",
@@ -15409,20 +15500,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Warsh affronta il Tenuous Balancing Act nel primo incontro della Fed come presidente - The New York Times"
-  },
-  {
-   "source": "Google News",
-   "title": "Kevin Warsh was bracing for rising inflation. A US-Iran agreement simplifies things - CNN",
-   "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFBYQWxYel9OZDl3aGdVUGttV1RpeTRiZk9DUFl2Q2ZFUXVISmExT21QNEt4cjRxQWFIaWQ3b0NZU1YtcmVXWVE1S1I5NXNrZkFIQjE4NXFHN3k4dDI5UVdseS1fZTBLQzJhdVRsajRtZzh6Zw?oc=5",
-   "published": "2026-06-16T09:00:09Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Kevin Warsh si stava preparando all’aumento dell’inflazione. Un accordo Usa-Iran semplifica le cose - CNN"
   },
   {
    "source": "Reuters",
@@ -15480,20 +15557,6 @@
   },
   {
    "source": "Reuters",
-   "title": "Iran draw with New Zealand in politically charged World Cup clash in LA - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNMmdfWVE3X2lhRGpKQW1HUENwdkZ4eThrak1JZFhrbnYzUGtLNFVydEVhTEo1Znp4NlZPd2NDX25xZ0VqLXNaN2FpTHJ1RlJXMnpHRkRiMkI3YS13YW9sZ2pxZGJzTDVqNXFuZGY2ZjNjcXEtRzBiOF9CNTlQYlhCc3ZMYUxEQ01VaklUTUtJSFlOZlBqNWhWUU9HZzZXa3RUYW5j?oc=5",
-   "published": "2026-06-16T03:06:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'Iran pareggia con la Nuova Zelanda nello scontro politicamente intenso della Coppa del Mondo a Los Angeles - Reuters"
-  },
-  {
-   "source": "Reuters",
    "title": "Oil prices fall 5% to 3-month low on hopes Strait of Hormuz will open - Reuters",
    "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOWENYY18wZzkzMHJkZWJ5NFh3OVNGUGZtTHlIalhVRTJ3QmlVYXJ6dHJrd3EyUGN2RkFILXlzS2JzRlZMV1FUeE14Nm13TnJXMkhkUW1UZFhyUHd2TXkzelJjdndCSjJxa3BJUDBnT3pHMTNkVGpwekFENUtTdExyVlUwV1V0eUlMaHhzUWRTSnpnY1RLbGpzOEFNdHp6ajFwUUtTYjFuZTBEZUQ3N0RIX0w2TTV6OXpHazRrRg?oc=5",
    "published": "2026-06-16T01:14:00Z",
@@ -15548,17 +15611,17 @@
    "title_it": "Quando è iniziata la guerra con l'Iran, SPY era a $ 686 e oggi $ 756 (quasi + 10%)"
   },
   {
-   "source": "CNBC",
-   "title": "Stocks making the biggest moves midday: SpaceX, Lumentum, Huntsman, e.l.f. Beauty, Intel & more",
-   "link": "https://www.cnbc.com/2026/06/16/stocks-making-the-biggest-moves-midday-spcx-lite-hun-elf-intc.html",
-   "published": "2026-06-16T16:25:12Z",
+   "source": "Investing.com",
+   "title": "Tesla coils below $417-$420 resistance: Hourly levels",
+   "link": "https://www.investing.com/news/stock-market-news/tesla-rangebound-between-405419-live-hourly-levels-93CH-4742476",
+   "published": "2026-06-16T19:05:12Z",
    "tickers": [
-    "INTC"
+    "TSLA"
    ],
    "topic_pri": 1,
-   "inv": false,
+   "inv": true,
    "sentiment": "neutral",
-   "title_it": "I titoli che hanno fatto i movimenti più importanti a mezzogiorno: SpaceX, Lumentum, Huntsman, e.l.f. Bellezza, Intel e altro ancora"
+   "title_it": "Bobine di Tesla sotto la resistenza di 417$-420$: livelli orari"
   },
   {
    "source": "CNBC",
@@ -15576,16 +15639,29 @@
   },
   {
    "source": "Investing.com",
-   "title": "Bitcoin tests 38.2% Fib resistance at $66,386: Live levels",
+   "title": "Bitcoin battles $67K resistance after SuperTrend flip: Live levels",
    "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-hits-66380-resistance-after-wbottom-breakout-live-levels-93CH-4741296",
-   "published": "2026-06-16T07:10:42Z",
+   "published": "2026-06-16T19:05:07Z",
    "tickers": [
     "BTC-USD"
    ],
    "topic_pri": 2,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Bitcoin testa la resistenza Fib del 38,2% a 66.386$: livelli in tempo reale"
+   "title_it": "Bitcoin combatte la resistenza di 67.000 dollari dopo il ribaltamento del SuperTrend: livelli live"
+  },
+  {
+   "source": "Reddit",
+   "title": "Shorting SPCX post-IPO while long QQQ?",
+   "link": "https://www.reddit.com/r/stocks/comments/1u7myvd/shorting_spcx_postipo_while_long_qqq/",
+   "published": "2026-06-16T19:08:34Z",
+   "tickers": [
+    "SPCX"
+   ],
+   "topic_pri": 2,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Shortare SPCX post-IPO mentre long QQQ?"
   },
   {
    "source": "Reddit",
@@ -15614,24 +15690,11 @@
    "title_it": "IPO SpaceX/SPCX: sbaglio ad aspettare finché la pressione di vendita del lock-up non diventi chiara?"
   },
   {
-   "source": "Reddit",
-   "title": "SPCX & AMZN..",
-   "link": "https://www.reddit.com/r/stocks/comments/1u6nuo6/spcx_amzn/",
-   "published": "2026-06-15T17:51:02Z",
-   "tickers": [
-    "SPCX"
-   ],
-   "topic_pri": 2,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "SPCX e AMZN.."
-  },
-  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-16T18:56:33Z",
+   "published": "2026-06-16T19:39:49Z",
    "tickers": [
     "MACRO"
    ],
