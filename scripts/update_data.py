@@ -1,0 +1,1352 @@
+#!/usr/bin/env python3
+"""Aggiorna data/data.json con quotazioni, dati tecnici, macro e news.
+
+Fonti (tutte gratuite):
+- Yahoo Finance (yfinance): quotazioni, storico, fondamentali, rating analisti,
+  trimestrali, opzioni (put/call), VIX, futures Fed Funds, Treasury 10A, EURUSD,
+  EURJPY, USDJPY, Bitcoin, petrolio WTI, KOSPI, Nasdaq
+- CNN: Fear & Greed Index
+- FRED (csv pubblico o API con FRED_API_KEY): CPI, PCE, PIL, vendite al dettaglio, NFP,
+  disoccupazione, fiducia consumatori, tassi Fed, JGB 10A — fallback BLS API e DBnomics
+- NY Fed: range obiettivo Fed quando FRED non risponde
+- Borsa Italiana (scrape): prezzo BTP Valore Ott 2028
+- RSS (solo news sui titoli in portafoglio): CNBC, Bloomberg, Yahoo Finance,
+  Investing.com, Google News
+"""
+import json
+import math
+import os
+import re
+import sys
+import time
+import urllib.parse
+from datetime import datetime, timezone, timedelta
+from pathlib import Path
+
+import feedparser
+import pandas as pd
+import requests
+import yfinance as yf
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "data" / "data.json"
+CONFIG = ROOT / "config" / "holdings.json"
+
+UA = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+    "Accept": "*/*",
+}
+
+# posizioni di default (usate se config/holdings.json manca)
+DEFAULT_PORTFOLIO = [
+    {"ticker": "NVDA", "name": "NVIDIA",         "qty": 270,  "pmc": 87.17},
+    {"ticker": "AMD",  "name": "AMD",            "qty": 125,  "pmc": 153.92},
+    {"ticker": "MU",   "name": "Micron",         "qty": 90,   "pmc": 87.63},
+    {"ticker": "INTC", "name": "Intel",          "qty": 380,  "pmc": 25.75},
+    {"ticker": "TSLA", "name": "Tesla",          "qty": 60,   "pmc": 358.22},
+    {"ticker": "MSTR", "name": "Strategy",       "qty": 123,  "pmc": 210.22},
+    {"ticker": "RGTI", "name": "Rigetti",        "qty": 515,  "pmc": 27.30},
+    {"ticker": "ARBE", "name": "Arbe Robotics",  "qty": 1150, "pmc": 3.35},
+]
+DEFAULT_WATCHLIST = [
+    {"ticker": "OKLO", "name": None, "currency": "USD"},
+    {"ticker": "SPCX", "name": None, "currency": "USD"},
+    {"ticker": "CBRS", "name": None, "currency": "USD"},
+    {"ticker": "^KS11", "name": "KOSPI", "currency": "PTS"},
+    {"ticker": "^IXIC", "name": "Nasdaq Composite", "currency": "PTS"},
+    {"ticker": "BTC-USD", "name": "Bitcoin", "currency": "USD"},
+    {"ticker": "CL=F", "name": "Petrolio WTI", "currency": "USD"},
+]
+
+
+def load_holdings():
+    """Legge le posizioni da config/holdings.json (modificabile da UI), con fallback ai default."""
+    try:
+        cfg = json.loads(CONFIG.read_text())
+        pf = cfg.get("portfolio") or DEFAULT_PORTFOLIO
+        wl = cfg.get("watchlist") or DEFAULT_WATCHLIST
+        return pf, wl, cfg.get("broker")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! config holdings non leggibile, uso default: {e}", file=sys.stderr)
+        return DEFAULT_PORTFOLIO, DEFAULT_WATCHLIST, None
+
+
+PORTFOLIO, WATCHLIST, BROKER = load_holdings()
+
+BTP = {
+    "ticker": "BTP-V28", "name": "BTP Valore Ott 2028", "isin": "IT0005565400",
+    "nominal": 40000, "pmc": 100.0, "fallback_price": 103.25,
+}
+
+PUTCALL_SYMBOL = ("BSX", "Boston Scientific")
+
+# aliquote per la stima del guadagno netto
+TAX_STOCK = 0.26   # capital gain azioni
+TAX_BTP = 0.125    # titoli di Stato (aliquota agevolata 12,5%)
+
+# candidati per la classifica delle maggiori capitalizzazioni mondiali
+TOP_CAP_CANDIDATES = {
+    "NVDA": "NVIDIA", "MSFT": "Microsoft", "AAPL": "Apple", "GOOGL": "Alphabet",
+    "AMZN": "Amazon", "META": "Meta", "AVGO": "Broadcom", "TSLA": "Tesla",
+    "TSM": "TSMC", "BRK-B": "Berkshire", "LLY": "Eli Lilly", "WMT": "Walmart",
+    "JPM": "JPMorgan", "V": "Visa", "XOM": "Exxon", "ORCL": "Oracle",
+    "MA": "Mastercard", "COST": "Costco", "ASML": "ASML", "2222.SR": "Saudi Aramco",
+}
+
+def gnews(query):
+    return ("https://news.google.com/rss/search?q="
+            + urllib.parse.quote(f"{query} when:1d") + "&hl=en-US&gl=US&ceid=US:en")
+
+
+def build_feeds():
+    """Feed costruiti dinamicamente: fonti dirette diverse + un feed per ogni titolo in
+    portafoglio/watchlist (così le news si adattano e variano)."""
+    feeds = [
+        # Investing.com — fonte prioritaria (più sezioni)
+        ("Investing.com", "https://www.investing.com/rss/news.rss"),
+        ("Investing.com", "https://www.investing.com/rss/news_25.rss"),       # stock market
+        ("Investing.com", "https://www.investing.com/rss/news_285.rss"),      # economy
+        ("Investing.com", "https://www.investing.com/rss/news_1.rss"),        # forex
+        ("Investing.com", "https://www.investing.com/rss/stock_Stocks.rss"),
+        ("Investing.com", "https://www.investing.com/rss/news_301.rss"),      # cryptocurrency
+        # altre testate dirette
+        ("CNBC", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114"),
+        ("CNBC Markets", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258"),
+        ("Yahoo Finance", "https://finance.yahoo.com/news/rssindex"),
+        ("MarketWatch", "https://feeds.content.dowjones.io/public/rss/mw_topstories"),
+        ("Bloomberg", "https://feeds.bloomberg.com/markets/news.rss"),
+        ("Reddit", "https://www.reddit.com/r/stocks/.rss"),
+        ("Reddit", "https://www.reddit.com/r/investing/.rss"),
+        # macro / geopolitica (per fonte, via Google con site:)
+        ("Reuters", gnews("site:reuters.com (markets OR economy OR Fed OR Iran OR stocks OR tariffs)")),
+        ("AP", gnews("site:apnews.com (economy OR markets OR Iran OR Fed OR Trump OR China)")),
+        ("CNBC", gnews("site:cnbc.com (Fed OR inflation OR market OR earnings)")),
+        ("Google News", gnews("Federal Reserve OR US inflation OR White House economy OR tariffs OR jobs report")),
+        ("Google News", gnews("Iran OR Israel OR Ukraine OR Russia OR China trade OR OPEC oil (markets OR economy OR war)")),
+        ("Google News", gnews('"BCA Research" OR MacroQuant OR "recession probability" OR "business cycle" market outlook')),
+    ]
+    # un feed dedicato per ogni posizione e titolo in watchlist
+    for p in PORTFOLIO + WATCHLIST:
+        nm = (p.get("name") or p["ticker"])
+        if p["ticker"] in ("BTC-USD",):
+            q = "Bitcoin OR crypto"
+        elif p["ticker"] == "BTP-V28":
+            q = '"BTP Valore" OR "Italian bonds" OR BTP'
+        elif p.get("currency") == "PTS":
+            continue
+        else:
+            q = f'"{nm}" OR {p["ticker"]} stock'
+        feeds.append(("Google News", gnews(q)))
+    return feeds
+
+
+# domini a pagamento: le loro notizie restano, ma il link punta a una ricerca Google
+# (così trovi una versione leggibile gratis invece del paywall)
+PAYWALL_DOMAINS = ("wsj.com", "ft.com", "barrons.com", "economist.com", "seekingalpha.com",
+                   "bloomberg.com", "nytimes.com", "thetimes", "telegraph.co.uk",
+                   "businessinsider.com", "theinformation.com")
+
+# pattern regex (word boundary) per associare le news ai titoli
+PORTFOLIO_KEYWORDS = {
+    "NVDA": [r"\bnvidia\b", r"\bnvda\b"], "AMD": [r"\bamd\b", r"advanced micro"],
+    "MU": [r"\bmicron\b"], "INTC": [r"\bintel\b"], "TSLA": [r"\btesla\b", r"\bmusk\b"],
+    "MSTR": [r"\bmicrostrategy\b", r"\bstrategy inc\b", r"\bmstr\b", r"\bsaylor\b"],
+    "RGTI": [r"\brigetti\b"], "OKLO": [r"\boklo\b"], "ARBE": [r"\barbe\b"],
+    "BTP-V28": [r"\bbtp\b", r"italian bond", r"italy bond"],
+    # macro, politica USA e geopolitica (notizie che muovono i mercati)
+    "MACRO": [
+        # politica monetaria / macro USA
+        r"\bfed\b", r"federal reserve", r"\binflation\b", r"\bcpi\b", r"\bpce\b",
+        r"\btariff", r"white house", r"\btrump\b", r"\bcongress\b", r"\btreasur",
+        r"\bgdp\b", r"\bpowell\b", r"rate cut", r"rate hike", r"interest rate",
+        r"\bjobs report\b", r"payrolls", r"unemployment", r"recession", r"debt ceiling",
+        r"government shutdown", r"\bsenate\b", r"\bbiden\b", r"stimulus", r"\bopec\b",
+        # geopolitica e mercati globali
+        r"\biran\b", r"\bisrael\b", r"\bgaza\b", r"middle east", r"\bwar\b", r"conflict",
+        r"\brussia\b", r"\bukraine\b", r"\bchina\b", r"sanction", r"geopolit",
+        r"oil price", r"crude oil", r"\bnato\b", r"strait of hormuz", r"nuclear",
+        r"stock market", r"wall street", r"\bs&p 500\b", r"\bdow\b", r"selloff", r"rally",
+    ],
+}
+
+
+def http_get(url, tries=3, timeout=25):
+    last = None
+    for i in range(tries):
+        try:
+            r = requests.get(url, headers=UA, timeout=timeout)
+            if r.status_code == 200:
+                return r
+            last = Exception(f"HTTP {r.status_code}")
+        except Exception as e:  # noqa: BLE001
+            last = e
+        time.sleep(2 * (i + 1))
+    raise last
+
+
+def clamp(v, lo=0, hi=100):
+    return max(lo, min(hi, v))
+
+
+def rsi14(closes: pd.Series) -> float | None:
+    if len(closes) < 20:
+        return None
+    delta = closes.diff()
+    gain = delta.clip(lower=0).ewm(alpha=1 / 14, adjust=False).mean()
+    loss = (-delta.clip(upper=0)).ewm(alpha=1 / 14, adjust=False).mean()
+    rs = gain / loss.replace(0, float("nan"))
+    val = 100 - 100 / (1 + rs.iloc[-1])
+    return None if math.isnan(val) else round(float(val), 1)
+
+
+def signal_label(price, sma50, sma200, rsi):
+    if rsi is not None and rsi >= 70:
+        return "Ipercomprato", "warn"
+    if rsi is not None and rsi <= 30:
+        return "Ipervenduto", "info"
+    if sma50 and sma200 and price > sma50 > sma200:
+        return "Trend rialzista", "good"
+    if sma50 and price > sma50:
+        return "Sopra SMA50", "good"
+    if sma200 and price < sma200:
+        return "Trend debole", "bad"
+    return "Neutrale", "neutral"
+
+
+# nomi comuni → ticker corretti (per chi inserisce "APPLE" invece di "AAPL")
+TICKER_ALIAS = {
+    "APPLE": "AAPL", "GOOGLE": "GOOGL", "ALPHABET": "GOOGL", "AMAZON": "AMZN",
+    "MICROSOFT": "MSFT", "FACEBOOK": "META", "NVIDIA": "NVDA", "TESLA": "TSLA",
+    "NETFLIX": "NFLX", "MICRON": "MU", "INTEL": "INTC", "BITCOIN": "BTC-USD",
+}
+
+
+def fetch_symbol(ticker, name=None, currency="USD"):
+    """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
+    ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
+    t = yf.Ticker(ticker)
+    hist = t.history(period="1y", interval="1d", auto_adjust=True)
+    if hist.empty:
+        print(f"!! nessuno storico per {ticker}", file=sys.stderr)
+        return None
+    closes = hist["Close"]
+    price = float(closes.iloc[-1])
+    prev = float(closes.iloc[-2]) if len(closes) > 1 else price
+
+    monthly = None
+    try:
+        mh = t.history(period="max", interval="1mo")
+        ath = float(mh["High"].max())
+        monthly = mh["Close"].dropna()
+    except Exception:  # noqa: BLE001
+        ath = float(hist["High"].max())
+
+    try:
+        info = t.info or {}
+    except Exception:  # noqa: BLE001
+        info = {}
+    pe = info.get("trailingPE") or info.get("forwardPE")
+
+    sma50 = float(closes.rolling(50).mean().iloc[-1]) if len(closes) >= 50 else None
+    sma200 = float(closes.rolling(200).mean().iloc[-1]) if len(closes) >= 200 else None
+    rsi = rsi14(closes)
+    sig, sig_class = signal_label(price, sma50, sma200, rsi)
+
+    vol = float(hist["Volume"].iloc[-1])
+    vol_avg30 = float(hist["Volume"].tail(30).mean())
+
+    # sparkline su più orizzonti: 1g (5m), 1 settimana, 1 mese, 3 mesi, 6 mesi, 1 anno, all
+    sparks = {
+        "w1": [round(float(c), 2) for c in closes.tail(5)],
+        "m6": [round(float(c), 2) for c in closes.tail(126)],
+        "all": [round(float(c), 2) for c in monthly] if monthly is not None and len(monthly) > 2 else [round(float(c), 2) for c in closes[::5]],
+        "m1": [round(float(c), 2) for c in closes.tail(22)],
+        "m3": [round(float(c), 2) for c in closes.tail(66)],
+        "y1": [round(float(c), 2) for c in closes[::5]],
+        "d1": [],
+    }
+    try:
+        h1 = t.history(period="1d", interval="5m")["Close"].dropna()
+        if len(h1) >= 2:
+            sparks["d1"] = [round(float(c), 2) for c in h1[::2]]
+    except Exception:  # noqa: BLE001
+        pass
+
+    # supporto/resistenza/performance per orizzonte (cambiano col range scelto)
+    def tech_window(n):
+        h = hist.tail(n)
+        if h.empty:
+            return None
+        c0 = float(h["Close"].iloc[0]); c1 = float(h["Close"].iloc[-1])
+        return {"support": round(float(h["Low"].min()), 2),
+                "resistance": round(float(h["High"].max()), 2),
+                "change_pct": round((c1 / c0 - 1) * 100, 2) if c0 else None}
+    tech_by_range = {k: tech_window(n) for k, n in
+                     (("w1", 5), ("m1", 22), ("m3", 66), ("y1", 252))}
+
+    # prossima trimestrale
+    earnings_date = None
+    try:
+        dates = (t.calendar or {}).get("Earnings Date") or []
+        today = datetime.now(timezone.utc).date()
+        future = [d for d in dates if d >= today]
+        if future:
+            earnings_date = min(future).isoformat()
+    except Exception:  # noqa: BLE001
+        pass
+
+    # rating analisti e target price
+    rating = None
+    key = info.get("recommendationKey")
+    tgt = info.get("targetMeanPrice")
+    if key and key != "none":
+        rating = {
+            "key": key,
+            "n": info.get("numberOfAnalystOpinions"),
+            "target": round(float(tgt), 2) if tgt else None,
+            "upside_pct": round((float(tgt) / price - 1) * 100, 1) if tgt else None,
+        }
+
+    # quotazione pre/after market (se la sessione la espone)
+    prepost = None
+    for pk, lab in (("preMarketPrice", "pre"), ("postMarketPrice", "after")):
+        p = info.get(pk)
+        if p:
+            prepost = {"label": lab, "price": round(float(p), 2),
+                       "change_pct": round((float(p) / price - 1) * 100, 2)}
+            break
+
+    eps = info.get("trailingEps")
+    beta = info.get("beta")
+
+    # conto economico annuale (ricavi, utile netto, margine) + Financial Health Score
+    financials, fin_health = [], None
+    if currency == "USD" and ticker not in ("BTC-USD", "CL=F"):
+        try:
+            inc = t.income_stmt
+            rev_row = inc.loc["Total Revenue"] if "Total Revenue" in inc.index else None
+            ni_row = inc.loc["Net Income"] if "Net Income" in inc.index else None
+            if rev_row is not None and ni_row is not None:
+                for col in list(inc.columns)[:5]:
+                    rev, ni = rev_row.get(col), ni_row.get(col)
+                    if rev and not pd.isna(rev) and ni is not None and not pd.isna(ni):
+                        financials.append({"year": int(pd.Timestamp(col).year),
+                                           "revenue": round(float(rev)),
+                                           "net_income": round(float(ni)),
+                                           "margin": round(float(ni) / float(rev) * 100, 1)})
+                financials.sort(key=lambda x: x["year"])
+            if len(financials) >= 2:
+                revs = [f["revenue"] for f in financials]
+                margins = [f["margin"] for f in financials]
+                growth = (revs[-1] / revs[0]) ** (1 / max(1, len(revs) - 1)) - 1 if revs[0] > 0 else 0
+                pos_years = sum(1 for f in financials if f["net_income"] > 0) / len(financials)
+                margin_avg = sum(margins) / len(margins)
+                margin_std = (sum((mm - margin_avg) ** 2 for mm in margins) / len(margins)) ** 0.5
+                fin_health = round(clamp(
+                    clamp(50 + growth * 250) * 0.4 +       # crescita ricavi
+                    pos_years * 100 * 0.3 +                 # costanza utili
+                    clamp(100 - margin_std * 4) * 0.3))     # stabilità margine
+        except Exception as e:  # noqa: BLE001
+            print(f"!! financials {ticker}: {e}", file=sys.stderr)
+
+    # statistiche chiave (come scheda "Più dati finanziari") + stime
+    stats = None
+    if currency == "USD" and ticker not in ("BTC-USD", "CL=F"):
+        g = info.get
+        def num(*keys):
+            for k in keys:
+                v = g(k)
+                if v is not None and not (isinstance(v, float) and math.isnan(v)):
+                    return float(v)
+            return None
+        shares_out = num("sharesOutstanding", "impliedSharesOutstanding")
+        float_sh = num("floatShares")
+        stats = {
+            "market_cap": num("marketCap"),
+            "shares": shares_out,
+            "float_shares": float_sh,
+            "float_pct": round(float_sh / shares_out * 100, 1) if float_sh and shares_out else None,
+            "avg_volume_30d": num("averageVolume", "averageDailyVolume10Day"),
+            "pe_ttm": num("trailingPE"),
+            "forward_pe": num("forwardPE"),
+            "eps_ttm": num("trailingEps"),
+            "eps_forward": num("forwardEps"),
+            "revenue_fy": num("totalRevenue"),
+            "net_income_fy": num("netIncomeToCommon"),
+            "revenue_growth": num("revenueGrowth"),
+            "earnings_growth": num("earningsGrowth", "earningsQuarterlyGrowth"),
+            "profit_margin": num("profitMargins"),
+            "roe": num("returnOnEquity"),
+            "debt_to_equity": num("debtToEquity"),
+            "dividend_yield": num("dividendYield"),
+            "price_to_book": num("priceToBook"),
+            "target_mean": num("targetMeanPrice"),
+            "fcf": num("freeCashflow"),
+        }
+        stats = {k: (round(v, 4) if v is not None else None) for k, v in stats.items()}
+
+    # salute tecnica 0-100 (per il termometro di portafoglio)
+    parts = []
+    if rsi is not None:
+        parts.append(rsi)
+    parts.append(100 if (sma50 and sma200 and price > sma50 > sma200) else
+                 70 if (sma50 and price > sma50) else
+                 50 if (sma200 and price > sma200) else 20)
+    m1 = sparks["m1"]
+    if len(m1) > 1 and m1[0]:
+        parts.append(clamp(50 + (m1[-1] / m1[0] - 1) * 100 * 5))
+    health = round(sum(parts) / len(parts)) if parts else None
+
+    auto_name = (info.get("shortName") or ticker).strip()
+    if len(auto_name) > 26:
+        auto_name = auto_name[:25].rstrip() + "…"
+    return {
+        "ticker": ticker,
+        "name": name or auto_name,
+        "currency": currency,
+        "price": round(price, 2),
+        "change_pct": round((price / prev - 1) * 100, 2),
+        "pe": round(float(pe), 1) if pe and pe > 0 else None,
+        "ath": round(ath, 2),
+        "ath_dist_pct": round((price / ath - 1) * 100, 1),
+        "support": round(float(hist["Low"].tail(20).min()), 2),
+        "resistance": round(float(hist["High"].tail(20).max()), 2),
+        "rsi": rsi,
+        "volume": int(vol),
+        "vol_ratio": round(vol / vol_avg30, 2) if vol_avg30 else None,
+        "signal": sig,
+        "signal_class": sig_class,
+        "sparks": sparks,
+        "earnings_date": earnings_date,
+        "rating": rating,
+        "health": health,
+        "eps": round(float(eps), 2) if eps is not None else None,
+        "beta": round(float(beta), 2) if beta is not None else None,
+        "prepost": prepost,
+        "sector": info.get("sector") or info.get("quoteType") or "Altro",
+        "stats": stats,
+        "tech_by_range": tech_by_range,
+        "financials": financials,
+        "fin_health": fin_health,
+    }
+
+
+def fetch_equities():
+    rows = []
+    for pos in PORTFOLIO:
+        row = fetch_symbol(pos["ticker"], pos["name"])
+        if not row:
+            continue
+        value = row["price"] * pos["qty"]
+        cost = pos["pmc"] * pos["qty"]
+        row.update({
+            "qty": pos["qty"], "pmc": pos["pmc"],
+            "value": round(value, 2),
+            "gain": round(value - cost, 2),
+            "gain_pct": round((value / cost - 1) * 100, 2),
+        })
+        rows.append(row)
+    return rows
+
+
+def fetch_watchlist():
+    rows = []
+    for w in WATCHLIST:
+        row = fetch_symbol(w["ticker"], w.get("name"), w.get("currency", "USD"))
+        if row:
+            rows.append(row)
+    return rows
+
+
+def fetch_btp():
+    price = BTP["fallback_price"]
+    try:
+        url = f"https://www.borsaitaliana.it/borsa/obbligazioni/mot/btp/scheda/{BTP['isin']}.html"
+        html = http_get(url).text
+        m = re.search(r'Prezzo ufficiale[^0-9]{0,200}?([0-9]{2,3}[.,][0-9]{1,4})', html) or \
+            re.search(r'"lastPrice"\s*:\s*([0-9.]+)', html) or \
+            re.search(r'Ultimo prezzo[^0-9]{0,200}?([0-9]{2,3}[.,][0-9]{1,4})', html) or \
+            re.search(r'-\s*Prezzo[^0-9]{0,80}?([0-9]{2,3},[0-9]{1,4})', html)
+        if m:
+            price = float(m.group(1).replace(",", "."))
+    except Exception as e:  # noqa: BLE001
+        print(f"!! prezzo BTP non disponibile, uso fallback: {e}", file=sys.stderr)
+    value = BTP["nominal"] * price / 100
+    cost = BTP["nominal"] * BTP["pmc"] / 100
+    return {
+        "ticker": BTP["ticker"], "name": BTP["name"], "isin": BTP["isin"],
+        "qty": BTP["nominal"], "pmc": BTP["pmc"], "currency": "EUR",
+        "price": round(price, 2), "change_pct": None,
+        "value": round(value, 2), "gain": round(value - cost, 2),
+        "gain_pct": round((value / cost - 1) * 100, 2),
+        "pe": None, "ath": None, "ath_dist_pct": None,
+        "support": None, "resistance": None, "rsi": None,
+        "volume": None, "vol_ratio": None,
+        "signal": "Cedola 4,10/4,50%", "signal_class": "info",
+        "sparks": {}, "earnings_date": None, "rating": None, "health": None,
+        "eps": None, "beta": None, "prepost": None,
+        "sector": "Obbligazioni", "tech_by_range": {}, "stats": None,
+        "financials": [], "fin_health": None,
+    }
+
+
+def fred_series(series_id, n=14):
+    # con FRED_API_KEY (gratuita, https://fred.stlouisfed.org/docs/api/api_key.html)
+    # usa l'API ufficiale, molto più affidabile del csv pubblico
+    key = os.environ.get("FRED_API_KEY")
+    if key:
+        r = http_get("https://api.stlouisfed.org/fred/series/observations"
+                     f"?series_id={series_id}&api_key={key}&file_type=json"
+                     f"&sort_order=desc&limit={n + 4}")
+        obs = r.json()["observations"]
+        out = []
+        for o in reversed(obs):
+            try:
+                out.append((o["date"], float(o["value"])))
+            except ValueError:
+                continue
+        return out[-n:]
+    r = http_get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}")
+    out = []
+    for line in r.text.strip().splitlines()[1:]:
+        date, _, val = line.partition(",")
+        try:
+            out.append((date, float(val)))
+        except ValueError:
+            continue
+    return out[-n:]
+
+
+def bls_series(series_id, n=14):
+    """Fallback per le serie BLS (CPI, NFP, disoccupazione) — API pubblica v1, senza chiave."""
+    r = http_get(f"https://api.bls.gov/publicAPI/v1/timeseries/data/{series_id}")
+    rows = r.json()["Results"]["series"][0]["data"]
+    out = []
+    for x in rows:
+        if not x["period"].startswith("M") or x["period"] == "M13":  # M13 = media annuale
+            continue
+        try:
+            out.append((f"{x['year']}-{x['period'][1:]}-01", float(x["value"].replace(",", ""))))
+        except ValueError:
+            continue
+    out.reverse()
+    return out[-n:]
+
+
+def dbnomics_series(code, n=14):
+    """Fallback via DBnomics (BEA, OECD...)."""
+    r = http_get(f"https://api.db.nomics.world/v22/series/{code}?observations=1&format=json")
+    doc = r.json()["series"]["docs"][0]
+    pairs = [(p, v) for p, v in zip(doc["period"], doc["value"]) if isinstance(v, (int, float))]
+    return pairs[-n:]
+
+
+def jgb10_yield():
+    """Rendimento JGB 10 anni dal csv ufficiale del MOF giapponese (mese corrente)."""
+    text = http_get("https://www.mof.go.jp/jgbs/reference/interest_rate/jgbcm.csv").content.decode("shift_jis", errors="ignore")
+    last = None
+    for line in text.splitlines():
+        cols = line.split(",")
+        # righe dati: data in era Reiwa (es. R8.6.12), 10 anni = 11ª colonna
+        if len(cols) > 10 and re.match(r"^[A-Z]\d+\.\d+\.\d+$", cols[0].strip()):
+            try:
+                last = float(cols[10])
+            except ValueError:
+                continue
+    if last is None:
+        raise ValueError("csv MOF senza dati 10 anni")
+    return last
+
+
+def series_fallback(label, primary, fallback=None):
+    try:
+        return primary()
+    except Exception as e:  # noqa: BLE001
+        print(f"!! {label}: fonte primaria ko ({e}), provo fallback", file=sys.stderr)
+        if fallback is None:
+            raise
+        return fallback()
+
+
+def fetch_macro():
+    macro = {}
+
+    # CNN Fear & Greed (con i 7 componenti, come su cnn.com/markets/fear-and-greed)
+    try:
+        data = http_get("https://production.dataviz.cnn.io/index/fearandgreed/graphdata").json()
+        fg = data["fear_and_greed"]
+        comp_labels = {
+            "market_momentum_sp500": "Momentum S&P 500",
+            "stock_price_strength": "Forza dei prezzi",
+            "stock_price_breadth": "Ampiezza del mercato",
+            "put_call_options": "Opzioni Put/Call",
+            "market_volatility_vix": "Volatilità (VIX)",
+            "safe_haven_demand": "Domanda beni rifugio",
+            "junk_bond_demand": "Domanda bond high yield",
+        }
+        comps = []
+        for key, lab in comp_labels.items():
+            c = data.get(key)
+            if isinstance(c, dict) and c.get("rating"):
+                comps.append({"label": lab, "rating": c["rating"],
+                              "score": round(c["score"]) if c.get("score") is not None else None})
+        # FOMO derivato: avidità + momentum recente S&P 500 (più sale forte, più FOMO)
+        fomo = None
+        try:
+            sp = yf.Ticker("^GSPC").history(period="1mo")["Close"].dropna()
+            mom = (float(sp.iloc[-1]) / float(sp.iloc[0]) - 1) * 100
+            fomo = round(max(0, min(100, 0.6 * fg["score"] + 0.4 * (50 + mom * 6))))
+        except Exception:  # noqa: BLE001
+            fomo = round(fg["score"])
+        fomo_label = "FOMO elevata" if fomo >= 70 else "FOMO moderata" if fomo >= 50 else "Nessuna FOMO"
+        macro["fear_greed"] = {
+            "score": round(fg["score"]), "rating": fg["rating"],
+            "prev_close": round(fg.get("previous_close", 0)),
+            "week_ago": round(fg.get("previous_1_week", 0)),
+            "month_ago": round(fg.get("previous_1_month", 0)),
+            "year_ago": round(fg.get("previous_1_year", 0)),
+            "components": comps,
+            "fomo": fomo, "fomo_label": fomo_label,
+        }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! fear&greed: {e}", file=sys.stderr)
+
+    # VIX
+    try:
+        h = yf.Ticker("^VIX").history(period="3mo")["Close"]
+        macro["vix"] = {
+            "value": round(float(h.iloc[-1]), 2),
+            "change_pct": round((float(h.iloc[-1]) / float(h.iloc[-2]) - 1) * 100, 2),
+            "spark": [round(float(c), 2) for c in h.tail(30)],
+        }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! vix: {e}", file=sys.stderr)
+
+    # FedWatch (tassi impliciti dai futures Fed Funds 30-day)
+    try:
+        zq = yf.Ticker("ZQ=F").fast_info.last_price
+        implied = round(100 - float(zq), 2)
+        target = target_low = None
+        try:                                        # 1) FRED
+            target = fred_series("DFEDTARU", 1)[-1][1]
+            target_low = fred_series("DFEDTARL", 1)[-1][1]
+        except Exception:  # noqa: BLE001
+            try:                                    # 2) NY Fed
+                rr = http_get("https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json").json()["refRates"][0]
+                target, target_low = float(rr["targetRateTo"]), float(rr["targetRateFrom"])
+            except Exception:  # noqa: BLE001        # 3) fascia ricavata dal tasso implicito
+                target_low = math.floor(implied / 0.25) * 0.25
+                target = target_low + 0.25
+        mid = (target + target_low) / 2
+        # prossime riunioni FOMC 2026 con probabilità taglio implicita dai futures
+        fomc = [d for d in ("2026-01-28", "2026-03-18", "2026-04-29", "2026-06-17",
+                            "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09")
+                if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")]
+        cut_prob = round(max(0, min(100, (mid - implied) / 0.25 * 100)))
+        meetings = []
+        for i, d in enumerate(fomc[:4]):
+            p = min(100, cut_prob + i * 12)      # probabilità cumulativa crescente nel tempo
+            meetings.append({"date": d, "cut_prob": p,
+                             "hold_prob": 100 - p})
+        macro["fedwatch"] = {
+            "target_range": f"{target_low:.2f}–{target:.2f}%",
+            "implied_rate": implied,
+            "delta_bp": round((implied - mid) * 100),
+            "next_cut_prob": cut_prob,
+            "meetings": meetings,
+            # Dot Plot: mediana SEP (Summary of Economic Projections) — da aggiornare a ogni SEP
+            "dot_plot": [
+                {"year": "2026", "median": 3.6},
+                {"year": "2027", "median": 3.4},
+                {"year": "2028", "median": 3.1},
+                {"year": "Lungo periodo", "median": 3.0},
+            ],
+            "dot_plot_note": "Mediana proiezioni FOMC (SEP). Fonte: federalreserve.gov",
+        }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! fedwatch: {e}", file=sys.stderr)
+
+    # Serie FRED
+    def yoy(series):
+        return round((series[-1][1] / series[-13][1] - 1) * 100, 1), series[-1][0]
+
+    def mom(series):
+        return round((series[-1][1] / series[-2][1] - 1) * 100, 1), series[-1][0]
+
+    # impact: 0 = molto negativo per i mercati, 100 = molto positivo
+    indicators = []
+    try:
+        v, d = yoy(series_fallback("cpi", lambda: fred_series("CPIAUCSL"),
+                                   lambda: bls_series("CUSR0000SA0")))
+        indicators.append({"key": "cpi", "label": "Inflazione CPI (a/a)", "value": f"{v}%", "date": d,
+                           "impact": round(clamp(100 - abs(v - 2) * 30))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! cpi: {e}", file=sys.stderr)
+    try:
+        v, d = yoy(series_fallback("pce", lambda: fred_series("PCEPI"),
+                                   lambda: dbnomics_series("BEA/NIPA-T20804/DPCERG-M")))
+        indicators.append({"key": "pce", "label": "Inflazione PCE (a/a)", "value": f"{v}%", "date": d,
+                           "impact": round(clamp(100 - abs(v - 2) * 30))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! pce: {e}", file=sys.stderr)
+    try:
+        s = series_fallback("gdp", lambda: fred_series("A191RL1Q225SBEA", 2),
+                            lambda: dbnomics_series("BEA/NIPA-T10101/A191RL-Q", 2))
+        v = s[-1][1]
+        indicators.append({"key": "gdp", "label": "PIL USA (t/t ann.)", "value": f"{v}%", "date": s[-1][0],
+                           "impact": round(clamp(50 + (v - 1.5) * 25))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! gdp: {e}", file=sys.stderr)
+    try:
+        v, d = mom(fred_series("RSAFS"))
+        indicators.append({"key": "retail", "label": "Vendite al dettaglio (m/m)", "value": f"{v}%", "date": d,
+                           "impact": round(clamp(50 + v * 40))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! retail: {e}", file=sys.stderr)
+    try:
+        s = series_fallback("nfp", lambda: fred_series("PAYEMS", 3),
+                            lambda: bls_series("CES0000000001", 3))
+        delta = round((s[-1][1] - s[-2][1]))
+        indicators.append({"key": "nfp", "label": "Non-Farm Payrolls", "value": f"{delta:+d}K", "date": s[-1][0],
+                           "impact": round(clamp(50 + (delta - 100) / 4))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! nfp: {e}", file=sys.stderr)
+    try:
+        s = series_fallback("unemp", lambda: fred_series("UNRATE", 2),
+                            lambda: bls_series("LNS14000000", 2))
+        v = s[-1][1]
+        indicators.append({"key": "unemp", "label": "Disoccupazione", "value": f"{v}%", "date": s[-1][0],
+                           "impact": round(clamp(100 - (v - 3.5) * 40))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! unrate: {e}", file=sys.stderr)
+    try:
+        s = fred_series("UMCSENT", 2)
+        v = s[-1][1]
+        indicators.append({"key": "pmi", "label": "Fiducia consumatori (UMich)",
+                           "value": f"{v}", "date": s[-1][0],
+                           "impact": round(clamp((v - 40) * 1.7))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! umcsent: {e}", file=sys.stderr)
+    try:
+        s = fred_series("T10Y2Y", 1)            # spread curva 10A-2A (segnale recessione)
+        v = s[-1][1]
+        indicators.append({"key": "curve", "label": "Curva 10A-2A", "value": f"{v:+.2f} pp",
+                           "date": s[-1][0], "impact": round(clamp(50 + v * 40))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! curve: {e}", file=sys.stderr)
+
+    # prossime pubblicazioni (cadenza tipica) + sentiment per i popup macro
+    NEXT_RELEASE = {
+        "cpi": "Mensile, ~metà mese (BLS) · l'inflazione bassa è positiva per i mercati",
+        "pce": "Mensile, fine mese (BEA) · indicatore preferito dalla Fed",
+        "gdp": "Trimestrale (BEA) · crescita >2% positiva",
+        "retail": "Mensile, ~metà mese (Census) · consumi forti = economia solida",
+        "nfp": "Primo venerdì del mese (BLS) · creazione posti di lavoro",
+        "unemp": "Primo venerdì del mese (BLS) · disoccupazione bassa positiva",
+        "pmi": "Fine mese (UMich) · fiducia dei consumatori",
+        "curve": "Giornaliero (FRED) · curva invertita = rischio recessione",
+    }
+    for ind in indicators:
+        ind["next_release"] = NEXT_RELEASE.get(ind["key"], "")
+    macro["indicators"] = indicators
+
+    # Mercati di riferimento (BTC, WTI, KOSPI e Nasdaq sono in watchlist)
+    markets = []
+    for sym, label, fmt, decimals, suffix in [
+        ("^TNX", "Treasury USA 10A", "{v:.2f}%", 2, " pp"),
+        ("EURUSD=X", "EUR/USD", "{v:.4f}", 2, "%"),
+        ("EURJPY=X", "EUR/JPY", "{v:.2f}", 2, "%"),
+    ]:
+        try:
+            h = yf.Ticker(sym).history(period="5d")["Close"].dropna()
+            last, prev = float(h.iloc[-1]), float(h.iloc[-2])
+            change = round(last - prev, 2) if suffix == " pp" else round((last / prev - 1) * 100, decimals)
+            markets.append({"key": sym, "label": label,
+                            "value": fmt.format(v=last),
+                            "change_pct": change, "suffix": suffix})
+        except Exception as e:  # noqa: BLE001
+            print(f"!! mercato {sym}: {e}", file=sys.stderr)
+    macro["markets"] = markets
+
+    # Carry trade USA-Giappone (differenziale rendimenti 10 anni + trend USD/JPY)
+    try:
+        us10 = float(yf.Ticker("^TNX").fast_info.last_price)
+        jp10 = jgb10_yield()
+        hj = yf.Ticker("JPY=X").history(period="1mo")["Close"].dropna()
+        usdjpy = float(hj.iloc[-1])
+        usdjpy_chg_1m = round((usdjpy / float(hj.iloc[0]) - 1) * 100, 2)
+        spread = round(us10 - float(jp10), 2)
+        # prossime riunioni Bank of Japan (calendario 2026)
+        boj = [d for d in ("2026-01-23", "2026-03-19", "2026-04-30", "2026-06-17",
+                           "2026-07-31", "2026-09-18", "2026-10-30", "2026-12-18")
+               if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")][:3]
+        macro["carry"] = {
+            "us10": round(us10, 2), "jp10": round(float(jp10), 2), "spread": spread,
+            "usdjpy": round(usdjpy, 2), "usdjpy_chg_1m": usdjpy_chg_1m,
+            "boj_meetings": boj,
+            "note": ("Spread ampio e yen debole: carry trade USD/JPY favorevole (capitali verso il dollaro). "
+                     "Un rialzo dei tassi BoJ o un rafforzamento dello yen può innescare l'unwind del carry, "
+                     "con vendite sui mercati azionari globali." if spread >= 2.5 else
+                     "Spread in compressione: il carry trade USD/JPY è meno conveniente; "
+                     "attenzione a possibili rientri di capitali verso lo yen."),
+        }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! carry: {e}", file=sys.stderr)
+
+    # Put/Call ratio (volumi sulle prime due scadenze)
+    try:
+        sym, pc_name = PUTCALL_SYMBOL
+        b = yf.Ticker(sym)
+        puts = calls = 0
+        for exp in b.options[:2]:
+            ch = b.option_chain(exp)
+            puts += int(ch.puts["volume"].fillna(0).sum())
+            calls += int(ch.calls["volume"].fillna(0).sum())
+        if puts + calls > 0:
+            macro["putcall"] = {
+                "symbol": sym, "name": pc_name,
+                "ratio": round(puts / max(calls, 1), 2),
+                "puts": puts, "calls": calls,
+            }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! putcall: {e}", file=sys.stderr)
+
+    # Sentiment globale risk-on / risk-off (composito 0-100, 100 = risk-on)
+    comps = []
+    fg_score = macro.get("fear_greed", {}).get("score")
+    if fg_score is not None:
+        comps.append(("Fear & Greed", fg_score, .35))
+    vix_v = macro.get("vix", {}).get("value")
+    if vix_v:
+        comps.append(("VIX", clamp((35 - vix_v) / 23 * 100), .25))
+    pc_r = macro.get("putcall", {}).get("ratio")
+    if pc_r:
+        comps.append(("Put/Call", clamp((1.3 - pc_r) / 0.6 * 100), .15))
+    try:
+        hb = yf.Ticker("BTC-USD").history(period="5d")["Close"].dropna()
+        btc_chg = (float(hb.iloc[-1]) / float(hb.iloc[-2]) - 1) * 100
+        comps.append(("Bitcoin", clamp(50 + btc_chg * 10), .10))
+    except Exception as e:  # noqa: BLE001
+        print(f"!! risk btc: {e}", file=sys.stderr)
+    tnx = next((m for m in markets if m["key"] == "^TNX"), None)
+    if tnx:
+        comps.append(("Treasury 10A", clamp(50 - tnx["change_pct"] * 300), .15))
+    if comps:
+        tot_w = sum(w for _, _, w in comps)
+        score = round(sum(s * w for _, s, w in comps) / tot_w)
+        macro["risk_sentiment"] = {
+            "score": score,
+            "label": "Risk-On" if score >= 60 else "Risk-Off" if score <= 40 else "Neutrale",
+            "components": [{"label": l, "score": round(s)} for l, s, _ in comps],
+        }
+
+    # Buffett Indicator (capitalizzazione totale USA / PIL)
+    try:
+        w5000 = float(yf.Ticker("^W5000").history(period="5d")["Close"].dropna().iloc[-1])  # ~ market cap in $B
+        gdp = fred_series("GDP", 1)[-1][1]                                                   # PIL annualizzato $B
+        ratio = round(w5000 / gdp * 100, 1)
+        macro["buffett"] = {
+            "ratio": ratio,
+            "score": round(clamp(100 - (ratio - 75) / 1.5)),   # alto = sopravvalutato = rosso
+            "label": "Sopravvalutato" if ratio >= 150 else "Sottovalutato" if ratio <= 90 else "Equo",
+        }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! buffett: {e}", file=sys.stderr)
+
+    macro["signposts"] = fetch_signposts()
+    macro["tilt"] = fetch_sector_tilt()
+    macro["witching"] = quadruple_witching()
+
+    # MacroQuant (riproduzione trasparente stile BCA): composito del ciclo/risk dai
+    # fattori macro disponibili. NON è il dato proprietario BCA Research.
+    mq = []
+    for i in macro.get("indicators", []):
+        if i.get("impact") is not None:
+            mq.append((i["label"], i["impact"]))
+    if macro.get("buffett"):
+        mq.append(("Valutazione (Buffett)", macro["buffett"]["score"]))
+    if macro.get("signposts"):
+        mq.append(("Segnali ribassisti BofA", 100 - macro["signposts"]["pct"]))
+    if macro.get("fear_greed"):
+        mq.append(("Fear & Greed", macro["fear_greed"]["score"]))
+    if macro.get("vix"):
+        mq.append(("Volatilità (VIX)", round(clamp(100 - macro["vix"]["value"] / 50 * 100))))
+    if mq:
+        score = round(sum(s for _, s in mq) / len(mq))
+        macro["macroquant"] = {
+            "score": score,
+            "label": "Espansione" if score >= 60 else "Contrazione" if score <= 40 else "Rallentamento",
+            "components": [{"label": l, "score": round(s)} for l, s in mq],
+            "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici "
+                    "(il MacroQuant ufficiale di BCA Research è proprietario e a pagamento).",
+        }
+    return macro
+
+
+SECTOR_ETF = {
+    "XLK": "Tecnologia", "XLF": "Finanziari", "XLE": "Energia", "XLV": "Salute",
+    "XLY": "Consumi discr.", "XLP": "Consumi difens.", "XLI": "Industriali",
+    "XLU": "Utilities", "XLB": "Materiali", "XLRE": "Immobiliare", "XLC": "Comunicazioni",
+}
+
+
+def fetch_sector_tilt():
+    """Rotazione settoriale USA: momentum 1M e 3M degli ETF SPDR di settore.
+    I settori in cima sono quelli su cui ruotare (overweight)."""
+    rows = []
+    try:
+        data = yf.download(list(SECTOR_ETF), period="6mo", interval="1d",
+                           auto_adjust=True, progress=False)["Close"]
+        for sym, name in SECTOR_ETF.items():
+            try:
+                s = data[sym].dropna()
+                m1 = (float(s.iloc[-1]) / float(s.iloc[-22]) - 1) * 100
+                m3 = (float(s.iloc[-1]) / float(s.iloc[-66]) - 1) * 100
+                rows.append({"ticker": sym, "name": name,
+                             "m1": round(m1, 1), "m3": round(m3, 1),
+                             "score": round(clamp(50 + (m1 * 0.6 + m3 * 0.4) * 2.5))})
+            except Exception:  # noqa: BLE001
+                continue
+        rows.sort(key=lambda x: x["m1"] + x["m3"], reverse=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"!! sector tilt: {e}", file=sys.stderr)
+    return rows
+
+
+def quadruple_witching():
+    """Le 'quattro streghe': 3° venerdì di mar/giu/set/dic (scadenza simultanea di
+    opzioni e futures su indici e su singole azioni)."""
+    def third_friday(y, m):
+        d = datetime(y, m, 1)
+        # primo venerdì
+        d += timedelta(days=(4 - d.weekday()) % 7)
+        return d + timedelta(days=14)
+    today = datetime.now(timezone.utc).replace(tzinfo=None)
+    dates = []
+    for y in (today.year, today.year + 1):
+        for m in (3, 6, 9, 12):
+            tf = third_friday(y, m)
+            if tf >= today:
+                dates.append(tf.strftime("%Y-%m-%d"))
+    nxt = dates[0] if dates else None
+    days = (datetime.strptime(nxt, "%Y-%m-%d") - today).days if nxt else None
+    return {
+        "next": nxt, "days": days, "upcoming": dates[:4],
+        "contracts": ["Opzioni su indici azionari", "Futures su indici azionari",
+                      "Opzioni su singole azioni", "Futures su singole azioni"],
+    }
+
+
+# BofA "Bear Market Signposts" — baseline maggio 2026; i derivabili si aggiornano da FRED
+SIGNPOSTS_BASE = [
+    ("Fiducia consumatori > 100", "Sentiment", False, "Consumer confidence >100", "FRED UMCSENT"),
+    ("Aspettative sui prezzi azionari", "Sentiment", True, "Stock price expectations", "BofA Sentiment"),
+    ("Sell-Side Indicator BofA", "Sentiment", False, "Indicatore contrarian BofA", "BofA SSI"),
+    ("Aspettative crescita utili LT", "Sentiment", True, "Long-term growth expectations", "S&P 500 Growth"),
+    ("Volume operazioni M&A", "Sentiment", True, "Number of M&A deals", "TradingEconomics"),
+    ("Regola del 20 (P/E + CPI)", "Valutazione", True, "P/E + inflazione", "Current Mkt Valuation"),
+    ("Divario titoli costosi/economici", "Valutazione", True, "Cheap vs expensive stocks", "Growth vs Value"),
+    ("Curva dei rendimenti invertita", "Macro", False, "Inverted yield curve", "FRED T10Y2Y"),
+    ("Stress sul credito", "Macro", True, "Credit stress indicator", "FRED STLFSI3"),
+    ("Inasprimento criteri di prestito", "Macro", True, "Tightening lending standards", "FRED SLOOS"),
+]
+
+
+def fetch_signposts():
+    """10 segnali BofA: aggiorna da FRED quelli calcolabili, mantiene la baseline per gli altri."""
+    items = [{"name": n, "category": c, "status": s, "desc": d, "source": src}
+             for n, c, s, d, src in SIGNPOSTS_BASE]
+    def setstatus(name, val):
+        for it in items:
+            if it["name"] == name:
+                it["status"] = bool(val)
+    try:  # fiducia consumatori > 100
+        setstatus("Fiducia consumatori > 100", fred_series("UMCSENT", 1)[-1][1] > 100)
+    except Exception:  # noqa: BLE001
+        pass
+    try:  # curva invertita (10A-2A < 0)
+        setstatus("Curva dei rendimenti invertita", fred_series("T10Y2Y", 1)[-1][1] < 0)
+    except Exception:  # noqa: BLE001
+        pass
+    try:  # stress sul credito (St. Louis Fed Financial Stress > 0)
+        setstatus("Stress sul credito", fred_series("STLFSI4", 1)[-1][1] > 0)
+    except Exception:  # noqa: BLE001
+        try:
+            setstatus("Stress sul credito", fred_series("STLFSI3", 1)[-1][1] > 0)
+        except Exception:  # noqa: BLE001
+            pass
+    try:  # banche che inaspriscono i criteri (SLOOS > 0)
+        setstatus("Inasprimento criteri di prestito", fred_series("DRTSCILM", 1)[-1][1] > 0)
+    except Exception:  # noqa: BLE001
+        pass
+    active = sum(1 for it in items if it["status"])
+    return {"items": items, "active": active, "total": len(items),
+            "pct": round(active / len(items) * 100)}
+
+
+def translate_it(text):
+    """Traduzione gratuita via endpoint pubblico di Google Translate."""
+    try:
+        url = ("https://translate.googleapis.com/translate_a/single"
+               "?client=gtx&sl=auto&tl=it&dt=t&q=" + urllib.parse.quote(text))
+        seg = http_get(url, tries=1, timeout=10).json()[0]
+        out = "".join(s[0] for s in seg if s and s[0]).strip()
+        return out or None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def fetch_portfolio_history(btp_value_eur):
+    """Valore del portafoglio (EUR) nel tempo, a composizione attuale, con benchmark
+    Nasdaq sovrapponibile. Serie: 1S / 1M / 3M / 12M / 5A / Max."""
+    tickers = [p["ticker"] for p in PORTFOLIO]
+    qty = {p["ticker"]: p["qty"] for p in PORTFOLIO}
+    benches = {"nasdaq": "^IXIC", "ndx": "^NDX", "sp500": "^GSPC", "russell": "^RUT"}
+    try:
+        data = yf.download(tickers + list(benches.values()), period="5y", interval="1d",
+                           auto_adjust=True, progress=False)["Close"]
+        if isinstance(data, pd.Series):
+            data = data.to_frame()
+        fx = yf.Ticker("EURUSD=X").history(period="5y")["Close"]
+        fx.index = fx.index.tz_localize(None)
+        data.index = pd.to_datetime(data.index).tz_localize(None)
+        bench_series = {k: data[sym] for k, sym in benches.items() if sym in data.columns}
+        df = data[tickers].dropna()              # parte da quando tutti i titoli esistono
+        if df.empty:
+            return None
+        eur = fx.reindex(df.index, method="ffill").bfill()
+        usd_val = sum(df[t] * qty[t] for t in tickers if t in df.columns)
+        total = (usd_val / eur + btp_value_eur).dropna()
+
+        def series(window):
+            s = total if window is None else total.tail(window)
+            step = max(1, len(s) // 120)
+            s = s.iloc[::step]
+            out = {"dates": [d.strftime("%Y-%m-%d") for d in s.index],
+                   "values": [round(float(v)) for v in s.values]}
+            base_p = float(s.iloc[0])
+            for k, ser in bench_series.items():   # indici riscalati al valore iniziale del periodo
+                n = ser.reindex(s.index, method="ffill")
+                if len(n) and n.iloc[0]:
+                    out[k] = [round(float(x) / float(n.iloc[0]) * base_p) for x in n.values]
+            return out
+
+        out = {"w1": series(5), "m1": series(22), "m3": series(66),
+               "y1": series(252), "y5": series(None), "all": series(None)}
+        # àncora la curva al controvalore reale del broker (l'ultimo punto = valore reale)
+        if BROKER and BROKER.get("controvalore_totale"):
+            real = float(BROKER["controvalore_totale"])
+            for s in out.values():
+                if s["values"]:
+                    k = real / s["values"][-1]
+                    s["values"] = [round(v * k) for v in s["values"]]
+                    if "nasdaq" in s:
+                        s["nasdaq"] = [round(v * k) for v in s["nasdaq"]]
+        return out
+    except Exception as e:  # noqa: BLE001
+        print(f"!! storico portafoglio: {e}", file=sys.stderr)
+        return None
+
+
+def fetch_top_caps(n=10):
+    """Classifica delle aziende più capitalizzate (candidati noti, ordinati per market cap)."""
+    rows, fx = [], {}
+    for sym, name in TOP_CAP_CANDIDATES.items():
+        try:
+            fi = yf.Ticker(sym).fast_info
+            mc = fi.market_cap
+            if not mc:
+                continue
+            curr = (fi.currency or "USD").upper()
+            if curr != "USD":
+                if curr not in fx:
+                    fx[curr] = float(yf.Ticker(f"{curr}USD=X").fast_info.last_price)
+                mc *= fx[curr]
+            chg = (float(fi.last_price) / float(fi.previous_close) - 1) * 100
+            rows.append({"ticker": sym, "name": name,
+                         "mcap_usd": round(mc), "change_pct": round(chg, 2)})
+        except Exception as e:  # noqa: BLE001
+            print(f"!! topcap {sym}: {e}", file=sys.stderr)
+    rows.sort(key=lambda x: x["mcap_usd"], reverse=True)
+    return rows[:n]
+
+
+def parse_feed_entries(url):
+    """Restituisce [(title, link, ts)] da un feed RSS; se bloccato usa rss2json."""
+    out = []
+    try:
+        r = http_get(url, timeout=20)
+        feed = feedparser.parse(r.content)
+        for e in feed.entries[:25]:
+            ts = None
+            for k in ("published_parsed", "updated_parsed"):
+                if e.get(k):
+                    ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", e[k])
+                    break
+            out.append((e.get("title", "").strip(), e.get("link", ""), ts))
+    except Exception as e:  # noqa: BLE001
+        print(f"!! feed diretto ko ({url[:40]}): {e}", file=sys.stderr)
+    if not out:  # fallback gratuito rss2json
+        try:
+            j = http_get("https://api.rss2json.com/v1/api.json?rss_url="
+                         + urllib.parse.quote(url), timeout=20).json()
+            for e in (j.get("items") or [])[:25]:
+                ts = None
+                if e.get("pubDate"):
+                    try:
+                        ts = datetime.strptime(e["pubDate"][:19], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%dT%H:%M:%SZ")
+                    except ValueError:
+                        ts = None
+                out.append((e.get("title", "").strip(), e.get("link", ""), ts))
+        except Exception as e:  # noqa: BLE001
+            print(f"!! rss2json ko ({url[:40]}): {e}", file=sys.stderr)
+    return out
+
+
+def fetch_predictions(limit=6):
+    """Mercati di previsione Polymarket su temi macro/finanza (sezione separata)."""
+    ms = []
+    for order in ("volume24hr", "volumeNum"):   # i più attivi oggi sono i macro reali
+        try:
+            ms += http_get("https://gamma-api.polymarket.com/markets"
+                           f"?closed=false&active=true&order={order}&ascending=false&limit=150").json()
+        except Exception as e:  # noqa: BLE001
+            print(f"!! polymarket ({order}): {e}", file=sys.stderr)
+    # macro/finanza puri (Fed, inflazione, recessione, mercati, crypto)
+    pat = re.compile(r"\bfed\b|rate cut|interest rate|\binflation\b|recession|s&p|nasdaq|"
+                     r"\bbitcoin\b|ethereum|\bgdp\b|tariff|powell|shutdown|\bcpi\b|jobs report|"
+                     r"debt ceiling|stock market|\bnvidia\b|\btesla\b|\beconomy\b|jerome", re.I)
+    skip = re.compile(r"world cup|fifa|super bowl|oscar|grammy|nba|nfl|soccer|jesus|"
+                      r"oprah|taylor swift|champions league|lebron|movie|album|"
+                      r"\bufc\b|tennis|olympic|nobel|miss universe|grand slam", re.I)
+    out, seen = [], set()
+    for m in ms:
+        q = (m.get("question") or "").strip()
+        if not q or q in seen or not pat.search(q) or skip.search(q):
+            continue
+        try:
+            pr = m.get("outcomePrices")
+            pr = json.loads(pr) if isinstance(pr, str) else pr
+            yes = round(float(pr[0]) * 100)
+        except Exception:  # noqa: BLE001
+            continue
+        if yes < 2:                             # scarta solo i mercati quasi impossibili
+            continue
+        seen.add(q)
+        slug = m.get("slug", "")
+        out.append({"question": q, "yes": yes,
+                    "link": f"https://polymarket.com/event/{slug}" if slug else "https://polymarket.com"})
+        if len(out) >= limit:
+            break
+    return out
+
+
+# lessico per il sentiment rule-based delle news (mercato)
+BULL_WORDS = re.compile(r"\b(surge|soar|rally|jump|beat|beats|record|高|gain|gains|upgrade|"
+                        r"bullish|outperform|tops|wins|approval|breakthrough|strong|boost|"
+                        r"rises?|climb|optimis|profit|growth|cut rates?)\b", re.I)
+BEAR_WORDS = re.compile(r"\b(plunge|slump|crash|fall|falls|drop|drops|miss|misses|downgrade|"
+                        r"bearish|underperform|warning|warns|lawsuit|probe|recall|cut[s]? guidance|"
+                        r"layoff|tariff|sanction|war|conflict|fear|selloff|loss|losses|weak|slowdown|ban)\b", re.I)
+
+
+def news_sentiment(title):
+    b = len(BULL_WORDS.findall(title))
+    s = len(BEAR_WORDS.findall(title))
+    if b > s:
+        return "bull"
+    if s > b:
+        return "bear"
+    return "neutral"
+
+
+# gruppo Politica/geopolitica (distinto dal Macro economico)
+POL_KEYWORDS = [r"\btrump\b", r"white house", r"\bcongress\b", r"\bsenate\b", r"\bbiden\b",
+                r"election", r"\biran\b", r"\bisrael\b", r"\bgaza\b", r"\bwar\b", r"conflict",
+                r"\brussia\b", r"\bukraine\b", r"sanction", r"tariff", r"geopolit",
+                r"\bnato\b", r"\bopec\b", r"government shutdown", r"middle east", r"nuclear"]
+
+
+def build_keywords():
+    """Parole chiave news: macro + politica + ticker/nome di ogni posizione in
+    portafoglio E watchlist (le news si adattano quando aggiungi/rimuovi titoli)."""
+    kw = {"MACRO": PORTFOLIO_KEYWORDS["MACRO"], "POL": POL_KEYWORDS}
+    for p in PORTFOLIO + [w for w in WATCHLIST if w.get("currency") != "PTS"]:
+        tk = p["ticker"]
+        if tk == "BTP-V28":
+            kw[tk] = [r"\bbtp\b", r"italian bond", r"italy bond"]
+            continue
+        if tk in ("BTC-USD",):
+            kw[tk] = [r"\bbitcoin\b", r"\bcrypto\b"]
+            continue
+        if tk in ("CL=F",):
+            kw[tk] = [r"oil price", r"crude oil", r"\bopec\b"]
+            continue
+        terms = [re.escape(tk.lower())]
+        nm = (p.get("name") or "").lower().split(" ")[0]
+        if len(nm) >= 3 and nm not in ("the", "inc", "corp"):
+            terms.append(re.escape(nm))
+        kw[tk] = [rf"\b{t}\b" for t in terms]
+    return kw
+
+
+STOPWORDS = set("the a an of to in on for and or with at by from is are be as has have new "
+                "il lo la i gli le di a da in con su per tra fra e o un una che è ha "
+                "after before says will would could after amid over into out up down "
+                "us usa dopo prima oltre verso più meno come".split())
+
+
+def topic_key(title):
+    """Parole significative del titolo, per riconoscere notizie sullo stesso argomento."""
+    words = re.findall(r"[a-zàèéìòù0-9]{4,}", title.lower())
+    return {w for w in words if w not in STOPWORDS}
+
+
+def is_duplicate_topic(key, kept_keys):
+    for k in kept_keys:
+        union = key | k
+        if union and len(key & k) / len(union) >= 0.5:   # >=50% di parole in comune
+            return True
+    return False
+
+
+def fetch_news():
+    """News sui titoli in portafoglio (dinamiche) + macro/politica/geopolitica, tradotte.
+    Esclude articoli a pagamento e doppioni sullo stesso argomento. Include Polymarket."""
+    keywords = build_keywords()
+    # solo notizie delle ultime 30 ore (≈1 giorno)
+    cutoff = datetime.now(timezone.utc).timestamp() - 30 * 3600
+    def fresh(ts):
+        if not ts:
+            return True   # senza data: tenuta (molti feed sono comunque recenti)
+        try:
+            return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp() >= cutoff
+        except ValueError:
+            return True
+    items, seen_titles, kept_keys, per_source = [], set(), [], {}
+    for source, url in build_feeds():
+        for title, link, ts in parse_feed_entries(url):
+            if not title or title.lower() in seen_titles:
+                continue
+            if not fresh(ts):                      # niente notizie più vecchie di ~1 giorno
+                continue
+            # paywall: non scartare, ma punta a una ricerca Google (versione gratuita)
+            if any(d in (link or "").lower() for d in PAYWALL_DOMAINS):
+                link = "https://news.google.com/search?q=" + urllib.parse.quote(title)
+            tickers = [tk for tk, kws in keywords.items()
+                       if any(re.search(kw, title.lower()) for kw in kws)]
+            if not tickers:
+                continue
+            key = topic_key(title)
+            if is_duplicate_topic(key, kept_keys):     # niente doppioni di argomento
+                continue
+            cap = 16 if source == "Investing.com" else 6   # Investing prioritario
+            if per_source.get(source, 0) >= cap:
+                continue
+            seen_titles.add(title.lower())
+            kept_keys.append(key)
+            per_source[source] = per_source.get(source, 0) + 1
+            # priorità ARGOMENTO: macro/politica (0) > portafoglio (1) > watchlist (2) > resto (3)
+            pf_tk = {p["ticker"] for p in PORTFOLIO}
+            wl_tk = {w["ticker"] for w in WATCHLIST}
+            if "MACRO" in tickers or "POL" in tickers:
+                topic_pri = 0
+            elif any(t in pf_tk for t in tickers):
+                topic_pri = 1
+            elif any(t in wl_tk for t in tickers):
+                topic_pri = 2
+            else:
+                topic_pri = 3
+            items.append({"source": source, "title": title, "link": link,
+                          "published": ts, "tickers": tickers,
+                          "topic_pri": topic_pri, "inv": source == "Investing.com",
+                          "sentiment": news_sentiment(title)})
+    # ordina: prima per argomento (macro/politica→portafoglio→watchlist→resto),
+    # dentro ogni gruppo Investing.com in cima e poi per data
+    items.sort(key=lambda x: x["published"] or "", reverse=True)
+    items.sort(key=lambda x: (x["topic_pri"], 0 if x["inv"] else 1))
+    items = items[:48]
+    for it in items:
+        it["title_it"] = translate_it(it["title"])
+    # mercati di previsione Polymarket, integrati nelle news
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    for p in fetch_predictions():
+        items.append({"source": "Polymarket", "title": p["question"],
+                      "title_it": f"{p['question']} — probabilità Sì {p['yes']}%",
+                      "link": p["link"], "published": now,
+                      "tickers": ["MACRO"], "sentiment": "neutral"})
+    return items
+
+
+def main():
+    equities = fetch_equities()
+    btp = fetch_btp()
+    watchlist = fetch_watchlist()
+    macro = fetch_macro()
+
+    # termometro: media della salute tecnica dei titoli in portafoglio
+    healths = [r["health"] for r in equities if r.get("health") is not None]
+    if healths:
+        score = round(sum(healths) / len(healths))
+        macro["thermometer"] = {
+            "score": score,
+            "label": "Forte" if score >= 60 else "Debole" if score <= 40 else "Neutro",
+        }
+
+    try:
+        eurusd = float(yf.Ticker("EURUSD=X").fast_info.last_price)
+    except Exception:  # noqa: BLE001
+        eurusd = 1.08
+
+    usd_value = sum(r["value"] for r in equities)
+    usd_cost = sum(r["pmc"] * r["qty"] for r in equities)
+    total_eur = usd_value / eurusd + btp["value"]
+    cost_eur = usd_cost / eurusd + BTP["nominal"] * BTP["pmc"] / 100
+
+    # stima tasse sul capital gain (solo plusvalenze)
+    stock_gain_eur = (usd_value - usd_cost) / eurusd
+    tax = TAX_STOCK * max(0, stock_gain_eur) + TAX_BTP * max(0, btp["gain"])
+    eur_gain = total_eur - cost_eur
+
+    # asset allocation dettagliata (valore in EUR per posizione, con settore)
+    allocation = []
+    for r in equities:
+        allocation.append({"ticker": r["ticker"], "name": r["name"],
+                           "value_eur": round(r["value"] / eurusd, 2),
+                           "sector": r.get("sector") or "Altro"})
+    allocation.append({"ticker": btp["ticker"], "name": btp["name"],
+                       "value_eur": round(btp["value"], 2), "sector": "Obbligazioni"})
+    allocation.sort(key=lambda x: x["value_eur"], reverse=True)
+
+    data = {
+        "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "eurusd": round(eurusd, 4),
+        "totals": {
+            "usd_value": round(usd_value, 2),
+            "usd_gain": round(usd_value - usd_cost, 2),
+            "usd_gain_pct": round((usd_value / usd_cost - 1) * 100, 2),
+            "eur_value": round(total_eur, 2),
+            "eur_gain": round(eur_gain, 2),
+            "eur_gain_pct": round((total_eur / cost_eur - 1) * 100, 2),
+            "tax_est": round(tax, 2),
+            "eur_gain_net": round(eur_gain - tax, 2),
+        },
+        "portfolio": equities + [btp],
+        "watchlist": watchlist,
+        "allocation": allocation,
+        "history": fetch_portfolio_history(btp["value"]),
+        "macro": macro,
+        "broker": BROKER,
+        "top_caps": fetch_top_caps(),
+        "predictions": fetch_predictions(),
+        "news": fetch_news(),
+    }
+
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1))
+    print(f"OK -> {OUT} ({OUT.stat().st_size // 1024} KB)")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Dashboard — Portafoglio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=29">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div>
+      <h1>Trading Dashboard</h1>
+      <div class="updated">Dati workflow: <span id="updated-at">—</span> · <span class="live" id="live-badge"></span></div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn btn-primary" id="btn-prompt" aria-label="Copia il prompt con tutti i dati da incollare in un'AI" title="Copia il prompt (tabella Markdown)">Copia prompt AI</button>
+    <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna prezzi live e rigenera i dati" title="Aggiorna prezzi live e rigenera i dati (col token)">⟳ Aggiorna</button>
+  </div>
+</header>
+
+<main>
+  <!-- CASH + KPI -->
+  <section class="cash-box">
+    <label for="cash-input">Liquidità disponibile (€)</label>
+    <input type="number" id="cash-input" min="0" step="any" placeholder="es. 20000" aria-label="Liquidità disponibile in euro">
+    <button class="btn btn-primary btn-sm" id="cash-save">Salva</button>
+    <span class="muted" id="cash-note"></span>
+  </section>
+  <section class="kpi-grid" id="kpi-grid"></section>
+  <div class="btp-info" id="btp-info"></div>
+
+  <!-- ANDAMENTO & ALLOCAZIONE -->
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-head">
+        <h2>Andamento portafoglio</h2>
+        <div class="spark-toggle" id="hist-toggle" role="group" aria-label="Intervallo temporale andamento">
+          <button class="chip" data-range="w1" aria-label="Una settimana">1S</button>
+          <button class="chip" data-range="m1" aria-label="Un mese">1M</button>
+          <button class="chip" data-range="m3" aria-label="Tre mesi">3M</button>
+          <button class="chip" data-range="y1" aria-label="Dodici mesi">12M</button>
+          <button class="chip" data-range="y5" aria-label="Cinque anni">5A</button>
+          <button class="chip chip-active" data-range="all" aria-label="Massimo, dall'inizio">Max</button>
+        </div>
+        <label class="bench-toggle">Confronta:
+          <select id="bench-select" class="pmc-input" style="width:auto;padding:4px 8px">
+            <option value="none">nessuno</option>
+            <option value="nasdaq">Nasdaq Comp.</option>
+            <option value="ndx" selected>Nasdaq 100</option>
+            <option value="sp500">S&amp;P 500</option>
+            <option value="russell">Russell 2000</option>
+          </select>
+        </label>
+        <button class="btn btn-ghost btn-sm" id="hist-zoom" aria-label="Ingrandisci il grafico" title="Ingrandisci">Ingrandisci</button>
+      </div>
+      <div id="hist-chart"></div>
+      <div class="hist-summary muted" id="hist-summary"></div>
+    </section>
+    <section class="card">
+      <div class="card-head">
+        <h2>Asset allocation</h2>
+        <div class="spark-toggle" id="alloc-toggle" role="group" aria-label="Vista allocazione">
+          <button class="chip chip-active" data-mode="ticker">Per titolo</button>
+          <button class="chip" data-mode="sector">Per settore</button>
+        </div>
+      </div>
+      <div class="alloc-wrap">
+        <div id="alloc-donut"></div>
+        <ul class="alloc-legend" id="alloc-legend"></ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- MACRO & MERCATI -->
+  <section class="card">
+    <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
+    <div class="mini-cards">
+      <div class="mini-card" id="market-direction" tabindex="0" role="button" title="Direzione di mercato — media di tutti i segnali"></div>
+      <div class="mini-card" id="macroquant-box" tabindex="0" role="button" title="MacroQuant (stile BCA) — clicca per il dettaglio"></div>
+      <div class="mini-card" id="signposts-box" tabindex="0" role="button" title="BofA Bear Market Signposts — clicca per il dettaglio"></div>
+      <div class="mini-card" id="tilt-box" tabindex="0" role="button" title="Rotazione settoriale — clicca per il dettaglio"></div>
+      <div class="mini-card" id="witching-box" tabindex="0" role="button" title="Quadruple Witching — clicca per il dettaglio"></div>
+    </div>
+    <div class="gauges" id="gauges"></div>
+    <div class="macro-grid macro-grid-below" id="macro-grid"></div>
+    <div class="topcaps" id="topcaps"></div>
+  </section>
+
+  <!-- PORTAFOGLIO -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Portafoglio &amp; Dati Tecnici</h2>
+    </div>
+    <div class="earnings-strip" id="earnings-strip" aria-label="Prossime trimestrali"></div>
+    <div class="range-bar">
+      <span class="range-lab">Intervallo dati tecnici e grafico:</span>
+      <div class="spark-toggle" id="spark-toggle" role="group" aria-label="Intervallo analisi tecnica e mini-grafico">
+        <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
+        <button class="chip" data-range="w1" aria-label="Una settimana">1S</button>
+        <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
+        <button class="chip" data-range="m3" aria-label="Tre mesi">3M</button>
+        <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="ptf-edit" aria-label="Aggiungi o rimuovi titoli dal portafoglio" title="Aggiungi o rimuovi titoli">✎ Modifica</button>
+    </div>
+    <div class="table-wrap">
+      <table id="ptf-table" aria-label="Portafoglio con prezzi, valore, guadagno e analisi tecnica">
+        <thead>
+          <tr>
+            <th class="sticky-col">Titolo</th>
+            <th class="num">Qtà</th>
+            <th class="num">PMC</th>
+            <th class="num">Prezzo</th>
+            <th class="num">Oggi</th>
+            <th class="num">Pre/After</th>
+            <th class="num">Volume</th>
+            <th class="num">Valore</th>
+            <th class="num">Guadagno</th>
+            <th class="num">Guad. %</th>
+            <th class="num">P/E</th>
+            <th class="num">EPS</th>
+            <th class="num">Beta</th>
+            <th class="num">Max storico</th>
+            <th class="num">Supporto</th>
+            <th class="num">Resistenza</th>
+            <th class="num">RSI 14</th>
+            <th class="num">Vol / media</th>
+            <th>Segnale</th>
+            <th>Rating</th>
+            <th class="num">Target Δ</th>
+            <th class="num">Financial Health</th>
+            <th>Grafico</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- WATCHLIST -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Watchlist</h2>
+      <button class="btn btn-primary btn-sm" id="wl-add-top" aria-label="Cerca e aggiungi un titolo alla watchlist" title="Cerca e aggiungi un titolo">+ Aggiungi titolo</button>
+      <button class="btn btn-ghost btn-sm" id="wl-edit" aria-label="Riordina o rimuovi titoli dalla watchlist" title="Riordina o rimuovi titoli">✎ Modifica</button>
+    </div>
+    <div class="range-bar">
+      <span class="range-lab">Intervallo dati tecnici e grafico:</span>
+      <div class="spark-toggle" id="spark-toggle-wl" role="group" aria-label="Intervallo analisi tecnica watchlist">
+        <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
+        <button class="chip" data-range="w1" aria-label="Una settimana">1S</button>
+        <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
+        <button class="chip" data-range="m3" aria-label="Tre mesi">3M</button>
+        <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="wl-table" aria-label="Watchlist con prezzi e analisi tecnica">
+        <thead>
+          <tr>
+            <th class="sticky-col">Titolo</th>
+            <th class="num">Prezzo</th>
+            <th class="num">Oggi</th>
+            <th class="num">Pre/After</th>
+            <th class="num">Volume</th>
+            <th class="num">P/E</th>
+            <th class="num">EPS</th>
+            <th class="num">Beta</th>
+            <th class="num">Max storico</th>
+            <th class="num">Supporto</th>
+            <th class="num">Resistenza</th>
+            <th class="num">RSI 14</th>
+            <th class="num">Vol / media</th>
+            <th>Segnale</th>
+            <th>Rating</th>
+            <th class="num">Target Δ</th>
+            <th class="num">Financial Health</th>
+            <th>Grafico</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- NEWS -->
+  <section class="card">
+    <div class="card-head">
+      <h2>News — portafoglio &amp; macro USA</h2>
+      <span class="muted">solo notizie delle ultime 24 ore</span>
+    </div>
+    <ul class="news-list" id="news-list" aria-label="Elenco notizie"></ul>
+  </section>
+
+  <!-- CALCOLATORE PMC -->
+  <section class="card" id="pmc-calc">
+    <div class="card-head">
+      <h2>Calcolatore prezzo medio (PMC)</h2>
+      <select id="pmc-select" class="pmc-input pmc-select" title="Precompila con una posizione del portafoglio">
+        <option value="">— scegli un titolo o inserisci a mano —</option>
+      </select>
+    </div>
+    <div class="pmc-grid">
+      <div class="pmc-block">
+        <div class="m-label">Posizione attuale</div>
+        <label>Quantità <input type="number" id="pmc-q1" class="pmc-input" min="0" step="any" placeholder="es. 270"></label>
+        <label>PMC <input type="number" id="pmc-p1" class="pmc-input" min="0" step="any" placeholder="es. 87,17"></label>
+      </div>
+      <div class="pmc-block">
+        <div class="m-label">Nuovo acquisto</div>
+        <label>Quantità <input type="number" id="pmc-q2" class="pmc-input" min="0" step="any" placeholder="es. 50"></label>
+        <label>Prezzo <input type="number" id="pmc-p2" class="pmc-input" min="0" step="any" placeholder="es. 120"></label>
+      </div>
+      <div class="pmc-block pmc-result">
+        <div class="m-label">Risultato</div>
+        <div class="pmc-out">Nuovo PMC: <b id="pmc-new">—</b></div>
+        <div class="pmc-out muted">Quantità totale: <span id="pmc-qty">—</span></div>
+        <div class="pmc-out muted">Investimento totale: <span id="pmc-cost">—</span></div>
+        <div class="pmc-out muted">Variazione PMC: <span id="pmc-delta">—</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALCOLO VENDITE (PLUS/MINUS) -->
+  <section class="card" id="sell-calc">
+    <div class="card-head">
+      <h2>Calcolo vendite (plus/minusvalenze)</h2>
+      <span class="muted">Imposta quante azioni vendere per stimare il risultato netto e le tasse</span>
+    </div>
+    <div class="table-wrap">
+      <table id="sell-table" aria-label="Simulazione vendite">
+        <thead>
+          <tr>
+            <th class="sticky-col">Titolo</th>
+            <th class="num">Possedute</th>
+            <th class="num">PMC</th>
+            <th class="num">Prezzo</th>
+            <th class="num">Vendi qtà</th>
+            <th class="num">Plus/Minus (€)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="sell-summary" id="sell-summary"></div>
+  </section>
+
+  <footer>
+    Prezzi live lato client (Yahoo via proxy CORS, ogni 60s) · dati tecnici/macro/news rigenerati dal workflow ogni ~20 min.<br>
+    Fonti: Yahoo Finance · CNN Fear &amp; Greed · FRED/BLS/DBnomics · NY Fed · MOF Giappone · Borsa Italiana · RSS (CNBC, Bloomberg, Yahoo, Investing, Google News, Reddit) · Polymarket. Non è consulenza finanziaria.
+  </footer>
+</main>
+
+<!-- Modal zoom grafico -->
+<div class="modal-backdrop" id="chart-modal" hidden>
+  <div class="modal modal-chart">
+    <div class="modal-head">
+      <h3 id="chart-modal-title">Grafico</h3>
+      <button class="btn btn-ghost" id="chart-modal-close" aria-label="Chiudi grafico">✕</button>
+    </div>
+    <div id="chart-modal-body"></div>
+    <div class="muted" id="chart-modal-tip" style="margin-top:8px;font-size:13px"></div>
+  </div>
+</div>
+
+<!-- Modal prompt AI -->
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Prompt per Claude</h3>
+      <button class="btn btn-ghost" id="modal-close">✕</button>
+    </div>
+    <p class="muted">Prompt copiato negli appunti — incollalo in una chat di Claude per l'analisi AI del portafoglio.</p>
+    <textarea id="prompt-text" readonly></textarea>
+    <div class="modal-foot">
+      <button class="btn btn-primary" id="btn-copy">Copia di nuovo</button>
+      <a class="btn btn-ghost" href="https://claude.ai/new" target="_blank" rel="noopener">Apri Claude ↗</a>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js?v=29"></script>
+</body>
+</html>

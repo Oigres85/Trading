@@ -1,0 +1,114 @@
+{
+ "portfolio": [
+  {
+   "ticker": "NVDA",
+   "name": "NVIDIA",
+   "qty": 270,
+   "pmc": 87.17
+  },
+  {
+   "ticker": "AMD",
+   "name": "AMD",
+   "qty": 125,
+   "pmc": 153.92
+  },
+  {
+   "ticker": "MU",
+   "name": "Micron",
+   "qty": 90,
+   "pmc": 87.63
+  },
+  {
+   "ticker": "INTC",
+   "name": "Intel",
+   "qty": 380,
+   "pmc": 25.75
+  },
+  {
+   "ticker": "TSLA",
+   "name": "Tesla",
+   "qty": 60,
+   "pmc": 358.22
+  },
+  {
+   "ticker": "MSTR",
+   "name": "Strategy",
+   "qty": 123,
+   "pmc": 210.22
+  },
+  {
+   "ticker": "RGTI",
+   "name": "Rigetti",
+   "qty": 515,
+   "pmc": 27.3
+  },
+  {
+   "ticker": "ARBE",
+   "name": "Arbe Robotics",
+   "qty": 1150,
+   "pmc": 3.35
+  }
+ ],
+ "watchlist": [
+  {
+   "ticker": "OKLO",
+   "name": null,
+   "currency": "USD"
+  },
+  {
+   "ticker": "SPCX",
+   "name": null,
+   "currency": "USD"
+  },
+  {
+   "ticker": "CBRS",
+   "name": null,
+   "currency": "USD"
+  },
+  {
+   "ticker": "^KS11",
+   "name": "KOSPI",
+   "currency": "PTS"
+  },
+  {
+   "ticker": "^IXIC",
+   "name": "Nasdaq Composite",
+   "currency": "PTS"
+  },
+  {
+   "ticker": "BTC-USD",
+   "name": "Bitcoin",
+   "currency": "USD"
+  },
+  {
+   "ticker": "CL=F",
+   "name": "Petrolio WTI",
+   "currency": "USD"
+  },
+  {
+   "ticker": "AAPL",
+   "name": null,
+   "currency": "USD"
+  },
+  {
+   "ticker": "^RUT",
+   "name": "Russell 2000",
+   "currency": "PTS"
+  }
+ ],
+ "broker": {
+  "as_of": "2026-06-13",
+  "controvalore_totale": 307846.68,
+  "profitto_totale_pct": 96.41,
+  "profitto_totale_eur": 150968.07,
+  "controvalore_azioni": 266266.68,
+  "profitto_usd_pct": 141.72,
+  "profitto_usd": 180574.05,
+  "ytd_pct": 59.88,
+  "y1_pct": 101.02,
+  "inception_pct": 172.55,
+  "controvalore_iniziale_1y": 136008.35,
+  "investimenti": 55995.8,
+  "cedole_btp": 1505
+ }
+}
