@@ -1,7 +1,3 @@
-Certamente! Per farti risparmiare tempo e fatica, ho unito tutto il codice. Ho preso il file originale integro che mi hai inviato e ho innestato in modo chirurgico la nuova vista "Value Investing" e tutte le correzioni per evitare che la tabella scompaia.
-
-Ecco il codice completo per il tuo file `app.js`. Copialo tutto, sovrascrivilo nel tuo editor su GitHub, salva e ricarica la pagina.
-
 ```javascript
 /* Trading Dashboard — rendering lato client di data/data.json */
 const REPO = "Oigres85/Trading";
