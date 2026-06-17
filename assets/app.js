@@ -1,4 +1,3 @@
-```javascript
 /* Trading Dashboard — rendering lato client di data/data.json */
 const REPO = "Oigres85/Trading";
 let DATA = null;
@@ -793,50 +792,24 @@ function fmtVolume(v) {
 
 function techCells(r) {
   const c = cur(r);
+  // supporto/resistenza cambiano con il range selezionato (1S/1M/3M/1A)
   const tw = (r.tech_by_range || {})[sparkRange];
   const support = tw ? tw.support : r.support;
   const resistance = tw ? tw.resistance : r.resistance;
   return `
-      <td class="num col-tech">${peBar(r.pe)}</td>
-      <td class="num col-tech">${epsBar(r.eps)}</td>
-      <td class="num col-tech">${betaBar(r.beta)}</td>
-      <td class="num col-tech">${athBar(r)}</td>
-      <td class="num col-tech">${support ? c + fmtNum.format(support) : "—"}</td>
-      <td class="num col-tech">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
-      <td class="num col-tech">${rsiBar(r.rsi)}</td>
-      <td class="num col-tech">${volBar(r.vol_ratio)}</td>
-      <td class="col-tech"><span class="badge ${r.signal_class}">${r.signal}</span></td>
-      <td class="col-tech">${ratingBadge(r.rating)}</td>
-      <td class="num col-tech">${targetBar(r.rating)}</td>
-      <td class="num col-tech">${finHealthBar(r)}</td>
-      <td class="spark-cell col-tech" data-tk="${r.ticker}" title="Clicca per ingrandire">${sparkline((r.sparks || {})[sparkRange])}</td>`;
-}
-
-function fundCells(r) {
-  const s = r.stats || {};
-  const roic = s.roe || 0; // proxy per ROIC 
-  const roicClass = roic >= 0.15 ? "pos" : ""; // > 15% verde (Regola EM)
-  const gross = s.profit_margin ? s.profit_margin * 1.5 : 0; 
-  const profit = s.profit_margin || 0;
-  const pfcf = s.fcf ? (s.market_cap / s.fcf) : null;
-  const revG = s.revenue_growth || 0;
-  const acq = 0; // Da implementare lato backend
-  const yield_ = s.dividend_yield || 0;
-
-  // Bandiera Rossa (Everything Money): bassa crescita organica ma alte acquisizioni
-  const acqWarn = (revG < 0.05 && acq > 1e9) ? ' <span title="Crescita non organica: alte acquisizioni">🚩</span>' : '';
-
-  return `
-    <td class="num col-fund">${s.market_cap ? fmtMcap(s.market_cap) : "—"}</td>
-    <td class="num col-fund">${s.market_cap ? fmtMcap(s.market_cap + (s.debt || 0)) : "—"}</td>
-    <td class="num col-fund"><b class="${roicClass}">${fmtNum.format(roic * 100)}%</b></td>
-    <td class="num col-fund">${fmtNum.format(gross * 100)}%</td>
-    <td class="num col-fund">${fmtNum.format(profit * 100)}%</td>
-    <td class="num col-fund">${peBar(pfcf)}</td>
-    <td class="num col-fund">${fmtNum.format(revG * 100)}%</td>
-    <td class="num col-fund">${acq ? fmtMcap(acq) : "—"}${acqWarn}</td>
-    <td class="num col-fund">${fmtNum.format(yield_ * 100)}%</td>
-  `;
+      <td class="num">${peBar(r.pe)}</td>
+      <td class="num">${epsBar(r.eps)}</td>
+      <td class="num">${betaBar(r.beta)}</td>
+      <td class="num">${athBar(r)}</td>
+      <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
+      <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
+      <td class="num">${rsiBar(r.rsi)}</td>
+      <td class="num">${volBar(r.vol_ratio)}</td>
+      <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
+      <td>${ratingBadge(r.rating)}</td>
+      <td class="num">${targetBar(r.rating)}</td>
+      <td class="num">${finHealthBar(r)}</td>
+      <td class="spark-cell" data-tk="${r.ticker}" title="Clicca per ingrandire">${sparkline((r.sparks || {})[sparkRange])}</td>`;
 }
 
 function finHealthBar(r) {
@@ -1257,6 +1230,7 @@ function delBtn(section, ticker) {
   return mv + del;
 }
 
+
 function renderTable() {
   const rows = sortRows(DATA.portfolio, "ptf-table").map(r => {
     const c = cur(r);
@@ -1272,7 +1246,6 @@ function renderTable() {
       <td class="num ${signCls(r.gain)}">${signTxt(Math.round(r.gain), ` ${c}`)}${r.currency === "USD" ? `<br><span class="sub-eur">${signTxt(Math.round(r.gain / (DATA.eurusd || 1.08)), " €")}</span>` : ""}</td>
       <td class="num ${signCls(r.gain_pct)}"><b>${signTxt(r.gain_pct)}</b></td>
       ${techCells(r)}
-      ${fundCells(r)}
     </tr>`;
   }).join("");
 
@@ -1283,10 +1256,10 @@ function renderTable() {
     <td class="num">${fmtEUR.format(t.eur_value)}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="22" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="13" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="32"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
 }
 
@@ -1300,11 +1273,125 @@ function renderWatchlist() {
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
-      ${fundCells(r)}
-    </tr>`).join("") : '<tr><td colspan="27" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="18" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="27"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="17"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
+}
+
+/* ---------------- trimestrali ---------------- */
+function renderEarnings() {
+  const items = DATA.portfolio
+    .filter(r => r.earnings_date)
+    .map(r => ({ ...r, days: Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) }))
+    .sort((a, b) => a.days - b.days);
+  $("#earnings-strip").innerHTML = items.length ? items.map(r => {
+    const d = new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
+    const when = r.days <= 0 ? "oggi" : r.days === 1 ? "domani" : `tra ${r.days} gg`;
+    // termometro: più vicina = barra più piena e più "calda"
+    const pct = Math.max(6, Math.min(100, 100 - r.days * 1.1));
+    const color = r.days <= 7 ? "var(--red)" : r.days <= 21 ? "var(--yellow)" : "var(--green)";
+    return `<div class="earn-card" data-earn="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per dettagli">
+      <div class="earn-top"><span class="earn-tk">${r.ticker}</span><span class="earn-when">${when}</span></div>
+      <div class="earn-date">${d}</div>
+      <div class="impact"><span class="impact-fill" style="width:${pct}%;background:${color}"></span></div>
+    </div>`;
+  }).join("") : "";
+}
+
+/* ---------------- gauges ---------------- */
+function gaugeSVG(pct, color) {
+  // semicerchio 0–100
+  const angle = Math.PI * (1 - pct / 100);
+  const x = 60 + 48 * Math.cos(angle), y = 58 - 48 * Math.sin(angle);
+  return `<svg viewBox="0 0 120 66">
+    <path d="M 12 58 A 48 48 0 0 1 108 58" fill="none" stroke="var(--border)" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 12 58 A 48 48 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}" fill="none" stroke="${color}" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${color}"/>
+  </svg>`;
+}
+
+function fgColor(score) {
+  if (score <= 25) return "var(--red)";
+  if (score <= 45) return "var(--yellow)";
+  if (score <= 55) return "var(--muted)";
+  if (score <= 75) return "var(--green)";
+  return "var(--cyan)";
+}
+
+const FG_LABELS = { "extreme fear": "Paura estrema", fear: "Paura", neutral: "Neutrale", greed: "Avidità", "extreme greed": "Avidità estrema" };
+
+/* colore sfumato verde(100)→arancio(50)→rosso(0) */
+function scoreColor(s) {
+  const h = Math.max(0, Math.min(120, (s / 100) * 120));   // 0=rosso, 60=giallo, 120=verde
+  return `hsl(${h.toFixed(0)} 75% 47%)`;
+}
+// scala SEMPRE verde(sx)→rosso(dx). score 0-100 (100=positivo): il marker del "buono"
+// sta a sinistra (verde), quello "cattivo" a destra (rosso). ends[0]=sinistra(verde).
+function thermoBar(score, ends) {
+  const s = Math.max(0, Math.min(100, score));
+  const pos = 100 - s;
+  return `<div class="thermo"><div class="thermo-scale"></div>
+    <div class="thermo-marker" style="left:${pos}%"></div></div>
+    ${ends ? `<div class="thermo-ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>` : ""}`;
+}
+/* card termometro uniforme; score 0-100 (100=positivo/verde, a sinistra). key per il popup */
+function thermoCard(key, title, score, valueText, subText, ends) {
+  return `<div class="gauge-card" data-gauge="${key}" tabindex="0" role="button" title="Clicca per dettagli e news">
+    <div class="g-title">${title}</div>
+    ${thermoBar(score, ends)}
+    <div class="gauge-value" style="color:${scoreColor(score)}">${valueText}</div>
+    <div class="gauge-sub">${subText}</div>
+  </div>`;
+}
+
+function renderGauges() {
+  const m = DATA.macro || {};
+  const cards = [];
+
+  if (m.risk_sentiment) {
+    const rs = m.risk_sentiment;
+    cards.push(thermoCard("sentiment", "Sentiment globale", rs.score, rs.score,
+      `<b>${rs.label}</b><br>composito F&amp;G · VIX · P/C · BTC · 10A`, ["Risk-on", "Risk-off"]));
+  }
+  if (m.fear_greed) {
+    const fg = m.fear_greed;
+    cards.push(thermoCard("fear_greed", "Fear &amp; Greed", fg.score, fg.score,
+      `<b>${FG_LABELS[fg.rating] || fg.rating}</b><br>1 sett: ${fg.week_ago} · 1 mese: ${fg.month_ago}`, ["Avidità", "Paura"]));
+  }
+  if (m.vix) {
+    const score = Math.max(0, Math.min(100, 100 - m.vix.value / 50 * 100));   // VIX basso = verde
+    cards.push(thermoCard("vix", "VIX — Volatilità", score, fmtNum.format(m.vix.value),
+      `${signTxt(m.vix.change_pct)} oggi<br>${m.vix.value < 17 ? "Mercato calmo" : m.vix.value < 25 ? "Tensione moderata" : "Alta volatilità"}`, ["Calmo", "Panico"]));
+  }
+  if (m.fedwatch) {
+    const fw = m.fedwatch;
+    const score = Math.max(0, Math.min(100, 50 - fw.delta_bp));   // tagli prezzati = verde
+    const dir = fw.delta_bp <= -10 ? `tagli prezzati (~${Math.abs(fw.delta_bp)} bp)` :
+                fw.delta_bp >= 10 ? `rialzi prezzati (~${fw.delta_bp} bp)` : "tassi fermi attesi";
+    cards.push(thermoCard("fedwatch", "FedWatch (futures FF)", score, fw.target_range,
+      `implicito <b>${fmtNum.format(fw.implied_rate)}%</b> · ${dir}`, ["Accomodante", "Restrittivo"]));
+  }
+  if (m.carry) {
+    const cy = m.carry;
+    const score = Math.max(0, Math.min(100, cy.spread / 5 * 100));
+    cards.push(thermoCard("carry", "Carry USA–Giappone", score, `${fmtNum.format(cy.spread)} pp`,
+      `US10A ${fmtNum.format(cy.us10)}% − JGB ${fmtNum.format(cy.jp10)}%<br>USD/JPY ${fmtNum.format(cy.usdjpy)} (${signTxt(cy.usdjpy_chg_1m)} 1m)`, ["Alto", "Basso"]));
+  }
+  if (m.putcall) {
+    const pc = m.putcall;
+    const score = Math.max(0, Math.min(100, 100 - pc.ratio / 2 * 100));   // più call = verde
+    cards.push(thermoCard("putcall", `Put/Call ${pc.symbol}`, score, fmtNum.format(pc.ratio),
+      `<b>${pc.ratio > 1 ? "Prevalgono PUT" : "Prevalgono CALL"}</b><br>put ${pc.puts.toLocaleString("it-IT")} · call ${pc.calls.toLocaleString("it-IT")}`, ["Call", "Put"]));
+  }
+  if (m.thermometer) {
+    const th = m.thermometer;
+    const lab = th.score >= 60 ? "Tranquillo" : th.score <= 40 ? "Da monitorare" : "Equilibrato";
+    cards.push(thermoCard("thermometer", "Salute portafoglio", th.score, th.score,
+      `<b>${lab}</b><br>salute tecnica media dei tuoi titoli`, ["Preoccupazione", "Serenità"]));
+  }
+
+  $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
 }
 
 /* ---------------- macro ---------------- */
@@ -1754,84 +1841,3 @@ loadData();
 setInterval(() => loadData(), 5 * 60 * 1000);
 // prezzi live ogni 60 secondi
 setInterval(() => livePrices(), 60 * 1000);
-
-
-/* ---------------- Toggle Vista Analisi Fondamentale ---------------- */
-function setupFundamentalsView() {
-  // 1. Inietta il CSS per la transizione fluida tra le due viste
-  if (!document.getElementById("fund-style")) {
-    const style = document.createElement("style");
-    style.id = "fund-style";
-    style.textContent = `
-      .col-fund { display: none; }
-      body.fund-mode .col-tech { display: none; }
-      body.fund-mode .col-fund { display: table-cell; }
-      .view-toggle { display: inline-flex; margin-right: 15px; vertical-align: middle; }
-    `;
-    document.head.appendChild(style);
-  }
-
-  const fundHeaders = ["Market Cap", "Ent. Value", "ROIC", "Marg. Lordo", "Marg. Netto", "P/FCF", "Crescita Ric. 3A", "Acquisizioni", "Div Yield"];
-  const sortKeys = ["mcap", "ev", "roic", "gross_margin", "profit_margin", "p_fcf", "rev_growth", "net_acq", "div_yield"];
-
-  // 2. Aggiungi intestazioni al Portafoglio
-  const table = document.querySelector("#ptf-table");
-  if (table && !table.querySelector(".col-fund")) {
-     const ths = table.querySelectorAll("thead th");
-     for(let i=10; i<ths.length; i++) ths[i].classList.add("col-tech");
-     const tr = table.querySelector("thead tr");
-     fundHeaders.forEach(text => {
-       const th = document.createElement("th"); th.className = "num col-fund sortable"; th.textContent = text;
-       tr.appendChild(th);
-     });
-     if(SORT_FIELDS["ptf-table"].indexOf("mcap") === -1) {
-         SORT_FIELDS["ptf-table"].push(...sortKeys);
-     }
-  }
-
-  // 3. Aggiungi intestazioni alla Watchlist
-  const wlTable = document.querySelector("#wl-table");
-  if (wlTable && !wlTable.querySelector(".col-fund")) {
-     const ths = wlTable.querySelectorAll("thead th");
-     for(let i=5; i<ths.length; i++) ths[i].classList.add("col-tech");
-     const tr = wlTable.querySelector("thead tr");
-     fundHeaders.forEach(text => {
-       const th = document.createElement("th"); th.className = "num col-fund sortable"; th.textContent = text;
-       tr.appendChild(th);
-     });
-     if(SORT_FIELDS["wl-table"].indexOf("mcap") === -1) {
-         SORT_FIELDS["wl-table"].push(...sortKeys);
-     }
-  }
-
-  // 4. Inserisci il bottone Interruttore nell'interfaccia
-  document.querySelectorAll(".range-bar").forEach(bar => {
-    if (!bar.querySelector(".view-toggle")) {
-      bar.insertAdjacentHTML("afterbegin", `
-        <div class="spark-toggle view-toggle" role="group">
-          <button class="chip chip-active" data-view="tech">Analisi Tecnica</button>
-          <button class="chip" data-view="fund">Value Investing</button>
-        </div>
-      `);
-    }
-  });
-
-  // 5. Attiva la logica del click
-  document.querySelectorAll(".view-toggle .chip").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const toggleGrp = e.target.closest(".view-toggle");
-      toggleGrp.querySelectorAll(".chip").forEach(c => c.classList.remove("chip-active"));
-      e.target.classList.add("chip-active");
-      if (e.target.dataset.view === "fund") {
-        document.body.classList.add("fund-mode");
-      } else {
-        document.body.classList.remove("fund-mode");
-      }
-    });
-  });
-}
-
-// Avvia l'interruttore subito dopo il caricamento dati
-setTimeout(setupFundamentalsView, 200);
-
-```
