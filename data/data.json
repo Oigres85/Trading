@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-06-17T05:25:32Z",
- "eurusd": 1.1616,
+ "updated_at": "2026-06-17T08:55:13Z",
+ "eurusd": 1.1606,
  "totals": {
   "usd_value": NaN,
   "usd_gain": NaN,
@@ -694,9 +694,9 @@
    "eps": 6.53,
    "beta": 2.2,
    "prepost": {
-    "label": "after",
-    "price": 207.55,
-    "change_pct": 0.07
+    "label": "pre",
+    "price": 208.27,
+    "change_pct": 0.41
    },
    "sector": "Technology",
    "stats": {
@@ -1626,9 +1626,9 @@
    "eps": 2.99,
    "beta": 2.49,
    "prepost": {
-    "label": "after",
-    "price": 510.77,
-    "change_pct": 0.69
+    "label": "pre",
+    "price": 523.1,
+    "change_pct": 3.12
    },
    "sector": "Technology",
    "stats": {
@@ -2558,9 +2558,9 @@
    "eps": 21.23,
    "beta": 2.17,
    "prepost": {
-    "label": "after",
-    "price": 1033.88,
-    "change_pct": 1.28
+    "label": "pre",
+    "price": 1055.09,
+    "change_pct": 3.36
    },
    "sector": "Technology",
    "stats": {
@@ -3329,9 +3329,9 @@
    "eps": -36.99,
    "beta": 3.47,
    "prepost": {
-    "label": "after",
-    "price": 122.98,
-    "change_pct": 0.13
+    "label": "pre",
+    "price": 122.2,
+    "change_pct": -0.5
    },
    "sector": "Technology",
    "stats": {
@@ -3826,8 +3826,8 @@
    "eps": -0.89,
    "beta": 1.9,
    "prepost": {
-    "label": "after",
-    "price": 20.84,
+    "label": "pre",
+    "price": 21.07,
     "change_pct": NaN
    },
    "sector": "Technology",
@@ -3949,25 +3949,25 @@
    "ticker": "OKLO",
    "name": "Oklo Inc.",
    "currency": "USD",
-   "price": 57.45,
-   "change_pct": -5.42,
+   "price": NaN,
+   "change_pct": NaN,
    "pe": null,
    "ath": 193.84,
-   "ath_dist_pct": -70.4,
+   "ath_dist_pct": NaN,
    "support": 53.01,
    "resistance": 73.86,
-   "rsi": 43.6,
-   "volume": 8781000,
-   "vol_ratio": 0.62,
-   "signal": "Trend debole",
-   "signal_class": "bad",
+   "rsi": 47.2,
+   "volume": 7463972,
+   "vol_ratio": 0.53,
+   "signal": "Neutrale",
+   "signal_class": "neutral",
    "sparks": {
     "w1": [
      54.02,
      57.86,
      57.49,
      60.74,
-     57.45
+     NaN
     ],
     "m6": [
      82.33,
@@ -4095,7 +4095,7 @@
      57.86,
      57.49,
      60.74,
-     57.45
+     NaN
     ],
     "all": [
      9.85,
@@ -4181,7 +4181,7 @@
      57.86,
      57.49,
      60.74,
-     57.45
+     NaN
     ],
     "m3": [
      58.37,
@@ -4249,7 +4249,7 @@
      57.86,
      57.49,
      60.74,
-     57.45
+     NaN
     ],
     "y1": [
      62.77,
@@ -4302,7 +4302,7 @@
      68.7,
      73.47,
      56.48,
-     57.45
+     NaN
     ],
     "d1": [
      60.96,
@@ -4351,15 +4351,15 @@
     "key": "buy",
     "n": 19,
     "target": 88.63,
-    "upside_pct": 54.3
+    "upside_pct": NaN
    },
-   "health": 25,
+   "health": 56,
    "eps": -0.84,
    "beta": 1.11,
    "prepost": {
-    "label": "after",
-    "price": 57.95,
-    "change_pct": 0.87
+    "label": "pre",
+    "price": 58.1,
+    "change_pct": NaN
    },
    "sector": "Utilities",
    "stats": {
@@ -4388,22 +4388,22 @@
     "w1": {
      "support": 53.42,
      "resistance": 61.98,
-     "change_pct": 6.35
+     "change_pct": NaN
     },
     "m1": {
      "support": 53.01,
      "resistance": 73.86,
-     "change_pct": -7.71
+     "change_pct": NaN
     },
     "m3": {
      "support": 44.88,
      "resistance": 81.5,
-     "change_pct": -1.58
+     "change_pct": NaN
     },
     "y1": {
      "support": 44.88,
      "resistance": 193.84,
-     "change_pct": -8.48
+     "change_pct": NaN
     }
    },
    "financials": [],
@@ -4497,17 +4497,17 @@
    "earnings_date": null,
    "rating": {
     "key": "buy",
-    "n": 5,
-    "target": 164.0,
-    "upside_pct": -14.8
+    "n": 6,
+    "target": 188.17,
+    "upside_pct": -2.3
    },
    "health": 60,
    "eps": -0.67,
    "beta": null,
    "prepost": {
-    "label": "after",
-    "price": 206.0,
-    "change_pct": 7.01
+    "label": "pre",
+    "price": 207.98,
+    "change_pct": 8.04
    },
    "sector": "Industrials",
    "stats": {
@@ -4529,7 +4529,7 @@
     "debt_to_equity": 73.597,
     "dividend_yield": null,
     "price_to_book": 33.8818,
-    "target_mean": 164.0,
+    "target_mean": 188.1667,
     "fcf": null
    },
    "tech_by_range": {
@@ -4741,9 +4741,9 @@
    "eps": 0.42,
    "beta": null,
    "prepost": {
-    "label": "after",
-    "price": 211.89,
-    "change_pct": -0.17
+    "label": "pre",
+    "price": 214.5,
+    "change_pct": 1.06
    },
    "sector": "Technology",
    "stats": {
@@ -4822,16 +4822,16 @@
    "ticker": "^KS11",
    "name": "KOSPI",
    "currency": "PTS",
-   "price": 8801.25,
-   "change_pct": 0.86,
+   "price": 8864.24,
+   "change_pct": 1.58,
    "pe": null,
    "ath": 8933.62,
-   "ath_dist_pct": -1.5,
+   "ath_dist_pct": -0.8,
    "support": 7053.84,
    "resistance": 8933.62,
-   "rsi": 63.5,
-   "volume": 472034,
-   "vol_ratio": 0.78,
+   "rsi": 64.1,
+   "volume": 565153,
+   "vol_ratio": 0.93,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -4840,7 +4840,7 @@
      8123.62,
      8545.98,
      8726.6,
-     8801.25
+     8864.24
     ],
     "m6": [
      4143.55,
@@ -4968,7 +4968,7 @@
      8123.62,
      8545.98,
      8726.6,
-     8801.25
+     8864.24
     ],
     "all": [
      651.22,
@@ -5325,7 +5325,7 @@
      5052.46,
      6598.87,
      8476.15,
-     8801.25
+     8864.24
     ],
     "m1": [
      7493.18,
@@ -5349,7 +5349,7 @@
      8123.62,
      8545.98,
      8726.6,
-     8801.25
+     8864.24
     ],
     "m3": [
      5583.25,
@@ -5417,7 +5417,7 @@
      8123.62,
      8545.98,
      8726.6,
-     8801.25
+     8864.24
     ],
     "y1": [
      2950.3,
@@ -5501,7 +5501,12 @@
      8791.99,
      8777.49,
      8797.08,
-     8795.99
+     8795.99,
+     8789.93,
+     8824.8,
+     8827.69,
+     8862.9,
+     8845.78
     ]
    },
    "earnings_date": null,
@@ -5515,23 +5520,23 @@
    "tech_by_range": {
     "w1": {
      "support": 7394.46,
-     "resistance": 8804.92,
-     "change_pct": 13.36
+     "resistance": 8872.18,
+     "change_pct": 14.17
     },
     "m1": {
      "support": 7053.84,
      "resistance": 8933.62,
-     "change_pct": 17.46
+     "change_pct": 18.3
     },
     "m3": {
      "support": 5042.99,
      "resistance": 8933.62,
-     "change_pct": 57.64
+     "change_pct": 58.76
     },
     "y1": {
      "support": 2925.79,
      "resistance": 8933.62,
-     "change_pct": 198.32
+     "change_pct": 200.45
     }
    },
    "financials": [],
@@ -6413,28 +6418,27 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 65734.47,
-   "change_pct": -0.84,
+   "price": 64850.01,
+   "change_pct": -1.14,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -47.9,
+   "ath_dist_pct": -48.6,
    "support": 59108.92,
-   "resistance": 74460.12,
-   "rsi": 42.2,
-   "volume": 24322693120,
-   "vol_ratio": 0.73,
+   "resistance": 74218.56,
+   "rsi": 39.7,
+   "volume": 24690841600,
+   "vol_ratio": 0.75,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
     "w1": [
-     63543.2,
      64421.32,
      65710.4,
      66289.5,
-     65734.47
+     65600.64,
+     64850.01
     ],
     "m6": [
-     66991.97,
      66221.84,
      68857.84,
      69767.62,
@@ -6559,7 +6563,8 @@
      64421.32,
      65710.4,
      66289.5,
-     65734.47
+     65600.64,
+     64850.01
     ],
     "all": [
      386.94,
@@ -6703,10 +6708,9 @@
      68233.31,
      76304.32,
      73579.69,
-     65734.48
+     64850.01
     ],
     "m1": [
-     75825.73,
      74344.7,
      73536.55,
      73372.52,
@@ -6727,10 +6731,10 @@
      64421.32,
      65710.4,
      66289.5,
-     65734.47
+     65600.64,
+     64850.01
     ],
     "m3": [
-     70753.41,
      74484.64,
      74181.61,
      74805.08,
@@ -6795,7 +6799,8 @@
      64421.32,
      65710.4,
      66289.5,
-     65734.47
+     65600.64,
+     64850.01
     ],
     "y1": [
      104601.12,
@@ -6870,47 +6875,69 @@
      73536.55,
      66703.66,
      63239.52,
-     63543.2
+     63543.2,
+     64850.01
     ],
     "d1": [
-     65631.32,
+     65629.73,
      65686.1,
      65650.13,
-     65743.02,
-     65758.8,
-     65644.02,
+     65743.03,
+     65758.79,
+     65651.22,
      65733.09,
      65733.69,
-     65505.02,
-     65543.58,
-     65700.01,
-     65817.29,
+     65505.03,
+     65542.59,
+     65700.45,
+     65817.3,
      65841.89,
-     65840.29,
-     66022.29,
-     65854.26,
-     65796.08,
-     65795.06,
-     65800.63,
-     65756.89,
-     65672.72,
-     65785.9,
-     65743.31,
-     65773.98,
+     65840.28,
+     66014.1,
+     65858.33,
+     65798.0,
+     65792.71,
+     65800.62,
+     65759.63,
+     65672.71,
+     65784.77,
+     65743.3,
+     65776.3,
      65796.07,
-     65782.02,
+     65782.01,
      65827.81,
      65831.13,
      65858.48,
-     65887.82,
-     65899.3,
-     65748.0,
-     65739.18
+     65888.02,
+     65896.2,
+     65757.05,
+     65740.2,
+     65805.0,
+     65846.07,
+     65718.1,
+     65770.01,
+     65790.61,
+     65774.75,
+     65645.1,
+     65575.24,
+     65567.21,
+     65519.44,
+     65624.3,
+     65446.81,
+     65483.72,
+     65467.24,
+     65246.27,
+     65398.45,
+     65270.77,
+     65272.92,
+     65132.55,
+     64859.97,
+     64850.01
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 21,
+   "health": 20,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -6918,24 +6945,24 @@
    "stats": null,
    "tech_by_range": {
     "w1": {
-     "support": 62778.79,
+     "support": 63431.32,
      "resistance": 67248.13,
-     "change_pct": 3.45
+     "change_pct": 0.67
     },
     "m1": {
      "support": 59108.92,
-     "resistance": 77990.87,
-     "change_pct": -13.31
+     "resistance": 76014.3,
+     "change_pct": -12.77
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -7.09
+     "change_pct": -12.94
     },
     "y1": {
      "support": 59108.92,
-     "resistance": 124167.09,
-     "change_pct": -46.71
+     "resistance": 123739.34,
+     "change_pct": -46.72
     }
    },
    "financials": [],
@@ -6945,16 +6972,16 @@
    "ticker": "CL=F",
    "name": "Petrolio WTI",
    "currency": "USD",
-   "price": 74.81,
-   "change_pct": -1.63,
+   "price": 75.66,
+   "change_pct": -0.51,
    "pe": null,
    "ath": 147.27,
-   "ath_dist_pct": -49.2,
-   "support": 74.72,
+   "ath_dist_pct": -48.6,
+   "support": 74.09,
    "resistance": 104.45,
-   "rsi": 29.2,
-   "volume": 14951,
-   "vol_ratio": 0.06,
+   "rsi": 29.8,
+   "volume": 42214,
+   "vol_ratio": 0.17,
    "signal": "Ipervenduto",
    "signal_class": "info",
    "sparks": {
@@ -6963,7 +6990,7 @@
      84.88,
      80.75,
      76.05,
-     74.81
+     75.66
     ],
     "m6": [
      55.27,
@@ -7091,7 +7118,7 @@
      84.88,
      80.75,
      76.05,
-     74.81
+     75.66
     ],
     "all": [
      33.1,
@@ -7358,7 +7385,7 @@
      65.21,
      105.07,
      87.36,
-     74.81
+     75.66
     ],
     "m1": [
      108.66,
@@ -7382,7 +7409,7 @@
      84.88,
      80.75,
      76.05,
-     74.81
+     75.66
     ],
     "m3": [
      93.5,
@@ -7450,7 +7477,7 @@
      84.88,
      80.75,
      76.05,
-     74.81
+     75.66
     ],
     "y1": [
      74.84,
@@ -7513,12 +7540,33 @@
      74.99,
      74.82,
      74.78,
-     74.8
+     74.8,
+     74.69,
+     74.66,
+     74.94,
+     75.16,
+     75.29,
+     75.47,
+     75.44,
+     75.1,
+     74.76,
+     74.84,
+     74.63,
+     74.28,
+     74.6,
+     75.02,
+     74.69,
+     74.75,
+     75.01,
+     75.38,
+     75.45,
+     75.65,
+     75.67
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 26,
+   "health": 27,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -7526,24 +7574,24 @@
    "stats": null,
    "tech_by_range": {
     "w1": {
-     "support": 74.72,
+     "support": 74.09,
      "resistance": 93.64,
-     "change_pct": -14.71
+     "change_pct": -13.74
     },
     "m1": {
-     "support": 74.72,
+     "support": 74.09,
      "resistance": 109.47,
-     "change_pct": -31.15
+     "change_pct": -30.37
     },
     "m3": {
-     "support": 74.72,
+     "support": 74.09,
      "resistance": 117.63,
-     "change_pct": -19.99
+     "change_pct": -19.08
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": -0.44
+     "change_pct": 0.69
     }
    },
    "financials": [],
@@ -8395,7 +8443,7 @@
    "currency": "USD",
    "price": 117.05,
    "change_pct": -8.45,
-   "pe": 75.9,
+   "pe": 75.7,
    "ath": 132.75,
    "ath_dist_pct": -11.8,
    "support": 98.33,
@@ -9239,9 +9287,9 @@
    "eps": -0.6,
    "beta": 2.23,
    "prepost": {
-    "label": "after",
-    "price": 118.43,
-    "change_pct": 1.18
+    "label": "pre",
+    "price": 121.69,
+    "change_pct": 3.96
    },
    "sector": "Technology",
    "stats": {
@@ -9251,9 +9299,9 @@
     "float_pct": 99.8,
     "avg_volume_30d": 130279969.0,
     "pe_ttm": null,
-    "forward_pe": 75.9266,
+    "forward_pe": 75.7375,
     "eps_ttm": -0.6,
-    "eps_forward": 1.5416,
+    "eps_forward": 1.5455,
     "revenue_fy": 53762998272.0,
     "net_income_fy": -3174000128.0,
     "revenue_growth": 0.072,
@@ -9861,9 +9909,9 @@
    "eps": 1.09,
    "beta": 1.8,
    "prepost": {
-    "label": "after",
-    "price": 402.84,
-    "change_pct": -0.45
+    "label": "pre",
+    "price": 403.57,
+    "change_pct": -0.27
    },
    "sector": "Consumer Cyclical",
    "stats": {
@@ -9944,7 +9992,7 @@
    "currency": "USD",
    "price": NaN,
    "change_pct": NaN,
-   "pe": 151.4,
+   "pe": 149.7,
    "ath": 207.52,
    "ath_dist_pct": NaN,
    "support": 126.65,
@@ -10357,11 +10405,11 @@
     "upside_pct": NaN
    },
    "health": 56,
-   "eps": 0.88,
+   "eps": 0.89,
    "beta": 1.51,
    "prepost": {
-    "label": "after",
-    "price": 132.59,
+    "label": "pre",
+    "price": 132.25,
     "change_pct": NaN
    },
    "sector": "Technology",
@@ -10371,9 +10419,9 @@
     "float_shares": 2104096749.0,
     "float_pct": 91.6,
     "avg_volume_30d": 44147725.0,
-    "pe_ttm": 151.4205,
+    "pe_ttm": 149.7191,
     "forward_pe": 64.052,
-    "eps_ttm": 0.88,
+    "eps_ttm": 0.89,
     "eps_forward": 2.0803,
     "revenue_fy": 5224174080.0,
     "net_income_fy": 2281529088.0,
@@ -11052,9 +11100,9 @@
    "eps": 13.1,
    "beta": 1.24,
    "prepost": {
-    "label": "after",
-    "price": 371.97,
-    "change_pct": -0.34
+    "label": "pre",
+    "price": 371.84,
+    "change_pct": -0.38
    },
    "sector": "Communication Services",
    "stats": {
@@ -11134,25 +11182,25 @@
   {
    "ticker": "MU",
    "name": "Micron",
-   "value_eur": 79089.51,
+   "value_eur": 79153.81,
    "sector": "Technology"
   },
   {
    "ticker": "AMD",
    "name": "AMD",
-   "value_eur": 54590.75,
+   "value_eur": 54635.13,
    "sector": "Technology"
   },
   {
    "ticker": "NVDA",
    "name": "NVIDIA",
-   "value_eur": 48211.0,
+   "value_eur": 48250.2,
    "sector": "Technology"
   },
   {
    "ticker": "MSTR",
    "name": "Strategy",
-   "value_eur": 13004.44,
+   "value_eur": 13015.01,
    "sector": "Technology"
   },
   {
@@ -12271,7 +12319,7 @@
     191222,
     190109,
     193481,
-    189649,
+    189648,
     191633,
     192836,
     196053,
@@ -12758,7 +12806,7 @@
     192383,
     199743,
     204616,
-    188739,
+    188738,
     201472,
     189729,
     195505,
@@ -13528,7 +13576,7 @@
     192383,
     199743,
     204616,
-    188739,
+    188738,
     201472,
     189729,
     195505,
@@ -14082,7 +14130,7 @@
  },
  "macro": {
   "fear_greed": {
-   "score": 39,
+   "score": 40,
    "rating": "fear",
    "prev_close": 39,
    "week_ago": 27,
@@ -14097,7 +14145,7 @@
     {
      "label": "Forza dei prezzi",
      "rating": "fear",
-     "score": 36
+     "score": 37
     },
     {
      "label": "Ampiezza del mercato",
@@ -14129,10 +14177,9 @@
    "fomo_label": "Nessuna FOMO"
   },
   "vix": {
-   "value": 16.41,
-   "change_pct": 1.3,
+   "value": 16.43,
+   "change_pct": 0.12,
    "spark": [
-    17.39,
     17.08,
     17.19,
     18.38,
@@ -14161,7 +14208,8 @@
     19.44,
     17.68,
     16.2,
-    16.41
+    16.41,
+    16.43
    ]
   },
   "fedwatch": {
@@ -14288,15 +14336,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1616",
-    "change_pct": 0.19,
+    "value": "1.1606",
+    "change_pct": 0.1,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "186.12",
-    "change_pct": 0.22,
+    "value": "185.87",
+    "change_pct": 0.08,
     "suffix": "%"
    }
   ],
@@ -14304,8 +14352,8 @@
    "us10": 4.43,
    "jp10": 2.65,
    "spread": 1.77,
-   "usdjpy": 160.27,
-   "usdjpy_chg_1m": 0.9,
+   "usdjpy": 160.19,
+   "usdjpy_chg_1m": 0.85,
    "boj_meetings": [
     "2026-06-17",
     "2026-07-31",
@@ -14326,7 +14374,7 @@
    "components": [
     {
      "label": "Fear & Greed",
-     "score": 39
+     "score": 40
     },
     {
      "label": "VIX",
@@ -14338,7 +14386,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 42
+     "score": 39
     },
     {
      "label": "Treasury 10A",
@@ -14495,9 +14543,9 @@
    {
     "ticker": "XLC",
     "name": "Comunicazioni",
-    "m1": -4.2,
-    "m3": -2.4,
-    "score": 41
+    "m1": -3.2,
+    "m3": -1.5,
+    "score": 44
    },
    {
     "ticker": "XLE",
@@ -14569,7 +14617,7 @@
     },
     {
      "label": "Fear & Greed",
-     "score": 39
+     "score": 40
     },
     {
      "label": "Volatilità (VIX)",
@@ -14603,61 +14651,61 @@
    "ticker": "NVDA",
    "name": "NVIDIA",
    "mcap_usd": 5023677698700,
-   "change_pct": -2.14
+   "change_pct": -0.07
   },
   {
    "ticker": "GOOGL",
    "name": "Alphabet",
    "mcap_usd": 4554610420399,
-   "change_pct": 1.07
+   "change_pct": 0.34
   },
   {
    "ticker": "AAPL",
    "name": "Apple",
    "mcap_usd": 4395044266009,
-   "change_pct": 0.97
+   "change_pct": 0.11
   },
   {
    "ticker": "MSFT",
    "name": "Microsoft",
    "mcap_usd": 2925540339729,
-   "change_pct": -1.38
+   "change_pct": 0.17
   },
   {
    "ticker": "AMZN",
    "name": "Amazon",
    "mcap_usd": 2646248921256,
-   "change_pct": -0.9
+   "change_pct": 0.09
   },
   {
    "ticker": "TSM",
    "name": "TSMC",
    "mcap_usd": 2208556159313,
-   "change_pct": -3.38
+   "change_pct": -0.65
   },
   {
    "ticker": "AVGO",
    "name": "Broadcom",
    "mcap_usd": 1792227995735,
-   "change_pct": -4.58
+   "change_pct": -0.26
   },
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1725055184827,
-   "change_pct": 0.83
+   "mcap_usd": 1710827622840,
+   "change_pct": -0.75
   },
   {
    "ticker": "META",
    "name": "Meta",
    "mcap_usd": 1523587051294,
-   "change_pct": 1.22
+   "change_pct": 0.42
   },
   {
    "ticker": "TSLA",
    "name": "Tesla",
    "mcap_usd": 1519791235393,
-   "change_pct": -1.06
+   "change_pct": 0.45
   }
  ],
  "predictions": [
@@ -14665,14 +14713,79 @@
    "question": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "yes": 100,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $62,000 on June 17?",
+   "yes": 99,
+   "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-17-2026"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $60,000 on June 17?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-60k-on-june-17-2026"
   }
  ],
  "news": [
   {
    "source": "Investing.com",
-   "title": "Has Trump achieved his goals in the war with Iran?",
-   "link": "https://www.investing.com/news/world-news/has-trump-achieved-his-goals-in-the-war-with-iran-4746480",
-   "published": "2026-06-17T05:06:53Z",
+   "title": "G7 leaders call for Lebanon ceasefire as they welcome framework U.S.-Iran deal",
+   "link": "https://www.investing.com/news/economy-news/g7-leaders-call-for-lebanon-ceasefire-as-they-welcome-framework-usiran-deal-4746652",
+   "published": "2026-06-17T08:50:02Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "I leader del G7 chiedono il cessate il fuoco in Libano mentre accolgono con favore l’accordo quadro tra Stati Uniti e Iran"
+  },
+  {
+   "source": "Investing.com",
+   "title": "China central bank’s deepening control on short-term rates sparks debate over policy focus",
+   "link": "https://www.investing.com/news/economy-news/china-central-banks-deepening-control-on-shortterm-rates-sparks-debate-over-policy-focus-4746650",
+   "published": "2026-06-17T08:48:53Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Il controllo rafforzato della banca centrale cinese sui tassi a breve termine accende il dibattito sulla focalizzazione della politica"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Oil slides on Iran supply hopes; bond yields pushed lower before Warsh debut",
+   "link": "https://www.investing.com/news/economy-news/oil-slides-on-iran-supply-prospects-as-traders-wait-on-warsh-4746343",
+   "published": "2026-06-17T08:48:29Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Il petrolio scivola sulle speranze di approvvigionamento dell’Iran; i rendimenti obbligazionari sono scesi prima del debutto di Warsh"
+  },
+  {
+   "source": "Investing.com",
+   "title": "EU gas sinks to one-month low as Iran peace deal defuses energy risk premium",
+   "link": "https://www.investing.com/news/commodities-news/eu-gas-sinks-to-onemonth-low-as-iran-peace-deal-defuses-energy-risk-premium-4746646",
+   "published": "2026-06-17T08:46:24Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Il gas dell’UE scende ai minimi di un mese mentre l’accordo di pace con l’Iran disinnesca il premio per il rischio energetico"
+  },
+  {
+   "source": "Investing.com",
+   "title": "BMW shares slide after China weakness, Iran war prompt profit warning",
+   "link": "https://www.investing.com/news/stock-market-news/bmw-shares-plunge-after-china-weakness-iran-war-trigger-profit-warning-4746530",
+   "published": "2026-06-17T07:49:09Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -14680,51 +14793,25 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "bear",
-   "title_it": "Trump ha raggiunto i suoi obiettivi nella guerra con l’Iran?"
+   "title_it": "Le azioni BMW crollano dopo la debolezza della Cina e la guerra con l'Iran spinge all'allarme sui profitti"
   },
   {
    "source": "Investing.com",
-   "title": "Exclusive-US holds off blacklisting China’s DeepSeek, more than 100 firms deemed security risks, sources say",
-   "link": "https://www.investing.com/news/economy-news/exclusiveus-holds-offblacklisting-chinas-deepseek-more-than-100-firms-deemed-security-risks-sources-say-4746216",
-   "published": "2026-06-17T04:54:26Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Exclusive-US resiste all'inserimento nella lista nera di DeepSeek cinese, più di 100 aziende ritengono rischi per la sicurezza, dicono fonti"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Exclusive-Iran deal includes $300 billion fund, more than half of which already committed, source says",
-   "link": "https://www.investing.com/news/stock-market-news/exclusiveiran-deal-includes-300-billion-fund-more-than-half-of-which-already-committed-source-says-4745500",
-   "published": "2026-06-17T04:48:24Z",
+   "title": "Bitcoin steady at $65k with Fed meeting in focus; Uniswap surges",
+   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-steady-at-65k-with-fed-meeting-in-focus-uniswap-surges-4746500",
+   "published": "2026-06-17T06:00:13Z",
    "tickers": [
     "MACRO",
-    "POL"
+    "BTC-USD"
    ],
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "L’accordo esclusivo con l’Iran prevede un fondo di 300 miliardi di dollari, più della metà dei quali già impegnati, dice la fonte"
+   "title_it": "Bitcoin stabile a 65.000 dollari con focus sulla riunione della Fed; Uniswap aumenta"
   },
   {
    "source": "Investing.com",
-   "title": "China’s Xiaohongshu prepares Hong Kong IPO at over $70 bln valuation - WSJ",
-   "link": "https://www.investing.com/news/stock-market-news/chinas-xiaohongshu-prepares-hong-kong-ipo-at-over-70-bln-valuation--wsj-4746470",
-   "published": "2026-06-17T04:27:18Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "La cinese Xiaohongshu prepara l'IPO di Hong Kong con una valutazione di oltre 70 miliardi di dollari - WSJ"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Asia FX, dollar muted ahead of Fed decision; Iran truce details eyed",
+   "title": "Dollar muted ahead of Fed decision; Iran truce details eyed",
    "link": "https://www.investing.com/news/forex-news/asia-fx-dollar-muted-ahead-of-fed-decision-iran-truce-details-eyed-4746467",
    "published": "2026-06-17T04:16:46Z",
    "tickers": [
@@ -14734,7 +14821,7 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Asia FX, dollaro in sordina in vista della decisione della Fed; Occhio ai dettagli della tregua iraniana"
+   "title_it": "Il dollaro è in sordina prima della decisione della Fed; Occhio ai dettagli della tregua iraniana"
   },
   {
    "source": "Investing.com",
@@ -14779,30 +14866,155 @@
    "title_it": "I rendimenti statunitensi si mantengono ai minimi di un mese mentre i mercati attendono i dettagli dell’accordo di pace con l’Iran"
   },
   {
-   "source": "Bloomberg",
-   "title": "China’s Zhipu Gets Lone ‘Short’ Call After 1,100% Rally",
-   "link": "https://news.google.com/search?q=China%E2%80%99s%20Zhipu%20Gets%20Lone%20%E2%80%98Short%E2%80%99%20Call%20After%201%2C100%25%20Rally",
-   "published": "2026-06-17T05:18:22Z",
+   "source": "CNBC",
+   "title": "'A signal of where power sits': Trump and world leaders joined by OpenAI, Anthropic, Google at G7",
+   "link": "https://www.cnbc.com/2026/06/17/g7-trump-ai-tech-leaders-openai-anthropic-google.html",
+   "published": "2026-06-17T08:47:54Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "\"Un segnale di dove risiede il potere\": Trump e i leader mondiali si uniscono a OpenAI, Anthropic e Google al G7"
+  },
+  {
+   "source": "CNBC",
+   "title": "From supply shock to oil glut: IEA flags scale of demand destruction caused by Iran war",
+   "link": "https://www.cnbc.com/2026/06/17/global-oil-demand-suppy-energy-prices-iea-inventories.html",
+   "published": "2026-06-17T08:39:42Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Dallo shock dell’offerta all’eccesso di petrolio: l’IEA segnala la portata della distruzione della domanda causata dalla guerra con l’Iran"
+  },
+  {
+   "source": "MarketWatch",
+   "title": "BMW issues a big profit warning it once again blames on China. The automaker is plotting a major strategy shift",
+   "link": "https://www.marketwatch.com/story/bmw-issues-a-big-profit-warning-it-once-again-blames-on-china-the-automaker-is-plotting-a-major-strategy-shift-d28e7428?mod=mw_rss_topstories",
+   "published": "2026-06-17T08:11:00Z",
+   "tickers": [
+    "MACRO",
+    "MSTR"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La BMW emette un grande avvertimento sui profitti e attribuisce ancora una volta la colpa alla Cina. La casa automobilistica sta pianificando un importante cambiamento di strategia"
+  },
+  {
+   "source": "CNBC",
+   "title": "China pushes for AI safety as G7 summit wraps up without Beijing",
+   "link": "https://www.cnbc.com/2026/06/17/china-pushes-for-ai-safety-as-g7-summit-wraps-up-without-beijing.html",
+   "published": "2026-06-17T08:04:21Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bull",
-   "title_it": "Lo Zhipu cinese riceve l'unica chiamata \"breve\" dopo un rally del 1.100%."
+   "sentiment": "neutral",
+   "title_it": "La Cina spinge per la sicurezza dell’intelligenza artificiale mentre il vertice del G7 si conclude senza Pechino"
   },
   {
    "source": "Bloomberg",
-   "title": "GLP-1 Craze Fuels Protein-Powder Maker Glanbia’s Share Rally",
-   "link": "https://news.google.com/search?q=GLP-1%20Craze%20Fuels%20Protein-Powder%20Maker%20Glanbia%E2%80%99s%20Share%20Rally",
-   "published": "2026-06-17T05:15:00Z",
+   "title": "Signing of Iran MOU Isn't Fully Priced: 3-Minutes MLIV",
+   "link": "https://news.google.com/search?q=Signing%20of%20Iran%20MOU%20Isn%27t%20Fully%20Priced%3A%203-Minutes%20MLIV",
+   "published": "2026-06-17T07:42:14Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La firma del protocollo d'intesa con l'Iran non ha un prezzo intero: MLIV di 3 minuti"
+  },
+  {
+   "source": "CNBC",
+   "title": "Central banks are bringing gold reserves home as geopolitical risks rise",
+   "link": "https://www.cnbc.com/2026/06/17/central-banks-gold-reserves-domestic-storage.html",
+   "published": "2026-06-17T07:28:36Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "Le banche centrali stanno riportando a casa le riserve auree mentre i rischi geopolitici aumentano"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Iran to Gain Major Financial Relief Under Interim Deal With US",
+   "link": "https://news.google.com/search?q=Iran%20to%20Gain%20Major%20Financial%20Relief%20Under%20Interim%20Deal%20With%20US",
+   "published": "2026-06-17T07:15:50Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "L’Iran otterrà importanti aiuti finanziari grazie all’accordo ad interim con gli Stati Uniti"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Japan Tourism Extends Decline on Reduced Flights, China Weakness",
+   "link": "https://news.google.com/search?q=Japan%20Tourism%20Extends%20Decline%20on%20Reduced%20Flights%2C%20China%20Weakness",
+   "published": "2026-06-17T07:15:00Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bull",
-   "title_it": "La mania del GLP-1 alimenta il rally delle azioni del produttore di proteine ​​in polvere Glanbia"
+   "sentiment": "neutral",
+   "title_it": "Il turismo in Giappone estende il calo dei voli ridotti, debolezza della Cina"
+  },
+  {
+   "source": "CNBC Markets",
+   "title": "UK inflation holds steady at 2.8% in May",
+   "link": "https://www.cnbc.com/2026/06/17/inflation-uk-cpi-interest-rates-bank-of-england.html",
+   "published": "2026-06-17T06:41:39Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’inflazione nel Regno Unito si mantiene stabile al 2,8% a maggio"
+  },
+  {
+   "source": "AP",
+   "title": "Trump goes after Netanyahu as he pursues deal with Iran, putting their friendship to the test - AP News",
+   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNV1F5am4yX1lmUklsbm5kdndpWHNPcVh5M1lXZ3l0OExROUFlbkZXVGpNYVhNYV83c0lyWXlMcGMwaG1maThoSFJoSVU0SlRtOE53YUpkUkowV2NjRzlJcmlzbE5zRHEwVmpGYlhGR01yWW82QjNqNjJfdGhpY1liQjlwVW5KbFdvVmMxNDhTeWxiTWQxcWtr?oc=5",
+   "published": "2026-06-17T06:20:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump insegue Netanyahu mentre persegue un accordo con l'Iran, mettendo alla prova la loro amicizia - AP News"
+  },
+  {
+   "source": "Reuters",
+   "title": "Has Trump achieved his goals in the war with Iran? - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQU2loLVdUWXl3ZlBzRDNsT0dZVkFVajIyNGF1X041VlNlV0JBdkluNGpmVmZ5NzFzNWJKaDM2QU5UMTIzZGhvZFZ1dWsyeWlqdGZZV3N1TlY2Ykl5MnlWaXJEclUwTDZOX1VjeVpKS00ydEVwdHk1OHBvY25EdVlVOUJQdkNTR3J4SkxSd0d2VmxOUHBRYU1qM0dCaFQ?oc=5",
+   "published": "2026-06-17T05:05:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Trump ha raggiunto i suoi obiettivi nella guerra con l’Iran? -Reuters"
   },
   {
    "source": "Reddit",
@@ -14819,22 +15031,8 @@
   },
   {
    "source": "Bloomberg",
-   "title": "Oil Tankers U-Turn, Rush to Middle East Before Hormuz Reopening",
-   "link": "https://news.google.com/search?q=Oil%20Tankers%20U-Turn%2C%20Rush%20to%20Middle%20East%20Before%20Hormuz%20Reopening",
-   "published": "2026-06-17T04:32:56Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Inversione di marcia delle petroliere, corsa in Medio Oriente prima della riapertura di Hormuz"
-  },
-  {
-   "source": "Bloomberg",
-   "title": "SNB Reviews Franc Alert Level Before Middle East Peace Deal",
-   "link": "https://news.google.com/search?q=SNB%20Reviews%20Franc%20Alert%20Level%20Before%20Middle%20East%20Peace%20Deal",
+   "title": "ECB Officials Say Iran Deal Isn’t Enough to Fix Energy Shock",
+   "link": "https://news.google.com/search?q=ECB%20Officials%20Say%20Iran%20Deal%20Isn%E2%80%99t%20Enough%20to%20Fix%20Energy%20Shock",
    "published": "2026-06-17T04:15:00Z",
    "tickers": [
     "MACRO",
@@ -14843,7 +15041,34 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "La BNS rivede il livello di allerta del franco prima dell’accordo di pace in Medio Oriente"
+   "title_it": "Funzionari della BCE affermano che l’accordo con l’Iran non è sufficiente per risolvere lo shock energetico"
+  },
+  {
+   "source": "AP",
+   "title": "Trump to wrap G7 summit facing skepticism at home and jitters overseas over his plan to end Iran war - AP News",
+   "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxPVnI2WGtqR3RNZGpvRVNISjI3SVhEM2tyX2VmRG1pZXZVRW1sTEFrNU8yWnFfeEo2LXV4U08wX0RuM3JhcWxzZEJ0c0RNTnNDSWZtYzVJVVhudVlJNHhSSGVQdm5SalJJY2tHT3BWNkpCQUc4MzNacVg0QTlKb1JkaUNpbnZYSTBZNmpBcmR1RQ?oc=5",
+   "published": "2026-06-17T04:02:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Trump concluderà il vertice del G7 affrontando lo scetticismo in patria e il nervosismo all'estero per il suo piano per porre fine alla guerra con l'Iran - AP News"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "China’s Regulator to Support Launch of Active ETF Products",
+   "link": "https://news.google.com/search?q=China%E2%80%99s%20Regulator%20to%20Support%20Launch%20of%20Active%20ETF%20Products",
+   "published": "2026-06-17T03:26:39Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’autorità di regolamentazione cinese supporterà il lancio di prodotti ETF attivi"
   },
   {
    "source": "Google News",
@@ -14860,7 +15085,7 @@
   },
   {
    "source": "Reuters",
-   "title": "Indian shares extend rally on lower crude after US-Iran peace deal - Reuters",
+   "title": "Indian shares extend rally as lower crude lifts sentiment after US-Iran deal - Reuters",
    "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNQ2htaUZvQW5oUVZ1QmNhUGt5bFcxLWVFQkR1dFFqT1ZKTVlVYTZHNXVEWFhfWVJsTGN2NG04SmlWWW5IM21RN19zVFkzREpXRUVXSy1wcFNRZWJVMWIwNEliRnpYYTBlU2trcEFGallfdHlwRDNySk4yR0Q1UXIwUnFGdkg4clY0LXJlRnREVlVpS3lkSHdkQnZuNndCSnVLWWJzTTNrWjdWeXNLWk15Um5UdERDQXBlRl85Rmt3?oc=5",
    "published": "2026-06-17T02:28:00Z",
    "tickers": [
@@ -14870,7 +15095,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bull",
-   "title_it": "Le azioni indiane continuano il rally sul greggio in calo dopo l'accordo di pace tra Stati Uniti e Iran - Reuters"
+   "title_it": "Le azioni indiane continuano il rally mentre il calo del greggio risolleva il sentiment dopo l'accordo USA-Iran - Reuters"
   },
   {
    "source": "MarketWatch",
@@ -14902,9 +15127,9 @@
   },
   {
    "source": "Reuters",
-   "title": "Oil slides on Iran supply prospects as traders wait on Warsh - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQOU5DMTRIOHpLY0VUdlJ6RW1fcEhveWNmVmZaNFo0YkdfNmN0a0VZN1JHMDcxVFdlMl81aVpWQV8td2hxb1dZcldhVE5USmVqeEhDNDA4Yk5RSDBpWnBuN3FTblFLMUxEa3poLTZsR3pfMmNfUENaOVZDRjVFNGl5V0l6MA?oc=5",
-   "published": "2026-06-17T01:50:00Z",
+   "title": "Gold steady as US-Iran deal details emerge, Fed verdict awaited - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOZmo2a0piWUpISXJxNEJNWlprT0NaYUx4OU1pZzZ6QUp3dUZCdGlsTUQxNlhZaG9WaXVNT1I2ZWxUb2RUSERFZ3ZpSVktbGN6N1JNUFdZdUplNEJsMWdPX1d0bi03b0lWVGk3TjBaYkJBY3NNQXJpazhpYmNhVndseV9wNXVuSW1IRDlMMTZBTVROeFdBRmkwa0s4Yk9hWHZVcGlmLVdUVXZEdw?oc=5",
+   "published": "2026-06-17T01:30:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -14912,11 +15137,11 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il petrolio scivola sulle prospettive di fornitura dell'Iran mentre i trader attendono Warsh - Reuters"
+   "title_it": "Oro stabile mentre emergono i dettagli dell'accordo USA-Iran, in attesa del verdetto della Fed - Reuters"
   },
   {
    "source": "Reuters",
-   "title": "Oil dips as investors weigh deal on Iran war as uncertainty persists on Hormuz - Reuters",
+   "title": "Oil little changed as investors weigh US-Iran peace deal, Hormuz uncertainty - Reuters",
    "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxNenNvdC1DbGktWE0tRE5scUJEblVjSy1HVWROZkNNQ3lqT290eXhQV0R5MXhxYUhHYlBaN1lqdl95QUpEaHRaX0lOY3h2aEJSblJxYldFODhXWGFwN3dlOV9xbFFWTnpJNUlTUkJkaG9nWjRUUEpSemE2N09VWFVtNFRnT2RSQ3lKV094RjN5MkNYZlRIOURlZWJhREdaLWc2bVhiV2hCNUlYaTZrTUdXWkpKRnBTLWo1QVVEcDBIbGFWdGFqczhubmVR?oc=5",
    "published": "2026-06-17T01:09:00Z",
    "tickers": [
@@ -14925,8 +15150,8 @@
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bear",
-   "title_it": "Il petrolio crolla mentre gli investitori valutano un accordo sulla guerra con l'Iran mentre persiste l'incertezza su Hormuz - Reuters"
+   "sentiment": "neutral",
+   "title_it": "Petrolio poco cambiato mentre gli investitori valutano l'accordo di pace Usa-Iran, incertezza su Hormuz - Reuters"
   },
   {
    "source": "MarketWatch",
@@ -14943,7 +15168,7 @@
   },
   {
    "source": "Reuters",
-   "title": "Dollar on the defensive ahead of first Fed decision under Warsh - Reuters",
+   "title": "Dollar on guard ahead of first Fed decision under Warsh - Reuters",
    "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNdkJCUU94WGx5UkN1MWF6aFdac2FRV2c4NVd4WHVkTXE3clBpZzVpdndJQmVJTDd1RllVdGtwNDZtS0xoYVNmZFFqSHJhUlBYczQxMXZKZ2hvSGdPOExILURHT1R3UHdYY2VwZWxoUE9SN2U0OW8zTDNBUHRYWU5VVUhkZWVuTE83OHk3a09XMWt6SEpwRjZMRE1janN2SGV3Wi1JbjBlaEQ0cmdy?oc=5",
    "published": "2026-06-17T00:35:00Z",
    "tickers": [
@@ -14952,7 +15177,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Dollaro sulla difensiva prima della prima decisione della Fed sotto Warsh - Reuters"
+   "title_it": "Dollaro in guardia prima della prima decisione della Fed sotto Warsh - Reuters"
   },
   {
    "source": "AP",
@@ -14967,48 +15192,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Funzionario americano afferma che l'Iran sapeva che la squadra avrebbe dovuto lasciare il paese poco dopo la partita della Coppa del Mondo - AP News"
-  },
-  {
-   "source": "Bloomberg",
-   "title": "Gold Holds Gain as US, Iran Prepare to Sign Interim Peace Deal",
-   "link": "https://news.google.com/search?q=Gold%20Holds%20Gain%20as%20US%2C%20Iran%20Prepare%20to%20Sign%20Interim%20Peace%20Deal",
-   "published": "2026-06-16T23:48:24Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bull",
-   "title_it": "L’oro continua a guadagnare mentre Stati Uniti e Iran si preparano a firmare un accordo di pace provvisorio"
-  },
-  {
-   "source": "AP",
-   "title": "Trump goes after Netanyahu as he pursues deal with Iran, putting their friendship to the test - AP News",
-   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNV1F5am4yX1lmUklsbm5kdndpWHNPcVh5M1lXZ3l0OExROUFlbkZXVGpNYVhNYV83c0lyWXlMcGMwaG1maThoSFJoSVU0SlRtOE53YUpkUkowV2NjRzlJcmlzbE5zRHEwVmpGYlhGR01yWW82QjNqNjJfdGhpY1liQjlwVW5KbFdvVmMxNDhTeWxiTWQxcWtr?oc=5",
-   "published": "2026-06-16T22:35:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Trump insegue Netanyahu mentre persegue un accordo con l'Iran, mettendo alla prova la loro amicizia - AP News"
-  },
-  {
-   "source": "CNBC",
-   "title": "Bill limiting investors from buying homes set to speed through Congress",
-   "link": "https://www.cnbc.com/2026/06/16/housing-bill-limiting-investors-congress.html",
-   "published": "2026-06-16T22:34:21Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il disegno di legge che limita gli investitori nell'acquisto di case è destinato ad accelerare l'approvazione del Congresso"
   },
   {
    "source": "Google News",
@@ -15026,16 +15209,16 @@
   },
   {
    "source": "Bloomberg",
-   "title": "Bonds Rally Ahead of Fed as Oil Extends Losing Run: Markets Wrap",
-   "link": "https://news.google.com/search?q=Bonds%20Rally%20Ahead%20of%20Fed%20as%20Oil%20Extends%20Losing%20Run%3A%20Markets%20Wrap",
+   "title": "Nasdaq Futures Rise Before Fed as Oil Extends Drop: Markets Wrap",
+   "link": "https://news.google.com/search?q=Nasdaq%20Futures%20Rise%20Before%20Fed%20as%20Oil%20Extends%20Drop%3A%20Markets%20Wrap",
    "published": "2026-06-16T22:06:39Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bull",
-   "title_it": "Le obbligazioni si rafforzano davanti alla Fed mentre il petrolio prolunga la corsa perdente: i mercati si chiudono"
+   "sentiment": "neutral",
+   "title_it": "I futures del Nasdaq salgono prima della Fed mentre il petrolio continua a scendere: i mercati si concludono"
   },
   {
    "source": "MarketWatch",
@@ -15093,20 +15276,6 @@
    "title_it": "Questi titoli dovrebbero sovraperformare una volta concluso l’accordo con l’Iran, afferma UBS"
   },
   {
-   "source": "Reuters",
-   "title": "Lawmakers in the dark on Iran deal as Trump says he will send it to Congress - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPUjVDeGNCNHlaMHpKVXNRUHZjaXVYckE1d2ZxbXNrUFA4d0pycUswME4wSmNiZHEzNVh2WEpLaVh5ZXluZVZZamRVc2ZWMjdPZVFJbXM3YzQ3TTRIN0c3LWhFT180OEJaRlVraENneHNJa1I2NVcxMURKdmlNRGI3Y3FjRmc3cWtxbDN4UjJfN3ZTR0RTYnVlYnZwcXhtYTJJdTNQRw?oc=5",
-   "published": "2026-06-16T19:56:54Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I legislatori sono all'oscuro dell'accordo con l'Iran mentre Trump dice che lo invierà al Congresso - Reuters"
-  },
-  {
    "source": "CNBC",
    "title": "Fed Chair Warsh expected to withhold 'dot' from central bank's interest rate outlook",
    "link": "https://www.cnbc.com/2026/06/16/fed-chair-warsh-expected-to-withhold-dot-from-central-banks-interest-rate-outlook.html",
@@ -15117,7 +15286,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il presidente della Fed Warsh dovrebbe tralasciare il \"punto\" dalle prospettive sui tassi di interesse della banca centrale"
+   "title_it": "Il presidente della Fed Warsh prevede di tralasciare il \"punto\" dalle prospettive sui tassi di interesse della banca centrale"
   },
   {
    "source": "Google News",
@@ -15143,27 +15312,13 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Mancano 24 ore al grande annuncio della Fed: ecco cosa sappiamo adesso - 24 ore su 24, 7 giorni su 7, Wall St."
-  },
-  {
-   "source": "AP",
-   "title": "Former Trump attorneys, aides plead not guilty to Wisconsin fake elector felony charges - AP News",
-   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPMTJ2RkJBRmZQRDgzdzF3bUZFX0FTSFhvNE45Yjd5VHp0SlZKYU8zQUZlUHFjdTZETHZQUExZSElxRWtJdG11OHRuQWk5MG10eWhDX1lNN1ZGVURnQVM1MEN4MmRBNnM4VVdqWTUyMHFLd25pV2xIQm1jMnZTWUZDZUxQVllGOWRJRE5OSEMtbmxPT0NhcFlmTS1FQWNWby14RDNzWGln?oc=5",
-   "published": "2026-06-16T18:52:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Ex avvocati e assistenti di Trump si dichiarano non colpevoli delle false accuse di reati elettorali del Wisconsin - AP News"
+   "title_it": "Mancano 24 ore al grande annuncio della Fed: ecco cosa sappiamo adesso - 24 ore su 24, 7 giorni su 7 Wall St."
   },
   {
    "source": "Reuters",
-   "title": "Tehran can immediately sell oil upon signing US-Iran deal, US official says - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQMF8zSlRJcE1kRDQ1Y0VlSmRwMEV1YmYzbi1jZS1Ha2lPd0hocXBMMThndVRPRVk1dXlGQlhYam14c1VUTmUzaTBKQllGdkw1Zlo4bGFhRFRiU3p2b2Y2T05MY3Nfcm5Ja1BDX2gwTlhPbzFubnczOENYaWZrY0RzeTd5QlNRRTV5UmYtZDlsMDJyaTFFTXFreFRNTXpzaW1CUGxnZUg1UGpuTzU3ZUdYQQ?oc=5",
-   "published": "2026-06-16T17:53:04Z",
+   "title": "Exclusive: Iran deal includes $300 billion fund, more than half of which already committed, source says - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxPWUQ2ODdpWjF3UzYxRTVRUi1hMkZRMEw3S3pDR0VWSzY5bjVWeE1TXzJZUUp1SWQ4QXFjVUJBNzRDcFp2cnJoMVBSQU45Vkp6YjdDanJLMlNiVFRTMm1KNnhlLWkxOXFLQUJmeTJkOThzTmlQMlpuVHlybW9SMnczd2lIWXJBcHI4Uk94R2RwUVg5aHJxR1ptNGppUVRSV1pneUp3WkN1elRrN1FSd0EwZ05kZDVEMTRpX0VGeHFwOVlvTmV3b3c?oc=5",
+   "published": "2026-06-16T17:58:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -15171,7 +15326,20 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Teheran può vendere immediatamente petrolio dopo la firma dell'accordo USA-Iran, dice un funzionario americano - Reuters"
+   "title_it": "Esclusivo: L'accordo con l'Iran comprende un fondo di 300 miliardi di dollari, più della metà dei quali già impegnati, dice una fonte - Reuters"
+  },
+  {
+   "source": "Google News",
+   "title": "Will interest rates change? What to expect from June's Fed meeting - USA Today",
+   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNWFVVdzdFTEtDQVBwcW1iUTFFT1lOMjZ5N2R2dUlfZk5GdWhDNVVDR0ljcE0wSWV6OXpUVVAwTU1wZXhwckZKOW1WcVRFdTBuVnFnN3RVaUpjX3dhMXR4Q0VGazdnUEFxcFVGS00xMUZmUS1Mb25jZkdlelVyVmtiTDZQSmlPQ0ZaTHJublpqLWE5OHl2WVNnZ054YllaX2NiaWc3YktR?oc=5",
+   "published": "2026-06-16T15:43:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "I tassi di interesse cambieranno? Cosa aspettarsi dalla riunione della Fed di giugno - USA Today"
   },
   {
    "source": "Reddit",
@@ -15202,58 +15370,6 @@
    "title_it": "Il presidente della Federal Reserve Kevin Warsh tiene il primo briefing sull'economia statunitense - C-SPAN"
   },
   {
-   "source": "CNBC",
-   "title": "Jim Cramer's top 10 things to watch in the stock market Tuesday - CNBC",
-   "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOcWd4NmZlSHZBQWhGNGs5Vy1kMzBCMi1QMWpwM0U1WVR5N2hoM2RtQlVwbmlha1A1SDdtbkJtRUdfSDlWZ0stcndnekFqR0FFMHVnRFBPZmVSODFiUTNpSXZRXzNTdEswaWhIaHdKR19rZGVFQVMxU0RtY2RsdmRQajFSOXlIT0xBT0doY29fZXFqbDVxbmJSRWY3djRkd0ZkaEE?oc=5",
-   "published": "2026-06-16T12:47:14Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Le 10 cose migliori da guardare martedì in borsa secondo Jim Cramer - CNBC"
-  },
-  {
-   "source": "CNBC",
-   "title": "Kevin Warsh's Fed is not expected to make any change to rates for a while, according to CNBC Fed Survey - CNBC",
-   "link": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQMVNCM1B5Y1NfRk4yN2thdUltcFlBMXZRVFVDVzBlZGR5aXBTWk0ydWo3dHRNSUp1NHFCQ0VfQjdtdncwRmc5TUxEV0ZmVWd6VWYxaGc4REN3WGFienJUWGtPd0QxQTNrcWhlQjRsM1F3VExpSVRhR1FTTXJLUmEzSy0yaXcyYTg4NHdfdERVTEl6YnZCLUhtWFN2UHlIa2NON3NGSDh4SGRqS2FyYzJYSm4ydXRTWlVUaEpnc1VaNVRVZ2stM1hyNnNhQmtrenlwSFY5Tg?oc=5",
-   "published": "2026-06-16T11:05:19Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Secondo la CNBC Fed Survey - CNBC, la Fed di Kevin Warsh non dovrebbe apportare alcuna modifica ai tassi per un po'"
-  },
-  {
-   "source": "Google News",
-   "title": "Fed set to make interest rate decision as inflation hits 3-year high - ABC News - Breaking News, Latest News and Videos",
-   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxObE9meWdub2FOS2dVY0pKYUxReEZrZGJhMnIyNG9JTEJpZlhISXFXMlZGZk1kSjRPWlRPejV6aTdXSHZnWWFkeHBvZVEydk9Sa1dLallzVGtIenB2OV9yR2daTDNrb2psQW5uZ2JSYnlOMUxmYzExZ1NBT1V3OGVlaERaZ1pPaVYwTDUyNVJCR1lJUkpoRFhhMzJha09TOVXSAaQBQVVfeXFMUGc0WHV5TzVaUnlTZjZ2Y1h3RHdSSnc0LWZoTzF3Uzk4WFkyQVByY1kxNkNoeDREX3Z6TDRSOUsyMmFvbHBGUWNlWUlXZGxJZFN6RFB5NWREWWtlRXUyMXJyUUlMTXo0cmh4NlpfT1pMUklyOGJLb1F5SDdteTItMzl5NVQybXk5U2ZQWkRGYmhnU0dJZ2hoTEFjb3FLaktRcjZNbDc?oc=5",
-   "published": "2026-06-16T09:16:26Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La Fed si appresta a prendere una decisione sul tasso di interesse mentre l'inflazione raggiunge il massimo di 3 anni - ABC News - Ultime notizie, ultime notizie e video"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Samsung sees higher chip orders from BYD, Google, AMD amid tight TSMC capacity- Ni",
-   "link": "https://www.investing.com/news/stock-market-news/samsung-sees-higher-chip-orders-from-byd-google-amd-amid-tight-tsmc-capacity-ni-4746469",
-   "published": "2026-06-17T04:20:37Z",
-   "tickers": [
-    "AMD"
-   ],
-   "topic_pri": 1,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Samsung vede ordini di chip più elevati da BYD, Google, AMD in un contesto di capacità limitata di TSMC-Ni"
-  },
-  {
    "source": "Reddit",
    "title": "Fixed income strategy in early retirement",
    "link": "https://www.reddit.com/r/investing/comments/1u7mzwl/fixed_income_strategy_in_early_retirement/",
@@ -15264,66 +15380,36 @@
    "topic_pri": 1,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Strategia del reddito fisso in caso di pensionamento anticipato"
-  },
-  {
-   "source": "CNBC",
-   "title": "'Godfather' of options sees SpaceX surpassing Nvidia, Tesla as early trades come in",
-   "link": "https://www.cnbc.com/2026/06/16/godfather-of-options-sees-spacex-surpassing-nvidia-tesla-as-early-trades-come-in.html",
-   "published": "2026-06-16T14:31:44Z",
-   "tickers": [
-    "NVDA"
-   ],
-   "topic_pri": 1,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il \"padrino\" delle opzioni vede SpaceX superare Nvidia e Tesla nei primi scambi"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Bitcoin battles $67K resistance after SuperTrend flip: Live levels",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-hits-66380-resistance-after-wbottom-breakout-live-levels-93CH-4741296",
-   "published": "2026-06-16T19:05:07Z",
-   "tickers": [
-    "BTC-USD"
-   ],
-   "topic_pri": 2,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Bitcoin combatte la resistenza di 67.000 dollari dopo il ribaltamento del SuperTrend: livelli live"
-  },
-  {
-   "source": "Reddit",
-   "title": "SPCX - Beware, institutional money is NOT buying this trash on the open market",
-   "link": "https://www.reddit.com/r/stocks/comments/1u7jhyx/spcx_beware_institutional_money_is_not_buying/",
-   "published": "2026-06-16T17:06:12Z",
-   "tickers": [
-    "SPCX"
-   ],
-   "topic_pri": 2,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "SPCX – Attenzione, il denaro istituzionale NON compra questa spazzatura sul mercato aperto"
-  },
-  {
-   "source": "Reddit",
-   "title": "SpaceX/SPCX IPO: Am I wrong to wait until the lock-up sell pressure becomes clear?",
-   "link": "https://www.reddit.com/r/stocks/comments/1u6wxpr/spacexspcx_ipo_am_i_wrong_to_wait_until_the/",
-   "published": "2026-06-15T23:26:04Z",
-   "tickers": [
-    "SPCX"
-   ],
-   "topic_pri": 2,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "IPO SpaceX/SPCX: sbaglio ad aspettare finché la pressione di vendita del lock-up non diventi chiara?"
+   "title_it": "Strategia del reddito fisso nel pensionamento anticipato"
   },
   {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the June 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the June 2026 meeting? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-june-2026-meeting",
-   "published": "2026-06-17T05:27:07Z",
+   "published": "2026-06-17T08:56:18Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Will the price of Bitcoin be above $62,000 on June 17?",
+   "title_it": "Will the price of Bitcoin be above $62,000 on June 17? — probabilità Sì 99%",
+   "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-17-2026",
+   "published": "2026-06-17T08:56:18Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Will the price of Bitcoin be above $60,000 on June 17?",
+   "title_it": "Will the price of Bitcoin be above $60,000 on June 17? — probabilità Sì 100%",
+   "link": "https://polymarket.com/event/bitcoin-above-60k-on-june-17-2026",
+   "published": "2026-06-17T08:56:18Z",
    "tickers": [
     "MACRO"
    ],
