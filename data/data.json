@@ -1,15 +1,15 @@
 {
- "updated_at": "2026-06-18T21:56:27Z",
- "eurusd": 1.1465,
+ "updated_at": "2026-06-18T22:51:27Z",
+ "eurusd": 1.1464,
  "totals": {
   "usd_value": 214844.19,
   "usd_gain": 129865.63,
   "usd_gain_pct": 152.82,
-  "eur_value": 228745.59,
-  "eur_gain": 114627.29,
+  "eur_value": 228767.06,
+  "eur_gain": 114640.27,
   "eur_gain_pct": 100.45,
-  "tax_est": 29619.7,
-  "eur_gain_net": 85007.59
+  "tax_est": 29623.07,
+  "eur_gain_net": 85017.19
  },
  "portfolio": [
   {
@@ -695,8 +695,8 @@
    "beta": 2.2,
    "prepost": {
     "label": "after",
-    "price": 210.81,
-    "change_pct": 0.06
+    "price": 210.16,
+    "change_pct": -0.25
    },
    "sector": "Technology",
    "stats": {
@@ -1627,8 +1627,8 @@
    "beta": 2.49,
    "prepost": {
     "label": "after",
-    "price": 539.19,
-    "change_pct": 0.34
+    "price": 536.99,
+    "change_pct": -0.07
    },
    "sector": "Technology",
    "stats": {
@@ -2559,8 +2559,8 @@
    "beta": 2.17,
    "prepost": {
     "label": "after",
-    "price": 1154.2,
-    "change_pct": 1.78
+    "price": 1148.0,
+    "change_pct": 1.24
    },
    "sector": "Technology",
    "stats": {
@@ -3330,8 +3330,8 @@
    "beta": 3.47,
    "prepost": {
     "label": "after",
-    "price": 112.4,
-    "change_pct": -0.12
+    "price": 111.98,
+    "change_pct": -0.49
    },
    "sector": "Technology",
    "stats": {
@@ -3827,8 +3827,8 @@
    "beta": 1.9,
    "prepost": {
     "label": "after",
-    "price": 21.22,
-    "change_pct": -0.66
+    "price": 21.16,
+    "change_pct": -0.94
    },
    "sector": "Technology",
    "stats": {
@@ -4358,8 +4358,8 @@
    "beta": 1.11,
    "prepost": {
     "label": "after",
-    "price": 61.1,
-    "change_pct": -0.11
+    "price": 60.97,
+    "change_pct": -0.33
    },
    "sector": "Utilities",
    "stats": {
@@ -4514,8 +4514,8 @@
    "beta": null,
    "prepost": {
     "label": "after",
-    "price": 182.67,
-    "change_pct": -1.26
+    "price": 180.75,
+    "change_pct": -2.3
    },
    "sector": "Industrials",
    "stats": {
@@ -4754,8 +4754,8 @@
    "beta": null,
    "prepost": {
     "label": "after",
-    "price": 236.88,
-    "change_pct": 0.92
+    "price": 236.2,
+    "change_pct": 0.63
    },
    "sector": "Technology",
    "stats": {
@@ -6430,28 +6430,27 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 62892.91,
-   "change_pct": -4.13,
+   "price": 62792.36,
+   "change_pct": -2.52,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -50.2,
    "support": 59108.92,
-   "resistance": 74218.56,
-   "rsi": 35.1,
-   "volume": 31012548608,
-   "vol_ratio": 0.94,
+   "resistance": 74153.5,
+   "rsi": 34.6,
+   "volume": 29707186176,
+   "vol_ratio": 0.89,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
     "w1": [
-     64421.32,
      65710.4,
      66289.5,
      65600.64,
-     62892.91
+     64418.45,
+     62792.36
     ],
     "m6": [
-     66221.84,
      68857.84,
      69767.62,
      68788.19,
@@ -6576,7 +6575,8 @@
      65710.4,
      66289.5,
      65600.64,
-     62892.91
+     64418.45,
+     62792.36
     ],
     "all": [
      386.94,
@@ -6720,10 +6720,9 @@
      68233.31,
      76304.32,
      73579.69,
-     62915.0
+     62792.36
     ],
     "m1": [
-     74344.7,
      73536.55,
      73372.52,
      73754.84,
@@ -6744,10 +6743,10 @@
      65710.4,
      66289.5,
      65600.64,
-     62892.91
+     64418.45,
+     62792.36
     ],
     "m3": [
-     74484.64,
      74181.61,
      74805.08,
      75152.13,
@@ -6812,7 +6811,8 @@
      65710.4,
      66289.5,
      65600.64,
-     62892.91
+     64418.45,
+     62792.36
     ],
     "y1": [
      104883.33,
@@ -6887,7 +6887,8 @@
      73372.52,
      64014.37,
      63090.59,
-     64421.32
+     64421.32,
+     62792.36
     ],
     "d1": [
      64541.68,
@@ -7021,7 +7022,13 @@
      62949.63,
      62905.89,
      62838.47,
-     62834.05
+     62834.05,
+     62844.32,
+     62847.04,
+     62768.32,
+     62690.0,
+     62745.1,
+     62791.08
     ]
    },
    "earnings_date": null,
@@ -7036,22 +7043,22 @@
     "w1": {
      "support": 62292.75,
      "resistance": 67248.13,
-     "change_pct": -2.37
+     "change_pct": -4.44
     },
     "m1": {
      "support": 59108.92,
-     "resistance": 76014.3,
-     "change_pct": -15.4
+     "resistance": 74460.12,
+     "change_pct": -14.61
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -15.56
+     "change_pct": -15.35
     },
     "y1": {
      "support": 59108.92,
-     "resistance": 123739.34,
-     "change_pct": -48.32
+     "resistance": 122509.66,
+     "change_pct": -44.54
     }
    },
    "financials": [],
@@ -7061,16 +7068,16 @@
    "ticker": "CL=F",
    "name": "Petrolio WTI",
    "currency": "USD",
-   "price": 75.52,
-   "change_pct": -1.65,
+   "price": 75.47,
+   "change_pct": -1.72,
    "pe": null,
    "ath": 147.27,
-   "ath_dist_pct": -48.7,
-   "support": 72.83,
+   "ath_dist_pct": -48.8,
+   "support": 74.59,
    "resistance": 102.66,
-   "rsi": 30.4,
-   "volume": 255117,
-   "vol_ratio": 1.01,
+   "rsi": 30.3,
+   "volume": 729,
+   "vol_ratio": 0.0,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -7079,7 +7086,7 @@
      80.75,
      76.05,
      76.79,
-     75.52
+     75.47
     ],
     "m6": [
      55.94,
@@ -7207,7 +7214,7 @@
      80.75,
      76.05,
      76.79,
-     75.52
+     75.47
     ],
     "all": [
      33.1,
@@ -7474,7 +7481,7 @@
      65.21,
      105.07,
      87.36,
-     75.52
+     75.47
     ],
     "m1": [
      107.77,
@@ -7498,7 +7505,7 @@
      80.75,
      76.05,
      76.79,
-     75.52
+     75.47
     ],
     "m3": [
      96.21,
@@ -7566,7 +7573,7 @@
      80.75,
      76.05,
      76.79,
-     75.52
+     75.47
     ],
     "y1": [
      75.14,
@@ -7723,7 +7730,12 @@
      75.46,
      75.39,
      75.41,
-     75.5
+     75.5,
+     75.45,
+     75.44,
+     75.68,
+     75.5,
+     75.47
     ]
    },
    "earnings_date": null,
@@ -7736,24 +7748,24 @@
    "stats": null,
    "tech_by_range": {
     "w1": {
-     "support": 72.83,
+     "support": 74.59,
      "resistance": 87.23,
-     "change_pct": -11.03
+     "change_pct": -11.09
     },
     "m1": {
-     "support": 72.83,
+     "support": 74.59,
      "resistance": 109.24,
-     "change_pct": -29.92
+     "change_pct": -29.97
     },
     "m3": {
-     "support": 72.83,
+     "support": 74.59,
      "resistance": 117.63,
-     "change_pct": -21.51
+     "change_pct": -21.56
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 0.79
+     "change_pct": 0.72
     }
    },
    "financials": [],
@@ -9450,8 +9462,8 @@
    "beta": 2.23,
    "prepost": {
     "label": "after",
-    "price": 134.15,
-    "change_pct": 0.12
+    "price": 133.99,
+    "change_pct": -0.0
    },
    "sector": "Technology",
    "stats": {
@@ -10072,8 +10084,8 @@
    "beta": 1.8,
    "prepost": {
     "label": "after",
-    "price": 399.59,
-    "change_pct": -0.22
+    "price": 398.0,
+    "change_pct": -0.62
    },
    "sector": "Consumer Cyclical",
    "stats": {
@@ -10571,8 +10583,8 @@
    "beta": 1.51,
    "prepost": {
     "label": "after",
-    "price": 128.8,
-    "change_pct": 0.26
+    "price": 128.6,
+    "change_pct": 0.1
    },
    "sector": "Technology",
    "stats": {
@@ -11263,8 +11275,8 @@
    "beta": 1.24,
    "prepost": {
     "label": "after",
-    "price": 367.54,
-    "change_pct": -0.13
+    "price": 365.65,
+    "change_pct": -0.65
    },
    "sector": "Communication Services",
    "stats": {
@@ -11918,7 +11930,7 @@
      262.81,
      273.93,
      265.04,
-     273.24,
+     273.25,
      282.06,
      281.36,
      276.51,
@@ -12190,8 +12202,8 @@
    "beta": 0.65,
    "prepost": {
     "label": "after",
-    "price": 400.4,
-    "change_pct": -0.14
+    "price": 400.35,
+    "change_pct": -0.15
    },
    "sector": "Healthcare",
    "stats": {
@@ -13117,8 +13129,8 @@
    "beta": 1.0,
    "prepost": {
     "label": "after",
-    "price": 326.0,
-    "change_pct": 0.24
+    "price": 325.82,
+    "change_pct": 0.18
    },
    "sector": "Financial Services",
    "stats": {
@@ -13265,7 +13277,7 @@
      652.88,
      656.65,
      639.92,
-     634.11,
+     634.12,
      650.37,
      672.3,
      663.48,
@@ -14044,8 +14056,8 @@
    "beta": 0.11,
    "prepost": {
     "label": "after",
-    "price": 510.95,
-    "change_pct": -0.0
+    "price": 511.0,
+    "change_pct": 0.01
    },
    "sector": "Industrials",
    "stats": {
@@ -14125,19 +14137,19 @@
   {
    "ticker": "MU",
    "name": "Micron",
-   "value_eur": 69234.63,
+   "value_eur": 69242.56,
    "sector": "Technology"
   },
   {
    "ticker": "NVDA",
    "name": "NVIDIA",
-   "value_eur": 49616.23,
+   "value_eur": 49621.92,
    "sector": "Technology"
   },
   {
    "ticker": "AMD",
    "name": "AMD",
-   "value_eur": 46869.41,
+   "value_eur": 46874.78,
    "sector": "Technology"
   },
   {
@@ -14149,13 +14161,13 @@
   {
    "ticker": "MSTR",
    "name": "Strategy",
-   "value_eur": 12072.29,
+   "value_eur": 12073.67,
    "sector": "Technology"
   },
   {
    "ticker": "RGTI",
    "name": "Rigetti",
-   "value_eur": 9594.55,
+   "value_eur": 9595.65,
    "sector": "Technology"
   }
  ],
@@ -14169,18 +14181,18 @@
     "2026-06-18"
    ],
    "values": [
-    294076,
-    310878,
-    296758,
-    296869,
+    294049,
+    310849,
+    296731,
+    296842,
     312479
    ],
    "nasdaq": [
-    294076,
-    303108,
-    299613,
-    295585,
-    301221
+    294049,
+    303080,
+    299586,
+    295558,
+    301194
    ],
    "ndx": [
     215274,
@@ -14230,52 +14242,52 @@
     "2026-06-18"
    ],
    "values": [
-    265454,
-    274639,
-    278740,
-    280623,
-    295524,
-    295416,
-    299665,
-    301791,
-    309362,
-    311632,
-    310043,
-    302933,
-    277604,
-    292029,
-    286150,
-    276750,
-    292479,
-    294076,
-    310878,
-    296758,
-    296869,
+    265430,
+    274614,
+    278715,
+    280597,
+    295496,
+    295388,
+    299638,
+    301763,
+    309333,
+    311603,
+    310015,
+    302905,
+    277578,
+    292002,
+    286123,
+    276724,
+    292452,
+    294049,
+    310849,
+    296731,
+    296842,
     312479
    ],
    "nasdaq": [
-    265454,
-    269555,
-    269788,
-    270310,
-    273514,
-    273704,
-    276194,
-    276761,
-    277932,
-    278005,
-    275542,
-    275307,
-    263798,
-    266059,
-    263484,
-    258259,
-    264827,
-    265640,
-    273798,
-    270642,
-    267003,
-    272094
+    265430,
+    269530,
+    269764,
+    270285,
+    273489,
+    273678,
+    276169,
+    276735,
+    277906,
+    277980,
+    275517,
+    275282,
+    263774,
+    266035,
+    263460,
+    258235,
+    264803,
+    265615,
+    273773,
+    270617,
+    266979,
+    272069
    ],
    "ndx": [
     194322,
@@ -14420,140 +14432,140 @@
     "2026-06-18"
    ],
    "values": [
-    208358,
-    205969,
-    205094,
-    198852,
-    199606,
-    198026,
-    199822,
-    192615,
-    190003,
-    185179,
-    191918,
-    193669,
-    194714,
-    198191,
-    197302,
-    201467,
-    204109,
-    206290,
-    208216,
-    215157,
-    217280,
-    220367,
-    224337,
-    224620,
-    222702,
-    231680,
-    229198,
-    238081,
-    241011,
-    235865,
-    236231,
-    237484,
-    240902,
-    242600,
-    250134,
-    264248,
-    259665,
-    276177,
-    283300,
-    277451,
-    281261,
-    284780,
-    273103,
-    266819,
-    265454,
-    274639,
-    278740,
-    280623,
-    295524,
-    295416,
-    299665,
-    301791,
-    309362,
-    311632,
-    310043,
-    302933,
-    277604,
-    292029,
-    286150,
-    276750,
-    292479,
-    294076,
-    310878,
-    296758,
-    296869,
+    208339,
+    205950,
+    205075,
+    198834,
+    199588,
+    198007,
+    199804,
+    192597,
+    189985,
+    185162,
+    191900,
+    193652,
+    194696,
+    198173,
+    197284,
+    201448,
+    204090,
+    206271,
+    208197,
+    215138,
+    217260,
+    220347,
+    224317,
+    224599,
+    222682,
+    231658,
+    229177,
+    238059,
+    240989,
+    235844,
+    236210,
+    237462,
+    240880,
+    242578,
+    250111,
+    264224,
+    259641,
+    276152,
+    283274,
+    277425,
+    281235,
+    284753,
+    273077,
+    266794,
+    265430,
+    274614,
+    278715,
+    280597,
+    295496,
+    295388,
+    299638,
+    301763,
+    309333,
+    311603,
+    310015,
+    302905,
+    277578,
+    292002,
+    286123,
+    276724,
+    292452,
+    294049,
+    310849,
+    296731,
+    296842,
     312479
    ],
    "nasdaq": [
-    208358,
-    205326,
-    204755,
-    200647,
-    203420,
-    201707,
-    203263,
-    198427,
-    194167,
-    192742,
-    200120,
-    202439,
-    202793,
-    203879,
-    204079,
-    209800,
-    211536,
-    212282,
-    214885,
-    219107,
-    222600,
-    223403,
-    226793,
-    226199,
-    224860,
-    228546,
-    226516,
-    230206,
-    230673,
-    228603,
-    228691,
-    230722,
-    232781,
-    232349,
-    234742,
-    239496,
-    239193,
-    243279,
-    243530,
-    241806,
-    244719,
-    246877,
-    243075,
-    241829,
-    239790,
-    243495,
-    243705,
-    244176,
-    247071,
-    247243,
-    249493,
-    250004,
-    251063,
-    251128,
-    248904,
-    248691,
-    238296,
-    240336,
-    238011,
-    233292,
-    239224,
-    239958,
-    247328,
-    244477,
-    241190,
-    245790
+    208339,
+    205307,
+    204736,
+    200629,
+    203402,
+    201689,
+    203244,
+    198409,
+    194149,
+    192724,
+    200101,
+    202421,
+    202775,
+    203860,
+    204060,
+    209780,
+    211516,
+    212262,
+    214866,
+    219086,
+    222579,
+    223382,
+    226773,
+    226178,
+    224840,
+    228525,
+    226495,
+    230185,
+    230652,
+    228582,
+    228670,
+    230701,
+    232759,
+    232328,
+    234721,
+    239474,
+    239171,
+    243257,
+    243508,
+    241784,
+    244696,
+    246854,
+    243053,
+    241807,
+    239768,
+    243472,
+    243683,
+    244154,
+    247048,
+    247220,
+    249470,
+    249981,
+    251040,
+    251105,
+    248881,
+    248668,
+    238274,
+    240314,
+    237990,
+    233270,
+    239202,
+    239936,
+    247305,
+    244454,
+    241168,
+    245767
    ],
    "ndx": [
     152526,
@@ -15695,7 +15707,7 @@
     85683,
     84279,
     86516,
-    85661,
+    85660,
     86403,
     84928,
     83567,
@@ -16465,7 +16477,7 @@
     85683,
     84279,
     86516,
-    85661,
+    85660,
     86403,
     84928,
     83567,
@@ -17157,8 +17169,8 @@
   },
   "fedwatch": {
    "target_range": "3.50–3.75%",
-   "implied_rate": 3.72,
-   "delta_bp": 10,
+   "implied_rate": 3.74,
+   "delta_bp": 12,
    "next_cut_prob": 0,
    "meetings": [
     {
@@ -17279,15 +17291,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1465",
-    "change_pct": -1.25,
+    "value": "1.1464",
+    "change_pct": -1.26,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "184.91",
-    "change_pct": -0.72,
+    "value": "184.75",
+    "change_pct": -0.8,
     "suffix": "%"
    }
   ],
@@ -17295,8 +17307,8 @@
    "us10": 4.45,
    "jp10": 2.61,
    "spread": 1.84,
-   "usdjpy": 161.35,
-   "usdjpy_chg_1m": 1.58,
+   "usdjpy": 161.2,
+   "usdjpy_chg_1m": 1.48,
    "boj_meetings": [
     "2026-07-31",
     "2026-09-18",
@@ -17329,7 +17341,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 9
+     "score": 7
     },
     {
      "label": "Treasury 10A",
@@ -17659,16 +17671,16 @@
   },
   {
    "question": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
-   "yes": 24,
+   "yes": 25,
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting"
   }
  ],
  "news": [
   {
    "source": "Investing.com",
-   "title": "Trump says ’we should stop’ Utah mail-in voting",
-   "link": "https://www.investing.com/news/politics-news/trump-says-we-should-stop-utah-mailin-voting-4750571",
-   "published": "2026-06-18T21:42:32Z",
+   "title": "Exclusive-Meta lobbies Congress for protection from child-harm lawsuits",
+   "link": "https://www.investing.com/news/stock-market-news/exclusivemeta-lobbies-congress-for-protection-from-childharm-lawsuits-4750621",
+   "published": "2026-06-18T22:25:28Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -17676,7 +17688,7 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Trump dice che “dovremmo fermare” il voto per corrispondenza nello Utah"
+   "title_it": "Il Congresso delle lobby Exclusive-Meta per la protezione dalle cause legali per danni ai minori"
   },
   {
    "source": "Investing.com",
@@ -17798,20 +17810,7 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Citi dice di acquistare USD/NOK sulla scia della Fed aggressiva e del calo dei prezzi del petrolio"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Range raises $8.3M Series A to unify treasury, risk and compliance across stablecoins and fiat",
-   "link": "https://www.investing.com/news/cryptocurrency-news/range-raises-83m-series-a-to-unify-treasury-risk-and-compliance-across-stablecoins-and-fiat-4749226",
-   "published": "2026-06-18T09:30:34Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "La gamma raccoglie 8,3 milioni di dollari di serie A per unificare tesoreria, rischio e conformità tra stablecoin e fiat"
+   "title_it": "Citi dice di acquistare USD/NOK in vista della linea dura della Fed e del calo dei prezzi del petrolio"
   },
   {
    "source": "Investing.com",
@@ -17853,6 +17852,33 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
+   "source": "Bloomberg",
+   "title": "Asian Stocks to Rise as US-Iran Deal Lifts Mood: Markets Wrap",
+   "link": "https://news.google.com/search?q=Asian%20Stocks%20to%20Rise%20as%20US-Iran%20Deal%20Lifts%20Mood%3A%20Markets%20Wrap",
+   "published": "2026-06-18T22:05:20Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "Azioni asiatiche in rialzo mentre l’accordo USA-Iran risolleva l’umore: i mercati si chiudono"
+  },
+  {
+   "source": "MarketWatch",
+   "title": "SpaceX is vastly more expensive than any stock in the S&P 500, fueled by ‘FOMO’ mentality",
+   "link": "https://www.marketwatch.com/story/spacex-is-vastly-more-expensive-than-any-stock-in-the-s-p-500-fueled-by-fomo-mentality-eb61cd69?mod=mw_rss_topstories",
+   "published": "2026-06-18T22:03:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "SpaceX è molto più costoso di qualsiasi titolo dell’S&P 500, alimentato dalla mentalità “FOMO”"
+  },
+  {
    "source": "CNBC",
    "title": "Trump administration temporarily cuts student loan interest rates for borrowers on autopay",
    "link": "https://www.cnbc.com/2026/06/18/trump-student-loan-autopay-interest-rate-discount.html",
@@ -17867,8 +17893,22 @@
    "title_it": "L’amministrazione Trump taglia temporaneamente i tassi di interesse sui prestiti studenteschi per i mutuatari con pagamento automatico"
   },
   {
+   "source": "Reuters",
+   "title": "Republicans blast Trump's Iran agreement as details emerge - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPa0FBNEpEUk9sRDhBMkp2bERRNEtLX3oweFJuTlM0ejdMZDZhX2ktUlg3cFk3TWc3aVcxc0xFeVlBTzg4eGZBMHNNS2dHbW1YSFJkZXYtZ3FGNWhKeTlZSU9KVWR2ZXphRlJjWk11ckFwUDM2cDM3Mm5rRk14ZkxoNEp3Qy1kdUR6OEFnczJHZzdhTUJUbW9LdGRGV2s?oc=5",
+   "published": "2026-06-18T21:35:48Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "I repubblicani criticano l'accordo di Trump con l'Iran mentre emergono i dettagli - Reuters"
+  },
+  {
    "source": "MarketWatch",
-   "title": "These stocks are in trouble now that Fed Chair Kevin Warsh removed the market’s guardrails",
+   "title": "These stocks are in trouble after Fed Chair Kevin Warsh removed the market’s guardrails",
    "link": "https://www.marketwatch.com/story/these-stocks-are-in-trouble-now-that-kevin-warsh-removed-the-markets-guardrails-f7f1e51c?mod=mw_rss_topstories",
    "published": "2026-06-18T21:35:00Z",
    "tickers": [
@@ -17877,7 +17917,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Questi titoli sono in difficoltà ora che il presidente della Fed Kevin Warsh ha rimosso i guardrail del mercato"
+   "title_it": "Questi titoli sono in difficoltà dopo che il presidente della Fed Kevin Warsh ha rimosso i guardrail del mercato"
   },
   {
    "source": "Google News",
@@ -17973,19 +18013,6 @@
    "title_it": "Alcuni senatori repubblicani e alleati di Trump hanno criticato duramente il suo accordo per porre fine alla guerra con l’Iran – AP News"
   },
   {
-   "source": "Bloomberg",
-   "title": "Hawkish Fed to Put Pressure on Historically Tight Credit Spreads",
-   "link": "https://news.google.com/search?q=Hawkish%20Fed%20to%20Put%20Pressure%20on%20Historically%20Tight%20Credit%20Spreads",
-   "published": "2026-06-18T20:15:26Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La Fed aggressiva metterà pressione sugli spread creditizi storicamente ristretti"
-  },
-  {
    "source": "CNBC",
    "title": "Vance says U.S. isn’t giving Iran ‘a cent’ as he defends Trump peace deal",
    "link": "https://www.cnbc.com/2026/06/18/vance-iran-war-memo-oil-gas.html",
@@ -17998,20 +18025,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Vance afferma che gli Stati Uniti non stanno dando “un centesimo” all’Iran mentre difende l’accordo di pace di Trump"
-  },
-  {
-   "source": "AP",
-   "title": "Democrats say money from Trump’s tax cuts bill is paying for White House ballroom project - AP News",
-   "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPQU1rM1BPSDFIVjFqU0xwVTVtRjdBY2xRMXdMbmxacW9xR3lNRF9Vc3JyTEtHSllDTmpjcFlZRGZPZ0JmWXVrQWZyUXgwbTRBRjVjcDBQcXFmb1Z0bWVaXzNSc1ZzWjlwQUhzVHZrbFIwVXdrZE9pRUFHUGhlSG5VUXNheVVmbE5GU1MtZDY3WXRLUTgwNlNMT3puYw?oc=5",
-   "published": "2026-06-18T20:00:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I democratici affermano che i soldi provenienti dalla legge sui tagli fiscali di Trump stanno finanziando il progetto della sala da ballo della Casa Bianca - AP News"
   },
   {
    "source": "Google News",
@@ -18038,21 +18051,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il traffico scorre attraverso Hormuz mentre entra in vigore l'accordo USA-Iran, restano interrogativi - Reuters"
-  },
-  {
-   "source": "MarketWatch",
-   "title": "The Iran oil shock taught traders these key lessons about demand and China",
-   "link": "https://www.marketwatch.com/story/the-iran-oil-shock-taught-traders-these-key-lessons-about-demand-and-china-b03ad6a3?mod=mw_rss_topstories",
-   "published": "2026-06-18T19:38:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Lo shock petrolifero iraniano ha insegnato ai trader queste lezioni fondamentali sulla domanda e sulla Cina"
+   "title_it": "Il traffico scorre attraverso Hormuz mentre l'accordo USA-Iran entra in vigore, restano interrogativi - Reuters"
   },
   {
    "source": "Google News",
@@ -18065,7 +18064,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Cosa è successo alla prima Fed di Kevin Warsh, la Chase Bank"
+   "title_it": "Cosa è successo alla prima Fed di Kevin Warsh: Chase Bank"
   },
   {
    "source": "Reuters",
@@ -18079,7 +18078,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "Vance mette in guardia i critici israeliani sull'accordo con l'Iran: Trump è il tuo unico alleato - Reuters"
+   "title_it": "Vance mette in guardia i critici israeliani sull'accordo con l'Iran: Trump è il vostro unico alleato - Reuters"
   },
   {
    "source": "CNBC",
@@ -18109,10 +18108,10 @@
    "title_it": "Ecco i cinque punti salienti del primo incontro di Kevin Warsh come presidente della Fed"
   },
   {
-   "source": "Reuters",
-   "title": "Republicans blast Trump's Iran agreement as details emerge - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPa0FBNEpEUk9sRDhBMkp2bERRNEtLX3oweFJuTlM0ejdMZDZhX2ktUlg3cFk3TWc3aVcxc0xFeVlBTzg4eGZBMHNNS2dHbW1YSFJkZXYtZ3FGNWhKeTlZSU9KVWR2ZXphRlJjWk11ckFwUDM2cDM3Mm5rRk14ZkxoNEp3Qy1kdUR6OEFnczJHZzdhTUJUbW9LdGRGV2s?oc=5",
-   "published": "2026-06-18T19:15:01Z",
+   "source": "AP",
+   "title": "JD Vance slams Israeli officials who criticized Iran deal, deepening rift between allies - AP News",
+   "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQT21XZ2NUeDJRa2VXQVhNdXYwU1V2VDFwM2pmcy1YUFU2bmM1U3lWOG9LT3BkSUY5NGwxWE5qWnpIYjVZVXdON21nOWFYdHd5RVBFY1dTVldhS1lJUEctRnZWOC1KWkdiWHcyUFFhWFNsdzdadUN5QXhTYmV4T1BwTnozaDJScGtBOHd6QWdnWQ?oc=5",
+   "published": "2026-06-18T18:57:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -18120,7 +18119,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "I repubblicani criticano l'accordo di Trump con l'Iran mentre emergono i dettagli - Reuters"
+   "title_it": "JD Vance critica i funzionari israeliani che hanno criticato l'accordo con l'Iran, approfondendo la spaccatura tra gli alleati - AP News"
   },
   {
    "source": "AP",
@@ -18150,20 +18149,6 @@
    "title_it": "Le scommesse sull’aumento dei tassi della Fed di luglio guidano l’impennata del volume dei futures obbligazionari"
   },
   {
-   "source": "MarketWatch",
-   "title": "How America cheated Black GIs after World War II, contributing to the racial wealth gap",
-   "link": "https://www.marketwatch.com/story/how-america-cheated-black-gis-after-world-war-ii-contributing-to-the-racial-wealth-gap-edb6b304?mod=mw_rss_topstories",
-   "published": "2026-06-18T18:40:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Come l'America ha ingannato i soldati neri dopo la seconda guerra mondiale, contribuendo al divario di ricchezza razziale"
-  },
-  {
    "source": "AP",
    "title": "How a Versailles dinner became the stage for Trump’s surprise Iran deal signing - AP News",
    "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQRjJxcWFmR2MtNkFhUWhqMElwMXNjLUxLQUdYNlBGQXdHWUpxN09NWW1wbTFPUU5qS2ZTUkNrZ05QSTh6cFRWcmQ2dkpQN3R5d2tKS1p5UjBCeVJGQUh0RHgtcDYwT1V3dXVTQlB4cG5UMklJY1plOV84cVRPQ3VEbkFSU0NmdlYxcU1ZSWVHM0FmVm9JQ3B5Yw?oc=5",
@@ -18175,7 +18160,21 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Come una cena a Versailles è diventata il palcoscenico per la firma a sorpresa di Trump dell'accordo con l'Iran - AP News"
+   "title_it": "Come una cena a Versailles è diventata il palcoscenico per la firma a sorpresa dell'accordo con l'Iran da parte di Trump - AP News"
+  },
+  {
+   "source": "Reuters",
+   "title": "Explainer: How Trump's deal with Iran compares to Obama's - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQbV9DV1p2OVVQRlVSYmRFYWxGd0lfcFFYamp1M1pGRVluaDB5Y2QyMVhKSERSVW9GM0ROOUNRUk1UVXpIaThfYnFvcHowazdUMWxkVWZSWEVaeUJvQUowTlR2SUJuMGdBUFZMeVdXVDJOT0xydWZoNUY0WUxPeWFadUdvbkZWZkhPTXVVTjdQNGZLNDdmOG9iellKYw?oc=5",
+   "published": "2026-06-18T18:25:29Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Spiegazione: Come si confronta l'accordo di Trump con l'Iran con quello di Obama - Reuters"
   },
   {
    "source": "CNBC",
@@ -18202,21 +18201,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bull",
-   "title_it": "L’accordo Usa-Iran ridisegna il Medio Oriente: l’Iran guadagna, rivali allarmati - Reuters"
-  },
-  {
-   "source": "Reuters",
-   "title": "Iran's Khamenei says he approved MoU with US, despite reservations, after assurances on Iran's rights - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxPczF6UzVRTUVGQXRuMmcxYm1INEtHVlRhWHEtYWhnVHlrRV90bDF0d0MxdjFmTVNQLUVzeDgxN1dMT0JjWjM2TUhJRHNBVmhXTXdpbjRvQ0hlMk5NRjhEQW9DZWpmT0xjOXRrcnlIME92VEY1b2pxaGk2NmdaZm9kOUVLX2lXYWd4U3VWcGRnQnVqNWY5TWl2Ql9XNDRzUUNZVk9KeUV5Y21JS0hHeWlpYzRKcllxeE9aSEtXVnduUUpXZw?oc=5",
-   "published": "2026-06-18T17:52:09Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'iraniano Khamenei afferma di aver approvato il protocollo d'intesa con gli Stati Uniti, nonostante le riserve, dopo aver assicurato i diritti dell'Iran - Reuters"
+   "title_it": "L'accordo USA-Iran ridisegna il Medio Oriente: l'Iran guadagna, rivali allarmati - Reuters"
   },
   {
    "source": "AP",
@@ -18315,11 +18300,38 @@
    "title_it": "Intel si mobilita per registrare un record dopo che Trump ha pubblicizzato l'accordo sui chip Apple"
   },
   {
+   "source": "Google News",
+   "title": "Fed lets key rate remain in place - The Arkansas Democrat-Gazette",
+   "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOLVEzWFVsZllqLXRlZUpHUEd5elpJNlpTQ0FSVHFlNmt5LUZIMjRUaVdOSzgtdUtORnd1cXViQlRUdG1zbEFYa2VMdVo4XzRoeDE5NHBDV3JFTFZhb20zYkxOQ3dtUzE1R0YtM0hXZFpJaHBaRi10cTBMcUJrRDdCalk4THA0Q2lJVFE?oc=5",
+   "published": "2026-06-18T08:20:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La Fed lascia che il tasso di riferimento rimanga in vigore - The Arkansas Democrat-Gazette"
+  },
+  {
+   "source": "Reddit",
+   "title": "Interest Take on Booz Allen Hamilton - Trump Buys After Cutting Ties",
+   "link": "https://www.reddit.com/r/stocks/comments/1u8y176/interest_take_on_booz_allen_hamilton_trump_buys/",
+   "published": "2026-06-18T05:55:39Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Interesse per Booz Allen Hamilton - Trump acquista dopo aver tagliato i legami"
+  },
+  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 74%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-06-18T21:57:27Z",
+   "published": "2026-06-18T22:52:33Z",
    "tickers": [
     "MACRO"
    ],
@@ -18328,9 +18340,9 @@
   {
    "source": "Polymarket",
    "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
-   "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 24%",
+   "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 25%",
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
-   "published": "2026-06-18T21:57:27Z",
+   "published": "2026-06-18T22:52:33Z",
    "tickers": [
     "MACRO"
    ],
