@@ -7305,28 +7305,27 @@
    "ticker": "^RUT",
    "name": "Russell 2000",
    "currency": "PTS",
-   "price": 2917.98,
-   "change_pct": -0.72,
+   "price": 2961.23,
+   "change_pct": 1.48,
    "pe": null,
    "ath": 2996.42,
-   "ath_dist_pct": -2.6,
-   "support": 2755.71,
+   "ath_dist_pct": -1.2,
+   "support": 2795.48,
    "resistance": 2996.42,
-   "rsi": 55.2,
-   "volume": 5883740000,
-   "vol_ratio": 1.04,
+   "rsi": 59.4,
+   "volume": 0,
+   "vol_ratio": 0.0,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
     "w1": [
-     2921.03,
      2943.99,
      2965.09,
      2939.2,
-     2917.98
+     2917.98,
+     2961.23
     ],
     "m6": [
-     2519.3,
      2492.3,
      2507.87,
      2529.43,
@@ -7451,7 +7450,8 @@
      2943.99,
      2965.09,
      2939.2,
-     2917.98
+     2917.98,
+     2961.23
     ],
     "all": [
      170.81,
@@ -7919,10 +7919,9 @@
      2496.37,
      2799.91,
      2919.34,
-     2917.98
+     2961.23
     ],
     "m1": [
-     2775.1,
      2747.07,
      2817.37,
      2843.45,
@@ -7943,10 +7942,10 @@
      2943.99,
      2965.09,
      2939.2,
-     2917.98
+     2917.98,
+     2961.23
     ],
     "m3": [
-     2503.29,
      2519.99,
      2478.64,
      2494.71,
@@ -8011,7 +8010,8 @@
      2943.99,
      2965.09,
      2939.2,
-     2917.98
+     2917.98,
+     2961.23
     ],
     "y1": [
      2112.96,
@@ -8070,7 +8070,7 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 77,
+   "health": 83,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -8078,24 +8078,24 @@
    "stats": null,
    "tech_by_range": {
     "w1": {
-     "support": 2854.23,
+     "support": 2910.96,
      "resistance": 2996.42,
-     "change_pct": -0.1
+     "change_pct": 0.59
     },
     "m1": {
      "support": 2722.85,
      "resistance": 2996.42,
-     "change_pct": 5.15
+     "change_pct": 7.8
     },
     "m3": {
      "support": 2404.99,
      "resistance": 2996.42,
-     "change_pct": 16.57
+     "change_pct": 17.51
     },
     "y1": {
      "support": 2088.07,
      "resistance": 2996.42,
-     "change_pct": 38.1
+     "change_pct": 40.15
     }
    },
    "financials": [],
@@ -8751,7 +8751,7 @@
      44.13,
      94.48,
      114.68,
-     121.1
+     133.43
     ],
     "m1": [
      110.8,
@@ -10719,7 +10719,7 @@
  "history": null,
  "macro": {
   "fear_greed": {
-   "score": 32,
+   "score": 36,
    "rating": "fear",
    "prev_close": 33,
    "week_ago": 32,
@@ -10728,8 +10728,8 @@
    "components": [
     {
      "label": "Momentum S&P 500",
-     "rating": "neutral",
-     "score": 48
+     "rating": "greed",
+     "score": 73
     },
     {
      "label": "Forza dei prezzi",
@@ -10963,7 +10963,7 @@
    "components": [
     {
      "label": "Fear & Greed",
-     "score": 32
+     "score": 36
     },
     {
      "label": "VIX",
@@ -11161,7 +11161,7 @@
    ]
   },
   "macroquant": {
-   "score": 47,
+   "score": 48,
    "label": "Rallentamento",
    "components": [
     {
@@ -11206,7 +11206,7 @@
     },
     {
      "label": "Fear & Greed",
-     "score": 32
+     "score": 36
     },
     {
      "label": "Volatilità (VIX)",
@@ -11931,10 +11931,10 @@
    "title_it": "L’era della Fed Warsh inizia con una grande sorpresa che nessuno si aspettava"
   },
   {
-   "source": "AP",
-   "title": "Vance, skeptical of foreign wars, becomes the face of Trump's tentative deal to end war with Iran - AP News",
-   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOOFczaEoxaHJfbGpBcXpYMVBDeWI3ZHRpTUdHd1h3Vjc0OU9NRWhNOVQtSzktUEpWQWN3cXVIUUlxR1JpRGlodzFNVUpyVU14N3VfUGxzZzd0dlJNdmQxLW11NjZnRGRPUXpUallCd3pIUmZsUUtLSVp5SVREcG5ZSHp2NFRnYWdXb0k3R2ZSZTZ4S0JmQm5Z?oc=5",
-   "published": "2026-06-18T04:01:00Z",
+   "source": "Reuters",
+   "title": "Stocks slip as Fed rate outlook offsets optimism over Iran deal - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPQWc5blRuNGVXLWNEeGRWUHBJTi1tNG1oR2wzR3R0RXY1dWdVS3JVMmRRSlI0NEgwZUpVNTNLdUphd1Q4OGpXSmtSc0lwVmNONzFpYWZFVG05OFQ4Y1JtaVAyN0lCblhSVEUwZ2RDTUx4eTFzWl9SR1NVT1RvTGxwSTg0dw?oc=5",
+   "published": "2026-06-18T01:40:00Z",
    "tickers": [
     "MACRO",
     "POL"
