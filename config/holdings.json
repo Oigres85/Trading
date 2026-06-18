@@ -9,13 +9,13 @@
   {
    "ticker": "AMD",
    "name": "AMD",
-   "qty": 125,
+   "qty": 100,
    "pmc": 153.92
   },
   {
    "ticker": "MU",
    "name": "Micron",
-   "qty": 90,
+   "qty": 70,
    "pmc": 87.63
   },
   {
@@ -93,19 +93,19 @@
    "currency": "USD"
   }
  ],
- "broker": {
-  "as_of": "2026-06-13",
-  "controvalore_totale": 307846.68,
-  "profitto_totale_pct": 96.41,
-  "profitto_totale_eur": 150968.07,
-  "controvalore_azioni": 266266.68,
-  "profitto_usd_pct": 141.72,
-  "profitto_usd": 180574.05,
+"broker": {
+  "as_of": "2026-06-18",
+  "controvalore_totale": 312478.97,
+  "profitto_totale_pct": 85.56,
+  "profitto_totale_eur": 100959.21,
+  "controvalore_azioni": 177645.96,
+  "profitto_usd_pct": 137.53,
+  "profitto_usd": 119222.49,
   "ytd_pct": 59.88,
   "y1_pct": 101.02,
   "inception_pct": 172.55,
   "controvalore_iniziale_1y": 136008.35,
-  "investimenti": 55995.8,
+  "investimenti": 219272.76,
   "cedole_btp": 1505
- }
+}
 }
