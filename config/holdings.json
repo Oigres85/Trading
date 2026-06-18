@@ -91,9 +91,14 @@
    "ticker": "GOOGL",
    "name": null,
    "currency": "USD"
+  },
+  {
+   "ticker": "UNH",
+   "name": null,
+   "currency": "USD"
   }
  ],
-"broker": {
+ "broker": {
   "as_of": "2026-06-18",
   "controvalore_totale": 312478.97,
   "profitto_totale_pct": 85.56,
@@ -107,5 +112,5 @@
   "controvalore_iniziale_1y": 136008.35,
   "investimenti": 219272.76,
   "cedole_btp": 1505
-}
+ }
 }
