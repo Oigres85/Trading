@@ -1,15 +1,15 @@
 {
- "updated_at": "2026-06-19T21:01:06Z",
- "eurusd": 1.1459,
+ "updated_at": "2026-06-19T21:58:14Z",
+ "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
   "usd_gain": 129865.63,
   "usd_gain_pct": 152.82,
-  "eur_value": 228821.91,
-  "eur_gain": 114660.27,
-  "eur_gain_pct": 100.44,
-  "tax_est": 29632.76,
-  "eur_gain_net": 85027.51
+  "eur_value": 228647.9,
+  "eur_gain": 114555.09,
+  "eur_gain_pct": 100.41,
+  "tax_est": 29605.42,
+  "eur_gain_net": 84949.67
  },
  "portfolio": [
   {
@@ -6430,16 +6430,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63155.71,
-   "change_pct": -1.96,
+   "price": 63010.0,
+   "change_pct": -2.19,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -50.0,
+   "ath_dist_pct": -50.1,
    "support": 59108.92,
    "resistance": 74153.5,
-   "rsi": 35.4,
-   "volume": 22560690176,
-   "vol_ratio": 0.68,
+   "rsi": 35.1,
+   "volume": 22236440576,
+   "vol_ratio": 0.67,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6448,7 +6448,7 @@
      66289.5,
      65600.64,
      64418.45,
-     63155.71
+     63010.0
     ],
     "m6": [
      68857.84,
@@ -6576,7 +6576,7 @@
      66289.5,
      65600.64,
      64418.45,
-     63155.71
+     63010.0
     ],
     "all": [
      386.94,
@@ -6720,7 +6720,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63155.71
+     63010.0
     ],
     "m1": [
      73536.55,
@@ -6744,7 +6744,7 @@
      66289.5,
      65600.64,
      64418.45,
-     63155.71
+     63010.0
     ],
     "m3": [
      74181.61,
@@ -6812,7 +6812,7 @@
      66289.5,
      65600.64,
      64418.45,
-     63155.71
+     63010.0
     ],
     "y1": [
      104684.29,
@@ -7016,7 +7016,12 @@
      62997.82,
      63036.57,
      63124.02,
-     63155.71
+     63110.04,
+     63209.3,
+     63165.42,
+     63072.62,
+     63030.95,
+     63003.57
     ]
    },
    "earnings_date": null,
@@ -7031,22 +7036,22 @@
     "w1": {
      "support": 62298.16,
      "resistance": 67248.13,
-     "change_pct": -3.89
+     "change_pct": -4.11
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74460.12,
-     "change_pct": -14.12
+     "change_pct": -14.31
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -14.86
+     "change_pct": -15.06
     },
     "y1": {
      "support": 59108.92,
      "resistance": 122509.66,
-     "change_pct": -44.22
+     "change_pct": -44.34
     }
    },
    "financials": [],
@@ -12738,7 +12743,7 @@
      20.53,
      20.44,
      16.54,
-     14.99,
+     15.0,
      17.44,
      21.66,
      24.26,
@@ -12914,7 +12919,7 @@
      147.52,
      137.6,
      136.37,
-     130.76,
+     130.77,
      147.85,
      161.13,
      165.17,
@@ -13295,7 +13300,7 @@
      652.88,
      656.65,
      639.92,
-     634.12,
+     634.11,
      650.37,
      672.3,
      663.48,
@@ -14155,19 +14160,19 @@
   {
    "ticker": "MU",
    "name": "Micron",
-   "value_eur": 69275.11,
+   "value_eur": 69210.82,
    "sector": "Technology"
   },
   {
    "ticker": "NVDA",
    "name": "NVIDIA",
-   "value_eur": 49645.24,
+   "value_eur": 49599.17,
    "sector": "Technology"
   },
   {
    "ticker": "AMD",
    "name": "AMD",
-   "value_eur": 46896.82,
+   "value_eur": 46853.29,
    "sector": "Technology"
   },
   {
@@ -14179,13 +14184,13 @@
   {
    "ticker": "MSTR",
    "name": "Strategy",
-   "value_eur": 12079.34,
+   "value_eur": 12068.13,
    "sector": "Technology"
   },
   {
    "ticker": "RGTI",
    "name": "Rigetti",
-   "value_eur": 9600.16,
+   "value_eur": 9591.25,
    "sector": "Technology"
   }
  ],
@@ -14392,7 +14397,7 @@
     "key": "EURUSD=X",
     "label": "EUR/USD",
     "value": "1.1469",
-    "change_pct": 0.09,
+    "change_pct": -0.33,
     "suffix": "%"
    },
    {
@@ -14407,7 +14412,7 @@
    "us10": 4.45,
    "jp10": 2.63,
    "spread": 1.82,
-   "usdjpy": 161.27,
+   "usdjpy": 161.28,
    "usdjpy_chg_1m": 1.52,
    "boj_meetings": [
     "2026-07-31",
@@ -14441,7 +14446,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 30
+     "score": 28
     }
    ]
   },
@@ -14743,7 +14748,7 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1709219438235,
+   "mcap_usd": 1709264942253,
    "change_pct": -0.23
   },
   {
@@ -14764,9 +14769,28 @@
    "question": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "yes": 72,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting"
+  },
+  {
+   "question": "Fed rate hike in 2026?",
+   "yes": 66,
+   "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
   }
  ],
  "news": [
+  {
+   "source": "Investing.com",
+   "title": "Russia stocks lower at close of trade; MOEX Russia Index down 1.04%",
+   "link": "https://www.investing.com/news/stock-market-news/russia-stocks-lower-at-close-of-trade-moex-russia-index-down-104-4751566",
+   "published": "2026-06-19T21:20:04Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Le azioni russe crollano alla chiusura delle contrattazioni; Indice MOEX Russia in calo dell'1,04%"
+  },
   {
    "source": "Investing.com",
    "title": "Italy’s Meloni says Trump ’totally invented’ story that she begged him for photo",
@@ -14780,20 +14804,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "L’italiana Meloni afferma che Trump ha “totalmente inventato” la storia secondo cui lei gli avrebbe chiesto una foto"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Trump says he is going to Turkey, China this year",
-   "link": "https://www.investing.com/news/world-news/trump-says-he-is-going-to-turkey-china-this-year-4751560",
-   "published": "2026-06-19T20:24:34Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Trump dice che quest’anno andrà in Turchia e Cina"
   },
   {
    "source": "Investing.com",
@@ -14822,34 +14832,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "Trump dice ad Axios che non vede più l’attività antropica come una minaccia alla sicurezza nazionale"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Israel, Hezbollah agree to ceasefire in Lebanon, U.S. official says",
-   "link": "https://www.investing.com/news/world-news/israeli-hezbollah-agree-to-ceasefire-starting-on-friday-us-official-4751504",
-   "published": "2026-06-19T19:30:29Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Israele e Hezbollah concordano il cessate il fuoco in Libano, dice un funzionario americano"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Brent set for 8% weekly fall as Israel, Hezbollah agree ceasefire",
-   "link": "https://www.investing.com/news/commodities-news/oil-falls-as-supply-starts-moving-through-strait-of-hormuz-4751273",
-   "published": "2026-06-19T19:12:26Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "bear",
-   "title_it": "Il Brent previsto per un calo settimanale dell'8% mentre Israele e Hezbollah concordano il cessate il fuoco"
   },
   {
    "source": "Investing.com",
@@ -14974,6 +14956,20 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
+   "source": "AP",
+   "title": "President Donald Trump unveils the new Air Force One, a converted Qatari jet - AP News",
+   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQLXdEMHdQYm1rNktyY1hvb2xNTnVSelUzcF9sMWJUZWlqbDA0ZzZrVnF5N1NCTjlEYjY3Vk9qMnBYSjExbklsaGhGVG55dGtpWWU4NVByc3hPWDE1dFBaV0JoOXhRTUo3MW1lRzlZaWpnV1NuaGdEU1pOa2xIb0wzRXdHX2gxalZsWVVLUlVB?oc=5",
+   "published": "2026-06-19T20:09:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il presidente Donald Trump svela il nuovo Air Force One, un jet del Qatar convertito - AP News"
+  },
+  {
    "source": "Reuters",
    "title": "Lebanon ceasefire agreed after US-Iran talks in Switzerland scrapped - Reuters",
    "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNdGlIRzVkQXRyMi1KZ2xpUGFScEtiNlk2M2VjV0t2M0xsY1NYcFJfQXNxSTFDSXFjaXZmNDVMWkVvU00zX0tXTE80MXpFUlVUeE8xOW1USzJtTERYV09YRU4zbnRic1NwaG1WRHVRT2s2TTl4NkgxMjNVMEtsS0pyQl9ldURhQVkwTzdzcG5sajE3bzhSS1h5NWpoWDJZd05HdTFodHd6azZjN2JLT25xaA?oc=5",
@@ -15000,20 +14996,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Cresce l’attrito tra Trump e i senatori repubblicani prima delle cruciali elezioni di medio termine – AP News"
-  },
-  {
-   "source": "AP",
-   "title": "US push to get Iran talks started hits an early bump. Vance stays at home, for now - AP News",
-   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPN3BNOERVVFFxUGJ3enFmQ3RqemY1dWVubjJHOVZHMFRfZXh4Q21BMmFkNGVrMk14YUM4bXhjb1dOdElOZ3k3dGRCcHBZZ3kzQ2VtVVllZ1RvZ1VqaE5ZdUlVcllXd05JN1dZWHNnMk9yeVZqS05WLXZsaWk5cEVyV21KR0N4d3hvR3E4UklDQUFoUQ?oc=5",
-   "published": "2026-06-19T19:12:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La spinta degli Stati Uniti per avviare i colloqui con l’Iran incontra un primo colpo. Vance resta a casa, per ora - AP News"
   },
   {
    "source": "AP",
@@ -15045,9 +15027,9 @@
   },
   {
    "source": "Reuters",
-   "title": "Iran to lodge FIFA complaint over World Cup travel restrictions - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPR1VYU082ZUFSeVhJV1cwcWhtajVlaWVxc1ViSFhOS0wwXzRfazlXNkxUbGtqMGZOa0FZVEFQWFZ6bktXc2o0OERiMDVrVnJuWGlSUEZvSHg1ZjVJczlBU0VpMzVob1p2anJRWTVhUnVXQWpRX041Q25GLW5SVmFiYjc3aDFVaFlSdF9EbHd2NGtEdm5URVBZckZXeGIwdWFvOTYzQ2FuUUxtdUFwTFdr?oc=5",
-   "published": "2026-06-19T17:36:19Z",
+   "title": "Trump heads to Camp David as Iran talks falter - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQanZjcWNWV1diQU5BSFRBUzJtMlVJVDhWSjZ6MXc5S21QVlF1NHVrM0hTdjJ5dEJrQjA1QXMzNHNPTnpySW00XzJfbXBhNXZUN1RHU1UySWFLRl9SdFA3WTVMWmZNaUtPNmZxTGlIZnN0ZUtCVUZVbTBsZ21FVWR3dVJ4WlZCbHpGcHczdXcxVURpQnNHY1JBVTFR?oc=5",
+   "published": "2026-06-19T17:39:43Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -15055,7 +15037,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'Iran presenterà reclamo alla FIFA per le restrizioni ai viaggi ai Mondiali - Reuters"
+   "title_it": "Trump si dirige a Camp David mentre i colloqui sull'Iran vacillano - Reuters"
   },
   {
    "source": "MarketWatch",
@@ -15304,6 +15286,19 @@
    "title_it": "I tassi ipotecari scendono dopo l'accordo di pace con l'Iran, ma la Fed segnala cautela - MSN"
   },
   {
+   "source": "Google News",
+   "title": "Kevin Warsh’s Fed debut sparks bond selloff as rate-hike bets surge - equiti.com",
+   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPZzVZbGtRcWZzZGhNcmIxWnpzM2VZLWpjX3dpV0IxRE9OajZDWTN3T2R5REt1QXhuRU1CRmhOX3E1dEp2NF9mMzhxbDlOeVBqVkdmWVl3TXdVNF9zTmw3TEZadVpEMFg2NlRWZ0JQYk94Z1ZfWjdrY0wwbTNtQjZsZjVKeFhucjkyYmlvUXRyQ3ZWMFlUaEZ4aXp1N1psTndXMTQ3cnV3?oc=5",
+   "published": "2026-06-19T10:41:34Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il debutto di Kevin Warsh alla Fed innesca una svendita di obbligazioni mentre aumentano le scommesse sull’aumento dei tassi - equiti.com"
+  },
+  {
    "source": "CNBC",
    "title": "Russia threatens escalation after Ukraine hits Moscow with largest-ever drone attack",
    "link": "https://www.cnbc.com/2026/06/19/russia-ukraine-moscow-drone-attack-trump.html",
@@ -15318,24 +15313,10 @@
    "title_it": "La Russia minaccia un’escalation dopo che l’Ucraina ha colpito Mosca con il più grande attacco di droni mai visto"
   },
   {
-   "source": "Bloomberg",
-   "title": "Europe Gas Storages Get Little Reprieve From Iran Peace Deal",
-   "link": "https://news.google.com/search?q=Europe%20Gas%20Storages%20Get%20Little%20Reprieve%20From%20Iran%20Peace%20Deal",
-   "published": "2026-06-19T09:11:58Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I depositi di gas in Europa ottengono poca tregua dall’accordo di pace con l’Iran"
-  },
-  {
    "source": "Reuters",
    "title": "EXCLUSIVE: Iran's Revolutionary Guards set up covert Iraqi cells to attack Gulf neighbors, sources say - Reuters",
    "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOdVVhdU1ZeHBCU08wQ0tpY3l4MXNnQWVaeFRzakJETHVFV2Q0Y2c3eTc3WjRKaVJBWTNUNkpncjh1WmQ0eFM2LTc0YzZfZzYyZlFwOW9TQ0V5S2cxalFaTWlDUlhrMDBaWU9uV3o5WXZsQjVSREFrQlNHQXNGX2lSbU1FSllXR2pKWFM1M3M2amJjZ0EtUXQtNDRTbWVtMFBuUDU3MUJKdTlDcWhZZ0pNQWRQa210ZVBmNXJmNnM5REM2NGt3eXpn?oc=5",
-   "published": "2026-06-19T07:09:20Z",
+   "published": "2026-06-19T06:03:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -15428,11 +15409,49 @@
    "title_it": "Guadagni di petrolio mentre i negoziati sulla guerra con l’Iran vacillano, i movimenti delle petroliere rallentano"
   },
   {
+   "source": "CNBC Markets",
+   "title": "Here are the five big takeaways from Kevin Warsh's first meeting as Fed chairman",
+   "link": "https://www.cnbc.com/2026/06/17/here-are-the-five-big-takeaways-from-kevin-warshs-first-meeting-as-fed-chairman.html",
+   "published": "2026-06-18T19:17:55Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Ecco i cinque punti salienti del primo incontro di Kevin Warsh come presidente della Fed"
+  },
+  {
+   "source": "CNBC",
+   "title": "Trump DNI pick Pulte poised to get access to U.S. intelligence despite congressional bid to thwart",
+   "link": "https://www.cnbc.com/2026/06/18/pulte-trump-dni-us-intelligence-congress.html",
+   "published": "2026-06-18T18:49:36Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump DNI sceglie Pulte pronto ad avere accesso all’intelligence statunitense nonostante i tentativi del Congresso di ostacolarlo"
+  },
+  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 72%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-06-19T21:01:51Z",
+   "published": "2026-06-19T21:58:52Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Fed rate hike in 2026?",
+   "title_it": "Fed rate hike in 2026? — probabilità Sì 66%",
+   "link": "https://polymarket.com/event/fed-rate-hike-in-2026",
+   "published": "2026-06-19T21:58:52Z",
    "tickers": [
     "MACRO"
    ],
