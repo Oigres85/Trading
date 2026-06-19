@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-06-19T17:41:37Z",
- "eurusd": 1.1477,
+ "updated_at": "2026-06-19T18:01:19Z",
+ "eurusd": 1.148,
  "totals": {
   "usd_value": NaN,
   "usd_gain": NaN,
@@ -6430,15 +6430,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 62988.0,
-   "change_pct": -2.22,
+   "price": 63130.34,
+   "change_pct": -2.0,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -50.1,
+   "ath_dist_pct": -50.0,
    "support": 59108.92,
    "resistance": 74153.5,
-   "rsi": 35.0,
-   "volume": 24416057344,
+   "rsi": 35.3,
+   "volume": 24559282176,
    "vol_ratio": 0.74,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -6448,7 +6448,7 @@
      66289.5,
      65600.64,
      64418.45,
-     62988.0
+     63130.34
     ],
     "m6": [
      68857.84,
@@ -6576,7 +6576,7 @@
      66289.5,
      65600.64,
      64418.45,
-     62988.0
+     63130.34
     ],
     "all": [
      386.94,
@@ -6720,7 +6720,7 @@
      68233.31,
      76304.32,
      73579.69,
-     62988.0
+     63130.34
     ],
     "m1": [
      73536.55,
@@ -6744,7 +6744,7 @@
      66289.5,
      65600.64,
      64418.45,
-     62988.0
+     63130.34
     ],
     "m3": [
      74181.61,
@@ -6812,7 +6812,7 @@
      66289.5,
      65600.64,
      64418.45,
-     62988.0
+     63130.34
     ],
     "y1": [
      104684.29,
@@ -6996,7 +6996,9 @@
      62940.0,
      62908.66,
      63009.89,
-     62988.0
+     63038.24,
+     63146.67,
+     63130.34
     ]
    },
    "earnings_date": null,
@@ -7011,22 +7013,22 @@
     "w1": {
      "support": 62298.16,
      "resistance": 67248.13,
-     "change_pct": -4.14
+     "change_pct": -3.93
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74460.12,
-     "change_pct": -14.34
+     "change_pct": -14.15
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -15.09
+     "change_pct": -14.9
     },
     "y1": {
      "support": 59108.92,
      "resistance": 122509.66,
-     "change_pct": -44.36
+     "change_pct": -44.24
     }
    },
    "financials": [],
@@ -11928,7 +11930,7 @@
      262.81,
      273.93,
      265.04,
-     273.24,
+     273.25,
      282.06,
      281.36,
      276.51,
@@ -12718,7 +12720,7 @@
      20.53,
      20.44,
      16.54,
-     15.0,
+     14.99,
      17.44,
      21.66,
      24.26,
@@ -13275,7 +13277,7 @@
      652.88,
      656.65,
      639.92,
-     634.11,
+     634.12,
      650.37,
      672.3,
      663.48,
@@ -13952,7 +13954,7 @@
      446.55,
      456.74,
      461.13,
-     448.44,
+     448.43,
      410.27,
      412.57,
      415.07,
@@ -14950,10 +14952,10 @@
     244279,
     247727,
     241642,
-    231202,
+    231203,
     230399,
     221265,
-    218044,
+    218043,
     214114,
     204429,
     207907,
@@ -15330,7 +15332,7 @@
     155708,
     154881,
     157015,
-    159309,
+    159308,
     157724,
     158409,
     157121,
@@ -15486,7 +15488,7 @@
     172678,
     173263,
     175991,
-    174070,
+    174069,
     178900,
     175011,
     174608,
@@ -15746,7 +15748,7 @@
     153263,
     160434,
     166937,
-    163245,
+    163244,
     169543,
     157386,
     148131,
@@ -16516,7 +16518,7 @@
     153263,
     160434,
     166937,
-    163245,
+    163244,
     169543,
     157386,
     148131,
@@ -17282,15 +17284,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1477",
-    "change_pct": -0.26,
+    "value": "1.1480",
+    "change_pct": -0.24,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "185.08",
-    "change_pct": 0.15,
+    "value": "185.05",
+    "change_pct": 0.13,
     "suffix": "%"
    }
   ],
@@ -17298,8 +17300,8 @@
    "us10": 4.45,
    "jp10": 2.63,
    "spread": 1.82,
-   "usdjpy": 161.3,
-   "usdjpy_chg_1m": 1.54,
+   "usdjpy": 161.26,
+   "usdjpy_chg_1m": 1.51,
    "boj_meetings": [
     "2026-07-31",
     "2026-09-18",
@@ -17332,7 +17334,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 28
+     "score": 30
     }
    ]
   },
@@ -17634,7 +17636,7 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1709219438235,
+   "mcap_usd": 1709310446271,
    "change_pct": -0.23
   },
   {
@@ -17863,6 +17865,33 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
+   "source": "Reuters",
+   "title": "Lebanon ceasefire agreed after US-Iran talks in Switzerland scrapped - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNdGlIRzVkQXRyMi1KZ2xpUGFScEtiNlk2M2VjV0t2M0xsY1NYcFJfQXNxSTFDSXFjaXZmNDVMWkVvU00zX0tXTE80MXpFUlVUeE8xOW1USzJtTERYV09YRU4zbnRic1NwaG1WRHVRT2s2TTl4NkgxMjNVMEtsS0pyQl9ldURhQVkwTzdzcG5sajE3bzhSS1h5NWpoWDJZd05HdTFodHd6azZjN2JLT25xaA?oc=5",
+   "published": "2026-06-19T17:49:29Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Accordo di cessate il fuoco in Libano dopo la rottura dei colloqui USA-Iran in Svizzera - Reuters"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "The 5 Largest Publicly Traded Solana Treasury Firms",
+   "link": "https://finance.yahoo.com/news/5-largest-publicly-traded-solana-132838567.html",
+   "published": "2026-06-19T17:40:59Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Le 5 più grandi società di tesoreria Solana quotate in borsa"
+  },
+  {
    "source": "MarketWatch",
    "title": "Warsh’s new task forces give the Fed wiggle room to put off changing rates until December",
    "link": "https://www.marketwatch.com/story/warshs-task-forces-give-the-fed-wiggle-room-to-put-off-changing-rates-until-december-364fc1fc?mod=mw_rss_topstories",
@@ -17874,19 +17903,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Le nuove task force di Warsh danno alla Fed margine di manovra per rinviare la modifica dei tassi fino a dicembre"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Jim Cramer: CoreWeave’s Backlog ‘May Be Much Greater’ Than Wall Street Thinks",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-coreweave-backlog-may-172139829.html",
-   "published": "2026-06-19T17:21:39Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Jim Cramer: il portafoglio ordini di CoreWeave “potrebbe essere molto più grande” di quanto pensi Wall Street"
   },
   {
    "source": "Yahoo Finance",
@@ -17983,20 +17999,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Il mercato azionario è chiuso oggi per Juneteenth? L'ufficio postale consegnerà la posta?"
-  },
-  {
-   "source": "Reuters",
-   "title": "Lebanon ceasefire agreed after US-Iran talks in Switzerland scrapped - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNdGlIRzVkQXRyMi1KZ2xpUGFScEtiNlk2M2VjV0t2M0xsY1NYcFJfQXNxSTFDSXFjaXZmNDVMWkVvU00zX0tXTE80MXpFUlVUeE8xOW1USzJtTERYV09YRU4zbnRic1NwaG1WRHVRT2s2TTl4NkgxMjNVMEtsS0pyQl9ldURhQVkwTzdzcG5sajE3bzhSS1h5NWpoWDJZd05HdTFodHd6azZjN2JLT25xaA?oc=5",
-   "published": "2026-06-19T16:32:43Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Accordo di cessate il fuoco in Libano dopo la rottura dei colloqui USA-Iran in Svizzera - Reuters"
   },
   {
    "source": "Bloomberg",
@@ -18320,7 +18322,7 @@
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 72%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-06-19T17:42:31Z",
+   "published": "2026-06-19T18:01:55Z",
    "tickers": [
     "MACRO"
    ],
