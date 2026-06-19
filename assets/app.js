@@ -5,12 +5,13 @@ let sparkRange = "m1";   // 1G | 1M | 1A
 
 /* ordinamento tabelle: click su intestazione → desc → asc → default */
 const SORT_FIELDS = {
+  // colonne attuali (senza "Valore" e "Max storico")
   "ptf-table": ["name", "qty", "pmc", "change_pct", "change_pct", "prepost_chg", "volume",
-                "value", "gain", "gain_pct", "pe", "eps", "beta", "ath_dist_pct", "support",
-                "resistance", "rsi", "vol_ratio", "health", "upside_pct", "upside_pct", null],
+                "gain", "gain_pct", "pe", "eps", "beta", "support",
+                "resistance", "rsi", "vol_ratio", "health", "upside_pct", "upside_pct", "fin_health", null],
   "wl-table": ["name", "change_pct", "change_pct", "prepost_chg", "volume", "pe", "eps",
-               "beta", "ath_dist_pct", "support", "resistance", "rsi", "vol_ratio",
-               "health", "upside_pct", "upside_pct", null],
+               "beta", "support", "resistance", "rsi", "vol_ratio",
+               "health", "upside_pct", "upside_pct", "fin_health", null],
 };
 const sortState = { "ptf-table": { field: null, dir: 0 }, "wl-table": { field: null, dir: 0 } };
 
@@ -800,7 +801,6 @@ function techCells(r) {
       <td class="num">${peBar(r.pe)}</td>
       <td class="num">${epsBar(r.eps)}</td>
       <td class="num">${betaBar(r.beta)}</td>
-      <td class="num">${athBar(r)}</td>
       <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
       <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
       <td class="num">${rsiBar(r.rsi)}</td>
@@ -1242,7 +1242,6 @@ function renderTable() {
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
-      <td class="num"><b>${c}${fmtNum.format(Math.round(r.value))}</b></td>
       <td class="num ${signCls(r.gain)}">${signTxt(Math.round(r.gain), ` ${c}`)}${r.currency === "USD" ? `<br><span class="sub-eur">${signTxt(Math.round(r.gain / (DATA.eurusd || 1.08)), " €")}</span>` : ""}</td>
       <td class="num ${signCls(r.gain_pct)}"><b>${signTxt(r.gain_pct)}</b></td>
       ${techCells(r)}
@@ -1253,13 +1252,12 @@ function renderTable() {
   const usdValue = DATA.portfolio.filter(r => r.currency === "USD").reduce((s, r) => s + r.value, 0);
   const totalRow = `<tr class="total-row">
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
-    <td class="num">${fmtEUR.format(t.eur_value)}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="13" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="12" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="21"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
 }
 
@@ -1273,7 +1271,7 @@ function renderWatchlist() {
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="18" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="17" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
     ? `<tr class="add-row"><td colspan="17"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
@@ -1482,14 +1480,14 @@ function buildPrompt() {
   const t = DATA.totals;
   const m = DATA.macro || {};
   const lines = [];
-  lines.push("Sei un analista finanziario quantitativo esperto di analisi tecnica, macro e gestione del rischio. PRIMA di analizzare, usa la RICERCA WEB per: (a) verificare i prezzi di oggi dei titoli elencati, (b) leggere le ultime notizie/risultati su questi titoli e sul quadro macro-politico, (c) trovare 2-3 titoli alternativi NON in portafoglio interessanti per diversificare. I dati sotto sono il contesto completo della mia dashboard (portafoglio, watchlist, macro, news, mercati di previsione).");
+  lines.push("PRIMA di analizzare i dati come un team dei migliori 5 Senior Analyst al mondo, usa la RICERCA WEB per: (a) verificare i prezzi di oggi dei titoli elencati, (b) leggere le ultime notizie/risultati su questi titoli e sul quadro macro-politico, (c) trovare titoli alternativi NON in portafoglio interessanti per diversificare. I dati sotto sono il contesto completo della mia dashboard (portafoglio, watchlist, macro, news, mercati di previsione, rotazione settoriale).");
   lines.push("");
-  lines.push("FORNISCI UN REPORT STRUTTURATO (solo a scopo informativo, non consulenza personalizzata) con:");
+  lines.push("FORNISCI UN REPORT STRUTTURATO (solo a scopo informativo) con:");
   lines.push("1) Sintesi macro e sentiment di mercato (rischio rialzista/ribassista nel breve e nel lungo periodo).");
   lines.push("2) Analisi tecnica titolo per titolo: ipercomprato/ipervenduto (RSI), vicinanza a supporti/resistenze, volumi anomali, trend.");
-  lines.push("3) INDICAZIONI OPERATIVE CONCRETE: per ogni titolo da alleggerire indica QUANTE azioni vendere e a CHE PREZZO (target tecnico), stimando la plus/minusvalenza; suggerisci come COMPENSARE le minusvalenze con le plusvalenze (in Italia: azioni 26%, BTP 12,5%; le minus compensano le plus entro 4 anni).");
-  lines.push("4) ROTAZIONE: il portafoglio è molto concentrato sul TECH/semiconduttori — proponi come ridurre questa intensità e verso quali settori/titoli ruotare (anche nomi nuovi trovati sul web), con possibili punti d'ingresso.");
-  lines.push("5) Ottica BREVE periodo (settimane) e LUNGO periodo (mesi/anni), separate.");
+  lines.push("3) INDICAZIONI OPERATIVE CONCRETE: per ogni titolo indica se mantenere/alleggerire/incrementare, con QUANTE azioni vendere/comprare e a CHE PREZZO (target/limite), stimando la plus/minusvalenza; suggerisci come COMPENSARE le minusvalenze con le plusvalenze (in Italia: azioni 26%, BTP 12,5%; le minus compensano le plus entro 4 anni).");
+  lines.push("4) ROTAZIONE & DE-RISKING: il portafoglio è concentrato su TECH/semiconduttori — proponi come ridurre questa intensità usando la liquidità disponibile; indica 2-3 ticker alternativi specifici (value/difensivi) e 2-3 ETF, con prezzi limite d'ingresso, sfruttando la rotazione settoriale qui sotto.");
+  lines.push("5) Ottica BREVE periodo (settimane), MEDIO periodo (mesi) e LUNGO periodo (anni), separate, con direzione e tempistiche.");
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   lines.push("");
