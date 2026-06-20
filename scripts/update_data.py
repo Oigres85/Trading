@@ -1279,6 +1279,17 @@ def fetch_news():
     return items
 
 
+def clean_nan(obj):
+    """Converte ricorsivamente NaN/Infinity in None (JSON valido per il browser)."""
+    if isinstance(obj, float):
+        return None if (math.isnan(obj) or math.isinf(obj)) else obj
+    if isinstance(obj, dict):
+        return {k: clean_nan(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [clean_nan(v) for v in obj]
+    return obj
+
+
 def main():
     equities = fetch_equities()
     btp = fetch_btp()
@@ -1344,7 +1355,8 @@ def main():
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(data, ensure_ascii=False, indent=1))
+    # NaN/Infinity non sono JSON validi per il browser → li converto in null prima di scrivere
+    OUT.write_text(json.dumps(clean_nan(data), ensure_ascii=False, indent=1))
     print(f"OK -> {OUT} ({OUT.stat().st_size // 1024} KB)")
 
 

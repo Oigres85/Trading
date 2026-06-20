@@ -87,7 +87,9 @@ async function loadData(showSpin = false) {
   if (showSpin) btn.classList.add("spinning");
   try {
     const res = await fetch(`data/data.json?t=${Date.now()}`, { cache: "no-store" });
-    DATA = await res.json();
+    const txt = await res.text();
+    // resiliente: NaN/Infinity non sono JSON validi per il browser → li converto in null
+    DATA = JSON.parse(txt.replace(/\bNaN\b/g, "null").replace(/-?\bInfinity\b/g, "null"));
     renderAll();
     livePrices();              // sovrappone i prezzi live ai dati del workflow
     if (showSpin) toast("Dati ricaricati ✓");
@@ -521,17 +523,37 @@ function openSignpostsModal() {
 /* ---------------- KPI ---------------- */
 function renderKPI() {
   const t = DATA.totals;
-  const net = t.eur_gain_net ?? t.eur_gain;
-  const patrimonio = t.eur_value;   // investito + liquidità
+  const b = DATA.broker;
+  const eurusd = DATA.eurusd || 1.08;
+  let invested, patrimonioInv, gain, gainPct, net, src;
+  if (b && b.controvalore_totale) {
+    // dati REALI del broker (autorevoli): coerenti con ciò che vedi sul tuo conto
+    invested = b.investimenti;
+    patrimonioInv = b.controvalore_totale;
+    gain = b.profitto_totale_eur;
+    gainPct = b.profitto_totale_pct;
+    const equityGainEur = (b.profitto_usd || 0) / eurusd;
+    const btpVal = (b.controvalore_totale || 0) - (b.controvalore_azioni || 0);
+    const btpGain = Math.max(0, btpVal - 40000);
+    const tax = 0.26 * Math.max(0, equityGainEur) + 0.125 * btpGain;
+    net = gain - tax;
+    src = `dati broker · agg. ${new Date(b.as_of).toLocaleDateString("it-IT")}`;
+  } else {
+    invested = t.eur_invested; patrimonioInv = t.eur_invested; gain = t.eur_gain;
+    gainPct = t.eur_gain_pct; net = t.eur_gain_net ?? t.eur_gain; src = "stima dai prezzi";
+  }
+  const patrimonio = patrimonioInv + cashEur;   // posizioni + liquidità
   const kpis = [
     { label: "Patrimonio totale (€)", value: fmtEUR.format(patrimonio),
-      sub: `investito ${fmtEUR.format(t.eur_invested ?? patrimonio)}${cashEur > 0 ? ` + liquidità ${fmtEUR.format(cashEur)}` : ""}`,
+      sub: `posizioni ${fmtEUR.format(patrimonioInv)}${cashEur > 0 ? ` + liquidità ${fmtEUR.format(cashEur)}` : ""}`,
       accent: "var(--blue)" },
-    { label: "Guadagno totale lordo (€)", value: signTxt(Math.round(t.eur_gain), " €"),
-      sub: `${signTxt(t.eur_gain_pct)} dal carico`,
-      subCls: signCls(t.eur_gain), accent: t.eur_gain >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(t.eur_gain) },
+    { label: "Capitale investito (€)", value: fmtEUR.format(invested),
+      sub: src, accent: "var(--purple)" },
+    { label: "Guadagno totale (€)", value: signTxt(Math.round(gain), " €"),
+      sub: `${signTxt(gainPct)} sul capitale investito`,
+      subCls: signCls(gain), accent: gain >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(gain) },
     { label: "Guadagno netto tasse (€)", value: signTxt(Math.round(net), " €"),
-      sub: t.tax_est ? `tasse stimate −${fmtEUR.format(Math.round(t.tax_est))} (26% azioni, 12,5% BTP)` : "",
+      sub: `dopo tasse stimate (26% azioni · 12,5% BTP)${b && b.cedole_btp ? ` · cedole BTP ${fmtEUR.format(b.cedole_btp)}` : ""}`,
       subCls: signCls(net), accent: net >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(net) },
   ];
 
@@ -1020,8 +1042,10 @@ async function drawTickerChart() {
   const r = all.find(x => x.ticker === cmTicker);
   if (!r) return;
   const sym = r.currency === "PTS" ? "" : r.currency === "EUR" ? "€" : "$";
-  const controls = `<div class="spark-toggle cm-ranges">` +
-    CM_RANGES.map(([k, lab]) => `<button class="chip cm-range ${k === cmRange ? "chip-active" : ""}" data-range="${k}">${lab}</button>`).join("") + `</div>`;
+  const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.ticker.replace("^", ""))}`;
+  const controls = `<div class="cm-controls"><div class="spark-toggle cm-ranges">` +
+    CM_RANGES.map(([k, lab]) => `<button class="chip cm-range ${k === cmRange ? "chip-active" : ""}" data-range="${k}">${lab}</button>`).join("") +
+    `</div><a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">Apri su TradingView ↗</a></div>`;
   $("#chart-modal-title").textContent = `${r.name} (${r.ticker})`;
   $("#chart-modal-body").innerHTML = controls + `<div class="muted" style="padding:40px 0;text-align:center" id="cm-loading">Carico le candele…</div>`;
   $("#chart-modal-tip").innerHTML = "";
@@ -1225,9 +1249,28 @@ function delBtn(section, ticker) {
   if (!editMode[section]) return "";
   const mv = `<button class="row-move" data-sec="${section}" data-tk="${ticker}" data-dir="-1" title="Sposta su" aria-label="Sposta su">▲</button>
     <button class="row-move" data-sec="${section}" data-tk="${ticker}" data-dir="1" title="Sposta giù" aria-label="Sposta giù">▼</button>`;
+  // solo in portafoglio: modifica quantità/PMC della posizione
+  const ed = (section === "portfolio" && ticker !== "BTP-V28")
+    ? `<button class="row-edit" data-tk="${ticker}" title="Modifica quantità/PMC di ${ticker}" aria-label="Modifica ${ticker}">✎</button>` : "";
   const del = ticker !== "BTP-V28"
     ? `<button class="row-del" data-sec="${section}" data-tk="${ticker}" title="Rimuovi ${ticker}">×</button>` : "";
-  return mv + del;
+  return mv + ed + del;
+}
+
+// modifica quantità e prezzo medio di carico di una posizione esistente
+function editPosition(ticker) {
+  const r = (DATA.portfolio || []).find(x => x.ticker === ticker);
+  if (!r) return;
+  const qty = parseFloat(window.prompt(`Nuova quantità di ${ticker}:`, r.qty) || "");
+  if (!(qty >= 0)) { toast("Quantità non valida"); return; }
+  const pmc = parseFloat(window.prompt(`Nuovo prezzo medio di carico (PMC) di ${ticker}:`, r.pmc) || "");
+  if (!(pmc > 0)) { toast("PMC non valido"); return; }
+  editHoldings("portfolio", cfg => {
+    const p = (cfg.portfolio || []).find(x => x.ticker === ticker);
+    if (!p) return false;
+    p.qty = qty; p.pmc = pmc;
+    return true;
+  });
 }
 
 
@@ -1786,6 +1829,8 @@ document.addEventListener("click", (e) => {
   if (del) { removeHolding(del.dataset.sec, del.dataset.tk); return; }
   const mv = e.target.closest(".row-move");
   if (mv) { moveHolding(mv.dataset.sec, mv.dataset.tk, +mv.dataset.dir); return; }
+  const ed = e.target.closest(".row-edit");
+  if (ed) { editPosition(ed.dataset.tk); return; }
   const add = e.target.closest(".row-add");
   if (add) { quickAddFromWatchlist(add.dataset.tk, parseFloat(add.dataset.price)); return; }
   if (e.target.id === "ptf-add" || e.target.id === "wl-add") {

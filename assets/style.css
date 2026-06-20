@@ -351,6 +351,13 @@ th.sortable:hover { color: var(--text); }
   width: 16px; height: 15px; border-radius: 3px; font-size: 8px; line-height: 1; margin-right: 2px; vertical-align: middle;
 }
 .row-move:hover { color: var(--text); border-color: var(--blue); }
+.row-edit {
+  background: rgba(76,141,255,.15); color: var(--blue); border: none; cursor: pointer;
+  width: 18px; height: 18px; border-radius: 4px; font-size: 11px; line-height: 1;
+  margin-right: 4px; font-weight: 700; vertical-align: middle;
+}
+.row-edit:hover { background: var(--blue); color: #fff; }
+.cm-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 
 /* ---------- tabella info nei popup (FedWatch) ---------- */
 .info-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
