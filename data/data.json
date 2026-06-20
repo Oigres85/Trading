@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-20T07:44:38Z",
+ "updated_at": "2026-06-20T08:17:50Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6470,16 +6470,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63688.77,
-   "change_pct": 0.23,
+   "price": 63496.76,
+   "change_pct": -0.07,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.5,
+   "ath_dist_pct": -49.7,
    "support": 59108.92,
    "resistance": 74153.5,
-   "rsi": 38.3,
-   "volume": 20835780608,
-   "vol_ratio": 0.64,
+   "rsi": 37.5,
+   "volume": 20387631104,
+   "vol_ratio": 0.62,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6488,7 +6488,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63688.77
+     63496.76
     ],
     "m6": [
      69767.62,
@@ -6616,7 +6616,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63688.77
+     63496.76
     ],
     "all": [
      386.94,
@@ -6760,7 +6760,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63688.77
+     63496.76
     ],
     "m1": [
      73372.52,
@@ -6784,7 +6784,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63688.77
+     63496.76
     ],
     "m3": [
      74805.08,
@@ -6852,7 +6852,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63688.77
+     63496.76
     ],
     "y1": [
      103309.6,
@@ -6976,7 +6976,10 @@
      63601.2,
      63714.61,
      63666.01,
-     63688.77
+     63686.26,
+     63625.99,
+     63580.67,
+     63491.83
     ]
    },
    "earnings_date": null,
@@ -6991,22 +6994,22 @@
     "w1": {
      "support": 62201.14,
      "resistance": 67248.13,
-     "change_pct": -3.92
+     "change_pct": -4.21
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74218.56,
-     "change_pct": -13.2
+     "change_pct": -13.46
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -14.86
+     "change_pct": -15.12
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -42.52
+     "change_pct": -42.7
     }
    },
    "financials": [],
@@ -12724,7 +12727,7 @@
      20.53,
      20.44,
      16.54,
-     15.0,
+     14.99,
      17.44,
      21.66,
      24.26,
@@ -12900,7 +12903,7 @@
      147.52,
      137.6,
      136.37,
-     130.77,
+     130.76,
      147.85,
      161.13,
      165.17,
@@ -13286,7 +13289,7 @@
      652.88,
      656.65,
      639.92,
-     634.12,
+     634.11,
      650.37,
      672.3,
      663.48,
@@ -15204,7 +15207,7 @@
     153058,
     154980,
     154532,
-    157101,
+    157100,
     156807,
     155640,
     157005,
@@ -17348,7 +17351,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 52
+     "score": 49
     }
    ]
   },
@@ -17807,7 +17810,7 @@
   },
   {
    "question": "Bitcoin Up or Down on June 20?",
-   "yes": 90,
+   "yes": 80,
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-june-20-2026"
   },
   {
@@ -17829,7 +17832,7 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "L'IRGC trarrà vantaggio dall'allentamento delle sanzioni iraniane in base all'accordo statunitense - Reuters"
+   "title_it": "L'IRGC trarrà vantaggio dall'allentamento delle sanzioni contro l'Iran in base all'accordo statunitense - Reuters"
   },
   {
    "source": "Investing.com",
@@ -17843,34 +17846,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "Perché gli Stati Uniti sono più esuberanti della Cina?"
-  },
-  {
-   "source": "Investing.com",
-   "title": "U.S., Qatar discuss plan to give Iran access to $6 billion in frozen funds - WSJ",
-   "link": "https://www.investing.com/news/economy-news/us-qatar-discuss-plan-to-give-iran-access-to-6-billion-in-frozen-funds--wsj-4751598",
-   "published": "2026-06-20T03:23:11Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Stati Uniti e Qatar discutono del piano per dare all'Iran l'accesso a 6 miliardi di dollari in fondi congelati - WSJ"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Iranian Guards’ business empire to win big if U.S. sanctions lifted",
-   "link": "https://www.investing.com/news/economic-indicators/iranian-guards-business-empire-to-win-big-if-us-sanctions-lifted-4751596",
-   "published": "2026-06-20T03:12:26Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "L’impero economico delle Guardie iraniane vincerebbe alla grande se le sanzioni statunitensi venissero revocate"
   },
   {
    "source": "Investing.com",
@@ -17969,6 +17944,33 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
+   "source": "Google News",
+   "title": "NFP Report Puts Fed Policy and Gold Price Outlook in Focus - equiti.com",
+   "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBHNUExN2hzdVFMNUJtU1g0VXd3WGN5SU9oU0RLbkg3aTVPZHFGVXNSeFZ3eTRxeTdoR2d3NHZkN01CcDdSSk9Wb1piV0FfWUIyRWpLMUl5Umx5d25JVE5tT1R4dnBidU0xalpXX25hVU9KTVJwSEc4ZQ?oc=5",
+   "published": "2026-06-20T07:17:22Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il rapporto NFP mette a fuoco la politica della Fed e le prospettive del prezzo dell'oro - equiti.com"
+  },
+  {
+   "source": "Reuters",
+   "title": "Iranian Guards' business empire to win big if U.S. sanctions lifted - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQeTVOWlpubWVJN3A4Rl9Wai1TNWRycWQwS1RrbXJCQndDZXIxaklsWV9idkhkRXI2SmN6cldIelBCNGVJNVNYWXhmUjNzeUx1VWhDbkNTdVJLNmwweUtzNmpobW5DSHNVc1BQM2xTc3plMzBpNVV6akI2X1AtVGkyN1l1Q0VIanZGNkctczJvSFM0WEtTdnZmNFlLdWg2LTVtUUxYTC00aEs0cG5qcERYSXBya1Y4dw?oc=5",
+   "published": "2026-06-20T03:08:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L'impero economico delle guardie iraniane vincerebbe alla grande se le sanzioni statunitensi venissero revocate - Reuters"
+  },
+  {
    "source": "Reuters",
    "title": "US, Iran envoys head for talks, Israeli strikes continue after ceasefire - Reuters",
    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNMmZyRmRQdUo5dlpLWnZaTEVkV2JBOXpMS2hNTEg1LVN6YzN2VjNlMXZkNXlNdVY4bWhaMG0wd1JtVWtmV1BNbXk5UjNHODNLT3ZJZUNfcmFZSmVvWkRfQ2J2eHNoZGRiWUpwbGZBT04zbjBILVZoV21rUC1VU2pWeENyaDJNRGMtY2otYWV5eG1fdjc3RFhFNmNCQzkyTWJLRVhVbjhFZWhfQQ?oc=5",
@@ -18036,7 +18038,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Trump ora afferma che uno dei due candidati repubblicani sarebbe una buona scelta nel ballottaggio del governatore della Carolina del Sud - AP News"
+   "title_it": "Trump ora afferma che uno dei candidati repubblicani sarebbe una buona scelta nel ballottaggio del governatore della Carolina del Sud - AP News"
   },
   {
    "source": "Google News",
@@ -18150,6 +18152,20 @@
    "title_it": "Le nuove task force di Warsh danno alla Fed margine di manovra per rinviare la modifica dei tassi fino a dicembre"
   },
   {
+   "source": "CNBC",
+   "title": "Fedspeak vs. war deal: Here are the things that drove this week's stock market",
+   "link": "https://www.cnbc.com/2026/06/19/fedspeak-vs-war-deal-here-are-the-things-that-drove-this-weeks-stock-market.html",
+   "published": "2026-06-19T17:24:10Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Parli della Fed contro accordo di guerra: ecco gli elementi che hanno guidato il mercato azionario di questa settimana"
+  },
+  {
    "source": "MarketWatch",
    "title": "Trump picked Kevin Warsh to cut rates. The new Fed chief just told us he has other plans.",
    "link": "https://www.marketwatch.com/story/trump-picked-kevin-warsh-to-cut-rates-the-new-fed-chief-just-told-us-he-has-other-plans-096bba56?mod=mw_rss_topstories",
@@ -18165,20 +18181,20 @@
   },
   {
    "source": "Google News",
-   "title": "Warsh’s First Test as Fed Chairman: Reading the AI Boom - WSJ",
-   "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOUjBFZTNLNVpkcVNlTG1PenRNbjVLaURfUUppU1lhVVNxYXZxSkhCaG13ZEpWWVVNYWQ5aUx4X1c1ZUtXcGo2dDF6Tks1dG9fRTlCenB4aEJJWTNHenNoV280TUZ4cFVlcDZoaG1RQWV2TUljMldTV2tEajVJZWo5MEFTZUVZLUU5X1VYdzhlTklsbjg?oc=5",
-   "published": "2026-06-19T17:00:00Z",
+   "title": "Jobs Report Shocks Wall Street | The Open Interest 6/5/2026 Alex Murdaugh (81d3NMleJ7) - Mshale",
+   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE0yRHBpWnBaQnNtR3M5Z1h5c1ROXzNrU1ZwWHFfNjFZYlh2eGgzUnFRcFMxUVFWZnpocG5yNE9URDlwVk83NWJpMUNCcUdvZk9hYTFxZXJHQWJxTUpqWXRhMg?oc=5",
+   "published": "2026-06-19T17:03:06Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il primo test di Warsh come presidente della Fed: leggere il boom dell'intelligenza artificiale - WSJ"
+   "title_it": "Il rapporto sull'occupazione sconvolge Wall Street | L'interesse aperto 05/06/2026 Alex Murdaugh (81d3NMleJ7) - Mshale"
   },
   {
    "source": "MarketWatch",
-   "title": "Fed watching is looking very different now. Two charts can help you in the Warsh era.",
+   "title": "The Fed is forcing Wall Street to do the heavy lifting. Use these benchmarks to find your footing.",
    "link": "https://www.marketwatch.com/story/fed-watching-is-looking-very-different-now-two-charts-can-help-you-in-the-warsh-era-d2372c15?mod=mw_rss_topstories",
    "published": "2026-06-19T16:59:00Z",
    "tickers": [
@@ -18187,7 +18203,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L’osservazione della Fed ora appare molto diversa. Due grafici possono aiutarti nell’era Warsh."
+   "title_it": "La Fed sta costringendo Wall Street a fare il lavoro pesante. Usa questi parametri di riferimento per trovare la tua posizione."
   },
   {
    "source": "CNBC",
@@ -18204,20 +18220,6 @@
    "title_it": "Meloni critica l'affermazione di Trump di aver \"implorato\" una foto con lui mentre il massimo diplomatico italiano annulla il viaggio negli Stati Uniti"
   },
   {
-   "source": "Reuters",
-   "title": "For US Vice President JD Vance, Iran talks could shape political rise - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOQWlnWFI3SUZDeUtiRU9JdURpYTJhMkM0Qzdzay01VGNKbFBXRDdNZURuX2h4TFNrdGVhYlF0QVcxaHY0cG5FNTIxSVRpVG9yOENHbnF1M2ZJRkpYb01kdUg5YWlhRHljMXhBcll5d2xNLTVaQXZQZDh2LWZhcU9TREVLYnl5MDUtdVQtdVlqOUQyQQ?oc=5",
-   "published": "2026-06-19T16:46:03Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bull",
-   "title_it": "Per il vicepresidente americano JD Vance, i colloqui con l'Iran potrebbero influenzare l'ascesa politica - Reuters"
-  },
-  {
    "source": "MarketWatch",
    "title": "Is the stock market closed today for Juneteenth? Will the post office deliver mail?",
    "link": "https://www.marketwatch.com/story/is-the-stock-market-open-on-juneteenth-will-the-post-office-deliver-mail-0569e453?mod=mw_rss_topstories",
@@ -18229,6 +18231,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Il mercato azionario è chiuso oggi per Juneteenth? L'ufficio postale consegnerà la posta?"
+  },
+  {
+   "source": "Reddit",
+   "title": "The market is mispricing the current geopolitical reality: The true bottleneck for the defense sector is not the US election, it is the raw material supply chain.",
+   "link": "https://www.reddit.com/r/investing/comments/1ua6gn4/the_market_is_mispricing_the_current_geopolitical/",
+   "published": "2026-06-19T16:23:02Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il mercato sta valutando erroneamente l’attuale realtà geopolitica: il vero collo di bottiglia per il settore della difesa non sono le elezioni americane, ma la catena di approvvigionamento delle materie prime."
   },
   {
    "source": "Bloomberg",
@@ -18245,6 +18261,20 @@
    "title_it": "Stati Uniti e Iran ritardano i colloqui sul nucleare mentre si aggravano gli scontri in Libano"
   },
   {
+   "source": "AP",
+   "title": "Analysis: A confident Iran is pressing its advantage, but challenges loom - AP News",
+   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPWUdQUEFORmxyRkQtNXcxbENvLXdHb0tBcWJ2OG13Wlp2Q0U3YXJET3U2Rjh0QnBtSnlDMzlxVnl3M0haOTN5YldsZnk1cjVBVm1pODl4SnExWkh6eUZ3T29yY3ZreG9UbFptVFFxcnVYaGtVRzgxNDYwRGNYWW9nVzBRMXhxY1RmeWRpQ3hRbXFzd05nZ2pfRG5CaF8?oc=5",
+   "published": "2026-06-19T16:09:28Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Analisi: un Iran fiducioso sta sfruttando il suo vantaggio, ma le sfide incombono - AP News"
+  },
+  {
    "source": "MarketWatch",
    "title": "Oil prices face fresh wave of volatility amid conflicting reports about Strait of Hormuz reopening and ongoing regional strife",
    "link": "https://www.marketwatch.com/story/oil-prices-under-new-wave-of-pressure-amid-lingering-questions-over-a-strait-of-hormuz-reopening-c58fc9e8?mod=mw_rss_topstories",
@@ -18258,20 +18288,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "I prezzi del petrolio si trovano ad affrontare una nuova ondata di volatilità tra le notizie contrastanti sulla riapertura dello Stretto di Hormuz e il conflitto regionale in corso"
-  },
-  {
-   "source": "AP",
-   "title": "Analysis: A confident Iran is pressing its advantage, but challenges loom - AP News",
-   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPWUdQUEFORmxyRkQtNXcxbENvLXdHb0tBcWJ2OG13Wlp2Q0U3YXJET3U2Rjh0QnBtSnlDMzlxVnl3M0haOTN5YldsZnk1cjVBVm1pODl4SnExWkh6eUZ3T29yY3ZreG9UbFptVFFxcnVYaGtVRzgxNDYwRGNYWW9nVzBRMXhxY1RmeWRpQ3hRbXFzd05nZ2pfRG5CaF8?oc=5",
-   "published": "2026-06-19T15:25:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Analisi: un Iran fiducioso sta sfruttando il suo vantaggio, ma le sfide incombono - AP News"
   },
   {
    "source": "Google News",
@@ -18369,19 +18385,17 @@
    "title_it": "La Russia minaccia un’escalation dopo che l’Ucraina ha colpito Mosca con il più grande attacco di droni mai visto"
   },
   {
-   "source": "Google News",
-   "title": "Interest rate cut not likely on the table, even after Iran deal and somewhat falling oil prices - Washington Examiner",
-   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOZXMyejNsLUcwYV9TT29meXBvZUljdXNjeXR0dVA4UWl0cHFPOHB3ampjaDl2a0NOVTkyWlotUkpkUnpoMkkxcTBMRkZCYzlkUFRPVXEzdlF1dXlESmtxTWVoVmhQOUU5MndpaDRWMXp3OXcyOGc0ZjdrWDJhNzlFdlRMQXpKUmk0bTZNTlBaTUZ6ZHo4ZDRCY1piYk1JNUdzNWo4?oc=5",
-   "published": "2026-06-19T10:00:00Z",
+   "source": "Yahoo Finance",
+   "title": "World shares are mixed and US futures fall after a tech-led rally on Wall St",
+   "link": "https://finance.yahoo.com/markets/world-indices/articles/asian-shares-retreat-thin-holiday-045615863.html",
+   "published": "2026-06-19T04:56:15Z",
    "tickers": [
-    "MACRO",
-    "POL",
-    "CL=F"
+    "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Probabilmente non è sul tavolo un taglio dei tassi di interesse, anche dopo l’accordo con l’Iran e il lieve calo dei prezzi del petrolio – Washington Examiner"
+   "title_it": "Le azioni mondiali sono contrastanti e i futures statunitensi crollano dopo il rally guidato dalla tecnologia a Wall Street"
   },
   {
    "source": "Yahoo Finance",
@@ -18425,33 +18439,6 @@
   },
   {
    "source": "Yahoo Finance",
-   "title": "Market-Weighted Healthcare or Active Manager Selection? IYH vs. PINK",
-   "link": "https://finance.yahoo.com/healthcare/articles/market-weighted-healthcare-active-manager-024837266.html",
-   "published": "2026-06-19T02:48:37Z",
-   "tickers": [
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Sanità ponderata per il mercato o selezione del manager attivo? IYH contro ROSA"
-  },
-  {
-   "source": "CNBC",
-   "title": "Trump claims Iran deal is 'unconditional surrender,' says his power has 'no limits': Axios",
-   "link": "https://www.cnbc.com/2026/06/19/trump-claims-iran-deal-is-unconditional-surrender-axios-.html",
-   "published": "2026-06-19T02:00:46Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Trump afferma che l’accordo con l’Iran rappresenta una “resa incondizionata”, afferma che il suo potere “non ha limiti”: Axios"
-  },
-  {
-   "source": "Yahoo Finance",
    "title": "Is Advanced Micro Devices (AMD) One of the Top 10 Dividend Stocks to Buy According to Reddit?",
    "link": "https://finance.yahoo.com/markets/stocks/articles/advanced-micro-devices-amd-one-035536885.html",
    "published": "2026-06-19T03:55:36Z",
@@ -18477,11 +18464,24 @@
    "title_it": "Bitcoin si ferma sotto la resistenza di 65.000$: livelli live"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "JPMorgan Chase & Co. (JPM) – Among the Top 10 Dividend Stocks to Buy According to Reddit",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jpmorgan-chase-co-jpm-among-035337364.html",
+   "published": "2026-06-19T03:53:37Z",
+   "tickers": [
+    "JPM"
+   ],
+   "topic_pri": 2,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "JPMorgan Chase & Co. (JPM) – Tra i primi 10 titoli azionari da acquistare secondo Reddit"
+  },
+  {
    "source": "Polymarket",
    "title": "Fed rate hike in 2026?",
    "title_it": "Fed rate hike in 2026? — probabilità Sì 66%",
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026",
-   "published": "2026-06-20T07:45:45Z",
+   "published": "2026-06-20T08:18:38Z",
    "tickers": [
     "MACRO"
    ],
@@ -18490,9 +18490,9 @@
   {
    "source": "Polymarket",
    "title": "Bitcoin Up or Down on June 20?",
-   "title_it": "Bitcoin Up or Down on June 20? — probabilità Sì 90%",
+   "title_it": "Bitcoin Up or Down on June 20? — probabilità Sì 80%",
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-june-20-2026",
-   "published": "2026-06-20T07:45:45Z",
+   "published": "2026-06-20T08:18:38Z",
    "tickers": [
     "MACRO"
    ],
@@ -18503,7 +18503,7 @@
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 74%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-06-20T07:45:45Z",
+   "published": "2026-06-20T08:18:38Z",
    "tickers": [
     "MACRO"
    ],
