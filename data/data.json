@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-20T17:27:51Z",
+ "updated_at": "2026-06-20T20:09:32Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6470,16 +6470,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63840.15,
-   "change_pct": 0.47,
+   "price": 63904.51,
+   "change_pct": 0.57,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.4,
    "support": 59108.92,
    "resistance": 74153.5,
-   "rsi": 38.9,
-   "volume": 18073481216,
-   "vol_ratio": 0.55,
+   "rsi": 39.1,
+   "volume": 17435840512,
+   "vol_ratio": 0.53,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6488,7 +6488,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63840.15
+     63904.51
     ],
     "m6": [
      69767.62,
@@ -6616,7 +6616,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63840.15
+     63904.51
     ],
     "all": [
      386.94,
@@ -6760,7 +6760,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63840.15
+     63904.51
     ],
     "m1": [
      73372.52,
@@ -6784,7 +6784,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63840.15
+     63904.51
     ],
     "m3": [
      74805.08,
@@ -6852,7 +6852,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63840.15
+     63904.51
     ],
     "y1": [
      103309.6,
@@ -7034,7 +7034,23 @@
      63955.66,
      63893.83,
      63884.7,
-     63842.59
+     63842.59,
+     63930.79,
+     63791.8,
+     63764.97,
+     63815.85,
+     63754.38,
+     63803.7,
+     63778.9,
+     63745.94,
+     63720.55,
+     63786.37,
+     63830.08,
+     63842.07,
+     63814.0,
+     63872.55,
+     63869.22,
+     63865.49
     ]
    },
    "earnings_date": null,
@@ -7049,22 +7065,22 @@
     "w1": {
      "support": 62201.14,
      "resistance": 67248.13,
-     "change_pct": -3.69
+     "change_pct": -3.6
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74218.56,
-     "change_pct": -12.99
+     "change_pct": -12.9
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -14.66
+     "change_pct": -14.57
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -42.39
+     "change_pct": -42.33
     }
    },
    "financials": [],
@@ -11987,7 +12003,7 @@
      262.81,
      273.93,
      265.04,
-     273.25,
+     273.24,
      282.06,
      281.36,
      276.51,
@@ -12782,7 +12798,7 @@
      20.53,
      20.44,
      16.54,
-     15.0,
+     14.99,
      17.44,
      21.66,
      24.26,
@@ -15046,7 +15062,7 @@
     217123,
     215584,
     217725,
-    220472,
+    220471,
     224617,
     223721,
     226649,
@@ -15820,7 +15836,7 @@
     153263,
     160434,
     166937,
-    163244,
+    163245,
     169543,
     157386,
     148131,
@@ -16590,7 +16606,7 @@
     153263,
     160434,
     166937,
-    163244,
+    163245,
     169543,
     157386,
     148131,
@@ -17389,7 +17405,7 @@
    "calls": 2916
   },
   "risk_sentiment": {
-   "score": 50,
+   "score": 51,
    "label": "Neutrale",
    "components": [
     {
@@ -17861,6 +17877,48 @@
  "news": [
   {
    "source": "Investing.com",
+   "title": "Trump says no toll on Strait of Hormuz unless US imposes one",
+   "link": "https://www.investing.com/news/commodities-news/trump-says-no-toll-on-strait-of-hormuz-unless-us-imposes-one-4751631",
+   "published": "2026-06-20T19:49:02Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Trump dice che non sarà imposto alcun pedaggio sullo Stretto di Hormuz a meno che gli Stati Uniti non ne impongano uno"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Will the end of the US-Iran war boost Republicans in the midterms?",
+   "link": "https://www.investing.com/news/economy-news/will-the-end-of-the-usiran-war-boost-republicans-in-the-midterms-4751629",
+   "published": "2026-06-20T18:01:31Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "La fine della guerra tra Stati Uniti e Iran darà impulso ai repubblicani nel medio termine?"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Israeli fire kills nine people in Gaza, including a child, medics say",
+   "link": "https://www.investing.com/news/world-news/israeli-fire-kills-five-people-in-gaza-including-a-child-medics-say-4751613",
+   "published": "2026-06-20T17:30:27Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Il fuoco israeliano uccide nove persone a Gaza, compreso un bambino, dicono i medici"
+  },
+  {
+   "source": "Investing.com",
    "title": "US forces monitoring Strait of Hormuz to ensure it stays open",
    "link": "https://www.investing.com/news/world-news/us-forces-monitoring-strait-of-hormuz-to-ensure-it-stays-open-4751624",
    "published": "2026-06-20T16:54:28Z",
@@ -17874,85 +17932,18 @@
   },
   {
    "source": "Investing.com",
-   "title": "Ukraine’s Zelenskiy says he returned state decoration to Polish president",
-   "link": "https://www.investing.com/news/world-news/ukraines-zelenskiy-says-he-returned-state-decoration-to-polish-president-4751623",
-   "published": "2026-06-20T16:48:29Z",
+   "title": "Bitcoin rises to near $64k, but Iran uncertainty limits broader recovery",
+   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-rebounds-above-63000-as-traders-assess-regulatory-developments-4751609",
+   "published": "2026-06-20T09:01:53Z",
    "tickers": [
     "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "L’ucraino Zelenskiy afferma di aver restituito la decorazione statale al presidente polacco"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Italy’s Meloni tells Trump to focus on his own popularity as row rumbles on",
-   "link": "https://www.investing.com/news/world-news/italys-meloni-tells-trump-to-focus-on-his-own-popularity-as-row-rumbles-on-4751622",
-   "published": "2026-06-20T16:42:29Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "L’italiano Meloni dice a Trump di concentrarsi sulla propria popolarità mentre rimbomba la disputa"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Israeli fire kills six people in Gaza, including a child, medics say",
-   "link": "https://www.investing.com/news/world-news/israeli-fire-kills-five-people-in-gaza-including-a-child-medics-say-4751613",
-   "published": "2026-06-20T16:00:33Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Il fuoco israeliano uccide sei persone a Gaza, compreso un bambino, dicono i medici"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Who wins in China? AI supercycle or domestic stagflation?",
-   "link": "https://www.investing.com/news/economy-news/who-wins-in-china-ai-supercycle-or-domestic-stagflation-4751621",
-   "published": "2026-06-20T15:47:26Z",
-   "tickers": [
-    "MACRO"
+    "POL",
+    "BTC-USD"
    ],
    "topic_pri": 0,
    "inv": true,
    "sentiment": "bull",
-   "title_it": "Chi vince in Cina? Superciclo dell’IA o stagflazione domestica?"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Italy’s Meloni says Trump ’totally invented’ story that she begged him for photo",
-   "link": "https://www.investing.com/news/world-news/meloni-fights-back-after-trump-tells-italian-tv-she-begged-for-photo-with-him-at-g7-4751475",
-   "published": "2026-06-20T13:36:25Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "L'italiana Meloni afferma che Trump ha \"totalmente inventato\" la storia secondo cui lei gli ha chiesto una foto"
-  },
-  {
-   "source": "Investing.com",
-   "title": "BofA explains the basics of Fed watching",
-   "link": "https://www.investing.com/news/economy-news/bofa-explains-the-basics-of-fed-watching-4751618",
-   "published": "2026-06-20T13:18:34Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "BofA spiega le basi del monitoraggio della Fed"
+   "title_it": "Bitcoin sale a quasi 64.000 dollari, ma l’incertezza sull’Iran limita una ripresa più ampia"
   },
   {
    "source": "Investing.com",
@@ -17970,34 +17961,6 @@
   },
   {
    "source": "Investing.com",
-   "title": "Bitcoin on track for weekly losses amid Iran uncertainty, rate jitters",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-falls-to-62k-heads-for-weekly-losses-amid-iran-uncertainty-rate-jitters-4751344",
-   "published": "2026-06-19T13:39:02Z",
-   "tickers": [
-    "MACRO",
-    "POL",
-    "BTC-USD"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "bear",
-   "title_it": "Bitcoin sulla buona strada per perdite settimanali tra l’incertezza dell’Iran e il nervosismo dei tassi"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Higher inflation drives jump in UK budget deficit in May",
-   "link": "https://www.investing.com/news/forex-news/uk-runs-much-bigger-than-expected-budget-deficit-in-may-4751341",
-   "published": "2026-06-19T12:30:26Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "bull",
-   "title_it": "L’aumento dell’inflazione spinge il deficit di bilancio del Regno Unito a maggio"
-  },
-  {
-   "source": "Investing.com",
    "title": "SpaceX IPO: Why Chasing The First Rally Can Be Dangerous",
    "link": "https://www.investing.com/analysis/spacex-ipo-why-chasing-the-first-rally-can-be-dangerous-200682380",
    "published": null,
@@ -18010,23 +17973,63 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
-   "source": "MarketWatch",
-   "title": "Fed Chair Kevin Warsh wants to get inflation under control. That could be bad news for home buyers seeking lower mortgage rates.",
-   "link": "https://www.marketwatch.com/story/fed-chair-kevin-warsh-wants-to-get-inflation-under-control-that-could-be-bad-news-for-home-buyers-seeking-lower-mortgage-rates-99fb4aad?mod=mw_rss_topstories",
-   "published": "2026-06-20T17:08:00Z",
+   "source": "Yahoo Finance",
+   "title": "The Vanguard S&P 500 ETF (VOO) Is the Most Popular ETF in the World. Here's One I Like Even Better.",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/vanguard-p-500-etf-voo-194900290.html",
+   "published": "2026-06-20T19:49:00Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il presidente della Fed Kevin Warsh vuole tenere l’inflazione sotto controllo. Questa potrebbe essere una brutta notizia per gli acquirenti di case che cercano tassi ipotecari più bassi."
+   "title_it": "L’ETF Vanguard S&P 500 (VOO) è l’ETF più popolare al mondo. Eccone uno che mi piace ancora di più."
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Goldman Sachs revisits its gold price target after Fed meeting",
+   "link": "https://finance.yahoo.com/markets/commodities/articles/goldman-sachs-revisits-gold-price-194700449.html",
+   "published": "2026-06-20T19:47:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Goldman Sachs rivede il suo obiettivo di prezzo dell'oro dopo la riunione della Fed"
+  },
+  {
+   "source": "CNBC",
+   "title": "Trump tries to blame Reflecting Pool woes on vandalism, without offering substantiation",
+   "link": "https://www.cnbc.com/2026/06/20/trump-tries-to-blame-reflecting-pool-woes-on-vandalism.html",
+   "published": "2026-06-20T17:36:36Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump cerca di attribuire i problemi di Reflecting Pool al vandalismo, senza offrire prove concrete"
+  },
+  {
+   "source": "Google News",
+   "title": "The Rate Update — No He Didn’t: Powell STAYS At The Fed — What Happens To Mortgage Rates Now? Oscar De La Hoya (uilyV2KCQD) - Fathom Journal",
+   "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5venhfWlZac1RYaFdJbjRHWHNlbnFJcjNuUmVxeGlXWUdMQUc3STJVWVZFZUJwV1RZMW5fWHI4dUNZMWlQVUQ1eXVLXy1GZFVqQ3d4WjRYYUhFYnZ6VGxTREw3MXo?oc=5",
+   "published": "2026-06-20T17:28:56Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L'aggiornamento dei tassi - No, non l'ha fatto: Powell RESTA alla Fed - Cosa succede adesso ai tassi ipotecari? Oscar De La Hoya (uilyV2KCQD) - Fathom Journal"
   },
   {
    "source": "CNBC",
    "title": "Iran reportedly closes Strait of Hormuz again, casting shadow over nuclear talks",
    "link": "https://www.cnbc.com/2026/06/20/iran-reportedly-closes-strait-of-hormuz-again-raising-doubt-over-talks.html",
-   "published": "2026-06-20T17:06:27Z",
+   "published": "2026-06-20T17:28:52Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -18065,21 +18068,6 @@
    "title_it": "Le sanzioni iraniane perdono efficacia"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Dow Jones Futures: Iran Closes Strait Of Hormuz; Nvidia Near Buy Point, Watch For This SpaceX Move",
-   "link": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-nvidia-5-chips-buy-points-spacex-stock/?src=A00220&yptr=yahoo",
-   "published": "2026-06-20T15:48:27Z",
-   "tickers": [
-    "MACRO",
-    "POL",
-    "NVDA"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Futures Dow Jones: l'Iran chiude lo Stretto di Hormuz; Nvidia vicino al punto di acquisto, attenzione a questa mossa di SpaceX"
-  },
-  {
    "source": "Google News",
    "title": "Warsh can’t succeed without help from White House - Gulf Today",
    "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQUGRqUzEwYTNUS0V4TGdhei04VUhXQV9WSmJXMTgyNW03NVdEQjJGc1Z0QV9MMGpMdGhzRlc2V3AxMUZEcmREeGtmRDFIeFY1Q2hnTWpBd3RJcUtYbExMbHQ3cjBzZFJNUkE5Mm82WWVNUmFyUlJKZE9xRlQ1MlNhMHIwQmRITnV4REZwbXBwT1B4Vkd5blRz?oc=5",
@@ -18092,33 +18080,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Warsh non può avere successo senza l’aiuto della Casa Bianca – Gulf Today"
-  },
-  {
-   "source": "MarketWatch",
-   "title": "The Fed is forcing Wall Street to do the heavy lifting. Use these benchmarks to find your footing.",
-   "link": "https://www.marketwatch.com/story/fed-watching-is-looking-very-different-now-two-charts-can-help-you-in-the-warsh-era-d2372c15?mod=mw_rss_topstories",
-   "published": "2026-06-20T15:36:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La Fed sta costringendo Wall Street a fare il lavoro pesante. Usa questi parametri di riferimento per trovare la tua posizione."
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Forget SpaceX: See This Overlooked AI Stock in Donald Trump’s Portfolio",
-   "link": "https://finance.yahoo.com/technology/ai/articles/forget-spacex-see-overlooked-ai-153143545.html",
-   "published": "2026-06-20T15:31:43Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Dimentica SpaceX: guarda queste azioni di intelligenza artificiale trascurate nel portafoglio di Donald Trump"
   },
   {
    "source": "Bloomberg",
@@ -18188,10 +18149,10 @@
    "title_it": "Il MOU dà respiro agli Stati Uniti e all’Iran"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Why Does Donald Trump Like Marvell Technology (MRVL)?",
-   "link": "https://finance.yahoo.com/technology/ai/articles/why-does-donald-trump-marvell-133141323.html",
-   "published": "2026-06-20T13:31:41Z",
+   "source": "Reuters",
+   "title": "Paris police arrest 20 as demonstrators defy ban on Iran opposition rally - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPemJad0VoZTdPSXlzRG41S2tQd1pXaFZLWXZvejJ0YlVMa0p5Q2ZBV05SSGxONHhvUHZGWWJUd2prZ3FXa0NFaEQxN2NsR01fRlVpRDREQTg1R1U5S05sR3NvVkN0LXM5MmdfNG1Cb2FWbGo0Rng5RV9Sa1ZyY0pDT21CV2NhRGJPQkhmSGNaYmc0NHJMNXZYQ2NfQThjRlNIY2d2VndGRnAwUTkwNnc?oc=5",
+   "published": "2026-06-20T13:46:09Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -18199,7 +18160,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Perché a Donald Trump piace la tecnologia Marvell (MRVL)?"
+   "title_it": "La polizia di Parigi arresta 20 manifestanti mentre sfidano il divieto di manifestazione dell'opposizione iraniana - Reuters"
   },
   {
    "source": "Reuters",
@@ -18298,19 +18259,6 @@
    "title_it": "La Svizzera afferma che i colloqui USA-Iran continuano al Bürgenstock ma rifiuta di identificare i partecipanti - Reuters"
   },
   {
-   "source": "Google News",
-   "title": "Former Fed Chair Warns of Major Risk That Could Derail This Bull Market - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNdzhoSGhnUUdjRWlqTGVFUFhyOWs1RjlibnhkYXBDdUJfcGppdVE0eEhnRFFFTktfUE91TExJYmNYVzhfdklxQkxRUDd1SGU3QkJwZVpoY2VXazhpM1VNMWlHbFBaTTMzLTlwQmx4dzhmQWFiRkVjUmRMQTMxSVhDU2xnazctY0ZUV29VbEdPQjcyT0M5c1QtNg?oc=5",
-   "published": "2026-06-20T11:21:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "L'ex presidente della Fed avverte di un grave rischio che potrebbe far deragliare questo mercato rialzista - Yahoo Finanza"
-  },
-  {
    "source": "CNBC",
    "title": "Iran to lodge FIFA complaint over World Cup travel restrictions",
    "link": "https://www.cnbc.com/2026/06/20/iran-to-lodge-fifa-complaint-over-world-cup-travel-restrictions.html",
@@ -18367,7 +18315,7 @@
   },
   {
    "source": "AP",
-   "title": "US-Iran talks to begin Sunday in Switzerland as Tehran closes the strait over Lebanon fighting - AP News",
+   "title": "US-Iran talks begin Sunday as Tehran closes the strait over Lebanon fighting - AP News",
    "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOZU83bXR0RDhtTHExa0dVVFJOTWlvNS1DMVM0WUdqX0JyNWQ0RnRTcUNzQlkzR2xtWDdnTVA0NEt3NDVMZXBZcl83X2lEVU9jRktXNlc4SjhKMWMxRUZidDJvdDBreDZLbmpsRklMU01GNkJiYVJVWnhyZnlzUkFhYzY1VFdtUjRUbTh6aHlCVkFQUGttSU44TDBWVDZZTlRJbUhTY3JzRHA?oc=5",
    "published": "2026-06-20T09:40:32Z",
    "tickers": [
@@ -18377,20 +18325,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "I colloqui USA-Iran inizieranno domenica in Svizzera mentre Teheran chiude lo stretto per i combattimenti in Libano - AP News"
-  },
-  {
-   "source": "CNBC",
-   "title": "Massive bonuses for South Korea's chip workers puts central bank on inflation alert",
-   "link": "https://www.cnbc.com/2026/06/20/south-korea-tech-samsung-sk-hynix-bonus-bank-of-korea.html",
-   "published": "2026-06-20T08:59:40Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I massicci bonus per i lavoratori dei chip della Corea del Sud mettono la banca centrale in allerta sull’inflazione"
+   "title_it": "I colloqui tra Stati Uniti e Iran iniziano domenica mentre Teheran chiude lo stretto per i combattimenti in Libano - AP News"
   },
   {
    "source": "Reuters",
@@ -18408,9 +18343,9 @@
   },
   {
    "source": "Reuters",
-   "title": "Vance expects Iran talks soon, as Guards say Hormuz is closed again - Reuters",
+   "title": "Iran negotiators head for Switzerland but Lebanon fighting continues - Reuters",
    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNMmZyRmRQdUo5dlpLWnZaTEVkV2JBOXpMS2hNTEg1LVN6YzN2VjNlMXZkNXlNdVY4bWhaMG0wd1JtVWtmV1BNbXk5UjNHODNLT3ZJZUNfcmFZSmVvWkRfQ2J2eHNoZGRiWUpwbGZBT04zbjBILVZoV21rUC1VU2pWeENyaDJNRGMtY2otYWV5eG1fdjc3RFhFNmNCQzkyTWJLRVhVbjhFZWhfQQ?oc=5",
-   "published": "2026-06-20T02:32:00Z",
+   "published": "2026-06-20T00:55:19Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -18418,7 +18353,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Vance si aspetta presto colloqui con l'Iran, poiché le guardie dicono che Hormuz è di nuovo chiuso - Reuters"
+   "title_it": "I negoziatori iraniani si dirigono verso la Svizzera, ma in Libano continuano gli scontri - Reuters"
   },
   {
    "source": "Reuters",
@@ -18433,6 +18368,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Fissato il cessate il fuoco in Libano, l'inviato di Trump si reca in Svizzera per colloqui tra Stati Uniti e Iran - Reuters"
+  },
+  {
+   "source": "AP",
+   "title": "Trump acknowledges support from allies at new Air Force One unveiling - AP News",
+   "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQYmx3d1ZIS3I0QTRXMTVmWWpMOVRnSmE2SE5XOUNoVVJhRWF6enhOek1IZmMtQXhmM0tDdWZYLXVfcU9SaWtpeC02RkIxYmoyMDl0UTdNWGFhTFg3cGI0em5MRGVZT2hNdkFPRWJ6bzFWRmFSUE1IUkVURVQ1Z21Zc3ZnUkxtQkZzTUZJRG5XQjUzeEh0RjFHUDFQQ1R2b3JaZFE4UDN1OXo1S1FBUUV3XzVxbzNta3FCT3dJMkZxQUlidTVBaEE?oc=5",
+   "published": "2026-06-19T21:40:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump riconosce il sostegno degli alleati alla presentazione della nuova Air Force One - AP News"
   },
   {
    "source": "CNBC",
@@ -18463,59 +18412,30 @@
    "title_it": "Trump dice ad Axios che non vede più l’Anthropic come una minaccia alla sicurezza nazionale"
   },
   {
-   "source": "AP",
-   "title": "Friction between Trump and Republican senators is growing before the pivotal midterm elections - AP News",
-   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPbGFYaTdQVEw0YWhGa2JnQjdHQkhUUUs4VFl5Q2VyTi04dVJGcGd4cjNvbDh6UEN1VnZyYzc2ckxDdEVieGdWc1FJdjRJcERGdTV1VUs4djJUOFVFcHZRdGVjNGRkTFlZdDJDRTA4eldUZFc5OG1NNGtaWF9zT3R6V0U1ekNPY1ZWLTB4ek5zdGhPZzRMQW1KREdTMm9XUGhvSG42RUpubWpQSGhFal9ZbWhJdlRUNF80?oc=5",
-   "published": "2026-06-19T19:15:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Cresce l’attrito tra Trump e i senatori repubblicani prima delle cruciali elezioni di medio termine – AP News"
-  },
-  {
-   "source": "Reuters",
-   "title": "Trump heads to Camp David as Iran talks falter - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQanZjcWNWV1diQU5BSFRBUzJtMlVJVDhWSjZ6MXc5S21QVlF1NHVrM0hTdjJ5dEJrQjA1QXMzNHNPTnpySW00XzJfbXBhNXZUN1RHU1UySWFLRl9SdFA3WTVMWmZNaUtPNmZxTGlIZnN0ZUtCVUZVbTBsZ21FVWR3dVJ4WlZCbHpGcHczdXcxVURpQnNHY1JBVTFR?oc=5",
-   "published": "2026-06-19T17:39:43Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Trump si dirige a Camp David mentre i colloqui sull'Iran vacillano - Reuters"
-  },
-  {
-   "source": "Reddit",
-   "title": "The market is mispricing the current geopolitical reality: The true bottleneck for the defense sector is not the US election, it is the raw material supply chain.",
-   "link": "https://www.reddit.com/r/investing/comments/1ua6gn4/the_market_is_mispricing_the_current_geopolitical/",
-   "published": "2026-06-19T16:23:02Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il mercato sta valutando erroneamente l’attuale realtà geopolitica: il vero collo di bottiglia per il settore della difesa non sono le elezioni americane, ma la catena di approvvigionamento delle materie prime."
-  },
-  {
    "source": "Investing.com",
-   "title": "Bitcoin rebounds above $63,000 as traders assess regulatory developments",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-rebounds-above-63000-as-traders-assess-regulatory-developments-4751609",
-   "published": "2026-06-20T09:01:53Z",
+   "title": "Bitcoin battles $65K resistance amid MACD bounce: Live levels",
+   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-hits-66380-resistance-after-wbottom-breakout-live-levels-93CH-4741296",
+   "published": "2026-06-20T19:02:10Z",
    "tickers": [
     "BTC-USD"
    ],
    "topic_pri": 2,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Bitcoin rimbalza sopra i 63.000 dollari mentre i trader valutano gli sviluppi normativi"
+   "title_it": "Bitcoin combatte la resistenza di 65.000 dollari durante il rimbalzo del MACD: livelli in tempo reale"
+  },
+  {
+   "source": "CNBC",
+   "title": "Bitcoin's future as revolutionary as the smartphone, according to CoinDesk",
+   "link": "https://www.cnbc.com/2026/06/20/bitcoin-as-revolutionary-as-smartphone-according-to-coindesk.html",
+   "published": "2026-06-20T15:00:01Z",
+   "tickers": [
+    "BTC-USD"
+   ],
+   "topic_pri": 2,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il futuro di Bitcoin è rivoluzionario quanto lo smartphone, secondo CoinDesk"
   }
  ]
 }
