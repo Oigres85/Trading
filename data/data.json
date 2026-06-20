@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
- "updated_at": "2026-06-20T05:00:47Z",
-=======
- "updated_at": "2026-06-20T05:25:06Z",
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+ "updated_at": "2026-06-20T05:37:08Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -723,7 +719,12 @@
     "dividend_yield": null,
     "price_to_book": 26.1078,
     "target_mean": 298.9322,
-    "fcf": 46335873024.0
+    "fcf": 46335873024.0,
+    "gross_margin": 0.7414,
+    "enterprise_value": 4978963906560.0,
+    "ev_ebitda": 30.082,
+    "peg": 0.65,
+    "roa": 0.5273
    },
    "tech_by_range": {
     "w1": {
@@ -1655,7 +1656,12 @@
     "dividend_yield": null,
     "price_to_book": 13.5881,
     "target_mean": 487.8958,
-    "fcf": 7173374976.0
+    "fcf": 7173374976.0,
+    "gross_margin": 0.5306,
+    "enterprise_value": 818711429120.0,
+    "ev_ebitda": 110.19,
+    "peg": 1.29,
+    "roa": 0.0365
    },
    "tech_by_range": {
     "w1": {
@@ -2587,7 +2593,12 @@
     "dividend_yield": null,
     "price_to_book": 17.6532,
     "target_mean": 945.6,
-    "fcf": 2893499904.0
+    "fcf": 2893499904.0,
+    "gross_margin": 0.5844,
+    "enterprise_value": 1147354873856.0,
+    "ev_ebitda": 31.176,
+    "peg": 0.36,
+    "roa": 0.2014
    },
    "tech_by_range": {
     "w1": {
@@ -3358,7 +3369,12 @@
     "dividend_yield": null,
     "price_to_book": 1.0621,
     "target_mean": 351.5385,
-    "fcf": -8699502592.0
+    "fcf": -8699502592.0,
+    "gross_margin": 0.6811,
+    "enterprise_value": 58073595904.0,
+    "ev_ebitda": -4.151,
+    "peg": 2.85,
+    "roa": -0.1781
    },
    "tech_by_range": {
     "w1": {
@@ -3855,7 +3871,12 @@
     "dividend_yield": null,
     "price_to_book": 12.164,
     "target_mean": 29.2425,
-    "fcf": -6209875.0
+    "fcf": -6209875.0,
+    "gross_margin": 0.2995,
+    "enterprise_value": 6449248256.0,
+    "ev_ebitda": -80.591,
+    "peg": null,
+    "roa": -0.1209
    },
    "tech_by_range": {
     "w1": {
@@ -4386,7 +4407,12 @@
     "dividend_yield": null,
     "price_to_book": 4.0307,
     "target_mean": 88.6316,
-    "fcf": -100000128.0
+    "fcf": -100000128.0,
+    "gross_margin": 0.0,
+    "enterprise_value": 7789793280.0,
+    "ev_ebitda": -45.261,
+    "peg": null,
+    "roa": -0.0718
    },
    "tech_by_range": {
     "w1": {
@@ -4542,7 +4568,12 @@
     "dividend_yield": null,
     "price_to_book": 31.0611,
     "target_mean": 187.8,
-    "fcf": null
+    "fcf": null,
+    "gross_margin": 0.4883,
+    "enterprise_value": 1183962365952.0,
+    "ev_ebitda": 299.737,
+    "peg": null,
+    "roa": null
    },
    "tech_by_range": {
     "w1": {
@@ -4782,7 +4813,12 @@
     "dividend_yield": null,
     "price_to_book": -23.1264,
     "target_mean": 294.0,
-    "fcf": -622919744.0
+    "fcf": -622919744.0,
+    "gross_margin": 0.3903,
+    "enterprise_value": 12643158016.0,
+    "ev_ebitda": -113.485,
+    "peg": null,
+    "roa": -0.053
    },
    "tech_by_range": {
     "w1": {
@@ -6434,29 +6470,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-<<<<<<< HEAD
-   "price": 63528.0,
-   "change_pct": -1.38,
-   "pe": null,
-   "ath": 126198.07,
-   "ath_dist_pct": -49.7,
-   "support": 59108.92,
-   "resistance": 74153.5,
-   "rsi": 36.3,
-   "volume": 21131304960,
-   "vol_ratio": 0.64,
-=======
-   "price": 63663.98,
-   "change_pct": -1.17,
+   "price": 63605.26,
+   "change_pct": -1.26,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.6,
    "support": 59108.92,
    "resistance": 74153.5,
-   "rsi": 36.6,
-   "volume": 21257172992,
-   "vol_ratio": 0.65,
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+   "rsi": 36.5,
+   "volume": 21190350848,
+   "vol_ratio": 0.64,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6465,11 +6488,7 @@
      66289.5,
      65600.64,
      64418.45,
-<<<<<<< HEAD
-     63528.0
-=======
-     63663.98
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+     63605.26
     ],
     "m6": [
      68857.84,
@@ -6597,11 +6616,7 @@
      66289.5,
      65600.64,
      64418.45,
-<<<<<<< HEAD
-     63528.0
-=======
-     63663.98
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+     63605.26
     ],
     "all": [
      386.94,
@@ -6745,11 +6760,7 @@
      68233.31,
      76304.32,
      73579.69,
-<<<<<<< HEAD
-     63528.0
-=======
-     63663.98
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+     63605.26
     ],
     "m1": [
      73536.55,
@@ -6773,11 +6784,7 @@
      66289.5,
      65600.64,
      64418.45,
-<<<<<<< HEAD
-     63528.0
-=======
-     63663.98
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+     63605.26
     ],
     "m3": [
      74181.61,
@@ -6845,11 +6852,7 @@
      66289.5,
      65600.64,
      64418.45,
-<<<<<<< HEAD
-     63528.0
-=======
-     63663.98
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+     63605.26
     ],
     "y1": [
      103309.6,
@@ -6957,13 +6960,10 @@
      63469.73,
      63544.5,
      63498.82,
-<<<<<<< HEAD
-     63528.0
-=======
      63513.3,
      63750.01,
-     63663.98
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+     63669.89,
+     63601.26
     ]
    },
    "earnings_date": null,
@@ -6978,38 +6978,22 @@
     "w1": {
      "support": 63281.52,
      "resistance": 67248.13,
-<<<<<<< HEAD
-     "change_pct": -3.32
-=======
-     "change_pct": -3.11
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+     "change_pct": -3.2
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74460.12,
-<<<<<<< HEAD
-     "change_pct": -13.61
-=======
-     "change_pct": -13.43
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+     "change_pct": -13.51
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-<<<<<<< HEAD
-     "change_pct": -14.36
-=======
-     "change_pct": -14.18
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+     "change_pct": -14.26
     },
     "y1": {
      "support": 59108.92,
      "resistance": 122509.66,
-<<<<<<< HEAD
-     "change_pct": -43.89
-=======
-     "change_pct": -43.77
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+     "change_pct": -43.82
     }
    },
    "financials": [],
@@ -9467,7 +9451,12 @@
     "dividend_yield": null,
     "price_to_book": 6.0418,
     "target_mean": 94.1415,
-    "fcf": -8301250048.0
+    "fcf": -8301250048.0,
+    "gross_margin": 0.372,
+    "enterprise_value": 614130319360.0,
+    "ev_ebitda": 43.328,
+    "peg": 1.36,
+    "roa": 0.0063
    },
    "tech_by_range": {
     "w1": {
@@ -10089,7 +10078,12 @@
     "dividend_yield": null,
     "price_to_book": 18.2897,
     "target_mean": 420.5463,
-    "fcf": 5251999744.0
+    "fcf": 5251999744.0,
+    "gross_margin": 0.1906,
+    "enterprise_value": 1491624263680.0,
+    "ev_ebitda": 134.453,
+    "peg": 5.72,
+    "roa": 0.0223
    },
    "tech_by_range": {
     "w1": {
@@ -10588,7 +10582,12 @@
     "dividend_yield": null,
     "price_to_book": 36.4454,
     "target_mean": 182.7541,
-    "fcf": 1752997120.0
+    "fcf": 1752997120.0,
+    "gross_margin": 0.8407,
+    "enterprise_value": 311734009856.0,
+    "ev_ebitda": 154.457,
+    "peg": 1.84,
+    "roa": 0.147
    },
    "tech_by_range": {
     "w1": {
@@ -11280,7 +11279,12 @@
     "dividend_yield": 0.24,
     "price_to_book": 9.3139,
     "target_mean": 432.8345,
-    "fcf": 27921750016.0
+    "fcf": 27921750016.0,
+    "gross_margin": 0.6037,
+    "enterprise_value": 4491333074944.0,
+    "ev_ebitda": 27.842,
+    "peg": 1.45,
+    "roa": 0.1464
    },
    "tech_by_range": {
     "w1": {
@@ -11911,7 +11915,7 @@
      262.81,
      273.93,
      265.04,
-     273.25,
+     273.24,
      282.06,
      281.36,
      276.51,
@@ -12207,7 +12211,12 @@
     "dividend_yield": null,
     "price_to_book": 3.7195,
     "target_mean": 409.7692,
-    "fcf": 17687500800.0
+    "fcf": 17687500800.0,
+    "gross_margin": 0.188,
+    "enterprise_value": 424331051008.0,
+    "ev_ebitda": 19.769,
+    "peg": 1.39,
+    "roa": 0.0378
    },
    "tech_by_range": {
     "w1": {
@@ -12877,7 +12886,7 @@
      147.52,
      137.6,
      136.37,
-     130.76,
+     130.77,
      147.85,
      161.13,
      165.17,
@@ -13134,7 +13143,12 @@
     "dividend_yield": null,
     "price_to_book": 2.5333,
     "target_mean": 342.0,
-    "fcf": null
+    "fcf": null,
+    "gross_margin": 0.0,
+    "enterprise_value": 646197411840.0,
+    "ev_ebitda": null,
+    "peg": 1.73,
+    "roa": 0.0127
    },
    "tech_by_range": {
     "w1": {
@@ -14061,7 +14075,12 @@
     "dividend_yield": null,
     "price_to_book": 15.6921,
     "target_mean": 625.1579,
-    "fcf": 3987124992.0
+    "fcf": 3987124992.0,
+    "gross_margin": 0.0991,
+    "enterprise_value": 142373568512.0,
+    "ev_ebitda": 17.808,
+    "peg": 1.08,
+    "roa": 0.0723
    },
    "tech_by_range": {
     "w1": {
@@ -14404,11 +14423,7 @@
     },
     {
      "label": "Bitcoin",
-<<<<<<< HEAD
-     "score": 36
-=======
      "score": 38
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     }
    ]
   },
@@ -14874,6 +14889,20 @@
  "news": [
   {
    "source": "Investing.com",
+   "title": "IRGC set to benefit from Iran sanctions relief under U.S. deal - Reuters",
+   "link": "https://www.investing.com/news/economy-news/irgc-set-to-benefit-from-iran-sanctions-relief-under-us-deal--reuters-4751600",
+   "published": "2026-06-20T05:11:05Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "L'IRGC trarrà vantaggio dall'allentamento delle sanzioni iraniane in base all'accordo statunitense - Reuters"
+  },
+  {
+   "source": "Investing.com",
    "title": "Why is the US more exuberant than China?",
    "link": "https://www.investing.com/news/economy-news/why-is-the-us-more-exuberant-than-china-4751599",
    "published": "2026-06-20T04:02:56Z",
@@ -14911,11 +14940,7 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-<<<<<<< HEAD
-   "title_it": "L’impero economico delle Guardie iraniane potrebbe vincere alla grande se le sanzioni statunitensi venissero revocate"
-=======
    "title_it": "L’impero economico delle Guardie iraniane vincerebbe alla grande se le sanzioni statunitensi venissero revocate"
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
   },
   {
    "source": "Investing.com",
@@ -14930,20 +14955,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "L’Iran si dice pronto alla diplomazia se gli Stati Uniti garantiranno che Israele rispetti il ​​cessate il fuoco"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Trump envoy, Iranian minister head to Switzerland for talks",
-   "link": "https://www.investing.com/news/world-news/trump-envoy-iranian-minister-head-to-switzerland-for-talks-4751591",
-   "published": "2026-06-20T02:36:26Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "L'inviato di Trump e il ministro iraniano si recano in Svizzera per colloqui"
   },
   {
    "source": "Investing.com",
@@ -14972,20 +14983,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "Trump svela il Qatar 747 prima di unirsi alla flotta dell'Air Force One"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Trump tells Axios he no longer views Anthropic as national security threat",
-   "link": "https://www.investing.com/news/stock-market-news/trump-tells-axios-he-no-longer-views-anthropic-as-national-security-threat-4751558",
-   "published": "2026-06-19T20:01:17Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Trump dice ad Axios che non vede più l’attività antropica come una minaccia alla sicurezza nazionale"
   },
   {
    "source": "Investing.com",
@@ -15095,7 +15092,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": null
+   "title_it": "Il presidente Donald Trump svela il nuovo Air Force One, un jet del Qatar convertito - AP News"
   },
   {
    "source": "AP",
@@ -15109,28 +15106,9 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-<<<<<<< HEAD
-   "title_it": "Trump ora afferma che uno dei candidati repubblicani sarebbe una buona scelta nel ballottaggio del governatore della Carolina del Sud - AP News"
-=======
    "title_it": "Trump ora afferma che uno dei due candidati repubblicani sarebbe una buona scelta nel ballottaggio del governatore della Carolina del Sud - AP News"
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
   },
   {
-   "source": "Google News",
-   "title": "Forget The June Fed Pause: Citadel Warns 'Second-Round Effects' Will Force A September Rate Hike - Sahm",
-   "link": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxPMFgxTDdNNXpXNjQ3Umh3V1gySEFJNEtvdWk4UXBXUXh1NEUzRGFpdkVfb3JkUWVvMFFEV3NCUE1xVV9kLTR0azlUbUNXTGJaZzlNYjJ4SlpNaUN0MHFOdkR6MUIyS1dfSTZpTUpvb3B0Y0FjdWZfc2VpeVpvcWl4OEdBQ0NRSVRtQS1KU3R0R3ZDOG9MTnV4cnYzcS1YMXQ4Ulpfd2J0c080bUo0Qnd4MXNCOHF3RlRSVzBYOTJxZDBFcTF5MzJRZTNBSGhlNi1qRW9hamVoTEhHbXBnX2c?oc=5",
-   "published": "2026-06-19T21:59:40Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Dimenticate la pausa della Fed di giugno: Citadel avverte che gli \"effetti del secondo round\" imporranno un rialzo dei tassi a settembre - Sahm"
-  },
-  {
-<<<<<<< HEAD
-=======
    "source": "AP",
    "title": "Iran says it’s being treated unfairly. Its World Cup travel schedule isn’t unique - AP News",
    "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQMnlqN2RWcnB0SElWa0JhYWV2bHF5a2hfclVPOFFSZzFIanl3aTRjWXdxbDlFWW9RaERTWXZyTThWS1g2cVdtWl9ZMnIzSXBpQ1BpeGV6dE9tYkg3am1DbzNKTWhKWnN6N3R6RkVncFZHNzE2NU53bWFZNlJJMnJUM2hscFdGM3Fwb2JIOFpnYWp2YXZK?oc=5",
@@ -15145,7 +15123,6 @@
    "title_it": "L’Iran afferma di essere trattato ingiustamente. Il suo programma di viaggio per la Coppa del Mondo non è unico - AP News"
   },
   {
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
    "source": "Google News",
    "title": "Mortgage rates dip after Iran peace deal but Fed signals caution - MSN",
    "link": "https://news.google.com/rss/articles/CBMirAJBVV95cUxQbEtWRjNxajh6R055cVBNaDFtLXR3bTh0NHhRVkZpZWV3UnpIVGNSM2lrbUpLTUliSVNKeU9fcDVISlJ2U1I2YUVzVDNORlR5NE45b3c4cWUzZHk5am9oZWVuV0lFb1BDWG91MUI5SWVlSGU2U0FId1BFTENVcEREd051VUlRRGFVamhwS0M4cndJM0FMSHdqODg4ejUyY3JsYmt0dXZBV2ZXcmZxRGo4VnZudDFmWHlyc04zZ0E0SVBFNG1FbmNxOGtqc1duYVczcFpHVzZWU21yWGhONC11c3BKTUkycHRjblBCdjVPRzhvXzNINUNhNFdYem5nVzdmSFZKV01ZRVNjcnNiOFFQcFlMM1VlbGxhUjlFeEE2YlllZFVVa3NERUVycXY?oc=5",
@@ -15160,6 +15137,20 @@
    "title_it": "I tassi ipotecari scendono dopo l'accordo di pace con l'Iran, ma la Fed segnala cautela - MSN"
   },
   {
+   "source": "CNBC",
+   "title": "Trump tells Axios he no longer views Anthropic as a national security threat",
+   "link": "https://www.cnbc.com/2026/06/19/trump-tells-axios-he-no-longer-views-anthropic-as-national-security-threat.html",
+   "published": "2026-06-19T20:18:05Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump dice ad Axios che non vede più l’Anthropic come una minaccia alla sicurezza nazionale"
+  },
+  {
    "source": "AP",
    "title": "Friction between Trump and Republican senators is growing before the pivotal midterm elections - AP News",
    "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPbGFYaTdQVEw0YWhGa2JnQjdHQkhUUUs4VFl5Q2VyTi04dVJGcGd4cjNvbDh6UEN1VnZyYzc2ckxDdEVieGdWc1FJdjRJcERGdTV1VUs4djJUOFVFcHZRdGVjNGRkTFlZdDJDRTA4eldUZFc5OG1NNGtaWF9zT3R6V0U1ekNPY1ZWLTB4ek5zdGhPZzRMQW1KREdTMm9XUGhvSG42RUpubWpQSGhFal9ZbWhJdlRUNF80?oc=5",
@@ -15171,7 +15162,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": null
+   "title_it": "Cresce l’attrito tra Trump e i senatori repubblicani prima delle cruciali elezioni di medio termine – AP News"
   },
   {
    "source": "Bloomberg",
@@ -15227,20 +15218,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Le nuove task force di Warsh danno alla Fed margine di manovra per rinviare la modifica dei tassi fino a dicembre"
-  },
-  {
-   "source": "CNBC",
-   "title": "Fedspeak vs. war deal: Here are the things that drove this week's stock market",
-   "link": "https://www.cnbc.com/2026/06/19/fedspeak-vs-war-deal-here-are-the-things-that-drove-this-weeks-stock-market.html",
-   "published": "2026-06-19T17:24:10Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Parli della Fed contro accordo di guerra: ecco gli elementi che hanno guidato il mercato azionario di questa settimana"
   },
   {
    "source": "MarketWatch",
@@ -15324,20 +15301,6 @@
    "title_it": "Stati Uniti e Iran ritardano i colloqui sul nucleare mentre si aggravano gli scontri in Libano"
   },
   {
-   "source": "AP",
-   "title": "Analysis: A confident Iran is pressing its advantage, but challenges loom - AP News",
-   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPWUdQUEFORmxyRkQtNXcxbENvLXdHb0tBcWJ2OG13Wlp2Q0U3YXJET3U2Rjh0QnBtSnlDMzlxVnl3M0haOTN5YldsZnk1cjVBVm1pODl4SnExWkh6eUZ3T29yY3ZreG9UbFptVFFxcnVYaGtVRzgxNDYwRGNYWW9nVzBRMXhxY1RmeWRpQ3hRbXFzd05nZ2pfRG5CaF8?oc=5",
-   "published": "2026-06-19T16:09:28Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Analisi: un Iran fiducioso sta sfruttando il suo vantaggio, ma le sfide incombono - AP News"
-  },
-  {
    "source": "MarketWatch",
    "title": "Oil prices face fresh wave of volatility amid conflicting reports about Strait of Hormuz reopening and ongoing regional strife",
    "link": "https://www.marketwatch.com/story/oil-prices-under-new-wave-of-pressure-amid-lingering-questions-over-a-strait-of-hormuz-reopening-c58fc9e8?mod=mw_rss_topstories",
@@ -15353,8 +15316,6 @@
    "title_it": "I prezzi del petrolio si trovano ad affrontare una nuova ondata di volatilità tra le notizie contrastanti sulla riapertura dello Stretto di Hormuz e il conflitto regionale in corso"
   },
   {
-<<<<<<< HEAD
-=======
    "source": "AP",
    "title": "Analysis: A confident Iran is pressing its advantage, but challenges loom - AP News",
    "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPWUdQUEFORmxyRkQtNXcxbENvLXdHb0tBcWJ2OG13Wlp2Q0U3YXJET3U2Rjh0QnBtSnlDMzlxVnl3M0haOTN5YldsZnk1cjVBVm1pODl4SnExWkh6eUZ3T29yY3ZreG9UbFptVFFxcnVYaGtVRzgxNDYwRGNYWW9nVzBRMXhxY1RmeWRpQ3hRbXFzd05nZ2pfRG5CaF8?oc=5",
@@ -15369,7 +15330,6 @@
    "title_it": "Analisi: un Iran fiducioso sta sfruttando il suo vantaggio, ma le sfide incombono - AP News"
   },
   {
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
    "source": "Reuters",
    "title": "Oil shipments rise in Hormuz although questions grow over Iran's transit terms - Reuters",
    "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxONmxOVHFxZFJqT0MyRms0akxNMzFSVG45ZDFFVHFjZkZrMmh0anBuak5MYjlwWWw3Vy04LWl1b3oxbnZHSGRqQ2V0cWN5WUhxbHpZdXRCQmdpZGpsUk40RWl3dlVyTWtTUTRQOUtjbHM4NUJtTlpwZWtMMmx3REpQMWl6OWJEYzVhSHpIVkVicGVSdzdiaHd6WkU4ZENSaWZlUVVVUFNXYTktZDRDSVdZMmRuWXhPWFBBS2RLMk01OEo0eWFy?oc=5",
@@ -15451,22 +15411,6 @@
    "title_it": "Il primo incontro della Fed di Kevin Warsh affonda la denuncia del \"calzino burattino\" di Elizabeth Warren - 24 ore su 24, 7 giorni su 7 Wall St."
   },
   {
-<<<<<<< HEAD
-=======
-   "source": "Google News",
-   "title": "Why We Don’t Think The Fed Will Hike Rates - Seeking Alpha",
-   "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPVGQ5ZkJGaFpqc0tWeGgyWURTdk1IaHRiTFZFeTNZN0NaTksxSk15S3gxLTdJcDNtVGxlWFZrNmh5ZTNBYUh3NzB2WjBYVkRScExLQzJlSE95LU5EUF9PazU2WVhlZkx3Z1RLVzRtd21PSms1VXNyVW95aThOUDktRzBNMjc?oc=5",
-   "published": "2026-06-19T10:55:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Perché non pensiamo che la Fed aumenterà i tassi - Seeking Alpha"
-  },
-  {
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
    "source": "CNBC",
    "title": "Russia threatens escalation after Ukraine hits Moscow with largest-ever drone attack",
    "link": "https://www.cnbc.com/2026/06/19/russia-ukraine-moscow-drone-attack-trump.html",
@@ -15479,6 +15423,21 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "La Russia minaccia un’escalation dopo che l’Ucraina ha colpito Mosca con il più grande attacco di droni mai visto"
+  },
+  {
+   "source": "Google News",
+   "title": "Interest rate cut not likely on the table, even after Iran deal and somewhat falling oil prices - Washington Examiner",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOZXMyejNsLUcwYV9TT29meXBvZUljdXNjeXR0dVA4UWl0cHFPOHB3ampjaDl2a0NOVTkyWlotUkpkUnpoMkkxcTBMRkZCYzlkUFRPVXEzdlF1dXlESmtxTWVoVmhQOUU5MndpaDRWMXp3OXcyOGc0ZjdrWDJhNzlFdlRMQXpKUmk0bTZNTlBaTUZ6ZHo4ZDRCY1piYk1JNUdzNWo4?oc=5",
+   "published": "2026-06-19T10:00:00Z",
+   "tickers": [
+    "MACRO",
+    "POL",
+    "CL=F"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Probabilmente non è sul tavolo un taglio dei tassi di interesse, anche dopo l’accordo con l’Iran e il lieve calo dei prezzi del petrolio – Washington Examiner"
   },
   {
    "source": "Reuters",
@@ -15546,16 +15505,6 @@
    "topic_pri": 2,
    "inv": true,
    "sentiment": "neutral",
-<<<<<<< HEAD
-   "title_it": "Bitcoin intrappolato tra 62.300$ e 64.600$: livelli in tempo reale"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Fed rate hike in 2026?",
-   "title_it": "Fed rate hike in 2026? — probabilità Sì 66%",
-   "link": "https://polymarket.com/event/fed-rate-hike-in-2026",
-   "published": "2026-06-20T05:01:38Z",
-=======
    "title_it": "Bitcoin intrappolato tra 62.300$ e 64.600$: livelli live"
   },
   {
@@ -15563,7 +15512,7 @@
    "title": "Fed rate hike in 2026?",
    "title_it": "Fed rate hike in 2026? — probabilità Sì 66%",
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026",
-   "published": "2026-06-20T05:26:13Z",
+   "published": "2026-06-20T05:38:06Z",
    "tickers": [
     "MACRO"
    ],
@@ -15574,8 +15523,7 @@
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 74%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-06-20T05:26:13Z",
->>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
+   "published": "2026-06-20T05:38:06Z",
    "tickers": [
     "MACRO"
    ],

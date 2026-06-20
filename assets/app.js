@@ -374,6 +374,7 @@ function renderAll() {
   renderAllocation();
   renderEarnings();
   renderTable();
+  if (ptfView === "fund") renderFundTable();
   renderWatchlist();
   renderGauges();
   renderMacro();
@@ -1378,6 +1379,63 @@ function renderWatchlist() {
   $("#wl-table tbody").innerHTML = rows + addRow;
 }
 
+/* ---------------- vista fondamentale (Value Investing) ---------------- */
+let ptfView = "tech";   // tech | fund
+const pctOf = (v) => v == null ? "—" : signTxt(Math.round(v * 1000) / 10);   // frazione → %
+const pctPlain = (v) => v == null ? "—" : (Math.round(v * 1000) / 10) + "%";
+function bigUsd(v) { if (v == null) return "—"; const a = Math.abs(v);
+  if (a >= 1e12) return "$" + (v / 1e12).toFixed(2) + "T";
+  if (a >= 1e9) return "$" + (v / 1e9).toFixed(1) + "B";
+  if (a >= 1e6) return "$" + (v / 1e6).toFixed(0) + "M"; return "$" + fmtNum.format(v); }
+function colorCell(txt, cls) { return `<span class="${cls || ""}">${txt}</span>`; }
+
+function renderFundTable() {
+  if (!DATA || !DATA.portfolio) return;
+  const head = ["Titolo", "Qtà", "PMC", "Prezzo", "Market Cap", "EV/EBITDA", "ROE", "Margine lordo",
+                "Margine netto", "P/FCF", "Cresc. ricavi", "Div Yield", "P/B", "PEG"];
+  $("#ptf-fund-table thead").innerHTML = "<tr>" +
+    head.map((h, i) => `<th class="${i === 0 ? "sticky-col" : "num"}">${h}</th>`).join("") + "</tr>";
+  const rows = DATA.portfolio.map(r => {
+    const c = cur(r), st = r.stats || {};
+    if (r.ticker === "BTP-V28") {
+      return `<tr><td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+        <td class="num">${fmtNum.format(r.qty)}</td><td class="num">${c}${fmtNum.format(r.pmc)}</td>
+        <td class="num"><b>${c}${fmtNum.format(r.price)}</b></td><td colspan="10" class="muted">Titolo di Stato — cedola 4,10/4,50%</td></tr>`;
+    }
+    const pfcf = (st.market_cap && st.fcf) ? st.market_cap / st.fcf : null;
+    const fcfWarn = (st.fcf != null && st.net_income_fy != null && st.fcf < st.net_income_fy * 0.6)
+      ? ` <span class="warn-flag" title="FCF molto inferiore all'utile: verifica la qualità degli utili">!</span>` : "";
+    const roeCls = st.roe == null ? "" : st.roe >= 0.15 ? "text-premium" : st.roe < 0 ? "neg" : "";
+    return `<tr>
+      <td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+      <td class="num">${fmtNum.format(r.qty)}</td>
+      <td class="num">${c}${fmtNum.format(r.pmc)}</td>
+      <td class="num"><b>${c}${fmtNum.format(r.price)}</b></td>
+      <td class="num">${bigUsd(st.market_cap)}</td>
+      <td class="num">${st.ev_ebitda != null ? fmtNum.format(st.ev_ebitda) : "—"}</td>
+      <td class="num">${colorCell(pctOf(st.roe), roeCls)}</td>
+      <td class="num">${pctPlain(st.gross_margin)}</td>
+      <td class="num ${st.profit_margin > 0 ? "pos" : st.profit_margin < 0 ? "neg" : ""}">${pctPlain(st.profit_margin)}</td>
+      <td class="num">${pfcf != null ? (pfcf < 0 ? `<span class="neg">neg.</span>` : fmtNum.format(pfcf)) + fcfWarn : "—"}</td>
+      <td class="num ${st.revenue_growth > 0 ? "pos" : st.revenue_growth < 0 ? "neg" : ""}">${pctOf(st.revenue_growth)}</td>
+      <td class="num">${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"}</td>
+      <td class="num">${st.price_to_book != null ? fmtNum.format(st.price_to_book) : "—"}</td>
+      <td class="num">${st.peg != null ? fmtNum.format(st.peg) : "—"}</td>
+    </tr>`;
+  }).join("");
+  $("#ptf-fund-table tbody").innerHTML = rows;
+}
+
+function setPtfView(v) {
+  ptfView = v;
+  document.querySelectorAll("#view-toggle .chip").forEach(c => c.classList.toggle("chip-active", c.dataset.view === v));
+  $("#ptf-tech-wrap").hidden = v !== "tech";
+  $("#ptf-fund-wrap").hidden = v !== "fund";
+  $("#spark-toggle").style.display = v === "tech" ? "" : "none";
+  $("#range-lab-tech").style.display = v === "tech" ? "" : "none";
+  if (v === "fund") renderFundTable();
+}
+
 /* ---------------- trimestrali ---------------- */
 function renderEarnings() {
   const items = DATA.portfolio
@@ -1832,6 +1890,8 @@ document.querySelectorAll("#spark-toggle .chip, #spark-toggle-wl .chip").forEach
   });
 });
 $("#wl-add-top").addEventListener("click", addWatchlist);
+document.querySelectorAll("#view-toggle .chip").forEach(ch =>
+  ch.addEventListener("click", () => setPtfView(ch.dataset.view)));
 document.querySelectorAll("#hist-toggle .chip").forEach(ch => {
   ch.addEventListener("click", () => {
     document.querySelectorAll("#hist-toggle .chip").forEach(c => c.classList.remove("chip-active"));

@@ -383,6 +383,11 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             "price_to_book": num("priceToBook"),
             "target_mean": num("targetMeanPrice"),
             "fcf": num("freeCashflow"),
+            "gross_margin": num("grossMargins"),
+            "enterprise_value": num("enterpriseValue"),
+            "ev_ebitda": num("enterpriseToEbitda"),
+            "peg": num("pegRatio", "trailingPegRatio"),
+            "roa": num("returnOnAssets"),
         }
         stats = {k: (round(v, 4) if v is not None else None) for k, v in stats.items()}
 

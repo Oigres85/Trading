@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=33">
+<link rel="stylesheet" href="assets/style.css?v=34">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -109,7 +109,11 @@
     </div>
     <div class="earnings-strip" id="earnings-strip" aria-label="Prossime trimestrali"></div>
     <div class="range-bar">
-      <span class="range-lab">Intervallo dati tecnici e grafico:</span>
+      <div class="spark-toggle" id="view-toggle" role="group" aria-label="Vista portafoglio">
+        <button class="chip chip-active" data-view="tech">Tecnica &amp; Prezzi</button>
+        <button class="chip" data-view="fund">Fondamentale (Value)</button>
+      </div>
+      <span class="range-lab" id="range-lab-tech">Intervallo:</span>
       <div class="spark-toggle" id="spark-toggle" role="group" aria-label="Intervallo analisi tecnica e mini-grafico">
         <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
         <button class="chip" data-range="w1" aria-label="Una settimana">1S</button>
@@ -119,7 +123,10 @@
       </div>
       <button class="btn btn-ghost btn-sm" id="ptf-edit" aria-label="Aggiungi o rimuovi titoli dal portafoglio" title="Aggiungi o rimuovi titoli">✎ Modifica</button>
     </div>
-    <div class="table-wrap">
+    <div class="table-wrap" id="ptf-fund-wrap" hidden>
+      <table id="ptf-fund-table" aria-label="Portafoglio — analisi fondamentale"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="table-wrap" id="ptf-tech-wrap">
       <table id="ptf-table" aria-label="Portafoglio con prezzi, valore, guadagno e analisi tecnica">
         <thead>
           <tr>
@@ -292,6 +299,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=33"></script>
+<script src="assets/app.js?v=34"></script>
 </body>
 </html>
