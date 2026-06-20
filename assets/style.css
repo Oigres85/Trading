@@ -360,6 +360,18 @@ th.sortable:hover { color: var(--text); }
 .thermo-scale { height: 8px; border-radius: 5px; background: linear-gradient(90deg,#22c55e,#eab308,#f59e0b,#ef4444); }
 .thermo-marker { position: absolute; top: -3px; width: 4px; height: 14px; border-radius: 2px; background: var(--text); transform: translateX(-50%); box-shadow: 0 0 0 2px var(--card); }
 .thermo-ends { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin: 2px 4px 0; }
+.m-ends { display: flex; justify-content: space-between; font-size: 8.5px; color: var(--muted); margin: 2px 2px 0; }
+
+/* Fear & Greed stile CNN (semicerchio + lancetta) */
+.fg-gauge { width: 100%; max-width: 180px; display: block; margin: 4px auto 0; }
+
+/* pallino che segnala un box apribile in popup */
+.popup-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--blue); opacity: .8; box-shadow: 0 0 0 2px var(--card); }
+.gauge-card, .macro-item, .mini-card, .earn-card { position: relative; }
+/* pallino "apribile" anche su mini-card e trimestrali (popup) */
+.mini-card::after, .earn-card::after { content: ""; position: absolute; top: 7px; right: 7px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--blue); opacity: .8; }
 
 /* ---------- rendimenti reali broker (compatto) ---------- */
 .broker-card { padding: 10px 14px; }

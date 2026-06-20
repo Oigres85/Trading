@@ -1508,11 +1508,31 @@ function thermoBar(score, ends) {
 /* card termometro uniforme; score 0-100 (100=positivo/verde, a sinistra). key per il popup */
 function thermoCard(key, title, score, valueText, subText, ends) {
   return `<div class="gauge-card" data-gauge="${key}" tabindex="0" role="button" title="Clicca per dettagli e news">
+    <span class="popup-dot"></span>
     <div class="g-title">${title}</div>
     ${thermoBar(score, ends)}
     <div class="gauge-value" style="color:${scoreColor(score)}">${valueText}</div>
     <div class="gauge-sub">${subText}</div>
   </div>`;
+}
+
+/* tachimetro Fear & Greed in stile CNN: semicerchio a 5 zone con lancetta */
+function fgGaugeCNN(score) {
+  const s = Math.max(0, Math.min(100, score));
+  const R = 80, cx = 100, cy = 95;
+  const zones = [[0, 25, "#d23b30"], [25, 45, "#f59e0b"], [45, 55, "#eab308"], [55, 75, "#7ac142"], [75, 100, "#16a34a"]];
+  const pt = (val, r) => { const a = Math.PI * (1 - val / 100); return [cx + r * Math.cos(a), cy - r * Math.sin(a)]; };
+  const arcs = zones.map(([a, b, col]) => {
+    const [x1, y1] = pt(a, R), [x2, y2] = pt(b, R);
+    return `<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${col}" stroke-width="16" stroke-linecap="butt"/>`;
+  }).join("");
+  const [nx, ny] = pt(s, R - 12);
+  return `<svg viewBox="0 0 200 112" class="fg-gauge">
+    ${arcs}
+    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="var(--text)" stroke-width="3"/>
+    <circle cx="${cx}" cy="${cy}" r="6" fill="var(--text)"/>
+    <text x="${cx}" y="${cy - 22}" text-anchor="middle" font-size="26" font-weight="700" fill="var(--text)">${Math.round(s)}</text>
+  </svg>`;
 }
 
 function renderGauges() {
@@ -1526,8 +1546,12 @@ function renderGauges() {
   }
   if (m.fear_greed) {
     const fg = m.fear_greed;
-    cards.push(thermoCard("fear_greed", "Fear &amp; Greed", fg.score, fg.score,
-      `<b>${FG_LABELS[fg.rating] || fg.rating}</b><br>1 sett: ${fg.week_ago} · 1 mese: ${fg.month_ago}`, ["Avidità", "Paura"]));
+    cards.push(`<div class="gauge-card" data-gauge="fear_greed" tabindex="0" role="button" title="Clicca per dettagli e news">
+      <span class="popup-dot"></span>
+      <div class="g-title">Fear &amp; Greed</div>
+      ${fgGaugeCNN(fg.score)}
+      <div class="gauge-sub"><b>${FG_LABELS[fg.rating] || fg.rating}</b> · 1 sett: ${fg.week_ago} · 1 mese: ${fg.month_ago}</div>
+    </div>`);
   }
   if (m.vix) {
     const score = Math.max(0, Math.min(100, 100 - m.vix.value / 50 * 100));   // VIX basso = verde
@@ -1558,7 +1582,7 @@ function renderGauges() {
     const th = m.thermometer;
     const lab = th.score >= 60 ? "Tranquillo" : th.score <= 40 ? "Da monitorare" : "Equilibrato";
     cards.push(thermoCard("thermometer", "Salute portafoglio", th.score, th.score,
-      `<b>${lab}</b><br>salute tecnica media dei tuoi titoli`, ["Preoccupazione", "Serenità"]));
+      `<b>${lab}</b><br>salute tecnica media dei tuoi titoli`, ["Serenità", "Preoccupazione"]));
   }
 
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
@@ -1582,19 +1606,24 @@ function marketImpact(m) {
 }
 
 function renderMacro() {
+  // termometro coerente: verde a sx (favorevole per il portafoglio) → rosso a dx (sfavorevole)
+  const macroThermo = (score) => score == null ? "" :
+    `${thermoBar(score)}<div class="m-ends"><span>favorevole</span><span>sfavorevole</span></div>`;
   const markets = (DATA.macro?.markets || []).map(m => `
     <div class="macro-item" data-macro="mk:${m.key}" tabindex="0" role="button" title="Clicca per dettagli e news" style="--accent:${MACRO_ACCENTS[m.key] || "var(--blue)"}">
+      <span class="popup-dot"></span>
       <div class="m-label">${m.label}</div>
       <div class="m-value">${m.value}</div>
       <div class="m-sub ${signCls(m.change_pct)}">${signTxt(m.change_pct, m.suffix || "%")} oggi</div>
-      ${impactBar(marketImpact(m), "impatto della variazione odierna")}
+      ${macroThermo(marketImpact(m))}
     </div>`);
   const indicators = (DATA.macro?.indicators || []).map(i => `
     <div class="macro-item" data-macro="in:${i.key}" tabindex="0" role="button" title="Clicca per dettagli e news" style="--accent:${MACRO_ACCENTS[i.key] || "var(--purple)"}">
+      <span class="popup-dot"></span>
       <div class="m-label">${i.label}</div>
       <div class="m-value">${i.value}</div>
       <div class="m-date">${i.date}</div>
-      ${impactBar(i.impact, "impatto sul mercato")}
+      ${macroThermo(i.impact)}
     </div>`);
   const cells = markets.concat(indicators);
   $("#macro-grid").innerHTML = cells.length ? cells.join("") : '<span class="muted">Dati non disponibili</span>';
