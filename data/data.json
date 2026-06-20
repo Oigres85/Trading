@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-20T21:03:32Z",
+ "updated_at": "2026-06-20T21:59:00Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6470,15 +6470,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63880.08,
-   "change_pct": 0.53,
+   "price": 63922.65,
+   "change_pct": 0.6,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.4,
+   "ath_dist_pct": -49.3,
    "support": 59108.92,
    "resistance": 74153.5,
-   "rsi": 39.0,
-   "volume": 17415028736,
+   "rsi": 39.2,
+   "volume": 17458753536,
    "vol_ratio": 0.53,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -6488,7 +6488,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63880.08
+     63922.65
     ],
     "m6": [
      69767.62,
@@ -6616,7 +6616,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63880.08
+     63922.65
     ],
     "all": [
      386.94,
@@ -6760,7 +6760,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63880.08
+     63922.65
     ],
     "m1": [
      73372.52,
@@ -6784,7 +6784,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63880.08
+     63922.65
     ],
     "m3": [
      74805.08,
@@ -6852,7 +6852,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63880.08
+     63922.65
     ],
     "y1": [
      103309.6,
@@ -7056,7 +7056,12 @@
      63798.12,
      63801.97,
      63844.89,
-     63880.08
+     63864.51,
+     63911.71,
+     63886.01,
+     63865.65,
+     63951.86,
+     63953.0
     ]
    },
    "earnings_date": null,
@@ -7071,22 +7076,22 @@
     "w1": {
      "support": 62201.14,
      "resistance": 67248.13,
-     "change_pct": -3.63
+     "change_pct": -3.57
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74218.56,
-     "change_pct": -12.94
+     "change_pct": -12.88
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -14.6
+     "change_pct": -14.55
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -42.35
+     "change_pct": -42.31
     }
    },
    "financials": [],
@@ -12804,7 +12809,7 @@
      20.53,
      20.44,
      16.54,
-     15.0,
+     14.99,
      17.44,
      21.66,
      24.26,
@@ -13366,7 +13371,7 @@
      652.88,
      656.65,
      639.92,
-     634.11,
+     634.12,
      650.37,
      672.3,
      663.48,
@@ -15068,7 +15073,7 @@
     217123,
     215584,
     217725,
-    220472,
+    220471,
     224617,
     223721,
     226649,
@@ -15583,7 +15588,7 @@
     173883,
     175594,
     176934,
-    175032,
+    175031,
     174870,
     174089,
     173138,
@@ -15623,7 +15628,7 @@
     188244,
     186492,
     183172,
-    180141,
+    180140,
     186461,
     191516,
     192567,
@@ -15842,7 +15847,7 @@
     153263,
     160434,
     166937,
-    163245,
+    163244,
     169543,
     157386,
     148131,
@@ -16612,7 +16617,7 @@
     153263,
     160434,
     166937,
-    163245,
+    163244,
     169543,
     157386,
     148131,
@@ -17428,7 +17433,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 55
+     "score": 56
     }
    ]
   },
@@ -17883,6 +17888,48 @@
  "news": [
   {
    "source": "Investing.com",
+   "title": "Soccer-U.S. defends Iran World Cup travel restrictions, says discussions ongoing",
+   "link": "https://www.investing.com/news/world-news/soccerus-defends-iran-world-cup-travel-restrictions-says-discussions-ongoing-4751634",
+   "published": "2026-06-20T21:24:30Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Calcio-USA difende le restrizioni ai viaggi in Iran per la Coppa del Mondo, afferma che sono in corso discussioni"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Russia stocks lower at close of trade; MOEX Russia Index unchanged",
+   "link": "https://www.investing.com/news/stock-market-news/russia-stocks-lower-at-close-of-trade-moex-russia-index-unchanged-4751633",
+   "published": "2026-06-20T21:20:03Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Le azioni russe crollano alla chiusura delle contrattazioni; Indice MOEX Russia invariato"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Ukraine’s Zelenskiy says he returned state decoration to Polish president",
+   "link": "https://www.investing.com/news/world-news/ukraines-zelenskiy-says-he-returned-state-decoration-to-polish-president-4751623",
+   "published": "2026-06-20T20:54:45Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "L’ucraino Zelenskiy afferma di aver restituito la decorazione statale al presidente polacco"
+  },
+  {
+   "source": "Investing.com",
    "title": "Trump says no toll on Strait of Hormuz unless US imposes one",
    "link": "https://www.investing.com/news/commodities-news/trump-says-no-toll-on-strait-of-hormuz-unless-us-imposes-one-4751631",
    "published": "2026-06-20T19:49:02Z",
@@ -17940,20 +17987,6 @@
   },
   {
    "source": "Investing.com",
-   "title": "Russia stocks lower at close of trade; MOEX Russia Index down 1.04%",
-   "link": "https://www.investing.com/news/stock-market-news/russia-stocks-lower-at-close-of-trade-moex-russia-index-down-104-4751566",
-   "published": "2026-06-19T21:20:04Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Le azioni russe crollano alla chiusura delle contrattazioni; Indice MOEX Russia in calo dell'1,04%"
-  },
-  {
-   "source": "Investing.com",
    "title": "SpaceX IPO: Why Chasing The First Rally Can Be Dangerous",
    "link": "https://www.investing.com/analysis/spacex-ipo-why-chasing-the-first-rally-can-be-dangerous-200682380",
    "published": null,
@@ -17980,6 +18013,20 @@
    "title_it": "Secondo quanto riferito, l’Iran chiude nuovamente lo Stretto di Hormuz, gettando ombra sui colloqui sul nucleare"
   },
   {
+   "source": "AP",
+   "title": "Trump threatens to charge US tolls in Strait of Hormuz if final Iran deal not reached in 60 days - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOZU83bXR0RDhtTHExa0dVVFJOTWlvNS1DMVM0WUdqX0JyNWQ0RnRTcUNzQlkzR2xtWDdnTVA0NEt3NDVMZXBZcl83X2lEVU9jRktXNlc4SjhKMWMxRUZidDJvdDBreDZLbmpsRklMU01GNkJiYVJVWnhyZnlzUkFhYzY1VFdtUjRUbTh6aHlCVkFQUGttSU44TDBWVDZZTlRJbUhTY3JzRHA?oc=5",
+   "published": "2026-06-20T20:54:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump minaccia di addebitare pedaggi statunitensi nello Stretto di Hormuz se l'accordo finale con l'Iran non verrà raggiunto entro 60 giorni - AP News"
+  },
+  {
    "source": "Yahoo Finance",
    "title": "ADMA Biologics (ADMA) Hit With Federal Securities Lawsuit Over Revenue Inflation Allegations",
    "link": "https://finance.yahoo.com/markets/stocks/articles/adma-biologics-adma-hit-federal-203437698.html",
@@ -18004,6 +18051,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "L’indicatore preferito dalla Fed mostra un’inflazione più rapida"
+  },
+  {
+   "source": "Google News",
+   "title": "What smart people are saying after Fed chair Kevin Warsh's debut - AOL.com",
+   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE5wa0M1bHBxWk9yYkhyRlNKNXNpc3Q1OE13SS1PLXdBbWRPV29FeTVlWEtqenBfZDlWZnR4RThablZRYnRxWkxIbkxzUUZkRk5fVUx1SC1uNkdaZWFLLUk0S1pVajh6TnNWdk9qdHJYNVZXbUxCWWxKTG9RSjdtdw?oc=5",
+   "published": "2026-06-20T18:29:11Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Cosa dicono le persone intelligenti dopo il debutto del presidente della Fed Kevin Warsh - AOL.com"
   },
   {
    "source": "CNBC",
@@ -18198,19 +18258,6 @@
    "title_it": "Mentre la guerra con l’Iran volge al termine, il Congresso si chiede: ne è valsa la pena? - Notizie AP"
   },
   {
-   "source": "Google News",
-   "title": "Fed’s Kevin Warsh takes tough, anti-inflation stance in first meeting as chair: ‘will deliver price stability’ - AOL.com",
-   "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTFBGajdhTzVoSVNUMGFIM05rejlhWG1RLUxoVzBRVldlOEl3b2E2VThmWktuMXVEZ1RpZUNWNjFMZkF6ckdFSUlQdnhyLWtQa2VwTXQxdVM1THNnYnhMVTMyZWw5NzhZQ1FoVXhVMVl0TUhISzA3a1dsZmJDNA?oc=5",
-   "published": "2026-06-20T11:56:19Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Kevin Warsh della Fed assume una posizione dura e anti-inflazione nella prima riunione come presidente: \"conferirà stabilità ai prezzi\" - AOL.com"
-  },
-  {
    "source": "Reuters",
    "title": "Switzerland says US-Iran talks continue at Bürgenstock, declines to identify participants - Reuters",
    "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPRDVvaUdiWWJuc1RxSXoxbnpGSXRFVVZJOHZmOU5CVWtEM3FUcVNLN0RkdHYtLTBndXNXU1RtbklqZUxUaW55LUR4dk1qRHlXXzZyRHgzM3JleV95Q0ZJN2ZmaTBsWkhmSlZPaDFtRmV2dmNzUWFrTG9mNFFNVjhadU9WVWstTTZNeVZjY3NkTWFoN0V5X3JGb1pybVVGb1NZaHMtNElLZklFV2h0a3l4VUpFalBDN1Vk?oc=5",
@@ -18223,6 +18270,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "La Svizzera afferma che i colloqui USA-Iran continuano al Bürgenstock ma rifiuta di identificare i partecipanti - Reuters"
+  },
+  {
+   "source": "Reuters",
+   "title": "Iranian Guards' business empire to win big if U.S. sanctions lifted - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQeTVOWlpubWVJN3A4Rl9Wai1TNWRycWQwS1RrbXJCQndDZXIxaklsWV9idkhkRXI2SmN6cldIelBCNGVJNVNYWXhmUjNzeUx1VWhDbkNTdVJLNmwweUtzNmpobW5DSHNVc1BQM2xTc3plMzBpNVV6akI2X1AtVGkyN1l1Q0VIanZGNkctczJvSFM0WEtTdnZmNFlLdWg2LTVtUUxYTC00aEs0cG5qcERYSXBya1Y4dw?oc=5",
+   "published": "2026-06-20T11:42:33Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L'impero economico delle guardie iraniane vincerebbe alla grande se le sanzioni statunitensi venissero revocate - Reuters"
   },
   {
    "source": "Google News",
@@ -18293,38 +18354,10 @@
    "title_it": "Chi sta danneggiando di più l’inflazione? I dati della Fed mostrano quali sono le popolazioni dell'Oklahoma più colpite: gli Oklahoman"
   },
   {
-   "source": "AP",
-   "title": "US-Iran talks begin Sunday as Tehran closes the strait over Lebanon fighting - AP News",
-   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOZU83bXR0RDhtTHExa0dVVFJOTWlvNS1DMVM0WUdqX0JyNWQ0RnRTcUNzQlkzR2xtWDdnTVA0NEt3NDVMZXBZcl83X2lEVU9jRktXNlc4SjhKMWMxRUZidDJvdDBreDZLbmpsRklMU01GNkJiYVJVWnhyZnlzUkFhYzY1VFdtUjRUbTh6aHlCVkFQUGttSU44TDBWVDZZTlRJbUhTY3JzRHA?oc=5",
-   "published": "2026-06-20T09:40:32Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I colloqui tra Stati Uniti e Iran iniziano domenica mentre Teheran chiude lo stretto per i combattimenti in Libano - AP News"
-  },
-  {
-   "source": "Reuters",
-   "title": "Iranian Guards' business empire to win big if U.S. sanctions lifted - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQeTVOWlpubWVJN3A4Rl9Wai1TNWRycWQwS1RrbXJCQndDZXIxaklsWV9idkhkRXI2SmN6cldIelBCNGVJNVNYWXhmUjNzeUx1VWhDbkNTdVJLNmwweUtzNmpobW5DSHNVc1BQM2xTc3plMzBpNVV6akI2X1AtVGkyN1l1Q0VIanZGNkctczJvSFM0WEtTdnZmNFlLdWg2LTVtUUxYTC00aEs0cG5qcERYSXBya1Y4dw?oc=5",
-   "published": "2026-06-20T03:08:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'impero economico delle guardie iraniane vincerebbe alla grande se le sanzioni statunitensi venissero revocate - Reuters"
-  },
-  {
    "source": "Reuters",
    "title": "Iran negotiators head for Switzerland but Lebanon fighting continues - Reuters",
    "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNMmZyRmRQdUo5dlpLWnZaTEVkV2JBOXpMS2hNTEg1LVN6YzN2VjNlMXZkNXlNdVY4bWhaMG0wd1JtVWtmV1BNbXk5UjNHODNLT3ZJZUNfcmFZSmVvWkRfQ2J2eHNoZGRiWUpwbGZBT04zbjBILVZoV21rUC1VU2pWeENyaDJNRGMtY2otYWV5eG1fdjc3RFhFNmNCQzkyTWJLRVhVbjhFZWhfQQ?oc=5",
-   "published": "2026-06-20T00:55:19Z",
+   "published": "2026-06-20T01:03:06Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -18350,9 +18383,9 @@
   },
   {
    "source": "AP",
-   "title": "Trump acknowledges support from allies at new Air Force One unveiling - AP News",
-   "link": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQYmx3d1ZIS3I0QTRXMTVmWWpMOVRnSmE2SE5XOUNoVVJhRWF6enhOek1IZmMtQXhmM0tDdWZYLXVfcU9SaWtpeC02RkIxYmoyMDl0UTdNWGFhTFg3cGI0em5MRGVZT2hNdkFPRWJ6bzFWRmFSUE1IUkVURVQ1Z21Zc3ZnUkxtQkZzTUZJRG5XQjUzeEh0RjFHUDFQQ1R2b3JaZFE4UDN1OXo1S1FBUUV3XzVxbzNta3FCT3dJMkZxQUlidTVBaEE?oc=5",
-   "published": "2026-06-19T21:40:00Z",
+   "title": "Trump now says either Republican candidate would be a good pick in South Carolina's governor runoff - AP News",
+   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOcTF5aFIyZE41bmJuLUg4TGZ3MWI3T2dnNU41bzRIU04taE5YUTZ6bFVYWWt2N3VpMGNlSmU5VXRtTl9hWTZHTXl3WjNFUWtEOE9CbGpXQ1UydGFQOGFKdGlYMHFHUERkWlRMZUczWFlFVkRxTzhRMVlTLW9YOWxXY3M2WFhJRjBTN196Ym9xSGdvZHliaFRaMWNTZXB1ZzQ?oc=5",
+   "published": "2026-06-19T22:16:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -18360,7 +18393,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Trump riconosce il sostegno degli alleati alla presentazione della nuova Air Force One - AP News"
+   "title_it": "Trump ora afferma che uno dei candidati repubblicani sarebbe una buona scelta nel ballottaggio del governatore della Carolina del Sud - AP News"
   },
   {
    "source": "CNBC",
@@ -18389,6 +18422,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Trump dice ad Axios che non vede più l’Anthropic come una minaccia alla sicurezza nazionale"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "This Company Could Become the Nvidia of AI Inference",
+   "link": "https://finance.yahoo.com/technology/ai/articles/company-could-become-nvidia-ai-212000227.html",
+   "published": "2026-06-20T21:20:00Z",
+   "tickers": [
+    "NVDA"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Questa azienda potrebbe diventare la Nvidia dell'AI Inference"
   },
   {
    "source": "Investing.com",
