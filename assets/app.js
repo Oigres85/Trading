@@ -86,10 +86,18 @@ async function loadData(showSpin = false) {
   const btn = $("#btn-refresh");
   if (showSpin) btn.classList.add("spinning");
   try {
-    const res = await fetch(`data/data.json?t=${Date.now()}`, { cache: "no-store" });
-    const txt = await res.text();
-    // resiliente: NaN/Infinity non sono JSON validi per il browser → li converto in null
-    DATA = JSON.parse(txt.replace(/\bNaN\b/g, "null").replace(/-?\bInfinity\b/g, "null"));
+    const sane = (s) => s.replace(/\bNaN\b/g, "null").replace(/-?\bInfinity\b/g, "null");
+    let parsed = null;
+    try {
+      const res = await fetch(`data/data.json?t=${Date.now()}`, { cache: "no-store" });
+      parsed = JSON.parse(sane(await res.text()));
+    } catch (e1) {
+      // fallback: se Pages serve un file in cache/corrotto, prendo la sorgente dal repo
+      console.warn("data.json di Pages non valido, uso raw.githubusercontent", e1);
+      const raw = await fetch(`https://raw.githubusercontent.com/${REPO}/main/data/data.json?t=${Date.now()}`, { cache: "no-store" });
+      parsed = JSON.parse(sane(await raw.text()));
+    }
+    DATA = parsed;
     renderAll();
     livePrices();              // sovrappone i prezzi live ai dati del workflow
     if (showSpin) toast("Dati ricaricati ✓");
