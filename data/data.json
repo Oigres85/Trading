@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-20T10:51:43Z",
+ "updated_at": "2026-06-20T11:08:08Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -3873,8 +3873,8 @@
     "target_mean": 29.2425,
     "fcf": -6209875.0,
     "gross_margin": 0.2995,
-    "enterprise_value": 6449248256.0,
-    "ev_ebitda": -80.591,
+    "enterprise_value": 6688575488.0,
+    "ev_ebitda": -83.582,
     "peg": null,
     "roa": -0.1209
    },
@@ -4409,8 +4409,8 @@
     "target_mean": 88.6316,
     "fcf": -100000128.0,
     "gross_margin": 0.0,
-    "enterprise_value": 7789793280.0,
-    "ev_ebitda": -45.261,
+    "enterprise_value": 8437039616.0,
+    "ev_ebitda": -49.022,
     "peg": null,
     "roa": -0.0718
    },
@@ -4445,7 +4445,7 @@
    "currency": "USD",
    "price": 185.0,
    "change_pct": -3.56,
-   "pe": null,
+   "pe": 711.5,
    "ath": 225.64,
    "ath_dist_pct": -18.0,
    "support": 149.34,
@@ -4555,9 +4555,9 @@
     "float_pct": 3.2,
     "avg_volume_30d": 288941860.0,
     "pe_ttm": null,
-    "forward_pe": -2055.5554,
+    "forward_pe": 711.5385,
     "eps_ttm": -0.67,
-    "eps_forward": -0.09,
+    "eps_forward": 0.26,
     "revenue_fy": 19300999168.0,
     "net_income_fy": -9356000256.0,
     "revenue_growth": 0.154,
@@ -6470,16 +6470,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63603.22,
-   "change_pct": 0.1,
+   "price": 63580.0,
+   "change_pct": 0.06,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.6,
    "support": 59108.92,
    "resistance": 74153.5,
-   "rsi": 37.9,
-   "volume": 19623268352,
-   "vol_ratio": 0.6,
+   "rsi": 37.8,
+   "volume": 19427244032,
+   "vol_ratio": 0.59,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6488,7 +6488,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63603.22
+     63580.0
     ],
     "m6": [
      69767.62,
@@ -6616,7 +6616,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63603.22
+     63580.0
     ],
     "all": [
      386.94,
@@ -6760,7 +6760,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63603.22
+     63580.0
     ],
     "m1": [
      73372.52,
@@ -6784,7 +6784,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63603.22
+     63580.0
     ],
     "m3": [
      74805.08,
@@ -6852,7 +6852,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63603.22
+     63580.0
     ],
     "y1": [
      103309.6,
@@ -6995,7 +6995,8 @@
      63593.07,
      63580.95,
      63532.87,
-     63603.22
+     63594.97,
+     63595.22
     ]
    },
    "earnings_date": null,
@@ -7010,22 +7011,22 @@
     "w1": {
      "support": 62201.14,
      "resistance": 67248.13,
-     "change_pct": -4.05
+     "change_pct": -4.09
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74218.56,
-     "change_pct": -13.31
+     "change_pct": -13.35
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -14.97
+     "change_pct": -15.01
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -42.6
+     "change_pct": -42.62
     }
    },
    "financials": [],
@@ -9467,7 +9468,7 @@
    "stats": {
     "market_cap": 673433780224.0,
     "shares": 5026000000.0,
-    "float_shares": 5016601380.0,
+    "float_shares": 5016551120.0,
     "float_pct": 99.8,
     "avg_volume_30d": 132945327.0,
     "pe_ttm": null,
@@ -9486,8 +9487,8 @@
     "target_mean": 94.1415,
     "fcf": -8301250048.0,
     "gross_margin": 0.372,
-    "enterprise_value": 614130319360.0,
-    "ev_ebitda": 43.328,
+    "enterprise_value": 699270758400.0,
+    "ev_ebitda": 49.335,
     "peg": 1.36,
     "roa": 0.0063
    },
@@ -11948,7 +11949,7 @@
      262.81,
      273.93,
      265.04,
-     273.24,
+     273.25,
      282.06,
      281.36,
      276.51,
@@ -12743,7 +12744,7 @@
      20.53,
      20.44,
      16.54,
-     14.99,
+     15.0,
      17.44,
      21.66,
      24.26,
@@ -15781,7 +15782,7 @@
     153263,
     160434,
     166937,
-    163244,
+    163245,
     169543,
     157386,
     148131,
@@ -16168,7 +16169,7 @@
     86802,
     89516,
     86851,
-    84957,
+    84956,
     89287,
     87359,
     91133,
@@ -16551,7 +16552,7 @@
     153263,
     160434,
     166937,
-    163244,
+    163245,
     169543,
     157386,
     148131,
@@ -16938,7 +16939,7 @@
     86802,
     89516,
     86851,
-    84957,
+    84956,
     89287,
     87359,
     91133,
@@ -17821,13 +17822,8 @@
  "predictions": [
   {
    "question": "Bitcoin Up or Down on June 20?",
-   "yes": 88,
+   "yes": 90,
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-june-20-2026"
-  },
-  {
-   "question": "Fed rate hike in 2026?",
-   "yes": 66,
-   "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
   }
  ],
  "news": [
@@ -17929,6 +17925,33 @@
   },
   {
    "source": "Google News",
+   "title": "The US economy is changing in three ways. The Fed must take note - The Times",
+   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPT1VvTEg4YTFDYWdPVjhYREFOVUpYb1Y5X3lRQ0NJT0pwNkhnNFg0V3ZQeVVxRXl6MkY2TUZ6eTE0eXJjUHU0REw2QzBTSUpyUWFFcmg4VW9UQndReUdTcmVmdy1ZM2VTc09STEh2LTYwUktXZXRCT2F5UEF2cXBfSlRFWTdZLTlqQW1CaEV3OFFzaUhjb0Vr?oc=5",
+   "published": "2026-06-20T11:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’economia americana sta cambiando in tre modi. La Fed deve prenderne atto - The Times"
+  },
+  {
+   "source": "CNBC",
+   "title": "Iran to lodge FIFA complaint over World Cup travel restrictions",
+   "link": "https://www.cnbc.com/2026/06/20/iran-to-lodge-fifa-complaint-over-world-cup-travel-restrictions.html",
+   "published": "2026-06-20T10:56:51Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L'Iran presenterà un reclamo alla FIFA per le restrizioni ai viaggi per la Coppa del Mondo"
+  },
+  {
+   "source": "Google News",
    "title": "Trump Wanted Lower Rates, But Warsh's Federal Reserve Might Hike Them (NYSEARCA:SPY) - Seeking Alpha",
    "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxONUZ3VGhzZmlHdk5NNXZfSmhUOFhZMlJ6TjhFVFpwTy1XQm82ZWFCcDFKQUZNNURnd0U2MGItdkt0ZGczLXRxSnRlSmFQaW85NkVXclFfT0M3MkkxR3pzSERJYkVGdzRjQ3V2RWNoTk53WU5mVW9reDFUS0ViOFBRc0o4ZjVnZ19PNU5LOFJfUG94VTZZZVZFOVdBYUlnTHBlMjhLV2dQVmozZUNH?oc=5",
    "published": "2026-06-20T10:15:59Z",
@@ -17953,19 +17976,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Chi sta danneggiando di più l’inflazione? I dati della Fed mostrano quali sono le popolazioni dell'Oklahoma più colpite: gli Oklahoman"
-  },
-  {
-   "source": "Google News",
-   "title": "Mortgage rates dip below 6.5% as Fed holds steady - eciks.org",
-   "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE1jTWpNcU1vbml5TjlSYl9PNTJKWWlJTlQ5cm1FWGZPQ0tJdXR0WXZHMHM1YjN3R2k4X29SdEl2VkdDUTVyV3BBSmdWdV9zZ2JXLWZ4Y2tLNUNRUzEwN0ZRN2JlUXFHQzRMNGJIU2VpQ0N4ZGs?oc=5",
-   "published": "2026-06-20T10:03:49Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I tassi ipotecari scendono sotto il 6,5% mentre la Fed rimane stabile - eciks.org"
   },
   {
    "source": "AP",
@@ -18174,20 +18184,6 @@
    "title_it": "Le nuove task force di Warsh danno alla Fed margine di manovra per rinviare la modifica dei tassi fino a dicembre"
   },
   {
-   "source": "CNBC",
-   "title": "Fedspeak vs. war deal: Here are the things that drove this week's stock market",
-   "link": "https://www.cnbc.com/2026/06/19/fedspeak-vs-war-deal-here-are-the-things-that-drove-this-weeks-stock-market.html",
-   "published": "2026-06-19T17:24:10Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Parli della Fed contro accordo di guerra: ecco gli elementi che hanno guidato il mercato azionario di questa settimana"
-  },
-  {
    "source": "MarketWatch",
    "title": "Trump picked Kevin Warsh to cut rates. The new Fed chief just told us he has other plans.",
    "link": "https://www.marketwatch.com/story/trump-picked-kevin-warsh-to-cut-rates-the-new-fed-chief-just-told-us-he-has-other-plans-096bba56?mod=mw_rss_topstories",
@@ -18229,6 +18225,20 @@
    "title_it": "Meloni critica l'affermazione di Trump di aver \"implorato\" una foto con lui mentre il massimo diplomatico italiano annulla il viaggio negli Stati Uniti"
   },
   {
+   "source": "Reuters",
+   "title": "For US Vice President JD Vance, Iran talks could shape political rise - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxOQWlnWFI3SUZDeUtiRU9JdURpYTJhMkM0Qzdzay01VGNKbFBXRDdNZURuX2h4TFNrdGVhYlF0QVcxaHY0cG5FNTIxSVRpVG9yOENHbnF1M2ZJRkpYb01kdUg5YWlhRHljMXhBcll5d2xNLTVaQXZQZDh2LWZhcU9TREVLYnl5MDUtdVQtdVlqOUQyQQ?oc=5",
+   "published": "2026-06-19T16:46:03Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "Per il vicepresidente americano JD Vance, i colloqui con l'Iran potrebbero influenzare l'ascesa politica - Reuters"
+  },
+  {
    "source": "MarketWatch",
    "title": "Is the stock market closed today for Juneteenth? Will the post office deliver mail?",
    "link": "https://www.marketwatch.com/story/is-the-stock-market-open-on-juneteenth-will-the-post-office-deliver-mail-0569e453?mod=mw_rss_topstories",
@@ -18256,20 +18266,6 @@
    "title_it": "Stati Uniti e Iran ritardano i colloqui sul nucleare mentre si aggravano gli scontri in Libano"
   },
   {
-   "source": "AP",
-   "title": "Analysis: A confident Iran is pressing its advantage, but challenges loom - AP News",
-   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPWUdQUEFORmxyRkQtNXcxbENvLXdHb0tBcWJ2OG13Wlp2Q0U3YXJET3U2Rjh0QnBtSnlDMzlxVnl3M0haOTN5YldsZnk1cjVBVm1pODl4SnExWkh6eUZ3T29yY3ZreG9UbFptVFFxcnVYaGtVRzgxNDYwRGNYWW9nVzBRMXhxY1RmeWRpQ3hRbXFzd05nZ2pfRG5CaF8?oc=5",
-   "published": "2026-06-19T16:09:28Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Analisi: un Iran fiducioso sta sfruttando il suo vantaggio, ma le sfide incombono - AP News"
-  },
-  {
    "source": "MarketWatch",
    "title": "Oil prices face fresh wave of volatility amid conflicting reports about Strait of Hormuz reopening and ongoing regional strife",
    "link": "https://www.marketwatch.com/story/oil-prices-under-new-wave-of-pressure-amid-lingering-questions-over-a-strait-of-hormuz-reopening-c58fc9e8?mod=mw_rss_topstories",
@@ -18283,6 +18279,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "I prezzi del petrolio si trovano ad affrontare una nuova ondata di volatilità tra le notizie contrastanti sulla riapertura dello Stretto di Hormuz e il conflitto regionale in corso"
+  },
+  {
+   "source": "AP",
+   "title": "Analysis: A confident Iran is pressing its advantage, but challenges loom - AP News",
+   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPWUdQUEFORmxyRkQtNXcxbENvLXdHb0tBcWJ2OG13Wlp2Q0U3YXJET3U2Rjh0QnBtSnlDMzlxVnl3M0haOTN5YldsZnk1cjVBVm1pODl4SnExWkh6eUZ3T29yY3ZreG9UbFptVFFxcnVYaGtVRzgxNDYwRGNYWW9nVzBRMXhxY1RmeWRpQ3hRbXFzd05nZ2pfRG5CaF8?oc=5",
+   "published": "2026-06-19T15:25:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Analisi: un Iran fiducioso sta sfruttando il suo vantaggio, ma le sfide incombono - AP News"
   },
   {
    "source": "Google News",
@@ -18338,20 +18348,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Cosa pensano gli americani della gestione dell’Iran da parte di Trump, secondo un nuovo sondaggio AP-NORC – AP News"
-  },
-  {
-   "source": "Reuters",
-   "title": "Iran to lodge FIFA complaint over World Cup travel restrictions - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPR1VYU082ZUFSeVhJV1cwcWhtajVlaWVxc1ViSFhOS0wwXzRfazlXNkxUbGtqMGZOa0FZVEFQWFZ6bktXc2o0OERiMDVrVnJuWGlSUEZvSHg1ZjVJczlBU0VpMzVob1p2anJRWTVhUnVXQWpRX041Q25GLW5SVmFiYjc3aDFVaFlSdF9EbHd2NGtEdm5URVBZckZXeGIwdWFvOTYzQ2FuUUxtdUFwTFdr?oc=5",
-   "published": "2026-06-19T11:43:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'Iran presenterà reclamo alla FIFA per le restrizioni ai viaggi ai Mondiali - Reuters"
   },
   {
    "source": "Yahoo Finance",
@@ -18449,20 +18445,9 @@
   {
    "source": "Polymarket",
    "title": "Bitcoin Up or Down on June 20?",
-   "title_it": "Bitcoin Up or Down on June 20? — probabilità Sì 88%",
+   "title_it": "Bitcoin Up or Down on June 20? — probabilità Sì 90%",
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-june-20-2026",
-   "published": "2026-06-20T10:52:29Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Fed rate hike in 2026?",
-   "title_it": "Fed rate hike in 2026? — probabilità Sì 66%",
-   "link": "https://polymarket.com/event/fed-rate-hike-in-2026",
-   "published": "2026-06-20T10:52:29Z",
+   "published": "2026-06-20T11:08:45Z",
    "tickers": [
     "MACRO"
    ],
