@@ -609,10 +609,11 @@ function renderKPI() {
     invested = t.eur_invested; patrimonioInv = t.eur_invested; gain = t.eur_gain;
     gainPct = t.eur_gain_pct; net = t.eur_gain_net ?? t.eur_gain; src = "stima dai prezzi";
   }
-  const patrimonio = patrimonioInv + cashEur;   // posizioni + liquidità
+  // col broker il controvalore include già la liquidità sul conto → NON sommarla (evita il doppio conteggio)
+  const patrimonio = b ? patrimonioInv : patrimonioInv + cashEur;
   const kpis = [
     { label: "Patrimonio totale (€)", value: fmtEUR.format(patrimonio),
-      sub: `posizioni ${fmtEUR.format(patrimonioInv)}${cashEur > 0 ? ` + liquidità ${fmtEUR.format(cashEur)}` : ""}`,
+      sub: b ? "controvalore conto (liquidità inclusa)" : `posizioni ${fmtEUR.format(patrimonioInv)}${cashEur > 0 ? ` + liquidità ${fmtEUR.format(cashEur)}` : ""}`,
       accent: "var(--blue)" },
     { label: "Capitale investito (€)", value: fmtEUR.format(invested),
       sub: src, accent: "var(--purple)" },
@@ -715,12 +716,8 @@ function renderBtpInfo() {
   const rate = next && next < new Date(2026, 9, 11) ? 0.041 : 0.045;
   const grossQ = Math.round(nominal * rate / 4), netQ = Math.round(grossQ * (1 - 0.125));
   const nextStr = next ? next.toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "—";
-  const t = DATA.totals;
-  const cap = `<div class="cap-line"><span><span class="cap-lab">Capitale investito</span> <b>${fmtEUR.format(Math.round(t.eur_cost))}</b></span>
-    <span><span class="cap-lab">Plusvalenza sul capitale</span> <b class="${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 10) / 10)})</b></span>
-    ${t.cash ? `<span><span class="cap-lab">Liquidità</span> <b>${fmtEUR.format(Math.round(t.cash))}</b></span>` : ""}
-    <span><span class="cap-lab">Patrimonio totale</span> <b>${fmtEUR.format(Math.round(t.eur_value))}</b></span></div>`;
-  box.innerHTML = cap +
+  // niente più blocco capitale/patrimonio qui (era duplicato e in conflitto con i KPI broker in alto)
+  box.innerHTML =
     `<div class="btp-line">BTP Valore Ott 2028 — ${cedoleInc != null ? `cedole incassate ${fmtEUR.format(cedoleInc)} lorde · ` : ""}prossima cedola ${nextStr}: ${fmtEUR.format(grossQ)} lordi (${fmtEUR.format(netQ)} netti, tassazione 12,5%).</div>`;
 }
 
@@ -1332,6 +1329,14 @@ function editPosition(ticker) {
   if (!(qty >= 0)) { toast("Quantità non valida"); return; }
   const pmc = parseFloat(window.prompt(`Nuovo prezzo medio di carico (PMC) di ${ticker}:`, r.pmc) || "");
   if (!(pmc > 0)) { toast("PMC non valido"); return; }
+  // aggiornamento IMMEDIATO su dashboard e riga (poi salva su config in background)
+  r.qty = qty; r.pmc = pmc;
+  if (r.currency === "USD" && r.price != null) {
+    r.value = r.price * qty; r.gain = r.value - pmc * qty;
+    r.gain_pct = Math.round((r.value / (pmc * qty) - 1) * 10000) / 100;
+  }
+  recomputeTotals(); renderKPI(); renderTable(); if (ptfView === "fund") renderFundTable(); renderAllocation();
+  toast(`${ticker} aggiornato — salvo nel repo…`);
   editHoldings("portfolio", cfg => {
     const p = (cfg.portfolio || []).find(x => x.ticker === ticker);
     if (!p) return false;
