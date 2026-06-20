@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=32">
+<link rel="stylesheet" href="assets/style.css?v=33">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -90,6 +90,16 @@
     <div class="gauges" id="gauges"></div>
     <div class="macro-grid macro-grid-below" id="macro-grid"></div>
     <div class="topcaps" id="topcaps"></div>
+  </section>
+
+  <!-- ROTAZIONE SETTORIALE -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Rotazione settoriale &amp; tematica (USA)</h2>
+      <button class="btn btn-ghost btn-sm" id="rotation-analyze" title="Sintesi della rotazione in corso">Analizza Rotazione</button>
+    </div>
+    <div id="rotation-heatmap" class="rot-heatmap" aria-label="Mappa di calore settori"></div>
+    <div id="rotation-hist" class="rot-hist" aria-label="Performance ETF settoriali"></div>
   </section>
 
   <!-- PORTAFOGLIO -->
@@ -282,6 +292,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=32"></script>
+<script src="assets/app.js?v=33"></script>
 </body>
 </html>

@@ -884,26 +884,38 @@ def fetch_macro():
     return macro
 
 
+# (ticker, nome, gruppo) — settori SPDR + principali ETF tematici per la heatmap
 SECTOR_ETF = {
-    "XLK": "Tecnologia", "XLF": "Finanziari", "XLE": "Energia", "XLV": "Salute",
-    "XLY": "Consumi discr.", "XLP": "Consumi difens.", "XLI": "Industriali",
-    "XLU": "Utilities", "XLB": "Materiali", "XLRE": "Immobiliare", "XLC": "Comunicazioni",
+    "XLK": ("Tecnologia", "Settori"), "XLF": ("Finanziari", "Settori"),
+    "XLE": ("Energia", "Settori"), "XLV": ("Salute", "Settori"),
+    "XLY": ("Consumi discr.", "Settori"), "XLP": ("Consumi difens.", "Settori"),
+    "XLI": ("Industriali", "Settori"), "XLU": ("Utilities", "Settori"),
+    "XLB": ("Materiali", "Settori"), "XLRE": ("Immobiliare", "Settori"),
+    "XLC": ("Comunicazioni", "Settori"),
+    "SMH": ("Semiconduttori", "Tematici"), "IGV": ("Software", "Tematici"),
+    "SKYY": ("Cloud", "Tematici"), "ARKK": ("Innovazione", "Tematici"),
+    "TAN": ("Solare", "Tematici"), "XBI": ("Biotech", "Tematici"),
+    "ITA": ("Difesa/Aerospazio", "Tematici"), "IBB": ("Pharma/Bio", "Tematici"),
+    "GLD": ("Oro", "Materie prime"), "IYT": ("Trasporti", "Tematici"),
 }
 
 
 def fetch_sector_tilt():
-    """Rotazione settoriale USA: momentum 1M e 3M degli ETF SPDR di settore.
-    I settori in cima sono quelli su cui ruotare (overweight)."""
+    """Rotazione settoriale/tematica USA: momentum 1M e 3M degli ETF.
+    I primi in classifica sono quelli su cui ruotare (overweight)."""
     rows = []
     try:
         data = yf.download(list(SECTOR_ETF), period="6mo", interval="1d",
                            auto_adjust=True, progress=False)["Close"]
-        for sym, name in SECTOR_ETF.items():
+        for sym, (name, group) in SECTOR_ETF.items():
             try:
                 s = data[sym].dropna()
-                m1 = (float(s.iloc[-1]) / float(s.iloc[-22]) - 1) * 100
-                m3 = (float(s.iloc[-1]) / float(s.iloc[-66]) - 1) * 100
-                rows.append({"ticker": sym, "name": name,
+                last = float(s.iloc[-1])
+                m1 = (last / float(s.iloc[-22]) - 1) * 100
+                m3 = (last / float(s.iloc[-66]) - 1) * 100
+                d1 = (last / float(s.iloc[-2]) - 1) * 100
+                rows.append({"ticker": sym, "name": name, "group": group,
+                             "price": round(last, 2), "d1": round(d1, 2),
                              "m1": round(m1, 1), "m3": round(m3, 1),
                              "score": round(clamp(50 + (m1 * 0.6 + m3 * 0.4) * 2.5))})
             except Exception:  # noqa: BLE001

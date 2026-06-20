@@ -296,6 +296,26 @@ th.sortable:hover { color: var(--text); }
 .cash-box label { font-size: 12.5px; color: var(--muted); }
 .cash-box input { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; font-family: var(--mono); width: 130px; }
 
+/* ---------- rotazione settoriale: heatmap + istogramma ---------- */
+.rot-heatmap { display: flex; flex-direction: column; gap: 10px; }
+.rot-group-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.rot-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+.rot-tile {
+  border-radius: 8px; padding: 8px 9px; min-height: 50px; color: #0a0e17;
+  display: flex; flex-direction: column; justify-content: space-between; cursor: default;
+}
+.rot-tile .rt-name { font-size: 11.5px; font-weight: 700; line-height: 1.15; }
+.rot-tile .rt-pct { font-family: var(--mono); font-size: 13px; font-weight: 700; }
+.rot-hist { margin-top: 16px; }
+.rot-hist-title { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.rot-bar-row { display: flex; align-items: center; gap: 10px; padding: 2px 0; font-size: 12px; }
+.rot-bar-lab { width: 180px; flex-shrink: 0; }
+.rot-bar-lab .tk { color: var(--muted); font-family: var(--mono); font-size: 10px; margin-left: 4px; }
+.rot-bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.rot-bar-fill { display: block; height: 100%; border-radius: 4px; }
+.rot-bar-val { width: 56px; text-align: right; font-family: var(--mono); font-weight: 700; }
+@media (max-width: 600px) { .rot-bar-lab { width: 120px; } }
+
 /* ---------- mini-card direzione/segnali ---------- */
 .mini-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
 @media (max-width: 700px) { .mini-cards { grid-template-columns: 1fr; } }

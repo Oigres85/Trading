@@ -378,6 +378,7 @@ function renderAll() {
   renderGauges();
   renderMacro();
   renderMiniCards();
+  renderSectorRotation();
   renderTopCaps();
   renderNews();
   renderBtpInfo();
@@ -470,6 +471,63 @@ function renderMiniCards() {
       <div class="mc-sub muted">composito ciclo economico · clicca per il dettaglio</div>`;
   }
 }
+
+/* ---------------- rotazione settoriale: heatmap + istogramma + popup ---------------- */
+function perfColor(p) {
+  // verde se sale, rosso se scende (gradiente proporzionale, ±10% = saturo)
+  return scoreColor(clamp(50 + p * 5));
+}
+
+function renderSectorRotation() {
+  const tilt = (DATA.macro || {}).tilt || [];
+  const hm = $("#rotation-heatmap"), hi = $("#rotation-hist");
+  if (!hm || !hi) return;
+  if (!tilt.length) { hm.innerHTML = '<div class="muted">Dati rotazione non disponibili</div>'; hi.innerHTML = ""; return; }
+  // heatmap raggruppata per gruppo (Settori / Tematici / Materie prime)
+  const groups = {};
+  tilt.forEach(s => { (groups[s.group || "Settori"] = groups[s.group || "Settori"] || []).push(s); });
+  hm.innerHTML = Object.entries(groups).map(([g, arr]) => `
+    <div class="rot-group">
+      <div class="rot-group-title">${esc(g)}</div>
+      <div class="rot-tiles">${arr.sort((a, b) => b.m1 - a.m1).map(s => `
+        <div class="rot-tile" style="background:${perfColor(s.m1)}" title="${esc(s.name)} (${s.ticker}) · 1M ${signTxt(s.m1)} · 3M ${signTxt(s.m3)}">
+          <span class="rt-name">${esc(s.name)}</span>
+          <span class="rt-pct">${signTxt(s.m1)}</span>
+        </div>`).join("")}</div>
+    </div>`).join("");
+  // istogramma performance 1M ordinato
+  const sorted = [...tilt].sort((a, b) => b.m1 - a.m1);
+  const maxAbs = Math.max(...sorted.map(s => Math.abs(s.m1)), 1);
+  hi.innerHTML = `<div class="rot-hist-title muted">Performance 1 mese (ETF)</div>` + sorted.map(s => {
+    const w = Math.abs(s.m1) / maxAbs * 100;
+    return `<div class="rot-bar-row">
+      <span class="rot-bar-lab">${esc(s.name)} <span class="tk">${s.ticker}</span></span>
+      <span class="rot-bar-track"><span class="rot-bar-fill" style="width:${w}%;background:${perfColor(s.m1)}"></span></span>
+      <span class="rot-bar-val ${signCls(s.m1)}">${signTxt(s.m1)}</span>
+    </div>`;
+  }).join("");
+}
+
+function openRotationModal() {
+  const tilt = (DATA.macro || {}).tilt || [];
+  if (!tilt.length) return;
+  const byM1 = [...tilt].sort((a, b) => b.m1 - a.m1);
+  const lead = byM1.slice(0, 3), lag = byM1.slice(-3).reverse();
+  const defensives = ["Utilities", "Consumi difens.", "Salute", "Oro"];
+  const defAvg = avg(tilt.filter(s => defensives.includes(s.name)).map(s => s.m1));
+  const tech = tilt.find(s => s.ticker === "XLK");
+  const cyc = tech ? tech.m1 : null;
+  let regime = "—";
+  if (defAvg != null && cyc != null) regime = defAvg > cyc ? "DIFENSIVO (i difensivi battono il Tech → cautela/de-risking)" : "PRO-RISCHIO (i ciclici/Tech guidano)";
+  const oversold = byM1.filter(s => s.m1 <= -5).map(s => s.name);
+  openInfoModal("Analisi rotazione settoriale", `
+    <div class="info-line"><b>Regime attuale:</b> ${regime}</div>
+    <div class="info-line"><b>In momentum (overweight):</b> ${lead.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
+    <div class="info-line"><b>In affanno (underweight):</b> ${lag.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
+    ${oversold.length ? `<div class="info-line"><b>Ipervenduti (-5% 1M):</b> ${oversold.map(esc).join(", ")}</div>` : ""}
+    <div class="info-line muted" style="margin-top:8px">Orientamento calcolato sui momentum 1M/3M degli ETF. Non è consulenza; per un piano operativo usa "Copia prompt AI".</div>`);
+}
+function avg(a) { return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; }
 
 function openMacroQuantModal() {
   const mq = (DATA.macro || {}).macroquant;
@@ -1565,9 +1623,10 @@ function buildPrompt() {
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
   if (m.fedwatch && (m.fedwatch.meetings || []).length) lines.push(`- FedWatch prossima riunione ${m.fedwatch.meetings[0].date}: prob. taglio ${m.fedwatch.meetings[0].cut_prob}%`);
   if ((m.tilt || []).length) {
-    const top = m.tilt.slice(0, 3).map(s => s.name).join(", ");
-    const bot = m.tilt.slice(-3).map(s => s.name).join(", ");
-    lines.push(`- Rotazione settoriale USA — forti: ${top}; deboli: ${bot}`);
+    lines.push("");
+    lines.push("ROTAZIONE SETTORIALE/TEMATICA USA (ETF, performance 1M e 3M):");
+    [...m.tilt].sort((a, b) => b.m1 - a.m1).forEach(s =>
+      lines.push(`- ${s.name} (${s.ticker}): 1M ${signTxt(s.m1)}, 3M ${signTxt(s.m3)}`));
   }
   if (m.witching) lines.push(`- Prossime "4 streghe" (quadruple witching): ${m.witching}`);
   // liquidità e capitale
@@ -1737,6 +1796,7 @@ $("#cash-save").addEventListener("click", saveCash);
 $("#cash-input").addEventListener("keydown", e => { if (e.key === "Enter") saveCash(); });
 $("#signposts-box").addEventListener("click", openSignpostsModal);
 $("#tilt-box").addEventListener("click", openTiltModal);
+$("#rotation-analyze").addEventListener("click", openRotationModal);
 $("#witching-box").addEventListener("click", openWitchingModal);
 $("#macroquant-box").addEventListener("click", openMacroQuantModal);
 $("#market-direction").addEventListener("click", () => {

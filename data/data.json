@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
  "updated_at": "2026-06-20T05:00:47Z",
+=======
+ "updated_at": "2026-06-20T05:25:06Z",
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -4834,11 +4838,11 @@
    "ticker": "^KS11",
    "name": "KOSPI",
    "currency": "PTS",
-   "price": null,
-   "change_pct": null,
+   "price": 9052.42,
+   "change_pct": 2.12,
    "pe": null,
    "ath": 9385.59,
-   "ath_dist_pct": null,
+   "ath_dist_pct": -3.5,
    "support": 7053.84,
    "resistance": 9385.59,
    "rsi": 66.1,
@@ -4852,7 +4856,7 @@
      8545.98,
      8726.6,
      8864.24,
-     null
+     9052.42
     ],
     "m6": [
      4135.0,
@@ -4980,7 +4984,7 @@
      8545.98,
      8726.6,
      8864.24,
-     null
+     9052.42
     ],
     "all": [
      651.22,
@@ -5361,7 +5365,7 @@
      8545.98,
      8726.6,
      8864.24,
-     null
+     9052.42
     ],
     "m3": [
      5487.24,
@@ -5429,7 +5433,7 @@
      8545.98,
      8726.6,
      8864.24,
-     null
+     9052.42
     ],
     "y1": [
      2977.74,
@@ -5532,23 +5536,23 @@
    "tech_by_range": {
     "w1": {
      "support": 8079.77,
-     "resistance": 8872.18,
-     "change_pct": null
+     "resistance": 9385.59,
+     "change_pct": 11.43
     },
     "m1": {
      "support": 7053.84,
-     "resistance": 8933.62,
-     "change_pct": null
+     "resistance": 9385.59,
+     "change_pct": 20.44
     },
     "m3": {
      "support": 5042.99,
-     "resistance": 8933.62,
-     "change_pct": null
+     "resistance": 9385.59,
+     "change_pct": 64.97
     },
     "y1": {
      "support": 2954.47,
-     "resistance": 8933.62,
-     "change_pct": null
+     "resistance": 9385.59,
+     "change_pct": 204.0
     }
    },
    "financials": [],
@@ -6430,6 +6434,7 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
+<<<<<<< HEAD
    "price": 63528.0,
    "change_pct": -1.38,
    "pe": null,
@@ -6440,6 +6445,18 @@
    "rsi": 36.3,
    "volume": 21131304960,
    "vol_ratio": 0.64,
+=======
+   "price": 63663.98,
+   "change_pct": -1.17,
+   "pe": null,
+   "ath": 126198.07,
+   "ath_dist_pct": -49.6,
+   "support": 59108.92,
+   "resistance": 74153.5,
+   "rsi": 36.6,
+   "volume": 21257172992,
+   "vol_ratio": 0.65,
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6448,7 +6465,11 @@
      66289.5,
      65600.64,
      64418.45,
+<<<<<<< HEAD
      63528.0
+=======
+     63663.98
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     ],
     "m6": [
      68857.84,
@@ -6576,7 +6597,11 @@
      66289.5,
      65600.64,
      64418.45,
+<<<<<<< HEAD
      63528.0
+=======
+     63663.98
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     ],
     "all": [
      386.94,
@@ -6720,7 +6745,11 @@
      68233.31,
      76304.32,
      73579.69,
+<<<<<<< HEAD
      63528.0
+=======
+     63663.98
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     ],
     "m1": [
      73536.55,
@@ -6744,7 +6773,11 @@
      66289.5,
      65600.64,
      64418.45,
+<<<<<<< HEAD
      63528.0
+=======
+     63663.98
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     ],
     "m3": [
      74181.61,
@@ -6812,7 +6845,11 @@
      66289.5,
      65600.64,
      64418.45,
+<<<<<<< HEAD
      63528.0
+=======
+     63663.98
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     ],
     "y1": [
      103309.6,
@@ -6920,7 +6957,13 @@
      63469.73,
      63544.5,
      63498.82,
+<<<<<<< HEAD
      63528.0
+=======
+     63513.3,
+     63750.01,
+     63663.98
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     ]
    },
    "earnings_date": null,
@@ -6935,22 +6978,38 @@
     "w1": {
      "support": 63281.52,
      "resistance": 67248.13,
+<<<<<<< HEAD
      "change_pct": -3.32
+=======
+     "change_pct": -3.11
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74460.12,
+<<<<<<< HEAD
      "change_pct": -13.61
+=======
+     "change_pct": -13.43
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
+<<<<<<< HEAD
      "change_pct": -14.36
+=======
+     "change_pct": -14.18
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     },
     "y1": {
      "support": 59108.92,
      "resistance": 122509.66,
+<<<<<<< HEAD
      "change_pct": -43.89
+=======
+     "change_pct": -43.77
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     }
    },
    "financials": [],
@@ -14345,7 +14404,11 @@
     },
     {
      "label": "Bitcoin",
+<<<<<<< HEAD
      "score": 36
+=======
+     "score": 38
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
     }
    ]
   },
@@ -14433,22 +14496,91 @@
   },
   "tilt": [
    {
+    "ticker": "SMH",
+    "name": "Semiconduttori",
+    "group": "Tematici",
+    "price": 659.88,
+    "d1": 5.76,
+    "m1": 21.3,
+    "m3": 66.3,
+    "score": 100
+   },
+   {
     "ticker": "XLK",
     "name": "Tecnologia",
+    "group": "Settori",
+    "price": 191.44,
+    "d1": 3.04,
     "m1": 10.5,
     "m3": 37.4,
     "score": 100
    },
    {
+    "ticker": "XBI",
+    "name": "Biotech",
+    "group": "Tematici",
+    "price": 140.72,
+    "d1": 0.95,
+    "m1": 11.0,
+    "m3": 13.3,
+    "score": 80
+   },
+   {
+    "ticker": "SKYY",
+    "name": "Cloud",
+    "group": "Tematici",
+    "price": 131.92,
+    "d1": -2.51,
+    "m1": 2.0,
+    "m3": 17.2,
+    "score": 70
+   },
+   {
+    "ticker": "ARKK",
+    "name": "Innovazione",
+    "group": "Tematici",
+    "price": 80.19,
+    "d1": 2.17,
+    "m1": 8.6,
+    "m3": 9.8,
+    "score": 73
+   },
+   {
+    "ticker": "IYT",
+    "name": "Trasporti",
+    "group": "Tematici",
+    "price": 83.32,
+    "d1": -3.23,
+    "m1": 3.9,
+    "m3": 13.1,
+    "score": 69
+   },
+   {
     "ticker": "XLI",
     "name": "Industriali",
+    "group": "Settori",
+    "price": 180.91,
+    "d1": 0.73,
     "m1": 7.2,
     "m3": 9.0,
     "score": 70
    },
    {
+    "ticker": "ITA",
+    "name": "Difesa/Aerospazio",
+    "group": "Tematici",
+    "price": 242.79,
+    "d1": 1.37,
+    "m1": 10.3,
+    "m3": 4.4,
+    "score": 70
+   },
+   {
     "ticker": "XLF",
     "name": "Finanziari",
+    "group": "Settori",
+    "price": 53.57,
+    "d1": -0.89,
     "m1": 4.8,
     "m3": 8.6,
     "score": 66
@@ -14456,20 +14588,49 @@
    {
     "ticker": "XLB",
     "name": "Materiali",
+    "group": "Settori",
+    "price": 51.81,
+    "d1": -0.4,
     "m1": 5.6,
     "m3": 5.1,
     "score": 64
    },
    {
+    "ticker": "IBB",
+    "name": "Pharma/Bio",
+    "group": "Tematici",
+    "price": 173.64,
+    "d1": 0.12,
+    "m1": 5.8,
+    "m3": 3.9,
+    "score": 63
+   },
+   {
     "ticker": "XLRE",
     "name": "Immobiliare",
+    "group": "Settori",
+    "price": 43.97,
+    "d1": -2.51,
     "m1": 0.5,
     "m3": 4.0,
     "score": 55
    },
    {
+    "ticker": "TAN",
+    "name": "Solare",
+    "group": "Tematici",
+    "price": 60.58,
+    "d1": 3.64,
+    "m1": -0.6,
+    "m3": 4.9,
+    "score": 54
+   },
+   {
     "ticker": "XLY",
     "name": "Consumi discr.",
+    "group": "Settori",
+    "price": 115.49,
+    "d1": -2.51,
     "m1": -0.7,
     "m3": 3.1,
     "score": 52
@@ -14477,13 +14638,29 @@
    {
     "ticker": "XLV",
     "name": "Salute",
+    "group": "Settori",
+    "price": 149.4,
+    "d1": -0.87,
     "m1": 1.4,
     "m3": 0.3,
     "score": 52
    },
    {
+    "ticker": "IGV",
+    "name": "Software",
+    "group": "Tematici",
+    "price": 89.09,
+    "d1": -0.08,
+    "m1": -3.1,
+    "m3": 4.2,
+    "score": 50
+   },
+   {
     "ticker": "XLU",
     "name": "Utilities",
+    "group": "Settori",
+    "price": 44.76,
+    "d1": 0.67,
     "m1": 0.9,
     "m3": -4.4,
     "score": 47
@@ -14491,6 +14668,9 @@
    {
     "ticker": "XLP",
     "name": "Consumi difens.",
+    "group": "Settori",
+    "price": 83.68,
+    "d1": -2.23,
     "m1": -2.6,
     "m3": -1.0,
     "score": 45
@@ -14498,6 +14678,9 @@
    {
     "ticker": "XLC",
     "name": "Comunicazioni",
+    "group": "Settori",
+    "price": 109.2,
+    "d1": -2.78,
     "m1": -6.7,
     "m3": -5.0,
     "score": 35
@@ -14505,9 +14688,22 @@
    {
     "ticker": "XLE",
     "name": "Energia",
+    "group": "Settori",
+    "price": 53.77,
+    "d1": -1.65,
     "m1": -12.3,
     "m3": -7.5,
     "score": 24
+   },
+   {
+    "ticker": "GLD",
+    "name": "Oro",
+    "group": "Materie prime",
+    "price": 387.12,
+    "d1": -0.38,
+    "m1": -5.9,
+    "m3": -15.7,
+    "score": 25
    }
   ],
   "witching": {
@@ -14668,6 +14864,11 @@
    "question": "Fed rate hike in 2026?",
    "yes": 66,
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
+  },
+  {
+   "question": "Will there be no change in Fed interest rates after the July 2026 meeting?",
+   "yes": 74,
+   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting"
   }
  ],
  "news": [
@@ -14710,7 +14911,11 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
+<<<<<<< HEAD
    "title_it": "L’impero economico delle Guardie iraniane potrebbe vincere alla grande se le sanzioni statunitensi venissero revocate"
+=======
+   "title_it": "L’impero economico delle Guardie iraniane vincerebbe alla grande se le sanzioni statunitensi venissero revocate"
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
   },
   {
    "source": "Investing.com",
@@ -14890,7 +15095,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il presidente Donald Trump svela il nuovo Air Force One, un jet del Qatar convertito - AP News"
+   "title_it": null
   },
   {
    "source": "AP",
@@ -14904,7 +15109,11 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
+<<<<<<< HEAD
    "title_it": "Trump ora afferma che uno dei candidati repubblicani sarebbe una buona scelta nel ballottaggio del governatore della Carolina del Sud - AP News"
+=======
+   "title_it": "Trump ora afferma che uno dei due candidati repubblicani sarebbe una buona scelta nel ballottaggio del governatore della Carolina del Sud - AP News"
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
   },
   {
    "source": "Google News",
@@ -14920,6 +15129,23 @@
    "title_it": "Dimenticate la pausa della Fed di giugno: Citadel avverte che gli \"effetti del secondo round\" imporranno un rialzo dei tassi a settembre - Sahm"
   },
   {
+<<<<<<< HEAD
+=======
+   "source": "AP",
+   "title": "Iran says it’s being treated unfairly. Its World Cup travel schedule isn’t unique - AP News",
+   "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQMnlqN2RWcnB0SElWa0JhYWV2bHF5a2hfclVPOFFSZzFIanl3aTRjWXdxbDlFWW9RaERTWXZyTThWS1g2cVdtWl9ZMnIzSXBpQ1BpeGV6dE9tYkg3am1DbzNKTWhKWnN6N3R6RkVncFZHNzE2NU53bWFZNlJJMnJUM2hscFdGM3Fwb2JIOFpnYWp2YXZK?oc=5",
+   "published": "2026-06-19T21:27:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’Iran afferma di essere trattato ingiustamente. Il suo programma di viaggio per la Coppa del Mondo non è unico - AP News"
+  },
+  {
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
    "source": "Google News",
    "title": "Mortgage rates dip after Iran peace deal but Fed signals caution - MSN",
    "link": "https://news.google.com/rss/articles/CBMirAJBVV95cUxQbEtWRjNxajh6R055cVBNaDFtLXR3bTh0NHhRVkZpZWV3UnpIVGNSM2lrbUpLTUliSVNKeU9fcDVISlJ2U1I2YUVzVDNORlR5NE45b3c4cWUzZHk5am9oZWVuV0lFb1BDWG91MUI5SWVlSGU2U0FId1BFTENVcEREd051VUlRRGFVamhwS0M4cndJM0FMSHdqODg4ejUyY3JsYmt0dXZBV2ZXcmZxRGo4VnZudDFmWHlyc04zZ0E0SVBFNG1FbmNxOGtqc1duYVczcFpHVzZWU21yWGhONC11c3BKTUkycHRjblBCdjVPRzhvXzNINUNhNFdYem5nVzdmSFZKV01ZRVNjcnNiOFFQcFlMM1VlbGxhUjlFeEE2YlllZFVVa3NERUVycXY?oc=5",
@@ -14945,21 +15171,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Cresce l’attrito tra Trump e i senatori repubblicani prima delle cruciali elezioni di medio termine – AP News"
-  },
-  {
-   "source": "AP",
-   "title": "Israel and Hezbollah agree to halt fighting, officials say, as US-Iran talks hang in the balance - AP News",
-   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNdDdtMWZ0SDdDbThCNEFjb2p2aE5QVFhETEFOT0RyUG9MaHlta2VNWWpjWE1sOFNEM3pYOE9NYkhRM2x3d0hnYzRQZ2F6eG5zSl9aZEpHd0xaRFR6LTFfNHFKdFBWVXdZSTNMMVZOY3RaZmVjRVZ0T0ZYVEZvWU8xZDBtdk5OMGpMaFhOR3RKU3MyUHFQU3NmMzluUFlFaDBD?oc=5",
-   "published": "2026-06-19T18:08:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Israele e Hezbollah concordano di fermare i combattimenti, dicono i funzionari, mentre i colloqui tra Stati Uniti e Iran sono in bilico - AP News"
+   "title_it": null
   },
   {
    "source": "Bloomberg",
@@ -15141,6 +15353,23 @@
    "title_it": "I prezzi del petrolio si trovano ad affrontare una nuova ondata di volatilità tra le notizie contrastanti sulla riapertura dello Stretto di Hormuz e il conflitto regionale in corso"
   },
   {
+<<<<<<< HEAD
+=======
+   "source": "AP",
+   "title": "Analysis: A confident Iran is pressing its advantage, but challenges loom - AP News",
+   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxPWUdQUEFORmxyRkQtNXcxbENvLXdHb0tBcWJ2OG13Wlp2Q0U3YXJET3U2Rjh0QnBtSnlDMzlxVnl3M0haOTN5YldsZnk1cjVBVm1pODl4SnExWkh6eUZ3T29yY3ZreG9UbFptVFFxcnVYaGtVRzgxNDYwRGNYWW9nVzBRMXhxY1RmeWRpQ3hRbXFzd05nZ2pfRG5CaF8?oc=5",
+   "published": "2026-06-19T15:25:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Analisi: un Iran fiducioso sta sfruttando il suo vantaggio, ma le sfide incombono - AP News"
+  },
+  {
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
    "source": "Reuters",
    "title": "Oil shipments rise in Hormuz although questions grow over Iran's transit terms - Reuters",
    "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxONmxOVHFxZFJqT0MyRms0akxNMzFSVG45ZDFFVHFjZkZrMmh0anBuak5MYjlwWWw3Vy04LWl1b3oxbnZHSGRqQ2V0cWN5WUhxbHpZdXRCQmdpZGpsUk40RWl3dlVyTWtTUTRQOUtjbHM4NUJtTlpwZWtMMmx3REpQMWl6OWJEYzVhSHpIVkVicGVSdzdiaHd6WkU4ZENSaWZlUVVVUFNXYTktZDRDSVdZMmRuWXhPWFBBS2RLMk01OEo0eWFy?oc=5",
@@ -15222,6 +15451,22 @@
    "title_it": "Il primo incontro della Fed di Kevin Warsh affonda la denuncia del \"calzino burattino\" di Elizabeth Warren - 24 ore su 24, 7 giorni su 7 Wall St."
   },
   {
+<<<<<<< HEAD
+=======
+   "source": "Google News",
+   "title": "Why We Don’t Think The Fed Will Hike Rates - Seeking Alpha",
+   "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPVGQ5ZkJGaFpqc0tWeGgyWURTdk1IaHRiTFZFeTNZN0NaTksxSk15S3gxLTdJcDNtVGxlWFZrNmh5ZTNBYUh3NzB2WjBYVkRScExLQzJlSE95LU5EUF9PazU2WVhlZkx3Z1RLVzRtd21PSms1VXNyVW95aThOUDktRzBNMjc?oc=5",
+   "published": "2026-06-19T10:55:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Perché non pensiamo che la Fed aumenterà i tassi - Seeking Alpha"
+  },
+  {
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
    "source": "CNBC",
    "title": "Russia threatens escalation after Ukraine hits Moscow with largest-ever drone attack",
    "link": "https://www.cnbc.com/2026/06/19/russia-ukraine-moscow-drone-attack-trump.html",
@@ -15301,6 +15546,7 @@
    "topic_pri": 2,
    "inv": true,
    "sentiment": "neutral",
+<<<<<<< HEAD
    "title_it": "Bitcoin intrappolato tra 62.300$ e 64.600$: livelli in tempo reale"
   },
   {
@@ -15309,6 +15555,27 @@
    "title_it": "Fed rate hike in 2026? — probabilità Sì 66%",
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026",
    "published": "2026-06-20T05:01:38Z",
+=======
+   "title_it": "Bitcoin intrappolato tra 62.300$ e 64.600$: livelli live"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Fed rate hike in 2026?",
+   "title_it": "Fed rate hike in 2026? — probabilità Sì 66%",
+   "link": "https://polymarket.com/event/fed-rate-hike-in-2026",
+   "published": "2026-06-20T05:26:13Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
+   "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 74%",
+   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
+   "published": "2026-06-20T05:26:13Z",
+>>>>>>> 933f9c8 (Sezione Rotazione settoriale: heatmap (settori+tematici) + istogramma performance 1M + popup 'Analizza Rotazione'; ETF tematici nella pipeline; rotazione completa nel prompt AI)
    "tickers": [
     "MACRO"
    ],
