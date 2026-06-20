@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-20T20:09:32Z",
+ "updated_at": "2026-06-20T21:03:32Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6470,15 +6470,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63904.51,
-   "change_pct": 0.57,
+   "price": 63880.08,
+   "change_pct": 0.53,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.4,
    "support": 59108.92,
    "resistance": 74153.5,
-   "rsi": 39.1,
-   "volume": 17435840512,
+   "rsi": 39.0,
+   "volume": 17415028736,
    "vol_ratio": 0.53,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -6488,7 +6488,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63904.51
+     63880.08
     ],
     "m6": [
      69767.62,
@@ -6616,7 +6616,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63904.51
+     63880.08
     ],
     "all": [
      386.94,
@@ -6760,7 +6760,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63904.51
+     63880.08
     ],
     "m1": [
      73372.52,
@@ -6784,7 +6784,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63904.51
+     63880.08
     ],
     "m3": [
      74805.08,
@@ -6852,7 +6852,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63904.51
+     63880.08
     ],
     "y1": [
      103309.6,
@@ -7050,7 +7050,13 @@
      63814.0,
      63872.55,
      63869.22,
-     63865.49
+     63865.49,
+     63883.99,
+     63867.29,
+     63798.12,
+     63801.97,
+     63844.89,
+     63880.08
     ]
    },
    "earnings_date": null,
@@ -7065,22 +7071,22 @@
     "w1": {
      "support": 62201.14,
      "resistance": 67248.13,
-     "change_pct": -3.6
+     "change_pct": -3.63
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74218.56,
-     "change_pct": -12.9
+     "change_pct": -12.94
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -14.57
+     "change_pct": -14.6
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -42.33
+     "change_pct": -42.35
     }
    },
    "financials": [],
@@ -12798,7 +12804,7 @@
      20.53,
      20.44,
      16.54,
-     14.99,
+     15.0,
      17.44,
      21.66,
      24.26,
@@ -15062,7 +15068,7 @@
     217123,
     215584,
     217725,
-    220471,
+    220472,
     224617,
     223721,
     226649,
@@ -15577,7 +15583,7 @@
     173883,
     175594,
     176934,
-    175031,
+    175032,
     174870,
     174089,
     173138,
@@ -15617,7 +15623,7 @@
     188244,
     186492,
     183172,
-    180140,
+    180141,
     186461,
     191516,
     192567,
@@ -17919,19 +17925,6 @@
   },
   {
    "source": "Investing.com",
-   "title": "US forces monitoring Strait of Hormuz to ensure it stays open",
-   "link": "https://www.investing.com/news/world-news/us-forces-monitoring-strait-of-hormuz-to-ensure-it-stays-open-4751624",
-   "published": "2026-06-20T16:54:28Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Le forze statunitensi monitorano lo Stretto di Hormuz per assicurarsi che rimanga aperto"
-  },
-  {
-   "source": "Investing.com",
    "title": "Bitcoin rises to near $64k, but Iran uncertainty limits broader recovery",
    "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-rebounds-above-63000-as-traders-assess-regulatory-developments-4751609",
    "published": "2026-06-20T09:01:53Z",
@@ -17973,30 +17966,44 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "The Vanguard S&P 500 ETF (VOO) Is the Most Popular ETF in the World. Here's One I Like Even Better.",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/vanguard-p-500-etf-voo-194900290.html",
-   "published": "2026-06-20T19:49:00Z",
+   "source": "CNBC",
+   "title": "Iran reportedly closes Strait of Hormuz again, casting shadow over nuclear talks",
+   "link": "https://www.cnbc.com/2026/06/20/iran-reportedly-closes-strait-of-hormuz-again-raising-doubt-over-talks.html",
+   "published": "2026-06-20T21:02:47Z",
    "tickers": [
-    "MACRO"
+    "MACRO",
+    "POL"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L’ETF Vanguard S&P 500 (VOO) è l’ETF più popolare al mondo. Eccone uno che mi piace ancora di più."
+   "title_it": "Secondo quanto riferito, l’Iran chiude nuovamente lo Stretto di Hormuz, gettando ombra sui colloqui sul nucleare"
   },
   {
    "source": "Yahoo Finance",
-   "title": "Goldman Sachs revisits its gold price target after Fed meeting",
-   "link": "https://finance.yahoo.com/markets/commodities/articles/goldman-sachs-revisits-gold-price-194700449.html",
-   "published": "2026-06-20T19:47:00Z",
+   "title": "ADMA Biologics (ADMA) Hit With Federal Securities Lawsuit Over Revenue Inflation Allegations",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/adma-biologics-adma-hit-federal-203437698.html",
+   "published": "2026-06-20T20:34:37Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "ADMA Biologics (ADMA) colpita da una causa federale sui titoli per accuse di inflazione delle entrate"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Fed’s Favorite Gauge Is Seen Showing Faster Inflation",
+   "link": "https://news.google.com/search?q=Fed%E2%80%99s%20Favorite%20Gauge%20Is%20Seen%20Showing%20Faster%20Inflation",
+   "published": "2026-06-20T20:00:00Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Goldman Sachs rivede il suo obiettivo di prezzo dell'oro dopo la riunione della Fed"
+   "title_it": "L’indicatore preferito dalla Fed mostra un’inflazione più rapida"
   },
   {
    "source": "CNBC",
@@ -18024,20 +18031,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "L'aggiornamento dei tassi - No, non l'ha fatto: Powell RESTA alla Fed - Cosa succede adesso ai tassi ipotecari? Oscar De La Hoya (uilyV2KCQD) - Fathom Journal"
-  },
-  {
-   "source": "CNBC",
-   "title": "Iran reportedly closes Strait of Hormuz again, casting shadow over nuclear talks",
-   "link": "https://www.cnbc.com/2026/06/20/iran-reportedly-closes-strait-of-hormuz-again-raising-doubt-over-talks.html",
-   "published": "2026-06-20T17:28:52Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Secondo quanto riferito, l’Iran chiude nuovamente lo Stretto di Hormuz, gettando ombra sui colloqui sul nucleare"
   },
   {
    "source": "Reddit",
@@ -18122,19 +18115,6 @@
    "title_it": "Trump approfondisce la disputa con l'italiano Meloni, che afferma che i suoi \"attacchi non provocati sono insensati\" - AP News"
   },
   {
-   "source": "Google News",
-   "title": "The Fed's Latest Inflation Outlook Offers Wall Street Its First Relief in Months - The Globe and Mail",
-   "link": "https://news.google.com/rss/articles/CBMi8AFBVV95cUxNY1pkS2Rkek1wOTh6NDZrNG85YTJETXlIdjRjWjZETFdsUDdDZTZBUDZMVEllbHRSV2drSTdPdUFnRzJ0Unl1S3V1TW1JTU96M1VUMVZ2YjFQMkYxLXhUMnZ5MVA2LVZsMzZJT1hYWVNRZy03aXRmQmZnXy1oVERoU1Flbk1raHlCY29HNDlqMlFMSmJOQmtiRnN5OGpjOVdwd2NleUFxSnA4dUhuYkt5cUE1YlhGaTFBZFdEcGF2ckxuNFhLMkJlM2dyLU9oYXBwQk1ZUXBlVGpqcE1kOE1nYk1KZ2VlY0hvc1E4MnNveE8?oc=5",
-   "published": "2026-06-20T14:20:40Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'ultimo outlook sull'inflazione della Fed offre a Wall Street il primo sollievo da mesi - The Globe and Mail"
-  },
-  {
    "source": "Bloomberg",
    "title": "MOU Gives US and Iran Breathing Room",
    "link": "https://news.google.com/search?q=MOU%20Gives%20US%20and%20Iran%20Breathing%20Room",
@@ -18204,20 +18184,6 @@
    "title_it": "Trump cerca l’Offramp dell’Iran"
   },
   {
-   "source": "Bloomberg",
-   "title": "US-Iran Delegations Expected in Switzerland",
-   "link": "https://news.google.com/search?q=US-Iran%20Delegations%20Expected%20in%20Switzerland",
-   "published": "2026-06-20T12:20:07Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Delegazioni USA-Iran attese in Svizzera"
-  },
-  {
    "source": "AP",
    "title": "Congress wonders as the Iran war draws to a close: Was it worth it? - AP News",
    "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNX2ZZbUI5MTlfaFUtZk0yTGtEbF9YeGN1SXd3SjBWUUtpM2lVQkVzcXdRbjhBLWV4azhJX3N3eE1ROTh6aDVzS1lWbnVLbDhIYjdNYjZOX2czSXdTMHBGcEVBNlAwWnFwOFVySVU5dDV2aGJHVmZyU2FBODZDTmwta0hqbl80ZmdhYTJuM1BQb2FzdGg2MDNNMndRUmlhR0hGb3ByRUttRQ?oc=5",
@@ -18257,6 +18223,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "La Svizzera afferma che i colloqui USA-Iran continuano al Bürgenstock ma rifiuta di identificare i partecipanti - Reuters"
+  },
+  {
+   "source": "Google News",
+   "title": "Former Fed Chair Warns of Major Risk That Could Derail This Bull Market - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNdzhoSGhnUUdjRWlqTGVFUFhyOWs1RjlibnhkYXBDdUJfcGppdVE0eEhnRFFFTktfUE91TExJYmNYVzhfdklxQkxRUDd1SGU3QkJwZVpoY2VXazhpM1VNMWlHbFBaTTMzLTlwQmx4dzhmQWFiRkVjUmRMQTMxSVhDU2xnazctY0ZUV29VbEdPQjcyT0M5c1QtNg?oc=5",
+   "published": "2026-06-20T11:21:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "L'ex presidente della Fed avverte di un grave rischio che potrebbe far deragliare questo mercato rialzista - Yahoo Finanza"
   },
   {
    "source": "CNBC",
