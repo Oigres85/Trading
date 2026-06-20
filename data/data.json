@@ -1,15 +1,15 @@
 {
- "updated_at": "2026-06-20T09:00:55Z",
+ "updated_at": "2026-06-20T10:23:16Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
-  "usd_gain": 129865.63,
-  "usd_gain_pct": 152.82,
+  "usd_gain": 130277.63,
+  "usd_gain_pct": 154.05,
   "eur_value": 228647.9,
-  "eur_gain": 114555.09,
-  "eur_gain_pct": 100.41,
-  "tax_est": 29605.42,
-  "eur_gain_net": 84949.67
+  "eur_gain": 114914.31,
+  "eur_gain_pct": 101.04,
+  "tax_est": 29698.81,
+  "eur_gain_net": 85215.5
  },
  "portfolio": [
   {
@@ -702,7 +702,7 @@
    "stats": {
     "market_cap": 5103122644992.0,
     "shares": 24221000000.0,
-    "float_shares": 23225466000.0,
+    "float_shares": 23225224000.0,
     "float_pct": 95.9,
     "avg_volume_30d": 162813875.0,
     "pe_ttm": 32.2649,
@@ -716,13 +716,13 @@
     "profit_margin": 0.6297,
     "roe": 1.1429,
     "debt_to_equity": 6.555,
-    "dividend_yield": null,
+    "dividend_yield": 0.47,
     "price_to_book": 26.1078,
     "target_mean": 298.9322,
     "fcf": 46335873024.0,
     "gross_margin": 0.7414,
-    "enterprise_value": 4978963906560.0,
-    "ev_ebitda": 30.082,
+    "enterprise_value": 5058340061184.0,
+    "ev_ebitda": 30.561,
     "peg": 0.65,
     "roa": 0.5273
    },
@@ -1724,7 +1724,7 @@
    "currency": "USD",
    "price": 1133.99,
    "change_pct": 8.7,
-   "pe": 53.4,
+   "pe": 53.5,
    "ath": 1149.43,
    "ath_dist_pct": -1.3,
    "support": 732.2,
@@ -2565,7 +2565,7 @@
     "upside_pct": -16.6
    },
    "health": 89,
-   "eps": 21.23,
+   "eps": 21.21,
    "beta": 2.17,
    "prepost": {
     "label": "after",
@@ -2576,13 +2576,13 @@
    "stats": {
     "market_cap": 1278839095296.0,
     "shares": 1127734051.0,
-    "float_shares": 1123572712.0,
+    "float_shares": 1123550158.0,
     "float_pct": 99.6,
     "avg_volume_30d": 50692645.0,
-    "pe_ttm": 53.4145,
-    "forward_pe": 9.8961,
-    "eps_ttm": 21.23,
-    "eps_forward": 114.5898,
+    "pe_ttm": 53.4649,
+    "forward_pe": 9.6138,
+    "eps_ttm": 21.21,
+    "eps_forward": 117.9539,
     "revenue_fy": 58119000064.0,
     "net_income_fy": 24110999552.0,
     "revenue_growth": 1.963,
@@ -2590,13 +2590,13 @@
     "profit_margin": 0.4149,
     "roe": 0.3982,
     "debt_to_equity": 14.902,
-    "dividend_yield": null,
+    "dividend_yield": 0.05,
     "price_to_book": 17.6532,
     "target_mean": 945.6,
     "fcf": 2893499904.0,
     "gross_margin": 0.5844,
-    "enterprise_value": 1147354873856.0,
-    "ev_ebitda": 31.176,
+    "enterprise_value": 1275048099840.0,
+    "ev_ebitda": 34.645,
     "peg": 0.36,
     "roa": 0.2014
    },
@@ -3371,8 +3371,8 @@
     "target_mean": 351.5385,
     "fcf": -8699502592.0,
     "gross_margin": 0.6811,
-    "enterprise_value": 58073595904.0,
-    "ev_ebitda": -4.151,
+    "enterprise_value": 54470991872.0,
+    "ev_ebitda": -3.893,
     "peg": 2.85,
     "roa": -0.1781
    },
@@ -3928,10 +3928,10 @@
    ],
    "fin_health": 1,
    "qty": 515,
-   "pmc": 27.3,
+   "pmc": 26.5,
    "value": 11000.4,
-   "gain": -3059.1,
-   "gain_pct": -21.76
+   "gain": -2647.1,
+   "gain_pct": -19.4
   },
   {
    "ticker": "BTP-V28",
@@ -4815,8 +4815,8 @@
     "target_mean": 294.0,
     "fcf": -622919744.0,
     "gross_margin": 0.3903,
-    "enterprise_value": 12643158016.0,
-    "ev_ebitda": -113.485,
+    "enterprise_value": 13923764224.0,
+    "ev_ebitda": -124.98,
     "peg": null,
     "roa": -0.053
    },
@@ -6470,16 +6470,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63381.6,
-   "change_pct": -0.25,
+   "price": 63570.8,
+   "change_pct": 0.05,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.8,
+   "ath_dist_pct": -49.6,
    "support": 59108.92,
    "resistance": 74153.5,
-   "rsi": 35.9,
-   "volume": 20653115392,
-   "vol_ratio": 0.63,
+   "rsi": 36.5,
+   "volume": 19877105664,
+   "vol_ratio": 0.61,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6488,7 +6488,7 @@
      65600.64,
      64418.45,
      63540.84,
-     63381.6
+     63570.8
     ],
     "m6": [
      69767.62,
@@ -6616,7 +6616,7 @@
      65600.64,
      64418.45,
      63540.84,
-     63381.6
+     63570.8
     ],
     "all": [
      386.94,
@@ -6760,7 +6760,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63381.6
+     63570.8
     ],
     "m1": [
      73372.52,
@@ -6784,7 +6784,7 @@
      65600.64,
      64418.45,
      63540.84,
-     63381.6
+     63570.8
     ],
     "m3": [
      74805.08,
@@ -6852,7 +6852,7 @@
      65600.64,
      64418.45,
      63540.84,
-     63381.6
+     63570.8
     ],
     "y1": [
      103309.6,
@@ -6984,7 +6984,15 @@
      63417.99,
      63390.07,
      63347.99,
-     63381.6
+     63392.36,
+     63455.41,
+     63504.0,
+     63547.59,
+     63638.15,
+     63669.73,
+     63661.66,
+     63622.18,
+     63570.8
     ]
    },
    "earnings_date": null,
@@ -6999,22 +7007,22 @@
     "w1": {
      "support": 62275.58,
      "resistance": 67248.13,
-     "change_pct": -4.39
+     "change_pct": -4.1
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74218.56,
-     "change_pct": -13.62
+     "change_pct": -13.36
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -15.27
+     "change_pct": -15.02
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -42.8
+     "change_pct": -42.63
     }
    },
    "financials": [],
@@ -9535,7 +9543,7 @@
    "currency": "USD",
    "price": 400.49,
    "change_pct": 1.04,
-   "pe": 367.4,
+   "pe": 370.8,
    "ath": 498.83,
    "ath_dist_pct": -19.7,
    "support": 380.15,
@@ -10071,7 +10079,7 @@
     "upside_pct": 5.0
    },
    "health": 38,
-   "eps": 1.09,
+   "eps": 1.08,
    "beta": 1.8,
    "prepost": {
     "label": "after",
@@ -10082,12 +10090,12 @@
    "stats": {
     "market_cap": 1504129843200.0,
     "shares": 3755723871.0,
-    "float_shares": 2815891530.0,
+    "float_shares": 2815853972.0,
     "float_pct": 75.0,
     "avg_volume_30d": 58082137.0,
-    "pe_ttm": 367.422,
+    "pe_ttm": 370.824,
     "forward_pe": 160.1992,
-    "eps_ttm": 1.09,
+    "eps_ttm": 1.08,
     "eps_forward": 2.5,
     "revenue_fy": 97878999040.0,
     "net_income_fy": 3862000128.0,
@@ -10101,8 +10109,8 @@
     "target_mean": 420.5463,
     "fcf": 5251999744.0,
     "gross_margin": 0.1906,
-    "enterprise_value": 1491624263680.0,
-    "ev_ebitda": 134.453,
+    "enterprise_value": 1475962863616.0,
+    "ev_ebitda": 133.042,
     "peg": 5.72,
     "roa": 0.0223
    },
@@ -11283,7 +11291,7 @@
    "stats": {
     "market_cap": 4490912595968.0,
     "shares": 5867155790.0,
-    "float_shares": 10822859320.0,
+    "float_shares": 10822738160.0,
     "float_pct": 184.5,
     "avg_volume_30d": 29821472.0,
     "pe_ttm": 28.0939,
@@ -11302,8 +11310,8 @@
     "target_mean": 432.8345,
     "fcf": 27921750016.0,
     "gross_margin": 0.6037,
-    "enterprise_value": 4491333074944.0,
-    "ev_ebitda": 27.842,
+    "enterprise_value": 4428087689216.0,
+    "ev_ebitda": 27.45,
     "peg": 1.45,
     "roa": 0.1464
    },
@@ -11936,7 +11944,7 @@
      262.81,
      273.93,
      265.04,
-     273.24,
+     273.25,
      282.06,
      281.36,
      276.51,
@@ -12204,7 +12212,7 @@
     "upside_pct": 2.2
    },
    "health": 76,
-   "eps": 13.29,
+   "eps": 13.27,
    "beta": 0.65,
    "prepost": {
     "label": "after",
@@ -12215,13 +12223,13 @@
    "stats": {
     "market_cap": 364129550336.0,
     "shares": 908144404.0,
-    "float_shares": 905438134.0,
+    "float_shares": 905429052.0,
     "float_pct": 99.7,
     "avg_volume_30d": 7842764.0,
-    "pe_ttm": 30.1701,
-    "forward_pe": 19.1832,
-    "eps_ttm": 13.29,
-    "eps_forward": 20.9016,
+    "pe_ttm": 30.2155,
+    "forward_pe": 19.1567,
+    "eps_ttm": 13.27,
+    "eps_forward": 20.9305,
     "revenue_fy": 449713012736.0,
     "net_income_fy": 12044000256.0,
     "revenue_growth": 0.02,
@@ -12229,13 +12237,13 @@
     "profit_margin": 0.0268,
     "roe": 0.1218,
     "debt_to_equity": 73.982,
-    "dividend_yield": null,
+    "dividend_yield": 2.31,
     "price_to_book": 3.7195,
     "target_mean": 409.7692,
     "fcf": 17687500800.0,
     "gross_margin": 0.188,
-    "enterprise_value": 424331051008.0,
-    "ev_ebitda": 19.769,
+    "enterprise_value": 418255568896.0,
+    "ev_ebitda": 19.486,
     "peg": 1.39,
     "roa": 0.0378
    },
@@ -12907,7 +12915,7 @@
      147.52,
      137.6,
      136.37,
-     130.77,
+     130.76,
      147.85,
      161.13,
      165.17,
@@ -13136,7 +13144,7 @@
     "upside_pct": 5.2
    },
    "health": 87,
-   "eps": 20.89,
+   "eps": 20.88,
    "beta": 1.0,
    "prepost": {
     "label": "after",
@@ -13147,13 +13155,13 @@
    "stats": {
     "market_cap": 871430684672.0,
     "shares": 2679511418.0,
-    "float_shares": 2665256417.0,
+    "float_shares": 2665149237.0,
     "float_pct": 99.5,
     "avg_volume_30d": 9008248.0,
-    "pe_ttm": 15.5682,
-    "forward_pe": 13.8191,
-    "eps_ttm": 20.89,
-    "eps_forward": 23.5341,
+    "pe_ttm": 15.5757,
+    "forward_pe": 13.8006,
+    "eps_ttm": 20.88,
+    "eps_forward": 23.5657,
     "revenue_fy": 173559005184.0,
     "net_income_fy": 57512001536.0,
     "revenue_growth": 0.127,
@@ -13161,12 +13169,12 @@
     "profit_margin": 0.3394,
     "roe": 0.1647,
     "debt_to_equity": null,
-    "dividend_yield": null,
+    "dividend_yield": 1.84,
     "price_to_book": 2.5333,
     "target_mean": 342.0,
     "fcf": null,
     "gross_margin": 0.0,
-    "enterprise_value": 646197411840.0,
+    "enterprise_value": 630334685184.0,
     "ev_ebitda": null,
     "peg": 1.73,
     "roa": 0.0127
@@ -14079,7 +14087,7 @@
    "stats": {
     "market_cap": 117806481408.0,
     "shares": 230563608.0,
-    "float_shares": 197606846.0,
+    "float_shares": 197604540.0,
     "float_pct": 85.7,
     "avg_volume_30d": 1358396.0,
     "pe_ttm": 24.7673,
@@ -14093,13 +14101,13 @@
     "profit_margin": 0.0638,
     "roe": 0.6764,
     "debt_to_equity": 276.365,
-    "dividend_yield": null,
+    "dividend_yield": 2.7,
     "price_to_book": 15.6921,
     "target_mean": 625.1579,
     "fcf": 3987124992.0,
     "gross_margin": 0.0991,
-    "enterprise_value": 142373568512.0,
-    "ev_ebitda": 17.808,
+    "enterprise_value": 136609472512.0,
+    "ev_ebitda": 17.087,
     "peg": 1.08,
     "roa": 0.0723
    },
@@ -14444,7 +14452,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 47
+     "score": 51
     }
    ]
   },
@@ -14903,43 +14911,11 @@
   },
   {
    "question": "Bitcoin Up or Down on June 20?",
-   "yes": 72,
+   "yes": 88,
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-june-20-2026"
-  },
-  {
-   "question": "Will there be no change in Fed interest rates after the July 2026 meeting?",
-   "yes": 74,
-   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting"
   }
  ],
  "news": [
-  {
-   "source": "Investing.com",
-   "title": "IRGC set to benefit from Iran sanctions relief under U.S. deal - Reuters",
-   "link": "https://www.investing.com/news/economy-news/irgc-set-to-benefit-from-iran-sanctions-relief-under-us-deal--reuters-4751600",
-   "published": "2026-06-20T05:11:05Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "L'IRGC trarrà vantaggio dall'allentamento delle sanzioni iraniane in base all'accordo statunitense - Reuters"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Why is the US more exuberant than China?",
-   "link": "https://www.investing.com/news/economy-news/why-is-the-us-more-exuberant-than-china-4751599",
-   "published": "2026-06-20T04:02:56Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Perché gli Stati Uniti sono più esuberanti della Cina?"
-  },
   {
    "source": "Investing.com",
    "title": "Russia stocks lower at close of trade; MOEX Russia Index down 1.04%",
@@ -15038,6 +15014,60 @@
   },
   {
    "source": "Google News",
+   "title": "Trump Wanted Lower Rates, But Warsh's Federal Reserve Might Hike Them (NYSEARCA:SPY) - Seeking Alpha",
+   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxONUZ3VGhzZmlHdk5NNXZfSmhUOFhZMlJ6TjhFVFpwTy1XQm82ZWFCcDFKQUZNNURnd0U2MGItdkt0ZGczLXRxSnRlSmFQaW85NkVXclFfT0M3MkkxR3pzSERJYkVGdzRjQ3V2RWNoTk53WU5mVW9reDFUS0ViOFBRc0o4ZjVnZ19PNU5LOFJfUG94VTZZZVZFOVdBYUlnTHBlMjhLV2dQVmozZUNH?oc=5",
+   "published": "2026-06-20T10:15:59Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump voleva tassi più bassi, ma la Federal Reserve di Warsh potrebbe aumentarli (NYSEARCA:SPY) - Seeking Alpha"
+  },
+  {
+   "source": "Google News",
+   "title": "Who is inflation hurting the most? Fed data shows which Oklahoma populations hardest hit - The Oklahoman",
+   "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNTFNVLUhsYkVDT0IxM0xsdTNpSW8td2ZHMWl4WFFIaGdLNzdwMGFrY001NGpLbF9YR1B2UTNpU0YzZTBjS19ubnFXb0piamxLS2RKczh2dG1oX3BOY0RQakI5cTNtSVdjVjlkOE83SVN4LVN1SjBzaGNsdWxJYTQxRjY1LUY3ckVHalNVVm5QeFlMU3ZLTnIwYXhuVUwtNFp4b2liOTZOTHJQcGZMNDBqaWZzOGIxekpUXzFOYjU2TGlBYWE1Z3dPYXhEYlJiWHdxbzlB?oc=5",
+   "published": "2026-06-20T10:15:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Chi sta danneggiando di più l’inflazione? I dati della Fed mostrano quali sono le popolazioni dell'Oklahoma più colpite: gli Oklahoman"
+  },
+  {
+   "source": "AP",
+   "title": "Fighting persists in Lebanon despite a ceasefire as the US-Iran deal is under threat - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOZU83bXR0RDhtTHExa0dVVFJOTWlvNS1DMVM0WUdqX0JyNWQ0RnRTcUNzQlkzR2xtWDdnTVA0NEt3NDVMZXBZcl83X2lEVU9jRktXNlc4SjhKMWMxRUZidDJvdDBreDZLbmpsRklMU01GNkJiYVJVWnhyZnlzUkFhYzY1VFdtUjRUbTh6aHlCVkFQUGttSU44TDBWVDZZTlRJbUhTY3JzRHA?oc=5",
+   "published": "2026-06-20T09:40:32Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "I combattimenti continuano in Libano nonostante il cessate il fuoco mentre l’accordo USA-Iran è in pericolo – AP News"
+  },
+  {
+   "source": "CNBC",
+   "title": "Massive bonuses for South Korea's chip workers puts central bank on inflation alert",
+   "link": "https://www.cnbc.com/2026/06/20/south-korea-tech-samsung-sk-hynix-bonus-bank-of-korea.html",
+   "published": "2026-06-20T08:59:40Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "I massicci bonus per i lavoratori dei chip della Corea del Sud mettono la banca centrale in allerta sull’inflazione"
+  },
+  {
+   "source": "Google News",
    "title": "NFP Report Puts Fed Policy and Gold Price Outlook in Focus - equiti.com",
    "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBHNUExN2hzdVFMNUJtU1g0VXd3WGN5SU9oU0RLbkg3aTVPZHFGVXNSeFZ3eTRxeTdoR2d3NHZkN01CcDdSSk9Wb1piV0FfWUIyRWpLMUl5Umx5d25JVE5tT1R4dnBidU0xalpXX25hVU9KTVJwSEc4ZQ?oc=5",
    "published": "2026-06-20T07:17:22Z",
@@ -15066,7 +15096,7 @@
    "source": "Reuters",
    "title": "Iranian Guards' business empire to win big if U.S. sanctions lifted - Reuters",
    "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQeTVOWlpubWVJN3A4Rl9Wai1TNWRycWQwS1RrbXJCQndDZXIxaklsWV9idkhkRXI2SmN6cldIelBCNGVJNVNYWXhmUjNzeUx1VWhDbkNTdVJLNmwweUtzNmpobW5DSHNVc1BQM2xTc3plMzBpNVV6akI2X1AtVGkyN1l1Q0VIanZGNkctczJvSFM0WEtTdnZmNFlLdWg2LTVtUUxYTC00aEs0cG5qcERYSXBya1Y4dw?oc=5",
-   "published": "2026-06-20T03:08:00Z",
+   "published": "2026-06-20T03:40:04Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -15160,20 +15190,6 @@
    "title_it": "Dimenticate la pausa della Fed di giugno: Citadel avverte che gli \"effetti del secondo round\" imporranno un rialzo dei tassi a settembre - Sahm"
   },
   {
-   "source": "Google News",
-   "title": "Mortgage rates dip after Iran peace deal but Fed signals caution - MSN",
-   "link": "https://news.google.com/rss/articles/CBMirAJBVV95cUxQbEtWRjNxajh6R055cVBNaDFtLXR3bTh0NHhRVkZpZWV3UnpIVGNSM2lrbUpLTUliSVNKeU9fcDVISlJ2U1I2YUVzVDNORlR5NE45b3c4cWUzZHk5am9oZWVuV0lFb1BDWG91MUI5SWVlSGU2U0FId1BFTENVcEREd051VUlRRGFVamhwS0M4cndJM0FMSHdqODg4ejUyY3JsYmt0dXZBV2ZXcmZxRGo4VnZudDFmWHlyc04zZ0E0SVBFNG1FbmNxOGtqc1duYVczcFpHVzZWU21yWGhONC11c3BKTUkycHRjblBCdjVPRzhvXzNINUNhNFdYem5nVzdmSFZKV01ZRVNjcnNiOFFQcFlMM1VlbGxhUjlFeEE2YlllZFVVa3NERUVycXY?oc=5",
-   "published": "2026-06-19T21:25:14Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I tassi ipotecari scendono dopo l'accordo di pace con l'Iran, ma la Fed segnala cautela - MSN"
-  },
-  {
    "source": "CNBC",
    "title": "Trump tells Axios he no longer views Anthropic as a national security threat",
    "link": "https://www.cnbc.com/2026/06/19/trump-tells-axios-he-no-longer-views-anthropic-as-national-security-threat.html",
@@ -15202,20 +15218,6 @@
    "title_it": "Cresce l’attrito tra Trump e i senatori repubblicani prima delle cruciali elezioni di medio termine – AP News"
   },
   {
-   "source": "AP",
-   "title": "Israel and Hezbollah agree to halt fighting, officials say, as US-Iran talks hang in the balance - AP News",
-   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNdDdtMWZ0SDdDbThCNEFjb2p2aE5QVFhETEFOT0RyUG9MaHlta2VNWWpjWE1sOFNEM3pYOE9NYkhRM2x3d0hnYzRQZ2F6eG5zSl9aZEpHd0xaRFR6LTFfNHFKdFBWVXdZSTNMMVZOY3RaZmVjRVZ0T0ZYVEZvWU8xZDBtdk5OMGpMaFhOR3RKU3MyUHFQU3NmMzluUFlFaDBD?oc=5",
-   "published": "2026-06-19T18:08:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Israele e Hezbollah concordano di fermare i combattimenti, dicono i funzionari, mentre i colloqui tra Stati Uniti e Iran sono in bilico - AP News"
-  },
-  {
    "source": "Bloomberg",
    "title": "Canada Imposes Temporary 10% Tariff on Canned Vegetables",
    "link": "https://news.google.com/search?q=Canada%20Imposes%20Temporary%2010%25%20Tariff%20on%20Canned%20Vegetables",
@@ -15242,20 +15244,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Trump si dirige a Camp David mentre i colloqui sull'Iran vacillano - Reuters"
-  },
-  {
-   "source": "Reuters",
-   "title": "Iran to lodge FIFA complaint over World Cup travel restrictions - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPR1VYU082ZUFSeVhJV1cwcWhtajVlaWVxc1ViSFhOS0wwXzRfazlXNkxUbGtqMGZOa0FZVEFQWFZ6bktXc2o0OERiMDVrVnJuWGlSUEZvSHg1ZjVJczlBU0VpMzVob1p2anJRWTVhUnVXQWpRX041Q25GLW5SVmFiYjc3aDFVaFlSdF9EbHd2NGtEdm5URVBZckZXeGIwdWFvOTYzQ2FuUUxtdUFwTFdr?oc=5",
-   "published": "2026-06-19T17:36:19Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'Iran presenterà reclamo alla FIFA per le restrizioni ai viaggi ai Mondiali - Reuters"
   },
   {
    "source": "MarketWatch",
@@ -15437,23 +15425,10 @@
    "title_it": "Cosa pensano gli americani della gestione dell’Iran da parte di Trump, secondo un nuovo sondaggio AP-NORC – AP News"
   },
   {
-   "source": "Google News",
-   "title": "Kevin Warsh’s First Fed Meeting Sinks Elizabeth Warren’s ‘Sock Puppet’ Complaint - 24/7 Wall St.",
-   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOYUwtUzRDZlF4TXBYQmZibzlUVmtzbzRYa2dMa2I3dHJMYVFIbnhBUnAwYXhVVDdyYURpZmhlaGlxNUxCRVhoMHdMV1VuMnY4ZVJiYU5sQ3J4NVAtdHhVUFFkOXZ2cmlPT2lWQ01jVzNYcVh5eXNCZ1dPQVJQajV2QXpGSERlUERYUWJSREhCWkh0WTBDMVdMd244S3I4XzVGejNFcDBXWVhmNk5aVUlRTlNjZGwzS0RzSjlPMQ?oc=5",
-   "published": "2026-06-19T11:51:50Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il primo incontro della Fed di Kevin Warsh affonda la denuncia del \"calzino burattino\" di Elizabeth Warren - 24 ore su 24, 7 giorni su 7 Wall St."
-  },
-  {
-   "source": "CNBC",
-   "title": "Russia threatens escalation after Ukraine hits Moscow with largest-ever drone attack",
-   "link": "https://www.cnbc.com/2026/06/19/russia-ukraine-moscow-drone-attack-trump.html",
-   "published": "2026-06-19T10:25:57Z",
+   "source": "Reuters",
+   "title": "Iran to lodge FIFA complaint over World Cup travel restrictions - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPR1VYU082ZUFSeVhJV1cwcWhtajVlaWVxc1ViSFhOS0wwXzRfazlXNkxUbGtqMGZOa0FZVEFQWFZ6bktXc2o0OERiMDVrVnJuWGlSUEZvSHg1ZjVJczlBU0VpMzVob1p2anJRWTVhUnVXQWpRX041Q25GLW5SVmFiYjc3aDFVaFlSdF9EbHd2NGtEdm5URVBZckZXeGIwdWFvOTYzQ2FuUUxtdUFwTFdr?oc=5",
+   "published": "2026-06-19T11:43:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -15461,74 +15436,61 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "La Russia minaccia un’escalation dopo che l’Ucraina ha colpito Mosca con il più grande attacco di droni mai visto"
+   "title_it": "L'Iran presenterà reclamo alla FIFA per le restrizioni ai viaggi ai Mondiali - Reuters"
   },
   {
    "source": "Yahoo Finance",
-   "title": "Gulf airlines get back to business as flights near pre-war levels",
-   "link": "https://finance.yahoo.com/economy/articles/gulf-airlines-back-business-flights-050241025.html",
-   "published": "2026-06-19T05:02:41Z",
+   "title": "Hotels poised to benefit from Iran deal",
+   "link": "https://finance.yahoo.com/real-estate/articles/hotels-poised-benefit-iran-deal-084039121.html",
+   "published": "2026-06-19T08:40:39Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bear",
-   "title_it": "Le compagnie aeree del Golfo tornano in attività con voli vicini ai livelli prebellici"
+   "sentiment": "neutral",
+   "title_it": "Gli hotel sono pronti a beneficiare dell’accordo con l’Iran"
   },
   {
    "source": "Yahoo Finance",
-   "title": "World shares are mixed and US futures fall after a tech-led rally on Wall St",
-   "link": "https://finance.yahoo.com/markets/world-indices/articles/asian-shares-retreat-thin-holiday-045615863.html",
-   "published": "2026-06-19T04:56:15Z",
+   "title": "Why Veralto (VLTO) Has a Liquid-Cooling Reliability Angle Through ChemTreat’s Dow Partnership",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/why-veralto-vlto-liquid-cooling-081408872.html",
+   "published": "2026-06-19T08:14:08Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Le azioni mondiali sono contrastanti e i futures statunitensi crollano dopo il rally trainato dal settore tecnologico a Wall Street"
+   "title_it": "Perché Veralto (VLTO) ha un angolo di affidabilità del raffreddamento a liquido attraverso la partnership Dow di ChemTreat"
   },
   {
    "source": "Yahoo Finance",
-   "title": "Oil falls as supply moves through Strait of Hormuz after Iran war pact",
-   "link": "https://finance.yahoo.com/energy/articles/oil-falls-supply-starts-moving-015329773.html",
-   "published": "2026-06-19T03:55:55Z",
+   "title": "India Isn’t Rushing Back to Middle Eastern Oil Despite Hormuz Reopening",
+   "link": "https://finance.yahoo.com/energy/articles/india-isn-t-rushing-back-080000672.html",
+   "published": "2026-06-19T08:00:00Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bear",
-   "title_it": "Il petrolio crolla mentre l’offerta si sposta attraverso lo Stretto di Hormuz dopo il patto di guerra con l’Iran"
+   "sentiment": "neutral",
+   "title_it": "L’India non torna di corsa al petrolio mediorientale nonostante la riapertura di Hormuz"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Walmart’s Sam’s Club Faces Food Safety Scrutiny in China, Reuters Reports",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/walmart-sam-club-faces-food-034852213.html",
-   "published": "2026-06-19T03:48:52Z",
+   "source": "Investing.com",
+   "title": "Bitcoin rebounds above $63,000 as traders assess regulatory developments",
+   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-rebounds-above-63000-as-traders-assess-regulatory-developments-4751609",
+   "published": "2026-06-20T09:01:53Z",
    "tickers": [
-    "MACRO"
+    "BTC-USD"
    ],
-   "topic_pri": 0,
-   "inv": false,
+   "topic_pri": 2,
+   "inv": true,
    "sentiment": "neutral",
-   "title_it": "Il Sam's Club di Walmart deve affrontare un controllo sulla sicurezza alimentare in Cina, riferisce Reuters"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Is Advanced Micro Devices (AMD) One of the Top 10 Dividend Stocks to Buy According to Reddit?",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/advanced-micro-devices-amd-one-035536885.html",
-   "published": "2026-06-19T03:55:36Z",
-   "tickers": [
-    "AMD"
-   ],
-   "topic_pri": 1,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Advanced Micro Devices (AMD) è uno dei 10 migliori titoli azionari da acquistare secondo Reddit?"
+   "title_it": "Bitcoin rimbalza sopra i 63.000 dollari mentre i trader valutano gli sviluppi normativi"
   },
   {
    "source": "Investing.com",
@@ -15544,24 +15506,11 @@
    "title_it": "Bitcoin si ferma sotto la resistenza di 65.000$: livelli live"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "JPMorgan Chase & Co. (JPM) – Among the Top 10 Dividend Stocks to Buy According to Reddit",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/jpmorgan-chase-co-jpm-among-035337364.html",
-   "published": "2026-06-19T03:53:37Z",
-   "tickers": [
-    "JPM"
-   ],
-   "topic_pri": 2,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "JPMorgan Chase & Co. (JPM) – Tra i 10 migliori titoli azionari da acquistare secondo Reddit"
-  },
-  {
    "source": "Polymarket",
    "title": "Fed rate hike in 2026?",
    "title_it": "Fed rate hike in 2026? — probabilità Sì 66%",
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026",
-   "published": "2026-06-20T09:01:42Z",
+   "published": "2026-06-20T10:23:49Z",
    "tickers": [
     "MACRO"
    ],
@@ -15570,20 +15519,9 @@
   {
    "source": "Polymarket",
    "title": "Bitcoin Up or Down on June 20?",
-   "title_it": "Bitcoin Up or Down on June 20? — probabilità Sì 72%",
+   "title_it": "Bitcoin Up or Down on June 20? — probabilità Sì 88%",
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-june-20-2026",
-   "published": "2026-06-20T09:01:42Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
-   "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 74%",
-   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-06-20T09:01:42Z",
+   "published": "2026-06-20T10:23:49Z",
    "tickers": [
     "MACRO"
    ],
