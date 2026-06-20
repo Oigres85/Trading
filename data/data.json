@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-20T17:25:09Z",
+ "updated_at": "2026-06-20T17:27:51Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6470,7 +6470,7 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 63840.51,
+   "price": 63840.15,
    "change_pct": 0.47,
    "pe": null,
    "ath": 126198.07,
@@ -6478,8 +6478,8 @@
    "support": 59108.92,
    "resistance": 74153.5,
    "rsi": 38.9,
-   "volume": 18227867648,
-   "vol_ratio": 0.56,
+   "volume": 18073481216,
+   "vol_ratio": 0.55,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6488,7 +6488,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63840.51
+     63840.15
     ],
     "m6": [
      69767.62,
@@ -6616,7 +6616,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63840.51
+     63840.15
     ],
     "all": [
      386.94,
@@ -6760,7 +6760,7 @@
      68233.31,
      76304.32,
      73579.69,
-     63840.51
+     63840.15
     ],
     "m1": [
      73372.52,
@@ -6784,7 +6784,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63840.51
+     63840.15
     ],
     "m3": [
      74805.08,
@@ -6852,7 +6852,7 @@
      65600.64,
      62896.47,
      63540.84,
-     63840.51
+     63840.15
     ],
     "y1": [
      103309.6,
@@ -7034,7 +7034,7 @@
      63955.66,
      63893.83,
      63884.7,
-     63840.51
+     63842.59
     ]
    },
    "earnings_date": null,
@@ -11920,7 +11920,7 @@
      70.77,
      78.29,
      81.27,
-     83.29,
+     83.3,
      87.88,
      93.98,
      97.83,
@@ -11987,7 +11987,7 @@
      262.81,
      273.93,
      265.04,
-     273.24,
+     273.25,
      282.06,
      281.36,
      276.51,
@@ -13344,7 +13344,7 @@
      652.88,
      656.65,
      639.92,
-     634.12,
+     634.11,
      650.37,
      672.3,
      663.48,
@@ -15262,7 +15262,7 @@
     153058,
     154980,
     154532,
-    157101,
+    157100,
     156807,
     155640,
     157005,
@@ -15561,7 +15561,7 @@
     173883,
     175594,
     176934,
-    175032,
+    175031,
     174870,
     174089,
     173138,
@@ -15601,7 +15601,7 @@
     188244,
     186492,
     183172,
-    180141,
+    180140,
     186461,
     191516,
     192567,
@@ -15820,7 +15820,7 @@
     153263,
     160434,
     166937,
-    163245,
+    163244,
     169543,
     157386,
     148131,
@@ -16207,7 +16207,7 @@
     86802,
     89516,
     86851,
-    84957,
+    84956,
     89287,
     87359,
     91133,
@@ -16590,7 +16590,7 @@
     153263,
     160434,
     166937,
-    163245,
+    163244,
     169543,
     157386,
     148131,
@@ -16977,7 +16977,7 @@
     86802,
     89516,
     86851,
-    84957,
+    84956,
     89287,
     87359,
     91133,
@@ -17939,7 +17939,7 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "L’italiana Meloni afferma che Trump ha “totalmente inventato” la storia secondo cui lei gli avrebbe chiesto una foto"
+   "title_it": "L'italiana Meloni afferma che Trump ha \"totalmente inventato\" la storia secondo cui lei gli ha chiesto una foto"
   },
   {
    "source": "Investing.com",
@@ -18213,7 +18213,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'Iran chiude lo stretto di Hormuz per violazione del cessate il fuoco - MEHR - Reuters"
+   "title_it": "L'Iran chiude lo Stretto di Hormuz per violazione del cessate il fuoco - MEHR - Reuters"
   },
   {
    "source": "AP",
@@ -18491,6 +18491,20 @@
    "title_it": "Trump si dirige a Camp David mentre i colloqui sull'Iran vacillano - Reuters"
   },
   {
+   "source": "Reddit",
+   "title": "The market is mispricing the current geopolitical reality: The true bottleneck for the defense sector is not the US election, it is the raw material supply chain.",
+   "link": "https://www.reddit.com/r/investing/comments/1ua6gn4/the_market_is_mispricing_the_current_geopolitical/",
+   "published": "2026-06-19T16:23:02Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il mercato sta valutando erroneamente l’attuale realtà geopolitica: il vero collo di bottiglia per il settore della difesa non sono le elezioni americane, ma la catena di approvvigionamento delle materie prime."
+  },
+  {
    "source": "Investing.com",
    "title": "Bitcoin rebounds above $63,000 as traders assess regulatory developments",
    "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-rebounds-above-63000-as-traders-assess-regulatory-developments-4751609",
@@ -18502,19 +18516,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "Bitcoin rimbalza sopra i 63.000 dollari mentre i trader valutano gli sviluppi normativi"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Bitcoin stalls below $65K resistance: Live levels",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-hits-66380-resistance-after-wbottom-breakout-live-levels-93CH-4741296",
-   "published": "2026-06-20T07:01:51Z",
-   "tickers": [
-    "BTC-USD"
-   ],
-   "topic_pri": 2,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Bitcoin si ferma sotto la resistenza di 65.000$: livelli live"
   }
  ]
 }
