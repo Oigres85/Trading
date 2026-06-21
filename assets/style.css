@@ -263,6 +263,10 @@ footer { color: var(--muted); font-size: 11.5px; text-align: center; line-height
 .mini-chart-wrap { margin: 4px 0 8px; }
 .mini-chart-dates { font-size: 11px; color: var(--muted); margin-top: 2px; }
 .mini-chart-legend { font-size: 11px; color: var(--muted); margin-top: 3px; display: flex; gap: 14px; }
+/* righe vista fondamentale: cliccabili → conto economico + statistiche */
+tr.fund-row { cursor: pointer; }
+tr.fund-row:hover td { background: var(--card-2); }
+tr.fund-row:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
 
 /* ---------- ETF bars sopra top-cap ---------- */
 .etf-bars { display: flex; flex-direction: column; gap: 3px; margin-bottom: 4px; }

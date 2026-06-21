@@ -1677,7 +1677,7 @@ function buildFundTable(list, tableSel, withQtyPmc) {
     const fcfWarn = (st.fcf != null && st.net_income_fy != null && st.fcf < st.net_income_fy * 0.6)
       ? ` <span class="warn-flag" title="FCF molto inferiore all'utile: verifica la qualità degli utili">!</span>` : "";
     const roeCls = st.roe == null ? "" : st.roe >= 0.15 ? "text-premium" : st.roe < 0 ? "neg" : "";
-    return `<tr>${lead}
+    return `<tr class="fund-row" data-fund-tk="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per conto economico e statistiche">${lead}
       <td class="num">${bigUsd(st.market_cap)}</td>
       <td class="num">${st.ev_ebitda != null ? fmtNum.format(st.ev_ebitda) : "—"}</td>
       <td class="num">${colorCell(pctOf(st.roe), roeCls)}</td>
@@ -2250,8 +2250,16 @@ $("#market-direction").addEventListener("click", () => {
 document.addEventListener("click", e => {
   const fh = e.target.closest(".fin-health");
   if (fh) { openFinancialsModal(fh.dataset.fin); return; }
+  const fr = e.target.closest(".fund-row");            // riga vista fondamentale → conto economico + statistiche
+  if (fr) { openFinancialsModal(fr.dataset.fundTk); return; }
   const sc = e.target.closest(".stat-cell");           // click su una metrica → spiegazione
   if (sc) { toast(sc.dataset.info); }
+});
+// accessibilità: Invio/Spazio sulla riga fondamentale aprono il dettaglio
+document.addEventListener("keydown", e => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const fr = e.target.closest && e.target.closest(".fund-row");
+  if (fr) { e.preventDefault(); openFinancialsModal(fr.dataset.fundTk); }
 });
 
 // due barre range (sopra portafoglio e sopra watchlist) sincronizzate
