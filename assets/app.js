@@ -384,10 +384,11 @@ function renderAll() {
   renderTable();
   if (ptfView === "fund") renderFundTable();
   renderWatchlist();
+  if (wlView === "fund") renderWlFundTable();
   renderGauges();
   renderMacro();
+  renderPortfolioHealth();
   renderMiniCards();
-  renderSectorRotation();
   renderTopCaps();
   renderNews();
   renderBtpInfo();
@@ -487,56 +488,72 @@ function perfColor(p) {
   return scoreColor(clamp(50 + p * 5));
 }
 
-function renderSectorRotation() {
-  const tilt = (DATA.macro || {}).tilt || [];
-  const hm = $("#rotation-heatmap"), hi = $("#rotation-hist");
-  if (!hm || !hi) return;
-  if (!tilt.length) { hm.innerHTML = '<div class="muted">Dati rotazione non disponibili</div>'; hi.innerHTML = ""; return; }
-  // heatmap raggruppata per gruppo (Settori / Tematici / Materie prime)
-  const groups = {};
-  tilt.forEach(s => { (groups[s.group || "Settori"] = groups[s.group || "Settori"] || []).push(s); });
-  hm.innerHTML = Object.entries(groups).map(([g, arr]) => `
-    <div class="rot-group">
-      <div class="rot-group-title">${esc(g)}</div>
-      <div class="rot-tiles">${arr.sort((a, b) => b.m1 - a.m1).map(s => `
-        <div class="rot-tile" style="background:${perfColor(s.m1)}" title="${esc(s.name)} (${s.ticker}) · 1M ${signTxt(s.m1)} · 3M ${signTxt(s.m3)}">
-          <span class="rt-name">${esc(s.name)}</span>
-          <span class="rt-pct">${signTxt(s.m1)}</span>
-        </div>`).join("")}</div>
-    </div>`).join("");
-  // istogramma performance 1M ordinato
-  const sorted = [...tilt].sort((a, b) => b.m1 - a.m1);
-  const maxAbs = Math.max(...sorted.map(s => Math.abs(s.m1)), 1);
-  hi.innerHTML = `<div class="rot-hist-title muted">Performance 1 mese (ETF)</div>` + sorted.map(s => {
-    const w = Math.abs(s.m1) / maxAbs * 100;
-    return `<div class="rot-bar-row">
-      <span class="rot-bar-lab">${esc(s.name)} <span class="tk">${s.ticker}</span></span>
-      <span class="rot-bar-track"><span class="rot-bar-fill" style="width:${w}%;background:${perfColor(s.m1)}"></span></span>
-      <span class="rot-bar-val ${signCls(s.m1)}">${signTxt(s.m1)}</span>
+function avg(a) { return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; }
+
+/* salute del portafoglio = media di TECNICA (titoli) + MACRO (direzione) + FONDAMENTALE (titoli) */
+function portfolioHealthParts() {
+  const m = DATA.macro || {};
+  const parts = [];
+  if (m.thermometer) parts.push(["Tecnica titoli", m.thermometer.score]);
+  const dir = (typeof marketDirectionScore === "function") ? marketDirectionScore() : null;
+  if (dir != null) parts.push(["Macro & mercato", dir]);
+  const fin = (DATA.portfolio || []).map(r => r.fin_health).filter(v => v != null);
+  if (fin.length) parts.push(["Fondamentale titoli", Math.round(avg(fin))]);
+  return parts;
+}
+function portfolioHealthScore() {
+  const p = portfolioHealthParts();
+  return p.length ? Math.round(avg(p.map(x => x[1]))) : null;
+}
+function renderPortfolioHealth() {
+  const box = $("#portfolio-health");
+  if (!box) return;
+  const score = portfolioHealthScore();
+  if (score == null) { box.innerHTML = ""; return; }
+  const lab = score >= 60 ? "Solido" : score <= 40 ? "Da monitorare" : "Equilibrato";
+  const parts = portfolioHealthParts();
+  box.innerHTML = `<span class="popup-dot"></span>
+    <div class="hb-left">
+      <div class="hb-title">Salute del portafoglio</div>
+      <div class="hb-score" style="color:${scoreColor(score)}">${score}/100 · <b>${lab}</b></div>
+      <div class="hb-sub muted">media di tecnica titoli + macro/mercato + fondamentale</div>
+    </div>
+    <div class="hb-right">${thermoBar(score, ["Solido", "Fragile"])}
+      <div class="hb-parts">${parts.map(p => `<span>${esc(p[0])}: <b style="color:${scoreColor(p[1])}">${p[1]}</b></span>`).join("")}</div>
     </div>`;
-  }).join("");
+}
+function openHealthModal() {
+  const score = portfolioHealthScore();
+  if (score == null) return;
+  const parts = portfolioHealthParts();
+  openInfoModal("Salute del portafoglio",
+    `<div class="info-line"><b>Punteggio complessivo:</b> <span style="color:${scoreColor(score)}">${score}/100</span> — media dei tre pilastri.</div>
+     <table class="info-table"><tbody>${parts.map(p =>
+      `<tr><td>${esc(p[0])}</td><td style="min-width:140px">${meterBar(p[1], scoreColor(p[1]), String(p[1]))}</td></tr>`).join("")}</tbody></table>
+     <div class="info-line muted" style="margin-top:8px">Tecnica = RSI/trend/momentum medi dei titoli · Macro = direzione mercato aggregata · Fondamentale = Financial Health medio dei titoli. Verde = favorevole, rosso = rischio.</div>`);
 }
 
-function openRotationModal() {
+// heatmap + istogramma + sintesi della rotazione (mostrati nel popup del widget Tilt)
+function rotationDetailHtml() {
   const tilt = (DATA.macro || {}).tilt || [];
-  if (!tilt.length) return;
-  const byM1 = [...tilt].sort((a, b) => b.m1 - a.m1);
-  const lead = byM1.slice(0, 3), lag = byM1.slice(-3).reverse();
-  const defensives = ["Utilities", "Consumi difens.", "Salute", "Oro"];
-  const defAvg = avg(tilt.filter(s => defensives.includes(s.name)).map(s => s.m1));
-  const tech = tilt.find(s => s.ticker === "XLK");
-  const cyc = tech ? tech.m1 : null;
-  let regime = "—";
-  if (defAvg != null && cyc != null) regime = defAvg > cyc ? "DIFENSIVO (i difensivi battono il Tech → cautela/de-risking)" : "PRO-RISCHIO (i ciclici/Tech guidano)";
-  const oversold = byM1.filter(s => s.m1 <= -5).map(s => s.name);
-  openInfoModal("Analisi rotazione settoriale", `
-    <div class="info-line"><b>Regime attuale:</b> ${regime}</div>
-    <div class="info-line"><b>In momentum (overweight):</b> ${lead.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
-    <div class="info-line"><b>In affanno (underweight):</b> ${lag.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
-    ${oversold.length ? `<div class="info-line"><b>Ipervenduti (-5% 1M):</b> ${oversold.map(esc).join(", ")}</div>` : ""}
-    <div class="info-line muted" style="margin-top:8px">Orientamento calcolato sui momentum 1M/3M degli ETF. Non è consulenza; per un piano operativo usa "Copia prompt AI".</div>`);
+  if (!tilt.length) return "<div class='muted'>Dati rotazione non disponibili</div>";
+  const groups = {};
+  tilt.forEach(s => { (groups[s.group || "Settori"] = groups[s.group || "Settori"] || []).push(s); });
+  const heat = Object.entries(groups).map(([g, arr]) => `
+    <div class="rot-group"><div class="rot-group-title">${esc(g)}</div>
+      <div class="rot-tiles">${arr.sort((a, b) => b.m1 - a.m1).map(s => `
+        <div class="rot-tile" style="background:${perfColor(s.m1)}" title="${esc(s.name)} (${s.ticker}) · 1M ${signTxt(s.m1)} · 3M ${signTxt(s.m3)}">
+          <span class="rt-name">${esc(s.name)}</span><span class="rt-pct">${signTxt(s.m1)}</span></div>`).join("")}</div>
+    </div>`).join("");
+  const sorted = [...tilt].sort((a, b) => b.m1 - a.m1);
+  const maxAbs = Math.max(...sorted.map(s => Math.abs(s.m1)), 1);
+  const hist = sorted.map(s => `<div class="rot-bar-row">
+      <span class="rot-bar-lab">${esc(s.name)} <span class="tk">${s.ticker}</span></span>
+      <span class="rot-bar-track"><span class="rot-bar-fill" style="width:${Math.abs(s.m1) / maxAbs * 100}%;background:${perfColor(s.m1)}"></span></span>
+      <span class="rot-bar-val ${signCls(s.m1)}">${signTxt(s.m1)}</span></div>`).join("");
+  return `<div class="rot-heatmap">${heat}</div>
+    <h4 style="margin:10px 0 4px">Performance 1 mese (ETF)</h4><div class="rot-hist">${hist}</div>`;
 }
-function avg(a) { return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; }
 
 function openMacroQuantModal() {
   const mq = (DATA.macro || {}).macroquant;
@@ -553,14 +570,19 @@ function openMacroQuantModal() {
 function openTiltModal() {
   const tilt = (DATA.macro || {}).tilt;
   if (!tilt || !tilt.length) return;
-  const rows = tilt.map((s, i) => `<tr>
-    <td>${i + 1}. ${esc(s.name)} <span class="muted">${s.ticker}</span></td>
-    <td class="${signCls(s.m1)}">${signTxt(s.m1)}</td>
-    <td class="${signCls(s.m3)}">${signTxt(s.m3)}</td>
-    <td>${meterBar(s.score, scoreColor(s.score), String(s.score))}</td></tr>`).join("");
-  openInfoModal("Rotazione settoriale USA (Tilt)",
-    `<p class="muted" style="margin:0 0 8px">Momentum degli ETF settoriali SPDR. I settori in cima sono i più forti: indicano dove sta ruotando il mercato (overweight). Fonte: Yahoo Finance.</p>
-     <table class="info-table"><thead><tr><th>Settore</th><th>1M</th><th>3M</th><th>Forza</th></tr></thead><tbody>${rows}</tbody></table>`);
+  const byM1 = [...tilt].sort((a, b) => b.m1 - a.m1);
+  const lead = byM1.slice(0, 3), lag = byM1.slice(-3).reverse();
+  const defensives = ["Utilities", "Consumi difens.", "Salute", "Oro"];
+  const defAvg = avg(tilt.filter(s => defensives.includes(s.name)).map(s => s.m1));
+  const tech = tilt.find(s => s.ticker === "XLK");
+  let regime = "—";
+  if (defAvg != null && tech) regime = defAvg > tech.m1 ? "DIFENSIVO — i difensivi battono il Tech (cautela / de-risking)" : "PRO-RISCHIO — ciclici e Tech guidano";
+  openInfoModal("Rotazione settoriale & tematica USA",
+    `<div class="info-line"><b>Regime:</b> ${regime}</div>
+     <div class="info-line"><b>Forti:</b> ${lead.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
+     <div class="info-line"><b>Deboli:</b> ${lag.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
+     ${rotationDetailHtml()}
+     <div class="info-line muted" style="margin-top:8px">Momentum 1M/3M degli ETF (Yahoo Finance). Verde = forza, rosso = debolezza.</div>`);
 }
 
 function openWitchingModal() {
@@ -1402,28 +1424,29 @@ function bigUsd(v) { if (v == null) return "—"; const a = Math.abs(v);
   if (a >= 1e6) return "$" + (v / 1e6).toFixed(0) + "M"; return "$" + fmtNum.format(v); }
 function colorCell(txt, cls) { return `<span class="${cls || ""}">${txt}</span>`; }
 
-function renderFundTable() {
-  if (!DATA || !DATA.portfolio) return;
-  const head = ["Titolo", "Qtà", "PMC", "Prezzo", "Market Cap", "EV/EBITDA", "ROE", "Margine lordo",
-                "Margine netto", "P/FCF", "Cresc. ricavi", "Div Yield", "P/B", "PEG"];
-  $("#ptf-fund-table thead").innerHTML = "<tr>" +
+// renderer fondamentale generico (riusato da portafoglio e watchlist)
+function buildFundTable(list, tableSel, withQtyPmc) {
+  const head = (withQtyPmc ? ["Titolo", "Qtà", "PMC", "Prezzo"] : ["Titolo", "Prezzo"])
+    .concat(["Market Cap", "EV/EBITDA", "ROE", "Margine lordo", "Margine netto", "P/FCF", "Cresc. ricavi", "Div Yield", "P/B", "PEG"]);
+  const fundColspan = 10;
+  $(`${tableSel} thead`).innerHTML = "<tr>" +
     head.map((h, i) => `<th class="${i === 0 ? "sticky-col" : "num"}">${h}</th>`).join("") + "</tr>";
-  const rows = DATA.portfolio.map(r => {
+  const rows = list.map(r => {
     const c = cur(r), st = r.stats || {};
-    if (r.ticker === "BTP-V28") {
-      return `<tr><td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
-        <td class="num">${fmtNum.format(r.qty)}</td><td class="num">${c}${fmtNum.format(r.pmc)}</td>
-        <td class="num"><b>${c}${fmtNum.format(r.price)}</b></td><td colspan="10" class="muted">Titolo di Stato — cedola 4,10/4,50%</td></tr>`;
+    const lead = withQtyPmc
+      ? `<td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+         <td class="num">${fmtNum.format(r.qty)}</td><td class="num">${c}${fmtNum.format(r.pmc)}</td>
+         <td class="num"><b>${r.price == null ? "…" : c + fmtNum.format(r.price)}</b></td>`
+      : `<td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+         <td class="num"><b>${r.price == null ? "…" : c + fmtNum.format(r.price)}</b></td>`;
+    if (r.ticker === "BTP-V28" || !st.market_cap) {
+      return `<tr>${lead}<td colspan="${fundColspan}" class="muted">${r.ticker === "BTP-V28" ? "Titolo di Stato — cedola 4,10/4,50%" : "Dati fondamentali non disponibili"}</td></tr>`;
     }
     const pfcf = (st.market_cap && st.fcf) ? st.market_cap / st.fcf : null;
     const fcfWarn = (st.fcf != null && st.net_income_fy != null && st.fcf < st.net_income_fy * 0.6)
       ? ` <span class="warn-flag" title="FCF molto inferiore all'utile: verifica la qualità degli utili">!</span>` : "";
     const roeCls = st.roe == null ? "" : st.roe >= 0.15 ? "text-premium" : st.roe < 0 ? "neg" : "";
-    return `<tr>
-      <td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
-      <td class="num">${fmtNum.format(r.qty)}</td>
-      <td class="num">${c}${fmtNum.format(r.pmc)}</td>
-      <td class="num"><b>${c}${fmtNum.format(r.price)}</b></td>
+    return `<tr>${lead}
       <td class="num">${bigUsd(st.market_cap)}</td>
       <td class="num">${st.ev_ebitda != null ? fmtNum.format(st.ev_ebitda) : "—"}</td>
       <td class="num">${colorCell(pctOf(st.roe), roeCls)}</td>
@@ -1436,7 +1459,16 @@ function renderFundTable() {
       <td class="num">${st.peg != null ? fmtNum.format(st.peg) : "—"}</td>
     </tr>`;
   }).join("");
-  $("#ptf-fund-table tbody").innerHTML = rows;
+  $(`${tableSel} tbody`).innerHTML = rows;
+}
+
+function renderFundTable() {
+  if (!DATA || !DATA.portfolio) return;
+  buildFundTable(DATA.portfolio, "#ptf-fund-table", true);
+}
+function renderWlFundTable() {
+  if (!DATA || !DATA.watchlist) return;
+  buildFundTable(DATA.watchlist.filter(r => r.currency !== "PTS"), "#wl-fund-table", false);
 }
 
 function setPtfView(v) {
@@ -1447,6 +1479,17 @@ function setPtfView(v) {
   $("#spark-toggle").style.display = v === "tech" ? "" : "none";
   $("#range-lab-tech").style.display = v === "tech" ? "" : "none";
   if (v === "fund") renderFundTable();
+}
+
+let wlView = "tech";
+function setWlView(v) {
+  wlView = v;
+  document.querySelectorAll("#wl-view-toggle .chip").forEach(c => c.classList.toggle("chip-active", c.dataset.view === v));
+  $("#wl-tech-wrap").hidden = v !== "tech";
+  $("#wl-fund-wrap").hidden = v !== "fund";
+  $("#spark-toggle-wl").style.display = v === "tech" ? "" : "none";
+  $("#wl-range-lab").style.display = v === "tech" ? "" : "none";
+  if (v === "fund") renderWlFundTable();
 }
 
 /* ---------------- trimestrali ---------------- */
@@ -1578,13 +1621,6 @@ function renderGauges() {
     cards.push(thermoCard("putcall", `Put/Call ${pc.symbol}`, score, fmtNum.format(pc.ratio),
       `<b>${pc.ratio > 1 ? "Prevalgono PUT" : "Prevalgono CALL"}</b><br>put ${pc.puts.toLocaleString("it-IT")} · call ${pc.calls.toLocaleString("it-IT")}`, ["Call", "Put"]));
   }
-  if (m.thermometer) {
-    const th = m.thermometer;
-    const lab = th.score >= 60 ? "Tranquillo" : th.score <= 40 ? "Da monitorare" : "Equilibrato";
-    cards.push(thermoCard("thermometer", "Salute portafoglio", th.score, th.score,
-      `<b>${lab}</b><br>salute tecnica media dei tuoi titoli`, ["Serenità", "Preoccupazione"]));
-  }
-
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
 }
 
@@ -1896,7 +1932,7 @@ $("#cash-save").addEventListener("click", saveCash);
 $("#cash-input").addEventListener("keydown", e => { if (e.key === "Enter") saveCash(); });
 $("#signposts-box").addEventListener("click", openSignpostsModal);
 $("#tilt-box").addEventListener("click", openTiltModal);
-$("#rotation-analyze").addEventListener("click", openRotationModal);
+$("#portfolio-health").addEventListener("click", openHealthModal);
 $("#witching-box").addEventListener("click", openWitchingModal);
 $("#macroquant-box").addEventListener("click", openMacroQuantModal);
 $("#market-direction").addEventListener("click", () => {
@@ -1934,6 +1970,8 @@ document.querySelectorAll("#spark-toggle .chip, #spark-toggle-wl .chip").forEach
 $("#wl-add-top").addEventListener("click", addWatchlist);
 document.querySelectorAll("#view-toggle .chip").forEach(ch =>
   ch.addEventListener("click", () => setPtfView(ch.dataset.view)));
+document.querySelectorAll("#wl-view-toggle .chip").forEach(ch =>
+  ch.addEventListener("click", () => setWlView(ch.dataset.view)));
 document.querySelectorAll("#hist-toggle .chip").forEach(ch => {
   ch.addEventListener("click", () => {
     document.querySelectorAll("#hist-toggle .chip").forEach(c => c.classList.remove("chip-active"));

@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=37">
+<link rel="stylesheet" href="assets/style.css?v=38">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -88,18 +88,10 @@
     </div>
     <div class="gauges" id="gauges"></div>
     <div class="macro-grid macro-grid-below" id="macro-grid"></div>
+    <div id="portfolio-health" class="health-banner" tabindex="0" role="button" title="Salute del portafoglio — clicca per il dettaglio"></div>
     <div class="topcaps" id="topcaps"></div>
   </section>
 
-  <!-- ROTAZIONE SETTORIALE -->
-  <section class="card">
-    <div class="card-head">
-      <h2>Rotazione settoriale &amp; tematica (USA)</h2>
-      <button class="btn btn-ghost btn-sm" id="rotation-analyze" title="Sintesi della rotazione in corso">Analizza Rotazione</button>
-    </div>
-    <div id="rotation-heatmap" class="rot-heatmap" aria-label="Mappa di calore settori"></div>
-    <div id="rotation-hist" class="rot-hist" aria-label="Performance ETF settoriali"></div>
-  </section>
 
   <!-- PORTAFOGLIO -->
   <section class="card">
@@ -165,7 +157,11 @@
       <button class="btn btn-ghost btn-sm" id="wl-edit" aria-label="Riordina o rimuovi titoli dalla watchlist" title="Riordina o rimuovi titoli">✎ Modifica</button>
     </div>
     <div class="range-bar">
-      <span class="range-lab">Intervallo dati tecnici e grafico:</span>
+      <div class="spark-toggle" id="wl-view-toggle" role="group" aria-label="Vista watchlist">
+        <button class="chip chip-active" data-view="tech">Tecnica &amp; Prezzi</button>
+        <button class="chip" data-view="fund">Fondamentale (Value)</button>
+      </div>
+      <span class="range-lab" id="wl-range-lab">Intervallo:</span>
       <div class="spark-toggle" id="spark-toggle-wl" role="group" aria-label="Intervallo analisi tecnica watchlist">
         <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
         <button class="chip" data-range="w1" aria-label="Una settimana">1S</button>
@@ -174,7 +170,10 @@
         <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
       </div>
     </div>
-    <div class="table-wrap">
+    <div class="table-wrap" id="wl-fund-wrap" hidden>
+      <table id="wl-fund-table" aria-label="Watchlist — analisi fondamentale"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="table-wrap" id="wl-tech-wrap">
       <table id="wl-table" aria-label="Watchlist con prezzi e analisi tecnica">
         <thead>
           <tr>
@@ -298,6 +297,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=37"></script>
+<script src="assets/app.js?v=38"></script>
 </body>
 </html>
