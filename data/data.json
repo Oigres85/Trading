@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-21T10:57:10Z",
+ "updated_at": "2026-06-21T11:39:54Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6480,16 +6480,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64264.01,
-   "change_pct": 0.04,
+   "price": 64174.01,
+   "change_pct": -0.1,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.1,
    "support": 59108.92,
    "resistance": 71334.95,
-   "rsi": 40.7,
-   "volume": 16130445312,
-   "vol_ratio": 0.5,
+   "rsi": 40.4,
+   "volume": 16566558720,
+   "vol_ratio": 0.51,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6498,7 +6498,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64264.01
+     64174.01
     ],
     "m6": [
      68843.16,
@@ -6626,7 +6626,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64264.01
+     64174.01
     ],
     "all": [
      386.94,
@@ -6770,7 +6770,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64264.01
+     64174.01
     ],
     "m1": [
      73579.69,
@@ -6794,7 +6794,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64264.01
+     64174.01
     ],
     "m3": [
      77126.88,
@@ -6862,7 +6862,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64264.01
+     64174.01
     ],
     "y1": [
      102257.41,
@@ -6938,7 +6938,7 @@
      60867.41,
      63561.05,
      65600.64,
-     64264.01
+     64174.01
     ],
     "d1": [
      64185.27,
@@ -7006,7 +7006,11 @@
      64273.37,
      64238.89,
      64265.51,
-     64285.65
+     64285.65,
+     64309.95,
+     64343.44,
+     64228.94,
+     64184.41
     ]
    },
    "earnings_date": null,
@@ -7021,27 +7025,27 @@
     "w1": {
      "support": 62201.14,
      "resistance": 66354.62,
-     "change_pct": -0.24
+     "change_pct": -0.38
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74153.5,
-     "change_pct": -12.66
+     "change_pct": -12.78
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -16.68
+     "change_pct": -16.79
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -44.25
+     "change_pct": -44.33
     }
    },
    "financials": [],
    "fin_health": null,
-   "rs_1m": -14.7
+   "rs_1m": -14.8
   },
   {
    "ticker": "CL=F",
@@ -11827,7 +11831,7 @@
      262.81,
      273.93,
      265.04,
-     273.25,
+     273.24,
      282.06,
      281.36,
      276.51,
@@ -12623,7 +12627,7 @@
      20.53,
      20.44,
      16.54,
-     14.99,
+     15.0,
      17.44,
      21.66,
      24.26,
@@ -13186,7 +13190,7 @@
      652.88,
      656.65,
      639.92,
-     634.12,
+     634.11,
      650.37,
      672.3,
      663.48,
@@ -14889,7 +14893,7 @@
     217123,
     215584,
     217725,
-    220471,
+    220472,
     224617,
     223721,
     226649,
@@ -16050,7 +16054,7 @@
     86802,
     89516,
     86851,
-    84957,
+    84956,
     89287,
     87359,
     91133,
@@ -16820,7 +16824,7 @@
     86802,
     89516,
     86851,
-    84957,
+    84956,
     89287,
     87359,
     91133,
@@ -19262,7 +19266,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 51
+     "score": 49
     },
     {
      "label": "Treasury 10A",
@@ -20951,8 +20955,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1705443139620,
-   "change_pct": 0.53
+   "mcap_usd": 1704154160338,
+   "change_pct": 0.46
   },
   {
    "ticker": "TSLA",
@@ -20975,6 +20979,34 @@
   }
  ],
  "news": [
+  {
+   "source": "Investing.com",
+   "title": "U.S.-Iran ceasefire talks set to begin in Switzerland as Vance arrives",
+   "link": "https://www.investing.com/news/economy-news/usiran-ceasefire-talks-set-to-begin-in-switzerland-as-vance-arrives-4751640",
+   "published": "2026-06-21T10:58:04Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "I colloqui per il cessate il fuoco tra Stati Uniti e Iran inizieranno in Svizzera con l'arrivo di Vance"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Ukraine’s battlefield shift has not solved its humanitarian crisis, IRC says",
+   "link": "https://www.investing.com/news/world-news/ukraines-battlefield-shift-has-not-solved-its-humanitarian-crisis-irc-says-4751665",
+   "published": "2026-06-21T10:42:31Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Lo spostamento del campo di battaglia dell’Ucraina non ha risolto la sua crisi umanitaria, afferma l’IRC"
+  },
   {
    "source": "Investing.com",
    "title": "UK develops long-range weapons for Ukraine without U.S. components",
@@ -21064,7 +21096,7 @@
    "source": "CNBC",
    "title": "Vance arrives in Switzerland for talks with Iranian negotiators amid rising Strait of Hormuz tensions",
    "link": "https://www.cnbc.com/2026/06/20/iran-reportedly-closes-strait-of-hormuz-again-raising-doubt-over-talks.html",
-   "published": "2026-06-21T10:22:45Z",
+   "published": "2026-06-21T11:33:39Z",
    "tickers": [
     "MACRO"
    ],
@@ -21072,6 +21104,59 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Vance arriva in Svizzera per colloqui con i negoziatori iraniani nel mezzo delle crescenti tensioni sullo Stretto di Hormuz"
+  },
+  {
+   "source": "CNBC",
+   "title": "Top Wall Street analysts like these 3 dividend stocks for solid returns",
+   "link": "https://www.cnbc.com/2026/06/21/top-wall-street-analysts-like-these-3-dividend-stocks-for-solid-returns.html",
+   "published": "2026-06-21T11:19:06Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "I migliori analisti di Wall Street apprezzano questi 3 titoli con dividendi per rendimenti solidi"
+  },
+  {
+   "source": "CNBC",
+   "title": "'Regime change but in a velvet glove': How Kevin Warsh has set out to remake the Fed",
+   "link": "https://www.cnbc.com/2026/06/21/how-kevin-warsh-has-set-out-to-remake-the-fed.html",
+   "published": "2026-06-21T11:14:02Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "“Cambiamento di regime ma in un guanto di velluto”: come Kevin Warsh ha deciso di rifare la Fed"
+  },
+  {
+   "source": "Google News",
+   "title": "Stock market bounces back to finish winning week as tech leads recovery - eciks.org",
+   "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTE9YS1lVMmdVaUQ0ZDl3Ynk0d0cyNUJXRmhwTzRYSGxjX1JpNHZrbkdlMEVEYWNzUFNRSmtJZXZodlZOeWFSUmh5ME53UExzZ05Wd0czd0plRVdyc3F1N182bnY4TUpNU19OZ3NzUHpjZWJRQlhwMjhLNg?oc=5",
+   "published": "2026-06-21T11:04:07Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il mercato azionario si riprende chiudendo una settimana vincente mentre la tecnologia guida la ripresa - eciks.org"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Aluminum’s War Shock Blunted by Dark Transits and Chinese Supply",
+   "link": "https://news.google.com/search?q=Aluminum%E2%80%99s%20War%20Shock%20Blunted%20by%20Dark%20Transits%20and%20Chinese%20Supply",
+   "published": "2026-06-21T11:00:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Lo shock bellico dell’alluminio è attenuato dai trasporti oscuri e dall’offerta cinese"
   },
   {
    "source": "AP",
@@ -21101,6 +21186,20 @@
    "title_it": "La Fed ha una nuova sedia. Cosa sta cambiando alla banca centrale sotto Warsh - USA Today"
   },
   {
+   "source": "Bloomberg",
+   "title": "Oil Keeps Flowing Through Hormuz Despite Iran Saying It’s Shut",
+   "link": "https://news.google.com/search?q=Oil%20Keeps%20Flowing%20Through%20Hormuz%20Despite%20Iran%20Saying%20It%E2%80%99s%20Shut",
+   "published": "2026-06-21T07:25:18Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il petrolio continua a scorrere attraverso Hormuz nonostante l’Iran affermi che è chiuso"
+  },
+  {
    "source": "Google News",
    "title": "Fed Holds Rates and Leans Toward Fighting Inflation With Future Increases - The New York Times",
    "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxOWlo2eWRfMHQzRGk2MTdTdkR4R3FLWHlxWjdRekZCOWRhWk42ajJxamdDcmZlbER4TzVxZlFMa0F5d0wycHVMejh1Qk1vTGtWQW1qV05HdXp6ZFFOd3FEOXdaRmw5ZC1HdDd6WGl1Q3NnOS0xc3Y0YUdyQ3htLUlzTVJqRG9oalZM?oc=5",
@@ -21112,20 +21211,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "La Fed mantiene i tassi e punta a combattere l'inflazione con aumenti futuri - The New York Times"
-  },
-  {
-   "source": "Reuters",
-   "title": "US VP Vance arrives in Switzerland for peace talks with Iran - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQdnAzWlotOEpfTUY1MXotSFVBTlJndkJWUS1QazZfdjFPNTFHQ3RWaFF5QjlFM3BndjQ1N0ExTlByMjNLODhTalhEb0loNTBnSmJ2OXdieURobkJ5WThHVzhwaXJ3enE4TzhzeHliaVN3bDB5SjFJa0JvNTYydEhDbW5aNmhGT2F2bFp3ZGNJOC1QZkFfWTBPQ1daS3NUbzFCVmRGWQ?oc=5",
-   "published": "2026-06-21T04:36:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il vicepresidente americano Vance arriva in Svizzera per colloqui di pace con l'Iran - Reuters"
   },
   {
    "source": "Reuters",
@@ -21154,19 +21239,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Trump cerca di attribuire i problemi di Reflecting Pool al vandalismo, senza offrire prove concrete"
-  },
-  {
-   "source": "Google News",
-   "title": "US Fed's key inflation gauge likely to show rising price pressures - Business Standard",
-   "link": "https://news.google.com/rss/articles/CBMi0AFBVV95cUxOWGk4cG1mSU92YnpVLW0tU1djbDdkMUZsSHFKSC11RHpIbzl4NnZUMkVjN0ZOUk1wcWFhMUVVc1Y4WFVMUW9BOVpvaElja2lZMHBsQmgtWWliZ0FfOENPb1NHSkhIZi1JMmt2MFN3bXlMT0VuYWd6Y1E2Y1JkUU1RNURqakdOdl9DOGRXWng0MS1Od0hoX0dnMHh3c3kyQjJSM25LMkJ5WmVNSkZrUUlwNVRpb1BtanBiQjR1TVhWLUM2TC14a0xRVzFDZGRpaXJO0gHQAUFVX3lxTE5YaThwbWZJT3ZielUtbS1TV2NsN2QxRmxIcUpILXVEekhvOXg2dlQyRWM3Rk5STXBxYWExRVVzVjhYVUxRb0E5Wm9oSWNraVkwcGxCaC1ZaWJnQV84Q09vU0dKSEhmLUkya3YwU3dteUxPRW5hZ3pjUTZjUmRRTVE1RGpqR052X0M4ZFdaeDQxLU53SGhfR2cweHdzeTJCMlIzbksyQnlaZU1KRmtRSXA1VGlvUG1qcGJCNHVNWFYtQzZMLXhrTFFXMUNkZGlpck4?oc=5",
-   "published": "2026-06-21T02:30:28Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il principale indicatore dell'inflazione della Fed statunitense probabilmente mostrerà crescenti pressioni sui prezzi - Business Standard"
   },
   {
    "source": "Google News",
@@ -21211,9 +21283,9 @@
   },
   {
    "source": "Reuters",
-   "title": "Top-level US-Iran peace talks to begin at Swiss resort with Hormuz in spotlight - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOd3B1UzBaM0FMeEpSTFF5N3J3NXFHanp0a0VKUlprczNXWVJCa0VmSUZxY1ZqYkNPdHBrVml3clJUZzdpck1DY3djZHR6ZTFMeU5HdHVTaTJPMV81Q0VJY1E3TWZyU2RlM0ZVZDJKZ2RERnRETURQRmM4MElPajdMV3VzNW4tUEVVWDZlWG1QTGU5dHVTX2NXdjd5UHd2blpVeW5QNE91cnRnYy1vN25BRTA0RjdzMTZ4X2lQd01JdmM2SnVD?oc=5",
-   "published": "2026-06-20T23:49:00Z",
+   "title": "Belgium brace for motivated Iran as Garcia manages Lukaku's minutes - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOcDRHMVQzMDJTcVhQRmFpV2g4bmJ2N1VRaTdfNXFPYlBicG1jNHlZUkxJc3VlZEwza3VIUWhRNE5OS0s2UVdOcmhENFF3WTJ2S1hJSGx1WFFXTDI5NE1zTkFCNTNVWm1mc25EOUFnQmtaa25NdXotY1FqVVUzNDNrT09xR2V3c0NiSm1fNTMzNGpJTUhTOFVWV2JsaEdOeDY0Y3c5U1J1MnQ0OWlUdGc?oc=5",
+   "published": "2026-06-21T00:04:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -21221,7 +21293,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Colloqui di pace ad alto livello tra Stati Uniti e Iran iniziano nella località svizzera con Hormuz sotto i riflettori - Reuters"
+   "title_it": "La doppietta del Belgio per l'Iran motivato mentre Garcia gestisce i minuti di Lukaku - Reuters"
   },
   {
    "source": "AP",
@@ -21264,6 +21336,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Gli Stati Uniti difendono le restrizioni ai viaggi in Iran per la Coppa del Mondo, dice discussioni in corso - Reuters"
+  },
+  {
+   "source": "Google News",
+   "title": "Spot Silver Dives 10% As Fed Rate Cut Hopes Fade After Recent Jobs Data - Stocktwits",
+   "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOZ1h4NnNUQVZqQnpQVE5oTnFPd045eW5EY1lvMjJiS2hlV1pGaXlVN3NPYlJtVHdLTmtWcTBIZFFRS3RhMGRNblRpX1JrNGpodlhDbmM3NXY1bXpfMzEwNmo1NXZmOVFKMHZvVzZGU1MxMzgyTGtlM2FXZmRORXdPNlk1Z1NXX0VUa2dVX1lyYWVDcGVFajA2MFlPT3Y5VUh1dkk2c1A4WU1QTjI1Q2lYOGhDSldkUW5IaEk2a19ldl9Qc1FNLW9KLVdjVGhhWDFtRWFR?oc=5",
+   "published": "2026-06-20T20:31:45Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L'argento spot crolla del 10% mentre le speranze di taglio dei tassi della Fed svaniscono dopo i recenti dati sull'occupazione - Stocktwits"
   },
   {
    "source": "Bloomberg",
@@ -21333,20 +21418,6 @@
    "title_it": "Kganyago del Sudafrica avverte che le aspettative di inflazione stanno aumentando"
   },
   {
-   "source": "Bloomberg",
-   "title": "MOU Gives US and Iran Breathing Room",
-   "link": "https://news.google.com/search?q=MOU%20Gives%20US%20and%20Iran%20Breathing%20Room",
-   "published": "2026-06-20T14:07:22Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il MOU dà respiro agli Stati Uniti e all’Iran"
-  },
-  {
    "source": "Reuters",
    "title": "Paris police arrest 20 as demonstrators defy ban on Iran opposition rally - Reuters",
    "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPemJad0VoZTdPSXlzRG41S2tQd1pXaFZLWXZvejJ0YlVMa0p5Q2ZBV05SSGxONHhvUHZGWWJUd2prZ3FXa0NFaEQxN2NsR01fRlVpRDREQTg1R1U5S05sR3NvVkN0LXM5MmdfNG1Cb2FWbGo0Rng5RV9Sa1ZyY0pDT21CV2NhRGJPQkhmSGNaYmc0NHJMNXZYQ2NfQThjRlNIY2d2VndGRnAwUTkwNnc?oc=5",
@@ -21372,7 +21443,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'Iran chiude lo stretto di Hormuz per violazione del cessate il fuoco - MEHR - Reuters"
+   "title_it": "L'Iran chiude lo Stretto di Hormuz per violazione del cessate il fuoco - MEHR - Reuters"
   },
   {
    "source": "AP",
@@ -21388,20 +21459,6 @@
    "title_it": "La scommessa di Warsh: una Federal Reserve più tranquilla potrebbe significare mercati volatili e tassi più alti – AP News"
   },
   {
-   "source": "Bloomberg",
-   "title": "Trump Seeks Iran Offramp",
-   "link": "https://news.google.com/search?q=Trump%20Seeks%20Iran%20Offramp",
-   "published": "2026-06-20T12:33:08Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Trump cerca l’Offramp dell’Iran"
-  },
-  {
    "source": "AP",
    "title": "Congress wonders as the Iran war draws to a close: Was it worth it? - AP News",
    "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNX2ZZbUI5MTlfaFUtZk0yTGtEbF9YeGN1SXd3SjBWUUtpM2lVQkVzcXdRbjhBLWV4azhJX3N3eE1ROTh6aDVzS1lWbnVLbDhIYjdNYjZOX2czSXdTMHBGcEVBNlAwWnFwOFVySVU5dDV2aGJHVmZyU2FBODZDTmwta0hqbl80ZmdhYTJuM1BQb2FzdGg2MDNNMndRUmlhR0hGb3ByRUttRQ?oc=5",
@@ -21414,6 +21471,20 @@
    "inv": false,
    "sentiment": "bear",
    "title_it": "Mentre la guerra con l’Iran volge al termine, il Congresso si chiede: ne è valsa la pena? - Notizie AP"
+  },
+  {
+   "source": "Reuters",
+   "title": "Switzerland says US-Iran talks continue at Bürgenstock, declines to identify participants - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPRDVvaUdiWWJuc1RxSXoxbnpGSXRFVVZJOHZmOU5CVWtEM3FUcVNLN0RkdHYtLTBndXNXU1RtbklqZUxUaW55LUR4dk1qRHlXXzZyRHgzM3JleV95Q0ZJN2ZmaTBsWkhmSlZPaDFtRmV2dmNzUWFrTG9mNFFNVjhadU9WVWstTTZNeVZjY3NkTWFoN0V5X3JGb1pybVVGb1NZaHMtNElLZklFV2h0a3l4VUpFalBDN1Vk?oc=5",
+   "published": "2026-06-20T11:45:48Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La Svizzera afferma che i colloqui USA-Iran continuano al Bürgenstock ma rifiuta di identificare i partecipanti - Reuters"
   },
   {
    "source": "Yahoo Finance",
@@ -21442,19 +21513,6 @@
    "title_it": "L’era Warsh della Fed ha chiaramente una nuova atmosfera – e questo non è del tutto negativo per gli investitori"
   },
   {
-   "source": "Google News",
-   "title": "The US economy is changing in three ways. The Fed must take note - The Times",
-   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPT1VvTEg4YTFDYWdPVjhYREFOVUpYb1Y5X3lRQ0NJT0pwNkhnNFg0V3ZQeVVxRXl6MkY2TUZ6eTE0eXJjUHU0REw2QzBTSUpyUWFFcmg4VW9UQndReUdTcmVmdy1ZM2VTc09STEh2LTYwUktXZXRCT2F5UEF2cXBfSlRFWTdZLTlqQW1CaEV3OFFzaUhjb0Vr?oc=5",
-   "published": "2026-06-20T11:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L’economia americana sta cambiando in tre modi. La Fed deve prenderne atto - The Times"
-  },
-  {
    "source": "CNBC",
    "title": "Iran to lodge FIFA complaint over World Cup travel restrictions",
    "link": "https://www.cnbc.com/2026/06/20/iran-to-lodge-fifa-complaint-over-world-cup-travel-restrictions.html",
@@ -21470,16 +21528,17 @@
   },
   {
    "source": "Yahoo Finance",
-   "title": "HELOC and home equity loan rates Saturday, June 20, 2026: Fed signals higher rates are likely",
-   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/heloc-home-equity-loan-interest-rates-today-saturday-june-20-2026-100000980.html",
-   "published": "2026-06-20T10:00:00Z",
+   "title": "Could Buying Nano Nuclear Energy Stock Today Set You Up for Life?",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/could-buying-nano-nuclear-energy-102500141.html",
+   "published": "2026-06-20T10:25:00Z",
    "tickers": [
-    "MACRO"
+    "MACRO",
+    "POL"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "HELOC e tassi sui mutui immobiliari Sabato 20 giugno 2026: la Fed segnala che sono probabili tassi più alti"
+   "title_it": "Acquistare oggi azioni di energia nanonucleare potrebbe prepararti alla vita?"
   },
   {
    "source": "Yahoo Finance",
@@ -21496,6 +21555,19 @@
   },
   {
    "source": "Yahoo Finance",
+   "title": "HELOC and home equity loan rates Saturday, June 20, 2026: Fed signals higher rates are likely",
+   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/heloc-home-equity-loan-interest-rates-today-saturday-june-20-2026-100000980.html",
+   "published": "2026-06-20T10:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "HELOC e tassi sui mutui immobiliari Sabato 20 giugno 2026: la Fed segnala che sono probabili tassi più alti"
+  },
+  {
+   "source": "Yahoo Finance",
    "title": "Mortgage and refinance interest rates today, Saturday, June 20, 2026: Rates mixed today",
    "link": "https://finance.yahoo.com/personal-finance/mortgages/article/mortgage-refinance-interest-rates-today-saturday-june-20-2026-100000527.html",
    "published": "2026-06-20T10:00:00Z",
@@ -21506,33 +21578,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Tassi di interesse ipotecari e rifinanziamenti oggi, sabato 20 giugno 2026: tassi contrastanti oggi"
-  },
-  {
-   "source": "CNBC",
-   "title": "Massive bonuses for South Korea's chip workers puts central bank on inflation alert",
-   "link": "https://www.cnbc.com/2026/06/20/south-korea-tech-samsung-sk-hynix-bonus-bank-of-korea.html",
-   "published": "2026-06-20T08:59:40Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I massicci bonus per i lavoratori dei chip della Corea del Sud mettono la banca centrale in allerta sull’inflazione"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "The Trump Bull Market Is Near Its Tipping Point, According to More Than 150 Years of History",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/trump-bull-market-near-tipping-082600455.html",
-   "published": "2026-06-20T08:26:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il mercato rialzista di Trump è vicino al punto di svolta, secondo oltre 150 anni di storia"
   },
   {
    "source": "Investing.com",
@@ -21558,7 +21603,7 @@
    "topic_pri": 2,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'esistenza anziché l'utopia: perché Bitcoin è già crollato, anche se le persone non se ne rendono conto"
+   "title_it": "L'esistenza invece dell'utopia: perché Bitcoin è già crollato, anche se le persone non se ne rendono conto"
   },
   {
    "source": "CNBC",
@@ -21578,7 +21623,7 @@
    "title": "Will the price of Bitcoin be above $58,000 on June 21?",
    "title_it": "Will the price of Bitcoin be above $58,000 on June 21? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-58k-on-june-21-2026",
-   "published": "2026-06-21T10:58:04Z",
+   "published": "2026-06-21T11:40:58Z",
    "tickers": [
     "MACRO"
    ],
