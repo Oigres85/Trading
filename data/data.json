@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-21T15:20:42Z",
+ "updated_at": "2026-06-21T16:14:46Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6480,16 +6480,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64126.19,
-   "change_pct": -0.18,
+   "price": 64039.85,
+   "change_pct": -0.31,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.2,
+   "ath_dist_pct": -49.3,
    "support": 59108.92,
    "resistance": 71334.95,
-   "rsi": 40.2,
-   "volume": 15394635776,
-   "vol_ratio": 0.48,
+   "rsi": 40.0,
+   "volume": 14618832896,
+   "vol_ratio": 0.45,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6498,7 +6498,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64126.19
+     64039.85
     ],
     "m6": [
      68843.16,
@@ -6626,7 +6626,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64126.19
+     64039.85
     ],
     "all": [
      386.94,
@@ -6770,7 +6770,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64126.19
+     64039.85
     ],
     "m1": [
      73579.69,
@@ -6794,7 +6794,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64126.19
+     64039.85
     ],
     "m3": [
      77126.88,
@@ -6862,7 +6862,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64126.19
+     64039.85
     ],
     "y1": [
      102257.41,
@@ -6938,7 +6938,7 @@
      60867.41,
      63561.05,
      65600.64,
-     64126.19
+     64039.85
     ],
     "d1": [
      64185.27,
@@ -7033,7 +7033,12 @@
      64009.32,
      64134.02,
      64121.86,
-     64126.19
+     64117.97,
+     64116.62,
+     64208.7,
+     64156.07,
+     64158.05,
+     64039.85
     ]
    },
    "earnings_date": null,
@@ -7048,27 +7053,27 @@
     "w1": {
      "support": 62201.14,
      "resistance": 66354.62,
-     "change_pct": -0.45
+     "change_pct": -0.59
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74153.5,
-     "change_pct": -12.85
+     "change_pct": -12.97
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -16.86
+     "change_pct": -16.97
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -44.37
+     "change_pct": -44.44
     }
    },
    "financials": [],
    "fin_health": null,
-   "rs_1m": -14.8
+   "rs_1m": -15.0
   },
   {
    "ticker": "CL=F",
@@ -11854,7 +11859,7 @@
      262.81,
      273.93,
      265.04,
-     273.25,
+     273.24,
      282.06,
      281.36,
      276.51,
@@ -12650,7 +12655,7 @@
      20.53,
      20.44,
      16.54,
-     15.0,
+     14.99,
      17.44,
      21.66,
      24.26,
@@ -13213,7 +13218,7 @@
      652.88,
      656.65,
      639.92,
-     634.12,
+     634.11,
      650.37,
      672.3,
      663.48,
@@ -14916,7 +14921,7 @@
     217123,
     215584,
     217725,
-    220472,
+    220471,
     224617,
     223721,
     226649,
@@ -15431,7 +15436,7 @@
     173883,
     175594,
     176934,
-    175032,
+    175031,
     174870,
     174089,
     173138,
@@ -15471,7 +15476,7 @@
     188244,
     186492,
     183172,
-    180141,
+    180140,
     186461,
     191516,
     192567,
@@ -15690,7 +15695,7 @@
     153263,
     160434,
     166937,
-    163244,
+    163245,
     169543,
     157386,
     148131,
@@ -16077,7 +16082,7 @@
     86802,
     89516,
     86851,
-    84957,
+    84956,
     89287,
     87359,
     91133,
@@ -16460,7 +16465,7 @@
     153263,
     160434,
     166937,
-    163244,
+    163245,
     169543,
     157386,
     148131,
@@ -16847,7 +16852,7 @@
     86802,
     89516,
     86851,
-    84957,
+    84956,
     89287,
     87359,
     91133,
@@ -19289,7 +19294,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 48
+     "score": 47
     },
     {
      "label": "Treasury 10A",
@@ -21133,17 +21138,32 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Warning: The S&P 500 Could Be on the Verge of Doing Something for the First Time in 155 Years, and It's Not Good News for Investors",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/warning-p-500-could-verge-150500024.html",
-   "published": "2026-06-21T15:05:00Z",
+   "source": "Bloomberg",
+   "title": "Iran Avoids Shared US Photo at Summit",
+   "link": "https://news.google.com/search?q=Iran%20Avoids%20Shared%20US%20Photo%20at%20Summit",
+   "published": "2026-06-21T15:49:03Z",
    "tickers": [
-    "MACRO"
+    "MACRO",
+    "POL"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bear",
-   "title_it": "Avvertimento: l'S&P 500 potrebbe essere sul punto di fare qualcosa per la prima volta in 155 anni, e non è una buona notizia per gli investitori"
+   "sentiment": "neutral",
+   "title_it": "L’Iran evita di condividere la foto degli Stati Uniti al vertice"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Esper: Hezbollah is 'Spoiler' for US-Iran Deal",
+   "link": "https://news.google.com/search?q=Esper%3A%20Hezbollah%20is%20%27Spoiler%27%20for%20US-Iran%20Deal",
+   "published": "2026-06-21T15:27:09Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Esper: Hezbollah è \"spoiler\" per l'accordo USA-Iran"
   },
   {
    "source": "CNBC",
@@ -21184,34 +21204,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Sforzi in corso per l'evacuazione sicura dello Stretto di Hormuz"
-  },
-  {
-   "source": "Google News",
-   "title": "What the Iran war cost the Pentagon, the economy — and Trump - KXLF-TV",
-   "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNbEhiejZ2TmNELXVrdk9SWEFvTXNhMXRMNndISDg5bjZvNUxMYkk3bGZhdUFjbFFwUEdZWUNOcEw5RGExMVQ2eEl4VVdNd2ZQSTdzUTJvQzcyLVNlbE5CeGFFQUlYU3NRSVY5aUFkQTVINmdFbDk5NUdHMTNRWmtMNjJfSTdKa0JjRTB2d3VfY1NKaHh6TkQzQUpoOA?oc=5",
-   "published": "2026-06-21T13:15:28Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Quanto è costata la guerra all’Iran al Pentagono, all’economia – e a Trump – KXLF-TV"
-  },
-  {
-   "source": "AP",
-   "title": "Vance and Iranian officials arrive in Switzerland to launch talks on Tehran’s nuclear program - AP News",
-   "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxNNFh5b3dHTzJSUUpQVUtRWDdqTG5SYWtlNHhyNXBuRWZEbHgycFNiZUVkLTJsa3d5NkJiMDVjeDE2LVpEVGJ1YkZURGlpZnc0WlAySkJVcVc2dTJsNHAzNVZQaElzS1BZeVN6TzJDTGFzOV9TZVdZMV9FRHhYNVpsMkV2MjcwNXI0NUtORXlMd2lzTmdlUDl3TWxOblBZQQ?oc=5",
-   "published": "2026-06-21T13:11:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Vance e funzionari iraniani arrivano in Svizzera per avviare i colloqui sul programma nucleare di Teheran - AP News"
   },
   {
    "source": "Google News",
@@ -21282,20 +21274,6 @@
    "title_it": "Carenza di carburante in Russia durante gli attacchi di droni in Ucraina"
   },
   {
-   "source": "Reuters",
-   "title": "Iran's Tasnim news agency says Hormuz will not reopen until Lebanon ceasefire holds, oil waivers issued - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPa005aHFiRnFPT0lhdUYwazVqbHV2cEhrTWJHWFVEZDhBWlpzNEtzRFptdVZsRkpwcnQ0ZVVfNXh5aE1JR202NGpWX3liaE1aeE4ybk5oRUhwLUJFWTNPOTdfMHRxMkM5bllwRDdVcXBLbUVCSDhKTEpCQS1rcERlUW9YLTBHZEQzYVRPanVKUFlpMHo1M1hpOTdvYlp6b0lUVk5OT2FXT196RjEwZ2dBRGxpNERROG5QOFVVVGlzWGcwMU1NNWE2X1FR?oc=5",
-   "published": "2026-06-21T11:19:43Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'agenzia di stampa iraniana Tasnim afferma che Hormuz non riaprirà finché non sarà rispettato il cessate il fuoco in Libano e non saranno state emesse le deroghe sul petrolio - Reuters"
-  },
-  {
    "source": "CNBC",
    "title": "Top Wall Street analysts like these 3 dividend stocks for solid returns",
    "link": "https://www.cnbc.com/2026/06/21/top-wall-street-analysts-like-these-3-dividend-stocks-for-solid-returns.html",
@@ -21335,20 +21313,6 @@
    "title_it": "Il mercato azionario si riprende chiudendo una settimana vincente mentre la tecnologia guida la ripresa - eciks.org"
   },
   {
-   "source": "Bloomberg",
-   "title": "Aluminum’s War Shock Blunted by Dark Transits and Chinese Supply",
-   "link": "https://news.google.com/search?q=Aluminum%E2%80%99s%20War%20Shock%20Blunted%20by%20Dark%20Transits%20and%20Chinese%20Supply",
-   "published": "2026-06-21T11:00:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Lo shock bellico dell’alluminio è attenuato dai trasporti oscuri e dall’offerta cinese"
-  },
-  {
    "source": "Google News",
    "title": "Warsh faces bind between Trump, inflation after scorching new report - AOL.com",
    "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE83eDBaMm5KUUMyZHBsV1Q5RF9xV29qZVlCcW5uSDZqa2dSdUs2LWdUelNqLUQ3TTExeW53M3ZsaS1qZGlKTnVZQmlyeHJnLVJKUTZYMi00Y09rYU9RRFhkbHl2NENVejJiaThoMUpDTDZkOV9yNHNTdzdRSm1fV1k?oc=5",
@@ -21361,6 +21325,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "I volti di Warsh si legano tra Trump e l'inflazione dopo il nuovo rapporto rovente - AOL.com"
+  },
+  {
+   "source": "Google News",
+   "title": "Fed got a new chair. What's changing at the central bank under Warsh - USA Today",
+   "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOOHVCVUFpSXR4SlpYbmlBY1V0Mk9kZE92XzFrZVBwenEyUGVUbXRPdXlZbW5yMm5qeXNiZ2I4Ym13XzVJMmxVRnc0RklDVW5kUWlZYVJaMjJuSmlpX2lFSGltLWc3LXNlNTFLQVg1TTE4WGVXY0ZxLVBfU0VVYjFWOVRmVEQ5dVlOSFpvTE1yX0E5dmdFX1N1YTE2a1Z2YkcyLWJQbDhFdw?oc=5",
+   "published": "2026-06-21T09:05:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La Fed ha una nuova sedia. Cosa sta cambiando alla banca centrale sotto Warsh - USA Today"
   },
   {
    "source": "Bloomberg",
@@ -21390,20 +21367,6 @@
    "title_it": "La Fed mantiene i tassi e punta a combattere l'inflazione con aumenti futuri - The New York Times"
   },
   {
-   "source": "Reuters",
-   "title": "US VP Vance arrives in Switzerland for peace talks with Iran - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQdnAzWlotOEpfTUY1MXotSFVBTlJndkJWUS1QazZfdjFPNTFHQ3RWaFF5QjlFM3BndjQ1N0ExTlByMjNLODhTalhEb0loNTBnSmJ2OXdieURobkJ5WThHVzhwaXJ3enE4TzhzeHliaVN3bDB5SjFJa0JvNTYydEhDbW5aNmhGT2F2bFp3ZGNJOC1QZkFfWTBPQ1daS3NUbzFCVmRGWQ?oc=5",
-   "published": "2026-06-21T04:36:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il vicepresidente americano Vance arriva in Svizzera per colloqui di pace con l'Iran - Reuters"
-  },
-  {
    "source": "AP",
    "title": "Coach says Iran still being treated poorly by US at World Cup ahead of second match - AP News",
    "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9jaFZYOXlUTHNtWFlHUVlRR1R6VEZFWExSQWNfQmNfeDlfWVlzN085cjA0Qkcxalc5QjNNU19EM21JczdMSkl2cDFoYmc2cEMzRThOWl9odFk2ZVRHTG80Z3JDNEhPZGhEY2pibHFnUE9tVGczSHZFNnQ3TFc1eUk?oc=5",
@@ -21416,20 +21379,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "L'allenatore dice che l'Iran viene ancora trattato male dagli Stati Uniti ai Mondiali prima della seconda partita - AP News"
-  },
-  {
-   "source": "Reuters",
-   "title": "Iran coach questions inconsistency as preparation for Belgium match cut short - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOMk1kNVo3MFREOWQxV2tJUmhKQktKWWI1dE50UEc5NllHakZfMU11YVRYSTFkNmVQSDVNcXpfbTJXOEdyeC03cHhxSkk0QWpaYXJmV3U5Y3FPLXhlZUFEZjVWbldRYWlPSE1TZ1Q4Sl85QlRwcTluaXUzVjJkc0JSRHpOVzNEai0wSWxhZ1JDOVN6U2xyRjhtUEY4eHNvbUFqMXRZUDhSZzdaZVZzZ3lWYlcxcF9nbF93M2Zmdw?oc=5",
-   "published": "2026-06-21T03:21:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'allenatore iraniano mette in dubbio l'incoerenza mentre la preparazione per la partita con il Belgio è stata interrotta - Reuters"
   },
   {
    "source": "AP",
@@ -21460,20 +21409,6 @@
    "title_it": "Entra nell'hotel iraniano della Coppa del Mondo a Tijuana, in Messico, dove i fan si ritrovano per tifare - AP News"
   },
   {
-   "source": "Reuters",
-   "title": "Belgium brace for motivated Iran as Garcia manages Lukaku's minutes - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOcDRHMVQzMDJTcVhQRmFpV2g4bmJ2N1VRaTdfNXFPYlBicG1jNHlZUkxJc3VlZEwza3VIUWhRNE5OS0s2UVdOcmhENFF3WTJ2S1hJSGx1WFFXTDI5NE1zTkFCNTNVWm1mc25EOUFnQmtaa25NdXotY1FqVVUzNDNrT09xR2V3c0NiSm1fNTMzNGpJTUhTOFVWV2JsaEdOeDY0Y3c5U1J1MnQ0OWlUdGc?oc=5",
-   "published": "2026-06-21T00:04:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il Belgio doppietta per l'Iran motivato mentre Garcia gestisce i minuti di Lukaku - Reuters"
-  },
-  {
    "source": "AP",
    "title": "US and Iran to talk Sunday in Switzerland as Tehran says it closed Strait of Hormuz again - AP News",
    "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOZU83bXR0RDhtTHExa0dVVFJOTWlvNS1DMVM0WUdqX0JyNWQ0RnRTcUNzQlkzR2xtWDdnTVA0NEt3NDVMZXBZcl83X2lEVU9jRktXNlc4SjhKMWMxRUZidDJvdDBreDZLbmpsRklMU01GNkJiYVJVWnhyZnlzUkFhYzY1VFdtUjRUbTh6aHlCVkFQUGttSU44TDBWVDZZTlRJbUhTY3JzRHA?oc=5",
@@ -21502,31 +21437,17 @@
    "title_it": "Trump approfondisce la disputa con l'italiano Meloni, che afferma che i suoi \"attacchi non provocati sono insensati\" - AP News"
   },
   {
-   "source": "Reuters",
-   "title": "U.S. defends Iran World Cup travel restrictions, says discussions ongoing - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOWXZKd3Rfc2FkZHhCTEc1WWk1cjBmbm95d2xObktVdTJ4S2JtUnd1ZzMydmltY3B0SUszd3BSN25PMHdPLXBOTlEtbnJ1c1ROV21zT0tZT3RTeTFHczIxRlhUNTI3RXNmSVhNaVVwUWJEcy1BT1ZLTnhXd0sxTXB6MW9qVUFuYXlpSVI2Ni1lb3doTnA2aW9jNG9CQWxZLUc2TnVIQ21TUGdjWkZ6SElKMDhOM2UxeXJfRGVhbg?oc=5",
-   "published": "2026-06-20T22:03:52Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Gli Stati Uniti difendono le restrizioni ai viaggi in Iran per la Coppa del Mondo, dice discussioni in corso - Reuters"
-  },
-  {
-   "source": "Bloomberg",
-   "title": "Fed’s Favorite Gauge Is Seen Showing Faster Inflation",
-   "link": "https://news.google.com/search?q=Fed%E2%80%99s%20Favorite%20Gauge%20Is%20Seen%20Showing%20Faster%20Inflation",
-   "published": "2026-06-20T20:00:00Z",
+   "source": "AP",
+   "title": "Hurricanes fans jam into downtown Raleigh for Stanley Cup parade and rally - AP News",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPQklFYnNvcm5oenJkc0llaHNOQ2swTnVqSEpQQUx3UG4wbXk0djh6Wm5MZUVsenpJTjZNMFQxb3NSQkIzbDh6dzRhOEs3ckk2dDgzQ3JxcGlXV1dpZlN4UG82R3o0cVduQm5taThSQlRhTEEyX2dyVjBMZ21DbGswM0hLTDBPUVNaYzVfaDNKa2hGZ0NfQmJybkF6TlRLM3Q0YjIxTA?oc=5",
+   "published": "2026-06-20T21:14:00Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L’indicatore preferito dalla Fed mostra un’inflazione più rapida"
+   "sentiment": "bull",
+   "title_it": "I fan degli Hurricanes si riversano nel centro di Raleigh per la parata e il raduno della Stanley Cup - AP News"
   },
   {
    "source": "Reddit",
@@ -21543,17 +21464,30 @@
    "title_it": "BREAKING: L'Iran afferma che Hormuz è di nuovo chiuso"
   },
   {
-   "source": "Reuters",
-   "title": "US forces monitoring Strait of Hormuz to ensure it stays open - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQOEt1ZGR5cFBKRG1mSHlLQTc3TnpyMnVnaWltNHQ1eXpockxLYVhxeVlqdmRMeThjck83dVdad2s0eTJOblROeE1GNkJWeF94RTE3cEwyNEFSWTVIaTZITHAtbTNMeS13dmtXUFZrUzJHZjNMdW9ReHZpOFhELUJaX2hNU1BLblRBYno3UHVBT1djajVIdlVQQ1hGb0RuR19wZHA0dUZXX1VrSlJPQVE?oc=5",
-   "published": "2026-06-20T16:55:11Z",
+   "source": "Yahoo Finance",
+   "title": "Mark Cuban Says the Stock Market Makes Guys Like Elon Musk ‘Insanely Rich’ — But Eliminating Billionaires Would Trigger the ‘Worst Depression’ Ever Seen",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/mark-cuban-says-stock-market-150002134.html",
+   "published": "2026-06-20T15:00:02Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Le forze americane monitorano lo Stretto di Hormuz per assicurarsi che rimanga aperto - Reuters"
+   "title_it": "Mark Cuban afferma che il mercato azionario rende persone come Elon Musk “follemente ricche”, ma l’eliminazione dei miliardari scatenerebbe la “peggiore depressione” mai vista"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Micron Must Do This on June 24, or Its Stock Could Crash",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/micron-must-june-24-stock-154531132.html",
+   "published": "2026-06-21T15:45:31Z",
+   "tickers": [
+    "MU"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Micron deve farlo il 24 giugno, altrimenti le sue azioni potrebbero crollare"
   },
   {
    "source": "MarketWatch",
@@ -21618,7 +21552,7 @@
    "topic_pri": 2,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'esistenza anziché l'utopia: perché Bitcoin è già crollato, anche se le persone non se ne rendono conto"
+   "title_it": "L'esistenza invece dell'utopia: perché Bitcoin è già crollato, anche se le persone non se ne rendono conto"
   },
   {
    "source": "CNBC",
@@ -21638,7 +21572,7 @@
    "title": "Will the price of Bitcoin be above $58,000 on June 21?",
    "title_it": "Will the price of Bitcoin be above $58,000 on June 21? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-58k-on-june-21-2026",
-   "published": "2026-06-21T15:22:11Z",
+   "published": "2026-06-21T16:15:38Z",
    "tickers": [
     "MACRO"
    ],
@@ -21649,7 +21583,7 @@
    "title": "Will the price of Bitcoin be above $62,000 on June 21?",
    "title_it": "Will the price of Bitcoin be above $62,000 on June 21? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-21-2026",
-   "published": "2026-06-21T15:22:11Z",
+   "published": "2026-06-21T16:15:38Z",
    "tickers": [
     "MACRO"
    ],
