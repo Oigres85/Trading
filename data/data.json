@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-21T16:44:43Z",
+ "updated_at": "2026-06-21T16:47:43Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6480,15 +6480,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64026.52,
-   "change_pct": -0.33,
+   "price": 64066.95,
+   "change_pct": -0.27,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.3,
+   "ath_dist_pct": -49.2,
    "support": 59108.92,
    "resistance": 71334.95,
-   "rsi": 39.9,
-   "volume": 14360111104,
+   "rsi": 40.0,
+   "volume": 14373686272,
    "vol_ratio": 0.44,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -6498,7 +6498,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64026.52
+     64066.95
     ],
     "m6": [
      68843.16,
@@ -6626,7 +6626,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64026.52
+     64066.95
     ],
     "all": [
      386.94,
@@ -6770,7 +6770,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64026.52
+     64066.95
     ],
     "m1": [
      73579.69,
@@ -6794,7 +6794,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64026.52
+     64066.95
     ],
     "m3": [
      77126.88,
@@ -6862,7 +6862,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64026.52
+     64066.95
     ],
     "y1": [
      102257.41,
@@ -6938,7 +6938,7 @@
      60867.41,
      63561.05,
      65600.64,
-     64026.52
+     64066.95
     ],
     "d1": [
      64185.27,
@@ -7041,7 +7041,7 @@
      64056.05,
      64134.49,
      63978.31,
-     64026.52
+     64025.93
     ]
    },
    "earnings_date": null,
@@ -7056,27 +7056,27 @@
     "w1": {
      "support": 62201.14,
      "resistance": 66354.62,
-     "change_pct": -0.61
+     "change_pct": -0.55
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74153.5,
-     "change_pct": -12.98
+     "change_pct": -12.93
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -16.99
+     "change_pct": -16.93
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -44.46
+     "change_pct": -44.42
     }
    },
    "financials": [],
    "fin_health": null,
-   "rs_1m": -15.0
+   "rs_1m": -14.9
   },
   {
    "ticker": "CL=F",
@@ -11862,7 +11862,7 @@
      262.81,
      273.93,
      265.04,
-     273.24,
+     273.25,
      282.06,
      281.36,
      276.51,
@@ -12658,7 +12658,7 @@
      20.53,
      20.44,
      16.54,
-     14.99,
+     15.0,
      17.44,
      21.66,
      24.26,
@@ -13221,7 +13221,7 @@
      652.88,
      656.65,
      639.92,
-     634.11,
+     634.12,
      650.37,
      672.3,
      663.48,
@@ -14924,7 +14924,7 @@
     217123,
     215584,
     217725,
-    220471,
+    220472,
     224617,
     223721,
     226649,
@@ -15439,7 +15439,7 @@
     173883,
     175594,
     176934,
-    175031,
+    175032,
     174870,
     174089,
     173138,
@@ -15479,7 +15479,7 @@
     188244,
     186492,
     183172,
-    180140,
+    180141,
     186461,
     191516,
     192567,
@@ -20861,8 +20861,32 @@
     }
    ]
   },
+  "smart_money": {
+   "score": 76,
+   "label": "Ottimista",
+   "vix3m": 19.6,
+   "vix_term_ratio": 0.838,
+   "ig_spread": 0.92,
+   "hy_ig_ratio": 2.86,
+   "divergence": -39,
+   "divergence_label": "Smart money ottimista / Retail pessimista",
+   "components": [
+    {
+     "label": "Struttura VIX (contango/backw.)",
+     "score": 100
+    },
+    {
+     "label": "Spread HY/IG (fuga qualità)",
+     "score": 73
+    },
+    {
+     "label": "Copertura PUT (P/C ratio)",
+     "score": 56
+    }
+   ]
+  },
   "macroquant": {
-   "score": 52,
+   "score": 53,
    "label": "Rallentamento",
    "components": [
     {
@@ -20916,6 +20940,10 @@
     {
      "label": "Rischio Credito (HY)",
      "score": 99
+    },
+    {
+     "label": "Smart Money (VIX+HY/IG+P/C)",
+     "score": 76
     }
    ],
    "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici (il MacroQuant ufficiale di BCA Research è proprietario e a pagamento)."
@@ -21199,20 +21227,6 @@
   },
   {
    "source": "Google News",
-   "title": "What the Iran war cost the Pentagon, the economy — and Trump - KXLF-TV",
-   "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNbEhiejZ2TmNELXVrdk9SWEFvTXNhMXRMNndISDg5bjZvNUxMYkk3bGZhdUFjbFFwUEdZWUNOcEw5RGExMVQ2eEl4VVdNd2ZQSTdzUTJvQzcyLVNlbE5CeGFFQUlYU3NRSVY5aUFkQTVINmdFbDk5NUdHMTNRWmtMNjJfSTdKa0JjRTB2d3VfY1NKaHh6TkQzQUpoOA?oc=5",
-   "published": "2026-06-21T13:15:28Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Quanto è costata la guerra all’Iran al Pentagono, all’economia – e a Trump – KXLF-TV"
-  },
-  {
-   "source": "Google News",
    "title": "Trump hails Iran deal but conflict continues to cast long shadow over global economy - The Guardian",
    "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPNUpaSEVTZ1NueVZrMXYwdjQwRlk3RndNUVUwU2dJRTJNV0NzSG5jVTJ1TEFpTnN3MTJjX0c1UEc4TktuZzJIbWdLNzR6Qjd6LTdOaTlhSFplSFRCeUxRVGpvQUJqMDBpQjFERHdSVzBjblpkbXJKV2p3bzJOZXc4ZHlJUGVacVRaUml0OGZNRDBKNEZrelE?oc=5",
    "published": "2026-06-21T13:05:00Z",
@@ -21387,6 +21401,19 @@
    "title_it": "Il petrolio continua a scorrere attraverso Hormuz nonostante l’Iran affermi che è chiuso"
   },
   {
+   "source": "Google News",
+   "title": "Fed Holds Rates and Leans Toward Fighting Inflation With Future Increases - The New York Times",
+   "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxOWlo2eWRfMHQzRGk2MTdTdkR4R3FLWHlxWjdRekZCOWRhWk42ajJxamdDcmZlbER4TzVxZlFMa0F5d0wycHVMejh1Qk1vTGtWQW1qV05HdXp6ZFFOd3FEOXdaRmw5ZC1HdDd6WGl1Q3NnOS0xc3Y0YUdyQ3htLUlzTVJqRG9oalZM?oc=5",
+   "published": "2026-06-21T06:01:16Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La Fed mantiene i tassi e punta a combattere l'inflazione con aumenti futuri - The New York Times"
+  },
+  {
    "source": "Reuters",
    "title": "US VP Vance arrives in Switzerland for peace talks with Iran - Reuters",
    "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQdnAzWlotOEpfTUY1MXotSFVBTlJndkJWUS1QazZfdjFPNTFHQ3RWaFF5QjlFM3BndjQ1N0ExTlByMjNLODhTalhEb0loNTBnSmJ2OXdieURobkJ5WThHVzhwaXJ3enE4TzhzeHliaVN3bDB5SjFJa0JvNTYydEhDbW5aNmhGT2F2bFp3ZGNJOC1QZkFfWTBPQ1daS3NUbzFCVmRGWQ?oc=5",
@@ -21468,7 +21495,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il Belgio doppietta per l'Iran motivato mentre Garcia gestisce i minuti di Lukaku - Reuters"
+   "title_it": "La doppietta del Belgio per l'Iran motivato mentre Garcia gestisce i minuti di Lukaku - Reuters"
   },
   {
    "source": "AP",
@@ -21645,17 +21672,17 @@
    "title_it": "I repubblicani acquistano criptovalute più dei democratici, lo mostrano i dati: cosa sta determinando il divario"
   },
   {
-   "source": "Reddit",
-   "title": "Existence Over Utopia: Why Bitcoin Has Already Collapsed, Even If People Don't Realize It",
-   "link": "https://www.reddit.com/r/investing/comments/1ubkc5v/existence_over_utopia_why_bitcoin_has_already/",
-   "published": "2026-06-21T08:06:55Z",
+   "source": "CNBC",
+   "title": "Bitcoin's future as revolutionary as the smartphone, according to CoinDesk",
+   "link": "https://www.cnbc.com/2026/06/20/bitcoin-as-revolutionary-as-smartphone-according-to-coindesk.html",
+   "published": "2026-06-20T15:00:01Z",
    "tickers": [
     "BTC-USD"
    ],
    "topic_pri": 2,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'esistenza anziché l'utopia: perché Bitcoin è già crollato, anche se le persone non se ne rendono conto"
+   "title_it": "Il futuro di Bitcoin è rivoluzionario quanto lo smartphone, secondo CoinDesk"
   }
  ],
  "options": {
