@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-21T18:57:39Z",
+ "updated_at": "2026-06-21T19:21:18Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6480,15 +6480,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64090.01,
-   "change_pct": -0.23,
+   "price": 64134.42,
+   "change_pct": -0.16,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.2,
    "support": 59108.92,
    "resistance": 71334.95,
-   "rsi": 40.1,
-   "volume": 14118945792,
+   "rsi": 40.2,
+   "volume": 14110168064,
    "vol_ratio": 0.44,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -6498,7 +6498,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64090.01
+     64134.42
     ],
     "m6": [
      68843.16,
@@ -6626,7 +6626,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64090.01
+     64134.42
     ],
     "all": [
      386.94,
@@ -6770,7 +6770,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64090.01
+     64134.42
     ],
     "m1": [
      73579.69,
@@ -6794,7 +6794,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64090.01
+     64134.42
     ],
     "m3": [
      77126.88,
@@ -6862,7 +6862,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64090.01
+     64134.42
     ],
     "y1": [
      102257.41,
@@ -6938,7 +6938,7 @@
      60867.41,
      63561.05,
      65600.64,
-     64090.01
+     64134.42
     ],
     "d1": [
      64185.27,
@@ -7054,7 +7054,10 @@
      63944.29,
      64067.34,
      64101.34,
-     64124.0
+     64124.0,
+     64099.35,
+     64141.17,
+     64134.42
     ]
    },
    "earnings_date": null,
@@ -7069,27 +7072,27 @@
     "w1": {
      "support": 62201.14,
      "resistance": 66354.62,
-     "change_pct": -0.51
+     "change_pct": -0.44
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74153.5,
-     "change_pct": -12.9
+     "change_pct": -12.84
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -16.9
+     "change_pct": -16.85
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -44.4
+     "change_pct": -44.36
     }
    },
    "financials": [],
    "fin_health": null,
-   "rs_1m": -14.9
+   "rs_1m": -14.8
   },
   {
    "ticker": "CL=F",
@@ -12671,7 +12674,7 @@
      20.53,
      20.44,
      16.54,
-     15.0,
+     14.99,
      17.44,
      21.66,
      24.26,
@@ -13234,7 +13237,7 @@
      652.88,
      656.65,
      639.92,
-     634.12,
+     634.11,
      650.37,
      672.3,
      663.48,
@@ -19267,8 +19270,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "185.00",
-    "change_pct": 0.1,
+    "value": "184.89",
+    "change_pct": 0.04,
     "suffix": "%"
    }
   ],
@@ -21048,6 +21051,21 @@
  "news": [
   {
    "source": "Investing.com",
+   "title": "Bitcoin rises above $64,000 as traders weigh Iran talks, bullish options bets",
+   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-rises-above-64000-as-traders-weigh-iran-talks-bullish-options-bets-4751659",
+   "published": "2026-06-21T18:52:30Z",
+   "tickers": [
+    "MACRO",
+    "POL",
+    "BTC-USD"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "bull",
+   "title_it": "Bitcoin sale sopra i 64.000 dollari mentre i trader valutano i colloqui con l'Iran e le scommesse rialziste sulle opzioni"
+  },
+  {
+   "source": "Investing.com",
    "title": "U.S.-Iran talks in Switzerland continue despite Iranian media walkout reports",
    "link": "https://www.investing.com/news/economy-news/usiran-ceasefire-talks-set-to-begin-in-switzerland-as-vance-arrives-4751640",
    "published": "2026-06-21T18:22:18Z",
@@ -21090,35 +21108,6 @@
   },
   {
    "source": "Investing.com",
-   "title": "Trump says US will resume attacks if Iran does not restrain Hezbollah allies",
-   "link": "https://www.investing.com/news/world-news/trump-says-us-will-resume-attacks-if-iran-does-not-restrain-hezbollah-allies-4751672",
-   "published": "2026-06-21T13:48:34Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Trump afferma che gli Stati Uniti riprenderanno gli attacchi se l’Iran non frena gli alleati di Hezbollah"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Bitcoin rises above $64,000 as traders weigh Iran talks, bullish options bets",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-rises-above-64000-as-traders-weigh-iran-talks-bullish-options-bets-4751659",
-   "published": "2026-06-21T08:26:51Z",
-   "tickers": [
-    "MACRO",
-    "POL",
-    "BTC-USD"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "bull",
-   "title_it": "Bitcoin sale sopra i 64.000 dollari mentre i trader valutano i colloqui con l'Iran e le scommesse rialziste sulle opzioni"
-  },
-  {
-   "source": "Investing.com",
    "title": "Russia stocks lower at close of trade; MOEX Russia Index unchanged",
    "link": "https://www.investing.com/news/stock-market-news/russia-stocks-lower-at-close-of-trade-moex-russia-index-unchanged-4751633",
    "published": "2026-06-20T21:20:03Z",
@@ -21145,6 +21134,33 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
+   "source": "Google News",
+   "title": "Everyday Economics: A new chair, a shorter statement, a Fed that stopped talking cuts - The Center Square",
+   "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNU0NkQTBIZTg0TkYzWjc3S2R6YlZ5R1ZiQWthUGtONncwYUZ5TUFaVzBCOXVBNGpxeENINTZMVDNUME5mdEtxcklGZHNYNndhRjQySDJ1d2UtbkpWWko2eVA5TjJPOV9aNllWdElqelZwTkhIblo2Yk54eTN6WnVQX1paWl9UbDMwbHdjSXJoZlZ0LUhH0gGaAUFVX3lxTE80M0lsaUxYRkJ0Wl9XQ1ROdXp4SlNSODNRbWpNTWR0R0xRTGxWbFdOMDQtWkhSNWcydi00SGtRekFqcnF6Y21ZV05QQ1FSWWR6V1ZwWUtpZEIwTnVJWGdrT1NkMmhCbGNqT0t4Yy1hNmJRakE4V3BlejAzRE9Yb05mcVVMV19KaXFUMElLcHpGWXd6VDFLMkVaU0E?oc=5",
+   "published": "2026-06-21T18:41:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Economia quotidiana: una nuova presidenza, una dichiarazione più breve, una Fed che smette di parlare di tagli - The Center Square"
+  },
+  {
+   "source": "AP",
+   "title": "The Latest: Trump threats shake up US-Iran talks in Switzerland on deal’s details - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQUWgtd2pJRXdwSF82TUxsVmowMDNWZnNONEpSeGVQQ0t3TXlVdGs3TU5xS0V2QUNHaHFrdmw3UmlDTU93RDRSb0xPNExzWTRvSU5tbTQ0MENKSlhfQVRGRmlUbFIzeG1yb2l1TzhSOXVzRzI2NWdIOVhDVzA5eWJwYmw2cmJVNWlpbmFMUjdiMENhaFhRbzlnOHlIMlh2YUlaM29QYTNNM0E?oc=5",
+   "published": "2026-06-21T18:39:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Le ultime: le minacce di Trump scuotono i colloqui USA-Iran in Svizzera sui dettagli dell'accordo - AP News"
+  },
+  {
    "source": "Yahoo Finance",
    "title": "1 Reason Why the Fed's Decision to Keep Interest Rates Steady Is No Match for Costco Stock",
    "link": "https://finance.yahoo.com/markets/stocks/articles/1-reason-why-feds-decision-182000215.html",
@@ -21155,7 +21171,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "1 motivo per cui la decisione della Fed di mantenere i tassi di interesse stabili non può competere con le azioni Costco"
+   "title_it": "1 motivo per cui la decisione della Fed di mantenere stabili i tassi di interesse non può competere con le azioni Costco"
   },
   {
    "source": "CNBC",
@@ -21213,6 +21229,20 @@
    "title_it": "Il rapporto PCE di questa settimana potrebbe rafforzare i tassi più alti e un dollaro più forte – Mott Capital Management"
   },
   {
+   "source": "Reuters",
+   "title": "Trump says US will resume attacks if Iran does not restrain Hezbollah allies - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPRnRDWmZ2cjd6SldKNEFTZ3pKNFBSeE52eUk1cUpuZ3lWdUJDTU5sbXkybHVTLWN1SWVYMDBhMUROTU01VHhaOTh1RVl5TVY3NUI5OEdFbm1IN2toZW45TDltUi1Wbk9QazZRWnpudnV6WmNxc3BmSEIwbzFuRmhSZ29pSU5jWTNkVW1vUjk0RF9PVDVTWG5rOVVJOG9DbG9IcEhuZm9fV2pfbFN1TUcyU0xQd0pmUUhCTVo5YTJkakhjeTZ0MlQwQzhn?oc=5",
+   "published": "2026-06-21T13:48:32Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump afferma che gli Stati Uniti riprenderanno gli attacchi se l'Iran non frena gli alleati di Hezbollah - Reuters"
+  },
+  {
    "source": "Bloomberg",
    "title": "Efforts Underway for Safe Evacuation of Strait of Hormuz",
    "link": "https://news.google.com/search?q=Efforts%20Underway%20for%20Safe%20Evacuation%20of%20Strait%20of%20Hormuz",
@@ -21227,8 +21257,8 @@
   },
   {
    "source": "Google News",
-   "title": "What the Iran war cost the Pentagon, the economy — and Trump - KZTV10",
-   "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxNZ0ZQR1dnMnBZOFhJMU5oVTAzRml1cHRTaUlIYlZrcGRCZzZfWGR4Sm4zX3RFUVYzb0xqdDhKeXhiUmsyTDl4TnZHeTZ3b3RBVlZhZlZHTFFnQXdEMEVacnliRE5BVmdXQWVVcUg4Njl0NjJoUEtHMUJobDdrd013NGJTY2VEYVFobE10WGZSbWt5LVRESlVCQmVTcmxtQQ?oc=5",
+   "title": "What the Iran war cost the Pentagon, the economy — and Trump - Scripps News",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQLTM0MGQxTjh1VjhMc3NnaFA0MU1lU1V0d0Z3VmRnZkxRRnBPRF9SRUs3em1IemNBdmtIM21nNlhfdmxDSXFPWndGZjQ4WjJMdG1DNThMT3RzdGZLN1BaWDdnX0JvOGY1eU9IdFNCSVhTUEI3V0ZDQk1uUUFIT3p4Y3AtNDZ4MlBTQUwtZzFNcDMtSC03SUN6Z0NBRUg2M2FjWG5ucw?oc=5",
    "published": "2026-06-21T13:15:28Z",
    "tickers": [
     "MACRO",
@@ -21237,21 +21267,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "Quanto è costata la guerra all’Iran al Pentagono, all’economia – e a Trump – KZTV10"
-  },
-  {
-   "source": "Google News",
-   "title": "Trump hails Iran deal but conflict continues to cast long shadow over global economy - The Guardian",
-   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPNUpaSEVTZ1NueVZrMXYwdjQwRlk3RndNUVUwU2dJRTJNV0NzSG5jVTJ1TEFpTnN3MTJjX0c1UEc4TktuZzJIbWdLNzR6Qjd6LTdOaTlhSFplSFRCeUxRVGpvQUJqMDBpQjFERHdSVzBjblpkbXJKV2p3bzJOZXc4ZHlJUGVacVRaUml0OGZNRDBKNEZrelE?oc=5",
-   "published": "2026-06-21T13:05:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Trump saluta l’accordo con l’Iran ma il conflitto continua a gettare una lunga ombra sull’economia globale – The Guardian"
+   "title_it": "Quanto è costata la guerra all’Iran al Pentagono, all’economia – e a Trump – Scripps News"
   },
   {
    "source": "MarketWatch",
@@ -21459,34 +21475,6 @@
    "title_it": "Entra nell'hotel iraniano della Coppa del Mondo a Tijuana, in Messico, dove i fan si ritrovano per tifare - AP News"
   },
   {
-   "source": "Reuters",
-   "title": "Belgium brace for motivated Iran as Garcia manages Lukaku's minutes - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOcDRHMVQzMDJTcVhQRmFpV2g4bmJ2N1VRaTdfNXFPYlBicG1jNHlZUkxJc3VlZEwza3VIUWhRNE5OS0s2UVdOcmhENFF3WTJ2S1hJSGx1WFFXTDI5NE1zTkFCNTNVWm1mc25EOUFnQmtaa25NdXotY1FqVVUzNDNrT09xR2V3c0NiSm1fNTMzNGpJTUhTOFVWV2JsaEdOeDY0Y3c5U1J1MnQ0OWlUdGc?oc=5",
-   "published": "2026-06-21T00:04:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La doppietta del Belgio per l'Iran motivato mentre Garcia gestisce i minuti di Lukaku - Reuters"
-  },
-  {
-   "source": "AP",
-   "title": "Russia frees 24 Filipinos after Marcos talks with Putin - AP News",
-   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPSFhHVlNUWGZ4MkpKQXB4aVJma09jTHZSVVIzTDZ0SG44bTZDalFjT2F0emFEeHZhNjR6VVgzUUxNU0ctNFV3U2pBUmJQQm1lc1R0R243RzJRSl9kRmtvcTJLUXhjM0c3dmhXcElKcjhXT0dEcDY3MXZNbE9KNUUwSENrcTlLUUFBUlFIamNkSy1fTGRxYWc?oc=5",
-   "published": "2026-06-20T23:29:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La Russia libera 24 filippini dopo che Marcos ha parlato con Putin - AP News"
-  },
-  {
    "source": "AP",
    "title": "US and Iran to talk Sunday in Switzerland as Tehran says it closed Strait of Hormuz again - AP News",
    "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOZU83bXR0RDhtTHExa0dVVFJOTWlvNS1DMVM0WUdqX0JyNWQ0RnRTcUNzQlkzR2xtWDdnTVA0NEt3NDVMZXBZcl83X2lEVU9jRktXNlc4SjhKMWMxRUZidDJvdDBreDZLbmpsRklMU01GNkJiYVJVWnhyZnlzUkFhYzY1VFdtUjRUbTh6aHlCVkFQUGttSU44TDBWVDZZTlRJbUhTY3JzRHA?oc=5",
@@ -21609,16 +21597,16 @@
   },
   {
    "source": "Investing.com",
-   "title": "Bitcoin battles $64,300-$65,000 resistance: Live levels",
+   "title": "Bitcoin coils below $65K resistance: Live levels",
    "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-hits-66380-resistance-after-wbottom-breakout-live-levels-93CH-4741296",
-   "published": "2026-06-21T07:01:43Z",
+   "published": "2026-06-21T19:02:13Z",
    "tickers": [
     "BTC-USD"
    ],
    "topic_pri": 2,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Bitcoin combatte la resistenza di 64.300$-65.000$: livelli live"
+   "title_it": "Bitcoin scende sotto la resistenza di 65.000$: livelli in tempo reale"
   },
   {
    "source": "Yahoo Finance",
