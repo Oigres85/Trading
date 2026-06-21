@@ -12,12 +12,27 @@ const SORT_FIELDS = {
   "wl-table": ["name", "change_pct", "change_pct", "prepost_chg", "volume", "pe", "eps",
                "beta", "support", "resistance", "rsi", "vol_ratio",
                "health", "upside_pct", "upside_pct", "fin_health", null],
+  // tabelle fondamentali (vista Value); i campi "stat:" leggono da r.stats
+  "ptf-fund-table": ["name", "qty", "pmc", "price", "stat:market_cap", "stat:ev_ebitda",
+                     "stat:roe", "stat:gross_margin", "stat:profit_margin", "pfcf",
+                     "stat:revenue_growth", "stat:dividend_yield", "stat:price_to_book", "stat:peg"],
+  "wl-fund-table": ["name", "price", "stat:market_cap", "stat:ev_ebitda",
+                    "stat:roe", "stat:gross_margin", "stat:profit_margin", "pfcf",
+                    "stat:revenue_growth", "stat:dividend_yield", "stat:price_to_book", "stat:peg"],
 };
-const sortState = { "ptf-table": { field: null, dir: 0 }, "wl-table": { field: null, dir: 0 } };
+const sortState = {
+  "ptf-table": { field: null, dir: 0 }, "wl-table": { field: null, dir: 0 },
+  "ptf-fund-table": { field: null, dir: 0 }, "wl-fund-table": { field: null, dir: 0 },
+};
 
 function sortVal(r, field) {
   if (field === "prepost_chg") return r.prepost?.change_pct ?? null;
   if (field === "upside_pct") return r.rating?.upside_pct ?? null;
+  if (field === "pfcf") {                    // P/FCF calcolato al volo
+    const st = r.stats || {};
+    return (st.market_cap && st.fcf) ? st.market_cap / st.fcf : null;
+  }
+  if (field && field.startsWith("stat:")) return r.stats?.[field.slice(5)] ?? null;
   return r[field] ?? null;
 }
 
@@ -1387,6 +1402,7 @@ const MACRO_INFO = {
   thermometer: ["Termometro portafoglio", "Media della salute tecnica (RSI, trend, momentum) dei tuoi titoli.", "Aggiornato a ogni refresh", /(?!)/],
   credit: ["Rischio Credito (HY OAS)", "Spread dei bond High Yield rispetto ai Treasury USA: proxy del rischio sistemico, analogo al mercato CDS senza costi di abbonamento. Fonte: ICE BofA via FRED.", "Giornaliero (FRED)", /credit|credito|spread|hy|high.?yield|cds|default|obbligaz|bond/i],
   decouple: ["Disaccoppiamento Macro", "Divergenza tra mercato azionario (S&P 500) e economia reale (PIL reale USA GDPC1): misura quanta crescita futura è già prezzata nella borsa. Entrambe le serie normalizzate a 100 all'inizio del periodo.", "Mensile/trimestrale (FRED)", /disaccopp|decoupl|valuation|bolla|bubble|pil|gdp|utili|profit|crescita/i],
+  smart_money: ["Smart Money vs Retail", "Posizionamento istituzionale dedotto da segnali professionali: struttura a termine del VIX (VIX/VIX3M), spread credito HY/IG e copertura put/call. Confrontato col Fear & Greed (proxy del sentiment retail) per evidenziare le divergenze tra denaro intelligente e folla.", "Aggiornato a ogni refresh", /smart.?money|istituzional|institution|hedge.?fund|posizionament|flow|flussi|put.?call|vix/i],
 };
 
 function openInfoModal(title, bodyHTML) {
@@ -1494,6 +1510,25 @@ function openMacroInfo(key) {
       <h4 style="margin:12px 0 4px">S&amp;P 500 vs PIL reale (base 100 = inizio periodo)</h4>
       ${miniDualChart(dc.sp500, dc.gdp, { color1: "var(--blue)", color2: "var(--green)", label1: "S&P 500", label2: "PIL reale" })}
       <div class="info-line muted" style="font-size:11px;margin-top:6px">Un gap ampio segnala che la borsa ha prezzato una crescita degli utili superiore a quella dell'economia reale. Storico pre-correzione: gap &gt;40 pp in 2000, 2007 e 2021.</div>`;
+  } else if (key === "smart_money" && m.smart_money) {
+    const sm = m.smart_money;
+    const smCol = scoreColor(sm.score);
+    extra = `<div class="info-line"><b>Posizionamento istituzionale:</b> <span style="color:${smCol}">${sm.score}/100 — ${sm.label}</span></div>
+      ${thermoBar(sm.score, ["Difensivo", "Aggressivo"])}`;
+    if (sm.divergence != null) {
+      const dvCol = Math.abs(sm.divergence) > 15 ? "var(--yellow)" : "var(--green)";
+      const fg = m.fear_greed?.score;
+      extra += `<div class="info-line" style="margin-top:8px"><b>Divergenza con il retail:</b> <span style="color:${dvCol}">${sm.divergence > 0 ? "+" : ""}${sm.divergence} pt — ${sm.divergence_label}</span></div>
+        <div class="info-line muted" style="font-size:11px">Fear &amp; Greed (retail) ${fg ?? "—"} vs Smart Money ${sm.score}. Un gap ampio segnala possibile inversione: quando il retail è euforico ma gli istituzionali si coprono, storicamente precede correzioni.</div>`;
+    }
+    if ((sm.components || []).length) {
+      extra += `<h4 style="margin:10px 0 4px">Componenti del segnale</h4>` + sm.components.map(c =>
+        `<div class="info-line" style="display:flex;justify-content:space-between;align-items:center"><span>${c.label}</span><span style="color:${scoreColor(c.score)};font-family:var(--mono)">${c.score}</span></div>`).join("");
+    }
+    const det = [];
+    if (sm.vix_term_ratio != null) det.push(`VIX/VIX3M ${fmtNum.format(sm.vix_term_ratio)} ${sm.vix_term_ratio > 1 ? "(backwardation = tensione)" : "(contango = calma)"}`);
+    if (sm.hy_ig_ratio != null) det.push(`HY/IG ${fmtNum.format(sm.hy_ig_ratio)}`);
+    if (det.length) extra += `<div class="info-line muted" style="font-size:11px;margin-top:6px">${det.join(" · ")}</div>`;
   } else {
     extra = `<div class="info-line"><b>Aggiornamento:</b> ${cadence}</div>`;
   }
@@ -1619,12 +1654,15 @@ function colorCell(txt, cls) { return `<span class="${cls || ""}">${txt}</span>`
 
 // renderer fondamentale generico (riusato da portafoglio e watchlist)
 function buildFundTable(list, tableSel, withQtyPmc) {
+  const tableId = tableSel.replace("#", "");
   const head = (withQtyPmc ? ["Titolo", "Qtà", "PMC", "Prezzo"] : ["Titolo", "Prezzo"])
     .concat(["Market Cap", "EV/EBITDA", "ROE", "Margine lordo", "Margine netto", "P/FCF", "Cresc. ricavi", "Div Yield", "P/B", "PEG"]);
   const fundColspan = 10;
   $(`${tableSel} thead`).innerHTML = "<tr>" +
     head.map((h, i) => `<th class="${i === 0 ? "sticky-col" : "num"}">${h}</th>`).join("") + "</tr>";
-  const rows = list.map(r => {
+  const orig = list;                          // ordine originale (per il ripristino "default")
+  const sorted = sortRows(list, tableId);
+  const rows = sorted.map(r => {
     const c = cur(r), st = r.stats || {};
     const lead = withQtyPmc
       ? `<td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
@@ -1653,6 +1691,9 @@ function buildFundTable(list, tableSel, withQtyPmc) {
     </tr>`;
   }).join("");
   $(`${tableSel} tbody`).innerHTML = rows;
+  // ordinamento cliccabile sugli header (la thead è ricostruita ogni volta)
+  initSorting(tableId, () => buildFundTable(orig, tableSel, withQtyPmc));
+  updateSortArrows(tableId);
 }
 
 function renderFundTable() {
@@ -1820,6 +1861,15 @@ function renderGauges() {
       `${fmtNum.format(cr.spread_hy)}% OAS`,
       `ICE BofA HY · <b style="color:${scoreColor(cr.score)}">${cr.label}</b><br>spread alto = stress sistemico`, ["Basso", "Elevato"]));
   }
+  if (m.smart_money) {
+    const sm = m.smart_money;
+    const divTxt = sm.divergence != null
+      ? `<br><b style="color:${Math.abs(sm.divergence) > 15 ? "var(--yellow)" : "var(--muted)"}">${sm.divergence_label}</b>`
+      : "";
+    cards.push(thermoCard("smart_money", "Smart Money vs Retail", sm.score,
+      `<b>${sm.label}</b>`,
+      `flussi istituzionali (VIX term · HY/IG · P/C)${divTxt}`, ["Difensivo", "Aggressivo"]));
+  }
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
 }
 
@@ -1954,7 +2004,7 @@ function buildPrompt() {
   lines.push("PRIMA di analizzare i dati come un team dei migliori 5 Senior Analyst al mondo, usa la RICERCA WEB per: (a) verificare i prezzi di oggi dei titoli elencati, (b) leggere le ultime notizie/risultati su questi titoli e sul quadro macro-politico, (c) trovare titoli alternativi NON in portafoglio interessanti per diversificare. I dati sotto sono il contesto completo della mia dashboard (portafoglio, watchlist, macro, news, mercati di previsione, rotazione settoriale).");
   lines.push("");
   lines.push("FORNISCI UN REPORT STRUTTURATO (solo a scopo informativo) con:");
-  lines.push("1) Sintesi macro e sentiment di mercato (rischio rialzista/ribassista nel breve e nel lungo periodo).");
+  lines.push("1) Sintesi macro e sentiment di mercato (rischio rialzista/ribassista nel breve e nel lungo periodo). Valuta in particolare i segnali di rischio sistemico: spread di credito High Yield, Smart Money vs Retail (divergenze istituzionali), disaccoppiamento S&P/PIL e stato della curva dei rendimenti.");
   lines.push("2) Analisi tecnica titolo per titolo: ipercomprato/ipervenduto (RSI), vicinanza a supporti/resistenze, volumi anomali, trend.");
   lines.push("3) INDICAZIONI OPERATIVE CONCRETE: per ogni titolo indica se mantenere/alleggerire/incrementare, con QUANTE azioni vendere/comprare e a CHE PREZZO (target/limite), stimando la plus/minusvalenza; suggerisci come COMPENSARE le minusvalenze con le plusvalenze (in Italia: azioni 26%, BTP 12,5%; le minus compensano le plus entro 4 anni).");
   lines.push("4) ROTAZIONE & DE-RISKING: il portafoglio è concentrato su TECH/semiconduttori — proponi come ridurre questa intensità usando la liquidità disponibile; indica 2-3 ticker alternativi specifici (value/difensivi) e 2-3 ETF, con prezzi limite d'ingresso, sfruttando la rotazione settoriale qui sotto.");
@@ -1993,6 +2043,20 @@ function buildPrompt() {
   (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (${i.date})`));
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
+  if (m.credit) lines.push(`- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`);
+  if (m.smart_money) {
+    let l = `- Smart Money vs Retail: ${m.smart_money.label} (${m.smart_money.score}/100, da VIX term + HY/IG + put/call)`;
+    if (m.smart_money.divergence != null) l += ` — divergenza col retail: ${m.smart_money.divergence_label}`;
+    lines.push(l);
+  }
+  if (m.decouple?.sp500?.length && m.decouple?.gdp?.length) {
+    const gap = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
+    lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: gap ${gap > 0 ? "+" : ""}${gap} pp (>40 pp storicamente precede correzioni; quanta crescita è già prezzata)`);
+  }
+  if ((m.curve_history || []).length) {
+    const cv = m.curve_history.slice(-1)[0].v;
+    lines.push(`- Curva 10A-2A: ${cv > 0 ? "+" : ""}${cv} pp (${cv < 0 ? "ancora invertita = rischio recessione" : "tornata positiva dopo l'inversione = dis-inversione in corso"})`);
+  }
   if (m.fedwatch && (m.fedwatch.meetings || []).length) lines.push(`- FedWatch prossima riunione ${m.fedwatch.meetings[0].date}: prob. taglio ${m.fedwatch.meetings[0].cut_prob}%`);
   if ((m.tilt || []).length) {
     lines.push("");
@@ -2016,7 +2080,7 @@ function buildPrompt() {
   lines.push("");
   lines.push("ULTIME NEWS (sentiment | titolo | fonte):");
   (DATA.news || []).slice(0, 18).forEach(n => {
-    const s = n.sentiment === "bull" ? "🟢" : n.sentiment === "bear" ? "🔴" : "⚪";
+    const s = n.sentiment === "bull" ? "[POS]" : n.sentiment === "bear" ? "[NEG]" : "[NEU]";
     lines.push(`- ${s} [${n.tickers.join(",")}] ${n.title} (${n.source})`);
   });
   return lines.join("\n");

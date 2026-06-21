@@ -925,6 +925,49 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! decouple: {e}", file=sys.stderr)
 
+    # Smart Money vs Retail: VIX term structure + HY/IG credit spread + put/call
+    try:
+        vix3m_h = yf.Ticker("^VIX3M").history(period="5d")["Close"].dropna()
+        vix3m = float(vix3m_h.iloc[-1]) if len(vix3m_h) else None
+        ig_data = fred_series("BAMLC0A4CBBB", 1)
+        ig_val = ig_data[-1][1] if ig_data else None
+        vix_val = macro.get("vix", {}).get("value")
+        hy_val = macro.get("credit", {}).get("spread_hy")
+        fg_score = macro.get("fear_greed", {}).get("score")
+        pc_ratio = macro.get("putcall", {}).get("ratio")
+        sm_comps, vix_ts, hy_ig = [], None, None
+        if vix_val and vix3m:
+            vix_ts = round(vix_val / vix3m, 3)
+            # backwardation (ratio>1) = smart money compra protezione = ribassista
+            sm_comps.append(("Struttura VIX (contango/backw.)", round(clamp(100 - (vix_ts - 0.85) / 0.35 * 100))))
+        if hy_val and ig_val and ig_val > 0:
+            hy_ig = round(hy_val / ig_val, 2)
+            # spread HY/IG alto = fuga dalla qualità = istituzionali difensivi
+            sm_comps.append(("Spread HY/IG (fuga qualità)", round(clamp(100 - (hy_ig - 1.5) / 5 * 100))))
+        if pc_ratio:
+            # put/call alto = copertura = segnale difensivo istituzionale
+            sm_comps.append(("Copertura PUT (P/C ratio)", round(clamp(100 - (pc_ratio - 0.6) / 1.2 * 100))))
+        if sm_comps:
+            sm_score = round(sum(s for _, s in sm_comps) / len(sm_comps))
+            fg_div = round(fg_score - sm_score) if fg_score is not None else None
+            macro["smart_money"] = {
+                "score": sm_score,
+                "label": "Ottimista" if sm_score >= 60 else "Cauto" if sm_score <= 40 else "Neutrale",
+                "vix3m": round(vix3m, 1) if vix3m else None,
+                "vix_term_ratio": vix_ts,
+                "ig_spread": round(ig_val, 2) if ig_val else None,
+                "hy_ig_ratio": hy_ig,
+                "divergence": fg_div,
+                "divergence_label": (
+                    "Retail euforia / Smart money cauto" if fg_div and fg_div > 15
+                    else "Smart money ottimista / Retail pessimista" if fg_div and fg_div < -15
+                    else "Allineati"
+                ) if fg_div is not None else None,
+                "components": [{"label": l, "score": s} for l, s in sm_comps],
+            }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! smart_money: {e}", file=sys.stderr)
+
     # MacroQuant (riproduzione trasparente stile BCA): composito del ciclo/risk dai
     # fattori macro disponibili. NON è il dato proprietario BCA Research.
     mq = []
@@ -941,6 +984,8 @@ def fetch_macro():
         mq.append(("Volatilità (VIX)", round(clamp(100 - macro["vix"]["value"] / 50 * 100))))
     if macro.get("credit"):
         mq.append(("Rischio Credito (HY)", macro["credit"]["score"]))
+    if macro.get("smart_money"):
+        mq.append(("Smart Money (VIX+HY/IG+P/C)", macro["smart_money"]["score"]))
     if mq:
         score = round(sum(s for _, s in mq) / len(mq))
         macro["macroquant"] = {
