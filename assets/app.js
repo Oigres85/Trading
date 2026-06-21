@@ -1956,31 +1956,60 @@ function thermoBar(score, ends) {
 }
 /* card termometro uniforme; score 0-100 (100=positivo/verde, a sinistra). key per il popup */
 function thermoCard(key, title, score, valueText, subText, ends) {
+  // Gauge semicircolare: verde sx (favorevole, score=100) → rosso dx (sfavorevole, score=0)
+  const s = Math.max(0, Math.min(100, score ?? 50));
+  const R = 68, cx = 88, cy = 80;
+  const zones = [
+    [0,  20, "#16a34a"],
+    [20, 40, "#86c52a"],
+    [40, 60, "#eab308"],
+    [60, 80, "#f97316"],
+    [80, 100,"#d23b30"],
+  ];
+  const pt = (val, r) => {
+    const a = Math.PI * (1 - val / 100);
+    return [cx + r * Math.cos(a), cy - r * Math.sin(a)];
+  };
+  const arcs = zones.map(([a, b, col]) => {
+    const [x1, y1] = pt(a, R), [x2, y2] = pt(b, R);
+    return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="butt"/>`;
+  }).join("");
+  // score 100 → ago sx (verde); score 0 → ago dx (rosso)
+  const [nx, ny] = pt(100 - s, R - 9);
+  const col = scoreColor(s);
+  const endsHtml = ends ? `<div class="gauge-ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>` : "";
   return `<div class="gauge-card" data-gauge="${key}" tabindex="0" role="button" title="Clicca per dettagli e news">
     <span class="popup-dot"></span>
     <div class="g-title">${title}</div>
-    ${thermoBar(score, ends)}
-    <div class="gauge-value" style="color:${scoreColor(score)}">${valueText}</div>
+    <svg viewBox="0 0 176 90" class="semi-gauge-svg">
+      ${arcs}
+      <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${col}" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="${cy}" r="5" fill="${col}"/>
+    </svg>
+    ${endsHtml}
+    <div class="gauge-value" style="color:${col}">${valueText}</div>
     <div class="gauge-sub">${subText}</div>
   </div>`;
 }
 
-/* tachimetro Fear & Greed in stile CNN: semicerchio a 5 zone con lancetta */
+/* tachimetro Fear & Greed: semicerchio stile CNN con lancetta — paura=sx, avidità=dx */
 function fgGaugeCNN(score) {
   const s = Math.max(0, Math.min(100, score));
-  const R = 80, cx = 100, cy = 95;
-  const zones = [[0, 25, "#d23b30"], [25, 45, "#f59e0b"], [45, 55, "#eab308"], [55, 75, "#7ac142"], [75, 100, "#16a34a"]];
+  const R = 68, cx = 88, cy = 80;
+  // F&G: 0=paura=sx, 100=avidità=dx (convenzionale CNN — non invertito)
+  const zones = [[0, 25, "#d23b30"], [25, 45, "#f59e0b"], [45, 55, "#eab308"], [55, 75, "#86c52a"], [75, 100, "#16a34a"]];
   const pt = (val, r) => { const a = Math.PI * (1 - val / 100); return [cx + r * Math.cos(a), cy - r * Math.sin(a)]; };
   const arcs = zones.map(([a, b, col]) => {
     const [x1, y1] = pt(a, R), [x2, y2] = pt(b, R);
-    return `<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${col}" stroke-width="16" stroke-linecap="butt"/>`;
+    return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="butt"/>`;
   }).join("");
-  const [nx, ny] = pt(s, R - 12);
-  return `<svg viewBox="0 0 200 112" class="fg-gauge">
+  const [nx, ny] = pt(s, R - 9);
+  const col = s >= 55 ? "#16a34a" : s >= 45 ? "#eab308" : "#d23b30";
+  return `<svg viewBox="0 0 176 90" class="semi-gauge-svg">
     ${arcs}
-    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="var(--text)" stroke-width="3"/>
-    <circle cx="${cx}" cy="${cy}" r="6" fill="var(--text)"/>
-    <text x="${cx}" y="${cy - 22}" text-anchor="middle" font-size="26" font-weight="700" fill="var(--text)">${Math.round(s)}</text>
+    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${col}" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="5" fill="${col}"/>
+    <text x="${cx}" y="${cy - 20}" text-anchor="middle" font-size="22" font-weight="700" fill="var(--text)">${Math.round(s)}</text>
   </svg>`;
 }
 

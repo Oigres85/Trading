@@ -170,14 +170,15 @@ tbody tr.total-row { background: var(--card-2); font-weight: 700; }
 .meter-fill { display: block; height: 100%; border-radius: 4px; }
 
 /* ---------- gauges (compatti) — flex-wrap così l'ultima riga riempie lo spazio ---------- */
-.gauges { display: flex; flex-wrap: wrap; gap: 10px; }
+.gauges { display: flex; flex-wrap: wrap; gap: 12px; }
 .gauge-card {
-  background: var(--card-2); border: 1px solid var(--border); border-radius: 10px;
-  padding: 10px 8px; text-align: center; flex: 1 1 150px; min-width: 140px;
+  background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 10px 10px; text-align: center; flex: 1 1 160px; min-width: 150px;
 }
-.gauge-card .g-title { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 5px; }
-.gauge-card svg { width: 100%; max-width: 110px; }
-.gauge-value { font-family: var(--mono); font-size: 17px; font-weight: 700; }
+.gauge-card .g-title { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
+.semi-gauge-svg { width: 100%; max-width: 176px; display: block; margin: 0 auto 2px; }
+.gauge-ends { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); padding: 0 6px; margin-bottom: 4px; font-family: var(--mono); }
+.gauge-value { font-family: var(--mono); font-size: 17px; font-weight: 700; line-height: 1.2; }
 .gauge-sub { font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
 
 /* ---------- macro (compatti) ---------- */
@@ -419,8 +420,6 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .thermo-ends { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin: 2px 4px 0; }
 .m-ends { display: flex; justify-content: space-between; font-size: 8.5px; color: var(--muted); margin: 2px 2px 0; }
 
-/* Fear & Greed stile CNN (semicerchio + lancetta) */
-.fg-gauge { width: 100%; max-width: 180px; display: block; margin: 4px auto 0; }
 
 /* pallino che segnala un box apribile in popup */
 .popup-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; border-radius: 50%;
