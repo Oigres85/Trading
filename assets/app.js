@@ -97,24 +97,31 @@ function signTxt(v, suffix = "%") {
   return (v > 0 ? "+" : "") + fmtNum.format(v) + suffix;
 }
 
+// URL raw: bypassa il CDN di GitHub Pages (nessun cache edge), dati sempre freschi.
+// Pages URL come fallback (CORS block su raw in ambienti aziendali).
+const RAW_URL = () => `https://raw.githubusercontent.com/${REPO}/main/data/data.json?t=${Date.now()}`;
+const PAGES_URL = () => `data/data.json?t=${Date.now()}`;
+
+async function fetchData() {
+  const sane = (s) => s.replace(/\bNaN\b/g, "null").replace(/-?\bInfinity\b/g, "null");
+  try {
+    const res = await fetch(RAW_URL(), { cache: "no-store" });
+    if (!res.ok) throw new Error(`raw ${res.status}`);
+    return JSON.parse(sane(await res.text()));
+  } catch {
+    // fallback: Pages URL (può avere latenza CDN di alcuni minuti)
+    const res2 = await fetch(PAGES_URL(), { cache: "no-store" });
+    return JSON.parse(sane(await res2.text()));
+  }
+}
+
 async function loadData(showSpin = false) {
   const btn = $("#btn-refresh");
   if (showSpin) btn.classList.add("spinning");
   try {
-    const sane = (s) => s.replace(/\bNaN\b/g, "null").replace(/-?\bInfinity\b/g, "null");
-    let parsed = null;
-    try {
-      const res = await fetch(`data/data.json?t=${Date.now()}`, { cache: "no-store" });
-      parsed = JSON.parse(sane(await res.text()));
-    } catch (e1) {
-      // fallback: se Pages serve un file in cache/corrotto, prendo la sorgente dal repo
-      console.warn("data.json di Pages non valido, uso raw.githubusercontent", e1);
-      const raw = await fetch(`https://raw.githubusercontent.com/${REPO}/main/data/data.json?t=${Date.now()}`, { cache: "no-store" });
-      parsed = JSON.parse(sane(await raw.text()));
-    }
-    DATA = parsed;
+    DATA = await fetchData();
     renderAll();
-    livePrices();              // sovrappone i prezzi live ai dati del workflow
+    livePrices();
     if (showSpin) toast("Dati ricaricati ✓");
   } catch (e) {
     console.error(e);
@@ -148,12 +155,12 @@ async function dispatchWorkflow(token) {
   });
 }
 
-/* attende il nuovo data.json (updated_at diverso dal precedente) */
+/* attende il nuovo data.json (updated_at diverso dal precedente) — usa raw per freschezza */
 async function waitForNewData(prev, tries = 28) {
   for (let i = 0; i < tries; i++) {
     await new Promise(r => setTimeout(r, 15000));
     try {
-      const d = await (await fetch(`data/data.json?t=${Date.now()}`, { cache: "no-store" })).json();
+      const d = await fetchData();
       if (d.updated_at !== prev) { DATA = d; renderAll(); return true; }
     } catch { /* riprova */ }
   }
