@@ -818,9 +818,17 @@ def fetch_macro():
         boj = [d for d in ("2026-01-23", "2026-03-19", "2026-04-30", "2026-06-17",
                            "2026-07-31", "2026-09-18", "2026-10-30", "2026-12-18")
                if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")][:3]
+        # tasso BoJ (overnight call rate) via FRED
+        boj_rate_val = None
+        try:
+            boj_r = fred_series("IRSTCB01JPM156N", 1)
+            boj_rate_val = round(boj_r[-1][1], 2) if boj_r else None
+        except Exception:
+            pass
         macro["carry"] = {
             "us10": round(us10, 2), "jp10": round(float(jp10), 2), "spread": spread,
             "usdjpy": round(usdjpy, 2), "usdjpy_chg_1m": usdjpy_chg_1m,
+            "boj_rate": boj_rate_val,
             "boj_meetings": boj,
             "note": ("Spread ampio e yen debole: carry trade USD/JPY favorevole (capitali verso il dollaro). "
                      "Un rialzo dei tassi BoJ o un rafforzamento dello yen può innescare l'unwind del carry, "

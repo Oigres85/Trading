@@ -991,12 +991,36 @@ const STAT_META = {
   target_mean: ["Target medio analisti", v => "$" + fmtN2(v), "Prezzo obiettivo medio degli analisti."],
   fcf: ["Free cash flow", v => "$" + fmtBig(v), "Liquidità generata al netto degli investimenti."],
 };
+function statScore(key, val) {
+  if (val == null) return null;
+  switch (key) {
+    case "roe":            return clamp((val + 0.05) / 0.35 * 100);
+    case "roa":            return clamp(val / 0.12 * 100);
+    case "profit_margin":  return clamp(val / 0.25 * 100);
+    case "gross_margin":   return clamp((val - 0.10) / 0.65 * 100);
+    case "revenue_growth": return clamp((val + 0.05) / 0.30 * 100);
+    case "earnings_growth":return clamp((val + 0.10) / 0.60 * 100);
+    case "dividend_yield": return val > 0 ? clamp(val / 0.06 * 100) : null;
+    case "ev_ebitda":      return clamp(100 - (val - 5) / 30 * 100);
+    case "price_to_book":  return clamp(100 - (val - 1) / 9 * 100);
+    case "forward_pe":     return clamp(100 - (val - 10) / 40 * 100);
+    case "peg":            return clamp(100 - (val - 0.5) / 2 * 100);
+    case "debt_to_equity": return clamp(100 - val / 4 * 100);
+    case "float_pct":      return clamp(val / 80 * 100);
+    default: return null;
+  }
+}
 function statsGrid(stats) {
   const cells = Object.entries(STAT_META)
     .filter(([k]) => stats[k] != null)
-    .map(([k, [lab, fmt, info]]) =>
-      `<button class="stat-cell" data-info="${esc(lab + ": " + info)}" title="${esc(info)}">
-        <span class="stat-lab">${lab}</span><span class="stat-val">${fmt(stats[k])}</span></button>`).join("");
+    .map(([k, [lab, fmt, info]]) => {
+      const sc = statScore(k, stats[k]);
+      const bar = sc != null
+        ? `<div class="stat-mini-bar"><div class="stat-mini-fill" style="width:${Math.round(sc)}%;background:${scoreColor(sc)}"></div></div>`
+        : "";
+      return `<button class="stat-cell" data-info="${esc(lab + ": " + info)}" title="${esc(info)}">
+        <span class="stat-lab">${lab}</span><span class="stat-val">${fmt(stats[k])}</span>${bar}</button>`;
+    }).join("");
   return cells ? `<h4 style="margin:12px 0 6px">Statistiche chiave</h4><div class="stats-grid">${cells}</div>` : "";
 }
 
@@ -1478,14 +1502,35 @@ function openMacroInfo(key) {
     }
   } else if (key === "carry" && m.carry) {
     const cy = m.carry;
-    extra = `<div class="info-line"><b>Spread USA−Giappone:</b> ${fmtNum.format(cy.spread)} punti (Treasury 10A ${fmtNum.format(cy.us10)}% − JGB 10A ${fmtNum.format(cy.jp10)}%)</div>
-      <div class="info-line"><b>USD/JPY:</b> ${fmtNum.format(cy.usdjpy)} (${signTxt(cy.usdjpy_chg_1m)} nell'ultimo mese)</div>
+    // aspettativa dinamica BoJ per ogni meeting, basata su spread corrente + trend yen
+    const bojExpect = (sp, yenChg) => {
+      if (sp < 1.0) return { txt: "Rialzo probabile — spread stretto, mercati prezzano stretta BoJ", cls: "neg" };
+      if (sp < 1.5) return { txt: "Possibile rialzo — BoJ hawkish, sorvegliare inflazione JP", cls: "neg" };
+      if (sp < 2.0) return { txt: "Fermi con bias hawkish — compressione in corso, rischio unwind carry", cls: "" };
+      if (sp < 2.5) return { txt: "Probabilmente fermi — spread sufficiente a sostenere carry", cls: "" };
+      return { txt: "Fermi o taglio remoto — spread ampio, carry molto conveniente", cls: "pos" };
+    };
+    const ex = bojExpect(cy.spread, cy.usdjpy_chg_1m);
+    const carryScore = clamp((cy.spread - 0.5) / 3 * 100);
+    extra = `<div class="info-line"><b>Tasso Treasury 10A (USA):</b> ${fmtNum.format(cy.us10)}%
+        &nbsp;·&nbsp; <b>JGB 10A (Giappone):</b> ${fmtNum.format(cy.jp10)}%</div>
+      <div class="info-line"><b>Spread USD−JPY:</b> <span style="color:${scoreColor(carryScore)}">${fmtNum.format(cy.spread)} pp</span></div>
+      ${cy.boj_rate != null ? `<div class="info-line"><b>Tasso BoJ (politica monetaria):</b> ${fmtNum.format(cy.boj_rate)}%</div>` : ""}
+      <div class="info-line"><b>USD/JPY:</b> ${fmtNum.format(cy.usdjpy)} <span class="${signCls(cy.usdjpy_chg_1m)}">(${signTxt(cy.usdjpy_chg_1m)} nell'ultimo mese)</span></div>
+      ${thermoBar(carryScore, ["Carry favorevole", "Carry a rischio"])}
       <div class="info-line" style="margin:8px 0">${cy.note || ""}</div>`;
     if ((cy.boj_meetings || []).length) {
       extra += `<h4 style="margin:10px 0 4px">Prossime riunioni Bank of Japan</h4>`
-        + `<table class="info-table"><thead><tr><th>Data</th><th>Atteso</th></tr></thead><tbody>`
-        + cy.boj_meetings.map(d => `<tr><td>${new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</td><td>tassi probabilmente fermi (sorvegliare svolte hawkish → rischio unwind carry)</td></tr>`).join("")
-        + `</tbody></table>`;
+        + `<table class="info-table"><thead><tr><th>Data</th><th>Attesa mercato</th></tr></thead><tbody>`
+        + cy.boj_meetings.map((d, i) => {
+            const e = i === 0 ? ex : bojExpect(cy.spread + i * 0.1, cy.usdjpy_chg_1m);
+            return `<tr><td>${new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</td>
+              <td class="${e.cls}">${e.txt}</td></tr>`;
+          }).join("")
+        + `</tbody></table>
+        <div class="info-line muted" style="font-size:11px;margin-top:6px">
+          Aspettative calcolate dinamicamente dallo spread corrente. Un rialzo BoJ comprime il differenziale e può innescare un rapido unwind del carry, con vendite sugli azionari globali (repatriazione capitali in yen).
+        </div>`;
     }
   } else if (key === "credit" && m.credit) {
     const cr = m.credit;
@@ -1551,11 +1596,28 @@ function openEarningsInfo(ticker) {
   if (!r) return;
   const days = r.earnings_date ? Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) : null;
   const rx = new RegExp(`${ticker}|${(r.name || "").split(" ")[0]}|earnings|trimestral|utili|risultati`, "i");
+  const RAT_SCORE = { strong_buy: 100, buy: 75, hold: 50, sell: 25, strong_sell: 0 };
+  const RAT_LABEL = { strong_buy: "Strong Buy", buy: "Buy", hold: "Hold", sell: "Sell", strong_sell: "Strong Sell" };
+  const epsForward = r.stats?.eps_forward;
+  const epsTTM = r.stats?.eps_ttm ?? r.eps;
+  let consensoHtml = "";
+  if (r.rating?.key) {
+    const rs = RAT_SCORE[r.rating.key] ?? 50;
+    const rLab = RAT_LABEL[r.rating.key] ?? r.rating.key;
+    consensoHtml = `<h4 style="margin:12px 0 6px">Consenso analisti</h4>
+      <div class="info-line"><b>Raccomandazione:</b> <span style="color:${scoreColor(rs)}">${rLab}</span>
+        <span class="muted"> · ${r.rating.n ?? "—"} analisti</span></div>
+      ${thermoBar(rs, ["Strong Buy", "Strong Sell"])}
+      ${r.rating.target ? `<div class="info-line" style="margin-top:6px">
+        <b>Target medio:</b> ${cur(r)}${fmtNum.format(r.rating.target)}
+        <span class="${signCls(r.rating.upside_pct)}"> (${signTxt(r.rating.upside_pct)} upside)</span></div>` : ""}
+      ${epsForward != null ? `<div class="info-line"><b>EPS stimato (forward):</b> ${cur(r)}${fmtNum.format(epsForward)}</div>` : ""}
+      ${epsTTM != null ? `<div class="info-line"><b>EPS (TTM):</b> ${cur(r)}${fmtNum.format(epsTTM)}</div>` : ""}`;
+  }
   openInfoModal(`${r.name} (${ticker}) — Trimestrale`, `
     <div class="info-line"><b>Data attesa:</b> ${r.earnings_date ? new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "n/d"} ${days != null ? `(tra ${days} gg)` : ""}</div>
-    ${r.eps != null ? `<div class="info-line"><b>EPS (ultimo):</b> ${fmtNum.format(r.eps)}</div>` : ""}
-    ${r.rating?.target ? `<div class="info-line"><b>Target analisti:</b> ${cur(r)}${fmtNum.format(r.rating.target)} (${signTxt(r.rating.upside_pct)})</div>` : ""}
-    <div class="info-line muted" style="margin-bottom:12px">Confronta i risultati con le attese degli analisti per valutare beat/miss.</div>
+    ${consensoHtml}
+    <div class="info-line muted" style="margin:10px 0 12px">I dati EPS si aggiornano dopo ogni trimestrale riportata. Il target è la media degli analisti coverage (fonte: yfinance).</div>
     <h4 style="margin:6px 0">Notizie correlate</h4>${relatedNews(rx)}`);
 }
 
