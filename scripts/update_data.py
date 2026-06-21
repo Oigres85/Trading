@@ -1009,6 +1009,13 @@ def fetch_macro():
             avg_pe = round(sum(pe_vals) / len(pe_vals), 1)
             pct_rank = round(sum(1 for v in pe_vals if v < cur_pe) / len(pe_vals) * 100)
             score = clamp(round(100 - (cur_pe - 10) / 40 * 100))
+            ndx_pe = None
+            try:
+                qqq_info = yf.Ticker("QQQ").info
+                raw_pe = qqq_info.get("trailingPE") or qqq_info.get("forwardPE")
+                ndx_pe = round(float(raw_pe), 1) if raw_pe else None
+            except Exception:
+                pass
             macro["sp500_pe"] = {
                 "current":  round(cur_pe, 1),
                 "avg_10y":  avg_pe,
@@ -1019,6 +1026,7 @@ def fetch_macro():
                             else "Sopravvalutazione" if cur_pe > 25
                             else "Valutazione elevata" if cur_pe > 20
                             else "Valutazione normale" if cur_pe > 14 else "Sottovalutazione",
+                "nasdaq_pe": ndx_pe,
             }
     except Exception as e:
         print(f"!! sp500_pe: {e}", file=sys.stderr)

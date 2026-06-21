@@ -1634,9 +1634,12 @@ function openMacroInfo(key) {
   } else if (key === "sp500_pe" && m.sp500_pe) {
     const pe = m.sp500_pe;
     const peCol = pe.current > 35 ? "var(--red)" : pe.current > 25 ? "var(--yellow)" : pe.current > 14 ? "var(--muted)" : "var(--green)";
-    extra = `<div class="info-line"><b>P/E attuale:</b> <span style="color:${peCol}">${pe.current}× — ${pe.label}</span></div>
-      <div class="info-line"><b>Media ultimi 10 anni:</b> ${pe.avg_10y}×</div>
-      <div class="info-line"><b>Percentile storico:</b> il mercato è stato più economico di adesso nel ${pe.pct_rank}% dei mesi degli ultimi 10 anni</div>
+    const ndxPeCol = pe.nasdaq_pe > 40 ? "var(--red)" : pe.nasdaq_pe > 30 ? "var(--yellow)" : "var(--muted)";
+    const ndxRow = pe.nasdaq_pe ? `<div class="info-line"><b>Nasdaq 100 (QQQ) P/E attuale:</b> <span style="color:${ndxPeCol}">${pe.nasdaq_pe}×</span> <span class="muted" style="font-size:11px">(storicamente NDX tratta a premio vs S&P; sopra 35× indica valutazioni tech tese)</span></div>` : "";
+    extra = `<div class="info-line"><b>S&P 500 P/E attuale:</b> <span style="color:${peCol}">${pe.current}× — ${pe.label}</span></div>
+      ${ndxRow}
+      <div class="info-line"><b>Media S&P ultimi 10 anni:</b> ${pe.avg_10y}×</div>
+      <div class="info-line"><b>Percentile storico S&P:</b> il mercato è stato più economico di adesso nel ${pe.pct_rank}% dei mesi degli ultimi 10 anni</div>
       ${thermoBar(pe.score, ["Sottovalutato", "Sopravvalutato"])}
       <div class="info-line muted" style="font-size:11px;margin:6px 0">
         P/E &gt;25: valutazioni tese, storicamente associate a ritorni futuri più bassi nei 10 anni successivi.
@@ -2042,8 +2045,9 @@ function renderGauges() {
   if (m.sp500_pe) {
     const pe = m.sp500_pe;
     const peCol = pe.current > 35 ? "var(--red)" : pe.current > 25 ? "var(--yellow)" : pe.current > 14 ? "var(--muted)" : "var(--green)";
-    cards.push(thermoCard("sp500_pe", "P/E S&P 500", pe.score,
-      `<span style="color:${peCol}">P/E ${pe.current}×</span>`,
+    const ndxStr = pe.nasdaq_pe ? ` · NDX ${pe.nasdaq_pe}×` : "";
+    cards.push(thermoCard("sp500_pe", "P/E S&P 500 / Nasdaq", pe.score,
+      `<span style="color:${peCol}">S&P ${pe.current}×</span>${ndxStr ? `<span class="muted" style="font-size:12px">${ndxStr}</span>` : ""}`,
       `${pe.label} · media 10A ${pe.avg_10y}× · percentile ${pe.pct_rank}°`, ["Sottovalutato", "Sopravvalutato"]));
   }
   if (m.corp_profit) {
@@ -2115,11 +2119,13 @@ function renderMacro() {
   if (m.sp500_pe) {
     const pe = m.sp500_pe;
     const peCol = pe.current > 35 ? "var(--red)" : pe.current > 25 ? "var(--yellow)" : pe.current > 14 ? "var(--muted)" : "var(--green)";
-    cells.push(`<div class="macro-item" data-macro="sp500_pe" tabindex="0" role="button" title="Clicca per storico P/E S&P 500" style="--accent:var(--yellow)">
+    const ndxLine = pe.nasdaq_pe ? `<div class="m-date" style="margin-top:2px">NDX (QQQ): <b>${pe.nasdaq_pe}×</b></div>` : "";
+    cells.push(`<div class="macro-item" data-macro="sp500_pe" tabindex="0" role="button" title="Clicca per storico P/E" style="--accent:var(--yellow)">
       <span class="popup-dot"></span>
-      <div class="m-label">P/E S&amp;P 500</div>
+      <div class="m-label">P/E S&amp;P 500 / Nasdaq</div>
       <div class="m-value" style="color:${peCol}">${pe.current}×</div>
-      <div class="m-date">${pe.label} · media 10A ${pe.avg_10y}×</div>
+      <div class="m-date">S&amp;P · ${pe.label} · media 10A ${pe.avg_10y}×</div>
+      ${ndxLine}
       ${macroThermo(pe.score)}
     </div>`);
   }
@@ -2336,7 +2342,11 @@ function buildPrompt() {
     [...m.tilt].sort((a, b) => b.m1 - a.m1).forEach(s =>
       lines.push(`- ${s.name} (${s.ticker}): 1M ${signTxt(s.m1)}, 3M ${signTxt(s.m3)}`));
   }
-  if (m.sp500_pe) lines.push(`- P/E Ratio S&P 500 (FRED SP500PE): ${m.sp500_pe.current}× (${m.sp500_pe.label}) · media 10A ${m.sp500_pe.avg_10y}× · percentile storico ${m.sp500_pe.pct_rank}° (il mercato è stato più economico nel ${m.sp500_pe.pct_rank}% dei mesi)`);
+  if (m.sp500_pe) {
+    let peLine = `- P/E Ratio S&P 500 (FRED SP500PE): ${m.sp500_pe.current}× (${m.sp500_pe.label}) · media 10A ${m.sp500_pe.avg_10y}× · percentile storico ${m.sp500_pe.pct_rank}°`;
+    if (m.sp500_pe.nasdaq_pe) peLine += ` · Nasdaq 100 (QQQ) P/E: ${m.sp500_pe.nasdaq_pe}× (tech solitamente a premio; >35× = valutazioni tese)`;
+    lines.push(peLine);
+  }
   if (m.corp_profit) lines.push(`- S&P vs Profitti Aziendali Reali (FRED CP): gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali)`);
   if (m.fed_market) lines.push(`- Fed Funds Rate attuale: ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}); tasso>4% storicamente comprime i multipli P/E in 12-18 mesi`);
   if (m.witching) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg)`);
