@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-21T10:47:48Z",
+ "updated_at": "2026-06-21T10:57:10Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6480,16 +6480,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64296.77,
-   "change_pct": 0.09,
+   "price": 64264.01,
+   "change_pct": 0.04,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.1,
    "support": 59108.92,
    "resistance": 71334.95,
-   "rsi": 40.8,
-   "volume": 15984176128,
-   "vol_ratio": 0.49,
+   "rsi": 40.7,
+   "volume": 16130445312,
+   "vol_ratio": 0.5,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6498,7 +6498,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64296.77
+     64264.01
     ],
     "m6": [
      68843.16,
@@ -6626,7 +6626,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64296.77
+     64264.01
     ],
     "all": [
      386.94,
@@ -6770,7 +6770,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64296.77
+     64264.01
     ],
     "m1": [
      73579.69,
@@ -6794,7 +6794,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64296.77
+     64264.01
     ],
     "m3": [
      77126.88,
@@ -6862,7 +6862,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64296.77
+     64264.01
     ],
     "y1": [
      102257.41,
@@ -6938,7 +6938,7 @@
      60867.41,
      63561.05,
      65600.64,
-     64296.77
+     64264.01
     ],
     "d1": [
      64185.27,
@@ -7005,7 +7005,8 @@
      64200.02,
      64273.37,
      64238.89,
-     64265.51
+     64265.51,
+     64285.65
     ]
    },
    "earnings_date": null,
@@ -7020,27 +7021,27 @@
     "w1": {
      "support": 62201.14,
      "resistance": 66354.62,
-     "change_pct": -0.19
+     "change_pct": -0.24
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74153.5,
-     "change_pct": -12.62
+     "change_pct": -12.66
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -16.64
+     "change_pct": -16.68
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -44.22
+     "change_pct": -44.25
     }
    },
    "financials": [],
    "fin_health": null,
-   "rs_1m": -14.6
+   "rs_1m": -14.7
   },
   {
    "ticker": "CL=F",
@@ -11826,7 +11827,7 @@
      262.81,
      273.93,
      265.04,
-     273.24,
+     273.25,
      282.06,
      281.36,
      276.51,
@@ -12622,7 +12623,7 @@
      20.53,
      20.44,
      16.54,
-     15.0,
+     14.99,
      17.44,
      21.66,
      24.26,
@@ -12798,7 +12799,7 @@
      147.52,
      137.6,
      136.37,
-     130.77,
+     130.76,
      147.85,
      161.13,
      165.17,
@@ -13185,7 +13186,7 @@
      652.88,
      656.65,
      639.92,
-     634.11,
+     634.12,
      650.37,
      672.3,
      663.48,
@@ -15662,7 +15663,7 @@
     153263,
     160434,
     166937,
-    163245,
+    163244,
     169543,
     157386,
     148131,
@@ -16049,7 +16050,7 @@
     86802,
     89516,
     86851,
-    84956,
+    84957,
     89287,
     87359,
     91133,
@@ -16432,7 +16433,7 @@
     153263,
     160434,
     166937,
-    163245,
+    163244,
     169543,
     157386,
     148131,
@@ -16819,7 +16820,7 @@
     86802,
     89516,
     86851,
-    84956,
+    84957,
     89287,
     87359,
     91133,
@@ -20950,8 +20951,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1706732241837,
-   "change_pct": 0.61
+   "mcap_usd": 1705443139620,
+   "change_pct": 0.53
   },
   {
    "ticker": "TSLA",
@@ -21371,7 +21372,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'Iran chiude lo Stretto di Hormuz per violazione del cessate il fuoco - MEHR - Reuters"
+   "title_it": "L'Iran chiude lo stretto di Hormuz per violazione del cessate il fuoco - MEHR - Reuters"
   },
   {
    "source": "AP",
@@ -21557,7 +21558,7 @@
    "topic_pri": 2,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'esistenza invece dell'utopia: perché Bitcoin è già crollato, anche se le persone non se ne rendono conto"
+   "title_it": "L'esistenza anziché l'utopia: perché Bitcoin è già crollato, anche se le persone non se ne rendono conto"
   },
   {
    "source": "CNBC",
@@ -21577,7 +21578,7 @@
    "title": "Will the price of Bitcoin be above $58,000 on June 21?",
    "title_it": "Will the price of Bitcoin be above $58,000 on June 21? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-58k-on-june-21-2026",
-   "published": "2026-06-21T10:48:12Z",
+   "published": "2026-06-21T10:58:04Z",
    "tickers": [
     "MACRO"
    ],
