@@ -74,6 +74,15 @@ def load_holdings():
 
 PORTFOLIO, WATCHLIST, BROKER = load_holdings()
 
+# benchmark settoriale per il calcolo RS 1M: sox=semiconduttori, ndx=tech, sp500=default
+SECTOR_BENCH = {
+    "NVDA": "sox", "AMD": "sox", "MU": "sox", "INTC": "sox", "RGTI": "sox",
+    "QCOM": "sox", "AVGO": "sox", "TXN": "sox", "MRVL": "sox", "ON": "sox",
+    "MSTR": "ndx", "TSLA": "ndx", "PLTR": "ndx", "GOOGL": "ndx",
+    "META": "ndx", "AMZN": "ndx", "MSFT": "ndx", "AAPL": "ndx",
+    "OKLO": "ndx", "SPCX": "ndx", "CBRS": "ndx",
+}
+
 BTP = {
     "ticker": "BTP-V28", "name": "BTP Valore Ott 2028", "isin": "IT0005565400",
     "nominal": 40000, "pmc": 100.0, "fallback_price": 103.25,
@@ -438,12 +447,14 @@ def fetch_symbol(ticker, name=None, currency="USD"):
 
 
 def fetch_equities():
-    # benchmark 1 mese per RS relativa
-    try:
-        sp_hist = yf.Ticker("^GSPC").history(period="2mo", interval="1d", auto_adjust=True)["Close"].dropna()
-        sp_m1 = (float(sp_hist.iloc[-1]) / float(sp_hist.iloc[-22]) - 1) * 100 if len(sp_hist) >= 22 else None
-    except Exception:  # noqa: BLE001
-        sp_m1 = None
+    # benchmark 1 mese per RS relativa (SP500, SOX, NDX)
+    bench_m1 = {}
+    for sym, key in (("^GSPC", "sp500"), ("^SOX", "sox"), ("^NDX", "ndx")):
+        try:
+            h = yf.Ticker(sym).history(period="2mo", interval="1d", auto_adjust=True)["Close"].dropna()
+            bench_m1[key] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100 if len(h) >= 22 else None
+        except Exception:  # noqa: BLE001
+            bench_m1[key] = None
 
     rows = []
     for pos in PORTFOLIO:
@@ -452,41 +463,49 @@ def fetch_equities():
             continue
         value = row["price"] * pos["qty"]
         cost = pos["pmc"] * pos["qty"]
-        # RS 1M = performance 1M del titolo meno performance 1M dell'S&P 500
+        # RS 1M vs benchmark settoriale
+        bkey = SECTOR_BENCH.get(pos["ticker"], "sp500")
+        bm1 = bench_m1.get(bkey) or bench_m1.get("sp500")
         m1 = row.get("sparks", {}).get("m1", [])
         rs_1m = None
-        if len(m1) >= 2 and m1[0] and sp_m1 is not None:
+        if len(m1) >= 2 and m1[0] and bm1 is not None:
             stk_m1 = (m1[-1] / m1[0] - 1) * 100
-            rs_1m = round(stk_m1 - sp_m1, 1)
+            rs_1m = round(stk_m1 - bm1, 1)
         row.update({
             "qty": pos["qty"], "pmc": pos["pmc"],
             "value": round(value, 2),
             "gain": round(value - cost, 2),
             "gain_pct": round((value / cost - 1) * 100, 2),
             "rs_1m": rs_1m,
+            "rs_bench": bkey,
         })
         rows.append(row)
     return rows
 
 
 def fetch_watchlist():
-    try:
-        sp_hist = yf.Ticker("^GSPC").history(period="2mo", interval="1d", auto_adjust=True)["Close"].dropna()
-        sp_m1 = (float(sp_hist.iloc[-1]) / float(sp_hist.iloc[-22]) - 1) * 100 if len(sp_hist) >= 22 else None
-    except Exception:  # noqa: BLE001
-        sp_m1 = None
+    bench_m1 = {}
+    for sym, key in (("^GSPC", "sp500"), ("^SOX", "sox"), ("^NDX", "ndx")):
+        try:
+            h = yf.Ticker(sym).history(period="2mo", interval="1d", auto_adjust=True)["Close"].dropna()
+            bench_m1[key] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100 if len(h) >= 22 else None
+        except Exception:  # noqa: BLE001
+            bench_m1[key] = None
 
     rows = []
     for w in WATCHLIST:
         row = fetch_symbol(w["ticker"], w.get("name"), w.get("currency", "USD"))
         if not row:
             continue
+        bkey = SECTOR_BENCH.get(w["ticker"], "sp500")
+        bm1 = bench_m1.get(bkey) or bench_m1.get("sp500")
         m1 = row.get("sparks", {}).get("m1", [])
         rs_1m = None
-        if len(m1) >= 2 and m1[0] and sp_m1 is not None:
+        if len(m1) >= 2 and m1[0] and bm1 is not None:
             stk_m1 = (m1[-1] / m1[0] - 1) * 100
-            rs_1m = round(stk_m1 - sp_m1, 1)
+            rs_1m = round(stk_m1 - bm1, 1)
         row["rs_1m"] = rs_1m
+        row["rs_bench"] = bkey
         rows.append(row)
     return rows
 
@@ -932,6 +951,41 @@ def fetch_macro():
             }
     except Exception as e:  # noqa: BLE001
         print(f"!! decouple: {e}", file=sys.stderr)
+
+    # S&P 500 vs Profitti Aziendali Reali USA (Corporate Profits, FRED CP)
+    try:
+        cp = fred_series("CP", 20)       # ~5 anni trimestrali
+        sp_cp = fred_series("SP500", 60) # ~5 anni mensili
+        if cp and sp_cp:
+            cp_base, sp_base = cp[0][1], sp_cp[0][1]
+            cur_sp = round(sp_cp[-1][1] / sp_base * 100, 1)
+            cur_cp = round(cp[-1][1] / cp_base * 100, 1)
+            gap = round(cur_sp - cur_cp, 1)
+            score = clamp(round(100 - max(0, gap - 10) / 60 * 100))
+            macro["corp_profit"] = {
+                "sp500":   [{"d": d, "v": round(v / sp_base * 100, 1)} for d, v in sp_cp],
+                "profits": [{"d": d, "v": round(v / cp_base * 100, 1)} for d, v in cp],
+                "gap": gap,
+                "score": score,
+                "label": "Asset Inflation estrema" if gap > 70 else "Asset Inflation" if gap > 40
+                         else "Tensione moderata" if gap > 20 else "Allineati",
+            }
+    except Exception as e:
+        print(f"!! corp_profit: {e}", file=sys.stderr)
+
+    # Fed Funds Rate + S&P 500 (andamento storico tassi vs mercato)
+    try:
+        ff = fred_series("FEDFUNDS", 60)   # ~5 anni mensili
+        sp_ff = fred_series("SP500", 60)   # ~5 anni mensili
+        if ff and sp_ff:
+            macro["fed_market"] = {
+                "fedfunds": [{"d": d, "v": round(v, 2)} for d, v in ff],
+                "sp500":    [{"d": d, "v": round(v)} for d, v in sp_ff],
+                "current_rate": round(ff[-1][1], 2),
+                "rate_date": ff[-1][0],
+            }
+    except Exception as e:
+        print(f"!! fed_market: {e}", file=sys.stderr)
 
     # Smart Money vs Retail: VIX term structure + HY/IG credit spread + put/call
     try:

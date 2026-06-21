@@ -608,13 +608,33 @@ function openTiltModal() {
 function openWitchingModal() {
   const w = (DATA.macro || {}).witching;
   if (!w) return;
-  const dates = (w.upcoming || []).map(d => `<li>${new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</li>`).join("");
+  const dates = (w.upcoming || []).map(d => `<tr><td>${new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</td><td class="muted">3° venerdì del trimestre</td></tr>`).join("");
   const contracts = (w.contracts || []).map(c => `<li>${esc(c)}</li>`).join("");
+  // urgency derivata dai giorni
+  const urgency = Math.max(0, Math.min(100, Math.round((1 - w.days / 90) * 100)));
+  const urgCol = w.days <= 7 ? "var(--red)" : w.days <= 21 ? "var(--yellow)" : "var(--muted)";
+  const urgLab = w.days <= 7 ? "IMMINENTE — massima attenzione a spike di volatilità intraday"
+               : w.days <= 21 ? "VICINA — monitorare volumi opzioni e livelli Max Pain"
+               : w.days <= 45 ? "IN ARRIVO — posizionarsi in anticipo se necessario"
+               : "LONTANA — nessuna azione urgente";
+  // opzioni portafoglio: Call/Put Wall per context
+  const ptf = DATA.portfolio || [];
+  const optContext = ptf.filter(r => DATA.options?.[r.ticker]).slice(0, 4).map(r => {
+    const ex = DATA.options[r.ticker]?.expiries?.[0];
+    return ex ? `<tr><td><b>${r.ticker}</b></td><td class="pos">${cur(r)}${fmtNum.format(ex.call_wall || 0)}</td><td class="neg">${cur(r)}${fmtNum.format(ex.put_wall || 0)}</td></tr>` : "";
+  }).join("");
   openInfoModal("Quadruple Witching — le quattro streghe",
-    `<p class="muted" style="margin:0 0 8px">Quattro volte l'anno (3° venerdì di marzo, giugno, settembre, dicembre) scadono contemporaneamente quattro tipi di derivati: spesso aumentano volumi e volatilità.</p>
-     <div class="info-line"><b>Prossima:</b> ${w.next ? new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "—"} (tra ${w.days} giorni)</div>
-     <h4 style="margin:10px 0 4px">Prossime date</h4><ul style="margin:0 0 8px 18px">${dates}</ul>
-     <h4 style="margin:10px 0 4px">Contratti che scadono</h4><ul style="margin:0 0 0 18px">${contracts}</ul>`);
+    `<p class="muted" style="margin:0 0 8px">Quattro volte l'anno (3° venerdì di marzo, giugno, settembre, dicembre) scadono contemporaneamente quattro tipi di derivati: spesso aumentano volumi e volatilità del 30-50% rispetto alla media giornaliera.</p>
+     <div class="info-line"><b>Prossima:</b> <b style="color:${urgCol}">${w.next ? new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "—"}</b> (tra ${w.days} giorni)</div>
+     <div class="meter-track" style="margin:6px 0"><span class="meter-fill" style="width:${urgency}%;background:${urgCol}"></span></div>
+     <div class="info-line" style="color:${urgCol};font-size:12px;margin-bottom:10px">${urgLab}</div>
+     <h4 style="margin:10px 0 4px">Impatto storico sulle opzioni del portafoglio</h4>
+     <div class="info-line muted" style="font-size:11px;margin-bottom:6px">I market maker devono coprire/chiudere posizioni in scadenza → volumi straordinari intorno a Call Wall e Put Wall, spesso con "pinning" del prezzo ai livelli di maggiore open interest.</div>
+     ${optContext ? `<table class="info-table"><thead><tr><th>Titolo</th><th>Call Wall</th><th>Put Wall</th></tr></thead><tbody>${optContext}</tbody></table>` : ""}
+     <h4 style="margin:10px 0 4px">Prossime date</h4>
+     <table class="info-table"><thead><tr><th>Data</th><th>Note</th></tr></thead><tbody>${dates}</tbody></table>
+     <h4 style="margin:10px 0 4px">Contratti in scadenza</h4><ul style="margin:0 0 0 18px">${contracts}</ul>
+     <div class="info-line muted" style="font-size:11px;margin-top:10px">Strategia tipica: evitare posizioni aperte sul mercato USA nelle 2 ore finali del giorno di scadenza. Se si detengono opzioni in portafoglio, valutare chiusura 1-2 giorni prima.</div>`);
 }
 
 function openSignpostsModal() {
@@ -924,11 +944,12 @@ function fmtVolume(v) {
   return String(v);
 }
 
-function rsBar(rs) {
+function rsBar(rs, bench) {
   if (rs == null) return "—";
-  // RS 1M vs S&P: positivo = outperformance (verde), negativo = underperformance (rosso)
   const color = rs >= 2 ? "var(--green)" : rs <= -2 ? "var(--red)" : "var(--muted)";
-  return `<span class="${rs > 0 ? "pos" : rs < 0 ? "neg" : ""}" style="font-family:var(--mono);font-size:12px;color:${color}">${rs > 0 ? "+" : ""}${fmtNum.format(rs)}%</span>`;
+  const bl = bench === "sox" ? "SOX" : bench === "ndx" ? "NDX" : "S&P";
+  const blHtml = bench ? ` <span class="muted" style="font-size:9px;vertical-align:middle">${bl}</span>` : "";
+  return `<span class="${rs > 0 ? "pos" : rs < 0 ? "neg" : ""}" style="font-family:var(--mono);font-size:12px;color:${color}">${rs > 0 ? "+" : ""}${fmtNum.format(rs)}%</span>${blHtml}`;
 }
 
 function techCells(r) {
@@ -945,7 +966,7 @@ function techCells(r) {
       <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
       <td class="num">${rsiBar(r.rsi)}</td>
       <td class="num">${volBar(r.vol_ratio)}</td>
-      <td class="num">${rsBar(r.rs_1m)}</td>
+      <td class="num">${rsBar(r.rs_1m, r.rs_bench)}</td>
       <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
       <td>${ratingBadge(r.rating)}</td>
       <td class="num">${targetBar(r.rating)}</td>
@@ -1427,6 +1448,8 @@ const MACRO_INFO = {
   credit: ["Rischio Credito (HY OAS)", "Spread dei bond High Yield rispetto ai Treasury USA: proxy del rischio sistemico, analogo al mercato CDS senza costi di abbonamento. Fonte: ICE BofA via FRED.", "Giornaliero (FRED)", /credit|credito|spread|hy|high.?yield|cds|default|obbligaz|bond/i],
   decouple: ["Disaccoppiamento Macro", "Divergenza tra mercato azionario (S&P 500) e economia reale (PIL reale USA GDPC1): misura quanta crescita futura è già prezzata nella borsa. Entrambe le serie normalizzate a 100 all'inizio del periodo.", "Mensile/trimestrale (FRED)", /disaccopp|decoupl|valuation|bolla|bubble|pil|gdp|utili|profit|crescita/i],
   smart_money: ["Smart Money vs Retail", "Posizionamento istituzionale dedotto da segnali professionali: struttura a termine del VIX (VIX/VIX3M), spread credito HY/IG e copertura put/call. Confrontato col Fear & Greed (proxy del sentiment retail) per evidenziare le divergenze tra denaro intelligente e folla.", "Aggiornato a ogni refresh", /smart.?money|istituzional|institution|hedge.?fund|posizionament|flow|flussi|put.?call|vix/i],
+  corp_profit: ["S&P 500 vs Profitti Aziendali Reali", "Divergenza tra l'S&P 500 nominale e i profitti aziendali reali USA (FRED CP). Un gap ampio segnala Asset Inflation: la borsa cresce più degli utili reali, trainata da svalutazione monetaria (fiat debasement) e non da crescita economica. Storicamente gap >40 pp precede lateralizzazioni o correzioni.", "Trimestrale (FRED CP + SP500 mensile)", /profitti|profit|asset.?inflat|nominal|real.?earn|corp|aziend|deflat/i],
+  fed_market: ["Fed Funds Rate vs S&P 500", "Andamento storico del tasso Fed Funds sovrapposto all'S&P 500 negli ultimi 5 anni. Mostra come i cicli di rialzo/taglio della politica monetaria influenzino il mercato azionario. Tassi alti comprimono i multipli; i tagli stimolano i rally.", "Mensile (FRED FEDFUNDS + SP500)", /fed.?fund|interest.?rate|tasso.?fed|fed.?rate|monetar|fomc.*trend|tassi.*mercato/i],
 };
 
 function openInfoModal(title, bodyHTML) {
@@ -1574,6 +1597,37 @@ function openMacroInfo(key) {
     if (sm.vix_term_ratio != null) det.push(`VIX/VIX3M ${fmtNum.format(sm.vix_term_ratio)} ${sm.vix_term_ratio > 1 ? "(backwardation = tensione)" : "(contango = calma)"}`);
     if (sm.hy_ig_ratio != null) det.push(`HY/IG ${fmtNum.format(sm.hy_ig_ratio)}`);
     if (det.length) extra += `<div class="info-line muted" style="font-size:11px;margin-top:6px">${det.join(" · ")}</div>`;
+  } else if (key === "corp_profit" && m.corp_profit) {
+    const cp = m.corp_profit;
+    const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
+    extra = `<div class="info-line"><b>Gap S&amp;P vs Profitti Reali:</b> <span style="color:${gapCol}">+${cp.gap} pp — ${cp.label}</span></div>
+      ${thermoBar(cp.score, ["Allineati", "Asset Inflation"])}
+      <div class="info-line muted" style="font-size:11px;margin:6px 0">
+        Quando l'S&amp;P 500 nominale cresce molto più dei profitti aziendali reali, l'eccesso è spiegato da svalutazione monetaria (fiat debasement) e non da crescita degli utili.
+        Storicamente gap &gt;40 pp precede correzioni prolungate o lateralizzazione. Vedi 2000, 2007, 2021.
+      </div>
+      <h4 style="margin:12px 0 4px">S&amp;P 500 nominale vs Profitti Aziendali Reali USA (base 100)</h4>
+      ${miniDualChart(cp.sp500, cp.profits, { color1: "var(--blue)", color2: "var(--yellow)", label1: "S&P 500 nominale", label2: "Profitti reali (FRED CP)" })}
+      <div class="info-line muted" style="font-size:11px;margin-top:6px">
+        <b>Scenario breve (0-6 mesi):</b> se gap cresce, la borsa sale per illusione nominale, non per utili reali — rischio di correzione tecnica.<br>
+        <b>Scenario lungo (12-36 mesi):</b> riallineamento tramite stagnazione dei prezzi o calo degli utili nominali; trigger: inflazione in risalita, scadenze fiscali, rallentamento consumi.
+      </div>`;
+  } else if (key === "fed_market" && m.fed_market) {
+    const fm = m.fed_market;
+    const rateCol = fm.current_rate > 4.5 ? "var(--red)" : fm.current_rate > 2.5 ? "var(--yellow)" : "var(--green)";
+    extra = `<div class="info-line"><b>Fed Funds Rate attuale:</b> <span style="color:${rateCol}">${fm.current_rate}%</span>
+        <span class="muted"> · rilevazione ${fm.rate_date}</span></div>
+      <div class="info-line muted" style="font-size:11px;margin:6px 0">
+        Il grafico mostra la correlazione storica tra il ciclo dei tassi Fed (rosso) e l'andamento dell'S&amp;P 500 (blu).
+        I rialzi comprimono i multipli P/E; i tagli innescano rally. Le scale sono normalizzate per sovrapposizione visiva.
+      </div>
+      <h4 style="margin:12px 0 4px">Fed Funds Rate (%) vs S&amp;P 500 — ultimi 5 anni</h4>
+      ${miniDualChart(fm.fedfunds, fm.sp500.map(p => ({ d: p.d, v: p.v / 1000 })),
+        { color1: "var(--red)", color2: "var(--blue)", label1: "Fed Funds Rate (%)", label2: "S&P 500 (÷1000)" })}
+      <div class="info-line muted" style="font-size:11px;margin-top:6px">
+        Con Fed Funds &gt;4% la storia mostra compressione dei multipli azionari entro 12-18 mesi.
+        Un taglio rapido (emergenza) storico precede rally ma anche segnali di crisi economica.
+      </div>`;
   } else {
     extra = `<div class="info-line"><b>Aggiornamento:</b> ${cadence}</div>`;
   }
@@ -1932,6 +1986,13 @@ function renderGauges() {
       `<b>${sm.label}</b>`,
       `flussi istituzionali (VIX term · HY/IG · P/C)${divTxt}`, ["Difensivo", "Aggressivo"]));
   }
+  if (m.corp_profit) {
+    const cp = m.corp_profit;
+    const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
+    cards.push(thermoCard("corp_profit", "S&P vs Profitti Reali", cp.score,
+      `<span style="color:${gapCol}">gap +${cp.gap} pp</span>`,
+      `<b style="color:${gapCol}">${cp.label}</b> · S&P nominale vs utili reali`, ["Allineati", "Asset Inflation"]));
+  }
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
 }
 
@@ -1988,6 +2049,18 @@ function renderMacro() {
       <div class="m-value" style="color:${gapCol}">${gap > 0 ? "+" : ""}${gap} pp</div>
       <div class="m-date">S&amp;P ${signTxt(Math.round(spLast - 100))} · PIL ${signTxt(Math.round(gdLast - 100))}</div>
       ${macroThermo(gapScore)}
+    </div>`);
+  }
+  if (m.fed_market) {
+    const fm = m.fed_market;
+    const rateCol = fm.current_rate > 4.5 ? "var(--red)" : fm.current_rate > 2.5 ? "var(--yellow)" : "var(--green)";
+    const rateScore = clamp(100 - (fm.current_rate - 0) / 6 * 100);
+    cells.push(`<div class="macro-item" data-macro="fed_market" tabindex="0" role="button" title="Clicca per grafico Fed Funds vs S&P" style="--accent:var(--red)">
+      <span class="popup-dot"></span>
+      <div class="m-label">Fed Funds vs Mercato</div>
+      <div class="m-value" style="color:${rateCol}">${fm.current_rate}%</div>
+      <div class="m-date">tasso Fed attuale · clicca per storico</div>
+      ${macroThermo(rateScore)}
     </div>`);
   }
 
@@ -2080,9 +2153,11 @@ function buildPrompt() {
     const c = cur(r);
     const optC = (DATA.options || {})[r.ticker];
     const optNote = optC ? `CW:${c}${f(optC.expiries?.[0]?.call_wall)} PW:${c}${f(optC.expiries?.[0]?.put_wall)}` : "—";
-    return `| ${r.name} (${r.ticker}) | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${r.rs_1m != null ? (r.rs_1m > 0 ? "+" : "") + r.rs_1m + "%" : "—"} | ${r.support ? c + f(r.support) : "—"} | ${r.resistance ? c + f(r.resistance) : "—"} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(r.beta)} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"} | ${r.signal} | ${optNote} |`;
+    const rsBench = r.rs_bench === "sox" ? "SOX" : r.rs_bench === "ndx" ? "NDX" : "S&P";
+    const rsCell = r.rs_1m != null ? `${r.rs_1m > 0 ? "+" : ""}${r.rs_1m}% (vs ${rsBench})` : "—";
+    return `| ${r.name} (${r.ticker}) | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rsCell} | ${r.support ? c + f(r.support) : "—"} | ${r.resistance ? c + f(r.resistance) : "—"} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(r.beta)} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"} | ${r.signal} | ${optNote} |`;
   };
-  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RS 1M | Supp. | Resist. | P/E | EPS | Beta | Target Δ | Trimestrale | Segnale | Opzioni (CW/PW) |";
+  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RS 1M (vs bench) | Supp. | Resist. | P/E | EPS | Beta | Target Δ | Trimestrale | Segnale | Opzioni (CW/PW) |";
   const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
@@ -2126,6 +2201,8 @@ function buildPrompt() {
     [...m.tilt].sort((a, b) => b.m1 - a.m1).forEach(s =>
       lines.push(`- ${s.name} (${s.ticker}): 1M ${signTxt(s.m1)}, 3M ${signTxt(s.m3)}`));
   }
+  if (m.corp_profit) lines.push(`- S&P vs Profitti Aziendali Reali (FRED CP): gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali)`);
+  if (m.fed_market) lines.push(`- Fed Funds Rate attuale: ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}); tasso>4% storicamente comprime i multipli P/E in 12-18 mesi`);
   if (m.witching) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg)`);
   // liquidità e capitale
   if (t.cash) lines.push(`- Liquidità disponibile: ${fmtEUR.format(t.cash)} · capitale investito: ${fmtEUR.format(t.eur_invested)}`);
