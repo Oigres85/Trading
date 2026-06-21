@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-21T16:47:43Z",
+ "updated_at": "2026-06-21T17:41:28Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6480,15 +6480,15 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64066.95,
-   "change_pct": -0.27,
+   "price": 63987.0,
+   "change_pct": -0.39,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.2,
+   "ath_dist_pct": -49.3,
    "support": 59108.92,
    "resistance": 71334.95,
-   "rsi": 40.0,
-   "volume": 14373686272,
+   "rsi": 39.8,
+   "volume": 14158206976,
    "vol_ratio": 0.44,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -6498,7 +6498,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64066.95
+     63987.0
     ],
     "m6": [
      68843.16,
@@ -6626,7 +6626,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64066.95
+     63987.0
     ],
     "all": [
      386.94,
@@ -6770,7 +6770,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64066.95
+     63987.0
     ],
     "m1": [
      73579.69,
@@ -6794,7 +6794,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64066.95
+     63987.0
     ],
     "m3": [
      77126.88,
@@ -6862,7 +6862,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64066.95
+     63987.0
     ],
     "y1": [
      102257.41,
@@ -6938,7 +6938,7 @@
      60867.41,
      63561.05,
      65600.64,
-     64066.95
+     63987.0
     ],
     "d1": [
      64185.27,
@@ -7041,7 +7041,13 @@
      64056.05,
      64134.49,
      63978.31,
-     64025.93
+     64025.93,
+     64056.01,
+     64102.22,
+     64125.02,
+     64077.62,
+     63996.39,
+     63987.0
     ]
    },
    "earnings_date": null,
@@ -7056,27 +7062,27 @@
     "w1": {
      "support": 62201.14,
      "resistance": 66354.62,
-     "change_pct": -0.55
+     "change_pct": -0.67
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74153.5,
-     "change_pct": -12.93
+     "change_pct": -13.04
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -16.93
+     "change_pct": -17.04
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -44.42
+     "change_pct": -44.49
     }
    },
    "financials": [],
    "fin_health": null,
-   "rs_1m": -14.9
+   "rs_1m": -15.0
   },
   {
    "ticker": "CL=F",
@@ -11862,7 +11868,7 @@
      262.81,
      273.93,
      265.04,
-     273.25,
+     273.24,
      282.06,
      281.36,
      276.51,
@@ -15698,7 +15704,7 @@
     153263,
     160434,
     166937,
-    163245,
+    163244,
     169543,
     157386,
     148131,
@@ -16468,7 +16474,7 @@
     153263,
     160434,
     166937,
-    163245,
+    163244,
     169543,
     157386,
     148131,
@@ -17119,8 +17125,8 @@
   },
   "fedwatch": {
    "target_range": "3.50–3.75%",
-   "implied_rate": 3.74,
-   "delta_bp": 12,
+   "implied_rate": 3.73,
+   "delta_bp": 10,
    "next_cut_prob": 0,
    "meetings": [
     {
@@ -19265,6 +19271,7 @@
    "spread": 1.82,
    "usdjpy": 161.27,
    "usdjpy_chg_1m": 1.52,
+   "boj_rate": 0.3,
    "boj_meetings": [
     "2026-07-31",
     "2026-09-18",
@@ -19275,9 +19282,9 @@
   "putcall": {
    "symbol": "BSX",
    "name": "Boston Scientific",
-   "ratio": 1.13,
-   "puts": 3307,
-   "calls": 2916
+   "ratio": 1.12,
+   "puts": 3330,
+   "calls": 2971
   },
   "risk_sentiment": {
    "score": 50,
@@ -19293,11 +19300,11 @@
     },
     {
      "label": "Put/Call",
-     "score": 28
+     "score": 30
     },
     {
      "label": "Bitcoin",
-     "score": 47
+     "score": 46
     },
     {
      "label": "Treasury 10A",
@@ -20862,13 +20869,13 @@
    ]
   },
   "smart_money": {
-   "score": 76,
+   "score": 77,
    "label": "Ottimista",
    "vix3m": 19.6,
    "vix_term_ratio": 0.838,
    "ig_spread": 0.92,
    "hy_ig_ratio": 2.86,
-   "divergence": -39,
+   "divergence": -40,
    "divergence_label": "Smart money ottimista / Retail pessimista",
    "components": [
     {
@@ -20881,12 +20888,12 @@
     },
     {
      "label": "Copertura PUT (P/C ratio)",
-     "score": 56
+     "score": 57
     }
    ]
   },
   "macroquant": {
-   "score": 53,
+   "score": 54,
    "label": "Rallentamento",
    "components": [
     {
@@ -20943,7 +20950,7 @@
     },
     {
      "label": "Smart Money (VIX+HY/IG+P/C)",
-     "score": 76
+     "score": 77
     }
    ],
    "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici (il MacroQuant ufficiale di BCA Research è proprietario e a pagamento)."
@@ -21062,7 +21069,7 @@
   },
   {
    "source": "Investing.com",
-   "title": "Trump warns Iran over Lebanon proxies as U.S.-Tehran talks continue",
+   "title": "Iran suspends U.S. talks after Trump threatens fresh strikes - media reports",
    "link": "https://www.investing.com/news/economy-news/usiran-ceasefire-talks-set-to-begin-in-switzerland-as-vance-arrives-4751640",
    "published": "2026-06-21T14:10:20Z",
    "tickers": [
@@ -21071,8 +21078,8 @@
    ],
    "topic_pri": 0,
    "inv": true,
-   "sentiment": "bear",
-   "title_it": "Trump mette in guardia l’Iran dalle procure del Libano mentre continuano i colloqui tra Stati Uniti e Teheran"
+   "sentiment": "neutral",
+   "title_it": "L’Iran sospende i colloqui con gli Stati Uniti dopo che Trump minaccia nuovi attacchi – riferiscono i media"
   },
   {
    "source": "Investing.com",
@@ -21087,20 +21094,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "Trump afferma che gli Stati Uniti riprenderanno gli attacchi se l’Iran non frena gli alleati di Hezbollah"
-  },
-  {
-   "source": "Investing.com",
-   "title": "No-fly zone for Iran talks disrupted flights at Zurich airport, authorities say",
-   "link": "https://www.investing.com/news/world-news/nofly-zone-for-iran-talks-disrupted-flights-at-zurich-airport-authorities-say-4751668",
-   "published": "2026-06-21T12:30:34Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "La no-fly zone per l'Iran parla di voli interrotti all'aeroporto di Zurigo, dicono le autorità"
   },
   {
    "source": "Investing.com",
@@ -21146,16 +21139,17 @@
   },
   {
    "source": "Yahoo Finance",
-   "title": "Wall Street Just Sold Off These IT-Services Stocks on AI Fears. Is the Sell-Off Overdone?",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/wall-street-just-sold-off-162000358.html",
-   "published": "2026-06-21T16:20:00Z",
+   "title": "Trump bought these health care stocks in 2026; should you?",
+   "link": "https://finance.yahoo.com/healthcare/articles/trump-bought-health-care-stocks-171700353.html",
+   "published": "2026-06-21T17:17:00Z",
    "tickers": [
-    "MACRO"
+    "MACRO",
+    "POL"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Wall Street ha appena svenduto questi titoli di servizi IT per paura dell'intelligenza artificiale. La svendita è eccessiva?"
+   "title_it": "Trump ha acquistato questi titoli sanitari nel 2026; dovresti?"
   },
   {
    "source": "CNBC",
@@ -21227,6 +21221,20 @@
   },
   {
    "source": "Google News",
+   "title": "What the Iran war cost the Pentagon, the economy — and Trump - Scripps News",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQLTM0MGQxTjh1VjhMc3NnaFA0MU1lU1V0d0Z3VmRnZkxRRnBPRF9SRUs3em1IemNBdmtIM21nNlhfdmxDSXFPWndGZjQ4WjJMdG1DNThMT3RzdGZLN1BaWDdnX0JvOGY1eU9IdFNCSVhTUEI3V0ZDQk1uUUFIT3p4Y3AtNDZ4MlBTQUwtZzFNcDMtSC03SUN6Z0NBRUg2M2FjWG5ucw?oc=5",
+   "published": "2026-06-21T13:15:28Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Quanto è costata la guerra all’Iran al Pentagono, all’economia – e a Trump – Scripps News"
+  },
+  {
+   "source": "Google News",
    "title": "Trump hails Iran deal but conflict continues to cast long shadow over global economy - The Guardian",
    "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPNUpaSEVTZ1NueVZrMXYwdjQwRlk3RndNUVUwU2dJRTJNV0NzSG5jVTJ1TEFpTnN3MTJjX0c1UEc4TktuZzJIbWdLNzR6Qjd6LTdOaTlhSFplSFRCeUxRVGpvQUJqMDBpQjFERHdSVzBjblpkbXJKV2p3bzJOZXc4ZHlJUGVacVRaUml0OGZNRDBKNEZrelE?oc=5",
    "published": "2026-06-21T13:05:00Z",
@@ -21278,6 +21286,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Ecco 3 grandi cose da tenere d’occhio nel mercato azionario la prossima settimana"
+  },
+  {
+   "source": "Reuters",
+   "title": "No-fly zone for Iran talks disrupted flights at Zurich airport, authorities say - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNR3Y0aFE0VW1lYXZYRERxU3ZYcWFQSlQyTHcyaUhfQ3BiSlJ3cGhWOWxMNTFjNGh2SFNRTUxNLTh5MWZ4aEtlZGs1M0JfZU9ONlFzcDdGaFlISTRZVktPMmo2MS1jYlRmb25NNEk2Yk9oQWczSkVHVkczR2RwMkVFVVhsLVJzb3VXRVJ1QnljMHU2NmRoajk3TGROWkhiRGxOMHU4bHh6QkpfUE1VYjhaa0RHV1MyTnVHTExLbQ?oc=5",
+   "published": "2026-06-21T12:29:46Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "No-fly zone per l'Iran, si parla di voli interrotti all'aeroporto di Zurigo, dicono le autorità - Reuters"
   },
   {
    "source": "Bloomberg",
@@ -21401,19 +21423,6 @@
    "title_it": "Il petrolio continua a scorrere attraverso Hormuz nonostante l’Iran affermi che è chiuso"
   },
   {
-   "source": "Google News",
-   "title": "Fed Holds Rates and Leans Toward Fighting Inflation With Future Increases - The New York Times",
-   "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxOWlo2eWRfMHQzRGk2MTdTdkR4R3FLWHlxWjdRekZCOWRhWk42ajJxamdDcmZlbER4TzVxZlFMa0F5d0wycHVMejh1Qk1vTGtWQW1qV05HdXp6ZFFOd3FEOXdaRmw5ZC1HdDd6WGl1Q3NnOS0xc3Y0YUdyQ3htLUlzTVJqRG9oalZM?oc=5",
-   "published": "2026-06-21T06:01:16Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La Fed mantiene i tassi e punta a combattere l'inflazione con aumenti futuri - The New York Times"
-  },
-  {
    "source": "Reuters",
    "title": "US VP Vance arrives in Switzerland for peace talks with Iran - Reuters",
    "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQdnAzWlotOEpfTUY1MXotSFVBTlJndkJWUS1QazZfdjFPNTFHQ3RWaFF5QjlFM3BndjQ1N0ExTlByMjNLODhTalhEb0loNTBnSmJ2OXdieURobkJ5WThHVzhwaXJ3enE4TzhzeHliaVN3bDB5SjFJa0JvNTYydEhDbW5aNmhGT2F2bFp3ZGNJOC1QZkFfWTBPQ1daS3NUbzFCVmRGWQ?oc=5",
@@ -21473,7 +21482,7 @@
    "source": "AP",
    "title": "Come inside Iran’s World Cup hotel in Tijuana, Mexico, where fans turn out to cheer - AP News",
    "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNdE5odklsTklDeTRlSG9oeVphNGFnX2JtVE52T3BhUGwwRFFYM2tzR19VTkFoQmFLbUU1SnA2cGJ2VWdBUVUzWGI5LV82cmVMRTFCejhfTHpEdDZscDV3eWhtdWoxbWFYSHlRQWVSVGpyMWZMNGhxcjZWRWU3eUM0LVhOZ1JrdzZrQ0E?oc=5",
-   "published": "2026-06-21T01:34:22Z",
+   "published": "2026-06-21T01:53:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -21567,19 +21576,6 @@
    "title_it": "BREAKING: L'Iran afferma che Hormuz è di nuovo chiuso"
   },
   {
-   "source": "Reuters",
-   "title": "US forces monitoring Strait of Hormuz to ensure it stays open - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQOEt1ZGR5cFBKRG1mSHlLQTc3TnpyMnVnaWltNHQ1eXpockxLYVhxeVlqdmRMeThjck83dVdad2s0eTJOblROeE1GNkJWeF94RTE3cEwyNEFSWTVIaTZITHAtbTNMeS13dmtXUFZrUzJHZjNMdW9ReHZpOFhELUJaX2hNU1BLblRBYno3UHVBT1djajVIdlVQQ1hGb0RuR19wZHA0dUZXX1VrSlJPQVE?oc=5",
-   "published": "2026-06-20T16:55:11Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Le forze americane monitorano lo Stretto di Hormuz per assicurarsi che rimanga aperto - Reuters"
-  },
-  {
    "source": "Yahoo Finance",
    "title": "Forget SpaceX: See This Overlooked AI Stock in Donald Trump’s Portfolio",
    "link": "https://finance.yahoo.com/technology/ai/articles/forget-spacex-see-overlooked-ai-153143545.html",
@@ -21607,17 +21603,30 @@
    "title_it": "Mark Cuban afferma che il mercato azionario rende persone come Elon Musk “follemente ricche”, ma l’eliminazione dei miliardari scatenerebbe la “peggiore depressione” mai vista"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "SpaceX and Nvidia Each Forecast $1 Trillion in Revenue. Which Stock is the Better Buy?",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/spacex-nvidia-forecast-1-trillion-162500758.html",
-   "published": "2026-06-21T16:25:00Z",
+   "source": "Reddit",
+   "title": "MU or SNDK which one looks better going forward?",
+   "link": "https://www.reddit.com/r/stocks/comments/1ubw0yf/mu_or_sndk_which_one_looks_better_going_forward/",
+   "published": "2026-06-21T17:34:28Z",
    "tickers": [
-    "NVDA"
+    "MU"
    ],
    "topic_pri": 1,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "SpaceX e Nvidia prevedono entrate per 1 trilione di dollari ciascuna. Quale azione è la migliore da acquistare?"
+   "title_it": "MU o SNDK quale sembra migliore in futuro?"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "The Retirement Strategy That Says Spend More and Worry Less",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/retirement-strategy-says-spend-more-171241330.html",
+   "published": "2026-06-21T17:12:41Z",
+   "tickers": [
+    "MSTR"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La strategia pensionistica che dice di spendere di più e preoccuparsi di meno"
   },
   {
    "source": "MarketWatch",
@@ -22098,7 +22107,7 @@
      ],
      "call_wall": 600.0,
      "put_wall": 315.0,
-     "opt_volume": 106678
+     "opt_volume": 112704
     },
     {
      "date": "2026-07-02",
@@ -22508,7 +22517,7 @@
      ],
      "call_wall": 560.0,
      "put_wall": 390.0,
-     "opt_volume": 13145
+     "opt_volume": 13152
     },
     {
      "date": "2026-07-10",
@@ -22918,7 +22927,7 @@
      ],
      "call_wall": 545.0,
      "put_wall": 455.0,
-     "opt_volume": 7117
+     "opt_volume": 7160
     }
    ]
   },
@@ -23316,25 +23325,25 @@
        "oi": 8
       },
       {
+       "strike": 262.5,
+       "bid": 35.1,
+       "ask": 39.6,
+       "iv": 161.9,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 265.0,
        "bid": 37.1,
        "ask": 41.7,
        "iv": 163.6,
        "vol": 2,
        "oi": 56
-      },
-      {
-       "strike": 270.0,
-       "bid": 41.2,
-       "ask": 45.7,
-       "iv": 165.7,
-       "vol": 2,
-       "oi": 22
       }
      ],
      "call_wall": 240.0,
      "put_wall": 200.0,
-     "opt_volume": 12300
+     "opt_volume": 12369
     },
     {
      "date": "2026-07-02",
@@ -23686,6 +23695,14 @@
        "oi": 4
       },
       {
+       "strike": 257.5,
+       "bid": 35.0,
+       "ask": 39.9,
+       "iv": 137.4,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 260.0,
        "bid": 36.7,
        "ask": 41.5,
@@ -23732,19 +23749,11 @@
        "iv": 144.0,
        "vol": 1,
        "oi": 156
-      },
-      {
-       "strike": 287.5,
-       "bid": 59.0,
-       "ask": 64.1,
-       "iv": 146.3,
-       "vol": 1,
-       "oi": 4
       }
      ],
      "call_wall": 400.0,
      "put_wall": 200.0,
-     "opt_volume": 2440
+     "opt_volume": 2511
     },
     {
      "date": "2026-07-10",
@@ -23854,12 +23863,28 @@
        "oi": 14
       },
       {
+       "strike": 237.5,
+       "bid": 23.5,
+       "ask": 27.7,
+       "iv": 122.7,
+       "vol": 4,
+       "oi": 2
+      },
+      {
        "strike": 240.0,
        "bid": 22.5,
        "ask": 26.6,
        "iv": 122.7,
        "vol": 1,
        "oi": 17
+      },
+      {
+       "strike": 242.5,
+       "bid": 21.6,
+       "ask": 25.9,
+       "iv": 123.7,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 245.0,
@@ -23918,47 +23943,23 @@
        "oi": 91
       },
       {
+       "strike": 262.5,
+       "bid": 15.8,
+       "ask": 18.5,
+       "iv": 125.3,
+       "vol": 1,
+       "oi": 6
+      },
+      {
        "strike": 265.0,
        "bid": 15.1,
        "ask": 18.1,
        "iv": 126.1,
        "vol": 12,
        "oi": 13
-      },
-      {
-       "strike": 267.5,
-       "bid": 14.6,
-       "ask": 17.2,
-       "iv": 126.2,
-       "vol": 6,
-       "oi": 12
-      },
-      {
-       "strike": 270.0,
-       "bid": 14.0,
-       "ask": 16.5,
-       "iv": 126.3,
-       "vol": 16,
-       "oi": 7
-      },
-      {
-       "strike": 272.5,
-       "bid": 13.5,
-       "ask": 16.0,
-       "iv": 127.1,
-       "vol": 1,
-       "oi": 1
       }
      ],
      "puts": [
-      {
-       "strike": 202.5,
-       "bid": 9.8,
-       "ask": 12.7,
-       "iv": 118.1,
-       "vol": 1,
-       "oi": 2
-      },
       {
        "strike": 205.0,
        "bid": 10.7,
@@ -24048,6 +24049,14 @@
        "oi": 38
       },
       {
+       "strike": 232.5,
+       "bid": 23.7,
+       "ask": 27.4,
+       "iv": 122.5,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 235.0,
        "bid": 25.2,
        "ask": 28.9,
@@ -24096,6 +24105,14 @@
        "oi": 0
       },
       {
+       "strike": 267.5,
+       "bid": 46.6,
+       "ask": 51.5,
+       "iv": 127.9,
+       "vol": 0,
+       "oi": 2
+      },
+      {
        "strike": 275.0,
        "bid": 52.1,
        "ask": 57.2,
@@ -24104,17 +24121,33 @@
        "oi": 1
       },
       {
+       "strike": 280.0,
+       "bid": 56.0,
+       "ask": 61.4,
+       "iv": 129.5,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 290.0,
        "bid": 64.4,
        "ask": 69.4,
        "iv": 131.3,
        "vol": 1,
        "oi": 1
+      },
+      {
+       "strike": 330.0,
+       "bid": 98.9,
+       "ask": 104.1,
+       "iv": 134.7,
+       "vol": 0,
+       "oi": 1
       }
      ],
      "call_wall": 400.0,
      "put_wall": 130.0,
-     "opt_volume": 526
+     "opt_volume": 537
     }
    ]
   },
@@ -24522,7 +24555,7 @@
      ],
      "call_wall": 370.0,
      "put_wall": 347.5,
-     "opt_volume": 36350
+     "opt_volume": 36355
     },
     {
      "date": "2026-06-24",
@@ -24858,6 +24891,14 @@
        "oi": 8
       },
       {
+       "strike": 377.5,
+       "bid": 10.15,
+       "ask": 12.2,
+       "iv": 41.0,
+       "vol": 1,
+       "oi": 8
+      },
+      {
        "strike": 380.0,
        "bid": 11.2,
        "ask": 13.85,
@@ -24872,6 +24913,14 @@
        "iv": 50.5,
        "vol": 3,
        "oi": 4
+      },
+      {
+       "strike": 387.5,
+       "bid": 17.75,
+       "ask": 21.35,
+       "iv": 51.9,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 390.0,
@@ -24908,7 +24957,7 @@
      ],
      "call_wall": 372.5,
      "put_wall": 335.0,
-     "opt_volume": 6984
+     "opt_volume": 6994
     },
     {
      "date": "2026-06-26",
@@ -25292,6 +25341,14 @@
        "oi": 254
       },
       {
+       "strike": 392.5,
+       "bid": 23.85,
+       "ask": 25.2,
+       "iv": 37.1,
+       "vol": 0,
+       "oi": 1
+      },
+      {
        "strike": 395.0,
        "bid": 26.2,
        "ask": 27.6,
@@ -25300,25 +25357,17 @@
        "oi": 83
       },
       {
-       "strike": 400.0,
-       "bid": 30.0,
-       "ask": 32.75,
-       "iv": 45.6,
-       "vol": 3,
-       "oi": 267
-      },
-      {
-       "strike": 405.0,
-       "bid": 34.9,
-       "ask": 38.4,
-       "iv": 59.0,
-       "vol": 1,
+       "strike": 397.5,
+       "bid": 27.6,
+       "ask": 31.3,
+       "iv": 54.6,
+       "vol": 0,
        "oi": 1
       }
      ],
      "call_wall": 380.0,
      "put_wall": 345.0,
-     "opt_volume": 54466
+     "opt_volume": 56193
     }
    ]
   },
@@ -25692,6 +25741,14 @@
        "oi": 0
       },
       {
+       "strike": 142.0,
+       "bid": 11.25,
+       "ask": 12.25,
+       "iv": 99.7,
+       "vol": 124,
+       "oi": 4
+      },
+      {
        "strike": 143.0,
        "bid": 11.9,
        "ask": 12.7,
@@ -25722,19 +25779,11 @@
        "iv": 99.1,
        "vol": 3,
        "oi": 0
-      },
-      {
-       "strike": 149.0,
-       "bid": 16.4,
-       "ask": 17.65,
-       "iv": 98.9,
-       "vol": 82,
-       "oi": 1
       }
      ],
      "call_wall": 140.0,
      "put_wall": 70.0,
-     "opt_volume": 233896
+     "opt_volume": 234218
     },
     {
      "date": "2026-07-02",
@@ -25942,14 +25991,6 @@
      ],
      "puts": [
       {
-       "strike": 121.0,
-       "bid": 3.35,
-       "ask": 3.95,
-       "iv": 93.8,
-       "vol": 155,
-       "oi": 115
-      },
-      {
        "strike": 122.0,
        "bid": 3.65,
        "ask": 4.25,
@@ -26038,12 +26079,36 @@
        "oi": 108
       },
       {
+       "strike": 133.0,
+       "bid": 8.3,
+       "ask": 8.6,
+       "iv": 92.7,
+       "vol": 132,
+       "oi": 0
+      },
+      {
+       "strike": 134.0,
+       "bid": 8.5,
+       "ask": 9.25,
+       "iv": 91.6,
+       "vol": 211,
+       "oi": 0
+      },
+      {
        "strike": 135.0,
        "bid": 9.15,
        "ask": 9.65,
        "iv": 91.4,
        "vol": 416,
        "oi": 145
+      },
+      {
+       "strike": 136.0,
+       "bid": 9.45,
+       "ask": 10.4,
+       "iv": 91.1,
+       "vol": 6,
+       "oi": 0
       },
       {
        "strike": 137.0,
@@ -26054,12 +26119,52 @@
        "oi": 1
       },
       {
+       "strike": 138.0,
+       "bid": 10.6,
+       "ask": 11.55,
+       "iv": 90.9,
+       "vol": 8,
+       "oi": 0
+      },
+      {
+       "strike": 139.0,
+       "bid": 11.2,
+       "ask": 12.2,
+       "iv": 91.0,
+       "vol": 32,
+       "oi": 0
+      },
+      {
        "strike": 140.0,
        "bid": 11.8,
        "ask": 12.85,
        "iv": 91.0,
        "vol": 80,
        "oi": 31
+      },
+      {
+       "strike": 141.0,
+       "bid": 12.45,
+       "ask": 13.45,
+       "iv": 90.8,
+       "vol": 3,
+       "oi": 0
+      },
+      {
+       "strike": 142.0,
+       "bid": 13.1,
+       "ask": 14.1,
+       "iv": 90.6,
+       "vol": 2,
+       "oi": 0
+      },
+      {
+       "strike": 143.0,
+       "bid": 13.8,
+       "ask": 14.8,
+       "iv": 90.9,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 145.0,
@@ -26070,65 +26175,25 @@
        "oi": 147
       },
       {
-       "strike": 149.0,
-       "bid": 18.15,
-       "ask": 19.35,
-       "iv": 92.0,
+       "strike": 147.0,
+       "bid": 16.65,
+       "ask": 17.85,
+       "iv": 92.1,
        "vol": 1,
-       "oi": 1
-      },
-      {
-       "strike": 150.0,
-       "bid": 18.95,
-       "ask": 20.05,
-       "iv": 91.8,
-       "vol": 98,
-       "oi": 14
-      },
-      {
-       "strike": 155.0,
-       "bid": 22.95,
-       "ask": 24.25,
-       "iv": 92.8,
-       "vol": 5,
-       "oi": 35
-      },
-      {
-       "strike": 165.0,
-       "bid": 31.7,
-       "ask": 33.05,
-       "iv": 94.2,
-       "vol": 5,
-       "oi": 91
-      },
-      {
-       "strike": 170.0,
-       "bid": 36.3,
-       "ask": 37.65,
-       "iv": 94.4,
-       "vol": 0,
-       "oi": 64
-      },
-      {
-       "strike": 175.0,
-       "bid": 40.45,
-       "ask": 43.45,
-       "iv": 102.1,
-       "vol": 0,
        "oi": 0
       },
       {
-       "strike": 180.0,
-       "bid": 45.4,
-       "ask": 48.25,
-       "iv": 106.3,
-       "vol": 0,
-       "oi": 40
+       "strike": 148.0,
+       "bid": 17.45,
+       "ask": 18.45,
+       "iv": 91.5,
+       "vol": 1,
+       "oi": 0
       }
      ],
      "call_wall": 120.0,
      "put_wall": 80.0,
-     "opt_volume": 43302
+     "opt_volume": 43759
     },
     {
      "date": "2026-07-10",
@@ -26336,14 +26401,6 @@
      ],
      "puts": [
       {
-       "strike": 121.0,
-       "bid": 5.0,
-       "ask": 5.6,
-       "iv": 88.8,
-       "vol": 308,
-       "oi": 75
-      },
-      {
        "strike": 122.0,
        "bid": 5.2,
        "ask": 5.9,
@@ -26416,6 +26473,14 @@
        "oi": 257
       },
       {
+       "strike": 131.0,
+       "bid": 9.0,
+       "ask": 9.9,
+       "iv": 88.1,
+       "vol": 30,
+       "oi": 0
+      },
+      {
        "strike": 132.0,
        "bid": 9.55,
        "ask": 10.0,
@@ -26456,6 +26521,22 @@
        "oi": 1
       },
       {
+       "strike": 138.0,
+       "bid": 12.8,
+       "ask": 13.8,
+       "iv": 88.2,
+       "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 139.0,
+       "bid": 13.4,
+       "ask": 14.45,
+       "iv": 88.4,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 140.0,
        "bid": 13.9,
        "ask": 14.95,
@@ -26464,12 +26545,28 @@
        "oi": 37
       },
       {
+       "strike": 143.0,
+       "bid": 15.9,
+       "ask": 16.85,
+       "iv": 87.6,
+       "vol": 0,
+       "oi": 10
+      },
+      {
        "strike": 145.0,
        "bid": 17.3,
        "ask": 18.2,
        "iv": 87.8,
        "vol": 101,
        "oi": 56
+      },
+      {
+       "strike": 148.0,
+       "bid": 19.25,
+       "ask": 20.3,
+       "iv": 87.0,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 150.0,
@@ -26502,19 +26599,11 @@
        "iv": 89.6,
        "vol": 2,
        "oi": 3
-      },
-      {
-       "strike": 175.0,
-       "bid": 41.8,
-       "ask": 43.35,
-       "iv": 90.0,
-       "vol": 0,
-       "oi": 30
       }
      ],
      "call_wall": 120.0,
      "put_wall": 90.0,
-     "opt_volume": 20870
+     "opt_volume": 20957
     }
    ]
   },
@@ -26864,12 +26953,28 @@
        "oi": 234
       },
       {
+       "strike": 337.5,
+       "bid": 12.1,
+       "ask": 14.05,
+       "iv": 35.5,
+       "vol": 27,
+       "oi": 123
+      },
+      {
        "strike": 340.0,
        "bid": 14.25,
        "ask": 16.35,
        "iv": 37.8,
        "vol": 25,
        "oi": 199
+      },
+      {
+       "strike": 342.5,
+       "bid": 16.5,
+       "ask": 18.75,
+       "iv": 40.7,
+       "vol": 6,
+       "oi": 0
       },
       {
        "strike": 345.0,
@@ -26896,37 +27001,29 @@
        "oi": 2
       },
       {
-       "strike": 370.0,
-       "bid": 43.25,
-       "ask": 46.45,
-       "iv": 78.8,
+       "strike": 352.5,
+       "bid": 25.55,
+       "ask": 28.95,
+       "iv": 56.8,
+       "vol": 0,
+       "oi": 2
+      },
+      {
+       "strike": 355.0,
+       "bid": 28.25,
+       "ask": 31.45,
+       "iv": 60.1,
        "vol": 0,
        "oi": 0
       }
      ],
      "call_wall": 330.0,
      "put_wall": 305.0,
-     "opt_volume": 19702
+     "opt_volume": 19764
     },
     {
      "date": "2026-07-02",
      "calls": [
-      {
-       "strike": 280.0,
-       "bid": 44.1,
-       "ask": 47.3,
-       "iv": 68.5,
-       "vol": 10,
-       "oi": 3
-      },
-      {
-       "strike": 285.0,
-       "bid": 39.2,
-       "ask": 42.35,
-       "iv": 63.0,
-       "vol": 8,
-       "oi": 7
-      },
       {
        "strike": 290.0,
        "bid": 34.2,
@@ -26952,12 +27049,28 @@
        "oi": 37
       },
       {
+       "strike": 302.5,
+       "bid": 22.7,
+       "ask": 25.3,
+       "iv": 44.7,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 305.0,
        "bid": 20.4,
        "ask": 22.95,
        "iv": 42.4,
        "vol": 1,
        "oi": 78
+      },
+      {
+       "strike": 307.5,
+       "bid": 18.15,
+       "ask": 20.6,
+       "iv": 39.9,
+       "vol": 3,
+       "oi": 0
       },
       {
        "strike": 310.0,
@@ -27080,6 +27193,14 @@
        "oi": 587
       },
       {
+       "strike": 347.5,
+       "bid": 0.27,
+       "ask": 0.62,
+       "iv": 26.5,
+       "vol": 5,
+       "oi": 0
+      },
+      {
        "strike": 350.0,
        "bid": 0.17,
        "ask": 0.48,
@@ -27088,20 +27209,20 @@
        "oi": 255
       },
       {
+       "strike": 352.5,
+       "bid": 0.12,
+       "ask": 0.38,
+       "iv": 27.5,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 355.0,
        "bid": 0.05,
        "ask": 0.31,
        "iv": 28.2,
        "vol": 47,
        "oi": 42
-      },
-      {
-       "strike": 360.0,
-       "bid": 0.09,
-       "ask": 0.15,
-       "iv": 28.1,
-       "vol": 14,
-       "oi": 9
       }
      ],
      "puts": [
@@ -27226,6 +27347,14 @@
        "oi": 368
       },
       {
+       "strike": 332.5,
+       "bid": 9.15,
+       "ask": 10.25,
+       "iv": 24.9,
+       "vol": 20,
+       "oi": 36
+      },
+      {
        "strike": 335.0,
        "bid": 10.95,
        "ask": 12.05,
@@ -27240,6 +27369,22 @@
        "iv": 25.7,
        "vol": 3,
        "oi": 16
+      },
+      {
+       "strike": 340.0,
+       "bid": 14.6,
+       "ask": 17.05,
+       "iv": 30.9,
+       "vol": 20,
+       "oi": 10
+      },
+      {
+       "strike": 345.0,
+       "bid": 18.9,
+       "ask": 21.65,
+       "iv": 34.1,
+       "vol": 2,
+       "oi": 2
       },
       {
        "strike": 355.0,
@@ -27260,7 +27405,7 @@
      ],
      "call_wall": 345.0,
      "put_wall": 275.0,
-     "opt_volume": 3409
+     "opt_volume": 3468
     },
     {
      "date": "2026-07-10",
@@ -27602,6 +27747,38 @@
        "iv": 41.4,
        "vol": 2,
        "oi": 1
+      },
+      {
+       "strike": 365.0,
+       "bid": 38.75,
+       "ask": 42.45,
+       "iv": 45.9,
+       "vol": 0,
+       "oi": 5
+      },
+      {
+       "strike": 380.0,
+       "bid": 53.8,
+       "ask": 57.35,
+       "iv": 55.5,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 385.0,
+       "bid": 58.75,
+       "ask": 62.3,
+       "iv": 58.4,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 390.0,
+       "bid": 63.75,
+       "ask": 67.3,
+       "iv": 61.5,
+       "vol": 0,
+       "oi": 1
       }
      ],
      "call_wall": 340.0,
@@ -27617,38 +27794,6 @@
     {
      "date": "2026-06-26",
      "calls": [
-      {
-       "strike": 385.0,
-       "bid": 123.5,
-       "ask": 131.0,
-       "iv": 129.0,
-       "vol": 0,
-       "oi": 26
-      },
-      {
-       "strike": 425.0,
-       "bid": 109.1,
-       "ask": 117.9,
-       "iv": 257.4,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 440.0,
-       "bid": 69.0,
-       "ask": 76.0,
-       "iv": 79.8,
-       "vol": 0,
-       "oi": 20
-      },
-      {
-       "strike": 455.0,
-       "bid": 54.0,
-       "ask": 61.0,
-       "iv": 65.5,
-       "vol": 25,
-       "oi": 25
-      },
       {
        "strike": 460.0,
        "bid": 49.1,
@@ -27671,6 +27816,14 @@
        "ask": 41.6,
        "iv": 72.5,
        "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 480.0,
+       "bid": 30.5,
+       "ask": 36.6,
+       "iv": 66.2,
+       "vol": 2,
        "oi": 0
       },
       {
@@ -27698,6 +27851,14 @@
        "oi": 5
       },
       {
+       "strike": 497.5,
+       "bid": 15.9,
+       "ask": 19.9,
+       "iv": 46.5,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 500.0,
        "bid": 13.4,
        "ask": 18.0,
@@ -27706,12 +27867,28 @@
        "oi": 18
       },
       {
+       "strike": 502.5,
+       "bid": 11.6,
+       "ask": 16.2,
+       "iv": 44.3,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 505.0,
        "bid": 10.9,
        "ask": 14.1,
        "iv": 41.8,
        "vol": 6,
        "oi": 159
+      },
+      {
+       "strike": 507.5,
+       "bid": 9.7,
+       "ask": 12.0,
+       "iv": 39.1,
+       "vol": 100,
+       "oi": 0
       },
       {
        "strike": 510.0,
@@ -27736,6 +27913,14 @@
        "iv": 37.7,
        "vol": 79,
        "oi": 92
+      },
+      {
+       "strike": 517.5,
+       "bid": 5.1,
+       "ask": 7.1,
+       "iv": 38.2,
+       "vol": 66,
+       "oi": 0
       },
       {
        "strike": 520.0,
@@ -27808,25 +27993,9 @@
        "iv": 39.1,
        "vol": 334,
        "oi": 229
-      },
-      {
-       "strike": 542.5,
-       "bid": 0.2,
-       "ask": 2.35,
-       "iv": 45.0,
-       "vol": 20,
-       "oi": 7
       }
      ],
      "puts": [
-      {
-       "strike": 475.0,
-       "bid": 0.0,
-       "ask": 1.4,
-       "iv": 45.0,
-       "vol": 39,
-       "oi": 17
-      },
       {
        "strike": 480.0,
        "bid": 0.3,
@@ -27850,6 +28019,14 @@
        "iv": 37.9,
        "vol": 65,
        "oi": 19
+      },
+      {
+       "strike": 487.5,
+       "bid": 1.15,
+       "ask": 3.1,
+       "iv": 43.5,
+       "vol": 109,
+       "oi": 5
       },
       {
        "strike": 490.0,
@@ -27940,6 +28117,14 @@
        "oi": 27
       },
       {
+       "strike": 517.5,
+       "bid": 10.0,
+       "ask": 13.0,
+       "iv": 35.6,
+       "vol": 4,
+       "oi": 6
+      },
+      {
        "strike": 520.0,
        "bid": 10.9,
        "ask": 15.5,
@@ -27980,6 +28165,14 @@
        "oi": 24
       },
       {
+       "strike": 532.5,
+       "bid": 20.6,
+       "ask": 24.9,
+       "iv": 40.9,
+       "vol": 3,
+       "oi": 0
+      },
+      {
        "strike": 535.0,
        "bid": 22.8,
        "ask": 28.1,
@@ -28002,27 +28195,11 @@
        "iv": 51.5,
        "vol": 0,
        "oi": 1
-      },
-      {
-       "strike": 550.0,
-       "bid": 35.5,
-       "ask": 42.0,
-       "iv": 55.6,
-       "vol": 2,
-       "oi": 8
-      },
-      {
-       "strike": 555.0,
-       "bid": 40.2,
-       "ask": 47.7,
-       "iv": 64.4,
-       "vol": 1,
-       "oi": 2
       }
      ],
      "call_wall": 670.0,
      "put_wall": 405.0,
-     "opt_volume": 3955
+     "opt_volume": 4284
     },
     {
      "date": "2026-07-02",
@@ -28084,11 +28261,27 @@
        "oi": 64
       },
       {
+       "strike": 480.0,
+       "bid": 31.1,
+       "ask": 37.5,
+       "iv": 50.1,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 485.0,
        "bid": 27.0,
        "ask": 33.0,
        "iv": 47.1,
        "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 495.0,
+       "bid": 20.3,
+       "ask": 24.5,
+       "iv": 41.8,
+       "vol": 2,
        "oi": 0
       },
       {
@@ -28098,6 +28291,14 @@
        "iv": 39.3,
        "vol": 5,
        "oi": 32
+      },
+      {
+       "strike": 505.0,
+       "bid": 12.5,
+       "ask": 17.6,
+       "iv": 39.3,
+       "vol": 5,
+       "oi": 0
       },
       {
        "strike": 510.0,
@@ -28122,6 +28323,14 @@
        "iv": 36.6,
        "vol": 32,
        "oi": 3
+      },
+      {
+       "strike": 522.5,
+       "bid": 5.7,
+       "ask": 8.2,
+       "iv": 35.3,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 525.0,
@@ -28194,14 +28403,6 @@
        "iv": 37.2,
        "vol": 80,
        "oi": 26
-      },
-      {
-       "strike": 565.0,
-       "bid": 0.35,
-       "ask": 1.7,
-       "iv": 41.5,
-       "vol": 64,
-       "oi": 9
       }
      ],
      "puts": [
@@ -28342,6 +28543,14 @@
        "oi": 6
       },
       {
+       "strike": 532.5,
+       "bid": 22.0,
+       "ask": 26.5,
+       "iv": 34.4,
+       "vol": 2,
+       "oi": 1
+      },
+      {
        "strike": 535.0,
        "bid": 22.9,
        "ask": 29.7,
@@ -28390,25 +28599,17 @@
        "oi": 11
       },
       {
-       "strike": 570.0,
-       "bid": 55.3,
-       "ask": 62.0,
-       "iv": 51.3,
+       "strike": 562.5,
+       "bid": 48.6,
+       "ask": 55.0,
+       "iv": 49.3,
        "vol": 2,
-       "oi": 12
-      },
-      {
-       "strike": 580.0,
-       "bid": 65.9,
-       "ask": 71.9,
-       "iv": 56.3,
-       "vol": 1,
-       "oi": 36
+       "oi": 0
       }
      ],
      "call_wall": 715.0,
      "put_wall": 405.0,
-     "opt_volume": 3370
+     "opt_volume": 3469
     },
     {
      "date": "2026-07-10",
@@ -28478,12 +28679,28 @@
        "oi": 1
       },
       {
+       "strike": 505.0,
+       "bid": 16.3,
+       "ask": 20.7,
+       "iv": 37.0,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 510.0,
        "bid": 13.5,
        "ask": 17.6,
        "iv": 35.9,
        "vol": 9,
        "oi": 31
+      },
+      {
+       "strike": 515.0,
+       "bid": 11.2,
+       "ask": 15.0,
+       "iv": 35.4,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 520.0,
@@ -28572,14 +28789,6 @@
        "iv": 42.2,
        "vol": 195,
        "oi": 23
-      },
-      {
-       "strike": 575.0,
-       "bid": 0.9,
-       "ask": 2.9,
-       "iv": 41.7,
-       "vol": 137,
-       "oi": 29
       }
      ],
      "puts": [
@@ -28778,7 +28987,7 @@
      ],
      "call_wall": 695.0,
      "put_wall": 450.0,
-     "opt_volume": 1947
+     "opt_volume": 1949
     }
    ]
   },
@@ -28790,36 +28999,36 @@
      "date": "2026-06-26",
      "calls": [
       {
-       "strike": 85.0,
-       "bid": 27.3,
-       "ask": 28.9,
-       "iv": 148.0,
-       "vol": 30,
-       "oi": 50
+       "strike": 101.0,
+       "bid": 12.45,
+       "ask": 13.95,
+       "iv": 103.9,
+       "vol": 20,
+       "oi": 0
       },
       {
-       "strike": 90.0,
-       "bid": 22.5,
-       "ask": 24.0,
-       "iv": 131.0,
-       "vol": 44,
-       "oi": 23
+       "strike": 102.0,
+       "bid": 11.7,
+       "ask": 13.15,
+       "iv": 103.5,
+       "vol": 22,
+       "oi": 0
       },
       {
-       "strike": 95.0,
-       "bid": 17.8,
-       "ask": 19.35,
-       "iv": 118.5,
-       "vol": 4,
-       "oi": 2
+       "strike": 103.0,
+       "bid": 11.05,
+       "ask": 12.3,
+       "iv": 103.3,
+       "vol": 7,
+       "oi": 0
       },
       {
-       "strike": 100.0,
-       "bid": 13.5,
-       "ask": 14.75,
-       "iv": 107.7,
-       "vol": 226,
-       "oi": 90
+       "strike": 104.0,
+       "bid": 10.25,
+       "ask": 11.5,
+       "iv": 101.4,
+       "vol": 2,
+       "oi": 4
       },
       {
        "strike": 105.0,
@@ -29194,19 +29403,11 @@
      ],
      "call_wall": 150.0,
      "put_wall": 75.0,
-     "opt_volume": 304101
+     "opt_volume": 309638
     },
     {
      "date": "2026-07-02",
      "calls": [
-      {
-       "strike": 85.0,
-       "bid": 27.6,
-       "ask": 29.65,
-       "iv": 123.4,
-       "vol": 98,
-       "oi": 21
-      },
       {
        "strike": 90.0,
        "bid": 22.95,
@@ -29230,6 +29431,14 @@
        "iv": 99.5,
        "vol": 52,
        "oi": 38
+      },
+      {
+       "strike": 104.0,
+       "bid": 11.25,
+       "ask": 13.25,
+       "iv": 92.0,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 105.0,
@@ -29604,59 +29813,11 @@
      ],
      "call_wall": 160.0,
      "put_wall": 115.0,
-     "opt_volume": 50133
+     "opt_volume": 50135
     },
     {
      "date": "2026-07-10",
      "calls": [
-      {
-       "strike": 55.0,
-       "bid": 55.65,
-       "ask": 60.25,
-       "iv": 168.5,
-       "vol": 288,
-       "oi": 5
-      },
-      {
-       "strike": 60.0,
-       "bid": 52.0,
-       "ask": 54.25,
-       "iv": 160.5,
-       "vol": 8,
-       "oi": 300
-      },
-      {
-       "strike": 65.0,
-       "bid": 47.15,
-       "ask": 49.3,
-       "iv": 147.5,
-       "vol": 1,
-       "oi": 1
-      },
-      {
-       "strike": 70.0,
-       "bid": 42.3,
-       "ask": 44.45,
-       "iv": 136.3,
-       "vol": 100,
-       "oi": 0
-      },
-      {
-       "strike": 75.0,
-       "bid": 37.45,
-       "ask": 39.65,
-       "iv": 125.4,
-       "vol": 28,
-       "oi": 28
-      },
-      {
-       "strike": 80.0,
-       "bid": 32.7,
-       "ask": 34.9,
-       "iv": 115.8,
-       "vol": 19,
-       "oi": 11
-      },
       {
        "strike": 90.0,
        "bid": 23.9,
@@ -29664,6 +29825,14 @@
        "iv": 100.2,
        "vol": 4,
        "oi": 5
+      },
+      {
+       "strike": 95.0,
+       "bid": 19.55,
+       "ask": 21.3,
+       "iv": 94.3,
+       "vol": 35,
+       "oi": 0
       },
       {
        "strike": 100.0,
@@ -29674,12 +29843,52 @@
        "oi": 12
       },
       {
+       "strike": 104.0,
+       "bid": 13.05,
+       "ask": 14.2,
+       "iv": 86.3,
+       "vol": 1,
+       "oi": 3
+      },
+      {
        "strike": 105.0,
        "bid": 12.7,
        "ask": 13.2,
        "iv": 85.5,
        "vol": 22,
        "oi": 113
+      },
+      {
+       "strike": 106.0,
+       "bid": 12.0,
+       "ask": 12.6,
+       "iv": 84.9,
+       "vol": 5,
+       "oi": 1
+      },
+      {
+       "strike": 107.0,
+       "bid": 11.1,
+       "ask": 12.0,
+       "iv": 83.1,
+       "vol": 1,
+       "oi": 0
+      },
+      {
+       "strike": 108.0,
+       "bid": 10.85,
+       "ask": 11.4,
+       "iv": 84.4,
+       "vol": 91,
+       "oi": 0
+      },
+      {
+       "strike": 109.0,
+       "bid": 9.9,
+       "ask": 10.8,
+       "iv": 82.0,
+       "vol": 78,
+       "oi": 0
       },
       {
        "strike": 110.0,
@@ -30014,7 +30223,7 @@
      ],
      "call_wall": 120.0,
      "put_wall": 80.0,
-     "opt_volume": 17231
+     "opt_volume": 17458
     }
    ]
   },
@@ -30340,6 +30549,14 @@
        "oi": 250
       },
       {
+       "strike": 1145.0,
+       "bid": 85.5,
+       "ask": 88.95,
+       "iv": 140.2,
+       "vol": 283,
+       "oi": 1
+      },
+      {
        "strike": 1150.0,
        "bid": 88.95,
        "ask": 91.05,
@@ -30380,6 +30597,14 @@
        "oi": 64
       },
       {
+       "strike": 1175.0,
+       "bid": 101.25,
+       "ask": 108.35,
+       "iv": 140.2,
+       "vol": 7,
+       "oi": 2
+      },
+      {
        "strike": 1180.0,
        "bid": 104.85,
        "ask": 110.5,
@@ -30410,27 +30635,11 @@
        "iv": 140.3,
        "vol": 21,
        "oi": 3
-      },
-      {
-       "strike": 1200.0,
-       "bid": 119.2,
-       "ask": 123.5,
-       "iv": 141.4,
-       "vol": 272,
-       "oi": 128
-      },
-      {
-       "strike": 1205.0,
-       "bid": 121.0,
-       "ask": 126.7,
-       "iv": 140.0,
-       "vol": 12,
-       "oi": 1
       }
      ],
      "call_wall": 1050.0,
      "put_wall": 600.0,
-     "opt_volume": 299028
+     "opt_volume": 300657
     },
     {
      "date": "2026-07-02",
@@ -30638,22 +30847,6 @@
      ],
      "puts": [
       {
-       "strike": 1065.0,
-       "bid": 64.4,
-       "ask": 70.1,
-       "iv": 123.4,
-       "vol": 49,
-       "oi": 14
-      },
-      {
-       "strike": 1070.0,
-       "bid": 66.6,
-       "ask": 71.2,
-       "iv": 122.7,
-       "vol": 26,
-       "oi": 59
-      },
-      {
        "strike": 1075.0,
        "bid": 68.5,
        "ask": 71.45,
@@ -30718,6 +30911,14 @@
        "oi": 13
       },
       {
+       "strike": 1115.0,
+       "bid": 86.15,
+       "ask": 91.6,
+       "iv": 120.8,
+       "vol": 62,
+       "oi": 0
+      },
+      {
        "strike": 1120.0,
        "bid": 88.55,
        "ask": 95.35,
@@ -30740,6 +30941,14 @@
        "iv": 121.2,
        "vol": 63,
        "oi": 27
+      },
+      {
+       "strike": 1135.0,
+       "bid": 97.75,
+       "ask": 103.1,
+       "iv": 122.0,
+       "vol": 21,
+       "oi": 0
       },
       {
        "strike": 1140.0,
@@ -30822,25 +31031,25 @@
        "oi": 10
       },
       {
+       "strike": 1250.0,
+       "bid": 167.2,
+       "ask": 177.25,
+       "iv": 121.1,
+       "vol": 0,
+       "oi": 11
+      },
+      {
        "strike": 1270.0,
        "bid": 182.25,
        "ask": 193.6,
        "iv": 122.7,
        "vol": 0,
        "oi": 1
-      },
-      {
-       "strike": 1290.0,
-       "bid": 196.95,
-       "ask": 208.5,
-       "iv": 122.6,
-       "vol": 1,
-       "oi": 2
       }
      ],
      "call_wall": 1000.0,
      "put_wall": 55.0,
-     "opt_volume": 61684
+     "opt_volume": 62006
     },
     {
      "date": "2026-07-10",
@@ -31168,6 +31377,22 @@
        "oi": 76
       },
       {
+       "strike": 1160.0,
+       "bid": 125.1,
+       "ask": 135.05,
+       "iv": 109.2,
+       "vol": 0,
+       "oi": 1
+      },
+      {
+       "strike": 1170.0,
+       "bid": 130.5,
+       "ask": 140.75,
+       "iv": 108.8,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 1180.0,
        "bid": 137.25,
        "ask": 147.05,
@@ -31200,6 +31425,14 @@
        "oi": 1
       },
       {
+       "strike": 1250.0,
+       "bid": 183.35,
+       "ask": 193.5,
+       "iv": 109.7,
+       "vol": 9,
+       "oi": 0
+      },
+      {
        "strike": 1260.0,
        "bid": 192.5,
        "ask": 201.0,
@@ -31222,35 +31455,11 @@
        "iv": 110.7,
        "vol": 20,
        "oi": 11
-      },
-      {
-       "strike": 1320.0,
-       "bid": 234.65,
-       "ask": 246.45,
-       "iv": 110.8,
-       "vol": 2,
-       "oi": 2
-      },
-      {
-       "strike": 1400.0,
-       "bid": 299.0,
-       "ask": 311.0,
-       "iv": 111.7,
-       "vol": 1,
-       "oi": 11
-      },
-      {
-       "strike": 1410.0,
-       "bid": 307.35,
-       "ask": 318.5,
-       "iv": 111.3,
-       "vol": 0,
-       "oi": 1
       }
      ],
      "call_wall": 1200.0,
      "put_wall": 55.0,
-     "opt_volume": 14483
+     "opt_volume": 14761
     }
    ]
   },
@@ -31648,25 +31857,25 @@
        "oi": 0
       },
       {
+       "strike": 237.5,
+       "bid": 24.45,
+       "ask": 30.3,
+       "iv": 109.8,
+       "vol": 18,
+       "oi": 0
+      },
+      {
        "strike": 240.0,
        "bid": 26.8,
        "ask": 32.95,
        "iv": 117.0,
        "vol": 3,
        "oi": 0
-      },
-      {
-       "strike": 255.0,
-       "bid": 40.65,
-       "ask": 48.9,
-       "iv": 151.1,
-       "vol": 0,
-       "oi": 0
       }
      ],
      "call_wall": 205.0,
      "put_wall": 190.0,
-     "opt_volume": 386208
+     "opt_volume": 386349
     },
     {
      "date": "2026-06-24",
@@ -32060,7 +32269,7 @@
      ],
      "call_wall": 210.0,
      "put_wall": 195.0,
-     "opt_volume": 92633
+     "opt_volume": 92677
     },
     {
      "date": "2026-06-26",
@@ -32886,18 +33095,18 @@
      ],
      "call_wall": 105.0,
      "put_wall": 35.0,
-     "opt_volume": 17027
+     "opt_volume": 18590
     },
     {
      "date": "2026-07-02",
      "calls": [
       {
-       "strike": 48.0,
-       "bid": 12.25,
-       "ask": 14.25,
-       "iv": 70.9,
-       "vol": 23,
-       "oi": 3
+       "strike": 49.0,
+       "bid": 11.5,
+       "ask": 13.45,
+       "iv": 86.5,
+       "vol": 30,
+       "oi": 0
       },
       {
        "strike": 50.0,
@@ -33296,7 +33505,7 @@
      ],
      "call_wall": 67.0,
      "put_wall": 35.0,
-     "opt_volume": 3802
+     "opt_volume": 3832
     },
     {
      "date": "2026-07-10",
