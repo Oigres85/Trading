@@ -972,7 +972,32 @@ function techCells(r) {
       <td>${ratingBadge(r.rating)}</td>
       <td class="num">${targetBar(r.rating)}</td>
       <td class="num">${finHealthBar(r)}</td>
+      ${optImpactCell(r.ticker)}
       <td class="spark-cell" data-tk="${r.ticker}" title="Clicca per ingrandire">${sparkline((r.sparks || {})[sparkRange])}</td>`;
+}
+
+function optImpactCell(ticker) {
+  const chain = optChain(ticker);
+  if (!chain || !(chain.expiries || []).length) return `<td class="num opt-col">—</td>`;
+  const exp = chain.expiries[0];
+  const avgVol = chain.avg_volume || 0;
+  const optVol = exp.opt_volume || 0;
+  const cw = exp.call_wall, pw = exp.put_wall;
+  if (!avgVol) return `<td class="opt-col" style="cursor:pointer" data-opt="${ticker}">
+    <span class="opt-col-walls muted">${cw ? "CW " + fmtNum.format(cw) : ""}${cw && pw ? " · " : ""}${pw ? "PW " + fmtNum.format(pw) : ""}</span>
+  </td>`;
+  const ratioPct = optVol * 100 / avgVol * 100;
+  const fill = Math.max(2, Math.min(100, ratioPct));
+  const [lab, , col] = ratioPct >= 30 ? ["ALTO", "", "var(--red)"]
+                     : ratioPct >= 10 ? ["MEDIO", "", "var(--yellow)"]
+                     : ["BASSO", "", "var(--green)"];
+  return `<td class="opt-col" style="cursor:pointer" data-opt="${ticker}">
+    <div class="opt-col-bar-wrap">
+      <div class="opt-col-bar-track"><div class="opt-col-bar-fill" style="width:${fill.toFixed(0)}%;background:${col}"></div></div>
+      <span class="opt-col-lab" style="color:${col}">${lab}</span>
+    </div>
+    ${(cw || pw) ? `<div class="opt-col-walls muted">${cw ? "CW " + fmtNum.format(cw) : ""}${cw && pw ? " · " : ""}${pw ? "PW " + fmtNum.format(pw) : ""}</div>` : ""}
+  </td>`;
 }
 
 function finHealthBar(r) {
@@ -2574,6 +2599,8 @@ $("#chart-modal").addEventListener("change", e => {
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeChartModal(); });
 document.addEventListener("click", (e) => {
+  const optCell = e.target.closest("[data-opt]");
+  if (optCell) { openOptionsModal(optCell.dataset.opt); return; }
   const cell = e.target.closest(".spark-cell");
   if (cell) { openTickerChart(cell.dataset.tk); return; }
   const macro = e.target.closest("[data-macro]");

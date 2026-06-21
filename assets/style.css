@@ -319,6 +319,15 @@ th.sortable:hover { color: var(--text); }
   width: 14px; height: 14px; line-height: 14px; text-align: center; font-size: 10px; font-weight: 700;
 }
 
+/* ---------- colonna Opzioni in-table ---------- */
+.opt-col { white-space: nowrap; min-width: 90px; padding: 6px 8px; vertical-align: middle; }
+.opt-col-bar-wrap { display: flex; align-items: center; gap: 6px; }
+.opt-col-bar-track { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; min-width: 44px; }
+.opt-col-bar-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+.opt-col-lab { font-size: 11px; font-weight: 700; font-family: var(--mono); min-width: 36px; }
+.opt-col-walls { font-size: 10px; margin-top: 2px; font-family: var(--mono); }
+.opt-col:hover { background: var(--card-2); }
+
 /* ---------- modulo opzioni: strike ladder + tachimetro impatto ---------- */
 .opt-controls { flex-wrap: wrap; gap: 10px; align-items: center; }
 .opt-side-tog .chip { min-width: 54px; }
