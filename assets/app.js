@@ -405,6 +405,7 @@ function renderAll() {
   renderPortfolioHealth();
   renderMiniCards();
   renderTopCaps();
+  renderTopETFs();
   renderNews();
   renderBtpInfo();
   renderSellCalc();
@@ -1448,6 +1449,7 @@ const MACRO_INFO = {
   credit: ["Rischio Credito (HY OAS)", "Spread dei bond High Yield rispetto ai Treasury USA: proxy del rischio sistemico, analogo al mercato CDS senza costi di abbonamento. Fonte: ICE BofA via FRED.", "Giornaliero (FRED)", /credit|credito|spread|hy|high.?yield|cds|default|obbligaz|bond/i],
   decouple: ["Disaccoppiamento Macro", "Divergenza tra mercato azionario (S&P 500) e economia reale (PIL reale USA GDPC1): misura quanta crescita futura è già prezzata nella borsa. Entrambe le serie normalizzate a 100 all'inizio del periodo.", "Mensile/trimestrale (FRED)", /disaccopp|decoupl|valuation|bolla|bubble|pil|gdp|utili|profit|crescita/i],
   smart_money: ["Smart Money vs Retail", "Posizionamento istituzionale dedotto da segnali professionali: struttura a termine del VIX (VIX/VIX3M), spread credito HY/IG e copertura put/call. Confrontato col Fear & Greed (proxy del sentiment retail) per evidenziare le divergenze tra denaro intelligente e folla.", "Aggiornato a ogni refresh", /smart.?money|istituzional|institution|hedge.?fund|posizionament|flow|flussi|put.?call|vix/i],
+  sp500_pe: ["P/E Ratio Storico S&P 500", "Rapporto Prezzo/Utili dell'S&P 500 su base mensile (FRED SP500PE). Mostra se il mercato è sopravvalutato rispetto alla media storica. P/E > 25 indica valutazioni tese; P/E > 35 livelli estremi. La percentile di rango storico indica quante volte negli ultimi 10 anni il mercato è stato più economico di adesso.", "Mensile (FRED SP500PE)", /p\/e|price.?earning|multiplo|valutaz|sopravvalut|cape|shiller/i],
   corp_profit: ["S&P 500 vs Profitti Aziendali Reali", "Divergenza tra l'S&P 500 nominale e i profitti aziendali reali USA (FRED CP). Un gap ampio segnala Asset Inflation: la borsa cresce più degli utili reali, trainata da svalutazione monetaria (fiat debasement) e non da crescita economica. Storicamente gap >40 pp precede lateralizzazioni o correzioni.", "Trimestrale (FRED CP + SP500 mensile)", /profitti|profit|asset.?inflat|nominal|real.?earn|corp|aziend|deflat/i],
   fed_market: ["Fed Funds Rate vs S&P 500", "Andamento storico del tasso Fed Funds sovrapposto all'S&P 500 negli ultimi 5 anni. Mostra come i cicli di rialzo/taglio della politica monetaria influenzino il mercato azionario. Tassi alti comprimono i multipli; i tagli stimolano i rally.", "Mensile (FRED FEDFUNDS + SP500)", /fed.?fund|interest.?rate|tasso.?fed|fed.?rate|monetar|fomc.*trend|tassi.*mercato/i],
 };
@@ -1597,6 +1599,25 @@ function openMacroInfo(key) {
     if (sm.vix_term_ratio != null) det.push(`VIX/VIX3M ${fmtNum.format(sm.vix_term_ratio)} ${sm.vix_term_ratio > 1 ? "(backwardation = tensione)" : "(contango = calma)"}`);
     if (sm.hy_ig_ratio != null) det.push(`HY/IG ${fmtNum.format(sm.hy_ig_ratio)}`);
     if (det.length) extra += `<div class="info-line muted" style="font-size:11px;margin-top:6px">${det.join(" · ")}</div>`;
+  } else if (key === "sp500_pe" && m.sp500_pe) {
+    const pe = m.sp500_pe;
+    const peCol = pe.current > 35 ? "var(--red)" : pe.current > 25 ? "var(--yellow)" : pe.current > 14 ? "var(--muted)" : "var(--green)";
+    extra = `<div class="info-line"><b>P/E attuale:</b> <span style="color:${peCol}">${pe.current}× — ${pe.label}</span></div>
+      <div class="info-line"><b>Media ultimi 10 anni:</b> ${pe.avg_10y}×</div>
+      <div class="info-line"><b>Percentile storico:</b> il mercato è stato più economico di adesso nel ${pe.pct_rank}% dei mesi degli ultimi 10 anni</div>
+      ${thermoBar(pe.score, ["Sottovalutato", "Sopravvalutato"])}
+      <div class="info-line muted" style="font-size:11px;margin:6px 0">
+        P/E &gt;25: valutazioni tese, storicamente associate a ritorni futuri più bassi nei 10 anni successivi.
+        P/E &gt;35: livelli estremi raggiunti solo nel 1999-2000 (bolla dot-com) e nel 2020-2021 (post-pandemia).<br>
+        Il P/E trailing usa gli utili degli ultimi 12 mesi — è più volatile del CAPE di Shiller (10 anni), ma più reattivo.
+      </div>
+      <h4 style="margin:12px 0 4px">P/E S&amp;P 500 — storico 10 anni (mensile, FRED)</h4>
+      ${miniLineChart(pe.history, { color: "var(--yellow)", zeroLine: false })}
+      <div class="info-line muted" style="font-size:11px;margin-top:6px">
+        <b>Implicazione per il portafoglio:</b> P/E elevato significa che ogni dollaro di utile è pagato di più.
+        In scenari di rialzo dei tassi + P/E &gt;25, i multipli tendono a comprimersi (-15% / -30% dall'inizio storico).
+        Suggerito: privilegiare titoli con P/E inferiore alla media settoriale e FCF yield elevato.
+      </div>`;
   } else if (key === "corp_profit" && m.corp_profit) {
     const cp = m.corp_profit;
     const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
@@ -1986,6 +2007,13 @@ function renderGauges() {
       `<b>${sm.label}</b>`,
       `flussi istituzionali (VIX term · HY/IG · P/C)${divTxt}`, ["Difensivo", "Aggressivo"]));
   }
+  if (m.sp500_pe) {
+    const pe = m.sp500_pe;
+    const peCol = pe.current > 35 ? "var(--red)" : pe.current > 25 ? "var(--yellow)" : pe.current > 14 ? "var(--muted)" : "var(--green)";
+    cards.push(thermoCard("sp500_pe", "P/E S&P 500", pe.score,
+      `<span style="color:${peCol}">P/E ${pe.current}×</span>`,
+      `${pe.label} · media 10A ${pe.avg_10y}× · percentile ${pe.pct_rank}°`, ["Sottovalutato", "Sopravvalutato"]));
+  }
   if (m.corp_profit) {
     const cp = m.corp_profit;
     const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
@@ -2014,6 +2042,7 @@ function marketImpact(m) {
 }
 
 function renderMacro() {
+  const m = DATA.macro || {};
   // termometro coerente: verde a sx (favorevole per il portafoglio) → rosso a dx (sfavorevole)
   const macroThermo = (score) => score == null ? "" :
     `${thermoBar(score)}<div class="m-ends"><span>favorevole</span><span>sfavorevole</span></div>`;
@@ -2049,6 +2078,17 @@ function renderMacro() {
       <div class="m-value" style="color:${gapCol}">${gap > 0 ? "+" : ""}${gap} pp</div>
       <div class="m-date">S&amp;P ${signTxt(Math.round(spLast - 100))} · PIL ${signTxt(Math.round(gdLast - 100))}</div>
       ${macroThermo(gapScore)}
+    </div>`);
+  }
+  if (m.sp500_pe) {
+    const pe = m.sp500_pe;
+    const peCol = pe.current > 35 ? "var(--red)" : pe.current > 25 ? "var(--yellow)" : pe.current > 14 ? "var(--muted)" : "var(--green)";
+    cells.push(`<div class="macro-item" data-macro="sp500_pe" tabindex="0" role="button" title="Clicca per storico P/E S&P 500" style="--accent:var(--yellow)">
+      <span class="popup-dot"></span>
+      <div class="m-label">P/E S&amp;P 500</div>
+      <div class="m-value" style="color:${peCol}">${pe.current}×</div>
+      <div class="m-date">${pe.label} · media 10A ${pe.avg_10y}×</div>
+      ${macroThermo(pe.score)}
     </div>`);
   }
   if (m.fed_market) {
@@ -2101,6 +2141,69 @@ function renderTopCaps() {
         <span class="topcap-mcap">${fmtMcap(x.mcap_usd)}</span>
         <span class="topcap-chg ${signCls(x.change_pct)}">${signTxt(x.change_pct)}</span>
       </li>`).join("") + "</ol>";
+}
+
+/* ---------------- top ETF dashboard ---------------- */
+function etfOpportunity(rsi) {
+  if (rsi == null) return { label: "—", color: "var(--muted)" };
+  if (rsi < 35) return { label: "Ipervenduto — possibile ingresso", color: "var(--green)" };
+  if (rsi < 48) return { label: "Zona neutro-bassa — da monitorare", color: "var(--yellow)" };
+  if (rsi < 65) return { label: "Momentum positivo", color: "var(--muted)" };
+  return { label: "Ipercomprato — attendere ritracciamento", color: "var(--red)" };
+}
+
+function renderTopETFs() {
+  const list = DATA.top_etfs || [];
+  const wrap = $("#top-etfs-wrap");
+  if (!list.length) { wrap.innerHTML = ""; return; }
+
+  const fmtAum = v => v >= 1000 ? `$${(v / 1000).toFixed(1)}T` : v ? `$${v}B` : "—";
+
+  const rows = list.map(r => {
+    const opp = etfOpportunity(r.rsi);
+    const m1  = r.sparks?.m1;
+    const m1v = (m1 && m1.length >= 2 && m1[0]) ? (m1[m1.length - 1] / m1[0] - 1) * 100 : null;
+    const m3  = r.sparks?.m3;
+    const m3v = (m3 && m3.length >= 2 && m3[0]) ? (m3[m3.length - 1] / m3[0] - 1) * 100 : null;
+    return `<tr>
+      <td class="sticky-col"><b>${esc(r.ticker)}</b></td>
+      <td>${esc(r.name)}</td>
+      <td class="num">${r.price != null ? "$" + fmtNum.format(r.price) : "—"}</td>
+      <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
+      <td class="num ${m1v != null ? signCls(m1v) : ""}">${m1v != null ? signTxt(Math.round(m1v * 10) / 10) : "—"}</td>
+      <td class="num ${m3v != null ? signCls(m3v) : ""}">${m3v != null ? signTxt(Math.round(m3v * 10) / 10) : "—"}</td>
+      <td class="num">${r.rsi ?? "—"}</td>
+      <td class="num">${r.pe != null ? fmtNum.format(r.pe) : "—"}</td>
+      <td class="num">${r.div_yield ? r.div_yield + "%" : "—"}</td>
+      <td class="num">${fmtAum(r.aum)}</td>
+      <td style="color:${opp.color};font-size:12px">${opp.label}</td>
+    </tr>`;
+  }).join("");
+
+  wrap.innerHTML = `
+    <div class="m-label" style="margin:14px 0 8px">Top 10 ETF — Metriche &amp; Opportunità di Ingresso</div>
+    <div class="table-wrap">
+      <table aria-label="Top 10 ETF">
+        <thead><tr>
+          <th class="sticky-col">Ticker</th>
+          <th>ETF</th>
+          <th class="num">Prezzo</th>
+          <th class="num">Oggi</th>
+          <th class="num">1M</th>
+          <th class="num">3M</th>
+          <th class="num">RSI</th>
+          <th class="num">P/E</th>
+          <th class="num">Div.%</th>
+          <th class="num">AUM</th>
+          <th>Segnale</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="muted" style="font-size:11px;margin-top:6px">
+      RSI &lt;35 = ipervenduto (potenziale ingresso); RSI &gt;70 = ipercomprato (attendere).
+      P/E e dividendo da Yahoo Finance. AUM = patrimonio gestito.
+    </div>`;
 }
 
 /* ---------------- news ---------------- */
@@ -2201,6 +2304,7 @@ function buildPrompt() {
     [...m.tilt].sort((a, b) => b.m1 - a.m1).forEach(s =>
       lines.push(`- ${s.name} (${s.ticker}): 1M ${signTxt(s.m1)}, 3M ${signTxt(s.m3)}`));
   }
+  if (m.sp500_pe) lines.push(`- P/E Ratio S&P 500 (FRED SP500PE): ${m.sp500_pe.current}× (${m.sp500_pe.label}) · media 10A ${m.sp500_pe.avg_10y}× · percentile storico ${m.sp500_pe.pct_rank}° (il mercato è stato più economico nel ${m.sp500_pe.pct_rank}% dei mesi)`);
   if (m.corp_profit) lines.push(`- S&P vs Profitti Aziendali Reali (FRED CP): gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali)`);
   if (m.fed_market) lines.push(`- Fed Funds Rate attuale: ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}); tasso>4% storicamente comprime i multipli P/E in 12-18 mesi`);
   if (m.witching) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg)`);
@@ -2210,6 +2314,19 @@ function buildPrompt() {
     lines.push("");
     lines.push("TOP 10 CAPITALIZZAZIONI MONDIALI:");
     DATA.top_caps.forEach((x, i) => lines.push(`${i + 1}. ${x.name} (${x.ticker}): ${fmtMcap(x.mcap_usd)} (${signTxt(x.change_pct)} oggi)`));
+  }
+  if ((DATA.top_etfs || []).length) {
+    lines.push("");
+    lines.push("TOP 10 ETF (metriche di valutazione e segnali di ingresso):");
+    lines.push("| ETF | Nome | Prezzo | Oggi | 1M | RSI | P/E | Div% | AUM | Segnale |");
+    lines.push("|---|---|---|---|---|---|---|---|---|---|");
+    DATA.top_etfs.forEach(r => {
+      const m1 = r.sparks?.m1;
+      const m1v = m1?.length >= 2 && m1[0] ? ((m1[m1.length-1]/m1[0]-1)*100).toFixed(1) : "—";
+      const opp = etfOpportunity(r.rsi);
+      lines.push(`| ${r.ticker} | ${r.name} | $${fmtNum.format(r.price || 0)} | ${signTxt(r.change_pct)} | ${m1v !== "—" ? signTxt(+m1v) : "—"} | ${r.rsi ?? "—"} | ${r.pe ?? "—"} | ${r.div_yield ? r.div_yield+"%" : "—"} | ${r.aum ? "$"+r.aum+"B" : "—"} | ${opp.label} |`);
+    });
+    lines.push("(RSI<35=ipervenduto/possibile ingresso; RSI>70=ipercomprato/attendere; valuta rotazione settoriale e de-risking tech con questi ETF)");
   }
   if ((DATA.predictions || []).length) {
     lines.push("");

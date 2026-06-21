@@ -88,6 +88,19 @@ BTP = {
     "nominal": 40000, "pmc": 100.0, "fallback_price": 103.25,
 }
 
+TOP_ETF_LIST = [
+    ("SPY",  "S&P 500"),
+    ("QQQ",  "Nasdaq 100"),
+    ("IWM",  "Russell 2000"),
+    ("GLD",  "Oro"),
+    ("TLT",  "T-Bond 20Y+"),
+    ("VGT",  "Tecnologia"),
+    ("XLF",  "Finanza"),
+    ("XLE",  "Energia"),
+    ("XLV",  "Salute"),
+    ("VNQ",  "Real Estate"),
+]
+
 PUTCALL_SYMBOL = ("BSX", "Boston Scientific")
 
 # aliquote per la stima del guadagno netto
@@ -987,6 +1000,29 @@ def fetch_macro():
     except Exception as e:
         print(f"!! fed_market: {e}", file=sys.stderr)
 
+    # P/E Ratio storico S&P 500 (FRED SP500PE, mensile)
+    try:
+        pe_data = fred_series("SP500PE", 120)  # ~10 anni mensili
+        if pe_data:
+            pe_vals = [v for _, v in pe_data if v]
+            cur_pe = pe_data[-1][1]
+            avg_pe = round(sum(pe_vals) / len(pe_vals), 1)
+            pct_rank = round(sum(1 for v in pe_vals if v < cur_pe) / len(pe_vals) * 100)
+            score = clamp(round(100 - (cur_pe - 10) / 40 * 100))
+            macro["sp500_pe"] = {
+                "current":  round(cur_pe, 1),
+                "avg_10y":  avg_pe,
+                "pct_rank": pct_rank,
+                "score":    score,
+                "history":  [{"d": d, "v": round(v, 1)} for d, v in pe_data if v],
+                "label":    "Estrema sopravvalutazione" if cur_pe > 35
+                            else "Sopravvalutazione" if cur_pe > 25
+                            else "Valutazione elevata" if cur_pe > 20
+                            else "Valutazione normale" if cur_pe > 14 else "Sottovalutazione",
+            }
+    except Exception as e:
+        print(f"!! sp500_pe: {e}", file=sys.stderr)
+
     # Smart Money vs Retail: VIX term structure + HY/IG credit spread + put/call
     try:
         vix3m_h = yf.Ticker("^VIX3M").history(period="5d")["Close"].dropna()
@@ -1327,6 +1363,25 @@ def fetch_top_caps(n=10):
     return rows[:n]
 
 
+def fetch_top_etfs():
+    """Dati live per i 10 ETF principali: prezzo, performance, RSI, PE, dividendo."""
+    rows = []
+    for ticker, name in TOP_ETF_LIST:
+        row = fetch_symbol(ticker, name)
+        if not row:
+            continue
+        try:
+            info = yf.Ticker(ticker).info
+            row["pe"]        = round(float(info["trailingPE"]), 1) if info.get("trailingPE") else None
+            row["div_yield"] = round(float(info.get("dividendYield", 0) or 0) * 100, 2)
+            aum = info.get("totalAssets")
+            row["aum"] = round(aum / 1e9, 1) if aum else None
+        except Exception:  # noqa: BLE001
+            pass
+        rows.append(row)
+    return rows
+
+
 def parse_feed_entries(url):
     """Restituisce [(title, link, ts)] da un feed RSS; se bloccato usa rss2json."""
     out = []
@@ -1612,6 +1667,7 @@ def main():
         "macro": macro,
         "broker": BROKER,
         "top_caps": fetch_top_caps(),
+        "top_etfs": fetch_top_etfs(),
         "predictions": fetch_predictions(),
         "news": fetch_news(),
         "options": options,
