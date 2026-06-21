@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-21T16:14:46Z",
+ "updated_at": "2026-06-21T16:44:43Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6480,16 +6480,16 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64039.85,
-   "change_pct": -0.31,
+   "price": 64026.52,
+   "change_pct": -0.33,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.3,
    "support": 59108.92,
    "resistance": 71334.95,
-   "rsi": 40.0,
-   "volume": 14618832896,
-   "vol_ratio": 0.45,
+   "rsi": 39.9,
+   "volume": 14360111104,
+   "vol_ratio": 0.44,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -6498,7 +6498,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64039.85
+     64026.52
     ],
     "m6": [
      68843.16,
@@ -6626,7 +6626,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64039.85
+     64026.52
     ],
     "all": [
      386.94,
@@ -6770,7 +6770,7 @@
      68233.31,
      76304.32,
      73579.69,
-     64039.85
+     64026.52
     ],
     "m1": [
      73579.69,
@@ -6794,7 +6794,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64039.85
+     64026.52
     ],
     "m3": [
      77126.88,
@@ -6862,7 +6862,7 @@
      62896.47,
      63540.84,
      64239.68,
-     64039.85
+     64026.52
     ],
     "y1": [
      102257.41,
@@ -6938,7 +6938,7 @@
      60867.41,
      63561.05,
      65600.64,
-     64039.85
+     64026.52
     ],
     "d1": [
      64185.27,
@@ -7038,7 +7038,10 @@
      64208.7,
      64156.07,
      64158.05,
-     64039.85
+     64056.05,
+     64134.49,
+     63978.31,
+     64026.52
     ]
    },
    "earnings_date": null,
@@ -7053,22 +7056,22 @@
     "w1": {
      "support": 62201.14,
      "resistance": 66354.62,
-     "change_pct": -0.59
+     "change_pct": -0.61
     },
     "m1": {
      "support": 59108.92,
      "resistance": 74153.5,
-     "change_pct": -12.97
+     "change_pct": -12.98
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -16.97
+     "change_pct": -16.99
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -44.44
+     "change_pct": -44.46
     }
    },
    "financials": [],
@@ -20999,18 +21002,7 @@
    "change_pct": 0.46
   }
  ],
- "predictions": [
-  {
-   "question": "Will the price of Bitcoin be above $58,000 on June 21?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-58k-on-june-21-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $62,000 on June 21?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-21-2026"
-  }
- ],
+ "predictions": [],
  "news": [
   {
    "source": "Investing.com",
@@ -21084,19 +21076,6 @@
   },
   {
    "source": "Investing.com",
-   "title": "Gold faces hurdle on path to $5,200 as hawkish Fed dampens ETF demand, MS says",
-   "link": "https://www.investing.com/news/commodities-news/gold-faces-hurdle-on-path-to-5200-as-hawkish-fed-dampens-etf-demand-ms-says-4751667",
-   "published": "2026-06-21T11:52:41Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "L'oro deve affrontare un ostacolo nel percorso verso i 5.200 dollari mentre la Fed falcata smorza la domanda di ETF, afferma MS"
-  },
-  {
-   "source": "Investing.com",
    "title": "Bitcoin rises above $64,000 as traders weigh Iran talks, bullish options bets",
    "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-rises-above-64000-as-traders-weigh-iran-talks-bullish-options-bets-4751659",
    "published": "2026-06-21T08:26:51Z",
@@ -21138,6 +21117,33 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Wall Street Just Sold Off These IT-Services Stocks on AI Fears. Is the Sell-Off Overdone?",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/wall-street-just-sold-off-162000358.html",
+   "published": "2026-06-21T16:20:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Wall Street ha appena svenduto questi titoli di servizi IT per paura dell'intelligenza artificiale. La svendita è eccessiva?"
+  },
+  {
+   "source": "CNBC",
+   "title": "Trump threatens Iran with fresh strikes as Vance leads peace talks in Switzerland",
+   "link": "https://www.cnbc.com/2026/06/21/us-and-iranians-meet-in-switzerland-for-peace-talks.html",
+   "published": "2026-06-21T16:18:03Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump minaccia l’Iran di nuovi attacchi mentre Vance conduce i colloqui di pace in Svizzera"
+  },
+  {
    "source": "Bloomberg",
    "title": "Iran Avoids Shared US Photo at Summit",
    "link": "https://news.google.com/search?q=Iran%20Avoids%20Shared%20US%20Photo%20at%20Summit",
@@ -21166,20 +21172,6 @@
    "title_it": "Esper: Hezbollah è \"spoiler\" per l'accordo USA-Iran"
   },
   {
-   "source": "CNBC",
-   "title": "Trump threatens Iran with fresh strikes as Vance attends talks in Switzerland",
-   "link": "https://www.cnbc.com/2026/06/21/us-and-iranians-meet-in-switzerland-for-peace-talks.html",
-   "published": "2026-06-21T14:42:04Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Trump minaccia l’Iran di nuovi attacchi mentre Vance partecipa ai colloqui in Svizzera"
-  },
-  {
    "source": "Google News",
    "title": "This Week’s PCE Report Could Reinforce Higher Rates and a Stronger Dollar - Mott Capital Management",
    "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQVnU3bF9WZEpCVVJIdHhyTXZZUWZSa2I5VzZnbnRzM19iemlsQTMxV2wtN2pHSTdlU2U4c3ZBTmJpcVBaRXFBOWw3SDBZYm90VHE2c3J5eTVNSzU0R25sbDNjbndJbjZvN01jejZBZmQxSElSYVNQQW9CZmdMT2ZTRURpWFZQaC1hNVYtQjdZYVB0YlNQUXZYNg?oc=5",
@@ -21204,6 +21196,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Sforzi in corso per l'evacuazione sicura dello Stretto di Hormuz"
+  },
+  {
+   "source": "Google News",
+   "title": "What the Iran war cost the Pentagon, the economy — and Trump - KXLF-TV",
+   "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNbEhiejZ2TmNELXVrdk9SWEFvTXNhMXRMNndISDg5bjZvNUxMYkk3bGZhdUFjbFFwUEdZWUNOcEw5RGExMVQ2eEl4VVdNd2ZQSTdzUTJvQzcyLVNlbE5CeGFFQUlYU3NRSVY5aUFkQTVINmdFbDk5NUdHMTNRWmtMNjJfSTdKa0JjRTB2d3VfY1NKaHh6TkQzQUpoOA?oc=5",
+   "published": "2026-06-21T13:15:28Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Quanto è costata la guerra all’Iran al Pentagono, all’economia – e a Trump – KXLF-TV"
   },
   {
    "source": "Google News",
@@ -21274,6 +21280,20 @@
    "title_it": "Carenza di carburante in Russia durante gli attacchi di droni in Ucraina"
   },
   {
+   "source": "Reuters",
+   "title": "Iran's Tasnim news agency says Hormuz will not reopen until Lebanon ceasefire holds, oil waivers issued - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPa005aHFiRnFPT0lhdUYwazVqbHV2cEhrTWJHWFVEZDhBWlpzNEtzRFptdVZsRkpwcnQ0ZVVfNXh5aE1JR202NGpWX3liaE1aeE4ybk5oRUhwLUJFWTNPOTdfMHRxMkM5bllwRDdVcXBLbUVCSDhKTEpCQS1rcERlUW9YLTBHZEQzYVRPanVKUFlpMHo1M1hpOTdvYlp6b0lUVk5OT2FXT196RjEwZ2dBRGxpNERROG5QOFVVVGlzWGcwMU1NNWE2X1FR?oc=5",
+   "published": "2026-06-21T11:19:43Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L'agenzia di stampa iraniana Tasnim afferma che Hormuz non riaprirà finché non sarà rispettato il cessate il fuoco in Libano e non saranno state emesse le deroghe sul petrolio - Reuters"
+  },
+  {
    "source": "CNBC",
    "title": "Top Wall Street analysts like these 3 dividend stocks for solid returns",
    "link": "https://www.cnbc.com/2026/06/21/top-wall-street-analysts-like-these-3-dividend-stocks-for-solid-returns.html",
@@ -21327,6 +21347,19 @@
    "title_it": "I volti di Warsh si legano tra Trump e l'inflazione dopo il nuovo rapporto rovente - AOL.com"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Best high-yield savings interest rates today, Sunday, June 21, 2026: Earn up to 4.10% APY",
+   "link": "https://finance.yahoo.com/personal-finance/banking/article/best-high-yield-savings-interest-rates-today-sunday-june-21-2026-100000731.html",
+   "published": "2026-06-21T10:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "I migliori tassi di interesse di risparmio ad alto rendimento oggi, domenica 21 giugno 2026: guadagna fino al 4,10% APY"
+  },
+  {
    "source": "Google News",
    "title": "Fed got a new chair. What's changing at the central bank under Warsh - USA Today",
    "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOOHVCVUFpSXR4SlpYbmlBY1V0Mk9kZE92XzFrZVBwenEyUGVUbXRPdXlZbW5yMm5qeXNiZ2I4Ym13XzVJMmxVRnc0RklDVW5kUWlZYVJaMjJuSmlpX2lFSGltLWc3LXNlNTFLQVg1TTE4WGVXY0ZxLVBfU0VVYjFWOVRmVEQ5dVlOSFpvTE1yX0E5dmdFX1N1YTE2a1Z2YkcyLWJQbDhFdw?oc=5",
@@ -21354,17 +21387,18 @@
    "title_it": "Il petrolio continua a scorrere attraverso Hormuz nonostante l’Iran affermi che è chiuso"
   },
   {
-   "source": "Google News",
-   "title": "Fed Holds Rates and Leans Toward Fighting Inflation With Future Increases - The New York Times",
-   "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxOWlo2eWRfMHQzRGk2MTdTdkR4R3FLWHlxWjdRekZCOWRhWk42ajJxamdDcmZlbER4TzVxZlFMa0F5d0wycHVMejh1Qk1vTGtWQW1qV05HdXp6ZFFOd3FEOXdaRmw5ZC1HdDd6WGl1Q3NnOS0xc3Y0YUdyQ3htLUlzTVJqRG9oalZM?oc=5",
-   "published": "2026-06-21T06:01:16Z",
+   "source": "Reuters",
+   "title": "US VP Vance arrives in Switzerland for peace talks with Iran - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQdnAzWlotOEpfTUY1MXotSFVBTlJndkJWUS1QazZfdjFPNTFHQ3RWaFF5QjlFM3BndjQ1N0ExTlByMjNLODhTalhEb0loNTBnSmJ2OXdieURobkJ5WThHVzhwaXJ3enE4TzhzeHliaVN3bDB5SjFJa0JvNTYydEhDbW5aNmhGT2F2bFp3ZGNJOC1QZkFfWTBPQ1daS3NUbzFCVmRGWQ?oc=5",
+   "published": "2026-06-21T04:36:00Z",
    "tickers": [
-    "MACRO"
+    "MACRO",
+    "POL"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "La Fed mantiene i tassi e punta a combattere l'inflazione con aumenti futuri - The New York Times"
+   "title_it": "Il vicepresidente americano Vance arriva in Svizzera per colloqui di pace con l'Iran - Reuters"
   },
   {
    "source": "AP",
@@ -21379,6 +21413,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "L'allenatore dice che l'Iran viene ancora trattato male dagli Stati Uniti ai Mondiali prima della seconda partita - AP News"
+  },
+  {
+   "source": "Reuters",
+   "title": "Iran coach questions inconsistency as preparation for Belgium match cut short - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOMk1kNVo3MFREOWQxV2tJUmhKQktKWWI1dE50UEc5NllHakZfMU11YVRYSTFkNmVQSDVNcXpfbTJXOEdyeC03cHhxSkk0QWpaYXJmV3U5Y3FPLXhlZUFEZjVWbldRYWlPSE1TZ1Q4Sl85QlRwcTluaXUzVjJkc0JSRHpOVzNEai0wSWxhZ1JDOVN6U2xyRjhtUEY4eHNvbUFqMXRZUDhSZzdaZVZzZ3lWYlcxcF9nbF93M2Zmdw?oc=5",
+   "published": "2026-06-21T03:21:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L'allenatore iraniano mette in dubbio l'incoerenza mentre la preparazione per la partita con il Belgio è stata interrotta - Reuters"
   },
   {
    "source": "AP",
@@ -21409,6 +21457,20 @@
    "title_it": "Entra nell'hotel iraniano della Coppa del Mondo a Tijuana, in Messico, dove i fan si ritrovano per tifare - AP News"
   },
   {
+   "source": "Reuters",
+   "title": "Belgium brace for motivated Iran as Garcia manages Lukaku's minutes - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOcDRHMVQzMDJTcVhQRmFpV2g4bmJ2N1VRaTdfNXFPYlBicG1jNHlZUkxJc3VlZEwza3VIUWhRNE5OS0s2UVdOcmhENFF3WTJ2S1hJSGx1WFFXTDI5NE1zTkFCNTNVWm1mc25EOUFnQmtaa25NdXotY1FqVVUzNDNrT09xR2V3c0NiSm1fNTMzNGpJTUhTOFVWV2JsaEdOeDY0Y3c5U1J1MnQ0OWlUdGc?oc=5",
+   "published": "2026-06-21T00:04:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il Belgio doppietta per l'Iran motivato mentre Garcia gestisce i minuti di Lukaku - Reuters"
+  },
+  {
    "source": "AP",
    "title": "US and Iran to talk Sunday in Switzerland as Tehran says it closed Strait of Hormuz again - AP News",
    "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOZU83bXR0RDhtTHExa0dVVFJOTWlvNS1DMVM0WUdqX0JyNWQ0RnRTcUNzQlkzR2xtWDdnTVA0NEt3NDVMZXBZcl83X2lEVU9jRktXNlc4SjhKMWMxRUZidDJvdDBreDZLbmpsRklMU01GNkJiYVJVWnhyZnlzUkFhYzY1VFdtUjRUbTh6aHlCVkFQUGttSU44TDBWVDZZTlRJbUhTY3JzRHA?oc=5",
@@ -21435,6 +21497,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Trump approfondisce la disputa con l'italiano Meloni, che afferma che i suoi \"attacchi non provocati sono insensati\" - AP News"
+  },
+  {
+   "source": "Reuters",
+   "title": "U.S. defends Iran World Cup travel restrictions, says discussions ongoing - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxOWXZKd3Rfc2FkZHhCTEc1WWk1cjBmbm95d2xObktVdTJ4S2JtUnd1ZzMydmltY3B0SUszd3BSN25PMHdPLXBOTlEtbnJ1c1ROV21zT0tZT3RTeTFHczIxRlhUNTI3RXNmSVhNaVVwUWJEcy1BT1ZLTnhXd0sxTXB6MW9qVUFuYXlpSVI2Ni1lb3doTnA2aW9jNG9CQWxZLUc2TnVIQ21TUGdjWkZ6SElKMDhOM2UxeXJfRGVhbg?oc=5",
+   "published": "2026-06-20T22:03:52Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Gli Stati Uniti difendono le restrizioni ai viaggi in Iran per la Coppa del Mondo, dice discussioni in corso - Reuters"
   },
   {
    "source": "AP",
@@ -21464,6 +21540,33 @@
    "title_it": "BREAKING: L'Iran afferma che Hormuz è di nuovo chiuso"
   },
   {
+   "source": "Reuters",
+   "title": "US forces monitoring Strait of Hormuz to ensure it stays open - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQOEt1ZGR5cFBKRG1mSHlLQTc3TnpyMnVnaWltNHQ1eXpockxLYVhxeVlqdmRMeThjck83dVdad2s0eTJOblROeE1GNkJWeF94RTE3cEwyNEFSWTVIaTZITHAtbTNMeS13dmtXUFZrUzJHZjNMdW9ReHZpOFhELUJaX2hNU1BLblRBYno3UHVBT1djajVIdlVQQ1hGb0RuR19wZHA0dUZXX1VrSlJPQVE?oc=5",
+   "published": "2026-06-20T16:55:11Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Le forze americane monitorano lo Stretto di Hormuz per assicurarsi che rimanga aperto - Reuters"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Forget SpaceX: See This Overlooked AI Stock in Donald Trump’s Portfolio",
+   "link": "https://finance.yahoo.com/technology/ai/articles/forget-spacex-see-overlooked-ai-153143545.html",
+   "published": "2026-06-20T15:31:43Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Dimentica SpaceX: guarda queste azioni di intelligenza artificiale trascurate nel portafoglio di Donald Trump"
+  },
+  {
    "source": "Yahoo Finance",
    "title": "Mark Cuban Says the Stock Market Makes Guys Like Elon Musk ‘Insanely Rich’ — But Eliminating Billionaires Would Trigger the ‘Worst Depression’ Ever Seen",
    "link": "https://finance.yahoo.com/markets/stocks/articles/mark-cuban-says-stock-market-150002134.html",
@@ -21478,16 +21581,16 @@
   },
   {
    "source": "Yahoo Finance",
-   "title": "Micron Must Do This on June 24, or Its Stock Could Crash",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/micron-must-june-24-stock-154531132.html",
-   "published": "2026-06-21T15:45:31Z",
+   "title": "SpaceX and Nvidia Each Forecast $1 Trillion in Revenue. Which Stock is the Better Buy?",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/spacex-nvidia-forecast-1-trillion-162500758.html",
+   "published": "2026-06-21T16:25:00Z",
    "tickers": [
-    "MU"
+    "NVDA"
    ],
    "topic_pri": 1,
    "inv": false,
-   "sentiment": "bear",
-   "title_it": "Micron deve farlo il 24 giugno, altrimenti le sue azioni potrebbero crollare"
+   "sentiment": "neutral",
+   "title_it": "SpaceX e Nvidia prevedono entrate per 1 trilione di dollari ciascuna. Quale azione è la migliore da acquistare?"
   },
   {
    "source": "MarketWatch",
@@ -21552,42 +21655,7 @@
    "topic_pri": 2,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'esistenza invece dell'utopia: perché Bitcoin è già crollato, anche se le persone non se ne rendono conto"
-  },
-  {
-   "source": "CNBC",
-   "title": "Bitcoin's future as revolutionary as the smartphone, according to CoinDesk",
-   "link": "https://www.cnbc.com/2026/06/20/bitcoin-as-revolutionary-as-smartphone-according-to-coindesk.html",
-   "published": "2026-06-20T15:00:01Z",
-   "tickers": [
-    "BTC-USD"
-   ],
-   "topic_pri": 2,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il futuro di Bitcoin è rivoluzionario quanto lo smartphone, secondo CoinDesk"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the price of Bitcoin be above $58,000 on June 21?",
-   "title_it": "Will the price of Bitcoin be above $58,000 on June 21? — probabilità Sì 100%",
-   "link": "https://polymarket.com/event/bitcoin-above-58k-on-june-21-2026",
-   "published": "2026-06-21T16:15:38Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the price of Bitcoin be above $62,000 on June 21?",
-   "title_it": "Will the price of Bitcoin be above $62,000 on June 21? — probabilità Sì 100%",
-   "link": "https://polymarket.com/event/bitcoin-above-62k-on-june-21-2026",
-   "published": "2026-06-21T16:15:38Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
+   "title_it": "L'esistenza anziché l'utopia: perché Bitcoin è già crollato, anche se le persone non se ne rendono conto"
   }
  ],
  "options": {
