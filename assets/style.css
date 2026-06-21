@@ -241,13 +241,13 @@ footer { color: var(--muted); font-size: 11.5px; text-align: center; line-height
 }
 .earn-card {
   background: var(--card-2); border: 1px solid var(--border); border-radius: 7px;
-  padding: 4px 8px; cursor: pointer; flex: 1 1 84px; min-width: 80px;
+  padding: 3px 7px; cursor: pointer; flex: 0 1 76px; min-width: 68px; max-width: 90px;
 }
 .earn-card:hover { border-color: var(--blue); }
 .earn-top { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; }
 .earn-tk { font-family: var(--mono); font-weight: 700; font-size: 11px; }
-.earn-when { color: var(--muted); font-size: 9px; white-space: nowrap; }
-.earn-date { font-family: var(--mono); font-size: 10px; color: var(--muted); margin: 1px 0 3px; }
+.earn-date { font-family: var(--mono); font-size: 9.5px; color: var(--muted); }
+.earn-when { font-size: 9px; font-weight: 600; white-space: nowrap; margin: 1px 0 3px; }
 
 /* barra range sotto le trimestrali */
 .range-bar { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; flex-wrap: wrap; }
@@ -260,6 +260,15 @@ footer { color: var(--muted); font-size: 11.5px; text-align: center; line-height
 .cm-ranges { margin-bottom: 10px; }
 .info-line { font-size: 13px; margin: 4px 0; }
 .modal-chart h4 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+
+/* ---------- ETF bars sopra top-cap ---------- */
+.etf-bars { display: flex; flex-direction: column; gap: 3px; margin-bottom: 4px; }
+.etf-bar-row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; }
+.etf-bar-lab { width: 160px; flex-shrink: 0; color: var(--text); }
+.etf-bar-lab .tk { color: var(--muted); font-family: var(--mono); font-size: 10px; margin-left: 3px; }
+.etf-bar-track { flex: 1; height: 7px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.etf-bar-fill { display: block; height: 100%; border-radius: 4px; }
+.etf-bar-val { width: 52px; text-align: right; font-family: var(--mono); font-size: 11px; font-weight: 600; }
 
 /* ---------- top capitalizzazioni ---------- */
 .topcap-list { list-style: none; columns: 2; column-gap: 26px; }

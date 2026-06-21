@@ -947,7 +947,8 @@
    "pmc": 153.92,
    "value": 53737.0,
    "gain": 38345.0,
-   "gain_pct": 249.12
+   "gain_pct": 249.12,
+   "rs_1m": 27.8
   },
   {
    "ticker": "NVDA",
@@ -1716,7 +1717,8 @@
    "pmc": 87.17,
    "value": 56886.3,
    "gain": 33350.4,
-   "gain_pct": 141.7
+   "gain_pct": 141.7,
+   "rs_1m": -6.4
   },
   {
    "ticker": "MU",
@@ -2653,7 +2655,8 @@
    "pmc": 87.63,
    "value": 79379.3,
    "gain": 73245.2,
-   "gain_pct": 1194.07
+   "gain_pct": 1194.07,
+   "rs_1m": 60.3
   },
   {
    "ticker": "MSTR",
@@ -3429,7 +3432,8 @@
    "pmc": 210.22,
    "value": 13841.19,
    "gain": -12015.87,
-   "gain_pct": -46.47
+   "gain_pct": -46.47,
+   "rs_1m": -33.6
   },
   {
    "ticker": "RGTI",
@@ -3931,7 +3935,8 @@
    "pmc": 26.5,
    "value": 11000.4,
    "gain": -2647.1,
-   "gain_pct": -19.4
+   "gain_pct": -19.4,
+   "rs_1m": 31.8
   },
   {
    "ticker": "BTP-V28",
@@ -3966,7 +3971,8 @@
    "tech_by_range": {},
    "stats": null,
    "financials": [],
-   "fin_health": null
+   "fin_health": null,
+   "rs_1m": null
   }
  ],
  "watchlist": [
@@ -4437,7 +4443,8 @@
     }
    },
    "financials": [],
-   "fin_health": null
+   "fin_health": null,
+   "rs_1m": 7.5
   },
   {
    "ticker": "SPCX",
@@ -4617,7 +4624,8 @@
      "margin": -26.4
     }
    ],
-   "fin_health": 55
+   "fin_health": 55,
+   "rs_1m": 12.9
   },
   {
    "ticker": "CBRS",
@@ -4868,7 +4876,8 @@
      "margin": 46.6
     }
    ],
-   "fin_health": 48
+   "fin_health": 48,
+   "rs_1m": -24.7
   },
   {
    "ticker": "^KS11",
@@ -5592,7 +5601,8 @@
     }
    },
    "financials": [],
-   "fin_health": null
+   "fin_health": null,
+   "rs_1m": 22.5
   },
   {
    "ticker": "^IXIC",
@@ -6464,7 +6474,8 @@
     }
    },
    "financials": [],
-   "fin_health": null
+   "fin_health": null,
+   "rs_1m": -1.4
   },
   {
    "ticker": "BTC-USD",
@@ -7017,7 +7028,8 @@
     }
    },
    "financials": [],
-   "fin_health": null
+   "fin_health": null,
+   "rs_1m": -15.4
   },
   {
    "ticker": "CL=F",
@@ -7616,7 +7628,8 @@
     }
    },
    "financials": [],
-   "fin_health": null
+   "fin_health": null,
+   "rs_1m": -24.1
   },
   {
    "ticker": "^RUT",
@@ -8455,7 +8468,8 @@
     }
    },
    "financials": [],
-   "fin_health": null
+   "fin_health": null,
+   "rs_1m": 3.2
   },
   {
    "ticker": "INTC",
@@ -9387,7 +9401,8 @@
      "margin": -0.5
     }
    ],
-   "fin_health": 38
+   "fin_health": 38,
+   "rs_1m": 18.9
   },
   {
    "ticker": "TSLA",
@@ -10014,7 +10029,8 @@
      "margin": 4.0
     }
    ],
-   "fin_health": 79
+   "fin_health": 79,
+   "rs_1m": -2.9
   },
   {
    "ticker": "PLTR",
@@ -10518,7 +10534,8 @@
      "margin": 36.3
     }
    ],
-   "fin_health": 68
+   "fin_health": 68,
+   "rs_1m": -7.0
   },
   {
    "ticker": "GOOGL",
@@ -11215,7 +11232,8 @@
      "margin": 32.8
     }
    ],
-   "fin_health": 87
+   "fin_health": 87,
+   "rs_1m": -7.0
   },
   {
    "ticker": "UNH",
@@ -12147,7 +12165,8 @@
      "margin": 2.7
     }
    ],
-   "fin_health": 90
+   "fin_health": 90,
+   "rs_1m": 1.6
   },
   {
    "ticker": "JPM",
@@ -13079,7 +13098,8 @@
      "margin": 31.4
     }
    ],
-   "fin_health": 90
+   "fin_health": 90,
+   "rs_1m": 8.0
   },
   {
    "ticker": "LMT",
@@ -14011,7 +14031,8 @@
      "margin": 6.7
     }
    ],
-   "fin_health": 83
+   "fin_health": 83,
+   "rs_1m": -4.3
   }
  ],
  "allocation": [

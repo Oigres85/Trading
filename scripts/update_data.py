@@ -438,6 +438,13 @@ def fetch_symbol(ticker, name=None, currency="USD"):
 
 
 def fetch_equities():
+    # benchmark 1 mese per RS relativa
+    try:
+        sp_hist = yf.Ticker("^GSPC").history(period="2mo", interval="1d", auto_adjust=True)["Close"].dropna()
+        sp_m1 = (float(sp_hist.iloc[-1]) / float(sp_hist.iloc[-22]) - 1) * 100 if len(sp_hist) >= 22 else None
+    except Exception:  # noqa: BLE001
+        sp_m1 = None
+
     rows = []
     for pos in PORTFOLIO:
         row = fetch_symbol(pos["ticker"], pos["name"])
@@ -445,22 +452,42 @@ def fetch_equities():
             continue
         value = row["price"] * pos["qty"]
         cost = pos["pmc"] * pos["qty"]
+        # RS 1M = performance 1M del titolo meno performance 1M dell'S&P 500
+        m1 = row.get("sparks", {}).get("m1", [])
+        rs_1m = None
+        if len(m1) >= 2 and m1[0] and sp_m1 is not None:
+            stk_m1 = (m1[-1] / m1[0] - 1) * 100
+            rs_1m = round(stk_m1 - sp_m1, 1)
         row.update({
             "qty": pos["qty"], "pmc": pos["pmc"],
             "value": round(value, 2),
             "gain": round(value - cost, 2),
             "gain_pct": round((value / cost - 1) * 100, 2),
+            "rs_1m": rs_1m,
         })
         rows.append(row)
     return rows
 
 
 def fetch_watchlist():
+    try:
+        sp_hist = yf.Ticker("^GSPC").history(period="2mo", interval="1d", auto_adjust=True)["Close"].dropna()
+        sp_m1 = (float(sp_hist.iloc[-1]) / float(sp_hist.iloc[-22]) - 1) * 100 if len(sp_hist) >= 22 else None
+    except Exception:  # noqa: BLE001
+        sp_m1 = None
+
     rows = []
     for w in WATCHLIST:
         row = fetch_symbol(w["ticker"], w.get("name"), w.get("currency", "USD"))
-        if row:
-            rows.append(row)
+        if not row:
+            continue
+        m1 = row.get("sparks", {}).get("m1", [])
+        rs_1m = None
+        if len(m1) >= 2 and m1[0] and sp_m1 is not None:
+            stk_m1 = (m1[-1] / m1[0] - 1) * 100
+            rs_1m = round(stk_m1 - sp_m1, 1)
+        row["rs_1m"] = rs_1m
+        rows.append(row)
     return rows
 
 

@@ -465,12 +465,17 @@ function renderMiniCards() {
       <div class="mc-value">Sovrappeso: <b style="color:var(--green)">${esc(top.name)}</b> ${signTxt(top.m1)}</div>
       <div class="mc-sub muted">debole: ${esc(bot.name)} ${signTxt(bot.m1)} · clicca per il dettaglio</div>`;
   }
-  // Quadruple Witching (4 streghe)
+  // Quadruple Witching (4 streghe) con rating-bar prossimità
   const w = m.witching, wBox = $("#witching-box");
   if (wBox && w && w.next) {
+    // urgenza 0-100: a 0 gg = 100 (massima), a 90+ gg = 0
+    const urgency = Math.max(0, Math.min(100, Math.round((1 - w.days / 90) * 100)));
+    const urgLab = w.days <= 7 ? "IMMINENTE" : w.days <= 21 ? "VICINA" : w.days <= 45 ? "IN ARRIVO" : "LONTANA";
+    const urgColor = w.days <= 7 ? "var(--red)" : w.days <= 21 ? "var(--yellow)" : "var(--muted)";
     wBox.innerHTML = `<div class="mc-title">Quadruple Witching (4 streghe)</div>
       <div class="mc-value">${new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</div>
-      <div class="mc-sub muted">tra ${w.days} gg · scadenza simultanea di opzioni e futures · clicca</div>`;
+      <div class="meter-track" style="margin:4px 0"><span class="meter-fill" style="width:${urgency}%;background:${urgColor}"></span></div>
+      <div class="mc-sub muted">tra ${w.days} gg · <b style="color:${urgColor}">${urgLab}</b> · clicca per dettagli</div>`;
   }
   // MacroQuant (stile BCA)
   const mq = m.macroquant, mqBox = $("#macroquant-box");
@@ -899,6 +904,13 @@ function fmtVolume(v) {
   return String(v);
 }
 
+function rsBar(rs) {
+  if (rs == null) return "—";
+  // RS 1M vs S&P: positivo = outperformance (verde), negativo = underperformance (rosso)
+  const color = rs >= 2 ? "var(--green)" : rs <= -2 ? "var(--red)" : "var(--muted)";
+  return `<span class="${rs > 0 ? "pos" : rs < 0 ? "neg" : ""}" style="font-family:var(--mono);font-size:12px;color:${color}">${rs > 0 ? "+" : ""}${fmtNum.format(rs)}%</span>`;
+}
+
 function techCells(r) {
   const c = cur(r);
   // supporto/resistenza cambiano con il range selezionato (1S/1M/3M/1A)
@@ -913,6 +925,7 @@ function techCells(r) {
       <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
       <td class="num">${rsiBar(r.rsi)}</td>
       <td class="num">${volBar(r.vol_ratio)}</td>
+      <td class="num">${rsBar(r.rs_1m)}</td>
       <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
       <td>${ratingBadge(r.rating)}</td>
       <td class="num">${targetBar(r.rating)}</td>
@@ -1605,8 +1618,8 @@ function renderEarnings() {
     const pct = Math.max(6, Math.min(100, 100 - r.days * 1.1));
     const color = r.days <= 7 ? "var(--red)" : r.days <= 21 ? "var(--yellow)" : "var(--green)";
     return `<div class="earn-card" data-earn="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per dettagli">
-      <div class="earn-top"><span class="earn-tk">${r.ticker}</span><span class="earn-when">${when}</span></div>
-      <div class="earn-date">${d}</div>
+      <div class="earn-top"><span class="earn-tk">${r.ticker}</span><span class="earn-date">${d}</span></div>
+      <div class="earn-when" style="color:${color}">${when}</div>
       <div class="impact"><span class="impact-fill" style="width:${pct}%;background:${color}"></span></div>
     </div>`;
   }).join("") : "";
@@ -1774,13 +1787,30 @@ function fmtMcap(v) {
 function renderTopCaps() {
   const list = DATA.top_caps || [];
   if (!list.length) { $("#topcaps").innerHTML = ""; return; }
-  $("#topcaps").innerHTML = `<div class="m-label" style="margin:14px 0 8px">Top 10 capitalizzazioni mondiali</div>
+
+  // barre ETF settoriali sopra la lista (top 5 per 1M, sintetico)
+  const tilt = (DATA.macro || {}).tilt || [];
+  let etfBars = "";
+  if (tilt.length) {
+    const top5 = [...tilt].sort((a, b) => b.m1 - a.m1).slice(0, 5);
+    const maxAbs = Math.max(...top5.map(s => Math.abs(s.m1)), 1);
+    etfBars = `<div class="m-label" style="margin:14px 0 6px">ETF settoriali — performance 1 mese</div>
+      <div class="etf-bars">` + top5.map(s => `
+        <div class="etf-bar-row">
+          <span class="etf-bar-lab">${esc(s.name)} <span class="tk">${s.ticker}</span></span>
+          <span class="etf-bar-track"><span class="etf-bar-fill" style="width:${Math.abs(s.m1) / maxAbs * 100}%;background:${perfColor(s.m1)}"></span></span>
+          <span class="etf-bar-val ${signCls(s.m1)}">${signTxt(s.m1)}</span>
+        </div>`).join("") + `</div>`;
+  }
+
+  $("#topcaps").innerHTML = etfBars +
+    `<div class="m-label" style="margin:14px 0 8px">Top 10 capitalizzazioni mondiali</div>
     <ol class="topcap-list">` + list.map((x, i) => `
       <li class="topcap-item">
         <span class="topcap-rank">${i + 1}</span>
         <span class="topcap-name">${esc(x.name)} <span class="tk">${x.ticker}</span></span>
         <span class="topcap-mcap">${fmtMcap(x.mcap_usd)}</span>
-        <span class="topcap-chg ${signCls(x.change_pct)}">${x.change_pct >= 0 ? "▲" : "▼"} ${signTxt(x.change_pct)}</span>
+        <span class="topcap-chg ${signCls(x.change_pct)}">${signTxt(x.change_pct)}</span>
       </li>`).join("") + "</ol>";
 }
 
@@ -1832,10 +1862,12 @@ function buildPrompt() {
   const f = (v, d = 2) => v === null || v === undefined ? "—" : fmtNum.format(v);
   const mdRow = (r) => {
     const c = cur(r);
-    return `| ${r.name} (${r.ticker}) | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${r.support ? c + f(r.support) : "—"} | ${r.resistance ? c + f(r.resistance) : "—"} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(r.beta)} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"} | ${r.signal} |`;
+    const optC = (DATA.options || {})[r.ticker];
+    const optNote = optC ? `CW:${c}${f(optC.expiries?.[0]?.call_wall)} PW:${c}${f(optC.expiries?.[0]?.put_wall)}` : "—";
+    return `| ${r.name} (${r.ticker}) | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${r.rs_1m != null ? (r.rs_1m > 0 ? "+" : "") + r.rs_1m + "%" : "—"} | ${r.support ? c + f(r.support) : "—"} | ${r.resistance ? c + f(r.resistance) : "—"} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(r.beta)} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"} | ${r.signal} | ${optNote} |`;
   };
-  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | Supp. | Resist. | P/E | EPS | Beta | Target Δ | Trimestrale | Segnale |";
-  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
+  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RS 1M | Supp. | Resist. | P/E | EPS | Beta | Target Δ | Trimestrale | Segnale | Opzioni (CW/PW) |";
+  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
   if ((DATA.watchlist || []).length) {
@@ -1864,7 +1896,7 @@ function buildPrompt() {
     [...m.tilt].sort((a, b) => b.m1 - a.m1).forEach(s =>
       lines.push(`- ${s.name} (${s.ticker}): 1M ${signTxt(s.m1)}, 3M ${signTxt(s.m3)}`));
   }
-  if (m.witching) lines.push(`- Prossime "4 streghe" (quadruple witching): ${m.witching}`);
+  if (m.witching) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg)`);
   // liquidità e capitale
   if (t.cash) lines.push(`- Liquidità disponibile: ${fmtEUR.format(t.cash)} · capitale investito: ${fmtEUR.format(t.eur_invested)}`);
   if ((DATA.top_caps || []).length) {
