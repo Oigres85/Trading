@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-21T05:28:05Z",
+ "updated_at": "2026-06-21T08:22:25Z",
  "eurusd": 1.1469,
  "totals": {
   "usd_value": 214844.19,
@@ -6470,29 +6470,27 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 64218.37,
-   "change_pct": 1.07,
+   "price": 63994.05,
+   "change_pct": -0.38,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.1,
+   "ath_dist_pct": -49.3,
    "support": 59108.92,
-   "resistance": 74153.5,
-   "rsi": 40.4,
-   "volume": 16949950464,
-   "vol_ratio": 0.52,
+   "resistance": 71334.95,
+   "rsi": 39.8,
+   "volume": 16335746048,
+   "vol_ratio": 0.5,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
     "w1": [
-     66289.5,
-     65600.64,
+     64418.45,
      62896.47,
      63540.84,
-     64218.37
+     64239.68,
+     63994.05
     ],
     "m6": [
-     69767.62,
-     68788.19,
      68843.16,
      67494.22,
      66425.32,
@@ -6614,9 +6612,11 @@
      65710.4,
      66289.5,
      65600.64,
+     64418.45,
      62896.47,
      63540.84,
-     64218.37
+     64239.68,
+     63994.05
     ],
     "all": [
      386.94,
@@ -6760,11 +6760,9 @@
      68233.31,
      76304.32,
      73579.69,
-     64218.37
+     63994.05
     ],
     "m1": [
-     73372.52,
-     73754.84,
      73579.69,
      71319.77,
      66703.66,
@@ -6782,13 +6780,13 @@
      65710.4,
      66289.5,
      65600.64,
+     64418.45,
      62896.47,
      63540.84,
-     64218.37
+     64239.68,
+     63994.05
     ],
     "m3": [
-     74805.08,
-     75152.13,
      77126.88,
      75726.21,
      73856.35,
@@ -6850,9 +6848,11 @@
      65710.4,
      66289.5,
      65600.64,
+     64418.45,
      62896.47,
      63540.84,
-     64218.37
+     64239.68,
+     63994.05
     ],
     "y1": [
      102257.41,
@@ -6927,7 +6927,8 @@
      71319.77,
      60867.41,
      63561.05,
-     65600.64
+     65600.64,
+     63994.05
     ],
     "d1": [
      64185.27,
@@ -6962,7 +6963,25 @@
      64245.7,
      64184.42,
      64158.05,
-     64208.69
+     64208.69,
+     64224.91,
+     64214.0,
+     64171.21,
+     64145.21,
+     64135.34,
+     64182.3,
+     64183.42,
+     64225.99,
+     64216.81,
+     64176.58,
+     64179.86,
+     64133.77,
+     64151.99,
+     64140.27,
+     64119.6,
+     64104.44,
+     64037.14,
+     63994.05
     ]
    },
    "earnings_date": null,
@@ -6976,23 +6995,23 @@
    "tech_by_range": {
     "w1": {
      "support": 62201.14,
-     "resistance": 67248.13,
-     "change_pct": -3.12
+     "resistance": 66354.62,
+     "change_pct": -0.66
     },
     "m1": {
      "support": 59108.92,
-     "resistance": 74218.56,
-     "change_pct": -12.48
+     "resistance": 74153.5,
+     "change_pct": -13.03
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -14.15
+     "change_pct": -17.03
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -42.05
+     "change_pct": -44.48
     }
    },
    "financials": [],
@@ -11776,7 +11795,7 @@
      262.81,
      273.93,
      265.04,
-     273.25,
+     273.24,
      282.06,
      281.36,
      276.51,
@@ -13133,7 +13152,7 @@
      652.88,
      656.65,
      639.92,
-     634.12,
+     634.11,
      650.37,
      672.3,
      663.48,
@@ -15051,7 +15070,7 @@
     153058,
     154980,
     154532,
-    157101,
+    157100,
     156807,
     155640,
     157005,
@@ -15350,7 +15369,7 @@
     173883,
     175594,
     176934,
-    175032,
+    175031,
     174870,
     174089,
     173138,
@@ -15390,7 +15409,7 @@
     188244,
     186492,
     183172,
-    180141,
+    180140,
     186461,
     191516,
     192567,
@@ -15996,7 +16015,7 @@
     86802,
     89516,
     86851,
-    84956,
+    84957,
     89287,
     87359,
     91133,
@@ -16766,7 +16785,7 @@
     86802,
     89516,
     86851,
-    84956,
+    84957,
     89287,
     87359,
     91133,
@@ -16989,7 +17008,7 @@
      "score": 9
     }
    ],
-   "fomo": 45,
+   "fomo": 47,
    "fomo_label": "Nessuna FOMO"
   },
   "vix": {
@@ -17185,7 +17204,7 @@
    "calls": 2916
   },
   "risk_sentiment": {
-   "score": 51,
+   "score": 50,
    "label": "Neutrale",
    "components": [
     {
@@ -17202,7 +17221,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 61
+     "score": 46
     },
     {
      "label": "Treasury 10A",
@@ -17477,11 +17496,11 @@
     "ticker": "XLC",
     "name": "Comunicazioni",
     "group": "Settori",
-    "price": 109.2,
-    "d1": -2.78,
-    "m1": -6.7,
-    "m3": -5.0,
-    "score": 35
+    "price": 109.45,
+    "d1": 0.23,
+    "m1": -5.5,
+    "m3": -4.8,
+    "score": 37
    },
    {
     "ticker": "XLE",
@@ -17641,8 +17660,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1709310446271,
-   "change_pct": -0.23
+   "mcap_usd": 1704154160338,
+   "change_pct": 0.46
   },
   {
    "ticker": "TSLA",
@@ -17667,51 +17686,22 @@
  "news": [
   {
    "source": "Investing.com",
-   "title": "Trump says Lincoln Memorial Reflecting Pool may be drained for repairs",
-   "link": "https://www.investing.com/news/economy-news/trump-says-lincoln-memorial-reflecting-pool-may-be-drained-for-repairs-4751646",
-   "published": "2026-06-21T03:10:16Z",
+   "title": "Earnings call transcript: Accenture Q3 2026 results spark sharp stock selloff",
+   "link": "https://www.investing.com/news/transcripts/earnings-call-transcript-accenture-q3-2026-results-spark-sharp-stock-selloff-93CH-4751653",
+   "published": "2026-06-21T06:44:56Z",
    "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Trump afferma che la piscina riflettente del Lincoln Memorial potrebbe essere prosciugata per riparazioni"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Trump, blaming alleged vandals, says Washington Reflecting Pool needs repairs",
-   "link": "https://www.investing.com/news/politics-news/trump-blaming-alleged-vandals-says-washington-reflecting-pool-needs-repairs-4751641",
-   "published": "2026-06-21T01:42:28Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Trump, incolpando presunti vandali, afferma che la Washington Reflecting Pool necessita di riparazioni"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Trump, Italy’s Meloni exchange fresh criticism over Iran war stance",
-   "link": "https://www.investing.com/news/economy-news/trump-italys-meloni-exchange-fresh-criticism-over-iran-war-stance-4751642",
-   "published": "2026-06-21T01:28:40Z",
-   "tickers": [
-    "MACRO",
-    "POL"
+    "MACRO"
    ],
    "topic_pri": 0,
    "inv": true,
    "sentiment": "bear",
-   "title_it": "Trump e la Meloni si scambiano nuove critiche sulla posizione di guerra dell’Iran"
+   "title_it": "Trascrizione delle chiamate sugli utili: i risultati di Accenture del terzo trimestre del 2026 innescano una forte svendita delle azioni"
   },
   {
    "source": "Investing.com",
-   "title": "U.S.-Iran ceasefire talks set to begin in Switzerland as Vance arrives",
-   "link": "https://www.investing.com/news/economy-news/usiran-ceasefire-talks-set-to-begin-in-switzerland-as-vance-arrives-4751640",
-   "published": "2026-06-21T00:55:03Z",
+   "title": "Israel says it ’eliminated’ two Hamas and Islamic Jihad operatives tied to major funding network",
+   "link": "https://www.investing.com/news/commodities-news/israel-says-it-eliminated-two-hamas-and-islamic-jihad-operatives-tied-to-major-funding-network-4751652",
+   "published": "2026-06-21T06:36:06Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -17719,7 +17709,21 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "I colloqui per il cessate il fuoco tra Stati Uniti e Iran inizieranno in Svizzera con l'arrivo di Vance"
+   "title_it": "Israele afferma di aver “eliminato” due agenti di Hamas e della Jihad islamica legati a un’importante rete di finanziamento"
+  },
+  {
+   "source": "Investing.com",
+   "title": "U.S. sanctions struggle to curb Iran, Russia, North Korea evasion tactics - WSJ",
+   "link": "https://www.investing.com/news/economy-news/us-sanctions-struggle-to-curb-iran-russia-north-korea-evasion-tactics--wsj-4751650",
+   "published": "2026-06-21T05:49:16Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Le sanzioni statunitensi faticano a frenare le tattiche di evasione di Iran, Russia e Corea del Nord - WSJ"
   },
   {
    "source": "Investing.com",
@@ -17764,10 +17768,37 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
+   "source": "CNBC",
+   "title": "Vance arrives in Switzerland for talks with Iranian negotiators amid rising Strait of Hormuz tensions",
+   "link": "https://www.cnbc.com/2026/06/20/iran-reportedly-closes-strait-of-hormuz-again-raising-doubt-over-talks.html",
+   "published": "2026-06-21T07:19:43Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Vance arriva in Svizzera per colloqui con i negoziatori iraniani nel mezzo delle crescenti tensioni sullo Stretto di Hormuz"
+  },
+  {
+   "source": "AP",
+   "title": "US Vice President JD Vance arrives in Switzerland to launch talks with Iran on its nuclear program - AP News",
+   "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxNNFh5b3dHTzJSUUpQVUtRWDdqTG5SYWtlNHhyNXBuRWZEbHgycFNiZUVkLTJsa3d5NkJiMDVjeDE2LVpEVGJ1YkZURGlpZnc0WlAySkJVcVc2dTJsNHAzNVZQaElzS1BZeVN6TzJDTGFzOV9TZVdZMV9FRHhYNVpsMkV2MjcwNXI0NUtORXlMd2lzTmdlUDl3TWxOblBZQQ?oc=5",
+   "published": "2026-06-21T06:55:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il vicepresidente americano JD Vance arriva in Svizzera per avviare i colloqui con l'Iran sul suo programma nucleare - AP News"
+  },
+  {
    "source": "Google News",
    "title": "Fed Holds Rates and Leans Toward Fighting Inflation With Future Increases - The New York Times",
    "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxOWlo2eWRfMHQzRGk2MTdTdkR4R3FLWHlxWjdRekZCOWRhWk42ajJxamdDcmZlbER4TzVxZlFMa0F5d0wycHVMejh1Qk1vTGtWQW1qV05HdXp6ZFFOd3FEOXdaRmw5ZC1HdDd6WGl1Q3NnOS0xc3Y0YUdyQ3htLUlzTVJqRG9oalZM?oc=5",
-   "published": "2026-06-21T04:18:10Z",
+   "published": "2026-06-21T06:01:16Z",
    "tickers": [
     "MACRO"
    ],
@@ -17777,10 +17808,10 @@
    "title_it": "La Fed mantiene i tassi e punta a combattere l'inflazione con aumenti futuri - The New York Times"
   },
   {
-   "source": "AP",
-   "title": "US Vice President JD Vance arriving in Switzerland to launch talks with Iran on its nuclear program - AP News",
-   "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxNNFh5b3dHTzJSUUpQVUtRWDdqTG5SYWtlNHhyNXBuRWZEbHgycFNiZUVkLTJsa3d5NkJiMDVjeDE2LVpEVGJ1YkZURGlpZnc0WlAySkJVcVc2dTJsNHAzNVZQaElzS1BZeVN6TzJDTGFzOV9TZVdZMV9FRHhYNVpsMkV2MjcwNXI0NUtORXlMd2lzTmdlUDl3TWxOblBZQQ?oc=5",
-   "published": "2026-06-21T04:01:00Z",
+   "source": "Reuters",
+   "title": "US VP Vance arrives in Switzerland for peace talks with Iran - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQdnAzWlotOEpfTUY1MXotSFVBTlJndkJWUS1QazZfdjFPNTFHQ3RWaFF5QjlFM3BndjQ1N0ExTlByMjNLODhTalhEb0loNTBnSmJ2OXdieURobkJ5WThHVzhwaXJ3enE4TzhzeHliaVN3bDB5SjFJa0JvNTYydEhDbW5aNmhGT2F2bFp3ZGNJOC1QZkFfWTBPQ1daS3NUbzFCVmRGWQ?oc=5",
+   "published": "2026-06-21T04:36:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -17788,7 +17819,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il vicepresidente americano JD Vance arriva in Svizzera per avviare i colloqui con l'Iran sul suo programma nucleare - AP News"
+   "title_it": "Il vicepresidente americano Vance arriva in Svizzera per colloqui di pace con l'Iran - Reuters"
   },
   {
    "source": "CNBC",
@@ -17859,47 +17890,6 @@
    "title_it": "Entra nell'hotel iraniano della Coppa del Mondo a Tijuana, in Messico, dove i fan si ritrovano per tifare - AP News"
   },
   {
-   "source": "Reuters",
-   "title": "US disputes Iranian claims about closing Strait of Hormuz as negotiators head to Switzerland - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMixAFBVV95cUxOd3B1UzBaM0FMeEpSTFF5N3J3NXFHanp0a0VKUlprczNXWVJCa0VmSUZxY1ZqYkNPdHBrVml3clJUZzdpck1DY3djZHR6ZTFMeU5HdHVTaTJPMV81Q0VJY1E3TWZyU2RlM0ZVZDJKZ2RERnRETURQRmM4MElPajdMV3VzNW4tUEVVWDZlWG1QTGU5dHVTX2NXdjd5UHd2blpVeW5QNE91cnRnYy1vN25BRTA0RjdzMTZ4X2lQd01JdmM2SnVD?oc=5",
-   "published": "2026-06-20T23:49:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Gli Stati Uniti contestano le affermazioni iraniane sulla chiusura dello Stretto di Hormuz mentre i negoziatori si dirigono in Svizzera - Reuters"
-  },
-  {
-   "source": "CNBC",
-   "title": "Iran reportedly closes Strait of Hormuz again as Vance heads to Switzerland for talks",
-   "link": "https://www.cnbc.com/2026/06/20/iran-reportedly-closes-strait-of-hormuz-again-raising-doubt-over-talks.html",
-   "published": "2026-06-20T22:59:26Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Secondo quanto riferito, l’Iran chiude nuovamente lo Stretto di Hormuz mentre Vance si dirige in Svizzera per colloqui"
-  },
-  {
-   "source": "AP",
-   "title": "US and Iran to talk Sunday in Switzerland as Tehran says it closed Strait of Hormuz again - AP News",
-   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOZU83bXR0RDhtTHExa0dVVFJOTWlvNS1DMVM0WUdqX0JyNWQ0RnRTcUNzQlkzR2xtWDdnTVA0NEt3NDVMZXBZcl83X2lEVU9jRktXNlc4SjhKMWMxRUZidDJvdDBreDZLbmpsRklMU01GNkJiYVJVWnhyZnlzUkFhYzY1VFdtUjRUbTh6aHlCVkFQUGttSU44TDBWVDZZTlRJbUhTY3JzRHA?oc=5",
-   "published": "2026-06-20T22:58:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Stati Uniti e Iran parleranno domenica in Svizzera mentre Teheran afferma di aver chiuso nuovamente lo Stretto di Hormuz - AP News"
-  },
-  {
    "source": "AP",
    "title": "Trump deepens the dustup with Italy's Meloni, who says his 'unprovoked attacks are senseless' - AP News",
    "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNSmluWjJycmtITFZDY3oxWjUzcU0zQ2tWdWU2OGdqbnBaajc4ZlFoVDRRQTgtU0xnS1dUZUlVazVJRHI5OWFXX09GdU1ZVl8zSTJHNmJNTVBLNEtVLXkzTzhsMDd0bEtLc0dUeDZ1N00wSTl4eHRPZWxCd3FZNTl3NlhIRHI1bzNRYm1IZGRZVkI4T3hja0ZB?oc=5",
@@ -17939,6 +17929,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "L’indicatore preferito dalla Fed mostra un’inflazione più rapida"
+  },
+  {
+   "source": "CNBC",
+   "title": "Iran reportedly closes Strait of Hormuz again as Vance heads to Switzerland for talks - CNBC",
+   "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNejNxcUIzVlE0WXduRmE3Mlc2ZkktWnI0VHhDdXZuQUZkUUZVYXlEYThyd2VTMG5INWVMdG5MS3dMeFRTenRCM2Z1amI4eTh3a3VudG5lY0c1Y3hiZC13MHVNMU5jdVE1QTdWX051em4wdFpoMzllVm44bFhTU201Z0pBRkV5U0dZZjU3VFhwOExDMWJKeFEwREx1bVFKb2hxY2lKb185RWdULTjSAbABQVVfeXFMT3cteUZrSlRKUkVYTWpsaVdwVXJQM0tDQWtQdzJTZ1g2a2ZDRjBsNjJmRkx5c1E2Y09lQ2FCZzhrM0QweXdjbnhHYnlic0xiRHlxWXAzSldEOU9EQTRYb2t4dklFTHhSVlRQYUZSWlBkRU1kelB0a2pwRXA2RURjZy13V2VMdEk2X2FFUzQ2UVpCWFVqSzQzdmtvdnpyWUZsbmI3VmoybFRIM0lfSnY3LTQ?oc=5",
+   "published": "2026-06-20T17:06:27Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Secondo quanto riferito, l'Iran chiude nuovamente lo Stretto di Hormuz mentre Vance si dirige in Svizzera per colloqui - CNBC"
   },
   {
    "source": "Reddit",
@@ -18107,16 +18111,16 @@
   },
   {
    "source": "Google News",
-   "title": "Former Fed Chair Warns of Major Risk That Could Derail This Bull Market - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNdzhoSGhnUUdjRWlqTGVFUFhyOWs1RjlibnhkYXBDdUJfcGppdVE0eEhnRFFFTktfUE91TExJYmNYVzhfdklxQkxRUDd1SGU3QkJwZVpoY2VXazhpM1VNMWlHbFBaTTMzLTlwQmx4dzhmQWFiRkVjUmRMQTMxSVhDU2xnazctY0ZUV29VbEdPQjcyT0M5c1QtNg?oc=5",
-   "published": "2026-06-20T11:21:00Z",
+   "title": "Former Fed Chair Warns of Major Risk That Could Derail This Bull Market - AOL.com",
+   "link": "https://news.google.com/rss/articles/CBMifEFVX3lxTFBmUUZsMVpTOGp2X3FhUGFmQmZObzFicUNIRktFMjB4MVR1YjFWZ1p2cUhVRktnVVFJVnhMdjZZUFFCOU9rY2hqay1tWkxFdnAxTVNCUy1KbkFna0RuV1M1cDVFV0tMQ1pLZEF1S0pod2tRYVpzcFBDVVhCTG8?oc=5",
+   "published": "2026-06-20T11:40:36Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "L'ex presidente della Fed avverte di un grave rischio che potrebbe far deragliare questo mercato rialzista - Yahoo Finanza"
+   "title_it": "L'ex presidente della Fed avverte di un grave rischio che potrebbe far deragliare questo mercato rialzista - AOL.com"
   },
   {
    "source": "CNBC",
@@ -18146,6 +18150,20 @@
    "title_it": "Chi sta danneggiando di più l’inflazione? I dati della Fed mostrano quali sono le popolazioni dell'Oklahoma più colpite: gli Oklahoman"
   },
   {
+   "source": "AP",
+   "title": "US and Iran to talk Sunday in Switzerland as Tehran says it closed Strait of Hormuz again - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOZU83bXR0RDhtTHExa0dVVFJOTWlvNS1DMVM0WUdqX0JyNWQ0RnRTcUNzQlkzR2xtWDdnTVA0NEt3NDVMZXBZcl83X2lEVU9jRktXNlc4SjhKMWMxRUZidDJvdDBreDZLbmpsRklMU01GNkJiYVJVWnhyZnlzUkFhYzY1VFdtUjRUbTh6aHlCVkFQUGttSU44TDBWVDZZTlRJbUhTY3JzRHA?oc=5",
+   "published": "2026-06-20T09:40:32Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Stati Uniti e Iran parleranno domenica in Svizzera mentre Teheran afferma di aver chiuso nuovamente lo Stretto di Hormuz - AP News"
+  },
+  {
    "source": "CNBC",
    "title": "Massive bonuses for South Korea's chip workers puts central bank on inflation alert",
    "link": "https://www.cnbc.com/2026/06/20/south-korea-tech-samsung-sk-hynix-bonus-bank-of-korea.html",
@@ -18159,57 +18177,17 @@
    "title_it": "I massicci bonus per i lavoratori dei chip della Corea del Sud mettono la banca centrale in allerta sull’inflazione"
   },
   {
-   "source": "CNBC",
-   "title": "Iran closes Strait of Hormuz again and says its negotiating team is heading to Switzerland - CNBC",
-   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPVDBfNzc3WGFrQTZQeUtWV1AtcTFVelcwTlRqdE9ESDRxSkstcUJsMnRYVUoxejR6WWlmSEJBY0UwTFJXYURvQy1vQ203NUkxNEJNUjdxV21yNzdBWWFhTEJzNngybkd4Y192R0diVjBTZUJETVVja1NpLXNYZnpoNzFMV3NrSUozR2FpaVJHRjExRzc4WFJ4ZmRST3FMcHJnbW5fZlBET1TSAa4BQVVfeXFMT2RpckM3Wl9ORU43b2VVcWNyLUx0RGtlSURrSTBNeU1KcnFSbkczSVIwLTNUOW9WX3RzdzRaM05rLVRKVHdrMW93RU8xaFlnSEpzbTl3NDNiVU5sejExWFAxcWNFdEFUX1NHODl2M1lsM25feWotakJvd1lfdXRZYnFqNFZUbXlaQmtaWEtPSXIxdElLUWxoQXhHdFUxMDFrRml1ZkxhX0RKbEZFLWh3?oc=5",
-   "published": "2026-06-20T06:37:57Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'Iran chiude nuovamente lo Stretto di Hormuz e afferma che la sua squadra negoziale si dirigerà in Svizzera - CNBC"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Is Robinhood Markets Stock Outperforming the S&P 500?",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/robinhood-markets-stock-outperforming-p-002040795.html",
-   "published": "2026-06-20T00:20:40Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Le azioni di Robinhood Markets stanno sovraperformando l’S&P 500?"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Strive Blames Leverage Unwind as SATA and Strategy’s STRC Slide Below Par",
-   "link": "https://finance.yahoo.com/markets/crypto/articles/strive-blames-leverage-unwind-sata-222600330.html",
-   "published": "2026-06-20T01:26:00Z",
-   "tickers": [
-    "MSTR"
-   ],
-   "topic_pri": 1,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Sforzarsi di incolpare la leva finanziaria Rilassarsi mentre SATA e STRC della strategia scivolano sotto la media"
-  },
-  {
    "source": "Investing.com",
-   "title": "Bitcoin battles $65K resistance amid MACD bounce: Live levels",
+   "title": "Bitcoin battles $64,300-$65,000 resistance: Live levels",
    "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-hits-66380-resistance-after-wbottom-breakout-live-levels-93CH-4741296",
-   "published": "2026-06-20T19:02:10Z",
+   "published": "2026-06-21T07:01:43Z",
    "tickers": [
     "BTC-USD"
    ],
    "topic_pri": 2,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Bitcoin combatte la resistenza di 65.000 dollari durante il rimbalzo del MACD: livelli in tempo reale"
+   "title_it": "Bitcoin combatte la resistenza di 64.300$-65.000$: livelli live"
   },
   {
    "source": "CNBC",
@@ -18225,11 +18203,24 @@
    "title_it": "Il futuro di Bitcoin è rivoluzionario quanto lo smartphone, secondo CoinDesk"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "This Billionaire Says Bitcoin Is a Better Investment Than Real Estate. Is He Right?",
+   "link": "https://finance.yahoo.com/markets/crypto/articles/billionaire-says-bitcoin-better-investment-025300233.html",
+   "published": "2026-06-20T02:53:00Z",
+   "tickers": [
+    "BTC-USD"
+   ],
+   "topic_pri": 2,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Questo miliardario afferma che Bitcoin è un investimento migliore del settore immobiliare. Ha ragione?"
+  },
+  {
    "source": "Polymarket",
    "title": "Will the price of Bitcoin be above $58,000 on June 21?",
    "title_it": "Will the price of Bitcoin be above $58,000 on June 21? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-58k-on-june-21-2026",
-   "published": "2026-06-21T05:29:30Z",
+   "published": "2026-06-21T08:23:25Z",
    "tickers": [
     "MACRO"
    ],
