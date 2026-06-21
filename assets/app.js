@@ -1131,7 +1131,7 @@ async function drawTickerChart() {
   const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.ticker.replace("^", ""))}`;
   const controls = `<div class="cm-controls"><div class="spark-toggle cm-ranges">` +
     CM_RANGES.map(([k, lab]) => `<button class="chip cm-range ${k === cmRange ? "chip-active" : ""}" data-range="${k}">${lab}</button>`).join("") +
-    `</div><a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">Apri su TradingView ↗</a></div>`;
+    `</div>${hasOptions(r.ticker) ? `<button class="btn btn-ghost btn-sm cm-opt-open">Catena opzioni</button>` : ""}<a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">Apri su TradingView ↗</a></div>`;
   $("#chart-modal-title").textContent = `${r.name} (${r.ticker})`;
   $("#chart-modal-body").innerHTML = controls + `<div class="muted" style="padding:40px 0;text-align:center" id="cm-loading">Carico le candele…</div>`;
   $("#chart-modal-tip").innerHTML = "";
@@ -1145,6 +1145,106 @@ async function drawTickerChart() {
     const vals = (r.sparks || {})[cmRange];
     openChartModal(`${r.name} (${r.ticker})`, vals, synthDates(cmRange, (vals || []).length), v => sym + fmtNum.format(v), controls);
   }
+}
+
+/* ===================== MODULO OPZIONI — Strike Ladder ===================== */
+/* Dati reali generati dalla pipeline (Yahoo via yfinance) → DATA.options[ticker]. */
+let optTicker = null, optExpIdx = 0, optSide = "call";
+
+function optChain(ticker) {
+  const o = DATA.options || {};
+  return o[ticker] || o[(ticker || "").toUpperCase()] || null;
+}
+function hasOptions(ticker) {
+  const c = optChain(ticker);
+  return !!(c && c.expiries && c.expiries.length);
+}
+
+function openOptionsModal(ticker) {
+  if (!hasOptions(ticker)) { toast("Catena opzioni non disponibile per " + ticker); return; }
+  const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
+  const r = all.find(x => x.ticker === ticker) || { ticker };
+  optTicker = ticker; optExpIdx = 0; optSide = "call";
+  $("#chart-modal-title").textContent = `Catena opzioni — ${r.name || r.ticker} (${r.ticker})`;
+  $("#chart-modal-tip").innerHTML = "";
+  $("#chart-modal").hidden = false;
+  renderOptionsContent();
+}
+
+function loadOptionsView() { renderOptionsContent(); }   // re-render (toggle/scadenza)
+
+function renderOptionsContent() {
+  const tk = optTicker;
+  const chain = optChain(tk);
+  if (!chain) return;
+  const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
+  const row = all.find(x => x.ticker === tk) || {};
+  const sym = row.currency === "EUR" ? "€" : "$";
+  const exps = chain.expiries;
+  if (optExpIdx >= exps.length) optExpIdx = 0;
+  const exp = exps[optExpIdx];
+  const spot = chain.spot ?? row.price ?? null;
+  const side = optSide === "put" ? (exp.puts || []) : (exp.calls || []);
+  const wallStrike = optSide === "put" ? exp.put_wall : exp.call_wall;
+  const wallLab = optSide === "put" ? "[Put Wall]" : "[Call Wall]";
+
+  const expSel = `<select class="pmc-input opt-expiry" style="width:auto;padding:4px 8px">` +
+    exps.map((e, i) => `<option value="${i}" ${i === optExpIdx ? "selected" : ""}>${new Date(e.date + "T00:00:00").toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}</option>`).join("") + `</select>`;
+  const sideTog = `<div class="spark-toggle opt-side-tog" role="group">
+      <button class="chip opt-side ${optSide === "call" ? "chip-active" : ""}" data-side="call">CALL</button>
+      <button class="chip opt-side ${optSide === "put" ? "chip-active" : ""}" data-side="put">PUT</button></div>`;
+  const controls = `<div class="cm-controls opt-controls">
+      <button class="btn btn-ghost btn-sm cm-opt-back">← Grafico</button>
+      <label class="bench-toggle">Scadenza: ${expSel}</label>
+      ${sideTog}
+      ${spot != null ? `<span class="muted">Spot: <b>${sym}${fmtNum.format(spot)}</b></span>` : ""}
+    </div>`;
+
+  // tachimetro d'impatto: volume opzioni (azioni equivalenti) vs volume medio del titolo
+  const avgVol = chain.avg_volume || null;
+  const optVol = exp.opt_volume || 0;
+  let impactHtml = "";
+  if (avgVol) {
+    const ratioPct = optVol * 100 / avgVol * 100;            // 1 contratto = 100 azioni
+    const fill = Math.max(2, Math.min(100, ratioPct));
+    const lvl = ratioPct >= 30 ? ["ALTO", "I market maker guidano il prezzo", "var(--red)"]
+              : ratioPct >= 10 ? ["MEDIO", "Le opzioni influenzano il titolo", "var(--yellow)"]
+              : ["BASSO", "Peso marginale sul sottostante", "var(--green)"];
+    impactHtml = `<div class="opt-impact">
+        <div class="opt-impact-head">Impatto opzioni sul titolo: <b style="color:${lvl[2]}">${lvl[0]}</b> <span class="muted">(${lvl[1]})</span></div>
+        <div class="opt-impact-track"><span class="opt-impact-fill" style="width:${fill.toFixed(0)}%;background:${lvl[2]}"></span>
+          <span class="opt-impact-tick" style="left:10%"></span><span class="opt-impact-tick" style="left:30%"></span></div>
+        <div class="opt-impact-foot muted">Volume opzioni ${fmtBig(optVol)} contratti (~${fmtBig(optVol * 100)} azioni eq.) · Vol. medio titolo ${fmtBig(avgVol)}</div>
+      </div>`;
+  }
+
+  // ATM = strike più vicino allo spot dentro la finestra
+  let atmStrike = null;
+  if (spot != null && side.length) atmStrike = side.reduce((m, o) => Math.abs(o.strike - spot) < Math.abs(m - spot) ? o.strike : m, side[0].strike);
+
+  const rows = side.map(o => {
+    const isATM = o.strike === atmStrike;
+    const isWall = wallStrike != null && o.strike === wallStrike;
+    return `<tr class="${isWall ? "opt-wall" : ""} ${isATM ? "opt-atm" : ""}">
+      <td>${sym}${fmtNum.format(o.strike)}${isATM ? ' <span class="opt-tag">ATM</span>' : ""}</td>
+      <td>${o.bid != null ? fmtNum.format(o.bid) : "—"}</td>
+      <td>${o.ask != null ? fmtNum.format(o.ask) : "—"}</td>
+      <td>${o.iv != null ? o.iv.toFixed(1) + "%" : "—"}</td>
+      <td>${(o.vol || 0).toLocaleString("it-IT")}</td>
+      <td>${(o.oi || 0).toLocaleString("it-IT")}${isWall ? ` <span class="opt-wall-lab">${wallLab}</span>` : ""}</td>
+    </tr>`;
+  }).join("");
+
+  const wallNote = wallStrike != null
+    ? `${optSide === "put" ? "Put Wall" : "Call Wall"} a <b>${sym}${fmtNum.format(wallStrike)}</b> (OI massimo) — ${optSide === "put" ? "supporto/magnete sotto il prezzo" : "resistenza/tetto sopra il prezzo"}.`
+    : "";
+
+  $("#chart-modal-body").innerHTML = controls + impactHtml + `
+    <div class="table-wrap"><table class="opt-table">
+      <thead><tr><th>STRIKE</th><th>BID</th><th>ASK</th><th>IV %</th><th>VOL</th><th>OPEN INTEREST</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">Nessuno strike per questa scadenza</td></tr>`}</tbody>
+    </table></div>
+    <div class="muted" style="margin-top:8px;font-size:11px">${wallNote} ATM = strike più vicino al prezzo. Fonte: Yahoo Finance (OI a fine giornata, aggiornato dalla pipeline).</div>`;
 }
 
 /* grafico a candele: verde se chiude >= apre, rosso se scende */
@@ -1998,8 +2098,15 @@ $("#hist-zoom").addEventListener("click", () => {
 $("#chart-modal-close").addEventListener("click", closeChartModal);
 $("#chart-modal").addEventListener("click", e => {
   if (e.target.id === "chart-modal") { closeChartModal(); return; }
+  if (e.target.closest(".cm-opt-open")) { openOptionsModal(cmTicker); return; }
+  if (e.target.closest(".cm-opt-back")) { optTicker = null; drawTickerChart(); return; }
+  const sd = e.target.closest(".opt-side");
+  if (sd) { optSide = sd.dataset.side; loadOptionsView(); return; }
   const rb = e.target.closest(".cm-range");
   if (rb) { cmRange = rb.dataset.range; drawTickerChart(); }
+});
+$("#chart-modal").addEventListener("change", e => {
+  if (e.target.classList.contains("opt-expiry")) { optExpIdx = Number(e.target.value); loadOptionsView(); }
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeChartModal(); });
 document.addEventListener("click", (e) => {

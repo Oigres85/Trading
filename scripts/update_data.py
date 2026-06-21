@@ -905,6 +905,73 @@ SECTOR_ETF = {
 }
 
 
+def _opt_rows(df, n_each, atm_idx):
+    """Riduce un DataFrame di opzioni a una finestra di strike attorno all'ATM."""
+    lo = max(0, atm_idx - n_each)
+    hi = atm_idx + n_each + 1
+    out = []
+    for _, o in df.iloc[lo:hi].iterrows():
+        out.append({
+            "strike": round(float(o["strike"]), 2),
+            "bid": None if pd.isna(o["bid"]) else round(float(o["bid"]), 2),
+            "ask": None if pd.isna(o["ask"]) else round(float(o["ask"]), 2),
+            "iv": None if pd.isna(o.get("impliedVolatility")) else round(float(o["impliedVolatility"]) * 100, 1),
+            "vol": int(o["volume"]) if not pd.isna(o["volume"]) else 0,
+            "oi": int(o["openInterest"]) if not pd.isna(o["openInterest"]) else 0,
+        })
+    return out
+
+
+def fetch_options_chain(symbols, n_strikes=12, n_expiries=3):
+    """Catena opzioni reale (Yahoo via yfinance, gestisce crumb/cookie lato server).
+    Per ogni titolo: spot, volume medio, e per le prossime scadenze una finestra di
+    strike attorno all'ATM con bid/ask/IV/volume/open interest, più Call/Put Wall e
+    l'impatto delle opzioni (volume opzioni in azioni equivalenti vs volume medio)."""
+    out = {}
+    for raw in symbols:
+        sym = TICKER_ALIAS.get(raw.strip().upper(), raw.strip())
+        try:
+            t = yf.Ticker(sym)
+            exps = list(getattr(t, "options", []) or [])
+            if not exps:
+                continue
+            hist = t.history(period="1mo", interval="1d", auto_adjust=True)
+            spot = float(hist["Close"].dropna().iloc[-1]) if not hist.empty else None
+            avg_vol = float(hist["Volume"].dropna().tail(20).mean()) if not hist.empty else None
+            expiries = []
+            for ed in exps[:n_expiries]:
+                try:
+                    ch = t.option_chain(ed)
+                except Exception:  # noqa: BLE001
+                    continue
+                calls = ch.calls.sort_values("strike").reset_index(drop=True)
+                puts = ch.puts.sort_values("strike").reset_index(drop=True)
+                if calls.empty and puts.empty:
+                    continue
+                ref = spot if spot else float(calls["strike"].median())
+                atm_c = int((calls["strike"] - ref).abs().idxmin()) if not calls.empty else 0
+                atm_p = int((puts["strike"] - ref).abs().idxmin()) if not puts.empty else 0
+                call_wall = float(calls.loc[calls["openInterest"].idxmax(), "strike"]) if not calls.empty and calls["openInterest"].notna().any() else None
+                put_wall = float(puts.loc[puts["openInterest"].idxmax(), "strike"]) if not puts.empty and puts["openInterest"].notna().any() else None
+                opt_vol = int(pd.concat([calls["volume"], puts["volume"]]).fillna(0).sum())
+                expiries.append({
+                    "date": ed,
+                    "calls": _opt_rows(calls, n_strikes, atm_c),
+                    "puts": _opt_rows(puts, n_strikes, atm_p),
+                    "call_wall": round(call_wall, 2) if call_wall else None,
+                    "put_wall": round(put_wall, 2) if put_wall else None,
+                    "opt_volume": opt_vol,
+                })
+            if expiries:
+                out[sym] = {"spot": round(spot, 2) if spot else None,
+                            "avg_volume": int(avg_vol) if avg_vol else None,
+                            "expiries": expiries}
+        except Exception as e:  # noqa: BLE001
+            print(f"!! opzioni {sym}: {e}", file=sys.stderr)
+        time.sleep(0.3)
+    return out
+
+
 def fetch_sector_tilt():
     """Rotazione settoriale/tematica USA: momentum 1M e 3M degli ETF.
     I primi in classifica sono quelli su cui ruotare (overweight)."""
@@ -1347,6 +1414,13 @@ def main():
                        "value_eur": round(btp["value"], 2), "sector": "Obbligazioni"})
     allocation.sort(key=lambda x: x["value_eur"], reverse=True)
 
+    # opzioni: solo azioni/ETF USA (no indici PTS, no cripto/futures con '-','=','^')
+    opt_syms = [r["ticker"] for r in equities
+                if r.get("currency") == "USD" and not re.search(r"[\^=]|-", r["ticker"])]
+    opt_syms += [r["ticker"] for r in watchlist
+                 if r.get("currency") == "USD" and not re.search(r"[\^=]|-", r["ticker"])]
+    options = fetch_options_chain(sorted(set(opt_syms)))
+
     data = {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "eurusd": round(eurusd, 4),
@@ -1369,6 +1443,7 @@ def main():
         "top_caps": fetch_top_caps(),
         "predictions": fetch_predictions(),
         "news": fetch_news(),
+        "options": options,
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
