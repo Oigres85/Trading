@@ -260,6 +260,9 @@ footer { color: var(--muted); font-size: 11.5px; text-align: center; line-height
 .cm-ranges { margin-bottom: 10px; }
 .info-line { font-size: 13px; margin: 4px 0; }
 .modal-chart h4 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.mini-chart-wrap { margin: 4px 0 8px; }
+.mini-chart-dates { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.mini-chart-legend { font-size: 11px; color: var(--muted); margin-top: 3px; display: flex; gap: 14px; }
 
 /* ---------- ETF bars sopra top-cap ---------- */
 .etf-bars { display: flex; flex-direction: column; gap: 3px; margin-bottom: 4px; }

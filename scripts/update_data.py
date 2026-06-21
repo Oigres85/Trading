@@ -767,6 +767,11 @@ def fetch_macro():
                            "date": s[-1][0], "impact": round(clamp(50 + v * 40))})
     except Exception as e:  # noqa: BLE001
         print(f"!! curve: {e}", file=sys.stderr)
+    try:
+        ch = fred_series("T10Y2Y", 520)          # ~2 anni giornalieri per il grafico storico
+        macro["curve_history"] = [{"d": d, "v": v} for d, v in ch if v is not None]
+    except Exception as e:  # noqa: BLE001
+        print(f"!! curve_history: {e}", file=sys.stderr)
 
     # prossime pubblicazioni (cadenza tipica) + sentiment per i popup macro
     NEXT_RELEASE = {
@@ -890,6 +895,36 @@ def fetch_macro():
     macro["tilt"] = fetch_sector_tilt()
     macro["witching"] = quadruple_witching()
 
+    # Rischio Credito: ICE BofA US High Yield OAS (BAMLH0A0HYM2) — proxy CDS gratuito
+    try:
+        hy = fred_series("BAMLH0A0HYM2", 260)   # ~1 anno giornaliero
+        hy_val = hy[-1][1]
+        # OAS HY: <4% = normale, 4-5% = attenzione, 5-7% = stress, >9% = crisi
+        hy_score = round(clamp(100 - (hy_val - 2.5) / 9 * 100))
+        macro["credit"] = {
+            "spread_hy": round(hy_val, 2),
+            "score": hy_score,
+            "label": "Crisi" if hy_val > 9 else "Stress elevato" if hy_val > 7 else
+                     "Attenzione" if hy_val > 5 else "Normale",
+            "date": hy[-1][0],
+            "history": [{"d": d, "v": round(v, 2)} for d, v in hy if v is not None],
+        }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! credit: {e}", file=sys.stderr)
+
+    # Disaccoppiamento Macro: S&P 500 vs PIL reale USA (normalizzati a 100)
+    try:
+        sp = fred_series("SP500", 36)    # ~3 anni mensili
+        gd = fred_series("GDPC1", 12)   # ~3 anni trimestrali
+        if sp and gd:
+            sp_base, gd_base = sp[0][1], gd[0][1]
+            macro["decouple"] = {
+                "sp500": [{"d": d, "v": round(v / sp_base * 100, 1)} for d, v in sp],
+                "gdp":   [{"d": d, "v": round(v / gd_base * 100, 1)} for d, v in gd],
+            }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! decouple: {e}", file=sys.stderr)
+
     # MacroQuant (riproduzione trasparente stile BCA): composito del ciclo/risk dai
     # fattori macro disponibili. NON è il dato proprietario BCA Research.
     mq = []
@@ -904,6 +939,8 @@ def fetch_macro():
         mq.append(("Fear & Greed", macro["fear_greed"]["score"]))
     if macro.get("vix"):
         mq.append(("Volatilità (VIX)", round(clamp(100 - macro["vix"]["value"] / 50 * 100))))
+    if macro.get("credit"):
+        mq.append(("Rischio Credito (HY)", macro["credit"]["score"]))
     if mq:
         score = round(sum(s for _, s in mq) / len(mq))
         macro["macroquant"] = {

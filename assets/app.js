@@ -703,8 +703,13 @@ function renderHistory() {
     <rect id="hist-hit" x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}" fill="transparent"/>
   </svg>${bench ? `<div class="bench-leg"><span class="leg-dash"></span> ${BENCH_LABEL[histBenchKey]} (riscalato)</div>` : ""}`;
   const first = vals[0], last = vals[vals.length - 1], chg = (last / first - 1) * 100;
-  let benchTxt = "";
-  if (bench) { const bchg = (bench[bench.length - 1] / bench[0] - 1) * 100; benchTxt = ` · ${BENCH_LABEL[histBenchKey]} ${signTxt(Math.round(bchg * 10) / 10)} (${chg >= bchg ? "sovra" : "sotto"}performance ${signTxt(Math.round((chg - bchg) * 10) / 10)})`; }
+  let benchTxt = "", alphaBadge = "";
+  if (bench) {
+    const bchg = (bench[bench.length - 1] / bench[0] - 1) * 100;
+    const alpha = Math.round((chg - bchg) * 10) / 10;
+    alphaBadge = ` · <b>Alpha: <span class="${signCls(alpha)}">${signTxt(alpha)} pp</span></b> vs ${BENCH_LABEL[histBenchKey]}`;
+    benchTxt = ` · ${BENCH_LABEL[histBenchKey]} <span class="${signCls(bchg)}">${signTxt(Math.round(bchg * 10) / 10)}</span>${alphaBadge}`;
+  }
   $("#hist-summary").innerHTML = `<span id="hist-tip">${fmtEUR.format(first)} → <b>${fmtEUR.format(last)}</b>
     <span class="${signCls(chg)}">${signTxt(Math.round(chg * 100) / 100)}</span> nel periodo${benchTxt}</span>`;
 
@@ -1318,6 +1323,47 @@ function relatedNews(rx, n = 6) {
      <div class="news-meta"><span class="news-src">${esc(x.source)}</span><span class="news-time">${timeAgo(x.published)}</span></div></li>`).join("") + "</ul>";
 }
 
+/* ---- mini chart helpers (per popup macro/credit/decouple) ---- */
+function miniLineChart(pts, { w = 420, h = 70, color = "var(--blue)", zeroLine = false } = {}) {
+  if (!pts || pts.length < 2) return '<div class="muted">Storico non disponibile</div>';
+  const vals = pts.map(p => p.v);
+  const mn = Math.min(...vals), mx = Math.max(...vals), rng = mx - mn || 0.01;
+  const px = i => ((i / (pts.length - 1)) * (w - 4) + 2).toFixed(1);
+  const py = v => (h - 4 - (v - mn) / rng * (h - 8) + 2).toFixed(1);
+  const poly = pts.map((p, i) => `${px(i)},${py(p.v)}`).join(" ");
+  const last = pts[pts.length - 1], first = pts[0];
+  const zl = zeroLine && mn < 0 && mx > 0
+    ? `<line x1="0" y1="${py(0)}" x2="${w}" y2="${py(0)}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 2"/>`
+    : "";
+  const dl = `${new Date(first.d).toLocaleDateString("it-IT", { month: "short", year: "2-digit" })} – ${new Date(last.d).toLocaleDateString("it-IT", { month: "short", year: "2-digit" })}`;
+  return `<div class="mini-chart-wrap">
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block">${zl}
+      <polyline points="${poly}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round"/>
+      <circle cx="${px(pts.length - 1)}" cy="${py(last.v)}" r="3" fill="${color}"/>
+    </svg>
+    <div class="mini-chart-dates">${dl} · <b>${fmtNum.format(first.v)}</b> → <b>${fmtNum.format(last.v)}</b></div>
+  </div>`;
+}
+
+function miniDualChart(pts1, pts2, { w = 420, h = 80, color1 = "var(--blue)", color2 = "var(--green)", label1 = "A", label2 = "B" } = {}) {
+  if (!pts1?.length || !pts2?.length) return '<div class="muted">Dati non disponibili</div>';
+  const all = [...pts1.map(p => p.v), ...pts2.map(p => p.v)];
+  const mn = Math.min(...all), mx = Math.max(...all), rng = mx - mn || 1;
+  const px = (i, len) => ((i / (len - 1)) * (w - 4) + 2).toFixed(1);
+  const py = v => (h - 4 - (v - mn) / rng * (h - 8) + 2).toFixed(1);
+  const poly = (pts) => pts.map((p, i) => `${px(i, pts.length)},${py(p.v)}`).join(" ");
+  const b100 = mn <= 100 && 100 <= mx ? `<line x1="0" y1="${py(100)}" x2="${w}" y2="${py(100)}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 2"/>` : "";
+  return `<div class="mini-chart-wrap">
+    <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block">${b100}
+      <polyline points="${poly(pts2)}" fill="none" stroke="${color2}" stroke-width="1.8"/>
+      <polyline points="${poly(pts1)}" fill="none" stroke="${color1}" stroke-width="2"/>
+      <circle cx="${px(pts1.length-1,pts1.length)}" cy="${py(pts1[pts1.length-1].v)}" r="3" fill="${color1}"/>
+      <circle cx="${px(pts2.length-1,pts2.length)}" cy="${py(pts2[pts2.length-1].v)}" r="3" fill="${color2}"/>
+    </svg>
+    <div class="mini-chart-legend"><span style="color:${color1}">—</span> ${label1} &nbsp; <span style="color:${color2}">—</span> ${label2} &nbsp; <span class="muted">— base 100</span></div>
+  </div>`;
+}
+
 // descrizione + cadenza pubblicazione (indicativa) per indicatore/box
 const MACRO_INFO = {
   "in:cpi": ["Inflazione CPI (a/a)", "Indice prezzi al consumo USA. Sopra il target Fed del 2% alimenta pressioni sui tassi.", "Pubblicazione mensile, ~10–15 del mese (BLS)", /inflaz|inflation|\bcpi\b|prezzi/i],
@@ -1339,6 +1385,8 @@ const MACRO_INFO = {
   sentiment: ["Sentiment globale", "Indicatore composito risk-on/risk-off.", "Aggiornato a ogni refresh", /sentiment|risk|rally|selloff|market/i],
   buffett: ["Buffett Indicator", "Capitalizzazione totale del mercato USA rapportata al PIL: sopra ~150% storicamente indica sopravvalutazione.", "Aggiornato a ogni refresh", /valuation|buffett|overvalu|gdp|market cap|bolla|bubble/i],
   thermometer: ["Termometro portafoglio", "Media della salute tecnica (RSI, trend, momentum) dei tuoi titoli.", "Aggiornato a ogni refresh", /(?!)/],
+  credit: ["Rischio Credito (HY OAS)", "Spread dei bond High Yield rispetto ai Treasury USA: proxy del rischio sistemico, analogo al mercato CDS senza costi di abbonamento. Fonte: ICE BofA via FRED.", "Giornaliero (FRED)", /credit|credito|spread|hy|high.?yield|cds|default|obbligaz|bond/i],
+  decouple: ["Disaccoppiamento Macro", "Divergenza tra mercato azionario (S&P 500) e economia reale (PIL reale USA GDPC1): misura quanta crescita futura è già prezzata nella borsa. Entrambe le serie normalizzate a 100 all'inizio del periodo.", "Mensile/trimestrale (FRED)", /disaccopp|decoupl|valuation|bolla|bubble|pil|gdp|utili|profit|crescita/i],
 };
 
 function openInfoModal(title, bodyHTML) {
@@ -1423,8 +1471,40 @@ function openMacroInfo(key) {
         + cy.boj_meetings.map(d => `<tr><td>${new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</td><td>tassi probabilmente fermi (sorvegliare svolte hawkish → rischio unwind carry)</td></tr>`).join("")
         + `</tbody></table>`;
     }
+  } else if (key === "credit" && m.credit) {
+    const cr = m.credit;
+    const crCol = scoreColor(cr.score);
+    extra = `<div class="info-line"><b>Spread HY (ICE BofA OAS):</b> <span style="color:${crCol}">${fmtNum.format(cr.spread_hy)}% — ${cr.label}</span> <span class="muted">(${cr.date})</span></div>
+      ${thermoBar(cr.score, ["Basso", "Elevato"])}
+      <div class="info-line muted" style="font-size:11px;margin-top:6px">L'OAS High Yield misura il premio di rischio obbligazionario rispetto ai Treasury.<br>
+      <b>&lt;4%</b> normale &nbsp;·&nbsp; <b>5-7%</b> stress &nbsp;·&nbsp; <b>&gt;9%</b> crisi sistemica. Proxy CDS via FRED (ICE BofA).</div>`;
+    if ((cr.history || []).length > 1) {
+      extra += `<h4 style="margin:12px 0 4px">Andamento spread HY (1 anno)</h4>
+        ${miniLineChart(cr.history, { color: crCol })}`;
+    }
+  } else if (key === "decouple" && m.decouple) {
+    const dc = m.decouple;
+    const spLast = dc.sp500[dc.sp500.length - 1].v;
+    const gdLast = dc.gdp[dc.gdp.length - 1].v;
+    const gap = Math.round(spLast - gdLast);
+    const gapCol = gap > 40 ? "var(--red)" : gap > 20 ? "var(--yellow)" : "var(--green)";
+    extra = `<div class="info-line"><b>S&amp;P 500 (normalizzato):</b> <span class="pos">${signTxt(spLast - 100)} dal periodo base</span></div>
+      <div class="info-line"><b>PIL reale USA (GDPC1):</b> ${signTxt(gdLast - 100)} dal periodo base</div>
+      <div class="info-line"><b>Gap (disaccoppiamento):</b> <span style="color:${gapCol}">${gap > 0 ? "+" : ""}${gap} pp — ${gap > 40 ? "speculazione elevata" : gap > 20 ? "valutazione tesa" : "disaccoppiamento contenuto"}</span></div>
+      <h4 style="margin:12px 0 4px">S&amp;P 500 vs PIL reale (base 100 = inizio periodo)</h4>
+      ${miniDualChart(dc.sp500, dc.gdp, { color1: "var(--blue)", color2: "var(--green)", label1: "S&P 500", label2: "PIL reale" })}
+      <div class="info-line muted" style="font-size:11px;margin-top:6px">Un gap ampio segnala che la borsa ha prezzato una crescita degli utili superiore a quella dell'economia reale. Storico pre-correzione: gap &gt;40 pp in 2000, 2007 e 2021.</div>`;
   } else {
     extra = `<div class="info-line"><b>Aggiornamento:</b> ${cadence}</div>`;
+  }
+
+  // curva storica: aggiunge il grafico al popup esistente di "in:curve"
+  if (key === "in:curve" && (m.curve_history || []).length > 1) {
+    const lastV = m.curve_history[m.curve_history.length - 1].v;
+    const crvCol = lastV >= 0 ? "var(--green)" : "var(--red)";
+    extra += `<h4 style="margin:12px 0 4px">Storico curva 10A-2A (2 anni)</h4>
+      ${miniLineChart(m.curve_history, { color: crvCol, zeroLine: true })}
+      <div class="info-line muted" style="font-size:11px;margin-top:4px">Sotto zero = inversione = segnale storico di recessione. La dis-inversione (risalita verso 0 e oltre) è in corso da fine 2023.</div>`;
   }
 
   openInfoModal(name, `<p style="margin:0 0 10px">${desc}</p>${extra}
@@ -1734,6 +1814,12 @@ function renderGauges() {
     cards.push(thermoCard("putcall", `Put/Call ${pc.symbol}`, score, fmtNum.format(pc.ratio),
       `<b>${pc.ratio > 1 ? "Prevalgono PUT" : "Prevalgono CALL"}</b><br>put ${pc.puts.toLocaleString("it-IT")} · call ${pc.calls.toLocaleString("it-IT")}`, ["Call", "Put"]));
   }
+  if (m.credit) {
+    const cr = m.credit;
+    cards.push(thermoCard("credit", "Rischio Credito (HY)", cr.score,
+      `${fmtNum.format(cr.spread_hy)}% OAS`,
+      `ICE BofA HY · <b style="color:${scoreColor(cr.score)}">${cr.label}</b><br>spread alto = stress sistemico`, ["Basso", "Elevato"]));
+  }
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
 }
 
@@ -1775,6 +1861,24 @@ function renderMacro() {
       ${macroThermo(i.impact)}
     </div>`);
   const cells = markets.concat(indicators);
+
+  // Disaccoppiamento macro: S&P 500 vs PIL reale
+  const dc = DATA.macro?.decouple;
+  if (dc?.sp500?.length && dc?.gdp?.length) {
+    const spLast = dc.sp500[dc.sp500.length - 1].v;
+    const gdLast = dc.gdp[dc.gdp.length - 1].v;
+    const gap = Math.round(spLast - gdLast);
+    const gapCol = gap > 40 ? "var(--red)" : gap > 20 ? "var(--yellow)" : "var(--green)";
+    const gapScore = Math.max(0, Math.min(100, 100 - gap / 1.2));
+    cells.push(`<div class="macro-item" data-macro="decouple" tabindex="0" role="button" title="Clicca per grafico S&P vs PIL" style="--accent:var(--blue)">
+      <span class="popup-dot"></span>
+      <div class="m-label">Disaccoppiamento Macro</div>
+      <div class="m-value" style="color:${gapCol}">${gap > 0 ? "+" : ""}${gap} pp</div>
+      <div class="m-date">S&amp;P ${signTxt(Math.round(spLast - 100))} · PIL ${signTxt(Math.round(gdLast - 100))}</div>
+      ${macroThermo(gapScore)}
+    </div>`);
+  }
+
   $("#macro-grid").innerHTML = cells.length ? cells.join("") : '<span class="muted">Dati non disponibili</span>';
 }
 
