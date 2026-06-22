@@ -493,9 +493,8 @@ function renderMiniCards() {
   if (tBox && tilt && tilt.length) {
     const top = tilt[0], bot = tilt[tilt.length - 1];
     tBox.innerHTML = `<div class="mc-title">Rotazione settoriale (Tilt)</div>
-      ${compactSemiGauge(top.score, ["Difensivo", "Aggressivo"])}
-      <div class="mc-value">Sovrappeso: <b style="color:var(--green)">${esc(top.name)}</b> ${signTxt(top.m1)}</div>
-      <div class="mc-sub muted">debole: ${esc(bot.name)} ${signTxt(bot.m1)} · clicca per il dettaglio</div>`;
+      <div class="mc-value" style="margin-top:6px">Sovrappeso: <b style="color:var(--green)">${esc(top.name)}</b> ${signTxt(top.m1)}</div>
+      <div class="mc-sub muted">debole: <b style="color:var(--red)">${esc(bot.name)}</b> ${signTxt(bot.m1)} · clicca per il dettaglio</div>`;
   }
   // Quadruple Witching (4 streghe): ora mostrata nel popup del box Put/Call (vedi openMacroInfo "putcall")
   // MacroQuant (stile BCA)
@@ -1695,41 +1694,34 @@ function openMacroInfo(key) {
       <div class="info-line muted" style="font-size:11px;margin-top:8px">
         Volumi sulle prime due scadenze. <b>Per il portafoglio:</b> un ratio in forte salita segnala aumento di copertura (possibile risk-off in arrivo); un ratio molto basso segnala compiacenza (rischio di correzione su sorprese negative).
       </div>`;
-    // opzioni del portafoglio: Call Wall / Put Wall per titolo (spostate qui dalle "4 streghe")
-    const ptfOpt = (DATA.portfolio || []).filter(r => DATA.options?.[r.ticker]?.expiries?.length);
-    if (ptfOpt.length) {
-      const rows = ptfOpt.map(r => {
-        const ex = DATA.options[r.ticker].expiries[0];
-        const pcr = (ex.put_oi && ex.call_oi) ? (ex.put_oi / ex.call_oi) : null;
+    // QUADRUPLE WITCHING (4 streghe): per ogni titolo (portafoglio + watchlist) la barra indica
+    // la PRESSIONE DI ROLLING/CHIUSURA dei contratti (volume opzioni vs volume medio del titolo +
+    // open interest in scadenza), NON il tempo che manca.
+    const w = m.witching;
+    const seen = new Set();
+    const optTk = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+      .filter(r => { if (seen.has(r.ticker) || !DATA.options?.[r.ticker]?.expiries?.length) return false; seen.add(r.ticker); return true; });
+    if (optTk.length) {
+      const rows = optTk.map(r => {
+        const ch = DATA.options[r.ticker], ex = ch.expiries[0];
+        const callOI = (ex.calls || []).reduce((s, o) => s + (o.oi || 0), 0);
+        const putOI = (ex.puts || []).reduce((s, o) => s + (o.oi || 0), 0);
+        const totOI = callOI + putOI;
+        const pcr = callOI ? putOI / callOI : null;
+        const ratio = ch.avg_volume ? (ex.opt_volume || 0) * 100 / ch.avg_volume * 100 : 0;
+        const lvl = ratio >= 30 ? ["ALTO", "var(--red)"] : ratio >= 10 ? ["MEDIO", "var(--yellow)"] : ["BASSO", "var(--green)"];
+        const bw = Math.max(4, Math.min(100, ratio));
         return `<tr><td><b>${r.ticker}</b></td>
           <td class="num pos">${ex.call_wall ? cur(r) + fmtNum.format(ex.call_wall) : "—"}</td>
           <td class="num neg">${ex.put_wall ? cur(r) + fmtNum.format(ex.put_wall) : "—"}</td>
-          <td class="num">${pcr != null ? `<span style="color:${scoreColor(clamp(100 - pcr / 2 * 100))}">${fmtNum.format(Math.round(pcr * 100) / 100)}</span>` : "—"}</td></tr>`;
+          <td class="num">${totOI ? fmtBig(totOI) : "—"}</td>
+          <td class="num">${pcr != null ? fmtNum.format(Math.round(pcr * 100) / 100) : "—"}</td>
+          <td><span class="roll-bar"><span class="roll-fill" style="width:${bw.toFixed(0)}%;background:${lvl[1]}"></span></span> <span style="color:${lvl[1]};font-size:11px;font-family:var(--mono)">${lvl[0]}</span></td></tr>`;
       }).join("");
-      extra += `<h4 style="margin:14px 0 4px">Muri di opzioni del portafoglio (Call/Put Wall)</h4>
-        <div class="info-line muted" style="font-size:11px;margin-bottom:4px">Strike a maggiore open interest: il prezzo tende a essere "attratto" verso questi livelli, soprattutto vicino alle scadenze (4 streghe). P/C = put/call open interest del titolo.</div>
-        <table class="info-table"><thead><tr><th>Titolo</th><th>Call Wall</th><th>Put Wall</th><th>P/C OI</th></tr></thead><tbody>${rows}</tbody></table>`;
-    }
-    // Quadruple Witching (4 streghe): inserito qui, con barra di prossimità per ogni data
-    const w = m.witching;
-    const wdates = w ? (w.upcoming && w.upcoming.length ? w.upcoming : (w.next ? [w.next] : [])) : [];
-    if (wdates.length) {
-      const now = Date.now();
-      const wrows = wdates.map(d => {
-        const days = Math.max(0, Math.round((new Date(d) - now) / 864e5));
-        const urg = Math.max(4, Math.min(100, Math.round((1 - days / 120) * 100)));
-        const col = days <= 7 ? "var(--red)" : days <= 21 ? "var(--yellow)" : days <= 45 ? "#f59e0b" : "var(--green)";
-        const lab = days <= 7 ? "imminente" : days <= 21 ? "vicina" : days <= 45 ? "in arrivo" : "lontana";
-        return `<div class="wt-row">
-          <span class="wt-date">${new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</span>
-          <span class="meter-track wt-bar"><span class="meter-fill" style="width:${urg}%;background:${col}"></span></span>
-          <span class="wt-days" style="color:${col}">tra ${days} gg · ${lab}</span></div>`;
-      }).join("");
-      extra += `<h4 style="margin:14px 0 4px">Quadruple Witching (4 streghe)</h4>
-        <div class="info-line muted" style="font-size:11px;margin-bottom:6px">Il 3° venerdì di marzo, giugno, settembre e dicembre scadono insieme 4 tipi di derivati: volumi e volatilità spesso +30-50%, con "pinning" del prezzo ai muri di opzioni. La barra indica la prossimità di ogni scadenza.</div>
-        ${wrows}
-        ${(w.contracts || []).length ? `<div class="info-line muted" style="font-size:11px;margin-top:6px">Contratti in scadenza: ${w.contracts.map(esc).join(" · ")}</div>` : ""}
-        <div class="info-line muted" style="font-size:11px;margin-top:4px">Strategia: evitare nuove posizioni nelle ultime 2 ore del giorno di scadenza; se detieni opzioni, valuta la chiusura 1-2 giorni prima.</div>`;
+      extra += `<h4 style="margin:14px 0 4px">Quadruple Witching (4 streghe) — pressione di rolling per titolo</h4>
+        <div class="info-line muted" style="font-size:11px;margin-bottom:4px">Alle "4 streghe" (3° venerdì di mar/giu/set/dic) gli operatori devono <b>chiudere o rinnovare (rolling)</b> i contratti in scadenza: si generano volumi record e alta volatilità, con il prezzo "attratto" verso i muri di opzioni (Call/Put Wall). La <b>barra</b> misura la pressione di rolling del titolo = volume opzioni rispetto al volume medio (ALTO = forte attività derivati).${w?.next ? ` Prossima scadenza: <b>${new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</b>.` : ""}</div>
+        <table class="info-table"><thead><tr><th>Titolo</th><th>Call Wall</th><th>Put Wall</th><th>OI tot.</th><th>P/C OI</th><th>Pressione rolling</th></tr></thead><tbody>${rows}</tbody></table>
+        <div class="info-line muted" style="font-size:11px;margin-top:6px">OI tot. = open interest totale (call+put) sulla scadenza più vicina · P/C OI = rapporto put/call OI. Strategia: nei giorni di scadenza attenzione agli spike intraday; valuta di chiudere/rollare le tue opzioni 1-2 giorni prima.</div>`;
     }
   } else if (key === "yield_recession" && m.yield_recession) {
     const yr = m.yield_recession;

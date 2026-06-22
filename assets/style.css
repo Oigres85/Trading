@@ -462,11 +462,9 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .opt-oi-leg { display: flex; gap: 14px; font-size: 11px; color: var(--muted); margin-top: 2px; flex-wrap: wrap; }
 .opt-oi-leg .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
 
-/* righe Quadruple Witching nel popup put/call */
-.wt-row { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
-.wt-date { min-width: 132px; font-size: 12px; font-family: var(--mono); }
-.wt-bar { flex: 1; }
-.wt-days { min-width: 112px; text-align: right; font-size: 11px; font-family: var(--mono); }
+/* barra pressione di rolling (4 streghe) per titolo nel popup put/call */
+.roll-bar { display: inline-block; width: 62px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; vertical-align: middle; margin-right: 6px; }
+.roll-fill { display: block; height: 100%; border-radius: 3px; }
 
 /* pallino che segnala un box apribile in popup */
 .popup-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; border-radius: 50%;
