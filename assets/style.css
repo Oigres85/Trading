@@ -102,6 +102,14 @@ main { max-width: 1500px; margin: 0 auto; padding: 0 20px 40px; }
 .kpi .value { font-family: var(--mono); font-size: 22px; font-weight: 700; }
 .kpi .sub { font-size: 12px; margin-top: 4px; font-family: var(--mono); }
 
+/* KPI compatti dentro la card Asset allocation */
+.kpi-grid.kpi-compact { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 8px; margin: 0 0 14px; }
+.kpi-compact .kpi { padding: 8px 10px 7px; border-radius: 8px; background: var(--card-2); }
+.kpi-compact .kpi::before { height: 2px; }
+.kpi-compact .kpi .label { font-size: 9px; letter-spacing: .4px; margin-bottom: 3px; }
+.kpi-compact .kpi .value { font-size: 15px; }
+.kpi-compact .kpi .sub { font-size: 9.5px; margin-top: 2px; line-height: 1.35; }
+
 /* ---------- card ---------- */
 .card {
   background: var(--card); border: 1px solid var(--border);
