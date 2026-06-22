@@ -26167,6 +26167,17 @@
    "sp500": -0.35,
    "ndx": -0.37,
    "sox": 1.57
+  },
+  "systemic_risk": {
+   "hy_oas": 2.66,
+   "hy_chg_1m": -5.7,
+   "ig_oas": 0.74,
+   "ig_chg_1m": -3.9,
+   "hy_ig": 3.59,
+   "stlfsi": -0.77,
+   "score": 98,
+   "status": "Mercato del Credito Rilassato",
+   "rising": false
   }
  },
  "broker": {

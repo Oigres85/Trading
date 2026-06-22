@@ -1074,6 +1074,45 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! credit: {e}", file=sys.stderr)
 
+    # Rischio Sistemico & Stress del Credito (CDS proxy): HY OAS + IG OAS + variazione 1 mese +
+    # indice di stress finanziario St. Louis Fed. Il credito anticipa l'azionario → allarme preventivo.
+    try:
+        hy_h = fred_series("BAMLH0A0HYM2", 30)        # HY OAS ~1 mese
+        ig_h = fred_series("BAMLC0A0CM", 30)          # IG OAS (corporate investment grade) ~1 mese
+        hy_now = hy_h[-1][1] if hy_h else None
+        hy_1m = hy_h[0][1] if hy_h else None
+        ig_now = ig_h[-1][1] if ig_h else None
+        ig_1m = ig_h[0][1] if ig_h else None
+        hy_chg = round((hy_now / hy_1m - 1) * 100, 1) if hy_now and hy_1m else None   # % MoM
+        ig_chg = round((ig_now / ig_1m - 1) * 100, 1) if ig_now and ig_1m else None
+        stl = None
+        try:
+            stl_d = fred_series("STLFSI4", 5)
+            stl = round(stl_d[-1][1], 2) if stl_d else None
+        except Exception:  # noqa: BLE001
+            pass
+        rising = hy_chg is not None and hy_chg > 8        # +8% MoM = brusco allargamento
+        easing = hy_chg is not None and hy_chg < -8
+        status = ("Credit Stress in Aumento — Rischio Risk-Off" if rising else
+                  "Credit Stress elevato" if (hy_now and hy_now > 6) else
+                  "Mercato del Credito Rilassato" if (easing or (hy_now and hy_now < 4)) else
+                  "Mercato del Credito Stabile")
+        # score 0-100 (100 = favorevole: spread bassi e in calo). Penalizza l'allargamento.
+        sc = clamp(100 - (hy_now - 2.5) / 9 * 100) if hy_now else 50
+        if hy_chg:
+            sc -= max(0, hy_chg) * 0.8
+        if stl is not None:
+            sc -= max(0, stl) * 12
+        macro["systemic_risk"] = {
+            "hy_oas": round(hy_now, 2) if hy_now else None, "hy_chg_1m": hy_chg,
+            "ig_oas": round(ig_now, 2) if ig_now else None, "ig_chg_1m": ig_chg,
+            "hy_ig": round(hy_now / ig_now, 2) if hy_now and ig_now else None,
+            "stlfsi": stl,
+            "score": round(clamp(sc)), "status": status, "rising": rising,
+        }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! systemic_risk: {e}", file=sys.stderr)
+
     # Disaccoppiamento Macro: S&P 500 vs PIL reale USA (normalizzati a 100)
     try:
         sp = fred_series("SP500", 36)    # ~3 anni mensili

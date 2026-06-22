@@ -594,11 +594,39 @@ function openTiltModal() {
   let regime = "—";
   if (defAvg != null && tech) regime = defAvg > tech.m1 ? "DIFENSIVO — i difensivi battono il Tech (cautela / de-risking)" : "PRO-RISCHIO — ciclici e Tech guidano";
   openInfoModal("Rotazione settoriale USA",
-    `<div class="info-line"><b>Regime:</b> ${regime}</div>
+    `<div style="margin-bottom:10px"><button class="btn btn-ghost btn-sm" data-action="rot-analyze">Analizza Rotazione</button></div>
+     <div class="info-line"><b>Regime:</b> ${regime}</div>
      <div class="info-line"><b>Forti:</b> ${lead.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
      <div class="info-line"><b>Deboli:</b> ${lag.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
      ${rotationDetailHtml()}
      <div class="info-line muted" style="margin-top:8px">Momentum 1M/3M degli ETF (Yahoo Finance). Verde = forza, rosso = debolezza.</div>`);
+}
+
+/* popup di orientamento rapido sulla rotazione (solo testo calcolato, NON il prompt AI) */
+function openRotationAnalysis() {
+  const tilt = (DATA.macro || {}).tilt;
+  if (!tilt || !tilt.length) { toast("Dati rotazione non disponibili"); return; }
+  const byM1 = [...tilt].sort((a, b) => b.m1 - a.m1);
+  const lead = byM1.slice(0, 3), lag = byM1.slice(-3).reverse();
+  const defensives = ["Utilities", "Consumi difens.", "Salute", "Oro"];
+  const defAvg = avg(tilt.filter(s => defensives.includes(s.name)).map(s => s.m1));
+  const tech = tilt.find(s => s.ticker === "XLK");
+  const semi = tilt.find(s => s.ticker === "SMH" || s.ticker === "SOXX" || /semicond/i.test(s.name));
+  const weak = byM1.filter(s => s.m1 < -2).slice(-3).map(s => s.name);
+  let regime = "";
+  if (defAvg != null && tech) {
+    regime = defAvg > tech.m1
+      ? `I settori <b>difensivi stanno sovraperformando il Tech</b> (difensivi ${signTxt(Math.round(defAvg * 10) / 10)} vs Tech ${signTxt(tech.m1)}): rotazione difensiva in corso, coerente con un de-risking dai semiconduttori.`
+      : `Il <b>Tech/ciclici guida</b> sui difensivi (Tech ${signTxt(tech.m1)} vs difensivi ${signTxt(Math.round(defAvg * 10) / 10)}): regime ancora pro-rischio.`;
+  }
+  openInfoModal("Analisi Rotazione Settoriale", `
+    <div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Orientamento rapido calcolato ora sui dati di rotazione (performance 1 mese degli ETF settoriali).</div>
+    ${regime ? `<div class="info-line">${regime}</div>` : ""}
+    <div class="info-line"><b>In forza (1M):</b> ${lead.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
+    <div class="info-line"><b>In debolezza (1M):</b> ${lag.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
+    ${weak.length ? `<div class="info-line">Settori in forte debolezza (potenziale ipervenduto / mean-reversion): <b>${weak.map(esc).join(", ")}</b></div>` : ""}
+    ${semi ? `<div class="info-line"><b>Semiconduttori:</b> ${signTxt(semi.m1)} (1M) — ${semi.m1 < 0 ? "in calo: finestra per ridurre l'esposizione sui rimbalzi" : "in forza: valuta alleggerimenti sugli strappi"}</div>` : ""}
+    <div class="info-line muted" style="font-size:11px;margin-top:8px">Per il piano operativo dettagliato di rotazione/de-risking usa "Copia prompt AI".</div>`);
 }
 
 function openWitchingModal() {
@@ -1576,6 +1604,7 @@ const MACRO_INFO = {
   carry: ["Carry USA–Giappone", "Differenziale di rendimento USA-Giappone, motore del carry trade su USD/JPY.", "Continuo", /carry|yen|jpy|japan|giappone|boj/i],
   putcall: ["Put/Call ratio", "Rapporto opzioni put/call: alto = copertura/pessimismo.", "Mercato aperto USA", /option|put|call|hedge/i],
   yield_recession: ["Curva dei rendimenti & Recessione", "Analisi storica: lo spread 10A-2A rispetto alla crescita del PIL reale e alle recessioni USA (FRED).", "Mensile", /curva|yield|recess|pil|gdp|recession|inversione|irripid/i],
+  systemic_risk: ["Rischio Sistemico & Credito", "Stress del mercato del credito (spread HY e IG, proxy CDS) come campanello d'allarme anticipato sull'azionario.", "Giornaliero", /credit|cds|spread|sistemic|systemic|stress|high.?yield|risk.?off/i],
   sentiment: ["Sentiment globale", "Indicatore composito risk-on/risk-off.", "Aggiornato a ogni refresh", /sentiment|risk|rally|selloff|market/i],
   buffett: ["Buffett Indicator", "Capitalizzazione totale del mercato USA rapportata al PIL: sopra ~150% storicamente indica sopravvalutazione.", "Aggiornato a ogni refresh", /valuation|buffett|overvalu|gdp|market cap|bolla|bubble/i],
   thermometer: ["Termometro portafoglio", "Media della salute tecnica (RSI, trend, momentum) dei tuoi titoli.", "Aggiornato a ogni refresh", /(?!)/],
@@ -1831,6 +1860,23 @@ function openMacroInfo(key) {
       extra += `<h4 style="margin:12px 0 4px">Andamento spread HY (1 anno)</h4>
         ${miniLineChart(cr.history, { color: crCol })}`;
     }
+  } else if (key === "systemic_risk" && m.systemic_risk) {
+    const sr = m.systemic_risk;
+    const stCol = sr.rising ? "var(--red)" : sr.score >= 60 ? "var(--green)" : sr.score <= 40 ? "var(--red)" : "var(--yellow)";
+    extra = `<div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">
+        Il mercato del credito (CDS / spread obbligazionari) anticipa sistematicamente l'azionario: un allargamento brusco degli spread = aumenta il costo per assicurarsi contro i fallimenti = segnale di <b>risk-off</b> in arrivo.
+      </div>
+      <div class="info-line"><b>Stato:</b> <span style="color:${stCol};font-weight:700">${esc(sr.status)}</span></div>
+      ${thermoBar(sr.score, ["Rilassato", "Stress"])}
+      <table class="info-table" style="margin-top:8px"><thead><tr><th>Spread (proxy CDS)</th><th class="num">Livello</th><th class="num">Var. 1 mese</th></tr></thead><tbody>
+        <tr><td><b>High Yield OAS</b> (CDX HY proxy)</td><td class="num">${sr.hy_oas != null ? fmtNum.format(sr.hy_oas) + "%" : "—"}</td><td class="num ${signCls(sr.hy_chg_1m)}">${sr.hy_chg_1m != null ? signTxt(sr.hy_chg_1m) : "—"}</td></tr>
+        <tr><td>Investment Grade OAS</td><td class="num">${sr.ig_oas != null ? fmtNum.format(sr.ig_oas) + "%" : "—"}</td><td class="num ${signCls(sr.ig_chg_1m)}">${sr.ig_chg_1m != null ? signTxt(sr.ig_chg_1m) : "—"}</td></tr>
+        ${sr.hy_ig != null ? `<tr><td>Rapporto HY/IG (fuga qualità)</td><td class="num">${fmtNum.format(sr.hy_ig)}×</td><td class="num">—</td></tr>` : ""}
+        ${sr.stlfsi != null ? `<tr><td>Indice Stress Finanziario (St. Louis Fed)</td><td class="num ${sr.stlfsi > 0 ? "neg" : "pos"}">${signTxt(sr.stlfsi)}</td><td class="num">—</td></tr>` : ""}
+      </tbody></table>
+      <div class="info-line muted" style="font-size:11px;margin-top:8px">
+        Spread in % MoM. <b>HY OAS</b>: &lt;4% normale · 5-7% stress · &gt;9% crisi. <b>HY/IG</b> in salita = rotazione verso la qualità (difensivo). <b>STLFSI &gt;0</b> = stress sopra la media. Per il debito sovrano USA non esiste un CDS gratuito affidabile: si usa l'indice di stress finanziario come proxy sistemico. Fonte: FRED (BofA OAS, STLFSI4).
+      </div>`;
   } else if (key === "decouple" && m.decouple) {
     const dc = m.decouple;
     const spLast = dc.sp500[dc.sp500.length - 1].v;
@@ -2506,6 +2552,17 @@ function renderMacro() {
       ${macroThermo(score)}
     </div>`);
   }
+  if (m.systemic_risk) {
+    const sr = m.systemic_risk;
+    const col = sr.rising ? "var(--red)" : sr.score >= 60 ? "var(--green)" : sr.score <= 40 ? "var(--red)" : "var(--yellow)";
+    cells.push(`<div class="macro-item" data-macro="systemic_risk" tabindex="0" role="button" title="Clicca per il dettaglio rischio sistemico e credito" style="--accent:var(--red)">
+      <span class="popup-dot"></span>
+      <div class="m-label">Rischio Sistemico (CDS)</div>
+      <div class="m-value" style="color:${col}">${sr.hy_oas != null ? fmtNum.format(sr.hy_oas) + "%" : "—"}${sr.hy_chg_1m != null ? ` <span style="font-size:11px" class="${signCls(sr.hy_chg_1m)}">${signTxt(sr.hy_chg_1m)} 1m</span>` : ""}</div>
+      <div class="m-date">${esc((sr.status || "").split(" — ")[0])}</div>
+      ${macroThermo(sr.score)}
+    </div>`);
+  }
 
   $("#macro-grid").innerHTML = cells.length ? cells.join("") : '<span class="muted">Dati non disponibili</span>';
 }
@@ -2669,6 +2726,21 @@ function buildPrompt() {
     DATA.watchlist.forEach(r => lines.push(mdRow(r)));
   }
   lines.push("");
+  // contesto economia USA (stile Macrotrends): P/E mercato, tassi Fed, inflazione, PIL, curva
+  const usEco = [];
+  if (m.sp500_pe) usEco.push(`P/E S&P 500 ${m.sp500_pe.current}× (media 10A ${m.sp500_pe.avg_10y}×)${m.sp500_pe.nasdaq_pe ? `, P/E Nasdaq 100 ${m.sp500_pe.nasdaq_pe}×` : ""}`);
+  if (m.fed_market) usEco.push(`tasso Fed ${m.fed_market.current_rate}%`);
+  const cpiI = (m.indicators || []).find(i => i.key === "cpi");
+  const pceI = (m.indicators || []).find(i => i.key === "pce");
+  if (cpiI) usEco.push(`inflazione CPI ${cpiI.value}`);
+  if (pceI) usEco.push(`PCE ${pceI.value}`);
+  if (m.yield_recession?.gdp_last != null) usEco.push(`PIL reale YoY ${signTxt(m.yield_recession.gdp_last)}`);
+  if (m.yield_recession?.current_curve != null) usEco.push(`curva 10A-2A ${signTxt(m.yield_recession.current_curve)} pp`);
+  if (usEco.length) {
+    lines.push("CONTESTO ECONOMIA USA (riferimento Macrotrends — usalo per calibrare rotazione settoriale e rischio del portafoglio):");
+    lines.push("- " + usEco.join(" · "));
+    lines.push("");
+  }
   lines.push("QUADRO MACRO:");
   if (m.risk_sentiment) lines.push(`- Sentiment globale: ${m.risk_sentiment.label} (${m.risk_sentiment.score}/100)`);
   if (m.thermometer) lines.push(`- Termometro tecnico del portafoglio: ${m.thermometer.label} (${m.thermometer.score}/100)`);
@@ -2698,6 +2770,10 @@ function buildPrompt() {
     const ch = m.credit.history || [];
     if (ch.length > 20) { const d = ch[ch.length - 1].v - ch[ch.length - 21].v; crl += `; trend ~1 mese ${d > 0 ? "+" : ""}${fmtNum.format(Math.round(d * 100) / 100)} pp (${d > 0.15 ? "spread in allargamento = rischio in aumento" : d < -0.15 ? "spread in restringimento = rischio in calo" : "stabile"})`; }
     lines.push(crl);
+  }
+  if (m.systemic_risk) {
+    const sr = m.systemic_risk;
+    lines.push(`- Rischio Sistemico & Credito (proxy CDS): HY OAS ${sr.hy_oas}% (${signTxt(sr.hy_chg_1m)} 1m), IG OAS ${sr.ig_oas ?? "—"}% (${sr.ig_chg_1m != null ? signTxt(sr.ig_chg_1m) : "—"} 1m), HY/IG ${sr.hy_ig ?? "—"}×${sr.stlfsi != null ? `, stress finanziario St.Louis ${signTxt(sr.stlfsi)}` : ""} — ${sr.status}`);
   }
   if (m.smart_money) {
     const sm = m.smart_money;
@@ -2799,6 +2875,10 @@ function buildPrompt() {
     const s = n.sentiment === "bull" ? "[POS]" : n.sentiment === "bear" ? "[NEG]" : "[NEU]";
     lines.push(`- ${s} [${n.tickers.join(",")}] ${n.title} (${n.source})`);
   });
+  lines.push("");
+  lines.push("DIRETTIVE SPECIFICHE FINALI:");
+  lines.push("A) Analizza l'attuale andamento dei macro-settori. Avendo necessità di effettuare un de-risking sui semiconduttori, crea un piano di rotazione del mio portafoglio basato sulla mia liquidità disponibile. Indicami 2-3 ticker alternativi specifici (value o difensivi) per riequilibrare l'assetto, fornendo i relativi prezzi limite d'ingresso.");
+  lines.push("B) Valuta l'attuale livello di stress del mercato del credito analizzando gli spread forniti (High Yield/CDS) e incrociali con la curva dei tassi, per confermare o smentire la solidità dell'attuale trend azionario.");
   return lines.join("\n");
 }
 
@@ -3045,6 +3125,7 @@ document.addEventListener("click", (e) => {
   if (earn) { openEarningsInfo(earn.dataset.earn); return; }
   const kpiC = e.target.closest('[data-kpi="alpha"]');
   if (kpiC) { openAlphaModal(); return; }
+  if (e.target.closest('[data-action="rot-analyze"]')) { openRotationAnalysis(); return; }
 });
 
 /* modifica posizioni */
