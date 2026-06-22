@@ -709,11 +709,24 @@ const BENCH_LABEL = { nasdaq: "Nasdaq Comp.", ndx: "Nasdaq 100", sp500: "S&P 500
 
 function renderHistory() {
   let h = DATA.history && DATA.history[histRange];
-  // curva REALE del broker (da inizio investimento all'ultimo movimento) per la vista Max
+  // vista Max = storico completo: andamento precedente (pipeline, dal 2021) raccordato
+  // alla curva REALE del broker degli ultimi mesi (ultimo punto = controvalore reale)
   const ec = DATA.broker?.equity_curve;
   let realCurve = false;
   if (histRange === "all" && ec && ec.length > 1) {
-    h = { dates: ec.map(p => p.d), values: ec.map(p => p.v) };
+    const all = DATA.history?.all;
+    const cut = ec[0].d;
+    let oldDates = [], oldVals = [];
+    if (all?.dates?.length) {
+      for (let i = 0; i < all.dates.length; i++) {
+        if (all.dates[i] < cut) { oldDates.push(all.dates[i]); oldVals.push(all.values[i]); }
+      }
+      if (oldVals.length) {   // raccordo: scala lo storico precedente per agganciarlo al 1° punto reale
+        const f = ec[0].v / oldVals[oldVals.length - 1];
+        oldVals = oldVals.map(v => Math.round(v * f));
+      }
+    }
+    h = { dates: oldDates.concat(ec.map(p => p.d)), values: oldVals.concat(ec.map(p => p.v)) };
     realCurve = true;
   }
   const box = $("#hist-chart");
@@ -1565,36 +1578,71 @@ function openMacroInfo(key) {
     }
   } else if (key === "carry" && m.carry) {
     const cy = m.carry;
-    // aspettativa dinamica BoJ per ogni meeting, basata su spread corrente + trend yen
-    const bojExpect = (sp, yenChg) => {
-      if (sp < 1.0) return { txt: "Rialzo probabile — spread stretto, mercati prezzano stretta BoJ", cls: "neg" };
-      if (sp < 1.5) return { txt: "Possibile rialzo — BoJ hawkish, sorvegliare inflazione JP", cls: "neg" };
-      if (sp < 2.0) return { txt: "Fermi con bias hawkish — compressione in corso, rischio unwind carry", cls: "" };
-      if (sp < 2.5) return { txt: "Probabilmente fermi — spread sufficiente a sostenere carry", cls: "" };
+    // regime del carry trade in base allo spread dei tassi 10A
+    const regime = cy.spread >= 3 ? { txt: "Carry molto favorevole — differenziale ampio, flussi verso USD", cls: "pos" }
+      : cy.spread >= 2.2 ? { txt: "Carry favorevole — differenziale solido", cls: "pos" }
+      : cy.spread >= 1.5 ? { txt: "Carry in compressione — margine in calo, sorvegliare l'unwind", cls: "" }
+      : { txt: "Carry a rischio — differenziale stretto, possibile rientro di capitali in yen", cls: "neg" };
+    // aspettativa BoJ per ogni meeting, basata su spread corrente + trend yen (yen forte ⇒ più pressione al rialzo)
+    const bojExpect = (sp) => {
+      if (sp < 1.2) return { txt: "Rialzo probabile — spread stretto, mercati prezzano stretta BoJ", cls: "neg" };
+      if (sp < 1.8) return { txt: "Possibile rialzo — BoJ hawkish, sorvegliare inflazione JP e yen", cls: "neg" };
+      if (sp < 2.4) return { txt: "Fermi con bias hawkish — compressione in corso, rischio unwind", cls: "" };
+      if (sp < 3.0) return { txt: "Probabilmente fermi — spread sufficiente a sostenere il carry", cls: "" };
       return { txt: "Fermi o taglio remoto — spread ampio, carry molto conveniente", cls: "pos" };
     };
-    const ex = bojExpect(cy.spread, cy.usdjpy_chg_1m);
     const carryScore = clamp((cy.spread - 0.5) / 3 * 100);
-    extra = `<div class="info-line"><b>Tasso Treasury 10A (USA):</b> ${fmtNum.format(cy.us10)}%
-        &nbsp;·&nbsp; <b>JGB 10A (Giappone):</b> ${fmtNum.format(cy.jp10)}%</div>
-      <div class="info-line"><b>Spread USD−JPY:</b> <span style="color:${scoreColor(carryScore)}">${fmtNum.format(cy.spread)} pp</span></div>
-      ${cy.boj_rate != null ? `<div class="info-line"><b>Tasso BoJ (politica monetaria):</b> ${fmtNum.format(cy.boj_rate)}%</div>` : ""}
-      <div class="info-line"><b>USD/JPY:</b> ${fmtNum.format(cy.usdjpy)} <span class="${signCls(cy.usdjpy_chg_1m)}">(${signTxt(cy.usdjpy_chg_1m)} nell'ultimo mese)</span></div>
+    const yenTrend = cy.usdjpy_chg_1m > 0 ? "yen in indebolimento (favorevole al carry)" : "yen in rafforzamento (attenzione all'unwind)";
+    extra = `<div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">
+        Il <b>carry trade USD/JPY</b>: ci si finanzia in yen a tasso quasi zero per investire in asset in dollari a tasso più alto. Più ampio è il differenziale dei tassi (e più debole lo yen), più è redditizio. Un rialzo BoJ o uno yen che si rafforza comprime il margine e può innescare un <b>unwind</b> rapido: vendite forzate sugli azionari globali e rientro di capitali in yen (come ad agosto 2024).
+      </div>
+      <div class="info-line"><b>Treasury 10A (USA):</b> ${fmtNum.format(cy.us10)}% &nbsp;·&nbsp; <b>JGB 10A (Giappone):</b> ${fmtNum.format(cy.jp10)}%</div>
+      <div class="info-line"><b>Differenziale tassi 10A (USA−Giappone):</b> <span style="color:${scoreColor(carryScore)}">${fmtNum.format(cy.spread)} pp</span> — <span class="${regime.cls}">${regime.txt}</span></div>
+      ${cy.boj_rate != null ? `<div class="info-line"><b>Tasso ufficiale BoJ (overnight call rate):</b> ${fmtNum.format(cy.boj_rate)}%</div>` : ""}
+      <div class="info-line"><b>Cambio USD/JPY:</b> ${fmtNum.format(cy.usdjpy)} <span class="${signCls(cy.usdjpy_chg_1m)}">(${signTxt(cy.usdjpy_chg_1m)} nell'ultimo mese)</span> — ${yenTrend}</div>
       ${thermoBar(carryScore, ["Carry favorevole", "Carry a rischio"])}
       <div class="info-line" style="margin:8px 0">${cy.note || ""}</div>`;
     if ((cy.boj_meetings || []).length) {
-      extra += `<h4 style="margin:10px 0 4px">Prossime riunioni Bank of Japan</h4>`
-        + `<table class="info-table"><thead><tr><th>Data</th><th>Attesa mercato</th></tr></thead><tbody>`
+      const fmtMeet = (d) => new Date(d + "T00:00:00").toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" });
+      const next = cy.boj_meetings[0];
+      const daysTo = Math.round((new Date(next + "T00:00:00") - new Date()) / 864e5);
+      extra += `<h4 style="margin:12px 0 4px">Prossime riunioni Bank of Japan (decisione sui tassi)</h4>
+        <div class="info-line"><b>Prossima:</b> ${fmtMeet(next)} <span class="muted">(tra ${daysTo} gg)</span></div>
+        <table class="info-table"><thead><tr><th>Data riunione</th><th>Scenario atteso (modello interno)</th></tr></thead><tbody>`
         + cy.boj_meetings.map((d, i) => {
-            const e = i === 0 ? ex : bojExpect(cy.spread + i * 0.1, cy.usdjpy_chg_1m);
-            return `<tr><td>${new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</td>
-              <td class="${e.cls}">${e.txt}</td></tr>`;
+            const e = bojExpect(cy.spread - i * 0.05);   // più avanti nel tempo = più incertezza di stretta
+            const est = d >= "2027-01-01" ? ' <span class="muted">(data stimata)</span>' : "";
+            return `<tr><td>${fmtMeet(d)}${est}</td><td class="${e.cls}">${e.txt}</td></tr>`;
           }).join("")
         + `</tbody></table>
         <div class="info-line muted" style="font-size:11px;margin-top:6px">
-          Aspettative calcolate dinamicamente dallo spread corrente. Un rialzo BoJ comprime il differenziale e può innescare un rapido unwind del carry, con vendite sugli azionari globali (repatriazione capitali in yen).
+          Calendario ufficiale BoJ 2026 (le date 2027 sono indicative e vanno confermate). Gli scenari sono un'euristica basata sul differenziale corrente, non previsioni ufficiali: un differenziale stretto aumenta la probabilità che il mercato prezzi una stretta BoJ.
         </div>`;
     }
+  } else if (key === "putcall" && m.putcall) {
+    const pc = m.putcall;
+    const total = (pc.puts || 0) + (pc.calls || 0);
+    const putPct = total ? Math.round(pc.puts / total * 100) : 50;
+    const callPct = 100 - putPct;
+    const bias = pc.ratio > 1.1 ? { txt: "Prevalgono le PUT — copertura/pessimismo (spesso difensivo o, agli estremi, contrarian rialzista)", cls: "neg" }
+      : pc.ratio < 0.7 ? { txt: "Prevalgono le CALL — euforia/compiacenza (agli estremi, contrarian ribassista)", cls: "pos" }
+      : { txt: "Flussi equilibrati tra put e call", cls: "" };
+    extra = `<div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">
+        Il <b>Put/Call ratio</b> misura il volume di opzioni put diviso quello delle call su ${esc(pc.name || pc.symbol)}. >1 = più put (copertura/ribasso); &lt;1 = più call (rialzo). È un indicatore di sentiment, spesso letto in chiave <b>contrarian</b> agli estremi.
+      </div>
+      <div class="info-line"><b>Ratio:</b> <span style="color:${scoreColor(clamp(100 - pc.ratio / 2 * 100))};font-family:var(--mono);font-weight:700">${fmtNum.format(pc.ratio)}</span> — <span class="${bias.cls}">${bias.txt}</span></div>
+      <h4 style="margin:12px 0 6px">Ripartizione del volume opzioni</h4>
+      <div class="pc-split" role="img" aria-label="Ripartizione call ${callPct}% put ${putPct}%">
+        <div class="pc-seg pc-call" style="width:${callPct}%">${callPct >= 12 ? "CALL " + callPct + "%" : ""}</div>
+        <div class="pc-seg pc-put" style="width:${putPct}%">${putPct >= 12 ? "PUT " + putPct + "%" : ""}</div>
+      </div>
+      <div class="info-line" style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;margin-top:6px">
+        <span style="color:var(--green)">CALL ${pc.calls.toLocaleString("it-IT")}</span>
+        <span style="color:var(--red)">PUT ${pc.puts.toLocaleString("it-IT")}</span>
+      </div>
+      <div class="info-line muted" style="font-size:11px;margin-top:8px">
+        Volumi sulle prime due scadenze. <b>Per il portafoglio:</b> un ratio in forte salita segnala aumento di copertura (possibile risk-off in arrivo); un ratio molto basso segnala compiacenza (rischio di correzione su sorprese negative).
+      </div>`;
   } else if (key === "credit" && m.credit) {
     const cr = m.credit;
     const crCol = scoreColor(cr.score);
@@ -2375,18 +2423,37 @@ function buildPrompt() {
   lines.push("QUADRO MACRO:");
   if (m.risk_sentiment) lines.push(`- Sentiment globale: ${m.risk_sentiment.label} (${m.risk_sentiment.score}/100)`);
   if (m.thermometer) lines.push(`- Termometro tecnico del portafoglio: ${m.thermometer.label} (${m.thermometer.score}/100)`);
-  if (m.fear_greed) lines.push(`- Fear & Greed: ${m.fear_greed.score} (${FG_LABELS[m.fear_greed.rating] || m.fear_greed.rating}), 1 settimana fa ${m.fear_greed.week_ago}, 1 mese fa ${m.fear_greed.month_ago}`);
+  if (m.fear_greed) {
+    let fgl = `- Fear & Greed: ${m.fear_greed.score} (${FG_LABELS[m.fear_greed.rating] || m.fear_greed.rating}), 1 settimana fa ${m.fear_greed.week_ago}, 1 mese fa ${m.fear_greed.month_ago}${m.fear_greed.year_ago ? `, 1 anno fa ${m.fear_greed.year_ago}` : ""}`;
+    if ((m.fear_greed.components || []).length) fgl += ` [componenti: ${m.fear_greed.components.map(c => `${c.label} ${c.rating}${c.score != null ? ` ${c.score}` : ""}`).join("; ")}]`;
+    lines.push(fgl);
+  }
   if (m.vix) lines.push(`- VIX: ${m.vix.value} (${signTxt(m.vix.change_pct)} oggi)`);
   if (m.fedwatch) lines.push(`- Fed: range ${m.fedwatch.target_range}, tasso implicito futures ${m.fedwatch.implied_rate}%`);
-  if (m.carry) lines.push(`- Carry USA-Giappone: spread ${fmtNum.format(m.carry.spread)} pp (US10A ${m.carry.us10}%, JGB10A ${m.carry.jp10}%), USD/JPY ${m.carry.usdjpy} (${signTxt(m.carry.usdjpy_chg_1m)} 1 mese)`);
-  if (m.putcall) lines.push(`- Put/Call ${m.putcall.symbol} (${m.putcall.name}): ${m.putcall.ratio} (put ${m.putcall.puts}, call ${m.putcall.calls})`);
+  if (m.carry) {
+    let cl = `- Carry USA-Giappone: spread tassi 10A ${fmtNum.format(m.carry.spread)} pp (US10A ${m.carry.us10}%, JGB10A ${m.carry.jp10}%), USD/JPY ${m.carry.usdjpy} (${signTxt(m.carry.usdjpy_chg_1m)} 1 mese)${m.carry.boj_rate != null ? `, tasso BoJ ${m.carry.boj_rate}%` : ""}`;
+    if ((m.carry.boj_meetings || []).length) cl += `; prossima riunione BoJ ${new Date(m.carry.boj_meetings[0] + "T00:00:00").toLocaleDateString("it-IT")} (rischio unwind se BoJ alza o lo yen si rafforza)`;
+    lines.push(cl);
+  }
+  if (m.putcall) {
+    const r = m.putcall.ratio;
+    const bias = r > 1.1 ? "prevalgono put = copertura/pessimismo (estremi = contrarian rialzista)" : r < 0.7 ? "prevalgono call = euforia (estremi = contrarian ribassista)" : "equilibrato";
+    lines.push(`- Put/Call ${m.putcall.symbol} (${m.putcall.name}): ${r} — ${bias} (put ${m.putcall.puts}, call ${m.putcall.calls})`);
+  }
   (m.markets || []).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (${i.date})`));
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
-  if (m.credit) lines.push(`- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`);
+  if (m.credit) {
+    let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`;
+    const ch = m.credit.history || [];
+    if (ch.length > 20) { const d = ch[ch.length - 1].v - ch[ch.length - 21].v; crl += `; trend ~1 mese ${d > 0 ? "+" : ""}${fmtNum.format(Math.round(d * 100) / 100)} pp (${d > 0.15 ? "spread in allargamento = rischio in aumento" : d < -0.15 ? "spread in restringimento = rischio in calo" : "stabile"})`; }
+    lines.push(crl);
+  }
   if (m.smart_money) {
     let l = `- Smart Money vs Retail: ${m.smart_money.label} (${m.smart_money.score}/100, da VIX term + HY/IG + put/call)`;
+    if (m.smart_money.vix_term_ratio != null) l += `, VIX/VIX3M ${fmtNum.format(m.smart_money.vix_term_ratio)} ${m.smart_money.vix_term_ratio > 1 ? "(backwardation=tensione)" : "(contango=calma)"}`;
+    if (m.smart_money.hy_ig_ratio != null) l += `, HY/IG ${fmtNum.format(m.smart_money.hy_ig_ratio)}`;
     if (m.smart_money.divergence != null) l += ` — divergenza col retail: ${m.smart_money.divergence_label}`;
     lines.push(l);
   }
@@ -2413,6 +2480,32 @@ function buildPrompt() {
   if (m.corp_profit) lines.push(`- S&P vs Profitti Aziendali Reali (FRED CP): gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali)`);
   if (m.fed_market) lines.push(`- Fed Funds Rate attuale: ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}); tasso>4% storicamente comprime i multipli P/E in 12-18 mesi`);
   if (m.witching) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg)`);
+  // salute del portafoglio (blend tecnica + macro + fondamentale)
+  if (typeof portfolioHealthScore === "function") {
+    const ph = portfolioHealthScore();
+    if (ph != null) {
+      const parts = (typeof portfolioHealthParts === "function") ? portfolioHealthParts() : [];
+      lines.push(`- Salute del portafoglio (blend): ${ph}/100${parts.length ? ` [${parts.map(p => `${p[0]} ${p[1]}`).join("; ")}]` : ""}`);
+    }
+  }
+  // concentrazione per settore (utile per il de-risking)
+  const alloc = DATA.allocation || [];
+  if (alloc.length) {
+    const tot = alloc.reduce((s, a) => s + (a.value_eur || 0), 0) || 1;
+    const bySec = {};
+    alloc.forEach(a => { const k = a.sector || a.ticker; bySec[k] = (bySec[k] || 0) + (a.value_eur || 0); });
+    const secs = Object.entries(bySec).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${Math.round(v / tot * 100)}%`);
+    lines.push(`- Concentrazione per settore: ${secs.join(" · ")} (portafoglio fortemente sbilanciato sul tech/semi → priorità al de-risking)`);
+  }
+  // statistiche di performance dal broker
+  if (DATA.broker) {
+    const b = DATA.broker;
+    const pf = [];
+    if (b.ytd_pct != null) pf.push(`YTD ${signTxt(b.ytd_pct)}`);
+    if (b.y1_pct != null) pf.push(`1 anno ${signTxt(b.y1_pct)}`);
+    if (b.inception_pct != null) pf.push(`dall'inizio ${signTxt(b.inception_pct)}`);
+    if (pf.length) lines.push(`- Performance storica (broker): ${pf.join(" · ")}`);
+  }
   // liquidità e capitale
   if (t.cash) lines.push(`- Liquidità disponibile: ${fmtEUR.format(t.cash)} · capitale investito: ${fmtEUR.format(t.eur_invested)}`);
   if ((DATA.top_caps || []).length) {

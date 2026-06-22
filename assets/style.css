@@ -433,6 +433,12 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .mini-card .compact-semi-gauge + .gauge-ends, .hb-right .compact-semi-gauge + .gauge-ends { max-width: 130px; }
 
 
+/* ripartizione put/call nel popup */
+.pc-split { display: flex; height: 26px; border-radius: 7px; overflow: hidden; border: 1px solid var(--border); }
+.pc-seg { display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; font-weight: 700; color: #06231a; white-space: nowrap; transition: width .3s; }
+.pc-call { background: var(--green); }
+.pc-put { background: var(--red); color: #2a0606; }
+
 /* pallino che segnala un box apribile in popup */
 .popup-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; border-radius: 50%;
   background: var(--blue); opacity: .8; box-shadow: 0 0 0 2px var(--card); }

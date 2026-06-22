@@ -846,10 +846,12 @@ def fetch_macro():
         usdjpy = float(hj.iloc[-1])
         usdjpy_chg_1m = round((usdjpy / float(hj.iloc[0]) - 1) * 100, 2)
         spread = round(us10 - float(jp10), 2)
-        # prossime riunioni Bank of Japan (calendario 2026)
-        boj = [d for d in ("2026-01-23", "2026-03-19", "2026-04-30", "2026-06-17",
-                           "2026-07-31", "2026-09-18", "2026-10-30", "2026-12-18")
-               if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")][:3]
+        # prossime riunioni Bank of Japan (calendario ufficiale 2026; date = 2° giorno = annuncio decisione)
+        boj = [d for d in ("2026-01-23", "2026-03-19", "2026-04-28", "2026-06-16",
+                           "2026-07-31", "2026-09-18", "2026-10-29", "2026-12-18",
+                           # 2027 (stimate sul calendario tipico BoJ, da confermare)
+                           "2027-01-22", "2027-03-18", "2027-04-28", "2027-06-17")
+               if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")][:4]
         # tasso BoJ (overnight call rate) via FRED
         boj_rate_val = None
         try:
