@@ -4,12 +4,15 @@
  "totals": {
   "usd_value": 214844.19,
   "usd_gain": 130277.63,
-  "usd_gain_pct": 154.05,
-  "eur_value": 228647.9,
-  "eur_gain": 114914.31,
-  "eur_gain_pct": 101.04,
-  "tax_est": 29698.81,
-  "eur_gain_net": 85215.5
+  "usd_gain_pct": 154.05336340983956,
+  "eur_value": 230267.24,
+  "eur_gain": 111935.71,
+  "eur_gain_pct": 94.59499932097557,
+  "tax_est": 28927.78,
+  "eur_gain_net": 83007.93,
+  "eur_invested": 230267.24,
+  "eur_cost": 118331.53,
+  "cash": 0
  },
  "portfolio": [
   {
@@ -948,7 +951,9 @@
    "value": 53737.0,
    "gain": 38345.0,
    "gain_pct": 249.12,
-   "rs_1m": 27.8
+   "rs_1m": 27.8,
+   "bval": 46782.07,
+   "bgain": 32456.0
   },
   {
    "ticker": "NVDA",
@@ -1718,7 +1723,9 @@
    "value": 56886.3,
    "gain": 33350.4,
    "gain_pct": 141.7,
-   "rs_1m": -6.4
+   "rs_1m": -6.4,
+   "bval": 49608.7,
+   "bgain": 27655.67
   },
   {
    "ticker": "MU",
@@ -2656,7 +2663,9 @@
    "value": 79379.3,
    "gain": 73245.2,
    "gain_pct": 1194.07,
-   "rs_1m": 60.3
+   "rs_1m": 60.3,
+   "bval": 69103.25,
+   "bgain": 63202.24
   },
   {
    "ticker": "MSTR",
@@ -3433,7 +3442,9 @@
    "value": 13841.19,
    "gain": -12015.87,
    "gain_pct": -46.47,
-   "rs_1m": -33.6
+   "rs_1m": -33.6,
+   "bval": 12071.52,
+   "bgain": -10253.59
   },
   {
    "ticker": "RGTI",
@@ -3936,7 +3947,9 @@
    "value": 11000.4,
    "gain": -2647.1,
    "gain_pct": -19.4,
-   "rs_1m": 31.8
+   "rs_1m": 31.8,
+   "bval": 11072.9,
+   "bgain": -2424.61
   },
   {
    "ticker": "BTP-V28",
@@ -3971,7 +3984,9 @@
    "tech_by_range": {},
    "stats": null,
    "financials": [],
-   "fin_health": null
+   "fin_health": null,
+   "bval": 41628.8,
+   "bgain": 1300.0
   }
  ],
  "watchlist": [
@@ -20989,9 +21004,9 @@
  },
  "broker": {
   "as_of": "2026-06-22",
-  "controvalore_investimenti": 230262.44,
-  "controvalore_btp": 41325,
-  "investimenti": 219272.76,
+  "controvalore_investimenti": 230267.24,
+  "controvalore_btp": 41628.8,
+  "investimenti": 118331.53,
   "cedole_btp": 1505,
   "ytd_pct": 59.88,
   "y1_pct": 101.02,
@@ -21049,8 +21064,13 @@
    {
     "d": "2026-06-10",
     "v": 221335
+   },
+   {
+    "d": "2026-06-22",
+    "v": 230267
    }
-  ]
+  ],
+  "btp_bgain": 1300.0
  },
  "top_caps": [
   {

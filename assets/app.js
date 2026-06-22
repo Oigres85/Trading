@@ -341,26 +341,35 @@ async function fetchQuote(symbol) {
 let cashEur = parseFloat(localStorage.getItem("cash_eur")) || 0;
 
 function recomputeTotals() {
-  const eq = DATA.portfolio.filter(r => r.currency === "USD");
-  const btp = DATA.portfolio.find(r => r.ticker === "BTP-V28");
-  const usdValue = eq.reduce((s, r) => s + r.value, 0);
-  const usdCost = eq.reduce((s, r) => s + r.pmc * r.qty, 0);
   const eurusd = DATA.eurusd || 1.08;
-  const btpVal = btp ? btp.value : 0, btpGain = btp ? btp.gain : 0;
-  const investedEur = usdValue / eurusd + btpVal;
-  const totalEur = investedEur + cashEur;          // include la liquidità
-  const costEur = usdCost / eurusd + (btp ? btp.pmc * btp.qty / 100 : 0);
-  const eurGain = investedEur - costEur;           // il guadagno è solo sull'investito
-  const tax = 0.26 * Math.max(0, (usdValue - usdCost) / eurusd) + 0.125 * Math.max(0, btpGain);
+  // valore e guadagno per posizione in EUR: usa lo snapshot REALE del broker (bval/bgain)
+  // se presente, altrimenti calcola dai prezzi live. r.val_eur/r.gain_eur = verità mostrata.
+  let valEur = 0, costEur = 0, stockGainEur = 0, btpGainEur = 0;
+  DATA.portfolio.forEach(r => {
+    let v, g;
+    if (r.bval != null) { v = r.bval; g = r.bgain || 0; }
+    else if (r.currency === "EUR") { v = r.value || 0; g = r.gain || 0; }
+    else { v = (r.value || 0) / eurusd; g = (r.gain || 0) / eurusd; }
+    r.val_eur = v; r.gain_eur = g;
+    valEur += v; costEur += (v - g);
+    if (r.ticker === "BTP-V28") btpGainEur += g; else stockGainEur += g;
+  });
+  const investedEur = valEur;                       // controvalore investimenti (liquidità esclusa)
+  const eurGain = stockGainEur + btpGainEur;
+  const tax = 0.26 * Math.max(0, stockGainEur) + 0.125 * Math.max(0, btpGainEur);
+  // totali in USD (per la riga "azioni $…" della tabella)
+  const eq = DATA.portfolio.filter(r => r.currency === "USD");
+  const usdValue = eq.reduce((s, r) => s + (r.value || 0), 0);
+  const usdCost = eq.reduce((s, r) => s + r.pmc * r.qty, 0);
   Object.assign(DATA.totals, {
-    usd_value: usdValue, usd_gain: usdValue - usdCost, usd_gain_pct: (usdValue / usdCost - 1) * 100,
-    eur_value: totalEur, eur_invested: investedEur, eur_cost: costEur, cash: cashEur,
-    eur_gain: eurGain, eur_gain_pct: (investedEur / costEur - 1) * 100,
+    usd_value: usdValue, usd_gain: usdValue - usdCost, usd_gain_pct: usdCost ? (usdValue / usdCost - 1) * 100 : 0,
+    eur_value: investedEur + cashEur, eur_invested: investedEur, eur_cost: costEur, cash: cashEur,
+    eur_gain: eurGain, eur_gain_pct: costEur ? eurGain / costEur * 100 : 0,
+    eur_stock_gain: stockGainEur, eur_btp_gain: btpGainEur,
     tax_est: tax, eur_gain_net: eurGain - tax,
   });
   DATA.allocation = DATA.portfolio.map(r => ({
-    ticker: r.ticker, name: r.name, sector: r.sector || "Altro",
-    value_eur: r.currency === "EUR" ? r.value : r.value / eurusd,
+    ticker: r.ticker, name: r.name, sector: r.sector || "Altro", value_eur: r.val_eur,
   }));
   if (cashEur > 0) DATA.allocation.push({ ticker: "CASH", name: "Liquidità", sector: "Liquidità", value_eur: cashEur });
   DATA.allocation.sort((a, b) => b.value_eur - a.value_eur);
@@ -605,7 +614,7 @@ function openTiltModal() {
   const tech = tilt.find(s => s.ticker === "XLK");
   let regime = "—";
   if (defAvg != null && tech) regime = defAvg > tech.m1 ? "DIFENSIVO — i difensivi battono il Tech (cautela / de-risking)" : "PRO-RISCHIO — ciclici e Tech guidano";
-  openInfoModal("Rotazione settoriale & tematica USA",
+  openInfoModal("Rotazione settoriale USA",
     `<div class="info-line"><b>Regime:</b> ${regime}</div>
      <div class="info-line"><b>Forti:</b> ${lead.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
      <div class="info-line"><b>Deboli:</b> ${lag.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
@@ -625,20 +634,12 @@ function openWitchingModal() {
                : w.days <= 21 ? "VICINA — monitorare volumi opzioni e livelli Max Pain"
                : w.days <= 45 ? "IN ARRIVO — posizionarsi in anticipo se necessario"
                : "LONTANA — nessuna azione urgente";
-  // opzioni portafoglio: Call/Put Wall per context
-  const ptf = DATA.portfolio || [];
-  const optContext = ptf.filter(r => DATA.options?.[r.ticker]).slice(0, 4).map(r => {
-    const ex = DATA.options[r.ticker]?.expiries?.[0];
-    return ex ? `<tr><td><b>${r.ticker}</b></td><td class="pos">${cur(r)}${fmtNum.format(ex.call_wall || 0)}</td><td class="neg">${cur(r)}${fmtNum.format(ex.put_wall || 0)}</td></tr>` : "";
-  }).join("");
   openInfoModal("Quadruple Witching — le quattro streghe",
     `<p class="muted" style="margin:0 0 8px">Quattro volte l'anno (3° venerdì di marzo, giugno, settembre, dicembre) scadono contemporaneamente quattro tipi di derivati: spesso aumentano volumi e volatilità del 30-50% rispetto alla media giornaliera.</p>
      <div class="info-line"><b>Prossima:</b> <b style="color:${urgCol}">${w.next ? new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "—"}</b> (tra ${w.days} giorni)</div>
      <div class="meter-track" style="margin:6px 0"><span class="meter-fill" style="width:${urgency}%;background:${urgCol}"></span></div>
      <div class="info-line" style="color:${urgCol};font-size:12px;margin-bottom:10px">${urgLab}</div>
-     <h4 style="margin:10px 0 4px">Impatto storico sulle opzioni del portafoglio</h4>
-     <div class="info-line muted" style="font-size:11px;margin-bottom:6px">I market maker devono coprire/chiudere posizioni in scadenza → volumi straordinari intorno a Call Wall e Put Wall, spesso con "pinning" del prezzo ai livelli di maggiore open interest.</div>
-     ${optContext ? `<table class="info-table"><thead><tr><th>Titolo</th><th>Call Wall</th><th>Put Wall</th></tr></thead><tbody>${optContext}</tbody></table>` : ""}
+     <div class="info-line muted" style="font-size:11px;margin-bottom:6px">In prossimità della scadenza i market maker coprono/chiudono le posizioni → volumi straordinari attorno a Call Wall e Put Wall (vedi sezione <b>Put/Call</b> per i muri di opzioni del tuo portafoglio), spesso con "pinning" del prezzo ai livelli di maggiore open interest.</div>
      <h4 style="margin:10px 0 4px">Prossime date</h4>
      <table class="info-table"><thead><tr><th>Data</th><th>Note</th></tr></thead><tbody>${dates}</tbody></table>
      <h4 style="margin:10px 0 4px">Contratti in scadenza</h4><ul style="margin:0 0 0 18px">${contracts}</ul>
@@ -661,23 +662,13 @@ function openSignpostsModal() {
 function renderKPI() {
   const t = DATA.totals;
   const b = DATA.broker;
-  let invested, controvalore, gain, gainPct, net, src;
-  if (b && b.controvalore_investimenti) {
-    // controvalore REALE degli investimenti (azioni + BTP), liquidità ESCLUSA
-    controvalore = b.controvalore_investimenti;
-    invested = b.investimenti;                       // capitale investito (costo)
-    gain = controvalore - invested;                  // guadagno = valore attuale − costo
-    gainPct = invested ? gain / invested * 100 : 0;
-    const btpVal = b.controvalore_btp || 0;
-    const btpGain = btpVal - 40000;                  // BTP: nominale 40k
-    const equityGain = gain - btpGain;               // resto = azioni
-    const tax = 0.26 * Math.max(0, equityGain) + 0.125 * Math.max(0, btpGain);
-    net = gain - tax;
-    src = `dati broker · agg. ${new Date(b.as_of).toLocaleDateString("it-IT")}`;
-  } else {
-    invested = t.eur_invested; controvalore = t.eur_value; gain = t.eur_gain;
-    gainPct = t.eur_gain_pct; net = t.eur_gain_net ?? t.eur_gain; src = "stima dai prezzi";
-  }
+  // i totali sono calcolati da recomputeTotals usando lo snapshot reale del broker (bval/bgain)
+  const controvalore = t.eur_invested;               // controvalore investimenti (no liquidità)
+  const invested = t.eur_cost;                        // capitale investito (costo)
+  const gain = t.eur_gain;
+  const gainPct = t.eur_gain_pct;
+  const net = t.eur_gain_net ?? t.eur_gain;
+  const src = (b && b.as_of) ? `dati broker · agg. ${new Date(b.as_of).toLocaleDateString("it-IT")}` : "stima dai prezzi";
   // la liquidità la inserisce l'utente: patrimonio = investimenti + liquidità
   const patrimonio = controvalore + cashEur;
   const kpis = [
@@ -1643,6 +1634,21 @@ function openMacroInfo(key) {
       <div class="info-line muted" style="font-size:11px;margin-top:8px">
         Volumi sulle prime due scadenze. <b>Per il portafoglio:</b> un ratio in forte salita segnala aumento di copertura (possibile risk-off in arrivo); un ratio molto basso segnala compiacenza (rischio di correzione su sorprese negative).
       </div>`;
+    // opzioni del portafoglio: Call Wall / Put Wall per titolo (spostate qui dalle "4 streghe")
+    const ptfOpt = (DATA.portfolio || []).filter(r => DATA.options?.[r.ticker]?.expiries?.length);
+    if (ptfOpt.length) {
+      const rows = ptfOpt.map(r => {
+        const ex = DATA.options[r.ticker].expiries[0];
+        const pcr = (ex.put_oi && ex.call_oi) ? (ex.put_oi / ex.call_oi) : null;
+        return `<tr><td><b>${r.ticker}</b></td>
+          <td class="num pos">${ex.call_wall ? cur(r) + fmtNum.format(ex.call_wall) : "—"}</td>
+          <td class="num neg">${ex.put_wall ? cur(r) + fmtNum.format(ex.put_wall) : "—"}</td>
+          <td class="num">${pcr != null ? `<span style="color:${scoreColor(clamp(100 - pcr / 2 * 100))}">${fmtNum.format(Math.round(pcr * 100) / 100)}</span>` : "—"}</td></tr>`;
+      }).join("");
+      extra += `<h4 style="margin:14px 0 4px">Muri di opzioni del portafoglio (Call/Put Wall)</h4>
+        <div class="info-line muted" style="font-size:11px;margin-bottom:4px">Strike a maggiore open interest: il prezzo tende a essere "attratto" verso questi livelli, soprattutto vicino alle scadenze (4 streghe). P/C = put/call open interest del titolo.</div>
+        <table class="info-table"><thead><tr><th>Titolo</th><th>Call Wall</th><th>Put Wall</th><th>P/C OI</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
   } else if (key === "credit" && m.credit) {
     const cr = m.credit;
     const crCol = scoreColor(cr.score);
@@ -1762,26 +1768,35 @@ function openEarningsInfo(ticker) {
   const rx = new RegExp(`${ticker}|${(r.name || "").split(" ")[0]}|earnings|trimestral|utili|risultati`, "i");
   const RAT_SCORE = { strong_buy: 100, buy: 75, hold: 50, sell: 25, strong_sell: 0 };
   const RAT_LABEL = { strong_buy: "Strong Buy", buy: "Buy", hold: "Hold", sell: "Sell", strong_sell: "Strong Sell" };
-  const epsForward = r.stats?.eps_forward;
-  const epsTTM = r.stats?.eps_ttm ?? r.eps;
+  const st = r.stats || {};
+  const epsForward = st.eps_forward;
+  const epsTTM = st.eps_ttm ?? r.eps;
+  const epsDelta = (epsForward != null && epsTTM != null && epsTTM !== 0) ? (epsForward / Math.abs(epsTTM) - 1) * 100 : null;
+  // gauge raccomandazione: SEMPRE tachimetro verde-sx (Strong Buy) → rosso-dx (Strong Sell)
   let consensoHtml = "";
   if (r.rating?.key) {
     const rs = RAT_SCORE[r.rating.key] ?? 50;
     const rLab = RAT_LABEL[r.rating.key] ?? r.rating.key;
-    consensoHtml = `<h4 style="margin:12px 0 6px">Consenso analisti</h4>
-      <div class="info-line"><b>Raccomandazione:</b> <span style="color:${scoreColor(rs)}">${rLab}</span>
-        <span class="muted"> · ${r.rating.n ?? "—"} analisti</span></div>
-      ${thermoBar(rs, ["Strong Buy", "Strong Sell"])}
-      ${r.rating.target ? `<div class="info-line" style="margin-top:6px">
-        <b>Target medio:</b> ${cur(r)}${fmtNum.format(r.rating.target)}
-        <span class="${signCls(r.rating.upside_pct)}"> (${signTxt(r.rating.upside_pct)} upside)</span></div>` : ""}
-      ${epsForward != null ? `<div class="info-line"><b>EPS stimato (forward):</b> ${cur(r)}${fmtNum.format(epsForward)}</div>` : ""}
-      ${epsTTM != null ? `<div class="info-line"><b>EPS (TTM):</b> ${cur(r)}${fmtNum.format(epsTTM)}</div>` : ""}`;
+    consensoHtml = `<h4 style="margin:12px 0 4px">Consenso analisti</h4>
+      <div style="max-width:200px;margin:0 auto">${compactSemiGauge(rs, ["Strong Buy", "Strong Sell"])}</div>
+      <div class="info-line" style="text-align:center;margin-top:2px"><b style="color:${scoreColor(rs)}">${rLab}</b>
+        <span class="muted"> · ${r.rating.n ?? "—"} analisti</span></div>`;
   }
+  // valori attesi: SEMPRE presenti (target, EPS stimato vs attuale, crescita attesa)
+  const exp = [];
+  if (r.rating?.target) exp.push(`<tr><td>Target medio analisti</td><td class="num"><b>${cur(r)}${fmtNum.format(r.rating.target)}</b> <span class="${signCls(r.rating.upside_pct)}">(${signTxt(r.rating.upside_pct)})</span></td></tr>`);
+  if (epsForward != null) exp.push(`<tr><td>EPS stimato (prossimi 12M)</td><td class="num"><b>${cur(r)}${fmtNum.format(epsForward)}</b>${epsDelta != null ? ` <span class="${signCls(epsDelta)}">(${signTxt(Math.round(epsDelta))} vs TTM)</span>` : ""}</td></tr>`);
+  if (epsTTM != null) exp.push(`<tr><td>EPS attuale (TTM)</td><td class="num">${cur(r)}${fmtNum.format(epsTTM)}</td></tr>`);
+  if (st.earnings_growth != null) exp.push(`<tr><td>Crescita utili attesa</td><td class="num ${st.earnings_growth > 0 ? "pos" : "neg"}">${pctOf(st.earnings_growth)}</td></tr>`);
+  if (st.revenue_growth != null) exp.push(`<tr><td>Crescita ricavi attesa</td><td class="num ${st.revenue_growth > 0 ? "pos" : "neg"}">${pctOf(st.revenue_growth)}</td></tr>`);
+  if (st.forward_pe != null) exp.push(`<tr><td>P/E prospettico</td><td class="num">${fmtNum.format(st.forward_pe)}×</td></tr>`);
+  const expHtml = exp.length ? `<h4 style="margin:12px 0 4px">Valori attesi</h4>
+    <table class="info-table"><tbody>${exp.join("")}</tbody></table>` : "";
   openInfoModal(`${r.name} (${ticker}) — Trimestrale`, `
     <div class="info-line"><b>Data attesa:</b> ${r.earnings_date ? new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "n/d"} ${days != null ? `(tra ${days} gg)` : ""}</div>
     ${consensoHtml}
-    <div class="info-line muted" style="margin:10px 0 12px">I dati EPS si aggiornano dopo ogni trimestrale riportata. Il target è la media degli analisti coverage (fonte: yfinance).</div>
+    ${expHtml}
+    <div class="info-line muted" style="margin:10px 0 12px">EPS e stime si aggiornano dopo ogni trimestrale. Target = media analisti coverage; crescita attesa e P/E prospettico dal consenso (fonte: yfinance).</div>
     <h4 style="margin:6px 0">Notizie correlate</h4>${relatedNews(rx)}`);
 }
 
@@ -1823,8 +1838,12 @@ function editPosition(ticker) {
 
 
 function renderTable() {
+  const eurusd = DATA.eurusd || 1.08;
   const rows = sortRows(DATA.portfolio, "ptf-table").map(r => {
     const c = cur(r);
+    // guadagno EUR = verità broker (bgain) se presente, altrimenti dai prezzi live
+    const gEur = r.gain_eur != null ? r.gain_eur : (r.currency === "EUR" ? (r.gain || 0) : (r.gain || 0) / eurusd);
+    const gPct = (r.bval != null && (r.bval - r.bgain)) ? r.bgain / (r.bval - r.bgain) * 100 : r.gain_pct;
     return `<tr>
       <td class="name-cell">${delBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
@@ -1833,8 +1852,8 @@ function renderTable() {
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
-      <td class="num ${signCls(r.gain)}">${signTxt(Math.round(r.gain), ` ${c}`)}${r.currency === "USD" ? `<br><span class="sub-eur">${signTxt(Math.round(r.gain / (DATA.eurusd || 1.08)), " €")}</span>` : ""}</td>
-      <td class="num ${signCls(r.gain_pct)}"><b>${signTxt(r.gain_pct)}</b></td>
+      <td class="num ${signCls(gEur)}">${signTxt(Math.round(gEur), " €")}${r.currency === "USD" && r.gain != null ? `<br><span class="sub-eur muted">${signTxt(Math.round(r.gain), " $")} live</span>` : ""}</td>
+      <td class="num ${signCls(gPct)}"><b>${signTxt(Math.round(gPct * 100) / 100)}</b></td>
       ${techCells(r)}
     </tr>`;
   }).join("");
@@ -1878,6 +1897,29 @@ function bigUsd(v) { if (v == null) return "—"; const a = Math.abs(v);
   if (a >= 1e6) return "$" + (v / 1e6).toFixed(0) + "M"; return "$" + fmtNum.format(v); }
 function colorCell(txt, cls) { return `<span class="${cls || ""}">${txt}</span>`; }
 
+/* indicatore di impatto visivo per la vista fondamentale (come i bar della vista tecnica):
+   score 0-100 (100 = favorevole/verde). Mostra valore colorato + mini-barra. */
+function fundBar(val, fmt, score) {
+  if (val == null || val === "" ) return "—";
+  const txt = fmt(val);
+  if (score == null) return txt;
+  const s = Math.max(0, Math.min(100, score));
+  return `<span class="fund-metric"><span style="color:${scoreColor(s)};font-weight:600">${txt}</span>
+    <span class="fmeter"><span class="fmeter-fill" style="width:${Math.max(6, s)}%;background:${scoreColor(s)}"></span></span></span>`;
+}
+// punteggi di favorevolezza (frazioni dove indicato). higher=meglio salvo lowerBetter
+const FSC = {
+  roe: v => v == null ? null : clamp(v * 400),                 // 0,25→100 · 0,15→60
+  gross: v => v == null ? null : clamp(v * 150),               // 0,66→100 · 0,40→60
+  net: v => v == null ? null : clamp(50 + v * 200),            // 0→50 · 0,25→100 · neg→<50
+  growth: v => v == null ? null : clamp(50 + v * 250),         // 0→50 · 0,2→100 · neg→<50
+  pfcf: v => v == null ? null : clamp(100 - (v - 10) / 0.5),   // <10→100 · 35→50 (basso meglio)
+  ev: v => v == null ? null : clamp(100 - (v - 8) / 0.3),      // <8→100 · 23→50 (basso meglio)
+  pb: v => v == null ? null : clamp(100 - (v - 1) / 0.08),     // 1→100 · 5→50 (basso meglio)
+  peg: v => v == null ? null : clamp(100 - (v - 0.5) / 0.03),  // 0,5→100 · 2→50 (basso meglio)
+  div: v => v == null ? null : clamp(v * 1500),                // 0,04→60 (alto meglio)
+};
+
 // renderer fondamentale generico (riusato da portafoglio e watchlist)
 function buildFundTable(list, tableSel, withQtyPmc) {
   const tableId = tableSel.replace("#", "");
@@ -1902,18 +1944,17 @@ function buildFundTable(list, tableSel, withQtyPmc) {
     const pfcf = (st.market_cap && st.fcf) ? st.market_cap / st.fcf : null;
     const fcfWarn = (st.fcf != null && st.net_income_fy != null && st.fcf < st.net_income_fy * 0.6)
       ? ` <span class="warn-flag" title="FCF molto inferiore all'utile: verifica la qualità degli utili">!</span>` : "";
-    const roeCls = st.roe == null ? "" : st.roe >= 0.15 ? "text-premium" : st.roe < 0 ? "neg" : "";
     return `<tr class="fund-row" data-fund-tk="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per conto economico e statistiche">${lead}
       <td class="num">${bigUsd(st.market_cap)}</td>
-      <td class="num">${st.ev_ebitda != null ? fmtNum.format(st.ev_ebitda) : "—"}</td>
-      <td class="num">${colorCell(pctOf(st.roe), roeCls)}</td>
-      <td class="num">${pctPlain(st.gross_margin)}</td>
-      <td class="num ${st.profit_margin > 0 ? "pos" : st.profit_margin < 0 ? "neg" : ""}">${pctPlain(st.profit_margin)}</td>
-      <td class="num">${pfcf != null ? (pfcf < 0 ? `<span class="neg">neg.</span>` : fmtNum.format(pfcf)) + fcfWarn : "—"}</td>
-      <td class="num ${st.revenue_growth > 0 ? "pos" : st.revenue_growth < 0 ? "neg" : ""}">${pctOf(st.revenue_growth)}</td>
-      <td class="num">${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"}</td>
-      <td class="num">${st.price_to_book != null ? fmtNum.format(st.price_to_book) : "—"}</td>
-      <td class="num">${st.peg != null ? fmtNum.format(st.peg) : "—"}</td>
+      <td class="num">${fundBar(st.ev_ebitda, fmtNum.format, FSC.ev(st.ev_ebitda))}</td>
+      <td class="num">${fundBar(st.roe, pctOf, FSC.roe(st.roe))}</td>
+      <td class="num">${fundBar(st.gross_margin, pctPlain, FSC.gross(st.gross_margin))}</td>
+      <td class="num">${fundBar(st.profit_margin, pctPlain, FSC.net(st.profit_margin))}</td>
+      <td class="num">${pfcf == null ? "—" : pfcf < 0 ? `<span class="neg">neg.</span>${fcfWarn}` : fundBar(pfcf, fmtNum.format, FSC.pfcf(pfcf)) + fcfWarn}</td>
+      <td class="num">${fundBar(st.revenue_growth, pctOf, FSC.growth(st.revenue_growth))}</td>
+      <td class="num">${st.dividend_yield ? fundBar(st.dividend_yield, pctPlain, FSC.div(st.dividend_yield)) : "—"}</td>
+      <td class="num">${fundBar(st.price_to_book, fmtNum.format, FSC.pb(st.price_to_book))}</td>
+      <td class="num">${fundBar(st.peg, fmtNum.format, FSC.peg(st.peg))}</td>
     </tr>`;
   }).join("");
   $(`${tableSel} tbody`).innerHTML = rows;
@@ -2265,23 +2306,9 @@ function fmtMcap(v) {
 function renderTopCaps() {
   const list = DATA.top_caps || [];
   if (!list.length) { $("#topcaps").innerHTML = ""; return; }
-
-  // barre ETF settoriali sopra la lista (top 5 per 1M, sintetico)
-  const tilt = (DATA.macro || {}).tilt || [];
-  let etfBars = "";
-  if (tilt.length) {
-    const top5 = [...tilt].sort((a, b) => b.m1 - a.m1).slice(0, 5);
-    const maxAbs = Math.max(...top5.map(s => Math.abs(s.m1)), 1);
-    etfBars = `<div class="m-label" style="margin:14px 0 6px">ETF settoriali — performance 1 mese</div>
-      <div class="etf-bars">` + top5.map(s => `
-        <div class="etf-bar-row">
-          <span class="etf-bar-lab">${esc(s.name)} <span class="tk">${s.ticker}</span></span>
-          <span class="etf-bar-track"><span class="etf-bar-fill" style="width:${Math.abs(s.m1) / maxAbs * 100}%;background:${perfColor(s.m1)}"></span></span>
-          <span class="etf-bar-val ${signCls(s.m1)}">${signTxt(s.m1)}</span>
-        </div>`).join("") + `</div>`;
-  }
-
-  $("#topcaps").innerHTML = etfBars +
+  // NB: le barre ETF settoriali sono state rimosse (duplicavano il widget "Rotazione settoriale (Tilt)";
+  // il dettaglio resta nel popup del widget Tilt → rotationDetailHtml).
+  $("#topcaps").innerHTML =
     `<div class="m-label" style="margin:14px 0 8px">Top 10 capitalizzazioni mondiali</div>
     <ol class="topcap-list">` + list.map((x, i) => `
       <li class="topcap-item">

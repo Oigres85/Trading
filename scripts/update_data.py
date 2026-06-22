@@ -486,6 +486,8 @@ def fetch_equities():
             rs_1m = round(stk_m1 - bm1, 1)
         row.update({
             "qty": pos["qty"], "pmc": pos["pmc"],
+            # snapshot reale broker in EUR (controvalore/profitto) se fornito in config
+            "bval": pos.get("bval"), "bgain": pos.get("bgain"),
             "value": round(value, 2),
             "gain": round(value - cost, 2),
             "gain_pct": round((value / cost - 1) * 100, 2),
@@ -541,6 +543,7 @@ def fetch_btp():
     return {
         "ticker": BTP["ticker"], "name": BTP["name"], "isin": BTP["isin"],
         "qty": BTP["nominal"], "pmc": BTP["pmc"], "currency": "EUR",
+        "bval": (BROKER or {}).get("controvalore_btp"), "bgain": (BROKER or {}).get("btp_bgain"),
         "price": round(price, 2), "change_pct": None,
         "value": round(value, 2), "gain": round(value - cost, 2),
         "gain_pct": round((value / cost - 1) * 100, 2),
