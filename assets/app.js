@@ -663,13 +663,69 @@ function renderKPI() {
       sub: `dopo tasse stimate (26% azioni · 12,5% BTP)${b && b.cedole_btp ? ` · cedole BTP ${fmtEUR.format(b.cedole_btp)}` : ""}`,
       subCls: signCls(net), accent: net >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(net) },
   ];
+  // Alpha vs benchmark (oggi): portafoglio Day % − indice principale
+  const bm = (DATA.macro || {}).benchmarks;
+  if (bm) {
+    const pday = portfolioDayPct();
+    const ref = bm.sp500 != null ? "sp500" : bm.ndx != null ? "ndx" : "sox";
+    const refLab = { sp500: "S&P 500", ndx: "Nasdaq 100", sox: "SOX" }[ref];
+    const alpha = (pday != null && bm[ref] != null) ? pday - bm[ref] : null;
+    kpis.push({
+      label: "Alpha oggi vs " + refLab,
+      value: alpha != null ? signTxt(Math.round(alpha * 100) / 100) + " pp" : "—",
+      sub: `portaf. ${pday != null ? signTxt(Math.round(pday * 100) / 100) : "—"} · clicca per S&P/Nasdaq/SOX`,
+      accent: "var(--cyan)", valueCls: signCls(alpha), kpiKey: "alpha",
+    });
+  }
 
   $("#kpi-grid").innerHTML = kpis.map(k => `
-    <div class="kpi" style="--accent:${k.accent}">
+    <div class="kpi${k.kpiKey ? " kpi-click" : ""}" style="--accent:${k.accent}"${k.kpiKey ? ` data-kpi="${k.kpiKey}" role="button" tabindex="0" title="Clicca per il dettaglio"` : ""}>
       <div class="label">${k.label}</div>
       <div class="value ${k.valueCls || ""}">${k.value}</div>
       <div class="sub ${k.subCls || ""}">${k.sub || ""}</div>
     </div>`).join("");
+}
+
+/* variazione % giornaliera del portafoglio = media pesata (per controvalore) dei titoli USD */
+function portfolioDayPct() {
+  const eq = (DATA.portfolio || []).filter(r => r.currency === "USD" && r.change_pct != null && (r.val_eur || r.value));
+  const w = eq.reduce((s, r) => s + (r.val_eur || r.value || 0), 0);
+  if (!w) return null;
+  return eq.reduce((s, r) => s + (r.val_eur || r.value || 0) * r.change_pct, 0) / w;
+}
+
+/* popup "Portfolio Alpha vs Benchmarks": confronto Day % vs S&P/Nasdaq/SOX + forza relativa per titolo */
+function openAlphaModal() {
+  const bm = (DATA.macro || {}).benchmarks || {};
+  const pday = portfolioDayPct();
+  const BLAB = { sp500: "S&P 500", ndx: "Nasdaq 100", sox: "SOX (semiconduttori)" };
+  const idxRow = (key) => {
+    if (bm[key] == null) return "";
+    const a = pday != null ? pday - bm[key] : null;
+    return `<div class="info-line" style="display:flex;justify-content:space-between;gap:10px">
+      <span><b>${BLAB[key]}:</b> <span class="${signCls(bm[key])}">${signTxt(bm[key])}</span></span>
+      <span>Alpha: <span class="${signCls(a)}" style="font-family:var(--mono);font-weight:700">${a != null ? signTxt(Math.round(a * 100) / 100) + " pp" : "—"}</span></span></div>`;
+  };
+  const BREF = { sox: "sox", ndx: "ndx", sp500: "sp500" };
+  const RLAB = { sox: "SOX", ndx: "Nasdaq 100", sp500: "S&P 500" };
+  const rows = (DATA.portfolio || []).filter(r => r.currency === "USD" && r.change_pct != null).map(r => {
+    const bk = BREF[r.rs_bench] || "sp500";
+    const bpct = bm[bk];
+    const rs = bpct != null ? r.change_pct - bpct : null;
+    const c = rs != null ? scoreColor(clamp(50 + rs * 12)) : "var(--muted)";
+    const bw = rs != null ? Math.max(4, Math.min(100, Math.abs(rs) * 16)) : 0;
+    return `<tr><td class="name-cell" style="font-family:Inter">${r.name}<span class="tk">${r.ticker}</span></td>
+      <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
+      <td class="num" style="color:${c};font-family:var(--mono)">${rs != null ? signTxt(Math.round(rs * 100) / 100) : "—"} <span class="muted" style="font-size:10px">(${RLAB[bk]})</span></td>
+      <td><span class="alpha-bar"><span class="alpha-fill" style="width:${bw.toFixed(0)}%;background:${c}"></span></span></td></tr>`;
+  }).join("");
+  openInfoModal("Portfolio Alpha vs Benchmarks (Day %)", `
+    <div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Alpha giornaliero = variazione % del portafoglio − variazione % dell'indice. Verde = sovraperformance, rosso = sottoperformance. La forza relativa di ogni titolo è calcolata sul benchmark del suo settore (semiconduttori→SOX, tech/growth→Nasdaq 100, finanziari/difensivi→S&P 500).</div>
+    <h4 style="margin:6px 0 4px">Portafoglio vs mercato</h4>
+    <div class="info-line"><b>Portafoglio oggi:</b> <span class="${signCls(pday)}" style="font-family:var(--mono);font-weight:700">${pday != null ? signTxt(Math.round(pday * 100) / 100) : "—"}</span> <span class="muted" style="font-size:11px">(media pesata per controvalore)</span></div>
+    ${idxRow("sp500")}${idxRow("ndx")}${idxRow("sox")}
+    <h4 style="margin:14px 0 4px">Forza relativa per titolo (Day % − benchmark di settore)</h4>
+    <table class="info-table"><thead><tr><th>Titolo</th><th>Oggi</th><th>Forza rel.</th><th>Sovra/sotto-perf.</th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="muted">Dati non disponibili</td></tr>'}</tbody></table>`);
 }
 
 /* ---------------- andamento portafoglio ---------------- */
@@ -696,13 +752,31 @@ function renderHistory() {
         oldVals = oldVals.map(v => Math.round(v * f));
       }
     }
-    h = { dates: oldDates.concat(ec.map(p => p.d)), values: oldVals.concat(ec.map(p => p.v)) };
+    const stDates = oldDates.concat(ec.map(p => p.d));
+    const stVals = oldVals.concat(ec.map(p => p.v));
+    h = { dates: stDates, values: stVals };
+    // benchmark sovrapposto: campiona la serie indice (pipeline) sulle date stitchate e riscala al 1° valore
+    if (all?.dates?.length) {
+      const allT = all.dates.map(d => +new Date(d));
+      ["nasdaq", "ndx", "sp500", "russell"].forEach(bk => {
+        const ser = all[bk];
+        if (!ser || ser.length !== all.dates.length) return;
+        const t0 = +new Date(stDates[0]);
+        const sampled = stDates.map(d => {
+          const t = +new Date(d);
+          let bi = 0, best = Infinity;
+          for (let i = 0; i < allT.length; i++) { const dd = Math.abs(allT[i] - t); if (dd < best) { best = dd; bi = i; } }
+          return ser[bi];
+        });
+        if (sampled[0]) { const sf = stVals[0] / sampled[0]; h[bk] = sampled.map(v => Math.round(v * sf)); }
+      });
+    }
     realCurve = true;
   }
   const box = $("#hist-chart");
   if (!h || h.values.length < 2) { box.innerHTML = '<div class="muted" style="padding:40px 0;text-align:center">Storico non disponibile</div>'; $("#hist-summary").textContent = ""; return; }
   const vals = h.values, dates = h.dates;
-  const bench = (!realCurve && histBenchKey !== "none" && h[histBenchKey] && h[histBenchKey].length === vals.length) ? h[histBenchKey] : null;
+  const bench = (histBenchKey !== "none" && h[histBenchKey] && h[histBenchKey].length === vals.length) ? h[histBenchKey] : null;
   const W = 560, H = 210, pad = { l: 56, r: 12, t: 12, b: 22 };
   const allv = bench ? vals.concat(bench) : vals;
   const min = Math.min(...allv), max = Math.max(...allv), range = max - min || 1;
@@ -2969,6 +3043,8 @@ document.addEventListener("click", (e) => {
   if (gauge) { openMacroInfo(gauge.dataset.gauge); return; }
   const earn = e.target.closest("[data-earn]");
   if (earn) { openEarningsInfo(earn.dataset.earn); return; }
+  const kpiC = e.target.closest('[data-kpi="alpha"]');
+  if (kpiC) { openAlphaModal(); return; }
 });
 
 /* modifica posizioni */

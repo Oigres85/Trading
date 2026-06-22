@@ -910,6 +910,21 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! yield_recession: {e}", file=sys.stderr)
 
+    # Benchmarks Day % (per modulo Alpha & Benchmarking): S&P 500, Nasdaq 100, SOX
+    try:
+        bdays = {}
+        for sym, key in (("^GSPC", "sp500"), ("^NDX", "ndx"), ("^SOX", "sox")):
+            try:
+                hb = yf.Ticker(sym).history(period="5d")["Close"].dropna()
+                if len(hb) >= 2:
+                    bdays[key] = round((float(hb.iloc[-1]) / float(hb.iloc[-2]) - 1) * 100, 2)
+            except Exception:  # noqa: BLE001
+                pass
+        if bdays:
+            macro["benchmarks"] = bdays
+    except Exception as e:  # noqa: BLE001
+        print(f"!! benchmarks: {e}", file=sys.stderr)
+
     # prossime pubblicazioni (cadenza tipica) + sentiment per i popup macro
     NEXT_RELEASE = {
         "cpi": "Mensile, ~metà mese (BLS) · l'inflazione bassa è positiva per i mercati",
