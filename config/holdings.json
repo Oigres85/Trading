@@ -6,7 +6,7 @@
    "qty": 100,
    "pmc": 153.92,
    "bval": 46782.07,
-   "bgain": 32456.0
+   "bgain": 32456
   },
   {
    "ticker": "NVDA",
@@ -116,6 +116,11 @@
    "ticker": "LMT",
    "name": null,
    "currency": "USD"
+  },
+  {
+   "ticker": "META",
+   "name": null,
+   "currency": "USD"
   }
  ],
  "broker": {
@@ -186,6 +191,6 @@
     "v": 230267
    }
   ],
-  "btp_bgain": 1300.0
+  "btp_bgain": 1300
  }
 }
