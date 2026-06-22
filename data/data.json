@@ -924,7 +924,27 @@
    "gain": 38388.0,
    "gain_pct": 249.4,
    "rs_1m": -1.8,
-   "rs_bench": "sox"
+   "rs_bench": "sox",
+   "smc": {
+    "bias": 62,
+    "label": "Lieve rialzo",
+    "structure": "laterale",
+    "bos": null,
+    "bull_fvg": 4,
+    "bear_fvg": 0,
+    "last_fvg": {
+     "dir": "rialzista",
+     "lo": 532.5,
+     "hi": 535.71
+    },
+    "liq_above": 546.44,
+    "liq_below": 486.8,
+    "order_block": {
+     "dir": "rialzista",
+     "lo": 452.4,
+     "hi": 467.97
+    }
+   }
   },
   {
    "ticker": "NVDA",
@@ -1670,7 +1690,23 @@
    "gain": 33056.1,
    "gain_pct": 140.45,
    "rs_1m": -28.1,
-   "rs_bench": "sox"
+   "rs_bench": "sox",
+   "smc": {
+    "bias": 50,
+    "label": "Neutro",
+    "structure": "laterale",
+    "bos": null,
+    "bull_fvg": 0,
+    "bear_fvg": 0,
+    "last_fvg": null,
+    "liq_above": 212.71,
+    "liq_below": 208.78,
+    "order_block": {
+     "dir": "rialzista",
+     "lo": 211.14,
+     "hi": 214.58
+    }
+   }
   },
   {
    "ticker": "MU",
@@ -2584,7 +2620,27 @@
    "gain": 76704.6,
    "gain_pct": 1250.46,
    "rs_1m": 39.7,
-   "rs_bench": "sox"
+   "rs_bench": "sox",
+   "smc": {
+    "bias": 94,
+    "label": "Accumulazione",
+    "structure": "rialzista",
+    "bos": "rialzista",
+    "bull_fvg": 8,
+    "bear_fvg": 0,
+    "last_fvg": {
+     "dir": "rialzista",
+     "lo": 1093.67,
+     "hi": 1168.57
+    },
+    "liq_above": null,
+    "liq_below": 1014.14,
+    "order_block": {
+     "dir": "rialzista",
+     "lo": 1043.19,
+     "hi": 1061.3
+    }
+   }
   },
   {
    "ticker": "MSTR",
@@ -3337,7 +3393,27 @@
    "gain": -12212.67,
    "gain_pct": -47.23,
    "rs_1m": -36.2,
-   "rs_bench": "ndx"
+   "rs_bench": "ndx",
+   "smc": {
+    "bias": 6,
+    "label": "Distribuzione",
+    "structure": "ribassista",
+    "bos": "ribassista",
+    "bull_fvg": 0,
+    "bear_fvg": 6,
+    "last_fvg": {
+     "dir": "ribassista",
+     "lo": 117.75,
+     "hi": 122.5
+    },
+    "liq_above": 134.5,
+    "liq_below": null,
+    "order_block": {
+     "dir": "rialzista",
+     "lo": 115.35,
+     "hi": 116.3
+    }
+   }
   },
   {
    "ticker": "RGTI",
@@ -3816,7 +3892,27 @@
    "gain": -2538.95,
    "gain_pct": -18.6,
    "rs_1m": 5.8,
-   "rs_bench": "sox"
+   "rs_bench": "sox",
+   "smc": {
+    "bias": 46,
+    "label": "Neutro",
+    "structure": "laterale",
+    "bos": null,
+    "bull_fvg": 2,
+    "bear_fvg": 3,
+    "last_fvg": {
+     "dir": "ribassista",
+     "lo": 21.42,
+     "hi": 22.14
+    },
+    "liq_above": 23.57,
+    "liq_below": 18.47,
+    "order_block": {
+     "dir": "rialzista",
+     "lo": 19.44,
+     "hi": 19.59
+    }
+   }
   },
   {
    "ticker": "BTP-V28",
@@ -25411,7 +25507,7 @@
    "rate_date": "2026-05-01"
   },
   "smart_money": {
-   "score": 88,
+   "score": 71,
    "label": "Ottimista",
    "vix3m": 20.0,
    "vix_term_ratio": 0.879,
@@ -25420,6 +25516,10 @@
    "divergence": -52,
    "divergence_label": "Smart money ottimista / Retail pessimista",
    "components": [
+    {
+     "label": "Struttura SMC indici (S&P 500 + Nasdaq)",
+     "score": 54
+    },
     {
      "label": "Struttura VIX (contango/backw.)",
      "score": 92
@@ -25432,7 +25532,48 @@
      "label": "Copertura PUT (P/C ratio)",
      "score": 100
     }
-   ]
+   ],
+   "smc_indices": {
+    "sp500": {
+     "bias": 50,
+     "label": "Neutro",
+     "structure": "laterale",
+     "bos": null,
+     "bull_fvg": 0,
+     "bear_fvg": 0,
+     "last_fvg": null,
+     "liq_above": 7517.12,
+     "liq_below": 7402.61,
+     "order_block": {
+      "dir": "rialzista",
+      "lo": 7553.68,
+      "hi": 7605.31
+     },
+     "label_idx": "S&P 500"
+    },
+    "nasdaq": {
+     "bias": 58,
+     "label": "Lieve rialzo",
+     "structure": "laterale",
+     "bos": null,
+     "bull_fvg": 2,
+     "bear_fvg": 0,
+     "last_fvg": {
+      "dir": "rialzista",
+      "lo": 29506.67,
+      "hi": 30285.63
+     },
+     "liq_above": 30587.16,
+     "liq_below": 29604.93,
+     "order_block": {
+      "dir": "rialzista",
+      "lo": 28508.03,
+      "hi": 28893.82
+     },
+     "label_idx": "Nasdaq 100"
+    }
+   },
+   "smc_avg": 54
   },
   "macroquant": {
    "score": 54,

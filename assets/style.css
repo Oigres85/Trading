@@ -462,6 +462,12 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .opt-oi-leg { display: flex; gap: 14px; font-size: 11px; color: var(--muted); margin-top: 2px; flex-wrap: wrap; }
 .opt-oi-leg .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
 
+/* card SMC (Smart Money Concepts) nel popup smart money */
+.smc-card { background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; }
+.smc-head { font-size: 13px; margin-bottom: 4px; }
+.smc-line { font-size: 11.5px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+.smc-line b { color: var(--text); }
+
 /* barra pressione di rolling (4 streghe) per titolo nel popup put/call */
 .roll-bar { display: inline-block; width: 62px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; vertical-align: middle; margin-right: 6px; }
 .roll-fill { display: block; height: 100%; border-radius: 3px; }

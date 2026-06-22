@@ -222,6 +222,59 @@ def rsi14(closes: pd.Series) -> float | None:
     return None if math.isnan(val) else round(float(val), 1)
 
 
+def smc_analysis(hist, lookback=90):
+    """Smart Money Concepts da OHLC (gratis): struttura/BOS, FVG, liquidità, order block, bias 0-100.
+    Heuristica trasparente sui prezzi giornalieri (non un feed proprietario)."""
+    try:
+        h = hist.tail(lookback)
+        if len(h) < 25:
+            return None
+        H = [float(x) for x in h["High"]]; L = [float(x) for x in h["Low"]]
+        C = [float(x) for x in h["Close"]]; O = [float(x) for x in h["Open"]]
+        n = len(C); price = C[-1]; k = 2
+        sh_idx = [i for i in range(k, n - k) if H[i] == max(H[i - k:i + k + 1])]
+        sl_idx = [i for i in range(k, n - k) if L[i] == min(L[i - k:i + k + 1])]
+        last_sh = H[sh_idx[-1]] if sh_idx else max(H)
+        last_sl = L[sl_idx[-1]] if sl_idx else min(L)
+        prev_sh = H[sh_idx[-2]] if len(sh_idx) >= 2 else None
+        prev_sl = L[sl_idx[-2]] if len(sl_idx) >= 2 else None
+        structure = "laterale"
+        if prev_sh is not None and prev_sl is not None:
+            if last_sh > prev_sh and last_sl > prev_sl:
+                structure = "rialzista"
+            elif last_sh < prev_sh and last_sl < prev_sl:
+                structure = "ribassista"
+        bos = "rialzista" if price > last_sh else "ribassista" if price < last_sl else None
+        # FVG aperti (gap a 3 candele non ancora riempiti) nelle ultime ~30 candele
+        bull_fvg = bear_fvg = 0; last_fvg = None
+        for i in range(max(2, n - 30), n):
+            if L[i] > H[i - 2] and not any(L[j] <= H[i - 2] for j in range(i + 1, n)):
+                bull_fvg += 1; last_fvg = {"dir": "rialzista", "lo": round(H[i - 2], 2), "hi": round(L[i], 2)}
+            if H[i] < L[i - 2] and not any(H[j] >= L[i - 2] for j in range(i + 1, n)):
+                bear_fvg += 1; last_fvg = {"dir": "ribassista", "lo": round(H[i], 2), "hi": round(L[i - 2], 2)}
+        liq_above = min([H[i] for i in sh_idx if H[i] > price], default=None)
+        liq_below = max([L[i] for i in sl_idx if L[i] < price], default=None)
+        # order block: ultima candela contraria prima di un impulso (bull: candela giù poi su forte)
+        ob = None
+        for i in range(n - 2, max(1, n - 20), -1):
+            if C[i] > O[i] and C[i - 1] < O[i - 1] and (C[i] - O[i]) > 1.3 * abs(O[i - 1] - C[i - 1]):
+                ob = {"dir": "rialzista", "lo": round(min(O[i - 1], C[i - 1]), 2), "hi": round(max(O[i - 1], C[i - 1]), 2)}; break
+        score = 50
+        score += 18 if structure == "rialzista" else -18 if structure == "ribassista" else 0
+        score += 14 if bos == "rialzista" else -14 if bos == "ribassista" else 0
+        score += min(12, bull_fvg * 4) - min(12, bear_fvg * 4)
+        score = int(clamp(score))
+        label = ("Accumulazione" if score >= 65 else "Lieve rialzo" if score >= 55
+                 else "Distribuzione" if score <= 35 else "Lieve ribasso" if score <= 45 else "Neutro")
+        return {"bias": score, "label": label, "structure": structure, "bos": bos,
+                "bull_fvg": bull_fvg, "bear_fvg": bear_fvg, "last_fvg": last_fvg,
+                "liq_above": round(liq_above, 2) if liq_above else None,
+                "liq_below": round(liq_below, 2) if liq_below else None,
+                "order_block": ob}
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def signal_label(price, sma50, sma200, rsi):
     if rsi is not None and rsi >= 70:
         return "Ipercomprato", "warn"
@@ -456,6 +509,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "tech_by_range": tech_by_range,
         "financials": financials,
         "fin_health": fin_health,
+        "smc": smc_analysis(hist),
     }
 
 
@@ -1084,8 +1138,23 @@ def fetch_macro():
     except Exception as e:
         print(f"!! sp500_pe: {e}", file=sys.stderr)
 
-    # Smart Money vs Retail: VIX term structure + HY/IG credit spread + put/call
+    # Smart Money vs Retail: ora basato su Smart Money Concepts (SMC) di S&P 500 e Nasdaq 100
+    # (struttura/BOS, FVG, liquidità, order block calcolati dall'OHLC) + proxy istituzionali
+    # (struttura VIX, spread HY/IG, copertura put/call) come contesto secondario.
     try:
+        smc_idx = {}
+        for sym, key, label in (("^GSPC", "sp500", "S&P 500"), ("^NDX", "nasdaq", "Nasdaq 100")):
+            try:
+                ih = yf.Ticker(sym).history(period="1y", interval="1d", auto_adjust=True)
+                s = smc_analysis(ih)
+                if s:
+                    s["label_idx"] = label
+                    smc_idx[key] = s
+            except Exception:  # noqa: BLE001
+                pass
+        smc_scores = [s["bias"] for s in smc_idx.values()]
+        smc_avg = round(sum(smc_scores) / len(smc_scores)) if smc_scores else None
+
         vix3m_h = yf.Ticker("^VIX3M").history(period="5d")["Close"].dropna()
         vix3m = float(vix3m_h.iloc[-1]) if len(vix3m_h) else None
         ig_data = fred_series("BAMLC0A4CBBB", 1)
@@ -1095,23 +1164,26 @@ def fetch_macro():
         fg_score = macro.get("fear_greed", {}).get("score")
         pc_ratio = macro.get("putcall", {}).get("ratio")
         sm_comps, vix_ts, hy_ig = [], None, None
+        if smc_avg is not None:
+            sm_comps.append(("Struttura SMC indici (S&P 500 + Nasdaq)", smc_avg))
         if vix_val and vix3m:
             vix_ts = round(vix_val / vix3m, 3)
-            # backwardation (ratio>1) = smart money compra protezione = ribassista
             sm_comps.append(("Struttura VIX (contango/backw.)", round(clamp(100 - (vix_ts - 0.85) / 0.35 * 100))))
         if hy_val and ig_val and ig_val > 0:
             hy_ig = round(hy_val / ig_val, 2)
-            # spread HY/IG alto = fuga dalla qualità = istituzionali difensivi
             sm_comps.append(("Spread HY/IG (fuga qualità)", round(clamp(100 - (hy_ig - 1.5) / 5 * 100))))
         if pc_ratio:
-            # put/call alto = copertura = segnale difensivo istituzionale
             sm_comps.append(("Copertura PUT (P/C ratio)", round(clamp(100 - (pc_ratio - 0.6) / 1.2 * 100))))
         if sm_comps:
-            sm_score = round(sum(s for _, s in sm_comps) / len(sm_comps))
+            # peso: la struttura SMC degli indici conta 3x (è il driver richiesto)
+            parts = ([smc_avg] * 3 if smc_avg is not None else []) + [s for l, s in sm_comps if not l.startswith("Struttura SMC")]
+            sm_score = round(sum(parts) / len(parts))
             fg_div = round(fg_score - sm_score) if fg_score is not None else None
             macro["smart_money"] = {
                 "score": sm_score,
                 "label": "Ottimista" if sm_score >= 60 else "Cauto" if sm_score <= 40 else "Neutrale",
+                "smc_indices": smc_idx,
+                "smc_avg": smc_avg,
                 "vix3m": round(vix3m, 1) if vix3m else None,
                 "vix_term_ratio": vix_ts,
                 "ig_spread": round(ig_val, 2) if ig_val else None,

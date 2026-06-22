@@ -1507,7 +1507,7 @@ const MACRO_INFO = {
   thermometer: ["Termometro portafoglio", "Media della salute tecnica (RSI, trend, momentum) dei tuoi titoli.", "Aggiornato a ogni refresh", /(?!)/],
   credit: ["Rischio Credito (HY OAS)", "Spread dei bond High Yield rispetto ai Treasury USA: proxy del rischio sistemico, analogo al mercato CDS senza costi di abbonamento. Fonte: ICE BofA via FRED.", "Giornaliero (FRED)", /credit|credito|spread|hy|high.?yield|cds|default|obbligaz|bond/i],
   decouple: ["Disaccoppiamento Macro", "Divergenza tra mercato azionario (S&P 500) e economia reale (PIL reale USA GDPC1): misura quanta crescita futura è già prezzata nella borsa. Entrambe le serie normalizzate a 100 all'inizio del periodo.", "Mensile/trimestrale (FRED)", /disaccopp|decoupl|valuation|bolla|bubble|pil|gdp|utili|profit|crescita/i],
-  smart_money: ["Smart Money vs Retail", "Posizionamento istituzionale dedotto da segnali professionali: struttura a termine del VIX (VIX/VIX3M), spread credito HY/IG e copertura put/call. Confrontato col Fear & Greed (proxy del sentiment retail) per evidenziare le divergenze tra denaro intelligente e folla.", "Aggiornato a ogni refresh", /smart.?money|istituzional|institution|hedge.?fund|posizionament|flow|flussi|put.?call|vix/i],
+  smart_money: ["Smart Money vs Retail", "Posizionamento istituzionale vs folla retail, confrontato col Fear & Greed per evidenziarne le divergenze.", "Aggiornato a ogni refresh", /smart.?money|istituzional|institution|hedge.?fund|posizionament|flow|flussi|put.?call|vix|smc|order.?block|liquidit|struttura/i],
   sp500_pe: ["P/E Ratio Storico S&P 500", "Rapporto Prezzo/Utili dell'S&P 500 su base mensile (FRED SP500PE). Mostra se il mercato è sopravvalutato rispetto alla media storica. P/E > 25 indica valutazioni tese; P/E > 35 livelli estremi. La percentile di rango storico indica quante volte negli ultimi 10 anni il mercato è stato più economico di adesso.", "Mensile (FRED SP500PE)", /p\/e|price.?earning|multiplo|valutaz|sopravvalut|cape|shiller/i],
   corp_profit: ["S&P 500 vs Profitti Aziendali Reali", "Divergenza tra l'S&P 500 nominale e i profitti aziendali reali USA (FRED CP). Un gap ampio segnala Asset Inflation: la borsa cresce più degli utili reali, trainata da svalutazione monetaria (fiat debasement) e non da crescita economica. Storicamente gap >40 pp precede lateralizzazioni o correzioni.", "Trimestrale (FRED CP + SP500 mensile)", /profitti|profit|asset.?inflat|nominal|real.?earn|corp|aziend|deflat/i],
   fed_market: ["Fed Funds Rate vs S&P 500", "Andamento storico del tasso Fed Funds sovrapposto all'S&P 500 negli ultimi 5 anni. Mostra come i cicli di rialzo/taglio della politica monetaria influenzino il mercato azionario. Tassi alti comprimono i multipli; i tagli stimolano i rally.", "Mensile (FRED FEDFUNDS + SP500)", /fed.?fund|interest.?rate|tasso.?fed|fed.?rate|monetar|fomc.*trend|tassi.*mercato/i],
@@ -1772,8 +1772,38 @@ function openMacroInfo(key) {
   } else if (key === "smart_money" && m.smart_money) {
     const sm = m.smart_money;
     const smCol = scoreColor(sm.score);
-    extra = `<div class="info-line"><b>Posizionamento istituzionale:</b> <span style="color:${smCol}">${sm.score}/100 — ${sm.label}</span></div>
+    extra = `<div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">
+        Indicatore basato sui <b>Smart Money Concepts (SMC)</b> calcolati dai prezzi (OHLC) di <b>S&amp;P 500 e Nasdaq 100</b>: struttura di mercato e rottura di struttura (<b>BOS</b>), <b>FVG</b> (Fair Value Gap), zone di <b>liquidità</b> (stop sopra i massimi / sotto i minimi) e <b>order block</b>. Verde = struttura rialzista/accumulazione istituzionale; rosso = distribuzione.
+      </div>
+      <div class="info-line"><b>Posizionamento istituzionale:</b> <span style="color:${smCol}">${sm.score}/100 — ${sm.label}</span></div>
       ${thermoBar(sm.score, ["Difensivo", "Aggressivo"])}`;
+    const arrow = d => d === "rialzista" ? '<span class="pos">▲ rialzista</span>' : d === "ribassista" ? '<span class="neg">▼ ribassista</span>' : '<span class="muted">laterale</span>';
+    const smcIdx = sm.smc_indices || {};
+    const smcCard = (s) => {
+      if (!s) return "";
+      const c = scoreColor(s.bias);
+      return `<div class="smc-card">
+        <div class="smc-head"><b>${esc(s.label_idx || "")}</b> <span style="color:${c}">${s.bias}/100 · ${s.label}</span></div>
+        <div class="smc-line">Struttura: ${arrow(s.structure)} &nbsp;·&nbsp; BOS: ${s.bos ? arrow(s.bos) : "—"}</div>
+        <div class="smc-line">FVG aperti: <span class="pos">${s.bull_fvg} ↑</span> / <span class="neg">${s.bear_fvg} ↓</span>${s.last_fvg ? ` · ultimo ${s.last_fvg.dir} ${fmtNum.format(s.last_fvg.lo)}–${fmtNum.format(s.last_fvg.hi)}` : ""}</div>
+        <div class="smc-line">Liquidità: sopra <b>${s.liq_above != null ? fmtNum.format(s.liq_above) : "—"}</b> · sotto <b>${s.liq_below != null ? fmtNum.format(s.liq_below) : "—"}</b>${s.order_block ? ` · Order block ${s.order_block.dir} ${fmtNum.format(s.order_block.lo)}–${fmtNum.format(s.order_block.hi)}` : ""}</div>
+      </div>`;
+    };
+    if (Object.keys(smcIdx).length) {
+      extra += `<h4 style="margin:12px 0 4px">SMC degli indici (driver dell'indicatore)</h4>${smcCard(smcIdx.sp500)}${smcCard(smcIdx.nasdaq)}`;
+    }
+    const ptfSmc = (DATA.portfolio || []).filter(r => r.smc);
+    if (ptfSmc.length) {
+      const dd = d => d === "rialzista" ? '<span class="pos">▲</span>' : d === "ribassista" ? '<span class="neg">▼</span>' : '<span class="muted">–</span>';
+      const rows = ptfSmc.map(r => {
+        const s = r.smc, c = scoreColor(s.bias), bw = Math.max(6, Math.min(100, s.bias));
+        return `<tr><td><b>${r.ticker}</b></td><td>${dd(s.structure)} ${esc(s.structure)}</td><td>${s.bos ? dd(s.bos) : "—"}</td>
+          <td class="num"><span class="pos">${s.bull_fvg}</span>/<span class="neg">${s.bear_fvg}</span></td>
+          <td><span class="roll-bar"><span class="roll-fill" style="width:${bw}%;background:${c}"></span></span> <span style="color:${c};font-family:var(--mono);font-size:11px">${s.bias}</span></td></tr>`;
+      }).join("");
+      extra += `<h4 style="margin:12px 0 4px">SMC dei tuoi titoli</h4>
+        <table class="info-table"><thead><tr><th>Titolo</th><th>Struttura</th><th>BOS</th><th>FVG ↑/↓</th><th>Bias SMC</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
     if (sm.divergence != null) {
       const dvCol = Math.abs(sm.divergence) > 15 ? "var(--yellow)" : "var(--green)";
       const fg = m.fear_greed?.score;
@@ -2596,11 +2626,20 @@ function buildPrompt() {
     lines.push(crl);
   }
   if (m.smart_money) {
-    let l = `- Smart Money vs Retail: ${m.smart_money.label} (${m.smart_money.score}/100, da VIX term + HY/IG + put/call)`;
-    if (m.smart_money.vix_term_ratio != null) l += `, VIX/VIX3M ${fmtNum.format(m.smart_money.vix_term_ratio)} ${m.smart_money.vix_term_ratio > 1 ? "(backwardation=tensione)" : "(contango=calma)"}`;
-    if (m.smart_money.hy_ig_ratio != null) l += `, HY/IG ${fmtNum.format(m.smart_money.hy_ig_ratio)}`;
-    if (m.smart_money.divergence != null) l += ` — divergenza col retail: ${m.smart_money.divergence_label}`;
+    const sm = m.smart_money;
+    let l = `- Smart Money vs Retail: ${sm.label} (${sm.score}/100, basato su SMC di S&P 500 e Nasdaq + VIX term + HY/IG + put/call)`;
+    const si = sm.smc_indices || {};
+    const idxTxt = Object.values(si).map(s => `${s.label_idx}: struttura ${s.structure}, BOS ${s.bos || "n/d"}, FVG ${s.bull_fvg}↑/${s.bear_fvg}↓, bias ${s.bias}/100`).join(" · ");
+    if (idxTxt) l += `. SMC indici → ${idxTxt}`;
+    if (sm.vix_term_ratio != null) l += `. VIX/VIX3M ${fmtNum.format(sm.vix_term_ratio)} ${sm.vix_term_ratio > 1 ? "(backwardation=tensione)" : "(contango=calma)"}`;
+    if (sm.hy_ig_ratio != null) l += `, HY/IG ${fmtNum.format(sm.hy_ig_ratio)}`;
+    if (sm.divergence != null) l += ` — divergenza col retail: ${sm.divergence_label}`;
     lines.push(l);
+    // SMC per titolo del portafoglio
+    const ptfSmc = (DATA.portfolio || []).filter(r => r.smc);
+    if (ptfSmc.length) {
+      lines.push("- SMC per titolo (struttura/BOS/FVG/bias): " + ptfSmc.map(r => `${r.ticker} ${r.smc.structure}${r.smc.bos ? "/BOS " + r.smc.bos : ""} FVG ${r.smc.bull_fvg}↑${r.smc.bear_fvg}↓ bias ${r.smc.bias}`).join(" · "));
+    }
   }
   if (m.decouple?.sp500?.length && m.decouple?.gdp?.length) {
     const gap = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
