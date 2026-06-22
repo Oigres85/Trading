@@ -558,13 +558,15 @@ def fetch_btp():
     }
 
 
-def fred_series(series_id, n=14):
+def fred_series(series_id, n=14, freq=None):
     # con FRED_API_KEY (gratuita, https://fred.stlouisfed.org/docs/api/api_key.html)
     # usa l'API ufficiale, molto più affidabile del csv pubblico
+    # freq: None (nativa) | "m" mensile | "q" trimestrale (aggregazione media)
     key = os.environ.get("FRED_API_KEY")
     if key:
+        fq = f"&frequency={freq}&aggregation_method=avg" if freq else ""
         r = http_get("https://api.stlouisfed.org/fred/series/observations"
-                     f"?series_id={series_id}&api_key={key}&file_type=json"
+                     f"?series_id={series_id}&api_key={key}&file_type=json{fq}"
                      f"&sort_order=desc&limit={n + 4}")
         obs = r.json()["observations"]
         out = []
@@ -807,6 +809,52 @@ def fetch_macro():
         macro["curve_history"] = [{"d": d, "v": v} for d, v in ch if v is not None]
     except Exception as e:  # noqa: BLE001
         print(f"!! curve_history: {e}", file=sys.stderr)
+
+    # Analisi macro: curva dei rendimenti vs recessioni (dati storici FRED, ~35 anni)
+    try:
+        curve_m = fred_series("T10Y2Y", 360, freq="m")          # 10A-2A mensile
+        gdp_q = fred_series("GDPC1", 150, freq="q")             # PIL reale trimestrale
+        usrec_m = fred_series("USREC", 360, freq="m")           # indicatore recessione NBER (0/1)
+        claims_m = fred_series("ICSA", 360, freq="m")           # sussidi disoccupazione (media mensile)
+        # crescita PIL reale YoY (%)
+        gdp_growth = []
+        for i in range(4, len(gdp_q)):
+            prev = gdp_q[i - 4][1]
+            if prev:
+                gdp_growth.append({"d": gdp_q[i][0], "v": round((gdp_q[i][1] / prev - 1) * 100, 2)})
+        # periodi di recessione da USREC (mesi consecutivi con valore >= 0.5)
+        recessions, start = [], None
+        for d, v in usrec_m:
+            if v >= 0.5 and start is None:
+                start = d
+            elif v < 0.5 and start is not None:
+                recessions.append({"start": start, "end": d})
+                start = None
+        if start is not None:
+            recessions.append({"start": start, "end": usrec_m[-1][0]})
+        cur_v = curve_m[-1][1] if curve_m else None
+        v12 = curve_m[-13][1] if len(curve_m) > 13 else None       # 12 mesi fa
+        steepening = (cur_v is not None and v12 is not None and cur_v - v12 > 0.2)
+        was_inverted = any(v < 0 for _, v in curve_m[-24:])         # invertita negli ultimi 2 anni
+        macro["yield_recession"] = {
+            "curve": [{"d": d, "v": round(v, 2)} for d, v in curve_m if v is not None],
+            "gdp_growth": gdp_growth,
+            "claims": [{"d": d, "v": round(v)} for d, v in claims_m if v is not None],
+            "recessions": recessions,
+            "current_curve": round(cur_v, 2) if cur_v is not None else None,
+            "curve_12m_ago": round(v12, 2) if v12 is not None else None,
+            "steepening": steepening,
+            "was_inverted_24m": was_inverted,
+            "label": ("Irripidimento post-inversione — segnale storico di recessione entro 12 mesi"
+                      if steepening and was_inverted else
+                      "Curva in irripidimento" if steepening else
+                      "Curva invertita — rischio recessione" if (cur_v is not None and cur_v < 0) else
+                      "Curva normale"),
+            "gdp_last": gdp_growth[-1]["v"] if gdp_growth else None,
+            "claims_last": round(claims_m[-1][1]) if claims_m else None,
+        }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! yield_recession: {e}", file=sys.stderr)
 
     # prossime pubblicazioni (cadenza tipica) + sentiment per i popup macro
     NEXT_RELEASE = {

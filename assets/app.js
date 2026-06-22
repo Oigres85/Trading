@@ -184,10 +184,10 @@ async function refreshAll() {
       return;
     }
     if (res.status !== 204) { toast(`Errore avvio aggiornamento (HTTP ${res.status})`); return; }
-    btn.textContent = "⏳ Rigenero…";
-    toast("Rigenerazione avviata — nuovi dati tra ~2-3 minuti");
-    if (await waitForNewData(DATA?.updated_at)) toast("Dati rigenerati ✓");
-    else toast("Ancora in corso — i dati arriveranno a breve");
+    // NON blocca la UI: i prezzi sono già aggiornati; la rigenerazione completa
+    // (yfinance + FRED, ~2-3 min) prosegue in background e aggiorna i dati quando pronta.
+    toast("Prezzi aggiornati ✓ · rigenerazione completa in background (~2-3 min)");
+    waitForNewData(DATA?.updated_at).then(ok => { if (ok) toast("Dati completi rigenerati ✓"); });
   } catch (e) {
     console.error(e);
     toast("Errore durante l'aggiornamento");
@@ -497,18 +497,7 @@ function renderMiniCards() {
       <div class="mc-value">Sovrappeso: <b style="color:var(--green)">${esc(top.name)}</b> ${signTxt(top.m1)}</div>
       <div class="mc-sub muted">debole: ${esc(bot.name)} ${signTxt(bot.m1)} · clicca per il dettaglio</div>`;
   }
-  // Quadruple Witching (4 streghe) con rating-bar prossimità
-  const w = m.witching, wBox = $("#witching-box");
-  if (wBox && w && w.next) {
-    // urgenza 0-100: a 0 gg = 100 (massima), a 90+ gg = 0
-    const urgency = Math.max(0, Math.min(100, Math.round((1 - w.days / 90) * 100)));
-    const urgLab = w.days <= 7 ? "IMMINENTE" : w.days <= 21 ? "VICINA" : w.days <= 45 ? "IN ARRIVO" : "LONTANA";
-    const urgColor = w.days <= 7 ? "var(--red)" : w.days <= 21 ? "var(--yellow)" : "var(--muted)";
-    wBox.innerHTML = `<div class="mc-title">Quadruple Witching (4 streghe)</div>
-      <div class="mc-value">${new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</div>
-      <div class="meter-track" style="margin:4px 0"><span class="meter-fill" style="width:${urgency}%;background:${urgColor}"></span></div>
-      <div class="mc-sub muted">tra ${w.days} gg · <b style="color:${urgColor}">${urgLab}</b> · clicca per dettagli</div>`;
-  }
+  // Quadruple Witching (4 streghe): ora mostrata nel popup del box Put/Call (vedi openMacroInfo "putcall")
   // MacroQuant (stile BCA)
   const mq = m.macroquant, mqBox = $("#macroquant-box");
   if (mqBox && mq) {
@@ -574,22 +563,13 @@ function openHealthModal() {
 function rotationDetailHtml() {
   const tilt = (DATA.macro || {}).tilt || [];
   if (!tilt.length) return "<div class='muted'>Dati rotazione non disponibili</div>";
-  const groups = {};
-  tilt.forEach(s => { (groups[s.group || "Settori"] = groups[s.group || "Settori"] || []).push(s); });
-  const heat = Object.entries(groups).map(([g, arr]) => `
-    <div class="rot-group"><div class="rot-group-title">${esc(g)}</div>
-      <div class="rot-tiles">${arr.sort((a, b) => b.m1 - a.m1).map(s => `
-        <div class="rot-tile" style="background:${perfColor(s.m1)}" title="${esc(s.name)} (${s.ticker}) · 1M ${signTxt(s.m1)} · 3M ${signTxt(s.m3)}">
-          <span class="rt-name">${esc(s.name)}</span><span class="rt-pct">${signTxt(s.m1)}</span></div>`).join("")}</div>
-    </div>`).join("");
   const sorted = [...tilt].sort((a, b) => b.m1 - a.m1);
   const maxAbs = Math.max(...sorted.map(s => Math.abs(s.m1)), 1);
   const hist = sorted.map(s => `<div class="rot-bar-row">
       <span class="rot-bar-lab">${esc(s.name)} <span class="tk">${s.ticker}</span></span>
       <span class="rot-bar-track"><span class="rot-bar-fill" style="width:${Math.abs(s.m1) / maxAbs * 100}%;background:${perfColor(s.m1)}"></span></span>
       <span class="rot-bar-val ${signCls(s.m1)}">${signTxt(s.m1)}</span></div>`).join("");
-  return `<div class="rot-heatmap">${heat}</div>
-    <h4 style="margin:10px 0 4px">Performance 1 mese (ETF)</h4><div class="rot-hist">${hist}</div>`;
+  return `<h4 style="margin:6px 0 4px">Performance 1 mese (ETF)</h4><div class="rot-hist">${hist}</div>`;
 }
 
 function openMacroQuantModal() {
@@ -1286,6 +1266,7 @@ function openOptionsModal(ticker) {
   const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
   const r = all.find(x => x.ticker === ticker) || { ticker };
   optTicker = ticker; optExpIdx = 0; optSide = "call";
+  cmTicker = ticker;   // così il pulsante "← Grafico" sa quale titolo mostrare
   $("#chart-modal-title").textContent = `Catena opzioni — ${r.name || r.ticker} (${r.ticker})`;
   $("#chart-modal-tip").innerHTML = "";
   $("#chart-modal").hidden = false;
@@ -1293,6 +1274,42 @@ function openOptionsModal(ticker) {
 }
 
 function loadOptionsView() { renderOptionsContent(); }   // re-render (toggle/scadenza)
+
+/* grafico put/call indicativo: open interest per strike (call verde, put rosso), spot + muri */
+function optOIChart(exp, spot, sym) {
+  const byStrike = {};
+  (exp.calls || []).forEach(o => { (byStrike[o.strike] = byStrike[o.strike] || {}).c = o.oi || 0; });
+  (exp.puts || []).forEach(o => { (byStrike[o.strike] = byStrike[o.strike] || {}).p = o.oi || 0; });
+  const strikes = Object.keys(byStrike).map(Number).sort((a, b) => a - b);
+  if (strikes.length < 2) return "";
+  const totC = strikes.reduce((s, k) => s + (byStrike[k].c || 0), 0);
+  const totP = strikes.reduce((s, k) => s + (byStrike[k].p || 0), 0);
+  const pcr = totC ? totP / totC : null;
+  const maxOI = Math.max(1, ...strikes.map(s => Math.max(byStrike[s].c || 0, byStrike[s].p || 0)));
+  const W = 620, H = 180, pad = { l: 8, r: 8, t: 16, b: 26 };
+  const n = strikes.length, bw = (W - pad.l - pad.r) / n, base = H - pad.b;
+  const x = i => pad.l + i * bw;
+  const yH = v => v / maxOI * (H - pad.t - pad.b);
+  const bars = strikes.map((s, i) => {
+    const c = byStrike[s].c || 0, p = byStrike[s].p || 0, cx = x(i) + bw / 2, w = Math.max(1.5, bw * 0.34);
+    return `<rect x="${(cx - w - 0.5).toFixed(1)}" y="${(base - yH(c)).toFixed(1)}" width="${w.toFixed(1)}" height="${yH(c).toFixed(1)}" fill="var(--green)" opacity="0.85"/>` +
+           `<rect x="${(cx + 0.5).toFixed(1)}" y="${(base - yH(p)).toFixed(1)}" width="${w.toFixed(1)}" height="${yH(p).toFixed(1)}" fill="var(--red)" opacity="0.85"/>`;
+  }).join("");
+  const mark = (strike, col, lab) => {
+    if (strike == null) return "";
+    let bi = 0; strikes.forEach((s, i) => { if (Math.abs(s - strike) < Math.abs(strikes[bi] - strike)) bi = i; });
+    const mx = x(bi) + bw / 2;
+    return `<line x1="${mx.toFixed(1)}" y1="${pad.t}" x2="${mx.toFixed(1)}" y2="${base}" stroke="${col}" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/>
+      <text x="${mx.toFixed(1)}" y="${(pad.t - 4).toFixed(1)}" text-anchor="middle" font-size="9" fill="${col}">${lab}</text>`;
+  };
+  const labIdx = [0, Math.floor(n / 2), n - 1];
+  const labels = labIdx.map(i => `<text x="${(x(i) + bw / 2).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="9" fill="var(--muted)">${sym}${fmtNum.format(strikes[i])}</text>`).join("");
+  return `<div class="opt-oi-chart">
+    <div class="opt-oi-head">Open interest per strike (Call vs Put)${pcr != null ? ` · P/C OI <b style="color:${scoreColor(clamp(100 - pcr / 2 * 100))}">${fmtNum.format(Math.round(pcr * 100) / 100)}</b>` : ""}</div>
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">${bars}${mark(spot, "var(--text)", "spot")}${mark(exp.call_wall, "var(--green)", "CW")}${mark(exp.put_wall, "var(--red)", "PW")}${labels}</svg>
+    <div class="opt-oi-leg"><span><span class="dot" style="background:var(--green)"></span>Call OI</span><span><span class="dot" style="background:var(--red)"></span>Put OI</span><span class="muted">CW=Call Wall · PW=Put Wall</span></div>
+  </div>`;
+}
 
 function renderOptionsContent() {
   const tk = optTicker;
@@ -1360,7 +1377,7 @@ function renderOptionsContent() {
     ? `${optSide === "put" ? "Put Wall" : "Call Wall"} a <b>${sym}${fmtNum.format(wallStrike)}</b> (OI massimo) — ${optSide === "put" ? "supporto/magnete sotto il prezzo" : "resistenza/tetto sopra il prezzo"}.`
     : "";
 
-  $("#chart-modal-body").innerHTML = controls + impactHtml + `
+  $("#chart-modal-body").innerHTML = controls + impactHtml + optOIChart(exp, spot, sym) + `
     <div class="table-wrap"><table class="opt-table">
       <thead><tr><th>STRIKE</th><th>BID</th><th>ASK</th><th>IV %</th><th>VOL</th><th>OPEN INTEREST</th></tr></thead>
       <tbody>${rows || `<tr><td colspan="6" class="muted" style="text-align:center;padding:20px">Nessuno strike per questa scadenza</td></tr>`}</tbody>
@@ -1485,6 +1502,7 @@ const MACRO_INFO = {
   fedwatch: ["FedWatch", "Aspettative di mercato sui tassi Fed dai futures sui Fed Funds.", "Riunioni FOMC ~ogni 6 settimane", /fed|powell|tass|rate|fomc|interest/i],
   carry: ["Carry USA–Giappone", "Differenziale di rendimento USA-Giappone, motore del carry trade su USD/JPY.", "Continuo", /carry|yen|jpy|japan|giappone|boj/i],
   putcall: ["Put/Call ratio", "Rapporto opzioni put/call: alto = copertura/pessimismo.", "Mercato aperto USA", /option|put|call|hedge/i],
+  yield_recession: ["Curva dei rendimenti & Recessione", "Analisi storica: lo spread 10A-2A rispetto alla crescita del PIL reale e alle recessioni USA (FRED).", "Mensile", /curva|yield|recess|pil|gdp|recession|inversione|irripid/i],
   sentiment: ["Sentiment globale", "Indicatore composito risk-on/risk-off.", "Aggiornato a ogni refresh", /sentiment|risk|rally|selloff|market/i],
   buffett: ["Buffett Indicator", "Capitalizzazione totale del mercato USA rapportata al PIL: sopra ~150% storicamente indica sopravvalutazione.", "Aggiornato a ogni refresh", /valuation|buffett|overvalu|gdp|market cap|bolla|bubble/i],
   thermometer: ["Termometro portafoglio", "Media della salute tecnica (RSI, trend, momentum) dei tuoi titoli.", "Aggiornato a ogni refresh", /(?!)/],
@@ -1516,6 +1534,49 @@ function nextReleaseDate(key) {
   if (key === "retail") return fmt(nextMonthDay(16));
   if (key === "pmi") return fmt(nextMonthDay(27));
   return null;   // gdp/curve: continui o trimestrali variabili
+}
+
+/* grafico macro: curva dei rendimenti vs PIL con bande di recessione (grigie) + doppio asse Y.
+   shiftMonths>0 sposta la curva in avanti (es. +12 mesi) per evidenziare il lead/lag col PIL. */
+function recessionChart(curveArr, gdpArr, recessions, opts = {}) {
+  const shiftMs = (opts.shiftMonths || 0) * 30.44 * 864e5;
+  const C = (curveArr || []).map(p => ({ t: +new Date(p.d + "T00:00:00") + shiftMs, v: p.v })).filter(p => !isNaN(p.t) && p.v != null);
+  const G = (gdpArr || []).map(p => ({ t: +new Date(p.d + "T00:00:00"), v: p.v })).filter(p => !isNaN(p.t) && p.v != null);
+  if (C.length < 2 || G.length < 2) return '<div class="muted">Dati storici non disponibili</div>';
+  const W = 640, H = 230, pad = { l: 40, r: 44, t: 14, b: 24 };
+  const minT = Math.min(...C.concat(G).map(p => p.t)), maxT = Math.max(...C.concat(G).map(p => p.t));
+  const x = t => pad.l + (t - minT) / (maxT - minT || 1) * (W - pad.l - pad.r);
+  const cMin = Math.min(...C.map(p => p.v), 0), cMax = Math.max(...C.map(p => p.v), 0), cR = (cMax - cMin) || 1;
+  const gMin = Math.min(...G.map(p => p.v), 0), gMax = Math.max(...G.map(p => p.v), 0), gR = (gMax - gMin) || 1;
+  const yC = v => pad.t + (1 - (v - cMin) / cR) * (H - pad.t - pad.b);
+  const yG = v => pad.t + (1 - (v - gMin) / gR) * (H - pad.t - pad.b);
+  const bands = (recessions || []).map(r => {
+    const x1 = x(+new Date(r.start + "T00:00:00")), x2 = x(+new Date(r.end + "T00:00:00"));
+    const xa = Math.max(pad.l, x1), xb = Math.min(W - pad.r, x2);
+    return (xb <= pad.l || xa >= W - pad.r) ? "" : `<rect x="${xa.toFixed(1)}" y="${pad.t}" width="${Math.max(0.5, xb - xa).toFixed(1)}" height="${(H - pad.t - pad.b).toFixed(1)}" fill="var(--muted)" opacity="0.2"/>`;
+  }).join("");
+  const poly = (arr, y) => arr.map(p => `${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join(" ");
+  const years = [];
+  const y0 = new Date(minT).getFullYear(), y1 = new Date(maxT).getFullYear();
+  const step = Math.ceil((y1 - y0) / 6) || 1;
+  for (let yy = Math.ceil(y0 / step) * step; yy <= y1; yy += step) {
+    const tx = x(+new Date(`${yy}-01-01T00:00:00`));
+    years.push(`<text x="${tx.toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="9" fill="var(--muted)">${yy}</text>`);
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
+    ${bands}
+    <line x1="${pad.l}" y1="${yC(0).toFixed(1)}" x2="${W - pad.r}" y2="${yC(0).toFixed(1)}" stroke="var(--border)" stroke-dasharray="3 3"/>
+    <polyline points="${poly(C, yC)}" fill="none" stroke="var(--blue)" stroke-width="1.8"/>
+    <polyline points="${poly(G, yG)}" fill="none" stroke="var(--green)" stroke-width="1.8"/>
+    <text x="2" y="${(pad.t + 6).toFixed(1)}" font-size="9" fill="var(--blue)">${fmtNum.format(Math.round(cMax * 10) / 10)}</text>
+    <text x="2" y="${(H - pad.b).toFixed(1)}" font-size="9" fill="var(--blue)">${fmtNum.format(Math.round(cMin * 10) / 10)}</text>
+    <text x="${W - pad.r + 4}" y="${(pad.t + 6).toFixed(1)}" font-size="9" fill="var(--green)">${fmtNum.format(Math.round(gMax))}%</text>
+    <text x="${W - pad.r + 4}" y="${(H - pad.b).toFixed(1)}" font-size="9" fill="var(--green)">${fmtNum.format(Math.round(gMin))}%</text>
+    ${years.join("")}
+  </svg>
+  <div class="rec-leg"><span><span class="dot" style="background:var(--blue)"></span>Curva 10A-2A${opts.shiftMonths ? ` (+${opts.shiftMonths}m)` : ""} <span class="muted">(asse sx, pp)</span></span>
+    <span><span class="dot" style="background:var(--green)"></span>PIL reale YoY <span class="muted">(asse dx, %)</span></span>
+    <span><span class="dot" style="background:var(--muted)"></span>Recessioni</span></div>`;
 }
 
 function openMacroInfo(key) {
@@ -1649,6 +1710,50 @@ function openMacroInfo(key) {
         <div class="info-line muted" style="font-size:11px;margin-bottom:4px">Strike a maggiore open interest: il prezzo tende a essere "attratto" verso questi livelli, soprattutto vicino alle scadenze (4 streghe). P/C = put/call open interest del titolo.</div>
         <table class="info-table"><thead><tr><th>Titolo</th><th>Call Wall</th><th>Put Wall</th><th>P/C OI</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
+    // Quadruple Witching (4 streghe): inserito qui, con barra di prossimità per ogni data
+    const w = m.witching;
+    const wdates = w ? (w.upcoming && w.upcoming.length ? w.upcoming : (w.next ? [w.next] : [])) : [];
+    if (wdates.length) {
+      const now = Date.now();
+      const wrows = wdates.map(d => {
+        const days = Math.max(0, Math.round((new Date(d) - now) / 864e5));
+        const urg = Math.max(4, Math.min(100, Math.round((1 - days / 120) * 100)));
+        const col = days <= 7 ? "var(--red)" : days <= 21 ? "var(--yellow)" : days <= 45 ? "#f59e0b" : "var(--green)";
+        const lab = days <= 7 ? "imminente" : days <= 21 ? "vicina" : days <= 45 ? "in arrivo" : "lontana";
+        return `<div class="wt-row">
+          <span class="wt-date">${new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</span>
+          <span class="meter-track wt-bar"><span class="meter-fill" style="width:${urg}%;background:${col}"></span></span>
+          <span class="wt-days" style="color:${col}">tra ${days} gg · ${lab}</span></div>`;
+      }).join("");
+      extra += `<h4 style="margin:14px 0 4px">Quadruple Witching (4 streghe)</h4>
+        <div class="info-line muted" style="font-size:11px;margin-bottom:6px">Il 3° venerdì di marzo, giugno, settembre e dicembre scadono insieme 4 tipi di derivati: volumi e volatilità spesso +30-50%, con "pinning" del prezzo ai muri di opzioni. La barra indica la prossimità di ogni scadenza.</div>
+        ${wrows}
+        ${(w.contracts || []).length ? `<div class="info-line muted" style="font-size:11px;margin-top:6px">Contratti in scadenza: ${w.contracts.map(esc).join(" · ")}</div>` : ""}
+        <div class="info-line muted" style="font-size:11px;margin-top:4px">Strategia: evitare nuove posizioni nelle ultime 2 ore del giorno di scadenza; se detieni opzioni, valuta la chiusura 1-2 giorni prima.</div>`;
+    }
+  } else if (key === "yield_recession" && m.yield_recession) {
+    const yr = m.yield_recession;
+    const cc = yr.current_curve, c12 = yr.curve_12m_ago;
+    const ccCol = cc == null ? "var(--muted)" : cc < 0 ? "var(--red)" : yr.steepening ? "var(--yellow)" : "var(--green)";
+    extra = `<div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">
+        Storicamente, quando la <b>curva dei rendimenti</b> (differenza tra Treasury USA a 10 e 2 anni) esce da un'inversione e si <b>irripidisce bruscamente</b>, una recessione tende a seguire entro ~12 mesi. La curva inverte prima, poi torna positiva proprio mentre l'economia rallenta. Le bande grigie sono le recessioni USA (NBER).
+      </div>
+      <div class="info-line"><b>Spread 10A-2A attuale:</b> <span style="color:${ccCol}">${cc != null ? (cc > 0 ? "+" : "") + fmtNum.format(cc) + " pp" : "—"}</span> ${c12 != null ? `<span class="muted">(12 mesi fa ${c12 > 0 ? "+" : ""}${fmtNum.format(c12)} pp)</span>` : ""}</div>
+      <div class="info-line"><b>Stato:</b> <span style="color:${ccCol}">${esc(yr.label || "")}</span></div>
+      ${yr.gdp_last != null ? `<div class="info-line"><b>Crescita PIL reale (YoY):</b> ${yr.gdp_last > 0 ? "+" : ""}${fmtNum.format(yr.gdp_last)}%</div>` : ""}
+      ${yr.claims_last != null ? `<div class="info-line"><b>Sussidi disoccupazione (sett.):</b> ${fmtNum.format(yr.claims_last)}</div>` : ""}
+      <h4 style="margin:14px 0 4px">Curva 10A-2A vs PIL reale · recessioni in grigio</h4>
+      ${recessionChart(yr.curve, yr.gdp_growth, yr.recessions)}
+      <h4 style="margin:16px 0 4px">Curva shiftata di 12 mesi vs crescita PIL</h4>
+      <div class="info-line muted" style="font-size:11px;margin-bottom:4px">La curva è traslata in avanti di 12 mesi: dove la curva (blu) anticipa la caduta del PIL (verde) si vede la sua capacità predittiva sulle recessioni.</div>
+      ${recessionChart(yr.curve, yr.gdp_growth, yr.recessions, { shiftMonths: 12 })}
+      <div class="info-line muted" style="font-size:11px;margin-top:8px">
+        <b>Lettura attuale:</b> ${yr.steepening && yr.was_inverted_24m
+          ? "la curva si sta irripidendo dopo un'inversione ma il PIL e l'occupazione restano resilienti: il segnale storico invita alla prudenza pur in assenza, per ora, di recessione."
+          : (cc != null && cc < 0) ? "curva ancora invertita: storicamente precede recessioni di 12-18 mesi."
+          : "curva normale/positiva: nessun segnale di stress imminente dalla struttura dei tassi."}
+        Fonte: FRED (T10Y2Y, GDPC1, USREC, ICSA).
+      </div>`;
   } else if (key === "credit" && m.credit) {
     const cr = m.credit;
     const crCol = scoreColor(cr.score);
@@ -1904,7 +2009,7 @@ function fundBar(val, fmt, score) {
   const txt = fmt(val);
   if (score == null) return txt;
   const s = Math.max(0, Math.min(100, score));
-  return `<span class="fund-metric"><span style="color:${scoreColor(s)};font-weight:600">${txt}</span>
+  return `<span class="fund-metric"><span style="color:${scoreColor(s)}">${txt}</span>
     <span class="fmeter"><span class="fmeter-fill" style="width:${Math.max(6, s)}%;background:${scoreColor(s)}"></span></span></span>`;
 }
 // punteggi di favorevolezza (frazioni dove indicato). higher=meglio salvo lowerBetter
@@ -1942,15 +2047,13 @@ function buildFundTable(list, tableSel, withQtyPmc) {
       return `<tr>${lead}<td colspan="${fundColspan}" class="muted">${r.ticker === "BTP-V28" ? "Titolo di Stato — cedola 4,10/4,50%" : "Dati fondamentali non disponibili"}</td></tr>`;
     }
     const pfcf = (st.market_cap && st.fcf) ? st.market_cap / st.fcf : null;
-    const fcfWarn = (st.fcf != null && st.net_income_fy != null && st.fcf < st.net_income_fy * 0.6)
-      ? ` <span class="warn-flag" title="FCF molto inferiore all'utile: verifica la qualità degli utili">!</span>` : "";
     return `<tr class="fund-row" data-fund-tk="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per conto economico e statistiche">${lead}
       <td class="num">${bigUsd(st.market_cap)}</td>
       <td class="num">${fundBar(st.ev_ebitda, fmtNum.format, FSC.ev(st.ev_ebitda))}</td>
       <td class="num">${fundBar(st.roe, pctOf, FSC.roe(st.roe))}</td>
       <td class="num">${fundBar(st.gross_margin, pctPlain, FSC.gross(st.gross_margin))}</td>
       <td class="num">${fundBar(st.profit_margin, pctPlain, FSC.net(st.profit_margin))}</td>
-      <td class="num">${pfcf == null ? "—" : pfcf < 0 ? `<span class="neg">neg.</span>${fcfWarn}` : fundBar(pfcf, fmtNum.format, FSC.pfcf(pfcf)) + fcfWarn}</td>
+      <td class="num">${pfcf == null ? "—" : pfcf < 0 ? `<span class="neg">neg.</span>` : fundBar(pfcf, fmtNum.format, FSC.pfcf(pfcf))}</td>
       <td class="num">${fundBar(st.revenue_growth, pctOf, FSC.growth(st.revenue_growth))}</td>
       <td class="num">${st.dividend_yield ? fundBar(st.dividend_yield, pctPlain, FSC.div(st.dividend_yield)) : "—"}</td>
       <td class="num">${fundBar(st.price_to_book, fmtNum.format, FSC.pb(st.price_to_book))}</td>
@@ -2293,6 +2396,20 @@ function renderMacro() {
       ${macroThermo(rateScore)}
     </div>`);
   }
+  if (m.yield_recession) {
+    const yr = m.yield_recession;
+    const cc = yr.current_curve;
+    const col = cc == null ? "var(--muted)" : cc < 0 ? "var(--red)" : yr.steepening ? "var(--yellow)" : "var(--green)";
+    // score favorevolezza: invertita o irripidimento post-inversione = sfavorevole
+    const score = cc == null ? 50 : (yr.steepening && yr.was_inverted_24m) ? 25 : cc < 0 ? 15 : clamp(50 + cc * 25);
+    cells.push(`<div class="macro-item" data-macro="yield_recession" tabindex="0" role="button" title="Clicca per l'analisi curva vs recessioni" style="--accent:var(--blue)">
+      <span class="popup-dot"></span>
+      <div class="m-label">Curva &amp; Recessione</div>
+      <div class="m-value" style="color:${col}">${cc != null ? (cc > 0 ? "+" : "") + fmtNum.format(cc) + " pp" : "—"}</div>
+      <div class="m-date">${esc((yr.label || "").split(" — ")[0])}</div>
+      ${macroThermo(score)}
+    </div>`);
+  }
 
   $("#macro-grid").innerHTML = cells.length ? cells.join("") : '<span class="muted">Dati non disponibili</span>';
 }
@@ -2415,18 +2532,27 @@ function buildPrompt() {
   const t = DATA.totals;
   const m = DATA.macro || {};
   const lines = [];
-  lines.push("PRIMA di analizzare i dati come un team dei migliori 5 Senior Analyst al mondo, usa la RICERCA WEB per: (a) verificare i prezzi di oggi dei titoli elencati, (b) leggere le ultime notizie/risultati su questi titoli e sul quadro macro-politico, (c) trovare titoli alternativi NON in portafoglio interessanti per diversificare. I dati sotto sono il contesto completo della mia dashboard (portafoglio, watchlist, macro, news, mercati di previsione, rotazione settoriale).");
+  lines.push("Sei il MIO TEAM PERSONALE di 5 Senior Analyst di Wall Street: un macro-strategist, un equity analyst, un risk manager, uno specialista opzioni/derivati e un trader tecnico. Lavori solo per me, con rigore istituzionale e linguaggio diretto e quantitativo. Il tuo compito è darmi OGNI GIORNO un quadro COMPLETO e PROSPETTICO del mio portafoglio e del mercato, e un percorso operativo chiaro che sfrutti al massimo le tue competenze.");
   lines.push("");
-  lines.push("FORNISCI UN REPORT STRUTTURATO (solo a scopo informativo) con:");
-  lines.push("1) Sintesi macro e sentiment di mercato (rischio rialzista/ribassista nel breve e nel lungo periodo). Valuta in particolare i segnali di rischio sistemico: spread di credito High Yield, Smart Money vs Retail (divergenze istituzionali), disaccoppiamento S&P/PIL e stato della curva dei rendimenti.");
-  lines.push("2) Analisi tecnica titolo per titolo: ipercomprato/ipervenduto (RSI), vicinanza a supporti/resistenze, volumi anomali, trend.");
-  lines.push("3) INDICAZIONI OPERATIVE CONCRETE: per ogni titolo indica se mantenere/alleggerire/incrementare, con QUANTE azioni vendere/comprare e a CHE PREZZO (target/limite), stimando la plus/minusvalenza; suggerisci come COMPENSARE le minusvalenze con le plusvalenze (in Italia: azioni 26%, BTP 12,5%; le minus compensano le plus entro 4 anni).");
-  lines.push("4) ROTAZIONE & DE-RISKING: il portafoglio è concentrato su TECH/semiconduttori — proponi come ridurre questa intensità usando la liquidità disponibile; indica 2-3 ticker alternativi specifici (value/difensivi) e 2-3 ETF, con prezzi limite d'ingresso, sfruttando la rotazione settoriale qui sotto.");
-  lines.push("5) Ottica BREVE periodo (settimane), MEDIO periodo (mesi) e LUNGO periodo (anni), separate, con direzione e tempistiche.");
+  lines.push("PASSO 1 — RICERCA WEB OBBLIGATORIA prima di analizzare: (a) verifica i prezzi di oggi dei titoli elencati; (b) leggi le ultimissime notizie/risultati su questi titoli, sui loro settori e sul quadro macro-politico; (c) controlla gli eventi imminenti (trimestrali, dati macro, riunioni Fed/BoJ, scadenze opzioni); (d) individua 3-5 titoli/ETF NON in portafoglio interessanti, incluse idee speculative ad alto potenziale.");
+  lines.push("");
+  lines.push("CONTESTO PERSONALE da tenere SEMPRE presente: il mio patrimonio totale, la liquidità disponibile (la decido io), il capitale investito (costo), il guadagno lordo e netto tasse, e TUTTE le mie posizioni con PMC (prezzo medio di carico = le mie operazioni passate), controvalore e P&L per singolo titolo. Ragiona su concentrazione/rischio, fiscalità italiana (azioni 26%, BTP 12,5%, compensazione minus/plus entro 4 anni) e impiego ottimale della liquidità.");
+  lines.push("");
+  lines.push("PRODUCI UN REPORT STRUTTURATO, professionale e AZIONABILE (solo a scopo informativo), con queste sezioni numerate:");
+  lines.push("1) QUADRO MACRO & SENTIMENT (oggi + prospettiva): regime di mercato e rischi sistemici — curva dei rendimenti vs recessione, credito HY, Smart Money vs Retail, disaccoppiamento S&P/PIL, carry USD/JPY, valutazioni (P/E S&P e Nasdaq) — e cosa implicano per un portafoglio tech-heavy come il mio.");
+  lines.push("2) ANALISI TECNICA titolo per titolo: RSI (iper-comprato/venduto), supporti/resistenze, volumi, trend, forza relativa settoriale (RS vs benchmark) e muri di opzioni (Call/Put Wall).");
+  lines.push("3) ANALISI FONDAMENTALE: per ogni titolo valuta valutazione (P/E, P/FCF, EV/EBITDA, PEG, P/B), qualità (ROE, margini, crescita ricavi/utili) e se il prezzo attuale è giustificato; segnala titoli sopra/sottovalutati.");
+  lines.push("4) PIANO OPERATIVO CONCRETO: per ogni posizione indica MANTENERE / ALLEGGERIRE / INCREMENTARE / USCIRE, con QUANTE azioni e a CHE PREZZO (limite/target), stima plus/minusvalenza e impatto fiscale (compensazione minus↔plus). Indica livelli di stop e ordini condizionati.");
+  lines.push("5) ROTAZIONE & DE-RISKING: come ridurre la concentrazione tech/semiconduttori usando la liquidità; proponi 2-3 titoli value/difensivi e 2-3 ETF con prezzi d'ingresso, sfruttando la rotazione settoriale qui sotto.");
+  lines.push("6) OPPORTUNITÀ SPECULATIVE (alto rischio/rendimento): 2-3 idee tattiche (momentum, eventi/catalizzatori, anche opzioni) con tesi, catalizzatore, ingresso, target, stop e dimensionamento prudente rispetto al patrimonio.");
+  lines.push("7) ORIZZONTI separati — BREVE (settimane), MEDIO (mesi), LUNGO (anni) — con direzione, probabilità e tempistiche; chiudi con una WATCHLIST DI EVENTI da monitorare nei prossimi giorni e i 3 rischi principali per il mio portafoglio.");
+  lines.push("Sii specifico e quantitativo (numeri, prezzi, %). Niente disclaimer lunghi: vai al punto come per un cliente private. Se i dati web aggiornati contraddicono quelli sotto, dillo e usa i più recenti.");
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
+  const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
+  lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(t.eur_value)}${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
   lines.push("");
-  lines.push(`PORTAFOGLIO (totale ${fmtEUR.format(t.eur_value)}, guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} / ${signTxt(t.eur_gain_pct)}${t.eur_gain_net !== undefined ? `, netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}):`);
+  lines.push("PORTAFOGLIO (controvalore e P&L reali per posizione; PMC = mie operazioni passate):");
   const f = (v, d = 2) => v === null || v === undefined ? "—" : fmtNum.format(v);
   const mdRow = (r) => {
     const c = cur(r);
@@ -2491,6 +2617,10 @@ function buildPrompt() {
   if ((m.curve_history || []).length) {
     const cv = m.curve_history.slice(-1)[0].v;
     lines.push(`- Curva 10A-2A: ${cv > 0 ? "+" : ""}${cv} pp (${cv < 0 ? "ancora invertita = rischio recessione" : "tornata positiva dopo l'inversione = dis-inversione in corso"})`);
+  }
+  if (m.yield_recession) {
+    const yr = m.yield_recession;
+    lines.push(`- Curva vs Recessione (storico FRED): spread 10A-2A ${yr.current_curve != null ? (yr.current_curve > 0 ? "+" : "") + yr.current_curve + " pp" : "—"}${yr.curve_12m_ago != null ? ` (12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago})` : ""}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. NB: irripidimento post-inversione → storicamente recessione entro ~12 mesi (curva shiftata di 12m anticipa il calo del PIL).`);
   }
   if (m.fedwatch && (m.fedwatch.meetings || []).length) lines.push(`- FedWatch prossima riunione ${m.fedwatch.meetings[0].date}: prob. taglio ${m.fedwatch.meetings[0].cut_prob}%`);
   if ((m.tilt || []).length) {
@@ -2714,7 +2844,6 @@ $("#cash-input").addEventListener("keydown", e => { if (e.key === "Enter") saveC
 $("#signposts-box").addEventListener("click", openSignpostsModal);
 $("#tilt-box").addEventListener("click", openTiltModal);
 $("#portfolio-health").addEventListener("click", openHealthModal);
-$("#witching-box").addEventListener("click", openWitchingModal);
 $("#macroquant-box").addEventListener("click", openMacroQuantModal);
 $("#market-direction").addEventListener("click", () => {
   const d = marketDirectionScore();

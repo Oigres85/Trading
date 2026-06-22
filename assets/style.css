@@ -178,17 +178,18 @@ tbody tr.total-row { background: var(--card-2); font-weight: 700; }
 }
 .meter-fill { display: block; height: 100%; border-radius: 4px; }
 
-/* ---------- gauges (compatti) — flex-wrap così l'ultima riga riempie lo spazio ---------- */
-.gauges { display: flex; flex-wrap: wrap; gap: 12px; }
+/* ---------- gauges (compatti) — griglia a colonne uguali: tutti i box stessa dimensione ---------- */
+.gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: 12px; }
 .gauge-card {
   background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
-  padding: 12px 10px 10px; text-align: center; flex: 1 1 160px; min-width: 150px;
+  padding: 12px 10px 10px; text-align: center;
+  display: flex; flex-direction: column; min-height: 192px;
 }
-.gauge-card .g-title { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
-.semi-gauge-svg { width: 100%; max-width: 176px; display: block; margin: 0 auto 2px; }
+.gauge-card .g-title { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; min-height: 24px; display: flex; align-items: center; justify-content: center; }
+.semi-gauge-svg { width: 100%; max-width: 150px; display: block; margin: 0 auto 2px; }
 .gauge-ends { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); padding: 0 6px; margin-bottom: 4px; font-family: var(--mono); }
 .gauge-value { font-family: var(--mono); font-size: 17px; font-weight: 700; line-height: 1.2; }
-.gauge-sub { font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+.gauge-sub { font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; flex: 1; }
 
 /* ---------- macro (compatti) ---------- */
 .macro-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 9px; }
@@ -451,6 +452,21 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .pc-seg { display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; font-weight: 700; color: #06231a; white-space: nowrap; transition: width .3s; }
 .pc-call { background: var(--green); }
 .pc-put { background: var(--red); color: #2a0606; }
+/* legenda grafico curva/recessione */
+.rec-leg { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--text); margin-top: 4px; }
+.rec-leg .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+/* grafico open interest per strike nel popup catena opzioni */
+.opt-oi-chart { margin: 10px 0 6px; }
+.opt-oi-head { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.opt-oi-leg { display: flex; gap: 14px; font-size: 11px; color: var(--muted); margin-top: 2px; flex-wrap: wrap; }
+.opt-oi-leg .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+/* righe Quadruple Witching nel popup put/call */
+.wt-row { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
+.wt-date { min-width: 132px; font-size: 12px; font-family: var(--mono); }
+.wt-bar { flex: 1; }
+.wt-days { min-width: 112px; text-align: right; font-size: 11px; font-family: var(--mono); }
 
 /* pallino che segnala un box apribile in popup */
 .popup-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; border-radius: 50%;
