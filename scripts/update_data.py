@@ -1333,9 +1333,9 @@ def fetch_portfolio_history(btp_value_eur):
 
         out = {"w1": series(5), "m1": series(22), "m3": series(66),
                "y1": series(252), "y5": series(None), "all": series(None)}
-        # àncora la curva al controvalore reale del broker (l'ultimo punto = valore reale)
-        if BROKER and BROKER.get("controvalore_totale"):
-            real = float(BROKER["controvalore_totale"])
+        # àncora la curva al controvalore reale degli investimenti (l'ultimo punto = valore reale, liquidità esclusa)
+        if BROKER and (BROKER.get("controvalore_investimenti") or BROKER.get("controvalore_totale")):
+            real = float(BROKER.get("controvalore_investimenti") or BROKER["controvalore_totale"])
             for s in out.values():
                 if s["values"]:
                     k = real / s["values"][-1]

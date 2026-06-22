@@ -66,7 +66,8 @@ main { max-width: 1500px; margin: 0 auto; padding: 0 20px 40px; }
 .hist-summary b { font-family: var(--mono); }
 
 /* asset allocation */
-.alloc-wrap { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.alloc-wrap { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+.alloc-right { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 12px; }
 .alloc-legend { list-style: none; flex: 1; min-width: 200px; }
 .alloc-item { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 12.5px; }
 .alloc-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
@@ -312,6 +313,10 @@ th.sortable:hover { color: var(--text); }
 .cash-box { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
 .cash-box label { font-size: 12.5px; color: var(--muted); }
 .cash-box input { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 6px 10px; font-family: var(--mono); width: 130px; }
+/* cash box dentro la card Asset allocation (spazio a destra del donut) */
+.cash-box-inline { display: flex; flex-direction: column; align-items: stretch; gap: 7px; background: var(--card-2); margin-bottom: 0; padding: 12px 14px; }
+.cash-box-inline .cash-row { display: flex; gap: 8px; align-items: center; }
+.cash-box-inline input { flex: 1; width: auto; }
 
 /* ---------- vista fondamentale ---------- */
 .text-premium { color: #16e36a; font-weight: 700; }   /* ROE/ROIC alto */
@@ -419,6 +424,13 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .thermo-marker { position: absolute; top: -3px; width: 4px; height: 14px; border-radius: 2px; background: var(--text); transform: translateX(-50%); box-shadow: 0 0 0 2px var(--card); }
 .thermo-ends { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin: 2px 4px 0; }
 .m-ends { display: flex; justify-content: space-between; font-size: 8.5px; color: var(--muted); margin: 2px 2px 0; }
+
+/* gauge semicircolare compatto (macro-item, mini-card, salute portafoglio) */
+.compact-semi-gauge { display: block; width: 100%; max-width: 118px; margin: 6px auto 0; }
+.mini-card .compact-semi-gauge { max-width: 130px; margin: 4px auto 2px; }
+.hb-right .compact-semi-gauge { max-width: 140px; margin: 0 auto 2px; }
+.compact-semi-gauge + .gauge-ends { display: flex; justify-content: space-between; max-width: 118px; margin: 1px auto 0; color: var(--muted); }
+.mini-card .compact-semi-gauge + .gauge-ends, .hb-right .compact-semi-gauge + .gauge-ends { max-width: 130px; }
 
 
 /* pallino che segnala un box apribile in popup */

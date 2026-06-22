@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=50">
+<link rel="stylesheet" href="assets/style.css?v=51">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -25,13 +25,7 @@
 </header>
 
 <main>
-  <!-- CASH + KPI -->
-  <section class="cash-box">
-    <label for="cash-input">Liquidità disponibile (€)</label>
-    <input type="number" id="cash-input" min="0" step="any" placeholder="es. 20000" aria-label="Liquidità disponibile in euro">
-    <button class="btn btn-primary btn-sm" id="cash-save">Salva</button>
-    <span class="muted" id="cash-note"></span>
-  </section>
+  <!-- KPI -->
   <section class="kpi-grid" id="kpi-grid"></section>
   <div class="btp-info" id="btp-info"></div>
 
@@ -71,7 +65,17 @@
       </div>
       <div class="alloc-wrap">
         <div id="alloc-donut"></div>
-        <ul class="alloc-legend" id="alloc-legend"></ul>
+        <div class="alloc-right">
+          <section class="cash-box cash-box-inline">
+            <label for="cash-input">Liquidità disponibile (€)</label>
+            <div class="cash-row">
+              <input type="number" id="cash-input" min="0" step="any" placeholder="es. 20000" aria-label="Liquidità disponibile in euro">
+              <button class="btn btn-primary btn-sm" id="cash-save">Salva</button>
+            </div>
+            <span class="muted" id="cash-note"></span>
+          </section>
+          <ul class="alloc-legend" id="alloc-legend"></ul>
+        </div>
       </div>
     </section>
   </div>
@@ -302,6 +306,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=50"></script>
+<script src="assets/app.js?v=51"></script>
 </body>
 </html>

@@ -467,7 +467,7 @@ function renderMiniCards() {
   if (dBox && dir != null) {
     const lab = dir >= 60 ? "Rialzista" : dir <= 40 ? "Ribassista" : "Laterale";
     dBox.innerHTML = `<div class="mc-title">Direzione mercato</div>
-      ${thermoBar(dir, ["Ribasso", "Rialzo"])}
+      ${compactSemiGauge(dir, ["Ribasso", "Rialzo"])}
       <div class="mc-value" style="color:${scoreColor(dir)}">${dir}% · ${lab}</div>
       <div class="mc-sub muted">media di tutti i segnali tecnici e macro</div>`;
   }
@@ -475,7 +475,7 @@ function renderMiniCards() {
   if (sBox && sp) {
     const risk = sp.pct >= 70 ? "Rischio alto" : sp.pct >= 40 ? "Rischio medio" : "Rischio basso";
     sBox.innerHTML = `<div class="mc-title">BofA Bear-Market Signposts</div>
-      ${thermoBar(100 - sp.pct, ["Ribassista", "Solido"])}
+      ${compactSemiGauge(100 - sp.pct, ["Ribassista", "Solido"])}
       <div class="mc-value" style="color:${scoreColor(100 - sp.pct)}">${sp.active}/${sp.total} attivi · ${risk}</div>
       <div class="mc-sub muted">clicca per il dettaglio dei 10 segnali</div>`;
   }
@@ -484,7 +484,7 @@ function renderMiniCards() {
   if (tBox && tilt && tilt.length) {
     const top = tilt[0], bot = tilt[tilt.length - 1];
     tBox.innerHTML = `<div class="mc-title">Rotazione settoriale (Tilt)</div>
-      ${thermoBar(top.score, ["Difensivo", "Aggressivo"])}
+      ${compactSemiGauge(top.score, ["Difensivo", "Aggressivo"])}
       <div class="mc-value">Sovrappeso: <b style="color:var(--green)">${esc(top.name)}</b> ${signTxt(top.m1)}</div>
       <div class="mc-sub muted">debole: ${esc(bot.name)} ${signTxt(bot.m1)} · clicca per il dettaglio</div>`;
   }
@@ -504,7 +504,7 @@ function renderMiniCards() {
   const mq = m.macroquant, mqBox = $("#macroquant-box");
   if (mqBox && mq) {
     mqBox.innerHTML = `<div class="mc-title">MacroQuant (stile BCA)</div>
-      ${thermoBar(mq.score, ["Contrazione", "Espansione"])}
+      ${compactSemiGauge(mq.score, ["Contrazione", "Espansione"])}
       <div class="mc-value" style="color:${scoreColor(mq.score)}">${mq.score}% · ${mq.label}</div>
       <div class="mc-sub muted">composito ciclo economico · clicca per il dettaglio</div>`;
   }
@@ -546,7 +546,7 @@ function renderPortfolioHealth() {
       <div class="hb-score" style="color:${scoreColor(score)}">${score}/100 · <b>${lab}</b></div>
       <div class="hb-sub muted">media di tecnica titoli + macro/mercato + fondamentale</div>
     </div>
-    <div class="hb-right">${thermoBar(score, ["Solido", "Fragile"])}
+    <div class="hb-right">${compactSemiGauge(score, ["Solido", "Fragile"])}
       <div class="hb-parts">${parts.map(p => `<span>${esc(p[0])}: <b style="color:${scoreColor(p[1])}">${p[1]}</b></span>`).join("")}</div>
     </div>`;
 }
@@ -661,34 +661,33 @@ function openSignpostsModal() {
 function renderKPI() {
   const t = DATA.totals;
   const b = DATA.broker;
-  const eurusd = DATA.eurusd || 1.08;
-  let invested, patrimonioInv, gain, gainPct, net, src;
-  if (b && b.controvalore_totale) {
-    // dati REALI del broker (autorevoli): coerenti con ciò che vedi sul tuo conto
-    invested = b.investimenti;
-    patrimonioInv = b.controvalore_totale;
-    gain = b.profitto_totale_eur;
-    gainPct = b.profitto_totale_pct;
-    const equityGainEur = (b.profitto_usd || 0) / eurusd;
-    const btpVal = (b.controvalore_totale || 0) - (b.controvalore_azioni || 0);
-    const btpGain = Math.max(0, btpVal - 40000);
-    const tax = 0.26 * Math.max(0, equityGainEur) + 0.125 * btpGain;
+  let invested, controvalore, gain, gainPct, net, src;
+  if (b && b.controvalore_investimenti) {
+    // controvalore REALE degli investimenti (azioni + BTP), liquidità ESCLUSA
+    controvalore = b.controvalore_investimenti;
+    invested = b.investimenti;                       // capitale investito (costo)
+    gain = controvalore - invested;                  // guadagno = valore attuale − costo
+    gainPct = invested ? gain / invested * 100 : 0;
+    const btpVal = b.controvalore_btp || 0;
+    const btpGain = btpVal - 40000;                  // BTP: nominale 40k
+    const equityGain = gain - btpGain;               // resto = azioni
+    const tax = 0.26 * Math.max(0, equityGain) + 0.125 * Math.max(0, btpGain);
     net = gain - tax;
     src = `dati broker · agg. ${new Date(b.as_of).toLocaleDateString("it-IT")}`;
   } else {
-    invested = t.eur_invested; patrimonioInv = t.eur_invested; gain = t.eur_gain;
+    invested = t.eur_invested; controvalore = t.eur_value; gain = t.eur_gain;
     gainPct = t.eur_gain_pct; net = t.eur_gain_net ?? t.eur_gain; src = "stima dai prezzi";
   }
-  // col broker il controvalore include già la liquidità sul conto → NON sommarla (evita il doppio conteggio)
-  const patrimonio = b ? patrimonioInv : patrimonioInv + cashEur;
+  // la liquidità la inserisce l'utente: patrimonio = investimenti + liquidità
+  const patrimonio = controvalore + cashEur;
   const kpis = [
     { label: "Patrimonio totale (€)", value: fmtEUR.format(patrimonio),
-      sub: b ? "controvalore conto (liquidità inclusa)" : `posizioni ${fmtEUR.format(patrimonioInv)}${cashEur > 0 ? ` + liquidità ${fmtEUR.format(cashEur)}` : ""}`,
+      sub: `investimenti ${fmtEUR.format(controvalore)}${cashEur > 0 ? ` + liquidità ${fmtEUR.format(cashEur)}` : " · liquidità da inserire"}`,
       accent: "var(--blue)" },
     { label: "Capitale investito (€)", value: fmtEUR.format(invested),
       sub: src, accent: "var(--purple)" },
     { label: "Guadagno totale (€)", value: signTxt(Math.round(gain), " €"),
-      sub: `${signTxt(gainPct)} sul capitale investito`,
+      sub: `${signTxt(Math.round(gainPct * 100) / 100)} sul capitale investito`,
       subCls: signCls(gain), accent: gain >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(gain) },
     { label: "Guadagno netto tasse (€)", value: signTxt(Math.round(net), " €"),
       sub: `dopo tasse stimate (26% azioni · 12,5% BTP)${b && b.cedole_btp ? ` · cedole BTP ${fmtEUR.format(b.cedole_btp)}` : ""}`,
@@ -709,11 +708,18 @@ let histBenchKey = "ndx";   // none | nasdaq | ndx | sp500 — default: confront
 const BENCH_LABEL = { nasdaq: "Nasdaq Comp.", ndx: "Nasdaq 100", sp500: "S&P 500", russell: "Russell 2000" };
 
 function renderHistory() {
-  const h = DATA.history && DATA.history[histRange];
+  let h = DATA.history && DATA.history[histRange];
+  // curva REALE del broker (da inizio investimento all'ultimo movimento) per la vista Max
+  const ec = DATA.broker?.equity_curve;
+  let realCurve = false;
+  if (histRange === "all" && ec && ec.length > 1) {
+    h = { dates: ec.map(p => p.d), values: ec.map(p => p.v) };
+    realCurve = true;
+  }
   const box = $("#hist-chart");
   if (!h || h.values.length < 2) { box.innerHTML = '<div class="muted" style="padding:40px 0;text-align:center">Storico non disponibile</div>'; $("#hist-summary").textContent = ""; return; }
   const vals = h.values, dates = h.dates;
-  const bench = (histBenchKey !== "none" && h[histBenchKey] && h[histBenchKey].length === vals.length) ? h[histBenchKey] : null;
+  const bench = (!realCurve && histBenchKey !== "none" && h[histBenchKey] && h[histBenchKey].length === vals.length) ? h[histBenchKey] : null;
   const W = 560, H = 210, pad = { l: 56, r: 12, t: 12, b: 22 };
   const allv = bench ? vals.concat(bench) : vals;
   const min = Math.min(...allv), max = Math.max(...allv), range = max - min || 1;
@@ -1975,7 +1981,8 @@ function thermoCard(key, title, score, valueText, subText, ends) {
     return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="butt"/>`;
   }).join("");
   // score 100 → ago sx (verde); score 0 → ago dx (rosso)
-  const [nx, ny] = pt(100 - s, R - 9);
+  const nv = Math.max(5, Math.min(95, 100 - s)); // clamp: evita che l'ago tocchi la baseline
+  const [nx, ny] = pt(nv, R - 9);
   const col = scoreColor(s);
   const endsHtml = ends ? `<div class="gauge-ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>` : "";
   return `<div class="gauge-card" data-gauge="${key}" tabindex="0" role="button" title="Clicca per dettagli e news">
@@ -1990,6 +1997,33 @@ function thermoCard(key, title, score, valueText, subText, ends) {
     <div class="gauge-value" style="color:${col}">${valueText}</div>
     <div class="gauge-sub">${subText}</div>
   </div>`;
+}
+
+/* gauge semicircolare compatto per macro-item e mini-card */
+function compactSemiGauge(score, ends) {
+  const s = Math.max(0, Math.min(100, score ?? 50));
+  const R = 50, cx = 65, cy = 57;
+  const zones = [
+    [0,  20, "#16a34a"],
+    [20, 40, "#86c52a"],
+    [40, 60, "#eab308"],
+    [60, 80, "#f97316"],
+    [80, 100,"#d23b30"],
+  ];
+  const pt = (val, r) => { const a = Math.PI * (1 - val / 100); return [cx + r * Math.cos(a), cy - r * Math.sin(a)]; };
+  const arcs = zones.map(([a, b, col]) => {
+    const [x1, y1] = pt(a, R), [x2, y2] = pt(b, R);
+    return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="butt"/>`;
+  }).join("");
+  const nv = Math.max(5, Math.min(95, 100 - s));
+  const [nx, ny] = pt(nv, R - 7);
+  const col = scoreColor(s);
+  const endsHtml = ends ? `<div class="gauge-ends" style="font-size:9px;padding:0 2px"><span>${ends[0]}</span><span>${ends[1]}</span></div>` : "";
+  return `<svg viewBox="0 0 130 64" class="compact-semi-gauge">
+    ${arcs}
+    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="4" fill="${col}"/>
+  </svg>${endsHtml}`;
 }
 
 /* tachimetro Fear & Greed: semicerchio stile CNN con lancetta — paura=sx, avidità=dx */
@@ -2110,7 +2144,7 @@ function renderMacro() {
   const m = DATA.macro || {};
   // termometro coerente: verde a sx (favorevole per il portafoglio) → rosso a dx (sfavorevole)
   const macroThermo = (score) => score == null ? "" :
-    `${thermoBar(score)}<div class="m-ends"><span>favorevole</span><span>sfavorevole</span></div>`;
+    compactSemiGauge(score, ["favorevole", "sfavorevole"]);
   const markets = (DATA.macro?.markets || []).map(m => `
     <div class="macro-item" data-macro="mk:${m.key}" tabindex="0" role="button" title="Clicca per dettagli e news" style="--accent:${MACRO_ACCENTS[m.key] || "var(--blue)"}">
       <span class="popup-dot"></span>
