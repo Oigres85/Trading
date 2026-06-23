@@ -2976,19 +2976,28 @@ Analizza in modo APPROFONDITO tutti i dati macro forniti:
 - Fed Watch: scenario tassi prossimi 6 mesi
 **VERDETTO FINALE:** regime bull/bear/range + sovrappeso/sottopeso azionario USA tech nelle prossime 8 settimane. Risponde al mandato CAGR ${cagrNeeded}%?
 
-## 2. ANALISI TECNICA PORTAFOGLIO & WATCHLIST (per OGNI titolo)
-Per ciascun titolo: RSI (interpretazione: ipercomprato/neutro/ipervenduto), supporto chiave (rottura = stop), resistenza chiave (target swing), volume anomalo (sì/no), segnale SMC (struttura/BOS/FVG/bias), forza relativa 1M vs benchmark (SOX/NDX/S&P500).
-**CLASSIFICA SETUP:** i 2 MIGLIORI e i 2 PEGGIORI per le prossime 2-4 settimane.
-**ZONE DRAWDOWN:** segnala i titoli con drawdown > 15% dal massimo 52 settimane come ZONE DI ACCUMULO per la liquidità disponibile (${fmtEUR.format(cashEur)} polvere secca).
+## 2. ANALISI PER SINGOLO TITOLO (portafoglio + watchlist)
+Per OGNI titolo usa questo formato fisso — non saltare nessuna voce:
 
-## 3. ANALISI FONDAMENTALE APPROFONDITA (per OGNI titolo)
-Giudizio BUY/HOLD/SELL con motivazione quantitativa: P/E vs settore, P/FCF (segnala [!FCF] se P/FCF >> P/E), EV/EBITDA, ROE/ROIC (>15%=[PREMIUM]), margine netto, crescita ricavi, PEG. Fair value stimato e upside/downside %. Verifica regola VC Sniper: P/E > 150 senza crescita → segnala come TRIGGER USCITA. Per i titoli in watchlist: vale la pena acquistare ora o attendere?
-**RIEPILOGO:** (a) titolo più sopravvalutato, (b) titolo con miglior qualità utili, (c) miglior opportunità ingresso in watchlist.
+### [TICKER] — [Nome]  [PORTAFOGLIO | WATCHLIST]
+**NEWS & CONTESTO (ultime 48h):** 2-3 righe. Cosa è successo al titolo di recente? Earnings, guidance, upgrade/downgrade, news di settore rilevanti, movimenti istituzionali. Se niente di rilevante, scrivi "Nessuna news materiale".
+**FONDAMENTALI:** P/E [X]× (settore [Y]×) · P/FCF [X]× [!FCF se >> P/E] · ROIC [X]% [PREMIUM se >15%] · Margine netto [X]% · Crescita ricavi [X]% · PEG [X] · Fair value stimato: $[X] ([upside/downside]% dal prezzo attuale). Regola VC Sniper: [OK — nessun trigger | ATTENZIONE — P/E>[X] senza crescita adeguata]
+**TECNICA:** RSI [X] ([ipercomprato >70 | neutro | ipervenduto <30]) · Supporto chiave: $[X] (rottura = stop loss) · Resistenza chiave: $[X] (target swing) · Volume: [anomalo/normale] · SMC: [struttura rialzista/ribassista/BOS/FVG] · Forza relativa 1M vs [SOX/NDX/S&P]: [+X% / -X% — outperform/underperform]
+**AZIONE RACCOMANDATA:** [MANTIENI | INCREMENTA X azioni a $Y limite | ALLEGGERISCI X azioni (plus/minus stimata €Z, tasse €W) | ESCI | ATTENDI INGRESSO a $Y] — Stop: $[X]. Motivazione in 1 riga.
 
-## 4. PIANO OPERATIVO CONCRETO — AZIONI DA FARE
-Per OGNI posizione in portafoglio: MANTIENI / INCREMENTA (N azioni a prezzo X limite) / ALLEGGERISCI (N azioni, stima plus/minus, tasse 26%/12.5%, compensabile con minus pregresse nel quadriennio) / ESCI. Stop loss tecnico preciso e tipo ordine. Per liquidità ${fmtEUR.format(cashEur)}: dove e come deployarla (ticker, quantità, prezzo limite, priorità). Nuovi ingressi identificati dalla ricerca web: 2-3 idee con entry precisa.
+---
+*(ripeti per ogni titolo)*
 
-## 5. RISCHI, COPERTURE & OUTLOOK
+**RIEPILOGO SEZIONE 2:** Setup MIGLIORE per le prossime 2-4 settimane: [ticker]. Setup PEGGIORE: [ticker]. Zone di accumulo (drawdown >15% dal max 52S, polvere secca ${fmtEUR.format(cashEur)}): [titoli con opportunità].
+
+## 3. PIANO OPERATIVO PRIORITÀ & NUOVI INGRESSI
+Elenca in ordine di urgenza le azioni da fare QUESTA SETTIMANA:
+1. [Azione più urgente: ticker, N azioni, prezzo limite, motivazione]
+2. ...
+Per la liquidità disponibile (${fmtEUR.format(cashEur)}): deployment ottimale con ticker + quantità + prezzo limite + priorità.
+Nuovi ingressi da ricerca web (NON in portafoglio): 2-3 idee con ticker, entry precisa, tesi in 2 righe, coerenti con mandato FASE 1→2.
+
+## 4. RISCHI, COPERTURE & OUTLOOK
 **Copertura portafoglio:** strategia opzioni low-cost (collar/put spread su QQQ o NDX) con strike e scadenza precisi, compatibile con Diamond Hands (copertura parziale, non totale). Muri opzioni (CW/PW) per titoli con dati disponibili → livelli pinning prossima scadenza.
 **Rischi principali** (in ordine probabilità × impatto): top 3.
 **Outlook:** BREVE (0-4 settimane) · MEDIO (1-3 mesi) · LUNGO (6-18 mesi) — direzione + livello chiave + probabilità %.
@@ -3295,6 +3304,7 @@ function computeSell() {
   const rows = sellRows();
   const byTk = Object.fromEntries(rows.map(r => [r.ticker, r]));
   let gains = 0, losses = 0, taxStock = 0, taxBtp = 0, stockNet = 0, btpNet = 0;
+  let grossProceeds = 0, totalCost = 0;
   document.querySelectorAll(".sell-in").forEach(inp => {
     const r = byTk[inp.dataset.tk];
     const q = Math.min(parseFloat(inp.value) || 0, r.qty);
@@ -3302,7 +3312,15 @@ function computeSell() {
     const cell = document.querySelector(`.sell-pl[data-tk="${inp.dataset.tk}"]`);
     cell.textContent = q ? signTxt(Math.round(pl), " €") : "—";
     cell.className = `num sell-pl ${signCls(pl)}`;
-    if (q) { if (pl >= 0) gains += pl; else losses += pl; }
+    if (q) {
+      if (pl >= 0) gains += pl; else losses += pl;
+      // prezzo di vendita × quantità (convertito in EUR se USD)
+      const eurusd = DATA.eurusd || 1;
+      const priceEur = r.currency === "USD" ? r.price / eurusd : r.price;
+      const pmcEur   = r.currency === "USD" ? r.pmc   / eurusd : r.pmc;
+      grossProceeds += priceEur * q;
+      totalCost     += pmcEur * q;
+    }
     if (r.ticker === "BTP-V28") btpNet += pl; else stockNet += pl;
   });
   // minusvalenze compensano le plusvalenze; tassa solo sul netto positivo
@@ -3311,23 +3329,36 @@ function computeSell() {
   const net = gains + losses;          // losses è negativo
   const tax = taxStock + taxBtp;
   const afterTax = net - tax;
+  // "Incasso netto" = liquidità effettiva ricevuta = controvalore vendita − tasse sulla plusvalenza
+  // NON è solo il guadagno netto: include anche il capitale restituito (costo di acquisto)
+  const cashReceived = grossProceeds - tax;
+  const hasData = grossProceeds > 0;
   // grafico a barre: plus (verde), minus (rosso), netto
   const maxAbs = Math.max(gains, Math.abs(losses), Math.abs(net), 1);
-  const bar = (v, col) => `<div class="sb-row"><span class="sb-lab">${v < 0 ? "Minusvalenze" : v === net ? "Netto" : "Plusvalenze"}</span>
+  const bar = (v, col, label) => `<div class="sb-row"><span class="sb-lab">${label}</span>
     <span class="sb-track"><span class="sb-fill" style="width:${Math.abs(v) / maxAbs * 100}%;background:${col}"></span></span>
     <span class="sb-val ${signCls(v)}">${signTxt(Math.round(v), " €")}</span></div>`;
   $("#sell-summary").innerHTML = `
     <div class="sell-bars">
-      ${bar(gains, "var(--green)")}
-      ${bar(losses, "var(--red)")}
-      ${bar(net, net >= 0 ? "var(--blue)" : "var(--red)")}
+      ${bar(gains, "var(--green)", "Plusvalenze")}
+      ${bar(losses, "var(--red)", "Minusvalenze")}
+      ${bar(net, net >= 0 ? "var(--blue)" : "var(--red)", "Guad./Perd. netto")}
     </div>
     <div class="sell-totals">
+      ${hasData ? `<div class="sell-tot-section"><span class="muted">Controvalore vendita</span>
+        <b>${fmtEUR.format(Math.round(grossProceeds))}</b>
+        <span class="sell-tot-note">Prezzo di mercato × quantità venduta (quanto entrerà sul conto dal broker)</span></div>` : ""}
+      <div><span class="muted">Costo di acquisto (PMC × qtà)</span> <b class="muted">${hasData ? "−" + fmtEUR.format(Math.round(totalCost)) : "—"}</b></div>
       <div><span class="muted">Plusvalenze</span> <b class="pos">${signTxt(Math.round(gains), " €")}</b></div>
       <div><span class="muted">Minusvalenze</span> <b class="neg">${signTxt(Math.round(losses), " €")}</b></div>
-      <div><span class="muted">Risultato lordo</span> <b class="${signCls(net)}">${signTxt(Math.round(net), " €")}</b></div>
-      <div><span class="muted">Tasse stimate (26% az. / 12,5% BTP, al netto delle minus)</span> <b class="neg">−${fmtEUR.format(Math.round(tax))}</b></div>
-      <div><span class="muted">Incasso netto stimato</span> <b class="${signCls(afterTax)}">${signTxt(Math.round(afterTax), " €")}</b></div>
+      <div><span class="muted">Risultato lordo (plus − minus)</span> <b class="${signCls(net)}">${signTxt(Math.round(net), " €")}</b></div>
+      <div><span class="muted">Tasse stimate (26% az. / 12,5% BTP, al netto delle minus)</span> <b class="neg">${tax > 0 ? "−" + fmtEUR.format(Math.round(tax)) : "0 €"}</b></div>
+      <div class="sell-net-box">
+        <div class="sell-net-main"><span>Liquidità netta sul conto</span> <b class="${cashReceived >= 0 ? "pos" : "neg"}">${hasData ? fmtEUR.format(Math.round(cashReceived)) : "—"}</b></div>
+        <div class="sell-net-note">Controvalore vendita (${hasData ? fmtEUR.format(Math.round(grossProceeds)) : "—"}) − tasse (${fmtEUR.format(Math.round(tax))}) = cash effettivo ricevuto sul conto. Diverso dal "guadagno netto" che è solo la differenza rispetto al costo di acquisto.</div>
+      </div>
+      <div class="sell-gain-box"><span class="muted">Di cui guadagno/perdita netto dopo tasse</span> <b class="${signCls(afterTax)}">${signTxt(Math.round(afterTax), " €")}</b>
+        <span class="sell-tot-note">Solo il profitto/perdita rispetto al tuo PMC (non include il capitale restituito)</span></div>
     </div>`;
 }
 

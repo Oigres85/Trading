@@ -551,8 +551,15 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .sb-track { flex: 1; height: 14px; background: var(--card-2); border-radius: 7px; overflow: hidden; }
 .sb-fill { display: block; height: 100%; border-radius: 7px; }
 .sb-val { font-family: var(--mono); font-weight: 700; min-width: 90px; text-align: right; }
-.sell-totals div { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.sell-totals div { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 .sell-totals b { font-family: var(--mono); }
+.sell-tot-section { display: flex; flex-direction: column !important; align-items: flex-start !important; padding: 8px 0 !important; background: rgba(76,141,255,.06); border-radius: 6px; margin: 4px 0; }
+.sell-tot-note { font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; display: block; }
+.sell-net-box { display: flex; flex-direction: column !important; align-items: flex-start !important; padding: 8px 0 6px !important; border-top: 2px solid var(--border) !important; margin-top: 4px; }
+.sell-net-main { display: flex; justify-content: space-between; width: 100%; font-size: 14px; font-weight: 700; }
+.sell-net-note { font-size: 10.5px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
+.sell-gain-box { display: flex; flex-direction: column !important; align-items: flex-start !important; padding: 5px 0 !important; }
+.sell-gain-box > span { display: flex; justify-content: space-between; width: 100%; }
 
 /* ---------- zoom grafico ---------- */
 .spark-cell { cursor: pointer; }
