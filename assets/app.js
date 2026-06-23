@@ -8,10 +8,12 @@ const SORT_FIELDS = {
   // colonne attuali (senza "Valore" e "Max storico")
   "ptf-table": ["name", "qty", "pmc", "change_pct", "change_pct", "prepost_chg", "volume",
                 "gain", "gain_pct", "pe", "eps", "beta", "support",
-                "resistance", "rsi", "vol_ratio", "health", "upside_pct", "upside_pct", "fin_health", null],
+                "resistance", "rsi", "vol_ratio", "health", "upside_pct", "upside_pct", "fin_health",
+                "stat:short_float", "w52_dist_pct", null],
   "wl-table": ["name", "change_pct", "change_pct", "prepost_chg", "volume", "pe", "eps",
                "beta", "support", "resistance", "rsi", "vol_ratio",
-               "health", "upside_pct", "upside_pct", "fin_health", null],
+               "health", "upside_pct", "upside_pct", "fin_health",
+               "stat:short_float", "w52_dist_pct", null],
   // tabelle fondamentali (vista Value); i campi "stat:" leggono da r.stats
   "ptf-fund-table": ["name", "qty", "pmc", "price", "stat:market_cap", "stat:ev_ebitda",
                      "stat:roe", "stat:gross_margin", "stat:profit_margin", "pfcf",
@@ -721,6 +723,67 @@ function renderKPI() {
       <div class="value ${k.valueCls || ""}">${k.value}</div>
       <div class="sub ${k.subCls || ""}">${k.sub || ""}</div>
     </div>`).join("");
+
+  // MilioneTracker — obiettivo €1.000.000 in 10 anni
+  const GOAL = 1_000_000;
+  const completionPct = Math.min(100, patrimonio / GOAL * 100);
+  const cagrNeeded = patrimonio > 0 && patrimonio < GOAL
+    ? (Math.pow(GOAL / patrimonio, 1 / 10) - 1) * 100 : 0;
+  const distanza = GOAL - patrimonio;
+  const cagrCol = cagrNeeded <= 10 ? "var(--green)" : cagrNeeded <= 15 ? "var(--yellow)" : "var(--red)";
+  const gradPct = Math.round(completionPct);
+  const mt = document.getElementById("milione-tracker");
+  if (mt) {
+    mt.innerHTML = `
+      <div class="mt-header">
+        <span class="mt-title">MilioneTracker</span>
+        <span class="mt-goal">Obiettivo: 1.000.000 € / 10 anni</span>
+      </div>
+      <div class="mt-row">
+        <span class="mt-stat"><span class="mt-val">${completionPct.toFixed(1)}%</span><span class="mt-lab">completato</span></span>
+        <span class="mt-stat"><span class="mt-val" style="color:${cagrCol}">${cagrNeeded.toFixed(1)}%</span><span class="mt-lab">CAGR necessario</span></span>
+        <span class="mt-stat"><span class="mt-val muted">${fmtEUR.format(Math.round(distanza))}</span><span class="mt-lab">distanza</span></span>
+      </div>
+      <div class="mt-bar-track" title="${completionPct.toFixed(1)}% verso €1M">
+        <div class="mt-bar-fill" style="width:${gradPct}%"></div>
+        <span class="mt-bar-label">${gradPct}%</span>
+      </div>`;
+  }
+}
+
+function openBetaSimulator() {
+  const GOAL = 1_000_000;
+  const t = DATA.totals;
+  const patrimonio = t.eur_invested + cashEur;
+  const eurusd = DATA.eurusd || 1.08;
+  const holdings = (DATA.portfolio || []).filter(r => r.beta != null && (r.val_eur || r.value));
+  if (!holdings.length) { toast("Beta non disponibile per il portafoglio"); return; }
+  const totalVal = holdings.reduce((s, r) => s + (r.val_eur || (r.value || 0) / eurusd), 0) || 1;
+  const wAvgBeta = holdings.reduce((s, r) => s + r.beta * (r.val_eur || (r.value || 0) / eurusd), 0) / totalVal;
+  const scenarios = [-10, -15, -20, -30, -40];
+  const rows = scenarios.map(ndxChg => {
+    const ptfChg = ndxChg * wAvgBeta;
+    const ptfAfter = patrimonio * (1 + ptfChg / 100);
+    const dist = ptfAfter - GOAL;
+    const distPct = (ptfAfter / GOAL - 1) * 100;
+    const col = ptfAfter >= GOAL * 0.9 ? "var(--green)" : ptfAfter >= GOAL * 0.7 ? "var(--yellow)" : "var(--red)";
+    return `<tr>
+      <td class="num neg">Nasdaq ${ndxChg}%</td>
+      <td class="num neg">${signTxt(Math.round(ptfChg * 10) / 10)}</td>
+      <td class="num" style="color:${col}">${fmtEUR.format(Math.round(ptfAfter))}</td>
+      <td class="num ${signCls(dist)}">${signTxt(Math.round(dist), " €")}</td>
+      <td class="num ${signCls(distPct)}">${signTxt(Math.round(distPct * 10) / 10)}</td>
+    </tr>`;
+  }).join("");
+  const tkBetas = holdings.slice().sort((a, b) => b.beta - a.beta).map(r =>
+    `<span>${r.ticker} <b style="color:${scoreColor(clamp(100-(r.beta-0.5)*55))}">${fmtNum.format(r.beta)}</b></span>`).join(" · ");
+  openInfoModal("Beta — Simulatore Drawdown Portafoglio", `
+    <div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Simulazione dell'impatto sul portafoglio al variare del Nasdaq. Il drawdown stimato = variazione Nasdaq × Beta ponderato del portafoglio. L'obiettivo finale è <b style="color:var(--green)">€1.000.000</b>.</div>
+    <div class="info-line"><b>Beta ponderato portafoglio:</b> <b style="font-family:var(--mono)">${fmtNum.format(Math.round(wAvgBeta * 100) / 100)}</b></div>
+    <div class="info-line"><b>Patrimonio attuale:</b> ${fmtEUR.format(Math.round(patrimonio))}</div>
+    <div class="info-line muted" style="font-size:11px;margin-bottom:10px">Beta per titolo: ${tkBetas}</div>
+    <table class="info-table"><thead><tr><th>Scenario Nasdaq</th><th>Drawdown stim.</th><th>Patrimonio risultante</th><th>Distanza da €1M</th><th>Δ obiettivo %</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="info-line muted" style="font-size:11px;margin-top:8px">Formula: Drawdown portafoglio = Δ% Nasdaq × Beta ponderato. Non considera ribilanciamento, stop loss o coperture. Il patrimonio include liquidità (${fmtEUR.format(cashEur)}).</div>`);
 }
 
 /* variazione % giornaliera del portafoglio = media pesata (per controvalore) dei titoli USD */
@@ -1024,9 +1087,13 @@ function epsBar(eps) {
   return meterBar(Math.min(Math.abs(eps), 15) / 15 * 100, scoreColor(clamp(50 + eps * 6)), fmtNum.format(eps));
 }
 
-function betaBar(beta) {
-  if (beta === null || beta === undefined) return "—";   // beta basso = verde (meno rischio)
-  return meterBar(Math.min(beta, 3) / 3 * 100, scoreColor(clamp(100 - (beta - 0.5) * 55)), fmtNum.format(beta));
+function betaBar(r) {
+  const beta = typeof r === "object" ? r.beta : r;
+  const tk = typeof r === "object" ? r.ticker : null;
+  if (beta === null || beta === undefined) return "—";
+  const bar = meterBar(Math.min(beta, 3) / 3 * 100, scoreColor(clamp(100 - (beta - 0.5) * 55)), fmtNum.format(beta));
+  if (!tk) return bar;
+  return `<button class="beta-btn" data-beta-tk="${tk}" title="Clicca per simulare il drawdown del portafoglio">${bar}</button>`;
 }
 
 function athBar(r) {
@@ -1060,6 +1127,28 @@ function rsBar(rs, bench) {
   return `<span class="${rs > 0 ? "pos" : rs < 0 ? "neg" : ""}" style="font-family:var(--mono);font-size:12px;color:${color}">${rs > 0 ? "+" : ""}${fmtNum.format(rs)}%</span>${blHtml}`;
 }
 
+function shortFloatCell(r) {
+  const sf = (r.stats || {}).short_float;
+  if (sf == null) return `<td class="num muted">—</td>`;
+  const pct = Math.round(sf * 1000) / 10;
+  const squeeze = pct > 12;
+  return `<td class="num">${pct}%${squeeze ? `<br><span class="badge badge-squeeze" title="Short Squeeze Risk: short float > 12%">[Squeeze Risk]</span>` : ""}</td>`;
+}
+
+function drawdownCell(r) {
+  const d = r.w52_dist_pct;
+  if (d == null) return `<td class="num muted">—</td>`;
+  if (d <= -25) {
+    const msg = "Zona DEEP VALUE — considera deploy liquidità 50%+";
+    return `<td class="num" title="${msg}"><span class="neg">${signTxt(d)}</span><br><span class="badge badge-deep-value">[DEEP VALUE]</span></td>`;
+  }
+  if (d <= -15) {
+    const msg = "Zona CORREZIONE — considera deploy liquidità 25-30%";
+    return `<td class="num" title="${msg}"><span class="neg">${signTxt(d)}</span><br><span class="badge badge-correction">[CORRECTION: Z1]</span></td>`;
+  }
+  return `<td class="num"><span class="${d < 0 ? "neg" : "pos"}">${signTxt(d)}</span></td>`;
+}
+
 function techCells(r) {
   const c = cur(r);
   // supporto/resistenza cambiano con il range selezionato (1S/1M/3M/1A)
@@ -1069,7 +1158,7 @@ function techCells(r) {
   return `
       <td class="num">${peBar(r.pe)}</td>
       <td class="num">${epsBar(r.eps)}</td>
-      <td class="num">${betaBar(r.beta)}</td>
+      <td class="num">${betaBar(r)}</td>
       <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
       <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
       <td class="num">${rsiBar(r.rsi)}</td>
@@ -1079,6 +1168,8 @@ function techCells(r) {
       <td>${ratingBadge(r.rating)}</td>
       <td class="num">${targetBar(r.rating)}</td>
       <td class="num">${finHealthBar(r)}</td>
+      ${shortFloatCell(r)}
+      ${drawdownCell(r)}
       ${optImpactCell(r.ticker)}
       <td class="spark-cell" data-tk="${r.ticker}" title="Clicca per ingrandire">${sparkline((r.sparks || {})[sparkRange])}</td>`;
 }
@@ -2285,20 +2376,49 @@ function setWlView(v) {
 }
 
 /* ---------------- trimestrali ---------------- */
+function impliedMoveForEarnings(r) {
+  const chain = optChain(r.ticker);
+  if (!chain || !chain.expiries?.length || !r.earnings_date || !r.price) return null;
+  const eDate = r.earnings_date;
+  // trova la prima scadenza uguale o successiva alla data trimestrale
+  const exp = chain.expiries.find(e => e.date >= eDate) || chain.expiries[0];
+  if (!exp) return null;
+  const spot = r.price;
+  // trova call e put ATM (strike più vicino al prezzo corrente)
+  const bestCall = (exp.calls || []).reduce((best, o) => {
+    if (!o.price || o.price <= 0) return best;
+    return !best || Math.abs(o.strike - spot) < Math.abs(best.strike - spot) ? o : best;
+  }, null);
+  const bestPut = (exp.puts || []).reduce((best, o) => {
+    if (!o.price || o.price <= 0) return best;
+    return !best || Math.abs(o.strike - spot) < Math.abs(best.strike - spot) ? o : best;
+  }, null);
+  if (!bestCall || !bestPut || spot <= 0) return null;
+  return Math.round(((bestCall.price + bestPut.price) / spot) * 1000) / 10;
+}
+
 function renderEarnings() {
-  const items = DATA.portfolio
+  const all = [...DATA.portfolio, ...(DATA.watchlist || [])];
+  const items = all
     .filter(r => r.earnings_date)
     .map(r => ({ ...r, days: Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) }))
+    .filter(r => r.days >= -1)
     .sort((a, b) => a.days - b.days);
+  const ptfTickers = new Set(DATA.portfolio.map(x => x.ticker));
   $("#earnings-strip").innerHTML = items.length ? items.map(r => {
     const d = new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
     const when = r.days <= 0 ? "oggi" : r.days === 1 ? "domani" : `tra ${r.days} gg`;
-    // termometro: più vicina = barra più piena e più "calda"
     const pct = Math.max(6, Math.min(100, 100 - r.days * 1.1));
     const color = r.days <= 7 ? "var(--red)" : r.days <= 21 ? "var(--yellow)" : "var(--green)";
+    const im = impliedMoveForEarnings(r);
+    const imHtml = im != null
+      ? `<div class="earn-im" style="color:${im >= 10 ? "var(--yellow)" : "var(--muted)"}" title="Implied Move (straddle ATM)">[+/- ${im}%]</div>`
+      : "";
+    const wlMark = !ptfTickers.has(r.ticker) ? `<span class="earn-wl" title="Watchlist">WL</span>` : "";
     return `<div class="earn-card" data-earn="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per dettagli">
-      <div class="earn-top"><span class="earn-tk">${r.ticker}</span><span class="earn-date">${d}</span></div>
+      <div class="earn-top"><span class="earn-tk">${r.ticker}${wlMark}</span><span class="earn-date">${d}</span></div>
       <div class="earn-when" style="color:${color}">${when}</div>
+      ${imHtml}
       <div class="impact"><span class="impact-fill" style="width:${pct}%;background:${color}"></span></div>
     </div>`;
   }).join("") : "";
@@ -2741,7 +2861,18 @@ function buildPrompt() {
   const t = DATA.totals;
   const m = DATA.macro || {};
   const lines = [];
-  lines.push("Sei il MIO TEAM DEDICATO di 5 Senior Analyst di Wall Street, specializzati nella gestione di fondi growth da $10B+ con focus su tech, semiconduttori e rotazione settoriale. Ogni analista risponde al proprio ruolo con rigore istituzionale e linguaggio diretto e quantitativo — nessun disclaimer, nessuna vaghezza:\n• ALEX (Macro-Strategist, ex-Goldman Sachs Global Investment Research): cicli economici, curva dei tassi, carry trade, rischio sistemico, rotazione settoriale globale, flight-to-safety.\n• SARA (Equity Analyst, ex-Morgan Stanley TMT Coverage): valutazione fondamentale (DCF, multipli settoriali), qualità degli utili, FCF yield, ROIC, catalizzatori trimestrali.\n• MARCO (Risk Manager, ex-JPMorgan Risk Advisory): concentrazione, correlazione, drawdown, scenario analysis, fiscalità italiana (26% su azioni, 12.5% BTP, compensazione minus↔plus entro 4 anni).\n• JAMES (Options Specialist, ex-Goldman Derivatives Desk): gamma, vega, muri di opzioni (CW/PW), pinning, strategie di copertura e posizioni direzionali con derivati.\n• LEI (Technical Trader, ex-Citadel Equity Strategies): Smart Money Concepts (SMC), order flow, BOS/FVG, supporti e resistenze chiave, RSI e anomalie di volume.\nUsate TUTTI i dati forniti sotto — prezzi, fondamentali, macro, news, opzioni, SMC — e producete analisi SPECIFICHE e QUANTITATIVE. Ogni raccomandazione deve contenere prezzo preciso, quantità precisa e motivazione sintetica (1 riga). L'obiettivo comune è proteggere il capitale, massimizzare il risk-adjusted return e battere il Nasdaq 100 come benchmark.");
+  const GOAL = 1_000_000;
+  const patrimonio = t.eur_invested + cashEur;
+  const cagrNeeded = patrimonio > 0 && patrimonio < GOAL
+    ? ((Math.pow(GOAL / patrimonio, 1 / 10) - 1) * 100).toFixed(1) : "0.0";
+  const distPct = ((patrimonio / GOAL - 1) * 100).toFixed(1);
+  const distEur = Math.round(GOAL - patrimonio);
+  lines.push(`*** DISTANZA DALL'OBIETTIVO: patrimonio attuale ${fmtEUR.format(Math.round(patrimonio))} / obiettivo €1.000.000 — completamento ${(patrimonio/GOAL*100).toFixed(1)}% — CAGR necessario: ${cagrNeeded}% annuo per 10 anni — mancano ${fmtEUR.format(distEur > 0 ? distEur : 0)} ***`);
+  lines.push("");
+  lines.push("MANDATO OBIETTIVO — LEGGILO PRIMA DI TUTTO IL RESTO:");
+  lines.push(`Cliente: uomo 40 anni. Obiettivo: €1.000.000 netti in 10 anni (CAGR target ~12-15% annuo, necessario oggi: ${cagrNeeded}%). Profilo: DIAMOND HANDS — tollera drawdown del -20-30% senza vendere (orizzonte decade, non settimana). Piano di transizione: FASE 1 (attuale) = semiconduttori/hardware AI → FASE 2 (2026-2028) = Software AI / Cloud / Cybersecurity / Biotech AI — iniziare rotazione anticipata. Regola VC Sniper: vendere SOLO su deterioramento fondamentale reale (guidance tagliata, perdita quota mercato, P/E>150 senza giustificazione di crescita) — NON vendere su volatilità di mercato normale. La liquidità disponibile (${fmtEUR.format(cashEur)}) è "polvere secca" da deployare in zone di correzione identificate dai dati di drawdown. Ogni raccomandazione deve essere COERENTE con questo mandato: non suggerire uscite per paura, non suggerire diversificazione difensiva eccessiva che riduce il CAGR sotto il ${cagrNeeded}% necessario.`);
+  lines.push("");
+  lines.push("Sei il MIO TEAM DEDICATO di 5 Senior Analyst di Wall Street, specializzati nella gestione di fondi growth da $10B+ con focus su tech, semiconduttori e rotazione settoriale. Ogni analista risponde al proprio ruolo con rigore istituzionale e linguaggio diretto e quantitativo — nessun disclaimer, nessuna vaghezza:\n• ALEX (Macro-Strategist, ex-Goldman Sachs Global Investment Research): cicli economici, curva dei tassi, carry trade, rischio sistemico, rotazione settoriale globale, flight-to-safety.\n• SARA (Equity Analyst, ex-Morgan Stanley TMT Coverage): valutazione fondamentale (DCF, multipli settoriali), qualità degli utili, FCF yield, ROIC, catalizzatori trimestrali.\n• MARCO (Risk Manager, ex-JPMorgan Risk Advisory): concentrazione, correlazione, drawdown, scenario analysis, fiscalità italiana (26% su azioni, 12.5% BTP, compensazione minus↔plus entro 4 anni).\n• JAMES (Options Specialist, ex-Goldman Derivatives Desk): gamma, vega, muri di opzioni (CW/PW), pinning, strategie di copertura e posizioni direzionali con derivati.\n• LEI (Technical Trader, ex-Citadel Equity Strategies): Smart Money Concepts (SMC), order flow, BOS/FVG, supporti e resistenze chiave, RSI e anomalie di volume.\nUsate TUTTI i dati forniti sotto — prezzi, fondamentali, macro, news, opzioni, SMC — e producete analisi SPECIFICHE e QUANTITATIVE. Ogni raccomandazione deve contenere prezzo preciso, quantità precisa e motivazione sintetica (1 riga). L'obiettivo è raggiungere €1.000.000 in 10 anni con CAGR ≥ ${cagrNeeded}%, proteggendo il capitale nelle correzioni e sfruttandole come opportunità di accumulo (Diamond Hands + VC Sniper).");
   lines.push("");
   lines.push("PASSO 1 — RICERCA WEB OBBLIGATORIA (esegui PRIMA di produrre il report): (a) verifica i prezzi di oggi e le variazioni intraday dei titoli in portafoglio; (b) leggi le ultime 24-48h di notizie su ogni titolo, settore e quadro macro-politico (earnings, guidance, upgrade/downgrade, regolazione, M&A, Fed/BoJ); (c) controlla il calendario eventi imminenti (trimestrali, dati macro USA/EU, riunioni FOMC/BoJ, scadenze opzioni mensili); (d) individua 3-5 titoli/ETF NON in portafoglio con setup interessante (momentum, value, event-driven), incluse 1-2 idee speculative ad alto potenziale. Se i dati web contraddicono quelli forniti sotto, privilegia i dati web e segnalalo esplicitamente.");
   lines.push("");
@@ -2758,7 +2889,7 @@ function buildPrompt() {
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
-  lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(t.eur_value)}${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
+  lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(Math.round(patrimonio))} (${(patrimonio/GOAL*100).toFixed(1)}% del target €1M, CAGR necessario ${cagrNeeded}%)${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
   lines.push("");
   lines.push("PORTAFOGLIO (controvalore e P&L reali per posizione; PMC = mie operazioni passate):");
   const f = (v, d = 2) => v === null || v === undefined ? "—" : fmtNum.format(v);
@@ -2987,11 +3118,11 @@ function buildPrompt() {
   }
   lines.push("");
   lines.push("DIRETTIVE SPECIFICHE FINALI (ogni analista risponde alla propria lettera):");
-  lines.push("A) [ALEX — Macro] Dai una call netta sul regime di mercato (bull/bear/range) con orizzonte 8 settimane e identifica i 3 rischi sistemici più urgenti per un portafoglio tech-heavy italiano. Incrocia carry USD/JPY, curva tassi, credito HY e sentiment istituzionale per dare una view coerente.");
-  lines.push("B) [SARA — Equity] Identifica il titolo in portafoglio più sopravvalutato (e perché venderlo ora) e il più sottovalutato (e perché incrementarlo). Per entrambi: fair value stimato, upside/downside % e catalizzatore principale nelle prossime 8 settimane.");
-  lines.push("C) [MARCO — Risk] Calcola la concentrazione settoriale attuale del portafoglio e proponi un piano di de-risking tech/semi in 2-3 mosse concrete, con numero preciso di azioni da vendere, prezzo limite, stima della plus/minusvalenza e calcolo netto post-tasse (26% azioni, compensazione con minus disponibili).");
-  lines.push("D) [JAMES — Options] Sulla base dei muri di opzioni forniti, indica il livello di pinning più probabile per ciascun titolo con dati opzioni nella prossima scadenza mensile. Proponi una strategia collar a basso costo sull'indice Nasdaq (QQQ o NDX) per proteggere il portafoglio da un drawdown del 15%.");
-  lines.push("E) [LEI — Technical] Fornisci i 2 titoli con il setup tecnico più interessante per un ingresso long nelle prossime 2 settimane (con entry preciso, stop e target) e i 2 titoli con segnale di debolezza tecnica imminente (con livello di stop da rispettare).");
+  lines.push(`A) [ALEX — Macro] Dai una call netta sul regime di mercato (bull/bear/range) con orizzonte 8 settimane. Rispondi ESPLICITAMENTE: il CAGR necessario di ${cagrNeeded}% è realistico nel regime attuale? Identifica i 3 rischi sistemici più urgenti per il mandato Diamond Hands (€1M / 10 anni). Incrocia carry USD/JPY, curva tassi, credito HY e sentiment istituzionale.`);
+  lines.push("B) [SARA — Equity] Valuta ogni titolo rispetto al mandato FASE 1→FASE 2: quali semiconduttori/hardware mantieni fino a deterioramento fondamentale (VC Sniper), quali Software AI / Cloud / Cybersecurity / Biotech AI inseriresti ora in watchlist per la rotazione FASE 2? Segnala se qualche titolo ha P/E > 150 senza crescita che giustifica il multiplo (unico trigger di uscita per la regola VC Sniper).");
+  lines.push(`C) [MARCO — Risk] Con Beta ponderato del portafoglio (calcolato dai dati), simula: (1) drawdown portafoglio se Nasdaq cede -20% e -30%, con patrimonio risultante e distanza da €1M; (2) identifica i titoli con drawdown attuale dal massimo 52 settimane > 15% (zone di accumulo per la "polvere secca" di ${fmtEUR.format(cashEur)}); (3) fiscalità: plus/minus latenti e compensazioni disponibili nel quadriennio.`);
+  lines.push("D) [JAMES — Options] Sulla base dei muri di opzioni e degli Implied Move trimestrali forniti: (1) indica i livelli di pinning per la prossima scadenza mensile; (2) per i titoli con earnings imminenti e Implied Move > 10%, valuta se il mercato prezza correttamente il rischio; (3) proponi collar a basso costo (QQQ/NDX) compatibile con il profilo Diamond Hands (copertura parziale, non totale).");
+  lines.push("E) [LEI — Technical] Identifica i 2 titoli in drawdown dal massimo 52 settimane con il setup tecnico più solido per accumulo (entry preciso, stop, target). Distingui tra: (a) correzione tecnica sana = opportunità Diamond Hands, (b) rottura struttura = warning fondamentale (da segnalare a SARA per regola VC Sniper).");
   return lines.join("\n");
 }
 
@@ -3161,7 +3292,9 @@ document.addEventListener("click", e => {
   const fr = e.target.closest(".fund-row");            // riga vista fondamentale → conto economico + statistiche
   if (fr) { openFinancialsModal(fr.dataset.fundTk); return; }
   const sc = e.target.closest(".stat-cell");           // click su una metrica → spiegazione
-  if (sc) { toast(sc.dataset.info); }
+  if (sc) { toast(sc.dataset.info); return; }
+  const bb = e.target.closest(".beta-btn");            // click su Beta → simulatore drawdown
+  if (bb) { openBetaSimulator(); return; }
 });
 // accessibilità: Invio/Spazio sulla riga fondamentale aprono il dettaglio
 document.addEventListener("keydown", e => {

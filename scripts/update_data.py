@@ -463,6 +463,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             "ev_ebitda": num("enterpriseToEbitda"),
             "peg": num("pegRatio", "trailingPegRatio"),
             "roa": num("returnOnAssets"),
+            "short_float": num("shortPercentOfFloat"),
         }
         stats = {k: (round(v, 4) if v is not None else None) for k, v in stats.items()}
 
@@ -490,6 +491,8 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "pe": round(float(pe), 1) if pe and pe > 0 else None,
         "ath": round(ath, 2),
         "ath_dist_pct": round((price / ath - 1) * 100, 1),
+        "w52_high": round(float(hist["High"].max()), 2),
+        "w52_dist_pct": round((price / float(hist["High"].max()) - 1) * 100, 1),
         "support": round(float(hist["Low"].tail(20).min()), 2),
         "resistance": round(float(hist["High"].tail(20).max()), 2),
         "rsi": rsi,
@@ -601,7 +604,7 @@ def fetch_btp():
         "price": round(price, 2), "change_pct": None,
         "value": round(value, 2), "gain": round(value - cost, 2),
         "gain_pct": round((value / cost - 1) * 100, 2),
-        "pe": None, "ath": None, "ath_dist_pct": None,
+        "pe": None, "ath": None, "ath_dist_pct": None, "w52_high": None, "w52_dist_pct": None,
         "support": None, "resistance": None, "rsi": None,
         "volume": None, "vol_ratio": None,
         "signal": "Cedola 4,10/4,50%", "signal_class": "info",
