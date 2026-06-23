@@ -187,7 +187,16 @@ async function refreshAll() {
     // NON blocca la UI: i prezzi sono già aggiornati; la rigenerazione completa
     // (yfinance + FRED, ~2-3 min) prosegue in background e aggiorna i dati quando pronta.
     toast("Prezzi aggiornati ✓ · rigenerazione completa in background (~2-3 min)");
-    waitForNewData(DATA?.updated_at).then(ok => { if (ok) toast("Dati completi rigenerati ✓"); });
+    waitForNewData(DATA?.updated_at).then(ok => {
+      if (ok) {
+        toast("Dati completi rigenerati ✓");
+        const b2 = $("#btn-refresh");
+        const origTxt = b2.textContent;
+        b2.textContent = "✓ Aggiornato";
+        b2.classList.add("btn-done");
+        setTimeout(() => { b2.textContent = origTxt; b2.classList.remove("btn-done"); }, 5000);
+      }
+    });
   } catch (e) {
     console.error(e);
     toast("Errore durante l'aggiornamento");
@@ -1610,9 +1619,9 @@ const MACRO_INFO = {
   thermometer: ["Termometro portafoglio", "Media della salute tecnica (RSI, trend, momentum) dei tuoi titoli.", "Aggiornato a ogni refresh", /(?!)/],
   credit: ["Rischio Credito (HY OAS)", "Spread dei bond High Yield rispetto ai Treasury USA: proxy del rischio sistemico, analogo al mercato CDS senza costi di abbonamento. Fonte: ICE BofA via FRED.", "Giornaliero (FRED)", /credit|credito|spread|hy|high.?yield|cds|default|obbligaz|bond/i],
   decouple: ["Disaccoppiamento Macro", "Divergenza tra mercato azionario (S&P 500) e economia reale (PIL reale USA GDPC1): misura quanta crescita futura è già prezzata nella borsa. Entrambe le serie normalizzate a 100 all'inizio del periodo.", "Mensile/trimestrale (FRED)", /disaccopp|decoupl|valuation|bolla|bubble|pil|gdp|utili|profit|crescita/i],
-  smart_money: ["Smart Money vs Retail", "Posizionamento istituzionale vs folla retail, confrontato col Fear & Greed per evidenziarne le divergenze.", "Aggiornato a ogni refresh", /smart.?money|istituzional|institution|hedge.?fund|posizionament|flow|flussi|put.?call|vix|smc|order.?block|liquidit|struttura/i],
+  smart_money: ["Istituzionali VS Retail", "Posizionamento istituzionale (SMC) vs folla retail (Fear & Greed) — divergenze estreme segnalano accumulo o distribuzione.", "Aggiornato a ogni refresh", /smart.?money|istituzional|institution|retail|hedge.?fund|posizionament|flow|flussi|put.?call|vix|smc|order.?block|liquidit|struttura/i],
   sp500_pe: ["P/E Ratio Storico S&P 500", "Rapporto Prezzo/Utili dell'S&P 500 su base mensile (FRED SP500PE). Mostra se il mercato è sopravvalutato rispetto alla media storica. P/E > 25 indica valutazioni tese; P/E > 35 livelli estremi. La percentile di rango storico indica quante volte negli ultimi 10 anni il mercato è stato più economico di adesso.", "Mensile (FRED SP500PE)", /p\/e|price.?earning|multiplo|valutaz|sopravvalut|cape|shiller/i],
-  corp_profit: ["S&P 500 vs Profitti Aziendali Reali", "Divergenza tra l'S&P 500 nominale e i profitti aziendali reali USA (FRED CP). Un gap ampio segnala Asset Inflation: la borsa cresce più degli utili reali, trainata da svalutazione monetaria (fiat debasement) e non da crescita economica. Storicamente gap >40 pp precede lateralizzazioni o correzioni.", "Trimestrale (FRED CP + SP500 mensile)", /profitti|profit|asset.?inflat|nominal|real.?earn|corp|aziend|deflat/i],
+  corp_profit: ["S&P 500 & Nasdaq 100 vs Profitti Reali", "Divergenza tra S&P 500 e Nasdaq 100 nominali e i profitti aziendali reali USA (FRED CP). Gap ampio = Asset Inflation da fiat debasement, non crescita utili reali. Storico: gap >40 pp precede correzioni o lateralizzazioni.", "Trimestrale (FRED CP + SP500/NDX mensile)", /profitti|profit|asset.?inflat|nominal|real.?earn|corp|aziend|deflat|nasdaq/i],
   fed_market: ["Fed Funds Rate vs S&P 500", "Andamento storico del tasso Fed Funds sovrapposto all'S&P 500 negli ultimi 5 anni. Mostra come i cicli di rialzo/taglio della politica monetaria influenzino il mercato azionario. Tassi alti comprimono i multipli; i tagli stimolano i rally.", "Mensile (FRED FEDFUNDS + SP500)", /fed.?fund|interest.?rate|tasso.?fed|fed.?rate|monetar|fomc.*trend|tassi.*mercato/i],
 };
 
@@ -1892,8 +1901,30 @@ function openMacroInfo(key) {
   } else if (key === "smart_money" && m.smart_money) {
     const sm = m.smart_money;
     const smCol = scoreColor(sm.score);
-    extra = `<div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">
+    const fgScore = m.fear_greed?.score;
+    const fgLabel = fgScore != null ? (FG_LABELS[m.fear_greed?.rating] || m.fear_greed?.rating || "") : "";
+    let divAlert = "";
+    if (fgScore != null && sm.score != null) {
+      if (fgScore > 75 && sm.score < 30)
+        divAlert = `<div class="sm-alert danger"><b>DIVERGENZA PERICOLOSA: Rischio Distribuzione Istituzionale</b><br>Retail in Long Estremo (Fear &amp; Greed ${fgScore}/100) mentre gli istituzionali mantengono posizione difensiva (${sm.score}/100). Setup storicamente associato a correzioni: gli "smart money" si distribuiscono sulla massa retail in euforia.</div>`;
+      else if (fgScore < 25 && sm.score > 70)
+        divAlert = `<div class="sm-alert bullish"><b>ACCUMULO ISTITUZIONALE: Setup Rialzista</b><br>Retail in Paura Estrema (Fear &amp; Greed ${fgScore}/100) mentre gli istituzionali accumulano aggressivamente (${sm.score}/100). Classico bottom con "blood in the streets" e accumulo smart money — storicamente setup rialzista.</div>`;
+    }
+    extra = `${divAlert}<div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">
         Indicatore basato sui <b>Smart Money Concepts (SMC)</b> calcolati dai prezzi (OHLC) di <b>S&amp;P 500 e Nasdaq 100</b>: struttura di mercato e rottura di struttura (<b>BOS</b>), <b>FVG</b> (Fair Value Gap), zone di <b>liquidità</b> (stop sopra i massimi / sotto i minimi) e <b>order block</b>. Verde = struttura rialzista/accumulazione istituzionale; rosso = distribuzione.
+      </div>
+      <h4 style="margin:8px 0 4px">Confronto visivo: Istituzionali vs Retail (Fear &amp; Greed)</h4>
+      <div class="dual-idx">
+        <div class="dual-idx-block">
+          ${compactSemiGauge(sm.score, ["Difensivo", "Aggressivo"])}
+          <div class="dual-idx-label">Istituzionali (SMC)</div>
+          <div class="dual-idx-val" style="color:${smCol}">${sm.score}/100 &middot; ${sm.label}</div>
+        </div>
+        ${fgScore != null ? `<div class="dual-idx-block">
+          ${compactSemiGauge(fgScore, ["Paura", "Avidità"])}
+          <div class="dual-idx-label">Retail (Fear &amp; Greed)</div>
+          <div class="dual-idx-val" style="color:${scoreColor(fgScore)}">${fgScore}/100${fgLabel ? ` &middot; ${fgLabel}` : ""}</div>
+        </div>` : ""}
       </div>
       <div class="info-line"><b>Posizionamento istituzionale:</b> <span style="color:${smCol}">${sm.score}/100 — ${sm.label}</span></div>
       ${thermoBar(sm.score, ["Difensivo", "Aggressivo"])}`;
@@ -1926,9 +1957,8 @@ function openMacroInfo(key) {
     }
     if (sm.divergence != null) {
       const dvCol = Math.abs(sm.divergence) > 15 ? "var(--yellow)" : "var(--green)";
-      const fg = m.fear_greed?.score;
-      extra += `<div class="info-line" style="margin-top:8px"><b>Divergenza con il retail:</b> <span style="color:${dvCol}">${sm.divergence > 0 ? "+" : ""}${sm.divergence} pt — ${sm.divergence_label}</span></div>
-        <div class="info-line muted" style="font-size:11px">Fear &amp; Greed (retail) ${fg ?? "—"} vs Smart Money ${sm.score}. Un gap ampio segnala possibile inversione: quando il retail è euforico ma gli istituzionali si coprono, storicamente precede correzioni.</div>`;
+      extra += `<div class="info-line" style="margin-top:8px"><b>Divergenza Istituzionali vs Retail:</b> <span style="color:${dvCol}">${sm.divergence > 0 ? "+" : ""}${sm.divergence} pt — ${sm.divergence_label}</span></div>
+        <div class="info-line muted" style="font-size:11px">Fear &amp; Greed (retail) ${fgScore ?? "—"}/100 vs Istituzionali ${sm.score}/100. Un gap ampio segnala possibile inversione: quando il retail è euforico ma gli istituzionali si coprono, storicamente precede correzioni.</div>`;
     }
     if ((sm.components || []).length) {
       extra += `<h4 style="margin:10px 0 4px">Componenti del segnale</h4>` + sm.components.map(c =>
@@ -1963,14 +1993,18 @@ function openMacroInfo(key) {
   } else if (key === "corp_profit" && m.corp_profit) {
     const cp = m.corp_profit;
     const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
-    extra = `<div class="info-line"><b>Gap S&amp;P vs Profitti Reali:</b> <span style="color:${gapCol}">+${cp.gap} pp — ${cp.label}</span></div>
+    const ndxGapCol = cp.ndx_gap != null ? (cp.ndx_gap > 40 ? "var(--red)" : cp.ndx_gap > 20 ? "var(--yellow)" : "var(--green)") : "var(--muted)";
+    extra = `<div class="info-line"><b>Gap S&amp;P 500 vs Profitti Reali:</b> <span style="color:${gapCol}">${cp.gap > 0 ? "+" : ""}${cp.gap} pp — ${cp.label}</span></div>
+      ${cp.ndx_gap != null ? `<div class="info-line"><b>Gap Nasdaq 100 vs Profitti Reali:</b> <span style="color:${ndxGapCol}">${cp.ndx_gap > 0 ? "+" : ""}${cp.ndx_gap} pp</span> <span class="muted" style="font-size:11px">(il Nasdaq tratta storicamente a premio su S&P)</span></div>` : ""}
       ${thermoBar(cp.score, ["Allineati", "Asset Inflation"])}
       <div class="info-line muted" style="font-size:11px;margin:6px 0">
-        Quando l'S&amp;P 500 nominale cresce molto più dei profitti aziendali reali, l'eccesso è spiegato da svalutazione monetaria (fiat debasement) e non da crescita degli utili.
+        Quando S&amp;P 500 e Nasdaq 100 nominali crescono molto più dei profitti aziendali reali, l'eccesso è spiegato da svalutazione monetaria (fiat debasement) e non da crescita degli utili.
         Storicamente gap &gt;40 pp precede correzioni prolungate o lateralizzazione. Vedi 2000, 2007, 2021.
       </div>
       <h4 style="margin:12px 0 4px">S&amp;P 500 nominale vs Profitti Aziendali Reali USA (base 100)</h4>
       ${miniDualChart(cp.sp500, cp.profits, { color1: "var(--blue)", color2: "var(--yellow)", label1: "S&P 500 nominale", label2: "Profitti reali (FRED CP)" })}
+      ${cp.ndx ? `<h4 style="margin:12px 0 4px">Nasdaq 100 nominale vs Profitti Aziendali Reali USA (base 100)</h4>
+      ${miniDualChart(cp.ndx, cp.profits, { color1: "var(--purple)", color2: "var(--yellow)", label1: "Nasdaq 100", label2: "Profitti reali (FRED CP)" })}` : ""}
       <div class="info-line muted" style="font-size:11px;margin-top:6px">
         <b>Scenario breve (0-6 mesi):</b> se gap cresce, la borsa sale per illusione nominale, non per utili reali — rischio di correzione tecnica.<br>
         <b>Scenario lungo (12-36 mesi):</b> riallineamento tramite stagnazione dei prezzi o calo degli utili nominali; trigger: inflazione in risalita, scadenze fiscali, rallentamento consumi.
@@ -2189,14 +2223,26 @@ function buildFundTable(list, tableSel, withQtyPmc) {
       return `<tr>${lead}<td colspan="${fundColspan}" class="muted">${r.ticker === "BTP-V28" ? "Titolo di Stato — cedola 4,10/4,50%" : "Dati fondamentali non disponibili"}</td></tr>`;
     }
     const pfcf = (st.market_cap && st.fcf) ? st.market_cap / st.fcf : null;
+    const peTtm = st.pe_ttm || r.pe;
+    const roePrem = st.roe != null && st.roe > 0.15;
+    const roeHtml = st.roe != null
+      ? (roePrem
+          ? `<span class="text-premium-green" title="ROIC/ROE > 15% — ritorno eccellente sul capitale investito">${fundBar(st.roe, pctOf, FSC.roe(st.roe))}</span>`
+          : fundBar(st.roe, pctOf, FSC.roe(st.roe)))
+      : "—";
+    const pfcfWarn = pfcf != null && pfcf > 0 && peTtm > 0 && pfcf > peTtm * 2
+      ? `<span class="fcf-warn" title="Warning: Controllare divergenza FCF/Utile — P/FCF ${fmtNum.format(Math.round(pfcf))}× >> P/E ${fmtNum.format(Math.round(peTtm))}×: il Free Cash Flow è significativamente inferiore al Net Income (possibili accrual contabili)"> !</span>` : "";
+    const pfcfHtml = pfcf == null ? "—" : pfcf < 0 ? `<span class="neg">neg.</span>` : `${fundBar(pfcf, fmtNum.format, FSC.pfcf(pfcf))}${pfcfWarn}`;
+    const revGrowthFlag = st.revenue_growth != null && st.revenue_growth < 0.05 && (st.ev_ebitda || 0) > 18
+      ? `<span style="color:var(--yellow);cursor:help;font-size:11px" title="Crescita ricavi bassa (<5%) con EV/EBITDA elevato: possibile crescita non organica da acquisizioni"> ?</span>` : "";
     return `<tr class="fund-row" data-fund-tk="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per conto economico e statistiche">${lead}
       <td class="num">${bigUsd(st.market_cap)}</td>
       <td class="num">${fundBar(st.ev_ebitda, fmtNum.format, FSC.ev(st.ev_ebitda))}</td>
-      <td class="num">${fundBar(st.roe, pctOf, FSC.roe(st.roe))}</td>
+      <td class="num">${roeHtml}</td>
       <td class="num">${fundBar(st.gross_margin, pctPlain, FSC.gross(st.gross_margin))}</td>
       <td class="num">${fundBar(st.profit_margin, pctPlain, FSC.net(st.profit_margin))}</td>
-      <td class="num">${pfcf == null ? "—" : pfcf < 0 ? `<span class="neg">neg.</span>` : fundBar(pfcf, fmtNum.format, FSC.pfcf(pfcf))}</td>
-      <td class="num">${fundBar(st.revenue_growth, pctOf, FSC.growth(st.revenue_growth))}</td>
+      <td class="num">${pfcfHtml}</td>
+      <td class="num">${fundBar(st.revenue_growth, pctOf, FSC.growth(st.revenue_growth))}${revGrowthFlag}</td>
       <td class="num">${st.dividend_yield ? fundBar(st.dividend_yield, pctPlain, FSC.div(st.dividend_yield)) : "—"}</td>
       <td class="num">${fundBar(st.price_to_book, fmtNum.format, FSC.pb(st.price_to_book))}</td>
       <td class="num">${fundBar(st.peg, fmtNum.format, FSC.peg(st.peg))}</td>
@@ -2415,8 +2461,8 @@ function renderGauges() {
   if (m.carry) {
     const cy = m.carry;
     const score = Math.max(0, Math.min(100, cy.spread / 5 * 100));
-    cards.push(thermoCard("carry", "Carry USA–Giappone", score, `${fmtNum.format(cy.spread)} pp`,
-      `US10A ${fmtNum.format(cy.us10)}% − JGB ${fmtNum.format(cy.jp10)}%<br>USD/JPY ${fmtNum.format(cy.usdjpy)} (${signTxt(cy.usdjpy_chg_1m)} 1m)`, ["Alto", "Basso"]));
+    cards.push(thermoCard("carry", "Carry USD/JPY — Rischio", score, `${fmtNum.format(cy.spread)} pp spread`,
+      `US10A ${fmtNum.format(cy.us10)}% − JGB ${fmtNum.format(cy.jp10)}%<br>USD/JPY ${fmtNum.format(cy.usdjpy)} (${signTxt(cy.usdjpy_chg_1m)} 1m)`, ["Rischio Basso", "Rischio Elevato"]));
   }
   if (m.putcall) {
     const pc = m.putcall;
@@ -2432,10 +2478,19 @@ function renderGauges() {
   }
   if (m.smart_money) {
     const sm = m.smart_money;
-    const divTxt = sm.divergence != null
-      ? `<br><b style="color:${Math.abs(sm.divergence) > 15 ? "var(--yellow)" : "var(--muted)"}">${sm.divergence_label}</b>`
-      : "";
-    cards.push(thermoCard("smart_money", "Smart Money vs Retail", sm.score,
+    const fgGauge = m.fear_greed?.score;
+    let divTxt = "";
+    if (fgGauge != null && sm.score != null) {
+      if (fgGauge > 75 && sm.score < 30)
+        divTxt = `<br><b style="color:var(--red)">DIVERGENZA PERICOLOSA</b>`;
+      else if (fgGauge < 25 && sm.score > 70)
+        divTxt = `<br><b style="color:var(--green)">ACCUMULO ISTITUZIONALE</b>`;
+      else if (sm.divergence != null && Math.abs(sm.divergence) > 15)
+        divTxt = `<br><b style="color:var(--yellow)">${sm.divergence_label}</b>`;
+    } else if (sm.divergence != null) {
+      divTxt = `<br><b style="color:${Math.abs(sm.divergence) > 15 ? "var(--yellow)" : "var(--muted)"}">${sm.divergence_label}</b>`;
+    }
+    cards.push(thermoCard("smart_money", "Istituzionali VS Retail", sm.score,
       `<b>${sm.label}</b>`,
       `flussi istituzionali (VIX term · HY/IG · P/C)${divTxt}`, ["Difensivo", "Aggressivo"]));
   }
@@ -2450,9 +2505,10 @@ function renderGauges() {
   if (m.corp_profit) {
     const cp = m.corp_profit;
     const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
-    cards.push(thermoCard("corp_profit", "S&P vs Profitti Reali", cp.score,
-      `<span style="color:${gapCol}">gap +${cp.gap} pp</span>`,
-      `<b style="color:${gapCol}">${cp.label}</b> · S&P nominale vs utili reali`, ["Allineati", "Asset Inflation"]));
+    const ndxGapStr = cp.ndx_gap != null ? ` · NDX ${cp.ndx_gap > 0 ? "+" : ""}${cp.ndx_gap} pp` : "";
+    cards.push(thermoCard("corp_profit", "S&P+NDX vs Profitti Reali", cp.score,
+      `<span style="color:${gapCol}">S&P ${cp.gap > 0 ? "+" : ""}${cp.gap} pp${ndxGapStr}</span>`,
+      `<b style="color:${gapCol}">${cp.label}</b>`, ["Allineati", "Asset Inflation"]));
   }
   $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
 }
@@ -2685,21 +2741,20 @@ function buildPrompt() {
   const t = DATA.totals;
   const m = DATA.macro || {};
   const lines = [];
-  lines.push("Sei il MIO TEAM PERSONALE di 5 Senior Analyst di Wall Street: un macro-strategist, un equity analyst, un risk manager, uno specialista opzioni/derivati e un trader tecnico. Lavori solo per me, con rigore istituzionale e linguaggio diretto e quantitativo. Il tuo compito è darmi OGNI GIORNO un quadro COMPLETO e PROSPETTICO del mio portafoglio e del mercato, e un percorso operativo chiaro che sfrutti al massimo le tue competenze.");
+  lines.push("Sei il MIO TEAM DEDICATO di 5 Senior Analyst di Wall Street, specializzati nella gestione di fondi growth da $10B+ con focus su tech, semiconduttori e rotazione settoriale. Ogni analista risponde al proprio ruolo con rigore istituzionale e linguaggio diretto e quantitativo — nessun disclaimer, nessuna vaghezza:\n• ALEX (Macro-Strategist, ex-Goldman Sachs Global Investment Research): cicli economici, curva dei tassi, carry trade, rischio sistemico, rotazione settoriale globale, flight-to-safety.\n• SARA (Equity Analyst, ex-Morgan Stanley TMT Coverage): valutazione fondamentale (DCF, multipli settoriali), qualità degli utili, FCF yield, ROIC, catalizzatori trimestrali.\n• MARCO (Risk Manager, ex-JPMorgan Risk Advisory): concentrazione, correlazione, drawdown, scenario analysis, fiscalità italiana (26% su azioni, 12.5% BTP, compensazione minus↔plus entro 4 anni).\n• JAMES (Options Specialist, ex-Goldman Derivatives Desk): gamma, vega, muri di opzioni (CW/PW), pinning, strategie di copertura e posizioni direzionali con derivati.\n• LEI (Technical Trader, ex-Citadel Equity Strategies): Smart Money Concepts (SMC), order flow, BOS/FVG, supporti e resistenze chiave, RSI e anomalie di volume.\nUsate TUTTI i dati forniti sotto — prezzi, fondamentali, macro, news, opzioni, SMC — e producete analisi SPECIFICHE e QUANTITATIVE. Ogni raccomandazione deve contenere prezzo preciso, quantità precisa e motivazione sintetica (1 riga). L'obiettivo comune è proteggere il capitale, massimizzare il risk-adjusted return e battere il Nasdaq 100 come benchmark.");
   lines.push("");
-  lines.push("PASSO 1 — RICERCA WEB OBBLIGATORIA prima di analizzare: (a) verifica i prezzi di oggi dei titoli elencati; (b) leggi le ultimissime notizie/risultati su questi titoli, sui loro settori e sul quadro macro-politico; (c) controlla gli eventi imminenti (trimestrali, dati macro, riunioni Fed/BoJ, scadenze opzioni); (d) individua 3-5 titoli/ETF NON in portafoglio interessanti, incluse idee speculative ad alto potenziale.");
+  lines.push("PASSO 1 — RICERCA WEB OBBLIGATORIA (esegui PRIMA di produrre il report): (a) verifica i prezzi di oggi e le variazioni intraday dei titoli in portafoglio; (b) leggi le ultime 24-48h di notizie su ogni titolo, settore e quadro macro-politico (earnings, guidance, upgrade/downgrade, regolazione, M&A, Fed/BoJ); (c) controlla il calendario eventi imminenti (trimestrali, dati macro USA/EU, riunioni FOMC/BoJ, scadenze opzioni mensili); (d) individua 3-5 titoli/ETF NON in portafoglio con setup interessante (momentum, value, event-driven), incluse 1-2 idee speculative ad alto potenziale. Se i dati web contraddicono quelli forniti sotto, privilegia i dati web e segnalalo esplicitamente.");
   lines.push("");
   lines.push("CONTESTO PERSONALE da tenere SEMPRE presente: il mio patrimonio totale, la liquidità disponibile (la decido io), il capitale investito (costo), il guadagno lordo e netto tasse, e TUTTE le mie posizioni con PMC (prezzo medio di carico = le mie operazioni passate), controvalore e P&L per singolo titolo. Ragiona su concentrazione/rischio, fiscalità italiana (azioni 26%, BTP 12,5%, compensazione minus/plus entro 4 anni) e impiego ottimale della liquidità.");
   lines.push("");
   lines.push("PRODUCI UN REPORT STRUTTURATO, professionale e AZIONABILE (solo a scopo informativo), con queste sezioni numerate:");
-  lines.push("1) QUADRO MACRO & SENTIMENT (oggi + prospettiva): regime di mercato e rischi sistemici — curva dei rendimenti vs recessione, credito HY, Smart Money vs Retail, disaccoppiamento S&P/PIL, carry USD/JPY, valutazioni (P/E S&P e Nasdaq) — e cosa implicano per un portafoglio tech-heavy come il mio.");
-  lines.push("2) ANALISI TECNICA titolo per titolo: RSI (iper-comprato/venduto), supporti/resistenze, volumi, trend, forza relativa settoriale (RS vs benchmark) e muri di opzioni (Call/Put Wall).");
-  lines.push("3) ANALISI FONDAMENTALE: per ogni titolo valuta valutazione (P/E, P/FCF, EV/EBITDA, PEG, P/B), qualità (ROE, margini, crescita ricavi/utili) e se il prezzo attuale è giustificato; segnala titoli sopra/sottovalutati.");
-  lines.push("4) PIANO OPERATIVO CONCRETO: per ogni posizione indica MANTENERE / ALLEGGERIRE / INCREMENTARE / USCIRE, con QUANTE azioni e a CHE PREZZO (limite/target), stima plus/minusvalenza e impatto fiscale (compensazione minus↔plus). Indica livelli di stop e ordini condizionati.");
-  lines.push("5) ROTAZIONE & DE-RISKING: come ridurre la concentrazione tech/semiconduttori usando la liquidità; proponi 2-3 titoli value/difensivi e 2-3 ETF con prezzi d'ingresso, sfruttando la rotazione settoriale qui sotto.");
-  lines.push("6) OPPORTUNITÀ SPECULATIVE (alto rischio/rendimento): 2-3 idee tattiche (momentum, eventi/catalizzatori, anche opzioni) con tesi, catalizzatore, ingresso, target, stop e dimensionamento prudente rispetto al patrimonio.");
-  lines.push("7) ORIZZONTI separati — BREVE (settimane), MEDIO (mesi), LUNGO (anni) — con direzione, probabilità e tempistiche; chiudi con una WATCHLIST DI EVENTI da monitorare nei prossimi giorni e i 3 rischi principali per il mio portafoglio.");
-  lines.push("Sii specifico e quantitativo (numeri, prezzi, %). Niente disclaimer lunghi: vai al punto come per un cliente private. Se i dati web aggiornati contraddicono quelli sotto, dillo e usa i più recenti.");
+  lines.push("1) QUADRO MACRO & REGIME (ALEX): call chiara sul regime attuale (bull/bear/range) e fase del ciclo economico. Analizza tutti i dati forniti: curva 10A-2A vs recessione storica, spread credito HY (proxy CDS), carry USD/JPY (rischio unwind yen), disaccoppiamento S&P+NDX/PIL, Istituzionali VS Retail (se divergenza estrema evidenziala in grassetto), P/E S&P e NDX vs profitti aziendali reali. Conclusione obbligatoria: sovrappeso o sottopeso azionario USA tech nelle prossime 8 settimane?");
+  lines.push("2) ANALISI TECNICA (LEI): per OGNI titolo in portafoglio e watchlist — RSI con interpretazione (ipercomprato/ipervenduto/neutro), supporto chiave immediato (rottura = stop), resistenza chiave (obiettivo swing), volume anomalo sì/no, segnale SMC (struttura/BOS/FVG/bias), forza relativa 1M vs benchmark (SOX/NDX/S&P). Classifica finale: i 2 titoli col setup tecnico MIGLIORE e i 2 col setup PEGGIORE per le prossime 2-4 settimane.");
+  lines.push("3) ANALISI FONDAMENTALE (SARA): per OGNI titolo — giudizio BUY/HOLD/SELL motivato da: P/E vs media settoriale, P/FCF (segnala se P/FCF >> P/E = earnings quality bassa), EV/EBITDA, ROE/ROIC (>15% = premium), margini, crescita ricavi, PEG. Stima fair value e upside/downside % rispetto al prezzo attuale. Segnala: (a) titolo più sopravvalutato, (b) titolo più sottovalutato, (c) titolo con qualità utili migliore (ROIC>15% + FCF>=Net Income).");
+  lines.push("4) PIANO OPERATIVO CONCRETO (tutti): per ogni posizione indica MANTENERE / ALLEGGERIRE / INCREMENTARE / USCIRE con numero PRECISO di azioni e prezzo limite (non range). Per ogni vendita: plus/minus stimata, tasse italiane (26% azioni, 12.5% BTP), se compensabile con minus pregresse nel quadriennio fiscale. Stop loss tecnico e tipo di ordine (limite/stop/condizionato).");
+  lines.push("5) ROTAZIONE & DE-RISKING (MARCO): piano concreto per portare la concentrazione tech/semi sotto 60% del portafoglio. Proponi 2-3 titoli value/difensivi NON in portafoglio (con ticker, prezzo attuale, limite d'ingresso e tesi in 2 righe) e 2-3 ETF per diversificazione geografica o settoriale (con AUM, P/E e dividend yield).");
+  lines.push("6) STRATEGIE OPZIONI & COPERTURA (JAMES): basandoti su CW/PW forniti e put/call ratio — (a) identifica i livelli di pinning più probabili per le prossime 4 settimane su ogni titolo con dati opzioni, (b) proponi una strategia di copertura concreta e low-cost per proteggere il portafoglio da un calo del 15% (collar, protective put, put spread — con strike e scadenza), (c) 1-2 trade speculativi su opzioni con catalizzatore preciso, scadenza, strike, premio stimato e rapporto R/R.");
+  lines.push("7) OUTLOOK MULTI-ORIZZONTE + RISCHI: BREVE (0-4 settimane) · MEDIO (1-3 mesi) · LUNGO (6-18 mesi). Per ognuno: direzione, livello chiave da monitorare, probabilità stimata (%). Chiudi con: (a) calendario eventi da monitorare nei prossimi 30 giorni (earnings, FOMC, BoJ, dati macro chiave, scadenze opzioni mensili), (b) i 3 rischi principali per il portafoglio in ordine di probabilità × impatto.");
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
@@ -2726,6 +2781,24 @@ function buildPrompt() {
     DATA.watchlist.forEach(r => lines.push(mdRow(r)));
   }
   lines.push("");
+  // ANALISI FONDAMENTALE DETTAGLIATA per ticker
+  const fundItems = [...DATA.portfolio, ...(DATA.watchlist || [])].filter(r => r.stats?.market_cap);
+  if (fundItems.length) {
+    lines.push("ANALISI FONDAMENTALE DETTAGLIATA (usa per sezione 3 — valutazione e qualità utili):");
+    lines.push("| Titolo | P/E TTM | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Div% | Note |");
+    lines.push("|---|---|---|---|---|---|---|---|---|---|---|");
+    fundItems.forEach(r => {
+      const st = r.stats || {};
+      const pfcf = st.market_cap && st.fcf && st.fcf > 0 ? Math.round(st.market_cap / st.fcf * 10) / 10 : null;
+      const peTtm2 = st.pe_ttm || r.pe;
+      const fcfWarn = pfcf != null && peTtm2 > 0 && pfcf > peTtm2 * 2 ? " [!FCF]" : "";
+      const roeTag = st.roe != null && st.roe > 0.15 ? " [ROIC>15%]" : "";
+      const wlTag = DATA.portfolio.find(p => p.ticker === r.ticker) ? "" : " [WL]";
+      lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg ? fmtNum.format(Math.round(st.peg * 100) / 100) : "—"} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${roeTag.trim()} ${fcfWarn.trim()} |`);
+    });
+    lines.push("([ROIC>15%]=qualità eccellente del capitale; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [WL]=watchlist)");
+    lines.push("");
+  }
   // contesto economia USA (stile Macrotrends): P/E mercato, tassi Fed, inflazione, PIL, curva
   const usEco = [];
   if (m.sp500_pe) usEco.push(`P/E S&P 500 ${m.sp500_pe.current}× (media 10A ${m.sp500_pe.avg_10y}×)${m.sp500_pe.nasdaq_pe ? `, P/E Nasdaq 100 ${m.sp500_pe.nasdaq_pe}×` : ""}`);
@@ -2777,13 +2850,22 @@ function buildPrompt() {
   }
   if (m.smart_money) {
     const sm = m.smart_money;
-    let l = `- Smart Money vs Retail: ${sm.label} (${sm.score}/100, basato su SMC di S&P 500 e Nasdaq + VIX term + HY/IG + put/call)`;
+    let l = `- Istituzionali VS Retail: ${sm.label} (${sm.score}/100, basato su SMC di S&P 500 e Nasdaq + VIX term + HY/IG + put/call)`;
     const si = sm.smc_indices || {};
     const idxTxt = Object.values(si).map(s => `${s.label_idx}: struttura ${s.structure}, BOS ${s.bos || "n/d"}, FVG ${s.bull_fvg}↑/${s.bear_fvg}↓, bias ${s.bias}/100`).join(" · ");
     if (idxTxt) l += `. SMC indici → ${idxTxt}`;
     if (sm.vix_term_ratio != null) l += `. VIX/VIX3M ${fmtNum.format(sm.vix_term_ratio)} ${sm.vix_term_ratio > 1 ? "(backwardation=tensione)" : "(contango=calma)"}`;
     if (sm.hy_ig_ratio != null) l += `, HY/IG ${fmtNum.format(sm.hy_ig_ratio)}`;
-    if (sm.divergence != null) l += ` — divergenza col retail: ${sm.divergence_label}`;
+    const fgBp = m.fear_greed?.score;
+    if (fgBp != null) {
+      if (fgBp > 75 && sm.score < 30)
+        l += ` — *** ALERT DIVERGENZA PERICOLOSA: retail F&G ${fgBp}/100 (LONG ESTREMO) vs istituzionali ${sm.score}/100 (SHORT) — rischio distribuzione imminente, storicamente precede correzioni ***`;
+      else if (fgBp < 25 && sm.score > 70)
+        l += ` — *** ALERT ACCUMULO ISTITUZIONALE: retail F&G ${fgBp}/100 (PAURA ESTREMA) vs istituzionali ${sm.score}/100 (AGGRESSIVI) — possibile bottom, setup rialzista ***`;
+      else if (sm.divergence != null) l += ` — divergenza col retail: ${sm.divergence_label}`;
+    } else if (sm.divergence != null) {
+      l += ` — divergenza col retail: ${sm.divergence_label}`;
+    }
     lines.push(l);
     // SMC per titolo del portafoglio
     const ptfSmc = (DATA.portfolio || []).filter(r => r.smc);
@@ -2815,7 +2897,12 @@ function buildPrompt() {
     if (m.sp500_pe.nasdaq_pe) peLine += ` · Nasdaq 100 (QQQ) P/E: ${m.sp500_pe.nasdaq_pe}× (tech solitamente a premio; >35× = valutazioni tese)`;
     lines.push(peLine);
   }
-  if (m.corp_profit) lines.push(`- S&P vs Profitti Aziendali Reali (FRED CP): gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali)`);
+  if (m.corp_profit) {
+    let cpBp = `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp`;
+    if (m.corp_profit.ndx_gap != null) cpBp += `, NDX gap ${m.corp_profit.ndx_gap > 0 ? "+" : ""}${m.corp_profit.ndx_gap} pp`;
+    cpBp += ` — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali)`;
+    lines.push(cpBp);
+  }
   if (m.fed_market) lines.push(`- Fed Funds Rate attuale: ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}); tasso>4% storicamente comprime i multipli P/E in 12-18 mesi`);
   if (m.witching) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg)`);
   // salute del portafoglio (blend tecnica + macro + fondamentale)
@@ -2876,9 +2963,35 @@ function buildPrompt() {
     lines.push(`- ${s} [${n.tickers.join(",")}] ${n.title} (${n.source})`);
   });
   lines.push("");
-  lines.push("DIRETTIVE SPECIFICHE FINALI:");
-  lines.push("A) Analizza l'attuale andamento dei macro-settori. Avendo necessità di effettuare un de-risking sui semiconduttori, crea un piano di rotazione del mio portafoglio basato sulla mia liquidità disponibile. Indicami 2-3 ticker alternativi specifici (value o difensivi) per riequilibrare l'assetto, fornendo i relativi prezzi limite d'ingresso.");
-  lines.push("B) Valuta l'attuale livello di stress del mercato del credito analizzando gli spread forniti (High Yield/CDS) e incrociali con la curva dei tassi, per confermare o smentire la solidità dell'attuale trend azionario.");
+  // news per singolo ticker (incrocio)
+  const allTickers2 = [...DATA.portfolio.map(r => r.ticker), ...(DATA.watchlist || []).map(r => r.ticker)];
+  const tkNews = {};
+  (DATA.news || []).forEach(n => {
+    (n.tickers || []).forEach(tk => {
+      if (allTickers2.includes(tk)) {
+        if (!tkNews[tk]) tkNews[tk] = [];
+        if (tkNews[tk].length < 3) tkNews[tk].push(n);
+      }
+    });
+  });
+  const tkNewsKeys = Object.keys(tkNews);
+  if (tkNewsKeys.length) {
+    lines.push("");
+    lines.push("NEWS RILEVANTI PER SINGOLO TITOLO (usa per valutare catalizzatori e rischi specifici — sezioni 2 e 3):");
+    tkNewsKeys.forEach(tk => {
+      tkNews[tk].forEach(n => {
+        const s2 = n.sentiment === "bull" ? "[+]" : n.sentiment === "bear" ? "[-]" : "[~]";
+        lines.push(`  ${tk}: ${s2} ${n.title} (${n.source})`);
+      });
+    });
+  }
+  lines.push("");
+  lines.push("DIRETTIVE SPECIFICHE FINALI (ogni analista risponde alla propria lettera):");
+  lines.push("A) [ALEX — Macro] Dai una call netta sul regime di mercato (bull/bear/range) con orizzonte 8 settimane e identifica i 3 rischi sistemici più urgenti per un portafoglio tech-heavy italiano. Incrocia carry USD/JPY, curva tassi, credito HY e sentiment istituzionale per dare una view coerente.");
+  lines.push("B) [SARA — Equity] Identifica il titolo in portafoglio più sopravvalutato (e perché venderlo ora) e il più sottovalutato (e perché incrementarlo). Per entrambi: fair value stimato, upside/downside % e catalizzatore principale nelle prossime 8 settimane.");
+  lines.push("C) [MARCO — Risk] Calcola la concentrazione settoriale attuale del portafoglio e proponi un piano di de-risking tech/semi in 2-3 mosse concrete, con numero preciso di azioni da vendere, prezzo limite, stima della plus/minusvalenza e calcolo netto post-tasse (26% azioni, compensazione con minus disponibili).");
+  lines.push("D) [JAMES — Options] Sulla base dei muri di opzioni forniti, indica il livello di pinning più probabile per ciascun titolo con dati opzioni nella prossima scadenza mensile. Proponi una strategia collar a basso costo sull'indice Nasdaq (QQQ o NDX) per proteggere il portafoglio da un drawdown del 15%.");
+  lines.push("E) [LEI — Technical] Fornisci i 2 titoli con il setup tecnico più interessante per un ingresso long nelle prossime 2 settimane (con entry preciso, stop e target) e i 2 titoli con segnale di debolezza tecnica imminente (con livello di stop da rispettare).");
   return lines.join("\n");
 }
 

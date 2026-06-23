@@ -1126,7 +1126,7 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! decouple: {e}", file=sys.stderr)
 
-    # S&P 500 vs Profitti Aziendali Reali USA (Corporate Profits, FRED CP)
+    # S&P 500 + Nasdaq 100 vs Profitti Aziendali Reali USA (Corporate Profits, FRED CP)
     try:
         cp = fred_series("CP", 20)       # ~5 anni trimestrali
         sp_cp = fred_series("SP500", 60) # ~5 anni mensili
@@ -1135,14 +1135,31 @@ def fetch_macro():
             cur_sp = round(sp_cp[-1][1] / sp_base * 100, 1)
             cur_cp = round(cp[-1][1] / cp_base * 100, 1)
             gap = round(cur_sp - cur_cp, 1)
-            score = clamp(round(100 - max(0, gap - 10) / 60 * 100))
+            # Nasdaq 100 (^NDX) — mensile 5 anni via yfinance
+            ndx_hist = None
+            ndx_gap = None
+            try:
+                ndx_raw = yf.Ticker("^NDX").history(period="5y", interval="1mo",
+                                                     auto_adjust=True)["Close"].dropna()
+                if len(ndx_raw) > 10:
+                    ndx_base_v = float(ndx_raw.iloc[0])
+                    ndx_hist = [{"d": str(d.date()), "v": round(float(v) / ndx_base_v * 100, 1)}
+                                for d, v in ndx_raw.items()]
+                    ndx_gap = round(ndx_hist[-1]["v"] - cur_cp, 1)
+            except Exception:
+                pass
+            # score sulla media dei due gap (o solo S&P se NDX non disponibile)
+            avg_gap = round((gap + ndx_gap) / 2, 1) if ndx_gap is not None else gap
+            score = clamp(round(100 - max(0, avg_gap - 10) / 60 * 100))
             macro["corp_profit"] = {
                 "sp500":   [{"d": d, "v": round(v / sp_base * 100, 1)} for d, v in sp_cp],
                 "profits": [{"d": d, "v": round(v / cp_base * 100, 1)} for d, v in cp],
-                "gap": gap,
-                "score": score,
-                "label": "Asset Inflation estrema" if gap > 70 else "Asset Inflation" if gap > 40
-                         else "Tensione moderata" if gap > 20 else "Allineati",
+                "ndx":     ndx_hist,
+                "gap":     gap,
+                "ndx_gap": ndx_gap,
+                "score":   score,
+                "label":   "Asset Inflation estrema" if avg_gap > 70 else "Asset Inflation" if avg_gap > 40
+                           else "Tensione moderata" if avg_gap > 20 else "Allineati",
             }
     except Exception as e:
         print(f"!! corp_profit: {e}", file=sys.stderr)
