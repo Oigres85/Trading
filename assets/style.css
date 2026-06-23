@@ -179,17 +179,17 @@ tbody tr.total-row { background: var(--card-2); font-weight: 700; }
 .meter-fill { display: block; height: 100%; border-radius: 4px; }
 
 /* ---------- gauges (compatti) — griglia a colonne uguali: tutti i box stessa dimensione ---------- */
-.gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: 12px; }
+.gauges { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; align-items: start; }
 .gauge-card {
   background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
   padding: 12px 10px 10px; text-align: center;
-  display: flex; flex-direction: column; min-height: 192px;
+  display: flex; flex-direction: column; height: 200px; box-sizing: border-box; overflow: hidden;
 }
-.gauge-card .g-title { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; min-height: 28px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1px; }
-.semi-gauge-svg { width: 100%; max-width: 150px; display: block; margin: 0 auto 2px; }
-.gauge-ends { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); padding: 0 6px; margin-bottom: 4px; font-family: var(--mono); }
-.gauge-value { font-family: var(--mono); font-size: 17px; font-weight: 700; line-height: 1.2; }
-.gauge-sub { font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; flex: 1; }
+.gauge-card .g-title { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; min-height: 28px; max-height: 36px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1px; overflow: hidden; }
+.semi-gauge-svg { width: 100%; max-width: 140px; height: 75px; display: block; margin: 0 auto 2px; flex-shrink: 0; }
+.gauge-ends { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); padding: 0 4px; margin-bottom: 2px; font-family: var(--mono); }
+.gauge-value { font-family: var(--mono); font-size: 15px; font-weight: 700; line-height: 1.2; flex-shrink: 0; }
+.gauge-sub { font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.3; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
 
 /* ---------- macro (compatti) ---------- */
 .macro-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 9px; }
@@ -694,3 +694,30 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 
 /* ---------- Prompt 17: Beta button ---------- */
 .beta-btn { background: none; border: none; padding: 0; cursor: pointer; color: inherit; font: inherit; width: 100%; }
+
+/* ---------- v62: Tilt-box mini bar chart ---------- */
+.tilt-mini { margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+.tilt-mini-row { display: flex; align-items: center; gap: 6px; font-size: 10px; }
+.tilt-mini-lab { flex: 0 0 70px; color: var(--muted); font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tilt-mini-bar { flex: 1; height: 7px; background: var(--card-3); border-radius: 4px; overflow: hidden; }
+.tilt-mini-fill { height: 100%; border-radius: 4px; transition: width .5s; }
+.tilt-mini-val { flex: 0 0 34px; text-align: right; font-family: var(--mono); font-size: 9.5px; }
+
+/* ---------- v62: Refresh done modal ---------- */
+.refresh-done-backdrop { position: fixed; inset: 0; z-index: 3000; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 32px; pointer-events: none; }
+.refresh-done-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 26px; min-width: 280px; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,.45); pointer-events: auto; text-align: center; animation: slide-up .3s cubic-bezier(.4,0,.2,1); }
+@keyframes slide-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.refresh-done-icon { font-size: 28px; margin-bottom: 8px; color: var(--green); font-weight: 700; }
+.refresh-done-title { font-size: 14px; font-weight: 700; color: var(--fg); margin-bottom: 4px; }
+.refresh-done-sub { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.refresh-done-box button { background: var(--green); color: #000; border: none; border-radius: 8px; padding: 6px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+/* ---------- v62: Refresh button states ---------- */
+.btn-refreshing { background: var(--red) !important; color: #fff !important; border-color: var(--red) !important; }
+
+/* ---------- v62: MilioneTracker CAGR note ---------- */
+.mt-note { font-size: 9.5px; color: var(--muted); font-style: italic; margin-top: 3px; line-height: 1.4; }
+
+/* ---------- v62: Layout — remove bottom whitespace ---------- */
+.chart-wrapper { padding-bottom: 0 !important; }
+.section { padding-bottom: 12px; }

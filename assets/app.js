@@ -171,12 +171,30 @@ async function waitForNewData(prev, tries = 28) {
 
 /* Aggiorna: prezzi live all'istante + rigenerazione completa via workflow (col token,
    chiesto una sola volta). Senza token resta comunque utile (prezzi live + reload). */
+function showRefreshDoneModal() {
+  const ts = DATA?.updated_at ? new Date(DATA.updated_at).toLocaleString("it-IT") : "—";
+  const existing = document.getElementById("refresh-done-modal");
+  if (existing) existing.remove();
+  const el = document.createElement("div");
+  el.id = "refresh-done-modal";
+  el.className = "refresh-done-backdrop";
+  el.innerHTML = `<div class="refresh-done-box">
+    <div class="refresh-done-icon">✓</div>
+    <div class="refresh-done-title">Aggiornamento Completato</div>
+    <div class="refresh-done-sub">Tutti i dati sono stati rigenerati con successo.<br><span class="muted">Aggiornato alle ${ts}</span></div>
+    <button class="btn btn-primary" onclick="this.closest('#refresh-done-modal').remove()">OK</button>
+  </div>`;
+  el.addEventListener("click", e => { if (e.target === el) el.remove(); });
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 8000);
+}
+
 async function refreshAll() {
   const btn = $("#btn-refresh");
-  btn.classList.add("spinning");
+  btn.classList.add("btn-refreshing");
   btn.textContent = "⏳ Aggiorno…";
   try {
-    livePrices();              // prezzi correnti subito (non blocca)
+    livePrices();
     const token = getToken();
     if (!token) { await loadData(false); toast("Prezzi aggiornati ✓ (token assente: niente rigenerazione completa)"); return; }
     const res = await dispatchWorkflow(token);
@@ -186,24 +204,23 @@ async function refreshAll() {
       return;
     }
     if (res.status !== 204) { toast(`Errore avvio aggiornamento (HTTP ${res.status})`); return; }
-    // NON blocca la UI: i prezzi sono già aggiornati; la rigenerazione completa
-    // (yfinance + FRED, ~2-3 min) prosegue in background e aggiorna i dati quando pronta.
-    toast("Prezzi aggiornati ✓ · rigenerazione completa in background (~2-3 min)");
+    toast("Pipeline avviata · rigenerazione completa in background (~2-3 min)");
     waitForNewData(DATA?.updated_at).then(ok => {
       if (ok) {
-        toast("Dati completi rigenerati ✓");
         const b2 = $("#btn-refresh");
-        const origTxt = b2.textContent;
+        const origTxt = "⟳ Aggiorna";
         b2.textContent = "✓ Aggiornato";
+        b2.classList.remove("btn-refreshing");
         b2.classList.add("btn-done");
-        setTimeout(() => { b2.textContent = origTxt; b2.classList.remove("btn-done"); }, 5000);
+        setTimeout(() => { b2.textContent = origTxt; b2.classList.remove("btn-done"); }, 6000);
+        showRefreshDoneModal();
       }
     });
   } catch (e) {
     console.error(e);
     toast("Errore durante l'aggiornamento");
   } finally {
-    btn.classList.remove("spinning");
+    btn.classList.remove("btn-refreshing");
     btn.textContent = "⟳ Aggiorna";
   }
 }
@@ -502,19 +519,37 @@ function renderMiniCards() {
   // Rotazione settoriale (Tilt): settore leader (overweight) e fanalino
   const tilt = m.tilt, tBox = $("#tilt-box");
   if (tBox && tilt && tilt.length) {
-    const top = tilt[0], bot = tilt[tilt.length - 1];
-    tBox.innerHTML = `<div class="mc-title">Rotazione settoriale (Tilt)</div>
-      <div class="mc-value" style="margin-top:6px">Sovrappeso: <b style="color:var(--green)">${esc(top.name)}</b> ${signTxt(top.m1)}</div>
-      <div class="mc-sub muted">debole: <b style="color:var(--red)">${esc(bot.name)}</b> ${signTxt(bot.m1)} · clicca per il dettaglio</div>`;
+    const sorted = [...tilt].sort((a, b) => b.m1 - a.m1);
+    const maxAbs = Math.max(...sorted.map(s => Math.abs(s.m1)), 1);
+    const defensives = ["Utilities", "Consumi difens.", "Salute", "Oro"];
+    const defAvg = avg(tilt.filter(s => defensives.includes(s.name)).map(s => s.m1));
+    const tech = tilt.find(s => s.ticker === "XLK");
+    const regime = (defAvg != null && tech)
+      ? (defAvg > tech.m1 ? "Rotazione DIFENSIVA" : "Regime PRO-RISCHIO") : "";
+    const regimeCol = (defAvg != null && tech)
+      ? (defAvg > tech.m1 ? "var(--yellow)" : "var(--green)") : "var(--muted)";
+    const miniHist = sorted.slice(0, 6).map(s => {
+      const w = Math.round(Math.abs(s.m1) / maxAbs * 100);
+      const col = s.m1 >= 0 ? "var(--green)" : "var(--red)";
+      return `<div class="tilt-mini-row">
+        <span class="tilt-mini-lab">${s.name.split(" ")[0]}</span>
+        <span class="tilt-mini-bar"><span style="width:${w}%;background:${col}"></span></span>
+        <span class="tilt-mini-val" style="color:${col}">${s.m1 > 0 ? "+" : ""}${s.m1}%</span>
+      </div>`;
+    }).join("");
+    tBox.innerHTML = `<div class="mc-title">Rotazione settoriale USA</div>
+      ${regime ? `<div style="font-size:10.5px;font-weight:700;color:${regimeCol};margin:2px 0 4px">${regime}</div>` : ""}
+      <div class="tilt-mini">${miniHist}</div>`;
   }
   // Quadruple Witching (4 streghe): ora mostrata nel popup del box Put/Call (vedi openMacroInfo "putcall")
   // MacroQuant (stile BCA)
   const mq = m.macroquant, mqBox = $("#macroquant-box");
   if (mqBox && mq) {
-    mqBox.innerHTML = `<div class="mc-title">MacroQuant (stile BCA)</div>
-      ${compactSemiGauge(mq.score, ["Contrazione", "Espansione"])}
-      <div class="mc-value" style="color:${scoreColor(mq.score)}">${mq.score}% · ${mq.label}</div>
-      <div class="mc-sub muted">composito ciclo economico · clicca per il dettaglio</div>`;
+    const mqLab = mq.score >= 60 ? "Ciclo espansivo" : mq.score >= 40 ? "Ciclo neutro" : "Rischio recessione";
+    mqBox.innerHTML = `<div class="mc-title">MacroQuant (Ciclo)</div>
+      ${compactSemiGauge(mq.score, ["Recessione", "Crescita"])}
+      <div class="mc-value" style="color:${scoreColor(mq.score)}">${mq.score}% · ${mqLab}</div>
+      <div class="mc-sub muted">salute ciclo: PIL · lavoro · inflazione · credito</div>`;
   }
 }
 
@@ -582,16 +617,42 @@ function rotationDetailHtml() {
   return `<h4 style="margin:6px 0 4px">Performance 1 mese (ETF)</h4><div class="rot-hist">${hist}</div>`;
 }
 
+const MQ_LABELS = {
+  "gdp": "PIL reale (crescita economia)",
+  "claims": "Sussidi disoccupazione (mercato lavoro)",
+  "cpi": "Inflazione CPI (pressioni prezzi)",
+  "pce": "Inflazione PCE (consumi)",
+  "retail": "Vendite al dettaglio (consumi privati)",
+  "nfp": "Occupazione Non-Farm (creazione posti lavoro)",
+  "unemp": "Tasso di disoccupazione",
+  "credit": "Spread credito HY (rischio sistema bancario)",
+  "curve": "Curva tassi 10A-2A (segnale recessione)",
+  "vix": "VIX (volatilità = paura del mercato)",
+  "fedwatch": "Aspettative Fed (politica monetaria)",
+};
 function openMacroQuantModal() {
   const mq = (DATA.macro || {}).macroquant;
   if (!mq) return;
-  const rows = (mq.components || []).map(c =>
-    `<tr><td>${esc(c.label)}</td><td style="min-width:120px">${meterBar(c.score, scoreColor(c.score), String(c.score))}</td></tr>`).join("");
-  openInfoModal(`MacroQuant (stile BCA) — ${mq.score}% · ${mq.label}`,
-    `<p class="muted" style="margin:0 0 8px">${esc(mq.note || "")}</p>
-     <div class="info-line">Punteggio: <b style="color:${scoreColor(mq.score)}">${mq.score}/100</b> (alto = ciclo espansivo/risk-on, basso = rischio recessione).</div>
-     <h4 style="margin:10px 0 4px">Componenti</h4>
-     <table class="info-table"><tbody>${rows}</tbody></table>`);
+  const rows = (mq.components || []).map(c => {
+    const friendlyLab = MQ_LABELS[c.key] || MQ_LABELS[c.label?.toLowerCase()] || c.label;
+    const interp = c.score >= 70 ? "Positivo per l'economia" : c.score >= 45 ? "Neutro" : "Segnale di debolezza";
+    return `<tr>
+      <td>${esc(friendlyLab)}</td>
+      <td style="min-width:120px">${meterBar(c.score, scoreColor(c.score), String(c.score))}</td>
+      <td class="muted" style="font-size:11px">${interp}</td>
+    </tr>`;
+  }).join("");
+  const cycleDesc = mq.score >= 60
+    ? "Ciclo espansivo: PIL cresce, occupazione solida, condizioni di credito normali. Favorevole per asset rischiosi (azioni, tech)."
+    : mq.score >= 40
+    ? "Ciclo neutro: segnali misti. Attenzione a dati macro in uscita."
+    : "Rischio di recessione: PIL debole, occupazione in calo o credito sotto stress. Preferire difensivi e ridurre rischio.";
+  openInfoModal(`MacroQuant — Ciclo economico: ${mq.score}%`,
+    `<div class="info-line" style="margin-bottom:8px">${cycleDesc}</div>
+     <div class="info-line"><b>Punteggio composito:</b> <b style="color:${scoreColor(mq.score)}">${mq.score}/100</b> — <span class="muted">100 = ciclo perfetto di crescita, 0 = recessione in atto</span></div>
+     <h4 style="margin:10px 0 4px">Cosa compone il punteggio</h4>
+     <table class="info-table"><thead><tr><th>Indicatore</th><th>Score</th><th>Interpretazione</th></tr></thead><tbody>${rows}</tbody></table>
+     <div class="info-line muted" style="font-size:11px;margin-top:8px">Ispirato alla metodologia BCA Research. Verde = indicatore positivo per l'economia, rosso = segnale di debolezza. Aggiornato a ogni refresh dei dati.</div>`);
 }
 
 function openTiltModal() {
@@ -602,15 +663,29 @@ function openTiltModal() {
   const defensives = ["Utilities", "Consumi difens.", "Salute", "Oro"];
   const defAvg = avg(tilt.filter(s => defensives.includes(s.name)).map(s => s.m1));
   const tech = tilt.find(s => s.ticker === "XLK");
-  let regime = "—";
-  if (defAvg != null && tech) regime = defAvg > tech.m1 ? "DIFENSIVO — i difensivi battono il Tech (cautela / de-risking)" : "PRO-RISCHIO — ciclici e Tech guidano";
-  openInfoModal("Rotazione settoriale USA",
-    `<div style="margin-bottom:10px"><button class="btn btn-ghost btn-sm" data-action="rot-analyze">Analizza Rotazione</button></div>
-     <div class="info-line"><b>Regime:</b> ${regime}</div>
-     <div class="info-line"><b>Forti:</b> ${lead.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
-     <div class="info-line"><b>Deboli:</b> ${lag.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
+  const semi = tilt.find(s => s.ticker === "SMH" || s.ticker === "SOXX" || /semicond/i.test(s.name));
+  const weak = byM1.filter(s => s.m1 < -2).slice(-3).map(s => s.name);
+  let regimeHtml = "";
+  if (defAvg != null && tech) {
+    const isDef = defAvg > tech.m1;
+    const col = isDef ? "var(--yellow)" : "var(--green)";
+    const lab = isDef ? "ROTAZIONE DIFENSIVA" : "REGIME PRO-RISCHIO";
+    const desc = isDef
+      ? `I difensivi (${signTxt(Math.round(defAvg * 10) / 10)}) sovraperformano il Tech (${signTxt(tech.m1)}): gli investitori si spostano su settori protettivi — segnale di cautela o de-risking.`
+      : `Tech/ciclici (${signTxt(tech.m1)}) guidano sui difensivi (${signTxt(Math.round(defAvg * 10) / 10)}): il mercato premia la crescita — contesto favorevole per il portafoglio tech.`;
+    regimeHtml = `<div class="info-line" style="margin-bottom:8px"><b style="color:${col}">${lab}</b> — ${desc}</div>`;
+  }
+  const semiHtml = semi ? `<div class="info-line"><b>Semiconduttori:</b> <span class="${signCls(semi.m1)}">${signTxt(semi.m1)}</span> (1M) — ${semi.m1 < 0 ? "in calo: possibile finestra di accumulo sui rimbalzi (diamond hands)" : "in forza: valuta alleggerimenti sugli strappi per de-risking parziale"}</div>` : "";
+  const weakHtml = weak.length ? `<div class="info-line"><b>Settori in forte debolezza</b> (potenziale mean-reversion): <b>${weak.map(esc).join(", ")}</b></div>` : "";
+  openInfoModal("Rotazione settoriale USA — Analisi",
+    `<div class="info-line muted" style="font-size:11px;margin-bottom:8px">Performance 1 mese degli ETF settoriali USA (Yahoo Finance). Verde = momentum positivo, rosso = debolezza. Clicca sui settori per capire il posizionamento attuale del mercato.</div>
+     ${regimeHtml}
+     <div class="info-line"><b>Settori in forza:</b> ${lead.map(s => `<b style="color:var(--green)">${esc(s.name)}</b> ${signTxt(s.m1)}`).join(" · ")}</div>
+     <div class="info-line"><b>Settori in debolezza:</b> ${lag.map(s => `<b style="color:var(--red)">${esc(s.name)}</b> ${signTxt(s.m1)}`).join(" · ")}</div>
+     ${semiHtml}
+     ${weakHtml}
      ${rotationDetailHtml()}
-     <div class="info-line muted" style="margin-top:8px">Momentum 1M/3M degli ETF (Yahoo Finance). Verde = forza, rosso = debolezza.</div>`);
+     <div class="info-line muted" style="font-size:11px;margin-top:8px">Usa "Copia prompt AI" per il piano operativo dettagliato di rotazione/de-risking con indicazioni precise per ogni posizione.</div>`);
 }
 
 /* popup di orientamento rapido sulla rotazione (solo testo calcolato, NON il prompt AI) */
@@ -731,23 +806,29 @@ function renderKPI() {
     ? (Math.pow(GOAL / patrimonio, 1 / 10) - 1) * 100 : 0;
   const distanza = GOAL - patrimonio;
   const cagrCol = cagrNeeded <= 10 ? "var(--green)" : cagrNeeded <= 15 ? "var(--yellow)" : "var(--red)";
+  const cagrRisk = cagrNeeded <= 10 ? "raggiungibile (Nasdaq storico ~10-12%)" : cagrNeeded <= 15 ? "sfidante ma realistico con tech" : "richiede performance eccezionale";
+  const goalYear = new Date().getFullYear() + 10;
   const gradPct = Math.round(completionPct);
   const mt = document.getElementById("milione-tracker");
   if (mt) {
     mt.innerHTML = `
       <div class="mt-header">
         <span class="mt-title">MilioneTracker</span>
-        <span class="mt-goal">Obiettivo: 1.000.000 € / 10 anni</span>
+        <span class="mt-goal">Obiettivo: €1.000.000 entro ${goalYear}</span>
       </div>
       <div class="mt-row">
         <span class="mt-stat"><span class="mt-val">${completionPct.toFixed(1)}%</span><span class="mt-lab">completato</span></span>
-        <span class="mt-stat"><span class="mt-val" style="color:${cagrCol}">${cagrNeeded.toFixed(1)}%</span><span class="mt-lab">CAGR necessario</span></span>
-        <span class="mt-stat"><span class="mt-val muted">${fmtEUR.format(Math.round(distanza))}</span><span class="mt-lab">distanza</span></span>
+        <span class="mt-stat" title="Crescita Annua Composta necessaria per raggiungere €1M in 10 anni dal patrimonio attuale. ${cagrRisk}.">
+          <span class="mt-val" style="color:${cagrCol}">${cagrNeeded.toFixed(1)}%</span>
+          <span class="mt-lab">CAGR/anno <span style="cursor:help;opacity:.6" title="Tasso di Crescita Annuo Composto necessario: se il patrimonio cresce del ${cagrNeeded.toFixed(1)}% ogni anno per 10 anni, raggiungi €1M nel ${goalYear}. ${cagrRisk}.">(?)</span></span>
+        </span>
+        <span class="mt-stat"><span class="mt-val muted">${fmtEUR.format(Math.round(Math.max(0, distanza)))}</span><span class="mt-lab">mancano</span></span>
       </div>
-      <div class="mt-bar-track" title="${completionPct.toFixed(1)}% verso €1M">
+      <div class="mt-bar-track" title="${completionPct.toFixed(1)}% verso €1M · CAGR necessario: ${cagrNeeded.toFixed(1)}% · ${cagrRisk}">
         <div class="mt-bar-fill" style="width:${gradPct}%"></div>
         <span class="mt-bar-label">${gradPct}%</span>
-      </div>`;
+      </div>
+      <div class="mt-note muted">${cagrRisk}</div>`;
   }
 }
 
@@ -1433,7 +1514,7 @@ async function drawTickerChart() {
   const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.ticker.replace("^", ""))}`;
   const controls = `<div class="cm-controls"><div class="spark-toggle cm-ranges">` +
     CM_RANGES.map(([k, lab]) => `<button class="chip cm-range ${k === cmRange ? "chip-active" : ""}" data-range="${k}">${lab}</button>`).join("") +
-    `</div>${hasOptions(r.ticker) ? `<button class="btn btn-ghost btn-sm cm-opt-open">Catena opzioni</button>` : ""}<a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">Apri su TradingView ↗</a></div>`;
+    `</div><a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">Apri su TradingView ↗</a></div>`;
   $("#chart-modal-title").textContent = `${r.name} (${r.ticker})`;
   $("#chart-modal-body").innerHTML = controls + `<div class="muted" style="padding:40px 0;text-align:center" id="cm-loading">Carico le candele…</div>`;
   $("#chart-modal-tip").innerHTML = "";
@@ -2007,7 +2088,7 @@ function openMacroInfo(key) {
       <h4 style="margin:8px 0 4px">Confronto visivo: Istituzionali vs Retail (Fear &amp; Greed)</h4>
       <div class="dual-idx">
         <div class="dual-idx-block">
-          ${compactSemiGauge(sm.score, ["Difensivo", "Aggressivo"])}
+          ${compactSemiGauge(sm.score, ["Bearish (Short)", "Bullish (Long)"])}
           <div class="dual-idx-label">Istituzionali (SMC)</div>
           <div class="dual-idx-val" style="color:${smCol}">${sm.score}/100 &middot; ${sm.label}</div>
         </div>
@@ -2018,7 +2099,7 @@ function openMacroInfo(key) {
         </div>` : ""}
       </div>
       <div class="info-line"><b>Posizionamento istituzionale:</b> <span style="color:${smCol}">${sm.score}/100 — ${sm.label}</span></div>
-      ${thermoBar(sm.score, ["Difensivo", "Aggressivo"])}`;
+      ${thermoBar(sm.score, ["Bearish (Short)", "Bullish (Long)"])}`;
     const arrow = d => d === "rialzista" ? '<span class="pos">▲ rialzista</span>' : d === "ribassista" ? '<span class="neg">▼ ribassista</span>' : '<span class="muted">laterale</span>';
     const smcIdx = sm.smc_indices || {};
     const smcCard = (s) => {
@@ -2612,7 +2693,7 @@ function renderGauges() {
     }
     cards.push(thermoCard("smart_money", "Istituzionali VS Retail", sm.score,
       `<b>${sm.label}</b>`,
-      `flussi istituzionali (VIX term · HY/IG · P/C)${divTxt}`, ["Difensivo", "Aggressivo"]));
+      `flussi istituzionali (VIX term · HY/IG · P/C)${divTxt}`, ["Bearish (Short)", "Bullish (Long)"]));
   }
   if (m.sp500_pe) {
     const pe = m.sp500_pe;
@@ -2872,20 +2953,46 @@ function buildPrompt() {
   lines.push("MANDATO OBIETTIVO — LEGGILO PRIMA DI TUTTO IL RESTO:");
   lines.push(`Cliente: uomo 40 anni. Obiettivo: €1.000.000 netti in 10 anni (CAGR target ~12-15% annuo, necessario oggi: ${cagrNeeded}%). Profilo: DIAMOND HANDS — tollera drawdown del -20-30% senza vendere (orizzonte decade, non settimana). Piano di transizione: FASE 1 (attuale) = semiconduttori/hardware AI → FASE 2 (2026-2028) = Software AI / Cloud / Cybersecurity / Biotech AI — iniziare rotazione anticipata. Regola VC Sniper: vendere SOLO su deterioramento fondamentale reale (guidance tagliata, perdita quota mercato, P/E>150 senza giustificazione di crescita) — NON vendere su volatilità di mercato normale. La liquidità disponibile (${fmtEUR.format(cashEur)}) è "polvere secca" da deployare in zone di correzione identificate dai dati di drawdown. Ogni raccomandazione deve essere COERENTE con questo mandato: non suggerire uscite per paura, non suggerire diversificazione difensiva eccessiva che riduce il CAGR sotto il ${cagrNeeded}% necessario.`);
   lines.push("");
-  lines.push("Sei il MIO TEAM DEDICATO di 5 Senior Analyst di Wall Street, specializzati nella gestione di fondi growth da $10B+ con focus su tech, semiconduttori e rotazione settoriale. Ogni analista risponde al proprio ruolo con rigore istituzionale e linguaggio diretto e quantitativo — nessun disclaimer, nessuna vaghezza:\n• ALEX (Macro-Strategist, ex-Goldman Sachs Global Investment Research): cicli economici, curva dei tassi, carry trade, rischio sistemico, rotazione settoriale globale, flight-to-safety.\n• SARA (Equity Analyst, ex-Morgan Stanley TMT Coverage): valutazione fondamentale (DCF, multipli settoriali), qualità degli utili, FCF yield, ROIC, catalizzatori trimestrali.\n• MARCO (Risk Manager, ex-JPMorgan Risk Advisory): concentrazione, correlazione, drawdown, scenario analysis, fiscalità italiana (26% su azioni, 12.5% BTP, compensazione minus↔plus entro 4 anni).\n• JAMES (Options Specialist, ex-Goldman Derivatives Desk): gamma, vega, muri di opzioni (CW/PW), pinning, strategie di copertura e posizioni direzionali con derivati.\n• LEI (Technical Trader, ex-Citadel Equity Strategies): Smart Money Concepts (SMC), order flow, BOS/FVG, supporti e resistenze chiave, RSI e anomalie di volume.\nUsate TUTTI i dati forniti sotto — prezzi, fondamentali, macro, news, opzioni, SMC — e producete analisi SPECIFICHE e QUANTITATIVE. Ogni raccomandazione deve contenere prezzo preciso, quantità precisa e motivazione sintetica (1 riga). L'obiettivo è raggiungere €1.000.000 in 10 anni con CAGR ≥ ${cagrNeeded}%, proteggendo il capitale nelle correzioni e sfruttandole come opportunità di accumulo (Diamond Hands + VC Sniper).");
+  lines.push(`Sei un SENIOR PORTFOLIO ADVISOR con competenze integrate di macro, equity, tecnica e risk management — profilo istituzionale da $10B+ fund, specializzato in growth tech USA. Produci un'analisi UNIVOCA, COESA e AZIONABILE: non cinque voci separate, ma un REPORT PROFESSIONALE UNICO come se fossi il CIO di un family office. Usa tutti i dati forniti (prezzi, fondamentali, macro, news, opzioni, SMC). Nessun disclaimer, nessuna vaghezza: solo numeri, ticker precisi, quantità precise, livelli precisi.
+
+TEAM DI RIFERIMENTO INTERNO (usali per arricchire l'analisi, NON come sezioni separate):
+• MARCO (Macro & Ciclo): curva tassi, carry, credito HY, PIL, Fed, istituzionali vs retail, rotazione settoriale
+• SARA (Equity & Fondamentali): DCF, multipli, FCF quality, ROIC, target price, catalizzatori trimestrali
+• LEI (Tecnica & Timing): RSI, supporti/resistenze, SMC/BOS/FVG, volume, forza relativa, timing entrata`);
   lines.push("");
-  lines.push("PASSO 1 — RICERCA WEB OBBLIGATORIA (esegui PRIMA di produrre il report): (a) verifica i prezzi di oggi e le variazioni intraday dei titoli in portafoglio; (b) leggi le ultime 24-48h di notizie su ogni titolo, settore e quadro macro-politico (earnings, guidance, upgrade/downgrade, regolazione, M&A, Fed/BoJ); (c) controlla il calendario eventi imminenti (trimestrali, dati macro USA/EU, riunioni FOMC/BoJ, scadenze opzioni mensili); (d) individua 3-5 titoli/ETF NON in portafoglio con setup interessante (momentum, value, event-driven), incluse 1-2 idee speculative ad alto potenziale. Se i dati web contraddicono quelli forniti sotto, privilegia i dati web e segnalalo esplicitamente.");
+  lines.push("STEP 1 — RICERCA WEB (obbligatoria PRIMA del report): (a) prezzi e variazioni intraday di TUTTI i titoli in portafoglio e watchlist; (b) notizie ultime 48h per ogni titolo (earnings, guidance, upgrade/downgrade, M&A, regolazione, Fed/BoJ); (c) calendario eventi prossimi 30 giorni (FOMC, BoJ, trimestrali, dati macro chiave); (d) 2-3 nuove idee di ingresso non in portafoglio (momentum, value o event-driven) coerenti con mandato €1M/10 anni. Se i dati web contraddicono quelli sotto, cita la fonte e usa i dati più aggiornati.");
   lines.push("");
-  lines.push("CONTESTO PERSONALE da tenere SEMPRE presente: il mio patrimonio totale, la liquidità disponibile (la decido io), il capitale investito (costo), il guadagno lordo e netto tasse, e TUTTE le mie posizioni con PMC (prezzo medio di carico = le mie operazioni passate), controvalore e P&L per singolo titolo. Ragiona su concentrazione/rischio, fiscalità italiana (azioni 26%, BTP 12,5%, compensazione minus/plus entro 4 anni) e impiego ottimale della liquidità.");
-  lines.push("");
-  lines.push("PRODUCI UN REPORT STRUTTURATO, professionale e AZIONABILE (solo a scopo informativo), con queste sezioni numerate:");
-  lines.push("1) QUADRO MACRO & REGIME (ALEX): call chiara sul regime attuale (bull/bear/range) e fase del ciclo economico. Analizza tutti i dati forniti: curva 10A-2A vs recessione storica, spread credito HY (proxy CDS), carry USD/JPY (rischio unwind yen), disaccoppiamento S&P+NDX/PIL, Istituzionali VS Retail (se divergenza estrema evidenziala in grassetto), P/E S&P e NDX vs profitti aziendali reali. Conclusione obbligatoria: sovrappeso o sottopeso azionario USA tech nelle prossime 8 settimane?");
-  lines.push("2) ANALISI TECNICA (LEI): per OGNI titolo in portafoglio e watchlist — RSI con interpretazione (ipercomprato/ipervenduto/neutro), supporto chiave immediato (rottura = stop), resistenza chiave (obiettivo swing), volume anomalo sì/no, segnale SMC (struttura/BOS/FVG/bias), forza relativa 1M vs benchmark (SOX/NDX/S&P). Classifica finale: i 2 titoli col setup tecnico MIGLIORE e i 2 col setup PEGGIORE per le prossime 2-4 settimane.");
-  lines.push("3) ANALISI FONDAMENTALE (SARA): per OGNI titolo — giudizio BUY/HOLD/SELL motivato da: P/E vs media settoriale, P/FCF (segnala se P/FCF >> P/E = earnings quality bassa), EV/EBITDA, ROE/ROIC (>15% = premium), margini, crescita ricavi, PEG. Stima fair value e upside/downside % rispetto al prezzo attuale. Segnala: (a) titolo più sopravvalutato, (b) titolo più sottovalutato, (c) titolo con qualità utili migliore (ROIC>15% + FCF>=Net Income).");
-  lines.push("4) PIANO OPERATIVO CONCRETO (tutti): per ogni posizione indica MANTENERE / ALLEGGERIRE / INCREMENTARE / USCIRE con numero PRECISO di azioni e prezzo limite (non range). Per ogni vendita: plus/minus stimata, tasse italiane (26% azioni, 12.5% BTP), se compensabile con minus pregresse nel quadriennio fiscale. Stop loss tecnico e tipo di ordine (limite/stop/condizionato).");
-  lines.push("5) ROTAZIONE & DE-RISKING (MARCO): piano concreto per portare la concentrazione tech/semi sotto 60% del portafoglio. Proponi 2-3 titoli value/difensivi NON in portafoglio (con ticker, prezzo attuale, limite d'ingresso e tesi in 2 righe) e 2-3 ETF per diversificazione geografica o settoriale (con AUM, P/E e dividend yield).");
-  lines.push("6) STRATEGIE OPZIONI & COPERTURA (JAMES): basandoti su CW/PW forniti e put/call ratio — (a) identifica i livelli di pinning più probabili per le prossime 4 settimane su ogni titolo con dati opzioni, (b) proponi una strategia di copertura concreta e low-cost per proteggere il portafoglio da un calo del 15% (collar, protective put, put spread — con strike e scadenza), (c) 1-2 trade speculativi su opzioni con catalizzatore preciso, scadenza, strike, premio stimato e rapporto R/R.");
-  lines.push("7) OUTLOOK MULTI-ORIZZONTE + RISCHI: BREVE (0-4 settimane) · MEDIO (1-3 mesi) · LUNGO (6-18 mesi). Per ognuno: direzione, livello chiave da monitorare, probabilità stimata (%). Chiudi con: (a) calendario eventi da monitorare nei prossimi 30 giorni (earnings, FOMC, BoJ, dati macro chiave, scadenze opzioni mensili), (b) i 3 rischi principali per il portafoglio in ordine di probabilità × impatto.");
+  lines.push(`PRODUCI UN REPORT UNICO STRUTTURATO in queste 5 sezioni — rispondi come UN UNICO ADVISOR che integra tutte le competenze:
+
+## 1. QUADRO MACRO & REGIME DI MERCATO
+Analizza in modo APPROFONDITO tutti i dati macro forniti:
+- Curva 10A-2A: valore attuale, tendenza, implicazioni recessione/espansione
+- Spread credito HY (OAS): livello, trend 1M, stress sistemico sì/no
+- Carry USD/JPY: spread tassi, rischio unwind yen, prossima BoJ
+- Fear & Greed vs Istituzionali: divergenza? Se sì → classificala (PERICOLOSA / ACCUMULO / NEUTRALE)
+- P/E S&P e Nasdaq vs profitti reali: mercato sopravvalutato o in linea?
+- MacroQuant (ciclo economico): espansione/contrazione, cosa sta guidando
+- Rotazione settoriale: quali settori in forza/debolezza, implicazione per portafoglio tech
+- Fed Watch: scenario tassi prossimi 6 mesi
+**VERDETTO FINALE:** regime bull/bear/range + sovrappeso/sottopeso azionario USA tech nelle prossime 8 settimane. Risponde al mandato CAGR ${cagrNeeded}%?
+
+## 2. ANALISI TECNICA PORTAFOGLIO & WATCHLIST (per OGNI titolo)
+Per ciascun titolo: RSI (interpretazione: ipercomprato/neutro/ipervenduto), supporto chiave (rottura = stop), resistenza chiave (target swing), volume anomalo (sì/no), segnale SMC (struttura/BOS/FVG/bias), forza relativa 1M vs benchmark (SOX/NDX/S&P500).
+**CLASSIFICA SETUP:** i 2 MIGLIORI e i 2 PEGGIORI per le prossime 2-4 settimane.
+**ZONE DRAWDOWN:** segnala i titoli con drawdown > 15% dal massimo 52 settimane come ZONE DI ACCUMULO per la liquidità disponibile (${fmtEUR.format(cashEur)} polvere secca).
+
+## 3. ANALISI FONDAMENTALE APPROFONDITA (per OGNI titolo)
+Giudizio BUY/HOLD/SELL con motivazione quantitativa: P/E vs settore, P/FCF (segnala [!FCF] se P/FCF >> P/E), EV/EBITDA, ROE/ROIC (>15%=[PREMIUM]), margine netto, crescita ricavi, PEG. Fair value stimato e upside/downside %. Verifica regola VC Sniper: P/E > 150 senza crescita → segnala come TRIGGER USCITA. Per i titoli in watchlist: vale la pena acquistare ora o attendere?
+**RIEPILOGO:** (a) titolo più sopravvalutato, (b) titolo con miglior qualità utili, (c) miglior opportunità ingresso in watchlist.
+
+## 4. PIANO OPERATIVO CONCRETO — AZIONI DA FARE
+Per OGNI posizione in portafoglio: MANTIENI / INCREMENTA (N azioni a prezzo X limite) / ALLEGGERISCI (N azioni, stima plus/minus, tasse 26%/12.5%, compensabile con minus pregresse nel quadriennio) / ESCI. Stop loss tecnico preciso e tipo ordine. Per liquidità ${fmtEUR.format(cashEur)}: dove e come deployarla (ticker, quantità, prezzo limite, priorità). Nuovi ingressi identificati dalla ricerca web: 2-3 idee con entry precisa.
+
+## 5. RISCHI, COPERTURE & OUTLOOK
+**Copertura portafoglio:** strategia opzioni low-cost (collar/put spread su QQQ o NDX) con strike e scadenza precisi, compatibile con Diamond Hands (copertura parziale, non totale). Muri opzioni (CW/PW) per titoli con dati disponibili → livelli pinning prossima scadenza.
+**Rischi principali** (in ordine probabilità × impatto): top 3.
+**Outlook:** BREVE (0-4 settimane) · MEDIO (1-3 mesi) · LUNGO (6-18 mesi) — direzione + livello chiave + probabilità %.
+**Calendario eventi prossimi 30 giorni:** trimestrali, FOMC, BoJ, dati macro chiave.`);
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
@@ -3117,12 +3224,14 @@ function buildPrompt() {
     });
   }
   lines.push("");
-  lines.push("DIRETTIVE SPECIFICHE FINALI (ogni analista risponde alla propria lettera):");
-  lines.push(`A) [ALEX — Macro] Dai una call netta sul regime di mercato (bull/bear/range) con orizzonte 8 settimane. Rispondi ESPLICITAMENTE: il CAGR necessario di ${cagrNeeded}% è realistico nel regime attuale? Identifica i 3 rischi sistemici più urgenti per il mandato Diamond Hands (€1M / 10 anni). Incrocia carry USD/JPY, curva tassi, credito HY e sentiment istituzionale.`);
-  lines.push("B) [SARA — Equity] Valuta ogni titolo rispetto al mandato FASE 1→FASE 2: quali semiconduttori/hardware mantieni fino a deterioramento fondamentale (VC Sniper), quali Software AI / Cloud / Cybersecurity / Biotech AI inseriresti ora in watchlist per la rotazione FASE 2? Segnala se qualche titolo ha P/E > 150 senza crescita che giustifica il multiplo (unico trigger di uscita per la regola VC Sniper).");
-  lines.push(`C) [MARCO — Risk] Con Beta ponderato del portafoglio (calcolato dai dati), simula: (1) drawdown portafoglio se Nasdaq cede -20% e -30%, con patrimonio risultante e distanza da €1M; (2) identifica i titoli con drawdown attuale dal massimo 52 settimane > 15% (zone di accumulo per la "polvere secca" di ${fmtEUR.format(cashEur)}); (3) fiscalità: plus/minus latenti e compensazioni disponibili nel quadriennio.`);
-  lines.push("D) [JAMES — Options] Sulla base dei muri di opzioni e degli Implied Move trimestrali forniti: (1) indica i livelli di pinning per la prossima scadenza mensile; (2) per i titoli con earnings imminenti e Implied Move > 10%, valuta se il mercato prezza correttamente il rischio; (3) proponi collar a basso costo (QQQ/NDX) compatibile con il profilo Diamond Hands (copertura parziale, non totale).");
-  lines.push("E) [LEI — Technical] Identifica i 2 titoli in drawdown dal massimo 52 settimane con il setup tecnico più solido per accumulo (entry preciso, stop, target). Distingui tra: (a) correzione tecnica sana = opportunità Diamond Hands, (b) rottura struttura = warning fondamentale (da segnalare a SARA per regola VC Sniper).");
+  lines.push(`ISTRUZIONI FINALI DI FORMATO:
+Rispondi come UN UNICO REPORT PROFESSIONALE (non come dialogo tra analisti). Usa le 5 sezioni numerate indicate. Per ogni dato quantitativo che citi, indica il valore preciso. Per ogni raccomandazione operativa: TICKER + N AZIONI + PREZZO LIMITE + MOTIVAZIONE IN UNA RIGA. Alla fine aggiungi una sezione SINTESI ESECUTIVA di max 5 bullet point con le 5 azioni più urgenti da fare oggi/questa settimana, ordinate per priorità.
+
+VINCOLI MANDATO (NON DEROGABILI):
+- CAGR target: ${cagrNeeded}% annuo → ogni raccomandazione deve essere coerente con questo obiettivo
+- Diamond Hands: NON suggerire uscite per volatilità normale (-20/-30%). Suggerire uscite SOLO se: P/E > 150 senza crescita, guidance tagliata, perdita strutturale quota mercato
+- Liquidità (${fmtEUR.format(cashEur)}): è "polvere secca" da deployare SOLO in zone drawdown > 15% dal massimo 52S
+- Fase 2 AI: inizia rotazione anticipata verso Software AI / Cloud / Cybersecurity / Biotech AI per il 2026-2028`);
   return lines.join("\n");
 }
 
