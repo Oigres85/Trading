@@ -41,13 +41,13 @@
    "bgain": -2424.61
   },
   {
-  "ticker": "GOOGL",
-  "name": "Alphabet Inc",
-  "qty": 50.0,
-  "pmc": 340.20,
-  "bval": 17108.00,
-  "bgain": 98.00
-}
+   "ticker": "GOOGL",
+   "name": "Alphabet Inc",
+   "qty": 50,
+   "pmc": 340.2,
+   "bval": 17108,
+   "bgain": 98
+  }
  ],
  "watchlist": [
   {
@@ -127,6 +127,11 @@
   },
   {
    "ticker": "META",
+   "name": null,
+   "currency": "USD"
+  },
+  {
+   "ticker": "MRVL",
    "name": null,
    "currency": "USD"
   }
