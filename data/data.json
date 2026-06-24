@@ -850,7 +850,7 @@
     "target": 487.9,
     "upside_pct": -4.8
    },
-   "health": 84,
+   "health": 85,
    "eps": 3.02,
    "beta": 2.49,
    "prepost": null,
@@ -3969,10 +3969,10 @@
    ],
    "fin_health": 1,
    "smc": {
-    "bias": 36,
-    "label": "Lieve ribasso",
+    "bias": 50,
+    "label": "Neutro",
     "structure": "laterale",
-    "bos": "ribassista",
+    "bos": null,
     "bull_fvg": 2,
     "bear_fvg": 2,
     "last_fvg": {
@@ -3981,7 +3981,7 @@
      "hi": 23.78
     },
     "liq_above": 20.12,
-    "liq_below": 18.47,
+    "liq_below": 19.53,
     "order_block": {
      "dir": "rialzista",
      "lo": 19.44,
@@ -4601,7 +4601,7 @@
     "target": 432.83,
     "upside_pct": 24.1
    },
-   "health": 32,
+   "health": 30,
    "eps": 13.12,
    "beta": 1.24,
    "prepost": null,
@@ -4684,10 +4684,10 @@
    ],
    "fin_health": 87,
    "smc": {
-    "bias": 38,
-    "label": "Lieve ribasso",
+    "bias": 24,
+    "label": "Distribuzione",
     "structure": "laterale",
-    "bos": null,
+    "bos": "ribassista",
     "bull_fvg": 0,
     "bear_fvg": 6,
     "last_fvg": {
@@ -4696,7 +4696,7 @@
      "hi": 358.67
     },
     "liq_above": 372.08,
-    "liq_below": 346.36,
+    "liq_below": 331.15,
     "order_block": {
      "dir": "rialzista",
      "lo": 358.78,
@@ -7693,7 +7693,7 @@
    "change_pct": -3.85,
    "pe": null,
    "ath": 147.27,
-   "ath_dist_pct": -52.2,
+   "ath_dist_pct": -52.3,
    "w52_high": 119.48,
    "w52_dist_pct": -41.1,
    "support": 69.63,
@@ -10085,7 +10085,7 @@
     "target": 94.75,
     "upside_pct": -27.4
    },
-   "health": 84,
+   "health": 86,
    "eps": -0.6,
    "beta": 2.23,
    "prepost": null,
@@ -11141,9 +11141,9 @@
    "change_pct": -0.4,
    "pe": 15.9,
    "ath": 338.09,
-   "ath_dist_pct": -1.6,
+   "ath_dist_pct": -1.5,
    "w52_high": 338.09,
-   "w52_dist_pct": -1.6,
+   "w52_dist_pct": -1.5,
    "support": 295.2,
    "resistance": 338.09,
    "rsi": 65.9,
@@ -11577,7 +11577,7 @@
      20.53,
      20.44,
      16.54,
-     15.0,
+     14.99,
      17.44,
      21.66,
      24.26,
@@ -11969,7 +11969,7 @@
     "key": "buy",
     "n": 21,
     "target": 342.0,
-    "upside_pct": 2.8
+    "upside_pct": 2.7
    },
    "health": 86,
    "eps": 20.88,
@@ -13009,7 +13009,7 @@
      "hi": 505.18
     },
     "liq_above": 519.11,
-    "liq_below": 490.05,
+    "liq_below": 497.06,
     "order_block": {
      "dir": "rialzista",
      "lo": 525.02,
@@ -13529,7 +13529,7 @@
     "target": 827.32,
     "upside_pct": 48.0
    },
-   "health": 22,
+   "health": 23,
    "eps": 27.49,
    "beta": 1.23,
    "prepost": null,
@@ -13661,80 +13661,80 @@
      269.05
     ],
     "m6": [
-     84.7,
-     87.57,
-     86.38,
-     86.23,
-     85.66,
-     86.65,
-     84.88,
-     89.28,
-     90.12,
-     88.12,
-     84.54,
-     83.35,
-     83.18,
-     82.85,
-     83.01,
-     81.17,
-     80.34,
-     80.42,
-     79.76,
-     82.51,
-     83.06,
-     80.19,
-     81.73,
+     84.8,
+     87.68,
+     86.49,
+     86.34,
+     85.76,
+     86.76,
+     84.98,
+     89.39,
+     90.23,
+     88.23,
+     84.64,
+     83.45,
+     83.22,
      82.89,
-     83.58,
-     81.3,
-     78.88,
-     78.62,
-     75.5,
-     73.69,
-     74.17,
-     80.24,
-     82.31,
-     81.97,
-     81.3,
-     78.19,
-     78.57,
-     78.97,
-     79.05,
-     79.57,
-     79.44,
-     77.75,
-     78.35,
-     80.88,
-     79.25,
-     81.65,
-     80.82,
-     77.47,
-     78.05,
-     75.64,
+     83.05,
+     81.21,
+     80.38,
+     80.46,
+     79.8,
+     82.55,
+     83.1,
+     80.23,
+     81.77,
+     82.93,
+     83.62,
+     81.34,
+     78.92,
+     78.66,
+     75.54,
+     73.73,
+     74.21,
+     80.28,
+     82.35,
+     82.01,
+     81.34,
+     78.23,
+     78.61,
+     79.01,
+     79.09,
+     79.61,
+     79.48,
+     77.79,
+     78.39,
+     80.92,
+     79.29,
+     81.69,
+     80.86,
+     77.51,
+     78.09,
+     75.68,
+     89.57,
+     92.65,
+     93.3,
+     90.44,
+     87.67,
+     87.86,
+     91.58,
+     90.79,
+     87.62,
      89.53,
-     92.6,
-     93.25,
-     90.39,
-     87.63,
-     87.82,
-     91.53,
-     90.74,
-     87.58,
-     89.49,
-     87.87,
-     90.11,
-     92.31,
-     98.4,
-     97.63,
-     94.83,
-     87.77,
-     99.0,
-     106.66,
-     107.06,
-     109.46,
-     109.33,
-     114.39,
-     119.87,
+     87.91,
+     90.16,
+     92.36,
+     98.45,
+     97.68,
+     94.88,
+     87.81,
+     99.05,
+     106.71,
+     107.11,
+     109.51,
+     109.38,
+     114.45,
+     119.93,
      128.49,
      131.3,
      133.83,
@@ -14128,20 +14128,20 @@
      269.05
     ],
     "m3": [
-     87.87,
-     90.11,
-     92.31,
-     98.4,
-     97.63,
-     94.83,
-     87.77,
-     99.0,
-     106.66,
-     107.06,
-     109.46,
-     109.33,
-     114.39,
-     119.87,
+     87.91,
+     90.16,
+     92.36,
+     98.45,
+     97.68,
+     94.88,
+     87.81,
+     99.05,
+     106.71,
+     107.11,
+     109.51,
+     109.38,
+     114.45,
+     119.93,
      128.49,
      131.3,
      133.83,
@@ -14196,46 +14196,46 @@
      269.05
     ],
     "y1": [
-     75.01,
-     76.03,
-     72.07,
-     70.72,
-     73.13,
-     81.59,
-     75.18,
-     79.17,
-     71.09,
-     74.65,
-     63.98,
-     66.46,
-     74.09,
-     83.65,
-     86.04,
-     90.51,
-     88.12,
-     82.67,
-     88.46,
-     93.22,
-     87.41,
-     76.59,
-     89.29,
-     98.79,
-     84.33,
-     83.99,
-     85.66,
-     88.12,
-     83.01,
-     82.51,
-     83.58,
-     73.69,
-     81.3,
-     79.57,
-     79.25,
-     75.64,
-     87.63,
-     89.49,
-     97.63,
-     107.06,
+     75.21,
+     76.24,
+     72.26,
+     70.85,
+     73.27,
+     81.74,
+     75.32,
+     79.32,
+     71.22,
+     74.79,
+     64.1,
+     66.59,
+     74.23,
+     83.81,
+     86.2,
+     90.68,
+     88.23,
+     82.77,
+     88.57,
+     93.33,
+     87.52,
+     76.68,
+     89.4,
+     98.91,
+     84.43,
+     84.09,
+     85.76,
+     88.23,
+     83.05,
+     82.55,
+     83.62,
+     73.73,
+     81.34,
+     79.61,
+     79.29,
+     75.68,
+     87.67,
+     89.53,
+     97.68,
+     107.11,
      128.49,
      139.69,
      164.31,
@@ -14285,7 +14285,7 @@
     "key": "strong_buy",
     "n": 41,
     "target": 241.79,
-    "upside_pct": -10.1
+    "upside_pct": -10.6
    },
    "health": 85,
    "eps": 2.9,
@@ -14332,12 +14332,12 @@
      "change_pct": 37.04
     },
     "m3": {
-     "support": 86.57,
+     "support": 86.61,
      "resistance": 329.88,
      "change_pct": 206.21
     },
     "y1": {
-     "support": 61.32,
+     "support": 61.44,
      "resistance": 329.88,
      "change_pct": 258.71
     }
@@ -14400,9 +14400,9 @@
    "change_pct": 1.98,
    "pe": 32.3,
    "ath": 278.56,
-   "ath_dist_pct": -14.3,
+   "ath_dist_pct": -14.5,
    "w52_high": 278.56,
-   "w52_dist_pct": -14.3,
+   "w52_dist_pct": -14.5,
    "support": 232.0,
    "resistance": 274.75,
    "rsi": 42.3,
@@ -23896,7 +23896,7 @@
     },
     {
      "label": "VIX",
-     "score": 66
+     "score": 67
     },
     {
      "label": "Put/Call",
@@ -23904,7 +23904,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 0
+     "score": 5
     },
     {
      "label": "Treasury 10A",
@@ -26588,10 +26588,10 @@
    },
    "smc_avg": 37,
    "vix3m": 21.1,
-   "vix_term_ratio": 0.944,
+   "vix_term_ratio": 0.935,
    "ig_spread": 0.93,
    "hy_ig_ratio": 2.91,
-   "divergence": -32,
+   "divergence": -33,
    "divergence_label": "Smart money ottimista / Retail pessimista",
    "components": [
     {
@@ -26600,7 +26600,7 @@
     },
     {
      "label": "Struttura VIX (contango/backw.)",
-     "score": 73
+     "score": 76
     },
     {
      "label": "Spread HY/IG (fuga qualità)",
@@ -26662,7 +26662,7 @@
     },
     {
      "label": "Volatilità (VIX)",
-     "score": 60
+     "score": 61
     },
     {
      "label": "Rischio Credito (HY)",
@@ -26676,7 +26676,7 @@
    "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici (il MacroQuant ufficiale di BCA Research è proprietario e a pagamento)."
   },
   "thermometer": {
-   "score": 46,
+   "score": 45,
    "label": "Neutro"
   }
  },
@@ -27550,7 +27550,7 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 63,
+   "health": 64,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -28293,7 +28293,7 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 64,
+   "health": 65,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -28381,9 +28381,9 @@
    "change_pct": 0.46,
    "pe": 19.8,
    "ath": 299.69,
-   "ath_dist_pct": -1.0,
+   "ath_dist_pct": -0.8,
    "w52_high": 299.69,
-   "w52_dist_pct": -1.0,
+   "w52_dist_pct": -0.8,
    "support": 276.96,
    "resistance": 299.69,
    "rsi": 60.4,
@@ -29022,7 +29022,7 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 77,
+   "health": 78,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -30488,7 +30488,7 @@
    "change_pct": -0.95,
    "pe": 34.5,
    "ath": 563.37,
-   "ath_dist_pct": -79.6,
+   "ath_dist_pct": -79.5,
    "w52_high": 126.0,
    "w52_dist_pct": -8.8,
    "support": 110.35,
@@ -31831,7 +31831,7 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 68,
+   "health": 69,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -32720,9 +32720,9 @@
      154.01,
      154.93,
      154.68,
-     156.33,
+     156.34,
      156.04,
-     156.33,
+     156.34,
      155.93,
      155.49,
      157.2,
@@ -34000,7 +34000,7 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 67,
+   "health": 68,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -34395,20 +34395,6 @@
    "title_it": "Il greggio americano scende sotto i 70 dollari mentre le petroliere transitano nello Stretto di Hormuz"
   },
   {
-   "source": "AP",
-   "title": "Trump abruptly cancels signing a housing bill, blindsiding Republicans - AP News",
-   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQb0RkNTJCSE91MldwX3VRekZ2Tm5fS2x5b3A1UzM2NGZNTEROMDg3eTZvWnQyR29ock5RSlhZU0EtUmM2SW1RdmNlWk1nc0pyTGF3RG11V3hpVXkyalF6ckVtZkpxTG9WRzB0WHNoSnhuM1VxMTdZaHVBaTlualI2dzIxNmNnanEwWm5icFVJWHJDS25IUnJqSA?oc=5",
-   "published": "2026-06-24T15:20:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Trump annulla improvvisamente la firma di una legge sugli alloggi, prendendo di sorpresa i repubblicani - AP News"
-  },
-  {
    "source": "Reuters",
    "title": "Global physical crude markets dive as Middle East ramps up supply - Reuters",
    "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxPLXUxZVlBdXJnZm1yZjBMY0p2LXNzMGdBTFliN0trUVU3eExBM1h3Zmd2T0tTX0VOdm5OOWFZMFJBaEc4cVRUOHlfSnQ4bWJlT0tzWjVCaUt2WU1tV0JwMDZRd3VWMFhZM2d2RkVVdGh0d0t4ZmcxTWQwUkQzSnZBOUxDTXMxbEtLUXpTYk9CUGJudGxiazlNR2owQ2VpNDhDVHJiXzRWQ3hhd2kza2ZNMDVrTjdjbWl0eWFXUFlndHlubmM?oc=5",
@@ -34461,7 +34447,20 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Israele insiste sulla presenza di truppe nel sud del Libano mentre Rubio difende l'accordo iraniano in Medio Oriente - Reuters"
+   "title_it": "Trump testa il lancio della Rust Belt a Penn. in mezzo all'Iran, pressioni inflazionistiche - The Detroit News"
+  },
+  {
+   "source": "Google News",
+   "title": "June Monthly Exec Briefing: US consumer bruised by persistent inflation - rbc.com",
+   "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPM0hRbFlROFprQXRWaVBUcWtnbldmRVhxSHQtVlQ5c1hXcjY5UnNhWDFsaTY4WVYtUmE4aDdENnBZRVlFZERuMlNLU0hPeEhmeW5IVEw1WWctZTQ2MnRtbXVRckVZNUpXWE1GN0pRVkM3d1FHa0tOa1dCZE44di1YUlhhanJPMmZQLXJDRHdrLXR5dTE1SXFnZ1N3ZUdFaDFGWHJxU1RWcXJKNWZUUV9OLXhaeEdXV2JQbDF2amVrRWd5Z1h5R3Z3ZlQ3VW9HRTlhbkQ4?oc=5",
+   "published": "2026-06-24T14:33:57Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Briefing mensile dei dirigenti di giugno: consumatori statunitensi colpiti dall'inflazione persistente - rbc.com"
   },
   {
    "source": "Reuters",
@@ -34545,6 +34544,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Il candidato al Senato del Michigan accusa Trump di mantenere chiuso il ponte Canada-USA per aiutare i donatori - AP News"
+  },
+  {
+   "source": "Reddit",
+   "title": "The AI bubble is literally the same thing as the dotcom bubble",
+   "link": "https://www.reddit.com/r/investing/comments/1ue5c6c/the_ai_bubble_is_literally_the_same_thing_as_the/",
+   "published": "2026-06-24T06:09:43Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La bolla dell’intelligenza artificiale è letteralmente la stessa cosa della bolla delle dotcom"
   },
   {
    "source": "Bloomberg",
@@ -35741,6 +35753,14 @@
        "iv": 70.2,
        "vol": 68,
        "oi": 315
+      },
+      {
+       "strike": 575.0,
+       "bid": 10.4,
+       "ask": 10.95,
+       "iv": 68.4,
+       "vol": 36,
+       "oi": 225
       }
      ],
      "puts": [
@@ -35943,6 +35963,14 @@
        "iv": 73.9,
        "vol": 50,
        "oi": 57
+      },
+      {
+       "strike": 575.0,
+       "bid": 72.75,
+       "ask": 76.65,
+       "iv": 80.3,
+       "vol": 1,
+       "oi": 7
       }
      ],
      "call_wall": 545.0,
@@ -36098,7 +36126,7 @@
        "strike": 250.0,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 35.9,
+       "iv": 37.5,
        "vol": 3289,
        "oi": 3782
       },
@@ -36122,7 +36150,7 @@
        "strike": 257.5,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 51.6,
+       "iv": 53.1,
        "vol": 28,
        "oi": 552
       },
@@ -36130,7 +36158,7 @@
        "strike": 260.0,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 57.8,
+       "iv": 59.4,
        "vol": 29,
        "oi": 934
       },
@@ -36138,7 +36166,7 @@
        "strike": 262.5,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 62.5,
+       "iv": 65.6,
        "vol": 15,
        "oi": 905
       },
@@ -36146,15 +36174,15 @@
        "strike": 265.0,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 68.8,
+       "iv": 70.3,
        "vol": 109,
        "oi": 1049
       },
       {
        "strike": 267.5,
        "bid": 0.0,
-       "ask": 0.01,
-       "iv": 75.0,
+       "ask": 0.02,
+       "iv": 81.3,
        "vol": 2,
        "oi": 182
       }
@@ -36309,7 +36337,7 @@
        "bid": 13.5,
        "ask": 13.7,
        "iv": 0.0,
-       "vol": 10,
+       "vol": 11,
        "oi": 0
       },
       {
@@ -36582,13 +36610,13 @@
        "strike": 210.0,
        "bid": 0.02,
        "ask": 0.03,
-       "iv": 57.0,
+       "iv": 56.3,
        "vol": 132,
        "oi": 2251
       },
       {
        "strike": 212.5,
-       "bid": 0.02,
+       "bid": 0.03,
        "ask": 0.04,
        "iv": 53.5,
        "vol": 207,
@@ -36932,7 +36960,7 @@
       },
       {
        "strike": 260.0,
-       "bid": 0.08,
+       "bid": 0.07,
        "ask": 0.1,
        "iv": 33.9,
        "vol": 366,
@@ -37384,7 +37412,7 @@
        "strike": 320.0,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 56.3,
+       "iv": 50.0,
        "vol": 138,
        "oi": 526
       },
@@ -39824,7 +39852,7 @@
        "strike": 302.5,
        "bid": 0.01,
        "ask": 0.08,
-       "iv": 48.8,
+       "iv": 49.6,
        "vol": 6,
        "oi": 602
       },
@@ -39832,7 +39860,7 @@
        "strike": 305.0,
        "bid": 0.02,
        "ask": 0.08,
-       "iv": 45.1,
+       "iv": 45.9,
        "vol": 4,
        "oi": 1481
       },
@@ -39854,7 +39882,7 @@
       },
       {
        "strike": 312.5,
-       "bid": 0.06,
+       "bid": 0.05,
        "ask": 0.12,
        "iv": 36.4,
        "vol": 6,
@@ -40208,7 +40236,7 @@
        "strike": 365.0,
        "bid": 0.0,
        "ask": 0.46,
-       "iv": 36.8,
+       "iv": 36.3,
        "vol": 6,
        "oi": 5
       }
@@ -40218,7 +40246,7 @@
        "strike": 302.5,
        "bid": 0.07,
        "ask": 0.28,
-       "iv": 34.6,
+       "iv": 35.1,
        "vol": 195,
        "oi": 328
       },
@@ -40234,7 +40262,7 @@
        "strike": 307.5,
        "bid": 0.13,
        "ask": 0.35,
-       "iv": 31.0,
+       "iv": 31.5,
        "vol": 3,
        "oi": 191
       },
@@ -40250,7 +40278,7 @@
        "strike": 312.5,
        "bid": 0.42,
        "ask": 0.52,
-       "iv": 28.3,
+       "iv": 28.9,
        "vol": 1,
        "oi": 50
       },
@@ -40506,7 +40534,7 @@
        "strike": 355.0,
        "bid": 0.36,
        "ask": 0.53,
-       "iv": 21.0,
+       "iv": 20.6,
        "vol": 7,
        "oi": 110
       },
@@ -40514,7 +40542,7 @@
        "strike": 360.0,
        "bid": 0.2,
        "ask": 0.29,
-       "iv": 21.5,
+       "iv": 21.1,
        "vol": 2,
        "oi": 84
       },
@@ -40556,7 +40584,7 @@
        "strike": 285.0,
        "bid": 0.05,
        "ask": 0.29,
-       "iv": 38.0,
+       "iv": 38.3,
        "vol": 1,
        "oi": 272
       },
@@ -41218,7 +41246,7 @@
       },
       {
        "strike": 505.0,
-       "bid": 4.7,
+       "bid": 4.6,
        "ask": 6.2,
        "iv": 31.2,
        "vol": 57,
@@ -42097,6 +42125,14 @@
        "iv": 35.2,
        "vol": 343,
        "oi": 782
+      },
+      {
+       "strike": 590.0,
+       "bid": 0.0,
+       "ask": 0.01,
+       "iv": 35.9,
+       "vol": 824,
+       "oi": 1597
       }
      ],
      "puts": [
@@ -42142,7 +42178,7 @@
       },
       {
        "strike": 540.0,
-       "bid": 0.01,
+       "bid": 0.0,
        "ask": 0.02,
        "iv": 27.0,
        "vol": 937,
@@ -42299,6 +42335,14 @@
        "iv": 98.0,
        "vol": 3,
        "oi": 35
+      },
+      {
+       "strike": 590.0,
+       "bid": 32.8,
+       "ask": 34.75,
+       "iv": 117.9,
+       "vol": 25,
+       "oi": 87
       }
      ],
      "call_wall": 600.0,
@@ -42507,6 +42551,14 @@
        "iv": 37.5,
        "vol": 560,
        "oi": 1171
+      },
+      {
+       "strike": 590.0,
+       "bid": 0.44,
+       "ask": 0.49,
+       "iv": 36.7,
+       "vol": 1505,
+       "oi": 4107
       }
      ],
      "puts": [
@@ -42709,6 +42761,14 @@
        "iv": 54.2,
        "vol": 1,
        "oi": 321
+      },
+      {
+       "strike": 590.0,
+       "bid": 32.4,
+       "ask": 34.8,
+       "iv": 66.9,
+       "vol": 66,
+       "oi": 922
       }
      ],
      "call_wall": 600.0,
@@ -42917,6 +42977,14 @@
        "iv": 32.3,
        "vol": 18,
        "oi": 112
+      },
+      {
+       "strike": 590.0,
+       "bid": 0.95,
+       "ask": 1.06,
+       "iv": 31.2,
+       "vol": 142,
+       "oi": 347
       }
      ],
      "puts": [
@@ -43119,6 +43187,14 @@
        "iv": 48.0,
        "vol": 2,
        "oi": 36
+      },
+      {
+       "strike": 590.0,
+       "bid": 32.15,
+       "ask": 35.8,
+       "iv": 57.4,
+       "vol": 2,
+       "oi": 44
       }
      ],
      "call_wall": 575.0,
@@ -46982,7 +47058,7 @@
        "strike": 225.0,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 84.4,
+       "iv": 81.3,
        "vol": 224,
        "oi": 5343
       },
@@ -46990,7 +47066,7 @@
        "strike": 227.5,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 90.6,
+       "iv": 87.5,
        "vol": 9,
        "oi": 2863
       }
@@ -47016,7 +47092,7 @@
        "strike": 172.5,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 90.6,
+       "iv": 93.8,
        "vol": 20,
        "oi": 2535
       },
@@ -47024,7 +47100,7 @@
        "strike": 175.0,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 81.3,
+       "iv": 84.4,
        "vol": 34,
        "oi": 8627
       },
@@ -47410,7 +47486,7 @@
        "strike": 167.5,
        "bid": 0.01,
        "ask": 0.02,
-       "iv": 70.3,
+       "iv": 71.1,
        "vol": 79,
        "oi": 1902
       },
@@ -47820,7 +47896,7 @@
        "strike": 150.0,
        "bid": 0.01,
        "ask": 0.02,
-       "iv": 78.1,
+       "iv": 78.9,
        "vol": 36,
        "oi": 159
       },
@@ -48229,6 +48305,14 @@
        "iv": 110.2,
        "vol": 101,
        "oi": 1547
+      },
+      {
+       "strike": 67.0,
+       "bid": 0.04,
+       "ask": 0.06,
+       "iv": 110.9,
+       "vol": 73,
+       "oi": 1275
       }
      ],
      "puts": [
@@ -48431,6 +48515,14 @@
        "iv": 156.3,
        "vol": 3,
        "oi": 132
+      },
+      {
+       "strike": 67.0,
+       "bid": 12.5,
+       "ask": 13.9,
+       "iv": 217.4,
+       "vol": 14,
+       "oi": 150
       }
      ],
      "call_wall": 65.0,
@@ -48631,6 +48723,14 @@
        "iv": 94.5,
        "vol": 22,
        "oi": 181
+      },
+      {
+       "strike": 67.0,
+       "bid": 0.29,
+       "ask": 0.34,
+       "iv": 91.6,
+       "vol": 323,
+       "oi": 620
       }
      ],
      "puts": [
@@ -48833,6 +48933,14 @@
        "iv": 138.8,
        "vol": 18,
        "oi": 131
+      },
+      {
+       "strike": 67.0,
+       "bid": 13.05,
+       "ask": 14.1,
+       "iv": 141.3,
+       "vol": 5,
+       "oi": 98
       }
      ],
      "call_wall": 70.0,
@@ -49041,6 +49149,14 @@
        "iv": 89.1,
        "vol": 22,
        "oi": 285
+      },
+      {
+       "strike": 67.0,
+       "bid": 0.83,
+       "ask": 0.92,
+       "iv": 89.0,
+       "vol": 17,
+       "oi": 118
       }
      ],
      "puts": [
@@ -49243,6 +49359,14 @@
        "iv": 106.6,
        "vol": 1,
        "oi": 125
+      },
+      {
+       "strike": 67.0,
+       "bid": 13.15,
+       "ask": 14.6,
+       "iv": 111.3,
+       "vol": 9,
+       "oi": 49
       }
      ],
      "call_wall": 61.0,
@@ -49276,7 +49400,7 @@
       },
       {
        "strike": 14.5,
-       "bid": 4.65,
+       "bid": 4.6,
        "ask": 6.35,
        "iv": 355.5,
        "vol": 2,
@@ -49284,7 +49408,7 @@
       },
       {
        "strike": 15.0,
-       "bid": 4.15,
+       "bid": 4.1,
        "ask": 5.15,
        "iv": 228.9,
        "vol": 4,
@@ -49292,7 +49416,7 @@
       },
       {
        "strike": 15.5,
-       "bid": 3.65,
+       "bid": 3.6,
        "ask": 4.85,
        "iv": 237.1,
        "vol": 1,
@@ -49300,7 +49424,7 @@
       },
       {
        "strike": 16.0,
-       "bid": 3.15,
+       "bid": 3.1,
        "ask": 3.95,
        "iv": 147.7,
        "vol": 4,
@@ -49480,8 +49604,8 @@
        "strike": 14.5,
        "bid": 0.01,
        "ask": 0.02,
-       "iv": 153.1,
-       "vol": 5,
+       "iv": 159.4,
+       "vol": 7,
        "oi": 12145
       },
       {
@@ -49622,7 +49746,7 @@
       },
       {
        "strike": 23.5,
-       "bid": 4.0,
+       "bid": 4.05,
        "ask": 4.85,
        "iv": 221.1,
        "vol": 7,
@@ -49718,7 +49842,7 @@
       },
       {
        "strike": 16.5,
-       "bid": 2.9,
+       "bid": 2.76,
        "ask": 4.2,
        "iv": 147.9,
        "vol": 10,
@@ -50008,7 +50132,7 @@
       },
       {
        "strike": 22.0,
-       "bid": 2.96,
+       "bid": 2.84,
        "ask": 3.4,
        "iv": 124.2,
        "vol": 23,
@@ -50032,7 +50156,7 @@
       },
       {
        "strike": 23.5,
-       "bid": 4.25,
+       "bid": 4.3,
        "ask": 5.1,
        "iv": 154.1,
        "vol": 11,
@@ -50080,7 +50204,7 @@
      "calls": [
       {
        "strike": 3.0,
-       "bid": 16.05,
+       "bid": 15.85,
        "ask": 18.35,
        "iv": 795.3,
        "vol": 0,
@@ -50160,7 +50284,7 @@
       },
       {
        "strike": 20.5,
-       "bid": 1.08,
+       "bid": 1.12,
        "ask": 1.26,
        "iv": 95.0,
        "vol": 30,
@@ -50378,7 +50502,7 @@
       },
       {
        "strike": 24.0,
-       "bid": 4.95,
+       "bid": 5.0,
        "ask": 5.8,
        "iv": 133.7,
        "vol": 2,
@@ -50488,7 +50612,7 @@
       },
       {
        "strike": 182.5,
-       "bid": 0.2,
+       "bid": 0.15,
        "ask": 0.25,
        "iv": 97.3,
        "vol": 934,
