@@ -885,7 +885,7 @@
    },
    "tech_by_range": {
     "w1": {
-     "support": 506.81,
+     "support": 505.39,
      "resistance": 562.99,
      "change_pct": -0.04
     },
@@ -1632,7 +1632,7 @@
     "target": 298.93,
     "upside_pct": 51.1
    },
-   "health": 34,
+   "health": 33,
    "eps": 6.52,
    "beta": 2.2,
    "prepost": null,
@@ -2342,7 +2342,7 @@
      69.23,
      67.49,
      82.04,
-     90.97,
+     90.98,
      80.43,
      86.88,
      76.15,
@@ -2665,8 +2665,8 @@
    ],
    "fin_health": 49,
    "smc": {
-    "bias": 76,
-    "label": "Accumulazione",
+    "bias": 62,
+    "label": "Lieve rialzo",
     "structure": "rialzista",
     "bos": null,
     "bull_fvg": 6,
@@ -2677,7 +2677,7 @@
      "hi": 1168.57
     },
     "liq_above": 1089.29,
-    "liq_below": 1014.14,
+    "liq_below": 854.35,
     "order_block": {
      "dir": "rialzista",
      "lo": 1043.19,
@@ -3886,7 +3886,7 @@
     "target": 29.24,
     "upside_pct": 51.0
    },
-   "health": 22,
+   "health": 21,
    "eps": -0.89,
    "beta": 1.9,
    "prepost": null,
@@ -6998,7 +6998,7 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 43,
+   "health": 42,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -7006,7 +7006,7 @@
    "stats": null,
    "tech_by_range": {
     "w1": {
-     "support": 25447.4,
+     "support": 25374.44,
      "resistance": 26561.12,
      "change_pct": -1.92
     },
@@ -7048,7 +7048,7 @@
      "hi": 25512.07
     }
    },
-   "rs_1m": -1.6,
+   "rs_1m": -1.9,
    "rs_bench": "sp500"
   },
   {
@@ -10198,7 +10198,7 @@
    "change_pct": -1.3,
    "pe": 30.5,
    "ath": 605.03,
-   "ath_dist_pct": -33.2,
+   "ath_dist_pct": -33.3,
    "w52_high": 414.16,
    "w52_dist_pct": -2.5,
    "support": 372.59,
@@ -11971,7 +11971,7 @@
     "target": 342.0,
     "upside_pct": 2.7
    },
-   "health": 86,
+   "health": 87,
    "eps": 20.88,
    "beta": 1.0,
    "prepost": null,
@@ -12073,7 +12073,7 @@
      "hi": 323.92
     }
    },
-   "rs_1m": 10.1,
+   "rs_1m": 10.5,
    "rs_bench": "sp500"
   },
   {
@@ -14287,7 +14287,7 @@
     "target": 241.79,
     "upside_pct": -10.6
    },
-   "health": 85,
+   "health": 84,
    "eps": 2.9,
    "beta": 2.28,
    "prepost": null,
@@ -15082,7 +15082,7 @@
     "target": 312.99,
     "upside_pct": 31.1
    },
-   "health": 31,
+   "health": 30,
    "eps": 7.4,
    "beta": 1.44,
    "prepost": null,
@@ -16151,7 +16151,7 @@
     168277,
     167512,
     170588,
-    171932,
+    171931,
     170919,
     169228,
     170347,
@@ -16349,7 +16349,7 @@
     150890,
     150952,
     151759,
-    151674,
+    151673,
     151286,
     152585,
     152784,
@@ -18152,7 +18152,7 @@
     {
      "label": "Momentum S&P 500",
      "rating": "fear",
-     "score": 35
+     "score": 34
     },
     {
      "label": "Forza dei prezzi",
@@ -18167,7 +18167,7 @@
     {
      "label": "Opzioni Put/Call",
      "rating": "fear",
-     "score": 30
+     "score": 29
     },
     {
      "label": "Volatilità (VIX)",
@@ -26796,7 +26796,7 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1697211435459,
+   "mcap_usd": 1697347020959,
    "change_pct": -0.38
   },
   {
@@ -27585,7 +27585,7 @@
    },
    "tech_by_range": {
     "w1": {
-     "support": 731.28,
+     "support": 731.24,
      "resistance": 750.22,
      "change_pct": -0.74
     },
@@ -28328,7 +28328,7 @@
    },
    "tech_by_range": {
     "w1": {
-     "support": 706.97,
+     "support": 705.58,
      "resistance": 745.45,
      "change_pct": -1.61
     },
@@ -31085,7 +31085,7 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 65,
+   "health": 63,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -31120,7 +31120,7 @@
    },
    "tech_by_range": {
     "w1": {
-     "support": 114.48,
+     "support": 114.1,
      "resistance": 121.99,
      "change_pct": -1.68
     },
@@ -31919,9 +31919,9 @@
    "change_pct": -1.99,
    "pe": 19.9,
    "ath": 85.38,
-   "ath_dist_pct": -37.5,
+   "ath_dist_pct": -37.4,
    "w52_high": 63.01,
-   "w52_dist_pct": -15.3,
+   "w52_dist_pct": -15.2,
    "support": 52.87,
    "resistance": 58.95,
    "rsi": 36.3,
@@ -32577,7 +32577,7 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 29,
+   "health": 30,
    "eps": null,
    "beta": null,
    "prepost": null,
@@ -32647,7 +32647,7 @@
      "hi": 56.22
     },
     "liq_above": 55.17,
-    "liq_below": 53.03,
+    "liq_below": 53.38,
     "order_block": {
      "dir": "rialzista",
      "lo": 53.39,
@@ -34096,16 +34096,45 @@
  "news": [
   {
    "source": "Investing.com",
-   "title": "China’s 360 says it has developed tools to match Anthropic’s Mythos",
-   "link": "https://www.investing.com/news/stock-market-news/chinas-360-says-it-has-developed-tools-to-match-anthropics-mythos-4758034",
-   "published": "2026-06-24T17:43:13Z",
+   "title": "US homebuilders advance after Congress passes affordable housing bill",
+   "link": "https://www.investing.com/news/stock-market-news/us-homebuilders-advance-after-congress-passes-affordable-housing-bill-4758800",
+   "published": "2026-06-24T18:48:30Z",
    "tickers": [
-    "MACRO"
+    "MACRO",
+    "POL"
    ],
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "China’s 360 afferma di aver sviluppato strumenti in linea con i miti di Anthropic"
+   "title_it": "I costruttori di case statunitensi avanzano dopo che il Congresso ha approvato la legge sugli alloggi a prezzi accessibili"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Exclusive-US to move forward with Turkey jet engine sales ahead of NATO summit, sources say",
+   "link": "https://www.investing.com/news/stock-market-news/exclusiveus-to-move-forward-with-turkey-jet-engine-sales-ahead-of-nato-summit-sources-say-4758648",
+   "published": "2026-06-24T18:42:56Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Gli Stati Uniti esclusivisti andranno avanti con le vendite di motori a reazione alla Turchia prima del vertice NATO, dicono fonti"
+  },
+  {
+   "source": "Investing.com",
+   "title": "US air fares rose 4.7% in early 2026 as oil prices spiked",
+   "link": "https://www.investing.com/news/stock-market-news/us-air-fares-rose-47-in-early-2026-as-oil-prices-spiked-4758793",
+   "published": "2026-06-24T18:37:14Z",
+   "tickers": [
+    "MACRO",
+    "CL=F"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Le tariffe aeree statunitensi sono aumentate del 4,7% all’inizio del 2026 a causa dell’impennata dei prezzi del petrolio"
   },
   {
    "source": "Investing.com",
@@ -34529,7 +34558,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bull",
-   "title_it": "Trump trasforma il calcio d'inizio dell'America 250 in una manifestazione in stile campagna sul National Mall - AP News"
+   "title_it": "Trump trasforma il lancio dell'America 250 in una manifestazione in stile campagna sul National Mall - AP News"
   },
   {
    "source": "AP",
@@ -34614,16 +34643,16 @@
   },
   {
    "source": "Investing.com",
-   "title": "Stocks lose steam, Nasdaq turns red in cautious trading ahead of Micron earnings",
+   "title": "Stocks attempt rebound, but Nasdaq slips amid caution ahead of Micron earnings",
    "link": "https://www.investing.com/news/stock-market-news/us-stock-futures-rise-after-bruising-tech-selloff-micron-earnings-on-tap-4757097",
-   "published": "2026-06-24T17:26:24Z",
+   "published": "2026-06-24T18:35:20Z",
    "tickers": [
     "MU"
    ],
    "topic_pri": 1,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Le azioni perdono slancio, il Nasdaq diventa rosso per gli scambi cauti in vista degli utili di Micron"
+   "title_it": "Le azioni tentano il rimbalzo, ma il Nasdaq scivola a causa della cautela in vista degli utili di Micron"
   },
   {
    "source": "CNBC",
@@ -37786,7 +37815,7 @@
       },
       {
        "strike": 372.5,
-       "bid": 0.09,
+       "bid": 0.07,
        "ask": 0.11,
        "iv": 37.1,
        "vol": 200,
@@ -38918,6 +38947,208 @@
       },
       {
        "strike": 131.0,
+       "bid": 7.15,
+       "ask": 7.25,
+       "iv": 100.2,
+       "vol": 139,
+       "oi": 313
+      },
+      {
+       "strike": 132.0,
+       "bid": 6.6,
+       "ask": 6.95,
+       "iv": 100.2,
+       "vol": 433,
+       "oi": 1387
+      },
+      {
+       "strike": 133.0,
+       "bid": 6.25,
+       "ask": 6.4,
+       "iv": 99.6,
+       "vol": 1360,
+       "oi": 1179
+      },
+      {
+       "strike": 134.0,
+       "bid": 5.8,
+       "ask": 6.15,
+       "iv": 100.0,
+       "vol": 154,
+       "oi": 355
+      },
+      {
+       "strike": 135.0,
+       "bid": 5.4,
+       "ask": 5.7,
+       "iv": 99.3,
+       "vol": 3914,
+       "oi": 1949
+      },
+      {
+       "strike": 136.0,
+       "bid": 5.15,
+       "ask": 5.5,
+       "iv": 100.8,
+       "vol": 328,
+       "oi": 368
+      },
+      {
+       "strike": 137.0,
+       "bid": 4.8,
+       "ask": 5.1,
+       "iv": 100.3,
+       "vol": 660,
+       "oi": 505
+      },
+      {
+       "strike": 138.0,
+       "bid": 4.4,
+       "ask": 4.75,
+       "iv": 99.5,
+       "vol": 409,
+       "oi": 489
+      },
+      {
+       "strike": 139.0,
+       "bid": 4.15,
+       "ask": 4.45,
+       "iv": 99.8,
+       "vol": 112,
+       "oi": 276
+      },
+      {
+       "strike": 140.0,
+       "bid": 3.85,
+       "ask": 4.05,
+       "iv": 98.8,
+       "vol": 3419,
+       "oi": 2774
+      },
+      {
+       "strike": 141.0,
+       "bid": 3.65,
+       "ask": 4.0,
+       "iv": 100.8,
+       "vol": 191,
+       "oi": 371
+      }
+     ],
+     "puts": [
+      {
+       "strike": 117.0,
+       "bid": 2.13,
+       "ask": 2.33,
+       "iv": 85.3,
+       "vol": 164,
+       "oi": 159
+      },
+      {
+       "strike": 118.0,
+       "bid": 2.37,
+       "ask": 2.55,
+       "iv": 84.7,
+       "vol": 327,
+       "oi": 370
+      },
+      {
+       "strike": 119.0,
+       "bid": 2.61,
+       "ask": 2.79,
+       "iv": 84.0,
+       "vol": 156,
+       "oi": 303
+      },
+      {
+       "strike": 120.0,
+       "bid": 2.9,
+       "ask": 3.1,
+       "iv": 84.0,
+       "vol": 2061,
+       "oi": 2682
+      },
+      {
+       "strike": 121.0,
+       "bid": 3.1,
+       "ask": 3.35,
+       "iv": 82.5,
+       "vol": 152,
+       "oi": 241
+      },
+      {
+       "strike": 122.0,
+       "bid": 3.4,
+       "ask": 3.7,
+       "iv": 82.2,
+       "vol": 177,
+       "oi": 337
+      },
+      {
+       "strike": 123.0,
+       "bid": 3.7,
+       "ask": 4.0,
+       "iv": 81.3,
+       "vol": 256,
+       "oi": 395
+      },
+      {
+       "strike": 124.0,
+       "bid": 4.05,
+       "ask": 4.35,
+       "iv": 80.8,
+       "vol": 388,
+       "oi": 263
+      },
+      {
+       "strike": 125.0,
+       "bid": 4.5,
+       "ask": 4.8,
+       "iv": 81.2,
+       "vol": 862,
+       "oi": 1628
+      },
+      {
+       "strike": 126.0,
+       "bid": 4.85,
+       "ask": 5.2,
+       "iv": 80.4,
+       "vol": 121,
+       "oi": 482
+      },
+      {
+       "strike": 127.0,
+       "bid": 5.25,
+       "ask": 5.55,
+       "iv": 79.3,
+       "vol": 209,
+       "oi": 138
+      },
+      {
+       "strike": 128.0,
+       "bid": 5.7,
+       "ask": 6.05,
+       "iv": 79.2,
+       "vol": 243,
+       "oi": 202
+      },
+      {
+       "strike": 129.0,
+       "bid": 6.25,
+       "ask": 6.55,
+       "iv": 79.3,
+       "vol": 320,
+       "oi": 112
+      },
+      {
+       "strike": 130.0,
+       "bid": 6.75,
+       "ask": 7.1,
+       "iv": 79.2,
+       "vol": 1354,
+       "oi": 1727
+      },
+      {
+       "strike": 131.0,
        "bid": 7.3,
        "ask": 7.7,
        "iv": 94.1,
@@ -39800,7 +40031,7 @@
       },
       {
        "strike": 350.0,
-       "bid": 0.03,
+       "bid": 0.02,
        "ask": 0.05,
        "iv": 26.4,
        "vol": 22,
@@ -40582,7 +40813,7 @@
       },
       {
        "strike": 285.0,
-       "bid": 0.05,
+       "bid": 0.11,
        "ask": 0.29,
        "iv": 38.3,
        "vol": 1,
@@ -40590,7 +40821,7 @@
       },
       {
        "strike": 290.0,
-       "bid": 0.11,
+       "bid": 0.18,
        "ask": 0.27,
        "iv": 34.0,
        "vol": 16,
@@ -40958,7 +41189,7 @@
       },
       {
        "strike": 465.0,
-       "bid": 0.05,
+       "bid": 0.0,
        "ask": 0.6,
        "iv": 48.2,
        "vol": 2,
@@ -41376,7 +41607,7 @@
       },
       {
        "strike": 460.0,
-       "bid": 0.65,
+       "bid": 0.55,
        "ask": 1.3,
        "iv": 37.7,
        "vol": 5,
@@ -41400,7 +41631,7 @@
       },
       {
        "strike": 475.0,
-       "bid": 1.95,
+       "bid": 1.9,
        "ask": 3.7,
        "iv": 37.5,
        "vol": 1,
@@ -41408,7 +41639,7 @@
       },
       {
        "strike": 480.0,
-       "bid": 3.0,
+       "bid": 2.65,
        "ask": 4.6,
        "iv": 36.0,
        "vol": 22,
@@ -41432,7 +41663,7 @@
       },
       {
        "strike": 495.0,
-       "bid": 8.0,
+       "bid": 7.1,
        "ask": 11.7,
        "iv": 40.4,
        "vol": 4,
@@ -41826,7 +42057,7 @@
       },
       {
        "strike": 505.0,
-       "bid": 15.7,
+       "bid": 14.6,
        "ask": 19.8,
        "iv": 35.5,
        "vol": 14,
@@ -41915,7 +42146,7 @@
      ],
      "call_wall": 695.0,
      "put_wall": 450.0,
-     "opt_volume": 1064
+     "opt_volume": 1074
     }
    ]
   },
@@ -42104,7 +42335,7 @@
       },
       {
        "strike": 582.5,
-       "bid": 0.0,
+       "bid": 0.01,
        "ask": 0.02,
        "iv": 32.0,
        "vol": 1678,
@@ -45052,7 +45283,7 @@
       },
       {
        "strike": 40.0,
-       "bid": 0.08,
+       "bid": 0.05,
        "ask": 0.1,
        "iv": 242.2,
        "vol": 783,
@@ -45422,7 +45653,7 @@
      "puts": [
       {
        "strike": 35.0,
-       "bid": 0.04,
+       "bid": 0.05,
        "ask": 0.25,
        "iv": 214.8,
        "vol": 15,
@@ -47076,7 +47307,7 @@
        "strike": 167.5,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 109.4,
+       "iv": 106.3,
        "vol": 1,
        "oi": 870
       },
@@ -47084,7 +47315,7 @@
        "strike": 170.0,
        "bid": 0.0,
        "ask": 0.01,
-       "iv": 100.0,
+       "iv": 96.9,
        "vol": 400,
        "oi": 12497
       },
@@ -47474,7 +47705,7 @@
       },
       {
        "strike": 227.5,
-       "bid": 0.01,
+       "bid": 0.0,
        "ask": 0.02,
        "iv": 57.8,
        "vol": 2720,
@@ -48736,7 +48967,7 @@
      "puts": [
       {
        "strike": 40.0,
-       "bid": 0.02,
+       "bid": 0.03,
        "ask": 0.1,
        "iv": 97.7,
        "vol": 32,
@@ -48752,7 +48983,7 @@
       },
       {
        "strike": 44.0,
-       "bid": 0.0,
+       "bid": 0.22,
        "ask": 0.4,
        "iv": 89.8,
        "vol": 1,
@@ -49383,6 +49614,14 @@
      "date": "2026-06-26",
      "calls": [
       {
+       "strike": 13.0,
+       "bid": 6.1,
+       "ask": 8.1,
+       "iv": 541.4,
+       "vol": 1,
+       "oi": 5
+      },
+      {
        "strike": 13.5,
        "bid": 5.65,
        "ask": 7.2,
@@ -49520,7 +49759,7 @@
       },
       {
        "strike": 22.0,
-       "bid": 0.11,
+       "bid": 0.12,
        "ask": 0.13,
        "iv": 112.5,
        "vol": 2919,
@@ -49584,6 +49823,14 @@
       }
      ],
      "puts": [
+      {
+       "strike": 13.0,
+       "bid": 0.0,
+       "ask": 0.03,
+       "iv": 196.9,
+       "vol": 1,
+       "oi": 19
+      },
       {
        "strike": 13.5,
        "bid": 0.0,
@@ -49793,6 +50040,14 @@
      "date": "2026-07-02",
      "calls": [
       {
+       "strike": 12.0,
+       "bid": 7.1,
+       "ask": 9.35,
+       "iv": 375.0,
+       "vol": 0,
+       "oi": 1
+      },
+      {
        "strike": 13.0,
        "bid": 6.1,
        "ask": 8.35,
@@ -49954,7 +50209,7 @@
       },
       {
        "strike": 23.5,
-       "bid": 0.22,
+       "bid": 0.21,
        "ask": 0.29,
        "iv": 109.6,
        "vol": 47,
@@ -49994,6 +50249,14 @@
       }
      ],
      "puts": [
+      {
+       "strike": 13.0,
+       "bid": 0.0,
+       "ask": 0.23,
+       "iv": 163.7,
+       "vol": 1,
+       "oi": 52
+      },
       {
        "strike": 13.5,
        "bid": 0.0,
@@ -51178,7 +51441,7 @@
       },
       {
        "strike": 190.0,
-       "bid": 35.0,
+       "bid": 33.5,
        "ask": 38.2,
        "iv": 89.6,
        "vol": 5,
@@ -51206,6 +51469,14 @@
     {
      "date": "2026-06-26",
      "calls": [
+      {
+       "strike": 372.5,
+       "bid": 29.55,
+       "ask": 34.9,
+       "iv": 66.3,
+       "vol": 2,
+       "oi": 3
+      },
       {
        "strike": 375.0,
        "bid": 27.2,
@@ -51408,6 +51679,14 @@
       }
      ],
      "puts": [
+      {
+       "strike": 372.5,
+       "bid": 0.02,
+       "ask": 0.18,
+       "iv": 46.7,
+       "vol": 30,
+       "oi": 52
+      },
       {
        "strike": 375.0,
        "bid": 0.02,
@@ -51617,6 +51896,14 @@
      "date": "2026-07-02",
      "calls": [
       {
+       "strike": 355.0,
+       "bid": 47.9,
+       "ask": 52.8,
+       "iv": 62.0,
+       "vol": 42,
+       "oi": 0
+      },
+      {
        "strike": 360.0,
        "bid": 42.5,
        "ask": 47.9,
@@ -51818,6 +52105,14 @@
       }
      ],
      "puts": [
+      {
+       "strike": 365.0,
+       "bid": 0.4,
+       "ask": 0.59,
+       "iv": 40.6,
+       "vol": 7,
+       "oi": 73
+      },
       {
        "strike": 370.0,
        "bid": 0.54,
