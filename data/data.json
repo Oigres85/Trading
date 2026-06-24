@@ -1,15 +1,15 @@
 {
- "updated_at": "2026-06-24T08:12:33Z",
- "eurusd": 1.1355,
+ "updated_at": "2026-06-24T08:15:08Z",
+ "eurusd": 1.1342,
  "totals": {
   "usd_value": 220657.72,
   "usd_gain": 119081.16,
   "usd_gain_pct": 117.23,
-  "eur_value": 235674.04,
-  "eur_gain": 106215.57,
-  "eur_gain_pct": 82.05,
-  "tax_est": 27435.04,
-  "eur_gain_net": 78780.53
+  "eur_value": 235894.7,
+  "eur_gain": 106334.65,
+  "eur_gain_pct": 82.07,
+  "tax_est": 27466.0,
+  "eur_gain_net": 78868.65
  },
  "portfolio": [
   {
@@ -865,8 +865,8 @@
    "beta": 2.49,
    "prepost": {
     "label": "pre",
-    "price": 529.25,
-    "change_pct": 1.81
+    "price": 530.67,
+    "change_pct": 2.08
    },
    "sector": "Technology",
    "stats": {
@@ -1661,8 +1661,8 @@
    "beta": 2.2,
    "prepost": {
     "label": "pre",
-    "price": 201.46,
-    "change_pct": 0.71
+    "price": 201.56,
+    "change_pct": 0.76
    },
    "sector": "Technology",
    "stats": {
@@ -2625,8 +2625,8 @@
    "beta": 2.17,
    "prepost": {
     "label": "pre",
-    "price": 1097.3,
-    "change_pct": 4.33
+    "price": 1103.9,
+    "change_pct": 4.96
    },
    "sector": "Technology",
    "stats": {
@@ -3428,8 +3428,8 @@
    "beta": 3.47,
    "prepost": {
     "label": "pre",
-    "price": 105.21,
-    "change_pct": 1.32
+    "price": 105.09,
+    "change_pct": 1.2
    },
    "sector": "Technology",
    "stats": {
@@ -3957,8 +3957,8 @@
    "beta": 1.9,
    "prepost": {
     "label": "pre",
-    "price": 21.37,
-    "change_pct": 0.42
+    "price": 21.36,
+    "change_pct": 0.38
    },
    "sector": "Technology",
    "stats": {
@@ -4686,8 +4686,8 @@
    "beta": 1.24,
    "prepost": {
     "label": "pre",
-    "price": 348.0,
-    "change_pct": 0.54
+    "price": 348.11,
+    "change_pct": 0.57
    },
    "sector": "Communication Services",
    "stats": {
@@ -5447,8 +5447,8 @@
    "beta": null,
    "prepost": {
     "label": "pre",
-    "price": 156.52,
-    "change_pct": 0.26
+    "price": 156.56,
+    "change_pct": 0.29
    },
    "sector": "Industrials",
    "stats": {
@@ -5704,8 +5704,8 @@
    "beta": null,
    "prepost": {
     "label": "pre",
-    "price": 201.5,
-    "change_pct": -11.12
+    "price": 201.31,
+    "change_pct": -11.21
    },
    "sector": "Technology",
    "stats": {
@@ -7456,8 +7456,8 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 62544.99,
-   "change_pct": -0.2,
+   "price": 62556.37,
+   "change_pct": -0.18,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -50.4,
@@ -7466,7 +7466,7 @@
    "support": 59108.92,
    "resistance": 67248.13,
    "rsi": 37.0,
-   "volume": 27818731520,
+   "volume": 27833368576,
    "vol_ratio": 0.85,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -7476,7 +7476,7 @@
      63237.54,
      63952.11,
      62668.02,
-     62544.99
+     62556.37
     ],
     "m6": [
      66957.52,
@@ -7604,7 +7604,7 @@
      63237.54,
      63952.11,
      62668.02,
-     62544.99
+     62556.37
     ],
     "all": [
      386.94,
@@ -7748,7 +7748,7 @@
      68233.31,
      76304.32,
      73579.69,
-     62541.98
+     62556.37
     ],
     "m1": [
      64014.37,
@@ -7772,7 +7772,7 @@
      63237.54,
      63952.11,
      62668.02,
-     62544.99
+     62556.37
     ],
     "m3": [
      75872.52,
@@ -7840,7 +7840,7 @@
      63237.54,
      63952.11,
      62668.02,
-     62544.99
+     62556.37
     ],
     "y1": [
      106045.63,
@@ -7916,7 +7916,7 @@
      61643.78,
      65710.4,
      63540.84,
-     62544.99
+     62556.37
     ],
     "d1": [
      62671.8,
@@ -7968,7 +7968,7 @@
      62607.6,
      62578.74,
      62572.3,
-     62544.99
+     62551.49
     ]
    },
    "earnings_date": null,
@@ -7983,22 +7983,22 @@
     "w1": {
      "support": 61893.21,
      "resistance": 65544.0,
-     "change_pct": -2.64
+     "change_pct": -2.62
     },
     "m1": {
      "support": 59108.92,
      "resistance": 67402.93,
-     "change_pct": -2.3
+     "change_pct": -2.28
     },
     "m3": {
      "support": 59108.92,
      "resistance": 82792.21,
-     "change_pct": -17.57
+     "change_pct": -17.55
     },
     "y1": {
      "support": 59108.92,
      "resistance": 116273.31,
-     "change_pct": -42.19
+     "change_pct": -42.18
     }
    },
    "financials": [],
@@ -8030,17 +8030,17 @@
    "ticker": "CL=F",
    "name": "Petrolio WTI",
    "currency": "USD",
-   "price": 71.98,
-   "change_pct": -1.68,
+   "price": 71.89,
+   "change_pct": -1.8,
    "pe": null,
    "ath": 147.27,
-   "ath_dist_pct": -51.1,
+   "ath_dist_pct": -51.2,
    "w52_high": 119.48,
    "w52_dist_pct": -39.8,
-   "support": 71.89,
+   "support": 71.82,
    "resistance": 97.0,
-   "rsi": 27.3,
-   "volume": 25895,
+   "rsi": 27.2,
+   "volume": 26452,
    "vol_ratio": 0.11,
    "signal": "Ipervenduto",
    "signal_class": "info",
@@ -8050,7 +8050,7 @@
      76.6,
      74.82,
      73.21,
-     71.98
+     71.89
     ],
     "m6": [
      58.01,
@@ -8178,7 +8178,7 @@
      76.6,
      74.82,
      73.21,
-     71.98
+     71.89
     ],
     "all": [
      33.1,
@@ -8445,7 +8445,7 @@
      65.21,
      105.07,
      87.36,
-     71.98
+     71.89
     ],
     "m1": [
      96.6,
@@ -8469,7 +8469,7 @@
      76.6,
      74.82,
      73.21,
-     71.98
+     71.89
     ],
     "m3": [
      98.32,
@@ -8537,7 +8537,7 @@
      76.6,
      74.82,
      73.21,
-     71.98
+     71.89
     ],
     "y1": [
      64.37,
@@ -8617,7 +8617,7 @@
      72.3,
      72.15,
      72.02,
-     71.98
+     71.89
     ]
    },
    "earnings_date": null,
@@ -8630,24 +8630,24 @@
    "stats": null,
    "tech_by_range": {
     "w1": {
-     "support": 71.89,
+     "support": 71.82,
      "resistance": 80.03,
-     "change_pct": -6.26
+     "change_pct": -6.38
     },
     "m1": {
-     "support": 71.89,
+     "support": 71.82,
      "resistance": 99.43,
-     "change_pct": -25.49
+     "change_pct": -25.58
     },
     "m3": {
-     "support": 71.89,
+     "support": 71.82,
      "resistance": 117.63,
-     "change_pct": -26.79
+     "change_pct": -26.88
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 10.87
+     "change_pct": 10.74
     }
    },
    "financials": [],
@@ -8672,7 +8672,7 @@
      "hi": 88.55
     }
    },
-   "rs_1m": -24.4,
+   "rs_1m": -24.5,
    "rs_bench": "sp500"
   },
   {
@@ -10392,8 +10392,8 @@
    "beta": 2.23,
    "prepost": {
     "label": "pre",
-    "price": 135.2,
-    "change_pct": 2.21
+    "price": 135.77,
+    "change_pct": 2.64
    },
    "sector": "Technology",
    "stats": {
@@ -11044,8 +11044,8 @@
    "beta": 1.8,
    "prepost": {
     "label": "pre",
-    "price": 383.71,
-    "change_pct": 0.55
+    "price": 384.0,
+    "change_pct": 0.63
    },
    "sector": "Consumer Cyclical",
    "stats": {
@@ -11573,8 +11573,8 @@
    "beta": 1.51,
    "prepost": {
     "label": "pre",
-    "price": 115.82,
-    "change_pct": -0.75
+    "price": 115.91,
+    "change_pct": -0.68
    },
    "sector": "Technology",
    "stats": {
@@ -11675,728 +11675,6 @@
     }
    },
    "rs_1m": -15.0,
-   "rs_bench": "ndx"
-  },
-  {
-   "ticker": "GOOGL",
-   "name": "Alphabet Inc.",
-   "currency": "USD",
-   "price": 346.13,
-   "change_pct": -1.02,
-   "pe": 26.4,
-   "ath": 408.37,
-   "ath_dist_pct": -15.2,
-   "w52_high": 408.37,
-   "w52_dist_pct": -15.2,
-   "support": 340.2,
-   "resistance": 393.64,
-   "rsi": 37.4,
-   "volume": 33864200,
-   "vol_ratio": 1.05,
-   "signal": "Neutrale",
-   "signal_class": "neutral",
-   "sparks": {
-    "w1": [
-     373.25,
-     363.79,
-     368.03,
-     349.68,
-     346.13
-    ],
-    "m6": [
-     306.76,
-     309.38,
-     313.94,
-     313.68,
-     313.1,
-     313.15,
-     313.44,
-     312.59,
-     314.74,
-     316.13,
-     313.93,
-     321.56,
-     325.02,
-     328.14,
-     331.43,
-     335.53,
-     335.4,
-     332.35,
-     329.57,
-     321.58,
-     327.95,
-     330.11,
-     327.5,
-     332.83,
-     334.12,
-     335.57,
-     337.81,
-     337.56,
-     343.24,
-     339.27,
-     332.61,
-     330.82,
-     322.44,
-     323.9,
-     318.17,
-     310.56,
-     308.6,
-     305.32,
-     301.63,
-     302.94,
-     302.46,
-     314.57,
-     311.09,
-     310.5,
-     312.49,
-     306.98,
-     311.35,
-     306.12,
-     303.19,
-     302.74,
-     300.49,
-     298.13,
-     306.18,
-     306.86,
-     308.52,
-     303.37,
-     302.1,
-     305.38,
-     310.73,
-     307.51,
-     306.95,
-     300.82,
-     301.88,
-     290.27,
-     290.76,
-     280.75,
-     274.18,
-     273.34,
-     287.39,
-     297.21,
-     295.59,
-     299.81,
-     305.28,
-     317.13,
-     318.3,
-     317.05,
-     321.12,
-     332.71,
-     336.92,
-     335.82,
-     341.48,
-     337.22,
-     332.09,
-     339.12,
-     338.69,
-     344.19,
-     350.13,
-     349.57,
-     349.73,
-     384.57,
-     385.46,
-     383.02,
-     388.2,
-     397.8,
-     397.75,
-     400.56,
-     388.41,
-     387.12,
-     402.38,
-     400.83,
-     396.54,
-     396.7,
-     387.43,
-     388.68,
-     387.43,
-     382.74,
-     388.65,
-     388.6,
-     389.9,
-     380.11,
-     376.15,
-     361.63,
-     358.78,
-     371.97,
-     368.31,
-     363.31,
-     364.26,
-     356.38,
-     357.77,
-     359.68,
-     369.35,
-     373.25,
-     363.79,
-     368.03,
-     349.68,
-     346.13
-    ],
-    "all": [
-     2.54,
-     3.21,
-     4.73,
-     4.51,
-     4.78,
-     4.85,
-     4.66,
-     4.48,
-     5.46,
-     6.88,
-     7.3,
-     7.14,
-     7.09,
-     7.85,
-     9.23,
-     10.04,
-     10.29,
-     10.73,
-     8.99,
-     9.67,
-     10.37,
-     9.22,
-     10.4,
-     9.59,
-     9.39,
-     9.97,
-     11.82,
-     12.03,
-     11.42,
-     12.44,
-     11.15,
-     11.36,
-     11.69,
-     12.35,
-     12.97,
-     12.65,
-     12.78,
-     14.07,
-     17.54,
-     17.19,
-     17.15,
-     14.0,
-     11.69,
-     10.93,
-     14.25,
-     14.53,
-     13.06,
-     11.75,
-     11.49,
-     9.93,
-     8.91,
-     7.27,
-     7.63,
-     8.4,
-     8.38,
-     8.63,
-     9.82,
-     10.35,
-     10.46,
-     10.99,
-     11.45,
-     12.3,
-     13.3,
-     14.46,
-     15.38,
-     13.15,
-     13.07,
-     14.07,
-     13.04,
-     12.05,
-     11.04,
-     12.03,
-     11.16,
-     13.04,
-     15.22,
-     13.78,
-     14.73,
-     14.89,
-     15.22,
-     14.55,
-     13.5,
-     13.12,
-     12.56,
-     14.97,
-     13.42,
-     12.78,
-     14.7,
-     14.87,
-     16.02,
-     14.39,
-     15.34,
-     15.91,
-     15.0,
-     14.41,
-     14.39,
-     15.7,
-     16.99,
-     18.72,
-     16.87,
-     17.32,
-     17.55,
-     18.74,
-     19.87,
-     19.7,
-     20.45,
-     21.61,
-     21.84,
-     22.02,
-     21.01,
-     21.73,
-     25.56,
-     26.28,
-     27.8,
-     29.29,
-     30.15,
-     27.65,
-     26.51,
-     28.33,
-     28.98,
-     28.72,
-     28.86,
-     29.16,
-     28.14,
-     27.21,
-     26.3,
-     26.64,
-     27.88,
-     27.49,
-     27.2,
-     27.03,
-     26.76,
-     32.59,
-     32.11,
-     31.64,
-     36.55,
-     37.81,
-     38.56,
-     37.73,
-     35.55,
-     37.81,
-     35.08,
-     37.11,
-     34.87,
-     39.22,
-     39.15,
-     39.85,
-     40.14,
-     38.45,
-     39.27,
-     40.65,
-     41.88,
-     42.02,
-     45.82,
-     48.92,
-     46.08,
-     46.86,
-     47.34,
-     48.26,
-     51.2,
-     51.35,
-     52.21,
-     58.59,
-     54.71,
-     51.4,
-     50.48,
-     54.52,
-     55.96,
-     60.82,
-     61.05,
-     59.82,
-     54.05,
-     54.99,
-     51.79,
-     55.8,
-     55.83,
-     58.33,
-     59.42,
-     54.84,
-     53.66,
-     60.37,
-     59.0,
-     60.52,
-     62.39,
-     64.63,
-     66.38,
-     71.01,
-     66.37,
-     57.59,
-     66.74,
-     71.05,
-     70.28,
-     73.74,
-     80.76,
-     72.64,
-     80.1,
-     86.95,
-     86.86,
-     90.56,
-     100.21,
-     102.22,
-     116.64,
-     116.81,
-     121.02,
-     133.54,
-     143.43,
-     132.5,
-     146.74,
-     140.65,
-     143.58,
-     134.11,
-     133.87,
-     137.85,
-     113.11,
-     112.76,
-     108.01,
-     115.3,
-     107.27,
-     94.81,
-     93.68,
-     100.1,
-     87.45,
-     97.97,
-     89.27,
-     102.82,
-     106.4,
-     121.79,
-     118.65,
-     131.55,
-     134.97,
-     129.71,
-     122.99,
-     131.37,
-     138.46,
-     138.87,
-     137.24,
-     149.6,
-     161.35,
-     170.98,
-     180.55,
-     170.23,
-     162.13,
-     164.58,
-     170.03,
-     167.88,
-     188.1,
-     202.96,
-     169.4,
-     153.84,
-     158.16,
-     171.04,
-     175.52,
-     191.35,
-     212.3,
-     242.41,
-     280.64,
-     319.55,
-     312.39,
-     337.56,
-     311.35,
-     287.19,
-     384.57,
-     380.11,
-     346.13
-    ],
-    "m1": [
-     387.43,
-     382.74,
-     388.65,
-     388.6,
-     389.9,
-     380.11,
-     376.15,
-     361.63,
-     358.78,
-     371.97,
-     368.31,
-     363.31,
-     364.26,
-     356.38,
-     357.77,
-     359.68,
-     369.35,
-     373.25,
-     363.79,
-     368.03,
-     349.68,
-     346.13
-    ],
-    "m3": [
-     306.95,
-     300.82,
-     301.88,
-     290.27,
-     290.76,
-     280.75,
-     274.18,
-     273.34,
-     287.39,
-     297.21,
-     295.59,
-     299.81,
-     305.28,
-     317.13,
-     318.3,
-     317.05,
-     321.12,
-     332.71,
-     336.92,
-     335.82,
-     341.48,
-     337.22,
-     332.09,
-     339.12,
-     338.69,
-     344.19,
-     350.13,
-     349.57,
-     349.73,
-     384.57,
-     385.46,
-     383.02,
-     388.2,
-     397.8,
-     397.75,
-     400.56,
-     388.41,
-     387.12,
-     402.38,
-     400.83,
-     396.54,
-     396.7,
-     387.43,
-     388.68,
-     387.43,
-     382.74,
-     388.65,
-     388.6,
-     389.9,
-     380.11,
-     376.15,
-     361.63,
-     358.78,
-     371.97,
-     368.31,
-     363.31,
-     364.26,
-     356.38,
-     357.77,
-     359.68,
-     369.35,
-     373.25,
-     363.79,
-     368.03,
-     349.68,
-     346.13
-    ],
-    "y1": [
-     166.3,
-     175.34,
-     176.12,
-     182.45,
-     189.69,
-     195.97,
-     195.53,
-     201.39,
-     198.75,
-     206.89,
-     231.64,
-     239.9,
-     251.54,
-     245.31,
-     245.21,
-     241.06,
-     250.97,
-     252.59,
-     280.93,
-     284.19,
-     278.03,
-     288.88,
-     319.55,
-     320.64,
-     308.89,
-     306.76,
-     313.15,
-     313.93,
-     335.53,
-     327.95,
-     335.57,
-     332.61,
-     310.56,
-     302.46,
-     306.98,
-     300.49,
-     303.37,
-     306.95,
-     280.75,
-     295.59,
-     317.05,
-     341.48,
-     344.19,
-     385.46,
-     400.56,
-     396.54,
-     382.74,
-     376.15,
-     363.31,
-     369.35,
-     346.13
-    ],
-    "d1": [
-     344.17,
-     347.31,
-     347.63,
-     347.97,
-     348.82,
-     347.83,
-     348.17,
-     347.12,
-     348.17,
-     346.49,
-     346.94,
-     345.97,
-     345.57,
-     346.02,
-     346.38,
-     346.19,
-     345.7,
-     347.29,
-     347.26,
-     347.55,
-     347.87,
-     347.48,
-     347.62,
-     347.65,
-     347.77,
-     347.27,
-     347.01,
-     346.73,
-     346.52,
-     346.35,
-     346.24,
-     346.7,
-     346.45,
-     346.74,
-     346.86,
-     347.08,
-     347.08,
-     347.22,
-     347.7
-    ]
-   },
-   "earnings_date": "2026-07-23",
-   "rating": {
-    "key": "strong_buy",
-    "n": 53,
-    "target": 432.83,
-    "upside_pct": 25.0
-   },
-   "health": 29,
-   "eps": 13.12,
-   "beta": 1.24,
-   "prepost": {
-    "label": "pre",
-    "price": 348.0,
-    "change_pct": 0.54
-   },
-   "sector": "Communication Services",
-   "stats": {
-    "market_cap": 4223676710912.0,
-    "shares": 5867155790.0,
-    "float_shares": 10822738160.0,
-    "float_pct": 184.5,
-    "avg_volume_30d": 30091063.0,
-    "pe_ttm": 26.3819,
-    "forward_pe": 23.7833,
-    "eps_ttm": 13.12,
-    "eps_forward": 14.5535,
-    "revenue_fy": 422498009088.0,
-    "net_income_fy": 160207994880.0,
-    "revenue_growth": 0.218,
-    "earnings_growth": 0.82,
-    "profit_margin": 0.3792,
-    "roe": 0.3888,
-    "debt_to_equity": 20.026,
-    "dividend_yield": 0.25,
-    "price_to_book": 8.7597,
-    "target_mean": 432.8345,
-    "fcf": 27921750016.0,
-    "gross_margin": 0.6037,
-    "enterprise_value": 4162747105280.0,
-    "ev_ebitda": 25.805,
-    "peg": 1.38,
-    "roa": 0.1464,
-    "short_float": 0.0142
-   },
-   "tech_by_range": {
-    "w1": {
-     "support": 340.2,
-     "resistance": 376.0,
-     "change_pct": -7.27
-    },
-    "m1": {
-     "support": 340.2,
-     "resistance": 393.64,
-     "change_pct": -10.66
-    },
-    "m3": {
-     "support": 271.95,
-     "resistance": 408.37,
-     "change_pct": 12.77
-    },
-    "y1": {
-     "support": 165.66,
-     "resistance": 408.37,
-     "change_pct": 108.14
-    }
-   },
-   "financials": [
-    {
-     "year": 2022,
-     "revenue": 282836000000,
-     "net_income": 59972000000,
-     "margin": 21.2
-    },
-    {
-     "year": 2023,
-     "revenue": 307394000000,
-     "net_income": 73795000000,
-     "margin": 24.0
-    },
-    {
-     "year": 2024,
-     "revenue": 350018000000,
-     "net_income": 100118000000,
-     "margin": 28.6
-    },
-    {
-     "year": 2025,
-     "revenue": 402836000000,
-     "net_income": 132170000000,
-     "margin": 32.8
-    }
-   ],
-   "fin_health": 87,
-   "smc": {
-    "bias": 24,
-    "label": "Distribuzione",
-    "structure": "laterale",
-    "bos": "ribassista",
-    "bull_fvg": 0,
-    "bear_fvg": 6,
-    "last_fvg": {
-     "dir": "ribassista",
-     "lo": 349.29,
-     "hi": 358.67
-    },
-    "liq_above": 372.08,
-    "liq_below": 331.15,
-    "order_block": {
-     "dir": "rialzista",
-     "lo": 358.78,
-     "hi": 361.81
-    }
-   },
-   "rs_1m": -10.6,
    "rs_bench": "ndx"
   },
   {
@@ -14209,8 +13487,8 @@
    "beta": 1.0,
    "prepost": {
     "label": "pre",
-    "price": 333.52,
-    "change_pct": -0.19
+    "price": 333.4,
+    "change_pct": -0.22
    },
    "sector": "Financial Services",
    "stats": {
@@ -15166,8 +14444,8 @@
    "beta": 0.11,
    "prepost": {
     "label": "pre",
-    "price": 503.27,
-    "change_pct": -0.08
+    "price": 502.42,
+    "change_pct": -0.25
    },
    "sector": "Industrials",
    "stats": {
@@ -15795,8 +15073,8 @@
    "beta": 1.23,
    "prepost": {
     "label": "pre",
-    "price": 562.74,
-    "change_pct": 0.1
+    "price": 562.99,
+    "change_pct": 0.14
    },
    "sector": "Communication Services",
    "stats": {
@@ -16567,8 +15845,8 @@
    "beta": 2.28,
    "prepost": {
     "label": "pre",
-    "price": 285.45,
-    "change_pct": 2.3
+    "price": 285.98,
+    "change_pct": 2.49
    },
    "sector": "Technology",
    "stats": {
@@ -17376,7 +16654,7 @@
    "beta": 1.44,
    "prepost": {
     "label": "pre",
-    "price": 232.92,
+    "price": 232.93,
     "change_pct": -0.51
    },
    "sector": "Consumer Cyclical",
@@ -17485,19 +16763,19 @@
   {
    "ticker": "MU",
    "name": "Micron",
-   "value_eur": 64840.56,
+   "value_eur": 64914.19,
    "sector": "Technology"
   },
   {
    "ticker": "NVDA",
    "name": "NVIDIA",
-   "value_eur": 47567.31,
+   "value_eur": 47621.32,
    "sector": "Technology"
   },
   {
    "ticker": "AMD",
    "name": "AMD",
-   "value_eur": 45783.19,
+   "value_eur": 45835.17,
    "sector": "Technology"
   },
   {
@@ -17509,19 +16787,19 @@
   {
    "ticker": "GOOGL",
    "name": "Alphabet Inc",
-   "value_eur": 15241.83,
+   "value_eur": 15259.14,
    "sector": "Communication Services"
   },
   {
    "ticker": "MSTR",
    "name": "Strategy",
-   "value_eur": 11248.58,
+   "value_eur": 11261.35,
    "sector": "Technology"
   },
   {
    "ticker": "RGTI",
    "name": "Rigetti",
-   "value_eur": 9651.77,
+   "value_eur": 9662.73,
    "sector": "Technology"
   }
  ],
@@ -18502,7 +17780,7 @@
     179564,
     182043,
     183828,
-    184985,
+    184984,
     183394,
     175578,
     175369,
@@ -20486,8 +19764,8 @@
    "fomo_label": "Nessuna FOMO"
   },
   "vix": {
-   "value": 19.22,
-   "change_pct": -1.39,
+   "value": 19.28,
+   "change_pct": -1.08,
    "spark": [
     17.87,
     17.26,
@@ -20518,7 +19796,7 @@
     16.4,
     17.28,
     19.49,
-    19.22
+    19.28
    ]
   },
   "fedwatch": {
@@ -26149,15 +25427,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1355",
-    "change_pct": -0.63,
+    "value": "1.1342",
+    "change_pct": -0.75,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "183.57",
-    "change_pct": -0.57,
+    "value": "183.42",
+    "change_pct": -0.65,
     "suffix": "%"
    }
   ],
@@ -26165,8 +25443,8 @@
    "us10": 4.49,
    "jp10": 2.68,
    "spread": 1.81,
-   "usdjpy": 161.71,
-   "usdjpy_chg_1m": 1.74,
+   "usdjpy": 161.74,
+   "usdjpy_chg_1m": 1.76,
    "boj_rate": 0.3,
    "boj_meetings": [
     "2026-07-31",
@@ -26193,7 +25471,7 @@
     },
     {
      "label": "VIX",
-     "score": 69
+     "score": 68
     },
     {
      "label": "Put/Call",
@@ -28837,7 +28115,7 @@
    "rate_date": "2026-05-01"
   },
   "smart_money": {
-   "score": 40,
+   "score": 39,
    "label": "Cauto",
    "smc_indices": {
     "sp500": {
@@ -28885,10 +28163,10 @@
    },
    "smc_avg": 34,
    "vix3m": 19.6,
-   "vix_term_ratio": 0.982,
+   "vix_term_ratio": 0.985,
    "ig_spread": 0.93,
    "hy_ig_ratio": 2.85,
-   "divergence": -13,
+   "divergence": -12,
    "divergence_label": "Allineati",
    "components": [
     {
@@ -28897,7 +28175,7 @@
     },
     {
      "label": "Struttura VIX (contango/backw.)",
-     "score": 62
+     "score": 61
     },
     {
      "label": "Spread HY/IG (fuga qualità)",
@@ -28959,7 +28237,7 @@
     },
     {
      "label": "Volatilità (VIX)",
-     "score": 62
+     "score": 61
     },
     {
      "label": "Rischio Credito (HY)",
@@ -28967,7 +28245,7 @@
     },
     {
      "label": "Smart Money (VIX+HY/IG+P/C)",
-     "score": 40
+     "score": 39
     }
    ],
    "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici (il MacroQuant ufficiale di BCA Research è proprietario e a pagamento)."
@@ -29093,8 +28371,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1693886870153,
-   "change_pct": -0.61
+   "mcap_usd": 1692597733475,
+   "change_pct": -0.68
   },
   {
    "ticker": "TSLA",
@@ -29499,7 +28777,7 @@
      109.14,
      102.59,
      106.2,
-     108.02,
+     108.01,
      110.72,
      112.93,
      111.46,
@@ -29862,8 +29140,8 @@
    "beta": null,
    "prepost": {
     "label": "pre",
-    "price": 735.33,
-    "change_pct": 0.24
+    "price": 735.63,
+    "change_pct": 0.28
    },
    "sector": "ETF",
    "stats": {
@@ -30619,8 +29897,8 @@
    "beta": null,
    "prepost": {
     "label": "pre",
-    "price": 717.92,
-    "change_pct": 0.6
+    "price": 718.83,
+    "change_pct": 0.73
    },
    "sector": "ETF",
    "stats": {
@@ -30966,7 +30244,7 @@
      44.07,
      45.52,
      47.94,
-     44.93,
+     44.94,
      46.34,
      49.81,
      48.15,
@@ -31362,8 +30640,8 @@
    "beta": null,
    "prepost": {
     "label": "pre",
-    "price": 296.04,
-    "change_pct": 0.24
+    "price": 296.1,
+    "change_pct": 0.26
    },
    "sector": "ETF",
    "stats": {
@@ -32768,8 +32046,8 @@
    "beta": null,
    "prepost": {
     "label": "pre",
-    "price": 86.43,
-    "change_pct": 0.27
+    "price": 86.42,
+    "change_pct": 0.26
    },
    "sector": "ETF",
    "stats": {
@@ -35448,7 +34726,7 @@
      69.86,
      70.24,
      69.96,
-     71.99,
+     72.0,
      71.31,
      76.29,
      72.86,
@@ -36087,7 +35365,7 @@
      44.74,
      42.07,
      40.84,
-     41.61,
+     41.6,
      38.7,
      39.68,
      41.86,
@@ -36647,6 +35925,19 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
+   "source": "MarketWatch",
+   "title": "World’s hottest stock market rallies after 10% plunge",
+   "link": "https://www.marketwatch.com/story/worlds-hottest-stock-market-rallies-after-10-plunge-156f47fa?mod=mw_rss_topstories",
+   "published": "2026-06-24T08:14:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Il rally del mercato azionario più caldo del mondo dopo il crollo del 10%."
+  },
+  {
    "source": "Google News",
    "title": "New Chairman, Old Inflation, Surprise Jobs Data: How Will Global Assets Be Repriced After Walsh's Debut? - odaily.news",
    "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE02dFFZblEyNHFuWmpIbnBtRlZiWVpiNXhUT3puaTc1aVk5RVlFSFRtM0ZpdlphN0tSR0lDdFF2QUZudzM2NnBsdDlEUDNWYnc?oc=5",
@@ -36856,7 +36147,8 @@
    "link": "https://www.cnbc.com/2026/06/23/alphabet-verizon-dow-djia.html",
    "published": "2026-06-24T01:40:44Z",
    "tickers": [
-    "MACRO"
+    "MACRO",
+    "GOOGL"
    ],
    "topic_pri": 0,
    "inv": false,
@@ -36896,7 +36188,8 @@
    "link": "https://www.marketwatch.com/story/alphabets-stock-is-set-to-join-the-dow-heres-which-company-is-getting-the-boot-73453ca7?mod=mw_rss_topstories",
    "published": "2026-06-24T00:25:00Z",
    "tickers": [
-    "MACRO"
+    "MACRO",
+    "GOOGL"
    ],
    "topic_pri": 0,
    "inv": false,
@@ -37000,20 +36293,6 @@
    "title_it": "Il Senato americano vota per fermare la guerra con l'Iran nell'ultimo rimprovero a Trump - Reuters"
   },
   {
-   "source": "MarketWatch",
-   "title": "Micron and Sandisk lead a sharp tech selloff in a ‘gut-check’ moment for AI stocks",
-   "link": "https://www.marketwatch.com/story/micron-and-sandisk-lead-a-sharp-tech-selloff-in-a-gut-check-moment-for-ai-stocks-cd92fa5d?mod=mw_rss_topstories",
-   "published": "2026-06-23T21:23:00Z",
-   "tickers": [
-    "MACRO",
-    "MU"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Micron e Sandisk guidano una forte svendita tecnologica in un momento di “controllo viscerale” per i titoli dell’intelligenza artificiale"
-  },
-  {
    "source": "AP",
    "title": "Federal appeals court allows the Trump administration to resume expanded use of speedy deportations - AP News",
    "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOMzNRWjhYYklQUXlJemJRRmJuRmlRVVg0RFVNMS1rcFl6emVzcDNPb3lDaXVQeXk0c2RJaGY0TEhOSDkzU2JvRms2eFh3b1VZUUY1NHRCaHlONUExV0FUOC15SjQwejJDNmtVUTMzaE1HUFBLUW5CTnVid2JaMWdDbjM2UXk2Y1FEWEhqU29MUEZqT0N5MEZZRXJZUmdtUlZSRmxqU1piMA?oc=5",
@@ -37026,6 +36305,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "La Corte d'appello federale consente all'amministrazione Trump di riprendere l'uso esteso delle deportazioni rapide - AP News"
+  },
+  {
+   "source": "Google News",
+   "title": "Trump to pay visit to closely divided Pennsylvania in return to campaigning - Y100 WNCY",
+   "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNNXFVQVlYUmxlNUFxQXJOUE5SZllIazY1ZzloQXJ1cG9jRlJBQkppWWJfbEV1SkhzYmFRRldNSGVIbFBFUThEY3JZdzBRLTBzcjQ0TlhuMDd1YnI5SEtNUFhBQm5HTXd5VHE3c3YxQ0NNd0xGblBmaUtxMWsyOEdyZWpZd1ZxRGVqa0xaR3FJeUxpRGt2aUxzS0c2cXZxMXIzNGV3QVFubw?oc=5",
+   "published": "2026-06-23T19:40:44Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump farà visita alla Pennsylvania, molto divisa, in cambio della campagna elettorale – Y100 WNCY"
   },
   {
    "source": "Google News",
@@ -37053,19 +36346,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Pochi negli Stati Uniti dicono che ne è valsa la pena la guerra con l’Iran; L'approvazione di Trump si colloca al livello più basso del mandato, secondo un sondaggio Reuters/Ipsos - Reuters"
-  },
-  {
-   "source": "Google News",
-   "title": "May PCE Expected to Show Rising Inflation - Morningstar",
-   "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTE1CaDcyQ3NWdXA4c2FjYTNxV19wd2R2cDMyMWhOMG1pdzRKYWtYa2k3ZlM1b1d5bWpJa191dGx0TFpaVlVqWUUxYjJoY1lzckFmSW15cDdEOUN6b0RaT3BaejFTQU1DdzE3akR0Q05ENVdUbDNsTVZON3hYSkR6U0k?oc=5",
-   "published": "2026-06-23T17:29:45Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Si prevede che il PCE di maggio mostrerà un'inflazione in aumento - Morningstar"
   },
   {
    "source": "CNBC Markets",
@@ -37153,7 +36433,7 @@
    "title": "Will Bitcoin dip to $57,500 in June?",
    "title_it": "Will Bitcoin dip to $57,500 in June? — probabilità Sì 15%",
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-57pt5k-in-june-2026-623",
-   "published": "2026-06-24T08:13:17Z",
+   "published": "2026-06-24T08:15:55Z",
    "tickers": [
     "MACRO"
    ],
@@ -37164,7 +36444,7 @@
    "title": "Will the price of Bitcoin be above $58,000 on June 24?",
    "title_it": "Will the price of Bitcoin be above $58,000 on June 24? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-58k-on-june-24-2026",
-   "published": "2026-06-24T08:13:17Z",
+   "published": "2026-06-24T08:15:55Z",
    "tickers": [
     "MACRO"
    ],
@@ -37175,7 +36455,7 @@
    "title": "Will Bitcoin dip to $55,000 in June?",
    "title_it": "Will Bitcoin dip to $55,000 in June? — probabilità Sì 5%",
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-55k-in-june-2026-779",
-   "published": "2026-06-24T08:13:17Z",
+   "published": "2026-06-24T08:15:55Z",
    "tickers": [
     "MACRO"
    ],
@@ -37186,7 +36466,7 @@
    "title": "Will the price of Bitcoin be above $56,000 on June 24?",
    "title_it": "Will the price of Bitcoin be above $56,000 on June 24? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-56k-on-june-24-2026",
-   "published": "2026-06-24T08:13:17Z",
+   "published": "2026-06-24T08:15:55Z",
    "tickers": [
     "MACRO"
    ],
