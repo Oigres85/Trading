@@ -53,8 +53,8 @@
    "name": "Palantir",
    "qty": 100,
    "pmc": 113.5,
-   "bval": 11387.0,
-   "bgain": 37.0
+   "bval": 11387,
+   "bgain": 37
   },
   {
    "ticker": "CBRS",
@@ -133,6 +133,11 @@
   },
   {
    "ticker": "AMZN",
+   "name": null,
+   "currency": "USD"
+  },
+  {
+   "ticker": "MICROSOFT",
    "name": null,
    "currency": "USD"
   }
