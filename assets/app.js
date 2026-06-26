@@ -5,15 +5,19 @@ let sparkRange = "m1";   // 1G | 1M | 1A
 
 /* ordinamento tabelle: click su intestazione → desc → asc → default */
 const SORT_FIELDS = {
-  // colonne attuali (senza "Valore" e "Max storico")
-  "ptf-table": ["name", "qty", "pmc", "change_pct", "change_pct", "prepost_chg", "volume",
-                "gain", "gain_pct", "pe", "eps", "beta", "support",
-                "resistance", "rsi", "vol_ratio", "health", "upside_pct", "upside_pct", "fin_health",
-                "stat:short_float", "w52_dist_pct", null],
-  "wl-table": ["name", "change_pct", "change_pct", "prepost_chg", "volume", "pe", "eps",
-               "beta", "support", "resistance", "rsi", "vol_ratio",
-               "health", "upside_pct", "upside_pct", "fin_health",
-               "stat:short_float", "w52_dist_pct", null],
+  // allineato 1:1 alle <th>: Titolo,Qtà,PMC,Prezzo,Oggi,Pre/After,Volume,Guadagno,Guad.%,
+  // P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,Vol/media,RS 1M,Segnale,Rating,Target Δ,
+  // Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
+  "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg", "volume",
+                "gain", "gain_pct", "pe", "eps", "beta", "sharpe_1y", "support",
+                "resistance", "rsi", "vol_ratio", "rs_1m", null, "upside_pct", "upside_pct",
+                "fin_health", "stat:short_float", "w52_dist_pct", null, null],
+  // Titolo,Prezzo,Oggi,Pre/After,Volume,P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,
+  // Vol/media,RS 1M,Segnale,Rating,Target Δ,Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
+  "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume", "pe", "eps",
+               "beta", "sharpe_1y", "support", "resistance", "rsi", "vol_ratio",
+               "rs_1m", null, "upside_pct", "upside_pct", "fin_health",
+               "stat:short_float", "w52_dist_pct", null, null],
   // tabelle fondamentali (vista Value); i campi "stat:" leggono da r.stats
   "ptf-fund-table": ["name", "qty", "pmc", "price", "stat:market_cap", "stat:ev_ebitda",
                      "stat:roe", "stat:gross_margin", "stat:profit_margin", "pfcf",
@@ -170,6 +174,49 @@ async function waitForNewData(prev, tries = 28) {
   return false;
 }
 
+/* ---- Barra di avanzamento dell'aggiornamento (la pipeline è lenta: feedback continuo) ---- */
+let _refreshTimer = null;
+const REFRESH_STAGES = [
+  [0,  "Avvio pipeline su GitHub Actions…"],
+  [12, "Download prezzi e fondamentali (Yahoo Finance)…"],
+  [32, "Elaborazione indici, macro e rotazione settoriale…"],
+  [52, "Calcolo Sharpe Ratio, opzioni e SMC…"],
+  [72, "Generazione e validazione data.json…"],
+  [88, "Quasi pronto, attendo la pubblicazione…"],
+];
+function showRefreshProgress() {
+  hideRefreshProgress();
+  const el = document.createElement("div");
+  el.id = "refresh-progress";
+  el.className = "refresh-progress";
+  el.innerHTML = `
+    <div class="rp-row"><span class="rp-spin"></span><span class="rp-msg" id="rp-msg">Avvio aggiornamento…</span><span class="rp-pct" id="rp-pct">0%</span></div>
+    <div class="rp-track"><div class="rp-fill" id="rp-fill" style="width:0%"></div></div>`;
+  document.body.appendChild(el);
+  const start = Date.now();
+  const EST = 150000;   // stima ~2,5 minuti
+  _refreshTimer = setInterval(() => {
+    const pct = Math.min(92, ((Date.now() - start) / EST) * 92);
+    const stage = [...REFRESH_STAGES].reverse().find(s => pct >= s[0]) || REFRESH_STAGES[0];
+    setRefreshProgress(pct, stage[1]);
+  }, 500);
+}
+function setRefreshProgress(pct, msg) {
+  const f = document.getElementById("rp-fill"); if (f) f.style.width = pct.toFixed(0) + "%";
+  const p = document.getElementById("rp-pct"); if (p) p.textContent = Math.round(pct) + "%";
+  if (msg) { const m = document.getElementById("rp-msg"); if (m) m.textContent = msg; }
+}
+function finishRefreshProgress(ok) {
+  if (_refreshTimer) { clearInterval(_refreshTimer); _refreshTimer = null; }
+  setRefreshProgress(100, ok ? "Aggiornamento completato ✓" : "Tempo scaduto — i dati potrebbero arrivare a breve");
+  setTimeout(hideRefreshProgress, ok ? 1200 : 2500);
+}
+function hideRefreshProgress() {
+  const el = document.getElementById("refresh-progress");
+  if (el) el.remove();
+  if (_refreshTimer) { clearInterval(_refreshTimer); _refreshTimer = null; }
+}
+
 /* Aggiorna: prezzi live all'istante + rigenerazione completa via workflow (col token,
    chiesto una sola volta). Senza token resta comunque utile (prezzi live + reload). */
 function showRefreshDoneModal() {
@@ -205,16 +252,19 @@ async function refreshAll() {
       return;
     }
     if (res.status !== 204) { toast(`Errore avvio aggiornamento (HTTP ${res.status})`); return; }
-    toast("Pipeline avviata · rigenerazione completa in background (~2-3 min)");
+    showRefreshProgress();
     waitForNewData(DATA?.updated_at).then(ok => {
+      finishRefreshProgress(ok);
+      const b2 = $("#btn-refresh");
+      const origTxt = "⟳ Aggiorna";
+      b2.classList.remove("btn-refreshing");
       if (ok) {
-        const b2 = $("#btn-refresh");
-        const origTxt = "⟳ Aggiorna";
         b2.textContent = "✓ Aggiornato";
-        b2.classList.remove("btn-refreshing");
         b2.classList.add("btn-done");
         setTimeout(() => { b2.textContent = origTxt; b2.classList.remove("btn-done"); }, 6000);
         showRefreshDoneModal();
+      } else {
+        b2.textContent = origTxt;
       }
     });
   } catch (e) {
@@ -347,9 +397,12 @@ function addWatchlist() {
 
 // riga segnaposto finché il workflow non porta i dati tecnici completi
 function placeholderRow(ticker, currency, extra) {
+  // valore provvisorio = costo (PMC × qtà): rende l'allocazione subito congrua,
+  // poi fillLivePrice lo raffina col prezzo reale. Evita posizioni "a 0" se il quote fallisce.
+  const provValue = (currency === "USD" && extra && extra.qty && extra.pmc) ? extra.qty * extra.pmc : 0;
   return {
-    ticker, name: ticker, currency, price: null, change_pct: null,
-    value: 0, gain: 0, gain_pct: null, pe: null, eps: null, beta: null,
+    ticker, name: ticker, currency, price: extra && extra.pmc || null, change_pct: null,
+    value: provValue, gain: 0, gain_pct: null, pe: null, eps: null, beta: null,
     ath: null, ath_dist_pct: null, support: null, resistance: null, rsi: null,
     volume: null, vol_ratio: null, signal: "in caricamento…", signal_class: "neutral",
     sparks: {}, tech_by_range: {}, rating: null, prepost: null, stats: null,
@@ -359,17 +412,18 @@ function placeholderRow(ticker, currency, extra) {
 
 function fillLivePrice(row, after) {
   fetchQuote(row.ticker).then(q => {
-    if (!q) return;
-    row.price = Math.round(q.price * 100) / 100;
-    row.change_pct = Math.round((q.price / q.prev - 1) * 10000) / 100;
-    if (row.currency === "USD" && row.qty) {
-      row.value = row.price * row.qty;
-      row.gain = row.value - row.pmc * row.qty;
-      row.gain_pct = Math.round((row.value / (row.pmc * row.qty) - 1) * 10000) / 100;
+    if (q) {
+      row.price = Math.round(q.price * 100) / 100;
+      row.change_pct = Math.round((q.price / q.prev - 1) * 10000) / 100;
+      if (row.currency === "USD" && row.qty) {
+        row.value = row.price * row.qty;
+        row.gain = row.value - row.pmc * row.qty;
+        row.gain_pct = Math.round((row.value / (row.pmc * row.qty) - 1) * 10000) / 100;
+      }
     }
     row._loading = false;
-    if (after) after();
-  });
+    if (after) after();   // anche se il quote fallisce: l'allocazione resta congrua col valore provvisorio
+  }).catch(() => { row._loading = false; if (after) after(); });
 }
 
 function removeHolding(section, ticker) {
@@ -506,6 +560,36 @@ function renderCash() {
   if (inp && document.activeElement !== inp) inp.value = cashEur || "";
   const note = $("#cash-note");
   if (note) note.textContent = cashEur > 0 ? `inclusa nel totale e nell'allocazione (${fmtEUR.format(cashEur)})` : "";
+  renderCashDrag();
+}
+
+/* Cash Drag: quantifica l'impatto della liquidità infruttifera (0%) sul CAGR obiettivo €1M.
+   Se la cassa è una frazione c del patrimonio, la quota investita (1-c) deve rendere
+   g/(1-c) per compensare lo 0% della liquidità e mantenere il CAGR complessivo g. */
+function renderCashDrag() {
+  const box = $("#cash-drag");
+  if (!box) return;
+  const GOAL = 1_000_000;
+  const controvalore = (DATA?.totals || {}).eur_invested || 0;
+  const patrimonio = controvalore + cashEur;
+  if (!(cashEur > 0) || patrimonio <= 0 || patrimonio >= GOAL) { box.hidden = true; return; }
+  const g = (Math.pow(GOAL / patrimonio, 1 / 10) - 1) * 100;   // CAGR complessivo necessario
+  const c = cashEur / patrimonio;                               // frazione liquidità
+  const cashPct = c * 100;
+  const investedPct = (1 - c) * 100;
+  const rInvested = g / (1 - c);                                // rendimento richiesto sulla sola quota investita
+  const drag = rInvested - g;                                   // peso aggiuntivo dovuto al cash
+  const col = drag > 4 ? "var(--red)" : drag > 2 ? "var(--yellow)" : "var(--green)";
+  box.hidden = false;
+  box.innerHTML = `
+    <div class="cash-drag-head"><b>Cash Drag</b> <span class="muted">impatto liquidità a 0% sul CAGR obiettivo</span></div>
+    <div class="cash-drag-body">
+      La liquidità è il <b>${cashPct.toFixed(1)}%</b> del patrimonio e rende <b>0%</b>.
+      Per restare sulla traiettoria del milione (CAGR complessivo <b>${g.toFixed(1)}%</b>),
+      la sola quota investita (<b>${investedPct.toFixed(1)}%</b>) deve rendere
+      <b style="color:${col}">${rInvested.toFixed(1)}%</b> annuo —
+      un sovraccarico di <b style="color:${col}">+${drag.toFixed(1)} pp</b> dovuto al cash.
+    </div>`;
 }
 function saveCash() {
   cashEur = parseFloat($("#cash-input").value) || 0;
@@ -595,6 +679,78 @@ function renderMiniCards() {
       <div class="mc-value" style="color:${scoreColor(mq.score)}">${mq.score}% · ${mqLab}</div>
       <div class="mc-sub muted">salute ciclo: PIL · lavoro · inflazione · credito</div>`;
   }
+  // Stagionalità (S&P 500 / Nasdaq): tachimetro del mese corrente
+  const se = m.seasonality, seBox = $("#seasonality-box");
+  if (seBox && se && se.score != null) {
+    const cm = MONTH_NAMES[(se.current_month || 1) - 1];
+    const both = se.sp_score != null && se.ndx_score != null;
+    const sub = both
+      ? `${cm}: S&P ${se.sp_score}% · NDX ${se.ndx_score}%`
+      : `${cm} · ${se.sp_score != null ? "S&P" : "Nasdaq"}`;
+    seBox.innerHTML = `<div class="mc-title">Stagionalità (${cm})</div>
+      ${compactSemiGauge(se.score, ["Sfavorevole", "Favorevole"])}
+      <div class="mc-value" style="color:${scoreColor(se.score)}">${se.score}% · ${se.label}</div>
+      <div class="mc-sub muted">${sub}</div>`;
+  }
+}
+
+const MONTH_NAMES = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+  "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+const MONTH_ABBR = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
+
+/* Popup stagionalità: grafico a barre con rendimento medio mensile sovrapposto S&P + Nasdaq */
+function openSeasonalityModal() {
+  const se = (DATA.macro || {}).seasonality;
+  if (!se) { toast("Dati stagionalità non disponibili"); return; }
+  const sp = se.sp500 || [], ndx = se.ndx || [];
+  const cm = se.current_month || 1;
+  // range comune per scalare le barre
+  const allAvg = [...sp, ...ndx].map(x => x.avg).filter(v => v != null);
+  const maxAbs = Math.max(0.5, ...allAvg.map(Math.abs));
+  const W = 620, H = 240, padL = 30, padB = 28, padT = 14, padR = 10;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const zeroY = padT + innerH / 2;
+  const colW = innerW / 12;
+  const barW = colW * 0.32;
+  const bar = (arr, color, off) => arr.map(x => {
+    if (x.avg == null) return "";
+    const cx = padL + (x.m - 0.5) * colW + off;
+    const h = Math.abs(x.avg) / maxAbs * (innerH / 2);
+    const yTop = x.avg >= 0 ? zeroY - h : zeroY;
+    const hl = x.m === cm ? `stroke="var(--text)" stroke-width="1"` : "";
+    return `<rect x="${(cx - barW / 2).toFixed(1)}" y="${yTop.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1, h).toFixed(1)}" fill="${color}" ${hl}><title>${MONTH_NAMES[x.m - 1]}: ${x.avg > 0 ? "+" : ""}${x.avg}% medio · ${x.pos}% positivi (${x.n} anni)</title></rect>`;
+  }).join("");
+  const monthLabels = MONTH_ABBR.map((mn, i) => {
+    const cx = padL + (i + 0.5) * colW;
+    const hl = (i + 1) === cm ? `font-weight="700" fill="var(--text)"` : `fill="var(--muted)"`;
+    return `<text x="${cx.toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="9" ${hl}>${mn}</text>`;
+  }).join("");
+  const gridY = [-maxAbs, 0, maxAbs].map(gv => {
+    const gy = zeroY - gv / maxAbs * (innerH / 2);
+    return `<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${W - padR}" y2="${gy.toFixed(1)}" stroke="var(--border)" stroke-width="${gv === 0 ? 1.4 : 1}"/>
+      <text x="${padL - 4}" y="${(gy + 3).toFixed(1)}" text-anchor="end" font-size="8" fill="var(--muted)">${gv > 0 ? "+" : ""}${gv.toFixed(1)}%</text>`;
+  }).join("");
+  const spAvgY = sp.length ? (sp.reduce((s, x) => s + (x.avg || 0), 0) / sp.length) : 0;
+  const ndxAvgY = ndx.length ? (ndx.reduce((s, x) => s + (x.avg || 0), 0) / ndx.length) : 0;
+  const curSp = sp.find(x => x.m === cm), curNdx = ndx.find(x => x.m === cm);
+  openInfoModal(`Stagionalità storica — ${MONTH_NAMES[cm - 1]}`,
+    `<div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Rendimento medio mensile storico di <b style="color:var(--blue)">S&P 500</b> e <b style="color:var(--purple)">Nasdaq 100</b> per ogni mese del calendario (intera storia disponibile). Il mese corrente è evidenziato. Il tachimetro nella dashboard sintetizza la favorevolezza stagionale del mese in corso.</div>
+     <div class="info-line" style="margin-bottom:6px">
+       <b>Mese corrente (${MONTH_NAMES[cm - 1]}):</b>
+       ${curSp ? ` S&P <span class="${signCls(curSp.avg)}">${curSp.avg > 0 ? "+" : ""}${curSp.avg}%</span> (${curSp.pos}% positivi)` : ""}
+       ${curNdx ? ` · Nasdaq <span class="${signCls(curNdx.avg)}">${curNdx.avg > 0 ? "+" : ""}${curNdx.avg}%</span> (${curNdx.pos}% positivi)` : ""}
+     </div>
+     <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
+       ${gridY}
+       ${bar(sp, "var(--blue)", -barW * 0.6)}
+       ${bar(ndx, "var(--purple)", barW * 0.6)}
+       ${monthLabels}
+     </svg>
+     <div class="info-line" style="display:flex;gap:16px;font-size:11px;margin-top:6px">
+       <span><span style="display:inline-block;width:10px;height:10px;background:var(--blue);border-radius:2px;vertical-align:middle"></span> S&P 500 (media ${spAvgY > 0 ? "+" : ""}${spAvgY.toFixed(2)}%/mese)</span>
+       <span><span style="display:inline-block;width:10px;height:10px;background:var(--purple);border-radius:2px;vertical-align:middle"></span> Nasdaq 100 (media ${ndxAvgY > 0 ? "+" : ""}${ndxAvgY.toFixed(2)}%/mese)</span>
+     </div>
+     <div class="info-line muted" style="font-size:11px;margin-top:8px">La stagionalità è una tendenza statistica storica, NON una garanzia: usala come contesto di probabilità, non come segnale isolato. "Sell in May", il rally di fine anno (Santa Claus rally) e la debolezza di settembre sono i pattern più noti.</div>`);
 }
 
 /* ---------------- rotazione settoriale: heatmap + istogramma + popup ---------------- */
@@ -821,7 +977,8 @@ function renderKPI() {
       sub: `dopo tasse stimate (26% azioni · 12,5% BTP)${b && b.cedole_btp ? ` · cedole BTP ${fmtEUR.format(b.cedole_btp)}` : ""}`,
       subCls: signCls(net), accent: net >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(net) },
   ];
-  // Alpha vs benchmark (oggi): portafoglio Day % − indice principale
+  // Daily Tracking Error vs benchmark (oggi): portafoglio Day % − indice principale
+  // (differenza aritmetica intraday, non un alpha corretto per il rischio su base storica)
   const bm = (DATA.macro || {}).benchmarks;
   if (bm) {
     const pday = portfolioDayPct();
@@ -829,17 +986,31 @@ function renderKPI() {
     const refLab = { sp500: "S&P 500", ndx: "Nasdaq 100", sox: "SOX" }[ref];
     const alpha = (pday != null && bm[ref] != null) ? pday - bm[ref] : null;
     kpis.push({
-      label: "Alpha oggi vs " + refLab,
+      label: "Daily Tracking Error vs " + refLab,
       value: alpha != null ? signTxt(Math.round(alpha * 100) / 100) + " pp" : "—",
       sub: `portaf. ${pday != null ? signTxt(Math.round(pday * 100) / 100) : "—"} · clicca per S&P/Nasdaq/SOX`,
       accent: "var(--cyan)", valueCls: signCls(alpha), kpiKey: "alpha",
+    });
+  }
+  // Sharpe Ratio complessivo del portafoglio (rendimento corretto per il rischio)
+  const pSharpe = t.portfolio_sharpe_ratio;
+  if (pSharpe != null) {
+    kpis.push({
+      label: "Sharpe Ratio portafoglio",
+      value: fmtNum.format(pSharpe),
+      sub: pSharpe > 2 ? "eccellente · rendimento/rischio efficiente"
+        : pSharpe >= 1 ? "buono · qualità istituzionale"
+        : pSharpe >= 0 ? "debole · poco premio per la volatilità"
+        : "negativo · rischio non ripagato",
+      accent: sharpeColor(pSharpe), valueCls: "",
+      valueStyle: `color:${sharpeColor(pSharpe)}`,
     });
   }
 
   $("#kpi-grid").innerHTML = kpis.map(k => `
     <div class="kpi${k.kpiKey ? " kpi-click" : ""}" style="--accent:${k.accent}"${k.kpiKey ? ` data-kpi="${k.kpiKey}" role="button" tabindex="0" title="Clicca per il dettaglio"` : ""}>
       <div class="label">${k.label}</div>
-      <div class="value ${k.valueCls || ""}">${k.value}</div>
+      <div class="value ${k.valueCls || ""}"${k.valueStyle ? ` style="${k.valueStyle}"` : ""}>${k.value}</div>
       <div class="sub ${k.subCls || ""}">${k.sub || ""}</div>
     </div>`).join("");
 
@@ -1020,20 +1191,31 @@ function renderHistory() {
     const stDates = oldDates.concat(ec.map(p => p.d));
     const stVals = oldVals.concat(ec.map(p => p.v));
     h = { dates: stDates, values: stVals };
-    // benchmark sovrapposto: campiona la serie indice (pipeline) sulle date stitchate e riscala al 1° valore
-    if (all?.dates?.length) {
+    // benchmark sovrapposto. Preferito: serie indice ALLINEATA alle date reali del broker
+    // (broker_bench, generata dalla pipeline) — corretta anche per IPO recenti che accorciano
+    // la storia del portafoglio. Fallback: campionamento per data vicina sulla serie "all".
+    const bb = DATA.history?.broker_bench;
+    const bbUsable = bb && !oldVals.length && Array.isArray(bb.dates) && bb.dates.length === ec.length;
+    if (bbUsable) {
+      ["nasdaq", "ndx", "sp500", "russell"].forEach(bk => {
+        if (Array.isArray(bb[bk]) && bb[bk].length === stVals.length) h[bk] = bb[bk];
+      });
+    } else if (all?.dates?.length) {
       const allT = all.dates.map(d => +new Date(d));
       ["nasdaq", "ndx", "sp500", "russell"].forEach(bk => {
         const ser = all[bk];
         if (!ser || ser.length !== all.dates.length) return;
-        const t0 = +new Date(stDates[0]);
         const sampled = stDates.map(d => {
           const t = +new Date(d);
           let bi = 0, best = Infinity;
           for (let i = 0; i < allT.length; i++) { const dd = Math.abs(allT[i] - t); if (dd < best) { best = dd; bi = i; } }
           return ser[bi];
         });
-        if (sampled[0]) { const sf = stVals[0] / sampled[0]; h[bk] = sampled.map(v => Math.round(v * sf)); }
+        // se il campionamento è quasi tutto piatto (copertura indice < finestra), non mostrare l'overlay fuorviante
+        const distinct = new Set(sampled).size;
+        if (sampled[0] && distinct > Math.max(3, sampled.length * 0.3)) {
+          const sf = stVals[0] / sampled[0]; h[bk] = sampled.map(v => Math.round(v * sf));
+        }
       });
     }
     realCurve = true;
@@ -1350,6 +1532,48 @@ function drawdownCell(r) {
   return `<td class="num"><span class="${d < 0 ? "neg" : "pos"}">${signTxt(d)}</span></td>`;
 }
 
+/* Cella Sharpe 1A: verde brillante >2, verde tenue 1-2, grigio <1 (cliccabile per spiegazione) */
+function sharpeColor(s) {
+  if (s == null) return "var(--muted)";
+  if (s > 2) return "var(--green)";
+  if (s >= 1) return "#86c52a";       // verde tenue
+  if (s >= 0) return "var(--muted)";
+  return "var(--red)";                // negativo = sottoperforma il risk-free
+}
+function sharpeCell(r) {
+  const s = r.sharpe_1y;
+  if (s == null) return `<td class="num muted">—</td>`;
+  return `<td class="num sharpe-cell" data-sharpe-tk="${r.ticker}" role="button" tabindex="0" title="Sharpe Ratio 12 mesi — clicca per la spiegazione"><b style="color:${sharpeColor(s)};font-family:var(--mono)">${fmtNum.format(s)}</b></td>`;
+}
+
+function openSharpeInfo(ticker) {
+  const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
+  const r = all.find(x => x.ticker === ticker);
+  if (!r) return;
+  const s = r.sharpe_1y;
+  const rf = ((DATA.totals || {}).risk_free_rate ?? 0.0363) * 100;
+  const pSharpe = (DATA.totals || {}).portfolio_sharpe_ratio;
+  const verdict = s == null ? null
+    : s > 2 ? { t: "ECCELLENTE", c: "var(--green)", d: "rendimento per unità di rischio molto alto: il titolo ha pagato bene la volatilità sopportata." }
+    : s >= 1 ? { t: "BUONO", c: "#86c52a", d: "rendimento corretto per il rischio solido (sopra 1 = accettabile per gli istituzionali)." }
+    : s >= 0 ? { t: "DEBOLE", c: "var(--muted)", d: "rendimento che ha appena battuto (o quasi) il tasso privo di rischio: poco premio per la volatilità." }
+    : { t: "NEGATIVO", c: "var(--red)", d: "ha reso meno del tasso privo di rischio: il rischio assunto NON è stato ripagato." };
+  openInfoModal(`Sharpe Ratio (12 mesi) — ${r.name} (${ticker})`,
+    `<div class="info-line" style="margin-bottom:10px"><b>Cos'è lo Sharpe Ratio?</b><br>Misura il <b>rendimento corretto per il rischio</b>: quanto extra-rendimento (sopra il tasso privo di rischio del <b>${fmtNum.format(rf)}%</b>) un titolo genera per ogni unità di volatilità. Formula: <span style="font-family:var(--mono)">(Rendimento annuo − ${fmtNum.format(rf)}%) ÷ Volatilità annua</span>. Più è alto, meglio il titolo "paga" il rischio che ti fa correre.</div>
+     <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
+       <div style="font-size:13px;margin-bottom:4px">${ticker}: <b style="color:${sharpeColor(s)};font-size:20px">${s != null ? fmtNum.format(s) : "n.d."}</b></div>
+       ${verdict ? `<div style="font-size:13px;color:${verdict.c};font-weight:700">${verdict.t}</div><div class="muted" style="font-size:12px;margin-top:3px">${verdict.d}</div>` : `<div class="muted" style="font-size:12px">Sharpe non ancora disponibile (servono ≥60 giorni di storico).</div>`}
+     </div>
+     <h4 style="margin:8px 0 4px">Scala di riferimento</h4>
+     <table class="info-table"><tbody>
+       <tr><td><b style="color:var(--green)">&gt; 2,0</b></td><td>Eccellente — rendimento/rischio molto efficiente</td></tr>
+       <tr><td><b style="color:#86c52a">1,0 – 2,0</b></td><td>Buono — standard di qualità istituzionale</td></tr>
+       <tr><td><b style="color:var(--muted)">0 – 1,0</b></td><td>Debole — poco premio per la volatilità</td></tr>
+       <tr><td><b style="color:var(--red)">&lt; 0</b></td><td>Negativo — il rischio non è stato ripagato</td></tr>
+     </tbody></table>
+     ${pSharpe != null ? `<div class="info-line muted" style="font-size:11.5px;margin-top:8px">Sharpe complessivo del portafoglio (calcolato con la matrice di covarianza pesata per controvalore): <b style="color:${sharpeColor(pSharpe)}">${fmtNum.format(pSharpe)}</b>. Grazie alla diversificazione, lo Sharpe di portafoglio è spesso più alto della media dei singoli titoli.</div>` : ""}`);
+}
+
 function techCells(r) {
   const c = cur(r);
   // supporto/resistenza cambiano con il range selezionato (1S/1M/3M/1A)
@@ -1360,6 +1584,7 @@ function techCells(r) {
       <td class="num">${peBar(r.pe)}</td>
       <td class="num">${epsBar(r.eps)}</td>
       <td class="num">${betaBar(r)}</td>
+      ${sharpeCell(r)}
       <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
       <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
       <td class="num">${rsiBar(r.rsi)}</td>
@@ -1626,22 +1851,61 @@ async function fetchOHLC(symbol, range, interval) {
   return null;
 }
 
+/* simbolo TradingView: exchange noto per i titoli core, altrimenti ticker nudo */
+const TV_EXCHANGE = {
+  NVDA: "NASDAQ", AMD: "NASDAQ", MU: "NASDAQ", MSTR: "NASDAQ", RGTI: "NASDAQ",
+  GOOGL: "NASDAQ", META: "NASDAQ", PLTR: "NASDAQ", AAPL: "NASDAQ", MSFT: "NASDAQ",
+  AMZN: "NASDAQ", TSLA: "NASDAQ", AVGO: "NASDAQ", INTC: "NASDAQ", QCOM: "NASDAQ",
+  CBRS: "NASDAQ", OKLO: "NYSE", SPCX: "NASDAQ",
+};
+function tvSymbol(r) {
+  const tk = (r.ticker || "").replace("^", "");
+  if (r.ticker && r.ticker.includes("-")) return tk;        // cripto/derivati: nudo
+  const ex = TV_EXCHANGE[tk];
+  return ex ? `${ex}:${tk}` : tk;
+}
+let cmView = "candles";   // "candles" | "tv"
+
+function cmControlsHTML(r) {
+  const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSymbol(r))}`;
+  const ranges = `<div class="spark-toggle cm-ranges">` +
+    CM_RANGES.map(([k, lab]) => `<button class="chip cm-range ${k === cmRange ? "chip-active" : ""}" data-range="${k}">${lab}</button>`).join("") +
+    `</div>`;
+  const views = `<div class="spark-toggle cm-views">
+    <button class="chip cm-viewbtn ${cmView === "candles" ? "chip-active" : ""}" data-cmview="candles">Candele</button>
+    <button class="chip cm-viewbtn ${cmView === "tv" ? "chip-active" : ""}" data-cmview="tv">TradingView</button>
+  </div>`;
+  return `<div class="cm-controls">${ranges}${views}<a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">Apri su TradingView ↗</a></div>`;
+}
+
+function renderTvWidget(r) {
+  const sym = encodeURIComponent(tvSymbol(r));
+  const src = `https://s.tradingview.com/widgetembed/?frameElementId=tv_${r.ticker}` +
+    `&symbol=${sym}&interval=D&hidesidetoolbar=0&symboledit=0&saveimage=0` +
+    `&toolbarbg=131722&theme=dark&style=1&timezone=Europe/Rome&locale=it&withdateranges=1`;
+  return `<div class="cm-tv-wrap">
+    <iframe class="cm-tv" src="${src}" title="TradingView ${esc(r.ticker)}" frameborder="0" allowtransparency="true" scrolling="no" loading="lazy"></iframe>
+    <div class="muted cm-tv-note">Grafico avanzato TradingView (dati di terze parti). Usa "Apri su TradingView ↗" per la versione completa.</div>
+  </div>`;
+}
+
 async function drawTickerChart() {
   const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
   const r = all.find(x => x.ticker === cmTicker);
   if (!r) return;
   const sym = r.currency === "PTS" ? "" : r.currency === "EUR" ? "€" : "$";
-  const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.ticker.replace("^", ""))}`;
-  const controls = `<div class="cm-controls"><div class="spark-toggle cm-ranges">` +
-    CM_RANGES.map(([k, lab]) => `<button class="chip cm-range ${k === cmRange ? "chip-active" : ""}" data-range="${k}">${lab}</button>`).join("") +
-    `</div><a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">Apri su TradingView ↗</a></div>`;
+  const controls = cmControlsHTML(r);
   $("#chart-modal-title").textContent = `${r.name} (${r.ticker})`;
-  $("#chart-modal-body").innerHTML = controls + `<div class="muted" style="padding:40px 0;text-align:center" id="cm-loading">Carico le candele…</div>`;
   $("#chart-modal-tip").innerHTML = "";
   $("#chart-modal").hidden = false;
+  if (cmView === "tv") {
+    $("#chart-modal-body").innerHTML = controls + renderTvWidget(r);
+    return;
+  }
+  $("#chart-modal-body").innerHTML = controls + `<div class="muted" style="padding:40px 0;text-align:center" id="cm-loading">Carico le candele…</div>`;
   const [yr, yi] = CM_YF[cmRange] || ["1mo", "1d"];
   const ohlc = await fetchOHLC(r.ticker, yr, yi);
-  if (cmTicker !== r.ticker) return;          // l'utente ha cambiato nel frattempo
+  if (cmTicker !== r.ticker || cmView !== "candles") return;   // l'utente ha cambiato nel frattempo
   if (ohlc) {
     drawCandleChart(ohlc, v => sym + fmtNum.format(v), controls);
   } else {                                    // fallback: linea dai dati salvati
@@ -1833,6 +2097,7 @@ function drawCandleChart(data, fmt, controlsHTML) {
 
 function openTickerChart(ticker) {
   cmTicker = ticker; cmRange = sparkRange in CM_SPAN ? sparkRange : "m1";
+  cmView = "candles";   // ogni apertura parte dalle candele native
   drawTickerChart();
 }
 
@@ -2437,10 +2702,10 @@ function renderTable() {
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="12" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="13" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="21"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="22"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
 }
 
@@ -2454,9 +2719,9 @@ function renderWatchlist() {
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="17" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="18" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="17"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="18"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
 }
 
@@ -2615,8 +2880,9 @@ function renderEarnings() {
     const imHtml = im != null
       ? `<div class="earn-im" style="color:${im >= 10 ? "var(--yellow)" : "var(--muted)"}" title="Implied Move (straddle ATM)">[+/- ${im}%]</div>`
       : "";
-    const wlMark = !ptfTickers.has(r.ticker) ? `<span class="earn-wl" title="Watchlist">WL</span>` : "";
-    return `<div class="earn-card" data-earn="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per dettagli">
+    const isWl = !ptfTickers.has(r.ticker);
+    const wlMark = isWl ? `<span class="earn-wl" title="Watchlist">WL</span>` : "";
+    return `<div class="earn-card${isWl ? " earn-card-wl" : ""}" data-earn="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)}${isWl ? " (watchlist)" : ""} — clicca per dettagli">
       <div class="earn-top"><span class="earn-tk">${r.ticker}${wlMark}</span><span class="earn-date">${d}</span></div>
       <div class="earn-when" style="color:${color}">${when}</div>
       ${imHtml}
@@ -3509,6 +3775,7 @@ function pmcSetMode(mode) {
   $("#pmc-p2-label").textContent = sell ? "Prezzo di vendita" : "Prezzo";
   $("#pmc-q2").placeholder = sell ? "es. 50" : "es. 50";
   $("#pmc-p2").placeholder = sell ? "es. 130" : "es. 120";
+  const cl = $("#pmc-comm-label"); if (cl) cl.hidden = sell;   // commissioni solo in acquisto
   pmcCompute();
 }
 
@@ -3517,7 +3784,10 @@ function pmcCompute() {
   const q1 = v("#pmc-q1"), p1 = v("#pmc-p1"), q2 = v("#pmc-q2"), p2 = v("#pmc-p2");
   const clear = () => ["#pmc-new", "#pmc-qty", "#pmc-cost", "#pmc-delta"].forEach(id => { $(id).textContent = "—"; $(id).className = id === "#pmc-new" ? "" : "muted"; });
 
+  const opRow = $("#pmc-opcost-row");
+
   if (pmcMode === "sell") {
+    if (opRow) opRow.hidden = true;
     // VENDITA: il PMC NON cambia; si realizza una plus/minusvalenza sulle azioni vendute
     $("#pmc-r1-lab").textContent = "PMC (invariato):";
     $("#pmc-r2-lab").textContent = "Quantità residua:";
@@ -3546,7 +3816,7 @@ function pmcCompute() {
   $("#pmc-r3-lab").textContent = "Investimento totale:";
   $("#pmc-r4-lab").textContent = "Variazione PMC:";
   const qty = q1 + q2, cost = q1 * p1 + q2 * p2;
-  if (qty <= 0 || cost <= 0) { clear(); return; }
+  if (qty <= 0 || cost <= 0) { if (opRow) opRow.hidden = true; clear(); return; }
   const pmc = cost / qty;
   $("#pmc-new").textContent = fmtNum.format(Math.round(pmc * 10000) / 10000);
   $("#pmc-new").className = "";
@@ -3554,6 +3824,19 @@ function pmcCompute() {
   $("#pmc-qty").className = "muted";
   $("#pmc-cost").textContent = fmtNum.format(Math.round(cost * 100) / 100);
   $("#pmc-cost").className = "muted";
+  // Costo dell'operazione del nuovo acquisto: controvalore (qtà × prezzo) + commissioni
+  if (opRow) {
+    const comm = v("#pmc-comm");
+    const newNotional = q2 * p2;
+    if (q2 > 0 && p2 > 0) {
+      opRow.hidden = false;
+      const tot = newNotional + comm;
+      $("#pmc-opcost").textContent = fmtNum.format(Math.round(tot * 100) / 100)
+        + (comm > 0 ? ` (controvalore ${fmtNum.format(Math.round(newNotional * 100) / 100)} + comm. ${fmtNum.format(comm)})` : "");
+    } else {
+      opRow.hidden = true;
+    }
+  }
   const el = $("#pmc-delta");
   if (p1 > 0) {
     const d = (pmc / p1 - 1) * 100;
@@ -3590,7 +3873,7 @@ $("#pmc-select").addEventListener("change", () => {
 });
 document.querySelectorAll("#pmc-mode .chip").forEach(c =>
   c.addEventListener("click", () => pmcSetMode(c.dataset.pmcMode)));
-["#pmc-q1", "#pmc-p1", "#pmc-q2", "#pmc-p2"].forEach(id =>
+["#pmc-q1", "#pmc-p1", "#pmc-q2", "#pmc-p2", "#pmc-comm"].forEach(id =>
   $(id).addEventListener("input", pmcCompute));
 
 /* liquidità + mini-card */
@@ -3600,6 +3883,7 @@ $("#signposts-box").addEventListener("click", openSignpostsModal);
 $("#tilt-box").addEventListener("click", openTiltModal);
 $("#portfolio-health").addEventListener("click", openHealthModal);
 $("#macroquant-box").addEventListener("click", openMacroQuantModal);
+$("#seasonality-box").addEventListener("click", openSeasonalityModal);
 $("#market-direction").addEventListener("click", () => {
   const d = marketDirectionScore();
   const comps = directionComponents();
@@ -3623,6 +3907,8 @@ document.addEventListener("click", e => {
   if (bb) { openBetaSimulator(); return; }
   const rc = e.target.closest(".rs-cell");             // click su RS 1M → spiegazione forza relativa
   if (rc && rc.dataset.rsTk) { openRsInfo(rc.dataset.rsTk); return; }
+  const shc = e.target.closest(".sharpe-cell");        // click su Sharpe 1A → spiegazione
+  if (shc && shc.dataset.sharpeTk) { openSharpeInfo(shc.dataset.sharpeTk); return; }
 });
 // accessibilità: Invio/Spazio sulla riga fondamentale aprono il dettaglio
 document.addEventListener("keydown", e => {
@@ -3681,8 +3967,10 @@ $("#chart-modal").addEventListener("click", e => {
   if (e.target.closest(".cm-opt-back")) { optTicker = null; drawTickerChart(); return; }
   const sd = e.target.closest(".opt-side");
   if (sd) { optSide = sd.dataset.side; loadOptionsView(); return; }
+  const vb = e.target.closest(".cm-viewbtn");
+  if (vb) { cmView = vb.dataset.cmview; drawTickerChart(); return; }
   const rb = e.target.closest(".cm-range");
-  if (rb) { cmRange = rb.dataset.range; drawTickerChart(); }
+  if (rb) { cmView = "candles"; cmRange = rb.dataset.range; drawTickerChart(); }
 });
 $("#chart-modal").addEventListener("change", e => {
   if (e.target.classList.contains("opt-expiry")) { optExpIdx = Number(e.target.value); loadOptionsView(); }

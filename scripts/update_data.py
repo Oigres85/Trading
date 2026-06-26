@@ -24,6 +24,7 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import feedparser
+import numpy as np
 import pandas as pd
 import requests
 import yfinance as yf
@@ -106,6 +107,11 @@ PUTCALL_SYMBOL = ("BSX", "Boston Scientific")
 # aliquote per la stima del guadagno netto
 TAX_STOCK = 0.26   # capital gain azioni
 TAX_BTP = 0.125    # titoli di Stato (aliquota agevolata 12,5%)
+
+# Tasso privo di rischio annuo per lo Sharpe Ratio (parametro di configurazione).
+# Default: 3.63% (rendimento T-Bill USA di riferimento). Modificabile via env RISK_FREE_RATE.
+RISK_FREE_RATE = float(os.environ.get("RISK_FREE_RATE", "0.0363"))
+TRADING_DAYS = 252   # giorni di borsa per l'annualizzazione
 
 # candidati per la classifica delle maggiori capitalizzazioni mondiali
 TOP_CAP_CANDIDATES = {
@@ -328,6 +334,16 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     rsi = rsi14(closes)
     sig, sig_class = signal_label(price, sma50, sma200, rsi)
 
+    # Sharpe Ratio annualizzato (12 mesi): (Rp - Rf) / sigma_p sui rendimenti giornalieri.
+    daily_ret = closes.pct_change().dropna()
+    sharpe_1y = None
+    if len(daily_ret) >= 60:
+        std_d = float(daily_ret.std(ddof=1))
+        if std_d > 0:
+            rp = float(daily_ret.mean()) * TRADING_DAYS              # rendimento annualizzato
+            sigma = std_d * (TRADING_DAYS ** 0.5)                    # volatilità annualizzata
+            sharpe_1y = round((rp - RISK_FREE_RATE) / sigma, 2)
+
     vol = float(hist["Volume"].iloc[-1])
     vol_avg30 = float(hist["Volume"].tail(30).mean())
 
@@ -506,6 +522,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "health": health,
         "eps": round(float(eps), 2) if eps is not None else None,
         "beta": round(float(beta), 2) if beta is not None else None,
+        "sharpe_1y": sharpe_1y,
         "prepost": prepost,
         "sector": info.get("sector") or info.get("quoteType") or "Altro",
         "stats": stats,
@@ -513,6 +530,9 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "financials": financials,
         "fin_health": fin_health,
         "smc": smc_analysis(hist),
+        # serie rendimenti giornalieri (uso interno per lo Sharpe di portafoglio; rimossa prima del dump)
+        "_ret_series": [round(float(x), 6) for x in daily_ret.tail(252)],
+        "_ret_dates": [d.strftime("%Y-%m-%d") for d in daily_ret.index[-252:]],
     }
 
 
@@ -1300,7 +1320,58 @@ def fetch_macro():
             "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici "
                     "(il MacroQuant ufficiale di BCA Research è proprietario e a pagamento).",
         }
+
+    try:
+        macro["seasonality"] = fetch_seasonality()
+    except Exception as e:  # noqa: BLE001
+        print(f"!! stagionalità: {e}", file=sys.stderr)
+
     return macro
+
+
+def seasonality_score(avg_pct, pos_pct):
+    """Mappa rendimento medio mensile + % mesi positivi su 0-100 (alto = stagione favorevole)."""
+    return round(clamp(50 + (pos_pct - 55) * 1.4 + avg_pct * 10))
+
+
+def fetch_seasonality():
+    """Stagionalità mensile storica di S&P 500 e Nasdaq 100: rendimento medio e % mesi positivi
+    per ciascun mese del calendario. Alimenta il tachimetro del mese corrente e il grafico nel popup."""
+    out = {}
+    for key, sym in (("sp500", "^GSPC"), ("ndx", "^NDX")):
+        try:
+            h = yf.Ticker(sym).history(period="max", interval="1mo")["Close"].dropna()
+            ret = h.pct_change().dropna()
+            buckets = {m: [] for m in range(1, 13)}
+            for dt, r in ret.items():
+                buckets[dt.month].append(float(r) * 100)
+            months = []
+            for m in range(1, 13):
+                vals = buckets[m]
+                if vals:
+                    avg = sum(vals) / len(vals)
+                    pos = sum(1 for v in vals if v > 0) / len(vals) * 100
+                    months.append({"m": m, "avg": round(avg, 2), "pos": round(pos, 1),
+                                   "n": len(vals), "score": seasonality_score(avg, pos)})
+                else:
+                    months.append({"m": m, "avg": None, "pos": None, "n": 0, "score": 50})
+            out[key] = months
+        except Exception as e:  # noqa: BLE001
+            print(f"!! stagionalità {sym}: {e}", file=sys.stderr)
+    cur_m = datetime.now(timezone.utc).month
+    sp_cur = next((x for x in out.get("sp500", []) if x["m"] == cur_m), None)
+    ndx_cur = next((x for x in out.get("ndx", []) if x["m"] == cur_m), None)
+    scores = [x["score"] for x in (sp_cur, ndx_cur) if x]
+    blended = round(sum(scores) / len(scores)) if scores else 50
+    label = "Favorevole" if blended >= 60 else "Sfavorevole" if blended <= 40 else "Neutrale"
+    return {
+        **out,
+        "current_month": cur_m,
+        "sp_score": sp_cur["score"] if sp_cur else None,
+        "ndx_score": ndx_cur["score"] if ndx_cur else None,
+        "score": blended,
+        "label": label,
+    }
 
 
 # (ticker, nome, gruppo) — settori SPDR + principali ETF tematici per la heatmap
@@ -1539,8 +1610,22 @@ def fetch_portfolio_history(btp_value_eur):
                 if s["values"]:
                     k = real / s["values"][-1]
                     s["values"] = [round(v * k) for v in s["values"]]
-                    if "nasdaq" in s:
-                        s["nasdaq"] = [round(v * k) for v in s["nasdaq"]]
+                    for bk in ("nasdaq", "ndx", "sp500", "russell"):
+                        if bk in s:
+                            s[bk] = [round(v * k) for v in s[bk]]
+        # benchmark ALLINEATO alla curva reale del broker (vista Max stitchata lato frontend):
+        # i titoli di nuova quotazione (es. IPO recenti) accorciano la storia del portafoglio,
+        # ma gli indici esistono da anni → li riscaliamo sulle date reali del broker.
+        if BROKER and BROKER.get("equity_curve"):
+            ec = BROKER["equity_curve"]
+            ec_dates = pd.to_datetime([p["d"] for p in ec])
+            base_v = float(ec[0]["v"])
+            bb = {"dates": [p["d"] for p in ec]}
+            for k, ser in bench_series.items():
+                n = ser.reindex(ec_dates, method="ffill").ffill().bfill()
+                if len(n) and float(n.iloc[0]):
+                    bb[k] = [round(float(x) / float(n.iloc[0]) * base_v) for x in n.values]
+            out["broker_bench"] = bb
         return out
     except Exception as e:  # noqa: BLE001
         print(f"!! storico portafoglio: {e}", file=sys.stderr)
@@ -1807,11 +1892,52 @@ def clean_nan(obj):
     return obj
 
 
+def compute_portfolio_sharpe(rows):
+    """Sharpe Ratio complessivo del portafoglio azionario: pesi = controvalore attuale,
+    varianza totale dalla matrice di covarianza dei rendimenti giornalieri allineati."""
+    series, weights = {}, {}
+    for r in rows:
+        rs, ds, val = r.get("_ret_series"), r.get("_ret_dates"), r.get("value")
+        if rs and ds and val and len(rs) == len(ds) and len(rs) >= 60:
+            series[r["ticker"]] = pd.Series(rs, index=pd.to_datetime(ds))
+            weights[r["ticker"]] = float(val)
+    if not series:
+        return None
+    df = pd.DataFrame(series).dropna()
+    if df.shape[0] < 60 or df.shape[1] < 1:
+        return None
+    tickers = list(df.columns)
+    w = np.array([weights[t] for t in tickers], dtype=float)
+    if w.sum() <= 0:
+        return None
+    w = w / w.sum()
+    mean_d = df.mean().values
+    cov_d = df.cov().values
+    port_mean_annual = float(np.dot(w, mean_d)) * TRADING_DAYS
+    port_var_annual = float(w @ cov_d @ w) * TRADING_DAYS
+    port_sigma = port_var_annual ** 0.5
+    if port_sigma <= 0:
+        return None
+    return round((port_mean_annual - RISK_FREE_RATE) / port_sigma, 2)
+
+
+def strip_private(rows):
+    """Rimuove le chiavi interne (prefisso _) prima della serializzazione JSON."""
+    for r in rows:
+        for k in [k for k in list(r.keys()) if k.startswith("_")]:
+            r.pop(k, None)
+
+
 def main():
     equities = fetch_equities()
     btp = fetch_btp()
     watchlist = fetch_watchlist()
     macro = fetch_macro()
+
+    # Sharpe Ratio complessivo (azionario) PRIMA di rimuovere le serie interne
+    portfolio_sharpe = compute_portfolio_sharpe(equities)
+    strip_private(equities)
+    strip_private(watchlist)
 
     # termometro: media della salute tecnica dei titoli in portafoglio
     healths = [r["health"] for r in equities if r.get("health") is not None]
@@ -1866,6 +1992,8 @@ def main():
             "eur_gain_pct": round((total_eur / cost_eur - 1) * 100, 2),
             "tax_est": round(tax, 2),
             "eur_gain_net": round(eur_gain - tax, 2),
+            "portfolio_sharpe_ratio": portfolio_sharpe,
+            "risk_free_rate": RISK_FREE_RATE,
         },
         "portfolio": equities + [btp],
         "watchlist": watchlist,

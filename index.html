@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=66">
+<link rel="stylesheet" href="assets/style.css?v=67">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -71,6 +71,7 @@
               <button class="btn btn-primary btn-sm" id="cash-save">Salva</button>
             </div>
             <span class="muted" id="cash-note"></span>
+            <div class="cash-drag" id="cash-drag" hidden></div>
           </section>
           <ul class="alloc-legend" id="alloc-legend"></ul>
           <div id="milione-tracker"></div>
@@ -87,6 +88,7 @@
       <div class="mini-card" id="macroquant-box" tabindex="0" role="button" title="MacroQuant (stile BCA) — clicca per il dettaglio"></div>
       <div class="mini-card" id="signposts-box" tabindex="0" role="button" title="BofA Bear Market Signposts — clicca per il dettaglio"></div>
       <div class="mini-card" id="tilt-box" tabindex="0" role="button" title="Rotazione settoriale — clicca per il dettaglio"></div>
+      <div class="mini-card" id="seasonality-box" tabindex="0" role="button" title="Stagionalità S&amp;P 500 / Nasdaq — clicca per il dettaglio"></div>
     </div>
     <div class="gauges" id="gauges"></div>
     <div class="macro-grid macro-grid-below" id="macro-grid"></div>
@@ -136,6 +138,7 @@
             <th class="num">P/E</th>
             <th class="num">EPS</th>
             <th class="num">Beta</th>
+            <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
             <th class="num">RSI 14</th>
@@ -192,6 +195,7 @@
             <th class="num">P/E</th>
             <th class="num">EPS</th>
             <th class="num">Beta</th>
+            <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
             <th class="num">RSI 14</th>
@@ -245,12 +249,14 @@
         <div class="m-label" id="pmc-b2-label">Nuovo acquisto</div>
         <label><span id="pmc-q2-label">Quantità</span> <input type="number" id="pmc-q2" class="pmc-input" min="0" step="any" placeholder="es. 50"></label>
         <label><span id="pmc-p2-label">Prezzo</span> <input type="number" id="pmc-p2" class="pmc-input" min="0" step="any" placeholder="es. 120"></label>
+        <label id="pmc-comm-label">Commissioni (€) <input type="number" id="pmc-comm" class="pmc-input" min="0" step="any" placeholder="es. 2,95"></label>
       </div>
       <div class="pmc-block pmc-result">
         <div class="m-label">Risultato</div>
         <div class="pmc-out"><span id="pmc-r1-lab">Nuovo PMC:</span> <b id="pmc-new">—</b></div>
         <div class="pmc-out muted"><span id="pmc-r2-lab">Quantità totale:</span> <span id="pmc-qty">—</span></div>
         <div class="pmc-out muted"><span id="pmc-r3-lab">Investimento totale:</span> <span id="pmc-cost">—</span></div>
+        <div class="pmc-out muted" id="pmc-opcost-row" hidden>Costo operazione: <b id="pmc-opcost">—</b></div>
         <div class="pmc-out muted"><span id="pmc-r4-lab">Variazione PMC:</span> <span id="pmc-delta">—</span></div>
       </div>
     </div>
@@ -314,6 +320,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=66"></script>
+<script src="assets/app.js?v=67"></script>
 </body>
 </html>

@@ -707,12 +707,33 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .earn-im { font-size: 9.5px; font-family: var(--mono); font-weight: 700; margin: 1px 0; }
 .earn-wl { font-size: 8px; vertical-align: super; color: var(--muted); margin-left: 2px; }
 
+/* ---------- v67: gerarchia visiva trimestrali — watchlist (qty=0) attenuata ---------- */
+.earn-card-wl { opacity: .5; }
+.earn-card-wl:hover { opacity: 1; transition: opacity .15s; }
+
 /* ---------- Prompt 17: Beta button ---------- */
 .beta-btn { background: none; border: none; padding: 0; cursor: pointer; color: inherit; font: inherit; width: 100%; }
 
 /* ---------- v64: RS (forza relativa) cell clickable ---------- */
 .rs-cell { cursor: pointer; }
 .rs-cell:hover { background: rgba(76,141,255,.08); }
+
+/* ---------- v67: Sharpe 1A cell clickable ---------- */
+.sharpe-cell { cursor: pointer; }
+.sharpe-cell:hover { background: rgba(76,141,255,.08); }
+
+/* ---------- v67: TradingView widget nel popup grafico ---------- */
+.cm-views { margin-left: 6px; }
+.cm-tv-wrap { margin-top: 10px; }
+.cm-tv { width: 100%; height: 460px; border: 1px solid var(--border); border-radius: 10px; display: block; background: #131722; }
+.cm-tv-note { font-size: 10.5px; margin-top: 6px; text-align: center; }
+@media (max-width: 760px) { .cm-tv { height: 360px; } }
+
+/* ---------- v67: Cash Drag indicator ---------- */
+.cash-drag { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.2); }
+.cash-drag-head { font-size: 11px; margin-bottom: 3px; }
+.cash-drag-head .muted { font-size: 10px; }
+.cash-drag-body { font-size: 11px; line-height: 1.5; color: var(--text); }
 
 /* ---------- v62: Tilt-box mini bar chart ---------- */
 .tilt-mini { margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
@@ -730,6 +751,19 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .refresh-done-title { font-size: 14px; font-weight: 700; color: var(--fg); margin-bottom: 4px; }
 .refresh-done-sub { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
 .refresh-done-box button { background: var(--green); color: #000; border: none; border-radius: 8px; padding: 6px 22px; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+/* ---------- v67: Refresh progress bar ---------- */
+.refresh-progress { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 3100;
+  width: min(440px, 92vw); background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 16px; box-shadow: 0 8px 32px rgba(0,0,0,.45); animation: slide-up .3s cubic-bezier(.4,0,.2,1); }
+.rp-row { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 8px; }
+.rp-msg { flex: 1; color: var(--text); }
+.rp-pct { font-family: var(--mono); font-weight: 700; color: var(--blue); }
+.rp-spin { width: 13px; height: 13px; border: 2px solid var(--border); border-top-color: var(--blue);
+  border-radius: 50%; animation: rp-rotate .8s linear infinite; flex-shrink: 0; }
+@keyframes rp-rotate { to { transform: rotate(360deg); } }
+.rp-track { height: 7px; background: var(--card-2); border-radius: 5px; overflow: hidden; }
+.rp-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #4c8dff, #16e36a); transition: width .5s ease; }
 
 /* ---------- v62: Refresh button states ---------- */
 .btn-refreshing { background: var(--red) !important; color: #fff !important; border-color: var(--red) !important; }
