@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=63">
+<link rel="stylesheet" href="assets/style.css?v=66">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -225,9 +225,15 @@
   <section class="card" id="pmc-calc">
     <div class="card-head">
       <h2>Calcolatore prezzo medio (PMC)</h2>
-      <select id="pmc-select" class="pmc-input pmc-select" title="Precompila con una posizione del portafoglio">
-        <option value="">— scegli un titolo o inserisci a mano —</option>
-      </select>
+      <div class="card-head-right">
+        <div class="spark-toggle" id="pmc-mode" role="tablist" title="Simula un acquisto (mediazione) o una vendita (realizzo)">
+          <button class="chip chip-active" data-pmc-mode="buy" role="tab">Acquisto</button>
+          <button class="chip" data-pmc-mode="sell" role="tab">Vendita</button>
+        </div>
+        <select id="pmc-select" class="pmc-input pmc-select" title="Precompila con una posizione del portafoglio o della watchlist">
+          <option value="">— scegli un titolo o inserisci a mano —</option>
+        </select>
+      </div>
     </div>
     <div class="pmc-grid">
       <div class="pmc-block">
@@ -236,16 +242,16 @@
         <label>PMC <input type="number" id="pmc-p1" class="pmc-input" min="0" step="any" placeholder="es. 87,17"></label>
       </div>
       <div class="pmc-block">
-        <div class="m-label">Nuovo acquisto</div>
-        <label>Quantità <input type="number" id="pmc-q2" class="pmc-input" min="0" step="any" placeholder="es. 50"></label>
-        <label>Prezzo <input type="number" id="pmc-p2" class="pmc-input" min="0" step="any" placeholder="es. 120"></label>
+        <div class="m-label" id="pmc-b2-label">Nuovo acquisto</div>
+        <label><span id="pmc-q2-label">Quantità</span> <input type="number" id="pmc-q2" class="pmc-input" min="0" step="any" placeholder="es. 50"></label>
+        <label><span id="pmc-p2-label">Prezzo</span> <input type="number" id="pmc-p2" class="pmc-input" min="0" step="any" placeholder="es. 120"></label>
       </div>
       <div class="pmc-block pmc-result">
         <div class="m-label">Risultato</div>
-        <div class="pmc-out">Nuovo PMC: <b id="pmc-new">—</b></div>
-        <div class="pmc-out muted">Quantità totale: <span id="pmc-qty">—</span></div>
-        <div class="pmc-out muted">Investimento totale: <span id="pmc-cost">—</span></div>
-        <div class="pmc-out muted">Variazione PMC: <span id="pmc-delta">—</span></div>
+        <div class="pmc-out"><span id="pmc-r1-lab">Nuovo PMC:</span> <b id="pmc-new">—</b></div>
+        <div class="pmc-out muted"><span id="pmc-r2-lab">Quantità totale:</span> <span id="pmc-qty">—</span></div>
+        <div class="pmc-out muted"><span id="pmc-r3-lab">Investimento totale:</span> <span id="pmc-cost">—</span></div>
+        <div class="pmc-out muted"><span id="pmc-r4-lab">Variazione PMC:</span> <span id="pmc-delta">—</span></div>
       </div>
     </div>
   </section>
@@ -308,6 +314,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=63"></script>
+<script src="assets/app.js?v=66"></script>
 </body>
 </html>
