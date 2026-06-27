@@ -11,13 +11,13 @@ const SORT_FIELDS = {
   "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg", "volume",
                 "gain", "gain_pct", "pe", "eps", "beta", "sharpe_1y", "support",
                 "resistance", "rsi", "vol_ratio", "rs_1m", null, "upside_pct", "upside_pct",
-                "fin_health", "stat:short_float", "w52_dist_pct", null, null],
+                "fin_health", "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,
   // Vol/media,RS 1M,Segnale,Rating,Target Δ,Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
   "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume", "pe", "eps",
                "beta", "sharpe_1y", "support", "resistance", "rsi", "vol_ratio",
                "rs_1m", null, "upside_pct", "upside_pct", "fin_health",
-               "stat:short_float", "w52_dist_pct", null, null],
+               "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // tabelle fondamentali (vista Value); i campi "stat:" leggono da r.stats
   "ptf-fund-table": ["name", "qty", "pmc", "price", "stat:market_cap", "stat:ev_ebitda",
                      "stat:roe", "stat:gross_margin", "stat:profit_margin", "pfcf",
@@ -609,7 +609,6 @@ function renderAll() {
   recomputeTotals();            // include la liquidità nei totali/allocazione
   renderCash();
   renderKPI();
-  renderHistory();
   renderAllocation();
   renderEarnings();
   renderTable();
@@ -620,8 +619,7 @@ function renderAll() {
   renderMacro();
   renderPortfolioHealth();
   renderMiniCards();
-  renderTopCaps();
-  renderTopETFs();
+  renderDecisionBar();
   renderNews();
   renderBtpInfo();
   renderSellCalc();
@@ -699,6 +697,94 @@ function marketDirectionScore() {
   return Math.round(c.reduce((a, b) => a + b.score, 0) / c.length);
 }
 
+/* ---------------- Top bar "Decisione" + diario delle azioni ---------------- */
+function loadDiary() {
+  try { return JSON.parse(localStorage.getItem("action_diary") || "[]"); } catch { return []; }
+}
+function saveDiaryEntry(text) {
+  const arr = loadDiary();
+  arr.unshift({ date: new Date().toISOString(), text });
+  localStorage.setItem("action_diary", JSON.stringify(arr.slice(0, 100)));
+}
+function deleteDiaryEntry(iso) {
+  localStorage.setItem("action_diary", JSON.stringify(loadDiary().filter(e => e.date !== iso)));
+}
+
+/* verdetto operativo coerente col mandato Diamond Hands: raramente "alleggerisci" */
+function decisionVerdict() {
+  const m = DATA.macro || {};
+  const dir = marketDirectionScore();
+  const vix = m.vix?.value;
+  const dd = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+    .filter(r => r.w52_dist_pct != null && r.w52_dist_pct <= -15).map(r => r.ticker);
+  const reasons = [];
+  let label, score, col;
+  // ACCUMULA: "blood in the streets" o titoli in zona sconto → schiera la polvere secca
+  if ((vix != null && vix > 20) || dd.length >= 1) {
+    label = "ACCUMULA";
+    col = "var(--green)";
+    score = 78;
+    if (vix > 20) reasons.push(`VIX ${fmtNum.format(vix)} > 20 (volatilità elevata = sconti)`);
+    if (dd.length) reasons.push(`${dd.length} titoli in zona sconto (>15% dal max 52S): ${dd.slice(0, 5).join(", ")}`);
+    reasons.push(`liquidità ${fmtEUR.format(cashEur)} da deployare su ordini limite ai supporti`);
+  } else if (dir != null && dir < 40) {
+    label = "PRUDENZA"; col = "var(--yellow)"; score = 32;
+    reasons.push(`regime debole (segnali ${dir}/100): nessun nuovo ingresso, ma niente vendite da panico (Diamond Hands)`);
+  } else {
+    label = "MANTIENI"; col = "var(--blue)"; score = dir != null ? dir : 55;
+    reasons.push(`regime ${dir != null ? dir + "/100" : "neutro"}: lascia correre le posizioni vincenti, conserva la liquidità`);
+  }
+  return { label, col, score, reasons, dir, dd };
+}
+
+function renderDecisionBar() {
+  const box = $("#decision-bar");
+  if (!box || !DATA) return;
+  const v = decisionVerdict();
+  const t = DATA.totals || {};
+  const GOAL = 1_000_000;
+  const patrimonio = (t.eur_invested || 0) + cashEur;
+  const compl = (patrimonio / GOAL * 100);
+  box.innerHTML = `
+    <div class="dec-left">
+      <div class="dec-lab">Decisione operativa</div>
+      <div class="dec-verdict" style="color:${v.col}">${v.label}</div>
+      <div class="dec-reason muted">${esc(v.reasons[0] || "")}</div>
+    </div>
+    <div class="dec-mid">
+      ${thermoLine(v.score, ["Alleggerisci", "Accumula"])}
+    </div>
+    <div class="dec-right">
+      <div class="dec-goal">${compl.toFixed(1)}% → €1M</div>
+      <div class="dec-cta muted">clicca per dettagli e diario azioni</div>
+    </div>`;
+}
+
+function openDecisionModal() {
+  const v = decisionVerdict();
+  const diary = loadDiary();
+  const diaryHtml = diary.length ? diary.map(e => `
+    <div class="diary-item" data-iso="${e.date}">
+      <span class="diary-date">${new Date(e.date).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "2-digit" })}</span>
+      <span class="diary-text">${esc(e.text)}</span>
+      <button class="diary-del" data-iso="${e.date}" title="Elimina">✕</button>
+    </div>`).join("") : `<div class="muted" style="font-size:12px">Nessuna voce ancora. Annota le tue operazioni e le motivazioni: il diario viene incluso nel prompt AI.</div>`;
+  openInfoModal(`Decisione operativa: ${v.label}`,
+    `<div class="info-line" style="margin-bottom:8px"><b style="color:${v.col};font-size:16px">${v.label}</b></div>
+     <ul style="margin:0 0 10px 18px;font-size:12.5px;line-height:1.6">${v.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
+     <div class="info-line muted" style="font-size:11px;margin-bottom:12px">Verdetto sintetico dai segnali macro + drawdown dei titoli, coerente col mandato Diamond Hands (le correzioni sono occasioni di accumulo, non di vendita).</div>
+     <h4 style="margin:10px 0 6px">Diario delle azioni</h4>
+     <div class="diary-add"><input type="text" id="diary-input" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="200"><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
+     <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
+  const refresh = () => { closeChartModal(); openDecisionModal(); };
+  $("#diary-save")?.addEventListener("click", () => {
+    const inp = $("#diary-input"); const txt = (inp.value || "").trim();
+    if (txt) { saveDiaryEntry(txt); refresh(); }
+  });
+  $("#diary-input")?.addEventListener("keydown", e => { if (e.key === "Enter") { const txt = e.target.value.trim(); if (txt) { saveDiaryEntry(txt); refresh(); } } });
+  document.querySelectorAll(".diary-del").forEach(b => b.addEventListener("click", () => { deleteDiaryEntry(b.dataset.iso); refresh(); }));
+}
+
 function renderMiniCards() {
   const m = DATA.macro || {};
   const dir = marketDirectionScore();
@@ -722,26 +808,19 @@ function renderMiniCards() {
   const tilt = m.tilt, tBox = $("#tilt-box");
   if (tBox && tilt && tilt.length) {
     const sorted = [...tilt].sort((a, b) => b.m1 - a.m1);
-    const maxAbs = Math.max(...sorted.map(s => Math.abs(s.m1)), 1);
     const defensives = ["Utilities", "Consumi difens.", "Salute", "Oro"];
     const defAvg = avg(tilt.filter(s => defensives.includes(s.name)).map(s => s.m1));
     const tech = tilt.find(s => s.ticker === "XLK");
-    const regime = (defAvg != null && tech)
-      ? (defAvg > tech.m1 ? "Rotazione DIFENSIVA" : "Regime PRO-RISCHIO") : "";
-    const regimeCol = (defAvg != null && tech)
-      ? (defAvg > tech.m1 ? "var(--yellow)" : "var(--green)") : "var(--muted)";
-    const miniHist = sorted.slice(0, 6).map(s => {
-      const w = Math.round(Math.abs(s.m1) / maxAbs * 100);
-      const col = s.m1 >= 0 ? "var(--green)" : "var(--red)";
-      return `<div class="tilt-mini-row">
-        <span class="tilt-mini-lab">${s.name.split(" ")[0]}</span>
-        <span class="tilt-mini-bar"><span style="width:${w}%;background:${col}"></span></span>
-        <span class="tilt-mini-val" style="color:${col}">${s.m1 > 0 ? "+" : ""}${s.m1}%</span>
-      </div>`;
-    }).join("");
-    tBox.innerHTML = `<div class="mc-title">Rotazione settoriale USA</div>
-      ${regime ? `<div style="font-size:10.5px;font-weight:700;color:${regimeCol};margin:2px 0 4px">${regime}</div>` : ""}
-      <div class="tilt-mini">${miniHist}</div>`;
+    const isDef = (defAvg != null && tech) ? defAvg > tech.m1 : null;
+    const regime = isDef == null ? "—" : isDef ? "Difensiva" : "Pro-rischio";
+    const regimeCol = isDef == null ? "var(--muted)" : isDef ? "var(--yellow)" : "var(--green)";
+    // score termometro: pro-rischio (tech>difensivi) = favorevole (alto)
+    const score = (defAvg != null && tech) ? clamp(50 + (tech.m1 - defAvg) * 8) : 50;
+    const lead = sorted[0], lag = sorted[sorted.length - 1];
+    tBox.innerHTML = `<div class="mc-title">Rotazione settoriale</div>
+      <div class="mc-value" style="color:${regimeCol}">${regime}</div>
+      ${thermoLine(score, ["Difensivo", "Pro-rischio"])}
+      <div class="mc-sub muted">↑ ${esc(lead.name.split(" ")[0])} ${signTxt(lead.m1)} · ↓ ${esc(lag.name.split(" ")[0])} ${signTxt(lag.m1)}</div>`;
   }
   // Quadruple Witching (4 streghe): ora mostrata nel popup del box Put/Call (vedi openMacroInfo "putcall")
   // MacroQuant (stile BCA)
@@ -786,6 +865,53 @@ function renderMiniCards() {
         <div class="mc-value muted">—</div><div class="mc-sub muted">dati intraday non disponibili</div>`;
     }
   }
+  // Sharpe Ratio del portafoglio (rendimento corretto per il rischio)
+  const shBox = $("#sharpe-box");
+  if (shBox) {
+    const ps = (DATA.totals || {}).portfolio_sharpe_ratio;
+    if (ps != null) {
+      const score = clamp(33 + ps * 22);   // ~0=33, 1=55, 2=77, 3=99
+      const lab = ps > 2 ? "Eccellente" : ps >= 1 ? "Buono" : ps >= 0 ? "Debole" : "Negativo";
+      shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
+        <div class="mc-value" style="color:${sharpeColor(ps)}">${fmtNum.format(ps)} · ${lab}</div>
+        ${thermoLine(score, ["Rischioso", "Efficiente"])}
+        <div class="mc-sub muted">rendimento corretto per il rischio</div>`;
+    } else {
+      shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
+        <div class="mc-value muted">—</div>
+        ${thermoLine(50, ["Rischioso", "Efficiente"])}
+        <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
+    }
+  }
+}
+
+/* Popup Sharpe di PORTAFOGLIO (diverso dal popup per-titolo openSharpeInfo) */
+function openPortfolioSharpeModal() {
+  const t = DATA.totals || {};
+  const ps = t.portfolio_sharpe_ratio;
+  const rf = (t.risk_free_rate ?? 0.0363) * 100;
+  // contributo per titolo (Sharpe singolo, ordinato)
+  const items = (DATA.portfolio || []).filter(r => r.sharpe_1y != null)
+    .sort((a, b) => b.sharpe_1y - a.sharpe_1y);
+  const rows = items.map(r => `<tr><td>${esc(r.name)} <span class="tk">${r.ticker}</span></td><td class="num"><b style="color:${sharpeColor(r.sharpe_1y)}">${fmtNum.format(r.sharpe_1y)}</b></td></tr>`).join("");
+  const verdict = ps == null ? null
+    : ps > 2 ? { t: "ECCELLENTE", c: "var(--green)" }
+    : ps >= 1 ? { t: "BUONO", c: "#86c52a" }
+    : ps >= 0 ? { t: "DEBOLE", c: "var(--muted)" }
+    : { t: "NEGATIVO", c: "var(--red)" };
+  openInfoModal("Sharpe Ratio del portafoglio",
+    `<div class="info-line" style="margin-bottom:10px"><b>Sharpe Ratio</b> = rendimento corretto per il rischio: l'extra-rendimento (sopra il tasso privo di rischio del <b>${fmtNum.format(rf)}%</b>) per ogni unità di volatilità. Quello di portafoglio è calcolato sulla <b>matrice di covarianza</b> pesata per controvalore, quindi tiene conto della diversificazione fra i titoli.</div>
+     <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
+       <div style="font-size:13px">Portafoglio: <b style="color:${ps != null ? sharpeColor(ps) : 'var(--muted)'};font-size:20px">${ps != null ? fmtNum.format(ps) : "n.d."}</b> ${verdict ? `<span style="color:${verdict.c};font-weight:700">· ${verdict.t}</span>` : ""}</div>
+     </div>
+     <h4 style="margin:8px 0 4px">Scala</h4>
+     <table class="info-table"><tbody>
+       <tr><td><b style="color:var(--green)">&gt; 2,0</b></td><td>Eccellente</td></tr>
+       <tr><td><b style="color:#86c52a">1,0 – 2,0</b></td><td>Buono (qualità istituzionale)</td></tr>
+       <tr><td><b style="color:var(--muted)">0 – 1,0</b></td><td>Debole</td></tr>
+       <tr><td><b style="color:var(--red)">&lt; 0</b></td><td>Rischio non ripagato</td></tr>
+     </tbody></table>
+     ${rows ? `<h4 style="margin:10px 0 4px">Sharpe per titolo</h4><table class="info-table"><thead><tr><th>Titolo</th><th class="num">Sharpe 1A</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="info-line muted" style="font-size:11.5px;margin-top:8px">Gli Sharpe per titolo compariranno dopo il prossimo run della pipeline.</div>`}`);
 }
 
 const MONTH_NAMES = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
@@ -1071,22 +1197,8 @@ function renderKPI() {
       sub: `dopo tasse stimate (26% azioni · 12,5% BTP)${b && b.cedole_btp ? ` · cedole BTP ${fmtEUR.format(b.cedole_btp)}` : ""}`,
       subCls: signCls(net), accent: net >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(net) },
   ];
-  // Daily Tracking Error: ora mostrato come mini-card con tachimetro tra i tab macro
-  // (vedi renderMiniCards → #tracking-error-box). Niente più KPI dedicata.
-  // Sharpe Ratio complessivo del portafoglio (rendimento corretto per il rischio)
-  const pSharpe = t.portfolio_sharpe_ratio;
-  if (pSharpe != null) {
-    kpis.push({
-      label: "Sharpe Ratio portafoglio",
-      value: fmtNum.format(pSharpe),
-      sub: pSharpe > 2 ? "eccellente · rendimento/rischio efficiente"
-        : pSharpe >= 1 ? "buono · qualità istituzionale"
-        : pSharpe >= 0 ? "debole · poco premio per la volatilità"
-        : "negativo · rischio non ripagato",
-      accent: sharpeColor(pSharpe), valueCls: "",
-      valueStyle: `color:${sharpeColor(pSharpe)}`,
-    });
-  }
+  // Daily Tracking Error e Sharpe Ratio: ora mini-card con termometro tra i tab macro
+  // (renderMiniCards → #tracking-error-box, #sharpe-box). Niente più KPI dedicate.
 
   $("#kpi-grid").innerHTML = kpis.map(k => `
     <div class="kpi${k.kpiKey ? " kpi-click" : ""}" style="--accent:${k.accent}"${k.kpiKey ? ` data-kpi="${k.kpiKey}" role="button" tabindex="0" title="Clicca per il dettaglio"` : ""}>
@@ -1105,6 +1217,7 @@ function renderKPI() {
   const cagrRisk = cagrNeeded <= 10 ? "raggiungibile (Nasdaq storico ~10-12%)" : cagrNeeded <= 15 ? "sfidante ma realistico con tech" : "richiede performance eccezionale";
   const goalYear = new Date().getFullYear() + 10;
   const gradPct = Math.round(completionPct);
+  const perfPct = t.eur_gain_pct != null ? t.eur_gain_pct : null;   // performance complessiva sul costo
   const mt = document.getElementById("milione-tracker");
   if (mt) {
     mt.innerHTML = `
@@ -1116,15 +1229,16 @@ function renderKPI() {
         <span class="mt-stat"><span class="mt-val">${completionPct.toFixed(1)}%</span><span class="mt-lab">completato</span></span>
         <span class="mt-stat mt-cagr-btn" role="button" tabindex="0" title="Clicca per la spiegazione del CAGR necessario">
           <span class="mt-val" style="color:${cagrCol}">${cagrNeeded.toFixed(1)}%</span>
-          <span class="mt-lab">CAGR/anno <span class="mt-help">?</span></span>
+          <span class="mt-lab">CAGR necessario <span class="mt-help">?</span></span>
         </span>
+        <span class="mt-stat"><span class="mt-val ${signCls(perfPct)}">${perfPct != null ? signTxt(Math.round(perfPct * 10) / 10) : "—"}</span><span class="mt-lab">tua performance</span></span>
         <span class="mt-stat"><span class="mt-val muted">${fmtEUR.format(Math.round(Math.max(0, distanza)))}</span><span class="mt-lab">mancano</span></span>
       </div>
       <div class="mt-bar-track">
         <div class="mt-bar-fill" style="width:${gradPct}%"></div>
         <span class="mt-bar-label">${gradPct}%</span>
       </div>
-      <div class="mt-note muted">CAGR ${cagrNeeded.toFixed(1)}%/anno: ${cagrRisk} — <span class="mt-cagr-link">cos'è?</span></div>`;
+      <div class="mt-note muted">CAGR necessario <b style="color:${cagrCol}">${cagrNeeded.toFixed(1)}%/anno</b> vs tua performance complessiva <b class="${signCls(perfPct)}">${perfPct != null ? signTxt(Math.round(perfPct * 10) / 10) : "—"}</b> (sul capitale investito) — <span class="mt-cagr-link">cos'è?</span></div>`;
     const openCagr = () => openCagrInfo(patrimonio, GOAL, cagrNeeded, completionPct, distanza, goalYear, cagrRisk);
     mt.querySelector(".mt-cagr-btn")?.addEventListener("click", openCagr);
     mt.querySelector(".mt-cagr-btn")?.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openCagr(); } });
@@ -1678,7 +1792,20 @@ function techCells(r) {
       ${shortFloatCell(r)}
       ${drawdownCell(r)}
       ${optImpactCell(r.ticker)}
+      ${earningsCell(r)}
       <td class="spark-cell" data-tk="${r.ticker}" title="Clicca per ingrandire">${sparkline((r.sparks || {})[sparkRange])}</td>`;
+}
+
+/* cella Trimestrale in tabella: data earnings + Implied Move (±%) */
+function earningsCell(r) {
+  if (!r.earnings_date) return `<td class="num muted">—</td>`;
+  const days = Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000);
+  if (days < -1) return `<td class="num muted">—</td>`;
+  const d = new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
+  const col = days <= 7 ? "var(--red)" : days <= 21 ? "var(--yellow)" : "var(--muted)";
+  const im = typeof impliedMoveForEarnings === "function" ? impliedMoveForEarnings(r) : null;
+  const imHtml = im != null ? `<br><span style="font-size:9px;color:${im >= 10 ? "var(--yellow)" : "var(--muted)"}">±${im}%</span>` : "";
+  return `<td class="num" style="white-space:nowrap"><span style="color:${col}">${d}</span>${imHtml}</td>`;
 }
 
 function optImpactCell(ticker) {
@@ -2783,10 +2910,10 @@ function renderTable() {
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="13" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="14" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="22"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
 }
 
@@ -2800,9 +2927,9 @@ function renderWatchlist() {
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="18" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="19" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="18"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="19"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
 }
 
@@ -2945,6 +3072,8 @@ function impliedMoveForEarnings(r) {
 }
 
 function renderEarnings() {
+  const strip = $("#earnings-strip");
+  if (!strip) return;   // strip rimossa: le trimestrali sono ora nella colonna di tabella
   const all = [...DATA.portfolio, ...(DATA.watchlist || [])];
   const items = all
     .filter(r => r.earnings_date)
@@ -2952,7 +3081,7 @@ function renderEarnings() {
     .filter(r => r.days >= -1)
     .sort((a, b) => a.days - b.days);
   const ptfTickers = new Set(DATA.portfolio.map(x => x.ticker));
-  $("#earnings-strip").innerHTML = items.length ? items.map(r => {
+  strip.innerHTML = items.length ? items.map(r => {
     const d = new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
     const when = r.days <= 0 ? "oggi" : r.days === 1 ? "domani" : `tra ${r.days} gg`;
     const pct = Math.max(6, Math.min(100, 100 - r.days * 1.1));
@@ -3001,98 +3130,42 @@ function scoreColor(s) {
 }
 // scala SEMPRE verde(sx)→rosso(dx). score 0-100 (100=positivo): il marker del "buono"
 // sta a sinistra (verde), quello "cattivo" a destra (rosso). ends[0]=sinistra(verde).
-function thermoBar(score, ends) {
-  const s = Math.max(0, Math.min(100, score));
-  const pos = 100 - s;
-  return `<div class="thermo"><div class="thermo-scale"></div>
-    <div class="thermo-marker" style="left:${pos}%"></div></div>
-    ${ends ? `<div class="thermo-ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>` : ""}`;
-}
-/* card termometro uniforme; score 0-100 (100=positivo/verde, a sinistra). key per il popup */
-function thermoCard(key, title, score, valueText, subText, ends) {
-  // Gauge semicircolare: verde sx (favorevole, score=100) → rosso dx (sfavorevole, score=0)
+/* TERMOMETRO LINEARE unificato (sostituisce i tachimetri semicircolari per compattare la dashboard).
+   score 0-100; convenzione: verde a SINISTRA = favorevole (score alto), rosso a destra = sfavorevole.
+   opt.direct=true → marker a score% (per Fear&Greed); opt.gradient → gradiente custom. */
+function thermoLine(score, ends, opt = {}) {
   const s = Math.max(0, Math.min(100, score ?? 50));
-  const R = 68, cx = 88, cy = 80;
-  const zones = [
-    [0,  20, "#16a34a"],
-    [20, 40, "#86c52a"],
-    [40, 60, "#eab308"],
-    [60, 80, "#f97316"],
-    [80, 100,"#d23b30"],
-  ];
-  const pt = (val, r) => {
-    const a = Math.PI * (1 - val / 100);
-    return [cx + r * Math.cos(a), cy - r * Math.sin(a)];
-  };
-  const arcs = zones.map(([a, b, col]) => {
-    const [x1, y1] = pt(a, R), [x2, y2] = pt(b, R);
-    return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="butt"/>`;
-  }).join("");
-  // score 100 → ago sx (verde); score 0 → ago dx (rosso)
-  const nv = Math.max(5, Math.min(95, 100 - s)); // clamp: evita che l'ago tocchi la baseline
-  const [nx, ny] = pt(nv, R - 9);
+  const pos = opt.direct ? s : 100 - s;
+  const gradStyle = opt.gradient ? ` style="background:${opt.gradient}"` : "";
+  return `<div class="tl">
+    <div class="tl-track"${gradStyle}><span class="tl-marker" style="left:${pos}%"></span></div>
+    ${ends ? `<div class="tl-ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>` : ""}
+  </div>`;
+}
+
+// retrocompatibilità: vecchio thermoBar e compactSemiGauge ora rendono il termometro lineare
+function thermoBar(score, ends) { return thermoLine(score, ends); }
+function compactSemiGauge(score, ends) { return thermoLine(score, ends); }
+
+/* card termometro uniforme e compatta; score 0-100 (100=positivo/verde, a sinistra). key per il popup */
+function thermoCard(key, title, score, valueText, subText, ends) {
+  const s = Math.max(0, Math.min(100, score ?? 50));
   const col = scoreColor(s);
-  const endsHtml = ends ? `<div class="gauge-ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>` : "";
   return `<div class="gauge-card" data-gauge="${key}" tabindex="0" role="button" title="Clicca per dettagli e news">
     <span class="popup-dot"></span>
     <div class="g-title">${title}</div>
-    <svg viewBox="0 0 176 90" class="semi-gauge-svg">
-      ${arcs}
-      <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${col}" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="${cx}" cy="${cy}" r="5" fill="${col}"/>
-    </svg>
-    ${endsHtml}
     <div class="gauge-value" style="color:${col}">${valueText}</div>
+    ${thermoLine(s, ends)}
     <div class="gauge-sub">${subText}</div>
   </div>`;
 }
 
-/* gauge semicircolare compatto per macro-item e mini-card */
-function compactSemiGauge(score, ends) {
-  const s = Math.max(0, Math.min(100, score ?? 50));
-  const R = 50, cx = 65, cy = 57;
-  const zones = [
-    [0,  20, "#16a34a"],
-    [20, 40, "#86c52a"],
-    [40, 60, "#eab308"],
-    [60, 80, "#f97316"],
-    [80, 100,"#d23b30"],
-  ];
-  const pt = (val, r) => { const a = Math.PI * (1 - val / 100); return [cx + r * Math.cos(a), cy - r * Math.sin(a)]; };
-  const arcs = zones.map(([a, b, col]) => {
-    const [x1, y1] = pt(a, R), [x2, y2] = pt(b, R);
-    return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${col}" stroke-width="9" stroke-linecap="butt"/>`;
-  }).join("");
-  const nv = Math.max(5, Math.min(95, 100 - s));
-  const [nx, ny] = pt(nv, R - 7);
-  const col = scoreColor(s);
-  const endsHtml = ends ? `<div class="gauge-ends" style="font-size:9px;padding:0 2px"><span>${ends[0]}</span><span>${ends[1]}</span></div>` : "";
-  return `<svg viewBox="0 0 130 64" class="compact-semi-gauge">
-    ${arcs}
-    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="${cx}" cy="${cy}" r="4" fill="${col}"/>
-  </svg>${endsHtml}`;
-}
-
-/* tachimetro Fear & Greed: semicerchio stile CNN con lancetta — paura=sx, avidità=dx */
+/* Fear & Greed come termometro lineare (paura=rosso sx, avidità=verde dx, marker diretto su score) */
 function fgGaugeCNN(score) {
   const s = Math.max(0, Math.min(100, score));
-  const R = 68, cx = 88, cy = 80;
-  // F&G: 0=paura=sx, 100=avidità=dx (convenzionale CNN — non invertito)
-  const zones = [[0, 25, "#d23b30"], [25, 45, "#f59e0b"], [45, 55, "#eab308"], [55, 75, "#86c52a"], [75, 100, "#16a34a"]];
-  const pt = (val, r) => { const a = Math.PI * (1 - val / 100); return [cx + r * Math.cos(a), cy - r * Math.sin(a)]; };
-  const arcs = zones.map(([a, b, col]) => {
-    const [x1, y1] = pt(a, R), [x2, y2] = pt(b, R);
-    return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="butt"/>`;
-  }).join("");
-  const [nx, ny] = pt(s, R - 9);
-  const col = s >= 55 ? "#16a34a" : s >= 45 ? "#eab308" : "#d23b30";
-  return `<svg viewBox="0 0 176 90" class="semi-gauge-svg">
-    ${arcs}
-    <line x1="${cx}" y1="${cy}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="${col}" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="${cx}" cy="${cy}" r="5" fill="${col}"/>
-    <text x="${cx}" y="${cy - 20}" text-anchor="middle" font-size="22" font-weight="700" fill="var(--text)">${Math.round(s)}</text>
-  </svg>`;
+  const col = s >= 55 ? "var(--green)" : s >= 45 ? "var(--yellow)" : "var(--red)";
+  return `<div class="gauge-value" style="color:${col}">${Math.round(s)}</div>
+    ${thermoLine(s, ["Paura", "Avidità"], { direct: true, gradient: "linear-gradient(90deg,#d23b30,#eab308,#16a34a)" })}`;
 }
 
 function renderGauges() {
@@ -3550,6 +3623,18 @@ Per OGNI titolo usa questo formato fisso — non saltare nessuna voce:
   if ((DATA.news || []).length) {
     const ns = newsSummary(DATA.news);
     lines.push(`SINTESI NEWS: tono ${ns.tone.t} su ${ns.tot} notizie (${ns.bull} positive, ${ns.neu} neutre, ${ns.bear} negative).`);
+  }
+  // VERDETTO OPERATIVO della dashboard (top bar Decisione)
+  try {
+    const dv = decisionVerdict();
+    lines.push(`VERDETTO DASHBOARD: ${dv.label} — ${dv.reasons.join("; ")}.`);
+  } catch { /* no-op */ }
+  // DIARIO DELLE AZIONI (storico operazioni e motivazioni dell'utente)
+  const diary = loadDiary();
+  if (diary.length) {
+    lines.push("");
+    lines.push("DIARIO DELLE AZIONI (mie operazioni passate e motivazioni — usalo per capire la mia strategia e dare continuità ai consigli):");
+    diary.slice(0, 30).forEach(e => lines.push(`- ${new Date(e.date).toLocaleDateString("it-IT")}: ${e.text}`));
   }
   lines.push("");
   lines.push("PORTAFOGLIO (controvalore e P&L reali per posizione; Sharpe 1A = rendimento/rischio; Drawdown 52S = distanza dal max; ±ImpMove = movimento implicito earnings):");
@@ -4055,6 +4140,24 @@ $("#macroquant-box").addEventListener("click", openMacroQuantModal);
 $("#seasonality-box").addEventListener("click", openSeasonalityModal);
 $("#tracking-error-box").addEventListener("click", openAlphaModal);
 $("#ptf-edit-values")?.addEventListener("click", openEditPortfolio);
+$("#alloc-edit")?.addEventListener("click", openEditPortfolio);
+$("#decision-bar")?.addEventListener("click", openDecisionModal);
+$("#sharpe-box")?.addEventListener("click", openPortfolioSharpeModal);
+
+/* popup Strumenti (PMC, vendite) e News */
+function showSimpleModal(id) { const m = $(id); if (m) m.hidden = false; }
+function hideSimpleModal(id) { const m = $(id); if (m) m.hidden = true; }
+$("#open-pmc")?.addEventListener("click", () => { pmcInit(); pmcCompute(); showSimpleModal("#pmc-modal"); });
+$("#open-sell")?.addEventListener("click", () => { renderSellCalc(); showSimpleModal("#sell-modal"); });
+$("#news-summary")?.addEventListener("click", () => showSimpleModal("#news-modal"));
+$("#pmc-modal-close")?.addEventListener("click", () => hideSimpleModal("#pmc-modal"));
+$("#sell-modal-close")?.addEventListener("click", () => hideSimpleModal("#sell-modal"));
+$("#news-modal-close")?.addEventListener("click", () => hideSimpleModal("#news-modal"));
+["pmc-modal", "sell-modal", "news-modal"].forEach(id =>
+  $("#" + id)?.addEventListener("click", e => { if (e.target.id === id) hideSimpleModal("#" + id); }));
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") ["#pmc-modal", "#sell-modal", "#news-modal"].forEach(hideSimpleModal);
+});
 $("#market-direction").addEventListener("click", () => {
   const d = marketDirectionScore();
   const comps = directionComponents();
@@ -4104,19 +4207,11 @@ document.querySelectorAll("#spark-toggle .chip, #spark-toggle-wl .chip").forEach
   });
 });
 $("#wl-add-top").addEventListener("click", addWatchlist);
+$("#ptf-add-top")?.addEventListener("click", addPortfolio);
 document.querySelectorAll("#view-toggle .chip").forEach(ch =>
   ch.addEventListener("click", () => setPtfView(ch.dataset.view)));
 document.querySelectorAll("#wl-view-toggle .chip").forEach(ch =>
   ch.addEventListener("click", () => setWlView(ch.dataset.view)));
-document.querySelectorAll("#hist-toggle .chip").forEach(ch => {
-  ch.addEventListener("click", () => {
-    document.querySelectorAll("#hist-toggle .chip").forEach(c => c.classList.remove("chip-active"));
-    ch.classList.add("chip-active");
-    histRange = ch.dataset.range;
-    renderHistory();
-  });
-});
-$("#bench-select").addEventListener("change", (e) => { histBenchKey = e.target.value; renderHistory(); });
 document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {
   ch.addEventListener("click", () => {
     document.querySelectorAll("#alloc-toggle .chip").forEach(c => c.classList.remove("chip-active"));
@@ -4126,11 +4221,6 @@ document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {
   });
 });
 
-/* zoom grafici */
-$("#hist-zoom").addEventListener("click", () => {
-  const h = DATA.history && DATA.history[histRange];
-  if (h) openChartModal(`Andamento portafoglio — ${histRange.toUpperCase()}`, h.values, h.dates, v => fmtEUR.format(Math.round(v)));
-});
 $("#chart-modal-close").addEventListener("click", closeChartModal);
 $("#chart-modal").addEventListener("click", e => {
   if (e.target.id === "chart-modal") { closeChartModal(); return; }

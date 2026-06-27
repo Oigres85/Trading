@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=68">
+<link rel="stylesheet" href="assets/style.css?v=69">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -26,45 +26,28 @@
 </header>
 
 <main>
-  <!-- ANDAMENTO & ALLOCAZIONE -->
-  <div class="grid-2">
-    <section class="card">
-      <div class="card-head">
-        <h2>Andamento portafoglio</h2>
-        <div class="spark-toggle" id="hist-toggle" role="group" aria-label="Intervallo temporale andamento">
-          <button class="chip" data-range="w1" aria-label="Una settimana">1S</button>
-          <button class="chip" data-range="m1" aria-label="Un mese">1M</button>
-          <button class="chip" data-range="m3" aria-label="Tre mesi">3M</button>
-          <button class="chip" data-range="y1" aria-label="Dodici mesi">12M</button>
-          <button class="chip" data-range="y5" aria-label="Cinque anni">5A</button>
-          <button class="chip chip-active" data-range="all" aria-label="Massimo, dall'inizio">Max</button>
-        </div>
-        <label class="bench-toggle">Confronta:
-          <select id="bench-select" class="pmc-input" style="width:auto;padding:4px 8px">
-            <option value="none">nessuno</option>
-            <option value="ndx" selected>Nasdaq 100</option>
-            <option value="sp500">S&amp;P 500</option>
-            <option value="russell">Russell 2000</option>
-          </select>
-        </label>
-        <button class="btn btn-ghost btn-sm" id="hist-zoom" aria-label="Ingrandisci il grafico" title="Ingrandisci">Ingrandisci</button>
-      </div>
-      <div id="hist-chart"></div>
-      <div class="hist-summary muted" id="hist-summary"></div>
-    </section>
+  <!-- DECISIONE (top bar) -->
+  <section class="card decision-bar" id="decision-bar" tabindex="0" role="button" title="Verdetto operativo — clicca per dettagli e diario delle azioni"></section>
+
+  <!-- ALLOCAZIONE -->
+  <div class="grid-1">
     <section class="card">
       <div class="card-head">
         <h2>Asset allocation</h2>
-        <div class="spark-toggle" id="alloc-toggle" role="group" aria-label="Vista allocazione">
-          <button class="chip chip-active" data-mode="ticker">Per titolo</button>
-          <button class="chip" data-mode="sector">Per settore</button>
+        <div class="card-head-right">
+          <div class="spark-toggle" id="alloc-toggle" role="group" aria-label="Vista allocazione">
+            <button class="chip chip-active" data-mode="ticker">Per titolo</button>
+            <button class="chip" data-mode="sector">Per settore</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="alloc-edit" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica</button>
         </div>
       </div>
       <section class="kpi-grid kpi-compact" id="kpi-grid"></section>
       <div class="btp-info" id="btp-info"></div>
       <div class="alloc-wrap">
-        <div id="alloc-donut"></div>
-        <div class="alloc-right">
+        <div class="alloc-donut-wrap"><div id="alloc-donut"></div></div>
+        <ul class="alloc-legend" id="alloc-legend"></ul>
+        <div class="alloc-side">
           <section class="cash-box cash-box-inline">
             <label for="cash-input">Liquidità disponibile (€)</label>
             <div class="cash-row">
@@ -74,7 +57,6 @@
             <span class="muted" id="cash-note"></span>
             <div class="cash-drag" id="cash-drag" hidden></div>
           </section>
-          <ul class="alloc-legend" id="alloc-legend"></ul>
           <div id="milione-tracker"></div>
         </div>
       </div>
@@ -91,12 +73,11 @@
       <div class="mini-card" id="tilt-box" tabindex="0" role="button" title="Rotazione settoriale — clicca per il dettaglio"></div>
       <div class="mini-card" id="seasonality-box" tabindex="0" role="button" title="Stagionalità S&amp;P 500 / Nasdaq — clicca per il dettaglio"></div>
       <div class="mini-card" id="tracking-error-box" tabindex="0" role="button" title="Daily Tracking Error vs benchmark — clicca per il dettaglio"></div>
+      <div class="mini-card" id="sharpe-box" tabindex="0" role="button" title="Sharpe Ratio del portafoglio — clicca per il dettaglio"></div>
     </div>
     <div class="gauges" id="gauges"></div>
     <div class="macro-grid macro-grid-below" id="macro-grid"></div>
     <div id="portfolio-health" class="health-banner" tabindex="0" role="button" title="Salute del portafoglio — clicca per il dettaglio"></div>
-    <div class="topcaps" id="topcaps"></div>
-    <div id="top-etfs-wrap" style="margin-top:20px"></div>
   </section>
 
 
@@ -104,8 +85,8 @@
   <section class="card">
     <div class="card-head">
       <h2>Portafoglio &amp; Dati Tecnici</h2>
+      <button class="btn btn-primary btn-sm" id="ptf-add-top" title="Aggiungi un titolo al portafoglio con quantità e PMC">+ Aggiungi titolo</button>
     </div>
-    <div class="earnings-strip" id="earnings-strip" aria-label="Prossime trimestrali"></div>
     <div class="range-bar">
       <div class="spark-toggle" id="view-toggle" role="group" aria-label="Vista portafoglio">
         <button class="chip chip-active" data-view="tech">Tecnica &amp; Prezzi</button>
@@ -154,6 +135,7 @@
             <th class="num">Short %</th>
             <th class="num">Drawdown 52S</th>
             <th>Opzioni</th>
+            <th class="num">Trimestrale</th>
             <th>Grafico</th>
           </tr>
         </thead>
@@ -211,6 +193,7 @@
             <th class="num">Short %</th>
             <th class="num">Drawdown 52S</th>
             <th>Opzioni</th>
+            <th class="num">Trimestrale</th>
             <th>Grafico</th>
           </tr>
         </thead>
@@ -219,76 +202,23 @@
     </div>
   </section>
 
-  <!-- NEWS -->
-  <section class="card">
-    <div class="card-head">
-      <h2>News — portafoglio &amp; macro USA</h2>
-      <span class="muted">solo notizie delle ultime 24 ore</span>
-    </div>
-    <div id="news-summary"></div>
-    <ul class="news-list" id="news-list" aria-label="Elenco notizie"></ul>
-  </section>
-
-  <!-- CALCOLATORE PMC -->
-  <section class="card" id="pmc-calc">
-    <div class="card-head">
-      <h2>Calcolatore prezzo medio (PMC)</h2>
-      <div class="card-head-right">
-        <div class="spark-toggle" id="pmc-mode" role="tablist" title="Simula un acquisto (mediazione) o una vendita (realizzo)">
-          <button class="chip chip-active" data-pmc-mode="buy" role="tab">Acquisto</button>
-          <button class="chip" data-pmc-mode="sell" role="tab">Vendita</button>
-        </div>
-        <select id="pmc-select" class="pmc-input pmc-select" title="Precompila con una posizione del portafoglio o della watchlist">
-          <option value="">— scegli un titolo o inserisci a mano —</option>
-        </select>
+  <!-- NEWS + STRUMENTI (compatti) -->
+  <div class="grid-2">
+    <section class="card">
+      <div class="card-head">
+        <h2>News — portafoglio &amp; macro USA</h2>
+        <span class="muted">clicca la sintesi per tutte le notizie</span>
       </div>
-    </div>
-    <div class="pmc-grid">
-      <div class="pmc-block">
-        <div class="m-label">Posizione attuale</div>
-        <label>Quantità <input type="number" id="pmc-q1" class="pmc-input" min="0" step="any" placeholder="es. 270"></label>
-        <label>PMC <input type="number" id="pmc-p1" class="pmc-input" min="0" step="any" placeholder="es. 87,17"></label>
+      <div id="news-summary" tabindex="0" role="button" title="Clicca per leggere tutte le notizie"></div>
+    </section>
+    <section class="card">
+      <div class="card-head"><h2>Strumenti</h2></div>
+      <div class="tools-btns">
+        <button class="btn btn-ghost tool-btn" id="open-pmc">Calcolatore PMC<span class="muted">mediazione acquisto / realizzo vendita</span></button>
+        <button class="btn btn-ghost tool-btn" id="open-sell">Calcolo vendite (plus/minus)<span class="muted">stima risultato netto e tasse</span></button>
       </div>
-      <div class="pmc-block">
-        <div class="m-label" id="pmc-b2-label">Nuovo acquisto</div>
-        <label><span id="pmc-q2-label">Quantità</span> <input type="number" id="pmc-q2" class="pmc-input" min="0" step="any" placeholder="es. 50"></label>
-        <label><span id="pmc-p2-label">Prezzo</span> <input type="number" id="pmc-p2" class="pmc-input" min="0" step="any" placeholder="es. 120"></label>
-        <label id="pmc-comm-label">Commissioni (€) <input type="number" id="pmc-comm" class="pmc-input" min="0" step="any" placeholder="es. 2,95"></label>
-      </div>
-      <div class="pmc-block pmc-result">
-        <div class="m-label">Risultato</div>
-        <div class="pmc-out"><span id="pmc-r1-lab">Nuovo PMC:</span> <b id="pmc-new">—</b></div>
-        <div class="pmc-out muted"><span id="pmc-r2-lab">Quantità totale:</span> <span id="pmc-qty">—</span></div>
-        <div class="pmc-out muted"><span id="pmc-r3-lab">Investimento totale:</span> <span id="pmc-cost">—</span></div>
-        <div class="pmc-out muted" id="pmc-opcost-row" hidden>Costo operazione: <b id="pmc-opcost">—</b></div>
-        <div class="pmc-out muted"><span id="pmc-r4-lab">Variazione PMC:</span> <span id="pmc-delta">—</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CALCOLO VENDITE (PLUS/MINUS) -->
-  <section class="card" id="sell-calc">
-    <div class="card-head">
-      <h2>Calcolo vendite (plus/minusvalenze)</h2>
-      <span class="muted">Imposta quante azioni vendere per stimare il risultato netto e le tasse</span>
-    </div>
-    <div class="table-wrap">
-      <table id="sell-table" aria-label="Simulazione vendite">
-        <thead>
-          <tr>
-            <th class="sticky-col">Titolo</th>
-            <th class="num">Possedute</th>
-            <th class="num">PMC</th>
-            <th class="num">Prezzo</th>
-            <th class="num">Vendi qtà</th>
-            <th class="num">Plus/Minus (€)</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <div class="sell-summary" id="sell-summary"></div>
-  </section>
+    </section>
+  </div>
 
   <footer>
     Prezzi live lato client (Yahoo via proxy CORS, ogni 60s) · dati tecnici/macro/news rigenerati dal workflow ogni ~20 min.<br>
@@ -324,6 +254,84 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=68"></script>
+<!-- Modal NEWS -->
+<div class="modal-backdrop" id="news-modal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h3>News — portafoglio &amp; macro USA</h3>
+      <button class="btn btn-ghost" id="news-modal-close">✕</button>
+    </div>
+    <ul class="news-list" id="news-list" aria-label="Elenco notizie"></ul>
+  </div>
+</div>
+
+<!-- Modal PMC -->
+<div class="modal-backdrop" id="pmc-modal" hidden>
+  <div class="modal modal-chart">
+    <div class="modal-head">
+      <h3>Calcolatore prezzo medio (PMC)</h3>
+      <button class="btn btn-ghost" id="pmc-modal-close">✕</button>
+    </div>
+    <div class="card-head-right" style="margin-bottom:12px">
+      <div class="spark-toggle" id="pmc-mode" role="tablist" title="Simula un acquisto (mediazione) o una vendita (realizzo)">
+        <button class="chip chip-active" data-pmc-mode="buy" role="tab">Acquisto</button>
+        <button class="chip" data-pmc-mode="sell" role="tab">Vendita</button>
+      </div>
+      <select id="pmc-select" class="pmc-input pmc-select" title="Precompila con una posizione del portafoglio o della watchlist">
+        <option value="">— scegli un titolo o inserisci a mano —</option>
+      </select>
+    </div>
+    <div class="pmc-grid">
+      <div class="pmc-block">
+        <div class="m-label">Posizione attuale</div>
+        <label>Quantità <input type="number" id="pmc-q1" class="pmc-input" min="0" step="any" placeholder="es. 270"></label>
+        <label>PMC <input type="number" id="pmc-p1" class="pmc-input" min="0" step="any" placeholder="es. 87,17"></label>
+      </div>
+      <div class="pmc-block">
+        <div class="m-label" id="pmc-b2-label">Nuovo acquisto</div>
+        <label><span id="pmc-q2-label">Quantità</span> <input type="number" id="pmc-q2" class="pmc-input" min="0" step="any" placeholder="es. 50"></label>
+        <label><span id="pmc-p2-label">Prezzo</span> <input type="number" id="pmc-p2" class="pmc-input" min="0" step="any" placeholder="es. 120"></label>
+        <label id="pmc-comm-label">Commissioni (€) <input type="number" id="pmc-comm" class="pmc-input" min="0" step="any" placeholder="es. 2,95"></label>
+      </div>
+      <div class="pmc-block pmc-result">
+        <div class="m-label">Risultato</div>
+        <div class="pmc-out"><span id="pmc-r1-lab">Nuovo PMC:</span> <b id="pmc-new">—</b></div>
+        <div class="pmc-out muted"><span id="pmc-r2-lab">Quantità totale:</span> <span id="pmc-qty">—</span></div>
+        <div class="pmc-out muted"><span id="pmc-r3-lab">Investimento totale:</span> <span id="pmc-cost">—</span></div>
+        <div class="pmc-out muted" id="pmc-opcost-row" hidden>Costo operazione: <b id="pmc-opcost">—</b></div>
+        <div class="pmc-out muted"><span id="pmc-r4-lab">Variazione PMC:</span> <span id="pmc-delta">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal CALCOLO VENDITE -->
+<div class="modal-backdrop" id="sell-modal" hidden>
+  <div class="modal modal-chart">
+    <div class="modal-head">
+      <h3>Calcolo vendite (plus/minusvalenze)</h3>
+      <button class="btn btn-ghost" id="sell-modal-close">✕</button>
+    </div>
+    <p class="muted" style="margin:0 0 10px">Imposta quante azioni vendere (prezzo modificabile a mano ✎) per stimare il risultato netto e le tasse.</p>
+    <div class="table-wrap">
+      <table id="sell-table" aria-label="Simulazione vendite">
+        <thead>
+          <tr>
+            <th class="sticky-col">Titolo</th>
+            <th class="num">Possedute</th>
+            <th class="num">PMC</th>
+            <th class="num">Prezzo</th>
+            <th class="num">Vendi qtà</th>
+            <th class="num">Plus/Minus (€)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="sell-summary" id="sell-summary"></div>
+  </div>
+</div>
+
+<script src="assets/app.js?v=69"></script>
 </body>
 </html>

@@ -66,9 +66,16 @@ main { max-width: 1500px; margin: 0 auto; padding: 0 20px 40px; }
 .hist-summary b { font-family: var(--mono); }
 
 /* asset allocation */
-.alloc-wrap { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+/* layout a 3 zone per riempire la larghezza piena (donut · legenda · liquidità+milione) */
+.alloc-wrap { display: grid; grid-template-columns: 180px 1fr 340px; gap: 22px; align-items: start; }
+@media (max-width: 980px) { .alloc-wrap { grid-template-columns: 160px 1fr; } .alloc-side { grid-column: 1 / -1; } }
+@media (max-width: 620px) { .alloc-wrap { grid-template-columns: 1fr; } .alloc-donut-wrap { justify-self: center; } }
+.alloc-donut-wrap { display: flex; justify-content: center; }
+.alloc-side { display: flex; flex-direction: column; gap: 12px; }
 .alloc-right { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 12px; }
-.alloc-legend { list-style: none; flex: 1; min-width: 200px; }
+.alloc-legend { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 18px; }
+@media (max-width: 620px) { .alloc-legend { columns: 1; } }
+.alloc-legend .alloc-item { break-inside: avoid; }
 .alloc-item { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 12.5px; }
 .alloc-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 .alloc-name { flex: 1; font-weight: 600; }
@@ -180,19 +187,24 @@ tbody tr.total-row { background: var(--card-2); font-weight: 700; }
 .meter-fill { display: block; height: 100%; border-radius: 4px; }
 
 /* ---------- gauges (compatti) — griglia a colonne uguali: tutti i box stessa dimensione ---------- */
-.gauges { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; align-items: start; }
+.gauges { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; align-items: stretch; }
 .gauge-card {
-  background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
-  padding: 12px 10px 10px; text-align: center;
-  display: flex; flex-direction: column; height: 218px; box-sizing: border-box; overflow: hidden;
+  background: var(--card-2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 10px 9px; text-align: center;
+  display: flex; flex-direction: column; height: 118px; box-sizing: border-box; overflow: hidden;
 }
-/* titolo: sempre 2 righe riservate → header di altezza uniforme su tutte le card */
-.gauge-card .g-title { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; height: 26px; line-height: 13px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1px; overflow: hidden; flex-shrink: 0; }
-.semi-gauge-svg { width: 100%; max-width: 138px; height: 68px; display: block; margin: 0 auto 2px; flex-shrink: 0; }
-.gauge-ends { display: flex; justify-content: space-between; gap: 4px; font-size: 8.5px; color: var(--muted); padding: 0 2px; margin-bottom: 2px; font-family: var(--mono); flex-shrink: 0; height: 12px; line-height: 12px; }
-.gauge-ends span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gauge-value { font-family: var(--mono); font-size: 15px; font-weight: 700; line-height: 1.2; flex-shrink: 0; }
-.gauge-sub { font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.35; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
+.gauge-card .g-title { color: var(--muted); font-size: 9.5px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; height: 24px; line-height: 12px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1px; overflow: hidden; flex-shrink: 0; }
+.gauge-value { font-family: var(--mono); font-size: 15px; font-weight: 700; line-height: 1.15; flex-shrink: 0; }
+.gauge-sub { font-size: 9.5px; color: var(--muted); margin-top: 3px; line-height: 1.3; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+/* ---------- termometro lineare unificato (sostituisce i tachimetri) ---------- */
+.tl { margin: 5px 2px 3px; }
+.tl-track { position: relative; height: 7px; border-radius: 4px;
+  background: linear-gradient(90deg, #16a34a 0%, #86c52a 25%, #eab308 50%, #f97316 75%, #d23b30 100%); }
+.tl-marker { position: absolute; top: -2px; width: 3px; height: 11px; border-radius: 2px; background: var(--text);
+  transform: translateX(-50%); box-shadow: 0 0 0 1.5px var(--card-2); }
+.tl-ends { display: flex; justify-content: space-between; gap: 4px; font-size: 8px; color: var(--muted); margin-top: 2px; font-family: var(--mono); }
+.tl-ends span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---------- macro (compatti) ---------- */
 .macro-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 9px; }
@@ -403,14 +415,14 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .rot-bar-val { width: 56px; text-align: right; font-family: var(--mono); font-weight: 700; }
 @media (max-width: 600px) { .rot-bar-lab { width: 120px; } }
 
-/* ---------- mini-card direzione/segnali ---------- */
-.mini-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-@media (max-width: 700px) { .mini-cards { grid-template-columns: 1fr; } }
-.mini-card { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; cursor: pointer; }
+/* ---------- mini-card direzione/segnali (uniformi e compatte, come i gauge) ---------- */
+.mini-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; align-items: stretch; }
+.mini-card { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px 9px; cursor: pointer;
+  height: 118px; box-sizing: border-box; display: flex; flex-direction: column; text-align: center; overflow: hidden; }
 .mini-card:hover { border-color: var(--blue); }
-.mc-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-.mc-value { font-family: var(--mono); font-weight: 700; font-size: 15px; margin-top: 2px; }
-.mc-sub { font-size: 11px; }
+.mc-title { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; height: 24px; line-height: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mc-value { font-family: var(--mono); font-weight: 700; font-size: 14px; flex-shrink: 0; }
+.mc-sub { font-size: 9.5px; color: var(--muted); margin-top: 3px; line-height: 1.3; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
 /* ---------- financial health ---------- */
 .fin-health { display: inline-flex; align-items: center; gap: 6px; min-width: 86px; background: none; border: none; cursor: pointer; padding: 0; color: var(--text); font-family: var(--mono); }
@@ -744,8 +756,37 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .sell-price.sp-edited { border-color: var(--blue); color: var(--blue); font-weight: 700; }
 .sp-pencil { color: var(--muted); font-size: 10px; margin-left: 3px; cursor: default; }
 
+/* ---------- v69: Decision top bar ---------- */
+.decision-bar { display: flex; align-items: center; gap: 18px; cursor: pointer; padding: 12px 18px; }
+.decision-bar:hover { border-color: var(--blue); }
+.dec-left { flex: 0 0 auto; min-width: 200px; }
+.dec-lab { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+.dec-verdict { font-size: 20px; font-weight: 800; line-height: 1.1; }
+.dec-reason { font-size: 11px; margin-top: 2px; max-width: 340px; }
+.dec-mid { flex: 1; min-width: 140px; }
+.dec-right { flex: 0 0 auto; text-align: right; }
+.dec-goal { font-family: var(--mono); font-weight: 700; font-size: 15px; color: var(--blue); }
+.dec-cta { font-size: 10px; margin-top: 2px; }
+@media (max-width: 700px) { .decision-bar { flex-wrap: wrap; gap: 10px; } .dec-mid { order: 3; flex-basis: 100%; } }
+
+/* ---------- v69: Diario azioni ---------- */
+.diary-add { display: flex; gap: 8px; margin-bottom: 10px; }
+.diary-add input { flex: 1; background: var(--card-2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 6px 8px; font-size: 12px; }
+.diary-list { display: flex; flex-direction: column; gap: 4px; max-height: 240px; overflow-y: auto; }
+.diary-item { display: flex; gap: 8px; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.diary-date { font-family: var(--mono); font-size: 10px; color: var(--muted); flex: 0 0 64px; }
+.diary-text { flex: 1; }
+.diary-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 11px; }
+.diary-del:hover { color: var(--red); }
+
+/* ---------- v69: Strumenti (PMC/vendite) come pulsanti ---------- */
+.tools-btns { display: flex; flex-direction: column; gap: 10px; }
+.tool-btn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; padding: 12px 14px; font-size: 14px; font-weight: 600; }
+.tool-btn .muted { font-size: 11px; font-weight: 400; }
+
 /* ---------- v68: News summary box ---------- */
-#news-summary { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+#news-summary { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+#news-summary:hover { border-color: var(--blue); }
 .ns-head { font-size: 12px; margin-bottom: 6px; }
 .ns-bar { display: flex; height: 8px; border-radius: 5px; overflow: hidden; background: var(--card-3); }
 .ns-seg { height: 100%; }
