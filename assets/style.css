@@ -729,6 +729,35 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .cm-tv-note { font-size: 10.5px; margin-top: 6px; text-align: center; }
 @media (max-width: 760px) { .cm-tv { height: 360px; } }
 
+/* ---------- v68: Modifica valori portafoglio (modale) ---------- */
+.edp-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 10px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); }
+.edp-head { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--border); }
+.edp-tk { font-size: 12px; }
+.edp-row input { background: var(--card-2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 4px 6px; font-family: var(--mono); font-size: 12px; width: 100%; }
+.edp-cash { margin-top: 8px; border-top: 1px solid var(--border); border-bottom: none; font-weight: 600; }
+.edp-actions { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+
+/* ---------- v68: Sell calc — prezzo manuale (matita) ---------- */
+.sell-price-cell { white-space: nowrap; }
+.sp-cur { color: var(--muted); font-size: 11px; margin-right: 1px; }
+.sell-price { background: var(--card-2); border: 1px solid var(--border); border-radius: 5px; color: var(--text); padding: 2px 4px; font-family: var(--mono); font-size: 12px; }
+.sell-price.sp-edited { border-color: var(--blue); color: var(--blue); font-weight: 700; }
+.sp-pencil { color: var(--muted); font-size: 10px; margin-left: 3px; cursor: default; }
+
+/* ---------- v68: News summary box ---------- */
+#news-summary { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+.ns-head { font-size: 12px; margin-bottom: 6px; }
+.ns-bar { display: flex; height: 8px; border-radius: 5px; overflow: hidden; background: var(--card-3); }
+.ns-seg { height: 100%; }
+.ns-bull { background: var(--green); }
+.ns-neu { background: var(--muted); opacity: .5; }
+.ns-bear { background: var(--red); }
+.ns-legend { display: flex; gap: 14px; font-size: 10.5px; margin-top: 5px; }
+.ns-top { font-size: 11px; margin-top: 7px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ns-chip { font-family: var(--mono); font-size: 10.5px; padding: 1px 6px; border-radius: 5px; background: var(--card-3); border: 1px solid var(--border); }
+.ns-chip.pos { color: var(--green); border-color: rgba(34,197,94,.35); }
+.ns-chip.neg { color: var(--red); border-color: rgba(239,68,68,.35); }
+
 /* ---------- v67: Cash Drag indicator ---------- */
 .cash-drag { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.2); }
 .cash-drag-head { font-size: 11px; margin-bottom: 3px; }

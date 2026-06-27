@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=67">
+<link rel="stylesheet" href="assets/style.css?v=68">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -20,7 +20,8 @@
   </div>
   <div class="actions">
     <button class="btn btn-primary" id="btn-prompt" aria-label="Copia il prompt con tutti i dati da incollare in un'AI" title="Copia il prompt (tabella Markdown)">Copia prompt AI</button>
-    <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna prezzi live e rigenera i dati" title="Aggiorna prezzi live e rigenera i dati (col token)">⟳ Aggiorna</button>
+    <button class="btn btn-ghost" id="btn-quick" aria-label="Aggiorna solo i prezzi live (veloce)" title="Aggiorna SUBITO i prezzi live (pochi secondi, niente pipeline)">⟳ Prezzi</button>
+    <button class="btn btn-ghost" id="btn-refresh" aria-label="Rigenera tutti i dati via pipeline" title="Rigenera TUTTI i dati (fondamentali, macro, news) via GitHub Actions — 2-3 min">↻ Rigenera tutto</button>
   </div>
 </header>
 
@@ -89,6 +90,7 @@
       <div class="mini-card" id="signposts-box" tabindex="0" role="button" title="BofA Bear Market Signposts — clicca per il dettaglio"></div>
       <div class="mini-card" id="tilt-box" tabindex="0" role="button" title="Rotazione settoriale — clicca per il dettaglio"></div>
       <div class="mini-card" id="seasonality-box" tabindex="0" role="button" title="Stagionalità S&amp;P 500 / Nasdaq — clicca per il dettaglio"></div>
+      <div class="mini-card" id="tracking-error-box" tabindex="0" role="button" title="Daily Tracking Error vs benchmark — clicca per il dettaglio"></div>
     </div>
     <div class="gauges" id="gauges"></div>
     <div class="macro-grid macro-grid-below" id="macro-grid"></div>
@@ -117,7 +119,8 @@
         <button class="chip" data-range="m3" aria-label="Tre mesi">3M</button>
         <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
       </div>
-      <button class="btn btn-ghost btn-sm" id="ptf-edit" aria-label="Aggiungi o rimuovi titoli dal portafoglio" title="Aggiungi o rimuovi titoli">✎ Modifica</button>
+      <button class="btn btn-ghost btn-sm" id="ptf-edit-values" aria-label="Modifica quantità, PMC e liquidità" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica valori</button>
+      <button class="btn btn-ghost btn-sm" id="ptf-edit" aria-label="Aggiungi o rimuovi titoli dal portafoglio" title="Aggiungi o rimuovi titoli">+ / − Titoli</button>
     </div>
     <div class="table-wrap" id="ptf-fund-wrap" hidden>
       <table id="ptf-fund-table" aria-label="Portafoglio — analisi fondamentale"><thead></thead><tbody></tbody></table>
@@ -222,6 +225,7 @@
       <h2>News — portafoglio &amp; macro USA</h2>
       <span class="muted">solo notizie delle ultime 24 ore</span>
     </div>
+    <div id="news-summary"></div>
     <ul class="news-list" id="news-list" aria-label="Elenco notizie"></ul>
   </section>
 
@@ -320,6 +324,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=67"></script>
+<script src="assets/app.js?v=68"></script>
 </body>
 </html>

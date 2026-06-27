@@ -237,6 +237,27 @@ function showRefreshDoneModal() {
   setTimeout(() => el.remove(), 8000);
 }
 
+/* Aggiornamento RAPIDO (secondi): prezzi live via Yahoo (CORS) + ricarico data.json
+   (può essere già stato rigenerato da un run schedulato). NIENTE pipeline lenta. */
+async function quickRefresh() {
+  const btn = $("#btn-quick");
+  const orig = btn.textContent;
+  btn.classList.add("btn-refreshing");
+  btn.textContent = "⟳ Aggiorno…";
+  try {
+    await Promise.allSettled([livePrices(), loadData(false)]);
+    btn.classList.remove("btn-refreshing");
+    btn.classList.add("btn-done");
+    btn.textContent = "✓ Prezzi aggiornati";
+    toast("Prezzi aggiornati ✓ (per fondamentali/news usa Rigenera tutto)");
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove("btn-done"); }, 4000);
+  } catch {
+    btn.classList.remove("btn-refreshing");
+    btn.textContent = orig;
+    toast("Errore aggiornamento prezzi");
+  }
+}
+
 async function refreshAll() {
   const btn = $("#btn-refresh");
   btn.classList.add("btn-refreshing");
@@ -375,6 +396,59 @@ function addPortfolio() {
     if (cfg.portfolio.some(p => p.ticker === ticker)) return false;
     cfg.portfolio.push({ ticker, name: ticker, qty, pmc });
     return true;
+  });
+}
+
+/* Modale "Modifica valori": edita qty + PMC di ogni posizione e la liquidità in un colpo solo.
+   Salva localmente (sopravvive al reload) e, se c'è un token, persiste su config/holdings.json. */
+function openEditPortfolio() {
+  const rows = (DATA.portfolio || []).filter(r => r.ticker !== "BTP-V28");
+  const body = `
+    <div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Modifica quantità e PMC di ogni posizione e la liquidità disponibile. Patrimonio, allocazione e KPI si aggiornano al salvataggio.</div>
+    <div class="edp-row edp-head"><span>Titolo</span><span>Quantità</span><span>PMC</span></div>
+    ${rows.map(r => `<div class="edp-row" data-edp="${r.ticker}">
+      <span class="edp-tk">${esc(r.name)} <span class="tk">${r.ticker}</span></span>
+      <input type="number" class="edp-qty" data-tk="${r.ticker}" value="${r.qty ?? ""}" step="any" min="0">
+      <input type="number" class="edp-pmc" data-tk="${r.ticker}" value="${r.pmc ?? ""}" step="any" min="0">
+    </div>`).join("")}
+    <div class="edp-row edp-cash"><span>Liquidità disponibile (€)</span><input type="number" id="edp-cash" value="${cashEur || ""}" step="any" min="0"><span></span></div>
+    <div class="edp-actions"><button class="btn btn-primary" id="edp-save">Salva modifiche</button>
+      <span class="muted" style="font-size:11px">le variazioni sono immediate; con token GitHub vengono anche salvate sul repo</span></div>`;
+  openInfoModal("Modifica valori portafoglio", body);
+  $("#edp-save")?.addEventListener("click", () => {
+    let changed = false;
+    document.querySelectorAll(".edp-row[data-edp]").forEach(div => {
+      const tk = div.dataset.edp;
+      const r = DATA.portfolio.find(x => x.ticker === tk);
+      if (!r) return;
+      const nq = parseFloat(div.querySelector(".edp-qty").value);
+      const np = parseFloat(div.querySelector(".edp-pmc").value);
+      if (nq > 0 && nq !== r.qty) { r.qty = nq; changed = true; }
+      if (np > 0 && np !== r.pmc) { r.pmc = np; changed = true; }
+      // ricalcola valore/guadagno dal prezzo corrente (no bval snapshot: ora è una posizione editata a mano)
+      if (r.price && r.currency === "USD") {
+        r.bval = null; r.bgain = null;
+        r.value = r.price * r.qty;
+        r.gain = r.value - r.pmc * r.qty;
+        r.gain_pct = Math.round((r.value / (r.pmc * r.qty) - 1) * 10000) / 100;
+      }
+      saveManualHolding({ ticker: tk, name: r.name, qty: r.qty, pmc: r.pmc, currency: r.currency || "USD" });
+    });
+    const nc = parseFloat($("#edp-cash").value) || 0;
+    if (nc !== cashEur) { cashEur = nc; localStorage.setItem("cash_eur", cashEur); changed = true; }
+    recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); renderCash();
+    closeChartModal();
+    toast(changed ? "Portafoglio aggiornato ✓" : "Nessuna modifica");
+    if (changed) {
+      // persistenza sul repo (best-effort, se c'è un token)
+      editHoldings("portfolio", cfg => {
+        cfg.portfolio = (cfg.portfolio || []).map(p => {
+          const r = DATA.portfolio.find(x => x.ticker === p.ticker);
+          return r ? { ...p, qty: r.qty, pmc: r.pmc } : p;
+        });
+        return true;
+      });
+    }
   });
 }
 
@@ -692,6 +766,26 @@ function renderMiniCards() {
       <div class="mc-value" style="color:${scoreColor(se.score)}">${se.score}% · ${se.label}</div>
       <div class="mc-sub muted">${sub}</div>`;
   }
+  // Daily Tracking Error vs benchmark (oggi): portafoglio Day% − indice, come tachimetro
+  const bm = m.benchmarks, teBox = $("#tracking-error-box");
+  if (teBox && bm) {
+    const pday = portfolioDayPct();
+    const ref = bm.sp500 != null ? "sp500" : bm.ndx != null ? "ndx" : "sox";
+    const refLab = { sp500: "S&P 500", ndx: "Nasdaq 100", sox: "SOX" }[ref];
+    const alpha = (pday != null && bm[ref] != null) ? pday - bm[ref] : null;
+    if (alpha != null) {
+      const score = clamp(50 + alpha * 12);   // sovraperformance → verde
+      const lab = alpha >= 0.3 ? "Sovraperforma" : alpha <= -0.3 ? "Sottoperforma" : "In linea";
+      teBox.innerHTML = `<div class="mc-title">Tracking Error vs ${refLab}</div>
+        ${compactSemiGauge(score, ["Sottoperf.", "Sovraperf."])}
+        <div class="mc-value" style="color:${scoreColor(score)}">${signTxt(Math.round(alpha * 100) / 100)} pp · ${lab}</div>
+        <div class="mc-sub muted">portaf. oggi ${pday != null ? signTxt(Math.round(pday * 100) / 100) : "—"} · clicca per dettaglio</div>`;
+    } else {
+      teBox.innerHTML = `<div class="mc-title">Tracking Error vs ${refLab}</div>
+        ${compactSemiGauge(50, ["Sottoperf.", "Sovraperf."])}
+        <div class="mc-value muted">—</div><div class="mc-sub muted">dati intraday non disponibili</div>`;
+    }
+  }
 }
 
 const MONTH_NAMES = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
@@ -977,21 +1071,8 @@ function renderKPI() {
       sub: `dopo tasse stimate (26% azioni · 12,5% BTP)${b && b.cedole_btp ? ` · cedole BTP ${fmtEUR.format(b.cedole_btp)}` : ""}`,
       subCls: signCls(net), accent: net >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(net) },
   ];
-  // Daily Tracking Error vs benchmark (oggi): portafoglio Day % − indice principale
-  // (differenza aritmetica intraday, non un alpha corretto per il rischio su base storica)
-  const bm = (DATA.macro || {}).benchmarks;
-  if (bm) {
-    const pday = portfolioDayPct();
-    const ref = bm.sp500 != null ? "sp500" : bm.ndx != null ? "ndx" : "sox";
-    const refLab = { sp500: "S&P 500", ndx: "Nasdaq 100", sox: "SOX" }[ref];
-    const alpha = (pday != null && bm[ref] != null) ? pday - bm[ref] : null;
-    kpis.push({
-      label: "Daily Tracking Error vs " + refLab,
-      value: alpha != null ? signTxt(Math.round(alpha * 100) / 100) + " pp" : "—",
-      sub: `portaf. ${pday != null ? signTxt(Math.round(pday * 100) / 100) : "—"} · clicca per S&P/Nasdaq/SOX`,
-      accent: "var(--cyan)", valueCls: signCls(alpha), kpiKey: "alpha",
-    });
-  }
+  // Daily Tracking Error: ora mostrato come mini-card con tachimetro tra i tab macro
+  // (vedi renderMiniCards → #tracking-error-box). Niente più KPI dedicata.
   // Sharpe Ratio complessivo del portafoglio (rendimento corretto per il rischio)
   const pSharpe = t.portfolio_sharpe_ratio;
   if (pSharpe != null) {
@@ -3306,11 +3387,62 @@ function timeAgo(iso) {
 
 const TOPIC_LABEL = t => t === "MACRO" ? "Macro" : t === "POL" ? "Politica" : t;
 
+/* sintesi globale di tutte le news: tono complessivo, conteggi, titoli più citati */
+function newsSummary(list) {
+  const ptf = new Set([...(DATA.portfolio || []), ...(DATA.watchlist || [])].map(r => r.ticker));
+  let bull = 0, bear = 0, neu = 0;
+  const tkCount = {}, tkTone = {};
+  list.forEach(n => {
+    const s = n.sentiment;
+    if (s === "bull") bull++; else if (s === "bear") bear++; else neu++;
+    (n.tickers || []).forEach(tk => {
+      tkCount[tk] = (tkCount[tk] || 0) + 1;
+      tkTone[tk] = (tkTone[tk] || 0) + (s === "bull" ? 1 : s === "bear" ? -1 : 0);
+    });
+  });
+  const tot = list.length || 1;
+  const net = bull - bear;
+  const tone = net >= 3 ? { t: "COSTRUTTIVO", c: "var(--green)" }
+    : net <= -3 ? { t: "CAUTO / RISK-OFF", c: "var(--red)" }
+    : { t: "MISTO / NEUTRO", c: "var(--yellow)" };
+  // titoli del portafoglio più citati, con tono
+  const top = Object.entries(tkCount)
+    .filter(([tk]) => ptf.has(tk))
+    .sort((a, b) => b[1] - a[1]).slice(0, 6)
+    .map(([tk, c]) => {
+      const tone = tkTone[tk] > 0 ? "pos" : tkTone[tk] < 0 ? "neg" : "muted";
+      return `<span class="ns-chip ${tone}">${tk} <b>${c}</b>${tkTone[tk] > 0 ? " ▲" : tkTone[tk] < 0 ? " ▼" : ""}</span>`;
+    }).join("");
+  return { bull, bear, neu, tot, tone, top };
+}
+
+function renderNewsSummary(list) {
+  const box = $("#news-summary");
+  if (!box) return;
+  if (!list.length) { box.innerHTML = ""; return; }
+  const s = newsSummary(list);
+  const pct = v => Math.round(v / s.tot * 100);
+  box.innerHTML = `
+    <div class="ns-head">Sintesi · <b style="color:${s.tone.c}">${s.tone.t}</b> <span class="muted">su ${s.tot} notizie</span></div>
+    <div class="ns-bar" title="positive ${s.bull} · neutre ${s.neu} · negative ${s.bear}">
+      <span class="ns-seg ns-bull" style="width:${pct(s.bull)}%"></span>
+      <span class="ns-seg ns-neu" style="width:${pct(s.neu)}%"></span>
+      <span class="ns-seg ns-bear" style="width:${pct(s.bear)}%"></span>
+    </div>
+    <div class="ns-legend">
+      <span class="pos">▲ ${s.bull} positive (${pct(s.bull)}%)</span>
+      <span class="muted">● ${s.neu} neutre</span>
+      <span class="neg">▼ ${s.bear} negative (${pct(s.bear)}%)</span>
+    </div>
+    ${s.top ? `<div class="ns-top"><span class="muted">Più citati (tuoi titoli):</span> ${s.top}</div>` : ""}`;
+}
+
 function renderNews() {
   // solo notizie delle ultime 24 ore (oltre a quanto già filtrato dalla pipeline)
   const cutoff = Date.now() - 26 * 3600 * 1000;
   let list = (DATA.news || []).filter(n => !n.published || new Date(n.published).getTime() >= cutoff);
   if (!list.length) list = DATA.news || [];   // fallback: se tutte vecchie, mostra comunque
+  renderNewsSummary(list);
   $("#news-list").innerHTML = list.length ? list.map(n => `
     <li class="news-item">
       <a href="${esc(n.link)}" target="_blank" rel="noopener" title="${esc(n.title)}">${esc(n.title_it || n.title)}</a>
@@ -3399,8 +3531,28 @@ Per OGNI titolo usa questo formato fisso — non saltare nessuna voce:
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
   lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(Math.round(patrimonio))} (${(patrimonio/GOAL*100).toFixed(1)}% del target €1M, CAGR necessario ${cagrNeeded}%)${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
+  // METRICHE DI RISCHIO/PORTAFOGLIO (dai popup della dashboard)
+  const riskBits = [];
+  if (t.portfolio_sharpe_ratio != null) riskBits.push(`Sharpe Ratio portafoglio ${fmtNum.format(t.portfolio_sharpe_ratio)} (Rf ${fmtNum.format((t.risk_free_rate ?? 0.0363) * 100)}%; >2 eccellente, 1-2 buono, <1 debole)`);
+  if (cashEur > 0 && patrimonio > 0 && patrimonio < GOAL) {
+    const cFrac = cashEur / patrimonio;
+    const rInv = (Number(cagrNeeded) / (1 - cFrac));
+    riskBits.push(`Cash Drag: liquidità ${(cFrac * 100).toFixed(1)}% a 0% → la quota investita deve rendere ${rInv.toFixed(1)}%/anno per tenere il CAGR ${cagrNeeded}% (sovraccarico +${(rInv - Number(cagrNeeded)).toFixed(1)} pp)`);
+  }
+  if (riskBits.length) lines.push("METRICHE DI RISCHIO: " + riskBits.join(" · ") + ".");
+  // STAGIONALITÀ del mese corrente
+  if (m.seasonality && m.seasonality.score != null) {
+    const se = m.seasonality;
+    const cm = MONTH_NAMES[(se.current_month || 1) - 1];
+    lines.push(`STAGIONALITÀ (${cm}): score ${se.score}/100 (${se.label})${se.sp_score != null ? ` · S&P ${se.sp_score}` : ""}${se.ndx_score != null ? ` · Nasdaq ${se.ndx_score}` : ""} — tendenza statistica storica del mese, da usare come contesto di probabilità.`);
+  }
+  // SINTESI NEWS (tono complessivo)
+  if ((DATA.news || []).length) {
+    const ns = newsSummary(DATA.news);
+    lines.push(`SINTESI NEWS: tono ${ns.tone.t} su ${ns.tot} notizie (${ns.bull} positive, ${ns.neu} neutre, ${ns.bear} negative).`);
+  }
   lines.push("");
-  lines.push("PORTAFOGLIO (controvalore e P&L reali per posizione; PMC = mie operazioni passate):");
+  lines.push("PORTAFOGLIO (controvalore e P&L reali per posizione; Sharpe 1A = rendimento/rischio; Drawdown 52S = distanza dal max; ±ImpMove = movimento implicito earnings):");
   const f = (v, d = 2) => v === null || v === undefined ? "—" : fmtNum.format(v);
   const mdRow = (r) => {
     const c = cur(r);
@@ -3408,10 +3560,15 @@ Per OGNI titolo usa questo formato fisso — non saltare nessuna voce:
     const optNote = optC ? `CW:${c}${f(optC.expiries?.[0]?.call_wall)} PW:${c}${f(optC.expiries?.[0]?.put_wall)}` : "—";
     const rsBench = r.rs_bench === "sox" ? "SOX" : r.rs_bench === "ndx" ? "NDX" : "S&P";
     const rsCell = r.rs_1m != null ? `${r.rs_1m > 0 ? "+" : ""}${r.rs_1m}% (vs ${rsBench})` : "—";
-    return `| ${r.name} (${r.ticker}) | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rsCell} | ${r.support ? c + f(r.support) : "—"} | ${r.resistance ? c + f(r.resistance) : "—"} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(r.beta)} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"} | ${r.signal} | ${optNote} |`;
+    const sh = r.sharpe_1y != null ? fmtNum.format(r.sharpe_1y) : "—";
+    const dd = r.w52_dist_pct != null ? signTxt(r.w52_dist_pct) : "—";
+    const im = impliedMoveForEarnings ? impliedMoveForEarnings(r) : null;
+    const imTxt = im != null ? `±${im}%` : "—";
+    const shortF = r.stats?.short_float != null ? fmtNum.format(Math.round(r.stats.short_float * 1000) / 10) + "%" : "—";
+    return `| ${r.name} (${r.ticker}) | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rsCell} | ${sh} | ${dd} | ${shortF} | ${r.support ? c + f(r.support) : "—"} | ${r.resistance ? c + f(r.resistance) : "—"} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(r.beta)} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
   };
-  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RS 1M (vs bench) | Supp. | Resist. | P/E | EPS | Beta | Target Δ | Trimestrale | Segnale | Opzioni (CW/PW) |";
-  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
+  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RS 1M (vs bench) | Sharpe 1A | Drawdown 52S | Short% | Supp. | Resist. | P/E | EPS | Beta | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
+  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
   if ((DATA.watchlist || []).length) {
@@ -3665,6 +3822,7 @@ async function showPrompt() {
 
 /* ---------------- eventi ---------------- */
 $("#btn-refresh").addEventListener("click", refreshAll);
+$("#btn-quick")?.addEventListener("click", quickRefresh);
 $("#btn-prompt").addEventListener("click", showPrompt);
 $("#modal-close").addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
@@ -3673,12 +3831,15 @@ $("#btn-copy").addEventListener("click", async () => {
   toast("Copiato ✓");
 });
 /* ---------------- calcolo vendite (plus/minusvalenze) ---------------- */
+const sellPriceOv = {};   // prezzo di vendita inserito a mano per ticker (override del prezzo di mercato)
+
 function sellRows() {
   const eur = DATA.eurusd || 1.08;
   return DATA.portfolio.map(r => {
     const toEur = r.currency === "EUR" ? 1 : 1 / eur;
-    const plPerShare = (r.price - r.pmc) * toEur;   // utile/perdita per azione in €
-    return { ...r, plPerShare, taxRate: r.ticker === "BTP-V28" ? 0.125 : 0.26 };
+    const price = sellPriceOv[r.ticker] != null ? sellPriceOv[r.ticker] : r.price;   // override manuale
+    const plPerShare = (price - r.pmc) * toEur;   // utile/perdita per azione in €
+    return { ...r, price, plPerShare, taxRate: r.ticker === "BTP-V28" ? 0.125 : 0.26 };
   });
 }
 
@@ -3686,17 +3847,25 @@ function renderSellCalc() {
   const rows = sellRows();
   $("#sell-table tbody").innerHTML = rows.map(r => {
     const c = cur(r);
-    const qty = r.ticker === "BTP-V28" ? r.qty : r.qty;
+    const edited = sellPriceOv[r.ticker] != null;
     return `<tr data-tk="${r.ticker}">
       <td class="name-cell">${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
-      <td class="num">${c}${fmtNum.format(r.price)}</td>
+      <td class="num sell-price-cell">
+        <span class="sp-cur">${c}</span><input type="number" class="sell-price${edited ? " sp-edited" : ""}" data-tk="${r.ticker}" value="${r.price}" step="any" title="Prezzo di vendita — modificabile a mano (✎)" style="width:74px">
+        <span class="sp-pencil" title="Prezzo modificabile a mano">✎</span>
+      </td>
       <td class="num"><input type="number" class="sell-in" data-tk="${r.ticker}" min="0" max="${r.qty}" step="any" placeholder="0" style="width:90px"></td>
       <td class="num sell-pl" data-tk="${r.ticker}">—</td>
     </tr>`;
   }).join("");
   document.querySelectorAll(".sell-in").forEach(i => i.addEventListener("input", computeSell));
+  document.querySelectorAll(".sell-price").forEach(i => i.addEventListener("input", () => {
+    const tk = i.dataset.tk, v = parseFloat(i.value);
+    if (v > 0) { sellPriceOv[tk] = v; i.classList.add("sp-edited"); } else { delete sellPriceOv[tk]; i.classList.remove("sp-edited"); }
+    computeSell();
+  }));
   computeSell();
 }
 
@@ -3884,6 +4053,8 @@ $("#tilt-box").addEventListener("click", openTiltModal);
 $("#portfolio-health").addEventListener("click", openHealthModal);
 $("#macroquant-box").addEventListener("click", openMacroQuantModal);
 $("#seasonality-box").addEventListener("click", openSeasonalityModal);
+$("#tracking-error-box").addEventListener("click", openAlphaModal);
+$("#ptf-edit-values")?.addEventListener("click", openEditPortfolio);
 $("#market-direction").addEventListener("click", () => {
   const d = marketDirectionScore();
   const comps = directionComponents();
