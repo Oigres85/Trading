@@ -701,13 +701,45 @@ function marketDirectionScore() {
 function loadDiary() {
   try { return JSON.parse(localStorage.getItem("action_diary") || "[]"); } catch { return []; }
 }
+function setDiary(arr) {
+  localStorage.setItem("action_diary", JSON.stringify(arr.slice(0, 100)));
+  pushDiaryCloud(arr);   // sync su GitHub se c'è un token (così è uguale su Mac e iPhone)
+}
 function saveDiaryEntry(text) {
   const arr = loadDiary();
   arr.unshift({ date: new Date().toISOString(), text });
-  localStorage.setItem("action_diary", JSON.stringify(arr.slice(0, 100)));
+  setDiary(arr);
 }
 function deleteDiaryEntry(iso) {
-  localStorage.setItem("action_diary", JSON.stringify(loadDiary().filter(e => e.date !== iso)));
+  setDiary(loadDiary().filter(e => e.date !== iso));
+}
+const DIARY_PATH = "config/action_diary.json";
+/* salva il diario su GitHub (config/action_diary.json) — solo se c'è già un token salvato (no prompt) */
+async function pushDiaryCloud(arr) {
+  const token = localStorage.getItem("gh_token");
+  if (!token) return;
+  try {
+    let sha;
+    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${DIARY_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
+    if (g.ok) sha = (await g.json()).sha;
+    await fetch(`https://api.github.com/repos/${REPO}/contents/${DIARY_PATH}`, {
+      method: "PUT", headers: ghHeaders(token),
+      body: JSON.stringify({ message: "Aggiorna diario azioni", content: btoa(unescape(encodeURIComponent(JSON.stringify(arr, null, 1)))), sha }),
+    });
+  } catch { /* offline o senza permessi: resta comunque in locale */ }
+}
+/* carica il diario dal cloud all'avvio e lo fonde col locale (per date univoche) */
+async function loadDiaryCloud() {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${DIARY_PATH}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return;
+    const cloud = await r.json();
+    if (!Array.isArray(cloud)) return;
+    const byDate = {};
+    [...cloud, ...loadDiary()].forEach(e => { if (e && e.date) byDate[e.date] = e; });
+    const merged = Object.values(byDate).sort((a, b) => (a.date < b.date ? 1 : -1));
+    localStorage.setItem("action_diary", JSON.stringify(merged.slice(0, 100)));
+  } catch { /* nessun diario remoto ancora */ }
 }
 
 /* verdetto operativo coerente col mandato Diamond Hands: raramente "alleggerisci" */
@@ -722,10 +754,27 @@ function decisionVerdict() {
   const vix = m.vix?.value;
   const eurusd = DATA.eurusd || 1.08;
   const universe = [...(DATA.portfolio || []), ...(DATA.watchlist || [])].filter(isEquity);
-  // candidati ACCUMULO: azioni in zona sconto (>15% dal max 52S)
+  // qualità fondamentale 0-100: premia ROIC/ROE, Sharpe, margini; penalizza i "rami secchi"
+  const qualityScore = (r) => {
+    const st = r.stats || {};
+    let q = 50;
+    if (st.roe != null) q += clamp(st.roe * 120, -30, 30);          // ROE/ROIC
+    if (r.sharpe_1y != null) q += clamp(r.sharpe_1y * 10, -20, 20);  // rendimento/rischio
+    if (st.profit_margin != null) q += clamp(st.profit_margin * 60, -15, 15);
+    if (st.revenue_growth != null) q += clamp(st.revenue_growth * 40, -10, 15);
+    return Math.round(clamp(q));
+  };
+  const isZombie = (r) => {
+    const st = r.stats || {};
+    return (st.roe != null && st.roe < 0) && (r.sharpe_1y != null && r.sharpe_1y < 0);
+  };
+  // candidati ACCUMULO: azioni in zona sconto (>15% dal max 52S) E NON "zombie" (qualità rotta).
+  // Si accumulano i nomi SCONTATI **e SOLIDI**, ordinati per qualità (poi per sconto).
   const accumula = universe
-    .filter(r => r.w52_dist_pct != null && r.w52_dist_pct <= -15 && r.price)
-    .sort((a, b) => a.w52_dist_pct - b.w52_dist_pct);
+    .filter(r => r.w52_dist_pct != null && r.w52_dist_pct <= -15 && r.price && !isZombie(r))
+    .map(r => ({ ...r, _q: qualityScore(r) }))
+    .sort((a, b) => (b._q - a._q) || (a.w52_dist_pct - b.w52_dist_pct));
+  const zombieSkipped = universe.filter(r => r.w52_dist_pct != null && r.w52_dist_pct <= -15 && isZombie(r)).map(r => r.ticker);
   // candidati ALLEGGERIMENTO (trim): multipli tossici o ipercomprato estremo (solo posizioni possedute)
   const trim = (DATA.portfolio || []).filter(isEquity)
     .filter(r => r.qty && ((r.pe && r.pe > 150) || (r.rsi && r.rsi > 78)))
@@ -737,16 +786,17 @@ function decisionVerdict() {
     const limit = Math.min(support, r.price);                 // ordine limite al supporto/prezzo
     const budget = cashUsd * (i === 0 ? 0.35 : i === 1 ? 0.25 : 0.15);
     const qty = limit > 0 ? Math.floor(budget / limit) : 0;
-    return { r, limit, qty, dd: r.w52_dist_pct };
+    return { r, limit, qty, dd: r.w52_dist_pct, q: r._q };
   }).filter(x => x.qty > 0);
 
   const reasons = [];
   let label, score, col;
-  if ((vix != null && vix > 20) || accumula.length >= 1) {
+  if (accumula.length >= 1 || (vix != null && vix > 20)) {
     label = "ACCUMULA"; col = "var(--green)"; score = 78;
     if (vix != null && vix > 20) reasons.push(`VIX ${fmtNum.format(vix)} > 20: volatilità elevata = sconti`);
-    if (accumula.length) reasons.push(`${accumula.length} azioni in zona sconto (>15% dal max 52S): ${accumula.slice(0, 5).map(r => r.ticker).join(", ")}`);
-    reasons.push(`schiera la liquidità (${fmtEUR.format(cashEur)}) con ordini limite ai supporti`);
+    if (accumula.length) reasons.push(`${accumula.length} azioni scontate E solide (>15% dal max 52S, qualità ok): ${accumula.slice(0, 5).map(r => r.ticker).join(", ")}`);
+    if (zombieSkipped.length) reasons.push(`scartati ${zombieSkipped.join(", ")}: scontati ma con fondamentali deboli (ROIC<0 e Sharpe<0) — NON accumulare`);
+    reasons.push(`schiera la liquidità (${fmtEUR.format(cashEur)}) con ordini limite ai supporti, priorità ai titoli di qualità più alta`);
   } else if (dir != null && dir < 40) {
     label = "PRUDENZA"; col = "var(--yellow)"; score = 32;
     reasons.push(`regime debole (segnali ${dir}/100): nessun nuovo ingresso, ma niente vendite da panico (Diamond Hands)`);
@@ -755,7 +805,22 @@ function decisionVerdict() {
     reasons.push(`regime ${dir != null ? dir + "/100" : "neutro"}: lascia correre le posizioni vincenti, conserva la liquidità`);
   }
   if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => r.ticker).join(", ")} (multiplo/RSI estremo)`);
-  return { label, col, score, reasons, dir, accumula, trim, withPlan };
+  return { label, col, score, reasons, dir, accumula, trim, withPlan, zombieSkipped };
+}
+
+// alert proattivi: condizioni rilevanti emerse oggi (deep value, correzione, squeeze, VIX)
+function alertsSummary() {
+  const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
+  const deep = all.filter(r => r.w52_dist_pct != null && r.w52_dist_pct <= -25);
+  const corr = all.filter(r => r.w52_dist_pct != null && r.w52_dist_pct <= -15 && r.w52_dist_pct > -25);
+  const sqz = all.filter(r => (r.stats?.short_float ?? 0) > 0.12);
+  const vix = (DATA.macro || {}).vix?.value;
+  const chips = [];
+  if (deep.length) chips.push({ t: `${deep.length} DEEP VALUE`, c: "var(--green)", tip: deep.map(r => r.ticker).join(", ") });
+  if (corr.length) chips.push({ t: `${corr.length} in correzione`, c: "var(--yellow)", tip: corr.map(r => r.ticker).join(", ") });
+  if (sqz.length) chips.push({ t: `${sqz.length} squeeze risk`, c: "var(--red)", tip: sqz.map(r => r.ticker).join(", ") });
+  if (vix != null && vix > 20) chips.push({ t: `VIX ${fmtNum.format(vix)}`, c: "var(--red)", tip: "Volatilità elevata" });
+  return chips;
 }
 
 function renderDecisionBar() {
@@ -766,14 +831,18 @@ function renderDecisionBar() {
   const GOAL = 1_000_000;
   const patrimonio = (t.eur_invested || 0) + cashEur;
   const compl = (patrimonio / GOAL * 100);
+  const chips = alertsSummary();
+  const chipsHtml = chips.length
+    ? `<div class="dec-alerts">${chips.map(c => `<span class="dec-chip" style="color:${c.c};border-color:${c.c}" title="${esc(c.tip)}">${esc(c.t)}</span>`).join("")}</div>`
+    : "";
   box.innerHTML = `
     <div class="dec-left">
       <div class="dec-lab">Decisione operativa</div>
       <div class="dec-verdict" style="color:${v.col}">${v.label}</div>
-      <div class="dec-reason muted">${esc(v.reasons[0] || "")}</div>
     </div>
     <div class="dec-mid">
       ${thermoLine(v.score, ["Alleggerisci", "Accumula"])}
+      ${chipsHtml}
     </div>
     <div class="dec-right">
       <div class="dec-goal">${compl.toFixed(1)}% → €1M</div>
@@ -793,13 +862,14 @@ function openDecisionModal() {
   // tabella ACCUMULO azionario con prezzo limite, quantità e motivazione
   const accHtml = (v.withPlan || []).length ? `
     <h4 style="margin:10px 0 4px">Accumulo azionario — ordini limite suggeriti</h4>
-    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Limite</th><th class="num">Qtà</th><th>Motivazione</th></tr></thead><tbody>
+    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Qualità</th><th class="num">Prezzo</th><th class="num">Limite</th><th class="num">Qtà</th><th>Motivazione</th></tr></thead><tbody>
     ${v.withPlan.map(p => `<tr>
       <td>${esc(p.r.name)} <span class="tk">${p.r.ticker}</span></td>
+      <td class="num"><b style="color:${scoreColor(p.q)}">${p.q}</b></td>
       <td class="num">$${fmtNum.format(p.r.price)}</td>
       <td class="num"><b style="color:var(--green)">$${fmtNum.format(Math.round(p.limit * 100) / 100)}</b></td>
       <td class="num"><b>${p.qty}</b></td>
-      <td style="font-size:11px">a ${signTxt(p.dd)} dal max 52S — accumulo Diamond Hands sul supporto</td>
+      <td style="font-size:11px">${signTxt(p.dd)} dal max 52S · qualità ${p.q}/100 — accumulo sul supporto</td>
     </tr>`).join("")}</tbody></table>
     <div class="info-line muted" style="font-size:11px;margin-top:4px">Quantità calcolate ripartendo la liquidità (${fmtEUR.format(cashEur)}) sui titoli più scontati. Imposta ordini LIMITE: se il prezzo non arriva, la cassa si conserva.</div>` : "";
   const trimHtml = (v.trim || []).length ? `
@@ -2972,6 +3042,21 @@ function renderTable() {
   const addRow = editMode.portfolio
     ? `<tr class="add-row"><td colspan="25"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
+  applyColLabels("ptf-table");
+}
+
+// Etichette colonne sui td (per la vista "a schede" su iPhone) + marcatura colonne chiave.
+const MOBILE_KEY_COLS = new Set(["Titolo", "Prezzo", "Oggi", "Guad. %", "RSI 14", "Segnale", "Drawdown 52S", "Trimestrale"]);
+function applyColLabels(tableId) {
+  const ths = [...document.querySelectorAll(`#${tableId} thead th`)].map(t => t.textContent.trim());
+  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
+    if (tr.classList.contains("total-row") || tr.classList.contains("add-row")) return;
+    [...tr.children].forEach((td, i) => {
+      const lab = ths[i] || "";
+      td.setAttribute("data-label", lab);
+      td.classList.toggle("td-key", MOBILE_KEY_COLS.has(lab));
+    });
+  });
 }
 
 function renderWatchlist() {
@@ -2987,6 +3072,7 @@ function renderWatchlist() {
   const addRow = editMode.watchlist
     ? `<tr class="add-row"><td colspan="21"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
+  applyColLabels("wl-table");
 }
 
 /* ---------------- vista fondamentale (Value Investing) ---------------- */
@@ -4378,6 +4464,7 @@ initSorting("ptf-table", renderTable);
 initSorting("wl-table", renderWatchlist);
 
 loadData();
+loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
 // ricarica completa (tecnici, news, storico) ogni 5 minuti
 setInterval(() => loadData(), 5 * 60 * 1000);
 // prezzi live ogni 60 secondi

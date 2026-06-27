@@ -157,11 +157,34 @@ td.name-cell .tk { color: var(--muted); font-size: 11px; font-family: var(--mono
 #ptf-table th, #wl-table th { font-size: 9.5px; letter-spacing: .3px; }
 #ptf-table td.name-cell .tk, #wl-table td.name-cell .tk { font-size: 10px; }
 #ptf-table .badge, #wl-table .badge { font-size: 8.5px; padding: 1px 3px; }
-/* su iPhone (Safari) testo ancora più piccolo + padding minimo, così la tabella entra meglio */
+/* su iPhone/Safari: VISTA A SCHEDE — ogni titolo diventa una card con i dati chiave (label: valore),
+   niente più scroll orizzontale. Su Mac resta la tabella piena. */
 @media (max-width: 820px) {
-  #ptf-table th, #ptf-table td, #wl-table th, #wl-table td { padding: 5px 5px; }
-  #ptf-table td, #wl-table td { font-size: 10.5px; }
-  #ptf-table th, #wl-table th { font-size: 9px; }
+  #ptf-table, #wl-table { white-space: normal; }
+  #ptf-table thead, #wl-table thead { display: none; }
+  #ptf-table tbody, #wl-table tbody { display: block; }
+  #ptf-table tbody tr, #wl-table tbody tr {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2px 10px;
+    background: var(--card-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 8px 10px; margin-bottom: 8px;
+  }
+  #ptf-table tbody tr.total-row, #wl-table tbody tr.total-row,
+  #ptf-table tbody tr.add-row, #wl-table tbody tr.add-row { display: block; }
+  #ptf-table td, #wl-table td { display: none; }            /* nascondi non-chiave su mobile */
+  #ptf-table td.td-key, #wl-table td.td-key {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+    border-bottom: none; padding: 3px 0; font-size: 12px; text-align: right;
+  }
+  #ptf-table td.td-key::before, #wl-table td.td-key::before {
+    content: attr(data-label); color: var(--muted); font-size: 9.5px; text-transform: uppercase;
+    letter-spacing: .3px; font-family: "Inter", sans-serif; font-weight: 600; text-align: left;
+  }
+  #ptf-table td.name-cell.td-key, #wl-table td.name-cell.td-key {
+    grid-column: 1 / -1; justify-content: flex-start; font-size: 14px; font-weight: 700;
+    border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 3px;
+  }
+  #ptf-table td.name-cell.td-key::before, #wl-table td.name-cell.td-key::before { content: ""; }
+  #ptf-table td.name-cell .tk, #wl-table td.name-cell .tk { display: inline; margin-left: 6px; }
 }
 .num { text-align: right; }
 td.num { text-align: right; }
@@ -792,6 +815,8 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .dec-right { flex: 0 0 auto; text-align: right; display: flex; align-items: baseline; gap: 8px; }
 .dec-goal { font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--blue); }
 .dec-cta { font-size: 9.5px; color: var(--muted); }
+.dec-alerts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.dec-chip { font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 999px; border: 1px solid; white-space: nowrap; }
 @media (max-width: 760px) { .decision-bar { flex-wrap: wrap; gap: 8px; } .dec-mid { order: 3; flex-basis: 100%; max-width: none; } .dec-reason { white-space: normal; } }
 
 /* ---------- v70: News dentro Macro + scroll popup ---------- */
