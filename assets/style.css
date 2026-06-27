@@ -817,6 +817,11 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .dec-cta { font-size: 9.5px; color: var(--muted); }
 .dec-alerts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
 .dec-chip { font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 999px; border: 1px solid; white-space: nowrap; }
+/* mini-trend (freccia vs ~1 settimana fa) */
+.trend { font-size: 10px; vertical-align: middle; cursor: help; }
+.trend-up { color: var(--green); }
+.trend-down { color: var(--red); }
+.trend-flat { color: var(--muted); }
 @media (max-width: 760px) { .decision-bar { flex-wrap: wrap; gap: 8px; } .dec-mid { order: 3; flex-basis: 100%; max-width: none; } .dec-reason { white-space: normal; } }
 
 /* ---------- v70: News dentro Macro + scroll popup ---------- */

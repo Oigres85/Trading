@@ -899,6 +899,23 @@ function openDecisionModal() {
   document.querySelectorAll(".diary-del").forEach(b => b.addEventListener("click", () => { deleteDiaryEntry(b.dataset.iso); refresh(); }));
 }
 
+/* mini-trend di una metrica vs ~1 settimana fa (dallo storico metrics_history della pipeline) */
+function metricTrend(field) {
+  const h = DATA.metrics_history || [];
+  if (h.length < 2) return "";
+  const cur = h[h.length - 1]?.[field];
+  const past = h[Math.max(0, h.length - 8)]?.[field];   // ~7 punti (giorni) fa
+  if (cur == null || past == null) return "";
+  const d = cur - past;
+  const eps = field === "sharpe" ? 0.05 : 0.3;
+  const dTxt = field === "sharpe" ? (d > 0 ? "+" : "") + fmtNum.format(Math.round(d * 100) / 100)
+    : (d > 0 ? "+" : "") + fmtNum.format(Math.round(d * 10) / 10) + " pp";
+  if (Math.abs(d) < eps) return `<span class="trend trend-flat" title="stabile vs ~1 settimana fa">→</span>`;
+  return d > 0
+    ? `<span class="trend trend-up" title="${dTxt} vs ~1 settimana fa">▲</span>`
+    : `<span class="trend trend-down" title="${dTxt} vs ~1 settimana fa">▼</span>`;
+}
+
 function renderMiniCards() {
   const m = DATA.macro || {};
   const dir = marketDirectionScore();
@@ -987,7 +1004,7 @@ function renderMiniCards() {
       const score = clamp(33 + ps * 22);   // ~0=33, 1=55, 2=77, 3=99
       const lab = ps > 2 ? "Eccellente" : ps >= 1 ? "Buono" : ps >= 0 ? "Debole" : "Negativo";
       shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
-        <div class="mc-value" style="color:${sharpeColor(ps)}">${fmtNum.format(ps)} · ${lab}</div>
+        <div class="mc-value" style="color:${sharpeColor(ps)}">${fmtNum.format(ps)} · ${lab} ${metricTrend("sharpe")}</div>
         ${thermoLine(score, ["Rischioso", "Efficiente"])}
         <div class="mc-sub muted">rendimento corretto per il rischio</div>`;
     } else {
@@ -1339,7 +1356,7 @@ function renderKPI() {
           <span class="mt-val" style="color:${cagrCol}">${cagrNeeded.toFixed(1)}%</span>
           <span class="mt-lab">CAGR necessario <span class="mt-help">?</span></span>
         </span>
-        <span class="mt-stat"><span class="mt-val ${signCls(perfPct)}">${perfPct != null ? signTxt(Math.round(perfPct * 10) / 10) : "—"}</span><span class="mt-lab">tua performance</span></span>
+        <span class="mt-stat"><span class="mt-val ${signCls(perfPct)}">${perfPct != null ? signTxt(Math.round(perfPct * 10) / 10) : "—"} ${metricTrend("gain_pct")}</span><span class="mt-lab">tua performance</span></span>
         <span class="mt-stat"><span class="mt-val muted">${fmtEUR.format(Math.round(Math.max(0, distanza)))}</span><span class="mt-lab">mancano</span></span>
       </div>
       <div class="mt-bar-track">

@@ -1980,6 +1980,24 @@ def main():
                  if r.get("currency") == "USD" and not re.search(r"[\^=]|-", r["ticker"])]
     options = fetch_options_chain(sorted(set(opt_syms)))
 
+    # storico metriche (1 punto per giorno): Sharpe e performance, per i mini-trend in dashboard
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    prev_hist = []
+    try:
+        if OUT.exists():
+            prev_hist = json.loads(OUT.read_text()).get("metrics_history") or []
+    except Exception:  # noqa: BLE001
+        prev_hist = []
+    point = {
+        "date": today,
+        "sharpe": portfolio_sharpe,
+        "gain_pct": round((total_eur / cost_eur - 1) * 100, 2),
+        "eur_value": round(total_eur, 2),
+    }
+    metrics_history = [p for p in prev_hist if p.get("date") != today]
+    metrics_history.append(point)
+    metrics_history = metrics_history[-180:]   # ~6 mesi di storico giornaliero
+
     data = {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "eurusd": round(eurusd, 4),
@@ -2006,6 +2024,7 @@ def main():
         "predictions": fetch_predictions(),
         "news": fetch_news(),
         "options": options,
+        "metrics_history": metrics_history,
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
