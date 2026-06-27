@@ -15,6 +15,9 @@ on:
     - cron: "0 16 * * *"    # 17:00 CET
     - cron: "55 19 * * *"   # 21:55 CEST
     - cron: "55 20 * * *"   # 21:55 CET
+    # Aggiornamento ORARIO durante la sessione USA nei giorni feriali (dati sempre freschi):
+    # 13:00–21:00 UTC = 15:00–23:00 CEST (copre pre-market e tutta la seduta di Wall Street).
+    - cron: "0 13-21 * * 1-5"
   workflow_dispatch:
 
 permissions:

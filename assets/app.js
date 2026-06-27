@@ -8,13 +8,13 @@ const SORT_FIELDS = {
   // allineato 1:1 alle <th>: Titolo,Qtà,PMC,Prezzo,Oggi,Pre/After,Volume,Guadagno,Guad.%,
   // P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,Vol/media,RS 1M,Segnale,Rating,Target Δ,
   // Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
-  "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg", "volume",
-                "gain", "gain_pct", "pe", "eps", "beta", "sharpe_1y", "support",
+  "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg",
+                "gain", "gain_pct", "pe", "beta", "sharpe_1y", "support",
                 "resistance", "rsi", "vol_ratio", "rs_1m", null, "upside_pct", "upside_pct",
                 "fin_health", "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,
   // Vol/media,RS 1M,Segnale,Rating,Target Δ,Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
-  "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume", "pe", "eps",
+  "wl-table": ["name", "price", "change_pct", "prepost_chg", "pe",
                "beta", "sharpe_1y", "support", "resistance", "rsi", "vol_ratio",
                "rs_1m", null, "upside_pct", "upside_pct", "fin_health",
                "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
@@ -600,12 +600,12 @@ async function livePrices() {
   recomputeTotals();
   renderKPI(); renderTable(); renderWatchlist(); renderAllocation();
   const el = $("#live-badge");
-  if (el) el.textContent = `prezzi aggiornati alle ${new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`;
+  if (el) el.textContent = `Prezzi live: ${new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
 }
 
 function renderAll() {
   const d = new Date(DATA.updated_at);
-  $("#updated-at").textContent = d.toLocaleString("it-IT", { dateStyle: "medium", timeStyle: "short" });
+  $("#updated-at").textContent = d.toLocaleString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
   recomputeTotals();            // include la liquidità nei totali/allocazione
   renderCash();
   renderKPI();
@@ -711,22 +711,42 @@ function deleteDiaryEntry(iso) {
 }
 
 /* verdetto operativo coerente col mandato Diamond Hands: raramente "alleggerisci" */
+// solo titoli AZIONARI USA (esclude indici ^, cripto/commodity con - o =, BTP, valuta PTS)
+function isEquity(r) {
+  return r && r.currency === "USD" && !/[\^=]/.test(r.ticker) && !r.ticker.includes("-") && r.ticker !== "BTP-V28";
+}
+
 function decisionVerdict() {
   const m = DATA.macro || {};
   const dir = marketDirectionScore();
   const vix = m.vix?.value;
-  const dd = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
-    .filter(r => r.w52_dist_pct != null && r.w52_dist_pct <= -15).map(r => r.ticker);
+  const eurusd = DATA.eurusd || 1.08;
+  const universe = [...(DATA.portfolio || []), ...(DATA.watchlist || [])].filter(isEquity);
+  // candidati ACCUMULO: azioni in zona sconto (>15% dal max 52S)
+  const accumula = universe
+    .filter(r => r.w52_dist_pct != null && r.w52_dist_pct <= -15 && r.price)
+    .sort((a, b) => a.w52_dist_pct - b.w52_dist_pct);
+  // candidati ALLEGGERIMENTO (trim): multipli tossici o ipercomprato estremo (solo posizioni possedute)
+  const trim = (DATA.portfolio || []).filter(isEquity)
+    .filter(r => r.qty && ((r.pe && r.pe > 150) || (r.rsi && r.rsi > 78)))
+    .sort((a, b) => (b.pe || 0) - (a.pe || 0));
+  // budget per candidato: deploy ~30% della liquidità sul migliore, poi a scalare
+  const cashUsd = cashEur * eurusd;
+  const withPlan = accumula.map((r, i) => {
+    const support = (r.tech_by_range?.[sparkRange]?.support) || r.support || r.price;
+    const limit = Math.min(support, r.price);                 // ordine limite al supporto/prezzo
+    const budget = cashUsd * (i === 0 ? 0.35 : i === 1 ? 0.25 : 0.15);
+    const qty = limit > 0 ? Math.floor(budget / limit) : 0;
+    return { r, limit, qty, dd: r.w52_dist_pct };
+  }).filter(x => x.qty > 0);
+
   const reasons = [];
   let label, score, col;
-  // ACCUMULA: "blood in the streets" o titoli in zona sconto → schiera la polvere secca
-  if ((vix != null && vix > 20) || dd.length >= 1) {
-    label = "ACCUMULA";
-    col = "var(--green)";
-    score = 78;
-    if (vix > 20) reasons.push(`VIX ${fmtNum.format(vix)} > 20 (volatilità elevata = sconti)`);
-    if (dd.length) reasons.push(`${dd.length} titoli in zona sconto (>15% dal max 52S): ${dd.slice(0, 5).join(", ")}`);
-    reasons.push(`liquidità ${fmtEUR.format(cashEur)} da deployare su ordini limite ai supporti`);
+  if ((vix != null && vix > 20) || accumula.length >= 1) {
+    label = "ACCUMULA"; col = "var(--green)"; score = 78;
+    if (vix != null && vix > 20) reasons.push(`VIX ${fmtNum.format(vix)} > 20: volatilità elevata = sconti`);
+    if (accumula.length) reasons.push(`${accumula.length} azioni in zona sconto (>15% dal max 52S): ${accumula.slice(0, 5).map(r => r.ticker).join(", ")}`);
+    reasons.push(`schiera la liquidità (${fmtEUR.format(cashEur)}) con ordini limite ai supporti`);
   } else if (dir != null && dir < 40) {
     label = "PRUDENZA"; col = "var(--yellow)"; score = 32;
     reasons.push(`regime debole (segnali ${dir}/100): nessun nuovo ingresso, ma niente vendite da panico (Diamond Hands)`);
@@ -734,7 +754,8 @@ function decisionVerdict() {
     label = "MANTIENI"; col = "var(--blue)"; score = dir != null ? dir : 55;
     reasons.push(`regime ${dir != null ? dir + "/100" : "neutro"}: lascia correre le posizioni vincenti, conserva la liquidità`);
   }
-  return { label, col, score, reasons, dir, dd };
+  if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => r.ticker).join(", ")} (multiplo/RSI estremo)`);
+  return { label, col, score, reasons, dir, accumula, trim, withPlan };
 }
 
 function renderDecisionBar() {
@@ -769,10 +790,33 @@ function openDecisionModal() {
       <span class="diary-text">${esc(e.text)}</span>
       <button class="diary-del" data-iso="${e.date}" title="Elimina">✕</button>
     </div>`).join("") : `<div class="muted" style="font-size:12px">Nessuna voce ancora. Annota le tue operazioni e le motivazioni: il diario viene incluso nel prompt AI.</div>`;
+  // tabella ACCUMULO azionario con prezzo limite, quantità e motivazione
+  const accHtml = (v.withPlan || []).length ? `
+    <h4 style="margin:10px 0 4px">Accumulo azionario — ordini limite suggeriti</h4>
+    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Limite</th><th class="num">Qtà</th><th>Motivazione</th></tr></thead><tbody>
+    ${v.withPlan.map(p => `<tr>
+      <td>${esc(p.r.name)} <span class="tk">${p.r.ticker}</span></td>
+      <td class="num">$${fmtNum.format(p.r.price)}</td>
+      <td class="num"><b style="color:var(--green)">$${fmtNum.format(Math.round(p.limit * 100) / 100)}</b></td>
+      <td class="num"><b>${p.qty}</b></td>
+      <td style="font-size:11px">a ${signTxt(p.dd)} dal max 52S — accumulo Diamond Hands sul supporto</td>
+    </tr>`).join("")}</tbody></table>
+    <div class="info-line muted" style="font-size:11px;margin-top:4px">Quantità calcolate ripartendo la liquidità (${fmtEUR.format(cashEur)}) sui titoli più scontati. Imposta ordini LIMITE: se il prezzo non arriva, la cassa si conserva.</div>` : "";
+  const trimHtml = (v.trim || []).length ? `
+    <h4 style="margin:12px 0 4px">Alleggerimento (Free Ride) — valuta TRIM 25-50%</h4>
+    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">P/E</th><th class="num">RSI</th><th class="num">Trim 30%</th><th>Motivazione</th></tr></thead><tbody>
+    ${v.trim.map(r => `<tr>
+      <td>${esc(r.name)} <span class="tk">${r.ticker}</span></td>
+      <td class="num">${r.pe ? fmtNum.format(r.pe) : "—"}</td>
+      <td class="num">${r.rsi ?? "—"}</td>
+      <td class="num"><b>${Math.round((r.qty || 0) * 0.3)}</b></td>
+      <td style="font-size:11px">${r.pe > 150 ? "multiplo tossico" : "RSI estremo"} — recupera capitale di rischio, lascia correre il resto</td>
+    </tr>`).join("")}</tbody></table>` : "";
   openInfoModal(`Decisione operativa: ${v.label}`,
     `<div class="info-line" style="margin-bottom:8px"><b style="color:${v.col};font-size:16px">${v.label}</b></div>
      <ul style="margin:0 0 10px 18px;font-size:12.5px;line-height:1.6">${v.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
-     <div class="info-line muted" style="font-size:11px;margin-bottom:12px">Verdetto sintetico dai segnali macro + drawdown dei titoli, coerente col mandato Diamond Hands (le correzioni sono occasioni di accumulo, non di vendita).</div>
+     ${accHtml}${trimHtml}
+     <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI, coerente col mandato Diamond Hands (le correzioni sono occasioni di accumulo, non di vendita). Per il piano completo usa "Copia prompt AI".</div>
      <h4 style="margin:10px 0 6px">Diario delle azioni</h4>
      <div class="diary-add"><input type="text" id="diary-input" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="200"><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
      <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
@@ -1002,16 +1046,10 @@ function renderPortfolioHealth() {
   const score = portfolioHealthScore();
   if (score == null) { box.innerHTML = ""; return; }
   const lab = score >= 60 ? "Solido" : score <= 40 ? "Da monitorare" : "Equilibrato";
-  const parts = portfolioHealthParts();
-  box.innerHTML = `<span class="popup-dot"></span>
-    <div class="hb-left">
-      <div class="hb-title">Salute del portafoglio</div>
-      <div class="hb-score" style="color:${scoreColor(score)}">${score}/100 · <b>${lab}</b></div>
-      <div class="hb-sub muted">media di tecnica titoli + macro/mercato + fondamentale</div>
-    </div>
-    <div class="hb-right">${compactSemiGauge(score, ["Solido", "Fragile"])}
-      <div class="hb-parts">${parts.map(p => `<span>${esc(p[0])}: <b style="color:${scoreColor(p[1])}">${p[1]}</b></span>`).join("")}</div>
-    </div>`;
+  box.innerHTML = `<div class="mc-title">Salute del portafoglio</div>
+    <div class="mc-value" style="color:${scoreColor(score)}">${score}/100 · ${lab}</div>
+    ${thermoLine(score, ["Fragile", "Solido"])}
+    <div class="mc-sub muted">tecnica + macro + fondamentale</div>`;
 }
 function openHealthModal() {
   const score = portfolioHealthScore();
@@ -1710,21 +1748,33 @@ function shortFloatCell(r) {
   if (sf == null) return `<td class="num muted">—</td>`;
   const pct = Math.round(sf * 1000) / 10;
   const squeeze = pct > 12;
-  return `<td class="num">${pct}%${squeeze ? `<br><span class="badge badge-squeeze" title="Short Squeeze Risk: short float > 12%">[Squeeze Risk]</span>` : ""}</td>`;
+  return `<td class="num">${pct}%${squeeze ? `<br><span class="badge badge-squeeze badge-info" data-badge="squeeze" role="button" tabindex="0" title="Clicca per la spiegazione">[Squeeze Risk]</span>` : ""}</td>`;
 }
 
 function drawdownCell(r) {
   const d = r.w52_dist_pct;
   if (d == null) return `<td class="num muted">—</td>`;
   if (d <= -25) {
-    const msg = "Zona DEEP VALUE — considera deploy liquidità 50%+";
-    return `<td class="num" title="${msg}"><span class="neg">${signTxt(d)}</span><br><span class="badge badge-deep-value">[DEEP VALUE]</span></td>`;
+    return `<td class="num"><span class="neg">${signTxt(d)}</span><br><span class="badge badge-deep-value badge-info" data-badge="deepvalue" role="button" tabindex="0" title="Clicca per la spiegazione">[DEEP VALUE]</span></td>`;
   }
   if (d <= -15) {
-    const msg = "Zona CORREZIONE — considera deploy liquidità 25-30%";
-    return `<td class="num" title="${msg}"><span class="neg">${signTxt(d)}</span><br><span class="badge badge-correction">[CORRECTION: Z1]</span></td>`;
+    return `<td class="num"><span class="neg">${signTxt(d)}</span><br><span class="badge badge-correction badge-info" data-badge="correction" role="button" tabindex="0" title="Clicca per la spiegazione">[CORRECTION: Z1]</span></td>`;
   }
   return `<td class="num"><span class="${d < 0 ? "neg" : "pos"}">${signTxt(d)}</span></td>`;
+}
+
+/* spiegazione dei badge (Squeeze Risk, Deep Value, Correzione, RSI ipervenduto) */
+const BADGE_INFO = {
+  squeeze: ["Short Squeeze Risk", "Più del 12% del flottante è venduto allo scoperto. Se il titolo sale, gli short sono costretti a ricomprare per chiudere le posizioni, alimentando un rialzo esplosivo (short squeeze). È un segnale di potenziale volatilità rialzista violenta — interessante per posizioni speculative, rischioso per chi è short."],
+  deepvalue: ["Deep Value — Deploy Cash", "Il titolo è sceso oltre il 25% dal massimo delle 52 settimane: massima asimmetria rischio/rendimento per chi accumula con orizzonte lungo (Diamond Hands). Zona di massimo interesse per schierare la liquidità tattica con ordini limite, se la tesi fondamentale è intatta."],
+  correction: ["Correzione — Zona 1", "Il titolo è in correzione (tra -15% e -25% dal massimo 52 settimane): primo livello di accumulo. Considera di impiegare il 25-30% della liquidità tattica con ordini limite ai supporti. Verifica che non sia una rottura strutturale dei fondamentali."],
+  oversold: ["RSI ipervenduto", "L'RSI è sotto 30: il titolo è statisticamente ipervenduto nel breve termine, spesso prelude a un rimbalzo tecnico. Da solo non è un segnale d'acquisto: incrocialo con supporto, trend e fondamentali."],
+  overbought: ["RSI ipercomprato", "L'RSI è sopra 70: il titolo è ipercomprato nel breve, possibile pausa/ritracciamento. Per le posizioni vincenti (Diamond Hands) NON è un motivo di vendita, ma può suggerire un TRIM parziale (Free Ride) se il multiplo è teso."],
+};
+function openBadgeInfo(type) {
+  const b = BADGE_INFO[type];
+  if (!b) return;
+  openInfoModal(b[0], `<div class="info-line" style="font-size:13px;line-height:1.65">${b[1]}</div>`);
 }
 
 /* Cella Sharpe 1A: verde brillante >2, verde tenue 1-2, grigio <1 (cliccabile per spiegazione) */
@@ -1769,6 +1819,15 @@ function openSharpeInfo(ticker) {
      ${pSharpe != null ? `<div class="info-line muted" style="font-size:11.5px;margin-top:8px">Sharpe complessivo del portafoglio (calcolato con la matrice di covarianza pesata per controvalore): <b style="color:${sharpeColor(pSharpe)}">${fmtNum.format(pSharpe)}</b>. Grazie alla diversificazione, lo Sharpe di portafoglio è spesso più alto della media dei singoli titoli.</div>` : ""}`);
 }
 
+/* pallino di riga: verde = grafico/popup disponibile · rosso = badge rilevante (squeeze/correzione/deep value) */
+function rowAlert(r) {
+  const sf = (r.stats || {}).short_float;
+  return (sf != null && sf > 0.12) || (r.w52_dist_pct != null && r.w52_dist_pct <= -15);
+}
+function rowDot(r) {
+  return `<span class="row-dot ${rowAlert(r) ? "alert" : ""}" title="${rowAlert(r) ? "Dati rilevanti da leggere (clicca i badge)" : "Grafico disponibile"}"></span>`;
+}
+
 function techCells(r) {
   const c = cur(r);
   // supporto/resistenza cambiano con il range selezionato (1S/1M/3M/1A)
@@ -1777,7 +1836,6 @@ function techCells(r) {
   const resistance = tw ? tw.resistance : r.resistance;
   return `
       <td class="num">${peBar(r.pe)}</td>
-      <td class="num">${epsBar(r.eps)}</td>
       <td class="num">${betaBar(r)}</td>
       ${sharpeCell(r)}
       <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
@@ -2891,13 +2949,12 @@ function renderTable() {
     const gEur = r.gain_eur != null ? r.gain_eur : (r.currency === "EUR" ? (r.gain || 0) : (r.gain || 0) / eurusd);
     const gPct = (r.bval != null && (r.bval - r.bgain)) ? r.bgain / (r.bval - r.bgain) * 100 : r.gain_pct;
     return `<tr>
-      <td class="name-cell">${delBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell">${rowDot(r)}${delBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${priceTxt(r, c)}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${prepostCell(r.prepost)}</td>
-      <td class="num">${fmtVolume(r.volume)}</td>
       <td class="num ${signCls(gEur)}">${signTxt(Math.round(gEur), " €")}${r.currency === "USD" && r.gain != null ? `<br><span class="sub-eur muted">${signTxt(Math.round(r.gain), " $")} live</span>` : ""}</td>
       <td class="num ${signCls(gPct)}"><b>${signTxt(Math.round(gPct * 100) / 100)}</b></td>
       ${techCells(r)}
@@ -2907,13 +2964,13 @@ function renderTable() {
   const t = DATA.totals;
   const usdValue = DATA.portfolio.filter(r => r.currency === "USD").reduce((s, r) => s + r.value, 0);
   const totalRow = `<tr class="total-row">
-    <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
+    <td class="name-cell" colspan="6">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="14" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="17" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="25"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
 }
 
@@ -2921,15 +2978,14 @@ function renderWatchlist() {
   const list = sortRows(DATA.watchlist || [], "wl-table");
   const c = (r) => r.currency === "PTS" ? "" : "$";
   const rows = list.length ? list.map(r => `<tr>
-      <td class="name-cell">${delBtn("watchlist", r.ticker)}<button class="row-add" data-tk="${r.ticker}" data-price="${r.price}" title="Aggiungi ${r.ticker} al portafoglio">➕</button>${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell">${rowDot(r)}${delBtn("watchlist", r.ticker)}<button class="row-add" data-tk="${r.ticker}" data-price="${r.price}" title="Aggiungi ${r.ticker} al portafoglio">➕</button>${esc(r.name)}<span class="tk">${r.ticker}</span></td>
       <td class="num"><b>${priceTxt(r, c(r))}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${prepostCell(r.prepost)}</td>
-      <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="19" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="21" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="19"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="21"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
 }
 
@@ -4138,7 +4194,7 @@ $("#tilt-box").addEventListener("click", openTiltModal);
 $("#portfolio-health").addEventListener("click", openHealthModal);
 $("#macroquant-box").addEventListener("click", openMacroQuantModal);
 $("#seasonality-box").addEventListener("click", openSeasonalityModal);
-$("#tracking-error-box").addEventListener("click", openAlphaModal);
+$("#tracking-error-box")?.addEventListener("click", openAlphaModal);
 $("#ptf-edit-values")?.addEventListener("click", openEditPortfolio);
 $("#alloc-edit")?.addEventListener("click", openEditPortfolio);
 $("#decision-bar")?.addEventListener("click", openDecisionModal);
@@ -4158,7 +4214,7 @@ $("#news-modal-close")?.addEventListener("click", () => hideSimpleModal("#news-m
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") ["#pmc-modal", "#sell-modal", "#news-modal"].forEach(hideSimpleModal);
 });
-$("#market-direction").addEventListener("click", () => {
+$("#market-direction")?.addEventListener("click", () => {
   const d = marketDirectionScore();
   const comps = directionComponents();
   const lab = d >= 60 ? "Rialzista" : d <= 40 ? "Ribassista" : "Laterale";
@@ -4183,6 +4239,8 @@ document.addEventListener("click", e => {
   if (rc && rc.dataset.rsTk) { openRsInfo(rc.dataset.rsTk); return; }
   const shc = e.target.closest(".sharpe-cell");        // click su Sharpe 1A → spiegazione
   if (shc && shc.dataset.sharpeTk) { openSharpeInfo(shc.dataset.sharpeTk); return; }
+  const bi = e.target.closest(".badge-info");          // badge (squeeze/deep value/correzione) → spiegazione
+  if (bi && bi.dataset.badge) { e.stopPropagation(); openBadgeInfo(bi.dataset.badge); return; }
 });
 // accessibilità: Invio/Spazio sulla riga fondamentale aprono il dettaglio
 document.addEventListener("keydown", e => {

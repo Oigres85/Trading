@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=69">
+<link rel="stylesheet" href="assets/style.css?v=70">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -15,7 +15,11 @@
   <div class="brand">
     <div>
       <h1>Trading Dashboard</h1>
-      <div class="updated">Dati workflow: <span id="updated-at">—</span> · <span class="live" id="live-badge"></span></div>
+      <div class="updated">
+        <span class="upd-item">Aggiornamento totale: <b id="updated-at">—</b></span>
+        <span class="upd-sep">·</span>
+        <span class="upd-item live" id="live-badge">Prezzi live: —</span>
+      </div>
     </div>
   </div>
   <div class="actions">
@@ -44,21 +48,22 @@
       </div>
       <section class="kpi-grid kpi-compact" id="kpi-grid"></section>
       <div class="btp-info" id="btp-info"></div>
-      <div class="alloc-wrap">
+      <!-- vista allocazione (per titolo/settore) SOPRA il box liquidità -->
+      <div class="alloc-top">
         <div class="alloc-donut-wrap"><div id="alloc-donut"></div></div>
         <ul class="alloc-legend" id="alloc-legend"></ul>
-        <div class="alloc-side">
-          <section class="cash-box cash-box-inline">
-            <label for="cash-input">Liquidità disponibile (€)</label>
-            <div class="cash-row">
-              <input type="number" id="cash-input" min="0" step="any" placeholder="es. 20000" aria-label="Liquidità disponibile in euro">
-              <button class="btn btn-primary btn-sm" id="cash-save">Salva</button>
-            </div>
-            <span class="muted" id="cash-note"></span>
-            <div class="cash-drag" id="cash-drag" hidden></div>
-          </section>
-          <div id="milione-tracker"></div>
-        </div>
+      </div>
+      <div class="alloc-bottom">
+        <section class="cash-box cash-box-inline">
+          <label for="cash-input">Liquidità disponibile (€)</label>
+          <div class="cash-row">
+            <input type="number" id="cash-input" min="0" step="any" placeholder="es. 20000" aria-label="Liquidità disponibile in euro">
+            <button class="btn btn-primary btn-sm" id="cash-save">Salva</button>
+          </div>
+          <span class="muted" id="cash-note"></span>
+          <div class="cash-drag" id="cash-drag" hidden></div>
+        </section>
+        <div id="milione-tracker"></div>
       </div>
     </section>
   </div>
@@ -67,17 +72,19 @@
   <section class="card">
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
     <div class="mini-cards">
-      <div class="mini-card" id="market-direction" tabindex="0" role="button" title="Direzione di mercato — media di tutti i segnali"></div>
+      <div class="mini-card" id="portfolio-health" tabindex="0" role="button" title="Salute del portafoglio — clicca per il dettaglio"></div>
       <div class="mini-card" id="macroquant-box" tabindex="0" role="button" title="MacroQuant (stile BCA) — clicca per il dettaglio"></div>
       <div class="mini-card" id="signposts-box" tabindex="0" role="button" title="BofA Bear Market Signposts — clicca per il dettaglio"></div>
       <div class="mini-card" id="tilt-box" tabindex="0" role="button" title="Rotazione settoriale — clicca per il dettaglio"></div>
       <div class="mini-card" id="seasonality-box" tabindex="0" role="button" title="Stagionalità S&amp;P 500 / Nasdaq — clicca per il dettaglio"></div>
-      <div class="mini-card" id="tracking-error-box" tabindex="0" role="button" title="Daily Tracking Error vs benchmark — clicca per il dettaglio"></div>
       <div class="mini-card" id="sharpe-box" tabindex="0" role="button" title="Sharpe Ratio del portafoglio — clicca per il dettaglio"></div>
     </div>
     <div class="gauges" id="gauges"></div>
     <div class="macro-grid macro-grid-below" id="macro-grid"></div>
-    <div id="portfolio-health" class="health-banner" tabindex="0" role="button" title="Salute del portafoglio — clicca per il dettaglio"></div>
+    <div class="macro-news">
+      <div class="macro-news-head"><h3>News — portafoglio &amp; macro USA</h3><span class="muted">clicca la sintesi per tutte le notizie</span></div>
+      <div id="news-summary" tabindex="0" role="button" title="Clicca per leggere tutte le notizie"></div>
+    </div>
   </section>
 
 
@@ -116,11 +123,9 @@
             <th class="num">Prezzo</th>
             <th class="num">Oggi</th>
             <th class="num">Pre/After</th>
-            <th class="num">Volume</th>
             <th class="num">Guadagno</th>
             <th class="num">Guad. %</th>
             <th class="num">P/E</th>
-            <th class="num">EPS</th>
             <th class="num">Beta</th>
             <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
             <th class="num">Supporto</th>
@@ -176,9 +181,7 @@
             <th class="num">Prezzo</th>
             <th class="num">Oggi</th>
             <th class="num">Pre/After</th>
-            <th class="num">Volume</th>
             <th class="num">P/E</th>
-            <th class="num">EPS</th>
             <th class="num">Beta</th>
             <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
             <th class="num">Supporto</th>
@@ -202,23 +205,14 @@
     </div>
   </section>
 
-  <!-- NEWS + STRUMENTI (compatti) -->
-  <div class="grid-2">
-    <section class="card">
-      <div class="card-head">
-        <h2>News — portafoglio &amp; macro USA</h2>
-        <span class="muted">clicca la sintesi per tutte le notizie</span>
-      </div>
-      <div id="news-summary" tabindex="0" role="button" title="Clicca per leggere tutte le notizie"></div>
-    </section>
-    <section class="card">
-      <div class="card-head"><h2>Strumenti</h2></div>
-      <div class="tools-btns">
-        <button class="btn btn-ghost tool-btn" id="open-pmc">Calcolatore PMC<span class="muted">mediazione acquisto / realizzo vendita</span></button>
-        <button class="btn btn-ghost tool-btn" id="open-sell">Calcolo vendite (plus/minus)<span class="muted">stima risultato netto e tasse</span></button>
-      </div>
-    </section>
-  </div>
+  <!-- STRUMENTI (compatti) -->
+  <section class="card">
+    <div class="card-head"><h2>Strumenti</h2></div>
+    <div class="tools-btns tools-btns-row">
+      <button class="btn btn-ghost tool-btn" id="open-pmc">Calcolatore PMC<span class="muted">mediazione acquisto / realizzo vendita</span></button>
+      <button class="btn btn-ghost tool-btn" id="open-sell">Calcolo vendite (plus/minus)<span class="muted">stima risultato netto e tasse</span></button>
+    </div>
+  </section>
 
   <footer>
     Prezzi live lato client (Yahoo via proxy CORS, ogni 60s) · dati tecnici/macro/news rigenerati dal workflow ogni ~20 min.<br>
@@ -332,6 +326,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=69"></script>
+<script src="assets/app.js?v=70"></script>
 </body>
 </html>
