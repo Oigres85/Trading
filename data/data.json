@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-06-27T14:58:50Z",
+ "updated_at": "2026-06-27T15:45:50Z",
  "eurusd": 1.139,
  "totals": {
   "usd_value": 268158.33,
@@ -9335,18 +9335,18 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 60512.92,
-   "change_pct": 0.83,
+   "price": 60685.93,
+   "change_pct": 1.12,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -52.0,
+   "ath_dist_pct": -51.9,
    "w52_high": 126198.07,
-   "w52_dist_pct": -52.0,
+   "w52_dist_pct": -51.9,
    "support": 58075.92,
    "resistance": 67248.13,
-   "rsi": 34.3,
-   "volume": 22142685184,
-   "vol_ratio": 0.67,
+   "rsi": 35.1,
+   "volume": 21066070016,
+   "vol_ratio": 0.64,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -9355,7 +9355,7 @@
      60995.13,
      59721.68,
      60016.43,
-     60512.92
+     60685.93
     ],
     "m6": [
      67659.39,
@@ -9483,7 +9483,7 @@
      60995.13,
      59721.68,
      60016.43,
-     60512.92
+     60685.93
     ],
     "all": [
      386.94,
@@ -9627,7 +9627,7 @@
      68233.31,
      76304.32,
      73579.69,
-     60512.93
+     60685.93
     ],
     "m1": [
      60867.41,
@@ -9651,7 +9651,7 @@
      60995.13,
      59721.68,
      60016.43,
-     60512.92
+     60685.93
     ],
     "m3": [
      78268.95,
@@ -9719,7 +9719,7 @@
      60995.13,
      59721.68,
      60016.43,
-     60512.92
+     60685.93
     ],
     "y1": [
      107088.43,
@@ -9795,7 +9795,7 @@
      63543.2,
      64418.45,
      63952.11,
-     60512.92
+     60685.93
     ],
     "d1": [
      60016.0,
@@ -9887,12 +9887,17 @@
      60514.56,
      60518.46,
      60539.81,
-     60505.84
+     60505.84,
+     60483.62,
+     60780.78,
+     60654.01,
+     60704.27,
+     60685.93
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 34,
+   "health": 35,
    "eps": null,
    "beta": null,
    "sharpe_1y": -1.02,
@@ -9903,22 +9908,22 @@
     "w1": {
      "support": 58075.92,
      "resistance": 64196.56,
-     "change_pct": -3.44
+     "change_pct": -3.16
     },
     "m1": {
      "support": 58075.92,
      "resistance": 67248.13,
-     "change_pct": -0.58
+     "change_pct": -0.3
     },
     "m3": {
      "support": 58075.92,
      "resistance": 82792.21,
-     "change_pct": -22.69
+     "change_pct": -22.46
     },
     "y1": {
      "support": 58075.92,
      "resistance": 116273.31,
-     "change_pct": -44.31
+     "change_pct": -44.15
     }
    },
    "financials": [],
@@ -9943,7 +9948,7 @@
      "hi": 63547.44
     }
    },
-   "rs_1m": 1.6,
+   "rs_1m": 1.9,
    "rs_bench": "sp500"
   },
   {
@@ -10103,13 +10108,16 @@
     "all": [
      33.1,
      30.86,
+     32.69,
      33.8,
      26.8,
      28.7,
      27.42,
      26.4,
+     28.46,
      28.37,
      26.25,
+     26.35,
      27.2,
      23.43,
      21.18,
@@ -10123,13 +10131,16 @@
      26.86,
      27.02,
      28.98,
+     30.47,
      27.22,
      26.89,
+     31.2,
      33.51,
      36.6,
      31.04,
      25.8,
      29.56,
+     30.19,
      30.54,
      31.57,
      29.2,
@@ -10137,11 +10148,13 @@
      30.41,
      32.52,
      33.05,
+     36.16,
      35.76,
      37.38,
      39.88,
      37.05,
      43.8,
+     42.12,
      49.64,
      51.76,
      49.13,
@@ -10150,6 +10163,7 @@
      51.75,
      55.4,
      49.72,
+     51.97,
      56.5,
      60.57,
      68.94,
@@ -10157,6 +10171,7 @@
      59.76,
      57.32,
      61.04,
+     67.92,
      61.41,
      66.63,
      71.88,
@@ -10165,13 +10180,16 @@
      74.4,
      70.26,
      62.91,
+     58.73,
      63.13,
      61.05,
      58.14,
      61.79,
      65.87,
+     65.71,
      64.01,
      70.68,
+     78.21,
      74.04,
      81.66,
      94.53,
@@ -10182,6 +10200,7 @@
      101.58,
      113.46,
      127.35,
+     140.0,
      124.08,
      115.46,
      100.64,
@@ -10189,6 +10208,8 @@
      54.43,
      44.6,
      41.68,
+     44.76,
+     49.66,
      51.12,
      66.31,
      69.89,
@@ -10196,6 +10217,7 @@
      69.96,
      70.61,
      77.0,
+     77.28,
      79.36,
      72.89,
      79.66,
@@ -10204,6 +10226,7 @@
      73.97,
      75.63,
      78.95,
+     71.92,
      79.97,
      81.43,
      84.11,
@@ -10212,6 +10235,7 @@
      96.97,
      106.72,
      113.93,
+     102.7,
      95.42,
      95.7,
      88.81,
@@ -10219,10 +10243,13 @@
      93.19,
      100.36,
      98.83,
+     98.48,
      107.07,
      103.02,
+     104.87,
      86.53,
      84.96,
+     88.06,
      96.47,
      92.19,
      86.24,
@@ -10236,13 +10263,16 @@
      96.56,
      105.03,
      107.65,
+     102.33,
      96.38,
      92.72,
+     98.42,
      97.49,
      102.59,
      101.58,
      99.74,
      102.71,
+     105.37,
      98.17,
      95.96,
      91.16,
@@ -10250,6 +10280,8 @@
      66.15,
      53.27,
      48.24,
+     49.76,
+     47.6,
      59.63,
      60.3,
      59.47,
@@ -10257,11 +10289,13 @@
      49.2,
      45.09,
      46.59,
+     41.65,
      37.04,
      33.62,
      33.75,
      38.34,
      45.92,
+     49.1,
      48.33,
      41.6,
      44.7,
@@ -10269,6 +10303,7 @@
      46.86,
      49.44,
      53.72,
+     52.81,
      54.01,
      50.6,
      49.33,
@@ -10277,13 +10312,16 @@
      50.17,
      47.23,
      51.67,
+     54.38,
      57.4,
      60.42,
      64.73,
      61.64,
      64.94,
+     68.57,
      67.04,
      74.15,
+     68.76,
      69.8,
      73.25,
      65.31,
@@ -10297,10 +10335,13 @@
      58.47,
      58.58,
      55.1,
+     54.07,
      54.18,
      55.17,
+     61.06,
      51.56,
      44.76,
+     20.48,
      18.84,
      35.49,
      39.27,
@@ -10308,6 +10349,7 @@
      42.61,
      40.22,
      35.79,
+     45.34,
      48.52,
      52.2,
      61.5,
@@ -10316,6 +10358,7 @@
      66.32,
      73.47,
      73.95,
+     68.5,
      75.03,
      83.57,
      66.18,
@@ -10324,6 +10367,7 @@
      95.72,
      100.28,
      104.69,
+     114.67,
      105.76,
      98.62,
      89.55,
@@ -10331,6 +10375,7 @@
      86.53,
      80.55,
      80.26,
+     78.87,
      77.05,
      75.67,
      76.78,
@@ -10339,6 +10384,7 @@
      81.8,
      83.63,
      90.79,
+     81.02,
      75.96,
      71.65,
      75.85,
@@ -10349,13 +10395,16 @@
      81.54,
      77.91,
      73.55,
+     68.17,
      69.26,
      68.0,
+     71.72,
      72.53,
      69.76,
      71.48,
      58.21,
      60.79,
+     65.11,
      69.26,
      64.01,
      62.37,
@@ -10363,6 +10412,8 @@
      58.55,
      57.42,
      65.21,
+     67.02,
+     101.38,
      105.07,
      87.36,
      69.23
@@ -10624,7 +10675,7 @@
    "beta": null,
    "sharpe_1y": 0.29,
    "prepost": null,
-   "sector": "FUTURE",
+   "sector": "ALTSYMBOL",
    "stats": null,
    "tech_by_range": {
     "w1": {
@@ -21105,7 +21156,7 @@
    "calls": 913
   },
   "risk_sentiment": {
-   "score": 38,
+   "score": 39,
    "label": "Risk-Off",
    "components": [
     {
@@ -21122,7 +21173,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 58
+     "score": 61
     }
    ]
   },
@@ -24426,7 +24477,7 @@
      76.19,
      79.14,
      76.6,
-     79.59,
+     79.58,
      82.81,
      80.91,
      85.14,
@@ -25031,7 +25082,7 @@
     -0.000548,
     0.005997,
     0.00282,
-    -0.003515,
+    -0.003516,
     0.001908,
     -0.004273,
     0.003343,
@@ -25051,7 +25102,7 @@
     -0.00507,
     0.00766,
     -0.000838,
-    0.007797,
+    0.007798,
     -0.001977,
     0.010646,
     0.003423,
@@ -25064,12 +25115,12 @@
     0.015357,
     -0.004401,
     0.004187,
-    0.002278,
+    0.002279,
     0.003541,
     -0.005964,
     -0.00741,
-    0.005419,
-    0.008358,
+    0.00542,
+    0.008357,
     -0.002896,
     0.002457,
     0.002312,
@@ -25126,7 +25177,7 @@
     0.003863,
     -0.015242,
     0.009961,
-    0.014718,
+    0.014719,
     0.009406,
     0.006904,
     0.005458,
@@ -25171,7 +25222,7 @@
     0.003984,
     -0.000101,
     -0.001984,
-    -0.002983,
+    -0.002982,
     0.004971,
     -0.008455,
     -0.004844,
@@ -25194,7 +25245,7 @@
     0.000569,
     -0.008814,
     0.007055,
-    -0.005575,
+    -0.005576,
     -0.013107,
     0.00876,
     -0.001607,
@@ -26119,7 +26170,7 @@
      577.73,
      588.35,
      596.02,
-     598.19,
+     598.18,
      602.31,
      595.82,
      609.15,
@@ -26286,14 +26337,14 @@
    },
    "_ret_series": [
     0.006477,
-    -0.008429,
-    0.006965,
+    -0.00843,
+    0.006966,
     0.00984,
     -0.007533,
-    0.000562,
+    0.000561,
     0.007079,
     -0.001438,
-    -0.002251,
+    -0.00225,
     0.003627,
     0.000917,
     0.001024,
@@ -26302,7 +26353,7 @@
     0.005185,
     -0.005176,
     0.004561,
-    0.002129,
+    0.002128,
     0.002407,
     0.003125,
     -0.001549,
@@ -26328,7 +26379,7 @@
     0.004015,
     0.001537,
     0.00626,
-    -0.011575,
+    -0.011576,
     -0.00838,
     0.007868,
     0.009051,
@@ -26336,7 +26387,7 @@
     0.004878,
     0.002833,
     0.000327,
-    0.00582,
+    0.005821,
     0.004417,
     0.008557,
     -0.000845,
@@ -26364,9 +26415,9 @@
     -0.003703,
     0.006567,
     0.012601,
-    -0.000261,
+    -0.000262,
     -0.009634,
-    0.008406,
+    0.008407,
     0.010678,
     0.017809,
     0.00769,
@@ -26379,7 +26430,7 @@
     -0.018627,
     -0.003155,
     0.022124,
-    -0.002664,
+    -0.002663,
     -0.000788,
     -0.020416,
     0.000756,
@@ -26397,7 +26448,7 @@
     0.002444,
     -0.00093,
     0.004077,
-    -0.001918,
+    -0.001919,
     0.001233,
     0.004096,
     -0.003234,
@@ -26407,7 +26458,7 @@
     -0.018537,
     0.01449,
     0.013035,
-    0.004794,
+    0.004793,
     0.004683,
     0.002926,
     -6.4e-05,
@@ -26431,7 +26482,7 @@
     0.003157,
     0.0044,
     0.009065,
-    0.003312,
+    0.003311,
     -0.005985,
     -0.012011,
     0.006866,
@@ -27195,7 +27246,7 @@
      169.0,
      183.04,
      192.5,
-     204.45,
+     204.44,
      206.91,
      211.0,
      211.58,
@@ -27560,8 +27611,8 @@
     0.02238,
     0.005097,
     -0.001313,
-    -0.003264,
-    0.002183,
+    -0.003265,
+    0.002184,
     -0.000227,
     0.029691,
     0.019444,
@@ -27570,17 +27621,17 @@
     0.003654,
     -0.007677,
     -0.003537,
-    0.002484,
+    0.002485,
     0.039209,
     -0.010518,
     0.008263,
-    0.007085,
+    0.007086,
     0.001187,
     -0.004445,
     -0.0054,
     -0.000983,
     0.012496,
-    0.004987,
+    0.004988,
     0.002019,
     -0.005876,
     -0.001773,
@@ -27624,7 +27675,7 @@
     -0.003208,
     -0.017275,
     0.014428,
-    -0.017697,
+    -0.017696,
     0.005242,
     0.010016,
     0.000861,
@@ -29401,7 +29452,7 @@
      43.17,
      42.44,
      38.21,
-     38.68,
+     38.69,
      40.99,
      39.75,
      39.89,
@@ -29950,29 +30001,29 @@
    },
    "_ret_series": [
     0.009841,
-    0.002479,
+    0.00248,
     -0.006353,
     -0.006965,
-    -0.009543,
+    -0.009544,
     -0.001277,
     0.010461,
     0.00069,
     -0.013795,
     -0.002098,
-    -0.007009,
-    0.001411,
+    -0.007008,
+    0.001412,
     -0.000235,
-    0.001528,
+    0.001527,
     0.008916,
-    0.006047,
+    0.006046,
     -0.005548,
     -0.001743,
     0.006287,
     -0.006479,
     0.016886,
-    -0.005154,
-    0.000576,
-    0.014216,
+    -0.005153,
+    0.000575,
+    0.014217,
     0.002733,
     0.003066,
     -0.005774,
@@ -29983,42 +30034,42 @@
     0.008281,
     -0.007414,
     -0.007125,
-    -0.002893,
+    -0.002894,
     0.005804,
     0.002193,
     -0.004952,
-    0.007407,
+    0.007406,
     -0.002872,
     -0.000576,
     -0.001153,
     0.006578,
     -0.007108,
     -0.007441,
-    0.010978,
+    0.010977,
     0.007624,
     0.015247,
-    0.013325,
+    0.013324,
     -0.005683,
     0.005716,
     0.006686,
     -0.004317,
-    0.002334,
-    0.002108,
+    0.002335,
+    0.002107,
     -0.002546,
     -0.01032,
     -0.001906,
-    -0.003595,
+    -0.003594,
     0.00699,
     -0.003807,
     0.0,
     -0.000899,
     0.008211,
     -0.002901,
-    0.002583,
+    0.002582,
     0.002912,
     -0.001898,
-    -0.007943,
-    0.005751,
+    -0.007944,
+    0.005752,
     0.000785,
     -0.000784,
     0.016147,
@@ -30069,7 +30120,7 @@
     0.000687,
     0.005492,
     -0.00091,
-    0.004783,
+    0.004784,
     -0.003732,
     -0.00217,
     0.001603,
@@ -31156,7 +31207,7 @@
     0.010266,
     -0.010312,
     0.01269,
-    0.013915,
+    0.013914,
     -0.008813,
     0.004715,
     0.008373,
@@ -31166,7 +31217,7 @@
     0.008488,
     0.004438,
     0.010117,
-    -0.000568,
+    -0.000569,
     0.0014,
     -0.00976,
     0.007944,
@@ -31179,7 +31230,7 @@
     -0.023274,
     0.022731,
     -0.00896,
-    0.012143,
+    0.012142,
     0.001951,
     0.008872,
     -0.005848,
@@ -31193,12 +31244,12 @@
     -0.002647,
     0.017725,
     -0.002435,
-    0.005126,
-    0.007025,
+    0.005127,
+    0.007026,
     0.009916,
     -0.015328,
     -0.010344,
-    0.00448,
+    0.004479,
     0.006696,
     0.001792,
     0.008772,
@@ -31228,7 +31279,7 @@
     -0.040787,
     0.026021,
     -0.012773,
-    0.009291,
+    0.009292,
     -0.003215,
     0.002412,
     0.013322,
@@ -31282,7 +31333,7 @@
     -0.005305,
     -0.002896,
     -0.009344,
-    0.002919,
+    0.002918,
     0.001905,
     0.011975,
     -0.000509,
@@ -31297,15 +31348,15 @@
     0.013416,
     0.007547,
     0.000981,
-    0.007205,
-    0.012454,
+    0.007206,
+    0.012453,
     0.006858,
-    -0.01855,
+    -0.018551,
     -0.01693,
     0.006859,
     -0.022057,
     -0.019947,
-    -0.018317,
+    -0.018316,
     0.043767,
     0.016132,
     -0.004285,
@@ -31333,7 +31384,7 @@
     -0.008631,
     0.014711,
     0.00338,
-    -0.010379,
+    -0.01038,
     0.002598,
     -0.022987,
     0.016011,
@@ -32426,7 +32477,7 @@
     -0.008922,
     0.003639,
     0.005916,
-    -0.010435,
+    -0.010434,
     0.007477,
     -0.017126,
     0.00697,
@@ -32452,7 +32503,7 @@
     0.005719,
     0.004738,
     -0.010375,
-    0.000762,
+    0.000763,
     0.001905,
     0.005133,
     -0.003215,
@@ -32472,9 +32523,9 @@
     0.016366,
     -0.004257,
     -0.00223,
-    -0.002235,
+    -0.002236,
     0.009709,
-    0.000925,
+    0.000924,
     0.002217,
     -0.001332,
     -0.004445,
@@ -33683,7 +33734,7 @@
     }
    },
    "_ret_series": [
-    -0.005744,
+    -0.005745,
     0.007664,
     0.017201,
     0.00115,
@@ -33701,7 +33752,7 @@
     0.004702,
     0.015678,
     0.007142,
-    -0.003774,
+    -0.003775,
     0.011366,
     0.009763,
     -0.014278,
@@ -33726,11 +33777,11 @@
     -0.001584,
     0.011221,
     0.007622,
-    0.00545,
+    0.005451,
     0.001438,
     -0.022426,
-    0.006668,
-    -0.019309,
+    0.006667,
+    -0.019308,
     -0.002289,
     0.004819,
     0.01747,
@@ -33745,8 +33796,8 @@
     0.017224,
     0.013007,
     0.008966,
-    0.009215,
-    -0.018371,
+    0.009216,
+    -0.018372,
     -0.010631,
     0.0,
     -0.010074,
@@ -33768,10 +33819,10 @@
     -0.010116,
     0.002384,
     -0.010421,
-    0.007441,
-    -0.005909,
+    0.00744,
+    -0.005908,
     0.007315,
-    0.000114,
+    0.000113,
     -0.010778,
     0.002638,
     0.009723,
@@ -33791,7 +33842,7 @@
     0.007561,
     0.013105,
     0.009619,
-    -0.012921,
+    -0.012922,
     0.018749,
     0.004247,
     -0.004121,
@@ -33811,7 +33862,7 @@
     -0.003831,
     0.009502,
     0.00762,
-    -0.005561,
+    -0.00556,
     0.021024,
     0.027163,
     -0.026658,
@@ -33849,17 +33900,17 @@
     0.00492,
     -0.000907,
     -0.004174,
-    0.003281,
+    0.00328,
     0.015804,
     0.020029,
-    -0.009117,
+    -0.009116,
     -0.005839,
     0.005161,
     0.001593,
     -0.004419,
     -0.012784,
     0.02482,
-    0.009301,
+    0.009302,
     0.003304,
     0.003466,
     0.010535,
@@ -34250,9 +34301,9 @@
      154.01,
      154.93,
      154.68,
-     156.34,
+     156.33,
      156.04,
-     156.34,
+     156.33,
      155.93,
      155.49,
      157.2,
@@ -34985,12 +35036,12 @@
     -0.002349,
     0.006402,
     0.005411,
-    -0.003345,
+    -0.003346,
     0.008246,
     -0.014258,
     0.006241,
     -0.000584,
-    -0.003942,
+    -0.003943,
     0.00733,
     0.000946,
     -0.004725,
@@ -35044,7 +35095,7 @@
     0.007801,
     0.023085,
     0.014202,
-    -0.000524,
+    -0.000523,
     -0.005958,
     -0.000856,
     0.005867,
@@ -35054,12 +35105,12 @@
     0.004204,
     0.022607,
     -0.002204,
-    -0.004861,
+    -0.00486,
     -0.01497,
     -0.005989,
     0.004665,
     -0.007609,
-    -0.004158,
+    -0.004159,
     -0.01194,
     -0.009707,
     0.014537,
@@ -35079,7 +35130,7 @@
     -0.005653,
     0.004587,
     -0.003022,
-    0.019673,
+    0.019672,
     0.009931,
     -0.009646,
     -0.005123,
@@ -35116,7 +35167,7 @@
     -0.000253,
     -0.002598,
     0.01766,
-    -0.010425,
+    -0.010424,
     -0.011291,
     0.001978,
     -0.019994,
@@ -36654,18 +36705,18 @@
  "predictions": [
   {
    "question": "Bitcoin Up or Down on June 27?",
-   "yes": 60,
+   "yes": 97,
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-june-27-2026"
-  },
-  {
-   "question": "Will the price of Bitcoin be above $56,000 on June 27?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-56k-on-june-27-2026"
   },
   {
    "question": "Will the price of Bitcoin be above $58,000 on June 27?",
    "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-above-58k-on-june-27-2026"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $56,000 on June 27?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-56k-on-june-27-2026"
   },
   {
    "question": "Will there be no change in Fed interest rates after the July 2026 meeting?",
@@ -36726,7 +36777,7 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Citi sostiene che vale la pena acquistare questi titoli internet cinesi in crisi in fase di ribasso"
+   "title_it": "Citi afferma che vale la pena acquistare questi titoli internet cinesi in crisi durante il calo"
   },
   {
    "source": "Investing.com",
@@ -36782,6 +36833,60 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Inflation flips Wall Street's Fed interest-rate bets",
+   "link": "https://finance.yahoo.com/economy/policy/articles/inflation-flips-wall-streets-fed-151700491.html",
+   "published": "2026-06-27T15:17:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’inflazione ribalta le scommesse della Fed sui tassi di interesse di Wall Street"
+  },
+  {
+   "source": "CNBC",
+   "title": "U.S. strikes Iran after Trump accuses Tehran of ceasefire violation in Strait of Hormuz",
+   "link": "https://www.cnbc.com/2026/06/26/us-strikes-iran-strait-of-hormuz-ceasefire.html",
+   "published": "2026-06-27T14:59:23Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Gli Stati Uniti attaccano l’Iran dopo che Trump accusa Teheran di violazione del cessate il fuoco nello Stretto di Hormuz"
+  },
+  {
+   "source": "Reuters",
+   "title": "Tanker struck in Hormuz as Iran, US trade attacks in worst escalation since peace deal - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOamVFR0VfZVlNU01BWjNWakdNczVUSHAzNWFlM0J3MGV1b0ZmbldmdnhQUHVpLTNabjVZSG5tSDJ0RDlQREk0emJnT3ZGbjFEZjVpTEt2UDgxOXpMdWV3dTIzX1ZtQVNpeUdDRVplMkUxd0FVNzNPTEFwZ3BVSUo4SG1BcHFDeEdYS2tIM3RUaWpZNEtyeWlub0h5c29pNjJmdDZ6Y2tha2hKWkNGa3Y0Y2JNYnk4ZWJuUlk4?oc=5",
+   "published": "2026-06-27T14:36:35Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Petroliera colpita a Hormuz mentre l'Iran e gli attacchi commerciali statunitensi sono nella peggiore escalation dall'accordo di pace - Reuters"
+  },
+  {
+   "source": "Google News",
+   "title": "America in Focus: Key inflation gauge surges, Apple raises prices, and mortgage rate climbs - The Boston Globe",
+   "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPQXQ2XzJuTFJoMU9FbUVySVc5blV1Q29RS1BkZkRkWFg5Y3F4MEYtT2g4a2ZHWUNXTnVBWDFGQXpxa3FiN2RBMm5KbDVJY3c3X1FFV1JmR2tZUWpaNUpHY3lLZ0ZNZTlyX0VBeXBGZl9wQ2xkeHBXRlRrYXNDYjVBX1NRQnI?oc=5",
+   "published": "2026-06-27T14:32:37Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "America in Focus: i principali indicatori di inflazione aumentano, Apple aumenta i prezzi e i tassi ipotecari salgono - The Boston Globe"
+  },
+  {
    "source": "Bloomberg",
    "title": "ECB’s Schnabel Sees Upside Inflation Risks Despite Peace Deal",
    "link": "https://news.google.com/search?q=ECB%E2%80%99s%20Schnabel%20Sees%20Upside%20Inflation%20Risks%20Despite%20Peace%20Deal",
@@ -36805,7 +36910,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Settimana del mercato azionario: rotazione, per ora, lontano dal boom dell’intelligenza artificiale"
+   "title_it": "Prossima settimana del mercato azionario: rotazione, per ora, lontano dal boom dell’intelligenza artificiale"
   },
   {
    "source": "CNBC",
@@ -36820,6 +36925,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Prima che esistessero i conti Trump, SEED OK donava ad alcuni neonati 1.000 dollari: come i ricercatori sostengono che le sovvenzioni incidessero sui bambini"
+  },
+  {
+   "source": "Google News",
+   "title": "Dollar retreats as US inflation data eases rate hike expectations - AOL.com",
+   "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTFBrVGk1UEZuRy1zdEFIZFctMC03cGxlcEpudHljek53VHg0MjlmbV9WcFRrUTk0VU94TF9mRnZmS3EyUnZrREU5bklMT2JwMEllVXgtbTJheVdtTHJIbThOS2ljWjZFTFg3UXlQY0FzbmhXUlRrQXJqREZ3?oc=5",
+   "published": "2026-06-27T13:05:48Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il dollaro si ritira mentre i dati sull'inflazione statunitense allentano le aspettative di rialzo dei tassi - AOL.com"
   },
   {
    "source": "MarketWatch",
@@ -36845,21 +36963,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Lo Stretto di Hormuz di Schrödinger: aperto o chiuso?"
-  },
-  {
-   "source": "CNBC",
-   "title": "U.S. strikes Iran after Trump accuses Tehran of ceasefire violation in Strait of Hormuz",
-   "link": "https://www.cnbc.com/2026/06/26/us-strikes-iran-strait-of-hormuz-ceasefire.html",
-   "published": "2026-06-27T12:43:35Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Gli Stati Uniti attaccano l’Iran dopo che Trump accusa Teheran di violazione del cessate il fuoco nello Stretto di Hormuz"
+   "title_it": "Lo stretto di Hormuz di Schrödinger: aperto o chiuso?"
   },
   {
    "source": "Bloomberg",
@@ -36886,6 +36990,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Il trading di questi due ETF suggerisce che i timori di inflazione sono eccessivi"
+  },
+  {
+   "source": "Reuters",
+   "title": "Supreme Court ruling, ECB conference likely to further frame Fed chief Warsh's early tenure - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOVVYyeVlFWjBaMHVRcE9pbWlvS05JVWdESHZ6VTBsTmsxM3dOaWFQRW1UTUp5aEtGRVZrYXBMT01fWXp5b2s4QmpMUDNncERCV2lpRVFBejktRGdSeDR2Mk1pdTJZanBwcHFodHQweVEyWUxhVnpvYXpWRUNQc2lTTDZaU1REUVl5TS1wSS04NS1hUzduWEhjVVpXbDRHaVhHN1BLQUpaR2NYemstemtYNmd1X2pyWThPUzVUdXlOb0xkUQ?oc=5",
+   "published": "2026-06-27T12:07:35Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Sentenza della Corte Suprema e conferenza della BCE probabilmente inquadrano ulteriormente il mandato anticipato del capo della Fed Warsh - Reuters"
   },
   {
    "source": "Bloomberg",
@@ -36929,35 +37046,8 @@
   },
   {
    "source": "Google News",
-   "title": "AI boom, stubborn inflation point to rate hike ahead, says Minneapolis Fed President - MPR News",
-   "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOd2thLUVGVXkwU3RrZlNlVVl4M1VocEU4NzRIZTJkN1pyNjZLYmpLVHpaVGhyUExTWi0wZjdkOVphalhSYjJqMGtmVFhHLWYtTHAzcHpJN1Q2SFhwak5PWkJFVVUyWWtwQl84NlRVbWZDVlN2MkJnVnBJS0MwZjJmN1o0TFdybnFaZmtpdWdUbWttalk1aGJteWtWbC1vNGEtODl6WmNiRTF2M2NQaldEeVZ5WU9UaGcxaG13UFJHSDQ?oc=5",
-   "published": "2026-06-27T12:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il boom dell'intelligenza artificiale e l'inflazione persistente fanno prevedere un rialzo dei tassi in vista, afferma il presidente della Fed di Minneapolis - MPR News"
-  },
-  {
-   "source": "Reuters",
-   "title": "Fresh ship struck in Hormuz as Iran, US trade attacks in worst escalation since peace deal - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOamVFR0VfZVlNU01BWjNWakdNczVUSHAzNWFlM0J3MGV1b0ZmbldmdnhQUHVpLTNabjVZSG5tSDJ0RDlQREk0emJnT3ZGbjFEZjVpTEt2UDgxOXpMdWV3dTIzX1ZtQVNpeUdDRVplMkUxd0FVNzNPTEFwZ3BVSUo4SG1BcHFDeEdYS2tIM3RUaWpZNEtyeWlub0h5c29pNjJmdDZ6Y2tha2hKWkNGa3Y0Y2JNYnk4ZWJuUlk4?oc=5",
-   "published": "2026-06-27T11:58:03Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Nuova nave colpita a Hormuz mentre l'Iran e gli attacchi commerciali statunitensi sono nella peggiore escalation dall'accordo di pace - Reuters"
-  },
-  {
-   "source": "Google News",
    "title": "With Just 6 Words, Fed Chair Kevin Warsh Demolished Expectations. \"It's Hard to Believe,\" Says President Trump. - The Globe and Mail",
-   "link": "https://news.google.com/rss/articles/CBMimwJBVV95cUxOakxvclRVTGV0SV9qRXdBMmVKRllheTRaLUI4QWdyRU1HSDJQaXM4WjB3UFE3a3VfUk4wM0VZMUE4OGxiU29laU1KVU01d29ZS2FRSTd1M0Q5SXBXVE5NUk9YeHFsN2VOaXp6cl9RWkhpQ295WE8zVDhmOTFBYXlMRVlUcHUtd0IxcjhseXVaajVTQWRNZTQwdkh2QzlqTWZLclp5cUNsV0ZCNlR6aXJ0ek5LVkNVOGlrZ2pwMktmVF9SWWtwaVdKak9EcWZEdVVCWmFhRVQ5d0VXRE9hekdoNTcyelY5elRXc0NUdEpyWDdCSENtejNFTnVUNU12TUF5cW9NYnNPbWRyOGVScGh6Qkx1YTU5eGlkcjhB?oc=5",
+   "link": "https://news.google.com/rss/articles/CBMilwJBVV95cUxOeGEzNW5HTUdwSGtGQnJWejFHSDhUbnpQVFRsYnVwdTk5YW0xSWhUZ0RDZmFwWWdYR3dkSFNGdklleTB6bTdhUktiOXNtRUg5elZBR2k5ZXBPNVZJaFU1RjZnY09IVlBGSVE0QnRlMVRvM2wtZjFZRElIMkxqNWlPcmM4X3lJV1ZKcVhwT3JDckJrUXJDRkY5QXlpbVFHbTJJaFI5UzhGaVhKS1FPMmxNZFlWeFJMamxrU0ZyWmZoVXhKd0hCNWdSWVItYlBHN1cxcExlOVZZZFhETUl3QndPajlrbXZBNE8tYU5xRVk3Z0pzbU40N2x6UDVZME9wczNKSEV3eTNLQ0pWVnJmZEh3eXBQZjk4ckE?oc=5",
    "published": "2026-06-27T11:20:38Z",
    "tickers": [
     "MACRO",
@@ -36967,6 +37057,46 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Con sole 6 parole, il presidente della Fed Kevin Warsh ha demolito le aspettative. \"È difficile da credere\", afferma il presidente Trump. - Il Globo e la Posta"
+  },
+  {
+   "source": "AP",
+   "title": "Egypt advances past group stage at the World Cup after a 1-1 draw with Iran - AP News",
+   "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOdTBCYy1zOXY4RjE5aVZXLTRDYVdqdDFIZU9aRnFWc2FHc3k0TkdHUnExY1ZlajJMYUIzNVBVSWV0TUpZOFNzQ3ItcVBDUkJvdzNBMXR5ZVJQUFpxZUhtOE44aXJmOHRrdmdhSVIyNUtLX1UzbHdQTkJfakpmQ0Z0cnJRb1JNbnVfdTRWTXdGYw?oc=5",
+   "published": "2026-06-27T11:15:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L'Egitto supera la fase a gironi della Coppa del Mondo dopo un pareggio per 1-1 contro l'Iran - AP News"
+  },
+  {
+   "source": "Google News",
+   "title": "As oil fades as an inflation concern, will AI take its place? The Fed is watching closely. - Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxNZjlQbzJqWXYwb1VVNzhVUUFfamE5MmduZ2RJbzZvMU1Yc2V2clhuZnRBYUxIM1NzNmdTZXI1a0RQZjEwZWYxVWxaXzBKeDhFQ1Fpb3k2MmR4S3dGczVMR0ZLdVpMLWUyMi13c29YZUdNMGlBR2RudzZxbFhPRDh3Y3JMaVplV3ZucXlQQ29KUzg5SENSbkFjTkw2cGF4Y2lxTDgwUEhHSV9OV1hjb3lETVZ0MWI2cmtDaUM2aDB3RjlYZ0lNLXJIMW1SZTRkWEd3Nkl0T3ktVl9xYnctRl81cERocVpLQQ?oc=5",
+   "published": "2026-06-27T11:08:38Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Mentre il petrolio svanisce come preoccupazione per l’inflazione, l’intelligenza artificiale prenderà il suo posto? La Fed osserva da vicino. - Yahoo Finanza"
+  },
+  {
+   "source": "Google News",
+   "title": "Kevin Warsh’s Federal Reserve inauguration does fewer things better - Washington Examiner",
+   "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOWDU3Y2I0a2Y2OTJXdUNNQXlJMzRmNWZmX3NvSG00cXBPUDlXVzNjbjdVcVlsV0kzY1FwUlV1ZEYySHgtV1FXajJ6VnZCLVN3Vy1pZXZhZmxoanBrX3JuaHNxMHFURHlfUlBOYWlrb29vTlpNQ0laZ3VxX3RlYkZ1bC1Xa0pSeFhFZ2R0dTZ0dTFCUUhDRk9BamFUcXJ3ZE1WSUFrZWpuRTFodnJMeWVjejNBNm5mejdRY0FzNERrSjE1SnVha3RLT04yMVBpZw?oc=5",
+   "published": "2026-06-27T10:45:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’insediamento della Federal Reserve di Kevin Warsh fa meno cose e meglio – Washington Examiner"
   },
   {
    "source": "Reuters",
@@ -36981,33 +37111,6 @@
    "inv": false,
    "sentiment": "bear",
    "title_it": "L’accordo di Trump con l’Iran non è all’altezza di questi elettori – e alcuni temono che potrebbe costare ai repubblicani il medio termine – Reuters"
-  },
-  {
-   "source": "Google News",
-   "title": "PCE Inflation Reached Its Highest Level in 3 Years. Here’s What Investors Need to Know. - AOL.com",
-   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNNllDX1FIRVJJSWVLMHFGclRzMVlIb3pWeWw4azEwV0hqaXR5YXZCNkhsWDM4ZlZwMEFBbkc3akJSRTlheHhpSlpEVGZvU0llRGUtQURUb2hjNXlLS09UdHNXRTR4SUxDdC1XTzNxZnk3eTVhenlhV0J2WE9ubFM1cEdBRTF1Zw?oc=5",
-   "published": "2026-06-27T09:41:28Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'inflazione PCE ha raggiunto il livello più alto degli ultimi 3 anni. Ecco cosa devono sapere gli investitori. - AOL.com"
-  },
-  {
-   "source": "AP",
-   "title": "Iranian drones attack Bahrain and a ship is struck in the strait after US airstrikes on Iran - AP News",
-   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOU21jd0pJa095S19rRUp3Q1NSN3dJZkxJVzYwNGFNbWtMa2ZqZ1lxWkx1T2xjbGI4UkhJd0sxXzJNcjVNNmllcmZ5SDlnZUlTMU1sV1NSRGlSbVRHMHFvX2pOWW5zT0JNNF8tdnEtSnYwQ1dQV3d0M0g4U0RBZEdZWlcwMFVFMGVER1N6NlRUOVVacVp4X18yS2FoczFWd1piYzdDeDlhSkc?oc=5",
-   "published": "2026-06-27T09:33:53Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Droni iraniani attaccano il Bahrein e una nave viene colpita nello stretto dopo gli attacchi aerei statunitensi sull'Iran - AP News"
   },
   {
    "source": "Reuters",
@@ -37025,9 +37128,9 @@
   },
   {
    "source": "AP",
-   "title": "Egypt advances past group stage at the World Cup after a 1-1 draw with Iran - AP News",
-   "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOdTBCYy1zOXY4RjE5aVZXLTRDYVdqdDFIZU9aRnFWc2FHc3k0TkdHUnExY1ZlajJMYUIzNVBVSWV0TUpZOFNzQ3ItcVBDUkJvdzNBMXR5ZVJQUFpxZUhtOE44aXJmOHRrdmdhSVIyNUtLX1UzbHdQTkJfakpmQ0Z0cnJRb1JNbnVfdTRWTXdGYw?oc=5",
-   "published": "2026-06-27T06:27:32Z",
+   "title": "Egypt star Mohamed Salah leaves 1-1 World Cup draw with Iran due to left knee injury - AP News",
+   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPTjc4X2EtbldETElhUmdGUTliVlc1OVlfSE5ZWC16SUVDU2FjM0VkMDhITlNtLUV4alBwcnFEcUUzNjZFcTRGcHdab1dXTk5fVG1fYlZQR0xTRDM2N0dKMHNBWF9NRkhFY3ZrMDlxTTBCTVJMN1hQVHZxNUg3Qzh2a2NHWHpybzZRc0ZWQ0FTOFd6UQ?oc=5",
+   "published": "2026-06-27T06:47:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -37035,7 +37138,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'Egitto supera la fase a gironi della Coppa del Mondo dopo un pareggio per 1-1 contro l'Iran - AP News"
+   "title_it": "La stella egiziana Mohamed Salah lascia il pareggio per 1-1 della Coppa del Mondo contro l'Iran a causa di un infortunio al ginocchio sinistro - AP News"
   },
   {
    "source": "AP",
@@ -37121,20 +37224,6 @@
    "title_it": "Una commissione Trump sollecita “ponti” tra Chiesa e Stato in un’ampia bozza di rapporto – AP News"
   },
   {
-   "source": "Reuters",
-   "title": "US military conducted strikes against Iran - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOdHdZdU1zam5FTTBKVzlNWDBLU3N0dmxTbFRaMjBrVFNwNHBXQVpnTU16SmhxWUdyRWRNUkE0NXdLWE5kMDNnc25rdFIxMk1jSFd4M05LWkxzTDVlTnRBUkotNW5RaHBQaGZFaXE2RWdlb2psdHVqTHV3MU9odHVVdVZ0M1NJX3pMQ0RHcGFsTWlQTXdIY29rSV9HQXJCWW1uZHVUWnQwOA?oc=5",
-   "published": "2026-06-26T20:53:09Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'esercito americano ha condotto attacchi contro l'Iran - Reuters"
-  },
-  {
    "source": "AP",
    "title": "Appeals court rejects Trump EPA bid to abandon rule restricting deadly soot pollution - AP News",
    "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQaS1FM3V0V1dkNGw5blhCbEpXQ29JRmtpRDlBT29haWc5LW9qb194RHpHbHFWTWJrMkpQOEd2ZXFCS2VHS2E0eHZRTGRyaG9MMGhXa0RJaGJVQ0lrS2ZfVk1PZlViRmMwLTVyM3RXY19SVVdNb3hBY0hueEVKSnF1RFFjdjJXaGROY2stS3JrMlVBR2NySEZuM0NVZW4?oc=5",
@@ -37149,23 +37238,23 @@
    "title_it": "La corte d'appello respinge la proposta di Trump dell'EPA di abbandonare la norma che limita l'inquinamento mortale da fuliggine - AP News"
   },
   {
-   "source": "Google News",
-   "title": "Minneapolis Fed's Kashkari pencils in one interest rate hike this year - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOM2N2Z3ROcGg1T2FFUk9WQnJoNDVUdWR5bUNoaXA1RlAxdmNPTjR6SEI2dHNWOG9sa1BYd21aV2R6TWtKT2ctTlBtOHAxd0t1eFdwM196NzMySjBXU0F4NUZyNXdpZ3FXMUlRSGFaMmY2NEg5NkNJMEdaTWtOMks4cjZVVlhrblUzVF9iSF9BSEtzOWVpUl9hUVNKd0phUVhTUEhNN1RWNFZIOExIdkplNU91LU1QaFp3NXNLUmFnZTEzUmd2anYtMG04bFJadw?oc=5",
-   "published": "2026-06-26T19:38:45Z",
+   "source": "CNBC",
+   "title": "Wall Street is set to close the books on a memorable first half next week. Here's what's ahead - CNBC",
+   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOaVptR192clcxQ1phTi1nSkEzNUcxU1JORm5tWXFJLVZyT21lWEJ2X05fLTFubkM2U0o5S2FCODdkUFNSTXI2dWRYbnYzVmpQUDZsc21JVXRCdDNDRndPT2JYdU9lLXdNSVJLc2p2TGpaZ0JScTJyU01hM2hjdzF2M252YzAzZThDLVBFNUVJcXB2YUx2RkE?oc=5",
+   "published": "2026-06-26T19:04:29Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il Kashkari della Fed di Minneapolis prevede un aumento dei tassi di interesse quest'anno - Yahoo Finanza"
+   "title_it": "Wall Street si appresta a chiudere i conti con una prima metà memorabile la prossima settimana. Ecco cosa ci aspetta - CNBC"
   },
   {
    "source": "AP",
    "title": "Trump threatens 100% tax on European imports if countries impose tax on digital services - AP News",
    "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQejBVS2s2RXhBczNPb0VTcUlaOEUxTWVqcW9kczFqejIxdGl5R0UzWXNMYnNqWUVfRE9CdE02dHoxNU9Ic0NRdENITzNNZ082RXBMdkFGY3gza3d4cGN1b3Z6U1JYaU40c2lES2FpcGNDbmR2UXB6WUgtVkYzWHdTOGNkU2hKUQ?oc=5",
-   "published": "2026-06-26T18:54:00Z",
+   "published": "2026-06-26T16:44:23Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -37174,19 +37263,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Trump minaccia una tassa del 100% sulle importazioni europee se i paesi imporranno tasse sui servizi digitali – AP News"
-  },
-  {
-   "source": "Google News",
-   "title": "Atlanta Fed Search for New Leader Stalls - WSJ",
-   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOWS1DMHVCQ0tlZjBIaVpBQTN3X2JyNXFzaVBEdEdSbkRoNEZoV0NpdG5fQnNETWJUR1BGaWxKaTNfZWlNbWhlUklncEFZTE5PYk5ENE9HdXJUY0hVRGlSWVptSTJra0FUMkQ5UnJSejBJaDhZSG9KSGN5TWVFaks4OXRxM1dBVHNwR0FjeF9tZW1ScUN4a1FyUg?oc=5",
-   "published": "2026-06-26T17:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La Fed di Atlanta cerca un nuovo leader in stallo - WSJ"
   },
   {
    "source": "Google News",
@@ -37202,46 +37278,6 @@
    "title_it": "Il rapporto sull’occupazione di giugno dovrebbe rafforzare la posizione della Fed che mette al primo posto l’inflazione - rbc.com"
   },
   {
-   "source": "CNBC",
-   "title": "Minneapolis Fed President Neel Kashkari says he expects a rate hike this year - CNBC",
-   "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQVjdCS0dPWlNzTHN4N2hDc0VOQVd0TFdDVnFBNkVrWnotY04wb1dlREwzOFVZNFA3Y0NhcmhVU1BCOXpfdnBrdHFMSTd1MllnZF9hOTdkemdNamI0WW5WSnY4Q2txTkZjWEQxWGMtNTBJRmhtRUpYaTZ0c3RsbkFCY2p0Y282X2tRdnZ1MFkzNGFpRmlBXzl0dXphN3dydWVvaWJOVWtpakd4Z3dUQXc0bXZiQUXSAboBQVVfeXFMTWJtUDk0c0VfbkNMbi1RU2U5dTVFS2hrM0xfWmdIek9CLTBjNGRuTlJLQ2d2X1J4Sm1xN21TNG1FS2YtTmVqN3M3UUg3elpUTzc4VU4zUDNmQ004UmVWdUFJWDlTX0MtaFpvQ0lRLVJuZVFJOWt0YWlRZ2tpY3ViTWgyVXNnSFhpaGlxNERiZzFaRXVEcmNWYXdBb0E3SWZnZDUtVGQ0RGhCNFV5dlF1UlRaOUhUSUpablhR?oc=5",
-   "published": "2026-06-26T15:45:40Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il presidente della Fed di Minneapolis Neel Kashkari afferma di aspettarsi un aumento dei tassi quest'anno - CNBC"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Stock Market Forecast For Next Six Months: Why More Gains May Lie Ahead",
-   "link": "https://www.investors.com/news/stock-market-forecast-next-six-months-2026-ai-stocks/?src=A00220&yptr=yahoo",
-   "published": "2026-06-26T13:08:21Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bull",
-   "title_it": "Previsioni del mercato azionario per i prossimi sei mesi: perché potrebbero verificarsi ulteriori guadagni"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Saudi Arabia Set to Slash Oil Prices as Hormuz Reopens",
-   "link": "https://finance.yahoo.com/energy/articles/saudi-arabia-set-slash-oil-130000417.html",
-   "published": "2026-06-26T13:00:00Z",
-   "tickers": [
-    "MACRO",
-    "CL=F"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L’Arabia Saudita si appresta a tagliare i prezzi del petrolio alla riapertura di Hormuz"
-  },
-  {
    "source": "Reddit",
    "title": "S&P 500, Nasdaq futures slide as OpenAI IPO delay report rattles techs",
    "link": "https://www.reddit.com/r/stocks/comments/1ug3ydx/sp_500_nasdaq_futures_slide_as_openai_ipo_delay/",
@@ -37253,20 +37289,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "S&P 500 e futures Nasdaq in calo mentre il rapporto sul ritardo dell'IPO di OpenAI scuote i tecnici"
-  },
-  {
-   "source": "CNBC Markets",
-   "title": "Shipping rebounds in Strait of Hormuz one week after U.S.-Iran deal – but fragile confidence threatens recovery",
-   "link": "https://www.cnbc.com/2026/06/26/strait-of-hormuz-shipping-oil-us-iran.html",
-   "published": "2026-06-26T09:36:24Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La navigazione marittima riparte nello Stretto di Hormuz una settimana dopo l’accordo tra Stati Uniti e Iran, ma la fragile fiducia minaccia la ripresa"
   },
   {
    "source": "Investing.com",
@@ -37296,6 +37318,19 @@
    "title_it": "Le azioni Micron esplodono in rialzo dopo il battito degli utili alimentati dall'intelligenza artificiale: sono in arrivo ulteriori rialzi?"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Does AMD pay dividends? How the chipmaker spends its money",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/does-amd-pay-dividends-chipmaker-152200952.html",
+   "published": "2026-06-27T15:22:00Z",
+   "tickers": [
+    "AMD"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "AMD paga dividendi? Come spende i suoi soldi il produttore di chip"
+  },
+  {
    "source": "Reddit",
    "title": "Micron’s Earnings Were Incredible - But Are AI/Semiconductor Expectations Becoming Dangerous?",
    "link": "https://www.reddit.com/r/stocks/comments/1uh4l5u/microns_earnings_were_incredible_but_are/",
@@ -37309,24 +37344,37 @@
    "title_it": "I guadagni di Micron sono stati incredibili, ma le aspettative sull’intelligenza artificiale e sui semiconduttori stanno diventando pericolose?"
   },
   {
-   "source": "Yahoo Finance",
-   "title": "Bank of America resets Micron stock price target after earnings",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/bank-america-resets-micron-stock-143700974.html",
-   "published": "2026-06-27T14:37:00Z",
+   "source": "CNBC",
+   "title": "Alphabet burnishes one of its best weapons in the battle for AI supremacy",
+   "link": "https://www.cnbc.com/2026/06/27/alphabet-burnishes-one-of-its-best-weapons-in-the-battle-for-ai-supremacy.html",
+   "published": "2026-06-27T13:21:04Z",
+   "tickers": [
+    "GOOGL"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Alphabet lucida una delle sue migliori armi nella battaglia per la supremazia dell'IA"
+  },
+  {
+   "source": "Reddit",
+   "title": "Korean markets triggered 2 circuit breakers this week, 1 after incredible MU earnings. Is this cause for concern?",
+   "link": "https://www.reddit.com/r/stocks/comments/1ughxkh/korean_markets_triggered_2_circuit_breakers_this/",
+   "published": "2026-06-26T20:23:23Z",
    "tickers": [
     "MU"
    ],
    "topic_pri": 1,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "La Bank of America reimposta il target di prezzo delle azioni Micron dopo gli utili"
+   "title_it": "I mercati coreani hanno innescato 2 interruttori automatici questa settimana, 1 dopo gli incredibili guadagni MU. Questo è motivo di preoccupazione?"
   },
   {
    "source": "Polymarket",
    "title": "Bitcoin Up or Down on June 27?",
-   "title_it": "Bitcoin Up or Down on June 27? — probabilità Sì 62%",
+   "title_it": "Bitcoin Up or Down on June 27? — probabilità Sì 97%",
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-june-27-2026",
-   "published": "2026-06-27T15:00:20Z",
+   "published": "2026-06-27T15:47:29Z",
    "tickers": [
     "MACRO"
    ],
@@ -37337,7 +37385,7 @@
    "title": "Will the price of Bitcoin be above $58,000 on June 27?",
    "title_it": "Will the price of Bitcoin be above $58,000 on June 27? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-58k-on-june-27-2026",
-   "published": "2026-06-27T15:00:20Z",
+   "published": "2026-06-27T15:47:29Z",
    "tickers": [
     "MACRO"
    ],
@@ -37348,7 +37396,7 @@
    "title": "Will the price of Bitcoin be above $56,000 on June 27?",
    "title_it": "Will the price of Bitcoin be above $56,000 on June 27? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-56k-on-june-27-2026",
-   "published": "2026-06-27T15:00:20Z",
+   "published": "2026-06-27T15:47:29Z",
    "tickers": [
     "MACRO"
    ],
@@ -37359,7 +37407,7 @@
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 80%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-06-27T15:00:20Z",
+   "published": "2026-06-27T15:47:29Z",
    "tickers": [
     "MACRO"
    ],
