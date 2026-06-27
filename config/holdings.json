@@ -4,7 +4,7 @@
    "ticker": "AMD",
    "name": "AMD",
    "qty": 100,
-   "pmc": 153.92,
+   "pmc": 153.916,
    "bval": 46782.07,
    "bgain": 32456
   },
@@ -12,7 +12,7 @@
    "ticker": "NVDA",
    "name": "NVIDIA",
    "qty": 270,
-   "pmc": 87.17,
+   "pmc": 81.167,
    "bval": 49608.7,
    "bgain": 27655.67
   },
@@ -20,9 +20,9 @@
    "ticker": "AVGO",
    "name": "Broadcom Inc.",
    "qty": 25,
-   "pmc": 365.00,
-   "bval": 9125.50,
-   "bgain": 0.50
+   "pmc": 365,
+   "bval": 9125.5,
+   "bgain": 0.5
   },
   {
    "ticker": "MU",
@@ -36,7 +36,7 @@
    "ticker": "MSTR",
    "name": "Strategy",
    "qty": 173,
-   "pmc": 173.30,
+   "pmc": 173.304,
    "bval": 12071.52,
    "bgain": -10253.59
   },
@@ -44,7 +44,7 @@
    "ticker": "RGTI",
    "name": "Rigetti",
    "qty": 515,
-   "pmc": 26.5,
+   "pmc": 26.504,
    "bval": 11072.9,
    "bgain": -2424.61
   },
