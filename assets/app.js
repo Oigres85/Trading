@@ -8,13 +8,13 @@ const SORT_FIELDS = {
   // allineato 1:1 alle <th>: Titolo,Qtà,PMC,Prezzo,Oggi,Pre/After,Volume,Guadagno,Guad.%,
   // P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,Vol/media,RS 1M,Segnale,Rating,Target Δ,
   // Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
-  "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg",
+  "ptf-table": ["name", "qty", "pmc", "price", "change_pct",
                 "gain", "gain_pct", "pe", "beta", "sharpe_1y", "support",
                 "resistance", "rsi", "vol_ratio", "rs_1m", null, "upside_pct", "upside_pct",
                 "fin_health", "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,
   // Vol/media,RS 1M,Segnale,Rating,Target Δ,Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
-  "wl-table": ["name", "price", "change_pct", "prepost_chg", "pe",
+  "wl-table": ["name", "price", "change_pct", "pe",
                "beta", "sharpe_1y", "support", "resistance", "rsi", "vol_ratio",
                "rs_1m", null, "upside_pct", "upside_pct", "fin_health",
                "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
@@ -184,7 +184,12 @@ const REFRESH_STAGES = [
   [72, "Generazione e validazione data.json…"],
   [88, "Quasi pronto, attendo la pubblicazione…"],
 ];
-function showRefreshProgress() {
+const PRICE_STAGES = [
+  [0,  "Scarico i prezzi live (Yahoo)…"],
+  [45, "Aggiorno controvalori e P&L…"],
+  [75, "Quasi pronto…"],
+];
+function showRefreshProgress(est = 150000, stages = REFRESH_STAGES) {
   hideRefreshProgress();
   const el = document.createElement("div");
   el.id = "refresh-progress";
@@ -194,12 +199,11 @@ function showRefreshProgress() {
     <div class="rp-track"><div class="rp-fill" id="rp-fill" style="width:0%"></div></div>`;
   document.body.appendChild(el);
   const start = Date.now();
-  const EST = 150000;   // stima ~2,5 minuti
   _refreshTimer = setInterval(() => {
-    const pct = Math.min(92, ((Date.now() - start) / EST) * 92);
-    const stage = [...REFRESH_STAGES].reverse().find(s => pct >= s[0]) || REFRESH_STAGES[0];
+    const pct = Math.min(92, ((Date.now() - start) / est) * 92);
+    const stage = [...stages].reverse().find(s => pct >= s[0]) || stages[0];
     setRefreshProgress(pct, stage[1]);
-  }, 500);
+  }, 300);
 }
 function setRefreshProgress(pct, msg) {
   const f = document.getElementById("rp-fill"); if (f) f.style.width = pct.toFixed(0) + "%";
@@ -244,14 +248,16 @@ async function quickRefresh() {
   const orig = btn.textContent;
   btn.classList.add("btn-refreshing");
   btn.textContent = "⟳ Aggiorno…";
+  showRefreshProgress(7000, PRICE_STAGES);   // stessa barra di "Rigenera tutto", ma veloce
   try {
     await Promise.allSettled([livePrices(), loadData(false)]);
+    finishRefreshProgress(true);
     btn.classList.remove("btn-refreshing");
     btn.classList.add("btn-done");
     btn.textContent = "✓ Prezzi aggiornati";
-    toast("Prezzi aggiornati ✓ (per fondamentali/news usa Rigenera tutto)");
     setTimeout(() => { btn.textContent = orig; btn.classList.remove("btn-done"); }, 4000);
   } catch {
+    finishRefreshProgress(false);
     btn.classList.remove("btn-refreshing");
     btn.textContent = orig;
     toast("Errore aggiornamento prezzi");
@@ -862,13 +868,12 @@ function openDecisionModal() {
   // tabella ACCUMULO azionario con prezzo limite, quantità e motivazione
   const accHtml = (v.withPlan || []).length ? `
     <h4 style="margin:10px 0 4px">Accumulo azionario — ordini limite suggeriti</h4>
-    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Qualità</th><th class="num">Prezzo</th><th class="num">Limite</th><th class="num">Qtà</th><th>Motivazione</th></tr></thead><tbody>
+    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Limite</th><th class="num">Azioni da comprare</th><th>Motivazione</th></tr></thead><tbody>
     ${v.withPlan.map(p => `<tr>
       <td>${esc(p.r.name)} <span class="tk">${p.r.ticker}</span></td>
-      <td class="num"><b style="color:${scoreColor(p.q)}">${p.q}</b></td>
       <td class="num">$${fmtNum.format(p.r.price)}</td>
       <td class="num"><b style="color:var(--green)">$${fmtNum.format(Math.round(p.limit * 100) / 100)}</b></td>
-      <td class="num"><b>${p.qty}</b></td>
+      <td class="num"><b style="font-size:14px">${p.qty}</b></td>
       <td style="font-size:11px">${signTxt(p.dd)} dal max 52S · qualità ${p.q}/100 — accumulo sul supporto</td>
     </tr>`).join("")}</tbody></table>
     <div class="info-line muted" style="font-size:11px;margin-top:4px">Quantità calcolate ripartendo la liquidità (${fmtEUR.format(cashEur)}) sui titoli più scontati. Imposta ordini LIMITE: se il prezzo non arriva, la cassa si conserva.</div>` : "";
@@ -3041,7 +3046,6 @@ function renderTable() {
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${priceTxt(r, c)}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
-      <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num ${signCls(gEur)}">${signTxt(Math.round(gEur), " €")}${r.currency === "USD" && r.gain != null ? `<br><span class="sub-eur muted">${signTxt(Math.round(r.gain), " $")} live</span>` : ""}</td>
       <td class="num ${signCls(gPct)}"><b>${signTxt(Math.round(gPct * 100) / 100)}</b></td>
       ${techCells(r)}
@@ -3051,13 +3055,13 @@ function renderTable() {
   const t = DATA.totals;
   const usdValue = DATA.portfolio.filter(r => r.currency === "USD").reduce((s, r) => s + r.value, 0);
   const totalRow = `<tr class="total-row">
-    <td class="name-cell" colspan="6">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
+    <td class="name-cell" colspan="5">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
     <td colspan="17" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="25"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="24"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applyColLabels("ptf-table");
 }
@@ -3083,11 +3087,10 @@ function renderWatchlist() {
       <td class="name-cell">${rowDot(r)}${delBtn("watchlist", r.ticker)}<button class="row-add" data-tk="${r.ticker}" data-price="${r.price}" title="Aggiungi ${r.ticker} al portafoglio">➕</button>${esc(r.name)}<span class="tk">${r.ticker}</span></td>
       <td class="num"><b>${priceTxt(r, c(r))}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
-      <td class="num">${prepostCell(r.prepost)}</td>
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="21" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="20" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="21"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="20"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   applyColLabels("wl-table");
 }
@@ -3345,19 +3348,7 @@ function renderGauges() {
       <div class="gauge-sub"><b>${FG_LABELS[fg.rating] || fg.rating}</b> · 1 sett: ${fg.week_ago} · 1 mese: ${fg.month_ago}</div>
     </div>`);
   }
-  if (m.vix) {
-    const score = Math.max(0, Math.min(100, 100 - m.vix.value / 50 * 100));   // VIX basso = verde
-    cards.push(thermoCard("vix", "VIX — Volatilità", score, fmtNum.format(m.vix.value),
-      `${signTxt(m.vix.change_pct)} oggi<br>${m.vix.value < 17 ? "Mercato calmo" : m.vix.value < 25 ? "Tensione moderata" : "Alta volatilità"}`, ["Calmo", "Panico"]));
-  }
-  if (m.fedwatch) {
-    const fw = m.fedwatch;
-    const score = Math.max(0, Math.min(100, 50 - fw.delta_bp));   // tagli prezzati = verde
-    const dir = fw.delta_bp <= -10 ? `tagli prezzati (~${Math.abs(fw.delta_bp)} bp)` :
-                fw.delta_bp >= 10 ? `rialzi prezzati (~${fw.delta_bp} bp)` : "tassi fermi attesi";
-    cards.push(thermoCard("fedwatch", "FedWatch (futures FF)", score, fw.target_range,
-      `implicito <b>${fmtNum.format(fw.implied_rate)}%</b> · ${dir}`, ["Accomodante", "Restrittivo"]));
-  }
+  // VIX e FedWatch rimossi dai gauge: i loro valori sono già nel box MacroQuant (ciclo).
   if (m.carry) {
     const cy = m.carry;
     const score = Math.max(0, Math.min(100, cy.spread / 5 * 100));
@@ -3370,12 +3361,7 @@ function renderGauges() {
     cards.push(thermoCard("putcall", `Put/Call ${pc.symbol}`, score, fmtNum.format(pc.ratio),
       `<b>${pc.ratio > 1 ? "Prevalgono PUT" : "Prevalgono CALL"}</b><br>put ${pc.puts.toLocaleString("it-IT")} · call ${pc.calls.toLocaleString("it-IT")}`, ["Call", "Put"]));
   }
-  if (m.credit) {
-    const cr = m.credit;
-    cards.push(thermoCard("credit", "Rischio Credito (HY)", cr.score,
-      `${fmtNum.format(cr.spread_hy)}% OAS`,
-      `ICE BofA HY · <b style="color:${scoreColor(cr.score)}">${cr.label}</b><br>spread alto = stress sistemico`, ["Basso", "Elevato"]));
-  }
+  // Rischio Credito (HY) rimosso dai gauge: già incluso nel box MacroQuant (ciclo).
   if (m.smart_money) {
     const sm = m.smart_money;
     const fgGauge = m.fear_greed?.score;
@@ -3654,19 +3640,17 @@ function renderNewsSummary(list) {
   if (!list.length) { box.innerHTML = ""; return; }
   const s = newsSummary(list);
   const pct = v => Math.round(v / s.tot * 100);
+  // riga unica e compatta: tono + barra + conteggi (dettaglio completo nel popup)
   box.innerHTML = `
-    <div class="ns-head">Sintesi · <b style="color:${s.tone.c}">${s.tone.t}</b> <span class="muted">su ${s.tot} notizie</span></div>
-    <div class="ns-bar" title="positive ${s.bull} · neutre ${s.neu} · negative ${s.bear}">
-      <span class="ns-seg ns-bull" style="width:${pct(s.bull)}%"></span>
-      <span class="ns-seg ns-neu" style="width:${pct(s.neu)}%"></span>
-      <span class="ns-seg ns-bear" style="width:${pct(s.bear)}%"></span>
-    </div>
-    <div class="ns-legend">
-      <span class="pos">▲ ${s.bull} positive (${pct(s.bull)}%)</span>
-      <span class="muted">● ${s.neu} neutre</span>
-      <span class="neg">▼ ${s.bear} negative (${pct(s.bear)}%)</span>
-    </div>
-    ${s.top ? `<div class="ns-top"><span class="muted">Più citati (tuoi titoli):</span> ${s.top}</div>` : ""}`;
+    <div class="ns-line">
+      <b style="color:${s.tone.c}">${s.tone.t}</b>
+      <span class="ns-bar" title="positive ${s.bull} · neutre ${s.neu} · negative ${s.bear}">
+        <span class="ns-seg ns-bull" style="width:${pct(s.bull)}%"></span>
+        <span class="ns-seg ns-neu" style="width:${pct(s.neu)}%"></span>
+        <span class="ns-seg ns-bear" style="width:${pct(s.bear)}%"></span>
+      </span>
+      <span class="ns-counts muted"><span class="pos">▲${s.bull}</span> <span class="neg">▼${s.bear}</span> · ${s.tot} news ›</span>
+    </div>`;
 }
 
 function renderNews() {
@@ -4294,7 +4278,7 @@ $("#cash-save").addEventListener("click", saveCash);
 $("#cash-input").addEventListener("keydown", e => { if (e.key === "Enter") saveCash(); });
 $("#signposts-box").addEventListener("click", openSignpostsModal);
 $("#tilt-box").addEventListener("click", openTiltModal);
-$("#portfolio-health").addEventListener("click", openHealthModal);
+$("#portfolio-health")?.addEventListener("click", openHealthModal);
 $("#macroquant-box").addEventListener("click", openMacroQuantModal);
 $("#seasonality-box").addEventListener("click", openSeasonalityModal);
 $("#tracking-error-box")?.addEventListener("click", openAlphaModal);
@@ -4415,12 +4399,12 @@ document.addEventListener("click", (e) => {
 });
 
 /* modifica posizioni */
-$("#ptf-edit").addEventListener("click", () => {
+$("#ptf-edit")?.addEventListener("click", () => {
   editMode.portfolio = !editMode.portfolio;
   $("#ptf-edit").classList.toggle("chip-active", editMode.portfolio);
   renderTable();
 });
-$("#wl-edit").addEventListener("click", () => {
+$("#wl-edit")?.addEventListener("click", () => {
   editMode.watchlist = !editMode.watchlist;
   $("#wl-edit").classList.toggle("chip-active", editMode.watchlist);
   renderWatchlist();

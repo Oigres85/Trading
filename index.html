@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=72">
+<link rel="stylesheet" href="assets/style.css?v=73">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -33,46 +33,39 @@
   <!-- DECISIONE (top bar) -->
   <section class="card decision-bar" id="decision-bar" tabindex="0" role="button" title="Verdetto operativo — clicca per dettagli e diario delle azioni"></section>
 
-  <!-- ALLOCAZIONE -->
-  <div class="grid-1">
-    <section class="card">
-      <div class="card-head">
-        <h2>Asset allocation</h2>
-        <div class="card-head-right">
-          <div class="spark-toggle" id="alloc-toggle" role="group" aria-label="Vista allocazione">
-            <button class="chip chip-active" data-mode="ticker">Per titolo</button>
-            <button class="chip" data-mode="sector">Per settore</button>
-          </div>
-          <button class="btn btn-ghost btn-sm" id="alloc-edit" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica</button>
-        </div>
+  <!-- PATRIMONIO -->
+  <section class="card kpi-card">
+    <section class="kpi-grid kpi-compact" id="kpi-grid"></section>
+  </section>
+
+  <!-- ALLOCAZIONE: solo torta + legenda laterale + liquidità -->
+  <section class="card">
+    <div class="card-head">
+      <h2>Asset allocation</h2>
+      <button class="btn btn-ghost btn-sm" id="alloc-edit" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica</button>
+    </div>
+    <div class="alloc-top">
+      <div class="alloc-donut-wrap"><div id="alloc-donut"></div></div>
+      <ul class="alloc-legend" id="alloc-legend"></ul>
+    </div>
+    <div class="spark-toggle alloc-toggle-below" id="alloc-toggle" role="group" aria-label="Vista allocazione">
+      <button class="chip chip-active" data-mode="ticker">Per titolo</button>
+      <button class="chip" data-mode="sector">Per settore</button>
+    </div>
+    <section class="cash-box cash-box-inline alloc-cash">
+      <label for="cash-input">Liquidità disponibile (€)</label>
+      <div class="cash-row">
+        <input type="number" id="cash-input" min="0" step="any" placeholder="es. 20000" aria-label="Liquidità disponibile in euro">
+        <button class="btn btn-primary btn-sm" id="cash-save">Salva</button>
       </div>
-      <section class="kpi-grid kpi-compact" id="kpi-grid"></section>
-      <div class="btp-info" id="btp-info"></div>
-      <!-- vista allocazione (per titolo/settore) SOPRA il box liquidità -->
-      <div class="alloc-top">
-        <div class="alloc-donut-wrap"><div id="alloc-donut"></div></div>
-        <ul class="alloc-legend" id="alloc-legend"></ul>
-      </div>
-      <div class="alloc-bottom">
-        <section class="cash-box cash-box-inline">
-          <label for="cash-input">Liquidità disponibile (€)</label>
-          <div class="cash-row">
-            <input type="number" id="cash-input" min="0" step="any" placeholder="es. 20000" aria-label="Liquidità disponibile in euro">
-            <button class="btn btn-primary btn-sm" id="cash-save">Salva</button>
-          </div>
-          <span class="muted" id="cash-note"></span>
-          <div class="cash-drag" id="cash-drag" hidden></div>
-        </section>
-        <div id="milione-tracker"></div>
-      </div>
+      <span class="muted" id="cash-note"></span>
     </section>
-  </div>
+  </section>
 
   <!-- MACRO & MERCATI -->
   <section class="card">
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
     <div class="mini-cards">
-      <div class="mini-card" id="portfolio-health" tabindex="0" role="button" title="Salute del portafoglio — clicca per il dettaglio"></div>
       <div class="mini-card" id="macroquant-box" tabindex="0" role="button" title="MacroQuant (stile BCA) — clicca per il dettaglio"></div>
       <div class="mini-card" id="signposts-box" tabindex="0" role="button" title="BofA Bear Market Signposts — clicca per il dettaglio"></div>
       <div class="mini-card" id="tilt-box" tabindex="0" role="button" title="Rotazione settoriale — clicca per il dettaglio"></div>
@@ -102,13 +95,10 @@
       <span class="range-lab" id="range-lab-tech">Intervallo:</span>
       <div class="spark-toggle" id="spark-toggle" role="group" aria-label="Intervallo analisi tecnica e mini-grafico">
         <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
-        <button class="chip" data-range="w1" aria-label="Una settimana">1S</button>
         <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
-        <button class="chip" data-range="m3" aria-label="Tre mesi">3M</button>
         <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
       </div>
       <button class="btn btn-ghost btn-sm" id="ptf-edit-values" aria-label="Modifica quantità, PMC e liquidità" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica valori</button>
-      <button class="btn btn-ghost btn-sm" id="ptf-edit" aria-label="Aggiungi o rimuovi titoli dal portafoglio" title="Aggiungi o rimuovi titoli">+ / − Titoli</button>
     </div>
     <div class="table-wrap" id="ptf-fund-wrap" hidden>
       <table id="ptf-fund-table" aria-label="Portafoglio — analisi fondamentale"><thead></thead><tbody></tbody></table>
@@ -122,7 +112,6 @@
             <th class="num">PMC</th>
             <th class="num">Prezzo</th>
             <th class="num">Oggi</th>
-            <th class="num">Pre/After</th>
             <th class="num">Guadagno</th>
             <th class="num">Guad. %</th>
             <th class="num">P/E</th>
@@ -164,9 +153,7 @@
       <span class="range-lab" id="wl-range-lab">Intervallo:</span>
       <div class="spark-toggle" id="spark-toggle-wl" role="group" aria-label="Intervallo analisi tecnica watchlist">
         <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
-        <button class="chip" data-range="w1" aria-label="Una settimana">1S</button>
         <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
-        <button class="chip" data-range="m3" aria-label="Tre mesi">3M</button>
         <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
       </div>
     </div>
@@ -180,7 +167,6 @@
             <th class="sticky-col">Titolo</th>
             <th class="num">Prezzo</th>
             <th class="num">Oggi</th>
-            <th class="num">Pre/After</th>
             <th class="num">P/E</th>
             <th class="num">Beta</th>
             <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
@@ -326,6 +312,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=72"></script>
+<script src="assets/app.js?v=73"></script>
 </body>
 </html>

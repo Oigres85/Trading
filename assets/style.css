@@ -822,6 +822,23 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .trend-up { color: var(--green); }
 .trend-down { color: var(--red); }
 .trend-flat { color: var(--muted); }
+
+/* ---------- v73: news bar compatta (una riga) ---------- */
+.macro-news { margin-top: 14px; }
+#news-summary { padding: 7px 12px; }
+.ns-line { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.ns-line .ns-bar { flex: 1; max-width: 220px; margin: 0; height: 7px; }
+.ns-counts { white-space: nowrap; font-family: var(--mono); font-size: 11px; }
+
+/* ---------- v73: card più alte per evitare testi troncati nelle mini-tab ---------- */
+.gauge-card, .mini-card { height: 132px; }
+.gauge-card .g-title, .mc-title { height: auto; min-height: 24px; max-height: 30px; }
+.gauge-sub, .mc-sub { -webkit-line-clamp: 3; }
+
+/* ---------- v73: allocation semplificata ---------- */
+.kpi-card { padding: 12px 16px; }
+.alloc-toggle-below { margin: 14px auto 6px; width: max-content; }
+.alloc-cash { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); max-width: 360px; }
 @media (max-width: 760px) { .decision-bar { flex-wrap: wrap; gap: 8px; } .dec-mid { order: 3; flex-basis: 100%; max-width: none; } .dec-reason { white-space: normal; } }
 
 /* ---------- v70: News dentro Macro + scroll popup ---------- */
