@@ -125,14 +125,25 @@ async function loadData(showSpin = false) {
   const btn = $("#btn-refresh");
   if (showSpin) btn.classList.add("spinning");
   try {
-    DATA = await fetchData();
+    // i proxy/CDN gratuiti a volte falliscono: riprovo fino a 3 volte prima di arrendermi
+    let lastErr;
+    for (let i = 0; i < 3; i++) {
+      try { DATA = await fetchData(); lastErr = null; break; }
+      catch (e) { lastErr = e; await new Promise(r => setTimeout(r, 1200 * (i + 1))); }
+    }
+    if (lastErr) throw lastErr;
     mergeManualHoldings();        // reintegra le posizioni aggiunte a mano (localStorage)
     renderAll();
     livePrices();
     if (showSpin) toast("Dati ricaricati ✓");
   } catch (e) {
     console.error(e);
-    if (showSpin) toast("Errore nel caricamento dati");
+    // se non ho mai caricato dati, mostro un avviso invece di una pagina vuota
+    if (!DATA) {
+      const el = $("#earnings-alert");
+      if (el) { el.hidden = false; el.className = "data-error"; el.innerHTML = `⚠ Impossibile caricare i dati (rete/proxy). <button class="btn btn-ghost btn-sm" onclick="loadData(true)">Riprova</button>`; }
+    }
+    if (showSpin) toast("Errore nel caricamento dati — riprovo tra poco");
   } finally {
     btn.classList.remove("spinning");
   }
@@ -620,12 +631,24 @@ async function livePrices() {
 
 function renderAll() {
   const d = new Date(DATA.updated_at);
-  $("#updated-at").textContent = d.toLocaleString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  const at = $("#updated-at");
+  at.textContent = d.toLocaleString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  // badge "dati vecchi": se il workflow non rigenera da >8 ore, avviso (la pipeline gira più volte al dì)
+  const ageH = (Date.now() - d.getTime()) / 3600000;
+  const upd = at.closest(".upd-item");
+  if (upd) {
+    upd.classList.toggle("stale", ageH > 8);
+    at.title = ageH > 8 ? `Dati di ${Math.round(ageH)} ore fa — premi "↻ Rigenera tutto" per aggiornarli` : "";
+    upd.querySelector(".stale-tag")?.remove();
+    if (ageH > 8) { const s = document.createElement("span"); s.className = "stale-tag"; s.textContent = ` ⚠ ${Math.round(ageH)}h fa`; at.after(s); }
+  }
   recomputeTotals();            // include la liquidità nei totali/allocazione
   renderCash();
   renderKPI();
+  renderPatrimonioSpark();
   renderAllocation();
   renderEarnings();
+  renderEarningsAlert();
   renderTable();
   if (ptfView === "fund") renderFundTable();
   renderWatchlist();
@@ -639,6 +662,41 @@ function renderAll() {
   renderBtpInfo();
   renderSellCalc();
   pmcInit();
+}
+
+/* mini-grafico andamento patrimonio (da metrics_history; fallback history.all) */
+function renderPatrimonioSpark() {
+  const box = $("#patrimonio-spark");
+  if (!box) return;
+  let vals = [];
+  const mh = DATA.metrics_history || [];
+  if (mh.length >= 2) vals = mh.map(p => p.eur_value).filter(v => v != null);
+  if (vals.length < 2) { const h = DATA.history?.all; if (h?.values?.length >= 2) vals = h.values; }
+  if (vals.length < 2) { box.innerHTML = ""; return; }
+  const first = vals[0], last = vals[vals.length - 1], chg = first ? (last / first - 1) * 100 : 0;
+  box.innerHTML = `<div class="psp-head"><span class="muted">Andamento patrimonio</span>
+    <span class="${signCls(chg)}">${signTxt(Math.round(chg * 10) / 10)}</span></div>
+    <div class="psp-spark">${sparkline(vals)}</div>`;
+}
+
+/* banner di alert: trimestrali entro 7 giorni (rischio binario) con Implied Move */
+function renderEarningsAlert() {
+  const box = $("#earnings-alert");
+  if (!box) return;
+  const all = [...DATA.portfolio, ...(DATA.watchlist || [])];
+  const items = all.filter(r => r.earnings_date)
+    .map(r => ({ ...r, days: Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) }))
+    .filter(r => r.days >= 0 && r.days <= 7)
+    .sort((a, b) => a.days - b.days);
+  if (!items.length) { box.hidden = true; box.innerHTML = ""; box.className = ""; return; }
+  const ptf = new Set(DATA.portfolio.map(x => x.ticker));
+  box.hidden = false;
+  box.className = "earnings-alert";
+  box.innerHTML = `<span class="ea-lab">⚠ Trimestrali entro 7 giorni</span>` + items.map(r => {
+    const im = typeof impliedMoveForEarnings === "function" ? impliedMoveForEarnings(r) : null;
+    const when = r.days <= 0 ? "oggi" : r.days === 1 ? "domani" : `tra ${r.days}gg`;
+    return `<span class="ea-chip${ptf.has(r.ticker) ? "" : " ea-wl"}" title="${esc(r.name)}${ptf.has(r.ticker) ? "" : " (watchlist)"}">${r.ticker} · ${when}${im != null ? ` · ±${im}%` : ""}</span>`;
+  }).join("");
 }
 
 /* ---------------- liquidità (cash) ---------------- */
@@ -794,6 +852,11 @@ function decisionVerdict() {
   const trim = (DATA.portfolio || []).filter(isEquity)
     .filter(r => r.qty && ((r.pe && r.pe > 150) || (r.rsi && r.rsi > 78)))
     .sort((a, b) => (b.pe || 0) - (a.pe || 0));
+  // TAX ALPHA: "rami secchi" in perdita latente (ROIC<0 o Sharpe<0) → minusvalenze da usare come scudo fiscale
+  const harvest = (DATA.portfolio || []).filter(isEquity)
+    .filter(r => r.qty && r.gain_eur != null && r.gain_eur < 0 &&
+      ((r.stats?.roe != null && r.stats.roe < 0) || (r.sharpe_1y != null && r.sharpe_1y < 0)))
+    .sort((a, b) => a.gain_eur - b.gain_eur);
   // budget per candidato: deploy ~30% della liquidità sul migliore, poi a scalare
   const cashUsd = cashEur * eurusd;
   const withPlan = accumula.map((r, i) => {
@@ -820,7 +883,7 @@ function decisionVerdict() {
     reasons.push(`regime ${dir != null ? dir + "/100" : "neutro"}: lascia correre le posizioni vincenti, conserva la liquidità`);
   }
   if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => r.ticker).join(", ")} (multiplo/RSI estremo)`);
-  return { label, col, score, reasons, dir, accumula, trim, withPlan, zombieSkipped };
+  return { label, col, score, reasons, dir, accumula, trim, withPlan, zombieSkipped, harvest };
 }
 
 // alert proattivi: condizioni rilevanti emerse oggi (deep value, correzione, squeeze, VIX)
@@ -903,10 +966,28 @@ function openDecisionModal() {
       <td class="num"><b>${Math.round((r.qty || 0) * 0.3)}</b></td>
       <td style="font-size:11px">${r.pe > 150 ? `multiplo tossico (P/E ${fmtNum.format(r.pe)})` : `RSI estremo (${r.rsi})`} — recupera capitale di rischio, lascia correre il resto</td>
     </tr>`; }).join("")}</tbody></table>` : "";
+  // TAX ALPHA: scudi fiscali (minusvalenze dei rami secchi) per compensare le plus delle vendite
+  let taxHtml = "";
+  if ((v.harvest || []).length) {
+    const totMinus = v.harvest.reduce((s, r) => s + (r.gain_eur || 0), 0);   // negativo
+    const totPlus = (v.trim || []).reduce((s, r) => s + Math.max(0, (r.gain_eur || 0)), 0);
+    const offset = Math.min(Math.abs(totMinus), totPlus);
+    const taxSaved = offset * 0.26;
+    taxHtml = `
+    <h4 style="margin:12px 0 4px">Scudi fiscali (Tax Alpha)</h4>
+    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Minus latente</th><th class="num">Azioni</th><th>Nota</th></tr></thead><tbody>
+    ${v.harvest.map(r => `<tr>
+      <td>${esc(r.name)} <span class="tk">${r.ticker}</span></td>
+      <td class="num"><b class="neg">${signTxt(Math.round(r.gain_eur), " €")}</b></td>
+      <td class="num"><b>${r.qty}</b></td>
+      <td style="font-size:11px">ramo secco (${r.stats?.roe != null && r.stats.roe < 0 ? "ROIC<0" : "Sharpe<0"}) — vendendolo realizzi una minusvalenza usabile come scudo</td>
+    </tr>`).join("")}</tbody></table>
+    <div class="info-line muted" style="font-size:11px;margin-top:4px">Vendendo i rami secchi realizzi <b class="neg">${fmtEUR.format(Math.round(totMinus))}</b> di minusvalenze. ${totPlus > 0 ? `Compensano fino a <b>${fmtEUR.format(Math.round(offset))}</b> di plusvalenze dalle vendite sopra, risparmiando ~<b class="pos">${fmtEUR.format(Math.round(taxSaved))}</b> di tasse (26%).` : `Le minus restano disponibili per compensare future plusvalenze (entro il quadriennio fiscale).`}</div>`;
+  }
   openInfoModal(`Decisione operativa: ${v.label}`,
     `<div class="info-line" style="margin-bottom:8px"><b style="color:${v.col};font-size:16px">${v.label}</b></div>
      <ul style="margin:0 0 10px 18px;font-size:12.5px;line-height:1.6">${v.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
-     ${accHtml}${trimHtml}
+     ${accHtml}${trimHtml}${taxHtml}
      <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI, coerente col mandato Diamond Hands (le correzioni sono occasioni di accumulo, non di vendita). Per il piano completo usa "Copia prompt AI".</div>
      <h4 style="margin:10px 0 6px">Diario delle azioni</h4>
      <div class="diary-add"><input type="text" id="diary-input" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="200"><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
