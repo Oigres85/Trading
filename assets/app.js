@@ -865,28 +865,30 @@ function openDecisionModal() {
       <span class="diary-text">${esc(e.text)}</span>
       <button class="diary-del" data-iso="${e.date}" title="Elimina">✕</button>
     </div>`).join("") : `<div class="muted" style="font-size:12px">Nessuna voce ancora. Annota le tue operazioni e le motivazioni: il diario viene incluso nel prompt AI.</div>`;
-  // tabella ACCUMULO azionario con prezzo limite, quantità e motivazione
+  // tabella ACCUMULO (acquisto): prezzo limite d'ingresso, STOP LOSS, quantità, motivazione
   const accHtml = (v.withPlan || []).length ? `
-    <h4 style="margin:10px 0 4px">Accumulo azionario — ordini limite suggeriti</h4>
-    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Limite</th><th class="num">Azioni da comprare</th><th>Motivazione</th></tr></thead><tbody>
-    ${v.withPlan.map(p => `<tr>
+    <h4 style="margin:10px 0 4px">Acquisti — ordini limite suggeriti</h4>
+    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Limite acq.</th><th class="num">Stop loss</th><th class="num">Qtà</th><th>Motivazione</th></tr></thead><tbody>
+    ${v.withPlan.map(p => { const stop = Math.round(p.limit * 0.92 * 100) / 100; return `<tr>
       <td>${esc(p.r.name)} <span class="tk">${p.r.ticker}</span></td>
       <td class="num">$${fmtNum.format(p.r.price)}</td>
       <td class="num"><b style="color:var(--green)">$${fmtNum.format(Math.round(p.limit * 100) / 100)}</b></td>
+      <td class="num"><b style="color:var(--red)">$${fmtNum.format(stop)}</b></td>
       <td class="num"><b style="font-size:14px">${p.qty}</b></td>
-      <td style="font-size:11px">${signTxt(p.dd)} dal max 52S · qualità ${p.q}/100 — accumulo sul supporto</td>
-    </tr>`).join("")}</tbody></table>
-    <div class="info-line muted" style="font-size:11px;margin-top:4px">Quantità calcolate ripartendo la liquidità (${fmtEUR.format(cashEur)}) sui titoli più scontati. Imposta ordini LIMITE: se il prezzo non arriva, la cassa si conserva.</div>` : "";
+      <td style="font-size:11px">${signTxt(p.dd)} dal max 52S · qualità ${p.q}/100 — accumulo sul supporto, stop -8%</td>
+    </tr>`; }).join("")}</tbody></table>
+    <div class="info-line muted" style="font-size:11px;margin-top:4px">Quantità ripartendo la liquidità (${fmtEUR.format(cashEur)}) sui titoli più scontati e solidi. Ordini LIMITE: se il prezzo non arriva, la cassa si conserva. Stop loss ~8% sotto l'ingresso.</div>` : "";
+  // tabella ALLEGGERIMENTO (vendita): prezzo limite di vendita, quantità, motivazione
   const trimHtml = (v.trim || []).length ? `
-    <h4 style="margin:12px 0 4px">Alleggerimento (Free Ride) — valuta TRIM 25-50%</h4>
-    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">P/E</th><th class="num">RSI</th><th class="num">Trim 30%</th><th>Motivazione</th></tr></thead><tbody>
-    ${v.trim.map(r => `<tr>
+    <h4 style="margin:12px 0 4px">Vendite/alleggerimenti — TRIM parziale (Free Ride)</h4>
+    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Limite vend.</th><th class="num">Qtà (30%)</th><th>Motivazione</th></tr></thead><tbody>
+    ${v.trim.map(r => { const lim = Math.round((r.resistance && r.resistance > r.price ? r.resistance : r.price) * 100) / 100; return `<tr>
       <td>${esc(r.name)} <span class="tk">${r.ticker}</span></td>
-      <td class="num">${r.pe ? fmtNum.format(r.pe) : "—"}</td>
-      <td class="num">${r.rsi ?? "—"}</td>
+      <td class="num">$${fmtNum.format(r.price)}</td>
+      <td class="num"><b style="color:var(--green)">$${fmtNum.format(lim)}</b></td>
       <td class="num"><b>${Math.round((r.qty || 0) * 0.3)}</b></td>
-      <td style="font-size:11px">${r.pe > 150 ? "multiplo tossico" : "RSI estremo"} — recupera capitale di rischio, lascia correre il resto</td>
-    </tr>`).join("")}</tbody></table>` : "";
+      <td style="font-size:11px">${r.pe > 150 ? `multiplo tossico (P/E ${fmtNum.format(r.pe)})` : `RSI estremo (${r.rsi})`} — recupera capitale di rischio, lascia correre il resto</td>
+    </tr>`; }).join("")}</tbody></table>` : "";
   openInfoModal(`Decisione operativa: ${v.label}`,
     `<div class="info-line" style="margin-bottom:8px"><b style="color:${v.col};font-size:16px">${v.label}</b></div>
      <ul style="margin:0 0 10px 18px;font-size:12.5px;line-height:1.6">${v.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
@@ -2247,29 +2249,17 @@ function renderTvWidget(r) {
   </div>`;
 }
 
-async function drawTickerChart() {
+function drawTickerChart() {
   const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
   const r = all.find(x => x.ticker === cmTicker);
   if (!r) return;
-  const sym = r.currency === "PTS" ? "" : r.currency === "EUR" ? "€" : "$";
-  const controls = cmControlsHTML(r);
+  // popup titolo: SOLO grafico TradingView (niente candele native), con link alla versione completa
+  const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSymbol(r))}`;
+  const controls = `<div class="cm-controls"><a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">Apri su TradingView ↗</a></div>`;
   $("#chart-modal-title").textContent = `${r.name} (${r.ticker})`;
   $("#chart-modal-tip").innerHTML = "";
   $("#chart-modal").hidden = false;
-  if (cmView === "tv") {
-    $("#chart-modal-body").innerHTML = controls + renderTvWidget(r);
-    return;
-  }
-  $("#chart-modal-body").innerHTML = controls + `<div class="muted" style="padding:40px 0;text-align:center" id="cm-loading">Carico le candele…</div>`;
-  const [yr, yi] = CM_YF[cmRange] || ["1mo", "1d"];
-  const ohlc = await fetchOHLC(r.ticker, yr, yi);
-  if (cmTicker !== r.ticker || cmView !== "candles") return;   // l'utente ha cambiato nel frattempo
-  if (ohlc) {
-    drawCandleChart(ohlc, v => sym + fmtNum.format(v), controls);
-  } else {                                    // fallback: linea dai dati salvati
-    const vals = (r.sparks || {})[cmRange];
-    openChartModal(`${r.name} (${r.ticker})`, vals, synthDates(cmRange, (vals || []).length), v => sym + fmtNum.format(v), controls);
-  }
+  $("#chart-modal-body").innerHTML = controls + renderTvWidget(r);
 }
 
 /* ===================== MODULO OPZIONI — Strike Ladder ===================== */
@@ -3702,47 +3692,18 @@ TEAM DI RIFERIMENTO INTERNO (usali per arricchire l'analisi, NON come sezioni se
   lines.push("");
   lines.push("STEP 1 — RICERCA WEB (obbligatoria PRIMA del report): (a) prezzi e variazioni intraday di TUTTI i titoli in portafoglio e watchlist; (b) notizie ultime 48h per ogni titolo (earnings, guidance, upgrade/downgrade, M&A, regolazione, Fed/BoJ); (c) calendario eventi prossimi 30 giorni (FOMC, BoJ, trimestrali, dati macro chiave); (d) 2-3 nuove idee di ingresso non in portafoglio (momentum, value o event-driven) coerenti con mandato €1M/10 anni. Se i dati web contraddicono quelli sotto, cita la fonte e usa i dati più aggiornati.");
   lines.push("");
-  lines.push(`PRODUCI UN REPORT UNICO STRUTTURATO in queste 5 sezioni — rispondi come UN UNICO ADVISOR che integra tutte le competenze:
+  lines.push(`FORMATO DELLA RISPOSTA — IMPORTANTE: voglio un'analisi DISCORSIVA e ragionata, in prosa scorrevole, NON un elenco di numeri o tabelle tecniche. Usa i dati qui sotto solo per RAGIONARE: nel testo cita pochissime cifre (solo quelle decisive), spiegando il "perché" con parole tue, come un gestore esperto che mi parla a voce. Struttura libera in 3 parti discorsive:
 
-## 1. QUADRO MACRO & REGIME DI MERCATO
-Analizza in modo APPROFONDITO tutti i dati macro forniti:
-- Curva 10A-2A: valore attuale, tendenza, implicazioni recessione/espansione
-- Spread credito HY (OAS): livello, trend 1M, stress sistemico sì/no
-- Carry USD/JPY: spread tassi, rischio unwind yen, prossima BoJ
-- Fear & Greed vs Istituzionali: divergenza? Se sì → classificala (PERICOLOSA / ACCUMULO / NEUTRALE)
-- P/E S&P e Nasdaq vs profitti reali: mercato sopravvalutato o in linea?
-- MacroQuant (ciclo economico): espansione/contrazione, cosa sta guidando
-- Rotazione settoriale: quali settori in forza/debolezza, implicazione per portafoglio tech
-- Fed Watch: scenario tassi prossimi 6 mesi
-**VERDETTO FINALE:** regime bull/bear/range + sovrappeso/sottopeso azionario USA tech nelle prossime 8 settimane. Risponde al mandato CAGR ${cagrNeeded}%?
+1) IL MERCATO, IN SINTESI — Un punto di vista OBIETTIVO e onesto su dove sta andando il mercato (azionario USA / tech in particolare) nelle prossime settimane: qual è il clima (rischio-on o rischio-off), cosa lo sta guidando (ciclo, tassi, sentiment, valutazioni, rotazione settoriale) e quali sono i 2-3 fattori che potrebbero cambiare le carte. Motiva ogni affermazione, senza sciorinare numeri.
 
-## 2. ANALISI PER SINGOLO TITOLO (portafoglio + watchlist)
-Per OGNI titolo usa questo formato fisso — non saltare nessuna voce:
+2) IL MIO PORTAFOGLIO — Un giudizio franco e ragionato sul mio portafoglio nel contesto attuale: punti di forza, fragilità, concentrazione, quali posizioni convincono e quali preoccupano e perché. Inquadralo rispetto all'obiettivo €1.000.000 in 10 anni (profilo Diamond Hands, transizione Fase 1→Fase 2 AI). Parlami come se dovessi capire la situazione complessiva, non i singoli decimali.
 
-### [TICKER] — [Nome]  [PORTAFOGLIO | WATCHLIST]
-**NEWS & CONTESTO (ultime 48h):** 2-3 righe. Cosa è successo al titolo di recente? Earnings, guidance, upgrade/downgrade, news di settore rilevanti, movimenti istituzionali. Se niente di rilevante, scrivi "Nessuna news materiale".
-**FONDAMENTALI:** P/E [X]× (settore [Y]×) · P/FCF [X]× [!FCF se >> P/E] · ROIC [X]% [PREMIUM se >15% | ZOMBIE se <0] · Margine netto [X]% · Crescita ricavi [X]% · PEG [X] · Fair value stimato: $[X] ([upside/downside]% dal prezzo attuale).
-**CATALIZZATORE (Pilastro ③):** [Moonshot — catalizzatore governativo/macro/partnership AI presente, mantieni a prescindere dai bilanci | Nessun catalizzatore speciale]
-**TECNICA:** RSI [X] ([ipercomprato >70 | neutro | ipervenduto <30]) · Supporto chiave: $[X] (rottura = stop loss) · Resistenza chiave: $[X] (target swing) · Volume: [anomalo/normale] · SMC: [struttura rialzista/ribassista/BOS/FVG] · Forza relativa 1M vs [SOX/NDX/S&P]: [+X% / -X% — outperform/underperform]
-**AZIONE RACCOMANDATA (Pilastro ①, mai binaria):** [MANTIENI | FREE RIDE: TRIM 25-50% (N azioni esatte a $Y limite — multiplo tossico/catalizzatore binario, recupero capitale di rischio) | INCREMENTA N azioni a $Y limite | LIQUIDA SCUDO FISCALE: vendi N azioni in perdita (azienda zombie, Pilastro ②) | ATTENDI INGRESSO a $Y] — Stop: $[X]. Motivazione in 1 riga.
+3) COSA FAREI ORA (conclusione sintetica e operativa) — Solo se ci sono operazioni che valga la pena fare. Per ognuna, in forma discorsiva ma con i numeri essenziali:
+   • ACQUISTI: ticker, prezzo LIMITE d'ingresso, STOP LOSS, quantità indicativa — e una frase che spiega PERCHÉ.
+   • VENDITE/ALLEGGERIMENTI: ticker, prezzo LIMITE di vendita, quantità — e il PERCHÉ (presa di profitto, multiplo tirato, tesi indebolita…).
+   Se NON ci sono operazioni sensate, dillo chiaramente ("meglio restare fermi, ecco perché"). Resta coerente col mandato: niente vendite da panico, la liquidità (${fmtEUR.format(cashEur)}) si schiera solo su debolezza reale.
 
----
-*(ripeti per ogni titolo)*
-
-**RIEPILOGO SEZIONE 2:** Setup MIGLIORE per le prossime 2-4 settimane: [ticker]. Setup PEGGIORE: [ticker]. Zone di accumulo (drawdown >15% dal max 52S, polvere secca ${fmtEUR.format(cashEur)}): [titoli con opportunità]. Titoli "Moonshot" da mantenere per catalizzatore: [ticker]. Aziende "zombie" candidate a scudo fiscale: [ticker].
-
-## 3. PIANO OPERATIVO PRIORITÀ & TAX ALPHA (Pilastri ① ② ④)
-**a) Azioni urgenti questa settimana** (ordine di priorità): 1. [ticker, N azioni, prezzo limite, motivazione] · 2. ...
-**b) TRIMMING STRATEGICO (Free Ride):** per ogni titolo ipercomprato / con multiplo tossico (P/E>150) / con earnings binario imminente → quante azioni alleggerire (25-50%) per incassare il capitale di rischio lasciando correre il resto. Indica plus lorda e residuo in Free Ride.
-**c) BILANCIAMENTO FISCALE DINAMICO (Tax Alpha):** se il punto (b) genera plusvalenze tassabili, ABBINA le vendite in profitto a vendite in perdita di aziende zombie (ROIC negativo / tesi rotta) presenti in portafoglio. Calcola le quantità ESATTE affinché le minusvalenze compensino le plusvalenze → tasse ≈ 0. Output in tabella: | Titolo | Azioni da vendere | Plus/Minus € | Effetto fiscale |.
-**d) DEPLOYMENT POLVERE SECCA (${fmtEUR.format(cashEur)}):** SOLO se VIX>20 o titoli in drawdown >15% → ordini limite millimetrici sui supporti (ticker, quantità, prezzo limite, priorità). Includi anche settori non-tech penalizzati (Value/Financials/Aerospace-Difesa/Banche) con ROIC>15%. Se non ci sono condizioni di "blood in the streets", scrivi esplicitamente "Liquidità CONSERVATA — nessun ingresso sui massimi".
-**e) Nuovi ingressi da ricerca web** (NON in portafoglio): 2-3 idee con ticker, entry precisa, tesi in 2 righe, coerenti con mandato FASE 1→2.
-
-## 4. RISCHI, COPERTURE & OUTLOOK
-**Copertura portafoglio:** strategia opzioni low-cost (collar/put spread su QQQ o NDX) con strike e scadenza precisi, compatibile con Diamond Hands (copertura parziale, non totale). Muri opzioni (CW/PW) per titoli con dati disponibili → livelli pinning prossima scadenza.
-**Rischi principali** (in ordine probabilità × impatto): top 3.
-**Outlook:** BREVE (0-4 settimane) · MEDIO (1-3 mesi) · LUNGO (6-18 mesi) — direzione + livello chiave + probabilità %.
-**Calendario eventi prossimi 30 giorni:** trimestrali, FOMC, BoJ, dati macro chiave.`);
+Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Massimo ~600-800 parole.`);
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
@@ -4013,19 +3974,13 @@ Per OGNI titolo usa questo formato fisso — non saltare nessuna voce:
   lines.push("");
   lines.push(`ROTAZIONE & DE-RISKING SEMICONDUTTORI (direttiva esplicita): Analizza l'attuale andamento dei macro-settori (vedi dati ROTAZIONE SETTORIALE sopra). Avendo necessità di effettuare un de-risking sui semiconduttori, crea un piano di rotazione del mio portafoglio basato sulla mia liquidità disponibile (${fmtEUR.format(cashEur)}). Indicami 2-3 ticker alternativi specifici (value o difensivi, oppure FASE 2 AI: Software/Cloud/Cybersecurity/Biotech) per riequilibrare l'assetto, fornendo i relativi prezzi limite d'ingresso.`);
   lines.push("");
-  lines.push(`ISTRUZIONI FINALI DI FORMATO:
-Rispondi come UN UNICO REPORT PROFESSIONALE (non come dialogo tra analisti) con la freddezza tattica di un hedge fund. Usa le 5 sezioni numerate indicate. Per ogni dato quantitativo che citi, indica il valore preciso. Per ogni raccomandazione operativa: TICKER + N AZIONI + PREZZO LIMITE + MOTIVAZIONE IN UNA RIGA. Alla fine aggiungi una sezione SINTESI ESECUTIVA di max 5 bullet point con le 5 azioni più urgenti da fare oggi/questa settimana, ordinate per priorità.
+  lines.push(`PROMEMORIA FINALE — come rispondere:
+- Scrivi in PROSA discorsiva e ragionata (niente tabelle, niente elenchi di numeri): spiega il "perché" come se mi parlassi a voce.
+- Mantieni un punto di vista OBIETTIVO: dimmi anche ciò che non va, non solo il lato positivo.
+- Cita solo le pochissime cifre decisive, integrate nel discorso.
+- Chiudi SEMPRE con la parte operativa sintetica: per ogni operazione consigliata indica prezzo LIMITE (per le vendite), STOP LOSS (per gli acquisti) e quantità indicativa, motivando ciascuna in una frase. Se non c'è nulla da fare, dillo e spiega perché.
 
-VINCOLI MANDATO + 4 PILASTRI ISTITUZIONALI (NON DEROGABILI):
-- CAGR target: ${cagrNeeded}% annuo → ogni raccomandazione deve essere coerente con questo obiettivo
-- Diamond Hands: NON suggerire uscite per volatilità normale (-20/-30%)
-- ① Scale-Out: mai uscite binarie totali → TRIMMING parziale 25-50% (Free Ride) su multipli tossici/earnings binari, non liquidazione completa
-- ② Tax Alpha: ogni plusvalenza va abbinata a minusvalenze di aziende zombie (ROIC<0) per azzerare le tasse 26%
-- ③ Moonshot: titoli con catalizzatore governativo/macro/AI vanno mantenuti anche se i bilanci sono deboli
-- ④ Polvere secca (${fmtEUR.format(cashEur)}): deploy SOLO su VIX>20 o drawdown>15%, con radar multi-settoriale (anche non-tech: Value/Financials/Difesa/Banche, ROIC>15%). Altrimenti CONSERVA.
-- Fase 2 AI: rotazione anticipata verso Software AI / Cloud / Cybersecurity / Biotech AI per il 2026-2028
-
-Conferma in apertura del report di aver integrato questi 4 protocolli istituzionali, poi procedi con l'analisi.`);
+Vincoli di mandato da rispettare nel ragionamento (NON elencarli nella risposta): obiettivo €1M in 10 anni (CAGR ~${cagrNeeded}%); profilo Diamond Hands (niente vendite da panico su volatilità normale); alleggerimenti solo parziali (Free Ride) su multipli tirati o tesi indebolite; liquidità ${fmtEUR.format(cashEur)} da schierare solo su debolezza reale; rotazione progressiva verso la Fase 2 AI (Software/Cloud/Cybersecurity/Biotech).`);
   return lines.join("\n");
 }
 
