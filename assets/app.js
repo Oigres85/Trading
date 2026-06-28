@@ -10,13 +10,13 @@ const SORT_FIELDS = {
   // Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
   "ptf-table": ["name", "qty", "pmc", "price", "change_pct",
                 "gain", "gain_pct", "pe", "beta", "sharpe_1y", "support",
-                "resistance", "rsi", "vol_ratio", "rs_1m", null, "upside_pct", "upside_pct",
+                "resistance", "rsi", "rs_1m", null, "upside_pct",
                 "fin_health", "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,
   // Vol/media,RS 1M,Segnale,Rating,Target Δ,Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
   "wl-table": ["name", "price", "change_pct", "pe",
-               "beta", "sharpe_1y", "support", "resistance", "rsi", "vol_ratio",
-               "rs_1m", null, "upside_pct", "upside_pct", "fin_health",
+               "beta", "sharpe_1y", "support", "resistance", "rsi",
+               "rs_1m", null, "upside_pct", "fin_health",
                "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // tabelle fondamentali (vista Value); i campi "stat:" leggono da r.stats
   "ptf-fund-table": ["name", "qty", "pmc", "price", "stat:market_cap", "stat:ev_ebitda",
@@ -1935,10 +1935,8 @@ function techCells(r) {
       <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
       <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
       <td class="num">${rsiBar(r.rsi)}</td>
-      <td class="num">${volBar(r.vol_ratio)}</td>
       <td class="num rs-cell" data-rs-tk="${r.ticker}" role="button" tabindex="0" title="Clicca per la spiegazione della forza relativa (RS)">${rsBar(r.rs_1m, r.rs_bench)}</td>
       <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
-      <td>${ratingBadge(r.rating)}</td>
       <td class="num">${targetBar(r.rating)}</td>
       <td class="num">${finHealthBar(r)}</td>
       ${shortFloatCell(r)}
@@ -3048,10 +3046,10 @@ function renderTable() {
     <td class="name-cell" colspan="5">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="17" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="15" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="24"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="22"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applyColLabels("ptf-table");
 }
@@ -3078,9 +3076,9 @@ function renderWatchlist() {
       <td class="num"><b>${priceTxt(r, c(r))}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="20" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="18" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="20"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="18"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   applyColLabels("wl-table");
 }
@@ -4239,6 +4237,7 @@ $("#seasonality-box").addEventListener("click", openSeasonalityModal);
 $("#tracking-error-box")?.addEventListener("click", openAlphaModal);
 $("#ptf-edit-values")?.addEventListener("click", openEditPortfolio);
 $("#alloc-edit")?.addEventListener("click", openEditPortfolio);
+$("#kpi-edit")?.addEventListener("click", openEditPortfolio);
 $("#decision-bar")?.addEventListener("click", openDecisionModal);
 $("#sharpe-box")?.addEventListener("click", openPortfolioSharpeModal);
 
