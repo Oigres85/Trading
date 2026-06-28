@@ -8,23 +8,23 @@ const SORT_FIELDS = {
   // allineato 1:1 alle <th>: Titolo,Qtà,PMC,Prezzo,Oggi,Pre/After,Volume,Guadagno,Guad.%,
   // P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,Vol/media,RS 1M,Segnale,Rating,Target Δ,
   // Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
-  "ptf-table": ["name", "qty", "pmc", "price", "change_pct",
+  "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "volume",
                 "gain", "gain_pct", "pe", "beta", "sharpe_1y", "support",
-                "resistance", "rsi", "rs_1m", null, "upside_pct",
+                "resistance", "rs_1m", null, "upside_pct",
                 "fin_health", "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,
   // Vol/media,RS 1M,Segnale,Rating,Target Δ,Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
-  "wl-table": ["name", "price", "change_pct", "pe",
-               "beta", "sharpe_1y", "support", "resistance", "rsi",
+  "wl-table": ["name", "price", "change_pct", "volume", "pe",
+               "beta", "sharpe_1y", "support", "resistance",
                "rs_1m", null, "upside_pct", "fin_health",
                "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // tabelle fondamentali (vista Value); i campi "stat:" leggono da r.stats
   "ptf-fund-table": ["name", "qty", "pmc", "price", "stat:market_cap", "stat:ev_ebitda",
-                     "stat:roe", "stat:gross_margin", "stat:profit_margin", "pfcf",
-                     "stat:revenue_growth", "stat:dividend_yield", "stat:price_to_book", "stat:peg"],
+                     "stat:roe", "stat:profit_margin", "pfcf",
+                     "stat:revenue_growth", "stat:dividend_yield", "stat:peg"],
   "wl-fund-table": ["name", "price", "stat:market_cap", "stat:ev_ebitda",
-                    "stat:roe", "stat:gross_margin", "stat:profit_margin", "pfcf",
-                    "stat:revenue_growth", "stat:dividend_yield", "stat:price_to_book", "stat:peg"],
+                    "stat:roe", "stat:profit_margin", "pfcf",
+                    "stat:revenue_growth", "stat:dividend_yield", "stat:peg"],
 };
 const sortState = {
   "ptf-table": { field: null, dir: 0 }, "wl-table": { field: null, dir: 0 },
@@ -365,13 +365,22 @@ function mergeManualHoldings() {
     if (!manual.length || !DATA || !Array.isArray(DATA.portfolio)) return;
     let added = false;
     manual.forEach(h => {
-      if (DATA.portfolio.some(p => p.ticker === h.ticker)) {
-        // la pipeline l'ha già acquisita: pulisci il localStorage
-        removeManualHolding(h.ticker);
+      const ex = DATA.portfolio.find(p => p.ticker === h.ticker);
+      if (ex) {
+        // le mie correzioni manuali PREVALGONO sullo snapshot (a volte stale) del broker:
+        // applico qty/PMC e azzero bval/bgain così il valore si calcola dal prezzo live reale.
+        if (h.qty > 0) ex.qty = h.qty;
+        if (h.pmc > 0) ex.pmc = h.pmc;
+        ex.bval = null; ex.bgain = null;
+        if (ex.price && ex.currency === "USD") {
+          ex.value = ex.price * ex.qty;
+          ex.gain = ex.value - ex.pmc * ex.qty;
+          ex.gain_pct = Math.round((ex.value / (ex.pmc * ex.qty) - 1) * 10000) / 100;
+        }
+        added = true;
         return;
       }
       const row = placeholderRow(h.ticker, h.currency || "USD", { qty: h.qty, pmc: h.pmc, name: h.name || h.ticker });
-      // inserisci prima del BTP se presente, altrimenti in coda
       const btpIdx = DATA.portfolio.findIndex(p => p.ticker === "BTP-V28");
       if (btpIdx >= 0) DATA.portfolio.splice(btpIdx, 0, row); else DATA.portfolio.push(row);
       fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); });
@@ -869,15 +878,20 @@ function openDecisionModal() {
   const accHtml = (v.withPlan || []).length ? `
     <h4 style="margin:10px 0 4px">Acquisti — ordini limite suggeriti</h4>
     <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Limite acq.</th><th class="num">Stop loss</th><th class="num">Qtà</th><th>Motivazione</th></tr></thead><tbody>
-    ${v.withPlan.map(p => { const stop = Math.round(p.limit * 0.92 * 100) / 100; return `<tr>
+    ${v.withPlan.map(p => {
+      // stop loss = supporto tecnico reale se sotto l'ingresso, altrimenti -8% di sicurezza
+      const sup = (p.r.tech_by_range?.[sparkRange]?.support) || p.r.support;
+      const stop = Math.round((sup && sup < p.limit ? sup * 0.99 : p.limit * 0.92) * 100) / 100;
+      const stopNote = (sup && sup < p.limit) ? "sotto il supporto" : "-8%";
+      return `<tr>
       <td>${esc(p.r.name)} <span class="tk">${p.r.ticker}</span></td>
       <td class="num">$${fmtNum.format(p.r.price)}</td>
       <td class="num"><b style="color:var(--green)">$${fmtNum.format(Math.round(p.limit * 100) / 100)}</b></td>
       <td class="num"><b style="color:var(--red)">$${fmtNum.format(stop)}</b></td>
       <td class="num"><b style="font-size:14px">${p.qty}</b></td>
-      <td style="font-size:11px">${signTxt(p.dd)} dal max 52S · qualità ${p.q}/100 — accumulo sul supporto, stop -8%</td>
+      <td style="font-size:11px">${signTxt(p.dd)} dal max 52S · qualità ${p.q}/100 — accumulo sul supporto, stop ${stopNote}</td>
     </tr>`; }).join("")}</tbody></table>
-    <div class="info-line muted" style="font-size:11px;margin-top:4px">Quantità ripartendo la liquidità (${fmtEUR.format(cashEur)}) sui titoli più scontati e solidi. Ordini LIMITE: se il prezzo non arriva, la cassa si conserva. Stop loss ~8% sotto l'ingresso.</div>` : "";
+    <div class="info-line muted" style="font-size:11px;margin-top:4px">Quantità ripartendo la liquidità (${fmtEUR.format(cashEur)}) sui titoli più scontati e solidi. Ordini LIMITE: se il prezzo non arriva, la cassa si conserva. Stop loss ancorato al supporto tecnico del titolo.</div>` : "";
   // tabella ALLEGGERIMENTO (vendita): prezzo limite di vendita, quantità, motivazione
   const trimHtml = (v.trim || []).length ? `
     <h4 style="margin:12px 0 4px">Vendite/alleggerimenti — TRIM parziale (Free Ride)</h4>
@@ -1934,7 +1948,6 @@ function techCells(r) {
       ${sharpeCell(r)}
       <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
       <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
-      <td class="num">${rsiBar(r.rsi)}</td>
       <td class="num rs-cell" data-rs-tk="${r.ticker}" role="button" tabindex="0" title="Clicca per la spiegazione della forza relativa (RS)">${rsBar(r.rs_1m, r.rs_bench)}</td>
       <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
       <td class="num">${targetBar(r.rating)}</td>
@@ -2996,6 +3009,12 @@ function delBtn(section, ticker) {
   return mv + ed + del;
 }
 
+// pulsante elimina SEMPRE visibile accanto al nome (no edit-mode); BTP escluso
+function nameDelBtn(section, ticker) {
+  if (ticker === "BTP-V28") return "";
+  return `<button class="row-del row-del-inline" data-sec="${section}" data-tk="${ticker}" title="Rimuovi ${ticker}" aria-label="Rimuovi ${ticker}">×</button>`;
+}
+
 // modifica quantità e prezzo medio di carico di una posizione esistente
 function editPosition(ticker) {
   const r = (DATA.portfolio || []).find(x => x.ticker === ticker);
@@ -3029,11 +3048,12 @@ function renderTable() {
     const gEur = r.gain_eur != null ? r.gain_eur : (r.currency === "EUR" ? (r.gain || 0) : (r.gain || 0) / eurusd);
     const gPct = (r.bval != null && (r.bval - r.bgain)) ? r.bgain / (r.bval - r.bgain) * 100 : r.gain_pct;
     return `<tr>
-      <td class="name-cell">${rowDot(r)}${delBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell">${rowDot(r)}${nameDelBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${priceTxt(r, c)}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
+      <td class="num">${fmtVolume(r.volume)}</td>
       <td class="num ${signCls(gEur)}">${signTxt(Math.round(gEur), " €")}${r.currency === "USD" && r.gain != null ? `<br><span class="sub-eur muted">${signTxt(Math.round(r.gain), " $")} live</span>` : ""}</td>
       <td class="num ${signCls(gPct)}"><b>${signTxt(Math.round(gPct * 100) / 100)}</b></td>
       ${techCells(r)}
@@ -3043,10 +3063,10 @@ function renderTable() {
   const t = DATA.totals;
   const usdValue = DATA.portfolio.filter(r => r.currency === "USD").reduce((s, r) => s + r.value, 0);
   const totalRow = `<tr class="total-row">
-    <td class="name-cell" colspan="5">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
+    <td class="name-cell" colspan="6">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="15" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="14" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
     ? `<tr class="add-row"><td colspan="22"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
@@ -3055,7 +3075,7 @@ function renderTable() {
 }
 
 // Etichette colonne sui td (per la vista "a schede" su iPhone) + marcatura colonne chiave.
-const MOBILE_KEY_COLS = new Set(["Titolo", "Prezzo", "Oggi", "Guad. %", "RSI 14", "Segnale", "Drawdown 52S", "Trimestrale"]);
+const MOBILE_KEY_COLS = new Set(["Titolo", "Prezzo", "Oggi", "Guad. %", "Segnale", "Drawdown 52S", "Trimestrale"]);
 function applyColLabels(tableId) {
   const ths = [...document.querySelectorAll(`#${tableId} thead th`)].map(t => t.textContent.trim());
   document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
@@ -3072,9 +3092,10 @@ function renderWatchlist() {
   const list = sortRows(DATA.watchlist || [], "wl-table");
   const c = (r) => r.currency === "PTS" ? "" : "$";
   const rows = list.length ? list.map(r => `<tr>
-      <td class="name-cell">${rowDot(r)}${delBtn("watchlist", r.ticker)}<button class="row-add" data-tk="${r.ticker}" data-price="${r.price}" title="Aggiungi ${r.ticker} al portafoglio">➕</button>${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell">${rowDot(r)}${nameDelBtn("watchlist", r.ticker)}<button class="row-add" data-tk="${r.ticker}" data-price="${r.price}" title="Aggiungi ${r.ticker} al portafoglio">➕</button>${esc(r.name)}<span class="tk">${r.ticker}</span></td>
       <td class="num"><b>${priceTxt(r, c(r))}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
+      <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
     </tr>`).join("") : '<tr><td colspan="18" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
@@ -3120,8 +3141,8 @@ const FSC = {
 function buildFundTable(list, tableSel, withQtyPmc) {
   const tableId = tableSel.replace("#", "");
   const head = (withQtyPmc ? ["Titolo", "Qtà", "PMC", "Prezzo"] : ["Titolo", "Prezzo"])
-    .concat(["Market Cap", "EV/EBITDA", "ROE", "Margine lordo", "Margine netto", "P/FCF", "Cresc. ricavi", "Div Yield", "P/B", "PEG"]);
-  const fundColspan = 10;
+    .concat(["Market Cap", "EV/EBITDA", "ROE", "Margine netto", "P/FCF", "Cresc. ricavi", "Div Yield", "PEG"]);
+  const fundColspan = 8;
   $(`${tableSel} thead`).innerHTML = "<tr>" +
     head.map((h, i) => `<th class="${i === 0 ? "sticky-col" : "num"}">${h}</th>`).join("") + "</tr>";
   const orig = list;                          // ordine originale (per il ripristino "default")
@@ -3154,12 +3175,10 @@ function buildFundTable(list, tableSel, withQtyPmc) {
       <td class="num">${bigUsd(st.market_cap)}</td>
       <td class="num">${fundBar(st.ev_ebitda, fmtNum.format, FSC.ev(st.ev_ebitda))}</td>
       <td class="num">${roeHtml}</td>
-      <td class="num">${fundBar(st.gross_margin, pctPlain, FSC.gross(st.gross_margin))}</td>
       <td class="num">${fundBar(st.profit_margin, pctPlain, FSC.net(st.profit_margin))}</td>
       <td class="num">${pfcfHtml}</td>
       <td class="num">${fundBar(st.revenue_growth, pctOf, FSC.growth(st.revenue_growth))}${revGrowthFlag}</td>
       <td class="num">${st.dividend_yield ? fundBar(st.dividend_yield, pctPlain, FSC.div(st.dividend_yield)) : "—"}</td>
-      <td class="num">${fundBar(st.price_to_book, fmtNum.format, FSC.pb(st.price_to_book))}</td>
       <td class="num">${fundBar(st.peg, fmtNum.format, FSC.peg(st.peg))}</td>
     </tr>`;
   }).join("");
