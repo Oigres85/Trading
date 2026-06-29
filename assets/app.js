@@ -428,9 +428,9 @@ function addPortfolio() {
 /* Modale "Modifica valori": edita qty + PMC di ogni posizione e la liquidità in un colpo solo.
    Salva localmente (sopravvive al reload) e, se c'è un token, persiste su config/holdings.json. */
 function openEditPortfolio() {
-  const rows = (DATA.portfolio || []).filter(r => r.ticker !== "BTP-V28");
+  const rows = (DATA.portfolio || []);   // include anche il BTP (modificabile)
   const body = `
-    <div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Modifica quantità e PMC di ogni posizione e la liquidità disponibile. Patrimonio, allocazione e KPI si aggiornano al salvataggio.</div>
+    <div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Modifica quantità e PMC di ogni posizione (BTP incluso) e la liquidità disponibile. Patrimonio, allocazione e KPI si aggiornano al salvataggio.</div>
     <div class="edp-row edp-head"><span>Titolo</span><span>Quantità</span><span>PMC</span></div>
     ${rows.map(r => `<div class="edp-row" data-edp="${r.ticker}">
       <span class="edp-tk">${esc(r.name)} <span class="tk">${r.ticker}</span></span>
@@ -457,8 +457,13 @@ function openEditPortfolio() {
         r.value = r.price * r.qty;
         r.gain = r.value - r.pmc * r.qty;
         r.gain_pct = Math.round((r.value / (r.pmc * r.qty) - 1) * 10000) / 100;
+      } else if (r.price && r.ticker === "BTP-V28") {        // BTP: valore = nominale × prezzo/100
+        r.bval = null; r.bgain = null;
+        r.value = r.qty * r.price / 100;
+        r.gain = r.value - r.qty * r.pmc / 100;
+        r.gain_pct = r.pmc ? Math.round((r.price / r.pmc - 1) * 10000) / 100 : 0;
       }
-      saveManualHolding({ ticker: tk, name: r.name, qty: r.qty, pmc: r.pmc, currency: r.currency || "USD" });
+      if (r.ticker !== "BTP-V28") saveManualHolding({ ticker: tk, name: r.name, qty: r.qty, pmc: r.pmc, currency: r.currency || "USD" });
     });
     const nc = parseFloat($("#edp-cash").value) || 0;
     if (nc !== cashEur) { cashEur = nc; localStorage.setItem("cash_eur", cashEur); changed = true; }
@@ -573,8 +578,12 @@ function recomputeTotals() {
   let valEur = 0, costEur = 0, stockGainEur = 0, btpGainEur = 0;
   DATA.portfolio.forEach(r => {
     let v, g;
-    if (r.bval != null) { v = r.bval; g = r.bgain || 0; }
-    else if (r.currency === "EUR") { v = r.value || 0; g = r.gain || 0; }
+    const hasLive = r.price != null && r.qty;
+    // PRIORITÀ AL VIVO: prezzo live × quantità (più fresco dello snapshot broker, spesso datato).
+    // Fallback allo snapshot bval/bgain solo se manca il prezzo live.
+    if (r.currency === "EUR") { v = r.value || 0; g = r.gain || 0; }                       // BTP (già in EUR)
+    else if (hasLive) { v = (r.price * r.qty) / eurusd; g = ((r.price - r.pmc) * r.qty) / eurusd; }
+    else if (r.bval != null) { v = r.bval; g = r.bgain || 0; }
     else { v = (r.value || 0) / eurusd; g = (r.gain || 0) / eurusd; }
     r.val_eur = v; r.gain_eur = g;
     valEur += v; costEur += (v - g);
@@ -645,7 +654,6 @@ function renderAll() {
   recomputeTotals();            // include la liquidità nei totali/allocazione
   renderCash();
   renderKPI();
-  renderPatrimonioSpark();
   renderAllocation();
   renderEarnings();
   renderEarningsAlert();
@@ -1116,6 +1124,39 @@ function renderMiniCards() {
         <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
     }
   }
+  // Margin Debt (leva a credito sul mercato): vicino ai massimi = rischio elevato
+  const md = m.margin_debt, mdBox = $("#margin-debt-box");
+  if (mdBox) {
+    if (md && md.pct_of_peak != null) {
+      const score = clamp(100 - md.pct_of_peak);    // lontano dal picco = basso rischio = verde
+      const lab = md.pct_of_peak >= 95 ? "Leva estrema" : md.pct_of_peak >= 80 ? "Leva alta" : md.pct_of_peak >= 60 ? "Leva media" : "Leva bassa";
+      mdBox.innerHTML = `<div class="mc-title">Margin Debt (leva mercato)</div>
+        <div class="mc-value" style="color:${scoreColor(score)}">${md.pct_of_peak}% del picco · ${lab}</div>
+        ${thermoLine(score, ["Estrema", "Bassa"])}
+        <div class="mc-sub muted">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""} · FINRA/FRED</div>`;
+    } else {
+      mdBox.innerHTML = `<div class="mc-title">Margin Debt (leva mercato)</div>
+        <div class="mc-value muted">—</div>${thermoLine(50, ["Estrema", "Bassa"])}
+        <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
+    }
+  }
+}
+
+/* Popup Margin Debt: dato attuale, variazioni, sparkline storica, impatto */
+function openMarginDebtModal() {
+  const md = (DATA.macro || {}).margin_debt;
+  if (!md) { toast("Dati Margin Debt non ancora disponibili"); return; }
+  const bn = (v) => "$" + fmtNum.format(Math.round(v / 1000)) + " mld";
+  const risk = md.pct_of_peak >= 95 ? { t: "ESTREMA", c: "var(--red)" } : md.pct_of_peak >= 80 ? { t: "ALTA", c: "var(--yellow)" } : md.pct_of_peak >= 60 ? { t: "MEDIA", c: "#86c52a" } : { t: "BASSA", c: "var(--green)" };
+  openInfoModal("Margin Debt — leva a credito sul mercato",
+    `<div class="info-line" style="margin-bottom:8px"><b>Cos'è:</b> il debito che gli investitori contraggono presso i broker per comprare titoli a leva. Quando è vicino ai massimi storici indica euforia e fragilità: nelle discese forza vendite a catena (margin call), amplificando i crolli.</div>
+     <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
+       <div style="font-size:13px">Attuale: <b>${bn(md.value)}</b> · <b style="color:${risk.c}">${md.pct_of_peak}% del picco storico</b> · leva <b style="color:${risk.c}">${risk.t}</b></div>
+       <div class="muted" style="font-size:12px;margin-top:3px">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""}${md.qoq != null ? ` · trim. ${signTxt(md.qoq)}` : ""} · picco storico ${bn(md.peak)} · agg. ${md.date}</div>
+     </div>
+     <h4 style="margin:8px 0 4px">Storico (ultimi trimestri)</h4>
+     <div class="psp-spark">${sparkline(md.history || [])}</div>
+     <div class="info-line muted" style="font-size:11.5px;margin-top:8px"><b>Impatto:</b> leva ${risk.t.toLowerCase()} → ${md.pct_of_peak >= 80 ? "mercato fragile: una correzione può innescare vendite forzate a catena. Per il tuo portafoglio tech (alta beta) significa drawdown potenzialmente più violenti — tieni pronta la liquidità e non aumentare la leva." : "rischio sistemico da leva contenuto: le discese hanno meno benzina da margin call. Contesto più sereno per accumulare con gradualità."}</div>`);
 }
 
 /* Popup Sharpe di PORTAFOGLIO (diverso dal popup per-titolo openSharpeInfo) */
@@ -1433,6 +1474,20 @@ function renderKPI() {
       <div class="value ${k.valueCls || ""}"${k.valueStyle ? ` style="${k.valueStyle}"` : ""}>${k.value}</div>
       <div class="sub ${k.subCls || ""}">${k.sub || ""}</div>
     </div>`).join("");
+
+  // DETTAGLIO PROFITTO PER VALUTA (stile broker): azioni USD + obbligazioni EUR
+  const pbc = $("#profit-by-currency");
+  if (pbc) {
+    const usdG = t.usd_gain, usdGp = t.usd_gain_pct;
+    const btp = (DATA.portfolio || []).find(r => r.ticker === "BTP-V28");
+    const btpGp = btp?.gain_pct, btpG = t.eur_btp_gain;
+    const row = (lab, pct, abs, cur) => pct == null ? "" :
+      `<div class="pbc-row"><span class="pbc-lab">${lab}</span>
+        <span class="pbc-val ${signCls(pct)}">${signTxt(Math.round(pct * 100) / 100)} <span class="muted">(${signTxt(Math.round(abs), " " + cur)})</span></span></div>`;
+    pbc.innerHTML = `<div class="pbc-head muted">Dettaglio profitto per valuta</div>
+      ${row("EUR (BTP)", btpGp, btpG, "€")}
+      ${row("USD (azioni)", usdGp, usdG, "$")}`;
+  }
 
   // MilioneTracker — obiettivo €1.000.000 in 10 anni
   const GOAL = 1_000_000;
@@ -1897,6 +1952,51 @@ function rsBar(rs, bench) {
 }
 
 /* Popup esplicativo della colonna "RS 1M" (forza relativa vs indice di settore: SOX/NDX/S&P) */
+/* scheda completa del titolo (tecnica + fondamentale) — utile soprattutto su iPhone (tap sul titolo) */
+function openStockDetail(ticker) {
+  const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
+  const r = all.find(x => x.ticker === ticker);
+  if (!r) return;
+  const c = cur(r);
+  const st = r.stats || {};
+  const pct = (v) => v == null ? "—" : (Math.round(v * 1000) / 10) + "%";
+  const row = (lab, val) => `<div class="sd-row"><span class="sd-lab">${lab}</span><span class="sd-val">${val}</span></div>`;
+  const inPtf = (DATA.portfolio || []).some(p => p.ticker === r.ticker && p.qty);
+  const tech = [
+    inPtf ? row("Quantità", fmtNum.format(r.qty)) : "",
+    inPtf ? row("PMC", c + fmtNum.format(r.pmc)) : "",
+    row("Prezzo", c + fmtNum.format(r.price) + ` <span class="${signCls(r.change_pct)}">(${signTxt(r.change_pct)})</span>`),
+    inPtf ? row("Guadagno", `<span class="${signCls(r.gain_eur)}">${signTxt(Math.round(r.gain_eur || 0), " €")}</span>`) : "",
+    row("RSI 14", r.rsi ?? "—"),
+    row("Supporto / Resistenza", `${r.support ? c + fmtNum.format(r.support) : "—"} / ${r.resistance ? c + fmtNum.format(r.resistance) : "—"}`),
+    row("Beta", r.beta ?? "—"),
+    row("Sharpe 1A", r.sharpe_1y != null ? `<b style="color:${sharpeColor(r.sharpe_1y)}">${fmtNum.format(r.sharpe_1y)}</b>` : "—"),
+    row("Forza rel. 1M", r.rs_1m != null ? signTxt(r.rs_1m) : "—"),
+    row("Drawdown 52S", r.w52_dist_pct != null ? signTxt(r.w52_dist_pct) : "—"),
+    row("Short float", st.short_float != null ? pct(st.short_float) : "—"),
+    row("Segnale", `<span class="badge ${r.signal_class}">${r.signal}</span>`),
+    r.rating?.upside_pct != null ? row("Target Δ", signTxt(r.rating.upside_pct)) : "",
+    r.earnings_date ? row("Trimestrale", new Date(r.earnings_date).toLocaleDateString("it-IT")) : "",
+  ].join("");
+  const fcf = st.market_cap && st.fcf && st.fcf > 0 ? Math.round(st.market_cap / st.fcf * 10) / 10 : null;
+  const fund = [
+    row("P/E", st.pe_ttm || r.pe ? fmtNum.format(Math.round((st.pe_ttm || r.pe) * 10) / 10) + "×" : "—"),
+    row("P/FCF", fcf ? fmtNum.format(fcf) + "×" : "—"),
+    row("EV/EBITDA", st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"),
+    row("ROE / ROIC", st.roe != null ? pct(st.roe) + (st.roe > 0.15 ? " <span class='pos'>[premium]</span>" : st.roe < 0 ? " <span class='neg'>[zombie]</span>" : "") : "—"),
+    row("Margine netto", st.profit_margin != null ? pct(st.profit_margin) : "—"),
+    row("Crescita ricavi", st.revenue_growth != null ? pct(st.revenue_growth) : "—"),
+    row("PEG", st.peg != null ? fmtNum.format(Math.round(st.peg * 100) / 100) : "—"),
+    row("P/B", st.price_to_book != null ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"),
+    row("Dividendo", st.dividend_yield != null ? pct(st.dividend_yield) : "—"),
+  ].join("");
+  const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSymbol(r))}`;
+  openInfoModal(`${r.name} (${r.ticker})`,
+    `<div class="sd-grid"><div class="sd-col"><h4>Tecnica & Prezzi</h4>${tech}</div>
+      <div class="sd-col"><h4>Fondamentali</h4>${st.market_cap ? fund : '<div class="muted" style="font-size:12px">Fondamentali non disponibili</div>'}</div></div>
+     <div style="margin-top:10px;text-align:center"><a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">Apri grafico TradingView ↗</a></div>`);
+}
+
 function openRsInfo(ticker) {
   const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
   const r = all.find(x => x.ticker === ticker);
@@ -3129,7 +3229,7 @@ function renderTable() {
     const gEur = r.gain_eur != null ? r.gain_eur : (r.currency === "EUR" ? (r.gain || 0) : (r.gain || 0) / eurusd);
     const gPct = (r.bval != null && (r.bval - r.bgain)) ? r.bgain / (r.bval - r.bgain) * 100 : r.gain_pct;
     return `<tr>
-      <td class="name-cell">${rowDot(r)}${nameDelBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${rowDot(r)}${nameDelBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${priceTxt(r, c)}</b></td>
@@ -3156,7 +3256,8 @@ function renderTable() {
 }
 
 // Etichette colonne sui td (per la vista "a schede" su iPhone) + marcatura colonne chiave.
-const MOBILE_KEY_COLS = new Set(["Titolo", "Prezzo", "Oggi", "Guad. %", "Segnale", "Drawdown 52S", "Trimestrale"]);
+const MOBILE_KEY_COLS = new Set(["Titolo", "Prezzo", "Oggi", "Guad. %", "Segnale", "Drawdown 52S", "Trimestrale",
+  "P/E TTM", "ROE", "Marg.netto", "Cresc.ricavi"]);   // + chiavi vista fondamentale su iPhone
 function applyColLabels(tableId) {
   const ths = [...document.querySelectorAll(`#${tableId} thead th`)].map(t => t.textContent.trim());
   document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
@@ -3173,7 +3274,7 @@ function renderWatchlist() {
   const list = sortRows(DATA.watchlist || [], "wl-table");
   const c = (r) => r.currency === "PTS" ? "" : "$";
   const rows = list.length ? list.map(r => `<tr>
-      <td class="name-cell">${rowDot(r)}${nameDelBtn("watchlist", r.ticker)}${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${rowDot(r)}${nameDelBtn("watchlist", r.ticker)}${esc(r.name)}<span class="tk">${r.ticker}</span></td>
       <td class="num"><b>${priceTxt(r, c(r))}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
@@ -3264,6 +3365,7 @@ function buildFundTable(list, tableSel, withQtyPmc) {
     </tr>`;
   }).join("");
   $(`${tableSel} tbody`).innerHTML = rows;
+  applyColLabels(tableId);     // vista a schede su iPhone anche per i fondamentali
   // ordinamento cliccabile sugli header (la thead è ricostruita ogni volta)
   initSorting(tableId, () => buildFundTable(orig, tableSel, withQtyPmc));
   updateSortArrows(tableId);
@@ -4340,6 +4442,7 @@ $("#alloc-edit")?.addEventListener("click", openEditPortfolio);
 $("#kpi-edit")?.addEventListener("click", openEditPortfolio);
 $("#decision-bar")?.addEventListener("click", openDecisionModal);
 $("#sharpe-box")?.addEventListener("click", openPortfolioSharpeModal);
+$("#margin-debt-box")?.addEventListener("click", openMarginDebtModal);
 
 /* popup Strumenti (PMC, vendite) e News */
 function showSimpleModal(id) { const m = $(id); if (m) m.hidden = false; }
@@ -4382,6 +4485,9 @@ document.addEventListener("click", e => {
   if (shc && shc.dataset.sharpeTk) { openSharpeInfo(shc.dataset.sharpeTk); return; }
   const bi = e.target.closest(".badge-info");          // badge (squeeze/deep value/correzione) → spiegazione
   if (bi && bi.dataset.badge) { e.stopPropagation(); openBadgeInfo(bi.dataset.badge); return; }
+  // tap sul nome del titolo (no su pulsanti) → scheda completa (utile su iPhone)
+  const nc = e.target.closest(".name-cell");
+  if (nc && nc.dataset.tk && !e.target.closest("button") && nc.closest("#ptf-table, #wl-table")) { openStockDetail(nc.dataset.tk); return; }
 });
 // accessibilità: Invio/Spazio sulla riga fondamentale aprono il dettaglio
 document.addEventListener("keydown", e => {

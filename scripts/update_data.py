@@ -1326,7 +1326,31 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! stagionalità: {e}", file=sys.stderr)
 
+    try:
+        macro["margin_debt"] = fetch_margin_debt()
+    except Exception as e:  # noqa: BLE001
+        print(f"!! margin debt: {e}", file=sys.stderr)
+
     return macro
+
+
+def fetch_margin_debt():
+    """Margin Debt (leva a credito sui conti titoli) via FRED — proxy del flow-of-funds
+    'Security Brokers and Dealers; Margin Accounts' (trimestrale, $ milioni).
+    Termometro: vicino ai massimi storici = leva estrema = rischio elevato."""
+    s = fred_series("BOGZ1FL663067003Q", n=120)
+    if len(s) < 5:
+        return None
+    vals = [v for _, v in s]
+    cur, peak = vals[-1], max(vals)
+    yoy = round((cur / vals[-5] - 1) * 100, 1) if vals[-5] else None
+    qoq = round((cur / vals[-2] - 1) * 100, 1) if vals[-2] else None
+    pct_peak = round(cur / peak * 100, 1) if peak else None
+    return {
+        "value": round(cur), "peak": round(peak), "pct_of_peak": pct_peak,
+        "yoy": yoy, "qoq": qoq, "date": s[-1][0],
+        "history": [round(v) for v in vals[-24:]],
+    }
 
 
 def seasonality_score(avg_pct, pos_pct):
