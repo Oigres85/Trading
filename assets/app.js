@@ -3930,10 +3930,20 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Massimo ~600
     const ns = newsSummary(DATA.news);
     lines.push(`SINTESI NEWS: tono ${ns.tone.t} su ${ns.tot} notizie (${ns.bull} positive, ${ns.neu} neutre, ${ns.bear} negative).`);
   }
-  // VERDETTO OPERATIVO della dashboard (top bar Decisione)
+  // VERDETTO + PIANO OPERATIVO calcolato dalla dashboard (top bar Decisione) — base di partenza per l'AI
   try {
     const dv = decisionVerdict();
     lines.push(`VERDETTO DASHBOARD: ${dv.label} — ${dv.reasons.join("; ")}.`);
+    if ((dv.withPlan || []).length) {
+      lines.push("Piano d'acquisto calcolato (ordini limite ai supporti, ripartendo la liquidità): " +
+        dv.withPlan.map(p => {
+          const sup = (p.r.tech_by_range?.[sparkRange]?.support) || p.r.support;
+          const stop = (sup && sup < p.limit ? sup * 0.99 : p.limit * 0.92);
+          return `${p.r.ticker} ${p.qty}az a $${fmtNum.format(Math.round(p.limit * 100) / 100)} (stop $${fmtNum.format(Math.round(stop * 100) / 100)}, qualità ${p.q}/100)`;
+        }).join(" · ") + ".");
+    }
+    if ((dv.trim || []).length) lines.push("Candidati ad alleggerimento (trim 25-50%): " + dv.trim.map(r => `${r.ticker} (${r.pe > 150 ? "P/E " + fmtNum.format(r.pe) : "RSI " + r.rsi})`).join(" · ") + ".");
+    if ((dv.harvest || []).length) lines.push("Scudi fiscali disponibili (rami secchi in perdita per compensare le plus): " + dv.harvest.map(r => `${r.ticker} (${signTxt(Math.round(r.gain_eur), " €")})`).join(" · ") + ".");
   } catch { /* no-op */ }
   // DIARIO DELLE AZIONI (storico operazioni e motivazioni dell'utente)
   const diary = loadDiary();
@@ -4026,6 +4036,11 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Massimo ~600
   (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (${i.date})`));
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
+  if (m.margin_debt && m.margin_debt.pct_of_peak != null) {
+    const md = m.margin_debt;
+    const lev = md.pct_of_peak >= 95 ? "ESTREMA" : md.pct_of_peak >= 80 ? "alta" : md.pct_of_peak >= 60 ? "media" : "bassa";
+    lines.push(`- Margin Debt (leva a credito FINRA): ${md.pct_of_peak}% del picco storico — leva ${lev}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""}. Leva alta/estrema = mercato fragile, le discese possono innescare margin call a catena (drawdown più violenti sul tech ad alta beta).`);
+  }
   if (m.credit) {
     let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`;
     const ch = m.credit.history || [];
