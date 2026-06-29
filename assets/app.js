@@ -1,7 +1,7 @@
 /* Trading Dashboard — rendering lato client di data/data.json */
 const REPO = "Oigres85/Trading";
 let DATA = null;
-let sparkRange = "m1";   // 1G | 1M | 1A
+let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
 /* ordinamento tabelle: click su intestazione → desc → asc → default */
 const SORT_FIELDS = {
@@ -372,8 +372,20 @@ function removeManualHolding(ticker) {
 /* unisce le posizioni manuali al DATA.portfolio appena caricato da data.json */
 function mergeManualHoldings() {
   try {
+    if (!DATA || !Array.isArray(DATA.portfolio)) return;
+    // override BTP salvato a mano (qty/PMC) — persiste tra i reload senza toccare la pipeline
+    try {
+      const bo = JSON.parse(localStorage.getItem("btp_override") || "null");
+      const btp = bo && DATA.portfolio.find(p => p.ticker === "BTP-V28");
+      if (btp) {
+        if (bo.qty > 0) btp.qty = bo.qty;
+        if (bo.pmc > 0) btp.pmc = bo.pmc;
+        btp.bval = null; btp.bgain = null;
+        if (btp.price) { btp.value = btp.qty * btp.price / 100; btp.gain = btp.value - btp.qty * btp.pmc / 100; }
+      }
+    } catch { /* nessun override BTP */ }
     const manual = loadManualHoldings();
-    if (!manual.length || !DATA || !Array.isArray(DATA.portfolio)) return;
+    if (!manual.length) return;
     let added = false;
     manual.forEach(h => {
       const ex = DATA.portfolio.find(p => p.ticker === h.ticker);
@@ -457,11 +469,14 @@ function openEditPortfolio() {
         r.value = r.price * r.qty;
         r.gain = r.value - r.pmc * r.qty;
         r.gain_pct = Math.round((r.value / (r.pmc * r.qty) - 1) * 10000) / 100;
-      } else if (r.price && r.ticker === "BTP-V28") {        // BTP: valore = nominale × prezzo/100
+      } else if (r.ticker === "BTP-V28") {                   // BTP: valore = nominale × prezzo/100
         r.bval = null; r.bgain = null;
-        r.value = r.qty * r.price / 100;
-        r.gain = r.value - r.qty * r.pmc / 100;
-        r.gain_pct = r.pmc ? Math.round((r.price / r.pmc - 1) * 10000) / 100 : 0;
+        if (r.price) {
+          r.value = r.qty * r.price / 100;
+          r.gain = r.value - r.qty * r.pmc / 100;
+          r.gain_pct = r.pmc ? Math.round((r.price / r.pmc - 1) * 10000) / 100 : 0;
+        }
+        localStorage.setItem("btp_override", JSON.stringify({ qty: r.qty, pmc: r.pmc }));   // persiste tra i reload
       }
       if (r.ticker !== "BTP-V28") saveManualHolding({ ticker: tk, name: r.name, qty: r.qty, pmc: r.pmc, currency: r.currency || "USD" });
     });
@@ -670,21 +685,6 @@ function renderAll() {
   renderBtpInfo();
   renderSellCalc();
   pmcInit();
-}
-
-/* mini-grafico andamento patrimonio (da metrics_history; fallback history.all) */
-function renderPatrimonioSpark() {
-  const box = $("#patrimonio-spark");
-  if (!box) return;
-  let vals = [];
-  const mh = DATA.metrics_history || [];
-  if (mh.length >= 2) vals = mh.map(p => p.eur_value).filter(v => v != null);
-  if (vals.length < 2) { const h = DATA.history?.all; if (h?.values?.length >= 2) vals = h.values; }
-  if (vals.length < 2) { box.innerHTML = ""; return; }
-  const first = vals[0], last = vals[vals.length - 1], chg = first ? (last / first - 1) * 100 : 0;
-  box.innerHTML = `<div class="psp-head"><span class="muted">Andamento patrimonio</span>
-    <span class="${signCls(chg)}">${signTxt(Math.round(chg * 10) / 10)}</span></div>
-    <div class="psp-spark">${sparkline(vals)}</div>`;
 }
 
 /* banner di alert: trimestrali entro 7 giorni (rischio binario) con Implied Move */
@@ -3287,7 +3287,7 @@ function renderWatchlist() {
 }
 
 /* ---------------- vista fondamentale (Value Investing) ---------------- */
-let ptfView = "tech";   // tech | fund
+let ptfView = localStorage.getItem("pref_ptf_view") || "tech";   // tech | fund (preferenza ricordata)
 const pctOf = (v) => v == null ? "—" : signTxt(Math.round(v * 1000) / 10);   // frazione → %
 const pctPlain = (v) => v == null ? "—" : (Math.round(v * 1000) / 10) + "%";
 function bigUsd(v) { if (v == null) return "—"; const a = Math.abs(v);
@@ -3382,6 +3382,7 @@ function renderWlFundTable() {
 
 function setPtfView(v) {
   ptfView = v;
+  localStorage.setItem("pref_ptf_view", v);
   document.querySelectorAll("#view-toggle .chip").forEach(c => c.classList.toggle("chip-active", c.dataset.view === v));
   $("#ptf-tech-wrap").hidden = v !== "tech";
   $("#ptf-fund-wrap").hidden = v !== "fund";
@@ -3390,9 +3391,10 @@ function setPtfView(v) {
   if (v === "fund") renderFundTable();
 }
 
-let wlView = "tech";
+let wlView = localStorage.getItem("pref_wl_view") || "tech";
 function setWlView(v) {
   wlView = v;
+  localStorage.setItem("pref_wl_view", v);
   document.querySelectorAll("#wl-view-toggle .chip").forEach(c => c.classList.toggle("chip-active", c.dataset.view === v));
   $("#wl-tech-wrap").hidden = v !== "tech";
   $("#wl-fund-wrap").hidden = v !== "fund";
@@ -4485,9 +4487,14 @@ document.addEventListener("click", e => {
   if (shc && shc.dataset.sharpeTk) { openSharpeInfo(shc.dataset.sharpeTk); return; }
   const bi = e.target.closest(".badge-info");          // badge (squeeze/deep value/correzione) → spiegazione
   if (bi && bi.dataset.badge) { e.stopPropagation(); openBadgeInfo(bi.dataset.badge); return; }
-  // tap sul nome del titolo (no su pulsanti) → scheda completa (utile su iPhone)
-  const nc = e.target.closest(".name-cell");
-  if (nc && nc.dataset.tk && !e.target.closest("button") && nc.closest("#ptf-table, #wl-table")) { openStockDetail(nc.dataset.tk); return; }
+  // tap su QUALSIASI punto della riga/card del titolo (no su pulsanti, grafico, opzioni o celle
+  // già interattive) → scheda completa. Indispensabile su iPhone dove la riga è una card.
+  const tr = e.target.closest("#ptf-table tbody tr, #wl-table tbody tr");
+  if (tr && !tr.classList.contains("total-row") && !tr.classList.contains("add-row")
+      && !e.target.closest("button, a, input, .spark-cell, [data-opt], .rs-cell, .sharpe-cell, .badge-info")) {
+    const tk = tr.querySelector(".name-cell")?.dataset.tk;
+    if (tk) { openStockDetail(tk); return; }
+  }
 });
 // accessibilità: Invio/Spazio sulla riga fondamentale aprono il dettaglio
 document.addEventListener("keydown", e => {
@@ -4506,11 +4513,22 @@ function syncSparkToggles() {
 document.querySelectorAll("#spark-toggle .chip, #spark-toggle-wl .chip").forEach(ch => {
   ch.addEventListener("click", () => {
     sparkRange = ch.dataset.range;
+    localStorage.setItem("pref_range", sparkRange);   // ricorda l'intervallo scelto
     syncSparkToggles();
     renderTable();
     renderWatchlist();
   });
 });
+// ripristina le preferenze salvate (vista tecnica/fondamentale + intervallo) all'avvio
+(function applyPrefs() {
+  document.querySelectorAll("#view-toggle .chip").forEach(c => c.classList.toggle("chip-active", c.dataset.view === ptfView));
+  $("#ptf-tech-wrap").hidden = ptfView !== "tech"; $("#ptf-fund-wrap").hidden = ptfView !== "fund";
+  if ($("#spark-toggle")) $("#spark-toggle").style.display = ptfView === "tech" ? "" : "none";
+  document.querySelectorAll("#wl-view-toggle .chip").forEach(c => c.classList.toggle("chip-active", c.dataset.view === wlView));
+  $("#wl-tech-wrap").hidden = wlView !== "tech"; $("#wl-fund-wrap").hidden = wlView !== "fund";
+  if ($("#spark-toggle-wl")) $("#spark-toggle-wl").style.display = wlView === "tech" ? "" : "none";
+  syncSparkToggles();
+})();
 $("#wl-add-top").addEventListener("click", addWatchlist);
 $("#ptf-add-top")?.addEventListener("click", addPortfolio);
 document.querySelectorAll("#view-toggle .chip").forEach(ch =>
