@@ -1165,7 +1165,28 @@ function openMarginDebtModal() {
      </div>
      <h4 style="margin:8px 0 4px">Storico (ultimi trimestri)</h4>
      <div class="psp-spark">${sparkline(md.history || [])}</div>
+     ${systemicRiskHtml(md)}
      <div class="info-line muted" style="font-size:11.5px;margin-top:8px"><b>Impatto:</b> leva ${risk.t.toLowerCase()} → ${md.pct_of_peak >= 80 ? "mercato fragile: una correzione può innescare vendite forzate a catena. Per il tuo portafoglio tech (alta beta) significa drawdown potenzialmente più violenti — tieni pronta la liquidità e non aumentare la leva." : "rischio sistemico da leva contenuto: le discese hanno meno benzina da margin call. Contesto più sereno per accumulare con gradualità."}</div>`);
+}
+
+/* Rischio sistemico combinato: Margin Debt (leva) + Forward P/E (valutazione).
+   ROSSO se leva vicino ai massimi E P/E forward elevato. Stima impatto deleveraging. */
+function systemicRiskHtml(md) {
+  const fpe = (DATA.macro || {}).forward_pe;
+  const pe = fpe ? fpe.value : null;
+  const peAvg = fpe ? fpe.avg_hist : 16.5;
+  const highLev = md.pct_of_peak >= 90;
+  const highPe = pe != null && pe > 20;
+  const danger = highLev && highPe;
+  const col = danger ? "#ef4444" : (highLev || highPe) ? "var(--yellow)" : "#38bdf8";
+  const verdict = danger ? "RISCHIO SISTEMICO ELEVATO" : (highLev || highPe) ? "Rischio moderato" : "Rischio contenuto";
+  // stima margin call su deleveraging -15%: storicamente ~10-15% del margin debt viene chiamato
+  const callsBn = Math.round(md.value / 1000 * 0.12);   // ~12% del margin debt (in $ mld)
+  return `<div class="info-line" style="background:var(--card-2);border-left:3px solid ${col};border-radius:8px;padding:10px;margin-top:10px">
+    <div style="font-size:13px;font-weight:700;color:${col};margin-bottom:4px">${verdict}</div>
+    <div style="font-size:12px">Leva (Margin Debt): <b>${md.pct_of_peak}% del picco</b> ${highLev ? "⚠" : ""} · Valutazione (Forward P/E S&P): <b>${pe != null ? pe + "×" : "n.d."}</b> vs media storica ${peAvg}× ${highPe ? "⚠" : ""}${fpe && fpe.is_mock ? " <span class='muted'>(stima)</span>" : ""}</div>
+    <div class="muted" style="font-size:11px;margin-top:4px">Logica: rosso se leva ≥90% del picco <b>E</b> Forward P/E &gt;20×. Scenario "deleveraging" (−15% mercato): possibili ~<b>$${fmtNum.format(callsBn)} mld</b> di margin call forzate, che amplificano la discesa. Tieni liquidità pronta per i ribassi.</div>
+  </div>`;
 }
 
 /* Popup Sharpe di PORTAFOGLIO (diverso dal popup per-titolo openSharpeInfo) */
@@ -4051,6 +4072,11 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2
     const md = m.margin_debt;
     const lev = md.pct_of_peak >= 95 ? "ESTREMA" : md.pct_of_peak >= 80 ? "alta" : md.pct_of_peak >= 60 ? "media" : "bassa";
     lines.push(`- Margin Debt (leva a credito FINRA): ${md.pct_of_peak}% del picco storico — leva ${lev}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""}. Leva alta/estrema = mercato fragile, le discese possono innescare margin call a catena (drawdown più violenti sul tech ad alta beta).`);
+  }
+  if (m.forward_pe) {
+    const fp = m.forward_pe;
+    const sysDanger = (m.margin_debt?.pct_of_peak >= 90) && fp.value > 20;
+    lines.push(`- Forward P/E S&P 500: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label})${fp.is_mock ? " [stima]" : ""}. ${sysDanger ? "RISCHIO SISTEMICO ELEVATO: leva ai massimi + valutazioni tese → vulnerabilità a deleveraging violento." : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva."}`);
   }
   if (m.credit) {
     let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`;

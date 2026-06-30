@@ -1232,6 +1232,25 @@ def fetch_macro():
     except Exception as e:
         print(f"!! sp500_pe: {e}", file=sys.stderr)
 
+    # Forward P/E S&P 500 (per il termometro di rischio sistemico).
+    # Provo a stimarlo da SPY (forwardPE); se non disponibile uso il valore di riferimento mock 24.5x.
+    try:
+        raw_fpe = None
+        try:
+            raw_fpe = (yf.Ticker("SPY").info or {}).get("forwardPE")
+        except Exception:  # noqa: BLE001
+            raw_fpe = None
+        is_mock = not raw_fpe
+        fpe = round(float(raw_fpe), 1) if raw_fpe else 24.5    # baseline giu-2026 (Yardeni/Bravo) se manca il dato
+        macro["forward_pe"] = {
+            "value": fpe,
+            "avg_hist": 16.5,                                  # media storica forward P/E S&P 500
+            "is_mock": is_mock,
+            "label": "Estremo" if fpe > 22 else "Elevato" if fpe > 18 else "Normale" if fpe > 14 else "Conveniente",
+        }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! forward_pe: {e}", file=sys.stderr)
+
     # Smart Money vs Retail: ora basato su Smart Money Concepts (SMC) di S&P 500 e Nasdaq 100
     # (struttura/BOS, FVG, liquidità, order block calcolati dall'OHLC) + proxy istituzionali
     # (struttura VIX, spread HY/IG, copertura put/call) come contesto secondario.
@@ -1335,10 +1354,17 @@ def fetch_macro():
 
 
 def fetch_margin_debt():
-    """Margin Debt (leva a credito sui conti titoli) via FRED — proxy del flow-of-funds
-    'Security Brokers and Dealers; Margin Accounts' (trimestrale, $ milioni).
+    """Margin Debt FINRA (leva a credito sui conti titoli) via FRED.
+    Provo prima la serie FINRA richiesta (più ampia, ~$1T+), poi il fallback flow-of-funds.
     Termometro: vicino ai massimi storici = leva estrema = rischio elevato."""
-    s = fred_series("BOGZ1FL663067003Q", n=120)
+    s = []
+    for sid in ("FINRADBC", "BOGZ1FL663067003Q"):   # FINRA member firms → fallback brokers/dealers
+        try:
+            s = fred_series(sid, n=120)
+            if len(s) >= 5:
+                break
+        except Exception:  # noqa: BLE001
+            s = []
     if len(s) < 5:
         return None
     vals = [v for _, v in s]
