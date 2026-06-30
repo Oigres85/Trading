@@ -3901,7 +3901,7 @@ TEAM DI RIFERIMENTO INTERNO (usali per arricchire l'analisi, NON come sezioni se
 • SARA (Equity & Fondamentali): DCF, multipli, FCF quality, ROIC, target price, catalizzatori trimestrali
 • LEI (Tecnica & Timing): RSI, supporti/resistenze, SMC/BOS/FVG, volume, forza relativa, timing entrata`);
   lines.push("");
-  lines.push("STEP 1 — RICERCA WEB (obbligatoria PRIMA del report): (a) prezzi e variazioni intraday di TUTTI i titoli in portafoglio e watchlist; (b) notizie ultime 48h per ogni titolo (earnings, guidance, upgrade/downgrade, M&A, regolazione, Fed/BoJ); (c) calendario eventi prossimi 30 giorni (FOMC, BoJ, trimestrali, dati macro chiave); (d) 2-3 nuove idee di ingresso non in portafoglio (momentum, value o event-driven) coerenti con mandato €1M/10 anni. Se i dati web contraddicono quelli sotto, cita la fonte e usa i dati più aggiornati.");
+  lines.push("STEP 1 — RICERCA WEB (obbligatoria PRIMA del report): (a) prezzi e variazioni intraday di TUTTI i titoli in portafoglio e watchlist; (b) notizie ultime 48h per ogni titolo (earnings, guidance, upgrade/downgrade, M&A, regolazione, Fed/BoJ); (c) calendario eventi prossimi 30 giorni (FOMC, BoJ, trimestrali, dati macro chiave); (d) SCANSIONE DI MERCATO per nuove idee: cerca su TUTTO il mercato USA 2-3 titoli che NON ho già (né portafoglio né watchlist) con setup interessante (momentum, value, event-driven, catalizzatori), privilegiando la Fase 2 AI (Software/Cloud/Cybersecurity/Biotech) e nomi di qualità per de-risking. NON limitarti alla mia lista: il valore aggiunto è proprio portarmi opportunità che non sto già seguendo. Se i dati web contraddicono quelli sotto, cita la fonte e usa i più aggiornati.");
   lines.push("");
   lines.push(`FORMATO DELLA RISPOSTA — IMPORTANTE: voglio un'analisi DISCORSIVA e ragionata, in prosa scorrevole, NON un elenco di numeri o tabelle tecniche. Usa i dati qui sotto solo per RAGIONARE: nel testo cita pochissime cifre (solo quelle decisive), spiegando il "perché" con parole tue, come un gestore esperto che mi parla a voce. Struttura libera in 3 parti discorsive:
 
@@ -3909,12 +3909,13 @@ TEAM DI RIFERIMENTO INTERNO (usali per arricchire l'analisi, NON come sezioni se
 
 2) IL MIO PORTAFOGLIO — Un giudizio franco e ragionato sul mio portafoglio nel contesto attuale: punti di forza, fragilità, concentrazione, quali posizioni convincono e quali preoccupano e perché. Inquadralo rispetto all'obiettivo €1.000.000 in 10 anni (profilo Diamond Hands, transizione Fase 1→Fase 2 AI). Parlami come se dovessi capire la situazione complessiva, non i singoli decimali.
 
-3) COSA FAREI ORA (conclusione sintetica e operativa) — Solo se ci sono operazioni che valga la pena fare. Per ognuna, in forma discorsiva ma con i numeri essenziali:
-   • ACQUISTI: ticker, prezzo LIMITE d'ingresso, STOP LOSS, quantità indicativa — e una frase che spiega PERCHÉ.
-   • VENDITE/ALLEGGERIMENTI: ticker, prezzo LIMITE di vendita, quantità — e il PERCHÉ (presa di profitto, multiplo tirato, tesi indebolita…).
-   Se NON ci sono operazioni sensate, dillo chiaramente ("meglio restare fermi, ecco perché"). Resta coerente col mandato: niente vendite da panico, la liquidità (${fmtEUR.format(cashEur)}) si schiera solo su debolezza reale.
+3) COSA FAREI ORA (conclusione sintetica e operativa). Elenca solo le 3-6 mosse più importanti, in ordine di priorità. REGOLA FERREA: OGNI operazione DEVE avere prezzo LIMITE, QUANTITÀ precisa (numero di azioni) e STOP LOSS — niente eccezioni, niente "valuta", niente range vaghi. Per ognuna anche una frase di PERCHÉ.
+   • ACQUISTI (sui miei titoli): ticker, prezzo limite d'ingresso, stop loss, N azioni, perché.
+   • NUOVE IDEE DAL MERCATO (OBBLIGATORIE, non solo i miei titoli): proponi 2-3 titoli USA che NON ho in portafoglio né in watchlist, scovati con la ricerca web su TUTTO il mercato (non limitarti alla mia lista). Privilegia la Fase 2 dell'AI — Software/Cloud/Cybersecurity/Biotech computazionale — o value/difensivi di qualità per de-risking. Per ciascuno: ticker, tesi in 1-2 righe, prezzo limite d'ingresso, stop loss, N azioni indicative (con la liquidità ${fmtEUR.format(cashEur)}).
+   • VENDITE/ALLEGGERIMENTI: ticker, prezzo limite di vendita, N azioni, perché (presa di profitto, multiplo tirato, tesi indebolita, scudo fiscale…).
+   Se davvero non c'è nulla da fare su una categoria, dillo ("nessun acquisto sensato ora, ecco perché"). Resta coerente col mandato: niente vendite da panico, la liquidità si schiera solo su debolezza reale.
 
-Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Massimo ~600-800 parole.`);
+Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2 discorsive; la parte 3 può essere un elenco puntato secco (è un piano operativo). Massimo ~700-900 parole.`);
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
@@ -3953,6 +3954,7 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Massimo ~600
     }
     if ((dv.trim || []).length) lines.push("Candidati ad alleggerimento (trim 25-50%): " + dv.trim.map(r => `${r.ticker} (${r.pe > 150 ? "P/E " + fmtNum.format(r.pe) : "RSI " + r.rsi})`).join(" · ") + ".");
     if ((dv.harvest || []).length) lines.push("Scudi fiscali disponibili (rami secchi in perdita per compensare le plus): " + dv.harvest.map(r => `${r.ticker} (${signTxt(Math.round(r.gain_eur), " €")})`).join(" · ") + ".");
+    lines.push("(NB: questo piano calcolato copre SOLO i miei titoli; usalo come base ma proponi ANCHE 2-3 nuovi titoli dal mercato, vedi sezione COSA FAREI ORA.)");
   } catch { /* no-op */ }
   // DIARIO DELLE AZIONI (storico operazioni e motivazioni dell'utente)
   const diary = loadDiary();
@@ -4204,7 +4206,8 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Massimo ~600
 - Scrivi in PROSA discorsiva e ragionata (niente tabelle, niente elenchi di numeri): spiega il "perché" come se mi parlassi a voce.
 - Mantieni un punto di vista OBIETTIVO: dimmi anche ciò che non va, non solo il lato positivo.
 - Cita solo le pochissime cifre decisive, integrate nel discorso.
-- Chiudi SEMPRE con la parte operativa sintetica: per ogni operazione consigliata indica prezzo LIMITE (per le vendite), STOP LOSS (per gli acquisti) e quantità indicativa, motivando ciascuna in una frase. Se non c'è nulla da fare, dillo e spiega perché.
+- Chiudi SEMPRE con la parte operativa: OGNI operazione (acquisto, vendita, nuova idea) DEVE avere prezzo LIMITE + QUANTITÀ precisa + STOP LOSS, con una frase di motivazione. Niente operazioni "a metà" senza i tre numeri.
+- OBBLIGATORIO: includi 2-3 NUOVE idee di titoli dal mercato che NON ho già (non limitarti a portafoglio/watchlist) — è la parte di maggior valore.
 
 Vincoli di mandato da rispettare nel ragionamento (NON elencarli nella risposta): obiettivo €1M in 10 anni (CAGR ~${cagrNeeded}%); profilo Diamond Hands (niente vendite da panico su volatilità normale); alleggerimenti solo parziali (Free Ride) su multipli tirati o tesi indebolite; liquidità ${fmtEUR.format(cashEur)} da schierare solo su debolezza reale; rotazione progressiva verso la Fase 2 AI (Software/Cloud/Cybersecurity/Biotech).`);
   return lines.join("\n");
