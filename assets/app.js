@@ -4256,11 +4256,16 @@ function renderSellCalc() {
         <span class="sp-cur">${c}</span><input type="number" class="sell-price${edited ? " sp-edited" : ""}" data-tk="${r.ticker}" value="${r.price}" step="any" title="Prezzo di vendita — modificabile a mano (✎)" style="width:74px">
         <span class="sp-pencil" title="Prezzo modificabile a mano">✎</span>
       </td>
-      <td class="num"><input type="number" class="sell-in" data-tk="${r.ticker}" min="0" max="${r.qty}" step="any" placeholder="0" style="width:90px"></td>
+      <td class="num"><input type="number" class="sell-in" data-tk="${r.ticker}" min="0" max="${r.qty}" step="any" placeholder="0" style="width:70px"><button class="sell-all" data-tk="${r.ticker}" title="Vendi tutta la posizione">tutte</button></td>
       <td class="num sell-pl" data-tk="${r.ticker}">—</td>
     </tr>`;
   }).join("");
   document.querySelectorAll(".sell-in").forEach(i => i.addEventListener("input", computeSell));
+  document.querySelectorAll(".sell-all").forEach(b => b.addEventListener("click", () => {
+    const inp = document.querySelector(`.sell-in[data-tk="${b.dataset.tk}"]`);
+    const r = sellRows().find(x => x.ticker === b.dataset.tk);
+    if (inp && r) { inp.value = r.qty; computeSell(); }
+  }));
   document.querySelectorAll(".sell-price").forEach(i => i.addEventListener("input", () => {
     const tk = i.dataset.tk, v = parseFloat(i.value);
     if (v > 0) { sellPriceOv[tk] = v; i.classList.add("sp-edited"); } else { delete sellPriceOv[tk]; i.classList.remove("sp-edited"); }
@@ -4279,8 +4284,15 @@ function computeSell() {
     const q = Math.min(parseFloat(inp.value) || 0, r.qty);
     const pl = r.plPerShare * q;
     const cell = document.querySelector(`.sell-pl[data-tk="${inp.dataset.tk}"]`);
-    cell.textContent = q ? signTxt(Math.round(pl), " €") : "—";
-    cell.className = `num sell-pl ${signCls(pl)}`;
+    if (q) {
+      cell.textContent = signTxt(Math.round(pl), " €");
+      cell.className = `num sell-pl ${signCls(pl)}`;
+    } else {
+      // anteprima: plus/minus latente se vendi TUTTA la posizione (così il popup è subito utile)
+      const full = r.plPerShare * r.qty;
+      cell.innerHTML = `<span class="muted" title="plus/minus se vendi tutta la posizione (${fmtNum.format(r.qty)} az.)">(${signTxt(Math.round(full), " €")})</span>`;
+      cell.className = "num sell-pl";
+    }
     if (q) {
       if (pl >= 0) gains += pl; else losses += pl;
       // prezzo di vendita × quantità (convertito in EUR se USD)

@@ -805,6 +805,9 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .sell-price { background: var(--card-2); border: 1px solid var(--border); border-radius: 5px; color: var(--text); padding: 2px 4px; font-family: var(--mono); font-size: 12px; }
 .sell-price.sp-edited { border-color: var(--blue); color: var(--blue); font-weight: 700; }
 .sp-pencil { color: var(--muted); font-size: 10px; margin-left: 3px; cursor: default; }
+.sell-all { margin-left: 5px; font-size: 10px; padding: 2px 6px; border-radius: 5px; border: 1px solid var(--border);
+  background: var(--card-2); color: var(--blue); cursor: pointer; }
+.sell-all:hover { border-color: var(--blue); }
 
 /* ---------- v69/v70: Decision top bar (compatta, micro) ---------- */
 .decision-bar { display: flex; align-items: center; gap: 16px; cursor: pointer; padding: 8px 16px; }
