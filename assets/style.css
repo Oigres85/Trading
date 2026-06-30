@@ -892,7 +892,10 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 
 /* ---------- v69: Diario azioni ---------- */
 .diary-add { display: flex; gap: 8px; margin-bottom: 10px; }
-.diary-add input { flex: 1; background: var(--card-2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 6px 8px; font-size: 12px; }
+.diary-add { align-items: flex-start; }
+.diary-add input, .diary-add textarea { flex: 1; background: var(--card-2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 6px 8px; font-size: 12px; }
+.diary-add textarea { resize: vertical; min-height: 34px; line-height: 1.4; font-family: inherit; overflow: hidden; }
+.diary-add textarea:focus { min-height: 60px; border-color: var(--blue); }
 .diary-list { display: flex; flex-direction: column; gap: 4px; max-height: 240px; overflow-y: auto; }
 .diary-item { display: flex; gap: 8px; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
 .diary-date { font-family: var(--mono); font-size: 10px; color: var(--muted); flex: 0 0 64px; }

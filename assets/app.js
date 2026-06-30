@@ -998,14 +998,23 @@ function openDecisionModal() {
      ${accHtml}${trimHtml}${taxHtml}
      <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI, coerente col mandato Diamond Hands (le correzioni sono occasioni di accumulo, non di vendita). Per il piano completo usa "Copia prompt AI".</div>
      <h4 style="margin:10px 0 6px">Diario delle azioni</h4>
-     <div class="diary-add"><input type="text" id="diary-input" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="200"><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
+     <div class="diary-add"><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
      <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
   const refresh = () => { closeChartModal(); openDecisionModal(); };
   $("#diary-save")?.addEventListener("click", () => {
     const inp = $("#diary-input"); const txt = (inp.value || "").trim();
     if (txt) { saveDiaryEntry(txt); refresh(); }
   });
-  $("#diary-input")?.addEventListener("keydown", e => { if (e.key === "Enter") { const txt = e.target.value.trim(); if (txt) { saveDiaryEntry(txt); refresh(); } } });
+  const di = $("#diary-input");
+  if (di) {
+    // si allarga man mano che scrivi; Invio = salva, Shift+Invio = a capo
+    const grow = () => { di.style.height = "auto"; di.style.height = Math.min(160, di.scrollHeight) + "px"; };
+    di.addEventListener("input", grow);
+    di.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); const txt = di.value.trim(); if (txt) { saveDiaryEntry(txt); refresh(); } }
+    });
+    di.focus();
+  }
   document.querySelectorAll(".diary-del").forEach(b => b.addEventListener("click", () => { deleteDiaryEntry(b.dataset.iso); refresh(); }));
 }
 
