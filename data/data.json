@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-07-02T04:57:01Z",
+ "updated_at": "2026-07-02T05:03:56Z",
  "eurusd": 1.1391,
  "totals": {
   "usd_value": 277557.67,
@@ -8666,18 +8666,18 @@
    "ticker": "^KS11",
    "name": "KOSPI",
    "currency": "PTS",
-   "price": 7863.4,
-   "change_pct": -5.3,
+   "price": 7851.02,
+   "change_pct": -5.45,
    "pe": null,
    "ath": 9385.59,
-   "ath_dist_pct": -16.2,
+   "ath_dist_pct": -16.4,
    "w52_high": 9385.59,
-   "w52_dist_pct": -16.2,
+   "w52_dist_pct": -16.4,
    "support": 7394.46,
    "resistance": 9385.59,
-   "rsi": 44.6,
-   "volume": 380190,
-   "vol_ratio": 0.79,
+   "rsi": 44.5,
+   "volume": 386012,
+   "vol_ratio": 0.8,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
@@ -8686,7 +8686,7 @@
      8394.65,
      8476.48,
      8303.41,
-     7863.4
+     7851.02
     ],
     "m6": [
      4108.62,
@@ -8814,7 +8814,7 @@
      8394.65,
      8476.48,
      8303.41,
-     7863.4
+     7851.02
     ],
     "all": [
      651.22,
@@ -9172,7 +9172,7 @@
      6598.87,
      8476.15,
      8476.48,
-     7863.4
+     7851.02
     ],
     "m1": [
      8801.49,
@@ -9196,7 +9196,7 @@
      8394.65,
      8476.48,
      8303.41,
-     7863.4
+     7851.02
     ],
     "m3": [
      5438.87,
@@ -9264,7 +9264,7 @@
      8394.65,
      8476.48,
      8303.41,
-     7863.4
+     7851.02
     ],
     "y1": [
      3075.06,
@@ -9345,7 +9345,8 @@
      7919.23,
      7890.0,
      7881.11,
-     7871.77
+     7871.77,
+     7851.02
     ]
    },
    "earnings_date": null,
@@ -9361,22 +9362,22 @@
     "w1": {
      "support": 7723.57,
      "resistance": 8861.7,
-     "change_pct": -6.51
+     "change_pct": -6.66
     },
     "m1": {
      "support": 7394.46,
      "resistance": 9385.59,
-     "change_pct": -10.66
+     "change_pct": -10.8
     },
     "m3": {
      "support": 5042.99,
      "resistance": 9385.59,
-     "change_pct": 44.58
+     "change_pct": 44.35
     },
     "y1": {
      "support": 3032.47,
      "resistance": 9385.59,
-     "change_pct": 155.72
+     "change_pct": 155.31
     }
    },
    "financials": [],
@@ -9401,7 +9402,7 @@
      "hi": 7899.77
     }
    },
-   "rs_1m": -9.1,
+   "rs_1m": -9.3,
    "rs_bench": "sp500"
   },
   {
@@ -10306,17 +10307,17 @@
    "ticker": "BTC-USD",
    "name": "Bitcoin",
    "currency": "USD",
-   "price": 60745.99,
-   "change_pct": 3.73,
+   "price": 60625.46,
+   "change_pct": 3.53,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -51.9,
+   "ath_dist_pct": -52.0,
    "w52_high": 126198.07,
-   "w52_dist_pct": -51.9,
+   "w52_dist_pct": -52.0,
    "support": 58075.92,
    "resistance": 67248.13,
-   "rsi": 40.4,
-   "volume": 39159279616,
+   "rsi": 39.9,
+   "volume": 39141466112,
    "vol_ratio": 1.18,
    "signal": "Trend debole",
    "signal_class": "bad",
@@ -10326,7 +10327,7 @@
      59532.34,
      60138.38,
      58558.86,
-     60745.99
+     60625.46
     ],
     "m6": [
      67453.77,
@@ -10454,7 +10455,7 @@
      59532.34,
      60138.38,
      58558.86,
-     60745.99
+     60625.46
     ],
     "all": [
      386.94,
@@ -10599,7 +10600,7 @@
      76304.32,
      73579.69,
      58558.86,
-     60745.99
+     60625.46
     ],
     "m1": [
      61449.29,
@@ -10623,7 +10624,7 @@
      59532.34,
      60138.38,
      58558.86,
-     60745.99
+     60625.46
     ],
     "m3": [
      77366.62,
@@ -10691,7 +10692,7 @@
      59532.34,
      60138.38,
      58558.86,
-     60745.99
+     60625.46
     ],
     "y1": [
      108859.32,
@@ -10798,12 +10799,13 @@
      60783.99,
      60686.22,
      60698.07,
-     60780.33
+     60780.33,
+     60625.46
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 35,
+   "health": 34,
    "eps": null,
    "beta": null,
    "sharpe_1y": -1.05,
@@ -10814,22 +10816,22 @@
     "w1": {
      "support": 58111.67,
      "resistance": 60987.32,
-     "change_pct": 1.34
+     "change_pct": 1.14
     },
     "m1": {
      "support": 58075.92,
      "resistance": 67248.13,
-     "change_pct": -1.14
+     "change_pct": -1.34
     },
     "m3": {
      "support": 58075.92,
      "resistance": 82792.21,
-     "change_pct": -21.48
+     "change_pct": -21.64
     },
     "y1": {
      "support": 58075.92,
      "resistance": 116273.31,
-     "change_pct": -44.81
+     "change_pct": -44.92
     }
    },
    "financials": [],
@@ -10854,15 +10856,15 @@
      "hi": 59940.35
     }
    },
-   "rs_1m": 0.4,
+   "rs_1m": 0.2,
    "rs_bench": "sp500"
   },
   {
    "ticker": "CL=F",
    "name": "Petrolio WTI",
    "currency": "USD",
-   "price": 67.89,
-   "change_pct": -1.01,
+   "price": 67.88,
+   "change_pct": -1.02,
    "pe": null,
    "ath": 147.27,
    "ath_dist_pct": -53.9,
@@ -10871,7 +10873,7 @@
    "support": 67.56,
    "resistance": 95.91,
    "rsi": 27.7,
-   "volume": 11222,
+   "volume": 11290,
    "vol_ratio": 0.05,
    "signal": "Ipervenduto",
    "signal_class": "info",
@@ -10881,7 +10883,7 @@
      70.75,
      69.5,
      68.58,
-     67.89
+     67.88
     ],
     "m6": [
      57.42,
@@ -11009,7 +11011,7 @@
      70.75,
      69.5,
      68.58,
-     67.89
+     67.88
     ],
     "all": [
      33.1,
@@ -11277,7 +11279,7 @@
      105.07,
      87.36,
      69.5,
-     67.89
+     67.88
     ],
     "m1": [
      93.76,
@@ -11301,7 +11303,7 @@
      70.75,
      69.5,
      68.58,
-     67.89
+     67.88
     ],
     "m3": [
      102.88,
@@ -11369,7 +11371,7 @@
      70.75,
      69.5,
      68.58,
-     67.89
+     67.88
     ],
     "y1": [
      67.45,
@@ -11429,7 +11431,8 @@
      67.79,
      67.82,
      67.82,
-     67.91
+     67.91,
+     67.88
     ]
    },
    "earnings_date": null,
@@ -11445,22 +11448,22 @@
     "w1": {
      "support": 67.56,
      "resistance": 71.86,
-     "change_pct": -1.94
+     "change_pct": -1.95
     },
     "m1": {
      "support": 67.56,
      "resistance": 97.0,
-     "change_pct": -27.59
+     "change_pct": -27.6
     },
     "m3": {
      "support": 67.56,
      "resistance": 117.63,
-     "change_pct": -34.01
+     "change_pct": -34.02
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 1.33
+     "change_pct": 1.31
     }
    },
    "financials": [],
@@ -14160,7 +14163,7 @@
      442.14,
      449.14,
      463.88,
-     468.19,
+     468.2,
      478.45,
      479.49,
      431.58,
@@ -27670,8 +27673,8 @@
    {
     "key": "^TNX",
     "label": "Treasury USA 10A",
-    "value": "4.47%",
-    "change_pct": 0.1,
+    "value": "4.37%",
+    "change_pct": -0.02,
     "suffix": " pp"
    },
    {
@@ -27684,8 +27687,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "184.94",
-    "change_pct": -0.36,
+    "value": "184.95",
+    "change_pct": -0.35,
     "suffix": "%"
    }
   ],
@@ -27693,8 +27696,8 @@
    "us10": 4.47,
    "jp10": 2.71,
    "spread": 1.76,
-   "usdjpy": 162.41,
-   "usdjpy_chg_1m": 1.74,
+   "usdjpy": 162.42,
+   "usdjpy_chg_1m": 1.75,
    "boj_rate": 0.3,
    "boj_meetings": [
     "2026-07-31",
@@ -27712,7 +27715,7 @@
    "calls": 1266
   },
   "risk_sentiment": {
-   "score": 43,
+   "score": 48,
    "label": "Neutrale",
    "components": [
     {
@@ -27729,11 +27732,11 @@
     },
     {
      "label": "Bitcoin",
-     "score": 87
+     "score": 85
     },
     {
      "label": "Treasury 10A",
-     "score": 20
+     "score": 56
     }
    ]
   },
@@ -31282,7 +31285,7 @@
      169.78,
      164.75,
      174.01,
-     171.27,
+     171.28,
      172.96,
      175.18,
      171.62,
@@ -31698,17 +31701,17 @@
     -0.004273,
     0.003343,
     0.00612,
-    -0.000733,
+    -0.000732,
     0.001896,
     0.000143,
-    0.008508,
+    0.008507,
     0.000331,
     0.004224,
     -0.000251,
     -0.002638,
     -0.001259,
     -0.003751,
-    -0.01639,
+    -0.016391,
     0.0152,
     -0.00507,
     0.00766,
@@ -31733,7 +31736,7 @@
     0.00542,
     0.008357,
     -0.002896,
-    0.002457,
+    0.002456,
     0.002312,
     0.002891,
     0.00831,
@@ -31741,7 +31744,7 @@
     0.005324,
     -0.001377,
     -0.001242,
-    0.004673,
+    0.004672,
     0.004953,
     0.004731,
     -0.005444,
@@ -31783,14 +31786,14 @@
     0.000556,
     -0.016594,
     -0.000164,
-    -0.009316,
+    -0.009317,
     -0.008398,
     0.003863,
     -0.015242,
     0.009961,
-    0.014718,
+    0.014719,
     0.009406,
-    0.006903,
+    0.006904,
     0.005458,
     -0.004566,
     0.001852,
@@ -31833,7 +31836,7 @@
     0.003984,
     -0.000101,
     -0.001984,
-    -0.002983,
+    -0.002982,
     0.004971,
     -0.008455,
     -0.004844,
@@ -31856,7 +31859,7 @@
     0.000569,
     -0.008814,
     0.007055,
-    -0.005575,
+    -0.005576,
     -0.013107,
     0.00876,
     -0.001607,
@@ -32953,10 +32956,10 @@
    "_ret_series": [
     0.00984,
     -0.007533,
-    0.000561,
+    0.000562,
     0.007079,
     -0.001438,
-    -0.002251,
+    -0.00225,
     0.003627,
     0.000917,
     0.001024,
@@ -32973,7 +32976,7 @@
     -0.005299,
     -0.019699,
     0.018452,
-    -0.00679,
+    -0.006789,
     0.012583,
     0.003384,
     0.009328,
@@ -32991,15 +32994,15 @@
     0.004015,
     0.001537,
     0.00626,
-    -0.011576,
+    -0.011575,
     -0.00838,
-    0.007867,
+    0.007868,
     0.009051,
     0.001443,
     0.004878,
     0.002833,
     0.000327,
-    0.00582,
+    0.005821,
     0.004417,
     0.008557,
     -0.000845,
@@ -33029,7 +33032,7 @@
     0.012601,
     -0.000262,
     -0.009634,
-    0.008406,
+    0.008407,
     0.010678,
     0.017809,
     0.00769,
@@ -33059,7 +33062,7 @@
     0.007826,
     0.002444,
     -0.00093,
-    0.004078,
+    0.004077,
     -0.001919,
     0.001233,
     0.004096,
@@ -33094,7 +33097,7 @@
     0.003157,
     0.0044,
     0.009065,
-    0.003312,
+    0.003311,
     -0.005985,
     -0.012011,
     0.006866,
@@ -33861,7 +33864,7 @@
      169.0,
      183.61,
      192.5,
-     204.45,
+     204.44,
      207.3,
      211.0,
      211.58,
@@ -34265,7 +34268,7 @@
     0.00219,
     0.00631,
     0.007417,
-    0.003986,
+    0.003987,
     -0.010737,
     0.010485,
     -0.006445,
@@ -34282,7 +34285,7 @@
     0.012215,
     0.003488,
     -0.005354,
-    -0.008515,
+    -0.008516,
     -0.008062,
     0.005636,
     -0.003208,
@@ -34327,7 +34330,7 @@
     -0.007404,
     -0.007539,
     0.010643,
-    0.015878,
+    0.015877,
     0.013255,
     -0.002343,
     0.010921,
@@ -34339,7 +34342,7 @@
     0.000942,
     -0.011966,
     0.019842,
-    0.007469,
+    0.007468,
     -0.018459,
     -0.003134,
     0.002841,
@@ -34347,7 +34350,7 @@
     0.000266,
     -0.014125,
     0.009744,
-    0.002289,
+    0.002288,
     -0.0086,
     -0.018002,
     0.035922,
@@ -34368,7 +34371,7 @@
     0.009181,
     -0.017323,
     0.009721,
-    -0.019101,
+    -0.019102,
     -0.022862,
     0.010881,
     -0.001025,
@@ -36619,47 +36622,47 @@
    },
    "_ret_series": [
     -0.006965,
-    -0.009543,
+    -0.009544,
     -0.001277,
-    0.010462,
+    0.010461,
     0.00069,
     -0.013795,
     -0.002098,
-    -0.007008,
+    -0.007009,
     0.001411,
     -0.000235,
-    0.001528,
+    0.001527,
     0.008916,
-    0.006046,
+    0.006047,
     -0.005548,
     -0.001743,
     0.006287,
     -0.006479,
     0.016886,
-    -0.005153,
+    -0.005154,
     0.000575,
     0.014217,
     0.002733,
     0.003066,
     -0.005774,
     -0.001708,
-    -0.004335,
+    -0.004334,
     0.001146,
     -0.005035,
     0.008281,
     -0.007414,
     -0.007125,
-    -0.002893,
+    -0.002894,
     0.005804,
     0.002193,
-    -0.004952,
-    0.007407,
+    -0.004951,
+    0.007406,
     -0.002872,
     -0.000576,
     -0.001153,
     0.006578,
-    -0.007108,
-    -0.007442,
+    -0.007109,
+    -0.007441,
     0.010977,
     0.007624,
     0.015247,
@@ -36669,9 +36672,9 @@
     0.006686,
     -0.004317,
     0.002335,
-    0.002107,
+    0.002108,
     -0.002546,
-    -0.010319,
+    -0.01032,
     -0.001906,
     -0.003595,
     0.00699,
@@ -36700,8 +36703,8 @@
     0.000437,
     0.003389,
     0.002615,
-    -0.010106,
-    -0.005819,
+    -0.010107,
+    -0.005818,
     -0.002982,
     -0.002501,
     0.002229,
@@ -36709,7 +36712,7 @@
     0.008993,
     -0.002117,
     -0.000223,
-    0.004579,
+    0.004578,
     0.001779,
     -0.008211,
     -0.005706,
@@ -36736,7 +36739,7 @@
     0.005492,
     -0.00091,
     0.004784,
-    -0.003732,
+    -0.003733,
     -0.00217,
     0.001603,
     0.006057,
@@ -36753,13 +36756,13 @@
     -0.002957,
     0.001711,
     0.005807,
-    -0.000226,
+    -0.000227,
     -0.005775,
     -0.013098,
     0.007617,
     0.004352,
     0.002737,
-    0.004777,
+    0.004776,
     -0.006225,
     -0.002278,
     0.000228,
@@ -36769,7 +36772,7 @@
     -0.002536,
     0.010862,
     0.000686,
-    -0.000229,
+    -0.000228,
     0.01154,
     -0.005309,
     0.013286,
@@ -36790,7 +36793,7 @@
     -0.003717,
     0.008705,
     -0.010647,
-    -0.012914,
+    -0.012913,
     -0.001951,
     -0.004944,
     0.007742,
@@ -36803,9 +36806,9 @@
     0.00965,
     -0.008406,
     -0.005458,
-    0.013312,
+    0.013311,
     -0.001037,
-    -0.000985,
+    -0.000984,
     0.006144,
     -0.001613,
     -0.000115,
@@ -36825,8 +36828,8 @@
     -0.004959,
     0.001043,
     -0.007757,
-    -0.000934,
-    0.003575,
+    -0.000933,
+    0.003576,
     -0.007593,
     0.005532,
     0.007609,
@@ -37833,20 +37836,20 @@
     0.008488,
     0.004438,
     0.010117,
-    -0.000568,
+    -0.000569,
     0.0014,
     -0.00976,
     0.007944,
     0.002831,
     0.00227,
-    0.007914,
+    0.007913,
     -0.001743,
     0.002194,
     -0.005731,
     -0.023274,
     0.022731,
     -0.00896,
-    0.012142,
+    0.012143,
     0.001951,
     0.008872,
     -0.005848,
@@ -37860,8 +37863,8 @@
     -0.002647,
     0.017725,
     -0.002435,
-    0.005126,
-    0.007026,
+    0.005127,
+    0.007025,
     0.009916,
     -0.015328,
     -0.010344,
@@ -37934,7 +37937,7 @@
     0.004342,
     0.008737,
     0.002169,
-    0.003606,
+    0.003607,
     -0.003619,
     -0.028866,
     -0.011168,
@@ -39094,15 +39097,15 @@
     -0.008922,
     0.003639,
     0.005916,
-    -0.010434,
+    -0.010435,
     0.007477,
     -0.017126,
     0.00697,
     0.009614,
     0.000571,
     -0.002855,
-    0.005535,
-    0.007973,
+    0.005536,
+    0.007972,
     -0.000565,
     0.006972,
     -0.006924,
@@ -39120,7 +39123,7 @@
     0.005719,
     0.004738,
     -0.010375,
-    0.000763,
+    0.000762,
     0.001905,
     0.005133,
     -0.003215,
@@ -39131,7 +39134,7 @@
     0.001302,
     0.0026,
     -0.007409,
-    -0.00168,
+    -0.001679,
     0.010467,
     -0.018313,
     0.000754,
@@ -39145,9 +39148,9 @@
     0.000925,
     0.002217,
     -0.001332,
-    -0.004445,
+    -0.004444,
     -0.00279,
-    -0.002611,
+    -0.002612,
     0.007294,
     0.005013,
     -0.004803,
@@ -39165,7 +39168,7 @@
     -0.027799,
     0.008114,
     0.01169,
-    -0.001136,
+    -0.001137,
     -0.005689,
     0.002098,
     0.010849,
@@ -39190,7 +39193,7 @@
     -0.008728,
     0.010957,
     0.004258,
-    0.012526,
+    0.012527,
     0.007804,
     0.007177,
     -0.008251,
@@ -40365,7 +40368,7 @@
     -0.014407,
     -0.008633,
     0.006154,
-    -0.008078,
+    -0.008077,
     -0.010354,
     0.004702,
     0.015678,
@@ -40395,10 +40398,10 @@
     -0.001584,
     0.011221,
     0.007622,
-    0.00545,
+    0.005451,
     0.001438,
     -0.022426,
-    0.006668,
+    0.006667,
     -0.019309,
     -0.002289,
     0.004819,
@@ -40414,7 +40417,7 @@
     0.017224,
     0.013007,
     0.008966,
-    0.009215,
+    0.009216,
     -0.018371,
     -0.010631,
     0.0,
@@ -40437,10 +40440,10 @@
     -0.010116,
     0.002384,
     -0.010421,
-    0.007441,
-    -0.005909,
+    0.00744,
+    -0.005908,
     0.007315,
-    0.000114,
+    0.000113,
     -0.010778,
     0.002638,
     0.009723,
@@ -40460,11 +40463,11 @@
     0.007561,
     0.013105,
     0.009619,
-    -0.012921,
+    -0.012922,
     0.018749,
     0.004247,
     -0.004121,
-    -0.010888,
+    -0.010889,
     0.006165,
     0.010503,
     -0.004764,
@@ -41627,10 +41630,10 @@
     0.003853,
     0.006126,
     -0.008289,
-    -0.001184,
+    -0.001183,
     -0.017996,
-    0.012443,
-    -0.011396,
+    0.012444,
+    -0.011397,
     -0.006631,
     -0.005689,
     0.018613,
@@ -41666,9 +41669,9 @@
     -0.004725,
     0.003798,
     0.00342,
-    -0.000363,
+    -0.000362,
     0.005368,
-    -0.009092,
+    -0.009091,
     0.017403,
     -0.011523,
     -0.008544,
@@ -41705,12 +41708,12 @@
     -0.006286,
     -0.010106,
     0.002223,
-    -0.000347,
+    -0.000346,
     0.001386,
     0.0045,
     0.003859,
     0.001922,
-    0.001371,
+    0.00137,
     0.007801,
     0.023085,
     0.014202,
@@ -41723,11 +41726,11 @@
     0.021067,
     0.004204,
     0.022607,
-    -0.002204,
+    -0.002205,
     -0.00486,
     -0.01497,
     -0.005989,
-    0.004665,
+    0.004664,
     -0.007609,
     -0.004159,
     -0.01194,
@@ -41736,8 +41739,8 @@
     0.009465,
     0.003125,
     0.013242,
-    -0.013004,
-    -0.001818,
+    -0.013005,
+    -0.001817,
     0.00078,
     0.006692,
     0.006592,
@@ -42823,7 +42826,7 @@
     -0.001457,
     0.000785,
     0.006279,
-    0.000111,
+    0.000112,
     0.006462,
     -0.014722,
     0.009437,
@@ -43342,14 +43345,14 @@
    "link": "https://polymarket.com/event/bitcoin-above-56k-on-july-2-2026"
   },
   {
-   "question": "Will the price of Bitcoin be above $52,000 on July 2?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-52k-on-july-2-2026"
-  },
-  {
    "question": "Will NVIDIA be the largest company in the world by market cap on July 31?",
    "yes": 90,
    "link": "https://polymarket.com/event/will-nvidia-be-the-largest-company-in-the-world-by-market-cap-on-july-31-20260624192329841"
+  },
+  {
+   "question": "Will the price of Bitcoin be above $52,000 on July 2?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-52k-on-july-2-2026"
   },
   {
    "question": "Will the price of Bitcoin be above $54,000 on July 2?",
@@ -43383,7 +43386,7 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "OpenAI propone di cedere all'amministrazione Trump una quota del 5%, riferisce FT"
+   "title_it": "OpenAI propone di cedere all'amministrazione Trump una quota del 5%, riferisce il FT"
   },
   {
    "source": "Investing.com",
@@ -43464,7 +43467,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "La Russia lancia un massiccio attacco all’Ucraina mentre la Polonia fa decollare i suoi aerei, la Finlandia limita lo spazio aereo"
+   "title_it": "La Russia lancia un massiccio attacco contro l’Ucraina mentre la Polonia fa decollare i suoi aerei, la Finlandia limita lo spazio aereo"
   },
   {
    "source": "Bloomberg",
@@ -43506,6 +43509,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Briefing mattutino EMEA: gli investitori attendono il rapporto sull'occupazione negli Stati Uniti - marketscreener.com"
+  },
+  {
+   "source": "AP",
+   "title": "Retrofitted Qatari jet takes flight as Air Force One for Trump’s trip to North Dakota - AP News",
+   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOVkdfSElVcEFEWWhDZlZKUmdXT2pfeTJDUTVUNXRmX2pOWm1OZ2ZvZEVPUUxrZzl2aFNPaHZpYkhidmJfX0Q0dDdLOXhuVUhRdWZlWVVCWUh5MlE5RlUyWUVzazdsRkZ2bjVJWV9HdHlEb1pjQ0FJX0dMbGJzb0NQUm1ScURFaVY3TlR5ZklNTTNjYmdLb2c?oc=5",
+   "published": "2026-07-02T04:16:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il jet del Qatar riadattato prende il volo come Air Force One per il viaggio di Trump nel Nord Dakota - AP News"
   },
   {
    "source": "CNBC",
@@ -43640,7 +43657,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Aprire un “conto Trump” per i tuoi figli? Ecco il rischio con cui devi prima fare i conti."
+   "title_it": "Aprire un “conto Trump” per i tuoi figli? Ecco il rischio con cui devi fare i conti per primo."
   },
   {
    "source": "Bloomberg",
@@ -43653,7 +43670,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "Il petrolio aumenta la caduta mentre altri barili scorrono attraverso lo Stretto di Hormuz"
+   "title_it": "Il petrolio aumenta la caduta mentre altri barili scorrono attraverso lo stretto di Hormuz"
   },
   {
    "source": "MarketWatch",
@@ -43668,6 +43685,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Dove posso investire i soldi del “conto Trump” di mio figlio? Il Dipartimento del Tesoro ha appena risposto a questa domanda."
+  },
+  {
+   "source": "Google News",
+   "title": "What Non-Farm Payrolls mean for the economy and markets - equiti.com",
+   "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxNTWV0bnJ3ZUgwT0lzMmZNVnB4MjltLVV5dUlUSk5rcW51Tms3Y2dHWmFDSDlseXN6Z3ktMU0ycEZRNUM3T1B2YzA1U3A4Z2Iwc2VweElhMlk3VFBXQmRiTWs1SGpPbEhYQUZod1dsMkZ3eEU5eXNtMk1YamVHdEh6Zl93?oc=5",
+   "published": "2026-07-01T21:33:28Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Cosa significano le buste paga non agricole per l’economia e i mercati - equiti.com"
   },
   {
    "source": "CNBC Markets",
@@ -43694,7 +43724,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "L'amministrazione Trump fa causa alla California, Virginia, per le nuove leggi sulle armi - AP News"
+   "title_it": "L'amministrazione Trump fa causa alla California, Virginia per le nuove leggi sulle armi – AP News"
   },
   {
    "source": "AP",
@@ -43761,20 +43791,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Warsh afferma che le previsioni sull'inflazione sono migliorate ma non dice se la Fed dovesse alzare i tassi - WSJ"
-  },
-  {
-   "source": "Google News",
-   "title": "Fed chief Kevin Warsh says inflation risks have dipped – but keeps quiet on rate hikes - New York Post",
-   "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQZ3hpcEQyN0t0WTAtcThEM2QxME1wRF9FX1BRdjk3Qjd3UmphbVNPNmZqbjlSemo5QmI0YzM3d19PLUQwVG50UUlfajBkeWVIRDZzaUxRWWRqSkpuQXByamlDaFlheGw3OXhRdHZrOU9zSXBRRVFPQVZ5emJaczA3b3hSNktWSmhnekVjc0IybnhZWXdrUjZvWHF6cUxxdGl3eWowb1NEcG83cXlrOElqWUhrel8?oc=5",
-   "published": "2026-07-01T17:57:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il capo della Fed Kevin Warsh afferma che i rischi di inflazione sono diminuiti, ma tace sugli aumenti dei tassi - New York Post"
+   "title_it": "Warsh afferma che le previsioni sull'inflazione sono migliorate ma non dirà se la Fed dovesse aumentare i tassi - WSJ"
   },
   {
    "source": "Google News",
@@ -43840,21 +43857,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "A giugno le buste paga del settore privato sono aumentate di 98.000 unità, meno del previsto, riferisce ADP"
-  },
-  {
-   "source": "AP",
-   "title": "Retrofitted Qatari jet takes flight as Air Force One for Trump’s trip to North Dakota - AP News",
-   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOVkdfSElVcEFEWWhDZlZKUmdXT2pfeTJDUTVUNXRmX2pOWm1OZ2ZvZEVPUUxrZzl2aFNPaHZpYkhidmJfX0Q0dDdLOXhuVUhRdWZlWVVCWUh5MlE5RlUyWUVzazdsRkZ2bjVJWV9HdHlEb1pjQ0FJX0dMbGJzb0NQUm1ScURFaVY3TlR5ZklNTTNjYmdLb2c?oc=5",
-   "published": "2026-07-01T13:38:36Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il jet del Qatar riadattato prende il volo come Air Force One per il viaggio di Trump nel Nord Dakota - AP News"
+   "title_it": "Le buste paga private sono aumentate di 98.000 unità a giugno, meno del previsto, riferisce ADP"
   },
   {
    "source": "Reddit",
@@ -44008,7 +44011,7 @@
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 80%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-07-02T04:58:08Z",
+   "published": "2026-07-02T05:05:14Z",
    "tickers": [
     "MACRO"
    ],
@@ -44019,7 +44022,7 @@
    "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
    "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 18%",
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
-   "published": "2026-07-02T04:58:08Z",
+   "published": "2026-07-02T05:05:14Z",
    "tickers": [
     "MACRO"
    ],
@@ -44030,18 +44033,7 @@
    "title": "Will the price of Bitcoin be above $56,000 on July 2?",
    "title_it": "Will the price of Bitcoin be above $56,000 on July 2? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-56k-on-july-2-2026",
-   "published": "2026-07-02T04:58:08Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the price of Bitcoin be above $52,000 on July 2?",
-   "title_it": "Will the price of Bitcoin be above $52,000 on July 2? — probabilità Sì 100%",
-   "link": "https://polymarket.com/event/bitcoin-above-52k-on-july-2-2026",
-   "published": "2026-07-02T04:58:08Z",
+   "published": "2026-07-02T05:05:14Z",
    "tickers": [
     "MACRO"
    ],
@@ -44052,7 +44044,18 @@
    "title": "Will NVIDIA be the largest company in the world by market cap on July 31?",
    "title_it": "Will NVIDIA be the largest company in the world by market cap on July 31? — probabilità Sì 90%",
    "link": "https://polymarket.com/event/will-nvidia-be-the-largest-company-in-the-world-by-market-cap-on-july-31-20260624192329841",
-   "published": "2026-07-02T04:58:08Z",
+   "published": "2026-07-02T05:05:14Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Will the price of Bitcoin be above $52,000 on July 2?",
+   "title_it": "Will the price of Bitcoin be above $52,000 on July 2? — probabilità Sì 100%",
+   "link": "https://polymarket.com/event/bitcoin-above-52k-on-july-2-2026",
+   "published": "2026-07-02T05:05:14Z",
    "tickers": [
     "MACRO"
    ],
@@ -44063,7 +44066,7 @@
    "title": "Will the price of Bitcoin be above $54,000 on July 2?",
    "title_it": "Will the price of Bitcoin be above $54,000 on July 2? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-54k-on-july-2-2026",
-   "published": "2026-07-02T04:58:08Z",
+   "published": "2026-07-02T05:05:14Z",
    "tickers": [
     "MACRO"
    ],
