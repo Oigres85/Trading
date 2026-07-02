@@ -8,13 +8,13 @@ const SORT_FIELDS = {
   // allineato 1:1 alle <th>: Titolo,Qtà,PMC,Prezzo,Oggi,Pre/After,Volume,Guadagno,Guad.%,
   // P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,Vol/media,RS 1M,Segnale,Rating,Target Δ,
   // Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
-  "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "volume",
+  "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg", "volume",
                 "gain", "gain_pct", "pe", "beta", "sharpe_1y", "support",
                 "resistance", "rs_1m", null, "upside_pct",
                 "fin_health", "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,
   // Vol/media,RS 1M,Segnale,Rating,Target Δ,Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
-  "wl-table": ["name", "price", "change_pct", "volume", "pe",
+  "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume", "pe",
                "beta", "sharpe_1y", "support", "resistance",
                "rs_1m", null, "upside_pct", "fin_health",
                "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
@@ -1184,7 +1184,7 @@ function systemicRiskHtml(md) {
   const callsBn = Math.round(md.value / 1000 * 0.12);   // ~12% del margin debt (in $ mld)
   return `<div class="info-line" style="background:var(--card-2);border-left:3px solid ${col};border-radius:8px;padding:10px;margin-top:10px">
     <div style="font-size:13px;font-weight:700;color:${col};margin-bottom:4px">${verdict}</div>
-    <div style="font-size:12px">Leva (Margin Debt): <b>${md.pct_of_peak}% del picco</b> ${highLev ? "⚠" : ""} · Valutazione (Forward P/E S&P): <b>${pe != null ? pe + "×" : "n.d."}</b> vs media storica ${peAvg}× ${highPe ? "⚠" : ""}${fpe && fpe.is_mock ? " <span class='muted'>(stima)</span>" : ""}</div>
+    <div style="font-size:12px">Leva (Margin Debt): <b>${md.pct_of_peak}% del picco</b> ${highLev ? "⚠" : ""}${md.series ? ` <span class="muted">(${esc(md.series)}, rilevazione ${md.date})</span>` : ""} · Valutazione (Forward P/E S&P): <b>${pe != null ? pe + "×" : "n.d. — dato API assente, nessuna stima fittizia"}</b>${pe != null ? ` vs media storica ${peAvg}×` : ""} ${highPe ? "⚠" : ""}</div>
     <div class="muted" style="font-size:11px;margin-top:4px">Logica: rosso se leva ≥90% del picco <b>E</b> Forward P/E &gt;20×. Scenario "deleveraging" (−15% mercato): possibili ~<b>$${fmtNum.format(callsBn)} mld</b> di margin call forzate, che amplificano la discesa. Tieni liquidità pronta per i ribassi.</div>
   </div>`;
 }
@@ -2136,15 +2136,6 @@ function openSharpeInfo(ticker) {
        <tr><td><b style="color:var(--red)">&lt; 0</b></td><td>Negativo — il rischio non è stato ripagato</td></tr>
      </tbody></table>
      ${pSharpe != null ? `<div class="info-line muted" style="font-size:11.5px;margin-top:8px">Sharpe complessivo del portafoglio (calcolato con la matrice di covarianza pesata per controvalore): <b style="color:${sharpeColor(pSharpe)}">${fmtNum.format(pSharpe)}</b>. Grazie alla diversificazione, lo Sharpe di portafoglio è spesso più alto della media dei singoli titoli.</div>` : ""}`);
-}
-
-/* pallino di riga: verde = grafico/popup disponibile · rosso = badge rilevante (squeeze/correzione/deep value) */
-function rowAlert(r) {
-  const sf = (r.stats || {}).short_float;
-  return (sf != null && sf > 0.12) || (r.w52_dist_pct != null && r.w52_dist_pct <= -15);
-}
-function rowDot(r) {
-  return `<span class="row-dot ${rowAlert(r) ? "alert" : ""}" title="${rowAlert(r) ? "Dati rilevanti da leggere (clicca i badge)" : "Grafico disponibile"}"></span>`;
 }
 
 function techCells(r) {
@@ -3259,11 +3250,12 @@ function renderTable() {
     const gEur = r.gain_eur != null ? r.gain_eur : (r.currency === "EUR" ? (r.gain || 0) : (r.gain || 0) / eurusd);
     const gPct = (r.bval != null && (r.bval - r.bgain)) ? r.bgain / (r.bval - r.bgain) * 100 : r.gain_pct;
     return `<tr>
-      <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${rowDot(r)}${nameDelBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${nameDelBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${priceTxt(r, c)}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
+      <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
       <td class="num ${signCls(gEur)}">${signTxt(Math.round(gEur), " €")}${r.currency === "USD" && r.gain != null ? `<br><span class="sub-eur muted">${signTxt(Math.round(r.gain), " $")} live</span>` : ""}</td>
       <td class="num ${signCls(gPct)}"><b>${signTxt(Math.round(gPct * 100) / 100)}</b></td>
@@ -3274,13 +3266,13 @@ function renderTable() {
   const t = DATA.totals;
   const usdValue = DATA.portfolio.filter(r => r.currency === "USD").reduce((s, r) => s + r.value, 0);
   const totalRow = `<tr class="total-row">
-    <td class="name-cell" colspan="6">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
+    <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
     <td colspan="14" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="22"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applyColLabels("ptf-table");
 }
@@ -3304,14 +3296,15 @@ function renderWatchlist() {
   const list = sortRows(DATA.watchlist || [], "wl-table");
   const c = (r) => r.currency === "PTS" ? "" : "$";
   const rows = list.length ? list.map(r => `<tr>
-      <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${rowDot(r)}${nameDelBtn("watchlist", r.ticker)}${esc(r.name)}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${nameDelBtn("watchlist", r.ticker)}${esc(r.name)}<span class="tk">${r.ticker}</span></td>
       <td class="num"><b>${priceTxt(r, c(r))}</b></td>
       <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
+      <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="18" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="19" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="18"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="19"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   applyColLabels("wl-table");
 }
@@ -4027,6 +4020,7 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2
       lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg ? fmtNum.format(Math.round(st.peg * 100) / 100) : "—"} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${roeTag.trim()} ${fcfWarn.trim()} |`);
     });
     lines.push("([ROIC>15%]=qualità eccellente del capitale; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [WL]=watchlist)");
+    if (DATA.sanity_filtered > 0) lines.push(`[!ANOMALIE FILTRATE DAL SANITY CHECK: ${DATA.sanity_filtered} — valori palesemente errati delle API (P/E assurdi, variazioni impossibili) sono stati rimossi a monte: i dati qui presenti sono già puliti]`);
     lines.push("");
   }
   // contesto economia USA (stile Macrotrends): P/E mercato, tassi Fed, inflazione, PIL, curva
@@ -4053,7 +4047,7 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2
     lines.push(fgl);
   }
   if (m.vix) lines.push(`- VIX: ${m.vix.value} (${signTxt(m.vix.change_pct)} oggi)`);
-  if (m.fedwatch) lines.push(`- Fed: range ${m.fedwatch.target_range}, tasso implicito futures ${m.fedwatch.implied_rate}%`);
+  if (m.fedwatch) lines.push(`- Fed Funds Rate: range ATTUALE ${m.fedwatch.target_range} · tasso implicito futures ${m.fedwatch.implied_rate}%${m.fedwatch.next_fomc ? ` · PROSSIMA RIUNIONE FOMC: ${new Date(m.fedwatch.next_fomc + "T00:00:00").toLocaleDateString("it-IT")}` : ""} (il tasso resta valido fino alla prossima decisione FOMC)`);
   if (m.carry) {
     let cl = `- Carry USA-Giappone: spread tassi 10A ${fmtNum.format(m.carry.spread)} pp (US10A ${m.carry.us10}%, JGB10A ${m.carry.jp10}%), USD/JPY ${m.carry.usdjpy} (${signTxt(m.carry.usdjpy_chg_1m)} 1 mese)${m.carry.boj_rate != null ? `, tasso BoJ ${m.carry.boj_rate}%` : ""}`;
     if ((m.carry.boj_meetings || []).length) cl += `; prossima riunione BoJ ${new Date(m.carry.boj_meetings[0] + "T00:00:00").toLocaleDateString("it-IT")} (rischio unwind se BoJ alza o lo yen si rafforza)`;
@@ -4065,18 +4059,20 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2
     lines.push(`- Put/Call ${m.putcall.symbol} (${m.putcall.name}): ${r} — ${bias} (put ${m.putcall.puts}, call ${m.putcall.calls})`);
   }
   (m.markets || []).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
-  (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (${i.date})`));
+  // ogni indicatore economico con la sua data di pubblicazione ESPLICITA: la latenza del dato
+  // deve essere palese all'AI (CPI/NFP = mensili con ~1 mese di ritardo; PIL = trimestrale)
+  (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile" : "serie mensile, normale ritardo di pubblicazione"})`));
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
   if (m.margin_debt && m.margin_debt.pct_of_peak != null) {
     const md = m.margin_debt;
     const lev = md.pct_of_peak >= 95 ? "ESTREMA" : md.pct_of_peak >= 80 ? "alta" : md.pct_of_peak >= 60 ? "media" : "bassa";
-    lines.push(`- Margin Debt (leva a credito FINRA): ${md.pct_of_peak}% del picco storico — leva ${lev}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""}. Leva alta/estrema = mercato fragile, le discese possono innescare margin call a catena (drawdown più violenti sul tech ad alta beta).`);
+    lines.push(`- Margin Debt (leva a credito, serie ${md.series || "FRED"}): ${md.pct_of_peak}% del picco storico${md.peak_date ? ` (ATH toccato il ${md.peak_date})` : ""} — leva ${lev}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""} (rilevazione ${md.date}). Leva alta/estrema = mercato fragile, le discese possono innescare margin call a catena (drawdown più violenti sul tech ad alta beta).`);
   }
-  if (m.forward_pe) {
+  if (m.forward_pe && m.forward_pe.value != null) {
     const fp = m.forward_pe;
     const sysDanger = (m.margin_debt?.pct_of_peak >= 90) && fp.value > 20;
-    lines.push(`- Forward P/E S&P 500: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label})${fp.is_mock ? " [stima]" : ""}. ${sysDanger ? "RISCHIO SISTEMICO ELEVATO: leva ai massimi + valutazioni tese → vulnerabilità a deleveraging violento." : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva."}`);
+    lines.push(`- Forward P/E S&P 500: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? "RISCHIO SISTEMICO ELEVATO: leva ai massimi + valutazioni tese → vulnerabilità a deleveraging violento." : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva."}`);
   }
   if (m.credit) {
     let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`;
@@ -4236,6 +4232,12 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2
 - OBBLIGATORIO: includi 2-3 NUOVE idee di titoli dal mercato che NON ho già (non limitarti a portafoglio/watchlist) — è la parte di maggior valore.
 
 Vincoli di mandato da rispettare nel ragionamento (NON elencarli nella risposta): obiettivo €1M in 10 anni (CAGR ~${cagrNeeded}%); profilo Diamond Hands (niente vendite da panico su volatilità normale); alleggerimenti solo parziali (Free Ride) su multipli tirati o tesi indebolite; liquidità ${fmtEUR.format(cashEur)} da schierare solo su debolezza reale; rotazione progressiva verso la Fase 2 AI (Software/Cloud/Cybersecurity/Biotech).`);
+  // istruzioni personali dell'utente (salvate in locale, priorità massima)
+  const extra = (localStorage.getItem("prompt_extra") || "").trim();
+  if (extra) {
+    lines.push("");
+    lines.push(`ISTRUZIONI PERSONALI DELL'UTENTE (PRIORITÀ MASSIMA, prevalgono su tutto il resto):\n${extra}`);
+  }
   return lines.join("\n");
 }
 
@@ -4251,10 +4253,12 @@ function toast(msg) {
 async function showPrompt() {
   const text = buildPrompt();
   $("#prompt-text").value = text;
+  const ex = $("#prompt-extra");
+  if (ex) ex.value = localStorage.getItem("prompt_extra") || "";
   $("#modal").hidden = false;
   try {
     await navigator.clipboard.writeText(text);
-    toast("Prompt copiato negli appunti ✓");
+    toast("Prompt copiato negli appunti ✓ (modificabile nel box)");
   } catch { /* clipboard non disponibile: l'utente può copiare dal box */ }
 }
 
@@ -4265,8 +4269,15 @@ $("#btn-prompt").addEventListener("click", showPrompt);
 $("#modal-close").addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
 $("#btn-copy").addEventListener("click", async () => {
-  await navigator.clipboard.writeText($("#prompt-text").value);
-  toast("Copiato ✓");
+  await navigator.clipboard.writeText($("#prompt-text").value);   // copia il testo EDITATO
+  toast("Copiato (con le tue modifiche) ✓");
+});
+// salva le istruzioni personali: incluse in fondo a OGNI prompt generato d'ora in poi
+$("#prompt-extra-save")?.addEventListener("click", () => {
+  const v = ($("#prompt-extra")?.value || "").trim();
+  if (v) localStorage.setItem("prompt_extra", v); else localStorage.removeItem("prompt_extra");
+  $("#prompt-text").value = buildPrompt();   // rigenera subito col blocco aggiornato
+  toast(v ? "Istruzioni personali salvate ✓ (incluse in ogni prompt)" : "Istruzioni personali rimosse");
 });
 /* ---------------- calcolo vendite (plus/minusvalenze) ---------------- */
 const sellPriceOv = {};   // prezzo di vendita inserito a mano per ticker (override del prezzo di mercato)
@@ -4309,6 +4320,7 @@ function renderSellCalc() {
     if (v > 0) { sellPriceOv[tk] = v; i.classList.add("sp-edited"); } else { delete sellPriceOv[tk]; i.classList.remove("sp-edited"); }
     computeSell();
   }));
+  applyColLabels("sell-table");   // etichette per la vista a schede su iPhone (input sempre visibili)
   computeSell();
 }
 

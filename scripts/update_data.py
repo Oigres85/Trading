@@ -113,6 +113,38 @@ TAX_BTP = 0.125    # titoli di Stato (aliquota agevolata 12,5%)
 RISK_FREE_RATE = float(os.environ.get("RISK_FREE_RATE", "0.0363"))
 TRADING_DAYS = 252   # giorni di borsa per l'annualizzazione
 
+# ---- Sanity check anti "Garbage In, Garbage Out" ----
+# Conta i valori palesemente errati (glitch API) scartati; il totale finisce in data.json
+# come "sanity_filtered" così il prompt AI può dichiararlo.
+SANITY_FILTERED = 0
+
+
+def sane_val(v, lo, hi, what=""):
+    """Se il valore è fuori da un range fisicamente plausibile, lo scarta (→ None) e lo conta."""
+    global SANITY_FILTERED
+    if v is None:
+        return None
+    try:
+        v = float(v)
+    except (TypeError, ValueError):
+        return None
+    if not (lo <= v <= hi):
+        SANITY_FILTERED += 1
+        print(f"!! sanity check: scartato {what}={v} (range plausibile {lo}..{hi})", file=sys.stderr)
+        return None
+    return v
+
+
+# Calendario FOMC 2026 (fonte: federalreserve.gov, pubblicato in anticipo) — serve a rendere
+# esplicita nel prompt la data della prossima riunione accanto al tasso attuale.
+FOMC_2026 = ["2026-01-27", "2026-03-17", "2026-04-28", "2026-06-16",
+             "2026-07-28", "2026-09-15", "2026-10-27", "2026-12-08"]
+
+
+def next_fomc_date():
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    return next((d for d in FOMC_2026 if d >= today), None)
+
 # candidati per la classifica delle maggiori capitalizzazioni mondiali
 TOP_CAP_CANDIDATES = {
     "NVDA": "NVIDIA", "MSFT": "Microsoft", "AAPL": "Apple", "GOOGL": "Alphabet",
@@ -327,7 +359,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         info = t.info or {}
     except Exception:  # noqa: BLE001
         info = {}
-    pe = info.get("trailingPE") or info.get("forwardPE")
+    pe = sane_val(info.get("trailingPE") or info.get("forwardPE"), 0.1, 3000, f"{ticker} P/E")
 
     sma50 = float(closes.rolling(50).mean().iloc[-1]) if len(closes) >= 50 else None
     sma200 = float(closes.rolling(200).mean().iloc[-1]) if len(closes) >= 200 else None
@@ -498,12 +530,20 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     auto_name = (info.get("shortName") or ticker).strip()
     if len(auto_name) > 26:
         auto_name = auto_name[:25].rstrip() + "…"
+    # sanity: una variazione intraday >+150% / <-80% su una large cap (>$5 mld) è un glitch API
+    chg = round((price / prev - 1) * 100, 2)
+    mcap = info.get("marketCap") or 0
+    if mcap > 5e9 and not (-80 <= chg <= 150):
+        global SANITY_FILTERED
+        SANITY_FILTERED += 1
+        print(f"!! sanity check: change_pct {chg}% scartato per {ticker} (mcap ${mcap/1e9:.0f}B)", file=sys.stderr)
+        chg = None
     return {
         "ticker": ticker,
         "name": name or auto_name,
         "currency": currency,
         "price": round(price, 2),
-        "change_pct": round((price / prev - 1) * 100, 2),
+        "change_pct": chg,
         "pe": round(float(pe), 1) if pe and pe > 0 else None,
         "ath": round(ath, 2),
         "ath_dist_pct": round((price / ath - 1) * 100, 1),
@@ -800,6 +840,7 @@ def fetch_macro():
             "implied_rate": implied,
             "delta_bp": round((implied - mid) * 100),
             "next_cut_prob": cut_prob,
+            "next_fomc": next_fomc_date(),   # data esplicita della prossima riunione FOMC
             "meetings": meetings,
             # Dot Plot: mediana SEP (Summary of Economic Projections) — da aggiornare a ogni SEP
             "dot_plot": [
@@ -1233,21 +1274,22 @@ def fetch_macro():
         print(f"!! sp500_pe: {e}", file=sys.stderr)
 
     # Forward P/E S&P 500 (per il termometro di rischio sistemico).
-    # Provo a stimarlo da SPY (forwardPE); se non disponibile uso il valore di riferimento mock 24.5x.
+    # NESSUN fallback fittizio (GIGO): se l'API non fornisce il dato, la metrica è
+    # semplicemente assente e il frontend la mostra come n.d. — mai numeri inventati.
     try:
         raw_fpe = None
         try:
             raw_fpe = (yf.Ticker("SPY").info or {}).get("forwardPE")
         except Exception:  # noqa: BLE001
             raw_fpe = None
-        is_mock = not raw_fpe
-        fpe = round(float(raw_fpe), 1) if raw_fpe else 24.5    # baseline giu-2026 (Yardeni/Bravo) se manca il dato
-        macro["forward_pe"] = {
-            "value": fpe,
-            "avg_hist": 16.5,                                  # media storica forward P/E S&P 500
-            "is_mock": is_mock,
-            "label": "Estremo" if fpe > 22 else "Elevato" if fpe > 18 else "Normale" if fpe > 14 else "Conveniente",
-        }
+        fpe = sane_val(raw_fpe, 5, 100, "S&P forward P/E")     # scarta valori assurdi
+        if fpe is not None:
+            fpe = round(float(fpe), 1)
+            macro["forward_pe"] = {
+                "value": fpe,
+                "avg_hist": 16.5,                              # media storica forward P/E S&P 500
+                "label": "Estremo" if fpe > 22 else "Elevato" if fpe > 18 else "Normale" if fpe > 14 else "Conveniente",
+            }
     except Exception as e:  # noqa: BLE001
         print(f"!! forward_pe: {e}", file=sys.stderr)
 
@@ -1357,24 +1399,30 @@ def fetch_margin_debt():
     """Margin Debt FINRA (leva a credito sui conti titoli) via FRED.
     Provo prima la serie FINRA richiesta (più ampia, ~$1T+), poi il fallback flow-of-funds.
     Termometro: vicino ai massimi storici = leva estrema = rischio elevato."""
-    s = []
-    for sid in ("FINRADBC", "BOGZ1FL663067003Q"):   # FINRA member firms → fallback brokers/dealers
+    # IMPORTANTE (fix GIGO): il picco storico va calcolato sull'INTERA serie disponibile,
+    # non su una finestra recente — altrimenti "100% del picco" è un falso massimo locale.
+    s, src = [], None
+    for sid in ("FINRADBC", "BOGZ1FL663067003Q"):   # FINRA member firms → fallback Fed Z.1 brokers/dealers
         try:
-            s = fred_series(sid, n=120)
-            if len(s) >= 5:
+            s = fred_series(sid, n=1200)            # tutta la storia (mensile ~100 anni / trimestrale ~300)
+            if len(s) >= 20:
+                src = sid
                 break
         except Exception:  # noqa: BLE001
             s = []
-    if len(s) < 5:
+    if len(s) < 20:
         return None
     vals = [v for _, v in s]
-    cur, peak = vals[-1], max(vals)
-    yoy = round((cur / vals[-5] - 1) * 100, 1) if vals[-5] else None
-    qoq = round((cur / vals[-2] - 1) * 100, 1) if vals[-2] else None
+    cur, peak = vals[-1], max(vals)                 # ATH reale su tutto lo storico
+    yoy = round((cur / vals[-5] - 1) * 100, 1) if len(vals) >= 5 and vals[-5] else None
+    qoq = round((cur / vals[-2] - 1) * 100, 1) if len(vals) >= 2 and vals[-2] else None
     pct_peak = round(cur / peak * 100, 1) if peak else None
+    peak_date = max(s, key=lambda t: t[1])[0]       # quando è stato toccato l'ATH
     return {
         "value": round(cur), "peak": round(peak), "pct_of_peak": pct_peak,
-        "yoy": yoy, "qoq": qoq, "date": s[-1][0],
+        "yoy": yoy, "qoq": qoq, "date": s[-1][0], "peak_date": peak_date,
+        # etichetta onesta della fonte: FINRA (debit balances) o Fed Z.1 (conti a margine b/d)
+        "series": "FINRA debit balances" if src == "FINRADBC" else "Fed Z.1 margin accounts (broker-dealer)",
         "history": [round(v) for v in vals[-24:]],
     }
 
@@ -2075,6 +2123,7 @@ def main():
         "news": fetch_news(),
         "options": options,
         "metrics_history": metrics_history,
+        "sanity_filtered": SANITY_FILTERED,   # anomalie API scartate dal sanity check in questo run
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
