@@ -514,6 +514,9 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             "short_float": num("shortPercentOfFloat"),
         }
         stats = {k: (round(v, 4) if v is not None else None) for k, v in stats.items()}
+        # sanity: un PEG negativo (utili o crescita attesa negativi) non è usabile nei modelli → n.d.
+        if stats.get("peg") is not None and stats["peg"] <= 0:
+            stats["peg"] = None
 
     # salute tecnica 0-100 (per il termometro di portafoglio)
     parts = []
@@ -547,6 +550,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "pe": round(float(pe), 1) if pe and pe > 0 else None,
         "ath": round(ath, 2),
         "ath_dist_pct": round((price / ath - 1) * 100, 1),
+        "sma200_dist_pct": round((price / sma200 - 1) * 100, 1) if sma200 else None,   # distanza % da SMA200 (price action pura)
         "w52_high": round(float(hist["High"].max()), 2),
         "w52_dist_pct": round((price / float(hist["High"].max()) - 1) * 100, 1),
         "support": round(float(hist["Low"].tail(20).min()), 2),
@@ -1399,12 +1403,46 @@ def fetch_margin_debt():
     """Margin Debt FINRA (leva a credito sui conti titoli) via FRED.
     Provo prima la serie FINRA richiesta (più ampia, ~$1T+), poi il fallback flow-of-funds.
     Termometro: vicino ai massimi storici = leva estrema = rischio elevato."""
-    # IMPORTANTE (fix GIGO): il picco storico va calcolato sull'INTERA serie disponibile,
-    # non su una finestra recente — altrimenti "100% del picco" è un falso massimo locale.
+    # FONTE PRIMARIA: statistiche ufficiali FINRA (customer debit balances, $ mln) dalla pagina
+    # pubblica — è la serie "vera" del margin debt (~$1,4T nel 2026, ATH pre-2026 ~$936 mld a ott 2021).
+    # Verificato: la serie "FINRADBC" NON esiste su FRED; la Z.1 resta solo come fallback.
+    MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
+              "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
+    try:
+        html = http_get("https://www.finra.org/investors/learn-to-invest/advanced-investing/margin-statistics").text
+        rows = re.findall(r"([A-Z][a-z]{2})-(\d{2})</td>\s*<td>([\d,]+)</td>", html)
+        fs = []
+        for mon, yy, val in rows:
+            mnum = MONTHS.get(mon)
+            if mnum:
+                fs.append((f"20{yy}-{mnum:02d}-01", float(val.replace(",", ""))))
+        fs.sort()
+        if len(fs) >= 6:
+            vals = [v for _, v in fs]
+            cur = vals[-1]
+            # la pagina FINRA elenca solo i mesi recenti: uso l'ATH storico documentato (ott 2021,
+            # $935,9 mld) come pavimento del picco, così il 100% è sempre l'All-Time High reale.
+            HIST_ATH_FLOOR = 935904.0
+            peak = max(max(vals), HIST_ATH_FLOOR)
+            peak_date = max(fs, key=lambda t: t[1])[0] if max(vals) >= HIST_ATH_FLOOR else "2021-10-01"
+            yoy = round((cur / vals[-13] - 1) * 100, 1) if len(vals) >= 13 and vals[-13] else None
+            mom = round((cur / vals[-2] - 1) * 100, 1) if len(vals) >= 2 and vals[-2] else None
+            return {
+                "value": round(cur), "peak": round(peak),
+                "pct_of_peak": round(cur / peak * 100, 1),
+                "yoy": yoy, "qoq": mom, "date": fs[-1][0], "peak_date": peak_date,
+                "series": "FINRA debit balances (mensile)",
+                "history": [round(v) for v in vals[-24:]],
+            }
+    except Exception as e:  # noqa: BLE001
+        print(f"!! margin debt FINRA (uso fallback FRED): {e}", file=sys.stderr)
+
+    # FALLBACK: Fed Z.1 (conti a margine broker-dealer) — misura DIVERSA e più piccola della FINRA;
+    # picco sull'INTERA serie disponibile (mai su finestre recenti).
     s, src = [], None
-    for sid in ("FINRADBC", "BOGZ1FL663067003Q"):   # FINRA member firms → fallback Fed Z.1 brokers/dealers
+    for sid in ("BOGZ1FL663067003Q",):
         try:
-            s = fred_series(sid, n=1200)            # tutta la storia (mensile ~100 anni / trimestrale ~300)
+            s = fred_series(sid, n=1200)            # tutta la storia disponibile
             if len(s) >= 20:
                 src = sid
                 break
@@ -1498,7 +1536,9 @@ def _opt_rows(df, n_each, atm_idx):
             "strike": round(float(o["strike"]), 2),
             "bid": None if pd.isna(o["bid"]) else round(float(o["bid"]), 2),
             "ask": None if pd.isna(o["ask"]) else round(float(o["ask"]), 2),
-            "iv": None if pd.isna(o.get("impliedVolatility")) else round(float(o["impliedVolatility"]) * 100, 1),
+            # IV: 0.0 è un glitch del feed, non un dato — meglio n.d. che uno zero che distorce il pricing
+            "iv": (round(float(o["impliedVolatility"]) * 100, 1)
+                   if not pd.isna(o.get("impliedVolatility")) and float(o["impliedVolatility"]) > 0.001 else None),
             "vol": int(o["volume"]) if not pd.isna(o["volume"]) else 0,
             "oi": int(o["openInterest"]) if not pd.isna(o["openInterest"]) else 0,
         })

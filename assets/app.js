@@ -9,22 +9,23 @@ const SORT_FIELDS = {
   // P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,Vol/media,RS 1M,Segnale,Rating,Target Δ,
   // Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
   "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg", "volume",
-                "gain", "gain_pct", "pe", "beta", "sharpe_1y", "support",
-                "resistance", "rs_1m", null, "upside_pct",
-                "fin_health", "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
+                "gain", "gain_pct", "beta", "sharpe_1y", "support",
+                "resistance", "sma200_dist_pct", "rs_1m", null,
+                "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,
   // Vol/media,RS 1M,Segnale,Rating,Target Δ,Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
-  "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume", "pe",
-               "beta", "sharpe_1y", "support", "resistance",
-               "rs_1m", null, "upside_pct", "fin_health",
+  "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume",
+               "beta", "sharpe_1y", "support", "resistance", "sma200_dist_pct",
+               "rs_1m", null,
                "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
-  // tabelle fondamentali (vista Value); i campi "stat:" leggono da r.stats
-  "ptf-fund-table": ["name", "qty", "pmc", "price", "stat:market_cap", "stat:ev_ebitda",
-                     "stat:roe", "stat:profit_margin", "pfcf",
-                     "stat:revenue_growth", "stat:dividend_yield", "stat:peg"],
-  "wl-fund-table": ["name", "price", "stat:market_cap", "stat:ev_ebitda",
-                    "stat:roe", "stat:profit_margin", "pfcf",
-                    "stat:revenue_growth", "stat:dividend_yield", "stat:peg"],
+  // tabelle fondamentali (vista Value); allineate 1:1 alle colonne:
+  // MarketCap, P/E, EV/EBITDA, ROE, Margine, P/FCF, Crescita, D/E, Div, PEG, FinHealth, TargetΔ
+  "ptf-fund-table": ["name", "qty", "pmc", "price", "stat:market_cap", "pe", "stat:ev_ebitda",
+                     "stat:roe", "stat:profit_margin", "pfcf", "stat:revenue_growth",
+                     "stat:debt_to_equity", "stat:dividend_yield", "stat:peg", "fin_health", "upside_pct"],
+  "wl-fund-table": ["name", "price", "stat:market_cap", "pe", "stat:ev_ebitda",
+                    "stat:roe", "stat:profit_margin", "pfcf", "stat:revenue_growth",
+                    "stat:debt_to_equity", "stat:dividend_yield", "stat:peg", "fin_health", "upside_pct"],
 };
 const sortState = {
   "ptf-table": { field: null, dir: 0 }, "wl-table": { field: null, dir: 0 },
@@ -252,29 +253,8 @@ function showRefreshDoneModal() {
   setTimeout(() => el.remove(), 8000);
 }
 
-/* Aggiornamento RAPIDO (secondi): prezzi live via Yahoo (CORS) + ricarico data.json
-   (può essere già stato rigenerato da un run schedulato). NIENTE pipeline lenta. */
-async function quickRefresh() {
-  const btn = $("#btn-quick");
-  const orig = btn.textContent;
-  btn.classList.add("btn-refreshing");
-  btn.textContent = "⟳ Aggiorno…";
-  showRefreshProgress(7000, PRICE_STAGES);   // stessa barra di "Rigenera tutto", ma veloce
-  try {
-    await Promise.allSettled([livePrices(), loadData(false)]);
-    finishRefreshProgress(true);
-    btn.classList.remove("btn-refreshing");
-    btn.classList.add("btn-done");
-    btn.textContent = "✓ Prezzi aggiornati";
-    setTimeout(() => { btn.textContent = orig; btn.classList.remove("btn-done"); }, 4000);
-  } catch {
-    finishRefreshProgress(false);
-    btn.classList.remove("btn-refreshing");
-    btn.textContent = orig;
-    toast("Errore aggiornamento prezzi");
-  }
-}
-
+// (il tasto rapido "⟳ Prezzi" è stato rimosso: resta un unico "⟳ Aggiorna tutto";
+//  i prezzi live si aggiornano comunque da soli ogni 60 secondi)
 async function refreshAll() {
   const btn = $("#btn-refresh");
   btn.classList.add("btn-refreshing");
@@ -294,7 +274,7 @@ async function refreshAll() {
     waitForNewData(DATA?.updated_at).then(ok => {
       finishRefreshProgress(ok);
       const b2 = $("#btn-refresh");
-      const origTxt = "⟳ Aggiorna";
+      const origTxt = "⟳ Aggiorna tutto";
       b2.classList.remove("btn-refreshing");
       if (ok) {
         b2.textContent = "✓ Aggiornato";
@@ -310,7 +290,7 @@ async function refreshAll() {
     toast("Errore durante l'aggiornamento");
   } finally {
     btn.classList.remove("btn-refreshing");
-    btn.textContent = "⟳ Aggiorna";
+    btn.textContent = "⟳ Aggiorna tutto";
   }
 }
 
@@ -885,7 +865,7 @@ function decisionVerdict() {
     reasons.push(`schiera la liquidità (${fmtEUR.format(cashEur)}) con ordini limite ai supporti, priorità ai titoli di qualità più alta`);
   } else if (dir != null && dir < 40) {
     label = "PRUDENZA"; col = "var(--yellow)"; score = 32;
-    reasons.push(`regime debole (segnali ${dir}/100): nessun nuovo ingresso, ma niente vendite da panico (Diamond Hands)`);
+    reasons.push(`regime debole (segnali ${dir}/100): nessun nuovo ingresso; disciplina di rischio, niente vendite emotive`);
   } else {
     label = "MANTIENI"; col = "var(--blue)"; score = dir != null ? dir : 55;
     reasons.push(`regime ${dir != null ? dir + "/100" : "neutro"}: lascia correre le posizioni vincenti, conserva la liquidità`);
@@ -914,9 +894,11 @@ function renderDecisionBar() {
   if (!box || !DATA) return;
   const v = decisionVerdict();
   const t = DATA.totals || {};
-  const GOAL = 1_000_000;
-  const patrimonio = (t.eur_invested || 0) + cashEur;
-  const compl = (patrimonio / GOAL * 100);
+  // obiettivo allineato al mandato del prompt AI: Sharpe > 2.0 e sovraperformance vs Nasdaq 100
+  const ps = t.portfolio_sharpe_ratio;
+  const bm = (DATA.macro || {}).benchmarks || {};
+  const pday = typeof portfolioDayPct === "function" ? portfolioDayPct() : null;
+  const alphaNdx = (pday != null && bm.ndx != null) ? Math.round((pday - bm.ndx) * 100) / 100 : null;
   const chips = alertsSummary();
   const chipsHtml = chips.length
     ? `<div class="dec-alerts">${chips.map(c => `<span class="dec-chip" style="color:${c.c};border-color:${c.c}" title="${esc(c.tip)}">${esc(c.t)}</span>`).join("")}</div>`
@@ -931,7 +913,7 @@ function renderDecisionBar() {
       ${chipsHtml}
     </div>
     <div class="dec-right">
-      <div class="dec-goal">${compl.toFixed(1)}% → €1M</div>
+      <div class="dec-goal" title="Mandato: massimizzare il rendimento corretto per il rischio e battere il Nasdaq 100">${alphaNdx != null ? `vs NDX oggi ${signTxt(alphaNdx, " pp")}` : "Obiettivo: battere NDX"}${ps != null ? ` · Sharpe ${fmtNum.format(ps)}/2.0` : ""}</div>
       <div class="dec-cta muted">clicca per dettagli e diario azioni</div>
     </div>`;
 }
@@ -943,6 +925,7 @@ function openDecisionModal() {
     <div class="diary-item" data-iso="${e.date}">
       <span class="diary-date">${new Date(e.date).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "2-digit" })}</span>
       <span class="diary-text">${esc(e.text)}</span>
+      <button class="diary-edit" data-iso="${e.date}" title="Modifica questa voce">✎</button>
       <button class="diary-del" data-iso="${e.date}" title="Elimina">✕</button>
     </div>`).join("") : `<div class="muted" style="font-size:12px">Nessuna voce ancora. Annota le tue operazioni e le motivazioni: il diario viene incluso nel prompt AI.</div>`;
   // tabella ACCUMULO (acquisto): prezzo limite d'ingresso, STOP LOSS, quantità, motivazione
@@ -996,7 +979,7 @@ function openDecisionModal() {
     `<div class="info-line" style="margin-bottom:8px"><b style="color:${v.col};font-size:16px">${v.label}</b></div>
      <ul style="margin:0 0 10px 18px;font-size:12.5px;line-height:1.6">${v.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
      ${accHtml}${trimHtml}${taxHtml}
-     <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI, coerente col mandato Diamond Hands (le correzioni sono occasioni di accumulo, non di vendita). Per il piano completo usa "Copia prompt AI".</div>
+     <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI. Obiettivo del motore: massimizzare il rendimento corretto per il rischio (Sharpe > 2.0) e sovraperformare il Nasdaq 100 — stesso mandato del prompt AI. Per l'analisi completa usa "Copia prompt AI".</div>
      <h4 style="margin:10px 0 6px">Diario delle azioni</h4>
      <div class="diary-add"><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
      <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
@@ -1016,6 +999,16 @@ function openDecisionModal() {
     di.focus();
   }
   document.querySelectorAll(".diary-del").forEach(b => b.addEventListener("click", () => { deleteDiaryEntry(b.dataset.iso); refresh(); }));
+  // modifica voce: carica il testo nel campo, rimuove la voce originale (si ri-salva con Aggiungi/Invio)
+  document.querySelectorAll(".diary-edit").forEach(b => b.addEventListener("click", () => {
+    const entry = loadDiary().find(x => x.date === b.dataset.iso);
+    if (!entry) return;
+    deleteDiaryEntry(b.dataset.iso);
+    const inp = $("#diary-input");
+    if (inp) { inp.value = entry.text; inp.dispatchEvent(new Event("input")); inp.focus(); }
+    document.querySelector(`.diary-item[data-iso="${b.dataset.iso}"]`)?.remove();
+    toast("Voce caricata nel campo: modifica e premi Aggiungi");
+  }));
 }
 
 /* mini-trend di una metrica vs ~1 settimana fa (dallo storico metrics_history della pipeline) */
@@ -1133,16 +1126,24 @@ function renderMiniCards() {
         <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
     }
   }
-  // Margin Debt (leva a credito sul mercato): vicino ai massimi = rischio elevato
+  // Margin Debt: l'etichetta della card DEVE riflettere la stessa logica di validazione del
+  // rischio sistemico (rosso "ESTREMA" SOLO se leva ≥90% del picco E Forward P/E >20 conferma;
+  // senza conferma → giallo). Niente cortocircuiti visivi tra widget e logica.
   const md = m.margin_debt, mdBox = $("#margin-debt-box");
   if (mdBox) {
     if (md && md.pct_of_peak != null) {
-      const score = clamp(100 - md.pct_of_peak);    // lontano dal picco = basso rischio = verde
-      const lab = md.pct_of_peak >= 95 ? "Leva estrema" : md.pct_of_peak >= 80 ? "Leva alta" : md.pct_of_peak >= 60 ? "Leva media" : "Leva bassa";
+      const fpeV = m.forward_pe && m.forward_pe.value != null ? m.forward_pe.value : null;
+      const highLev = md.pct_of_peak >= 90;
+      const confirmed = highLev && fpeV != null && fpeV > 20;         // condizione AND completa
+      let lab, col, score;
+      if (confirmed)            { lab = "Leva ESTREMA (confermata)"; col = "var(--red)"; score = 5; }
+      else if (highLev)         { lab = fpeV == null ? "Leva elevata — conferma P/E n.d." : "Leva elevata"; col = "var(--yellow)"; score = 25; }
+      else if (md.pct_of_peak >= 60) { lab = "Leva media"; col = "var(--yellow)"; score = clamp(100 - md.pct_of_peak); }
+      else                      { lab = "Leva bassa"; col = "var(--green)"; score = clamp(100 - md.pct_of_peak); }
       mdBox.innerHTML = `<div class="mc-title">Margin Debt (leva mercato)</div>
-        <div class="mc-value" style="color:${scoreColor(score)}">${md.pct_of_peak}% del picco · ${lab}</div>
+        <div class="mc-value" style="color:${col}">${md.pct_of_peak}% del picco · ${lab}</div>
         ${thermoLine(score, ["Estrema", "Bassa"])}
-        <div class="mc-sub muted">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""} · FINRA/FRED</div>`;
+        <div class="mc-sub muted">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""} · ${md.series || "FINRA/FRED"} · ${md.date || ""}</div>`;
     } else {
       mdBox.innerHTML = `<div class="mc-title">Margin Debt (leva mercato)</div>
         <div class="mc-value muted">—</div>${thermoLine(50, ["Estrema", "Bassa"])}
@@ -1156,7 +1157,11 @@ function openMarginDebtModal() {
   const md = (DATA.macro || {}).margin_debt;
   if (!md) { toast("Dati Margin Debt non ancora disponibili"); return; }
   const bn = (v) => "$" + fmtNum.format(Math.round(v / 1000)) + " mld";
-  const risk = md.pct_of_peak >= 95 ? { t: "ESTREMA", c: "var(--red)" } : md.pct_of_peak >= 80 ? { t: "ALTA", c: "var(--yellow)" } : md.pct_of_peak >= 60 ? { t: "MEDIA", c: "#86c52a" } : { t: "BASSA", c: "var(--green)" };
+  // stessa logica di validazione della card: ESTREMA (rosso) solo se leva ≥90% E Forward P/E >20
+  const fpeC = (DATA.macro || {}).forward_pe?.value ?? null;
+  const risk = (md.pct_of_peak >= 90 && fpeC != null && fpeC > 20) ? { t: "ESTREMA (confermata da P/E)", c: "var(--red)" }
+    : md.pct_of_peak >= 90 ? { t: fpeC == null ? "ELEVATA — conferma P/E n.d." : "ELEVATA", c: "var(--yellow)" }
+    : md.pct_of_peak >= 60 ? { t: "MEDIA", c: "#86c52a" } : { t: "BASSA", c: "var(--green)" };
   openInfoModal("Margin Debt — leva a credito sul mercato",
     `<div class="info-line" style="margin-bottom:8px"><b>Cos'è:</b> il debito che gli investitori contraggono presso i broker per comprare titoli a leva. Quando è vicino ai massimi storici indica euforia e fragilità: nelle discese forza vendite a catena (margin call), amplificando i crolli.</div>
      <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
@@ -1870,7 +1875,7 @@ function renderAllocation() {
     const pct = (x.value_eur / total * 100).toFixed(1);
     return `<li class="alloc-item">
       <span class="alloc-dot" style="background:${ALLOC_COLORS[i % ALLOC_COLORS.length]}"></span>
-      <span class="alloc-name">${esc(x.name)} ${x.ticker ? `<span class="tk">${x.ticker}</span>` : ""}</span>
+      <span class="alloc-name">${esc(x.name)} ${x.ticker ? `<span class="tk">${x.ticker}</span>` : ""}${x.ticker && x.sector ? ` <span class="muted" style="font-size:10px">(${esc(x.sector)})</span>` : ""}</span>
       <span class="alloc-pct">${pct}%</span>
       <span class="alloc-val muted">${fmtEUR.format(Math.round(x.value_eur))}</span>
     </li>`;
@@ -2144,16 +2149,19 @@ function techCells(r) {
   const tw = (r.tech_by_range || {})[sparkRange];
   const support = tw ? tw.support : r.support;
   const resistance = tw ? tw.resistance : r.resistance;
+  // Δ SMA200: sopra la media di lungo = trend sano; sotto = trend compromesso (price action pura)
+  const sma = r.sma200_dist_pct;
+  const smaCell = sma != null
+    ? `<td class="num"><span class="${sma >= 0 ? "pos" : "neg"}">${signTxt(sma)}</span></td>`
+    : `<td class="num muted">n.d.</td>`;
   return `
-      <td class="num">${peBar(r.pe)}</td>
       <td class="num">${betaBar(r)}</td>
       ${sharpeCell(r)}
       <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
       <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
+      ${smaCell}
       <td class="num rs-cell" data-rs-tk="${r.ticker}" role="button" tabindex="0" title="Clicca per la spiegazione della forza relativa (RS)">${rsBar(r.rs_1m, r.rs_bench)}</td>
-      <td><span class="badge ${r.signal_class}">${r.signal}</span></td>
-      <td class="num">${targetBar(r.rating)}</td>
-      <td class="num">${finHealthBar(r)}</td>
+      <td title="Logica del segnale: prezzo vs SMA50/SMA200 (trend) + RSI(14), calcolati su base giornaliera (daily). Golden setup = prezzo > SMA50 > SMA200 con RSI non estremo."><span class="badge ${r.signal_class}">${r.signal}</span></td>
       ${shortFloatCell(r)}
       ${drawdownCell(r)}
       ${optImpactCell(r.ticker)}
@@ -2312,7 +2320,7 @@ function openFinancialsModal(ticker) {
     const px = cx + bw / 2, py = yM(x.margin);
     line += `${px.toFixed(1)},${py.toFixed(1)} `;
     labels += `<text x="${px.toFixed(1)}" y="${(H - 12).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--muted)">${x.year}${x.est ? "*" : ""}</text>`;
-    labels += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="#f59e0b" opacity="${op}"><title>Margine ${x.year}: ${x.margin}%</title></circle>`;
+    labels += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3" fill="#f59e0b" opacity="${op}"><title>Margine ${x.year}: ${x.margin}%${Math.abs(x.margin) > mMax ? " (fuori scala — punto limitato al bordo per non rompere il grafico)" : ""}</title></circle>`;
   });
   const svg = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:300px">
     <line x1="${pad.l}" y1="${y0.toFixed(1)}" x2="${W - pad.r}" y2="${y0.toFixed(1)}" stroke="var(--border)"/>
@@ -2594,7 +2602,7 @@ function renderOptionsContent() {
       <td>${sym}${fmtNum.format(o.strike)}${isATM ? ' <span class="opt-tag">ATM</span>' : ""}</td>
       <td>${o.bid != null ? fmtNum.format(o.bid) : "—"}</td>
       <td>${o.ask != null ? fmtNum.format(o.ask) : "—"}</td>
-      <td>${o.iv != null ? o.iv.toFixed(1) + "%" : "—"}</td>
+      <td>${o.iv != null && o.iv > 0 ? o.iv.toFixed(1) + "%" : "n.d."}</td>
       <td>${(o.vol || 0).toLocaleString("it-IT")}</td>
       <td>${(o.oi || 0).toLocaleString("it-IT")}${isWall ? ` <span class="opt-wall-lab">${wallLab}</span>` : ""}</td>
     </tr>`;
@@ -3156,8 +3164,7 @@ function openMacroInfo(key) {
       <div class="info-line muted" style="font-size:11px;margin-top:4px">Sotto zero = inversione = segnale storico di recessione. La dis-inversione (risalita verso 0 e oltre) è in corso da fine 2023.</div>`;
   }
 
-  openInfoModal(name, `<p style="margin:0 0 10px">${desc}</p>${extra}
-    <h4 style="margin:10px 0 4px">Notizie correlate</h4>${relatedNews(rx)}`);
+  openInfoModal(name, `<p style="margin:0 0 10px">${desc}</p>${extra}`);
 }
 
 function openEarningsInfo(ticker) {
@@ -3195,8 +3202,7 @@ function openEarningsInfo(ticker) {
     <div class="info-line"><b>Data attesa:</b> ${r.earnings_date ? new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "n/d"} ${days != null ? `(tra ${days} gg)` : ""}</div>
     ${consensoHtml}
     ${expHtml}
-    <div class="info-line muted" style="margin:10px 0 12px">EPS e stime si aggiornano dopo ogni trimestrale. Target = media analisti coverage; crescita attesa e P/E prospettico dal consenso (fonte: yfinance).</div>
-    <h4 style="margin:6px 0">Notizie correlate</h4>${relatedNews(rx)}`);
+    <div class="info-line muted" style="margin:10px 0 12px">EPS e stime si aggiornano dopo ogni trimestrale. Target = media analisti coverage; crescita attesa e P/E prospettico dal consenso (fonte: yfinance).</div>`);
 }
 
 function delBtn(section, ticker) {
@@ -3269,10 +3275,10 @@ function renderTable() {
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="14" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="12" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="21"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applyColLabels("ptf-table");
 }
@@ -3302,9 +3308,9 @@ function renderWatchlist() {
       <td class="num">${prepostCell(r.prepost)}</td>
       <td class="num">${fmtVolume(r.volume)}</td>
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="19" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="17" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="19"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="17"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   applyColLabels("wl-table");
 }
@@ -3346,8 +3352,8 @@ const FSC = {
 function buildFundTable(list, tableSel, withQtyPmc) {
   const tableId = tableSel.replace("#", "");
   const head = (withQtyPmc ? ["Titolo", "Qtà", "PMC", "Prezzo"] : ["Titolo", "Prezzo"])
-    .concat(["Market Cap", "EV/EBITDA", "ROE", "Margine netto", "P/FCF", "Cresc. ricavi", "Div Yield", "PEG"]);
-  const fundColspan = 8;
+    .concat(["Market Cap", "P/E", "EV/EBITDA", "ROE", "Margine netto", "P/FCF", "Cresc. ricavi", "Debt/Equity", "Div Yield", "PEG", "Financial Health", "Target Δ"]);
+  const fundColspan = 12;
   $(`${tableSel} thead`).innerHTML = "<tr>" +
     head.map((h, i) => `<th class="${i === 0 ? "sticky-col" : "num"}">${h}</th>`).join("") + "</tr>";
   const orig = list;                          // ordine originale (per il ripristino "default")
@@ -3376,15 +3382,22 @@ function buildFundTable(list, tableSel, withQtyPmc) {
     const pfcfHtml = pfcf == null ? "—" : pfcf < 0 ? `<span class="neg">neg.</span>` : `${fundBar(pfcf, fmtNum.format, FSC.pfcf(pfcf))}${pfcfWarn}`;
     const revGrowthFlag = st.revenue_growth != null && st.revenue_growth < 0.05 && (st.ev_ebitda || 0) > 18
       ? `<span style="color:var(--yellow);cursor:help;font-size:11px" title="Crescita ricavi bassa (<5%) con EV/EBITDA elevato: possibile crescita non organica da acquisizioni"> ?</span>` : "";
+    // sanity di rendering: PEG negativo e D/E fuori scala non entrano nei modelli → "n.d."
+    const pegOk = st.peg != null && st.peg > 0;
+    const deOk = st.debt_to_equity != null && st.debt_to_equity >= 0 && st.debt_to_equity < 1000;
     return `<tr class="fund-row" data-fund-tk="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per conto economico e statistiche">${lead}
       <td class="num">${bigUsd(st.market_cap)}</td>
+      <td class="num">${peTtm > 0 ? fmtNum.format(Math.round(peTtm * 10) / 10) + "×" : "n.d."}</td>
       <td class="num">${fundBar(st.ev_ebitda, fmtNum.format, FSC.ev(st.ev_ebitda))}</td>
       <td class="num">${roeHtml}</td>
       <td class="num">${fundBar(st.profit_margin, pctPlain, FSC.net(st.profit_margin))}</td>
       <td class="num">${pfcfHtml}</td>
       <td class="num">${fundBar(st.revenue_growth, pctOf, FSC.growth(st.revenue_growth))}${revGrowthFlag}</td>
+      <td class="num" title="Debito totale / patrimonio netto (leva finanziaria, fonte yfinance)">${deOk ? fmtNum.format(Math.round(st.debt_to_equity)) + "%" : "n.d."}</td>
       <td class="num">${st.dividend_yield ? fundBar(st.dividend_yield, pctPlain, FSC.div(st.dividend_yield)) : "—"}</td>
-      <td class="num">${fundBar(st.peg, fmtNum.format, FSC.peg(st.peg))}</td>
+      <td class="num">${pegOk ? fundBar(st.peg, fmtNum.format, FSC.peg(st.peg)) : "n.d."}</td>
+      <td class="num">${finHealthBar(r)}</td>
+      <td class="num">${targetBar(r.rating)}</td>
     </tr>`;
   }).join("");
   $(`${tableSel} tbody`).innerHTML = rows;
@@ -3891,56 +3904,30 @@ function buildPrompt() {
   const t = DATA.totals;
   const m = DATA.macro || {};
   const lines = [];
-  const GOAL = 1_000_000;
   const patrimonio = t.eur_invested + cashEur;
-  const cagrNeeded = patrimonio > 0 && patrimonio < GOAL
-    ? ((Math.pow(GOAL / patrimonio, 1 / 10) - 1) * 100).toFixed(1) : "0.0";
-  const distPct = ((patrimonio / GOAL - 1) * 100).toFixed(1);
-  const distEur = Math.round(GOAL - patrimonio);
-  lines.push(`*** DISTANZA DALL'OBIETTIVO: patrimonio attuale ${fmtEUR.format(Math.round(patrimonio))} / obiettivo €1.000.000 — completamento ${(patrimonio/GOAL*100).toFixed(1)}% — CAGR necessario: ${cagrNeeded}% annuo per 10 anni — mancano ${fmtEUR.format(distEur > 0 ? distEur : 0)} ***`);
+  lines.push("RUOLO: sei un ANALISTA QUANTITATIVO SENIOR di un Hedge Fund. Approccio asettico, matematico e strategico: nessuna emotività, nessun aneddoto, nessun disclaimer — solo evidenza estratta dai dati.");
   lines.push("");
-  lines.push("MANDATO OBIETTIVO — LEGGILO PRIMA DI TUTTO IL RESTO:");
-  lines.push(`Cliente: uomo 40 anni. Obiettivo: €1.000.000 netti in 10 anni (CAGR target ~12-15% annuo, necessario oggi: ${cagrNeeded}%). Profilo: DIAMOND HANDS — tollera drawdown del -20-30% senza vendere (orizzonte decade, non settimana). Piano di transizione: FASE 1 (attuale) = semiconduttori/hardware AI → FASE 2 (2026-2028) = Software AI / Cloud / Cybersecurity / Biotech AI — iniziare rotazione anticipata. La liquidità disponibile (${fmtEUR.format(cashEur)}) è "polvere secca" da deployare in zone di correzione identificate dai dati di drawdown. Ogni raccomandazione deve essere COERENTE con questo mandato: non suggerire uscite per paura, non suggerire diversificazione difensiva eccessiva che riduce il CAGR sotto il ${cagrNeeded}% necessario.`);
+  lines.push("MANDATO ISTITUZIONALE: Il tuo obiettivo istituzionale è la massimizzazione del rendimento assoluto corretto per il rischio (Sharpe Ratio > 2.0) e la sovraperformance strutturale rispetto al Nasdaq 100. Analizza ogni dato con la spietatezza di un risk manager.");
   lines.push("");
-  lines.push("IDENTITÀ OPERATIVA — NON SEI UN ADVISOR RETAIL: ragiona, parla e struttura le operazioni con la freddezza e l'intelligenza adattiva, opportunistica e spietata di un HEDGE FUND SPECULATIVO (Long/Short Equity & Venture Capital). Abbandona ogni rigidità retail. Applica SEMPRE questi 4 PILASTRI ISTITUZIONALI a ogni raccomandazione:");
-  lines.push(`① ADATTABILITÀ E GESTIONE ASIMMETRICA (Scale-In / Scale-Out): ABBANDONA la logica binaria "Compra Tutto / Vendi Tutto". Quando un titolo è in forte ipercomprato, raggiunge multipli tossici (es. P/E > 150 senza iper-crescita) o si avvicina a un catalizzatore binario estremo (es. trimestrale imminente con estensione estrema del prezzo), NON proporre uscita totale: calcola e proponi un TRIMMING STRATEGICO parziale (alleggerimento del 25-50%, indica N azioni esatte) per recuperare il capitale di rischio e lasciare correre la posizione residua in "FREE RIDE" (profitto puro senza rischio sul trend).`);
-  lines.push(`② TAX ALPHA (Ottimizzazione Fiscale Dinamica): le tasse uccidono l'interesse composto. Ogni volta che proponi una presa di profitto (capital gain tassato 26%), DEVI scansionare il portafoglio cercando "aziende zombie" (ROIC negativo, FCF negativo, tesi fondamentale rotta, trend strutturalmente compromesso) da liquidare in perdita per generare SCUDI FISCALI (minusvalenze). Calcola la quantità ESATTA di azioni da vendere in profitto e in perdita affinché le minusvalenze assorbano quasi interamente le plusvalenze → tasse vicine a zero e massima liquidità netta generata ("polvere secca"). Ricorda: in Italia le minus compensano le plus entro il quadriennio fiscale.`);
-  lines.push(`③ VALUTAZIONE DEI CATALIZZATORI (Macro & Politici): non basarti SOLO sui bilanci. Se un'azienda anche in perdita ottiene un catalizzatore governativo/sistemico (es. sussidi USA su Quantum Computing per RGTI, partnership AI strategiche per GOOGL/MU/AMD), la logica fondamentale passa in secondo piano: il titolo diventa un'OPZIONE "MOONSHOT" speculativa e va MANTENUTO/accumulato per il potenziale rialzo esponenziale. Cita i catalizzatori politici/macro emersi dalla ricerca web.`);
-  lines.push(`④ GESTIONE DELLA POLVERE SECCA (Liquidity as a Weapon): la cassa NON si usa mai sui massimi. Solo nelle giornate "Blood in the streets" (VIX > 20, pre-market in rosso sangue, crolli asiatici/europei) la liquidità (${fmtEUR.format(cashEur)}) va schierata come trappola: proponi ORDINI LIMITE di acquisto millimetrici sui supporti tecnici chiave per asset di altissima qualità. In quei giorni NON limitarti al tech: scansiona la watchlist anche su settori non-tech penalizzati da vendite indiscriminate (Value, Financials, Aerospace/Difesa, Cloud, Data, Banche) e privilegia i titoli con i migliori fondamentali (ROIC > 15%) su supporti millimetrici. Se il prezzo non raggiunge il limite, la liquidità si CONSERVA — nessun inseguimento.`);
+  lines.push("ESTRAZIONE TOTALE E VERIFICA: scansiona TUTTI i dati forniti in questo payload — macro, tecnici, fondamentali, metriche di rischio (Sharpe, Beta, drawdown, short interest, implied move), opzioni, news e diario. Sei autorizzato e incoraggiato a utilizzare i tuoi tool di ricerca web per verificare, aggiornare e approfondire i dati macroeconomici, tecnici e fondamentali forniti, assicurandoti che l'analisi sia perfettamente allineata alla realtà in tempo reale. Ogni dato riporta la propria data di rilevazione: pesa esplicitamente il lag temporale (le serie mensili/trimestrali hanno un ritardo di pubblicazione fisiologico).");
   lines.push("");
-  lines.push(`Sei un SENIOR PORTFOLIO ADVISOR con competenze integrate di macro, equity, tecnica e risk management — profilo istituzionale da $10B+ fund, specializzato in growth tech USA. Produci un'analisi UNIVOCA, COESA e AZIONABILE: non cinque voci separate, ma un REPORT PROFESSIONALE UNICO come se fossi il CIO di un family office. Usa tutti i dati forniti (prezzi, fondamentali, macro, news, opzioni, SMC). Nessun disclaimer, nessuna vaghezza: solo numeri, ticker precisi, quantità precise, livelli precisi.
+  lines.push(`STRUTTURA DELL'OUTPUT — rispondi SOLO con queste due sezioni, in modo discorsivo, comprensibile ma altamente tecnico:
 
-TEAM DI RIFERIMENTO INTERNO (usali per arricchire l'analisi, NON come sezioni separate):
-• MARCO (Macro & Ciclo): curva tassi, carry, credito HY, PIL, Fed, istituzionali vs retail, rotazione settoriale
-• SARA (Equity & Fondamentali): DCF, multipli, FCF quality, ROIC, target price, catalizzatori trimestrali
-• LEI (Tecnica & Timing): RSI, supporti/resistenze, SMC/BOS/FVG, volume, forza relativa, timing entrata`);
-  lines.push("");
-  lines.push("STEP 1 — RICERCA WEB (obbligatoria PRIMA del report): (a) prezzi e variazioni intraday di TUTTI i titoli in portafoglio e watchlist; (b) notizie ultime 48h per ogni titolo (earnings, guidance, upgrade/downgrade, M&A, regolazione, Fed/BoJ); (c) calendario eventi prossimi 30 giorni (FOMC, BoJ, trimestrali, dati macro chiave); (d) SCANSIONE DI MERCATO per nuove idee: cerca su TUTTO il mercato USA 2-3 titoli che NON ho già (né portafoglio né watchlist) con setup interessante (momentum, value, event-driven, catalizzatori), privilegiando la Fase 2 AI (Software/Cloud/Cybersecurity/Biotech) e nomi di qualità per de-risking. NON limitarti alla mia lista: il valore aggiunto è proprio portarmi opportunità che non sto già seguendo. Se i dati web contraddicono quelli sotto, cita la fonte e usa i più aggiornati.");
-  lines.push("");
-  lines.push(`FORMATO DELLA RISPOSTA — IMPORTANTE: voglio un'analisi DISCORSIVA e ragionata, in prosa scorrevole, NON un elenco di numeri o tabelle tecniche. Usa i dati qui sotto solo per RAGIONARE: nel testo cita pochissime cifre (solo quelle decisive), spiegando il "perché" con parole tue, come un gestore esperto che mi parla a voce. Struttura libera in 3 parti discorsive:
+1. SCENARIO MACROECONOMICO E FLUSSI — Un quadro narrativo chiaro che spieghi la situazione attuale incrociando i dati macro forniti (tassi, inflazione, curva, credito, VIX, sentiment, leva/margin debt, stagionalità, rotazione settoriale, posizionamento istituzionale) con le tue verifiche online: regime in corso, driver dominanti dei flussi, 2-3 fattori che possono rompere lo scenario.
 
-1) IL MERCATO, IN SINTESI — Un punto di vista OBIETTIVO e onesto su dove sta andando il mercato (azionario USA / tech in particolare) nelle prossime settimane: qual è il clima (rischio-on o rischio-off), cosa lo sta guidando (ciclo, tassi, sentiment, valutazioni, rotazione settoriale) e quali sono i 2-3 fattori che potrebbero cambiare le carte. Motiva ogni affermazione, senza sciorinare numeri.
+2. RADIOGRAFIA DEL PORTAFOGLIO — Un focus sullo stato di salute del portafoglio fornito: concentrazione (settoriale e per singola posizione), inefficienze, profilo di rischio (Beta, Sharpe — a confronto con il target istituzionale 2.0 —, drawdown, correlazioni implicite tra le posizioni), qualità e coerenza delle posizioni rispetto al mandato di sovraperformance sul Nasdaq 100, tenendo conto dello storico letto dal DIARIO DELLE AZIONI.
 
-2) IL MIO PORTAFOGLIO — Un giudizio franco e ragionato sul mio portafoglio nel contesto attuale: punti di forza, fragilità, concentrazione, quali posizioni convincono e quali preoccupano e perché. Inquadralo rispetto all'obiettivo €1.000.000 in 10 anni (profilo Diamond Hands, transizione Fase 1→Fase 2 AI). Parlami come se dovessi capire la situazione complessiva, non i singoli decimali.
-
-3) COSA FAREI ORA (conclusione sintetica e operativa). Elenca solo le 3-6 mosse più importanti, in ordine di priorità. REGOLA FERREA: OGNI operazione DEVE avere prezzo LIMITE, QUANTITÀ precisa (numero di azioni) e STOP LOSS — niente eccezioni, niente "valuta", niente range vaghi. Per ognuna anche una frase di PERCHÉ.
-   • ACQUISTI (sui miei titoli): ticker, prezzo limite d'ingresso, stop loss, N azioni, perché.
-   • NUOVE IDEE DAL MERCATO (OBBLIGATORIE, non solo i miei titoli): proponi 2-3 titoli USA che NON ho in portafoglio né in watchlist, scovati con la ricerca web su TUTTO il mercato (non limitarti alla mia lista). Privilegia la Fase 2 dell'AI — Software/Cloud/Cybersecurity/Biotech computazionale — o value/difensivi di qualità per de-risking. Per ciascuno: ticker, tesi in 1-2 righe, prezzo limite d'ingresso, stop loss, N azioni indicative (con la liquidità ${fmtEUR.format(cashEur)}).
-   • VENDITE/ALLEGGERIMENTI: ticker, prezzo limite di vendita, N azioni, perché (presa di profitto, multiplo tirato, tesi indebolita, scudo fiscale…).
-   Se davvero non c'è nulla da fare su una categoria, dillo ("nessun acquisto sensato ora, ecco perché"). Resta coerente col mandato: niente vendite da panico, la liquidità si schiera solo su debolezza reale.
-
-Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2 discorsive; la parte 3 può essere un elenco puntato secco (è un piano operativo). Massimo ~700-900 parole.`);
+BLOCCO OPERATIVO (DIVIETO TASSATIVO): in questa fase NON devi suggerire alcuna operazione — nessun acquisto, vendita, alleggerimento, rotazione, copertura, prezzo o quantità. L'output deve chiudersi OBBLIGATORIAMENTE con questa frase esatta: "Analisi completata. In attesa di interrogazioni tattiche su eventuali ingressi, uscite o rotazioni di portafoglio."`);
   lines.push("");
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")}`);
   const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
-  lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(Math.round(patrimonio))} (${(patrimonio/GOAL*100).toFixed(1)}% del target €1M, CAGR necessario ${cagrNeeded}%)${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
+  lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(Math.round(patrimonio))}${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
   // METRICHE DI RISCHIO/PORTAFOGLIO (dai popup della dashboard)
   const riskBits = [];
-  if (t.portfolio_sharpe_ratio != null) riskBits.push(`Sharpe Ratio portafoglio ${fmtNum.format(t.portfolio_sharpe_ratio)} (Rf ${fmtNum.format((t.risk_free_rate ?? 0.0363) * 100)}%; >2 eccellente, 1-2 buono, <1 debole)`);
-  if (cashEur > 0 && patrimonio > 0 && patrimonio < GOAL) {
+  if (t.portfolio_sharpe_ratio != null) riskBits.push(`Sharpe Ratio portafoglio ${fmtNum.format(t.portfolio_sharpe_ratio)} vs target istituzionale 2.0 (Rf ${fmtNum.format((t.risk_free_rate ?? 0.0363) * 100)}%)`);
+  if (cashEur > 0 && patrimonio > 0) {
     const cFrac = cashEur / patrimonio;
-    const rInv = (Number(cagrNeeded) / (1 - cFrac));
-    riskBits.push(`Cash Drag: liquidità ${(cFrac * 100).toFixed(1)}% a 0% → la quota investita deve rendere ${rInv.toFixed(1)}%/anno per tenere il CAGR ${cagrNeeded}% (sovraccarico +${(rInv - Number(cagrNeeded)).toFixed(1)} pp)`);
+    riskBits.push(`Liquidità infruttifera: ${(cFrac * 100).toFixed(1)}% del patrimonio a rendimento 0 (drag strutturale sul rendimento composto e sullo Sharpe complessivo)`);
   }
   if (riskBits.length) lines.push("METRICHE DI RISCHIO: " + riskBits.join(" · ") + ".");
   // STAGIONALITÀ del mese corrente
@@ -3954,21 +3941,21 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2
     const ns = newsSummary(DATA.news);
     lines.push(`SINTESI NEWS: tono ${ns.tone.t} su ${ns.tot} notizie (${ns.bull} positive, ${ns.neu} neutre, ${ns.bear} negative).`);
   }
-  // VERDETTO + PIANO OPERATIVO calcolato dalla dashboard (top bar Decisione) — base di partenza per l'AI
+  // OUTPUT DEL MOTORE DELLA DASHBOARD — solo DATI di contesto sul posizionamento interno.
+  // In modalità standby l'AI NON deve commentarli operativamente né trasformarli in raccomandazioni.
   try {
     const dv = decisionVerdict();
-    lines.push(`VERDETTO DASHBOARD: ${dv.label} — ${dv.reasons.join("; ")}.`);
+    lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (dato di contesto — NON commentare operativamente, usalo solo per valutare posizionamento e coerenza): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
     if ((dv.withPlan || []).length) {
-      lines.push("Piano d'acquisto calcolato (ordini limite ai supporti, ripartendo la liquidità): " +
+      lines.push("· Livelli calcolati dal motore (contesto): " +
         dv.withPlan.map(p => {
           const sup = (p.r.tech_by_range?.[sparkRange]?.support) || p.r.support;
           const stop = (sup && sup < p.limit ? sup * 0.99 : p.limit * 0.92);
-          return `${p.r.ticker} ${p.qty}az a $${fmtNum.format(Math.round(p.limit * 100) / 100)} (stop $${fmtNum.format(Math.round(stop * 100) / 100)}, qualità ${p.q}/100)`;
+          return `${p.r.ticker} limite $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(Math.round(stop * 100) / 100)} (qualità ${p.q}/100)`;
         }).join(" · ") + ".");
     }
-    if ((dv.trim || []).length) lines.push("Candidati ad alleggerimento (trim 25-50%): " + dv.trim.map(r => `${r.ticker} (${r.pe > 150 ? "P/E " + fmtNum.format(r.pe) : "RSI " + r.rsi})`).join(" · ") + ".");
-    if ((dv.harvest || []).length) lines.push("Scudi fiscali disponibili (rami secchi in perdita per compensare le plus): " + dv.harvest.map(r => `${r.ticker} (${signTxt(Math.round(r.gain_eur), " €")})`).join(" · ") + ".");
-    lines.push("(NB: questo piano calcolato copre SOLO i miei titoli; usalo come base ma proponi ANCHE 2-3 nuovi titoli dal mercato, vedi sezione COSA FAREI ORA.)");
+    if ((dv.trim || []).length) lines.push("· Posizioni segnalate dal motore come tese (contesto): " + dv.trim.map(r => `${r.ticker} (${r.pe > 150 ? "P/E " + fmtNum.format(r.pe) : "RSI " + r.rsi})`).join(" · ") + ".");
+    if ((dv.harvest || []).length) lines.push("· Minusvalenze latenti utilizzabili fiscalmente (contesto): " + dv.harvest.map(r => `${r.ticker} (${signTxt(Math.round(r.gain_eur), " €")})`).join(" · ") + ".");
   } catch { /* no-op */ }
   // DIARIO DELLE AZIONI (storico operazioni e motivazioni dell'utente)
   const diary = loadDiary();
@@ -4017,7 +4004,7 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2
       const fcfWarn = pfcf != null && peTtm2 > 0 && pfcf > peTtm2 * 2 ? " [!FCF]" : "";
       const roeTag = st.roe != null && st.roe > 0.15 ? " [ROIC>15%]" : "";
       const wlTag = DATA.portfolio.find(p => p.ticker === r.ticker) ? "" : " [WL]";
-      lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg ? fmtNum.format(Math.round(st.peg * 100) / 100) : "—"} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${roeTag.trim()} ${fcfWarn.trim()} |`);
+      lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg > 0 ? fmtNum.format(Math.round(st.peg * 100) / 100) : "n.d."} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${roeTag.trim()} ${fcfWarn.trim()} |`);
     });
     lines.push("([ROIC>15%]=qualità eccellente del capitale; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [WL]=watchlist)");
     if (DATA.sanity_filtered > 0) lines.push(`[!ANOMALIE FILTRATE DAL SANITY CHECK: ${DATA.sanity_filtered} — valori palesemente errati delle API (P/E assurdi, variazioni impossibili) sono stati rimossi a monte: i dati qui presenti sono già puliti]`);
@@ -4046,7 +4033,11 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2
     if ((m.fear_greed.components || []).length) fgl += ` [componenti: ${m.fear_greed.components.map(c => `${c.label} ${c.rating}${c.score != null ? ` ${c.score}` : ""}`).join("; ")}]`;
     lines.push(fgl);
   }
-  if (m.vix) lines.push(`- VIX: ${m.vix.value} (${signTxt(m.vix.change_pct)} oggi)`);
+  // sanity finale sul payload: un valore impossibile diventa "n.d." e NON entra nell'analisi
+  const nd = (v, lo, hi) => (v != null && v >= lo && v <= hi) ? v : null;
+  const vixOk = m.vix ? nd(m.vix.value, 0.1, 200) : null;   // VIX negativo o assurdo = glitch
+  if (vixOk != null) lines.push(`- VIX: ${vixOk} (${signTxt(m.vix.change_pct)} oggi — rilevazione odierna)`);
+  else if (m.vix) lines.push("- VIX: n.d. (valore scartato dal sanity check)");
   if (m.fedwatch) lines.push(`- Fed Funds Rate: range ATTUALE ${m.fedwatch.target_range} · tasso implicito futures ${m.fedwatch.implied_rate}%${m.fedwatch.next_fomc ? ` · PROSSIMA RIUNIONE FOMC: ${new Date(m.fedwatch.next_fomc + "T00:00:00").toLocaleDateString("it-IT")}` : ""} (il tasso resta valido fino alla prossima decisione FOMC)`);
   if (m.carry) {
     let cl = `- Carry USA-Giappone: spread tassi 10A ${fmtNum.format(m.carry.spread)} pp (US10A ${m.carry.us10}%, JGB10A ${m.carry.jp10}%), USD/JPY ${m.carry.usdjpy} (${signTxt(m.carry.usdjpy_chg_1m)} 1 mese)${m.carry.boj_rate != null ? `, tasso BoJ ${m.carry.boj_rate}%` : ""}`;
@@ -4222,22 +4213,12 @@ Tono: lucido, diretto, onesto, niente disclaimer, niente tabelloni. Le parti 1-2
     });
   }
   lines.push("");
-  lines.push(`ROTAZIONE & DE-RISKING SEMICONDUTTORI (direttiva esplicita): Analizza l'attuale andamento dei macro-settori (vedi dati ROTAZIONE SETTORIALE sopra). Avendo necessità di effettuare un de-risking sui semiconduttori, crea un piano di rotazione del mio portafoglio basato sulla mia liquidità disponibile (${fmtEUR.format(cashEur)}). Indicami 2-3 ticker alternativi specifici (value o difensivi, oppure FASE 2 AI: Software/Cloud/Cybersecurity/Biotech) per riequilibrare l'assetto, fornendo i relativi prezzi limite d'ingresso.`);
-  lines.push("");
-  lines.push(`PROMEMORIA FINALE — come rispondere:
-- Scrivi in PROSA discorsiva e ragionata (niente tabelle, niente elenchi di numeri): spiega il "perché" come se mi parlassi a voce.
-- Mantieni un punto di vista OBIETTIVO: dimmi anche ciò che non va, non solo il lato positivo.
-- Cita solo le pochissime cifre decisive, integrate nel discorso.
-- Chiudi SEMPRE con la parte operativa: OGNI operazione (acquisto, vendita, nuova idea) DEVE avere prezzo LIMITE + QUANTITÀ precisa + STOP LOSS, con una frase di motivazione. Niente operazioni "a metà" senza i tre numeri.
-- OBBLIGATORIO: includi 2-3 NUOVE idee di titoli dal mercato che NON ho già (non limitarti a portafoglio/watchlist) — è la parte di maggior valore.
-
-Vincoli di mandato da rispettare nel ragionamento (NON elencarli nella risposta): obiettivo €1M in 10 anni (CAGR ~${cagrNeeded}%); profilo Diamond Hands (niente vendite da panico su volatilità normale); alleggerimenti solo parziali (Free Ride) su multipli tirati o tesi indebolite; liquidità ${fmtEUR.format(cashEur)} da schierare solo su debolezza reale; rotazione progressiva verso la Fase 2 AI (Software/Cloud/Cybersecurity/Biotech).`);
-  // istruzioni personali dell'utente (salvate in locale, priorità massima)
-  const extra = (localStorage.getItem("prompt_extra") || "").trim();
-  if (extra) {
-    lines.push("");
-    lines.push(`ISTRUZIONI PERSONALI DELL'UTENTE (PRIORITÀ MASSIMA, prevalgono su tutto il resto):\n${extra}`);
-  }
+  lines.push(`PROMEMORIA FINALE (vincolante):
+- Tono asettico, matematico, strategico: da analista quantitativo, non da consulente retail.
+- Mantieni un punto di vista OBIETTIVO e spietato: evidenzia inefficienze e rischi prima dei meriti.
+- Cita le cifre decisive integrandole nel discorso; per ogni dato citato considera la sua data di rilevazione.
+- SOLO le due sezioni richieste (SCENARIO MACROECONOMICO E FLUSSI · RADIOGRAFIA DEL PORTAFOGLIO). NESSUN suggerimento operativo.
+- Chiusura obbligatoria, testuale: "Analisi completata. In attesa di interrogazioni tattiche su eventuali ingressi, uscite o rotazioni di portafoglio."`);
   return lines.join("\n");
 }
 
@@ -4253,8 +4234,6 @@ function toast(msg) {
 async function showPrompt() {
   const text = buildPrompt();
   $("#prompt-text").value = text;
-  const ex = $("#prompt-extra");
-  if (ex) ex.value = localStorage.getItem("prompt_extra") || "";
   $("#modal").hidden = false;
   try {
     await navigator.clipboard.writeText(text);
@@ -4264,20 +4243,12 @@ async function showPrompt() {
 
 /* ---------------- eventi ---------------- */
 $("#btn-refresh").addEventListener("click", refreshAll);
-$("#btn-quick")?.addEventListener("click", quickRefresh);
 $("#btn-prompt").addEventListener("click", showPrompt);
 $("#modal-close").addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
 $("#btn-copy").addEventListener("click", async () => {
   await navigator.clipboard.writeText($("#prompt-text").value);   // copia il testo EDITATO
   toast("Copiato (con le tue modifiche) ✓");
-});
-// salva le istruzioni personali: incluse in fondo a OGNI prompt generato d'ora in poi
-$("#prompt-extra-save")?.addEventListener("click", () => {
-  const v = ($("#prompt-extra")?.value || "").trim();
-  if (v) localStorage.setItem("prompt_extra", v); else localStorage.removeItem("prompt_extra");
-  $("#prompt-text").value = buildPrompt();   // rigenera subito col blocco aggiornato
-  toast(v ? "Istruzioni personali salvate ✓ (incluse in ogni prompt)" : "Istruzioni personali rimosse");
 });
 /* ---------------- calcolo vendite (plus/minusvalenze) ---------------- */
 const sellPriceOv = {};   // prezzo di vendita inserito a mano per ticker (override del prezzo di mercato)
@@ -4302,10 +4273,10 @@ function renderSellCalc() {
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num sell-price-cell">
-        <span class="sp-cur">${c}</span><input type="number" class="sell-price${edited ? " sp-edited" : ""}" data-tk="${r.ticker}" value="${r.price}" step="any" title="Prezzo di vendita — modificabile a mano (✎)" style="width:74px">
+        <span class="sp-cur">${c}</span><input type="number" inputmode="decimal" class="sell-price${edited ? " sp-edited" : ""}" data-tk="${r.ticker}" value="${r.price}" step="any" title="Prezzo di vendita — modificabile a mano (✎)" style="width:74px">
         <span class="sp-pencil" title="Prezzo modificabile a mano">✎</span>
       </td>
-      <td class="num"><input type="number" class="sell-in" data-tk="${r.ticker}" min="0" max="${r.qty}" step="any" placeholder="0" style="width:70px"><button class="sell-all" data-tk="${r.ticker}" title="Vendi tutta la posizione">tutte</button></td>
+      <td class="num"><input type="number" inputmode="decimal" class="sell-in" data-tk="${r.ticker}" min="0" max="${r.qty}" step="any" placeholder="0" style="width:70px"><button class="sell-all" data-tk="${r.ticker}" title="Vendi tutta la posizione">tutte</button></td>
       <td class="num sell-pl" data-tk="${r.ticker}">—</td>
     </tr>`;
   }).join("");

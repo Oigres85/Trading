@@ -729,7 +729,9 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
   #sell-table td.name-cell { grid-column: 1 / -1; justify-content: flex-start; font-size: 13.5px;
     font-weight: 700; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 3px; }
   #sell-table td.name-cell::before { content: ""; }
-  #sell-table .sell-in { width: 84px !important; }
+  /* iOS: input ≥16px evita zoom/focus bizzosi di Safari e garantisce la digitazione */
+  #sell-table .sell-in, #sell-table .sell-price { width: 96px !important; font-size: 16px; padding: 6px 8px; }
+  #sell-table .sell-all { font-size: 12px; padding: 4px 10px; }
 }
 
 .toast {

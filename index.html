@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=86">
+<link rel="stylesheet" href="assets/style.css?v=87">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -24,8 +24,7 @@
   </div>
   <div class="actions">
     <button class="btn btn-primary" id="btn-prompt" aria-label="Copia il prompt con tutti i dati da incollare in un'AI" title="Copia il prompt (tabella Markdown)">Copia prompt AI</button>
-    <button class="btn btn-ghost" id="btn-quick" aria-label="Aggiorna solo i prezzi live (veloce)" title="Aggiorna SUBITO i prezzi live (pochi secondi, niente pipeline)">⟳ Prezzi</button>
-    <button class="btn btn-ghost" id="btn-refresh" aria-label="Rigenera tutti i dati via pipeline" title="Rigenera TUTTI i dati (fondamentali, macro, news) via GitHub Actions — 2-3 min">↻ Rigenera tutto</button>
+    <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: prezzi live subito + rigenerazione completa via pipeline (~2-3 min)">⟳ Aggiorna tutto</button>
   </div>
 </header>
 
@@ -121,15 +120,13 @@
             <th class="num">Volume</th>
             <th class="num">Guadagno</th>
             <th class="num">Guad. %</th>
-            <th class="num">P/E</th>
             <th class="num">Beta</th>
             <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
+            <th class="num" title="Distanza % dalla media mobile a 200 giorni (price action pura)">Δ SMA200</th>
             <th class="num">RS 1M</th>
             <th>Segnale</th>
-            <th class="num">Target Δ</th>
-            <th class="num">Financial Health</th>
             <th class="num">Short %</th>
             <th class="num">Drawdown 52S</th>
             <th>Opzioni</th>
@@ -172,15 +169,13 @@
             <th class="num">Oggi</th>
             <th class="num" title="Variazione pre-market / after-hours (dallo snapshot pipeline)">Pre/After</th>
             <th class="num">Volume</th>
-            <th class="num">P/E</th>
             <th class="num">Beta</th>
             <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
+            <th class="num" title="Distanza % dalla media mobile a 200 giorni (price action pura)">Δ SMA200</th>
             <th class="num">RS 1M</th>
             <th>Segnale</th>
-            <th class="num">Target Δ</th>
-            <th class="num">Financial Health</th>
             <th class="num">Short %</th>
             <th class="num">Drawdown 52S</th>
             <th>Opzioni</th>
@@ -229,11 +224,8 @@
     </div>
     <p class="muted">Prompt copiato negli appunti — puoi MODIFICARLO qui sotto prima di copiarlo. Le "istruzioni personali" vengono salvate e incluse a ogni generazione futura.</p>
     <textarea id="prompt-text" spellcheck="false"></textarea>
-    <label class="prompt-extra-lab" for="prompt-extra">Istruzioni personali (salvate, aggiunte in fondo a ogni prompt)</label>
-    <textarea id="prompt-extra" rows="2" placeholder="Es: concentrati sui semiconduttori; rispondi in massimo 400 parole; evita opzioni…"></textarea>
     <div class="modal-foot">
       <button class="btn btn-primary" id="btn-copy">Copia (con modifiche)</button>
-      <button class="btn btn-ghost" id="prompt-extra-save">Salva istruzioni personali</button>
       <a class="btn btn-ghost" href="https://claude.ai/new" target="_blank" rel="noopener">Apri Claude ↗</a>
     </div>
   </div>
@@ -317,6 +309,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=86"></script>
+<script src="assets/app.js?v=87"></script>
 </body>
 </html>
