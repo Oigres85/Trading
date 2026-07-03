@@ -4628,25 +4628,6 @@ $("#margin-debt-box")?.addEventListener("click", openMarginDebtModal);
 /* popup Strumenti (PMC, vendite) e News */
 function showSimpleModal(id) { const m = $(id); if (m) m.hidden = false; }
 function hideSimpleModal(id) { const m = $(id); if (m) m.hidden = true; }
-
-/* iOS Safari: con un modal `position:fixed` aperto il body dietro resta scrollabile e,
-   all'apertura della tastiera, Safari scrolla la pagina disallineando l'hit-testing degli
-   input nel layer fisso (tocchi "a vuoto", tastiera che si chiude). Con un modal aperto
-   blocco lo scroll del body e lo ripristino al pixel esatto alla chiusura. */
-let _lockScrollY = null;
-function syncBodyLock() {
-  const open = [...document.querySelectorAll(".modal-backdrop")].some(m => !m.hidden);
-  if (open && _lockScrollY == null) {
-    _lockScrollY = window.scrollY;
-    Object.assign(document.body.style, { position: "fixed", top: `-${_lockScrollY}px`, left: "0", right: "0", width: "100%" });
-  } else if (!open && _lockScrollY != null) {
-    Object.assign(document.body.style, { position: "", top: "", left: "", right: "", width: "" });
-    window.scrollTo(0, _lockScrollY);
-    _lockScrollY = null;
-  }
-}
-// osserva l'attributo [hidden] di tutti i modal: il lock segue qualsiasi apertura/chiusura
-new MutationObserver(syncBodyLock).observe(document.body, { attributes: true, attributeFilter: ["hidden"], subtree: true });
 $("#open-pmc")?.addEventListener("click", () => { pmcInit(); pmcCompute(); showSimpleModal("#pmc-modal"); });
 $("#open-sell")?.addEventListener("click", () => { renderSellCalc(); showSimpleModal("#sell-modal"); });
 $("#news-summary")?.addEventListener("click", () => showSimpleModal("#news-modal"));

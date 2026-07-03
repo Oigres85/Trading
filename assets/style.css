@@ -608,7 +608,18 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .bk-val { font-family: var(--mono); font-weight: 700; font-size: 14px; margin-top: 3px; }
 
 /* ---------- calcolo vendite ---------- */
-.sell-in { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; font-family: var(--mono); }
+/* BUGFIX bloccante: il modal è un flex-column con un riepilogo alto (.sell-summary); l'algoritmo
+   flex comprimeva .table-wrap (overflow:auto, quindi riducibile) fino a height:0, NASCONDENDO
+   tutte le righe con gli input → l'utente non riusciva a digitare. Qui la tabella si dimensiona
+   sul contenuto (flex-shrink:0, no scroll interno) e a scrollare è il modal intero. */
+#sell-modal .table-wrap { max-height: none; overflow: visible; flex-shrink: 0; }
+/* la table-wrap non scrolla più internamente (scrolla il modal): l'header sticky resterebbe
+   incollato in cima sovrapponendosi alla 1ª riga di input → lo rendo statico nel modal vendite */
+#sell-modal #sell-table thead th { position: static; }
+/* campi input ben visibili e interattivi (sfondo contrastante + focus ring) */
+.sell-in { background: var(--card-2); color: var(--text); border: 1px solid var(--blue); border-radius: 6px; padding: 6px 9px; font-family: var(--mono); font-size: 14px; -webkit-appearance: none; appearance: none; }
+.sell-in::placeholder { color: var(--muted); }
+.sell-in:focus, .sell-price:focus { outline: 2px solid var(--blue); outline-offset: 1px; background: var(--bg); }
 .sell-summary { margin-top: 16px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
 @media (max-width: 760px) { .sell-summary { grid-template-columns: 1fr; } }
 .sb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
