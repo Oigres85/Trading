@@ -6,17 +6,17 @@ let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (
 /* ordinamento tabelle: click su intestazione → desc → asc → default */
 const SORT_FIELDS = {
   // allineato 1:1 alle <th>: Titolo,Qtà,PMC,Prezzo,Oggi,Pre/After,Volume,Guadagno,Guad.%,
-  // P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,Vol/media,RS 1M,Segnale,Rating,Target Δ,
-  // Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
+  // Beta,Sharpe 1A,Supporto,Resistenza,Δ SMA200,RS 1M,RS NDX 1M,Segnale,Short %,
+  // Drawdown 52S,Opzioni,Trimestrale,Grafico
   "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg", "volume",
                 "gain", "gain_pct", "beta", "sharpe_1y", "support",
-                "resistance", "sma200_dist_pct", "rs_1m", null,
+                "resistance", "sma200_dist_pct", "rs_1m", "rs_ndx_1m", null,
                 "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
-  // Titolo,Prezzo,Oggi,Pre/After,Volume,P/E,EPS,Beta,Sharpe 1A,Supporto,Resistenza,RSI,
-  // Vol/media,RS 1M,Segnale,Rating,Target Δ,Financial Health,Short %,Drawdown 52S,Opzioni,Grafico
+  // Titolo,Prezzo,Oggi,Pre/After,Volume,Beta,Sharpe 1A,Supporto,Resistenza,Δ SMA200,
+  // RS 1M,RS NDX 1M,Segnale,Short %,Drawdown 52S,Opzioni,Trimestrale,Grafico
   "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume",
                "beta", "sharpe_1y", "support", "resistance", "sma200_dist_pct",
-               "rs_1m", null,
+               "rs_1m", "rs_ndx_1m", null,
                "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // tabelle fondamentali (vista Value); allineate 1:1 alle colonne:
   // MarketCap, P/E, EV/EBITDA, ROE, Margine, P/FCF, Crescita, D/E, Div, PEG, Z-Score, FinHealth, TargetΔ
@@ -806,20 +806,44 @@ function atrStop(refPrice, r) {
   return { stop: Math.round((refPrice - 2 * a.atr) * 100) / 100, atr: a.atr, pct: a.pct, src: a.src };
 }
 
-/* Beta di Portafoglio (weighted beta): Σ beta_i × peso_i sul capitale investito (liquidità
-   esclusa). Il BTP conta con beta 0 (esposizione azionaria nulla); "coverage" = quota del
-   controvalore con beta noto, per onestà sul dato. */
+/* beta effettivo di un titolo: PRIORITÀ alla regressione della pipeline sui log-rendimenti
+   12M vs Nasdaq 100 (beta_ndx); fallback al beta Yahoo (5A mensile vs S&P) solo se manca. */
+function betaOf(r) {
+  if (r.beta_ndx != null) return r.beta_ndx;
+  if (r.ticker === "BTP-V28") return 0;   // esposizione azionaria nulla
+  return r.beta ?? null;
+}
+
+/* Beta di Portafoglio (weighted beta vs NDX): Σ beta_i × peso_i MARK-TO-MARKET sul capitale
+   investito (liquidità esclusa). Il BTP conta con beta 0. "src" dice se il dato viene dalla
+   regressione della pipeline o dal fallback Yahoo. */
 function portfolioBeta() {
   const inv = (DATA?.portfolio || []).filter(r => (r.val_eur || 0) > 0);
   const tot = inv.reduce((s, r) => s + r.val_eur, 0);
   if (!tot) return null;
-  let wb = 0, covered = 0;
+  let wb = 0, covered = 0, regEur = 0;
   inv.forEach(r => {
-    const beta = r.beta != null ? r.beta : (r.ticker === "BTP-V28" ? 0 : null);
-    if (beta != null) { wb += beta * r.val_eur; covered += r.val_eur; }
+    const beta = betaOf(r);
+    if (beta != null) {
+      wb += beta * r.val_eur; covered += r.val_eur;
+      if (r.beta_ndx != null || r.ticker === "BTP-V28") regEur += r.val_eur;
+    }
   });
   if (!covered) return null;
-  return { beta: Math.round(wb / tot * 100) / 100, coverage: Math.round(covered / tot * 100), total: tot };
+  const allReg = regEur >= covered * 0.999;
+  return { beta: Math.round(wb / tot * 100) / 100, total: tot,
+           src: allReg ? "regressione log-return 12M vs NDX" : "misto: regressione NDX + fallback Yahoo",
+           fromPipeline: DATA?.totals?.portfolio_beta_ndx ?? null };
+}
+
+/* Rischio cambio EUR/USD: quota % del NAV (investito + liquidità EUR) denominata in USD
+   e NON coperta — un apprezzamento dell'euro erode i guadagni in dollari a parità di prezzi. */
+function fxExposure() {
+  const inv = (DATA?.portfolio || []).filter(r => (r.val_eur || 0) > 0);
+  const nav = inv.reduce((s, r) => s + r.val_eur, 0) + cashEur;
+  if (!nav) return null;
+  const usdEur = inv.filter(r => r.currency === "USD").reduce((s, r) => s + r.val_eur, 0);
+  return { pct: Math.round(usdEur / nav * 1000) / 10, usdEur, nav, eurusd: DATA?.eurusd ?? null };
 }
 
 /* rischio liquidità/slippage: la posizione vale più del 5% del volume medio giornaliero in $
@@ -841,13 +865,15 @@ function positionWeightPct(r) {
 }
 
 /* VETO del risk manager (non scavalcabile da alcun supporto tecnico):
-   - VALUE TRAP se, anche singolarmente: Sharpe 1A < 0 · Short Interest ≥ 15% ·
+   - VALUE TRAP se, anche singolarmente: Sharpe 1A < -0.3 · Short Interest ≥ 15% ·
      margine netto negativo con PEG non calcolabile/negativo.
+     (soglia -0.3 e non 0: uno Sharpe lievemente negativo in un mercato in drawdown è rumore,
+     sotto -0.3 è distruzione sistematica di valore corretto per il rischio)
    - NON ACCUMULARE se ROIC/ROE < 0 o PEG < 0 (qualità del capitale rotta). */
 function qualityVeto(r) {
   const st = r.stats || {};
   const why = [];
-  if (r.sharpe_1y != null && r.sharpe_1y < 0) why.push("Sharpe 1A < 0 (rischio non ripagato)");
+  if (r.sharpe_1y != null && r.sharpe_1y < -0.3) why.push(`Sharpe 1A ${fmtNum.format(r.sharpe_1y)} < -0.3 (distruzione di valore risk-adjusted)`);
   if (st.short_float != null && st.short_float >= 0.15) why.push(`Short Interest ${Math.round(st.short_float * 1000) / 10}% ≥ 15%`);
   const pegBroken = st.peg == null || st.peg <= 0;   // la pipeline azzera già i PEG ≤ 0 → n.d.
   if (st.profit_margin != null && st.profit_margin < 0 && pegBroken) why.push("margine netto negativo con PEG non calcolabile");
@@ -879,7 +905,9 @@ function decisionVerdict() {
     const st = r.stats || {};
     const parts = [];
     if (r.sharpe_1y != null) parts.push([clamp(50 + (r.sharpe_1y - refSharpe) * 25), .40]);
-    if (r.rs_1m != null) parts.push([clamp(50 + r.rs_1m * 4), .30]);
+    // forza relativa: metro diretto del mandato = RS vs NDX (fallback sul benchmark settoriale)
+    const rsq = r.rs_ndx_1m ?? r.rs_1m;
+    if (rsq != null) parts.push([clamp(50 + rsq * 4), .30]);
     let q = 50;
     if (st.roe != null) q += clamp(st.roe * 120, -30, 30);
     if (st.profit_margin != null) q += clamp(st.profit_margin * 60, -15, 15);
@@ -1253,24 +1281,56 @@ function renderMiniCards() {
         <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
     }
   }
-  // Beta di Portafoglio (rischio sistematico aggregato): weighted beta su capitale investito
+  // Beta di Portafoglio vs NDX (rischio sistematico aggregato): weighted beta MTM
   const betaBox = $("#beta-box");
   if (betaBox) {
     const pb = portfolioBeta();
     if (pb) {
-      // beta 1.0 = mercato; >1.3 aggressivo (giallo/rosso), <0.8 difensivo
+      // beta 1.0 = NDX; >1.3 aggressivo (giallo/rosso), <0.8 difensivo
       const score = clamp(100 - (pb.beta - 0.5) * 55);
       const lab = pb.beta >= 1.5 ? "Molto aggressivo" : pb.beta >= 1.2 ? "Aggressivo" : pb.beta >= 0.8 ? "In linea col mercato" : "Difensivo";
-      betaBox.innerHTML = `<div class="mc-title">Beta di Portafoglio</div>
+      betaBox.innerHTML = `<div class="mc-title">Beta Portafoglio (vs NDX)</div>
         <div class="mc-value" style="color:${scoreColor(score)}">${fmtNum.format(pb.beta)} · ${lab}</div>
         ${thermoLine(score, ["Aggressivo", "Difensivo"])}
-        <div class="mc-sub muted">vs mercato 1.0 · copertura ${pb.coverage}% · clicca per stress test</div>`;
+        <div class="mc-sub muted">${esc(pb.src)} · clicca per stress test</div>`;
     } else {
-      betaBox.innerHTML = `<div class="mc-title">Beta di Portafoglio</div>
+      betaBox.innerHTML = `<div class="mc-title">Beta Portafoglio (vs NDX)</div>
         <div class="mc-value muted">—</div>${thermoLine(50, ["Aggressivo", "Difensivo"])}
         <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
     }
   }
+  // Rischio Cambio EUR/USD: quota del NAV in USD non coperta
+  const fxBox = $("#fx-box");
+  if (fxBox) {
+    const fx = fxExposure();
+    if (fx) {
+      // esposizione valutaria: oltre ~70% del NAV in USD = rischio cambio strutturale
+      const score = clamp(100 - fx.pct);
+      const lab = fx.pct >= 70 ? "Strutturale" : fx.pct >= 40 ? "Rilevante" : "Contenuto";
+      fxBox.innerHTML = `<div class="mc-title">Rischio Cambio EUR/USD</div>
+        <div class="mc-value" style="color:${scoreColor(score)}">${fmtNum.format(fx.pct)}% NAV in USD</div>
+        ${thermoLine(score, ["Esposto", "Coperto"])}
+        <div class="mc-sub muted">non coperto · ${lab}${fx.eurusd ? ` · EUR/USD ${fmtNum.format(fx.eurusd)}` : ""}</div>`;
+    } else {
+      fxBox.innerHTML = `<div class="mc-title">Rischio Cambio EUR/USD</div>
+        <div class="mc-value muted">—</div>${thermoLine(50, ["Esposto", "Coperto"])}
+        <div class="mc-sub muted">in attesa dei dati</div>`;
+    }
+  }
+}
+
+/* Popup Rischio Cambio: esposizione USD, sensibilità e razionale */
+function openFxModal() {
+  const fx = fxExposure();
+  if (!fx) { toast("Dati non ancora disponibili"); return; }
+  const hit1 = Math.round(fx.usdEur * 0.01);   // impatto di ±1% del cambio sul NAV in €
+  openInfoModal("Rischio cambio EUR/USD — esposizione non coperta",
+    `<div class="info-line" style="margin-bottom:8px"><b>Cos'è:</b> la quota del patrimonio denominata in dollari senza copertura valutaria. A parità di prezzi dei titoli, un <b>apprezzamento dell'euro</b> riduce il controvalore in € delle posizioni USA (e viceversa).</div>
+     <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
+       <div style="font-size:13px">Esposizione USD: <b>${fmtNum.format(fx.pct)}% del NAV</b> (${fmtEUR.format(Math.round(fx.usdEur))} su ${fmtEUR.format(Math.round(fx.nav))})</div>
+       <div class="muted" style="font-size:12px;margin-top:3px">${fx.eurusd ? `EUR/USD attuale ${fmtNum.format(fx.eurusd)} · ` : ""}sensibilità: ±1% del cambio ≈ <b>${fmtEUR.format(hit1)}</b> sul patrimonio</div>
+     </div>
+     <div class="info-line muted" style="font-size:11.5px">Il BTP e la liquidità in € non sono esposti. La copertura (hedging) ha un costo pari al differenziale tassi USD-EUR: per un portafoglio growth di lungo periodo molti fondi accettano l'esposizione, ma va dichiarata e monitorata — è un fattore di rischio a sé, separato dal rischio azionario.</div>`);
 }
 
 /* Popup Margin Debt: dato attuale, variazioni, sparkline storica, impatto */
@@ -1662,18 +1722,21 @@ function openBetaSimulator() {
       <td class="num">${fmtEUR.format(Math.round(patrimonio + lossEur))}</td>
     </tr>`;
   }).join("");
-  const holdings = (DATA.portfolio || []).filter(r => r.beta != null && (r.val_eur || 0) > 0);
-  const tkBetas = holdings.slice().sort((a, b) => b.beta - a.beta).map(r => {
+  const holdings = (DATA.portfolio || []).filter(r => betaOf(r) != null && (r.val_eur || 0) > 0);
+  const tkBetas = holdings.slice().sort((a, b) => betaOf(b) - betaOf(a)).map(r => {
+    const b = betaOf(r);
     const w = positionWeightPct(r);
-    return `<span>${r.ticker} <b style="color:${scoreColor(clamp(100 - (r.beta - 0.5) * 55))}">${fmtNum.format(r.beta)}</b>${w != null ? ` <span class="muted">(${fmtNum.format(w)}%)</span>` : ""}</span>`;
+    const srcTag = r.beta_ndx != null ? "" : (r.ticker === "BTP-V28" ? "" : "*");
+    return `<span>${r.ticker} <b style="color:${scoreColor(clamp(100 - (b - 0.5) * 55))}">${fmtNum.format(b)}${srcTag}</b>${w != null ? ` <span class="muted">(${fmtNum.format(w)}%)</span>` : ""}</span>`;
   }).join(" · ");
-  openInfoModal("Beta di Portafoglio — rischio sistematico", `
-    <div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Beta di Portafoglio = Σ (beta del titolo × peso % sul capitale investito, liquidità esclusa). Misura l'amplificazione attesa dei movimenti di mercato: beta 1,4 → una discesa del mercato del 10% pesa ~14% sul portafoglio. Il BTP conta con beta 0 (esposizione azionaria nulla).</div>
-    <div class="info-line"><b>Beta di Portafoglio:</b> <b style="font-family:var(--mono);font-size:18px">${fmtNum.format(pb.beta)}</b> <span class="muted">(vs mercato 1.0 · copertura beta ${pb.coverage}% del controvalore)</span></div>
+  const anyFallback = holdings.some(r => r.beta_ndx == null && r.ticker !== "BTP-V28");
+  openInfoModal("Beta di Portafoglio vs Nasdaq 100 — rischio sistematico", `
+    <div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Beta di Portafoglio = Σ (beta del titolo × peso % <b>mark-to-market</b> sul capitale investito, liquidità esclusa). Il beta di ogni titolo è la <b>regressione dei log-rendimenti giornalieri 12M vs Nasdaq 100</b> (il benchmark del mandato), non il beta 5A di Yahoo. Beta 1,4 → una discesa del NDX del 10% pesa ~14% sul portafoglio. Il BTP conta con beta 0.</div>
+    <div class="info-line"><b>Beta di Portafoglio:</b> <b style="font-family:var(--mono);font-size:18px">${fmtNum.format(pb.beta)}</b> <span class="muted">(vs NDX 1.0 · ${esc(pb.src)})</span></div>
     <div class="info-line"><b>Capitale investito:</b> ${fmtEUR.format(Math.round(t.eur_invested))} · liquidità ${fmtEUR.format(cashEur)}</div>
-    <div class="info-line muted" style="font-size:11px;margin-bottom:10px">Beta × peso per titolo: ${tkBetas}</div>
-    <table class="info-table"><thead><tr><th>Scenario Nasdaq</th><th>Impatto stim.</th><th>P&amp;L stimato</th><th>Patrimonio risultante</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="info-line muted" style="font-size:11px;margin-top:8px">Formula: impatto = Δ% mercato × Beta di Portafoglio, applicato al solo capitale investito. Non considera ribilanciamento, stop 2×ATR o coperture: è lo scenario passivo peggiore.</div>`);
+    <div class="info-line muted" style="font-size:11px;margin-bottom:10px">Beta × peso per titolo: ${tkBetas}${anyFallback ? ` <span class="muted">(* = fallback Yahoo, in attesa del run pipeline)</span>` : ""}</div>
+    <table class="info-table"><thead><tr><th>Scenario Nasdaq 100</th><th>Impatto stim.</th><th>P&amp;L stimato</th><th>Patrimonio risultante</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="info-line muted" style="font-size:11px;margin-top:8px">Formula: impatto = Δ% NDX × Beta di Portafoglio, applicato al solo capitale investito. Non considera ribilanciamento, stop 2×ATR o coperture: è lo scenario passivo peggiore.</div>`);
 }
 
 /* variazione % giornaliera del portafoglio = media pesata (per controvalore) dei titoli USD */
@@ -1989,12 +2052,14 @@ function epsBar(eps) {
 }
 
 function betaBar(r) {
-  const beta = typeof r === "object" ? r.beta : r;
+  // beta vs NDX dalla regressione pipeline (betaOf), fallback Yahoo se non ancora disponibile
+  const beta = typeof r === "object" ? betaOf(r) : r;
   const tk = typeof r === "object" ? r.ticker : null;
+  const src = typeof r === "object" && r.beta_ndx != null ? "regressione 12M vs NDX" : "Yahoo (5A vs S&P)";
   if (beta === null || beta === undefined) return "—";
   const bar = meterBar(Math.min(beta, 3) / 3 * 100, scoreColor(clamp(100 - (beta - 0.5) * 55)), fmtNum.format(beta));
   if (!tk) return bar;
-  return `<button class="beta-btn" data-beta-tk="${tk}" title="Clicca per simulare il drawdown del portafoglio">${bar}</button>`;
+  return `<button class="beta-btn" data-beta-tk="${tk}" title="Beta ${src} — clicca per lo stress test di portafoglio">${bar}</button>`;
 }
 
 function athBar(r) {
@@ -2056,9 +2121,12 @@ function openStockDetail(ticker) {
     inPtf ? row("Guadagno", `<span class="${signCls(r.gain_eur)}">${signTxt(Math.round(r.gain_eur || 0), " €")}</span>`) : "",
     row("RSI 14", r.rsi ?? "—"),
     row("Supporto / Resistenza", `${r.support ? c + fmtNum.format(r.support) : "—"} / ${r.resistance ? c + fmtNum.format(r.resistance) : "—"}`),
-    row("Beta", r.beta ?? "—"),
+    row("Beta vs NDX", r.beta_ndx != null ? `${fmtNum.format(r.beta_ndx)} <span class="muted" style="font-size:10px">(regressione 12M)</span>` : (r.beta != null ? `${fmtNum.format(r.beta)} <span class="muted" style="font-size:10px">(Yahoo)</span>` : "—")),
     row("Sharpe 1A", r.sharpe_1y != null ? `<b style="color:${sharpeColor(r.sharpe_1y)}">${fmtNum.format(r.sharpe_1y)}</b>` : "—"),
-    row("Forza rel. 1M", r.rs_1m != null ? signTxt(r.rs_1m) : "—"),
+    row("Forza rel. 1M (settore)", r.rs_1m != null ? signTxt(r.rs_1m) : "—"),
+    row("Forza rel. 1M vs NDX", r.rs_ndx_1m != null ? `<span class="${signCls(r.rs_ndx_1m)}">${signTxt(r.rs_ndx_1m, " pp")}</span>` : "—"),
+    r.avg_corr != null ? row("Correlazione media ptf", `${fmtNum.format(r.avg_corr)}${r.max_corr != null ? ` <span class="muted" style="font-size:10px">(max ${fmtNum.format(r.max_corr)} con ${r.max_corr_with})</span>` : ""}`) : "",
+    r.risk_contrib_pct != null ? row("Quota rischio ptf (MCR)", `${fmtNum.format(r.risk_contrib_pct)}%`) : "",
     row("Drawdown 52S", r.w52_dist_pct != null ? signTxt(r.w52_dist_pct) : "—"),
     row("Short float", st.short_float != null ? pct(st.short_float) : "—"),
     row("Segnale", `<span class="badge ${r.signal_class}">${r.signal}</span>`),
@@ -2214,6 +2282,9 @@ function techCells(r) {
       <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
       ${smaCell}
       <td class="num rs-cell" data-rs-tk="${r.ticker}" role="button" tabindex="0" title="Clicca per la spiegazione della forza relativa (RS)">${rsBar(r.rs_1m, r.rs_bench)}</td>
+      ${r.rs_ndx_1m != null
+        ? `<td class="num" title="Sovra/sotto-performance a 1 mese vs Nasdaq 100 (metro del mandato)"><span class="${signCls(r.rs_ndx_1m)}">${signTxt(r.rs_ndx_1m, " pp")}</span></td>`
+        : `<td class="num muted" title="Disponibile dopo il prossimo run della pipeline">n.d.</td>`}
       <td title="Logica del segnale: prezzo vs SMA50/SMA200 (trend) + RSI(14), calcolati su base giornaliera (daily). Golden setup = prezzo > SMA50 > SMA200 con RSI non estremo."><span class="badge ${r.signal_class}">${r.signal}</span></td>
       ${shortFloatCell(r)}
       ${drawdownCell(r)}
@@ -2304,7 +2375,7 @@ const STAT_META = {
   avg_volume_30d: ["Volume medio", fmtBig, "Volume di scambi medio giornaliero."],
   target_mean: ["Target medio analisti", v => "$" + fmtN2(v), "Prezzo obiettivo medio degli analisti."],
   fcf: ["Free cash flow", v => "$" + fmtBig(v), "Liquidità generata al netto degli investimenti."],
-  altman_z: ["Altman Z-Score", fmtN2, "Rischio insolvenza: <1,81 distress, 1,81-2,99 zona grigia, >2,99 solido."],
+  altman_z: ["Altman Z''-Score", fmtN2, "Rischio insolvenza, variante Z'' per non-manifatturieri (tech/servizi, senza Sales/TA). Flag prudenziale <1,81; cutoff canonici Z'': <1,1 distress, >2,6 solido."],
 };
 function statScore(key, val) {
   if (val == null) return null;
@@ -3339,10 +3410,10 @@ function renderTable() {
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="12" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="13" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="21"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="22"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applyColLabels("ptf-table");
 }
@@ -3372,9 +3443,9 @@ function renderWatchlist() {
       <td class="num">${prepostCell(r.prepost)}</td>
       ${volumeCell(r)}
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="17" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="18" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="17"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="18"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   applyColLabels("wl-table");
 }
@@ -3461,7 +3532,7 @@ function buildFundTable(list, tableSel, withQtyPmc) {
       <td class="num" title="Debito totale / patrimonio netto (leva finanziaria, fonte yfinance)">${deOk ? fmtNum.format(Math.round(st.debt_to_equity)) + "%" : "n.d."}</td>
       <td class="num">${st.dividend_yield ? fundBar(st.dividend_yield, pctPlain, FSC.div(st.dividend_yield)) : "—"}</td>
       <td class="num">${pegOk ? fundBar(st.peg, fmtNum.format, FSC.peg(st.peg)) : "n.d."}</td>
-      <td class="num" title="Altman Z-Score (rischio insolvenza): <1,81 distress · 1,81-2,99 zona grigia · >2,99 solido${st.altman_missing ? " — proxy con 1 componente di bilancio mancante" : ""}">${st.altman_z != null ? `${fundBar(st.altman_z, fmtNum.format, FSC.zscore(st.altman_z))}${st.altman_z < 1.81 ? `<br><span class="badge badge-default-risk">[RISCHIO DEFAULT]</span>` : ""}` : "n.d."}</td>
+      <td class="num" title="Altman Z''-Score non-manifatturieri (rischio insolvenza): flag prudenziale <1,81 · cutoff canonici Z'': <1,1 distress, >2,6 solido${st.altman_missing ? " — proxy con 1 componente di bilancio mancante" : ""}">${st.altman_z != null ? `${fundBar(st.altman_z, fmtNum.format, FSC.zscore(st.altman_z))}${st.altman_z < 1.81 ? `<br><span class="badge badge-default-risk">[RISCHIO DEFAULT]</span>` : ""}` : "n.d."}</td>
       <td class="num">${finHealthBar(r)}</td>
       <td class="num">${targetBar(r.rating)}</td>
     </tr>`;
@@ -3976,8 +4047,8 @@ function buildPrompt() {
   lines.push("MANDATO ISTITUZIONALE: Il tuo obiettivo istituzionale è la massimizzazione del rendimento assoluto corretto per il rischio (Sharpe Ratio > 2.0) e la sovraperformance strutturale rispetto al Nasdaq 100. Analizza ogni dato con la spietatezza di un risk manager.");
   lines.push("");
   lines.push(`REGOLE DI RISK MANAGEMENT (vincolanti e non derogabili — valgono per questa analisi E per ogni successiva interrogazione tattica in questa chat):
-1. VALUE TRAP VETO: scarta automaticamente (verdetto "SCARTATO - VALUE TRAP") qualsiasi asset che presenti, contemporaneamente o singolarmente: Sharpe 1A < 0, Short Interest >= 15%, oppure margine netto compromesso con PEG < 0 o non calcolabile. Nessun supporto tecnico, per quanto forte, può scavalcare questo veto fondamentale.
-2. CORRELAZIONE E SOVRAESPOSIZIONE (anti "Correlation Blindness"): Penalizza e sconsiglia l'ingresso/accumulo su qualsiasi asset che presenti un'alta correlazione storica (>0.75) con posizioni già esistenti in portafoglio, qualora l'esposizione al singolo settore superi il 25% del totale investito.
+1. VALUE TRAP VETO: scarta automaticamente (verdetto "SCARTATO - VALUE TRAP") qualsiasi asset che presenti, contemporaneamente o singolarmente: Sharpe 1A < -0.3, Short Interest >= 15%, oppure margine netto compromesso con PEG < 0 o non calcolabile. Nessun supporto tecnico, per quanto forte, può scavalcare questo veto fondamentale.
+2. CORRELAZIONE E SOVRAESPOSIZIONE (anti "Correlation Blindness"): Penalizza e sconsiglia l'ingresso/accumulo su qualsiasi asset che presenti un'alta correlazione storica (>0.75) con posizioni già esistenti in portafoglio, qualora l'esposizione al singolo settore superi il 25% del totale investito. USA I DATI: la MATRICE DI RISCHIO PER POSIZIONE qui sotto riporta la correlazione media e massima REALE (log-rendimenti giornalieri 12 mesi) di ogni titolo vs il portafoglio — non stimare le correlazioni a memoria.
 3. SIZING ISTITUZIONALE: Nessuna singola posizione non coperta deve superare il 10% del Net Asset Value (NAV) del portafoglio. Suggerisci alleggerimenti (trimming) automatici per le posizioni che sforano passivamente questo limite a causa della rivalutazione del prezzo.
 4. LIQUIDITÀ E SLIPPAGE: per gli asset flaggati [ILLIQUIDO] (posizione > 5% del volume medio giornaliero) considera lo slippage in ingresso/uscita: privilegia ordini limite frazionati e non assumere l'eseguito al prezzo di schermo.
 5. RISCHIO EVENTO: per gli asset flaggati [!EARNINGS RISK] (trimestrale < 14 giorni) il gap post-earnings può scavalcare stop e supporti: pesa il rischio binario nel dimensionamento.
@@ -4000,9 +4071,12 @@ BLOCCO OPERATIVO (DIVIETO TASSATIVO): in questa fase NON devi suggerire alcuna o
   lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(Math.round(patrimonio))}${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
   // METRICHE DI RISCHIO/PORTAFOGLIO (dai popup della dashboard)
   const riskBits = [];
-  if (t.portfolio_sharpe_ratio != null) riskBits.push(`Sharpe Ratio portafoglio ${fmtNum.format(t.portfolio_sharpe_ratio)} vs target istituzionale 2.0 (Rf ${fmtNum.format((t.risk_free_rate ?? 0.0363) * 100)}%)`);
+  if (t.portfolio_sharpe_ratio != null) riskBits.push(`Sharpe Ratio portafoglio ${fmtNum.format(t.portfolio_sharpe_ratio)} vs target istituzionale 2.0 (log-rendimenti giornalieri 12M, matrice di covarianza, pesi mark-to-market, Rf ${fmtNum.format((t.risk_free_rate ?? 0.0363) * 100)}%)`);
   const pbP = portfolioBeta();
-  if (pbP) riskBits.push(`Beta di Portafoglio: ${fmtNum.format(pbP.beta)} (vs mercato 1.0) — weighted beta sul capitale investito, liquidità esclusa, BTP a beta 0; copertura beta ${pbP.coverage}% del controvalore`);
+  if (pbP) riskBits.push(`Beta di Portafoglio: ${fmtNum.format(pbP.beta)} vs Nasdaq 100 (=1.0) — ${pbP.src}, pesi mark-to-market sul capitale investito, liquidità esclusa, BTP a beta 0`);
+  if (t.avg_pairwise_corr != null) riskBits.push(`correlazione media tra le posizioni: ${fmtNum.format(t.avg_pairwise_corr)} (log-rendimenti giornalieri 12M — più è alta, minore la diversificazione reale)`);
+  const fxP = fxExposure();
+  if (fxP) riskBits.push(`Rischio cambio EUR/USD: ${fmtNum.format(fxP.pct)}% del NAV denominato in USD NON coperto${fxP.eurusd ? ` (EUR/USD ${fmtNum.format(fxP.eurusd)})` : ""} — un apprezzamento dell'euro dell'1% costa ~${fmtEUR.format(Math.round(fxP.usdEur * 0.01))} a parità di prezzi`);
   // concentrazione: posizione più pesante e primo settore (per le regole di sizing/correlazione)
   const wPos = (DATA.portfolio || []).map(r => ({ tk: r.ticker, w: positionWeightPct(r) })).filter(x => x.w != null).sort((a, b) => b.w - a.w);
   if (wPos.length) {
@@ -4073,6 +4147,7 @@ BLOCCO OPERATIVO (DIVIETO TASSATIVO): in questa fase NON devi suggerire alcuna o
     const optNote = optC ? `CW:${c}${f(optC.expiries?.[0]?.call_wall)} PW:${c}${f(optC.expiries?.[0]?.put_wall)}` : "—";
     const rsBench = r.rs_bench === "sox" ? "SOX" : r.rs_bench === "ndx" ? "NDX" : "S&P";
     const rsCell = r.rs_1m != null ? `${r.rs_1m > 0 ? "+" : ""}${r.rs_1m}% (vs ${rsBench})` : "—";
+    const rsNdxCell = r.rs_ndx_1m != null ? `${r.rs_ndx_1m > 0 ? "+" : ""}${r.rs_ndx_1m}pp` : "—";
     const sh = r.sharpe_1y != null ? fmtNum.format(r.sharpe_1y) : "—";
     const dd = r.w52_dist_pct != null ? signTxt(r.w52_dist_pct) : "—";
     const im = impliedMoveForEarnings ? impliedMoveForEarnings(r) : null;
@@ -4094,25 +4169,44 @@ BLOCCO OPERATIVO (DIVIETO TASSATIVO): in questa fase NON devi suggerire alcuna o
     if (earningsRiskDays(r) != null) flags.push("[!EARNINGS RISK]");
     if (isIlliquid(r)) flags.push("[ILLIQUIDO]");
     const nameCell = `${r.name} (${r.ticker})${flags.length ? " " + flags.join(" ") : ""}`;
-    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${sh} | ${dd} | ${shortF} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(r.beta)} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
+    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${dd} | ${shortF} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
   };
-  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | Sharpe 1A | Drawdown 52S | Short% | Supp. | Stop 2×ATR | P/E | EPS | Beta | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
-  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
+  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Drawdown 52S | Short% | Supp. | Stop 2×ATR | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
+  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
-  lines.push("(Stop 2×ATR = prezzo attuale − 2×ATR(14 Wilder), su posizioni in gain il floor è il PMC; assorbe la volatilità fisiologica invece di una % fissa. [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante.)");
+  lines.push("(Stop 2×ATR = prezzo attuale − 2×ATR(14 Wilder), su posizioni in gain il floor è il PMC; assorbe la volatilità fisiologica invece di una % fissa. Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante.)");
+  // MATRICE DI RISCHIO PER POSIZIONE: pesi MTM, MCR, beta NDX, correlazioni reali
+  const riskRows = (DATA.portfolio || []).filter(r => r.qty && (r.risk_contrib_pct != null || r.avg_corr != null || r.beta_ndx != null));
+  if (riskRows.length) {
+    lines.push("");
+    lines.push("MATRICE DI RISCHIO PER POSIZIONE (log-rendimenti giornalieri 12M, pesi mark-to-market — usa QUESTI numeri per correlazione e concentrazione del rischio, non stime a memoria):");
+    lines.push("| Titolo | Peso % NAV (MTM) | Beta NDX | Quota rischio ptf (MCR) | Corr. media vs ptf | Corr. max (con) |");
+    lines.push("|---|---|---|---|---|---|");
+    riskRows.slice().sort((a, b) => (b.risk_contrib_pct ?? -1) - (a.risk_contrib_pct ?? -1)).forEach(r => {
+      const w = positionWeightPct(r);
+      lines.push(`| ${r.ticker} | ${w != null ? fmtNum.format(w) + "%" : "—"} | ${r.beta_ndx != null ? fmtNum.format(r.beta_ndx) : "—"} | ${r.risk_contrib_pct != null ? fmtNum.format(r.risk_contrib_pct) + "%" : "—"} | ${r.avg_corr != null ? fmtNum.format(r.avg_corr) : "—"} | ${r.max_corr != null ? `${fmtNum.format(r.max_corr)} (${r.max_corr_with})` : "—"} |`);
+    });
+    lines.push("(MCR = contributo marginale al rischio: quota % della varianza totale del portafoglio attribuibile alla posizione — la somma fa 100%. Una posizione con MCR molto sopra il suo peso concentra il rischio.)");
+  }
   if ((DATA.watchlist || []).length) {
     lines.push("");
     lines.push("WATCHLIST (nessuna posizione):");
     lines.push(head); lines.push(sep);
     DATA.watchlist.forEach(r => lines.push(mdRow(r)));
+    // correlazione dei candidati watchlist vs il portafoglio ESISTENTE (per la regola n.2)
+    const wlCorr = (DATA.watchlist || []).filter(r => r.avg_corr != null || r.max_corr != null);
+    if (wlCorr.length) {
+      lines.push("· Correlazione dei candidati watchlist vs il portafoglio attuale (per la regola CORRELAZIONE E SOVRAESPOSIZIONE): " +
+        wlCorr.map(r => `${r.ticker} media ${fmtNum.format(r.avg_corr)}${r.max_corr != null ? `, max ${fmtNum.format(r.max_corr)} con ${r.max_corr_with}` : ""}`).join(" · ") + ".");
+    }
   }
   lines.push("");
   // ANALISI FONDAMENTALE DETTAGLIATA per ticker
   const fundItems = [...DATA.portfolio, ...(DATA.watchlist || [])].filter(r => r.stats?.market_cap);
   if (fundItems.length) {
     lines.push("ANALISI FONDAMENTALE DETTAGLIATA (usa per sezione 3 — valutazione e qualità utili):");
-    lines.push("| Titolo | P/E TTM | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Altman Z | Div% | Note |");
+    lines.push("| Titolo | P/E TTM | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Altman Z'' | Div% | Note |");
     lines.push("|---|---|---|---|---|---|---|---|---|---|---|---|");
     fundItems.forEach(r => {
       const st = r.stats || {};
@@ -4127,7 +4221,7 @@ BLOCCO OPERATIVO (DIVIETO TASSATIVO): in questa fase NON devi suggerire alcuna o
       const noteTags = [roeTag.trim(), fcfWarn.trim(), zTag.trim()].filter(Boolean).join(" ");
       lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg > 0 ? fmtNum.format(Math.round(st.peg * 100) / 100) : "n.d."} | ${zCell} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${noteTags} |`);
     });
-    lines.push("([ROIC>15%]=qualità eccellente del capitale; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z<1,81 (zona distress, rischio insolvenza); Altman Z 1,81-2,99=zona grigia, >2,99=solido; [WL]=watchlist)");
+    lines.push("([ROIC>15%]=qualità eccellente del capitale; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z''<1,81, flag prudenziale del mandato — Z'' è la variante non-manifatturieri (6.56·WC/TA+3.26·RE/TA+6.72·EBIT/TA+1.05·MVE/TL, senza Sales/TA), cutoff canonici <1,1 distress / >2,6 solido; P/E TTM='—' con EPS<0 per igiene matematica; [WL]=watchlist)");
     if (DATA.sanity_filtered > 0) lines.push(`[!ANOMALIE FILTRATE DAL SANITY CHECK: ${DATA.sanity_filtered} — valori palesemente errati delle API (P/E assurdi, variazioni impossibili) sono stati rimossi a monte: i dati qui presenti sono già puliti]`);
     lines.push("");
   }
@@ -4623,6 +4717,7 @@ $("#kpi-edit")?.addEventListener("click", openEditPortfolio);
 $("#decision-bar")?.addEventListener("click", openDecisionModal);
 $("#sharpe-box")?.addEventListener("click", openPortfolioSharpeModal);
 $("#beta-box")?.addEventListener("click", openBetaSimulator);
+$("#fx-box")?.addEventListener("click", openFxModal);
 $("#margin-debt-box")?.addEventListener("click", openMarginDebtModal);
 
 /* popup Strumenti (PMC, vendite) e News */

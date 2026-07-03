@@ -332,6 +332,7 @@ TICKER_ALIAS = {
     "APPLE": "AAPL", "GOOGLE": "GOOGL", "ALPHABET": "GOOGL", "AMAZON": "AMZN",
     "MICROSOFT": "MSFT", "FACEBOOK": "META", "NVIDIA": "NVDA", "TESLA": "TSLA",
     "NETFLIX": "NFLX", "MICRON": "MU", "INTEL": "INTC", "BITCOIN": "BTC-USD",
+    "TSMC": "TSM",   # l'ADR USA di Taiwan Semiconductor è TSM: "TSMC" su Yahoo non esiste
 }
 
 
@@ -366,15 +367,18 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     rsi = rsi14(closes)
     sig, sig_class = signal_label(price, sma50, sma200, rsi)
 
-    # Sharpe Ratio annualizzato (12 mesi): (Rp - Rf) / sigma_p sui rendimenti giornalieri.
-    daily_ret = closes.pct_change().dropna()
+    # Rendimenti LOGARITMICI giornalieri (12 mesi): base unica di Sharpe, volatilità, beta
+    # e correlazioni. I log-return sono additivi nel tempo e non sovrastimano il rendimento
+    # composto come la media aritmetica dei rendimenti semplici (bias ~ +sigma^2/2 sui titoli volatili).
+    daily_ret = np.log(closes / closes.shift(1)).replace([np.inf, -np.inf], np.nan).dropna()
     sharpe_1y = None
     if len(daily_ret) >= 60:
         std_d = float(daily_ret.std(ddof=1))
         if std_d > 0:
-            rp = float(daily_ret.mean()) * TRADING_DAYS              # rendimento annualizzato
+            rp = float(daily_ret.mean()) * TRADING_DAYS              # log-rendimento annualizzato
             sigma = std_d * (TRADING_DAYS ** 0.5)                    # volatilità annualizzata
-            sharpe_1y = round((rp - RISK_FREE_RATE) / sigma, 2)
+            rf_log = math.log1p(RISK_FREE_RATE)                      # Rf coerente in spazio log
+            sharpe_1y = round((rp - rf_log) / sigma, 2)
 
     vol = float(hist["Volume"].iloc[-1])
     vol_avg30 = float(hist["Volume"].tail(30).mean())
@@ -457,6 +461,10 @@ def fetch_symbol(ticker, name=None, currency="USD"):
 
     eps = info.get("trailingEps")
     beta = info.get("beta")
+    # IGIENE P/E: con EPS TTM negativo (azienda in perdita) un P/E positivo è privo di senso —
+    # il fallback su forwardPE (riga sopra) mascherava la perdita. Obbligatoriamente n.d.
+    if eps is not None and float(eps) < 0:
+        pe = None
 
     # conto economico annuale (ricavi, utile netto, margine) + Financial Health Score
     financials, fin_health = [], None
@@ -532,12 +540,17 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         # sanity: un PEG negativo (utili o crescita attesa negativi) non è usabile nei modelli → n.d.
         if stats.get("peg") is not None and stats["peg"] <= 0:
             stats["peg"] = None
+        # IGIENE P/E anche nelle stats: EPS TTM < 0 → pe_ttm obbligatoriamente n.d.
+        if stats.get("eps_ttm") is not None and stats["eps_ttm"] < 0:
+            stats["pe_ttm"] = None
 
-        # Altman Z-Score (rischio insolvenza) dai bilanci yfinance:
-        # Z = 1.2·WC/TA + 1.4·RE/TA + 3.3·EBIT/TA + 0.6·MVE/TL + 1.0·Sales/TA
-        # Proxy fedele: tollera al massimo 1 componente mancante (pesata 0, conteggiata
-        # in altman_missing); se mancano di più il dato resta n.d. — niente stime cieche.
-        # Soglie classiche: <1.81 distress, 1.81-2.99 zona grigia, >2.99 solido.
+        # Altman Z''-Score (variante NON-MANIFATTURIERI/servizi, Altman 1993 — corretta per
+        # tech/software asset-light): Z'' = 6.56·WC/TA + 3.26·RE/TA + 6.72·EBIT/TA + 1.05·MVE/TL.
+        # NIENTE termine Sales/TA: la formula classica penalizzava a sproposito i business
+        # con pochi asset e alto multiplo. Proxy fedele: tollera al massimo 1 componente
+        # mancante (pesata 0, conteggiata in altman_missing); se mancano di più → n.d.
+        # Flag di distress del mandato: < 1.81 → [RISCHIO DEFAULT] (nota: i cutoff canonici
+        # dello Z'' sono 1.1/2.6, quindi 1.81 è un flag PRUDENZIALE dentro la zona grigia).
         try:
             bs = t.balance_sheet
             def bs_row(*names):
@@ -566,16 +579,16 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             if ta_ and ta_ > 0 and tl_ and tl_ > 0:
                 wc = (ca_ - cl_) if (ca_ is not None and cl_ is not None) else None
                 comp = [
-                    (1.2, wc / ta_ if wc is not None else None),
-                    (1.4, re_ / ta_ if re_ is not None else None),
-                    (3.3, ebit / ta_ if ebit is not None else None),
-                    (0.6, stats["market_cap"] / tl_ if stats.get("market_cap") else None),
-                    (1.0, stats["revenue_fy"] / ta_ if stats.get("revenue_fy") else None),
+                    (6.56, wc / ta_ if wc is not None else None),
+                    (3.26, re_ / ta_ if re_ is not None else None),
+                    (6.72, ebit / ta_ if ebit is not None else None),
+                    (1.05, stats["market_cap"] / tl_ if stats.get("market_cap") else None),
                 ]
                 missing = sum(1 for _, x in comp if x is None)
                 if missing <= 1:
                     stats["altman_z"] = round(sum(w_ * (x or 0.0) for w_, x in comp), 2)
                     stats["altman_missing"] = missing
+                    stats["altman_model"] = "Z''"
         except Exception as e:  # noqa: BLE001
             print(f"!! altman {ticker}: {e}", file=sys.stderr)
 
@@ -660,14 +673,17 @@ def fetch_equities():
             continue
         value = row["price"] * pos["qty"]
         cost = pos["pmc"] * pos["qty"]
-        # RS 1M vs benchmark settoriale
+        # RS 1M vs benchmark settoriale + RS 1M vs NDX (metro diretto del mandato)
         bkey = SECTOR_BENCH.get(pos["ticker"], "sp500")
         bm1 = bench_m1.get(bkey) or bench_m1.get("sp500")
         m1 = row.get("sparks", {}).get("m1", [])
-        rs_1m = None
-        if len(m1) >= 2 and m1[0] and bm1 is not None:
+        rs_1m, rs_ndx_1m = None, None
+        if len(m1) >= 2 and m1[0]:
             stk_m1 = (m1[-1] / m1[0] - 1) * 100
-            rs_1m = round(stk_m1 - bm1, 1)
+            if bm1 is not None:
+                rs_1m = round(stk_m1 - bm1, 1)
+            if bench_m1.get("ndx") is not None:
+                rs_ndx_1m = round(stk_m1 - bench_m1["ndx"], 1)
         row.update({
             "qty": pos["qty"], "pmc": pos["pmc"],
             # snapshot reale broker in EUR (controvalore/profitto) se fornito in config
@@ -677,6 +693,7 @@ def fetch_equities():
             "gain_pct": round((value / cost - 1) * 100, 2),
             "rs_1m": rs_1m,
             "rs_bench": bkey,
+            "rs_ndx_1m": rs_ndx_1m,
         })
         rows.append(row)
     return rows
@@ -699,12 +716,16 @@ def fetch_watchlist():
         bkey = SECTOR_BENCH.get(w["ticker"], "sp500")
         bm1 = bench_m1.get(bkey) or bench_m1.get("sp500")
         m1 = row.get("sparks", {}).get("m1", [])
-        rs_1m = None
-        if len(m1) >= 2 and m1[0] and bm1 is not None:
+        rs_1m, rs_ndx_1m = None, None
+        if len(m1) >= 2 and m1[0]:
             stk_m1 = (m1[-1] / m1[0] - 1) * 100
-            rs_1m = round(stk_m1 - bm1, 1)
+            if bm1 is not None:
+                rs_1m = round(stk_m1 - bm1, 1)
+            if bench_m1.get("ndx") is not None:
+                rs_ndx_1m = round(stk_m1 - bench_m1["ndx"], 1)
         row["rs_1m"] = rs_1m
         row["rs_bench"] = bkey
+        row["rs_ndx_1m"] = rs_ndx_1m
         rows.append(row)
     return rows
 
@@ -2093,9 +2114,18 @@ def clean_nan(obj):
     return obj
 
 
-def compute_portfolio_sharpe(rows):
-    """Sharpe Ratio complessivo del portafoglio azionario: pesi = controvalore attuale,
-    varianza totale dalla matrice di covarianza dei rendimenti giornalieri allineati."""
+def compute_risk_metrics(rows, watch_rows=None):
+    """Motore di rischio istituzionale sul pannello dei LOG-rendimenti giornalieri allineati (12M).
+    Pesi = controvalore ATTUALE mark-to-market (mai il costo storico). Calcola e annota:
+    - Sharpe di portafoglio (media/covarianza dei log-return, Rf in spazio log);
+    - beta vs Nasdaq 100 per titolo via regressione OLS (cov/var sui log-return), NON il
+      beta 5A-mensile-vs-S&P ereditato dalle API Yahoo;
+    - beta di portafoglio = Σ w_i·beta_i (pesi MTM);
+    - matrice di correlazione: per ogni titolo correlazione MEDIA e MASSIMA vs il resto
+      del portafoglio (per la watchlist: vs le posizioni possedute → filtro d'ingresso);
+    - MCR: contributo marginale al rischio, quota % della varianza totale di portafoglio
+      attribuibile a ogni posizione (w_i·(Σw)_i / wᵀΣw).
+    Ritorna {"sharpe", "portfolio_beta_ndx", "avg_pairwise_corr"} e annota le row in place."""
     series, weights = {}, {}
     for r in rows:
         rs, ds, val = r.get("_ret_series"), r.get("_ret_dates"), r.get("value")
@@ -2112,14 +2142,104 @@ def compute_portfolio_sharpe(rows):
     if w.sum() <= 0:
         return None
     w = w / w.sum()
-    mean_d = df.mean().values
+
+    def _naive(ix):
+        """DatetimeIndex normalizzato e senza timezone (yfinance è tz-aware, le serie interne no)."""
+        ix = pd.to_datetime(ix)
+        if getattr(ix, "tz", None) is not None:
+            ix = ix.tz_localize(None)
+        return ix.normalize()
+
+    # --- benchmark NDX: log-rendimenti giornalieri 12 mesi per il beta di regressione ---
+    ndx_ret = None
+    try:
+        nh = yf.Ticker("^NDX").history(period="1y", interval="1d", auto_adjust=True)["Close"].dropna()
+        ndx_ret = np.log(nh / nh.shift(1)).replace([np.inf, -np.inf], np.nan).dropna()
+        ndx_ret.index = _naive(ndx_ret.index)
+    except Exception as e:  # noqa: BLE001
+        print(f"!! NDX per beta: {e}", file=sys.stderr)
+
+    def beta_vs_ndx(s):
+        if ndx_ret is None or len(ndx_ret) < 60:
+            return None
+        si = s.copy()
+        si.index = _naive(si.index)
+        pair = pd.concat([si, ndx_ret], axis=1, join="inner").dropna()
+        if pair.shape[0] < 60:
+            return None
+        var_b = float(pair.iloc[:, 1].var(ddof=1))
+        if var_b <= 0:
+            return None
+        return round(float(pair.iloc[:, 0].cov(pair.iloc[:, 1])) / var_b, 2)
+
+    # --- beta NDX per titolo del portafoglio + beta pesato MTM ---
+    betas = {}
+    for t in tickers:
+        betas[t] = beta_vs_ndx(df[t])
+    port_beta = None
+    known = [(w[i], betas[t]) for i, t in enumerate(tickers) if betas[t] is not None]
+    if known:
+        wk = sum(x[0] for x in known)
+        if wk > 0:
+            port_beta = round(sum(x[0] * x[1] for x in known) / wk, 2)
+
+    # --- correlazioni: media e massima di ogni titolo vs il RESTO del portafoglio ---
+    corr = df.corr()
+    avg_pairwise = None
+    if len(tickers) >= 2:
+        off = corr.values[np.triu_indices(len(tickers), k=1)]
+        avg_pairwise = round(float(np.nanmean(off)), 2) if off.size else None
+    corr_notes = {}
+    for t in tickers:
+        others = [o for o in tickers if o != t]
+        if not others:
+            continue
+        vals = corr.loc[t, others]
+        corr_notes[t] = {"avg_corr": round(float(vals.mean()), 2),
+                         "max_corr": round(float(vals.max()), 2),
+                         "max_corr_with": str(vals.idxmax())}
+
+    # --- MCR: quota % della varianza di portafoglio attribuibile a ogni posizione ---
     cov_d = df.cov().values
+    port_var_d = float(w @ cov_d @ w)
+    mcr = {}
+    if port_var_d > 0:
+        contrib = w * (cov_d @ w) / port_var_d * 100          # somma = 100%
+        mcr = {t: round(float(c), 1) for t, c in zip(tickers, contrib)}
+
+    # --- Sharpe di portafoglio sui log-return (Rf coerente in spazio log) ---
+    mean_d = df.mean().values
     port_mean_annual = float(np.dot(w, mean_d)) * TRADING_DAYS
-    port_var_annual = float(w @ cov_d @ w) * TRADING_DAYS
-    port_sigma = port_var_annual ** 0.5
-    if port_sigma <= 0:
-        return None
-    return round((port_mean_annual - RISK_FREE_RATE) / port_sigma, 2)
+    port_sigma = (port_var_d * TRADING_DAYS) ** 0.5
+    sharpe = round((port_mean_annual - math.log1p(RISK_FREE_RATE)) / port_sigma, 2) if port_sigma > 0 else None
+
+    # --- annota le row del portafoglio ---
+    for r in rows:
+        t = r["ticker"]
+        if t in betas and betas[t] is not None:
+            r["beta_ndx"] = betas[t]
+        if t in corr_notes:
+            r.update(corr_notes[t])
+        if t in mcr:
+            r["risk_contrib_pct"] = mcr[t]
+
+    # --- watchlist: correlazione e beta NDX vs le posizioni POSSEDUTE (filtro d'ingresso) ---
+    for r in (watch_rows or []):
+        rs, ds = r.get("_ret_series"), r.get("_ret_dates")
+        if not (rs and ds and len(rs) == len(ds) and len(rs) >= 60):
+            continue
+        s = pd.Series(rs, index=pd.to_datetime(ds))
+        b = beta_vs_ndx(s)
+        if b is not None:
+            r["beta_ndx"] = b
+        joined = pd.concat([s.rename("_wl"), df], axis=1, join="inner").dropna()
+        if joined.shape[0] >= 60 and len(tickers) >= 1:
+            cvals = joined.corr().loc["_wl", tickers]
+            r["avg_corr"] = round(float(cvals.mean()), 2)
+            r["max_corr"] = round(float(cvals.max()), 2)
+            r["max_corr_with"] = str(cvals.idxmax())
+
+    return {"sharpe": sharpe, "portfolio_beta_ndx": port_beta, "avg_pairwise_corr": avg_pairwise}
 
 
 def strip_private(rows):
@@ -2135,8 +2255,9 @@ def main():
     watchlist = fetch_watchlist()
     macro = fetch_macro()
 
-    # Sharpe Ratio complessivo (azionario) PRIMA di rimuovere le serie interne
-    portfolio_sharpe = compute_portfolio_sharpe(equities)
+    # Metriche di rischio (Sharpe, beta NDX, correlazioni, MCR) PRIMA di rimuovere le serie interne
+    risk = compute_risk_metrics(equities, watchlist) or {}
+    portfolio_sharpe = risk.get("sharpe")
     strip_private(equities)
     strip_private(watchlist)
 
@@ -2213,6 +2334,10 @@ def main():
             "eur_gain_net": round(eur_gain - tax, 2),
             "portfolio_sharpe_ratio": portfolio_sharpe,
             "risk_free_rate": RISK_FREE_RATE,
+            # beta di portafoglio da regressione log-return vs ^NDX, pesi mark-to-market
+            "portfolio_beta_ndx": risk.get("portfolio_beta_ndx"),
+            # correlazione media tra le coppie di posizioni (diversificazione interna)
+            "avg_pairwise_corr": risk.get("avg_pairwise_corr"),
         },
         "portfolio": equities + [btp],
         "watchlist": watchlist,

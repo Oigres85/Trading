@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=89">
+<link rel="stylesheet" href="assets/style.css?v=90">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -74,7 +74,8 @@
       <div class="mini-card" id="tilt-box" tabindex="0" role="button" title="Rotazione settoriale — clicca per il dettaglio"></div>
       <div class="mini-card" id="seasonality-box" tabindex="0" role="button" title="Stagionalità S&amp;P 500 / Nasdaq — clicca per il dettaglio"></div>
       <div class="mini-card" id="sharpe-box" tabindex="0" role="button" title="Sharpe Ratio del portafoglio — clicca per il dettaglio"></div>
-      <div class="mini-card" id="beta-box" tabindex="0" role="button" title="Beta di Portafoglio (rischio sistematico aggregato) — clicca per lo stress test"></div>
+      <div class="mini-card" id="beta-box" tabindex="0" role="button" title="Beta di Portafoglio vs Nasdaq 100 (rischio sistematico aggregato) — clicca per lo stress test"></div>
+      <div class="mini-card" id="fx-box" tabindex="0" role="button" title="Rischio cambio EUR/USD — quota del NAV in dollari non coperta — clicca per il dettaglio"></div>
       <div class="mini-card" id="margin-debt-box" tabindex="0" role="button" title="Margin Debt FINRA — leva a credito sul mercato — clicca per il dettaglio"></div>
     </div>
     <div class="gauges" id="gauges"></div>
@@ -126,7 +127,8 @@
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
             <th class="num" title="Distanza % dalla media mobile a 200 giorni (price action pura)">Δ SMA200</th>
-            <th class="num">RS 1M</th>
+            <th class="num" title="Forza relativa 1 mese vs benchmark settoriale (SOX/NDX/S&P)">RS 1M</th>
+            <th class="num" title="Forza relativa 1 mese vs Nasdaq 100 — metro diretto del mandato di sovraperformance">RS NDX 1M</th>
             <th>Segnale</th>
             <th class="num">Short %</th>
             <th class="num">Drawdown 52S</th>
@@ -175,7 +177,8 @@
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
             <th class="num" title="Distanza % dalla media mobile a 200 giorni (price action pura)">Δ SMA200</th>
-            <th class="num">RS 1M</th>
+            <th class="num" title="Forza relativa 1 mese vs benchmark settoriale (SOX/NDX/S&P)">RS 1M</th>
+            <th class="num" title="Forza relativa 1 mese vs Nasdaq 100 — metro diretto del mandato di sovraperformance">RS NDX 1M</th>
             <th>Segnale</th>
             <th class="num">Short %</th>
             <th class="num">Drawdown 52S</th>
@@ -310,6 +313,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=89"></script>
+<script src="assets/app.js?v=90"></script>
 </body>
 </html>
