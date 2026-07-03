@@ -1271,8 +1271,13 @@ function renderMiniCards() {
     const mds = marginDebtState();
     if (mds) {
       const md = mds.md;
+      // label qualitativa nella card (il "100% del picco" nudo era inutilmente ansiogeno):
+      // i numeri esatti restano nel popup di dettaglio. Solo rendering, zero impatti sui calcoli.
+      const pctLab = md.pct_of_peak >= 95 ? "Sui massimi storici"
+        : md.pct_of_peak >= 80 ? "Vicino ai massimi"
+        : md.pct_of_peak >= 60 ? "Zona intermedia" : "Lontano dai massimi";
       mdBox.innerHTML = `<div class="mc-title">Margin Debt (leva mercato)</div>
-        <div class="mc-value" style="color:${mds.col}">${md.pct_of_peak}% del picco · ${mds.label}</div>
+        <div class="mc-value" style="color:${mds.col}">${pctLab} · ${mds.label}</div>
         ${thermoLine(mds.score, ["Estrema", "Bassa"])}
         <div class="mc-sub muted">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""} · ${md.series || "FINRA/FRED"} · ${md.date || ""}</div>`;
     } else {
@@ -4056,13 +4061,16 @@ function buildPrompt() {
   lines.push("");
   lines.push("ESTRAZIONE TOTALE E VERIFICA: scansiona TUTTI i dati forniti in questo payload — macro, tecnici, fondamentali, metriche di rischio (Sharpe, Beta, drawdown, short interest, implied move), opzioni, news e diario. Sei autorizzato e incoraggiato a utilizzare i tuoi tool di ricerca web per verificare, aggiornare e approfondire i dati macroeconomici, tecnici e fondamentali forniti, assicurandoti che l'analisi sia perfettamente allineata alla realtà in tempo reale. Ogni dato riporta la propria data di rilevazione: pesa esplicitamente il lag temporale (le serie mensili/trimestrali hanno un ritardo di pubblicazione fisiologico).");
   lines.push("");
-  lines.push(`STRUTTURA DELL'OUTPUT — rispondi SOLO con queste due sezioni, in modo discorsivo, comprensibile ma altamente tecnico:
+  lines.push(`STRUTTURA DELL'OUTPUT — rispondi SOLO con queste tre sezioni; le prime due discorsive, comprensibili ma altamente tecniche:
 
 1. SCENARIO MACROECONOMICO E FLUSSI — Un quadro narrativo chiaro che spieghi la situazione attuale incrociando i dati macro forniti (tassi, inflazione, curva, credito, VIX, sentiment, leva/margin debt, stagionalità, rotazione settoriale, posizionamento istituzionale) con le tue verifiche online: regime in corso, driver dominanti dei flussi, 2-3 fattori che possono rompere lo scenario.
 
 2. RADIOGRAFIA DEL PORTAFOGLIO — Un focus sullo stato di salute del portafoglio fornito: concentrazione (settoriale e per singola posizione), inefficienze, profilo di rischio (Beta, Sharpe — a confronto con il target istituzionale 2.0 —, drawdown, correlazioni implicite tra le posizioni), qualità e coerenza delle posizioni rispetto al mandato di sovraperformance sul Nasdaq 100, tenendo conto dello storico letto dal DIARIO DELLE AZIONI.
 
-BLOCCO OPERATIVO (DIVIETO TASSATIVO): in questa fase NON devi suggerire alcuna operazione — nessun acquisto, vendita, alleggerimento, rotazione, copertura, prezzo o quantità. L'output deve chiudersi OBBLIGATORIAMENTE con questa frase esatta: "Analisi completata. In attesa di interrogazioni tattiche su eventuali ingressi, uscite o rotazioni di portafoglio."`);
+3. PIANO D'AZIONE E SUGGERIMENTI (EXECUTIVE SUMMARY) — Cambia tono: usa un linguaggio discorsivo, meno tecnico e molto più comprensibile e sintetico. Struttura questa sezione in tre parti:
+- GRAFICI SINTETICI: Genera grafici testuali in formato ASCII/Markdown (utilizzando i caratteri █ e ░) per visualizzare a colpo d'occhio lo squilibrio del portafoglio (es. la concentrazione estrema dell'MCR su MU/AMD rispetto al resto, o lo sbilanciamento del rischio valutario).
+- AZIONI SUL PORTAFOGLIO: Fornisci suggerimenti operativi chiari. Indica esattamente quali asset liquidare (Value Traps) o alleggerire e quante azioni vendere - se ritieni - per abbattere il rischio e rientrare nel limite del 10% NAV.
+- RADAR WATCHLIST: Indica in modo discorsivo i titoli dalla watchlist che, in base alla matrice e ai dati, risultano i migliori candidati da monitorare per un accumulo futuro anche in base al portafoglio.`);
   lines.push("");
   const ageMin = Math.round((Date.now() - new Date(DATA.updated_at).getTime()) / 60000);
   const lagNote = ageMin > 90 ? ` [ATTENZIONE: snapshot di ${ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min"} fa — i prezzi potrebbero essere disallineati dal mercato live; verifica online i livelli critici prima di ragionarci sopra]` : "";
@@ -4113,7 +4121,7 @@ BLOCCO OPERATIVO (DIVIETO TASSATIVO): in questa fase NON devi suggerire alcuna o
   // In modalità standby l'AI NON deve commentarli operativamente né trasformarli in raccomandazioni.
   try {
     const dv = decisionVerdict();
-    lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (dato di contesto — NON commentare operativamente, usalo solo per valutare posizionamento e coerenza): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
+    lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (posizionamento interno calcolato dalla dashboard — usalo come base quantitativa per la sezione 3, validandolo criticamente invece di ripeterlo a pappagallo; se il tuo giudizio diverge dal motore, dichiaralo e motiva): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
     lines.push("· NOTA METODOLOGICA: gli Stop Loss sono calcolati dinamicamente su base 2×ATR a 14 periodi (Wilder) per assorbire la volatilità fisiologica del titolo — NON sono percentuali fisse. Il verdetto di accumulo è ritarato sul mandato quant: impatto marginale sullo Sharpe, forza relativa 1M vs benchmark, qualità fondamentale; gli asset in veto (value trap / ROIC<0 / PEG<0) sono esclusi a prescindere dal supporto tecnico.");
     if ((dv.withPlan || []).length) {
       lines.push("· Livelli calcolati dal motore (contesto, ordini limite + stop 2×ATR): " +
@@ -4433,11 +4441,11 @@ BLOCCO OPERATIVO (DIVIETO TASSATIVO): in questa fase NON devi suggerire alcuna o
   }
   lines.push("");
   lines.push(`PROMEMORIA FINALE (vincolante):
-- Tono asettico, matematico, strategico: da analista quantitativo, non da consulente retail.
+- Sezioni 1 e 2: tono asettico, matematico, strategico — da analista quantitativo, non da consulente retail. Sezione 3: tono discorsivo, sintetico e comprensibile (executive summary).
 - Mantieni un punto di vista OBIETTIVO e spietato: evidenzia inefficienze e rischi prima dei meriti.
 - Cita le cifre decisive integrandole nel discorso; per ogni dato citato considera la sua data di rilevazione.
-- SOLO le due sezioni richieste (SCENARIO MACROECONOMICO E FLUSSI · RADIOGRAFIA DEL PORTAFOGLIO). NESSUN suggerimento operativo.
-- Chiusura obbligatoria, testuale: "Analisi completata. In attesa di interrogazioni tattiche su eventuali ingressi, uscite o rotazioni di portafoglio."`);
+- SOLO le tre sezioni richieste (SCENARIO MACROECONOMICO E FLUSSI · RADIOGRAFIA DEL PORTAFOGLIO · PIANO D'AZIONE E SUGGERIMENTI).
+- Ogni suggerimento operativo della sezione 3 deve rispettare le REGOLE DI RISK MANAGEMENT (veto value trap, correlazione, sizing 10% NAV) e citare quantità e livelli coerenti coi dati del payload (stop 2×ATR, supporti, MCR).`);
   return lines.join("\n");
 }
 
