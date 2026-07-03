@@ -379,6 +379,21 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     vol = float(hist["Volume"].iloc[-1])
     vol_avg30 = float(hist["Volume"].tail(30).mean())
 
+    # ATR(14) — Average True Range con smoothing di Wilder (EWMA alpha=1/14).
+    # È la base degli stop loss dinamici del motore (2×ATR): assorbe la volatilità
+    # fisiologica del titolo invece di usare percentuali fisse.
+    atr_14 = None
+    try:
+        tr = pd.concat([
+            hist["High"] - hist["Low"],
+            (hist["High"] - hist["Close"].shift(1)).abs(),
+            (hist["Low"] - hist["Close"].shift(1)).abs(),
+        ], axis=1).max(axis=1).dropna()
+        if len(tr) >= 15:
+            atr_14 = float(tr.ewm(alpha=1 / 14, adjust=False).mean().iloc[-1])
+    except Exception as e:  # noqa: BLE001
+        print(f"!! ATR {ticker}: {e}", file=sys.stderr)
+
     # sparkline su più orizzonti: 1g (5m), 1 settimana, 1 mese, 3 mesi, 6 mesi, 1 anno, all
     sparks = {
         "w1": [round(float(c), 2) for c in closes.tail(5)],
@@ -518,6 +533,52 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         if stats.get("peg") is not None and stats["peg"] <= 0:
             stats["peg"] = None
 
+        # Altman Z-Score (rischio insolvenza) dai bilanci yfinance:
+        # Z = 1.2·WC/TA + 1.4·RE/TA + 3.3·EBIT/TA + 0.6·MVE/TL + 1.0·Sales/TA
+        # Proxy fedele: tollera al massimo 1 componente mancante (pesata 0, conteggiata
+        # in altman_missing); se mancano di più il dato resta n.d. — niente stime cieche.
+        # Soglie classiche: <1.81 distress, 1.81-2.99 zona grigia, >2.99 solido.
+        try:
+            bs = t.balance_sheet
+            def bs_row(*names):
+                for nm in names:
+                    if nm in bs.index:
+                        v = bs.loc[nm].iloc[0]   # colonna più recente
+                        if v is not None and not pd.isna(v):
+                            return float(v)
+                return None
+            ta_ = bs_row("Total Assets")
+            tl_ = bs_row("Total Liabilities Net Minority Interest", "Total Liab")
+            ca_ = bs_row("Current Assets", "Total Current Assets")
+            cl_ = bs_row("Current Liabilities", "Total Current Liabilities")
+            re_ = bs_row("Retained Earnings")
+            ebit = None
+            try:
+                inc_z = t.income_stmt
+                for nm in ("EBIT", "Operating Income", "Pretax Income"):
+                    if nm in inc_z.index:
+                        v = inc_z.loc[nm].iloc[0]
+                        if v is not None and not pd.isna(v):
+                            ebit = float(v)
+                            break
+            except Exception:  # noqa: BLE001
+                pass
+            if ta_ and ta_ > 0 and tl_ and tl_ > 0:
+                wc = (ca_ - cl_) if (ca_ is not None and cl_ is not None) else None
+                comp = [
+                    (1.2, wc / ta_ if wc is not None else None),
+                    (1.4, re_ / ta_ if re_ is not None else None),
+                    (3.3, ebit / ta_ if ebit is not None else None),
+                    (0.6, stats["market_cap"] / tl_ if stats.get("market_cap") else None),
+                    (1.0, stats["revenue_fy"] / ta_ if stats.get("revenue_fy") else None),
+                ]
+                missing = sum(1 for _, x in comp if x is None)
+                if missing <= 1:
+                    stats["altman_z"] = round(sum(w_ * (x or 0.0) for w_, x in comp), 2)
+                    stats["altman_missing"] = missing
+        except Exception as e:  # noqa: BLE001
+            print(f"!! altman {ticker}: {e}", file=sys.stderr)
+
     # salute tecnica 0-100 (per il termometro di portafoglio)
     parts = []
     if rsi is not None:
@@ -558,6 +619,8 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "rsi": rsi,
         "volume": int(vol),
         "vol_ratio": round(vol / vol_avg30, 2) if vol_avg30 else None,
+        "atr_14": round(atr_14, 2) if atr_14 else None,
+        "atr_pct": round(atr_14 / price * 100, 2) if atr_14 and price else None,
         "signal": sig,
         "signal_class": sig_class,
         "sparks": sparks,
