@@ -6,16 +6,16 @@ let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (
 /* ordinamento tabelle: click su intestazione → desc → asc → default */
 const SORT_FIELDS = {
   // allineato 1:1 alle <th>: Titolo,Qtà,PMC,Prezzo,Oggi,Pre/After,Volume,Guadagno,Guad.%,
-  // Beta,Sharpe 1A,Supporto,Resistenza,Δ SMA200,RS 1M,RS NDX 1M,Segnale,Short %,
+  // Beta,Sharpe 1A,Sortino 1A,Supporto,Resistenza,Δ SMA200,RS 1M,RS NDX 1M,Segnale,Short %,
   // Drawdown 52S,Opzioni,Trimestrale,Grafico
   "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg", "volume",
-                "gain", "gain_pct", "beta", "sharpe_1y", "support",
+                "gain", "gain_pct", "beta", "sharpe_1y", "sortino_1y", "support",
                 "resistance", "sma200_dist_pct", "rs_1m", "rs_ndx_1m", null,
                 "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
-  // Titolo,Prezzo,Oggi,Pre/After,Volume,Beta,Sharpe 1A,Supporto,Resistenza,Δ SMA200,
+  // Titolo,Prezzo,Oggi,Pre/After,Volume,Beta,Sharpe 1A,Sortino 1A,Supporto,Resistenza,Δ SMA200,
   // RS 1M,RS NDX 1M,Segnale,Short %,Drawdown 52S,Opzioni,Trimestrale,Grafico
   "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume",
-               "beta", "sharpe_1y", "support", "resistance", "sma200_dist_pct",
+               "beta", "sharpe_1y", "sortino_1y", "support", "resistance", "sma200_dist_pct",
                "rs_1m", "rs_ndx_1m", null,
                "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
   // tabelle fondamentali (vista Value); allineate 1:1 alle colonne:
@@ -931,7 +931,14 @@ function positionWeightPct(r) {
 function qualityVeto(r) {
   const st = r.stats || {};
   const why = [];
-  if (r.sharpe_1y != null && r.sharpe_1y < -0.3) why.push(`Sharpe 1A ${fmtNum.format(r.sharpe_1y)} < -0.3 (distruzione di valore risk-adjusted)`);
+  // metro del veto: SORTINO (downside deviation) — punisce la distruzione di valore reale,
+  // non i rally; un titolo volatile al rialzo non finisce in value trap per lo Sharpe basso.
+  // Fallback etichettato allo Sharpe finché la pipeline non popola sortino_1y.
+  if (r.sortino_1y != null) {
+    if (r.sortino_1y < -0.3) why.push(`Sortino 1A ${fmtNum.format(r.sortino_1y)} < -0.3 (distruzione di valore sul downside)`);
+  } else if (r.sharpe_1y != null && r.sharpe_1y < -0.3) {
+    why.push(`Sharpe 1A ${fmtNum.format(r.sharpe_1y)} < -0.3 (proxy: Sortino n.d. fino al prossimo run pipeline)`);
+  }
   if (st.short_float != null && st.short_float >= 0.15) why.push(`Short Interest ${Math.round(st.short_float * 1000) / 10}% ≥ 15%`);
   const pegBroken = st.peg == null || st.peg <= 0;   // la pipeline azzera già i PEG ≤ 0 → n.d.
   if (st.profit_margin != null && st.profit_margin < 0 && pegBroken) why.push("margine netto negativo con PEG non calcolabile");
@@ -1318,7 +1325,8 @@ function renderMiniCards() {
       const score = clamp(33 + ps * 22);   // ~0=33, 1=55, 2=77, 3=99
       const lab = ps > 2 ? "Eccellente" : ps >= 1 ? "Buono" : ps >= 0 ? "Debole" : "Negativo";
       const so = (DATA.totals || {}).portfolio_sortino_ratio;
-      const varE = (DATA.totals || {}).var95_1d_eur;
+      // VaR: preferisci la stima STORICA (percentili empirici — onesta sulle code grasse)
+      const varE = (DATA.totals || {}).var95_hist_eur ?? (DATA.totals || {}).var95_1d_eur;
       const subBits = [];
       if (so != null) subBits.push(`Sortino ${fmtNum.format(so)}`);
       if (varE != null) subBits.push(`VaR95 1g ${fmtEUR.format(varE)}`);
@@ -1463,7 +1471,14 @@ function openPortfolioSharpeModal() {
   const so = t.portfolio_sortino_ratio;
   const extraRisk = [];
   if (so != null) extraRisk.push(`<div style="font-size:12.5px;margin-top:6px"><b>Sortino</b>: <b style="color:${sharpeColor(so)}">${fmtNum.format(so)}</b> — come lo Sharpe ma conta solo la volatilità <b>negativa</b>: se è molto più alto dello Sharpe, gran parte della varianza è "buona" (rally), non rischio.</div>`);
-  if (t.var95_1d_eur != null) extraRisk.push(`<div style="font-size:12.5px;margin-top:6px"><b>VaR 95% (1 giorno)</b>: <b class="neg">${fmtEUR.format(t.var95_1d_eur)}</b> (${fmtNum.format(t.var95_1d_pct)}% dell'azionario) — la perdita che nel 95% dei giorni NON viene superata.${t.es95_1d_eur != null ? ` <b>Expected Shortfall</b>: <b class="neg">${fmtEUR.format(t.es95_1d_eur)}</b> — la perdita MEDIA nel 5% dei giorni peggiori (la coda oltre il VaR).` : ""}</div>`);
+  {
+    // stima STORICA primaria (percentili empirici della serie reale: onesta sulle code
+    // grasse dei titoli volatili); la parametrica normale resta come confronto
+    const vE = t.var95_hist_eur ?? t.var95_1d_eur, vP = t.var95_hist_pct ?? t.var95_1d_pct;
+    const eE = t.es95_hist_eur ?? t.es95_1d_eur;
+    const isHist = t.var95_hist_eur != null;
+    if (vE != null) extraRisk.push(`<div style="font-size:12.5px;margin-top:6px"><b>VaR 95% (1 giorno${isHist ? ", storico" : ", parametrico"})</b>: <b class="neg">${fmtEUR.format(vE)}</b> (${fmtNum.format(vP)}% dell'azionario) — la perdita che nel 95% dei giorni NON viene superata${isHist ? ", misurata sui percentili REALI degli ultimi 12 mesi" : ""}.${eE != null ? ` <b>Expected Shortfall</b>: <b class="neg">${fmtEUR.format(eE)}</b> — la perdita MEDIA nel 5% dei giorni peggiori (la coda oltre il VaR).` : ""}${isHist && t.var95_1d_eur != null ? ` <span class="muted">(parametrico normale: ${fmtEUR.format(t.var95_1d_eur)} — sottostima le code grasse)</span>` : ""}</div>`);
+  }
   openInfoModal("Sharpe Ratio del portafoglio",
     `<div class="info-line" style="margin-bottom:10px"><b>Sharpe Ratio</b> = rendimento corretto per il rischio: l'extra-rendimento (sopra il tasso privo di rischio del <b>${fmtNum.format(rf)}%</b>) per ogni unità di volatilità. Quello di portafoglio è calcolato sulla <b>matrice di covarianza</b> pesata per controvalore, quindi tiene conto della diversificazione fra i titoli.</div>
      <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
@@ -2314,6 +2329,13 @@ function sharpeCell(r) {
   return `<td class="num sharpe-cell" data-sharpe-tk="${r.ticker}" role="button" tabindex="0" title="Sharpe Ratio 12 mesi — clicca per la spiegazione"><b style="color:${sharpeColor(s)};font-family:var(--mono)">${fmtNum.format(s)}</b></td>`;
 }
 
+function sortinoCell(r) {
+  const s = r.sortino_1y;
+  if (s == null) return `<td class="num muted" title="Sortino n.d. — arriva col prossimo run della pipeline">—</td>`;
+  const veto = s < -0.3;
+  return `<td class="num" title="Sortino 12 mesi (solo volatilità negativa) — metro del veto value trap${veto ? ": SOTTO la soglia -0.3" : ""}"><b style="color:${veto ? "var(--red)" : sharpeColor(s)};font-family:var(--mono)">${fmtNum.format(s)}</b>${veto ? '<br><span class="badge badge-squeeze">[VETO]</span>' : ""}</td>`;
+}
+
 function openSharpeInfo(ticker) {
   const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
   const r = all.find(x => x.ticker === ticker);
@@ -2356,6 +2378,7 @@ function techCells(r) {
   return `
       <td class="num">${betaBar(r)}</td>
       ${sharpeCell(r)}
+      ${sortinoCell(r)}
       <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
       <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
       ${smaCell}
@@ -3488,10 +3511,10 @@ function renderTable() {
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="13" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="14" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="22"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applyColLabels("ptf-table");
 }
@@ -3521,9 +3544,9 @@ function renderWatchlist() {
       <td class="num">${prepostCell(r.prepost)}</td>
       ${volumeCell(r)}
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="18" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="19" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="18"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="19"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   applyColLabels("wl-table");
 }
@@ -4125,7 +4148,7 @@ function buildPrompt() {
   lines.push("MANDATO ISTITUZIONALE: Il tuo obiettivo istituzionale è la massimizzazione del rendimento assoluto corretto per il rischio (Sharpe Ratio > 2.0) e la sovraperformance strutturale rispetto al Nasdaq 100. Analizza ogni dato con la spietatezza di un risk manager.");
   lines.push("");
   lines.push(`REGOLE DI RISK MANAGEMENT (vincolanti e non derogabili — valgono per questa analisi E per ogni successiva interrogazione tattica in questa chat):
-1. VALUE TRAP VETO: scarta automaticamente (verdetto "SCARTATO - VALUE TRAP") qualsiasi asset che presenti, contemporaneamente o singolarmente: Sharpe 1A < -0.3, Short Interest >= 15%, oppure margine netto compromesso con PEG < 0 o non calcolabile. Nessun supporto tecnico, per quanto forte, può scavalcare questo veto fondamentale.
+1. VALUE TRAP VETO: scarta automaticamente (verdetto "SCARTATO - VALUE TRAP") qualsiasi asset che presenti, contemporaneamente o singolarmente: Sortino 1A < -0.3 (distruzione di valore sul downside — il Sortino, non lo Sharpe, è il metro del veto: non punisce la volatilità da rally), Short Interest >= 15%, oppure margine netto compromesso con PEG < 0 o non calcolabile. Nessun supporto tecnico, per quanto forte, può scavalcare questo veto fondamentale.
 2. CORRELAZIONE E SOVRAESPOSIZIONE (anti "Correlation Blindness"): Penalizza e sconsiglia l'ingresso/accumulo su qualsiasi asset che presenti un'alta correlazione storica (>0.75) con posizioni già esistenti in portafoglio, qualora l'esposizione al singolo settore superi il 25% del totale investito. USA I DATI: la MATRICE DI RISCHIO PER POSIZIONE qui sotto riporta la correlazione media e massima REALE (log-rendimenti giornalieri 12 mesi) di ogni titolo vs il portafoglio — non stimare le correlazioni a memoria.
 3. SIZING ISTITUZIONALE: Nessuna singola posizione non coperta deve superare il 10% del Net Asset Value (NAV) del portafoglio. Suggerisci alleggerimenti (trimming) automatici per le posizioni che sforano passivamente questo limite a causa della rivalutazione del prezzo.
 4. LIQUIDITÀ E SLIPPAGE: per gli asset flaggati [ILLIQUIDO] (posizione > 5% del volume medio giornaliero) considera lo slippage in ingresso/uscita: privilegia ordini limite frazionati e non assumere l'eseguito al prezzo di schermo.
@@ -4155,7 +4178,12 @@ function buildPrompt() {
   const riskBits = [];
   if (t.portfolio_sharpe_ratio != null) riskBits.push(`Sharpe Ratio portafoglio ${fmtNum.format(t.portfolio_sharpe_ratio)} vs target istituzionale 2.0 (log-rendimenti giornalieri 12M, matrice di covarianza, pesi mark-to-market, Rf ${fmtNum.format((t.risk_free_rate ?? 0.0363) * 100)}%)`);
   if (t.portfolio_sortino_ratio != null) riskBits.push(`Sortino Ratio ${fmtNum.format(t.portfolio_sortino_ratio)} (come lo Sharpe ma con la sola volatilità NEGATIVA: se Sortino >> Sharpe, gran parte della varianza è al rialzo — rischio "vero" più basso di quanto lo Sharpe suggerisca)`);
-  if (t.var95_1d_eur != null) riskBits.push(`VaR 95% a 1 giorno: ${fmtEUR.format(t.var95_1d_eur)} (${fmtNum.format(t.var95_1d_pct)}% del comparto azionario — perdita massima attesa nel 95% dei giorni; parametrico normale)${t.es95_1d_eur != null ? `, Expected Shortfall 95%: ${fmtEUR.format(t.es95_1d_eur)} (perdita MEDIA nel 5% dei giorni peggiori)` : ""}`);
+  {
+    const vE = t.var95_hist_eur ?? t.var95_1d_eur, vP = t.var95_hist_pct ?? t.var95_1d_pct;
+    const eE = t.es95_hist_eur ?? t.es95_1d_eur;
+    const isHist = t.var95_hist_eur != null;
+    if (vE != null) riskBits.push(`VaR 95% a 1 giorno${isHist ? " (STORICO, percentili empirici 12M — onesto sulle code grasse)" : " (parametrico normale — sottostima le code)"}: ${fmtEUR.format(vE)} (${fmtNum.format(vP)}% del comparto azionario)${eE != null ? `, Expected Shortfall 95%: ${fmtEUR.format(eE)} (perdita MEDIA nel 5% dei giorni peggiori)` : ""}${isHist && t.var95_1d_eur != null ? ` [parametrico: ${fmtEUR.format(t.var95_1d_eur)}]` : ""}`);
+  }
   const pbP = portfolioBeta();
   if (pbP) riskBits.push(`Beta di Portafoglio: ${fmtNum.format(pbP.beta)} vs Nasdaq 100 (=1.0) — ${pbP.src}, pesi mark-to-market sul capitale investito, liquidità esclusa, BTP a beta 0`);
   if (t.avg_pairwise_corr != null) riskBits.push(`correlazione media tra le posizioni: ${fmtNum.format(t.avg_pairwise_corr)} (log-rendimenti giornalieri 12M — più è alta, minore la diversificazione reale)`);
@@ -4247,6 +4275,7 @@ function buildPrompt() {
     const rsCell = r.rs_1m != null ? `${r.rs_1m > 0 ? "+" : ""}${r.rs_1m}% (vs ${rsBench})` : "—";
     const rsNdxCell = r.rs_ndx_1m != null ? `${r.rs_ndx_1m > 0 ? "+" : ""}${r.rs_ndx_1m}pp` : "—";
     const sh = r.sharpe_1y != null ? fmtNum.format(r.sharpe_1y) : "—";
+    const so = r.sortino_1y != null ? fmtNum.format(r.sortino_1y) : "—";
     const dd = r.w52_dist_pct != null ? signTxt(r.w52_dist_pct) : "—";
     const im = impliedMoveForEarnings ? impliedMoveForEarnings(r) : null;
     const imTxt = im != null ? `±${im}%` : "—";
@@ -4267,13 +4296,13 @@ function buildPrompt() {
     if (earningsRiskDays(r) != null) flags.push("[!EARNINGS RISK]");
     if (isIlliquid(r)) flags.push("[ILLIQUIDO]");
     const nameCell = `${r.name} (${r.ticker})${flags.length ? " " + flags.join(" ") : ""}`;
-    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${dd} | ${shortF} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
+    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
   };
-  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Drawdown 52S | Short% | Supp. | Stop 2×ATR | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
-  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
+  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A | Drawdown 52S | Short% | Supp. | Stop 2×ATR | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
+  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
-  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante.)");
+  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Sortino 1A = Sharpe con la sola volatilità NEGATIVA: è il metro del veto value trap (< -0.3 = distruzione di valore sul downside). Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante.)");
   // MATRICE DI RISCHIO PER POSIZIONE: pesi MTM, MCR, beta NDX, correlazioni reali
   const riskRows = (DATA.portfolio || []).filter(r => r.qty && (r.risk_contrib_pct != null || r.avg_corr != null || r.beta_ndx != null));
   if (riskRows.length) {

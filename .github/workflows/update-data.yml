@@ -47,6 +47,10 @@ jobs:
           # opzionale: backup prezzi se Yahoo fallisce (registrazione gratuita su tiingo.com)
           TIINGO_API_KEY: ${{ secrets.TIINGO_API_KEY }}
 
+      # gate di qualità: violazioni matematiche hard (P/E con EPS<0, MCR rotto, stop
+      # incoerenti) bloccano il commit dei dati; i degradi di mercato sono solo warning
+      - run: python scripts/audit_data.py data/data.json
+
       - name: Commit dati aggiornati
         run: |
           git config user.name "github-actions[bot]"

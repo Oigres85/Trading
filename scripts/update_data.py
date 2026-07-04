@@ -415,14 +415,21 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     # e correlazioni. I log-return sono additivi nel tempo e non sovrastimano il rendimento
     # composto come la media aritmetica dei rendimenti semplici (bias ~ +sigma^2/2 sui titoli volatili).
     daily_ret = np.log(closes / closes.shift(1)).replace([np.inf, -np.inf], np.nan).dropna()
-    sharpe_1y = None
+    sharpe_1y, sortino_1y = None, None
     if len(daily_ret) >= 60:
         std_d = float(daily_ret.std(ddof=1))
+        rf_log = math.log1p(RISK_FREE_RATE)                          # Rf coerente in spazio log
+        rp = float(daily_ret.mean()) * TRADING_DAYS                  # log-rendimento annualizzato
         if std_d > 0:
-            rp = float(daily_ret.mean()) * TRADING_DAYS              # log-rendimento annualizzato
             sigma = std_d * (TRADING_DAYS ** 0.5)                    # volatilità annualizzata
-            rf_log = math.log1p(RISK_FREE_RATE)                      # Rf coerente in spazio log
             sharpe_1y = round((rp - rf_log) / sigma, 2)
+        # Sortino: stesso numeratore, ma al denominatore la sola downside deviation
+        # (radice della media dei quadrati dei rendimenti sotto Rf giornaliero).
+        # È il metro del VETO value trap: punisce le perdite, non i rally.
+        downside = np.minimum(daily_ret.values - rf_log / TRADING_DAYS, 0.0)
+        dd_ann = float(np.sqrt(np.mean(downside ** 2)) * (TRADING_DAYS ** 0.5))
+        if dd_ann > 0:
+            sortino_1y = round((rp - rf_log) / dd_ann, 2)
 
     vol = float(hist["Volume"].iloc[-1])
     vol_avg30 = float(hist["Volume"].tail(30).mean())
@@ -688,6 +695,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "eps": round(float(eps), 2) if eps is not None else None,
         "beta": round(float(beta), 2) if beta is not None else None,
         "sharpe_1y": sharpe_1y,
+        "sortino_1y": sortino_1y,
         "prepost": prepost,
         "sector": info.get("sector") or info.get("quoteType") or "Altro",
         "stats": stats,
@@ -2269,12 +2277,23 @@ def compute_risk_metrics(rows, watch_rows=None):
     if dd_annual > 0:
         sortino = round((port_mean_annual - rf_log) / dd_annual, 2)
 
-    # --- VaR/ES parametrici 1 giorno al 95% (normale, media 0 per prudenza): % del
-    # controvalore azionario a rischio nel 5% dei giorni peggiori; l'Expected Shortfall
-    # è la perdita MEDIA quando il VaR viene superato (coda). In € li converte main(). ---
+    # --- VaR/ES 1 giorno al 95%: % del controvalore azionario a rischio nel 5% dei
+    # giorni peggiori; l'Expected Shortfall è la perdita MEDIA quando il VaR viene
+    # superato. Due stime: STORICA (percentile empirico della serie di portafoglio —
+    # onesta sulle code grasse dei titoli volatili, è quella primaria) e parametrica
+    # normale (media 0 per prudenza — sottostima le code by design, resta come confronto).
+    # In € li converte main(). ---
     sigma_1d = port_var_d ** 0.5
     var95_1d_pct = round(1.645 * sigma_1d * 100, 2)
     es95_1d_pct = round(2.063 * sigma_1d * 100, 2)
+    var95_hist_pct = es95_hist_pct = None
+    if len(port_ret_d) >= 100:
+        q05 = float(np.quantile(port_ret_d, 0.05))
+        tail = port_ret_d[port_ret_d <= q05]
+        if q05 < 0:
+            var95_hist_pct = round(-q05 * 100, 2)
+            if len(tail):
+                es95_hist_pct = round(-float(np.mean(tail)) * 100, 2)
 
     # --- annota le row del portafoglio ---
     for r in rows:
@@ -2304,7 +2323,8 @@ def compute_risk_metrics(rows, watch_rows=None):
 
     return {"sharpe": sharpe, "sortino": sortino, "portfolio_beta_ndx": port_beta,
             "avg_pairwise_corr": avg_pairwise,
-            "var95_1d_pct": var95_1d_pct, "es95_1d_pct": es95_1d_pct}
+            "var95_1d_pct": var95_1d_pct, "es95_1d_pct": es95_1d_pct,
+            "var95_hist_pct": var95_hist_pct, "es95_hist_pct": es95_hist_pct}
 
 
 def ratchet_stops(rows, prev_by_ticker):
@@ -2438,6 +2458,11 @@ def main():
             "es95_1d_pct": risk.get("es95_1d_pct"),
             "var95_1d_eur": round(usd_value / eurusd * risk["var95_1d_pct"] / 100) if risk.get("var95_1d_pct") else None,
             "es95_1d_eur": round(usd_value / eurusd * risk["es95_1d_pct"] / 100) if risk.get("es95_1d_pct") else None,
+            # variante STORICA (percentili empirici — primaria: onesta sulle code grasse)
+            "var95_hist_pct": risk.get("var95_hist_pct"),
+            "es95_hist_pct": risk.get("es95_hist_pct"),
+            "var95_hist_eur": round(usd_value / eurusd * risk["var95_hist_pct"] / 100) if risk.get("var95_hist_pct") else None,
+            "es95_hist_eur": round(usd_value / eurusd * risk["es95_hist_pct"] / 100) if risk.get("es95_hist_pct") else None,
         },
         "portfolio": equities + [btp],
         "watchlist": watchlist,

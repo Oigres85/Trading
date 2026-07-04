@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=93">
+<link rel="stylesheet" href="assets/style.css?v=94">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -126,6 +126,7 @@
             <th class="num">Guad. %</th>
             <th class="num" title="Beta vs Nasdaq 100 — regressione sui log-rendimenti 12M calcolata dalla pipeline; se n.d. usa il beta Yahoo (5A mensile vs S&P), sempre etichettato">Beta</th>
             <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
+            <th class="num" title="Sortino Ratio 12 mesi — come lo Sharpe ma con la sola volatilità NEGATIVA (downside deviation): è il metro del veto value trap (< -0.3 = distruzione di valore)">Sortino 1A</th>
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
             <th class="num" title="Distanza % dalla media mobile a 200 giorni (price action pura)">Δ SMA200</th>
@@ -176,6 +177,7 @@
             <th class="num">Volume</th>
             <th class="num" title="Beta vs Nasdaq 100 — regressione sui log-rendimenti 12M calcolata dalla pipeline; se n.d. usa il beta Yahoo (5A mensile vs S&P), sempre etichettato">Beta</th>
             <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
+            <th class="num" title="Sortino Ratio 12 mesi — come lo Sharpe ma con la sola volatilità NEGATIVA (downside deviation): è il metro del veto value trap (< -0.3 = distruzione di valore)">Sortino 1A</th>
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
             <th class="num" title="Distanza % dalla media mobile a 200 giorni (price action pura)">Δ SMA200</th>
@@ -315,6 +317,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=93"></script>
+<script src="assets/app.js?v=94"></script>
 </body>
 </html>
