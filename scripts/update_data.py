@@ -13,6 +13,7 @@ Fonti (tutte gratuite):
 - RSS (solo news sui titoli in portafoglio): CNBC, Bloomberg, Yahoo Finance,
   Investing.com, Google News
 """
+import io
 import json
 import math
 import os
@@ -336,11 +337,54 @@ TICKER_ALIAS = {
 }
 
 
+def backup_daily(ticker):
+    """Piano B per i PREZZI (OHLCV daily) quando Yahoo non dà lo storico — tutto il lato
+    titoli dipende da un'API non ufficiale e rate-limited, serve ridondanza. Catena:
+    1) Stooq (gratis, senza chiave) — NB: da alcune reti risponde con un challenge
+       anti-bot JS (verificato); il tentativo costa poco e da altri IP può passare;
+    2) Tiingo (JSON ufficiale, gratuito con registrazione) SOLO se è impostata la env
+       TIINGO_API_KEY (secret GitHub Actions, come FRED_API_KEY) — zero chiamate finché
+       Yahoo è sano, quindi il free tier non si consuma.
+    Fondamentali/info restano n.d. (fonte diversa = niente stime incrociate)."""
+    try:  # --- 1) Stooq CSV ---
+        txt = http_get(f"https://stooq.com/q/d/l/?s={ticker.lower()}.us&i=d", tries=1, timeout=15).text
+        if txt and not txt.lstrip().startswith("<") and "No data" not in txt:
+            df = pd.read_csv(io.StringIO(txt), parse_dates=["Date"], index_col="Date")
+            if not df.empty and {"Open", "High", "Low", "Close", "Volume"}.issubset(df.columns):
+                return df.tail(260)[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Close"]), "stooq"
+    except Exception as e:  # noqa: BLE001
+        print(f"!! stooq {ticker}: {e}", file=sys.stderr)
+    key = os.environ.get("TIINGO_API_KEY")
+    if key:
+        try:  # --- 2) Tiingo JSON (campi adj* = coerenti con auto_adjust di Yahoo) ---
+            start = (datetime.now(timezone.utc) - timedelta(days=380)).strftime("%Y-%m-%d")
+            js = http_get(f"https://api.tiingo.com/tiingo/daily/{ticker.lower()}/prices?startDate={start}&token={key}",
+                          tries=2, timeout=20).json()
+            if isinstance(js, list) and len(js) >= 30:
+                df = pd.DataFrame(js)
+                df["Date"] = pd.to_datetime(df["date"]).dt.tz_localize(None)
+                df = df.set_index("Date").rename(columns={
+                    "adjOpen": "Open", "adjHigh": "High", "adjLow": "Low",
+                    "adjClose": "Close", "adjVolume": "Volume"})
+                need = {"Open", "High", "Low", "Close", "Volume"}
+                if need.issubset(df.columns):
+                    return df.tail(260)[list(need)].dropna(subset=["Close"]), "tiingo"
+        except Exception as e:  # noqa: BLE001
+            print(f"!! tiingo {ticker}: {e}", file=sys.stderr)
+    return None
+
+
 def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
     ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
     t = yf.Ticker(ticker)
+    price_src = "yahoo"
     hist = t.history(period="1y", interval="1d", auto_adjust=True)
+    if hist.empty and currency == "USD" and not re.search(r"[\^=]|-", ticker):
+        bk = backup_daily(ticker)
+        if bk is not None and len(bk[0]) >= 30:
+            hist, price_src = bk
+            print(f"·· prezzi {ticker} da {price_src} (fallback: Yahoo senza storico)", file=sys.stderr)
     if hist.empty:
         print(f"!! nessuno storico per {ticker}", file=sys.stderr)
         return None
@@ -619,6 +663,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "ticker": ticker,
         "name": name or auto_name,
         "currency": currency,
+        "price_src": price_src,          # "yahoo" | "stooq" (fallback prezzi etichettato)
         "price": round(price, 2),
         "change_pct": chg,
         "pe": round(float(pe), 1) if pe and pe > 0 else None,

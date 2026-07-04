@@ -6,7 +6,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=92">
+<link rel="stylesheet" href="assets/style.css?v=93">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -34,6 +34,8 @@
 
   <!-- ALERT EARNINGS IMMINENTI -->
   <div id="earnings-alert" hidden></div>
+  <!-- ALERT RICONCILIAZIONE BROKER (snapshot vecchio o posizioni incoerenti) -->
+  <div id="reconcile-alert" hidden></div>
 
   <!-- PATRIMONIO -->
   <section class="card kpi-card">
@@ -122,7 +124,7 @@
             <th class="num">Volume</th>
             <th class="num">Guadagno</th>
             <th class="num">Guad. %</th>
-            <th class="num">Beta</th>
+            <th class="num" title="Beta vs Nasdaq 100 — regressione sui log-rendimenti 12M calcolata dalla pipeline; se n.d. usa il beta Yahoo (5A mensile vs S&P), sempre etichettato">Beta</th>
             <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
@@ -172,7 +174,7 @@
             <th class="num">Oggi</th>
             <th class="num" title="Variazione pre-market / after-hours (dallo snapshot pipeline)">Pre/After</th>
             <th class="num">Volume</th>
-            <th class="num">Beta</th>
+            <th class="num" title="Beta vs Nasdaq 100 — regressione sui log-rendimenti 12M calcolata dalla pipeline; se n.d. usa il beta Yahoo (5A mensile vs S&P), sempre etichettato">Beta</th>
             <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
             <th class="num">Supporto</th>
             <th class="num">Resistenza</th>
@@ -313,6 +315,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=92"></script>
+<script src="assets/app.js?v=93"></script>
 </body>
 </html>

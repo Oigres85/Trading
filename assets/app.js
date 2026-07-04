@@ -652,6 +652,7 @@ function renderAll() {
   renderAllocation();
   renderEarnings();
   renderEarningsAlert();
+  renderReconcileAlert();
   renderTable();
   if (ptfView === "fund") renderFundTable();
   renderWatchlist();
@@ -687,6 +688,48 @@ function renderEarningsAlert() {
     const when = r.days <= 0 ? "oggi" : r.days === 1 ? "domani" : `tra ${r.days}gg`;
     return `<span class="ea-chip${ptf.has(r.ticker) ? "" : " ea-wl"}" title="${esc(r.name)}${ptf.has(r.ticker) ? "" : " (watchlist)"}">${r.ticker} · ${when}${im != null ? ` · ±${im}%` : ""}</span>`;
   }).join("");
+}
+
+/* riconciliazione col broker: niente API, quindi qty/PMC/bval sono aggiornati A MANO.
+   Due segnali di disallineamento (il buco più pericoloso: un trade eseguito ma non
+   riportato → il motore ragiona su un portafoglio che non esiste più):
+   1) snapshot broker VECCHIO (>14 gg dalla data as_of);
+   2) incoerenza per posizione: controvalore ricalcolato (prezzo live × qtà, in €) che
+      diverge >20% dal bval del broker — quasi sempre qty/PMC non allineati o bval stantio
+      (la soglia larga assorbe il drift di mercato di un paio di settimane). */
+function reconcileState() {
+  const b = DATA?.broker || {};
+  const out = { staleDays: null, mismatches: [] };
+  if (b.as_of) {
+    const d = Math.floor((Date.now() - new Date(b.as_of + "T00:00:00")) / 86400000);
+    if (d >= 0) out.staleDays = d;
+  }
+  (DATA?.portfolio || []).forEach(r => {
+    if (r.val_eur == null || r.bval == null || r.bval <= 0) return;
+    const dev = r.val_eur / r.bval - 1;
+    // soglia volatility-aware: banda ~2σ del titolo sull'età dello snapshot (σ_d ≈ ATR%/1,4),
+    // col floor al 20%. Senza: i nomi ultra-volatili (MSTR, IPO) sforerebbero per puro
+    // drift di mercato e il banner griderebbe al lupo.
+    const days = Math.max(out.staleDays ?? 7, 1);
+    const sigmaD = r.atr_pct != null ? r.atr_pct / 100 / 1.4 : 0.025;
+    const thr = Math.max(0.20, 2 * sigmaD * Math.sqrt(days));
+    if (Math.abs(dev) > thr) out.mismatches.push({ tk: r.ticker, dev: Math.round(dev * 100) });
+  });
+  out.needed = (out.staleDays != null && out.staleDays > 14) || out.mismatches.length > 0;
+  return out;
+}
+
+function renderReconcileAlert() {
+  const box = $("#reconcile-alert");
+  if (!box) return;
+  const rec = reconcileState();
+  if (!rec.needed) { box.hidden = true; box.innerHTML = ""; box.className = ""; return; }
+  const bits = [];
+  if (rec.staleDays != null && rec.staleDays > 14) bits.push(`snapshot broker di <b>${rec.staleDays} giorni</b> fa (${esc((DATA.broker || {}).as_of || "")})`);
+  if (rec.mismatches.length) bits.push(`posizioni incoerenti col broker: <b>${rec.mismatches.map(m => `${m.tk} ${m.dev > 0 ? "+" : ""}${m.dev}%`).join(", ")}</b>`);
+  box.hidden = false;
+  box.className = "data-error";
+  box.innerHTML = `⚠ <b>RICONCILIA COL BROKER</b> — ${bits.join(" · ")}. Se hai operato senza aggiornare quantità/PMC, il motore sta ragionando su un portafoglio che non esiste più: usa "✎ Modifica valori" e aggiorna lo snapshot in holdings.json.`;
 }
 
 /* ---------------- liquidità (cash) ---------------- */
@@ -957,10 +1000,15 @@ function decisionVerdict() {
 
   // 4) piano operativo: ordini limite al supporto, stop a 2×ATR (volatilità, non % fissa)
   const cashUsd = cashEur * eurusd;
+  // sizing regime-aware: i budget d'ingresso si riducono quando la volatilità di mercato
+  // sale (VIX) — stessa logica degli stop ATR ma a livello di PORTAFOGLIO: in regime
+  // nervoso si rischia meno per operazione, non si spegne il motore.
+  const vixV = (DATA.macro || {}).vix?.value;
+  const riskScale = vixV == null ? 1 : vixV > 30 ? 0.4 : vixV > 25 ? 0.5 : vixV > 20 ? 0.75 : 1;
   const withPlan = accumula.map((r, i) => {
     const support = (r.tech_by_range?.[sparkRange]?.support) || r.support || r.price;
     const limit = Math.min(support, r.price);                 // ordine limite al supporto/prezzo
-    const budget = cashUsd * (i === 0 ? 0.35 : i === 1 ? 0.25 : 0.15);
+    const budget = cashUsd * (i === 0 ? 0.35 : i === 1 ? 0.25 : 0.15) * riskScale;
     const qty = limit > 0 ? Math.floor(budget / limit) : 0;
     const st = atrStop(limit, r);
     return { r, limit, qty, dd: r.w52_dist_pct, q: r._q, stop: st ? st.stop : Math.round(limit * 0.92 * 100) / 100, atr: st };
@@ -981,6 +1029,7 @@ function decisionVerdict() {
     reasons.push(`${accumula.length} candidati migliorano il profilo Sharpe/RS del portafoglio (score quant ≥60): ${accumula.slice(0, 5).map(r => `${r.ticker} ${r._q}/100`).join(", ")}`);
     reasons.push(`criteri: impatto marginale sullo Sharpe (vs ${refSharpe != null ? fmtNum.format(refSharpe) : "n.d."} attuale, target 2.0) · forza relativa 1M vs benchmark · qualità fondamentale`);
     reasons.push(`ordini LIMITE ai supporti con stop a 2×ATR(14): il rischio per operazione si adatta alla volatilità del titolo`);
+    if (riskScale < 1) reasons.push(`regime di volatilità: VIX ${fmtNum.format(vixV)} → budget d'ingresso ridotti al ${Math.round(riskScale * 100)}% (sizing regime-aware: in mercato nervoso si rischia meno per operazione)`);
   } else if (dir != null && dir < 40) {
     label = "PRUDENZA"; col = "var(--yellow)"; score = 32;
     reasons.push(`regime debole (segnali ${dir}/100) e nessun candidato con edge quant: nessun nuovo ingresso, disciplina sugli stop 2×ATR`);
@@ -4133,6 +4182,16 @@ function buildPrompt() {
     riskBits.push(`Liquidità infruttifera: ${(cFrac * 100).toFixed(1)}% del patrimonio a rendimento 0 (drag strutturale sul rendimento composto e sullo Sharpe complessivo)`);
   }
   if (riskBits.length) lines.push("METRICHE DI RISCHIO: " + riskBits.join(" · ") + ".");
+  // riconciliazione broker: se i dati manuali sono stantii/incoerenti l'AI deve saperlo
+  try {
+    const rec = reconcileState();
+    if (rec.needed) {
+      const bits = [];
+      if (rec.staleDays != null && rec.staleDays > 14) bits.push(`snapshot broker vecchio di ${rec.staleDays} giorni (${(DATA.broker || {}).as_of})`);
+      if (rec.mismatches.length) bits.push(`controvalore ricalcolato che diverge >20% dal bval broker su: ${rec.mismatches.map(m => `${m.tk} ${m.dev > 0 ? "+" : ""}${m.dev}%`).join(", ")}`);
+      lines.push(`⚠ RICONCILIAZIONE BROKER NECESSARIA (${bits.join("; ")}): i campi statici del broker potrebbero non riflettere trade recenti. Fidati dei valori RICALCOLATI (prezzo live × quantità) e segnala l'incoerenza all'inizio della sezione 3 chiedendo conferma delle posizioni.`);
+    }
+  } catch { /* no-op */ }
   // STAGIONALITÀ del mese corrente
   if (m.seasonality && m.seasonality.score != null) {
     const se = m.seasonality;
