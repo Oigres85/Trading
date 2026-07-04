@@ -806,6 +806,21 @@ function atrStop(refPrice, r) {
   return { stop: Math.round((refPrice - 2 * a.atr) * 100) / 100, atr: a.atr, pct: a.pct, src: a.src };
 }
 
+/* stop operativo di una POSIZIONE APERTA: priorità allo stop RATCHET della pipeline
+   (stop_atr: sale col prezzo e non ridiscende — persistito tra i run), fallback al
+   calcolo client 2×ATR dal prezzo attuale (non ancorato, etichettato). */
+function stopOf(r) {
+  if (r.stop_atr != null) {
+    return { stop: r.stop_atr, violated: !!r.stop_violated, ratchet: true,
+             pct: r.atr_pct ?? null, src: "ratchet 2×ATR" };
+  }
+  const st = atrStop(r.price, r);
+  if (!st) return null;
+  const inGain = r.qty && r.pmc != null && r.price > r.pmc;
+  const stop = inGain ? Math.max(st.stop, r.pmc) : st.stop;
+  return { stop: Math.round(stop * 100) / 100, violated: r.price < stop, ratchet: false, pct: st.pct, src: st.src };
+}
+
 /* beta effettivo di un titolo: PRIORITÀ alla regressione della pipeline sui log-rendimenti
    12M vs Nasdaq 100 (beta_ndx); fallback al beta Yahoo (5A mensile vs S&P) solo se manca. */
 function betaOf(r) {
@@ -950,15 +965,13 @@ function decisionVerdict() {
     const st = atrStop(limit, r);
     return { r, limit, qty, dd: r.w52_dist_pct, q: r._q, stop: st ? st.stop : Math.round(limit * 0.92 * 100) / 100, atr: st };
   }).filter(x => x.qty > 0);
-  // stop TRAILING sulle posizioni esistenti: 2×ATR dal prezzo attuale, mai sotto il PMC se in gain
+  // stop TRAILING sulle posizioni esistenti: ratchet pipeline (stopOf) — sale, non ridiscende
   const trailing = (DATA.portfolio || []).filter(isEquity).filter(r => r.qty && r.price)
     .map(r => {
-      const st = atrStop(r.price, r);
-      if (!st) return null;
-      const inGain = r.pmc != null && r.price > r.pmc;
-      const stop = inGain ? Math.max(st.stop, r.pmc) : st.stop;
-      return { r, stop: Math.round(stop * 100) / 100, atr: st, floored: inGain && st.stop < r.pmc };
+      const st = stopOf(r);
+      return st ? { r, stop: st.stop, violated: st.violated, ratchet: st.ratchet, atr: st } : null;
     }).filter(Boolean);
+  const stopViolations = trailing.filter(x => x.violated);
 
   const reasons = [];
   let label, score, col;
@@ -975,10 +988,11 @@ function decisionVerdict() {
     label = "MANTIENI"; col = "var(--blue)"; score = dir != null ? dir : 55;
     reasons.push(`nessun candidato migliora abbastanza Sharpe/forza relativa (regime ${dir != null ? dir + "/100" : "neutro"}): conserva liquidità e posizioni vincenti`);
   }
+  if (stopViolations.length) reasons.unshift(`⚠ STOP VIOLATO su ${stopViolations.map(x => `${x.r.ticker} (stop $${fmtNum.format(x.stop)}, prezzo $${fmtNum.format(x.r.price)})`).join(", ")} — il prezzo è sotto lo stop trailing ancorato: decidere uscita o ri-arm consapevole`);
   if (vetoTk.length) reasons.push(`VETO risk manager su ${vetoTk.join(", ")} — esclusi a prescindere dal supporto tecnico`);
   if (overweight.length) reasons.push(`sizing: ${overweight.map(x => `${x.r.ticker} ${x.w}%`).join(", ")} oltre il 10% del NAV → valuta trimming di rientro`);
   if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => r.ticker).join(", ")} (multiplo/RSI estremo)`);
-  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, excluded, overweight, harvest };
+  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, overweight, harvest };
 }
 
 // alert proattivi: condizioni rilevanti emerse oggi (deep value, correzione, squeeze, VIX)
@@ -1050,18 +1064,18 @@ function openDecisionModal() {
       <td style="font-size:11px">score quant ${p.q}/100 · ${p.dd != null ? signTxt(p.dd) + " dal max 52S · " : ""}${atrNote}</td>
     </tr>`; }).join("")}</tbody></table>
     <div class="info-line muted" style="font-size:11px;margin-top:4px">Quantità ripartendo la liquidità (${fmtEUR.format(cashEur)}) sui candidati con lo score quant più alto (Sharpe marginale · RS 1M · qualità). Ordini LIMITE: se il prezzo non arriva, la cassa si conserva. Stop loss a <b>2×ATR(14)</b> sotto l'ingresso: assorbe la volatilità fisiologica del titolo invece di una % fissa.</div>` : "";
-  // STOP TRAILING sulle posizioni esistenti: 2×ATR dal prezzo attuale (floor al PMC se in gain)
+  // STOP TRAILING sulle posizioni esistenti: ratchet della pipeline (sale, non ridiscende)
   const trailHtml = (v.trailing || []).length ? `
-    <h4 style="margin:12px 0 4px">Stop dinamici posizioni aperte (2×ATR)</h4>
-    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Stop 2×ATR</th><th class="num">Dist.</th><th>Base</th></tr></thead><tbody>
-    ${v.trailing.map(x => `<tr>
+    <h4 style="margin:12px 0 4px">Stop trailing posizioni aperte (ratchet 2×ATR)</h4>
+    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Stop</th><th class="num">Dist.</th><th>Stato</th></tr></thead><tbody>
+    ${v.trailing.map(x => `<tr${x.violated ? ' style="background:rgba(239,68,68,.08)"' : ""}>
       <td>${esc(x.r.name)} <span class="tk">${x.r.ticker}</span></td>
       <td class="num">$${fmtNum.format(x.r.price)}</td>
       <td class="num"><b style="color:var(--red)">$${fmtNum.format(x.stop)}</b></td>
       <td class="num">${signTxt(Math.round((x.stop / x.r.price - 1) * 1000) / 10)}</td>
-      <td style="font-size:11px">${x.atr.src}${x.floored ? " · alzato al PMC (posizione in gain)" : ""}</td>
+      <td style="font-size:11px">${x.violated ? '<b style="color:var(--red)">⚠ STOP VIOLATO</b> — prezzo sotto lo stop ancorato' : x.ratchet ? "ratchet attivo (ancorato, non ridiscende)" : esc(x.atr.src) + " (client, non ancorato)"}</td>
     </tr>`).join("")}</tbody></table>
-    <div class="info-line muted" style="font-size:11px;margin-top:4px">Trailing stop a 2×ATR(14) dal prezzo corrente; sulle posizioni in guadagno lo stop non scende mai sotto il PMC (protezione del capitale).</div>` : "";
+    <div class="info-line muted" style="font-size:11px;margin-top:4px">Stop RATCHET: parte a 2×ATR(14) sotto il prezzo e da lì può solo salire coi massimi — non si riabbassa quando il titolo scende (uno stop che ridiscende non è uno stop). Persistito tra i run della pipeline; si resetta se quantità o PMC cambiano. Con "⚠ STOP VIOLATO" la disciplina prevede uscita o ri-arm consapevole.</div>` : "";
   // ESCLUSI dal veto del risk manager (value trap / qualità rotta)
   const vetoHtml = (v.excluded || []).length ? `
     <h4 style="margin:12px 0 4px">Esclusi dal motore (veto risk manager)</h4>
@@ -1159,12 +1173,12 @@ function marginDebtState() {
   const fpe = m.forward_pe?.value ?? null;
   const high = md.pct_of_peak >= 90;
   const confirmed = high && fpe != null && fpe > 20;
-  let label, col, score;
-  if (confirmed)                  { label = "Leva ESTREMA (confermata da Forward P/E)"; col = "var(--red)"; score = 5; }
-  else if (high)                  { label = fpe == null ? "Leva ELEVATA — conferma P/E n.d." : "Leva ELEVATA"; col = "var(--yellow)"; score = 25; }
-  else if (md.pct_of_peak >= 60)  { label = "Leva MEDIA"; col = "var(--yellow)"; score = clamp(100 - md.pct_of_peak); }
-  else                            { label = "Leva BASSA"; col = "var(--green)"; score = clamp(100 - md.pct_of_peak); }
-  return { md, fpe, high, confirmed, label, col, score };
+  let label, labelShort, col, score;
+  if (confirmed)                  { label = "Leva ESTREMA (confermata da Forward P/E)"; labelShort = "Leva ESTREMA"; col = "var(--red)"; score = 5; }
+  else if (high)                  { label = fpe == null ? "Leva ELEVATA — conferma P/E n.d." : "Leva ELEVATA"; labelShort = "Leva ELEVATA"; col = "var(--yellow)"; score = 25; }
+  else if (md.pct_of_peak >= 60)  { label = "Leva MEDIA"; labelShort = "Leva MEDIA"; col = "var(--yellow)"; score = clamp(100 - md.pct_of_peak); }
+  else                            { label = "Leva BASSA"; labelShort = "Leva BASSA"; col = "var(--green)"; score = clamp(100 - md.pct_of_peak); }
+  return { md, fpe, high, confirmed, label, labelShort, col, score };
 }
 
 function renderMiniCards() {
@@ -1254,10 +1268,15 @@ function renderMiniCards() {
     if (ps != null) {
       const score = clamp(33 + ps * 22);   // ~0=33, 1=55, 2=77, 3=99
       const lab = ps > 2 ? "Eccellente" : ps >= 1 ? "Buono" : ps >= 0 ? "Debole" : "Negativo";
+      const so = (DATA.totals || {}).portfolio_sortino_ratio;
+      const varE = (DATA.totals || {}).var95_1d_eur;
+      const subBits = [];
+      if (so != null) subBits.push(`Sortino ${fmtNum.format(so)}`);
+      if (varE != null) subBits.push(`VaR95 1g ${fmtEUR.format(varE)}`);
       shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
         <div class="mc-value" style="color:${sharpeColor(ps)}">${fmtNum.format(ps)} · ${lab} ${metricTrend("sharpe")}</div>
         ${thermoLine(score, ["Rischioso", "Efficiente"])}
-        <div class="mc-sub muted">rendimento corretto per il rischio</div>`;
+        <div class="mc-sub muted">${subBits.length ? subBits.join(" · ") : "rendimento corretto per il rischio"}</div>`;
     } else {
       shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
         <div class="mc-value muted">—</div>
@@ -1277,7 +1296,7 @@ function renderMiniCards() {
         : md.pct_of_peak >= 80 ? "Vicino ai massimi"
         : md.pct_of_peak >= 60 ? "Zona intermedia" : "Lontano dai massimi";
       mdBox.innerHTML = `<div class="mc-title">Margin Debt (leva mercato)</div>
-        <div class="mc-value" style="color:${mds.col}">${pctLab} · ${mds.label}</div>
+        <div class="mc-value" style="color:${mds.col}">${pctLab} · ${mds.labelShort}</div>
         ${thermoLine(mds.score, ["Estrema", "Bassa"])}
         <div class="mc-sub muted">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""} · ${md.series || "FINRA/FRED"} · ${md.date || ""}</div>`;
     } else {
@@ -1392,10 +1411,15 @@ function openPortfolioSharpeModal() {
     : ps >= 1 ? { t: "BUONO", c: "#86c52a" }
     : ps >= 0 ? { t: "DEBOLE", c: "var(--muted)" }
     : { t: "NEGATIVO", c: "var(--red)" };
+  const so = t.portfolio_sortino_ratio;
+  const extraRisk = [];
+  if (so != null) extraRisk.push(`<div style="font-size:12.5px;margin-top:6px"><b>Sortino</b>: <b style="color:${sharpeColor(so)}">${fmtNum.format(so)}</b> — come lo Sharpe ma conta solo la volatilità <b>negativa</b>: se è molto più alto dello Sharpe, gran parte della varianza è "buona" (rally), non rischio.</div>`);
+  if (t.var95_1d_eur != null) extraRisk.push(`<div style="font-size:12.5px;margin-top:6px"><b>VaR 95% (1 giorno)</b>: <b class="neg">${fmtEUR.format(t.var95_1d_eur)}</b> (${fmtNum.format(t.var95_1d_pct)}% dell'azionario) — la perdita che nel 95% dei giorni NON viene superata.${t.es95_1d_eur != null ? ` <b>Expected Shortfall</b>: <b class="neg">${fmtEUR.format(t.es95_1d_eur)}</b> — la perdita MEDIA nel 5% dei giorni peggiori (la coda oltre il VaR).` : ""}</div>`);
   openInfoModal("Sharpe Ratio del portafoglio",
     `<div class="info-line" style="margin-bottom:10px"><b>Sharpe Ratio</b> = rendimento corretto per il rischio: l'extra-rendimento (sopra il tasso privo di rischio del <b>${fmtNum.format(rf)}%</b>) per ogni unità di volatilità. Quello di portafoglio è calcolato sulla <b>matrice di covarianza</b> pesata per controvalore, quindi tiene conto della diversificazione fra i titoli.</div>
      <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
        <div style="font-size:13px">Portafoglio: <b style="color:${ps != null ? sharpeColor(ps) : 'var(--muted)'};font-size:20px">${ps != null ? fmtNum.format(ps) : "n.d."}</b> ${verdict ? `<span style="color:${verdict.c};font-weight:700">· ${verdict.t}</span>` : ""}</div>
+       ${extraRisk.join("")}
      </div>
      <h4 style="margin:8px 0 4px">Scala</h4>
      <table class="info-table"><tbody>
@@ -2290,7 +2314,7 @@ function techCells(r) {
       ${r.rs_ndx_1m != null
         ? `<td class="num" title="Sovra/sotto-performance a 1 mese vs Nasdaq 100 (metro del mandato)"><span class="${signCls(r.rs_ndx_1m)}">${signTxt(r.rs_ndx_1m, " pp")}</span></td>`
         : `<td class="num muted" title="Disponibile dopo il prossimo run della pipeline">n.d.</td>`}
-      <td title="Logica del segnale: prezzo vs SMA50/SMA200 (trend) + RSI(14), calcolati su base giornaliera (daily). Golden setup = prezzo > SMA50 > SMA200 con RSI non estremo."><span class="badge ${r.signal_class}">${r.signal}</span></td>
+      <td title="Logica del segnale: prezzo vs SMA50/SMA200 (trend) + RSI(14), calcolati su base giornaliera (daily). Golden setup = prezzo > SMA50 > SMA200 con RSI non estremo."><span class="badge ${r.signal_class}">${r.signal}</span>${r.qty && r.stop_violated ? `<br><span class="badge badge-earnrisk" title="Il prezzo è SOTTO lo stop trailing ancorato ($${fmtNum.format(r.stop_atr)}): la disciplina prevede uscita o ri-arm consapevole. Lo stop ratchet non si riabbassa da solo.">[STOP VIOLATO]</span>` : ""}</td>
       ${shortFloatCell(r)}
       ${drawdownCell(r)}
       ${optImpactCell(r.ticker)}
@@ -4057,7 +4081,8 @@ function buildPrompt() {
 3. SIZING ISTITUZIONALE: Nessuna singola posizione non coperta deve superare il 10% del Net Asset Value (NAV) del portafoglio. Suggerisci alleggerimenti (trimming) automatici per le posizioni che sforano passivamente questo limite a causa della rivalutazione del prezzo.
 4. LIQUIDITÀ E SLIPPAGE: per gli asset flaggati [ILLIQUIDO] (posizione > 5% del volume medio giornaliero) considera lo slippage in ingresso/uscita: privilegia ordini limite frazionati e non assumere l'eseguito al prezzo di schermo.
 5. RISCHIO EVENTO: per gli asset flaggati [!EARNINGS RISK] (trimestrale < 14 giorni) il gap post-earnings può scavalcare stop e supporti: pesa il rischio binario nel dimensionamento.
-6. IGIENE DEI DATI (anti-allucinazione): ogni valore indicato come "n.d." o "—" è NON DISPONIBILE: non stimarlo, non interpolarlo, non sostituirlo con la tua conoscenza pregressa senza dichiararlo esplicitamente come stima esterna con la sua fonte e data. I prezzi del payload sono riferiti alla data di generazione indicata: se citi un prezzo verificato online più recente, indica entrambi.`);
+6. IGIENE DEI DATI (anti-allucinazione): ogni valore indicato come "n.d." o "—" è NON DISPONIBILE: non stimarlo, non interpolarlo, non sostituirlo con la tua conoscenza pregressa senza dichiararlo esplicitamente come stima esterna con la sua fonte e data. I prezzi del payload sono riferiti alla data di generazione indicata: se citi un prezzo verificato online più recente, indica entrambi.
+7. ESECUZIONE E GAP DI SESSIONE: i suggerimenti operativi valgono per la PROSSIMA sessione di mercato, sui prezzi di questo payload. Usa SEMPRE ordini LIMITE, mai ordini a mercato in apertura: un gap overnight può eseguire a prezzi lontani dai livelli calcolati e invalidare stop e quantità.`);
   lines.push("");
   lines.push("ESTRAZIONE TOTALE E VERIFICA: scansiona TUTTI i dati forniti in questo payload — macro, tecnici, fondamentali, metriche di rischio (Sharpe, Beta, drawdown, short interest, implied move), opzioni, news e diario. Sei autorizzato e incoraggiato a utilizzare i tuoi tool di ricerca web per verificare, aggiornare e approfondire i dati macroeconomici, tecnici e fondamentali forniti, assicurandoti che l'analisi sia perfettamente allineata alla realtà in tempo reale. Ogni dato riporta la propria data di rilevazione: pesa esplicitamente il lag temporale (le serie mensili/trimestrali hanno un ritardo di pubblicazione fisiologico).");
   lines.push("");
@@ -4080,6 +4105,8 @@ function buildPrompt() {
   // METRICHE DI RISCHIO/PORTAFOGLIO (dai popup della dashboard)
   const riskBits = [];
   if (t.portfolio_sharpe_ratio != null) riskBits.push(`Sharpe Ratio portafoglio ${fmtNum.format(t.portfolio_sharpe_ratio)} vs target istituzionale 2.0 (log-rendimenti giornalieri 12M, matrice di covarianza, pesi mark-to-market, Rf ${fmtNum.format((t.risk_free_rate ?? 0.0363) * 100)}%)`);
+  if (t.portfolio_sortino_ratio != null) riskBits.push(`Sortino Ratio ${fmtNum.format(t.portfolio_sortino_ratio)} (come lo Sharpe ma con la sola volatilità NEGATIVA: se Sortino >> Sharpe, gran parte della varianza è al rialzo — rischio "vero" più basso di quanto lo Sharpe suggerisca)`);
+  if (t.var95_1d_eur != null) riskBits.push(`VaR 95% a 1 giorno: ${fmtEUR.format(t.var95_1d_eur)} (${fmtNum.format(t.var95_1d_pct)}% del comparto azionario — perdita massima attesa nel 95% dei giorni; parametrico normale)${t.es95_1d_eur != null ? `, Expected Shortfall 95%: ${fmtEUR.format(t.es95_1d_eur)} (perdita MEDIA nel 5% dei giorni peggiori)` : ""}`);
   const pbP = portfolioBeta();
   if (pbP) riskBits.push(`Beta di Portafoglio: ${fmtNum.format(pbP.beta)} vs Nasdaq 100 (=1.0) — ${pbP.src}, pesi mark-to-market sul capitale investito, liquidità esclusa, BTP a beta 0`);
   if (t.avg_pairwise_corr != null) riskBits.push(`correlazione media tra le posizioni: ${fmtNum.format(t.avg_pairwise_corr)} (log-rendimenti giornalieri 12M — più è alta, minore la diversificazione reale)`);
@@ -4122,7 +4149,11 @@ function buildPrompt() {
   try {
     const dv = decisionVerdict();
     lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (posizionamento interno calcolato dalla dashboard — usalo come base quantitativa per la sezione 3, validandolo criticamente invece di ripeterlo a pappagallo; se il tuo giudizio diverge dal motore, dichiaralo e motiva): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
-    lines.push("· NOTA METODOLOGICA: gli Stop Loss sono calcolati dinamicamente su base 2×ATR a 14 periodi (Wilder) per assorbire la volatilità fisiologica del titolo — NON sono percentuali fisse. Il verdetto di accumulo è ritarato sul mandato quant: impatto marginale sullo Sharpe, forza relativa 1M vs benchmark, qualità fondamentale; gli asset in veto (value trap / ROIC<0 / PEG<0) sono esclusi a prescindere dal supporto tecnico.");
+    lines.push("· NOTA METODOLOGICA: gli Stop Loss sulle posizioni sono TRAILING RATCHET su base 2×ATR(14 Wilder): partono 2×ATR sotto il prezzo e da lì possono solo SALIRE coi massimi — non si riabbassano nei ribassi (persistiti tra i run, reset solo se il trade cambia). NON sono percentuali fisse. Il verdetto di accumulo è ritarato sul mandato quant: impatto marginale sullo Sharpe, forza relativa 1M vs benchmark, qualità fondamentale; gli asset in veto (value trap / ROIC<0 / PEG<0) sono esclusi a prescindere dal supporto tecnico.");
+    if ((dv.stopViolations || []).length) {
+      lines.push("· ⚠ STOP VIOLATI (il prezzo è SOTTO lo stop trailing ancorato — nella sezione 3 indica per ciascuno se uscire o ri-armare, con motivazione): " +
+        dv.stopViolations.map(x => `${x.r.ticker} stop $${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)} (${signTxt(Math.round((x.r.price / x.stop - 1) * 1000) / 10)})`).join(" · ") + ".");
+    }
     if ((dv.withPlan || []).length) {
       lines.push("· Livelli calcolati dal motore (contesto, ordini limite + stop 2×ATR): " +
         dv.withPlan.map(p => {
@@ -4131,8 +4162,8 @@ function buildPrompt() {
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {
-      lines.push("· Stop dinamici posizioni aperte (2×ATR dal prezzo attuale, floor al PMC se in gain): " +
-        dv.trailing.map(x => `${x.r.ticker} stop $${fmtNum.format(x.stop)} (${signTxt(Math.round((x.stop / x.r.price - 1) * 1000) / 10)})`).join(" · ") + ".");
+      lines.push("· Stop trailing posizioni aperte (ratchet 2×ATR, ancorati — non ridiscendono): " +
+        dv.trailing.map(x => `${x.r.ticker} stop $${fmtNum.format(x.stop)} (${signTxt(Math.round((x.stop / x.r.price - 1) * 1000) / 10)}${x.violated ? " ⚠VIOLATO" : ""})`).join(" · ") + ".");
     }
     if ((dv.excluded || []).length) lines.push("· ESCLUSI dal veto risk manager (contesto): " + dv.excluded.map(x => `${x.r.ticker} → ${x.verdict} (${x.why.join(", ")})`).join(" · ") + ".");
     if ((dv.overweight || []).length) lines.push("· Sizing oltre il 10% del NAV (candidati a trimming di rientro): " + dv.overweight.map(x => `${x.r.ticker} ${fmtNum.format(x.w)}%`).join(" · ") + ".");
@@ -4164,16 +4195,16 @@ function buildPrompt() {
     // RVol (Volume Relativo) + flag Volumi Anomali (>1,5×)
     const rv = r.vol_ratio;
     const rvCell = rv != null ? `${fmtNum.format(rv)}×${rv > 1.5 ? " [Volumi Anomali]" : ""}` : "—";
-    // Stop 2×ATR dal prezzo attuale (trailing; floor al PMC se posizione in gain)
-    const st = atrStop(r.price, r);
+    // Stop trailing: ratchet della pipeline sulle posizioni, 2×ATR client su watchlist
+    const st = r.qty ? stopOf(r) : atrStop(r.price, r);
     let stopCell = "—";
     if (st) {
-      const inGain = r.qty && r.pmc != null && r.price > r.pmc;
-      const stop = inGain ? Math.max(st.stop, r.pmc) : st.stop;
-      stopCell = `${c}${f(Math.round(stop * 100) / 100)} (ATR ${fmtNum.format(st.pct)}%)`;
+      const tag = r.qty ? (st.ratchet ? "ratchet" : "client") : "teorico";
+      stopCell = `${c}${f(st.stop)} (${tag})`;
     }
-    // flag di rischio inline nel nome: earnings imminenti + illiquidità (slippage)
+    // flag di rischio inline nel nome: stop violato, earnings imminenti, illiquidità
     const flags = [];
+    if (r.qty && st && st.violated) flags.push("[STOP VIOLATO]");
     if (earningsRiskDays(r) != null) flags.push("[!EARNINGS RISK]");
     if (isIlliquid(r)) flags.push("[ILLIQUIDO]");
     const nameCell = `${r.name} (${r.ticker})${flags.length ? " " + flags.join(" ") : ""}`;
@@ -4183,7 +4214,7 @@ function buildPrompt() {
   const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
-  lines.push("(Stop 2×ATR = prezzo attuale − 2×ATR(14 Wilder), su posizioni in gain il floor è il PMC; assorbe la volatilità fisiologica invece di una % fissa. Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante.)");
+  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante.)");
   // MATRICE DI RISCHIO PER POSIZIONE: pesi MTM, MCR, beta NDX, correlazioni reali
   const riskRows = (DATA.portfolio || []).filter(r => r.qty && (r.risk_contrib_pct != null || r.avg_corr != null || r.beta_ndx != null));
   if (riskRows.length) {

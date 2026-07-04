@@ -2211,7 +2211,25 @@ def compute_risk_metrics(rows, watch_rows=None):
     mean_d = df.mean().values
     port_mean_annual = float(np.dot(w, mean_d)) * TRADING_DAYS
     port_sigma = (port_var_d * TRADING_DAYS) ** 0.5
-    sharpe = round((port_mean_annual - math.log1p(RISK_FREE_RATE)) / port_sigma, 2) if port_sigma > 0 else None
+    rf_log = math.log1p(RISK_FREE_RATE)
+    sharpe = round((port_mean_annual - rf_log) / port_sigma, 2) if port_sigma > 0 else None
+
+    # --- Sortino: come lo Sharpe ma col solo rischio NEGATIVO (downside deviation).
+    # Su un portafoglio growth lo Sharpe punisce anche i rally; il Sortino separa la
+    # varianza "cattiva" (perdite sotto Rf) da quella buona. Stesso pannello, stessa Rf. ---
+    sortino = None
+    port_ret_d = df.values @ w                                 # serie giornaliera del portafoglio
+    downside = np.minimum(port_ret_d - rf_log / TRADING_DAYS, 0.0)
+    dd_annual = float(np.sqrt(np.mean(downside ** 2)) * (TRADING_DAYS ** 0.5))
+    if dd_annual > 0:
+        sortino = round((port_mean_annual - rf_log) / dd_annual, 2)
+
+    # --- VaR/ES parametrici 1 giorno al 95% (normale, media 0 per prudenza): % del
+    # controvalore azionario a rischio nel 5% dei giorni peggiori; l'Expected Shortfall
+    # è la perdita MEDIA quando il VaR viene superato (coda). In € li converte main(). ---
+    sigma_1d = port_var_d ** 0.5
+    var95_1d_pct = round(1.645 * sigma_1d * 100, 2)
+    es95_1d_pct = round(2.063 * sigma_1d * 100, 2)
 
     # --- annota le row del portafoglio ---
     for r in rows:
@@ -2239,7 +2257,29 @@ def compute_risk_metrics(rows, watch_rows=None):
             r["max_corr"] = round(float(cvals.max()), 2)
             r["max_corr_with"] = str(cvals.idxmax())
 
-    return {"sharpe": sharpe, "portfolio_beta_ndx": port_beta, "avg_pairwise_corr": avg_pairwise}
+    return {"sharpe": sharpe, "sortino": sortino, "portfolio_beta_ndx": port_beta,
+            "avg_pairwise_corr": avg_pairwise,
+            "var95_1d_pct": var95_1d_pct, "es95_1d_pct": es95_1d_pct}
+
+
+def ratchet_stops(rows, prev_by_ticker):
+    """Trailing stop 2×ATR(14) con RATCHET: sale col prezzo, NON ridiscende quando il
+    titolo scende — uno stop che si riabbassa da solo non è uno stop. Ancoraggio:
+    stop = max(stop del run precedente, prezzo − 2×ATR). Se il prezzo chiude sotto lo
+    stop ancorato → stop_violated=True e il livello resta congelato finché il prezzo
+    non risale sopra o la posizione cambia. Il ratchet si RESETTA se qty/PMC cambiano
+    (nuovo trade → nuovo trailing). Solo posizioni possedute con ATR disponibile."""
+    for r in rows:
+        price, atr = r.get("price"), r.get("atr_14")
+        if not (r.get("qty") and price and atr):
+            continue
+        raw = price - 2 * atr
+        prev = prev_by_ticker.get(r["ticker"]) or {}
+        prev_stop = prev.get("stop_atr")
+        same_pos = prev.get("qty") == r.get("qty") and prev.get("pmc") == r.get("pmc")
+        stop = max(prev_stop, raw) if (prev_stop is not None and same_pos) else raw
+        r["stop_atr"] = round(stop, 2)
+        r["stop_violated"] = bool(price < stop)
 
 
 def strip_private(rows):
@@ -2250,6 +2290,14 @@ def strip_private(rows):
 
 
 def main():
+    # snapshot del run PRECEDENTE (serve due volte: ratchet degli stop e metrics_history)
+    prev_data = {}
+    try:
+        if OUT.exists():
+            prev_data = json.loads(OUT.read_text())
+    except Exception:  # noqa: BLE001
+        prev_data = {}
+
     equities = fetch_equities()
     btp = fetch_btp()
     watchlist = fetch_watchlist()
@@ -2260,6 +2308,10 @@ def main():
     portfolio_sharpe = risk.get("sharpe")
     strip_private(equities)
     strip_private(watchlist)
+
+    # trailing stop 2×ATR con ratchet (ancorato allo stop del run precedente)
+    prev_by_ticker = {r.get("ticker"): r for r in (prev_data.get("portfolio") or [])}
+    ratchet_stops(equities, prev_by_ticker)
 
     # termometro: media della salute tecnica dei titoli in portafoglio
     healths = [r["health"] for r in equities if r.get("health") is not None]
@@ -2304,12 +2356,7 @@ def main():
 
     # storico metriche (1 punto per giorno): Sharpe e performance, per i mini-trend in dashboard
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    prev_hist = []
-    try:
-        if OUT.exists():
-            prev_hist = json.loads(OUT.read_text()).get("metrics_history") or []
-    except Exception:  # noqa: BLE001
-        prev_hist = []
+    prev_hist = prev_data.get("metrics_history") or []
     point = {
         "date": today,
         "sharpe": portfolio_sharpe,
@@ -2333,11 +2380,19 @@ def main():
             "tax_est": round(tax, 2),
             "eur_gain_net": round(eur_gain - tax, 2),
             "portfolio_sharpe_ratio": portfolio_sharpe,
+            # Sortino = Sharpe con la sola downside deviation (rischio "vero")
+            "portfolio_sortino_ratio": risk.get("sortino"),
             "risk_free_rate": RISK_FREE_RATE,
             # beta di portafoglio da regressione log-return vs ^NDX, pesi mark-to-market
             "portfolio_beta_ndx": risk.get("portfolio_beta_ndx"),
             # correlazione media tra le coppie di posizioni (diversificazione interna)
             "avg_pairwise_corr": risk.get("avg_pairwise_corr"),
+            # VaR/ES parametrici 1g 95% sul comparto azionario (il BTP non ha serie):
+            # % del controvalore azionario + conversione in € ai pesi MTM correnti
+            "var95_1d_pct": risk.get("var95_1d_pct"),
+            "es95_1d_pct": risk.get("es95_1d_pct"),
+            "var95_1d_eur": round(usd_value / eurusd * risk["var95_1d_pct"] / 100) if risk.get("var95_1d_pct") else None,
+            "es95_1d_eur": round(usd_value / eurusd * risk["es95_1d_pct"] / 100) if risk.get("es95_1d_pct") else None,
         },
         "portfolio": equities + [btp],
         "watchlist": watchlist,
