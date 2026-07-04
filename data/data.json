@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-07-04T10:50:37Z",
+ "updated_at": "2026-07-04T14:49:18Z",
  "eurusd": 1.144,
  "totals": {
   "usd_value": 269963.16,
@@ -41,8 +41,8 @@
    "support": 437.23,
    "resistance": 584.73,
    "rsi": 52.3,
-   "volume": 28228900,
-   "vol_ratio": 0.89,
+   "volume": 28142500,
+   "vol_ratio": 0.88,
    "atr_14": 35.87,
    "atr_pct": 6.93,
    "signal": "Trend rialzista",
@@ -2524,8 +2524,8 @@
    "support": 854.35,
    "resistance": 1255.0,
    "rsi": 48.5,
-   "volume": 61844400,
-   "vol_ratio": 1.09,
+   "volume": 61316900,
+   "vol_ratio": 1.08,
    "atr_14": 96.9,
    "atr_pct": 9.93,
    "signal": "Trend rialzista",
@@ -3506,7 +3506,7 @@
    "support": 81.81,
    "resistance": 136.25,
    "rsi": 40.6,
-   "volume": 34757600,
+   "volume": 34625800,
    "vol_ratio": 1.4,
    "atr_14": 10.21,
    "atr_pct": 10.14,
@@ -7139,7 +7139,7 @@
    "support": 138.83,
    "resistance": 238.95,
    "rsi": 26.7,
-   "volume": 44273600,
+   "volume": 44166700,
    "vol_ratio": 1.51,
    "atr_14": 10.14,
    "atr_pct": 7.23,
@@ -10541,21 +10541,21 @@
    "name": "Bitcoin",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 62419.7,
-   "change_pct": -0.2,
+   "price": 62653.36,
+   "change_pct": 0.17,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -50.5,
-   "sma200_dist_pct": -16.6,
+   "ath_dist_pct": -50.4,
+   "sma200_dist_pct": -16.3,
    "w52_high": 126198.07,
-   "w52_dist_pct": -50.5,
+   "w52_dist_pct": -50.4,
    "support": 57747.77,
    "resistance": 67248.13,
-   "rsi": 47.4,
-   "volume": 22798792704,
-   "vol_ratio": 0.75,
+   "rsi": 48.3,
+   "volume": 19703818240,
+   "vol_ratio": 0.65,
    "atr_14": 2122.92,
-   "atr_pct": 3.4,
+   "atr_pct": 3.39,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -10564,7 +10564,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62419.7
+     62653.36
     ],
     "m6": [
      65738.1,
@@ -10692,7 +10692,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62419.7
+     62653.36
     ],
     "all": [
      386.94,
@@ -10837,7 +10837,7 @@
      76304.32,
      73579.69,
      58558.86,
-     62419.7
+     62653.36
     ],
     "m1": [
      64421.32,
@@ -10861,7 +10861,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62419.7
+     62653.36
     ],
     "m3": [
      76304.32,
@@ -10929,7 +10929,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62419.7
+     62653.36
     ],
     "y1": [
      108034.34,
@@ -11005,7 +11005,7 @@
      63540.84,
      60995.13,
      60138.38,
-     62419.7
+     62653.36
     ],
     "d1": [
      62534.16,
@@ -11072,15 +11072,39 @@
      62403.88,
      62436.02,
      62424.86,
-     62430.6
+     62430.6,
+     62463.05,
+     62419.28,
+     62467.01,
+     62428.1,
+     62496.33,
+     62435.09,
+     62439.62,
+     62488.03,
+     62509.21,
+     62503.98,
+     62576.35,
+     62567.1,
+     62564.82,
+     62554.8,
+     62567.98,
+     62616.15,
+     62543.61,
+     62533.24,
+     62518.89,
+     62574.56,
+     62612.59,
+     62616.54,
+     62579.44,
+     62628.14
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 34,
+   "health": 35,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -1.15,
+   "sharpe_1y": -1.14,
    "sortino_1y": -1.49,
    "prepost": null,
    "sector": "CRYPTOCURRENCY",
@@ -11089,22 +11113,22 @@
     "w1": {
      "support": 57747.77,
      "resistance": 62879.01,
-     "change_pct": 6.59
+     "change_pct": 6.99
     },
     "m1": {
      "support": 57747.77,
      "resistance": 67248.13,
-     "change_pct": -3.11
+     "change_pct": -2.74
     },
     "m3": {
      "support": 57747.77,
      "resistance": 82792.21,
-     "change_pct": -18.2
+     "change_pct": -17.89
     },
     "y1": {
      "support": 57747.77,
      "resistance": 116273.31,
-     "change_pct": -45.47
+     "change_pct": -45.27
     }
    },
    "financials": [],
@@ -11129,9 +11153,9 @@
      "hi": 59940.35
     }
    },
-   "rs_1m": -1.4,
+   "rs_1m": -1.1,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.2,
+   "rs_ndx_1m": 1.6,
    "beta_ndx": 0.93,
    "avg_corr": 0.34,
    "max_corr": 0.79,
@@ -12799,8 +12823,8 @@
    "support": 98.33,
    "resistance": 142.35,
    "rsi": 49.1,
-   "volume": 125021700,
-   "vol_ratio": 0.98,
+   "volume": 124577600,
+   "vol_ratio": 0.97,
    "atr_14": 10.65,
    "atr_pct": 8.85,
    "signal": "Trend rialzista",
@@ -14591,7 +14615,7 @@
    "support": 349.2,
    "resistance": 436.15,
    "rsi": 49.8,
-   "volume": 42194400,
+   "volume": 42128900,
    "vol_ratio": 0.92,
    "atr_14": 13.06,
    "atr_pct": 3.35,
@@ -14622,7 +14646,7 @@
      442.14,
      449.14,
      463.88,
-     468.2,
+     468.19,
      478.45,
      479.49,
      431.58,
@@ -17884,8 +17908,8 @@
    "stats": {
     "market_cap": 6067188224.0,
     "shares": 453429560.0,
-    "float_shares": 410195815.0,
-    "float_pct": 90.5,
+    "float_shares": 410097372.0,
+    "float_pct": 90.4,
     "avg_volume_30d": 39379832.0,
     "pe_ttm": 19.5167,
     "forward_pe": 12.9104,
@@ -20415,7 +20439,7 @@
    "support": 404.56,
    "resistance": 479.0,
    "rsi": 50.2,
-   "volume": 18424800,
+   "volume": 18375000,
    "vol_ratio": 1.34,
    "atr_14": 21.44,
    "atr_pct": 4.94,
@@ -21796,7 +21820,7 @@
    "support": 6.37,
    "resistance": 10.12,
    "rsi": 25.8,
-   "volume": 22002000,
+   "volume": 21956000,
    "vol_ratio": 1.47,
    "atr_14": 0.56,
    "atr_pct": 8.69,
@@ -30491,7 +30515,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 48
+     "score": 52
     }
    ]
   },
@@ -33619,7 +33643,7 @@
    "support": 716.58,
    "resistance": 756.36,
    "rsi": 54.1,
-   "volume": 57506000,
+   "volume": 57447800,
    "vol_ratio": 1.0,
    "atr_14": 10.21,
    "atr_pct": 1.37,
@@ -34028,7 +34052,7 @@
      169.78,
      164.75,
      174.01,
-     171.28,
+     171.27,
      172.96,
      175.18,
      171.62,
@@ -34447,20 +34471,20 @@
     -0.000733,
     0.001894,
     0.000143,
-    0.008472,
+    0.008471,
     0.000331,
-    0.004215,
+    0.004216,
     -0.000251,
     -0.002641,
     -0.00126,
     -0.003758,
     -0.016526,
-    0.015085,
+    0.015086,
     -0.005083,
-    0.007631,
+    0.00763,
     -0.000838,
     0.007767,
-    -0.00198,
+    -0.001979,
     0.01059,
     0.003417,
     9.3e-05,
@@ -34474,11 +34498,11 @@
     0.004178,
     0.002276,
     0.003535,
-    -0.005982,
+    -0.005981,
     -0.007438,
     0.005405,
     0.008323,
-    -0.002901,
+    -0.0029,
     0.002454,
     0.002309,
     0.002887,
@@ -34494,7 +34518,7 @@
     -0.003187,
     -0.004624,
     0.005713,
-    0.002806,
+    0.002807,
     0.00376,
     0.003402,
     0.001151,
@@ -34507,7 +34531,7 @@
     0.015228,
     -0.001222,
     0.00443,
-    -0.006834,
+    -0.006833,
     0.00566,
     0.010347,
     -1.5e-05,
@@ -34553,13 +34577,13 @@
     -0.011065,
     0.007523,
     0.009023,
-    0.006211,
+    0.00621,
     0.00456,
     0.003512,
     -0.000101,
     -0.00357,
     -0.001222,
-    -0.007437,
+    -0.007436,
     0.001831,
     0.006638,
     0.00593,
@@ -34601,7 +34625,7 @@
     -0.004814,
     0.000568,
     -0.008853,
-    0.00703,
+    0.007031,
     -0.005591,
     -0.013194,
     0.008722,
@@ -34613,7 +34637,7 @@
     0.002627,
     -0.014052,
     -0.002467,
-    -0.01444,
+    -0.014439,
     0.010445,
     -0.003362,
     0.005557,
@@ -34957,8 +34981,8 @@
    "support": 685.62,
    "resistance": 745.45,
    "rsi": 48.3,
-   "volume": 51086100,
-   "vol_ratio": 1.07,
+   "volume": 50959800,
+   "vol_ratio": 1.06,
    "atr_14": 16.54,
    "atr_pct": 2.32,
    "signal": "Trend rialzista",
@@ -36221,7 +36245,7 @@
    "support": 276.96,
    "resistance": 302.72,
    "rsi": 58.4,
-   "volume": 21236400,
+   "volume": 21178900,
    "vol_ratio": 0.74,
    "atr_14": 5.49,
    "atr_pct": 1.85,
@@ -36643,7 +36667,7 @@
      167.27,
      180.76,
      191.8,
-     182.05,
+     182.06,
      171.4,
      159.55,
      174.23,
@@ -36971,7 +36995,7 @@
     -0.001159,
     -0.006401,
     -0.005087,
-    -0.009843,
+    -0.009842,
     -0.020585,
     0.022134,
     0.005084,
@@ -36987,7 +37011,7 @@
     -0.007706,
     -0.003543,
     0.002481,
-    0.03846,
+    0.038459,
     -0.010574,
     0.008229,
     0.007061,
@@ -37001,7 +37025,7 @@
     -0.005893,
     -0.001775,
     0.018315,
-    -0.010268,
+    -0.010269,
     0.004229,
     -0.001648,
     0.002557,
@@ -37017,7 +37041,7 @@
     0.002188,
     0.00629,
     0.00739,
-    0.003979,
+    0.003978,
     -0.010795,
     0.01043,
     -0.006465,
@@ -37037,7 +37061,7 @@
     -0.008552,
     -0.008095,
     0.00562,
-    -0.003213,
+    -0.003214,
     -0.017426,
     0.014325,
     -0.017855,
@@ -37047,7 +37071,7 @@
     -0.00246,
     -0.028518,
     0.00291,
-    -0.020075,
+    -0.020076,
     0.003046,
     -0.000171,
     -0.01868,
@@ -37065,7 +37089,7 @@
     0.002071,
     0.013513,
     0.011666,
-    -0.015441,
+    -0.01544,
     -0.007592,
     -0.004743,
     -0.010701,
@@ -38675,7 +38699,7 @@
    "support": 84.31,
    "resistance": 87.47,
    "rsi": 47.7,
-   "volume": 20957200,
+   "volume": 20816300,
    "vol_ratio": 0.8,
    "atr_14": 0.64,
    "atr_pct": 0.75,
@@ -38839,7 +38863,7 @@
      41.36,
      42.3,
      42.9,
-     40.22,
+     40.23,
      40.12,
      40.54,
      41.16,
@@ -39065,7 +39089,7 @@
      89.2,
      86.86,
      93.5,
-     88.96,
+     88.97,
      93.27,
      93.59,
      90.76,
@@ -39381,7 +39405,7 @@
     }
    },
    "_ret_series": [
-    -0.009589,
+    -0.00959,
     -0.001278,
     0.010407,
     0.00069,
@@ -39391,7 +39415,7 @@
     0.00141,
     -0.000235,
     0.001526,
-    0.008877,
+    0.008876,
     0.006028,
     -0.005563,
     -0.001745,
@@ -39400,14 +39424,14 @@
     0.016745,
     -0.005167,
     0.000575,
-    0.014117,
+    0.014116,
     0.002729,
-    0.003061,
-    -0.00579,
-    -0.00171,
+    0.003062,
+    -0.005791,
+    -0.001709,
     -0.004344,
     0.001145,
-    -0.005047,
+    -0.005048,
     0.008247,
     -0.007442,
     -0.00715,
@@ -39419,9 +39443,9 @@
     -0.002876,
     -0.000576,
     -0.001153,
-    0.006557,
+    0.006556,
     -0.007134,
-    -0.00747,
+    -0.007469,
     0.010918,
     0.007595,
     0.015132,
@@ -39429,7 +39453,7 @@
     -0.005699,
     0.005699,
     0.006664,
-    -0.004326,
+    -0.004327,
     0.002332,
     0.002105,
     -0.002549,
@@ -39439,7 +39463,7 @@
     0.006966,
     -0.003814,
     0.0,
-    -0.000899,
+    -0.0009,
     0.008178,
     -0.002905,
     0.002579,
@@ -39453,17 +39477,17 @@
     -0.000552,
     0.003197,
     -0.002204,
-    0.007473,
+    0.007472,
     -0.001534,
-    0.00383,
+    0.003831,
     0.004903,
     0.000652,
     -0.006867,
-    0.000437,
+    0.000438,
     0.003383,
     0.002612,
     -0.010158,
-    -0.005835,
+    -0.005836,
     -0.002986,
     -0.002504,
     0.002226,
@@ -39483,22 +39507,22 @@
     0.005682,
     0.002552,
     0.004423,
-    -0.004755,
+    -0.004756,
     -0.012527,
     0.00045,
     0.002811,
     -0.005404,
     -0.004639,
-    -0.003295,
+    -0.003294,
     0.001024,
-    0.003857,
+    0.003858,
     -0.00136,
     -0.009685,
     0.000687,
     0.005477,
     -0.000911,
     0.004772,
-    -0.00374,
+    -0.003739,
     -0.002173,
     0.001601,
     0.006039,
@@ -39510,14 +39534,14 @@
     0.004929,
     -0.00206,
     0.005826,
-    -0.005024,
+    -0.005025,
     0.006618,
     -0.002961,
     0.00171,
     0.005791,
-    -0.000226,
+    -0.000227,
     -0.005792,
-    -0.013185,
+    -0.013184,
     0.007588,
     0.004343,
     0.002733,
@@ -39529,7 +39553,7 @@
     -0.002861,
     0.002423,
     -0.002539,
-    0.010803,
+    0.010804,
     0.000686,
     -0.000228,
     0.011474,
@@ -39541,7 +39565,7 @@
     0.001005,
     -0.002346,
     0.003684,
-    0.001781,
+    0.001782,
     0.000111,
     0.003996,
     0.006074,
@@ -39552,7 +39576,7 @@
     -0.003724,
     0.008667,
     -0.010704,
-    -0.012998,
+    -0.012997,
     -0.001953,
     -0.004956,
     0.007712,
@@ -40606,7 +40630,7 @@
     0.007912,
     0.002827,
     0.002268,
-    0.007882,
+    0.007883,
     -0.001745,
     0.002191,
     -0.005748,
@@ -40617,7 +40641,7 @@
     0.001949,
     0.008833,
     -0.005865,
-    0.015428,
+    0.015429,
     0.001726,
     -0.003995,
     -0.006294,
@@ -40626,7 +40650,7 @@
     -0.007168,
     -0.00265,
     0.01757,
-    -0.002437,
+    -0.002438,
     0.005113,
     0.007001,
     0.009867,
@@ -40639,13 +40663,13 @@
     0.001177,
     0.012924,
     0.005357,
-    0.001112,
+    0.001113,
     0.009764,
     -0.003391,
     -0.003694,
     0.017599,
     0.009299,
-    0.016035,
+    0.016034,
     -0.01033,
     -0.007402,
     -0.003022,
@@ -41113,8 +41137,8 @@
    "support": 51.3,
    "resistance": 55.64,
    "rsi": 73.8,
-   "volume": 46285200,
-   "vol_ratio": 1.24,
+   "volume": 46246100,
+   "vol_ratio": 1.23,
    "atr_14": 0.78,
    "atr_pct": 1.4,
    "signal": "Ipercomprato",
@@ -41898,7 +41922,7 @@
     -0.003221,
     0.016374,
     -0.005804,
-    0.007669,
+    0.007668,
     0.002047,
     0.001301,
     0.002596,
@@ -41906,7 +41930,7 @@
     -0.001681,
     0.010413,
     -0.018483,
-    0.000754,
+    0.000753,
     0.004321,
     -0.00338,
     0.016233,
@@ -42384,7 +42408,7 @@
    "support": 52.62,
    "resistance": 58.62,
    "rsi": 38.0,
-   "volume": 28538200,
+   "volume": 28525600,
    "vol_ratio": 0.77,
    "atr_14": 1.15,
    "atr_pct": 2.16,
@@ -43152,7 +43176,7 @@
     0.009715,
     -0.014381,
     -0.005375,
-    -0.018751,
+    -0.01875,
     -0.002222,
     0.001287,
     -0.009282,
@@ -43163,7 +43187,7 @@
     0.011509,
     -0.000935,
     0.0,
-    -0.005978,
+    -0.005979,
     0.000353,
     0.00831,
     0.006854,
@@ -43199,8 +43223,8 @@
     0.0053,
     0.004937,
     0.001566,
-    -0.005827,
-    -0.013694,
+    -0.005828,
+    -0.013693,
     -0.02937,
     0.01352,
     -0.000116,
@@ -43216,7 +43240,7 @@
     -0.010476,
     0.007413,
     -0.005926,
-    0.007288,
+    0.007289,
     0.000113,
     -0.010837,
     0.002635,
@@ -43243,7 +43267,7 @@
     -0.004129,
     -0.010948,
     0.006146,
-    0.010448,
+    0.010449,
     -0.004775,
     -0.009839,
     -0.007056,
@@ -43655,7 +43679,7 @@
    "support": 148.14,
    "resistance": 163.85,
    "rsi": 72.9,
-   "volume": 14722300,
+   "volume": 14719400,
    "vol_ratio": 1.32,
    "atr_14": 2.6,
    "atr_pct": 1.59,
@@ -44025,7 +44049,7 @@
      69.86,
      70.49,
      69.96,
-     72.0,
+     71.99,
      71.6,
      76.29,
      72.86,
@@ -44425,7 +44449,7 @@
     -0.02842,
     0.005353,
     0.014235,
-    -0.003841,
+    -0.003842,
     -0.015133,
     -0.01156,
     0.008875,
@@ -44466,19 +44490,19 @@
     0.002948,
     0.023777,
     0.03043,
-    -0.001954,
+    -0.001953,
     0.011319,
     -0.004845,
     0.000763,
     0.00194,
     -0.002217,
     -0.014531,
-    -0.001127,
+    -0.001126,
     0.002744,
     0.001544,
     -0.001685,
     0.006653,
-    0.010553,
+    0.010554,
     0.002345,
     0.005703,
     0.000548,
@@ -44488,12 +44512,12 @@
     -0.010158,
     0.00222,
     -0.000347,
-    0.001385,
+    0.001386,
     0.00449,
     0.003852,
     0.00192,
-    0.00137,
-    0.00777,
+    0.001369,
+    0.007771,
     0.022823,
     0.014102,
     -0.000524,
@@ -44504,7 +44528,7 @@
     -0.005992,
     0.020848,
     0.004195,
-    0.022355,
+    0.022356,
     -0.002207,
     -0.004872,
     -0.015083,
@@ -44514,9 +44538,9 @@
     -0.004167,
     -0.012012,
     -0.009755,
-    0.014432,
-    0.009421,
-    0.00312,
+    0.014433,
+    0.00942,
+    0.003121,
     0.013155,
     -0.01309,
     -0.001819,
@@ -45610,20 +45634,20 @@
     -0.001458,
     0.000785,
     0.006259,
-    0.000112,
+    0.000111,
     0.006441,
     -0.014832,
     0.009393,
     -0.001114,
     0.002115,
     0.004105,
-    0.017017,
-    0.001958,
+    0.017018,
+    0.001957,
     -0.003483,
     0.000109,
     -0.016155,
     0.015937,
-    -0.014277,
+    -0.014276,
     -0.014147,
     -0.002471,
     0.010182,
@@ -45634,7 +45658,7 @@
     -0.006647,
     0.005636,
     0.009286,
-    -0.007152,
+    -0.007153,
     0.005704,
     -0.008511,
     0.017062,
@@ -45645,7 +45669,7 @@
     -0.002622,
     0.006216,
     -0.002613,
-    0.005436,
+    0.005435,
     -0.016726,
     0.000551,
     0.007464,
@@ -45655,14 +45679,14 @@
     -0.001637,
     0.018073,
     -0.004622,
-    -0.001617,
+    -0.001618,
     -0.005302,
     -0.001303,
     0.00217,
     -0.006525,
     0.000218,
-    0.005439,
-    -0.009884,
+    0.00544,
+    -0.009885,
     -0.002991,
     0.009826,
     0.00033,
@@ -45671,15 +45695,15 @@
     -0.005256,
     0.003726,
     -0.009452,
-    -0.003651,
-    -0.005222,
+    -0.00365,
+    -0.005223,
     -0.005474,
     -0.012852,
     0.006334,
     0.010208,
     0.014405,
     -0.003527,
-    0.006493,
+    0.006492,
     0.01004,
     -0.002827,
     0.004238,
@@ -45687,14 +45711,14 @@
     0.002925,
     0.002809,
     -0.019831,
-    -0.026089,
+    -0.026088,
     0.004733,
     0.002582,
     -0.001459,
     0.001683,
     0.000896,
     -0.004828,
-    0.015412,
+    0.015413,
     -0.000554,
     0.011138,
     -0.007485,
@@ -45702,7 +45726,7 @@
     0.002123,
     -0.008294,
     0.004044,
-    -0.007877,
+    -0.007878,
     -0.004189,
     0.016094,
     0.002676,
@@ -45719,7 +45743,7 @@
     0.003595,
     0.004364,
     -0.001229,
-    0.003126,
+    0.003125,
     -0.007383,
     0.003698,
     -0.005271,
@@ -45729,7 +45753,7 @@
     0.006556,
     0.001126,
     0.002024,
-    0.002019,
+    0.00202,
     -0.008216,
     0.000339,
     0.002257,
@@ -45738,7 +45762,7 @@
     0.008887,
     0.002014,
     0.00134,
-    0.005566,
+    0.005565,
     0.008621,
     0.006909,
     0.012166,
@@ -45765,7 +45789,7 @@
     -0.011798,
     -0.002122,
     0.007511,
-    0.000106,
+    0.000105,
     0.002526,
     -0.002737,
     0.006828,
@@ -46126,16 +46150,29 @@
   },
   {
    "question": "Bitcoin Up or Down on July 4?",
-   "yes": 94,
+   "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-july-4-2026"
   }
  ],
  "news": [
   {
    "source": "Investing.com",
-   "title": "Trump extols America, rails at communism in US 250th celebration",
-   "link": "https://www.investing.com/news/politics-news/trump-extols-america-rails-at-communism-in-us-250th-celebration-4775337",
-   "published": "2026-07-04T10:30:28Z",
+   "title": "Is AI inflation transitory?",
+   "link": "https://www.investing.com/news/stock-market-news/is-ai-inflation-transitory-4775369",
+   "published": "2026-07-04T14:23:27Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "L’inflazione dell’IA è transitoria?"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Khamenei lies in state in Tehran as Iran begins week of funeral ceremonies",
+   "link": "https://www.investing.com/news/world-news/irans-slain-leader-khamenei-laid-in-state-in-tehran-for-week-of-mass-funeral-events-4775171",
+   "published": "2026-07-04T13:36:27Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -46143,27 +46180,13 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Trump esalta l’America e inveisce contro il comunismo nella celebrazione del 250esimo anniversario degli Stati Uniti"
+   "title_it": "Khamenei giace nello stato di Teheran mentre l'Iran inizia la settimana delle cerimonie funebri"
   },
   {
    "source": "Investing.com",
-   "title": "Trump to mark U.S. 250th anniversary with campaign-style rally on National Mall",
-   "link": "https://www.investing.com/news/politics-news/trump-to-mark-us-250th-anniversary-with-campaignstyle-rally-on-national-mall-4775359",
-   "published": "2026-07-04T10:07:16Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "bull",
-   "title_it": "Trump celebrerà il 250° anniversario degli Stati Uniti con una manifestazione in stile campagna al National Mall"
-  },
-  {
-   "source": "Investing.com",
-   "title": "When their interests align, Trump and Roberts both win at Supreme Court",
-   "link": "https://www.investing.com/news/politics-news/when-their-interests-align-trump-and-roberts-both-win-at-supreme-court-4775358",
-   "published": "2026-07-04T10:06:55Z",
+   "title": "Iran holds state funeral for Khamenei as successor stays out of public view",
+   "link": "https://www.investing.com/news/economy-news/irans-supreme-leaders-funeral-begins-as-hormuz-security-remains-in-focus-4775328",
+   "published": "2026-07-04T12:46:37Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -46171,7 +46194,21 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Quando i loro interessi si allineano, Trump e Roberts vincono entrambi alla Corte Suprema"
+   "title_it": "L'Iran tiene i funerali di stato per Khamenei mentre il successore resta nascosto alla vista del pubblico"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Iran conflict strengthens case for power, metals over oil: strategist",
+   "link": "https://www.investing.com/news/stock-market-news/iran-conflict-strengthens-case-for-power-metals-over-oil-strategist-4775367",
+   "published": "2026-07-04T12:07:22Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "bear",
+   "title_it": "Il conflitto iraniano rafforza le ragioni a favore del potere, dei metalli sul petrolio: stratega"
   },
   {
    "source": "Investing.com",
@@ -46215,6 +46252,90 @@
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
   },
   {
+   "source": "Bloomberg",
+   "title": "USS Intrepid's History Spans War, Space and 9/11",
+   "link": "https://news.google.com/search?q=USS%20Intrepid%27s%20History%20Spans%20War%2C%20Space%20and%209/11",
+   "published": "2026-07-04T14:39:50Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "La storia della USS Intrepid abbraccia la guerra, lo spazio e l'11 settembre"
+  },
+  {
+   "source": "MarketWatch",
+   "title": "When it comes to beating the stock market, no news really is good news",
+   "link": "https://www.marketwatch.com/story/when-it-comes-to-beating-the-stock-market-no-news-really-is-good-news-43328bf0?mod=mw_rss_topstories",
+   "published": "2026-07-04T13:10:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Quando si tratta di battere il mercato azionario, nessuna notizia è davvero una buona notizia"
+  },
+  {
+   "source": "Google News",
+   "title": "Bitcoin Now Braced For A Critical Fed July Price ‘Pivot Point’ - Forbes",
+   "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxQaWZUV1lLVDBjZjZSVGh1aXlGUV9GT3IxRkhHLWZJelBTN0xvOEZKVXRsdEswdmlubzRLUUdrQUdlbGdIMFEwbnQtbnBVT2JpYm9WbFpSS2hYdXNKMkRCRmREZ3ZjbVpHaE9lV2tGa0lobDVlYVZxWlJZQVRLLUtPakpsa193UjRSMk5Ma05yRUVkbEZCTnhfQ3VwMXU1OGpiOUV6bDRJa2ptQTAza2ZqU0FTYnlKRVVaZ0tkZFA0MmVEXzFDcmdmZzBnZWNucU0?oc=5",
+   "published": "2026-07-04T11:41:38Z",
+   "tickers": [
+    "MACRO",
+    "BTC-USD",
+    "NOW"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Bitcoin ora si prepara al \"punto cardine\" critico dei prezzi della Fed di luglio - Forbes"
+  },
+  {
+   "source": "CNBC",
+   "title": "Trump to mark U.S. 250th anniversary with campaign-style rally on National Mall",
+   "link": "https://www.cnbc.com/2026/07/04/trump-to-mark-us-250th-anniversary-with-campaign-style-rally.html",
+   "published": "2026-07-04T11:40:40Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "Trump celebrerà il 250° anniversario degli Stati Uniti con una manifestazione in stile campagna al National Mall"
+  },
+  {
+   "source": "AP",
+   "title": "Iran begins dayslong funeral for the late Supreme Leader Ayatollah Ali Khamenei, killed in war - AP News",
+   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOUTNod0xTMjJIckxKX0NjQ1Z3OXJDbEZFcXNka1dQNVFfdjE5WVNnNUFfRWFuaEtnRExzV3huaXBRQ1BCUnozUnV0eG9ReGlvTUdrNDU2SjBKNzVkaE42MVNPcWt1a2U1RTllNTFFUjVuMnBkYU44SUUzSUtDaDUzbE1SNHlxMVQ5aXBHS3BxamR0eHpuWGo1WWxJNWRNaXFBVUd5SHhYaW41dDVreWVJYVhiYVhLQQ?oc=5",
+   "published": "2026-07-04T10:54:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "L'Iran inizia il funerale di un giorno per il defunto leader supremo Ayatollah Ali Khamenei, ucciso in guerra - AP News"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Tankers U-Turn in Hormuz, With Some Taking Iran Route Instead",
+   "link": "https://news.google.com/search?q=Tankers%20U-Turn%20in%20Hormuz%2C%20With%20Some%20Taking%20Iran%20Route%20Instead",
+   "published": "2026-07-04T10:33:09Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Inversione di marcia delle petroliere a Hormuz, con alcune che prendono invece la rotta dell’Iran"
+  },
+  {
    "source": "CNBC",
    "title": "Trump hails U.S. exceptionalism before veering into darkly political speech to usher in America's 250th anniversary",
    "link": "https://www.cnbc.com/2026/07/04/trump-makes-darkly-political-speech-to-usher-in-uss-250-anniversary.html",
@@ -46242,20 +46363,6 @@
    "title_it": "La BCE è in “buona posizione” visti i dati sull’inflazione, afferma Moulin"
   },
   {
-   "source": "AP",
-   "title": "Iran begins dayslong funeral for the late Supreme Leader Ayatollah Ali Khamenei, killed in war - AP News",
-   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOUTNod0xTMjJIckxKX0NjQ1Z3OXJDbEZFcXNka1dQNVFfdjE5WVNnNUFfRWFuaEtnRExzV3huaXBRQ1BCUnozUnV0eG9ReGlvTUdrNDU2SjBKNzVkaE42MVNPcWt1a2U1RTllNTFFUjVuMnBkYU44SUUzSUtDaDUzbE1SNHlxMVQ5aXBHS3BxamR0eHpuWGo1WWxJNWRNaXFBVUd5SHhYaW41dDVreWVJYVhiYVhLQQ?oc=5",
-   "published": "2026-07-04T09:07:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "L'Iran inizia il funerale di un giorno per il defunto leader supremo Ayatollah Ali Khamenei, ucciso in guerra - AP News"
-  },
-  {
    "source": "Google News",
    "title": "Donald Trump Says US Stock Market Rally Marks Start of ‘Golden Age’ - CryptoRank",
    "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQQXlYcVhWWjdJLVRLV2V6ZjRjN1RZQ2phU21CbndfMTBCTGpLaVZ0ZVd4aFhxRWtONnRGTW9NTlZ5b1Vtdzd2YXVkclNCY3B5ckNWcEtfdnVoSUl0NHNPVno3ZzBsZUR6dm1yYVNVaWlQeTVKZDlDOUYtYkdPd1VkZ0NZaDlrLWY3QzRCTlFYbF9MV0pnWGl2SzB4Ni1qWXVjR0ptSlNn?oc=5",
@@ -46268,6 +46375,19 @@
    "inv": false,
    "sentiment": "bull",
    "title_it": "Donald Trump afferma che il rally del mercato azionario statunitense segna l'inizio dell'\"età dell'oro\" - CryptoRank"
+  },
+  {
+   "source": "Google News",
+   "title": "Fed chairman says inflation risks are declining, predicts AI will create jobs - AOL.com",
+   "link": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQRV9zZGVjVlBtbUc3QTUxTXlGbk5fTnJsNzM5c2lldzZ5ZWJEZm9kYWZEM1BIeFVLdTVXZkhFdFY1TWt2M21Kb3ltRXpCTFF3N21GZmlNWFpfa1VrNXo1UHF6Ul94eXluYlluZm81OWFObktEOG56N3VFbE9TM203eDR3?oc=5",
+   "published": "2026-07-04T08:46:50Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il presidente della Fed afferma che i rischi di inflazione stanno diminuendo e prevede che l'intelligenza artificiale creerà posti di lavoro - AOL.com"
   },
   {
    "source": "Google News",
@@ -46309,32 +46429,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "L'Iran inizia il funerale di sei giorni per l'Ayatollah Khamenei quasi quattro mesi dopo la sua morte"
-  },
-  {
-   "source": "Reddit",
-   "title": "High probabilty of recession in Q4?",
-   "link": "https://www.reddit.com/r/investing/comments/1un0e09/high_probabilty_of_recession_in_q4/",
-   "published": "2026-07-04T05:19:57Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Alta probabilità di recessione nel quarto trimestre?"
-  },
-  {
-   "source": "Google News",
-   "title": "Fed chief Kevin Warsh says inflation risks have dipped – but keeps quiet on rate hikes - AOL.com",
-   "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTE1vd3o5YUxGWWNtSm9sbk0tbk5PVkdtdkpJSnZwNTBTeWEyNzY0ZFZCTUE5VDh4Y3JfUXRyajNkTVdzSXM4bWRId0c1Y1UwSEkxQjBPSHNJOWZORmZTa0JUTTFwdDM5NUdXVmVjRlpGU3NCelYyMWFXZzNR?oc=5",
-   "published": "2026-07-04T03:37:23Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il capo della Fed Kevin Warsh afferma che i rischi di inflazione sono diminuiti, ma tace sugli aumenti dei tassi - AOL.com"
   },
   {
    "source": "Bloomberg",
@@ -46391,6 +46485,20 @@
    "title_it": "L’Asia affamata di energia sta già traendo lezioni dalla crisi iraniana"
   },
   {
+   "source": "Reuters",
+   "title": "Russian defence ministry says its forces captured Kostiantynivka in eastern Ukraine - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxNQ0RBRmlpN2UtbDdMQUpmZDNuaXozSW1uMm1qWTBoT3lWc25yamFFUklpYW81bFk4ZHY4cVVqdGtIU0o2bGlpeldFcjJ4b1d4aGxxQTlzS1R0T2JxRXplR1M0MGphWnpTdVFzcFJQUGFPVWhmNUFISVNHSURvYnpOMnBUVVhHWlpOekJNUkxKS3N3cEZlYUlJZzhScllvc29yVFV6UmFNa2Q0cGRqQ2dkSUhERHoyS1dxelBGVS1NM0lwOE5iN1VZSWlxaXUwZzdtQmFGenJHaVVKalE?oc=5",
+   "published": "2026-07-03T22:08:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il ministero della Difesa russo afferma che le sue forze hanno catturato Kostiantynivka nell'Ucraina orientale - Reuters"
+  },
+  {
    "source": "AP",
    "title": "Trump administration’s interpretation of slavery under George Washington can be reinstalled - AP News",
    "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQRWxMbEF0emwxOG91eUdzWlMxTlJablZoOWt5dng3TlhxeXFVSFVXanlMQXg3NWdHQlJBRjNVZm9vVWhzTjUxUXZoOHRtckEwWGQxNVBzNzczanRzVHpaTW1ocjhzc0pXMGxXM0Vzc3hHUzQ4VlV2YlAwdmN0R20yTE9wd0lQT2l1ZTB2ekRTRjdOX3hybVEycS1wcFp5bUNuS2M5SjA1NGs?oc=5",
@@ -46406,6 +46514,20 @@
    "title_it": "L’interpretazione della schiavitù dell’amministrazione Trump sotto George Washington può essere reinstallata – AP News"
   },
   {
+   "source": "Reuters",
+   "title": "Supreme Court's Barrett fuels conservative wins while sometimes splitting with Trump - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPejQtd1h2RDVtZEdDQldiRmxBZURoTlZnTDJZdDlOcHRfQ2tyb0ZMTVJ5MThCRlBTWVlic1BYTTIzWm9vU1owb0ZBcUVGVlFNUkNiTU9yd1N2Q3BaWjBIZHJZTEYyQnZhTTAyNjVzY1g5NkZic2RzckthT0hlUEZtZmxzZkRlN2VaSzVBS0VZOGtoMUlfZ29SSXNNb2hvWFNWa0FEUXBmOEdxQWRpVjM0UGE5WHdqcGlCNkZ3dXZ0ZWJ5Q2VxTGhlb1BR?oc=5",
+   "published": "2026-07-03T21:05:17Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "Barrett della Corte Suprema alimenta le vittorie dei conservatori mentre a volte si divide con Trump - Reuters"
+  },
+  {
    "source": "AP",
    "title": "Belgian diamond group that won tariff relief gifted Trump a lavishly encrusted ring - AP News",
    "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPa25PQUJ3V2t0TVBBQVdWamJDaDlsZThkeENjS2c0Z1JtNDExZmY4NUpXSVR1VFZTVTBhc3dqaEF1cHVDbTRNWUYzMHBTT19pRlBRaFJ4QVNCMk1oTFJKYUE5SS1tcFZyRktCM2tTaFJJcjgyVldYOXhWemQ3cnJSdm9Oelg2QXRtTlhwa25ETHFIQk9mUjJscUlR?oc=5",
@@ -46417,7 +46539,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "Il gruppo belga di diamanti che ha ottenuto uno sgravio tariffario ha regalato a Trump un anello riccamente incrostato - AP News"
+   "title_it": "Il gruppo belga di diamanti che ha ottenuto uno sgravio tariffario ha regalato a Trump un anello riccamente tempestato - AP News"
   },
   {
    "source": "AP",
@@ -46432,6 +46554,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Trump legge un libro per bambini sul podcast di Usha Vance, poi parla di se stesso e dei precedenti presidenti - AP News"
+  },
+  {
+   "source": "Reuters",
+   "title": "China's Chery takes over former Nissan car factory in South Africa - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQR0pWNmE3WGFrOVBtRlpvaEk4eDNSWG41eG1BZnpSeGQ2VU9nU0lEYmtEWk5FT0JpS1dINkZRemVHYmtnTnpRU0lKZ0Q2TzUxZ3hyYWNoYmVMWUk1TGZPMm5hamlJZXIwb09Hdl9QWkVJUkMyTUN0M0dXMW5KOExVbk1maHFpdDZLNTJBb1h3SEZ0TFlBbFJqYk9IUDg1OVFBY0Q4dmt1VUZqUDRrdXh6SmJaTmtLUnVX?oc=5",
+   "published": "2026-07-03T19:38:27Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La cinese Chery rileva l'ex fabbrica di automobili Nissan in Sud Africa - Reuters"
   },
   {
    "source": "MarketWatch",
@@ -46489,17 +46624,18 @@
    "title_it": "Lo STOXX 600 europeo registra la migliore settimana da oltre un mese mentre il rally si allarga - Reuters"
   },
   {
-   "source": "Reddit",
-   "title": "The semis dropped 10–14% in two days and my feed instantly called a recession. I track the cross-asset tape daily and 5 of 6 recession tells pointed the other way, rotation",
-   "link": "https://www.reddit.com/r/investing/comments/1umivby/the_semis_dropped_1014_in_two_days_and_my_feed/",
-   "published": "2026-07-03T16:20:06Z",
+   "source": "Reuters",
+   "title": "EXCLUSIVE Russia set to import North Asian jet fuel amid fuel crisis, sources say - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPanlfMW1EMnFya2ZMNmFLVjBtT3ctNzZIdmVvVlVsYlNYNTJMRXJaTXlRU3BET0dncnF1UDlTMFdmVy14ZnkwdVdjWjNrS203OExQQjBjTUJHRTRBVUdYYkRSVUVLVGszZjF2ZWRMU2VvY0RhWGhVTFpPV0VkTmE1cTVHVnZueU9OOHBnT0xCcmNZdVVmeS1WZzdyS050NUVNcm1BQVlGZmV6N0NySlFJa3NIRG9YNDk2QUhR?oc=5",
+   "published": "2026-07-03T16:27:30Z",
    "tickers": [
-    "MACRO"
+    "MACRO",
+    "POL"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Le semifinali sono scese del 10-14% in due giorni e il mio feed ha immediatamente chiamato recessione. Seguo quotidianamente il nastro cross-asset e 5 su 6 segnali di recessione puntano nella direzione opposta, ovvero la rotazione"
+   "title_it": "ESCLUSIVO La Russia si appresta a importare carburante per aerei dal Nord Asia in mezzo alla crisi del carburante, dicono fonti - Reuters"
   },
   {
    "source": "Google News",
@@ -46516,84 +46652,16 @@
   },
   {
    "source": "CNBC",
-   "title": "Global stock markets close higher as Europe's benchmark hits 52-week high: Live updates",
-   "link": "https://www.cnbc.com/2026/07/03/stock-market-today-live-updates.html",
-   "published": "2026-07-03T15:34:44Z",
+   "title": "The hunt for AI's next winners defined the stock market's holiday-shortened week",
+   "link": "https://www.cnbc.com/2026/07/03/the-hunt-for-ais-next-winners-defined-the-stock-markets-holiday-shortened-week.html",
+   "published": "2026-07-03T15:51:06Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "I mercati azionari globali chiudono in rialzo mentre il benchmark europeo tocca il massimo di 52 settimane: aggiornamenti in tempo reale"
-  },
-  {
-   "source": "Bloomberg",
-   "title": "Argentina Pushes $6 Billion in Repo Maturities Past Election",
-   "link": "https://news.google.com/search?q=Argentina%20Pushes%20%246%20Billion%20in%20Repo%20Maturities%20Past%20Election",
-   "published": "2026-07-03T15:16:22Z",
-   "tickers": [
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L’Argentina spinge 6 miliardi di dollari in scadenze Repo dopo le elezioni"
-  },
-  {
-   "source": "Reuters",
-   "title": "NATO leaders to gather in Ankara, aiming to smooth over tensions with Trump - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxQTkJLWS1Wbnk4WEdvWjVXR01zVmJmVlBYLXpnT2g5OVlxSG15bF9QbWEzMS1Ca2EtcjFJaUt2dlNlLUhRZzAxa2tVS2Y3WWFNWDBpN0JIdkpoN1JINTUyZ1Q5dGZMaUFkWmJtaGVGeEFLWHdSZkd3VTkxUWdHR1VIM2F1a0RCVTMwUkQ2OHlEckNIUFlTdjJlTVF5YU1pWW1kMTM2Rm1tVUNaNGYyQUZSSmYwa3MwQ3UtNVgyTjgyLXpBdUs4SVpJ?oc=5",
-   "published": "2026-07-03T14:23:58Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I leader della Nato si riuniscono ad Ankara per allentare le tensioni con Trump - Reuters"
-  },
-  {
-   "source": "Reuters",
-   "title": "NATO leaders including Trump to affirm 'ironclad commitment' to collective defence in Ankara, summit text says - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxNR21mS1FvbzMzXzlxSUFEVVV5ZENiRktERHRtQ1hycW16UmphZF9RdUEybTVmYjNkOWY4dTFvZ3MyVlZPSnVaLVU2dS1DRjBkempBVkRvd2NROFBkRjlTajI5cjVLSjBxSzlaWmp2Z1RxQVlPaFBJMjQzNUd0VUdFejN1OVItOEhTQUtQU1Zzc2VfU0xQUFgxdWlvZEJfYUROWG9ZMlBhZUNsaTNLWDVzcTc0b2pLc0pRWDBkUGVSbTljVjNudFhGcU84amZSb1dPTzN2TDN0TQ?oc=5",
-   "published": "2026-07-03T14:22:58Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Leader della NATO, compreso Trump, affermano \"impegno ferreo\" per la difesa collettiva ad Ankara, dice il testo del vertice - Reuters"
-  },
-  {
-   "source": "Reuters",
-   "title": "How does the Iran crisis compare with the 1979 oil shock? - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNMG9oa3VPLW5oa2dhSDc5NXA3czBNYlVLR3lrdGprX2FpQ1VYOGxtNngweEJVVm52d0F0RmVuQXhfc0xWcWxjck9oUWN6S0NLRjhoSEkyTVN4R3Rod05JeWRPS1M0LUZtamZ6NlFDUGRmSnBxTTgxYUlZdkRjb2NaNmV3d2tKZkZ0ZEd4MmU3X19EZzhQdVlzTDM2ZDVfSjU1ZmFJZWF2QllXNkU?oc=5",
-   "published": "2026-07-03T13:52:45Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Come si confronta la crisi iraniana con lo shock petrolifero del 1979? -Reuters"
-  },
-  {
-   "source": "Google News",
-   "title": "Week Ahead for FX, Bonds: Fed Minutes in Focus - WSJ",
-   "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQcklhc25pMDBGOTZDdFVaVEZnODA2OTJvYmJsZm4wb2pHOC11NTVOUmlWMEpkOEgydkJ4dzJWcHlfdFJ1bENFVGZLaERZS2VDcF9rRkQzNk93bWp0Q2xpZUl1QU13eWhHbENTeGk5OFFabjZvV2xILXptT3BIMl9FN0x5Qk1OVk1t?oc=5",
-   "published": "2026-07-03T12:40:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Settimana in anticipo per FX e obbligazioni: focus sui verbali della Fed - WSJ"
+   "title_it": "La caccia ai prossimi vincitori dell'intelligenza artificiale ha definito la settimana abbreviata per le festività del mercato azionario"
   },
   {
    "source": "CNBC",
@@ -46608,71 +46676,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Il Freedom 250 di Trump attira sponsor aziendali con imprese prima della sua amministrazione"
-  },
-  {
-   "source": "Reuters",
-   "title": "Analysts cut Canadian dollar forecasts as USMCA uncertainty clips rate hike chances Analysts cut Canadian dollar forecasts as USMCA uncertainty clips rate hike chances: Reuters poll - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiywFBVV95cUxPSnFtV1JwSE1DalROVXJNNTNtUEh0SmdqZ1RZNEx4MURVbElBUnprMXBCcUpWTWUzbDJlTWhMYUFyNG1MYnRROV9CYmNFblVfbWEtTDBTZ0FQUkRvYV9IVHZVbjd1NjFDNVRZdG52dmVPcVFBRGlVTW1mQnkxTDJ0a3NnWFFzSVl4N1RMWG1FU3FERHBzanozTzV0NjFmdXpyaWVGX1RTRE5IdWRIams4OGlFOVRuS2s1XzhSaThNUm5Ga1c0T0hZWTVKSQ?oc=5",
-   "published": "2026-07-03T11:25:02Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Gli analisti tagliano le previsioni sul dollaro canadese mentre l'incertezza dell'USMCA taglia le possibilità di rialzo dei tassi Gli analisti tagliano le previsioni sul dollaro canadese mentre l'incertezza dell'USMCA taglia le possibilità di rialzo dei tassi: sondaggio Reuters - Reuters"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Mortgage and refinance interest rates today, Friday, July 3: Rates mostly higher again today",
-   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/mortgage-and-refinance-interest-rates-today-friday-july-3-rates-mostly-higher-again-today-100000290.html",
-   "published": "2026-07-03T10:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Tassi di interesse ipotecari e di rifinanziamento oggi, venerdì 3 luglio: Tassi per lo più più alti anche oggi"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "U.S. holiday pause, softer Fed expectations and Asia rebound shape global markets: Dow Jones, S&P, Nasdaq, Wall Street Futures",
-   "link": "https://finance.yahoo.com/markets/articles/u-holiday-pause-softer-fed-091937206.html",
-   "published": "2026-07-03T09:19:37Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La pausa festiva negli Stati Uniti, le aspettative più deboli della Fed e la ripresa dell’Asia influenzano i mercati globali: Dow Jones, S&P, Nasdaq, Wall Street Futures"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Dollar heads for biggest weekly drop since April as jobs data dims Fed hike bets",
-   "link": "https://finance.yahoo.com/news/dollar-heads-weekly-drop-jobs-015041368.html",
-   "published": "2026-07-03T08:10:12Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Il dollaro si avvia verso il calo settimanale più consistente da aprile, mentre i dati sull'occupazione indeboliscono le previsioni di un rialzo della Fed"
-  },
-  {
-   "source": "CNBC",
-   "title": "Oman walks a diplomatic tightrope over Strait of Hormuz fees, creating a ‘blind spot’ for markets",
-   "link": "https://www.cnbc.com/2026/07/03/oman-strait-hormuz-fees-iran-trump.html",
-   "published": "2026-07-03T07:59:34Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L’Oman cammina sul filo del rasoio diplomatico sulle tasse dello Stretto di Hormuz, creando un “punto cieco” per i mercati"
   },
   {
    "source": "Investing.com",
@@ -46701,6 +46704,58 @@
    "title_it": "Le azioni Micron esplodono in rialzo dopo il battito degli utili alimentati dall'intelligenza artificiale: sono in arrivo ulteriori rialzi?"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer Believes “Micron’s Become a Secular Growth Story, Not a Cyclical Story”",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-believes-micron-become-142402063.html",
+   "published": "2026-07-04T14:24:02Z",
+   "tickers": [
+    "MU"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "Jim Cramer ritiene che “quella di Micron sia diventata una storia di crescita secolare e non ciclica”"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer on Cerebras Systems: “I Warned You to Stay Away From This One”",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-cerebras-systems-warned-142341194.html",
+   "published": "2026-07-04T14:23:41Z",
+   "tickers": [
+    "CBRS"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Jim Cramer su Cerebras Systems: \"Ti avevo avvertito di stare lontano da questo\""
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer Considers AMD Stock’s Dip as a Buying Opportunity",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-considers-amd-stock-142132089.html",
+   "published": "2026-07-04T14:21:32Z",
+   "tickers": [
+    "AMD"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Jim Cramer considera il calo delle azioni AMD come un’opportunità di acquisto"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Jim Cramer on Palantir: “This Is the Fastest Grower of the Stocks I Follow, and It’s Been Crushed”",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/jim-cramer-palantir-fastest-grower-142010542.html",
+   "published": "2026-07-04T14:20:10Z",
+   "tickers": [
+    "PLTR"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Jim Cramer su Palantir: \"Questo è il titolo che cresce più velocemente tra quelli che seguo, ed è stato schiacciato\""
+  },
+  {
    "source": "Reddit",
    "title": "Meta's full arc this week: +9% on cloud hype and -5% on Zuck's own AI comments.",
    "link": "https://www.reddit.com/r/stocks/comments/1umnxm8/metas_full_arc_this_week_9_on_cloud_hype_and_5_on/",
@@ -46725,19 +46780,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Nvidia scommette su un boom della robotica da trilioni di dollari. Ecco il modo nascosto per scambiarlo."
-  },
-  {
-   "source": "Reddit",
-   "title": "What's the Smartest Investment Strategy During Rising Global Tensions?",
-   "link": "https://www.reddit.com/r/investing/comments/1um7aoz/whats_the_smartest_investment_strategy_during/",
-   "published": "2026-07-03T07:06:47Z",
-   "tickers": [
-    "MSTR"
-   ],
-   "topic_pri": 1,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Qual è la strategia di investimento più intelligente durante le crescenti tensioni globali?"
   },
   {
    "source": "Investing.com",
@@ -46766,24 +46808,11 @@
    "title_it": "Bitcoin combatte la fortezza di resistenza da 63.000 dollari: livelli live"
   },
   {
-   "source": "Investing.com",
-   "title": "Bitcoin edges above $62k, set for weekly rise after softer U.S. jobs data",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-holds-above-61k-set-for-weekly-rise-after-softer-us-jobs-data-4775004",
-   "published": "2026-07-03T12:54:10Z",
-   "tickers": [
-    "BTC-USD"
-   ],
-   "topic_pri": 2,
-   "inv": true,
-   "sentiment": "bull",
-   "title_it": "Bitcoin supera i 62.000 dollari, destinato a registrare un rialzo settimanale dopo i dati più deboli sull'occupazione negli Stati Uniti"
-  },
-  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 90%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-07-04T10:51:40Z",
+   "published": "2026-07-04T14:50:45Z",
    "tickers": [
     "MACRO"
    ],
@@ -46794,7 +46823,7 @@
    "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
    "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 10%",
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
-   "published": "2026-07-04T10:51:40Z",
+   "published": "2026-07-04T14:50:45Z",
    "tickers": [
     "MACRO"
    ],
@@ -46803,9 +46832,9 @@
   {
    "source": "Polymarket",
    "title": "Bitcoin Up or Down on July 4?",
-   "title_it": "Bitcoin Up or Down on July 4? — probabilità Sì 94%",
+   "title_it": "Bitcoin Up or Down on July 4? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-july-4-2026",
-   "published": "2026-07-04T10:51:40Z",
+   "published": "2026-07-04T14:50:45Z",
    "tickers": [
     "MACRO"
    ],
@@ -46815,7 +46844,7 @@
  "options": {
   "AMD": {
    "spot": 517.82,
-   "avg_volume": 32086385,
+   "avg_volume": 32082065,
    "expiries": [
     {
      "date": "2026-07-10",
@@ -54939,7 +54968,7 @@
   },
   "INTC": {
    "spot": 120.35,
-   "avg_volume": 131842055,
+   "avg_volume": 131819850,
    "expiries": [
     {
      "date": "2026-07-10",
@@ -56175,7 +56204,7 @@
   },
   "LUMN": {
    "spot": 6.43,
-   "avg_volume": 15085500,
+   "avg_volume": 15083200,
    "expiries": [
     {
      "date": "2026-07-10",
@@ -58263,7 +58292,7 @@
   },
   "MSFT": {
    "spot": 390.49,
-   "avg_volume": 48918590,
+   "avg_volume": 48915315,
    "expiries": [
     {
      "date": "2026-07-06",
@@ -59483,7 +59512,7 @@
   },
   "MSTR": {
    "spot": 100.77,
-   "avg_volume": 29032555,
+   "avg_volume": 29025965,
    "expiries": [
     {
      "date": "2026-07-10",
@@ -60719,7 +60748,7 @@
   },
   "MU": {
    "spot": 975.56,
-   "avg_volume": 59190255,
+   "avg_volume": 59163880,
    "expiries": [
     {
      "date": "2026-07-10",
@@ -66819,7 +66848,7 @@
   },
   "ORCL": {
    "spot": 140.27,
-   "avg_volume": 32265920,
+   "avg_volume": 32260575,
    "expiries": [
     {
      "date": "2026-07-10",
@@ -76235,7 +76264,7 @@
   },
   "TSM": {
    "spot": 434.16,
-   "avg_volume": 15148615,
+   "avg_volume": 15146125,
    "expiries": [
     {
      "date": "2026-07-10",
