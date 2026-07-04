@@ -157,13 +157,13 @@ check("marginDebtState: 100% picco senza Forward P/E → ELEVATA con conferma n.
 // buildPrompt: smoke test completo
 const prompt = run(`buildPrompt()`);
 const has = (s) => prompt.includes(s);
-check("prompt: veto value trap su Sortino con eccezione motivabile (CEO)", has("Sortino < -0.3") && has("FLESSIBILITÀ INTELLIGENTE SUL VETO") && has("SPECIFICO presente in questo payload"));
+check("prompt: modello Advisory Board — conflitto Risk vs Growth con Sortino e scelta al CEO", has("Sortino < -0.3") && has("IL CONFLITTO RISK vs GROWTH") && has("LA SCELTA AL CEO"));
 check("prompt: colonna Sortino 1A nella tabella PORTAFOGLIO", has("| Sortino 1A |"));
-check("prompt: struttura CEO a tre sezioni con schede operative", has("GESTIONE DEL PORTAFOGLIO ESISTENTE") && has("RADAR WATCHLIST E NUOVE ALLOCAZIONI") && has("MOTIVAZIONE OLISTICA"));
+check("prompt: tre sezioni con schede operative ed esecuzione esatta", has("GESTIONE DEL PORTAFOGLIO ESISTENTE") && has("RADAR WATCHLIST E NUOVE ALLOCAZIONI") && has("ESECUZIONE ESATTA") && has("INDICI LEADING") && has("KOSPI"));
 check("prompt: matrice di rischio per posizione", has("MATRICE DI RISCHIO PER POSIZIONE"));
 check("prompt: flag [STOP VIOLATO] su TST3", /\[STOP VIOLATO\][\s\S]*TST3|TST3[^\n]*\[STOP VIOLATO\]/.test(prompt));
 check("prompt: VaR storico primario", has("STORICO, percentili empirici"));
-check("prompt: regole igiene dati e gap sessione conservate", has("IGIENE DEI DATI") && has("ESECUZIONE E GAP DI SESSIONE"));
+check("prompt: igiene dati e gap sessione conservate", has("IGIENE DEI DATI") && has("gap di sessione") && has("ordini LIMITE"));
 check("prompt: niente RICONCILIAZIONE nel baseline pulito", !has("RICONCILIAZIONE BROKER NECESSARIA"));
 check("prompt: nessun 'undefined' nel payload", !has("undefined"));
 check("prompt: nessun 'NaN' nel payload", !/\bNaN\b/.test(prompt));
