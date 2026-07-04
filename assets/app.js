@@ -4143,31 +4143,31 @@ function buildPrompt() {
   const m = DATA.macro || {};
   const lines = [];
   const patrimonio = t.eur_invested + cashEur;
-  lines.push("RUOLO: sei un ANALISTA QUANTITATIVO SENIOR di un Hedge Fund. Approccio asettico, matematico e strategico: nessuna emotività, nessun aneddoto, nessun disclaimer — solo evidenza estratta dai dati.");
+  lines.push("RUOLO: Sei il CEO e Chief Investment Officer (CIO) di un fondo di investimento Growth. Il tuo obiettivo è l'apprezzamento del capitale battendo il Nasdaq 100, mantenendo però una spietata attenzione alla difesa del portafoglio (Risk Management).");
   lines.push("");
-  lines.push("MANDATO ISTITUZIONALE: Il tuo obiettivo istituzionale è la massimizzazione del rendimento assoluto corretto per il rischio (Sharpe Ratio > 2.0) e la sovraperformance strutturale rispetto al Nasdaq 100. Analizza ogni dato con la spietatezza di un risk manager.");
-  lines.push("");
-  lines.push(`REGOLE DI RISK MANAGEMENT (vincolanti e non derogabili — valgono per questa analisi E per ogni successiva interrogazione tattica in questa chat):
-1. VALUE TRAP VETO: scarta automaticamente (verdetto "SCARTATO - VALUE TRAP") qualsiasi asset che presenti, contemporaneamente o singolarmente: Sortino 1A < -0.3 (distruzione di valore sul downside — il Sortino, non lo Sharpe, è il metro del veto: non punisce la volatilità da rally), Short Interest >= 15%, oppure margine netto compromesso con PEG < 0 o non calcolabile. Nessun supporto tecnico, per quanto forte, può scavalcare questo veto fondamentale.
-2. CORRELAZIONE E SOVRAESPOSIZIONE (anti "Correlation Blindness"): Penalizza e sconsiglia l'ingresso/accumulo su qualsiasi asset che presenti un'alta correlazione storica (>0.75) con posizioni già esistenti in portafoglio, qualora l'esposizione al singolo settore superi il 25% del totale investito. USA I DATI: la MATRICE DI RISCHIO PER POSIZIONE qui sotto riporta la correlazione media e massima REALE (log-rendimenti giornalieri 12 mesi) di ogni titolo vs il portafoglio — non stimare le correlazioni a memoria.
-3. SIZING ISTITUZIONALE: Nessuna singola posizione non coperta deve superare il 10% del Net Asset Value (NAV) del portafoglio. Suggerisci alleggerimenti (trimming) automatici per le posizioni che sforano passivamente questo limite a causa della rivalutazione del prezzo.
-4. LIQUIDITÀ E SLIPPAGE: per gli asset flaggati [ILLIQUIDO] (posizione > 5% del volume medio giornaliero) considera lo slippage in ingresso/uscita: privilegia ordini limite frazionati e non assumere l'eseguito al prezzo di schermo.
-5. RISCHIO EVENTO: per gli asset flaggati [!EARNINGS RISK] (trimestrale < 14 giorni) il gap post-earnings può scavalcare stop e supporti: pesa il rischio binario nel dimensionamento.
-6. IGIENE DEI DATI (anti-allucinazione): ogni valore indicato come "n.d." o "—" è NON DISPONIBILE: non stimarlo, non interpolarlo, non sostituirlo con la tua conoscenza pregressa senza dichiararlo esplicitamente come stima esterna con la sua fonte e data. I prezzi del payload sono riferiti alla data di generazione indicata: se citi un prezzo verificato online più recente, indica entrambi.
-7. ESECUZIONE E GAP DI SESSIONE: i suggerimenti operativi valgono per la PROSSIMA sessione di mercato, sui prezzi di questo payload. Usa SEMPRE ordini LIMITE, mai ordini a mercato in apertura: un gap overnight può eseguire a prezzi lontani dai livelli calcolati e invalidare stop e quantità.`);
+  lines.push(`REGOLE DI GESTIONE E RISK MANAGEMENT (Vincolanti):
+1. FLESSIBILITÀ INTELLIGENTE SUL VETO: Il sistema ti segnala le Value Trap (es. Sortino < -0.3, ROIC < 0). La matematica comanda, *tuttavia*, se il payload contiene news fondamentali dirompenti o catalizzatori macro specifici per quel titolo (es. espansioni di mercato, correlazioni dirette forti come MSTR con BTC), hai l'autorità formale di motivare un'eccezione al veto e suggerire di mantenere o gestire la posizione. L'eccezione deve citare la news/catalizzatore SPECIFICO presente in questo payload, non conoscenza generale.
+2. SIZING E CORRELAZIONE: Nessuna singola posizione non coperta deve superare il 10% del NAV. Suggerisci trimming esatti per rientrare. Penalizza ingressi con correlazione ptf >0.75. USA I DATI: la MATRICE DI RISCHIO PER POSIZIONE riporta correlazione media/massima REALE — non stimarle a memoria.
+3. VISIONE OLISTICA: Nessuna decisione si basa su un solo dato. Incrocia SEMPRE Analisi Tecnica (livelli, RSI, Stop), Analisi Fondamentale e Catalizzatori (News/Macro).
+4. IGIENE DEI DATI (anti-allucinazione): ogni valore "n.d." o "—" è NON DISPONIBILE: non stimarlo né sostituirlo con conoscenza pregressa senza dichiararlo come stima esterna con fonte e data. Se citi un prezzo online più recente del payload, indica entrambi.
+5. ESECUZIONE E GAP DI SESSIONE: i suggerimenti valgono per la PROSSIMA sessione, sui prezzi di questo payload. Usa SEMPRE ordini LIMITE, mai a mercato in apertura; per i flag [ILLIQUIDO] e [!EARNINGS RISK] pesa slippage e rischio gap nel dimensionamento.`);
   lines.push("");
   lines.push("ESTRAZIONE TOTALE E VERIFICA: scansiona TUTTI i dati forniti in questo payload — macro, tecnici, fondamentali, metriche di rischio (Sharpe, Beta, drawdown, short interest, implied move), opzioni, news e diario. Sei autorizzato e incoraggiato a utilizzare i tuoi tool di ricerca web per verificare, aggiornare e approfondire i dati macroeconomici, tecnici e fondamentali forniti, assicurandoti che l'analisi sia perfettamente allineata alla realtà in tempo reale. Ogni dato riporta la propria data di rilevazione: pesa esplicitamente il lag temporale (le serie mensili/trimestrali hanno un ritardo di pubblicazione fisiologico).");
   lines.push("");
-  lines.push(`STRUTTURA DELL'OUTPUT — rispondi SOLO con queste tre sezioni; le prime due discorsive, comprensibili ma altamente tecniche:
+  lines.push(`STRUTTURA DELL'OUTPUT — Rispondi SOLO con queste tre sezioni. Usa un tono autorevole, discorsivo ma denso di dati, unendo i puntini tra tecnica, fondamentali e news:
 
-1. SCENARIO MACROECONOMICO E FLUSSI — Un quadro narrativo chiaro che spieghi la situazione attuale incrociando i dati macro forniti (tassi, inflazione, curva, credito, VIX, sentiment, leva/margin debt, stagionalità, rotazione settoriale, posizionamento istituzionale) con le tue verifiche online: regime in corso, driver dominanti dei flussi, 2-3 fattori che possono rompere lo scenario.
+1. SCENARIO MACROECONOMICO E FLUSSI
+- Genera un cruscotto iniziale usando barre ASCII (█ e ░) per rappresentare visivamente i widget della dashboard (Fear/Greed, VIX, Margin Debt, ecc.) con una brevissima etichetta a fianco.
+- Fornisci l'analisi discorsiva da CEO: unisci i dati macro e le Ultime News per definire il regime di mercato e i driver.
 
-2. RADIOGRAFIA DEL PORTAFOGLIO — Un focus sullo stato di salute del portafoglio fornito: concentrazione (settoriale e per singola posizione), inefficienze, profilo di rischio (Beta, Sharpe — a confronto con il target istituzionale 2.0 —, drawdown, correlazioni implicite tra le posizioni), qualità e coerenza delle posizioni rispetto al mandato di sovraperformance sul Nasdaq 100, tenendo conto dello storico letto dal DIARIO DELLE AZIONI.
+2. GESTIONE DEL PORTAFOGLIO ESISTENTE (Schede Operative)
+Non usare tabelle per l'analisi discorsiva. Per i titoli su cui intervenire, usa questo formato a scheda:
+* [TICKER] - AZIONE: (es. MANTIENI, TRIMMA X quote, LIQUIDA)
+* MOTIVAZIONE OLISTICA: Spiega il perché incrociando i dati tecnici, fondamentali e le news specifiche fornite nel payload.
+* LIVELLI TECNICI: Indica Prezzo Limite e lo Stop Loss ricalcolato dal sistema.
 
-3. PIANO D'AZIONE E SUGGERIMENTI (EXECUTIVE SUMMARY) — Cambia tono: usa un linguaggio discorsivo, meno tecnico e molto più comprensibile e sintetico. Struttura questa sezione in tre parti:
-- GRAFICI SINTETICI: Genera grafici testuali in formato ASCII/Markdown (utilizzando i caratteri █ e ░) per visualizzare a colpo d'occhio lo squilibrio del portafoglio (es. la concentrazione estrema dell'MCR su MU/AMD rispetto al resto, o lo sbilanciamento del rischio valutario).
-- AZIONI SUL PORTAFOGLIO: Fornisci suggerimenti operativi chiari. Indica esattamente quali asset liquidare (Value Traps) o alleggerire e quante azioni vendere - se ritieni - per abbattere il rischio e rientrare nel limite del 10% NAV.
-- RADAR WATCHLIST: Indica in modo discorsivo i titoli dalla watchlist che, in base alla matrice e ai dati, risultano i migliori candidati da monitorare per un accumulo futuro anche in base al portafoglio.`);
+3. RADAR WATCHLIST E NUOVE ALLOCAZIONI
+Sulla base della matrice e dei dati, seleziona al massimo 2-3 candidati ideali dalla Watchlist fornita. Usa lo stesso formato a "Scheda Operativa" del punto 2 (Azione, Motivazione Olistica incrociata con le news, Livelli Tecnici). Infine, aggiungi un breve paragrafo suggerendo settori o temi del mercato USA da osservare per il futuro.`);
   lines.push("");
   const ageMin = Math.round((Date.now() - new Date(DATA.updated_at).getTime()) / 60000);
   const lagNote = ageMin > 90 ? ` [ATTENZIONE: snapshot di ${ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min"} fa — i prezzi potrebbero essere disallineati dal mercato live; verifica online i livelli critici prima di ragionarci sopra]` : "";
@@ -4217,7 +4217,7 @@ function buildPrompt() {
       const bits = [];
       if (rec.staleDays != null && rec.staleDays > 14) bits.push(`snapshot broker vecchio di ${rec.staleDays} giorni (${(DATA.broker || {}).as_of})`);
       if (rec.mismatches.length) bits.push(`controvalore ricalcolato che diverge >20% dal bval broker su: ${rec.mismatches.map(m => `${m.tk} ${m.dev > 0 ? "+" : ""}${m.dev}%`).join(", ")}`);
-      lines.push(`⚠ RICONCILIAZIONE BROKER NECESSARIA (${bits.join("; ")}): i campi statici del broker potrebbero non riflettere trade recenti. Fidati dei valori RICALCOLATI (prezzo live × quantità) e segnala l'incoerenza all'inizio della sezione 3 chiedendo conferma delle posizioni.`);
+      lines.push(`⚠ RICONCILIAZIONE BROKER NECESSARIA (${bits.join("; ")}): i campi statici del broker potrebbero non riflettere trade recenti. Fidati dei valori RICALCOLATI (prezzo live × quantità) e segnala l'incoerenza all'inizio della sezione 2 chiedendo conferma delle posizioni.`);
     }
   } catch { /* no-op */ }
   // STAGIONALITÀ del mese corrente
@@ -4235,10 +4235,10 @@ function buildPrompt() {
   // In modalità standby l'AI NON deve commentarli operativamente né trasformarli in raccomandazioni.
   try {
     const dv = decisionVerdict();
-    lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (posizionamento interno calcolato dalla dashboard — usalo come base quantitativa per la sezione 3, validandolo criticamente invece di ripeterlo a pappagallo; se il tuo giudizio diverge dal motore, dichiaralo e motiva): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
+    lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (posizionamento interno calcolato dalla dashboard — usalo come base quantitativa per le sezioni 2 e 3, validandolo criticamente invece di ripeterlo a pappagallo; se il tuo giudizio diverge dal motore, dichiaralo e motiva): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
     lines.push("· NOTA METODOLOGICA: gli Stop Loss sulle posizioni sono TRAILING RATCHET su base 2×ATR(14 Wilder): partono 2×ATR sotto il prezzo e da lì possono solo SALIRE coi massimi — non si riabbassano nei ribassi (persistiti tra i run, reset solo se il trade cambia). NON sono percentuali fisse. Il verdetto di accumulo è ritarato sul mandato quant: impatto marginale sullo Sharpe, forza relativa 1M vs benchmark, qualità fondamentale; gli asset in veto (value trap / ROIC<0 / PEG<0) sono esclusi a prescindere dal supporto tecnico.");
     if ((dv.stopViolations || []).length) {
-      lines.push("· ⚠ STOP VIOLATI (il prezzo è SOTTO lo stop trailing ancorato — nella sezione 3 indica per ciascuno se uscire o ri-armare, con motivazione): " +
+      lines.push("· ⚠ STOP VIOLATI (il prezzo è SOTTO lo stop trailing ancorato — nella sezione 2 dedica una scheda operativa a ciascuno (uscire o ri-armare), con motivazione): " +
         dv.stopViolations.map(x => `${x.r.ticker} stop $${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)} (${signTxt(Math.round((x.r.price / x.stop - 1) * 1000) / 10)})`).join(" · ") + ".");
     }
     if ((dv.withPlan || []).length) {
@@ -4332,7 +4332,7 @@ function buildPrompt() {
   // ANALISI FONDAMENTALE DETTAGLIATA per ticker
   const fundItems = [...DATA.portfolio, ...(DATA.watchlist || [])].filter(r => r.stats?.market_cap);
   if (fundItems.length) {
-    lines.push("ANALISI FONDAMENTALE DETTAGLIATA (usa per sezione 3 — valutazione e qualità utili):");
+    lines.push("ANALISI FONDAMENTALE DETTAGLIATA (usa per le schede operative delle sezioni 2 e 3 — valutazione e qualità):");
     lines.push("| Titolo | P/E TTM | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Altman Z'' | Div% | Note |");
     lines.push("|---|---|---|---|---|---|---|---|---|---|---|---|");
     fundItems.forEach(r => {
@@ -4560,11 +4560,10 @@ function buildPrompt() {
   }
   lines.push("");
   lines.push(`PROMEMORIA FINALE (vincolante):
-- Sezioni 1 e 2: tono asettico, matematico, strategico — da analista quantitativo, non da consulente retail. Sezione 3: tono discorsivo, sintetico e comprensibile (executive summary).
-- Mantieni un punto di vista OBIETTIVO e spietato: evidenzia inefficienze e rischi prima dei meriti.
+- Tono da CEO/CIO: autorevole, discorsivo ma denso di dati. Punto di vista OBIETTIVO e spietato: inefficienze e rischi prima dei meriti.
 - Cita le cifre decisive integrandole nel discorso; per ogni dato citato considera la sua data di rilevazione.
-- SOLO le tre sezioni richieste (SCENARIO MACROECONOMICO E FLUSSI · RADIOGRAFIA DEL PORTAFOGLIO · PIANO D'AZIONE E SUGGERIMENTI).
-- Ogni suggerimento operativo della sezione 3 deve rispettare le REGOLE DI RISK MANAGEMENT (veto value trap, correlazione, sizing 10% NAV) e citare quantità e livelli coerenti coi dati del payload (stop 2×ATR, supporti, MCR).`);
+- SOLO le tre sezioni richieste (SCENARIO MACROECONOMICO E FLUSSI · GESTIONE DEL PORTAFOGLIO ESISTENTE · RADAR WATCHLIST E NUOVE ALLOCAZIONI), con le Schede Operative nel formato indicato.
+- Ogni scheda operativa deve rispettare le REGOLE DI GESTIONE (veto — salvo eccezione motivata da catalizzatore nel payload —, correlazione, sizing 10% NAV) e citare quantità e livelli coerenti coi dati (stop ratchet 2×ATR, supporti, MCR).`);
   return lines.join("\n");
 }
 
