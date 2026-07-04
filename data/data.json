@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-07-04T14:49:18Z",
+ "updated_at": "2026-07-04T15:39:10Z",
  "eurusd": 1.144,
  "totals": {
   "usd_value": 269963.16,
@@ -10541,21 +10541,21 @@
    "name": "Bitcoin",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 62653.36,
-   "change_pct": 0.17,
+   "price": 62832.01,
+   "change_pct": 0.46,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -50.4,
-   "sma200_dist_pct": -16.3,
+   "ath_dist_pct": -50.2,
+   "sma200_dist_pct": -16.0,
    "w52_high": 126198.07,
-   "w52_dist_pct": -50.4,
+   "w52_dist_pct": -50.2,
    "support": 57747.77,
    "resistance": 67248.13,
-   "rsi": 48.3,
-   "volume": 19703818240,
-   "vol_ratio": 0.65,
-   "atr_14": 2122.92,
-   "atr_pct": 3.39,
+   "rsi": 48.9,
+   "volume": 19515215872,
+   "vol_ratio": 0.64,
+   "atr_14": 2126.55,
+   "atr_pct": 3.38,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -10564,7 +10564,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62653.36
+     62832.01
     ],
     "m6": [
      65738.1,
@@ -10692,7 +10692,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62653.36
+     62832.01
     ],
     "all": [
      386.94,
@@ -10837,7 +10837,7 @@
      76304.32,
      73579.69,
      58558.86,
-     62653.36
+     62832.01
     ],
     "m1": [
      64421.32,
@@ -10861,7 +10861,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62653.36
+     62832.01
     ],
     "m3": [
      76304.32,
@@ -10929,7 +10929,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62653.36
+     62832.01
     ],
     "y1": [
      108034.34,
@@ -11005,7 +11005,7 @@
      63540.84,
      60995.13,
      60138.38,
-     62653.36
+     62832.01
     ],
     "d1": [
      62534.16,
@@ -11096,39 +11096,44 @@
      62612.59,
      62616.54,
      62579.44,
-     62628.14
+     62628.14,
+     62611.36,
+     62680.37,
+     62772.59,
+     62847.4,
+     62852.84
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 35,
+   "health": 36,
    "eps": null,
    "beta": null,
    "sharpe_1y": -1.14,
-   "sortino_1y": -1.49,
+   "sortino_1y": -1.48,
    "prepost": null,
    "sector": "CRYPTOCURRENCY",
    "stats": null,
    "tech_by_range": {
     "w1": {
      "support": 57747.77,
-     "resistance": 62879.01,
-     "change_pct": 6.99
+     "resistance": 62907.06,
+     "change_pct": 7.3
     },
     "m1": {
      "support": 57747.77,
      "resistance": 67248.13,
-     "change_pct": -2.74
+     "change_pct": -2.47
     },
     "m3": {
      "support": 57747.77,
      "resistance": 82792.21,
-     "change_pct": -17.89
+     "change_pct": -17.66
     },
     "y1": {
      "support": 57747.77,
      "resistance": 116273.31,
-     "change_pct": -45.27
+     "change_pct": -45.11
     }
    },
    "financials": [],
@@ -11153,9 +11158,9 @@
      "hi": 59940.35
     }
    },
-   "rs_1m": -1.1,
+   "rs_1m": -0.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.6,
+   "rs_ndx_1m": 1.9,
    "beta_ndx": 0.93,
    "avg_corr": 0.34,
    "max_corr": 0.79,
@@ -30498,7 +30503,7 @@
    "calls": 3868
   },
   "risk_sentiment": {
-   "score": 43,
+   "score": 44,
    "label": "Neutrale",
    "components": [
     {
@@ -30515,7 +30520,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 52
+     "score": 54
     }
    ]
   },
@@ -34020,7 +34025,7 @@
      109.14,
      102.59,
      106.75,
-     108.01,
+     108.02,
      110.72,
      113.53,
      111.46,
@@ -34052,7 +34057,7 @@
      169.78,
      164.75,
      174.01,
-     171.27,
+     171.28,
      172.96,
      175.18,
      171.62,
@@ -34479,7 +34484,7 @@
     -0.00126,
     -0.003758,
     -0.016526,
-    0.015086,
+    0.015085,
     -0.005083,
     0.00763,
     -0.000838,
@@ -34498,11 +34503,11 @@
     0.004178,
     0.002276,
     0.003535,
-    -0.005981,
+    -0.005982,
     -0.007438,
     0.005405,
     0.008323,
-    -0.0029,
+    -0.002901,
     0.002454,
     0.002309,
     0.002887,
@@ -35442,7 +35447,7 @@
      549.0,
      562.3,
      567.67,
-     598.18,
+     598.19,
      626.78,
      617.0,
      612.86,
@@ -36637,7 +36642,7 @@
      169.0,
      183.61,
      192.5,
-     204.44,
+     204.45,
      207.3,
      211.0,
      211.58,
@@ -38997,7 +39002,7 @@
      95.87,
      92.58,
      90.39,
-     86.7,
+     86.71,
      90.65,
      90.02,
      91.79,
@@ -39046,7 +39051,7 @@
      100.59,
      107.47,
      108.49,
-     108.77,
+     108.76,
      120.78,
      117.55,
      116.24,
@@ -39089,7 +39094,7 @@
      89.2,
      86.86,
      93.5,
-     88.97,
+     88.96,
      93.27,
      93.59,
      90.76,
@@ -39405,17 +39410,17 @@
     }
    },
    "_ret_series": [
-    -0.00959,
+    -0.009589,
     -0.001278,
     0.010407,
     0.00069,
     -0.013891,
     -0.0021,
     -0.007033,
-    0.00141,
+    0.001411,
     -0.000235,
     0.001526,
-    0.008876,
+    0.008877,
     0.006028,
     -0.005563,
     -0.001745,
@@ -39426,7 +39431,7 @@
     0.000575,
     0.014116,
     0.002729,
-    0.003062,
+    0.003061,
     -0.005791,
     -0.001709,
     -0.004344,
@@ -39443,7 +39448,7 @@
     -0.002876,
     -0.000576,
     -0.001153,
-    0.006556,
+    0.006557,
     -0.007134,
     -0.007469,
     0.010918,
@@ -39453,17 +39458,17 @@
     -0.005699,
     0.005699,
     0.006664,
-    -0.004327,
+    -0.004326,
     0.002332,
     0.002105,
     -0.002549,
     -0.010373,
     -0.001908,
     -0.003601,
-    0.006966,
+    0.006965,
     -0.003814,
     0.0,
-    -0.0009,
+    -0.000899,
     0.008178,
     -0.002905,
     0.002579,
@@ -39477,13 +39482,13 @@
     -0.000552,
     0.003197,
     -0.002204,
-    0.007472,
+    0.007473,
     -0.001534,
-    0.003831,
+    0.00383,
     0.004903,
     0.000652,
     -0.006867,
-    0.000438,
+    0.000437,
     0.003383,
     0.002612,
     -0.010158,
@@ -39492,14 +39497,14 @@
     -0.002504,
     0.002226,
     -0.010956,
-    0.008953,
+    0.008952,
     -0.002119,
     -0.000223,
     0.004568,
     0.001777,
     -0.008245,
     -0.005722,
-    0.002472,
+    0.002473,
     -0.000337,
     -0.002023,
     0.00393,
@@ -39507,7 +39512,7 @@
     0.005682,
     0.002552,
     0.004423,
-    -0.004756,
+    -0.004755,
     -0.012527,
     0.00045,
     0.002811,
@@ -39538,7 +39543,7 @@
     0.006618,
     -0.002961,
     0.00171,
-    0.005791,
+    0.00579,
     -0.000227,
     -0.005792,
     -0.013184,
@@ -39547,15 +39552,15 @@
     0.002733,
     0.004765,
     -0.006245,
-    -0.002281,
+    -0.00228,
     0.000228,
     -0.005608,
     -0.002861,
     0.002423,
     -0.002539,
-    0.010804,
+    0.010803,
     0.000686,
-    -0.000228,
+    -0.000229,
     0.011474,
     -0.005323,
     0.013199,
@@ -39565,7 +39570,7 @@
     0.001005,
     -0.002346,
     0.003684,
-    0.001782,
+    0.001781,
     0.000111,
     0.003996,
     0.006074,
@@ -39576,7 +39581,7 @@
     -0.003724,
     0.008667,
     -0.010704,
-    -0.012997,
+    -0.012998,
     -0.001953,
     -0.004956,
     0.007712,
@@ -40630,7 +40635,7 @@
     0.007912,
     0.002827,
     0.002268,
-    0.007883,
+    0.007882,
     -0.001745,
     0.002191,
     -0.005748,
@@ -40650,7 +40655,7 @@
     -0.007168,
     -0.00265,
     0.01757,
-    -0.002438,
+    -0.002437,
     0.005113,
     0.007001,
     0.009867,
@@ -40663,13 +40668,13 @@
     0.001177,
     0.012924,
     0.005357,
-    0.001113,
+    0.001112,
     0.009764,
     -0.003391,
     -0.003694,
     0.017599,
     0.009299,
-    0.016034,
+    0.016035,
     -0.01033,
     -0.007402,
     -0.003022,
@@ -40707,7 +40712,7 @@
     0.024649,
     -0.009101,
     0.001124,
-    -0.028576,
+    -0.028577,
     0.00517,
     -0.016748,
     -0.015051,
@@ -40756,7 +40761,7 @@
     0.007519,
     0.000981,
     0.00718,
-    0.012376,
+    0.012377,
     0.006835,
     -0.018725,
     -0.017074,
@@ -40769,7 +40774,7 @@
     -0.004294,
     0.000708,
     -0.025894,
-    0.001589,
+    0.001588,
     0.000383,
     0.009204,
     -0.004333,
@@ -40787,7 +40792,7 @@
     0.0177,
     0.000164,
     0.004158,
-    -0.019758,
+    -0.019757,
     -0.008668,
     0.014604,
     0.003374,
@@ -41902,7 +41907,7 @@
     -0.000565,
     0.006948,
     -0.006948,
-    -0.005101,
+    -0.0051,
     -0.001896,
     -0.006282,
     -0.018696,
@@ -41922,7 +41927,7 @@
     -0.003221,
     0.016374,
     -0.005804,
-    0.007668,
+    0.007669,
     0.002047,
     0.001301,
     0.002596,
@@ -41930,7 +41935,7 @@
     -0.001681,
     0.010413,
     -0.018483,
-    0.000753,
+    0.000754,
     0.004321,
     -0.00338,
     0.016233,
@@ -43187,7 +43192,7 @@
     0.011509,
     -0.000935,
     0.0,
-    -0.005979,
+    -0.005978,
     0.000353,
     0.00831,
     0.006854,
@@ -44049,7 +44054,7 @@
      69.86,
      70.49,
      69.96,
-     71.99,
+     72.0,
      71.6,
      76.29,
      72.86,
@@ -44442,8 +44447,8 @@
     0.018442,
     0.020312,
     -0.00375,
-    0.005289,
-    -0.008757,
+    0.00529,
+    -0.008758,
     -0.006377,
     -0.001787,
     -0.02842,
@@ -44464,7 +44469,7 @@
     -0.003351,
     0.008212,
     -0.01436,
-    0.006222,
+    0.006221,
     -0.000584,
     -0.00395,
     0.007303,
@@ -44472,7 +44477,7 @@
     -0.004736,
     0.003791,
     0.003414,
-    -0.000363,
+    -0.000362,
     0.005354,
     -0.009133,
     0.017254,
@@ -45638,11 +45643,11 @@
     0.006441,
     -0.014832,
     0.009393,
-    -0.001114,
+    -0.001113,
     0.002115,
     0.004105,
     0.017018,
-    0.001957,
+    0.001958,
     -0.003483,
     0.000109,
     -0.016155,
@@ -45658,9 +45663,9 @@
     -0.006647,
     0.005636,
     0.009286,
-    -0.007153,
+    -0.007152,
     0.005704,
-    -0.008511,
+    -0.008512,
     0.017062,
     0.002871,
     -0.002981,
@@ -45679,7 +45684,7 @@
     -0.001637,
     0.018073,
     -0.004622,
-    -0.001618,
+    -0.001617,
     -0.005302,
     -0.001303,
     0.00217,
@@ -45695,15 +45700,15 @@
     -0.005256,
     0.003726,
     -0.009452,
-    -0.00365,
-    -0.005223,
+    -0.003651,
+    -0.005222,
     -0.005474,
     -0.012852,
     0.006334,
     0.010208,
     0.014405,
     -0.003527,
-    0.006492,
+    0.006493,
     0.01004,
     -0.002827,
     0.004238,
@@ -46144,17 +46149,45 @@
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting"
   },
   {
-   "question": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
-   "yes": 10,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting"
-  },
-  {
    "question": "Bitcoin Up or Down on July 4?",
    "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-july-4-2026"
+  },
+  {
+   "question": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
+   "yes": 10,
+   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting"
   }
  ],
  "news": [
+  {
+   "source": "Investing.com",
+   "title": "Turkey’s Erdogan says Israel must not scupper US-Iran deal",
+   "link": "https://www.investing.com/news/world-news/turkeys-erdogan-says-israel-must-not-scupper-usiran-deal-4775370",
+   "published": "2026-07-04T15:18:29Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Il turco Erdogan afferma che Israele non deve far fallire l’accordo USA-Iran"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Iran holds state funeral for Khamenei as successor stays out of public view",
+   "link": "https://www.investing.com/news/economy-news/irans-supreme-leaders-funeral-begins-as-hormuz-security-remains-in-focus-4775328",
+   "published": "2026-07-04T14:50:14Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "L'Iran tiene i funerali di stato per Khamenei mentre il successore resta nascosto alla vista del pubblico"
+  },
   {
    "source": "Investing.com",
    "title": "Is AI inflation transitory?",
@@ -46181,20 +46214,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "Khamenei giace nello stato di Teheran mentre l'Iran inizia la settimana delle cerimonie funebri"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Iran holds state funeral for Khamenei as successor stays out of public view",
-   "link": "https://www.investing.com/news/economy-news/irans-supreme-leaders-funeral-begins-as-hormuz-security-remains-in-focus-4775328",
-   "published": "2026-07-04T12:46:37Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "L'Iran tiene i funerali di stato per Khamenei mentre il successore resta nascosto alla vista del pubblico"
   },
   {
    "source": "Investing.com",
@@ -46250,6 +46269,20 @@
    "inv": true,
    "sentiment": "bull",
    "title_it": "IPO di SpaceX: perché inseguire il primo rally può essere pericoloso"
+  },
+  {
+   "source": "Reuters",
+   "title": "Mass grief at Khamenei funeral projects hardline grip on post-war Iran - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNS1NHb181V19lQUxyWlFMQnU5WjNucmZBZHl3NlQtUzZTRFN6aVgweE4tdVJrNVlOYVQzQTExdllpN3NHaWlHcXZTSENOa3hWeEpycTBHdGJLRVhzYlhRdEs1UVk4VE1pR3ZnTzEyb0Z3YmxBUUV5cHJEV2VLMjAzUXp1Q1FfVWY1aWNmYVo3TUgxOXdEdExNenNKT1RyQlRFVWlrakprSWV0Zw?oc=5",
+   "published": "2026-07-04T14:53:37Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Il cordoglio di massa per i funerali di Khamenei proietta una presa dura sull'Iran del dopoguerra - Reuters"
   },
   {
    "source": "Bloomberg",
@@ -46361,6 +46394,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "La BCE è in “buona posizione” visti i dati sull’inflazione, afferma Moulin"
+  },
+  {
+   "source": "AP",
+   "title": "China’s military promotes 2 new generals after anti-corruption purge thins ranks - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQODM3MUhwYWpqSDRBemxhcHIxWkdJdnhFRHN2N2ptWHdwd3hNeFFxeUpoc1Q5ZXk4aUM5LVhWMUR0TnJiNUhLVnRZTkJYS1FTVURUaGFkSHBwYmxnSmhtaHlzMW1FNlRLTm1ORlBrZW54WUM4QS0xemgySlBjTUVrNmV5M254UXZyUVBqVTVBeXR3YmlFV255TkZKQ0lXY1p0RGs4?oc=5",
+   "published": "2026-07-04T09:56:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’esercito cinese promuove 2 nuovi generali dopo che l’epurazione anti-corruzione ha assottigliato i ranghi – AP News"
   },
   {
    "source": "Google News",
@@ -46500,35 +46546,6 @@
   },
   {
    "source": "AP",
-   "title": "Trump administration’s interpretation of slavery under George Washington can be reinstalled - AP News",
-   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQRWxMbEF0emwxOG91eUdzWlMxTlJablZoOWt5dng3TlhxeXFVSFVXanlMQXg3NWdHQlJBRjNVZm9vVWhzTjUxUXZoOHRtckEwWGQxNVBzNzczanRzVHpaTW1ocjhzc0pXMGxXM0Vzc3hHUzQ4VlV2YlAwdmN0R20yTE9wd0lQT2l1ZTB2ekRTRjdOX3hybVEycS1wcFp5bUNuS2M5SjA1NGs?oc=5",
-   "published": "2026-07-03T21:33:00Z",
-   "tickers": [
-    "MACRO",
-    "POL",
-    "BE"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L’interpretazione della schiavitù dell’amministrazione Trump sotto George Washington può essere reinstallata – AP News"
-  },
-  {
-   "source": "Reuters",
-   "title": "Supreme Court's Barrett fuels conservative wins while sometimes splitting with Trump - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPejQtd1h2RDVtZEdDQldiRmxBZURoTlZnTDJZdDlOcHRfQ2tyb0ZMTVJ5MThCRlBTWVlic1BYTTIzWm9vU1owb0ZBcUVGVlFNUkNiTU9yd1N2Q3BaWjBIZHJZTEYyQnZhTTAyNjVzY1g5NkZic2RzckthT0hlUEZtZmxzZkRlN2VaSzVBS0VZOGtoMUlfZ29SSXNNb2hvWFNWa0FEUXBmOEdxQWRpVjM0UGE5WHdqcGlCNkZ3dXZ0ZWJ5Q2VxTGhlb1BR?oc=5",
-   "published": "2026-07-03T21:05:17Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bull",
-   "title_it": "Barrett della Corte Suprema alimenta le vittorie dei conservatori mentre a volte si divide con Trump - Reuters"
-  },
-  {
-   "source": "AP",
    "title": "Belgian diamond group that won tariff relief gifted Trump a lavishly encrusted ring - AP News",
    "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPa25PQUJ3V2t0TVBBQVdWamJDaDlsZThkeENjS2c0Z1JtNDExZmY4NUpXSVR1VFZTVTBhc3dqaEF1cHVDbTRNWUYzMHBTT19pRlBRaFJ4QVNCMk1oTFJKYUE5SS1tcFZyRktCM2tTaFJJcjgyVldYOXhWemQ3cnJSdm9Oelg2QXRtTlhwa25ETHFIQk9mUjJscUlR?oc=5",
    "published": "2026-07-03T20:13:00Z",
@@ -46539,7 +46556,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "Il gruppo belga di diamanti che ha ottenuto uno sgravio tariffario ha regalato a Trump un anello riccamente tempestato - AP News"
+   "title_it": "Il gruppo belga di diamanti che ha ottenuto uno sgravio tariffario ha regalato a Trump un anello riccamente incrostato - AP News"
   },
   {
    "source": "AP",
@@ -46795,35 +46812,11 @@
    "title_it": "Il Bitcoin scivola via con gli afflussi istituzionali, le strategie aziendali rimangono al centro dell’attenzione"
   },
   {
-   "source": "Investing.com",
-   "title": "Bitcoin battles $63K resistance fortress: Live levels",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-in-bear-flag-near-annual-low-live-levels-93CH-4764319",
-   "published": "2026-07-04T07:02:03Z",
-   "tickers": [
-    "BTC-USD"
-   ],
-   "topic_pri": 2,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Bitcoin combatte la fortezza di resistenza da 63.000 dollari: livelli live"
-  },
-  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 90%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-07-04T14:50:45Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
-   "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 10%",
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
-   "published": "2026-07-04T14:50:45Z",
+   "published": "2026-07-04T15:40:26Z",
    "tickers": [
     "MACRO"
    ],
@@ -46834,7 +46827,18 @@
    "title": "Bitcoin Up or Down on July 4?",
    "title_it": "Bitcoin Up or Down on July 4? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-july-4-2026",
-   "published": "2026-07-04T14:50:45Z",
+   "published": "2026-07-04T15:40:26Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
+   "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 10%",
+   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
+   "published": "2026-07-04T15:40:26Z",
    "tickers": [
     "MACRO"
    ],
