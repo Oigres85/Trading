@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-07-05T07:19:44Z",
+ "updated_at": "2026-07-05T07:53:27Z",
  "eurusd": 1.144,
  "totals": {
   "usd_value": 269963.16,
@@ -10541,21 +10541,21 @@
    "name": "Bitcoin",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 62713.58,
-   "change_pct": 0.27,
+   "price": 62928.55,
+   "change_pct": 0.61,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -50.3,
-   "sma200_dist_pct": -16.2,
+   "ath_dist_pct": -50.1,
+   "sma200_dist_pct": -15.9,
    "w52_high": 126198.07,
-   "w52_dist_pct": -50.3,
+   "w52_dist_pct": -50.1,
    "support": 57747.77,
    "resistance": 67248.13,
-   "rsi": 48.5,
-   "volume": 17554432000,
+   "rsi": 49.3,
+   "volume": 17598070784,
    "vol_ratio": 0.58,
    "atr_14": 2121.46,
-   "atr_pct": 3.38,
+   "atr_pct": 3.37,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -10564,7 +10564,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62713.58
+     62928.55
     ],
     "m6": [
      65738.1,
@@ -10692,7 +10692,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62713.58
+     62928.55
     ],
     "all": [
      386.94,
@@ -10837,7 +10837,7 @@
      76304.32,
      73579.69,
      58558.86,
-     62713.58
+     62921.33
     ],
     "m1": [
      64421.32,
@@ -10861,7 +10861,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62713.58
+     62928.55
     ],
     "m3": [
      76304.32,
@@ -10929,7 +10929,7 @@
      60003.76,
      61485.3,
      62544.2,
-     62713.58
+     62928.55
     ],
     "y1": [
      108231.18,
@@ -11050,16 +11050,20 @@
      62700.01,
      62731.18,
      62718.81,
-     62702.5
+     62702.5,
+     62730.36,
+     62783.09,
+     62863.48,
+     62921.33
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 35,
+   "health": 36,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -1.15,
-   "sortino_1y": -1.49,
+   "sharpe_1y": -1.14,
+   "sortino_1y": -1.48,
    "prepost": null,
    "sector": "CRYPTOCURRENCY",
    "stats": null,
@@ -11067,22 +11071,22 @@
     "w1": {
      "support": 57747.77,
      "resistance": 63087.74,
-     "change_pct": 7.09
+     "change_pct": 7.46
     },
     "m1": {
      "support": 57747.77,
      "resistance": 67248.13,
-     "change_pct": -2.65
+     "change_pct": -2.32
     },
     "m3": {
      "support": 57747.77,
      "resistance": 82792.21,
-     "change_pct": -17.81
+     "change_pct": -17.53
     },
     "y1": {
      "support": 57747.77,
      "resistance": 116273.31,
-     "change_pct": -45.22
+     "change_pct": -45.03
     }
    },
    "financials": [],
@@ -11107,9 +11111,9 @@
      "hi": 59940.35
     }
    },
-   "rs_1m": -1.0,
+   "rs_1m": -0.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.7,
+   "rs_ndx_1m": 2.0,
    "beta_ndx": 0.93,
    "avg_corr": 0.34,
    "max_corr": 0.79,
@@ -30337,7 +30341,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 53
+     "score": 56
     },
     {
      "label": "Treasury 10A",
@@ -33426,8 +33430,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1679080230578,
-   "change_pct": -0.23
+   "mcap_usd": 1680368886523,
+   "change_pct": -0.15
   },
   {
    "ticker": "META",
@@ -33679,7 +33683,7 @@
      79.78,
      82.81,
      80.91,
-     85.4,
+     85.39,
      82.75,
      82.32,
      80.48,
@@ -33836,7 +33840,7 @@
      109.14,
      102.59,
      106.75,
-     108.01,
+     108.02,
      110.72,
      113.53,
      111.46,
@@ -34287,7 +34291,7 @@
     -0.000733,
     0.001894,
     0.000143,
-    0.008472,
+    0.008471,
     0.000331,
     0.004215,
     -0.000251,
@@ -34317,7 +34321,7 @@
     -0.005982,
     -0.007438,
     0.005405,
-    0.008323,
+    0.008322,
     -0.0029,
     0.002454,
     0.002309,
@@ -34334,7 +34338,7 @@
     -0.003187,
     -0.004624,
     0.005713,
-    0.002806,
+    0.002807,
     0.00376,
     0.003402,
     0.001151,
@@ -34379,7 +34383,7 @@
     0.00688,
     0.005444,
     -0.004576,
-    0.001851,
+    0.00185,
     0.003457,
     0.000731,
     0.001898,
@@ -35562,10 +35566,10 @@
     0.018283,
     -0.006813,
     0.012505,
-    0.003379,
+    0.003378,
     0.009285,
     -0.002963,
-    0.01249,
+    0.012491,
     0.0005,
     -0.000776,
     -0.004407,
@@ -35579,7 +35583,7 @@
     0.001536,
     0.00624,
     -0.011643,
-    -0.008416,
+    -0.008415,
     0.007837,
     0.009011,
     0.001442,
@@ -35587,17 +35591,17 @@
     0.002829,
     0.000327,
     0.005804,
-    0.004407,
-    0.008521,
-    -0.000845,
+    0.004408,
+    0.00852,
+    -0.000846,
     -0.001998,
     0.008977,
-    0.006747,
+    0.006746,
     0.005903,
-    -0.006665,
+    -0.006664,
     -0.003517,
     -0.004321,
-    0.004102,
+    0.004103,
     0.00462,
     0.002735,
     0.004786,
@@ -35618,7 +35622,7 @@
     -0.009681,
     0.008371,
     0.010622,
-    0.017653,
+    0.017652,
     0.00766,
     0.004493,
     -0.015407,
@@ -35651,7 +35655,7 @@
     0.001233,
     0.004087,
     -0.00324,
-    -0.019304,
+    -0.019303,
     -0.005032,
     0.00198,
     -0.018711,
@@ -36453,7 +36457,7 @@
      169.0,
      183.61,
      192.5,
-     204.44,
+     204.45,
      207.3,
      211.0,
      211.58,
@@ -36857,7 +36861,7 @@
     0.002188,
     0.00629,
     0.00739,
-    0.003978,
+    0.003979,
     -0.010795,
     0.01043,
     -0.006465,
@@ -36877,7 +36881,7 @@
     -0.008552,
     -0.008095,
     0.00562,
-    -0.003214,
+    -0.003213,
     -0.017426,
     0.014325,
     -0.017855,
@@ -36887,7 +36891,7 @@
     -0.00246,
     -0.028518,
     0.00291,
-    -0.020076,
+    -0.020075,
     0.003046,
     -0.000171,
     -0.01868,
@@ -36905,7 +36909,7 @@
     0.002071,
     0.013513,
     0.011666,
-    -0.01544,
+    -0.015441,
     -0.007592,
     -0.004743,
     -0.010701,
@@ -36944,8 +36948,8 @@
     -0.018166,
     0.035292,
     0.006994,
-    -0.002702,
-    -0.004556,
+    -0.002701,
+    -0.004557,
     -0.02063,
     0.013091,
     0.000304,
@@ -38679,7 +38683,7 @@
      41.36,
      42.3,
      42.9,
-     40.23,
+     40.22,
      40.12,
      40.54,
      41.16,
@@ -38905,7 +38909,7 @@
      89.2,
      86.86,
      93.5,
-     88.97,
+     88.96,
      93.27,
      93.59,
      90.76,
@@ -39244,7 +39248,7 @@
     0.002729,
     0.003062,
     -0.005791,
-    -0.00171,
+    -0.001709,
     -0.004344,
     0.001145,
     -0.005048,
@@ -39276,10 +39280,10 @@
     -0.010373,
     -0.001908,
     -0.003601,
-    0.006966,
+    0.006965,
     -0.003814,
     0.0,
-    -0.0009,
+    -0.000899,
     0.008178,
     -0.002905,
     0.002579,
@@ -39287,13 +39291,13 @@
     -0.0019,
     -0.007975,
     0.005735,
-    0.000784,
-    -0.000784,
+    0.000785,
+    -0.000785,
     0.016018,
     -0.000552,
     0.003197,
-    -0.002204,
-    0.007473,
+    -0.002203,
+    0.007472,
     -0.001534,
     0.00383,
     0.004903,
@@ -39325,13 +39329,13 @@
     0.004423,
     -0.004755,
     -0.012527,
-    0.000451,
+    0.00045,
     0.002811,
     -0.005404,
     -0.004639,
-    -0.003295,
+    -0.003294,
     0.001024,
-    0.003857,
+    0.003858,
     -0.00136,
     -0.009685,
     0.000687,
@@ -39350,7 +39354,7 @@
     0.004929,
     -0.00206,
     0.005826,
-    -0.005025,
+    -0.005024,
     0.006618,
     -0.002961,
     0.00171,
@@ -39363,7 +39367,7 @@
     0.002733,
     0.004765,
     -0.006245,
-    -0.00228,
+    -0.002281,
     0.000228,
     -0.005608,
     -0.002861,
@@ -40456,14 +40460,14 @@
     0.012069,
     0.001949,
     0.008833,
-    -0.005865,
+    -0.005866,
     0.015429,
     0.001726,
     -0.003995,
     -0.006294,
     0.002896,
     -0.019082,
-    -0.007168,
+    -0.007169,
     -0.00265,
     0.01757,
     -0.002437,
@@ -40474,7 +40478,7 @@
     -0.010398,
     0.00447,
     0.006674,
-    0.001791,
+    0.00179,
     0.008734,
     0.001177,
     0.012924,
@@ -40485,7 +40489,7 @@
     -0.003694,
     0.017599,
     0.009299,
-    0.016035,
+    0.016034,
     -0.01033,
     -0.007402,
     -0.003022,
@@ -40525,8 +40529,8 @@
     0.001124,
     -0.028577,
     0.00517,
-    -0.016747,
-    -0.015051,
+    -0.016748,
+    -0.015052,
     0.006775,
     -0.0301,
     0.004447,
@@ -40572,7 +40576,7 @@
     0.007519,
     0.000981,
     0.00718,
-    0.012377,
+    0.012376,
     0.006835,
     -0.018725,
     -0.017074,
@@ -40585,7 +40589,7 @@
     -0.004294,
     0.000708,
     -0.025894,
-    0.001588,
+    0.001589,
     0.000383,
     0.009204,
     -0.004333,
@@ -40603,7 +40607,7 @@
     0.0177,
     0.000164,
     0.004158,
-    -0.019757,
+    -0.019758,
     -0.008668,
     0.014604,
     0.003374,
@@ -41741,7 +41745,7 @@
     0.007669,
     0.002047,
     0.001301,
-    0.002597,
+    0.002596,
     -0.007436,
     -0.001681,
     0.010413,
@@ -41776,7 +41780,7 @@
     0.0,
     -0.028192,
     0.008082,
-    0.011623,
+    0.011622,
     -0.001137,
     -0.005706,
     0.002096,
@@ -41819,7 +41823,7 @@
     -0.006385,
     -0.000183,
     -0.001649,
-    0.005485,
+    0.005486,
     0.012204,
     0.001986,
     0.005398,
@@ -42990,22 +42994,22 @@
     -0.003782,
     0.011302,
     0.009715,
-    -0.01438,
+    -0.014381,
     -0.005375,
     -0.018751,
     -0.002222,
     0.001287,
     -0.009282,
     -0.003903,
-    0.006378,
+    0.006379,
     -0.008039,
     0.004855,
     0.011509,
-    -0.000934,
+    -0.000935,
     0.0,
     -0.005978,
     0.000353,
-    0.008311,
+    0.00831,
     0.006854,
     0.02017,
     0.002606,
@@ -43040,7 +43044,7 @@
     0.004937,
     0.001566,
     -0.005828,
-    -0.013693,
+    -0.013694,
     -0.02937,
     0.01352,
     -0.000116,
@@ -43056,8 +43060,8 @@
     -0.010476,
     0.007413,
     -0.005926,
-    0.007289,
-    0.000113,
+    0.007288,
+    0.000114,
     -0.010837,
     0.002634,
     0.009676,
@@ -43098,7 +43102,7 @@
     0.009457,
     0.007591,
     -0.005576,
-    0.020807,
+    0.020806,
     0.026801,
     -0.02702,
     -0.011237,
@@ -43129,7 +43133,7 @@
     -0.018356,
     0.006831,
     -0.011101,
-    0.018982,
+    0.018981,
     0.007275,
     -0.005452,
     0.004908,
@@ -43145,7 +43149,7 @@
     -0.004429,
     -0.012867,
     0.024517,
-    0.009259,
+    0.009258,
     0.003298,
     0.00346,
     0.01048,
@@ -43840,7 +43844,7 @@
      63.79,
      58.71,
      55.36,
-     59.63,
+     59.64,
      59.44,
      60.47,
      55.8,
@@ -44265,7 +44269,7 @@
     -0.02842,
     0.005353,
     0.014235,
-    -0.003841,
+    -0.003842,
     -0.015133,
     -0.01156,
     0.008875,
@@ -44273,14 +44277,14 @@
     0.006884,
     0.01588,
     0.005014,
-    0.016657,
+    0.016656,
     -0.002352,
     0.006382,
     0.005397,
     -0.003351,
     0.008212,
     -0.01436,
-    0.006222,
+    0.006221,
     -0.000584,
     -0.00395,
     0.007303,
@@ -44312,14 +44316,14 @@
     0.000763,
     0.001939,
     -0.002217,
-    -0.014531,
+    -0.01453,
     -0.001127,
     0.002744,
     0.001544,
     -0.001685,
     0.006653,
-    0.010553,
-    0.002346,
+    0.010554,
+    0.002345,
     0.005703,
     0.000548,
     -6.8e-05,
@@ -44332,10 +44336,10 @@
     0.00449,
     0.003852,
     0.00192,
-    0.00137,
+    0.001369,
     0.00777,
     0.022823,
-    0.014103,
+    0.014102,
     -0.000524,
     -0.005976,
     -0.000857,
@@ -44346,17 +44350,17 @@
     0.004195,
     0.022356,
     -0.002207,
-    -0.004873,
+    -0.004872,
     -0.015083,
     -0.006007,
     0.004654,
     -0.007638,
     -0.004167,
-    -0.012012,
+    -0.012013,
     -0.009755,
-    0.014432,
-    0.009421,
-    0.00312,
+    0.014433,
+    0.00942,
+    0.003121,
     0.013155,
     -0.01309,
     -0.001819,
@@ -45446,7 +45450,7 @@
     }
    },
    "_ret_series": [
-    -0.008591,
+    -0.00859,
     -0.001458,
     0.000785,
     0.006259,
@@ -45956,7 +45960,7 @@
  "predictions": [
   {
    "question": "Will Bitcoin reach $64,000 June 29-July 5?",
-   "yes": 18,
+   "yes": 23,
    "link": "https://polymarket.com/event/will-bitcoin-reach-64k-june-29-july-5-2026"
   },
   {
@@ -45965,17 +45969,40 @@
    "link": "https://polymarket.com/event/bitcoin-above-60k-on-july-5-2026"
   },
   {
-   "question": "Will the price of Bitcoin be above $54,000 on July 5?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-54k-on-july-5-2026"
-  },
-  {
    "question": "Will the price of Bitcoin be above $64,000 on July 5?",
-   "yes": 3,
+   "yes": 4,
    "link": "https://polymarket.com/event/bitcoin-above-64k-on-july-5-2026"
   }
  ],
  "news": [
+  {
+   "source": "Investing.com",
+   "title": "Three sons of Iran’s slain leader Khamenei appear at funeral, not his successor",
+   "link": "https://www.investing.com/news/world-news/three-sons-of-irans-slain-leader-khamenei-appear-at-funeral-not-his-successor-4775406",
+   "published": "2026-07-05T07:42:27Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Al funerale compaiono tre figli del leader iraniano Khamenei ucciso, non il suo successore"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Millions mourn Khamenei as Trump says Iran talks to resume soon",
+   "link": "https://www.investing.com/news/economy-news/millions-mourn-khamenei-as-trump-says-iran-talks-to-resume-soon-4775407",
+   "published": "2026-07-05T07:24:15Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Milioni di persone piangono Khamenei mentre Trump afferma che i colloqui con l’Iran riprenderanno presto"
+  },
   {
    "source": "Investing.com",
    "title": "Trump marks America’s 250th birthday with National Mall address",
@@ -46002,46 +46029,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "Una ONG cristiana accoglie con favore il rilascio del pastore detenuto nel sud della Cina"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Trump gives campaign-style July 4 speech on National Mall for US 250th anniversary",
-   "link": "https://www.investing.com/news/politics-news/trump-to-mark-us-250th-anniversary-with-campaignstyle-rally-on-national-mall-4775359",
-   "published": "2026-07-05T05:12:24Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Trump tiene un discorso in stile elettorale il 4 luglio al National Mall per il 250° anniversario degli Stati Uniti"
-  },
-  {
-   "source": "Investing.com",
-   "title": "China seeks closer business ties with Europe as Wang meets Wallenberg",
-   "link": "https://www.investing.com/news/economy-news/china-seeks-closer-business-ties-with-europe-as-wang-meets-wallenberg-4775400",
-   "published": "2026-07-05T04:52:33Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "La Cina cerca legami commerciali più stretti con l’Europa mentre Wang incontra Wallenberg"
-  },
-  {
-   "source": "Investing.com",
-   "title": "New Zealand pledges seven new trade negotiations if National Party wins election",
-   "link": "https://www.investing.com/news/economy-news/new-zealand-pledges-seven-new-trade-negotiations-if-national-party-wins-election-4775396",
-   "published": "2026-07-05T03:30:16Z",
-   "tickers": [
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "bull",
-   "title_it": "La Nuova Zelanda promette sette nuovi negoziati commerciali se il Partito Nazionale vince le elezioni"
   },
   {
    "source": "Investing.com",
@@ -46140,6 +46127,20 @@
    "title_it": "Gli alti funzionari iraniani partecipano alla preghiera per il defunto leader supremo, l'Ayatollah Ali Khamenei, a Teheran - AP News"
   },
   {
+   "source": "CNBC",
+   "title": "Trump gives campaign-style July 4 speech on National Mall for U.S. 250th anniversary",
+   "link": "https://www.cnbc.com/2026/07/05/trump-gives-campaign-style-july-4-speech-on-national-mall.html",
+   "published": "2026-07-05T06:23:16Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump tiene un discorso in stile elettorale il 4 luglio al National Mall per il 250° anniversario degli Stati Uniti"
+  },
+  {
    "source": "AP",
    "title": "Trump mixes patriotism with partisanship as he celebrates America's 'joyous' 250th anniversary - AP News",
    "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNeFlpZFpJamx2a3psVFBHZDdSN0pyVkNzT2lDQmYyajlWRXFNWHNJTENnNWc5R1c2STlBWF9IazBhV2pWRUpuVzZ5a1BhbDE1d29FUmpOb0JkMEhEZ1JlenNQSUdDZ09JRURiTFF2aUpieFN5cHJnSHpNeUdvYWQtT1M4d0oxdk9Ed0RyNm4tSFc4d3BpVVJQeUJpR1JMcjg?oc=5",
@@ -46206,19 +46207,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Wang Yi afferma che la Cina accoglie favorevolmente relazioni commerciali europee più forti"
-  },
-  {
-   "source": "AP",
-   "title": "China’s military promotes 2 new generals after anti-corruption purge thins ranks - AP News",
-   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQODM3MUhwYWpqSDRBemxhcHIxWkdJdnhFRHN2N2ptWHdwd3hNeFFxeUpoc1Q5ZXk4aUM5LVhWMUR0TnJiNUhLVnRZTkJYS1FTVURUaGFkSHBwYmxnSmhtaHlzMW1FNlRLTm1ORlBrZW54WUM4QS0xemgySlBjTUVrNmV5M254UXZyUVBqVTVBeXR3YmlFV255TkZKQ0lXY1p0RGs4?oc=5",
-   "published": "2026-07-05T01:50:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L’esercito cinese promuove 2 nuovi generali dopo che l’epurazione anti-corruzione ha assottigliato i ranghi – AP News"
   },
   {
    "source": "Reuters",
@@ -46384,6 +46372,19 @@
    "inv": false,
    "sentiment": "bear",
    "title_it": "La storia della USS Intrepid abbraccia la guerra, lo spazio e l'11 settembre"
+  },
+  {
+   "source": "AP",
+   "title": "China’s military promotes 2 new generals after anti-corruption purge thins ranks - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQODM3MUhwYWpqSDRBemxhcHIxWkdJdnhFRHN2N2ptWHdwd3hNeFFxeUpoc1Q5ZXk4aUM5LVhWMUR0TnJiNUhLVnRZTkJYS1FTVURUaGFkSHBwYmxnSmhtaHlzMW1FNlRLTm1ORlBrZW54WUM4QS0xemgySlBjTUVrNmV5M254UXZyUVBqVTVBeXR3YmlFV255TkZKQ0lXY1p0RGs4?oc=5",
+   "published": "2026-07-04T13:36:20Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’esercito cinese promuove 2 nuovi generali dopo che l’epurazione anti-corruzione ha assottigliato i ranghi – AP News"
   },
   {
    "source": "Google News",
@@ -46576,9 +46577,9 @@
   {
    "source": "Polymarket",
    "title": "Will Bitcoin reach $64,000 June 29-July 5?",
-   "title_it": "Will Bitcoin reach $64,000 June 29-July 5? — probabilità Sì 18%",
+   "title_it": "Will Bitcoin reach $64,000 June 29-July 5? — probabilità Sì 26%",
    "link": "https://polymarket.com/event/will-bitcoin-reach-64k-june-29-july-5-2026",
-   "published": "2026-07-05T07:21:03Z",
+   "published": "2026-07-05T07:54:22Z",
    "tickers": [
     "MACRO"
    ],
@@ -46589,18 +46590,7 @@
    "title": "Will the price of Bitcoin be above $60,000 on July 5?",
    "title_it": "Will the price of Bitcoin be above $60,000 on July 5? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-60k-on-july-5-2026",
-   "published": "2026-07-05T07:21:03Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the price of Bitcoin be above $54,000 on July 5?",
-   "title_it": "Will the price of Bitcoin be above $54,000 on July 5? — probabilità Sì 100%",
-   "link": "https://polymarket.com/event/bitcoin-above-54k-on-july-5-2026",
-   "published": "2026-07-05T07:21:03Z",
+   "published": "2026-07-05T07:54:22Z",
    "tickers": [
     "MACRO"
    ],
@@ -46609,9 +46599,9 @@
   {
    "source": "Polymarket",
    "title": "Will the price of Bitcoin be above $64,000 on July 5?",
-   "title_it": "Will the price of Bitcoin be above $64,000 on July 5? — probabilità Sì 3%",
+   "title_it": "Will the price of Bitcoin be above $64,000 on July 5? — probabilità Sì 4%",
    "link": "https://polymarket.com/event/bitcoin-above-64k-on-july-5-2026",
-   "published": "2026-07-05T07:21:03Z",
+   "published": "2026-07-05T07:54:22Z",
    "tickers": [
     "MACRO"
    ],
@@ -79429,6 +79419,6 @@
    "forward_pe: missing — fonte ko in questo run: conferma leva/valutazioni impossibile",
    "sp500_pe: missing — fonte ko in questo run: conferma leva/valutazioni impossibile"
   ],
-  "generated_at": "2026-07-05T07:21:03Z"
+  "generated_at": "2026-07-05T07:54:23Z"
  }
 }
