@@ -134,6 +134,7 @@ async function loadData(showSpin = false) {
     }
     if (lastErr) throw lastErr;
     mergeManualHoldings();        // reintegra le posizioni aggiunte a mano (localStorage)
+    applyMacroOverrides();        // correzioni manuali dei dati macro flaggati (decadono da sole)
     renderAll();
     livePrices();
     if (showSpin) toast("Dati ricaricati ✓");
@@ -720,6 +721,7 @@ function reconcileState() {
   return out;
 }
 
+
 /* DATA ASSERTIONS lato client (post-incidente margin debt congelato a $622 mld Z.1):
    legge data_quality dalla pipeline e, se assente (JSON vecchio), ricalcola i check
    critici in locale. Un dato DATATO o INAFFIDABILE deve URLARE: banner in dashboard
@@ -727,8 +729,22 @@ function reconcileState() {
 function validateMacroData() {
   const dq = DATA?.data_quality;
   const m = DATA?.macro || {};
-  const out = { bad: [], stale: [], flags: {} };   // flags[key] = testo da iniettare nel prompt
+  const out = { bad: [], stale: [], overrides: [], flags: {} };   // flags[key] = testo per il prompt
+  const overridden = (key) => {
+    if (key === "forward_pe") return m.forward_pe?.manual_override && m.forward_pe;
+    if (key === "sp500_pe") return m.sp500_pe?.manual_override && m.sp500_pe;
+    if (key === "margin_debt") return m.margin_debt?.manual_override && m.margin_debt;
+    if (key === "vix") return m.vix?.manual_override && m.vix;
+    const ind = (m.indicators || []).find(i => i.key === key);
+    return ind?.manual_override ? ind : null;
+  };
   const classify = (key, status, note) => {
+    const ovNode = overridden(key);
+    if (ovNode) {   // corretto a mano: allarme SPENTO, provenienza dichiarata nel prompt
+      out.overrides.push({ key, date: (ovNode.override_date || "").slice(0, 10) });
+      out.flags[key] = `[MANUAL_OVERRIDE — valore inserito dall'utente il ${(ovNode.override_date || "").slice(0, 10) || "n.d."}]`;
+      return;
+    }
     if (status === "implausible" || status === "unreliable" || status === "missing") {
       out.bad.push({ key, status, note });
       out.flags[key] = `[!!! DATATO / UNRELIABLE !!!${note ? " " + note : ""}]`;
@@ -749,8 +765,146 @@ function validateMacroData() {
     if (md && ageD(md.date) > 90) classify("margin_debt", "stale", "");
     if (m.vix && m.vix.value != null && !(m.vix.value >= 5 && m.vix.value <= 150)) classify("vix", "implausible", `VIX ${m.vix.value}`);
   }
-  out.ok = !out.bad.length && !out.stale.length;
+  out.ok = !out.bad.length && !out.stale.length;   // gli override attivi NON sono allarme
   return out;
+}
+
+/* ---------------- MANUAL OVERRIDE dei dati macro flaggati ----------------
+   L'utente può correggere a mano un dato missing/stale/unreliable dal popup del banner.
+   Regole di onestà: (1) l'override si applica SOLO finché la pipeline resta rotta su quel
+   dato — quando torna un dato vero e fresco, l'override decade automaticamente;
+   (2) ogni valore corretto a mano è marcato manual_override e nel prompt appare come
+   [MANUAL_OVERRIDE] con la data d'inserimento: mai spacciato per dato di fonte. */
+const OVERRIDE_PATH = "config/macro_overrides.json";
+function loadOverrides() {
+  try { return JSON.parse(localStorage.getItem("macro_overrides") || "{}"); } catch { return {}; }
+}
+function saveOverrides(o) {
+  localStorage.setItem("macro_overrides", JSON.stringify(o));
+  pushOverridesCloud(o);   // sync su GitHub se c'è token (stesso pattern del diario)
+}
+async function pushOverridesCloud(o) {
+  const token = localStorage.getItem("gh_token");
+  if (!token) return;
+  try {
+    let sha;
+    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${OVERRIDE_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
+    if (g.ok) sha = (await g.json()).sha;
+    await fetch(`https://api.github.com/repos/${REPO}/contents/${OVERRIDE_PATH}`, {
+      method: "PUT", headers: ghHeaders(token),
+      body: JSON.stringify({ message: "Override manuale dati macro", content: btoa(unescape(encodeURIComponent(JSON.stringify(o, null, 1)))), sha }),
+    });
+  } catch { /* offline: resta in locale */ }
+}
+async function loadOverridesCloud() {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${OVERRIDE_PATH}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return;
+    const cloud = await r.json();
+    if (cloud && typeof cloud === "object") {
+      const local = loadOverrides();
+      // vince il più recente per chiave
+      Object.entries(cloud).forEach(([k, v]) => {
+        if (!local[k] || (v.savedAt || "") > (local[k].savedAt || "")) local[k] = v;
+      });
+      localStorage.setItem("macro_overrides", JSON.stringify(local));
+    }
+  } catch { /* nessun override remoto */ }
+}
+
+/* stato pipeline per chiave (dai check data_quality), PRIMA degli override */
+function dqStatusOf(key) {
+  const c = (DATA?.data_quality?.checks || []).find(x => x.key === key);
+  return c ? c.status : null;
+}
+
+/* applica gli override ai dati in memoria; ritorna le chiavi applicate */
+function applyMacroOverrides() {
+  const m = DATA?.macro;
+  if (!m) return [];
+  const ov = loadOverrides();
+  const applied = [];
+  let changed = false;
+  Object.entries(ov).forEach(([key, o]) => {
+    const st = dqStatusOf(key);
+    const broken = st == null || ["missing", "unreliable", "implausible", "stale"].includes(st);
+    if (!broken) { delete ov[key]; changed = true; return; }   // pipeline guarita → override decade
+    const v = parseFloat(o.value);
+    if (!(v > 0)) return;
+    if (key === "forward_pe") {
+      m.forward_pe = { value: v, avg_hist: 16.5,
+        label: v > 22 ? "Estremo" : v > 18 ? "Elevato" : v > 14 ? "Normale" : "Conveniente",
+        manual_override: true, override_date: o.savedAt };
+    } else if (key === "sp500_pe") {
+      m.sp500_pe = Object.assign(m.sp500_pe || { history: [] }, {
+        current: v, label: v > 25 ? "Sopravvalutazione" : v > 20 ? "Valutazione elevata" : "Valutazione normale",
+        manual_override: true, override_date: o.savedAt });
+    } else if (key === "margin_debt") {
+      const peak = Math.max(v, 935904, m.margin_debt?.peak || 0);
+      m.margin_debt = Object.assign(m.margin_debt || {}, {
+        value: v, peak, pct_of_peak: Math.round(v / peak * 1000) / 10,
+        date: o.date || m.margin_debt?.date, series: "FINRA debit balances (override manuale)",
+        manual_override: true, override_date: o.savedAt });
+      delete m.margin_debt.unreliable;
+    } else if (key === "vix") {
+      m.vix = Object.assign(m.vix || {}, { value: v, manual_override: true, override_date: o.savedAt });
+    } else {   // indicatori (pmi, cpi, pce, gdp, nfp...)
+      const ind = (m.indicators || []).find(i => i.key === key);
+      if (ind) { ind.value = String(o.value); ind.manual_override = true; ind.override_date = o.savedAt; ind.date = (o.savedAt || "").slice(0, 10) || ind.date; }
+    }
+    applied.push(key);
+  });
+  if (changed) saveOverrides(ov);
+  return applied;
+}
+
+/* popup di correzione: input per ogni dato flaggato, salva → override + allarme spento */
+function openDataQualityModal() {
+  const v = validateMacroData();
+  const items = [...v.bad.map(b => ({ ...b, sev: "bad" })), ...v.stale.map(s2 => ({ ...s2, status: "stale", sev: "stale" }))];
+  const ov = loadOverrides();
+  if (!items.length && !Object.keys(ov).length) { toast("Nessun dato macro da correggere ✓"); return; }
+  const HINTS = {
+    forward_pe: "Forward P/E S&P 500 (es. 21.7 — wsj.com/market-data/stocks/peyields)",
+    sp500_pe: "P/E trailing S&P 500 (es. 25.4)",
+    margin_debt: "Margin Debt FINRA in $ MILIONI (es. 1415557 = $1,42T — finra.org margin statistics)",
+    pmi: "ISM Manufacturing PMI (es. 48.5)", vix: "VIX spot", cpi: "CPI YoY % (es. 4.3)", pce: "PCE YoY %",
+  };
+  const rows = items.map(it => `
+    <div class="edp-row"><span class="edp-tk"><b>${esc(it.key)}</b> <span class="muted">(${esc(it.status)})</span><br>
+      <span class="muted" style="font-size:10px">${esc(HINTS[it.key] || "valore numerico")}</span></span>
+      <input type="number" step="any" inputmode="decimal" id="ov-${esc(it.key)}" placeholder="valore corretto" value="${ov[it.key]?.value ?? ""}">
+      ${it.key === "margin_debt" ? `<input type="month" id="ov-date-${esc(it.key)}" value="${(ov[it.key]?.date || new Date().toISOString().slice(0, 7))}">` : "<span></span>"}
+    </div>`).join("");
+  const active = Object.keys(ov).length ? `<div class="info-line muted" style="font-size:11px;margin-top:8px">Override attivi: ${Object.entries(ov).map(([k, o]) => `${k}=${o.value}`).join(", ")} — decadono da soli quando la pipeline torna a fornire il dato vero.</div>` : "";
+  openInfoModal("Correggi dati macro (override manuale)",
+    `<div class="info-line" style="margin-bottom:8px">Inserisci i valori corretti per i dati che la pipeline non riesce a fornire. Verranno usati da dashboard e prompt AI marcati <b>[MANUAL_OVERRIDE]</b> con la data d'inserimento, e <b>decadranno automaticamente</b> quando la fonte tornerà a funzionare.</div>
+     ${rows || '<div class="muted">Nessun dato flaggato al momento.</div>'}${active}
+     <div class="edp-actions"><button class="btn btn-primary btn-sm" id="ov-save">Salva override</button>
+     <button class="btn btn-ghost btn-sm" id="ov-clear">Rimuovi tutti</button></div>`);
+  $("#ov-save")?.addEventListener("click", () => {
+    const o = loadOverrides();
+    const now = new Date().toISOString();
+    items.forEach(it => {
+      const inp = $(`#ov-${it.key}`);
+      const val = parseFloat(inp?.value);
+      if (val > 0) {
+        o[it.key] = { value: val, savedAt: now };
+        const dt = $(`#ov-date-${it.key}`);
+        if (dt && dt.value) o[it.key].date = dt.value + "-01";
+      }
+    });
+    saveOverrides(o);
+    applyMacroOverrides();
+    renderAll();
+    closeChartModal();
+    toast("Override salvati — allarme spento per i dati corretti ✓");
+  });
+  $("#ov-clear")?.addEventListener("click", () => {
+    saveOverrides({});
+    toast("Override rimossi — al prossimo caricamento tornano i dati (e gli allarmi) della pipeline");
+    closeChartModal();
+  });
 }
 
 function renderDataQualityAlert() {
@@ -762,7 +916,10 @@ function renderDataQualityAlert() {
   const st = v.stale.map(s => esc(s.key)).join(", ");
   box.hidden = false;
   box.className = "data-error";
-  box.innerHTML = `⚠ <b>QUALITÀ DATI MACRO</b> — ${bad ? `INAFFIDABILI: ${bad}. ` : ""}${st ? `Datati oltre la cadenza attesa: ${st}.` : ""} Il prompt AI marca questi dati con flag espliciti; non basare decisioni di leva/macro su di essi senza verifica web.`;
+  box.style.cursor = "pointer";
+  box.title = "Clicca per correggere manualmente i dati flaggati";
+  box.innerHTML = `⚠ <b>QUALITÀ DATI MACRO</b> — ${bad ? `INAFFIDABILI: ${bad}. ` : ""}${st ? `Datati oltre la cadenza attesa: ${st}.` : ""} Il prompt AI li marca con flag espliciti. <button class="btn btn-ghost btn-sm" id="dq-fix" style="margin-left:8px">✎ Correggi dati</button>`;
+  box.onclick = openDataQualityModal;
 }
 
 function renderReconcileAlert() {
@@ -1132,7 +1289,7 @@ function renderDecisionBar() {
       <div class="dec-verdict" style="color:${v.col}">${v.label}</div>
     </div>
     <div class="dec-mid">
-      ${thermoLine(v.score, ["Alleggerisci", "Accumula"])}
+      ${thermoLine(v.score, ["Accumula", "Alleggerisci"])}
       ${chipsHtml}
     </div>
     <div class="dec-right">
@@ -1298,7 +1455,7 @@ function renderMiniCards() {
   if (sBox && sp) {
     const risk = sp.pct >= 70 ? "Rischio alto" : sp.pct >= 40 ? "Rischio medio" : "Rischio basso";
     sBox.innerHTML = `<div class="mc-title">BofA Bear-Market Signposts</div>
-      ${compactSemiGauge(100 - sp.pct, ["Ribassista", "Solido"])}
+      ${compactSemiGauge(100 - sp.pct, ["Solido", "Ribassista"])}
       <div class="mc-value" style="color:${scoreColor(100 - sp.pct)}">${sp.active}/${sp.total} attivi · ${risk}</div>
       <div class="mc-sub muted">clicca per il dettaglio dei 10 segnali</div>`;
   }
@@ -1317,7 +1474,7 @@ function renderMiniCards() {
     const lead = sorted[0], lag = sorted[sorted.length - 1];
     tBox.innerHTML = `<div class="mc-title">Rotazione settoriale</div>
       <div class="mc-value" style="color:${regimeCol}">${regime}</div>
-      ${thermoLine(score, ["Difensivo", "Pro-rischio"])}
+      ${thermoLine(score, ["Pro-rischio", "Difensivo"])}
       <div class="mc-sub muted">↑ ${esc(lead.name.split(" ")[0])} ${signTxt(lead.m1)} · ↓ ${esc(lag.name.split(" ")[0])} ${signTxt(lag.m1)}</div>`;
   }
   // Quadruple Witching (4 streghe): ora mostrata nel popup del box Put/Call (vedi openMacroInfo "putcall")
@@ -1326,7 +1483,7 @@ function renderMiniCards() {
   if (mqBox && mq) {
     const mqLab = mq.score >= 60 ? "Ciclo espansivo" : mq.score >= 40 ? "Ciclo neutro" : "Rischio recessione";
     mqBox.innerHTML = `<div class="mc-title">MacroQuant (Ciclo)</div>
-      ${compactSemiGauge(mq.score, ["Recessione", "Crescita"])}
+      ${compactSemiGauge(mq.score, ["Crescita", "Recessione"])}
       <div class="mc-value" style="color:${scoreColor(mq.score)}">${mq.score}% · ${mqLab}</div>
       <div class="mc-sub muted">salute ciclo: PIL · lavoro · inflazione · credito</div>`;
   }
@@ -1339,7 +1496,7 @@ function renderMiniCards() {
       ? `${cm}: S&P ${se.sp_score}% · NDX ${se.ndx_score}%`
       : `${cm} · ${se.sp_score != null ? "S&P" : "Nasdaq"}`;
     seBox.innerHTML = `<div class="mc-title">Stagionalità (${cm})</div>
-      ${compactSemiGauge(se.score, ["Sfavorevole", "Favorevole"])}
+      ${compactSemiGauge(se.score, ["Favorevole", "Sfavorevole"])}
       <div class="mc-value" style="color:${scoreColor(se.score)}">${se.score}% · ${se.label}</div>
       <div class="mc-sub muted">${sub}</div>`;
   }
@@ -1378,12 +1535,12 @@ function renderMiniCards() {
       if (varE != null) subBits.push(`VaR95 1g ${fmtEUR.format(varE)}`);
       shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
         <div class="mc-value" style="color:${sharpeColor(ps)}">${fmtNum.format(ps)} · ${lab} ${metricTrend("sharpe")}</div>
-        ${thermoLine(score, ["Rischioso", "Efficiente"])}
+        ${thermoLine(score, ["Efficiente", "Rischioso"])}
         <div class="mc-sub muted">${subBits.length ? subBits.join(" · ") : "rendimento corretto per il rischio"}</div>`;
     } else {
       shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
         <div class="mc-value muted">—</div>
-        ${thermoLine(50, ["Rischioso", "Efficiente"])}
+        ${thermoLine(50, ["Efficiente", "Rischioso"])}
         <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
     }
   }
@@ -1400,11 +1557,11 @@ function renderMiniCards() {
         : md.pct_of_peak >= 60 ? "Zona intermedia" : "Lontano dai massimi";
       mdBox.innerHTML = `<div class="mc-title">Margin Debt (leva mercato)</div>
         <div class="mc-value" style="color:${mds.col}">${pctLab} · ${mds.labelShort}</div>
-        ${thermoLine(mds.score, ["Estrema", "Bassa"])}
+        ${thermoLine(mds.score, ["Bassa", "Estrema"])}
         <div class="mc-sub muted">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""} · ${md.series || "FINRA/FRED"} · ${md.date || ""}</div>`;
     } else {
       mdBox.innerHTML = `<div class="mc-title">Margin Debt (leva mercato)</div>
-        <div class="mc-value muted">—</div>${thermoLine(50, ["Estrema", "Bassa"])}
+        <div class="mc-value muted">—</div>${thermoLine(50, ["Bassa", "Estrema"])}
         <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
     }
   }
@@ -1418,11 +1575,11 @@ function renderMiniCards() {
       const lab = pb.beta >= 1.5 ? "Molto aggressivo" : pb.beta >= 1.2 ? "Aggressivo" : pb.beta >= 0.8 ? "In linea col mercato" : "Difensivo";
       betaBox.innerHTML = `<div class="mc-title">Beta Portafoglio (vs NDX)</div>
         <div class="mc-value" style="color:${scoreColor(score)}">${fmtNum.format(pb.beta)} · ${lab}</div>
-        ${thermoLine(score, ["Aggressivo", "Difensivo"])}
+        ${thermoLine(score, ["Difensivo", "Aggressivo"])}
         <div class="mc-sub muted">${esc(pb.src)} · clicca per stress test</div>`;
     } else {
       betaBox.innerHTML = `<div class="mc-title">Beta Portafoglio (vs NDX)</div>
-        <div class="mc-value muted">—</div>${thermoLine(50, ["Aggressivo", "Difensivo"])}
+        <div class="mc-value muted">—</div>${thermoLine(50, ["Difensivo", "Aggressivo"])}
         <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
     }
   }
@@ -1436,11 +1593,11 @@ function renderMiniCards() {
       const lab = fx.pct >= 70 ? "Strutturale" : fx.pct >= 40 ? "Rilevante" : "Contenuto";
       fxBox.innerHTML = `<div class="mc-title">Rischio Cambio EUR/USD</div>
         <div class="mc-value" style="color:${scoreColor(score)}">${fmtNum.format(fx.pct)}% NAV in USD</div>
-        ${thermoLine(score, ["Esposto", "Coperto"])}
+        ${thermoLine(score, ["Coperto", "Esposto"])}
         <div class="mc-sub muted">non coperto · ${lab}${fx.eurusd ? ` · EUR/USD ${fmtNum.format(fx.eurusd)}` : ""}</div>`;
     } else {
       fxBox.innerHTML = `<div class="mc-title">Rischio Cambio EUR/USD</div>
-        <div class="mc-value muted">—</div>${thermoLine(50, ["Esposto", "Coperto"])}
+        <div class="mc-value muted">—</div>${thermoLine(50, ["Coperto", "Esposto"])}
         <div class="mc-sub muted">in attesa dei dati</div>`;
     }
   }
@@ -1631,7 +1788,7 @@ function renderPortfolioHealth() {
   const lab = score >= 60 ? "Solido" : score <= 40 ? "Da monitorare" : "Equilibrato";
   box.innerHTML = `<div class="mc-title">Salute del portafoglio</div>
     <div class="mc-value" style="color:${scoreColor(score)}">${score}/100 · ${lab}</div>
-    ${thermoLine(score, ["Fragile", "Solido"])}
+    ${thermoLine(score, ["Solido", "Fragile"])}
     <div class="mc-sub muted">tecnica + macro + fondamentale</div>`;
 }
 function openHealthModal() {
@@ -3324,7 +3481,7 @@ function openMacroInfo(key) {
       <h4 style="margin:8px 0 4px">Confronto visivo: Istituzionali vs Retail (Fear &amp; Greed)</h4>
       <div class="dual-idx">
         <div class="dual-idx-block">
-          ${compactSemiGauge(sm.score, ["Bearish (Short)", "Bullish (Long)"])}
+          ${compactSemiGauge(sm.score, ["Bullish (Long)", "Bearish (Short)"])}
           <div class="dual-idx-label">Istituzionali (SMC)</div>
           <div class="dual-idx-val" style="color:${smCol}">${sm.score}/100 &middot; ${sm.label}</div>
         </div>
@@ -3335,7 +3492,7 @@ function openMacroInfo(key) {
         </div>` : ""}
       </div>
       <div class="info-line"><b>Posizionamento istituzionale:</b> <span style="color:${smCol}">${sm.score}/100 — ${sm.label}</span></div>
-      ${thermoBar(sm.score, ["Bearish (Short)", "Bullish (Long)"])}`;
+      ${thermoBar(sm.score, ["Bullish (Long)", "Bearish (Short)"])}`;
     const arrow = d => d === "rialzista" ? '<span class="pos">▲ rialzista</span>' : d === "ribassista" ? '<span class="neg">▼ ribassista</span>' : '<span class="muted">laterale</span>';
     const smcIdx = sm.smc_indices || {};
     const smcCard = (s) => {
@@ -3383,8 +3540,8 @@ function openMacroInfo(key) {
     const ndxRow = pe.nasdaq_pe ? `<div class="info-line"><b>Nasdaq 100 (QQQ) P/E attuale:</b> <span style="color:${ndxPeCol}">${pe.nasdaq_pe}×</span> <span class="muted" style="font-size:11px">(storicamente NDX tratta a premio vs S&P; sopra 35× indica valutazioni tech tese)</span></div>` : "";
     extra = `<div class="info-line"><b>S&P 500 P/E attuale:</b> <span style="color:${peCol}">${pe.current}× — ${pe.label}</span></div>
       ${ndxRow}
-      <div class="info-line"><b>Media S&P ultimi 10 anni:</b> ${pe.avg_10y}×</div>
-      <div class="info-line"><b>Percentile storico S&P:</b> il mercato è stato più economico di adesso nel ${pe.pct_rank}% dei mesi degli ultimi 10 anni</div>
+      ${pe.avg_10y != null ? `<div class="info-line"><b>Media S&P ultimi 10 anni:</b> ${pe.avg_10y}×</div>` : ""}
+      ${pe.pct_rank != null ? `<div class="info-line"><b>Percentile storico S&P:</b> il mercato è stato più economico di adesso nel ${pe.pct_rank}% dei mesi degli ultimi 10 anni</div>` : ""}
       ${thermoBar(pe.score, ["Sottovalutato", "Sopravvalutato"])}
       <div class="info-line muted" style="font-size:11px;margin:6px 0">
         P/E &gt;25: valutazioni tese, storicamente associate a ritorni futuri più bassi nei 10 anni successivi.
@@ -3890,7 +4047,7 @@ function renderGauges() {
     }
     cards.push(thermoCard("smart_money", "Istituzionali VS Retail", sm.score,
       `<b>${sm.label}</b>`,
-      `flussi istituzionali${divTxt}`, ["Bearish", "Bullish"]));
+      `flussi istituzionali${divTxt}`, ["Bullish", "Bearish"]));
   }
   if (m.sp500_pe) {
     const pe = m.sp500_pe;
@@ -3898,7 +4055,7 @@ function renderGauges() {
     const ndxStr = pe.nasdaq_pe ? ` · NDX ${pe.nasdaq_pe}×` : "";
     cards.push(thermoCard("sp500_pe", "P/E S&P 500 / Nasdaq", pe.score,
       `<span style="color:${peCol}">S&P ${pe.current}×</span>${ndxStr ? `<span class="muted" style="font-size:12px">${ndxStr}</span>` : ""}`,
-      `${pe.label} · media 10A ${pe.avg_10y}× · percentile ${pe.pct_rank}°`, ["Sottovalutato", "Sopravvalutato"]));
+      `${pe.label}${pe.avg_10y != null ? ` · media 10A ${pe.avg_10y}×` : ""}${pe.pct_rank != null ? ` · percentile ${pe.pct_rank}°` : ""}`, ["Sottovalutato", "Sopravvalutato"]));
   }
   if (m.corp_profit) {
     const cp = m.corp_profit;
@@ -3975,7 +4132,7 @@ function renderMacro() {
       <span class="popup-dot"></span>
       <div class="m-label">P/E S&amp;P 500 / Nasdaq</div>
       <div class="m-value" style="color:${peCol}">${pe.current}×</div>
-      <div class="m-date">S&amp;P · ${pe.label} · media 10A ${pe.avg_10y}×</div>
+      <div class="m-date">S&amp;P · ${pe.label}${pe.avg_10y != null ? ` · media 10A ${pe.avg_10y}×` : ""}</div>
       ${ndxLine}
       ${macroThermo(pe.score)}
     </div>`);
@@ -4192,17 +4349,28 @@ function buildPrompt() {
   const patrimonio = t.eur_invested + cashEur;
   lines.push(`RUOLO: Sei il Comitato di Investimento Senior (analisti quantitativi, fondamentali e macro) di un fondo Growth. Riporti all'Amministratore Delegato (l'utente). Non sei un esecutore di format: sei un comitato di Wall Street che pensa. Esponi i fatti, i conflitti tra matematica e mercato, e le tue raccomandazioni — l'ultima parola spetta al CEO.
 
-DELEGA PIENA SULLA FORMA: decidi TU come strutturare il report — numero di sezioni, ordine, formato e lunghezza — in base a ciò che i dati di oggi meritano: un giorno denso di news e violazioni merita un report ricco; una domenica piatta merita poche righe oneste, non riempitivi. Le raccomandazioni operative, quando le dai, devono essere inequivocabili nel modo che riterrai più chiaro (quantità, prezzi limite, stop — il sistema fornisce già stop ratchet 2×ATR e supporti calcolati). Se qualcosa non ti torna — una strategia ambigua, un dato contraddittorio, un'intenzione del CEO che non conosci — FAI DOMANDE invece di assumere.
+DELEGA PIENA SULLA FORMA: decidi TU come strutturare il report — numero di sezioni, ordine, formato e lunghezza — in base a ciò che i dati di oggi meritano: un giorno denso di news e violazioni merita un report ricco; una domenica piatta merita poche righe oneste, non riempitivi. Se qualcosa non ti torna — una strategia ambigua, un dato contraddittorio, un'intenzione del CEO che non conosci — FAI DOMANDE invece di assumere.
+
+MANDATO DI CONSEGNA MINIMA (NON è una gabbia sulla forma, è il contenuto che il report DEVE contenere, comunque tu decida di organizzarlo — non "dimenticarlo" per fare narrativa macro):
+A. INDICI LEADING: leggi SEMPRE, anche in poche righe, lo stato di KOSPI (^KS11), Nasdaq Composite (^IXIC) e Bitcoin (BTC-USD) come anticipatori — il KOSPI chiude prima dell'apertura USA (proxy del sentiment tech/semiconduttori), Bitcoin è il termometro dell'appetito al rischio globale e ha correlazione diretta con MSTR/nomi ad alta beta. Se sono nel payload, NON ignorarli.
+B. ESECUZIONE COMPLETA: per OGNI operazione suggerita (COMPRA o VENDI) fornisci SEMPRE il calcolo MATEMATICO ESATTO della quantità di quote — non solo prezzo e stop. Un ordine senza numero di azioni è INUTILIZZABILE dal broker. Regola di sizing: dimensiona sul budget disponibile (liquidità per gli acquisti) rispettando il tetto del 10% del NAV per singola posizione; mostra il conto (es. "budget 5.000$ ÷ prezzo limite 180$ = 27 quote, = 4.860$ = 6,2% del NAV, entro il 10%"). Per le vendite/trim indica le quote esatte da liquidare per rientrare nel limite o realizzare la tesi.
+C. INCROCIO CON LE NEWS SPECIFICHE: il payload contiene NEWS PER SINGOLO TITOLO (catalizzatori micro). Incrociale con la tecnica e i fondamentali di QUEL titolo — non liquidarle con un riassunto macro generico. Se una tua raccomandazione poggia su una notizia, cita quale. MAI inventare un catalizzatore che non è nel payload (anti-allucinazione): se non c'è, dillo.
+D. GAP PRE/AFTER-MARKET: la colonna Pre/After mostra dove scambia il titolo FUORI dalla sessione ufficiale. Un ordine limite ancorato alla chiusura ufficiale può eseguire a un prezzo letale se in apertura c'è un gap. Quando il dato Pre/After esiste, usalo per calibrare il limite e AVVISA esplicitamente del rischio gap; quando manca, dichiaralo come incognita.
 
 BRIEFING SUI PROBLEMI NOTI DEL SISTEMA (tienine conto in ogni analisi):
-1. LATENZA MACRO: il payload contiene serie con lag di pubblicazione fisiologico (PIL trimestrale, CPI/PCE mensili con ~1 mese di ritardo). Ogni dato porta la sua data di rilevazione e il sistema marca automaticamente i casi critici con [LAG TEMPORALE RILEVATO] o [!!! DATATO / UNRELIABLE !!!]. Sei autorizzato e INVITATO a usare la ricerca web per verificare e aggiornare i dati — per quelli flaggati il double-check è OBBLIGATORIO prima di trarne conclusioni; cita fonte e data di ciò che aggiorni.
+1. LATENZA MACRO: il payload contiene serie con lag di pubblicazione fisiologico (PIL trimestrale, CPI/PCE mensili con ~1 mese di ritardo). Ogni dato porta la sua data di rilevazione e il sistema marca automaticamente i casi critici con [LAG TEMPORALE RILEVATO] o [!!! DATATO / UNRELIABLE !!!]. Sei autorizzato e INVITATO a usare la ricerca web per verificare e aggiornare i dati — per quelli flaggati il double-check è OBBLIGATORIO prima di trarne conclusioni; cita fonte e data di ciò che aggiorni. Se nemmeno la ricerca web recupera un dato, lascialo mancante ma TIENINE CONTO nell'analisi (non ragionare come se fosse a zero).
 2. RISCHIO CAMBIO E CASH DRAG: gran parte del NAV è in USD non coperto (il numero esatto è nelle METRICHE DI RISCHIO) e la liquidità è infruttifera allo 0%. Sono due inefficienze strutturali: pesale attivamente quando suggerisci operazioni (una vendita aumenta il cash drag se il ricavato resta fermo; l'esposizione USD amplifica o attutisce ogni mossa in euro).
 3. SIZING vs QUALITÀ: alcune posizioni violano il limite del 10% del NAV ma sono aziende eccellenti (ROIC alto, crescita). Non nascondere il conflitto: dichiara la violazione, esponi il lato rischio e il lato qualità, e raccomanda con trasparenza. Lo stesso vale per le value trap segnalate (Sortino < -0.3): la matematica comanda, ma se vedi un catalizzatore REALE nel payload, argomentalo.
-4. INDICI LEADING: in watchlist ci sono ^KS11 (KOSPI) e ^IXIC (Nasdaq Composite): il KOSPI chiude prima dell'apertura USA ed è un anticipatore utile per il sentiment tech/semiconduttori. Usali quando aiutano la lettura, non per obbligo.
-5. IGIENE DEI DATI: "n.d." o "—" = dato NON disponibile: non inventarlo, non colmarlo con conoscenza pregressa senza dichiararlo. I suggerimenti valgono per la PROSSIMA sessione sui prezzi del payload: preferisci ordini LIMITE e pesa i gap overnight, l'illiquidità ([ILLIQUIDO]) e il rischio earnings ([!EARNINGS RISK]).
+4. IGIENE DEI DATI: "n.d." o "—" = dato NON disponibile: non inventarlo, non colmarlo con conoscenza pregressa senza dichiararlo. I suggerimenti valgono per la PROSSIMA sessione sui prezzi del payload: preferisci ordini LIMITE e pesa i gap overnight, l'illiquidità ([ILLIQUIDO]) e il rischio earnings ([!EARNINGS RISK]).
 
 Sii proattivo e spietato sui rischi: se vedi un problema che il CEO non ti ha chiesto di guardare, sollevalo tu.`);
   lines.push("");
+  // ORDINE WEB-SEARCH IN CIMA: se ci sono dati mancanti/inaffidabili, l'imperativo va visto
+  // PRIMA di tutto il resto (l'LLM tende a "dimenticarlo" se sepolto in fondo al payload)
+  if ((dqV.bad || []).length) {
+    lines.push(`⚠⚠ PRIMO ORDINE OPERATIVO (esegui PRIMA di scrivere l'analisi): questi dati macro sono MANCANTI o INAFFIDABILI nel payload → [${dqV.bad.map(b => b.key).join(", ")}]. Usa OBBLIGATORIAMENTE la ricerca web per reperirne il valore reale corrente (cita valore, fonte e data per ciascuno) e usali per la lettura di leva finanziaria e valutazioni. Se la ricerca non li recupera, lasciali mancanti ma dichiaralo e tienine conto — non trattarli come zero.`);
+    lines.push("");
+  }
   const ageMin = Math.round((Date.now() - new Date(DATA.updated_at).getTime()) / 60000);
   const lagNote = ageMin > 90 ? ` [ATTENZIONE: snapshot di ${ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min"} fa — i prezzi potrebbero essere disallineati dal mercato live; verifica online i livelli critici prima di ragionarci sopra]` : "";
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")} (prezzi: snapshot pipeline + refresh live lato client ogni 60s)${lagNote}`);
@@ -4388,7 +4556,7 @@ Sii proattivo e spietato sui rischi: se vedi un problema che il CEO non ti ha ch
   }
   // contesto economia USA (stile Macrotrends): P/E mercato, tassi Fed, inflazione, PIL, curva
   const usEco = [];
-  if (m.sp500_pe) usEco.push(`P/E S&P 500 ${m.sp500_pe.current}× (media 10A ${m.sp500_pe.avg_10y}×)${m.sp500_pe.nasdaq_pe ? `, P/E Nasdaq 100 ${m.sp500_pe.nasdaq_pe}×` : ""}`);
+  if (m.sp500_pe) usEco.push(`P/E S&P 500 ${m.sp500_pe.current}×${m.sp500_pe.avg_10y != null ? ` (media 10A ${m.sp500_pe.avg_10y}×)` : ""}${m.sp500_pe.nasdaq_pe ? `, P/E Nasdaq 100 ${m.sp500_pe.nasdaq_pe}×` : ""}`);
   if (m.fed_market) usEco.push(`tasso Fed ${m.fed_market.current_rate}%`);
   const cpiI = (m.indicators || []).find(i => i.key === "cpi");
   const pceI = (m.indicators || []).find(i => i.key === "pce");
@@ -4435,6 +4603,13 @@ Sii proattivo e spietato sui rischi: se vedi un problema che il CEO non ti ha ch
   // macro, con l'ordine esplicito di fare double-check web su ciò che è datato/inaffidabile
   if (!dqV.ok) {
     lines.push(`⚠ DATA QUALITY REPORT (assertions automatiche del sistema): ${[...dqV.bad.map(b => `${b.key} INAFFIDABILE (${b.status}${b.note ? ": " + b.note : ""})`), ...dqV.stale.map(s => `${s.key} DATATO oltre la cadenza attesa`)].join(" · ")}. Per ogni dato marcato qui sotto con [!!! DATATO / UNRELIABLE !!!] o [LAG TEMPORALE RILEVATO]: NON usarlo così com'è — fai double-check con la ricerca web e cita il valore aggiornato con fonte e data.`);
+    const missingKeys = dqV.bad.map(b => b.key);
+    if (missingKeys.length) {
+      lines.push(`ATTENZIONE — ORDINE OPERATIVO: i seguenti dati sono mancanti o inaffidabili nel payload: [${missingKeys.join(", ")}]. PRIMA di generare la tua analisi, usa OBBLIGATORIAMENTE il tuo strumento di ricerca web per reperire questi valori in tempo reale (cita valore, fonte e data per ciascuno) e usali al posto di quelli assenti — in particolare per valutare leva finanziaria e valutazioni di mercato.`);
+    }
+  }
+  if ((dqV.overrides || []).length) {
+    lines.push(`OVERRIDE MANUALI ATTIVI (valori inseriti dall'utente perché la fonte era ko — trattali come dati validi ma verifica se puoi): ${dqV.overrides.map(o => `${o.key} [MANUAL_OVERRIDE del ${o.date || "n.d."}]`).join(" · ")}.`);
   }
   const mds = marginDebtState();
   if (mds) {
@@ -4506,7 +4681,7 @@ Sii proattivo e spietato sui rischi: se vedi un problema che il CEO non ti ha ch
       lines.push(`- ${s.name} (${s.ticker}): 1M ${signTxt(s.m1)}, 3M ${signTxt(s.m3)}`));
   }
   if (m.sp500_pe) {
-    let peLine = `- P/E Ratio S&P 500 (FRED SP500PE): ${m.sp500_pe.current}× (${m.sp500_pe.label}) · media 10A ${m.sp500_pe.avg_10y}× · percentile storico ${m.sp500_pe.pct_rank}°`;
+    let peLine = `- P/E Ratio S&P 500: ${m.sp500_pe.current}× (${m.sp500_pe.label})${m.sp500_pe.avg_10y != null ? ` · media 10A ${m.sp500_pe.avg_10y}×` : ""}${m.sp500_pe.pct_rank != null ? ` · percentile storico ${m.sp500_pe.pct_rank}°` : ""}`;
     if (m.sp500_pe.nasdaq_pe) peLine += ` · Nasdaq 100 (QQQ) P/E: ${m.sp500_pe.nasdaq_pe}× (tech solitamente a premio; >35× = valutazioni tese)`;
     lines.push(peLine);
   }
@@ -5084,6 +5259,7 @@ initSorting("wl-table", renderWatchlist);
 
 loadData();
 loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
+loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
 // ricarica completa (tecnici, news, storico) ogni 5 minuti
 setInterval(() => loadData(), 5 * 60 * 1000);
 // prezzi live ogni 60 secondi

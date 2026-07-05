@@ -1384,14 +1384,63 @@ def fetch_macro():
     except Exception as e:
         print(f"!! fed_market: {e}", file=sys.stderr)
 
-    # P/E Ratio storico S&P 500 (FRED SP500PE, mensile)
+    # --- P/E di mercato: catena di fonti (post-incidente forward_pe/sp500_pe missing) ---
+    # WSJ "P/Es & Yields on Major Indexes": tabella HTML aperta con trailing E forward
+    # (verificato live lug 2026: S&P trailing 25.4, forward 21.7). Parser condiviso.
+    def fetch_pe_wsj():
+        """La pagina embedda JSON con campi nominati (verificato lug 2026):
+        "S&P 500 Index","priceEarningsRatio":"25.37","priceEarningsRatioEstimate":"21.74"
+        → parsing sul JSON, non sull'HTML delle celle (fragile)."""
+        try:
+            wsj_ua = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+            h = requests.get("https://www.wsj.com/market-data/stocks/peyields", headers=wsj_ua, timeout=25).text
+            out = {}
+            for label, key in (('"S&P 500 Index"', "sp"), ('"NASDAQ 100 Index"', "ndx"),
+                               ('"Nasdaq 100 Index"', "ndx"), ('"NASDAQ 100"', "ndx")):
+                i = h.find(label)
+                if i < 0 or (key + "_trail") in out:
+                    continue
+                win = h[i:i + 500]
+                mt = re.search(r'"priceEarningsRatio"\s*:\s*"([\d.]+)"', win)
+                mf = re.search(r'"priceEarningsRatioEstimate"\s*:\s*"([\d.]+)"', win)
+                if mt:
+                    out[key + "_trail"] = float(mt.group(1))
+                if mf:
+                    out[key + "_fwd"] = float(mf.group(1))
+            return out
+        except Exception as e:  # noqa: BLE001
+            print(f"!! WSJ peyields: {e}", file=sys.stderr)
+            return {}
+    wsj_pe = fetch_pe_wsj()
+
+    # P/E Ratio storico S&P 500: FRED SP500PE (con storia) → fallback multpl → fallback WSJ trailing
     try:
-        pe_data = fred_series("SP500PE", 120)  # ~10 anni mensili
+        pe_data = []
+        try:
+            pe_data = fred_series("SP500PE", 120)  # ~10 anni mensili
+        except Exception as e:  # noqa: BLE001
+            print(f"!! FRED SP500PE ko, provo multpl/WSJ: {e}", file=sys.stderr)
+        if not pe_data:
+            cur_alt = None
+            try:  # multpl: pagina semplice col valore corrente
+                mh = requests.get("https://www.multpl.com/s-p-500-pe-ratio",
+                                  headers={"User-Agent": "Mozilla/5.0 (Macintosh) AppleWebKit/537.36"}, timeout=20).text
+                mm = re.search(r'Current S&P 500 PE Ratio[^0-9]{0,80}?([\d.]+)', mh)
+                cur_alt = float(mm.group(1)) if mm else None
+            except Exception as e:  # noqa: BLE001
+                print(f"!! multpl: {e}", file=sys.stderr)
+            if cur_alt is None:
+                cur_alt = wsj_pe.get("sp_trail")
+            if cur_alt is not None:
+                # niente storia mensile dalla fonte alternativa: history vuota, media 10A n.d.
+                pe_data = [(datetime.now(timezone.utc).strftime("%Y-%m-%d"), float(cur_alt))]
         if pe_data:
             pe_vals = [v for _, v in pe_data if v]
             cur_pe = pe_data[-1][1]
-            avg_pe = round(sum(pe_vals) / len(pe_vals), 1)
-            pct_rank = round(sum(1 for v in pe_vals if v < cur_pe) / len(pe_vals) * 100)
+            # media/percentile SOLO con storia vera (>=24 mesi): mai statistiche su 1 punto
+            has_hist = len(pe_vals) >= 24
+            avg_pe = round(sum(pe_vals) / len(pe_vals), 1) if has_hist else None
+            pct_rank = round(sum(1 for v in pe_vals if v < cur_pe) / len(pe_vals) * 100) if has_hist else None
             score = clamp(round(100 - (cur_pe - 10) / 40 * 100))
             ndx_pe = None
             try:
@@ -1400,6 +1449,8 @@ def fetch_macro():
                 ndx_pe = round(float(raw_pe), 1) if raw_pe else None
             except Exception:
                 pass
+            if ndx_pe is None:
+                ndx_pe = wsj_pe.get("ndx_trail")   # fallback WSJ per il Nasdaq 100
             macro["sp500_pe"] = {
                 "current":  round(cur_pe, 1),
                 "avg_10y":  avg_pe,
@@ -1411,19 +1462,22 @@ def fetch_macro():
                             else "Valutazione elevata" if cur_pe > 20
                             else "Valutazione normale" if cur_pe > 14 else "Sottovalutazione",
                 "nasdaq_pe": ndx_pe,
+                "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
             }
     except Exception as e:
         print(f"!! sp500_pe: {e}", file=sys.stderr)
 
     # Forward P/E S&P 500 (per il termometro di rischio sistemico).
-    # NESSUN fallback fittizio (GIGO): se l'API non fornisce il dato, la metrica è
-    # semplicemente assente e il frontend la mostra come n.d. — mai numeri inventati.
+    # FONTE PRIMARIA: WSJ forward estimate (Yahoo ha smesso di esporre forwardPE su SPY —
+    # verificato lug 2026: None). Fallback: Yahoo SPY, se mai tornasse.
+    # NESSUN fallback fittizio (GIGO): senza dato la metrica resta assente/n.d.
     try:
-        raw_fpe = None
-        try:
-            raw_fpe = (yf.Ticker("SPY").info or {}).get("forwardPE")
-        except Exception:  # noqa: BLE001
-            raw_fpe = None
+        raw_fpe = wsj_pe.get("sp_fwd")
+        if raw_fpe is None:
+            try:
+                raw_fpe = (yf.Ticker("SPY").info or {}).get("forwardPE")
+            except Exception:  # noqa: BLE001
+                raw_fpe = None
         fpe = sane_val(raw_fpe, 5, 100, "S&P forward P/E")     # scarta valori assurdi
         if fpe is not None:
             fpe = round(float(fpe), 1)
@@ -1431,6 +1485,7 @@ def fetch_macro():
                 "value": fpe,
                 "avg_hist": 16.5,                              # media storica forward P/E S&P 500
                 "label": "Estremo" if fpe > 22 else "Elevato" if fpe > 18 else "Normale" if fpe > 14 else "Conveniente",
+                "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
             }
     except Exception as e:  # noqa: BLE001
         print(f"!! forward_pe: {e}", file=sys.stderr)
@@ -1534,6 +1589,26 @@ def fetch_macro():
         macro["margin_debt"] = fetch_margin_debt((PREV_DATA.get("macro") or {}).get("margin_debt"))
     except Exception as e:  # noqa: BLE001
         print(f"!! margin debt: {e}", file=sys.stderr)
+
+    # CARRY-FORWARD P/E di mercato: WSJ/multpl funzionano da IP residenziali ma sono bloccati
+    # dagli IP datacenter (CI) come FINRA. Il P/E si muove lento: se la fonte è ko in questo
+    # run, riporto avanti l'ultimo valore del run precedente (≤45 gg) marcato carried, invece
+    # di lasciare un buco che acceca la lettura di leva/valutazioni.
+    prev_macro = PREV_DATA.get("macro") or {}
+    for key in ("sp500_pe", "forward_pe"):
+        if macro.get(key):
+            continue
+        prev = prev_macro.get(key)
+        if not prev:
+            continue
+        prev_at = prev.get("fetched_at") or prev.get("date")
+        try:
+            age = (datetime.now(timezone.utc).date() - datetime.fromisoformat(str(prev_at)[:10]).date()).days if prev_at else 999
+        except Exception:  # noqa: BLE001
+            age = 999
+        if age <= 45:
+            macro[key] = dict(prev, carried=True)
+            print(f"·· {key}: fonte ko, carry-forward del run precedente (età {age}g)", file=sys.stderr)
 
     return macro
 

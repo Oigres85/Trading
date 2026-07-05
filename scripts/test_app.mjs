@@ -157,9 +157,9 @@ check("marginDebtState: 100% picco senza Forward P/E → ELEVATA con conferma n.
 // buildPrompt: smoke test completo
 const prompt = run(`buildPrompt()`);
 const has = (s) => prompt.includes(s);
-check("prompt: advisory libero — delega sulla forma, domande al CEO, Sortino nel briefing", has("DELEGA PIENA SULLA FORMA") && has("FAI DOMANDE") && has("Sortino < -0.3"));
+check("prompt: advisory libero + mandato consegna minima anti-laziness", has("DELEGA PIENA SULLA FORMA") && has("MANDATO DI CONSEGNA MINIMA") && has("FAI DOMANDE"));
 check("prompt: colonna Sortino 1A nella tabella PORTAFOGLIO", has("| Sortino 1A |"));
-check("prompt: briefing problemi noti (lag, FX/cash drag, sizing vs qualità, leading KOSPI)", has("LATENZA MACRO") && has("RISCHIO CAMBIO E CASH DRAG") && has("SIZING vs QUALITÀ") && has("KOSPI") && !has("Rispondi SOLO con queste tre sezioni"));
+check("prompt: consegna minima (leading KOSPI/Nasdaq/BTC, quote esatte, news, gap pre/after)", has("KOSPI") && has("Bitcoin") && has("calcolo MATEMATICO ESATTO della quantità") && has("NEWS SPECIFICHE") && has("GAP PRE/AFTER-MARKET"));
 check("prompt: matrice di rischio per posizione", has("MATRICE DI RISCHIO PER POSIZIONE"));
 check("prompt: flag [STOP VIOLATO] su TST3", /\[STOP VIOLATO\][\s\S]*TST3|TST3[^\n]*\[STOP VIOLATO\]/.test(prompt));
 check("prompt: VaR storico primario", has("STORICO, percentili empirici"));
@@ -182,6 +182,13 @@ check("validateMacroData: pulito con data_quality ok dalla pipeline", run(`
   const v = validateMacroData();
   delete DATA.data_quality;
   return v.ok === true`));
+
+
+check("prompt: web-search order in CIMA sui dati mancanti/inaffidabili", run(`
+  const p2 = buildPrompt();
+  const iOrder = p2.indexOf("PRIMO ORDINE OPERATIVO");
+  const iPortafoglio = p2.indexOf("MATRICE DI RISCHIO PER POSIZIONE");
+  return iOrder > 0 && iOrder < iPortafoglio`));
 
 /* ---------- report ---------- */
 let fail = 0;
