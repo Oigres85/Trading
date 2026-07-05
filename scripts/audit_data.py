@@ -41,6 +41,26 @@ for r in rows:
         if bool(r.get("stop_violated")) != expect:
             hard.append(f"{r['ticker']}: stop_violated={r.get('stop_violated')} incoerente (prezzo {r['price']} vs stop {r['stop_atr']})")
 
+# HARD 5 (post-incidente margin debt): spazzatura macro NON flaggata non deve MAI passare.
+# La spazzatura FLAGGATA (data_quality) è un degrado dichiarato → warn, la pipeline vive.
+macro = d.get("macro", {})
+md = macro.get("margin_debt") or {}
+if md and "FINRA" in str(md.get("series", "")) and md.get("value", 0) < 800_000:
+    hard.append(f"margin debt 'FINRA' a ${md.get('value'):,}M < $800 mld nel 2026 senza flag: spazzatura non intercettata")
+if md and md.get("unreliable") and not any(c.get("key") == "margin_debt" and c.get("status") in ("unreliable", "implausible")
+                                           for c in (d.get("data_quality") or {}).get("checks", [])):
+    hard.append("margin debt unreliable ma non presente nei check di data_quality")
+vix_v = (macro.get("vix") or {}).get("value")
+if vix_v is not None and not 5 <= vix_v <= 150:
+    hard.append(f"VIX {vix_v} fuori range [5,150] non nullato")
+for i in macro.get("indicators", []):
+    if i.get("key") in ("cpi", "pce") and str(i.get("value")).strip() in ("0%", "0.0%"):
+        hard.append(f"{i['key']} a 0% nel payload: spazzatura non nullata")
+
+# SOFT: alert dichiarati dalla validazione macro (degradi noti, non blocking)
+for a in (d.get("data_quality") or {}).get("alerts", []):
+    soft.append(f"data_quality: {a}")
+
 # SOFT: campi quant attesi dopo un run completo
 t = d.get("totals", {})
 for k in ("portfolio_sharpe_ratio", "portfolio_sortino_ratio", "var95_hist_pct", "portfolio_beta_ndx"):

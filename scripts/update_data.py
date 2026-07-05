@@ -32,6 +32,7 @@ import yfinance as yf
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "data.json"
+PREV_DATA: dict = {}   # snapshot del run precedente (settato da main; usato da carry-forward/ratchet)
 CONFIG = ROOT / "config" / "holdings.json"
 
 UA = {
@@ -1529,77 +1530,195 @@ def fetch_macro():
         print(f"!! stagionalità: {e}", file=sys.stderr)
 
     try:
-        macro["margin_debt"] = fetch_margin_debt()
+        # PREV_DATA (snapshot del run precedente, settato da main) alimenta il carry-forward
+        macro["margin_debt"] = fetch_margin_debt((PREV_DATA.get("macro") or {}).get("margin_debt"))
     except Exception as e:  # noqa: BLE001
         print(f"!! margin debt: {e}", file=sys.stderr)
 
     return macro
 
 
-def fetch_margin_debt():
-    """Margin Debt FINRA (leva a credito sui conti titoli) via FRED.
-    Provo prima la serie FINRA richiesta (più ampia, ~$1T+), poi il fallback flow-of-funds.
-    Termometro: vicino ai massimi storici = leva estrema = rischio elevato."""
-    # FONTE PRIMARIA: statistiche ufficiali FINRA (customer debit balances, $ mln) dalla pagina
-    # pubblica — è la serie "vera" del margin debt (~$1,4T nel 2026, ATH pre-2026 ~$936 mld a ott 2021).
-    # Verificato: la serie "FINRADBC" NON esiste su FRED; la Z.1 resta solo come fallback.
+def _finra_scrape(url):
+    """Scrape della tabella FINRA (Mon-YY | debit balances $mln). Ritorna [(iso_date, val)] ordinati.
+    HEADER DEDICATO (verificato sul campo, lug 2026): l'Akamai di finra.org risponde 403
+    all'UA del modulo ("Chrome/124" + Accept:*/* = fingerprint browser incoerente) e 200
+    a un UA generico SENZA Accept — era QUESTA la causa dei fallimenti, anche in CI."""
     MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
               "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
-    try:
-        html = http_get("https://www.finra.org/investors/learn-to-invest/advanced-investing/margin-statistics").text
-        rows = re.findall(r"([A-Z][a-z]{2})-(\d{2})</td>\s*<td>([\d,]+)</td>", html)
-        fs = []
-        for mon, yy, val in rows:
-            mnum = MONTHS.get(mon)
-            if mnum:
-                fs.append((f"20{yy}-{mnum:02d}-01", float(val.replace(",", ""))))
-        fs.sort()
-        if len(fs) >= 6:
-            vals = [v for _, v in fs]
-            cur = vals[-1]
-            # la pagina FINRA elenca solo i mesi recenti: uso l'ATH storico documentato (ott 2021,
-            # $935,9 mld) come pavimento del picco, così il 100% è sempre l'All-Time High reale.
-            HIST_ATH_FLOOR = 935904.0
-            peak = max(max(vals), HIST_ATH_FLOOR)
-            peak_date = max(fs, key=lambda t: t[1])[0] if max(vals) >= HIST_ATH_FLOOR else "2021-10-01"
-            yoy = round((cur / vals[-13] - 1) * 100, 1) if len(vals) >= 13 and vals[-13] else None
-            mom = round((cur / vals[-2] - 1) * 100, 1) if len(vals) >= 2 and vals[-2] else None
-            return {
-                "value": round(cur), "peak": round(peak),
-                "pct_of_peak": round(cur / peak * 100, 1),
-                "yoy": yoy, "qoq": mom, "date": fs[-1][0], "peak_date": peak_date,
-                "series": "FINRA debit balances (mensile)",
-                "history": [round(v) for v in vals[-24:]],
-            }
-    except Exception as e:  # noqa: BLE001
-        print(f"!! margin debt FINRA (uso fallback FRED): {e}", file=sys.stderr)
+    finra_ua = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+    html = requests.get(url, headers=finra_ua, timeout=25).text
+    rows = re.findall(r"<td[^>]*>\s*([A-Z][a-z]{2})-(\d{2})\s*</td>\s*<td[^>]*>\s*\$?([\d,]+)", html)
+    fs = []
+    for mon, yy, val in rows:
+        mnum = MONTHS.get(mon)
+        if mnum:
+            fs.append((f"20{yy}-{mnum:02d}-01", float(val.replace(",", ""))))
+    fs.sort()
+    return fs
 
-    # FALLBACK: Fed Z.1 (conti a margine broker-dealer) — misura DIVERSA e più piccola della FINRA;
-    # picco sull'INTERA serie disponibile (mai su finestre recenti).
-    s, src = [], None
-    for sid in ("BOGZ1FL663067003Q",):
+
+def fetch_margin_debt(prev_md=None):
+    """Margin Debt: leva a credito reale sui conti titoli. CATENA DI FONTI (post-incidente
+    "widget congelato a $622 mld Z.1 mentre FINRA stampava $1,42T"):
+    1. scrape FINRA su DUE URL (pagina investors + canonical rules-guidance) — è la serie vera;
+       NB: finra.org è dietro Akamai e da IP datacenter (GitHub Actions) può rispondere con
+       challenge → per questo esiste il passo 2;
+    2. CARRY-FORWARD: se lo scrape fallisce ma il run PRECEDENTE aveva un dato FINRA con
+       reference date ≤ 90 giorni, quel dato è ANCORA VALIDO (serie mensile con ~1 mese di
+       lag di pubblicazione): lo riporto avanti marcato carried=True. Un dato mensile vero
+       di 2 mesi batte una serie sbagliata di oggi;
+    3. Fed Z.1 (misura DIVERSA e più piccola: conti a margine broker-dealer) SOLO come ultima
+       spiaggia, marcata unreliable=True: validate_macro e la UI la trattano come inaffidabile.
+    Plausibilità 2026: un valore FINRA < $800 mld = spazzatura → scartato a monte."""
+    for url in ("https://www.finra.org/investors/learn-to-invest/advanced-investing/margin-statistics",
+                "https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics"):
         try:
-            s = fred_series(sid, n=1200)            # tutta la storia disponibile
-            if len(s) >= 20:
-                src = sid
-                break
+            fs = _finra_scrape(url)
+            if len(fs) >= 6 and fs[-1][1] >= 800_000:      # threshold plausibilità 2026 ($ mln)
+                vals = [v for _, v in fs]
+                cur = vals[-1]
+                HIST_ATH_FLOOR = 935904.0                   # ATH pre-2026 documentato (ott 2021)
+                peak = max(max(vals), HIST_ATH_FLOOR)
+                peak_date = max(fs, key=lambda t: t[1])[0] if max(vals) >= HIST_ATH_FLOOR else "2021-10-01"
+                yoy = round((cur / vals[-13] - 1) * 100, 1) if len(vals) >= 13 and vals[-13] else None
+                mom = round((cur / vals[-2] - 1) * 100, 1) if len(vals) >= 2 and vals[-2] else None
+                return {
+                    "value": round(cur), "peak": round(peak),
+                    "pct_of_peak": round(cur / peak * 100, 1),
+                    "yoy": yoy, "qoq": mom, "date": fs[-1][0], "peak_date": peak_date,
+                    "series": "FINRA debit balances (mensile)",
+                    "history": [round(v) for v in vals[-24:]],
+                    "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                }
+        except Exception as e:  # noqa: BLE001
+            print(f"!! margin debt FINRA scrape ({url.split('/')[-2]}): {e}", file=sys.stderr)
+
+    # 2) carry-forward dell'ultimo FINRA valido (serie mensile: resta attuale ~90 giorni)
+    if prev_md and "FINRA" in str(prev_md.get("series", "")) and prev_md.get("date") and prev_md.get("value", 0) >= 800_000:
+        try:
+            age = (datetime.now(timezone.utc).date() - datetime.fromisoformat(prev_md["date"]).date()).days
+            if age <= 90:
+                out = dict(prev_md)
+                out["carried"] = True                      # dichiarato: riportato dal run precedente
+                print(f"·· margin debt: scrape FINRA ko, carry-forward del dato {prev_md['date']} (età {age}g)", file=sys.stderr)
+                return out
         except Exception:  # noqa: BLE001
-            s = []
+            pass
+
+    # 3) ultima spiaggia: Fed Z.1 — misura diversa, MARCATA inaffidabile per il risk management
+    try:
+        s = fred_series("BOGZ1FL663067003Q", n=1200)       # tutta la storia disponibile
+    except Exception:  # noqa: BLE001
+        s = []
     if len(s) < 20:
         return None
     vals = [v for _, v in s]
-    cur, peak = vals[-1], max(vals)                 # ATH reale su tutto lo storico
-    yoy = round((cur / vals[-5] - 1) * 100, 1) if len(vals) >= 5 and vals[-5] else None
-    qoq = round((cur / vals[-2] - 1) * 100, 1) if len(vals) >= 2 and vals[-2] else None
-    pct_peak = round(cur / peak * 100, 1) if peak else None
-    peak_date = max(s, key=lambda t: t[1])[0]       # quando è stato toccato l'ATH
+    cur, peak = vals[-1], max(vals)
     return {
-        "value": round(cur), "peak": round(peak), "pct_of_peak": pct_peak,
-        "yoy": yoy, "qoq": qoq, "date": s[-1][0], "peak_date": peak_date,
-        # etichetta onesta della fonte: FINRA (debit balances) o Fed Z.1 (conti a margine b/d)
-        "series": "FINRA debit balances" if src == "FINRADBC" else "Fed Z.1 margin accounts (broker-dealer)",
+        "value": round(cur), "peak": round(peak),
+        "pct_of_peak": round(cur / peak * 100, 1) if peak else None,
+        "yoy": round((cur / vals[-5] - 1) * 100, 1) if len(vals) >= 5 and vals[-5] else None,
+        "qoq": round((cur / vals[-2] - 1) * 100, 1) if len(vals) >= 2 and vals[-2] else None,
+        "date": s[-1][0], "peak_date": max(s, key=lambda t: t[1])[0],
+        "series": "Fed Z.1 margin accounts (broker-dealer)",
+        "unreliable": True,   # NON è la serie FINRA: misura diversa → la UI/prompt devono urlarlo
         "history": [round(v) for v in vals[-24:]],
     }
+
+
+def validate_macro(macro):
+    """DATA ASSERTIONS (post-incidente margin debt congelato): valida il macro PRIMA che
+    finisca nel payload AI. Due famiglie di regole:
+    - AGE CHECK: età del reference date vs la cadenza attesa della serie (un CPI di 65
+      giorni è fisiologico, un margin debt FINRA di 6 mesi no);
+    - THRESHOLD CHECK: range di plausibilità 2026 (margin debt FINRA < $800 mld, CPI 0%,
+      VIX 0 = l'API sta restituendo spazzatura → il valore viene NULLATO, mai iniettato).
+    Ritorna data_quality = {"checks": [...], "alerts": [...]} serializzato nel JSON:
+    la UI (validateMacroData) e audit_data.py ci costruiscono sopra banner e gate CI."""
+    today = datetime.now(timezone.utc).date()
+    checks, alerts = [], []
+
+    def age_of(ds):
+        try:
+            return (today - datetime.fromisoformat(str(ds)[:10]).date()).days
+        except Exception:  # noqa: BLE001
+            return None
+
+    def add(key, date, max_age, status, note=""):
+        checks.append({"key": key, "date": str(date)[:10] if date else None,
+                       "age_days": age_of(date), "max_age": max_age, "status": status, "note": note})
+        if status != "ok":
+            alerts.append(f"{key}: {status}{' — ' + note if note else ''}")
+
+    # --- margin debt: fonte giusta + fresco + plausibile ---
+    md = macro.get("margin_debt")
+    if not md:
+        add("margin_debt", None, 90, "missing", "nessuna fonte disponibile")
+    elif md.get("unreliable"):
+        add("margin_debt", md.get("date"), 90, "unreliable",
+            f"serie {md.get('series')} ≠ FINRA (misura diversa): NON usare per decisioni di leva")
+    elif md.get("value", 0) < 800_000:
+        md["unreliable"] = True
+        add("margin_debt", md.get("date"), 90, "implausible",
+            f"${md.get('value'):,}M < $800 mld nel 2026 = dato spazzatura")
+    else:
+        a = age_of(md.get("date"))
+        add("margin_debt", md.get("date"), 90,
+            "ok" if (a is not None and a <= 90) else "stale",
+            "carry-forward dal run precedente (scrape FINRA ko)" if md.get("carried") else "")
+
+    # --- indicatori mensili/trimestrali: età massima per cadenza (reference date) ---
+    MAX_AGE = {"cpi": 75, "pce": 75, "nfp": 50, "unemp": 50, "pmi": 50, "retail": 75, "gdp": 210}
+    for i in macro.get("indicators", []):
+        k = i.get("key")
+        if k not in MAX_AGE:
+            continue
+        a = age_of(i.get("date"))
+        # threshold: un'inflazione a 0% o un PMI fuori [25,75] = spazzatura API → nullo
+        num = None
+        try:
+            num = float(re.sub(r"[^\d.\-]", "", str(i.get("value"))))
+        except Exception:  # noqa: BLE001
+            pass
+        if k in ("cpi", "pce") and num == 0:
+            i["value"] = "n.d."
+            add(k, i.get("date"), MAX_AGE[k], "implausible", "inflazione 0% = spazzatura API, valore nullato")
+        elif k == "pmi" and num is not None and not 25 <= num <= 75:
+            i["value"] = "n.d."
+            add(k, i.get("date"), MAX_AGE[k], "implausible", f"PMI {num} fuori range [25,75], nullato")
+        else:
+            add(k, i.get("date"), MAX_AGE[k], "ok" if (a is not None and a <= MAX_AGE[k]) else "stale")
+
+    # --- VIX: alta frequenza, deve esserci ed essere plausibile a ogni run ---
+    vix = macro.get("vix") or {}
+    v = vix.get("value")
+    if v is None:
+        add("vix", None, 2, "missing")
+    elif not 5 <= v <= 150:
+        vix["value"] = None
+        add("vix", None, 2, "implausible", f"VIX {v} fuori range [5,150], nullato")
+    else:
+        add("vix", today.isoformat(), 2, "ok")
+
+    # --- Fed Funds: il tasso resta valido fino al prossimo FOMC, ma la rilevazione dev'esserci ---
+    fm = macro.get("fed_market") or {}
+    r = fm.get("current_rate")
+    if r is None:
+        add("fedfunds", fm.get("rate_date"), 60, "missing")
+    elif not 0 < r < 10:
+        fm["current_rate"] = None
+        add("fedfunds", fm.get("rate_date"), 60, "implausible", f"tasso {r}% fuori range, nullato")
+    else:
+        add("fedfunds", fm.get("rate_date"), 60, "ok")
+
+    # --- valutazione mercato (forward P/E, S&P P/E): se mancano il quadro leva è monco ---
+    for k, obj in (("forward_pe", macro.get("forward_pe")), ("sp500_pe", macro.get("sp500_pe"))):
+        val = (obj or {}).get("value") or (obj or {}).get("current")
+        add(k, today.isoformat(), 40, "ok" if val is not None else "missing",
+            "" if val is not None else "fonte ko in questo run: conferma leva/valutazioni impossibile")
+
+    return {"checks": checks, "alerts": alerts,
+            "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
 
 
 def seasonality_score(avg_pct, pos_pct):
@@ -2355,13 +2474,15 @@ def strip_private(rows):
 
 
 def main():
-    # snapshot del run PRECEDENTE (serve due volte: ratchet degli stop e metrics_history)
+    # snapshot del run PRECEDENTE (ratchet stop, carry-forward margin debt, metrics_history)
+    global PREV_DATA
     prev_data = {}
     try:
         if OUT.exists():
             prev_data = json.loads(OUT.read_text())
     except Exception:  # noqa: BLE001
         prev_data = {}
+    PREV_DATA = prev_data
 
     equities = fetch_equities()
     btp = fetch_btp()
@@ -2477,6 +2598,8 @@ def main():
         "options": options,
         "metrics_history": metrics_history,
         "sanity_filtered": SANITY_FILTERED,   # anomalie API scartate dal sanity check in questo run
+        # DATA ASSERTIONS: esito della validazione age+threshold sul macro (per UI e gate CI)
+        "data_quality": validate_macro(macro),
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

@@ -33487,40 +33487,30 @@
    "label": "Favorevole"
   },
   "margin_debt": {
-   "value": 622199,
-   "peak": 622199,
+   "value": 1415557,
+   "peak": 1415557,
    "pct_of_peak": 100.0,
-   "yoy": 30.5,
-   "qoq": 2.1,
-   "date": "2026-01-01",
-   "peak_date": "2026-01-01",
-   "series": "Fed Z.1 margin accounts (broker-dealer)",
+   "yoy": 53.7,
+   "qoq": 8.5,
+   "date": "2026-05-01",
+   "peak_date": "2026-05-01",
+   "series": "FINRA debit balances (mensile)",
    "history": [
-    281771,
-    333573,
-    411054,
-    470398,
-    494562,
-    513678,
-    517568,
-    519187,
-    466897,
-    458614,
-    381610,
-    370528,
-    380525,
-    401990,
-    397939,
-    433768,
-    451005,
-    451493,
-    485515,
-    476860,
-    506422,
-    566101,
-    609675,
-    622199
-   ]
+    920960,
+    1007961,
+    1022548,
+    1059723,
+    1126494,
+    1183654,
+    1214321,
+    1225597,
+    1279042,
+    1253192,
+    1220922,
+    1304281,
+    1415557
+   ],
+   "fetched_at": "2026-07-05"
   },
   "thermometer": {
    "score": 33,
@@ -79523,5 +79513,111 @@
    "eur_value": 277357.53
   }
  ],
- "sanity_filtered": 4
+ "sanity_filtered": 4,
+ "data_quality": {
+  "checks": [
+   {
+    "key": "margin_debt",
+    "date": "2026-05-01",
+    "age_days": 65,
+    "max_age": 90,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "cpi",
+    "date": "2026-05-01",
+    "age_days": 65,
+    "max_age": 75,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "pce",
+    "date": "2026-05-01",
+    "age_days": 65,
+    "max_age": 75,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "gdp",
+    "date": "2026-01-01",
+    "age_days": 185,
+    "max_age": 210,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "retail",
+    "date": "2026-05-01",
+    "age_days": 65,
+    "max_age": 75,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "nfp",
+    "date": "2026-06-01",
+    "age_days": 34,
+    "max_age": 50,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "unemp",
+    "date": "2026-06-01",
+    "age_days": 34,
+    "max_age": 50,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "pmi",
+    "date": "2026-05-01",
+    "age_days": 65,
+    "max_age": 50,
+    "status": "stale",
+    "note": ""
+   },
+   {
+    "key": "vix",
+    "date": "2026-07-05",
+    "age_days": 0,
+    "max_age": 2,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "fedfunds",
+    "date": "2026-06-01",
+    "age_days": 34,
+    "max_age": 60,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "forward_pe",
+    "date": "2026-07-05",
+    "age_days": 0,
+    "max_age": 40,
+    "status": "missing",
+    "note": "fonte ko in questo run: conferma leva/valutazioni impossibile"
+   },
+   {
+    "key": "sp500_pe",
+    "date": "2026-07-05",
+    "age_days": 0,
+    "max_age": 40,
+    "status": "missing",
+    "note": "fonte ko in questo run: conferma leva/valutazioni impossibile"
+   }
+  ],
+  "alerts": [
+   "pmi: stale",
+   "forward_pe: missing — fonte ko in questo run: conferma leva/valutazioni impossibile",
+   "sp500_pe: missing — fonte ko in questo run: conferma leva/valutazioni impossibile"
+  ],
+  "generated_at": "2026-07-05T05:13:41Z"
+ }
 }

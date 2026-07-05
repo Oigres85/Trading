@@ -73,5 +73,23 @@ check("risk: correlazioni annotate su ogni riga",
       all(r.get("avg_corr") is not None and r.get("max_corr_with") for r in panel))
 check("risk: avg_pairwise_corr in [-1,1]", risk.get("avg_pairwise_corr") is not None and -1 <= risk["avg_pairwise_corr"] <= 1)
 
-print(f"\n{('TUTTI I ' + str(14 - len(FAILED)) + '/14 CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
+
+# ---------- margin debt: carry-forward quando lo scrape FINRA fallisce ----------
+import update_data as ud
+from datetime import datetime, timezone, timedelta
+_orig_scrape = ud._finra_scrape
+ud._finra_scrape = lambda url: (_ for _ in ()).throw(RuntimeError("403 simulato"))
+recent = (datetime.now(timezone.utc) - timedelta(days=40)).strftime("%Y-%m-01")
+prev_ok = {"series": "FINRA debit balances (mensile)", "date": recent, "value": 1415557,
+           "peak": 1415557, "pct_of_peak": 100.0, "history": []}
+md_cf = ud.fetch_margin_debt(prev_ok)
+check("margin debt: carry-forward FINRA recente quando scrape ko",
+      md_cf is not None and md_cf.get("carried") is True and md_cf["value"] == 1415557)
+old = dict(prev_ok, date=(datetime.now(timezone.utc) - timedelta(days=120)).strftime("%Y-%m-01"))
+md_old = ud.fetch_margin_debt(old)
+check("margin debt: prev troppo vecchio (120g) NON riportato avanti (Z.1 flaggato o None)",
+      md_old is None or md_old.get("unreliable") is True)
+ud._finra_scrape = _orig_scrape
+
+print(f"\n{('TUTTI I ' + str(16 - len(FAILED)) + '/16 CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)

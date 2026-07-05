@@ -157,17 +157,31 @@ check("marginDebtState: 100% picco senza Forward P/E → ELEVATA con conferma n.
 // buildPrompt: smoke test completo
 const prompt = run(`buildPrompt()`);
 const has = (s) => prompt.includes(s);
-check("prompt: modello Advisory Board — conflitto Risk vs Growth con Sortino e scelta al CEO", has("Sortino < -0.3") && has("IL CONFLITTO RISK vs GROWTH") && has("LA SCELTA AL CEO"));
+check("prompt: advisory libero — delega sulla forma, domande al CEO, Sortino nel briefing", has("DELEGA PIENA SULLA FORMA") && has("FAI DOMANDE") && has("Sortino < -0.3"));
 check("prompt: colonna Sortino 1A nella tabella PORTAFOGLIO", has("| Sortino 1A |"));
-check("prompt: tre sezioni con schede operative ed esecuzione esatta", has("GESTIONE DEL PORTAFOGLIO ESISTENTE") && has("RADAR WATCHLIST E NUOVE ALLOCAZIONI") && has("ESECUZIONE ESATTA") && has("INDICI LEADING") && has("KOSPI"));
+check("prompt: briefing problemi noti (lag, FX/cash drag, sizing vs qualità, leading KOSPI)", has("LATENZA MACRO") && has("RISCHIO CAMBIO E CASH DRAG") && has("SIZING vs QUALITÀ") && has("KOSPI") && !has("Rispondi SOLO con queste tre sezioni"));
 check("prompt: matrice di rischio per posizione", has("MATRICE DI RISCHIO PER POSIZIONE"));
 check("prompt: flag [STOP VIOLATO] su TST3", /\[STOP VIOLATO\][\s\S]*TST3|TST3[^\n]*\[STOP VIOLATO\]/.test(prompt));
 check("prompt: VaR storico primario", has("STORICO, percentili empirici"));
-check("prompt: igiene dati e gap sessione conservate", has("IGIENE DEI DATI") && has("gap di sessione") && has("ordini LIMITE"));
+check("prompt: igiene dati, gap overnight e verifica web obbligatoria sui flag", has("IGIENE DEI DATI") && has("ordini LIMITE") && has("double-check") && has("ricerca web"));
 check("prompt: niente RICONCILIAZIONE nel baseline pulito", !has("RICONCILIAZIONE BROKER NECESSARIA"));
 check("prompt: nessun 'undefined' nel payload", !has("undefined"));
 check("prompt: nessun 'NaN' nel payload", !/\bNaN\b/.test(prompt));
 check("prompt: chiusura standby v87 rimossa", !has("In attesa di interrogazioni tattiche"));
+
+
+// data assertions: il fallback client-side deve urlare su margin debt non-FINRA
+check("validateMacroData: margin debt Z.1 → UNRELIABLE (fallback client)", run(`
+  const v = validateMacroData();
+  return v.bad.some(b => b.key === "margin_debt") && /UNRELIABLE/.test(v.flags.margin_debt || "")`));
+check("prompt: DATA QUALITY REPORT e flag inline sul margin debt", run(`
+  const p2 = buildPrompt();
+  return p2.includes("DATA QUALITY REPORT") && p2.includes("[!!! DATATO / UNRELIABLE !!!")`));
+check("validateMacroData: pulito con data_quality ok dalla pipeline", run(`
+  DATA.data_quality = { checks: [{ key: "margin_debt", status: "ok" }], alerts: [] };
+  const v = validateMacroData();
+  delete DATA.data_quality;
+  return v.ok === true`));
 
 /* ---------- report ---------- */
 let fail = 0;

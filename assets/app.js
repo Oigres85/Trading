@@ -653,6 +653,7 @@ function renderAll() {
   renderEarnings();
   renderEarningsAlert();
   renderReconcileAlert();
+  renderDataQualityAlert();
   renderTable();
   if (ptfView === "fund") renderFundTable();
   renderWatchlist();
@@ -717,6 +718,51 @@ function reconcileState() {
   });
   out.needed = (out.staleDays != null && out.staleDays > 14) || out.mismatches.length > 0;
   return out;
+}
+
+/* DATA ASSERTIONS lato client (post-incidente margin debt congelato a $622 mld Z.1):
+   legge data_quality dalla pipeline e, se assente (JSON vecchio), ricalcola i check
+   critici in locale. Un dato DATATO o INAFFIDABILE deve URLARE: banner in dashboard
+   + flag giganti nel prompt — mai più degradi silenziosi. */
+function validateMacroData() {
+  const dq = DATA?.data_quality;
+  const m = DATA?.macro || {};
+  const out = { bad: [], stale: [], flags: {} };   // flags[key] = testo da iniettare nel prompt
+  const classify = (key, status, note) => {
+    if (status === "implausible" || status === "unreliable" || status === "missing") {
+      out.bad.push({ key, status, note });
+      out.flags[key] = `[!!! DATATO / UNRELIABLE !!!${note ? " " + note : ""}]`;
+    } else if (status === "stale" && !out.flags[key]) {   // mai degradare un flag UNRELIABLE a semplice LAG
+      out.stale.push({ key, note });
+      out.flags[key] = "[LAG TEMPORALE RILEVATO — double-check via web PRIMA di usare questo dato]";
+    }
+  };
+  if (dq && Array.isArray(dq.checks)) {
+    dq.checks.forEach(c => classify(c.key, c.status, c.note || ""));
+  } else {
+    // fallback client-side minimale su JSON senza data_quality (pre-v97)
+    const md = m.margin_debt;
+    if (md && (md.unreliable || !/FINRA/.test(md.series || "") || (md.value || 0) < 800000)) {
+      classify("margin_debt", "unreliable", `serie ${md?.series || "?"} — non è il dato FINRA reale (~$1,4T nel 2026)`);
+    }
+    const ageD = (ds) => ds ? Math.floor((Date.now() - new Date(ds).getTime()) / 86400000) : null;
+    if (md && ageD(md.date) > 90) classify("margin_debt", "stale", "");
+    if (m.vix && m.vix.value != null && !(m.vix.value >= 5 && m.vix.value <= 150)) classify("vix", "implausible", `VIX ${m.vix.value}`);
+  }
+  out.ok = !out.bad.length && !out.stale.length;
+  return out;
+}
+
+function renderDataQualityAlert() {
+  const box = $("#dataquality-alert");
+  if (!box) return;
+  const v = validateMacroData();
+  if (v.ok) { box.hidden = true; box.innerHTML = ""; box.className = ""; return; }
+  const bad = v.bad.map(b => `<b>${esc(b.key)}</b> (${esc(b.status)}${b.note ? ": " + esc(b.note) : ""})`).join(" · ");
+  const st = v.stale.map(s => esc(s.key)).join(", ");
+  box.hidden = false;
+  box.className = "data-error";
+  box.innerHTML = `⚠ <b>QUALITÀ DATI MACRO</b> — ${bad ? `INAFFIDABILI: ${bad}. ` : ""}${st ? `Datati oltre la cadenza attesa: ${st}.` : ""} Il prompt AI marca questi dati con flag espliciti; non basare decisioni di leva/macro su di essi senza verifica web.`;
 }
 
 function renderReconcileAlert() {
@@ -4141,29 +4187,21 @@ function renderNews() {
 function buildPrompt() {
   const t = DATA.totals;
   const m = DATA.macro || {};
+  const dqV = validateMacroData();   // data assertions: usata da indicatori, margin debt e report
   const lines = [];
   const patrimonio = t.eur_invested + cashEur;
-  lines.push(`RUOLO: Sei il Comitato di Investimento Senior (Analisti Quantitativi e Fondamentali) di un Hedge Fund. Stai presentando il tuo report quotidiano all'Amministratore Delegato (l'utente). Il tuo compito non è imporre decisioni cieche, ma esporre i fatti e i conflitti tra matematica e mercato, proponendo soluzioni.
+  lines.push(`RUOLO: Sei il Comitato di Investimento Senior (analisti quantitativi, fondamentali e macro) di un fondo Growth. Riporti all'Amministratore Delegato (l'utente). Non sei un esecutore di format: sei un comitato di Wall Street che pensa. Esponi i fatti, i conflitti tra matematica e mercato, e le tue raccomandazioni — l'ultima parola spetta al CEO.
 
-MANDATO E REGOLE DI DISCUSSIONE:
-1. IL CONFLITTO RISK vs GROWTH: Il tuo compito è evidenziare SEMPRE le violazioni matematiche (es. peso > 10% NAV, Sortino < -0.3, Correlazione > 0.75). Tuttavia, devi bilanciarle con la visione discrezionale: se un titolo vìola il NAV ma ha fondamentali eccezionali (ROIC > 15%) o catalizzatori macro/news dirompenti, difendine il valore.
-2. IGIENE DEI DATI E REALISMO: Ogni valore "n.d." o "—" non va inventato. I suggerimenti valgono per la PROSSIMA sessione sui prezzi di questo payload. Pesa i gap di sessione e usa ordini LIMITE.
-3. LA SCELTA AL CEO: Nelle tue analisi, presenta il lato oscuro (Rischio) e il lato luminoso (Fondamentale/News). Dopodiché fornisci la tua raccomandazione operativa esatta, sapendo che l'ultima parola spetta al CEO.
+DELEGA PIENA SULLA FORMA: decidi TU come strutturare il report — numero di sezioni, ordine, formato e lunghezza — in base a ciò che i dati di oggi meritano: un giorno denso di news e violazioni merita un report ricco; una domenica piatta merita poche righe oneste, non riempitivi. Le raccomandazioni operative, quando le dai, devono essere inequivocabili nel modo che riterrai più chiaro (quantità, prezzi limite, stop — il sistema fornisce già stop ratchet 2×ATR e supporti calcolati). Se qualcosa non ti torna — una strategia ambigua, un dato contraddittorio, un'intenzione del CEO che non conosci — FAI DOMANDE invece di assumere.
 
-STRUTTURA DELL'OUTPUT — Rispondi SOLO con queste tre sezioni. Tono da riunione di Wall Street (professionale, analitico, dibattuto):
+BRIEFING SUI PROBLEMI NOTI DEL SISTEMA (tienine conto in ogni analisi):
+1. LATENZA MACRO: il payload contiene serie con lag di pubblicazione fisiologico (PIL trimestrale, CPI/PCE mensili con ~1 mese di ritardo). Ogni dato porta la sua data di rilevazione e il sistema marca automaticamente i casi critici con [LAG TEMPORALE RILEVATO] o [!!! DATATO / UNRELIABLE !!!]. Sei autorizzato e INVITATO a usare la ricerca web per verificare e aggiornare i dati — per quelli flaggati il double-check è OBBLIGATORIO prima di trarne conclusioni; cita fonte e data di ciò che aggiorni.
+2. RISCHIO CAMBIO E CASH DRAG: gran parte del NAV è in USD non coperto (il numero esatto è nelle METRICHE DI RISCHIO) e la liquidità è infruttifera allo 0%. Sono due inefficienze strutturali: pesale attivamente quando suggerisci operazioni (una vendita aumenta il cash drag se il ricavato resta fermo; l'esposizione USD amplifica o attutisce ogni mossa in euro).
+3. SIZING vs QUALITÀ: alcune posizioni violano il limite del 10% del NAV ma sono aziende eccellenti (ROIC alto, crescita). Non nascondere il conflitto: dichiara la violazione, esponi il lato rischio e il lato qualità, e raccomanda con trasparenza. Lo stesso vale per le value trap segnalate (Sortino < -0.3): la matematica comanda, ma se vedi un catalizzatore REALE nel payload, argomentalo.
+4. INDICI LEADING: in watchlist ci sono ^KS11 (KOSPI) e ^IXIC (Nasdaq Composite): il KOSPI chiude prima dell'apertura USA ed è un anticipatore utile per il sentiment tech/semiconduttori. Usali quando aiutano la lettura, non per obbligo.
+5. IGIENE DEI DATI: "n.d." o "—" = dato NON disponibile: non inventarlo, non colmarlo con conoscenza pregressa senza dichiararlo. I suggerimenti valgono per la PROSSIMA sessione sui prezzi del payload: preferisci ordini LIMITE e pesa i gap overnight, l'illiquidità ([ILLIQUIDO]) e il rischio earnings ([!EARNINGS RISK]).
 
-1. SCENARIO MACROECONOMICO, FLUSSI E INDICI LEADING (Executive Summary)
-- Lettura Indici Leading: Analizza obbligatoriamente lo stato del KOSPI (^KS11) e del Nasdaq (^IXIC) presenti nella Watchlist. Usa il KOSPI come indicatore anticipatore asiatico per il sentiment sul comparto Tech/Semiconduttori prima dell'apertura USA.
-- Fornisci l'analisi discorsiva da CEO: unisci i dati macro e le Ultime News per definire il regime di mercato e i driver.
-
-2. GESTIONE DEL PORTAFOGLIO ESISTENTE (Schede Operative)
-Non usare tabelle per l'analisi discorsiva. Per i titoli su cui intervenire, usa questo formato a scheda:
-* [TICKER] - AZIONE: (es. MANTIENI, TRIMMA X quote, LIQUIDA TUTTO)
-* MOTIVAZIONE OLISTICA: Spiega il perché incrociando i dati tecnici, fondamentali e le news specifiche fornite nel payload.
-* ESECUZIONE ESATTA: Scrivi in modo inequivocabile l'ordine da passare al broker. Usa il formato rigido: "VENDI [X] quote a limite di $[Prezzo Attuale]" (usando il prezzo odierno per le liquidazioni/trimming) oppure "COMPRA [X] quote a limite di $[Supporto]" (usando i livelli calcolati dal motore per le nuove entrate). Specifica sempre lo Stop Loss ricalcolato dal sistema.
-
-3. RADAR WATCHLIST E NUOVE ALLOCAZIONI
-Sulla base della matrice e dei dati, seleziona al massimo 2-3 candidati ideali dalla Watchlist. Usa lo stesso formato a "Scheda Operativa" del punto 2 (Azione, Motivazione Olistica, Esecuzione Esatta). Infine, aggiungi un breve paragrafo suggerendo settori o temi del mercato USA da osservare per il futuro.`);
+Sii proattivo e spietato sui rischi: se vedi un problema che il CEO non ti ha chiesto di guardare, sollevalo tu.`);
   lines.push("");
   const ageMin = Math.round((Date.now() - new Date(DATA.updated_at).getTime()) / 60000);
   const lagNote = ageMin > 90 ? ` [ATTENZIONE: snapshot di ${ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min"} fa — i prezzi potrebbero essere disallineati dal mercato live; verifica online i livelli critici prima di ragionarci sopra]` : "";
@@ -4213,7 +4251,7 @@ Sulla base della matrice e dei dati, seleziona al massimo 2-3 candidati ideali d
       const bits = [];
       if (rec.staleDays != null && rec.staleDays > 14) bits.push(`snapshot broker vecchio di ${rec.staleDays} giorni (${(DATA.broker || {}).as_of})`);
       if (rec.mismatches.length) bits.push(`controvalore ricalcolato che diverge >20% dal bval broker su: ${rec.mismatches.map(m => `${m.tk} ${m.dev > 0 ? "+" : ""}${m.dev}%`).join(", ")}`);
-      lines.push(`⚠ RICONCILIAZIONE BROKER NECESSARIA (${bits.join("; ")}): i campi statici del broker potrebbero non riflettere trade recenti. Fidati dei valori RICALCOLATI (prezzo live × quantità) e segnala l'incoerenza all'inizio della sezione 2 chiedendo conferma delle posizioni.`);
+      lines.push(`⚠ RICONCILIAZIONE BROKER NECESSARIA (${bits.join("; ")}): i campi statici del broker potrebbero non riflettere trade recenti. Fidati dei valori RICALCOLATI (prezzo live × quantità) e segnala l'incoerenza IN APERTURA del report chiedendo conferma delle posizioni.`);
     }
   } catch { /* no-op */ }
   // STAGIONALITÀ del mese corrente
@@ -4231,10 +4269,10 @@ Sulla base della matrice e dei dati, seleziona al massimo 2-3 candidati ideali d
   // In modalità standby l'AI NON deve commentarli operativamente né trasformarli in raccomandazioni.
   try {
     const dv = decisionVerdict();
-    lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (posizionamento interno calcolato dalla dashboard — usalo come base quantitativa per le sezioni 2 e 3, validandolo criticamente invece di ripeterlo a pappagallo; se il tuo giudizio diverge dal motore, dichiaralo e motiva): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
+    lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (posizionamento interno calcolato dalla dashboard — usalo come base quantitativa per le tue raccomandazioni, validandolo criticamente invece di ripeterlo a pappagallo; se il tuo giudizio diverge dal motore, dichiaralo e motiva): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
     lines.push("· NOTA METODOLOGICA: gli Stop Loss sulle posizioni sono TRAILING RATCHET su base 2×ATR(14 Wilder): partono 2×ATR sotto il prezzo e da lì possono solo SALIRE coi massimi — non si riabbassano nei ribassi (persistiti tra i run, reset solo se il trade cambia). NON sono percentuali fisse. Il verdetto di accumulo è ritarato sul mandato quant: impatto marginale sullo Sharpe, forza relativa 1M vs benchmark, qualità fondamentale; gli asset in veto (value trap / ROIC<0 / PEG<0) sono esclusi a prescindere dal supporto tecnico.");
     if ((dv.stopViolations || []).length) {
-      lines.push("· ⚠ STOP VIOLATI (il prezzo è SOTTO lo stop trailing ancorato — nella sezione 2 dedica una scheda operativa a ciascuno (uscire o ri-armare), con motivazione): " +
+      lines.push("· ⚠ STOP VIOLATI (il prezzo è SOTTO lo stop trailing ancorato — dedica a ciascuno una raccomandazione esplicita (uscire o ri-armare), con motivazione): " +
         dv.stopViolations.map(x => `${x.r.ticker} stop $${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)} (${signTxt(Math.round((x.r.price / x.stop - 1) * 1000) / 10)})`).join(" · ") + ".");
     }
     if ((dv.withPlan || []).length) {
@@ -4328,7 +4366,7 @@ Sulla base della matrice e dei dati, seleziona al massimo 2-3 candidati ideali d
   // ANALISI FONDAMENTALE DETTAGLIATA per ticker
   const fundItems = [...DATA.portfolio, ...(DATA.watchlist || [])].filter(r => r.stats?.market_cap);
   if (fundItems.length) {
-    lines.push("ANALISI FONDAMENTALE DETTAGLIATA (usa per le schede operative delle sezioni 2 e 3 — valutazione e qualità):");
+    lines.push("ANALISI FONDAMENTALE DETTAGLIATA (valutazione e qualità per le tue raccomandazioni):");
     lines.push("| Titolo | P/E TTM | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Altman Z'' | Div% | Note |");
     lines.push("|---|---|---|---|---|---|---|---|---|---|---|---|");
     fundItems.forEach(r => {
@@ -4390,9 +4428,14 @@ Sulla base della matrice e dei dati, seleziona al massimo 2-3 candidati ideali d
   (m.markets || []).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   // ogni indicatore economico con la sua data di pubblicazione ESPLICITA: la latenza del dato
   // deve essere palese all'AI (CPI/NFP = mensili con ~1 mese di ritardo; PIL = trimestrale)
-  (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile" : "serie mensile, normale ritardo di pubblicazione"})`));
+  (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile" : "serie mensile, normale ritardo di pubblicazione"})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`));
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
+  // DATA QUALITY REPORT: i dati flaggati dalle assertions vengono dichiarati PRIMA del quadro
+  // macro, con l'ordine esplicito di fare double-check web su ciò che è datato/inaffidabile
+  if (!dqV.ok) {
+    lines.push(`⚠ DATA QUALITY REPORT (assertions automatiche del sistema): ${[...dqV.bad.map(b => `${b.key} INAFFIDABILE (${b.status}${b.note ? ": " + b.note : ""})`), ...dqV.stale.map(s => `${s.key} DATATO oltre la cadenza attesa`)].join(" · ")}. Per ogni dato marcato qui sotto con [!!! DATATO / UNRELIABLE !!!] o [LAG TEMPORALE RILEVATO]: NON usarlo così com'è — fai double-check con la ricerca web e cita il valore aggiornato con fonte e data.`);
+  }
   const mds = marginDebtState();
   if (mds) {
     const md = mds.md;
@@ -4400,7 +4443,8 @@ Sulla base della matrice e dei dati, seleziona al massimo 2-3 candidati ideali d
     // La label già esprime lo stato; conf aggiunge solo la sfumatura di conferma senza duplicare.
     const conf = mds.confirmed ? " → RISCHIO SISTEMICO (confermato dal Forward P/E >20)"
       : (mds.high && mds.fpe != null) ? " (il Forward P/E attuale non conferma il livello estremo)" : "";
-    lines.push(`- Margin Debt (leva a credito, serie ${md.series || "FRED"}): ${md.pct_of_peak}% del picco storico${md.peak_date ? ` (ATH toccato il ${md.peak_date})` : ""} — ${mds.label}${conf}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""} (rilevazione ${md.date}). Leva alta/estrema = mercato fragile, le discese possono innescare margin call a catena (drawdown più violenti sul tech ad alta beta).`);
+    const mdFlag = dqV.flags.margin_debt ? ` ${dqV.flags.margin_debt}` : "";
+    lines.push(`- Margin Debt (leva a credito, serie ${md.series || "FRED"}${md.carried ? ", carry-forward dal run precedente" : ""}): $${fmtNum.format(Math.round((md.value || 0) / 1000))} mld = ${md.pct_of_peak}% del picco storico${md.peak_date ? ` (ATH ${md.peak_date})` : ""} — ${mds.label}${conf}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""} (rilevazione ${md.date}).${mdFlag} Leva alta/estrema = mercato fragile, le discese possono innescare margin call a catena (drawdown più violenti sul tech ad alta beta).`);
   }
   if (m.forward_pe && m.forward_pe.value != null) {
     const fp = m.forward_pe;
@@ -4546,7 +4590,7 @@ Sulla base della matrice e dei dati, seleziona al massimo 2-3 candidati ideali d
   const tkNewsKeys = Object.keys(tkNews);
   if (tkNewsKeys.length) {
     lines.push("");
-    lines.push("NEWS RILEVANTI PER SINGOLO TITOLO (usa per valutare catalizzatori e rischi specifici — sezioni 2 e 3):");
+    lines.push("NEWS RILEVANTI PER SINGOLO TITOLO (catalizzatori e rischi specifici — incrociale con tecnica e fondamentali):");
     tkNewsKeys.forEach(tk => {
       tkNews[tk].forEach(n => {
         const s2 = n.sentiment === "bull" ? "[+]" : n.sentiment === "bear" ? "[-]" : "[~]";
@@ -4555,11 +4599,11 @@ Sulla base della matrice e dei dati, seleziona al massimo 2-3 candidati ideali d
     });
   }
   lines.push("");
-  lines.push(`PROMEMORIA FINALE (vincolante):
-- Tono da Comitato di Investimento: professionale, analitico, dibattuto — esponi i conflitti tra matematica e mercato, poi raccomanda; l'ultima parola spetta al CEO.
-- Cita le cifre decisive integrandole nel discorso; per ogni dato citato considera la sua data di rilevazione.
-- SOLO le tre sezioni richieste (SCENARIO MACRO/FLUSSI/INDICI LEADING · GESTIONE DEL PORTAFOGLIO ESISTENTE · RADAR WATCHLIST E NUOVE ALLOCAZIONI), con le Schede Operative nel formato indicato (Azione / Motivazione Olistica / Esecuzione Esatta).
-- Ogni scheda deve dichiarare le violazioni matematiche rilevanti (sizing 10% NAV, Sortino, correlazione) anche quando le difendi, e citare quantità e livelli coerenti coi dati (stop ratchet 2×ATR, supporti, MCR).`);
+  lines.push(`PROMEMORIA FINALE:
+- La forma del report la scegli tu; la sostanza no: cifre decisive integrate nel discorso, ogni dato pesato per la sua data di rilevazione, violazioni matematiche (sizing, Sortino, correlazione) SEMPRE dichiarate anche quando le difendi.
+- Raccomandazioni operative inequivocabili (quantità, prezzi, stop coerenti con stop ratchet/supporti/MCR del payload) e disciplina: ordini limite, mai a mercato in apertura.
+- Se un dato è flaggato [!!! DATATO / UNRELIABLE !!!] o [LAG TEMPORALE RILEVATO], il double-check web è obbligatorio prima di usarlo.
+- Domande al CEO benvenute quando servono. L'ultima parola è sua.`);
   return lines.join("\n");
 }
 
