@@ -11,13 +11,13 @@ const SORT_FIELDS = {
   "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg", "volume",
                 "gain", "gain_pct", "beta", "sharpe_1y", "sortino_1y", "support",
                 "resistance", "sma200_dist_pct", "rs_1m", "rs_ndx_1m", null,
-                "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
+                "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,Beta,Sharpe 1A,Sortino 1A,Supporto,Resistenza,Δ SMA200,
   // RS 1M,RS NDX 1M,Segnale,Short %,Drawdown 52S,Opzioni,Trimestrale,Grafico
   "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume",
                "beta", "sharpe_1y", "sortino_1y", "support", "resistance", "sma200_dist_pct",
                "rs_1m", "rs_ndx_1m", null,
-               "stat:short_float", "w52_dist_pct", null, "earnings_date", null],
+               "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null],
   // tabelle fondamentali (vista Value); allineate 1:1 alle colonne:
   // MarketCap, P/E, EV/EBITDA, ROE, Margine, P/FCF, Crescita, D/E, Div, PEG, Z-Score, FinHealth, TargetΔ
   "ptf-fund-table": ["name", "qty", "pmc", "price", "stat:market_cap", "pe", "stat:ev_ebitda",
@@ -2492,6 +2492,18 @@ function shortFloatCell(r) {
   return `<td class="num">${pct}%${squeeze ? `<br><span class="badge badge-squeeze badge-info" data-badge="squeeze" role="button" tabindex="0" title="Clicca per la spiegazione">[Squeeze Risk]</span>` : ""}</td>`;
 }
 
+/* Flottante: azioni liberamente scambiabili. Evidenzia il rischio short squeeze quando il
+   float è ridotto (<50M) E lo short interest è elevato (>=15%) E i volumi sono anomali (>1,5×). */
+function floatCell(r) {
+  const st = r.stats || {};
+  const fs = st.float_shares;
+  if (fs == null) return `<td class="num muted">—</td>`;
+  const txt = fs >= 1e9 ? (fs / 1e9).toFixed(1) + "B" : Math.round(fs / 1e6) + "M";
+  const pct = st.float_pct != null ? `<br><span class="muted" style="font-size:9px">${fmtNum.format(st.float_pct)}%</span>` : "";
+  const squeeze = fs < 50e6 && (st.short_float ?? 0) >= 0.15 && (r.vol_ratio ?? 0) > 1.5;
+  return `<td class="num" title="Flottante ${fmtNum.format(Math.round(fs / 1e6))}M azioni${st.float_pct != null ? ` (${fmtNum.format(st.float_pct)}% del totale)` : ""}${squeeze ? " — LOW FLOAT + Short≥15% + RVol>1,5: rischio short squeeze" : ""}">${squeeze ? `<b class="neg">${txt}</b>` : txt}${pct}${squeeze ? `<br><span class="badge badge-squeeze">[LOW FLOAT]</span>` : ""}</td>`;
+}
+
 function drawdownCell(r) {
   const d = r.w52_dist_pct;
   if (d == null) return `<td class="num muted">—</td>`;
@@ -2591,6 +2603,7 @@ function techCells(r) {
         : `<td class="num muted" title="Disponibile dopo il prossimo run della pipeline">n.d.</td>`}
       <td title="Logica del segnale: prezzo vs SMA50/SMA200 (trend) + RSI(14), calcolati su base giornaliera (daily). Golden setup = prezzo > SMA50 > SMA200 con RSI non estremo."><span class="badge ${r.signal_class}">${r.signal}</span>${r.qty && r.stop_violated ? `<br><span class="badge badge-earnrisk" title="Il prezzo è SOTTO lo stop trailing ancorato ($${fmtNum.format(r.stop_atr)}): la disciplina prevede uscita o ri-arm consapevole. Lo stop ratchet non si riabbassa da solo.">[STOP VIOLATO]</span>` : ""}</td>
       ${shortFloatCell(r)}
+      ${floatCell(r)}
       ${drawdownCell(r)}
       ${optImpactCell(r.ticker)}
       ${earningsCell(r)}
@@ -3714,10 +3727,10 @@ function renderTable() {
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="14" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="15" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="24"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applyColLabels("ptf-table");
 }
@@ -3747,9 +3760,9 @@ function renderWatchlist() {
       <td class="num">${prepostCell(r.prepost)}</td>
       ${volumeCell(r)}
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="19" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="20" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="19"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="20"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   applyColLabels("wl-table");
 }
