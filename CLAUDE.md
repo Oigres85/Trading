@@ -22,15 +22,19 @@
 
 Il "megaprompt" che l'utente copia (`buildPrompt()` in `app.js`) ha due parti:
 
-1. **TESTATA** (istruzioni: `RUOLO:` … `sollevalo tu.`) → vive in **`config/prompt_header.txt`**.
-   - In `app.js` c'è solo `promptHeaderText()` che legge l'override (localStorage/cloud) oppure
-     il fallback embedded `DEFAULT_PROMPT_HEADER`.
-   - **Per cambiare le istruzioni dell'AI si edita `config/prompt_header.txt`, NON il testo in `app.js`.**
-   - `DEFAULT_PROMPT_HEADER` è solo il fallback offline e **deve restare byte-identico** al file:
-     se cambi uno, aggiorna l'altro nello **stesso commit** (verifica: `DEFAULT_PROMPT_HEADER.trim()
-     === contenuto del file`).
-   - L'utente edita la testata dalla dashboard ("⚙ Impostazioni Prompt AI" → scrive il file via
-     Contents API). **NON sovrascrivere mai a mano ciò che la UI salva** senza motivo esplicito.
+1. **TESTATA** (le istruzioni all'AI) → vive in **`config/prompt_header.txt`**, ed è la **fonte
+   di verità**. L'utente la edita dalla dashboard ("⚙ Impostazioni Prompt AI"), che scrive il
+   file via GitHub Contents API (commit "Aggiorna testata prompt AI (da dashboard)").
+   - `loadPromptHeaderCloud()` scarica il file all'avvio → `localStorage.prompt_header` →
+     `promptHeaderText()` lo usa nel prompt. `DEFAULT_PROMPT_HEADER` in `app.js` è **SOLO il
+     fallback offline** (primo caricamento / senza rete).
+   - ⚠️ **Il fallback NON deve coincidere col file** e NON va "riallineato": il file è pieno di
+     personalizzazioni del CEO che il fallback non ha. Il test verifica solo che il fallback
+     esista e sia sensato, NON l'uguaglianza (v104 — la vecchia regola "byte-identico" era
+     sbagliata: falliva la CI a ogni edit dell'utente).
+   - 🛑 **NON sovrascrivere MAI `config/prompt_header.txt`** (cancelleresti il lavoro del CEO).
+     Per cambiare le istruzioni: dillo all'utente di editarle dalla UI, oppure — se richiesto
+     esplicitamente — modifica il file sapendo che sostituisci la sua versione.
 
 2. **CODA** (payload dati: tabelle portafoglio/watchlist, matrice di rischio, macro, news,
    fondamentali, ecc.) → generata dalle funzioni JS in `buildPrompt()`.

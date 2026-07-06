@@ -1913,30 +1913,6 @@ function openRotationAnalysis() {
     <div class="info-line muted" style="font-size:11px;margin-top:8px">Per il piano operativo dettagliato di rotazione/de-risking usa "Copia prompt AI".</div>`);
 }
 
-function openWitchingModal() {
-  const w = (DATA.macro || {}).witching;
-  if (!w) return;
-  const dates = (w.upcoming || []).map(d => `<tr><td>${new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</td><td class="muted">3° venerdì del trimestre</td></tr>`).join("");
-  const contracts = (w.contracts || []).map(c => `<li>${esc(c)}</li>`).join("");
-  // urgency derivata dai giorni
-  const urgency = Math.max(0, Math.min(100, Math.round((1 - w.days / 90) * 100)));
-  const urgCol = w.days <= 7 ? "var(--red)" : w.days <= 21 ? "var(--yellow)" : "var(--muted)";
-  const urgLab = w.days <= 7 ? "IMMINENTE — massima attenzione a spike di volatilità intraday"
-               : w.days <= 21 ? "VICINA — monitorare volumi opzioni e livelli Max Pain"
-               : w.days <= 45 ? "IN ARRIVO — posizionarsi in anticipo se necessario"
-               : "LONTANA — nessuna azione urgente";
-  openInfoModal("Quadruple Witching — le quattro streghe",
-    `<p class="muted" style="margin:0 0 8px">Quattro volte l'anno (3° venerdì di marzo, giugno, settembre, dicembre) scadono contemporaneamente quattro tipi di derivati: spesso aumentano volumi e volatilità del 30-50% rispetto alla media giornaliera.</p>
-     <div class="info-line"><b>Prossima:</b> <b style="color:${urgCol}">${w.next ? new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "—"}</b> (tra ${w.days} giorni)</div>
-     <div class="meter-track" style="margin:6px 0"><span class="meter-fill" style="width:${urgency}%;background:${urgCol}"></span></div>
-     <div class="info-line" style="color:${urgCol};font-size:12px;margin-bottom:10px">${urgLab}</div>
-     <div class="info-line muted" style="font-size:11px;margin-bottom:6px">In prossimità della scadenza i market maker coprono/chiudono le posizioni → volumi straordinari attorno a Call Wall e Put Wall (vedi sezione <b>Put/Call</b> per i muri di opzioni del tuo portafoglio), spesso con "pinning" del prezzo ai livelli di maggiore open interest.</div>
-     <h4 style="margin:10px 0 4px">Prossime date</h4>
-     <table class="info-table"><thead><tr><th>Data</th><th>Note</th></tr></thead><tbody>${dates}</tbody></table>
-     <h4 style="margin:10px 0 4px">Contratti in scadenza</h4><ul style="margin:0 0 0 18px">${contracts}</ul>
-     <div class="info-line muted" style="font-size:11px;margin-top:10px">Strategia tipica: evitare posizioni aperte sul mercato USA nelle 2 ore finali del giorno di scadenza. Se si detengono opzioni in portafoglio, valutare chiusura 1-2 giorni prima.</div>`);
-}
-
 function openSignpostsModal() {
   const sp = (DATA.macro || {}).signposts;
   if (!sp) return;
@@ -2082,122 +2058,6 @@ let histRange = "all";   // w1 | m1 | m3 | y1 | y5 | all — default: dall'inizi
 let histBenchKey = "ndx";   // none | nasdaq | ndx | sp500 — default: confronto con Nasdaq 100
 const BENCH_LABEL = { nasdaq: "Nasdaq Comp.", ndx: "Nasdaq 100", sp500: "S&P 500", russell: "Russell 2000" };
 
-function renderHistory() {
-  let h = DATA.history && DATA.history[histRange];
-  // vista Max = storico completo: andamento precedente (pipeline, dal 2021) raccordato
-  // alla curva REALE del broker degli ultimi mesi (ultimo punto = controvalore reale)
-  const ec = DATA.broker?.equity_curve;
-  let realCurve = false;
-  if (histRange === "all" && ec && ec.length > 1) {
-    const all = DATA.history?.all;
-    const cut = ec[0].d;
-    let oldDates = [], oldVals = [];
-    if (all?.dates?.length) {
-      for (let i = 0; i < all.dates.length; i++) {
-        if (all.dates[i] < cut) { oldDates.push(all.dates[i]); oldVals.push(all.values[i]); }
-      }
-      if (oldVals.length) {   // raccordo: scala lo storico precedente per agganciarlo al 1° punto reale
-        const f = ec[0].v / oldVals[oldVals.length - 1];
-        oldVals = oldVals.map(v => Math.round(v * f));
-      }
-    }
-    const stDates = oldDates.concat(ec.map(p => p.d));
-    const stVals = oldVals.concat(ec.map(p => p.v));
-    h = { dates: stDates, values: stVals };
-    // benchmark sovrapposto. Preferito: serie indice ALLINEATA alle date reali del broker
-    // (broker_bench, generata dalla pipeline) — corretta anche per IPO recenti che accorciano
-    // la storia del portafoglio. Fallback: campionamento per data vicina sulla serie "all".
-    const bb = DATA.history?.broker_bench;
-    const bbUsable = bb && !oldVals.length && Array.isArray(bb.dates) && bb.dates.length === ec.length;
-    if (bbUsable) {
-      ["nasdaq", "ndx", "sp500", "russell"].forEach(bk => {
-        if (Array.isArray(bb[bk]) && bb[bk].length === stVals.length) h[bk] = bb[bk];
-      });
-    } else if (all?.dates?.length) {
-      const allT = all.dates.map(d => +new Date(d));
-      ["nasdaq", "ndx", "sp500", "russell"].forEach(bk => {
-        const ser = all[bk];
-        if (!ser || ser.length !== all.dates.length) return;
-        const sampled = stDates.map(d => {
-          const t = +new Date(d);
-          let bi = 0, best = Infinity;
-          for (let i = 0; i < allT.length; i++) { const dd = Math.abs(allT[i] - t); if (dd < best) { best = dd; bi = i; } }
-          return ser[bi];
-        });
-        // se il campionamento è quasi tutto piatto (copertura indice < finestra), non mostrare l'overlay fuorviante
-        const distinct = new Set(sampled).size;
-        if (sampled[0] && distinct > Math.max(3, sampled.length * 0.3)) {
-          const sf = stVals[0] / sampled[0]; h[bk] = sampled.map(v => Math.round(v * sf));
-        }
-      });
-    }
-    realCurve = true;
-  }
-  const box = $("#hist-chart");
-  if (!h || h.values.length < 2) { box.innerHTML = '<div class="muted" style="padding:40px 0;text-align:center">Storico non disponibile</div>'; $("#hist-summary").textContent = ""; return; }
-  const vals = h.values, dates = h.dates;
-  const bench = (histBenchKey !== "none" && h[histBenchKey] && h[histBenchKey].length === vals.length) ? h[histBenchKey] : null;
-  const W = 560, H = 210, pad = { l: 56, r: 12, t: 12, b: 22 };
-  const allv = bench ? vals.concat(bench) : vals;
-  const min = Math.min(...allv), max = Math.max(...allv), range = max - min || 1;
-  const x = i => pad.l + i / (vals.length - 1) * (W - pad.l - pad.r);
-  const y = v => pad.t + (1 - (v - min) / range) * (H - pad.t - pad.b);
-  const poly = arr => arr.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
-  const area = `${pad.l},${y(min)} ${poly(vals)} ${x(vals.length - 1)},${y(min)}`;
-  const up = vals[vals.length - 1] >= vals[0];
-  const col = up ? "var(--green)" : "var(--red)";
-  const grid = [0, .25, .5, .75, 1].map(f => {
-    const gv = min + range * f, gy = y(gv);
-    return `<line x1="${pad.l}" y1="${gy.toFixed(1)}" x2="${W - pad.r}" y2="${gy.toFixed(1)}" stroke="var(--border)" stroke-width="1"/>
-      <text x="${pad.l - 6}" y="${(gy + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--muted)">${fmtNum.format(Math.round(gv / 1000))}k</text>`;
-  }).join("");
-  const xl = [0, Math.floor(vals.length / 2), vals.length - 1].map(i => {
-    const dt = new Date(dates[i]).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "2-digit" });
-    return `<text x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="middle" font-size="9" fill="var(--muted)">${dt}</text>`;
-  }).join("");
-  const benchLine = bench ? `<polyline points="${poly(bench)}" fill="none" stroke="var(--cyan)" stroke-width="1.6" stroke-dasharray="4 3" opacity="0.85"/>` : "";
-  box.innerHTML = `<svg id="hist-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:210px">
-    <defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${col}" stop-opacity="0.28"/>
-      <stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
-    ${grid}
-    <polygon points="${area}" fill="url(#hg)"/>
-    <polyline points="${poly(vals)}" fill="none" stroke="${col}" stroke-width="2"/>
-    ${benchLine}
-    <line id="hist-cursor" x1="0" y1="${pad.t}" x2="0" y2="${H - pad.b}" stroke="var(--text)" stroke-width="1" opacity="0"/>
-    <circle id="hist-dot" r="3.5" fill="${col}" opacity="0"/>
-    <rect id="hist-hit" x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}" fill="transparent"/>
-  </svg>${bench ? `<div class="bench-leg"><span class="leg-dash"></span> ${BENCH_LABEL[histBenchKey]} (riscalato)</div>` : ""}`;
-  const first = vals[0], last = vals[vals.length - 1], chg = (last / first - 1) * 100;
-  let benchTxt = "", alphaBadge = "";
-  if (bench) {
-    const bchg = (bench[bench.length - 1] / bench[0] - 1) * 100;
-    const alpha = Math.round((chg - bchg) * 10) / 10;
-    alphaBadge = ` · <b>Alpha: <span class="${signCls(alpha)}">${signTxt(alpha)} pp</span></b> vs ${BENCH_LABEL[histBenchKey]}`;
-    benchTxt = ` · ${BENCH_LABEL[histBenchKey]} <span class="${signCls(bchg)}">${signTxt(Math.round(bchg * 10) / 10)}</span>${alphaBadge}`;
-  }
-  $("#hist-summary").innerHTML = `<span id="hist-tip">${fmtEUR.format(first)} → <b>${fmtEUR.format(last)}</b>
-    <span class="${signCls(chg)}">${signTxt(Math.round(chg * 100) / 100)}</span> nel periodo${benchTxt}</span>`;
-
-  // tooltip al passaggio del mouse
-  const svg = $("#hist-svg"), hit = $("#hist-hit"), cursor = $("#hist-cursor"), dot = $("#hist-dot"), tip = $("#hist-tip");
-  const baseTip = tip.innerHTML;
-  const move = (ev) => {
-    const r = svg.getBoundingClientRect();
-    const px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
-    const i = Math.max(0, Math.min(vals.length - 1, Math.round((px / r.width * W - pad.l) / (W - pad.l - pad.r) * (vals.length - 1))));
-    const vx = x(i), vy = y(vals[i]);
-    cursor.setAttribute("x1", vx); cursor.setAttribute("x2", vx); cursor.setAttribute("opacity", ".4");
-    dot.setAttribute("cx", vx); dot.setAttribute("cy", vy); dot.setAttribute("opacity", "1");
-    const dchg = (vals[i] / first - 1) * 100;
-    tip.innerHTML = `${new Date(dates[i]).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}: <b>${fmtEUR.format(vals[i])}</b> <span class="${signCls(dchg)}">${signTxt(Math.round(dchg * 100) / 100)}</span> dal primo giorno`;
-  };
-  const leave = () => { cursor.setAttribute("opacity", "0"); dot.setAttribute("opacity", "0"); tip.innerHTML = baseTip; };
-  hit.addEventListener("mousemove", move);
-  hit.addEventListener("touchmove", move);
-  hit.addEventListener("mouseleave", leave);
-}
-
 /* ---------------- info BTP (riga unica sotto i KPI) ---------------- */
 function renderBtpInfo() {
   const box = $("#btp-info");
@@ -2305,46 +2165,16 @@ function meterBar(pct, color, text) {
   </div>`;
 }
 
-function rsiBar(rsi) {
-  if (rsi === null || rsi === undefined) return "—";
-  // ipervenduto (<30) = verde (opportunità) · ipercomprato (>70) = rosso (rischio)
-  const color = scoreColor(100 - rsi);
-  return meterBar(rsi, color, fmtNum.format(rsi));
-}
-
-function volBar(ratio) {
-  if (!ratio) return "—";
-  // volume vs media 30gg: normale = verde, anomalo = rosso (gradiente)
-  return meterBar((ratio / 3) * 100, scoreColor(clamp(100 - (ratio - 1) * 60)), `${fmtNum.format(ratio)}×`);
-}
-
 const RATING_LABELS = {
   strong_buy: ["Strong Buy", "good"], buy: ["Buy", "good"],
   hold: ["Hold", "neutral"], underperform: ["Underperf.", "bad"],
   sell: ["Sell", "bad"], strong_sell: ["Strong Sell", "bad"],
 };
 
-function ratingBadge(r) {
-  if (!r || !r.key) return "—";
-  const [label, cls] = RATING_LABELS[r.key] || [r.key, "neutral"];
-  const n = r.n ? ` title="${r.n} analisti — target medio ${fmtNum.format(r.target)}"` : "";
-  return `<span class="badge ${cls}"${n}>${label}</span>`;
-}
-
 function targetBar(r) {
   if (!r || r.upside_pct === null || r.upside_pct === undefined) return "—";
   const u = r.upside_pct;   // upside alto = verde, negativo = rosso
   return meterBar(Math.abs(u) * 2, scoreColor(clamp(50 + u * 2.5)), signTxt(u));
-}
-
-function peBar(pe) {
-  if (!pe || pe <= 0) return "—";   // P/E basso = verde (economico), alto = rosso
-  return meterBar(Math.min(pe, 60) / 60 * 100, scoreColor(clamp(100 - pe * 2.2)), fmtNum.format(pe));
-}
-
-function epsBar(eps) {
-  if (eps === null || eps === undefined) return "—";   // utili positivi = verde
-  return meterBar(Math.min(Math.abs(eps), 15) / 15 * 100, scoreColor(clamp(50 + eps * 6)), fmtNum.format(eps));
 }
 
 function betaBar(r) {
@@ -2356,15 +2186,6 @@ function betaBar(r) {
   const bar = meterBar(Math.min(beta, 3) / 3 * 100, scoreColor(clamp(100 - (beta - 0.5) * 55)), fmtNum.format(beta));
   if (!tk) return bar;
   return `<button class="beta-btn" data-beta-tk="${tk}" title="Beta ${src} — clicca per lo stress test di portafoglio">${bar}</button>`;
-}
-
-function athBar(r) {
-  if (!r.ath) return "—";
-  const closeness = Math.max(0, 100 + r.ath_dist_pct);   // 100 = sul massimo storico = verde
-  return `<div class="meter" title="Max storico ${fmtNum.format(r.ath)}">
-    <span class="meter-txt">${signTxt(r.ath_dist_pct)}</span>
-    <span class="meter-track"><span class="meter-fill" style="width:${Math.max(3, closeness)}%;background:${scoreColor(closeness)}"></span></span>
-  </div>`;
 }
 
 function prepostCell(pp) {
@@ -2800,62 +2621,12 @@ function openFinancialsModal(ticker) {
 }
 
 /* ---------------- zoom grafico (modale, touch + mouse) ---------------- */
-function openChartModal(title, vals, dates, fmt, controlsHTML) {
-  if (!vals || vals.length < 2) { toast("Grafico non disponibile per questo intervallo"); return; }
-  fmt = fmt || (v => fmtNum.format(v));
-  const W = 900, H = 380, pad = { l: 64, r: 16, t: 16, b: 28 };
-  const min = Math.min(...vals), max = Math.max(...vals), range = max - min || 1;
-  const x = i => pad.l + i / (vals.length - 1) * (W - pad.l - pad.r);
-  const y = v => pad.t + (1 - (v - min) / range) * (H - pad.t - pad.b);
-  const line = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
-  const up = vals[vals.length - 1] >= vals[0], col = up ? "var(--green)" : "var(--red)";
-  const grid = [0, .25, .5, .75, 1].map(f => {
-    const gv = min + range * f, gy = y(gv);
-    return `<line x1="${pad.l}" y1="${gy.toFixed(1)}" x2="${W - pad.r}" y2="${gy.toFixed(1)}" stroke="var(--border)"/>
-      <text x="${pad.l - 8}" y="${(gy + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(gv)}</text>`;
-  }).join("");
-  $("#chart-modal-title").textContent = title;
-  $("#chart-modal-body").innerHTML = (controlsHTML || "") + `<svg id="cm-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
-    <defs><linearGradient id="cmg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${col}" stop-opacity="0.25"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
-    ${grid}
-    <polygon points="${pad.l},${y(min)} ${line} ${x(vals.length - 1)},${y(min)}" fill="url(#cmg)"/>
-    <polyline points="${line}" fill="none" stroke="${col}" stroke-width="2.5"/>
-    <line id="cm-cur" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--text)" opacity="0"/>
-    <circle id="cm-dot" r="4.5" fill="${col}" opacity="0"/>
-    <rect id="cm-hit" x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}" fill="transparent"/>
-  </svg>`;
-  const first = vals[0], last = vals[vals.length - 1], chg = (last / first - 1) * 100;
-  const baseTip = `${fmt(first)} → ${fmt(last)} · <span class="${signCls(chg)}">${signTxt(Math.round(chg * 100) / 100)}</span> nel periodo`;
-  const tip = $("#chart-modal-tip"); tip.innerHTML = baseTip;
-  $("#chart-modal").hidden = false;
-  const svg = $("#cm-svg"), hit = $("#cm-hit"), cur = $("#cm-cur"), dot = $("#cm-dot");
-  const move = ev => {
-    const r = svg.getBoundingClientRect();
-    const px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
-    const i = Math.max(0, Math.min(vals.length - 1, Math.round((px / r.width * W - pad.l) / (W - pad.l - pad.r) * (vals.length - 1))));
-    cur.setAttribute("x1", x(i)); cur.setAttribute("x2", x(i)); cur.setAttribute("opacity", ".4");
-    dot.setAttribute("cx", x(i)); dot.setAttribute("cy", y(vals[i])); dot.setAttribute("opacity", "1");
-    const d = dates && dates[i] ? new Date(dates[i]).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" }) + ": " : "";
-    const dchg = (vals[i] / first - 1) * 100;
-    tip.innerHTML = `${d}<b>${fmt(vals[i])}</b> <span class="${signCls(dchg)}">${signTxt(Math.round(dchg * 100) / 100)}</span>`;
-  };
-  hit.addEventListener("mousemove", move);
-  hit.addEventListener("touchmove", ev => { ev.preventDefault(); move(ev); }, { passive: false });
-  hit.addEventListener("touchstart", move);
-}
 function closeChartModal() { $("#chart-modal").hidden = true; }
 
 /* zoom del grafico di un singolo titolo, con selettore range e date sul punto */
 let cmTicker = null, cmRange = "m1";
 const CM_RANGES = [["d1", "1G"], ["w1", "1S"], ["m1", "1M"], ["m3", "3M"], ["m6", "6M"], ["y1", "1A"], ["all", "ALL"]];
 const CM_SPAN = { d1: 1, w1: 7, m1: 31, m3: 92, m6: 183, y1: 365, all: 365 * 5 };   // giorni coperti (per le date)
-
-function synthDates(range, n) {
-  const span = CM_SPAN[range] || 30, today = Date.now(), out = [];
-  for (let i = 0; i < n; i++) out.push(new Date(today - (n - 1 - i) * (span / (n - 1 || 1)) * 86400000).toISOString().slice(0, 10));
-  return out;
-}
 
 // mappa range → parametri Yahoo (range, interval) per i dati OHLC reali
 const CM_YF = {
@@ -2898,18 +2669,6 @@ function tvSymbol(r) {
   return ex ? `${ex}:${tk}` : tk;
 }
 let cmView = "candles";   // "candles" | "tv"
-
-function cmControlsHTML(r) {
-  const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSymbol(r))}`;
-  const ranges = `<div class="spark-toggle cm-ranges">` +
-    CM_RANGES.map(([k, lab]) => `<button class="chip cm-range ${k === cmRange ? "chip-active" : ""}" data-range="${k}">${lab}</button>`).join("") +
-    `</div>`;
-  const views = `<div class="spark-toggle cm-views">
-    <button class="chip cm-viewbtn ${cmView === "candles" ? "chip-active" : ""}" data-cmview="candles">Candele</button>
-    <button class="chip cm-viewbtn ${cmView === "tv" ? "chip-active" : ""}" data-cmview="tv">TradingView</button>
-  </div>`;
-  return `<div class="cm-controls">${ranges}${views}<a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">Apri su TradingView ↗</a></div>`;
-}
 
 function renderTvWidget(r) {
   const sym = encodeURIComponent(tvSymbol(r));
@@ -3073,49 +2832,6 @@ function renderOptionsContent() {
 }
 
 /* grafico a candele: verde se chiude >= apre, rosso se scende */
-function drawCandleChart(data, fmt, controlsHTML) {
-  const W = 900, H = 380, pad = { l: 64, r: 16, t: 16, b: 28 };
-  const lo = Math.min(...data.map(d => d.l)), hi = Math.max(...data.map(d => d.h));
-  const range = hi - lo || 1;
-  const x = i => pad.l + (i + 0.5) / data.length * (W - pad.l - pad.r);
-  const y = v => pad.t + (1 - (v - lo) / range) * (H - pad.t - pad.b);
-  const cw = Math.max(1.2, Math.min(14, (W - pad.l - pad.r) / data.length * 0.65));
-  const grid = [0, .25, .5, .75, 1].map(f => {
-    const gv = lo + range * f, gy = y(gv);
-    return `<line x1="${pad.l}" y1="${gy.toFixed(1)}" x2="${W - pad.r}" y2="${gy.toFixed(1)}" stroke="var(--border)"/>
-      <text x="${pad.l - 8}" y="${(gy + 4).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(gv)}</text>`;
-  }).join("");
-  const candles = data.map((d, i) => {
-    const up = d.c >= d.o, col = up ? "var(--green)" : "var(--red)";
-    const cx = x(i), yo = y(d.o), yc = y(d.c);
-    const top = Math.min(yo, yc), bh = Math.max(1, Math.abs(yc - yo));
-    return `<line x1="${cx.toFixed(1)}" y1="${y(d.h).toFixed(1)}" x2="${cx.toFixed(1)}" y2="${y(d.l).toFixed(1)}" stroke="${col}" stroke-width="1"/>
-      <rect x="${(cx - cw / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${cw.toFixed(1)}" height="${bh.toFixed(1)}" fill="${col}"/>`;
-  }).join("");
-  const xl = [0, Math.floor(data.length / 2), data.length - 1].map(i =>
-    `<text x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--muted)">${new Date(data[i].t).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "2-digit" })}</text>`).join("");
-  $("#chart-modal-body").innerHTML = (controlsHTML || "") + `<svg id="cm-svg" viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
-    ${grid}${candles}${xl}
-    <line id="cm-cur" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--text)" opacity="0"/>
-    <rect id="cm-hit" x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}" fill="transparent"/>
-  </svg>`;
-  const first = data[0].c, last = data[data.length - 1].c, chg = (last / first - 1) * 100;
-  const baseTip = `${fmt(first)} → ${fmt(last)} · <span class="${signCls(chg)}">${signTxt(Math.round(chg * 100) / 100)}</span> nel periodo`;
-  const tip = $("#chart-modal-tip"); tip.innerHTML = baseTip;
-  const svg = $("#cm-svg"), hit = $("#cm-hit"), cur = $("#cm-cur");
-  const move = ev => {
-    const rc = svg.getBoundingClientRect();
-    const px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rc.left;
-    const i = Math.max(0, Math.min(data.length - 1, Math.floor((px / rc.width * W - pad.l) / (W - pad.l - pad.r) * data.length)));
-    const d = data[i]; cur.setAttribute("x1", x(i)); cur.setAttribute("x2", x(i)); cur.setAttribute("opacity", ".4");
-    const cls = d.c >= d.o ? "pos" : "neg";
-    tip.innerHTML = `${new Date(d.t).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })} · A ${fmt(d.o)} · Max ${fmt(d.h)} · Min ${fmt(d.l)} · <b class="${cls}">C ${fmt(d.c)}</b>`;
-  };
-  hit.addEventListener("mousemove", move);
-  hit.addEventListener("touchmove", ev => { ev.preventDefault(); move(ev); }, { passive: false });
-  hit.addEventListener("touchstart", move);
-}
-
 function openTickerChart(ticker) {
   cmTicker = ticker; cmRange = sparkRange in CM_SPAN ? sparkRange : "m1";
   cmView = "candles";   // ogni apertura parte dalle candele native
@@ -3123,14 +2839,6 @@ function openTickerChart(ticker) {
 }
 
 /* ---------------- popup informativi (macro / trimestrali) ---------------- */
-function relatedNews(rx, n = 6) {
-  const list = (DATA.news || []).filter(x => rx.test(x.title_it || x.title)).slice(0, n);
-  if (!list.length) return '<div class="muted">Nessuna notizia correlata recente.</div>';
-  return '<ul class="news-list" style="columns:1">' + list.map(x =>
-    `<li class="news-item"><a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title_it || x.title)}</a>
-     <div class="news-meta"><span class="news-src">${esc(x.source)}</span><span class="news-time">${timeAgo(x.published)}</span></div></li>`).join("") + "</ul>";
-}
-
 /* ---- mini chart helpers (per popup macro/credit/decouple) ---- */
 function miniLineChart(pts, { w = 420, h = 70, color = "var(--blue)", zeroLine = false } = {}) {
   if (!pts || pts.length < 2) return '<div class="muted">Storico non disponibile</div>';
@@ -3657,18 +3365,6 @@ function openEarningsInfo(ticker) {
     <div class="info-line muted" style="margin:10px 0 12px">EPS e stime si aggiornano dopo ogni trimestrale. Target = media analisti coverage; crescita attesa e P/E prospettico dal consenso (fonte: yfinance).</div>`);
 }
 
-function delBtn(section, ticker) {
-  if (!editMode[section]) return "";
-  const mv = `<button class="row-move" data-sec="${section}" data-tk="${ticker}" data-dir="-1" title="Sposta su" aria-label="Sposta su">▲</button>
-    <button class="row-move" data-sec="${section}" data-tk="${ticker}" data-dir="1" title="Sposta giù" aria-label="Sposta giù">▼</button>`;
-  // solo in portafoglio: modifica quantità/PMC della posizione
-  const ed = (section === "portfolio" && ticker !== "BTP-V28")
-    ? `<button class="row-edit" data-tk="${ticker}" title="Modifica quantità/PMC di ${ticker}" aria-label="Modifica ${ticker}">✎</button>` : "";
-  const del = ticker !== "BTP-V28"
-    ? `<button class="row-del" data-sec="${section}" data-tk="${ticker}" title="Rimuovi ${ticker}">×</button>` : "";
-  return mv + ed + del;
-}
-
 // pulsante elimina SEMPRE visibile accanto al nome (no edit-mode); BTP escluso
 function nameDelBtn(section, ticker) {
   if (ticker === "BTP-V28") return "";
@@ -3775,7 +3471,6 @@ function bigUsd(v) { if (v == null) return "—"; const a = Math.abs(v);
   if (a >= 1e12) return "$" + (v / 1e12).toFixed(2) + "T";
   if (a >= 1e9) return "$" + (v / 1e9).toFixed(1) + "B";
   if (a >= 1e6) return "$" + (v / 1e6).toFixed(0) + "M"; return "$" + fmtNum.format(v); }
-function colorCell(txt, cls) { return `<span class="${cls || ""}">${txt}</span>`; }
 
 /* indicatore di impatto visivo per la vista fondamentale (come i bar della vista tecnica):
    score 0-100 (100 = favorevole/verde). Mostra valore colorato + mini-barra. */
@@ -3946,25 +3641,6 @@ function renderEarnings() {
 }
 
 /* ---------------- gauges ---------------- */
-function gaugeSVG(pct, color) {
-  // semicerchio 0–100
-  const angle = Math.PI * (1 - pct / 100);
-  const x = 60 + 48 * Math.cos(angle), y = 58 - 48 * Math.sin(angle);
-  return `<svg viewBox="0 0 120 66">
-    <path d="M 12 58 A 48 48 0 0 1 108 58" fill="none" stroke="var(--border)" stroke-width="9" stroke-linecap="round"/>
-    <path d="M 12 58 A 48 48 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}" fill="none" stroke="${color}" stroke-width="9" stroke-linecap="round"/>
-    <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${color}"/>
-  </svg>`;
-}
-
-function fgColor(score) {
-  if (score <= 25) return "var(--red)";
-  if (score <= 45) return "var(--yellow)";
-  if (score <= 55) return "var(--muted)";
-  if (score <= 75) return "var(--green)";
-  return "var(--cyan)";
-}
-
 const FG_LABELS = { "extreme fear": "Paura estrema", fear: "Paura", neutral: "Neutrale", greed: "Avidità", "extreme greed": "Avidità estrema" };
 
 /* colore sfumato verde(100)→arancio(50)→rosso(0) */
@@ -4084,13 +3760,6 @@ function renderGauges() {
 /* ---------------- macro ---------------- */
 const MACRO_ACCENTS = { cpi: "var(--red)", pce: "var(--yellow)", gdp: "var(--blue)", retail: "var(--purple)", nfp: "var(--green)", unemp: "var(--cyan)", pmi: "var(--blue)", "BTC-USD": "var(--yellow)", "CL=F": "var(--purple)", "^KS11": "var(--cyan)", "^IXIC": "var(--blue)" };
 
-function impactBar(score, titleTxt) {
-  if (score === null || score === undefined) return "";
-  return `<div class="impact" title="${titleTxt || "impatto sul mercato"}: ${score}/100">
-    <span class="impact-fill" style="width:${Math.max(4, score)}%;background:${scoreColor(score)}"></span>
-  </div>`;
-}
-
 function marketImpact(m) {
   // variazione giornaliera → impatto 0-100 (rendimenti in pp: salita = restrittivo)
   if (m.change_pct === null || m.change_pct === undefined) return null;
@@ -4197,22 +3866,6 @@ function fmtMcap(v) {
   return "$" + fmtNum.format(Math.round(v / 1e9)) + "B";
 }
 
-function renderTopCaps() {
-  const list = DATA.top_caps || [];
-  if (!list.length) { $("#topcaps").innerHTML = ""; return; }
-  // NB: le barre ETF settoriali sono state rimosse (duplicavano il widget "Rotazione settoriale (Tilt)";
-  // il dettaglio resta nel popup del widget Tilt → rotationDetailHtml).
-  $("#topcaps").innerHTML =
-    `<div class="m-label" style="margin:14px 0 8px">Top 10 capitalizzazioni mondiali</div>
-    <ol class="topcap-list">` + list.map((x, i) => `
-      <li class="topcap-item">
-        <span class="topcap-rank">${i + 1}</span>
-        <span class="topcap-name">${esc(x.name)} <span class="tk">${x.ticker}</span></span>
-        <span class="topcap-mcap">${fmtMcap(x.mcap_usd)}</span>
-        <span class="topcap-chg ${signCls(x.change_pct)}">${signTxt(x.change_pct)}</span>
-      </li>`).join("") + "</ol>";
-}
-
 /* ---------------- top ETF dashboard ---------------- */
 function etfOpportunity(rsi) {
   if (rsi == null) return { label: "—", color: "var(--muted)" };
@@ -4220,60 +3873,6 @@ function etfOpportunity(rsi) {
   if (rsi < 48) return { label: "Zona neutro-bassa — da monitorare", color: "var(--yellow)" };
   if (rsi < 65) return { label: "Momentum positivo", color: "var(--muted)" };
   return { label: "Ipercomprato — attendere ritracciamento", color: "var(--red)" };
-}
-
-function renderTopETFs() {
-  const list = DATA.top_etfs || [];
-  const wrap = $("#top-etfs-wrap");
-  if (!list.length) { wrap.innerHTML = ""; return; }
-
-  const fmtAum = v => v >= 1000 ? `$${(v / 1000).toFixed(1)}T` : v ? `$${v}B` : "—";
-
-  const rows = list.map(r => {
-    const opp = etfOpportunity(r.rsi);
-    const m1  = r.sparks?.m1;
-    const m1v = (m1 && m1.length >= 2 && m1[0]) ? (m1[m1.length - 1] / m1[0] - 1) * 100 : null;
-    const m3  = r.sparks?.m3;
-    const m3v = (m3 && m3.length >= 2 && m3[0]) ? (m3[m3.length - 1] / m3[0] - 1) * 100 : null;
-    return `<tr>
-      <td class="sticky-col"><b>${esc(r.ticker)}</b></td>
-      <td>${esc(r.name)}</td>
-      <td class="num">${r.price != null ? "$" + fmtNum.format(r.price) : "—"}</td>
-      <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
-      <td class="num ${m1v != null ? signCls(m1v) : ""}">${m1v != null ? signTxt(Math.round(m1v * 10) / 10) : "—"}</td>
-      <td class="num ${m3v != null ? signCls(m3v) : ""}">${m3v != null ? signTxt(Math.round(m3v * 10) / 10) : "—"}</td>
-      <td class="num">${r.rsi ?? "—"}</td>
-      <td class="num">${r.pe != null ? fmtNum.format(r.pe) : "—"}</td>
-      <td class="num">${r.div_yield ? r.div_yield + "%" : "—"}</td>
-      <td class="num">${fmtAum(r.aum)}</td>
-      <td style="color:${opp.color};font-size:12px">${opp.label}</td>
-    </tr>`;
-  }).join("");
-
-  wrap.innerHTML = `
-    <div class="m-label" style="margin:14px 0 8px">Top 10 ETF — Metriche &amp; Opportunità di Ingresso</div>
-    <div class="table-wrap">
-      <table aria-label="Top 10 ETF">
-        <thead><tr>
-          <th class="sticky-col">Ticker</th>
-          <th>ETF</th>
-          <th class="num">Prezzo</th>
-          <th class="num">Oggi</th>
-          <th class="num">1M</th>
-          <th class="num">3M</th>
-          <th class="num">RSI</th>
-          <th class="num">P/E</th>
-          <th class="num">Div.%</th>
-          <th class="num">AUM</th>
-          <th>Segnale</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-    <div class="muted" style="font-size:11px;margin-top:6px">
-      RSI &lt;35 = ipervenduto (potenziale ingresso); RSI &gt;70 = ipercomprato (attendere).
-      P/E e dividendo da Yahoo Finance. AUM = patrimonio gestito.
-    </div>`;
 }
 
 /* ---------------- news ---------------- */
@@ -4360,10 +3959,12 @@ function renderNews() {
    LA TESTATA È STATA DISACCOPPIATA (v101). Il testo delle ISTRUZIONI all'AI vive NEL FILE:
         ►►►  config/prompt_header.txt  ◄◄◄
    Per cambiare le istruzioni dell'AI EDITA QUEL FILE, non questo. La costante
-   DEFAULT_PROMPT_HEADER qui sotto è SOLO un fallback offline e DEVE restare byte-identica
-   a config/prompt_header.txt (se cambi una, aggiorna l'altra nello STESSO commit).
-   L'utente edita la testata dalla UI ("⚙ Impostazioni Prompt") → scrive quel file via
-   GitHub Contents API: NON sovrascrivere mai a mano ciò che la UI salva.
+   DEFAULT_PROMPT_HEADER qui sotto è SOLO il fallback offline (usato al primo caricamento o
+   senza rete): NON deve coincidere col file — il file è la fonte di verità ed è editato
+   dall'utente dalla UI ("⚙ Impostazioni Prompt"), che lo scrive via GitHub Contents API e
+   lo ricarica con loadPromptHeaderCloud(). 🛑 NON sovrascrivere MAI config/prompt_header.txt
+   a mano (cancelleresti le personalizzazioni del CEO). Modifica DEFAULT_PROMPT_HEADER solo
+   se vuoi cambiare il fallback offline, non per "allinearlo" al file.
    La "CODA" (payload dati: tabelle/macro/news/fondamentali/portafoglio) è generata dalle
    funzioni JS piu sotto e NON va toccata/semplificata. Vedi CLAUDE.md nella root.
    ██████████████████████████████████████████████████████████████████████████████████ */
