@@ -4341,13 +4341,14 @@ function renderNews() {
 
 
 /* ---------------- prompt AI ---------------- */
-function buildPrompt() {
-  const t = DATA.totals;
-  const m = DATA.macro || {};
-  const dqV = validateMacroData();   // data assertions: usata da indicatori, margin debt e report
-  const lines = [];
-  const patrimonio = t.eur_invested + cashEur;
-  lines.push(`RUOLO: Sei il Comitato di Investimento Senior (analisti quantitativi, fondamentali e macro) di un fondo Growth. Riporti all'Amministratore Delegato (l'utente). Non sei un esecutore di format: sei un comitato di Wall Street che pensa. Esponi i fatti, i conflitti tra matematica e mercato, e le tue raccomandazioni — l'ultima parola spetta al CEO.
+/* ================= TESTATA DEL PROMPT (decoupling testata/coda) =================
+   La "Testata" (istruzioni: RUOLO...proattivo) e editabile dal CEO via UI e persistita
+   server-side in config/prompt_header.txt (GET raw.githubusercontent + POST GitHub
+   Contents API, stesso meccanismo di diario/override — GitHub Pages non ha backend
+   Express). La "Coda" (payload dati) resta generata AL 100% dalle funzioni attuali,
+   intoccata. Precedenza: override cloud/locale -> DEFAULT embedded (fallback offline). */
+const PROMPT_HEADER_PATH = "config/prompt_header.txt";
+const DEFAULT_PROMPT_HEADER = `RUOLO: Sei il Comitato di Investimento Senior (analisti quantitativi, fondamentali e macro) di un fondo Growth. Riporti all'Amministratore Delegato (l'utente). Non sei un esecutore di format: sei un comitato di Wall Street che pensa. Esponi i fatti, i conflitti tra matematica e mercato, e le tue raccomandazioni — l'ultima parola spetta al CEO.
 
 DELEGA PIENA SULLA FORMA: decidi TU come strutturare il report — numero di sezioni, ordine, formato e lunghezza — in base a ciò che i dati di oggi meritano: un giorno denso di news e violazioni merita un report ricco; una domenica piatta merita poche righe oneste, non riempitivi. Se qualcosa non ti torna — una strategia ambigua, un dato contraddittorio, un'intenzione del CEO che non conosci — FAI DOMANDE invece di assumere.
 
@@ -4365,7 +4366,52 @@ BRIEFING SUI PROBLEMI NOTI DEL SISTEMA (osservazioni strategiche, NON divieti as
 4. CONCENTRAZIONE SETTORIALE (IL PARADOSSO DIVERSIFICAZIONE): Se suggerisci un acquisto forte (es. SNDK) ma il fondo ha già posizioni enormi nello stesso settore (es. MU), NON omettere il suggerimento, ma fai NOTARE esplicitamente al CEO che l'operazione aumenterebbe la concentrazione settoriale e annullerebbe la diversificazione. Il trade va esposto, la scelta resta al CEO.
 5. IGIENE DEI DATI E ISTRUZIONI: "n.d." = dato non disponibile, non inventarlo. Preferisci ordini LIMITE.
 
-Sii proattivo e spietato sui rischi: se vedi un problema che il CEO non ti ha chiesto di guardare, sollevalo tu.`);
+Sii proattivo e spietato sui rischi: se vedi un problema che il CEO non ti ha chiesto di guardare, sollevalo tu.`;
+function promptHeaderText() {
+  const ov = localStorage.getItem("prompt_header");
+  return (ov && ov.trim()) ? ov : DEFAULT_PROMPT_HEADER;
+}
+function savePromptHeader(text) {
+  const t = (text || "").trim();
+  const isDefault = !t || t === DEFAULT_PROMPT_HEADER.trim();
+  if (isDefault) localStorage.removeItem("prompt_header");
+  else localStorage.setItem("prompt_header", t);
+  // sul server scrivo SEMPRE testo valido: la testata effettiva (default reale se si ripristina)
+  pushPromptHeaderCloud(isDefault ? DEFAULT_PROMPT_HEADER : t);
+}
+/* POST equivalente: sovrascrive config/prompt_header.txt via GitHub Contents API */
+async function pushPromptHeaderCloud(text) {
+  const token = localStorage.getItem("gh_token");
+  if (!token) return false;
+  try {
+    let sha;
+    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${PROMPT_HEADER_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
+    if (g.ok) sha = (await g.json()).sha;
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${PROMPT_HEADER_PATH}`, {
+      method: "PUT", headers: ghHeaders(token),
+      body: JSON.stringify({ message: "Aggiorna testata prompt AI (da dashboard)", content: btoa(unescape(encodeURIComponent(text))), sha }),
+    });
+    return r.ok;
+  } catch { return false; }
+}
+/* GET equivalente: legge la testata server-side e la usa come override (server vince) */
+async function loadPromptHeaderCloud() {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${PROMPT_HEADER_PATH}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return;
+    const txt = (await r.text()).trim();
+    if (txt && txt !== DEFAULT_PROMPT_HEADER.trim()) localStorage.setItem("prompt_header", txt);
+    else localStorage.removeItem("prompt_header");   // server allineato al default -> nessun override
+  } catch { /* offline: resta l'eventuale override locale */ }
+}
+
+function buildPrompt() {
+  const t = DATA.totals;
+  const m = DATA.macro || {};
+  const dqV = validateMacroData();   // data assertions: usata da indicatori, margin debt e report
+  const lines = [];
+  const patrimonio = t.eur_invested + cashEur;
+  lines.push(promptHeaderText());   // TESTATA editabile (server-side + override locale); coda dati INTATTA sotto
   lines.push("");
   // ORDINE WEB-SEARCH IN CIMA: se ci sono dati mancanti/inaffidabili, l'imperativo va visto
   // PRIMA di tutto il resto (l'LLM tende a "dimenticarlo" se sepolto in fondo al payload)
@@ -4486,6 +4532,12 @@ Sii proattivo e spietato sui rischi: se vedi un problema che il CEO non ti ha ch
     const im = impliedMoveForEarnings ? impliedMoveForEarnings(r) : null;
     const imTxt = im != null ? `±${im}%` : "—";
     const shortF = r.stats?.short_float != null ? fmtNum.format(Math.round(r.stats.short_float * 1000) / 10) + "%" : "—";
+    // Flottante (azioni liberamente scambiabili): milioni/miliardi + % sul totale se disponibile.
+    // Rischio short squeeze / volatilità asimmetrica: low float + short alto + RVol alto = polveriera.
+    const fsh = r.stats?.float_shares;
+    const floatCell = fsh != null
+      ? (fsh >= 1e9 ? (fsh / 1e9).toFixed(1) + "B" : Math.round(fsh / 1e6) + "M") + (r.stats?.float_pct != null ? ` (${fmtNum.format(r.stats.float_pct)}%)` : "")
+      : "—";
     // RVol (Volume Relativo) + flag Volumi Anomali (>1,5×)
     const rv = r.vol_ratio;
     const rvCell = rv != null ? `${fmtNum.format(rv)}×${rv > 1.5 ? " [Volumi Anomali]" : ""}` : "—";
@@ -4502,13 +4554,14 @@ Sii proattivo e spietato sui rischi: se vedi un problema che il CEO non ti ha ch
     if (earningsRiskDays(r) != null) flags.push("[!EARNINGS RISK]");
     if (isIlliquid(r)) flags.push("[ILLIQUIDO]");
     const nameCell = `${r.name} (${r.ticker})${flags.length ? " " + flags.join(" ") : ""}`;
-    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
+    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${floatCell} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
   };
-  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A | Drawdown 52S | Short% | Supp. | Stop 2×ATR | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
-  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
+  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A | Drawdown 52S | Short% | Float | Supp. | Stop 2×ATR | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
+  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
-  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Sortino 1A = Sharpe con la sola volatilità NEGATIVA: è il metro del veto value trap (< -0.3 = distruzione di valore sul downside). Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante.)");
+  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Sortino 1A = Sharpe con la sola volatilità NEGATIVA: è il metro del veto value trap (< -0.3 = distruzione di valore sul downside). Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante. Float = azioni fluttuanti liberamente scambiabili (milioni/miliardi, e % sul totale).)");
+  lines.push("· [LOW FLOAT RISK]: Un titolo con flottante ridotto (Low Float < 50M azioni) unito a uno Short Interest ≥ 15% e Volumi Anomali (RVol > 1.5) indica un rischio imminente di Short Squeeze o volatilità asimmetrica estrema. L'AI deve evidenziarlo come un'opportunità o un pericolo immediato di liquidità.");
   // MATRICE DI RISCHIO PER POSIZIONE: pesi MTM, MCR, beta NDX, correlazioni reali
   const riskRows = (DATA.portfolio || []).filter(r => r.qty && (r.risk_contrib_pct != null || r.avg_corr != null || r.beta_ndx != null));
   if (riskRows.length) {
@@ -5070,6 +5123,31 @@ function showSimpleModal(id) { const m = $(id); if (m) m.hidden = false; }
 function hideSimpleModal(id) { const m = $(id); if (m) m.hidden = true; }
 $("#open-pmc")?.addEventListener("click", () => { pmcInit(); pmcCompute(); showSimpleModal("#pmc-modal"); });
 $("#open-sell")?.addEventListener("click", () => { renderSellCalc(); showSimpleModal("#sell-modal"); });
+
+/* ---- Editor Testata Prompt (decoupling): apre, mostra, salva sul server ---- */
+function openPromptSettings() {
+  const ta = $("#prompt-header-editor");
+  if (ta) ta.value = promptHeaderText();
+  const st = $("#prompt-settings-status");
+  if (st) st.textContent = localStorage.getItem("prompt_header") ? "testata personalizzata attiva" : "testata di default";
+  showSimpleModal("#prompt-settings-modal");
+}
+$("#open-prompt-settings")?.addEventListener("click", openPromptSettings);
+$("#prompt-settings-close")?.addEventListener("click", () => hideSimpleModal("#prompt-settings-modal"));
+$("#prompt-settings-modal")?.addEventListener("click", e => { if (e.target.id === "prompt-settings-modal") hideSimpleModal("#prompt-settings-modal"); });
+$("#prompt-settings-save")?.addEventListener("click", async () => {
+  const txt = $("#prompt-header-editor")?.value || "";
+  savePromptHeader(txt);
+  const hasToken = !!localStorage.getItem("gh_token");
+  toast(hasToken ? "Testata salvata sul server ✓" : "Testata salvata su questo browser (nessun token: no sync server)");
+  hideSimpleModal("#prompt-settings-modal");
+});
+$("#prompt-settings-reset")?.addEventListener("click", () => {
+  if (!window.confirm("Ripristinare la testata di default? Le modifiche salvate verranno perse.")) return;
+  savePromptHeader("");                 // "" → rimuove l'override e riporta il file al default
+  const ta = $("#prompt-header-editor"); if (ta) ta.value = DEFAULT_PROMPT_HEADER;
+  toast("Testata ripristinata al default");
+});
 $("#news-summary")?.addEventListener("click", () => showSimpleModal("#news-modal"));
 $("#pmc-modal-close")?.addEventListener("click", () => hideSimpleModal("#pmc-modal"));
 $("#sell-modal-close")?.addEventListener("click", () => hideSimpleModal("#sell-modal"));
@@ -5077,7 +5155,7 @@ $("#news-modal-close")?.addEventListener("click", () => hideSimpleModal("#news-m
 ["pmc-modal", "sell-modal", "news-modal"].forEach(id =>
   $("#" + id)?.addEventListener("click", e => { if (e.target.id === id) hideSimpleModal("#" + id); }));
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape") ["#pmc-modal", "#sell-modal", "#news-modal"].forEach(hideSimpleModal);
+  if (e.key === "Escape") ["#pmc-modal", "#sell-modal", "#news-modal", "#prompt-settings-modal"].forEach(hideSimpleModal);
 });
 $("#market-direction")?.addEventListener("click", () => {
   const d = marketDirectionScore();
@@ -5263,6 +5341,7 @@ initSorting("wl-table", renderWatchlist);
 
 loadData();
 loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
+loadPromptHeaderCloud();   // sincronizza la testata del prompt dal server (config/prompt_header.txt)
 loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
 // ricarica completa (tecnici, news, storico) ogni 5 minuti
 setInterval(() => loadData(), 5 * 60 * 1000);

@@ -62,7 +62,7 @@ DATA = {
       support: 95, resistance: 120, rsi: 45, atr_14: 3, atr_pct: 3, stop_atr: 94, stop_violated: false,
       vol_ratio: 1.0, fin_health: 80, signal: "ok", signal_class: "good", sector: "Technology",
       risk_contrib_pct: 60, avg_corr: 0.3, max_corr: 0.5, max_corr_with: "TST3",
-      stats: ${JSON.stringify(baseStats)}, sparks: {}, tech_by_range: {}, financials: [] },
+      stats: ${JSON.stringify({ ...baseStats, float_shares: 40e6, float_pct: 88 })}, sparks: {}, tech_by_range: {}, financials: [] },
     { ticker: "TST2", name: "Trap Inc", currency: "USD", qty: 50, pmc: 100, price: 80, bval: 4000,
       sharpe_1y: -0.2, sortino_1y: -0.6, rs_1m: -10, rs_ndx_1m: -12, w52_dist_pct: -40,
       support: 70, resistance: 110, rsi: 30, atr_14: 4, atr_pct: 5, vol_ratio: 2.0,
@@ -189,6 +189,13 @@ check("prompt: web-search order in CIMA sui dati mancanti/inaffidabili", run(`
   const iOrder = p2.indexOf("PRIMO ORDINE OPERATIVO");
   const iPortafoglio = p2.indexOf("MATRICE DI RISCHIO PER POSIZIONE");
   return iOrder > 0 && iOrder < iPortafoglio`));
+
+
+check("prompt: colonna Float nella tabella + valore leggibile (40M)", run(`
+  const p2 = buildPrompt();
+  return p2.includes("| Float |") && p2.includes("40M")`));
+check("prompt: nota metodologica [LOW FLOAT RISK]", run(`
+  return buildPrompt().includes("[LOW FLOAT RISK]") && buildPrompt().includes("Low Float < 50M")`));
 
 /* ---------- report ---------- */
 let fail = 0;
