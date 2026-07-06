@@ -91,5 +91,15 @@ check("margin debt: prev troppo vecchio (120g) NON riportato avanti (Z.1 flaggat
       md_old is None or md_old.get("unreliable") is True)
 ud._finra_scrape = _orig_scrape
 
-print(f"\n{('TUTTI I ' + str(16 - len(FAILED)) + '/16 CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
+
+# ---------- Fix estrazione dati (v104.2): has_fundamentals ----------
+check("has_fundamentals: True per azioni singole USA (AAPL, NVDA)",
+      ud.has_fundamentals("AAPL","USD") and ud.has_fundamentals("NVDA","USD"))
+check("has_fundamentals: False per indici/cripto/commodity/ETF/EUR",
+      not any([ud.has_fundamentals("^KS11","USD"), ud.has_fundamentals("^IXIC","USD"),
+               ud.has_fundamentals("BTC-USD","USD"), ud.has_fundamentals("CL=F","USD"),
+               ud.has_fundamentals("SPY","USD"), ud.has_fundamentals("QQQ","USD"),
+               ud.has_fundamentals("SOXX","USD"), ud.has_fundamentals("BTP-V28","EUR")]))
+
+print(f"\n{('TUTTI I ' + str(18 - len(FAILED)) + '/18 CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)

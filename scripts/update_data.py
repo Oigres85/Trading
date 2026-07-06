@@ -378,6 +378,32 @@ def backup_daily(ticker):
     return None
 
 
+# Asset SENZA bilanci (indici, cripto, commodity, ETF): il quoteSummary Yahoo risponde 404.
+# Saltarli pulisce i log e velocizza la build. ETF noti = TOP_ETF_LIST + SECTOR_ETF + benchmark.
+NO_FUNDAMENTALS_ETF = {"SPY", "QQQ", "IWM", "GLD", "TLT", "VGT", "VNQ", "SOXX", "SMH",
+                       "XLK", "XLF", "XLE", "XLV", "XLY", "XLP", "XLI", "XLU", "XLB", "XLRE", "XLC"}
+
+def has_fundamentals(ticker, currency):
+    """True solo per AZIONI SINGOLE USA con bilanci reali. Esclude indici (^), futures/fx (=),
+    cripto/coppie (-) ed ETF (quoteSummary Yahoo → 404 su questi)."""
+    return currency == "USD" and not re.search(r"[\^=]|-", ticker) and ticker.upper() not in NO_FUNDAMENTALS_ETF
+
+
+def bench_close(sym, fallback=None, period="2mo"):
+    """Chiusure giornaliere di un benchmark, con FALLBACK (es. ^SOX index → SOXX ETF, molto più
+    stabile da IP datacenter). L'RS usa la % di variazione: index ed ETF equivalgono. None se ko."""
+    for s in (sym, fallback):
+        if not s:
+            continue
+        try:
+            h = yf.Ticker(s).history(period=period, interval="1d")["Close"].dropna()
+            if len(h) >= 2:
+                return h
+        except Exception:  # noqa: BLE001
+            pass
+    return None
+
+
 def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
     ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
@@ -404,10 +430,14 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     except Exception:  # noqa: BLE001
         ath = float(hist["High"].max())
 
-    try:
-        info = t.info or {}
-    except Exception:  # noqa: BLE001
-        info = {}
+    # t.info fa una chiamata quoteSummary che dà 404 (rumoroso) su indici/cripto/commodity/ETF:
+    # per questi NON serve (prezzo/tecnica vengono dallo storico, il nome dal config) → skip.
+    info = {}
+    if has_fundamentals(ticker, currency):
+        try:
+            info = t.info or {}
+        except Exception:  # noqa: BLE001
+            info = {}
     pe = sane_val(info.get("trailingPE") or info.get("forwardPE"), 0.1, 3000, f"{ticker} P/E")
 
     sma50 = float(closes.rolling(50).mean().iloc[-1]) if len(closes) >= 50 else None
@@ -482,16 +512,17 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     tech_by_range = {k: tech_window(n) for k, n in
                      (("w1", 5), ("m1", 22), ("m3", 66), ("y1", 252))}
 
-    # prossima trimestrale
+    # prossima trimestrale (t.calendar = altra chiamata quoteSummary → skip su indici/cripto/ETF)
     earnings_date = None
-    try:
-        dates = (t.calendar or {}).get("Earnings Date") or []
-        today = datetime.now(timezone.utc).date()
-        future = [d for d in dates if d >= today]
-        if future:
-            earnings_date = min(future).isoformat()
-    except Exception:  # noqa: BLE001
-        pass
+    if has_fundamentals(ticker, currency):
+        try:
+            dates = (t.calendar or {}).get("Earnings Date") or []
+            today = datetime.now(timezone.utc).date()
+            future = [d for d in dates if d >= today]
+            if future:
+                earnings_date = min(future).isoformat()
+        except Exception:  # noqa: BLE001
+            pass
 
     # rating analisti e target price
     rating = None
@@ -523,7 +554,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
 
     # conto economico annuale (ricavi, utile netto, margine) + Financial Health Score
     financials, fin_health = [], None
-    if currency == "USD" and ticker not in ("BTC-USD", "CL=F"):
+    if has_fundamentals(ticker, currency):
         try:
             inc = t.income_stmt
             rev_row = inc.loc["Total Revenue"] if "Total Revenue" in inc.index else None
@@ -553,7 +584,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
 
     # statistiche chiave (come scheda "Più dati finanziari") + stime
     stats = None
-    if currency == "USD" and ticker not in ("BTC-USD", "CL=F"):
+    if has_fundamentals(ticker, currency):
         g = info.get
         def num(*keys):
             for k in keys:
@@ -720,12 +751,9 @@ def fetch_symbol(ticker, name=None, currency="USD"):
 def fetch_equities():
     # benchmark 1 mese per RS relativa (SP500, SOX, NDX)
     bench_m1 = {}
-    for sym, key in (("^GSPC", "sp500"), ("^SOX", "sox"), ("^NDX", "ndx")):
-        try:
-            h = yf.Ticker(sym).history(period="2mo", interval="1d", auto_adjust=True)["Close"].dropna()
-            bench_m1[key] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100 if len(h) >= 22 else None
-        except Exception:  # noqa: BLE001
-            bench_m1[key] = None
+    for sym, key, fb in (("^GSPC", "sp500", None), ("^SOX", "sox", "SOXX"), ("^NDX", "ndx", None)):
+        h = bench_close(sym, fb)   # ^SOX flaky da IP datacenter → fallback SOXX (stessa % RS)
+        bench_m1[key] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100 if (h is not None and len(h) >= 22) else None
 
     rows = []
     for pos in PORTFOLIO:
@@ -762,12 +790,9 @@ def fetch_equities():
 
 def fetch_watchlist():
     bench_m1 = {}
-    for sym, key in (("^GSPC", "sp500"), ("^SOX", "sox"), ("^NDX", "ndx")):
-        try:
-            h = yf.Ticker(sym).history(period="2mo", interval="1d", auto_adjust=True)["Close"].dropna()
-            bench_m1[key] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100 if len(h) >= 22 else None
-        except Exception:  # noqa: BLE001
-            bench_m1[key] = None
+    for sym, key, fb in (("^GSPC", "sp500", None), ("^SOX", "sox", "SOXX"), ("^NDX", "ndx", None)):
+        h = bench_close(sym, fb)   # ^SOX flaky da IP datacenter → fallback SOXX (stessa % RS)
+        bench_m1[key] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100 if (h is not None and len(h) >= 22) else None
 
     rows = []
     for w in WATCHLIST:
@@ -1126,13 +1151,10 @@ def fetch_macro():
     # Benchmarks Day % (per modulo Alpha & Benchmarking): S&P 500, Nasdaq 100, SOX
     try:
         bdays = {}
-        for sym, key in (("^GSPC", "sp500"), ("^NDX", "ndx"), ("^SOX", "sox")):
-            try:
-                hb = yf.Ticker(sym).history(period="5d")["Close"].dropna()
-                if len(hb) >= 2:
-                    bdays[key] = round((float(hb.iloc[-1]) / float(hb.iloc[-2]) - 1) * 100, 2)
-            except Exception:  # noqa: BLE001
-                pass
+        for sym, key, fb in (("^GSPC", "sp500", None), ("^NDX", "ndx", None), ("^SOX", "sox", "SOXX")):
+            hb = bench_close(sym, fb, period="5d")   # ^SOX flaky → fallback SOXX
+            if hb is not None and len(hb) >= 2:
+                bdays[key] = round((float(hb.iloc[-1]) / float(hb.iloc[-2]) - 1) * 100, 2)
         if bdays:
             macro["benchmarks"] = bdays
     except Exception as e:  # noqa: BLE001
@@ -1420,13 +1442,11 @@ def fetch_macro():
             return {}
     wsj_pe = fetch_pe_wsj()
 
-    # P/E Ratio storico S&P 500: FRED SP500PE (con storia) → fallback multpl → fallback WSJ trailing
+    # P/E Ratio corrente S&P 500: multpl → WSJ trailing (+ carry-forward più sotto).
+    # NB: "SP500PE" NON è una serie FRED valida (FRED non pubblica il P/E dell'S&P 500): il
+    # vecchio tentativo dava HTTP 400 a OGNI run senza mai restituire nulla → rimosso.
     try:
         pe_data = []
-        try:
-            pe_data = fred_series("SP500PE", 120)  # ~10 anni mensili
-        except Exception as e:  # noqa: BLE001
-            print(f"!! FRED SP500PE ko, provo multpl/WSJ: {e}", file=sys.stderr)
         if not pe_data:
             cur_alt = None
             try:  # multpl: pagina semplice col valore corrente
