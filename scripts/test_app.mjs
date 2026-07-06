@@ -197,6 +197,21 @@ check("prompt: colonna Float nella tabella + valore leggibile (40M)", run(`
 check("prompt: nota metodologica [LOW FLOAT RISK]", run(`
   return buildPrompt().includes("[LOW FLOAT RISK]") && buildPrompt().includes("Low Float < 50M")`));
 
+// GUARDRAIL BLOCCANTE (decoupling v101): il fallback embedded DEFAULT_PROMPT_HEADER DEVE restare
+// byte-identico a config/prompt_header.txt. Se divergono (es. un'istanza futura ha modificato la
+// testata in app.js invece del file), questo test FALLISCE e blocca il CI. Vedi CLAUDE.md.
+{
+  const embedded = vm.runInContext("typeof DEFAULT_PROMPT_HEADER === 'string' ? DEFAULT_PROMPT_HEADER.trim() : null", ctx);
+  const fileTxt = readFileSync(join(ROOT, "config", "prompt_header.txt"), "utf8").trim();
+  const same = embedded === fileTxt;
+  check("SYNC TESTATA: DEFAULT_PROMPT_HEADER (app.js) === config/prompt_header.txt (byte-identico)", same);
+  if (!same) {
+    console.log("  ⚠ La testata embedded e il file sono DIVERSI. NON modificare la testata in app.js:");
+    console.log("    edita config/prompt_header.txt e riallinea DEFAULT_PROMPT_HEADER nello stesso commit.");
+    if (embedded == null) console.log("    (DEFAULT_PROMPT_HEADER non trovata o non stringa in app.js)");
+  }
+}
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {
