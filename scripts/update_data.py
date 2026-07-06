@@ -15,6 +15,7 @@ Fonti (tutte gratuite):
 """
 import io
 import json
+import logging
 import math
 import os
 import re
@@ -29,6 +30,10 @@ import numpy as np
 import pandas as pd
 import requests
 import yfinance as yf
+
+# yfinance logga internamente ("$TICKER: possibly delisted", 404 quoteSummary) su indici/ticker
+# flaky: catturiamo già le eccezioni a valle, qui zittiamo il logger per non inquinare stderr.
+logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "data.json"
@@ -384,9 +389,17 @@ NO_FUNDAMENTALS_ETF = {"SPY", "QQQ", "IWM", "GLD", "TLT", "VGT", "VNQ", "SOXX", 
                        "XLK", "XLF", "XLE", "XLV", "XLY", "XLP", "XLI", "XLU", "XLB", "XLRE", "XLC"}
 
 def has_fundamentals(ticker, currency):
-    """True solo per AZIONI SINGOLE USA con bilanci reali. Esclude indici (^), futures/fx (=),
-    cripto/coppie (-) ed ETF (quoteSummary Yahoo → 404 su questi)."""
-    return currency == "USD" and not re.search(r"[\^=]|-", ticker) and ticker.upper() not in NO_FUNDAMENTALS_ETF
+    """True per le AZIONI USA con bilanci reali, INCLUSE le multi-classe (BRK-B, BF-B). Esclude
+    solo ciò che su Yahoo non ha quoteSummary: indici (^), futures/commodity/fx (=), cripto e
+    coppie valutarie (suffisso tipo -USD/-USDT, 3+ lettere) ed ETF noti."""
+    tk = ticker.upper()
+    if currency != "USD" or tk in NO_FUNDAMENTALS_ETF:
+        return False
+    if re.search(r"[\^=]", tk):          # indici (^GSPC), futures/fx (CL=F, EURUSD=X)
+        return False
+    if re.search(r"-[A-Z]{3,}$", tk):    # cripto/coppie: BTC-USD, ETH-USDT — NON tocca BRK-B/BF-B (-B)
+        return False
+    return True
 
 
 def bench_close(sym, fallback=None, period="2mo"):
@@ -2174,7 +2187,14 @@ def parse_feed_entries(url):
     """Restituisce [(title, link, ts)] da un feed RSS; se bloccato usa rss2json."""
     out = []
     try:
-        r = http_get(url, timeout=20)
+        # Reddit rate-limita (HTTP 429) UA generici/datacenter → UA browser realistico + Accept
+        if "reddit.com" in url:
+            r = requests.get(url, timeout=20, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                              "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+                "Accept": "application/rss+xml,application/xml;q=0.9,text/html;q=0.8,*/*;q=0.7"})
+        else:
+            r = http_get(url, timeout=20)
         feed = feedparser.parse(r.content)
         for e in feed.entries[:25]:
             ts = None
