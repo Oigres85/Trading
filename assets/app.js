@@ -4341,12 +4341,19 @@ function renderNews() {
 
 
 /* ---------------- prompt AI ---------------- */
-/* ================= TESTATA DEL PROMPT (decoupling testata/coda) =================
-   La "Testata" (istruzioni: RUOLO...proattivo) e editabile dal CEO via UI e persistita
-   server-side in config/prompt_header.txt (GET raw.githubusercontent + POST GitHub
-   Contents API, stesso meccanismo di diario/override — GitHub Pages non ha backend
-   Express). La "Coda" (payload dati) resta generata AL 100% dalle funzioni attuali,
-   intoccata. Precedenza: override cloud/locale -> DEFAULT embedded (fallback offline). */
+/* ██████████████████████████████████████████████████████████████████████████████████
+   🛑🛑🛑  STOP! NON MODIFICARE IL TESTO DEL PROMPT (LA TESTATA) IN QUESTO FILE.  🛑🛑🛑
+   ██████████████████████████████████████████████████████████████████████████████████
+   LA TESTATA È STATA DISACCOPPIATA (v101). Il testo delle ISTRUZIONI all'AI vive NEL FILE:
+        ►►►  config/prompt_header.txt  ◄◄◄
+   Per cambiare le istruzioni dell'AI EDITA QUEL FILE, non questo. La costante
+   DEFAULT_PROMPT_HEADER qui sotto è SOLO un fallback offline e DEVE restare byte-identica
+   a config/prompt_header.txt (se cambi una, aggiorna l'altra nello STESSO commit).
+   L'utente edita la testata dalla UI ("⚙ Impostazioni Prompt") → scrive quel file via
+   GitHub Contents API: NON sovrascrivere mai a mano ciò che la UI salva.
+   La "CODA" (payload dati: tabelle/macro/news/fondamentali/portafoglio) è generata dalle
+   funzioni JS piu sotto e NON va toccata/semplificata. Vedi CLAUDE.md nella root.
+   ██████████████████████████████████████████████████████████████████████████████████ */
 const PROMPT_HEADER_PATH = "config/prompt_header.txt";
 const DEFAULT_PROMPT_HEADER = `RUOLO: Sei il Comitato di Investimento Senior (analisti quantitativi, fondamentali e macro) di un fondo Growth. Riporti all'Amministratore Delegato (l'utente). Non sei un esecutore di format: sei un comitato di Wall Street che pensa. Esponi i fatti, i conflitti tra matematica e mercato, e le tue raccomandazioni — l'ultima parola spetta al CEO.
 
@@ -4411,7 +4418,9 @@ function buildPrompt() {
   const dqV = validateMacroData();   // data assertions: usata da indicatori, margin debt e report
   const lines = [];
   const patrimonio = t.eur_invested + cashEur;
-  lines.push(promptHeaderText());   // TESTATA editabile (server-side + override locale); coda dati INTATTA sotto
+  // 🛑 TESTATA: viene da config/prompt_header.txt (via promptHeaderText). NON scrivere qui il
+  //    testo delle istruzioni — editalo in config/prompt_header.txt. Coda dati INTATTA sotto. 🛑
+  lines.push(promptHeaderText());
   lines.push("");
   // ORDINE WEB-SEARCH IN CIMA: se ci sono dati mancanti/inaffidabili, l'imperativo va visto
   // PRIMA di tutto il resto (l'LLM tende a "dimenticarlo" se sepolto in fondo al payload)
