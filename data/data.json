@@ -5330,7 +5330,7 @@
     "market_cap": 4441492684800.0,
     "shares": 5867155790.0,
     "float_shares": 10823222800.0,
-    "float_pct": 184.5,
+    "float_pct": null,
     "avg_volume_30d": 31740572.0,
     "pe_ttm": 27.7847,
     "forward_pe": 25.0026,
@@ -20474,7 +20474,7 @@
     "market_cap": 2365758373888.0,
     "shares": 5186474013.0,
     "float_shares": 37818938572.0,
-    "float_pct": 729.2,
+    "float_pct": null,
     "avg_volume_30d": 13986186.0,
     "pe_ttm": 39.6299,
     "forward_pe": 22.4819,
@@ -29789,11 +29789,11 @@
    "note": "Spread in compressione: il carry trade USD/JPY è meno conveniente; attenzione a possibili rientri di capitali verso lo yen."
   },
   "putcall": {
-   "symbol": "BSX",
-   "name": "Boston Scientific",
-   "ratio": 10.73,
-   "puts": 16112,
-   "calls": 1502
+   "symbol": "SPY",
+   "name": "S&P 500 ETF",
+   "ratio": 1.03,
+   "puts": 2815747,
+   "calls": 2746507
   },
   "risk_sentiment": {
    "score": 49,

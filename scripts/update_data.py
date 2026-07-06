@@ -104,7 +104,10 @@ TOP_ETF_LIST = [
     ("VNQ",  "Real Estate"),
 ]
 
-PUTCALL_SYMBOL = ("BSX", "Boston Scientific")
+# Put/Call ratio come proxy del SENTIMENT DI MERCATO: SPY (ETF S&P 500, opzioni liquidissime,
+# ratio ~1.0 rappresentativo). NON usare un singolo titolo (era "BSX"=Boston Scientific: ratio
+# ~12 = spazzatura che inquinava marketDirectionScore e smart money).
+PUTCALL_SYMBOL = ("SPY", "S&P 500 ETF")
 
 # aliquote per la stima del guadagno netto
 TAX_STOCK = 0.26   # capital gain azioni
@@ -564,7 +567,11 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             "market_cap": num("marketCap"),
             "shares": shares_out,
             "float_shares": float_sh,
-            "float_pct": round(float_sh / shares_out * 100, 1) if float_sh and shares_out else None,
+            # float_pct nullificato se >100%: impossibile (il float non può superare le azioni
+            # in circolazione). Succede su multi-classe (GOOGL) e ADR (TSM) dove Yahoo restituisce
+            # floatShares e sharesOutstanding in UNITÀ INCOMPATIBILI → % senza senso per l'AI.
+            "float_pct": (lambda p: p if (p is not None and p <= 100) else None)(
+                round(float_sh / shares_out * 100, 1) if float_sh and shares_out else None),
             "avg_volume_30d": num("averageVolume", "averageDailyVolume10Day"),
             "pe_ttm": num("trailingPE"),
             "forward_pe": num("forwardPE"),

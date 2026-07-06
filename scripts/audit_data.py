@@ -34,6 +34,18 @@ for r in rows + wl:
     if peg is not None and peg <= 0:
         hard.append(f"{r['ticker']}: peg={peg} <= 0 nel payload")
 
+# HARD 3b: float_pct impossibile (>100%) non deve MAI arrivare nel payload — mislead l'AI
+# (multi-classe/ADR con unità Yahoo incompatibili). La pipeline lo nullifica: qui è il gate.
+for r in rows + wl:
+    fp = (r.get("stats") or {}).get("float_pct")
+    if fp is not None and fp > 100:
+        hard.append(f"{r['ticker']}: float_pct={fp}% > 100 (impossibile: unità Yahoo incompatibili, va nullificato)")
+
+# HARD 3c: put/call ratio sano (proxy sentiment di mercato, non un singolo titolo illiquido)
+pc = (macro_pc := d.get("macro", {}).get("putcall") or {}).get("ratio")
+if pc is not None and (pc <= 0 or pc > 5):
+    hard.append(f"put/call ratio {pc} fuori range plausibile (0,05–5]: simbolo sbagliato? (era BSX=singolo titolo)")
+
 # HARD 4: stop ratchet coerente (violated ⇔ prezzo < stop)
 for r in rows:
     if r.get("stop_atr") is not None and r.get("price"):
