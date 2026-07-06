@@ -4031,7 +4031,9 @@ function buildPrompt() {
   const m = DATA.macro || {};
   const dqV = validateMacroData();   // data assertions: usata da indicatori, margin debt e report
   const lines = [];
-  const patrimonio = t.eur_invested + cashEur;
+  // difensivo: eur_invested lo calcola recomputeTotals (gira in renderAll prima di qui). Se per
+  // qualsiasi motivo mancasse, ripiego su eur_value del payload — mai "NaN €" verso l'AI.
+  const patrimonio = Number.isFinite(t.eur_invested + cashEur) ? t.eur_invested + cashEur : (t.eur_value ?? 0);
   // 🛑 TESTATA: viene da config/prompt_header.txt (via promptHeaderText). NON scrivere qui il
   //    testo delle istruzioni — editalo in config/prompt_header.txt. Coda dati INTATTA sotto. 🛑
   lines.push(promptHeaderText());
@@ -4296,7 +4298,7 @@ function buildPrompt() {
     const md = mds.md;
     // etichetta 1:1 con la card e il popup della dashboard (marginDebtState) — niente hardcode.
     // La label già esprime lo stato; conf aggiunge solo la sfumatura di conferma senza duplicare.
-    const conf = mds.confirmed ? " → RISCHIO SISTEMICO (confermato dal Forward P/E >20)"
+    const conf = mds.confirmed ? " → RISCHIO SISTEMICO (Forward P/E >20)"
       : (mds.high && mds.fpe != null) ? " (il Forward P/E attuale non conferma il livello estremo)" : "";
     const mdFlag = dqV.flags.margin_debt ? ` ${dqV.flags.margin_debt}` : "";
     lines.push(`- Margin Debt (leva a credito, serie ${md.series || "FRED"}${md.carried ? ", carry-forward dal run precedente" : ""}): $${fmtNum.format(Math.round((md.value || 0) / 1000))} mld = ${md.pct_of_peak}% del picco storico${md.peak_date ? ` (ATH ${md.peak_date})` : ""} — ${mds.label}${conf}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""} (rilevazione ${md.date}).${mdFlag} Leva alta/estrema = mercato fragile, le discese possono innescare margin call a catena (drawdown più violenti sul tech ad alta beta).`);

@@ -479,7 +479,18 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             sortino_1y = round((rp - rf_log) / dd_ann, 2)
 
     vol = float(hist["Volume"].iloc[-1])
-    vol_avg30 = float(hist["Volume"].tail(30).mean())
+    # RVol (volume relativo) su base FULL-DAY: se l'ultimo bar è di OGGI e la sessione USA è ancora
+    # in corso (prima delle ~21 UTC) è PARZIALE → confrontarlo con la media giornaliera darebbe
+    # sempre <1 e il flag [Volumi Anomali] non scatterebbe MAI. Uso allora l'ultima seduta COMPLETA.
+    # vol==0 (tipico degli indici ^ senza volume) → RVol n.d., non 0.
+    _vols = hist["Volume"].dropna()
+    _now = datetime.now(timezone.utc)
+    _partial = len(_vols) > 0 and _vols.index[-1].date() == _now.date() and _now.hour < 21
+    _ri = -2 if (_partial and len(_vols) >= 32) else -1
+    _vol_rv = float(_vols.iloc[_ri]) if len(_vols) >= abs(_ri) else 0.0
+    _win = _vols.iloc[_ri - 30:_ri] if len(_vols) >= abs(_ri) + 30 else _vols.tail(30)
+    vol_avg30 = float(_win.mean()) if len(_win) else 0.0
+    vol_ratio = round(_vol_rv / vol_avg30, 2) if (vol_avg30 and _vol_rv > 0) else None
 
     # ATR(14) — Average True Range con smoothing di Wilder (EWMA alpha=1/14).
     # È la base degli stop loss dinamici del motore (2×ATR): assorbe la volatilità
@@ -735,7 +746,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "resistance": round(float(hist["High"].tail(20).max()), 2),
         "rsi": rsi,
         "volume": int(vol),
-        "vol_ratio": round(vol / vol_avg30, 2) if vol_avg30 else None,
+        "vol_ratio": vol_ratio,   # RVol full-day robusto (vedi sopra): n.d. se volume 0/assente
         "atr_14": round(atr_14, 2) if atr_14 else None,
         "atr_pct": round(atr_14 / price * 100, 2) if atr_14 and price else None,
         "signal": sig,
