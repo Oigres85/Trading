@@ -4,6 +4,46 @@
 > non sono ovvie dal codice e che, se ignorate, rompono il sistema. Aggiornalo quando prendi
 > una decisione strutturale nuova.
 
+## 🔁 Esercizio ricorrente: "check del prompt AI applicato a te stesso"
+
+L'utente chiede periodicamente di generare il prompt reale e di ESEGUIRLO su di sé (simulare
+l'LLM ricevente) per trovare attriti tra testata (istruzioni) e coda (dati). **Metodo collaudato**:
+
+1. Genera il prompt FEDELE al browser con questo harness (nota i 3 dettagli critici:
+   `localStorage.getItem("prompt_header")` deve restituire il file utente, `recomputeTotals()`
+   va chiamato PRIMA di `buildPrompt()`, i NaN del JSON vanno sostituiti):
+   ```bash
+   node -e '
+   const fs=require("fs"),vm=require("vm");const src=fs.readFileSync("assets/app.js","utf8");
+   const el=()=>({addEventListener(){},classList:{add(){},remove(){},toggle(){},contains:()=>false},style:{},dataset:{},hidden:true,querySelector:()=>el(),querySelectorAll:()=>[],closest:()=>null});
+   const ctx={console,document:{querySelector:()=>el(),querySelectorAll:()=>[],getElementById:()=>el(),createElement:()=>el(),addEventListener(){},body:el()},localStorage:{getItem:(k)=>k==="prompt_header"?fs.readFileSync("config/prompt_header.txt","utf8"):null,setItem(){},removeItem(){}},window:{addEventListener(){},matchMedia:()=>({matches:false})},navigator:{clipboard:{}},fetch:()=>Promise.reject(),setInterval:()=>0,clearInterval(){},setTimeout:()=>0,Event:class{},MutationObserver:class{observe(){}}};
+   vm.createContext(ctx);vm.runInContext(src,ctx);
+   const d=JSON.parse(fs.readFileSync("data/data.json","utf8").replace(/\bNaN\b/g,"null"));
+   vm.runInContext("DATA="+JSON.stringify(d)+"; cashEur=28500; recomputeTotals();",ctx);
+   fs.writeFileSync("/tmp/prompt_live.txt",vm.runInContext("buildPrompt()",ctx));'
+   ```
+   ⚠️ Un "NaN €" o dati piatti nel prompt così generato possono essere ARTEFATTI dell'harness
+   (recomputeTotals/cash mancanti), non bug di produzione: verificare prima di allarmare.
+2. Leggi /tmp/prompt_live.txt riga per riga COME L'LLM RICEVENTE: dove sbaglieresti tu?
+   Confronta ogni istruzione della testata con i dati che la coda fornisce davvero.
+3. I fix vanno separati: CODA/sistema = implementi tu; TESTATA = `config/prompt_header.txt`
+   è dell'utente (editato dalla UI) → solo raccomandazioni, MAI modifiche dirette.
+
+**Già trovato e SISTEMATO nelle iterazioni passate (v104→v108) — non ri-scoprire/ri-fixare**:
+float_pct>100 nullato (GOOGL/TSM multi-classe/ADR) · put/call su SPY (era BSX spazzatura) ·
+RVol full-day (era sempre <1 col bar intraday parziale) · wall opzioni sanity (0DTE skip,
+banda 0,5–2× spot, CW==PW lontano = artefatto → nulli; guard anche in mdRow) · chiave
+`umich` (ex "pmi": è FRED UMCSENT, NON l'ISM PMI) · DATA QUALITY REPORT prima del QUADRO
+MACRO · header tabelle con conteggi espliciti ("N POSIZIONI → N righe", ancora anti-omissione)
+· P/E etichettati [TRAILING/FORWARD, fonte] · margin debt label da YoY (pct_of_peak saturo
+13/13 mesi) · offloading algebrico completo: budget_operativo_spendibile (cash−ES95),
+prezzo_limite_aggiustato (gap pre/after), risk_reward "1:X.X" (_risk_reward_str, reward=res−supp,
+risk=2×ATR) — l'LLM non deve fare NESSUN conto, solo giudizio.
+
+**Punti aperti noti**: WSJ/multpl bloccati dagli IP CI (carry-forward ≤45g copre); prompt
+~10,4k token (se cresce ancora, tagliare prima le news per-ticker); i CW sotto lo spot ma
+in banda plausibile possono essere legittimi (non stringere oltre la banda senza evidenza).
+
 ## 🏗️ Architettura (JAMstack statico — NON c'è un backend)
 
 - Il sito è **statico su GitHub Pages**: solo `index.html` + `assets/app.js` + `assets/style.css`,
