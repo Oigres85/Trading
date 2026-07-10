@@ -103,5 +103,34 @@ check("has_fundamentals: False per indici/cripto/commodity/ETF/EUR",
                ud.has_fundamentals("SPY","USD"), ud.has_fundamentals("QQQ","USD"),
                ud.has_fundamentals("SOXX","USD"), ud.has_fundamentals("BTP-V28","EUR")]))
 
-print(f"\n{('TUTTI I ' + str(19 - len(FAILED)) + '/19 CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
+# ---------- drop_void_bars (v110): barra Yahoo con Close=NaN (^KS11 post-chiusura) ----------
+import pandas as pd
+_df = pd.DataFrame({"Close": [100.0, 101.0, float("nan")], "Volume": [10, 11, 12]})
+_trim = ud.drop_void_bars(_df)
+check("drop_void_bars: barra finale senza Close scartata (prezzo = ultima chiusura valida)",
+      len(_trim) == 2 and float(_trim["Close"].iloc[-1]) == 101.0)
+check("drop_void_bars: storico tutto-NaN diventa vuoto (scatta il fallback/skip)",
+      ud.drop_void_bars(pd.DataFrame({"Close": [float("nan")], "Volume": [1]})).empty
+      and ud.drop_void_bars(pd.DataFrame()).empty)
+
+# ---------- norm_div_yield (v110): yfinance dividendYield in % o frazione ----------
+check("norm_div_yield: percento yfinance nuovo → frazione (ORCL 1.39 → 0.0139, TLT 4.53 → 0.0453)",
+      abs(ud.norm_div_yield(1.39) - 0.0139) < 1e-9 and abs(ud.norm_div_yield(4.53) - 0.0453) < 1e-9)
+check("norm_div_yield: frazione legacy e None passano intatti",
+      ud.norm_div_yield(0.0142) == 0.0142 and ud.norm_div_yield(None) is None and ud.norm_div_yield(0.0) == 0.0)
+
+# ---------- scrub_cross_currency_stats (v110): ADR con bilanci in valuta locale ----------
+_s = {"price_to_book": 99.2, "ev_ebitda": 5.6, "fcf": 4e12, "enterprise_value": 2e12,
+      "revenue_fy": 3e12, "net_income_fy": 1e12, "roe": 0.36, "pe_ttm": 38.2}
+_out = ud.scrub_cross_currency_stats(dict(_s), "TWD", "USD")
+check("scrub_cross_currency: TSM-like (TWD vs USD) → rapporti prezzo/bilancio nullati, ratio interni salvi",
+      all(_out[k] is None for k in ("price_to_book", "ev_ebitda", "fcf", "enterprise_value", "revenue_fy", "net_income_fy"))
+      and _out["roe"] == 0.36 and _out["pe_ttm"] == 38.2 and _out.get("cross_currency") is True)
+_same = ud.scrub_cross_currency_stats(dict(_s), "USD", "USD")
+check("scrub_cross_currency: valute uguali (o mancanti) → no-op",
+      _same["price_to_book"] == 99.2 and "cross_currency" not in _same
+      and ud.scrub_cross_currency_stats(dict(_s), None, "USD")["fcf"] == 4e12)
+
+N_CHECKS = 25
+print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)

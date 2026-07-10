@@ -147,8 +147,11 @@ def sane_val(v, lo, hi, what=""):
 
 # Calendario FOMC 2026 (fonte: federalreserve.gov, pubblicato in anticipo) — serve a rendere
 # esplicita nel prompt la data della prossima riunione accanto al tasso attuale.
-FOMC_2026 = ["2026-01-27", "2026-03-17", "2026-04-28", "2026-06-16",
-             "2026-07-28", "2026-09-15", "2026-10-27", "2026-12-08"]
+# ⚠ UNICA fonte di verità: giorno della DECISIONE (2° giorno della riunione), quello che conta
+# per i mercati. Prima convivevano due liste hardcoded (qui i giorni-1, in fetch_fedwatch i
+# giorni-2) e il prompt stampava due date diverse per la stessa riunione (28/07 vs 29/07).
+FOMC_2026 = ["2026-01-28", "2026-03-18", "2026-04-29", "2026-06-17",
+             "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09"]
 
 
 def next_fomc_date():
@@ -432,16 +435,49 @@ def bench_close(sym, fallback=None, period="2mo"):
     return None
 
 
+def norm_div_yield(v):
+    """Normalizza dividendYield di Yahoo a FRAZIONE (0.0142 = 1,42%). yfinance ha cambiato
+    unità (2025+: il campo arriva già in PERCENTO — visto sul campo: ORCL 1.39 mostrato
+    "139%", TLT 4.53 mostrato "453%"). Heuristica: nessun asset di questo universo rende
+    >25% → un valore >0.25 è un percento da riportare a frazione."""
+    if v is None:
+        return None
+    return v / 100 if v > 0.25 else v
+
+
+def scrub_cross_currency_stats(stats, financial_currency, quote_currency):
+    """GOTCHA ADR/valuta (stessa famiglia di float_pct>100): se i bilanci sono in valuta
+    locale (financialCurrency ≠ currency — es. TSM: TWD vs prezzo ADR in USD) i campi di
+    Yahoo che mischiano prezzo e bilancio escono con UNITÀ INCOMPATIBILI → spazzatura
+    (visto sul campo: TSM P/B 99,2× invece di ~12×, P/FCF 3,2× invece di ~25×).
+    Nullifica i campi cross-currency e marca lo stat (fallback rumoroso, non silenzioso)."""
+    if stats and financial_currency and quote_currency and financial_currency != quote_currency:
+        for k in ("price_to_book", "ev_ebitda", "fcf", "enterprise_value",
+                  "revenue_fy", "net_income_fy"):
+            stats[k] = None
+        stats["cross_currency"] = True
+    return stats
+
+
+def drop_void_bars(hist):
+    """Barre senza Close via. Yahoo può appendere la barra ODIERNA con Close=NaN e volume
+    valorizzato (visto sul campo, lug 2026: ^KS11 dopo la chiusura coreana) → il prezzo
+    diventava null in dashboard e prompt, accecando la lettura leading del KOSPI richiesta
+    dalla testata. Una barra senza chiusura non è una barra: il prezzo resta l'ultima
+    chiusura valida (semantica documentata: "price = ULTIMA CHIUSURA REGOLARE")."""
+    return hist[hist["Close"].notna()] if not hist.empty else hist
+
+
 def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
     ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
     t = yf.Ticker(ticker)
     price_src = "yahoo"
-    hist = t.history(period="1y", interval="1d", auto_adjust=True)
+    hist = drop_void_bars(t.history(period="1y", interval="1d", auto_adjust=True))
     if hist.empty and currency == "USD" and not re.search(r"[\^=]|-", ticker):
         bk = backup_daily(ticker)
         if bk is not None and len(bk[0]) >= 30:
-            hist, price_src = bk
+            hist, price_src = drop_void_bars(bk[0]), bk[1]
             print(f"·· prezzi {ticker} da {price_src} (fallback: Yahoo senza storico)", file=sys.stderr)
     if hist.empty:
         print(f"!! nessuno storico per {ticker}", file=sys.stderr)
@@ -657,7 +693,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             "profit_margin": num("profitMargins"),
             "roe": num("returnOnEquity"),
             "debt_to_equity": num("debtToEquity"),
-            "dividend_yield": num("dividendYield"),
+            "dividend_yield": norm_div_yield(num("dividendYield")),
             "price_to_book": num("priceToBook"),
             "target_mean": num("targetMeanPrice"),
             "fcf": num("freeCashflow"),
@@ -669,6 +705,8 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             "short_float": num("shortPercentOfFloat"),
         }
         stats = {k: (round(v, 4) if v is not None else None) for k, v in stats.items()}
+        # ADR con bilanci in valuta locale → via i rapporti prezzo-vs-bilancio (unità miste)
+        stats = scrub_cross_currency_stats(stats, g("financialCurrency"), g("currency"))
         # sanity: un PEG negativo (utili o crescita attesa negativi) non è usabile nei modelli → n.d.
         if stats.get("peg") is not None and stats["peg"] <= 0:
             stats["peg"] = None
@@ -1052,8 +1090,8 @@ def fetch_macro():
                 target = target_low + 0.25
         mid = (target + target_low) / 2
         # prossime riunioni FOMC 2026 con probabilità taglio implicita dai futures
-        fomc = [d for d in ("2026-01-28", "2026-03-18", "2026-04-29", "2026-06-17",
-                            "2026-07-29", "2026-09-16", "2026-10-28", "2026-12-09")
+        # (stesso calendario FOMC_2026: mai più due liste divergenti nel prompt)
+        fomc = [d for d in FOMC_2026
                 if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")]
         cut_prob = round(max(0, min(100, (mid - implied) / 0.25 * 100)))
         meetings = []
@@ -1435,18 +1473,23 @@ def fetch_macro():
                     ndx_gap = round(ndx_hist[-1]["v"] - cur_cp, 1)
             except Exception:
                 pass
-            # score sulla media dei due gap (o solo S&P se NDX non disponibile)
-            avg_gap = round((gap + ndx_gap) / 2, 1) if ndx_gap is not None else gap
-            score = clamp(round(100 - max(0, avg_gap - 10) / 60 * 100))
+            # score/label sul gap PEGGIORE, non sulla media: con S&P a -24 e NDX a +59 la
+            # media (17.5) diceva "Allineati 88/100" mentre l'NDX — il benchmark del mandato —
+            # bucava da solo la soglia "Asset Inflation" (>40). Un flag di rischio non si
+            # diluisce col comparto messo meglio (v110).
+            worst_gap = round(max(gap, ndx_gap), 1) if ndx_gap is not None else gap
+            score = clamp(round(100 - max(0, worst_gap - 10) / 60 * 100))
             macro["corp_profit"] = {
                 "sp500":   [{"d": d, "v": round(v / sp_base * 100, 1)} for d, v in sp_cp],
                 "profits": [{"d": d, "v": round(v / cp_base * 100, 1)} for d, v in cp],
                 "ndx":     ndx_hist,
                 "gap":     gap,
                 "ndx_gap": ndx_gap,
+                "worst_gap": worst_gap,
                 "score":   score,
-                "label":   "Asset Inflation estrema" if avg_gap > 70 else "Asset Inflation" if avg_gap > 40
-                           else "Tensione moderata" if avg_gap > 20 else "Allineati",
+                "label":   ("Asset Inflation estrema" if worst_gap > 70 else "Asset Inflation" if worst_gap > 40
+                            else "Tensione moderata" if worst_gap > 20 else "Allineati")
+                           + (" (driver: NDX)" if ndx_gap is not None and ndx_gap > gap and worst_gap > 20 else ""),
             }
     except Exception as e:
         print(f"!! corp_profit: {e}", file=sys.stderr)
@@ -2325,7 +2368,8 @@ def fetch_top_etfs():
         try:
             info = yf.Ticker(ticker).info
             row["pe"]        = round(float(info["trailingPE"]), 1) if info.get("trailingPE") else None
-            row["div_yield"] = round(float(info.get("dividendYield", 0) or 0) * 100, 2)
+            # norm_div_yield: yfinance può dare il campo già in % (TLT usciva "453%")
+            row["div_yield"] = round((norm_div_yield(float(info.get("dividendYield", 0) or 0)) or 0) * 100, 2)
             aum = info.get("totalAssets")
             row["aum"] = round(aum / 1e9, 1) if aum else None
         except Exception:  # noqa: BLE001

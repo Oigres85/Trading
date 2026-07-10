@@ -81,7 +81,14 @@ DATA = {
       signal: "debole", signal_class: "bad", sector: "Technology",
       stats: ${JSON.stringify(baseStats)}, sparks: {}, tech_by_range: {}, financials: [] },
   ],
-  watchlist: [],
+  watchlist: [
+    { ticker: "TSTW", name: "Watch Corp", currency: "USD", price: 100,
+      beta_ndx: 1.1, sharpe_1y: 2.5, sortino_1y: 2.8, rs_1m: 5, rs_ndx_1m: 6, w52_dist_pct: -15,
+      support: 95, resistance: 120, rsi: 45, atr_14: 3, atr_pct: 3, vol_ratio: 1.0, fin_health: 80,
+      signal: "ok", signal_class: "good", sector: "Technology",
+      avg_corr: 0.3, max_corr: 0.5, max_corr_with: "TST1",
+      stats: ${JSON.stringify({ ...baseStats, float_shares: 40e6, float_pct: 88 })}, sparks: {}, tech_by_range: {}, financials: [] },
+  ],
 };
 cashEur = 10000;
 recomputeTotals();
@@ -132,12 +139,16 @@ check("decisionVerdict: TST2 tra gli esclusi, TST3 tra le violazioni", run(`
   return dv.excluded.some(x => x.r.ticker === "TST2") &&
   dv.stopViolations.some(x => x.r.ticker === "TST3") &&
   typeof dv.label === "string"`));
-check("sizing regime-aware: VIX 27 dimezza il budget d'ingresso", run(`
-  const q1 = (decisionVerdict().withPlan.find(p => p.r.ticker === "TST1") || {}).qty || 0;
+check("sizing regime-aware: VIX 27 dimezza il budget d'ingresso (TSTW, watchlist)", run(`
+  const q1 = (decisionVerdict().withPlan.find(p => p.r.ticker === "TSTW") || {}).qty || 0;
   DATA.macro.vix.value = 27;
-  const q2 = (decisionVerdict().withPlan.find(p => p.r.ticker === "TST1") || {}).qty || 0;
+  const q2 = (decisionVerdict().withPlan.find(p => p.r.ticker === "TSTW") || {}).qty || 0;
   DATA.macro.vix.value = 15;
   return q1 > 0 && q2 > 0 && q2 <= Math.ceil(q1 * 0.55)`));
+check("cap sizing v110: TST1 (peso >10% NAV) NON è candidato ad accumulo, con motivazione dedicata", run(`
+  const dv = decisionVerdict();
+  return !dv.accumula.some(r => r.ticker === "TST1") &&
+    dv.reasons.some(s => s.includes("cap sizing") && s.includes("TST1"))`));
 
 // riconciliazione broker (soglia volatility-aware)
 check("reconcile: baseline pulita (drift TST4 -25% sotto la banda 2σ con ATR 9%)", run(`

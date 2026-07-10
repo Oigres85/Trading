@@ -1194,8 +1194,17 @@ function decisionVerdict() {
 
   // candidati ACCUMULO: migliorano il profilo rischio/rendimento (score ≥ 60) e hanno
   // Sharpe noto. Il drawdown non è più la porta d'ingresso: è solo un tiebreaker di prezzo.
+  // Una posizione GIÀ oltre il cap del 10% NAV non può essere candidata ad accumulo (v110):
+  // prima diceva "accumula MU" e "trimma MU" nello stesso verdetto — contraddizione servita
+  // all'LLM. Il cap sizing è un veto d'ingresso, non solo un flag a valle.
+  const overCap = [];
   const accumula = eligible
     .filter(r => r.price && r.sharpe_1y != null)
+    .filter(r => {
+      const w = positionWeightPct(r);
+      if (w != null && w > 10) { overCap.push({ r, w }); return false; }
+      return true;
+    })
     .map(r => ({ ...r, _q: quantScore(r) }))
     .filter(r => r._q >= 60)
     .sort((a, b) => (b._q - a._q) || ((a.w52_dist_pct ?? 0) - (b.w52_dist_pct ?? 0)));
@@ -1239,10 +1248,16 @@ function decisionVerdict() {
 
   const reasons = [];
   let label, score, col;
-  const vetoTk = excluded.map(x => `${x.r.ticker} (${x.verdict === "SCARTATO - VALUE TRAP" ? "VALUE TRAP" : x.why[0]})`);
+  // il veto su una POSIZIONE detenuta significa "non incrementare", non "vendi subito":
+  // senza il distinguo l'LLM leggeva "META SCARTATO - VALUE TRAP" su un titolo in portafoglio
+  // e doveva indovinare se fosse un ordine di vendita (v110). Tag corto + legenda unica in coda.
+  const vetoTk = excluded.map(x => `${x.r.ticker}${x.r.qty ? " [in ptf]" : ""} (${x.verdict === "SCARTATO - VALUE TRAP" ? "VALUE TRAP" : x.why[0]})`);
+  const vetoHeldNote = excluded.some(x => x.r.qty)
+    ? " ([in ptf] = posizione detenuta: il veto vieta l'ACCUMULO, la decisione tenere/vendere resta aperta)" : "";
   if (accumula.length >= 1 && cashUsd > 0) {
     label = "ACCUMULA"; col = "var(--green)"; score = 72;
-    reasons.push(`${accumula.length} candidati migliorano il profilo Sharpe/RS del portafoglio (score quant ≥60): ${accumula.slice(0, 5).map(r => `${r.ticker} ${r._q}/100`).join(", ")}`);
+    reasons.push(`${accumula.length} candidati migliorano il profilo Sharpe/RS del portafoglio (score quant ≥60): ${accumula.slice(0, 8).map(r => `${r.ticker} ${r._q}/100`).join(", ")}${accumula.length > 8 ? ", …" : ""}`);
+    if (overCap.length) reasons.push(`esclusi dall'accumulo per cap sizing (posizione già oltre il 10% del NAV): ${overCap.map(x => `${x.r.ticker} (${fmtNum.format(x.w)}%)`).join(", ")} — su questi si valuta solo il trimming di rientro`);
     reasons.push(`criteri: impatto marginale sullo Sharpe (vs ${refSharpe != null ? fmtNum.format(refSharpe) : "n.d."} attuale, target 2.0) · forza relativa 1M vs benchmark · qualità fondamentale`);
     reasons.push(`ordini LIMITE ai supporti con stop a 2×ATR(14): il rischio per operazione si adatta alla volatilità del titolo`);
     if (riskScale < 1) reasons.push(`regime di volatilità: VIX ${fmtNum.format(vixV)} → budget d'ingresso ridotti al ${Math.round(riskScale * 100)}% (sizing regime-aware: in mercato nervoso si rischia meno per operazione)`);
@@ -1254,7 +1269,7 @@ function decisionVerdict() {
     reasons.push(`nessun candidato migliora abbastanza Sharpe/forza relativa (regime ${dir != null ? dir + "/100" : "neutro"}): conserva liquidità e posizioni vincenti`);
   }
   if (stopViolations.length) reasons.unshift(`⚠ STOP VIOLATO su ${stopViolations.map(x => `${x.r.ticker} (stop $${fmtNum.format(x.stop)}, prezzo $${fmtNum.format(x.r.price)})`).join(", ")} — il prezzo è sotto lo stop trailing ancorato: decidere uscita o ri-arm consapevole`);
-  if (vetoTk.length) reasons.push(`VETO risk manager su ${vetoTk.join(", ")} — esclusi a prescindere dal supporto tecnico`);
+  if (vetoTk.length) reasons.push(`VETO risk manager su ${vetoTk.join(", ")} — esclusi a prescindere dal supporto tecnico${vetoHeldNote}`);
   if (overweight.length) reasons.push(`sizing: ${overweight.map(x => `${x.r.ticker} ${x.w}%`).join(", ")} oltre il 10% del NAV → valuta trimming di rientro`);
   if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => r.ticker).join(", ")} (multiplo/RSI estremo)`);
   return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, overweight, harvest };
@@ -4212,6 +4227,11 @@ function buildPrompt() {
     lines.push("");
     lines.push("DIARIO DELLE AZIONI (mie operazioni passate e motivazioni — usalo per capire la mia strategia e dare continuità ai consigli):");
     diary.slice(0, 30).forEach(e => lines.push(`- ${new Date(e.date).toLocaleDateString("it-IT")}: ${e.text}`));
+  } else {
+    // l'analisi per-titolo cita il diario: se è vuoto va DETTO (anti-allucinazione),
+    // non lasciato all'LLM da indovinare cercando una sezione che non c'è
+    lines.push("");
+    lines.push("DIARIO DELLE AZIONI: vuoto — nessuna operazione registrata di recente.");
   }
   lines.push("");
   lines.push(`PORTAFOGLIO — ${DATA.portfolio.length} POSIZIONI: la tua Tabella A deve avere ESATTAMENTE ${DATA.portfolio.length} righe (controvalore e P&L reali per posizione; Sharpe 1A = rendimento/rischio; Drawdown 52S = distanza dal max; ±ImpMove = movimento implicito earnings; RVol = volume oggi/media 30gg; Stop 2×ATR = stop dinamico su volatilità):`);
@@ -4511,7 +4531,10 @@ function buildPrompt() {
     if (pf.length) lines.push(`- Performance storica (broker): ${pf.join(" · ")}`);
   }
   // liquidità e capitale
-  if (t.cash) lines.push(`- Liquidità disponibile: ${fmtEUR.format(t.cash)} · capitale investito: ${fmtEUR.format(t.eur_invested)}`);
+  // "controvalore (mark-to-market)", NON "capitale investito": la SITUAZIONE PATRIMONIALE usa
+  // già "capitale investito (costo)" per il costo storico — stesso nome per due grandezze
+  // diverse (175k costo vs 287k MTM) mandava in confusione l'LLM ricevente
+  if (t.cash) lines.push(`- Liquidità disponibile: ${fmtEUR.format(t.cash)} · controvalore investito (mark-to-market): ${fmtEUR.format(t.eur_invested)}`);
   if ((DATA.top_caps || []).length) {
     lines.push("");
     lines.push("TOP 10 CAPITALIZZAZIONI MONDIALI:");
