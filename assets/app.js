@@ -874,7 +874,7 @@ function openDataQualityModal() {
     forward_pe: "Forward P/E S&P 500 (es. 21.7 — wsj.com/market-data/stocks/peyields)",
     sp500_pe: "P/E trailing S&P 500 (es. 25.4)",
     margin_debt: "Margin Debt FINRA in $ MILIONI (es. 1415557 = $1,42T — finra.org margin statistics)",
-    pmi: "ISM Manufacturing PMI (es. 48.5)", vix: "VIX spot", cpi: "CPI YoY % (es. 4.3)", pce: "PCE YoY %",
+    umich: "Fiducia consumatori UMich (es. 53.3 — NON è l'ISM PMI)", vix: "VIX spot", cpi: "CPI YoY % (es. 4.3)", pce: "PCE YoY %",
   };
   const rows = items.map(it => `
     <div class="edp-row"><span class="edp-tk"><b>${esc(it.key)}</b> <span class="muted">(${esc(it.status)})</span><br>
@@ -4206,12 +4206,16 @@ function buildPrompt() {
     diary.slice(0, 30).forEach(e => lines.push(`- ${new Date(e.date).toLocaleDateString("it-IT")}: ${e.text}`));
   }
   lines.push("");
-  lines.push("PORTAFOGLIO (controvalore e P&L reali per posizione; Sharpe 1A = rendimento/rischio; Drawdown 52S = distanza dal max; ±ImpMove = movimento implicito earnings; RVol = volume oggi/media 30gg; Stop 2×ATR = stop dinamico su volatilità):");
+  lines.push(`PORTAFOGLIO — ${DATA.portfolio.length} POSIZIONI: la tua Tabella A deve avere ESATTAMENTE ${DATA.portfolio.length} righe (controvalore e P&L reali per posizione; Sharpe 1A = rendimento/rischio; Drawdown 52S = distanza dal max; ±ImpMove = movimento implicito earnings; RVol = volume oggi/media 30gg; Stop 2×ATR = stop dinamico su volatilità):`);
   const f = (v, d = 2) => v === null || v === undefined ? "—" : fmtNum.format(v);
   const mdRow = (r) => {
     const c = cur(r);
     const optC = (DATA.options || {})[r.ticker];
-    const optNote = optC ? `CW:${c}${f(optC.expiries?.[0]?.call_wall)} PW:${c}${f(optC.expiries?.[0]?.put_wall)}` : "—";
+    // wall sanity: un muro fuori da 0.4×–2.5× lo spot è un relitto di chain degenere → n.d.
+    const wallOk = (w) => (w != null && r.price != null && w >= r.price * 0.4 && w <= r.price * 2.5) ? w : null;
+    let cw = wallOk(optC?.expiries?.[0]?.call_wall), pw = wallOk(optC?.expiries?.[0]?.put_wall);
+    if (cw != null && cw === pw && r.price && Math.abs(cw / r.price - 1) > 0.25) { cw = pw = null; }   // firma chain artefatta
+    const optNote = (cw != null || pw != null) ? `CW:${cw != null ? c + f(cw) : "n.d."} PW:${pw != null ? c + f(pw) : "n.d."}` : "—";
     const rsBench = r.rs_bench === "sox" ? "SOX" : r.rs_bench === "ndx" ? "NDX" : "S&P";
     const rsCell = r.rs_1m != null ? `${r.rs_1m > 0 ? "+" : ""}${r.rs_1m}% (vs ${rsBench})` : "—";
     const rsNdxCell = r.rs_ndx_1m != null ? `${r.rs_ndx_1m > 0 ? "+" : ""}${r.rs_ndx_1m}pp` : "—";
@@ -4272,7 +4276,7 @@ function buildPrompt() {
   }
   if ((DATA.watchlist || []).length) {
     lines.push("");
-    lines.push("WATCHLIST (nessuna posizione):");
+    lines.push(`WATCHLIST — ${DATA.watchlist.length} TITOLI (nessuna posizione): la tua Tabella B deve avere ESATTAMENTE ${DATA.watchlist.length} righe, nessun titolo omesso:`);
     lines.push(head); lines.push(sep);
     DATA.watchlist.forEach(r => lines.push(mdRow(r)));
     // correlazione dei candidati watchlist vs il portafoglio ESISTENTE (per la regola n.2)
@@ -4321,6 +4325,18 @@ function buildPrompt() {
     lines.push("- " + usEco.join(" · "));
     lines.push("");
   }
+  // DATA QUALITY REPORT: i dati flaggati dalle assertions vengono dichiarati PRIMA del quadro
+  // macro, con l'ordine esplicito di fare double-check web su ciò che è datato/inaffidabile
+  if (!dqV.ok) {
+    lines.push(`⚠ DATA QUALITY REPORT (assertions automatiche del sistema): ${[...dqV.bad.map(b => `${b.key} INAFFIDABILE (${b.status}${b.note ? ": " + b.note : ""})`), ...dqV.stale.map(s => `${s.key} DATATO oltre la cadenza attesa`)].join(" · ")}. Per ogni dato marcato qui sotto con [!!! DATATO / UNRELIABLE !!!] o [LAG TEMPORALE RILEVATO]: NON usarlo così com'è — fai double-check con la ricerca web e cita il valore aggiornato con fonte e data.`);
+    const missingKeys = dqV.bad.map(b => b.key);
+    if (missingKeys.length) {
+      lines.push(`ATTENZIONE — ORDINE OPERATIVO: i seguenti dati sono mancanti o inaffidabili nel payload: [${missingKeys.join(", ")}]. PRIMA di generare la tua analisi, usa OBBLIGATORIAMENTE il tuo strumento di ricerca web per reperire questi valori in tempo reale (cita valore, fonte e data per ciascuno) e usali al posto di quelli assenti — in particolare per valutare leva finanziaria e valutazioni di mercato.`);
+    }
+  }
+  if ((dqV.overrides || []).length) {
+    lines.push(`OVERRIDE MANUALI ATTIVI (valori inseriti dall'utente perché la fonte era ko — trattali come dati validi ma verifica se puoi): ${dqV.overrides.map(o => `${o.key} [MANUAL_OVERRIDE del ${o.date || "n.d."}]`).join(" · ")}.`);
+  }
   lines.push("QUADRO MACRO:");
   if (m.risk_sentiment) lines.push(`- Sentiment globale: ${m.risk_sentiment.label} (${m.risk_sentiment.score}/100)`);
   if (m.thermometer) lines.push(`- Termometro tecnico del portafoglio: ${m.thermometer.label} (${m.thermometer.score}/100)`);
@@ -4368,18 +4384,6 @@ function buildPrompt() {
   (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile" : "serie mensile, normale ritardo di pubblicazione"})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`));
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
-  // DATA QUALITY REPORT: i dati flaggati dalle assertions vengono dichiarati PRIMA del quadro
-  // macro, con l'ordine esplicito di fare double-check web su ciò che è datato/inaffidabile
-  if (!dqV.ok) {
-    lines.push(`⚠ DATA QUALITY REPORT (assertions automatiche del sistema): ${[...dqV.bad.map(b => `${b.key} INAFFIDABILE (${b.status}${b.note ? ": " + b.note : ""})`), ...dqV.stale.map(s => `${s.key} DATATO oltre la cadenza attesa`)].join(" · ")}. Per ogni dato marcato qui sotto con [!!! DATATO / UNRELIABLE !!!] o [LAG TEMPORALE RILEVATO]: NON usarlo così com'è — fai double-check con la ricerca web e cita il valore aggiornato con fonte e data.`);
-    const missingKeys = dqV.bad.map(b => b.key);
-    if (missingKeys.length) {
-      lines.push(`ATTENZIONE — ORDINE OPERATIVO: i seguenti dati sono mancanti o inaffidabili nel payload: [${missingKeys.join(", ")}]. PRIMA di generare la tua analisi, usa OBBLIGATORIAMENTE il tuo strumento di ricerca web per reperire questi valori in tempo reale (cita valore, fonte e data per ciascuno) e usali al posto di quelli assenti — in particolare per valutare leva finanziaria e valutazioni di mercato.`);
-    }
-  }
-  if ((dqV.overrides || []).length) {
-    lines.push(`OVERRIDE MANUALI ATTIVI (valori inseriti dall'utente perché la fonte era ko — trattali come dati validi ma verifica se puoi): ${dqV.overrides.map(o => `${o.key} [MANUAL_OVERRIDE del ${o.date || "n.d."}]`).join(" · ")}.`);
-  }
   const mds = marginDebtState();
   if (mds) {
     const md = mds.md;

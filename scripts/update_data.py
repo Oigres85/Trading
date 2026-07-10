@@ -1115,7 +1115,7 @@ def fetch_macro():
     try:
         s = fred_series("UMCSENT", 2)
         v = s[-1][1]
-        indicators.append({"key": "pmi", "label": "Fiducia consumatori (UMich)",
+        indicators.append({"key": "umich", "label": "Fiducia consumatori (UMich)",
                            "value": f"{v}", "date": s[-1][0],
                            "impact": round(clamp((v - 40) * 1.7))})
     except Exception as e:  # noqa: BLE001
@@ -1199,7 +1199,7 @@ def fetch_macro():
         "retail": "Mensile, ~metà mese (Census) · consumi forti = economia solida",
         "nfp": "Primo venerdì del mese (BLS) · creazione posti di lavoro",
         "unemp": "Primo venerdì del mese (BLS) · disoccupazione bassa positiva",
-        "pmi": "Fine mese (UMich) · fiducia dei consumatori",
+        "umich": "Fine mese (UMich) · fiducia dei consumatori",
         "curve": "Giornaliero (FRED) · curva invertita = rischio recessione",
     }
     for ind in indicators:
@@ -1891,7 +1891,7 @@ def validate_macro(macro):
     # il dato nuovo esce entro ~1 settimana dal mese successivo → 45g = sicuramente vecchio).
     # CPI/PCE/retail restano a 75g: il reference date è il mese PRECEDENTE la pubblicazione
     # (~45g di età già alla release) — 45 li flaggherebbe SEMPRE, creando assuefazione al flag.
-    MAX_AGE = {"cpi": 75, "pce": 75, "nfp": 45, "unemp": 45, "pmi": 45, "retail": 75, "gdp": 210}
+    MAX_AGE = {"cpi": 75, "pce": 75, "nfp": 45, "unemp": 45, "umich": 45, "retail": 75, "gdp": 210}
     for i in macro.get("indicators", []):
         k = i.get("key")
         if k not in MAX_AGE:
@@ -1906,9 +1906,9 @@ def validate_macro(macro):
         if k in ("cpi", "pce") and num == 0:
             i["value"] = "n.d."
             add(k, i.get("date"), MAX_AGE[k], "implausible", "inflazione 0% = spazzatura API, valore nullato")
-        elif k == "pmi" and num is not None and not 25 <= num <= 75:
+        elif k == "umich" and num is not None and not 30 <= num <= 120:
             i["value"] = "n.d."
-            add(k, i.get("date"), MAX_AGE[k], "implausible", f"PMI {num} fuori range [25,75], nullato")
+            add(k, i.get("date"), MAX_AGE[k], "implausible", f"UMich {num} fuori range [30,120], nullato")
         else:
             add(k, i.get("date"), MAX_AGE[k], "ok" if (a is not None and a <= MAX_AGE[k]) else "stale")
 
@@ -2041,7 +2041,14 @@ def fetch_options_chain(symbols, n_strikes=12, n_expiries=3):
             spot = float(hist["Close"].dropna().iloc[-1]) if not hist.empty else None
             avg_vol = float(hist["Volume"].dropna().tail(20).mean()) if not hist.empty else None
             expiries = []
-            for ed in exps[:n_expiries]:
+            today_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            for ed in exps[:n_expiries + 1]:
+                # 0DTE (scadenza odierna): chain instabile/degenere a ridosso della chiusura —
+                # i "wall" che ne escono sono rumore (visto AMD spot $546 con wall $40). Salto.
+                if ed <= today_iso:
+                    continue
+                if len(expiries) >= n_expiries:
+                    break
                 try:
                     ch = t.option_chain(ed)
                 except Exception:  # noqa: BLE001
@@ -2053,8 +2060,23 @@ def fetch_options_chain(symbols, n_strikes=12, n_expiries=3):
                 ref = spot if spot else float(calls["strike"].median())
                 atm_c = int((calls["strike"] - ref).abs().idxmin()) if not calls.empty else 0
                 atm_p = int((puts["strike"] - ref).abs().idxmin()) if not puts.empty else 0
-                call_wall = float(calls.loc[calls["openInterest"].idxmax(), "strike"]) if not calls.empty and calls["openInterest"].notna().any() else None
-                put_wall = float(puts.loc[puts["openInterest"].idxmax(), "strike"]) if not puts.empty and puts["openInterest"].notna().any() else None
+                # WALL SANITY: il max-OI va cercato SOLO tra strike plausibili (0.5×–2× lo spot).
+                # Gli strike-relitto (adjusted options post split/eventi) hanno OI residuo su
+                # livelli assurdi e senza filtro "vincono" producendo muri fuori dal mondo.
+                def _wall(df):
+                    if df.empty or not df["openInterest"].notna().any():
+                        return None
+                    win = df[(df["strike"] >= ref * 0.5) & (df["strike"] <= ref * 2.0)] if ref else df
+                    if win.empty or not win["openInterest"].notna().any():
+                        return None
+                    return float(win.loc[win["openInterest"].idxmax(), "strike"])
+                call_wall = _wall(calls)
+                put_wall = _wall(puts)
+                # firma di chain artefatta: max-OI di call E put sullo STESSO strike lontano
+                # dallo spot (>25%) = relitto/adjusted options, non un livello di mercato
+                if (call_wall is not None and call_wall == put_wall and ref
+                        and abs(call_wall / ref - 1) > 0.25):
+                    call_wall = put_wall = None
                 opt_vol = int(pd.concat([calls["volume"], puts["volume"]]).fillna(0).sum())
                 expiries.append({
                     "date": ed,

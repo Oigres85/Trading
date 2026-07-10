@@ -69,6 +69,16 @@ for i in macro.get("indicators", []):
     if i.get("key") in ("cpi", "pce") and str(i.get("value")).strip() in ("0%", "0.0%"):
         hard.append(f"{i['key']} a 0% nel payload: spazzatura non nullata")
 
+# SOFT: wall opzioni implausibili (chain degenere/0DTE) — la pipeline li filtra, qui sentinella
+for tk, oc in (d.get("options") or {}).items():
+    row = next((r for r in rows + wl if r.get("ticker") == tk), None)
+    px = (row or {}).get("price")
+    e0 = (oc.get("expiries") or [{}])[0]
+    for wname in ("call_wall", "put_wall"):
+        w = e0.get(wname)
+        if w and px and not (px * 0.4 <= w <= px * 2.5):
+            soft.append(f"{tk}: {wname}={w} implausibile vs spot {px} (chain degenere?)")
+
 # SOFT: alert dichiarati dalla validazione macro (degradi noti, non blocking)
 for a in (d.get("data_quality") or {}).get("alerts", []):
     soft.append(f"data_quality: {a}")
