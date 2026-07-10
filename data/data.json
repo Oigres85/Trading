@@ -1005,7 +1005,8 @@
    "max_corr_with": "MU",
    "risk_contrib_pct": 27.1,
    "stop_atr": 494.66,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 547.06
   },
   {
    "ticker": "NVDA",
@@ -1819,7 +1820,8 @@
    "max_corr_with": "AVGO",
    "risk_contrib_pct": 12.5,
    "stop_atr": 190.26,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 202.31
   },
   {
    "ticker": "AVGO",
@@ -2506,7 +2508,8 @@
    "max_corr_with": "NVDA",
    "risk_contrib_pct": 2.7,
    "stop_atr": 369.98,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 400.86
   },
   {
    "ticker": "MU",
@@ -3488,7 +3491,8 @@
    "max_corr_with": "AMD",
    "risk_contrib_pct": 39.4,
    "stop_atr": 844.91,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 1002.43
   },
   {
    "ticker": "MSTR",
@@ -4309,7 +4313,8 @@
    "max_corr_with": "RGTI",
    "risk_contrib_pct": 5.4,
    "stop_atr": 82.45,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 94.21
   },
   {
    "ticker": "RGTI",
@@ -4851,7 +4856,8 @@
    "max_corr_with": "MSTR",
    "risk_contrib_pct": 4.7,
    "stop_atr": 14.79,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 17.0
   },
   {
    "ticker": "GOOGL",
@@ -5598,7 +5604,8 @@
    "max_corr_with": "AVGO",
    "risk_contrib_pct": 1.9,
    "stop_atr": 348.09,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 357.55
   },
   {
    "ticker": "META",
@@ -6252,7 +6259,8 @@
    "max_corr_with": "NVDA",
    "risk_contrib_pct": 2.2,
    "stop_atr": 582.0,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 639.84
   },
   {
    "ticker": "PLTR",
@@ -6806,7 +6814,8 @@
    "max_corr_with": "MSTR",
    "risk_contrib_pct": 2.6,
    "stop_atr": 124.81,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 128.76
   },
   {
    "ticker": "CBRS",
@@ -7128,7 +7137,8 @@
    "rs_bench": "ndx",
    "rs_ndx_1m": -17.6,
    "stop_atr": 147.78,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 199.9
   },
   {
    "ticker": "ORCL",
@@ -8096,7 +8106,8 @@
    "max_corr_with": "AVGO",
    "risk_contrib_pct": 1.5,
    "stop_atr": 128.06,
-   "stop_violated": false
+   "stop_violated": false,
+   "prezzo_limite_aggiustato": 144.84
   },
   {
    "ticker": "BTP-V28",
@@ -8135,7 +8146,8 @@
    "tech_by_range": {},
    "stats": null,
    "financials": [],
-   "fin_health": null
+   "fin_health": null,
+   "prezzo_limite_aggiustato": 103.09
   }
  ],
  "watchlist": [
@@ -8646,7 +8658,8 @@
    "beta_ndx": 2.72,
    "avg_corr": 0.38,
    "max_corr": 0.63,
-   "max_corr_with": "RGTI"
+   "max_corr_with": "RGTI",
+   "prezzo_limite_aggiustato": 49.75
   },
   {
    "ticker": "SPCX",
@@ -8887,7 +8900,8 @@
    "smc": null,
    "rs_1m": -6.5,
    "rs_bench": "ndx",
-   "rs_ndx_1m": -6.5
+   "rs_ndx_1m": -6.5,
+   "prezzo_limite_aggiustato": 152.28
   },
   {
    "ticker": "^KS11",
@@ -9643,7 +9657,8 @@
    "beta_ndx": 0.42,
    "avg_corr": 0.1,
    "max_corr": 0.29,
-   "max_corr_with": "MU"
+   "max_corr_with": "MU",
+   "prezzo_limite_aggiustato": 7475.94
   },
   {
    "ticker": "^IXIC",
@@ -10551,7 +10566,8 @@
    "beta_ndx": 0.94,
    "avg_corr": 0.56,
    "max_corr": 0.73,
-   "max_corr_with": "NVDA"
+   "max_corr_with": "NVDA",
+   "prezzo_limite_aggiustato": 26206.89
   },
   {
    "ticker": "BTC-USD",
@@ -11128,7 +11144,8 @@
    "beta_ndx": 0.94,
    "avg_corr": 0.35,
    "max_corr": 0.79,
-   "max_corr_with": "MSTR"
+   "max_corr_with": "MSTR",
+   "prezzo_limite_aggiustato": 63938.16
   },
   {
    "ticker": "CL=F",
@@ -11784,7 +11801,8 @@
    "beta_ndx": -0.58,
    "avg_corr": -0.09,
    "max_corr": 0.02,
-   "max_corr_with": "ORCL"
+   "max_corr_with": "ORCL",
+   "prezzo_limite_aggiustato": 71.6
   },
   {
    "ticker": "^RUT",
@@ -12660,7 +12678,8 @@
    "beta_ndx": 0.77,
    "avg_corr": 0.4,
    "max_corr": 0.54,
-   "max_corr_with": "RGTI"
+   "max_corr_with": "RGTI",
+   "prezzo_limite_aggiustato": 2992.54
   },
   {
    "ticker": "INTC",
@@ -13632,7 +13651,8 @@
    "beta_ndx": 2.19,
    "avg_corr": 0.25,
    "max_corr": 0.5,
-   "max_corr_with": "MU"
+   "max_corr_with": "MU",
+   "prezzo_limite_aggiustato": 112.63
   },
   {
    "ticker": "AMZN",
@@ -14452,7 +14472,8 @@
    "beta_ndx": 0.93,
    "avg_corr": 0.29,
    "max_corr": 0.47,
-   "max_corr_with": "META"
+   "max_corr_with": "META",
+   "prezzo_limite_aggiustato": 246.2
   },
   {
    "ticker": "MSFT",
@@ -15410,7 +15431,8 @@
    "beta_ndx": 0.48,
    "avg_corr": 0.26,
    "max_corr": 0.5,
-   "max_corr_with": "PLTR"
+   "max_corr_with": "PLTR",
+   "prezzo_limite_aggiustato": 384.11
   },
   {
    "ticker": "SMCI",
@@ -16116,7 +16138,8 @@
    "beta_ndx": 2.47,
    "avg_corr": 0.3,
    "max_corr": 0.46,
-   "max_corr_with": "AMD"
+   "max_corr_with": "AMD",
+   "prezzo_limite_aggiustato": 28.37
   },
   {
    "ticker": "PATH",
@@ -16653,7 +16676,8 @@
    "beta_ndx": 0.8,
    "avg_corr": 0.19,
    "max_corr": 0.38,
-   "max_corr_with": "PLTR"
+   "max_corr_with": "PLTR",
+   "prezzo_limite_aggiustato": 11.82
   },
   {
    "ticker": "SNDK",
@@ -17138,7 +17162,8 @@
    "beta_ndx": 3.22,
    "avg_corr": 0.31,
    "max_corr": 0.74,
-   "max_corr_with": "MU"
+   "max_corr_with": "MU",
+   "prezzo_limite_aggiustato": 1887.99
   },
   {
    "ticker": "CRCL",
@@ -17625,7 +17650,8 @@
    "beta_ndx": 2.04,
    "avg_corr": 0.3,
    "max_corr": 0.55,
-   "max_corr_with": "MSTR"
+   "max_corr_with": "MSTR",
+   "prezzo_limite_aggiustato": 63.17
   },
   {
    "ticker": "TSM",
@@ -18440,7 +18466,8 @@
    "beta_ndx": 1.57,
    "avg_corr": 0.43,
    "max_corr": 0.64,
-   "max_corr_with": "NVDA"
+   "max_corr_with": "NVDA",
+   "prezzo_limite_aggiustato": 439.39
   },
   {
    "ticker": "LUMN",
@@ -19408,7 +19435,8 @@
    "beta_ndx": 2.09,
    "avg_corr": 0.31,
    "max_corr": 0.41,
-   "max_corr_with": "AMD"
+   "max_corr_with": "AMD",
+   "prezzo_limite_aggiustato": 6.7
   },
   {
    "ticker": "NFLX",
@@ -20172,7 +20200,8 @@
    "beta_ndx": 0.18,
    "avg_corr": 0.07,
    "max_corr": 0.21,
-   "max_corr_with": "PLTR"
+   "max_corr_with": "PLTR",
+   "prezzo_limite_aggiustato": 74.54
   },
   {
    "ticker": "AMKR",
@@ -20979,7 +21008,8 @@
    "beta_ndx": 2.43,
    "avg_corr": 0.33,
    "max_corr": 0.6,
-   "max_corr_with": "MU"
+   "max_corr_with": "MU",
+   "prezzo_limite_aggiustato": 72.95
   },
   {
    "ticker": "AMAT",
@@ -21951,7 +21981,8 @@
    "beta_ndx": 2.05,
    "avg_corr": 0.34,
    "max_corr": 0.7,
-   "max_corr_with": "MU"
+   "max_corr_with": "MU",
+   "prezzo_limite_aggiustato": 597.8
   },
   {
    "ticker": "CEG",
@@ -22479,7 +22510,8 @@
    "beta_ndx": 1.03,
    "avg_corr": 0.27,
    "max_corr": 0.39,
-   "max_corr_with": "AMD"
+   "max_corr_with": "AMD",
+   "prezzo_limite_aggiustato": 250.4
   },
   {
    "ticker": "LITE",
@@ -23080,7 +23112,8 @@
    "beta_ndx": 2.15,
    "avg_corr": 0.27,
    "max_corr": 0.48,
-   "max_corr_with": "MU"
+   "max_corr_with": "MU",
+   "prezzo_limite_aggiustato": 793.45
   }
  ],
  "allocation": [
@@ -33160,6 +33193,29 @@
   "thermometer": {
    "score": 44,
    "label": "Neutro"
+  },
+  "liquidity_split": {
+   "inst_cash_pct": 8.0,
+   "inst_note": "AUM BIL+SHV $68B vs SPY $781B",
+   "proxy": true
+  },
+  "dollar_ruler": {
+   "value": 100.78,
+   "chg_3m_pct": 2.16,
+   "flag": null,
+   "src": "DXY"
+  },
+  "momentum": {
+   "sp500": {
+    "price": 7543.64,
+    "sma125": 7073.35,
+    "dist_pct": 6.65
+   },
+   "ndx": {
+    "price": 29727.1,
+    "sma125": 26809.3,
+    "dist_pct": 10.88
+   }
   }
  },
  "broker": {
@@ -78780,7 +78836,7 @@
     "key": "nfp",
     "date": "2026-06-01",
     "age_days": 39,
-    "max_age": 50,
+    "max_age": 45,
     "status": "ok",
     "note": ""
    },
@@ -78788,7 +78844,7 @@
     "key": "unemp",
     "date": "2026-06-01",
     "age_days": 39,
-    "max_age": 50,
+    "max_age": 45,
     "status": "ok",
     "note": ""
    },
@@ -78796,7 +78852,7 @@
     "key": "pmi",
     "date": "2026-05-01",
     "age_days": 70,
-    "max_age": 50,
+    "max_age": 45,
     "status": "stale",
     "note": ""
    },
@@ -78836,6 +78892,6 @@
   "alerts": [
    "pmi: stale"
   ],
-  "generated_at": "2026-07-10T07:29:37Z"
+  "generated_at": "2026-07-10T08:17:33Z"
  }
 }

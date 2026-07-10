@@ -598,9 +598,15 @@ function recomputeTotals() {
     eur_gain: eurGain, eur_gain_pct: costEur ? eurGain / costEur * 100 : 0,
     eur_stock_gain: stockGainEur, eur_btp_gain: btpGainEur,
     tax_est: tax, eur_gain_net: eurGain - tax,
+    // OFFLOADING per l'LLM: budget realmente spendibile = cassa − Expected Shortfall 95%
+    // (la quota pari all'ES è tail-risk INVIOLABILE). Mai sotto zero. ES storico se disponibile.
+    budget_operativo_spendibile: Math.max(0, cashEur - (DATA.totals?.es95_hist_eur ?? DATA.totals?.es95_1d_eur ?? 0)),
   });
   DATA.allocation = DATA.portfolio.map(r => ({
     ticker: r.ticker, name: r.name, sector: r.sector || "Altro", value_eur: r.val_eur,
+    gain_eur: r.gain_eur ?? null,
+    gain_pct: (r.gain_eur != null && r.val_eur != null && (r.val_eur - r.gain_eur) > 0)
+      ? Math.round(r.gain_eur / (r.val_eur - r.gain_eur) * 1000) / 10 : null,
   }));
   if (cashEur > 0) DATA.allocation.push({ ticker: "CASH", name: "Liquidità", sector: "Liquidità", value_eur: cashEur });
   DATA.allocation.sort((a, b) => b.value_eur - a.value_eur);
@@ -1426,18 +1432,29 @@ function metricTrend(field) {
    Logica AND: rosso "ESTREMA" SOLO se leva ≥90% del picco E Forward P/E >20 conferma;
    ≥90% senza conferma → giallo (con nota esplicita se il P/E manca). */
 function marginDebtState() {
+  /* METODOLOGIA v106 (post-audit): il "% del picco" è SATURO in un bull market — verificato
+     13/13 mesi a >=95% del picco: allarme permanente = potere discriminante zero. La label è
+     ora guidata dal TASSO DI ESPANSIONE (YoY) della leva, che è il segnale storicamente
+     predittivo (~+60% nel 2000, ~+40% nel 2007), con l'INVERSIONE dai massimi (YoY o MoM
+     negativi dopo un picco) come stato peggiore: il deleveraging È il crash che inizia.
+     Livello assoluto e ATH restano nel payload come contesto. */
   const m = DATA?.macro || {};
   const md = m.margin_debt;
   if (!md || md.pct_of_peak == null) return null;
   const fpe = m.forward_pe?.value ?? null;
-  const high = md.pct_of_peak >= 90;
-  const confirmed = high && fpe != null && fpe > 20;
+  const yoy = md.yoy, mom = md.qoq;
+  const nearPeak = md.pct_of_peak >= 90;
+  const rollover = nearPeak && ((mom != null && mom < -2) || (yoy != null && yoy < 0));
+  const high = yoy != null ? yoy >= 20 : nearPeak;             // fallback al livello se YoY n.d.
+  const extreme = yoy != null && yoy >= 40;
+  const confirmed = (extreme || high) && fpe != null && fpe > 20;
   let label, labelShort, col, score;
-  if (confirmed)                  { label = "Leva ESTREMA (confermata da Forward P/E)"; labelShort = "Leva ESTREMA"; col = "var(--red)"; score = 5; }
-  else if (high)                  { label = fpe == null ? "Leva ELEVATA — conferma P/E n.d." : "Leva ELEVATA"; labelShort = "Leva ELEVATA"; col = "var(--yellow)"; score = 25; }
-  else if (md.pct_of_peak >= 60)  { label = "Leva MEDIA"; labelShort = "Leva MEDIA"; col = "var(--yellow)"; score = clamp(100 - md.pct_of_peak); }
-  else                            { label = "Leva BASSA"; labelShort = "Leva BASSA"; col = "var(--green)"; score = clamp(100 - md.pct_of_peak); }
-  return { md, fpe, high, confirmed, label, labelShort, col, score };
+  if (rollover)      { label = "INVERSIONE DELLA LEVA dai massimi (deleveraging in corso)"; labelShort = "DELEVERAGING"; col = "var(--red)"; score = 2; }
+  else if (extreme)  { label = confirmed ? `Espansione leva ESTREMA (YoY ${fmtNum.format(yoy)}%, confermata da Forward P/E)` : `Espansione leva ESTREMA (YoY ${fmtNum.format(yoy)}%)${fpe == null ? " — conferma P/E n.d." : ""}`; labelShort = "Espansione ESTREMA"; col = "var(--red)"; score = 8; }
+  else if (high)     { label = `Espansione leva ELEVATA${yoy != null ? ` (YoY ${fmtNum.format(yoy)}%)` : ""}${fpe == null ? " — conferma P/E n.d." : ""}`; labelShort = "Espansione ELEVATA"; col = "var(--yellow)"; score = 25; }
+  else if (yoy != null && yoy >= 0) { label = `Leva in espansione fisiologica (YoY ${fmtNum.format(yoy)}%)`; labelShort = "Espansione fisiologica"; col = "var(--yellow)"; score = 55; }
+  else               { label = yoy != null ? `Leva in contrazione (YoY ${fmtNum.format(yoy)}%)` : "Leva BASSA"; labelShort = "In contrazione"; col = "var(--green)"; score = 75; }
+  return { md, fpe, high: extreme || high, confirmed, rollover, label, labelShort, col, score };
 }
 
 function renderMiniCards() {
@@ -2090,9 +2107,16 @@ function renderAllocation() {
   let list;
   if (allocMode === "sector") {
     const by = {};
-    src.forEach(x => { const s = x.sector || "Altro"; by[s] = (by[s] || 0) + x.value_eur; });
-    list = Object.entries(by).map(([name, value_eur]) => ({ name, ticker: "", value_eur }))
-      .sort((a, b) => b.value_eur - a.value_eur);
+    src.forEach(x => {
+      const s = x.sector || "Altro";
+      (by[s] = by[s] || { value_eur: 0, gain_eur: 0, hasGain: false }).value_eur += x.value_eur;
+      if (x.gain_eur != null) { by[s].gain_eur += x.gain_eur; by[s].hasGain = true; }
+    });
+    list = Object.entries(by).map(([name, o]) => ({
+      name, ticker: "", value_eur: o.value_eur,
+      gain_eur: o.hasGain ? o.gain_eur : null,
+      gain_pct: (o.hasGain && (o.value_eur - o.gain_eur) > 0) ? Math.round(o.gain_eur / (o.value_eur - o.gain_eur) * 1000) / 10 : null,
+    })).sort((a, b) => b.value_eur - a.value_eur);
   } else {
     list = src;
   }
@@ -2134,9 +2158,14 @@ function renderAllocation() {
   $("#alloc-center").addEventListener("click", resetCenter);
   $("#alloc-legend").innerHTML = list.map((x, i) => {
     const pct = (x.value_eur / total * 100).toFixed(1);
+    // guadagno/perdita della posizione: freccia verde ↑ se in gain, rossa ↓ se in perdita
+    const g = x.gain_pct, ge = x.gain_eur;
+    const gainHtml = (g != null && ge != null)
+      ? `<span class="alloc-gain ${g >= 0 ? "pos" : "neg"}" title="P&L della posizione: ${signTxt(Math.round(ge), " €")}">${g >= 0 ? "▲" : "▼"} ${signTxt(g)} <span class="alloc-gain-eur">(${signTxt(Math.round(ge), " €")})</span></span>`
+      : "";
     return `<li class="alloc-item">
       <span class="alloc-dot" style="background:${ALLOC_COLORS[i % ALLOC_COLORS.length]}"></span>
-      <span class="alloc-name">${esc(x.name)} ${x.ticker ? `<span class="tk">${x.ticker}</span>` : ""}${x.ticker && x.sector ? ` <span class="muted" style="font-size:10px">(${esc(x.sector)})</span>` : ""}</span>
+      <span class="alloc-name">${esc(x.name)} ${x.ticker ? `<span class="tk">${x.ticker}</span>` : ""}${x.ticker && x.sector ? ` <span class="muted" style="font-size:10px">(${esc(x.sector)})</span>` : ""} ${gainHtml}</span>
       <span class="alloc-pct">${pct}%</span>
       <span class="alloc-val muted">${fmtEUR.format(Math.round(x.value_eur))}</span>
     </li>`;
@@ -2895,6 +2924,9 @@ const MACRO_INFO = {
   "mk:EURJPY=X": ["Cambio EUR/JPY", "Euro contro yen.", "Continuo (forex)", /yen|jpy|euro|cambio/i],
   fear_greed: ["Fear & Greed Index", "Sentiment di mercato CNN: 0 paura estrema, 100 avidità estrema.", "Aggiornato giornalmente", /sentiment|fear|greed|paura|avidit|rally|selloff/i],
   vix: ["VIX — Volatilità", "Indice della volatilità attesa S&P500 (\"indice della paura\").", "Mercato aperto USA", /vix|volatil|selloff|panic|paura/i],
+  credit: ["Rischio Credito (HY OAS)", "Spread dei bond high-yield vs Treasury (proxy CDS): allargamento = stress sul credito, storicamente anticipa le correzioni azionarie.", "Giornaliero (FRED)", /credit|spread|high.?yield|oas/i],
+  liquidity: ["Liquidità in attesa — Istituzionali vs Retail", "PROXY dichiarati: quota AUM in T-Bill ETF (BIL+SHV) vs SPY per gli istituzionali; fondi monetari retail FRED RMFNS (livello, YoY, percentile 5A). Cash alto = benzina potenziale per i rialzi; in aumento = de-risking in corso.", "AUM: giornaliero · RMFNS: mensile", /liquidit|cash|money market|dry powder/i],
+  dollar: ["Righello Dollaro (DXY 3M)", "Variazione trimestrale del Dollar Index: sopra +5% comprime gli utili esteri delle large cap USA ([FX HEADWIND] nelle tabelle); sotto -5% li gonfia ([FX TAILWIND]).", "Giornaliero", /dollar|dxy|valut|cambio/i],
   fedwatch: ["FedWatch", "Aspettative di mercato sui tassi Fed dai futures sui Fed Funds.", "Riunioni FOMC ~ogni 6 settimane", /fed|powell|tass|rate|fomc|interest/i],
   carry: ["Carry USA–Giappone", "Differenziale di rendimento USA-Giappone, motore del carry trade su USD/JPY.", "Continuo", /carry|yen|jpy|japan|giappone|boj/i],
   putcall: ["Put/Call ratio", "Rapporto opzioni put/call: alto = copertura/pessimismo.", "Mercato aperto USA", /option|put|call|hedge/i],
@@ -3713,6 +3745,34 @@ function renderGauges() {
     cards.push(thermoCard("carry", "Carry USD/JPY — Rischio", score, `${fmtNum.format(cy.spread)} pp spread`,
       `US10A ${fmtNum.format(cy.us10)}% − JGB ${fmtNum.format(cy.jp10)}%<br>USD/JPY ${fmtNum.format(cy.usdjpy)} (${signTxt(cy.usdjpy_chg_1m)} 1m)`, ["Rischio Basso", "Rischio Elevato"]));
   }
+  if (m.vix && m.vix.value != null) {
+    const v = m.vix.value;
+    const score = clamp(100 - (v - 10) / 30 * 100);            // 10=calmo(verde) → 40+=panico(rosso)
+    const lab = v < 15 ? "Calma" : v < 20 ? "Normale" : v < 28 ? "Tensione" : "Panico";
+    cards.push(thermoCard("vix", "VIX — Volatilità attesa", score, fmtNum.format(v),
+      `<b>${lab}</b>${m.vix.change_pct != null ? `<br>${signTxt(m.vix.change_pct)} oggi` : ""}`, ["Calma", "Panico"]));
+  }
+  if (m.credit && m.credit.spread_hy != null) {
+    cards.push(thermoCard("credit", "Rischio Credito (HY OAS)", m.credit.score ?? 50,
+      `${fmtNum.format(m.credit.spread_hy)}%`,
+      `<b>${esc(m.credit.label || "")}</b><br>&lt;4% normale · 5-7% stress · &gt;9% crisi`, ["Rilassato", "Crisi"]));
+  }
+  if (m.liquidity_split && m.liquidity_split.inst_cash_pct != null) {
+    const L = m.liquidity_split;
+    const score = clamp(L.inst_cash_pct / 20 * 100);           // più cash parcheggiato = più benzina
+    cards.push(thermoCard("liquidity", "Liquidità in attesa (Ist. vs Retail)", score,
+      `${fmtNum.format(L.inst_cash_pct)}%`,
+      `Istituzionali (proxy AUM BIL+SHV/SPY)${L.retail_mmf_bln != null ? `<br>Retail MMF $${fmtNum.format(L.retail_mmf_bln)} mld${L.retail_pctile_5y != null ? ` · ${L.retail_pctile_5y}° pct 5A` : ""}` : ""}`,
+      ["Poca benzina", "Molta benzina"], ));
+  }
+  if (m.dollar_ruler && m.dollar_ruler.chg_3m_pct != null) {
+    const D = m.dollar_ruler;
+    const score = clamp(50 - D.chg_3m_pct * 8);                // dollaro su = compressione utili = rosso
+    cards.push(thermoCard("dollar", "Righello Dollaro (3M)", score,
+      `${signTxt(D.chg_3m_pct)}`,
+      `${D.src} ${fmtNum.format(D.value)}<br><b>${D.flag ? (D.chg_3m_pct >= 5 ? "COMPRESSIONE utili esteri" : "BOOST utili esteri") : "Impatto FX neutro (±5%)"}</b>`,
+      ["Boost utili", "Compressione"]));
+  }
   if (m.putcall) {
     const pc = m.putcall;
     const score = Math.max(0, Math.min(100, 100 - pc.ratio / 2 * 100));   // più call = verde
@@ -4084,6 +4144,10 @@ function buildPrompt() {
     const cFrac = cashEur / patrimonio;
     riskBits.push(`Liquidità infruttifera: ${(cFrac * 100).toFixed(1)}% del patrimonio a rendimento 0 (drag strutturale sul rendimento composto e sullo Sharpe complessivo)`);
   }
+  if (t.budget_operativo_spendibile != null && (t.es95_hist_eur ?? t.es95_1d_eur) != null) {
+    const esAbs = t.es95_hist_eur ?? t.es95_1d_eur;
+    riskBits.push(`BUDGET OPERATIVO SPENDIBILE (già calcolato, USA QUESTO — non rifare il conto): ${fmtEUR.format(Math.round(t.budget_operativo_spendibile))} = liquidità ${fmtEUR.format(cashEur)} − Expected Shortfall 95% ${fmtEUR.format(esAbs)} (quota tail-risk inviolabile)`);
+  }
   if (riskBits.length) lines.push("METRICHE DI RISCHIO: " + riskBits.join(" · ") + ".");
   // riconciliazione broker: se i dati manuali sono stantii/incoerenti l'AI deve saperlo
   try {
@@ -4173,19 +4237,25 @@ function buildPrompt() {
       const tag = r.qty ? (st.ratchet ? "ratchet" : "client") : "teorico";
       stopCell = `${c}${f(st.stop)} (${tag})`;
     }
-    // flag di rischio inline nel nome: stop violato, earnings imminenti, illiquidità
+    // flag di rischio inline nel nome: stop violato, earnings imminenti, illiquidità, FX
     const flags = [];
+    const dr = (DATA.macro || {}).dollar_ruler;
+    if (dr && dr.flag && (r.stats?.market_cap ?? 0) >= 100e9) {
+      flags.push(dr.chg_3m_pct >= 5 ? "[FX HEADWIND]" : "[FX TAILWIND]");   // large cap: utili esteri sensibili al dollaro
+    }
     if (r.qty && st && st.violated) flags.push("[STOP VIOLATO]");
     if (earningsRiskDays(r) != null) flags.push("[!EARNINGS RISK]");
     if (isIlliquid(r)) flags.push("[ILLIQUIDO]");
     const nameCell = `${r.name} (${r.ticker})${flags.length ? " " + flags.join(" ") : ""}`;
-    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${c}${f(r.price)} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${floatCell} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
+    const adjL = r.prezzo_limite_aggiustato;
+    const priceCell = `${c}${f(r.price)}${(adjL != null && r.price != null && Math.abs(adjL - r.price) / r.price > 0.001) ? ` → agg. ${c}${f(adjL)} (${r.prepost?.label || "ext"})` : ""}`;
+    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${floatCell} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
   };
   const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A | Drawdown 52S | Short% | Float | Supp. | Stop 2×ATR | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
   const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
-  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Sortino 1A = Sharpe con la sola volatilità NEGATIVA: è il metro del veto value trap (< -0.3 = distruzione di valore sul downside). Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante. Float = azioni fluttuanti liberamente scambiabili (milioni/miliardi, e % sul totale).)");
+  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Sortino 1A = Sharpe con la sola volatilità NEGATIVA: è il metro del veto value trap (< -0.3 = distruzione di valore sul downside). Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante. Float = azioni fluttuanti liberamente scambiabili (milioni/miliardi, e % sul totale). \"→ agg. $X\" = PREZZO LIMITE AGGIUSTATO già calcolato dal sistema sul gap pre/after: USA QUELLO per gli ordini limite, non ricalcolare il gap a mano. [FX HEADWIND/TAILWIND] = large cap (mcap≥$100B) esposta al Righello Dollaro attivo.)");
   lines.push("· [LOW FLOAT RISK]: Un titolo con flottante ridotto (Low Float < 50M azioni) unito a uno Short Interest ≥ 15% e Volumi Anomali (RVol > 1.5) indica un rischio imminente di Short Squeeze o volatilità asimmetrica estrema. L'AI deve evidenziarlo come un'opportunità o un pericolo immediato di liquidità.");
   // MATRICE DI RISCHIO PER POSIZIONE: pesi MTM, MCR, beta NDX, correlazioni reali
   const riskRows = (DATA.portfolio || []).filter(r => r.qty && (r.risk_contrib_pct != null || r.avg_corr != null || r.beta_ndx != null));
@@ -4275,6 +4345,23 @@ function buildPrompt() {
     const bias = r > 1.1 ? "prevalgono put = copertura/pessimismo (estremi = contrarian rialzista)" : r < 0.7 ? "prevalgono call = euforia (estremi = contrarian ribassista)" : "equilibrato";
     lines.push(`- Put/Call ${m.putcall.symbol} (${m.putcall.name}): ${r} — ${bias} (put ${m.putcall.puts}, call ${m.putcall.calls})`);
   }
+  if (m.liquidity_split) {
+    const L = m.liquidity_split;
+    const bits = [];
+    if (L.inst_cash_pct != null) bits.push(`Istituzionali Cash: ${fmtNum.format(L.inst_cash_pct)}% (proxy ${L.inst_note || "AUM BIL+SHV vs SPY"})`);
+    if (L.retail_mmf_bln != null) bits.push(`Retail Cash: fondi monetari retail $${fmtNum.format(L.retail_mmf_bln)} mld (FRED RMFNS${L.retail_yoy_pct != null ? `, YoY ${signTxt(L.retail_yoy_pct)}` : ""}${L.retail_pctile_5y != null ? `, ${L.retail_pctile_5y}° percentile 5A` : ""})`);
+    if (bits.length) lines.push(`- Liquidità in attesa (dry powder di mercato, PROXY dichiarati): ${bits.join(" · ")} — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.`);
+  }
+  if (m.dollar_ruler) {
+    const D = m.dollar_ruler;
+    lines.push(`- Righello Dollaro (${D.src}): ${D.value} · 3 mesi ${signTxt(D.chg_3m_pct)}${D.flag ? ` ${D.flag} — impatta gli utili esteri delle Large Cap USA (vedi tag FX nelle tabelle)` : " (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)"}`);
+  }
+  if (m.momentum) {
+    const mo = m.momentum;
+    const part = (k, lab) => mo[k] ? `${lab} ${fmtNum.format(mo[k].price)} vs SMA125 ${fmtNum.format(mo[k].sma125)} (${signTxt(mo[k].dist_pct)})` : null;
+    const ps = [part("sp500", "S&P 500"), part("ndx", "Nasdaq 100")].filter(Boolean);
+    if (ps.length) lines.push(`- Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): ${ps.join(" · ")} — sopra = trend primario integro, sotto = deterioramento.`);
+  }
   (m.markets || []).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   // ogni indicatore economico con la sua data di pubblicazione ESPLICITA: la latenza del dato
   // deve essere palese all'AI (CPI/NFP = mensili con ~1 mese di ritardo; PIL = trimestrale)
@@ -4306,7 +4393,7 @@ function buildPrompt() {
   if (m.forward_pe && m.forward_pe.value != null) {
     const fp = m.forward_pe;
     const sysDanger = (m.margin_debt?.pct_of_peak >= 90) && fp.value > 20;
-    lines.push(`- Forward P/E S&P 500: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? "RISCHIO SISTEMICO ELEVATO: leva ai massimi + valutazioni tese → vulnerabilità a deleveraging violento." : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva."}`);
+    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"} — metodologia DIVERSA dal trailing: NON derivarne tassi di crescita impliciti]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? "RISCHIO SISTEMICO ELEVATO: leva ai massimi + valutazioni tese → vulnerabilità a deleveraging violento." : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva."}`);
   }
   if (m.credit) {
     let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`;
@@ -4363,7 +4450,7 @@ function buildPrompt() {
       lines.push(`- ${s.name} (${s.ticker}): 1M ${signTxt(s.m1)}, 3M ${signTxt(s.m3)}`));
   }
   if (m.sp500_pe) {
-    let peLine = `- P/E Ratio S&P 500: ${m.sp500_pe.current}× (${m.sp500_pe.label})${m.sp500_pe.avg_10y != null ? ` · media 10A ${m.sp500_pe.avg_10y}×` : ""}${m.sp500_pe.pct_rank != null ? ` · percentile storico ${m.sp500_pe.pct_rank}°` : ""}`;
+    let peLine = `- P/E Ratio S&P 500 [TRAILING, fonte: ${m.sp500_pe.source || "FRED/multpl"}]: ${m.sp500_pe.current}× (${m.sp500_pe.label})${m.sp500_pe.avg_10y != null ? ` · media 10A ${m.sp500_pe.avg_10y}×` : ""}${m.sp500_pe.pct_rank != null ? ` · percentile storico ${m.sp500_pe.pct_rank}°` : ""}`;
     if (m.sp500_pe.nasdaq_pe) peLine += ` · Nasdaq 100 (QQQ) P/E: ${m.sp500_pe.nasdaq_pe}× (tech solitamente a premio; >35× = valutazioni tese)`;
     lines.push(peLine);
   }

@@ -150,9 +150,15 @@ check("reconcile: qty dimezzata su TST1 viene catturata", run(`
   return rec.needed === true && rec.mismatches.some(m => m.tk === "TST1")`));
 
 // margin debt: stato condiviso 1:1
-check("marginDebtState: 100% picco senza Forward P/E → ELEVATA con conferma n.d.", run(`
+check("marginDebtState v106: YoY 30% → Espansione ELEVATA, conferma n.d. (livello=contesto)", run(`
   const m = marginDebtState();
-  return m.high === true && m.confirmed === false && /conferma P\\/E n\\.d\\./.test(m.label) && m.labelShort === "Leva ELEVATA"`));
+  return m.high === true && m.confirmed === false && /conferma P\\/E n\\.d\\./.test(m.label) && m.labelShort === "Espansione ELEVATA"`));
+check("marginDebtState v106: YoY 54% → ESTREMA; MoM -3 dai massimi → DELEVERAGING", run(`
+  const md = DATA.macro.margin_debt;
+  md.yoy = 54; const ex = marginDebtState().labelShort;
+  md.qoq = -3; const roll = marginDebtState().labelShort;
+  md.yoy = 30; delete md.qoq;
+  return ex === "Espansione ESTREMA" && roll === "DELEVERAGING"`));
 
 // buildPrompt: smoke test completo
 const prompt = run(`buildPrompt()`);

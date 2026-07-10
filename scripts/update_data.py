@@ -409,7 +409,7 @@ def bench_close(sym, fallback=None, period="2mo"):
         if not s:
             continue
         try:
-            h = yf.Ticker(s).history(period=period, interval="1d")["Close"].dropna()
+            h = yf.Ticker(s).history(period=period, interval="1d", auto_adjust=True)["Close"].dropna()   # Adj Close: split/dividendi non gonfiano la RS
             if len(h) >= 2:
                 return h
         except Exception:  # noqa: BLE001
@@ -432,6 +432,9 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         print(f"!! nessuno storico per {ticker}", file=sys.stderr)
         return None
     closes = hist["Close"]
+    # ISOLAMENTO SESSIONI: price = ULTIMA CHIUSURA REGOLARE (Adj Close, auto_adjust=True).
+    # I prezzi extended-hours (preMarketPrice/postMarketPrice) vivono SOLO in "prepost" e in
+    # prezzo_limite_aggiustato: MAI dentro metriche statiche (returns, ATR, mcap, covarianze).
     price = float(closes.iloc[-1])
     prev = float(closes.iloc[-2]) if len(closes) > 1 else price
 
@@ -760,6 +763,10 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "sharpe_1y": sharpe_1y,
         "sortino_1y": sortino_1y,
         "prepost": prepost,
+        # OFFLOADING per l'LLM: prezzo di riferimento REALE per ordini limite. Se c'è un gap
+        # pre/after (sessione estesa) usa QUEL prezzo; altrimenti l'ultima chiusura regolare.
+        # Evita che l'AI calcoli male "chiusura + gap%" a mano.
+        "prezzo_limite_aggiustato": round(float(prepost["price"]), 2) if prepost else round(price, 2),
         "sector": info.get("sector") or info.get("quoteType") or "Altro",
         "stats": stats,
         "tech_by_range": tech_by_range,
@@ -1471,6 +1478,7 @@ def fetch_macro():
     # vecchio tentativo dava HTTP 400 a OGNI run senza mai restituire nulla → rimosso.
     try:
         pe_data = []
+        pe_source = "FRED SP500PE"
         if not pe_data:
             cur_alt = None
             try:  # multpl: pagina semplice col valore corrente
@@ -1480,8 +1488,10 @@ def fetch_macro():
                 cur_alt = float(mm.group(1)) if mm else None
             except Exception as e:  # noqa: BLE001
                 print(f"!! multpl: {e}", file=sys.stderr)
+            pe_source = "multpl"
             if cur_alt is None:
                 cur_alt = wsj_pe.get("sp_trail")
+                pe_source = "WSJ"
             if cur_alt is not None:
                 # niente storia mensile dalla fonte alternativa: history vuota, media 10A n.d.
                 pe_data = [(datetime.now(timezone.utc).strftime("%Y-%m-%d"), float(cur_alt))]
@@ -1513,6 +1523,9 @@ def fetch_macro():
                             else "Valutazione elevata" if cur_pe > 20
                             else "Valutazione normale" if cur_pe > 14 else "Sottovalutazione",
                 "nasdaq_pe": ndx_pe,
+                # TRASPARENZA FONTE (anti-allucinazione LLM): trailing e forward vengono da fonti
+                # e metodologie DIVERSE — etichettarle evita falsi tassi di crescita impliciti
+                "source": pe_source, "kind": "trailing",
                 "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
             }
     except Exception as e:
@@ -1536,6 +1549,8 @@ def fetch_macro():
                 "value": fpe,
                 "avg_hist": 16.5,                              # media storica forward P/E S&P 500
                 "label": "Estremo" if fpe > 22 else "Elevato" if fpe > 18 else "Normale" if fpe > 14 else "Conveniente",
+                "source": "WSJ (estimate)" if wsj_pe.get("sp_fwd") is not None else "Yahoo SPY",
+                "kind": "forward",
                 "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
             }
     except Exception as e:  # noqa: BLE001
@@ -1635,6 +1650,14 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! stagionalità: {e}", file=sys.stderr)
 
+    for key, fn in (("liquidity_split", fetch_liquidity_split),
+                    ("dollar_ruler", fetch_dollar_ruler),
+                    ("momentum", fetch_momentum)):
+        try:
+            macro[key] = fn()
+        except Exception as e:  # noqa: BLE001
+            print(f"!! {key}: {e}", file=sys.stderr)
+
     try:
         # PREV_DATA (snapshot del run precedente, settato da main) alimenta il carry-forward
         macro["margin_debt"] = fetch_margin_debt((PREV_DATA.get("macro") or {}).get("margin_debt"))
@@ -1662,6 +1685,76 @@ def fetch_macro():
             print(f"·· {key}: fonte ko, carry-forward del run precedente (età {age}g)", file=sys.stderr)
 
     return macro
+
+
+def fetch_liquidity_split():
+    """Liquidità Istituzionali vs Retail — PROXY DICHIARATI (non misure dirette):
+    - ISTITUZIONALI: quota AUM parcheggiata in T-Bill ETF (BIL+SHV) vs l'azionario core (SPY).
+      È un rapporto REALE tra masse: sale quando gli istituzionali stanno liquidi.
+    - RETAIL: FRED RMFNS (retail money market funds, $ mld, mensile): livello + YoY +
+      percentile 5 anni. NIENTE percentuale inventata: non esiste un denominatore onesto
+      per "il cash del retail è X% del suo portafoglio" — meglio livello e trend veri."""
+    out = {}
+    try:
+        aums = {}
+        for sym in ("BIL", "SHV", "SPY"):
+            try:
+                aums[sym] = float((yf.Ticker(sym).info or {}).get("totalAssets") or 0)
+            except Exception:  # noqa: BLE001
+                aums[sym] = 0.0
+        mm = aums["BIL"] + aums["SHV"]
+        if mm > 0 and aums["SPY"] > 0:
+            out["inst_cash_pct"] = round(mm / (mm + aums["SPY"]) * 100, 1)
+            out["inst_note"] = f"AUM BIL+SHV ${mm/1e9:.0f}B vs SPY ${aums['SPY']/1e9:.0f}B"
+    except Exception as e:  # noqa: BLE001
+        print(f"!! liquidity inst: {e}", file=sys.stderr)
+    try:
+        rm = fred_series("RMFNS", n=62)          # ~5 anni mensili
+        if len(rm) >= 12:
+            vals = [v for _, v in rm]
+            cur = vals[-1]
+            out["retail_mmf_bln"] = round(cur, 1)
+            out["retail_yoy_pct"] = round((cur / vals[-13] - 1) * 100, 1) if len(vals) >= 13 and vals[-13] else None
+            out["retail_pctile_5y"] = round(sum(1 for v in vals if v < cur) / len(vals) * 100)
+            out["retail_date"] = rm[-1][0]
+    except Exception as e:  # noqa: BLE001
+        print(f"!! liquidity retail RMFNS: {e}", file=sys.stderr)
+    out["proxy"] = True
+    return out or None
+
+
+def fetch_dollar_ruler():
+    """Righello Dollaro: variazione 3 mesi del Dollar Index (DXY, fallback UUP).
+    Dollaro forte = compressione utili esteri delle large cap USA (e viceversa).
+    Flag algoritmico: >+5% nel trimestre → COMPRESSIONE; <-5% → BOOST; altrimenti neutro."""
+    for sym, src in (("DX-Y.NYB", "DXY"), ("UUP", "UUP (proxy)")):
+        try:
+            h = yf.Ticker(sym).history(period="4mo", interval="1d", auto_adjust=True)["Close"].dropna()
+            if len(h) >= 60:
+                cur = float(h.iloc[-1])
+                chg = (cur / float(h.iloc[-63]) - 1) * 100      # ~3 mesi di trading
+                flag = ("[COMPRESSIONE UTILI VALUTARIA: RIGHELLO ESTESO]" if chg >= 5
+                        else "[BOOST UTILI VALUTARIA: RIGHELLO ACCORCIATO]" if chg <= -5 else None)
+                return {"value": round(cur, 2), "chg_3m_pct": round(chg, 2), "flag": flag, "src": src}
+        except Exception as e:  # noqa: BLE001
+            print(f"!! dollar ruler {sym}: {e}", file=sys.stderr)
+    return None
+
+
+def fetch_momentum():
+    """Momentum strutturale S&P 500 e Nasdaq 100: distanza % del prezzo dalla SMA125
+    (≈ media a 6 mesi). Sopra = trend primario integro; sotto = deterioramento."""
+    out = {}
+    for sym, key in (("^GSPC", "sp500"), ("^NDX", "ndx")):
+        try:
+            h = yf.Ticker(sym).history(period="1y", interval="1d", auto_adjust=True)["Close"].dropna()
+            if len(h) >= 125:
+                px = float(h.iloc[-1]); sma = float(h.rolling(125).mean().iloc[-1])
+                out[key] = {"price": round(px, 2), "sma125": round(sma, 2),
+                            "dist_pct": round((px / sma - 1) * 100, 2)}
+        except Exception as e:  # noqa: BLE001
+            print(f"!! momentum {sym}: {e}", file=sys.stderr)
+    return out or None
 
 
 def _finra_scrape(url):
@@ -1794,7 +1887,11 @@ def validate_macro(macro):
             "carry-forward dal run precedente (scrape FINRA ko)" if md.get("carried") else "")
 
     # --- indicatori mensili/trimestrali: età massima per cadenza (reference date) ---
-    MAX_AGE = {"cpi": 75, "pce": 75, "nfp": 50, "unemp": 50, "pmi": 50, "retail": 75, "gdp": 210}
+    # HARD STOP obsolescenza: 45 giorni per le serie mensili "puntuali" (PMI/NFP/disoccupazione:
+    # il dato nuovo esce entro ~1 settimana dal mese successivo → 45g = sicuramente vecchio).
+    # CPI/PCE/retail restano a 75g: il reference date è il mese PRECEDENTE la pubblicazione
+    # (~45g di età già alla release) — 45 li flaggherebbe SEMPRE, creando assuefazione al flag.
+    MAX_AGE = {"cpi": 75, "pce": 75, "nfp": 45, "unemp": 45, "pmi": 45, "retail": 75, "gdp": 210}
     for i in macro.get("indicators", []):
         k = i.get("key")
         if k not in MAX_AGE:
