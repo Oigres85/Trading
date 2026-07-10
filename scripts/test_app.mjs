@@ -215,6 +215,11 @@ check("prompt: nota metodologica [LOW FLOAT RISK]", run(`
   if (!ok) console.log("  ⚠ Il fallback DEFAULT_PROMPT_HEADER manca o è degenere. Deve restare un header valido (fallback offline).");
 }
 
+
+check("prompt: R/R teorico pre-calcolato in tabella (TST1 supp95/res120/atr3 → 1:4.2)", run(`
+  const p2 = buildPrompt();
+  return p2.includes("| R/R teorico |") && p2.includes("1:4.2")`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

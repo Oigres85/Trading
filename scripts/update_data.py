@@ -346,6 +346,21 @@ TICKER_ALIAS = {
 }
 
 
+def _risk_reward_str(limite, target, atr):
+    """R/R teorico "1:X.X" con risk = 2×ATR sotto il limite e reward = target − limite.
+    None (→ n.d.) se dati mancanti, risk non positivo o target sotto il limite."""
+    try:
+        if not limite or not target or not atr or atr <= 0:
+            return None
+        risk = 2.0 * float(atr)
+        reward = float(target) - float(limite)
+        if risk <= 0 or reward <= 0:
+            return None
+        return f"1:{reward / risk:.1f}"
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def backup_daily(ticker):
     """Piano B per i PREZZI (OHLCV daily) quando Yahoo non dà lo storico — tutto il lato
     titoli dipende da un'API non ufficiale e rate-limited, serve ridondanza. Catena:
@@ -767,6 +782,12 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         # pre/after (sessione estesa) usa QUEL prezzo; altrimenti l'ultima chiusura regolare.
         # Evita che l'AI calcoli male "chiusura + gap%" a mano.
         "prezzo_limite_aggiustato": round(float(prepost["price"]), 2) if prepost else round(price, 2),
+        # OFFLOADING R/R per la Tabella B dell'LLM: reward = resistenza − limite(supporto),
+        # risk = limite − stop(2×ATR) = 2×ATR. Formato "1:X.X"; degeneri/mancanti → None (n.d.).
+        "risk_reward": _risk_reward_str(
+            float(hist["Low"].tail(20).min()),            # limite = supporto
+            float(hist["High"].tail(20).max()),           # target = resistenza
+            atr_14),
         "sector": info.get("sector") or info.get("quoteType") or "Altro",
         "stats": stats,
         "tech_by_range": tech_by_range,
