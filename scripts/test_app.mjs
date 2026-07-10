@@ -220,6 +220,31 @@ check("prompt: R/R teorico pre-calcolato in tabella (TST1 supp95/res120/atr3 →
   const p2 = buildPrompt();
   return p2.includes("| R/R teorico |") && p2.includes("1:4.2")`));
 
+/* GUARDRAIL CARD MOBILE (v109): ogni etichetta di MOBILE_KEY_COLS deve esistere DAVVERO
+   tra le <th> di index.html (viste tecniche) o nella head[] di buildFundTable (viste
+   fondamentali). Un'etichetta orfana = colonna che sparisce dalle card iPhone senza errori
+   (già successo: "P/E TTM"/"Marg.netto"/"Cresc.ricavi" vs "P/E"/"Margine netto"/"Cresc. ricavi"). */
+{
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const thLabels = (id) => {
+    const m = html.match(new RegExp(`<table id="${id}"[\\s\\S]*?<thead>([\\s\\S]*?)</thead>`));
+    return m ? [...m[1].matchAll(/<th[^>]*>([^<]*)<\/th>/g)].map(x => x[1].replace(/&amp;/g, "&").trim()) : [];
+  };
+  const headStmt = src.match(/const head = \(withQtyPmc[\s\S]*?\]\);/);
+  const fundLabels = headStmt ? [...headStmt[0].matchAll(/"([^"]+)"/g)].map(x => x[1]) : [];
+  const all = new Set([...thLabels("ptf-table"), ...thLabels("wl-table"), ...fundLabels]);
+  const keys = run("[...MOBILE_KEY_COLS]");
+  const orphans = keys.filter(k => !all.has(k));
+  check("MOBILE_KEY_COLS: nessuna etichetta orfana (card iPhone)", fundLabels.length > 5 && keys.length > 5 && orphans.length === 0);
+  if (orphans.length) console.log("  ⚠ etichette senza colonna reale:", orphans.join(", "));
+  // le card watchlist devono mostrare gli stessi campi del portafoglio (meno Guadagno/Guad. %,
+  // che la watchlist non ha per natura) — richiesta esplicita utente (STEP1 mobile)
+  const wl = new Set(thLabels("wl-table"));
+  const missingWl = thLabels("ptf-table").filter(l => keys.includes(l) && !["Guad. %", "Guadagno"].includes(l) && !wl.has(l));
+  check("card mobile watchlist ≡ portafoglio (vista tecnica)", missingWl.length === 0);
+  if (missingWl.length) console.log("  ⚠ colonne chiave del portafoglio assenti dalla watchlist:", missingWl.join(", "));
+}
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

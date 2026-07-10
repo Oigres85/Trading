@@ -160,7 +160,9 @@ td.name-cell .tk { color: var(--muted); font-size: 11px; font-family: var(--mono
 /* su iPhone/Safari: VISTA A SCHEDE — ogni titolo diventa una card con i dati chiave (label: valore),
    niente più scroll orizzontale. Su Mac resta la tabella piena. */
 @media (max-width: 820px) {
-  :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) { white-space: normal; }
+  /* display:block: da display:table il layout tabellare dimensionerebbe il table al
+     max-content delle righe-card (grid), sforando il wrap → valori tagliati a destra */
+  :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) { white-space: normal; display: block; width: 100%; }
   :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) thead { display: none; }
   :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) tbody { display: block; }
   :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) tbody tr {
@@ -174,7 +176,11 @@ td.name-cell .tk { color: var(--muted); font-size: 11px; font-family: var(--mono
   :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) td.td-key {
     display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
     border-bottom: none; padding: 3px 0; font-size: 12px; text-align: right;
+    /* i badge ([CORRECTION]/[!EARNINGS RISK]…) sono flex item: senza wrap+min-width la cella
+       non può comprimersi sotto il loro min-content e sfonda la colonna della card */
+    flex-wrap: wrap; min-width: 0;
   }
+  :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) td.td-key .badge { margin-left: auto; }
   :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) td.td-key::before {
     content: attr(data-label); color: var(--muted); font-size: 9.5px; text-transform: uppercase;
     letter-spacing: .3px; font-family: "Inter", sans-serif; font-weight: 600; text-align: left;
@@ -184,6 +190,14 @@ td.name-cell .tk { color: var(--muted); font-size: 11px; font-family: var(--mono
     border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 3px;
   }
   :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) td.name-cell.td-key::before { content: ""; }
+  /* note a colonne multiple (colspan: "dati non disponibili", BTP, "Nessun dato"): riga intera
+     della card, testo a capo — senza questa regola sfondano la griglia e allargano TUTTE le card */
+  :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) td.td-key[colspan] {
+    grid-column: 1 / -1; justify-content: flex-start; text-align: left; min-width: 0; white-space: normal;
+  }
+  /* le barre hanno min-width pensate per il desktop (meter 90px, fin-health 86px): dentro la
+     colonna ~133px della card, label+barra sfondano la griglia → lasciale comprimere */
+  :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) td.td-key :is(.meter,.fin-health,.meter-txt) { min-width: 0; }
   :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) td.name-cell .tk { display: inline; margin-left: 6px; }
   /* card cliccabile per la scheda completa */
   :is(#ptf-table,#wl-table,#ptf-fund-table,#wl-fund-table) tbody tr { cursor: pointer; }

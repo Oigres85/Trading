@@ -3464,13 +3464,21 @@ function renderTable() {
 }
 
 // Etichette colonne sui td (per la vista "a schede" su iPhone) + marcatura colonne chiave.
+// ⚠ Le stringhe devono coincidere ESATTAMENTE con i testi delle <th> (index.html per le viste
+// tecniche, head[] di buildFundTable per le fondamentali): un mismatch fa sparire la colonna
+// dalle card mobile (test di guardia in test_app.mjs).
 const MOBILE_KEY_COLS = new Set(["Titolo", "Prezzo", "Oggi", "Guad. %", "Segnale", "Drawdown 52S", "Trimestrale",
-  "P/E TTM", "ROE", "Marg.netto", "Cresc.ricavi"]);   // + chiavi vista fondamentale su iPhone
+  "Market Cap", "P/E", "ROE", "Margine netto", "Cresc. ricavi", "Financial Health", "Target Δ"]);   // + chiavi vista fondamentale su iPhone
 function applyColLabels(tableId) {
-  const ths = [...document.querySelectorAll(`#${tableId} thead th`)].map(t => t.textContent.trim());
+  // textContent può contenere la freccia di sort (" ▼"/" ▲") appesa da updateSortArrows: va tolta
+  const ths = [...document.querySelectorAll(`#${tableId} thead th`)].map(t => t.textContent.replace(/[▲▼]/g, "").trim());
   document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
     if (tr.classList.contains("total-row") || tr.classList.contains("add-row")) return;
     [...tr.children].forEach((td, i) => {
+      // td con colspan = nota che copre più colonne ("Dati fondamentali non disponibili",
+      // "Nessun dato", BTP): l'etichetta della colonna i sarebbe fuorviante e il testo lungo
+      // sfonderebbe la griglia 2-col della card → niente label, riga intera (CSS td-key[colspan])
+      if (td.colSpan > 1) { td.setAttribute("data-label", ""); td.classList.add("td-key"); return; }
       const lab = ths[i] || "";
       td.setAttribute("data-label", lab);
       td.classList.toggle("td-key", MOBILE_KEY_COLS.has(lab));
