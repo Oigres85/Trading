@@ -822,6 +822,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "ath": round(ath, 2),
         "ath_dist_pct": round((price / ath - 1) * 100, 1),
         "sma200_dist_pct": round((price / sma200 - 1) * 100, 1) if sma200 else None,   # distanza % da SMA200 (price action pura)
+        "sma50_dist_pct": round((price / sma50 - 1) * 100, 1) if sma50 else None,      # distanza % da SMA50 (setup TURNAROUND SQUEEZE)
         "w52_high": round(float(hist["High"].max()), 2),
         "w52_dist_pct": round((price / float(hist["High"].max()) - 1) * 100, 1),
         "support": round(float(hist["Low"].tail(20).min()), 2),
@@ -2886,7 +2887,9 @@ def main():
                  if r.get("currency") == "USD" and not re.search(r"[\^=]|-", r["ticker"])]
     options = fetch_options_chain(sorted(set(opt_syms)))
 
-    # storico metriche (1 punto per giorno): Sharpe e performance, per i mini-trend in dashboard
+    # storico metriche (1 punto per giorno): Sharpe e performance per i mini-trend in dashboard
+    # + CINEMATICA v113: RS vs NDX e MCR per titolo, VIX e term structure — servono al blocco
+    # "DELTA" del prompt (velocità dei segnali vs 7/30 giorni fa, non solo la fotografia).
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     prev_hist = prev_data.get("metrics_history") or []
     point = {
@@ -2894,6 +2897,11 @@ def main():
         "sharpe": portfolio_sharpe,
         "gain_pct": round((total_eur / cost_eur - 1) * 100, 2),
         "eur_value": round(total_eur, 2),
+        "vix": (macro.get("vix") or {}).get("value"),
+        "vix_term": (macro.get("smart_money") or {}).get("vix_term_ratio"),
+        "titles": {r["ticker"]: {"rs": r.get("rs_ndx_1m"), "mcr": r.get("risk_contrib_pct")}
+                   for r in equities
+                   if r.get("qty") and (r.get("rs_ndx_1m") is not None or r.get("risk_contrib_pct") is not None)},
     }
     metrics_history = [p for p in prev_hist if p.get("date") != today]
     metrics_history.append(point)

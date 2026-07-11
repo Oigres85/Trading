@@ -139,6 +139,23 @@ check("risk_ratios: drift positivo → Sharpe e Sortino positivi, Sortino ≥ Sh
 check("risk_ratios: <60 osservazioni → (None, None) — la finestra 6M di un'IPO resta n.d.",
       ud.risk_ratios(pd.Series([0.01] * 30)) == (None, None))
 
-N_CHECKS = 27
+# ---------- notify_alerts (v113): raccolta, dedup e composizione — funzioni pure ----------
+import notify_alerts as na
+_nd = {"portfolio": [{"ticker": "TSTV", "qty": 10, "stop_violated": True, "price": 90, "stop_atr": 100},
+                     {"ticker": "OKAY", "qty": 5, "stop_violated": False}],
+       "watchlist": [{"ticker": "SQZ", "stats": {"short_float": 0.25}, "vol_ratio": 2.5, "sma50_dist_pct": 3.0},
+                     {"ticker": "NOP", "stats": {"short_float": 0.25}, "vol_ratio": 1.0, "sma50_dist_pct": 3.0}],
+       "data_quality": {"alerts": ["umich: stale"]}, "updated_at": "2026-07-11T10:00:00Z"}
+_cur = na.collect_alerts(_nd)
+check("notify: collect_alerts (stop violato, squeeze setup, data quality)",
+      _cur == {"stops": ["TSTV"], "dq": ["umich: stale"], "squeeze": ["SQZ"]})
+_new = na.diff_alerts(_cur, {"stops": [], "dq": ["umich: stale"], "squeeze": []})
+check("notify: diff_alerts segnala solo le novità (dq già notificato → fuori)",
+      _new == {"stops": ["TSTV"], "dq": [], "squeeze": ["SQZ"]})
+check("notify: build_message compone i blocchi e torna None senza novità",
+      "STOP VIOLATO" in na.build_message(_new, _nd) and "SQZ" in na.build_message(_new, _nd)
+      and na.build_message({"stops": [], "dq": [], "squeeze": []}, _nd) is None)
+
+N_CHECKS = 30
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)

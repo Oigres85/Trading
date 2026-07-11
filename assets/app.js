@@ -298,6 +298,18 @@ async function refreshAll() {
 /* ---------------- aggiungi/rimuovi titoli ---------------- */
 const editMode = { portfolio: false, watchlist: false };
 
+/* AUTO-TIMESTAMP SNAPSHOT (v113): salvare quantità/PMC/titoli del PORTAFOGLIO dalla UI
+   significa aver appena riconciliato le posizioni col broker → la data di snapshot broker
+   si aggiorna DA SOLA alla data odierna. Prima restava ferma e il banner "RICONCILIA COL
+   BROKER" continuava a suonare a vuoto finché l'utente non editava holdings.json a mano.
+   Le modifiche alla sola watchlist non toccano le posizioni → data invariata. */
+function stampBrokerDate(cfg, section) {
+  if (section !== "watchlist" && cfg && cfg.broker) {
+    cfg.broker.as_of = new Date().toISOString().slice(0, 10);
+  }
+  return cfg;
+}
+
 async function editHoldings(section, mutate) {
   const token = getToken();
   if (!token) { toast("Serve un token GitHub (permessi Actions + Contents) per modificare le posizioni"); return; }
@@ -315,6 +327,7 @@ async function editHoldings(section, mutate) {
     const file = await r.json();
     const cfg = JSON.parse(decodeURIComponent(escape(atob((file.content || "").replace(/\s/g, "")))));
     if (!mutate(cfg)) return;                 // mutate ritorna false se annullato/invalido
+    stampBrokerDate(cfg, section);            // auto-timestamp snapshot (v113, vedi helper)
     // 2) scrivi il nuovo config
     const body = {
       message: `Aggiorna posizioni (${section})`,
@@ -1145,6 +1158,19 @@ function positionWeightPct(r) {
        SMA200) · forza relativa 1M vs NDX positiva (batte il benchmark del mandato ORA).
      Short interest alto e margini negativi NON sono riabilitabili: sono rischio presente,
      non cicatrici del passato. Il riabilitato resta un SORVEGLIATO: viene dichiarato. */
+/* TURNAROUND SQUEEZE (v113): un titolo VETATO in caduta ma con risveglio istituzionale
+   violento — Short Interest ≥ 20% + RVol > 2 (flussi anomali) + prezzo sopra SMA50
+   (struttura in riparazione) — non va scartato in silenzio: è un setup speculativo
+   asimmetrico che il CEO deve VEDERE, dichiarato come tale (sizing dimezzato, stop
+   stretto 1×ATR). Solo watchlist: su una posizione detenuta non è un'idea d'ingresso.
+   Il veto del mandato growth RESTA: questo è un tag informativo, non una promozione. */
+function squeezeSetup(r) {
+  const st = r.stats || {};
+  return !r.qty && st.short_float != null && st.short_float >= 0.20 &&
+    r.vol_ratio != null && r.vol_ratio > 2.0 &&
+    r.sma50_dist_pct != null && r.sma50_dist_pct > 0;
+}
+
 function qualityVeto(r) {
   const st = r.stats || {};
   const why = [];
@@ -1195,9 +1221,11 @@ function decisionVerdict() {
   universe.forEach(r => {
     const v = qualityVeto(r);
     if (v && v.rehab) { rehabbed.push({ r, ...v }); eligible.push(r); }
-    else if (v) excluded.push({ r, ...v });
+    else if (v) excluded.push({ r, ...v, squeeze: squeezeSetup(r) });
     else eligible.push(r);
   });
+  // setup speculativi TURNAROUND SQUEEZE tra gli esclusi (v113): esposti, non promossi
+  const squeezed = excluded.filter(x => x.squeeze);
 
   // 2) score quant 0-100 sui soli eleggibili: impatto marginale sullo Sharpe (40%),
   //    forza relativa 1M vs benchmark/NDX (30%), qualità fondamentale (30%).
@@ -1314,9 +1342,10 @@ function decisionVerdict() {
   if (stopViolations.length) reasons.unshift(`⚠ STOP VIOLATO su ${stopViolations.map(x => `${x.r.ticker} (stop $${fmtNum.format(x.stop)}, prezzo $${fmtNum.format(x.r.price)})`).join(", ")} — il prezzo è sotto lo stop trailing ancorato: decidere uscita o ri-arm consapevole`);
   if (vetoTk.length) reasons.push(`VETO risk manager su ${vetoTk.join(", ")} — esclusi a prescindere dal supporto tecnico${vetoHeldNote}`);
   if (rehabbed.length) reasons.push(`RIABILITATI dal veto Sortino (regola growth v111 — qualità intatta + prezzo sopra SMA200 + RS 1M vs NDX positiva, criteri tutti meccanici): ${rehabbed.map(x => `${x.r.ticker} (${x.why[0]}; MA ${x.rehabWhy})`).join(" · ")} — trattali da candidati SORVEGLIATI: il trailing 12M resta negativo, la ripresa è provata dai dati correnti`);
+  if (squeezed.length) reasons.push(`⚡ SETUP TURNAROUND SQUEEZE su ${squeezed.map(x => `${x.r.ticker} (short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% · RVol ${fmtNum.format(x.r.vol_ratio)}× · sopra SMA50)`).join(", ")} — il VETO growth resta: valutabile SOLO come speculazione asimmetrica dichiarata, sizing massimo METÀ dello standard, stop stretto 1×ATR, ordine limite`);
   if (overweight.length) reasons.push(`sizing: ${overweight.map(x => `${x.r.ticker} ${x.w}%`).join(", ")} oltre il 10% del NAV → valuta trimming di rientro`);
   if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => r.ticker).join(", ")} (multiplo/RSI estremo)`);
-  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, overweight, harvest };
+  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, squeezed, overweight, harvest };
 }
 
 // alert proattivi: condizioni rilevanti emerse oggi (deep value, correzione, squeeze, VIX)
@@ -1410,6 +1439,11 @@ function openDecisionModal() {
     <h4 style="margin:12px 0 4px">Riabilitati dal veto Sortino (regola growth)</h4>
     ${v.rehabbed.map(x => `<div class="info-line" style="font-size:12px"><b style="color:var(--yellow)">${x.r.ticker}</b> — ${x.why.join(" · ")}; <b>MA</b> ${x.rehabWhy}</div>`).join("")}
     <div class="info-line muted" style="font-size:11px;margin-top:2px">Il Sortino 12M guarda indietro: con qualità intatta (ROE&gt;15%, margini positivi), prezzo sopra SMA200 e RS 1M vs NDX positiva il titolo torna eleggibile — da SORVEGLIATO.</div>` : "";
+  // SETUP TURNAROUND SQUEEZE (v113): esclusi che mostrano risveglio violento — esposti, non promossi
+  const squeezeHtml = (v.squeezed || []).length ? `
+    <h4 style="margin:12px 0 4px">⚡ Setup Turnaround Squeeze (speculativo, veto confermato)</h4>
+    ${v.squeezed.map(x => `<div class="info-line" style="font-size:12px"><b style="color:var(--yellow)">${x.r.ticker}</b> — short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% · RVol ${fmtNum.format(x.r.vol_ratio)}× · ${signTxt(x.r.sma50_dist_pct)} sopra SMA50</div>`).join("")}
+    <div class="info-line muted" style="font-size:11px;margin-top:2px">Short elevato + volumi anomali + struttura in riparazione = possibile short squeeze. NON è un investimento del mandato: solo speculazione dichiarata — sizing massimo metà standard, stop stretto 1×ATR, ordine limite.</div>` : "";
   // tabella ALLEGGERIMENTO (vendita): prezzo limite di vendita, quantità, motivazione
   const trimHtml = (v.trim || []).length ? `
     <h4 style="margin:12px 0 4px">Vendite/alleggerimenti — TRIM parziale (Free Ride)</h4>
@@ -1442,7 +1476,7 @@ function openDecisionModal() {
   openInfoModal(`Decisione operativa: ${v.label}`,
     `<div class="info-line" style="margin-bottom:8px"><b style="color:${v.col};font-size:16px">${v.label}</b></div>
      <ul style="margin:0 0 10px 18px;font-size:12.5px;line-height:1.6">${v.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
-     ${accHtml}${trailHtml}${vetoHtml}${rehabHtml}${trimHtml}${taxHtml}
+     ${accHtml}${trailHtml}${vetoHtml}${rehabHtml}${squeezeHtml}${trimHtml}${taxHtml}
      <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI. Obiettivo del motore: massimizzare il rendimento corretto per il rischio (Sharpe > 2.0) e sovraperformare il Nasdaq 100 — stesso mandato del prompt AI. Per l'analisi completa usa "Copia prompt AI".</div>
      <h4 style="margin:10px 0 6px">Diario delle azioni</h4>
      <div class="diary-add"><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
@@ -4271,10 +4305,74 @@ function buildPrompt() {
     }
     if ((dv.excluded || []).length) lines.push("· ESCLUSI dal veto risk manager (contesto): " + dv.excluded.map(x => `${x.r.ticker} → ${x.verdict} (${x.why.join(", ")})`).join(" · ") + ".");
     if ((dv.rehabbed || []).length) lines.push("· RIABILITATI dal veto Sortino — regola growth v111 (contesto): " + dv.rehabbed.map(x => `${x.r.ticker} → ${x.why.join(", ")}; MA ${x.rehabWhy}`).join(" · ") + ". Il Sortino 12M è backward-looking: con qualità intatta, prezzo sopra SMA200 e RS positiva il titolo è di nuovo eleggibile all'accumulo, da SORVEGLIATO (dichiara sempre il trailing negativo).");
+    if ((dv.squeezed || []).length) lines.push("· [TURNAROUND SQUEEZE RISK] (contesto, v113): " + dv.squeezed.map(x => `${x.r.ticker} → veto (${x.why[0]}) MA short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% + RVol ${fmtNum.format(x.r.vol_ratio)}× + prezzo sopra SMA50 (${signTxt(x.r.sma50_dist_pct)})`).join(" · ") + ". NON è un candidato del mandato growth: se il CEO vuole trattarlo, va dichiarato come SPECULAZIONE asimmetrica — sizing massimo METÀ dello standard, stop stretto 1×ATR, solo ordine limite, mai media al ribasso.");
     if ((dv.overweight || []).length) lines.push("· Sizing oltre il 10% del NAV (candidati a trimming di rientro): " + dv.overweight.map(x => `${x.r.ticker} ${fmtNum.format(x.w)}%`).join(" · ") + ".");
     if ((dv.trim || []).length) lines.push("· Posizioni segnalate dal motore come tese (contesto): " + dv.trim.map(r => `${r.ticker} (${r.pe > 150 ? "P/E " + fmtNum.format(r.pe) : "RSI " + r.rsi})`).join(" · ") + ".");
     if ((dv.harvest || []).length) lines.push("· Minusvalenze latenti utilizzabili fiscalmente (contesto): " + dv.harvest.map(r => `${r.ticker} (${signTxt(Math.round(r.gain_eur), " €")})`).join(" · ") + ".");
   } catch { /* no-op */ }
+
+  // ---- TRACK RECORD DEL MOTORE (v113): il motore si misura da solo, run dopo run.
+  // I segnali ACCUMULA vengono loggati dal CI (scripts/log_verdict.mjs → verdict_track in
+  // data.json) e valutati a 7/30 giorni: l'LLM deve CALIBRARE la fiducia nel motore sugli
+  // esiti reali, non presumerla. Un advisory che non misura se stesso è solo narrativa.
+  lines.push("");
+  const vt = DATA.verdict_track;
+  if (vt && ((vt.mature30 || {}).n || (vt.mature7 || {}).n)) {
+    const fmtB = (b, lab) => b && b.n ? `${lab}: ${b.n} segnali · ritorno medio ${signTxt(b.avg_ret)} · vs NDX ${signTxt(b.avg_vs_ndx, "pp")} · hit-rate vs NDX ${b.hit_pct}%` : null;
+    const bits = [fmtB(vt.mature30, "maturazione ≥30g"), fmtB(vt.mature7, "maturazione ≥7g")].filter(Boolean);
+    lines.push(`TRACK RECORD DEL MOTORE (esito dei segnali ACCUMULA passati, ipotesi di acquisto alla chiusura del giorno del segnale — usalo per CALIBRARE la fiducia nei candidati odierni; un motore in errore va pesato di conseguenza): ${bits.join(" · ")}.`);
+    if ((vt.last || []).length) lines.push("· Ultimi segnali maturati: " + vt.last.map(s => `${s.tk} ${signTxt(s.ret_pct)} (vs NDX ${signTxt(s.vs_ndx_pp, "pp")}, segnale ${s.date})`).join(" · ") + ".");
+  } else {
+    lines.push("TRACK RECORD DEL MOTORE: storico in costruzione — i segnali ACCUMULA vengono loggati a ogni run e valutati dopo 7 e 30 giorni di maturazione. Finché non matura, tratta i candidati del motore come ipotesi da validare, non come raccomandazioni provate.");
+  }
+
+  // ---- CINEMATICA DEI SEGNALI (v113): la velocità conta quanto il livello — RS che
+  // decelera, MCR che si concentra e term structure che si irrigidisce anticipano i
+  // downgrade del motore. Confronti vs il punto storico più vicino a 7/30 giorni fa.
+  try {
+    const kHist = DATA.metrics_history || [];
+    const nowP = kHist[kHist.length - 1];
+    const pAt = (days) => { const t = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10); let best = null; for (const p of kHist) if (p.date <= t) best = p; return best; };
+    const p7 = pAt(7), p30 = pAt(30);
+    if (nowP && p7) {
+      const kin = [];
+      const dnum = (a, b, dec = 2) => (a != null && b != null) ? Math.round((a - b) * 10 ** dec) / 10 ** dec : null;
+      const sh7 = dnum(nowP.sharpe, p7.sharpe), sh30 = dnum(nowP.sharpe, p30 && p30.sharpe);
+      if (sh7 != null) kin.push(`Sharpe di portafoglio ${fmtNum.format(nowP.sharpe)} (Δ7g ${signTxt(sh7, "")}${sh30 != null ? `, Δ30g ${signTxt(sh30, "")}` : ""})`);
+      const vt7 = dnum(nowP.vix_term, p7.vix_term, 3);
+      if (nowP.vix_term != null && vt7 != null) kin.push(`VIX/VIX3M ${fmtNum.format(nowP.vix_term)} (Δ7g ${signTxt(vt7, "")} — ${vt7 > 0.02 ? "term structure in IRRIGIDIMENTO: lo smart money sta comprando protezione" : vt7 < -0.02 ? "term structure in distensione: coperture rilassate" : "term structure stabile"}${nowP.vix_term >= 1 ? "; BACKWARDATION: stress acuto in corso" : ""})`);
+      const vx7 = dnum(nowP.vix, p7.vix, 2);
+      if (vx7 != null) kin.push(`VIX ${fmtNum.format(nowP.vix)} (Δ7g ${signTxt(vx7, " punti")})`);
+      // RS Velocity: Δ7g della RS 1M vs NDX per i titoli in portafoglio
+      const tNow = nowP.titles || {}, tOld = p7.titles || {};
+      const rsMoves = Object.keys(tNow)
+        .map(tk => ({ tk, rs: (tNow[tk] || {}).rs, d: dnum((tNow[tk] || {}).rs, (tOld[tk] || {}).rs, 1) }))
+        .filter(x => x.d != null)
+        .sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+      if (rsMoves.length) {
+        kin.push("RS Velocity (Δ7g della RS 1M vs NDX; |Δ|≥3pp = variazione RILEVANTE): " +
+          rsMoves.slice(0, 6).map(x => `${x.tk} RS ${signTxt(x.rs, "pp")} (Δ ${signTxt(x.d, "pp")}${Math.abs(x.d) >= 3 ? (x.d > 0 ? " ↑ACCELERA" : " ↓DECELERA") : ""})`).join(" · "));
+      }
+      // Derivata di concentrazione: MCR dei 3 maggiori contributori di rischio
+      const mcrMoves = Object.keys(tNow)
+        .map(tk => ({ tk, m: (tNow[tk] || {}).mcr, d: dnum((tNow[tk] || {}).mcr, (tOld[tk] || {}).mcr, 1) }))
+        .filter(x => x.m != null)
+        .sort((a, b) => b.m - a.m).slice(0, 3);
+      if (mcrMoves.length) {
+        kin.push("Derivata di concentrazione (MCR top-3, Δ7g — se sale, il rischio si sta CONCENTRANDO): " +
+          mcrMoves.map(x => `${x.tk} ${fmtNum.format(x.m)}%${x.d != null ? ` (Δ ${signTxt(x.d, "pp")})` : ""}`).join(" · "));
+      }
+      if (kin.length) {
+        lines.push("");
+        lines.push("CINEMATICA DEI SEGNALI (Δ vs ~7/30 giorni — leggi la DIREZIONE oltre al livello):");
+        kin.forEach(k => lines.push("- " + k));
+        if (!rsMoves.length) lines.push("- (cinematica per-titolo in costruzione: RS/MCR storici si accumulano dai run dell'11/07/2026 → confronti a 7g completi dal ~18/07)");
+      }
+    } else {
+      lines.push("");
+      lines.push("CINEMATICA DEI SEGNALI: storico metriche insufficiente (<7 giorni) — il blocco si attiva da solo quando lo storico matura.");
+    }
+  } catch { /* la cinematica non deve mai rompere il prompt */ }
   // DIARIO DELLE AZIONI (storico operazioni e motivazioni dell'utente)
   const diary = loadDiary();
   if (diary.length) {
@@ -4336,6 +4434,7 @@ function buildPrompt() {
     if (r.qty && st && st.violated) flags.push("[STOP VIOLATO]");
     if (earningsRiskDays(r) != null) flags.push("[!EARNINGS RISK]");
     if (isIlliquid(r)) flags.push("[ILLIQUIDO]");
+    if (squeezeSetup(r)) flags.push("[TURNAROUND SQUEEZE RISK]");
     const nameCell = `${r.name} (${r.ticker})${flags.length ? " " + flags.join(" ") : ""}`;
     // R/R teorico per la Tabella B: pipeline (risk_reward) o fallback client stessa formula
     let rrCell = isIndex ? null : (r.risk_reward ?? null);

@@ -312,6 +312,56 @@ check("prompt: R/R teorico pre-calcolato in tabella (TST1 supp95/res120/atr3 →
   const p2 = buildPrompt();
   return p2.includes("| R/R teorico |") && p2.includes("1:4.2")`));
 
+// ---- v113: turnaround squeeze, cinematica, track record, auto-timestamp broker ----
+check("squeezeSetup: short≥20% + RVol>2 + sopra SMA50 → setup; posizione detenuta MAI", run(`
+  const base = { vol_ratio: 2.6, sma50_dist_pct: 2.0, stats: { short_float: 0.25 } };
+  return squeezeSetup({ ...base }) === true &&
+    squeezeSetup({ ...base, qty: 10 }) === false &&
+    squeezeSetup({ ...base, vol_ratio: 1.2 }) === false &&
+    squeezeSetup({ ...base, sma50_dist_pct: -1 }) === false`));
+check("decisionVerdict: escluso con setup squeeze → dv.squeezed + reason ⚡ + flag in tabella prompt", run(`
+  DATA.watchlist.push({ ticker: "TSTQ", name: "Squeeze Co", currency: "USD", price: 50,
+    sortino_1y: -0.9, sharpe_1y: -0.6, vol_ratio: 2.6, sma50_dist_pct: 2.0, w52_dist_pct: -60,
+    support: 45, resistance: 70, rsi: 55, atr_14: 2, atr_pct: 4,
+    signal: "debole", signal_class: "bad", sector: "Technology",
+    avg_corr: 0.2, max_corr: 0.3, max_corr_with: "TST1",
+    stats: { short_float: 0.25, roe: 0.05, profit_margin: 0.05, market_cap: 1e9, avg_volume_30d: 1e7 },
+    sparks: {}, tech_by_range: {}, financials: [] });
+  const dv = decisionVerdict();
+  const p = buildPrompt();
+  DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== "TSTQ");
+  const row = p.split("\\n").find(l => l.includes("Squeeze Co"));
+  return dv.squeezed.some(x => x.r.ticker === "TSTQ") &&
+    dv.reasons.some(s => s.includes("TURNAROUND SQUEEZE") && s.includes("TSTQ")) &&
+    p.includes("[TURNAROUND SQUEEZE RISK] (contesto") && row.includes("[TURNAROUND SQUEEZE RISK]")`));
+check("prompt v113: CINEMATICA — RS velocity con ↓DECELERA, MCR top-3 e term structure", run(`
+  const old = DATA.metrics_history;
+  const d8 = new Date(Date.now() - 8 * 86400000).toISOString().slice(0, 10);
+  const d0 = new Date().toISOString().slice(0, 10);
+  DATA.metrics_history = [
+    { date: d8, sharpe: 1.5, vix: 18, vix_term: 0.9, titles: { TST1: { rs: 10, mcr: 40 } } },
+    { date: d0, sharpe: 1.8, vix: 15, vix_term: 0.8, titles: { TST1: { rs: 3, mcr: 42 } } }];
+  const p = buildPrompt();
+  DATA.metrics_history = old;
+  return p.includes("CINEMATICA DEI SEGNALI") && p.includes("RS Velocity") &&
+    /TST1 RS \\+3pp \\(Δ -7pp ↓DECELERA\\)/.test(p) &&
+    p.includes("Derivata di concentrazione") && p.includes("term structure in distensione")`));
+check("prompt v113: TRACK RECORD renderizzato quando maturo, 'in costruzione' quando vuoto", run(`
+  const p0 = buildPrompt();
+  DATA.verdict_track = { mature7: { n: 3, avg_ret: 4.2, avg_vs_ndx: 1.1, hit_pct: 67 }, mature30: { n: 0 },
+    last: [{ tk: "TST1", date: "2026-06-01", ret_pct: 5, vs_ndx_pp: 2 }] };
+  const p1 = buildPrompt();
+  delete DATA.verdict_track;
+  return p0.includes("TRACK RECORD DEL MOTORE: storico in costruzione") &&
+    p1.includes("maturazione ≥7g: 3 segnali") && p1.includes("hit-rate vs NDX 67%") &&
+    p1.includes("Ultimi segnali maturati: TST1 +5%")`));
+check("stampBrokerDate v113: salvataggio PORTAFOGLIO aggiorna as_of a oggi, watchlist no", run(`
+  const today = new Date().toISOString().slice(0, 10);
+  const a = stampBrokerDate({ broker: { as_of: "2026-06-22" } }, "portfolio");
+  const b = stampBrokerDate({ broker: { as_of: "2026-06-22" } }, "watchlist");
+  const c = stampBrokerDate({}, "portfolio");   // senza blocco broker: nessun crash
+  return a.broker.as_of === today && b.broker.as_of === "2026-06-22" && !!c`));
+
 /* GUARDRAIL CARD MOBILE (v109): ogni etichetta di MOBILE_KEY_COLS deve esistere DAVVERO
    tra le <th> di index.html (viste tecniche) o nella head[] di buildFundTable (viste
    fondamentali). Un'etichetta orfana = colonna che sparisce dalle card iPhone senza errori

@@ -22,6 +22,7 @@ on:
 
 permissions:
   contents: write
+  issues: write        # fallback notifiche: GitHub Issue quando WhatsApp/SMTP non configurati
 
 concurrency:
   group: update-data
@@ -51,11 +52,37 @@ jobs:
       # incoerenti) bloccano il commit dei dati; i degradi di mercato sono solo warning
       - run: python scripts/audit_data.py data/data.json
 
+      # registro verdetti→esiti (v113): logga i candidati del motore e inietta il track
+      # record in data.json. BEST-EFFORT: exit 0 sempre + continue-on-error, non deve
+      # MAI bloccare il commit dei dati.
+      - name: Log verdetti e track record
+        run: node scripts/log_verdict.mjs
+        continue-on-error: true
+
+      # notifiche alert (v113): stop violati / data quality / setup squeeze. Canali:
+      # WhatsApp CallMeBot → email SMTP → GitHub Issue (fallback senza secret).
+      # ANTI-FRAGILE: lo script esce sempre 0; continue-on-error come seconda cintura.
+      - name: Notifiche alert (best-effort)
+        run: python scripts/notify_alerts.py
+        continue-on-error: true
+        env:
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          GITHUB_TOKEN: ${{ github.token }}
+
       - name: Commit dati aggiornati
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
+          # file di stato best-effort: possono non esistere ai primi run
+          git add config/verdict_history.jsonl 2>/dev/null || true
+          git add config/alert_state.json 2>/dev/null || true
           git diff --cached --quiet && echo "nessuna variazione" && exit 0
           git commit -m "Aggiornamento dati $(date -u +'%Y-%m-%d %H:%M UTC')"
           # push robusto: riprova con rebase se il remote è avanzato
