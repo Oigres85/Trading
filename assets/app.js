@@ -306,6 +306,13 @@ const editMode = { portfolio: false, watchlist: false };
 function stampBrokerDate(cfg, section) {
   if (section !== "watchlist" && cfg && cfg.broker) {
     cfg.broker.as_of = new Date().toISOString().slice(0, 10);
+    // Il timbro vale per le POSIZIONI (qty/PMC appena riconciliati a mano), NON per i
+    // controvalori bval/bgain, che appartengono al VECCHIO snapshot: tenerli con la data
+    // nuova stringerebbe la banda del drift (scala con √giorni) e il banner RICONCILIA
+    // griderebbe al lupo su puro movimento di mercato (visto sul campo: RGTI -22% dal
+    // 22/06 = mercato, non trade fantasma). Via i campi stale: tornano col prossimo
+    // snapshot completo incollato dal broker in holdings.json.
+    (cfg.portfolio || []).forEach(p => { delete p.bval; delete p.bgain; });
   }
   return cfg;
 }

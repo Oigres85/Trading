@@ -355,12 +355,14 @@ check("prompt v113: TRACK RECORD renderizzato quando maturo, 'in costruzione' qu
   return p0.includes("TRACK RECORD DEL MOTORE: storico in costruzione") &&
     p1.includes("maturazione ≥7g: 3 segnali") && p1.includes("hit-rate vs NDX 67%") &&
     p1.includes("Ultimi segnali maturati: TST1 +5%")`));
-check("stampBrokerDate v113: salvataggio PORTAFOGLIO aggiorna as_of a oggi, watchlist no", run(`
+check("stampBrokerDate v113: salvataggio PORTAFOGLIO aggiorna as_of a oggi e rimuove i bval stale, watchlist no", run(`
   const today = new Date().toISOString().slice(0, 10);
-  const a = stampBrokerDate({ broker: { as_of: "2026-06-22" } }, "portfolio");
-  const b = stampBrokerDate({ broker: { as_of: "2026-06-22" } }, "watchlist");
+  const mk = () => ({ broker: { as_of: "2026-06-22" }, portfolio: [{ ticker: "X", qty: 1, pmc: 2, bval: 100, bgain: 5 }] });
+  const a = stampBrokerDate(mk(), "portfolio");
+  const b = stampBrokerDate(mk(), "watchlist");
   const c = stampBrokerDate({}, "portfolio");   // senza blocco broker: nessun crash
-  return a.broker.as_of === today && b.broker.as_of === "2026-06-22" && !!c`));
+  return a.broker.as_of === today && !("bval" in a.portfolio[0]) && !("bgain" in a.portfolio[0]) &&
+    b.broker.as_of === "2026-06-22" && b.portfolio[0].bval === 100 && !!c`));
 
 /* GUARDRAIL CARD MOBILE (v109): ogni etichetta di MOBILE_KEY_COLS deve esistere DAVVERO
    tra le <th> di index.html (viste tecniche) o nella head[] di buildFundTable (viste
