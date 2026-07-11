@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-07-11T09:13:01Z",
+ "updated_at": "2026-07-11T10:10:18Z",
  "eurusd": 1.1419,
  "totals": {
   "usd_value": 292824.47,
@@ -6185,7 +6185,7 @@
     "profit_margin": 0.3284,
     "roe": 0.3293,
     "debt_to_equity": 35.608,
-    "dividend_yield": 0.0033,
+    "dividend_yield": 0.0031,
     "price_to_book": 6.97,
     "target_mean": 827.91,
     "fcf": 25558249472.0,
@@ -6730,7 +6730,7 @@
    "stats": {
     "market_cap": 303955181568.0,
     "shares": 2296071334.0,
-    "float_shares": 2104120722.0,
+    "float_shares": 2104288534.0,
     "float_pct": 91.6,
     "avg_volume_30d": 43986762.0,
     "pe_ttm": 145.7356,
@@ -10808,22 +10808,22 @@
    "name": "Bitcoin",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 64194.17,
+   "price": 64110.3,
    "price_asof": "2026-07-11",
-   "change_pct": 0.1,
+   "change_pct": -0.03,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.1,
-   "sma200_dist_pct": -13.2,
+   "ath_dist_pct": -49.2,
+   "sma200_dist_pct": -13.3,
    "w52_high": 126198.07,
-   "w52_dist_pct": -49.1,
+   "w52_dist_pct": -49.2,
    "support": 57747.77,
    "resistance": 65544.0,
-   "rsi": 54.1,
-   "volume": 20225138688,
+   "rsi": 53.7,
+   "volume": 19323025408,
    "vol_ratio": 0.99,
    "atr_14": 1978.95,
-   "atr_pct": 3.08,
+   "atr_pct": 3.09,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -10832,7 +10832,7 @@
      62257.57,
      63193.15,
      64127.14,
-     64194.17
+     64110.3
     ],
     "m6": [
      65969.78,
@@ -10960,7 +10960,7 @@
      62257.57,
      63193.15,
      64127.14,
-     64194.17
+     64110.3
     ],
     "all": [
      386.94,
@@ -11105,7 +11105,7 @@
      76304.32,
      73579.69,
      58558.86,
-     64194.17
+     64110.3
     ],
     "m1": [
      64239.68,
@@ -11129,7 +11129,7 @@
      62257.57,
      63193.15,
      64127.14,
-     64194.17
+     64110.3
     ],
     "m3": [
      80009.99,
@@ -11197,7 +11197,7 @@
      62257.57,
      63193.15,
      64127.14,
-     64194.17
+     64110.3
     ],
     "y1": [
      117516.99,
@@ -11273,7 +11273,7 @@
      60016.43,
      60003.76,
      63995.02,
-     64194.17
+     64110.3
     ],
     "d1": [
      64058.85,
@@ -11331,7 +11331,12 @@
      64234.38,
      64210.38,
      64223.54,
-     64194.17
+     64176.09,
+     64209.2,
+     64174.0,
+     64140.87,
+     64101.5,
+     64101.54
     ]
    },
    "earnings_date": null,
@@ -11339,12 +11344,12 @@
    "health": 41,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -1.26,
-   "sortino_1y": -1.63,
+   "sharpe_1y": -1.27,
+   "sortino_1y": -1.64,
    "sharpe_6m": -0.42,
-   "sortino_6m": -0.56,
+   "sortino_6m": -0.58,
    "prepost": null,
-   "prezzo_limite_aggiustato": 64194.17,
+   "prezzo_limite_aggiustato": 64110.3,
    "risk_reward": "1:2.0",
    "sector": "Altro",
    "stats": null,
@@ -11352,22 +11357,22 @@
     "w1": {
      "support": 61492.65,
      "resistance": 64658.97,
-     "change_pct": 1.42
+     "change_pct": 1.28
     },
     "m1": {
      "support": 57747.77,
      "resistance": 65544.0,
-     "change_pct": -0.07
+     "change_pct": -0.2
     },
     "m3": {
      "support": 57747.77,
      "resistance": 82430.17,
-     "change_pct": -19.77
+     "change_pct": -19.87
     },
     "y1": {
      "support": 57747.77,
      "resistance": 111167.31,
-     "change_pct": -41.98
+     "change_pct": -42.05
     }
    },
    "financials": [],
@@ -11384,7 +11389,7 @@
      "lo": 63422.94,
      "hi": 63964.97
     },
-    "liq_above": 64597.57,
+    "liq_above": 64185.77,
     "liq_below": 62201.14,
     "order_block": {
      "dir": "rialzista",
@@ -11392,9 +11397,9 @@
      "hi": 59940.35
     }
    },
-   "rs_1m": -2.6,
+   "rs_1m": -2.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -2.6,
+   "rs_ndx_1m": -2.7,
    "beta_ndx": 0.94,
    "avg_corr": 0.35,
    "max_corr": 0.79,
@@ -13896,7 +13901,7 @@
    "stats": {
     "market_cap": 552055799808.0,
     "shares": 5026000000.0,
-    "float_shares": 5016601380.0,
+    "float_shares": 5016551120.0,
     "float_pct": 99.8,
     "avg_volume_30d": 135274252.0,
     "pe_ttm": null,
@@ -14873,7 +14878,7 @@
      442.14,
      449.14,
      463.88,
-     468.2,
+     468.19,
      478.45,
      479.49,
      431.58,
@@ -15688,7 +15693,7 @@
    "stats": {
     "market_cap": 2860690440192.0,
     "shares": 7428434704.0,
-    "float_shares": 7417514905.0,
+    "float_shares": 7417366336.0,
     "float_pct": 99.9,
     "avg_volume_30d": 40348836.0,
     "pe_ttm": 22.8818,
@@ -21995,7 +22000,7 @@
      56.41,
      78.79,
      82.44,
-     92.36,
+     92.35,
      113.12,
      127.87,
      127.01,
@@ -22808,7 +22813,7 @@
    "stats": {
     "market_cap": 89768304640.0,
     "shares": 357102017.0,
-    "float_shares": 337748828.0,
+    "float_shares": 337745216.0,
     "float_pct": 94.6,
     "avg_volume_30d": 3682198.0,
     "pe_ttm": 21.7834,
@@ -29552,7 +29557,7 @@
    "calls": 836108
   },
   "risk_sentiment": {
-   "score": 56,
+   "score": 55,
    "label": "Neutrale",
    "components": [
     {
@@ -29569,7 +29574,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 51
+     "score": 50
     },
     {
      "label": "Treasury 10A",
@@ -33117,7 +33122,7 @@
      109.14,
      102.59,
      106.75,
-     108.02,
+     108.01,
      110.72,
      113.53,
      111.46,
@@ -33149,7 +33154,7 @@
      169.78,
      164.75,
      174.01,
-     171.28,
+     171.27,
      172.96,
      175.18,
      171.62,
@@ -33180,7 +33185,7 @@
      214.47,
      215.1,
      219.43,
-     224.61,
+     224.6,
      231.47,
      234.28,
      247.48,
@@ -33544,7 +33549,7 @@
     -0.00126,
     -0.003758,
     -0.016526,
-    0.015086,
+    0.015085,
     -0.005083,
     0.007631,
     -0.000838,
@@ -33568,11 +33573,11 @@
     0.005405,
     0.008323,
     -0.0029,
-    0.002454,
+    0.002453,
     0.002309,
     0.002887,
     0.008276,
-    -0.000335,
+    -0.000334,
     0.00531,
     -0.001378,
     -0.001243,
@@ -34773,7 +34778,7 @@
    "_ret_series": [
     0.00362,
     0.000916,
-    0.001023,
+    0.001024,
     0.00806,
     -0.000962,
     0.005171,
@@ -34781,7 +34786,7 @@
     0.004551,
     0.002126,
     0.002404,
-    0.003121,
+    0.00312,
     -0.00155,
     0.001339,
     -0.005313,
@@ -34789,7 +34794,7 @@
     0.018283,
     -0.006813,
     0.012505,
-    0.003379,
+    0.003378,
     0.009285,
     -0.002963,
     0.01249,
@@ -34804,7 +34809,7 @@
     -0.002889,
     0.004007,
     0.001536,
-    0.00624,
+    0.006241,
     -0.011643,
     -0.008415,
     0.007837,
@@ -34814,13 +34819,13 @@
     0.002829,
     0.000327,
     0.005804,
-    0.004408,
+    0.004407,
     0.008521,
     -0.000846,
     -0.001998,
     0.008977,
     0.006747,
-    0.005903,
+    0.005902,
     -0.006665,
     -0.003517,
     -0.004321,
@@ -36012,7 +36017,7 @@
     -0.001159,
     -0.006401,
     -0.005087,
-    -0.009843,
+    -0.009842,
     -0.020585,
     0.022134,
     0.005084,
@@ -36078,7 +36083,7 @@
     -0.008552,
     -0.008095,
     0.00562,
-    -0.003214,
+    -0.003213,
     -0.017426,
     0.014325,
     -0.017855,
@@ -36095,7 +36100,7 @@
     0.027933,
     0.018087,
     0.021567,
-    0.008813,
+    0.008814,
     0.005846,
     -0.012663,
     -0.001834,
@@ -36106,7 +36111,7 @@
     0.002071,
     0.013513,
     0.011666,
-    -0.015441,
+    -0.01544,
     -0.007592,
     -0.004743,
     -0.010701,
@@ -36145,8 +36150,8 @@
     -0.018166,
     0.035292,
     0.006994,
-    -0.002702,
-    -0.004556,
+    -0.002701,
+    -0.004557,
     -0.02063,
     0.013091,
     0.000304,
@@ -37862,7 +37867,7 @@
      42.73,
      40.07,
      39.96,
-     40.38,
+     40.39,
      41.0,
      42.71,
      43.12,
@@ -38384,16 +38389,16 @@
     0.006028,
     -0.005563,
     -0.001745,
-    0.006268,
+    0.006267,
     -0.0065,
     0.016745,
     -0.005167,
     0.000575,
-    0.014117,
+    0.014116,
     0.002729,
-    0.003062,
+    0.003061,
     -0.005791,
-    -0.00171,
+    -0.001709,
     -0.004344,
     0.001145,
     -0.005048,
@@ -38410,7 +38415,7 @@
     -0.001153,
     0.006557,
     -0.007134,
-    -0.00747,
+    -0.007469,
     0.010918,
     0.007595,
     0.015132,
@@ -38425,14 +38430,14 @@
     -0.010373,
     -0.001908,
     -0.003601,
-    0.006966,
+    0.006965,
     -0.003814,
     0.0,
-    -0.0009,
+    -0.000899,
     0.008178,
     -0.002905,
     0.002579,
-    0.002908,
+    0.002907,
     -0.0019,
     -0.007975,
     0.005735,
@@ -38444,7 +38449,7 @@
     -0.002204,
     0.007472,
     -0.001534,
-    0.003831,
+    0.00383,
     0.004903,
     0.000652,
     -0.006867,
@@ -38474,13 +38479,13 @@
     0.004423,
     -0.004755,
     -0.012527,
-    0.00045,
+    0.000451,
     0.002811,
     -0.005404,
     -0.004639,
     -0.003295,
     0.001024,
-    0.003857,
+    0.003858,
     -0.00136,
     -0.009685,
     0.000687,
@@ -38501,8 +38506,8 @@
     0.005826,
     -0.005025,
     0.006618,
-    -0.002961,
-    0.001709,
+    -0.002962,
+    0.00171,
     0.00579,
     -0.000226,
     -0.005792,
@@ -38520,12 +38525,12 @@
     -0.002539,
     0.010803,
     0.000686,
-    -0.000229,
+    -0.000228,
     0.011474,
     -0.005323,
     0.013199,
     0.005476,
-    0.001671,
+    0.00167,
     -0.00379,
     0.001005,
     -0.002346,
@@ -38541,9 +38546,9 @@
     -0.003724,
     0.008667,
     -0.010704,
-    -0.012998,
+    -0.012997,
     -0.001953,
-    -0.004956,
+    -0.004957,
     0.007712,
     0.002748,
     -0.005619,
@@ -39566,7 +39571,7 @@
     -0.000569,
     0.001399,
     -0.009808,
-    0.007913,
+    0.007912,
     0.002827,
     0.002268,
     0.007882,
@@ -39580,7 +39585,7 @@
     0.00195,
     0.008833,
     -0.005866,
-    0.015429,
+    0.015428,
     0.001726,
     -0.003995,
     -0.006294,
@@ -40835,8 +40840,8 @@
     -0.003221,
     0.016374,
     -0.005804,
-    0.007668,
-    0.002048,
+    0.007669,
+    0.002047,
     0.001301,
     0.002596,
     -0.007436,
@@ -40862,7 +40867,7 @@
     -0.004815,
     -0.00895,
     -0.000749,
-    0.006911,
+    0.006912,
     -0.000372,
     0.001303,
     -0.004847,
@@ -40916,7 +40921,7 @@
     -0.006385,
     -0.000183,
     -0.001649,
-    0.005486,
+    0.005485,
     0.012204,
     0.001986,
     0.005398,
@@ -40933,7 +40938,7 @@
     -0.007927,
     -0.019358,
     -0.001476,
-    0.004054,
+    0.004055,
     0.001287,
     -0.023041,
     0.004875,
@@ -40955,7 +40960,7 @@
     -0.02011,
     -0.000774,
     0.010592,
-    0.007443,
+    0.007444,
     -0.008402,
     0.006499,
     -0.034105,
@@ -40966,7 +40971,7 @@
     -0.002531,
     -0.001756,
     0.005647,
-    -0.005256,
+    -0.005257,
     -0.012967,
     -0.004757,
     -0.005379,
@@ -42053,7 +42058,7 @@
     -0.014512,
     -0.00867,
     0.006135,
-    -0.008111,
+    -0.00811,
     -0.010408,
     0.004691,
     0.015556,
@@ -42061,18 +42066,18 @@
     -0.003782,
     0.011302,
     0.009715,
-    -0.014381,
+    -0.01438,
     -0.005375,
     -0.018751,
     -0.002222,
     0.001287,
     -0.009282,
     -0.003903,
-    0.006379,
+    0.006378,
     -0.008039,
     0.004855,
     0.011509,
-    -0.000935,
+    -0.000934,
     0.0,
     -0.005978,
     0.000353,
@@ -42612,9 +42617,9 @@
      154.01,
      154.93,
      154.68,
-     156.34,
+     156.33,
      156.04,
-     156.34,
+     156.33,
      155.93,
      155.49,
      157.2,
@@ -42942,7 +42947,7 @@
      69.86,
      70.49,
      69.96,
-     72.0,
+     71.99,
      71.6,
      76.29,
      72.86,
@@ -43171,7 +43176,7 @@
      156.15,
      153.43,
      156.37,
-     156.34,
+     156.33,
      157.2,
      157.19,
      152.95,
@@ -43310,7 +43315,7 @@
     -0.02842,
     0.005353,
     0.014235,
-    -0.003842,
+    -0.003841,
     -0.015133,
     -0.01156,
     0.008875,
@@ -43330,10 +43335,10 @@
     -0.00395,
     0.007303,
     0.000945,
-    -0.004736,
+    -0.004737,
     0.003791,
     0.003414,
-    -0.000362,
+    -0.000363,
     0.005354,
     -0.009133,
     0.017254,
@@ -43380,7 +43385,7 @@
     0.00137,
     0.00777,
     0.022823,
-    0.014103,
+    0.014102,
     -0.000524,
     -0.005976,
     -0.000857,
@@ -43391,7 +43396,7 @@
     0.004195,
     0.022356,
     -0.002207,
-    -0.004873,
+    -0.004872,
     -0.015083,
     -0.006007,
     0.004654,
@@ -43400,8 +43405,8 @@
     -0.012012,
     -0.009755,
     0.014432,
-    0.009421,
-    0.00312,
+    0.00942,
+    0.003121,
     0.013155,
     -0.01309,
     -0.001819,
@@ -43409,14 +43414,14 @@
     0.00667,
     0.00657,
     -0.001998,
-    0.005212,
+    0.005213,
     0.001603,
     -0.001539,
     -0.000835,
     -0.005669,
     0.004576,
     -0.003027,
-    0.019482,
+    0.019481,
     0.009882,
     -0.009692,
     -0.005136,
@@ -43434,7 +43439,7 @@
     -0.007361,
     -0.00318,
     0.005963,
-    0.00612,
+    0.006121,
     -0.010265,
     0.012447,
     -0.007656,
@@ -43444,8 +43449,8 @@
     0.005905,
     -0.001601,
     0.010648,
-    -0.001905,
-    0.001905,
+    -0.001904,
+    0.001904,
     -0.002604,
     -0.002802,
     0.010908,
@@ -43466,7 +43471,7 @@
     0.008112,
     -0.009114,
     -0.016848,
-    -0.003609,
+    -0.003608,
     -0.008769,
     0.000242,
     0.000138,
@@ -44476,13 +44481,13 @@
     -0.001114,
     0.002115,
     0.004105,
-    0.017017,
+    0.017018,
     0.001958,
     -0.003483,
     0.000109,
     -0.016155,
     0.015937,
-    -0.014277,
+    -0.014276,
     -0.014147,
     -0.002471,
     0.010182,
@@ -44493,9 +44498,9 @@
     -0.006647,
     0.005636,
     0.009286,
-    -0.007152,
+    -0.007153,
     0.005704,
-    -0.008512,
+    -0.008511,
     0.017062,
     0.002871,
     -0.002981,
@@ -44514,14 +44519,14 @@
     -0.001637,
     0.018073,
     -0.004622,
-    -0.001617,
+    -0.001618,
     -0.005302,
     -0.001303,
     0.00217,
     -0.006525,
     0.000218,
-    0.005439,
-    -0.009884,
+    0.00544,
+    -0.009885,
     -0.002991,
     0.009826,
     0.00033,
@@ -44530,15 +44535,15 @@
     -0.005256,
     0.003726,
     -0.009452,
-    -0.003651,
-    -0.005222,
+    -0.00365,
+    -0.005223,
     -0.005474,
-    -0.012852,
+    -0.012853,
     0.006334,
     0.010208,
     0.014405,
     -0.003527,
-    0.006493,
+    0.006492,
     0.01004,
     -0.002827,
     0.004238,
@@ -44561,7 +44566,7 @@
     0.002123,
     -0.008294,
     0.004044,
-    -0.007877,
+    -0.007878,
     -0.004189,
     0.016094,
     0.002676,
@@ -44578,7 +44583,7 @@
     0.003595,
     0.004364,
     -0.001229,
-    0.003126,
+    0.003125,
     -0.007383,
     0.003698,
     -0.005271,
@@ -44992,6 +44997,33 @@
  "news": [
   {
    "source": "Investing.com",
+   "title": "Two dead, 19 wounded as Russia strikes Ukraine with missiles, drones",
+   "link": "https://www.investing.com/news/world-news/two-dead-19-wounded-as-russia-strikes-ukraine-with-missiles-drones-4787226",
+   "published": "2026-07-11T10:06:26Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Due morti, 19 feriti mentre la Russia colpisce l'Ucraina con missili e droni"
+  },
+  {
+   "source": "Investing.com",
+   "title": "China evacuates over one million as Typhoon Bavi nears",
+   "link": "https://www.investing.com/news/world-news/china-evacuates-over-one-million-as-typhoon-bavi-nears-4787223",
+   "published": "2026-07-11T09:18:28Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "La Cina evacua oltre un milione mentre il tifone Bavi si avvicina"
+  },
+  {
+   "source": "Investing.com",
    "title": "2027 French presidential election: Where do we stand now?",
    "link": "https://www.investing.com/news/economy-news/2027-french-presidential-election-where-do-we-stand-now-4787219",
    "published": "2026-07-11T07:57:26Z",
@@ -45030,34 +45062,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "L’Ucraina crea un comando militare a lungo raggio per intensificare gli attacchi contro la Russia"
-  },
-  {
-   "source": "Investing.com",
-   "title": "China temporarily bans helium exports as US-Iran tensions flare again",
-   "link": "https://www.investing.com/news/commodities-news/china-temporarily-bans-helium-exports-as-usiran-tensions-flare-again-4785887",
-   "published": "2026-07-11T05:06:08Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "La Cina vieta temporaneamente le esportazioni di elio mentre le tensioni tra Stati Uniti e Iran si riaccendono"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Trump says US, Iran agree to continue talks but ceasefire over",
-   "link": "https://www.investing.com/news/commodities-news/trump-says-us-iran-agree-to-continue-talks-but-ceasefire-over-4787214",
-   "published": "2026-07-11T04:48:28Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Trump afferma che Stati Uniti e Iran sono d’accordo nel proseguire i colloqui ma il cessate il fuoco è terminato"
   },
   {
    "source": "Investing.com",
@@ -45115,6 +45119,48 @@
    "title_it": "I rendimenti globali si stabilizzano dopo che lo scontro tra Stati Uniti e Iran ha innescato il picco più forte degli ultimi mesi"
   },
   {
+   "source": "CNBC",
+   "title": "Trump threatens to 'decimate' Iran if it tries to kill him, as Treasury sanctions alleged Iranian financier",
+   "link": "https://www.cnbc.com/2026/07/11/trump-threat.html",
+   "published": "2026-07-11T09:36:03Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump minaccia di “decimare” l’Iran se tenta di ucciderlo, mentre il Tesoro sanziona il presunto finanziere iraniano"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "China Tells Refiners to Keep Fuel Output High as Iran War Drags",
+   "link": "https://news.google.com/search?q=China%20Tells%20Refiners%20to%20Keep%20Fuel%20Output%20High%20as%20Iran%20War%20Drags",
+   "published": "2026-07-11T09:00:20Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "La Cina dice alle raffinerie di mantenere alta la produzione di carburante mentre la guerra con l’Iran si trascina"
+  },
+  {
+   "source": "AP",
+   "title": "Trump threatens Iran after Ayatollah Ali Khamenei’s funeral saw open calls for his killing - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQb29YUXh5MnNRTjVBazdXOUdMSkx5bkU0WHJFVFRGX1pyY0E5cWZfRXc5NnhQVjdOUVFzZTJFNkpBNlZpdUZIVGdoNk5ieU1sVUw1dDMwdkhSYWF4a0pKUk9nYVFMLW5HRFRjOUJTSTBuVEkxLTQ1X2NEZk5FWDMwV2lnRlBhYmhyY2FjQU82S2pnM2RQSEpfTjFwSXBlbk54OGdr?oc=5",
+   "published": "2026-07-11T07:36:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump minaccia l’Iran dopo che il funerale dell’Ayatollah Ali Khamenei ha visto aperte richieste per la sua uccisione – AP News"
+  },
+  {
    "source": "Bloomberg",
    "title": "China Power Load Hits Early Record as Data, EV Demand Rises",
    "link": "https://news.google.com/search?q=China%20Power%20Load%20Hits%20Early%20Record%20as%20Data%2C%20EV%20Demand%20Rises",
@@ -45128,10 +45174,10 @@
    "title_it": "Il carico di energia cinese raggiunge i primi record mentre i dati e la domanda di veicoli elettrici aumentano"
   },
   {
-   "source": "AP",
-   "title": "Trump threatens Iran after Ayatollah Ali Khamenei’s funeral saw open calls for his killing - AP News",
-   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQb29YUXh5MnNRTjVBazdXOUdMSkx5bkU0WHJFVFRGX1pyY0E5cWZfRXc5NnhQVjdOUVFzZTJFNkpBNlZpdUZIVGdoNk5ieU1sVUw1dDMwdkhSYWF4a0pKUk9nYVFMLW5HRFRjOUJTSTBuVEkxLTQ1X2NEZk5FWDMwV2lnRlBhYmhyY2FjQU82S2pnM2RQSEpfTjFwSXBlbk54OGdr?oc=5",
-   "published": "2026-07-11T05:56:00Z",
+   "source": "Reuters",
+   "title": "Trump says US, Iran agree to continue talks but ceasefire over - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOdDY4WWlhcGlFTE0zWE9HdXJlWnFJNXRhLWthUlFCZVdiVV91elpLUlh3Ni1UQUU2OXg2RXV0MUVWVHk0SE9CSFA4RjdOV05hTFRUX3ZEb3Z0OEJWNkYtdGR2ajRDR0FWS2xXaEhQeFNuLTZ0NXVKLS1mbklIQnpPT2VINnQ1ZmF5eDFHNXQtY01aSVVMYXkwTEh4RnlmRUthcjlGOG1LYndabUJ6NWc?oc=5",
+   "published": "2026-07-11T04:46:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -45139,7 +45185,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Trump minaccia l’Iran dopo che il funerale dell’Ayatollah Ali Khamenei ha visto aperte richieste per la sua uccisione – AP News"
+   "title_it": "Trump dice che Stati Uniti e Iran sono d'accordo nel proseguire i colloqui ma il cessate il fuoco è finito - Reuters"
   },
   {
    "source": "Reuters",
@@ -45197,20 +45243,6 @@
    "title_it": "Gli Stati Uniti chiedono all'Iran di dichiarare pubblicamente che lo Stretto di Hormuz è aperto e che Teheran non attaccherà più le navi - AP News"
   },
   {
-   "source": "CNBC",
-   "title": "Trump admin eases export controls for UAE; Warren blasts 'corrupt' provision",
-   "link": "https://www.cnbc.com/2026/07/10/trump-uae-mgx-crypto-export-commerce-warren.html",
-   "published": "2026-07-10T22:02:04Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L’amministratore Trump facilita i controlli sulle esportazioni per gli Emirati Arabi Uniti; Warren critica i provvedimenti “corrotti”."
-  },
-  {
    "source": "Bloomberg",
    "title": "Nuclear Energy Services Firm Holtec Joins Sector’s IPO Rush",
    "link": "https://news.google.com/search?q=Nuclear%20Energy%20Services%20Firm%20Holtec%20Joins%20Sector%E2%80%99s%20IPO%20Rush",
@@ -45237,19 +45269,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Gli Stati Uniti insistono affinché l'Iran si impegni a fermare gli attacchi nello stretto di Hormuz, dicono funzionari americani - Reuters"
-  },
-  {
-   "source": "CNBC",
-   "title": "S&P 500 closes higher to notch a winning week, helped by tech gains",
-   "link": "https://www.cnbc.com/2026/07/09/stock-market-today-live-updates.html",
-   "published": "2026-07-10T20:16:42Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bull",
-   "title_it": "L’S&P 500 chiude in rialzo registrando una settimana vincente, aiutato dai guadagni tecnologici"
   },
   {
    "source": "AP",
@@ -45511,20 +45530,6 @@
    "title_it": "Questi sono i 10 stati americani più economici per il 2026, dove è ancora possibile battere l’inflazione"
   },
   {
-   "source": "Reuters",
-   "title": "Iran has asked to continue talks and the US agreed, Trump says - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxQcUtqQnRSYkhpd2ZXamR3RVhpdVVWaWIwVFc4RGRNT2xzaUpaNEdkOENLbHN0SUU3Yzd3ZXZsT3k3WFhEcEpOZWZFbEhYSXFJbGpiYlpsRnp2MTAwc09DLThKOU1meXJBS0l1SXhyUHhGZmhUR0R4VFBjeG9lVUVGN1Jnd2RaQllDTC1EQnlNTEZEQzdqNFhkSE1CYTNYZk5KVTdlSm9iUQ?oc=5",
-   "published": "2026-07-10T14:46:28Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'Iran ha chiesto di proseguire i colloqui e gli Stati Uniti hanno acconsentito, dice Trump - Reuters"
-  },
-  {
    "source": "CNBC",
    "title": "These are America's 10 most expensive states for 2026, where inflation is punishing residents",
    "link": "https://www.cnbc.com/2026/07/10/10-most-expensive-places-to-live-america-top-states-for-business.html",
@@ -45536,6 +45541,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Questi sono i 10 stati più costosi d’America per il 2026, dove l’inflazione sta penalizzando i residenti"
+  },
+  {
+   "source": "CNBC",
+   "title": "The Club's top 10 things to watch in the stock market Friday",
+   "link": "https://www.cnbc.com/2026/07/10/the-clubs-top-10-things-to-watch-in-the-stock-market-friday.html",
+   "published": "2026-07-10T13:30:28Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Le 10 cose migliori da guardare in borsa venerdì secondo il Club"
   },
   {
    "source": "Yahoo Finance",
@@ -45562,20 +45580,6 @@
    "inv": false,
    "sentiment": "bull",
    "title_it": "Le azioni statunitensi salgono mentre Wall Street dimostra di essere ancora affamata di vincitori dell’intelligenza artificiale"
-  },
-  {
-   "source": "Bloomberg",
-   "title": "Wheat Soars as Ukraine Attacks on Russia Seen as Export Risk",
-   "link": "https://news.google.com/search?q=Wheat%20Soars%20as%20Ukraine%20Attacks%20on%20Russia%20Seen%20as%20Export%20Risk",
-   "published": "2026-07-10T04:07:17Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il grano vola mentre l’Ucraina attacca la Russia visto come un rischio per le esportazioni"
   },
   {
    "source": "Investing.com",
@@ -45647,7 +45651,7 @@
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 78%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-07-11T09:13:39Z",
+   "published": "2026-07-11T10:11:04Z",
    "tickers": [
     "MACRO"
    ],
@@ -45658,7 +45662,7 @@
    "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
    "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 22%",
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
-   "published": "2026-07-11T09:13:39Z",
+   "published": "2026-07-11T10:11:04Z",
    "tickers": [
     "MACRO"
    ],
@@ -77842,6 +77846,6 @@
   "alerts": [
    "umich: stale"
   ],
-  "generated_at": "2026-07-11T09:13:39Z"
+  "generated_at": "2026-07-11T10:11:05Z"
  }
 }
