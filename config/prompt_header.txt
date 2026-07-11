@@ -12,14 +12,10 @@ Valutazione Discorsiva: Raggruppa i titoli (es. Semiconduttori, Software, ecc.) 
 Azioni Operative: Per ogni titolo in portafoglio, dichiara chiaramente l'operazione suggerita (TRIM, MANTIENI, VENDI) e la relativa motivazione basata sui dati. Menzione d'obbligo ai livelli di Stop Ratchet attivi e alle soglie di sovraesposizione (>10% NAV).
 3. WATCHLIST E ALLOCAZIONE STRATEGICA DELLA LIQUIDITÀ
 Effettua un'analisi prospettica chiara e strutturata dei titoli monitorati, garantendo un'alta leggibilità attraverso elenchi o tabelle discorsive.
-I Grandi Esclusi (Scarti): Mappa i titoli da ignorare fornendo la motivazione tecnica o fondamentale del rifiuto (es. identificazione come "Value Trap" tramite Sortino Ratio < -0.3, ROIC negativo, Short Interest elevato).
+I Grandi Esclusi (Scarti): Mappa i titoli da ignorare fornendo la motivazione tecnica o fondamentale del rifiuto (es. identificazione come "Value Trap" tramite Sortino Ratio < -0.3, ROIC negativo, Short Interest elevato). I titoli marcati RIABILITATI dal veto Sortino (regola growth) NON sono scarti: trattali come candidati SORVEGLIATI, dichiarando sempre il trailing negativo accanto alla tesi di ripresa.
 Le Opportunità (Acquisti Suggeriti): Per le azioni promosse all'acquisto (COMPRA), fornisci un'argomentazione solida che leghi il fondamentale (es. EPS, P/E) al timing tecnico (supporti, Volumi Anomali, SMC).
-Impiego del Capitale: Dichiara il budget_operativo_spendibile disponibile (senza ricalcolarlo). Detraggi virtualmente da esso i controvalori degli ingressi suggeriti. Per ogni ingresso, indica tassativamente il Prezzo Limite (usando → agg. se presente), lo Stop Loss 2xATR e il Risk/Reward teorico forniti nel payload.
+Impiego del Capitale: Dichiara il budget_operativo_spendibile disponibile (senza ricalcolarlo). Detraggi virtualmente da esso i controvalori degli ingressi suggeriti. Il tetto per singolo ingresso è il MINORE tra il 10% del NAV e il budget residuo. Per ogni ingresso, indica tassativamente il Prezzo Limite (usando → agg. se presente), lo Stop Loss 2xATR e il Risk/Reward teorico forniti nel payload.
 4. MATRICE DI SINTESI DEI RISCHI (VISUAL SUMMARY)
 Per massimizzare l'impatto visivo nel PDF, chiudi il documento con una Tabella Markdown a 3 colonne elegante e riassuntiva:
 | Sorgente di Rischio (Macro o Specifico per Titolo) | Canale di Trasmissione sul Portafoglio | Contromisura Operativa Adottata |
 OBBLIGO DI RICERCA WEB (ANTI-PIGRIZIA): Se un dato Macro vitale è flaggato nel payload come [LAG TEMPORALE RILEVATO] o DATATO, avvia obbligatoriamente la ricerca web citando fonte e data esatta. Se fallisce, inserisci l'avviso per l'override manuale.
-Cosa abbiamo risolto con questa versione:
-Via libera alla lunghezza: Abbiamo rimosso i vecchi comandi che gli intimavano di "non riassumere" e di essere telegrafico.
-Dizionarietto Macro: L'istruzione "Per OGNI indicatore... fornisci una spiegazione sintetica del significato" forzerà l'AI a spiegare il "perché" dietro ogni numero (es. spiegherà perché un Forward P/E a 21.7x unito al Margin Debt al 100% è letale).
-Leggibilità del PDF: Imponendo gerarchie, raggruppamenti e la divisione tra "Grandi Esclusi" e "Opportunità" per la Watchlist, eviterai che il report si trasformi in un muro di testo noioso, rendendolo perfetto da stampare o salvare.

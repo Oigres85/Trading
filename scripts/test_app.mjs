@@ -150,6 +150,53 @@ check("cap sizing v110: TST1 (peso >10% NAV) NON è candidato ad accumulo, con m
   return !dv.accumula.some(r => r.ticker === "TST1") &&
     dv.reasons.some(s => s.includes("cap sizing") && s.includes("TST1"))`));
 
+// ---- RIABILITAZIONE GROWTH (v111): il veto Sortino è revocato SOLO con qualità+trend+RS ----
+check("riabilitazione growth: Sortino negativo MA ROE>15% + sopra SMA200 + RS>0 → eleggibile, tag RIABILITATO", run(`
+  const rehabRow = { ticker: "TSTR", currency: "USD", price: 100, sortino_1y: -0.8, sharpe_1y: -0.5,
+    sma200_dist_pct: 4.2, rs_ndx_1m: 3.5, stats: { roe: 0.30, profit_margin: 0.20, peg: 1.2 } };
+  const v = qualityVeto(rehabRow);
+  return v && v.rehab === true && v.verdict.includes("RIABILITATO") && v.rehabWhy.includes("SMA200")`));
+check("riabilitazione growth: RS negativa (MSFT-like) → veto Sortino CONFERMATO", run(`
+  const still = { ticker: "TSTM", currency: "USD", price: 100, sortino_1y: -1.4,
+    sma200_dist_pct: -8, rs_ndx_1m: -7.6, stats: { roe: 0.34, profit_margin: 0.39, peg: 1.2 } };
+  const v = qualityVeto(still);
+  return v && !v.rehab && v.verdict === "SCARTATO - VALUE TRAP"`));
+check("riabilitazione growth: short interest ≥15% NON è riabilitabile (rischio presente)", run(`
+  const shorty = { ticker: "TSTS", currency: "USD", price: 100, sortino_1y: -0.5,
+    sma200_dist_pct: 4, rs_ndx_1m: 5, stats: { roe: 0.30, profit_margin: 0.20, short_float: 0.18, peg: 1.2 } };
+  const v = qualityVeto(shorty);
+  return v && !v.rehab && v.why.some(w => w.includes("Short Interest"))`));
+check("decisionVerdict: riabilitato entra tra gli eleggibili e nei reasons come SORVEGLIATO", run(`
+  DATA.watchlist.push({ ticker: "TSTR", name: "Rehab Corp", currency: "USD", price: 100,
+    sortino_1y: -0.8, sharpe_1y: 2.2, rs_1m: 4, rs_ndx_1m: 3.5, sma200_dist_pct: 4.2, w52_dist_pct: -20,
+    support: 95, resistance: 120, rsi: 50, atr_14: 3, atr_pct: 3, vol_ratio: 1, fin_health: 75,
+    signal: "ok", signal_class: "good", sector: "Technology",
+    avg_corr: 0.2, max_corr: 0.4, max_corr_with: "TST1",
+    stats: { roe: 0.30, profit_margin: 0.20, revenue_growth: 0.25, peg: 1.2, market_cap: 1e9, avg_volume_30d: 1e7 },
+    sparks: {}, tech_by_range: {}, financials: [] });
+  const dv = decisionVerdict();
+  DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== "TSTR");
+  return dv.rehabbed.some(x => x.r.ticker === "TSTR") &&
+    !dv.excluded.some(x => x.r.ticker === "TSTR") &&
+    dv.reasons.some(s => s.includes("RIABILITATI") && s.includes("TSTR"))`));
+
+// ---- TRIM PEG-aware (v111, let winners run): P/E ottico alto ma PEG sano → niente trim ----
+check("trim growth: P/E 185 con PEG 1.2 (AMD-like) NON va in trim; PEG n.d. (CBRS-like) sì", run(`
+  DATA.portfolio.push(
+    { ticker: "TSTG", name: "Growth Winner", currency: "USD", qty: 10, pmc: 50, price: 100, bval: 1000,
+      pe: 185, rsi: 60, sharpe_1y: 2.0, sortino_1y: 2.5, support: 90, resistance: 120, vol_ratio: 1,
+      signal: "ok", signal_class: "good", sector: "Technology",
+      stats: { roe: 0.3, profit_margin: 0.2, peg: 1.2, market_cap: 1e9 }, sparks: {}, tech_by_range: {}, financials: [] },
+    { ticker: "TSTC", name: "Optical Multiple", currency: "USD", qty: 10, pmc: 50, price: 100, bval: 1000,
+      pe: 458, rsi: 60, sharpe_1y: 2.0, sortino_1y: 2.5, support: 90, resistance: 120, vol_ratio: 1,
+      signal: "ok", signal_class: "good", sector: "Technology",
+      stats: { roe: 0.3, profit_margin: 0.2, market_cap: 1e9 }, sparks: {}, tech_by_range: {}, financials: [] });
+  recomputeTotals();
+  const dv = decisionVerdict();
+  DATA.portfolio = DATA.portfolio.filter(r => !["TSTG","TSTC"].includes(r.ticker));
+  recomputeTotals();
+  return !dv.trim.some(r => r.ticker === "TSTG") && dv.trim.some(r => r.ticker === "TSTC")`));
+
 // riconciliazione broker (soglia volatility-aware)
 check("reconcile: baseline pulita (drift TST4 -25% sotto la banda 2σ con ATR 9%)", run(`
   reconcileState().needed === false`));

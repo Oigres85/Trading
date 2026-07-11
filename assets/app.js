@@ -1136,21 +1136,43 @@ function positionWeightPct(r) {
      margine netto negativo con PEG non calcolabile/negativo.
      (soglia -0.3 e non 0: uno Sharpe lievemente negativo in un mercato in drawdown è rumore,
      sotto -0.3 è distruzione sistematica di valore corretto per il rischio)
-   - NON ACCUMULARE se ROIC/ROE < 0 o PEG < 0 (qualità del capitale rotta). */
+   - NON ACCUMULARE se ROIC/ROE < 0 o PEG < 0 (qualità del capitale rotta).
+   - RIABILITAZIONE GROWTH (v111): il Sortino 12M guarda INDIETRO — dopo un crash marchia
+     VALUE TRAP proprio i titoli di qualità in recupero, quando un fondo growth dovrebbe
+     poterli ricomprare. Il veto Sortino (e SOLO quello) è revocato se il titolo prova la
+     ripresa su TRE assi insieme, tutti meccanici:
+       qualità intatta (ROE > 15% E margine netto > 0) · trend riparato (prezzo sopra
+       SMA200) · forza relativa 1M vs NDX positiva (batte il benchmark del mandato ORA).
+     Short interest alto e margini negativi NON sono riabilitabili: sono rischio presente,
+     non cicatrici del passato. Il riabilitato resta un SORVEGLIATO: viene dichiarato. */
 function qualityVeto(r) {
   const st = r.stats || {};
   const why = [];
   // metro del veto: SORTINO (downside deviation) — punisce la distruzione di valore reale,
   // non i rally; un titolo volatile al rialzo non finisce in value trap per lo Sharpe basso.
   // Fallback etichettato allo Sharpe finché la pipeline non popola sortino_1y.
+  let downside = null;
   if (r.sortino_1y != null) {
-    if (r.sortino_1y < -0.3) why.push(`Sortino 1A ${fmtNum.format(r.sortino_1y)} < -0.3 (distruzione di valore sul downside)`);
+    if (r.sortino_1y < -0.3) downside = `Sortino 1A ${fmtNum.format(r.sortino_1y)} < -0.3 (distruzione di valore sul downside)`;
   } else if (r.sharpe_1y != null && r.sharpe_1y < -0.3) {
-    why.push(`Sharpe 1A ${fmtNum.format(r.sharpe_1y)} < -0.3 (proxy: Sortino n.d. fino al prossimo run pipeline)`);
+    downside = `Sharpe 1A ${fmtNum.format(r.sharpe_1y)} < -0.3 (proxy: Sortino n.d. fino al prossimo run pipeline)`;
   }
   if (st.short_float != null && st.short_float >= 0.15) why.push(`Short Interest ${Math.round(st.short_float * 1000) / 10}% ≥ 15%`);
   const pegBroken = st.peg == null || st.peg <= 0;   // la pipeline azzera già i PEG ≤ 0 → n.d.
   if (st.profit_margin != null && st.profit_margin < 0 && pegBroken) why.push("margine netto negativo con PEG non calcolabile");
+  if (downside) {
+    const rsNow = r.rs_ndx_1m ?? r.rs_1m;
+    const rehab = !why.length &&
+      st.roe != null && st.roe > 0.15 &&
+      st.profit_margin != null && st.profit_margin > 0 &&
+      r.sma200_dist_pct != null && r.sma200_dist_pct > 0 &&
+      rsNow != null && rsNow > 0;
+    if (rehab) return {
+      verdict: "RIABILITATO (growth)", rehab: true, why: [downside],
+      rehabWhy: `ROE ${Math.round(st.roe * 100)}% · ${signTxt(Math.round(r.sma200_dist_pct * 10) / 10)} vs SMA200 · RS 1M vs NDX ${signTxt(Math.round(rsNow * 10) / 10, "pp")}`,
+    };
+    why.unshift(downside);
+  }
   if (why.length) return { verdict: "SCARTATO - VALUE TRAP", why };
   if (st.roe != null && st.roe < 0) return { verdict: "NON ACCUMULARE", why: ["ROIC/ROE negativo"] };
   if (st.peg != null && st.peg < 0) return { verdict: "NON ACCUMULARE", why: ["PEG negativo"] };
@@ -1164,12 +1186,17 @@ function decisionVerdict() {
   const ps = t.portfolio_sharpe_ratio;
   const universe = [...(DATA.portfolio || []), ...(DATA.watchlist || [])].filter(isEquity);
 
-  // 1) VETO fondamentale: value trap e qualità rotta escluse a prescindere dal drawdown
+  // 1) VETO fondamentale: value trap e qualità rotta escluse a prescindere dal drawdown.
+  //    I RIABILITATI (veto Sortino revocato dalla regola growth) tornano eleggibili ma
+  //    restano dichiarati come sorvegliati: trailing negativo, ripresa provata.
   const excluded = [];
   const eligible = [];
+  const rehabbed = [];
   universe.forEach(r => {
     const v = qualityVeto(r);
-    if (v) excluded.push({ r, ...v }); else eligible.push(r);
+    if (v && v.rehab) { rehabbed.push({ r, ...v }); eligible.push(r); }
+    else if (v) excluded.push({ r, ...v });
+    else eligible.push(r);
   });
 
   // 2) score quant 0-100 sui soli eleggibili: impatto marginale sullo Sharpe (40%),
@@ -1214,13 +1241,24 @@ function decisionVerdict() {
     .map(r => ({ r, w: positionWeightPct(r) }))
     .filter(x => x.w != null && x.w > 10)
     .sort((a, b) => b.w - a.w);
-  // alleggerimenti tattici: multipli tossici o ipercomprato estremo (solo posizioni possedute)
+  // alleggerimenti tattici: multipli NON GIUSTIFICATI dalla crescita o ipercomprato estremo
+  // (solo posizioni possedute). Mandato growth "let winners run" (v111): un P/E ottico alto
+  // con PEG ≤ 2 è crescita pagata al prezzo giusto, non un motivo di trim — si trimma quando
+  // anche la crescita non copre il multiplo (PEG > 2 o non calcolabile) o l'RSI è estremo.
   const trim = (DATA.portfolio || []).filter(isEquity)
-    .filter(r => r.qty && ((r.pe && r.pe > 150) || (r.rsi && r.rsi > 78)))
+    .filter(r => {
+      const peg = r.stats?.peg;
+      const unjustified = r.pe && r.pe > 150 && !(peg > 0 && peg <= 2);
+      return r.qty && (unjustified || (r.rsi && r.rsi > 78));
+    })
     .sort((a, b) => (b.pe || 0) - (a.pe || 0));
   // TAX ALPHA: posizioni in perdita latente con veto qualità → minusvalenze come scudo fiscale
+  // (i riabilitati NON sono candidati harvest: la regola growth dice tenerli, non venderli)
   const harvest = (DATA.portfolio || []).filter(isEquity)
-    .filter(r => r.qty && r.gain_eur != null && r.gain_eur < 0 && qualityVeto(r))
+    .filter(r => {
+      const v = r.qty && r.gain_eur != null && r.gain_eur < 0 ? qualityVeto(r) : null;
+      return v && !v.rehab;
+    })
     .sort((a, b) => a.gain_eur - b.gain_eur);
 
   // 4) piano operativo: ordini limite al supporto, stop a 2×ATR (volatilità, non % fissa)
@@ -1270,9 +1308,10 @@ function decisionVerdict() {
   }
   if (stopViolations.length) reasons.unshift(`⚠ STOP VIOLATO su ${stopViolations.map(x => `${x.r.ticker} (stop $${fmtNum.format(x.stop)}, prezzo $${fmtNum.format(x.r.price)})`).join(", ")} — il prezzo è sotto lo stop trailing ancorato: decidere uscita o ri-arm consapevole`);
   if (vetoTk.length) reasons.push(`VETO risk manager su ${vetoTk.join(", ")} — esclusi a prescindere dal supporto tecnico${vetoHeldNote}`);
+  if (rehabbed.length) reasons.push(`RIABILITATI dal veto Sortino (regola growth v111 — qualità intatta + prezzo sopra SMA200 + RS 1M vs NDX positiva, criteri tutti meccanici): ${rehabbed.map(x => `${x.r.ticker} (${x.why[0]}; MA ${x.rehabWhy})`).join(" · ")} — trattali da candidati SORVEGLIATI: il trailing 12M resta negativo, la ripresa è provata dai dati correnti`);
   if (overweight.length) reasons.push(`sizing: ${overweight.map(x => `${x.r.ticker} ${x.w}%`).join(", ")} oltre il 10% del NAV → valuta trimming di rientro`);
   if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => r.ticker).join(", ")} (multiplo/RSI estremo)`);
-  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, overweight, harvest };
+  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, overweight, harvest };
 }
 
 // alert proattivi: condizioni rilevanti emerse oggi (deep value, correzione, squeeze, VIX)
@@ -1361,6 +1400,11 @@ function openDecisionModal() {
     <h4 style="margin:12px 0 4px">Esclusi dal motore (veto risk manager)</h4>
     ${v.excluded.map(x => `<div class="info-line" style="font-size:12px"><b style="color:var(--red)">${x.r.ticker}</b> — <b>${x.verdict}</b>: ${x.why.join(" · ")}</div>`).join("")}
     <div class="info-line muted" style="font-size:11px;margin-top:2px">Nessun supporto tecnico può scavalcare il veto fondamentale.</div>` : "";
+  // RIABILITATI dal veto Sortino (regola growth v111): eleggibili ma dichiarati
+  const rehabHtml = (v.rehabbed || []).length ? `
+    <h4 style="margin:12px 0 4px">Riabilitati dal veto Sortino (regola growth)</h4>
+    ${v.rehabbed.map(x => `<div class="info-line" style="font-size:12px"><b style="color:var(--yellow)">${x.r.ticker}</b> — ${x.why.join(" · ")}; <b>MA</b> ${x.rehabWhy}</div>`).join("")}
+    <div class="info-line muted" style="font-size:11px;margin-top:2px">Il Sortino 12M guarda indietro: con qualità intatta (ROE&gt;15%, margini positivi), prezzo sopra SMA200 e RS 1M vs NDX positiva il titolo torna eleggibile — da SORVEGLIATO.</div>` : "";
   // tabella ALLEGGERIMENTO (vendita): prezzo limite di vendita, quantità, motivazione
   const trimHtml = (v.trim || []).length ? `
     <h4 style="margin:12px 0 4px">Vendite/alleggerimenti — TRIM parziale (Free Ride)</h4>
@@ -1393,7 +1437,7 @@ function openDecisionModal() {
   openInfoModal(`Decisione operativa: ${v.label}`,
     `<div class="info-line" style="margin-bottom:8px"><b style="color:${v.col};font-size:16px">${v.label}</b></div>
      <ul style="margin:0 0 10px 18px;font-size:12.5px;line-height:1.6">${v.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
-     ${accHtml}${trailHtml}${vetoHtml}${trimHtml}${taxHtml}
+     ${accHtml}${trailHtml}${vetoHtml}${rehabHtml}${trimHtml}${taxHtml}
      <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI. Obiettivo del motore: massimizzare il rendimento corretto per il rischio (Sharpe > 2.0) e sovraperformare il Nasdaq 100 — stesso mandato del prompt AI. Per l'analisi completa usa "Copia prompt AI".</div>
      <h4 style="margin:10px 0 6px">Diario delle azioni</h4>
      <div class="diary-add"><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
@@ -4217,6 +4261,7 @@ function buildPrompt() {
         dv.trailing.map(x => `${x.r.ticker} stop $${fmtNum.format(x.stop)} (${signTxt(Math.round((x.stop / x.r.price - 1) * 1000) / 10)}${x.violated ? " ⚠VIOLATO" : ""})`).join(" · ") + ".");
     }
     if ((dv.excluded || []).length) lines.push("· ESCLUSI dal veto risk manager (contesto): " + dv.excluded.map(x => `${x.r.ticker} → ${x.verdict} (${x.why.join(", ")})`).join(" · ") + ".");
+    if ((dv.rehabbed || []).length) lines.push("· RIABILITATI dal veto Sortino — regola growth v111 (contesto): " + dv.rehabbed.map(x => `${x.r.ticker} → ${x.why.join(", ")}; MA ${x.rehabWhy}`).join(" · ") + ". Il Sortino 12M è backward-looking: con qualità intatta, prezzo sopra SMA200 e RS positiva il titolo è di nuovo eleggibile all'accumulo, da SORVEGLIATO (dichiara sempre il trailing negativo).");
     if ((dv.overweight || []).length) lines.push("· Sizing oltre il 10% del NAV (candidati a trimming di rientro): " + dv.overweight.map(x => `${x.r.ticker} ${fmtNum.format(x.w)}%`).join(" · ") + ".");
     if ((dv.trim || []).length) lines.push("· Posizioni segnalate dal motore come tese (contesto): " + dv.trim.map(r => `${r.ticker} (${r.pe > 150 ? "P/E " + fmtNum.format(r.pe) : "RSI " + r.rsi})`).join(" · ") + ".");
     if ((dv.harvest || []).length) lines.push("· Minusvalenze latenti utilizzabili fiscalmente (contesto): " + dv.harvest.map(r => `${r.ticker} (${signTxt(Math.round(r.gain_eur), " €")})`).join(" · ") + ".");
