@@ -59,6 +59,28 @@ jobs:
         run: node scripts/log_verdict.mjs
         continue-on-error: true
 
+      # RED TEAM sui DATI FRESCHI (v116): gli invarianti finanziari del motore vengono
+      # verificati su tutte le combinazioni di stato UI PRIMA del commit. Un fallimento
+      # qui NON blocca i dati (il bug sarebbe nel codice, non nei prezzi) ma fa scattare
+      # l'allarme WhatsApp: mai più scoprire un limite d'ordine folle leggendo il report.
+      - name: Red team invarianti motore (dati freschi)
+        id: redteam
+        run: node scripts/redteam.mjs
+        continue-on-error: true
+      - name: Allarme red team
+        if: steps.redteam.outcome == 'failure'
+        run: python scripts/notify_alerts.py --custom "RED TEAM FALLITO sul run dati delle $(date -u +'%H:%M UTC'): il motore ha violato gli invarianti finanziari con i dati freschi. NON usare il report finché non controlli la tab Actions."
+        continue-on-error: true
+        env:
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          GITHUB_TOKEN: ${{ github.token }}
+
       # notifiche alert (v113): stop violati / data quality / setup squeeze. Canali:
       # WhatsApp CallMeBot → email SMTP → GitHub Issue (fallback senza secret).
       # ANTI-FRAGILE: lo script esce sempre 0; continue-on-error come seconda cintura.

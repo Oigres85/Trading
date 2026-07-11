@@ -27,6 +27,7 @@ import os
 import sys
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -132,14 +133,42 @@ def send_github_issue(msg):
     return ok
 
 
-def main():
-    data = json.loads(DATA.read_text())
-    state = {}
+def _load_state():
     if STATE.exists():
         try:
-            state = json.loads(STATE.read_text())
+            return json.loads(STATE.read_text())
         except Exception:  # noqa: BLE001 — stato corrotto: si riparte da zero
-            state = {}
+            return {}
+    return {}
+
+
+def send_custom(text):
+    """Modalità --custom (v116): messaggio diretto in cascata canali, usata dal RED TEAM
+    in CI quando gli invarianti del motore falliscono su dati freschi. Dedup per
+    giorno+testo: un workflow rotto che gira ogni ora non deve spammare WhatsApp."""
+    state = _load_state()
+    sig = datetime.now(timezone.utc).strftime("%Y-%m-%d") + "|" + text[:120]
+    if state.get("last_custom") == sig:
+        print("notify: custom già inviato oggi (dedup)")
+        return
+    msg = "⚠ TRADING DASHBOARD — RED TEAM\n" + text
+    for channel in (send_whatsapp, send_email, send_github_issue):
+        try:
+            if channel(msg):
+                state["last_custom"] = sig
+                STATE.write_text(json.dumps(state, indent=1))
+                return
+        except Exception as e:  # noqa: BLE001
+            print(f"!! notify {channel.__name__}: {e}", file=sys.stderr)
+    print("!! notify custom: nessun canale riuscito", file=sys.stderr)
+
+
+def main():
+    if len(sys.argv) >= 3 and sys.argv[1] == "--custom":
+        send_custom(sys.argv[2])
+        return
+    data = json.loads(DATA.read_text())
+    state = _load_state()
     current = collect_alerts(data)
     new = diff_alerts(current, state.get("last_alerted"))
     msg = build_message(new, data)

@@ -4485,7 +4485,8 @@ function buildPrompt() {
     // Banda di plausibilità v115: un supporto sotto il 50% del prezzo è preistoria/garbage
     // → il R/R che ne uscirebbe è spazzatura con la virgola: meglio n.d.
     let rrCell = isIndex ? null : (r.risk_reward ?? null);
-    if (rrCell == null && !isIndex && r.support && r.resistance && r.support > 0 && r.price > 0 && r.support >= r.price * 0.5) {
+    if (rrCell == null && !isIndex && r.support && r.resistance && r.support > 0 && r.price > 0
+        && r.support >= r.price * 0.5 && r.resistance <= r.price * 2) {   // resistenza >2× il prezzo = garbage (v116)
       const aObj = atrOf(r);
       if (aObj && aObj.atr > 0) {
         const reward = r.resistance - r.support, risk = 2 * aObj.atr;

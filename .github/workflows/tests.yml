@@ -21,6 +21,12 @@ jobs:
           node --check assets/app.js
           node scripts/test_app.mjs
 
+      # RED TEAM (v116, gate HARD): invarianti finanziari su tutte le combinazioni di
+      # stato UI × scenari di dati avvelenati. Codice che può produrre un ordine
+      # impossibile (incidente SNDK: limite $40,1 / stop -$366) NON si pusha.
+      - name: Red team invarianti motore
+        run: node scripts/redteam.mjs
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
