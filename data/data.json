@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-07-11T17:01:56Z",
+ "updated_at": "2026-07-11T20:39:03Z",
  "eurusd": 1.1419,
  "totals": {
   "usd_value": 292824.47,
@@ -2530,7 +2530,7 @@
    "price": 979.3,
    "price_asof": "2026-07-10",
    "change_pct": -1.24,
-   "pe": 22.4,
+   "pe": 22.1,
    "ath": 1254.81,
    "ath_dist_pct": -22,
    "sma200_dist_pct": 110.9,
@@ -3378,7 +3378,7 @@
     "upside_pct": 51.7
    },
    "health": 74,
-   "eps": 43.68,
+   "eps": 44.26,
    "beta": 2.14,
    "sharpe_1y": 2.72,
    "sortino_1y": 4.46,
@@ -3398,9 +3398,9 @@
     "float_shares": 1125304748,
     "float_pct": 99.6,
     "avg_volume_30d": 51215483,
-    "pe_ttm": 22.4199,
+    "pe_ttm": 22.1261,
     "forward_pe": 6.5444,
-    "eps_ttm": 43.68,
+    "eps_ttm": 44.26,
     "eps_forward": 149.6385,
     "revenue_fy": 90273996800,
     "net_income_fy": 50468999168,
@@ -5914,7 +5914,7 @@
      198.72,
      191.95,
      159.85,
-     157.72,
+     157.71,
      161.51,
      134.5,
      92.35,
@@ -10822,23 +10822,23 @@
    "name": "Bitcoin",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 64129.99,
+   "price": 64307.87,
    "price_asof": "2026-07-11",
-   "change_pct": 0,
+   "change_pct": 0.28,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -49.2,
-   "sma200_dist_pct": -13.3,
-   "sma50_dist_pct": -1.6,
+   "ath_dist_pct": -49,
+   "sma200_dist_pct": -13.1,
+   "sma50_dist_pct": -1.3,
    "w52_high": 126198.07,
-   "w52_dist_pct": -49.2,
+   "w52_dist_pct": -49,
    "support": 57747.77,
    "resistance": 65544,
-   "rsi": 53.8,
-   "volume": 16582110208,
+   "rsi": 54.5,
+   "volume": 14045231104,
    "vol_ratio": 0.99,
    "atr_14": 1993.06,
-   "atr_pct": 3.11,
+   "atr_pct": 3.1,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -10847,7 +10847,7 @@
      62257.57,
      63193.15,
      64127.14,
-     64129.99
+     64307.87
     ],
     "m6": [
      65969.78,
@@ -10975,7 +10975,7 @@
      62257.57,
      63193.15,
      64127.14,
-     64129.99
+     64307.87
     ],
     "all": [
      386.94,
@@ -11120,7 +11120,7 @@
      76304.32,
      73579.69,
      58558.86,
-     64129.99
+     64307.87
     ],
     "m1": [
      64239.68,
@@ -11144,7 +11144,7 @@
      62257.57,
      63193.15,
      64127.14,
-     64129.99
+     64307.87
     ],
     "m3": [
      80009.99,
@@ -11212,7 +11212,7 @@
      62257.57,
      63193.15,
      64127.14,
-     64129.99
+     64307.87
     ],
     "y1": [
      117516.99,
@@ -11288,7 +11288,7 @@
      60016.43,
      60003.76,
      63995.02,
-     64129.99
+     64307.87
     ],
     "d1": [
      64058.85,
@@ -11393,20 +11393,41 @@
      64172.23,
      64095.91,
      64075.63,
-     64129.99
+     64141.57,
+     64166,
+     64167.24,
+     64330.57,
+     64307.88,
+     64273.11,
+     64257.89,
+     64267.84,
+     64323.18,
+     64311.09,
+     64310.08,
+     64253.96,
+     64265.17,
+     64279.99,
+     64297.39,
+     64195.42,
+     64225.27,
+     64238.71,
+     64270.01,
+     64282.85,
+     64294.17,
+     64301.99
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 41,
+   "health": 42,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -1.27,
+   "sharpe_1y": -1.26,
    "sortino_1y": -1.63,
-   "sharpe_6m": -0.42,
-   "sortino_6m": -0.57,
+   "sharpe_6m": -0.4,
+   "sortino_6m": -0.55,
    "prepost": null,
-   "prezzo_limite_aggiustato": 64129.99,
+   "prezzo_limite_aggiustato": 64307.87,
    "risk_reward": "1:2.0",
    "sector": "Altro",
    "stats": null,
@@ -11414,22 +11435,22 @@
     "w1": {
      "support": 61492.65,
      "resistance": 64658.97,
-     "change_pct": 1.32
+     "change_pct": 1.6
     },
     "m1": {
      "support": 57747.77,
      "resistance": 65544,
-     "change_pct": -0.17
+     "change_pct": 0.11
     },
     "m3": {
      "support": 57747.77,
      "resistance": 82430.17,
-     "change_pct": -19.85
+     "change_pct": -19.63
     },
     "y1": {
      "support": 57747.77,
      "resistance": 111167.31,
-     "change_pct": -42.04
+     "change_pct": -41.88
     }
    },
    "financials": [],
@@ -11446,7 +11467,7 @@
      "lo": 63422.94,
      "hi": 63964.97
     },
-    "liq_above": 64185.77,
+    "liq_above": 64597.57,
     "liq_below": 62201.14,
     "order_block": {
      "dir": "rialzista",
@@ -11454,9 +11475,9 @@
      "hi": 59940.35
     }
    },
-   "rs_1m": -2.7,
+   "rs_1m": -2.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -2.7,
+   "rs_ndx_1m": -2.4,
    "beta_ndx": 0.94,
    "avg_corr": 0.35,
    "max_corr": 0.79,
@@ -15214,7 +15235,7 @@
      26.61,
      22.82,
      27.25,
-     24.73,
+     24.72,
      24.53,
      27.42,
      26.09,
@@ -17608,7 +17629,7 @@
   },
   {
    "ticker": "CRCL",
-   "name": "Circle Internet Group, In…",
+   "name": "CRCL",
    "currency": "USD",
    "price_src": "yahoo",
    "price": 66.14,
@@ -17970,56 +17991,47 @@
     ]
    },
    "earnings_date": "2026-08-11",
-   "rating": {
-    "key": "buy",
-    "n": 22,
-    "target": 133.71,
-    "upside_pct": 102.2
-   },
+   "rating": null,
    "health": 20,
-   "eps": -0.23,
+   "eps": null,
    "beta": null,
    "sharpe_1y": -1.12,
    "sortino_1y": -1.59,
    "sharpe_6m": -0.41,
    "sortino_6m": -0.6,
-   "prepost": {
-    "label": "after",
-    "price": 66.64,
-    "change_pct": 0.76
-   },
-   "prezzo_limite_aggiustato": 66.64,
+   "prepost": null,
+   "prezzo_limite_aggiustato": 66.14,
    "risk_reward": "1:1.9",
-   "sector": "Financial Services",
+   "sector": "Altro",
    "stats": {
-    "market_cap": 17678606336,
-    "shares": 229857799,
-    "float_shares": 190866619,
-    "float_pct": 83,
-    "avg_volume_30d": 15052053,
+    "market_cap": null,
+    "shares": null,
+    "float_shares": null,
+    "float_pct": null,
+    "avg_volume_30d": null,
     "pe_ttm": null,
-    "forward_pe": 34.9278,
-    "eps_ttm": -0.23,
-    "eps_forward": 1.8936,
-    "revenue_fy": 2862202112,
-    "net_income_fy": -14255000,
-    "revenue_growth": 0.2,
-    "earnings_growth": -0.809,
-    "profit_margin": -0.0276,
-    "roe": -0.0298,
-    "debt_to_equity": 0.431,
+    "forward_pe": null,
+    "eps_ttm": null,
+    "eps_forward": null,
+    "revenue_fy": null,
+    "net_income_fy": null,
+    "revenue_growth": null,
+    "earnings_growth": null,
+    "profit_margin": null,
+    "roe": null,
+    "debt_to_equity": null,
     "dividend_yield": null,
-    "price_to_book": 4.7792,
-    "target_mean": 133.7114,
-    "fcf": -141372752,
-    "gross_margin": 0.0811,
-    "enterprise_value": 14939743232,
-    "ev_ebitda": -112.004,
-    "peg": 4.34,
-    "roa": -0.0013,
-    "short_float": 0.0971,
-    "altman_z": 0.39,
-    "altman_missing": 0,
+    "price_to_book": null,
+    "target_mean": null,
+    "fcf": null,
+    "gross_margin": null,
+    "enterprise_value": null,
+    "ev_ebitda": null,
+    "peg": null,
+    "roa": null,
+    "short_float": null,
+    "altman_z": 0.14,
+    "altman_missing": 1,
     "altman_model": "Z''"
    },
    "tech_by_range": {
@@ -22352,9 +22364,9 @@
     "float_pct": 99.6,
     "avg_volume_30d": 9231464,
     "pe_ttm": 56.8396,
-    "forward_pe": 36.4535,
+    "forward_pe": 36.169,
     "eps_ttm": 10.6,
-    "eps_forward": 16.5279,
+    "eps_forward": 16.6579,
     "revenue_fy": 29024000000,
     "net_income_fy": 8508000256,
     "revenue_growth": 0.114,
@@ -29623,11 +29635,11 @@
    "symbol": "SPY",
    "name": "S&P 500 ETF",
    "ratio": 1.08,
-   "puts": 903932,
-   "calls": 836811
+   "puts": 903877,
+   "calls": 836108
   },
   "risk_sentiment": {
-   "score": 55,
+   "score": 56,
    "label": "Neutrale",
    "components": [
     {
@@ -29644,7 +29656,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 50
+     "score": 53
     },
     {
      "label": "Treasury 10A",
@@ -33256,7 +33268,7 @@
      214.47,
      215.1,
      219.43,
-     224.6,
+     224.61,
      231.47,
      234.28,
      247.48,
@@ -33614,7 +33626,7 @@
     0.000143,
     0.008471,
     0.000331,
-    0.004216,
+    0.004215,
     -0.000251,
     -0.002641,
     -0.00126,
@@ -33642,7 +33654,7 @@
     -0.005982,
     -0.007438,
     0.005405,
-    0.008323,
+    0.008322,
     -0.0029,
     0.002454,
     0.002309,
@@ -36084,7 +36096,7 @@
     -0.007126,
     -0.004056,
     0.008275,
-    0.015157,
+    0.015158,
     -0.013904,
     0.003706,
     -0.001159,
@@ -36117,10 +36129,10 @@
     0.012419,
     0.004975,
     0.002017,
-    -0.005893,
+    -0.005894,
     -0.001775,
-    0.018315,
-    -0.010268,
+    0.018314,
+    -0.010269,
     0.004229,
     -0.001648,
     0.002557,
@@ -36166,14 +36178,14 @@
     -0.00246,
     -0.028518,
     0.00291,
-    -0.020075,
+    -0.020076,
     0.003046,
     -0.000171,
     -0.01868,
     0.027933,
     0.018087,
     0.021567,
-    0.008813,
+    0.008814,
     0.005846,
     -0.012663,
     -0.001834,
@@ -36184,7 +36196,7 @@
     0.002071,
     0.013513,
     0.011666,
-    -0.015441,
+    -0.01544,
     -0.007592,
     -0.004743,
     -0.010701,
@@ -36223,8 +36235,8 @@
     -0.018166,
     0.035292,
     0.006994,
-    -0.002702,
-    -0.004556,
+    -0.002701,
+    -0.004557,
     -0.02063,
     0.013091,
     0.000304,
@@ -37942,7 +37954,7 @@
      42.73,
      40.07,
      39.96,
-     40.38,
+     40.39,
      41,
      42.71,
      43.12,
@@ -38183,7 +38195,7 @@
      80.1,
      82.41,
      83.91,
-     86.95,
+     86.96,
      88.79,
      90.57,
      85.63,
@@ -38460,7 +38472,7 @@
     0.00141,
     -0.000235,
     0.001526,
-    0.008876,
+    0.008877,
     0.006028,
     -0.005563,
     -0.001745,
@@ -38469,14 +38481,14 @@
     0.016745,
     -0.005167,
     0.000575,
-    0.014117,
+    0.014116,
     0.002729,
     0.003061,
     -0.00579,
     -0.00171,
     -0.004344,
     0.001145,
-    -0.005048,
+    -0.005047,
     0.008246,
     -0.007442,
     -0.00715,
@@ -38486,11 +38498,11 @@
     -0.004964,
     0.007379,
     -0.002876,
-    -0.000576,
+    -0.000577,
     -0.001153,
     0.006557,
     -0.007134,
-    -0.00747,
+    -0.007469,
     0.010918,
     0.007595,
     0.015132,
@@ -38505,46 +38517,46 @@
     -0.010373,
     -0.001908,
     -0.003601,
-    0.006966,
+    0.006965,
     -0.003814,
     0,
     -0.0009,
     0.008178,
     -0.002905,
     0.002579,
-    0.002907,
+    0.002908,
     -0.0019,
     -0.007975,
     0.005735,
-    0.000785,
-    -0.000785,
+    0.000784,
+    -0.000784,
     0.016018,
     -0.000552,
     0.003197,
     -0.002204,
-    0.007472,
+    0.007473,
     -0.001534,
-    0.00383,
+    0.003831,
     0.004903,
     0.000652,
     -0.006867,
     0.000437,
     0.003383,
-    0.002612,
+    0.002611,
     -0.010158,
     -0.005835,
     -0.002986,
     -0.002504,
     0.002226,
     -0.010956,
-    0.008953,
+    0.008952,
     -0.002119,
     -0.000223,
     0.004568,
     0.001777,
     -0.008245,
     -0.005722,
-    0.002473,
+    0.002472,
     -0.000337,
     -0.002023,
     0.00393,
@@ -38554,13 +38566,13 @@
     0.004423,
     -0.004755,
     -0.012527,
-    0.000451,
+    0.00045,
     0.002811,
     -0.005404,
     -0.004639,
     -0.003295,
     0.001024,
-    0.003858,
+    0.003857,
     -0.00136,
     -0.009685,
     0.000687,
@@ -38582,7 +38594,7 @@
     -0.005025,
     0.006618,
     -0.002961,
-    0.001709,
+    0.00171,
     0.005791,
     -0.000226,
     -0.005792,
@@ -38592,21 +38604,21 @@
     0.002733,
     0.004765,
     -0.006245,
-    -0.002281,
+    -0.00228,
     0.000228,
     -0.005608,
     -0.002861,
     0.002423,
     -0.002539,
-    0.010803,
+    0.010804,
     0.000686,
-    -0.000229,
+    -0.000228,
     0.011474,
     -0.005323,
     0.013199,
     0.005476,
-    0.00167,
-    -0.003791,
+    0.001671,
+    -0.00379,
     0.001005,
     -0.002346,
     0.003684,
@@ -38637,9 +38649,9 @@
     0.013224,
     -0.001038,
     -0.000985,
-    0.006126,
+    0.006125,
     -0.001614,
-    -0.000116,
+    -0.000115,
     0.003227,
     -0.002534,
     -0.002425,
@@ -39660,7 +39672,7 @@
     0.012069,
     0.001949,
     0.008833,
-    -0.005866,
+    -0.005865,
     0.015429,
     0.001726,
     -0.003995,
@@ -39670,13 +39682,13 @@
     -0.007168,
     -0.00265,
     0.01757,
-    -0.002438,
-    0.005114,
+    -0.002437,
+    0.005113,
     0.007001,
     0.009867,
     -0.015446,
     -0.010398,
-    0.004469,
+    0.00447,
     0.006674,
     0.00179,
     0.008734,
@@ -39689,7 +39701,7 @@
     -0.003694,
     0.017599,
     0.009299,
-    0.016034,
+    0.016035,
     -0.01033,
     -0.007402,
     -0.003022,
@@ -40897,7 +40909,7 @@
     -0.000565,
     0.006948,
     -0.006948,
-    -0.005101,
+    -0.0051,
     -0.001896,
     -0.006282,
     -0.018696,
@@ -40944,7 +40956,7 @@
     -0.004815,
     -0.00895,
     -0.000749,
-    0.006912,
+    0.006911,
     -0.000372,
     0.001303,
     -0.004847,
@@ -42144,9 +42156,9 @@
     -0.003782,
     0.011302,
     0.009715,
-    -0.01438,
+    -0.014381,
     -0.005375,
-    -0.018751,
+    -0.01875,
     -0.002222,
     0.001287,
     -0.009282,
@@ -42155,11 +42167,11 @@
     -0.008039,
     0.004855,
     0.011509,
-    -0.000934,
+    -0.000935,
     0,
     -0.005978,
     0.000353,
-    0.008311,
+    0.00831,
     0.006854,
     0.02017,
     0.002606,
@@ -42213,10 +42225,10 @@
     0.007289,
     0.000113,
     -0.010837,
-    0.002634,
+    0.002635,
     0.009676,
     0.014285,
-    0.009005,
+    0.009006,
     0.012976,
     -0.014083,
     0.002545,
@@ -42237,7 +42249,7 @@
     -0.004129,
     -0.010948,
     0.006146,
-    0.010448,
+    0.010449,
     -0.004775,
     -0.009839,
     -0.007056,
@@ -42252,7 +42264,7 @@
     0.009457,
     0.007591,
     -0.005576,
-    0.020807,
+    0.020806,
     0.026801,
     -0.02702,
     -0.011237,
@@ -42283,7 +42295,7 @@
     -0.018356,
     0.006831,
     -0.011101,
-    0.018982,
+    0.018981,
     0.007275,
     -0.005452,
     0.004908,
@@ -42299,7 +42311,7 @@
     -0.004429,
     -0.012867,
     0.024517,
-    0.009259,
+    0.009258,
     0.003298,
     0.00346,
     0.01048,
@@ -42696,9 +42708,9 @@
      154.01,
      154.93,
      154.68,
-     156.34,
+     156.33,
      156.04,
-     156.34,
+     156.33,
      155.93,
      155.49,
      157.2,
@@ -43255,7 +43267,7 @@
      156.15,
      153.43,
      156.37,
-     156.34,
+     156.33,
      157.2,
      157.19,
      152.95,
@@ -43392,7 +43404,7 @@
     -0.006377,
     -0.001787,
     -0.02842,
-    0.005353,
+    0.005352,
     0.014235,
     -0.003842,
     -0.015133,
@@ -43405,11 +43417,11 @@
     0.016656,
     -0.002352,
     0.006382,
-    0.005397,
+    0.005396,
     -0.003351,
     0.008212,
     -0.01436,
-    0.006221,
+    0.006222,
     -0.000584,
     -0.00395,
     0.007303,
@@ -43417,7 +43429,7 @@
     -0.004736,
     0.003791,
     0.003414,
-    -0.000362,
+    -0.000363,
     0.005354,
     -0.009133,
     0.017254,
@@ -43441,14 +43453,14 @@
     0.000763,
     0.001939,
     -0.002217,
-    -0.01453,
+    -0.014531,
     -0.001127,
     0.002744,
     0.001544,
     -0.001685,
     0.006653,
-    0.010554,
-    0.002345,
+    0.010553,
+    0.002346,
     0.005703,
     0.000548,
     -0.000068,
@@ -43461,7 +43473,7 @@
     0.00449,
     0.003852,
     0.00192,
-    0.001369,
+    0.00137,
     0.00777,
     0.022823,
     0.014102,
@@ -43481,9 +43493,9 @@
     0.004654,
     -0.007638,
     -0.004167,
-    -0.012013,
+    -0.012012,
     -0.009755,
-    0.014433,
+    0.014432,
     0.00942,
     0.003121,
     0.013155,
@@ -43493,14 +43505,14 @@
     0.00667,
     0.00657,
     -0.001998,
-    0.005212,
+    0.005213,
     0.001603,
     -0.001539,
     -0.000835,
     -0.005669,
     0.004576,
     -0.003027,
-    0.019482,
+    0.019481,
     0.009882,
     -0.009692,
     -0.005136,
@@ -43518,7 +43530,7 @@
     -0.007361,
     -0.00318,
     0.005963,
-    0.00612,
+    0.006121,
     -0.010265,
     0.012447,
     -0.007656,
@@ -43528,8 +43540,8 @@
     0.005905,
     -0.001601,
     0.010648,
-    -0.001905,
-    0.001905,
+    -0.001904,
+    0.001904,
     -0.002604,
     -0.002802,
     0.010908,
@@ -43550,7 +43562,7 @@
     0.008112,
     -0.009114,
     -0.016848,
-    -0.003609,
+    -0.003608,
     -0.008769,
     0.000242,
     0.000138,
@@ -44558,10 +44570,10 @@
     0.006441,
     -0.014832,
     0.009393,
-    -0.001113,
+    -0.001114,
     0.002115,
     0.004105,
-    0.017017,
+    0.017018,
     0.001958,
     -0.003483,
     0.000109,
@@ -44580,7 +44592,7 @@
     0.009286,
     -0.007153,
     0.005704,
-    -0.008511,
+    -0.008512,
     0.017062,
     0.002871,
     -0.002981,
@@ -44616,7 +44628,7 @@
     0.003726,
     -0.009452,
     -0.003651,
-    -0.005223,
+    -0.005222,
     -0.005474,
     -0.012852,
     0.006334,
@@ -44631,14 +44643,14 @@
     0.002925,
     0.002809,
     -0.019831,
-    -0.026088,
+    -0.026089,
     0.004733,
     0.002582,
     -0.001459,
     0.001683,
     0.000896,
     -0.004828,
-    0.015413,
+    0.015412,
     -0.000554,
     0.011138,
     -0.007485,
@@ -44646,7 +44658,7 @@
     0.002123,
     -0.008294,
     0.004044,
-    -0.007878,
+    -0.007877,
     -0.004189,
     0.016094,
     0.002676,
@@ -44673,7 +44685,7 @@
     0.006556,
     0.001126,
     0.002024,
-    0.00202,
+    0.002019,
     -0.008216,
     0.000339,
     0.002257,
@@ -44682,7 +44694,7 @@
     0.008887,
     0.002014,
     0.00134,
-    0.005565,
+    0.005566,
     0.008621,
     0.006909,
     0.012166,
@@ -44709,7 +44721,7 @@
     -0.011798,
     -0.002122,
     0.007511,
-    0.000105,
+    0.000106,
     0.002526,
     -0.002737,
     0.006828,
@@ -45064,11 +45076,6 @@
  ],
  "predictions": [
   {
-   "question": "Iasi: Zsombor Piros vs Jerome Kym",
-   "yes": 74,
-   "link": "https://polymarket.com/event/atp-piros-kym-2026-07-11"
-  },
-  {
    "question": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "yes": 78,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting"
@@ -45077,63 +45084,9 @@
  "news": [
   {
    "source": "Investing.com",
-   "title": "Trump says he ’just finished’ a physical at Walter Reed",
-   "link": "https://www.investing.com/news/politics-news/trump-says-he-just-finished-a-physical-at-walter-reed-4787291",
-   "published": "2026-07-11T16:48:51Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Trump dice di aver “appena terminato” una visita medica al Walter Reed"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Typhoon Bavi makes landfall in eastern China’s Taizhou after nearly 2 million evacuated",
-   "link": "https://www.investing.com/news/world-news/china-evacuates-over-one-million-as-typhoon-bavi-nears-4787223",
-   "published": "2026-07-11T16:48:31Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Il tifone Bavi si è abbattuto a Taizhou, nella Cina orientale, dopo aver evacuato quasi 2 milioni di persone"
-  },
-  {
-   "source": "Investing.com",
-   "title": "China’s Q2 slowdown worsened by ’de facto’ fiscal austerity, Citi says",
-   "link": "https://www.investing.com/news/economy-news/chinas-q2-slowdown-worsened-by-de-facto-fiscal-austerity-citi-says-4787290",
-   "published": "2026-07-11T16:42:46Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "bear",
-   "title_it": "Il rallentamento della Cina nel secondo trimestre è peggiorato dall’austerità fiscale “de facto”, afferma Citi"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Six dead, dozens wounded as Russia strikes Ukraine with missiles, drones",
-   "link": "https://www.investing.com/news/world-news/two-dead-19-wounded-as-russia-strikes-ukraine-with-missiles-drones-4787226",
-   "published": "2026-07-11T16:42:24Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Sei morti, decine di feriti mentre la Russia colpisce l'Ucraina con missili e droni"
-  },
-  {
-   "source": "Investing.com",
    "title": "Trump administration subpoenas New York Times journalists over Air Force One story, newspaper says",
    "link": "https://www.investing.com/news/politics-news/trump-administration-subpoenas-new-york-times-journalists-over-air-force-one-story-newspaper-says-4787287",
-   "published": "2026-07-11T16:00:32Z",
+   "published": "2026-07-11T20:06:26Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -45142,6 +45095,48 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "L'amministrazione Trump cita in giudizio i giornalisti del New York Times per la storia dell'Air Force One, dice il giornale"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Russian strikes kill seven, wound dozens, Ukraine’s Zelenskiy seeks faster weapons deliveries",
+   "link": "https://www.investing.com/news/world-news/two-dead-19-wounded-as-russia-strikes-ukraine-with-missiles-drones-4787226",
+   "published": "2026-07-11T19:30:29Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Gli attacchi russi uccidono sette persone e ne feriscono dozzine, l’ucraino Zelenskiy cerca consegne di armi più rapide"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Iran’s Khamenei vows revenge as Trump warns of devastating U.S. response",
+   "link": "https://www.investing.com/news/economy-news/trump-threatens-to-decimate-iran-as-us-steps-up-military-diplomatic-pressure-4787217",
+   "published": "2026-07-11T19:22:34Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "bear",
+   "title_it": "L’iraniano Khamenei promette vendetta mentre Trump avverte della devastante risposta degli Stati Uniti"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Ukraine says drone strikes damage 21 Russian oil tankers in Sea of Azov attack",
+   "link": "https://www.investing.com/news/world-news/ukraine-says-drone-strikes-damage-21-russian-oil-tankers-in-sea-of-azov-attack-4787300",
+   "published": "2026-07-11T19:11:40Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "L'Ucraina afferma che gli attacchi dei droni hanno danneggiato 21 petroliere russe nell'attacco del Mar d'Azov"
   },
   {
    "source": "Investing.com",
@@ -45186,17 +45181,143 @@
   },
   {
    "source": "Investing.com",
-   "title": "Global yields steady after U.S.-Iran clash triggers biggest spike in months",
-   "link": "https://www.investing.com/news/forex-news/euro-yields-steady-after-usiran-clash-triggers-biggest-spike-in-months-4785452",
-   "published": "2026-07-10T12:59:39Z",
+   "title": "Bitcoin rebounds above $64k, heads for weekly gain on tech-led rally",
+   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-rebounds-above-64k-heads-for-weekly-rise-on-techled-rally-4785390",
+   "published": "2026-07-10T22:07:39Z",
+   "tickers": [
+    "MACRO",
+    "BTC-USD"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "bull",
+   "title_it": "Bitcoin rimbalza sopra i 64.000 dollari, puntando al guadagno settimanale grazie al rally guidato dalla tecnologia"
+  },
+  {
+   "source": "CNBC",
+   "title": "Trump threatens to 'decimate' Iran if it tries to kill him, as Treasury sanctions alleged Iranian financier",
+   "link": "https://www.cnbc.com/2026/07/11/trump-threat.html",
+   "published": "2026-07-11T20:35:21Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "topic_pri": 0,
-   "inv": true,
+   "inv": false,
    "sentiment": "neutral",
-   "title_it": "Rendimenti globali stabili dopo che lo scontro tra Stati Uniti e Iran ha innescato il picco più forte degli ultimi mesi"
+   "title_it": "Trump minaccia di “decimare” l’Iran se tenta di ucciderlo, mentre il Tesoro sanziona il presunto finanziere iraniano"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Dow Jones Futures: Market Ready To Go? Nvidia, Micron, Sandisk Near Buy Points With Big Earnings Due",
+   "link": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-big-earnings-market-sets-up-nvidia-micron-sandisk-robinhood-spacex/?src=A00220&yptr=yahoo",
+   "published": "2026-07-11T20:05:42Z",
+   "tickers": [
+    "MACRO",
+    "NVDA",
+    "MU"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Futures Dow Jones: il mercato è pronto a ripartire? Nvidia, Micron, Sandisk vicini ai punti di acquisto con grandi guadagni dovuti"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Warsh and US Inflation Will Set Tone for July Fed Decision",
+   "link": "https://news.google.com/search?q=Warsh%20and%20US%20Inflation%20Will%20Set%20Tone%20for%20July%20Fed%20Decision",
+   "published": "2026-07-11T20:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Warsh e l’inflazione statunitense daranno il tono alla decisione della Fed di luglio"
+  },
+  {
+   "source": "AP",
+   "title": "Trump and Iran's supreme leader trade threats as the fate of Strait of Hormuz challenges talks - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQb29YUXh5MnNRTjVBazdXOUdMSkx5bkU0WHJFVFRGX1pyY0E5cWZfRXc5NnhQVjdOUVFzZTJFNkpBNlZpdUZIVGdoNk5ieU1sVUw1dDMwdkhSYWF4a0pKUk9nYVFMLW5HRFRjOUJTSTBuVEkxLTQ1X2NEZk5FWDMwV2lnRlBhYmhyY2FjQU82S2pnM2RQSEpfTjFwSXBlbk54OGdr?oc=5",
+   "published": "2026-07-11T19:53:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump e il leader supremo dell’Iran minacciano i commerci mentre si parla del destino dello Stretto di Hormuz – AP News"
+  },
+  {
+   "source": "Google News",
+   "title": "Trump and Iran's supreme leader trade threats as mediators try to save their crumbling deal - PBS",
+   "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNeFNzeDdreEZqVDNJUjEwaVZKQngxRS0xcnhiOENSNVJ6bVc1VHVaWklxMi11UWFtWE5EUFBsU2dnRTVoYXEyM2tiLVVHQWNOcTBNaTNwUEhiNlhfNncyLXgwZ0ktTERHU2xtREZLR010dDRhX0c2TktVQk9KVG1zVU1yNDVOZjdDVmFaeXloTEZRZDlPcUU4SlN4M2cxWTFrbmVXRVpmem9kemVrUG94SXdMTmQ3bTdwZ1RvY0RkQ05YSmPSAcgBQVVfeXFMUGxhaHF0M290TDQzVEVyTFZkN1B3NHU0SFBtMVJIWmZhNVlZNVd0MzMtQ1BsdVAxN2tQZ2hkMFByYkFSUzJrb3dvTmNFS1g1S3BBT1VLa3Vta1RBNmUxTFFhUUg2VWROeVBQc0hlcDlNdy1QSndDVGxyQWc0bkotME1sMG1YbHY3YU4wbkM5N1dpcTY4aUdyNENHX00wWHVHVks2ZjVpZEw1S1pDVWNOQjNNaWY5cTN0RmVqa2hFUFVtZ1RIaEFSRGc?oc=5",
+   "published": "2026-07-11T19:25:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump e il leader supremo dell'Iran minacciano i commerci mentre i mediatori cercano di salvare il loro fatiscente accordo - PBS"
+  },
+  {
+   "source": "AP",
+   "title": "Trump suggests a standing order to attack Iran if it assassinates him. But Vance would make the call - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNS09GLTR6OERMc0tDYndyV0VZQ3NxdEFwa1Zpc1JZZVpzVFVqME1hLWtaNElHNmZsZjZIbjFyRGwyakdSU0U2cjdXSUFaSlVBYks2ejFtOVg5LUpLZGc4akg3SjI1eXY1VHJveE1TMVUyTHgxR1ZCOWExdHAwQXRUZTloanZ2WWVrbWROLVhsR1VDSEZybHQ2OGttdmI2LWc0Z01V?oc=5",
+   "published": "2026-07-11T19:17:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump suggerisce un ordine permanente per attaccare l’Iran se questo lo assassina. Ma Vance avrebbe chiamato - AP News"
+  },
+  {
+   "source": "Google News",
+   "title": "3 Trump Moves That Shook Markets This Week - BeInCrypto",
+   "link": "https://news.google.com/rss/articles/CBMiYkFVX3lxTFA3ZGk1MEllQ2U5X1RNYmFVZDhjMlJRTDhUWmQ4LUc3UnFQS3JDMGFhWlpuVHAtdnVBbVkweW5zNlFCXzJsY194cFByTTRRZXZaeExBclplUTkwLUVSQ0NFX3F3?oc=5",
+   "published": "2026-07-11T18:51:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "3 mosse di Trump che hanno scosso i mercati questa settimana - BeInCrypto"
+  },
+  {
+   "source": "CNBC",
+   "title": "Typhoon Bavi makes landfall in eastern China's Taizhou after nearly 2 million evacuated",
+   "link": "https://www.cnbc.com/2026/07/11/china-evacuates-more-than-one-million-people-as-typhoon-bavi-nears.html",
+   "published": "2026-07-11T18:26:18Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il tifone Bavi si è abbattuto a Taizhou, nella Cina orientale, dopo aver evacuato quasi 2 milioni di persone"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Bitcoin dropped 2% then rebounded after Trump said he's 'a big crypto guy' — here are experts takes on buying the dip",
+   "link": "https://finance.yahoo.com/markets/crypto/articles/bitcoin-dropped-2-then-rebounded-180000405.html",
+   "published": "2026-07-11T18:00:00Z",
+   "tickers": [
+    "MACRO",
+    "POL",
+    "BTC-USD"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il Bitcoin è sceso del 2% per poi rimbalzare dopo che Trump ha dichiarato di essere \"un grande tipo di criptovaluta\": ecco le opinioni degli esperti sull'acquisto del calo"
   },
   {
    "source": "Bloomberg",
@@ -45211,20 +45332,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Le varietà di fornitura Patriot danno forma agli aiuti all’Ucraina"
-  },
-  {
-   "source": "AP",
-   "title": "Trump and Iran’s supreme leader trade threats as mediators try to save their crumbling deal - AP News",
-   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQb29YUXh5MnNRTjVBazdXOUdMSkx5bkU0WHJFVFRGX1pyY0E5cWZfRXc5NnhQVjdOUVFzZTJFNkpBNlZpdUZIVGdoNk5ieU1sVUw1dDMwdkhSYWF4a0pKUk9nYVFMLW5HRFRjOUJTSTBuVEkxLTQ1X2NEZk5FWDMwV2lnRlBhYmhyY2FjQU82S2pnM2RQSEpfTjFwSXBlbk54OGdr?oc=5",
-   "published": "2026-07-11T16:52:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Trump e il leader supremo dell’Iran minacciano i commerci mentre i mediatori cercano di salvare il loro fatiscente accordo – AP News"
   },
   {
    "source": "CNBC",
@@ -45254,19 +45361,6 @@
    "title_it": "Le azioni si riprendono quando il Congresso va in pausa estiva. Ecco perché."
   },
   {
-   "source": "MarketWatch",
-   "title": "The U.S. stock market is becoming ‘too big to fail’",
-   "link": "https://www.marketwatch.com/story/the-u-s-stock-market-is-becoming-too-big-to-fail-b3473e40?mod=mw_rss_topstories",
-   "published": "2026-07-11T15:47:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il mercato azionario americano sta diventando “troppo grande per fallire”"
-  },
-  {
    "source": "Bloomberg",
    "title": "McCaul Backs Deeper US Ukraine Defense Ties",
    "link": "https://news.google.com/search?q=McCaul%20Backs%20Deeper%20US%20Ukraine%20Defense%20Ties",
@@ -45279,6 +45373,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "McCaul sostiene legami di difesa più profondi tra Stati Uniti e Ucraina"
+  },
+  {
+   "source": "AP",
+   "title": "America In Focus: Fed officials divided on US inflation views; US home prices hit all-time high - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNYmRkSnA4a1VCa3Fpb1FiQ1ZseFd0dW5VdVMwajdWLV91MUdtb3YydktCMEdwRk5jeGo0SnhkWlgtT281NjdibVhjUko5alZ6YmZrRVIyVjBSeTYyclRYNkFKVDY1ekNqTlZlQ0tweWYxeHdfa0c3WHoxNFM5b3FEM1UzR1RNWVdsU0p2NWwyZDRDaDZiRHJpVlZVekpjVGViQXc0?oc=5",
+   "published": "2026-07-11T15:32:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "America in focus: i funzionari della Fed divisi sulle opinioni sull'inflazione negli Stati Uniti; I prezzi delle case negli Stati Uniti hanno raggiunto il massimo storico - AP News"
   },
   {
    "source": "Bloomberg",
@@ -45306,19 +45413,6 @@
    "inv": false,
    "sentiment": "bear",
    "title_it": "Le principali case automobilistiche tedesche colpite dal forte calo delle vendite in Cina mentre la concorrenza si surriscalda - AP News"
-  },
-  {
-   "source": "AP",
-   "title": "America In Focus: Fed officials divided on US inflation views; US home prices hit all-time high - AP News",
-   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxNYmRkSnA4a1VCa3Fpb1FiQ1ZseFd0dW5VdVMwajdWLV91MUdtb3YydktCMEdwRk5jeGo0SnhkWlgtT281NjdibVhjUko5alZ6YmZrRVIyVjBSeTYyclRYNkFKVDY1ekNqTlZlQ0tweWYxeHdfa0c3WHoxNFM5b3FEM1UzR1RNWVdsU0p2NWwyZDRDaDZiRHJpVlZVekpjVGViQXc0?oc=5",
-   "published": "2026-07-11T14:10:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "America in focus: i funzionari della Fed divisi sulle opinioni sull'inflazione negli Stati Uniti; I prezzi delle case negli Stati Uniti hanno raggiunto il massimo storico - AP News"
   },
   {
    "source": "CNBC",
@@ -45389,33 +45483,18 @@
    "title_it": "Berkshire Hathaway guadagna terreno, ma è ancora dietro l'S&P 500 mentre il '26 entra nella seconda metà"
   },
   {
-   "source": "CNBC",
-   "title": "Trump threatens to 'decimate' Iran if it tries to kill him, as Treasury sanctions alleged Iranian financier",
-   "link": "https://www.cnbc.com/2026/07/11/trump-threat.html",
-   "published": "2026-07-11T12:51:50Z",
+   "source": "Google News",
+   "title": "Oil Jumps 10% on Iran Conflict and Could Spike to $100 a Barrel, Analysts Say - EnergyNow.com",
+   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNaUYxWXU0ZTFwaWtCOWZCVzJyNHJoU0ZnMzBkZm5NU283TE45ZzM0bVpKUEpubExlM0hQeV9sZjZ0M3BabGFDaUI0d1c2QS1SN183cGlPaXo3cE5ld0NBRXotajY3UkhaTm51M3R3eXJNYnlObGFDYzhWaXc2N1Y2aWxFUC1HT1d2Ml9nNUZvYXExVzJJdzR1ekR5RG9mcThpVmw0NlQtX1c?oc=5",
+   "published": "2026-07-11T12:05:53Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Trump minaccia di “decimare” l’Iran se tenta di ucciderlo, mentre il Tesoro sanziona il presunto finanziere iraniano"
-  },
-  {
-   "source": "Google News",
-   "title": "OPEC+ Agrees to Boost Oil Output When Strait of Hormuz Reopens - EnergyNow.com",
-   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNbHJPcmIwM1FXUFAzM0hWdlZyb2xhb0VsN3g2dGJxdFRGakxQU1VrTEMyS2NpQTV6NVpLM09Ma09UOF9PWnVQSmd6bG9JcThtUGRCeDgzaDVXY1AxUGo3NUcwNkhtMUlULUgwZWxSbnNaaTRRM2Q0T1pTUFlWQWg1b1NfTHJXTmhUUnYxQzZiWDU4NzctVlpz?oc=5",
-   "published": "2026-07-11T11:28:07Z",
-   "tickers": [
-    "MACRO",
-    "POL",
-    "CL=F"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bull",
-   "title_it": "L’OPEC+ accetta di aumentare la produzione di petrolio quando riaprirà lo Stretto di Hormuz - EnergyNow.com"
+   "sentiment": "bear",
+   "title_it": "Il petrolio sale del 10% a causa del conflitto iraniano e potrebbe raggiungere i 100 dollari al barile, dicono gli analisti - EnergyNow.com"
   },
   {
    "source": "Bloomberg",
@@ -45432,17 +45511,18 @@
    "title_it": "La Cina dice alle raffinerie di mantenere alta la produzione di carburante mentre la guerra con l’Iran si trascina"
   },
   {
-   "source": "Bloomberg",
-   "title": "China Power Load Hits Early Record as Data, EV Demand Rises",
-   "link": "https://news.google.com/search?q=China%20Power%20Load%20Hits%20Early%20Record%20as%20Data%2C%20EV%20Demand%20Rises",
-   "published": "2026-07-11T07:29:13Z",
+   "source": "Google News",
+   "title": "Fed report to Congress sees 'stepped up' inflation in the spring - investingLive",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPNll4WjZscEM0cmxOOFk2eEI4c3RVOUVGcE55ZmZ4cDZyd1JxUFZWZWFHcTNyVktHano1NUZTVEhTMkMybEdNdm95THk3Z283bmZiR2N3M1U1RTV2MUs0aWs1dGtXOGpKUnd3bGNGeTMzWXRQckQ1U1VjdkJSbFlwRDdWOUNSbnAtbGNvQjQ4dXdlLW1HcnNMOVB1N1luaWlJSWpPQQ?oc=5",
+   "published": "2026-07-11T07:18:30Z",
    "tickers": [
-    "MACRO"
+    "MACRO",
+    "POL"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bull",
-   "title_it": "Il carico di energia cinese raggiunge i primi record mentre i dati e la domanda di veicoli elettrici aumentano"
+   "sentiment": "neutral",
+   "title_it": "Il rapporto della Fed al Congresso prevede un aumento dell'inflazione in primavera - investingLive"
   },
   {
    "source": "Google News",
@@ -45475,22 +45555,9 @@
   },
   {
    "source": "Reuters",
-   "title": "US seeks Iranian pledge to free up Strait of Hormuz - Reuters",
+   "title": "US seeks free Hormuz access from Iran as talks focus on strait - Reuters",
    "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxOdDY4WWlhcGlFTE0zWE9HdXJlWnFJNXRhLWthUlFCZVdiVV91elpLUlh3Ni1UQUU2OXg2RXV0MUVWVHk0SE9CSFA4RjdOV05hTFRUX3ZEb3Z0OEJWNkYtdGR2ajRDR0FWS2xXaEhQeFNuLTZ0NXVKLS1mbklIQnpPT2VINnQ1ZmF5eDFHNXQtY01aSVVMYXkwTEh4RnlmRUthcjlGOG1LYndabUJ6NWc?oc=5",
    "published": "2026-07-11T04:46:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Gli Stati Uniti chiedono all'Iran l'impegno a liberare lo Stretto di Hormuz - Reuters"
-  },
-  {
-   "source": "Google News",
-   "title": "Fed report to Congress sees 'stepped up' inflation in the spring - investingLive",
-   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPNll4WjZscEM0cmxOOFk2eEI4c3RVOUVGcE55ZmZ4cDZyd1JxUFZWZWFHcTNyVktHano1NUZTVEhTMkMybEdNdm95THk3Z283bmZiR2N3M1U1RTV2MUs0aWs1dGtXOGpKUnd3bGNGeTMzWXRQckQ1U1VjdkJSbFlwRDdWOUNSbnAtbGNvQjQ4dXdlLW1HcnNMOVB1N1luaWlJSWpPQQ?oc=5",
-   "published": "2026-07-11T04:16:31Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -45498,7 +45565,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il rapporto della Fed al Congresso prevede un aumento dell'inflazione in primavera - investingLive"
+   "title_it": "Gli Stati Uniti chiedono il libero accesso a Hormuz da parte dell'Iran mentre i colloqui si concentrano sullo stretto - Reuters"
   },
   {
    "source": "Reuters",
@@ -45516,6 +45583,20 @@
   },
   {
    "source": "AP",
+   "title": "Crews are draining the Lincoln Memorial Reflecting Pool again as part of Trump's troubled revamp - AP News",
+   "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxPaEhYQ2hneHMtWndtYWpsTFNJU0VzRGJoV0s1UHBFempJSzk2bHhuQktiT0tGM2xRekMtX2M0dndRRzA5SWwwTDlrd1ZuUDdnZmE5YmhaWGU1VUVoREF0VG1lV1ZsamRPeEdOcWt3U051OXVhQTFuRi1oYVM1MWhFQTAxUmloSFJYdXB0UU1xU2FkWnVHVjZLWFY4WkxnZw?oc=5",
+   "published": "2026-07-11T00:34:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Gli equipaggi stanno nuovamente prosciugando la piscina riflettente del Lincoln Memorial come parte del travagliato rinnovamento di Trump - AP News"
+  },
+  {
+   "source": "AP",
    "title": "Trump administration rolls back a key protection for imperiled wildlife - AP News",
    "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxQdC1FakwyTXZ6RE4yT0UxbmNLdTVNSms0N3BBRm9FeTE4bjFsdjQ4Z193dHdHODZrenhGZ29zandrSFhyTVVfNWdUeWpjeHQyZGtYZnFQSU9GYnVZNGJvVTQ3NlplWUhwVnZ5M2FIR0tzamVRcWtXNENBYl91RFg3Ukh5WWtLLTgxV05RX19TVEcya21YbnFfWFN0MjBKdUxmWkFMZ2stOGk?oc=5",
    "published": "2026-07-11T00:22:00Z",
@@ -45530,6 +45611,20 @@
   },
   {
    "source": "Reuters",
+   "title": "Trump says US agreed to Iran's request to continue talks, but ceasefire is over - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNWU8weHNqWU10dDFxUGpMR3Z5LW0xVVVnTlNuU2ZBaWpXS0ZnbHQ4c3BENmZ2QVZMZ0VLWmIyUnU0NVM2Tkp4T0lONVM2NnF5cHluZWRxR3FkOXdsNEJoQ3I1VmV3a3hOcExFWll0Vkp2VUJKN2xpcU13US1lOEkxWE1CcEY2dWZGbUZ4TzZ3V0lYRUhLdC1CZjJNTDVJZVM2TDZpSUU0V0lQdkZn?oc=5",
+   "published": "2026-07-10T22:25:15Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump afferma che gli Stati Uniti hanno accettato la richiesta dell'Iran di proseguire i colloqui, ma il cessate il fuoco è finito - Reuters"
+  },
+  {
+   "source": "Reuters",
    "title": "US insists Iran commit to stopping attacks in Hormuz strait, say US officials - Reuters",
    "link": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxOTDI4WnJQY1UzQVd1QjZQMXRFUkM2SHdzNV9EYmd2cTQ2a1h3cTN0NTlza0JSMWFlbFhibmY0SnVRSHU0U2ZsRGpoMEhMamd5RXNZUXZRVUJRQnVzVGhtajFJbHdXSUtjNy1iOGpTODU3dG5YLUphaGlYRDRXLUZSdXF2U3laZDhaeTVvalFJbjlGOGJYaTFFdnRuMUJmZXE3U1Z0LTRxaUtiNTNnQnQ2bGdDZEVhUzV4OHdBVlBTSVVBdw?oc=5",
    "published": "2026-07-10T21:36:03Z",
@@ -45540,132 +45635,35 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Gli Stati Uniti insistono affinché l'Iran si impegni a fermare gli attacchi nello stretto di Hormuz, dicono funzionari americani - Reuters"
-  },
-  {
-   "source": "AP",
-   "title": "Trump admin responds to border wall lawsuit by waiving a law at the center of the case - AP News",
-   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQQUhwQUEyclpSMU5WMmozNVM5azF6WHBjS1Y3dllpeXcwVExQNmRKbUpBcy1wOGxLUmY2OHRiU3RCOGZibE9lY1BNblJtN1prdF9WVi1qOGE3d1VYTUxlUVR0dFhXajlJVkpNYjJUMk16b3RmVDdUVnV3RXJEVHNqTGFHTzNXR3R3SDNWT3EzMUxzZngyODZ5Zlpwc0gxQk0?oc=5",
-   "published": "2026-07-10T20:06:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "L'amministratore Trump risponde alla causa sul muro di confine rinunciando a una legge al centro del caso - AP News"
+   "title_it": "Gli Stati Uniti insistono affinché l'Iran si impegni a fermare gli attacchi nello stretto di Hormuz, affermano funzionari statunitensi - Reuters"
   },
   {
    "source": "Reuters",
-   "title": "Iran oil stuck at sea surges as China's teapots turn to rival Middle East supplies, traders say - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxPOWxpczA5UVItb3hGWndrQnBSdU1yckMyQWV0WDQ2ZzhLb3BBcmF5NU9oYmdmbW1MOWFtU2p5MmlqQnYtUWxISDZUNjRMTjVYdmtSdmJFVERuNUczVU9VSlRBUzA2OEZRV0FmV0g2RzBNbzhENTMwV3o2WkJscWxRLXFOaXdzaDVkQmxjdlJ6eDB3RzNHaXQ1bE1vX0tzM2xYWFprZGdRODk3ajgyWjVmUmtPSGQwSEt1dWhXdGNxU2FFYnEta2NYeVZ2V08?oc=5",
-   "published": "2026-07-10T19:33:18Z",
+   "title": "US pain at the pump worsens after more US-Iran fighting lifts oil prices - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNNmRTRTU1SVQyc05BT2JHSGRkZ0JQaFI5WjVraUplNlJaQVUzUk1jeHp2eE9WQ191SkRkSDRZZjJiVWtBZHg2VXdCWW9jV0xNLXR4QzhQak5NSDd6QVp5dWtFbl95TGVwVDhBRGV3V05CWGV0U2JVeU52OW1XSHhkVENveUdMSEF4Um8yc1B0cVphckZzd0dOZ0l5VHlVdHdEYXRrem4tNzlmSEJKZUNkRDJCMjhBSG5x?oc=5",
+   "published": "2026-07-10T20:42:04Z",
    "tickers": [
     "MACRO",
-    "POL"
+    "POL",
+    "CL=F"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Petrolio iraniano bloccato dall'impennata del mare mentre le teiere cinesi si rivolgono alle forniture rivali del Medio Oriente, dicono i trader - Reuters"
+   "title_it": "La sofferenza degli Stati Uniti alla pompa si aggrava dopo che i nuovi scontri tra Stati Uniti e Iran hanno fatto lievitare i prezzi del petrolio - Reuters"
   },
   {
-   "source": "CNBC",
-   "title": "Trump says he won't sign housing bill, which would become law automatically",
-   "link": "https://www.cnbc.com/2026/07/10/trump-housing-bill-save-act-law.html",
-   "published": "2026-07-10T19:04:32Z",
+   "source": "Investing.com",
+   "title": "Broader AI demand is key for Nvidia investors, Morgan Stanley says",
+   "link": "https://www.investing.com/news/stock-market-news/broader-ai-demand-is-key-for-nvidia-investors-morgan-stanley-says-4787293",
+   "published": "2026-07-11T17:08:56Z",
    "tickers": [
-    "MACRO",
-    "POL"
+    "NVDA"
    ],
-   "topic_pri": 0,
-   "inv": false,
+   "topic_pri": 1,
+   "inv": true,
    "sentiment": "neutral",
-   "title_it": "Trump dice che non firmerà la legge sugli alloggi, che diventerebbe legge automaticamente"
-  },
-  {
-   "source": "Reuters",
-   "title": "US issues fresh Iran-related sanctions as conflict flares - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQM3VkRHJQX280dm52aTMzUkNlOHJKNVNFQ2g2d19JWVc4dkVCMzBiSUhyR01LaTJkalhNQnMybnNrTk9QVWZwSng1TXZGalh6QnVsekV5bVVKN3kwcE02X19TT2ZuZzFfeHQ4RDlHSG84eHFjaEsxRUtlSDlVanpfb2lSVE0zVnhVZlpWd0JuR1VEeU9BQ2stcVpmMll5SjcxUWdTWVk1cmIzUQ?oc=5",
-   "published": "2026-07-10T18:49:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Gli Stati Uniti emettono nuove sanzioni legate all'Iran mentre il conflitto divampa - Reuters"
-  },
-  {
-   "source": "Google News",
-   "title": "Fed Flags AI Demand, Middle East Conflict As Contributors To Inflation Pressures — FOMC Ready To Act 'Forcefully' To Keep Expectations Anchored - TradingView",
-   "link": "https://news.google.com/rss/articles/CBMipgJBVV95cUxQdThJUG5ybGhoNTYtcElBWDBPaEZrZTV2UjdoTGxIdVJrQzV4aml2WmZDZFExcjA5UU1JUlVyN0g1RFBrSmRsTUVnSFZqbEJuZW1fSUthQkhGUWFoay1GbnoyNDFUZkRmeWF1QjdOTEh2eEJoTXpGRS1kLUpTeFVSUnhuMWl6blpNRkxaMmQyTWlncFh1WWZSa0NPM2F2aW9US1g0RkdJMkdkR09xNEVfcjIwMlR4MDUxVFR2WUNva25vX1VJU1A2OTRSSkROc2NsU245MTVTcUlxUnV2TVhkNGxRbzlhUTFQbmFwZGVNTXJYM05IenY3elZMclpITGhsSW9NYWdHVlNuRFVva0tVckl4YzRuNGp6RGhUTGdPYkRNNjJZREE?oc=5",
-   "published": "2026-07-10T17:36:53Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "La Fed segnala la domanda di intelligenza artificiale e il conflitto in Medio Oriente come fattori che contribuiscono alle pressioni inflazionistiche: il FOMC è pronto ad agire \"con forza\" per mantenere ancorate le aspettative - TradingView"
-  },
-  {
-   "source": "Reddit",
-   "title": "Brent broke $76 on Iran strikes and the waiver kill, Shanghai cracked 4,000, and I think the whole move finished in 72 hours",
-   "link": "https://www.reddit.com/r/stocks/comments/1usu5wv/brent_broke_76_on_iran_strikes_and_the_waiver/",
-   "published": "2026-07-10T17:25:15Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il Brent ha superato i 76 dollari grazie agli attacchi contro l'Iran e alla rinuncia, Shanghai ha superato quota 4.000 e penso che l'intero movimento sia terminato in 72 ore"
-  },
-  {
-   "source": "Reddit",
-   "title": "US private AI investment is about 23x China's. So why does the research funding trend still nag at me as a long term allocator?",
-   "link": "https://www.reddit.com/r/investing/comments/1usu41x/us_private_ai_investment_is_about_23x_chinas_so/",
-   "published": "2026-07-10T17:23:33Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Gli investimenti privati ​​statunitensi nell’intelligenza artificiale ammontano a circa 23 volte quelli cinesi. Allora perché la tendenza al finanziamento della ricerca continua a tormentarmi in quanto erogatore a lungo termine?"
-  },
-  {
-   "source": "Google News",
-   "title": "Selection process for Atlanta Fed president reset after Warsh became chairman, CNBC reports - AOL.com",
-   "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxQMVUtZF9wdGcyc3pBdTNxVHBpOE9GMHJKZkQtN1lUSWF0SzlUVktQS09qODBuYTNsUVhkTEdoNElHWWRHZV9hS2I5a1R4NW1ma1RfOVFjNG93YVBsa3RIZ0FKOHFlazkxYXZxTXh0R1plVmVNYWR4OFI0SW9nenZDUUZPZ3hBRURjWFJz?oc=5",
-   "published": "2026-07-10T17:06:22Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il processo di selezione per il presidente della Fed di Atlanta è stato ripristinato dopo che Warsh è diventato presidente, riferisce CNBC - AOL.com"
-  },
-  {
-   "source": "AP",
-   "title": "Transgender girls who challenged Trump sports order drop lawsuit after Supreme Court ruling - AP News",
-   "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNaWFvZm5uLXJ1bE5tUmpoZTRSX2tHVE9jNGRoQk9rU2xaRHVUQ0JhcW1wZUdZTEkzaXZPSXZINEl3cVhkOGZlb1BOdktZNHBscDI0bFJWT3p1S3hUQVJlWGJIRzMyT3FxTnQtenhGQXRpRFZWc2kxM1pEdFcyeHR1ay1fUk1vRE1SRHhRWi03RVJlcm0wUk1PQ0U2VXpVZko4Y3JUWC01eExTdHM1ZTc1LXdB?oc=5",
-   "published": "2026-07-10T17:03:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Le ragazze transgender che hanno contestato l'ordine sportivo di Trump ritirano la causa dopo la sentenza della Corte Suprema - AP News"
+   "title_it": "Una più ampia domanda di intelligenza artificiale è fondamentale per gli investitori Nvidia, afferma Morgan Stanley"
   },
   {
    "source": "Investing.com",
@@ -45682,19 +45680,6 @@
   },
   {
    "source": "Investing.com",
-   "title": "Meta AI image detector fails to identify some of its own cropped AI images, Reuters analysis finds",
-   "link": "https://www.investing.com/news/stock-market-news/meta-ai-image-detector-fails-to-identify-some-of-its-own-cropped-ai-images-reuters-analysis-finds-4786551",
-   "published": "2026-07-10T23:06:32Z",
-   "tickers": [
-    "META"
-   ],
-   "topic_pri": 1,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Il rilevatore di immagini Meta AI non riesce a identificare alcune delle proprie immagini AI ritagliate, rileva l'analisi di Reuters"
-  },
-  {
-   "source": "Investing.com",
    "title": "Why SK Hynix’s Nasdaq Listing Is a Hidden Catalyst for Micron’s Surge",
    "link": "https://www.investing.com/analysis/why-sk-hynixs-nasdaq-listing-is-a-hidden-catalyst-for-microns-surge-200683385",
    "published": null,
@@ -45704,7 +45689,7 @@
    "topic_pri": 1,
    "inv": true,
    "sentiment": "bull",
-   "title_it": "Perché la quotazione al Nasdaq di SK Hynix è un catalizzatore nascosto dell’impennata di Micron"
+   "title_it": "Perché la quotazione al Nasdaq di SK Hynix è un catalizzatore nascosto per l’impennata di Micron"
   },
   {
    "source": "Investing.com",
@@ -45733,22 +45718,37 @@
    "title_it": "Le azioni Micron esplodono in rialzo dopo il battito degli utili alimentati dall'intelligenza artificiale: sono in arrivo ulteriori rialzi?"
   },
   {
-   "source": "Polymarket",
-   "title": "Iasi: Zsombor Piros vs Jerome Kym",
-   "title_it": "Iasi: Zsombor Piros vs Jerome Kym — probabilità Sì 74%",
-   "link": "https://polymarket.com/event/atp-piros-kym-2026-07-11",
-   "published": "2026-07-11T17:02:44Z",
+   "source": "Reddit",
+   "title": "Mark Zuckerberg said AI was behind schedule last week but Meta's up by 22% in last 10 days.",
+   "link": "https://www.reddit.com/r/stocks/comments/1usysby/mark_zuckerberg_said_ai_was_behind_schedule_last/",
+   "published": "2026-07-10T20:12:21Z",
    "tickers": [
-    "MACRO"
+    "META"
    ],
-   "sentiment": "neutral"
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Mark Zuckerberg ha detto che l'IA era in ritardo rispetto al programma la scorsa settimana, ma Meta è cresciuta del 22% negli ultimi 10 giorni."
+  },
+  {
+   "source": "Investing.com",
+   "title": "Bitcoin holds gains above $64,000 as U.S. crypto policy remains in focus",
+   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-stays-above-64000-as-us-crypto-policy-advances-adoption-grows-4787225",
+   "published": "2026-07-11T20:17:29Z",
+   "tickers": [
+    "BTC-USD"
+   ],
+   "topic_pri": 2,
+   "inv": true,
+   "sentiment": "bull",
+   "title_it": "Bitcoin mantiene guadagni superiori a 64.000 dollari poiché la politica crittografica statunitense rimane al centro dell'attenzione"
   },
   {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 78%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-07-11T17:02:44Z",
+   "published": "2026-07-11T20:40:14Z",
    "tickers": [
     "MACRO"
    ],
@@ -46242,7 +46242,7 @@
        "bid": 44.15,
        "ask": 49.3,
        "iv": 89.1,
-       "vol": 14,
+       "vol": 0,
        "oi": 19
       },
       {
@@ -46578,7 +46578,7 @@
      ],
      "call_wall": 700,
      "put_wall": 550,
-     "opt_volume": 3598
+     "opt_volume": 3580
     },
     {
      "date": "2026-07-31",
@@ -46988,7 +46988,7 @@
      ],
      "call_wall": 770,
      "put_wall": 560,
-     "opt_volume": 6137
+     "opt_volume": 5847
     }
    ]
   },
@@ -47358,13 +47358,13 @@
        "bid": 65.05,
        "ask": 69.65,
        "iv": 61,
-       "vol": 2,
+       "vol": 0,
        "oi": 0
       }
      ],
      "call_wall": 590,
      "put_wall": 460,
-     "opt_volume": 39816
+     "opt_volume": 39803
     },
     {
      "date": "2026-07-17",
@@ -48106,7 +48106,7 @@
        "bid": 27.35,
        "ask": 31.1,
        "iv": 64.9,
-       "vol": 2,
+       "vol": 0,
        "oi": 1
       },
       {
@@ -48144,7 +48144,7 @@
      ],
      "call_wall": 540,
      "put_wall": 490,
-     "opt_volume": 2350
+     "opt_volume": 2125
     }
    ]
   },
@@ -48543,19 +48543,19 @@
      "calls": [
       {
        "strike": 42,
-       "bid": 23.9,
-       "ask": 26.3,
+       "bid": 0,
+       "ask": 0,
        "iv": null,
        "vol": 4,
-       "oi": 5
+       "oi": 0
       },
       {
        "strike": 43,
-       "bid": 23,
-       "ask": 25.4,
+       "bid": 0,
+       "ask": 0,
        "iv": null,
        "vol": 2,
-       "oi": 2
+       "oi": 0
       },
       {
        "strike": 44,
@@ -48567,11 +48567,11 @@
       },
       {
        "strike": 45,
-       "bid": 21.4,
-       "ask": 23.7,
+       "bid": 0,
+       "ask": 0,
        "iv": null,
        "vol": 1,
-       "oi": 13
+       "oi": 0
       },
       {
        "strike": 46,
@@ -48921,11 +48921,11 @@
      "calls": [
       {
        "strike": 42,
-       "bid": 24.8,
-       "ask": 27.2,
+       "bid": 0,
+       "ask": 0,
        "iv": null,
        "vol": 1,
-       "oi": 6
+       "oi": 0
       },
       {
        "strike": 43,
@@ -50856,7 +50856,7 @@
      ],
      "call_wall": 400,
      "put_wall": 352.5,
-     "opt_volume": 22136
+     "opt_volume": 22122
     },
     {
      "date": "2026-07-15",
@@ -51220,13 +51220,13 @@
        "bid": 103.1,
        "ask": 106.95,
        "iv": 131,
-       "vol": 1,
+       "vol": 0,
        "oi": 0
       }
      ],
      "call_wall": 400,
      "put_wall": 365,
-     "opt_volume": 7115
+     "opt_volume": 7097
     },
     {
      "date": "2026-07-17",
@@ -51636,7 +51636,7 @@
      ],
      "call_wall": 500,
      "put_wall": 330,
-     "opt_volume": 47677
+     "opt_volume": 47674
     }
    ]
   },
@@ -52884,22 +52884,6 @@
      "date": "2026-07-17",
      "calls": [
       {
-       "strike": 190,
-       "bid": 59.7,
-       "ask": 63.6,
-       "iv": 101.8,
-       "vol": 1,
-       "oi": 2
-      },
-      {
-       "strike": 195,
-       "bid": 44.2,
-       "ask": 47.5,
-       "iv": null,
-       "vol": 1,
-       "oi": 1
-      },
-      {
        "strike": 200,
        "bid": 49.7,
        "ask": 53.6,
@@ -52948,6 +52932,14 @@
        "oi": 22
       },
       {
+       "strike": 232.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 235,
        "bid": 16.2,
        "ask": 20,
@@ -52962,6 +52954,14 @@
        "iv": 67.9,
        "vol": 17,
        "oi": 176
+      },
+      {
+       "strike": 242.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 245,
@@ -53086,14 +53086,6 @@
      ],
      "puts": [
       {
-       "strike": 195,
-       "bid": 0,
-       "ask": 1.85,
-       "iv": 117.8,
-       "vol": 2,
-       "oi": 525
-      },
-      {
        "strike": 200,
        "bid": 0.05,
        "ask": 0.4,
@@ -53156,6 +53148,14 @@
        "iv": 50.3,
        "vol": 88,
        "oi": 208
+      },
+      {
+       "strike": 237.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 240,
@@ -53294,22 +53294,6 @@
      "date": "2026-07-24",
      "calls": [
       {
-       "strike": 185,
-       "bid": 65,
-       "ask": 68.9,
-       "iv": 88.3,
-       "vol": 1,
-       "oi": 11
-      },
-      {
-       "strike": 190,
-       "bid": 60.1,
-       "ask": 64,
-       "iv": 84.4,
-       "vol": 25,
-       "oi": 45
-      },
-      {
        "strike": 195,
        "bid": 55.4,
        "ask": 59,
@@ -53366,6 +53350,14 @@
        "oi": 9
       },
       {
+       "strike": 237.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 240,
        "bid": 14.5,
        "ask": 17.9,
@@ -53388,6 +53380,14 @@
        "iv": 53.4,
        "vol": 2,
        "oi": 80
+      },
+      {
+       "strike": 247.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 250,
@@ -53500,7 +53500,7 @@
        "bid": 0,
        "ask": 4.8,
        "iv": 70.1,
-       "vol": 3,
+       "vol": 0,
        "oi": 13
       },
       {
@@ -53540,7 +53540,7 @@
        "bid": 2.45,
        "ask": 5.1,
        "iv": 56.4,
-       "vol": 59,
+       "vol": 0,
        "oi": 57
       },
       {
@@ -53698,7 +53698,7 @@
      ],
      "call_wall": 300,
      "put_wall": 240,
-     "opt_volume": 1384
+     "opt_volume": 1322
     },
     {
      "date": "2026-07-31",
@@ -54144,12 +54144,44 @@
        "oi": 179
       },
       {
+       "strike": 57,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 60,
        "bid": 6.95,
        "ask": 7.4,
        "iv": 92.4,
        "vol": 145,
        "oi": 969
+      },
+      {
+       "strike": 62,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 63,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 64,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 65,
@@ -54266,44 +54298,12 @@
      ],
      "puts": [
       {
-       "strike": 30,
-       "bid": 0,
-       "ask": 0.05,
-       "iv": 225,
-       "vol": 1,
-       "oi": 77
-      },
-      {
-       "strike": 35,
-       "bid": 0,
-       "ask": 0.01,
-       "iv": 156.3,
-       "vol": 1,
-       "oi": 192
-      },
-      {
-       "strike": 40,
-       "bid": 0,
-       "ask": 0.02,
-       "iv": 134.4,
-       "vol": 15,
-       "oi": 2250
-      },
-      {
-       "strike": 45,
-       "bid": 0,
-       "ask": 0.03,
-       "iv": 109.4,
-       "vol": 6660,
-       "oi": 3167
-      },
-      {
-       "strike": 50,
-       "bid": 0.03,
-       "ask": 0.08,
-       "iv": 97.7,
-       "vol": 155,
-       "oi": 3186
+       "strike": 54,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 55,
@@ -54314,12 +54314,76 @@
        "oi": 2879
       },
       {
+       "strike": 56,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 57,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 58,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 59,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 60,
        "bid": 0.6,
        "ask": 0.84,
        "iv": 79.7,
        "vol": 820,
        "oi": 4099
+      },
+      {
+       "strike": 61,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 62,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 63,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 64,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 65,
@@ -55608,7 +55672,7 @@
      ],
      "call_wall": 380,
      "put_wall": 352.5,
-     "opt_volume": 45911
+     "opt_volume": 45824
     },
     {
      "date": "2026-07-15",
@@ -55626,7 +55690,7 @@
        "bid": 31.35,
        "ask": 34,
        "iv": 51,
-       "vol": 2,
+       "vol": 0,
        "oi": 1
       },
       {
@@ -55994,7 +56058,7 @@
      ],
      "call_wall": 355,
      "put_wall": 350,
-     "opt_volume": 11203
+     "opt_volume": 11198
     },
     {
      "date": "2026-07-17",
@@ -56820,7 +56884,7 @@
      ],
      "call_wall": 110,
      "put_wall": 100,
-     "opt_volume": 45350
+     "opt_volume": 45348
     },
     {
      "date": "2026-07-17",
@@ -57240,7 +57304,7 @@
        "bid": 43.35,
        "ask": 46.3,
        "iv": 240.7,
-       "vol": 1,
+       "vol": 0,
        "oi": 1
       },
       {
@@ -57248,7 +57312,7 @@
        "bid": 28.05,
        "ask": 32.1,
        "iv": 106.4,
-       "vol": 1,
+       "vol": 0,
        "oi": 1
       },
       {
@@ -57400,7 +57464,7 @@
        "bid": 1.66,
        "ask": 2.79,
        "iv": 71.1,
-       "vol": 17,
+       "vol": 18,
        "oi": 81
       },
       {
@@ -57594,7 +57658,7 @@
        "bid": 8.2,
        "ask": 10.15,
        "iv": 63.6,
-       "vol": 2,
+       "vol": 0,
        "oi": 2
       },
       {
@@ -57640,7 +57704,7 @@
      ],
      "call_wall": 115,
      "put_wall": 110,
-     "opt_volume": 2643
+     "opt_volume": 2565
     }
    ]
   },
@@ -58010,7 +58074,7 @@
        "bid": 53.2,
        "ask": 59.9,
        "iv": 83.6,
-       "vol": 12,
+       "vol": 5,
        "oi": 37
       },
       {
@@ -58056,7 +58120,7 @@
      ],
      "call_wall": 900,
      "put_wall": 850,
-     "opt_volume": 11734
+     "opt_volume": 11714
     },
     {
      "date": "2026-07-24",
@@ -58466,7 +58530,7 @@
      ],
      "call_wall": 1000,
      "put_wall": 480,
-     "opt_volume": 1945
+     "opt_volume": 1860
     },
     {
      "date": "2026-07-31",
@@ -58620,7 +58684,7 @@
        "bid": 53.7,
        "ask": 63.7,
        "iv": 92.2,
-       "vol": 1,
+       "vol": 7,
        "oi": 31
       },
       {
@@ -58644,7 +58708,7 @@
        "bid": 47.8,
        "ask": 57.8,
        "iv": 91.9,
-       "vol": 2,
+       "vol": 1,
        "oi": 4
       },
       {
@@ -58766,7 +58830,7 @@
        "bid": 61.3,
        "ask": 71.3,
        "iv": 91.5,
-       "vol": 5,
+       "vol": 3,
        "oi": 9
       },
       {
@@ -58822,7 +58886,7 @@
        "bid": 81.1,
        "ask": 91.1,
        "iv": 91.4,
-       "vol": 2,
+       "vol": 1,
        "oi": 30
       },
       {
@@ -58876,7 +58940,7 @@
      ],
      "call_wall": 800,
      "put_wall": 695,
-     "opt_volume": 1621
+     "opt_volume": 1441
     }
    ]
   },
@@ -59060,10 +59124,10 @@
       {
        "strike": 1,
        "bid": 0,
-       "ask": 0.01,
-       "iv": 575,
+       "ask": 0,
+       "iv": 50,
        "vol": 0,
-       "oi": 1
+       "oi": 0
       },
       {
        "strike": 2,
@@ -59115,9 +59179,9 @@
       },
       {
        "strike": 5.5,
-       "bid": 0.01,
+       "bid": 0,
        "ask": 0.23,
-       "iv": 154.7,
+       "iv": 151.6,
        "vol": 1,
        "oi": 35
       },
@@ -59188,8 +59252,8 @@
       {
        "strike": 10,
        "bid": 2.91,
-       "ask": 3.9,
-       "iv": 231.3,
+       "ask": 3.45,
+       "iv": 251.6,
        "vol": 11,
        "oi": 537
       },
@@ -59198,14 +59262,14 @@
        "bid": 3.45,
        "ask": 3.9,
        "iv": 246.9,
-       "vol": 4,
+       "vol": 0,
        "oi": 3
       },
       {
        "strike": 11,
        "bid": 3.95,
-       "ask": 5.3,
-       "iv": 357.8,
+       "ask": 4.5,
+       "iv": 310.9,
        "vol": 4,
        "oi": 26
       },
@@ -59230,13 +59294,13 @@
        "bid": 5.45,
        "ask": 6,
        "iv": 360.2,
-       "vol": 1,
+       "vol": 0,
        "oi": 1
       }
      ],
      "call_wall": 11,
      "put_wall": 6,
-     "opt_volume": 1451
+     "opt_volume": 1445
     },
     {
      "date": "2026-07-24",
@@ -59244,9 +59308,9 @@
       {
        "strike": 3,
        "bid": 3.55,
-       "ask": 4.45,
-       "iv": 403.9,
-       "vol": 5,
+       "ask": 3.95,
+       "iv": 215.6,
+       "vol": 6,
        "oi": 4
       },
       {
@@ -59324,8 +59388,8 @@
       {
        "strike": 8.5,
        "bid": 0.02,
-       "ask": 0.16,
-       "iv": 102,
+       "ask": 0.12,
+       "iv": 94.9,
        "vol": 2,
        "oi": 186
       },
@@ -59397,9 +59461,9 @@
      "puts": [
       {
        "strike": 3.5,
-       "bid": 0,
+       "bid": null,
        "ask": 0.2,
-       "iv": 251.6,
+       "iv": 307.8,
        "vol": 1,
        "oi": 1
       },
@@ -59413,9 +59477,9 @@
       },
       {
        "strike": 4.5,
-       "bid": 0,
+       "bid": null,
        "ask": 0.09,
-       "iv": 139.1,
+       "iv": 164.8,
        "vol": 1,
        "oi": 2
       },
@@ -59485,17 +59549,17 @@
       },
       {
        "strike": 9,
-       "bid": 2.06,
-       "ask": 3.7,
-       "iv": 244.1,
+       "bid": 1.82,
+       "ask": 2.84,
+       "iv": 106.3,
        "vol": 2,
        "oi": 36
       },
       {
        "strike": 9.5,
        "bid": 1.67,
-       "ask": 4.05,
-       "iv": 132.8,
+       "ask": 3.9,
+       "iv": 92.2,
        "vol": 1,
        "oi": 6
       },
@@ -59550,7 +59614,7 @@
      ],
      "call_wall": 9.5,
      "put_wall": 6.5,
-     "opt_volume": 473
+     "opt_volume": 474
     },
     {
      "date": "2026-07-31",
@@ -59582,8 +59646,8 @@
       {
        "strike": 5.5,
        "bid": 0.99,
-       "ask": 2.94,
-       "iv": 217.6,
+       "ask": 2.95,
+       "iv": 218.8,
        "vol": 2,
        "oi": 1
       },
@@ -59600,7 +59664,7 @@
        "bid": 0.54,
        "ask": 0.66,
        "iv": 75.4,
-       "vol": 1,
+       "vol": 3,
        "oi": 82
       },
       {
@@ -59703,9 +59767,9 @@
      "puts": [
       {
        "strike": 3.5,
-       "bid": 0,
+       "bid": null,
        "ask": 0.07,
-       "iv": 160.9,
+       "iv": 187.5,
        "vol": 0,
        "oi": 1
       },
@@ -59792,8 +59856,8 @@
       {
        "strike": 9.5,
        "bid": 2.48,
-       "ask": 4.05,
-       "iv": 195.3,
+       "ask": 3.7,
+       "iv": 162.9,
        "vol": 10,
        "oi": 11
       },
@@ -59824,7 +59888,7 @@
      ],
      "call_wall": 7,
      "put_wall": 6,
-     "opt_volume": 4471
+     "opt_volume": 4473
     }
    ]
   },
@@ -60168,7 +60232,7 @@
      ],
      "call_wall": 650,
      "put_wall": 550,
-     "opt_volume": 121631
+     "opt_volume": 121632
     },
     {
      "date": "2026-07-15",
@@ -60859,9 +60923,9 @@
       },
       {
        "strike": 715,
-       "bid": 96.15,
-       "ask": 101.7,
-       "iv": 193.6,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
        "vol": 1,
        "oi": 0
       },
@@ -60892,7 +60956,7 @@
      ],
      "call_wall": 650,
      "put_wall": 580,
-     "opt_volume": 224963
+     "opt_volume": 224965
     }
    ]
   },
@@ -61286,8 +61350,8 @@
        "bid": 25.6,
        "ask": 29,
        "iv": 67.5,
-       "vol": 10,
-       "oi": 1
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 420,
@@ -61302,13 +61366,13 @@
        "bid": 38.1,
        "ask": 41.5,
        "iv": 86.8,
-       "vol": 4,
+       "vol": 0,
        "oi": 0
       }
      ],
      "call_wall": 390,
      "put_wall": 372.5,
-     "opt_volume": 85213
+     "opt_volume": 85197
     },
     {
      "date": "2026-07-15",
@@ -61698,11 +61762,19 @@
        "iv": 53.8,
        "vol": 5,
        "oi": 1
+      },
+      {
+       "strike": 437.5,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
       }
      ],
      "call_wall": 390,
      "put_wall": 380,
-     "opt_volume": 17644
+     "opt_volume": 17642
     },
     {
      "date": "2026-07-17",
@@ -62098,7 +62170,7 @@
        "bid": 34.4,
        "ask": 36,
        "iv": 46.9,
-       "vol": 183,
+       "vol": 184,
        "oi": 16687
       },
       {
@@ -62112,7 +62184,7 @@
      ],
      "call_wall": 475,
      "put_wall": 420,
-     "opt_volume": 104111
+     "opt_volume": 104112
     }
    ]
   },
@@ -63348,7 +63420,7 @@
      ],
      "call_wall": 135,
      "put_wall": 50,
-     "opt_volume": 9790
+     "opt_volume": 9791
     }
    ]
   },
@@ -63764,7 +63836,136 @@
      ],
      "call_wall": 1250,
      "put_wall": 870,
-     "opt_volume": 96936
+     "opt_volume": 96930
+    },
+    {
+     "date": "2026-07-15",
+     "calls": [],
+     "puts": [
+      {
+       "strike": 910,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 915,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 920,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 925,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 930,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 935,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 940,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 945,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 950,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 955,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 960,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 970,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 975,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 985,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 995,
+       "bid": null,
+       "ask": null,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      }
+     ],
+     "call_wall": null,
+     "put_wall": null,
+     "opt_volume": 0
     },
     {
      "date": "2026-07-17",
@@ -64175,416 +64376,6 @@
      "call_wall": 1200,
      "put_wall": 730,
      "opt_volume": 212903
-    },
-    {
-     "date": "2026-07-20",
-     "calls": [
-      {
-       "strike": 915,
-       "bid": 90.1,
-       "ask": 98.75,
-       "iv": 90.5,
-       "vol": 1,
-       "oi": 19
-      },
-      {
-       "strike": 920,
-       "bid": 87.5,
-       "ask": 95.4,
-       "iv": 90.9,
-       "vol": 3,
-       "oi": 40
-      },
-      {
-       "strike": 925,
-       "bid": 84.15,
-       "ask": 92.1,
-       "iv": 90.6,
-       "vol": 3,
-       "oi": 10
-      },
-      {
-       "strike": 930,
-       "bid": 80.8,
-       "ask": 88.85,
-       "iv": 90.2,
-       "vol": 48,
-       "oi": 61
-      },
-      {
-       "strike": 935,
-       "bid": 78.15,
-       "ask": 85.7,
-       "iv": 90.4,
-       "vol": 3,
-       "oi": 18
-      },
-      {
-       "strike": 940,
-       "bid": 74.7,
-       "ask": 82.6,
-       "iv": 89.8,
-       "vol": 111,
-       "oi": 13
-      },
-      {
-       "strike": 945,
-       "bid": 71.9,
-       "ask": 79.6,
-       "iv": 89.7,
-       "vol": 151,
-       "oi": 14
-      },
-      {
-       "strike": 950,
-       "bid": 69.3,
-       "ask": 76.65,
-       "iv": 89.8,
-       "vol": 20,
-       "oi": 57
-      },
-      {
-       "strike": 955,
-       "bid": 66.2,
-       "ask": 73.8,
-       "iv": 89.4,
-       "vol": 7,
-       "oi": 5
-      },
-      {
-       "strike": 960,
-       "bid": 63.95,
-       "ask": 71.05,
-       "iv": 89.6,
-       "vol": 30,
-       "oi": 22
-      },
-      {
-       "strike": 965,
-       "bid": 60.35,
-       "ask": 68.3,
-       "iv": 88.7,
-       "vol": 113,
-       "oi": 31
-      },
-      {
-       "strike": 970,
-       "bid": 59.8,
-       "ask": 65.6,
-       "iv": 90.1,
-       "vol": 72,
-       "oi": 34
-      },
-      {
-       "strike": 980,
-       "bid": 53.45,
-       "ask": 60.6,
-       "iv": 88.8,
-       "vol": 571,
-       "oi": 29
-      },
-      {
-       "strike": 985,
-       "bid": 52,
-       "ask": 58.25,
-       "iv": 89.4,
-       "vol": 60,
-       "oi": 6
-      },
-      {
-       "strike": 990,
-       "bid": 48.5,
-       "ask": 55,
-       "iv": 87.6,
-       "vol": 13,
-       "oi": 123
-      },
-      {
-       "strike": 995,
-       "bid": 46.15,
-       "ask": 52.55,
-       "iv": 87.3,
-       "vol": 49,
-       "oi": 277
-      },
-      {
-       "strike": 1000,
-       "bid": 45,
-       "ask": 50.35,
-       "iv": 88,
-       "vol": 294,
-       "oi": 331
-      },
-      {
-       "strike": 1005,
-       "bid": 42.2,
-       "ask": 49.3,
-       "iv": 88.1,
-       "vol": 29,
-       "oi": 50
-      },
-      {
-       "strike": 1010,
-       "bid": 39.85,
-       "ask": 47,
-       "iv": 87.6,
-       "vol": 40,
-       "oi": 35
-      },
-      {
-       "strike": 1015,
-       "bid": 38.5,
-       "ask": 45.35,
-       "iv": 88.2,
-       "vol": 3,
-       "oi": 54
-      },
-      {
-       "strike": 1020,
-       "bid": 36.4,
-       "ask": 43.45,
-       "iv": 88,
-       "vol": 30,
-       "oi": 65
-      },
-      {
-       "strike": 1025,
-       "bid": 34.65,
-       "ask": 41.65,
-       "iv": 88,
-       "vol": 37,
-       "oi": 29
-      },
-      {
-       "strike": 1030,
-       "bid": 33,
-       "ask": 39.9,
-       "iv": 88,
-       "vol": 4,
-       "oi": 56
-      },
-      {
-       "strike": 1035,
-       "bid": 31.6,
-       "ask": 38.25,
-       "iv": 88.2,
-       "vol": 7,
-       "oi": 28
-      },
-      {
-       "strike": 1040,
-       "bid": 29.95,
-       "ask": 36.6,
-       "iv": 88.1,
-       "vol": 10,
-       "oi": 20
-      }
-     ],
-     "puts": [
-      {
-       "strike": 920,
-       "bid": 27.15,
-       "ask": 34.65,
-       "iv": 88.8,
-       "vol": 5,
-       "oi": 27
-      },
-      {
-       "strike": 925,
-       "bid": 31.05,
-       "ask": 35.8,
-       "iv": 89.9,
-       "vol": 4,
-       "oi": 67
-      },
-      {
-       "strike": 930,
-       "bid": 30.9,
-       "ask": 37.65,
-       "iv": 88.1,
-       "vol": 8,
-       "oi": 18
-      },
-      {
-       "strike": 935,
-       "bid": 32.05,
-       "ask": 39.65,
-       "iv": 87.4,
-       "vol": 1,
-       "oi": 10
-      },
-      {
-       "strike": 940,
-       "bid": 35.05,
-       "ask": 42.15,
-       "iv": 88.6,
-       "vol": 5,
-       "oi": 13
-      },
-      {
-       "strike": 945,
-       "bid": 35.85,
-       "ask": 43.6,
-       "iv": 86.9,
-       "vol": 6,
-       "oi": 14
-      },
-      {
-       "strike": 950,
-       "bid": 40.05,
-       "ask": 45.85,
-       "iv": 88.6,
-       "vol": 72,
-       "oi": 35
-      },
-      {
-       "strike": 955,
-       "bid": 40.05,
-       "ask": 47.7,
-       "iv": 86.5,
-       "vol": 3,
-       "oi": 4
-      },
-      {
-       "strike": 960,
-       "bid": 42.25,
-       "ask": 50,
-       "iv": 86.3,
-       "vol": 5,
-       "oi": 10
-      },
-      {
-       "strike": 965,
-       "bid": 44.55,
-       "ask": 52.1,
-       "iv": 86,
-       "vol": 5,
-       "oi": 4
-      },
-      {
-       "strike": 970,
-       "bid": 46.95,
-       "ask": 54.85,
-       "iv": 86.2,
-       "vol": 54,
-       "oi": 76
-      },
-      {
-       "strike": 975,
-       "bid": 49.35,
-       "ask": 57.35,
-       "iv": 86,
-       "vol": 36,
-       "oi": 5
-      },
-      {
-       "strike": 980,
-       "bid": 51.9,
-       "ask": 60,
-       "iv": 86,
-       "vol": 2,
-       "oi": 33
-      },
-      {
-       "strike": 985,
-       "bid": 54.5,
-       "ask": 62.4,
-       "iv": 85.7,
-       "vol": 7,
-       "oi": 2
-      },
-      {
-       "strike": 990,
-       "bid": 57.15,
-       "ask": 65.7,
-       "iv": 86.1,
-       "vol": 31,
-       "oi": 30
-      },
-      {
-       "strike": 995,
-       "bid": 59.9,
-       "ask": 67.65,
-       "iv": 85.3,
-       "vol": 28,
-       "oi": 54
-      },
-      {
-       "strike": 1000,
-       "bid": 63,
-       "ask": 70.65,
-       "iv": 85.6,
-       "vol": 325,
-       "oi": 33
-      },
-      {
-       "strike": 1005,
-       "bid": 65.6,
-       "ask": 74.2,
-       "iv": 85.7,
-       "vol": 1,
-       "oi": 8
-      },
-      {
-       "strike": 1010,
-       "bid": 68.75,
-       "ask": 76.8,
-       "iv": 85.5,
-       "vol": 12,
-       "oi": 25
-      },
-      {
-       "strike": 1015,
-       "bid": 71.65,
-       "ask": 79.85,
-       "iv": 85.3,
-       "vol": 10,
-       "oi": 21
-      },
-      {
-       "strike": 1020,
-       "bid": 74.75,
-       "ask": 83.65,
-       "iv": 85.7,
-       "vol": 10,
-       "oi": 26
-      },
-      {
-       "strike": 1025,
-       "bid": 77.95,
-       "ask": 86,
-       "iv": 85,
-       "vol": 8,
-       "oi": 1
-      },
-      {
-       "strike": 1030,
-       "bid": 81.2,
-       "ask": 90.1,
-       "iv": 85.6,
-       "vol": 1,
-       "oi": 12
-      },
-      {
-       "strike": 1040,
-       "bid": 87.9,
-       "ask": 95.85,
-       "iv": 84.7,
-       "vol": 11,
-       "oi": 14
-      },
-      {
-       "strike": 1050,
-       "bid": 94.9,
-       "ask": 103.6,
-       "iv": 85.3,
-       "vol": 1,
-       "oi": 7
-      }
-     ],
-     "call_wall": 1000,
-     "put_wall": 660,
-     "opt_volume": 6248
     }
    ]
   },
@@ -66172,7 +65963,7 @@
      ],
      "call_wall": 205,
      "put_wall": 175,
-     "opt_volume": 627108
+     "opt_volume": 627088
     },
     {
      "date": "2026-07-15",
@@ -66526,7 +66317,7 @@
      ],
      "call_wall": 205,
      "put_wall": 170,
-     "opt_volume": 158755
+     "opt_volume": 158754
     },
     {
      "date": "2026-07-17",
@@ -66936,7 +66727,7 @@
      ],
      "call_wall": 250,
      "put_wall": 180,
-     "opt_volume": 726674
+     "opt_volume": 726673
     }
    ]
   },
@@ -66957,7 +66748,7 @@
       },
       {
        "strike": 30,
-       "bid": 17.8,
+       "bid": 17.25,
        "ask": 19.35,
        "iv": 253.5,
        "vol": 10,
@@ -66993,7 +66784,7 @@
        "ask": 3.3,
        "iv": 81.3,
        "vol": 63,
-       "oi": 295
+       "oi": 296
       },
       {
        "strike": 48,
@@ -67112,8 +66903,8 @@
       {
        "strike": 25,
        "bid": 0,
-       "ask": 0.02,
-       "iv": 181.3,
+       "ask": 0.03,
+       "iv": 187.5,
        "vol": 3,
        "oi": 3406
       },
@@ -67171,7 +66962,7 @@
        "ask": 2.51,
        "iv": 84.6,
        "vol": 238,
-       "oi": 226
+       "oi": 252
       },
       {
        "strike": 50,
@@ -67211,7 +67002,7 @@
        "ask": 6.25,
        "iv": 86.9,
        "vol": 67,
-       "oi": 442
+       "oi": 450
       },
       {
        "strike": 55,
@@ -67259,7 +67050,7 @@
        "ask": 11.7,
        "iv": 104.7,
        "vol": 195,
-       "oi": 6031
+       "oi": 6025
       },
       {
        "strike": 61,
@@ -67270,9 +67061,9 @@
        "oi": 156
       }
      ],
-     "call_wall": 70,
+     "call_wall": 80,
      "put_wall": 35,
-     "opt_volume": 18590
+     "opt_volume": 18594
     },
     {
      "date": "2026-07-24",
@@ -67355,15 +67146,15 @@
        "ask": 3.5,
        "iv": 84.8,
        "vol": 105,
-       "oi": 5
+       "oi": 13
       },
       {
        "strike": 49,
        "bid": 3.05,
        "ask": 3.25,
        "iv": 84.4,
-       "vol": 10,
-       "oi": 13
+       "vol": 13,
+       "oi": 15
       },
       {
        "strike": 49.5,
@@ -67395,7 +67186,7 @@
        "ask": 2.05,
        "iv": 85,
        "vol": 27,
-       "oi": 168
+       "oi": 192
       },
       {
        "strike": 53,
@@ -67411,7 +67202,7 @@
        "ask": 1.68,
        "iv": 88.1,
        "vol": 87,
-       "oi": 48
+       "oi": 51
       },
       {
        "strike": 55,
@@ -67451,7 +67242,7 @@
        "ask": 0.79,
        "iv": 88.5,
        "vol": 8,
-       "oi": 92
+       "oi": 110
       },
       {
        "strike": 60,
@@ -67501,7 +67292,7 @@
        "ask": 1.15,
        "iv": 86.4,
        "vol": 27,
-       "oi": 72
+       "oi": 74
       },
       {
        "strike": 44,
@@ -67540,7 +67331,7 @@
        "bid": 2.43,
        "ask": 2.7,
        "iv": 85,
-       "vol": 119,
+       "vol": 120,
        "oi": 20
       },
       {
@@ -67548,7 +67339,7 @@
        "bid": 2.69,
        "ask": 2.89,
        "iv": 84.6,
-       "vol": 4,
+       "vol": 6,
        "oi": 183
       },
       {
@@ -67588,7 +67379,7 @@
        "bid": 4.35,
        "ask": 4.7,
        "iv": 85.7,
-       "vol": 1,
+       "vol": 2,
        "oi": 76
       },
       {
@@ -67666,7 +67457,7 @@
      ],
      "call_wall": 70,
      "put_wall": 45,
-     "opt_volume": 3384
+     "opt_volume": 3401
     },
     {
      "date": "2026-07-31",
@@ -67685,7 +67476,7 @@
        "ask": 10.15,
        "iv": 91.4,
        "vol": 2,
-       "oi": 46
+       "oi": 47
       },
       {
        "strike": 43,
@@ -67749,7 +67540,7 @@
        "ask": 3.75,
        "iv": 87.9,
        "vol": 97,
-       "oi": 264
+       "oi": 286
       },
       {
        "strike": 51,
@@ -67805,7 +67596,7 @@
        "ask": 1.6,
        "iv": 88.1,
        "vol": 13,
-       "oi": 18
+       "oi": 25
       },
       {
        "strike": 58,
@@ -67829,7 +67620,7 @@
        "ask": 1.15,
        "iv": 89.6,
        "vol": 588,
-       "oi": 684
+       "oi": 1081
       },
       {
        "strike": 61,
@@ -67837,7 +67628,7 @@
        "ask": 0.99,
        "iv": 83.2,
        "vol": 54,
-       "oi": 81
+       "oi": 84
       }
      ],
      "puts": [
@@ -67863,7 +67654,7 @@
        "ask": 1.28,
        "iv": 88.9,
        "vol": 19,
-       "oi": 73
+       "oi": 77
       },
       {
        "strike": 42,
@@ -67887,7 +67678,7 @@
        "ask": 2.4,
        "iv": 91.4,
        "vol": 52,
-       "oi": 69
+       "oi": 71
       },
       {
        "strike": 45,
@@ -67902,7 +67693,7 @@
        "bid": 2.44,
        "ask": 2.73,
        "iv": 84.9,
-       "vol": 1,
+       "vol": 2,
        "oi": 89
       },
       {
@@ -67950,7 +67741,7 @@
        "bid": 5.75,
        "ask": 6.2,
        "iv": 87.5,
-       "vol": 4,
+       "vol": 2,
        "oi": 42
       },
       {
@@ -68023,12 +67814,12 @@
        "ask": 13.6,
        "iv": 90,
        "vol": 33,
-       "oi": 95
+       "oi": 93
       }
      ],
      "call_wall": 60,
      "put_wall": 40,
-     "opt_volume": 1707
+     "opt_volume": 1712
     }
    ]
   },
@@ -68053,7 +67844,7 @@
        "ask": 57.8,
        "iv": 204.2,
        "vol": 170,
-       "oi": 51
+       "oi": 0
       },
       {
        "strike": 90,
@@ -68069,7 +67860,7 @@
        "ask": 47.8,
        "iv": 161.3,
        "vol": 61,
-       "oi": 16
+       "oi": 0
       },
       {
        "strike": 100,
@@ -68181,7 +67972,7 @@
        "ask": 0.36,
        "iv": 62.4,
        "vol": 2511,
-       "oi": 3850
+       "oi": 4294
       },
       {
        "strike": 165,
@@ -68205,7 +67996,7 @@
        "ask": 0.17,
        "iv": 70.9,
        "vol": 1130,
-       "oi": 11106
+       "oi": 13171
       },
       {
        "strike": 172.5,
@@ -68229,7 +68020,7 @@
        "ask": 0.16,
        "iv": 78.1,
        "vol": 33,
-       "oi": 1035
+       "oi": 1038
       },
       {
        "strike": 180,
@@ -68237,24 +68028,24 @@
        "ask": 0.09,
        "iv": 80.1,
        "vol": 394,
-       "oi": 7886
+       "oi": 8224
       }
      ],
      "puts": [
       {
        "strike": 80,
-       "bid": 0.03,
+       "bid": 0,
        "ask": 0.03,
-       "iv": 154.7,
+       "iv": 143.8,
        "vol": 1027,
        "oi": 446
       },
       {
        "strike": 85,
        "bid": 0,
-       "ask": 0.01,
-       "iv": 118.8,
-       "vol": 5,
+       "ask": 0.03,
+       "iv": 129.7,
+       "vol": 6,
        "oi": 743
       },
       {
@@ -68263,7 +68054,7 @@
        "ask": 0.05,
        "iv": 122.7,
        "vol": 2521,
-       "oi": 1124
+       "oi": 1121
       },
       {
        "strike": 95,
@@ -68279,7 +68070,7 @@
        "ask": 0.08,
        "iv": 103.9,
        "vol": 23,
-       "oi": 2346
+       "oi": 2356
       },
       {
        "strike": 105,
@@ -68295,15 +68086,15 @@
        "ask": 0.09,
        "iv": 78.5,
        "vol": 292,
-       "oi": 1761
+       "oi": 1774
       },
       {
        "strike": 115,
        "bid": 0.05,
        "ask": 0.1,
        "iv": 68.8,
-       "vol": 628,
-       "oi": 2504
+       "vol": 629,
+       "oi": 2515
       },
       {
        "strike": 120,
@@ -68319,7 +68110,7 @@
        "ask": 0.45,
        "iv": 59.9,
        "vol": 1108,
-       "oi": 3235
+       "oi": 3683
       },
       {
        "strike": 130,
@@ -68327,7 +68118,7 @@
        "ask": 0.88,
        "iv": 55.2,
        "vol": 1923,
-       "oi": 6479
+       "oi": 5776
       },
       {
        "strike": 135,
@@ -68335,7 +68126,7 @@
        "ask": 1.89,
        "iv": 53.1,
        "vol": 3555,
-       "oi": 8343
+       "oi": 8470
       },
       {
        "strike": 140,
@@ -68343,7 +68134,7 @@
        "ask": 3.85,
        "iv": 52.7,
        "vol": 5130,
-       "oi": 7956
+       "oi": 8732
       },
       {
        "strike": 145,
@@ -68351,7 +68142,7 @@
        "ask": 6.85,
        "iv": 53.1,
        "vol": 674,
-       "oi": 6827
+       "oi": 8090
       },
       {
        "strike": 150,
@@ -68359,7 +68150,7 @@
        "ask": 10.75,
        "iv": 54.8,
        "vol": 395,
-       "oi": 8021
+       "oi": 8749
       },
       {
        "strike": 155,
@@ -68367,7 +68158,7 @@
        "ask": 15.25,
        "iv": 63.7,
        "vol": 106,
-       "oi": 6424
+       "oi": 6475
       },
       {
        "strike": 160,
@@ -68375,7 +68166,7 @@
        "ask": 19.95,
        "iv": 59.7,
        "vol": 158,
-       "oi": 7223
+       "oi": 7184
       },
       {
        "strike": 162.5,
@@ -68391,7 +68182,7 @@
        "ask": 25.05,
        "iv": 84.1,
        "vol": 64,
-       "oi": 7411
+       "oi": 7378
       },
       {
        "strike": 167.5,
@@ -68399,7 +68190,7 @@
        "ask": 28.2,
        "iv": 107.3,
        "vol": 15,
-       "oi": 272
+       "oi": 270
       },
       {
        "strike": 170,
@@ -68414,8 +68205,8 @@
        "bid": 29.9,
        "ask": 33.4,
        "iv": 124.2,
-       "vol": 12,
-       "oi": 175
+       "vol": 1,
+       "oi": 176
       },
       {
        "strike": 175,
@@ -68439,12 +68230,12 @@
        "ask": 39.75,
        "iv": 103.3,
        "vol": 23,
-       "oi": 4583
+       "oi": 4556
       }
      ],
      "call_wall": 160,
-     "put_wall": 135,
-     "opt_volume": 81528
+     "put_wall": 150,
+     "opt_volume": 81642
     },
     {
      "date": "2026-07-24",
@@ -68454,7 +68245,7 @@
        "bid": 13.05,
        "ask": 14.65,
        "iv": 61,
-       "vol": 4,
+       "vol": 0,
        "oi": 2
       },
       {
@@ -68462,7 +68253,7 @@
        "bid": 12.4,
        "ask": 13.85,
        "iv": 61.2,
-       "vol": 1,
+       "vol": 4,
        "oi": 64
       },
       {
@@ -68471,7 +68262,7 @@
        "ask": 13.1,
        "iv": 61,
        "vol": 15,
-       "oi": 30
+       "oi": 29
       },
       {
        "strike": 132,
@@ -68510,7 +68301,7 @@
        "bid": 8.05,
        "ask": 9.1,
        "iv": 55.3,
-       "vol": 11,
+       "vol": 19,
        "oi": 22
       },
       {
@@ -68535,7 +68326,7 @@
        "ask": 7.45,
        "iv": 58.4,
        "vol": 109,
-       "oi": 455
+       "oi": 453
       },
       {
        "strike": 140,
@@ -68543,7 +68334,7 @@
        "ask": 6.75,
        "iv": 57.5,
        "vol": 4467,
-       "oi": 368
+       "oi": 316
       },
       {
        "strike": 141,
@@ -68567,7 +68358,7 @@
        "ask": 5.75,
        "iv": 59,
        "vol": 97,
-       "oi": 163
+       "oi": 173
       },
       {
        "strike": 144,
@@ -68607,7 +68398,7 @@
        "ask": 3.9,
        "iv": 59.4,
        "vol": 28,
-       "oi": 295
+       "oi": 299
       },
       {
        "strike": 149,
@@ -68631,7 +68422,7 @@
        "ask": 2.43,
        "iv": 58.3,
        "vol": 205,
-       "oi": 277
+       "oi": 455
       },
       {
        "strike": 155,
@@ -68688,8 +68479,8 @@
        "bid": 2.75,
        "ask": 2.99,
        "iv": 55.4,
-       "vol": 25,
-       "oi": 85
+       "vol": 26,
+       "oi": 90
       },
       {
        "strike": 134,
@@ -68697,7 +68488,7 @@
        "ask": 3.35,
        "iv": 55.1,
        "vol": 46,
-       "oi": 184
+       "oi": 185
       },
       {
        "strike": 135,
@@ -68713,7 +68504,7 @@
        "ask": 4.2,
        "iv": 55.2,
        "vol": 30,
-       "oi": 44
+       "oi": 59
       },
       {
        "strike": 137,
@@ -68721,7 +68512,7 @@
        "ask": 4.45,
        "iv": 54.6,
        "vol": 39,
-       "oi": 21
+       "oi": 29
       },
       {
        "strike": 138,
@@ -68854,7 +68645,7 @@
      ],
      "call_wall": 190,
      "put_wall": 135,
-     "opt_volume": 22638
+     "opt_volume": 22640
     },
     {
      "date": "2026-07-31",
@@ -68881,7 +68672,7 @@
        "ask": 15.55,
        "iv": 65,
        "vol": 11,
-       "oi": 92
+       "oi": 49
       },
       {
        "strike": 131,
@@ -68945,7 +68736,7 @@
        "ask": 9.1,
        "iv": 60.1,
        "vol": 29,
-       "oi": 79
+       "oi": 57
       },
       {
        "strike": 140,
@@ -68961,7 +68752,7 @@
        "ask": 8,
        "iv": 59.6,
        "vol": 70,
-       "oi": 331
+       "oi": 296
       },
       {
        "strike": 142,
@@ -69009,7 +68800,7 @@
        "ask": 5.5,
        "iv": 59.8,
        "vol": 7695,
-       "oi": 7383
+       "oi": 6404
       },
       {
        "strike": 148,
@@ -69025,7 +68816,7 @@
        "ask": 5.4,
        "iv": 61.5,
        "vol": 51,
-       "oi": 35
+       "oi": 44
       },
       {
        "strike": 150,
@@ -69033,7 +68824,7 @@
        "ask": 4.55,
        "iv": 59.6,
        "vol": 1529,
-       "oi": 6591
+       "oi": 6538
       },
       {
        "strike": 152.5,
@@ -69067,7 +68858,7 @@
        "ask": 2.16,
        "iv": 58.4,
        "vol": 204,
-       "oi": 5686
+       "oi": 5825
       },
       {
        "strike": 130,
@@ -69075,7 +68866,7 @@
        "ask": 3.4,
        "iv": 57.5,
        "vol": 280,
-       "oi": 928
+       "oi": 852
       },
       {
        "strike": 131,
@@ -69083,7 +68874,7 @@
        "ask": 3.8,
        "iv": 56.9,
        "vol": 31,
-       "oi": 79
+       "oi": 81
       },
       {
        "strike": 132,
@@ -69091,7 +68882,7 @@
        "ask": 4.05,
        "iv": 56.8,
        "vol": 54,
-       "oi": 77
+       "oi": 108
       },
       {
        "strike": 133,
@@ -69115,7 +68906,7 @@
        "ask": 5.05,
        "iv": 56.4,
        "vol": 218,
-       "oi": 1145
+       "oi": 1150
       },
       {
        "strike": 136,
@@ -69123,7 +68914,7 @@
        "ask": 5.75,
        "iv": 56.9,
        "vol": 80,
-       "oi": 24
+       "oi": 28
       },
       {
        "strike": 137,
@@ -69131,7 +68922,7 @@
        "ask": 6.2,
        "iv": 56.7,
        "vol": 39,
-       "oi": 29
+       "oi": 32
       },
       {
        "strike": 138,
@@ -69146,7 +68937,7 @@
        "bid": 6.45,
        "ask": 7.1,
        "iv": 56.6,
-       "vol": 26,
+       "vol": 3,
        "oi": 117
       },
       {
@@ -69155,7 +68946,7 @@
        "ask": 7.45,
        "iv": 56,
        "vol": 172,
-       "oi": 914
+       "oi": 921
       },
       {
        "strike": 141,
@@ -69163,7 +68954,7 @@
        "ask": 8.2,
        "iv": 56.6,
        "vol": 106,
-       "oi": 46
+       "oi": 50
       },
       {
        "strike": 142,
@@ -69179,7 +68970,7 @@
        "ask": 9.3,
        "iv": 55.2,
        "vol": 7,
-       "oi": 59
+       "oi": 68
       },
       {
        "strike": 144,
@@ -69195,15 +68986,15 @@
        "ask": 10.45,
        "iv": 56.4,
        "vol": 19,
-       "oi": 506
+       "oi": 511
       },
       {
        "strike": 146,
        "bid": 10.35,
        "ask": 11.1,
        "iv": 56.6,
-       "vol": 50,
-       "oi": 28
+       "vol": 3,
+       "oi": 50
       },
       {
        "strike": 147,
@@ -69211,7 +69002,7 @@
        "ask": 12.25,
        "iv": 58.5,
        "vol": 30,
-       "oi": 47
+       "oi": 68
       },
       {
        "strike": 148,
@@ -69219,14 +69010,14 @@
        "ask": 12.4,
        "iv": 56.3,
        "vol": 60,
-       "oi": 65
+       "oi": 66
       },
       {
        "strike": 149,
        "bid": 12.3,
        "ask": 13.1,
        "iv": 56.5,
-       "vol": 33,
+       "vol": 38,
        "oi": 76
       },
       {
@@ -69235,15 +69026,15 @@
        "ask": 14.4,
        "iv": 56.5,
        "vol": 14,
-       "oi": 453
+       "oi": 482
       },
       {
        "strike": 152.5,
        "bid": 14,
        "ask": 15.6,
        "iv": 52.9,
-       "vol": 7,
-       "oi": 115
+       "vol": 1,
+       "oi": 119
       },
       {
        "strike": 155,
@@ -69251,7 +69042,7 @@
        "ask": 18.2,
        "iv": 58.5,
        "vol": 7,
-       "oi": 816
+       "oi": 832
       },
       {
        "strike": 157.5,
@@ -69259,12 +69050,12 @@
        "ask": 20.15,
        "iv": 55.7,
        "vol": 34,
-       "oi": 53
+       "oi": 64
       }
      ],
      "call_wall": 152.5,
      "put_wall": 125,
-     "opt_volume": 24241
+     "opt_volume": 24165
     }
    ]
   },
@@ -69437,9 +69228,9 @@
       },
       {
        "strike": 15.5,
-       "bid": 0,
+       "bid": null,
        "ask": 0.05,
-       "iv": 109.4,
+       "iv": 125,
        "vol": 1,
        "oi": 31
       },
@@ -69831,10 +69622,10 @@
       },
       {
        "strike": 15.5,
-       "bid": 0,
+       "bid": null,
        "ask": 0.2,
-       "iv": 103.1,
-       "vol": 1,
+       "iv": 124.6,
+       "vol": 0,
        "oi": 3
       },
       {
@@ -70028,13 +69819,13 @@
        "bid": 9.7,
        "ask": 11.25,
        "iv": 204.7,
-       "vol": 2,
+       "vol": 0,
        "oi": 0
       }
      ],
      "call_wall": 11,
      "put_wall": 8.5,
-     "opt_volume": 1691
+     "opt_volume": 1688
     },
     {
      "date": "2026-07-31",
@@ -70217,9 +70008,9 @@
       },
       {
        "strike": 16.5,
-       "bid": 0,
+       "bid": null,
        "ask": 0.2,
-       "iv": 97.7,
+       "iv": 116.4,
        "vol": 0,
        "oi": 2
       }
@@ -70382,13 +70173,13 @@
        "bid": 8.75,
        "ask": 9.8,
        "iv": 211.9,
-       "vol": 4,
+       "vol": 0,
        "oi": 1
       }
      ],
      "call_wall": 12,
      "put_wall": 8.5,
-     "opt_volume": 1081
+     "opt_volume": 1077
     }
    ]
   },
@@ -70804,7 +70595,7 @@
      ],
      "call_wall": 200,
      "put_wall": 120,
-     "opt_volume": 169217
+     "opt_volume": 169218
     },
     {
      "date": "2026-07-24",
@@ -71840,10 +71631,10 @@
       {
        "strike": 7,
        "bid": 0,
-       "ask": 0.02,
-       "iv": 256.3,
+       "ask": 0,
+       "iv": 50,
        "vol": 45,
-       "oi": 105
+       "oi": 0
       },
       {
        "strike": 8,
@@ -72273,9 +72064,9 @@
       },
       {
        "strike": 13,
-       "bid": 0.07,
+       "bid": 0,
        "ask": 0.25,
-       "iv": 101.6,
+       "iv": 94.9,
        "vol": 2,
        "oi": 26
       },
@@ -73204,7 +72995,7 @@
      ],
      "call_wall": 35,
      "put_wall": 20,
-     "opt_volume": 133573
+     "opt_volume": 133572
     },
     {
      "date": "2026-07-24",
@@ -74440,7 +74231,7 @@
      ],
      "call_wall": 2000,
      "put_wall": 1650,
-     "opt_volume": 51598
+     "opt_volume": 51596
     },
     {
      "date": "2026-07-24",
@@ -74850,7 +74641,7 @@
      ],
      "call_wall": 1900,
      "put_wall": 1700,
-     "opt_volume": 8369
+     "opt_volume": 8343
     },
     {
      "date": "2026-07-31",
@@ -75182,7 +74973,7 @@
        "bid": 222.7,
        "ask": 234.8,
        "iv": 120.9,
-       "vol": 3,
+       "vol": 5,
        "oi": 38
       },
       {
@@ -75260,7 +75051,7 @@
      ],
      "call_wall": 3000,
      "put_wall": 2000,
-     "opt_volume": 5706
+     "opt_volume": 5678
     }
    ]
   },
@@ -76086,7 +75877,7 @@
      ],
      "call_wall": 160,
      "put_wall": 140,
-     "opt_volume": 28898
+     "opt_volume": 28895
     },
     {
      "date": "2026-07-31",
@@ -76912,7 +76703,7 @@
      ],
      "call_wall": 400,
      "put_wall": 350,
-     "opt_volume": 79719
+     "opt_volume": 79696
     },
     {
      "date": "2026-07-24",
@@ -77276,7 +77067,7 @@
        "bid": 27.75,
        "ask": 29.9,
        "iv": 52.5,
-       "vol": 80,
+       "vol": 0,
        "oi": 35
       },
       {
@@ -77308,7 +77099,7 @@
        "bid": 34.7,
        "ask": 37.15,
        "iv": 52.4,
-       "vol": 2,
+       "vol": 0,
        "oi": 1
       },
       {
@@ -77322,7 +77113,7 @@
      ],
      "call_wall": 540,
      "put_wall": 400,
-     "opt_volume": 8451
+     "opt_volume": 8369
     },
     {
      "date": "2026-07-31",
@@ -77980,10 +77771,10 @@
   "alerts": [
    "umich: stale"
   ],
-  "generated_at": "2026-07-11T17:02:44Z"
+  "generated_at": "2026-07-11T20:40:14Z"
  },
  "verdict_track": {
-  "generated": "2026-07-11T17:02:45.006Z",
+  "generated": "2026-07-11T20:40:18.399Z",
   "since": "2026-07-11",
   "episodes": 5,
   "mature7": {
