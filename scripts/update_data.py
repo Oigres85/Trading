@@ -354,11 +354,19 @@ TICKER_ALIAS = {
 SECTOR_OVERRIDES = {"SKHYV": "Technology"}
 
 
+def _finite_pos(v):
+    """True solo per numeri FINITI e positivi. NaN è truthy e sopravvive ai check
+    booleani ingenui (`if atr:`): questo è il pavimento matematico di sistema (v115)
+    per stop, prezzi, ATR — le grandezze che in borsa non possono essere ≤ 0."""
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and v == v and math.isfinite(v) and v > 0
+
+
 def _risk_reward_str(limite, target, atr):
     """R/R teorico "1:X.X" con risk = 2×ATR sotto il limite e reward = target − limite.
     None (→ n.d.) se dati mancanti, risk non positivo o target sotto il limite."""
     try:
-        if not limite or not target or not atr or atr <= 0:
+        # _finite_pos anche qui (v115): NaN passerebbe i check booleani e produrrebbe "1:nan"
+        if not (_finite_pos(limite) and _finite_pos(target) and _finite_pos(atr)):
             return None
         risk = 2.0 * float(atr)
         reward = float(target) - float(limite)
@@ -490,8 +498,20 @@ def drop_void_bars(hist):
     valorizzato (visto sul campo, lug 2026: ^KS11 dopo la chiusura coreana) → il prezzo
     diventava null in dashboard e prompt, accecando la lettura leading del KOSPI richiesta
     dalla testata. Una barra senza chiusura non è una barra: il prezzo resta l'ultima
-    chiusura valida (semantica documentata: "price = ULTIMA CHIUSURA REGOLARE")."""
-    return hist[hist["Close"].notna()] if not hist.empty else hist
+    chiusura valida (semantica documentata: "price = ULTIMA CHIUSURA REGOLARE").
+    v115 — via anche le BARRE-GLITCH (protezione supporti/ATR/minimi fantasma):
+    Close/Low ≤ 0, High < Low, o Low sotto il 50% del corpo (min(Open, Close)) — la firma
+    del bad tick: una scrollata VERA chiude vicino al minimo e NON viene toccata, un
+    minimo fantasma a -70% intrabar con chiusura regolare sì. Prezzi/volumi negativi
+    non esistono in borsa: qui c'è il blocco fisico a monte di tutti i calcoli."""
+    if hist.empty:
+        return hist
+    m = hist["Close"].notna() & (hist["Close"] > 0)
+    if all(c in hist.columns for c in ("Open", "High", "Low")):
+        body_min = hist[["Open", "Close"]].min(axis=1)
+        m &= hist["Low"].notna() & (hist["Low"] > 0) & (hist["High"] >= hist["Low"]) \
+             & (hist["Low"] >= body_min * 0.5)
+    return hist[m]
 
 
 def fetch_symbol(ticker, name=None, currency="USD"):
@@ -2802,13 +2822,34 @@ def ratchet_stops(rows, prev_by_ticker):
     (nuovo trade → nuovo trailing). Solo posizioni possedute con ATR disponibile."""
     for r in rows:
         price, atr = r.get("price"), r.get("atr_14")
-        if not (r.get("qty") and price and atr):
+        # BLINDATURA v115: NaN è truthy in Python — il vecchio guard lo lasciava passare e
+        # max(prev, nan) propagava nan sullo stop. Prezzo finito e >0 obbligatorio.
+        if not (r.get("qty") and _finite_pos(price)):
             continue
-        raw = price - 2 * atr
         prev = prev_by_ticker.get(r["ticker"]) or {}
         prev_stop = prev.get("stop_atr")
+        # prev plausibile: finito, >0, non oltre 3× il prezzo (uno stop ancorato può stare
+        # LEGITTIMAMENTE sopra il prezzo dopo un crollo — violato e congelato — ma 3× è
+        # solo il residuo di un run avvelenato: si riparte dal calcolo pulito)
+        prev_ok = _finite_pos(prev_stop) and prev_stop <= price * 3
         same_pos = prev.get("qty") == r.get("qty") and prev.get("pmc") == r.get("pmc")
-        stop = max(prev_stop, raw) if (prev_stop is not None and same_pos) else raw
+        raw = price - 2 * atr if _finite_pos(atr) else None
+        # ATR assente/NaN in QUESTO run: lo stop ANCORATO di una posizione aperta non si
+        # perde per un buco dati — carry del precedente (la protezione sopravvive all'outage)
+        if raw is None:
+            if prev_ok and same_pos:
+                r["stop_atr"] = round(prev_stop, 2)
+                r["stop_violated"] = bool(price < prev_stop)
+            continue
+        # INVARIANTE RATCHET: con posizione invariata e prev valido, lo stop esportato è
+        # max(prev, nuovo) → NON può MAI scendere sotto lo stop del run precedente.
+        stop = max(prev_stop, raw) if (prev_ok and same_pos) else raw
+        # SCUDO SOTTO-ZERO: mai esportare uno stop ≤ 0 (2×ATR ≥ prezzo = dato malato):
+        # meglio n.d. (il client lo dichiara) che uno stop matematicamente impossibile.
+        if stop <= 0:
+            r.pop("stop_atr", None)
+            r.pop("stop_violated", None)
+            continue
         r["stop_atr"] = round(stop, 2)
         r["stop_violated"] = bool(price < stop)
 

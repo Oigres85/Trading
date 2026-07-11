@@ -389,6 +389,35 @@ check("stampBrokerDate v113: salvataggio PORTAFOGLIO aggiorna as_of a oggi e rim
   if (missingWl.length) console.log("  ⚠ colonne chiave del portafoglio assenti dalla watchlist:", missingWl.join(", "));
 }
 
+/* ---------- SAFE BY DESIGN v115 (post-incidente SNDK $40,1 / stop -$366) ---------- */
+check("paracadute: supporto recente in banda → usato tal quale, nessun fallback", run(`
+  const p = saneEntryLimit({ price: 100, support: 95, tech_by_range: { m1: { support: 92 } } });
+  return p.limit === 95 && p.fallback === false`));
+check("paracadute: supporti fuori banda ±25% → fallback SMA50, dichiarato", run(`
+  const p = saneEntryLimit({ price: 100, support: 40, tech_by_range: { m1: { support: 35 } }, sma50_dist_pct: 5 });
+  return Math.abs(p.limit - 95.24) < 0.01 && p.fallback === true && p.src === "SMA50"`));
+check("paracadute: nessun dato utilizzabile → -5% dal prezzo, dichiarato", run(`
+  const p = saneEntryLimit({ price: 100, support: 2 });
+  return p.limit === 95 && p.fallback === true && p.src.includes("-5%")`));
+check("INCIDENTE SNDK: il piano d'ingresso IGNORA il range del grafico (sparkRange='y1')", run(`
+  const wl = DATA.watchlist.find(r => r.ticker === "TSTW");
+  wl.tech_by_range = { y1: { support: 2, resistance: 200 } };   // minimo preistorico alla SNDK
+  const oldRange = sparkRange; sparkRange = "y1";
+  const dv = decisionVerdict();
+  sparkRange = oldRange; delete wl.tech_by_range.y1;
+  const p = dv.withPlan.find(x => x.r.ticker === "TSTW");
+  return p && p.limit === 95 && p.stop > 0 && p.stop < p.limit`));
+check("scudo sotto-zero: 2×ATR ≥ prezzo → stop al pavimento 50%, flaggato", run(`
+  const st = atrStop(100, { atr_14: 60, price: 100 });
+  return st && st.stop === 50 && st.src.includes("PAVIMENTO")`));
+check("null-storm: riga con SOLE quotazioni (tutte le metriche assenti) → niente crash, niente undefined", run(`
+  DATA.watchlist.push({ ticker: "TSTN", name: "Null Storm", currency: "USD", price: 10,
+    sparks: {}, tech_by_range: {}, financials: [] });
+  let ok = true, p = "";
+  try { decisionVerdict(); p = buildPrompt(); } catch (e) { ok = false; }
+  DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== "TSTN");
+  return ok && p.includes("TSTN") && !p.includes("undefined") && !/\\bNaN\\b/.test(p)`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

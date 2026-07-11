@@ -1074,15 +1074,45 @@ function atrOf(r) {
 /* stop loss dinamico: 2×ATR sotto il prezzo di riferimento (ingresso o prezzo attuale per trailing) */
 function atrStop(refPrice, r) {
   const a = atrOf(r);
-  if (!a || !refPrice) return null;
-  return { stop: Math.round((refPrice - 2 * a.atr) * 100) / 100, atr: a.atr, pct: a.pct, src: a.src };
+  if (!a || !(refPrice > 0) || !(a.atr > 0)) return null;
+  let stop = refPrice - 2 * a.atr;
+  // SCUDO SOTTO-ZERO (v115): uno stop loss non esiste in territorio negativo. Se 2×ATR
+  // mangia più del 50% del riferimento (ATR avvelenato da barre-glitch o riferimento
+  // sbagliato — visto sul campo: SNDK stop -$366) il numero non è risk management:
+  // pavimento al 50% del riferimento, SEMPRE dichiarato nella sorgente.
+  const floored = stop < refPrice * 0.5;
+  if (floored) stop = refPrice * 0.5;
+  return { stop: Math.round(stop * 100) / 100, atr: a.atr, pct: a.pct,
+           src: a.src + (floored ? " — PAVIMENTO 50%: 2×ATR anomalo, verificare il dato" : "") };
+}
+
+/* PARACADUTE ORDINI (v115, post-incidente SNDK limite $40,1 su quotazione $1915):
+   il supporto per un ORDINE deve venire dal passato RECENTE (pipeline: min Low 20 sedute,
+   più le finestre brevi w1/m1) e stare in una banda operativa dal prezzo. MAI il range
+   del grafico (y1 = minimo di un anno fa = preistoria). Se nessun supporto è plausibile,
+   fallback DICHIARATO: SMA50 → pullback 2×ATR → -5%. Niente scarti silenziosi. */
+const ORDER_SUPPORT_MAX_GAP = 0.25;   // un limite >25% sotto il mercato non è un ordine: è una preghiera
+function saneEntryLimit(r) {
+  const price = r.price;
+  if (!(price > 0)) return null;
+  const ok = (s) => s > 0 && s <= price && s >= price * (1 - ORDER_SUPPORT_MAX_GAP);
+  const cands = [r.support, r.tech_by_range?.m1?.support, r.tech_by_range?.w1?.support].filter(ok);
+  if (cands.length) return { limit: Math.max(...cands), src: "supporto recente", fallback: false };
+  const sma50 = r.sma50_dist_pct != null ? price / (1 + r.sma50_dist_pct / 100) : null;
+  if (ok(sma50)) return { limit: Math.round(sma50 * 100) / 100, src: "SMA50", fallback: true };
+  const a = atrOf(r);
+  const atrPull = a && a.atr > 0 ? price - 2 * a.atr : null;
+  if (ok(atrPull)) return { limit: Math.round(atrPull * 100) / 100, src: "pullback 2×ATR", fallback: true };
+  return { limit: Math.round(price * 0.95 * 100) / 100, src: "-5% dal prezzo (nessun supporto plausibile)", fallback: true };
 }
 
 /* stop operativo di una POSIZIONE APERTA: priorità allo stop RATCHET della pipeline
    (stop_atr: sale col prezzo e non ridiscende — persistito tra i run), fallback al
    calcolo client 2×ATR dal prezzo attuale (non ancorato, etichettato). */
 function stopOf(r) {
-  if (r.stop_atr != null) {
+  // cintura client (v115): uno stop ratchet ≤ 0 o assurdo (>3× il prezzo) è un residuo
+  // di run avvelenato — si ignora e si ricalcola dal vivo, mai fidarsi di un numero malato
+  if (r.stop_atr != null && r.stop_atr > 0 && (!(r.price > 0) || r.stop_atr <= r.price * 3)) {
     return { stop: r.stop_atr, violated: !!r.stop_violated, ratchet: true,
              pct: r.atr_pct ?? null, src: "ratchet 2×ATR" };
   }
@@ -1309,13 +1339,18 @@ function decisionVerdict() {
   const vixV = (DATA.macro || {}).vix?.value;
   const riskScale = vixV == null ? 1 : vixV > 30 ? 0.4 : vixV > 25 ? 0.5 : vixV > 20 ? 0.75 : 1;
   const withPlan = accumula.map((r, i) => {
-    const support = (r.tech_by_range?.[sparkRange]?.support) || r.support || r.price;
-    const limit = Math.min(support, r.price);                 // ordine limite al supporto/prezzo
+    // MAI il range del GRAFICO negli ordini (v115): sparkRange è una preferenza di
+    // visualizzazione — con "1A" selezionato il piano pescava il minimo di un anno fa
+    // (SNDK limite $40,1 su quotazione $1915, stop -$366). saneEntryLimit usa solo
+    // supporti RECENTI in banda ±25% dal prezzo, con fallback dichiarato SMA50/ATR/-5%.
+    const pick = saneEntryLimit(r) || { limit: r.price, src: "prezzo", fallback: false };
+    const limit = Math.min(pick.limit, r.price);
     const budget = cashUsd * (i === 0 ? 0.35 : i === 1 ? 0.25 : 0.15) * riskScale;
     const qty = limit > 0 ? Math.floor(budget / limit) : 0;
     const st = atrStop(limit, r);
-    return { r, limit, qty, dd: r.w52_dist_pct, q: r._q, stop: st ? st.stop : Math.round(limit * 0.92 * 100) / 100, atr: st };
-  }).filter(x => x.qty > 0);
+    return { r, limit, qty, dd: r.w52_dist_pct, q: r._q, stop: st ? st.stop : Math.round(limit * 0.92 * 100) / 100, atr: st,
+             limitSrc: pick.src, limitFallback: pick.fallback };
+  }).filter(x => x.qty > 0 && x.limit > 0 && x.stop > 0 && x.stop < x.limit);
   // stop TRAILING sulle posizioni esistenti: ratchet pipeline (stopOf) — sale, non ridiscende
   const trailing = (DATA.portfolio || []).filter(isEquity).filter(r => r.qty && r.price)
     .map(r => {
@@ -4303,7 +4338,10 @@ function buildPrompt() {
           // in tabella si perde e l'LLM rischia di suggerire un limite che scavalca l'evento (v112)
           const ed = earningsRiskDays(p.r);
           const earnTag = ed != null ? ` [!EARNINGS RISK: trimestrale ${p.r.earnings_date} tra ${ed}gg — valuta ingresso post-evento o sizing ridotto]` : "";
-          return `${p.r.ticker} limite $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)} (score quant ${p.q}/100)${atrTag}${earnTag}`;
+          // paracadute v115: se il supporto API era fuori banda, il limite viene da un
+          // fallback e l'LLM deve saperlo (mai fallback silenziosi)
+          const srcTag = p.limitFallback ? ` [supporto API fuori banda ±25%: limite da ${p.limitSrc}]` : "";
+          return `${p.r.ticker} limite $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}`;
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {
@@ -4443,9 +4481,11 @@ function buildPrompt() {
     if (isIlliquid(r)) flags.push("[ILLIQUIDO]");
     if (squeezeSetup(r)) flags.push("[TURNAROUND SQUEEZE RISK]");
     const nameCell = `${r.name} (${r.ticker})${flags.length ? " " + flags.join(" ") : ""}`;
-    // R/R teorico per la Tabella B: pipeline (risk_reward) o fallback client stessa formula
+    // R/R teorico per la Tabella B: pipeline (risk_reward) o fallback client stessa formula.
+    // Banda di plausibilità v115: un supporto sotto il 50% del prezzo è preistoria/garbage
+    // → il R/R che ne uscirebbe è spazzatura con la virgola: meglio n.d.
     let rrCell = isIndex ? null : (r.risk_reward ?? null);
-    if (rrCell == null && !isIndex && r.support && r.resistance && r.support > 0) {
+    if (rrCell == null && !isIndex && r.support && r.resistance && r.support > 0 && r.price > 0 && r.support >= r.price * 0.5) {
       const aObj = atrOf(r);
       if (aObj && aObj.atr > 0) {
         const reward = r.resistance - r.support, risk = 2 * aObj.atr;
@@ -4460,7 +4500,7 @@ function buildPrompt() {
     const staleTag = r.price_asof && DATA.updated_at && r.price_asof < DATA.updated_at.slice(0, 10)
       ? ` [chiusura del ${new Date(r.price_asof + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}]` : "";
     const priceCell = `${c}${f(r.price)}${staleTag}${(adjL != null && r.price != null && Math.abs(adjL - r.price) / r.price > 0.001) ? ` → agg. ${c}${f(adjL)} (${r.prepost?.label || "ext"})` : ""}`;
-    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${floatCell} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
+    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${floatCell} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal ?? "—"} | ${optNote} |`;
   };
   const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A | Drawdown 52S | Short% | Float | Supp. | Stop 2×ATR | R/R teorico | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
   const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";

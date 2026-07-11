@@ -53,6 +53,21 @@ for r in rows:
         if bool(r.get("stop_violated")) != expect:
             hard.append(f"{r['ticker']}: stop_violated={r.get('stop_violated')} incoerente (prezzo {r['price']} vs stop {r['stop_atr']})")
 
+# HARD 4b (v115, post-incidente SNDK limite $40/stop -$366): in borsa non esistono valori
+# ≤ 0 — stop, prezzi e supporti negativi o nulli nel payload sono SEMPRE un bug di codice.
+# E uno stop oltre 3× il prezzo è il residuo di un run avvelenato, non un ancoraggio legittimo.
+for r in rows + wl:
+    px = r.get("price")
+    for k in ("price", "support", "resistance", "stop_atr", "atr_14"):
+        v = r.get(k)
+        if v is not None and (not isinstance(v, (int, float)) or v != v or v <= 0):
+            hard.append(f"{r['ticker']}: {k}={v} ≤ 0 o non-finito nel payload")
+    if r.get("stop_atr") is not None and px and r["stop_atr"] > px * 3:
+        hard.append(f"{r['ticker']}: stop_atr={r['stop_atr']} oltre 3× il prezzo {px} (run avvelenato?)")
+    # supporto MAIN scollegato dal prezzo (>60% sotto): finestra recente rotta → warn rumoroso
+    if r.get("support") and px and r["support"] < px * 0.4:
+        soft.append(f"{r['ticker']}: support {r['support']} < 40% del prezzo {px} — finestra supporti da verificare")
+
 # HARD 5 (post-incidente margin debt): spazzatura macro NON flaggata non deve MAI passare.
 # La spazzatura FLAGGATA (data_quality) è un degrado dichiarato → warn, la pipeline vive.
 macro = d.get("macro", {})

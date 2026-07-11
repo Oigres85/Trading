@@ -156,6 +156,46 @@ check("notify: build_message compone i blocchi e torna None senza novità",
       "STOP VIOLATO" in na.build_message(_new, _nd) and "SQZ" in na.build_message(_new, _nd)
       and na.build_message({"stops": [], "dq": [], "squeeze": []}, _nd) is None)
 
-N_CHECKS = 30
+# ---------- BLINDATURA RATCHET + SCUDO SOTTO-ZERO (v115, post-incidente SNDK) ----------
+_nanf = float("nan")
+# 1) ATR NaN nel run corrente: lo stop ancorato NON si perde (carry del prev), niente nan propagato
+_rows = [dict(ticker="TSTX", qty=10, pmc=50, price=100.0, atr_14=_nanf)]
+ud.ratchet_stops(_rows, {"TSTX": {"stop_atr": 80.0, "qty": 10, "pmc": 50}})
+check("ratchet blindato: ATR NaN → carry dello stop precedente (80), mai nan",
+      _rows[0].get("stop_atr") == 80.0 and _rows[0].get("stop_violated") is False)
+# 2) 2×ATR ≥ prezzo senza prev → NIENTE stop esportato (mai negativo nel payload)
+_rows = [dict(ticker="TSTX", qty=10, pmc=50, price=100.0, atr_14=60.0)]
+ud.ratchet_stops(_rows, {})
+check("scudo sotto-zero: raw negativo senza prev → nessuno stop nel payload",
+      "stop_atr" not in _rows[0] and "stop_violated" not in _rows[0])
+# 3) prev spazzatura (5× il prezzo, run avvelenato) → si riparte dal calcolo pulito
+_rows = [dict(ticker="TSTX", qty=10, pmc=50, price=100.0, atr_14=5.0)]
+ud.ratchet_stops(_rows, {"TSTX": {"stop_atr": 500.0, "qty": 10, "pmc": 50}})
+check("ratchet blindato: prev implausibile (5× prezzo) scartato → stop = ricalcolo pulito 90",
+      _rows[0].get("stop_atr") == 90.0 and _rows[0].get("stop_violated") is False)
+# 4) monotonia certificata: mai al ribasso su posizione invariata, in NESSUNA sequenza
+_prev = {}
+_stops = []
+for _px in [100.0, 130.0, 90.0, 85.0, 140.0, 60.0]:
+    _rows = [dict(ticker="TSTX", qty=10, pmc=50, price=_px, atr_14=5.0)]
+    ud.ratchet_stops(_rows, _prev)
+    _stops.append(_rows[0]["stop_atr"])
+    _prev = {"TSTX": {"stop_atr": _rows[0]["stop_atr"], "qty": 10, "pmc": 50}}
+check("ratchet blindato: sequenza sali-scendi → stop MONOTONO non decrescente",
+      all(b >= a for a, b in zip(_stops, _stops[1:])))
+
+# ---------- drop_void_bars v115: barre-glitch (minimi fantasma) ----------
+_g = pd.DataFrame({"Open": [1900.0, 1910.0, 1905.0, 200.0, -5.0],
+                   "High": [1920.0, 1915.0, 1910.0, 210.0, 5.0],
+                   "Low":  [1890.0, 40.1,   100.0,  95.0,  -10.0],
+                   "Close":[1915.0, 1912.0, 1908.0, 100.0, 3.0]})
+# riga 0: sana · riga 1: minimo fantasma 40.1 con corpo ~1910 (bad tick → VIA) ·
+# riga 2: Low 100 su corpo 1905 (glitch → VIA) · riga 3: flash crash VERO (chiude 100,
+# low 95 vicino al corpo → RESTA) · riga 4: prezzi negativi (→ VIA)
+_clean = ud.drop_void_bars(_g)
+check("barre-glitch: minimo fantasma (SNDK-like 40.1 su corpo 1910) e prezzi ≤0 scartati, flash crash vero conservato",
+      len(_clean) == 2 and list(_clean["Low"]) == [1890.0, 95.0])
+
+N_CHECKS = 35
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
