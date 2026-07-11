@@ -180,6 +180,40 @@ check("decisionVerdict: riabilitato entra tra gli eleggibili e nei reasons come 
     !dv.excluded.some(x => x.r.ticker === "TSTR") &&
     dv.reasons.some(s => s.includes("RIABILITATI") && s.includes("TSTR"))`));
 
+// ---- v112: staleness dichiarata, indici non operabili, earnings sul piano, diario, Sharpe 6M ----
+check("prompt v112: prezzo stale flaggato '[chiusura del …]' e indici PTS senza stop/R:R", run(`
+  DATA.watchlist.push({ ticker: "TSTI", name: "Indice Test", currency: "PTS", price: 1000,
+    price_asof: "2020-01-01", change_pct: 0.5, support: 950, resistance: 1100, rsi: 50, atr_14: 20, atr_pct: 2,
+    vol_ratio: 1, signal: "ok", signal_class: "good", sector: "—", stats: null, sparks: {}, tech_by_range: {}, financials: [] });
+  const p = buildPrompt();
+  DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== "TSTI");
+  const line = p.split("\\n").find(l => l.includes("TSTI"));
+  return line.includes("[chiusura del 01/01]") && !line.includes("teorico") && !line.includes("1:")`));
+check("prompt v112: [!EARNINGS RISK] sulla riga del piano d'ingresso (Livelli)", run(`
+  const fut = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  const wl = DATA.watchlist.find(r => r.ticker === "TSTW"); wl.earnings_date = fut;
+  const p = buildPrompt();
+  delete wl.earnings_date;
+  const line = p.split("\\n").find(l => l.includes("Livelli calcolati dal motore"));
+  return line && line.includes("TSTW") && line.includes("[!EARNINGS RISK: trimestrale " + fut)`));
+check("prompt v112: istruzione di incrocio diario ↔ Tabella A quando il diario è popolato", run(`
+  localStorage.setItem("action_diary", JSON.stringify([{ date: "2026-07-10", text: "acquisto test 10 azioni" }]));
+  const p = buildPrompt();
+  localStorage.removeItem("action_diary");
+  return p.includes("INCROCIA il diario con la Tabella A") && p.includes("acquisto test 10 azioni")`));
+check("quantScore v112: il riabilitato usa lo Sharpe 6M (regime) e supera la soglia candidati", run(`
+  DATA.watchlist.push({ ticker: "TSTR6", name: "Rehab Regime", currency: "USD", price: 100,
+    sortino_1y: -0.8, sharpe_1y: -0.5, sharpe_6m: 2.6, rs_1m: 4, rs_ndx_1m: 3.5, sma200_dist_pct: 4.2, w52_dist_pct: -20,
+    support: 95, resistance: 120, rsi: 50, atr_14: 3, atr_pct: 3, vol_ratio: 1, fin_health: 75,
+    signal: "ok", signal_class: "good", sector: "Technology", avg_corr: 0.2, max_corr: 0.4, max_corr_with: "TST1",
+    stats: { roe: 0.30, profit_margin: 0.20, revenue_growth: 0.25, peg: 1.2, market_cap: 1e9, avg_volume_30d: 1e7 },
+    sparks: {}, tech_by_range: {}, financials: [] });
+  const dv = decisionVerdict();
+  DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== "TSTR6");
+  const cand = dv.accumula.find(r => r.ticker === "TSTR6");
+  const rl = dv.reasons.find(s => s.includes("RIABILITATI"));
+  return !!cand && cand._q >= 60 && rl.includes("Sharpe 6M 2,6")`));
+
 // ---- TRIM PEG-aware (v111, let winners run): P/E ottico alto ma PEG sano → niente trim ----
 check("trim growth: P/E 185 con PEG 1.2 (AMD-like) NON va in trim; PEG n.d. (CBRS-like) sì", run(`
   DATA.portfolio.push(

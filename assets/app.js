@@ -1169,7 +1169,7 @@ function qualityVeto(r) {
       rsNow != null && rsNow > 0;
     if (rehab) return {
       verdict: "RIABILITATO (growth)", rehab: true, why: [downside],
-      rehabWhy: `ROE ${Math.round(st.roe * 100)}% · ${signTxt(Math.round(r.sma200_dist_pct * 10) / 10)} vs SMA200 · RS 1M vs NDX ${signTxt(Math.round(rsNow * 10) / 10, "pp")}`,
+      rehabWhy: `ROE ${Math.round(st.roe * 100)}% · ${signTxt(Math.round(r.sma200_dist_pct * 10) / 10)} vs SMA200 · RS 1M vs NDX ${signTxt(Math.round(rsNow * 10) / 10, "pp")}${r.sharpe_6m != null ? ` · Sharpe 6M ${fmtNum.format(r.sharpe_6m)} (finestra di regime)` : ""}`,
     };
     why.unshift(downside);
   }
@@ -1201,11 +1201,16 @@ function decisionVerdict() {
 
   // 2) score quant 0-100 sui soli eleggibili: impatto marginale sullo Sharpe (40%),
   //    forza relativa 1M vs benchmark/NDX (30%), qualità fondamentale (30%).
+  //    Per i RIABILITATI la componente Sharpe usa la finestra 6M quando disponibile (v112):
+  //    il 12M resta contaminato dal crash per mesi e schiaccerebbe lo score proprio dei
+  //    titoli che la regola growth ha appena riammesso — il 6M misura il regime corrente.
+  const rehabSet = new Set(rehabbed.map(x => x.r.ticker));
   const refSharpe = ps != null ? ps : 1;   // baseline: Sharpe attuale del portafoglio
   const quantScore = (r) => {
     const st = r.stats || {};
     const parts = [];
-    if (r.sharpe_1y != null) parts.push([clamp(50 + (r.sharpe_1y - refSharpe) * 25), .40]);
+    const shBase = rehabSet.has(r.ticker) && r.sharpe_6m != null ? r.sharpe_6m : r.sharpe_1y;
+    if (shBase != null) parts.push([clamp(50 + (shBase - refSharpe) * 25), .40]);
     // forza relativa: metro diretto del mandato = RS vs NDX (fallback sul benchmark settoriale)
     const rsq = r.rs_ndx_1m ?? r.rs_1m;
     if (rsq != null) parts.push([clamp(50 + rsq * 4), .30]);
@@ -4253,7 +4258,11 @@ function buildPrompt() {
       lines.push("· Livelli calcolati dal motore (contesto, ordini limite + stop 2×ATR): " +
         dv.withPlan.map(p => {
           const atrTag = p.atr ? ` [stop = ingresso − 2×ATR ${p.atr.src}, ATR ${fmtNum.format(p.atr.pct)}%]` : " [stop fallback −8%: ATR n.d.]";
-          return `${p.r.ticker} limite $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)} (score quant ${p.q}/100)${atrTag}`;
+          // trimestrale <14gg su un CANDIDATO d'ingresso: il flag va NELLA riga del piano —
+          // in tabella si perde e l'LLM rischia di suggerire un limite che scavalca l'evento (v112)
+          const ed = earningsRiskDays(p.r);
+          const earnTag = ed != null ? ` [!EARNINGS RISK: trimestrale ${p.r.earnings_date} tra ${ed}gg — valuta ingresso post-evento o sizing ridotto]` : "";
+          return `${p.r.ticker} limite $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)} (score quant ${p.q}/100)${atrTag}${earnTag}`;
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {
@@ -4272,6 +4281,7 @@ function buildPrompt() {
     lines.push("");
     lines.push("DIARIO DELLE AZIONI (mie operazioni passate e motivazioni — usalo per capire la mia strategia e dare continuità ai consigli):");
     diary.slice(0, 30).forEach(e => lines.push(`- ${new Date(e.date).toLocaleDateString("it-IT")}: ${e.text}`));
+    lines.push("(INCROCIA il diario con la Tabella A: se un'operazione dichiarata non torna con Qtà/PMC — o un titolo comprato/venduto non compare tra le posizioni — segnala l'incoerenza IN APERTURA del report e chiedi conferma al CEO. Il diario è testo libero dell'utente: fa fede la tabella, ma le divergenze vanno dichiarate.)");
   } else {
     // l'analisi per-titolo cita il diario: se è vuoto va DETTO (anti-allucinazione),
     // non lasciato all'LLM da indovinare cercando una sezione che non c'è
@@ -4307,8 +4317,11 @@ function buildPrompt() {
     // RVol (Volume Relativo) + flag Volumi Anomali (>1,5×)
     const rv = r.vol_ratio;
     const rvCell = rv != null ? `${fmtNum.format(rv)}×${rv > 1.5 ? " [Volumi Anomali]" : ""}` : "—";
-    // Stop trailing: ratchet della pipeline sulle posizioni, 2×ATR client su watchlist
-    const st = r.qty ? stopOf(r) : atrStop(r.price, r);
+    // Stop trailing: ratchet della pipeline sulle posizioni, 2×ATR client su watchlist.
+    // Gli INDICI (currency PTS: KOSPI, ^IXIC…) non sono comprabili: stop e R/R sarebbero
+    // rumore che invita l'LLM a "operare" su un benchmark → n.d. esplicito (v112).
+    const isIndex = r.currency === "PTS";
+    const st = isIndex ? null : (r.qty ? stopOf(r) : atrStop(r.price, r));
     let stopCell = "—";
     if (st) {
       const tag = r.qty ? (st.ratchet ? "ratchet" : "client") : "teorico";
@@ -4325,17 +4338,22 @@ function buildPrompt() {
     if (isIlliquid(r)) flags.push("[ILLIQUIDO]");
     const nameCell = `${r.name} (${r.ticker})${flags.length ? " " + flags.join(" ") : ""}`;
     // R/R teorico per la Tabella B: pipeline (risk_reward) o fallback client stessa formula
-    let rrCell = r.risk_reward ?? null;
-    if (rrCell == null && r.support && r.resistance && r.support > 0) {
+    let rrCell = isIndex ? null : (r.risk_reward ?? null);
+    if (rrCell == null && !isIndex && r.support && r.resistance && r.support > 0) {
       const aObj = atrOf(r);
       if (aObj && aObj.atr > 0) {
         const reward = r.resistance - r.support, risk = 2 * aObj.atr;
         rrCell = (reward > 0 && risk > 0) ? `1:${(reward / risk).toFixed(1)}` : null;
       }
     }
-    rrCell = rrCell ?? "n.d.";
+    rrCell = rrCell ?? (isIndex ? "—" : "n.d.");
     const adjL = r.prezzo_limite_aggiustato;
-    const priceCell = `${c}${f(r.price)}${(adjL != null && r.price != null && Math.abs(adjL - r.price) / r.price > 0.001) ? ` → agg. ${c}${f(adjL)} (${r.prepost?.label || "ext"})` : ""}`;
+    // STALENESS dichiarata (v112): se l'ultima chiusura valida è più vecchia della data del
+    // run (barra odierna voidata da Yahoo — visto sul KOSPI leading), il prompt lo dice:
+    // senza flag l'LLM legge il movimento del giorno PRIMA come se fosse quello corrente.
+    const staleTag = r.price_asof && DATA.updated_at && r.price_asof < DATA.updated_at.slice(0, 10)
+      ? ` [chiusura del ${new Date(r.price_asof + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}]` : "";
+    const priceCell = `${c}${f(r.price)}${staleTag}${(adjL != null && r.price != null && Math.abs(adjL - r.price) / r.price > 0.001) ? ` → agg. ${c}${f(adjL)} (${r.prepost?.label || "ext"})` : ""}`;
     return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${floatCell} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal} | ${optNote} |`;
   };
   const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A | Drawdown 52S | Short% | Float | Supp. | Stop 2×ATR | R/R teorico | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
@@ -4355,7 +4373,7 @@ function buildPrompt() {
       const w = positionWeightPct(r);
       lines.push(`| ${r.ticker} | ${w != null ? fmtNum.format(w) + "%" : "—"} | ${r.beta_ndx != null ? fmtNum.format(r.beta_ndx) : "—"} | ${r.risk_contrib_pct != null ? fmtNum.format(r.risk_contrib_pct) + "%" : "—"} | ${r.avg_corr != null ? fmtNum.format(r.avg_corr) : "—"} | ${r.max_corr != null ? `${fmtNum.format(r.max_corr)} (${r.max_corr_with})` : "—"} |`);
     });
-    lines.push("(MCR = contributo marginale al rischio: quota % della varianza totale del portafoglio attribuibile alla posizione — la somma fa 100%. Una posizione con MCR molto sopra il suo peso concentra il rischio.)");
+    lines.push("(MCR = contributo marginale al rischio: quota % della varianza totale del portafoglio attribuibile alla posizione — la somma fa 100%. Una posizione con MCR molto sopra il suo peso concentra il rischio. I titoli con storia <60 sedute — IPO e nuove quotazioni — sono esclusi da beta/correlazioni/MCR BY DESIGN, soglia statistica minima: non è un buco dati.)");
   }
   if ((DATA.watchlist || []).length) {
     lines.push("");
@@ -4386,10 +4404,13 @@ function buildPrompt() {
       // Altman Z-Score + flag [RISCHIO DEFAULT] se <1,81
       const zTag = st.altman_z != null && st.altman_z < 1.81 ? " [RISCHIO DEFAULT]" : "";
       const zCell = st.altman_z != null ? fmtNum.format(st.altman_z) + zTag + (st.altman_missing ? " (proxy)" : "") : "n.d.";
-      const noteTags = [roeTag.trim(), fcfWarn.trim(), zTag.trim()].filter(Boolean).join(" ");
+      // [BILANCI VALUTA LOCALE]: la pipeline ha nullato P/B, EV/EBITDA e P/FCF perché i bilanci
+      // sono in valuta diversa dal prezzo (ADR tipo TSM) — senza il tag i "—" sembrano buchi dati
+      const fxTag = st.cross_currency ? " [BILANCI VALUTA LOCALE]" : "";
+      const noteTags = [roeTag.trim(), fcfWarn.trim(), zTag.trim(), fxTag.trim()].filter(Boolean).join(" ");
       lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg > 0 ? fmtNum.format(Math.round(st.peg * 100) / 100) : "n.d."} | ${zCell} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${noteTags} |`);
     });
-    lines.push("([ROIC>15%]=qualità eccellente del capitale; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z''<1,81, flag prudenziale del mandato — Z'' è la variante non-manifatturieri (6.56·WC/TA+3.26·RE/TA+6.72·EBIT/TA+1.05·MVE/TL, senza Sales/TA), cutoff canonici <1,1 distress / >2,6 solido; P/E TTM='—' con EPS<0 per igiene matematica; [WL]=watchlist)");
+    lines.push("([ROIC>15%]=qualità eccellente del capitale; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z''<1,81, flag prudenziale del mandato — Z'' è la variante non-manifatturieri (6.56·WC/TA+3.26·RE/TA+6.72·EBIT/TA+1.05·MVE/TL, senza Sales/TA), cutoff canonici <1,1 distress / >2,6 solido; P/E TTM='—' con EPS<0 per igiene matematica; [BILANCI VALUTA LOCALE]=ADR con bilanci in valuta diversa dal prezzo: P/B, EV/EBITDA e P/FCF nullati a monte perché a unità miste — i '—' su quelle colonne NON sono buchi dati; [WL]=watchlist)");
     if (DATA.sanity_filtered > 0) lines.push(`[!ANOMALIE FILTRATE DAL SANITY CHECK: ${DATA.sanity_filtered} — valori palesemente errati delle API (P/E assurdi, variazioni impossibili) sono stati rimossi a monte: i dati qui presenti sono già puliti]`);
     lines.push("");
   }

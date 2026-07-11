@@ -131,6 +131,14 @@ check("scrub_cross_currency: valute uguali (o mancanti) → no-op",
       _same["price_to_book"] == 99.2 and "cross_currency" not in _same
       and ud.scrub_cross_currency_stats(dict(_s), None, "USD")["fcf"] == 4e12)
 
-N_CHECKS = 25
+# ---------- risk_ratios (v112): stessa metrica su finestre 12M e 6M ----------
+_ret = pd.Series(([0.01, -0.002] * 100))          # drift positivo con downside reale
+_sh, _so = ud.risk_ratios(_ret)
+check("risk_ratios: drift positivo → Sharpe e Sortino positivi, Sortino ≥ Sharpe (downside dev ≤ std)",
+      _sh is not None and _so is not None and _sh > 0 and _so >= _sh)
+check("risk_ratios: <60 osservazioni → (None, None) — la finestra 6M di un'IPO resta n.d.",
+      ud.risk_ratios(pd.Series([0.01] * 30)) == (None, None))
+
+N_CHECKS = 27
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)

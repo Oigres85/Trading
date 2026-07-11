@@ -348,6 +348,11 @@ TICKER_ALIAS = {
     "TSMC": "TSM",   # l'ADR USA di Taiwan Semiconductor è TSM: "TSMC" su Yahoo non esiste
 }
 
+# Settori noti che Yahoo non popola (ADR neo-quotati: info.sector assente per settimane).
+# Senza override finivano nel bucket fantasma "EQUITY" (il quoteType usato come settore!)
+# e la CONCENTRAZIONE Technology risultava SOTTOSTIMATA nel prompt — v112.
+SECTOR_OVERRIDES = {"SKHYV": "Technology"}
+
 
 def _risk_reward_str(limite, target, atr):
     """R/R teorico "1:X.X" con risk = 2×ATR sotto il limite e reward = target − limite.
@@ -459,6 +464,27 @@ def scrub_cross_currency_stats(stats, financial_currency, quote_currency):
     return stats
 
 
+def risk_ratios(daily_ret):
+    """Sharpe e Sortino ANNUALIZZATI da una serie di LOG-rendimenti giornalieri (≥60 oss.,
+    altrimenti (None, None)). Estratto in helper (v112) per calcolare la stessa identica
+    metrica su finestre diverse: 12M (veto value trap) e 6M (score dei riabilitati growth).
+    Sortino: stesso numeratore dello Sharpe, al denominatore la sola downside deviation
+    (radice della media dei quadrati dei rendimenti sotto il Rf giornaliero)."""
+    if len(daily_ret) < 60:
+        return None, None
+    sharpe = sortino = None
+    std_d = float(daily_ret.std(ddof=1))
+    rf_log = math.log1p(RISK_FREE_RATE)                          # Rf coerente in spazio log
+    rp = float(daily_ret.mean()) * TRADING_DAYS                  # log-rendimento annualizzato
+    if std_d > 0:
+        sharpe = round((rp - rf_log) / (std_d * (TRADING_DAYS ** 0.5)), 2)
+    downside = np.minimum(daily_ret.values - rf_log / TRADING_DAYS, 0.0)
+    dd_ann = float(np.sqrt(np.mean(downside ** 2)) * (TRADING_DAYS ** 0.5))
+    if dd_ann > 0:
+        sortino = round((rp - rf_log) / dd_ann, 2)
+    return sharpe, sortino
+
+
 def drop_void_bars(hist):
     """Barre senza Close via. Yahoo può appendere la barra ODIERNA con Close=NaN e volume
     valorizzato (visto sul campo, lug 2026: ^KS11 dopo la chiusura coreana) → il prezzo
@@ -488,6 +514,13 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     # prezzo_limite_aggiustato: MAI dentro metriche statiche (returns, ATR, mcap, covarianze).
     price = float(closes.iloc[-1])
     prev = float(closes.iloc[-2]) if len(closes) > 1 else price
+    # DATA dell'ultima chiusura valida: se Yahoo ha voidato la barra odierna (drop_void_bars,
+    # visto su ^KS11) il prezzo è quello del giorno PRIMA — il prompt lo deve dichiarare
+    # ("[chiusura del DD/MM]") o l'LLM legge un movimento vecchio come se fosse di oggi.
+    try:
+        price_asof = str(closes.index[-1].date())
+    except Exception:  # noqa: BLE001 — indice non-datetime (backup esotici): meglio niente che sbagliato
+        price_asof = None
 
     monthly = None
     try:
@@ -516,21 +549,11 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     # e correlazioni. I log-return sono additivi nel tempo e non sovrastimano il rendimento
     # composto come la media aritmetica dei rendimenti semplici (bias ~ +sigma^2/2 sui titoli volatili).
     daily_ret = np.log(closes / closes.shift(1)).replace([np.inf, -np.inf], np.nan).dropna()
-    sharpe_1y, sortino_1y = None, None
-    if len(daily_ret) >= 60:
-        std_d = float(daily_ret.std(ddof=1))
-        rf_log = math.log1p(RISK_FREE_RATE)                          # Rf coerente in spazio log
-        rp = float(daily_ret.mean()) * TRADING_DAYS                  # log-rendimento annualizzato
-        if std_d > 0:
-            sigma = std_d * (TRADING_DAYS ** 0.5)                    # volatilità annualizzata
-            sharpe_1y = round((rp - rf_log) / sigma, 2)
-        # Sortino: stesso numeratore, ma al denominatore la sola downside deviation
-        # (radice della media dei quadrati dei rendimenti sotto Rf giornaliero).
-        # È il metro del VETO value trap: punisce le perdite, non i rally.
-        downside = np.minimum(daily_ret.values - rf_log / TRADING_DAYS, 0.0)
-        dd_ann = float(np.sqrt(np.mean(downside ** 2)) * (TRADING_DAYS ** 0.5))
-        if dd_ann > 0:
-            sortino_1y = round((rp - rf_log) / dd_ann, 2)
+    sharpe_1y, sortino_1y = risk_ratios(daily_ret)
+    # Finestra 6M (~126 sedute): metrica di REGIME per lo score dei RIABILITATI growth —
+    # dopo un crash la finestra 12M resta contaminata dal drawdown per mesi e schiaccia
+    # lo score di titoli già in recupero; il 6M misura il regime corrente. Il VETO resta sul 12M.
+    sharpe_6m, sortino_6m = risk_ratios(daily_ret.tail(126))
 
     vol = float(hist["Volume"].iloc[-1])
     # RVol (volume relativo) su base FULL-DAY: se l'ultimo bar è di OGGI e la sessione USA è ancora
@@ -777,10 +800,12 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     auto_name = (info.get("shortName") or ticker).strip()
     if len(auto_name) > 26:
         auto_name = auto_name[:25].rstrip() + "…"
-    # sanity: una variazione intraday >+150% / <-80% su una large cap (>$5 mld) è un glitch API
-    chg = round((price / prev - 1) * 100, 2)
+    # sanity: una variazione intraday >+150% / <-80% su una large cap (>$5 mld) è un glitch API.
+    # Con UNA sola barra di storico (IPO del giorno prima: visto su SKHYV) prev==price darebbe
+    # uno 0% FINTO — meglio n.d. che un numero inventato (il day-2 reale era +13%).
+    chg = round((price / prev - 1) * 100, 2) if len(closes) > 1 else None
     mcap = info.get("marketCap") or 0
-    if mcap > 5e9 and not (-80 <= chg <= 150):
+    if chg is not None and mcap > 5e9 and not (-80 <= chg <= 150):
         global SANITY_FILTERED
         SANITY_FILTERED += 1
         print(f"!! sanity check: change_pct {chg}% scartato per {ticker} (mcap ${mcap/1e9:.0f}B)", file=sys.stderr)
@@ -791,6 +816,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "currency": currency,
         "price_src": price_src,          # "yahoo" | "stooq" (fallback prezzi etichettato)
         "price": round(price, 2),
+        "price_asof": price_asof,        # data dell'ultima chiusura valida (staleness dichiarabile)
         "change_pct": chg,
         "pe": round(float(pe), 1) if pe and pe > 0 else None,
         "ath": round(ath, 2),
@@ -815,6 +841,8 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "beta": round(float(beta), 2) if beta is not None else None,
         "sharpe_1y": sharpe_1y,
         "sortino_1y": sortino_1y,
+        "sharpe_6m": sharpe_6m,          # finestra di REGIME per lo score dei riabilitati growth
+        "sortino_6m": sortino_6m,
         "prepost": prepost,
         # OFFLOADING per l'LLM: prezzo di riferimento REALE per ordini limite. Se c'è un gap
         # pre/after (sessione estesa) usa QUEL prezzo; altrimenti l'ultima chiusura regolare.
@@ -826,7 +854,8 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             float(hist["Low"].tail(20).min()),            # limite = supporto
             float(hist["High"].tail(20).max()),           # target = resistenza
             atr_14),
-        "sector": info.get("sector") or info.get("quoteType") or "Altro",
+        # MAI il quoteType come settore ("EQUITY" non è un settore: falsava la concentrazione)
+        "sector": SECTOR_OVERRIDES.get(ticker) or info.get("sector") or "Altro",
         "stats": stats,
         "tech_by_range": tech_by_range,
         "financials": financials,
