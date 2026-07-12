@@ -1117,7 +1117,18 @@ function stopOf(r) {
              pct: r.atr_pct ?? null, src: "ratchet 2×ATR" };
   }
   const st = atrStop(r.price, r);
-  if (!st) return null;
+  if (!st) {
+    // STOP PROVVISORIO v119: una posizione DETENUTA senza ATR (IPO con storia <15 sedute,
+    // es. SKHYV) resterebbe SENZA PROTEZIONE — un titolo in portafoglio senza stop è un buco
+    // di risk management. Finché la serie non basta al 2×ATR, stop provvisorio −12% dal
+    // prezzo (dichiarato), sostituito dal ratchet reale appena l'ATR è disponibile.
+    if (r.qty && r.price > 0) {
+      const prov = Math.round(r.price * 0.88 * 100) / 100;
+      return { stop: prov, violated: r.price < prov, ratchet: false, pct: 12,
+               src: "provvisorio −12% (ATR n.d.: storia <15 sedute, da inizializzare)" };
+    }
+    return null;
+  }
   const inGain = r.qty && r.pmc != null && r.price > r.pmc;
   const stop = inGain ? Math.max(st.stop, r.pmc) : st.stop;
   return { stop: Math.round(stop * 100) / 100, violated: r.price < stop, ratchet: false, pct: st.pct, src: st.src };
@@ -4354,17 +4365,31 @@ function buildPrompt() {
           // paracadute v115: se il supporto API era fuori banda, il limite viene da un
           // fallback e l'LLM deve saperlo (mai fallback silenziosi)
           const srcTag = p.limitFallback ? ` [supporto API fuori banda ±25%: limite da ${p.limitSrc}]` : "";
-          return `${p.r.ticker} limite $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}`;
+          // v119 — TUTTI i campi della citazione tracciabilità (prezzo, limite, stop, R/R) su
+          // UNA riga: prima l'LLM doveva assemblarli cercando in tabella e sbagliava (metteva il
+          // limite nello slot "Prezzo" della citazione). Ora cita direttamente da qui.
+          const rr = p.r.risk_reward ? ` / R/R ${p.r.risk_reward}` : "";
+          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}`;
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {
       lines.push("· Stop trailing posizioni aperte (ratchet 2×ATR, ancorati — non ridiscendono): " +
-        dv.trailing.map(x => `${x.r.ticker} stop $${fmtNum.format(x.stop)} (${signTxt(Math.round((x.stop / x.r.price - 1) * 1000) / 10)}${x.violated ? " ⚠VIOLATO" : ""})`).join(" · ") + ".");
+        dv.trailing.map(x => {
+          const prov = (x.atr?.src || "").includes("provvisorio");
+          return `${x.r.ticker} stop $${fmtNum.format(x.stop)} (${signTxt(Math.round((x.stop / x.r.price - 1) * 1000) / 10)}${x.violated ? " ⚠VIOLATO" : ""}${prov ? " — PROVVISORIO −12%, ATR n.d. (storia <15 sedute): da inizializzare al prossimo run" : ""})`;
+        }).join(" · ") + ".");
     }
     if ((dv.excluded || []).length) lines.push("· ESCLUSI dal veto risk manager (contesto): " + dv.excluded.map(x => `${x.r.ticker} → ${x.verdict} (${x.why.join(", ")})`).join(" · ") + ".");
     if ((dv.rehabbed || []).length) lines.push("· RIABILITATI dal veto Sortino — regola growth v111 (contesto): " + dv.rehabbed.map(x => `${x.r.ticker} → ${x.why.join(", ")}; MA ${x.rehabWhy}`).join(" · ") + ". Il Sortino 12M è backward-looking: con qualità intatta, prezzo sopra SMA200 e RS positiva il titolo è di nuovo eleggibile all'accumulo, da SORVEGLIATO (dichiara sempre il trailing negativo).");
     if ((dv.squeezed || []).length) lines.push("· [TURNAROUND SQUEEZE RISK] (contesto, v113): " + dv.squeezed.map(x => `${x.r.ticker} → veto (${x.why[0]}) MA short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% + RVol ${fmtNum.format(x.r.vol_ratio)}× + prezzo sopra SMA50 (${signTxt(x.r.sma50_dist_pct)})`).join(" · ") + ". NON è un candidato del mandato growth: se il CEO vuole trattarlo, va dichiarato come SPECULAZIONE asimmetrica — sizing massimo METÀ dello standard, stop stretto 1×ATR, solo ordine limite, mai media al ribasso.");
-    if ((dv.overweight || []).length) lines.push("· Sizing oltre il 10% del NAV (candidati a trimming di rientro): " + dv.overweight.map(x => `${x.r.ticker} ${fmtNum.format(x.w)}%`).join(" · ") + ".");
+    // v119 — il trim ora porta un PREZZO LIMITE di vendita e la QUANTITÀ esatta per rientrare
+    // al 10% del NAV (matematica del sistema, non a mente): prima il prompt dava solo il peso %
+    // e l'LLM ripiegava su "a mercato", violando la regola ordini-limite del mandato.
+    if ((dv.overweight || []).length) lines.push("· Sizing oltre il 10% del NAV (candidati a trimming di rientro; ordine LIMITE di vendita, mai a mercato): " + dv.overweight.map(x => {
+      const r = x.r, toTen = (r.qty && x.w > 10) ? Math.ceil(r.qty * (1 - 10 / x.w)) : null;
+      const lim = r.price ? `${cur(r)}${fmtNum.format(r.price)}` : "n.d.";
+      return `${r.ticker} ${fmtNum.format(x.w)}%${toTen ? ` → per rientrare a 10% NAV: vendere ~${toTen} az. a limite ≥ ${lim} (prezzo corrente)` : ""}`;
+    }).join(" · ") + ".");
     if ((dv.trim || []).length) lines.push("· Posizioni segnalate dal motore come tese (contesto): " + dv.trim.map(r => `${r.ticker} (${r.pe > 150 ? "P/E " + fmtNum.format(r.pe) : "RSI " + r.rsi})`).join(" · ") + ".");
     if ((dv.harvest || []).length) lines.push("· Minusvalenze latenti utilizzabili fiscalmente (contesto): " + dv.harvest.map(r => `${r.ticker} (${signTxt(Math.round(r.gain_eur), " €")})`).join(" · ") + ".");
   } catch { /* no-op */ }
@@ -4489,7 +4514,9 @@ function buildPrompt() {
     const st = isIndex ? null : (r.qty ? stopOf(r) : atrStop(entryRef, r));
     let stopCell = "—";
     if (st) {
-      const tag = r.qty ? (st.ratchet ? "ratchet" : "client") : "teorico";
+      // "provvisorio" ha priorità sul tag generico: uno stop −12% senza ATR (SKHYV young)
+      // NON è un ratchet ancorato, e l'LLM lo deve sapere (v119)
+      const tag = (st.src || "").includes("provvisorio") ? "provvisorio" : (r.qty ? (st.ratchet ? "ratchet" : "client") : "teorico");
       stopCell = `${c}${f(st.stop)} (${tag})`;
     }
     // flag di rischio inline nel nome: stop violato, earnings imminenti, illiquidità, FX

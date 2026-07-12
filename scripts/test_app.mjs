@@ -433,6 +433,25 @@ check("v118 coerenza riga: stop teorico watchlist ancorato al LIMITE d'ingresso,
   const limit = 1485, entryStop = 1485 - 2 * 203;   // ancorato al supporto d'ingresso
   return stop != null && stop < limit && Math.abs(stop - entryStop) < 1`));
 
+check("v119 stop provvisorio: posizione detenuta senza ATR (SKHYV IPO) NON resta senza protezione", run(`
+  DATA.portfolio.push({ ticker: "TSTIPO", name: "IPO Fresca", currency: "USD", qty: 50, pmc: 168, price: 168,
+    bval: 8400, signal: "Neutrale", signal_class: "neutral", sparks: {}, tech_by_range: {}, financials: [] });
+  const s = stopOf(DATA.portfolio.find(r => r.ticker === "TSTIPO"));
+  DATA.portfolio = DATA.portfolio.filter(r => r.ticker !== "TSTIPO");
+  return s && Math.abs(s.stop - 168 * 0.88) < 0.5 && s.ratchet === false && s.src.includes("provvisorio")`));
+check("v119 tracciabilità: la riga Livelli porta prezzo, limite e stop sulla stessa riga (R/R se presente)", run(`
+  // il candidato del fixture ha risk_reward → R/R deve comparire
+  DATA.watchlist.forEach(r => { if (r.ticker === "TSTW") r.risk_reward = "1:2.5"; });
+  const p = buildPrompt();
+  DATA.watchlist.forEach(r => { if (r.ticker === "TSTW") delete r.risk_reward; });
+  const liv = p.split("\\n").find(l => l.includes("Livelli calcolati"));
+  return liv && /prezzo \\$[\\d.,]+ → limite d'ingresso \\$[\\d.,]+ \\/ stop \\$[\\d.,]+/.test(liv) && liv.includes("/ R/R 1:2.5")`));
+check("v119 trim con limite: le posizioni sovrappeso portano qtà e prezzo LIMITE di vendita (no 'a mercato')", run(`
+  const p = buildPrompt();
+  const line = p.split("\\n").find(l => l.includes("Sizing oltre il 10%"));
+  return line && line.includes("ordine LIMITE di vendita, mai a mercato") &&
+    /vendere ~\\d+ az\\. a limite ≥ \\$[\\d.,]+/.test(line)`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {
