@@ -1386,7 +1386,14 @@ function decisionVerdict() {
   if (rehabbed.length) reasons.push(`RIABILITATI dal veto Sortino (regola growth v111 — qualità intatta + prezzo sopra SMA200 + RS 1M vs NDX positiva, criteri tutti meccanici): ${rehabbed.map(x => `${x.r.ticker} (${x.why[0]}; MA ${x.rehabWhy})`).join(" · ")} — trattali da candidati SORVEGLIATI: il trailing 12M resta negativo, la ripresa è provata dai dati correnti`);
   if (squeezed.length) reasons.push(`⚡ SETUP TURNAROUND SQUEEZE su ${squeezed.map(x => `${x.r.ticker} (short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% · RVol ${fmtNum.format(x.r.vol_ratio)}× · sopra SMA50)`).join(", ")} — il VETO growth resta: valutabile SOLO come speculazione asimmetrica dichiarata, sizing massimo METÀ dello standard, stop stretto 1×ATR, ordine limite`);
   if (overweight.length) reasons.push(`sizing: ${overweight.map(x => `${x.r.ticker} ${x.w}%`).join(", ")} oltre il 10% del NAV → valuta trimming di rientro`);
-  if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => r.ticker).join(", ")} (multiplo/RSI estremo)`);
+  // motivo PRECISO per titolo (non il generico "multiplo/RSI estremo": su CBRS scattava solo
+  // il multiplo e l'LLM segnalava "RSI 43,6 non estremo" — v118)
+  if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => {
+    const why = [];
+    if (r.pe && r.pe > 150 && !(r.stats?.peg > 0 && r.stats.peg <= 2)) why.push(`P/E ${Math.round(r.pe)}× non giustificato dalla crescita`);
+    if (r.rsi && r.rsi > 78) why.push(`RSI ${r.rsi} ipercomprato`);
+    return `${r.ticker} (${why.join(" + ") || "multiplo teso"})`;
+  }).join(", ")}`);
   return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, squeezed, overweight, harvest };
 }
 
@@ -4282,10 +4289,16 @@ function buildPrompt() {
   if (allocR.length) {
     const totA = allocR.reduce((s, a) => s + (a.value_eur || 0), 0) || 1;
     const bySecR = {};
-    allocR.filter(a => a.sector !== "Liquidità").forEach(a => { const k = a.sector || a.ticker; bySecR[k] = (bySecR[k] || 0) + (a.value_eur || 0); });
+    // v118 — la regola di CONCENTRAZIONE settoriale misura il rischio CORRELATO: base = solo
+    // capitale AZIONARIO (liquidità E obbligazioni escluse — il BTP è beta 0, non fa parte
+    // del book correlato). Prima la base includeva le obbligazioni ("dell'investito") e dava
+    // una % diversa da "Concentrazione per settore" (patrimonio totale) → l'LLM la leggeva
+    // come incoerenza. Ora le due cifre hanno denominatori ESPLICITI e distinti.
+    allocR.filter(a => a.sector !== "Liquidità" && a.sector !== "Obbligazioni")
+          .forEach(a => { const k = a.sector || a.ticker; bySecR[k] = (bySecR[k] || 0) + (a.value_eur || 0); });
     const invTot = Object.values(bySecR).reduce((s, v) => s + v, 0) || 1;
     const topSec = Object.entries(bySecR).sort((a, b) => b[1] - a[1])[0];
-    if (topSec) riskBits.push(`primo settore: ${topSec[0]} ${Math.round(topSec[1] / invTot * 100)}% dell'investito${topSec[1] / invTot > 0.25 ? " — SOPRA la soglia del 25% (regola correlazione attiva)" : ""}`);
+    if (topSec) riskBits.push(`primo settore: ${topSec[0]} ${Math.round(topSec[1] / invTot * 100)}% del capitale AZIONARIO (base del rischio correlato: liquidità e obbligazioni escluse)${topSec[1] / invTot > 0.25 ? " — SOPRA la soglia del 25% (regola correlazione attiva)" : ""}`);
     void totA;
   }
   if (cashEur > 0 && patrimonio > 0) {
@@ -4463,8 +4476,14 @@ function buildPrompt() {
     // Stop trailing: ratchet della pipeline sulle posizioni, 2×ATR client su watchlist.
     // Gli INDICI (currency PTS: KOSPI, ^IXIC…) non sono comprabili: stop e R/R sarebbero
     // rumore che invita l'LLM a "operare" su un benchmark → n.d. esplicito (v112).
+    // v118 — COERENZA DI RIGA: sui candidati watchlist lo stop teorico si ancora al LIMITE
+    // D'INGRESSO (saneEntryLimit), non al prezzo corrente. Prima, su un titolo ad ATR alto
+    // (SNDK: 2×ATR=$406 su prezzo $1916, ma supporto d'ingresso $1485) lo stop-da-prezzo
+    // usciva $1509 → SOPRA il limite → stop-loss long impossibile, e in conflitto col piano
+    // ($1078). Ora tabella, R/R e "Livelli calcolati dal motore" hanno UN'UNICA reference.
     const isIndex = r.currency === "PTS";
-    const st = isIndex ? null : (r.qty ? stopOf(r) : atrStop(r.price, r));
+    const entryRef = (!isIndex && !r.qty) ? (saneEntryLimit(r)?.limit ?? r.price) : r.price;
+    const st = isIndex ? null : (r.qty ? stopOf(r) : atrStop(entryRef, r));
     let stopCell = "—";
     if (st) {
       const tag = r.qty ? (st.ratchet ? "ratchet" : "client") : "teorico";
@@ -4732,7 +4751,7 @@ function buildPrompt() {
     const bySec = {};
     alloc.forEach(a => { const k = a.sector || a.ticker; bySec[k] = (bySec[k] || 0) + (a.value_eur || 0); });
     const secs = Object.entries(bySec).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${Math.round(v / tot * 100)}%`);
-    lines.push(`- Concentrazione per settore: ${secs.join(" · ")} (portafoglio fortemente sbilanciato sul tech/semi → priorità al de-risking)`);
+    lines.push(`- Concentrazione per settore (% del PATRIMONIO TOTALE, liquidità e obbligazioni incluse, somma 100%): ${secs.join(" · ")} (portafoglio fortemente sbilanciato sul tech/semi → priorità al de-risking). NB: la "regola correlazione >25%" nelle METRICHE DI RISCHIO usa invece la % del solo capitale azionario — denominatore diverso, non un'incoerenza.`);
   }
   // statistiche di performance dal broker
   if (DATA.broker) {

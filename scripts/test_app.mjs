@@ -418,6 +418,21 @@ check("null-storm: riga con SOLE quotazioni (tutte le metriche assenti) → nien
   DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== "TSTN");
   return ok && p.includes("TSTN") && !p.includes("undefined") && !/\\bNaN\\b/.test(p)`));
 
+check("v118 coerenza riga: stop teorico watchlist ancorato al LIMITE d'ingresso, MAI sopra (incidente SNDK)", run(`
+  // SNDK-like: ATR alto, supporto profondo — lo stop-da-prezzo uscirebbe SOPRA il limite
+  DATA.watchlist.push({ ticker: "TSTK", name: "HiATR", currency: "USD", price: 1916,
+    support: 1485, resistance: 2354, atr_14: 203, atr_pct: 10.6, rsi: 52, vol_ratio: 0.9,
+    sharpe_1y: 3.5, sortino_1y: 5.9, signal: "Trend rialzista", signal_class: "good",
+    sma50_dist_pct: 5, stats: { roe: 0.39, profit_margin: 0.34, peg: 1.3, market_cap: 5e10 },
+    sparks: {}, tech_by_range: {}, financials: [] });
+  const p = buildPrompt();
+  DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== "TSTK");
+  const row = p.split("\\n").find(l => l.startsWith("| HiATR"));
+  const m = row.match(/\\$(\\d+(?:[.,]\\d+)?) \\(teorico\\)/);
+  const stop = m ? parseFloat(m[1].replace(",", ".")) : null;
+  const limit = 1485, entryStop = 1485 - 2 * 203;   // ancorato al supporto d'ingresso
+  return stop != null && stop < limit && Math.abs(stop - entryStop) < 1`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

@@ -219,6 +219,16 @@ check("morning brief: verdetto, stop violati, earnings, delta VIX 7g e riabilita
 check("morning brief: niente 'None'/'nan' nel testo e lunghezza entro il limite CallMeBot",
       "None" not in _brief and "nan" not in _brief and len(_brief) <= 1400)
 
-N_CHECKS = 37
+# ---------- div_yield_frac (v118): dividendo assoluto/prezzo, non ambiguo + cap ----------
+check("div_yield_frac: rate/price esatto (GOOGL $0,84 su $357 = 0,24%, non il 25% del bug)",
+      abs(ud.div_yield_frac(0.84, 357.0, 0.25) - 0.84 / 357.0) < 1e-9)
+check("div_yield_frac: MU $0,46 su $979 ≈ 0,047% (non il 5% del bug boundary)",
+      ud.div_yield_frac(0.46, 979.0, 0.05) < 0.001)
+check("div_yield_frac: senza tasso → fallback al campo % di Yahoo (ORCL 1.39 → 0,0139)",
+      abs(ud.div_yield_frac(None, 140.0, 1.39) - 0.0139) < 1e-9)
+check("div_yield_frac: cap 30% — un 453% (TLT-like) è errore di unità → None",
+      ud.div_yield_frac(None, 84.0, 453.0) is None and ud.div_yield_frac(300.0, 84.0, None) is None)
+
+N_CHECKS = 41
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)

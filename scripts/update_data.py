@@ -449,13 +449,30 @@ def bench_close(sym, fallback=None, period="2mo"):
 
 
 def norm_div_yield(v):
-    """Normalizza dividendYield di Yahoo a FRAZIONE (0.0142 = 1,42%). yfinance ha cambiato
-    unità (2025+: il campo arriva già in PERCENTO — visto sul campo: ORCL 1.39 mostrato
-    "139%", TLT 4.53 mostrato "453%"). Heuristica: nessun asset di questo universo rende
-    >25% → un valore >0.25 è un percento da riportare a frazione."""
+    """Normalizza il campo dividendYield di Yahoo a FRAZIONE. FALLBACK euristico (usare
+    div_yield_frac quando c'è dividendRate+prezzo): yfinance dà il campo in PERCENTO
+    (ORCL 1.39=1,39%, TLT 4.53=4,53%) → /100. ⚠ la soglia 0.25 sbagliava sui titoli a
+    yield BASSO (GOOGL 0.25→"25%", MU 0.05→"5%", bug v118): sotto 0.25 non si può
+    distinguere "0,25%" (percento) da "25%" (frazione) senza il tasso assoluto."""
     if v is None:
         return None
     return v / 100 if v > 0.25 else v
+
+
+def div_yield_frac(rate, price, yfield):
+    """Dividend yield come FRAZIONE, fonte NON AMBIGUA: dividendo annuo $/azione ÷ prezzo.
+    dividendRate è un valore assoluto (GOOGL $0,84, MU $0,46) → yield = rate/price esatto,
+    nessuna euristica. Fallback al campo % di Yahoo (norm_div_yield) se il tasso manca.
+    Cap di sicurezza: un yield >30% nel nostro universo è un errore di unità → None (il
+    payload lo mostra '—', mai un '25%' assurdo su una large-cap tech)."""
+    y = None
+    if _finite_pos(rate) and _finite_pos(price):
+        y = rate / price
+    else:
+        y = norm_div_yield(yfield)
+    if y is not None and y > 0.30:
+        return None
+    return y
 
 
 def scrub_cross_currency_stats(stats, financial_currency, quote_currency):
@@ -736,7 +753,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             "profit_margin": num("profitMargins"),
             "roe": num("returnOnEquity"),
             "debt_to_equity": num("debtToEquity"),
-            "dividend_yield": norm_div_yield(num("dividendYield")),
+            "dividend_yield": div_yield_frac(num("dividendRate", "trailingAnnualDividendRate"), price, num("dividendYield")),
             "price_to_book": num("priceToBook"),
             "target_mean": num("targetMeanPrice"),
             "fcf": num("freeCashflow"),
@@ -2418,8 +2435,9 @@ def fetch_top_etfs():
         try:
             info = yf.Ticker(ticker).info
             row["pe"]        = round(float(info["trailingPE"]), 1) if info.get("trailingPE") else None
-            # norm_div_yield: yfinance può dare il campo già in % (TLT usciva "453%")
-            row["div_yield"] = round((norm_div_yield(float(info.get("dividendYield", 0) or 0)) or 0) * 100, 2)
+            # div_yield_frac: tasso assoluto/prezzo (non ambiguo) + cap 30% (TLT usciva "453%")
+            _dr = info.get("dividendRate") or info.get("trailingAnnualDividendRate")
+            row["div_yield"] = round((div_yield_frac(_dr, row.get("price"), info.get("dividendYield")) or 0) * 100, 2)
             aum = info.get("totalAssets")
             row["aum"] = round(aum / 1e9, 1) if aum else None
         except Exception:  # noqa: BLE001
