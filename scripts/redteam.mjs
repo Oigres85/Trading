@@ -11,6 +11,14 @@
      I4  righe tabelle = conteggi dichiarati ("N POSIZIONI/TITOLI → N righe")
      I5  R/R "1:X" con X ≤ 60 (rapporti oltre = resistenza/ATR garbage)
      I6  coerenza di riga: stop teorico watchlist < supporto d'ingresso della stessa riga
+     I7  ogni posizione DETENUTA (Qtà valorizzata, no BTP) ha uno stop (SKHYV senza stop)
+     I8  Div% in [0,20] su ogni riga fondamentale (bug GOOGL "25%": errore di unità)
+     I9  ROE in [-150,400]% (fuori = unità sbagliate)
+     I10 Prezzo/Supp. mai ≤ 0 nelle tabelle titoli (backstop lato prompt del gate pipeline)
+     I11 nessun leak di placeholder (null nudo, [object Object], undefined%)
+   Ogni invariante nasce da un bug REALE già visto → il red team lo rende una guardia
+   permanente: la classe non può ripresentarsi senza far fallire la CI. NON prova l'assenza
+   di OGNI bug (impossibile), ma chiude le classi ricorrenti che finora trovava l'LLM a mano.
    Exit 1 con report dettagliato alla prima campagna con violazioni.
    In CI: gate HARD in tests.yml (il codice rotto non si pusha), best-effort + allarme
    WhatsApp in update-data.yml (i dati freschi che rompono gli invarianti non passano
@@ -159,6 +167,67 @@ function checkCampaign(name, ctx) {
       fail(name, `I6 ${cols[1]}: stop teorico ${stop} ≥ supporto d'ingresso ${supp} (stop long impossibile — incidente SNDK)`);
     }
   }
+  auditTables(name, p);   // I7–I11: audit semantico delle tabelle (ogni bug passato → guardia)
+}
+
+/* AUDITOR SEMANTICO DELLE TABELLE (v120) — la risposta al "ogni report scopre nuovi bug":
+   invece di aspettare che l'LLM li trovi, ogni CLASSE di bug già vista diventa una guardia
+   deterministica che gira su TUTTE le campagne. Parsa le tabelle per NOME di colonna (robusto
+   al riordino), non per posizione fissa. Non prova l'assenza di OGNI bug (impossibile), ma
+   chiude le classi ricorrenti: valore impossibile, posizione senza stop, cella ≤0, leak. */
+function parseIt(s) {
+  if (!s) return null;
+  const m = s.match(/-?\d[\d.]*,\d+|-?\d[\d.]*/);   // numero italiano o semplice
+  if (!m) return null;
+  let t = m[0];
+  if (t.includes(",")) t = t.replace(/\./g, "").replace(",", ".");   // "." = migliaia, "," = decimali
+  const v = parseFloat(t);
+  return Number.isFinite(v) ? v : null;
+}
+function tablesOf(p) {
+  const lines = p.split("\n"), tables = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (!lines[i].startsWith("| Titolo")) continue;
+    const cols = lines[i].split("|").map(s => s.trim());
+    const idx = {}; cols.forEach((c, j) => { if (c) idx[c] = j; });
+    const rows = [];
+    let k = i + 1;
+    if (lines[k] && lines[k].startsWith("|---")) k++;
+    for (; k < lines.length && lines[k].startsWith("| "); k++) {
+      if (lines[k].startsWith("| Titolo") || lines[k].startsWith("|---")) continue;
+      rows.push(lines[k].split("|").map(s => s.trim()));
+    }
+    tables.push({ idx, rows });
+  }
+  return tables;
+}
+function auditTables(name, p) {
+  // I11 leak di placeholder oltre a undefined/NaN/Infinity (già I3): null nudo, [object Object]
+  if (/\|\s*null\s*\||\[object Object\]|\$\s*null|undefined%/.test(p)) fail(name, "I11 leak placeholder (null/[object Object]) nel prompt");
+  for (const t of tablesOf(p)) {
+    const ti = t.idx["Titolo"];
+    const stopKey = Object.keys(t.idx).find(k => k.startsWith("Stop"));
+    // I7 — ogni posizione DETENUTA (Qtà valorizzata) deve avere uno stop (SKHYV senza stop)
+    if (t.idx["Qtà"] != null && stopKey) {
+      for (const r of t.rows) {
+        const tk = r[ti] || "", qty = r[t.idx["Qtà"]] || "", stop = r[t.idx[stopKey]] || "";
+        if (/BTP/.test(tk) || !/\d/.test(qty) || qty === "—") continue;   // BTP e non-detenuti esclusi
+        if (stop === "—" || stop === "" || !/\d/.test(stop)) fail(name, `I7 ${tk}: posizione detenuta (Qtà ${qty}) SENZA stop di protezione`);
+      }
+    }
+    // I8 — Div% plausibile: >20% su questo universo growth = quasi sempre errore di unità (bug GOOGL 25%)
+    if (t.idx["Div%"] != null) {
+      for (const r of t.rows) { const v = parseIt(r[t.idx["Div%"]]); if (v != null && (v < 0 || v > 20)) fail(name, `I8 ${r[ti]}: Div% ${r[t.idx["Div%"]]} fuori range [0,20] (errore di unità)`); }
+    }
+    // I9 — ROE entro una banda larga ma finita: fuori = unità sbagliate
+    if (t.idx["ROE"] != null) {
+      for (const r of t.rows) { const v = parseIt(r[t.idx["ROE"]]); if (v != null && (v < -150 || v > 400)) fail(name, `I9 ${r[ti]}: ROE ${r[t.idx["ROE"]]} fuori range [-150,400]%`); }
+    }
+    // I10 — prezzi/supporti mai ≤ 0 nelle tabelle titoli (backstop del gate pipeline lato prompt)
+    for (const nm of ["Prezzo", "Supp."]) {
+      if (t.idx[nm] != null) { for (const r of t.rows) { const v = parseIt(r[t.idx[nm]]); if (v != null && v <= 0) fail(name, `I10 ${r[ti]}: ${nm} ${r[t.idx[nm]]} ≤ 0`); } }
+    }
+  }
 }
 
 /* ---------- campagne ---------- */
@@ -199,4 +268,4 @@ if (violations.length) {
   if (violations.length > 40) console.error(`  … e altre ${violations.length - 40}`);
   process.exit(1);
 }
-console.log(`RED TEAM: ${campaigns} campagne (4 scenari dati × stati UI), 6 invarianti — nessuna violazione`);
+console.log(`RED TEAM: ${campaigns} campagne (4 scenari dati × stati UI), 11 invarianti — nessuna violazione`);
