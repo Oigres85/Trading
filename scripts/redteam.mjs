@@ -10,6 +10,7 @@
      I3  prompt: mai "undefined", NaN, Infinity o importi negativi ($-…)
      I4  righe tabelle = conteggi dichiarati ("N POSIZIONI/TITOLI → N righe")
      I5  R/R "1:X" con X ≤ 60 (rapporti oltre = resistenza/ATR garbage)
+     I6  coerenza di riga: stop teorico watchlist < supporto d'ingresso della stessa riga
    Exit 1 con report dettagliato alla prima campagna con violazioni.
    In CI: gate HARD in tests.yml (il codice rotto non si pusha), best-effort + allarme
    WhatsApp in update-data.yml (i dati freschi che rompono gli invarianti non passano
@@ -144,6 +145,20 @@ function checkCampaign(name, ctx) {
   for (const m of p.matchAll(/1:(\d+(?:\.\d+)?)/g)) {
     if (parseFloat(m[1]) > 60) fail(name, `I5 R/R implausibile "${m[0]}" (resistenza/ATR garbage)`);
   }
+  // I6 COERENZA SEMANTICA DI RIGA (v118, incidente SNDK $1509>$1485): uno stop long
+  // "(teorico)" — ingresso al supporto — deve stare SOTTO il supporto d'ingresso della
+  // stessa riga. Il red team numerico non lo vedeva (lo stop era >0, tecnicamente valido):
+  // era una relazione FRA due celle. Colonne mdRow: 16=Supp. · 17=Stop 2×ATR.
+  const euro = (s) => { const m = (s || "").match(/[\d.]+,\d+|\d[\d.]*/); if (!m) return null;
+    return parseFloat(m[0].replace(/\./g, "").replace(",", ".")); };
+  for (const line of p.split("\n")) {
+    if (!line.startsWith("| ") || !line.includes("(teorico)")) continue;
+    const cols = line.split("|").map(s => s.trim());
+    const supp = euro(cols[16]), stop = euro(cols[17]);
+    if (supp != null && stop != null && stop >= supp) {
+      fail(name, `I6 ${cols[1]}: stop teorico ${stop} ≥ supporto d'ingresso ${supp} (stop long impossibile — incidente SNDK)`);
+    }
+  }
 }
 
 /* ---------- campagne ---------- */
@@ -184,4 +199,4 @@ if (violations.length) {
   if (violations.length > 40) console.error(`  … e altre ${violations.length - 40}`);
   process.exit(1);
 }
-console.log(`RED TEAM: ${campaigns} campagne (4 scenari dati × stati UI), 5 invarianti — nessuna violazione`);
+console.log(`RED TEAM: ${campaigns} campagne (4 scenari dati × stati UI), 6 invarianti — nessuna violazione`);

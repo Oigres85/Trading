@@ -4476,13 +4476,16 @@ function buildPrompt() {
     // Stop trailing: ratchet della pipeline sulle posizioni, 2×ATR client su watchlist.
     // Gli INDICI (currency PTS: KOSPI, ^IXIC…) non sono comprabili: stop e R/R sarebbero
     // rumore che invita l'LLM a "operare" su un benchmark → n.d. esplicito (v112).
-    // v118 — COERENZA DI RIGA: sui candidati watchlist lo stop teorico si ancora al LIMITE
-    // D'INGRESSO (saneEntryLimit), non al prezzo corrente. Prima, su un titolo ad ATR alto
-    // (SNDK: 2×ATR=$406 su prezzo $1916, ma supporto d'ingresso $1485) lo stop-da-prezzo
-    // usciva $1509 → SOPRA il limite → stop-loss long impossibile, e in conflitto col piano
-    // ($1078). Ora tabella, R/R e "Livelli calcolati dal motore" hanno UN'UNICA reference.
+    // v118 — COERENZA DI RIGA: sui candidati watchlist lo stop teorico si ancora al SUPPORTO
+    // MOSTRATO nella riga stessa (colonna Supp.), non al prezzo corrente. Prima, su ATR alto
+    // (SNDK: 2×ATR=$406, prezzo $1916, supporto $1485) lo stop-da-prezzo usciva $1509 → SOPRA
+    // il supporto → stop-loss long impossibile. Ancorando a r.support, stop = supp − 2×ATR è
+    // SEMPRE sotto il supporto per costruzione (ATR>0): la riga è coerente con sé stessa
+    // (invariante I6 del red team). Fallback a saneEntryLimit/prezzo se il supporto manca.
     const isIndex = r.currency === "PTS";
-    const entryRef = (!isIndex && !r.qty) ? (saneEntryLimit(r)?.limit ?? r.price) : r.price;
+    const entryRef = (!isIndex && !r.qty)
+      ? ((r.support > 0 && r.support <= r.price) ? r.support : (saneEntryLimit(r)?.limit ?? r.price))
+      : r.price;
     const st = isIndex ? null : (r.qty ? stopOf(r) : atrStop(entryRef, r));
     let stopCell = "—";
     if (st) {
