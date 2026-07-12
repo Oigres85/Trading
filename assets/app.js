@@ -690,6 +690,7 @@ function renderAll() {
   renderPortfolioHealth();
   renderMiniCards();
   renderDecisionBar();
+  renderRiskParams();
   renderNews();
   renderBtpInfo();
   // NON ricostruire la tabella vendite mentre il popup è aperto: l'auto-refresh (ogni 5 min)
@@ -1443,6 +1444,114 @@ function alertsSummary() {
   if (sqz.length) chips.push({ t: `${sqz.length} squeeze risk`, c: "var(--red)", tip: sqz.map(r => r.ticker).join(", ") });
   if (vix != null && vix > 20) chips.push({ t: `VIX ${fmtNum.format(vix)}`, c: "var(--red)", tip: "Volatilità elevata" });
   return chips;
+}
+
+/* ═══ PARAMETRI DI RISCHIO DEL FONDO (v122) — regole attive lette in tempo reale ═══
+   Registro DICHIARATIVO: ogni regola = soglia (da RISK_PARAMS) + stato LIVE calcolato dai
+   dati correnti. Tier per impatto: red = protezione del capitale, yellow = dimensionamento,
+   green = segnali. Un'unica fonte per la card e il popup. */
+function topEquitySectorPct() {
+  const allocR = (DATA.allocation || []).filter(a => a.sector !== "Liquidità" && a.sector !== "Obbligazioni");
+  const bySec = {};
+  allocR.forEach(a => { const k = a.sector || a.ticker; bySec[k] = (bySec[k] || 0) + (a.value_eur || 0); });
+  const tot = Object.values(bySec).reduce((s, v) => s + v, 0) || 1;
+  const top = Object.entries(bySec).sort((a, b) => b[1] - a[1])[0];
+  return top ? { name: top[0], pct: Math.round(top[1] / tot * 100) } : null;
+}
+function riskRulesRegistry() {
+  const t = DATA.totals || {};
+  let dv = {}; try { dv = decisionVerdict(); } catch { dv = {}; }
+  const ptf = (DATA.portfolio || []).filter(isEquity);
+  const allEq = [...ptf, ...(DATA.watchlist || []).filter(isEquity)];
+  const es95 = t.es95_hist_eur ?? t.es95_1d_eur;
+  const budget = t.budget_operativo_spendibile;
+  const vix = (DATA.macro || {}).vix?.value;
+  const rScale = vix == null ? 1 : vix > 30 ? 0.4 : vix > 25 ? 0.5 : vix > 20 ? 0.75 : 1;
+  const sec = topEquitySectorPct();
+  const maxCorr = Math.max(0, ...ptf.map(r => r.max_corr ?? 0));
+  const trimTac = ptf.filter(r => r.qty && ((r.pe && r.pe > 150 && !(r.stats?.peg > 0 && r.stats.peg <= 2)) || (r.rsi && r.rsi > 78)));
+  const altman = allEq.filter(r => r.stats?.altman_z != null && r.stats.altman_z < 1.81);
+  const earn = ptf.filter(r => earningsRiskDays(r) != null);
+  const eur = (v) => v == null ? "n.d." : fmtEUR.format(Math.round(v));
+  const nOv = (dv.overCap || []).length, nAl = (dv.concentrationAlert || []).length, nVeto = (dv.excluded || []).length;
+  const nAcc = (dv.accumula || []).length, nReh = (dv.rehabbed || []).length, nSq = (dv.squeezed || []).length;
+  const nStopV = (dv.stopViolations || []).length, nTrail = (dv.trailing || []).length;
+  return [
+    // 🔴 RED — protezione del capitale / gate rigidi
+    { tier: "red", label: "Cap d'ingresso", th: `${RISK_PARAMS.capNoAdd_pct}% NAV`, active: nOv > 0,
+      state: `${nOv} posizioni ≥10% NAV: divieto di NUOVI acquisti (si lasciano correre)`,
+      why: "Un singolo nome non deve poter crescere OLTRE il 10% del NAV con capitale FRESCO (rischio idiosincratico d'ingresso). Ciò che supera il 10% per apprezzamento organico NON viene trimmato — Let Winners Run, protetto dallo stop ratchet.", where: "motore (decisionVerdict)" },
+    { tier: "red", label: "Veto Value Trap", th: `Sortino 1A < ${RISK_PARAMS.sortinoVeto}`, active: nVeto > 0,
+      state: `${nVeto} titoli in veto (Sortino<${RISK_PARAMS.sortinoVeto} · Short≥15% · margine neg+PEG rotto)`,
+      why: "Divieto di ACCUMULO su titoli che distruggono valore corretto per il rischio (downside deviation) o con short interest da squeeze. Non media al ribasso sul coltello che cade. Il veto vieta l'accumulo, non impone la vendita.", where: "motore (qualityVeto)" },
+    { tier: "red", label: "Riserva tail-risk ES95", th: `budget = cassa − ES95`, active: true,
+      state: `ES95 ${eur(es95)} accantonato · budget operativo ${eur(budget)}`,
+      why: "La perdita MEDIA nel 5% dei giorni peggiori resta intoccabile: protegge l'INTERO portafoglio da un crollo di mercato senza cappare i vincenti. Confermata dal CEO.", where: "pipeline (totals)" },
+    { tier: "red", label: "Stop ratchet 2×ATR", th: `trailing, sale e non scende`, active: nStopV > 0,
+      state: nStopV > 0 ? `⚠ ${nStopV} STOP VIOLATI su ${nTrail} posizioni` : `${nTrail} stop attivi, nessuno violato`,
+      why: "Stop dinamico a 2×ATR(14) sotto il prezzo, ancorato: sale coi massimi e non ridiscende. È la difesa principale su ogni posizione — sostituisce il cap sizing come protezione dei vincenti.", where: "pipeline (ratchet_stops)" },
+    // 🟡 YELLOW — dimensionamento / esecuzione
+    { tier: "yellow", label: "Alert concentrazione", th: `singolo nome > ${RISK_PARAMS.capAlert_pct}% NAV`, active: nAl > 0,
+      state: nAl > 0 ? `⚠ ${nAl} nomi oltre il 25% NAV` : `nessun nome oltre il 25% NAV`,
+      why: "Avviso di rischio idiosincratico quando un singolo titolo supera il 25% del NAV. È un promemoria per una scelta consapevole, MAI un obbligo di trim (Let Winners Run).", where: "motore (decisionVerdict)" },
+    { tier: "yellow", label: "Alert concentrazione settore", th: `> ${Math.round(RISK_PARAMS.sectorAlert_frac * 100)}% azionario`, active: !!(sec && sec.pct > RISK_PARAMS.sectorAlert_frac * 100),
+      state: sec ? `${sec.name} ${sec.pct}% del capitale azionario` : "n.d.",
+      why: "Il mandato Growth tollera forte esposizione tech come normalità strutturale: l'alert scatta solo su sbilanciamenti estremi (>75%) come promemoria per valutare rotazioni tematiche.", where: "motore + pipeline (allocation)" },
+    { tier: "yellow", label: "Score minimo d'accumulo", th: `≥ ${RISK_PARAMS.minScore}/100`, active: nAcc > 0,
+      state: `${nAcc} candidati con edge quant ≥${RISK_PARAMS.minScore}`,
+      why: "Solo i titoli il cui score (impatto marginale sullo Sharpe 40% · forza relativa 1M 30% · qualità fondamentale 30%) supera 60 entrano nel piano d'accumulo.", where: "motore (quantScore)" },
+    { tier: "yellow", label: "Regime sizing VIX", th: `×0,75/0,5/0,4 a VIX>20/25/30`, active: rScale < 1,
+      state: vix != null ? `VIX ${fmtNum.format(vix)} → budget d'ingresso ×${rScale}` : "VIX n.d.",
+      why: "In mercato nervoso si rischia meno per operazione: il budget d'ingresso si riduce all'aumentare della volatilità implicita, senza spegnere il motore.", where: "motore (decisionVerdict)" },
+    { tier: "yellow", label: "Riabilitazione growth", th: `ROE>15% + >SMA200 + RS>0`, active: nReh > 0,
+      state: nReh > 0 ? `${nReh} titoli riabilitati (sorvegliati)` : "nessuna riabilitazione attiva",
+      why: "Revoca il veto Sortino a un leader in recupero: il Sortino 12M guarda indietro e penalizza chi si sta riprendendo. Il riabilitato torna eleggibile ma resta SORVEGLIATO (trailing negativo dichiarato).", where: "motore (qualityVeto)" },
+    { tier: "yellow", label: "Paracadute limite d'ordine", th: `supporto entro ±25% dal prezzo`, active: false,
+      state: "attivo su ogni ordine d'ingresso",
+      why: "Un limite d'acquisto più lontano del 25% dal prezzo non è un ordine ma un residuo di dato sporco: scatta un fallback dichiarato (SMA50 → 2×ATR → -5%). Nato dall'incidente SNDK.", where: "motore (saneEntryLimit)" },
+    // 🟢 GREEN — segnali informativi
+    { tier: "green", label: "Turnaround squeeze", th: `short≥20% + RVol>2 + >SMA50`, active: nSq > 0,
+      state: nSq > 0 ? `${nSq} setup speculativi esposti` : "nessun setup squeeze",
+      why: "Un titolo vetato ma con risveglio istituzionale improvviso viene esposto come speculazione asimmetrica dichiarata (sizing dimezzato, stop 1×ATR), mai promosso a investimento del mandato.", where: "motore (squeezeSetup)" },
+    { tier: "green", label: "Trim tattico valutazione", th: `P/E>150 non giust. o RSI>78`, active: trimTac.length > 0,
+      state: trimTac.length > 0 ? `${trimTac.map(r => r.ticker).join(", ")} (multiplo/ipercomprato)` : "nessuno",
+      why: "Segnala multipli non giustificati dalla crescita (P/E>150 con PEG fuori scala) o ipercomprato estremo (RSI>78) come candidati opzionali a un free-ride. Non è un obbligo.", where: "motore (decisionVerdict)" },
+    { tier: "green", label: "Rischio default (Altman)", th: `Altman Z'' < 1,81`, active: altman.length > 0,
+      state: altman.length > 0 ? `${altman.map(r => r.ticker).join(", ")}` : "nessun titolo in distress",
+      why: "Flag prudenziale di solidità di bilancio (Altman Z'' non-manifatturieri): sotto 1,81 il titolo è nella zona grigia di rischio insolvenza. Solo segnalazione.", where: "pipeline (stats.altman_z)" },
+    { tier: "green", label: "Earnings imminenti", th: `trimestrale < 14 giorni`, active: earn.length > 0,
+      state: earn.length > 0 ? `${earn.map(r => r.ticker).join(", ")}` : "nessuna trimestrale <14gg",
+      why: "Rischio evento binario: il gap post-earnings può scavalcare stop e supporti. Su un candidato d'ingresso impone la scelta esplicita ingresso post-evento o sizing ridotto.", where: "pipeline (earnings_date)" },
+    { tier: "green", label: "Correlazione fra posizioni", th: `coppia > 0,75`, active: maxCorr > 0.75,
+      state: `correlazione max in portafoglio ${fmtNum.format(Math.round(maxCorr * 100) / 100)}`,
+      why: "Due posizioni troppo correlate non diversificano: la soglia 0,75 segnala quando la diversificazione apparente è illusoria. Oggi la coppia più correlata è sotto soglia.", where: "pipeline (matrice correlazioni)" },
+  ];
+}
+const RP_TIER = { red: { c: "var(--red)", lab: "Protezione capitale" }, yellow: { c: "var(--yellow)", lab: "Dimensionamento" }, green: { c: "var(--green)", lab: "Segnale" } };
+function renderRiskParams() {
+  const grid = $("#risk-params-grid");
+  if (!grid || !DATA) return;
+  const rules = riskRulesRegistry();
+  grid.innerHTML = rules.map((r, i) => `
+    <button class="rp-chip rp-${r.tier}${r.active ? " rp-active" : ""}" data-rp="${i}" title="${esc(r.state)}">
+      <span class="rp-chip-dot"></span>
+      <span class="rp-chip-body"><span class="rp-chip-label">${esc(r.label)}</span><span class="rp-chip-th">${esc(r.th)}</span></span>
+      ${r.active ? '<span class="rp-chip-flag">attiva</span>' : ""}
+    </button>`).join("");
+  grid.querySelectorAll(".rp-chip").forEach(b => b.addEventListener("click", () => openRiskRuleModal(rules[+b.dataset.rp])));
+}
+function openRiskRuleModal(r) {
+  if (!r) return;
+  const tier = RP_TIER[r.tier];
+  const body = `
+    <div class="rp-modal-head" style="border-left:4px solid ${tier.c}">
+      <div class="rp-modal-tier" style="color:${tier.c}">${tier.lab}${r.active ? ' · <b>ATTIVA ORA</b>' : ""}</div>
+      <div class="rp-modal-th">Soglia: <b>${esc(r.th)}</b></div>
+    </div>
+    <div class="rp-modal-state"><span class="muted">Stato corrente:</span> ${esc(r.state)}</div>
+    <div class="rp-modal-why">${esc(r.why)}</div>
+    <div class="info-line muted" style="font-size:11px;margin-top:10px">Vive in: ${esc(r.where)} · le soglie sono in <code>RISK_PARAMS</code> (assets/app.js), calibrabili dal CEO.</div>`;
+  openInfoModal(r.label, body);
 }
 
 function renderDecisionBar() {
