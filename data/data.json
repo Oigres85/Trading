@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-07-12T10:01:28Z",
+ "updated_at": "2026-07-12T10:17:58Z",
  "eurusd": 1.1419,
  "totals": {
   "usd_value": 292824.47,
@@ -5914,7 +5914,7 @@
      198.72,
      191.95,
      159.85,
-     157.72,
+     157.71,
      161.51,
      134.5,
      92.35,
@@ -10827,20 +10827,20 @@
    "name": "Bitcoin",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 63918.4,
+   "price": 63862.15,
    "price_asof": "2026-07-12",
-   "change_pct": 0.18,
+   "change_pct": 0.09,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.4,
    "sma200_dist_pct": -13.5,
-   "sma50_dist_pct": -1.5,
+   "sma50_dist_pct": -1.6,
    "w52_high": 126198.07,
    "w52_dist_pct": -49.4,
    "support": 57747.77,
    "resistance": 64658.97,
-   "rsi": 52.9,
-   "volume": 21122121728,
+   "rsi": 52.6,
+   "volume": 21290307584,
    "vol_ratio": 0.5,
    "atr_14": 1902.26,
    "atr_pct": 2.98,
@@ -10852,7 +10852,7 @@
      63193.15,
      64127.14,
      63802.03,
-     63918.4
+     63862.15
     ],
     "m6": [
      68402.38,
@@ -10980,7 +10980,7 @@
      63193.15,
      64127.14,
      63802.03,
-     63918.4
+     63862.15
     ],
     "all": [
      386.94,
@@ -11125,7 +11125,7 @@
      76304.32,
      73579.69,
      58558.86,
-     63918.4
+     63862.15
     ],
     "m1": [
      63237.54,
@@ -11149,7 +11149,7 @@
      63193.15,
      64127.14,
      63802.03,
-     63918.4
+     63862.15
     ],
     "m3": [
      80186.77,
@@ -11217,7 +11217,7 @@
      63193.15,
      64127.14,
      63802.03,
-     63918.4
+     63862.15
     ],
     "y1": [
      117435.23,
@@ -11293,7 +11293,7 @@
      59940.1,
      61485.3,
      63297.39,
-     63918.4
+     63862.15
     ],
     "d1": [
      63849.23,
@@ -11355,7 +11355,9 @@
      63738.86,
      63852.44,
      63961.25,
-     63953.71
+     63953.71,
+     63897.66,
+     63885.63
     ]
    },
    "earnings_date": null,
@@ -11366,9 +11368,9 @@
    "sharpe_1y": -1.27,
    "sortino_1y": -1.64,
    "sharpe_6m": -0.32,
-   "sortino_6m": -0.43,
+   "sortino_6m": -0.44,
    "prepost": null,
-   "prezzo_limite_aggiustato": 63918.4,
+   "prezzo_limite_aggiustato": 63862.15,
    "risk_reward": "1:1.8",
    "sector": "Altro",
    "stats": null,
@@ -11376,22 +11378,22 @@
     "w1": {
      "support": 61492.65,
      "resistance": 64658.97,
-     "change_pct": 2.67
+     "change_pct": 2.58
     },
     "m1": {
      "support": 57747.77,
      "resistance": 65544,
-     "change_pct": 1.08
+     "change_pct": 0.99
     },
     "m3": {
      "support": 57747.77,
      "resistance": 82430.17,
-     "change_pct": -20.29
+     "change_pct": -20.36
     },
     "y1": {
      "support": 57747.77,
      "resistance": 110764.91,
-     "change_pct": -40.01
+     "change_pct": -40.06
     }
    },
    "financials": [],
@@ -11416,9 +11418,9 @@
      "hi": 59940.35
     }
    },
-   "rs_1m": -1.5,
+   "rs_1m": -1.6,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -1.5,
+   "rs_ndx_1m": -1.6,
    "beta_ndx": 0.94,
    "avg_corr": 0.35,
    "max_corr": 0.79,
@@ -14798,7 +14800,7 @@
      442.14,
      449.14,
      463.88,
-     468.19,
+     468.2,
      478.45,
      479.49,
      431.58,
@@ -15072,7 +15074,7 @@
      26.61,
      22.82,
      27.25,
-     24.72,
+     24.73,
      24.53,
      27.42,
      26.09,
@@ -22492,7 +22494,7 @@
      89.7,
      94.7,
      102.33,
-     107.16,
+     107.17,
      110.94,
      119.19,
      115.1,
@@ -29507,7 +29509,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 52
+     "score": 51
     },
     {
      "label": "Treasury 10A",
@@ -32653,8 +32655,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1722985312560,
-   "change_pct": 0.22
+   "mcap_usd": 1721696587980,
+   "change_pct": 0.15
   },
   {
    "ticker": "META",
@@ -32908,7 +32910,7 @@
      79.78,
      82.81,
      80.91,
-     85.4,
+     85.39,
      82.75,
      82.32,
      80.48,
@@ -33097,7 +33099,7 @@
      169.78,
      164.75,
      174.01,
-     171.28,
+     171.27,
      172.96,
      175.18,
      171.62,
@@ -33477,7 +33479,7 @@
     "order_block": null
    },
    "_ret_series": [
-    0.001907,
+    0.001906,
     -0.004282,
     0.003338,
     0.006101,
@@ -33515,7 +33517,7 @@
     -0.007438,
     0.005405,
     0.008323,
-    -0.0029,
+    -0.002901,
     0.002454,
     0.002309,
     0.002887,
@@ -33531,7 +33533,7 @@
     -0.003187,
     -0.004624,
     0.005713,
-    0.002807,
+    0.002806,
     0.00376,
     0.003402,
     0.001151,
@@ -33544,7 +33546,7 @@
     0.015228,
     -0.001222,
     0.00443,
-    -0.006833,
+    -0.006834,
     0.00566,
     0.010347,
     -0.000015,
@@ -33581,7 +33583,7 @@
     0.000731,
     0.001898,
     -0.003009,
-    -0.000863,
+    -0.000864,
     0.00661,
     0.002324,
     -0.01081,
@@ -33590,13 +33592,13 @@
     -0.011065,
     0.007523,
     0.009023,
-    0.00621,
+    0.006211,
     0.00456,
     0.003512,
     -0.000101,
     -0.00357,
     -0.001222,
-    -0.007436,
+    -0.007437,
     0.001831,
     0.006638,
     0.00593,
@@ -33638,7 +33640,7 @@
     -0.004814,
     0.000568,
     -0.008853,
-    0.007031,
+    0.00703,
     -0.005591,
     -0.013194,
     0.008722,
@@ -33650,7 +33652,7 @@
     0.002627,
     -0.014052,
     -0.002467,
-    -0.014439,
+    -0.01444,
     0.010445,
     -0.003362,
     0.005557,
@@ -34462,7 +34464,7 @@
      549,
      562.3,
      567.67,
-     598.18,
+     598.19,
      626.78,
      617,
      612.86,
@@ -34721,7 +34723,7 @@
    },
    "_ret_series": [
     0.00362,
-    0.000916,
+    0.000917,
     0.001023,
     0.00806,
     -0.000962,
@@ -34735,7 +34737,7 @@
     0.001339,
     -0.005313,
     -0.019895,
-    0.018283,
+    0.018284,
     -0.006813,
     0.012505,
     0.003379,
@@ -34768,7 +34770,7 @@
     -0.000845,
     -0.001998,
     0.008977,
-    0.006746,
+    0.006747,
     0.005903,
     -0.006664,
     -0.003517,
@@ -34776,11 +34778,11 @@
     0.004103,
     0.00462,
     0.002735,
-    0.004785,
+    0.004786,
     0.004103,
     -0.004219,
     0.007482,
-    -0.00528,
+    -0.005279,
     0.011399,
     -0.001211,
     -0.035331,
@@ -34795,7 +34797,7 @@
     0.008371,
     0.010622,
     0.017652,
-    0.007661,
+    0.00766,
     0.004493,
     -0.015407,
     0.004812,
@@ -34810,9 +34812,9 @@
     -0.020627,
     0.000756,
     -0.008577,
-    -0.012251,
+    -0.01225,
     0.005952,
-    -0.023957,
+    -0.023956,
     0.007485,
     0.025252,
     0.006145,
@@ -34841,7 +34843,7 @@
     -0.002322,
     -0.0083,
     -0.001939,
-    0.007911,
+    0.007912,
     0.008748,
     0.000962,
     -0.005705,
@@ -34862,7 +34864,7 @@
     -0.012084,
     0.006843,
     -0.015483,
-    -0.017623,
+    -0.017624,
     -0.0145,
     0.020918,
     0.007631,
@@ -34871,7 +34873,7 @@
     -0.020549,
     0.002129,
     -0.001031,
-    0.007439,
+    0.00744,
     -0.003837,
     0.00881,
     -0.012229,
@@ -34879,11 +34881,11 @@
     0.014389,
     -0.012138,
     -0.003206,
-    0.001317,
+    0.001316,
     -0.010763,
     0.015128,
     -0.003017,
-    -0.015157,
+    -0.015158,
     0.013267,
     0.000017,
     -0.000132,
@@ -35507,7 +35509,7 @@
      50.3,
      54.44,
      57.53,
-     53.2,
+     53.19,
      49.08,
      52.38,
      48.48,
@@ -35636,7 +35638,7 @@
      169,
      183.61,
      192.5,
-     204.44,
+     204.45,
      207.3,
      211,
      211.58,
@@ -35956,13 +35958,13 @@
     -0.007126,
     -0.004056,
     0.008275,
-    0.015157,
+    0.015158,
     -0.013904,
     0.003706,
     -0.001159,
     -0.006401,
     -0.005087,
-    -0.009843,
+    -0.009842,
     -0.020585,
     0.022134,
     0.005084,
@@ -35970,7 +35972,7 @@
     -0.00327,
     0.002181,
     -0.000227,
-    0.029259,
+    0.029258,
     0.019257,
     -0.012972,
     -0.004875,
@@ -35978,7 +35980,7 @@
     -0.007706,
     -0.003543,
     0.002481,
-    0.03846,
+    0.038459,
     -0.010574,
     0.008229,
     0.007061,
@@ -35992,7 +35994,7 @@
     -0.005893,
     -0.001775,
     0.018315,
-    -0.010268,
+    -0.010269,
     0.004229,
     -0.001648,
     0.002557,
@@ -36095,8 +36097,8 @@
     -0.018166,
     0.035292,
     0.006994,
-    -0.002701,
-    -0.004557,
+    -0.002702,
+    -0.004556,
     -0.02063,
     0.013091,
     0.000304,
@@ -38329,7 +38331,7 @@
    "_ret_series": [
     -0.0021,
     -0.007033,
-    0.001411,
+    0.00141,
     -0.000235,
     0.001526,
     0.008876,
@@ -38341,10 +38343,10 @@
     0.016745,
     -0.005167,
     0.000575,
-    0.014116,
+    0.014117,
     0.002729,
     0.003062,
-    -0.005791,
+    -0.00579,
     -0.00171,
     -0.004344,
     0.001145,
@@ -38352,7 +38354,7 @@
     0.008246,
     -0.007442,
     -0.00715,
-    -0.002898,
+    -0.002897,
     0.005787,
     0.00219,
     -0.004964,
@@ -38360,7 +38362,7 @@
     -0.002876,
     -0.000576,
     -0.001153,
-    0.006556,
+    0.006557,
     -0.007134,
     -0.007469,
     0.010918,
@@ -38393,16 +38395,16 @@
     0.016018,
     -0.000552,
     0.003197,
-    -0.002203,
+    -0.002204,
     0.007473,
     -0.001534,
-    0.00383,
+    0.003831,
     0.004903,
     0.000652,
     -0.006867,
-    0.000438,
+    0.000437,
     0.003383,
-    0.002612,
+    0.002611,
     -0.010158,
     -0.005835,
     -0.002986,
@@ -38416,7 +38418,7 @@
     0.001777,
     -0.008245,
     -0.005722,
-    0.002472,
+    0.002473,
     -0.000337,
     -0.002023,
     0.00393,
@@ -38426,13 +38428,13 @@
     0.004423,
     -0.004755,
     -0.012527,
-    0.000451,
+    0.00045,
     0.002811,
     -0.005404,
     -0.004639,
-    -0.003294,
+    -0.003295,
     0.001024,
-    0.003857,
+    0.003858,
     -0.00136,
     -0.009685,
     0.000687,
@@ -38454,11 +38456,11 @@
     -0.005025,
     0.006618,
     -0.002961,
-    0.00171,
-    0.00579,
-    -0.000227,
+    0.001709,
+    0.005791,
+    -0.000226,
     -0.005792,
-    -0.013184,
+    -0.013185,
     0.007588,
     0.004343,
     0.002733,
@@ -38468,11 +38470,11 @@
     0.000228,
     -0.005608,
     -0.002861,
-    0.002423,
+    0.002424,
     -0.002539,
     0.010803,
     0.000686,
-    -0.000229,
+    -0.000228,
     0.011474,
     -0.005323,
     0.013199,
@@ -38493,9 +38495,9 @@
     -0.003724,
     0.008667,
     -0.010704,
-    -0.012998,
+    -0.012997,
     -0.001953,
-    -0.004956,
+    -0.004957,
     0.007712,
     0.002748,
     -0.005619,
@@ -38509,9 +38511,9 @@
     0.013224,
     -0.001038,
     -0.000985,
-    0.006126,
+    0.006125,
     -0.001614,
-    -0.000116,
+    -0.000115,
     0.003227,
     -0.002534,
     -0.002425,
@@ -39532,14 +39534,14 @@
     0.012069,
     0.001949,
     0.008833,
-    -0.005866,
+    -0.005865,
     0.015429,
     0.001726,
     -0.003995,
     -0.006294,
     0.002896,
     -0.019082,
-    -0.007169,
+    -0.007168,
     -0.00265,
     0.01757,
     -0.002437,
@@ -39561,7 +39563,7 @@
     -0.003694,
     0.017599,
     0.009299,
-    0.016034,
+    0.016035,
     -0.01033,
     -0.007402,
     -0.003022,
@@ -39602,7 +39604,7 @@
     -0.028577,
     0.00517,
     -0.016748,
-    -0.015052,
+    -0.015051,
     0.006775,
     -0.0301,
     0.004447,
@@ -39648,7 +39650,7 @@
     0.007519,
     0.000981,
     0.00718,
-    0.012376,
+    0.012377,
     0.006835,
     -0.018725,
     -0.017074,
@@ -39661,7 +39663,7 @@
     -0.004294,
     0.000708,
     -0.025894,
-    0.001589,
+    0.001588,
     0.000383,
     0.009204,
     -0.004333,
@@ -39679,7 +39681,7 @@
     0.0177,
     0.000164,
     0.004158,
-    -0.019758,
+    -0.019757,
     -0.008668,
     0.014604,
     0.003374,
@@ -42015,7 +42017,7 @@
     0.007117,
     -0.003782,
     0.011302,
-    0.009716,
+    0.009715,
     -0.014381,
     -0.005375,
     -0.018751,
@@ -42027,11 +42029,11 @@
     -0.008039,
     0.004855,
     0.011509,
-    -0.000934,
+    -0.000935,
     0,
-    -0.005979,
+    -0.005978,
     0.000353,
-    0.008311,
+    0.00831,
     0.006854,
     0.02017,
     0.002606,
@@ -42066,7 +42068,7 @@
     0.004937,
     0.001566,
     -0.005828,
-    -0.013693,
+    -0.013694,
     -0.02937,
     0.01352,
     -0.000116,
@@ -42082,8 +42084,8 @@
     -0.010476,
     0.007413,
     -0.005926,
-    0.007289,
-    0.000113,
+    0.007288,
+    0.000114,
     -0.010837,
     0.002634,
     0.009676,
@@ -42114,7 +42116,7 @@
     -0.009839,
     -0.007056,
     -0.031014,
-    0.0219,
+    0.021899,
     -0.014622,
     0,
     0.010299,
@@ -42124,7 +42126,7 @@
     0.009457,
     0.007591,
     -0.005576,
-    0.020807,
+    0.020806,
     0.026801,
     -0.02702,
     -0.011237,
@@ -42155,7 +42157,7 @@
     -0.018356,
     0.006831,
     -0.011101,
-    0.018982,
+    0.018981,
     0.007275,
     -0.005452,
     0.004908,
@@ -42171,7 +42173,7 @@
     -0.004429,
     -0.012867,
     0.024517,
-    0.009259,
+    0.009258,
     0.003298,
     0.00346,
     0.01048,
@@ -44434,7 +44436,7 @@
     0.002115,
     0.004105,
     0.017017,
-    0.001957,
+    0.001958,
     -0.003483,
     0.000109,
     -0.016155,
@@ -44450,9 +44452,9 @@
     -0.006647,
     0.005636,
     0.009286,
-    -0.007153,
+    -0.007152,
     0.005704,
-    -0.008511,
+    -0.008512,
     0.017062,
     0.002871,
     -0.002981,
@@ -44952,7 +44954,7 @@
   },
   {
    "question": "Fed rate hike in 2026?",
-   "yes": 64,
+   "yes": 63,
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026"
   },
   {
@@ -45003,20 +45005,6 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "Gli Stati Uniti colpiscono l’Iran, Teheran colpisce gli stati del Golfo, dice che lo Stretto di Hormuz è chiuso"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Lindsey Graham dies at 71 after brief illness, leaving vacancy in U.S. Senate",
-   "link": "https://www.investing.com/news/economy-news/lindsey-graham-dies-at-71-after-brief-illness-leaving-vacancy-in-us-senate-4787331",
-   "published": "2026-07-12T07:02:55Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Lindsey Graham muore a 71 anni dopo una breve malattia, lasciando un posto vacante al Senato degli Stati Uniti"
   },
   {
    "source": "Investing.com",
@@ -45073,6 +45061,20 @@
    "title_it": "BofA nomina la Corea del Sud e gli Emirati Arabi Uniti tra i principali contendenti dell'IA oltre a Stati Uniti e Cina"
   },
   {
+   "source": "Bloomberg",
+   "title": "Hormuz Route Open Despite Iran Declaration, Maritime Group Says",
+   "link": "https://news.google.com/search?q=Hormuz%20Route%20Open%20Despite%20Iran%20Declaration%2C%20Maritime%20Group%20Says",
+   "published": "2026-07-12T10:02:26Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La rotta Hormuz è aperta nonostante la dichiarazione dell'Iran, afferma il Maritime Group"
+  },
+  {
    "source": "Google News",
    "title": "Federal Reserve Bank of Dallas white paper shows the impact of illegal immigration in numbers - CBS News",
    "link": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxQckFrbHN3RlpLeXprOWVaLURiQm1fUWlOZThPMWJ2T3JJQ0VzYWtUV2xfM3lFZDZfVXBVM1h2Q0VyTUx6b0tnYmFXR1FiY2VJcUkxQ1FXSlJ2OW8wYVg5R3B2Zl9WQlVwUUZuOHo2YWQwZXFOZ1lJUWpJUldQcWNrcDBYbm01VVRybzBzc3NHdzg3c0pIV0lZdl9ZTUdMRkJjaXN1NDNJX3lUMkstOE9ydlNEWHBoOXVnODZWSkcweHZVaUlFOHg3UXdrNHBjbG9EbHJVemdrLVNicVU5WF90NW5KM2hWZlU?oc=5",
@@ -45084,6 +45086,19 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Il libro bianco della Federal Reserve Bank di Dallas mostra l'impatto dell'immigrazione clandestina in numeri - CBS News"
+  },
+  {
+   "source": "Reuters",
+   "title": "Typhoon Bavi batters eastern China, threatens days of heavy rain - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNeWtNV1dZVG12dFREVVVYbGZsZWRjYmJQWHhWWHV3Wk9DUEpwb2kwaDhLZWNsNHZGOWZrN0F1YTBjVDRwbW1Vend0NkZRNU9qQUg1ZDNhZ3hzMzRWS2lyN2RqeEZKa0puc3FuTGM2cjg2UVF4eGFEem1LdmlUcDdILTYwM3dmM1ROczhwWThvMUgxX0VZQVhoMG4zWnZNSWJiM1dHd18zYmFWMWJRTGxpNXNyaWtvZw?oc=5",
+   "published": "2026-07-12T09:55:20Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il tifone Bavi si abbatte sulla Cina orientale e minaccia giorni di forti piogge - Reuters"
   },
   {
    "source": "CNBC",
@@ -45156,16 +45171,16 @@
   },
   {
    "source": "Reuters",
-   "title": "Typhoon Bavi batters eastern China, threatens days of heavy rain - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNeWtNV1dZVG12dFREVVVYbGZsZWRjYmJQWHhWWHV3Wk9DUEpwb2kwaDhLZWNsNHZGOWZrN0F1YTBjVDRwbW1Vend0NkZRNU9qQUg1ZDNhZ3hzMzRWS2lyN2RqeEZKa0puc3FuTGM2cjg2UVF4eGFEem1LdmlUcDdILTYwM3dmM1ROczhwWThvMUgxX0VZQVhoMG4zWnZNSWJiM1dHd18zYmFWMWJRTGxpNXNyaWtvZw?oc=5",
-   "published": "2026-07-12T02:22:00Z",
+   "title": "South China Sea joint statement says China's maritime claims have no basis - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMivgFBVV95cUxQS09EWmdpMEZqVE9nazcwbDh4TWRGN2J3Z1hSQTVzbzh1QzkyRTRjeENDQ2VRYXc4N2ROcmF2bU00MHZDTWMzVllycFpBT25Idk9TMlZrWWZVSzdxZWV4S2k3V3Z6VGJVTTZmZVd1UTNPdVFwSkNudDRwNmVJVnczWHJ2VExVdEQ3bFY2UVVzREZVRjd1bFhoaFR4MzB1TlJHTnNmdWx2RXdpVmR5Y2VwRU43SUN5dFJyNTlpMm1B?oc=5",
+   "published": "2026-07-12T06:44:00Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il tifone Bavi si abbatte sulla Cina orientale e minaccia giorni di forti piogge - Reuters"
+   "title_it": "Mar Cinese Meridionale, dichiarazione congiunta afferma che le rivendicazioni marittime della Cina non hanno alcun fondamento - Reuters"
   },
   {
    "source": "Bloomberg",
@@ -45263,20 +45278,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "L'amministrazione Trump cita in giudizio i giornalisti del New York Times per la storia dell'Air Force One, dice il giornale"
-  },
-  {
-   "source": "Reuters",
-   "title": "Zelenskiy says Ukraine officials will be held accountable for weapons store - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPemRJenFZSlg5ZzhseUxkMHlpRnBudHRYT3p6TWJmR2lWQjJ1Y3RSTU9NUkFUZlJZWnl4VFgxVXowSXp4amp0bXZRaHFrR1dsT2Q3VGJOYXhHdlp0NkxrblF4Vl8tc2o1NnpTQ1hWSzllYTRlamhVVjRaNVBXVUF4ZTJUUjg3aENZajBRLVF0Y1hDN1R2Rk1Udk5BMEpvY2p1Y0Q1VHVNenpVWko1ZWtaRnRoYw?oc=5",
-   "published": "2026-07-11T21:18:23Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Zelenskiy afferma che i funzionari ucraini saranno ritenuti responsabili del deposito di armi - Reuters"
   },
   {
    "source": "Google News",
@@ -45388,20 +45389,6 @@
    "inv": false,
    "sentiment": "bull",
    "title_it": "Le azioni si riprendono quando il Congresso va in pausa estiva. Ecco perché."
-  },
-  {
-   "source": "Bloomberg",
-   "title": "McCaul Backs Deeper US Ukraine Defense Ties",
-   "link": "https://news.google.com/search?q=McCaul%20Backs%20Deeper%20US%20Ukraine%20Defense%20Ties",
-   "published": "2026-07-11T15:45:10Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "McCaul sostiene legami di difesa più profondi tra Stati Uniti e Ucraina"
   },
   {
    "source": "AP",
@@ -45615,11 +45602,35 @@
    "title_it": "Come Union Pacific (UNP) sta affrontando gli ostacoli normativi per portare avanti la sua strategia di rete ferroviaria da costa a costa"
   },
   {
+   "source": "Yahoo Finance",
+   "title": "Shares of Intel and AMD Have Plummeted in the Last Few Days. Is It Time to Panic?",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/shares-intel-amd-plummeted-last-073500363.html",
+   "published": "2026-07-11T07:35:00Z",
+   "tickers": [
+    "AMD"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Le azioni di Intel e AMD sono crollate negli ultimi giorni. È tempo di farsi prendere dal panico?"
+  },
+  {
    "source": "Polymarket",
    "title": "Will the price of Bitcoin be above $60,000 on July 12?",
    "title_it": "Will the price of Bitcoin be above $60,000 on July 12? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/bitcoin-above-60k-on-july-12-2026",
-   "published": "2026-07-12T10:02:13Z",
+   "published": "2026-07-12T10:18:41Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Will the price of Bitcoin be above $62,000 on July 12?",
+   "title_it": "Will the price of Bitcoin be above $62,000 on July 12? — probabilità Sì 100%",
+   "link": "https://polymarket.com/event/bitcoin-above-62k-on-july-12-2026",
+   "published": "2026-07-12T10:18:41Z",
    "tickers": [
     "MACRO"
    ],
@@ -45630,18 +45641,7 @@
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 80%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-07-12T10:02:13Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the price of Bitcoin be above $62,000 on July 12?",
-   "title_it": "Will the price of Bitcoin be above $62,000 on July 12? — probabilità Sì 99%",
-   "link": "https://polymarket.com/event/bitcoin-above-62k-on-july-12-2026",
-   "published": "2026-07-12T10:02:13Z",
+   "published": "2026-07-12T10:18:41Z",
    "tickers": [
     "MACRO"
    ],
@@ -45650,9 +45650,9 @@
   {
    "source": "Polymarket",
    "title": "Fed rate hike in 2026?",
-   "title_it": "Fed rate hike in 2026? — probabilità Sì 64%",
+   "title_it": "Fed rate hike in 2026? — probabilità Sì 63%",
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026",
-   "published": "2026-07-12T10:02:13Z",
+   "published": "2026-07-12T10:18:41Z",
    "tickers": [
     "MACRO"
    ],
@@ -45663,7 +45663,7 @@
    "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
    "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 21%",
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
-   "published": "2026-07-12T10:02:13Z",
+   "published": "2026-07-12T10:18:41Z",
    "tickers": [
     "MACRO"
    ],
@@ -77740,10 +77740,10 @@
   "alerts": [
    "umich: stale"
   ],
-  "generated_at": "2026-07-12T10:02:14Z"
+  "generated_at": "2026-07-12T10:18:41Z"
  },
  "verdict_track": {
-  "generated": "2026-07-12T10:02:16.944Z",
+  "generated": "2026-07-12T10:18:43.210Z",
   "since": "2026-07-11",
   "episodes": 5,
   "mature7": {
