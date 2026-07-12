@@ -1,0 +1,32 @@
+# MORNING BRIEF WhatsApp (v117): digest deterministico delle 09:00, zero LLM.
+# Doppio cron per coprire ora legale/solare — lo script invia SOLO se l'ora locale
+# Europe/Rome è le 9 (guardia anti-doppione); workflow_dispatch bypassa per i test.
+# Solo giorni feriali: nel weekend non c'è niente di operativo da dire.
+name: Morning brief WhatsApp
+
+on:
+  schedule:
+    - cron: "0 7 * * 1-5"   # 09:00 CEST (estate)
+    - cron: "0 8 * * 1-5"   # 09:00 CET (inverno)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # solo stdlib: nessun pip install. Anti-fragile: lo script esce SEMPRE 0.
+      - name: Componi e invia il brief
+        run: python scripts/morning_brief.py
+        env:
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}

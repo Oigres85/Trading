@@ -196,6 +196,29 @@ _clean = ud.drop_void_bars(_g)
 check("barre-glitch: minimo fantasma (SNDK-like 40.1 su corpo 1910) e prezzi ≤0 scartati, flash crash vero conservato",
       len(_clean) == 2 and list(_clean["Low"]) == [1890.0, 95.0])
 
-N_CHECKS = 35
+# ---------- morning brief (v117): digest deterministico, componibile e pulito ----------
+import morning_brief as mb
+_bdata = {
+    "updated_at": "2026-07-12T06:01:00Z",
+    "totals": {"eur_value": 297662.47, "eur_gain_pct": 59.78},
+    "portfolio": [
+        {"ticker": "AAA", "currency": "USD", "price": 100.0, "stop_atr": 95.0, "value": 10000,
+         "change_pct": 1.2, "earnings_date": "2026-07-15"},
+        {"ticker": "BBB", "currency": "USD", "price": 50.0, "stop_atr": 55.0, "stop_violated": True,
+         "value": 5000, "change_pct": -2.0},
+    ],
+    "data_quality": {"alerts": ["umich: stale"]},
+    "macro": {"vix": {"value": 15.03}, "smart_money": {"vix_term_ratio": 0.81}},
+    "metrics_history": [{"date": "2026-07-04", "vix": 17.0}],
+}
+_bv = {"label": "ACCUMULA", "candidates": [{"tk": "SNDK", "q": 90, "limit": 1485.02}], "rehab": ["META"], "squeeze": []}
+_brief = mb.build_brief(_bdata, _bv, now=datetime(2026, 7, 12, 7, 0, tzinfo=timezone.utc))
+check("morning brief: verdetto, stop violati, earnings, delta VIX 7g e riabilitati tutti presenti",
+      all(s in _brief for s in ("ACCUMULA", "SNDK 90/100", "STOP VIOLATO: BBB", "AAA 15/07",
+                                "META", "umich: stale", "-2,0 vs 7g", "Stop vicini: AAA +5,3%")))
+check("morning brief: niente 'None'/'nan' nel testo e lunghezza entro il limite CallMeBot",
+      "None" not in _brief and "nan" not in _brief and len(_brief) <= 1400)
+
+N_CHECKS = 37
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
