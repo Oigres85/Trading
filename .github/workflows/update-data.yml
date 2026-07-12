@@ -103,6 +103,20 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
           GITHUB_TOKEN: ${{ github.token }}
 
+      # LLM-CRITIC (v122): QA SEMANTICO del prompt via Gemini — azzera il QA manuale del CEO.
+      # A ogni run genera il prompt reale e chiede a Gemini di trovare incoerenze/valori
+      # impossibili/campi mal-etichettati (ciò che il red team deterministico non vede).
+      # Difetti → alert WhatsApp + log in config/llm_critic_log.jsonl. Best-effort: exit 0
+      # sempre + continue-on-error. Senza GEMINI_API_KEY fa no-op (attivalo aggiungendo il secret).
+      - name: LLM-critic QA del prompt (best-effort)
+        run: node scripts/llm_critic.mjs
+        continue-on-error: true
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
+
       - name: Commit dati aggiornati
         run: |
           git config user.name "github-actions[bot]"
@@ -111,6 +125,7 @@ jobs:
           # file di stato best-effort: possono non esistere ai primi run
           git add config/verdict_history.jsonl 2>/dev/null || true
           git add config/alert_state.json 2>/dev/null || true
+          git add config/llm_critic_log.jsonl 2>/dev/null || true
           git diff --cached --quiet && echo "nessuna variazione" && exit 0
           git commit -m "Aggiornamento dati $(date -u +'%Y-%m-%d %H:%M UTC')"
           # push robusto: riprova con rebase se il remote è avanzato
