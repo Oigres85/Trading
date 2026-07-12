@@ -69,7 +69,13 @@ jobs:
         continue-on-error: true
       - name: Allarme red team
         if: steps.redteam.outcome == 'failure'
-        run: python scripts/notify_alerts.py --custom "RED TEAM FALLITO sul run dati delle $(date -u +'%H:%M UTC'): il motore ha violato gli invarianti finanziari con i dati freschi. NON usare il report finché non controlli la tab Actions."
+        # block scalar (>-): il messaggio contiene ": " che in uno scalare YAML piano
+        # invalida il file (successo il 11/07: workflow rotto = dati fermi una notte)
+        run: >-
+          python scripts/notify_alerts.py --custom
+          "RED TEAM FALLITO sul run dati — il motore ha violato gli invarianti
+          finanziari con i dati freschi. NON usare il report finché non controlli
+          la tab Actions."
         continue-on-error: true
         env:
           CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
