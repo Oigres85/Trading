@@ -145,10 +145,30 @@ check("sizing regime-aware: VIX 27 dimezza il budget d'ingresso (TSTW, watchlist
   const q2 = (decisionVerdict().withPlan.find(p => p.r.ticker === "TSTW") || {}).qty || 0;
   DATA.macro.vix.value = 15;
   return q1 > 0 && q2 > 0 && q2 <= Math.ceil(q1 * 0.55)`));
-check("cap sizing v110: TST1 (peso >10% NAV) NON è candidato ad accumulo, con motivazione dedicata", run(`
+check("cap d'ingresso v121: TST1 (peso ≥10% NAV) NON è candidato ad accumulo (divieto di NUOVI acquisti)", run(`
   const dv = decisionVerdict();
   return !dv.accumula.some(r => r.ticker === "TST1") &&
-    dv.reasons.some(s => s.includes("cap sizing") && s.includes("TST1"))`));
+    dv.overCap.some(x => x.r.ticker === "TST1") &&
+    dv.reasons.some(s => s.includes("cap d'ingresso") && s.includes("TST1") && s.includes("Let Winners Run"))`));
+check("Let Winners Run v121: una posizione tra 10% e 25% NON genera trim né alert (cresce libera)", run(`
+  // porto TST1 a un peso tra 10% e 25% (qty 28 → ~15%): overCap (no accumulo) MA nessun alert
+  const r = DATA.portfolio.find(x => x.ticker === "TST1");
+  const oldQty = r.qty; r.qty = 28; recomputeTotals();
+  const dv = decisionVerdict();
+  const w = positionWeightPct(r);
+  r.qty = oldQty; recomputeTotals();
+  return w > 10 && w < 25 &&
+    dv.overCap.some(x => x.r.ticker === "TST1") &&
+    !dv.concentrationAlert.some(x => x.r.ticker === "TST1") &&
+    !dv.reasons.some(s => s.includes("ALERT CONCENTRAZIONE"))`));
+check("alert concentrazione v121: SOLO sopra il 25% del NAV, come avviso (non trim)", run(`
+  // gonfio TST1 oltre il 25%: deve comparire l'alert concentrazione, mai un obbligo di trim
+  const r = DATA.portfolio.find(x => x.ticker === "TST1");
+  const oldQty = r.qty; r.qty = 1000; recomputeTotals();
+  const dv = decisionVerdict();
+  r.qty = oldQty; recomputeTotals();
+  return dv.concentrationAlert.some(x => x.r.ticker === "TST1") &&
+    dv.reasons.some(s => s.includes("ALERT CONCENTRAZIONE") && s.includes("NON è un obbligo di trim"))`));
 
 // ---- RIABILITAZIONE GROWTH (v111): il veto Sortino è revocato SOLO con qualità+trend+RS ----
 check("riabilitazione growth: Sortino negativo MA ROE>15% + sopra SMA200 + RS>0 → eleggibile, tag RIABILITATO", run(`
@@ -446,11 +466,14 @@ check("v119 tracciabilità: la riga Livelli porta prezzo, limite e stop sulla st
   DATA.watchlist.forEach(r => { if (r.ticker === "TSTW") delete r.risk_reward; });
   const liv = p.split("\\n").find(l => l.includes("Livelli calcolati"));
   return liv && /prezzo \\$[\\d.,]+ → limite d'ingresso \\$[\\d.,]+ \\/ stop \\$[\\d.,]+/.test(liv) && liv.includes("/ R/R 1:2.5")`));
-check("v119 trim con limite: le posizioni sovrappeso portano qtà e prezzo LIMITE di vendita (no 'a mercato')", run(`
+check("v121 cap d'ingresso nel prompt: ≥10% = solo divieto acquisti (Let Winners Run), niente trim forzato", run(`
+  const p = buildPrompt();   // TST1 al 38% nel fixture → riga cap d'ingresso, NON riga trim
+  const cap = p.split("\\n").find(l => l.includes("Cap d'ingresso") && l.includes("solo DIVIETO di nuovi acquisti"));
+  return cap && cap.includes("stop ratchet 2×ATR") && !p.includes("trimming di rientro")`));
+check("v121 alert concentrazione nel prompt: >25% = avviso con disciplina ordini-limite, mai a mercato", run(`
   const p = buildPrompt();
-  const line = p.split("\\n").find(l => l.includes("Sizing oltre il 10%"));
-  return line && line.includes("ordine LIMITE di vendita, mai a mercato") &&
-    /vendere ~\\d+ az\\. a limite ≥ \\$[\\d.,]+/.test(line)`));
+  const al = p.split("\\n").find(l => l.startsWith("· ⚠ ALERT CONCENTRAZIONE"));
+  return al && al.includes("NON obbligo di trim") && al.includes("mai a mercato")`));
 
 /* ---------- report ---------- */
 let fail = 0;

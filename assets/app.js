@@ -1134,6 +1134,26 @@ function stopOf(r) {
   return { stop: Math.round(stop * 100) / 100, violated: r.price < stop, ratchet: false, pct: st.pct, src: st.src };
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+   PARAMETRI DI RISCHIO DEL FONDO (v121) — direttive del CEO, calibrate il 12/07/2026.
+   Un unico punto di verità per le soglie che governano il verdetto: cambiare qui = cambiare
+   la politica di rischio, senza cercare numeri sparsi nel codice.
+   Filosofia: mandato Growth "Let Winners Run" — si cappa l'INGRESSO su ciò che è già grande,
+   NON si trimma ciò che è cresciuto da solo (protetto dallo stop ratchet 2×ATR).
+   ═══════════════════════════════════════════════════════════════════════════════════════ */
+const RISK_PARAMS = {
+  capNoAdd_pct: 10,        // #1 — DIVIETO DI ACCUMULO se la posizione è già ≥ questo % del NAV
+                           //      (cap rigido SOLO sui nuovi acquisti; resta a 10%)
+  capAlert_pct: 25,        // #1 — ALERT di concentrazione singolo titolo (solo avviso, NIENTE
+                           //      trim automatico: sotto il 25% i vincenti corrono liberi)
+  sortinoVeto: -0.3,       // #2 — soglia veto VALUE TRAP sul Sortino 1A (CEO: mantieni rigido)
+  sectorAlert_frac: 0.75,  // #6 — ALERT concentrazione settoriale > 75% del capitale azionario
+                           //      (mandato tech/growth: la forte esposizione è la normalità)
+  minScore: 60,            // #8 — score quant minimo per candidato d'accumulo
+  // #10 riserva tail-risk (budget = cassa − ES95): confermata dal CEO, gestita in pipeline.
+  // #7 stop 2×ATR ratchet e #4 riabilitazione growth: confermati invariati.
+};
+
 /* beta effettivo di un titolo: PRIORITÀ alla regressione della pipeline sui log-rendimenti
    12M vs Nasdaq 100 (beta_ndx); fallback al beta Yahoo (5A mensile vs S&P) solo se manca. */
 function betaOf(r) {
@@ -1227,9 +1247,9 @@ function qualityVeto(r) {
   // Fallback etichettato allo Sharpe finché la pipeline non popola sortino_1y.
   let downside = null;
   if (r.sortino_1y != null) {
-    if (r.sortino_1y < -0.3) downside = `Sortino 1A ${fmtNum.format(r.sortino_1y)} < -0.3 (distruzione di valore sul downside)`;
-  } else if (r.sharpe_1y != null && r.sharpe_1y < -0.3) {
-    downside = `Sharpe 1A ${fmtNum.format(r.sharpe_1y)} < -0.3 (proxy: Sortino n.d. fino al prossimo run pipeline)`;
+    if (r.sortino_1y < RISK_PARAMS.sortinoVeto) downside = `Sortino 1A ${fmtNum.format(r.sortino_1y)} < ${RISK_PARAMS.sortinoVeto} (distruzione di valore sul downside)`;
+  } else if (r.sharpe_1y != null && r.sharpe_1y < RISK_PARAMS.sortinoVeto) {
+    downside = `Sharpe 1A ${fmtNum.format(r.sharpe_1y)} < ${RISK_PARAMS.sortinoVeto} (proxy: Sortino n.d. fino al prossimo run pipeline)`;
   }
   if (st.short_float != null && st.short_float >= 0.15) why.push(`Short Interest ${Math.round(st.short_float * 1000) / 10}% ≥ 15%`);
   const pegBroken = st.peg == null || st.peg <= 0;   // la pipeline azzera già i PEG ≤ 0 → n.d.
@@ -1300,27 +1320,29 @@ function decisionVerdict() {
     return Math.round(parts.reduce((s, p) => s + p[0] * p[1], 0) / wTot);
   };
 
-  // candidati ACCUMULO: migliorano il profilo rischio/rendimento (score ≥ 60) e hanno
+  // candidati ACCUMULO: migliorano il profilo rischio/rendimento (score ≥ minScore) e hanno
   // Sharpe noto. Il drawdown non è più la porta d'ingresso: è solo un tiebreaker di prezzo.
-  // Una posizione GIÀ oltre il cap del 10% NAV non può essere candidata ad accumulo (v110):
-  // prima diceva "accumula MU" e "trimma MU" nello stesso verdetto — contraddizione servita
-  // all'LLM. Il cap sizing è un veto d'ingresso, non solo un flag a valle.
+  // CAP D'INGRESSO (#1, direttiva CEO v121): una posizione GIÀ ≥ capNoAdd_pct del NAV non può
+  // ricevere NUOVI acquisti — il cap rigido vale SOLO sull'accumulo, mai come trim forzato.
   const overCap = [];
   const accumula = eligible
     .filter(r => r.price && r.sharpe_1y != null)
     .filter(r => {
       const w = positionWeightPct(r);
-      if (w != null && w > 10) { overCap.push({ r, w }); return false; }
+      if (w != null && w >= RISK_PARAMS.capNoAdd_pct) { overCap.push({ r, w }); return false; }
       return true;
     })
     .map(r => ({ ...r, _q: quantScore(r) }))
-    .filter(r => r._q >= 60)
+    .filter(r => r._q >= RISK_PARAMS.minScore)
     .sort((a, b) => (b._q - a._q) || ((a.w52_dist_pct ?? 0) - (b.w52_dist_pct ?? 0)));
 
-  // 3) SIZING istituzionale: posizioni oltre il 10% del NAV → trimming suggerito
-  const overweight = (DATA.portfolio || []).filter(isEquity)
+  // 3) CONCENTRAZIONE SINGOLO TITOLO (#1, direttiva CEO v121): NESSUN trim automatico su ciò che
+  // è cresciuto per apprezzamento organico — "Let Winners Run", la protezione è lo stop ratchet
+  // 2×ATR. Solo un ALERT informativo se un nome supera capAlert_pct (25%) del NAV. Le posizioni
+  // tra capNoAdd (10%) e capAlert (25%) corrono libere: niente trim, niente allarme.
+  const concentrationAlert = (DATA.portfolio || []).filter(isEquity)
     .map(r => ({ r, w: positionWeightPct(r) }))
-    .filter(x => x.w != null && x.w > 10)
+    .filter(x => x.w != null && x.w > RISK_PARAMS.capAlert_pct)
     .sort((a, b) => b.w - a.w);
   // alleggerimenti tattici: multipli NON GIUSTIFICATI dalla crescita o ipercomprato estremo
   // (solo posizioni possedute). Mandato growth "let winners run" (v111): un P/E ottico alto
@@ -1380,8 +1402,8 @@ function decisionVerdict() {
     ? " ([in ptf] = posizione detenuta: il veto vieta l'ACCUMULO, la decisione tenere/vendere resta aperta)" : "";
   if (accumula.length >= 1 && cashUsd > 0) {
     label = "ACCUMULA"; col = "var(--green)"; score = 72;
-    reasons.push(`${accumula.length} candidati migliorano il profilo Sharpe/RS del portafoglio (score quant ≥60): ${accumula.slice(0, 8).map(r => `${r.ticker} ${r._q}/100`).join(", ")}${accumula.length > 8 ? ", …" : ""}`);
-    if (overCap.length) reasons.push(`esclusi dall'accumulo per cap sizing (posizione già oltre il 10% del NAV): ${overCap.map(x => `${x.r.ticker} (${fmtNum.format(x.w)}%)`).join(", ")} — su questi si valuta solo il trimming di rientro`);
+    reasons.push(`${accumula.length} candidati migliorano il profilo Sharpe/RS del portafoglio (score quant ≥${RISK_PARAMS.minScore}): ${accumula.slice(0, 8).map(r => `${r.ticker} ${r._q}/100`).join(", ")}${accumula.length > 8 ? ", …" : ""}`);
+    if (overCap.length) reasons.push(`esclusi dai NUOVI acquisti per cap d'ingresso (posizione già ≥${RISK_PARAMS.capNoAdd_pct}% del NAV — divieto di accumulo, NON di detenzione): ${overCap.map(x => `${x.r.ticker} (${fmtNum.format(x.w)}%)`).join(", ")} — si lasciano correre (Let Winners Run), protetti dallo stop ratchet 2×ATR; nessun trim automatico`);
     reasons.push(`criteri: impatto marginale sullo Sharpe (vs ${refSharpe != null ? fmtNum.format(refSharpe) : "n.d."} attuale, target 2.0) · forza relativa 1M vs benchmark · qualità fondamentale`);
     reasons.push(`ordini LIMITE ai supporti con stop a 2×ATR(14): il rischio per operazione si adatta alla volatilità del titolo`);
     if (riskScale < 1) reasons.push(`regime di volatilità: VIX ${fmtNum.format(vixV)} → budget d'ingresso ridotti al ${Math.round(riskScale * 100)}% (sizing regime-aware: in mercato nervoso si rischia meno per operazione)`);
@@ -1396,7 +1418,7 @@ function decisionVerdict() {
   if (vetoTk.length) reasons.push(`VETO risk manager su ${vetoTk.join(", ")} — esclusi a prescindere dal supporto tecnico${vetoHeldNote}`);
   if (rehabbed.length) reasons.push(`RIABILITATI dal veto Sortino (regola growth v111 — qualità intatta + prezzo sopra SMA200 + RS 1M vs NDX positiva, criteri tutti meccanici): ${rehabbed.map(x => `${x.r.ticker} (${x.why[0]}; MA ${x.rehabWhy})`).join(" · ")} — trattali da candidati SORVEGLIATI: il trailing 12M resta negativo, la ripresa è provata dai dati correnti`);
   if (squeezed.length) reasons.push(`⚡ SETUP TURNAROUND SQUEEZE su ${squeezed.map(x => `${x.r.ticker} (short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% · RVol ${fmtNum.format(x.r.vol_ratio)}× · sopra SMA50)`).join(", ")} — il VETO growth resta: valutabile SOLO come speculazione asimmetrica dichiarata, sizing massimo METÀ dello standard, stop stretto 1×ATR, ordine limite`);
-  if (overweight.length) reasons.push(`sizing: ${overweight.map(x => `${x.r.ticker} ${x.w}%`).join(", ")} oltre il 10% del NAV → valuta trimming di rientro`);
+  if (concentrationAlert.length) reasons.push(`⚠ ALERT CONCENTRAZIONE: ${concentrationAlert.map(x => `${x.r.ticker} ${x.w}%`).join(", ")} oltre il ${RISK_PARAMS.capAlert_pct}% del NAV — soglia di attenzione del CEO; NON è un obbligo di trim (Let Winners Run), ma valuta consapevolmente il rischio idiosincratico di un singolo nome così pesante`);
   // motivo PRECISO per titolo (non il generico "multiplo/RSI estremo": su CBRS scattava solo
   // il multiplo e l'LLM segnalava "RSI 43,6 non estremo" — v118)
   if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => {
@@ -1405,7 +1427,7 @@ function decisionVerdict() {
     if (r.rsi && r.rsi > 78) why.push(`RSI ${r.rsi} ipercomprato`);
     return `${r.ticker} (${why.join(" + ") || "multiplo teso"})`;
   }).join(", ")}`);
-  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, squeezed, overweight, harvest };
+  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, squeezed, overCap, concentrationAlert, harvest };
 }
 
 // alert proattivi: condizioni rilevanti emerse oggi (deep value, correzione, squeeze, VIX)
@@ -4309,7 +4331,7 @@ function buildPrompt() {
           .forEach(a => { const k = a.sector || a.ticker; bySecR[k] = (bySecR[k] || 0) + (a.value_eur || 0); });
     const invTot = Object.values(bySecR).reduce((s, v) => s + v, 0) || 1;
     const topSec = Object.entries(bySecR).sort((a, b) => b[1] - a[1])[0];
-    if (topSec) riskBits.push(`primo settore: ${topSec[0]} ${Math.round(topSec[1] / invTot * 100)}% del capitale AZIONARIO (base del rischio correlato: liquidità e obbligazioni escluse)${topSec[1] / invTot > 0.25 ? " — SOPRA la soglia del 25% (regola correlazione attiva)" : ""}`);
+    if (topSec) riskBits.push(`primo settore: ${topSec[0]} ${Math.round(topSec[1] / invTot * 100)}% del capitale AZIONARIO (base del rischio correlato: liquidità e obbligazioni escluse)${topSec[1] / invTot > RISK_PARAMS.sectorAlert_frac ? ` — ⚠ ALERT: oltre il ${Math.round(RISK_PARAMS.sectorAlert_frac * 100)}% (soglia CEO per sbilanciamenti estremi; il mandato Growth tollera forte esposizione tech — valuta rotazione solo se opportuno)` : " (entro la normalità strutturale del mandato tech/growth)"}`);
     void totA;
   }
   if (cashEur > 0 && patrimonio > 0) {
@@ -4383,13 +4405,11 @@ function buildPrompt() {
     if ((dv.rehabbed || []).length) lines.push("· RIABILITATI dal veto Sortino — regola growth v111 (contesto): " + dv.rehabbed.map(x => `${x.r.ticker} → ${x.why.join(", ")}; MA ${x.rehabWhy}`).join(" · ") + ". Il Sortino 12M è backward-looking: con qualità intatta, prezzo sopra SMA200 e RS positiva il titolo è di nuovo eleggibile all'accumulo, da SORVEGLIATO (dichiara sempre il trailing negativo).");
     if ((dv.squeezed || []).length) lines.push("· [TURNAROUND SQUEEZE RISK] (contesto, v113): " + dv.squeezed.map(x => `${x.r.ticker} → veto (${x.why[0]}) MA short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% + RVol ${fmtNum.format(x.r.vol_ratio)}× + prezzo sopra SMA50 (${signTxt(x.r.sma50_dist_pct)})`).join(" · ") + ". NON è un candidato del mandato growth: se il CEO vuole trattarlo, va dichiarato come SPECULAZIONE asimmetrica — sizing massimo METÀ dello standard, stop stretto 1×ATR, solo ordine limite, mai media al ribasso.");
     // v119 — il trim ora porta un PREZZO LIMITE di vendita e la QUANTITÀ esatta per rientrare
-    // al 10% del NAV (matematica del sistema, non a mente): prima il prompt dava solo il peso %
-    // e l'LLM ripiegava su "a mercato", violando la regola ordini-limite del mandato.
-    if ((dv.overweight || []).length) lines.push("· Sizing oltre il 10% del NAV (candidati a trimming di rientro; ordine LIMITE di vendita, mai a mercato): " + dv.overweight.map(x => {
-      const r = x.r, toTen = (r.qty && x.w > 10) ? Math.ceil(r.qty * (1 - 10 / x.w)) : null;
-      const lim = r.price ? `${cur(r)}${fmtNum.format(r.price)}` : "n.d.";
-      return `${r.ticker} ${fmtNum.format(x.w)}%${toTen ? ` → per rientrare a 10% NAV: vendere ~${toTen} az. a limite ≥ ${lim} (prezzo corrente)` : ""}`;
-    }).join(" · ") + ".");
+    // CAP D'INGRESSO (#1, direttiva CEO v121): i titoli ≥10% NAV NON ricevono nuovi acquisti,
+    // ma NON vanno trimmati se cresciuti da soli (Let Winners Run, protetti dallo stop ratchet).
+    if ((dv.overCap || []).length) lines.push(`· Cap d'ingresso (posizioni ≥${RISK_PARAMS.capNoAdd_pct}% NAV — solo DIVIETO di nuovi acquisti, si lasciano correre): ` + dv.overCap.map(x => `${x.r.ticker} ${fmtNum.format(x.w)}%`).join(" · ") + ". Nessun trim automatico: la protezione è lo stop ratchet 2×ATR di ogni posizione.");
+    // ALERT concentrazione singolo titolo: SOLO avviso sopra il 25%, mai un obbligo di trim.
+    if ((dv.concentrationAlert || []).length) lines.push(`· ⚠ ALERT CONCENTRAZIONE (singolo nome > ${RISK_PARAMS.capAlert_pct}% del NAV — soglia di attenzione, NON obbligo di trim): ` + dv.concentrationAlert.map(x => `${x.r.ticker} ${fmtNum.format(x.w)}%`).join(" · ") + ". Valuta consapevolmente il rischio idiosincratico; se decidi di alleggerire, ordine LIMITE di vendita ≥ prezzo corrente, mai a mercato.");
     if ((dv.trim || []).length) lines.push("· Posizioni segnalate dal motore come tese (contesto): " + dv.trim.map(r => `${r.ticker} (${r.pe > 150 ? "P/E " + fmtNum.format(r.pe) : "RSI " + r.rsi})`).join(" · ") + ".");
     if ((dv.harvest || []).length) lines.push("· Minusvalenze latenti utilizzabili fiscalmente (contesto): " + dv.harvest.map(r => `${r.ticker} (${signTxt(Math.round(r.gain_eur), " €")})`).join(" · ") + ".");
   } catch { /* no-op */ }
