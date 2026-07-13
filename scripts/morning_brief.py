@@ -11,8 +11,8 @@ imminenti sulle posizioni · alert data quality · VIX e term structure con delt
 stato track record.
 
 Anti-fragile come notify_alerts: exit 0 SEMPRE. Doppio cron CET/CEST nel workflow →
-la guardia oraria (Europe/Rome == 9) evita il doppio invio; workflow_dispatch o
-FORCE_BRIEF=1 bypassano la guardia per i test."""
+la guardia oraria (Europe/Rome == 9) o la presenza di emergenze intraday
+evita il doppio invio di routine; workflow_dispatch o FORCE_BRIEF=1 bypassano sempre."""
 import json
 import os
 import sys
@@ -132,11 +132,32 @@ def build_brief(data, verdict, now=None):
 def main():
     forced = os.environ.get("FORCE_BRIEF") == "1" or os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
     hour_rome = datetime.now(ZoneInfo("Europe/Rome")).hour
-    if not forced and hour_rome != 9:
-        print(f"brief: ora locale {hour_rome} ≠ 9 (doppio cron CET/CEST) — skip")
-        return
+    
     data = json.loads(DATA.read_text())
-    msg = build_brief(data, _last_verdict())
+    verdict = _last_verdict()
+    
+    # Valutazione emergenze per bypass veto orario (Event-Driven)
+    rows = [r for r in data.get("portfolio", []) if r.get("currency") == "USD"]
+    stop_violati = any(r.get("stop_violated") for r in rows)
+    alerts = (data.get("data_quality") or {}).get("alerts") or []
+    has_critical_alerts = any("MACRO SHOCK" in str(a).upper() or "SHOCK" in str(a).upper() for a in alerts)
+    has_squeeze = bool(verdict and verdict.get("squeeze"))
+    
+    is_emergency = stop_violati or has_critical_alerts or has_squeeze
+    
+    # Veto: esegui solo se è il run delle 9:00, se forzato, o se c'è un'emergenza da segnalare
+    if not (forced or hour_rome == 9 or is_emergency):
+        print(f"brief: ora locale {hour_rome} ≠ 9 e nessuna emergenza rilevata — skip")
+        return
+
+    msg = build_brief(data, verdict)
+    
+    # Se è un bypass di emergenza fuori orario, aggiungi una riga di allarme in cima
+    if is_emergency and hour_rome != 9 and not forced:
+        msg = "🚨 [ALERT INTRAYDAY BYPASS] 🚨\n" + msg
+        msg = msg[:1400]
+        print(f"brief: emergenza rilevata alle ore {hour_rome}, veto orario bypassato.")
+
     if not os.environ.get("CALLMEBOT_APIKEY"):
         print("brief (dry-run, nessun CALLMEBOT_APIKEY):\n" + msg)
         return
