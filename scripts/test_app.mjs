@@ -139,6 +139,16 @@ check("decisionVerdict: TST2 tra gli esclusi, TST3 tra le violazioni", run(`
   return dv.excluded.some(x => x.r.ticker === "TST2") &&
   dv.stopViolations.some(x => x.r.ticker === "TST3") &&
   typeof dv.label === "string"`));
+check("coerenza cassa↔verdetto v123: candidati PRONTI + cassa 0 → stato LIQUIDITÀ, non il falso 'nessun candidato'", run(`
+  const savedCash = cashEur; cashEur = 0; recomputeTotals();
+  const dv = decisionVerdict();
+  cashEur = savedCash; recomputeTotals();
+  return dv.accumula.length >= 1 && dv.label === "LIQUIDITÀ" &&
+    dv.reasons.some(s => s.includes("PRONTI") && s.includes("liquidità esaurita")) &&
+    !dv.reasons.some(s => s.includes("nessun candidato migliora abbastanza"))`));
+check("coerenza cassa↔verdetto v123: con cassa sufficiente e ordini eseguibili → ACCUMULA", run(`
+  const dv = decisionVerdict();   // fixture: cashEur 10000, candidati con withPlan eseguibile
+  return dv.label === "ACCUMULA" && dv.withPlan.length > 0`));
 check("sizing regime-aware: VIX 27 dimezza il budget d'ingresso (TSTW, watchlist)", run(`
   const q1 = (decisionVerdict().withPlan.find(p => p.r.ticker === "TSTW") || {}).qty || 0;
   DATA.macro.vix.value = 27;

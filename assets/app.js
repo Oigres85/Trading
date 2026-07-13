@@ -1401,13 +1401,23 @@ function decisionVerdict() {
   const vetoTk = excluded.map(x => `${x.r.ticker}${x.r.qty ? " [in ptf]" : ""} (${x.verdict === "SCARTATO - VALUE TRAP" ? "VALUE TRAP" : x.why[0]})`);
   const vetoHeldNote = excluded.some(x => x.r.qty)
     ? " ([in ptf] = posizione detenuta: il veto vieta l'ACCUMULO, la decisione tenere/vendere resta aperta)" : "";
-  if (accumula.length >= 1 && cashUsd > 0) {
+  // COERENZA CASSA↔VERDETTO (v123): il ramo ACCUMULA scatta solo se c'è ALMENO UN ORDINE
+  // ESEGUIBILE (withPlan non vuoto). Prima il gate era `cashUsd > 0`: con cassa a 0 (o troppo
+  // piccola per 1 azione) il verdetto cadeva in MANTIENI stampando "nessun candidato migliora
+  // abbastanza" — FALSO, i candidati esistevano (accumula.length>0). Ora i tre stati sono
+  // distinti: (a) candidati + cassa → ACCUMULA · (b) candidati MA cassa esaurita → segnala
+  // l'opportunità bloccata dalla liquidità · (c) davvero nessun candidato → MANTIENI/PRUDENZA.
+  if (accumula.length >= 1 && withPlan.length > 0) {
     label = "ACCUMULA"; col = "var(--green)"; score = 72;
     reasons.push(`${accumula.length} candidati migliorano il profilo Sharpe/RS del portafoglio (score quant ≥${RISK_PARAMS.minScore}): ${accumula.slice(0, 8).map(r => `${r.ticker} ${r._q}/100`).join(", ")}${accumula.length > 8 ? ", …" : ""}`);
     if (overCap.length) reasons.push(`esclusi dai NUOVI acquisti per cap d'ingresso (posizione già ≥${RISK_PARAMS.capNoAdd_pct}% del NAV — divieto di accumulo, NON di detenzione): ${overCap.map(x => `${x.r.ticker} (${fmtNum.format(x.w)}%)`).join(", ")} — si lasciano correre (Let Winners Run), protetti dallo stop ratchet 2×ATR; nessun trim automatico`);
     reasons.push(`criteri: impatto marginale sullo Sharpe (vs ${refSharpe != null ? fmtNum.format(refSharpe) : "n.d."} attuale, target 2.0) · forza relativa 1M vs benchmark · qualità fondamentale`);
     reasons.push(`ordini LIMITE ai supporti con stop a 2×ATR(14): il rischio per operazione si adatta alla volatilità del titolo`);
     if (riskScale < 1) reasons.push(`regime di volatilità: VIX ${fmtNum.format(vixV)} → budget d'ingresso ridotti al ${Math.round(riskScale * 100)}% (sizing regime-aware: in mercato nervoso si rischia meno per operazione)`);
+  } else if (accumula.length >= 1) {
+    // candidati PRONTI ma nessun ordine eseguibile: la liquidità è il collo di bottiglia, NON la mancanza di idee
+    label = "LIQUIDITÀ"; col = "var(--yellow)"; score = 50;
+    reasons.push(`⚠ ${accumula.length} candidati d'ingresso PRONTI (${accumula.slice(0, 5).map(r => `${r.ticker} ${r._q}/100`).join(", ")}${accumula.length > 5 ? ", …" : ""}) MA liquidità esaurita (cassa ${fmtEUR.format(cashEur)}${t.budget_operativo_spendibile != null ? `, budget operativo ${fmtEUR.format(Math.round(t.budget_operativo_spendibile))}` : ""}): nessun ingresso ESEGUIBILE oggi. Non è "niente da comprare" — è "niente con cui comprare". Per attivarli, libera cassa: trim tattico, uscita dai nomi in veto (es. MSTR), o nuovo versamento.`);
   } else if (dir != null && dir < 40) {
     label = "PRUDENZA"; col = "var(--yellow)"; score = 32;
     reasons.push(`regime debole (segnali ${dir}/100) e nessun candidato con edge quant: nessun nuovo ingresso, disciplina sugli stop 2×ATR`);
