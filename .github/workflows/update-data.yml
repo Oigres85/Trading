@@ -2,22 +2,23 @@ name: Aggiorna dati dashboard
 
 on:
   schedule:
-    # Orari Italia richiesti: 06:00 · 09:55 · 15:25 · 17:00 · 21:55 (ogni giorno).
-    # GitHub usa UTC: includo sia CEST (estate, UTC+2) sia CET (inverno, UTC+1)
-    # così l'orario locale è corretto tutto l'anno (eventuale refresh extra è innocuo).
+    # RADAR TATTICO — orari ITALIA richiesti: 06:00 · 10:00 · 15:30 · 17:00 · 21:00 · 22:00.
+    #   06:00 chiusura mercati asiatici · 10:00 sessione europea + futures USA · 15:30 · 17:00
+    #   assestamento post-apertura Wall Street · 21:00 preparazione Power Hour · 22:00.
+    # GitHub cron è in UTC: per far cadere questi orari LOCALI tutto l'anno includo sia CEST
+    # (estate, UTC+2) sia CET (inverno, UTC+1). L'eventuale run "extra" fuori stagione è
+    # innocuo (concurrency group + commit no-op se i dati non cambiano).
     - cron: "0 4 * * *"     # 06:00 CEST
     - cron: "0 5 * * *"     # 06:00 CET
-    - cron: "55 7 * * *"    # 09:55 CEST
-    - cron: "55 8 * * *"    # 09:55 CET
-    - cron: "25 13 * * *"   # 15:25 CEST
-    - cron: "25 14 * * *"   # 15:25 CET
+    - cron: "0 8 * * *"     # 10:00 CEST
+    - cron: "0 9 * * *"     # 10:00 CET
+    - cron: "30 13 * * *"   # 15:30 CEST
+    - cron: "30 14 * * *"   # 15:30 CET
     - cron: "0 15 * * *"    # 17:00 CEST
     - cron: "0 16 * * *"    # 17:00 CET
-    - cron: "55 19 * * *"   # 21:55 CEST
-    - cron: "55 20 * * *"   # 21:55 CET
-    # Aggiornamento ORARIO durante la sessione USA nei giorni feriali (dati sempre freschi):
-    # 13:00–21:00 UTC = 15:00–23:00 CEST (copre pre-market e tutta la seduta di Wall Street).
-    - cron: "0 13-21 * * 1-5"
+    - cron: "0 19 * * *"    # 21:00 CEST
+    - cron: "0 20 * * *"    # 21:00 CET  /  22:00 CEST
+    - cron: "0 21 * * *"    # 22:00 CET
   workflow_dispatch:
 
 permissions:
