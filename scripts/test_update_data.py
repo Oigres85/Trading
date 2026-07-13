@@ -147,14 +147,34 @@ _nd = {"portfolio": [{"ticker": "TSTV", "qty": 10, "stop_violated": True, "price
                      {"ticker": "NOP", "stats": {"short_float": 0.25}, "vol_ratio": 1.0, "sma50_dist_pct": 3.0}],
        "data_quality": {"alerts": ["umich: stale"]}, "updated_at": "2026-07-11T10:00:00Z"}
 _cur = na.collect_alerts(_nd)
-check("notify: collect_alerts (stop violato, squeeze setup, data quality)",
-      _cur == {"stops": ["TSTV"], "dq": ["umich: stale"], "squeeze": ["SQZ"]})
-_new = na.diff_alerts(_cur, {"stops": [], "dq": ["umich: stale"], "squeeze": []})
+check("notify: collect_alerts (stop violato, squeeze setup, data quality, shock vuoto)",
+      _cur == {"stops": ["TSTV"], "dq": ["umich: stale"], "squeeze": ["SQZ"], "shock": []})
+_new = na.diff_alerts(_cur, {"stops": [], "dq": ["umich: stale"], "squeeze": [], "shock": []})
 check("notify: diff_alerts segnala solo le novità (dq già notificato → fuori)",
-      _new == {"stops": ["TSTV"], "dq": [], "squeeze": ["SQZ"]})
+      _new == {"stops": ["TSTV"], "dq": [], "squeeze": ["SQZ"], "shock": []})
 check("notify: build_message compone i blocchi e torna None senza novità",
       "STOP VIOLATO" in na.build_message(_new, _nd) and "SQZ" in na.build_message(_new, _nd)
-      and na.build_message({"stops": [], "dq": [], "squeeze": []}, _nd) is None)
+      and na.build_message({"stops": [], "dq": [], "squeeze": [], "shock": []}, _nd) is None)
+# MACRO SHOCK ALERT v125: collect + build
+_shockd = {"portfolio": [], "watchlist": [], "data_quality": {},
+           "macro": {"shock_alert": {"active": True, "threshold": -2.0,
+                                     "sources": [{"src": "KOSPI (Asia)", "chg": -8.9}, {"src": "Futures Nasdaq 100", "chg": -2.4}]}}}
+_sc = na.collect_alerts(_shockd)
+check("notify shock v125: collect_alerts raccoglie le fonti oltre -2%",
+      "KOSPI (Asia) -8.9%" in _sc["shock"] and "Futures Nasdaq 100 -2.4%" in _sc["shock"])
+check("notify shock v125: build_message emette il blocco MACRO SHOCK ALERT",
+      "MACRO SHOCK ALERT" in na.build_message(_sc, _shockd) and "SOSPENDI" in na.build_message(_sc, _shockd))
+
+# ---------- live-market + shock alert (v125): funzioni pure della pipeline ----------
+check("v125 is_live_market: cripto/futures/indici esteri sì, azioni USA e indici USA no",
+      ud.is_live_market("^KS11") and ud.is_live_market("BTC-USD") and ud.is_live_market("NQ=F")
+      and not ud.is_live_market("AAPL") and not ud.is_live_market("^IXIC") and not ud.is_live_market("^GSPC"))
+check("v125 compute_shock_alert: KOSPI -8,9% + futures -2,4% → alert attivo, worst -8,9%",
+      (lambda s: s and s["active"] and s["worst_chg"] == -8.9 and len(s["sources"]) == 2)(
+          ud.compute_shock_alert({"futures": {"nasdaq": {"change_pct": -2.4}, "sp500": {"change_pct": -0.5}}},
+                                 [{"ticker": "^KS11", "change_pct": -8.9}])))
+check("v125 compute_shock_alert: cali sotto soglia (-1,5%) → nessun alert (None)",
+      ud.compute_shock_alert({"futures": {"nasdaq": {"change_pct": -1.5}}}, [{"ticker": "^KS11", "change_pct": -1.0}]) is None)
 
 # ---------- BLINDATURA RATCHET + SCUDO SOTTO-ZERO (v115, post-incidente SNDK) ----------
 _nanf = float("nan")
@@ -229,6 +249,6 @@ check("div_yield_frac: senza tasso → fallback al campo % di Yahoo (ORCL 1.39 �
 check("div_yield_frac: cap 30% — un 453% (TLT-like) è errore di unità → None",
       ud.div_yield_frac(None, 84.0, 453.0) is None and ud.div_yield_frac(300.0, 84.0, None) is None)
 
-N_CHECKS = 41
+N_CHECKS = 48
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)

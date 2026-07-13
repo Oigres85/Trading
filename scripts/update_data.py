@@ -531,6 +531,27 @@ def drop_void_bars(hist):
     return hist[m]
 
 
+# Strumenti che CONTRATTANO quando Wall Street dorme: la loro ultima candela GIORNALIERA è
+# stantia mentre il mercato è vivo (v125). Per questi il prezzo mostrato = ULTIMO SCAMBIO LIVE
+# (fast_info.last_price), non la chiusura: KOSPI in crollo asiatico, BTC 24/7, futures 24/5.
+LIVE_FOREIGN_INDICES = {"^KS11", "^KS200", "^N225", "^HSI", "^HSCE", "^TWII", "^STOXX50E",
+                        "^FTSE", "^GDAXI", "^FCHI", "^AXJO", "^BSESN", "000001.SS"}
+def is_live_market(ticker):
+    """True per cripto (-USD), futures (=F) e indici esteri che scambiano fuori dall'orario USA."""
+    tk = (ticker or "").upper()
+    return tk.endswith("-USD") or tk.endswith("=F") or tk in LIVE_FOREIGN_INDICES
+
+
+def live_last_price(t):
+    """Ultimo prezzo di scambio LIVE via fast_info (real-time, non l'ultima candela chiusa).
+    None se non disponibile/degenere — il chiamante ricade sulla chiusura."""
+    try:
+        lp = float(t.fast_info.last_price)
+        return lp if _finite_pos(lp) else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
     ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
@@ -558,6 +579,20 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         price_asof = str(closes.index[-1].date())
     except Exception:  # noqa: BLE001 — indice non-datetime (backup esotici): meglio niente che sbagliato
         price_asof = None
+
+    # LIVE OVERRIDE v125 (punto cieco 72h): per gli strumenti che scambiano mentre Wall Street
+    # è chiusa (KOSPI, BTC, futures) il prezzo mostrato è l'ULTIMO SCAMBIO LIVE, non la candela
+    # giornaliera stantia. La chiusura più recente diventa il RIFERIMENTO per la variazione
+    # (così il crollo asiatico -8,9% appare come tale). Le metriche statiche (ATR/returns/SMA)
+    # restano sulla serie giornaliera: solo il prezzo/variazione mostrati diventano live.
+    price_live = False
+    if is_live_market(ticker):
+        lp = live_last_price(t)
+        if lp is not None and abs(lp / price - 1) < 0.5:   # guardia anti-glitch: scarto <50% dalla chiusura
+            prev = price       # la chiusura più recente è il riferimento della variazione live
+            price = lp
+            price_asof = None   # non è una chiusura: è live
+            price_live = True
 
     monthly = None
     try:
@@ -854,6 +889,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "price_src": price_src,          # "yahoo" | "stooq" (fallback prezzi etichettato)
         "price": round(price, 2),
         "price_asof": price_asof,        # data dell'ultima chiusura valida (staleness dichiarabile)
+        "price_live": price_live,        # True = ultimo scambio LIVE (KOSPI/BTC/futures fuori orario USA)
         "change_pct": chg,
         "pe": round(float(pe), 1) if pe and pe > 0 else None,
         "ath": round(ath, 2),
@@ -1783,7 +1819,8 @@ def fetch_macro():
 
     for key, fn in (("liquidity_split", fetch_liquidity_split),
                     ("dollar_ruler", fetch_dollar_ruler),
-                    ("momentum", fetch_momentum)):
+                    ("momentum", fetch_momentum),
+                    ("futures", fetch_futures)):   # v125: futures NQ/ES live (leading pre-apertura USA)
         try:
             macro[key] = fn()
         except Exception as e:  # noqa: BLE001
@@ -1886,6 +1923,46 @@ def fetch_momentum():
         except Exception as e:  # noqa: BLE001
             print(f"!! momentum {sym}: {e}", file=sys.stderr)
     return out or None
+
+
+def fetch_futures():
+    """Futures indici USA LIVE (v125) — leading indicator prima dell'apertura di Wall Street:
+    Nasdaq 100 (NQ=F) e S&P 500 (ES=F). fast_info dà l'ultimo scambio real-time (i futures
+    scambiano ~24/5); variazione vs chiusura precedente. Alimenta anche il MACRO SHOCK ALERT."""
+    out = {}
+    for sym, key, lab in (("NQ=F", "nasdaq", "Futures Nasdaq 100"), ("ES=F", "sp500", "Futures S&P 500")):
+        try:
+            fi = yf.Ticker(sym).fast_info
+            lp, pc = float(fi.last_price), float(fi.previous_close)
+            if _finite_pos(lp) and _finite_pos(pc):
+                out[key] = {"symbol": sym, "label": lab, "price": round(lp, 2),
+                            "change_pct": round((lp / pc - 1) * 100, 2)}
+        except Exception as e:  # noqa: BLE001
+            print(f"!! futures {sym}: {e}", file=sys.stderr)
+    return out or None
+
+
+def compute_shock_alert(macro, watchlist):
+    """MACRO SHOCK ALERT v125 — riconosce le mattinate di panico: se l'Asia (KOSPI) o i futures
+    Nasdaq cedono oltre il -2% mentre Wall Street è chiusa, alza un flag che testata/critic/
+    dashboard leggono per SOSPENDERE gli acquisti aggressivi finché non si assesta la prima ora.
+    Legge i dati LIVE già raccolti (nessuna chiamata extra)."""
+    THR = -2.0
+    sources = []
+    fut = macro.get("futures") or {}
+    for key, lab in (("nasdaq", "Futures Nasdaq 100"), ("sp500", "Futures S&P 500")):
+        chg = (fut.get(key) or {}).get("change_pct")
+        if chg is not None and chg <= THR:
+            sources.append({"src": lab, "chg": chg})
+    for r in watchlist:
+        if r.get("ticker") == "^KS11" and r.get("change_pct") is not None and r["change_pct"] <= THR:
+            sources.append({"src": "KOSPI (Asia)", "chg": r["change_pct"]})
+    if not sources:
+        return None
+    worst = min(s["chg"] for s in sources)
+    return {"active": True, "threshold": THR, "sources": sources, "worst_chg": worst,
+            "note": "Asia/futures Nasdaq oltre -2% con Wall Street chiusa: sospendere gli acquisti "
+                    "aggressivi, attendere l'assestamento della prima ora di scambi USA."}
 
 
 def _finra_scrape(url):
@@ -2894,6 +2971,11 @@ def main():
     btp = fetch_btp()
     watchlist = fetch_watchlist()
     macro = fetch_macro()
+    # MACRO SHOCK ALERT v125: incrocia futures Nasdaq (macro) e KOSPI live (watchlist) → flag panico
+    shock = compute_shock_alert(macro, watchlist)
+    if shock:
+        macro["shock_alert"] = shock
+        print(f"!! [MACRO SHOCK ALERT] {shock['worst_chg']}% — {[s['src'] for s in shock['sources']]}", file=sys.stderr)
 
     # Metriche di rischio (Sharpe, beta NDX, correlazioni, MCR) PRIMA di rimuovere le serie interne
     risk = compute_risk_metrics(equities, watchlist) or {}

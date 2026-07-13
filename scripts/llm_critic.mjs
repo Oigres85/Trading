@@ -62,7 +62,7 @@ Il tuo UNICO compito: trovare DIFETTI OGGETTIVI del payload che porterebbero a d
 5. CONTEGGI SBAGLIATI: "N POSIZIONI/TITOLI" che non corrisponde al numero di righe della tabella.
 
 REGOLE ANTI-FALSO-POSITIVO (rispettale rigorosamente):
-- "—", "n.d.", "n/a", "[chiusura del …]", "[BILANCI VALUTA LOCALE]", "provvisorio", "teorico", "storia <60 sedute" sono comportamenti CORRETTI del sistema, NON difetti. Non segnalarli.
+- "—", "n.d.", "n/a", "[chiusura del …]", "[LIVE]", "[MACRO SHOCK ALERT]", "[STOP A RISCHIO …]", "[BILANCI VALUTA LOCALE]", "provvisorio", "teorico", "storia <60 sedute" sono comportamenti/flag CORRETTI del sistema, NON difetti. Non segnalarli come errori. (Se presente [MACRO SHOCK ALERT], puoi però annotarlo a parte come [ALTA] contesto: "shock macro attivo — acquisti da sospendere".)
 - Un Sortino/Sharpe/EPS NEGATIVO è legittimo. Un dato semplicemente MANCANTE (—) NON è un difetto.
 - NON valutare la bontà delle scelte d'investimento: solo la coerenza matematica e strutturale dei DATI.
 

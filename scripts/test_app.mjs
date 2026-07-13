@@ -485,6 +485,37 @@ check("v121 alert concentrazione nel prompt: >25% = avviso con disciplina ordini
   const al = p.split("\\n").find(l => l.startsWith("· ⚠ ALERT CONCENTRAZIONE"));
   return al && al.includes("NON obbligo di trim") && al.includes("mai a mercato")`));
 
+// ---- v125: shock alert, [LIVE], futures, stop-a-rischio orario esteso ----
+check("v125 shock alert: [MACRO SHOCK ALERT] in CIMA al prompt con direttiva sospensione acquisti", run(`
+  DATA.macro.shock_alert = { active: true, threshold: -2, sources: [{ src: "KOSPI (Asia)", chg: -8.9 }] };
+  const p = buildPrompt();
+  delete DATA.macro.shock_alert;
+  const line = p.split("\\n").find(l => l.includes("[MACRO SHOCK ALERT]"));
+  // deve stare PRIMA della situazione patrimoniale (in cima)
+  return line && line.includes("SOSPENDI") && line.includes("KOSPI (Asia)") &&
+    p.indexOf("[MACRO SHOCK ALERT]") < p.indexOf("SITUAZIONE PATRIMONIALE")`));
+check("v125 tag [LIVE]: prezzo live-market marcato [LIVE], non [chiusura del]", run(`
+  const wl = DATA.watchlist.find(r => r.ticker === "TSTW");
+  wl.price_live = true; wl.price_asof = "2020-01-01";
+  const p = buildPrompt();
+  delete wl.price_live; delete wl.price_asof;
+  const row = p.split("\\n").find(l => l.startsWith("| ") && l.includes("(TSTW)"));
+  return row && row.includes("[LIVE]") && !row.includes("[chiusura del")`));
+check("v125 futures nel prompt: NQ/ES live come leading pre-apertura", run(`
+  DATA.macro.futures = { nasdaq: { price: 20000, change_pct: -2.4 }, sp500: { price: 6500, change_pct: -1.1 } };
+  const p = buildPrompt();
+  delete DATA.macro.futures;
+  return p.includes("Futures USA LIVE") && p.includes("Nasdaq 100 (NQ)")`));
+check("v125 stop a rischio orario esteso: prepost >1% a ridosso dello stop → flag nel nome", run(`
+  const r = DATA.portfolio.find(x => x.ticker === "TST1");
+  const st = stopOf(r);
+  const saved = r.prepost;
+  r.prepost = { label: "after", price: st.stop * 1.01, change_pct: -3.2 };   // sotto la soglia 2% dallo stop
+  const p = buildPrompt();
+  r.prepost = saved;
+  const row = p.split("\\n").find(l => l.includes("(TST1)"));
+  return row && row.includes("[STOP A RISCHIO AFTER");`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

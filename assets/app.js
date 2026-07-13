@@ -680,6 +680,7 @@ function renderAll() {
   renderEarnings();
   renderEarningsAlert();
   renderReconcileAlert();
+  renderShockAlert();
   renderDataQualityAlert();
   renderTable();
   if (ptfView === "fund") renderFundTable();
@@ -932,6 +933,17 @@ function openDataQualityModal() {
     toast("Override rimossi — al prossimo caricamento tornano i dati (e gli allarmi) della pipeline");
     closeChartModal();
   });
+}
+
+function renderShockAlert() {
+  const box = $("#shock-alert");
+  if (!box) return;
+  const s = (DATA.macro || {}).shock_alert;
+  if (!s || !s.active) { box.hidden = true; box.innerHTML = ""; return; }
+  const src = s.sources.map(x => `${esc(x.src)} ${signTxt(x.chg)}`).join(" · ");
+  box.hidden = false;
+  box.className = "shock-alert-banner";
+  box.innerHTML = `🚨 <b>MACRO SHOCK ALERT</b> — ${src}: i mercati globali cedono oltre il ${s.threshold}% con Wall Street chiusa. <b>Sospendi gli acquisti aggressivi</b> e attendi l'assestamento della prima ora di scambi USA. Il prompt AI porta la direttiva in cima.`;
 }
 
 function renderDataQualityAlert() {
@@ -4412,6 +4424,13 @@ function buildPrompt() {
   //    testo delle istruzioni — editalo in config/prompt_header.txt. Coda dati INTATTA sotto. 🛑
   lines.push(promptHeaderText());
   lines.push("");
+  // MACRO SHOCK ALERT v125 — in CIMA a tutto (più urgente della web-search): Asia/futures
+  // Nasdaq oltre -2% con Wall Street chiusa → sospendere gli acquisti aggressivi.
+  const shock = (DATA.macro || {}).shock_alert;
+  if (shock && shock.active) {
+    lines.push(`🚨🚨 [MACRO SHOCK ALERT] (leggi PRIMA di ogni raccomandazione): ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} — i mercati globali cedono oltre il ${shock.threshold}% mentre Wall Street è chiusa. DIRETTIVA OPERATIVA: SOSPENDI gli ordini di ACQUISTO aggressivi, NON inseguire i limiti d'ingresso ai supporti calcolati su dati pre-shock, attendi l'assestamento della PRIMA ORA di scambi USA. Rivaluta gli stop delle posizioni aperte contro il gap d'apertura atteso. Puoi comunque analizzare, ma ogni ingresso proposto oggi va marcato "CONDIZIONATO all'assestamento post-apertura".`);
+    lines.push("");
+  }
   // ORDINE WEB-SEARCH IN CIMA: se ci sono dati mancanti/inaffidabili, l'imperativo va visto
   // PRIMA di tutto il resto (l'LLM tende a "dimenticarlo" se sepolto in fondo al payload)
   if ((dqV.bad || []).length) {
@@ -4672,6 +4691,11 @@ function buildPrompt() {
       flags.push(dr.chg_3m_pct >= 5 ? "[FX HEADWIND]" : "[FX TAILWIND]");   // large cap: utili esteri sensibili al dollaro
     }
     if (r.qty && st && st.violated) flags.push("[STOP VIOLATO]");
+    // ORARIO ESTESO v125 (Risultato 2): un movimento pre/after >1% che porta il prezzo esteso
+    // a ridosso o sotto lo stop ratchet è un pericolo che matura mentre Wall Street è chiusa.
+    if (r.qty && st && r.prepost && Math.abs(r.prepost.change_pct ?? 0) > 1 && r.prepost.price <= st.stop * 1.02) {
+      flags.push(`[STOP A RISCHIO ${(r.prepost.label || "ext").toUpperCase()} ${signTxt(r.prepost.change_pct)}]`);
+    }
     if (earningsRiskDays(r) != null) flags.push("[!EARNINGS RISK]");
     if (isIlliquid(r)) flags.push("[ILLIQUIDO]");
     if (squeezeSetup(r)) flags.push("[TURNAROUND SQUEEZE RISK]");
@@ -4693,8 +4717,11 @@ function buildPrompt() {
     // STALENESS dichiarata (v112): se l'ultima chiusura valida è più vecchia della data del
     // run (barra odierna voidata da Yahoo — visto sul KOSPI leading), il prompt lo dice:
     // senza flag l'LLM legge il movimento del giorno PRIMA come se fosse quello corrente.
-    const staleTag = r.price_asof && DATA.updated_at && r.price_asof < DATA.updated_at.slice(0, 10)
-      ? ` [chiusura del ${new Date(r.price_asof + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}]` : "";
+    // v125: [LIVE] per gli strumenti che scambiano fuori orario USA (KOSPI/BTC/futures): il
+    // prezzo è l'ultimo scambio real-time, non la candela stantia. Ha priorità sullo staleTag.
+    const staleTag = r.price_live ? " [LIVE]"
+      : (r.price_asof && DATA.updated_at && r.price_asof < DATA.updated_at.slice(0, 10)
+        ? ` [chiusura del ${new Date(r.price_asof + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}]` : "");
     const priceCell = `${c}${f(r.price)}${staleTag}${(adjL != null && r.price != null && Math.abs(adjL - r.price) / r.price > 0.001) ? ` → agg. ${c}${f(adjL)} (${r.prepost?.label || "ext"})` : ""}`;
     return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${floatCell} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal ?? "—"} | ${optNote} |`;
   };
@@ -4823,6 +4850,13 @@ function buildPrompt() {
     const part = (k, lab) => mo[k] ? `${lab} ${fmtNum.format(mo[k].price)} vs SMA125 ${fmtNum.format(mo[k].sma125)} (${signTxt(mo[k].dist_pct)})` : null;
     const ps = [part("sp500", "S&P 500"), part("ndx", "Nasdaq 100")].filter(Boolean);
     if (ps.length) lines.push(`- Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): ${ps.join(" · ")} — sopra = trend primario integro, sotto = deterioramento.`);
+  }
+  // FUTURES USA LIVE (v125): leading indicator prima dell'apertura di Wall Street
+  if (m.futures) {
+    const fu = m.futures;
+    const fp = (k, lab) => fu[k] ? `${lab} ${fmtNum.format(fu[k].price)} (${signTxt(fu[k].change_pct)})` : null;
+    const fs = [fp("nasdaq", "Nasdaq 100 (NQ)"), fp("sp500", "S&P 500 (ES)")].filter(Boolean);
+    if (fs.length) lines.push(`- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): ${fs.join(" · ")} — negativi marcati = apertura USA in gap-down attesa.`);
   }
   (m.markets || []).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   // ogni indicatore economico con la sua data di pubblicazione ESPLICITA: la latenza del dato

@@ -52,7 +52,10 @@ def collect_alerts(data):
         and (r.get("vol_ratio") or 0) > 2.0
         and (r.get("sma50_dist_pct") or 0) > 0
     )
-    return {"stops": stops, "dq": dq, "squeeze": squeeze}
+    # MACRO SHOCK ALERT v125: firma = elenco fonti oltre -2% (dedup: se non cambia, niente doppio invio)
+    sh = (data.get("macro", {}) or {}).get("shock_alert") or {}
+    shock = sorted(f"{s['src']} {s['chg']}%" for s in sh.get("sources", [])) if sh.get("active") else []
+    return {"stops": stops, "dq": dq, "squeeze": squeeze, "shock": shock}
 
 
 def diff_alerts(current, previous):
@@ -63,6 +66,9 @@ def diff_alerts(current, previous):
 
 def build_message(new, data):
     parts = []
+    if new.get("shock"):
+        parts.append("🚨 MACRO SHOCK ALERT: " + " · ".join(new["shock"])
+                     + " (Asia/futures oltre -2% con Wall Street chiusa) → SOSPENDI acquisti aggressivi, attendi l'assestamento della prima ora USA.")
     if new["stops"]:
         rows = {r["ticker"]: r for r in data.get("portfolio", [])}
         det = []

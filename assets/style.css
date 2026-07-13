@@ -1041,3 +1041,14 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .rp-modal-state { font-size: 13px; margin-bottom: 10px; }
 .rp-modal-why { font-size: 12.5px; line-height: 1.55; color: var(--text); }
 @media (max-width: 820px) { .rp-grid { grid-template-columns: 1fr 1fr; } .rp-legend { display: none; } }
+
+/* ═══ MACRO SHOCK ALERT (v125) ═══ */
+.shock-alert-banner {
+  background: linear-gradient(90deg, rgba(239,68,68,.16), rgba(239,68,68,.06));
+  border: 1px solid var(--red); border-left: 4px solid var(--red);
+  border-radius: 10px; padding: 11px 14px; margin-bottom: 12px;
+  font-size: 13px; line-height: 1.5; color: var(--text);
+  animation: shockpulse 2s ease-in-out infinite;
+}
+.shock-alert-banner b { color: var(--red); }
+@keyframes shockpulse { 0%,100% { border-left-color: var(--red); } 50% { border-left-color: rgba(239,68,68,.35); } }
