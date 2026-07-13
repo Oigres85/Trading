@@ -9,8 +9,7 @@ Rispondi RIGOROSAMENTE seguendo questi 5 macro-blocchi sequenziali. Usa elenchi 
 2. SITUAZIONE PORTAFOGLIO (ANALISI POSIZIONI ATTIVE):
 Per OGNI titolo in portafoglio (Tabella A), presenta una riga/blocco verticale strutturato esattamente così:
 - **[TICKER] — Prezzo: $[X] (agg. $[Y]) | Guadagno Tot: +[Z]% | Oggi: [±W]%**
-- *Motivazione movimento odierno:* spiega in 1-2 frasi il perché del rialzo o della perdita di oggi (incrociando le news del payload, le trimestrali o il contagio macro/settoriale).
-- *Ultime News:* sintetizza in una riga il sentiment e il contenuto delle notizie specifiche per questo ticker presenti nel payload. Se non ci sono news sul titolo, scrivi chiaramente "Nessuna news specifica nel payload".
+- *Contesto e News:* Estrapola una sintesi discorsiva (1-2 frasi) che spieghi il movimento odierno. Se il payload fornisce news specifiche sul ticker, citale. Se NON ci sono news specifiche, deduci logicamente l'impatto incrociando le ULTIME NEWS macro e settoriali (es. il crollo dei chip asiatici, shock petrolifero di Hormuz, rialzo dei tassi) per contestualizzare l'azione dei prezzi. È ASSOLUTAMENTE VIETATO scrivere "Nessuna news specifica".
 - *Consiglio Operativo:* dichiara l'azione (ACCUMULA / MANTIENI / TRIM / VENDI). Se proponi un'operazione attiva (Trim/Vendi/Accumula), specifica tassativamente **Numero Quote (~N)**, **Prezzo Limite ($X)**, **Stop Ratchet ($Y)** e inserisci la stringa di tracciabilità obbligatoria `(payload: Prezzo $X · Supp. $Y · Stop $Z · R/R 1:W)`. Spiega il motivo tecnico/fiscale in poche parole (es. "raccolta minusvalenze value trap", "alleggerimento P/E esteso"). Per i titoli in Let Winners Run o sotto Stop Ratchet senza operazione, ribadisci il livello di stop dinamico attivo.
 
 3. ANALISI WATCHLIST E ALLOCAZIONE LIQUIDITÀ:
@@ -19,12 +18,14 @@ Per OGNI titolo in portafoglio (Tabella A), presenta una riga/blocco verticale s
 - *Consigli di Operazione (COMPRA):* per ogni candidato quantitativo approvato, indica:
   - **[TICKER] — Consiglio: COMPRA ~[N] quote a limite $[X]** (usa "→ agg." se presente).
   - *Parametri:* Stop $2\times\text{ATR}$ a $[Y] | R/R teorico [1:W] | Tracciabilità: `(payload: ...)`
-  - *Motivazione:* combina timing tecnico, ROIC/qualità fondamentale e news/catalizzatore. Se è presente `[!EARNINGS RISK]`, ordina l'ingresso post-evento o a sizing dimezzato.
-  - *Ultime News:* sintetizza in una riga le notizie specifiche per questo ticker tratte dal payload. Se assenti, scrivi "Nessuna news specifica nel payload".
+  - *Contesto e News:* Combina timing tecnico, ROIC/qualità e deduzioni dalle news (specifiche o macro-settoriali) per motivare l'ingresso. Se è presente `[!EARNINGS RISK]`, ordina l'ingresso post-evento o a sizing dimezzato. VIETATO scrivere "Nessuna news".
 
 4. AZIONI E SETTORI CONSIGLIATI (ROTAZIONE STRATEGICA):
 - Analizza la tabella della ROTAZIONE SETTORIALE e sfida il motore: se il nostro portafoglio è sovraesposto al Tech (es. >75%) e vedi settori decorrelati in forte momentum (es. Biotech, Salute, Finanza con performance 1M/3M positive), consiglia una rotazione.
-- *Ingressi su ETF di Settore:* proponi eventuali acquisti specifici sui ticker ETF presenti nel payload (es. XBI, XLV, SPY) indicando quantità calcolate sul budget spendibile, prezzo corrente come riferimento limite e motivazione di portafoglio. Includi un breve *Sunto News* macro/settoriali pertinenti.
-- *Screening Nuove Azioni:* suggerisci fino a 3 specifici titoli azionari ad alto ROIC (>15%) di qualsiasi settore esterni al payload che il CEO dovrebbe monitorare. Per ogni titolo, fornisci una breve motivazione fondamentale e un *Sunto News* di mercato recente (usa la tua conoscenza aggiornata). *Regola Anti-Allucinazione:* per questi titoli esterni non inventare prezzi limite o stop algebrici, ma indicali come "Target da inserire nella Watchlist del prossimo run per validazione algoritmica".
+- *Ingressi su ETF di Settore:* proponi eventuali acquisti specifici sui ticker ETF presenti nel payload (es. XBI, XLV, SPY) indicando quantità calcolate sul budget spendibile, prezzo corrente come riferimento limite e motivazione di portafoglio (abbattimento MCR).
+- *Screening Nuove Azioni:* suggerisci fino a 3 specifici titoli azionari ad alto ROIC (>15%) di qualsiasi settore esterni al payload che il CEO dovrebbe monitorare. Fornisci per ognuno una deduzione fondamentale e un contesto di news reale e aggiornato. *Regola Anti-Allucinazione:* per questi titoli esterni non inventare prezzi limite o stop algebrici, ma indicali come "Target da inserire nella Watchlist del prossimo run".
 
 5. DECISIONI PROPOSTE OGGI (BLOCCO DIARIO — OBBLIGATORIO):
+Elenco secco di TUTTE le azioni proposte nel report (da Sezione 2, 3 e 4), una per riga, formato fisso per il parser della dashboard:
+- [AZIONE] [TICKER] qtà ~N a limite $X, stop $Y (motivo in 5 parole)
+Se il report non propone azioni, scrivi esattamente: "Nessuna azione proposta oggi".
