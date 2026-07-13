@@ -1366,7 +1366,14 @@ function decisionVerdict() {
     .sort((a, b) => a.gain_eur - b.gain_eur);
 
   // 4) piano operativo: ordini limite al supporto, stop a 2×ATR (volatilità, non % fissa)
-  const cashUsd = cashEur * eurusd;
+  // ALLINEAMENTO LOGICO v124: il sizing degli ingressi usa la STESSA base del budget dichiarato
+  // al prompt — il BUDGET OPERATIVO SPENDIBILE (cassa − ES95, riserva tail-risk inviolabile),
+  // non la cassa piena. Prima il motore dimensionava su cashUsd intero mentre la testata diceva
+  // all'LLM "spendibile = cassa − ES95": le quantità suggerite potevano sforare la riserva.
+  // Ora coincidono: le due metriche di base sono la stessa.
+  const es95Eur = t.es95_hist_eur ?? t.es95_1d_eur ?? 0;
+  const budgetOpEur = t.budget_operativo_spendibile != null ? t.budget_operativo_spendibile : Math.max(0, cashEur - es95Eur);
+  const budgetOpUsd = budgetOpEur * eurusd;   // base di sizing = budget operativo (post riserva ES95)
   // sizing regime-aware: i budget d'ingresso si riducono quando la volatilità di mercato
   // sale (VIX) — stessa logica degli stop ATR ma a livello di PORTAFOGLIO: in regime
   // nervoso si rischia meno per operazione, non si spegne il motore.
@@ -1379,7 +1386,7 @@ function decisionVerdict() {
     // supporti RECENTI in banda ±25% dal prezzo, con fallback dichiarato SMA50/ATR/-5%.
     const pick = saneEntryLimit(r) || { limit: r.price, src: "prezzo", fallback: false };
     const limit = Math.min(pick.limit, r.price);
-    const budget = cashUsd * (i === 0 ? 0.35 : i === 1 ? 0.25 : 0.15) * riskScale;
+    const budget = budgetOpUsd * (i === 0 ? 0.35 : i === 1 ? 0.25 : 0.15) * riskScale;
     const qty = limit > 0 ? Math.floor(budget / limit) : 0;
     const st = atrStop(limit, r);
     return { r, limit, qty, dd: r.w52_dist_pct, q: r._q, stop: st ? st.stop : Math.round(limit * 0.92 * 100) / 100, atr: st,

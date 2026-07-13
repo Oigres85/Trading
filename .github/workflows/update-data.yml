@@ -19,6 +19,10 @@ on:
     - cron: "0 19 * * *"    # 21:00 CEST
     - cron: "0 20 * * *"    # 21:00 CET  /  22:00 CEST
     - cron: "0 21 * * *"    # 22:00 CET
+    # RUN ORARIO durante la sessione USA (giorni feriali) per non perdere la freschezza di
+    # verdetto/technicals/macro mentre Wall Street è aperta. 13:00–22:00 UTC copre le
+    # 15:00–23:00 ITALIA sia in CEST (13–21 UTC) sia in CET (14–22 UTC).
+    - cron: "0 13-22 * * 1-5"
   workflow_dispatch:
 
 permissions:
