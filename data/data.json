@@ -1,15 +1,15 @@
 {
- "updated_at": "2026-07-13T08:02:00Z",
- "eurusd": 1.1429,
+ "updated_at": "2026-07-13T09:01:58Z",
+ "eurusd": 1.1438,
  "totals": {
   "usd_value": 292824.47,
   "usd_gain": 125767.71,
   "usd_gain_pct": 75.28,
-  "eur_value": 297484.2,
-  "eur_gain": 111309.54,
-  "eur_gain_pct": 59.79,
-  "tax_est": 28770,
-  "eur_gain_net": 82539.54,
+  "eur_value": 297279.24,
+  "eur_gain": 111221.51,
+  "eur_gain_pct": 59.78,
+  "tax_est": 28747.11,
+  "eur_gain_net": 82474.4,
   "portfolio_sharpe_ratio": 1.87,
   "portfolio_sortino_ratio": 2.73,
   "risk_free_rate": 0.0363,
@@ -17,12 +17,12 @@
   "avg_pairwise_corr": 0.31,
   "var95_1d_pct": 4.17,
   "es95_1d_pct": 5.23,
-  "var95_1d_eur": 10684,
-  "es95_1d_eur": 13400,
+  "var95_1d_eur": 10676,
+  "es95_1d_eur": 13390,
   "var95_hist_pct": 3.95,
   "es95_hist_pct": 5.63,
-  "var95_hist_eur": 10121,
-  "es95_hist_eur": 14425
+  "var95_hist_eur": 10113,
+  "es95_hist_eur": 14414
  },
  "portfolio": [
   {
@@ -32,6 +32,7 @@
    "price_src": "yahoo",
    "price": 557.89,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 2.04,
    "pe": 185.3,
    "ath": 584.73,
@@ -888,11 +889,11 @@
    "sharpe_6m": 2.56,
    "sortino_6m": 4.06,
    "prepost": {
-    "label": "after",
-    "price": 559.77,
-    "change_pct": 0.34
+    "label": "pre",
+    "price": 543.5,
+    "change_pct": -2.58
    },
-   "prezzo_limite_aggiustato": 559.77,
+   "prezzo_limite_aggiustato": 543.5,
    "risk_reward": "1:1.7",
    "sector": "Technology",
    "stats": {
@@ -1016,6 +1017,7 @@
    "price_src": "yahoo",
    "price": 210.96,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 4.03,
    "pe": 32.3,
    "ath": 236.26,
@@ -1704,11 +1706,11 @@
    "sharpe_6m": 0.48,
    "sortino_6m": 0.71,
    "prepost": {
-    "label": "after",
-    "price": 210.57,
-    "change_pct": -0.18
+    "label": "pre",
+    "price": 207.44,
+    "change_pct": -1.67
    },
-   "prezzo_limite_aggiustato": 210.57,
+   "prezzo_limite_aggiustato": 207.44,
    "risk_reward": "1:1.7",
    "sector": "Technology",
    "stats": {
@@ -1836,6 +1838,7 @@
    "price_src": "yahoo",
    "price": 399.97,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.28,
    "pe": 66.7,
    "ath": 495,
@@ -2397,11 +2400,11 @@
    "sharpe_6m": 0.57,
    "sortino_6m": 0.79,
    "prepost": {
-    "label": "after",
-    "price": 400.4,
-    "change_pct": 0.11
+    "label": "pre",
+    "price": 392.83,
+    "change_pct": -1.79
    },
-   "prezzo_limite_aggiustato": 400.4,
+   "prezzo_limite_aggiustato": 392.83,
    "risk_reward": "1:1.7",
    "sector": "Technology",
    "stats": {
@@ -2529,6 +2532,7 @@
    "price_src": "yahoo",
    "price": 979.3,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -1.24,
    "pe": 22.1,
    "ath": 1254.81,
@@ -3385,11 +3389,11 @@
    "sharpe_6m": 2.37,
    "sortino_6m": 3.81,
    "prepost": {
-    "label": "after",
-    "price": 982.75,
-    "change_pct": 0.35
+    "label": "pre",
+    "price": 929.68,
+    "change_pct": -5.07
    },
-   "prezzo_limite_aggiustato": 982.75,
+   "prezzo_limite_aggiustato": 929.68,
    "risk_reward": "1:2.1",
    "sector": "Technology",
    "stats": {
@@ -3517,6 +3521,7 @@
    "price_src": "yahoo",
    "price": 94.64,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.8,
    "pe": null,
    "ath": 543,
@@ -4212,11 +4217,11 @@
    "sharpe_6m": -1.28,
    "sortino_6m": -1.8,
    "prepost": {
-    "label": "after",
-    "price": 94.89,
-    "change_pct": 0.26
+    "label": "pre",
+    "price": 93.41,
+    "change_pct": -1.3
    },
-   "prezzo_limite_aggiustato": 94.89,
+   "prezzo_limite_aggiustato": 93.41,
    "risk_reward": "1:3.0",
    "sector": "Technology",
    "stats": {
@@ -4344,6 +4349,7 @@
    "price_src": "yahoo",
    "price": 16.54,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -2.65,
    "pe": null,
    "ath": 58.15,
@@ -4760,11 +4766,11 @@
    "sharpe_6m": -0.88,
    "sortino_6m": -1.31,
    "prepost": {
-    "label": "after",
-    "price": 16.64,
-    "change_pct": 0.6
+    "label": "pre",
+    "price": 16.37,
+    "change_pct": -1.03
    },
-   "prezzo_limite_aggiustato": 16.64,
+   "prezzo_limite_aggiustato": 16.37,
    "risk_reward": "1:2.2",
    "sector": "Technology",
    "stats": {
@@ -4888,6 +4894,7 @@
    "price_src": "yahoo",
    "price": 357.18,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.48,
    "pe": 27.2,
    "ath": 408.37,
@@ -5509,7 +5516,7 @@
    "sharpe_6m": 0.56,
    "sortino_6m": 0.92,
    "prepost": {
-    "label": "after",
+    "label": "pre",
     "price": 357.17,
     "change_pct": 0
    },
@@ -5638,6 +5645,7 @@
    "price_src": "yahoo",
    "price": 669.21,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 5.97,
    "pe": 24.3,
    "ath": 793.65,
@@ -6166,11 +6174,11 @@
    "sharpe_6m": 0.07,
    "sortino_6m": 0.1,
    "prepost": {
-    "label": "after",
-    "price": 668,
-    "change_pct": -0.18
+    "label": "pre",
+    "price": 666.49,
+    "change_pct": -0.41
    },
-   "prezzo_limite_aggiustato": 668,
+   "prezzo_limite_aggiustato": 666.49,
    "risk_reward": "1:2.6",
    "sector": "Communication Services",
    "stats": {
@@ -6298,6 +6306,7 @@
    "price_src": "yahoo",
    "price": 126.79,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -1.74,
    "pe": 142.5,
    "ath": 207.52,
@@ -6726,11 +6735,11 @@
    "sharpe_6m": -1.35,
    "sortino_6m": -1.77,
    "prepost": {
-    "label": "after",
-    "price": 126.6,
-    "change_pct": -0.15
+    "label": "pre",
+    "price": 127.49,
+    "change_pct": 0.55
    },
-   "prezzo_limite_aggiustato": 126.6,
+   "prezzo_limite_aggiustato": 127.49,
    "risk_reward": "1:2.4",
    "sector": "Technology",
    "stats": {
@@ -6858,6 +6867,7 @@
    "price_src": "yahoo",
    "price": 215.08,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 8.34,
    "pe": 478,
    "ath": 386.34,
@@ -7061,11 +7071,11 @@
    "sharpe_6m": null,
    "sortino_6m": null,
    "prepost": {
-    "label": "after",
-    "price": 215,
-    "change_pct": -0.04
+    "label": "pre",
+    "price": 208.1,
+    "change_pct": -3.25
    },
-   "prezzo_limite_aggiustato": 215,
+   "prezzo_limite_aggiustato": 208.1,
    "risk_reward": "1:1.5",
    "sector": "Technology",
    "stats": {
@@ -7188,6 +7198,7 @@
    "price_src": "yahoo",
    "price": 140.64,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -2.14,
    "pe": 24.1,
    "ath": 341.82,
@@ -8030,11 +8041,11 @@
    "sharpe_6m": -1.08,
    "sortino_6m": -1.57,
    "prepost": {
-    "label": "after",
-    "price": 140.85,
-    "change_pct": 0.15
+    "label": "pre",
+    "price": 140.6,
+    "change_pct": -0.03
    },
-   "prezzo_limite_aggiustato": 140.85,
+   "prezzo_limite_aggiustato": 140.6,
    "risk_reward": "1:3.2",
    "sector": "Technology",
    "stats": {
@@ -8162,6 +8173,7 @@
    "price_src": "yahoo",
    "price": 168.01,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": null,
    "pe": 24.5,
    "ath": 177,
@@ -8243,12 +8255,8 @@
    "sortino_1y": null,
    "sharpe_6m": null,
    "sortino_6m": null,
-   "prepost": {
-    "label": "after",
-    "price": 172.13,
-    "change_pct": 2.46
-   },
-   "prezzo_limite_aggiustato": 172.13,
+   "prepost": null,
+   "prezzo_limite_aggiustato": 168.01,
    "risk_reward": null,
    "sector": "Technology",
    "stats": {
@@ -8392,6 +8400,7 @@
    "price_src": "yahoo",
    "price": 48.85,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.85,
    "pe": null,
    "ath": 193.84,
@@ -8809,8 +8818,12 @@
    "sortino_1y": -0.25,
    "sharpe_6m": -1.53,
    "sortino_6m": -2.09,
-   "prepost": null,
-   "prezzo_limite_aggiustato": 48.85,
+   "prepost": {
+    "label": "pre",
+    "price": 48.1,
+    "change_pct": -1.54
+   },
+   "prezzo_limite_aggiustato": 48.1,
    "risk_reward": "1:2.0",
    "sector": "Utilities",
    "stats": {
@@ -8903,6 +8916,7 @@
    "price_src": "yahoo",
    "price": 145.3,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -4.51,
    "pe": null,
    "ath": 225.64,
@@ -9061,10 +9075,10 @@
    "sortino_6m": null,
    "prepost": {
     "label": "pre",
-    "price": 143.27,
-    "change_pct": -1.4
+    "price": 143.61,
+    "change_pct": -1.16
    },
-   "prezzo_limite_aggiustato": 143.27,
+   "prezzo_limite_aggiustato": 143.61,
    "risk_reward": "1:2.4",
    "sector": "Industrials",
    "stats": {
@@ -9152,8 +9166,9 @@
    "currency": "PTS",
    "price_src": "yahoo",
    "price": 6806.93,
-   "price_asof": "2026-07-13",
-   "change_pct": -8.95,
+   "price_asof": null,
+   "price_live": true,
+   "change_pct": 0,
    "pe": null,
    "ath": 9385.59,
    "ath_dist_pct": -27.5,
@@ -9915,6 +9930,7 @@
    "price_src": "yahoo",
    "price": 26281.61,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.29,
    "pe": null,
    "ath": 27190.21,
@@ -10823,23 +10839,24 @@
    "name": "Bitcoin",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 62935.57,
-   "price_asof": "2026-07-13",
-   "change_pct": -1.29,
+   "price": 63135.83,
+   "price_asof": null,
+   "price_live": true,
+   "change_pct": 0,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -50.1,
-   "sma200_dist_pct": -14.7,
-   "sma50_dist_pct": -2.6,
+   "ath_dist_pct": -50,
+   "sma200_dist_pct": -14.4,
+   "sma50_dist_pct": -2.3,
    "w52_high": 126198.07,
-   "w52_dist_pct": -50.1,
+   "w52_dist_pct": -50,
    "support": 57747.77,
    "resistance": 64658.97,
-   "rsi": 48.4,
-   "volume": 21825544192,
+   "rsi": 49.3,
+   "volume": 22193616896,
    "vol_ratio": 0.7,
    "atr_14": 1891.28,
-   "atr_pct": 3.01,
+   "atr_pct": 3,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -10848,7 +10865,7 @@
      64127.14,
      63802.03,
      63758.22,
-     62935.57
+     63135.83
     ],
     "m6": [
      69926.92,
@@ -10976,7 +10993,7 @@
      64127.14,
      63802.03,
      63758.22,
-     62935.57
+     63135.83
     ],
     "all": [
      386.94,
@@ -11121,7 +11138,7 @@
      76304.32,
      73579.69,
      58558.86,
-     62935.57
+     63135.83
     ],
     "m1": [
      63952.11,
@@ -11145,7 +11162,7 @@
      64127.14,
      63802.03,
      63758.22,
-     62935.57
+     63135.83
     ],
     "m3": [
      80664.37,
@@ -11213,7 +11230,7 @@
      64127.14,
      63802.03,
      63758.22,
-     62935.57
+     63135.83
     ],
     "y1": [
      119116.12,
@@ -11289,7 +11306,7 @@
      59532.34,
      62544.2,
      62257.57,
-     62935.57
+     63135.83
     ],
     "d1": [
      63858.49,
@@ -11339,20 +11356,27 @@
      62882.01,
      62991.3,
      62920.02,
-     62927.28
+     62927.28,
+     62981.11,
+     62977.62,
+     62964.04,
+     63018.02,
+     63057.01,
+     63133,
+     63135.83
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 37,
+   "health": 38,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -1.33,
+   "sharpe_1y": -1.32,
    "sortino_1y": -1.71,
-   "sharpe_6m": -0.66,
-   "sortino_6m": -0.89,
+   "sharpe_6m": -0.64,
+   "sortino_6m": -0.86,
    "prepost": null,
-   "prezzo_limite_aggiustato": 62935.57,
+   "prezzo_limite_aggiustato": 63135.83,
    "risk_reward": "1:1.8",
    "sector": "Altro",
    "stats": null,
@@ -11360,22 +11384,22 @@
     "w1": {
      "support": 61645.75,
      "resistance": 64658.97,
-     "change_pct": -0.41
+     "change_pct": -0.09
     },
     "m1": {
      "support": 57747.77,
      "resistance": 65544,
-     "change_pct": -1.59
+     "change_pct": -1.28
     },
     "m3": {
      "support": 57747.77,
      "resistance": 82430.17,
-     "change_pct": -21.98
+     "change_pct": -21.73
     },
     "y1": {
      "support": 57747.77,
      "resistance": 107428.26,
-     "change_pct": -38.05
+     "change_pct": -37.85
     }
    },
    "financials": [],
@@ -11396,9 +11420,9 @@
      "hi": 59940.35
     }
    },
-   "rs_1m": -4.1,
+   "rs_1m": -3.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -4.1,
+   "rs_ndx_1m": -3.8,
    "beta_ndx": 0.94,
    "avg_corr": 0.35,
    "max_corr": 0.79,
@@ -11409,23 +11433,24 @@
    "name": "Petrolio WTI",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 73.95,
-   "price_asof": "2026-07-13",
-   "change_pct": 3.56,
+   "price": 72.94,
+   "price_asof": null,
+   "price_live": true,
+   "change_pct": 0,
    "pe": null,
    "ath": 147.27,
-   "ath_dist_pct": -49.8,
-   "sma200_dist_pct": -0.4,
-   "sma50_dist_pct": -15.2,
+   "ath_dist_pct": -50.5,
+   "sma200_dist_pct": -1.8,
+   "sma50_dist_pct": -16.3,
    "w52_high": 119.48,
-   "w52_dist_pct": -38.1,
+   "w52_dist_pct": -39,
    "support": 67.04,
    "resistance": 87.23,
-   "rsi": 43.6,
-   "volume": 44328,
+   "rsi": 41.4,
+   "volume": 55061,
    "vol_ratio": 1.08,
    "atr_14": 3.9,
-   "atr_pct": 5.27,
+   "atr_pct": 5.35,
    "signal": "Trend debole",
    "signal_class": "bad",
    "sparks": {
@@ -11434,7 +11459,7 @@
      73.52,
      72.08,
      71.41,
-     73.95
+     72.94
     ],
     "m6": [
      59.12,
@@ -11562,7 +11587,7 @@
      73.52,
      72.08,
      71.41,
-     73.95
+     72.94
     ],
     "all": [
      33.1,
@@ -11830,7 +11855,7 @@
      105.07,
      87.36,
      69.5,
-     73.95
+     72.94
     ],
     "m1": [
      90.03,
@@ -11854,7 +11879,7 @@
      73.52,
      72.08,
      71.41,
-     73.95
+     72.94
     ],
     "m3": [
      94.41,
@@ -11922,7 +11947,7 @@
      73.52,
      72.08,
      71.41,
-     73.95
+     72.94
     ],
     "y1": [
      66.98,
@@ -11975,7 +12000,7 @@
      76.6,
      69.23,
      68.55,
-     73.95
+     72.94
     ],
     "d1": [
      74.34,
@@ -12001,20 +12026,26 @@
      74.05,
      74.07,
      73.9,
-     73.95
+     73.96,
+     73.74,
+     73.43,
+     73.41,
+     73.3,
+     73.37,
+     72.94
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 21,
+   "health": 20,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.12,
-   "sortino_1y": 0.17,
-   "sharpe_6m": 0.67,
-   "sortino_6m": 0.9,
+   "sharpe_1y": 0.1,
+   "sortino_1y": 0.13,
+   "sharpe_6m": 0.63,
+   "sortino_6m": 0.84,
    "prepost": null,
-   "prezzo_limite_aggiustato": 73.95,
+   "prezzo_limite_aggiustato": 72.94,
    "risk_reward": "1:2.6",
    "sector": "Altro",
    "stats": null,
@@ -12022,22 +12053,22 @@
     "w1": {
      "support": 68.58,
      "resistance": 76.08,
-     "change_pct": 4.98
+     "change_pct": 3.55
     },
     "m1": {
      "support": 67.04,
      "resistance": 93.64,
-     "change_pct": -17.86
+     "change_pct": -18.98
     },
     "m3": {
      "support": 67.04,
      "resistance": 110.93,
-     "change_pct": -21.67
+     "change_pct": -22.74
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 10.41
+     "change_pct": 8.9
     }
    },
    "financials": [],
@@ -12062,9 +12093,9 @@
      "hi": 68.68
     }
    },
-   "rs_1m": -20.4,
+   "rs_1m": -21.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -20.4,
+   "rs_ndx_1m": -21.5,
    "beta_ndx": -0.58,
    "avg_corr": -0.09,
    "max_corr": 0.02,
@@ -12077,6 +12108,7 @@
    "price_src": "yahoo",
    "price": 2977.81,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.49,
    "pe": null,
    "ath": 3046.59,
@@ -12959,6 +12991,7 @@
    "price_src": "yahoo",
    "price": 109.84,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -2.4,
    "pe": null,
    "ath": 142.35,
@@ -13816,10 +13849,10 @@
    "sortino_6m": 3.45,
    "prepost": {
     "label": "pre",
-    "price": 105.89,
-    "change_pct": -3.6
+    "price": 106.8,
+    "change_pct": -2.77
    },
-   "prezzo_limite_aggiustato": 105.89,
+   "prezzo_limite_aggiustato": 106.8,
    "risk_reward": "1:2.0",
    "sector": "Technology",
    "stats": {
@@ -13937,6 +13970,7 @@
    "price_src": "yahoo",
    "price": 245.34,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.69,
    "pe": 29.3,
    "ath": 278.56,
@@ -14646,10 +14680,10 @@
    "sortino_6m": -0.02,
    "prepost": {
     "label": "pre",
-    "price": 244.74,
-    "change_pct": -0.25
+    "price": 245.52,
+    "change_pct": 0.07
    },
-   "prezzo_limite_aggiustato": 244.74,
+   "prezzo_limite_aggiustato": 245.52,
    "risk_reward": "1:1.6",
    "sector": "Consumer Cyclical",
    "stats": {
@@ -14767,6 +14801,7 @@
    "price_src": "yahoo",
    "price": 385.1,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.19,
    "pe": 22.9,
    "ath": 551.05,
@@ -14804,7 +14839,7 @@
      442.14,
      449.14,
      463.88,
-     468.2,
+     468.19,
      478.45,
      479.49,
      431.58,
@@ -15610,10 +15645,10 @@
    "sortino_6m": -1.8,
    "prepost": {
     "label": "pre",
-    "price": 387.4,
-    "change_pct": 0.6
+    "price": 387.12,
+    "change_pct": 0.52
    },
-   "prezzo_limite_aggiustato": 387.4,
+   "prezzo_limite_aggiustato": 387.12,
    "risk_reward": "1:2.2",
    "sector": "Technology",
    "stats": {
@@ -15731,6 +15766,7 @@
    "price_src": "yahoo",
    "price": 28.31,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.25,
    "pe": 14.9,
    "ath": 122.9,
@@ -16322,10 +16358,10 @@
    "sortino_6m": -0.17,
    "prepost": {
     "label": "pre",
-    "price": 27.76,
-    "change_pct": -1.94
+    "price": 27.73,
+    "change_pct": -2.04
    },
-   "prezzo_limite_aggiustato": 27.76,
+   "prezzo_limite_aggiustato": 27.73,
    "risk_reward": "1:2.3",
    "sector": "Technology",
    "stats": {
@@ -16443,6 +16479,7 @@
    "price_src": "yahoo",
    "price": 11.68,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -1.02,
    "pe": 19.5,
    "ath": 90,
@@ -16865,10 +16902,10 @@
    "sortino_6m": -1.98,
    "prepost": {
     "label": "pre",
-    "price": 11.66,
-    "change_pct": -0.17
+    "price": 11.77,
+    "change_pct": 0.77
    },
-   "prezzo_limite_aggiustato": 11.66,
+   "prezzo_limite_aggiustato": 11.77,
    "risk_reward": "1:1.8",
    "sector": "Technology",
    "stats": {
@@ -16986,6 +17023,7 @@
    "price_src": "yahoo",
    "price": 1915.92,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 3.1,
    "pe": 65.4,
    "ath": 2354.39,
@@ -17362,10 +17400,10 @@
    "sortino_6m": 5.05,
    "prepost": {
     "label": "pre",
-    "price": 1785,
-    "change_pct": -6.83
+    "price": 1790.1,
+    "change_pct": -6.57
    },
-   "prezzo_limite_aggiustato": 1785,
+   "prezzo_limite_aggiustato": 1790.1,
    "risk_reward": "1:2.1",
    "sector": "Technology",
    "stats": {
@@ -17477,6 +17515,7 @@
    "price_src": "yahoo",
    "price": 66.14,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 4.97,
    "pe": null,
    "ath": 298.99,
@@ -17849,10 +17888,10 @@
    "sortino_6m": -0.6,
    "prepost": {
     "label": "pre",
-    "price": 65.03,
-    "change_pct": -1.68
+    "price": 65.43,
+    "change_pct": -1.07
    },
-   "prezzo_limite_aggiustato": 65.03,
+   "prezzo_limite_aggiustato": 65.43,
    "risk_reward": "1:1.9",
    "sector": "Financial Services",
    "stats": {
@@ -17970,6 +18009,7 @@
    "price_src": "yahoo",
    "price": 434.11,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.65,
    "pe": 37.7,
    "ath": 479,
@@ -18658,7 +18698,7 @@
      435.85
     ]
    },
-   "earnings_date": "2026-07-16",
+   "earnings_date": null,
    "rating": {
     "key": "strong_buy",
     "n": 18,
@@ -18674,10 +18714,10 @@
    "sortino_6m": 1.96,
    "prepost": {
     "label": "pre",
-    "price": 434.47,
-    "change_pct": 0.08
+    "price": 433.38,
+    "change_pct": -0.17
    },
-   "prezzo_limite_aggiustato": 434.47,
+   "prezzo_limite_aggiustato": 433.38,
    "risk_reward": "1:1.8",
    "sector": "Technology",
    "stats": {
@@ -18792,6 +18832,7 @@
    "price_src": "yahoo",
    "price": 6.73,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.3,
    "pe": null,
    "ath": 22.28,
@@ -19649,10 +19690,10 @@
    "sortino_6m": -0.63,
    "prepost": {
     "label": "pre",
-    "price": 6.61,
-    "change_pct": -1.78
+    "price": 6.83,
+    "change_pct": 1.49
    },
-   "prezzo_limite_aggiustato": 6.61,
+   "prezzo_limite_aggiustato": 6.83,
    "risk_reward": "1:2.8",
    "sector": "Communication Services",
    "stats": {
@@ -19766,6 +19807,7 @@
    "price_src": "yahoo",
    "price": 73.37,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -2.78,
    "pe": 23.7,
    "ath": 134.12,
@@ -20415,10 +20457,10 @@
    "sortino_6m": -1.72,
    "prepost": {
     "label": "pre",
-    "price": 73.67,
-    "change_pct": 0.41
+    "price": 73.9,
+    "change_pct": 0.72
    },
-   "prezzo_limite_aggiustato": 73.67,
+   "prezzo_limite_aggiustato": 73.9,
    "risk_reward": "1:2.3",
    "sector": "Communication Services",
    "stats": {
@@ -20536,6 +20578,7 @@
    "price_src": "yahoo",
    "price": 70.47,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -2.34,
    "pe": 40.5,
    "ath": 96.68,
@@ -21228,10 +21271,10 @@
    "sortino_6m": 1.01,
    "prepost": {
     "label": "pre",
-    "price": 67.58,
-    "change_pct": -4.1
+    "price": 68.3,
+    "change_pct": -3.08
    },
-   "prezzo_limite_aggiustato": 67.58,
+   "prezzo_limite_aggiustato": 68.3,
    "risk_reward": "1:2.7",
    "sector": "Technology",
    "stats": {
@@ -21346,6 +21389,7 @@
    "price_src": "yahoo",
    "price": 602.5,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 2.35,
    "pe": 56.8,
    "ath": 739.67,
@@ -21932,7 +21976,7 @@
      56.41,
      78.79,
      82.44,
-     92.35,
+     92.36,
      113.12,
      127.87,
      127.01,
@@ -22203,10 +22247,10 @@
    "sortino_6m": 3.3,
    "prepost": {
     "label": "pre",
-    "price": 576.01,
-    "change_pct": -4.4
+    "price": 582.46,
+    "change_pct": -3.33
    },
-   "prezzo_limite_aggiustato": 576.01,
+   "prezzo_limite_aggiustato": 582.46,
    "risk_reward": "1:2.4",
    "sector": "Technology",
    "stats": {
@@ -22324,6 +22368,7 @@
    "price_src": "yahoo",
    "price": 251.38,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.26,
    "pe": 21.8,
    "ath": 411.04,
@@ -22498,7 +22543,7 @@
      89.7,
      94.7,
      102.33,
-     107.16,
+     107.17,
      110.94,
      119.19,
      115.1,
@@ -22737,10 +22782,10 @@
    "sortino_6m": -1.57,
    "prepost": {
     "label": "pre",
-    "price": 249.18,
-    "change_pct": -0.88
+    "price": 250.95,
+    "change_pct": -0.17
    },
-   "prezzo_limite_aggiustato": 249.18,
+   "prezzo_limite_aggiustato": 250.95,
    "risk_reward": "1:2.8",
    "sector": "Utilities",
    "stats": {
@@ -22858,6 +22903,7 @@
    "price_src": "yahoo",
    "price": 802.01,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 2.07,
    "pe": 141,
    "ath": 1085.68,
@@ -23349,10 +23395,10 @@
    "sortino_6m": 2.12,
    "prepost": {
     "label": "pre",
-    "price": 770.37,
-    "change_pct": -3.95
+    "price": 774.7,
+    "change_pct": -3.41
    },
-   "prezzo_limite_aggiustato": 770.37,
+   "prezzo_limite_aggiustato": 774.7,
    "risk_reward": "1:2.2",
    "sector": "Technology",
    "stats": {
@@ -23468,19 +23514,19 @@
   {
    "ticker": "MU",
    "name": "Micron",
-   "value_eur": 59982.12,
+   "value_eur": 59934.14,
    "sector": "Technology"
   },
   {
    "ticker": "NVDA",
    "name": "NVIDIA",
-   "value_eur": 49839.3,
+   "value_eur": 49799.43,
    "sector": "Technology"
   },
   {
    "ticker": "AMD",
    "name": "AMD",
-   "value_eur": 48815.37,
+   "value_eur": 48776.32,
    "sector": "Technology"
   },
   {
@@ -23492,55 +23538,55 @@
   {
    "ticker": "META",
    "name": "Meta Platforms",
-   "value_eur": 17566.76,
+   "value_eur": 17552.71,
    "sector": "Communication Services"
   },
   {
    "ticker": "GOOGL",
    "name": "Alphabet Inc",
-   "value_eur": 15626.62,
+   "value_eur": 15614.12,
    "sector": "Communication Services"
   },
   {
    "ticker": "MSTR",
    "name": "Strategy",
-   "value_eur": 14326.13,
+   "value_eur": 14314.67,
    "sector": "Technology"
   },
   {
    "ticker": "PLTR",
    "name": "Palantir",
-   "value_eur": 11094.12,
+   "value_eur": 11085.25,
    "sector": "Technology"
   },
   {
    "ticker": "AVGO",
    "name": "Broadcom Inc.",
-   "value_eur": 8749.34,
+   "value_eur": 8742.34,
    "sector": "Technology"
   },
   {
    "ticker": "ORCL",
    "name": "ORCL",
-   "value_eur": 8614.2,
+   "value_eur": 8607.31,
    "sector": "Technology"
   },
   {
    "ticker": "RGTI",
    "name": "Rigetti",
-   "value_eur": 8611.14,
+   "value_eur": 8604.25,
    "sector": "Technology"
   },
   {
    "ticker": "SKHYV",
    "name": "SKHYV",
-   "value_eur": 7350.44,
+   "value_eur": 7344.56,
    "sector": "Technology"
   },
   {
    "ticker": "CBRS",
    "name": "Cerebras",
-   "value_eur": 5645.85,
+   "value_eur": 5641.33,
    "sector": "Technology"
   }
  ],
@@ -23797,8 +23843,8 @@
    "fomo_label": "FOMO moderata"
   },
   "vix": {
-   "value": 16.41,
-   "change_pct": 9.18,
+   "value": 16.29,
+   "change_pct": 8.38,
    "spark": [
     15.32,
     16.05,
@@ -23829,7 +23875,7 @@
     16.9,
     15.84,
     15.03,
-    16.41
+    16.29
    ]
   },
   "fedwatch": {
@@ -29461,15 +29507,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1429",
-    "change_pct": -0.04,
+    "value": "1.1438",
+    "change_pct": 0.04,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "185.19",
-    "change_pct": -0.24,
+    "value": "185.33",
+    "change_pct": -0.16,
     "suffix": "%"
    }
   ],
@@ -29477,8 +29523,8 @@
    "us10": 4.57,
    "jp10": 2.76,
    "spread": 1.81,
-   "usdjpy": 162.1,
-   "usdjpy_chg_1m": 1.34,
+   "usdjpy": 162.09,
+   "usdjpy_chg_1m": 1.33,
    "boj_rate": 0.3,
    "boj_meetings": [
     "2026-07-31",
@@ -29513,7 +29559,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 38
+     "score": 40
     },
     {
      "label": "Treasury 10A",
@@ -32219,7 +32265,7 @@
    },
    "smc_avg": 54,
    "vix3m": 18.6,
-   "vix_term_ratio": 0.884,
+   "vix_term_ratio": 0.877,
    "ig_spread": 0.94,
    "hy_ig_ratio": 2.87,
    "divergence": -15,
@@ -32231,7 +32277,7 @@
     },
     {
      "label": "Struttura VIX (contango/backw.)",
-     "score": 90
+     "score": 92
     },
     {
      "label": "Spread HY/IG (fuga qualità)",
@@ -32495,8 +32541,8 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 100.97,
-   "chg_3m_pct": 2.65,
+   "value": 100.85,
+   "chg_3m_pct": 2.52,
    "flag": null,
    "src": "DXY"
   },
@@ -32510,6 +32556,20 @@
     "price": 29825.11,
     "sma125": 26843.84,
     "dist_pct": 11.11
+   }
+  },
+  "futures": {
+   "nasdaq": {
+    "symbol": "NQ=F",
+    "label": "Futures Nasdaq 100",
+    "price": 29740.75,
+    "change_pct": 0.15
+   },
+   "sp500": {
+    "symbol": "ES=F",
+    "label": "Futures S&P 500",
+    "price": 7597.75,
+    "change_pct": 0.18
    }
   },
   "margin_debt": {
@@ -32659,8 +32719,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1722939431058,
-   "change_pct": -0.07
+   "mcap_usd": 1719073483168,
+   "change_pct": -0.3
   },
   {
    "ticker": "META",
@@ -32683,6 +32743,7 @@
    "price_src": "yahoo",
    "price": 754.95,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.43,
    "pe": 27.2,
    "ath": 760.4,
@@ -33134,7 +33195,7 @@
      214.47,
      215.1,
      219.43,
-     224.6,
+     224.61,
      231.47,
      234.28,
      247.48,
@@ -33490,7 +33551,7 @@
     -0.000733,
     0.001894,
     0.000143,
-    0.008472,
+    0.008471,
     0.000331,
     0.004215,
     -0.000251,
@@ -33498,9 +33559,9 @@
     -0.00126,
     -0.003758,
     -0.016526,
-    0.015085,
+    0.015086,
     -0.005083,
-    0.00763,
+    0.007631,
     -0.000838,
     0.007767,
     -0.001979,
@@ -33517,7 +33578,7 @@
     0.004178,
     0.002276,
     0.003535,
-    -0.005982,
+    -0.005981,
     -0.007438,
     0.005405,
     0.008323,
@@ -33537,7 +33598,7 @@
     -0.003187,
     -0.004624,
     0.005713,
-    0.002806,
+    0.002807,
     0.00376,
     0.003402,
     0.001151,
@@ -33550,7 +33611,7 @@
     0.015228,
     -0.001222,
     0.00443,
-    -0.006834,
+    -0.006833,
     0.00566,
     0.010347,
     -0.000015,
@@ -33596,13 +33657,13 @@
     -0.011065,
     0.007523,
     0.009023,
-    0.006211,
+    0.00621,
     0.00456,
     0.003512,
     -0.000101,
     -0.00357,
     -0.001222,
-    -0.007437,
+    -0.007436,
     0.001831,
     0.006638,
     0.00593,
@@ -33644,7 +33705,7 @@
     -0.004814,
     0.000568,
     -0.008853,
-    0.00703,
+    0.007031,
     -0.005591,
     -0.013194,
     0.008722,
@@ -33656,7 +33717,7 @@
     0.002627,
     -0.014052,
     -0.002467,
-    -0.01444,
+    -0.014439,
     0.010445,
     -0.003362,
     0.005557,
@@ -33996,6 +34057,7 @@
    "price_src": "yahoo",
    "price": 725.51,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.31,
    "pe": 32.2,
    "ath": 748.65,
@@ -34727,7 +34789,7 @@
    },
    "_ret_series": [
     0.00362,
-    0.000916,
+    0.000917,
     0.001023,
     0.00806,
     -0.000962,
@@ -34770,8 +34832,8 @@
     0.000327,
     0.005804,
     0.004407,
-    0.008521,
-    -0.000845,
+    0.00852,
+    -0.000846,
     -0.001998,
     0.008977,
     0.006747,
@@ -34782,11 +34844,11 @@
     0.004103,
     0.00462,
     0.002735,
-    0.004785,
+    0.004786,
     0.004103,
     -0.004219,
     0.007482,
-    -0.00528,
+    -0.005279,
     0.011399,
     -0.001211,
     -0.035331,
@@ -34796,12 +34858,12 @@
     -0.00371,
     0.006545,
     0.012522,
-    -0.000261,
+    -0.000262,
     -0.009681,
     0.008371,
     0.010622,
     0.017652,
-    0.007661,
+    0.00766,
     0.004493,
     -0.015407,
     0.004812,
@@ -34816,9 +34878,9 @@
     -0.020627,
     0.000756,
     -0.008577,
-    -0.012251,
+    -0.01225,
     0.005952,
-    -0.023957,
+    -0.023956,
     0.007485,
     0.025252,
     0.006145,
@@ -34847,7 +34909,7 @@
     -0.002322,
     -0.0083,
     -0.001939,
-    0.007911,
+    0.007912,
     0.008748,
     0.000962,
     -0.005705,
@@ -34868,7 +34930,7 @@
     -0.012084,
     0.006843,
     -0.015483,
-    -0.017623,
+    -0.017624,
     -0.0145,
     0.020918,
     0.007631,
@@ -34877,7 +34939,7 @@
     -0.020549,
     0.002129,
     -0.001031,
-    0.007439,
+    0.00744,
     -0.003837,
     0.00881,
     -0.012229,
@@ -34885,11 +34947,11 @@
     0.014389,
     -0.012138,
     -0.003206,
-    0.001317,
+    0.001316,
     -0.010763,
     0.015128,
     -0.003017,
-    -0.015157,
+    -0.015158,
     0.013267,
     0.000017,
     -0.000132,
@@ -35239,6 +35301,7 @@
    "price_src": "yahoo",
    "price": 295.99,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.42,
    "pe": 18.3,
    "ath": 302.72,
@@ -35962,13 +36025,13 @@
     -0.007126,
     -0.004056,
     0.008275,
-    0.015157,
+    0.015158,
     -0.013904,
     0.003706,
     -0.001159,
     -0.006401,
     -0.005087,
-    -0.009842,
+    -0.009843,
     -0.020585,
     0.022134,
     0.005084,
@@ -35976,7 +36039,7 @@
     -0.00327,
     0.002181,
     -0.000227,
-    0.029259,
+    0.029258,
     0.019257,
     -0.012972,
     -0.004875,
@@ -36044,14 +36107,14 @@
     -0.00246,
     -0.028518,
     0.00291,
-    -0.020075,
+    -0.020076,
     0.003046,
     -0.000171,
     -0.01868,
     0.027933,
     0.018087,
     0.021567,
-    0.008813,
+    0.008814,
     0.005846,
     -0.012663,
     -0.001834,
@@ -36062,7 +36125,7 @@
     0.002071,
     0.013513,
     0.011666,
-    -0.015441,
+    -0.01544,
     -0.007592,
     -0.004743,
     -0.010701,
@@ -36101,8 +36164,8 @@
     -0.018166,
     0.035292,
     0.006994,
-    -0.002702,
-    -0.004556,
+    -0.002701,
+    -0.004557,
     -0.02063,
     0.013091,
     0.000304,
@@ -36468,6 +36531,7 @@
    "price_src": "yahoo",
    "price": 377.01,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.31,
    "pe": null,
    "ath": 509.7,
@@ -37643,6 +37707,7 @@
    "price_src": "yahoo",
    "price": 84.47,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.02,
    "pe": null,
    "ath": 148.52,
@@ -38061,7 +38126,7 @@
      80.1,
      82.41,
      83.91,
-     86.96,
+     86.95,
      88.79,
      90.57,
      85.63,
@@ -38333,7 +38398,7 @@
     }
    },
    "_ret_series": [
-    -0.002101,
+    -0.0021,
     -0.007033,
     0.00141,
     -0.000235,
@@ -38383,10 +38448,10 @@
     -0.010373,
     -0.001908,
     -0.003601,
-    0.006965,
+    0.006966,
     -0.003814,
     0,
-    -0.0009,
+    -0.000899,
     0.008178,
     -0.002905,
     0.002579,
@@ -38394,28 +38459,28 @@
     -0.0019,
     -0.007975,
     0.005735,
-    0.000784,
-    -0.000784,
+    0.000785,
+    -0.000785,
     0.016018,
     -0.000552,
     0.003197,
     -0.002203,
     0.007472,
     -0.001534,
-    0.00383,
+    0.003831,
     0.004903,
     0.000652,
     -0.006867,
-    0.000438,
+    0.000437,
     0.003383,
-    0.002612,
+    0.002611,
     -0.010158,
     -0.005835,
     -0.002986,
     -0.002504,
     0.002226,
     -0.010956,
-    0.008953,
+    0.008952,
     -0.002119,
     -0.000223,
     0.004568,
@@ -38432,11 +38497,11 @@
     0.004423,
     -0.004755,
     -0.012527,
-    0.000451,
+    0.00045,
     0.002811,
     -0.005404,
     -0.004639,
-    -0.003294,
+    -0.003295,
     0.001024,
     0.003857,
     -0.00136,
@@ -38460,7 +38525,7 @@
     -0.005024,
     0.006618,
     -0.002961,
-    0.00171,
+    0.001709,
     0.005791,
     -0.000227,
     -0.005792,
@@ -38470,11 +38535,11 @@
     0.002733,
     0.004765,
     -0.006245,
-    -0.00228,
+    -0.002281,
     0.000228,
     -0.005608,
     -0.002861,
-    0.002423,
+    0.002424,
     -0.002539,
     0.010803,
     0.000686,
@@ -38483,7 +38548,7 @@
     -0.005323,
     0.013199,
     0.005476,
-    0.001671,
+    0.00167,
     -0.00379,
     0.001005,
     -0.002346,
@@ -38499,7 +38564,7 @@
     -0.003724,
     0.008667,
     -0.010704,
-    -0.012998,
+    -0.012997,
     -0.001953,
     -0.004956,
     0.007712,
@@ -38527,7 +38592,7 @@
     -0.006354,
     0.009115,
     -0.00023,
-    -0.005529,
+    -0.00553,
     0.001962,
     -0.002193,
     0.001847,
@@ -38552,7 +38617,7 @@
     0.003688,
     0.005447,
     0.004948,
-    0.002347,
+    0.002348,
     0.005145,
     0.000233,
     0.000538,
@@ -38846,6 +38911,7 @@
    "price_src": "yahoo",
    "price": 118.08,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.31,
    "pe": 35.5,
    "ath": 563.57,
@@ -39538,8 +39604,8 @@
     0.012069,
     0.00195,
     0.008833,
-    -0.005866,
-    0.015429,
+    -0.005865,
+    0.015428,
     0.001726,
     -0.003995,
     -0.006294,
@@ -39554,7 +39620,7 @@
     0.009867,
     -0.015446,
     -0.010398,
-    0.00447,
+    0.004469,
     0.006674,
     0.00179,
     0.008734,
@@ -39581,7 +39647,7 @@
     -0.009213,
     0.016846,
     -0.000495,
-    -0.041643,
+    -0.041642,
     0.025688,
     -0.012855,
     0.009249,
@@ -39607,7 +39673,7 @@
     0.001124,
     -0.028577,
     0.00517,
-    -0.016747,
+    -0.016748,
     -0.015052,
     0.006775,
     -0.0301,
@@ -39654,7 +39720,7 @@
     0.007519,
     0.000981,
     0.00718,
-    0.012377,
+    0.012376,
     0.006835,
     -0.018725,
     -0.017074,
@@ -39667,7 +39733,7 @@
     -0.004294,
     0.000708,
     -0.025894,
-    0.001588,
+    0.001589,
     0.000383,
     0.009204,
     -0.004333,
@@ -39685,7 +39751,7 @@
     0.0177,
     0.000164,
     0.004158,
-    -0.019757,
+    -0.019758,
     -0.008668,
     0.014604,
     0.003374,
@@ -40031,6 +40097,7 @@
    "price_src": "yahoo",
    "price": 55.71,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.31,
    "pe": 17.6,
    "ath": 56.59,
@@ -40798,12 +40865,12 @@
     0.007669,
     0.002047,
     0.001301,
-    0.002597,
+    0.002596,
     -0.007436,
     -0.001681,
     0.010413,
     -0.018483,
-    0.000754,
+    0.000753,
     0.004321,
     -0.00338,
     0.016233,
@@ -41277,6 +41344,7 @@
    "price_src": "yahoo",
    "price": 55.08,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.47,
    "pe": 20.5,
    "ath": 86.08,
@@ -41589,7 +41657,7 @@
      21.25,
      20.81,
      21.28,
-     22.54,
+     22.55,
      21.69,
      21.53,
      19.23,
@@ -42022,7 +42090,7 @@
     -0.003782,
     0.011302,
     0.009715,
-    -0.014381,
+    -0.01438,
     -0.005375,
     -0.018751,
     -0.002222,
@@ -42033,11 +42101,11 @@
     -0.008039,
     0.004855,
     0.011509,
-    -0.000935,
+    -0.000934,
     0,
     -0.005978,
     0.000353,
-    0.00831,
+    0.008311,
     0.006854,
     0.02017,
     0.002606,
@@ -42071,8 +42139,8 @@
     0.0053,
     0.004937,
     0.001566,
-    -0.005827,
-    -0.013694,
+    -0.005828,
+    -0.013693,
     -0.02937,
     0.01352,
     -0.000116,
@@ -42088,13 +42156,13 @@
     -0.010476,
     0.007413,
     -0.005926,
-    0.007288,
+    0.007289,
     0.000113,
     -0.010837,
-    0.002635,
+    0.002634,
     0.009676,
     0.014285,
-    0.009006,
+    0.009005,
     0.012976,
     -0.014083,
     0.002545,
@@ -42130,7 +42198,7 @@
     0.009457,
     0.007591,
     -0.005576,
-    0.020806,
+    0.020807,
     0.026801,
     -0.02702,
     -0.011237,
@@ -42161,7 +42229,7 @@
     -0.018356,
     0.006831,
     -0.011101,
-    0.018981,
+    0.018982,
     0.007275,
     -0.005452,
     0.004908,
@@ -42177,7 +42245,7 @@
     -0.004429,
     -0.012867,
     0.024517,
-    0.009258,
+    0.009259,
     0.003298,
     0.00346,
     0.01048,
@@ -42523,6 +42591,7 @@
    "price_src": "yahoo",
    "price": 160.84,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": -0.82,
    "pe": 28.9,
    "ath": 165.61,
@@ -43272,7 +43341,7 @@
     -0.02842,
     0.005353,
     0.014235,
-    -0.003841,
+    -0.003842,
     -0.015133,
     -0.01156,
     0.008875,
@@ -43291,7 +43360,7 @@
     -0.000584,
     -0.00395,
     0.007303,
-    0.000946,
+    0.000945,
     -0.004736,
     0.003791,
     0.003414,
@@ -43313,19 +43382,19 @@
     0.002948,
     0.023777,
     0.03043,
-    -0.001954,
+    -0.001953,
     0.011319,
     -0.004845,
     0.000763,
     0.00194,
     -0.002217,
     -0.014531,
-    -0.001127,
+    -0.001126,
     0.002744,
     0.001544,
     -0.001685,
     0.006653,
-    0.010553,
+    0.010554,
     0.002345,
     0.005703,
     0.000548,
@@ -43335,12 +43404,12 @@
     -0.010158,
     0.00222,
     -0.000347,
-    0.001385,
+    0.001386,
     0.00449,
     0.003852,
     0.00192,
-    0.00137,
-    0.00777,
+    0.001369,
+    0.007771,
     0.022823,
     0.014102,
     -0.000524,
@@ -43351,7 +43420,7 @@
     -0.005992,
     0.020848,
     0.004195,
-    0.022355,
+    0.022356,
     -0.002207,
     -0.004872,
     -0.015083,
@@ -43361,9 +43430,9 @@
     -0.004167,
     -0.012012,
     -0.009755,
-    0.014432,
-    0.009421,
-    0.00312,
+    0.014433,
+    0.00942,
+    0.003121,
     0.013155,
     -0.01309,
     -0.001819,
@@ -43769,6 +43838,7 @@
    "price_src": "yahoo",
    "price": 97.32,
    "price_asof": "2026-07-10",
+   "price_live": false,
    "change_pct": 0.24,
    "pe": 31.1,
    "ath": 99.15,
@@ -44439,13 +44509,13 @@
     -0.001114,
     0.002115,
     0.004105,
-    0.017018,
+    0.017017,
     0.001958,
     -0.003483,
     0.000109,
     -0.016155,
     0.015937,
-    -0.014276,
+    -0.014277,
     -0.014147,
     -0.002471,
     0.010182,
@@ -44458,7 +44528,7 @@
     0.009286,
     -0.007153,
     0.005704,
-    -0.008511,
+    -0.008512,
     0.017062,
     0.002871,
     -0.002981,
@@ -44476,15 +44546,15 @@
     -0.002287,
     -0.001637,
     0.018073,
-    -0.004622,
-    -0.001618,
+    -0.004623,
+    -0.001617,
     -0.005302,
     -0.001303,
     0.00217,
     -0.006525,
     0.000218,
-    0.00544,
-    -0.009885,
+    0.005439,
+    -0.009884,
     -0.002991,
     0.009826,
     0.00033,
@@ -44493,10 +44563,10 @@
     -0.005256,
     0.003726,
     -0.009452,
-    -0.00365,
+    -0.003651,
     -0.005223,
     -0.005474,
-    -0.012853,
+    -0.012852,
     0.006334,
     0.010208,
     0.014405,
@@ -44514,7 +44584,7 @@
     0.002582,
     -0.001459,
     0.001683,
-    0.000896,
+    0.000897,
     -0.004828,
     0.015412,
     -0.000554,
@@ -44532,7 +44602,7 @@
     0.004403,
     0.00329,
     -0.011562,
-    -0.00355,
+    -0.003551,
     0.002553,
     -0.002442,
     -0.001112,
@@ -44541,11 +44611,11 @@
     0.003595,
     0.004364,
     -0.001229,
-    0.003125,
+    0.003126,
     -0.007383,
     0.003698,
     -0.005271,
-    -0.003831,
+    -0.00383,
     0.005124,
     -0.00068,
     0.006556,
@@ -44947,18 +45017,18 @@
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting"
   },
   {
-   "question": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
-   "yes": 22,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting"
-  },
-  {
    "question": "Will the price of Bitcoin be above $60,000 on July 13?",
    "yes": 99,
    "link": "https://polymarket.com/event/bitcoin-above-60k-on-july-13-2026"
   },
   {
+   "question": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
+   "yes": 22,
+   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting"
+  },
+  {
    "question": "Will the price of Bitcoin be above $62,000 on July 13?",
-   "yes": 90,
+   "yes": 94,
    "link": "https://polymarket.com/event/bitcoin-above-62k-on-july-13-2026"
   },
   {
@@ -44967,51 +45037,51 @@
    "link": "https://polymarket.com/event/ethereum-above-1600-on-july-13-2026"
   },
   {
-   "question": "Will Bitcoin reach $65,000 in July?",
-   "yes": 70,
-   "link": "https://polymarket.com/event/will-bitcoin-reach-65k-in-july-2026"
+   "question": "Will the price of Bitcoin be above $64,000 on July 13?",
+   "yes": 12,
+   "link": "https://polymarket.com/event/bitcoin-above-64k-on-july-13-2026"
   }
  ],
  "news": [
   {
    "source": "Investing.com",
-   "title": "Romania’s annual inflation drops to 10.42% in June",
-   "link": "https://www.investing.com/news/economic-indicators/romanias-annual-inflation-drops-to-1042-in-june-93CH-4787564",
-   "published": "2026-07-13T07:30:58Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "bear",
-   "title_it": "L’inflazione annuale della Romania scende al 10,42% a giugno"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Why is Gjensidige Forsikring stock rallying today?",
-   "link": "https://www.investing.com/news/stock-market-news/why-is-gjensidige-forsikring-stock-rallying-today-93CH-4787562",
-   "published": "2026-07-13T07:29:28Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Perché le azioni del Gjensidige Forsikring stanno registrando un rally oggi?"
-  },
-  {
-   "source": "Investing.com",
-   "title": "FTSE 100 today: Stocks edge higher as oil surges on Iran strikes",
-   "link": "https://www.investing.com/news/stock-market-news/ftse-100-today-stocks-edge-higher-as-oil-surges-on-iran-strikes-4787539",
-   "published": "2026-07-13T07:24:21Z",
+   "title": "European oil stocks climb after U.S. and Iran trade fresh strikes",
+   "link": "https://www.investing.com/news/stock-market-news/european-oil-stocks-climb-after-us-and-iran-trade-fresh-strikes-4787606",
+   "published": "2026-07-13T08:23:33Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "topic_pri": 0,
    "inv": true,
+   "sentiment": "bull",
+   "title_it": "I titoli petroliferi europei salgono dopo che Stati Uniti e Iran hanno lanciato nuovi attacchi"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Why is Vodafone stock rallying today?",
+   "link": "https://www.investing.com/news/stock-market-news/why-is-vodafone-stock-rallying-today-93CH-4787601",
+   "published": "2026-07-13T08:17:55Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": true,
    "sentiment": "neutral",
-   "title_it": "FTSE 100 oggi: le azioni salgono mentre il petrolio aumenta a causa degli attacchi dell'Iran"
+   "title_it": "Perché le azioni Vodafone sono in rialzo oggi?"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Euro yields hold near multi-week highs as Hormuz closure fuels inflation fears",
+   "link": "https://www.investing.com/news/forex-news/euro-yields-hold-near-multiweek-highs-as-hormuz-closure-fuels-inflation-fears-4787447",
+   "published": "2026-07-13T07:55:30Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "I rendimenti dell’euro si mantengono prossimi ai massimi da più settimane poiché la chiusura di Hormuz alimenta i timori di inflazione"
   },
   {
    "source": "Investing.com",
@@ -45043,6 +45113,62 @@
    "title_it": "Il dollaro sale su nuovi attacchi in Medio Oriente, chiusura di Hormuz"
   },
   {
+   "source": "CNBC",
+   "title": "U.S. and Iran exchange strikes as Strait of Hormuz standoff escalates",
+   "link": "https://www.cnbc.com/2026/07/13/us-iran-war-hormuz-oil-trump.html",
+   "published": "2026-07-13T09:00:32Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Stati Uniti e Iran si scambiano attacchi mentre lo stallo nello Stretto di Hormuz si intensifica"
+  },
+  {
+   "source": "CNBC",
+   "title": "Treasury yields muted as U.S.-Iran ceasefire strained; investors await core inflation data",
+   "link": "https://www.cnbc.com/2026/07/13/treasury-yields-faltering-us-iran-ceasefire-bond-markets.html",
+   "published": "2026-07-13T08:54:45Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "I rendimenti dei titoli del Tesoro sono diminuiti a causa della tensione del cessate il fuoco tra Stati Uniti e Iran; gli investitori attendono i dati sull’inflazione core"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Oil Jumps as US Conducts Wave of Strikes Against Iran",
+   "link": "https://news.google.com/search?q=Oil%20Jumps%20as%20US%20Conducts%20Wave%20of%20Strikes%20Against%20Iran",
+   "published": "2026-07-13T08:34:37Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il petrolio balza mentre gli Stati Uniti conducono un’ondata di attacchi contro l’Iran"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "European Stocks 'Vulnerable' Without Solid Iran Deal: Schroders",
+   "link": "https://news.google.com/search?q=European%20Stocks%20%27Vulnerable%27%20Without%20Solid%20Iran%20Deal%3A%20Schroders",
+   "published": "2026-07-13T08:28:37Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Le azioni europee “vulnerabili” senza un solido accordo con l’Iran: Schroders"
+  },
+  {
    "source": "Bloomberg",
    "title": "SK Hynix Jolts Stocks More Than Iran: 3-Minutes MLIV",
    "link": "https://news.google.com/search?q=SK%20Hynix%20Jolts%20Stocks%20More%20Than%20Iran%3A%203-Minutes%20MLIV",
@@ -45057,10 +45183,10 @@
    "title_it": "SK Hynix fa sobbalzare le azioni più dell'Iran: MLIV di 3 minuti"
   },
   {
-   "source": "CNBC",
-   "title": "Stock futures slip after U.S., Iran exchange airstrikes again; Kospi plunges 7%: Live updates",
-   "link": "https://www.cnbc.com/2026/07/12/stock-market-today-live-updates.html",
-   "published": "2026-07-13T07:56:35Z",
+   "source": "AP",
+   "title": "US and Iran vie for Strait of Hormuz, waterway key to global energy supplies, in latest attacks - AP News",
+   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNQXlDMHpMczFma2paOVJQMzZuZzVNVFZLeS04V0VXUk1zUFBSTGRaelYzaU1fQlg0azEwQ1dQQ2lfV2VmOFBMZ0ZGa0tjSWJGUWVFdDhhUTdCbmpKMy1QRHVOdE5YRnliNmJfVkRKU09zdVhYSm1hQW94MDlUbEp1OXB0ZjIzZlFtYUdZZHBQb2pHT1V5bjZtbVE0QVN3cTg?oc=5",
+   "published": "2026-07-13T07:35:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -45068,21 +45194,21 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "I futures azionari crollano dopo i nuovi attacchi aerei sugli scambi statunitensi e iraniani; Kospi crolla del 7%: aggiornamenti in tempo reale"
+   "title_it": "Stati Uniti e Iran si contendono lo Stretto di Hormuz, via d'acqua fondamentale per l'approvvigionamento energetico globale, negli ultimi attacchi - AP News"
   },
   {
-   "source": "CNBC",
-   "title": "U.S. and Iran exchange strikes as Strait of Hormuz standoff escalates",
-   "link": "https://www.cnbc.com/2026/07/13/us-iran-war-hormuz-oil-trump.html",
-   "published": "2026-07-13T07:18:34Z",
+   "source": "Bloomberg",
+   "title": "European Stocks Drop After US-Iran Strikes, Oil Lifts Energy",
+   "link": "https://news.google.com/search?q=European%20Stocks%20Drop%20After%20US-Iran%20Strikes%2C%20Oil%20Lifts%20Energy",
+   "published": "2026-07-13T07:30:09Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Stati Uniti e Iran si scambiano attacchi mentre lo stallo nello Stretto di Hormuz si intensifica"
+   "sentiment": "bear",
+   "title_it": "Le azioni europee crollano dopo gli attacchi USA-Iran, il petrolio solleva l'energia"
   },
   {
    "source": "AP",
@@ -45112,20 +45238,6 @@
    "title_it": "Settimana in anticipo per Forex e obbligazioni: focus sui dati sull'inflazione negli Stati Uniti e sulla Cina - marketscreener.com"
   },
   {
-   "source": "Bloomberg",
-   "title": "Sfakianakis: Iran Tests US Resolve in Hormuz",
-   "link": "https://news.google.com/search?q=Sfakianakis%3A%20Iran%20Tests%20US%20Resolve%20in%20Hormuz",
-   "published": "2026-07-13T06:56:52Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Sfakianakis: l’Iran mette alla prova la determinazione degli Stati Uniti a Hormuz"
-  },
-  {
    "source": "Reuters",
    "title": "Iran escalates attacks on US bases in Gulf states, warns of more 'incidents' in strait - Reuters",
    "link": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOMG0wMGZybUNSMnZyOWQzck1Eb0JwcFdfWUVXNlBYbk10c3VveDRrdzVpYVJhNjdwdUdnR1ZMZDhVTXdnWE41M09iZnZwUmJzbEpsX2V0Q2xDWmdHVjZGRkxtRmVsOFU2OWM3aGsyUGljckNVb1F1WlpmMk5GQVE4S0Q4QXJQYlI4V1hZSktORXBZYm1YXzNsQUYwQ2dOSUJtSTJrNmpvR3M5Q2szcXYzWENxeGFIbnRHS0lhaXdnN3FFcnM?oc=5",
@@ -45140,10 +45252,10 @@
    "title_it": "L'Iran intensifica gli attacchi alle basi americane negli stati del Golfo e avverte di nuovi \"incidenti\" nelle strette - Reuters"
   },
   {
-   "source": "Bloomberg",
-   "title": "Investors Weigh War Risks as US and Iran Trade Fire | Insight with Haslinda Amin 7/13/2026",
-   "link": "https://news.google.com/search?q=Investors%20Weigh%20War%20Risks%20as%20US%20and%20Iran%20Trade%20Fire%20%7C%20Insight%20with%20Haslinda%20Amin%207/13/2026",
-   "published": "2026-07-13T06:31:32Z",
+   "source": "AP",
+   "title": "Iran persecutes its Baha’i minority fiercely in a year of protests and war, rights groups say - AP News",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxQNHBlbXlFX0ZjVEdZbS1jcmlXSDlNcDItZVdVRmdxVEhIYnVHMkFrYUJGWVNPbU9NN09uaHN6Mk5UdDhpSFdNVFI4NEc5eWxEZUtoRXdUZWVrSWVONEI2LVR2X3lWZnE3R21UbWZSUGNySnkyS3lyUV85Uk1qSGV0UkJmWnVUT3cxX3prb2xtT2dtOEE4azBXbFRiY1NhamhFOVVz?oc=5",
+   "published": "2026-07-13T05:17:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -45151,50 +45263,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "Gli investitori valutano i rischi di guerra nel contesto del fuoco commerciale tra Stati Uniti e Iran | Approfondimento con Haslinda Amin 13/07/2026"
-  },
-  {
-   "source": "Bloomberg",
-   "title": "Euro-Area Outlook Cut by Economists as Iran War Weighs on Region",
-   "link": "https://news.google.com/search?q=Euro-Area%20Outlook%20Cut%20by%20Economists%20as%20Iran%20War%20Weighs%20on%20Region",
-   "published": "2026-07-13T06:30:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Gli economisti tagliano le prospettive per l’Eurozona mentre la guerra con l’Iran pesa sulla regione"
-  },
-  {
-   "source": "AP",
-   "title": "Oil prices jump and Asian shares slip as US and Iran carry out airstrikes - AP News",
-   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPcHZ0YWpGZjBZakNRRmRveklzX1hRUklIWUc2MzVoWE51Z1Bjc0JFU05vd2tGVWhaSVVVSmFvbHU3QWJZcEs0R2dkRjFxcG9WaGMtWFo2SmhqTTVjSDNFVFk5Zl8xcmdiaTFHUmM5cWU0RzNDeDU2TGM4RWJJMjg3Y2lYeEJBWkdqeXFWUjg0eWpNZw?oc=5",
-   "published": "2026-07-13T06:03:00Z",
-   "tickers": [
-    "MACRO",
-    "POL",
-    "CL=F"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bull",
-   "title_it": "I prezzi del petrolio salgono e le azioni asiatiche crollano mentre Stati Uniti e Iran effettuano attacchi aerei - AP News"
-  },
-  {
-   "source": "AP",
-   "title": "US and Iran vie for Strait of Hormuz, waterway key to global energy supplies, in latest attacks - AP News",
-   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNQXlDMHpMczFma2paOVJQMzZuZzVNVFZLeS04V0VXUk1zUFBSTGRaelYzaU1fQlg0azEwQ1dQQ2lfV2VmOFBMZ0ZGa0tjSWJGUWVFdDhhUTdCbmpKMy1QRHVOdE5YRnliNmJfVkRKU09zdVhYSm1hQW94MDlUbEp1OXB0ZjIzZlFtYUdZZHBQb2pHT1V5bjZtbVE0QVN3cTg?oc=5",
-   "published": "2026-07-13T05:46:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Stati Uniti e Iran si contendono lo Stretto di Hormuz, via d'acqua fondamentale per l'approvvigionamento energetico globale, negli ultimi attacchi - AP News"
+   "title_it": "L’Iran perseguita ferocemente la sua minoranza baha’i in un anno di proteste e guerre, dicono i gruppi per i diritti – AP News"
   },
   {
    "source": "Reuters",
@@ -45208,7 +45277,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Fornitura per meno di un mese: le scorte europee di carburante per aerei sono esigue mentre si infiammano le tensioni con l'Iran - Reuters"
+   "title_it": "Fornitura per meno di un mese: le scorte europee di carburante per aerei sono esigue mentre si inaspriscono le tensioni con l'Iran - Reuters"
   },
   {
    "source": "Reuters",
@@ -45239,20 +45308,6 @@
    "title_it": "Mercato azionario statunitense: l’inflazione accelera mentre tariffe, costi energetici e investimenti nell’intelligenza artificiale aumentano la pressione sui prezzi - The Economic Times"
   },
   {
-   "source": "Bloomberg",
-   "title": "El Niño and Iran War Team Up in a Food Squeeze",
-   "link": "https://news.google.com/search?q=El%20Ni%C3%B1o%20and%20Iran%20War%20Team%C2%A0Up%20in%20a%20Food%20Squeeze",
-   "published": "2026-07-13T04:10:57Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "El Niño e la guerra in Iran si alleano per una spremuta alimentare"
-  },
-  {
    "source": "AP",
    "title": "Ukraine reels after Sen. Lindsey Graham’s sudden death, fearing a weaker link to Trump - AP News",
    "link": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPellBSHhlNWRLclozaXhPSzhGc21IbGNrNzVUNzl2N0N5TFd5TlNzbjl5QnREZzJlZ2FjWTlyRFM0NEhuc3lQYjYzX1JlZExIWTdJcHNzQzdhS2ZmRF95bzdmNi1OSGJJNXFvX1pRSVRhSC1mTEh4Wjc5NUl5UG9qOFF1WllfQUN0SHBfb0ZTYnV4bzZRZTQtcV9OMFdhYWNDTEMyNUxYM2Jkb1VhaWRRNw?oc=5",
@@ -45277,7 +45332,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bull",
-   "title_it": "La “Grande Muraglia Verde” cinese doma la crescita del deserto, ma gli scienziati avvertono che la lotta non è finita – AP News"
+   "title_it": "La “Grande Muraglia Verde” cinese frena la crescita del deserto, ma gli scienziati avvertono che la lotta non è finita – AP News"
   },
   {
    "source": "MarketWatch",
@@ -45293,19 +45348,6 @@
    "inv": false,
    "sentiment": "bull",
    "title_it": "I prezzi del petrolio salgono, i futures azionari scendono dopo l’ultima ondata di scioperi tra Stati Uniti e Iran"
-  },
-  {
-   "source": "Google News",
-   "title": "Warsh and U.S. inflation will set tone for July Fed decision - The Spokesman-Review",
-   "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxPT3M3RnFxdXdPTkxCNVloLXFHamdtdUY4d0g5ZF9FT2V2MXktQnZVcVc0Y2hYamVOek5qV2pSX2h4YmRnXzdNOUpoSjY5QlA1UWJzQXpnYzRMYWJ0RjFkQ0tYVklkYU9ZUE5FaVc3Yk1Dcl81VVpkTUVDdkswQ1RSUkFVci0tdlMtTEx6dzVqOUN5TzFfa3A1TUVyZUFTQQ?oc=5",
-   "published": "2026-07-13T02:40:53Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Warsh e l’inflazione statunitense daranno il tono alla decisione della Fed di luglio – The Spokesman-Review"
   },
   {
    "source": "Google News",
@@ -45346,6 +45388,20 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "I “conti Trump” sono fantastici, se sei già ricco"
+  },
+  {
+   "source": "Reuters",
+   "title": "Shares skid as Gulf conflict sends oil surging - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQS2QwU3pIcHNXVlZZZW1SUXpNSVlUYlRILUdqUmJBODg5ZDh0Q3d4U21VZkdHZGhmZDlnNFFxYWZ1Y1AwTTJ1bTBZVlQ5ZFpSSngtMTdzNzljNExjWk15WE11MDBScXMwTmJkcG9NM2lEMjM3Z1E5ODNPWWljYnVxUko5T21tZ055eHhtMnh0bDZNZw?oc=5",
+   "published": "2026-07-13T00:25:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Le azioni crollano mentre il conflitto del Golfo fa impennare il petrolio - Reuters"
   },
   {
    "source": "CNBC",
@@ -45414,7 +45470,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Gli Stati Uniti stanno effettuando attacchi contro i sistemi missilistici iraniani attorno allo Stretto di Hormuz, riferisce Axios - Reuters"
+   "title_it": "Gli Stati Uniti effettuano attacchi contro i sistemi missilistici iraniani attorno allo Stretto di Hormuz, riferisce Axios - Reuters"
   },
   {
    "source": "AP",
@@ -45445,10 +45501,10 @@
    "title_it": "Muore Lindsey Graham, sciopero dell'Iran e fissate le semifinali dei Mondiali - Reuters"
   },
   {
-   "source": "Reuters",
-   "title": "Gulf bourses subdued as US and Iran exchange strikes - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPU1pXOXRCNmZyZWlJV04zUzZFZmtwSG01b1IwN3VENmRyaTRoOThIR3hHbmJVTWNpU1NVTVNtRUMzTmNWXzg1WGdfeEFnZUNEQ3BUdUwyTVdickl6aFdqRzRUOHJ2VXA4Wk9oazhIdnFoczZwa2Jld1hPOEZIRlprYk9SWndKdEU3Z3RTSWhSZWF5MnZYRzNxWVEtRUlpakhU?oc=5",
-   "published": "2026-07-12T13:07:13Z",
+   "source": "Google News",
+   "title": "What to Expect in Markets this Week: Inflation Data, Warsh Testimony in Congress, Bank Earnings - Investopedia",
+   "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPRS1BOUNiOWQ4VWpFcUhRY0RmTGFvcnFScjFraHM2SlMxS3Q3VjB0eDYyazBzdlh1bVVxN1ZJb3B3aTFkY24xeUt6S1l2ejJjeUhQTDl1SFBBbUpUM0VySjg2NzN1SkNNTUtfX0g0aUlLSTA5dllCd3lMU0p5R2g2VEhhc1BQTm9nLVVJc3RBT0ZNX0IwSFhpV0xBcGN5ZzhnYUVXRm5ISWFoY1JzYWh5TUNLLVRCeTlRMVcwYld2QnN1RFN1OF9HS2NfaE0teUxucE1MZ1FDdG9yRXM?oc=5",
+   "published": "2026-07-12T14:12:33Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -45456,7 +45512,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Borse del Golfo in ribasso dopo gli scioperi di Usa e Iran - Reuters"
+   "title_it": "Cosa aspettarsi dai mercati questa settimana: dati sull'inflazione, testimonianza di Warsh al Congresso, utili bancari - Investopedia"
   },
   {
    "source": "MarketWatch",
@@ -45508,7 +45564,7 @@
    "topic_pri": 1,
    "inv": true,
    "sentiment": "bull",
-   "title_it": "Perché la quotazione al Nasdaq di SK Hynix è un catalizzatore nascosto dell’impennata di Micron"
+   "title_it": "Perché la quotazione al Nasdaq di SK Hynix è un catalizzatore nascosto per l’impennata di Micron"
   },
   {
    "source": "Investing.com",
@@ -45535,6 +45591,19 @@
    "inv": true,
    "sentiment": "bull",
    "title_it": "Le azioni Micron esplodono in rialzo dopo il battito degli utili alimentati dall'intelligenza artificiale: sono in arrivo ulteriori rialzi?"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "IREN (IREN), BE Networks Partner to Simulate NVIDIA Blackwell GPU Infrastructure",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/iren-iren-networks-partner-simulate-075912782.html",
+   "published": "2026-07-12T07:59:12Z",
+   "tickers": [
+    "NVDA"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "IREN (IREN), partner di BE Networks per simulare l'infrastruttura GPU NVIDIA Blackwell"
   },
   {
    "source": "Investing.com",
@@ -45576,6 +45645,19 @@
    "title_it": "TSMC, il più grande produttore di chip a contratto al mondo, segnala un aumento del 68% nei ricavi di giugno"
   },
   {
+   "source": "Bloomberg",
+   "title": "TSMC’s Sales Soar 36% in Latest Sign of AI Spending Momentum",
+   "link": "https://news.google.com/search?q=TSMC%E2%80%99s%20Sales%20Soar%2036%25%20in%20Latest%20Sign%20of%20AI%20Spending%20Momentum",
+   "published": "2026-07-13T05:40:42Z",
+   "tickers": [
+    "TSMC"
+   ],
+   "topic_pri": 2,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "Le vendite di TSMC salgono del 36% come ultimo segnale di slancio nella spesa per l'intelligenza artificiale"
+  },
+  {
    "source": "Reddit",
    "title": "Japan just landed a reusable rocket prototype and SPCX is not threatened by this.",
    "link": "https://www.reddit.com/r/stocks/comments/1uv2n0j/japan_just_landed_a_reusable_rocket_prototype_and/",
@@ -45606,18 +45688,7 @@
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 76%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-07-13T08:02:50Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
-   "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 22%",
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
-   "published": "2026-07-13T08:02:50Z",
+   "published": "2026-07-13T09:03:03Z",
    "tickers": [
     "MACRO"
    ],
@@ -45628,7 +45699,18 @@
    "title": "Will the price of Bitcoin be above $60,000 on July 13?",
    "title_it": "Will the price of Bitcoin be above $60,000 on July 13? — probabilità Sì 99%",
    "link": "https://polymarket.com/event/bitcoin-above-60k-on-july-13-2026",
-   "published": "2026-07-13T08:02:50Z",
+   "published": "2026-07-13T09:03:03Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "sentiment": "neutral"
+  },
+  {
+   "source": "Polymarket",
+   "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
+   "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 22%",
+   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
+   "published": "2026-07-13T09:03:03Z",
    "tickers": [
     "MACRO"
    ],
@@ -45637,9 +45719,9 @@
   {
    "source": "Polymarket",
    "title": "Will the price of Bitcoin be above $62,000 on July 13?",
-   "title_it": "Will the price of Bitcoin be above $62,000 on July 13? — probabilità Sì 90%",
+   "title_it": "Will the price of Bitcoin be above $62,000 on July 13? — probabilità Sì 94%",
    "link": "https://polymarket.com/event/bitcoin-above-62k-on-july-13-2026",
-   "published": "2026-07-13T08:02:50Z",
+   "published": "2026-07-13T09:03:03Z",
    "tickers": [
     "MACRO"
    ],
@@ -45650,7 +45732,7 @@
    "title": "Will the price of Ethereum be above $1,600 on July 13?",
    "title_it": "Will the price of Ethereum be above $1,600 on July 13? — probabilità Sì 100%",
    "link": "https://polymarket.com/event/ethereum-above-1600-on-july-13-2026",
-   "published": "2026-07-13T08:02:50Z",
+   "published": "2026-07-13T09:03:03Z",
    "tickers": [
     "MACRO"
    ],
@@ -45658,10 +45740,10 @@
   },
   {
    "source": "Polymarket",
-   "title": "Will Bitcoin reach $65,000 in July?",
-   "title_it": "Will Bitcoin reach $65,000 in July? — probabilità Sì 70%",
-   "link": "https://polymarket.com/event/will-bitcoin-reach-65k-in-july-2026",
-   "published": "2026-07-13T08:02:50Z",
+   "title": "Will the price of Bitcoin be above $64,000 on July 13?",
+   "title_it": "Will the price of Bitcoin be above $64,000 on July 13? — probabilità Sì 12%",
+   "link": "https://polymarket.com/event/bitcoin-above-64k-on-july-13-2026",
+   "published": "2026-07-13T09:03:03Z",
    "tickers": [
     "MACRO"
    ],
@@ -57703,6 +57785,14 @@
        "oi": 0
       },
       {
+       "strike": 111,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 29,
+       "oi": 0
+      },
+      {
        "strike": 112,
        "bid": 0,
        "ask": 0,
@@ -57789,19 +57879,11 @@
        "iv": null,
        "vol": 1,
        "oi": 0
-      },
-      {
-       "strike": 123,
-       "bid": 0,
-       "ask": 0,
-       "iv": null,
-       "vol": 10,
-       "oi": 0
       }
      ],
      "call_wall": null,
      "put_wall": null,
-     "opt_volume": 2536
+     "opt_volume": 2565
     }
    ]
   },
@@ -64128,6 +64210,416 @@
      "opt_volume": 0
     },
     {
+     "date": "2026-07-17",
+     "calls": [
+      {
+       "strike": 920,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 31,
+       "oi": 0
+      },
+      {
+       "strike": 925,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 930,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 114,
+       "oi": 0
+      },
+      {
+       "strike": 935,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 940,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 66,
+       "oi": 0
+      },
+      {
+       "strike": 945,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 950,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 981,
+       "oi": 0
+      },
+      {
+       "strike": 955,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 960,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 200,
+       "oi": 0
+      },
+      {
+       "strike": 965,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 970,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 535,
+       "oi": 0
+      },
+      {
+       "strike": 975,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 980,
+       "bid": 0,
+       "ask": 0,
+       "iv": 0.2,
+       "vol": 1219,
+       "oi": 0
+      },
+      {
+       "strike": 985,
+       "bid": 0,
+       "ask": 0,
+       "iv": 1.6,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 990,
+       "bid": 0,
+       "ask": 0,
+       "iv": 1.6,
+       "vol": 641,
+       "oi": 0
+      },
+      {
+       "strike": 995,
+       "bid": 0,
+       "ask": 0,
+       "iv": 3.1,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 1000,
+       "bid": 0,
+       "ask": 0,
+       "iv": 3.1,
+       "vol": 6360,
+       "oi": 0
+      },
+      {
+       "strike": 1005,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 1010,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 258,
+       "oi": 0
+      },
+      {
+       "strike": 1015,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 1020,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 1797,
+       "oi": 0
+      },
+      {
+       "strike": 1025,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 1030,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 675,
+       "oi": 0
+      },
+      {
+       "strike": 1035,
+       "bid": 0,
+       "ask": 0,
+       "iv": 12.5,
+       "vol": 131,
+       "oi": 0
+      },
+      {
+       "strike": 1040,
+       "bid": 0,
+       "ask": 0,
+       "iv": 12.5,
+       "vol": 2057,
+       "oi": 0
+      }
+     ],
+     "puts": [
+      {
+       "strike": 920,
+       "bid": 0,
+       "ask": 0,
+       "iv": 12.5,
+       "vol": 499,
+       "oi": 0
+      },
+      {
+       "strike": 925,
+       "bid": 0,
+       "ask": 0,
+       "iv": 12.5,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 930,
+       "bid": 0,
+       "ask": 0,
+       "iv": 12.5,
+       "vol": 278,
+       "oi": 0
+      },
+      {
+       "strike": 935,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 940,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 345,
+       "oi": 0
+      },
+      {
+       "strike": 945,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 950,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 2104,
+       "oi": 0
+      },
+      {
+       "strike": 955,
+       "bid": 0,
+       "ask": 0,
+       "iv": 6.3,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 960,
+       "bid": 0,
+       "ask": 0,
+       "iv": 3.1,
+       "vol": 479,
+       "oi": 0
+      },
+      {
+       "strike": 965,
+       "bid": 0,
+       "ask": 0,
+       "iv": 3.1,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 970,
+       "bid": 0,
+       "ask": 0,
+       "iv": 1.6,
+       "vol": 972,
+       "oi": 0
+      },
+      {
+       "strike": 975,
+       "bid": 0,
+       "ask": 0,
+       "iv": 0.8,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 980,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 548,
+       "oi": 0
+      },
+      {
+       "strike": 985,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 990,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 324,
+       "oi": 0
+      },
+      {
+       "strike": 995,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 1000,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 3367,
+       "oi": 0
+      },
+      {
+       "strike": 1005,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 1010,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 467,
+       "oi": 0
+      },
+      {
+       "strike": 1015,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 1020,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 327,
+       "oi": 0
+      },
+      {
+       "strike": 1025,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 0,
+       "oi": 0
+      },
+      {
+       "strike": 1030,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 41,
+       "oi": 0
+      },
+      {
+       "strike": 1035,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 45,
+       "oi": 0
+      },
+      {
+       "strike": 1040,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 29,
+       "oi": 0
+      }
+     ],
+     "call_wall": 490,
+     "put_wall": 1560,
+     "opt_volume": 212903
+    },
+    {
      "date": "2026-07-20",
      "calls": [
       {
@@ -65364,16 +65856,8 @@
      "opt_volume": 41594
     },
     {
-     "date": "2026-08-07",
+     "date": "2026-07-31",
      "calls": [
-      {
-       "strike": 50,
-       "bid": 0,
-       "ask": 0,
-       "iv": null,
-       "vol": 1,
-       "oi": 0
-      },
       {
        "strike": 61,
        "bid": 0,
@@ -65387,7 +65871,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 0,
+       "vol": 1,
        "oi": 0
       },
       {
@@ -65395,7 +65879,15 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 2,
+       "vol": 16,
+       "oi": 0
+      },
+      {
+       "strike": 64,
+       "bid": 0,
+       "ask": 0,
+       "iv": null,
+       "vol": 37,
        "oi": 0
       },
       {
@@ -65403,7 +65895,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 10,
+       "vol": 32,
        "oi": 0
       },
       {
@@ -65411,7 +65903,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 2,
+       "vol": 4,
        "oi": 0
       },
       {
@@ -65419,7 +65911,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 0,
+       "vol": 24,
        "oi": 0
       },
       {
@@ -65427,7 +65919,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 0,
+       "vol": 24,
        "oi": 0
       },
       {
@@ -65435,7 +65927,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 2,
+       "vol": 13,
        "oi": 0
       },
       {
@@ -65443,7 +65935,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 46,
+       "vol": 416,
        "oi": 0
       },
       {
@@ -65451,7 +65943,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 12,
+       "vol": 215,
        "oi": 0
       },
       {
@@ -65459,7 +65951,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 49,
+       "vol": 139,
        "oi": 0
       },
       {
@@ -65467,15 +65959,15 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 215,
+       "vol": 656,
        "oi": 0
       },
       {
        "strike": 74,
        "bid": 0,
        "ask": 0,
-       "iv": 0.8,
-       "vol": 229,
+       "iv": 1.6,
+       "vol": 252,
        "oi": 0
       },
       {
@@ -65483,7 +65975,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 3.1,
-       "vol": 326,
+       "vol": 2651,
        "oi": 0
       },
       {
@@ -65491,7 +65983,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 3.1,
-       "vol": 106,
+       "vol": 635,
        "oi": 0
       },
       {
@@ -65499,7 +65991,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 6.3,
-       "vol": 82,
+       "vol": 584,
        "oi": 0
       },
       {
@@ -65507,7 +65999,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 6.3,
-       "vol": 101,
+       "vol": 936,
        "oi": 0
       },
       {
@@ -65515,23 +66007,23 @@
        "bid": 0,
        "ask": 0,
        "iv": 6.3,
-       "vol": 126,
+       "vol": 3521,
        "oi": 0
       },
       {
        "strike": 80,
        "bid": 0,
        "ask": 0,
-       "iv": 6.3,
-       "vol": 895,
+       "iv": 12.5,
+       "vol": 1805,
        "oi": 0
       },
       {
        "strike": 81,
        "bid": 0,
        "ask": 0,
-       "iv": 6.3,
-       "vol": 64,
+       "iv": 12.5,
+       "vol": 212,
        "oi": 0
       },
       {
@@ -65539,7 +66031,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 12.5,
-       "vol": 87,
+       "vol": 120,
        "oi": 0
       },
       {
@@ -65547,7 +66039,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 12.5,
-       "vol": 76,
+       "vol": 213,
        "oi": 0
       },
       {
@@ -65555,7 +66047,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 12.5,
-       "vol": 75,
+       "vol": 289,
        "oi": 0
       },
       {
@@ -65563,7 +66055,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 12.5,
-       "vol": 172,
+       "vol": 1443,
        "oi": 0
       }
      ],
@@ -65572,8 +66064,8 @@
        "strike": 61,
        "bid": 0,
        "ask": 0,
-       "iv": 12.5,
-       "vol": 22,
+       "iv": 25,
+       "vol": 96,
        "oi": 0
       },
       {
@@ -65581,7 +66073,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 12.5,
-       "vol": 10,
+       "vol": 13854,
        "oi": 0
       },
       {
@@ -65589,7 +66081,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 12.5,
-       "vol": 11,
+       "vol": 6,
        "oi": 0
       },
       {
@@ -65597,7 +66089,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 12.5,
-       "vol": 71,
+       "vol": 101,
        "oi": 0
       },
       {
@@ -65605,7 +66097,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 12.5,
-       "vol": 62,
+       "vol": 978,
        "oi": 0
       },
       {
@@ -65613,15 +66105,15 @@
        "bid": 0,
        "ask": 0,
        "iv": 12.5,
-       "vol": 60,
+       "vol": 89,
        "oi": 0
       },
       {
        "strike": 67,
        "bid": 0,
        "ask": 0,
-       "iv": 6.3,
-       "vol": 74,
+       "iv": 12.5,
+       "vol": 134,
        "oi": 0
       },
       {
@@ -65629,7 +66121,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 6.3,
-       "vol": 195,
+       "vol": 4406,
        "oi": 0
       },
       {
@@ -65637,7 +66129,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 6.3,
-       "vol": 178,
+       "vol": 236,
        "oi": 0
       },
       {
@@ -65645,7 +66137,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 6.3,
-       "vol": 334,
+       "vol": 374,
        "oi": 0
       },
       {
@@ -65653,15 +66145,15 @@
        "bid": 0,
        "ask": 0,
        "iv": 3.1,
-       "vol": 331,
+       "vol": 294,
        "oi": 0
       },
       {
        "strike": 72,
        "bid": 0,
        "ask": 0,
-       "iv": 1.6,
-       "vol": 170,
+       "iv": 3.1,
+       "vol": 389,
        "oi": 0
       },
       {
@@ -65669,7 +66161,7 @@
        "bid": 0,
        "ask": 0,
        "iv": 0.8,
-       "vol": 76,
+       "vol": 602,
        "oi": 0
       },
       {
@@ -65677,7 +66169,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 138,
+       "vol": 347,
        "oi": 0
       },
       {
@@ -65685,7 +66177,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 46,
+       "vol": 589,
        "oi": 0
       },
       {
@@ -65693,7 +66185,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 48,
+       "vol": 19,
        "oi": 0
       },
       {
@@ -65701,7 +66193,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 24,
+       "vol": 19,
        "oi": 0
       },
       {
@@ -65709,7 +66201,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 13,
+       "vol": 30,
        "oi": 0
       },
       {
@@ -65717,7 +66209,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 6,
+       "vol": 4,
        "oi": 0
       },
       {
@@ -65725,7 +66217,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 4,
+       "vol": 211,
        "oi": 0
       },
       {
@@ -65733,7 +66225,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 4,
+       "vol": 1,
        "oi": 0
       },
       {
@@ -65741,7 +66233,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 3,
+       "vol": 19,
        "oi": 0
       },
       {
@@ -65749,7 +66241,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 3,
+       "vol": 2,
        "oi": 0
       },
       {
@@ -65757,7 +66249,7 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 10,
+       "vol": 3,
        "oi": 0
       },
       {
@@ -65765,13 +66257,13 @@
        "bid": 0,
        "ask": 0,
        "iv": null,
-       "vol": 5,
+       "vol": 17,
        "oi": 0
       }
      ],
-     "call_wall": null,
-     "put_wall": null,
-     "opt_volume": 5899
+     "call_wall": 50,
+     "put_wall": 40,
+     "opt_volume": 41429
     }
    ]
   },
@@ -78108,10 +78600,10 @@
   {
    "date": "2026-07-13",
    "sharpe": 1.87,
-   "gain_pct": 59.79,
-   "eur_value": 297484.2,
-   "vix": 16.41,
-   "vix_term": 0.884,
+   "gain_pct": 59.78,
+   "eur_value": 297279.24,
+   "vix": 16.29,
+   "vix_term": 0.877,
    "titles": {
     "AMD": {
      "rs": 14.8,
@@ -78263,10 +78755,10 @@
   "alerts": [
    "umich: stale"
   ],
-  "generated_at": "2026-07-13T08:02:50Z"
+  "generated_at": "2026-07-13T09:03:04Z"
  },
  "verdict_track": {
-  "generated": "2026-07-13T08:02:52.062Z",
+  "generated": "2026-07-13T09:03:04.631Z",
   "since": "2026-07-11",
   "episodes": 5,
   "mature7": {
