@@ -516,6 +516,22 @@ check("v125 stop a rischio orario esteso: prepost >1% a ridosso dello stop → f
   const row = p.split("\\n").find(l => l.includes("(TST1)"));
   return row && row.includes("[STOP A RISCHIO AFTER");`));
 
+check("v126 froth: alert schiuma speculativa nel prompt con direttiva (no acquisti tech, solo ratchet, ES95 salva)", run(`
+  DATA.macro.froth = { soxl: { symbol: "SOXL", rvol: 3.1, chg_5d_pct: 12.4 }, tqqq: { symbol: "TQQQ", rvol: 1.2, chg_5d_pct: 4 },
+    alert: true, note: "Volume estremo in acquisto sugli ETF a leva 3x (SOXL RVol 3.1× / +12.4% 5g)." };
+  const p = buildPrompt();
+  delete DATA.macro.froth;
+  const l = p.split("\\n").find(x => x.includes("[SPECULATIVE FROTH ALERT]"));
+  return l && l.includes("SOXL") && l.includes("NON impegnare il budget") && l.includes("Stop Ratchet") && l.includes("ES95")`));
+check("v126 breadth: divergenza SPY/RSP nel prompt con direttiva prudenza; forma neutra senza alert", run(`
+  DATA.macro.breadth = { spy_1m_pct: 2.6, rsp_1m_pct: -0.8, divergence_pp: 3.4, alert: true, note: "Rally retto dalle megacap." };
+  const p1 = buildPrompt();
+  DATA.macro.breadth = { spy_1m_pct: 2.6, rsp_1m_pct: 1.9, divergence_pp: 0.7, alert: false };
+  const p2 = buildPrompt();
+  delete DATA.macro.breadth;
+  return p1.includes("[BREADTH DIVERGENCE]") && p1.includes("prudenza sui nuovi ingressi") &&
+    !p2.includes("[BREADTH DIVERGENCE]") && p2.includes("Ampiezza di mercato")`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

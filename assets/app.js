@@ -4858,6 +4858,29 @@ function buildPrompt() {
     const fs = [fp("nasdaq", "Nasdaq 100 (NQ)"), fp("sp500", "S&P 500 (ES)")].filter(Boolean);
     if (fs.length) lines.push(`- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): ${fs.join(" · ")} — negativi marcati = apertura USA in gap-down attesa.`);
   }
+  // RADAR SCHIUMA SPECULATIVA v126 (ETF a leva 3x): l'euforia retail terminale sul tech/semi
+  // è il contesto in cui questo portafoglio (87% tech) rischia di comprare l'ultimo massimo.
+  if (m.froth) {
+    const fr = m.froth;
+    const fbit = (k, lab) => fr[k] ? `${lab} RVol ${fmtNum.format(fr[k].rvol)}×${fr[k].chg_5d_pct != null ? ` (${signTxt(fr[k].chg_5d_pct)} 5g)` : ""}` : null;
+    const fbits = [fbit("soxl", "SOXL 3x semi"), fbit("tqqq", "TQQQ 3x NDX")].filter(Boolean);
+    if (fr.alert) {
+      lines.push(`- ⚠ [SPECULATIVE FROTH ALERT] Schiuma speculativa sugli ETF a leva: ${fbits.join(" · ")}. ${fr.note || ""} DIRETTIVA: è in corso una speculazione estrema sui prodotti a leva tech — NON impegnare il budget operativo in NUOVI acquisti tech/semi finché il volume non si normalizza; le posizioni esistenti restano protette SOLO dagli Stop Ratchet 2×ATR (non alzarli, non anticiparli). La riserva ES95 resta inviolabile.`);
+    } else if (fbits.length) {
+      lines.push(`- Schiuma speculativa ETF leva 3x (proxy euforia retail): ${fbits.join(" · ")} — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).`);
+    }
+  }
+  // PROXY AMPIEZZA DI MERCATO v126 (SPY vs RSP): un rally retto da poche megacap è la
+  // fragilità specifica di un book concentrato su NVDA/MU/AMD.
+  if (m.breadth) {
+    const br = m.breadth;
+    const base = `SPY (cap-pesato) ${signTxt(br.spy_1m_pct)} vs RSP (equi-pesato) ${signTxt(br.rsp_1m_pct)} a 1M · spread ${signTxt(br.divergence_pp, "pp")}`;
+    if (br.alert) {
+      lines.push(`- ⚠ [BREADTH DIVERGENCE] Ampiezza di mercato in deterioramento: ${base}. ${br.note || ""} DIRETTIVA: il rally NON è confermato dall'azione media — prudenza sui nuovi ingressi (sizing ridotto o ingresso post-conferma), priorità ai candidati con RS propria e non trainata dall'indice; per il book già concentrato sulle megacap questo è il segnale d'allarme più specifico: verifica la distanza degli stop ratchet.`);
+    } else {
+      lines.push(`- Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): ${base} — rally ${br.divergence_pp > 2 ? "trainato dalle megacap ma con partecipazione" : "con partecipazione ampia"} (alert se SPY+ con RSP− o spread >4pp).`);
+    }
+  }
   (m.markets || []).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   // ogni indicatore economico con la sua data di pubblicazione ESPLICITA: la latenza del dato
   // deve essere palese all'AI (CPI/NFP = mensili con ~1 mese di ritardo; PIL = trimestrale)

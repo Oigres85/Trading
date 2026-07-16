@@ -1820,7 +1820,9 @@ def fetch_macro():
     for key, fn in (("liquidity_split", fetch_liquidity_split),
                     ("dollar_ruler", fetch_dollar_ruler),
                     ("momentum", fetch_momentum),
-                    ("futures", fetch_futures)):   # v125: futures NQ/ES live (leading pre-apertura USA)
+                    ("futures", fetch_futures),          # v125: futures NQ/ES live (leading pre-apertura USA)
+                    ("froth", fetch_speculative_froth),  # v126: schiuma speculativa ETF 3x (SOXL/TQQQ)
+                    ("breadth", fetch_market_breadth)):  # v126: ampiezza SPY vs RSP (rally megacap-only)
         try:
             macro[key] = fn()
         except Exception as e:  # noqa: BLE001
@@ -1940,6 +1942,68 @@ def fetch_futures():
         except Exception as e:  # noqa: BLE001
             print(f"!! futures {sym}: {e}", file=sys.stderr)
     return out or None
+
+
+def fetch_speculative_froth():
+    """RADAR SCHIUMA SPECULATIVA (v126) — flussi sugli ETF a leva 3x (SOXL semis, TQQQ Nasdaq)
+    come proxy dell'euforia retail terminale. Segnale = VOLUME RELATIVO estremo (RVol vs media
+    30 sedute) DENTRO un movimento al rialzo a 5 sedute: ondata di volume mentre si sale =
+    frenesia d'acquisto. NIENTE RSI: su un 3x è strutturalmente ipercomprato in ogni trend →
+    solo falsi positivi. Alert se RVol ≥ 2.5 con prezzo su a 5 sedute su almeno un ETF."""
+    out = {}
+    for sym, key in (("SOXL", "soxl"), ("TQQQ", "tqqq")):
+        try:
+            h = drop_void_bars(yf.Ticker(sym).history(period="3mo", interval="1d", auto_adjust=True))
+            if len(h) < 35:
+                continue
+            vols = h["Volume"].dropna()
+            # ultima seduta COMPLETA (stessa regola RVol del resto del sistema: il bar di oggi
+            # a sessione aperta è parziale e darebbe sempre <1)
+            _now = datetime.now(timezone.utc)
+            ri = -2 if (len(vols) and vols.index[-1].date() == _now.date() and _now.hour < 21) else -1
+            v_last = float(vols.iloc[ri])
+            v_avg = float(vols.iloc[ri - 30:ri].mean())
+            closes = h["Close"].dropna()
+            chg5 = (float(closes.iloc[-1]) / float(closes.iloc[-6]) - 1) * 100 if len(closes) >= 6 else None
+            if v_avg > 0:
+                out[key] = {"symbol": sym, "rvol": round(v_last / v_avg, 2),
+                            "chg_5d_pct": round(chg5, 2) if chg5 is not None else None}
+        except Exception as e:  # noqa: BLE001
+            print(f"!! froth {sym}: {e}", file=sys.stderr)
+    if not out:
+        return None
+    hot = [v for v in out.values() if v["rvol"] >= 2.5 and (v["chg_5d_pct"] or 0) > 0]
+    out["alert"] = bool(hot)
+    if hot:
+        out["note"] = ("Volume estremo in acquisto sugli ETF a leva 3x (" +
+                       ", ".join(f"{v['symbol']} RVol {v['rvol']}× / +{v['chg_5d_pct']}% 5g" for v in hot) +
+                       "): euforia retail terminale sul tech/semi.")
+    return out
+
+
+def fetch_market_breadth():
+    """PROXY AMPIEZZA DI MERCATO (v126) — S&P 500 capitalizzato (SPY) vs equi-pesato (RSP) a
+    21 sedute: se SPY sale mentre RSP arretra, il rally è retto da poche megacap — la fragilità
+    a cui un portafoglio concentrato su NVDA/MU/AMD è più esposto. Alert su divergenza:
+    SPY positivo con RSP negativo, oppure spread > 4pp."""
+    try:
+        rets = {}
+        for sym in ("SPY", "RSP"):
+            h = drop_void_bars(yf.Ticker(sym).history(period="3mo", interval="1d", auto_adjust=True))["Close"].dropna()
+            if len(h) < 22:
+                return None
+            rets[sym] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100
+        spread = rets["SPY"] - rets["RSP"]
+        alert = (rets["SPY"] > 0 and rets["RSP"] < 0) or spread > 4
+        out = {"spy_1m_pct": round(rets["SPY"], 2), "rsp_1m_pct": round(rets["RSP"], 2),
+               "divergence_pp": round(spread, 2), "alert": alert}
+        if alert:
+            out["note"] = (f"SPY {rets['SPY']:+.1f}% vs RSP {rets['RSP']:+.1f}% a 1M "
+                           f"(spread {spread:+.1f}pp): il rally è retto dalle megacap, l'azione media non partecipa.")
+        return out
+    except Exception as e:  # noqa: BLE001
+        print(f"!! breadth SPY/RSP: {e}", file=sys.stderr)
+        return None
 
 
 def compute_shock_alert(macro, watchlist):
