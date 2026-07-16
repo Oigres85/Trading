@@ -24,6 +24,11 @@ on:
     # 15:00–23:00 ITALIA sia in CEST (13–21 UTC) sia in CET (14–22 UTC).
     - cron: "0 13-22 * * 1-5"
   workflow_dispatch:
+    inputs:
+      notify_test:
+        description: "Solo test notifiche: invia un messaggio di prova (WhatsApp/email/Issue) e termina, senza toccare i dati"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -34,7 +39,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # DIAGNOSI CANALE NOTIFICHE (v127): lanciabile dal telefono via "Run workflow" con
+  # notify_test=true → prova WhatsApp/email/Issue e termina, senza rigenerare i dati.
+  # Serve a capire perché il WhatsApp "non arriva mai" (apikey/attivazione/dedup).
+  notify-test:
+    if: ${{ github.event.inputs.notify_test == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test canali notifica (incondizionato, bypassa dedup)
+        run: python scripts/notify_alerts.py --test
+        env:
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          GITHUB_TOKEN: ${{ github.token }}
+
   update:
+    if: ${{ github.event.inputs.notify_test != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

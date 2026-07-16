@@ -164,6 +164,17 @@ check("notify shock v125: collect_alerts raccoglie le fonti oltre -2%",
       "KOSPI (Asia) -8.9%" in _sc["shock"] and "Futures Nasdaq 100 -2.4%" in _sc["shock"])
 check("notify shock v125: build_message emette il blocco MACRO SHOCK ALERT",
       "MACRO SHOCK ALERT" in na.build_message(_sc, _shockd) and "SOSPENDI" in na.build_message(_sc, _shockd))
+# CallMeBot risponde 200 anche su errore: la validazione del BODY è ciò che distingue inviato/fallito
+check("notify v127: CallMeBot body 'Message queued' su HTTP 200 → ok",
+      na._callmebot_ok(200, "Message queued. You will receive it in a few seconds.") == (True, True, False))
+check("notify v127: CallMeBot 'APIKey is invalid' su HTTP 200 → FALLITO (non più falso 'inviato')",
+      na._callmebot_ok(200, "APIKey is invalid. ...")[0] is False)
+check("notify v127: CallMeBot telefono non attivato ('You need to activate the API') su 200 → FALLITO",
+      na._callmebot_ok(200, "You need to activate the API on your phone...")[0] is False)
+check("notify v127: HTTP 500 → FALLITO a prescindere dal body",
+      na._callmebot_ok(500, "Message queued")[0] is False)
+check("notify v127: body sconosciuto su 200 senza marker d'errore → ok ottimista (cascata copre)",
+      na._callmebot_ok(200, "<html>whatever</html>") == (True, False, False))
 
 # ---------- live-market + shock alert (v125): funzioni pure della pipeline ----------
 check("v125 is_live_market: cripto/futures/indici esteri sì, azioni USA e indici USA no",
@@ -277,6 +288,6 @@ check("div_yield_frac: senza tasso → fallback al campo % di Yahoo (ORCL 1.39 �
 check("div_yield_frac: cap 30% — un 453% (TLT-like) è errore di unità → None",
       ud.div_yield_frac(None, 84.0, 453.0) is None and ud.div_yield_frac(300.0, 84.0, None) is None)
 
-N_CHECKS = 51
+N_CHECKS = 56
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)

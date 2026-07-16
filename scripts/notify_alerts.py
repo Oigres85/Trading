@@ -87,6 +87,27 @@ def build_message(new, data):
         + "\nhttps://oigres85.github.io/Trading/"
 
 
+# CallMeBot risponde SEMPRE HTTP 200 (anche su apikey invalida / telefono non attivato): il
+# vero esito è nel BODY. Marker osservati sul campo — successo vs errore.
+_CALLMEBOT_OK = ("message queued", "message sent", "will receive it", "queued", "sent to")
+_CALLMEBOT_ERR = ("invalid", "not valid", "not registered", "not activated", "activate the api",
+                  "you need to", "not been activated", "apikey missing", "api key missing",
+                  "blocked", "not found", "wasn't able", "was not able", "no permission")
+
+
+def _callmebot_ok(status, body):
+    """L'incidente 'WhatsApp mai arrivato': CallMeBot ritorna 200 anche quando NON invia
+    (apikey sbagliata, telefono non attivato) → il vecchio `r.status == 200` credeva d'aver
+    inviato. Unico modo affidabile: leggere il BODY. Ritorna (ok, queued, errored):
+      • ok = True solo se 200 e NESSUN marker d'errore noto (ottimista sui body sconosciuti:
+        il fallimento reale porta sempre un marker d'errore, la cascata copre i falsi negativi);
+      • queued/errored = diagnostica loggata in Actions."""
+    low = (body or "").lower()
+    errored = any(e in low for e in _CALLMEBOT_ERR)
+    queued = any(o in low for o in _CALLMEBOT_OK)
+    return (status == 200 and not errored), queued, errored
+
+
 def send_whatsapp(msg):
     key = os.environ.get("CALLMEBOT_APIKEY")
     if not key:
@@ -95,9 +116,37 @@ def send_whatsapp(msg):
     url = ("https://api.callmebot.com/whatsapp.php?phone=" + urllib.parse.quote(phone)
            + "&apikey=" + urllib.parse.quote(key) + "&text=" + urllib.parse.quote(msg))
     with urllib.request.urlopen(url, timeout=20) as r:
-        ok = r.status == 200
-    print("notify: WhatsApp CallMeBot", "ok" if ok else f"HTTP {r.status}")
+        status = r.status
+        body = r.read().decode("utf-8", "replace")
+    ok, queued, errored = _callmebot_ok(status, body)
+    diag = ("queued" if queued else "nessun marker di successo") + (", ERRORE nel body" if errored else "")
+    # il body è loggato (troncato) in Actions: è LÌ che si diagnostica il "mai arrivato"
+    print(f"notify: WhatsApp CallMeBot {'ok' if ok else 'FALLITO'} (HTTP {status}, {diag}) "
+          f"body={body[:200]!r}", file=sys.stderr if not ok else sys.stdout)
     return ok
+
+
+def send_test():
+    """Modalità --test (diagnostica): invio INCONDIZIONATO (bypassa dedup e soglie) di un
+    messaggio di prova su tutti i canali, con esito per-canale. Serve a provare che il canale
+    WhatsApp funziona indipendentemente dallo stato di config/alert_state.json."""
+    msg = ("✅ Trading Dashboard — TEST NOTIFICHE "
+           + datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+           + "\nSe ricevi questo messaggio su WhatsApp, il canale CallMeBot è configurato bene.")
+    any_ok = False
+    for channel in (send_whatsapp, send_email, send_github_issue):
+        try:
+            res = bool(channel(msg))
+        except Exception as e:  # noqa: BLE001
+            res = False
+            print(f"!! notify --test {channel.__name__}: {e}", file=sys.stderr)
+        print(f"notify --test: {channel.__name__} → {'OK' if res else 'ko / non configurato'}")
+        any_ok = any_ok or res
+    if not any_ok:
+        print("!! notify --test: NESSUN canale riuscito. Checklist WhatsApp: secret "
+              "CALLMEBOT_APIKEY presente? CALLMEBOT_PHONE con prefisso +39? Attivazione fatta "
+              "(msg 'I allow callmebot to send me messages' al numero CallMeBot)?", file=sys.stderr)
+    return any_ok
 
 
 def send_email(msg):
@@ -170,6 +219,9 @@ def send_custom(text):
 
 
 def main():
+    if len(sys.argv) >= 2 and sys.argv[1] == "--test":
+        send_test()
+        return
     if len(sys.argv) >= 3 and sys.argv[1] == "--custom":
         send_custom(sys.argv[2])
         return
