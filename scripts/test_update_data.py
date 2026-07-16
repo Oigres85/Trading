@@ -169,12 +169,40 @@ check("notify shock v125: build_message emette il blocco MACRO SHOCK ALERT",
 check("v125 is_live_market: cripto/futures/indici esteri sì, azioni USA e indici USA no",
       ud.is_live_market("^KS11") and ud.is_live_market("BTC-USD") and ud.is_live_market("NQ=F")
       and not ud.is_live_market("AAPL") and not ud.is_live_market("^IXIC") and not ud.is_live_market("^GSPC"))
-check("v125 compute_shock_alert: KOSPI -8,9% + futures -2,4% → alert attivo, worst -8,9%",
+check("v125 compute_shock_alert: KOSPI -8,9% LIVE + futures -2,4% → alert attivo, worst -8,9%",
       (lambda s: s and s["active"] and s["worst_chg"] == -8.9 and len(s["sources"]) == 2)(
           ud.compute_shock_alert({"futures": {"nasdaq": {"change_pct": -2.4}, "sp500": {"change_pct": -0.5}}},
-                                 [{"ticker": "^KS11", "change_pct": -8.9}])))
+                                 [{"ticker": "^KS11", "change_pct": -8.9, "price_live": True}])))
 check("v125 compute_shock_alert: cali sotto soglia (-1,5%) → nessun alert (None)",
       ud.compute_shock_alert({"futures": {"nasdaq": {"change_pct": -1.5}}}, [{"ticker": "^KS11", "change_pct": -1.0}]) is None)
+
+# ---------- FIX FANTASMA v127: gate di sessione timezone-aware sul KOSPI a candela ----------
+from datetime import datetime as _dt, timezone as _tz
+_now_reopen = _dt(2026, 7, 17, 3, 0, tzinfo=_tz.utc)     # Seoul 2026-07-17 12:00 (sessione riaperta)
+# 1) FANTASMA: crollo di IERI (candela 2026-07-16) letto oggi (Seoul 2026-07-17) con Asia riaperta
+#    e live non disponibile → la candela stantia NON deve più attivare l'alert
+check("v127 shock fantasma: KOSPI -8,95% da candela di IERI (asof<oggi Seoul), no live → alert None",
+      ud.compute_shock_alert({}, [{"ticker": "^KS11", "change_pct": -8.95, "price_live": False,
+                                   "price_asof": "2026-07-16"}], now_utc=_now_reopen) is None)
+# 2) SESSIONE CORRENTE a candela: asof == oggi Seoul → alert legittimo attivo
+check("v127 shock sessione corrente: KOSPI -8,95% da candela di OGGI (asof==oggi Seoul) → alert attivo",
+      (lambda s: s and s["active"] and s["sources"][0]["basis"] == "candle")(
+          ud.compute_shock_alert({}, [{"ticker": "^KS11", "change_pct": -8.95, "price_live": False,
+                                       "price_asof": "2026-07-17"}], now_utc=_now_reopen)))
+# 3) LIVE è sempre corrente per costruzione (delta ricalcolato vs chiusura recente)
+check("v127 shock live: KOSPI -8,95% price_live=True → attivo a prescindere dalla data candela",
+      (lambda s: s and s["active"] and s["sources"][0]["basis"] == "live")(
+          ud.compute_shock_alert({}, [{"ticker": "^KS11", "change_pct": -8.95, "price_live": True}],
+                                 now_utc=_now_reopen)))
+# 4) i FUTURES restano live per costruzione (previous_close rolla al settlement) anche con KOSPI fantasma
+check("v127 shock: futures -3% live restano attivi mentre il KOSPI fantasma è soppresso",
+      (lambda s: s and len(s["sources"]) == 1 and s["sources"][0]["basis"] == "live")(
+          ud.compute_shock_alert({"futures": {"nasdaq": {"change_pct": -3.0}}},
+                                 [{"ticker": "^KS11", "change_pct": -8.95, "price_live": False,
+                                   "price_asof": "2026-07-16"}], now_utc=_now_reopen)))
+# 5) _market_date: offset Asia/Seoul (UTC+9) — 20:00 UTC del 16/07 è già 17/07 a Seoul
+check("v127 _market_date: 2026-07-16 20:00 UTC → 2026-07-17 a Seoul (UTC+9)",
+      ud._market_date("Asia/Seoul", _dt(2026, 7, 16, 20, 0, tzinfo=_tz.utc)).isoformat() == "2026-07-17")
 
 # ---------- BLINDATURA RATCHET + SCUDO SOTTO-ZERO (v115, post-incidente SNDK) ----------
 _nanf = float("nan")
@@ -249,6 +277,6 @@ check("div_yield_frac: senza tasso → fallback al campo % di Yahoo (ORCL 1.39 �
 check("div_yield_frac: cap 30% — un 453% (TLT-like) è errore di unità → None",
       ud.div_yield_frac(None, 84.0, 453.0) is None and ud.div_yield_frac(300.0, 84.0, None) is None)
 
-N_CHECKS = 48
+N_CHECKS = 51
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)

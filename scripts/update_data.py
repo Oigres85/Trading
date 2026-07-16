@@ -25,6 +25,11 @@ import urllib.parse
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
+try:
+    from zoneinfo import ZoneInfo            # py3.9+: gestisce la DST correttamente
+except Exception:                            # noqa: BLE001 — ambiente minimale senza modulo
+    ZoneInfo = None
+
 import feedparser
 import numpy as np
 import pandas as pd
@@ -2006,21 +2011,65 @@ def fetch_market_breadth():
         return None
 
 
-def compute_shock_alert(macro, watchlist):
-    """MACRO SHOCK ALERT v125 — riconosce le mattinate di panico: se l'Asia (KOSPI) o i futures
-    Nasdaq cedono oltre il -2% mentre Wall Street è chiusa, alza un flag che testata/critic/
-    dashboard leggono per SOSPENDERE gli acquisti aggressivi finché non si assesta la prima ora.
-    Legge i dati LIVE già raccolti (nessuna chiamata extra)."""
+_SHOCK_FALLBACK_OFFSET = {"Asia/Seoul": 9, "America/New_York": -4}   # ore vs UTC se manca tzdata
+
+
+def _market_date(tz_name, now_utc):
+    """Data di CALENDARIO nel fuso del mercato. Con ZoneInfo gestisce la DST; senza tzdata
+    (ambiente minimale) ricade su un offset fisso — per Asia/Seoul (UTC+9, niente DST) è
+    esatto tutto l'anno, che è il caso che conta per il gate anti-fantasma del KOSPI."""
+    if ZoneInfo is not None:
+        try:
+            return now_utc.astimezone(ZoneInfo(tz_name)).date()
+        except Exception:  # noqa: BLE001 — nome fuso non risolvibile: offset fisso
+            pass
+    return (now_utc + timedelta(hours=_SHOCK_FALLBACK_OFFSET.get(tz_name, 0))).date()
+
+
+def compute_shock_alert(macro, watchlist, now_utc=None):
+    """MACRO SHOCK ALERT (v127 session-aware) — riconosce le mattinate di panico: se l'Asia
+    (KOSPI) o i futures Nasdaq cedono oltre il -2% mentre Wall Street è chiusa, alza un flag che
+    testata/critic/dashboard leggono per SOSPENDERE gli acquisti aggressivi finché non si assesta
+    la prima ora. Legge i dati LIVE già raccolti (nessuna chiamata extra).
+
+    ⚠ FIX FANTASMA (v127): il -2% conta SOLO se il crollo appartiene alla SESSIONE CORRENTE del
+    suo mercato. Il bug reale: un KOSPI -8,95% restava flaggato per giorni perché, a Asia
+    RIAPERTA e prezzo live ~0%, la pipeline ricadeva sulla candela giornaliera STANTIA del giorno
+    del crollo (Yahoo può voidare la barra odierna / non averla ancora formata) e ne rileggeva la
+    variazione come se fosse di oggi. Discriminante:
+      • KOSPI LIVE (`price_live`): il delta è ricalcolato in real-time vs la chiusura più recente
+        → è per costruzione la sessione corrente → attendibile (a riapertura piatta dà ~0% da solo).
+      • KOSPI a CANDELA (`price_live` falso): vale solo se `price_asof` == data di Seoul di OGGI;
+        una candela di una sessione precedente è un FANTASMA → soppressa (loggata su stderr).
+      • Futures NQ=F/ES=F: `fast_info.previous_close` rolla al settlement CME (America/New_York),
+        quindi il delta è già ancorato alla sessione corrente → live per costruzione.
+    """
     THR = -2.0
-    sources = []
+    now_utc = now_utc or datetime.now(timezone.utc)
+    sources, suppressed = [], []
     fut = macro.get("futures") or {}
     for key, lab in (("nasdaq", "Futures Nasdaq 100"), ("sp500", "Futures S&P 500")):
         chg = (fut.get(key) or {}).get("change_pct")
         if chg is not None and chg <= THR:
-            sources.append({"src": lab, "chg": chg})
+            sources.append({"src": lab, "chg": chg, "basis": "live"})   # delta vs settlement corrente
     for r in watchlist:
-        if r.get("ticker") == "^KS11" and r.get("change_pct") is not None and r["change_pct"] <= THR:
-            sources.append({"src": "KOSPI (Asia)", "chg": r["change_pct"]})
+        if r.get("ticker") != "^KS11":
+            continue
+        chg = r.get("change_pct")
+        if chg is None or chg > THR:
+            continue
+        if r.get("price_live"):
+            sources.append({"src": "KOSPI (Asia)", "chg": chg, "basis": "live"})
+        else:
+            asof = r.get("price_asof")
+            seoul_today = _market_date("Asia/Seoul", now_utc)
+            if asof is not None and str(asof) == seoul_today.isoformat():
+                sources.append({"src": "KOSPI (Asia)", "chg": chg, "basis": "candle"})
+            else:
+                suppressed.append({"src": "KOSPI (Asia)", "chg": chg, "asof": asof, "today": seoul_today.isoformat()})
+    for s in suppressed:
+        print(f"·· shock alert: KOSPI {s['chg']}% SOPPRESSO (candela sessione precedente = fantasma; "
+              f"asof={s['asof']}, oggi Seoul={s['today']})", file=sys.stderr)
     if not sources:
         return None
     worst = min(s["chg"] for s in sources)
