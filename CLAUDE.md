@@ -120,5 +120,10 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
 - `config/prompt_header.txt` — **testata del prompt (editabile)**.
 - `config/holdings.json` — portafoglio/watchlist/broker (l'utente li aggiorna a mano).
 - `scripts/update_data.py` — pipeline dati (Yahoo/FRED/FINRA/scraping) → `data/data.json`.
+- `scripts/cio_report.mjs` — **engine Report CIO (v127)**: riusa il vm-harness di buildPrompt +
+  deep-data da data.json → Gemini stateless (system=testata, user=payload, `responseSchema`
+  `CIOReportSchema`) → validazione invarianti (0<stop<limite≤prezzo, ticker, budget) →
+  `data/cio_report.json`. No-op senza `GEMINI_API_KEY`; cassa assunta `CIO_CASH_EUR` (def 28500).
 - `scripts/test_app.mjs` / `test_update_data.py` / `audit_data.py` — test e gate qualità.
-- `.github/workflows/` — `update-data.yml` (dati) e `tests.yml` (CI test).
+- `.github/workflows/` — `update-data.yml` (dati; input `notify_test` per il test WhatsApp),
+  `cio-report.yml` (Report CIO, mattina feriale) e `tests.yml` (CI test).
