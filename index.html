@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=129">
+<link rel="stylesheet" href="assets/style.css?v=130">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -28,7 +28,7 @@
     </div>
   </div>
   <div class="actions">
-    <button class="btn btn-primary" id="btn-cio" aria-label="Genera il Report CIO completo: documento istituzionale, PDF ed export per analisi AI" title="Report CIO — documento completo, PDF ed export per analisi AI">📄 Report CIO</button>
+    <button class="btn btn-primary" id="btn-cio" aria-label="Copia il pacchetto completo per l'analisi AI: storico macro, tecnica, fondamentali e ultime news" title="Copia il pacchetto completo (storico macro + tecnica + fondamentali + news) da incollare in Claude">📋 Copia Analisi AI</button>
     <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: prezzi live subito + rigenerazione completa via pipeline (~2-3 min)">⟳ Aggiorna tutto</button>
   </div>
 </header>
@@ -356,17 +356,6 @@
   </div>
 </div>
 
-<!-- REPORT CIO (v128): documento client-side on-demand; isolato in stampa (@media print) → PDF nativo.
-     "Copia per analisi AI" esporta testata + payload + digest storici (ingloba il vecchio prompt AI). -->
-<div id="cio-report" class="cio-overlay" hidden>
-  <div class="cio-actions">
-    <button class="btn btn-primary" id="cio-copy" title="Copia il pacchetto completo (testata + dati + analisi storica) da incollare in Claude">📋 Copia per analisi AI</button>
-    <button class="btn btn-primary" id="cio-print" title="Salva come PDF con la stampa del browser">⬇ Scarica Report PDF</button>
-    <button class="btn btn-ghost" id="cio-close" aria-label="Chiudi il report">✕ Chiudi</button>
-  </div>
-  <div id="cio-body" class="cio-scroll"></div>
-</div>
-
-<script src="assets/app.js?v=129"></script>
+<script src="assets/app.js?v=130"></script>
 </body>
 </html>

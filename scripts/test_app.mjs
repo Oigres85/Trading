@@ -532,13 +532,8 @@ check("v126 breadth: divergenza SPY/RSP nel prompt con direttiva prudenza; forma
   return p1.includes("[BREADTH DIVERGENCE]") && p1.includes("prudenza sui nuovi ingressi") &&
     !p2.includes("[BREADTH DIVERGENCE]") && p2.includes("Ampiezza di mercato")`));
 
-/* ---------- v128: Report CIO client-side (documento + digest storici + export AI) ---------- */
-check("CIO v128: renderCIOReport dal DATA vivo → header istituzionale, verdetto, tabelle ptf/watchlist, zero leak", run(`
-  const html = renderCIOReport();
-  return html.includes("COMITATO DI INVESTIMENTO") && html.includes("Verdetto del motore")
-      && html.includes("TST1") && html.includes("lettura storica dei grafici")
-      && !html.includes("undefined") && !/>\\s*null\\s*</.test(html)`));
-check("CIO v128: buildCIOText = prompt esistente + ANALISI STORICA + FONDAMENTALE PROFONDO (ingloba il prompt AI)", run(`
+/* ---------- v130: Analisi AI a bottone unico (buildCIOText + digest storici) ---------- */
+check("CIO v130: buildCIOText = prompt esistente + ANALISI STORICA + FONDAMENTALE PROFONDO (ingloba il prompt AI)", run(`
   const t = buildCIOText();
   return t.includes("ANALISI STORICA") && t.includes("FONDAMENTALE PROFONDO")
       && t.indexOf("ANALISI STORICA") > t.length / 2 && t.includes(buildPrompt().slice(0, 200))`));

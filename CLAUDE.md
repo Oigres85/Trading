@@ -123,17 +123,16 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
 - `scripts/test_app.mjs` / `test_update_data.py` / `audit_data.py` — test e gate qualità.
 - `.github/workflows/` — `update-data.yml` (dati) e `tests.yml` (CI test).
 
-## 📄 Report CIO (v128) — l'UNICO flusso di analisi
+## 📋 Copia Analisi AI (v130) — l'UNICO flusso di analisi, UN SOLO bottone
 
-Bottone "📄 Report CIO" in topbar → `renderCIOReport()` genera CLIENT-SIDE, on-demand, il
-documento istituzionale completo (allarmi/veto, verdetto motore, digest storici macro,
-portafoglio, watchlist, trend multi-orizzonte da sparks, fondamentale profondo CAGR, news,
-track record). Due azioni: **Scarica Report PDF** (stampa nativa, `@media print` isola
-`#cio-report`) e **Copia per analisi AI** (`buildCIOText()` = `buildPrompt()` +
-`historicalDigestText()`) da incollare in Claude per l'analisi senior con verifica web.
-- Il vecchio bottone "Copia prompt AI" è stato INGLOBATO qui (rimosso dalla topbar; la modal
-  `#modal` resta come fallback clipboard). `buildPrompt()` resta INTATTO (Regola Suprema):
-  `buildCIOText` APPENDE i digest, non modifica la coda.
+Bottone "📋 Copia Analisi AI" in topbar → `copyCIOText()`: genera CLIENT-SIDE il pacchetto
+completo (`buildCIOText()` = `buildPrompt()` + `historicalDigestText()`), lo copia negli
+appunti e apre la modal `#modal` per revisione/modifica. Si incolla in Claude per l'analisi
+senior con verifica web. Il lettore del report È Claude: il testo è il report.
+- Il documento HTML/PDF istituzionale (`renderCIOReport`, overlay `#cio-report`, stili
+  `.cio-*`, `@media print`) è stato RIMOSSO per decisione del CEO (v130) — non reintrodurlo:
+  era un artefatto intermedio senza lettore.
+- `buildPrompt()` resta INTATTO (Regola Suprema): `buildCIOText` APPENDE i digest.
 - I DIGEST STORICI (`buildHistoricalDigests`/`sparkTrendRows`/`titleDeepData`) sono la
   "lettura quantitativa dei grafici" dei popup: pendenze, percentili nel range, inversioni
   — calcolati da serie GIÀ in data.json (margin_debt.history, credit.history, curve_history,

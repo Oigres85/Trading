@@ -5070,13 +5070,13 @@ function toast(msg) {
   setTimeout(() => el.remove(), 2500);
 }
 
-/* ============ REPORT CIO (v128) — documento istituzionale CLIENT-SIDE, on-demand ============
-   Il report si genera DAL VIVO nel browser a ogni click (niente file CI, niente LLM di mezzo):
-   sempre disponibile, sempre coerente coi dati caricati e con la CASSA VERA dell'utente.
-   Ingloba il vecchio "Copia prompt AI" (bottone rimosso): l'azione "Copia per analisi AI" copia
-   buildPrompt() + i DIGEST STORICI (la "lettura quantitativa dei grafici" dei popup) + il
-   fondamentale profondo — il pacchetto completo da incollare in Claude per l'analisi senior.
-   Il PDF è la stampa nativa del browser (@media print isola #cio-report): zero dipendenze. */
+/* ============ ANALISI AI (v130) — UN SOLO BOTTONE, un solo flusso ============
+   "📋 Copia Analisi AI" genera DAL VIVO (niente file CI, niente LLM di mezzo) il pacchetto
+   COMPLETO da incollare in Claude: buildPrompt() intatto (testata utente + payload dati) +
+   i DIGEST STORICI (la "lettura quantitativa dei grafici" dei popup: macro, tecnica multi-
+   orizzonte, fondamentale profondo) + le news già nel payload. Copia negli appunti e mostra
+   la modal per revisione/modifica. Il documento HTML/PDF istituzionale è stato RIMOSSO per
+   decisione del CEO (il lettore del report è Claude, non un umano: il testo È il report). */
 
 /* ---------- helpers numerici null-safe (— ovunque manchi il dato) ---------- */
 const dgFin = (v) => (v != null && Number.isFinite(Number(v))) ? Number(v) : null;
@@ -5202,163 +5202,22 @@ function buildCIOText() {
   return buildPrompt() + "\n\n" + historicalDigestText();
 }
 
-/* ---------- documento istituzionale (HTML → stampa PDF nativa) ---------- */
-function cioTag(txt, cls) { return `<span class="cio-tag ${cls}">${esc(txt)}</span>`; }
-
-function renderCIOReport() {
-  if (!DATA) return `<div class="cio-doc cio-empty"><h1>Dati non ancora caricati</h1><p>Attendi il caricamento della dashboard e riprova.</p></div>`;
-  const t = DATA.totals || {};
-  const eurusd = DATA.eurusd || 1.08;
-  const v = decisionVerdict();
-  const digests = buildHistoricalDigests();
-  const trends = sparkTrendRows();
-  const deep = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
-    .filter(r => r && r.currency === "USD" && r.price > 0 && !/^[\^]/.test(r.ticker) && !/[=]F$|-USD$/.test(r.ticker))
-    .map(titleDeepData);
-  const upd = (DATA.updated_at || "—").slice(0, 16).replace("T", " ");
-
-  /* — allarmi & veto (tutto ciò che oggi è sparso in banner/popup) — */
-  const alarms = [];
-  const sh = (DATA.macro || {}).shock_alert;
-  if (sh?.active) alarms.push(`🚨 MACRO SHOCK ALERT: ${(sh.sources || []).map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} — sospendi gli acquisti aggressivi, attendi l'assestamento della prima ora USA.`);
-  const fr = (DATA.macro || {}).froth;
-  if (fr?.alert) alarms.push(`🫧 SPECULATIVE FROTH: ${fr.note || "volumi estremi sugli ETF 3x"}`);
-  const br = (DATA.macro || {}).breadth;
-  if (br?.alert) alarms.push(`📉 BREADTH DIVERGENCE: ${br.note || "il rally è retto dalle megacap"}`);
-  for (const x of v.stopViolations || []) alarms.push(`⛔ STOP VIOLATO: ${x.r.ticker} (prezzo ${cur(x.r)}${fmtNum.format(x.r.price)} sotto stop ${cur(x.r)}${fmtNum.format(x.stop)}) — disciplina: uscita o ri-arm consapevole.`);
-  const in7 = (d) => { if (!d) return false; const dd = (new Date(d) - Date.now()) / 86400000; return dd >= 0 && dd <= 7; };
-  const earn = (DATA.portfolio || []).filter(r => r.qty && in7(r.earnings_date)).map(r => `${r.ticker} ${String(r.earnings_date).slice(5, 10)}`);
-  if (earn.length) alarms.push(`📅 EARNINGS ≤7g su posizioni: ${earn.join(", ")} — rischio gap, niente nuovi ingressi a ridosso.`);
-  const dq = ((DATA.data_quality || {}).alerts || []);
-  if (dq.length) alarms.push(`🟡 DATA QUALITY: ${dq.join(", ")} — verifica sul web i dati flaggati prima di usarli.`);
-  for (const x of v.excluded || []) alarms.push(`🛑 VETO ${esc(x.verdict || "")}: ${x.r.ticker} — ${(x.why || []).join(", ")}${x.r.qty ? " [in ptf: vieta l'accumulo, non ordina la vendita]" : ""}`);
-  for (const c of v.concentrationAlert || []) alarms.push(`⚠ CONCENTRAZIONE: ${c.r.ticker} ${c.w}% del NAV oltre la soglia di attenzione (Let Winners Run: nessun trim d'ufficio).`);
-
-  /* — piano operativo del motore — */
-  const planRows = (v.withPlan || []).map(p => `<tr>
-    <td class="cio-tk">${esc(p.r.ticker)}</td><td>${cioTag(v.label === "LIQUIDITÀ" ? "PRONTO (no cassa)" : "CANDIDATO", "cio-buy")}</td>
-    <td class="cio-r">${dgTxt(p.q, "", 0)}</td><td class="cio-r">${dgTxt(p.qty, "", 0)}</td>
-    <td class="cio-r">$${fmtNum.format(p.limit)}</td><td class="cio-r">$${fmtNum.format(p.stop)}</td>
-    <td class="cio-r">${p.qty && p.limit ? "$" + fmtNum.format(Math.round(p.qty * p.limit)) : "—"}</td></tr>`).join("");
-  const rehab = (v.rehabbed || []).map(x => x.r.ticker).join(", ");
-
-  /* — tabella portafoglio (posizioni reali) — */
-  const usdNav = dgFin(t.usd_value);
-  const ptfRows = (DATA.portfolio || []).filter(r => r.qty).map(r => {
-    const vUsd = r.currency === "EUR" ? (dgFin(r.value) ?? 0) * eurusd : dgFin(r.value);
-    const w = (vUsd && usdNav) ? vUsd / usdNav * 100 : null;
-    return `<tr><td class="cio-tk">${esc(r.ticker)}</td><td class="cio-r">${dgTxt(r.qty, "", 0)}</td>
-      <td class="cio-r">${cur(r)}${dgTxt(r.pmc, "", 2)}</td><td class="cio-r">${cur(r)}${dgTxt(r.price, "", 2)}</td>
-      <td class="cio-r">${signTxt(dgFin(r.change_pct))}</td><td class="cio-r">${dgTxt(w, "%")}</td>
-      <td class="cio-r">${signTxt(dgFin(r.gain_pct))}</td><td class="cio-r">${r.stop_atr != null ? cur(r) + dgTxt(r.stop_atr, "", 2) + (r.stop_violated ? " ⛔" : "") : "—"}</td>
-      <td class="cio-r">${signTxt(dgFin(r.rs_ndx_1m), "pp")}</td><td class="cio-r">${dgTxt(r.sortino_1y, "", 2)}</td>
-      <td class="cio-r">${dgTxt(r.risk_contrib_pct, "%")}</td><td>${esc(r.signal ?? "—")}</td></tr>`;
-  }).join("");
-
-  /* — watchlist compatta — */
-  const wlRows = (DATA.watchlist || []).filter(r => r.currency === "USD" && r.price > 0 && !r.qty).map(r =>
-    `<tr><td class="cio-tk">${esc(r.ticker)}</td><td class="cio-r">${cur(r)}${dgTxt(r.price, "", 2)}</td>
-     <td class="cio-r">${signTxt(dgFin(r.change_pct))}</td><td class="cio-r">${signTxt(dgFin(r.rs_ndx_1m), "pp")}</td>
-     <td class="cio-r">${r.support != null ? cur(r) + dgTxt(r.support, "", 2) : "—"}</td>
-     <td class="cio-r">${esc(r.risk_reward ?? "—")}</td><td>${esc(r.signal ?? "—")}</td></tr>`).join("");
-
-  /* — news recenti — */
-  const newsRows = (DATA.news || []).slice(0, 10).map(n =>
-    `<li><b>${esc((n.published || "").slice(5, 16).replace("T", " "))}</b> · ${esc(n.title_it || n.title || "")} <span class="cio-trace">(${esc(n.source || "—")}${Array.isArray(n.tickers) && n.tickers.length ? " · " + n.tickers.join(",") : ""})</span></li>`).join("");
-
-  const vt = DATA.verdict_track || {};
-  const trendRows = trends.map(r => `<tr><td class="cio-tk">${esc(r.tk)}${r.held ? " ●" : ""}</td>
-    <td class="cio-r">${signTxt(r.w1)}</td><td class="cio-r">${signTxt(r.m1)}</td>
-    <td class="cio-r">${signTxt(r.m3)}</td><td class="cio-r">${signTxt(r.y1)}</td></tr>`).join("");
-  const deepRows = deep.map(x => `<tr><td class="cio-tk">${esc(x.tk)}</td>
-    <td class="cio-r">${dgTxt(x.revCagr, "%")}${x.span ? ` <span class="cio-trace">(${x.span}A)</span>` : ""}</td>
-    <td class="cio-r">${dgTxt(x.niCagr, "%")}</td><td class="cio-r">${dgTxt(x.revYoY, "%")}</td>
-    <td class="cio-r">${dgTxt(x.epsG, "%")}</td><td class="cio-r">${dgTxt(x.fwdPe)}</td>
-    <td class="cio-r">${dgTxt(x.peg, "", 2)}</td><td class="cio-r">${dgTxt(x.upside, "%")}</td></tr>`).join("");
-
-  return `<article class="cio-doc">
-    <header class="cio-header">
-      <div>
-        <div class="cio-kicker">COMITATO DI INVESTIMENTO — REPORT OPERATIVO</div>
-        <h1>Trading Dashboard · Report CIO</h1>
-      </div>
-      <div class="cio-meta">
-        <div>Dati del <b>${esc(upd)}</b> · generato ora, client-side</div>
-        <div>NAV ${t.eur_value != null ? fmtEUR.format(Math.round(t.eur_value)) : "—"} · cassa ${fmtEUR.format(Math.round(cashEur || 0))}</div>
-        <div>Budget operativo ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"} (cassa − ES95)</div>
-        <div class="cio-model">Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · Sortino ${dgTxt(t.portfolio_sortino_ratio, "", 2)} · β NDX ${dgTxt(t.portfolio_beta_ndx, "", 2)} · ES95 1g ${t.es95_hist_eur != null ? fmtEUR.format(t.es95_hist_eur) : "—"}</div>
-      </div>
-    </header>
-    ${alarms.length ? `<section class="cio-alarms"><h2>⚠ Allarmi &amp; Veto (${alarms.length})</h2><ul>${alarms.map(a => `<li>${a}</li>`).join("")}</ul></section>` : ""}
-    <section class="cio-sec"><h2>1 · Verdetto del motore: ${esc(v.label)} (${dgTxt(v.score, "", 0)}/100)</h2>
-      <ul class="cio-list">${(v.reasons || []).map(r => `<li>${esc(r)}</li>`).join("") || "<li>—</li>"}</ul>
-      ${planRows ? `<div class="cio-table-wrap"><table class="cio-table">
-        <thead><tr><th>Titolo</th><th>Stato</th><th>Score</th><th>Qtà</th><th>Limite</th><th>Stop</th><th>Controvalore</th></tr></thead>
-        <tbody>${planRows}</tbody></table></div>` : `<p class="cio-trace">Nessun piano d'ingresso eseguibile oggi.</p>`}
-      ${rehab ? `<p class="cio-trace">Riabilitati (SORVEGLIATI): ${esc(rehab)}</p>` : ""}</section>
-    <section class="cio-sec"><h2>2 · Macro &amp; Regime — lettura storica dei grafici</h2>
-      <div class="cio-table-wrap"><table class="cio-table">
-        <thead><tr><th>Serie</th><th>Lettura quantitativa</th></tr></thead>
-        <tbody>${digests.map(d => `<tr><td class="cio-tk">${esc(d.label)}</td><td>${esc(d.text)}</td></tr>`).join("")}</tbody>
-      </table></div></section>
-    <section class="cio-sec"><h2>3 · Portafoglio (${(DATA.portfolio || []).filter(r => r.qty).length} posizioni)</h2>
-      <div class="cio-table-wrap"><table class="cio-table">
-        <thead><tr><th>Titolo</th><th>Qtà</th><th>PMC</th><th>Prezzo</th><th>Oggi</th><th>Peso</th><th>Gain</th><th>Stop</th><th>RS 1M</th><th>Sortino</th><th>MCR</th><th>Segnale</th></tr></thead>
-        <tbody>${ptfRows || `<tr><td colspan="12" class="cio-empty-row">Nessuna posizione.</td></tr>`}</tbody>
-      </table></div></section>
-    <section class="cio-sec"><h2>4 · Watchlist</h2>
-      <div class="cio-table-wrap"><table class="cio-table">
-        <thead><tr><th>Titolo</th><th>Prezzo</th><th>Oggi</th><th>RS 1M</th><th>Supp.</th><th>R/R</th><th>Segnale</th></tr></thead>
-        <tbody>${wlRows || `<tr><td colspan="7" class="cio-empty-row">—</td></tr>`}</tbody>
-      </table></div></section>
-    <section class="cio-sec"><h2>5 · Trend multi-orizzonte (● = in portafoglio)</h2>
-      <div class="cio-table-wrap"><table class="cio-table">
-        <thead><tr><th>Titolo</th><th>1S</th><th>1M</th><th>3M</th><th>1A</th></tr></thead>
-        <tbody>${trendRows || `<tr><td colspan="5" class="cio-empty-row">—</td></tr>`}</tbody>
-      </table></div></section>
-    <section class="cio-sec"><h2>6 · Fondamentale profondo (CAGR dai bilanci)</h2>
-      <div class="cio-table-wrap"><table class="cio-table">
-        <thead><tr><th>Titolo</th><th>CAGR ricavi</th><th>CAGR utili</th><th>Ricavi YoY</th><th>EPS ttm→fwd</th><th>Fwd P/E</th><th>PEG</th><th>Upside target</th></tr></thead>
-        <tbody>${deepRows || `<tr><td colspan="8" class="cio-empty-row">—</td></tr>`}</tbody>
-      </table></div></section>
-    <section class="cio-sec"><h2>7 · News recenti</h2>
-      <ul class="cio-list">${newsRows || "<li>—</li>"}</ul></section>
-    <section class="cio-sec"><h2>8 · Track record del motore</h2>
-      <p>${vt.since ? `Dal ${esc(vt.since)}: ${dgTxt(vt.episodes, "", 0)} episodi di segnale · esiti maturi ≥7g: ${dgTxt(vt.mature7?.n, "", 0)} · ≥30g: ${dgTxt(vt.mature30?.n, "", 0)}.` : "—"}</p></section>
-    <footer class="cio-foot">Report generato client-side dai dati della dashboard (pipeline ${esc(upd)}); cassa e budget = valori REALI dell'utente.
-      Per l'analisi senior: "Copia per analisi AI" esporta testata + payload + questa lettura storica, da incollare in Claude (obblighi di verifica web nella testata).
-      Documento di supporto decisionale, non consulenza finanziaria. Repo pubblico: i valori sono reali.</footer>
-  </article>`;
-}
-
-function openCIOReport() {
-  if (!DATA) { toast("Dati non ancora caricati, riprova tra un attimo"); return; }
-  $("#cio-body").innerHTML = renderCIOReport();
-  $("#cio-report").hidden = false;
-  document.body.classList.add("cio-open");
-}
-function closeCIOReport() {
-  $("#cio-report").hidden = true;
-  document.body.classList.remove("cio-open");
-}
+/* ---------- azione unica: copia il pacchetto completo e mostralo nella modal ---------- */
 async function copyCIOText() {
-  if (!DATA) { toast("Dati non ancora caricati"); return; }
+  if (!DATA) { toast("Dati non ancora caricati, riprova tra un attimo"); return; }
   const text = buildCIOText();
-  $("#prompt-text").value = text;   // la modal resta il fallback/editor (clipboard può mancare su iOS)
+  $("#prompt-text").value = text;   // visibile/editabile nel box (e copiabile a mano se la clipboard manca, es. iOS)
+  $("#modal").hidden = false;
   try {
     await navigator.clipboard.writeText(text);
-    toast("Pacchetto analisi copiato ✓ — incollalo in Claude");
-  } catch {
-    $("#modal").hidden = false;     // clipboard negata: si copia a mano dal box
-  }
+    toast("Analisi AI copiata ✓ — incollala in Claude");
+  } catch { /* clipboard non disponibile: si copia dal box */ }
 }
+
 
 /* ---------------- eventi ---------------- */
 $("#btn-refresh").addEventListener("click", refreshAll);
-$("#btn-cio")?.addEventListener("click", openCIOReport);
-$("#cio-close")?.addEventListener("click", closeCIOReport);
-$("#cio-print")?.addEventListener("click", () => window.print());
-$("#cio-copy")?.addEventListener("click", copyCIOText);
+$("#btn-cio")?.addEventListener("click", copyCIOText);
 $("#modal-close").addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
 $("#btn-copy").addEventListener("click", async () => {
