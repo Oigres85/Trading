@@ -552,12 +552,18 @@ check("CIO v128: digest HY OAS — percentile nel range e allarme compressione",
   const d = buildHistoricalDigests().find(x => x.label.startsWith("HY OAS"));
   DATA.macro.credit = saved;
   return d.text.includes("percentile 0°") && d.text.includes("compressione estrema")`));
-check("CIO v128: sparkTrendRows calcola la variazione % first→last per range e marca [ptf]", run(`
+check("CIO v130: sparkTrendRows calcola la variazione % first→last per range (serie abbastanza lunghe) e marca [ptf]", run(`
   const saved = DATA.portfolio[0].sparks;
-  DATA.portfolio[0].sparks = { m1: [100, 105, 110], y1: [200, 150] };
+  DATA.portfolio[0].sparks = { m1: Array.from({length: 20}, (_, i) => 100 + i * (10/19)), y1: Array.from({length: 46}, (_, i) => 200 - i * (50/45)) };
   const r = sparkTrendRows().find(x => x.tk === "TST1");
   DATA.portfolio[0].sparks = saved;
-  return r && Math.round(r.m1) === 10 && Math.round(r.y1) === -25 && r.held === true && r.w1 === null`));
+  return r && Math.round(r.m1) === 10 && Math.round(r.y1) === -25 && r.held === true && r.w1 === null && r.short === false`));
+check("CIO v130: sparkTrendRows scarta gli orizzonti a storia insufficiente (titolo appena quotato) e li marca", run(`
+  const saved = DATA.portfolio[0].sparks;
+  DATA.portfolio[0].sparks = { w1: [100, 98, 95, 91], m1: [100, 98, 95, 91], m3: [100, 98, 95, 91], y1: [100, 98, 95, 91] };
+  const r = sparkTrendRows().find(x => x.tk === "TST1");
+  DATA.portfolio[0].sparks = saved;
+  return r && r.w1 !== null && r.m1 === null && r.m3 === null && r.y1 === null && r.short === true`));
 check("CIO v128: titleDeepData — CAGR ricavi dai financials pluriennali e EPS ttm→fwd", run(`
   const d = titleDeepData({ ticker: "TSTX", price: 100,
     financials: [{ year: 2022, revenue: 100, net_income: 10 }, { year: 2025, revenue: 200, net_income: -5 }],

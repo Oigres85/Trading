@@ -5152,8 +5152,8 @@ function buildHistoricalDigests() {
   const mh = Array.isArray(DATA.metrics_history) ? DATA.metrics_history : [];
   const navs = mh.map(x => dgFin(x && x.eur_value)).filter(x => x != null);
   const shp = mh.map(x => dgFin(x && x.sharpe)).filter(x => x != null);
-  out.push({ label: `NAV & Sharpe del fondo (storico ${mh.length} rilevazioni)`, text: navs.length >= 2
-    ? `NAV €${fmtNum.format(Math.round(navs[navs.length - 1]))} · Δ7 rilev. ${signTxt(dgDelta(navs, Math.min(7, navs.length - 1)))} · Sharpe ${dgTxt(shp[shp.length - 1], "", 2)} (Δ7 ${shp.length >= 8 ? dgTxt(shp[shp.length - 1] - shp[shp.length - 8], "", 2) : "—"})`
+  out.push({ label: `Controvalore investito & Sharpe del fondo (storico ${mh.length} rilevazioni)`, text: navs.length >= 2
+    ? `investito €${fmtNum.format(Math.round(navs[navs.length - 1]))} (MTM, cassa esclusa) · Δ7 rilev. ${signTxt(dgDelta(navs, Math.min(7, navs.length - 1)))} · Sharpe ${dgTxt(shp[shp.length - 1], "", 2)} (Δ7 ${shp.length >= 8 ? dgTxt(shp[shp.length - 1] - shp[shp.length - 8], "", 2) : "—"})`
     : "—" });
 
   return out;
@@ -5165,11 +5165,14 @@ function sparkTrendRows() {
   for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) {
     if (!r || r.currency !== "USD" || !(r.price > 0)) continue;
     const sp = r.sparks || {};
-    const tr = (k) => { const a = Array.isArray(sp[k]) ? sp[k].map(dgFin).filter(x => x != null) : [];
-      return a.length >= 2 ? (a[a.length - 1] / a[0] - 1) * 100 : null; };
-    const w1 = tr("w1"), m1 = tr("m1"), m3 = tr("m3"), y1 = tr("y1");
+    // ogni orizzonte richiede abbastanza barre da COPRIRLO davvero: su un titolo appena quotato
+    // (es. SKHY) le serie sono troncate e 1S=1M=3M darebbero lo STESSO numero (falso multi-orizzonte).
+    const tr = (k, minLen) => { const a = Array.isArray(sp[k]) ? sp[k].map(dgFin).filter(x => x != null) : [];
+      return a.length >= minLen ? (a[a.length - 1] / a[0] - 1) * 100 : null; };
+    const w1 = tr("w1", 4), m1 = tr("m1", 18), m3 = tr("m3", 50), y1 = tr("y1", 45);
     if ([w1, m1, m3, y1].every(v => v == null)) continue;
-    rows.push({ tk: r.ticker, w1, m1, m3, y1, held: !!r.qty });
+    rows.push({ tk: r.ticker, w1, m1, m3, y1, held: !!r.qty,
+                short: [w1, m1, m3, y1].filter(v => v != null).length < 2 });
   }
   return rows;
 }
@@ -5184,7 +5187,7 @@ function historicalDigestText() {
     L.push(`TREND MULTI-ORIZZONTE PER TITOLO — ${tr.length} TITOLI → ${tr.length} righe (variazione % nel range; incrocia col RS 1M per confermare/negare il momentum):`);
     L.push("| Titolo | 1S | 1M | 3M | 1A |");
     L.push("|---|---|---|---|---|");
-    for (const r of tr) L.push(`| ${r.tk}${r.held ? " [ptf]" : ""} | ${signTxt(r.w1)} | ${signTxt(r.m1)} | ${signTxt(r.m3)} | ${signTxt(r.y1)} |`);
+    for (const r of tr) L.push(`| ${r.tk}${r.held ? " [ptf]" : ""}${r.short ? " [storia insuff.]" : ""} | ${signTxt(r.w1)} | ${signTxt(r.m1)} | ${signTxt(r.m3)} | ${signTxt(r.y1)} |`);
   }
   const deep = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
     .filter(r => r && r.currency === "USD" && r.price > 0 && !/^[\^]/.test(r.ticker) && !/[=]F$|-USD$/.test(r.ticker))
@@ -5195,7 +5198,7 @@ function historicalDigestText() {
     L.push("|---|---|---|---|---|---|---|---|");
     for (const t of deep) L.push(`| ${t.tk} | ${dgTxt(t.revCagr, "%")}${t.span ? ` (${t.span}A)` : ""} | ${dgTxt(t.niCagr, "%")} | ${dgTxt(t.revYoY, "%")} | ${dgTxt(t.epsG, "%")} | ${dgTxt(t.fwdPe)} | ${dgTxt(t.peg, "", 2)} | ${dgTxt(t.upside, "%")} |`);
   }
-  L.push("USO: incrocia CAGR e PEG coi multipli per giustificare/negare Let Winners Run; pendenze macro in deterioramento (Margin Debt in DELEVERAGING, HY OAS in allargamento, curva in dis-inversione) → riduci il sizing dei nuovi ingressi prima che i prezzi lo confermino.");
+  L.push("USO: incrocia CAGR e PEG coi multipli (Fwd P/E vs CAGR = PEG implicito) per giustificare/negare Let Winners Run — attenzione ai casi in cui il YoY gonfiato da un ciclo diverge dal CAGR pluriennale (rimbalzo, non crescita strutturale). Sulle pendenze macro, sia gli ESTREMI (Margin Debt a ridosso del picco = leva estrema, HY OAS ai minimi del range = compiacenza del credito) sia le INVERSIONI DI TENDENZA (leva in deleveraging, spread in allargamento, curva in dis-inversione) segnalano fragilità → riduci il sizing dei nuovi ingressi prima che i prezzi lo confermino.");
   return L.join("\n");
 }
 function buildCIOText() {
