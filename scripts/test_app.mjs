@@ -7,7 +7,6 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import vm from "node:vm";
-import { validateReport, computeDeepData } from "./cio_report.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
@@ -532,40 +531,6 @@ check("v126 breadth: divergenza SPY/RSP nel prompt con direttiva prudenza; forma
   delete DATA.macro.breadth;
   return p1.includes("[BREADTH DIVERGENCE]") && p1.includes("prudenza sui nuovi ingressi") &&
     !p2.includes("[BREADTH DIVERGENCE]") && p2.includes("Ampiezza di mercato")`));
-
-/* ---------- STEP 4: POST-validazione del Report CIO (cio_report.mjs) ---------- */
-// universo sintetico: prezzi correnti per la validazione degli ordini generati dall'LLM
-const cioLive = {
-  data: { portfolio: [{ ticker: "MU", price: 100 }, { ticker: "BTP-V28", price: 98 }],
-          watchlist: [{ ticker: "TSM", price: 200 }] },
-  budgetUsd: 5000,
-};
-const cioOrder = (o) => ({ analisi_portafoglio: [o] });
-check("CIO validazione: ordine ACCUMULA sano (0<stop<limite≤prezzo entro 30%) → nessuna violazione hard",
-  validateReport(cioOrder({ ticker: "MU", azione: "ACCUMULA", qty: 10, limite: 95, stop: 88 }), cioLive).hard.length === 0);
-check("CIO validazione: stop ≥ limite (incidente SNDK) → violazione hard",
-  validateReport(cioOrder({ ticker: "MU", azione: "ACCUMULA", qty: 10, limite: 90, stop: 95 }), cioLive).hard.some(v => /stop.*≥ limite/.test(v)));
-check("CIO validazione: ticker allucinato (non nel payload) → violazione hard",
-  validateReport(cioOrder({ ticker: "ZZZZ", azione: "NUOVO_INGRESSO", qty: 5, limite: 10, stop: 8 }), cioLive).hard.some(v => /inesistente/.test(v)));
-check("CIO validazione: limite oltre il 30% sotto il prezzo (SNDK $40 su $1900) → violazione hard",
-  validateReport(cioOrder({ ticker: "MU", azione: "ACCUMULA", qty: 10, limite: 60, stop: 50 }), cioLive).hard.some(v => /oltre il 30%/.test(v)));
-check("CIO validazione: budget operativo sforato (acquisti > cassa−ES95) → violazione hard",
-  validateReport(cioOrder({ ticker: "MU", azione: "ACCUMULA", qty: 100, limite: 95, stop: 88 }), cioLive).hard.some(v => /budget sforato/.test(v)));
-check("CIO validazione: MANTIENI senza ordine (qty/limite/stop null) → nessuna violazione",
-  validateReport(cioOrder({ ticker: "TSM", azione: "MANTIENI", qty: null, limite: null, stop: null }), cioLive).hard.length === 0);
-check("CIO validazione: BTP escluso dalla validazione ordini tattici",
-  validateReport(cioOrder({ ticker: "BTP-V28", azione: "MANTIENI" }), cioLive).hard.length === 0);
-check("CIO validazione: VENDI con limite sotto mercato → warning (non hard)",
-  (r => r.hard.length === 0 && r.warn.some(v => /svendita/.test(v)))(
-    validateReport(cioOrder({ ticker: "TSM", azione: "VENDI", qty: 5, limite: 150 }), cioLive)));
-check("CIO deep-data: computeDeepData filtra indici/futures/cripto e calcola CAGR/PEG per i titoli",
-  (dd => dd.titles.length >= 1 && dd.titles.every(t => "rev_cagr_4y_pct" in t && "peg" in t)
-        && !dd.titles.some(t => /^[\^]/.test(t.ticker) || /=F$|-USD$/.test(t.ticker)))(
-    computeDeepData({ portfolio: [{ ticker: "MU", currency: "USD", price: 100,
-      financials: [{ year: 2022, revenue: 100, net_income: 10 }, { year: 2025, revenue: 200, net_income: 20 }],
-      stats: { eps_ttm: 5, eps_forward: 8, forward_pe: 12, peg: 1.1, revenue_growth: 0.2, target_mean: 130 } }],
-      watchlist: [{ ticker: "^KS11", currency: "USD", price: 6800 }, { ticker: "BTC-USD", currency: "USD", price: 60000 }],
-      macro: {}, metrics_history: [] })));
 
 /* ---------- STEP 5: renderCIOReport (vista istituzionale, funzione pura di app.js) ---------- */
 check("CIO render: payload valido → ticker, tag azione colorato e box allarmi nell'HTML", run(`

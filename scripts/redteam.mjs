@@ -21,7 +21,7 @@
    di OGNI bug (impossibile), ma chiude le classi ricorrenti che finora trovava l'LLM a mano.
    Exit 1 con report dettagliato alla prima campagna con violazioni.
    In CI: gate HARD in tests.yml (il codice rotto non si pusha), best-effort + allarme
-   WhatsApp in update-data.yml (i dati freschi che rompono gli invarianti non passano
+   (email/Issue) in update-data.yml (i dati freschi che rompono gli invarianti non passano
    inosservati). Uso: node scripts/redteam.mjs [path/app.js] (default assets/app.js —
    il path alternativo serve a validare il detector su codice vecchio). */
 import { readFileSync } from "node:fs";

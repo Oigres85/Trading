@@ -24,46 +24,17 @@ on:
     # 15:00–23:00 ITALIA sia in CEST (13–21 UTC) sia in CET (14–22 UTC).
     - cron: "0 13-22 * * 1-5"
   workflow_dispatch:
-    inputs:
-      notify_test:
-        description: "Solo test notifiche: invia un messaggio di prova (WhatsApp/email/Issue) e termina, senza toccare i dati"
-        type: boolean
-        default: false
 
 permissions:
   contents: write
-  issues: write        # fallback notifiche: GitHub Issue quando WhatsApp/SMTP non configurati
+  issues: write        # fallback notifiche: GitHub Issue quando SMTP non configurato
 
 concurrency:
   group: update-data
   cancel-in-progress: true
 
 jobs:
-  # DIAGNOSI CANALE NOTIFICHE (v127): lanciabile dal telefono via "Run workflow" con
-  # notify_test=true → prova WhatsApp/email/Issue e termina, senza rigenerare i dati.
-  # Serve a capire perché il WhatsApp "non arriva mai" (apikey/attivazione/dedup).
-  notify-test:
-    if: ${{ github.event.inputs.notify_test == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Test canali notifica (incondizionato, bypassa dedup)
-        run: python scripts/notify_alerts.py --test
-        env:
-          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
-          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          MAIL_TO: ${{ secrets.MAIL_TO }}
-          GITHUB_TOKEN: ${{ github.token }}
-
   update:
-    if: ${{ github.event.inputs.notify_test != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -96,7 +67,7 @@ jobs:
       # RED TEAM sui DATI FRESCHI (v116): gli invarianti finanziari del motore vengono
       # verificati su tutte le combinazioni di stato UI PRIMA del commit. Un fallimento
       # qui NON blocca i dati (il bug sarebbe nel codice, non nei prezzi) ma fa scattare
-      # l'allarme WhatsApp: mai più scoprire un limite d'ordine folle leggendo il report.
+      # l'allarme: mai più scoprire un limite d'ordine folle leggendo il report.
       - name: Red team invarianti motore (dati freschi)
         id: redteam
         run: node scripts/redteam.mjs
@@ -112,8 +83,6 @@ jobs:
           la tab Actions."
         continue-on-error: true
         env:
-          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
-          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
@@ -122,34 +91,18 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       # notifiche alert (v113): stop violati / data quality / setup squeeze. Canali:
-      # WhatsApp CallMeBot → email SMTP → GitHub Issue (fallback senza secret).
+      # email SMTP → GitHub Issue (fallback senza secret). WhatsApp/CallMeBot rimosso (lug 2026).
       # ANTI-FRAGILE: lo script esce sempre 0; continue-on-error come seconda cintura.
       - name: Notifiche alert (best-effort)
         run: python scripts/notify_alerts.py
         continue-on-error: true
         env:
-          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
-          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
           GITHUB_TOKEN: ${{ github.token }}
-
-      # LLM-CRITIC (v122): QA SEMANTICO del prompt via Gemini — azzera il QA manuale del CEO.
-      # A ogni run genera il prompt reale e chiede a Gemini di trovare incoerenze/valori
-      # impossibili/campi mal-etichettati (ciò che il red team deterministico non vede).
-      # Difetti → alert WhatsApp + log in config/llm_critic_log.jsonl. Best-effort: exit 0
-      # sempre + continue-on-error. Senza GEMINI_API_KEY fa no-op (attivalo aggiungendo il secret).
-      - name: LLM-critic QA del prompt (best-effort)
-        run: node scripts/llm_critic.mjs
-        continue-on-error: true
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ secrets.GEMINI_MODEL }}
-          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
-          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
 
       - name: Commit dati aggiornati
         run: |
@@ -159,7 +112,6 @@ jobs:
           # file di stato best-effort: possono non esistere ai primi run
           git add config/verdict_history.jsonl 2>/dev/null || true
           git add config/alert_state.json 2>/dev/null || true
-          git add config/llm_critic_log.jsonl 2>/dev/null || true
           git diff --cached --quiet && echo "nessuna variazione" && exit 0
           git commit -m "Aggiornamento dati $(date -u +'%Y-%m-%d %H:%M UTC')"
           # push robusto: riprova con rebase se il remote è avanzato

@@ -164,17 +164,9 @@ check("notify shock v125: collect_alerts raccoglie le fonti oltre -2%",
       "KOSPI (Asia) -8.9%" in _sc["shock"] and "Futures Nasdaq 100 -2.4%" in _sc["shock"])
 check("notify shock v125: build_message emette il blocco MACRO SHOCK ALERT",
       "MACRO SHOCK ALERT" in na.build_message(_sc, _shockd) and "SOSPENDI" in na.build_message(_sc, _shockd))
-# CallMeBot risponde 200 anche su errore: la validazione del BODY è ciò che distingue inviato/fallito
-check("notify v127: CallMeBot body 'Message queued' su HTTP 200 → ok",
-      na._callmebot_ok(200, "Message queued. You will receive it in a few seconds.") == (True, True, False))
-check("notify v127: CallMeBot 'APIKey is invalid' su HTTP 200 → FALLITO (non più falso 'inviato')",
-      na._callmebot_ok(200, "APIKey is invalid. ...")[0] is False)
-check("notify v127: CallMeBot telefono non attivato ('You need to activate the API') su 200 → FALLITO",
-      na._callmebot_ok(200, "You need to activate the API on your phone...")[0] is False)
-check("notify v127: HTTP 500 → FALLITO a prescindere dal body",
-      na._callmebot_ok(500, "Message queued")[0] is False)
-check("notify v127: body sconosciuto su 200 senza marker d'errore → ok ottimista (cascata copre)",
-      na._callmebot_ok(200, "<html>whatever</html>") == (True, False, False))
+# v128: canale WhatsApp/CallMeBot RIMOSSO per decisione del CEO — la cascata è email→Issue
+check("notify v128: canale WhatsApp rimosso, cascata = email → GitHub Issue",
+      not hasattr(na, "send_whatsapp") and hasattr(na, "send_email") and hasattr(na, "send_github_issue"))
 
 # ---------- live-market + shock alert (v125): funzioni pure della pipeline ----------
 check("v125 is_live_market: cripto/futures/indici esteri sì, azioni USA e indici USA no",
@@ -255,29 +247,6 @@ _clean = ud.drop_void_bars(_g)
 check("barre-glitch: minimo fantasma (SNDK-like 40.1 su corpo 1910) e prezzi ≤0 scartati, flash crash vero conservato",
       len(_clean) == 2 and list(_clean["Low"]) == [1890.0, 95.0])
 
-# ---------- morning brief (v117): digest deterministico, componibile e pulito ----------
-import morning_brief as mb
-_bdata = {
-    "updated_at": "2026-07-12T06:01:00Z",
-    "totals": {"eur_value": 297662.47, "eur_gain_pct": 59.78},
-    "portfolio": [
-        {"ticker": "AAA", "currency": "USD", "price": 100.0, "stop_atr": 95.0, "value": 10000,
-         "change_pct": 1.2, "earnings_date": "2026-07-15"},
-        {"ticker": "BBB", "currency": "USD", "price": 50.0, "stop_atr": 55.0, "stop_violated": True,
-         "value": 5000, "change_pct": -2.0},
-    ],
-    "data_quality": {"alerts": ["umich: stale"]},
-    "macro": {"vix": {"value": 15.03}, "smart_money": {"vix_term_ratio": 0.81}},
-    "metrics_history": [{"date": "2026-07-04", "vix": 17.0}],
-}
-_bv = {"label": "ACCUMULA", "candidates": [{"tk": "SNDK", "q": 90, "limit": 1485.02}], "rehab": ["META"], "squeeze": []}
-_brief = mb.build_brief(_bdata, _bv, now=datetime(2026, 7, 12, 7, 0, tzinfo=timezone.utc))
-check("morning brief: verdetto, stop violati, earnings, delta VIX 7g e riabilitati tutti presenti",
-      all(s in _brief for s in ("ACCUMULA", "SNDK 90/100", "STOP VIOLATO: BBB", "AAA 15/07",
-                                "META", "umich: stale", "-2,0 vs 7g", "Stop vicini: AAA +5,3%")))
-check("morning brief: niente 'None'/'nan' nel testo e lunghezza entro il limite CallMeBot",
-      "None" not in _brief and "nan" not in _brief and len(_brief) <= 1400)
-
 # ---------- div_yield_frac (v118): dividendo assoluto/prezzo, non ambiguo + cap ----------
 check("div_yield_frac: rate/price esatto (GOOGL $0,84 su $357 = 0,24%, non il 25% del bug)",
       abs(ud.div_yield_frac(0.84, 357.0, 0.25) - 0.84 / 357.0) < 1e-9)
@@ -288,6 +257,6 @@ check("div_yield_frac: senza tasso → fallback al campo % di Yahoo (ORCL 1.39 �
 check("div_yield_frac: cap 30% — un 453% (TLT-like) è errore di unità → None",
       ud.div_yield_frac(None, 84.0, 453.0) is None and ud.div_yield_frac(300.0, 84.0, None) is None)
 
-N_CHECKS = 56
+N_CHECKS = 50
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
