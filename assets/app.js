@@ -5080,9 +5080,109 @@ async function showPrompt() {
   } catch { /* clipboard non disponibile: l'utente può copiare dal box */ }
 }
 
+/* ============ REPORT CIO (v127, STEP 5) — vista istituzionale + stampa PDF nativa ============
+   Legge il report STRUTTURATO e VALIDATO generato in CI (data/cio_report.json da
+   scripts/cio_report.mjs) e lo rende come documento formale. Il PDF è la STAMPA nativa del
+   browser (@media print isola #cio-report): zero dipendenze, funziona su GitHub Pages e iPhone.
+   Il bottone AFFIANCA "Copia prompt AI" (fallback collaudato + flusso manuale con web-search),
+   non lo sostituisce. */
+const CIO_RAW_URL = () => `https://raw.githubusercontent.com/${REPO}/main/data/cio_report.json?t=${Date.now()}`;
+const CIO_PAGES_URL = () => `data/cio_report.json?t=${Date.now()}`;
+let CIO_REPORT = null;
+
+async function loadCIOReport() {
+  const grab = async (url) => {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error(String(r.status));
+    return JSON.parse((await r.text()).replace(/\bNaN\b/g, "null"));
+  };
+  try { CIO_REPORT = await grab(CIO_RAW_URL()); }
+  catch { try { CIO_REPORT = await grab(CIO_PAGES_URL()); } catch { CIO_REPORT = null; } }
+  updateCIOButton();
+  return CIO_REPORT;
+}
+function updateCIOButton() {
+  const btn = $("#btn-cio"); if (!btn) return;
+  const ts = CIO_REPORT?.meta?.generated_at;
+  btn.title = ts ? `Report CIO del ${new Date(ts).toLocaleString("it-IT")} — apri e stampa in PDF`
+                 : "Nessun report CIO ancora generato (workflow cio-report.yml)";
+}
+
+function cioAzioneTag(a) {
+  const cls = (a === "ACCUMULA" || a === "NUOVO_INGRESSO") ? "cio-buy"
+            : (a === "VENDI" || a === "ALLEGGERISCI") ? "cio-sell" : "cio-hold";
+  return `<span class="cio-tag ${cls}">${esc(a)}</span>`;
+}
+const cioPar = (t) => esc(t).replace(/\n/g, "<br>");
+const cioNum = (v, prefix = "") => (v == null || v === "") ? "—" : prefix + fmtNum.format(Number(v));
+
+function renderCIOReport(payload) {
+  if (!payload || !payload.report) {
+    return `<div class="cio-doc cio-empty"><h1>Report CIO non ancora disponibile</h1>
+      <p>Nessun <code>data/cio_report.json</code> trovato. Il report viene generato dal workflow
+      <b>cio-report.yml</b> (mattina nei giorni feriali) o manualmente da GitHub → Actions → "Run
+      workflow", con il secret <code>GEMINI_API_KEY</code> configurato. Nel frattempo usa
+      "Copia prompt AI" per il flusso manuale.</p></div>`;
+  }
+  const { meta, report } = payload;
+  const gen = meta?.generated_at ? new Date(meta.generated_at).toLocaleString("it-IT") : "—";
+  const orders = Array.isArray(report.analisi_portafoglio) ? report.analisi_portafoglio : [];
+  const rows = orders.map(o => `<tr>
+      <td class="cio-tk">${esc(o.ticker)}</td>
+      <td>${cioAzioneTag(o.azione)}</td>
+      <td class="cio-r">${cioNum(o.qty)}</td>
+      <td class="cio-r">${cioNum(o.limite, "$")}</td>
+      <td class="cio-r">${cioNum(o.stop, "$")}</td>
+      <td>${cioPar(o.motivazione)}</td>
+      <td class="cio-trace">${cioPar(o.tracciabilita)}</td></tr>`).join("");
+  const alarms = Array.isArray(report.allarmi_e_veto) ? report.allarmi_e_veto : [];
+  const v = meta?.validation;
+  const valTxt = v ? `${v.passed ? "nessuna violazione" : (v.hard?.length || 0) + " violazioni"}${v.warn?.length ? `, ${v.warn.length} warning` : ""}` : "n.d.";
+  return `<article class="cio-doc">
+    <header class="cio-header">
+      <div>
+        <div class="cio-kicker">COMITATO DI INVESTIMENTO — REPORT OPERATIVO</div>
+        <h1>Trading Dashboard · Report CIO</h1>
+      </div>
+      <div class="cio-meta">
+        <div>Generato <b>${esc(gen)}</b></div>
+        <div>Dati del ${esc((meta?.data_updated_at || "—").slice(0, 16).replace("T", " "))}</div>
+        <div>Budget operativo ${meta?.budget_operativo_eur != null ? fmtEUR.format(meta.budget_operativo_eur) : "—"}</div>
+        <div class="cio-model">modello ${esc(meta?.model || "—")} · cassa assunta ${meta?.assumed_cash_eur != null ? fmtEUR.format(meta.assumed_cash_eur) : "—"}</div>
+      </div>
+    </header>
+    <section class="cio-sec"><h2>1 · Briefing &amp; Sanity Check</h2><p>${cioPar(report.briefing_e_sanity_check)}</p></section>
+    <section class="cio-sec"><h2>2 · Macro &amp; Regime</h2><p>${cioPar(report.macro_e_regime)}</p></section>
+    <section class="cio-sec"><h2>3 · Analisi del Portafoglio</h2>
+      <div class="cio-table-wrap"><table class="cio-table">
+        <thead><tr><th>Titolo</th><th>Azione</th><th>Qtà</th><th>Limite</th><th>Stop</th><th>Motivazione</th><th>Tracciabilità</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="7" class="cio-empty-row">Nessun ordine proposto.</td></tr>`}</tbody>
+      </table></div></section>
+    <section class="cio-sec"><h2>4 · Allocazione della Liquidità</h2><p>${cioPar(report.allocazione_liquidita)}</p></section>
+    <section class="cio-sec"><h2>5 · Rotazione Strategica</h2><p>${cioPar(report.rotazione_strategica)}</p></section>
+    ${alarms.length ? `<section class="cio-alarms"><h2>⚠ Allarmi &amp; Veto</h2><ul>${alarms.map(a => `<li>${cioPar(a)}</li>`).join("")}</ul></section>` : ""}
+    <footer class="cio-foot">Report generato automaticamente e validato sugli invarianti del motore (${esc(valTxt)}).
+      Documento di supporto decisionale, non consulenza finanziaria. Repo pubblico: i valori sono reali.</footer>
+  </article>`;
+}
+
+async function openCIOReport() {
+  if (!CIO_REPORT) { toast("Carico il report CIO…"); await loadCIOReport(); }
+  $("#cio-body").innerHTML = renderCIOReport(CIO_REPORT);
+  $("#cio-report").hidden = false;
+  document.body.classList.add("cio-open");
+}
+function closeCIOReport() {
+  $("#cio-report").hidden = true;
+  document.body.classList.remove("cio-open");
+}
+
 /* ---------------- eventi ---------------- */
 $("#btn-refresh").addEventListener("click", refreshAll);
 $("#btn-prompt").addEventListener("click", showPrompt);
+$("#btn-cio")?.addEventListener("click", openCIOReport);
+$("#cio-close")?.addEventListener("click", closeCIOReport);
+$("#cio-print")?.addEventListener("click", () => window.print());
 $("#modal-close").addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
 $("#btn-copy").addEventListener("click", async () => {
@@ -5565,6 +5665,7 @@ loadData();
 loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
 loadPromptHeaderCloud();   // sincronizza la testata del prompt dal server (config/prompt_header.txt)
 loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
+loadCIOReport();    // best-effort: se esiste data/cio_report.json aggiorna lo stato del bottone Report CIO
 // ricarica completa (tecnici, news, storico) ogni 5 minuti
 setInterval(() => loadData(), 5 * 60 * 1000);
 // prezzi live ogni 60 secondi

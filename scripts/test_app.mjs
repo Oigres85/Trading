@@ -567,6 +567,26 @@ check("CIO deep-data: computeDeepData filtra indici/futures/cripto e calcola CAG
       watchlist: [{ ticker: "^KS11", currency: "USD", price: 6800 }, { ticker: "BTC-USD", currency: "USD", price: 60000 }],
       macro: {}, metrics_history: [] })));
 
+/* ---------- STEP 5: renderCIOReport (vista istituzionale, funzione pura di app.js) ---------- */
+check("CIO render: payload valido → ticker, tag azione colorato e box allarmi nell'HTML", run(`
+  const html = renderCIOReport({
+    meta: { generated_at: "2026-07-17T06:15:00Z", data_updated_at: "2026-07-17T06:00:00Z",
+            model: "gemini-2.0-flash", assumed_cash_eur: 28500, budget_operativo_eur: 15935,
+            validation: { passed: true, hard: [], warn: [] } },
+    report: { briefing_e_sanity_check: "ok", macro_e_regime: "regime",
+              analisi_portafoglio: [{ ticker: "MU", azione: "ACCUMULA", qty: 10, limite: 95, stop: 88, motivazione: "m", tracciabilita: "Tabella A" }],
+              allocazione_liquidita: "liq", rotazione_strategica: "rot", allarmi_e_veto: ["MACRO SHOCK ALERT attivo"] } });
+  return html.includes("MU") && html.includes("cio-buy") && html.includes("ACCUMULA")
+      && html.includes("cio-alarms") && html.includes("MACRO SHOCK ALERT attivo") && html.includes("Report CIO")`));
+check("CIO render: payload assente → placeholder 'non ancora disponibile' (nessun crash)", run(`
+  const html = renderCIOReport(null);
+  return html.includes("non ancora disponibile") && html.includes("cio-report.yml")`));
+check("CIO render: ordine con campi null → celle '—', nessun 'null'/'undefined' nell'HTML", run(`
+  const html = renderCIOReport({ meta: {}, report: { briefing_e_sanity_check: "", macro_e_regime: "",
+    analisi_portafoglio: [{ ticker: "TSM", azione: "MANTIENI", qty: null, limite: null, stop: null, motivazione: "", tracciabilita: "" }],
+    allocazione_liquidita: "", rotazione_strategica: "", allarmi_e_veto: [] } });
+  return html.includes("cio-hold") && html.includes("—") && !/>\\s*(null|undefined)\\s*</.test(html)`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

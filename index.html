@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=127">
+<link rel="stylesheet" href="assets/style.css?v=128">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -29,6 +29,7 @@
   </div>
   <div class="actions">
     <button class="btn btn-primary" id="btn-prompt" aria-label="Copia il prompt con tutti i dati da incollare in un'AI" title="Copia il prompt (tabella Markdown)">Copia prompt AI</button>
+    <button class="btn btn-primary" id="btn-cio" aria-label="Apri il Report CIO generato dall'AI e stampalo in PDF" title="Report CIO (PDF)">📄 Report CIO</button>
     <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: prezzi live subito + rigenerazione completa via pipeline (~2-3 min)">⟳ Aggiorna tutto</button>
   </div>
 </header>
@@ -356,6 +357,15 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=127"></script>
+<!-- REPORT CIO (v127): overlay a schermo intero, isolato in stampa (@media print) → PDF nativo -->
+<div id="cio-report" class="cio-overlay" hidden>
+  <div class="cio-actions">
+    <button class="btn btn-primary" id="cio-print" title="Salva come PDF con la stampa del browser">⬇ Scarica Report PDF</button>
+    <button class="btn btn-ghost" id="cio-close" aria-label="Chiudi il report">✕ Chiudi</button>
+  </div>
+  <div id="cio-body" class="cio-scroll"></div>
+</div>
+
+<script src="assets/app.js?v=128"></script>
 </body>
 </html>
