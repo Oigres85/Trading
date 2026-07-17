@@ -27,7 +27,7 @@ on:
 
 permissions:
   contents: write
-  issues: write        # fallback notifiche: GitHub Issue quando SMTP non configurato
+  issues: write        # canale UNICO notifiche: GitHub Issue (zero secret)
 
 concurrency:
   group: update-data
@@ -83,25 +83,15 @@ jobs:
           la tab Actions."
         continue-on-error: true
         env:
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          MAIL_TO: ${{ secrets.MAIL_TO }}
           GITHUB_TOKEN: ${{ github.token }}
 
-      # notifiche alert (v113): stop violati / data quality / setup squeeze. Canali:
-      # email SMTP → GitHub Issue (fallback senza secret). WhatsApp/CallMeBot rimosso (lug 2026).
+      # notifiche alert (v113): stop violati / data quality / setup squeeze. Canale UNICO:
+      # GitHub Issue (zero secret). WhatsApp/CallMeBot ed email SMTP rimossi (lug 2026).
       # ANTI-FRAGILE: lo script esce sempre 0; continue-on-error come seconda cintura.
       - name: Notifiche alert (best-effort)
         run: python scripts/notify_alerts.py
         continue-on-error: true
         env:
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          MAIL_TO: ${{ secrets.MAIL_TO }}
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Commit dati aggiornati

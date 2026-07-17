@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """NOTIFICHE ALERT (v113) — best-effort, ANTI-FRAGILE: qualunque cosa succeda qui dentro
-(SMTP giù, token scaduto, rete assente) lo script logga e esce SEMPRE 0 — la pipeline
-dati non deve mai fallire per colpa di una notifica.
+(token scaduto, rete assente) lo script logga e esce SEMPRE 0 — la pipeline dati non deve
+mai fallire per colpa di una notifica.
 
 Cosa notifica (solo VARIAZIONI rispetto all'ultimo alert inviato, dedup via
 config/alert_state.json committato dal CI):
@@ -9,16 +9,12 @@ config/alert_state.json committato dal CI):
   - alert di data quality nuovi (dato macro stale/unreliable);
   - nuovi setup [TURNAROUND SQUEEZE RISK] in watchlist (opportunità speculativa).
 
-Canali, in ordine di preferenza (il primo che riesce vince) — WhatsApp/CallMeBot RIMOSSO
-per decisione del CEO (lug 2026, servizio dismesso — non reintrodurlo):
-  1. Email SMTP (secret SMTP_PASS obbligatorio; SMTP_HOST/SMTP_USER/SMTP_PORT opzionali,
-     default Gmail/Workspace: smtp.gmail.com:587, mittente sergio.garofalo@siigep.tech).
-     Destinatario: sergiomariagarofalo@icloud.com (override con MAIL_TO).
-  2. Fallback SEMPRE disponibile: GitHub Issue sul repo (GITHUB_TOKEN nativo del workflow)
-     → GitHub manda la sua notifica email/app all'owner senza alcun secret.
+Canale UNICO: GitHub Issue sul repo (GITHUB_TOKEN nativo del workflow, zero secret) → GitHub
+manda la sua notifica app/email all'owner. WhatsApp/CallMeBot ed email SMTP RIMOSSI per
+decisione del CEO (lug 2026 — non reintrodurli).
 
-Lo stato dedup viene aggiornato SOLO se almeno un canale è andato a buon fine: se tutto
-fallisce, si ritenta al run successivo."""
+Lo stato dedup viene aggiornato SOLO se il canale va a buon fine: se fallisce, si ritenta
+al run successivo."""
 import json
 import os
 import sys
@@ -29,9 +25,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data" / "data.json"
 STATE = ROOT / "config" / "alert_state.json"
-
-DEFAULT_TO = "sergiomariagarofalo@icloud.com"
-DEFAULT_FROM = "sergio.garofalo@siigep.tech"
 
 
 def collect_alerts(data):
@@ -83,46 +76,20 @@ def build_message(new, data):
 
 
 def send_test():
-    """Modalità --test (diagnostica): invio INCONDIZIONATO (bypassa dedup e soglie) di un
-    messaggio di prova sui canali configurati, con esito per-canale."""
+    """Modalità --test (diagnostica): apre una Issue di prova (bypassa dedup e soglie).
+    Utile solo in Actions, dove GITHUB_TOKEN e GITHUB_REPOSITORY sono automatici."""
     msg = ("✅ Trading Dashboard — TEST NOTIFICHE "
            + datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-           + "\nSe ricevi questo messaggio, il canale di notifica è configurato bene.")
-    any_ok = False
-    for channel in (send_email, send_github_issue):
-        try:
-            res = bool(channel(msg))
-        except Exception as e:  # noqa: BLE001
-            res = False
-            print(f"!! notify --test {channel.__name__}: {e}", file=sys.stderr)
-        print(f"notify --test: {channel.__name__} → {'OK' if res else 'ko / non configurato'}")
-        any_ok = any_ok or res
-    if not any_ok:
-        print("!! notify --test: nessun canale riuscito (SMTP_PASS per email; GITHUB_TOKEN "
-              "per le Issue è automatico solo in Actions).", file=sys.stderr)
-    return any_ok
-
-
-def send_email(msg):
-    pwd = os.environ.get("SMTP_PASS")
-    if not pwd:
-        return False
-    import smtplib
-    from email.mime.text import MIMEText
-    host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
-    port = int(os.environ.get("SMTP_PORT", "587"))
-    user = os.environ.get("SMTP_USER", DEFAULT_FROM)
-    to = os.environ.get("MAIL_TO", DEFAULT_TO)
-    mime = MIMEText(msg, "plain", "utf-8")
-    mime["Subject"] = "⚠ Trading Dashboard — alert"
-    mime["From"] = user
-    mime["To"] = to
-    with smtplib.SMTP(host, port, timeout=25) as s:
-        s.starttls()
-        s.login(user, pwd)
-        s.sendmail(user, [to], mime.as_string())
-    print(f"notify: email inviata a {to}")
-    return True
+           + "\nSe vedi questa Issue, il canale di notifica è configurato bene.")
+    try:
+        ok = bool(send_github_issue(msg))
+    except Exception as e:  # noqa: BLE001
+        ok = False
+        print(f"!! notify --test: {e}", file=sys.stderr)
+    if not ok:
+        print("!! notify --test: Issue non creata (GITHUB_TOKEN/GITHUB_REPOSITORY presenti "
+              "solo in Actions).", file=sys.stderr)
+    return ok
 
 
 def send_github_issue(msg):
@@ -161,15 +128,14 @@ def send_custom(text):
         print("notify: custom già inviato oggi (dedup)")
         return
     msg = "⚠ TRADING DASHBOARD — RED TEAM\n" + text
-    for channel in (send_email, send_github_issue):
-        try:
-            if channel(msg):
-                state["last_custom"] = sig
-                STATE.write_text(json.dumps(state, indent=1))
-                return
-        except Exception as e:  # noqa: BLE001
-            print(f"!! notify {channel.__name__}: {e}", file=sys.stderr)
-    print("!! notify custom: nessun canale riuscito", file=sys.stderr)
+    try:
+        if send_github_issue(msg):
+            state["last_custom"] = sig
+            STATE.write_text(json.dumps(state, indent=1))
+            return
+    except Exception as e:  # noqa: BLE001
+        print(f"!! notify custom: {e}", file=sys.stderr)
+    print("!! notify custom: Issue non creata", file=sys.stderr)
 
 
 def main():
@@ -192,19 +158,15 @@ def main():
         print("notify: nessuna novità")
         return
     sent = False
-    for channel in (send_email, send_github_issue):
-        try:
-            if channel(msg):
-                sent = True
-                break
-        except Exception as e:  # noqa: BLE001 — canale ko: si passa al successivo
-            print(f"!! notify {channel.__name__}: {e}", file=sys.stderr)
+    try:
+        sent = bool(send_github_issue(msg))
+    except Exception as e:  # noqa: BLE001
+        print(f"!! notify: {e}", file=sys.stderr)
     if sent:
         STATE.write_text(json.dumps({"last_alerted": current,
                                      "updated": data.get("updated_at")}, indent=1))
     else:
-        print("!! notify: nessun canale disponibile/riuscito — si ritenta al prossimo run",
-              file=sys.stderr)
+        print("!! notify: Issue non creata — si ritenta al prossimo run", file=sys.stderr)
 
 
 if __name__ == "__main__":

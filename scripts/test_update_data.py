@@ -164,9 +164,9 @@ check("notify shock v125: collect_alerts raccoglie le fonti oltre -2%",
       "KOSPI (Asia) -8.9%" in _sc["shock"] and "Futures Nasdaq 100 -2.4%" in _sc["shock"])
 check("notify shock v125: build_message emette il blocco MACRO SHOCK ALERT",
       "MACRO SHOCK ALERT" in na.build_message(_sc, _shockd) and "SOSPENDI" in na.build_message(_sc, _shockd))
-# v128: canale WhatsApp/CallMeBot RIMOSSO per decisione del CEO — la cascata è email→Issue
-check("notify v128: canale WhatsApp rimosso, cascata = email → GitHub Issue",
-      not hasattr(na, "send_whatsapp") and hasattr(na, "send_email") and hasattr(na, "send_github_issue"))
+# v130: WhatsApp/CallMeBot ed email SMTP RIMOSSI — canale UNICO = GitHub Issue
+check("notify v130: solo GitHub Issue (niente WhatsApp né email)",
+      not hasattr(na, "send_whatsapp") and not hasattr(na, "send_email") and hasattr(na, "send_github_issue"))
 
 # ---------- live-market + shock alert (v125): funzioni pure della pipeline ----------
 check("v125 is_live_market: cripto/futures/indici esteri sì, azioni USA e indici USA no",
