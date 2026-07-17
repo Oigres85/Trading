@@ -5153,10 +5153,13 @@ function titleDeepData(r) {
     niCagr = cagr(a.net_income, b.net_income);        // utili: solo se entrambi positivi (cagr lo garantisce)
   }
   const epsG = (s.eps_ttm > 0 && s.eps_forward > 0) ? s.eps_forward / s.eps_ttm - 1 : null;
-  const upside = (s.target_mean > 0 && r.price > 0) ? s.target_mean / r.price - 1 : null;
+  // efficienza pluriennale: divergenza CAGR utili − CAGR ricavi = leva operativa (se >0) o
+  // erosione margini (se <0). Altman Z'' = distanza dal distress (variante non-manifatturieri).
+  const effGap = (revCagr != null && niCagr != null) ? dgPct(niCagr - revCagr) : null;
   return { tk: r.ticker, span, revCagr: dgPct(revCagr), niCagr: dgPct(niCagr),
-           revYoY: dgPct(s.revenue_growth), epsG: dgPct(epsG),
-           fwdPe: dgFin(s.forward_pe), peg: dgFin(s.peg), upside: dgPct(upside) };
+           revYoY: dgPct(s.revenue_growth), epsG: dgPct(epsG), effGap,
+           altman: dgFin(s.altman_z), fwdPe: dgFin(s.forward_pe), peg: dgFin(s.peg),
+           upside: dgPct((s.target_mean > 0 && r.price > 0) ? s.target_mean / r.price - 1 : null) };
 }
 
 /* ---------- DIGEST STORICI: le serie che i popup disegnano, tradotte in numeri ----------
@@ -5333,10 +5336,10 @@ function historicalDigestText() {
   if (deep.length) {
     // SOLO le colonne NUOVE non già in Tabella A/B (CAGR pluriennale + EPS ttm→fwd): PEG, crescita
     // YoY, Fwd P/E e upside sono già nella tabella fondamentale e in Tabella A/B → tolte (anti-ridondanza).
-    L.push(`=== FONDAMENTALE PROFONDO — ${deep.length} TITOLI → ${deep.length} righe (CAGR COMPOSTO dai bilanci pluriennali — ciò che le tabelle YoY NON mostrano; EPS impl. = eps_forward/eps_ttm−1) ===`);
-    L.push("| Titolo | CAGR ricavi | CAGR utili | EPS ttm→fwd |");
-    L.push("|---|---|---|---|");
-    for (const t of deep) L.push(`| ${t.tk} | ${dgTxt(t.revCagr, "%")}${t.span ? ` (${t.span}A)` : ""} | ${dgTxt(t.niCagr, "%")} | ${dgTxt(t.epsG, "%")} |`);
+    L.push(`=== FONDAMENTALE PROFONDO — ${deep.length} TITOLI → ${deep.length} righe (efficienza PLURIENNALE — ciò che le tabelle YoY NON mostrano; EPS impl. = eps_forward/eps_ttm−1; Δeff = CAGR utili − CAGR ricavi, >0 = leva operativa / <0 = erosione margini; Z'' = Altman distress) ===`);
+    L.push("| Titolo | CAGR ricavi | CAGR utili | Δeff (utili−ricavi) | EPS ttm→fwd | Altman Z'' |");
+    L.push("|---|---|---|---|---|---|");
+    for (const t of deep) L.push(`| ${t.tk} | ${dgTxt(t.revCagr, "%")}${t.span ? ` (${t.span}A)` : ""} | ${dgTxt(t.niCagr, "%")} | ${dgTxt(t.effGap, "pp")} | ${dgTxt(t.epsG, "%")} | ${dgTxt(t.altman, "", 2)}${dgFin(t.altman) != null && t.altman < 1.81 ? " [DISTRESS]" : ""} |`);
   }
   L.push("USO: incrocia il CAGR pluriennale col YoY delle tabelle — quando il YoY gonfiato da un ciclo diverge dal CAGR (es. rimbalzo memorie), è un rimbalzo, non crescita strutturale. Sulle pendenze macro, sia gli ESTREMI (Margin Debt a ridosso del picco = leva estrema, HY OAS ai minimi del range = compiacenza del credito) sia le INVERSIONI DI TENDENZA (leva in deleveraging, spread in allargamento, curva in dis-inversione) segnalano fragilità → riduci il sizing dei nuovi ingressi prima che i prezzi lo confermino. Usa ΔRS/ΔMCR e ⚠deg per anticipare i downgrade PRIMA della rottura tecnica.");
   return L.join("\n");
