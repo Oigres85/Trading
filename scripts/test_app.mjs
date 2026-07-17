@@ -564,6 +564,19 @@ check("CIO v130: sparkTrendRows scarta gli orizzonti a storia insufficiente (tit
   const r = sparkTrendRows().find(x => x.tk === "TST1");
   DATA.portfolio[0].sparks = saved;
   return r && r.w1 !== null && r.m1 === null && r.m3 === null && r.y1 === null && r.short === true`));
+check("shock client v132: KOSPI live -8% + futures -3% → 2 fonti; KOSPI recuperato 0% → la fonte KOSPI sparisce (fix desync)", run(`
+  const savedW = DATA.watchlist, savedM = DATA.macro.futures;
+  DATA.watchlist = [{ ticker: "^KS11", change_pct: -8 }];
+  DATA.macro.futures = { nasdaq: { change_pct: -3 }, sp500: { change_pct: -0.5 } };
+  const s1 = shockSourcesLive();
+  DATA.watchlist = [{ ticker: "^KS11", change_pct: 0 }];
+  const s2 = shockSourcesLive();
+  DATA.watchlist = savedW; DATA.macro.futures = savedM;
+  return s1.length === 2 && s1.some(x => x.src === "KOSPI (Asia)") && s2.length === 1 && !s2.some(x => x.src === "KOSPI (Asia)")`));
+check("shock client v132: usRegularSessionOpen — 12:00 ET feriale aperto, 20:00 ET chiuso, sabato chiuso", run(`
+  return usRegularSessionOpen(new Date("2026-07-17T16:00:00Z")) === true
+      && usRegularSessionOpen(new Date("2026-07-18T00:00:00Z")) === false
+      && usRegularSessionOpen(new Date("2026-07-18T16:00:00Z")) === false`));
 check("CIO v128: titleDeepData — CAGR ricavi dai financials pluriennali e EPS ttm→fwd", run(`
   const d = titleDeepData({ ticker: "TSTX", price: 100,
     financials: [{ year: 2022, revenue: 100, net_income: 10 }, { year: 2025, revenue: 200, net_income: -5 }],

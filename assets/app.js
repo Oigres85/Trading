@@ -655,7 +655,8 @@ async function livePrices() {
   DATA.portfolio.forEach(upd);
   (DATA.watchlist || []).forEach(upd);
   recomputeTotals();
-  renderKPI(); renderTable(); renderWatchlist(); renderAllocation();
+  refreshShockClient();         // ricalcola lo shock dai prezzi live (KOSPI/futures) — coglie crolli/recuperi
+  renderKPI(); renderTable(); renderWatchlist(); renderAllocation(); renderShockAlert();
   const el = $("#live-badge");
   if (el) el.textContent = `Prezzi live: ${new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
 }
@@ -680,6 +681,7 @@ function renderAll() {
   renderEarnings();
   renderEarningsAlert();
   renderReconcileAlert();
+  refreshShockClient();         // allinea il banner shock ai prezzi live già presenti
   renderShockAlert();
   renderDataQualityAlert();
   renderTable();
@@ -933,6 +935,42 @@ function openDataQualityModal() {
     toast("Override rimossi — al prossimo caricamento tornano i dati (e gli allarmi) della pipeline");
     closeChartModal();
   });
+}
+
+/* SHOCK ALERT CLIENT-SIDE (v132): la pipeline calcola lo shock solo ai suoi run, ma i prezzi di
+   KOSPI/futures si aggiornano LIVE nel browser ogni 60s → un crollo (o un RECUPERO) tra un run e
+   l'altro non si rifletteva nel banner. Qui ricalcolo dai prezzi live: la variazione live di
+   ^KS11 (q.price/q.prev, già sessione-corrente per costruzione) rimpiazza il valore di pipeline;
+   i futures restano quelli di pipeline (non aggiornati client-side). Gate: solo con Wall Street
+   REGOLARE chiusa (lo shock è un fenomeno overnight/pre-apertura). */
+function usRegularSessionOpen(now = new Date()) {
+  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const day = et.getDay(); if (day === 0 || day === 6) return false;   // weekend
+  const mins = et.getHours() * 60 + et.getMinutes();
+  return mins >= 570 && mins < 960;                                    // 9:30–16:00 ET
+}
+function shockSourcesLive() {
+  const THR = -2.0, sources = [];
+  const fut = (DATA.macro || {}).futures || {};
+  for (const [k, lab] of [["nasdaq", "Futures Nasdaq 100"], ["sp500", "Futures S&P 500"]]) {
+    const chg = dgFin((fut[k] || {}).change_pct);
+    if (chg != null && chg <= THR) sources.push({ src: lab, chg });
+  }
+  const k = (DATA.watchlist || []).find(r => r.ticker === "^KS11");
+  const kc = k ? dgFin(k.change_pct) : null;                          // live: q.price/q.prev
+  if (kc != null && kc <= THR) sources.push({ src: "KOSPI (Asia)", chg: kc });
+  return sources;
+}
+function computeShockClient() {
+  const sources = shockSourcesLive();
+  if (!sources.length || usRegularSessionOpen()) return null;
+  return { active: true, threshold: -2, sources, worst_chg: Math.min(...sources.map(s => s.chg)),
+           note: "Asia/futures Nasdaq oltre -2% con Wall Street chiusa: sospendere gli acquisti "
+               + "aggressivi, attendere l'assestamento della prima ora di scambi USA.", client: true };
+}
+function refreshShockClient() {
+  // sovrascrive lo shock_alert (KOSPI live-autoritativo + futures di pipeline). Non tocca nient'altro.
+  if (DATA && DATA.macro) DATA.macro.shock_alert = computeShockClient();
 }
 
 function renderShockAlert() {
