@@ -4591,8 +4591,15 @@ function buildPrompt() {
       if (nowP.vix_term != null && vt7 != null) kin.push(`VIX/VIX3M ${fmtNum.format(nowP.vix_term)} (Δ7g ${signTxt(vt7, "")} — ${vt7 > 0.02 ? "term structure in IRRIGIDIMENTO: lo smart money sta comprando protezione" : vt7 < -0.02 ? "term structure in distensione: coperture rilassate" : "term structure stabile"}${nowP.vix_term >= 1 ? "; BACKWARDATION: stress acuto in corso" : ""})`);
       const vx7 = dnum(nowP.vix, p7.vix, 2);
       if (vx7 != null) kin.push(`VIX ${fmtNum.format(nowP.vix)} (Δ7g ${signTxt(vx7, " punti")})`);
-      // RS Velocity: Δ7g della RS 1M vs NDX per i titoli in portafoglio
-      const tNow = nowP.titles || {}, tOld = p7.titles || {};
+      // RS Velocity: Δ7g della RS 1M vs NDX per i titoli in portafoglio.
+      // ⚠ i titles per-titolo esistono solo dai run dell'11/07: pAt(7) può cadere PRIMA (nessun
+      // titles) → confronto vuoto. Uso il più recente snapshot TITOLATO ≤7g, fallback al primo
+      // titolato disponibile (la finestra reale può essere <7g: è comunque la derivata vera).
+      const tNow = nowP.titles || {};
+      const titled = kHist.filter(p => p.titles && Object.keys(p.titles).length);
+      const t7 = pAt(7), pOldTitled = (t7 && t7.titles && Object.keys(t7.titles).length) ? t7
+        : (titled.find(p => p.date <= (t7 || nowP).date) || titled[0] || p7);
+      const tOld = (pOldTitled && pOldTitled.titles) || {};
       const rsMoves = Object.keys(tNow)
         .map(tk => ({ tk, rs: (tNow[tk] || {}).rs, d: dnum((tNow[tk] || {}).rs, (tOld[tk] || {}).rs, 1) }))
         .filter(x => x.d != null)
@@ -5159,7 +5166,33 @@ function buildHistoricalDigests() {
   return out;
 }
 
-/* trend multi-orizzonte per titolo dalle sparkline (prima→ultima barra di ogni range) */
+/* CINEMATICA per-titolo (v131): derivate reali da metrics_history. I titles per-titolo esistono
+   dai run dell'11/07 → il lookback dev'essere TITOLATO (nearest snapshot con dati per quel ticker),
+   altrimenti cade prima che i titles esistano e la derivata risulta "vuota" (bug del placeholder). */
+function titleKinematics(tk) {
+  const titled = (DATA.metrics_history || []).filter(s => s && s.titles && s.titles[tk]);
+  if (titled.length < 2) return { drs7: null, drs30: null, dmcr7: null, mcr: titled[0] ? dgFin(titled[0].titles[tk].mcr) : null, span: titled.length };
+  const cur = titled[titled.length - 1].titles[tk];
+  const back = (days) => { const target = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+    let best = null; for (const s of titled) if (s.date <= target) best = s; return best; };
+  const b7 = back(7) || titled[0];                 // <7g di storico → il più vecchio titolato (finestra reale <7g)
+  const b30 = back(30);
+  const d = (a, b) => (dgFin(a) != null && dgFin(b) != null) ? Math.round((a - b) * 10) / 10 : null;
+  return {
+    drs7: (b7 && b7 !== titled[titled.length - 1]) ? d(cur.rs, b7.titles[tk].rs) : null,
+    drs30: (b30 && b30.titles[tk]) ? d(cur.rs, b30.titles[tk].rs) : null,
+    dmcr7: (b7 && b7 !== titled[titled.length - 1]) ? d(cur.mcr, b7.titles[tk].mcr) : null,
+    mcr: dgFin(cur.mcr), span: titled.length,
+  };
+}
+/* percentile del prezzo nel range 52 settimane (da sparks.y1: dove sta OGGI tra minimo e massimo) */
+function price52wPct(r) {
+  const y1 = Array.isArray(r.sparks && r.sparks.y1) ? r.sparks.y1.map(dgFin).filter(x => x != null) : [];
+  if (y1.length < 10 || !(r.price > 0)) return null;
+  const lo = Math.min(r.price, ...y1), hi = Math.max(r.price, ...y1);
+  return hi > lo ? Math.round((r.price - lo) / (hi - lo) * 100) : null;
+}
+/* trend multi-orizzonte + cinematica per titolo */
 function sparkTrendRows() {
   const rows = [];
   for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) {
@@ -5171,38 +5204,107 @@ function sparkTrendRows() {
       return a.length >= minLen ? (a[a.length - 1] / a[0] - 1) * 100 : null; };
     const w1 = tr("w1", 4), m1 = tr("m1", 18), m3 = tr("m3", 50), y1 = tr("y1", 45);
     if ([w1, m1, m3, y1].every(v => v == null)) continue;
+    const kin = titleKinematics(r.ticker);
+    // REGIME DI VARIANZA per titolo: MCR che SALE (rischio che si concentra) mentre la RS SCENDE
+    // (forza relativa che degrada) = cinematica in deterioramento PRIMA che il supporto ceda.
+    const degrade = kin.dmcr7 != null && kin.dmcr7 > 0 && kin.drs7 != null && kin.drs7 < 0;
     rows.push({ tk: r.ticker, w1, m1, m3, y1, held: !!r.qty,
-                short: [w1, m1, m3, y1].filter(v => v != null).length < 2 });
+                short: [w1, m1, m3, y1].filter(v => v != null).length < 2,
+                pct52: price52wPct(r), ...kin, degrade });
   }
   return rows;
 }
 
-/* ---------- testo per l'analisi AI: prompt esistente + digest (il pacchetto COMPLETO) ---------- */
+/* news mappate al singolo titolo attivo (100% dei titoli): usa i tag ticker già nel feed */
+function activeTitleNews() {
+  const news = DATA.news || [];
+  const out = [];
+  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) {
+    if (!r || r.currency !== "USD" || !(r.price > 0)) continue;
+    const hits = news.filter(n => Array.isArray(n.tickers) && n.tickers.includes(r.ticker)).slice(0, 3);
+    out.push({ tk: r.ticker, held: !!r.qty, hits });
+  }
+  return out;
+}
+
+/* EXECUTIVE BRIEF (v131): Δ dall'ultimo storico + priorità operativa — l'orientamento in cima
+   che trasforma il dump in un brief. Solo INPUT per l'analisi, NON decisioni (quelle le prende Claude). */
+function buildExecutiveDelta() {
+  const L = ["=== EXECUTIVE BRIEF — Δ dall'ultimo storico + priorità di oggi (INPUT per l'analisi, non decisioni) ==="];
+  const t = DATA.totals || {};
+  const mh = (DATA.metrics_history || []).filter(x => x);
+  const navs = mh.map(x => dgFin(x.eur_value)).filter(x => x != null);
+  const dLast = navs.length >= 2 ? (navs[navs.length - 1] / navs[navs.length - 2] - 1) * 100 : null;
+  const d7 = dgDelta(navs, Math.min(7, navs.length - 1));
+  L.push(`· Investito €${t.eur_value != null ? fmtNum.format(Math.round(t.eur_value)) : "—"} (Δ ultimo run ${signTxt(dLast)}, Δ7 rilev. ${signTxt(d7)}) · Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · VIX ${dgTxt((DATA.macro || {}).vix && DATA.macro.vix.value, "", 1)} · cassa ${fmtEUR.format(Math.round(cashEur || 0))} · budget op. ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"}`);
+  const v = decisionVerdict();
+  L.push(`· Verdetto motore: ${v.label} (${dgTxt(v.score, "", 0)}/100)${(v.withPlan || []).length ? ` · candidati: ${v.withPlan.slice(0, 4).map(p => p.r.ticker).join(", ")}` : ""}`);
+  // priorità: shock, stop violati, earnings ≤7g, veto in ptf, top/worst RS mover della settimana
+  const pri = [];
+  const sh = (DATA.macro || {}).shock_alert;
+  if (sh && sh.active) pri.push(`🚨 SHOCK ${(sh.sources || []).map(s => `${s.src} ${signTxt(s.chg)}`).join("/")}`);
+  const sv = (v.stopViolations || []).map(x => x.r.ticker);
+  if (sv.length) pri.push(`⛔ stop violati: ${sv.join(", ")}`);
+  const in7 = (d) => { if (!d) return false; const dd = (new Date(d) - Date.now()) / 86400000; return dd >= 0 && dd <= 7; };
+  const earn = (DATA.portfolio || []).filter(r => r.qty && in7(r.earnings_date)).map(r => r.ticker);
+  if (earn.length) pri.push(`📅 earnings ≤7g: ${earn.join(", ")}`);
+  const vetoPtf = (v.excluded || []).filter(x => x.r.qty).map(x => x.r.ticker);
+  if (vetoPtf.length) pri.push(`🛑 veto in ptf: ${vetoPtf.join(", ")}`);
+  const movers = sparkTrendRows().filter(r => r.drs7 != null).sort((a, b) => b.drs7 - a.drs7);
+  if (movers.length) pri.push(`RS Δ7g → top ${movers[0].tk} ${signTxt(movers[0].drs7, "pp")} / worst ${movers[movers.length - 1].tk} ${signTxt(movers[movers.length - 1].drs7, "pp")}`);
+  const degr = sparkTrendRows().filter(r => r.degrade).map(r => r.tk);
+  if (degr.length) pri.push(`⚠ cinematica in degrado (MCR↑ + RS↓): ${degr.join(", ")}`);
+  L.push("· PRIORITÀ: " + (pri.length ? pri.join(" · ") : "nessun evento forcing rilevato"));
+  return L.join("\n");
+}
+
+/* ---------- testo per l'analisi AI: executive brief + prompt esistente + digest storici ---------- */
 function historicalDigestText() {
   const L = [];
-  L.push("=== ANALISI STORICA — LETTURA QUANTITATIVA DEI GRAFICI (traiettorie delle serie che la dashboard disegna: usa pendenze e percentili, non solo i livelli) ===");
+  L.push("=== ANALISI STORICA — LETTURA QUANTITATIVA DEI GRAFICI (traiettorie delle serie: usa pendenze e percentili, non solo i livelli) ===");
   for (const d of buildHistoricalDigests()) L.push(`· ${d.label}: ${d.text}`);
+
   const tr = sparkTrendRows();
   if (tr.length) {
-    L.push(`TREND MULTI-ORIZZONTE PER TITOLO — ${tr.length} TITOLI → ${tr.length} righe (variazione % nel range; incrocia col RS 1M per confermare/negare il momentum):`);
-    L.push("| Titolo | 1S | 1M | 3M | 1A |");
-    L.push("|---|---|---|---|---|");
-    for (const r of tr) L.push(`| ${r.tk}${r.held ? " [ptf]" : ""}${r.short ? " [storia insuff.]" : ""} | ${signTxt(r.w1)} | ${signTxt(r.m1)} | ${signTxt(r.m3)} | ${signTxt(r.y1)} |`);
+    const top3 = tr.filter(r => r.held && r.mcr != null).sort((a, b) => b.mcr - a.mcr).slice(0, 3);
+    const top3sum = top3.reduce((s, r) => s + (r.mcr || 0), 0);
+    L.push(`CINEMATICA & TREND PER TITOLO — ${tr.length} TITOLI → ${tr.length} righe (variazione % nel range · Perc.52S = posizione del prezzo nel range 52 settimane · ΔRS = velocità della forza relativa vs NDX · ΔMCR = accelerazione della concentrazione del rischio · ⚠deg = MCR↑ con RS↓, cinematica in degrado PRIMA della rottura del supporto):`);
+    L.push("| Titolo | 1S | 1M | 3M | 1A | Perc.52S | ΔRS 7g | ΔRS 30g | ΔMCR 7g |");
+    L.push("|---|---|---|---|---|---|---|---|---|");
+    for (const r of tr) L.push(`| ${r.tk}${r.held ? " [ptf]" : ""}${r.degrade ? " ⚠deg" : ""}${r.short ? " [storia insuff.]" : ""} | ${signTxt(r.w1)} | ${signTxt(r.m1)} | ${signTxt(r.m3)} | ${signTxt(r.y1)} | ${dgTxt(r.pct52, "°", 0)} | ${r.drs7 != null ? signTxt(r.drs7, "pp") : "—"} | ${r.drs30 != null ? signTxt(r.drs30, "pp") : "— (storico <30g)"} | ${r.dmcr7 != null ? signTxt(r.dmcr7, "pp") : "—"} |`);
+    // REGIME DI VARIANZA a livello di portafoglio: concentrazione top-3 vs qualità (Sharpe) in trend
+    const shp = (DATA.metrics_history || []).map(x => dgFin(x && x.sharpe)).filter(x => x != null);
+    const dShp = shp.length >= 8 ? Math.round((shp[shp.length - 1] - shp[shp.length - 8]) * 100) / 100 : null;
+    if (top3.length) L.push(`REGIME DI VARIANZA: MCR Top-3 ${dgTxt(top3sum, "%", 0)} (${top3.map(r => r.tk).join("+")}) su Sharpe ptf ${dgTxt((DATA.totals || {}).portfolio_sharpe_ratio, "", 2)}${dShp != null ? ` (Δ7 ${signTxt(dShp, "")})` : ""} → concentrazione alta + qualità ${dShp != null && dShp < 0 ? "in deterioramento = fragilità della varianza (il rischio si addensa mentre il rendimento/rischio cala)" : "stabile"}.`);
   }
+
+  const news = activeTitleNews();
+  const withNews = news.filter(n => n.hits.length);
+  if (withNews.length || news.length) {
+    // NB: lista, non tabella "| " → dicitura SENZA "— N TITOLI" per non innescare l'invariante I4 (righe=conteggio)
+    L.push(`NEWS VERTICALE PER TITOLO ATTIVO (${news.length} titoli attivi · catalizzatori/rischi specifici; "—" = nessuna news verticale oggi, deduci dal macro-settore):`);
+    for (const n of news) {
+      const txt = n.hits.length ? n.hits.map(h => `[${(h.sentiment || "neu").slice(0, 3)}] ${h.title_it || h.title}`).join(" · ") : "—";
+      L.push(`  ${n.tk}${n.held ? " [ptf]" : ""}: ${txt}`);
+    }
+  }
+
   const deep = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
     .filter(r => r && r.currency === "USD" && r.price > 0 && !/^[\^]/.test(r.ticker) && !/[=]F$|-USD$/.test(r.ticker))
     .map(titleDeepData);
   if (deep.length) {
-    L.push(`=== FONDAMENTALE PROFONDO — ${deep.length} TITOLI → ${deep.length} righe (CAGR composto dai bilanci pluriennali già scaricati; EPS impl. = eps_forward/eps_ttm−1) ===`);
-    L.push("| Titolo | CAGR ricavi | CAGR utili | Ricavi YoY | EPS ttm→fwd | Fwd P/E | PEG | Upside target |");
-    L.push("|---|---|---|---|---|---|---|---|");
-    for (const t of deep) L.push(`| ${t.tk} | ${dgTxt(t.revCagr, "%")}${t.span ? ` (${t.span}A)` : ""} | ${dgTxt(t.niCagr, "%")} | ${dgTxt(t.revYoY, "%")} | ${dgTxt(t.epsG, "%")} | ${dgTxt(t.fwdPe)} | ${dgTxt(t.peg, "", 2)} | ${dgTxt(t.upside, "%")} |`);
+    // SOLO le colonne NUOVE non già in Tabella A/B (CAGR pluriennale + EPS ttm→fwd): PEG, crescita
+    // YoY, Fwd P/E e upside sono già nella tabella fondamentale e in Tabella A/B → tolte (anti-ridondanza).
+    L.push(`=== FONDAMENTALE PROFONDO — ${deep.length} TITOLI → ${deep.length} righe (CAGR COMPOSTO dai bilanci pluriennali — ciò che le tabelle YoY NON mostrano; EPS impl. = eps_forward/eps_ttm−1) ===`);
+    L.push("| Titolo | CAGR ricavi | CAGR utili | EPS ttm→fwd |");
+    L.push("|---|---|---|---|");
+    for (const t of deep) L.push(`| ${t.tk} | ${dgTxt(t.revCagr, "%")}${t.span ? ` (${t.span}A)` : ""} | ${dgTxt(t.niCagr, "%")} | ${dgTxt(t.epsG, "%")} |`);
   }
-  L.push("USO: incrocia CAGR e PEG coi multipli (Fwd P/E vs CAGR = PEG implicito) per giustificare/negare Let Winners Run — attenzione ai casi in cui il YoY gonfiato da un ciclo diverge dal CAGR pluriennale (rimbalzo, non crescita strutturale). Sulle pendenze macro, sia gli ESTREMI (Margin Debt a ridosso del picco = leva estrema, HY OAS ai minimi del range = compiacenza del credito) sia le INVERSIONI DI TENDENZA (leva in deleveraging, spread in allargamento, curva in dis-inversione) segnalano fragilità → riduci il sizing dei nuovi ingressi prima che i prezzi lo confermino.");
+  L.push("USO: incrocia il CAGR pluriennale col YoY delle tabelle — quando il YoY gonfiato da un ciclo diverge dal CAGR (es. rimbalzo memorie), è un rimbalzo, non crescita strutturale. Sulle pendenze macro, sia gli ESTREMI (Margin Debt a ridosso del picco = leva estrema, HY OAS ai minimi del range = compiacenza del credito) sia le INVERSIONI DI TENDENZA (leva in deleveraging, spread in allargamento, curva in dis-inversione) segnalano fragilità → riduci il sizing dei nuovi ingressi prima che i prezzi lo confermino. Usa ΔRS/ΔMCR e ⚠deg per anticipare i downgrade PRIMA della rottura tecnica.");
   return L.join("\n");
 }
 function buildCIOText() {
-  return buildPrompt() + "\n\n" + historicalDigestText();
+  return buildExecutiveDelta() + "\n\n" + buildPrompt() + "\n\n" + historicalDigestText();
 }
 
 /* ---------- azione unica: copia il pacchetto completo e mostralo nella modal ---------- */
