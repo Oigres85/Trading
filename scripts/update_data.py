@@ -813,6 +813,12 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         # IGIENE P/E anche nelle stats: EPS TTM < 0 → pe_ttm obbligatoriamente n.d.
         if stats.get("eps_ttm") is not None and stats["eps_ttm"] < 0:
             stats["pe_ttm"] = None
+        # MULTIPLI DI VALUTAZIONE NEGATIVI = privi di senso (patrimonio netto negativo → P/B<0;
+        # EBITDA negativo → EV/EBITDA<0): un "P/B -55,7×" o "EV/EBITDA -513×" (visto su CBRS) non è
+        # un multiplo, è rumore. Nullati: la distress la dicono già ROE<0, margini<0 e Altman.
+        for _k in ("price_to_book", "ev_ebitda"):
+            if stats.get(_k) is not None and stats[_k] <= 0:
+                stats[_k] = None
 
         # Altman Z''-Score (variante NON-MANIFATTURIERI/servizi, Altman 1993 — corretta per
         # tech/software asset-light): Z'' = 6.56·WC/TA + 3.26·RE/TA + 6.72·EBIT/TA + 1.05·MVE/TL.
@@ -2384,15 +2390,24 @@ def fetch_options_chain(symbols, n_strikes=12, n_expiries=3):
                 # WALL SANITY: il max-OI va cercato SOLO tra strike plausibili (0.5×–2× lo spot).
                 # Gli strike-relitto (adjusted options post split/eventi) hanno OI residuo su
                 # livelli assurdi e senza filtro "vincono" producendo muri fuori dal mondo.
-                def _wall(df):
+                # finestra LATO-SPECIFICA: il CALL WALL è resistenza (strike ≳ spot), il PUT WALL
+                # è supporto (strike ≲ spot). La vecchia banda simmetrica [0,5×–2×] lasciava
+                # passare mostri come SNDK PW $2650 su spot $1411 (put wall SOPRA lo spot) o CW $930
+                # SOTTO: relitti/adjusted options, non livelli di mercato. ±5% attorno allo spot
+                # per tollerare i wall ATM.
+                def _wall(df, above):
                     if df.empty or not df["openInterest"].notna().any():
                         return None
-                    win = df[(df["strike"] >= ref * 0.5) & (df["strike"] <= ref * 2.0)] if ref else df
+                    if ref:
+                        win = df[(df["strike"] >= ref * 0.95) & (df["strike"] <= ref * 2.0)] if above \
+                            else df[(df["strike"] >= ref * 0.5) & (df["strike"] <= ref * 1.05)]
+                    else:
+                        win = df
                     if win.empty or not win["openInterest"].notna().any():
                         return None
                     return float(win.loc[win["openInterest"].idxmax(), "strike"])
-                call_wall = _wall(calls)
-                put_wall = _wall(puts)
+                call_wall = _wall(calls, True)
+                put_wall = _wall(puts, False)
                 # firma di chain artefatta: max-OI di call E put sullo STESSO strike lontano
                 # dallo spot (>25%) = relitto/adjusted options, non un livello di mercato
                 if (call_wall is not None and call_wall == put_wall and ref
