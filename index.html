@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=134">
+<link rel="stylesheet" href="assets/style.css?v=135">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -29,14 +29,12 @@
   </div>
   <div class="actions">
     <button class="btn btn-primary" id="btn-cio" aria-label="Copia il pacchetto completo per l'analisi AI: storico macro, tecnica, fondamentali e ultime news" title="Copia il pacchetto completo (storico macro + tecnica + fondamentali + news) da incollare in Claude">📋 Copia Analisi AI</button>
+    <button class="btn btn-ghost" id="btn-diary" aria-label="Diario delle azioni e dettaglio verdetto" title="Diario delle azioni (finisce nell'export AI) + dettaglio verdetto motore">📔 Diario</button>
     <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: prezzi live subito + rigenerazione completa via pipeline (~2-3 min)">⟳ Aggiorna tutto</button>
   </div>
 </header>
 
 <main>
-  <!-- DECISIONE (top bar) -->
-  <section class="card decision-bar" id="decision-bar" tabindex="0" role="button" title="Verdetto operativo — clicca per dettagli e diario delle azioni"></section>
-
   <!-- MACRO SHOCK ALERT (v125): Asia/futures oltre -2% con Wall Street chiusa -->
   <div id="shock-alert" hidden></div>
   <!-- ALERT EARNINGS IMMINENTI -->
@@ -356,6 +354,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=134"></script>
+<script src="assets/app.js?v=135"></script>
 </body>
 </html>

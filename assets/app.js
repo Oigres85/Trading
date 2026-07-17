@@ -180,9 +180,13 @@ async function waitForNewData(prev, tries = 28) {
   for (let i = 0; i < tries; i++) {
     await new Promise(r => setTimeout(r, 15000));
     try {
+      rpLog(`Controllo pubblicazione dati (tentativo ${i + 1}/${tries})…`);
       const d = await fetchData();
-      if (d.updated_at !== prev) { DATA = d; renderAll(); return true; }
-    } catch { /* riprova */ }
+      if (d.updated_at !== prev) {
+        rpLog("Nuovo data.json ricevuto — rendering della dashboard");
+        DATA = d; renderAll(); return true;
+      }
+    } catch { rpLog(`Rete/CDN non pronti, riprovo (tentativo ${i + 1})`); }
   }
   return false;
 }
@@ -202,14 +206,26 @@ const PRICE_STAGES = [
   [45, "Aggiorno controvalori e P&L…"],
   [75, "Quasi pronto…"],
 ];
+let _lastRpMsg = "";
+function rpLog(msg) {
+  const box = document.getElementById("rp-log");
+  if (!box) return;
+  const line = document.createElement("div");
+  line.className = "rp-log-line";
+  line.textContent = `${new Date().toLocaleTimeString("it-IT")} · ${msg}`;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
 function showRefreshProgress(est = 150000, stages = REFRESH_STAGES) {
   hideRefreshProgress();
+  _lastRpMsg = "";
   const el = document.createElement("div");
   el.id = "refresh-progress";
   el.className = "refresh-progress";
   el.innerHTML = `
     <div class="rp-row"><span class="rp-spin"></span><span class="rp-msg" id="rp-msg">Avvio aggiornamento…</span><span class="rp-pct" id="rp-pct">0%</span></div>
-    <div class="rp-track"><div class="rp-fill" id="rp-fill" style="width:0%"></div></div>`;
+    <div class="rp-track"><div class="rp-fill" id="rp-fill" style="width:0%"></div></div>
+    <div class="rp-log" id="rp-log" aria-live="polite"></div>`;
   document.body.appendChild(el);
   const start = Date.now();
   _refreshTimer = setInterval(() => {
@@ -221,7 +237,10 @@ function showRefreshProgress(est = 150000, stages = REFRESH_STAGES) {
 function setRefreshProgress(pct, msg) {
   const f = document.getElementById("rp-fill"); if (f) f.style.width = pct.toFixed(0) + "%";
   const p = document.getElementById("rp-pct"); if (p) p.textContent = Math.round(pct) + "%";
-  if (msg) { const m = document.getElementById("rp-msg"); if (m) m.textContent = msg; }
+  if (msg) {
+    const m = document.getElementById("rp-msg"); if (m) m.textContent = msg;
+    if (msg !== _lastRpMsg) { _lastRpMsg = msg; rpLog(msg); }   // ogni nuovo step → riga di log
+  }
 }
 function finishRefreshProgress(ok) {
   if (_refreshTimer) { clearInterval(_refreshTimer); _refreshTimer = null; }
@@ -272,6 +291,7 @@ async function refreshAll() {
     }
     if (res.status !== 204) { toast(`Errore avvio aggiornamento (HTTP ${res.status})`); return; }
     showRefreshProgress();
+    rpLog("Workflow GitHub Actions avviato (rigenerazione completa della pipeline)");
     waitForNewData(DATA?.updated_at).then(ok => {
       finishRefreshProgress(ok);
       const b2 = $("#btn-refresh");
@@ -692,7 +712,6 @@ function renderAll() {
   renderMacro();
   renderPortfolioHealth();
   renderMiniCards();
-  renderDecisionBar();
   renderRiskParams();
   renderNews();
   renderBtpInfo();
@@ -1621,35 +1640,9 @@ function openRiskRuleModal(r) {
   openInfoModal(r.label, body);
 }
 
-function renderDecisionBar() {
-  const box = $("#decision-bar");
-  if (!box || !DATA) return;
-  const v = decisionVerdict();
-  const t = DATA.totals || {};
-  // obiettivo allineato al mandato del prompt AI: Sharpe > 2.0 e sovraperformance vs Nasdaq 100
-  const ps = t.portfolio_sharpe_ratio;
-  const bm = (DATA.macro || {}).benchmarks || {};
-  const pday = typeof portfolioDayPct === "function" ? portfolioDayPct() : null;
-  const alphaNdx = (pday != null && bm.ndx != null) ? Math.round((pday - bm.ndx) * 100) / 100 : null;
-  const chips = alertsSummary();
-  const chipsHtml = chips.length
-    ? `<div class="dec-alerts">${chips.map(c => `<span class="dec-chip" style="color:${c.c};border-color:${c.c}" title="${esc(c.tip)}">${esc(c.t)}</span>`).join("")}</div>`
-    : "";
-  box.innerHTML = `
-    <div class="dec-left">
-      <div class="dec-lab">Decisione operativa</div>
-      <div class="dec-verdict" style="color:${v.col}">${v.label}</div>
-    </div>
-    <div class="dec-mid">
-      ${thermoLine(v.score, ["Accumula", "Alleggerisci"])}
-      ${chipsHtml}
-    </div>
-    <div class="dec-right">
-      <div class="dec-goal" title="Mandato: massimizzare il rendimento corretto per il rischio e battere il Nasdaq 100">${alphaNdx != null ? `vs NDX oggi ${signTxt(alphaNdx, " pp")}` : "Obiettivo: battere NDX"}${ps != null ? ` · Sharpe ${fmtNum.format(ps)}/2.0` : ""}</div>
-      <div class="dec-cta muted">clicca per dettagli e diario azioni</div>
-    </div>`;
-}
-
+/* v135: la barra "Decisione operativa" in cima è stata RIMOSSA (il verdetto vive nell'export
+   AI). Il DIARIO delle azioni resta accessibile dal bottone "📔 Diario" della topbar, che
+   apre lo stesso modal (dettaglio verdetto + editor del diario che finisce nel prompt). */
 function openDecisionModal() {
   const v = decisionVerdict();
   const diary = loadDiary();
@@ -5615,7 +5608,7 @@ $("#tracking-error-box")?.addEventListener("click", openAlphaModal);
 $("#ptf-edit-values")?.addEventListener("click", openEditPortfolio);
 $("#alloc-edit")?.addEventListener("click", openEditPortfolio);
 $("#kpi-edit")?.addEventListener("click", openEditPortfolio);
-$("#decision-bar")?.addEventListener("click", openDecisionModal);
+$("#btn-diary")?.addEventListener("click", openDecisionModal);
 $("#sharpe-box")?.addEventListener("click", openPortfolioSharpeModal);
 $("#beta-box")?.addEventListener("click", openBetaSimulator);
 $("#fx-box")?.addEventListener("click", openFxModal);

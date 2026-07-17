@@ -990,6 +990,10 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 @keyframes rp-rotate { to { transform: rotate(360deg); } }
 .rp-track { height: 7px; background: var(--card-2); border-radius: 5px; overflow: hidden; }
 .rp-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #4c8dff, #16e36a); transition: width .5s ease; }
+.rp-log { margin-top: 9px; max-height: 108px; overflow-y: auto; font-family: var(--mono); font-size: 10.5px;
+  line-height: 1.55; color: var(--muted); border-top: 1px solid var(--border); padding-top: 7px; }
+.rp-log-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rp-log-line:last-child { color: var(--text); }
 
 /* ---------- v62: Refresh button states ---------- */
 .btn-refreshing { background: var(--red) !important; color: #fff !important; border-color: var(--red) !important; }
