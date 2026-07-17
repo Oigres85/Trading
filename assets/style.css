@@ -1097,6 +1097,8 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
   padding: 12px 16px; margin-bottom: 20px; }
 .cio-alarms h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .5px; color: #b52323; margin-bottom: 6px; font-weight: 700; }
 .cio-alarms ul { margin: 0; padding-left: 18px; color: #7a2b2b; font-size: 12px; line-height: 1.6; }
+.cio-list { margin: 0 0 6px; padding-left: 18px; color: #2a3140; font-size: 12.5px; line-height: 1.65; }
+.cio-list li { margin-bottom: 3px; }
 .cio-foot { border-top: 1px solid #e4e9f2; padding-top: 12px; margin-top: 8px; font-size: 10.5px; color: #7a8296; }
 .cio-doc.cio-empty { text-align: center; padding: 60px 42px; }
 .cio-doc.cio-empty h1 { border: 0; margin-bottom: 14px; }

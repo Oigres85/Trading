@@ -532,25 +532,42 @@ check("v126 breadth: divergenza SPY/RSP nel prompt con direttiva prudenza; forma
   return p1.includes("[BREADTH DIVERGENCE]") && p1.includes("prudenza sui nuovi ingressi") &&
     !p2.includes("[BREADTH DIVERGENCE]") && p2.includes("Ampiezza di mercato")`));
 
-/* ---------- STEP 5: renderCIOReport (vista istituzionale, funzione pura di app.js) ---------- */
-check("CIO render: payload valido → ticker, tag azione colorato e box allarmi nell'HTML", run(`
-  const html = renderCIOReport({
-    meta: { generated_at: "2026-07-17T06:15:00Z", data_updated_at: "2026-07-17T06:00:00Z",
-            model: "gemini-2.0-flash", assumed_cash_eur: 28500, budget_operativo_eur: 15935,
-            validation: { passed: true, hard: [], warn: [] } },
-    report: { briefing_e_sanity_check: "ok", macro_e_regime: "regime",
-              analisi_portafoglio: [{ ticker: "MU", azione: "ACCUMULA", qty: 10, limite: 95, stop: 88, motivazione: "m", tracciabilita: "Tabella A" }],
-              allocazione_liquidita: "liq", rotazione_strategica: "rot", allarmi_e_veto: ["MACRO SHOCK ALERT attivo"] } });
-  return html.includes("MU") && html.includes("cio-buy") && html.includes("ACCUMULA")
-      && html.includes("cio-alarms") && html.includes("MACRO SHOCK ALERT attivo") && html.includes("Report CIO")`));
-check("CIO render: payload assente → placeholder 'non ancora disponibile' (nessun crash)", run(`
-  const html = renderCIOReport(null);
-  return html.includes("non ancora disponibile") && html.includes("cio-report.yml")`));
-check("CIO render: ordine con campi null → celle '—', nessun 'null'/'undefined' nell'HTML", run(`
-  const html = renderCIOReport({ meta: {}, report: { briefing_e_sanity_check: "", macro_e_regime: "",
-    analisi_portafoglio: [{ ticker: "TSM", azione: "MANTIENI", qty: null, limite: null, stop: null, motivazione: "", tracciabilita: "" }],
-    allocazione_liquidita: "", rotazione_strategica: "", allarmi_e_veto: [] } });
-  return html.includes("cio-hold") && html.includes("—") && !/>\\s*(null|undefined)\\s*</.test(html)`));
+/* ---------- v128: Report CIO client-side (documento + digest storici + export AI) ---------- */
+check("CIO v128: renderCIOReport dal DATA vivo → header istituzionale, verdetto, tabelle ptf/watchlist, zero leak", run(`
+  const html = renderCIOReport();
+  return html.includes("COMITATO DI INVESTIMENTO") && html.includes("Verdetto del motore")
+      && html.includes("TST1") && html.includes("lettura storica dei grafici")
+      && !html.includes("undefined") && !/>\\s*null\\s*</.test(html)`));
+check("CIO v128: buildCIOText = prompt esistente + ANALISI STORICA + FONDAMENTALE PROFONDO (ingloba il prompt AI)", run(`
+  const t = buildCIOText();
+  return t.includes("ANALISI STORICA") && t.includes("FONDAMENTALE PROFONDO")
+      && t.indexOf("ANALISI STORICA") > t.length / 2 && t.includes(buildPrompt().slice(0, 200))`));
+check("CIO v128: digest null-safe — fixture senza serie storiche → '—', mai undefined/NaN", run(`
+  const t = historicalDigestText();
+  return !t.includes("undefined") && !/\\bNaN\\b/.test(t) && t.includes("—")`));
+check("CIO v128: digest Margin Debt calcola pendenze da history (Δ1M +10%, Δ6M +25%)", run(`
+  const saved = DATA.macro.margin_debt;
+  DATA.macro.margin_debt = { history: [100, 100, 100, 100, 100, 100, 104, 110, 110, 112, 115, 118, 125, 137.5], yoy: 37.5, qoq: 10, pct_of_peak: 100 };
+  const d = buildHistoricalDigests().find(x => x.label.startsWith("Margin Debt"));
+  DATA.macro.margin_debt = saved;
+  return d.text.includes("+10") && d.text.includes("+25") && d.text.includes("espansione")`));
+check("CIO v128: digest HY OAS — percentile nel range e allarme compressione", run(`
+  const saved = DATA.macro.credit;
+  DATA.macro.credit = { spread_hy: 2.7, history: Array.from({length: 250}, (_, i) => ({ d: "x", v: 2.7 + (i % 50) / 50 })) };
+  const d = buildHistoricalDigests().find(x => x.label.startsWith("HY OAS"));
+  DATA.macro.credit = saved;
+  return d.text.includes("percentile 0°") && d.text.includes("compressione estrema")`));
+check("CIO v128: sparkTrendRows calcola la variazione % first→last per range e marca [ptf]", run(`
+  const saved = DATA.portfolio[0].sparks;
+  DATA.portfolio[0].sparks = { m1: [100, 105, 110], y1: [200, 150] };
+  const r = sparkTrendRows().find(x => x.tk === "TST1");
+  DATA.portfolio[0].sparks = saved;
+  return r && Math.round(r.m1) === 10 && Math.round(r.y1) === -25 && r.held === true && r.w1 === null`));
+check("CIO v128: titleDeepData — CAGR ricavi dai financials pluriennali e EPS ttm→fwd", run(`
+  const d = titleDeepData({ ticker: "TSTX", price: 100,
+    financials: [{ year: 2022, revenue: 100, net_income: 10 }, { year: 2025, revenue: 200, net_income: -5 }],
+    stats: { eps_ttm: 5, eps_forward: 8, forward_pe: 12, peg: 1.1, revenue_growth: 0.2, target_mean: 130 } });
+  return Math.round(d.revCagr) === 26 && d.niCagr === null && d.epsG === 60 && d.upside === 30 && d.span === 3`));
 
 /* ---------- report ---------- */
 let fail = 0;

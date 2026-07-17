@@ -1697,7 +1697,7 @@ function openDecisionModal() {
     `<div class="info-line" style="margin-bottom:8px"><b style="color:${v.col};font-size:16px">${v.label}</b></div>
      <ul style="margin:0 0 10px 18px;font-size:12.5px;line-height:1.6">${v.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
      ${accHtml}${trailHtml}${vetoHtml}${rehabHtml}${squeezeHtml}${trimHtml}${taxHtml}
-     <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI. Obiettivo del motore: massimizzare il rendimento corretto per il rischio (Sharpe > 2.0) e sovraperformare il Nasdaq 100 — stesso mandato del prompt AI. Per l'analisi completa usa "Copia prompt AI".</div>
+     <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI. Obiettivo del motore: massimizzare il rendimento corretto per il rischio (Sharpe > 2.0) e sovraperformare il Nasdaq 100 — stesso mandato del Report CIO. Per l'analisi completa apri "📄 Report CIO" → Copia per analisi AI.</div>
      <h4 style="margin:10px 0 6px">Diario delle azioni</h4>
      <div class="diary-add"><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
      <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
@@ -2218,7 +2218,7 @@ function openTiltModal() {
      ${semiHtml}
      ${weakHtml}
      ${rotationDetailHtml()}
-     <div class="info-line muted" style="font-size:11px;margin-top:8px">Usa "Copia prompt AI" per il piano operativo dettagliato di rotazione/de-risking con indicazioni precise per ogni posizione.</div>`);
+     <div class="info-line muted" style="font-size:11px;margin-top:8px">Usa "📄 Report CIO" → Copia per analisi AI per il piano operativo dettagliato di rotazione/de-risking con indicazioni precise per ogni posizione.</div>`);
 }
 
 /* popup di orientamento rapido sulla rotazione (solo testo calcolato, NON il prompt AI) */
@@ -2245,7 +2245,7 @@ function openRotationAnalysis() {
     <div class="info-line"><b>In debolezza (1M):</b> ${lag.map(s => `${esc(s.name)} ${signTxt(s.m1)}`).join(" · ")}</div>
     ${weak.length ? `<div class="info-line">Settori in forte debolezza (potenziale ipervenduto / mean-reversion): <b>${weak.map(esc).join(", ")}</b></div>` : ""}
     ${semi ? `<div class="info-line"><b>Semiconduttori:</b> ${signTxt(semi.m1)} (1M) — ${semi.m1 < 0 ? "in calo: finestra per ridurre l'esposizione sui rimbalzi" : "in forza: valuta alleggerimenti sugli strappi"}</div>` : ""}
-    <div class="info-line muted" style="font-size:11px;margin-top:8px">Per il piano operativo dettagliato di rotazione/de-risking usa "Copia prompt AI".</div>`);
+    <div class="info-line muted" style="font-size:11px;margin-top:8px">Per il piano operativo dettagliato di rotazione/de-risking usa "📄 Report CIO" → Copia per analisi AI.</div>`);
 }
 
 function openSignpostsModal() {
@@ -5070,74 +5070,212 @@ function toast(msg) {
   setTimeout(() => el.remove(), 2500);
 }
 
-async function showPrompt() {
-  const text = buildPrompt();
-  $("#prompt-text").value = text;
-  $("#modal").hidden = false;
-  try {
-    await navigator.clipboard.writeText(text);
-    toast("Prompt copiato negli appunti ✓ (modificabile nel box)");
-  } catch { /* clipboard non disponibile: l'utente può copiare dal box */ }
-}
+/* ============ REPORT CIO (v128) — documento istituzionale CLIENT-SIDE, on-demand ============
+   Il report si genera DAL VIVO nel browser a ogni click (niente file CI, niente LLM di mezzo):
+   sempre disponibile, sempre coerente coi dati caricati e con la CASSA VERA dell'utente.
+   Ingloba il vecchio "Copia prompt AI" (bottone rimosso): l'azione "Copia per analisi AI" copia
+   buildPrompt() + i DIGEST STORICI (la "lettura quantitativa dei grafici" dei popup) + il
+   fondamentale profondo — il pacchetto completo da incollare in Claude per l'analisi senior.
+   Il PDF è la stampa nativa del browser (@media print isola #cio-report): zero dipendenze. */
 
-/* ============ REPORT CIO (v127, STEP 5) — vista istituzionale + stampa PDF nativa ============
-   Legge il report STRUTTURATO e VALIDATO generato in CI (data/cio_report.json da
-   scripts/cio_report.mjs) e lo rende come documento formale. Il PDF è la STAMPA nativa del
-   browser (@media print isola #cio-report): zero dipendenze, funziona su GitHub Pages e iPhone.
-   Il bottone AFFIANCA "Copia prompt AI" (fallback collaudato + flusso manuale con web-search),
-   non lo sostituisce. */
-const CIO_RAW_URL = () => `https://raw.githubusercontent.com/${REPO}/main/data/cio_report.json?t=${Date.now()}`;
-const CIO_PAGES_URL = () => `data/cio_report.json?t=${Date.now()}`;
-let CIO_REPORT = null;
+/* ---------- helpers numerici null-safe (— ovunque manchi il dato) ---------- */
+const dgFin = (v) => (v != null && Number.isFinite(Number(v))) ? Number(v) : null;
+const dgTxt = (v, suf = "", dec = 1) => { const n = dgFin(v); return n == null ? "—" : fmtNum.format(Math.round(n * 10 ** dec) / 10 ** dec) + suf; };
+const dgPct = (x) => { const n = dgFin(x); return n == null ? null : Math.round(n * 1000) / 10; };   // frazione → %
+const dgDelta = (arr, n) => {   // variazione % ultimo vs n passi indietro (serie di numeri)
+  if (!Array.isArray(arr) || arr.length < n + 1) return null;
+  const a = dgFin(arr[arr.length - 1 - n]), b = dgFin(arr[arr.length - 1]);
+  return (a && b) ? (b / a - 1) * 100 : null;
+};
+const dgPercentile = (arr, v) => {   // posizione % di v nel range della serie
+  const xs = (arr || []).map(dgFin).filter(x => x != null);
+  const x = dgFin(v);
+  if (x == null || xs.length < 5) return null;
+  const lo = Math.min(...xs), hi = Math.max(...xs);
+  return hi > lo ? Math.round((x - lo) / (hi - lo) * 100) : null;
+};
 
-async function loadCIOReport() {
-  const grab = async (url) => {
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error(String(r.status));
-    return JSON.parse((await r.text()).replace(/\bNaN\b/g, "null"));
-  };
-  try { CIO_REPORT = await grab(CIO_RAW_URL()); }
-  catch { try { CIO_REPORT = await grab(CIO_PAGES_URL()); } catch { CIO_REPORT = null; } }
-  updateCIOButton();
-  return CIO_REPORT;
-}
-function updateCIOButton() {
-  const btn = $("#btn-cio"); if (!btn) return;
-  const ts = CIO_REPORT?.meta?.generated_at;
-  btn.title = ts ? `Report CIO del ${new Date(ts).toLocaleString("it-IT")} — apri e stampa in PDF`
-                 : "Nessun report CIO ancora generato (workflow cio-report.yml)";
-}
-
-function cioAzioneTag(a) {
-  const cls = (a === "ACCUMULA" || a === "NUOVO_INGRESSO") ? "cio-buy"
-            : (a === "VENDI" || a === "ALLEGGERISCI") ? "cio-sell" : "cio-hold";
-  return `<span class="cio-tag ${cls}">${esc(a)}</span>`;
-}
-const cioPar = (t) => esc(t).replace(/\n/g, "<br>");
-const cioNum = (v, prefix = "") => (v == null || v === "") ? "—" : prefix + fmtNum.format(Number(v));
-
-function renderCIOReport(payload) {
-  if (!payload || !payload.report) {
-    return `<div class="cio-doc cio-empty"><h1>Report CIO non ancora disponibile</h1>
-      <p>Nessun <code>data/cio_report.json</code> trovato. Il report viene generato dal workflow
-      <b>cio-report.yml</b> (mattina nei giorni feriali) o manualmente da GitHub → Actions → "Run
-      workflow", con il secret <code>GEMINI_API_KEY</code> configurato. Nel frattempo usa
-      "Copia prompt AI" per il flusso manuale.</p></div>`;
+/* ---------- fondamentale PROFONDO: CAGR pluriennale dai bilanci già in pipeline ---------- */
+function titleDeepData(r) {
+  const s = r.stats || {};
+  const fin = Array.isArray(r.financials) ? [...r.financials].sort((a, b) => a.year - b.year) : [];
+  let revCagr = null, niCagr = null, span = null;
+  if (fin.length >= 2) {
+    const a = fin[0], b = fin[fin.length - 1];
+    span = b.year - a.year;
+    const cagr = (x, y) => (x > 0 && y > 0 && span > 0) ? (Math.pow(y / x, 1 / span) - 1) : null;
+    revCagr = cagr(a.revenue, b.revenue);
+    niCagr = cagr(a.net_income, b.net_income);        // utili: solo se entrambi positivi (cagr lo garantisce)
   }
-  const { meta, report } = payload;
-  const gen = meta?.generated_at ? new Date(meta.generated_at).toLocaleString("it-IT") : "—";
-  const orders = Array.isArray(report.analisi_portafoglio) ? report.analisi_portafoglio : [];
-  const rows = orders.map(o => `<tr>
-      <td class="cio-tk">${esc(o.ticker)}</td>
-      <td>${cioAzioneTag(o.azione)}</td>
-      <td class="cio-r">${cioNum(o.qty)}</td>
-      <td class="cio-r">${cioNum(o.limite, "$")}</td>
-      <td class="cio-r">${cioNum(o.stop, "$")}</td>
-      <td>${cioPar(o.motivazione)}</td>
-      <td class="cio-trace">${cioPar(o.tracciabilita)}</td></tr>`).join("");
-  const alarms = Array.isArray(report.allarmi_e_veto) ? report.allarmi_e_veto : [];
-  const v = meta?.validation;
-  const valTxt = v ? `${v.passed ? "nessuna violazione" : (v.hard?.length || 0) + " violazioni"}${v.warn?.length ? `, ${v.warn.length} warning` : ""}` : "n.d.";
+  const epsG = (s.eps_ttm > 0 && s.eps_forward > 0) ? s.eps_forward / s.eps_ttm - 1 : null;
+  const upside = (s.target_mean > 0 && r.price > 0) ? s.target_mean / r.price - 1 : null;
+  return { tk: r.ticker, span, revCagr: dgPct(revCagr), niCagr: dgPct(niCagr),
+           revYoY: dgPct(s.revenue_growth), epsG: dgPct(epsG),
+           fwdPe: dgFin(s.forward_pe), peg: dgFin(s.peg), upside: dgPct(upside) };
+}
+
+/* ---------- DIGEST STORICI: le serie che i popup disegnano, tradotte in numeri ----------
+   Un analista guarda le TRAIETTORIE (pendenza, percentile nel range, inversioni), non i livelli:
+   questi digest danno all'AI esattamente ciò che l'occhio estrae dai grafici. Ogni voce è
+   null-safe: serie assente → "—", mai un crash o un placeholder sporco. */
+function buildHistoricalDigests() {
+  const m = DATA.macro || {};
+  const out = [];
+
+  const md = m.margin_debt || {};
+  const mdh = Array.isArray(md.history) ? md.history.map(dgFin).filter(x => x != null) : [];
+  out.push({ label: "Margin Debt (FINRA, mensile)", text: mdh.length >= 2
+    ? `${fmtNum.format(mdh[mdh.length - 1])} M$ · Δ1M ${signTxt(dgDelta(mdh, 1))} · Δ6M ${signTxt(dgDelta(mdh, 6))} · YoY ${signTxt(dgFin(md.yoy))} · ${dgTxt(md.pct_of_peak, "% del picco")} · regime ${(dgFin(md.qoq) ?? 0) < -2 || (dgFin(md.yoy) ?? 0) < 0 ? "DELEVERAGING (rollover della leva: storicamente precede i drawdown)" : "espansione della leva"}`
+    : "—" });
+
+  const cr = m.credit || {};
+  const crh = Array.isArray(cr.history) ? cr.history.map(x => dgFin(x && x.v)).filter(x => x != null) : [];
+  const crPct = dgPercentile(crh, cr.spread_hy);
+  out.push({ label: "HY OAS (spread high yield, serie 1A)", text: crh.length >= 5
+    ? `${dgTxt(cr.spread_hy, "%", 2)} · Δ1M ${signTxt(dgDelta(crh, 21), "%")} · range 1A [${dgTxt(Math.min(...crh), "", 2)}–${dgTxt(Math.max(...crh), "", 2)}] · percentile ${dgTxt(crPct, "°", 0)}${crPct != null && crPct <= 20 ? " (compressione estrema: il credito non prezza rischio)" : crPct != null && crPct >= 80 ? " (stress creditizio in costruzione)" : ""}`
+    : "—" });
+
+  const cvh = Array.isArray(m.curve_history) ? m.curve_history.map(x => dgFin(x && x.v)).filter(x => x != null) : [];
+  let inv = null;
+  for (let i = cvh.length - 1; i >= 0; i--) { if (cvh[i] < 0) { inv = cvh.length - 1 - i; break; } }
+  out.push({ label: "Curva 10A–2A (serie ~2A)", text: cvh.length >= 5
+    ? `${dgTxt(cvh[cvh.length - 1], "pp", 2)} · Δ1M ${cvh.length >= 22 ? dgTxt(cvh[cvh.length - 1] - cvh[cvh.length - 22], "pp", 2) : "—"} · Δ3M ${cvh.length >= 64 ? dgTxt(cvh[cvh.length - 1] - cvh[cvh.length - 64], "pp", 2) : "—"} · ${inv == null ? "nessuna inversione nella serie" : inv === 0 ? "INVERTITA ORA" : `ultima inversione ${inv} sedute fa${inv <= 252 ? " (il rischio recessivo storicamente matura DOPO la dis-inversione)" : ""}`}`
+    : "—" });
+
+  const vx = m.vix || {};
+  const vxs = Array.isArray(vx.spark) ? vx.spark.map(dgFin).filter(x => x != null) : [];
+  const vxPct = dgPercentile(vxs, vx.value);
+  out.push({ label: "VIX (finestra spark ~3M)", text: dgFin(vx.value) != null
+    ? `${dgTxt(vx.value, "", 1)} · oggi ${signTxt(dgFin(vx.change_pct))} · percentile finestra ${dgTxt(vxPct, "°", 0)} · term VIX/VIX3M ${dgTxt((m.smart_money || {}).vix_term_ratio, "", 2)}${dgFin((m.smart_money || {}).vix_term_ratio) != null ? ((m.smart_money || {}).vix_term_ratio >= 1 ? " (BACKWARDATION: stress)" : " (contango: calma)") : ""}`
+    : "—" });
+
+  const mh = Array.isArray(DATA.metrics_history) ? DATA.metrics_history : [];
+  const navs = mh.map(x => dgFin(x && x.eur_value)).filter(x => x != null);
+  const shp = mh.map(x => dgFin(x && x.sharpe)).filter(x => x != null);
+  out.push({ label: `NAV & Sharpe del fondo (storico ${mh.length} rilevazioni)`, text: navs.length >= 2
+    ? `NAV €${fmtNum.format(Math.round(navs[navs.length - 1]))} · Δ7 rilev. ${signTxt(dgDelta(navs, Math.min(7, navs.length - 1)))} · Sharpe ${dgTxt(shp[shp.length - 1], "", 2)} (Δ7 ${shp.length >= 8 ? dgTxt(shp[shp.length - 1] - shp[shp.length - 8], "", 2) : "—"})`
+    : "—" });
+
+  return out;
+}
+
+/* trend multi-orizzonte per titolo dalle sparkline (prima→ultima barra di ogni range) */
+function sparkTrendRows() {
+  const rows = [];
+  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) {
+    if (!r || r.currency !== "USD" || !(r.price > 0)) continue;
+    const sp = r.sparks || {};
+    const tr = (k) => { const a = Array.isArray(sp[k]) ? sp[k].map(dgFin).filter(x => x != null) : [];
+      return a.length >= 2 ? (a[a.length - 1] / a[0] - 1) * 100 : null; };
+    const w1 = tr("w1"), m1 = tr("m1"), m3 = tr("m3"), y1 = tr("y1");
+    if ([w1, m1, m3, y1].every(v => v == null)) continue;
+    rows.push({ tk: r.ticker, w1, m1, m3, y1, held: !!r.qty });
+  }
+  return rows;
+}
+
+/* ---------- testo per l'analisi AI: prompt esistente + digest (il pacchetto COMPLETO) ---------- */
+function historicalDigestText() {
+  const L = [];
+  L.push("=== ANALISI STORICA — LETTURA QUANTITATIVA DEI GRAFICI (traiettorie delle serie che la dashboard disegna: usa pendenze e percentili, non solo i livelli) ===");
+  for (const d of buildHistoricalDigests()) L.push(`· ${d.label}: ${d.text}`);
+  const tr = sparkTrendRows();
+  if (tr.length) {
+    L.push(`TREND MULTI-ORIZZONTE PER TITOLO — ${tr.length} TITOLI → ${tr.length} righe (variazione % nel range; incrocia col RS 1M per confermare/negare il momentum):`);
+    L.push("| Titolo | 1S | 1M | 3M | 1A |");
+    L.push("|---|---|---|---|---|");
+    for (const r of tr) L.push(`| ${r.tk}${r.held ? " [ptf]" : ""} | ${signTxt(r.w1)} | ${signTxt(r.m1)} | ${signTxt(r.m3)} | ${signTxt(r.y1)} |`);
+  }
+  const deep = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+    .filter(r => r && r.currency === "USD" && r.price > 0 && !/^[\^]/.test(r.ticker) && !/[=]F$|-USD$/.test(r.ticker))
+    .map(titleDeepData);
+  if (deep.length) {
+    L.push(`=== FONDAMENTALE PROFONDO — ${deep.length} TITOLI → ${deep.length} righe (CAGR composto dai bilanci pluriennali già scaricati; EPS impl. = eps_forward/eps_ttm−1) ===`);
+    L.push("| Titolo | CAGR ricavi | CAGR utili | Ricavi YoY | EPS ttm→fwd | Fwd P/E | PEG | Upside target |");
+    L.push("|---|---|---|---|---|---|---|---|");
+    for (const t of deep) L.push(`| ${t.tk} | ${dgTxt(t.revCagr, "%")}${t.span ? ` (${t.span}A)` : ""} | ${dgTxt(t.niCagr, "%")} | ${dgTxt(t.revYoY, "%")} | ${dgTxt(t.epsG, "%")} | ${dgTxt(t.fwdPe)} | ${dgTxt(t.peg, "", 2)} | ${dgTxt(t.upside, "%")} |`);
+  }
+  L.push("USO: incrocia CAGR e PEG coi multipli per giustificare/negare Let Winners Run; pendenze macro in deterioramento (Margin Debt in DELEVERAGING, HY OAS in allargamento, curva in dis-inversione) → riduci il sizing dei nuovi ingressi prima che i prezzi lo confermino.");
+  return L.join("\n");
+}
+function buildCIOText() {
+  return buildPrompt() + "\n\n" + historicalDigestText();
+}
+
+/* ---------- documento istituzionale (HTML → stampa PDF nativa) ---------- */
+function cioTag(txt, cls) { return `<span class="cio-tag ${cls}">${esc(txt)}</span>`; }
+
+function renderCIOReport() {
+  if (!DATA) return `<div class="cio-doc cio-empty"><h1>Dati non ancora caricati</h1><p>Attendi il caricamento della dashboard e riprova.</p></div>`;
+  const t = DATA.totals || {};
+  const eurusd = DATA.eurusd || 1.08;
+  const v = decisionVerdict();
+  const digests = buildHistoricalDigests();
+  const trends = sparkTrendRows();
+  const deep = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+    .filter(r => r && r.currency === "USD" && r.price > 0 && !/^[\^]/.test(r.ticker) && !/[=]F$|-USD$/.test(r.ticker))
+    .map(titleDeepData);
+  const upd = (DATA.updated_at || "—").slice(0, 16).replace("T", " ");
+
+  /* — allarmi & veto (tutto ciò che oggi è sparso in banner/popup) — */
+  const alarms = [];
+  const sh = (DATA.macro || {}).shock_alert;
+  if (sh?.active) alarms.push(`🚨 MACRO SHOCK ALERT: ${(sh.sources || []).map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} — sospendi gli acquisti aggressivi, attendi l'assestamento della prima ora USA.`);
+  const fr = (DATA.macro || {}).froth;
+  if (fr?.alert) alarms.push(`🫧 SPECULATIVE FROTH: ${fr.note || "volumi estremi sugli ETF 3x"}`);
+  const br = (DATA.macro || {}).breadth;
+  if (br?.alert) alarms.push(`📉 BREADTH DIVERGENCE: ${br.note || "il rally è retto dalle megacap"}`);
+  for (const x of v.stopViolations || []) alarms.push(`⛔ STOP VIOLATO: ${x.r.ticker} (prezzo ${cur(x.r)}${fmtNum.format(x.r.price)} sotto stop ${cur(x.r)}${fmtNum.format(x.stop)}) — disciplina: uscita o ri-arm consapevole.`);
+  const in7 = (d) => { if (!d) return false; const dd = (new Date(d) - Date.now()) / 86400000; return dd >= 0 && dd <= 7; };
+  const earn = (DATA.portfolio || []).filter(r => r.qty && in7(r.earnings_date)).map(r => `${r.ticker} ${String(r.earnings_date).slice(5, 10)}`);
+  if (earn.length) alarms.push(`📅 EARNINGS ≤7g su posizioni: ${earn.join(", ")} — rischio gap, niente nuovi ingressi a ridosso.`);
+  const dq = ((DATA.data_quality || {}).alerts || []);
+  if (dq.length) alarms.push(`🟡 DATA QUALITY: ${dq.join(", ")} — verifica sul web i dati flaggati prima di usarli.`);
+  for (const x of v.excluded || []) alarms.push(`🛑 VETO ${esc(x.verdict || "")}: ${x.r.ticker} — ${(x.why || []).join(", ")}${x.r.qty ? " [in ptf: vieta l'accumulo, non ordina la vendita]" : ""}`);
+  for (const c of v.concentrationAlert || []) alarms.push(`⚠ CONCENTRAZIONE: ${c.r.ticker} ${c.w}% del NAV oltre la soglia di attenzione (Let Winners Run: nessun trim d'ufficio).`);
+
+  /* — piano operativo del motore — */
+  const planRows = (v.withPlan || []).map(p => `<tr>
+    <td class="cio-tk">${esc(p.r.ticker)}</td><td>${cioTag(v.label === "LIQUIDITÀ" ? "PRONTO (no cassa)" : "CANDIDATO", "cio-buy")}</td>
+    <td class="cio-r">${dgTxt(p.q, "", 0)}</td><td class="cio-r">${dgTxt(p.qty, "", 0)}</td>
+    <td class="cio-r">$${fmtNum.format(p.limit)}</td><td class="cio-r">$${fmtNum.format(p.stop)}</td>
+    <td class="cio-r">${p.qty && p.limit ? "$" + fmtNum.format(Math.round(p.qty * p.limit)) : "—"}</td></tr>`).join("");
+  const rehab = (v.rehabbed || []).map(x => x.r.ticker).join(", ");
+
+  /* — tabella portafoglio (posizioni reali) — */
+  const usdNav = dgFin(t.usd_value);
+  const ptfRows = (DATA.portfolio || []).filter(r => r.qty).map(r => {
+    const vUsd = r.currency === "EUR" ? (dgFin(r.value) ?? 0) * eurusd : dgFin(r.value);
+    const w = (vUsd && usdNav) ? vUsd / usdNav * 100 : null;
+    return `<tr><td class="cio-tk">${esc(r.ticker)}</td><td class="cio-r">${dgTxt(r.qty, "", 0)}</td>
+      <td class="cio-r">${cur(r)}${dgTxt(r.pmc, "", 2)}</td><td class="cio-r">${cur(r)}${dgTxt(r.price, "", 2)}</td>
+      <td class="cio-r">${signTxt(dgFin(r.change_pct))}</td><td class="cio-r">${dgTxt(w, "%")}</td>
+      <td class="cio-r">${signTxt(dgFin(r.gain_pct))}</td><td class="cio-r">${r.stop_atr != null ? cur(r) + dgTxt(r.stop_atr, "", 2) + (r.stop_violated ? " ⛔" : "") : "—"}</td>
+      <td class="cio-r">${signTxt(dgFin(r.rs_ndx_1m), "pp")}</td><td class="cio-r">${dgTxt(r.sortino_1y, "", 2)}</td>
+      <td class="cio-r">${dgTxt(r.risk_contrib_pct, "%")}</td><td>${esc(r.signal ?? "—")}</td></tr>`;
+  }).join("");
+
+  /* — watchlist compatta — */
+  const wlRows = (DATA.watchlist || []).filter(r => r.currency === "USD" && r.price > 0 && !r.qty).map(r =>
+    `<tr><td class="cio-tk">${esc(r.ticker)}</td><td class="cio-r">${cur(r)}${dgTxt(r.price, "", 2)}</td>
+     <td class="cio-r">${signTxt(dgFin(r.change_pct))}</td><td class="cio-r">${signTxt(dgFin(r.rs_ndx_1m), "pp")}</td>
+     <td class="cio-r">${r.support != null ? cur(r) + dgTxt(r.support, "", 2) : "—"}</td>
+     <td class="cio-r">${esc(r.risk_reward ?? "—")}</td><td>${esc(r.signal ?? "—")}</td></tr>`).join("");
+
+  /* — news recenti — */
+  const newsRows = (DATA.news || []).slice(0, 10).map(n =>
+    `<li><b>${esc((n.published || "").slice(5, 16).replace("T", " "))}</b> · ${esc(n.title_it || n.title || "")} <span class="cio-trace">(${esc(n.source || "—")}${Array.isArray(n.tickers) && n.tickers.length ? " · " + n.tickers.join(",") : ""})</span></li>`).join("");
+
+  const vt = DATA.verdict_track || {};
+  const trendRows = trends.map(r => `<tr><td class="cio-tk">${esc(r.tk)}${r.held ? " ●" : ""}</td>
+    <td class="cio-r">${signTxt(r.w1)}</td><td class="cio-r">${signTxt(r.m1)}</td>
+    <td class="cio-r">${signTxt(r.m3)}</td><td class="cio-r">${signTxt(r.y1)}</td></tr>`).join("");
+  const deepRows = deep.map(x => `<tr><td class="cio-tk">${esc(x.tk)}</td>
+    <td class="cio-r">${dgTxt(x.revCagr, "%")}${x.span ? ` <span class="cio-trace">(${x.span}A)</span>` : ""}</td>
+    <td class="cio-r">${dgTxt(x.niCagr, "%")}</td><td class="cio-r">${dgTxt(x.revYoY, "%")}</td>
+    <td class="cio-r">${dgTxt(x.epsG, "%")}</td><td class="cio-r">${dgTxt(x.fwdPe)}</td>
+    <td class="cio-r">${dgTxt(x.peg, "", 2)}</td><td class="cio-r">${dgTxt(x.upside, "%")}</td></tr>`).join("");
+
   return `<article class="cio-doc">
     <header class="cio-header">
       <div>
@@ -5145,30 +5283,57 @@ function renderCIOReport(payload) {
         <h1>Trading Dashboard · Report CIO</h1>
       </div>
       <div class="cio-meta">
-        <div>Generato <b>${esc(gen)}</b></div>
-        <div>Dati del ${esc((meta?.data_updated_at || "—").slice(0, 16).replace("T", " "))}</div>
-        <div>Budget operativo ${meta?.budget_operativo_eur != null ? fmtEUR.format(meta.budget_operativo_eur) : "—"}</div>
-        <div class="cio-model">modello ${esc(meta?.model || "—")} · cassa assunta ${meta?.assumed_cash_eur != null ? fmtEUR.format(meta.assumed_cash_eur) : "—"}</div>
+        <div>Dati del <b>${esc(upd)}</b> · generato ora, client-side</div>
+        <div>NAV ${t.eur_value != null ? fmtEUR.format(Math.round(t.eur_value)) : "—"} · cassa ${fmtEUR.format(Math.round(cashEur || 0))}</div>
+        <div>Budget operativo ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"} (cassa − ES95)</div>
+        <div class="cio-model">Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · Sortino ${dgTxt(t.portfolio_sortino_ratio, "", 2)} · β NDX ${dgTxt(t.portfolio_beta_ndx, "", 2)} · ES95 1g ${t.es95_hist_eur != null ? fmtEUR.format(t.es95_hist_eur) : "—"}</div>
       </div>
     </header>
-    <section class="cio-sec"><h2>1 · Briefing &amp; Sanity Check</h2><p>${cioPar(report.briefing_e_sanity_check)}</p></section>
-    <section class="cio-sec"><h2>2 · Macro &amp; Regime</h2><p>${cioPar(report.macro_e_regime)}</p></section>
-    <section class="cio-sec"><h2>3 · Analisi del Portafoglio</h2>
+    ${alarms.length ? `<section class="cio-alarms"><h2>⚠ Allarmi &amp; Veto (${alarms.length})</h2><ul>${alarms.map(a => `<li>${a}</li>`).join("")}</ul></section>` : ""}
+    <section class="cio-sec"><h2>1 · Verdetto del motore: ${esc(v.label)} (${dgTxt(v.score, "", 0)}/100)</h2>
+      <ul class="cio-list">${(v.reasons || []).map(r => `<li>${esc(r)}</li>`).join("") || "<li>—</li>"}</ul>
+      ${planRows ? `<div class="cio-table-wrap"><table class="cio-table">
+        <thead><tr><th>Titolo</th><th>Stato</th><th>Score</th><th>Qtà</th><th>Limite</th><th>Stop</th><th>Controvalore</th></tr></thead>
+        <tbody>${planRows}</tbody></table></div>` : `<p class="cio-trace">Nessun piano d'ingresso eseguibile oggi.</p>`}
+      ${rehab ? `<p class="cio-trace">Riabilitati (SORVEGLIATI): ${esc(rehab)}</p>` : ""}</section>
+    <section class="cio-sec"><h2>2 · Macro &amp; Regime — lettura storica dei grafici</h2>
       <div class="cio-table-wrap"><table class="cio-table">
-        <thead><tr><th>Titolo</th><th>Azione</th><th>Qtà</th><th>Limite</th><th>Stop</th><th>Motivazione</th><th>Tracciabilità</th></tr></thead>
-        <tbody>${rows || `<tr><td colspan="7" class="cio-empty-row">Nessun ordine proposto.</td></tr>`}</tbody>
+        <thead><tr><th>Serie</th><th>Lettura quantitativa</th></tr></thead>
+        <tbody>${digests.map(d => `<tr><td class="cio-tk">${esc(d.label)}</td><td>${esc(d.text)}</td></tr>`).join("")}</tbody>
       </table></div></section>
-    <section class="cio-sec"><h2>4 · Allocazione della Liquidità</h2><p>${cioPar(report.allocazione_liquidita)}</p></section>
-    <section class="cio-sec"><h2>5 · Rotazione Strategica</h2><p>${cioPar(report.rotazione_strategica)}</p></section>
-    ${alarms.length ? `<section class="cio-alarms"><h2>⚠ Allarmi &amp; Veto</h2><ul>${alarms.map(a => `<li>${cioPar(a)}</li>`).join("")}</ul></section>` : ""}
-    <footer class="cio-foot">Report generato automaticamente e validato sugli invarianti del motore (${esc(valTxt)}).
+    <section class="cio-sec"><h2>3 · Portafoglio (${(DATA.portfolio || []).filter(r => r.qty).length} posizioni)</h2>
+      <div class="cio-table-wrap"><table class="cio-table">
+        <thead><tr><th>Titolo</th><th>Qtà</th><th>PMC</th><th>Prezzo</th><th>Oggi</th><th>Peso</th><th>Gain</th><th>Stop</th><th>RS 1M</th><th>Sortino</th><th>MCR</th><th>Segnale</th></tr></thead>
+        <tbody>${ptfRows || `<tr><td colspan="12" class="cio-empty-row">Nessuna posizione.</td></tr>`}</tbody>
+      </table></div></section>
+    <section class="cio-sec"><h2>4 · Watchlist</h2>
+      <div class="cio-table-wrap"><table class="cio-table">
+        <thead><tr><th>Titolo</th><th>Prezzo</th><th>Oggi</th><th>RS 1M</th><th>Supp.</th><th>R/R</th><th>Segnale</th></tr></thead>
+        <tbody>${wlRows || `<tr><td colspan="7" class="cio-empty-row">—</td></tr>`}</tbody>
+      </table></div></section>
+    <section class="cio-sec"><h2>5 · Trend multi-orizzonte (● = in portafoglio)</h2>
+      <div class="cio-table-wrap"><table class="cio-table">
+        <thead><tr><th>Titolo</th><th>1S</th><th>1M</th><th>3M</th><th>1A</th></tr></thead>
+        <tbody>${trendRows || `<tr><td colspan="5" class="cio-empty-row">—</td></tr>`}</tbody>
+      </table></div></section>
+    <section class="cio-sec"><h2>6 · Fondamentale profondo (CAGR dai bilanci)</h2>
+      <div class="cio-table-wrap"><table class="cio-table">
+        <thead><tr><th>Titolo</th><th>CAGR ricavi</th><th>CAGR utili</th><th>Ricavi YoY</th><th>EPS ttm→fwd</th><th>Fwd P/E</th><th>PEG</th><th>Upside target</th></tr></thead>
+        <tbody>${deepRows || `<tr><td colspan="8" class="cio-empty-row">—</td></tr>`}</tbody>
+      </table></div></section>
+    <section class="cio-sec"><h2>7 · News recenti</h2>
+      <ul class="cio-list">${newsRows || "<li>—</li>"}</ul></section>
+    <section class="cio-sec"><h2>8 · Track record del motore</h2>
+      <p>${vt.since ? `Dal ${esc(vt.since)}: ${dgTxt(vt.episodes, "", 0)} episodi di segnale · esiti maturi ≥7g: ${dgTxt(vt.mature7?.n, "", 0)} · ≥30g: ${dgTxt(vt.mature30?.n, "", 0)}.` : "—"}</p></section>
+    <footer class="cio-foot">Report generato client-side dai dati della dashboard (pipeline ${esc(upd)}); cassa e budget = valori REALI dell'utente.
+      Per l'analisi senior: "Copia per analisi AI" esporta testata + payload + questa lettura storica, da incollare in Claude (obblighi di verifica web nella testata).
       Documento di supporto decisionale, non consulenza finanziaria. Repo pubblico: i valori sono reali.</footer>
   </article>`;
 }
 
-async function openCIOReport() {
-  if (!CIO_REPORT) { toast("Carico il report CIO…"); await loadCIOReport(); }
-  $("#cio-body").innerHTML = renderCIOReport(CIO_REPORT);
+function openCIOReport() {
+  if (!DATA) { toast("Dati non ancora caricati, riprova tra un attimo"); return; }
+  $("#cio-body").innerHTML = renderCIOReport();
   $("#cio-report").hidden = false;
   document.body.classList.add("cio-open");
 }
@@ -5176,13 +5341,24 @@ function closeCIOReport() {
   $("#cio-report").hidden = true;
   document.body.classList.remove("cio-open");
 }
+async function copyCIOText() {
+  if (!DATA) { toast("Dati non ancora caricati"); return; }
+  const text = buildCIOText();
+  $("#prompt-text").value = text;   // la modal resta il fallback/editor (clipboard può mancare su iOS)
+  try {
+    await navigator.clipboard.writeText(text);
+    toast("Pacchetto analisi copiato ✓ — incollalo in Claude");
+  } catch {
+    $("#modal").hidden = false;     // clipboard negata: si copia a mano dal box
+  }
+}
 
 /* ---------------- eventi ---------------- */
 $("#btn-refresh").addEventListener("click", refreshAll);
-$("#btn-prompt").addEventListener("click", showPrompt);
 $("#btn-cio")?.addEventListener("click", openCIOReport);
 $("#cio-close")?.addEventListener("click", closeCIOReport);
 $("#cio-print")?.addEventListener("click", () => window.print());
+$("#cio-copy")?.addEventListener("click", copyCIOText);
 $("#modal-close").addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
 $("#btn-copy").addEventListener("click", async () => {
@@ -5665,7 +5841,6 @@ loadData();
 loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
 loadPromptHeaderCloud();   // sincronizza la testata del prompt dal server (config/prompt_header.txt)
 loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
-loadCIOReport();    // best-effort: se esiste data/cio_report.json aggiorna lo stato del bottone Report CIO
 // ricarica completa (tecnici, news, storico) ogni 5 minuti
 setInterval(() => loadData(), 5 * 60 * 1000);
 // prezzi live ogni 60 secondi

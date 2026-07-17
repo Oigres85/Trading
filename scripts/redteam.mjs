@@ -132,7 +132,9 @@ function checkCampaign(name, ctx) {
     if (!(t.stop > 0)) fail(name, `I2 ${t.tk}: stop trailing ${t.stop} ≤ 0`);
     if (t.price > 0 && t.stop > t.price * 3) fail(name, `I2 ${t.tk}: stop trailing ${t.stop} oltre 3× il prezzo ${t.price}`);
   }
-  const p = vm.runInContext("buildPrompt()", ctx);
+  // v128: audita il PACCHETTO COMPLETO (payload + digest storici del Report CIO) se presente —
+  // i digest devono reggere null-storm e dati avvelenati esattamente come la coda del prompt
+  const p = vm.runInContext("typeof buildCIOText === 'function' ? buildCIOText() : buildPrompt()", ctx);
   if (p.includes("undefined")) fail(name, `I3 'undefined' nel prompt: …${p.slice(Math.max(0, p.indexOf("undefined") - 60), p.indexOf("undefined") + 30)}…`);
   if (/\bNaN\b/.test(p)) fail(name, "I3 'NaN' nel prompt");
   if (/Infinity/.test(p)) fail(name, "I3 'Infinity' nel prompt");
