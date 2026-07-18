@@ -671,6 +671,16 @@ check("v138 curva: riga indicators etichettata GIORNALIERA (non più 'serie mens
   DATA.macro.indicators = saved;
   return p.includes("serie GIORNALIERA FRED T10Y2Y") && !p.includes("Curva 10A-2A: +0.41 pp (rilevazione 2026-07-16 — serie mensile")`));
 
+/* ---------- v139: benchmark nel brief + attribuzione ---------- */
+check("v139 benchmark: l'executive brief apre col confronto fondo vs Nasdaq (null-safe senza ^IXIC)", run(`
+  const b = buildExecutiveDelta();
+  return b.includes("BENCHMARK vs Nasdaq") && b.includes("pagella") === false && !b.includes("undefined")`));
+check("v139 benchmark: con ^IXIC nel fixture la riga riporta i trend dell'indice", run(`
+  DATA.watchlist.push({ ticker: "^IXIC", currency: "USD", price: 25000, sparks: { w1: [100, 99, 98, 97.5], m1: Array.from({length: 20}, (_, i) => 100 - i * 0.2) } });
+  const b = buildExecutiveDelta();
+  DATA.watchlist.pop();
+  return b.includes("vs Composite -2,5%")`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

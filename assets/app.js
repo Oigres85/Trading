@@ -1809,7 +1809,8 @@ function renderAIValidation(text) {
     <td>${ico[x.level]} ${x.msgs.length ? esc(x.msgs.join(" · ")) : "invarianti rispettate"}</td></tr>`).join("");
   return `<table class="info-table" style="margin-top:8px"><thead><tr><th>Titolo</th><th>Azione</th><th class="num">Qtà</th><th class="num">Limite</th><th class="num">Stop</th><th>Esito</th></tr></thead><tbody>${rows}</tbody></table>
     <div class="info-line ${v.budget.ok ? "" : "neg"}" style="font-size:12px;margin-top:6px">${v.budget.ok ? "✅" : "⛔"} Spesa d'acquisto ~$${fmtNum.format(v.budget.spend)} vs budget operativo $${fmtNum.format(v.budget.budget)} (cassa − ES95)${v.budget.ok ? "" : " — SFORATO"}</div>
-    <div class="info-line" style="font-size:12.5px;margin-top:4px"><b>${v.hardCount ? `⛔ ${v.hardCount} violazioni HARD — NON eseguire questi ordini senza correggerli` : v.warnCount ? `⚠️ nessuna violazione hard, ${v.warnCount} avvisi` : "✅ tutti gli ordini rispettano gli invarianti del fondo"}</b></div>`;
+    <div class="info-line" style="font-size:12.5px;margin-top:4px"><b>${v.hardCount ? `⛔ ${v.hardCount} violazioni HARD — NON eseguire questi ordini senza correggerli` : v.warnCount ? `⚠️ nessuna violazione hard, ${v.warnCount} avvisi` : "✅ tutti gli ordini rispettano gli invarianti del fondo"}</b></div>
+    <button class="btn btn-ghost btn-sm" id="val-log" style="margin-top:6px" title="Registra i consigli AI validati come voce [AI] del diario: è l'attribuzione che permette di misurare, a 7/30 giorni, se i consigli aggiungono alpha">📔 Registra consigli nel diario [AI]</button>`;
 }
 
 function openDecisionModal() {
@@ -1903,17 +1904,33 @@ function openDecisionModal() {
      <div class="diary-add"><textarea id="val-input" rows="2" placeholder="Incolla qui il report di Claude…"></textarea><button class="btn btn-primary btn-sm" id="val-run">Valida ordini</button></div>
      <div id="val-out"></div>
      <h4 style="margin:14px 0 6px">Diario delle azioni</h4>
-     <div class="diary-add"><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
+     <div class="diary-add"><select id="diary-src" title="FONTE della decisione — l'attribuzione è ciò che permette di misurare, tra un mese, se i consigli AI aggiungono alpha oppure no"><option value="CEO">👤 Mia decisione</option><option value="AI">🤖 Consiglio AI</option><option value="MOTORE">⚙️ Motore</option></select><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
      <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
   const refresh = () => { closeChartModal(); openDecisionModal(); };
   $("#val-run")?.addEventListener("click", () => {
     const txt = ($("#val-input")?.value || "").trim();
     const out = $("#val-out");
     if (out) out.innerHTML = txt ? renderAIValidation(txt) : `<div class="muted" style="font-size:12px">Incolla prima il testo del report.</div>`;
+    // ponte validatore→diario: un click e i consigli AI validati diventano una voce [AI]
+    // datata — il pezzo di ATTRIBUZIONE che rende misurabile il valore del loop AI a 7/30g
+    $("#val-log")?.addEventListener("click", () => {
+      const orders = parseAIOrders(($("#val-input")?.value || "").trim());
+      if (!orders.length) { toast("Nessun ordine da registrare"); return; }
+      const vres = validateAIOrders(orders);
+      const txt2 = "[AI] Consigli del report: " + vres.rows.map(x =>
+        `${x.tk} ${x.action === "BUY" ? "COMPRA" : "VENDI"}${x.qty ? " " + x.qty : ""}${x.limit != null ? " @" + fmtNum.format(x.limit) : ""}${x.stop != null ? " stop " + fmtNum.format(x.stop) : ""} [${x.level}]`).join(" · ");
+      saveDiaryEntry(txt2.slice(0, 400));
+      toast("Consigli AI registrati nel diario ✓ (valutabili a 7/30g)");
+      refresh();
+    });
   });
+  // ATTRIBUZIONE (v139): ogni voce porta la FONTE della decisione ([CEO]/[AI]/[MOTORE]) —
+  // è il dato che dopo qualche settimana risponde empiricamente a "i consigli AI aggiungono
+  // alpha?". Il prefisso viaggia nel diario e quindi nell'export AI.
+  const srcTag = () => { const s = $("#diary-src")?.value || "CEO"; return `[${s}] `; };
   $("#diary-save")?.addEventListener("click", () => {
     const inp = $("#diary-input"); const txt = (inp.value || "").trim();
-    if (txt) { saveDiaryEntry(txt); refresh(); }
+    if (txt) { saveDiaryEntry(/^\[(CEO|AI|MOTORE)\]/.test(txt) ? txt : srcTag() + txt); refresh(); }
   });
   const di = $("#diary-input");
   if (di) {
@@ -1921,7 +1938,7 @@ function openDecisionModal() {
     const grow = () => { di.style.height = "auto"; di.style.height = Math.min(160, di.scrollHeight) + "px"; };
     di.addEventListener("input", grow);
     di.addEventListener("keydown", e => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); const txt = di.value.trim(); if (txt) { saveDiaryEntry(txt); refresh(); } }
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); const txt = di.value.trim(); if (txt) { saveDiaryEntry(/^\[(CEO|AI|MOTORE)\]/.test(txt) ? txt : srcTag() + txt); refresh(); } }
     });
     di.focus();
   }
@@ -5450,6 +5467,16 @@ function buildExecutiveDelta() {
   const dLast = navs.length >= 2 ? (navs[navs.length - 1] / navs[navs.length - 2] - 1) * 100 : null;
   const d7 = dgDelta(navs, Math.min(7, navs.length - 1));
   L.push(`· Investito €${t.eur_value != null ? fmtNum.format(Math.round(t.eur_value)) : "—"} (Δ ultimo run ${signTxt(dLast)}, Δ7 rilev. ${signTxt(d7)}) · Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · VIX ${dgTxt((DATA.macro || {}).vix && DATA.macro.vix.value, "", 1)} · cassa ${fmtEUR.format(Math.round(cashEur || 0))} · budget op. ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"}`);
+  // BENCHMARK (v139): il metro che mancava — il mandato è battere il Nasdaq, quindi il brief
+  // apre col confronto. Finestre APPROSSIMATE e dichiarate (rilevazioni fondo vs sedute indice).
+  const ix = (DATA.watchlist || []).find(r => r.ticker === "^IXIC");
+  const ixTr = (k) => { const a = ((ix || {}).sparks || {})[k] || []; const xs = a.map(dgFin).filter(x => x != null);
+    return xs.length >= 2 ? (xs[xs.length - 1] / xs[0] - 1) * 100 : null; };
+  const bm = (DATA.macro || {}).benchmarks || {};
+  const pday = typeof portfolioDayPct === "function" ? portfolioDayPct() : null;
+  const alphaDay = (pday != null && bm.ndx != null) ? Math.round((pday - bm.ndx) * 100) / 100 : null;
+  const fund1m = navs.length >= 2 ? dgDelta(navs, Math.min(21, navs.length - 1)) : null;
+  L.push(`· BENCHMARK vs Nasdaq (il mandato): oggi fondo ${signTxt(pday)} vs NDX ${signTxt(dgFin(bm.ndx))}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs Composite ${signTxt(ixTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs Composite ${signTxt(ixTr("m1"))} (finestre approssimate: rilevazioni fondo vs sedute indice — l'alpha di PERIODO è il verdetto sul processo, non il P&L assoluto)`);
   const v = decisionVerdict();
   L.push(`· Verdetto motore: ${v.label} (${dgTxt(v.score, "", 0)}/100)${(v.withPlan || []).length ? ` · candidati: ${v.withPlan.slice(0, 4).map(p => p.r.ticker).join(", ")}` : ""}`);
   // priorità: shock, stop violati, earnings ≤7g, veto in ptf, top/worst RS mover della settimana
