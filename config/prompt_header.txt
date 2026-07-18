@@ -60,7 +60,7 @@ ANALISI WATCHLIST E ALLOCAZIONE LIQUIDITÀ
 Budget Spendibile: Dichiara il valore di budget_operativo_spendibile (cassa − ES95 intoccabile).
 Sintesi rapida dei titoli sotto VETO (con motivazione).
 Consigli di Operazione (COMPRA): Per ogni candidato approvato, usa esattamente questo formato:
-[TICKER] — COMPRA ~[N] quote a limite $[X] (usa solo prezzo agg. se non presente trovalo su internet).
+[TICKER] — COMPRA ~[N] quote a limite $[X] con stop $[Z] (usa solo prezzo agg. se non presente trovalo su internet). Rispetta ESATTAMENTE questo formato: il CEO valida ogni ordine con un validatore automatico che estrae ticker, quote, limite e stop dal testo.
 Analisi e Parametri: Motiva l'acquisto incrociando timing tecnico, ROIC e contesto macro/news. Dichiara la stringa di tracciabilità (payload: ...). In presenza del tag [!EARNINGS RISK], specifica che l'ingresso va eseguito post-evento o a sizing dimezzato.
 
 AZIONI E SETTORI CONSIGLIATI (ROTAZIONE STRATEGICA)

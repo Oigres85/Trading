@@ -614,6 +614,35 @@ check("Polymarket Δ7g: la riga del prompt riporta [Δ7g …] su ogni scommessa"
   DATA.predictions = saved;
   return p.includes("[Δ7g")`));
 
+/* ---------- v137: VALIDATORE DEL RITORNO (report AI → invarianti) ---------- */
+check("validatore: parseMoneyLoose gestisce formati it/en/semplici", run(`
+  return parseMoneyLoose("1.325,03") === 1325.03 && parseMoneyLoose("1,325.03") === 1325.03
+      && parseMoneyLoose("626") === 626 && parseMoneyLoose("626,5") === 626.5
+      && parseMoneyLoose("$1.325") === 1325 && parseMoneyLoose("") === null`));
+check("validatore: parseAIOrders estrae ticker/qty/limite/stop dal formato canonico della testata", run(`
+  const o = parseAIOrders("[TST1] — COMPRA ~14 quote a limite $95,50 con stop $88 (payload: ...)");
+  return o.length === 1 && o[0].tk === "TST1" && o[0].action === "BUY" && o[0].qty === 14
+      && o[0].limit === 95.5 && o[0].stop === 88`));
+check("validatore: ordine sano su fixture → nessuna violazione hard", run(`
+  const v = validateAIOrders([{ tk: "TSTW", action: "BUY", qty: 5, limit: 95, stop: 88 }]);
+  return v.rows[0].level !== "hard" && v.budget.ok`));
+check("validatore: ticker allucinato → hard", run(`
+  const v = validateAIOrders(parseAIOrders("ZZZQ — COMPRA ~10 quote a limite $50 con stop $45"));
+  return v.rows.length === 0 || v.rows.every(r => r.level !== "ok")`));
+check("validatore: stop ≥ limite → hard (ordine long impossibile)", run(`
+  const v = validateAIOrders([{ tk: "TSTW", action: "BUY", qty: 5, limit: 90, stop: 95 }]);
+  return v.rows[0].level === "hard" && v.rows[0].msgs.some(m => m.includes("impossibile"))`));
+check("validatore: limite oltre il 30% sotto il prezzo → hard (classe SNDK)", run(`
+  const r = DATA.watchlist.find(x => x.ticker === "TSTW");
+  const v = validateAIOrders([{ tk: "TSTW", action: "BUY", qty: 5, limit: Math.round(r.price * 0.6), stop: Math.round(r.price * 0.5) }]);
+  return v.rows[0].level === "hard" && v.rows[0].msgs.some(m => m.includes("30%"))`));
+check("validatore: vendita di titolo non detenuto (watchlist) → hard", run(`
+  const v = validateAIOrders([{ tk: "TSTW", action: "SELL", qty: 5, limit: null, stop: null }]);
+  return v.rows[0].level === "hard" && v.rows[0].msgs.some(m => m.includes("NON detenuto"))`));
+check("validatore: acquisto su titolo in VETO (TST2 value trap) → hard", run(`
+  const v = validateAIOrders([{ tk: "TST2", action: "BUY", qty: 5, limit: 95, stop: 88 }]);
+  return v.rows[0].level === "hard" && v.rows[0].msgs.some(m => m.includes("VETO"))`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

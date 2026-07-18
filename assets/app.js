@@ -1677,6 +1677,141 @@ function openRiskRuleModal(r) {
 /* v135: la barra "Decisione operativa" in cima è stata RIMOSSA (il verdetto vive nell'export
    AI). Il DIARIO delle azioni resta accessibile dal bottone "📔 Diario" della topbar, che
    apre lo stesso modal (dettaglio verdetto + editor del diario che finisce nel prompt). */
+/* ============ VALIDATORE DEL RITORNO (v137) — chiude il loop analisi→ordine ============
+   L'export va a Claude; la risposta torna QUI prima del broker: gli ordini proposti nel
+   report vengono estratti dal testo e verificati contro gli STESSI invarianti del red team
+   (ticker esistente, 0<stop<limite≤prezzo, banda 30% anti-SNDK, veto risk manager, cap 10%
+   NAV, budget cassa−ES95). Un LLM che allucina un limite folle non arriva mai al broker. */
+
+// numeri in formato italiano (1.325,03) O anglosassone (1,325.03) O semplice (626 / 626.5)
+function parseMoneyLoose(s) {
+  s = String(s || "").replace(/[$€\s]/g, "");
+  if (!s) return null;
+  const lastDot = s.lastIndexOf("."), lastCom = s.lastIndexOf(",");
+  let v;
+  if (lastDot >= 0 && lastCom >= 0) {                    // entrambi: l'ULTIMO separatore è il decimale
+    const dec = Math.max(lastDot, lastCom);
+    v = parseFloat(s.slice(0, dec).replace(/[.,]/g, "") + "." + s.slice(dec + 1));
+  } else if (lastCom >= 0) {                             // solo virgola: 1-2 cifre dopo = decimale it
+    v = (s.length - lastCom - 1) <= 2 ? parseFloat(s.slice(0, lastCom).replace(/,/g, "") + "." + s.slice(lastCom + 1))
+                                      : parseFloat(s.replace(/,/g, ""));
+  } else if (lastDot >= 0) {                             // solo punto: 3 cifre dopo = migliaia it ($1.325)
+    v = ((s.length - lastDot - 1) === 3 && s.length > 4) ? parseFloat(s.replace(/\./g, "")) : parseFloat(s);
+  } else v = parseFloat(s);
+  return Number.isFinite(v) ? v : null;
+}
+
+const AI_BUY = /\b(COMPRA|ACCUMULA|NUOVO\s+INGRESSO)\b/i;
+const AI_SELL = /\b(VENDI|TRIM(?:MA)?|ALLEGGERISCI|RIDUCI)\b/i;
+
+/* estrae gli ordini dal testo libero del report AI: righe con un ticker NOTO + verbo d'azione.
+   Formato canonico della testata: "[TICKER] — COMPRA ~N quote a limite $X con stop $Y",
+   ma il parser tollera variazioni (limite/a/ingresso; stop/stop loss). */
+function parseAIOrders(text) {
+  const known = new Map();
+  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) if (r.ticker) known.set(r.ticker.toUpperCase(), r);
+  const orders = [];
+  const seen = new Set();
+  for (const rawLine of String(text || "").split("\n")) {
+    const line = rawLine.trim();
+    if (line.length < 8) continue;
+    const isBuy = AI_BUY.test(line), isSell = AI_SELL.test(line);
+    if (!isBuy && !isSell) continue;
+    // ticker noto presente come parola (evita match dentro altre parole)
+    let tk = null;
+    for (const k of known.keys()) {
+      if (new RegExp(`(^|[^A-Z0-9.\\-])${k.replace(/[-=^.]/g, "\\$&")}([^A-Z0-9.\\-]|$)`).test(line.toUpperCase())) { tk = k; break; }
+    }
+    if (!tk) {
+      // riga in formato ordine canonico ("[XXX] — VERBO…") su ticker NON nel payload:
+      // NON ignorarla in silenzio — è l'allucinazione che il validatore esiste per beccare
+      const m = line.match(/^\[?([A-Z][A-Z0-9.\-=^]{0,9})\]?\s*—/);
+      if (m && !known.has(m[1].toUpperCase())) {
+        orders.push({ tk: m[1].toUpperCase(), action: isBuy ? "BUY" : "SELL", qty: null, limit: null, stop: null,
+                      line: line.slice(0, 160), unknown: true });
+      }
+      continue;
+    }
+    const sig = tk + "|" + (isBuy ? "B" : "S");
+    if (seen.has(sig)) continue;                        // primo ordine per ticker/verso (il resto è prosa)
+    seen.add(sig);
+    const num = "([\\d.,]+)";
+    const qtyM = line.match(new RegExp(`~?\\s*(\\d+)\\s*(?:quote|azioni)`, "i"));
+    const limM = line.match(new RegExp(`(?:limite|ingresso)\\s*(?:di|d'|a)?\\s*\\$?\\s*${num}`, "i"))
+              || line.match(new RegExp(`\\ba\\s+\\$\\s*${num}`, "i"));
+    const stopM = line.match(new RegExp(`stop(?:\\s*loss)?\\s*(?:a|di)?\\s*\\$?\\s*${num}`, "i"));
+    orders.push({ tk, action: isBuy ? "BUY" : "SELL", qty: qtyM ? parseInt(qtyM[1], 10) : null,
+                  limit: limM ? parseMoneyLoose(limM[1]) : null, stop: stopM ? parseMoneyLoose(stopM[1]) : null,
+                  line: line.slice(0, 160) });
+  }
+  return orders;
+}
+
+/* verifica gli ordini estratti contro gli invarianti del sistema. Ritorna righe con esito
+   hard/warn/ok + verifica budget aggregata. STESSE classi di violazione del red team I1. */
+function validateAIOrders(orders) {
+  const t = DATA.totals || {};
+  const eurusd = DATA.eurusd || 1.08;
+  const rows = [];
+  const byTk = new Map();
+  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) if (r.ticker) byTk.set(r.ticker.toUpperCase(), r);
+  const usdNav = dgFin(t.usd_value);
+  const budgetUsd = (dgFin(t.budget_operativo_spendibile) ?? 0) * eurusd;
+  let buyNotional = 0;
+  for (const o of orders) {
+    const hard = [], warn = [];
+    const r = byTk.get(o.tk);
+    if (!r) { rows.push({ ...o, level: "hard", msgs: ["ticker non presente nel payload (allucinazione)"] }); continue; }
+    const price = dgFin(r.price);
+    if (o.action === "BUY") {
+      const veto = typeof qualityVeto === "function" ? qualityVeto(r) : null;
+      if (veto && !veto.rehab) hard.push(`titolo in VETO risk manager (${(veto.why || [veto.verdict]).join(", ")})`);
+      else if (veto && veto.rehab) warn.push("riabilitato dal veto Sortino: SORVEGLIATO, sizing prudente");
+      const vUsd = r.currency === "EUR" ? (dgFin(r.value) ?? 0) * eurusd : dgFin(r.value);
+      const w = (vUsd && usdNav) ? vUsd / usdNav * 100 : null;
+      if (r.qty && w != null && w >= (RISK_PARAMS?.capNoAdd_pct ?? 10)) hard.push(`cap d'ingresso: posizione già ${fmtNum.format(Math.round(w * 10) / 10)}% del NAV (divieto di accumulo)`);
+      if (o.limit == null) warn.push("nessun prezzo LIMITE rilevato (gli ordini a mercato sono vietati dalla disciplina)");
+      else {
+        if (!(o.limit > 0)) hard.push("limite ≤ 0");
+        if (price && o.limit > price * 1.02) hard.push(`limite $${fmtNum.format(o.limit)} SOPRA il prezzo corrente $${fmtNum.format(price)}`);
+        if (price && (price - o.limit) / price > 0.30) hard.push(`limite $${fmtNum.format(o.limit)} oltre il 30% dal prezzo $${fmtNum.format(price)} (classe incidente SNDK)`);
+      }
+      if (o.stop == null) warn.push("nessuno stop rilevato: proteggi l'ingresso col 2×ATR");
+      else {
+        if (!(o.stop > 0)) hard.push("stop ≤ 0");
+        if (o.limit != null && o.stop >= o.limit) hard.push(`stop $${fmtNum.format(o.stop)} ≥ limite $${fmtNum.format(o.limit)} (ordine long impossibile)`);
+      }
+      const in7 = r.earnings_date && (new Date(r.earnings_date) - Date.now()) / 86400000 <= 7 && (new Date(r.earnings_date) - Date.now()) >= 0;
+      if (in7) warn.push(`earnings ${String(r.earnings_date).slice(5, 10)} entro 7g: ingresso post-evento o sizing dimezzato`);
+      if (o.qty && o.limit) buyNotional += o.qty * o.limit;
+    } else {
+      if (!r.qty) hard.push("vendita di un titolo NON detenuto (è in watchlist)");
+      else if (o.qty && o.qty > r.qty) hard.push(`quantità ${o.qty} > posseduta ${r.qty}`);
+      if (o.limit != null && price && o.limit < price * 0.95) warn.push(`limite di vendita $${fmtNum.format(o.limit)} molto sotto il mercato $${fmtNum.format(price)} (svendita?)`);
+    }
+    rows.push({ ...o, level: hard.length ? "hard" : warn.length ? "warn" : "ok", msgs: [...hard, ...warn] });
+  }
+  const budget = { spend: Math.round(buyNotional), budget: Math.round(budgetUsd),
+                   ok: !(budgetUsd > 0 && buyNotional > budgetUsd * 1.05) };
+  return { rows, budget, hardCount: rows.filter(x => x.level === "hard").length + (budget.ok ? 0 : 1),
+           warnCount: rows.filter(x => x.level === "warn").length };
+}
+
+function renderAIValidation(text) {
+  const orders = parseAIOrders(text);
+  if (!orders.length) return `<div class="muted" style="font-size:12px;margin-top:6px">Nessun ordine riconosciuto nel testo (cerco righe con un ticker del payload + COMPRA/ACCUMULA/VENDI/TRIM). Il formato canonico "[TICKER] — COMPRA ~N quote a limite $X con stop $Y" è il più affidabile.</div>`;
+  const v = validateAIOrders(orders);
+  const ico = { ok: "✅", warn: "⚠️", hard: "⛔" };
+  const rows = v.rows.map(x => `<tr class="val-${x.level}">
+    <td class="tk">${esc(x.tk)}</td><td>${x.action === "BUY" ? "Acquisto" : "Vendita"}</td>
+    <td class="num">${x.qty ?? "—"}</td><td class="num">${x.limit != null ? "$" + fmtNum.format(x.limit) : "—"}</td>
+    <td class="num">${x.stop != null ? "$" + fmtNum.format(x.stop) : "—"}</td>
+    <td>${ico[x.level]} ${x.msgs.length ? esc(x.msgs.join(" · ")) : "invarianti rispettate"}</td></tr>`).join("");
+  return `<table class="info-table" style="margin-top:8px"><thead><tr><th>Titolo</th><th>Azione</th><th class="num">Qtà</th><th class="num">Limite</th><th class="num">Stop</th><th>Esito</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="info-line ${v.budget.ok ? "" : "neg"}" style="font-size:12px;margin-top:6px">${v.budget.ok ? "✅" : "⛔"} Spesa d'acquisto ~$${fmtNum.format(v.budget.spend)} vs budget operativo $${fmtNum.format(v.budget.budget)} (cassa − ES95)${v.budget.ok ? "" : " — SFORATO"}</div>
+    <div class="info-line" style="font-size:12.5px;margin-top:4px"><b>${v.hardCount ? `⛔ ${v.hardCount} violazioni HARD — NON eseguire questi ordini senza correggerli` : v.warnCount ? `⚠️ nessuna violazione hard, ${v.warnCount} avvisi` : "✅ tutti gli ordini rispettano gli invarianti del fondo"}</b></div>`;
+}
+
 function openDecisionModal() {
   const v = decisionVerdict();
   const diary = loadDiary();
@@ -1763,10 +1898,19 @@ function openDecisionModal() {
      <ul style="margin:0 0 10px 18px;font-size:12.5px;line-height:1.6">${v.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
      ${accHtml}${trailHtml}${vetoHtml}${rehabHtml}${squeezeHtml}${trimHtml}${taxHtml}
      <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI. Obiettivo del motore: massimizzare il rendimento corretto per il rischio (Sharpe > 2.0) e sovraperformare il Nasdaq 100 — stesso mandato del Report CIO. Per l'analisi completa apri "📄 Report CIO" → Copia per analisi AI.</div>
-     <h4 style="margin:10px 0 6px">Diario delle azioni</h4>
+     <h4 style="margin:12px 0 6px">✅ Validatore report AI</h4>
+     <div class="info-line muted" style="font-size:11px;margin-bottom:6px">Incolla la risposta di Claude: gli ordini proposti vengono estratti e verificati contro gli invarianti del fondo (ticker, stop&lt;limite≤prezzo, banda 30%, veto, cap 10% NAV, budget cassa−ES95) PRIMA di andare al broker.</div>
+     <div class="diary-add"><textarea id="val-input" rows="2" placeholder="Incolla qui il report di Claude…"></textarea><button class="btn btn-primary btn-sm" id="val-run">Valida ordini</button></div>
+     <div id="val-out"></div>
+     <h4 style="margin:14px 0 6px">Diario delle azioni</h4>
      <div class="diary-add"><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
      <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
   const refresh = () => { closeChartModal(); openDecisionModal(); };
+  $("#val-run")?.addEventListener("click", () => {
+    const txt = ($("#val-input")?.value || "").trim();
+    const out = $("#val-out");
+    if (out) out.innerHTML = txt ? renderAIValidation(txt) : `<div class="muted" style="font-size:12px">Incolla prima il testo del report.</div>`;
+  });
   $("#diary-save")?.addEventListener("click", () => {
     const inp = $("#diary-input"); const txt = (inp.value || "").trim();
     if (txt) { saveDiaryEntry(txt); refresh(); }
