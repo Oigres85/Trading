@@ -2214,11 +2214,16 @@ def validate_macro(macro):
             "carry-forward dal run precedente (scrape FINRA ko)" if md.get("carried") else "")
 
     # --- indicatori mensili/trimestrali: età massima per cadenza (reference date) ---
-    # HARD STOP obsolescenza: 45 giorni per le serie mensili "puntuali" (PMI/NFP/disoccupazione:
-    # il dato nuovo esce entro ~1 settimana dal mese successivo → 45g = sicuramente vecchio).
-    # CPI/PCE/retail restano a 75g: il reference date è il mese PRECEDENTE la pubblicazione
-    # (~45g di età già alla release) — 45 li flaggherebbe SEMPRE, creando assuefazione al flag.
-    MAX_AGE = {"cpi": 75, "pce": 75, "nfp": 45, "unemp": 45, "umich": 45, "retail": 75, "gdp": 210}
+    # SOGLIE CALIBRATE SUL CALENDARIO DI PUBBLICAZIONE REALE (v137 — fix "banner che grida al
+    # lupo"): l'età è quella del REFERENCE date, e il dato più fresco AL MONDO può essere
+    # legittimamente vecchio fino a: NFP/disocc. (ref M-01, esce il 1° venerdì di M+1, il
+    # successivo ~35g dopo) → worst-case ~67g; CPI (esce metà M+1) → ~75g; retail (metà M+1)
+    # → ~75g; PCE (esce FINE M+1: il ref M-01 resta il più recente fino a ~fine M+2) → ~91g;
+    # UMich: FRED pubblica UMCSENT con 1-2 mesi di ritardo di licenza (il sito UMich è avanti
+    # ma non abbiamo una fonte scrapabile stabile) → ~85g. Soglia = worst-case + margine:
+    # così il flag scatta SOLO quando il dato è più vecchio di quanto il calendario permetta
+    # (vera anomalia di fetch), non sull'attesa fisiologica della prossima release.
+    MAX_AGE = {"cpi": 80, "pce": 95, "nfp": 70, "unemp": 70, "umich": 85, "retail": 80, "gdp": 210}
     for i in macro.get("indicators", []):
         k = i.get("key")
         if k not in MAX_AGE:
