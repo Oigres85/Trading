@@ -643,6 +643,34 @@ check("validatore: acquisto su titolo in VETO (TST2 value trap) → hard", run(`
   const v = validateAIOrders([{ tk: "TST2", action: "BUY", qty: 5, limit: 95, stop: 88 }]);
   return v.rows[0].level === "hard" && v.rows[0].msgs.some(m => m.includes("VETO"))`));
 
+/* ---------- v138: pulizia payload (streghe condizionali, tagli, buyback, curva) ---------- */
+check("v138 streghe: nel prompt SOLO se <30 giorni; a 62g sparisce", run(`
+  DATA.macro.witching = { next: "2026-09-18", days: 62 };
+  const far = buildPrompt();
+  DATA.macro.witching = { next: "2026-09-18", days: 12 };
+  const near = buildPrompt();
+  delete DATA.macro.witching;
+  return !far.includes("4 streghe") && near.includes("4 streghe") && near.includes("tra 12 gg")`));
+check("v138 tagli: TOP 10 CAPITALIZZAZIONI ed EUR/JPY fuori dal payload", run(`
+  DATA.top_caps = [{ ticker: "AAPL", name: "Apple", mcap_usd: 4.8e12, change_pct: 1 }];
+  DATA.macro.markets = [{ label: "EUR/JPY", value: "185.76", change_pct: -0.1 }, { label: "EUR/USD", value: "1.14", change_pct: 0.1 }];
+  const p = buildPrompt();
+  DATA.top_caps = []; DATA.macro.markets = [];
+  return !p.includes("TOP 10 CAPITALIZZAZIONI") && !p.includes("EUR/JPY") && p.includes("EUR/USD")`));
+check("v138 buyback: colonna Buyback% nella tabella fondamentale, [DILUISCE] se negativo", run(`
+  const r = DATA.portfolio.find(x => x.stats?.market_cap);
+  const saved = r.stats.buyback_yield;
+  r.stats.buyback_yield = -0.02;
+  const p = buildPrompt();
+  r.stats.buyback_yield = saved;
+  return p.includes("| Buyback% |") && p.includes("[DILUISCE]") && p.includes("riacquisti NETTI")`));
+check("v138 curva: riga indicators etichettata GIORNALIERA (non più 'serie mensile')", run(`
+  const saved = DATA.macro.indicators;
+  DATA.macro.indicators = [{ key: "curve", label: "Curva 10A-2A", value: "+0.41 pp", date: "2026-07-16" }];
+  const p = buildPrompt();
+  DATA.macro.indicators = saved;
+  return p.includes("serie GIORNALIERA FRED T10Y2Y") && !p.includes("Curva 10A-2A: +0.41 pp (rilevazione 2026-07-16 — serie mensile")`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

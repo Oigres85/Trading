@@ -557,6 +557,22 @@ def live_last_price(t):
         return None
 
 
+def buyback_yield_frac(repurchase, issuance, mcap):
+    """Buyback yield NETTO delle emissioni = (riacquisti − emissioni) / market cap, frazione.
+    Nel cashflow yfinance 'Repurchase Of Capital Stock' è NEGATIVO (uscita di cassa) e
+    l'issuance è positiva (entrata): net = (−repurchase − issuance). Metrica discriminante
+    growth: >0 restituisce capitale riducendo le azioni, <0 DILUISCE (tipico SBC-heavy).
+    Cap plausibilità ±25% (oltre = unità sporche → None). None se mcap assente."""
+    if not mcap or mcap <= 0:
+        return None
+    rep = -float(repurchase) if repurchase is not None else 0.0    # riacquisti come positivo
+    iss = float(issuance) if issuance is not None else 0.0
+    if repurchase is None and issuance is None:
+        return None
+    y = (rep - iss) / float(mcap)
+    return round(y, 4) if abs(y) <= 0.25 else None
+
+
 def _live_is_informative(lp, last_close):
     """FIX FALSO-LIVE (v137, visto sul KOSPI): a mercato ESTERO CHIUSO fast_info resta congelato
     sull'ultimo scambio = la chiusura stessa. Attivare l'override in quel caso non aggiunge
@@ -772,6 +788,26 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         except Exception as e:  # noqa: BLE001
             print(f"!! financials {ticker}: {e}", file=sys.stderr)
 
+    # BUYBACK YIELD (v138) — dal cashflow annuale già scaricabile da yfinance: riacquisti
+    # netti delle emissioni / market cap. Il market cap arriva dopo (stats): qui salvo solo
+    # i flussi; il rapporto si calcola nel blocco stats. Best-effort: righe assenti → None.
+    _bb_repurchase, _bb_issuance = None, None
+    if has_fundamentals(ticker, currency):
+        try:
+            cf = t.cashflow
+            for _row, _dst in (("Repurchase Of Capital Stock", "rep"), ("Issuance Of Capital Stock", "iss"),
+                               ("Common Stock Issuance", "iss")):
+                if _row in cf.index:
+                    _ser = cf.loc[_row].dropna()
+                    if len(_ser):
+                        _val = float(_ser.iloc[0])            # colonna più recente
+                        if _dst == "rep":
+                            _bb_repurchase = _val
+                        elif _bb_issuance is None:
+                            _bb_issuance = _val
+        except Exception as e:  # noqa: BLE001
+            print(f"!! cashflow {ticker}: {e}", file=sys.stderr)
+
     # statistiche chiave (come scheda "Più dati finanziari") + stime
     stats = None
     if has_fundamentals(ticker, currency):
@@ -815,6 +851,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             "peg": num("pegRatio", "trailingPegRatio"),
             "roa": num("returnOnAssets"),
             "short_float": num("shortPercentOfFloat"),
+            "buyback_yield": buyback_yield_frac(_bb_repurchase, _bb_issuance, num("marketCap")),
         }
         stats = {k: (round(v, 4) if v is not None else None) for k, v in stats.items()}
         # ADR con bilanci in valuta locale → via i rapporti prezzo-vs-bilancio (unità miste)
@@ -1340,9 +1377,17 @@ def fetch_macro():
                 start = None
         if start is not None:
             recessions.append({"start": start, "end": usrec_m[-1][0]})
-        cur_v = curve_m[-1][1] if curve_m else None
-        v12 = curve_m[-13][1] if len(curve_m) > 13 else None       # 12 mesi fa
-        steepening = (cur_v is not None and v12 is not None and cur_v - v12 > 0.2)
+        # UNIFICAZIONE LETTURA CURVA (v138): current_curve = ultimo valore GIORNALIERO T10Y2Y
+        # (stesso numero di indicators/curve_history — prima qui c'era la MEDIA MENSILE e il
+        # payload mostrava due valori diversi per la stessa grandezza, es. +0,41 vs +0,36).
+        # La serie mensile resta SOLO per il modello storico shiftato (steepening/12m fa).
+        try:
+            cur_v = fred_series("T10Y2Y", 1)[-1][1]
+        except Exception:  # noqa: BLE001 — fallback alla media mensile se il daily fallisce
+            cur_v = curve_m[-1][1] if curve_m else None
+        cur_m = curve_m[-1][1] if curve_m else None
+        v12 = curve_m[-13][1] if len(curve_m) > 13 else None       # 12 mesi fa (media mensile)
+        steepening = (cur_m is not None and v12 is not None and cur_m - v12 > 0.2)
         was_inverted = any(v < 0 for _, v in curve_m[-24:])         # invertita negli ultimi 2 anni
         macro["yield_recession"] = {
             "curve": [{"d": d, "v": round(v, 2)} for d, v in curve_m if v is not None],

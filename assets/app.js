@@ -4977,8 +4977,8 @@ function buildPrompt() {
   const fundItems = [...DATA.portfolio, ...(DATA.watchlist || [])].filter(r => r.stats?.market_cap);
   if (fundItems.length) {
     lines.push("ANALISI FONDAMENTALE DETTAGLIATA (valutazione e qualità per le tue raccomandazioni):");
-    lines.push("| Titolo | P/E TTM | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Altman Z'' | Div% | Note |");
-    lines.push("|---|---|---|---|---|---|---|---|---|---|---|---|");
+    lines.push("| Titolo | P/E TTM | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Altman Z'' | Div% | Buyback% | Note |");
+    lines.push("|---|---|---|---|---|---|---|---|---|---|---|---|---|");
     fundItems.forEach(r => {
       const st = r.stats || {};
       const pfcf = st.market_cap && st.fcf && st.fcf > 0 ? Math.round(st.market_cap / st.fcf * 10) / 10 : null;
@@ -4993,9 +4993,9 @@ function buildPrompt() {
       // sono in valuta diversa dal prezzo (ADR tipo TSM) — senza il tag i "—" sembrano buchi dati
       const fxTag = st.cross_currency ? " [BILANCI VALUTA LOCALE]" : "";
       const noteTags = [roeTag.trim(), fcfWarn.trim(), zTag.trim(), fxTag.trim()].filter(Boolean).join(" ");
-      lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg > 0 ? fmtNum.format(Math.round(st.peg * 100) / 100) : "n.d."} | ${zCell} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${noteTags} |`);
+      lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg > 0 ? fmtNum.format(Math.round(st.peg * 100) / 100) : "n.d."} | ${zCell} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${st.buyback_yield != null ? signTxt(Math.round(st.buyback_yield * 1000) / 10) + (st.buyback_yield < -0.005 ? " [DILUISCE]" : "") : "—"} | ${noteTags} |`);
     });
-    lines.push("([ROIC>15%]=qualità eccellente del capitale; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z''<1,81, flag prudenziale del mandato — Z'' è la variante non-manifatturieri (6.56·WC/TA+3.26·RE/TA+6.72·EBIT/TA+1.05·MVE/TL, senza Sales/TA), cutoff canonici <1,1 distress / >2,6 solido; P/E TTM='—' con EPS<0 per igiene matematica; [BILANCI VALUTA LOCALE]=ADR con bilanci in valuta diversa dal prezzo: P/B, EV/EBITDA e P/FCF nullati a monte perché a unità miste — i '—' su quelle colonne NON sono buchi dati; [WL]=watchlist)");
+    lines.push("([ROIC>15%]=qualità eccellente del capitale; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z''<1,81, flag prudenziale del mandato — Z'' è la variante non-manifatturieri (6.56·WC/TA+3.26·RE/TA+6.72·EBIT/TA+1.05·MVE/TL, senza Sales/TA), cutoff canonici <1,1 distress / >2,6 solido; P/E TTM='—' con EPS<0 per igiene matematica; [BILANCI VALUTA LOCALE]=ADR con bilanci in valuta diversa dal prezzo: P/B, EV/EBITDA e P/FCF nullati a monte perché a unità miste — i '—' su quelle colonne NON sono buchi dati; [WL]=watchlist; Buyback%=riacquisti NETTI delle emissioni / market cap dall'ultimo cashflow annuale — discriminante growth: >0 restituisce capitale riducendo le azioni, [DILUISCE]=emissioni>riacquisti, tipico SBC pesante che erode l'EPS per azione)");
     if (DATA.sanity_filtered > 0) lines.push(`[!ANOMALIE FILTRATE DAL SANITY CHECK: ${DATA.sanity_filtered} — valori palesemente errati delle API (P/E assurdi, variazioni impossibili) sono stati rimossi a monte: i dati qui presenti sono già puliti]`);
     lines.push("");
   }
@@ -5097,10 +5097,12 @@ function buildPrompt() {
       lines.push(`- Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): ${base} — rally ${br.divergence_pp > 2 ? "trainato dalle megacap ma con partecipazione" : "con partecipazione ampia"} (alert se SPY+ con RSP− o spread >4pp).`);
     }
   }
-  (m.markets || []).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
+  // EUR/JPY escluso dal payload (v138): ridondante — il rischio yen è già nel blocco Carry
+  // USA-Giappone (USD/JPY + tasso BoJ), e il rischio cambio del fondo è EUR/USD.
+  (m.markets || []).filter(x => !/EUR\/JPY/i.test(x.label || "")).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   // ogni indicatore economico con la sua data di pubblicazione ESPLICITA: la latenza del dato
   // deve essere palese all'AI (CPI/NFP = mensili con ~1 mese di ritardo; PIL = trimestrale)
-  (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile" : "serie mensile, normale ritardo di pubblicazione"})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`));
+  (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile" : i.key === "curve" ? "serie GIORNALIERA FRED T10Y2Y, ultima chiusura" : "serie mensile, normale ritardo di pubblicazione"})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`));
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
   const mds = marginDebtState();
@@ -5163,7 +5165,7 @@ function buildPrompt() {
   }
   if (m.yield_recession) {
     const yr = m.yield_recession;
-    lines.push(`- Curva vs Recessione (storico FRED): spread 10A-2A ${yr.current_curve != null ? (yr.current_curve > 0 ? "+" : "") + yr.current_curve + " pp" : "—"}${yr.curve_12m_ago != null ? ` (12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago})` : ""}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. NB: irripidimento post-inversione → storicamente recessione entro ~12 mesi (curva shiftata di 12m anticipa il calo del PIL).`);
+    lines.push(`- Curva vs Recessione (storico FRED): spread 10A-2A ${yr.current_curve != null ? (yr.current_curve > 0 ? "+" : "") + yr.current_curve + " pp (chiusura daily, stessa lettura delle righe sopra)" : "—"}${yr.curve_12m_ago != null ? ` (12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago}, media mensile del modello storico)` : ""}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. NB: irripidimento post-inversione → storicamente recessione entro ~12 mesi (curva shiftata di 12m anticipa il calo del PIL).`);
   }
   if (m.fedwatch && (m.fedwatch.meetings || []).length) lines.push(`- FedWatch prossima riunione ${m.fedwatch.meetings[0].date}: prob. taglio ${m.fedwatch.meetings[0].cut_prob}%`);
   if ((m.tilt || []).length) {
@@ -5184,7 +5186,8 @@ function buildPrompt() {
     lines.push(cpBp);
   }
   if (m.fed_market) lines.push(`- Fed Funds Rate attuale: ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}); tasso>4% storicamente comprime i multipli P/E in 12-18 mesi`);
-  if (m.witching) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg)`);
+  // 4 streghe SOLO se imminenti (v138): a >30 giorni è rumore senza valore operativo
+  if (m.witching && m.witching.days != null && m.witching.days < 30) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg — volumi record e prezzo "attratto" dai muri di opzioni: prudenza sugli ordini a ridosso)`);
   // salute del portafoglio (blend tecnica + macro + fondamentale)
   if (typeof portfolioHealthScore === "function") {
     const ph = portfolioHealthScore();
@@ -5216,11 +5219,8 @@ function buildPrompt() {
   // già "capitale investito (costo)" per il costo storico — stesso nome per due grandezze
   // diverse (175k costo vs 287k MTM) mandava in confusione l'LLM ricevente
   if (t.cash) lines.push(`- Liquidità disponibile: ${fmtEUR.format(t.cash)} · controvalore investito (mark-to-market): ${fmtEUR.format(t.eur_invested)}`);
-  if ((DATA.top_caps || []).length) {
-    lines.push("");
-    lines.push("TOP 10 CAPITALIZZAZIONI MONDIALI:");
-    DATA.top_caps.forEach((x, i) => lines.push(`${i + 1}. ${x.name} (${x.ticker}): ${fmtMcap(x.mcap_usd)} (${signTxt(x.change_pct)} oggi)`));
-  }
+  // TOP 10 CAPITALIZZAZIONI rimosso dal payload (v138): nessun valore decisionale per il
+  // fondo (i nomi rilevanti sono già in ptf/watchlist con dati completi); resta nella UI.
   if ((DATA.top_etfs || []).length) {
     lines.push("");
     lines.push("TOP 10 ETF (metriche di valutazione e segnali di ingresso):");

@@ -252,6 +252,15 @@ _clean = ud.drop_void_bars(_g)
 check("barre-glitch: minimo fantasma (SNDK-like 40.1 su corpo 1910) e prezzi ≤0 scartati, flash crash vero conservato",
       len(_clean) == 2 and list(_clean["Low"]) == [1890.0, 95.0])
 
+# ---------- buyback_yield_frac (v138): riacquisti netti / mcap dal cashflow ----------
+check("buyback: riacquisti $10B (negativi nel cashflow) − emissioni $2B su mcap $200B = +4%",
+      ud.buyback_yield_frac(-10e9, 2e9, 200e9) == 0.04)
+check("buyback: solo emissioni (SBC-heavy) → yield NEGATIVO = diluizione",
+      ud.buyback_yield_frac(None, 4e9, 100e9) == -0.04)
+check("buyback: senza mcap o senza flussi → None; |yield|>25% (unità sporche) → None",
+      ud.buyback_yield_frac(-10e9, None, 0) is None and ud.buyback_yield_frac(None, None, 1e9) is None
+      and ud.buyback_yield_frac(-50e9, None, 100e9) is None)
+
 # ---------- div_yield_frac (v118): dividendo assoluto/prezzo, non ambiguo + cap ----------
 check("div_yield_frac: rate/price esatto (GOOGL $0,84 su $357 = 0,24%, non il 25% del bug)",
       abs(ud.div_yield_frac(0.84, 357.0, 0.25) - 0.84 / 357.0) < 1e-9)
@@ -262,6 +271,6 @@ check("div_yield_frac: senza tasso → fallback al campo % di Yahoo (ORCL 1.39 �
 check("div_yield_frac: cap 30% — un 453% (TLT-like) è errore di unità → None",
       ud.div_yield_frac(None, 84.0, 453.0) is None and ud.div_yield_frac(300.0, 84.0, None) is None)
 
-N_CHECKS = 51
+N_CHECKS = 54
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
