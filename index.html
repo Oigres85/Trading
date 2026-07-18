@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=139">
+<link rel="stylesheet" href="assets/style.css?v=140">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -221,7 +221,6 @@
     <div class="tools-btns tools-btns-row">
       <button class="btn btn-ghost tool-btn" id="open-pmc">Calcolatore PMC<span class="muted">mediazione acquisto / realizzo vendita</span></button>
       <button class="btn btn-ghost tool-btn" id="open-sell">Calcolo vendite (plus/minus)<span class="muted">stima risultato netto e tasse</span></button>
-      <button class="btn btn-ghost tool-btn" id="open-prompt-settings">⚙ Impostazioni Prompt AI<span class="muted">modifica la testata (istruzioni) e salvala sul server</span></button>
     </div>
   </section>
 
@@ -310,23 +309,6 @@
   </div>
 </div>
 
-<!-- Modal IMPOSTAZIONI PROMPT (editor testata) -->
-<div class="modal-backdrop" id="prompt-settings-modal" hidden>
-  <div class="modal modal-chart">
-    <div class="modal-head">
-      <h3>Impostazioni Prompt AI — Testata (istruzioni)</h3>
-      <button class="btn btn-ghost" id="prompt-settings-close">✕</button>
-    </div>
-    <p class="muted" style="margin:0 0 8px">Questa è SOLO la <b>testata</b> testuale (ruolo, mandato, regole). La <b>coda dati</b> (tabelle, macro, news, portafoglio) è generata automaticamente dal sistema e resta intatta. Salvando, la testata viene scritta sul server (<code>config/prompt_header.txt</code>) e vale su tutti i tuoi dispositivi. Serve un token GitHub salvato per la scrittura remota; senza token la modifica resta comunque locale su questo browser.</p>
-    <textarea id="prompt-header-editor" spellcheck="false" style="width:100%;min-height:52vh;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:var(--mono);font-size:12px;line-height:1.5"></textarea>
-    <div class="modal-foot">
-      <span class="muted" id="prompt-settings-status" style="margin-right:auto"></span>
-      <button class="btn btn-ghost" id="prompt-settings-reset">Ripristina default</button>
-      <button class="btn btn-primary" id="prompt-settings-save">Salva sul server</button>
-    </div>
-  </div>
-</div>
-
 <!-- Modal CALCOLO VENDITE -->
 <div class="modal-backdrop" id="sell-modal" hidden>
   <div class="modal modal-chart">
@@ -354,6 +336,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=139"></script>
+<script src="assets/app.js?v=140"></script>
 </body>
 </html>

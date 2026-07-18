@@ -1002,6 +1002,7 @@ function usRegularSessionOpen(now = new Date()) {
   const mins = et.getHours() * 60 + et.getMinutes();
   return mins >= 570 && mins < 960;                                    // 9:30–16:00 ET
 }
+const seoulToday = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // UTC+9, niente DST
 function shockSourcesLive() {
   const THR = -2.0, sources = [];
   const fut = (DATA.macro || {}).futures || {};
@@ -1009,9 +1010,14 @@ function shockSourcesLive() {
     const chg = dgFin((fut[k] || {}).change_pct);
     if (chg != null && chg <= THR) sources.push({ src: lab, chg });
   }
+  // GATE DI SESSIONE (v141, stesso fix del server v127): il change_pct del KOSPI vale solo se
+  // è della SESSIONE CORRENTE — price_live (delta ricalcolato in tempo reale) oppure candela
+  // con price_asof = data di Seoul di OGGI. Una candela stantia ([chiusura del 16/07] letta il
+  // 18) qui reintroduceva l'Allarme Fantasma che la pipeline aveva già soppresso.
   const k = (DATA.watchlist || []).find(r => r.ticker === "^KS11");
-  const kc = k ? dgFin(k.change_pct) : null;                          // live: q.price/q.prev
-  if (kc != null && kc <= THR) sources.push({ src: "KOSPI (Asia)", chg: kc });
+  const kc = k ? dgFin(k.change_pct) : null;
+  const kFresh = k && (k.price_live === true || (k.price_asof && String(k.price_asof) === seoulToday()));
+  if (kc != null && kc <= THR && kFresh) sources.push({ src: "KOSPI (Asia)", chg: kc });
   return sources;
 }
 function computeShockClient() {
@@ -1814,7 +1820,8 @@ function renderAIValidation(text) {
 }
 
 function openDecisionModal() {
-  const v = decisionVerdict();
+  // v141: il modal è SOLO Diario + Validatore (la "sintesi delle operazioni" del motore è stata
+  // rimossa su direttiva CEO: il verdetto operativo vive nell'export AI, non in un popup).
   const diary = loadDiary();
   const diaryHtml = diary.length ? diary.map(e => `
     <div class="diary-item" data-iso="${e.date}">
@@ -1822,97 +1829,20 @@ function openDecisionModal() {
       <span class="diary-text">${esc(e.text)}</span>
       <button class="diary-edit" data-iso="${e.date}" title="Modifica questa voce">✎</button>
       <button class="diary-del" data-iso="${e.date}" title="Elimina">✕</button>
-    </div>`).join("") : `<div class="muted" style="font-size:12px">Nessuna voce ancora. Annota le tue operazioni e le motivazioni: il diario viene incluso nel prompt AI.</div>`;
-  // tabella ACCUMULO (acquisto): prezzo limite d'ingresso, STOP 2×ATR, quantità, motivazione
-  const accHtml = (v.withPlan || []).length ? `
-    <h4 style="margin:10px 0 4px">Acquisti — ordini limite suggeriti</h4>
-    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Limite acq.</th><th class="num">Stop 2×ATR</th><th class="num">Qtà</th><th>Motivazione</th></tr></thead><tbody>
-    ${v.withPlan.map(p => {
-      const atrNote = p.atr ? `ATR ${p.atr.src === "ATR14" ? "14" : "proxy"} $${fmtNum.format(Math.round(p.atr.atr * 100) / 100)} (${fmtNum.format(p.atr.pct)}%)` : "ATR n.d. → -8%";
-      return `<tr>
-      <td>${esc(p.r.name)} <span class="tk">${p.r.ticker}</span></td>
-      <td class="num">$${fmtNum.format(p.r.price)}</td>
-      <td class="num"><b style="color:var(--green)">$${fmtNum.format(Math.round(p.limit * 100) / 100)}</b></td>
-      <td class="num"><b style="color:var(--red)">$${fmtNum.format(p.stop)}</b></td>
-      <td class="num"><b style="font-size:14px">${p.qty}</b></td>
-      <td style="font-size:11px">score quant ${p.q}/100 · ${p.dd != null ? signTxt(p.dd) + " dal max 52S · " : ""}${atrNote}</td>
-    </tr>`; }).join("")}</tbody></table>
-    <div class="info-line muted" style="font-size:11px;margin-top:4px">Quantità ripartendo la liquidità (${fmtEUR.format(cashEur)}) sui candidati con lo score quant più alto (Sharpe marginale · RS 1M · qualità). Ordini LIMITE: se il prezzo non arriva, la cassa si conserva. Stop loss a <b>2×ATR(14)</b> sotto l'ingresso: assorbe la volatilità fisiologica del titolo invece di una % fissa.</div>` : "";
-  // STOP TRAILING sulle posizioni esistenti: ratchet della pipeline (sale, non ridiscende)
-  const trailHtml = (v.trailing || []).length ? `
-    <h4 style="margin:12px 0 4px">Stop trailing posizioni aperte (ratchet 2×ATR)</h4>
-    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Stop</th><th class="num">Dist.</th><th>Stato</th></tr></thead><tbody>
-    ${v.trailing.map(x => `<tr${x.violated ? ' style="background:rgba(239,68,68,.08)"' : ""}>
-      <td>${esc(x.r.name)} <span class="tk">${x.r.ticker}</span></td>
-      <td class="num">$${fmtNum.format(x.r.price)}</td>
-      <td class="num"><b style="color:var(--red)">$${fmtNum.format(x.stop)}</b></td>
-      <td class="num">${signTxt(Math.round((x.stop / x.r.price - 1) * 1000) / 10)}</td>
-      <td style="font-size:11px">${x.violated ? '<b style="color:var(--red)">⚠ STOP VIOLATO</b> — prezzo sotto lo stop ancorato' : x.ratchet ? "ratchet attivo (ancorato, non ridiscende)" : esc(x.atr.src) + " (client, non ancorato)"}</td>
-    </tr>`).join("")}</tbody></table>
-    <div class="info-line muted" style="font-size:11px;margin-top:4px">Stop RATCHET: parte a 2×ATR(14) sotto il prezzo e da lì può solo salire coi massimi — non si riabbassa quando il titolo scende (uno stop che ridiscende non è uno stop). Persistito tra i run della pipeline; si resetta se quantità o PMC cambiano. Con "⚠ STOP VIOLATO" la disciplina prevede uscita o ri-arm consapevole.</div>` : "";
-  // ESCLUSI dal veto del risk manager (value trap / qualità rotta)
-  const vetoHtml = (v.excluded || []).length ? `
-    <h4 style="margin:12px 0 4px">Esclusi dal motore (veto risk manager)</h4>
-    ${v.excluded.map(x => `<div class="info-line" style="font-size:12px"><b style="color:var(--red)">${x.r.ticker}</b> — <b>${x.verdict}</b>: ${x.why.join(" · ")}</div>`).join("")}
-    <div class="info-line muted" style="font-size:11px;margin-top:2px">Nessun supporto tecnico può scavalcare il veto fondamentale.</div>` : "";
-  // RIABILITATI dal veto Sortino (regola growth v111): eleggibili ma dichiarati
-  const rehabHtml = (v.rehabbed || []).length ? `
-    <h4 style="margin:12px 0 4px">Riabilitati dal veto Sortino (regola growth)</h4>
-    ${v.rehabbed.map(x => `<div class="info-line" style="font-size:12px"><b style="color:var(--yellow)">${x.r.ticker}</b> — ${x.why.join(" · ")}; <b>MA</b> ${x.rehabWhy}</div>`).join("")}
-    <div class="info-line muted" style="font-size:11px;margin-top:2px">Il Sortino 12M guarda indietro: con qualità intatta (ROE&gt;15%, margini positivi), prezzo sopra SMA200 e RS 1M vs NDX positiva il titolo torna eleggibile — da SORVEGLIATO.</div>` : "";
-  // SETUP TURNAROUND SQUEEZE (v113): esclusi che mostrano risveglio violento — esposti, non promossi
-  const squeezeHtml = (v.squeezed || []).length ? `
-    <h4 style="margin:12px 0 4px">⚡ Setup Turnaround Squeeze (speculativo, veto confermato)</h4>
-    ${v.squeezed.map(x => `<div class="info-line" style="font-size:12px"><b style="color:var(--yellow)">${x.r.ticker}</b> — short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% · RVol ${fmtNum.format(x.r.vol_ratio)}× · ${signTxt(x.r.sma50_dist_pct)} sopra SMA50</div>`).join("")}
-    <div class="info-line muted" style="font-size:11px;margin-top:2px">Short elevato + volumi anomali + struttura in riparazione = possibile short squeeze. NON è un investimento del mandato: solo speculazione dichiarata — sizing massimo metà standard, stop stretto 1×ATR, ordine limite.</div>` : "";
-  // tabella ALLEGGERIMENTO (vendita): prezzo limite di vendita, quantità, motivazione
-  const trimHtml = (v.trim || []).length ? `
-    <h4 style="margin:12px 0 4px">Vendite/alleggerimenti — TRIM parziale (Free Ride)</h4>
-    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Prezzo</th><th class="num">Limite vend.</th><th class="num">Qtà (30%)</th><th>Motivazione</th></tr></thead><tbody>
-    ${v.trim.map(r => { const lim = Math.round((r.resistance && r.resistance > r.price ? r.resistance : r.price) * 100) / 100; return `<tr>
-      <td>${esc(r.name)} <span class="tk">${r.ticker}</span></td>
-      <td class="num">$${fmtNum.format(r.price)}</td>
-      <td class="num"><b style="color:var(--green)">$${fmtNum.format(lim)}</b></td>
-      <td class="num"><b>${Math.round((r.qty || 0) * 0.3)}</b></td>
-      <td style="font-size:11px">${r.pe > 150 ? `multiplo tossico (P/E ${fmtNum.format(r.pe)})` : `RSI estremo (${r.rsi})`} — recupera capitale di rischio, lascia correre il resto</td>
-    </tr>`; }).join("")}</tbody></table>` : "";
-  // TAX ALPHA: scudi fiscali (minusvalenze dei rami secchi) per compensare le plus delle vendite
-  let taxHtml = "";
-  if ((v.harvest || []).length) {
-    const totMinus = v.harvest.reduce((s, r) => s + (r.gain_eur || 0), 0);   // negativo
-    const totPlus = (v.trim || []).reduce((s, r) => s + Math.max(0, (r.gain_eur || 0)), 0);
-    const offset = Math.min(Math.abs(totMinus), totPlus);
-    const taxSaved = offset * 0.26;
-    taxHtml = `
-    <h4 style="margin:12px 0 4px">Scudi fiscali (Tax Alpha)</h4>
-    <table class="info-table"><thead><tr><th>Titolo</th><th class="num">Minus latente</th><th class="num">Azioni</th><th>Nota</th></tr></thead><tbody>
-    ${v.harvest.map(r => `<tr>
-      <td>${esc(r.name)} <span class="tk">${r.ticker}</span></td>
-      <td class="num"><b class="neg">${signTxt(Math.round(r.gain_eur), " €")}</b></td>
-      <td class="num"><b>${r.qty}</b></td>
-      <td style="font-size:11px">ramo secco (${r.stats?.roe != null && r.stats.roe < 0 ? "ROIC<0" : "Sharpe<0"}) — vendendolo realizzi una minusvalenza usabile come scudo</td>
-    </tr>`).join("")}</tbody></table>
-    <div class="info-line muted" style="font-size:11px;margin-top:4px">Vendendo i rami secchi realizzi <b class="neg">${fmtEUR.format(Math.round(totMinus))}</b> di minusvalenze. ${totPlus > 0 ? `Compensano fino a <b>${fmtEUR.format(Math.round(offset))}</b> di plusvalenze dalle vendite sopra, risparmiando ~<b class="pos">${fmtEUR.format(Math.round(taxSaved))}</b> di tasse (26%).` : `Le minus restano disponibili per compensare future plusvalenze (entro il quadriennio fiscale).`}</div>`;
-  }
-  openInfoModal(`Decisione operativa: ${v.label}`,
-    `<div class="info-line" style="margin-bottom:8px"><b style="color:${v.col};font-size:16px">${v.label}</b></div>
-     <ul style="margin:0 0 10px 18px;font-size:12.5px;line-height:1.6">${v.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
-     ${accHtml}${trailHtml}${vetoHtml}${rehabHtml}${squeezeHtml}${trimHtml}${taxHtml}
-     <div class="info-line muted" style="font-size:11px;margin:12px 0">Verdetto su soli titoli AZIONARI. Obiettivo del motore: massimizzare il rendimento corretto per il rischio (Sharpe > 2.0) e sovraperformare il Nasdaq 100 — stesso mandato del Report CIO. Per l'analisi completa apri "📄 Report CIO" → Copia per analisi AI.</div>
-     <h4 style="margin:12px 0 6px">✅ Validatore report AI</h4>
-     <div class="info-line muted" style="font-size:11px;margin-bottom:6px">Incolla la risposta di Claude: gli ordini proposti vengono estratti e verificati contro gli invarianti del fondo (ticker, stop&lt;limite≤prezzo, banda 30%, veto, cap 10% NAV, budget cassa−ES95) PRIMA di andare al broker.</div>
-     <div class="diary-add"><textarea id="val-input" rows="2" placeholder="Incolla qui il report di Claude…"></textarea><button class="btn btn-primary btn-sm" id="val-run">Valida ordini</button></div>
+    </div>`).join("") : `<div class="muted" style="font-size:12px">Nessuna voce ancora. Annota le operazioni con la loro FONTE: il diario viaggia nell'export AI e alimenta l'attribuzione.</div>`;
+  openInfoModal("📔 Diario & Validatore report AI",
+    `<h4 style="margin:2px 0 6px">✅ Validatore report AI</h4>
+     <div class="info-line muted" style="font-size:11px;margin-bottom:6px">Incolla la risposta dell'LLM: gli ordini vengono estratti e verificati contro gli invarianti del fondo (ticker, stop&lt;limite≤prezzo, banda 30%, veto, cap 10% NAV, budget cassa−ES95) PRIMA di andare al broker.</div>
+     <div class="diary-add"><textarea id="val-input" rows="2" placeholder="Incolla qui il report dell'LLM…"></textarea><button class="btn btn-primary btn-sm" id="val-run">Valida ordini</button></div>
      <div id="val-out"></div>
      <h4 style="margin:14px 0 6px">Diario delle azioni</h4>
-     <div class="diary-add"><select id="diary-src" title="FONTE della decisione — l'attribuzione è ciò che permette di misurare, tra un mese, se i consigli AI aggiungono alpha oppure no"><option value="CEO">👤 Mia decisione</option><option value="AI">🤖 Consiglio AI</option><option value="MOTORE">⚙️ Motore</option></select><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
+     <div class="diary-add"><select id="diary-src" title="FONTE della decisione — permette di misurare, nel tempo, quale voce al tavolo aggiunge alpha"><option value="CEO">👤 Mia decisione</option><option value="AI">🤖 Consiglio AI</option><option value="MOTORE">⚙️ Motore</option></select><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
      <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
   const refresh = () => { closeChartModal(); openDecisionModal(); };
   $("#val-run")?.addEventListener("click", () => {
     const txt = ($("#val-input")?.value || "").trim();
     const out = $("#val-out");
     if (out) out.innerHTML = txt ? renderAIValidation(txt) : `<div class="muted" style="font-size:12px">Incolla prima il testo del report.</div>`;
-    // ponte validatore→diario: un click e i consigli AI validati diventano una voce [AI]
-    // datata — il pezzo di ATTRIBUZIONE che rende misurabile il valore del loop AI a 7/30g
     $("#val-log")?.addEventListener("click", () => {
       const orders = parseAIOrders(($("#val-input")?.value || "").trim());
       if (!orders.length) { toast("Nessun ordine da registrare"); return; }
@@ -1924,9 +1854,6 @@ function openDecisionModal() {
       refresh();
     });
   });
-  // ATTRIBUZIONE (v139): ogni voce porta la FONTE della decisione ([CEO]/[AI]/[MOTORE]) —
-  // è il dato che dopo qualche settimana risponde empiricamente a "i consigli AI aggiungono
-  // alpha?". Il prefisso viaggia nel diario e quindi nell'export AI.
   const srcTag = () => { const s = $("#diary-src")?.value || "CEO"; return `[${s}] `; };
   $("#diary-save")?.addEventListener("click", () => {
     const inp = $("#diary-input"); const txt = (inp.value || "").trim();
@@ -1934,16 +1861,13 @@ function openDecisionModal() {
   });
   const di = $("#diary-input");
   if (di) {
-    // si allarga man mano che scrivi; Invio = salva, Shift+Invio = a capo
     const grow = () => { di.style.height = "auto"; di.style.height = Math.min(160, di.scrollHeight) + "px"; };
     di.addEventListener("input", grow);
     di.addEventListener("keydown", e => {
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); const txt = di.value.trim(); if (txt) { saveDiaryEntry(/^\[(CEO|AI|MOTORE)\]/.test(txt) ? txt : srcTag() + txt); refresh(); } }
     });
-    di.focus();
   }
   document.querySelectorAll(".diary-del").forEach(b => b.addEventListener("click", () => { deleteDiaryEntry(b.dataset.iso); refresh(); }));
-  // modifica voce: carica il testo nel campo, rimuove la voce originale (si ri-salva con Aggiungi/Invio)
   document.querySelectorAll(".diary-edit").forEach(b => b.addEventListener("click", () => {
     const entry = loadDiary().find(x => x.date === b.dataset.iso);
     if (!entry) return;
@@ -4604,29 +4528,9 @@ function promptHeaderText() {
   const ov = localStorage.getItem("prompt_header");
   return (ov && ov.trim()) ? ov : DEFAULT_PROMPT_HEADER;
 }
-function savePromptHeader(text) {
-  const t = (text || "").trim();
-  const isDefault = !t || t === DEFAULT_PROMPT_HEADER.trim();
-  if (isDefault) localStorage.removeItem("prompt_header");
-  else localStorage.setItem("prompt_header", t);
-  // sul server scrivo SEMPRE testo valido: la testata effettiva (default reale se si ripristina)
-  pushPromptHeaderCloud(isDefault ? DEFAULT_PROMPT_HEADER : t);
-}
+/* v141: savePromptHeader/pushPromptHeaderCloud rimosse con l'editor UI — la testata
+   (Costituzione) si scrive via repo; il client la LEGGE soltanto (loadPromptHeaderCloud). */
 /* POST equivalente: sovrascrive config/prompt_header.txt via GitHub Contents API */
-async function pushPromptHeaderCloud(text) {
-  const token = localStorage.getItem("gh_token");
-  if (!token) return false;
-  try {
-    let sha;
-    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${PROMPT_HEADER_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
-    if (g.ok) sha = (await g.json()).sha;
-    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${PROMPT_HEADER_PATH}`, {
-      method: "PUT", headers: ghHeaders(token),
-      body: JSON.stringify({ message: "Aggiorna testata prompt AI (da dashboard)", content: btoa(unescape(encodeURIComponent(text))), sha }),
-    });
-    return r.ok;
-  } catch { return false; }
-}
 /* GET equivalente: legge la testata server-side e la usa come override (server vince) */
 async function loadPromptHeaderCloud() {
   try {
@@ -5826,39 +5730,9 @@ function hideSimpleModal(id) { const m = $(id); if (m) m.hidden = true; }
 $("#open-pmc")?.addEventListener("click", () => { pmcInit(); pmcCompute(); showSimpleModal("#pmc-modal"); });
 $("#open-sell")?.addEventListener("click", () => { renderSellCalc(); showSimpleModal("#sell-modal"); });
 
-/* ---- Editor Testata Prompt (decoupling): apre, mostra, salva sul server ---- */
-function openPromptSettings() {
-  const ta = $("#prompt-header-editor");
-  if (ta) ta.value = promptHeaderText();
-  const st = $("#prompt-settings-status");
-  if (st) st.textContent = localStorage.getItem("prompt_header") ? "testata personalizzata attiva" : "testata di default";
-  showSimpleModal("#prompt-settings-modal");
-}
-$("#open-prompt-settings")?.addEventListener("click", openPromptSettings);
-$("#prompt-settings-close")?.addEventListener("click", () => hideSimpleModal("#prompt-settings-modal"));
-$("#prompt-settings-modal")?.addEventListener("click", e => { if (e.target.id === "prompt-settings-modal") hideSimpleModal("#prompt-settings-modal"); });
-$("#prompt-settings-save")?.addEventListener("click", async () => {
-  const txt = $("#prompt-header-editor")?.value || "";
-  savePromptHeader(txt);
-  const hasToken = !!localStorage.getItem("gh_token");
-  toast(hasToken ? "Testata salvata sul server ✓" : "Testata salvata su questo browser (nessun token: no sync server)");
-  hideSimpleModal("#prompt-settings-modal");
-});
-$("#prompt-settings-reset")?.addEventListener("click", () => {
-  if (!window.confirm("Ripristinare la testata di default? Le modifiche salvate verranno perse.")) return;
-  savePromptHeader("");                 // "" → rimuove l'override e riporta il file al default
-  const ta = $("#prompt-header-editor"); if (ta) ta.value = DEFAULT_PROMPT_HEADER;
-  toast("Testata ripristinata al default");
-});
-$("#news-summary")?.addEventListener("click", () => showSimpleModal("#news-modal"));
-$("#pmc-modal-close")?.addEventListener("click", () => hideSimpleModal("#pmc-modal"));
-$("#sell-modal-close")?.addEventListener("click", () => hideSimpleModal("#sell-modal"));
-$("#news-modal-close")?.addEventListener("click", () => hideSimpleModal("#news-modal"));
-["pmc-modal", "sell-modal", "news-modal"].forEach(id =>
-  $("#" + id)?.addEventListener("click", e => { if (e.target.id === id) hideSimpleModal("#" + id); }));
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") ["#pmc-modal", "#sell-modal", "#news-modal", "#prompt-settings-modal"].forEach(hideSimpleModal);
-});
+/* v141: l'editor UI della testata (⚙ Impostazioni Prompt) è stato RIMOSSO su direttiva CEO:
+   la Costituzione in config/prompt_header.txt si mantiene via repo. loadPromptHeaderCloud()
+   resta: il file è ancora la fonte di verità caricata a ogni avvio. */
 $("#market-direction")?.addEventListener("click", () => {
   const d = marketDirectionScore();
   const comps = directionComponents();

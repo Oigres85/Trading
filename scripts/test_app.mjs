@@ -564,15 +564,18 @@ check("CIO v130: sparkTrendRows scarta gli orizzonti a storia insufficiente (tit
   const r = sparkTrendRows().find(x => x.tk === "TST1");
   DATA.portfolio[0].sparks = saved;
   return r && r.w1 !== null && r.m1 === null && r.m3 === null && r.y1 === null && r.short === true`));
-check("shock client v132: KOSPI live -8% + futures -3% → 2 fonti; KOSPI recuperato 0% → la fonte KOSPI sparisce (fix desync)", run(`
+check("shock client v141: KOSPI LIVE -8% + futures -3% → 2 fonti; recuperato 0% → sparisce; candela STANTIA -8% → esclusa (Allarme Fantasma)", run(`
   const savedW = DATA.watchlist, savedM = DATA.macro.futures;
-  DATA.watchlist = [{ ticker: "^KS11", change_pct: -8 }];
+  DATA.watchlist = [{ ticker: "^KS11", change_pct: -8, price_live: true }];
   DATA.macro.futures = { nasdaq: { change_pct: -3 }, sp500: { change_pct: -0.5 } };
   const s1 = shockSourcesLive();
-  DATA.watchlist = [{ ticker: "^KS11", change_pct: 0 }];
+  DATA.watchlist = [{ ticker: "^KS11", change_pct: 0, price_live: true }];
   const s2 = shockSourcesLive();
+  DATA.watchlist = [{ ticker: "^KS11", change_pct: -8, price_live: false, price_asof: "2026-07-16" }];
+  const s3 = shockSourcesLive();   // candela di 2 giorni fa: il gate di sessione la scarta
   DATA.watchlist = savedW; DATA.macro.futures = savedM;
-  return s1.length === 2 && s1.some(x => x.src === "KOSPI (Asia)") && s2.length === 1 && !s2.some(x => x.src === "KOSPI (Asia)")`));
+  return s1.length === 2 && s1.some(x => x.src === "KOSPI (Asia)") && s2.length === 1 && !s2.some(x => x.src === "KOSPI (Asia)")
+      && s3.length === 1 && !s3.some(x => x.src === "KOSPI (Asia)")`));
 check("shock client v132: usRegularSessionOpen — 12:00 ET feriale aperto, 20:00 ET chiuso, sabato chiuso", run(`
   return usRegularSessionOpen(new Date("2026-07-17T16:00:00Z")) === true
       && usRegularSessionOpen(new Date("2026-07-18T00:00:00Z")) === false
