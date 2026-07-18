@@ -103,6 +103,39 @@ function signTxt(v, suffix = "%") {
   if (v === null || v === undefined) return "—";
   return (v > 0 ? "+" : "") + fmtNum.format(v) + suffix;
 }
+// [⚡ASIMM] (v136): motore di volatilità asimmetrica RIALZISTA — Sortino 1A supera lo Sharpe 1A
+// di oltre il 70% (varianza quasi tutta al rialzo) CON momentum in corso (RSI>55). Su questi
+// titoli la testata vieta le prese di beneficio da ipercomprato RSI: solo stop ratchet 2×ATR.
+function isAsimm(r) {
+  const sh = r.sharpe_1y, so = r.sortino_1y, rsi = r.rsi;
+  return sh != null && so != null && sh > 0 && so / sh > 1.7 && rsi != null && rsi > 55;
+}
+function signalTxt(r) { return `${r.signal ?? "—"}${isAsimm(r) ? " [⚡ASIMM]" : ""}`; }
+
+// Polymarket Δ7g (v136): storico client-side delle probabilità (localStorage, un punto/giorno)
+// → velocità del sentiment speculativo macro. Senza 7 giorni di storico → "[Δ7g —]".
+function pmHist() { try { return JSON.parse(localStorage.getItem("polymarket_hist") || "{}"); } catch { return {}; } }
+function recordPolymarket() {
+  const preds = (typeof DATA !== "undefined" && DATA && DATA.predictions) || [];
+  if (!preds.length) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const h = pmHist();
+  for (const p of preds) {
+    if (p.question == null || p.yes == null) continue;
+    const arr = h[p.question] || [];
+    if (arr.length && arr[arr.length - 1][0] === today) arr[arr.length - 1] = [today, p.yes];   // aggiorna oggi
+    else arr.push([today, p.yes]);
+    h[p.question] = arr.slice(-45);   // ~45 giorni di storico, basta per Δ7g/Δ30g
+  }
+  try { localStorage.setItem("polymarket_hist", JSON.stringify(h)); } catch { /* quota/blocco: best-effort */ }
+}
+function pmDelta7(question, yesNow) {
+  const arr = pmHist()[question] || [];
+  const target = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+  let past = null;
+  for (const [d, v] of arr) { if (d <= target) past = v; }   // il valore più recente con data ≤ 7g fa
+  return past != null ? Math.round(yesNow - past) : null;
+}
 
 // URL raw: bypassa il CDN di GitHub Pages (nessun cache edge), dati sempre freschi.
 // Pages URL come fallback (CORS block su raw in ambienti aziendali).
@@ -713,6 +746,7 @@ function renderAll() {
   renderPortfolioHealth();
   renderMiniCards();
   renderRiskParams();
+  recordPolymarket();   // accumula lo storico Polymarket (un punto/giorno) per la derivata Δ7g
   renderNews();
   renderBtpInfo();
   // NON ricostruire la tabella vendite mentre il popup è aperto: l'auto-refresh (ogni 5 min)
@@ -2624,7 +2658,7 @@ function openStockDetail(ticker) {
     r.risk_contrib_pct != null ? row("Quota rischio ptf (MCR)", `${fmtNum.format(r.risk_contrib_pct)}%`) : "",
     row("Drawdown 52S", r.w52_dist_pct != null ? signTxt(r.w52_dist_pct) : "—"),
     row("Short float", st.short_float != null ? pct(st.short_float) : "—"),
-    row("Segnale", `<span class="badge ${r.signal_class}">${r.signal}</span>`),
+    row("Segnale", `<span class="badge ${r.signal_class}">${r.signal}</span>${isAsimm(r) ? ` <span class="badge badge-asimm">⚡ASIMM</span>` : ""}`),
     r.rating?.upside_pct != null ? row("Target Δ", signTxt(r.rating.upside_pct)) : "",
     r.earnings_date ? row("Trimestrale", new Date(r.earnings_date).toLocaleDateString("it-IT")) : "",
   ].join("");
@@ -2800,7 +2834,7 @@ function techCells(r) {
       ${r.rs_ndx_1m != null
         ? `<td class="num" title="Sovra/sotto-performance a 1 mese vs Nasdaq 100 (metro del mandato)"><span class="${signCls(r.rs_ndx_1m)}">${signTxt(r.rs_ndx_1m, " pp")}</span></td>`
         : `<td class="num muted" title="Disponibile dopo il prossimo run della pipeline">n.d.</td>`}
-      <td title="Logica del segnale: prezzo vs SMA50/SMA200 (trend) + RSI(14), calcolati su base giornaliera (daily). Golden setup = prezzo > SMA50 > SMA200 con RSI non estremo."><span class="badge ${r.signal_class}">${r.signal}</span>${r.qty && r.stop_violated ? `<br><span class="badge badge-earnrisk" title="Il prezzo è SOTTO lo stop trailing ancorato ($${fmtNum.format(r.stop_atr)}): la disciplina prevede uscita o ri-arm consapevole. Lo stop ratchet non si riabbassa da solo.">[STOP VIOLATO]</span>` : ""}</td>
+      <td title="Logica del segnale: prezzo vs SMA50/SMA200 (trend) + RSI(14), calcolati su base giornaliera (daily). Golden setup = prezzo > SMA50 > SMA200 con RSI non estremo."><span class="badge ${r.signal_class}">${r.signal}</span>${isAsimm(r) ? ` <span class="badge badge-asimm" title="Motore di volatilità asimmetrica rialzista: Sortino 1A > 1,7× Sharpe 1A con RSI>55. Niente prese di beneficio da ipercomprato — solo stop ratchet 2×ATR.">⚡ASIMM</span>` : ""}${r.qty && r.stop_violated ? `<br><span class="badge badge-earnrisk" title="Il prezzo è SOTTO lo stop trailing ancorato ($${fmtNum.format(r.stop_atr)}): la disciplina prevede uscita o ri-arm consapevole. Lo stop ratchet non si riabbassa da solo.">[STOP VIOLATO]</span>` : ""}</td>
       ${shortFloatCell(r)}
       ${floatCell(r)}
       ${drawdownCell(r)}
@@ -4761,7 +4795,7 @@ function buildPrompt() {
       : (r.price_asof && DATA.updated_at && r.price_asof < DATA.updated_at.slice(0, 10)
         ? ` [chiusura del ${new Date(r.price_asof + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}]` : "");
     const priceCell = `${c}${f(r.price)}${staleTag}${(adjL != null && r.price != null && Math.abs(adjL - r.price) / r.price > 0.001) ? ` → agg. ${c}${f(adjL)} (${r.prepost?.label || "ext"})` : ""}`;
-    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${floatCell} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${r.signal ?? "—"} | ${optNote} |`;
+    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${floatCell} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${signalTxt(r)} | ${optNote} |`;
   };
   const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A | Drawdown 52S | Short% | Float | Supp. | Stop 2×ATR | R/R teorico | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
   const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
@@ -5058,8 +5092,9 @@ function buildPrompt() {
   }
   if ((DATA.predictions || []).length) {
     lines.push("");
-    lines.push("MERCATI DI PREVISIONE (Polymarket, prob. Sì):");
-    DATA.predictions.forEach(p => lines.push(`- ${p.question}: ${p.yes}%`));
+    recordPolymarket();   // registra lo snapshot di oggi (dedup giornaliero) per la derivata Δ7g
+    lines.push("MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):");
+    DATA.predictions.forEach(p => { const d = pmDelta7(p.question, p.yes); lines.push(`- ${p.question}: ${p.yes}% [Δ7g ${d == null ? "—" : (d > 0 ? "+" : "") + d + "pp"}]`); });
   }
   lines.push("");
   lines.push("ULTIME NEWS (sentiment | titolo | fonte):");

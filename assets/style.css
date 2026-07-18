@@ -796,6 +796,7 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 /* ---------- v88: badge quant risk (RVol, earnings risk, default risk) ---------- */
 .badge-anom { background: rgba(245,158,11,.15); color: var(--yellow); border: 1px solid rgba(245,158,11,.4); font-size: 8.5px; padding: 1px 4px; border-radius: 4px; white-space: nowrap; font-weight: 700; }
 .badge-earnrisk { background: rgba(239,68,68,.15); color: var(--red); border: 1px solid rgba(239,68,68,.4); font-size: 8.5px; padding: 1px 4px; border-radius: 4px; white-space: nowrap; font-weight: 700; }
+.badge-asimm { background: rgba(34,211,238,.16); color: var(--cyan); border: 1px solid rgba(34,211,238,.45); font-size: 8.5px; padding: 1px 4px; border-radius: 4px; white-space: nowrap; font-weight: 700; }
 .badge-default-risk { background: rgba(239,68,68,.18); color: var(--red); border: 1px solid rgba(239,68,68,.45); font-size: 8.5px; padding: 1px 4px; border-radius: 4px; white-space: nowrap; font-weight: 700; }
 
 /* ---------- Prompts 15/18: Drawdown badges ---------- */

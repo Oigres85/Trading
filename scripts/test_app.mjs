@@ -583,6 +583,37 @@ check("CIO v128: titleDeepData — CAGR ricavi dai financials pluriennali e EPS 
     stats: { eps_ttm: 5, eps_forward: 8, forward_pe: 12, peg: 1.1, revenue_growth: 0.2, target_mean: 130 } });
   return Math.round(d.revCagr) === 26 && d.niCagr === null && d.epsG === 60 && d.upside === 30 && d.span === 3`));
 
+/* ---------- v136: tag [⚡ASIMM] (volatilità asimmetrica) + Polymarket Δ7g ---------- */
+check("ASIMM: Sortino>1,7×Sharpe (entrambi>0) e RSI>55 → true; ratio basso / Sharpe≤0 / RSI≤55 → false", run(`
+  return isAsimm({ sharpe_1y: 1, sortino_1y: 2, rsi: 60 }) === true
+      && isAsimm({ sharpe_1y: 1, sortino_1y: 1.5, rsi: 60 }) === false
+      && isAsimm({ sharpe_1y: -1, sortino_1y: -2, rsi: 60 }) === false
+      && isAsimm({ sharpe_1y: 1, sortino_1y: 2, rsi: 50 }) === false`));
+check("ASIMM: signalTxt appende il tag solo ai titoli qualificati", run(`
+  return signalTxt({ signal: "Sopra SMA50", sharpe_1y: 1, sortino_1y: 2, rsi: 60 }).includes("[⚡ASIMM]")
+      && !signalTxt({ signal: "Neutrale", sharpe_1y: 1, sortino_1y: 1.2, rsi: 60 }).includes("ASIMM")`));
+check("ASIMM: compare nella Tabella A del prompt per una posizione qualificata", run(`
+  const r = DATA.portfolio.find(x => x.qty);
+  const s1 = r.sharpe_1y, so1 = r.sortino_1y, rsi = r.rsi;
+  r.sharpe_1y = 1; r.sortino_1y = 2.5; r.rsi = 60;
+  const has = buildPrompt().includes("[⚡ASIMM]");
+  r.sharpe_1y = s1; r.sortino_1y = so1; r.rsi = rsi;
+  return has`));
+check("Polymarket Δ7g: con storico di ≥7g calcola il delta; senza storico → null", run(`
+  const d8 = new Date(Date.now() - 8 * 86400000).toISOString().slice(0, 10);   // 8 giorni fa (≤ target 7g)
+  const d0 = new Date().toISOString().slice(0, 10);                            // oggi (dopo il target)
+  localStorage.setItem("polymarket_hist", JSON.stringify({ "Q1?": [[d8, 91], [d0, 95]] }));
+  const withHist = pmDelta7("Q1?", 95);
+  const noHist = pmDelta7("Q-inesistente?", 50);
+  localStorage.removeItem("polymarket_hist");
+  return withHist === 4 && noHist === null`));
+check("Polymarket Δ7g: la riga del prompt riporta [Δ7g …] su ogni scommessa", run(`
+  const saved = DATA.predictions;
+  DATA.predictions = [{ question: "Fed no change?", yes: 95 }];
+  const p = buildPrompt();
+  DATA.predictions = saved;
+  return p.includes("[Δ7g")`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {
