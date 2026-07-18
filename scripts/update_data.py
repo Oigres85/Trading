@@ -557,6 +557,16 @@ def live_last_price(t):
         return None
 
 
+def _live_is_informative(lp, last_close):
+    """FIX FALSO-LIVE (v137, visto sul KOSPI): a mercato ESTERO CHIUSO fast_info resta congelato
+    sull'ultimo scambio = la chiusura stessa. Attivare l'override in quel caso non aggiunge
+    informazione ma ARRETRA il riferimento (prev = chiusura precedente) → il prompt mostrava
+    la variazione della seduta GIÀ CHIUSA con l'etichetta [LIVE], come fosse in corso adesso
+    (KOSPI -6,37% ripetuto identico su 3 run serali). Live "informativo" = scambio DIVERSO
+    dalla chiusura più recente; identico → si resta sulla candela con [chiusura del DD/MM]."""
+    return lp is not None and last_close and abs(lp / last_close - 1) >= 1e-6
+
+
 def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
     ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
@@ -593,7 +603,9 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     price_live = False
     if is_live_market(ticker):
         lp = live_last_price(t)
-        if lp is not None and abs(lp / price - 1) < 0.5:   # guardia anti-glitch: scarto <50% dalla chiusura
+        # guardia anti-glitch (<50% dalla chiusura) + guardia anti-FALSO-LIVE (v137): un last_price
+        # IDENTICO alla chiusura = mercato chiuso/feed congelato → niente override, resta la candela
+        if lp is not None and abs(lp / price - 1) < 0.5 and _live_is_informative(lp, price):
             prev = price       # la chiusura più recente è il riferimento della variazione live
             price = lp
             price_asof = None   # non è una chiusura: è live

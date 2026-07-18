@@ -168,6 +168,11 @@ check("notify shock v125: build_message emette il blocco MACRO SHOCK ALERT",
 check("notify v130: solo GitHub Issue (niente WhatsApp né email)",
       not hasattr(na, "send_whatsapp") and not hasattr(na, "send_email") and hasattr(na, "send_github_issue"))
 
+# v137: falso-live — fast_info congelato sulla chiusura (mercato estero chiuso) NON è informativo
+check("v137 _live_is_informative: scambio ≠ chiusura → live vero; identico alla chiusura → falso live (KOSPI congelato)",
+      ud._live_is_informative(6820.0, 6825.5) and not ud._live_is_informative(6820.6, 6820.6)
+      and not ud._live_is_informative(None, 6820.6))
+
 # ---------- live-market + shock alert (v125): funzioni pure della pipeline ----------
 check("v125 is_live_market: cripto/futures/indici esteri sì, azioni USA e indici USA no",
       ud.is_live_market("^KS11") and ud.is_live_market("BTC-USD") and ud.is_live_market("NQ=F")
@@ -257,6 +262,6 @@ check("div_yield_frac: senza tasso → fallback al campo % di Yahoo (ORCL 1.39 �
 check("div_yield_frac: cap 30% — un 453% (TLT-like) è errore di unità → None",
       ud.div_yield_frac(None, 84.0, 453.0) is None and ud.div_yield_frac(300.0, 84.0, None) is None)
 
-N_CHECKS = 50
+N_CHECKS = 51
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
