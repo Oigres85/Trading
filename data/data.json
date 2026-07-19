@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-07-19T10:20:18Z",
+ "updated_at": "2026-07-19T11:12:33Z",
  "eurusd": 1.1446,
  "totals": {
   "usd_value": 256641.95,
@@ -897,10 +897,10 @@
    "risk_reward": "1:1.7",
    "sector": "Technology",
    "stats": {
-    "market_cap": null,
-    "shares": null,
+    "market_cap": 808386560000,
+    "shares": 1630600639,
     "float_shares": 1621991068,
-    "float_pct": null,
+    "float_pct": 99.5,
     "avg_volume_30d": 35763120,
     "pe_ttm": 164.159,
     "forward_pe": 36.8191,
@@ -914,7 +914,7 @@
     "roe": 0.0806,
     "debt_to_equity": 6.005,
     "dividend_yield": null,
-    "price_to_book": null,
+    "price_to_book": 12.536,
     "target_mean": 540.1915,
     "fcf": 7173374976,
     "gross_margin": 0.5306,
@@ -923,9 +923,9 @@
     "peg": 1.16,
     "roa": 0.0365,
     "short_float": 0.0256,
-    "buyback_yield": null,
-    "altman_z": 2.15,
-    "altman_missing": 1,
+    "buyback_yield": 0.0024,
+    "altman_z": 63.1,
+    "altman_missing": 0,
     "altman_model": "Z''"
    },
    "tech_by_range": {
@@ -3373,7 +3373,7 @@
      857.01
     ]
    },
-   "earnings_date": null,
+   "earnings_date": "2026-09-23",
    "rating": {
     "key": "strong_buy",
     "n": 42,
@@ -3396,10 +3396,10 @@
    "risk_reward": "1:2.6",
    "sector": "Technology",
    "stats": {
-    "market_cap": null,
-    "shares": null,
+    "market_cap": 958798299136,
+    "shares": 1129393151,
     "float_shares": 1125282160,
-    "float_pct": null,
+    "float_pct": 99.6,
     "avg_volume_30d": 51765387,
     "pe_ttm": 19.194,
     "forward_pe": 5.6308,
@@ -3413,7 +3413,7 @@
     "roe": 0.6664,
     "debt_to_equity": 6.33,
     "dividend_yield": 0.0006,
-    "price_to_book": null,
+    "price_to_book": 13.2159,
     "target_mean": 1491.9524,
     "fcf": 7639499776,
     "gross_margin": 0.7257,
@@ -3422,9 +3422,9 @@
     "peg": 0.12,
     "roa": 0.3487,
     "short_float": 0.0281,
-    "buyback_yield": null,
-    "altman_z": 4.11,
-    "altman_missing": 1,
+    "buyback_yield": 0,
+    "altman_z": 39.27,
+    "altman_missing": 0,
     "altman_model": "Z''"
    },
    "tech_by_range": {
@@ -5557,7 +5557,10 @@
     "peg": 1.4,
     "roa": 0.1464,
     "short_float": 0.0146,
-    "buyback_yield": 0.0108
+    "buyback_yield": 0.0108,
+    "altman_z": 29.4,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "tech_by_range": {
     "w1": {
@@ -10346,21 +10349,21 @@
    "name": "Bitcoin",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 64546.48,
+   "price": 64564.01,
    "price_asof": "2026-07-19",
    "price_live": false,
-   "change_pct": -0.39,
+   "change_pct": -0.36,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -48.9,
+   "ath_dist_pct": -48.8,
    "sma200_dist_pct": -11.6,
    "sma50_dist_pct": 1.9,
    "w52_high": 126198.07,
-   "w52_dist_pct": -48.9,
+   "w52_dist_pct": -48.8,
    "support": 57747.77,
    "resistance": 65507.59,
    "rsi": 54.1,
-   "volume": 14719834112,
+   "volume": 14888044544,
    "vol_ratio": 0.51,
    "atr_14": 1727.13,
    "atr_pct": 2.68,
@@ -10372,7 +10375,7 @@
      63789.28,
      63899.46,
      64796.6,
-     64546.48
+     64564.01
     ],
     "m6": [
      74861.09,
@@ -10500,7 +10503,7 @@
      63789.28,
      63899.46,
      64796.6,
-     64546.48
+     64564.01
     ],
     "all": [
      386.94,
@@ -10645,7 +10648,7 @@
      76304.32,
      73579.69,
      58558.86,
-     64546.48
+     64564.01
     ],
     "m1": [
      59532.34,
@@ -10669,7 +10672,7 @@
      63789.28,
      63899.46,
      64796.6,
-     64546.48
+     64564.01
     ],
     "m3": [
      79065.68,
@@ -10737,7 +10740,7 @@
      63789.28,
      63899.46,
      64796.6,
-     64546.48
+     64564.01
     ],
     "y1": [
      117939.98,
@@ -10813,7 +10816,7 @@
      63088.3,
      63193.15,
      64956.11,
-     64546.48
+     64564.01
     ],
     "d1": [
      64791.07,
@@ -10877,7 +10880,13 @@
      64475.02,
      64478.02,
      64517.91,
-     64526.31
+     64526.31,
+     64554.02,
+     64584.54,
+     64624,
+     64545.59,
+     64514.07,
+     64564.01
     ]
    },
    "earnings_date": null,
@@ -10890,7 +10899,7 @@
    "sharpe_6m": -0.89,
    "sortino_6m": -1.19,
    "prepost": null,
-   "prezzo_limite_aggiustato": 64546.48,
+   "prezzo_limite_aggiustato": 64564.01,
    "risk_reward": "1:2.2",
    "sector": "Altro",
    "stats": null,
@@ -10898,22 +10907,22 @@
     "w1": {
      "support": 62489.45,
      "resistance": 65507.59,
-     "change_pct": -0.26
+     "change_pct": -0.23
     },
     "m1": {
      "support": 57747.77,
      "resistance": 65507.59,
-     "change_pct": 8.42
+     "change_pct": 8.45
     },
     "m3": {
      "support": 57747.77,
      "resistance": 81634.84,
-     "change_pct": -18.36
+     "change_pct": -18.34
     },
     "y1": {
      "support": 57747.77,
      "resistance": 107428.26,
-     "change_pct": -39.11
+     "change_pct": -39.09
     }
    },
    "financials": [],
@@ -10938,7 +10947,7 @@
      "hi": 63757.17
     }
    },
-   "rs_1m": 9.1,
+   "rs_1m": 9.2,
    "rs_bench": "sp500",
    "rs_ndx_1m": 13,
    "beta_ndx": 0.92,
@@ -18866,7 +18875,7 @@
   },
   {
    "ticker": "CRM",
-   "name": "CRM",
+   "name": "Salesforce, Inc.",
    "currency": "USD",
    "price_src": "yahoo",
    "price": 170.77,
@@ -19260,7 +19269,7 @@
      199.33,
      197.41,
      247.62,
-     258.67,
+     258.66,
      276.31,
      303.57,
      296.44,
@@ -19480,7 +19489,7 @@
      171.26
     ]
    },
-   "earnings_date": null,
+   "earnings_date": "2026-09-02",
    "rating": {
     "key": "buy",
     "n": 52,
@@ -19503,10 +19512,10 @@
    "risk_reward": "1:2.1",
    "sector": "Technology",
    "stats": {
-    "market_cap": null,
-    "shares": null,
+    "market_cap": 139860639744,
+    "shares": 819000000,
     "float_shares": 793668330,
-    "float_pct": null,
+    "float_pct": 96.9,
     "avg_volume_30d": 14825340,
     "pe_ttm": 19.8109,
     "forward_pe": 10.9995,
@@ -19529,9 +19538,9 @@
     "peg": 0.71,
     "roa": 0.057,
     "short_float": 0.0715,
-    "buyback_yield": null,
-    "altman_z": 0.66,
-    "altman_missing": 1,
+    "buyback_yield": 0.0901,
+    "altman_z": 3.42,
+    "altman_missing": 0,
     "altman_model": "Z''"
    },
    "tech_by_range": {
@@ -20554,8 +20563,8 @@
    "stats": {
     "market_cap": 38521946112,
     "shares": 92130188,
-    "float_shares": 80550450,
-    "float_pct": 87.4,
+    "float_shares": 80450776,
+    "float_pct": 87.3,
     "avg_volume_30d": 7850472,
     "pe_ttm": 384.1333,
     "forward_pe": 180.5798,
@@ -22987,7 +22996,7 @@
     224010,
     226996,
     222605,
-    228228,
+    228227,
     227608,
     223913,
     224393,
@@ -33647,8 +33656,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1722480616047,
-   "change_pct": 0.38
+   "mcap_usd": 1723768963134,
+   "change_pct": 0.45
   },
   {
    "ticker": "META",
@@ -34060,7 +34069,7 @@
      109.14,
      102.59,
      106.75,
-     108.02,
+     108.01,
      110.72,
      113.53,
      111.46,
@@ -34482,9 +34491,9 @@
     -0.00126,
     -0.003758,
     -0.016526,
-    0.015086,
+    0.015085,
     -0.005083,
-    0.00763,
+    0.007631,
     -0.000838,
     0.007767,
     -0.001979,
@@ -34501,27 +34510,27 @@
     0.004178,
     0.002276,
     0.003535,
-    -0.005982,
+    -0.005981,
     -0.007438,
     0.005405,
     0.008323,
     -0.0029,
-    0.002454,
+    0.002453,
     0.002309,
     0.002887,
     0.008276,
-    -0.000335,
+    -0.000334,
     0.00531,
     -0.001378,
     -0.001243,
-    0.004661,
+    0.004662,
     0.004941,
     0.00472,
     -0.005458,
     -0.003187,
     -0.004624,
     0.005713,
-    0.002806,
+    0.002807,
     0.00376,
     0.003402,
     0.001151,
@@ -34534,7 +34543,7 @@
     0.015228,
     -0.001222,
     0.00443,
-    -0.006834,
+    -0.006833,
     0.00566,
     0.010347,
     -0.000015,
@@ -34571,7 +34580,7 @@
     0.000731,
     0.001898,
     -0.003009,
-    -0.000864,
+    -0.000863,
     0.00661,
     0.002324,
     -0.01081,
@@ -34580,13 +34589,13 @@
     -0.011065,
     0.007523,
     0.009023,
-    0.006211,
+    0.00621,
     0.00456,
     0.003512,
     -0.000101,
     -0.00357,
     -0.001222,
-    -0.007437,
+    -0.007436,
     0.001831,
     0.006638,
     0.00593,
@@ -34628,7 +34637,7 @@
     -0.004814,
     0.000568,
     -0.008853,
-    0.00703,
+    0.007031,
     -0.005591,
     -0.013194,
     0.008722,
@@ -34640,7 +34649,7 @@
     0.002627,
     -0.014052,
     -0.002467,
-    -0.01444,
+    -0.014439,
     0.010445,
     -0.003362,
     0.005557,
@@ -35739,7 +35748,7 @@
     -0.000399,
     -0.01366,
     -0.005955,
-    -0.004641,
+    -0.00464,
     0.01531,
     -0.002889,
     0.004007,
@@ -35756,22 +35765,22 @@
     0.005804,
     0.004407,
     0.008521,
-    -0.000845,
+    -0.000846,
     -0.001998,
     0.008977,
-    0.006747,
+    0.006746,
     0.005903,
-    -0.006665,
+    -0.006664,
     -0.003517,
     -0.004321,
-    0.004102,
+    0.004103,
     0.00462,
     0.002735,
-    0.004786,
+    0.004785,
     0.004103,
     -0.004219,
     0.007482,
-    -0.005279,
+    -0.00528,
     0.011399,
     -0.001211,
     -0.035331,
@@ -35781,12 +35790,12 @@
     -0.00371,
     0.006545,
     0.012522,
-    -0.000262,
+    -0.000261,
     -0.009681,
     0.008371,
     0.010622,
-    0.017653,
-    0.00766,
+    0.017652,
+    0.007661,
     0.004493,
     -0.015407,
     0.004812,
@@ -35801,9 +35810,9 @@
     -0.020627,
     0.000756,
     -0.008577,
-    -0.01225,
+    -0.012251,
     0.005952,
-    -0.023956,
+    -0.023957,
     0.007485,
     0.025252,
     0.006145,
@@ -35818,7 +35827,7 @@
     0.001233,
     0.004087,
     -0.00324,
-    -0.019304,
+    -0.019303,
     -0.005032,
     0.00198,
     -0.018711,
@@ -35832,7 +35841,7 @@
     -0.002322,
     -0.0083,
     -0.001939,
-    0.007912,
+    0.007911,
     0.008748,
     0.000962,
     -0.005705,
@@ -35853,7 +35862,7 @@
     -0.012084,
     0.006843,
     -0.015483,
-    -0.017624,
+    -0.017623,
     -0.0145,
     0.020918,
     0.007631,
@@ -35862,7 +35871,7 @@
     -0.020549,
     0.002129,
     -0.001031,
-    0.00744,
+    0.007439,
     -0.003837,
     0.00881,
     -0.012229,
@@ -35870,11 +35879,11 @@
     0.014389,
     -0.012138,
     -0.003206,
-    0.001316,
+    0.001317,
     -0.010763,
     0.015128,
     -0.003017,
-    -0.015158,
+    -0.015157,
     0.013267,
     0.000017,
     -0.000132,
@@ -36970,7 +36979,7 @@
     -0.007706,
     -0.003543,
     0.002481,
-    0.038459,
+    0.03846,
     -0.010574,
     0.008229,
     0.007061,
@@ -36984,7 +36993,7 @@
     -0.005893,
     -0.001775,
     0.018315,
-    -0.010269,
+    -0.010268,
     0.004229,
     -0.001648,
     0.002557,
@@ -37000,7 +37009,7 @@
     0.002188,
     0.00629,
     0.00739,
-    0.003978,
+    0.003979,
     -0.010795,
     0.01043,
     -0.006465,
@@ -37020,7 +37029,7 @@
     -0.008552,
     -0.008095,
     0.00562,
-    -0.003214,
+    -0.003213,
     -0.017426,
     0.014325,
     -0.017855,
@@ -37030,14 +37039,14 @@
     -0.00246,
     -0.028518,
     0.00291,
-    -0.020076,
+    -0.020075,
     0.003046,
     -0.000171,
     -0.01868,
     0.027933,
     0.018087,
     0.021567,
-    0.008814,
+    0.008813,
     0.005846,
     -0.012663,
     -0.001834,
@@ -37048,7 +37057,7 @@
     0.002071,
     0.013513,
     0.011666,
-    -0.01544,
+    -0.015441,
     -0.007592,
     -0.004743,
     -0.010701,
@@ -37087,8 +37096,8 @@
     -0.018166,
     0.035292,
     0.006994,
-    -0.002701,
-    -0.004557,
+    -0.002702,
+    -0.004556,
     -0.02063,
     0.013091,
     0.000304,
@@ -38813,7 +38822,7 @@
      42.73,
      40.07,
      39.96,
-     40.38,
+     40.39,
      41,
      42.71,
      43.12,
@@ -39054,7 +39063,7 @@
      80.1,
      82.41,
      83.91,
-     86.95,
+     86.96,
      88.79,
      90.57,
      85.63,
@@ -39337,7 +39346,7 @@
     0.000575,
     0.014117,
     0.002729,
-    0.003062,
+    0.003061,
     -0.005791,
     -0.00171,
     -0.004344,
@@ -39371,14 +39380,14 @@
     -0.010373,
     -0.001908,
     -0.003601,
-    0.006965,
+    0.006966,
     -0.003814,
     0,
-    -0.0009,
+    -0.000899,
     0.008178,
     -0.002905,
     0.002579,
-    0.002907,
+    0.002908,
     -0.0019,
     -0.007975,
     0.005735,
@@ -39388,7 +39397,7 @@
     -0.000552,
     0.003197,
     -0.002204,
-    0.007473,
+    0.007472,
     -0.001534,
     0.00383,
     0.004903,
@@ -39398,12 +39407,12 @@
     0.003383,
     0.002612,
     -0.010158,
-    -0.005835,
+    -0.005836,
     -0.002986,
     -0.002504,
     0.002226,
     -0.010956,
-    0.008953,
+    0.008952,
     -0.002119,
     -0.000223,
     0.004568,
@@ -39411,7 +39420,7 @@
     -0.008245,
     -0.005722,
     0.002472,
-    -0.000336,
+    -0.000337,
     -0.002023,
     0.00393,
     0.003021,
@@ -39450,15 +39459,15 @@
     -0.002961,
     0.00171,
     0.005791,
-    -0.000226,
+    -0.000227,
     -0.005792,
-    -0.013185,
+    -0.013184,
     0.007588,
     0.004343,
     0.002733,
     0.004765,
     -0.006245,
-    -0.002281,
+    -0.00228,
     0.000228,
     -0.005608,
     -0.002861,
@@ -39466,13 +39475,13 @@
     -0.002539,
     0.010803,
     0.000686,
-    -0.000228,
+    -0.000229,
     0.011474,
     -0.005323,
     0.013199,
     0.005476,
     0.001671,
-    -0.00379,
+    -0.003791,
     0.001005,
     -0.002346,
     0.003684,
@@ -39489,7 +39498,7 @@
     -0.010704,
     -0.012998,
     -0.001953,
-    -0.004957,
+    -0.004956,
     0.007712,
     0.002748,
     -0.005619,
@@ -39503,9 +39512,9 @@
     0.013224,
     -0.001038,
     -0.000985,
-    0.006125,
+    0.006126,
     -0.001614,
-    -0.000115,
+    -0.000116,
     0.003227,
     -0.002534,
     -0.002425,
@@ -40525,25 +40534,25 @@
     0.022477,
     -0.009,
     0.012069,
-    0.001949,
+    0.00195,
     0.008833,
-    -0.005866,
-    0.015429,
+    -0.005865,
+    0.015428,
     0.001726,
     -0.003995,
     -0.006294,
     0.002896,
     -0.019082,
-    -0.007169,
+    -0.007168,
     -0.00265,
     0.01757,
-    -0.002437,
+    -0.002438,
     0.005113,
     0.007001,
     0.009867,
     -0.015446,
     -0.010398,
-    0.00447,
+    0.004469,
     0.006674,
     0.00179,
     0.008734,
@@ -41811,7 +41820,7 @@
     0.005,
     -0.004815,
     -0.00895,
-    -0.000749,
+    -0.00075,
     0.006911,
     -0.000372,
     0.001303,
@@ -41883,7 +41892,7 @@
     -0.007927,
     -0.019358,
     -0.001476,
-    0.004054,
+    0.004055,
     0.001287,
     -0.023041,
     0.004875,
@@ -41905,7 +41914,7 @@
     -0.02011,
     -0.000774,
     0.010592,
-    0.007443,
+    0.007444,
     -0.008402,
     0.006499,
     -0.034105,
@@ -41916,7 +41925,7 @@
     -0.002531,
     -0.001756,
     0.005647,
-    -0.005256,
+    -0.005257,
     -0.012967,
     -0.004757,
     -0.005379,
@@ -43521,7 +43530,7 @@
    "price_asof": "2026-07-17",
    "price_live": false,
    "change_pct": -0.44,
-   "pe": null,
+   "pe": 29,
    "ath": 165.61,
    "ath_dist_pct": -2.7,
    "sma200_dist_pct": 7.2,
@@ -43566,9 +43575,9 @@
      154.01,
      154.93,
      154.68,
-     156.34,
+     156.33,
      156.04,
-     156.34,
+     156.33,
      155.93,
      155.49,
      157.2,
@@ -44129,7 +44138,7 @@
      156.15,
      153.43,
      156.37,
-     156.34,
+     156.33,
      157.2,
      157.19,
      152.95,
@@ -44264,7 +44273,7 @@
     -0.02842,
     0.005353,
     0.014235,
-    -0.003842,
+    -0.003841,
     -0.015133,
     -0.01156,
     0.008875,
@@ -44272,18 +44281,18 @@
     0.006884,
     0.01588,
     0.005014,
-    0.016656,
+    0.016657,
     -0.002352,
     0.006382,
     0.005396,
     -0.003351,
     0.008212,
     -0.01436,
-    0.006221,
+    0.006222,
     -0.000584,
     -0.00395,
     0.007303,
-    0.000945,
+    0.000946,
     -0.004736,
     0.003791,
     0.003414,
@@ -44305,14 +44314,14 @@
     0.002948,
     0.023777,
     0.03043,
-    -0.001954,
+    -0.001953,
     0.011319,
     -0.004845,
     0.000763,
-    0.001939,
+    0.00194,
     -0.002217,
-    -0.01453,
-    -0.001127,
+    -0.014531,
+    -0.001126,
     0.002744,
     0.001544,
     -0.001685,
@@ -44332,7 +44341,7 @@
     0.003852,
     0.00192,
     0.001369,
-    0.00777,
+    0.007771,
     0.022823,
     0.014102,
     -0.000524,
@@ -44351,7 +44360,7 @@
     0.004654,
     -0.007638,
     -0.004167,
-    -0.012013,
+    -0.012012,
     -0.009755,
     0.014433,
     0.00942,
@@ -44363,14 +44372,14 @@
     0.00667,
     0.00657,
     -0.001998,
-    0.005212,
+    0.005213,
     0.001603,
     -0.001539,
     -0.000835,
     -0.005669,
     0.004576,
     -0.003027,
-    0.019482,
+    0.019481,
     0.009882,
     -0.009692,
     -0.005136,
@@ -44388,7 +44397,7 @@
     -0.007361,
     -0.00318,
     0.005963,
-    0.00612,
+    0.006121,
     -0.010265,
     0.012447,
     -0.007656,
@@ -44398,8 +44407,8 @@
     0.005905,
     -0.001601,
     0.010648,
-    -0.001905,
-    0.001905,
+    -0.001904,
+    0.001904,
     -0.002604,
     -0.002802,
     0.010908,
@@ -44420,7 +44429,7 @@
     0.008112,
     -0.009114,
     -0.016848,
-    -0.003609,
+    -0.003608,
     -0.008769,
     0.000242,
     0.000138,
@@ -44756,7 +44765,7 @@
     "2026-07-16",
     "2026-07-17"
    ],
-   "div_yield": 1.6,
+   "div_yield": 1.12,
    "aum": 40.6
   },
   {
@@ -45432,7 +45441,7 @@
    },
    "_ret_series": [
     0.004105,
-    0.017017,
+    0.017018,
     0.001957,
     -0.003483,
     0.000109,
@@ -45470,7 +45479,7 @@
     -0.001637,
     0.018073,
     -0.004622,
-    -0.001617,
+    -0.001618,
     -0.005302,
     -0.001303,
     0.00217,
@@ -45486,7 +45495,7 @@
     -0.005256,
     0.003726,
     -0.009452,
-    -0.003651,
+    -0.00365,
     -0.005223,
     -0.005474,
     -0.012852,
@@ -45494,7 +45503,7 @@
     0.010208,
     0.014405,
     -0.003527,
-    0.006493,
+    0.006492,
     0.01004,
     -0.002827,
     0.004238,
@@ -45534,7 +45543,7 @@
     0.003595,
     0.004364,
     -0.001229,
-    0.003126,
+    0.003125,
     -0.007383,
     0.003698,
     -0.005271,
@@ -45953,6 +45962,20 @@
  "news": [
   {
    "source": "Investing.com",
+   "title": "US renews strikes on Iran after two military personnel killed by Iranian attack",
+   "link": "https://www.investing.com/news/world-news/us-renews-strikes-on-iran-after-two-military-personnel-were-killed-by-iranian-attack-4799684",
+   "published": "2026-07-19T11:06:44Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Gli Stati Uniti rinnovano gli attacchi contro l'Iran dopo che due militari sono stati uccisi dall'attacco iraniano"
+  },
+  {
+   "source": "Investing.com",
    "title": "Institutional demand for CXMT’s $8.6 billion Shanghai IPO dented by chip stock selloff",
    "link": "https://www.investing.com/news/stock-market-news/institutional-demand-for-cxmts-86-billion-shanghai-ipo-dented-by-chip-stock-selloff-4799712",
    "published": "2026-07-19T09:18:32Z",
@@ -45978,6 +46001,20 @@
    "title_it": "Goldman Sachs consiglia di vendere la coppia GBP/USD per timori di rally"
   },
   {
+   "source": "AP",
+   "title": "US strikes Iran’s Revolutionary Guard over an attack that killed troops in Jordan - AP News",
+   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQOVVPQXpIUjAzU1c2TG1GcXJUU19aU2FodDRTVWV4RVdVN2stQ1NueUtIRC03M2hXNFZLRkQzUUdqMWNQOVBMbzFmc1NGejY3bXFNSnJYMXNNRTIyMlNMYjFPbXVOcXJCSkFPVHNsMkRvblBzcjc5aXJhbHlndGlrek9RbmVBTlN4SHI3N1VHLUpGVlNmTE4tSlAwSktTd1k?oc=5",
+   "published": "2026-07-19T10:13:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Gli Stati Uniti colpiscono la Guardia rivoluzionaria iraniana per un attacco che ha ucciso truppe in Giordania - AP News"
+  },
+  {
    "source": "Google News",
    "title": "A Statistical Revamp Is About to Lower Inflation, at a Critical Time - WSJ",
    "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQVGJ3eDJ0X1JSRGZFSkpSQ2NSRXNUejVIQUU5bnJNekJ2UXZxS0F5UGhmMEk1cWRPNkhmanF2bUl4OHY2R0daLXpnV045eTVkZEpaV1lmYmFqN2p1blVSSEdQWHkwRFBiNUFFOG9qbXRKSXY0dkpYLWlFTThPUGlkd0Mtd3Y4dw?oc=5",
@@ -45989,20 +46026,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Un rinnovamento statistico sta per ridurre l’inflazione, in un momento critico - WSJ"
-  },
-  {
-   "source": "AP",
-   "title": "US strikes Iran’s Revolutionary Guard over an attack that killed troops in Jordan - AP News",
-   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQOVVPQXpIUjAzU1c2TG1GcXJUU19aU2FodDRTVWV4RVdVN2stQ1NueUtIRC03M2hXNFZLRkQzUUdqMWNQOVBMbzFmc1NGejY3bXFNSnJYMXNNRTIyMlNMYjFPbXVOcXJCSkFPVHNsMkRvblBzcjc5aXJhbHlndGlrek9RbmVBTlN4SHI3N1VHLUpGVlNmTE4tSlAwSktTd1k?oc=5",
-   "published": "2026-07-19T09:09:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Gli Stati Uniti colpiscono la Guardia rivoluzionaria iraniana per un attacco che ha ucciso truppe in Giordania - AP News"
   },
   {
    "source": "Google News",
@@ -46019,8 +46042,8 @@
   },
   {
    "source": "Bloomberg",
-   "title": "US and Iran Launch Fresh Strikes After Two Troops Die in Jordan",
-   "link": "https://news.google.com/search?q=US%20and%20Iran%20Launch%20Fresh%20Strikes%20After%20Two%20Troops%20Die%20in%20Jordan",
+   "title": "US, Iran Launch Fresh Strikes After Two Troops Die in Jordan",
+   "link": "https://news.google.com/search?q=US%2C%20Iran%20Launch%20Fresh%20Strikes%20After%20Two%20Troops%20Die%20in%20Jordan",
    "published": "2026-07-19T06:58:45Z",
    "tickers": [
     "MACRO",
@@ -46029,13 +46052,13 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Stati Uniti e Iran lanciano nuovi attacchi dopo la morte di due truppe in Giordania"
+   "title_it": "Stati Uniti e Iran lanciano nuovi attacchi dopo la morte di due soldati in Giordania"
   },
   {
    "source": "Reuters",
    "title": "Lebanon's Aoun to meet Trump at White House, hoping to generate pressure on Israel - Reuters",
    "link": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPOU4yVVlYeXdhdDFTY0pNZUZjSzRvWE1mWi1NcF9MVUI5Y3N3aTRrRzU2RnpCc2tzVV9LS21EQ1RPdUFDN0VnVURKZ0V5RTFScVUtTElSUlp3VU1xZE45UWY3ZmV6cnFmeEVFSE4yMEZ5UVFmVEFwczBtRzdoS3dyUGszV2V3anJEOTBOQ3l0bS16aU0zeU8tYUdwSzRBenlEZmVVT2oxNjZCU21mbkRzN1JIakN4UnoxRlpJWjVCNA?oc=5",
-   "published": "2026-07-19T06:03:50Z",
+   "published": "2026-07-19T06:03:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -46087,6 +46110,19 @@
   },
   {
    "source": "Google News",
+   "title": "America In Focus: US inflation cooled in June, but AI build-out poses latest threat - Jacksonville Journal-Courier",
+   "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNcmMyVzNKVU9waFZ6SWk0Rjg4NGNfM2RZRmFXNGhvMnN2dWVRemV0QXhCUlo2WnNQLXBTVGFWSG9TQ0htNXN5bko3LTlZbzZaeHBGYUJiVzhUZUpqQTVieFlNbWpwLUpCc3dCS0F1VlA3bWNXZS1jWDZmM3I0Nm1PTWJwa1JVeG5taFJra242V3RVZFpKWkJ6Tlkwc1Z4Ty0zQ0dJQXBVNkZQaDg?oc=5",
+   "published": "2026-07-19T03:21:06Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "America in primo piano: l'inflazione negli Stati Uniti si è raffreddata a giugno, ma lo sviluppo dell'intelligenza artificiale rappresenta l'ultima minaccia - Jacksonville Journal-Courier"
+  },
+  {
+   "source": "Google News",
    "title": "There's no 'excuse' for rate hike, Hassett says. Does the Fed agree? - AOL.com",
    "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTE0xWjc3dHEtcmM4NXpTSzFQQVBQdVVLTVFNQzNEVFg3b0FmU0JvMzhjZmJPdlJFbGI5MDVMd3VMNE56Qi1rT2NzckxrdXY4ajloNDNidHZDTWxCNmtnbWZITnBTVjZIWVFZU0lMSnZlbkRSOVNDX0QzeDhRdw?oc=5",
    "published": "2026-07-19T01:50:40Z",
@@ -46113,20 +46149,6 @@
    "title_it": "Il leader supremo dell'Iran afferma che le violazioni degli Stati Uniti dimostrano che la firma di Trump è \"inutile\" - Reuters"
   },
   {
-   "source": "Reuters",
-   "title": "US renews strikes on Iran after two military personnel killed by Iranian attack - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPcmZSOG9seXNyMUFGTW1NMF9XWUVNYUZLczBFRWFTTDZZYnRjX081R3pnUzl6NTFVM053aG50T09hb2pMSlFxTGV6T2V0ZEZaRUFtNjVTSk01MWFrb05KcHdVdHZHMktERXlFVEdKTGFrTlo0cl9SY0hjb0dpb01rMDh6Z2l5MFoyWGI2VjA3cGx1UTN1T1RqU0RCeHVLdVlWUEJIU0dHaFl2SEpKN1AySUlMeUJPQVBtWUtPY1BHUUw5bGZxTEpCRQ?oc=5",
-   "published": "2026-07-18T23:21:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Gli Stati Uniti rinnovano gli attacchi contro l'Iran dopo che due militari sono stati uccisi nell'attacco iraniano - Reuters"
-  },
-  {
    "source": "AP",
    "title": "16 US service members have died in the Iran war, reflecting a conflict fought largely in the air - AP News",
    "link": "https://news.google.com/rss/articles/CBMihAFBVV95cUxOR0hpOHR6RFNuWW1CU2M2ZXdqMVgta1lXUld6b2VBSTMzTXdicTQweDJZZ2RaQnhoenBYdExDN0ZtRjlsb3NxRTB4SGtCQUw2aW9jbWZHaWJsc3dhUjVXeDVPRm5NcVQxSVdITmxRbFdMTXlmVTBiWFFDUTNJbnJscWVYc2k?oc=5",
@@ -46139,6 +46161,19 @@
    "inv": false,
    "sentiment": "bear",
    "title_it": "16 militari statunitensi sono morti nella guerra con l'Iran, riflettendo un conflitto combattuto in gran parte nell'aria - AP News"
+  },
+  {
+   "source": "CNBC",
+   "title": "Apple’s anti-capex AI advantage fuels a fresh Wall Street upgrade - CNBC",
+   "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNQXN1U0FvN01OWTA1ZG5DZDdFeXowMVdXM0U3ZVR2Rm0tam92cjVGdEZtdDE1azdBV2FWYzdnaDlQWXZJakFZQnpEQUM0aTRLVWdrYjZPdHdITE8yLW96WjhkbUsxNUx2YkdHRkFuQ2tUZXlUekZRQmpQVjFKdy1UWmVtclB1N2s0MFpKRllZTFBiWkc5eHgzczFzQnhBRGR0VFlzYmp5WWg1eEU?oc=5",
+   "published": "2026-07-18T18:53:54Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "Il vantaggio dell’intelligenza artificiale anti-capex di Apple alimenta un nuovo aggiornamento di Wall Street – CNBC"
   },
   {
    "source": "AP",
@@ -46182,6 +46217,19 @@
    "title_it": "\"WarshGPT\": come Wall Street si sta adattando alla nuova era di comunicazione della Fed"
   },
   {
+   "source": "Google News",
+   "title": "The U.S. saw the first ‘China Shock.’ Now the world gets the sequel. - The Washington Post",
+   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPOUhVM1VfUHQxb1dNVW5sMVM1Z2xYeTJWN2VlUG8tb0ZvS3ZUN2JUSjl4QWhHclVaMTNtMGF1VUx5b2NKcjQ5eGNaN3hZTEIzbXdKMDFtUm5oNzBPckxrbkU4aE8yamRXd0d4QmpPQVRNMGVBWXZfZjdrNTlma1NnWXFaOFhMMmJOdExSTFdCeDVIUUpZUWt6LURxSFdYUjZ6NXl3Y0JkQ1liZlI3SU85Q0hlRQ?oc=5",
+   "published": "2026-07-18T17:00:01Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Gli Stati Uniti hanno assistito al primo “shock cinese”. Ora il mondo ha il seguito. -Il Washington Post"
+  },
+  {
    "source": "Reddit",
    "title": "Record exports, record imports, and then a GDP miss 24 hours later. One of my assumptions about how these numbers fit together is wrong.",
    "link": "https://www.reddit.com/r/investing/comments/1v00ydc/record_exports_record_imports_and_then_a_gdp_miss/",
@@ -46193,20 +46241,6 @@
    "inv": false,
    "sentiment": "bull",
    "title_it": "Esportazioni record, importazioni record e poi il PIL mancato 24 ore dopo. Una delle mie ipotesi su come questi numeri si incastrano tra loro è sbagliata."
-  },
-  {
-   "source": "Google News",
-   "title": "Iran Gas Shock Forces Half of Americans to Cut Food and Medical Spending - Tech Times",
-   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQd2dDeEN1emdVU2JHY2hCR3BlWjhYVTdTbGcyMUVSU29FekdZTnQ4Vm9wNGdPaVdUN2xIU1pkckhWbWNFc3RURmtXLUFJTE9QZWI0Z1lscGZVU1pGcXlCS2VKZ1c2cW5zbEtzWmhYSjVxYVg4ZkNkLXRjWklWV1FjT1B6RU5CLUR6NDdnMVVRTkl1Z3VqRy1vM3ZVX0l4WTgtV01iTWo1RXhWUG1TZlRPbklBb3lnaTVK?oc=5",
-   "published": "2026-07-18T16:28:39Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Lo shock del gas iraniano costringe metà degli americani a tagliare le spese alimentari e mediche - Tech Times"
   },
   {
    "source": "Reddit",
@@ -46251,19 +46285,6 @@
    "title_it": "Trump sposta il suo tono su Jimmy Carter mentre è alle prese con l’Iran, l’inflazione e la sua stessa eredità – AP News"
   },
   {
-   "source": "Google News",
-   "title": "America In Focus: US inflation cooled in June, but AI build-out poses latest threat - The Seattle Times",
-   "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPRU5xV3pjMFVMeDdOYlBEZ3Frc0tkdnV4WDhXcmVCRkdHN3l2cGljRzYzWENXNTh0NmxGYUMycjZuTkNQQzBIa2U1ZmlGMUpsVUtxa0FyR1JOczBTaDhtQjkwZnp1Z1cxZG4wMUZQUnEyQzZ5b0JwYTZHQ2VVTEhhbmg0YUdpOGRkUVVSZWR6a0dpZFNLUG5BQ3ZybmVNcGdJY0hkVjJ1aFFhTjNCUHNtWmg4NW04WGVpZGFzSg?oc=5",
-   "published": "2026-07-18T14:10:16Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "America in primo piano: l'inflazione negli Stati Uniti si è raffreddata a giugno, ma lo sviluppo dell'intelligenza artificiale rappresenta l'ultima minaccia - The Seattle Times"
-  },
-  {
    "source": "CNBC",
    "title": "Trump Media pitched $100,000 monthly fee for fastest feed of U.S. president's posts, sources say",
    "link": "https://www.cnbc.com/2026/07/18/trump-media-pitched-100000/month-fee-for-fastest-feed-of-trump-posts.html",
@@ -46306,6 +46327,20 @@
    "title_it": "Il premier dell'Ontario afferma che le critiche di Trump agli sforzi del Canada per fermare gli incendi sono \"assolutamente inaccettabili\" - Reuters"
   },
   {
+   "source": "Bloomberg",
+   "title": "Oil’s Battered Shock Absorbers Risk Price Spike as War Returns",
+   "link": "https://news.google.com/search?q=Oil%E2%80%99s%20Battered%20Shock%20Absorbers%20Risk%20Price%20Spike%20as%20War%20Returns",
+   "published": "2026-07-18T12:30:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Gli ammortizzatori malconci del petrolio rischiano un’impennata dei prezzi con il ritorno della guerra"
+  },
+  {
    "source": "CNBC",
    "title": "World Cup audience stayed bipartisan despite Trump's prominent role, CNBC survey finds",
    "link": "https://www.cnbc.com/2026/07/18/world-cup-viewership-trump-democrats-republicans-poll.html",
@@ -46332,6 +46367,33 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Non è stato ancora fatto: rimborsare le tariffe o realizzare la promessa dell’intelligenza artificiale"
+  },
+  {
+   "source": "Reuters",
+   "title": "Spain's World Cup winner Capdevila seeks Trump's help after US entry denial - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOV0pYMmprcU4xZFZmbWNZc2NBSkdQYjVFX3hFYllBT0Z2WnFJSkhId3FvRzVyR090NW5RV2dySlpkTzNKbG4yQm1fNGFNenR1dnN4RjNNbEFBOEZGZ2h2WWdMdXdrdXQ2YWc0eEdOdGQtTWJPaXcxM2Rmcm8zS1hjenItbjVJb2lyd0xCdVdRT0swSnFFSjQtc3AxS19yeHNmS3JlM2lhT2dYdUoxd2hBTXMtWWZFTHNsVUhHMGtnWWs?oc=5",
+   "published": "2026-07-18T11:58:35Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il vincitore della Coppa del Mondo della Spagna Capdevila cerca l'aiuto di Trump dopo il rifiuto dell'ingresso degli Stati Uniti - Reuters"
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "The S&P 500 is breaking the earnings playbook: Chart of the Day",
+   "link": "https://finance.yahoo.com/markets/article/the-sp-500-is-breaking-the-earnings-playbook-chart-of-the-day-115602014.html",
+   "published": "2026-07-18T11:56:02Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’S&P 500 sta infrangendo il programma degli utili: Grafico del giorno"
   },
   {
    "source": "Yahoo Finance",
@@ -46373,20 +46435,6 @@
    "title_it": "Anthropic offre 600.000 dollari a qualcuno che possa dare forma alla sua storia a Wall Street mentre si prepara per un'IPO di successo"
   },
   {
-   "source": "CNBC",
-   "title": "Ukrainian drone attacks kill seven warehouse workers in Russia, spark fire at Moscow region oil depot - CNBC",
-   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxQTENIaFVXRE41ZVVHWlhWZW0xN3FVeTJybmRkelhrZTBvU3NSQkg2TW50WFRxUE4yWlh5ZVl5TEppWUtSZnVadk5yWm4tV2t0Mndrejh0UG5sWENyS1U0Szd5RUNhUU43RjZfMElLNG9rYTZmTjV4eVdNSlJpRjdubXpXVV83VnNmZjZjb1Q0QjBQV2hwbTd2UThZUjN3Mi010gGmAUFVX3lxTE5VVUFIaTVtM09ZamRmaV9HMjhtTkQ1S2ZhMHVCQ1VtejFxWTVVdTlYVVd4YmJ4WjU5OFIwbFkwbnpjSzRISFNlRzc4R2tNMGZCcExHbkplOHRJY0xqUDdVZk1JYVE2RWlrcVZHMnVvTnA3RjYwNVl2djAyUEI2dW00anBTSENydFgyUko1a1pOVXljR05vdTNPMzhSX1lQN01UeXRCaEE?oc=5",
-   "published": "2026-07-18T10:27:55Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Attacchi di droni ucraini uccidono sette magazzinieri in Russia e incendiano un deposito petrolifero nella regione di Mosca - CNBC"
-  },
-  {
    "source": "Yahoo Finance",
    "title": "Mortgage and refinance interest rates today, Saturday, July 18, 2026: Rates lower to start the weekend",
    "link": "https://finance.yahoo.com/personal-finance/mortgages/article/mortgage-and-refinance-interest-rates-today-saturday-july-18-2026-rates-lower-to-start-the-weekend-100000896.html",
@@ -46398,19 +46446,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Tassi di interesse ipotecari e rifinanziamenti oggi, sabato 18 luglio 2026: tassi più bassi all'inizio del fine settimana"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "Inflation Isn't Just a Trumpflation Problem Any Longer -- There's a New Culprit, and It Has Potentially Dire Implications for Wall Street",
-   "link": "https://finance.yahoo.com/economy/policy/articles/inflation-isnt-just-trumpflation-problem-082600040.html",
-   "published": "2026-07-18T08:26:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L’inflazione non è più solo un problema di Trumpflation: c’è un nuovo colpevole e ha implicazioni potenzialmente disastrose per Wall Street"
   },
   {
    "source": "Bloomberg",
@@ -46425,19 +46460,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Le infrastrutture energetiche del Kuwait colpite durante gli intensi attacchi all’Iran"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "SpaceX stock falls back to earth shortly after Wall Street analysts release florid targets: ‘Paving the superhighway to the stars’",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/spacex-stock-falls-back-earth-080000016.html",
-   "published": "2026-07-18T08:00:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Le azioni di SpaceX tornano sulla terra poco dopo che gli analisti di Wall Street hanno pubblicato obiettivi floridi: “Aprire l’autostrada verso le stelle”"
   },
   {
    "source": "Investing.com",
@@ -46489,7 +46511,7 @@
    "topic_pri": 1,
    "inv": true,
    "sentiment": "bull",
-   "title_it": "Le azioni Micron esplodono in rialzo dopo il battito degli utili alimentati dall'intelligenza artificiale: sono in arrivo ulteriori rialzi?"
+   "title_it": "Le azioni Micron esplodono in rialzo dopo il battito degli utili alimentati dall’intelligenza artificiale: sono in arrivo ulteriori rialzi?"
   },
   {
    "source": "Reddit",
@@ -46506,16 +46528,31 @@
   },
   {
    "source": "Yahoo Finance",
-   "title": "Palantir Stock Slipped 35% From Its Peak. Is the Artificial Intelligence (AI) Software Leader a Safe Buy for the Second Half of 2026?",
-   "link": "https://finance.yahoo.com/markets/stocks/articles/palantir-stock-slipped-35-peak-080500365.html",
-   "published": "2026-07-18T08:05:00Z",
+   "title": "Google Cloud Revenue Grew 63% Last Quarter. Here's Why That Number Matters More Than Alphabet's Ad Business Right Now.",
+   "link": "https://finance.yahoo.com/markets/stocks/articles/google-cloud-revenue-grew-63-100500769.html",
+   "published": "2026-07-18T10:05:00Z",
    "tickers": [
-    "PLTR"
+    "GOOGL"
    ],
    "topic_pri": 1,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Le azioni Palantir sono scese del 35% dal suo picco. Il leader del software di intelligenza artificiale (AI) è un acquisto sicuro per la seconda metà del 2026?"
+   "title_it": "I ricavi di Google Cloud sono cresciuti del 63% nell'ultimo trimestre. Ecco perché quel numero conta più del business pubblicitario di Alphabet in questo momento."
+  },
+  {
+   "source": "Yahoo Finance",
+   "title": "Big Tech's $182 Billion AI Debt Spree: How META, NVDA and AMZN Are Reshaping Credit Markets",
+   "link": "https://finance.yahoo.com/technology/ai/articles/big-techs-182-billion-ai-100123901.html",
+   "published": "2026-07-18T10:01:23Z",
+   "tickers": [
+    "NVDA",
+    "META",
+    "AMZN"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L'ondata di debiti AI di 182 miliardi di dollari di Big Tech: come META, NVDA e AMZN stanno rimodellando i mercati del credito"
   },
   {
    "source": "Reddit",
@@ -46541,7 +46578,7 @@
    "topic_pri": 2,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Bitcoin punta a 72.000 dollari mentre crescono le preoccupazioni in materia di governance e concentrazione mineraria"
+   "title_it": "Bitcoin punta a 72.000 dollari mentre crescono le preoccupazioni sulla governance e sulla concentrazione mineraria"
   },
   {
    "source": "Investing.com",
@@ -46574,7 +46611,7 @@
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 94%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-07-19T10:21:15Z",
+   "published": "2026-07-19T11:13:26Z",
    "tickers": [
     "MACRO"
    ],
@@ -46585,7 +46622,7 @@
    "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
    "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 5%",
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
-   "published": "2026-07-19T10:21:15Z",
+   "published": "2026-07-19T11:13:26Z",
    "tickers": [
     "MACRO"
    ],
@@ -60725,7 +60762,7 @@
      ],
      "call_wall": 775,
      "put_wall": 600,
-     "opt_volume": 81429
+     "opt_volume": 81405
     }
    ]
   },
@@ -77811,10 +77848,10 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-07-19T10:21:15Z"
+  "generated_at": "2026-07-19T11:13:26Z"
  },
  "verdict_track": {
-  "generated": "2026-07-19T10:21:16.106Z",
+  "generated": "2026-07-19T11:13:29.493Z",
   "since": "2026-07-11",
   "episodes": 5,
   "mature7": {
