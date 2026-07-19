@@ -746,6 +746,7 @@ function renderAll() {
   renderPortfolioHealth();
   renderMiniCards();
   renderRiskParams();
+  renderQuickRead();    // card "Lettura rapida" = executive brief reso leggibile per l'umano
   recordPolymarket();   // accumula lo storico Polymarket (un punto/giorno) per la derivata Δ7g
   renderNews();
   renderBtpInfo();
@@ -1815,8 +1816,7 @@ function renderAIValidation(text) {
     <td>${ico[x.level]} ${x.msgs.length ? esc(x.msgs.join(" · ")) : "invarianti rispettate"}</td></tr>`).join("");
   return `<table class="info-table" style="margin-top:8px"><thead><tr><th>Titolo</th><th>Azione</th><th class="num">Qtà</th><th class="num">Limite</th><th class="num">Stop</th><th>Esito</th></tr></thead><tbody>${rows}</tbody></table>
     <div class="info-line ${v.budget.ok ? "" : "neg"}" style="font-size:12px;margin-top:6px">${v.budget.ok ? "✅" : "⛔"} Spesa d'acquisto ~$${fmtNum.format(v.budget.spend)} vs budget operativo $${fmtNum.format(v.budget.budget)} (cassa − ES95)${v.budget.ok ? "" : " — SFORATO"}</div>
-    <div class="info-line" style="font-size:12.5px;margin-top:4px"><b>${v.hardCount ? `⛔ ${v.hardCount} violazioni HARD — NON eseguire questi ordini senza correggerli` : v.warnCount ? `⚠️ nessuna violazione hard, ${v.warnCount} avvisi` : "✅ tutti gli ordini rispettano gli invarianti del fondo"}</b></div>
-    <button class="btn btn-ghost btn-sm" id="val-log" style="margin-top:6px" title="Registra i consigli AI validati come voce [AI] del diario: è l'attribuzione che permette di misurare, a 7/30 giorni, se i consigli aggiungono alpha">📔 Registra consigli nel diario [AI]</button>`;
+    <div class="info-line" style="font-size:12.5px;margin-top:4px"><b>${v.hardCount ? `⛔ ${v.hardCount} violazioni HARD — NON eseguire questi ordini senza correggerli` : v.warnCount ? `⚠️ nessuna violazione hard, ${v.warnCount} avvisi` : "✅ tutti gli ordini rispettano gli invarianti del fondo"}</b></div>`;
 }
 
 function openDecisionModal() {
@@ -1830,41 +1830,33 @@ function openDecisionModal() {
       <button class="diary-edit" data-iso="${e.date}" title="Modifica questa voce">✎</button>
       <button class="diary-del" data-iso="${e.date}" title="Elimina">✕</button>
     </div>`).join("") : `<div class="muted" style="font-size:12px">Nessuna voce ancora. Annota le operazioni con la loro FONTE: il diario viaggia nell'export AI e alimenta l'attribuzione.</div>`;
-  openInfoModal("📔 Diario & Validatore report AI",
-    `<h4 style="margin:2px 0 6px">✅ Validatore report AI</h4>
-     <div class="info-line muted" style="font-size:11px;margin-bottom:6px">Incolla la risposta dell'LLM: gli ordini vengono estratti e verificati contro gli invarianti del fondo (ticker, stop&lt;limite≤prezzo, banda 30%, veto, cap 10% NAV, budget cassa−ES95) PRIMA di andare al broker.</div>
+  openInfoModal("📔 Diario delle azioni",
+    `<div class="info-line muted" style="font-size:11px;margin-bottom:6px">Qui vanno SOLO le operazioni che ESEGUI davvero (tue decisioni): il diario viaggia nell'export AI e dà continuità ai consigli.</div>
+     <div class="diary-add"><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
+     <div class="diary-list" id="diary-list">${diaryHtml}</div>
+     <details style="margin-top:14px"><summary style="cursor:pointer;font-size:12.5px;font-weight:600">✅ Validatore report AI (aprilo solo se ti serve)</summary>
+     <div class="info-line muted" style="font-size:11px;margin:6px 0">Incolla la risposta dell'LLM: gli ordini vengono estratti e verificati contro gli invarianti del fondo (ticker, stop&lt;limite≤prezzo, banda 30%, veto, cap 10% NAV, budget cassa−ES95) PRIMA di andare al broker. Non scrive nulla nel diario.</div>
      <div class="diary-add"><textarea id="val-input" rows="2" placeholder="Incolla qui il report dell'LLM…"></textarea><button class="btn btn-primary btn-sm" id="val-run">Valida ordini</button></div>
-     <div id="val-out"></div>
-     <h4 style="margin:14px 0 6px">Diario delle azioni</h4>
-     <div class="diary-add"><select id="diary-src" title="FONTE della decisione — permette di misurare, nel tempo, quale voce al tavolo aggiunge alpha"><option value="CEO">👤 Mia decisione</option><option value="AI">🤖 Consiglio AI</option><option value="MOTORE">⚙️ Motore</option></select><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
-     <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
+     <div id="val-out"></div></details>`);
   const refresh = () => { closeChartModal(); openDecisionModal(); };
+  // v142: il diario è SOLO delle operazioni ESEGUITE dal CEO (direttiva: niente select fonte,
+  // niente registrazione dei report LLM). Il validatore resta come strumento di CONTROLLO,
+  // ripiegato e senza alcuna scrittura sul diario.
   $("#val-run")?.addEventListener("click", () => {
     const txt = ($("#val-input")?.value || "").trim();
     const out = $("#val-out");
     if (out) out.innerHTML = txt ? renderAIValidation(txt) : `<div class="muted" style="font-size:12px">Incolla prima il testo del report.</div>`;
-    $("#val-log")?.addEventListener("click", () => {
-      const orders = parseAIOrders(($("#val-input")?.value || "").trim());
-      if (!orders.length) { toast("Nessun ordine da registrare"); return; }
-      const vres = validateAIOrders(orders);
-      const txt2 = "[AI] Consigli del report: " + vres.rows.map(x =>
-        `${x.tk} ${x.action === "BUY" ? "COMPRA" : "VENDI"}${x.qty ? " " + x.qty : ""}${x.limit != null ? " @" + fmtNum.format(x.limit) : ""}${x.stop != null ? " stop " + fmtNum.format(x.stop) : ""} [${x.level}]`).join(" · ");
-      saveDiaryEntry(txt2.slice(0, 400));
-      toast("Consigli AI registrati nel diario ✓ (valutabili a 7/30g)");
-      refresh();
-    });
   });
-  const srcTag = () => { const s = $("#diary-src")?.value || "CEO"; return `[${s}] `; };
   $("#diary-save")?.addEventListener("click", () => {
     const inp = $("#diary-input"); const txt = (inp.value || "").trim();
-    if (txt) { saveDiaryEntry(/^\[(CEO|AI|MOTORE)\]/.test(txt) ? txt : srcTag() + txt); refresh(); }
+    if (txt) { saveDiaryEntry(txt); refresh(); }
   });
   const di = $("#diary-input");
   if (di) {
     const grow = () => { di.style.height = "auto"; di.style.height = Math.min(160, di.scrollHeight) + "px"; };
     di.addEventListener("input", grow);
     di.addEventListener("keydown", e => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); const txt = di.value.trim(); if (txt) { saveDiaryEntry(/^\[(CEO|AI|MOTORE)\]/.test(txt) ? txt : srcTag() + txt); refresh(); } }
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); const txt = di.value.trim(); if (txt) { saveDiaryEntry(txt); refresh(); } }
     });
   }
   document.querySelectorAll(".diary-del").forEach(b => b.addEventListener("click", () => { deleteDiaryEntry(b.dataset.iso); refresh(); }));
@@ -4580,11 +4572,11 @@ function buildPrompt() {
     const vE = t.var95_hist_eur ?? t.var95_1d_eur, vP = t.var95_hist_pct ?? t.var95_1d_pct;
     const eE = t.es95_hist_eur ?? t.es95_1d_eur;
     const isHist = t.var95_hist_eur != null;
-    if (vE != null) riskBits.push(`VaR 95% a 1 giorno${isHist ? " (STORICO, percentili empirici 12M — onesto sulle code grasse)" : " (parametrico normale — sottostima le code)"}: ${fmtEUR.format(vE)} (${fmtNum.format(vP)}% del comparto azionario)${eE != null ? `, Expected Shortfall 95%: ${fmtEUR.format(eE)} (perdita MEDIA nel 5% dei giorni peggiori)` : ""}${isHist && t.var95_1d_eur != null ? ` [parametrico: ${fmtEUR.format(t.var95_1d_eur)}]` : ""}`);
+    if (vE != null) riskBits.push(`VaR 95% a 1 giorno${isHist ? " (STORICO, percentili empirici 12M — onesto sulle code grasse)" : " (parametrico normale — sottostima le code)"}: ${fmtEUR.format(vE)} (${fmtNum.format(vP)}% del comparto azionario)${eE != null ? `, Expected Shortfall 95% a 1 GIORNO: ${fmtEUR.format(eE)} (perdita MEDIA nel 5% dei giorni peggiori — orizzonte GIORNALIERO, non annuale)` : ""}${isHist && t.var95_1d_eur != null ? ` [parametrico: ${fmtEUR.format(t.var95_1d_eur)}]` : ""}`);
   }
   const pbP = portfolioBeta();
   if (pbP) riskBits.push(`Beta di Portafoglio: ${fmtNum.format(pbP.beta)} vs Nasdaq 100 (=1.0) — ${pbP.src}, pesi mark-to-market sul capitale investito, liquidità esclusa, BTP a beta 0`);
-  if (t.avg_pairwise_corr != null) riskBits.push(`correlazione media tra le posizioni: ${fmtNum.format(t.avg_pairwise_corr)} (log-rendimenti giornalieri 12M — più è alta, minore la diversificazione reale)`);
+  if (t.avg_pairwise_corr != null) riskBits.push(`correlazione media tra le posizioni: ${fmtNum.format(t.avg_pairwise_corr)} (log-rendimenti giornalieri 12M, calcolata sul SOLO comparto azionario — BTP e liquidità NON sono nel calcolo, quindi non la "mitigano"; più è alta, minore la diversificazione reale)`);
   const fxP = fxExposure();
   if (fxP) riskBits.push(`Rischio cambio EUR/USD: ${fmtNum.format(fxP.pct)}% del NAV denominato in USD NON coperto${fxP.eurusd ? ` (EUR/USD ${fmtNum.format(fxP.eurusd)})` : ""} — un apprezzamento dell'euro dell'1% costa ~${fmtEUR.format(Math.round(fxP.usdEur * 0.01))} a parità di prezzi`);
   // concentrazione: posizione più pesante e primo settore (per le regole di sizing/correlazione)
@@ -5400,6 +5392,29 @@ function buildExecutiveDelta() {
   if (degr.length) pri.push(`⚠ cinematica in degrado (MCR↑ + RS↓): ${degr.join(", ")}`);
   L.push("· PRIORITÀ: " + (pri.length ? pri.join(" · ") : "nessun evento forcing rilevato"));
   return L.join("\n");
+}
+
+/* LETTURA RAPIDA (v142) — la risposta a "voglio leggere i dati io, in modo immediato":
+   rende in card le STESSE righe dell'executive brief che apre l'export AI (una sola fonte
+   di verità, due lettori). Niente da mantenere in doppio: se il brief cresce, cresce anche qui. */
+function renderQuickRead() {
+  const box = $("#quick-read");
+  if (!box || !DATA) return;
+  const lines = buildExecutiveDelta().split("\n").filter(l => l.startsWith("·"));
+  const pretty = (l) => {
+    let t = esc(l.replace(/^·\s*/, ""));
+    // evidenzia le etichette chiave e colora gli alert testuali
+    t = t.replace(/^(BENCHMARK vs Nasdaq \(il mandato\):)/, "<b>$1</b>")
+         .replace(/^(Verdetto motore:)/, "<b>$1</b>")
+         .replace(/^(PRIORITÀ:)/, "<b style='color:var(--yellow)'>$1</b>")
+         .replace(/⛔[^·]*/g, m => `<span style="color:var(--red)">${m}</span>`)
+         .replace(/🚨[^·]*/g, m => `<span style="color:var(--red)">${m}</span>`)
+         .replace(/🛑[^·]*/g, m => `<span style="color:var(--red)">${m}</span>`);
+    return `<div class="qr-line">${t}</div>`;
+  };
+  box.innerHTML = `<div class="qr-head">📖 Lettura rapida <span class="muted">— la stessa sintesi che apre l'export AI</span></div>` +
+    lines.map(pretty).join("");
+  box.hidden = false;
 }
 
 /* ---------- testo per l'analisi AI: executive brief + prompt esistente + digest storici ---------- */

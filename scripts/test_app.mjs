@@ -684,6 +684,16 @@ check("v139 benchmark: con ^IXIC nel fixture la riga riporta i trend dell'indice
   DATA.watchlist.pop();
   return b.includes("vs Composite -2,5%")`));
 
+/* ---------- v142: Lettura rapida (brief → card umana, stessa fonte di verità) ---------- */
+check("v142 lettura rapida: le righe del brief diventano HTML della card (BENCHMARK e PRIORITÀ presenti, zero leak)", run(`
+  const box = { hidden: true, innerHTML: "" };
+  const orig = document.querySelector;
+  document.querySelector = (sel) => sel === "#quick-read" ? box : orig(sel);
+  renderQuickRead();
+  document.querySelector = orig;
+  return box.innerHTML.includes("BENCHMARK") && box.innerHTML.includes("PRIORITÀ")
+      && !box.innerHTML.includes("undefined") && box.hidden === false`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {
