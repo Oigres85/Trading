@@ -746,7 +746,6 @@ function renderAll() {
   renderPortfolioHealth();
   renderMiniCards();
   renderRiskParams();
-  renderQuickRead();    // card "Lettura rapida" = executive brief reso leggibile per l'umano
   recordPolymarket();   // accumula lo storico Polymarket (un punto/giorno) per la derivata Δ7g
   renderNews();
   renderBtpInfo();
@@ -1265,6 +1264,35 @@ const RISK_PARAMS = {
   // #7 stop 2×ATR ratchet e #4 riabilitazione growth: confermati invariati.
 };
 
+/* EDITOR PARAMETRI DI RISCHIO (v143) — il CEO calibra le soglie dalla UI, senza toccare il
+   codice. Ogni parametro ha spiegazione, banda di validità e default; gli override vivono in
+   localStorage (questo browser) e MUTANO RISK_PARAMS al volo: motore, verdetto ed export AI
+   usano immediatamente il nuovo valore. I parametri Python-side (stop 2×ATR, riserva ES95)
+   NON sono qui: vivono in pipeline e restano fissi by design. */
+const RISK_PARAM_DEFS = [
+  { key: "capNoAdd_pct", label: "Cap d'ingresso singolo titolo (% NAV)", unit: "%", scale: 1, min: 1, max: 50, step: 0.5, def: 10,
+    desc: "Divieto di NUOVI acquisti quando una posizione pesa già almeno questa percentuale del NAV. Non forza vendite: la posizione può continuare a correre (Let Winners Run)." },
+  { key: "capAlert_pct", label: "Alert concentrazione singolo titolo (% NAV)", unit: "%", scale: 1, min: 5, max: 90, step: 1, def: 25,
+    desc: "Sopra questa percentuale del NAV su un solo titolo scatta l'avviso di concentrazione. Solo segnalazione: mai trim automatico." },
+  { key: "sortinoVeto", label: "Soglia veto VALUE TRAP (Sortino 12M)", unit: "", scale: 1, min: -3, max: 0, step: 0.05, def: -0.3,
+    desc: "Sortino a 12 mesi sotto questo valore = titolo escluso dai nuovi acquisti (value trap: distruzione di valore sul downside). È evidenza forte, superabile solo con tesi dichiarata; più il valore è vicino a 0, più il veto è severo." },
+  { key: "sectorAlert_frac", label: "Alert concentrazione settoriale (%)", unit: "%", scale: 100, min: 10, max: 100, step: 1, def: 75,
+    desc: "Avviso quando il primo settore supera questa percentuale del capitale AZIONARIO (liquidità e obbligazioni escluse). Il mandato growth tollera un tech alto: la soglia dice quando dichiararlo." },
+  { key: "minScore", label: "Score minimo candidati (0–100)", unit: "", scale: 1, min: 0, max: 100, step: 1, def: 60,
+    desc: "Punteggio quant minimo (Sharpe marginale + forza relativa + qualità) perché un titolo diventi candidato all'accumulo del motore. Alzarlo = meno candidati ma più selettivi." },
+];
+function applyRiskOverrides() {
+  let ov = {};
+  try { ov = JSON.parse(localStorage.getItem("risk_params_overrides") || "{}"); } catch { ov = {}; }
+  for (const d of RISK_PARAM_DEFS) {
+    const v = ov[d.key];
+    if (typeof v === "number" && Number.isFinite(v) && v >= d.min / d.scale - 1e-9 && v <= d.max / d.scale + 1e-9) {
+      RISK_PARAMS[d.key] = v;                 // valore INTERNO (già in scala frazione dove serve)
+    }
+  }
+}
+applyRiskOverrides();   // gli override del CEO valgono da subito, prima di qualunque calcolo
+
 /* beta effettivo di un titolo: PRIORITÀ alla regressione della pipeline sui log-rendimenti
    12M vs Nasdaq 100 (beta_ndx); fallback al beta Yahoo (5A mensile vs S&P) solo se manca. */
 function betaOf(r) {
@@ -1655,6 +1683,42 @@ function riskRulesRegistry() {
   ];
 }
 const RP_TIER = { red: { c: "var(--red)", lab: "Protezione capitale" }, yellow: { c: "var(--yellow)", lab: "Dimensionamento" }, green: { c: "var(--green)", lab: "Segnale" } };
+/* editor soglie (v143): select + valore + spiegazione. Gli override mutano RISK_PARAMS e
+   rilanciano renderAll: verdetto, chips e export AI riflettono subito la nuova soglia. */
+function rpShownValue(d) { return Math.round(RISK_PARAMS[d.key] * d.scale * 100) / 100; }
+function initRiskEditor() {
+  const sel = $("#rp-param"), inp = $("#rp-value"), desc = $("#rp-desc");
+  if (!sel || !inp || !desc) return;
+  sel.innerHTML = RISK_PARAM_DEFS.map((d, i) => `<option value="${i}">${esc(d.label)}</option>`).join("");
+  const ovs = () => { try { return JSON.parse(localStorage.getItem("risk_params_overrides") || "{}"); } catch { return {}; } };
+  const show = () => {
+    const d = RISK_PARAM_DEFS[+sel.value];
+    inp.value = rpShownValue(d);
+    inp.min = d.min; inp.max = d.max; inp.step = d.step;
+    const custom = ovs()[d.key] != null;
+    desc.innerHTML = `${esc(d.desc)} <span class="muted">Banda valida: ${d.min}–${d.max}${d.unit} · default ${d.def}${d.unit}${custom ? ' · <b style="color:var(--yellow)">valore PERSONALIZZATO attivo</b>' : ""}</span>`;
+  };
+  sel.addEventListener("change", show);
+  $("#rp-save")?.addEventListener("click", () => {
+    const d = RISK_PARAM_DEFS[+sel.value];
+    const v = parseFloat(String(inp.value).replace(",", "."));
+    if (!Number.isFinite(v) || v < d.min || v > d.max) { toast(`Valore fuori banda: serve ${d.min}–${d.max}${d.unit}`); return; }
+    const ov = ovs(); ov[d.key] = v / d.scale;                       // salvo in scala interna
+    localStorage.setItem("risk_params_overrides", JSON.stringify(ov));
+    applyRiskOverrides(); renderAll(); show();
+    toast(`${d.label} → ${v}${d.unit} ✓ (motore, verdetto ed export usano subito la nuova soglia; salvata su questo browser)`);
+  });
+  $("#rp-reset")?.addEventListener("click", () => {
+    const d = RISK_PARAM_DEFS[+sel.value];
+    const ov = ovs(); delete ov[d.key];
+    localStorage.setItem("risk_params_overrides", JSON.stringify(ov));
+    RISK_PARAMS[d.key] = d.scale === 100 ? d.def / 100 : d.def;
+    applyRiskOverrides(); renderAll(); show();
+    toast(`${d.label} riportato al default (${d.def}${d.unit})`);
+  });
+  show();
+}
+
 function renderRiskParams() {
   const grid = $("#risk-params-grid");
   if (!grid || !DATA) return;
@@ -1677,7 +1741,7 @@ function openRiskRuleModal(r) {
     </div>
     <div class="rp-modal-state"><span class="muted">Stato corrente:</span> ${esc(r.state)}</div>
     <div class="rp-modal-why">${esc(r.why)}</div>
-    <div class="info-line muted" style="font-size:11px;margin-top:10px">Vive in: ${esc(r.where)} · le soglie sono in <code>RISK_PARAMS</code> (assets/app.js), calibrabili dal CEO.</div>`;
+    <div class="info-line muted" style="font-size:11px;margin-top:10px">Vive in: ${esc(r.where)} · le soglie principali si modificano dal menu in cima a questa sezione (Parametri di Rischio → scegli parametro, inserisci valore, Salva).</div>`;
   openInfoModal(r.label, body);
 }
 
@@ -5394,29 +5458,6 @@ function buildExecutiveDelta() {
   return L.join("\n");
 }
 
-/* LETTURA RAPIDA (v142) — la risposta a "voglio leggere i dati io, in modo immediato":
-   rende in card le STESSE righe dell'executive brief che apre l'export AI (una sola fonte
-   di verità, due lettori). Niente da mantenere in doppio: se il brief cresce, cresce anche qui. */
-function renderQuickRead() {
-  const box = $("#quick-read");
-  if (!box || !DATA) return;
-  const lines = buildExecutiveDelta().split("\n").filter(l => l.startsWith("·"));
-  const pretty = (l) => {
-    let t = esc(l.replace(/^·\s*/, ""));
-    // evidenzia le etichette chiave e colora gli alert testuali
-    t = t.replace(/^(BENCHMARK vs Nasdaq \(il mandato\):)/, "<b>$1</b>")
-         .replace(/^(Verdetto motore:)/, "<b>$1</b>")
-         .replace(/^(PRIORITÀ:)/, "<b style='color:var(--yellow)'>$1</b>")
-         .replace(/⛔[^·]*/g, m => `<span style="color:var(--red)">${m}</span>`)
-         .replace(/🚨[^·]*/g, m => `<span style="color:var(--red)">${m}</span>`)
-         .replace(/🛑[^·]*/g, m => `<span style="color:var(--red)">${m}</span>`);
-    return `<div class="qr-line">${t}</div>`;
-  };
-  box.innerHTML = `<div class="qr-head">📖 Lettura rapida <span class="muted">— la stessa sintesi che apre l'export AI</span></div>` +
-    lines.map(pretty).join("");
-  box.hidden = false;
-}
-
 /* ---------- testo per l'analisi AI: executive brief + prompt esistente + digest storici ---------- */
 function historicalDigestText() {
   const L = [];
@@ -5934,6 +5975,7 @@ loadData();
 loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
 loadPromptHeaderCloud();   // sincronizza la testata del prompt dal server (config/prompt_header.txt)
 loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
+initRiskEditor();       // editor soglie di rischio (v143): select+valore+spiegazione
 // ricarica completa (tecnici, news, storico) ogni 5 minuti
 setInterval(() => loadData(), 5 * 60 * 1000);
 // prezzi live ogni 60 secondi

@@ -1063,8 +1063,8 @@ tr.val-ok td { background: rgba(34,197,94,.07); }
 .shock-alert-banner b { color: var(--red); }
 @keyframes shockpulse { 0%,100% { border-left-color: var(--red); } 50% { border-left-color: rgba(239,68,68,.35); } }
 
-/* ═══ LETTURA RAPIDA (v142) — l'executive brief come card umana ═══ */
-.quick-read { padding: 12px 16px; }
-.qr-head { font-size: 13px; font-weight: 700; margin-bottom: 7px; }
-.qr-line { font-size: 12.5px; line-height: 1.65; color: var(--text); padding: 3px 0; border-top: 1px solid var(--border); }
-.qr-line:first-of-type { border-top: 0; }
+/* ═══ EDITOR SOGLIE DI RISCHIO (v143) ═══ */
+.rp-editor { background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; margin-bottom: 10px; }
+.rp-editor-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.rp-editor select { flex: 1; min-width: 220px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; font-size: 12.5px; }
+.rp-editor input { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; font-size: 12.5px; font-family: var(--mono); }

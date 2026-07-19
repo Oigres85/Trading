@@ -684,15 +684,32 @@ check("v139 benchmark: con ^IXIC nel fixture la riga riporta i trend dell'indice
   DATA.watchlist.pop();
   return b.includes("vs Composite -2,5%")`));
 
-/* ---------- v142: Lettura rapida (brief → card umana, stessa fonte di verità) ---------- */
-check("v142 lettura rapida: le righe del brief diventano HTML della card (BENCHMARK e PRIORITÀ presenti, zero leak)", run(`
-  const box = { hidden: true, innerHTML: "" };
-  const orig = document.querySelector;
-  document.querySelector = (sel) => sel === "#quick-read" ? box : orig(sel);
-  renderQuickRead();
-  document.querySelector = orig;
-  return box.innerHTML.includes("BENCHMARK") && box.innerHTML.includes("PRIORITÀ")
-      && !box.innerHTML.includes("undefined") && box.hidden === false`));
+/* ---------- v143: editor parametri di rischio (override localStorage → RISK_PARAMS) ---------- */
+check("v143 risk editor: override valido muta RISK_PARAMS (capNoAdd 10→15) e la frazione scala (sector 75→60%)", run(`
+  const saved = { cap: RISK_PARAMS.capNoAdd_pct, sec: RISK_PARAMS.sectorAlert_frac };
+  localStorage.setItem("risk_params_overrides", JSON.stringify({ capNoAdd_pct: 15, sectorAlert_frac: 0.60 }));
+  applyRiskOverrides();
+  const ok = RISK_PARAMS.capNoAdd_pct === 15 && Math.abs(RISK_PARAMS.sectorAlert_frac - 0.60) < 1e-9;
+  localStorage.removeItem("risk_params_overrides");
+  RISK_PARAMS.capNoAdd_pct = saved.cap; RISK_PARAMS.sectorAlert_frac = saved.sec;
+  return ok`));
+check("v143 risk editor: valori fuori banda o non numerici vengono IGNORATI (protezione capitale)", run(`
+  const saved = { cap: RISK_PARAMS.capNoAdd_pct, veto: RISK_PARAMS.sortinoVeto };
+  localStorage.setItem("risk_params_overrides", JSON.stringify({ capNoAdd_pct: 99, sortinoVeto: "abc" }));
+  applyRiskOverrides();
+  const ok = RISK_PARAMS.capNoAdd_pct === saved.cap && RISK_PARAMS.sortinoVeto === saved.veto;
+  localStorage.removeItem("risk_params_overrides");
+  return ok`));
+check("v143 risk editor: l'override del cap cambia DAVVERO il verdetto (posizione 38% NAV con cap 45 → accumulabile)", run(`
+  const saved = RISK_PARAMS.capNoAdd_pct;
+  RISK_PARAMS.capNoAdd_pct = 45;                       // TST1 pesa ~38%: sotto il nuovo cap
+  const v1 = decisionVerdict();
+  RISK_PARAMS.capNoAdd_pct = 5;                        // cap severo: TST1 bloccata
+  const v2 = decisionVerdict();
+  RISK_PARAMS.capNoAdd_pct = saved;
+  const in1 = (v1.accumula || []).some(r => r.ticker === "TST1");
+  const in2 = (v2.accumula || []).some(r => r.ticker === "TST1");
+  return in1 === true && in2 === false`));
 
 /* ---------- report ---------- */
 let fail = 0;
