@@ -808,6 +808,23 @@ check("v145 cap display: 'posizione più pesante' usa il cap REALE (capNoAdd_pct
   RISK_PARAMS.capNoAdd_pct = saved;
   return p.includes("cap d'ingresso del 15%") && !p.includes("SOPRA il limite del 10%")`));
 
+check("v146 budget 0: cassa < ES95 → flag ⛔ + presidio A1, niente falsa equazione '0 = X − Y'", run(`
+  const savedCash = cashEur;
+  DATA.totals.es95_hist_eur = 5000;
+  cashEur = 0; recomputeTotals();                    // budget = max(0, 0−5000) = 0
+  const p = buildPrompt();
+  const b = buildExecutiveDelta();
+  delete DATA.totals.es95_hist_eur; cashEur = savedCash; recomputeTotals();
+  return p.includes("⛔ BUDGET OPERATIVO SPENDIBILE: 0 €") && p.includes("regola A1")
+      && !p.includes("USA QUESTO — non rifare il conto") && b.includes("⛔ BUDGET 0")`));
+check("v146 cap display: il BTP (bond, beta 0) NON compare nella lista over-cap d'ingresso", run(`
+  const saved = RISK_PARAMS.capNoAdd_pct;
+  RISK_PARAMS.capNoAdd_pct = 1;                       // cap bassissimo: ogni equity è "over", il BTP no
+  const p = buildPrompt();
+  RISK_PARAMS.capNoAdd_pct = saved;
+  const m = p.match(/SOPRA il cap d'ingresso[^\\n]*/);
+  return m == null || !/BTP/.test(m[0])`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

@@ -4681,15 +4681,16 @@ function buildPrompt() {
   const fxP = fxExposure();
   if (fxP) riskBits.push(`Rischio cambio EUR/USD: ${fmtNum.format(fxP.pct)}% del NAV denominato in USD NON coperto${fxP.eurusd ? ` (EUR/USD ${fmtNum.format(fxP.eurusd)})` : ""} — un apprezzamento dell'euro dell'1% costa ~${fmtEUR.format(Math.round(fxP.usdEur * 0.01))} a parità di prezzi`);
   // concentrazione: posizione più pesante e primo settore (per le regole di sizing/correlazione)
-  const wPos = (DATA.portfolio || []).map(r => ({ tk: r.ticker, w: positionWeightPct(r) })).filter(x => x.w != null).sort((a, b) => b.w - a.w);
+  const wPos = (DATA.portfolio || []).map(r => ({ tk: r.ticker, w: positionWeightPct(r), eq: isEquity(r) })).filter(x => x.w != null).sort((a, b) => b.w - a.w);
   if (wPos.length) {
     // Soglia = il cap d'ingresso REALE del motore (RISK_PARAMS.capNoAdd_pct, override-abile dalla
     // dashboard), NON un 10% hardcoded. Prima la riga diceva "SOPRA il limite del 10%" mentre il
-    // motore usava un cap diverso (es. 15%): un nome tra 10% e il cap (es. AMD 14,7%) risultava
-    // "sopra il limite" QUI ma restava candidato all'accumulo → contraddizione nel payload.
+    // motore usava un cap diverso (es. 15%): un nome tra 10% e il cap risultava "sopra il limite"
+    // QUI ma restava candidato → contraddizione. E il cap vale sulle sole EQUITY (universo
+    // dell'accumulo): il BTP a beta 0 non si "accumula", quindi NON va nella lista over-cap.
     const cap = RISK_PARAMS.capNoAdd_pct;
-    const overCapPos = wPos.filter(x => x.w > cap);
-    riskBits.push(`posizione più pesante: ${wPos[0].tk} ${fmtNum.format(wPos[0].w)}% del NAV${overCapPos.length ? ` — SOPRA il cap d'ingresso del ${fmtNum.format(cap)}% (divieto di ACCUMULO, non di detenzione): ${overCapPos.map(x => `${x.tk} ${fmtNum.format(x.w)}%`).join(", ")}` : ` (entro il cap d'ingresso del ${fmtNum.format(cap)}%)`}`);
+    const overCapPos = wPos.filter(x => x.eq && x.w > cap);
+    riskBits.push(`posizione più pesante: ${wPos[0].tk} ${fmtNum.format(wPos[0].w)}% del NAV${overCapPos.length ? ` — equity SOPRA il cap d'ingresso del ${fmtNum.format(cap)}% (divieto di ACCUMULO, non di detenzione): ${overCapPos.map(x => `${x.tk} ${fmtNum.format(x.w)}%`).join(", ")}` : ` (equity entro il cap d'ingresso del ${fmtNum.format(cap)}%)`}`);
   }
   const allocR = DATA.allocation || [];
   if (allocR.length) {
@@ -4713,7 +4714,16 @@ function buildPrompt() {
   }
   if (t.budget_operativo_spendibile != null && (t.es95_hist_eur ?? t.es95_1d_eur) != null) {
     const esAbs = t.es95_hist_eur ?? t.es95_1d_eur;
-    riskBits.push(`BUDGET OPERATIVO SPENDIBILE (già calcolato, USA QUESTO — non rifare il conto): ${fmtEUR.format(Math.round(t.budget_operativo_spendibile))} = liquidità ${fmtEUR.format(cashEur)} − Expected Shortfall 95% ${fmtEUR.format(esAbs)} (quota tail-risk inviolabile)`);
+    const bud = Math.round(t.budget_operativo_spendibile);
+    if (bud <= 0) {
+      // Budget clampato a 0 (cassa < ES95): NON stampare la falsa equazione "0 = X − Y" (era
+      // "0 € = liquidità 0 € − ES95 12.469 €", un'uguaglianza matematicamente falsa che l'LLM
+      // legge male) e METTI UN PRESIDIO A1: un LLM con contesto sporco tende a riportare cassa/
+      // budget del run precedente (visto: Gemini ha usato 17.531 €/30.000 € con cassa 0).
+      riskBits.push(`⛔ BUDGET OPERATIVO SPENDIBILE: 0 € — la cassa (${fmtEUR.format(Math.round(cashEur))}) NON copre la riserva tail-risk ES95 (${fmtEUR.format(esAbs)}), quindi ZERO potere d'acquisto oggi. NESSUN ordine di ACQUISTO è eseguibile. Ignora qualsiasi importo di cassa o budget di run/conversazioni precedenti (regola A1): oggi vale 0, punto`);
+    } else {
+      riskBits.push(`BUDGET OPERATIVO SPENDIBILE (già calcolato, USA QUESTO — non rifare il conto): ${fmtEUR.format(bud)} = liquidità ${fmtEUR.format(Math.round(cashEur))} − Expected Shortfall 95% ${fmtEUR.format(esAbs)} (quota tail-risk inviolabile)`);
+    }
   }
   if (riskBits.length) lines.push("METRICHE DI RISCHIO: " + riskBits.join(" · ") + ".");
   // riconciliazione broker: se i dati manuali sono stantii/incoerenti l'AI deve saperlo
@@ -5511,8 +5521,10 @@ function buildExecutiveDelta() {
   L.push(`· BENCHMARK vs Nasdaq 100 (il mandato, proxy QQQ): oggi fondo ${signTxt(pday)} vs NDX ${signTxt(ndxDay)}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs NDX ${signTxt(ndxTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs NDX ${signTxt(ndxTr("m1"))} (finestre approssimate: rilevazioni fondo vs sedute indice — l'alpha di PERIODO è il verdetto sul processo, non il P&L assoluto)`);
   const v = decisionVerdict();
   L.push(`· Verdetto motore: ${v.label} (${dgTxt(v.score, "", 0)}/100)${(v.withPlan || []).length ? ` · candidati (${v.withPlan.length}): ${v.withPlan.slice(0, 6).map(p => p.r.ticker).join(", ")}${v.withPlan.length > 6 ? ", …" : ""}` : ""}`);
-  // priorità: shock, stop violati, earnings ≤7g, veto in ptf, top/worst RS mover della settimana
+  // priorità: budget 0, shock, stop violati, earnings ≤7g, veto in ptf, top/worst RS mover
   const pri = [];
+  if (t.budget_operativo_spendibile != null && Math.round(t.budget_operativo_spendibile) <= 0)
+    pri.push(`⛔ BUDGET 0 — nessun acquisto eseguibile (ignora cassa/budget di run precedenti, A1)`);
   const sh = (DATA.macro || {}).shock_alert;
   if (sh && sh.active) pri.push(`🚨 SHOCK ${(sh.sources || []).map(s => `${s.src} ${signTxt(s.chg)}`).join("/")}`);
   const sv = (v.stopViolations || []).map(x => x.r.ticker);
