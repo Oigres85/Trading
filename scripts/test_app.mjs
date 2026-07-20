@@ -711,6 +711,20 @@ check("v143 risk editor: l'override del cap cambia DAVVERO il verdetto (posizion
   const in2 = (v2.accumula || []).some(r => r.ticker === "TST1");
   return in1 === true && in2 === false`));
 
+/* ---------- v143.1: guardia headless dell'editor rischio (regressione log_verdict) ---------- */
+check("v143.1 rpShownValue null-safe: def assente → '' (non crasha su d.key)", run(`
+  return rpShownValue(undefined) === "" && rpShownValue(null) === ""
+      && rpShownValue(RISK_PARAM_DEFS[0]) === RISK_PARAMS.capNoAdd_pct`));
+check("v143.1 initRiskEditor: con select senza .value stringa (stub CI) esce senza eccezioni", run(`
+  const orig = document.querySelector;
+  document.querySelector = (sel) => (sel === "#rp-param" || sel === "#rp-value" || sel === "#rp-desc")
+    ? { addEventListener() {}, innerHTML: "" }   // stub SENZA .value (come l'harness log_verdict)
+    : orig(sel);
+  let ok = true;
+  try { initRiskEditor(); } catch { ok = false; }
+  document.querySelector = orig;
+  return ok`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

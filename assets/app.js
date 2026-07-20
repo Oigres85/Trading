@@ -1685,14 +1685,17 @@ function riskRulesRegistry() {
 const RP_TIER = { red: { c: "var(--red)", lab: "Protezione capitale" }, yellow: { c: "var(--yellow)", lab: "Dimensionamento" }, green: { c: "var(--green)", lab: "Segnale" } };
 /* editor soglie (v143): select + valore + spiegazione. Gli override mutano RISK_PARAMS e
    rilanciano renderAll: verdetto, chips e export AI riflettono subito la nuova soglia. */
-function rpShownValue(d) { return Math.round(RISK_PARAMS[d.key] * d.scale * 100) / 100; }
+function rpShownValue(d) { return d ? Math.round(RISK_PARAMS[d.key] * d.scale * 100) / 100 : ""; }
 function initRiskEditor() {
   const sel = $("#rp-param"), inp = $("#rp-value"), desc = $("#rp-desc");
-  if (!sel || !inp || !desc) return;
+  // guardia headless (v143.1): nell'harness CI (log_verdict/test) il DOM è uno stub senza
+  // .value reale → senza questa uscita anticipata sel.value=undefined → indice NaN → crash.
+  if (!sel || !inp || !desc || typeof sel.value !== "string") return;
   sel.innerHTML = RISK_PARAM_DEFS.map((d, i) => `<option value="${i}">${esc(d.label)}</option>`).join("");
   const ovs = () => { try { return JSON.parse(localStorage.getItem("risk_params_overrides") || "{}"); } catch { return {}; } };
   const show = () => {
-    const d = RISK_PARAM_DEFS[+sel.value];
+    const d = RISK_PARAM_DEFS[+sel.value] || RISK_PARAM_DEFS[0];
+    if (!d) return;
     inp.value = rpShownValue(d);
     inp.min = d.min; inp.max = d.max; inp.step = d.step;
     const custom = ovs()[d.key] != null;
