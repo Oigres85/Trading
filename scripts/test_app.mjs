@@ -486,14 +486,14 @@ check("v121 alert concentrazione nel prompt: >25% = avviso con disciplina ordini
   return al && al.includes("NON obbligo di trim") && al.includes("mai a mercato")`));
 
 // ---- v125: shock alert, [LIVE], futures, stop-a-rischio orario esteso ----
-check("v125 shock alert: [MACRO SHOCK ALERT] in CIMA al prompt con direttiva sospensione acquisti", run(`
-  DATA.macro.shock_alert = { active: true, threshold: -2, sources: [{ src: "KOSPI (Asia)", chg: -8.9 }] };
+check("v125→v145 shock alert: il SEGNALE DI SHOCK sta in CIMA (prima della situazione patrimoniale), NON è un ordine", run(`
+  DATA.macro.shock_alert = { active: true, threshold: 2, sources: [{ src: "KOSPI (Asia)", chg: -8.9 }] };
   const p = buildPrompt();
   delete DATA.macro.shock_alert;
-  const line = p.split("\\n").find(l => l.includes("[MACRO SHOCK ALERT]"));
-  // deve stare PRIMA della situazione patrimoniale (in cima)
-  return line && line.includes("SOSPENDI") && line.includes("KOSPI (Asia)") &&
-    p.indexOf("[MACRO SHOCK ALERT]") < p.indexOf("SITUAZIONE PATRIMONIALE")`));
+  const line = p.split("\\n").find(l => l.includes("[SEGNALE DI SHOCK"));
+  // in cima (prima del patrimonio), col dato sorgente, MA senza l'ordine di sospensione (reframe A4)
+  return line && line.includes("KOSPI (Asia)") && !line.includes("SOSPENDI gli ordini") &&
+    p.indexOf("[SEGNALE DI SHOCK") < p.indexOf("SITUAZIONE PATRIMONIALE")`));
 check("v125 tag [LIVE]: prezzo live-market marcato [LIVE], non [chiusura del]", run(`
   const wl = DATA.watchlist.find(r => r.ticker === "TSTW");
   wl.price_live = true; wl.price_asof = "2020-01-01";
@@ -675,14 +675,14 @@ check("v138 curva: riga indicators etichettata GIORNALIERA (non più 'serie mens
   return p.includes("serie GIORNALIERA FRED T10Y2Y") && !p.includes("Curva 10A-2A: +0.41 pp (rilevazione 2026-07-16 — serie mensile")`));
 
 /* ---------- v139: benchmark nel brief + attribuzione ---------- */
-check("v139 benchmark: l'executive brief apre col confronto fondo vs Nasdaq (null-safe senza ^IXIC)", run(`
+check("v139 benchmark: l'executive brief apre col confronto fondo vs Nasdaq (null-safe senza QQQ)", run(`
   const b = buildExecutiveDelta();
   return b.includes("BENCHMARK vs Nasdaq") && b.includes("pagella") === false && !b.includes("undefined")`));
-check("v139 benchmark: con ^IXIC nel fixture la riga riporta i trend dell'indice", run(`
-  DATA.watchlist.push({ ticker: "^IXIC", currency: "USD", price: 25000, sparks: { w1: [100, 99, 98, 97.5], m1: Array.from({length: 20}, (_, i) => 100 - i * 0.2) } });
+check("v145 benchmark: UNIFICATO a Nasdaq 100 (QQQ) su tutte le finestre — niente più Composite/mix di indici", run(`
+  DATA.top_etfs = (DATA.top_etfs || []).concat([{ ticker: "QQQ", change_pct: -1.5, sparks: { w1: [100, 99, 98, 97.5], m1: Array.from({length: 20}, (_, i) => 100 - i * 0.2) } }]);
   const b = buildExecutiveDelta();
-  DATA.watchlist.pop();
-  return b.includes("vs Composite -2,5%")`));
+  DATA.top_etfs = DATA.top_etfs.filter(r => r.ticker !== "QQQ");
+  return b.includes("vs Nasdaq 100") && b.includes("vs NDX -2,5%") && !b.includes("Composite")`));
 
 /* ---------- v143: editor parametri di rischio (override localStorage → RISK_PARAMS) ---------- */
 check("v143 risk editor: override valido muta RISK_PARAMS (capNoAdd 10→15) e la frazione scala (sector 75→60%)", run(`
@@ -748,6 +748,58 @@ check("v144 veto graduato: short interest → sempre FORTE anche con Sortino bor
 check("v144 veto graduato: la severità compare nel prompt (FORTE/DEBOLE)", run(`
   const p = buildPrompt();
   return /veto (FORTE|DEBOLE)/.test(p) || /\\[(FORTE|DEBOLE)\\]/.test(p) || !(dv => (dv.excluded||[]).length)(decisionVerdict())`));
+
+/* ---------- v145: revisione payload (parità tabelle fondamentali, brief onesto, ⚠deg, cap gate, shock) ---------- */
+check("v145 fondamentali: la DETTAGLIATA dichiara il conteggio 'N TITOLI → N righe' e le righe combaciano (guard I4)", run(`
+  const p = buildPrompt();
+  const dett = (p.match(/ANALISI FONDAMENTALE DETTAGLIATA — (\\d+) TITOLI/) || [])[1];
+  const start = p.indexOf("ANALISI FONDAMENTALE DETTAGLIATA");
+  let rows = 0, started = false;
+  for (const l of p.slice(start).split("\\n")) { if (l.startsWith("| Titolo") || l.startsWith("|---")) continue; if (l.startsWith("| ")) { rows++; started = true; continue; } if (started) break; }
+  return dett != null && Number(dett) === rows`));
+check("v145 fondamentali: market_cap azzerato NON fa sparire il titolo dalla DETTAGLIATA (bug AMD/MU/CRM)", run(`
+  const r = DATA.portfolio.find(x => x.ticker === "TST1");
+  const saved = r.stats.market_cap; r.stats.market_cap = null;
+  const p = buildPrompt();
+  r.stats.market_cap = saved;
+  const start = p.indexOf("ANALISI FONDAMENTALE DETTAGLIATA");
+  return /\\| TST1 /.test(p.slice(start, start + 3000))`));
+check("v145 brief: 'Investito' = capitale MTM cassa ESCLUSA (eur_invested), non il patrimonio totale", run(`
+  const b = buildExecutiveDelta();
+  const inv = Math.round(DATA.totals.eur_invested), tot = Math.round(DATA.totals.eur_value);
+  return b.includes("MTM, cassa esclusa") && inv !== tot && b.includes("Investito €" + fmtNum.format(inv))`));
+check("v145 rendimento book: da gain_pct (cash-neutral), IMMUNE al break/movimenti di cassa in eur_value", run(`
+  const mh = [
+    { date: "2026-07-01", gain_pct: 50, eur_value: 300000 },   // cassa inclusa (pre-break)
+    { date: "2026-07-08", gain_pct: 53, eur_value: 270000 },   // −30k = artefatto cassa, non perdita
+  ];
+  const r = bookReturnPct(mh, 7);   // (1,53/1,50)−1 = +2,00%, NON il −10% dei delta di eur_value
+  return r != null && Math.abs(r - 2) < 0.05`));
+check("v145 ⚠deg: RS che decelera sotto la soglia (−0,3pp) NON è degrado (rumore); ≥3pp con MCR↑ sì", run(`
+  const iso = (days) => new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+  const savedMH = DATA.metrics_history, savedWL = DATA.watchlist;
+  const mk = (rsNew, mcrNew) => ([{ date: iso(10), titles: { TDEG: { rs: 0, mcr: 5 } } }, { date: iso(0), titles: { TDEG: { rs: rsNew, mcr: mcrNew } } }]);
+  DATA.watchlist = [{ ticker: "TDEG", currency: "USD", price: 100, sparks: { w1: [100, 100, 100, 100] } }];
+  DATA.metrics_history = mk(-0.3, 5.2);   // drs7 −0,3 (rumore), dmcr7 +0,2
+  const noise = sparkTrendRows().find(r => r.tk === "TDEG");
+  DATA.metrics_history = mk(-3.5, 5.2);   // drs7 −3,5 (rilevante), dmcr7 +0,2
+  const real = sparkTrendRows().find(r => r.tk === "TDEG");
+  DATA.metrics_history = savedMH; DATA.watchlist = savedWL;
+  return noise && noise.degrade === false && real && real.degrade === true`));
+check("v145 cap gate: positionWeightPct ricava il peso da qty×price se val_eur manca (niente fail-open del cap)", run(`
+  const r = DATA.portfolio.find(x => x.ticker === "TST1");
+  const saved = r.val_eur; delete r.val_eur;
+  const w = positionWeightPct(r);
+  r.val_eur = saved;
+  return w != null && w >= RISK_PARAMS.capNoAdd_pct`));
+check("v145 shock: EVIDENZA instradata in A4 con conferma futures, NON più 'DIRETTIVA: SOSPENDI'", run(`
+  const saved = DATA.macro.shock_alert, savedF = DATA.macro.futures;
+  DATA.macro.shock_alert = { active: true, threshold: 2, sources: [{ src: "KOSPI", chg: -4.3 }] };
+  DATA.macro.futures = { nasdaq: { label: "Fut NDX", change_pct: 0.4 }, sp500: { label: "Fut S&P", change_pct: 0.1 } };
+  const p = buildPrompt();
+  DATA.macro.shock_alert = saved; DATA.macro.futures = savedF;
+  return p.includes("SEGNALE DI SHOCK") && p.includes("NON è un ordine") && p.includes("WORKFLOW A4")
+      && p.includes("ALLARME FANTASMA") && /Fut NDX \\+0,4/.test(p) && !p.includes("DIRETTIVA OPERATIVA: SOSPENDI")`));
 
 /* ---------- report ---------- */
 let fail = 0;

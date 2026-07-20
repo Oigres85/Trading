@@ -1040,7 +1040,7 @@ function renderShockAlert() {
   const src = s.sources.map(x => `${esc(x.src)} ${signTxt(x.chg)}`).join(" · ");
   box.hidden = false;
   box.className = "shock-alert-banner";
-  box.innerHTML = `🚨 <b>MACRO SHOCK ALERT</b> — ${src}: i mercati globali cedono oltre il ${s.threshold}% con Wall Street chiusa. <b>Sospendi gli acquisti aggressivi</b> e attendi l'assestamento della prima ora di scambi USA. Il prompt AI porta la direttiva in cima.`;
+  box.innerHTML = `🚨 <b>SEGNALE DI SHOCK</b> — ${src}: caduta oltre il ${s.threshold}% con Wall Street chiusa. <b>Da verificare</b>, non un ordine: controlla la conferma USA (futures) prima di trarre conclusioni — se gli USA non confermano è un allarme localizzato. Il prompt AI porta il segnale in cima, instradato nel workflow A4.`;
 }
 
 function renderDataQualityAlert() {
@@ -1251,6 +1251,10 @@ function stopOf(r) {
    Filosofia: mandato Growth "Let Winners Run" — si cappa l'INGRESSO su ciò che è già grande,
    NON si trimma ciò che è cresciuto da solo (protetto dallo stop ratchet 2×ATR).
    ═══════════════════════════════════════════════════════════════════════════════════════ */
+// Soglia di RILEVANZA della RS velocity (Δ7g della forza relativa vs NDX): sotto questa un
+// movimento è RUMORE per definizione del payload. Sorgente unica, riusata sia nell'etichetta
+// "|Δ|≥3pp = variazione RILEVANTE" sia nel gate ⚠deg (che prima scattava su -0,3pp = rumore).
+const RS_VEL_RILEVANTE_PP = 3;
 const RISK_PARAMS = {
   capNoAdd_pct: 10,        // #1 — DIVIETO DI ACCUMULO se la posizione è già ≥ questo % del NAV
                            //      (cap rigido SOLO sui nuovi acquisti; resta a 10%)
@@ -1347,8 +1351,20 @@ function isIlliquid(r) {
 function positionWeightPct(r) {
   const t = DATA?.totals || {};
   const nav = (t.eur_invested || 0) + cashEur;
-  if (!nav || !(r.val_eur > 0)) return null;
-  return Math.round(r.val_eur / nav * 1000) / 10;
+  if (!nav) return null;
+  // val_eur lo setta recomputeTotals; se per una race non è ancora presente su una posizione
+  // DETENUTA (qty>0), ricavalo da prezzo×qty (mirror di recomputeTotals). Senza questo fallback
+  // positionWeightPct tornava null e il CAP GATE dell'accumulo (w != null && w ≥ cap) falliva
+  // APERTO: un nome già oltre il 10% NAV (es. AMD 14,7% nello snapshot) sfuggiva alla soglia e
+  // finiva TRA I CANDIDATI, in aperta violazione di B3 "Let Winners Run". Watchlist (no qty) →
+  // resta null → passa il gate (peso 0, corretto).
+  let ve = r.val_eur;
+  if (!(ve > 0) && r.qty && r.price != null) {
+    const eurusd = DATA.eurusd || 1.08;
+    ve = r.currency === "EUR" ? (r.value || r.price * r.qty) : (r.price * r.qty) / eurusd;
+  }
+  if (!(ve > 0)) return null;
+  return Math.round(ve / nav * 1000) / 10;
 }
 
 /* VETO del risk manager (non scavalcabile da alcun supporto tecnico):
@@ -4622,11 +4638,20 @@ function buildPrompt() {
   //    testo delle istruzioni — editalo in config/prompt_header.txt. Coda dati INTATTA sotto. 🛑
   lines.push(promptHeaderText());
   lines.push("");
-  // MACRO SHOCK ALERT v125 — in CIMA a tutto (più urgente della web-search): Asia/futures
-  // Nasdaq oltre -2% con Wall Street chiusa → sospendere gli acquisti aggressivi.
+  // SEGNALE DI SHOCK (v145): NON è più una DIRETTIVA che ordina di sospendere gli acquisti — era
+  // un dettame in contrasto sia con la filosofia "indicatori non dettami" sia con la regola A4
+  // (che impone di escludere l'ALLARME FANTASMA prima di attivare protocolli). Ora è EVIDENZA
+  // instradata dentro A4, con la conferma incrociata USA (futures) servita INLINE: se gli USA non
+  // confermano la caduta asiatica, il CIO la declassa a evento localizzato invece di congelarsi.
   const shock = (DATA.macro || {}).shock_alert;
   if (shock && shock.active) {
-    lines.push(`🚨🚨 [MACRO SHOCK ALERT] (leggi PRIMA di ogni raccomandazione): ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} — i mercati globali cedono oltre il ${shock.threshold}% mentre Wall Street è chiusa. DIRETTIVA OPERATIVA: SOSPENDI gli ordini di ACQUISTO aggressivi, NON inseguire i limiti d'ingresso ai supporti calcolati su dati pre-shock, attendi l'assestamento della PRIMA ORA di scambi USA. Rivaluta gli stop delle posizioni aperte contro il gap d'apertura atteso. Puoi comunque analizzare, ma ogni ingresso proposto oggi va marcato "CONDIZIONATO all'assestamento post-apertura".`);
+    const fut = (DATA.macro || {}).futures || {};
+    const futBits = [fut.nasdaq, fut.sp500].filter(f => f && f.change_pct != null)
+      .map(f => `${f.label || f.symbol || "Fut"} ${signTxt(f.change_pct)}`).join(" · ");
+    const futLine = futBits
+      ? `Conferma incrociata USA (dato più fresco, ha PRIORITÀ sull'Asia): ${futBits}. Se i futures USA NON confermano la caduta (verdi o piatti mentre l'Asia crolla), è un ALLARME FANTASMA localizzato: dichiaralo al CEO e procedi normalmente.`
+      : `Conferma incrociata USA: futures non nel payload → verificali via web PRIMA di trarre conclusioni (A4).`;
+    lines.push(`🚨 [SEGNALE DI SHOCK — verifica con A4, NON è un ordine]: ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} (oltre ${shock.threshold}% con Wall Street chiusa). È un INDIZIO da validare, non un verdetto. WORKFLOW A4 in ordine: 1) conferma il dato (Tabella B/web) · 2) escludi cache/feed rotto · 3) ${futLine} · 4) SOLO se il regime è confermato: alza gli standard d'ingresso, non inseguire i limiti calcolati su dati pre-shock, marca gli ingressi "CONDIZIONATO all'assestamento della prima ora" e rivaluta gli stop contro il gap atteso. La decisione resta tua e pesata sui 4 pilastri — mai una sospensione automatica.`);
     lines.push("");
   }
   // ORDINE WEB-SEARCH IN CIMA: se ci sono dati mancanti/inaffidabili, l'imperativo va visto
@@ -4803,8 +4828,8 @@ function buildPrompt() {
         .filter(x => x.d != null)
         .sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
       if (rsMoves.length) {
-        kin.push("RS Velocity (Δ7g della RS 1M vs NDX; |Δ|≥3pp = variazione RILEVANTE): " +
-          rsMoves.slice(0, 6).map(x => `${x.tk} RS ${signTxt(x.rs, "pp")} (Δ ${signTxt(x.d, "pp")}${Math.abs(x.d) >= 3 ? (x.d > 0 ? " ↑ACCELERA" : " ↓DECELERA") : ""})`).join(" · "));
+        kin.push(`RS Velocity (Δ7g della RS 1M vs NDX; |Δ|≥${RS_VEL_RILEVANTE_PP}pp = variazione RILEVANTE): ` +
+          rsMoves.slice(0, 6).map(x => `${x.tk} RS ${signTxt(x.rs, "pp")} (Δ ${signTxt(x.d, "pp")}${Math.abs(x.d) >= RS_VEL_RILEVANTE_PP ? (x.d > 0 ? " ↑ACCELERA" : " ↓DECELERA") : ""})`).join(" · "));
       }
       // Derivata di concentrazione: MCR dei 3 maggiori contributori di rischio
       const mcrMoves = Object.keys(tNow)
@@ -4963,9 +4988,15 @@ function buildPrompt() {
   }
   lines.push("");
   // ANALISI FONDAMENTALE DETTAGLIATA per ticker
-  const fundItems = [...DATA.portfolio, ...(DATA.watchlist || [])].filter(r => r.stats?.market_cap);
+  // Universo = STESSO predicato del FONDAMENTALE PROFONDO (isEquity): le due tabelle fondamentali
+  // devono coprire gli STESSI titoli. Prima il filtro era `r.stats?.market_cap`: quando l'API
+  // azzerava il market_cap di un nome che aveva comunque P/E/ROE/PEG (capitava su AMD/MU/CRM),
+  // la riga spariva SOLO da qui — senza conteggio-guardia che se ne accorgesse — mentre restava
+  // nel PROFONDO. Ora l'inclusione non dipende dal market_cap (serve solo al P/FCF, che diventa
+  // "—" se manca) e il conteggio "N TITOLI → N righe" fa scattare l'invariante I4 su ogni drop.
+  const fundItems = [...(DATA.portfolio || []), ...(DATA.watchlist || [])].filter(isEquity);
   if (fundItems.length) {
-    lines.push("ANALISI FONDAMENTALE DETTAGLIATA (valutazione e qualità per le tue raccomandazioni):");
+    lines.push(`ANALISI FONDAMENTALE DETTAGLIATA — ${fundItems.length} TITOLI → ${fundItems.length} righe (valutazione e qualità per le tue raccomandazioni; deve coprire gli stessi titoli del FONDAMENTALE PROFONDO):`);
     lines.push("| Titolo | P/E TTM | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Altman Z'' | Div% | Buyback% | Note |");
     lines.push("|---|---|---|---|---|---|---|---|---|---|---|---|---|");
     fundItems.forEach(r => {
@@ -5241,34 +5272,15 @@ function buildPrompt() {
     DATA.predictions.forEach(p => { const d = pmDelta7(p.question, p.yes); lines.push(`- ${p.question}: ${p.yes}% [Δ7g ${d == null ? "—" : (d > 0 ? "+" : "") + d + "pp"}]`); });
   }
   lines.push("");
-  lines.push("ULTIME NEWS (sentiment | titolo | fonte):");
-  (DATA.news || []).slice(0, 18).forEach(n => {
+  lines.push("ULTIME NEWS (sentiment | titolo | fonte · tono aggregato nella SINTESI NEWS):");
+  (DATA.news || []).slice(0, 12).forEach(n => {
     const s = n.sentiment === "bull" ? "[POS]" : n.sentiment === "bear" ? "[NEG]" : "[NEU]";
     lines.push(`- ${s} [${n.tickers.join(",")}] ${n.title} (${n.source})`);
   });
   lines.push("");
-  // news per singolo ticker (incrocio)
-  const allTickers2 = [...DATA.portfolio.map(r => r.ticker), ...(DATA.watchlist || []).map(r => r.ticker)];
-  const tkNews = {};
-  (DATA.news || []).forEach(n => {
-    (n.tickers || []).forEach(tk => {
-      if (allTickers2.includes(tk)) {
-        if (!tkNews[tk]) tkNews[tk] = [];
-        if (tkNews[tk].length < 3) tkNews[tk].push(n);
-      }
-    });
-  });
-  const tkNewsKeys = Object.keys(tkNews);
-  if (tkNewsKeys.length) {
-    lines.push("");
-    lines.push("NEWS RILEVANTI PER SINGOLO TITOLO (catalizzatori e rischi specifici — incrociale con tecnica e fondamentali):");
-    tkNewsKeys.forEach(tk => {
-      tkNews[tk].forEach(n => {
-        const s2 = n.sentiment === "bull" ? "[+]" : n.sentiment === "bear" ? "[-]" : "[~]";
-        lines.push(`  ${tk}: ${s2} ${n.title} (${n.source})`);
-      });
-    });
-  }
+  // Le news per singolo titolo NON si duplicano qui (v145 anti-bloat): vivono nel blocco
+  // "NEWS VERTICALE PER TITOLO ATTIVO" più sotto — stessa fonte, titoli in italiano, flag [ptf]
+  // e Deduzione Zero. Un solo posto = meno token, niente doppione da riconciliare per l'LLM.
   lines.push("");
   lines.push(`PROMEMORIA FINALE:
 - La forma del report la scegli tu; la sostanza no: cifre decisive integrate nel discorso, ogni dato pesato per la sua data di rilevazione, violazioni matematiche (sizing, Sortino, correlazione) SEMPRE dichiarate anche quando le difendi.
@@ -5304,6 +5316,25 @@ const dgDelta = (arr, n) => {   // variazione % ultimo vs n passi indietro (seri
   const a = dgFin(arr[arr.length - 1 - n]), b = dgFin(arr[arr.length - 1]);
   return (a && b) ? (b / a - 1) * 100 : null;
 };
+/* RENDIMENTO DEL BOOK cash-flow-neutral su ~daysBack giorni, dai delta di gain_pct del
+   metrics_history: (1+g_ora)/(1+g_prima)−1. È l'UNICO rendimento onesto del portafoglio —
+   i delta di eur_value sono inquinati (a) dal break di definizione cassa-inclusa→esclusa di
+   metà luglio 2026 e (b), sempre, da versamenti/prelievi di liquidità. Lookback per DATA (per
+   allinearsi alle finestre degli indici); fallback per conteggio rilevazioni se le date mancano. */
+function bookReturnPct(mh, daysBack) {
+  const gps = (mh || []).map(x => ({ d: x && x.date, g: dgFin(x && x.gain_pct) })).filter(x => x.g != null);
+  if (gps.length < 2) return null;
+  const last = gps[gps.length - 1];
+  let prev;
+  if (last.d) {
+    const target = new Date(last.d).getTime() - daysBack * 86400000;
+    prev = gps.reduce((best, e) => (e.d && Math.abs(new Date(e.d).getTime() - target) < Math.abs(new Date(best.d).getTime() - target)) ? e : best, gps[0]);
+  } else {
+    prev = gps[Math.max(0, gps.length - 1 - daysBack)];
+  }
+  if (!prev || prev === last || prev.g == null) return null;
+  return ((1 + last.g / 100) / (1 + prev.g / 100) - 1) * 100;
+}
 const dgPercentile = (arr, v) => {   // posizione % di v nel range della serie
   const xs = (arr || []).map(dgFin).filter(x => x != null);
   const x = dgFin(v);
@@ -5373,7 +5404,7 @@ function buildHistoricalDigests() {
   const navs = mh.map(x => dgFin(x && x.eur_value)).filter(x => x != null);
   const shp = mh.map(x => dgFin(x && x.sharpe)).filter(x => x != null);
   out.push({ label: `Controvalore investito & Sharpe del fondo (storico ${mh.length} rilevazioni)`, text: navs.length >= 2
-    ? `investito €${fmtNum.format(Math.round(navs[navs.length - 1]))} (MTM, cassa esclusa) · Δ7 rilev. ${signTxt(dgDelta(navs, Math.min(7, navs.length - 1)))} · Sharpe ${dgTxt(shp[shp.length - 1], "", 2)} (Δ7 ${shp.length >= 8 ? dgTxt(shp[shp.length - 1] - shp[shp.length - 8], "", 2) : "—"})`
+    ? `investito €${fmtNum.format(Math.round(navs[navs.length - 1]))} (MTM, cassa esclusa) · Δ~7g ${signTxt(bookReturnPct(mh, 7))} (rendimento del book cash-neutral, non delta di eur_value) · Sharpe ${dgTxt(shp[shp.length - 1], "", 2)} (Δ7 ${shp.length >= 8 ? dgTxt(shp[shp.length - 1] - shp[shp.length - 8], "", 2) : "—"})`
     : "—" });
 
   return out;
@@ -5420,7 +5451,11 @@ function sparkTrendRows() {
     const kin = titleKinematics(r.ticker);
     // REGIME DI VARIANZA per titolo: MCR che SALE (rischio che si concentra) mentre la RS SCENDE
     // (forza relativa che degrada) = cinematica in deterioramento PRIMA che il supporto ceda.
-    const degrade = kin.dmcr7 != null && kin.dmcr7 > 0 && kin.drs7 != null && kin.drs7 < 0;
+    // ⚠deg = degradazione cinematica REALE (MCR che sale + RS che decelera), non rumore. Prima
+    // bastava drs7<0 e scattava su -0,3pp (META) — contraddicendo la soglia di rilevanza 3pp che
+    // il payload dichiara altrove. Ora la decelerazione dev'essere RILEVANTE per la STESSA soglia:
+    // un ⚠deg significa "entrambi i lati materiali", quindi affidabile come pre-allarme.
+    const degrade = kin.dmcr7 != null && kin.dmcr7 > 0 && kin.drs7 != null && kin.drs7 <= -RS_VEL_RILEVANTE_PP;
     rows.push({ tk: r.ticker, w1, m1, m3, y1, held: !!r.qty,
                 short: [w1, m1, m3, y1].filter(v => v != null).length < 2,
                 pct52: price52wPct(r), ...kin, degrade });
@@ -5446,22 +5481,31 @@ function buildExecutiveDelta() {
   const L = ["=== EXECUTIVE BRIEF — Δ dall'ultimo storico + priorità di oggi (INPUT per l'analisi, non decisioni) ==="];
   const t = DATA.totals || {};
   const mh = (DATA.metrics_history || []).filter(x => x);
-  const navs = mh.map(x => dgFin(x.eur_value)).filter(x => x != null);
-  const dLast = navs.length >= 2 ? (navs[navs.length - 1] / navs[navs.length - 2] - 1) * 100 : null;
-  const d7 = dgDelta(navs, Math.min(7, navs.length - 1));
-  L.push(`· Investito €${t.eur_value != null ? fmtNum.format(Math.round(t.eur_value)) : "—"} (Δ ultimo run ${signTxt(dLast)}, Δ7 rilev. ${signTxt(d7)}) · Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · VIX ${dgTxt((DATA.macro || {}).vix && DATA.macro.vix.value, "", 1)} · cassa ${fmtEUR.format(Math.round(cashEur || 0))} · budget op. ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"}`);
-  // BENCHMARK (v139): il metro che mancava — il mandato è battere il Nasdaq, quindi il brief
-  // apre col confronto. Finestre APPROSSIMATE e dichiarate (rilevazioni fondo vs sedute indice).
-  const ix = (DATA.watchlist || []).find(r => r.ticker === "^IXIC");
-  const ixTr = (k) => { const a = ((ix || {}).sparks || {})[k] || []; const xs = a.map(dgFin).filter(x => x != null);
+  // RENDIMENTI DEL BOOK cash-flow-neutral (da gain_pct), NON dai delta di eur_value: quella serie
+  // ha un break di definizione (cassa inclusa→esclusa, metà lug 2026) + i movimenti di cassa la
+  // inquinano → era la vera causa del paradosso "1S peggio di 1M" e del -8,35% sovrastimato.
+  const gps = mh.map(x => ({ d: x.date, g: dgFin(x.gain_pct) })).filter(x => x.g != null);
+  const dLast = gps.length >= 2 ? ((1 + gps[gps.length - 1].g / 100) / (1 + gps[gps.length - 2].g / 100) - 1) * 100 : null;
+  const d7 = bookReturnPct(mh, 7);
+  const fund1m = bookReturnPct(mh, 30);
+  // "Investito" = capitale MTM cassa ESCLUSA (eur_invested), NON eur_value (che include la cassa):
+  // prima la riga stampava il patrimonio TOTALE etichettato "Investito" e ci appiccicava delta
+  // calcolati sulla serie invested → doppio disallineamento.
+  const invested = Number.isFinite(t.eur_invested) ? t.eur_invested : (t.eur_value != null ? t.eur_value - (cashEur || 0) : null);
+  L.push(`· Investito €${invested != null ? fmtNum.format(Math.round(invested)) : "—"} (MTM, cassa esclusa · Δ ultimo run ${signTxt(dLast)}, Δ~7g ${signTxt(d7)} — rendimento del book cash-neutral) · Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · VIX ${dgTxt((DATA.macro || {}).vix && DATA.macro.vix.value, "", 1)} · cassa ${fmtEUR.format(Math.round(cashEur || 0))} · budget op. ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"}`);
+  // BENCHMARK: UN SOLO indice su tutte le finestre — Nasdaq 100 (il mandato, memory "vs NDX"),
+  // via QQQ, l'unica serie NDX-family con spark w1/m1. Prima mescolava NDX (giorno) e Nasdaq
+  // COMPOSITE (settimana/mese): indici DIVERSI, alpha non confrontabili tra finestre.
+  const qqq = (DATA.top_etfs || []).find(r => r.ticker === "QQQ");
+  const ndxTr = (k) => { const a = ((qqq || {}).sparks || {})[k] || []; const xs = a.map(dgFin).filter(x => x != null);
     return xs.length >= 2 ? (xs[xs.length - 1] / xs[0] - 1) * 100 : null; };
   const bm = (DATA.macro || {}).benchmarks || {};
+  const ndxDay = (qqq && qqq.change_pct != null) ? qqq.change_pct : dgFin(bm.ndx);
   const pday = typeof portfolioDayPct === "function" ? portfolioDayPct() : null;
-  const alphaDay = (pday != null && bm.ndx != null) ? Math.round((pday - bm.ndx) * 100) / 100 : null;
-  const fund1m = navs.length >= 2 ? dgDelta(navs, Math.min(21, navs.length - 1)) : null;
-  L.push(`· BENCHMARK vs Nasdaq (il mandato): oggi fondo ${signTxt(pday)} vs NDX ${signTxt(dgFin(bm.ndx))}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs Composite ${signTxt(ixTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs Composite ${signTxt(ixTr("m1"))} (finestre approssimate: rilevazioni fondo vs sedute indice — l'alpha di PERIODO è il verdetto sul processo, non il P&L assoluto)`);
+  const alphaDay = (pday != null && ndxDay != null) ? Math.round((pday - ndxDay) * 100) / 100 : null;
+  L.push(`· BENCHMARK vs Nasdaq 100 (il mandato, proxy QQQ): oggi fondo ${signTxt(pday)} vs NDX ${signTxt(ndxDay)}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs NDX ${signTxt(ndxTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs NDX ${signTxt(ndxTr("m1"))} (finestre approssimate: rilevazioni fondo vs sedute indice — l'alpha di PERIODO è il verdetto sul processo, non il P&L assoluto)`);
   const v = decisionVerdict();
-  L.push(`· Verdetto motore: ${v.label} (${dgTxt(v.score, "", 0)}/100)${(v.withPlan || []).length ? ` · candidati: ${v.withPlan.slice(0, 4).map(p => p.r.ticker).join(", ")}` : ""}`);
+  L.push(`· Verdetto motore: ${v.label} (${dgTxt(v.score, "", 0)}/100)${(v.withPlan || []).length ? ` · candidati (${v.withPlan.length}): ${v.withPlan.slice(0, 6).map(p => p.r.ticker).join(", ")}${v.withPlan.length > 6 ? ", …" : ""}` : ""}`);
   // priorità: shock, stop violati, earnings ≤7g, veto in ptf, top/worst RS mover della settimana
   const pri = [];
   const sh = (DATA.macro || {}).shock_alert;
@@ -5503,13 +5547,16 @@ function historicalDigestText() {
 
   const news = activeTitleNews();
   const withNews = news.filter(n => n.hits.length);
-  if (withNews.length || news.length) {
+  if (news.length) {
     // NB: lista, non tabella "| " → dicitura SENZA "— N TITOLI" per non innescare l'invariante I4 (righe=conteggio)
-    L.push(`NEWS VERTICALE PER TITOLO ATTIVO (${news.length} titoli attivi · catalizzatori/rischi specifici; "—" = nessuna news verticale oggi, deduci dal macro-settore):`);
-    for (const n of news) {
-      const txt = n.hits.length ? n.hits.map(h => `[${(h.sentiment || "neu").slice(0, 3)}] ${h.title_it || h.title}`).join(" · ") : "—";
-      L.push(`  ${n.tk}${n.held ? " [ptf]" : ""}: ${txt}`);
+    // Anti-bloat v145: elenco SOLO i titoli con news; i restanti in UNA riga (ticker + Deduzione Zero),
+    // invece di ~20 righe "TICKER: —" a segnale zero. L'istruzione Deduzione Zero resta esplicita.
+    const noNews = news.filter(n => !n.hits.length);
+    L.push(`NEWS VERTICALE PER TITOLO ATTIVO (${withNews.length}/${news.length} titoli attivi con news oggi · catalizzatori/rischi specifici):`);
+    for (const n of withNews) {
+      L.push(`  ${n.tk}${n.held ? " [ptf]" : ""}: ${n.hits.map(h => `[${(h.sentiment || "neu").slice(0, 3)}] ${h.title_it || h.title}`).join(" · ")}`);
     }
+    if (noNews.length) L.push(`  Altri ${noNews.length} titoli attivi (${noNews.map(n => `${n.tk}${n.held ? " [ptf]" : ""}`).join(", ")}): nessuna news verticale oggi → Deduzione Zero (deduci dal macro-settore, STEP 3).`);
   }
 
   const deep = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
