@@ -4683,8 +4683,13 @@ function buildPrompt() {
   // concentrazione: posizione più pesante e primo settore (per le regole di sizing/correlazione)
   const wPos = (DATA.portfolio || []).map(r => ({ tk: r.ticker, w: positionWeightPct(r) })).filter(x => x.w != null).sort((a, b) => b.w - a.w);
   if (wPos.length) {
-    const over10 = wPos.filter(x => x.w > 10);
-    riskBits.push(`posizione più pesante: ${wPos[0].tk} ${fmtNum.format(wPos[0].w)}% del NAV${over10.length ? ` — SOPRA il limite del 10%: ${over10.map(x => `${x.tk} ${fmtNum.format(x.w)}%`).join(", ")}` : " (entro il limite del 10%)"}`);
+    // Soglia = il cap d'ingresso REALE del motore (RISK_PARAMS.capNoAdd_pct, override-abile dalla
+    // dashboard), NON un 10% hardcoded. Prima la riga diceva "SOPRA il limite del 10%" mentre il
+    // motore usava un cap diverso (es. 15%): un nome tra 10% e il cap (es. AMD 14,7%) risultava
+    // "sopra il limite" QUI ma restava candidato all'accumulo → contraddizione nel payload.
+    const cap = RISK_PARAMS.capNoAdd_pct;
+    const overCapPos = wPos.filter(x => x.w > cap);
+    riskBits.push(`posizione più pesante: ${wPos[0].tk} ${fmtNum.format(wPos[0].w)}% del NAV${overCapPos.length ? ` — SOPRA il cap d'ingresso del ${fmtNum.format(cap)}% (divieto di ACCUMULO, non di detenzione): ${overCapPos.map(x => `${x.tk} ${fmtNum.format(x.w)}%`).join(", ")}` : ` (entro il cap d'ingresso del ${fmtNum.format(cap)}%)`}`);
   }
   const allocR = DATA.allocation || [];
   if (allocR.length) {

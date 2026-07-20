@@ -801,6 +801,13 @@ check("v145 shock: EVIDENZA instradata in A4 con conferma futures, NON più 'DIR
   return p.includes("SEGNALE DI SHOCK") && p.includes("NON è un ordine") && p.includes("WORKFLOW A4")
       && p.includes("ALLARME FANTASMA") && /Fut NDX \\+0,4/.test(p) && !p.includes("DIRETTIVA OPERATIVA: SOSPENDI")`));
 
+check("v145 cap display: 'posizione più pesante' usa il cap REALE (capNoAdd_pct), non un 10% hardcoded", run(`
+  const saved = RISK_PARAMS.capNoAdd_pct;
+  RISK_PARAMS.capNoAdd_pct = 15;                       // TST1 pesa ~38% NAV → sopra il cap 15
+  const p = buildPrompt();
+  RISK_PARAMS.capNoAdd_pct = saved;
+  return p.includes("cap d'ingresso del 15%") && !p.includes("SOPRA il limite del 10%")`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {
