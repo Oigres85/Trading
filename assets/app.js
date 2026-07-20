@@ -1406,9 +1406,18 @@ function qualityVeto(r) {
     };
     why.unshift(downside);
   }
-  if (why.length) return { verdict: "SCARTATO - VALUE TRAP", why };
-  if (st.roe != null && st.roe < 0) return { verdict: "NON ACCUMULARE", why: ["ROIC/ROE negativo"] };
-  if (st.peg != null && st.peg < 0) return { verdict: "NON ACCUMULARE", why: ["PEG negativo"] };
+  if (why.length) {
+    // GRADAZIONE DEL VETO (v144): il muro di "SCARTATO" identici nasconde la differenza tra un
+    // Sortino -2,7 STRUTTURALE e un -0,4 che una brutta settimana ha spinto sotto soglia. Un veto
+    // è DEBOLE se è guidato SOLO dal downside e resta entro ~2,5× la soglia (borderline, spesso
+    // ciclico → l'LLM può superarlo con tesi più facilmente); FORTE se profondo o con short/margini.
+    const sortinoOnly = downside && why.length === 1;
+    const deep = r.sortino_1y != null ? r.sortino_1y <= RISK_PARAMS.sortinoVeto * 2.5 : true;
+    const strength = (sortinoOnly && !deep) ? "debole" : "forte";
+    return { verdict: "SCARTATO - VALUE TRAP", why, strength };
+  }
+  if (st.roe != null && st.roe < 0) return { verdict: "NON ACCUMULARE", why: ["ROIC/ROE negativo"], strength: "forte" };
+  if (st.peg != null && st.peg < 0) return { verdict: "NON ACCUMULARE", why: ["PEG negativo"], strength: "forte" };
   return null;
 }
 
@@ -1543,7 +1552,7 @@ function decisionVerdict() {
   // il veto su una POSIZIONE detenuta significa "non incrementare", non "vendi subito":
   // senza il distinguo l'LLM leggeva "META SCARTATO - VALUE TRAP" su un titolo in portafoglio
   // e doveva indovinare se fosse un ordine di vendita (v110). Tag corto + legenda unica in coda.
-  const vetoTk = excluded.map(x => `${x.r.ticker}${x.r.qty ? " [in ptf]" : ""} (${x.verdict === "SCARTATO - VALUE TRAP" ? "VALUE TRAP" : x.why[0]})`);
+  const vetoTk = excluded.map(x => `${x.r.ticker}${x.r.qty ? " [in ptf]" : ""} (${x.verdict === "SCARTATO - VALUE TRAP" ? "VALUE TRAP" : x.why[0]}${x.strength ? `, veto ${x.strength.toUpperCase()}` : ""})`);
   const vetoHeldNote = excluded.some(x => x.r.qty)
     ? " ([in ptf] = posizione detenuta: il veto vieta l'ACCUMULO, la decisione tenere/vendere resta aperta)" : "";
   // COERENZA CASSA↔VERDETTO (v123): il ramo ACCUMULA scatta solo se c'è ALMENO UN ORDINE
@@ -4735,7 +4744,7 @@ function buildPrompt() {
           return `${x.r.ticker} stop $${fmtNum.format(x.stop)} (${signTxt(Math.round((x.stop / x.r.price - 1) * 1000) / 10)}${x.violated ? " ⚠VIOLATO" : ""}${prov ? " — PROVVISORIO −12%, ATR n.d. (storia <15 sedute): da inizializzare al prossimo run" : ""})`;
         }).join(" · ") + ".");
     }
-    if ((dv.excluded || []).length) lines.push("· ESCLUSI dal veto risk manager (contesto): " + dv.excluded.map(x => `${x.r.ticker} → ${x.verdict} (${x.why.join(", ")})`).join(" · ") + ".");
+    if ((dv.excluded || []).length) lines.push("· ESCLUSI dal veto risk manager (contesto; veto FORTE = strutturale/short/margini · veto DEBOLE = Sortino borderline, spesso ciclico → superabile con tesi): " + dv.excluded.map(x => `${x.r.ticker} → ${x.verdict}${x.strength ? ` [${x.strength.toUpperCase()}]` : ""} (${x.why.join(", ")})`).join(" · ") + ".");
     if ((dv.rehabbed || []).length) lines.push("· RIABILITATI dal veto Sortino — regola growth v111 (contesto): " + dv.rehabbed.map(x => `${x.r.ticker} → ${x.why.join(", ")}; MA ${x.rehabWhy}`).join(" · ") + ". Il Sortino 12M è backward-looking: con qualità intatta, prezzo sopra SMA200 e RS positiva il titolo è di nuovo eleggibile all'accumulo, da SORVEGLIATO (dichiara sempre il trailing negativo).");
     if ((dv.squeezed || []).length) lines.push("· [TURNAROUND SQUEEZE RISK] (contesto, v113): " + dv.squeezed.map(x => `${x.r.ticker} → veto (${x.why[0]}) MA short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% + RVol ${fmtNum.format(x.r.vol_ratio)}× + prezzo sopra SMA50 (${signTxt(x.r.sma50_dist_pct)})`).join(" · ") + ". NON è un candidato del mandato growth: se il CEO vuole trattarlo, va dichiarato come SPECULAZIONE asimmetrica — sizing massimo METÀ dello standard, stop stretto 1×ATR, solo ordine limite, mai media al ribasso.");
     // v119 — il trim ora porta un PREZZO LIMITE di vendita e la QUANTITÀ esatta per rientrare
@@ -5184,6 +5193,17 @@ function buildPrompt() {
     alloc.forEach(a => { const k = a.sector || a.ticker; bySec[k] = (bySec[k] || 0) + (a.value_eur || 0); });
     const secs = Object.entries(bySec).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${Math.round(v / tot * 100)}%`);
     lines.push(`- Concentrazione per settore (% del PATRIMONIO TOTALE, liquidità e obbligazioni incluse, somma 100%): ${secs.join(" · ")} (portafoglio fortemente sbilanciato sul tech/semi → priorità al de-risking). NB: la "regola correlazione >25%" nelle METRICHE DI RISCHIO usa invece la % del solo capitale azionario — denominatore diverso, non un'incoerenza.`);
+  }
+  // IDEE DI ROTAZIONE (v144): compounder di qualità ESTERNI al portafoglio, dai settori in
+  // accelerazione — la materia prima POSITIVA per rompere la monocultura tech. Dati reali dal
+  // motore (ROE, RS, PEG): l'LLM le VALUTA, non le esegue (vanno prima messe in watchlist).
+  const scr = DATA.screener || [];
+  if (scr.length) {
+    lines.push("");
+    lines.push("IDEE DI ROTAZIONE (screening automatico — compounder ad alto ROIC ESTERNI al portafoglio, dai settori che stanno ACCELERANDO; servono a de-concentrare la monocultura tech/semi con nomi a bassa correlazione. NON sono ordini: valutane la tesi e, se convince, proponi al CEO di inserirli in watchlist per la validazione del motore al prossimo run):");
+    lines.push("| Titolo | Settore (ETF 1M) | Prezzo | 1M | RS 1M vs NDX | ROE | Cresc.ricavi | Fwd P/E | PEG | Upside target | RSI |");
+    lines.push("|---|---|---|---|---|---|---|---|---|---|---|");
+    scr.forEach(r => lines.push(`| ${r.name} (${r.ticker}) | ${r.sector_name}${r.sector_m1 != null ? ` (${signTxt(r.sector_m1)})` : ""} | $${fmtNum.format(r.price)} | ${signTxt(r.m1_pct)} | ${r.rs_ndx_1m != null ? signTxt(r.rs_ndx_1m, "pp") : "—"} | ${r.roe_pct != null ? signTxt(r.roe_pct) : "—"} | ${r.rev_growth_pct != null ? signTxt(r.rev_growth_pct) : "—"} | ${r.forward_pe ?? "—"} | ${r.peg ?? "—"} | ${r.target_upside_pct != null ? signTxt(r.target_upside_pct) : "—"} | ${r.rsi ?? "—"} |`));
   }
   // statistiche di performance dal broker
   if (DATA.broker) {

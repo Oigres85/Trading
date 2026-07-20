@@ -3146,6 +3146,79 @@ def strip_private(rows):
             r.pop(k, None)
 
 
+# ═══ SCREENER IDEE DI ROTAZIONE (v144) ═══
+# Universo curato di compounder di QUALITÀ ESTERNI alla concentrazione tech/semi del fondo:
+# è la "materia prima positiva" che mancava all'analisi — senza, l'LLM può solo difendere il
+# libro esistente. Ogni nome è mappato al suo ETF settoriale per correlarlo alla rotazione reale.
+SCREENER_UNIVERSE = {
+    "LLY": "XLV", "UNH": "XLV", "ABBV": "XLV", "ISRG": "XLV", "MRK": "XLV",
+    "AMGN": "IBB", "VRTX": "XBI",
+    "JPM": "XLF", "V": "XLF", "MA": "XLF", "BRK-B": "XLF",
+    "XOM": "XLE", "CVX": "XLE",
+    "CAT": "XLI", "GE": "XLI", "HON": "XLI",
+    "COST": "XLP", "WMT": "XLP",
+}
+
+
+def fetch_screener(held_tickers, tilt_rows):
+    """Ritorna i migliori candidati di ROTAZIONE: qualità alta (ROE>15%), NON già in portafoglio/
+    watchlist, in un settore che sta ACCELERANDO (ETF con m1>0). Best-effort: ogni fetch protetto,
+    [] se tutto fallisce. Serve a rompere la monocultura tech: bassa correlazione col book."""
+    held = {t.upper() for t in held_tickers}
+    tilt = {r["ticker"]: r for r in (tilt_rows or [])}
+    # rendimento 1M del Nasdaq 100 per la forza relativa dei candidati (una sola chiamata)
+    ndx_m1 = None
+    try:
+        ns = yf.Ticker("^NDX").history(period="3mo", interval="1d")["Close"].dropna()
+        if len(ns) >= 22:
+            ndx_m1 = (float(ns.iloc[-1]) / float(ns.iloc[-22]) - 1) * 100
+    except Exception:  # noqa: BLE001
+        pass
+    out = []
+    for tk, etf in SCREENER_UNIVERSE.items():
+        if tk.upper() in held:
+            continue
+        try:
+            t = yf.Ticker(tk)
+            hist = drop_void_bars(t.history(period="3mo", interval="1d", auto_adjust=True))
+            closes = hist["Close"].dropna()
+            if len(closes) < 22:
+                continue
+            price = float(closes.iloc[-1])
+            m1 = (price / float(closes.iloc[-22]) - 1) * 100
+            info = t.info or {}
+            roe = info.get("returnOnEquity")
+            if roe is None or roe < 0.15:                 # SOLO qualità eccellente del capitale
+                continue
+            sec = tilt.get(etf) or {}
+            sec_m1 = sec.get("m1")
+            if sec_m1 is not None and sec_m1 < -1:        # scarta i settori in contrazione netta
+                continue
+            rsi = rsi14(closes)
+            tgt = info.get("targetMeanPrice")
+            out.append({
+                "ticker": tk, "name": (info.get("shortName") or tk)[:26],
+                "sector_etf": etf, "sector_name": (sec.get("name") or etf),
+                "sector_m1": round(sec_m1, 1) if sec_m1 is not None else None,
+                "price": round(price, 2), "m1_pct": round(m1, 1),
+                "rs_ndx_1m": round(m1 - ndx_m1, 1) if ndx_m1 is not None else None,
+                "roe_pct": round(roe * 100, 1),
+                "rev_growth_pct": round(info.get("revenueGrowth") * 100, 1) if info.get("revenueGrowth") is not None else None,
+                "forward_pe": round(info.get("forwardPE"), 1) if info.get("forwardPE") else None,
+                "peg": round(info.get("pegRatio") or info.get("trailingPegRatio"), 2) if (info.get("pegRatio") or info.get("trailingPegRatio")) else None,
+                "rsi": rsi,
+                "target_upside_pct": round((tgt / price - 1) * 100, 1) if (tgt and price) else None,
+                # score: forza del settore (rotazione) + forza relativa del titolo + bonus qualità
+                "_score": (sec_m1 or 0) * 1.5 + (m1 - (ndx_m1 or 0)) + min(roe * 100, 40) * 0.3,
+            })
+        except Exception as e:  # noqa: BLE001
+            print(f"!! screener {tk}: {e}", file=sys.stderr)
+    out.sort(key=lambda x: x["_score"], reverse=True)
+    for r in out:
+        r.pop("_score", None)
+    return out[:6]                                        # i 6 migliori: idee, non una watchlist infinita
+
+
 def main():
     # snapshot del run PRECEDENTE (ratchet stop, carry-forward margin debt, metrics_history)
     global PREV_DATA
@@ -3279,6 +3352,8 @@ def main():
         "top_caps": fetch_top_caps(),
         "top_etfs": fetch_top_etfs(),
         "predictions": fetch_predictions(),
+        "screener": fetch_screener([r["ticker"] for r in equities] + [r["ticker"] for r in watchlist],
+                                   macro.get("tilt")),
         "news": fetch_news(),
         "options": options,
         "metrics_history": metrics_history,

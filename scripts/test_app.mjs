@@ -725,6 +725,30 @@ check("v143.1 initRiskEditor: con select senza .value stringa (stub CI) esce sen
   document.querySelector = orig;
   return ok`));
 
+/* ---------- v144: screener idee di rotazione + gradazione veto ---------- */
+check("v144 screener: il blocco IDEE DI ROTAZIONE compare nel prompt con i dati del candidato", run(`
+  const saved = DATA.screener;
+  DATA.screener = [{ ticker: "LLY", name: "Eli Lilly", sector_name: "Salute", sector_etf: "XLV", sector_m1: 5.8,
+    price: 900, m1_pct: 4.2, rs_ndx_1m: 6.1, roe_pct: 62, rev_growth_pct: 30, forward_pe: 35, peg: 1.8, target_upside_pct: 15, rsi: 58 }];
+  const p = buildPrompt();
+  DATA.screener = saved;
+  return p.includes("IDEE DI ROTAZIONE") && p.includes("Eli Lilly (LLY)") && p.includes("Salute") && p.includes("ESTERNI al portafoglio")`));
+check("v144 screener: assente/vuoto → nessun blocco (niente sezione vuota)", run(`
+  const saved = DATA.screener; DATA.screener = [];
+  const p = buildPrompt(); DATA.screener = saved;
+  return !p.includes("IDEE DI ROTAZIONE")`));
+check("v144 veto graduato: Sortino profondo → FORTE; borderline (solo downside) → DEBOLE", run(`
+  const base = { stats: { roe: 0.05, short_float: 0.02, peg: 1.5, profit_margin: 0.1 } };
+  const forte = qualityVeto({ ...base, sortino_1y: -2.5 });          // profondo
+  const debole = qualityVeto({ ...base, sortino_1y: -0.4, sma200_dist_pct: -5, rs_ndx_1m: -3 }); // borderline, non riabilitabile
+  return forte.strength === "forte" && debole.strength === "debole"`));
+check("v144 veto graduato: short interest → sempre FORTE anche con Sortino borderline", run(`
+  const v = qualityVeto({ stats: { roe: 0.05, short_float: 0.20, peg: 1.5, profit_margin: 0.1 }, sortino_1y: -0.4 });
+  return v.verdict === "SCARTATO - VALUE TRAP" && v.strength === "forte"`));
+check("v144 veto graduato: la severità compare nel prompt (FORTE/DEBOLE)", run(`
+  const p = buildPrompt();
+  return /veto (FORTE|DEBOLE)/.test(p) || /\\[(FORTE|DEBOLE)\\]/.test(p) || !(dv => (dv.excluded||[]).length)(decisionVerdict())`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {
