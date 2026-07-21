@@ -5440,7 +5440,7 @@ function buildPrompt() {
 - La forma del report la scegli tu; la sostanza no: cifre decisive integrate nel discorso, ogni dato pesato per la sua data di rilevazione, violazioni matematiche (sizing, Sortino, correlazione) SEMPRE dichiarate anche quando le difendi.
 - Raccomandazioni operative inequivocabili (quantità, prezzi, stop coerenti con stop ratchet/supporti/MCR del payload) e disciplina: ordini limite, mai a mercato in apertura.
 - Se un dato è flaggato [!!! DATATO / UNRELIABLE !!!] o [LAG TEMPORALE RILEVATO], il double-check web è obbligatorio prima di usarlo.
-- Domande al CEO benvenute quando servono. L'ultima parola è sua.`);
+- NIENTE domande in chiusura: il report finisce con le decisioni. Se un dato manca, dichiara l'assunzione e procedi. L'ultima parola è del CEO.`);
   return lines.join("\n");
 }
 
