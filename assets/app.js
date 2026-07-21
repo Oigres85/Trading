@@ -1002,6 +1002,51 @@ function usRegularSessionOpen(now = new Date()) {
   const mins = et.getHours() * 60 + et.getMinutes();
   return mins >= 570 && mins < 960;                                    // 9:30–16:00 ET
 }
+/* FASE DELLA SEDUTA USA (v149): il payload deve sapere "che ora è" — un'analisi delle 07:18
+   italiane (notte USA) ragiona su anticipatori (KOSPI/futures/esteso) e propone ordini per
+   l'APERTURA; una delle 15:00 ET ragiona sui prezzi live. Senza questa riga l'LLM ignorava
+   il KOSPI +4,5% live in pre-apertura (visto sul run del 21/07). Festività USA non considerate
+   (approssimazione dichiarata). */
+function usSessionInfo(now = new Date()) {
+  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const day = et.getDay(), mins = et.getHours() * 60 + et.getMinutes();
+  const weekend = day === 0 || day === 6;
+  const phase = weekend ? "weekend"
+    : mins >= 240 && mins < 570 ? "pre-market"
+    : mins >= 570 && mins < 960 ? "regular"
+    : mins >= 960 && mins < 1200 ? "after-hours"
+    : "notte";
+  let minsToOpen = null;
+  if (!weekend && mins < 570) minsToOpen = 570 - mins;
+  else {
+    let ahead = 1;
+    while ([0, 6].includes((day + ahead) % 7)) ahead++;
+    minsToOpen = ahead * 1440 - mins + 570;
+  }
+  return { phase, minsToOpen, etHHMM: `${String(et.getHours()).padStart(2, "0")}:${String(et.getMinutes()).padStart(2, "0")}` };
+}
+function sessionContextLine() {
+  const s = usSessionInfo();
+  const hrs = Math.round(s.minsToOpen / 60 * 10) / 10;
+  // anticipatori inline (STEP 0 material): KOSPI live, futures pipeline, BTC — i dati che
+  // l'LLM deve pesare PRIMA della campana, serviti dove li legge per primi
+  const wl = DATA.watchlist || [];
+  const ks = wl.find(r => r.ticker === "^KS11"), btc = wl.find(r => r.ticker === "BTC-USD");
+  const fut = (DATA.macro || {}).futures || {};
+  const lead = [
+    ks && ks.change_pct != null ? `KOSPI ${signTxt(ks.change_pct)}${ks.price_live ? " [LIVE]" : ""}` : null,
+    fut.nasdaq?.change_pct != null ? `Fut NDX ${signTxt(fut.nasdaq.change_pct)}` : null,
+    fut.sp500?.change_pct != null ? `Fut S&P ${signTxt(fut.sp500.change_pct)}` : null,
+    btc && btc.change_pct != null ? `BTC ${signTxt(btc.change_pct)}` : null,
+  ].filter(Boolean).join(" · ");
+  const beforeBell = s.phase === "notte" || s.phase === "pre-market" || s.phase === "weekend";
+  const guida = beforeBell
+    ? `SEI PRIMA DELLA CAMPANA (apertura tra ~${hrs}h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura`
+    : s.phase === "regular"
+      ? `SESSIONE USA APERTA: i prezzi live hanno priorità; gli ordini limite sono eseguibili oggi`
+      : `USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~${hrs}h); il "→ agg." incorpora già il gap after`;
+  return `CONTESTO DI SESSIONE (ora ET ${s.etHHMM}, fase: ${s.phase.toUpperCase()} — festività USA non considerate)${lead ? ` · ANTICIPATORI: ${lead}` : ""} · ${guida}.`;
+}
 const seoulToday = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // UTC+9, niente DST
 function shockSourcesLive() {
   const THR = -2.0, sources = [];
@@ -1812,7 +1857,10 @@ function parseAIOrders(text) {
   const orders = [];
   const seen = new Set();
   for (const rawLine of String(text || "").split("\n")) {
-    const line = rawLine.trim();
+    // NORMALIZZAZIONE v149: gli LLM emettono ordini anche in TABELLE markdown ("| **RGTI** |
+    // VENDI | ~595 | **$14,31** …") nonostante il formato canonico A2 — visto su Gemini 21/07.
+    // Via grassetto e pipe→separatore, così ticker/verbo/importi tornano estraibili.
+    const line = rawLine.replace(/\*\*/g, "").replace(/\s*\|\s*/g, " · ").trim();
     if (line.length < 8) continue;
     const isBuy = AI_BUY.test(line), isSell = AI_SELL.test(line);
     if (!isBuy && !isSell) continue;
@@ -1835,10 +1883,20 @@ function parseAIOrders(text) {
     if (seen.has(sig)) continue;                        // primo ordine per ticker/verso (il resto è prosa)
     seen.add(sig);
     const num = "([\\d.,]+)";
-    const qtyM = line.match(new RegExp(`~?\\s*(\\d+)\\s*(?:quote|azioni)`, "i"));
-    const limM = line.match(new RegExp(`(?:limite|ingresso)\\s*(?:di|d'|a)?\\s*\\$?\\s*${num}`, "i"))
-              || line.match(new RegExp(`\\ba\\s+\\$\\s*${num}`, "i"));
-    const stopM = line.match(new RegExp(`stop(?:\\s*loss)?\\s*(?:a|di)?\\s*\\$?\\s*${num}`, "i"));
+    // fallback tabellare v149: "~595" nudo (colonna Quantità, senza "quote") e primo "$X" della
+    // riga NON preceduto da parole di tracciabilità (Prezzo/Supp./Stop/res/PMC: sono citazioni,
+    // non il limite). Niente lookbehind (Safari vecchi): scansione esplicita dei "$X" con la
+    // parola precedente in blocklist. Il formato canonico resta prioritario.
+    const qtyM = line.match(new RegExp(`~?\\s*(\\d+)\\s*(?:quote|azioni)`, "i"))
+              || line.match(/~\s*(\d+)(?![\d.,%])/);
+    let limM = line.match(new RegExp(`(?:limite|ingresso)\\s*(?:di|d'|a)?\\s*\\$?\\s*${num}`, "i"))
+            || line.match(new RegExp(`\\ba\\s+\\$\\s*${num}`, "i"));
+    if (!limM) {
+      for (const m of line.matchAll(new RegExp(`(\\S*)\\s*\\$\\s*${num}`, "g"))) {
+        if (!/^(prezzo|supp|stop|res|pmc)/i.test((m[1] || "").replace(/[^A-Za-z.]/g, ""))) { limM = [m[0], m[2]]; break; }
+      }
+    }
+    const stopM = line.match(new RegExp(`stop(?:\\s*loss)?\\s*(?:\\(2×ATR\\))?\\s*(?:a|di)?\\s*\\$?\\s*${num}`, "i"));
     orders.push({ tk, action: isBuy ? "BUY" : "SELL", qty: qtyM ? parseInt(qtyM[1], 10) : null,
                   limit: limM ? parseMoneyLoose(limM[1]) : null, stop: stopM ? parseMoneyLoose(stopM[1]) : null,
                   line: line.slice(0, 160) });
@@ -4663,6 +4721,10 @@ function buildPrompt() {
   const ageMin = Math.round((Date.now() - new Date(DATA.updated_at).getTime()) / 60000);
   const lagNote = ageMin > 90 ? ` [ATTENZIONE: snapshot di ${ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min"} fa — i prezzi potrebbero essere disallineati dal mercato live; verifica online i livelli critici prima di ragionarci sopra]` : "";
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")} (prezzi: snapshot pipeline + refresh live lato client ogni 60s)${lagNote}`);
+  // CONTESTO DI SESSIONE (v149): la fase della seduta USA calcolata ADESSO (client), non al
+  // run pipeline — orienta l'LLM su quali dati sono "il presente" (anticipatori vs live) e
+  // per QUALE campana valgono gli ordini. Vedi usSessionInfo/sessionContextLine.
+  lines.push(sessionContextLine());
   const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
   lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(Math.round(patrimonio))}${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
   // METRICHE DI RISCHIO/PORTAFOGLIO (dai popup della dashboard)

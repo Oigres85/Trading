@@ -850,6 +850,31 @@ check("v148 Livelli motore: la riga dei candidati include il 'target res.' (nume
   const p = buildPrompt();
   return (dv.withPlan || []).length === 0 || p.includes("target res. $")`));
 
+/* ---------- v149: contesto di sessione + validatore su ordini in tabella markdown ---------- */
+check("v149 sessione: fasi deterministiche (lun 08:00 ET=pre-market · mer 12:00=regular · sab=weekend · mar 22:00=notte)", run(`
+  const at = (iso) => usSessionInfo(new Date(iso));
+  return at("2026-07-20T12:00:00Z").phase === "pre-market"     // lunedì 08:00 ET (EDT)
+      && at("2026-07-22T16:00:00Z").phase === "regular"        // mercoledì 12:00 ET
+      && at("2026-07-25T15:00:00Z").phase === "weekend"        // sabato
+      && at("2026-07-22T02:00:00Z").phase === "notte"          // martedì 22:00 ET (mer 02:00 UTC)
+      && at("2026-07-20T12:00:00Z").minsToOpen === 90`));
+check("v149 sessione: la riga CONTESTO DI SESSIONE è nel prompt con fase + guida ordini-per-campana", run(`
+  const p = buildPrompt();
+  return p.includes("CONTESTO DI SESSIONE (ora ET ") &&
+    (p.includes("PRIMA DELLA CAMPANA") || p.includes("SESSIONE USA APERTA") || p.includes("AFTER-HOURS"))`));
+check("v149 sessione: con KOSPI/futures/BTC nel fixture gli ANTICIPATORI compaiono inline", run(`
+  DATA.watchlist.push({ ticker: "^KS11", currency: "PTS", price: 6800, change_pct: 4.5, price_live: true });
+  DATA.macro.futures = { nasdaq: { change_pct: 0.27 }, sp500: { change_pct: 0.14 } };
+  const p = buildPrompt();
+  DATA.watchlist.pop(); delete DATA.macro.futures;
+  return p.includes("ANTICIPATORI: KOSPI +4,5% [LIVE]") && p.includes("Fut NDX +0,27%")`));
+check("v149 validatore: ordine in RIGA TABELLA markdown (stile Gemini) → ticker/verso/qty/limite estratti", run(`
+  const o = parseAIOrders("| **TSTW** | VENDI | ~595 | **$14,31** (agg. after) | — | Violazione stop. (Prezzo $14,25 · Supp. $13,41 · Stop $14,79) | 95/100 |");
+  return o.length === 1 && o[0].tk === "TSTW" && o[0].action === "SELL" && o[0].qty === 595 && o[0].limit === 14.31`));
+check("v149 validatore: il formato canonico A2 resta parsato identico (regressione)", run(`
+  const o = parseAIOrders("[TST1] — COMPRA ~14 quote a limite $95,50 con stop $88 (payload: ...)");
+  return o.length === 1 && o[0].qty === 14 && o[0].limit === 95.5 && o[0].stop === 88`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {
