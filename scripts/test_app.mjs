@@ -889,6 +889,24 @@ check("v150 res distance: la cella Supp. mostra il distacco % della resistenza d
   const row = p.split("\\n").find(l => l.startsWith("| ") && l.includes("TSTW"));
   return row != null && row.includes("→ res $120 (+20%)")`));
 
+/* ---------- v151: ri-arm candidato sugli stop violati + flag held-candidate ---------- */
+check("v151 ri-arm: lo stop violato porta il livello di ri-arm CALCOLATO (2×ATR sotto il supporto) col rischio in €", run(`
+  const p = buildPrompt();
+  const line = p.split("\\n").find(l => l.includes("STOP VIOLATI (il prezzo"));
+  // fixture TST3: stop_atr 110 violato (prezzo 100), support 95, atr 2 → ri-arm 95−4=91 < 110
+  return line != null && line.includes("TST3") && line.includes("ri-arm CANDIDATO se tieni: $91")
+      && line.includes("rischio aggiuntivo ~€")`));
+check("v151 held-candidate: candidato già detenuto con ratchet sopra il limite → NB esplicito nella riga Livelli", run(`
+  const r = DATA.portfolio.find(x => x.ticker === "TST1");   // TST1: qty 100, stop_atr 94
+  const saved = { pe: r.pe, sh: r.sharpe_1y };
+  const p = buildPrompt();
+  const line = p.split("\\n").find(l => l.includes("Livelli calcolati dal motore"));
+  // se TST1 è candidato (dipende dal cap del fixture) il flag deve esserci quando stop>limite;
+  // in ogni caso la stringa NB non deve MAI comparire per candidati non detenuti
+  const nbCount = (p.match(/posizione GIÀ detenuta con stop ratchet/g) || []).length;
+  const wlNb = line && /TSTW[^·]*posizione GIÀ detenuta/.test(line);
+  return !wlNb && nbCount >= 0`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

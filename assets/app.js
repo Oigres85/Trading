@@ -4857,8 +4857,19 @@ function buildPrompt() {
     lines.push(`ANALISI PER-TITOLO: per i titoli rilevanti di PORTAFOGLIO e WATCHLIST — tenendo conto delle ultime operazioni del DIARIO DELLE AZIONI — fai un'analisi tecnica E fondamentale specifica su quel titolo, incrociando le sue news e il contesto macro. NON generalizzare e NON inventare dati non presenti nel payload (anti-allucinazione): se un dato manca, dichiaralo.`);
     lines.push("· NOTA METODOLOGICA: gli Stop Loss sulle posizioni sono TRAILING RATCHET su base 2×ATR(14 Wilder): partono 2×ATR sotto il prezzo e da lì possono solo SALIRE coi massimi — non si riabbassano nei ribassi (persistiti tra i run, reset solo se il trade cambia). NON sono percentuali fisse. Il verdetto di accumulo è ritarato sul mandato quant: impatto marginale sullo Sharpe, forza relativa 1M vs benchmark, qualità fondamentale; gli asset in veto (value trap / ROIC<0 / PEG<0) sono esclusi a prescindere dal supporto tecnico.");
     if ((dv.stopViolations || []).length) {
+      // RI-ARM CANDIDATO (v151): la testata chiede "se ri-armi dichiara il NUOVO livello e il
+      // rischio in €" ma A1 vieta all'LLM di INVENTARE stop → il livello lo calcola il SISTEMA:
+      // stop teorico 2×ATR ancorato al SUPPORTO della riga (sempre < supporto per costruzione),
+      // col rischio aggiuntivo già quantificato = quote × (stop violato − ri-arm) in €.
+      const eurusdRA = DATA.eurusd || 1.08;
       lines.push("· ⚠ STOP VIOLATI (il prezzo è SOTTO lo stop trailing ancorato — dedica a ciascuno una raccomandazione esplicita (uscire o ri-armare), con motivazione): " +
-        dv.stopViolations.map(x => `${x.r.ticker} stop $${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)} (${signTxt(Math.round((x.r.price / x.stop - 1) * 1000) / 10)})`).join(" · ") + ".");
+        dv.stopViolations.map(x => {
+          const base = `${x.r.ticker} stop $${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)} (${signTxt(Math.round((x.r.price / x.stop - 1) * 1000) / 10)})`;
+          const ra = (x.r.support > 0 && x.r.support < x.r.price) ? atrStop(x.r.support, x.r) : null;
+          if (!ra || !(ra.stop > 0) || !(ra.stop < x.stop)) return base;
+          const riskEur = Math.round(x.r.qty * (x.stop - ra.stop) / eurusdRA);
+          return `${base} [ri-arm CANDIDATO se tieni: $${fmtNum.format(ra.stop)} (2×ATR sotto il supporto $${fmtNum.format(x.r.support)}) → rischio aggiuntivo ~€${fmtNum.format(riskEur)} = ${fmtNum.format(x.r.qty)} quote × $${fmtNum.format(Math.round((x.stop - ra.stop) * 100) / 100)}]`;
+        }).join(" · ") + ".");
     }
     if ((dv.withPlan || []).length) {
       lines.push("· Livelli calcolati dal motore (contesto, ordini limite + stop 2×ATR): " +
@@ -4879,7 +4890,13 @@ function buildPrompt() {
           // il rapporto ma non il livello a cui punta il reward. Stessa banda di plausibilità.
           const resT = (p.r.resistance != null && p.r.price > 0 && p.r.resistance > p.limit && p.r.resistance <= p.r.price * 2)
             ? ` / target res. $${fmtNum.format(p.r.resistance)}` : "";
-          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}`;
+          // v151 — candidato GIÀ DETENUTO col ratchet sopra il limite d'ingresso: raggiungere il
+          // limite implica lo stop della posizione GIÀ scattato. Senza flag i due piani (accumulo
+          // vs protezione) sembrano indipendenti e l'LLM deve dedurre il conflitto da solo.
+          const heldStop = p.r.qty ? stopOf(p.r) : null;
+          const heldTag = (heldStop && heldStop.stop > p.limit)
+            ? ` [NB: posizione GIÀ detenuta con stop ratchet $${fmtNum.format(heldStop.stop)} SOPRA questo limite — il prezzo arriva al limite solo DOPO aver violato lo stop: decidi prima la sorte della posizione]` : "";
+          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}${heldTag}`;
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {
