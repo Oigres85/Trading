@@ -1739,8 +1739,8 @@ function riskRulesRegistry() {
   return [
     // 🔴 RED — protezione del capitale / gate rigidi
     { tier: "red", label: "Cap d'ingresso", th: `${RISK_PARAMS.capNoAdd_pct}% NAV`, active: nOv > 0,
-      state: `${nOv} posizioni ≥10% NAV: divieto di NUOVI acquisti (si lasciano correre)`,
-      why: "Un singolo nome non deve poter crescere OLTRE il 10% del NAV con capitale FRESCO (rischio idiosincratico d'ingresso). Ciò che supera il 10% per apprezzamento organico NON viene trimmato — Let Winners Run, protetto dallo stop ratchet.", where: "motore (decisionVerdict)" },
+      state: `${nOv} posizioni ≥${RISK_PARAMS.capNoAdd_pct}% NAV: divieto di NUOVI acquisti (si lasciano correre)`,
+      why: `Un singolo nome non deve poter crescere OLTRE il ${RISK_PARAMS.capNoAdd_pct}% del NAV con capitale FRESCO (rischio idiosincratico d'ingresso). Ciò che supera il cap per apprezzamento organico NON viene trimmato — Let Winners Run, protetto dallo stop ratchet.`, where: "motore (decisionVerdict)" },
     { tier: "red", label: "Veto Value Trap", th: `Sortino 1A < ${RISK_PARAMS.sortinoVeto}`, active: nVeto > 0,
       state: `${nVeto} titoli in veto (Sortino<${RISK_PARAMS.sortinoVeto} · Short≥15% · margine neg+PEG rotto)`,
       why: "Divieto di ACCUMULO su titoli che distruggono valore corretto per il rischio (downside deviation) o con short interest da squeeze. Non media al ribasso sul coltello che cade. Il veto vieta l'accumulo, non impone la vendita.", where: "motore (qualityVeto)" },
@@ -2024,7 +2024,7 @@ function openDecisionModal() {
      <div class="diary-add"><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
      <div class="diary-list" id="diary-list">${diaryHtml}</div>
      <details style="margin-top:14px"><summary style="cursor:pointer;font-size:12.5px;font-weight:600">✅ Validatore report AI (aprilo solo se ti serve)</summary>
-     <div class="info-line muted" style="font-size:11px;margin:6px 0">Incolla la risposta dell'LLM: gli ordini vengono estratti e verificati contro gli invarianti del fondo (ticker, stop&lt;limite≤prezzo, banda 30%, veto, cap 10% NAV, budget cassa−ES95) PRIMA di andare al broker. Non scrive nulla nel diario.</div>
+     <div class="info-line muted" style="font-size:11px;margin:6px 0">Incolla la risposta dell'LLM: gli ordini vengono estratti e verificati contro gli invarianti del fondo (ticker, stop&lt;limite≤prezzo, banda 30%, veto, cap ${RISK_PARAMS.capNoAdd_pct}% NAV, budget cassa−ES95) PRIMA di andare al broker. Non scrive nulla nel diario.</div>
      <div class="diary-add"><textarea id="val-input" rows="2" placeholder="Incolla qui il report dell'LLM…"></textarea><button class="btn btn-primary btn-sm" id="val-run">Valida ordini</button></div>
      <div id="val-out"></div></details>`);
   const refresh = () => { closeChartModal(); openDecisionModal(); };

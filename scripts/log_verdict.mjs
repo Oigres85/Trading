@@ -26,7 +26,12 @@ try {
   // ---- 1) verdetto di oggi via harness vm (stesso DOM-stub di test_app.mjs) ----
   const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
   const el = () => ({ addEventListener() {}, classList: { add() {}, remove() {}, toggle() {}, contains: () => false }, style: {}, dataset: {}, hidden: true, querySelector: () => el(), querySelectorAll: () => [], closest: () => null });
-  const ctx = { console, document: { querySelector: () => el(), querySelectorAll: () => [], getElementById: () => el(), createElement: () => el(), addEventListener() {}, body: el() }, localStorage: { getItem: () => null, setItem() {}, removeItem() {} }, window: { addEventListener() {}, matchMedia: () => ({ matches: false }) }, navigator: { clipboard: {} }, fetch: () => Promise.reject(new Error("offline")), setInterval: () => 0, clearInterval() {}, setTimeout: () => 0, clearTimeout() {}, Event: class {}, MutationObserver: class { observe() {} } };
+  // v152: lo stub localStorage serve i PARAMETRI DI RISCHIO DEL CEO da config/risk_params.json
+  // (sincronizzati dalla dashboard, v150). Prima il CI loggava il verdetto col cap di DEFAULT
+  // (10%) mentre il CEO opera col suo override (es. 20%): con cap diversi cambiano i CANDIDATI
+  // (AMD dentro/fuori) → il track record misurava un motore DIVERSO da quello del browser.
+  const riskOv = (() => { try { return readFileSync(join(ROOT, "config", "risk_params.json"), "utf8"); } catch { return null; } })();
+  const ctx = { console, document: { querySelector: () => el(), querySelectorAll: () => [], getElementById: () => el(), createElement: () => el(), addEventListener() {}, body: el() }, localStorage: { getItem: (k) => k === "risk_params_overrides" ? riskOv : null, setItem() {}, removeItem() {} }, window: { addEventListener() {}, matchMedia: () => ({ matches: false }) }, navigator: { clipboard: {} }, fetch: () => Promise.reject(new Error("offline")), setInterval: () => 0, clearInterval() {}, setTimeout: () => 0, clearTimeout() {}, Event: class {}, MutationObserver: class { observe() {} } };
   vm.createContext(ctx);
   vm.runInContext(src, ctx, { filename: "app.js" });
   const d = JSON.parse(readFileSync(DATAF, "utf8").replace(/\bNaN\b/g, "null"));

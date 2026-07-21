@@ -907,6 +907,15 @@ check("v151 held-candidate: candidato già detenuto con ratchet sopra il limite 
   const wlNb = line && /TSTW[^·]*posizione GIÀ detenuta/.test(line);
   return !wlNb && nbCount >= 0`));
 
+/* ---------- v152: coerenza UI col cap configurabile ---------- */
+check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/razionale (niente 10% hardcoded)", run(`
+  const saved = RISK_PARAMS.capNoAdd_pct;
+  RISK_PARAMS.capNoAdd_pct = 20;
+  const rules = riskRulesRegistry();
+  RISK_PARAMS.capNoAdd_pct = saved;
+  const cap = rules.find(r => r.label === "Cap d'ingresso");
+  return !!cap && cap.th === "20% NAV" && cap.state.includes("≥20% NAV") && cap.why.includes("20%") && !cap.state.includes("10%")`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {
