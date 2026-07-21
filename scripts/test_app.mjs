@@ -875,6 +875,20 @@ check("v149 validatore: il formato canonico A2 resta parsato identico (regressio
   const o = parseAIOrders("[TST1] — COMPRA ~14 quote a limite $95,50 con stop $88 (payload: ...)");
   return o.length === 1 && o[0].qty === 14 && o[0].limit === 95.5 && o[0].stop === 88`));
 
+/* ---------- v150: sync cloud parametri di rischio + distanza res in cella ---------- */
+check("v150 risk sync: la chiave _savedAt (stringa merge) NON inquina RISK_PARAMS né crasha applyRiskOverrides", run(`
+  const saved = RISK_PARAMS.capNoAdd_pct;
+  localStorage.setItem("risk_params_overrides", JSON.stringify({ capNoAdd_pct: 15, _savedAt: "2026-07-21T06:00:00Z" }));
+  applyRiskOverrides();
+  const ok = RISK_PARAMS.capNoAdd_pct === 15 && RISK_PARAMS._savedAt === undefined;
+  localStorage.removeItem("risk_params_overrides");
+  RISK_PARAMS.capNoAdd_pct = saved;
+  return ok`));
+check("v150 res distance: la cella Supp. mostra il distacco % della resistenza dal prezzo", run(`
+  const p = buildPrompt();
+  const row = p.split("\\n").find(l => l.startsWith("| ") && l.includes("TSTW"));
+  return row != null && row.includes("→ res $120 (+20%)")`));
+
 /* ---------- report ---------- */
 let fail = 0;
 for (const [name, ok] of T) {

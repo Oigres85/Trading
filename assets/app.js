@@ -1341,6 +1341,41 @@ function applyRiskOverrides() {
   }
 }
 applyRiskOverrides();   // gli override del CEO valgono da subito, prima di qualunque calcolo
+/* SYNC CLOUD dei parametri di rischio (v150) — stesso pattern di diario/override macro.
+   Prima vivevano SOLO in localStorage ("salvata su questo browser"): il cap 20% del CEO sul
+   Mac restava 10% su iPhone → lo STESSO bottone 📋 generava payload DIVERSI per device
+   (candidati 3 vs 4, riga cap diversa). Trovato eseguendo il prompt su me stesso (harness
+   senza localStorage = il "device nuovo"). Chiave _savedAt = merge whole-object: vince il
+   più recente; applyRiskOverrides la ignora (accetta solo numeri in banda). */
+const RISK_PARAMS_PATH = "config/risk_params.json";
+async function pushRiskParamsCloud(ov) {
+  const token = localStorage.getItem("gh_token");
+  if (!token) return;
+  try {
+    let sha;
+    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${RISK_PARAMS_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
+    if (g.ok) sha = (await g.json()).sha;
+    await fetch(`https://api.github.com/repos/${REPO}/contents/${RISK_PARAMS_PATH}`, {
+      method: "PUT", headers: ghHeaders(token),
+      body: JSON.stringify({ message: "Parametri di rischio (da dashboard)", content: btoa(unescape(encodeURIComponent(JSON.stringify(ov, null, 1)))), sha }),
+    });
+  } catch { /* offline: resta in locale */ }
+}
+async function loadRiskParamsCloud() {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${RISK_PARAMS_PATH}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return;
+    const cloud = await r.json();
+    if (!cloud || typeof cloud !== "object") return;
+    let local = {};
+    try { local = JSON.parse(localStorage.getItem("risk_params_overrides") || "{}"); } catch { local = {}; }
+    if ((cloud._savedAt || "") > (local._savedAt || "")) {
+      localStorage.setItem("risk_params_overrides", JSON.stringify(cloud));
+      applyRiskOverrides();
+      if (typeof DATA !== "undefined" && DATA) renderAll();
+    }
+  } catch { /* nessun file remoto */ }
+}
 
 /* beta effettivo di un titolo: PRIORITÀ alla regressione della pipeline sui log-rendimenti
    12M vs Nasdaq 100 (beta_ndx); fallback al beta Yahoo (5A mensile vs S&P) solo se manca. */
@@ -1777,14 +1812,18 @@ function initRiskEditor() {
     const v = parseFloat(String(inp.value).replace(",", "."));
     if (!Number.isFinite(v) || v < d.min || v > d.max) { toast(`Valore fuori banda: serve ${d.min}–${d.max}${d.unit}`); return; }
     const ov = ovs(); ov[d.key] = v / d.scale;                       // salvo in scala interna
+    ov._savedAt = new Date().toISOString();
     localStorage.setItem("risk_params_overrides", JSON.stringify(ov));
+    pushRiskParamsCloud(ov);   // sync su GitHub se c'è token (così è uguale su Mac e iPhone)
     applyRiskOverrides(); renderAll(); show();
-    toast(`${d.label} → ${v}${d.unit} ✓ (motore, verdetto ed export usano subito la nuova soglia; salvata su questo browser)`);
+    toast(`${d.label} → ${v}${d.unit} ✓ (motore, verdetto ed export usano subito la nuova soglia; sincronizzata sui tuoi dispositivi se c'è il token GitHub)`);
   });
   $("#rp-reset")?.addEventListener("click", () => {
     const d = RISK_PARAM_DEFS[+sel.value];
     const ov = ovs(); delete ov[d.key];
+    ov._savedAt = new Date().toISOString();
     localStorage.setItem("risk_params_overrides", JSON.stringify(ov));
+    pushRiskParamsCloud(ov);
     RISK_PARAMS[d.key] = d.scale === 100 ? d.def / 100 : d.def;
     applyRiskOverrides(); renderAll(); show();
     toast(`${d.label} riportato al default (${d.def}${d.unit})`);
@@ -5041,7 +5080,9 @@ function buildPrompt() {
     // supporto. Stessa banda di plausibilità del R/R (res ≤ 2× prezzo, res > supp).
     const resOk = r.resistance != null && r.support > 0 && r.resistance > r.support
       && r.price > 0 && r.resistance <= r.price * 2;
-    const suppCell = r.support ? `${c}${f(r.support)}${resOk ? ` → res ${c}${f(r.resistance)}` : ""}` : "—";
+    // v150: distanza % della res dal prezzo IN CELLA — una res lontana (es. +51% su un nome
+    // crollato) gonfia otticamente il R/R teorico: col numero accanto l'LLM pesa l'orizzonte.
+    const suppCell = r.support ? `${c}${f(r.support)}${resOk ? ` → res ${c}${f(r.resistance)} (${signTxt(Math.round((r.resistance / r.price - 1) * 1000) / 10)})` : ""}` : "—";
     // Sortino 6M accanto all'1A (v148): la "finestra di regime" era calcolata per tutti ma
     // mostrata solo per i riabilitati. È il dato ODIERNO che la SIMMETRIA DEL VETO richiede:
     // 1A negativo + 6M in recupero = veto ciclico; entrambi negativi = strutturale.
@@ -5055,7 +5096,7 @@ function buildPrompt() {
   const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
-  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Sortino 1A = Sharpe con la sola volatilità NEGATIVA: è il metro del veto value trap (< -0.3 = distruzione di valore sul downside); il \"(6M …)\" accanto è la FINESTRA DI REGIME: 1A negativo con 6M in recupero = danno ciclico in via di riassorbimento (evidenza ODIERNA per la simmetria del veto), entrambi negativi = strutturale. Supp. = supporto; \"→ res $Y\" nella stessa cella = RESISTENZA (il target del R/R teorico: reward = res − supp) — usali come livelli operativi di ingresso e presa di profitto. Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante. Float = azioni fluttuanti liberamente scambiabili (milioni/miliardi, e % sul totale). R/R teorico = GIÀ CALCOLATO dal sistema (reward = resistenza − supporto; risk = 2×ATR): usalo in Tabella B senza rifare l'algebra; n.d. = non calcolabile. \"→ agg. $X\" = PREZZO LIMITE AGGIUSTATO già calcolato dal sistema sul gap pre/after: USA QUELLO per gli ordini limite, non ricalcolare il gap a mano. [FX HEADWIND/TAILWIND] = large cap (mcap≥$100B) esposta al Righello Dollaro attivo.)");
+  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Sortino 1A = Sharpe con la sola volatilità NEGATIVA: è il metro del veto value trap (< -0.3 = distruzione di valore sul downside); il \"(6M …)\" accanto è la FINESTRA DI REGIME: 1A negativo con 6M in recupero = danno ciclico in via di riassorbimento (evidenza ODIERNA per la simmetria del veto), entrambi negativi = strutturale. Supp. = supporto; \"→ res $Y (+Z%)\" nella stessa cella = RESISTENZA col suo distacco dal prezzo (il target del R/R teorico: reward = res − supp) — usali come livelli operativi di ingresso e presa di profitto; una res molto distante (+30% e oltre) gonfia il R/R: pesane l'orizzonte. Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante. Float = azioni fluttuanti liberamente scambiabili (milioni/miliardi, e % sul totale). R/R teorico = GIÀ CALCOLATO dal sistema (reward = resistenza − supporto; risk = 2×ATR): usalo in Tabella B senza rifare l'algebra; n.d. = non calcolabile. \"→ agg. $X\" = PREZZO LIMITE AGGIUSTATO già calcolato dal sistema sul gap pre/after: USA QUELLO per gli ordini limite, non ricalcolare il gap a mano. [FX HEADWIND/TAILWIND] = large cap (mcap≥$100B) esposta al Righello Dollaro attivo.)");
   lines.push("· [LOW FLOAT RISK]: Un titolo con flottante ridotto (Low Float < 50M azioni) unito a uno Short Interest ≥ 15% e Volumi Anomali (RVol > 1.5) indica un rischio imminente di Short Squeeze o volatilità asimmetrica estrema. L'AI deve evidenziarlo come un'opportunità o un pericolo immediato di liquidità.");
   // MATRICE DI RISCHIO PER POSIZIONE: pesi MTM, MCR, beta NDX, correlazioni reali
   const riskRows = (DATA.portfolio || []).filter(r => r.qty && (r.risk_contrib_pct != null || r.avg_corr != null || r.beta_ndx != null));
@@ -6143,6 +6184,7 @@ loadData();
 loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
 loadPromptHeaderCloud();   // sincronizza la testata del prompt dal server (config/prompt_header.txt)
 loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
+loadRiskParamsCloud();   // sincronizza i parametri di rischio del CEO (config/risk_params.json) — cap/veto uguali su ogni device
 initRiskEditor();       // editor soglie di rischio (v143): select+valore+spiegazione
 // ricarica completa (tecnici, news, storico) ogni 5 minuti
 setInterval(() => loadData(), 5 * 60 * 1000);
