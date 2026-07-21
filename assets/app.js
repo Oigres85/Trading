@@ -4774,7 +4774,11 @@ function buildPrompt() {
           // UNA riga: prima l'LLM doveva assemblarli cercando in tabella e sbagliava (metteva il
           // limite nello slot "Prezzo" della citazione). Ora cita direttamente da qui.
           const rr = p.r.risk_reward ? ` / R/R ${p.r.risk_reward}` : "";
-          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}`;
+          // target = resistenza (v148): è il numeratore del R/R — senza stamparlo l'LLM vedeva
+          // il rapporto ma non il livello a cui punta il reward. Stessa banda di plausibilità.
+          const resT = (p.r.resistance != null && p.r.price > 0 && p.r.resistance > p.limit && p.r.resistance <= p.r.price * 2)
+            ? ` / target res. $${fmtNum.format(p.r.resistance)}` : "";
+          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}`;
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {
@@ -4968,13 +4972,28 @@ function buildPrompt() {
       : (r.price_asof && DATA.updated_at && r.price_asof < DATA.updated_at.slice(0, 10)
         ? ` [chiusura del ${new Date(r.price_asof + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}]` : "");
     const priceCell = `${c}${f(r.price)}${staleTag}${(adjL != null && r.price != null && Math.abs(adjL - r.price) / r.price > 0.001) ? ` → agg. ${c}${f(adjL)} (${r.prepost?.label || "ext"})` : ""}`;
-    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so} | ${dd} | ${shortF} | ${floatCell} | ${r.support ? c + f(r.support) : "—"} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${signalTxt(r)} | ${optNote} |`;
+    // Supp. + resistenza NELLA STESSA CELLA (v148): la resistenza era calcolata (è il "reward"
+    // del R/R teorico) ma MAI stampata — l'LLM vedeva il rapporto senza il livello target.
+    // In-cell (non nuova colonna) per non spostare gli indici I6 del red team (16=Supp., 17=Stop)
+    // e perché euro()/parseIt leggono il PRIMO numero → i validatori continuano a leggere il
+    // supporto. Stessa banda di plausibilità del R/R (res ≤ 2× prezzo, res > supp).
+    const resOk = r.resistance != null && r.support > 0 && r.resistance > r.support
+      && r.price > 0 && r.resistance <= r.price * 2;
+    const suppCell = r.support ? `${c}${f(r.support)}${resOk ? ` → res ${c}${f(r.resistance)}` : ""}` : "—";
+    // Sortino 6M accanto all'1A (v148): la "finestra di regime" era calcolata per tutti ma
+    // mostrata solo per i riabilitati. È il dato ODIERNO che la SIMMETRIA DEL VETO richiede:
+    // 1A negativo + 6M in recupero = veto ciclico; entrambi negativi = strutturale.
+    const so6 = r.sortino_6m != null ? ` (6M ${fmtNum.format(r.sortino_6m)})` : "";
+    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so}${so6} | ${dd} | ${shortF} | ${floatCell} | ${suppCell} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${signalTxt(r)} | ${optNote} |`;
   };
-  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A | Drawdown 52S | Short% | Float | Supp. | Stop 2×ATR | R/R teorico | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
+  // NB v148: "Supp." resta il NOME esatto della colonna (il red team I10 la cerca per nome; I6
+  // legge gli indici 16/17) — la resistenza vive DENTRO la cella ("$X → res $Y"), il Sortino 6M
+  // dentro la cella Sortino ("-0,4 (6M 0,2)"): niente colonne nuove, niente indici spostati.
+  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A (6M) | Drawdown 52S | Short% | Float | Supp. | Stop 2×ATR | R/R teorico | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
   const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
-  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Sortino 1A = Sharpe con la sola volatilità NEGATIVA: è il metro del veto value trap (< -0.3 = distruzione di valore sul downside). Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante. Float = azioni fluttuanti liberamente scambiabili (milioni/miliardi, e % sul totale). R/R teorico = GIÀ CALCOLATO dal sistema (reward = resistenza − supporto; risk = 2×ATR): usalo in Tabella B senza rifare l'algebra; n.d. = non calcolabile. \"→ agg. $X\" = PREZZO LIMITE AGGIUSTATO già calcolato dal sistema sul gap pre/after: USA QUELLO per gli ordini limite, non ricalcolare il gap a mano. [FX HEADWIND/TAILWIND] = large cap (mcap≥$100B) esposta al Righello Dollaro attivo.)");
+  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Sortino 1A = Sharpe con la sola volatilità NEGATIVA: è il metro del veto value trap (< -0.3 = distruzione di valore sul downside); il \"(6M …)\" accanto è la FINESTRA DI REGIME: 1A negativo con 6M in recupero = danno ciclico in via di riassorbimento (evidenza ODIERNA per la simmetria del veto), entrambi negativi = strutturale. Supp. = supporto; \"→ res $Y\" nella stessa cella = RESISTENZA (il target del R/R teorico: reward = res − supp) — usali come livelli operativi di ingresso e presa di profitto. Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante. Float = azioni fluttuanti liberamente scambiabili (milioni/miliardi, e % sul totale). R/R teorico = GIÀ CALCOLATO dal sistema (reward = resistenza − supporto; risk = 2×ATR): usalo in Tabella B senza rifare l'algebra; n.d. = non calcolabile. \"→ agg. $X\" = PREZZO LIMITE AGGIUSTATO già calcolato dal sistema sul gap pre/after: USA QUELLO per gli ordini limite, non ricalcolare il gap a mano. [FX HEADWIND/TAILWIND] = large cap (mcap≥$100B) esposta al Righello Dollaro attivo.)");
   lines.push("· [LOW FLOAT RISK]: Un titolo con flottante ridotto (Low Float < 50M azioni) unito a uno Short Interest ≥ 15% e Volumi Anomali (RVol > 1.5) indica un rischio imminente di Short Squeeze o volatilità asimmetrica estrema. L'AI deve evidenziarlo come un'opportunità o un pericolo immediato di liquidità.");
   // MATRICE DI RISCHIO PER POSIZIONE: pesi MTM, MCR, beta NDX, correlazioni reali
   const riskRows = (DATA.portfolio || []).filter(r => r.qty && (r.risk_contrib_pct != null || r.avg_corr != null || r.beta_ndx != null));

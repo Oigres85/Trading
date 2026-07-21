@@ -286,7 +286,7 @@ check("marginDebtState v106: YoY 54% → ESTREMA; MoM -3 dai massimi → DELEVER
 const prompt = run(`buildPrompt()`);
 const has = (s) => prompt.includes(s);
 check("prompt: advisory libero + mandato consegna minima anti-laziness", has("DELEGA PIENA SULLA FORMA") && has("MANDATO DI CONSEGNA MINIMA") && has("FAI DOMANDE"));
-check("prompt: colonna Sortino 1A nella tabella PORTAFOGLIO", has("| Sortino 1A |"));
+check("prompt: colonna Sortino 1A (6M) nella tabella PORTAFOGLIO", has("| Sortino 1A (6M) |"));
 check("prompt: consegna minima (leading KOSPI/Nasdaq/BTC, quote esatte, news, gap pre/after)", has("KOSPI") && has("Bitcoin") && has("calcolo MATEMATICO ESATTO della quantità") && has("NEWS SPECIFICHE") && has("GAP PRE/AFTER-MARKET"));
 check("prompt: matrice di rischio per posizione", has("MATRICE DI RISCHIO PER POSIZIONE"));
 check("prompt: flag [STOP VIOLATO] su TST3", /\[STOP VIOLATO\][\s\S]*TST3|TST3[^\n]*\[STOP VIOLATO\]/.test(prompt));
@@ -824,6 +824,31 @@ check("v146 cap display: il BTP (bond, beta 0) NON compare nella lista over-cap 
   RISK_PARAMS.capNoAdd_pct = saved;
   const m = p.match(/SOPRA il cap d'ingresso[^\\n]*/);
   return m == null || !/BTP/.test(m[0])`));
+
+/* ---------- v148: resistenza + Sortino 6M nel payload (dati calcolati ma mai stampati) ---------- */
+check("v148 resistenza: la cella Supp. porta anche la resistenza ('→ res $Y') quando plausibile", run(`
+  const r = DATA.watchlist.find(x => x.ticker === "TSTW");   // support 95, resistance 120, price 100
+  const p = buildPrompt();
+  const row = p.split("\\n").find(l => l.startsWith("| ") && l.includes("TSTW"));
+  return row != null && row.includes("$95") && row.includes("→ res $120")`));
+check("v148 resistenza: fuori banda (res > 2× prezzo) → NON stampata (niente target garbage)", run(`
+  const r = DATA.watchlist.find(x => x.ticker === "TSTW");
+  const saved = r.resistance; r.resistance = r.price * 100;
+  const p = buildPrompt();
+  r.resistance = saved;
+  const row = p.split("\\n").find(l => l.startsWith("| ") && l.includes("TSTW"));
+  return row != null && !row.includes("→ res")`));
+check("v148 Sortino 6M: la finestra di regime compare accanto all'1A ('(6M …)') quando disponibile", run(`
+  const r = DATA.portfolio.find(x => x.ticker === "TST1");
+  const saved = r.sortino_6m; r.sortino_6m = 0.85;
+  const p = buildPrompt();
+  r.sortino_6m = saved;
+  const row = p.split("\\n").find(l => l.startsWith("| ") && l.includes("TST1"));
+  return p.includes("Sortino 1A (6M)") && row != null && row.includes("(6M 0,85)")`));
+check("v148 Livelli motore: la riga dei candidati include il 'target res.' (numeratore del R/R)", run(`
+  const dv = decisionVerdict();
+  const p = buildPrompt();
+  return (dv.withPlan || []).length === 0 || p.includes("target res. $")`));
 
 /* ---------- report ---------- */
 let fail = 0;
