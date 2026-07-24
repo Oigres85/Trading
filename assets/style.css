@@ -818,7 +818,7 @@ tr.val-ok td { background: rgba(34,197,94,.07); }
 .earn-card-wl:hover { opacity: 1; transition: opacity .15s; }
 
 /* ---------- Prompt 17: Beta button ---------- */
-.beta-btn { background: none; border: none; padding: 0; cursor: pointer; color: inherit; font: inherit; width: 100%; }
+.beta-cell { display: block; width: 100%; }
 
 /* ---------- v64: RS (forza relativa) cell clickable ---------- */
 .rs-cell { cursor: pointer; }

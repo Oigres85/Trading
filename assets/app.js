@@ -1385,27 +1385,6 @@ function betaOf(r) {
   return r.beta ?? null;
 }
 
-/* Beta di Portafoglio (weighted beta vs NDX): Σ beta_i × peso_i MARK-TO-MARKET sul capitale
-   investito (liquidità esclusa). Il BTP conta con beta 0. "src" dice se il dato viene dalla
-   regressione della pipeline o dal fallback Yahoo. */
-function portfolioBeta() {
-  const inv = (DATA?.portfolio || []).filter(r => (r.val_eur || 0) > 0);
-  const tot = inv.reduce((s, r) => s + r.val_eur, 0);
-  if (!tot) return null;
-  let wb = 0, covered = 0, regEur = 0;
-  inv.forEach(r => {
-    const beta = betaOf(r);
-    if (beta != null) {
-      wb += beta * r.val_eur; covered += r.val_eur;
-      if (r.beta_ndx != null || r.ticker === "BTP-V28") regEur += r.val_eur;
-    }
-  });
-  if (!covered) return null;
-  const allReg = regEur >= covered * 0.999;
-  return { beta: Math.round(wb / tot * 100) / 100, total: tot,
-           src: allReg ? "regressione log-return 12M vs NDX" : "misto: regressione NDX + fallback Yahoo",
-           fromPipeline: DATA?.totals?.portfolio_beta_ndx ?? null };
-}
 
 /* Rischio cambio EUR/USD: quota % del NAV (investito + liquidità EUR) denominata in USD
    e NON coperta — un apprezzamento dell'euro erode i guadagni in dollari a parità di prezzi. */
@@ -2231,24 +2210,6 @@ function renderMiniCards() {
         <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
     }
   }
-  // Beta di Portafoglio vs NDX (rischio sistematico aggregato): weighted beta MTM
-  const betaBox = $("#beta-box");
-  if (betaBox) {
-    const pb = portfolioBeta();
-    if (pb) {
-      // beta 1.0 = NDX; >1.3 aggressivo (giallo/rosso), <0.8 difensivo
-      const score = clamp(100 - (pb.beta - 0.5) * 55);
-      const lab = pb.beta >= 1.5 ? "Molto aggressivo" : pb.beta >= 1.2 ? "Aggressivo" : pb.beta >= 0.8 ? "In linea col mercato" : "Difensivo";
-      betaBox.innerHTML = `<div class="mc-title">Beta Portafoglio (vs NDX)</div>
-        <div class="mc-value" style="color:${scoreColor(score)}">${fmtNum.format(pb.beta)} · ${lab}</div>
-        ${thermoLine(score, ["Difensivo", "Aggressivo"])}
-        <div class="mc-sub muted">${esc(pb.src)} · clicca per stress test</div>`;
-    } else {
-      betaBox.innerHTML = `<div class="mc-title">Beta Portafoglio (vs NDX)</div>
-        <div class="mc-value muted">—</div>${thermoLine(50, ["Difensivo", "Aggressivo"])}
-        <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
-    }
-  }
   // Rischio Cambio EUR/USD: quota del NAV in USD non coperta
   const fxBox = $("#fx-box");
   if (fxBox) {
@@ -2643,39 +2604,6 @@ function renderKPI() {
 
 }
 
-/* Popup "Beta di Portafoglio": weighted beta, contributi per titolo e stress test vs Nasdaq */
-function openBetaSimulator() {
-  const t = DATA.totals;
-  const patrimonio = t.eur_invested + cashEur;
-  const pb = portfolioBeta();
-  if (!pb) { toast("Beta non disponibile per il portafoglio"); return; }
-  const scenarios = [-10, -15, -20, -30, -40];
-  const rows = scenarios.map(ndxChg => {
-    const ptfChg = ndxChg * pb.beta;
-    const lossEur = t.eur_invested * ptfChg / 100;
-    return `<tr>
-      <td class="num neg">Nasdaq ${ndxChg}%</td>
-      <td class="num neg">${signTxt(Math.round(ptfChg * 10) / 10)}</td>
-      <td class="num neg">${signTxt(Math.round(lossEur), " €")}</td>
-      <td class="num">${fmtEUR.format(Math.round(patrimonio + lossEur))}</td>
-    </tr>`;
-  }).join("");
-  const holdings = (DATA.portfolio || []).filter(r => betaOf(r) != null && (r.val_eur || 0) > 0);
-  const tkBetas = holdings.slice().sort((a, b) => betaOf(b) - betaOf(a)).map(r => {
-    const b = betaOf(r);
-    const w = positionWeightPct(r);
-    const srcTag = r.beta_ndx != null ? "" : (r.ticker === "BTP-V28" ? "" : "*");
-    return `<span>${r.ticker} <b style="color:${scoreColor(clamp(100 - (b - 0.5) * 55))}">${fmtNum.format(b)}${srcTag}</b>${w != null ? ` <span class="muted">(${fmtNum.format(w)}%)</span>` : ""}</span>`;
-  }).join(" · ");
-  const anyFallback = holdings.some(r => r.beta_ndx == null && r.ticker !== "BTP-V28");
-  openInfoModal("Beta di Portafoglio vs Nasdaq 100 — rischio sistematico", `
-    <div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Beta di Portafoglio = Σ (beta del titolo × peso % <b>mark-to-market</b> sul capitale investito, liquidità esclusa). Il beta di ogni titolo è la <b>regressione dei log-rendimenti giornalieri 12M vs Nasdaq 100</b> (il benchmark del mandato), non il beta 5A di Yahoo. Beta 1,4 → una discesa del NDX del 10% pesa ~14% sul portafoglio. Il BTP conta con beta 0.</div>
-    <div class="info-line"><b>Beta di Portafoglio:</b> <b style="font-family:var(--mono);font-size:18px">${fmtNum.format(pb.beta)}</b> <span class="muted">(vs NDX 1.0 · ${esc(pb.src)})</span></div>
-    <div class="info-line"><b>Capitale investito:</b> ${fmtEUR.format(Math.round(t.eur_invested))} · liquidità ${fmtEUR.format(cashEur)}</div>
-    <div class="info-line muted" style="font-size:11px;margin-bottom:10px">Beta × peso per titolo: ${tkBetas}${anyFallback ? ` <span class="muted">(* = fallback Yahoo, in attesa del run pipeline)</span>` : ""}</div>
-    <table class="info-table"><thead><tr><th>Scenario Nasdaq 100</th><th>Impatto stim.</th><th>P&amp;L stimato</th><th>Patrimonio risultante</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="info-line muted" style="font-size:11px;margin-top:8px">Formula: impatto = Δ% NDX × Beta di Portafoglio, applicato al solo capitale investito. Non considera ribilanciamento, stop 2×ATR o coperture: è lo scenario passivo peggiore.</div>`);
-}
 
 /* variazione % giornaliera del portafoglio = media pesata (per controvalore) dei titoli USD */
 function portfolioDayPct() {
@@ -2863,7 +2791,7 @@ function betaBar(r) {
   if (beta === null || beta === undefined) return "—";
   const bar = meterBar(Math.min(beta, 3) / 3 * 100, scoreColor(clamp(100 - (beta - 0.5) * 55)), fmtNum.format(beta));
   if (!tk) return bar;
-  return `<button class="beta-btn" data-beta-tk="${tk}" title="Beta ${src} — clicca per lo stress test di portafoglio">${bar}</button>`;
+  return `<span class="beta-cell" data-beta-tk="${tk}" title="Beta ${src} (regressione log-rendimenti 12M vs Nasdaq 100)">${bar}</span>`;
 }
 
 function prepostCell(pp) {
@@ -4776,8 +4704,6 @@ function buildPrompt() {
     const isHist = t.var95_hist_eur != null;
     if (vE != null) riskBits.push(`VaR 95% a 1 giorno${isHist ? " (STORICO, percentili empirici 12M — onesto sulle code grasse)" : " (parametrico normale — sottostima le code)"}: ${fmtEUR.format(vE)} (${fmtNum.format(vP)}% del comparto azionario)${eE != null ? `, Expected Shortfall 95% a 1 GIORNO: ${fmtEUR.format(eE)} (perdita MEDIA nel 5% dei giorni peggiori — orizzonte GIORNALIERO, non annuale)` : ""}${isHist && t.var95_1d_eur != null ? ` [parametrico: ${fmtEUR.format(t.var95_1d_eur)}]` : ""}`);
   }
-  const pbP = portfolioBeta();
-  if (pbP) riskBits.push(`Beta di Portafoglio: ${fmtNum.format(pbP.beta)} vs Nasdaq 100 (=1.0) — ${pbP.src}, pesi mark-to-market sul capitale investito, liquidità esclusa, BTP a beta 0`);
   if (t.avg_pairwise_corr != null) riskBits.push(`correlazione media tra le posizioni: ${fmtNum.format(t.avg_pairwise_corr)} (log-rendimenti giornalieri 12M, calcolata sul SOLO comparto azionario — BTP e liquidità NON sono nel calcolo, quindi non la "mitigano"; più è alta, minore la diversificazione reale)`);
   const fxP = fxExposure();
   if (fxP) riskBits.push(`Rischio cambio EUR/USD: ${fmtNum.format(fxP.pct)}% del NAV denominato in USD NON coperto${fxP.eurusd ? ` (EUR/USD ${fmtNum.format(fxP.eurusd)})` : ""} — un apprezzamento dell'euro dell'1% costa ~${fmtEUR.format(Math.round(fxP.usdEur * 0.01))} a parità di prezzi`);
@@ -5729,8 +5655,141 @@ function historicalDigestText() {
   L.push("USO: incrocia il CAGR pluriennale col YoY delle tabelle — quando il YoY gonfiato da un ciclo diverge dal CAGR (es. rimbalzo memorie), è un rimbalzo, non crescita strutturale. Sulle pendenze macro, sia gli ESTREMI (Margin Debt a ridosso del picco = leva estrema, HY OAS ai minimi del range = compiacenza del credito) sia le INVERSIONI DI TENDENZA (leva in deleveraging, spread in allargamento, curva in dis-inversione) segnalano fragilità → riduci il sizing dei nuovi ingressi prima che i prezzi lo confermino. Usa ΔRS/ΔMCR e ⚠deg per anticipare i downgrade PRIMA della rottura tecnica.");
   return L.join("\n");
 }
+/* ═══════════════════ MOTORE DI CORRELAZIONE (v154) ═══════════════════
+   Il problema che risolve: il payload consegnava news, settori e posizioni in SILOS separati,
+   lasciando all'LLM tutto il lavoro di join su ~65k caratteri. Risultato: non lo faceva, e
+   ripiegava sul riassunto del verdetto del motore (risposte "banali e meccaniche").
+   Qui il join lo fa il CODICE — deterministico, verificabile — così l'LLM riceve il segnale
+   GIÀ COLLEGATO al book e può spendere il suo budget in giudizio, non in aggregazione.
+   NB: le news arrivano con tickers quasi sempre solo [MACRO] (build_keywords cerca il ticker
+   letterale nel titolo): la classificazione TEMATICA qui sotto è ciò che le rende utilizzabili. */
+/* Matcher per tema. ATTENZIONE ai falsi positivi (visti sul campo):
+   - "AI" va cercato SOLO come acronimo MAIUSCOLO nel titolo inglese: in italiano "ai" è una
+     preposizione comune e classificava news di previdenza sociale come AI/DATACENTER;
+   - la geopolitica generica (guerra/Iran) NON va mappata sui semiconduttori: colpisce
+     l'appetito al rischio (→ beta), mentre solo dazi/export-control toccano la filiera. */
+const NEWS_THEMES = [
+  { id: "SEMI/CHIP", tk: ["AMD", "NVDA", "AVGO", "MU", "TSM", "SNDK", "INTC", "SMCI", "SKHY", "WDC", "MRVL", "CBRS"],
+    m: (en, it) => /chip|semiconduc|foundry|wafer|\bdram\b|\bnand\b|\bhbm\b|\bgpu\b|nvidia|tsmc|micron/i.test(en) || /semicondutt|chip/i.test(it) },
+  { id: "AI/DATACENTER", tk: ["NVDA", "AMD", "AVGO", "MU", "PLTR", "SMCI", "CBRS", "GOOGL", "META", "ORCL", "NOW", "MRVL"],
+    m: (en, it) => /\bAI\b/.test(en) || /artificial intelligence|data ?cent(er|re)|\bLLM\b|openai|inference/i.test(en) || /intelligenza artificiale|data ?center/i.test(it) },
+  { id: "TASSI/FED/INFLAZIONE", tk: null,   // null = colpisce per MULTIPLO/BETA (il codice sceglie)
+    m: (en, it) => /\bfed\b|fomc|powell|interest rate|\brates?\b|inflation|\bcpi\b|\bpce\b|yield|treasury|bond sell|hawkish|dovish/i.test(en) || /inflazion|tass[oi] d|rendiment/i.test(it) },
+  { id: "CLOUD/SOFTWARE", tk: ["ORCL", "PLTR", "CRM", "NOW", "PATH", "GOOGL", "AMZN"],
+    m: (en, it) => /\bcloud\b|software|\bsaas\b|subscription/i.test(en) || /\bcloud\b|software/i.test(it) },
+  { id: "CRYPTO", tk: ["MSTR", "CRCL", "BTC-USD"],
+    m: (en, it) => /bitcoin|crypto|ethereum|blockchain|stablecoin/i.test(en + " " + it) },
+  { id: "ENERGIA/OIL", tk: ["CL=F"],
+    m: (en, it) => /\boil\b|crude|opec|brent|\bwti\b|energy shock|natural gas/i.test(en) || /petroli|greggio|shock energetic/i.test(it) },
+  { id: "NUCLEARE/UTILITY", tk: ["OKLO", "CEG", "BE"],
+    m: (en, it) => /nuclear|reactor|\bSMR\b|power grid|electricity demand/i.test(en) || /nuclear|rete elettric/i.test(it) },
+  { id: "DAZI/EXPORT-CONTROL", tk: ["TSM", "AVGO", "MU", "NVDA", "AMD"],   // SOLO filiera/supply chain
+    m: (en, it) => /tariff|export control|trade probe|trade war|chip ban|sanction.{0,20}(chip|tech|semicon)/i.test(en) || /dazi|controlli all.export|guerra commercial/i.test(it) },
+  { id: "GEOPOLITICA (risk-off)", tk: null,   // appetito al rischio → colpisce i beta alti
+    m: (en, it) => /\bwar\b|iran|hormuz|middle east|missile|airstrike|invasion/i.test(en) || /guerra|iran|medio oriente/i.test(it) },
+  { id: "REGOLAM./MEGACAP", tk: ["GOOGL", "META"],
+    m: (en, it) => /antitrust|\bEU fine|probe into tech|privacy fine|alphabet|\bgoogle\b|\bmeta\b/i.test(en) || /antitrust|multe dell.UE|aziende tecnolog/i.test(it) },
+];
+function marketLinkText() {
+  const L = [];
+  const ptf = (DATA.portfolio || []).filter(isEquity);
+  const wl = (DATA.watchlist || []).filter(isEquity);
+  const held = new Map(ptf.map(r => [r.ticker, r]));
+  const universe = new Map([...ptf, ...wl].map(r => [r.ticker, r]));
+  const wOf = (r) => positionWeightPct(r);
+  const rsOf = (r) => dgFin(r.rs_ndx_1m ?? r.rs_1m);
+  const mcrOf = (r) => dgFin(r.risk_contrib_pct);
+  const tag = (r) => {
+    const w = wOf(r), rs = rsOf(r), m = mcrOf(r);
+    const bits = [];
+    if (w != null) bits.push(`${fmtNum.format(w)}% NAV`);
+    if (m != null) bits.push(`MCR ${fmtNum.format(m)}%`);
+    if (rs != null) bits.push(`RS ${signTxt(rs, "pp")}`);
+    return `${r.ticker}${held.has(r.ticker) ? "" : " [wl]"}${bits.length ? ` (${bits.join(" · ")})` : ""}`;
+  };
+
+  // ── 1) TEMI DELLE NEWS → POSIZIONI TOCCATE ────────────────────────────────
+  const news = (DATA.news || []).filter(n => n && n.title);
+  const themed = [];
+  for (const th of NEWS_THEMES) {
+    const hits = news.filter(n => th.m(n.title || "", n.title_it || ""));
+    if (!hits.length) continue;
+    let targets;
+    if (th.tk) targets = th.tk.map(t => universe.get(t)).filter(Boolean);
+    else {   // temi TASSI/GEOPOLITICA: colpiscono chi paga multiplo/beta — i più sensibili del book
+      targets = [...universe.values()]
+        .filter(r => (dgFin(r.beta_ndx) ?? 0) >= 1.5 || (dgFin(r.pe) ?? 0) >= 60)
+        .sort((a, b) => (dgFin(b.beta_ndx) ?? 0) - (dgFin(a.beta_ndx) ?? 0));
+    }
+    // le posizioni DETENUTE vanno prima: sono quelle su cui il CEO decide oggi
+    targets.sort((a, b) => (held.has(b.ticker) ? 1 : 0) - (held.has(a.ticker) ? 1 : 0));
+    const inPtf = targets.filter(r => held.has(r.ticker));
+    if (!targets.length) continue;
+    const expo = inPtf.reduce((s, r) => s + (wOf(r) ?? 0), 0);
+    themed.push({ id: th.id, n: hits.length, sample: (hits[0].title_it || hits[0].title).slice(0, 110),
+                  targets: targets.slice(0, 8), expo, inPtf: inPtf.length });
+  }
+  themed.sort((a, b) => b.expo - a.expo || b.n - a.n);
+  if (themed.length) {
+    L.push("· TEMI DELLE NEWS DI OGGI → LE TUE POSIZIONI ESPOSTE (il collegamento news↔book, che i ticker delle news NON danno):");
+    for (const t of themed) {
+      L.push(`  [${t.id}] ${t.n} news · es. "${t.sample}" → ${t.targets.map(tag).join(" · ")}${t.inPtf ? ` — esposizione in PTF ${fmtNum.format(Math.round(t.expo * 10) / 10)}% del NAV` : " — nessuna posizione detenuta (solo watchlist)"}`);
+    }
+  }
+
+  // ── 2) ROTAZIONE SETTORIALE → MIA ESPOSIZIONE ─────────────────────────────
+  const tilt = ((DATA.macro || {}).tilt || []).filter(x => x && dgFin(x.m1) != null);
+  if (tilt.length) {
+    const themeOf = (name) => NEWS_THEMES.find(t => new RegExp(t.id.split("/")[0], "i").test(name)
+      || (t.id === "SEMI/CHIP" && /semicondut/i.test(name)) || (t.id === "ENERGIA/OIL" && /energia/i.test(name))
+      || (t.id === "NUCLEARE/UTILITY" && /utilit/i.test(name)) || (t.id === "CLOUD/SOFTWARE" && /software|cloud/i.test(name)));
+    const rows = [];
+    for (const s of tilt.slice().sort((a, b) => dgFin(b.m1) - dgFin(a.m1))) {
+      const th = themeOf(s.name || "");
+      const mine = th && th.tk ? th.tk.map(t => held.get(t)).filter(Boolean) : [];
+      if (!mine.length) continue;
+      const expo = mine.reduce((acc, r) => acc + (wOf(r) ?? 0), 0);
+      const rsAvg = mine.map(rsOf).filter(x => x != null);
+      rows.push(`  ${s.name} (${s.ticker}) ${signTxt(dgFin(s.m1))} 1M → tue posizioni: ${mine.map(r => r.ticker).join("+")} = ${fmtNum.format(Math.round(expo * 10) / 10)}% del NAV${rsAvg.length ? ` · RS media ${signTxt(Math.round(rsAvg.reduce((a, b) => a + b, 0) / rsAvg.length * 10) / 10, "pp")}` : ""}`);
+    }
+    if (rows.length) {
+      L.push("· VENTO SETTORIALE vs DOVE SEI PESANTE (rotazione 1M incrociata col book):");
+      L.push(...rows);
+    }
+  }
+
+  // ── 3) DIVERGENZE: dove i dati si contraddicono (gli SPUNTI da spiegare) ──
+  const div = [];
+  for (const r of ptf) {
+    const rs = rsOf(r), w = wOf(r), m = mcrOf(r);
+    const nTheme = themed.filter(t => t.targets.some(x => x.ticker === r.ticker));
+    if (nTheme.length && rs != null && rs <= -5) {
+      div.push(`  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] ma la sua forza relativa è ${signTxt(rs, "pp")} vs NDX → il flusso NON conferma la narrativa delle news`);
+    }
+    if (m != null && w != null && m >= w * 1.6 && m >= 15) {
+      div.push(`  ${r.ticker}: pesa ${fmtNum.format(w)}% del NAV ma genera ${fmtNum.format(m)}% del rischio (${fmtNum.format(Math.round(m / w * 10) / 10)}× il suo peso) → è qui che si decide la volatilità del fondo`);
+    }
+    const st = r.qty ? stopOf(r) : null;
+    if (st && st.stop > 0 && r.price > 0 && !st.violated) {
+      const dist = (r.price / st.stop - 1) * 100;
+      if (dist <= 3 && (w ?? 0) >= 5) div.push(`  ${r.ticker}: stop a ${signTxt(Math.round(dist * 10) / 10)} dal prezzo su una posizione da ${fmtNum.format(w)}% del NAV → una seduta storta la porta in esecuzione`);
+    }
+  }
+  if (div.length) {
+    L.push("· DIVERGENZE RILEVATE DAL SISTEMA (contraddizioni nei dati: spiegale, non elencarle):");
+    L.push(...div.slice(0, 8));
+  }
+
+  if (!L.length) return "";
+  return "=== CORRELAZIONI CALCOLATE — COSA MUOVE IL TUO PORTAFOGLIO OGGI ===\n"
+       + "(join news↔settori↔posizioni fatto dal sistema: NON ripeterlo, USALO come materia prima del ragionamento)\n"
+       + L.join("\n");
+}
+
 function buildCIOText() {
-  return buildExecutiveDelta() + "\n\n" + buildPrompt() + "\n\n" + historicalDigestText();
+  const link = marketLinkText();
+  return buildExecutiveDelta() + "\n\n" + buildPrompt() + "\n\n"
+       + (link ? link + "\n\n" : "") + historicalDigestText();
 }
 
 /* ---------- azione unica: copia il pacchetto completo e mostralo nella modal ---------- */
@@ -6002,7 +6061,6 @@ $("#alloc-edit")?.addEventListener("click", openEditPortfolio);
 $("#kpi-edit")?.addEventListener("click", openEditPortfolio);
 $("#btn-diary")?.addEventListener("click", openDecisionModal);
 $("#sharpe-box")?.addEventListener("click", openPortfolioSharpeModal);
-$("#beta-box")?.addEventListener("click", openBetaSimulator);
 $("#fx-box")?.addEventListener("click", openFxModal);
 $("#margin-debt-box")?.addEventListener("click", openMarginDebtModal);
 
@@ -6034,8 +6092,6 @@ document.addEventListener("click", e => {
   if (fr) { openFinancialsModal(fr.dataset.fundTk); return; }
   const sc = e.target.closest(".stat-cell");           // click su una metrica → spiegazione
   if (sc) { toast(sc.dataset.info); return; }
-  const bb = e.target.closest(".beta-btn");            // click su Beta → simulatore drawdown
-  if (bb) { openBetaSimulator(); return; }
   const rc = e.target.closest(".rs-cell");             // click su RS 1M → spiegazione forza relativa
   if (rc && rc.dataset.rsTk) { openRsInfo(rc.dataset.rsTk); return; }
   const shc = e.target.closest(".sharpe-cell");        // click su Sharpe 1A → spiegazione
