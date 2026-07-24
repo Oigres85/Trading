@@ -5668,32 +5668,61 @@ function historicalDigestText() {
      preposizione comune e classificava news di previdenza sociale come AI/DATACENTER;
    - la geopolitica generica (guerra/Iran) NON va mappata sui semiconduttori: colpisce
      l'appetito al rischio (→ beta), mentre solo dazi/export-control toccano la filiera. */
+/* CLASSIFICAZIONE AUTOMATICA (v155) — i temi NON hanno più liste di ticker da aggiornare a mano.
+   Ogni titolo si auto-assegna dai PROPRI dati (sector, rs_bench, name, market cap): un nome nuovo
+   aggiunto in watchlist entra nei temi DA SOLO, senza toccare il codice. Prima ogni ingresso
+   (WDC/MRVL/NOW/BE…) restava invisibile al motore di correlazione finché non lo si aggiungeva a
+   mano — e un rename del ticker (TSM→TSMC) lo faceva uscire in silenzio dal tema.
+   Uniche eccezioni: i proxy SEMANTICI che i dati non possono esprimere (MSTR è "Technology" e
+   CRCL "Financial Services", ma di fatto seguono il bitcoin) → THEME_SEED, additivo e dichiarato. */
+const THEME_SEED = { CRYPTO: ["MSTR", "CRCL", "BTC-USD"] };
+const thName = (r) => `${r.name || ""} ${r.ticker || ""}`;
+const thIsSemi = (r) => r.rs_bench === "sox"
+  || /semiconduc|semicondutt|foundry|micron|sandisk|western digital|hynix|taiwan semi|marvell|cerebras|super micro|broadcom|nvidia|intel|rigetti/i.test(thName(r))
+  || /^(TSMC?|WDC|SNDK|MRVL|SMCI|CBRS|SKHY)$/i.test(r.ticker || "");
+const thIsSoftware = (r) => r.sector === "Technology" && !thIsSemi(r);
+const thIsEnergy = (r) => r.sector === "Utilities" || /nuclear|energy|reactor|power|solar/i.test(thName(r));
+const thIsMegacapComm = (r) => r.sector === "Communication Services"
+  && (dgFin((r.stats || {}).market_cap) ?? 0) >= 100e9;
+const thIsOil = (r) => /petroli|greggio|crude|\boil\b|\bWTI\b/i.test(thName(r)) || /^CL=F$/.test(r.ticker || "");
 const NEWS_THEMES = [
-  { id: "SEMI/CHIP", tk: ["AMD", "NVDA", "AVGO", "MU", "TSM", "SNDK", "INTC", "SMCI", "SKHY", "WDC", "MRVL", "CBRS"],
+  { id: "SEMI/CHIP", sel: thIsSemi,
     m: (en, it) => /chip|semiconduc|foundry|wafer|\bdram\b|\bnand\b|\bhbm\b|\bgpu\b|nvidia|tsmc|micron/i.test(en) || /semicondutt|chip/i.test(it) },
-  { id: "AI/DATACENTER", tk: ["NVDA", "AMD", "AVGO", "MU", "PLTR", "SMCI", "CBRS", "GOOGL", "META", "ORCL", "NOW", "MRVL"],
+  { id: "AI/DATACENTER", sel: (r) => thIsSemi(r) || thIsSoftware(r) || thIsMegacapComm(r),
     m: (en, it) => /\bAI\b/.test(en) || /artificial intelligence|data ?cent(er|re)|\bLLM\b|openai|inference/i.test(en) || /intelligenza artificiale|data ?center/i.test(it) },
-  { id: "TASSI/FED/INFLAZIONE", tk: null,   // null = colpisce per MULTIPLO/BETA (il codice sceglie)
+  { id: "TASSI/FED/INFLAZIONE", sel: null,   // null = colpisce per MULTIPLO/BETA (il codice sceglie)
     m: (en, it) => /\bfed\b|fomc|powell|interest rate|\brates?\b|inflation|\bcpi\b|\bpce\b|yield|treasury|bond sell|hawkish|dovish/i.test(en) || /inflazion|tass[oi] d|rendiment/i.test(it) },
-  { id: "CLOUD/SOFTWARE", tk: ["ORCL", "PLTR", "CRM", "NOW", "PATH", "GOOGL", "AMZN"],
+  { id: "CLOUD/SOFTWARE", sel: thIsSoftware,
     m: (en, it) => /\bcloud\b|software|\bsaas\b|subscription/i.test(en) || /\bcloud\b|software/i.test(it) },
-  { id: "CRYPTO", tk: ["MSTR", "CRCL", "BTC-USD"],
+  { id: "CRYPTO", sel: (r) => /bitcoin|crypto|blockchain|stablecoin/i.test(thName(r)) || /-USD$/.test(r.ticker || ""),
     m: (en, it) => /bitcoin|crypto|ethereum|blockchain|stablecoin/i.test(en + " " + it) },
-  { id: "ENERGIA/OIL", tk: ["CL=F"],
+  { id: "ENERGIA/OIL", sel: thIsOil,
     m: (en, it) => /\boil\b|crude|opec|brent|\bwti\b|energy shock|natural gas/i.test(en) || /petroli|greggio|shock energetic/i.test(it) },
-  { id: "NUCLEARE/UTILITY", tk: ["OKLO", "CEG", "BE"],
+  { id: "NUCLEARE/UTILITY", sel: thIsEnergy,
     m: (en, it) => /nuclear|reactor|\bSMR\b|power grid|electricity demand/i.test(en) || /nuclear|rete elettric/i.test(it) },
-  { id: "DAZI/EXPORT-CONTROL", tk: ["TSM", "AVGO", "MU", "NVDA", "AMD"],   // SOLO filiera/supply chain
+  { id: "DAZI/EXPORT-CONTROL", sel: thIsSemi,   // SOLO filiera/supply chain
     m: (en, it) => /tariff|export control|trade probe|trade war|chip ban|sanction.{0,20}(chip|tech|semicon)/i.test(en) || /dazi|controlli all.export|guerra commercial/i.test(it) },
-  { id: "GEOPOLITICA (risk-off)", tk: null,   // appetito al rischio → colpisce i beta alti
+  { id: "GEOPOLITICA (risk-off)", sel: null,   // appetito al rischio → colpisce i beta alti
     m: (en, it) => /\bwar\b|iran|hormuz|middle east|missile|airstrike|invasion/i.test(en) || /guerra|iran|medio oriente/i.test(it) },
-  { id: "REGOLAM./MEGACAP", tk: ["GOOGL", "META"],
+  { id: "REGOLAM./MEGACAP", sel: thIsMegacapComm,
     m: (en, it) => /antitrust|\bEU fine|probe into tech|privacy fine|alphabet|\bgoogle\b|\bmeta\b/i.test(en) || /antitrust|multe dell.UE|aziende tecnolog/i.test(it) },
 ];
+/* membri di un tema: predicato sui dati del titolo + eventuale seed semantico */
+function themeMembers(th, universe) {
+  const seed = THEME_SEED[th.id] || [];
+  const out = new Map();
+  for (const r of universe.values()) if (th.sel && th.sel(r)) out.set(r.ticker, r);
+  for (const t of seed) { const r = universe.get(t); if (r) out.set(t, r); }
+  return [...out.values()];
+}
 function marketLinkText() {
   const L = [];
   const ptf = (DATA.portfolio || []).filter(isEquity);
-  const wl = (DATA.watchlist || []).filter(isEquity);
+  // universo dei temi: equity + le ANCORE tematiche non-equity della watchlist (petrolio, crypto:
+  // servono a dare un bersaglio ai temi ENERGIA/CRYPTO). Gli INDICI (currency PTS o prefisso ^)
+  // restano fuori: sono benchmark, non posizioni tematizzabili.
+  const wl = (DATA.watchlist || []).filter(r => r && r.price > 0 && r.currency !== "PTS"
+    && !/^\^/.test(r.ticker || "") && (isEquity(r) || /[-=]/.test(r.ticker || "")));
   const held = new Map(ptf.map(r => [r.ticker, r]));
   const universe = new Map([...ptf, ...wl].map(r => [r.ticker, r]));
   const wOf = (r) => positionWeightPct(r);
@@ -5715,7 +5744,7 @@ function marketLinkText() {
     const hits = news.filter(n => th.m(n.title || "", n.title_it || ""));
     if (!hits.length) continue;
     let targets;
-    if (th.tk) targets = th.tk.map(t => universe.get(t)).filter(Boolean);
+    if (th.sel) targets = themeMembers(th, universe);
     else {   // temi TASSI/GEOPOLITICA: colpiscono chi paga multiplo/beta — i più sensibili del book
       targets = [...universe.values()]
         .filter(r => (dgFin(r.beta_ndx) ?? 0) >= 1.5 || (dgFin(r.pe) ?? 0) >= 60)
@@ -5746,7 +5775,7 @@ function marketLinkText() {
     const rows = [];
     for (const s of tilt.slice().sort((a, b) => dgFin(b.m1) - dgFin(a.m1))) {
       const th = themeOf(s.name || "");
-      const mine = th && th.tk ? th.tk.map(t => held.get(t)).filter(Boolean) : [];
+      const mine = th && th.sel ? themeMembers(th, held) : [];
       if (!mine.length) continue;
       const expo = mine.reduce((acc, r) => acc + (wOf(r) ?? 0), 0);
       const rsAvg = mine.map(rsOf).filter(x => x != null);
