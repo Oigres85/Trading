@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "163";
+const BUILD_VERSION = "164";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1581,12 +1581,16 @@ function decisionVerdict() {
   //    il 12M resta contaminato dal crash per mesi e schiaccerebbe lo score proprio dei
   //    titoli che la regola growth ha appena riammesso — il 6M misura il regime corrente.
   const rehabSet = new Set(rehabbed.map(x => x.r.ticker));
-  const refSharpe = ps != null ? ps : 1;   // baseline: Sharpe attuale del portafoglio
+  // v164: il fallback silenzioso a 1 era doppiamente dannoso — (a) stampava "vs 1 attuale" mentre
+  // la riga di sintesi dello stesso payload diceva "Sharpe —", (b) ricalibrava la componente 40%
+  // dello score su una baseline INVENTATA (nello scenario di prova i candidati passavano da 4 a 8).
+  // Ora resta null: lo score esclude la componente Sharpe e rinormalizza sugli altri pesi.
+  const refSharpe = ps != null ? ps : null;   // baseline: Sharpe attuale del portafoglio (null = n.d.)
   const quantScore = (r) => {
     const st = r.stats || {};
     const parts = [];
     const shBase = rehabSet.has(r.ticker) && r.sharpe_6m != null ? r.sharpe_6m : r.sharpe_1y;
-    if (shBase != null) parts.push([clamp(50 + (shBase - refSharpe) * 25), .40]);
+    if (shBase != null && refSharpe != null) parts.push([clamp(50 + (shBase - refSharpe) * 25), .40]);
     // forza relativa: metro diretto del mandato = RS vs NDX (fallback sul benchmark settoriale)
     const rsq = r.rs_ndx_1m ?? r.rs_1m;
     if (rsq != null) parts.push([clamp(50 + rsq * 4), .30]);
@@ -1696,14 +1700,21 @@ function decisionVerdict() {
   if (accumula.length >= 1 && withPlan.length > 0) {
     label = "ACCUMULA"; col = "var(--green)"; score = 72;
     reasons.push(`${accumula.length} candidati migliorano il profilo Sharpe/RS del portafoglio (score quant ≥${RISK_PARAMS.minScore}): ${accumula.slice(0, 8).map(r => `${r.ticker} ${r._q}/100`).join(", ")}${accumula.length > 8 ? ", …" : ""}`);
-    if (overCap.length) reasons.push(`esclusi dai NUOVI acquisti per cap d'ingresso (posizione già ≥${RISK_PARAMS.capNoAdd_pct}% del NAV — divieto di accumulo, NON di detenzione): ${overCap.map(x => `${x.r.ticker} (${fmtNum.format(x.w)}%)`).join(", ")} — si lasciano correre (Let Winners Run), protetti dallo stop ratchet 2×ATR; nessun trim automatico`);
-    reasons.push(`criteri: impatto marginale sullo Sharpe (vs ${refSharpe != null ? fmtNum.format(refSharpe) : "n.d."} attuale, target 2.0) · forza relativa 1M vs benchmark · qualità fondamentale`);
+    reasons.push(refSharpe != null
+      ? `criteri: impatto marginale sullo Sharpe (vs ${fmtNum.format(refSharpe)} attuale, target 2.0) · forza relativa 1M vs benchmark · qualità fondamentale`
+      : `criteri: forza relativa 1M vs benchmark · qualità fondamentale — ⚠ lo Sharpe di portafoglio non è disponibile in questo run: la componente Sharpe (40% dello score) è ESCLUSA e i pesi rinormalizzati, quindi il ranking è meno informativo del solito`);
     reasons.push(`ordini LIMITE ai supporti con stop a 2×ATR(14): il rischio per operazione si adatta alla volatilità del titolo`);
     if (riskScale < 1) reasons.push(`regime di volatilità: VIX ${fmtNum.format(vixV)} → budget d'ingresso ridotti al ${Math.round(riskScale * 100)}% (sizing regime-aware: in mercato nervoso si rischia meno per operazione)`);
   } else if (accumula.length >= 1) {
     // candidati PRONTI ma nessun ordine eseguibile: la liquidità è il collo di bottiglia, NON la mancanza di idee
     label = "LIQUIDITÀ"; col = "var(--yellow)"; score = 50;
     reasons.push(`⚠ ${accumula.length} candidati d'ingresso PRONTI (${accumula.slice(0, 5).map(r => `${r.ticker} ${r._q}/100`).join(", ")}${accumula.length > 5 ? ", …" : ""}) MA liquidità esaurita (cassa ${fmtEUR.format(cashEur)}${t.budget_operativo_spendibile != null ? `, budget operativo ${fmtEUR.format(Math.round(t.budget_operativo_spendibile))}` : ""}): nessun ingresso ESEGUIBILE oggi. Non è "niente da comprare" — è "niente con cui comprare". Per attivarli, libera cassa: trim tattico, uscita dai nomi in veto (es. MSTR), o nuovo versamento.`);
+  } else if (overCap.length) {
+    // v164 — TERZO COLLO DI BOTTIGLIA (simmetrico a LIQUIDITÀ): i candidati esistevano e passavano
+    // lo score, li ha fermati il CAP D'INGRESSO. Dirlo "nessun candidato migliora abbastanza" era
+    // una diagnosi FALSA e opposta alla realtà ("c'è un buon nome, ma è già troppo pesante").
+    label = "CAP"; col = "var(--yellow)"; score = 50;
+    reasons.push(`⚠ nessun ingresso possibile per CAP D'INGRESSO, non per mancanza di idee: ${overCap.map(x => `${x.r.ticker} (${fmtNum.format(x.w)}%)`).join(", ")} ${overCap.length > 1 ? "superano" : "supera"} già il ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% del NAV. Non è "niente di buono da comprare" — è "il buono che vedo lo ho già, e in dose piena". Le vie aperte restano: lasciar correre (Let Winners Run, protetto dal ratchet), alzare il cap DICHIARANDOLO, o cercare fuori dal book nomi a bassa correlazione.`);
   } else if (dir != null && dir < 40) {
     label = "PRUDENZA"; col = "var(--yellow)"; score = 32;
     reasons.push(`regime debole (segnali ${dir}/100) e nessun candidato con edge quant: nessun nuovo ingresso, disciplina sugli stop 2×ATR`);
@@ -1711,6 +1722,7 @@ function decisionVerdict() {
     label = "MANTIENI"; col = "var(--blue)"; score = dir != null ? dir : 55;
     reasons.push(`nessun candidato migliora abbastanza Sharpe/forza relativa (regime ${dir != null ? dir + "/100" : "neutro"}): conserva liquidità e posizioni vincenti`);
   }
+  if (overCap.length && label !== "CAP") reasons.push(`esclusi dai NUOVI acquisti per cap d'ingresso (posizione già ≥${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% del NAV — divieto di accumulo, NON di detenzione): ${overCap.map(x => `${x.r.ticker} (${fmtNum.format(x.w)}%)`).join(", ")} — si lasciano correre (Let Winners Run), protetti dallo stop ratchet 2×ATR; nessun trim automatico`);
   if (stopViolations.length) reasons.unshift(`⚠ STOP VIOLATO su ${stopViolations.map(x => `${x.r.ticker} (stop $${fmtNum.format(x.stop)}, prezzo $${fmtNum.format(x.r.price)})`).join(", ")} — il prezzo è sotto lo stop trailing ancorato: decidere uscita o ri-arm consapevole`);
   if (vetoTk.length) reasons.push(`VETO risk manager su ${vetoTk.join(", ")} — esclusi a prescindere dal supporto tecnico${vetoHeldNote}`);
   if (rehabbed.length) reasons.push(`RIABILITATI dal veto Sortino (regola growth v111 — qualità intatta + prezzo sopra SMA200 + RS 1M vs NDX positiva, criteri tutti meccanici): ${rehabbed.map(x => `${x.r.ticker} (${x.why[0]}; MA ${x.rehabWhy})`).join(" · ")} — trattali da candidati SORVEGLIATI: il trailing 12M resta negativo, la ripresa è provata dai dati correnti`);
@@ -4915,6 +4927,19 @@ function buildPrompt() {
           // appena sotto (MU 18,9% con cap 20%) lo ATTRAVERSA comprando, e il payload non dava
           // all'LLM alcun numero per accorgersene. Qui la capienza è CALCOLATA (quote entro il cap),
           // dichiarata come evidenza — non come divieto: sforare resta una scelta del CEO, ma esplicita.
+          // v164 — DE-RATCHET: il ratchet si resetta quando cambia la quantità
+          // (update_data.py: `stop = max(prev_stop, raw) if (prev_ok and same_pos) else raw`),
+          // quindi ACCUMULARE fa cadere il trailing anche sulle quote GIÀ possedute, dal livello
+          // ancorato a quello nuovo più basso. Il payload quantificava con precisione il rischio
+          // del ri-arm sugli stop violati ma lasciava INVISIBILE questo costo simmetrico: un CIO
+          // leggeva "COMPRA con stop $429" credendo il rischio limitato alle nuove quote.
+          let deRatchetTag = "";
+          if (p.r.qty > 0 && heldStop && heldStop.stop > p.stop && p.stop > 0) {
+            const perShare = heldStop.stop - p.stop;
+            const eurusdDR = DATA.eurusd || 1.08;
+            const addEur = Math.round(p.r.qty * perShare / eurusdDR);
+            if (addEur > 0) deRatchetTag = ` [⚠ DE-RATCHET: accumulare RESETTA il trailing da $${fmtNum.format(heldStop.stop)} a $${fmtNum.format(p.stop)} anche sulle ${fmtNum.format(p.r.qty)} quote GIÀ detenute → scopre ~${fmtEUR.format(addEur)} di downside sulla posizione esistente, oltre al rischio delle nuove quote. Se accumuli, dichiaralo]`;
+          }
           let capTag = "";
           const wNow = p.r.qty ? positionWeightPct(p.r) : null;
           const navTot = (DATA?.totals?.eur_invested || 0) + cashEur;
@@ -4926,7 +4951,7 @@ function buildPrompt() {
               ? ` [CAP: già ${fmtNum.format(wNow)}% del NAV su un cap del ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% → capienza residua ~${fmtNum.format(maxQty)} quote a questo limite (~${fmtEUR.format(Math.round(roomEur))}); oltre, l'ingresso porta la posizione FUORI dal cap: se lo fai, dichiaralo]`
               : ` [CAP: già ${fmtNum.format(wNow)}% del NAV, cap ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% → capienza ESAURITA: qualunque acquisto sfora il cap]`;
           }
-          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)}${limT} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}${aggT}${heldTag}${capTag}`;
+          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)}${limT} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}${aggT}${heldTag}${deRatchetTag}${capTag}`;
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {
@@ -5212,7 +5237,7 @@ function buildPrompt() {
       const pfcf = st.market_cap && st.fcf && st.fcf > 0 ? Math.round(st.market_cap / st.fcf * 10) / 10 : null;
       const peTtm2 = st.pe_ttm || r.pe;
       const fcfWarn = pfcf != null && peTtm2 > 0 && pfcf > peTtm2 * 2 ? " [!FCF]" : "";
-      const roeTag = st.roe != null && st.roe > 0.15 ? " [ROIC>15%]" : "";
+      const roeTag = st.roe != null && st.roe > 0.15 ? " [ROE>15%]" : "";
       const wlTag = DATA.portfolio.find(p => p.ticker === r.ticker) ? "" : " [WL]";
       // Altman Z-Score + flag [RISCHIO DEFAULT] se <1,81
       const zTag = st.altman_z != null && st.altman_z < 1.81 ? " [RISCHIO DEFAULT]" : "";
@@ -5223,7 +5248,7 @@ function buildPrompt() {
       const noteTags = [roeTag.trim(), fcfWarn.trim(), zTag.trim(), fxTag.trim()].filter(Boolean).join(" ");
       lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg > 0 ? fmtNum.format(Math.round(st.peg * 100) / 100) : "n.d."} | ${zCell} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${st.buyback_yield != null ? signTxt(Math.round(st.buyback_yield * 1000) / 10) + (st.buyback_yield < -0.005 ? " [DILUISCE]" : "") : "—"} | ${noteTags} |`);
     });
-    lines.push("([ROIC>15%]=qualità eccellente del capitale; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z''<1,81, flag prudenziale del mandato — Z'' è la variante non-manifatturieri (6.56·WC/TA+3.26·RE/TA+6.72·EBIT/TA+1.05·MVE/TL, senza Sales/TA), cutoff canonici <1,1 distress / >2,6 solido; P/E TTM='—' con EPS<0 per igiene matematica; [BILANCI VALUTA LOCALE]=ADR con bilanci in valuta diversa dal prezzo: P/B, EV/EBITDA e P/FCF nullati a monte perché a unità miste — i '—' su quelle colonne NON sono buchi dati; [WL]=watchlist; Buyback%=riacquisti NETTI delle emissioni / market cap dall'ultimo cashflow annuale — discriminante growth: >0 restituisce capitale riducendo le azioni, [DILUISCE]=emissioni>riacquisti, tipico SBC pesante che erode l'EPS per azione)");
+    lines.push("([ROE>15%]=Return on EQUITY oltre il 15% — NB: è ROE, non ROIC: su società con molta leva o buyback aggressivi il denominatore (patrimonio netto) si comprime e il valore si gonfia, quindi NON leggerlo come qualità del capitale investito; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z''<1,81, flag prudenziale del mandato — Z'' è la variante non-manifatturieri (6.56·WC/TA+3.26·RE/TA+6.72·EBIT/TA+1.05·MVE/TL, senza Sales/TA), cutoff canonici <1,1 distress / >2,6 solido; P/E TTM='—' con EPS<0 per igiene matematica; [BILANCI VALUTA LOCALE]=ADR con bilanci in valuta diversa dal prezzo: P/B, EV/EBITDA e P/FCF nullati a monte perché a unità miste — i '—' su quelle colonne NON sono buchi dati; [WL]=watchlist; Buyback%=riacquisti NETTI delle emissioni / market cap dall'ultimo cashflow annuale — discriminante growth: >0 restituisce capitale riducendo le azioni, [DILUISCE]=emissioni>riacquisti, tipico SBC pesante che erode l'EPS per azione)");
     if (DATA.sanity_filtered > 0) lines.push(`[!ANOMALIE FILTRATE DAL SANITY CHECK: ${DATA.sanity_filtered} — valori palesemente errati delle API (P/E assurdi, variazioni impossibili) sono stati rimossi a monte: i dati qui presenti sono già puliti]`);
     lines.push("");
   }
@@ -5265,7 +5290,16 @@ function buildPrompt() {
   // sanity finale sul payload: un valore impossibile diventa "n.d." e NON entra nell'analisi
   const nd = (v, lo, hi) => (v != null && v >= lo && v <= hi) ? v : null;
   const vixOk = m.vix ? nd(m.vix.value, 0.1, 200) : null;   // VIX negativo o assurdo = glitch
-  if (vixOk != null) lines.push(`- VIX: ${vixOk} (${signTxt(m.vix.change_pct)} oggi — rilevazione odierna)`);
+  // v164: il VIX si dichiarava "rilevazione odierna" SEMPRE, anche col mercato chiuso — unico dato
+  // del payload a contraddire il CONTESTO DI SESSIONE e le celle prezzo "[chiusura del GG/MM]".
+  // E' proprio l'indicatore su cui il CIO calibra rischio e sizing: farlo sembrare posteriore alla
+  // chiusura induce a credere che esista una misura di volatilita' piu' fresca dei prezzi.
+  if (vixOk != null) {
+    const vixFresco = usRegularSessionOpen();
+    const vixAsof = (() => { const c = lastUsEquityCloseUTC();
+      return c ? `[chiusura del ${String(c.at.getUTCDate()).padStart(2, "0")}/${String(c.at.getUTCMonth() + 1).padStart(2, "0")}]` : "[ultima chiusura]"; })();
+    lines.push(`- VIX: ${vixOk} (${signTxt(m.vix.change_pct)} ${vixFresco ? "oggi — rilevazione odierna" : `nell'ultima seduta ${vixAsof} — mercato CHIUSO: nessuna rilevazione piu' recente dei prezzi`})`);
+  }
   else if (m.vix) lines.push("- VIX: n.d. (valore scartato dal sanity check)");
   if (m.fedwatch) lines.push(`- Fed Funds Rate: range ATTUALE ${m.fedwatch.target_range} · tasso implicito futures ${m.fedwatch.implied_rate}%${m.fedwatch.next_fomc ? ` · PROSSIMA RIUNIONE FOMC: ${new Date(m.fedwatch.next_fomc + "T00:00:00").toLocaleDateString("it-IT")}` : ""} (il tasso resta valido fino alla prossima decisione FOMC)`);
   if (m.carry) {
@@ -5330,7 +5364,7 @@ function buildPrompt() {
   (m.markets || []).filter(x => !/EUR\/JPY/i.test(x.label || "")).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   // ogni indicatore economico con la sua data di pubblicazione ESPLICITA: la latenza del dato
   // deve essere palese all'AI (CPI/NFP = mensili con ~1 mese di ritardo; PIL = trimestrale)
-  (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile" : i.key === "curve" ? "serie GIORNALIERA FRED T10Y2Y, ultima chiusura" : "serie mensile, normale ritardo di pubblicazione"})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`));
+  (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile" : i.key === "curve" ? "serie GIORNALIERA FRED T10Y2Y, ultima chiusura" : i.key === "umich" ? "serie mensile via FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui — verificale prima di trarne conclusioni sul consumatore" : "serie mensile, normale ritardo di pubblicazione"})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`));
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
   const mds = marginDebtState();
@@ -5346,7 +5380,13 @@ function buildPrompt() {
   if (m.forward_pe && m.forward_pe.value != null) {
     const fp = m.forward_pe;
     const sysDanger = (m.margin_debt?.pct_of_peak >= 90) && fp.value > 20;
-    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"} — metodologia DIVERSA dal trailing: NON derivarne tassi di crescita impliciti]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? "RISCHIO SISTEMICO ELEVATO: leva ai massimi + valutazioni tese → vulnerabilità a deleveraging violento." : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva."}`);
+    const carriedTag = (o) => {
+      if (!o || !o.carried) return "";
+      const d = o.fetched_at || o.date;
+      const age = d ? Math.round((Date.now() - new Date(d)) / 86400000) : null;
+      return `, ⚠ CARRY-FORWARD dal run precedente${d ? ` (rilevato ${String(d).slice(0, 10)}${age != null ? `, ${age}g fa` : ""})` : ""} — la fonte era irraggiungibile: pesalo come dato DATATO, non odierno`;
+    };
+    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: NON derivarne tassi di crescita impliciti]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? "RISCHIO SISTEMICO ELEVATO: leva ai massimi + valutazioni tese → vulnerabilità a deleveraging violento." : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva."}`);
   }
   if (m.credit) {
     let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`;
@@ -5403,7 +5443,8 @@ function buildPrompt() {
       lines.push(`- ${s.name} (${s.ticker}): 1M ${signTxt(s.m1)}, 3M ${signTxt(s.m3)}`));
   }
   if (m.sp500_pe) {
-    let peLine = `- P/E Ratio S&P 500 [TRAILING, fonte: ${m.sp500_pe.source || "FRED/multpl"}]: ${m.sp500_pe.current}× (${m.sp500_pe.label})${m.sp500_pe.avg_10y != null ? ` · media 10A ${m.sp500_pe.avg_10y}×` : ""}${m.sp500_pe.pct_rank != null ? ` · percentile storico ${m.sp500_pe.pct_rank}°` : ""}`;
+    const cf = m.sp500_pe.carried ? `, ⚠ CARRY-FORWARD dal run precedente${m.sp500_pe.fetched_at || m.sp500_pe.date ? ` (rilevato ${String(m.sp500_pe.fetched_at || m.sp500_pe.date).slice(0, 10)})` : ""} — fonte irraggiungibile: dato DATATO` : "";
+    let peLine = `- P/E Ratio S&P 500 [TRAILING, fonte: ${m.sp500_pe.source || "FRED/multpl"}${cf}]: ${m.sp500_pe.current}× (${m.sp500_pe.label})${m.sp500_pe.avg_10y != null ? ` · media 10A ${m.sp500_pe.avg_10y}×` : ""}${m.sp500_pe.pct_rank != null ? ` · percentile storico ${m.sp500_pe.pct_rank}°` : ""}`;
     if (m.sp500_pe.nasdaq_pe) peLine += ` · Nasdaq 100 (QQQ) P/E: ${m.sp500_pe.nasdaq_pe}× (tech solitamente a premio; >35× = valutazioni tese)`;
     lines.push(peLine);
   }
@@ -5439,7 +5480,7 @@ function buildPrompt() {
   const scr = DATA.screener || [];
   if (scr.length) {
     lines.push("");
-    lines.push("IDEE DI ROTAZIONE (screening automatico — compounder ad alto ROIC ESTERNI al portafoglio, dai settori che stanno ACCELERANDO; servono a de-concentrare la monocultura tech/semi con nomi a bassa correlazione. NON sono ordini: valutane la tesi e, se convince, proponi al CEO di inserirli in watchlist per la validazione del motore al prossimo run):");
+    lines.push("IDEE DI ROTAZIONE (screening automatico — compounder ad alta ROE (non ROIC: vedi nota della tabella fondamentale) ESTERNI al portafoglio, dai settori che stanno ACCELERANDO; servono a de-concentrare la monocultura tech/semi con nomi a bassa correlazione. NON sono ordini: valutane la tesi e, se convince, proponi al CEO di inserirli in watchlist per la validazione del motore al prossimo run):");
     lines.push("| Titolo | Settore (ETF 1M) | Prezzo | 1M | RS 1M vs NDX | ROE | Cresc.ricavi | Fwd P/E | PEG | Upside target | RSI |");
     lines.push("|---|---|---|---|---|---|---|---|---|---|---|");
     scr.forEach(r => lines.push(`| ${r.name} (${r.ticker}) | ${r.sector_name}${r.sector_m1 != null ? ` (${signTxt(r.sector_m1)})` : ""} | $${fmtNum.format(r.price)} | ${signTxt(r.m1_pct)} | ${r.rs_ndx_1m != null ? signTxt(r.rs_ndx_1m, "pp") : "—"} | ${r.roe_pct != null ? signTxt(r.roe_pct) : "—"} | ${r.rev_growth_pct != null ? signTxt(r.rev_growth_pct) : "—"} | ${r.forward_pe ?? "—"} | ${r.peg ?? "—"} | ${r.target_upside_pct != null ? signTxt(r.target_upside_pct) : "—"} | ${r.rsi ?? "—"} |`));
@@ -5722,7 +5763,7 @@ function buildExecutiveDelta() {
   const ndxDay = (qqq && qqq.change_pct != null) ? qqq.change_pct : dgFin(bm.ndx);
   const pday = typeof portfolioDayPct === "function" ? portfolioDayPct() : null;
   const alphaDay = (pday != null && ndxDay != null) ? Math.round((pday - ndxDay) * 100) / 100 : null;
-  L.push(`· BENCHMARK vs Nasdaq 100 (il mandato, proxy QQQ): ${dayLab} fondo ${signTxt(pday)} vs NDX ${signTxt(ndxDay)}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs NDX ${signTxt(ndxTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs NDX ${signTxt(ndxTr("m1"))} (finestre approssimate: rilevazioni fondo vs sedute indice — l'alpha di PERIODO è il verdetto sul processo, non il P&L assoluto)`);
+  L.push(`· BENCHMARK vs Nasdaq 100 (il mandato, proxy QQQ): ${dayLab} fondo ${signTxt(pday)} vs NDX ${signTxt(ndxDay)}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs NDX ${signTxt(ndxTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs NDX ${signTxt(ndxTr("m1"))} (⚠ BASI DIVERSE, non confrontare i tre alpha fra loro: "${dayLab}" è il solo comparto AZIONARIO in USD (BTP e cambio esclusi), mentre 1S e 1M sono il rendimento del book INTERO in EUR — quindi includono il BTP (~15% del book, volatilità ~0, che comprime meccanicamente il rendimento di periodo) e l'effetto cambio su un NAV per il 76% in USD non coperto. Il confronto col NDX, indice azionario in USD, è quindi indicativo sulle finestre lunghe: l'alpha di PERIODO resta il verdetto sul processo, ma il suo SEGNO può dipendere da BTP e EUR/USD prima che dalla selezione dei titoli. Finestre approssimate anche nel tempo: rilevazioni fondo vs sedute indice)`);
   const v = decisionVerdict();
   L.push(`· Verdetto motore: ${v.label} (${dgTxt(v.score, "", 0)}/100)${(v.withPlan || []).length ? ` · candidati (${v.withPlan.length}): ${v.withPlan.slice(0, 6).map(p => p.r.ticker).join(", ")}${v.withPlan.length > 6 ? ", …" : ""}` : ""}`);
   // priorità: budget 0, shock, stop violati, earnings ≤7g, veto in ptf, top/worst RS mover

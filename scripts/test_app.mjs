@@ -932,6 +932,45 @@ check("v156 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi, PROME
   const iProm = t.lastIndexOf("PROMEMORIA FINALE:");
   // il blocco sintesi sta DOPO la testata ma PRIMA delle tabelle-silo; PROMEMORIA è l'ULTIMA sezione
   return iCorr > 0 && iData > iCorr && iProm > iData && !t.slice(iProm).includes("DATI AL ")`));
+check("v164 stato CAP: se i candidati esistono ma sono TUTTI oltre il cap, il verdetto NON dice 'nessun candidato'", run(`
+  const savedCap = RISK_PARAMS.capNoAdd_pct, savedWl = DATA.watchlist;
+  DATA.watchlist = [];                                   // solo detenuti → il cap è l'unico collo di bottiglia
+  RISK_PARAMS.capNoAdd_pct = 5;                          // ogni posizione del fixture supera il 5% del NAV
+  const dv = decisionVerdict();
+  RISK_PARAMS.capNoAdd_pct = savedCap; DATA.watchlist = savedWl;
+  const testo = dv.reasons.join(" ");
+  if (!(dv.overCap || []).length) return true;           // scenario non riproducibile: vacuo
+  // se il cap ha svuotato i candidati, il verdetto deve DIRLO e non affermare il falso
+  if (!(dv.accumula || []).length) {
+    return dv.label === "CAP" && /CAP D'INGRESSO/.test(testo)
+        && !/nessun candidato migliora abbastanza/.test(testo);
+  }
+  return /cap d'ingresso/i.test(testo)`));
+check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzera il trailing sulle quote esistenti", run(`
+  const p = buildPrompt();
+  const line = p.split("\\n").find(l => l.includes("Livelli calcolati dal motore"));
+  if (line == null) return true;
+  const dv = decisionVerdict();
+  // per ogni candidato detenuto il cui ratchet sta SOPRA lo stop d'ingresso, il tag è obbligatorio
+  const attesi = (dv.withPlan || []).filter(x => {
+    if (!(x.r.qty > 0)) return false;
+    const hs = stopOf(x.r);
+    return hs && hs.stop > x.stop && x.stop > 0;
+  });
+  if (!attesi.length) return true;
+  return attesi.every(x => new RegExp("DE-RATCHET[^\\\\]]*" + x.r.ticker).test(line)
+                        || line.includes("DE-RATCHET"))`));
+check("v164 Sharpe n.d.: la componente 40% è ESCLUSA e dichiarata, non sostituita da una baseline inventata", run(`
+  const t = DATA.totals, saved = t.portfolio_sharpe_ratio;
+  t.portfolio_sharpe_ratio = null;
+  const dv = decisionVerdict();
+  const p = buildPrompt();
+  t.portfolio_sharpe_ratio = saved;
+  const testo = dv.reasons.join(" ");
+  // niente "vs 1 attuale" inventato; se il ramo criteri è emesso deve dichiarare l'esclusione
+  const mente = /impatto marginale sullo Sharpe \\(vs 1 attuale/.test(testo) || /vs 1 attuale/.test(p);
+  const dichiara = !/criteri:/.test(testo) || /componente Sharpe \\(40% dello score\\) è ESCLUSA/.test(testo);
+  return !mente && dichiara`));
 check("v163 falsa accelerazione: RS 1M che sale col PREZZO che scende = roll-off della finestra, non rimbalzo", run(`
   const r = DATA.portfolio.find(x => x.ticker === "TST2");
   const saved = { s: r.sortino_1y, sp: r.sparks, mh: DATA.metrics_history, news: DATA.news };

@@ -2326,7 +2326,11 @@ def validate_macro(macro):
     # --- valutazione mercato (forward P/E, S&P P/E): se mancano il quadro leva è monco ---
     for k, obj in (("forward_pe", macro.get("forward_pe")), ("sp500_pe", macro.get("sp500_pe"))):
         val = (obj or {}).get("value") or (obj or {}).get("current")
-        add(k, today.isoformat(), 40, "ok" if val is not None else "missing",
+        # v164: si timbrava today.isoformat() a prescindere → age_days sempre 0 e max_age=40 MAI
+        # attivabile: un valore carry-forward fino a 45 giorni passava come "rilevato oggi, ok" e
+        # guidava l'escalation "RISCHIO SISTEMICO ELEVATO". Ora si usa la data REALE del dato.
+        _asof = (obj or {}).get("fetched_at") or (obj or {}).get("date") or today.isoformat()
+        add(k, str(_asof)[:10], 40, "ok" if val is not None else "missing",
             "" if val is not None else "fonte ko in questo run: conferma leva/valutazioni impossibile")
 
     return {"checks": checks, "alerts": alerts,
