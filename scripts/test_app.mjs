@@ -475,7 +475,17 @@ check("v119 tracciabilità: la riga Livelli porta prezzo, limite e stop sulla st
   const p = buildPrompt();
   DATA.watchlist.forEach(r => { if (r.ticker === "TSTW") delete r.risk_reward; });
   const liv = p.split("\\n").find(l => l.includes("Livelli calcolati"));
-  return liv && /prezzo \\$[\\d.,]+ → limite d'ingresso \\$[\\d.,]+ \\/ stop \\$[\\d.,]+/.test(liv) && liv.includes("/ R/R 1:2.5")`));
+  // v160: fra limite e stop può comparire la distanza dal prezzo "(-6,4% dal prezzo)" → regex tollerante
+  return liv && /prezzo \\$[\\d.,]+ → limite d'ingresso \\$[\\d.,]+[^/]*\\/ stop \\$[\\d.,]+/.test(liv) && liv.includes("/ R/R 1:2.5")`));
+check("v160 livelli: il target porta la sua DISTANZA dal prezzo e il limite la propria (un target al prezzo è flaggato)", run(`
+  const saved = {};
+  DATA.watchlist.forEach(r => { if (r.ticker === "TSTW") { saved.res = r.resistance; r.resistance = r.price * 1.005; } });
+  const p = buildPrompt();
+  DATA.watchlist.forEach(r => { if (r.ticker === "TSTW") r.resistance = saved.res; });
+  const liv = p.split("\\n").find(l => l.includes("Livelli calcolati"));
+  // resistenza a +0,5% dal prezzo → deve comparire la distanza E l'avviso che il R/R non è spazio di salita
+  return liv != null && /dal prezzo,/.test(liv) && /dal limite\\)/.test(liv)
+      && liv.includes("il target è di fatto AL PREZZO ATTUALE")`));
 check("v121 cap d'ingresso nel prompt: ≥10% = solo divieto acquisti (Let Winners Run), niente trim forzato", run(`
   const p = buildPrompt();   // TST1 al 38% nel fixture → riga cap d'ingresso, NON riga trim
   const cap = p.split("\\n").find(l => l.includes("Cap d'ingresso") && l.includes("solo DIVIETO di nuovi acquisti"));

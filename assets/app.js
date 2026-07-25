@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "159";
+const BUILD_VERSION = "160";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4868,8 +4868,32 @@ function buildPrompt() {
           const rr = p.r.risk_reward ? ` / R/R ${p.r.risk_reward}` : "";
           // target = resistenza (v148): è il numeratore del R/R — senza stamparlo l'LLM vedeva
           // il rapporto ma non il livello a cui punta il reward. Stessa banda di plausibilità.
+          // v160 — il TARGET senza la sua DISTANZA dal prezzo è mezza informazione: HG mostrava
+          // "target res. $36,28" con R/R 1:2.3 mentre il prezzo era già $36,16 (+0,3%). In tabella la
+          // distanza c'era (v148), nella riga che genera gli ORDINI no — proprio dove serve. Un target
+          // che coincide col prezzo rende il R/R aritmeticamente vero ed economicamente vuoto.
           const resT = (p.r.resistance != null && p.r.price > 0 && p.r.resistance > p.limit && p.r.resistance <= p.r.price * 2)
-            ? ` / target res. $${fmtNum.format(p.r.resistance)}` : "";
+            ? (() => {
+                const dFromPrice = (p.r.resistance / p.r.price - 1) * 100;
+                const dFromLimit = (p.r.resistance / p.limit - 1) * 100;
+                const warn = dFromPrice < 2
+                  ? ` ⚠ il target è di fatto AL PREZZO ATTUALE: il R/R misura la distanza supporto→resistenza, non spazio di salita da qui`
+                  : "";
+                return ` / target res. $${fmtNum.format(p.r.resistance)} (${signTxt(Math.round(dFromPrice * 10) / 10)} dal prezzo, ${signTxt(Math.round(dFromLimit * 10) / 10)} dal limite)${warn}`;
+              })()
+            : "";
+          // distanza del LIMITE dal prezzo = probabilità che l'ordine venga MAI eseguito. Un limite
+          // a −6% su un nome al 100° percentile 52S non è "prudente": è un ordine che si riempie
+          // solo se il trend si rompe. Il payload dava i due numeri separati e mai la loro distanza.
+          const dLimit = (p.r.price > 0 && p.limit > 0) ? (p.limit / p.r.price - 1) * 100 : null;
+          const limT = dLimit != null ? ` (${signTxt(Math.round(dLimit * 10) / 10)} dal prezzo)` : "";
+          // se il prezzo esteso ha già mosso, dichiaralo QUI: la legenda dice "usa → agg. per gli
+          // ordini limite" ma questo limite è calcolato sul supporto della chiusura → istruzioni in
+          // conflitto se non si esplicita il rapporto fra i due.
+          const pp = p.r.prepost || {};
+          const aggP = dgFin(pp.price);
+          const aggT = (aggP && p.r.price > 0 && Math.abs(aggP / p.r.price - 1) >= 0.01)
+            ? ` [NB ${pp.label || "esteso"} $${fmtNum.format(aggP)} (${signTxt(Math.round((aggP / p.r.price - 1) * 1000) / 10)}): questo limite è calcolato sul supporto della CHIUSURA, non sul gap — se l'esteso tiene, il limite dista ${signTxt(Math.round((p.limit / aggP - 1) * 1000) / 10)} da lì]` : "";
           // v151 — candidato GIÀ DETENUTO col ratchet sopra il limite d'ingresso: raggiungere il
           // limite implica lo stop della posizione GIÀ scattato. Senza flag i due piani (accumulo
           // vs protezione) sembrano indipendenti e l'LLM deve dedurre il conflitto da solo.
@@ -4891,7 +4915,7 @@ function buildPrompt() {
               ? ` [CAP: già ${fmtNum.format(wNow)}% del NAV su un cap del ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% → capienza residua ~${fmtNum.format(maxQty)} quote a questo limite (~${fmtEUR.format(Math.round(roomEur))}); oltre, l'ingresso porta la posizione FUORI dal cap: se lo fai, dichiaralo]`
               : ` [CAP: già ${fmtNum.format(wNow)}% del NAV, cap ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% → capienza ESAURITA: qualunque acquisto sfora il cap]`;
           }
-          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}${heldTag}${capTag}`;
+          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)}${limT} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}${aggT}${heldTag}${capTag}`;
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {
@@ -4929,6 +4953,19 @@ function buildPrompt() {
     // se i 4 segnali sono dello STESSO GIORNO su nomi correlati non sono 4 osservazioni indipendenti:
     // è UN evento di mercato osservato 4 volte, e non autorizza nessuna calibrazione. Senza questa
     // riga il payload induce un errore di inferenza (l'LLM conclude "il motore è rotto" da n=1).
+    // v160 — TRACK RECORD DELLE DIVERGENZE: il sistema misura le PROPRIE affermazioni. Ogni divergenza
+    // di cautela è una previsione implicita ("questo nome sottoperformerà"); il CI la scora da solo sui
+    // prezzi, senza input manuale. Serve a sapere QUALI detector meritano fiducia e quali sono rumore.
+    const dt = (vt.div_track || []).filter(x => x && x.n >= 3);
+    if (dt.length) {
+      const lab = { theme_rs: "flusso-non-conferma-narrativa", mcr_over_weight: "rischio≫peso",
+                    verdict_vs_regime: "verdetto-vs-regime", relapse: "candidato-già-fallito",
+                    accel_into_veto: "momentum-dentro-veto" };
+      lines.push("· TRACK RECORD DELLE DIVERGENZE (il sistema misura le proprie segnalazioni: extra-rendimento medio vs NDX dopo ≥7g dalla segnalazione; per i segnali di CAUTELA \"azzeccato\" = il nome ha poi sottoperformato — un detector con hit-rate basso va pesato meno, non ripetuto): " +
+        dt.map(x => `${lab[x.kind] || x.kind} — ${x.n} casi, media ${signTxt(x.avg_rel_pp, "pp")}${x.hit_pct != null ? `, azzeccati ${x.hit_pct}%` : " (segnale dichiarato ambiguo: si misura la direzione, non la ragione)"}`).join(" · ") + ".");
+    } else if ((vt.div_open || 0) > 0) {
+      lines.push(`· TRACK RECORD DELLE DIVERGENZE: in costruzione — le ${vt.div_open} divergenze di oggi vengono loggate e valutate sui prezzi fra 7 e 30 giorni, automaticamente. Finché non matura, trattale come ipotesi argomentate, non come detector provati.`);
+    }
     const days = [...new Set((vt.last || []).map(s => s.date).filter(Boolean))];
     const nSig = ((vt.mature7 || {}).n || 0) + ((vt.mature30 || {}).n || 0);
     if (days.length === 1 && (vt.last || []).length > 1) {
@@ -5806,6 +5843,8 @@ function themeMembers(th, universe) {
   for (const t of seed) { const r = universe.get(t); if (r) out.set(t, r); }
   return [...out.values()];
 }
+/* ultimo set di divergenze in forma strutturata (popolato da marketLinkText, letto dal CI) */
+let LAST_DIV_SIGNALS = [];
 function marketLinkText() {
   const L = [];
   const ptf = (DATA.portfolio || []).filter(isEquity);
@@ -5943,6 +5982,12 @@ function marketLinkText() {
   // (momentum di brevissimo vs distruzione di valore di fondo). Sono le contraddizioni che l'LLM
   // non vede da solo perché vivono in tabelle lontane nel payload.
   const divRelapse = [], divMcr = [], divTheme = [], divAccel = [], divStop = [], divMeta = [];
+  // v160 — SEGNALI STRUTTURATI per l'auto-misurazione. Le divergenze sono AFFERMAZIONI verificabili
+  // ("il flusso non conferma la narrativa su MU"): fra 7-30 giorni i prezzi dicono da soli se erano
+  // informative. Esporle in forma strutturata permette al CI (log_verdict.mjs) di scorarle SENZA
+  // alcun input manuale — è l'unico modo di misurare la qualità dell'analisi a costo zero per il CEO.
+  LAST_DIV_SIGNALS = [];
+  const sig = (tk, kind) => { LAST_DIV_SIGNALS.push({ tk, kind }); };
   let dvL = null;
   try { dvL = decisionVerdict(); } catch { dvL = null; }
 
@@ -5968,7 +6013,20 @@ function marketLinkText() {
       const tiltRow = ((DATA.macro || {}).tilt || []).find(x => /semicond/i.test(x.name || "") ) ;
       const wind = (top[0].startsWith("Semi") && tiltRow && dgFin(tiltRow.m1) != null) ? dgFin(tiltRow.m1) : null;
       if (expoNow >= 25) {
-        divMeta.push(`  ⚑ VERDETTO vs REGIME: il motore dice ${dvL.label} e ${top[1].length} dei ${cands.length} candidati (${top[1].join(", ")}) sono ${top[0]} — settore su cui il book pesa GIÀ ${fmtNum.format(Math.round(expoNow * 10) / 10)}% del NAV e ${fmtNum.format(Math.round(mcrNow * 10) / 10)}% del rischio${wind != null ? `, con vento settoriale ${signTxt(wind)} a 1M` : ""}. Il motore ottimizza titolo per titolo (Sharpe marginale, RS, qualità) e NON vede il portafoglio che ne risulta: seguirlo alla lettera AUMENTA la concentrazione che le tue stesse metriche segnalano. Non è un divieto — è la scelta che devi fare consapevolmente: concentrare ancora sulla convinzione, o usare il budget per de-correlare. Dichiara quale delle due, e perché.`);
+        // ONESTÀ VERSO IL MOTORE: se fra i candidati c'è già un nome FUORI dal settore dominante e
+        // a bassa correlazione col book, la via di de-correlazione non è un'idea astratta — è una
+        // riga della stessa lista. Nominarla evita che la meta-divergenza suoni come "il motore
+        // sbaglia sempre": spesso il motore la de-correlazione l'ha già proposta, in cima.
+        const others = cands.filter(r => !top[1].includes(r.ticker));
+        const deCorr = others.map(r => {
+          const c = dgFin(r.avg_corr);
+          return `${r.ticker}${c != null ? ` (corr. media col book ${fmtNum.format(c)})` : ""}`;
+        });
+        const altTxt = deCorr.length
+          ? ` La via alternativa NON è ipotetica: fra i candidati stessi ci sono ${deCorr.join(", ")} — fuori dal settore dominante${others.some(r => (dgFin(r.avg_corr) ?? 1) < 0.2) ? " e a correlazione bassa col book" : ""}: è lì che lo stesso budget compra diversificazione invece di raddoppiare la scommessa.`
+          : "";
+        top[1].forEach(tk => sig(tk, "verdict_vs_regime"));
+        divMeta.push(`  ⚑ VERDETTO vs REGIME: il motore dice ${dvL.label} e ${top[1].length} dei ${cands.length} candidati (${top[1].join(", ")}) sono ${top[0]} — settore su cui il book pesa GIÀ ${fmtNum.format(Math.round(expoNow * 10) / 10)}% del NAV e ${fmtNum.format(Math.round(mcrNow * 10) / 10)}% del rischio${wind != null ? `, con vento settoriale ${signTxt(wind)} a 1M` : ""}. Il motore ottimizza titolo per titolo (Sharpe marginale, RS, qualità) e NON vede il portafoglio che ne risulta: seguirlo alla lettera AUMENTA la concentrazione che le tue stesse metriche segnalano.${altTxt} Non è un divieto — è la scelta che devi fare consapevolmente: concentrare ancora sulla convinzione, o usare il budget per de-correlare. Dichiara quale delle due, e perché.`);
       }
     }
   }
@@ -5978,6 +6036,7 @@ function marketLinkText() {
     .filter(s => s && dgFin(s.ret_pct) != null && dgFin(s.ret_pct) < 0).map(s => [s.tk, s]));
   for (const r of (dvL && dvL.accumula || [])) {
     const s = losers.get(r.ticker);
+    if (s) sig(r.ticker, "relapse");
     if (s) divRelapse.push(`  ${r.ticker}: torna tra i candidati ACCUMULA (score ${r._q}/100) ma l'ULTIMO segnale del motore su questo nome ha reso ${signTxt(dgFin(s.ret_pct))} (vs NDX ${signTxt(dgFin(s.vs_ndx_pp), "pp")}, ${s.date}) → il motore ci ha già provato e ha perso: la sua fiducia va calibrata su questo, non ripetuta per inerzia`);
   }
 
@@ -5989,6 +6048,7 @@ function marketLinkText() {
   for (const r of ptf) {
     const rs = rsOf(r), w = wOf(r), m = mcrOf(r);
     if (m != null && w != null && m >= w * 1.6 && m >= 15) {
+      sig(r.ticker, "mcr_over_weight");
       divMcr.push(`  ${r.ticker}: pesa ${fmtNum.format(w)}% del NAV ma genera ${fmtNum.format(m)}% del rischio (${fmtNum.format(Math.round(m / w * 10) / 10)}× il suo peso) → è qui che si decide la volatilità del fondo`);
     }
     const nTheme = themed.filter(t => t.targets.some(x => x.ticker === r.ticker));
@@ -6000,6 +6060,7 @@ function marketLinkText() {
       const totNews = nTheme.reduce((s, t) => s + t.n, 0);
       const totUnpriced = nTheme.reduce((s, t) => s + (t.nUnpriced || 0), 0);
       const priceBlind = marketClosed && totNews > 0 && totUnpriced / totNews >= 0.5;
+      sig(r.ticker, priceBlind ? "theme_rs_blind" : "theme_rs");
       divTheme.push(priceBlind
         ? `  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] con RS ${signTxt(rs, "pp")} vs NDX, MA ${totUnpriced}/${totNews} di quelle news sono POSTERIORI alla chiusura → la RS misura il prezzo PRIMA della notizia: non è il flusso che smentisce la narrativa, è una narrativa che il flusso non ha ancora votato. Verifica all'apertura, non trattarla come contraddizione`
         : `  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] ma la sua forza relativa è ${signTxt(rs, "pp")} vs NDX → il flusso NON conferma la narrativa delle news`);
@@ -6007,11 +6068,13 @@ function marketLinkText() {
     const v = vetoStrong.get(r.ticker);
     if (v) {
       const d = dgFin(titleKinematics(r.ticker).drs7);
+      if (d != null && d >= 5) sig(r.ticker, "accel_into_veto");
       if (d != null && d >= 5) divAccel.push(`  ${r.ticker}: la forza relativa ACCELERA (${signTxt(d, "pp")} in 7g) ma il nome resta in VETO FORTE (${(v.why || [])[0] || "value trap"}) → il momentum di brevissimo contraddice la distruzione di valore di fondo: rimbalzo tecnico da vendere in forza o inversione vera? il track record del nome decide`);
     }
     const st = r.qty ? stopOf(r) : null;
     if (st && st.stop > 0 && r.price > 0 && !st.violated) {
       const dist = (r.price / st.stop - 1) * 100;
+      if (dist <= 3 && (w ?? 0) >= 5) sig(r.ticker, "stop_near");
       if (dist <= 3 && (w ?? 0) >= 5) divStop.push(`  ${r.ticker}: stop a ${signTxt(Math.round(dist * 10) / 10)} dal prezzo su una posizione da ${fmtNum.format(w)}% del NAV → una seduta storta la porta in esecuzione`);
     }
   }
