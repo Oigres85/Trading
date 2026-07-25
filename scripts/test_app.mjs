@@ -932,6 +932,37 @@ check("v156 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi, PROME
   const iProm = t.lastIndexOf("PROMEMORIA FINALE:");
   // il blocco sintesi sta DOPO la testata ma PRIMA delle tabelle-silo; PROMEMORIA è l'ULTIMA sezione
   return iCorr > 0 && iData > iCorr && iProm > iData && !t.slice(iProm).includes("DATI AL ")`));
+check("v163 falsa accelerazione: RS 1M che sale col PREZZO che scende = roll-off della finestra, non rimbalzo", run(`
+  const r = DATA.portfolio.find(x => x.ticker === "TST2");
+  const saved = { s: r.sortino_1y, sp: r.sparks, mh: DATA.metrics_history, news: DATA.news };
+  r.sortino_1y = -2.0;                                   // veto FORTE (downside profondo)
+  DATA.news = [{ title: "AI chips", tickers: [], sentiment: "neu", source: "T", published: "2026-07-24T14:00:00Z" }];
+  // storico RS: +12pp in 7 giorni (drs7 >= 5) → il detector scatta
+  const day = (n) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+  DATA.metrics_history = [
+    { date: day(8), titles: { TST2: { rs: -20, mcr: 10 } } },
+    { date: day(0), titles: { TST2: { rs: -8, mcr: 10 } } },
+  ];
+  // caso A: prezzo SCESO nella stessa finestra → deve dichiarare la falsa accelerazione
+  r.sparks = { w1: [100, 99, 98, 97, 94] };
+  const giu = marketLinkText();
+  // caso B: prezzo SALITO → accelerazione vera, framing del momentum
+  r.sparks = { w1: [100, 102, 104, 106, 110] };
+  const su = marketLinkText();
+  Object.assign(r, { sortino_1y: saved.s, sparks: saved.sp });
+  DATA.metrics_history = saved.mh; DATA.news = saved.news;
+  return giu.includes("FALSA ACCELERAZIONE") && giu.includes("NON è rimbalzato")
+      && su.includes("il prezzo lo conferma") && !su.includes("FALSA ACCELERAZIONE")`));
+check("v163 troncamento a 8: le detenute non elencate sono DICHIARATE e restano visibili ai detector", run(`
+  const txt = marketLinkText();
+  for (const line of txt.split("\\n")) {
+    const m = line.match(/^  \\[[^\\]]+\\].*→ (.*?)(?: \\(\\+(\\d+) detenute non elencate: ([\\d,]+)% del NAV\\))? — esposizione in PTF ([\\d,]+)% del NAV/);
+    if (!m) continue;
+    const mostrati = m[1].split(" · ").length;
+    // se sono stati troncati (8 mostrati) DEVE esserci la dichiarazione del resto
+    if (mostrati >= 8 && m[2] == null) return false;
+  }
+  return true`));
 check("v162 rischio: il confronto parametrico distingue VaR ed ES (prima una cifra di VaR seguiva l'ES e si leggeva come suo)", run(`
   const t = DATA.totals, saved = { v: t.var95_1d_eur, e: t.es95_1d_eur, vh: t.var95_hist_eur, eh: t.es95_hist_eur };
   Object.assign(t, { var95_1d_eur: 9802, es95_1d_eur: 12298, var95_hist_eur: 9184, es95_hist_eur: 12986 });

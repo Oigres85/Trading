@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "162";
+const BUILD_VERSION = "163";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5915,8 +5915,12 @@ function marketLinkText() {
         .filter(r => (dgFin(r.beta_ndx) ?? 0) >= 1.5 || (dgFin(r.pe) ?? 0) >= 60)
         .sort((a, b) => (dgFin(b.beta_ndx) ?? 0) - (dgFin(a.beta_ndx) ?? 0));
     }
-    // le posizioni DETENUTE vanno prima: sono quelle su cui il CEO decide oggi
-    targets.sort((a, b) => (held.has(b.ticker) ? 1 : 0) - (held.has(a.ticker) ? 1 : 0));
+    // le posizioni DETENUTE vanno prima e, fra queste, quelle che PESANO di più: la lista viene
+    // troncata a 8 e il taglio deve cadere sui nomi meno rilevanti, non su quelli che capitano
+    // ultimi nell'ordine di portafoglio (v163: ORCL, RS -23pp, veniva tagliato mentre restavano
+    // nomi a peso minore).
+    targets.sort((a, b) => (held.has(b.ticker) ? 1 : 0) - (held.has(a.ticker) ? 1 : 0)
+      || (wOf(b) ?? 0) - (wOf(a) ?? 0));
     const inPtf = targets.filter(r => held.has(r.ticker));
     if (!targets.length) continue;
     const expo = inPtf.reduce((s, r) => s + (wOf(r) ?? 0), 0);
@@ -5927,12 +5931,24 @@ function marketLinkText() {
     // che cita un ticker è la più informativa; su un tema MACRO (TASSI, GEOPOLITICA — quelli senza
     // predicato `sel`) citare un ticker non c'entra, e preferirlo metteva in vetrina un pezzo sul
     // Bitcoin come esemplare del tema Fed. Lì vince semplicemente la notizia più recente.
+    // v163: il predicato guardava `universe`, che include per costruzione le ANCORE non-equity
+    // (BTC-USD, CL=F). Una news che cita SOLO il Bitcoin vinceva così il rango di "segnale
+    // specifico" sul tema DAZI (56% del NAV in semi), scavalcando per recency le notizie sulle
+    // tariffe: il tema più pesante del book veniva presentato con un titolo sul Bitcoin. Il
+    // predicato ora è relativo ai BERSAGLI DEL TEMA, non all'universo.
+    const tset = new Set(targets.map(r => r.ticker));
     const ranked = hits.slice().sort((a, b) => {
-      const sp = (x) => (th.sel && (x.tickers || []).some(t => universe.has(t))) ? 1 : 0;
+      const sp = (x) => (th.sel && (x.tickers || []).some(t => tset.has(t))) ? 1 : 0;
       return sp(b) - sp(a) || String(b.published || "").localeCompare(String(a.published || ""));
     });
+    const shownT = targets.slice(0, 8);
+    // `allTargets` = elenco COMPLETO: i detector di divergenza devono girare su questo, non sulla
+    // lista troncata per la stampa (altrimenti un nome tagliato non può generare segnale).
     themed.push({ id: th.id, n: hits.length, nUnpriced, th, sample: newsCore(ranked[0].title_it || ranked[0].title).slice(0, 110),
-                  targets: targets.slice(0, 8), expo, inPtf: inPtf.length });
+                  targets: shownT, allTargets: targets, expo,
+                  expoShown: shownT.filter(r => held.has(r.ticker)).reduce((s, r) => s + (wOf(r) ?? 0), 0),
+                  hiddenPtf: inPtf.length - shownT.filter(r => held.has(r.ticker)).length,
+                  inPtf: inPtf.length });
   }
   themed.sort((a, b) => b.expo - a.expo || b.n - a.n);
   if (themed.length) {
@@ -5948,7 +5964,12 @@ function marketLinkText() {
     L.push("· TEMI DELLE NEWS DI OGGI → LE TUE POSIZIONI ESPOSTE (il collegamento news↔book, che i ticker delle news NON danno · peso NAV/MCR/RS indicati alla prima comparsa di ogni titolo):");
     for (const t of themed) {
       const unp = (marketClosed && t.nUnpriced) ? ` · ⏰ ${t.nUnpriced}/${t.n} NON ancora prezzate` : "";
-      L.push(`  [${t.id}] ${t.n} news${unp} · es. "${t.sample}" → ${t.targets.map(tagOnce).join(" · ")}${t.inPtf ? ` — esposizione in PTF ${fmtNum.format(Math.round(t.expo * 10) / 10)}% del NAV` : " — nessuna posizione detenuta (solo watchlist)"}`);
+      // v163: la % dichiarata è calcolata su TUTTI i detenuti del tema ma se ne stampano max 8 →
+      // la somma dei nomi visibili non tornava e il CIO trovava un dato che non quadra. Il resto
+      // ora è dichiarato esplicitamente invece di sparire in silenzio.
+      const extra = t.hiddenPtf > 0
+        ? ` (+${t.hiddenPtf} detenute non elencate: ${fmtNum.format(Math.round((t.expo - t.expoShown) * 10) / 10)}% del NAV)` : "";
+      L.push(`  [${t.id}] ${t.n} news${unp} · es. "${t.sample}" → ${t.targets.map(tagOnce).join(" · ")}${extra}${t.inPtf ? ` — esposizione in PTF ${fmtNum.format(Math.round(t.expo * 10) / 10)}% del NAV` : " — nessuna posizione detenuta (solo watchlist)"}`);
     }
   }
 
@@ -6100,7 +6121,10 @@ function marketLinkText() {
       sig(r.ticker, "mcr_over_weight");
       divMcr.push(`  ${r.ticker}: pesa ${fmtNum.format(w)}% del NAV ma genera ${fmtNum.format(m)}% del rischio (${fmtNum.format(Math.round(m / w * 10) / 10)}× il suo peso) → è qui che si decide la volatilità del fondo`);
     }
-    const nTheme = themed.filter(t => t.targets.some(x => x.ticker === r.ticker));
+    // v163: `t.targets` è la lista TRONCATA per la stampa — filtrarci sopra rendeva il detector
+    // cieco sui nomi tagliati (ORCL, RS -23pp, il segnale più forte del book, veniva soppresso
+    // mentre GOOGL a -3,7pp passava). Si filtra sull'elenco completo.
+    const nTheme = themed.filter(t => (t.allTargets || t.targets).some(x => x.ticker === r.ticker));
     if (nTheme.length && rs != null && rs <= -3) {
       // v158 — QUALIFICATORE TEMPORALE: se la maggioranza delle news del tema è arrivata DOPO la
       // chiusura, il prezzo non ha ancora potuto votarle: chiamarla "il flusso non conferma" è un
@@ -6117,8 +6141,29 @@ function marketLinkText() {
     const v = vetoStrong.get(r.ticker);
     if (v) {
       const d = dgFin(titleKinematics(r.ticker).drs7);
-      if (d != null && d >= 5) sig(r.ticker, "accel_into_veto");
-      if (d != null && d >= 5) divAccel.push(`  ${r.ticker}: la forza relativa ACCELERA (${signTxt(d, "pp")} in 7g) ma il nome resta in VETO FORTE (${(v.why || [])[0] || "value trap"}) → il momentum di brevissimo contraddice la distruzione di valore di fondo: rimbalzo tecnico da vendere in forza o inversione vera? il track record del nome decide`);
+      if (d != null && d >= 5) {
+        // v163 — LA RS CHE SALE NON È UN RIMBALZO. drs7 è il Δ7g della RS a 1 MESE: una finestra
+        // mobile. Se un crollo di 4 settimane fa ESCE dalla finestra, la RS migliora di colpo
+        // mentre il prezzo continua a scendere. Il payload verbalizzava quel salto come "momentum
+        // di brevissimo" e chiedeva "vendere in forza o inversione vera?" su nomi che stavano
+        // facendo nuovi minimi (MSTR -6,3% e ORCL -5,3% nei 7g citati, entrambi PEGGIO dell'indice,
+        // ORCL pure con lo stop violato): entrambe le opzioni presupponevano un rimbalzo inesistente.
+        // Ora si guarda il PREZZO nella stessa finestra e la riga dice la verità in entrambi i casi.
+        const p7 = (() => { const a = ((r.sparks || {}).w1 || []).map(dgFin).filter(x => x != null);
+          return a.length >= 2 ? (a[a.length - 1] / a[0] - 1) * 100 : null; })();
+        const b7 = (() => { const bm = (DATA.watchlist || []).find(x => x.ticker === "^IXIC")
+            || (DATA.top_etfs || []).find(x => x.ticker === "QQQ");
+          const a = ((bm || {}).sparks || {}).w1 || []; const xs = a.map(dgFin).filter(x => x != null);
+          return xs.length >= 2 ? (xs[xs.length - 1] / xs[0] - 1) * 100 : null; })();
+        const realRebound = p7 != null && (b7 == null ? p7 > 0 : p7 > b7);
+        const rsNow = rsOf(r);
+        const lvl = rsNow != null ? ` (RS ora ${signTxt(rsNow, "pp")})` : "";
+        const px = p7 != null ? `prezzo ${signTxt(Math.round(p7 * 10) / 10)} a 7g${b7 != null ? ` vs benchmark ${signTxt(Math.round(b7 * 10) / 10)}` : ""}` : "prezzo 7g n.d.";
+        sig(r.ticker, realRebound ? "accel_into_veto" : "rs_rolloff_artifact");
+        divAccel.push(realRebound
+          ? `  ${r.ticker}: la forza relativa ACCELERA (${signTxt(d, "pp")} in 7g)${lvl} E il prezzo lo conferma (${px}), ma il nome resta in VETO FORTE (${(v.why || [])[0] || "value trap"}) → qui il momentum contraddice davvero la distruzione di valore di fondo: rimbalzo tecnico da vendere in forza o inversione vera? il track record del nome decide`
+          : `  ${r.ticker}: ATTENZIONE, FALSA ACCELERAZIONE — la RS 1M migliora di ${signTxt(d, "pp")} in 7g${lvl} ma il ${px}: il titolo NON è rimbalzato, è il crollo delle settimane precedenti che ESCE dalla finestra mobile a 30 giorni. Non leggerlo come forza: il nome resta in VETO FORTE (${(v.why || [])[0] || "value trap"}) e sta ancora perdendo terreno${r.stop_violated || (r.qty && stopOf(r) && stopOf(r).violated) ? ", con lo STOP VIOLATO" : ""}`);
+      }
     }
     const st = r.qty ? stopOf(r) : null;
     if (st && st.stop > 0 && r.price > 0 && !st.violated) {
