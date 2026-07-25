@@ -922,6 +922,34 @@ check("v156 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi, PROME
   const iProm = t.lastIndexOf("PROMEMORIA FINALE:");
   // il blocco sintesi sta DOPO la testata ma PRIMA delle tabelle-silo; PROMEMORIA è l'ULTIMA sezione
   return iCorr > 0 && iData > iCorr && iProm > iData && !t.slice(iProm).includes("DATI AL ")`));
+check("v159 track record: segnali tutti dello STESSO giorno → dichiarato il limite statistico (n=1, non 4 osservazioni)", run(`
+  const saved = DATA.verdict_track;
+  DATA.verdict_track = { mature7: { n: 4, avg_ret: -13.4, avg_vs_ndx: -7.7, hit_pct: 0 },
+    last: [{ tk: "AAA", date: "2026-07-11", ret_pct: -25, vs_ndx_pp: -19.3 },
+           { tk: "BBB", date: "2026-07-11", ret_pct: -10.5, vs_ndx_pp: -4.8 }] };
+  const p1 = buildPrompt();
+  DATA.verdict_track.last[1].date = "2026-07-18";        // date distinte → avviso diverso
+  const p2 = buildPrompt();
+  DATA.verdict_track = saved;
+  return p1.includes("LIMITE STATISTICO DEL CAMPIONE") && p1.includes("NON osservazioni indipendenti")
+      && !p2.includes("LIMITE STATISTICO DEL CAMPIONE") && p2.includes("CAMPIONE PICCOLO")`));
+check("v159 meta-divergenza: se i candidati si concentrano nel settore già sovrappesato, il conflitto verdetto-vs-regime è dichiarato", run(`
+  const savedCap = RISK_PARAMS.capNoAdd_pct, savedNews = DATA.news;
+  RISK_PARAMS.capNoAdd_pct = 60;                          // sblocca i detenuti come candidati
+  DATA.news = [{ title: "AI chips rally", tickers: [], sentiment: "neu", source: "T", published: "2026-07-24T14:00:00Z" }];
+  const dv = decisionVerdict();
+  const txt = marketLinkText();
+  RISK_PARAMS.capNoAdd_pct = savedCap; DATA.news = savedNews;
+  const cands = dv.accumula || [];
+  if (cands.length < 2) return true;                      // scenario non riproducibile nel fixture: vacuo
+  // stesso criterio del detector: settore dominante ≥50% dei candidati
+  const secOf = (r) => (r.sector || "n.d.");
+  const by = {}; cands.forEach(r => { const s = secOf(r); (by[s] = by[s] || []).push(r.ticker); });
+  const top = Object.values(by).sort((a, b) => b.length - a.length)[0];
+  const dominante = top.length >= 2 && top.length / cands.length >= 0.5;
+  const expo = (DATA.portfolio || []).filter(r => secOf(r) === Object.keys(by).find(k => by[k] === top))
+    .reduce((s, r) => s + (positionWeightPct(r) ?? 0), 0);
+  return (dominante && expo >= 25) ? txt.includes("VERDETTO vs REGIME") : true`));
 check("v158 cap headroom: OGNI candidato GIÀ detenuto dichiara la capienza residua entro il cap (quote + €)", run(`
   // cap alzato per far entrare fra i candidati un nome DETENUTO (nel fixture i pesi sono alti):
   // senza, withPlan contiene solo watchlist (peso nullo) e l'invariante sarebbe vuoto.

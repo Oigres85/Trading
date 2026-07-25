@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "158";
+const BUILD_VERSION = "159";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4925,6 +4925,17 @@ function buildPrompt() {
     const bits = [fmtB(vt.mature30, "maturazione ≥30g"), fmtB(vt.mature7, "maturazione ≥7g")].filter(Boolean);
     lines.push(`TRACK RECORD DEL MOTORE (esito dei segnali ACCUMULA passati, ipotesi di acquisto alla chiusura del giorno del segnale — usalo per CALIBRARE la fiducia nei candidati odierni; un motore in errore va pesato di conseguenza): ${bits.join(" · ")}.`);
     if ((vt.last || []).length) lines.push("· Ultimi segnali maturati: " + vt.last.map(s => `${s.tk} ${signTxt(s.ret_pct)} (vs NDX ${signTxt(s.vs_ndx_pp, "pp")}, segnale ${s.date})`).join(" · ") + ".");
+    // v159 — ONESTÀ STATISTICA: un "hit-rate 0% su 4 segnali" suona come una condanna del motore, ma
+    // se i 4 segnali sono dello STESSO GIORNO su nomi correlati non sono 4 osservazioni indipendenti:
+    // è UN evento di mercato osservato 4 volte, e non autorizza nessuna calibrazione. Senza questa
+    // riga il payload induce un errore di inferenza (l'LLM conclude "il motore è rotto" da n=1).
+    const days = [...new Set((vt.last || []).map(s => s.date).filter(Boolean))];
+    const nSig = ((vt.mature7 || {}).n || 0) + ((vt.mature30 || {}).n || 0);
+    if (days.length === 1 && (vt.last || []).length > 1) {
+      lines.push(`· ⚠ LIMITE STATISTICO DEL CAMPIONE: tutti i segnali maturati provengono da UN SOLO giorno (${days[0]}) e da nomi fortemente correlati — è un evento osservato più volte, NON osservazioni indipendenti. Un hit-rate calcolato così NON è una misura della bontà del motore: usalo come indizio (in quella finestra il motore ha comprato debolezza che è peggiorata), mai come prova statistica. Il campione diventa informativo con segnali distribuiti su più date.`);
+    } else if (nSig > 0 && nSig < 10) {
+      lines.push(`· ⚠ CAMPIONE PICCOLO (${nSig} segnali su ${days.length} date distinte): indizio direzionale, non evidenza statistica — non trarne conclusioni forti sulla bontà del motore.`);
+    }
   } else {
     lines.push("TRACK RECORD DEL MOTORE: storico in costruzione — i segnali ACCUMULA vengono loggati a ogni run e valutati dopo 7 e 30 giorni di maturazione. Finché non matura, tratta i candidati del motore come ipotesi da validare, non come raccomandazioni provate.");
   }
@@ -5627,7 +5638,13 @@ function activeTitleNews() {
 /* EXECUTIVE BRIEF (v131): Δ dall'ultimo storico + priorità operativa — l'orientamento in cima
    che trasforma il dump in un brief. Solo INPUT per l'analisi, NON decisioni (quelle le prende Claude). */
 function buildExecutiveDelta() {
-  const L = ["=== EXECUTIVE BRIEF — Δ dall'ultimo storico + priorità di oggi (INPUT per l'analisi, non decisioni) ==="];
+  // v159 — a mercato CHIUSO "oggi" non esiste: i prezzi sono quelli dell'ultima seduta e il Δ dal run
+  // precedente è ~0 per costruzione. Etichettare quei numeri "oggi" (e un Δ 0% come "non è cambiato
+  // nulla") contraddiceva il blocco CATALIZZATORI NON PREZZATI, che nello stesso payload elenca
+  // decine di novità. Il brief ora dichiara quale orologio sta leggendo.
+  const closedNow = !usRegularSessionOpen();
+  const dayLab = closedNow ? "ultima seduta" : "oggi";
+  const L = [`=== EXECUTIVE BRIEF — Δ dall'ultimo storico + priorità ${closedNow ? "per la prossima apertura" : "di oggi"} (INPUT per l'analisi, non decisioni) ===`];
   const t = DATA.totals || {};
   const mh = (DATA.metrics_history || []).filter(x => x);
   // RENDIMENTI DEL BOOK cash-flow-neutral (da gain_pct), NON dai delta di eur_value: quella serie
@@ -5641,7 +5658,12 @@ function buildExecutiveDelta() {
   // prima la riga stampava il patrimonio TOTALE etichettato "Investito" e ci appiccicava delta
   // calcolati sulla serie invested → doppio disallineamento.
   const invested = Number.isFinite(t.eur_invested) ? t.eur_invested : (t.eur_value != null ? t.eur_value - (cashEur || 0) : null);
-  L.push(`· Investito €${invested != null ? fmtNum.format(Math.round(invested)) : "—"} (MTM, cassa esclusa · Δ ultimo run ${signTxt(dLast)}, Δ~7g ${signTxt(d7)} — rendimento del book cash-neutral) · Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · VIX ${dgTxt((DATA.macro || {}).vix && DATA.macro.vix.value, "", 1)} · cassa ${fmtEUR.format(Math.round(cashEur || 0))} · budget op. ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"}`);
+  // Δ dal run precedente: a mercati chiusi è ~0 PER COSTRUZIONE (stessi prezzi) — dirlo, altrimenti
+  // "0%" si legge come "niente di nuovo" proprio mentre arrivano notizie non ancora prezzate.
+  const dLastTxt = (closedNow && dLast != null && Math.abs(dLast) < 0.05)
+    ? `Δ ultimo run ~0% (mercati CHIUSI: prezzi identici per costruzione — il nuovo di questo run NON è nei prezzi, è nelle notizie post-chiusura)`
+    : `Δ ultimo run ${signTxt(dLast)}`;
+  L.push(`· Investito €${invested != null ? fmtNum.format(Math.round(invested)) : "—"} (MTM, cassa esclusa · ${dLastTxt}, Δ~7g ${signTxt(d7)} — rendimento del book cash-neutral) · Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · VIX ${dgTxt((DATA.macro || {}).vix && DATA.macro.vix.value, "", 1)} · cassa ${fmtEUR.format(Math.round(cashEur || 0))} · budget op. ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"}`);
   // BENCHMARK: UN SOLO indice su tutte le finestre — Nasdaq 100 (il mandato, memory "vs NDX"),
   // via QQQ, l'unica serie NDX-family con spark w1/m1. Prima mescolava NDX (giorno) e Nasdaq
   // COMPOSITE (settimana/mese): indici DIVERSI, alpha non confrontabili tra finestre.
@@ -5652,7 +5674,7 @@ function buildExecutiveDelta() {
   const ndxDay = (qqq && qqq.change_pct != null) ? qqq.change_pct : dgFin(bm.ndx);
   const pday = typeof portfolioDayPct === "function" ? portfolioDayPct() : null;
   const alphaDay = (pday != null && ndxDay != null) ? Math.round((pday - ndxDay) * 100) / 100 : null;
-  L.push(`· BENCHMARK vs Nasdaq 100 (il mandato, proxy QQQ): oggi fondo ${signTxt(pday)} vs NDX ${signTxt(ndxDay)}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs NDX ${signTxt(ndxTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs NDX ${signTxt(ndxTr("m1"))} (finestre approssimate: rilevazioni fondo vs sedute indice — l'alpha di PERIODO è il verdetto sul processo, non il P&L assoluto)`);
+  L.push(`· BENCHMARK vs Nasdaq 100 (il mandato, proxy QQQ): ${dayLab} fondo ${signTxt(pday)} vs NDX ${signTxt(ndxDay)}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs NDX ${signTxt(ndxTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs NDX ${signTxt(ndxTr("m1"))} (finestre approssimate: rilevazioni fondo vs sedute indice — l'alpha di PERIODO è il verdetto sul processo, non il P&L assoluto)`);
   const v = decisionVerdict();
   L.push(`· Verdetto motore: ${v.label} (${dgTxt(v.score, "", 0)}/100)${(v.withPlan || []).length ? ` · candidati (${v.withPlan.length}): ${v.withPlan.slice(0, 6).map(p => p.r.ticker).join(", ")}${v.withPlan.length > 6 ? ", …" : ""}` : ""}`);
   // priorità: budget 0, shock, stop violati, earnings ≤7g, veto in ptf, top/worst RS mover
@@ -5920,9 +5942,36 @@ function marketLinkText() {
   // il TRACK RECORD del motore su quello stesso nome, e la RS che ACCELERA su un nome in veto FORTE
   // (momentum di brevissimo vs distruzione di valore di fondo). Sono le contraddizioni che l'LLM
   // non vede da solo perché vivono in tabelle lontane nel payload.
-  const divRelapse = [], divMcr = [], divTheme = [], divAccel = [], divStop = [];
+  const divRelapse = [], divMcr = [], divTheme = [], divAccel = [], divStop = [], divMeta = [];
   let dvL = null;
   try { dvL = decisionVerdict(); } catch { dvL = null; }
+
+  // 3z) META-DIVERGENZA (v159): il VERDETTO del motore contro il REGIME di rischio del motore stesso.
+  // È la contraddizione che contiene tutte le altre e che il sistema non calcolava: i singoli detector
+  // dicevano "MU concentra il rischio", "AMD idem", ma nessuno diceva che il motore sta CHIEDENDO di
+  // aumentare proprio quella concentrazione. Un CIO che legge 5 candidati e non nota che 4 sono dello
+  // stesso settore in cui è già sovrappesato (in un settore che per giunta perde) sta subendo il
+  // verdetto invece di pesarlo. Qui il conflitto si dichiara, non si risolve: la scelta resta del CEO.
+  if (dvL && (dvL.accumula || []).length) {
+    const cands = dvL.accumula;
+    const secOf = (r) => thIsSemi(r) ? "Semiconduttori/memoria" : (r.sector || "n.d.");
+    const bySec = new Map();
+    for (const r of cands) { const s = secOf(r); bySec.set(s, [...(bySec.get(s) || []), r.ticker]); }
+    // settore dominante fra i candidati
+    let top = null;
+    for (const [s, tks] of bySec) if (!top || tks.length > top[1].length) top = [s, tks];
+    if (top && top[1].length >= 2 && top[1].length / cands.length >= 0.5) {
+      // esposizione ATTUALE del book su quel settore + vento settoriale 1M
+      const mine = ptf.filter(r => secOf(r) === top[0]);
+      const expoNow = mine.reduce((s, r) => s + (wOf(r) ?? 0), 0);
+      const mcrNow = mine.reduce((s, r) => s + (mcrOf(r) ?? 0), 0);
+      const tiltRow = ((DATA.macro || {}).tilt || []).find(x => /semicond/i.test(x.name || "") ) ;
+      const wind = (top[0].startsWith("Semi") && tiltRow && dgFin(tiltRow.m1) != null) ? dgFin(tiltRow.m1) : null;
+      if (expoNow >= 25) {
+        divMeta.push(`  ⚑ VERDETTO vs REGIME: il motore dice ${dvL.label} e ${top[1].length} dei ${cands.length} candidati (${top[1].join(", ")}) sono ${top[0]} — settore su cui il book pesa GIÀ ${fmtNum.format(Math.round(expoNow * 10) / 10)}% del NAV e ${fmtNum.format(Math.round(mcrNow * 10) / 10)}% del rischio${wind != null ? `, con vento settoriale ${signTxt(wind)} a 1M` : ""}. Il motore ottimizza titolo per titolo (Sharpe marginale, RS, qualità) e NON vede il portafoglio che ne risulta: seguirlo alla lettera AUMENTA la concentrazione che le tue stesse metriche segnalano. Non è un divieto — è la scelta che devi fare consapevolmente: concentrare ancora sulla convinzione, o usare il budget per de-correlare. Dichiara quale delle due, e perché.`);
+      }
+    }
+  }
 
   // 3a) candidato d'accumulo che il motore ha GIÀ giocato e perso (track record del nome)
   const losers = new Map(((DATA.verdict_track || {}).last || [])
@@ -5966,7 +6015,8 @@ function marketLinkText() {
       if (dist <= 3 && (w ?? 0) >= 5) divStop.push(`  ${r.ticker}: stop a ${signTxt(Math.round(dist * 10) / 10)} dal prezzo su una posizione da ${fmtNum.format(w)}% del NAV → una seduta storta la porta in esecuzione`);
     }
   }
-  const div = [...divRelapse, ...divMcr, ...divTheme, ...divAccel, ...divStop];
+  // la meta-divergenza apre: è la cornice dentro cui vanno lette le altre
+  const div = [...divMeta, ...divRelapse, ...divMcr, ...divTheme, ...divAccel, ...divStop];
   if (div.length) {
     L.push("· DIVERGENZE RILEVATE DAL SISTEMA (contraddizioni nei dati: spiegale, non elencarle):");
     L.push(...div.slice(0, 8));
