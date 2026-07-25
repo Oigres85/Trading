@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "157";
+const BUILD_VERSION = "158";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1037,19 +1037,61 @@ function sessionContextLine() {
   const wl = DATA.watchlist || [];
   const ks = wl.find(r => r.ticker === "^KS11"), btc = wl.find(r => r.ticker === "BTC-USD");
   const fut = (DATA.macro || {}).futures || {};
+  // v158 — un anticipatore vale solo se è FRESCO. Nel weekend anche l'Asia è chiusa: il KOSPI è la
+  // candela di venerdì, già incorporata nella chiusura USA di venerdì. Spacciarlo per "anticipatore"
+  // spingeva a leggere due volte lo stesso movimento (e ha già prodotto un allarme shock fantasma).
+  const dmy = (v) => { const t = new Date(String(v).slice(0, 10)); return isNaN(t) ? "" : ` [chiusura del ${String(t.getUTCDate()).padStart(2, "0")}/${String(t.getUTCMonth() + 1).padStart(2, "0")}]`; };
   const lead = [
-    ks && ks.change_pct != null ? `KOSPI ${signTxt(ks.change_pct)}${ks.price_live ? " [LIVE]" : ""}` : null,
+    ks && ks.change_pct != null ? `KOSPI ${signTxt(ks.change_pct)}${ks.price_live ? " [LIVE]" : dmy(ks.price_asof)}` : null,
     fut.nasdaq?.change_pct != null ? `Fut NDX ${signTxt(fut.nasdaq.change_pct)}` : null,
     fut.sp500?.change_pct != null ? `Fut S&P ${signTxt(fut.sp500.change_pct)}` : null,
-    btc && btc.change_pct != null ? `BTC ${signTxt(btc.change_pct)}` : null,
+    btc && btc.change_pct != null ? `BTC ${signTxt(btc.change_pct)} [24/7]` : null,
   ].filter(Boolean).join(" · ");
   const beforeBell = s.phase === "notte" || s.phase === "pre-market" || s.phase === "weekend";
-  const guida = beforeBell
+  const guida = s.phase === "weekend"
+    ? `WEEKEND, MERCATI CHIUSI (apertura tra ~${hrs}h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono le NOTIZIE arrivate dopo la campana (vedi CATALIZZATORI NON ANCORA PREZZATI): gli ordini valgono per l'apertura di lunedì, a limite, mai a mercato`
+    : beforeBell
     ? `SEI PRIMA DELLA CAMPANA (apertura tra ~${hrs}h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura`
     : s.phase === "regular"
       ? `SESSIONE USA APERTA: i prezzi live hanno priorità; gli ordini limite sono eseguibili oggi`
       : `USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~${hrs}h); il "→ agg." incorpora già il gap after`;
   return `CONTESTO DI SESSIONE (ora ET ${s.etHHMM}, fase: ${s.phase.toUpperCase()} — festività USA non considerate)${lead ? ` · ANTICIPATORI: ${lead}` : ""} · ${guida}.`;
+}
+/* ── OROLOGIO DEL PREZZO vs OROLOGIO DELLE NOTIZIE (v158) ─────────────────────────
+   Il payload mescola due orologi: i PREZZI si fermano alla campana (venerdì 16:00 ET), le NEWS
+   continuano ad arrivare. Senza questa distinzione il sistema commette un errore logico grave:
+   confronta un prezzo di venerdì con una notizia di sabato e conclude che "il flusso non conferma
+   la narrativa" — ma il prezzo NON PUÒ aver votato una notizia che non ha ancora visto.
+   Queste funzioni separano le news GIÀ PREZZATE da quelle NON ANCORA PREZZATE (i catalizzatori
+   della prossima apertura), che è informazione operativa che il payload prima non sapeva esprimere. */
+function etUtcOffsetHours(d) {   // ore da sottrarre a UTC per avere l'ora di New York (4 EDT / 5 EST)
+  const utc = new Date(d.toLocaleString("en-US", { timeZone: "UTC" }));
+  const et = new Date(d.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  return Math.round((utc - et) / 3600000);
+}
+/* istante UTC dell'ultima chiusura USA (16:00 ET del giorno di price_asof delle EQUITY:
+   crypto/futures/indici esteri quotano 24/7 e falserebbero il confine) */
+function lastUsEquityCloseUTC() {
+  const eq = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+    .filter(r => r && r.currency === "USD" && !/-USD$|^\^|=F$/.test(r.ticker || "") && r.price_asof);
+  const asof = eq.map(r => String(r.price_asof).slice(0, 10)).sort().pop();
+  if (!asof) return null;
+  const off = etUtcOffsetHours(new Date(asof + "T18:00:00Z"));
+  const t = new Date(`${asof}T${String(16 + off).padStart(2, "0")}:00:00Z`);
+  return isNaN(t) ? null : { at: t, asof };
+}
+/* news pubblicate DOPO l'ultima chiusura = non ancora nel prezzo.
+   Esclude le voci sintetiche Polymarket (sono snapshot di probabilità, non notizie). */
+function newsSplitByClose() {
+  const close = lastUsEquityCloseUTC();
+  const real = (DATA.news || []).filter(n => n && n.title && !/— probabilità Sì/.test(n.title_it || n.title));
+  if (!close) return { unpriced: [], priced: real, close: null, total: real.length };
+  const unpriced = [], priced = [];
+  for (const n of real) {
+    const t = n.published ? new Date(n.published) : null;
+    (t && !isNaN(t) && t > close.at ? unpriced : priced).push(n);
+  }
+  return { unpriced, priced, close, total: real.length };
 }
 const seoulToday = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // UTC+9, niente DST
 function shockSourcesLive() {
@@ -4834,7 +4876,22 @@ function buildPrompt() {
           const heldStop = p.r.qty ? stopOf(p.r) : null;
           const heldTag = (heldStop && heldStop.stop > p.limit)
             ? ` [NB: posizione GIÀ detenuta con stop ratchet $${fmtNum.format(heldStop.stop)} SOPRA questo limite — il prezzo arriva al limite solo DOPO aver violato lo stop: decidi prima la sorte della posizione]` : "";
-          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}${heldTag}`;
+          // v158 — CAPIENZA RESIDUA AL CAP: il gate blocca chi è GIÀ oltre il cap, ma un candidato
+          // appena sotto (MU 18,9% con cap 20%) lo ATTRAVERSA comprando, e il payload non dava
+          // all'LLM alcun numero per accorgersene. Qui la capienza è CALCOLATA (quote entro il cap),
+          // dichiarata come evidenza — non come divieto: sforare resta una scelta del CEO, ma esplicita.
+          let capTag = "";
+          const wNow = p.r.qty ? positionWeightPct(p.r) : null;
+          const navTot = (DATA?.totals?.eur_invested || 0) + cashEur;
+          if (wNow != null && navTot > 0 && p.limit > 0) {
+            const roomEur = (RISK_PARAMS.capNoAdd_pct - wNow) / 100 * navTot;
+            const eurusd = DATA.eurusd || 1.08;
+            const maxQty = Math.floor(roomEur * eurusd / p.limit);
+            capTag = maxQty > 0
+              ? ` [CAP: già ${fmtNum.format(wNow)}% del NAV su un cap del ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% → capienza residua ~${fmtNum.format(maxQty)} quote a questo limite (~${fmtEUR.format(Math.round(roomEur))}); oltre, l'ingresso porta la posizione FUORI dal cap: se lo fai, dichiaralo]`
+              : ` [CAP: già ${fmtNum.format(wNow)}% del NAV, cap ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% → capienza ESAURITA: qualunque acquisto sfora il cap]`;
+          }
+          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}${heldTag}${capTag}`;
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {
@@ -5751,10 +5808,16 @@ function marketLinkText() {
 
   // ── 1) TEMI DELLE NEWS → POSIZIONI TOCCATE ────────────────────────────────
   const news = (DATA.news || []).filter(n => n && n.title);
+  // OROLOGIO DEL PREZZO (v158): quali news il prezzo ha GIÀ votato e quali no. Serve sia al blocco
+  // dei catalizzatori non prezzati sia a non dichiarare divergenze logicamente impossibili.
+  const split = newsSplitByClose();
+  const marketClosed = !usRegularSessionOpen();
+  const unpricedSet = new Set(split.unpriced.map(n => n.title));
   const themed = [];
   for (const th of NEWS_THEMES) {
     const hits = news.filter(n => th.m(n.title || "", n.title_it || ""));
     if (!hits.length) continue;
+    const nUnpriced = hits.filter(n => unpricedSet.has(n.title)).length;
     let targets;
     if (th.sel) targets = themeMembers(th, universe);
     else {   // temi TASSI/GEOPOLITICA: colpiscono chi paga multiplo/beta — i più sensibili del book
@@ -5767,14 +5830,63 @@ function marketLinkText() {
     const inPtf = targets.filter(r => held.has(r.ticker));
     if (!targets.length) continue;
     const expo = inPtf.reduce((s, r) => s + (wOf(r) ?? 0), 0);
-    themed.push({ id: th.id, n: hits.length, sample: (hits[0].title_it || hits[0].title).slice(0, 110),
+    themed.push({ id: th.id, n: hits.length, nUnpriced, th, sample: (hits[0].title_it || hits[0].title).slice(0, 110),
                   targets: targets.slice(0, 8), expo, inPtf: inPtf.length });
   }
   themed.sort((a, b) => b.expo - a.expo || b.n - a.n);
   if (themed.length) {
     L.push("· TEMI DELLE NEWS DI OGGI → LE TUE POSIZIONI ESPOSTE (il collegamento news↔book, che i ticker delle news NON danno):");
     for (const t of themed) {
-      L.push(`  [${t.id}] ${t.n} news · es. "${t.sample}" → ${t.targets.map(tag).join(" · ")}${t.inPtf ? ` — esposizione in PTF ${fmtNum.format(Math.round(t.expo * 10) / 10)}% del NAV` : " — nessuna posizione detenuta (solo watchlist)"}`);
+      const unp = (marketClosed && t.nUnpriced) ? ` · ⏰ ${t.nUnpriced}/${t.n} NON ancora prezzate` : "";
+      L.push(`  [${t.id}] ${t.n} news${unp} · es. "${t.sample}" → ${t.targets.map(tag).join(" · ")}${t.inPtf ? ` — esposizione in PTF ${fmtNum.format(Math.round(t.expo * 10) / 10)}% del NAV` : " — nessuna posizione detenuta (solo watchlist)"}`);
+    }
+  }
+
+  // ── 1-bis) CATALIZZATORI NON ANCORA PREZZATI (v158) ───────────────────────
+  // A mercato chiuso il prezzo è congelato alla campana: le news arrivate dopo NON sono nel prezzo.
+  // Sono le uniche che possono muovere la PROSSIMA apertura — e il payload prima non le distingueva
+  // dalle news già digerite, seppellendo un catalizzatore su misura del book in mezzo alle altre.
+  if (marketClosed && split.unpriced.length && split.close) {
+    const dt = split.close.at;
+    const dd = `${String(dt.getUTCDate()).padStart(2, "0")}/${String(dt.getUTCMonth() + 1).padStart(2, "0")}`;
+    // ogni news non prezzata → titoli toccati: prima i ticker espliciti della news, poi i temi
+    const rows = [];
+    const cut = (s, n) => { const x = String(s); if (x.length <= n) return x; const c = x.slice(0, n); const sp = c.lastIndexOf(" "); return (sp > n * 0.6 ? c.slice(0, sp) : c) + "…"; };
+    for (const n of split.unpriced) {
+      const en = n.title || "", it = n.title_it || "";
+      // una news che CITA il ticker vale molto più di un macro-tema che si sventaglia su mezzo book:
+      // la specificità è il criterio di ordinamento, non la sola esposizione.
+      const direct = (n.tickers || []).map(t => universe.get(t)).filter(r => r && held.has(r.ticker));
+      const ths = NEWS_THEMES.filter(t => t.m(en, it) && t.sel);
+      const viaTheme = ths.flatMap(t => themeMembers(t, held));
+      const hit = [...new Map([...direct, ...viaTheme].map(r => [r.ticker, r])).values()]
+        .filter(r => held.has(r.ticker))
+        .sort((a, b) => (direct.includes(b) ? 1 : 0) - (direct.includes(a) ? 1 : 0) || (wOf(b) ?? 0) - (wOf(a) ?? 0));
+      if (!hit.length) continue;                         // solo ciò che tocca il book: niente rumore macro
+      const expo = hit.reduce((s, r) => s + (wOf(r) ?? 0), 0);
+      const when = n.published ? new Date(n.published) : null;
+      const hhmm = when && !isNaN(when) ? `${String(when.getUTCDate()).padStart(2, "0")}/${String(when.getUTCMonth() + 1).padStart(2, "0")} ${String(when.getUTCHours()).padStart(2, "0")}:${String(when.getUTCMinutes()).padStart(2, "0")}Z` : "—";
+      const names = hit.slice(0, 4).map(r => `${r.ticker}${direct.includes(r) ? "◄citata" : ""} ${fmtNum.format(wOf(r) ?? 0)}%`).join(" · ");
+      // firma dei bersagli: più news macro che colpiscono ESATTAMENTE lo stesso gruppo si contano, non si ripetono
+      const sig = hit.map(r => r.ticker).join(",");
+      rows.push({ expo, sig, direct: direct.length > 0,
+        txt: `  ${hhmm} · "${cut(it || en, 105)}" → ${names}${hit.length > 4 ? ` +${hit.length - 4}` : ""} = ${fmtNum.format(Math.round(expo * 10) / 10)}% NAV${ths.length ? ` [${ths.map(t => t.id).join(", ")}]` : ""}` });
+    }
+    // prima le news che citano un mio titolo, poi per esposizione
+    rows.sort((a, b) => (b.direct ? 1 : 0) - (a.direct ? 1 : 0) || b.expo - a.expo);
+    const shown = [], dupCount = new Map();
+    for (const r of rows) {
+      const k = r.direct ? `direct:${r.txt}` : r.sig;
+      if (!r.direct && dupCount.has(k)) { dupCount.set(k, dupCount.get(k) + 1); continue; }
+      dupCount.set(k, 1); shown.push(r);
+    }
+    if (shown.length) {
+      L.push(`· ⏰ CATALIZZATORI NON ANCORA PREZZATI (${split.unpriced.length} news su ${split.total} pubblicate DOPO la chiusura del ${dd}: il prezzo che vedi NON le ha ancora viste). NON spiegano il passato — sono ciò che può muovere la PROSSIMA apertura, ed è qui che un ordine limite si vince o si perde. "◄citata" = la news nomina quel titolo (segnale specifico); senza, è esposizione tematica:`);
+      for (const r of shown.slice(0, 6)) {
+        const extra = !r.direct && dupCount.get(r.sig) > 1 ? `  (+${dupCount.get(r.sig) - 1} altre news sullo stesso gruppo)` : "";
+        L.push(r.txt + extra);
+      }
+      if (shown.length > 6) L.push(`  (+${shown.length - 6} altri gruppi non prezzati a impatto minore)`);
     }
   }
 
@@ -5832,7 +5944,16 @@ function marketLinkText() {
     }
     const nTheme = themed.filter(t => t.targets.some(x => x.ticker === r.ticker));
     if (nTheme.length && rs != null && rs <= -3) {
-      divTheme.push(`  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] ma la sua forza relativa è ${signTxt(rs, "pp")} vs NDX → il flusso NON conferma la narrativa delle news`);
+      // v158 — QUALIFICATORE TEMPORALE: se la maggioranza delle news del tema è arrivata DOPO la
+      // chiusura, il prezzo non ha ancora potuto votarle: chiamarla "il flusso non conferma" è un
+      // errore logico (si confronta un prezzo di venerdì con una notizia di sabato). In quel caso
+      // la riga cambia natura: non è una contraddizione, è una tesi ancora da verificare all'apertura.
+      const totNews = nTheme.reduce((s, t) => s + t.n, 0);
+      const totUnpriced = nTheme.reduce((s, t) => s + (t.nUnpriced || 0), 0);
+      const priceBlind = marketClosed && totNews > 0 && totUnpriced / totNews >= 0.5;
+      divTheme.push(priceBlind
+        ? `  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] con RS ${signTxt(rs, "pp")} vs NDX, MA ${totUnpriced}/${totNews} di quelle news sono POSTERIORI alla chiusura → la RS misura il prezzo PRIMA della notizia: non è il flusso che smentisce la narrativa, è una narrativa che il flusso non ha ancora votato. Verifica all'apertura, non trattarla come contraddizione`
+        : `  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] ma la sua forza relativa è ${signTxt(rs, "pp")} vs NDX → il flusso NON conferma la narrativa delle news`);
     }
     const v = vetoStrong.get(r.ticker);
     if (v) {

@@ -858,10 +858,25 @@ check("v149 sessione: fasi deterministiche (lun 08:00 ET=pre-market · mer 12:00
       && at("2026-07-25T15:00:00Z").phase === "weekend"        // sabato
       && at("2026-07-22T02:00:00Z").phase === "notte"          // martedì 22:00 ET (mer 02:00 UTC)
       && at("2026-07-20T12:00:00Z").minsToOpen === 90`));
-check("v149 sessione: la riga CONTESTO DI SESSIONE è nel prompt con fase + guida ordini-per-campana", run(`
+check("v149→v158 sessione: la riga CONTESTO DI SESSIONE è nel prompt con fase + guida ordini-per-campana (weekend ha la sua guida)", run(`
   const p = buildPrompt();
   return p.includes("CONTESTO DI SESSIONE (ora ET ") &&
-    (p.includes("PRIMA DELLA CAMPANA") || p.includes("SESSIONE USA APERTA") || p.includes("AFTER-HOURS"))`));
+    (p.includes("PRIMA DELLA CAMPANA") || p.includes("SESSIONE USA APERTA") || p.includes("AFTER-HOURS")
+     || p.includes("WEEKEND, MERCATI CHIUSI"))`));
+check("v158 orologio del prezzo: le news dopo la chiusura USA sono separate da quelle già prezzate", run(`
+  const savedN = DATA.news, savedP = DATA.portfolio[0].price_asof, savedC = DATA.portfolio[0].currency;
+  DATA.portfolio[0].price_asof = "2026-07-24"; DATA.portfolio[0].currency = "USD";
+  DATA.news = [
+    { title: "Priced in already", published: "2026-07-24T14:00:00Z", tickers: [], sentiment: "neu", source: "T" },
+    { title: "After the bell catalyst", published: "2026-07-25T02:00:00Z", tickers: [], sentiment: "neu", source: "T" },
+    { title: "Fed poll — probabilità Sì 70%", published: "2026-07-25T03:00:00Z", tickers: [], sentiment: "neu", source: "T" },
+  ];
+  const s = newsSplitByClose();
+  DATA.news = savedN; DATA.portfolio[0].price_asof = savedP; DATA.portfolio[0].currency = savedC;
+  // il confine è 16:00 ET = 20:00Z (EDT); la voce Polymarket sintetica è esclusa dal conteggio
+  return s.close != null && s.close.asof === "2026-07-24" && s.total === 2
+      && s.unpriced.length === 1 && s.unpriced[0].title === "After the bell catalyst"
+      && s.priced.length === 1`));
 check("v149 sessione: con KOSPI/futures/BTC nel fixture gli ANTICIPATORI compaiono inline", run(`
   DATA.watchlist.push({ ticker: "^KS11", currency: "PTS", price: 6800, change_pct: 4.5, price_live: true });
   DATA.macro.futures = { nasdaq: { change_pct: 0.27 }, sp500: { change_pct: 0.14 } };
@@ -907,6 +922,25 @@ check("v156 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi, PROME
   const iProm = t.lastIndexOf("PROMEMORIA FINALE:");
   // il blocco sintesi sta DOPO la testata ma PRIMA delle tabelle-silo; PROMEMORIA è l'ULTIMA sezione
   return iCorr > 0 && iData > iCorr && iProm > iData && !t.slice(iProm).includes("DATI AL ")`));
+check("v158 cap headroom: OGNI candidato GIÀ detenuto dichiara la capienza residua entro il cap (quote + €)", run(`
+  // cap alzato per far entrare fra i candidati un nome DETENUTO (nel fixture i pesi sono alti):
+  // senza, withPlan contiene solo watchlist (peso nullo) e l'invariante sarebbe vuoto.
+  const savedCap = RISK_PARAMS.capNoAdd_pct;
+  RISK_PARAMS.capNoAdd_pct = 60;
+  const dv = decisionVerdict();
+  const p = buildPrompt();
+  RISK_PARAMS.capNoAdd_pct = savedCap;
+  const line = p.split("\\n").find(l => l.includes("Livelli calcolati dal motore"));
+  const heldCands = (dv.withPlan || []).filter(x => x.r && x.r.qty > 0).map(x => x.r.ticker);
+  if (!heldCands.length) return true;                    // nessun candidato detenuto: invariante vacua
+  if (line == null) return false;
+  // per ogni candidato detenuto deve comparire un tag CAP con capienza in quote o esaurita
+  const seg = line.split(" · ");
+  return heldCands.every(tk => {
+    const s = seg.find(x => x.startsWith(tk + ":") || x.includes(tk + ": prezzo"));
+    return s != null && s.includes("[CAP:") &&
+      (/capienza residua ~\\d/.test(s) || s.includes("capienza ESAURITA"));
+  })`));
 check("v151 held-candidate: candidato già detenuto con ratchet sopra il limite → NB esplicito nella riga Livelli", run(`
   const r = DATA.portfolio.find(x => x.ticker === "TST1");   // TST1: qty 100, stop_atr 94
   const saved = { pe: r.pe, sh: r.sharpe_1y };
