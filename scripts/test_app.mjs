@@ -932,6 +932,32 @@ check("v156 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi, PROME
   const iProm = t.lastIndexOf("PROMEMORIA FINALE:");
   // il blocco sintesi sta DOPO la testata ma PRIMA delle tabelle-silo; PROMEMORIA è l'ULTIMA sezione
   return iCorr > 0 && iData > iCorr && iProm > iData && !t.slice(iProm).includes("DATI AL ")`));
+check("v162 rischio: il confronto parametrico distingue VaR ed ES (prima una cifra di VaR seguiva l'ES e si leggeva come suo)", run(`
+  const t = DATA.totals, saved = { v: t.var95_1d_eur, e: t.es95_1d_eur, vh: t.var95_hist_eur, eh: t.es95_hist_eur };
+  Object.assign(t, { var95_1d_eur: 9802, es95_1d_eur: 12298, var95_hist_eur: 9184, es95_hist_eur: 12986 });
+  const p = buildPrompt();
+  Object.assign(t, { var95_1d_eur: saved.v, es95_1d_eur: saved.e, var95_hist_eur: saved.vh, es95_hist_eur: saved.eh });
+  const line = p.split("\\n").find(l => l.includes("VaR 95% a 1 giorno"));
+  if (line == null) return true;                          // riga assente in questo scenario: vacuo
+  // entrambe le cifre parametriche presenti E ciascuna col suo nome (niente numero orfano)
+  return /VaR 9802/.test(line) && /ES 12\\.298/.test(line) && line.includes("PARAMETRICO")
+      && !/\\[parametrico: [\\d.]+ €\\]/.test(line)`));
+check("v162 falsi negativi tematici: 'federal reserve' per esteso, 'trade practices' e 'clean energy' vengono catturati", run(`
+  // si testano i MATCHER direttamente: un tema entra nel payload solo se ha titoli BERSAGLIO nel
+  // book, e la fixture non ha semi né utility — passare da marketLinkText misurerebbe la fixture,
+  // non la regex che è ciò che è stato corretto.
+  const m = (id) => NEWS_THEMES.find(t => t.id === id).m;
+  const tassi = m("TASSI/FED/INFLAZIONE"), dazi = m("DAZI/EXPORT-CONTROL"), nuc = m("NUCLEARE/UTILITY");
+  return tassi("Economy bringing mixed messages ahead of next federal reserve meeting", "")
+      && tassi("", "L'economia prima della riunione della Fed")
+      && dazi("Trump says the US will investigate EU trade practices", "")
+      && dazi("", "indagine sulle pratiche commerciali UE")
+      && nuc("Trump administration admits grants for clean energy were canceled", "")
+      && nuc("", "sovvenzioni per l'energia pulita cancellate")
+      // e NON devono allargarsi a qualunque cosa: controllo anti-falso-positivo
+      && !tassi("Trump mixes jokes at press dinner", "")
+      && !dazi("Bitcoin slips on Iran tensions", "")
+      && !nuc("Nvidia unveils new GPU", "")`));
 check("v161 Polymarket: le voci sintetiche di probabilità non contano come news né fanno da esempio del tema", run(`
   const savedNews = DATA.news;
   DATA.news = [

@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "161";
+const BUILD_VERSION = "162";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2364,7 +2364,7 @@ function openPortfolioSharpeModal() {
     const vE = t.var95_hist_eur ?? t.var95_1d_eur, vP = t.var95_hist_pct ?? t.var95_1d_pct;
     const eE = t.es95_hist_eur ?? t.es95_1d_eur;
     const isHist = t.var95_hist_eur != null;
-    if (vE != null) extraRisk.push(`<div style="font-size:12.5px;margin-top:6px"><b>VaR 95% (1 giorno${isHist ? ", storico" : ", parametrico"})</b>: <b class="neg">${fmtEUR.format(vE)}</b> (${fmtNum.format(vP)}% dell'azionario) — la perdita che nel 95% dei giorni NON viene superata${isHist ? ", misurata sui percentili REALI degli ultimi 12 mesi" : ""}.${eE != null ? ` <b>Expected Shortfall</b>: <b class="neg">${fmtEUR.format(eE)}</b> — la perdita MEDIA nel 5% dei giorni peggiori (la coda oltre il VaR).` : ""}${isHist && t.var95_1d_eur != null ? ` <span class="muted">(parametrico normale: ${fmtEUR.format(t.var95_1d_eur)} — sottostima le code grasse)</span>` : ""}</div>`);
+    if (vE != null) extraRisk.push(`<div style="font-size:12.5px;margin-top:6px"><b>VaR 95% (1 giorno${isHist ? ", storico" : ", parametrico"})</b>: <b class="neg">${fmtEUR.format(vE)}</b> (${fmtNum.format(vP)}% dell'azionario) — la perdita che nel 95% dei giorni NON viene superata${isHist ? ", misurata sui percentili REALI degli ultimi 12 mesi" : ""}.${eE != null ? ` <b>Expected Shortfall</b>: <b class="neg">${fmtEUR.format(eE)}</b> — la perdita MEDIA nel 5% dei giorni peggiori (la coda oltre il VaR).` : ""}${isHist && t.var95_1d_eur != null ? ` <span class="muted">(col metodo parametrico normale: VaR ${fmtEUR.format(t.var95_1d_eur)}${t.es95_1d_eur != null ? `, ES ${fmtEUR.format(t.es95_1d_eur)}` : ""} — sottostima le code grasse)</span>` : ""}</div>`);
   }
   openInfoModal("Sharpe Ratio del portafoglio",
     `<div class="info-line" style="margin-bottom:10px"><b>Sharpe Ratio</b> = rendimento corretto per il rischio: l'extra-rendimento (sopra il tasso privo di rischio del <b>${fmtNum.format(rf)}%</b>) per ogni unità di volatilità. Quello di portafoglio è calcolato sulla <b>matrice di covarianza</b> pesata per controvalore, quindi tiene conto della diversificazione fra i titoli.</div>
@@ -4760,7 +4760,7 @@ function buildPrompt() {
     const vE = t.var95_hist_eur ?? t.var95_1d_eur, vP = t.var95_hist_pct ?? t.var95_1d_pct;
     const eE = t.es95_hist_eur ?? t.es95_1d_eur;
     const isHist = t.var95_hist_eur != null;
-    if (vE != null) riskBits.push(`VaR 95% a 1 giorno${isHist ? " (STORICO, percentili empirici 12M — onesto sulle code grasse)" : " (parametrico normale — sottostima le code)"}: ${fmtEUR.format(vE)} (${fmtNum.format(vP)}% del comparto azionario)${eE != null ? `, Expected Shortfall 95% a 1 GIORNO: ${fmtEUR.format(eE)} (perdita MEDIA nel 5% dei giorni peggiori — orizzonte GIORNALIERO, non annuale)` : ""}${isHist && t.var95_1d_eur != null ? ` [parametrico: ${fmtEUR.format(t.var95_1d_eur)}]` : ""}`);
+    if (vE != null) riskBits.push(`VaR 95% a 1 giorno${isHist ? " (STORICO, percentili empirici 12M — onesto sulle code grasse)" : " (parametrico normale — sottostima le code)"}: ${fmtEUR.format(vE)} (${fmtNum.format(vP)}% del comparto azionario)${eE != null ? `, Expected Shortfall 95% a 1 GIORNO: ${fmtEUR.format(eE)} (perdita MEDIA nel 5% dei giorni peggiori — orizzonte GIORNALIERO, non annuale)` : ""}${isHist && t.var95_1d_eur != null ? ` [confronto col metodo PARAMETRICO normale, che sottostima le code grasse: VaR ${fmtEUR.format(t.var95_1d_eur)}${t.es95_1d_eur != null ? ` · ES ${fmtEUR.format(t.es95_1d_eur)}` : ""} — il budget operativo usa l'ES STORICO, più prudente]` : ""}`);
   }
   if (t.avg_pairwise_corr != null) riskBits.push(`correlazione media tra le posizioni: ${fmtNum.format(t.avg_pairwise_corr)} (log-rendimenti giornalieri 12M, calcolata sul SOLO comparto azionario — BTP e liquidità NON sono nel calcolo, quindi non la "mitigano"; più è alta, minore la diversificazione reale)`);
   const fxP = fxExposure();
@@ -5830,7 +5830,9 @@ const NEWS_THEMES = [
   { id: "AI/DATACENTER", sel: (r) => thIsSemi(r) || thIsSoftware(r) || thIsMegacapComm(r),
     m: (en, it) => /\bAI\b/.test(en) || /artificial intelligence|data ?cent(er|re)|\bLLM\b|openai|inference/i.test(en) || /intelligenza artificiale|data ?center/i.test(it) },
   { id: "TASSI/FED/INFLAZIONE", sel: null,   // null = colpisce per MULTIPLO/BETA (il codice sceglie)
-    m: (en, it) => /\bfed\b|fomc|powell|interest rate|\brates?\b|inflation|\bcpi\b|\bpce\b|yield|treasury|bond sell|hawkish|dovish/i.test(en) || /inflazion|tass[oi] d|rendiment/i.test(it) },
+    // v162: "federal reserve" per esteso NON era coperto da \bfed\b — una news sulla riunione FOMC
+    // a 4 giorni dall'evento restava fuori dal tema. Idem "rate cut/hike/decision" e l'IT "riunione della Fed".
+    m: (en, it) => /\bfed\b|federal reserve|fomc|powell|interest rate|\brates?\b|rate (cut|hike|decision)|inflation|\bcpi\b|\bpce\b|yield|treasury|bond sell|hawkish|dovish/i.test(en) || /inflazion|tass[oi] d|rendiment|federal reserve|riunione della fed/i.test(it) },
   { id: "CLOUD/SOFTWARE", sel: thIsSoftware,
     m: (en, it) => /\bcloud\b|software|\bsaas\b|subscription/i.test(en) || /\bcloud\b|software/i.test(it) },
   { id: "CRYPTO", sel: (r) => /bitcoin|crypto|blockchain|stablecoin/i.test(thName(r)) || /-USD$/.test(r.ticker || ""),
@@ -5838,9 +5840,11 @@ const NEWS_THEMES = [
   { id: "ENERGIA/OIL", sel: thIsOil,
     m: (en, it) => /\boil\b|crude|opec|brent|\bwti\b|energy shock|natural gas/i.test(en) || /petroli|greggio|shock energetic/i.test(it) },
   { id: "NUCLEARE/UTILITY", sel: thIsEnergy,
-    m: (en, it) => /nuclear|reactor|\bSMR\b|power grid|electricity demand/i.test(en) || /nuclear|rete elettric/i.test(it) },
+    // v162: le sovvenzioni all'energia pulita toccano BE/CEG/OKLO in watchlist ma non matchavano nulla
+    m: (en, it) => /nuclear|reactor|\bSMR\b|power grid|electricity demand|clean energy|renewable/i.test(en) || /nuclear|rete elettric|energia pulita|rinnovabil/i.test(it) },
   { id: "DAZI/EXPORT-CONTROL", sel: thIsSemi,   // SOLO filiera/supply chain
-    m: (en, it) => /tariff|export control|trade probe|trade war|chip ban|sanction.{0,20}(chip|tech|semicon)/i.test(en) || /dazi|controlli all.export|guerra commercial/i.test(it) },
+    // v162: "investigate EU trade practices" (escalation commerciale) non matchava "trade probe|trade war"
+    m: (en, it) => /tariff|export control|trade prob|trade practice|trade investigation|trade war|chip ban|sanction.{0,20}(chip|tech|semicon)/i.test(en) || /dazi|controlli all.export|guerra commercial|pratiche commerciali|indagine commercial/i.test(it) },
   { id: "GEOPOLITICA (risk-off)", sel: null,   // appetito al rischio → colpisce i beta alti
     m: (en, it) => /\bwar\b|iran|hormuz|middle east|missile|airstrike|invasion/i.test(en) || /guerra|iran|medio oriente/i.test(it) },
   { id: "REGOLAM./MEGACAP", sel: thIsMegacapComm,
