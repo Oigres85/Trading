@@ -792,14 +792,14 @@ check("v145 cap gate: positionWeightPct ricava il peso da qty×price se val_eur 
   const w = positionWeightPct(r);
   r.val_eur = saved;
   return w != null && w >= RISK_PARAMS.capNoAdd_pct`));
-check("v145 shock: EVIDENZA instradata in A4 con conferma futures, NON più 'DIRETTIVA: SOSPENDI'", run(`
+check("v145→v156 shock: EVIDENZA con workflow di verifica INLINE + conferma futures, NON più 'DIRETTIVA: SOSPENDI' né riferimento 'A4' pendente", run(`
   const saved = DATA.macro.shock_alert, savedF = DATA.macro.futures;
   DATA.macro.shock_alert = { active: true, threshold: 2, sources: [{ src: "KOSPI", chg: -4.3 }] };
   DATA.macro.futures = { nasdaq: { label: "Fut NDX", change_pct: 0.4 }, sp500: { label: "Fut S&P", change_pct: 0.1 } };
   const p = buildPrompt();
   DATA.macro.shock_alert = saved; DATA.macro.futures = savedF;
-  return p.includes("SEGNALE DI SHOCK") && p.includes("NON è un ordine") && p.includes("WORKFLOW A4")
-      && p.includes("ALLARME FANTASMA") && /Fut NDX \\+0,4/.test(p) && !p.includes("DIRETTIVA OPERATIVA: SOSPENDI")`));
+  return p.includes("SEGNALE DI SHOCK") && p.includes("NON è un ordine") && p.includes("WORKFLOW DI VERIFICA")
+      && !/\\bA4\\b/.test(p) && p.includes("ALLARME FANTASMA") && /Fut NDX \\+0,4/.test(p) && !p.includes("DIRETTIVA OPERATIVA: SOSPENDI")`));
 
 check("v145 cap display: 'posizione più pesante' usa il cap REALE (capNoAdd_pct), non un 10% hardcoded", run(`
   const saved = RISK_PARAMS.capNoAdd_pct;
@@ -890,12 +890,23 @@ check("v150 res distance: la cella Supp. mostra il distacco % della resistenza d
   return row != null && row.includes("→ res $120 (+20%)")`));
 
 /* ---------- v151: ri-arm candidato sugli stop violati + flag held-candidate ---------- */
-check("v151 ri-arm: lo stop violato porta il livello di ri-arm CALCOLATO (2×ATR sotto il supporto) col rischio in €", run(`
+check("v151→v156 ri-arm: livello CALCOLATO (2×ATR sotto il supporto) + rischio dal PREZZO CORRENTE, non dallo stop violato", run(`
   const p = buildPrompt();
   const line = p.split("\\n").find(l => l.includes("STOP VIOLATI (il prezzo"));
-  // fixture TST3: stop_atr 110 violato (prezzo 100), support 95, atr 2 → ri-arm 95−4=91 < 110
+  // fixture TST3: stop_atr 110 violato (prezzo 100), support 95, atr 2 → ri-arm 95−4=91 < prezzo.
+  // v156: rischio = qty×(PREZZO−ri-arm) = 10×(100−91)=€90, NON qty×(stop violato−ri-arm)=10×19=€190.
   return line != null && line.includes("TST3") && line.includes("ri-arm CANDIDATO se tieni: $91")
-      && line.includes("rischio aggiuntivo ~€")`));
+      && line.includes("~€90 = 10 quote × $9 dal prezzo") && !line.includes("€190") && !line.includes("$19 ")`));
+check("v156 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi, PROMEMORIA FINALE chiude in coda", run(`
+  const savedNews = DATA.news;
+  DATA.news = [{ title: "AI boom lifts data center chips", tickers: [], sentiment: "neu", source: "Test" }];   // tema AI/DATACENTER → TST1 (Technology)
+  const t = typeof buildCIOText === "function" ? buildCIOText() : "";
+  DATA.news = savedNews;
+  const iCorr = t.indexOf("=== CORRELAZIONI CALCOLATE");
+  const iData = t.indexOf("\\nDATI AL ");
+  const iProm = t.lastIndexOf("PROMEMORIA FINALE:");
+  // il blocco sintesi sta DOPO la testata ma PRIMA delle tabelle-silo; PROMEMORIA è l'ULTIMA sezione
+  return iCorr > 0 && iData > iCorr && iProm > iData && !t.slice(iProm).includes("DATI AL ")`));
 check("v151 held-candidate: candidato già detenuto con ratchet sopra il limite → NB esplicito nella riga Livelli", run(`
   const r = DATA.portfolio.find(x => x.ticker === "TST1");   // TST1: qty 100, stop_atr 94
   const saved = { pe: r.pe, sh: r.sharpe_1y };

@@ -1085,7 +1085,7 @@ function renderShockAlert() {
   const src = s.sources.map(x => `${esc(x.src)} ${signTxt(x.chg)}`).join(" · ");
   box.hidden = false;
   box.className = "shock-alert-banner";
-  box.innerHTML = `🚨 <b>SEGNALE DI SHOCK</b> — ${src}: caduta oltre il ${s.threshold}% con Wall Street chiusa. <b>Da verificare</b>, non un ordine: controlla la conferma USA (futures) prima di trarre conclusioni — se gli USA non confermano è un allarme localizzato. Il prompt AI porta il segnale in cima, instradato nel workflow A4.`;
+  box.innerHTML = `🚨 <b>SEGNALE DI SHOCK</b> — ${src}: caduta oltre il ${s.threshold}% con Wall Street chiusa. <b>Da verificare</b>, non un ordine: controlla la conferma USA (futures) prima di trarre conclusioni — se gli USA non confermano è un allarme localizzato. Il prompt AI porta il segnale in cima col suo workflow di verifica.`;
 }
 
 function renderDataQualityAlert() {
@@ -4664,10 +4664,11 @@ function buildPrompt() {
   lines.push(promptHeaderText());
   lines.push("");
   // SEGNALE DI SHOCK (v145): NON è più una DIRETTIVA che ordina di sospendere gli acquisti — era
-  // un dettame in contrasto sia con la filosofia "indicatori non dettami" sia con la regola A4
-  // (che impone di escludere l'ALLARME FANTASMA prima di attivare protocolli). Ora è EVIDENZA
-  // instradata dentro A4, con la conferma incrociata USA (futures) servita INLINE: se gli USA non
-  // confermano la caduta asiatica, il CIO la declassa a evento localizzato invece di congelarsi.
+  // un dettame in contrasto con la filosofia "indicatori non dettami". Ora è EVIDENZA con un
+  // workflow di verifica INLINE (v156: prima citava "A4", sezione della testata che la slim-down
+  // v155 a 3 limiti ha rimosso → riferimento pendente; il workflow è auto-contenuto qui sotto):
+  // la conferma incrociata USA (futures) è servita nel testo, se gli USA non confermano la caduta
+  // asiatica il CIO la declassa a evento localizzato invece di congelarsi.
   const shock = (DATA.macro || {}).shock_alert;
   if (shock && shock.active) {
     const fut = (DATA.macro || {}).futures || {};
@@ -4675,8 +4676,8 @@ function buildPrompt() {
       .map(f => `${f.label || f.symbol || "Fut"} ${signTxt(f.change_pct)}`).join(" · ");
     const futLine = futBits
       ? `Conferma incrociata USA (dato più fresco, ha PRIORITÀ sull'Asia): ${futBits}. Se i futures USA NON confermano la caduta (verdi o piatti mentre l'Asia crolla), è un ALLARME FANTASMA localizzato: dichiaralo al CEO e procedi normalmente.`
-      : `Conferma incrociata USA: futures non nel payload → verificali via web PRIMA di trarre conclusioni (A4).`;
-    lines.push(`🚨 [SEGNALE DI SHOCK — verifica con A4, NON è un ordine]: ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} (oltre ${shock.threshold}% con Wall Street chiusa). È un INDIZIO da validare, non un verdetto. WORKFLOW A4 in ordine: 1) conferma il dato (Tabella B/web) · 2) escludi cache/feed rotto · 3) ${futLine} · 4) SOLO se il regime è confermato: alza gli standard d'ingresso, non inseguire i limiti calcolati su dati pre-shock, marca gli ingressi "CONDIZIONATO all'assestamento della prima ora" e rivaluta gli stop contro il gap atteso. La decisione resta tua e pesata sui 4 pilastri — mai una sospensione automatica.`);
+      : `Conferma incrociata USA: futures non nel payload → verificali via web PRIMA di trarre conclusioni.`;
+    lines.push(`🚨 [SEGNALE DI SHOCK — verifica prima di agire, NON è un ordine]: ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} (oltre ${shock.threshold}% con Wall Street chiusa). È un INDIZIO da validare, non un verdetto. WORKFLOW DI VERIFICA in ordine: 1) conferma il dato (Tabella B/web) · 2) escludi cache/feed rotto · 3) ${futLine} · 4) SOLO se il regime è confermato: alza gli standard d'ingresso, non inseguire i limiti calcolati su dati pre-shock, marca gli ingressi "CONDIZIONATO all'assestamento della prima ora" e rivaluta gli stop contro il gap atteso. La decisione resta tua e pesata sui 4 pilastri — mai una sospensione automatica.`);
     lines.push("");
   }
   // ORDINE WEB-SEARCH IN CIMA: se ci sono dati mancanti/inaffidabili, l'imperativo va visto
@@ -4778,23 +4779,30 @@ function buildPrompt() {
   // In modalità standby l'AI NON deve commentarli operativamente né trasformarli in raccomandazioni.
   try {
     const dv = decisionVerdict();
-    lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (posizionamento interno calcolato dalla dashboard — usalo come base quantitativa per le tue raccomandazioni, validandolo criticamente invece di ripeterlo a pappagallo; se il tuo giudizio diverge dal motore, dichiaralo e motiva): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
-    lines.push(`INDIPENDENZA SUL VERDETTO: NON limitarti a ripetere i candidati ad accumulo della dashboard. Controlla l'intera Watchlist e la tabella della ROTAZIONE SETTORIALE. Se vedi settori in forte crescita mensile (es. Biotech) contrapposti a settori in contrazione (es. Semiconduttori), sfida il verdetto della dashboard e proponi una rotazione strategica alternativa se migliora l'MCR globale del portafoglio.`);
-    lines.push(`ANALISI PER-TITOLO: per i titoli rilevanti di PORTAFOGLIO e WATCHLIST — tenendo conto delle ultime operazioni del DIARIO DELLE AZIONI — fai un'analisi tecnica E fondamentale specifica su quel titolo, incrociando le sue news e il contesto macro. NON generalizzare e NON inventare dati non presenti nel payload (anti-allucinazione): se un dato manca, dichiaralo.`);
+    lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (posizionamento interno calcolato dalla dashboard — è un'OPINIONE quant da pesare, non un verdetto da parafrasare; se il tuo giudizio diverge, dichiaralo e motiva col dato di OGGI): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
+    // NOTA (v156): rimosse da qui le direttive INDIPENDENZA SUL VERDETTO e ANALISI PER-TITOLO —
+    // erano una SECONDA testata dentro il payload (il payload deve essere MATERIA PRIMA, non un
+    // rulebook che compete con la Costituzione). L'indipendenza vive in [B1], l'analisi per-titolo
+    // nelle domande [C], il materiale di rotazione nel blocco CORRELAZIONI + IDEE DI ROTAZIONE.
     lines.push("· NOTA METODOLOGICA: gli Stop Loss sulle posizioni sono TRAILING RATCHET su base 2×ATR(14 Wilder): partono 2×ATR sotto il prezzo e da lì possono solo SALIRE coi massimi — non si riabbassano nei ribassi (persistiti tra i run, reset solo se il trade cambia). NON sono percentuali fisse. Il verdetto di accumulo è ritarato sul mandato quant: impatto marginale sullo Sharpe, forza relativa 1M vs benchmark, qualità fondamentale; gli asset in veto (value trap / ROIC<0 / PEG<0) sono esclusi a prescindere dal supporto tecnico.");
     if ((dv.stopViolations || []).length) {
       // RI-ARM CANDIDATO (v151): la testata chiede "se ri-armi dichiara il NUOVO livello e il
       // rischio in €" ma A1 vieta all'LLM di INVENTARE stop → il livello lo calcola il SISTEMA:
       // stop teorico 2×ATR ancorato al SUPPORTO della riga (sempre < supporto per costruzione),
-      // col rischio aggiuntivo già quantificato = quote × (stop violato − ri-arm) in €.
+      // col rischio aggiuntivo già quantificato. BASE = PREZZO CORRENTE, non lo stop violato:
+      // il prezzo è GIÀ sotto lo stop ancorato, quindi la perdita stop→prezzo è già maturata e
+      // uscendo ora la realizzi comunque. Il rischio che il ri-arm AGGIUNGE è solo quello da
+      // "esco adesso al prezzo" fino al nuovo stop = quote × (prezzo − ri-arm). Usare (stop−ri-arm)
+      // gonfiava il numero contando una perdita già incassata (v156).
       const eurusdRA = DATA.eurusd || 1.08;
       lines.push("· ⚠ STOP VIOLATI (il prezzo è SOTTO lo stop trailing ancorato — dedica a ciascuno una raccomandazione esplicita (uscire o ri-armare), con motivazione): " +
         dv.stopViolations.map(x => {
           const base = `${x.r.ticker} stop $${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)} (${signTxt(Math.round((x.r.price / x.stop - 1) * 1000) / 10)})`;
           const ra = (x.r.support > 0 && x.r.support < x.r.price) ? atrStop(x.r.support, x.r) : null;
-          if (!ra || !(ra.stop > 0) || !(ra.stop < x.stop)) return base;
-          const riskEur = Math.round(x.r.qty * (x.stop - ra.stop) / eurusdRA);
-          return `${base} [ri-arm CANDIDATO se tieni: $${fmtNum.format(ra.stop)} (2×ATR sotto il supporto $${fmtNum.format(x.r.support)}) → rischio aggiuntivo ~€${fmtNum.format(riskEur)} = ${fmtNum.format(x.r.qty)} quote × $${fmtNum.format(Math.round((x.stop - ra.stop) * 100) / 100)}]`;
+          if (!ra || !(ra.stop > 0) || !(ra.stop < x.r.price)) return base;
+          const perShare = x.r.price - ra.stop;
+          const riskEur = Math.round(x.r.qty * perShare / eurusdRA);
+          return `${base} [ri-arm CANDIDATO se tieni: $${fmtNum.format(ra.stop)} (2×ATR sotto il supporto $${fmtNum.format(x.r.support)}) → rischio aggiuntivo ~€${fmtNum.format(riskEur)} = ${fmtNum.format(x.r.qty)} quote × $${fmtNum.format(Math.round(perShare * 100) / 100)} dal prezzo]`;
         }).join(" · ") + ".");
     }
     if ((dv.withPlan || []).length) {
@@ -4928,7 +4936,7 @@ function buildPrompt() {
     lines.push("DIARIO DELLE AZIONI: vuoto — nessuna operazione registrata di recente.");
   }
   lines.push("");
-  lines.push(`PORTAFOGLIO — ${DATA.portfolio.length} POSIZIONI: la tua Tabella A deve avere ESATTAMENTE ${DATA.portfolio.length} righe (controvalore e P&L reali per posizione; Sharpe 1A = rendimento/rischio; Drawdown 52S = distanza dal max; ±ImpMove = movimento implicito earnings; RVol = volume oggi/media 30gg; Stop 2×ATR = stop dinamico su volatilità):`);
+  lines.push(`PORTAFOGLIO — ${DATA.portfolio.length} POSIZIONI (Tabella A — i tuoi dati per posizione: controvalore e P&L reali; Sharpe 1A = rendimento/rischio; Drawdown 52S = distanza dal max; ±ImpMove = movimento implicito earnings; RVol = volume oggi/media 30gg; Stop 2×ATR = stop dinamico su volatilità. È la tua materia prima: cita la cella dove regge una decisione, NON riprodurre la tabella):`);
   const f = (v, d = 2) => v === null || v === undefined ? "—" : fmtNum.format(v);
   const mdRow = (r) => {
     const c = cur(r);
@@ -5056,7 +5064,7 @@ function buildPrompt() {
   }
   if ((DATA.watchlist || []).length) {
     lines.push("");
-    lines.push(`WATCHLIST — ${DATA.watchlist.length} TITOLI (nessuna posizione): la tua Tabella B deve avere ESATTAMENTE ${DATA.watchlist.length} righe, nessun titolo omesso:`);
+    lines.push(`WATCHLIST — ${DATA.watchlist.length} TITOLI (Tabella B — nessuna posizione, è il tuo universo di caccia: cita un nome solo se entra in una tesi operativa, NON riprodurre la tabella):`);
     lines.push(head); lines.push(sep);
     DATA.watchlist.forEach(r => lines.push(mdRow(r)));
     // correlazione dei candidati watchlist vs il portafoglio ESISTENTE (per la regola n.2)
@@ -5772,38 +5780,68 @@ function marketLinkText() {
     const themeOf = (name) => NEWS_THEMES.find(t => new RegExp(t.id.split("/")[0], "i").test(name)
       || (t.id === "SEMI/CHIP" && /semicondut/i.test(name)) || (t.id === "ENERGIA/OIL" && /energia/i.test(name))
       || (t.id === "NUCLEARE/UTILITY" && /utilit/i.test(name)) || (t.id === "CLOUD/SOFTWARE" && /software|cloud/i.test(name)));
+    // ordina per ESPOSIZIONE (dove il book è pesante), non per performance del settore: il vento
+    // che conta di più è quello sul 53% in semi, non il +11% dell'energia dove non hai nulla (v156).
     const rows = [];
-    for (const s of tilt.slice().sort((a, b) => dgFin(b.m1) - dgFin(a.m1))) {
+    for (const s of tilt) {
       const th = themeOf(s.name || "");
       const mine = th && th.sel ? themeMembers(th, held) : [];
       if (!mine.length) continue;
       const expo = mine.reduce((acc, r) => acc + (wOf(r) ?? 0), 0);
       const rsAvg = mine.map(rsOf).filter(x => x != null);
-      rows.push(`  ${s.name} (${s.ticker}) ${signTxt(dgFin(s.m1))} 1M → tue posizioni: ${mine.map(r => r.ticker).join("+")} = ${fmtNum.format(Math.round(expo * 10) / 10)}% del NAV${rsAvg.length ? ` · RS media ${signTxt(Math.round(rsAvg.reduce((a, b) => a + b, 0) / rsAvg.length * 10) / 10, "pp")}` : ""}`);
+      rows.push({ expo, txt: `  ${s.name} (${s.ticker}) ${signTxt(dgFin(s.m1))} 1M → tue posizioni: ${mine.map(r => r.ticker).join("+")} = ${fmtNum.format(Math.round(expo * 10) / 10)}% del NAV${rsAvg.length ? ` · RS media ${signTxt(Math.round(rsAvg.reduce((a, b) => a + b, 0) / rsAvg.length * 10) / 10, "pp")}` : ""}` });
     }
     if (rows.length) {
-      L.push("· VENTO SETTORIALE vs DOVE SEI PESANTE (rotazione 1M incrociata col book):");
-      L.push(...rows);
+      rows.sort((a, b) => b.expo - a.expo);
+      L.push("· VENTO SETTORIALE vs DOVE SEI PESANTE (rotazione 1M incrociata col book, dal settore dove pesi di più):");
+      L.push(...rows.map(r => r.txt));
     }
   }
 
   // ── 3) DIVERGENZE: dove i dati si contraddicono (gli SPUNTI da spiegare) ──
-  const div = [];
+  // v156: oltre alle contraddizioni INTRA-titolo (tema caldo/RS debole, MCR≫peso, stop vicino)
+  // il motore ora incrocia BLOCCHI che prima restavano scollegati: il candidato d'accumulo contro
+  // il TRACK RECORD del motore su quello stesso nome, e la RS che ACCELERA su un nome in veto FORTE
+  // (momentum di brevissimo vs distruzione di valore di fondo). Sono le contraddizioni che l'LLM
+  // non vede da solo perché vivono in tabelle lontane nel payload.
+  const divRelapse = [], divMcr = [], divTheme = [], divAccel = [], divStop = [];
+  let dvL = null;
+  try { dvL = decisionVerdict(); } catch { dvL = null; }
+
+  // 3a) candidato d'accumulo che il motore ha GIÀ giocato e perso (track record del nome)
+  const losers = new Map(((DATA.verdict_track || {}).last || [])
+    .filter(s => s && dgFin(s.ret_pct) != null && dgFin(s.ret_pct) < 0).map(s => [s.tk, s]));
+  for (const r of (dvL && dvL.accumula || [])) {
+    const s = losers.get(r.ticker);
+    if (s) divRelapse.push(`  ${r.ticker}: torna tra i candidati ACCUMULA (score ${r._q}/100) ma l'ULTIMO segnale del motore su questo nome ha reso ${signTxt(dgFin(s.ret_pct))} (vs NDX ${signTxt(dgFin(s.vs_ndx_pp), "pp")}, ${s.date}) → il motore ci ha già provato e ha perso: la sua fiducia va calibrata su questo, non ripetuta per inerzia`);
+  }
+
+  // 3d) nomi in VETO FORTE con la forza relativa che ACCELERA (rimbalzo tecnico vs valore rotto)
+  const vetoStrong = new Map((dvL && dvL.excluded || [])
+    .filter(x => x && x.r && held.has(x.r.ticker) && String(x.strength || "").toLowerCase() === "forte")
+    .map(x => [x.r.ticker, x]));
+
   for (const r of ptf) {
     const rs = rsOf(r), w = wOf(r), m = mcrOf(r);
-    const nTheme = themed.filter(t => t.targets.some(x => x.ticker === r.ticker));
-    if (nTheme.length && rs != null && rs <= -5) {
-      div.push(`  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] ma la sua forza relativa è ${signTxt(rs, "pp")} vs NDX → il flusso NON conferma la narrativa delle news`);
-    }
     if (m != null && w != null && m >= w * 1.6 && m >= 15) {
-      div.push(`  ${r.ticker}: pesa ${fmtNum.format(w)}% del NAV ma genera ${fmtNum.format(m)}% del rischio (${fmtNum.format(Math.round(m / w * 10) / 10)}× il suo peso) → è qui che si decide la volatilità del fondo`);
+      divMcr.push(`  ${r.ticker}: pesa ${fmtNum.format(w)}% del NAV ma genera ${fmtNum.format(m)}% del rischio (${fmtNum.format(Math.round(m / w * 10) / 10)}× il suo peso) → è qui che si decide la volatilità del fondo`);
+    }
+    const nTheme = themed.filter(t => t.targets.some(x => x.ticker === r.ticker));
+    if (nTheme.length && rs != null && rs <= -3) {
+      divTheme.push(`  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] ma la sua forza relativa è ${signTxt(rs, "pp")} vs NDX → il flusso NON conferma la narrativa delle news`);
+    }
+    const v = vetoStrong.get(r.ticker);
+    if (v) {
+      const d = dgFin(titleKinematics(r.ticker).drs7);
+      if (d != null && d >= 5) divAccel.push(`  ${r.ticker}: la forza relativa ACCELERA (${signTxt(d, "pp")} in 7g) ma il nome resta in VETO FORTE (${(v.why || [])[0] || "value trap"}) → il momentum di brevissimo contraddice la distruzione di valore di fondo: rimbalzo tecnico da vendere in forza o inversione vera? il track record del nome decide`);
     }
     const st = r.qty ? stopOf(r) : null;
     if (st && st.stop > 0 && r.price > 0 && !st.violated) {
       const dist = (r.price / st.stop - 1) * 100;
-      if (dist <= 3 && (w ?? 0) >= 5) div.push(`  ${r.ticker}: stop a ${signTxt(Math.round(dist * 10) / 10)} dal prezzo su una posizione da ${fmtNum.format(w)}% del NAV → una seduta storta la porta in esecuzione`);
+      if (dist <= 3 && (w ?? 0) >= 5) divStop.push(`  ${r.ticker}: stop a ${signTxt(Math.round(dist * 10) / 10)} dal prezzo su una posizione da ${fmtNum.format(w)}% del NAV → una seduta storta la porta in esecuzione`);
     }
   }
+  const div = [...divRelapse, ...divMcr, ...divTheme, ...divAccel, ...divStop];
   if (div.length) {
     L.push("· DIVERGENZE RILEVATE DAL SISTEMA (contraddizioni nei dati: spiegale, non elencarle):");
     L.push(...div.slice(0, 8));
@@ -5817,8 +5855,34 @@ function marketLinkText() {
 
 function buildCIOText() {
   const link = marketLinkText();
-  return buildExecutiveDelta() + "\n\n" + buildPrompt() + "\n\n"
-       + (link ? link + "\n\n" : "") + historicalDigestText();
+  const brief = buildExecutiveDelta();
+  const full = buildPrompt();
+  const historical = historicalDigestText();
+  // HOISTING del blocco sintesi (v156) — la testata è costruita attorno a "Parti dal blocco
+  // CORRELAZIONI CALCOLATE / le DIVERGENZE sono il cuore del lavoro", ma appeso in coda quel blocco
+  // finiva al ~78% del payload: DOPO tutte le tabelle-silo e persino dopo "PROMEMORIA FINALE" (che
+  // legge come chiusura). Il lettore incontrava la SINTESI per ultima, dopo 49k caratteri di dump →
+  // esattamente ciò che spinge alla parafrasi. Ora lo splice mette il blocco SUBITO dopo la testata
+  // (confine = promptHeaderText, la fonte di verità), adiacente all'istruzione che lo richiama e
+  // PRIMA dei dati grezzi, che restano come materiale di verifica. buildPrompt() NON viene toccato
+  // (Regola Suprema): si ricompone solo la stringa sul confine testata↔payload.
+  // Inoltre "PROMEMORIA FINALE" (istruzioni di chiusura) veniva emesso da buildPrompt PRIMA dei
+  // 3 blocchi storici appesi da buildCIOText → un "promemoria FINALE" con 3 sezioni di dati dopo.
+  // Lo si estrae e lo si rimette in fondo a TUTTO: [brief][testata][sintesi][dati+storici][chiusura].
+  const header = promptHeaderText();
+  const PROMEMORIA_MARK = "\nPROMEMORIA FINALE:";
+  let body = full, tail = "";
+  if (full.startsWith(header)) {
+    let rest = full.slice(header.length).replace(/^\n+/, "");
+    const pi = rest.lastIndexOf(PROMEMORIA_MARK);
+    if (pi >= 0) { tail = rest.slice(pi).replace(/^\n+/, ""); rest = rest.slice(0, pi).replace(/\n+$/, ""); }
+    body = header + (link ? "\n\n" + link : "") + "\n\n" + rest;
+  } else if (link) {
+    body = full + "\n\n" + link;   // confine non combaciante: fallback alla coda (comportamento pre-v156)
+  }
+  return brief + "\n\n" + body
+       + (historical ? "\n\n" + historical : "")
+       + (tail ? "\n\n" + tail : "");
 }
 
 /* ---------- azione unica: copia il pacchetto completo e mostralo nella modal ---------- */
