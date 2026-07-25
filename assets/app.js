@@ -1,5 +1,9 @@
 /* Trading Dashboard — rendering lato client di data/data.json */
 const REPO = "Oigres85/Trading";
+/* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
+   Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
+   servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
+const BUILD_VERSION = "157";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5880,7 +5884,12 @@ function buildCIOText() {
   } else if (link) {
     body = full + "\n\n" + link;   // confine non combaciante: fallback alla coda (comportamento pre-v156)
   }
-  return brief + "\n\n" + body
+  // TIMBRO DI BUILD in cima a tutto: versione del codice (prova che Safari non ha servito una
+  // pagina in cache) + ora di generazione lato client (prova che il run è di adesso).
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const stamp = `⟦ BUILD v${BUILD_VERSION} · generato ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())} · se questa versione è più vecchia del sito, Safari ha una pagina in cache → ricarica forzato ⟧`;
+  return stamp + "\n\n" + brief + "\n\n" + body
        + (historical ? "\n\n" + historical : "")
        + (tail ? "\n\n" + tail : "");
 }
