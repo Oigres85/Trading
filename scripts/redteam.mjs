@@ -16,6 +16,7 @@
      I9  ROE in [-150,400]% (fuori = unità sbagliate)
      I10 Prezzo/Supp. mai ≤ 0 nelle tabelle titoli (backstop lato prompt del gate pipeline)
      I11 nessun leak di placeholder (null nudo, [object Object], undefined%)
+     I12 nessun RIFERIMENTO PENDENTE: se il testo rimanda a una sezione, quella sezione esiste
    Ogni invariante nasce da un bug REALE già visto → il red team lo rende una guardia
    permanente: la classe non può ripresentarsi senza far fallire la CI. NON prova l'assenza
    di OGNI bug (impossibile), ma chiude le classi ricorrenti che finora trovava l'LLM a mano.
@@ -206,6 +207,20 @@ function tablesOf(p) {
 function auditTables(name, p) {
   // I11 leak di placeholder oltre a undefined/NaN/Infinity (già I3): null nudo, [object Object]
   if (/\|\s*null\s*\||\[object Object\]|\$\s*null|undefined%/.test(p)) fail(name, "I11 leak placeholder (null/[object Object]) nel prompt");
+  // I12 RIFERIMENTI PENDENTI (v161): il payload non deve mandare l'LLM a cercare una sezione che
+  // non esiste. Classe di bug vista TRE volte: la testata citava la regola "A4" dopo che lo
+  // slim-down v155 l'aveva rimossa; poi due rimandi a CATALIZZATORI NON ANCORA PREZZATI (guida
+  // weekend + testata) restavano stampati anche quando quel blocco non veniva generato (mercato
+  // aperto, nessuna news post-chiusura, price_asof assente). Il rimando è utile solo se il
+  // bersaglio c'è: qui si verifica che ogni rimando esplicito abbia la sua sezione nel testo.
+  const REFS = [
+    { ref: /vedi CATALIZZATORI NON ANCORA PREZZATI/, sec: /· ⏰ CATALIZZATORI NON ANCORA PREZZATI/ },
+    { ref: /\bWORKFLOW A4\b|verifica con A4/, sec: /\[A4\]/ },
+    { ref: /vedi CORRELAZIONI CALCOLATE/, sec: /=== CORRELAZIONI CALCOLATE/ },
+  ];
+  for (const r of REFS) {
+    if (r.ref.test(p) && !r.sec.test(p)) fail(name, `I12 riferimento pendente: il testo rimanda a "${r.ref.source}" ma la sezione non è nel payload`);
+  }
   for (const t of tablesOf(p)) {
     const ti = t.idx["Titolo"];
     const stopKey = Object.keys(t.idx).find(k => k.startsWith("Stop"));
@@ -270,4 +285,4 @@ if (violations.length) {
   if (violations.length > 40) console.error(`  … e altre ${violations.length - 40}`);
   process.exit(1);
 }
-console.log(`RED TEAM: ${campaigns} campagne (4 scenari dati × stati UI), 11 invarianti — nessuna violazione`);
+console.log(`RED TEAM: ${campaigns} campagne (4 scenari dati × stati UI), 12 invarianti — nessuna violazione`);

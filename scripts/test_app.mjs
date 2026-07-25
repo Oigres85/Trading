@@ -932,6 +932,51 @@ check("v156 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi, PROME
   const iProm = t.lastIndexOf("PROMEMORIA FINALE:");
   // il blocco sintesi sta DOPO la testata ma PRIMA delle tabelle-silo; PROMEMORIA è l'ULTIMA sezione
   return iCorr > 0 && iData > iCorr && iProm > iData && !t.slice(iProm).includes("DATI AL ")`));
+check("v161 Polymarket: le voci sintetiche di probabilità non contano come news né fanno da esempio del tema", run(`
+  const savedNews = DATA.news;
+  DATA.news = [
+    { title: "Will the Fed cut rates in July? — probabilità Sì 73%", tickers: [], sentiment: "neu", source: "PM", published: "2026-07-25T05:02:00Z" },
+    { title: "Fed holds as inflation cools", title_it: "La Fed tiene i tassi mentre l'inflazione rallenta", tickers: [], sentiment: "neu", source: "R", published: "2026-07-25T04:00:00Z" },
+  ];
+  const txt = marketLinkText();
+  const split = newsSplitByClose();
+  DATA.news = savedNews;
+  // il tema TASSI deve contare 1 news (non 2) e non citare la riga Polymarket
+  const m = txt.match(/\\[TASSI\\/FED\\/INFLAZIONE\\] (\\d+) news/);
+  return split.total === 1 && (m == null || m[1] === "1") && !txt.includes("probabilità Sì")`));
+check("v161 coda editoriale: la sigla della FONTE non classifica il tema (Kavout | AI ≠ notizia AI)", run(`
+  const savedNews = DATA.news;
+  // titolo macro con la sigla "AI" solo nella coda della fonte: NON deve entrare in AI/DATACENTER
+  DATA.news = [{ title: "What Does the February Jobs Report Really Tell Us - Kavout | AI",
+                 title_it: "Cosa ci dice il rapporto sull'occupazione - Kavout | AI",
+                 tickers: [], sentiment: "neu", source: "K", published: "2026-07-25T02:00:00Z" }];
+  const soloFonte = marketLinkText();
+  DATA.news = [{ title: "Nvidia unveils AI data centers initiative", title_it: "Nvidia lancia data center IA",
+                 tickers: [], sentiment: "neu", source: "K", published: "2026-07-25T02:00:00Z" }];
+  const veraAI = marketLinkText();
+  DATA.news = savedNews;
+  return !soloFonte.includes("[AI/DATACENTER]") && veraAI.includes("[AI/DATACENTER]")`));
+check("v161 nessun riferimento pendente: senza news post-chiusura il payload NON rimanda ai CATALIZZATORI", run(`
+  const savedNews = DATA.news;
+  DATA.news = [];                                        // nessuna news → il blocco non si genera
+  const vuoto = buildCIOText();
+  DATA.news = savedNews;
+  const pieno = buildCIOText();
+  const hasBlock = (t) => t.includes("· ⏰ CATALIZZATORI NON ANCORA PREZZATI");
+  const hasRef   = (t) => t.includes("vedi CATALIZZATORI NON ANCORA PREZZATI");
+  // invariante: rimando ⇒ sezione presente (in ENTRAMBI gli scenari)
+  return (!hasRef(vuoto) || hasBlock(vuoto)) && (!hasRef(pieno) || hasBlock(pieno)) && !hasRef(vuoto)`));
+check("v161 fase di seduta: usRegularSessionOpen è DERIVATA da usSessionInfo (fonte di verità unica)", run(`
+  const at = (iso) => new Date(iso);
+  return usRegularSessionOpen(at("2026-07-22T16:00:00Z")) === true    // mer 12:00 ET = regular
+      && usRegularSessionOpen(at("2026-07-25T15:00:00Z")) === false   // sabato
+      && usRegularSessionOpen(at("2026-07-20T12:00:00Z")) === false   // lun 08:00 ET = pre-market
+      && usRegularSessionOpen(at("2026-07-22T02:00:00Z")) === false   // notte
+      // coerenza strutturale: vero ⟺ fase "regular", su tutta la griglia oraria
+      && [...Array(24).keys()].every(h => {
+           const d = at("2026-07-22T" + String(h).padStart(2,"0") + ":30:00Z");
+           return usRegularSessionOpen(d) === (usSessionInfo(d).phase === "regular");
+         })`));
 check("v159 track record: segnali tutti dello STESSO giorno → dichiarato il limite statistico (n=1, non 4 osservazioni)", run(`
   const saved = DATA.verdict_track;
   DATA.verdict_track = { mature7: { n: 4, avg_ret: -13.4, avg_vs_ndx: -7.7, hit_pct: 0 },

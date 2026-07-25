@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "160";
+const BUILD_VERSION = "161";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1000,11 +1000,13 @@ function openDataQualityModal() {
    ^KS11 (q.price/q.prev, già sessione-corrente per costruzione) rimpiazza il valore di pipeline;
    i futures restano quelli di pipeline (non aggiornati client-side). Gate: solo con Wall Street
    REGOLARE chiusa (lo shock è un fenomeno overnight/pre-apertura). */
+/* v161 — FONTE DI VERITÀ UNICA sulla fase di seduta: derivata da usSessionInfo invece di
+   ri-implementare la stessa finestra oraria. Prima le due funzioni erano coerenti solo "per
+   costruzione" (stesse costanti copiate): qualunque ritocco a una — festività, DST, orari
+   ridotti — le avrebbe fatte divergere, e il payload avrebbe potuto dire WEEKEND in una riga
+   e comportarsi da mercato aperto in un'altra. Ora la divergenza è impossibile. */
 function usRegularSessionOpen(now = new Date()) {
-  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
-  const day = et.getDay(); if (day === 0 || day === 6) return false;   // weekend
-  const mins = et.getHours() * 60 + et.getMinutes();
-  return mins >= 570 && mins < 960;                                    // 9:30–16:00 ET
+  return usSessionInfo(now).phase === "regular";
 }
 /* FASE DELLA SEDUTA USA (v149): il payload deve sapere "che ora è" — un'analisi delle 07:18
    italiane (notte USA) ragiona su anticipatori (KOSPI/futures/esteso) e propone ordini per
@@ -1048,8 +1050,16 @@ function sessionContextLine() {
     btc && btc.change_pct != null ? `BTC ${signTxt(btc.change_pct)} [24/7]` : null,
   ].filter(Boolean).join(" · ");
   const beforeBell = s.phase === "notte" || s.phase === "pre-market" || s.phase === "weekend";
+  // v161 — il rimando al blocco CATALIZZATORI si stampa SOLO se quel blocco esiste davvero in
+  // questo payload (news post-chiusura presenti). Un rimando a una sezione assente è la stessa
+  // classe di difetto dell'ex "A4": manda l'LLM a cercare qualcosa che non c'è.
+  // La riga AFFERMA il fatto (N notizie dopo la campana) invece di RIMANDARE a una sezione: il
+  // blocco CATALIZZATORI si genera solo se almeno una di quelle notizie tocca il book, quindi un
+  // rimando incondizionato poteva puntare a una sezione assente (news post-chiusura tutte estranee
+  // al portafoglio). Un'affermazione vera in ogni caso non può diventare pendente.
+  const nUnp = (() => { try { return newsSplitByClose().unpriced.length; } catch { return 0; } })();
   const guida = s.phase === "weekend"
-    ? `WEEKEND, MERCATI CHIUSI (apertura tra ~${hrs}h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Il segnale fresco di questo run sono le NOTIZIE arrivate dopo la campana (vedi CATALIZZATORI NON ANCORA PREZZATI): gli ordini valgono per l'apertura di lunedì, a limite, mai a mercato`
+    ? `WEEKEND, MERCATI CHIUSI (apertura tra ~${hrs}h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA.${nUnp ? ` Il segnale fresco di questo run sono le ${nUnp} NOTIZIE arrivate dopo la campana, che il prezzo non ha ancora votato:` : " Nessuna notizia nuova dopo la campana:"} gli ordini valgono per l'apertura di lunedì, a limite, mai a mercato`
     : beforeBell
     ? `SEI PRIMA DELLA CAMPANA (apertura tra ~${hrs}h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura`
     : s.phase === "regular"
@@ -1082,9 +1092,10 @@ function lastUsEquityCloseUTC() {
 }
 /* news pubblicate DOPO l'ultima chiusura = non ancora nel prezzo.
    Esclude le voci sintetiche Polymarket (sono snapshot di probabilità, non notizie). */
+const isRealNews = (n) => !!(n && n.title) && !/— probabilità Sì/.test(n.title_it || n.title);
 function newsSplitByClose() {
   const close = lastUsEquityCloseUTC();
-  const real = (DATA.news || []).filter(n => n && n.title && !/— probabilità Sì/.test(n.title_it || n.title));
+  const real = (DATA.news || []).filter(isRealNews);
   if (!close) return { unpriced: [], priced: real, close: null, total: real.length };
   const unpriced = [], priced = [];
   for (const n of real) {
@@ -5775,10 +5786,10 @@ function historicalDigestText() {
   if (deep.length) {
     // SOLO le colonne NUOVE non già in Tabella A/B (CAGR pluriennale + EPS ttm→fwd): PEG, crescita
     // YoY, Fwd P/E e upside sono già nella tabella fondamentale e in Tabella A/B → tolte (anti-ridondanza).
-    L.push(`=== FONDAMENTALE PROFONDO — ${deep.length} TITOLI → ${deep.length} righe (efficienza PLURIENNALE — ciò che le tabelle YoY NON mostrano; EPS impl. = eps_forward/eps_ttm−1; Δeff = CAGR utili − CAGR ricavi, >0 = leva operativa / <0 = erosione margini; Z'' = Altman distress) ===`);
-    L.push("| Titolo | CAGR ricavi | CAGR utili | Δeff (utili−ricavi) | EPS ttm→fwd | Altman Z'' |");
-    L.push("|---|---|---|---|---|---|");
-    for (const t of deep) L.push(`| ${t.tk} | ${dgTxt(t.revCagr, "%")}${t.span ? ` (${t.span}A)` : ""} | ${dgTxt(t.niCagr, "%")} | ${dgTxt(t.effGap, "pp")} | ${dgTxt(t.epsG, "%")} | ${dgTxt(t.altman, "", 2)}${dgFin(t.altman) != null && t.altman < 1.81 ? " [DISTRESS]" : ""} |`);
+    L.push(`=== FONDAMENTALE PROFONDO — ${deep.length} TITOLI → ${deep.length} righe (efficienza PLURIENNALE — ciò che le tabelle YoY NON mostrano; EPS impl. = eps_forward/eps_ttm−1; Δeff = CAGR utili − CAGR ricavi, >0 = leva operativa / <0 = erosione margini. NB: l'Altman Z'' NON è ripetuto qui — è un dato puntuale, non pluriennale, e vive nella tabella ANALISI FONDAMENTALE con la sua metodologia e il flag [RISCHIO DEFAULT]) ===`);
+    L.push("| Titolo | CAGR ricavi | CAGR utili | Δeff (utili−ricavi) | EPS ttm→fwd |");
+    L.push("|---|---|---|---|---|");
+    for (const t of deep) L.push(`| ${t.tk} | ${dgTxt(t.revCagr, "%")}${t.span ? ` (${t.span}A)` : ""} | ${dgTxt(t.niCagr, "%")} | ${dgTxt(t.effGap, "pp")} | ${dgTxt(t.epsG, "%")} |`);
   }
   L.push("USO: incrocia il CAGR pluriennale col YoY delle tabelle — quando il YoY gonfiato da un ciclo diverge dal CAGR (es. rimbalzo memorie), è un rimbalzo, non crescita strutturale. Sulle pendenze macro, sia gli ESTREMI (Margin Debt a ridosso del picco = leva estrema, HY OAS ai minimi del range = compiacenza del credito) sia le INVERSIONI DI TENDENZA (leva in deleveraging, spread in allargamento, curva in dis-inversione) segnalano fragilità → riduci il sizing dei nuovi ingressi prima che i prezzi lo confermino. Usa ΔRS/ΔMCR e ⚠deg per anticipare i downgrade PRIMA della rottura tecnica.");
   return L.join("\n");
@@ -5868,7 +5879,21 @@ function marketLinkText() {
   };
 
   // ── 1) TEMI DELLE NEWS → POSIZIONI TOCCATE ────────────────────────────────
-  const news = (DATA.news || []).filter(n => n && n.title);
+  const news = (DATA.news || []).filter(isRealNews);
+  /* v161 — CODA EDITORIALE fuori dal matching. I titoli arrivano con la fonte in coda
+     ("… - Reuters", "… - Kavout | AI"): il matcher /\bAI\b/ agganciava la SIGLA DELLA FONTE e
+     classificava come AI/DATACENTER una notizia sul rapporto occupazione, che finiva pure a fare
+     da titolo-esempio del tema più importante per questo book. Qui la coda si toglie prima del
+     match: segmento finale dopo " - " o " | ", corto e senza punteggiatura di frase, max 2 giri. */
+  const newsCore = (t) => {
+    let s = String(t || "");
+    for (let i = 0; i < 2; i++) {
+      const m = s.match(/^(.*?)\s+[-|]\s+([^-|]{1,30})$/);
+      if (!m || /[.!?;:]/.test(m[2])) break;
+      s = m[1];
+    }
+    return s;
+  };
   // OROLOGIO DEL PREZZO (v158): quali news il prezzo ha GIÀ votato e quali no. Serve sia al blocco
   // dei catalizzatori non prezzati sia a non dichiarare divergenze logicamente impossibili.
   const split = newsSplitByClose();
@@ -5876,7 +5901,7 @@ function marketLinkText() {
   const unpricedSet = new Set(split.unpriced.map(n => n.title));
   const themed = [];
   for (const th of NEWS_THEMES) {
-    const hits = news.filter(n => th.m(n.title || "", n.title_it || ""));
+    const hits = news.filter(n => th.m(newsCore(n.title), newsCore(n.title_it)));
     if (!hits.length) continue;
     const nUnpriced = hits.filter(n => unpricedSet.has(n.title)).length;
     let targets;
@@ -5891,15 +5916,35 @@ function marketLinkText() {
     const inPtf = targets.filter(r => held.has(r.ticker));
     if (!targets.length) continue;
     const expo = inPtf.reduce((s, r) => s + (wOf(r) ?? 0), 0);
-    themed.push({ id: th.id, n: hits.length, nUnpriced, th, sample: (hits[0].title_it || hits[0].title).slice(0, 110),
+    // l'esemplare del tema: prima una news che nomina un titolo dell'universo (segnale specifico),
+    // poi la più recente. hits[0] era l'ordine di arrivo del feed — arbitrario, e su AI/DATACENTER
+    // metteva in vetrina un falso positivo invece della notizia che muove il book.
+    // …ma il criterio dipende dal TIPO di tema: su un tema di titoli (SEMI, AI, CLOUD…) la news
+    // che cita un ticker è la più informativa; su un tema MACRO (TASSI, GEOPOLITICA — quelli senza
+    // predicato `sel`) citare un ticker non c'entra, e preferirlo metteva in vetrina un pezzo sul
+    // Bitcoin come esemplare del tema Fed. Lì vince semplicemente la notizia più recente.
+    const ranked = hits.slice().sort((a, b) => {
+      const sp = (x) => (th.sel && (x.tickers || []).some(t => universe.has(t))) ? 1 : 0;
+      return sp(b) - sp(a) || String(b.published || "").localeCompare(String(a.published || ""));
+    });
+    themed.push({ id: th.id, n: hits.length, nUnpriced, th, sample: newsCore(ranked[0].title_it || ranked[0].title).slice(0, 110),
                   targets: targets.slice(0, 8), expo, inPtf: inPtf.length });
   }
   themed.sort((a, b) => b.expo - a.expo || b.n - a.n);
   if (themed.length) {
-    L.push("· TEMI DELLE NEWS DI OGGI → LE TUE POSIZIONI ESPOSTE (il collegamento news↔book, che i ticker delle news NON danno):");
+    // v161 — ANTI-RIPETIZIONE: gli stessi titoli ricorrono in quasi tutti i temi, e stampare per
+    // ognuno "(peso NAV · MCR · RS)" ogni volta significava ripetere ~40 volte gli stessi numeri:
+    // 2-3k caratteri che DILUISCONO il segnale invece di aggiungerlo. Il tag completo si stampa
+    // alla PRIMA comparsa del titolo (dove informa davvero), poi basta il ticker.
+    const tagged = new Set();
+    const tagOnce = (r) => {
+      if (tagged.has(r.ticker)) return `${r.ticker}${held.has(r.ticker) ? "" : " [wl]"}`;
+      tagged.add(r.ticker); return tag(r);
+    };
+    L.push("· TEMI DELLE NEWS DI OGGI → LE TUE POSIZIONI ESPOSTE (il collegamento news↔book, che i ticker delle news NON danno · peso NAV/MCR/RS indicati alla prima comparsa di ogni titolo):");
     for (const t of themed) {
       const unp = (marketClosed && t.nUnpriced) ? ` · ⏰ ${t.nUnpriced}/${t.n} NON ancora prezzate` : "";
-      L.push(`  [${t.id}] ${t.n} news${unp} · es. "${t.sample}" → ${t.targets.map(tag).join(" · ")}${t.inPtf ? ` — esposizione in PTF ${fmtNum.format(Math.round(t.expo * 10) / 10)}% del NAV` : " — nessuna posizione detenuta (solo watchlist)"}`);
+      L.push(`  [${t.id}] ${t.n} news${unp} · es. "${t.sample}" → ${t.targets.map(tagOnce).join(" · ")}${t.inPtf ? ` — esposizione in PTF ${fmtNum.format(Math.round(t.expo * 10) / 10)}% del NAV` : " — nessuna posizione detenuta (solo watchlist)"}`);
     }
   }
 
@@ -5914,7 +5959,7 @@ function marketLinkText() {
     const rows = [];
     const cut = (s, n) => { const x = String(s); if (x.length <= n) return x; const c = x.slice(0, n); const sp = c.lastIndexOf(" "); return (sp > n * 0.6 ? c.slice(0, sp) : c) + "…"; };
     for (const n of split.unpriced) {
-      const en = n.title || "", it = n.title_it || "";
+      const en = newsCore(n.title), it = newsCore(n.title_it);
       // una news che CITA il ticker vale molto più di un macro-tema che si sventaglia su mezzo book:
       // la specificità è il criterio di ordinamento, non la sola esposizione.
       const direct = (n.tickers || []).map(t => universe.get(t)).filter(r => r && held.has(r.ticker));
