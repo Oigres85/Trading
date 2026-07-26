@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "165";
+const BUILD_VERSION = "166";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6360,8 +6360,13 @@ function marketLinkText() {
       const totUnpriced = nTheme.reduce((s, t) => s + (t.nUnpriced || 0), 0);
       const priceBlind = marketClosed && totNews > 0 && totUnpriced / totNews >= 0.5;
       sig(r.ticker, priceBlind ? "theme_rs_blind" : "theme_rs");
+      // v166 — SCALE TEMPORALI: la RS è una misura a UN MESE. Dire "il prezzo non ha ancora votato"
+      // la annullava del tutto per via di news di poche ore — l'errore speculare a quello del
+      // roll-off corretto in v163 (confondere l'orizzonte della metrica con quello dell'evento).
+      // Una debolezza relativa lunga un mese resta un fatto: le news fresche NON la spiegano e NON
+      // la cancellano. La riga ora tiene insieme le due verità invece di sostituirne una all'altra.
       divTheme.push(priceBlind
-        ? `  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] con RS ${signTxt(rs, "pp")} vs NDX, MA ${totUnpriced}/${totNews} di quelle news sono POSTERIORI alla chiusura → la RS misura il prezzo PRIMA della notizia: non è il flusso che smentisce la narrativa, è una narrativa che il flusso non ha ancora votato. Verifica all'apertura, non trattarla come contraddizione`
+        ? `  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] con RS ${signTxt(rs, "pp")} vs NDX — debolezza relativa maturata su UN MESE, quindi un fatto acquisito e non smentibile dalle news di oggi. Però ${totUnpriced}/${totNews} di quelle news sono POSTERIORI all'ultima chiusura: NON sono ancora nel prezzo e quindi nemmeno in questa RS. Le due cose convivono — il mese dice debolezza, le notizie fresche sono un'ipotesi non ancora votata dal flusso: se decidi sulla narrativa, stai scommettendo contro un mese di prezzo`
         : `  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] ma la sua forza relativa è ${signTxt(rs, "pp")} vs NDX → il flusso NON conferma la narrativa delle news`);
     }
     const v = vetoStrong.get(r.ticker);
