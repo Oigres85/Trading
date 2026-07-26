@@ -1097,6 +1097,15 @@ check("v161 coda editoriale: la sigla della FONTE non classifica il tema (Kavout
   const veraAI = marketLinkText();
   DATA.news = savedNews;
   return !soloFonte.includes("[AI/DATACENTER]") && veraAI.includes("[AI/DATACENTER]")`));
+check("v171 Asia aperta mentre NY è nel weekend: il KOSPI non va dichiarato fermo a venerdì", run(`
+  const at = (iso) => new Date(iso);
+  // lunedì 02:00 CEST = 09:00 KST (KOSPI apre) ma a New York è ancora domenica sera
+  const apre = at("2026-07-27T00:00:00Z");
+  return seoulSessionOpen(apre) === true
+      && usSessionInfo(apre).phase === "weekend"          // NY: ancora weekend
+      && seoulSessionOpen(at("2026-07-27T07:00:00Z")) === false   // 09:00 CEST: KOSPI chiuso
+      && seoulSessionOpen(at("2026-07-25T02:00:00Z")) === false   // sabato: chiuso
+      && seoulSessionOpen(at("2026-07-26T21:00:00Z")) === false`)); // domenica sera: non ancora
 check("v161 nessun riferimento pendente: senza news post-chiusura il payload NON rimanda ai CATALIZZATORI", run(`
   const savedNews = DATA.news;
   DATA.news = [];                                        // nessuna news → il blocco non si genera

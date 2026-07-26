@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "170";
+const BUILD_VERSION = "171";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1158,7 +1158,10 @@ function sessionContextLine() {
   // rimando incondizionato poteva puntare a una sezione assente (news post-chiusura tutte estranee
   // al portafoglio). Un'affermazione vera in ogni caso non può diventare pendente.
   const nUnp = (() => { try { return newsSplitByClose().unpriced.length; } catch { return 0; } })();
-  const guida = s.phase === "weekend"
+  const asiaViva = seoulSessionOpen();
+  const guida = (s.phase === "weekend" && asiaViva)
+    ? `WEEKEND a New York MA BORSA ASIATICA APERTA (Seoul sta scambiando ora; apertura USA tra ~${hrs}h): questa è la finestra in cui l'Asia è l'UNICA informazione nuova. Il KOSPI qui NON è un dato di venerdì: è il primo mercato che vota sulle notizie del fine settimana, e storicamente anticipa la direzione dei semiconduttori. Pesalo come tale, insieme ai futures USA se già quotati.`
+    : s.phase === "weekend"
     ? `WEEKEND, MERCATI CHIUSI (apertura tra ~${hrs}h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA.${nUnp ? ` Il segnale fresco di questo run sono le ${nUnp} NOTIZIE arrivate dopo la campana, che il prezzo non ha ancora votato:` : " Nessuna notizia nuova dopo la campana:"} gli ordini valgono per l'apertura di lunedì, a limite, mai a mercato`
     : beforeBell
     ? `SEI PRIMA DELLA CAMPANA (apertura tra ~${hrs}h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura`
@@ -1205,6 +1208,18 @@ function newsSplitByClose() {
   return { unpriced, priced, close, total: real.length };
 }
 const seoulToday = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // UTC+9, niente DST
+/* v171 — L'ASIA APRE MENTRE A NEW YORK È ANCORA DOMENICA. Il ramo "weekend" assumeva che tutto
+   fosse fermo, ma il KOSPI apre alle 09:00 KST = 02:00 CEST del lunedì, quando l'orologio di New
+   York segna ancora le 20:00 di domenica. In quella finestra il payload dichiarava "KOSPI fermo
+   alla chiusura di venerdì, non anticipa nulla" mentre il KOSPI stava scambiando dal vivo — cioè
+   proprio quando l'anticipatore asiatico è l'unica informazione nuova disponibile. */
+function seoulSessionOpen(now = new Date()) {
+  const kst = new Date(now.getTime() + 9 * 3600e3);        // Corea: UTC+9 fisso, nessun DST
+  const g = kst.getUTCDay();
+  if (g === 0 || g === 6) return false;                    // sabato/domenica a Seoul
+  const min = kst.getUTCHours() * 60 + kst.getUTCMinutes();
+  return min >= 540 && min < 930;                          // 09:00–15:30 KST
+}
 function shockSourcesLive() {
   const THR = -2.0, sources = [];
   const fut = (DATA.macro || {}).futures || {};
