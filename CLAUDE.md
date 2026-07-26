@@ -141,8 +141,18 @@ Precedente: TOP 10 CAPITALIZZAZIONI (v138). Poi, in v184, dopo aver MISURATO inv
 - **MATRICE DI RISCHIO, 2 colonne** — peso NAV e beta già nelle CORRELAZIONI e in Tabella A. MCR
   resta: è l'unica classifica completa del rischio, ordinata e a somma 100%.
 
-Effetto misurato: −4,0% caratteri, −5,0% cifre derivate, −4,2% numeri ripetuti. **Modesto, e va
-detto**: la leva grossa sarebbe ridurre le RIGHE della watchlist, non le colonne. Il guadagno vero
+- **EPS RIMESSO in v185** dopo aver provato il payload su me stesso: Bloom Energy mostrava
+  "P/E —" con ROE +1,3% e margine +0,3%, tutto in apparenza sano, e senza EPS non c'era modo di
+  sapere che l'utile per azione è negativo (−0,04). Per gli altri cinque titoli senza P/E il segno
+  lo davano ROE o margine; per BE no. La convenzione "P/E = '—' quando EPS<0" rendeva quel
+  trattino ambiguo fra dato mancante e società in perdita. **P/E resta tolto**: quello è davvero
+  duplicato. Lezione: due colonne che sembrano la stessa cosa non lo sono — una era ridondante,
+  l'altra disambiguava una convenzione della tabella stessa.
+
+Effetto misurato a dati COSTANTI (v183→v185, stesso data.json): −3,9% caratteri, −5,1% cifre
+derivate. **Modesto, e va detto**: la leva grossa sarebbe ridurre le RIGHE della watchlist, non le
+colonne. Attenzione a misurare il taglio contro un payload rigenerato DOPO un run del CI: i dati
+cambiano e il confronto si sporca (la prima misura diceva −6,1%, era per metà il data.json nuovo). Il guadagno vero
 non è la dimensione ma un allineamento in meno da mantenere — la classe C11/C1.
 
 **C12 è la ricevuta del taglio**: verifica sui dati VERI che i 12 fatti dei blocchi rimossi siano

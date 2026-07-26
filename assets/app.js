@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "184";
+const BUILD_VERSION = "185";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5506,7 +5506,14 @@ function buildPrompt() {
     // per tutti i titoli della watchlist). Gli indici sono quelli della `head` condivisa e la
     // proiezione avviene DOPO mdRow, cosi' la Tabella A e il red team (che legge gli indici
     // 16/17 e il nome "Supp.") restano invariati.
-    const TAGLIA_WL = new Set([2, 3, 6, 19, 20]);
+    // v185: EPS (20) RIMESSO. Provando il payload su me stesso e' emerso il caso Bloom Energy:
+    // nel fondamentale BE mostra "P/E —" con ROE +1,3% e margine +0,3%, tutto in apparenza sano,
+    // e senza EPS non c'e' modo di sapere che l'utile per azione e' NEGATIVO (-0,04). Per gli
+    // altri cinque titoli senza P/E il segno lo davano ROE o margine, per BE no. La convenzione
+    // della tabella e' "P/E = '—' quando EPS<0 per igiene matematica": togliere EPS rendeva quel
+    // trattino ambiguo fra "dato mancante" e "societa' in perdita". P/E resta tolto: quello e'
+    // davvero duplicato in ANALISI FONDAMENTALE per tutti e 25 i titoli.
+    const TAGLIA_WL = new Set([2, 3, 6, 19]);
     const proietta = (riga) => {
       const c = riga.split("|");
       return c.filter((_, i) => !TAGLIA_WL.has(i)).join("|");

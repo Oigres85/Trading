@@ -330,6 +330,9 @@ function c12_fattiSopravvissuti(t) {
     { che: "peso NAV per titolo",    re: /% NAV · MCR /,               era: "MATRICE DI RISCHIO (colonna)", ora: "CORRELAZIONI news↔book" },
     { che: "beta NDX per titolo",    re: /\| Beta NDX \|/,             era: "MATRICE DI RISCHIO (colonna)", ora: "Tabella A" },
     { che: "rotazione settoriale",   re: /Semiconduttori \(SMH\)/,     era: "TOP 10 ETF", ora: "ROTAZIONE SETTORIALE" },
+    // v185: aggiunto DOPO aver provato il payload su me stesso — l'avevo tolto senza che nulla
+    // se ne accorgesse, ed e' esattamente il buco che C12 esiste per non lasciare aperto.
+    { che: "EPS dei titoli watchlist", re: /\| EPS \|/,                 era: "Tabella B (tolto per errore in v184)", ora: "Tabella B" },
   ];
   const persi = ATTESI.filter(a => !a.re.test(t));
   if (persi.length) flag("C12 fatto perso in un taglio", persi.map(a =>
