@@ -310,6 +310,33 @@ function c11_grandezzePerTitolo(t, ctx) {
   else ok(`C11 grandezze per titolo coerenti fra i blocchi (${perTicker.size} confronti)`);
 }
 
+/* ═══════════ C12 — I FATTI DEI BLOCCHI TAGLIATI DEVONO ESSERE ANCORA QUI ════════════
+   Il v184 ha rimosso quattro blocchi perche' RIPETEVANO numeri gia' presenti altrove. La
+   giustificazione del taglio e' tutta in quel "gia' presenti altrove": se un domani cambia il
+   blocco che li ospita, il taglio smette di essere gratuito e diventa una perdita di dati, in
+   silenzio. Questo controllo e' la ricevuta del taglio — gira sul payload VERO, non su un
+   fixture, perche' e' li' che quei numeri esistono. */
+function c12_fattiSopravvissuti(t) {
+  const ATTESI = [
+    { che: "ΔRS 7g per titolo",      re: /ΔRS 7g/,                    era: "CINEMATICA DEI SEGNALI", ora: "tabella CINEMATICA & TREND PER TITOLO" },
+    { che: "ΔMCR 7g per titolo",     re: /ΔMCR 7g/,                   era: "CINEMATICA DEI SEGNALI", ora: "tabella CINEMATICA & TREND PER TITOLO" },
+    { che: "term structure VIX",     re: /VIX\/VIX3M [\d,]+/,          era: "CINEMATICA DEI SEGNALI", ora: "QUADRO MACRO" },
+    { che: "Δ7g dello Sharpe",       re: /Sharpe [\d,]+ \(Δ7 [\d,-]+\)/, era: "CINEMATICA DEI SEGNALI", ora: "digest ANALISI STORICA" },
+    { che: "MCR Top-3",              re: /MCR Top-3 \d+%/,             era: "CINEMATICA DEI SEGNALI", ora: "REGIME DI VARIANZA" },
+    { che: "P/E S&P 500 e Nasdaq",   re: /P\/E Ratio S&P 500[^\n]*Nasdaq 100/, era: "CONTESTO ECONOMIA USA", ora: "ROTAZIONE SETTORIALE" },
+    { che: "tasso Fed",              re: /Fed Funds Rate/,             era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
+    { che: "CPI e PCE",              re: /Inflazione CPI[\s\S]{0,400}Inflazione PCE/, era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
+    { che: "curva 10A-2A",           re: /Curva 10A-2A/,               era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
+    { che: "peso NAV per titolo",    re: /% NAV · MCR /,               era: "MATRICE DI RISCHIO (colonna)", ora: "CORRELAZIONI news↔book" },
+    { che: "beta NDX per titolo",    re: /\| Beta NDX \|/,             era: "MATRICE DI RISCHIO (colonna)", ora: "Tabella A" },
+    { che: "rotazione settoriale",   re: /Semiconduttori \(SMH\)/,     era: "TOP 10 ETF", ora: "ROTAZIONE SETTORIALE" },
+  ];
+  const persi = ATTESI.filter(a => !a.re.test(t));
+  if (persi.length) flag("C12 fatto perso in un taglio", persi.map(a =>
+    `"${a.che}" non è più nel payload: stava in ${a.era}, doveva restare in ${a.ora}`).join(" · "));
+  else ok(`C12 i ${ATTESI.length} fatti dei blocchi rimossi in v184 sono tutti ancora nel payload`);
+}
+
 /* ---------------------------------- esecuzione ---------------------------------- */
 const { testo, ctx } = generaPayload();
 c1_valoriRipetuti(testo);
@@ -323,6 +350,7 @@ c8_denominatori(testo);
 c9_istruzioniDuplicate(testo);
 c10_sezioniInesistenti(testo);
 c11_grandezzePerTitolo(testo, ctx);
+c12_fattiSopravvissuti(testo);
 
 if (VERBOSE) PASSATI.forEach(p => console.log(`  ok   ${p}`));
 if (PROBLEMI.length) {
@@ -330,4 +358,4 @@ if (PROBLEMI.length) {
   PROBLEMI.forEach((p, i) => console.log(`  ${i + 1}. [${p.classe}] ${p.msg}\n`));
   process.exit(1);
 }
-console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 11 classi — nessuna incoerenza interna`);
+console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 12 classi — nessuna incoerenza interna`);

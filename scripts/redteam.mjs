@@ -159,13 +159,24 @@ function checkCampaign(name, ctx) {
   // I6 COERENZA SEMANTICA DI RIGA (v118, incidente SNDK $1509>$1485): uno stop long
   // "(teorico)" — ingresso al supporto — deve stare SOTTO il supporto d'ingresso della
   // stessa riga. Il red team numerico non lo vedeva (lo stop era >0, tecnicamente valido):
-  // era una relazione FRA due celle. Colonne mdRow: 16=Supp. · 17=Stop 2×ATR.
+  // era una relazione FRA due celle.
+  // v184: le colonne si trovano PER NOME, leggendo l'intestazione della tabella in cui la riga
+  // si trova. Gli indici fissi 16/17 sono saltati appena la Tabella B ha perso cinque colonne,
+  // e avrebbero continuato a puntare a due celle a caso segnalando 500 falsi allarmi. È la
+  // stessa lezione di C10: un registro fisso di posizioni invecchia da solo e in silenzio.
   const euro = (s) => { const m = (s || "").match(/[\d.]+,\d+|\d[\d.]*/); if (!m) return null;
     return parseFloat(m[0].replace(/\./g, "").replace(",", ".")); };
+  let iSupp = -1, iStop = -1;
   for (const line of p.split("\n")) {
+    if (line.startsWith("| Titolo |")) {                       // intestazione: rilega gli indici
+      const h = line.split("|").map(s => s.trim());
+      iSupp = h.indexOf("Supp."); iStop = h.findIndex(x => x.startsWith("Stop 2×ATR"));
+      continue;
+    }
     if (!line.startsWith("| ") || !line.includes("(teorico)")) continue;
+    if (iSupp < 0 || iStop < 0) { fail(name, "I6 intestazione tabella senza colonne Supp./Stop 2×ATR"); continue; }
     const cols = line.split("|").map(s => s.trim());
-    const supp = euro(cols[16]), stop = euro(cols[17]);
+    const supp = euro(cols[iSupp]), stop = euro(cols[iStop]);
     if (supp != null && stop != null && stop >= supp) {
       fail(name, `I6 ${cols[1]}: stop teorico ${stop} ≥ supporto d'ingresso ${supp} (stop long impossibile — incidente SNDK)`);
     }

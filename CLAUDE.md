@@ -126,6 +126,33 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
 - `git pull --rebase origin main && git push` (il CI committa `data.json`; conflitti su quel
   file → tenere la versione remota fresca, i tuoi calcoli si ricomputano al run successivo).
 
+## ✂️ Blocchi RIMOSSI dal payload (non reintrodurre senza misurare)
+
+Precedente: TOP 10 CAPITALIZZAZIONI (v138). Poi, in v184, dopo aver MISURATO invece di stimare:
+
+- **CINEMATICA DEI SEGNALI** — 21 numeri su 21 già altrove (Sharpe e Δ7g in SITUAZIONE PATRIMONIALE
+  e nel digest, VIX/VIX3M in QUADRO MACRO, ΔRS e ΔMCR sono COLONNE della tabella per-titolo).
+- **CONTESTO ECONOMIA USA** — tutto in QUADRO MACRO e ROTAZIONE; il PIL YoY compariva due volte con
+  formati diversi ("+2,68%" e "2.68%"), cioè lo stesso dato che si presentava come due dati.
+- **TOP 10 ETF** — mai citato in tre report reali di LLM diversi; la rotazione utile è già nei 21 ETF.
+- **Tabella B, 5 colonne** — Qtà/PMC/Guad.% sono SEMPRE vuote su un universo senza posizioni
+  (verificato: 0 righe su 25), P/E ed EPS sono in ANALISI FONDAMENTALE per tutti e 25 i titoli
+  (verificato: 0 titoli perderebbero il dato). Proiezione DOPO mdRow: Tabella A intatta.
+- **MATRICE DI RISCHIO, 2 colonne** — peso NAV e beta già nelle CORRELAZIONI e in Tabella A. MCR
+  resta: è l'unica classifica completa del rischio, ordinata e a somma 100%.
+
+Effetto misurato: −4,0% caratteri, −5,0% cifre derivate, −4,2% numeri ripetuti. **Modesto, e va
+detto**: la leva grossa sarebbe ridurre le RIGHE della watchlist, non le colonne. Il guadagno vero
+non è la dimensione ma un allineamento in meno da mantenere — la classe C11/C1.
+
+**C12 è la ricevuta del taglio**: verifica sui dati VERI che i 12 fatti dei blocchi rimossi siano
+ancora nel payload. Se un domani cambia il blocco che li ospita, il taglio smette di essere gratuito
+e C12 lo dice subito. Prima di rimettere un blocco: misura se i suoi numeri esistono già altrove.
+
+⚠️ Un taglio di colonne rompe chi legge per INDICE: il red team I6 usava 16/17 fissi e ha sparato
+500 falsi allarmi. Ora trova Supp./Stop 2×ATR **per nome** rileggendo l'intestazione. Stessa lezione
+di C10: un registro fisso di posizioni invecchia da solo e in silenzio.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

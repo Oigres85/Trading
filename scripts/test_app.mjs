@@ -368,18 +368,18 @@ check("decisionVerdict: escluso con setup squeeze → dv.squeezed + reason ⚡ +
   return dv.squeezed.some(x => x.r.ticker === "TSTQ") &&
     dv.reasons.some(s => s.includes("TURNAROUND SQUEEZE") && s.includes("TSTQ")) &&
     p.includes("[TURNAROUND SQUEEZE RISK] (contesto") && row.includes("[TURNAROUND SQUEEZE RISK]")`));
-check("prompt v113: CINEMATICA — RS velocity con ↓DECELERA, MCR top-3 e term structure", run(`
-  const old = DATA.metrics_history;
-  const d8 = new Date(Date.now() - 8 * 86400000).toISOString().slice(0, 10);
-  const d0 = new Date().toISOString().slice(0, 10);
-  DATA.metrics_history = [
-    { date: d8, sharpe: 1.5, vix: 18, vix_term: 0.9, titles: { TST1: { rs: 10, mcr: 40 } } },
-    { date: d0, sharpe: 1.8, vix: 15, vix_term: 0.8, titles: { TST1: { rs: 3, mcr: 42 } } }];
-  const p = buildPrompt();
-  DATA.metrics_history = old;
-  return p.includes("CINEMATICA DEI SEGNALI") && p.includes("RS Velocity") &&
-    /TST1 RS \\+3pp \\(Δ -7pp ↓DECELERA\\)/.test(p) &&
-    p.includes("Derivata di concentrazione") && p.includes("term structure in distensione")`));
+// v184: il blocco CINEMATICA DEI SEGNALI è stato RIMOSSO perché ripeteva 21 numeri su 21.
+// Il test non verifica più che il blocco esista — verifica che i FATTI che portava siano ancora
+// nel payload, prodotti dai blocchi che li avevano già. È la forma giusta di questo test: se un
+// domani sparisse anche una di queste, il taglio avrebbe perso informazione e lo saprei subito.
+check("prompt v184: il blocco CINEMATICA DEI SEGNALI non c'è più, e la term structure resta", run(`
+  const p = buildCIOText();
+  // Le altre grandezze che il blocco ripeteva (ΔRS, ΔMCR, ΔSharpe, MCR Top-3) hanno bisogno di
+  // sparks e storico che questo fixture non ha: la loro sopravvivenza si verifica sui dati VERI,
+  // in coherence_check C12. Qui si asserisce solo ciò che il fixture può davvero produrre —
+  // un test che pretende dati inesistenti fallisce per il motivo sbagliato.
+  // (anche VIX/VIX3M dipende da macro.vix_term, assente in questo fixture: sta in C12)
+  return !p.includes("CINEMATICA DEI SEGNALI") && !p.includes("CONTESTO ECONOMIA USA") && !p.includes("TOP 10 ETF")`));
 check("prompt v113: TRACK RECORD renderizzato quando maturo, 'in costruzione' quando vuoto", run(`
   const p0 = buildPrompt();
   DATA.verdict_track = { mature7: { n: 3, avg_ret: 4.2, avg_vs_ndx: 1.1, hit_pct: 67 }, mature30: { n: 0 },

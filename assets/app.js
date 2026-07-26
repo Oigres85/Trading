@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "183";
+const BUILD_VERSION = "184";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5346,60 +5346,12 @@ function buildPrompt() {
     lines.push("TRACK RECORD DEL MOTORE: storico in costruzione — i segnali ACCUMULA vengono loggati a ogni run e valutati dopo 7 e 30 giorni di maturazione. Finché non matura, tratta i candidati del motore come ipotesi da validare, non come raccomandazioni provate.");
   }
 
-  // ---- CINEMATICA DEI SEGNALI (v113): la velocità conta quanto il livello — RS che
-  // decelera, MCR che si concentra e term structure che si irrigidisce anticipano i
-  // downgrade del motore. Confronti vs il punto storico più vicino a 7/30 giorni fa.
-  try {
-    const kHist = DATA.metrics_history || [];
-    const nowP = kHist[kHist.length - 1];
-    const pAt = (days) => { const t = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10); let best = null; for (const p of kHist) if (p.date <= t) best = p; return best; };
-    const p7 = pAt(7), p30 = pAt(30);
-    if (nowP && p7) {
-      const kin = [];
-      const dnum = (a, b, dec = 2) => (a != null && b != null) ? Math.round((a - b) * 10 ** dec) / 10 ** dec : null;
-      const sh7 = dnum(nowP.sharpe, p7.sharpe), sh30 = dnum(nowP.sharpe, p30 && p30.sharpe);
-      if (sh7 != null) kin.push(`Sharpe di portafoglio ${fmtNum.format(nowP.sharpe)} (Δ7g ${signTxt(sh7, "")}${sh30 != null ? `, Δ30g ${signTxt(sh30, "")}` : ""})`);
-      const vt7 = dnum(nowP.vix_term, p7.vix_term, 3);
-      if (nowP.vix_term != null && vt7 != null) kin.push(`VIX/VIX3M ${fmtNum.format(nowP.vix_term)} (Δ7g ${signTxt(vt7, "")} — ${vt7 > 0.02 ? "term structure in IRRIGIDIMENTO: lo smart money sta comprando protezione" : vt7 < -0.02 ? "term structure in distensione: coperture rilassate" : "term structure stabile"}${nowP.vix_term >= 1 ? "; BACKWARDATION: stress acuto in corso" : ""})`);
-      const vx7 = dnum(nowP.vix, p7.vix, 2);
-      if (vx7 != null) kin.push(`VIX ${fmtNum.format(nowP.vix)} (Δ7g ${signTxt(vx7, " punti")})`);
-      // RS Velocity: Δ7g della RS 1M vs NDX per i titoli in portafoglio.
-      // ⚠ i titles per-titolo esistono solo dai run dell'11/07: pAt(7) può cadere PRIMA (nessun
-      // titles) → confronto vuoto. Uso il più recente snapshot TITOLATO ≤7g, fallback al primo
-      // titolato disponibile (la finestra reale può essere <7g: è comunque la derivata vera).
-      const tNow = nowP.titles || {};
-      const titled = kHist.filter(p => p.titles && Object.keys(p.titles).length);
-      const t7 = pAt(7), pOldTitled = (t7 && t7.titles && Object.keys(t7.titles).length) ? t7
-        : (titled.find(p => p.date <= (t7 || nowP).date) || titled[0] || p7);
-      const tOld = (pOldTitled && pOldTitled.titles) || {};
-      const rsMoves = Object.keys(tNow)
-        .map(tk => ({ tk, rs: (tNow[tk] || {}).rs, d: dnum((tNow[tk] || {}).rs, (tOld[tk] || {}).rs, 1) }))
-        .filter(x => x.d != null)
-        .sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
-      if (rsMoves.length) {
-        kin.push(`RS Velocity (Δ7g della RS 1M vs NDX; |Δ|≥${RS_VEL_RILEVANTE_PP}pp = variazione RILEVANTE): ` +
-          rsMoves.slice(0, 6).map(x => `${x.tk} RS ${signTxt(x.rs, "pp")} (Δ ${signTxt(x.d, "pp")}${Math.abs(x.d) >= RS_VEL_RILEVANTE_PP ? (x.d > 0 ? " ↑ACCELERA" : " ↓DECELERA") : ""})`).join(" · "));
-      }
-      // Derivata di concentrazione: MCR dei 3 maggiori contributori di rischio
-      const mcrMoves = Object.keys(tNow)
-        .map(tk => ({ tk, m: (tNow[tk] || {}).mcr, d: dnum((tNow[tk] || {}).mcr, (tOld[tk] || {}).mcr, 1) }))
-        .filter(x => x.m != null)
-        .sort((a, b) => b.m - a.m).slice(0, 3);
-      if (mcrMoves.length) {
-        kin.push("Derivata di concentrazione (MCR top-3, Δ7g — se sale, il rischio si sta CONCENTRANDO): " +
-          mcrMoves.map(x => `${x.tk} ${fmtNum.format(x.m)}%${x.d != null ? ` (Δ ${signTxt(x.d, "pp")})` : ""}`).join(" · "));
-      }
-      if (kin.length) {
-        lines.push("");
-        lines.push("CINEMATICA DEI SEGNALI (Δ vs ~7/30 giorni — leggi la DIREZIONE oltre al livello):");
-        kin.forEach(k => lines.push("- " + k));
-        if (!rsMoves.length) lines.push("- (cinematica per-titolo in costruzione: RS/MCR storici si accumulano dai run dell'11/07/2026 → confronti a 7g completi dal ~18/07)");
-      }
-    } else {
-      lines.push("");
-      lines.push("CINEMATICA DEI SEGNALI: storico metriche insufficiente (<7 giorni) — il blocco si attiva da solo quando lo storico matura.");
-    }
-  } catch { /* la cinematica non deve mai rompere il prompt */ }
+  // ---- CINEMATICA DEI SEGNALI: RIMOSSA dal payload (v184, come TOP 10 CAPITALIZZAZIONI in v138).
+  // Misurato prima di togliere: 21 numeri su 21 comparivano GIÀ altrove nel payload — Sharpe e il
+  // suo Δ7g in SITUAZIONE PATRIMONIALE e nel digest storico, VIX e VIX/VIX3M in QUADRO MACRO,
+  // ΔRS e ΔMCR sono COLONNE della tabella CINEMATICA & TREND PER TITOLO. Zero informazione persa,
+  // un allineamento in meno da mantenere (è la classe di difetto che ha prodotto C11).
+  // Il calcolo per-titolo resta vivo: lo fa titleKinematics(), usata dalla tabella e dalla UI.
   // DIARIO DELLE AZIONI (storico operazioni e motivazioni dell'utente)
   const diary = loadDiary();
   if (diary.length) {
@@ -5535,19 +5487,32 @@ function buildPrompt() {
   if (riskRows.length) {
     lines.push("");
     lines.push("MATRICE DI RISCHIO PER POSIZIONE (log-rendimenti giornalieri 12M, pesi mark-to-market — usa QUESTI numeri per correlazione e concentrazione del rischio, non stime a memoria):");
-    lines.push("| Titolo | Peso % NAV (MTM) | Beta NDX | Quota rischio ptf (MCR) | Corr. media vs ptf | Corr. max (con) |");
-    lines.push("|---|---|---|---|---|---|");
+    lines.push("| Titolo | Quota rischio ptf (MCR) | Corr. media vs ptf | Corr. max (con) |");
+    lines.push("|---|---|---|---|");
     riskRows.slice().sort((a, b) => (b.risk_contrib_pct ?? -1) - (a.risk_contrib_pct ?? -1)).forEach(r => {
-      const w = positionWeightPct(r);
-      lines.push(`| ${r.ticker} | ${w != null ? fmtNum.format(w) + "%" : "—"} | ${r.beta_ndx != null ? fmtNum.format(r.beta_ndx) : "—"} | ${r.risk_contrib_pct != null ? fmtNum.format(r.risk_contrib_pct) + "%" : "—"} | ${r.avg_corr != null ? fmtNum.format(r.avg_corr) : "—"} | ${r.max_corr != null ? `${fmtNum.format(r.max_corr)} (${r.max_corr_with})` : "—"} |`);
+      // v184: "Peso % NAV" e "Beta NDX" tolti — il peso e' gia' accanto a ogni titolo nelle
+      // CORRELAZIONI ("MU (18,9% NAV · MCR 39,8% · RS -2,8pp)") e il beta e' una colonna della
+      // Tabella A. Restano MCR (unica classifica completa del rischio, ordinata, somma 100%) e
+      // le due correlazioni, che non esistono da nessun'altra parte del payload.
+      lines.push(`| ${r.ticker} | ${r.risk_contrib_pct != null ? fmtNum.format(r.risk_contrib_pct) + "%" : "—"} | ${r.avg_corr != null ? fmtNum.format(r.avg_corr) : "—"} | ${r.max_corr != null ? `${fmtNum.format(r.max_corr)} (${r.max_corr_with})` : "—"} |`);
     });
     lines.push("(MCR = contributo marginale al rischio: quota % della varianza totale del portafoglio attribuibile alla posizione — la somma fa 100%. Una posizione con MCR molto sopra il suo peso concentra il rischio. I titoli con storia <60 sedute — IPO e nuove quotazioni — sono esclusi da beta/correlazioni/MCR BY DESIGN, soglia statistica minima: non è un buco dati.)");
   }
   if ((DATA.watchlist || []).length) {
     lines.push("");
     lines.push(`WATCHLIST — ${DATA.watchlist.length} TITOLI (Tabella B — nessuna posizione, è il tuo universo di caccia: cita un nome solo se entra in una tesi operativa, NON riprodurre la tabella):`);
-    lines.push(head); lines.push(sep);
-    DATA.watchlist.forEach(r => lines.push(mdRow(r)));
+    // v184 — colonne tolte alla sola Tabella B (la dashboard NON cambia): 2 Qta, 3 PMC,
+    // 6 Guad.% (sempre vuote senza posizione) e 19 P/E, 20 EPS (gia' in ANALISI FONDAMENTALE
+    // per tutti i titoli della watchlist). Gli indici sono quelli della `head` condivisa e la
+    // proiezione avviene DOPO mdRow, cosi' la Tabella A e il red team (che legge gli indici
+    // 16/17 e il nome "Supp.") restano invariati.
+    const TAGLIA_WL = new Set([2, 3, 6, 19, 20]);
+    const proietta = (riga) => {
+      const c = riga.split("|");
+      return c.filter((_, i) => !TAGLIA_WL.has(i)).join("|");
+    };
+    lines.push(proietta(head)); lines.push(proietta(sep));
+    DATA.watchlist.forEach(r => lines.push(proietta(mdRow(r))));
     // correlazione dei candidati watchlist vs il portafoglio ESISTENTE (per la regola n.2)
     const wlCorr = (DATA.watchlist || []).filter(r => r.avg_corr != null || r.max_corr != null);
     if (wlCorr.length) {
@@ -5598,11 +5563,11 @@ function buildPrompt() {
   if (pceI) usEco.push(`PCE ${pceI.value}`);
   if (m.yield_recession?.gdp_last != null) usEco.push(`PIL reale YoY ${signTxt(m.yield_recession.gdp_last)}`);
   if (m.yield_recession?.current_curve != null) usEco.push(`curva 10A-2A ${signTxt(m.yield_recession.current_curve)} pp`);
-  if (usEco.length) {
-    lines.push("CONTESTO ECONOMIA USA (fonte di riferimento: Macrotrends):");
-    lines.push("- " + usEco.join(" · "));
-    lines.push("");
-  }
+  // CONTESTO ECONOMIA USA: RIMOSSO dal payload (v184). Verificato numero per numero: P/E S&P e
+  // Nasdaq stanno in ROTAZIONE SETTORIALE, tasso Fed / CPI / PCE / curva 10A-2A in QUADRO MACRO,
+  // e il PIL reale YoY compariva DUE VOLTE con formati diversi ("+2,68%" qui, "2.68%" nella riga
+  // Curva vs Recessione) — cioè lo stesso dato che si presentava come due dati.
+  void usEco;
   // DATA QUALITY REPORT: i dati flaggati dalle assertions vengono dichiarati PRIMA del quadro
   // macro, con l'ordine esplicito di fare double-check web su ciò che è datato/inaffidabile
   if (!dqV.ok) {
@@ -5847,19 +5812,9 @@ function buildPrompt() {
   if (t.cash) lines.push(`- Liquidità disponibile: ${fmtEUR.format(t.cash)} · controvalore investito (mark-to-market): ${fmtEUR.format(t.eur_invested)}`);
   // TOP 10 CAPITALIZZAZIONI rimosso dal payload (v138): nessun valore decisionale per il
   // fondo (i nomi rilevanti sono già in ptf/watchlist con dati completi); resta nella UI.
-  if ((DATA.top_etfs || []).length) {
-    lines.push("");
-    lines.push("TOP 10 ETF (metriche di valutazione e segnali di ingresso):");
-    lines.push("| ETF | Nome | Prezzo | Oggi | 1M | RSI | P/E | Div% | AUM | Segnale |");
-    lines.push("|---|---|---|---|---|---|---|---|---|---|");
-    DATA.top_etfs.forEach(r => {
-      const m1 = r.sparks?.m1;
-      const m1v = m1?.length >= 2 && m1[0] ? ((m1[m1.length-1]/m1[0]-1)*100).toFixed(1) : "—";
-      const opp = etfOpportunity(r.rsi);
-      lines.push(`| ${r.ticker} | ${r.name} | $${fmtNum.format(r.price || 0)} | ${signTxt(r.change_pct)} | ${m1v !== "—" ? signTxt(+m1v) : "—"} | ${r.rsi ?? "—"} | ${r.pe ?? "—"} | ${r.div_yield ? r.div_yield+"%" : "—"} | ${r.aum ? "$"+r.aum+"B" : "—"} | ${opp.label} |`);
-    });
-    lines.push("(RSI<35=ipervenduto/possibile ingresso; RSI>70=ipercomprato/attendere; valuta rotazione settoriale e de-risking tech con questi ETF)");
-  }
+  // TOP 10 ETF: RIMOSSO dal payload (v184), come TOP 10 CAPITALIZZAZIONI in v138 — e resta nella UI.
+  // Non e' stato citato in nessuno dei tre report reali di LLM diversi sullo stesso payload, e la
+  // rotazione che serve davvero e' gia' in ROTAZIONE SETTORIALE (21 ETF con performance 1M e 3M).
   if ((DATA.predictions || []).length) {
     lines.push("");
     recordPolymarket();   // registra lo snapshot di oggi (dedup giornaliero) per la derivata Δ7g
