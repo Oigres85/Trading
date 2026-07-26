@@ -93,6 +93,11 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
 - `node scripts/test_app.mjs` — test funzioni pure JS (motore, risk, buildPrompt)
 - `python3 scripts/test_update_data.py` — test pipeline (ratchet, risk metrics)
 - `python3 scripts/audit_data.py data/data.json` — gate qualità dati (P/E con EPS<0, MCR, ecc.)
+- `node scripts/coherence_check.mjs` — gate COERENZA INTERNA del payload: stessa grandezza con
+  valori diversi, freschezza contraddittoria, somme che non tornano, verdetti opposti sullo stesso
+  titolo, terminologia divergente, denominatori non dichiarati. È la classe che audit e red team
+  non vedono: un payload che si contraddice non è invalido, è INAFFIDABILE. Ogni detector è stato
+  validato iniettando l'incoerenza che deve trovare (`--verbose` mostra anche i controlli passati).
 - Bump `?v=NN` in `index.html` (cache-busting su style.css e app.js) a ogni release.
 - `git pull --rebase origin main && git push` (il CI committa `data.json`; conflitti su quel
   file → tenere la versione remota fresca, i tuoi calcoli si ricomputano al run successivo).

@@ -942,13 +942,15 @@ check("v169 decisioni: le detenute in VETO FORTE entrano nella lista anche SENZA
   if (!attesi.size) return line == null;                 // niente da decidere: la riga non deve esserci
   if (line == null) return false;
   return [...attesi].every(tk => line.includes(tk));`));
-check("v169 budget: si dichiara che NON include i proventi delle vendite proposte", run(`
+check("v170 budget: il capitale liquidabile è CONTESTO, mai capienza di spesa di oggi", run(`
   const p = buildPrompt();
-  const line = p.split("\\n").find(l => l.includes("BUDGET SE VENDI"));
+  const line = p.split("\\n").find(l => l.includes("CAPITALE IMMOBILIZZATO"));
   const dv = decisionVerdict();
   const cene = (dv.stopViolations || []).length || (dv.excluded || []).some(x => x.r && x.r.qty && String(x.strength||"").toLowerCase() === "forte");
   if (!cene) return line == null;
-  return line != null && /NON include i proventi/.test(line) && /budget POST-vendite/.test(line);`));
+  // il capitale liquidabile è CONTESTO: non deve mai essere presentato come budget spendibile oggi
+  return line != null && /NON budget/.test(line) && /non possono superarlo/.test(line)
+      && /T\\+2/.test(line) && !/dimensiona gli acquisti sul budget POST/.test(line);`));
 check("v167 cap sulla perdita: la quantità massima scende al crescere della distanza dallo stop", run(`
   const p = buildPrompt();
   const line = p.split("\\n").find(l => l.includes("Livelli calcolati dal motore"));

@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "169";
+const BUILD_VERSION = "170";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5136,7 +5136,13 @@ function buildPrompt() {
             return `${x.r.ticker} (${fmtNum.format(Math.round(valEur(x.r)))} € — ${x.perche}${mv})`;
           }).join(" · ") +
           `. Tenere è una decisione quanto vendere, ma va DICHIARATA: questi nomi non escono da soli dal portafoglio.`);
-        lines.push(`· 💧 BUDGET SE VENDI: il BUDGET OPERATIVO SPENDIBILE (${bud != null ? fmtEUR.format(Math.round(bud)) : "n.d."}) è calcolato sulla CASSA ATTUALE e NON include i proventi delle vendite che stai valutando. Liquidando tutte le ${daDecidere.length} posizioni qui sopra libereresti ~${fmtEUR.format(Math.round(liquid))}, portando il budget a ~${bud != null ? fmtEUR.format(Math.round(bud + liquid)) : "n.d."}. Se il tuo piano include vendite, dimensiona gli acquisti sul budget POST-vendite e dichiaralo — altrimenti il vincolo A3 ti fa sotto-investire.`);
+        // v170 — il CEO ha corretto (giustamente) la formulazione precedente: finché non hai VENDUTO,
+        // il budget è quello ATTUALE, non quello presunto. Le vendite sono ordini a LIMITE — possono
+        // non riempirsi — e comunque regolano a T+2. Invitare a dimensionare gli acquisti sui proventi
+        // attesi significava autorizzare a impegnare denaro che potrebbe non arrivare: l'esatto
+        // rischio che il vincolo di budget esiste per prevenire. Il controvalore resta come CONTESTO
+        // (dice cosa la liquidazione renderebbe possibile), mai come capienza di spesa di oggi.
+        lines.push(`· 💧 CAPITALE IMMOBILIZZATO in queste posizioni: ~${fmtEUR.format(Math.round(liquid))}. È CONTESTO, NON budget: il BUDGET OPERATIVO SPENDIBILE di oggi resta ${bud != null ? fmtEUR.format(Math.round(bud)) : "n.d."} e gli acquisti di oggi non possono superarlo. I proventi NON sono disponibili finché le vendite non sono ESEGUITE — sono ordini a limite, possono non riempirsi, e regolano a T+2. Se vendi oggi, quel capitale entra nel budget del PROSSIMO run, non di questo: non anticiparlo negli ordini.`);
       }
     }
     if ((dv.withPlan || []).length) {
