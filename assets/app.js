@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "182";
+const BUILD_VERSION = "183";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5154,7 +5154,12 @@ function buildPrompt() {
         const bud = DATA?.totals?.budget_operativo_spendibile;
         lines.push(`· 🔷 POSIZIONI CHE CHIEDONO UNA DECISIONE OGGI (${daDecidere.length}): ` +
           daDecidere.map(x => {
-            const mv = dgFin(x.r.gain) != null && x.r.gain < 0 ? ` · minusvalenza latente ${fmtEUR.format(Math.round(x.r.gain))}` : "";
+            // v183: EUR, come il controvalore accanto. Stessa scala di valEur() — `gain` grezzo
+            // e' in valuta del titolo e stamparlo con fmtEUR creava un secondo valore, piu' alto
+            // del vero del cambio, per una grandezza che il payload gia' pubblica altrove.
+            const gEur = Number.isFinite(x.r.gain_eur) ? x.r.gain_eur
+              : (dgFin(x.r.gain) != null ? x.r.gain / eurusdD : null);
+            const mv = gEur != null && gEur < 0 ? ` · minusvalenza latente ${fmtEUR.format(Math.round(gEur))}` : "";
             return `${x.r.ticker} (${fmtNum.format(Math.round(valEur(x.r)))} € — ${x.perche}${mv})`;
           }).join(" · ") +
           `. Tenere è una decisione quanto vendere, ma va DICHIARATA: questi nomi non escono da soli dal portafoglio.`);

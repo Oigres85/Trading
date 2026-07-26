@@ -115,6 +115,13 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
   titolo, terminologia divergente, denominatori non dichiarati. È la classe che audit e red team
   non vedono: un payload che si contraddice non è invalido, è INAFFIDABILE. Ogni detector è stato
   validato iniettando l'incoerenza che deve trovare (`--verbose` mostra anche i controlli passati).
+- `node scripts/fx_check.mjs` — gate VALUTA. Genera il payload DUE VOLTE con EUR/USD diversi: ogni
+  importo in € che non si muove col cambio o è un euro vero (cassa, VaR/ES già convertiti dalla
+  pipeline) o è un DOLLARO col simbolo sbagliato. Nato dal v183: la minusvalenza latente nel blocco
+  decisioni era il P&L grezzo in USD stampato con fmtEUR, accanto a un controvalore correttamente
+  convertito — due valori per la stessa grandezza, e un LLM reale ha usato quello sbagliato per
+  dimensionare una compensazione fiscale. Gli invarianti legittimi stanno in `LEGITTIMI` con la
+  loro ragione scritta: aggiungerne uno senza motivazione è come disattivare il gate.
 - Bump `?v=NN` in `index.html` (cache-busting su style.css e app.js) a ogni release.
 - `git pull --rebase origin main && git push` (il CI committa `data.json`; conflitti su quel
   file → tenere la versione remota fresca, i tuoi calcoli si ricomputano al run successivo).

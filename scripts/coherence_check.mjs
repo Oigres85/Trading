@@ -61,7 +61,7 @@ const num = (s) => {
   // il payload mescola formato italiano (1.234,5) e inglese (18.58): si distingue dalla virgola.
   // Senza questa distinzione "18.58" diventava 1858 — il primo falso positivo di questo checker.
   if (x.includes(",")) x = x.replace(/\./g, "").replace(",", ".");
-  else if (/^\d{1,3}(\.\d{3})+$/.test(x)) x = x.replace(/\./g, "");   // 1.234 = migliaia
+  else if (/^-?\d{1,3}(\.\d{3})+$/.test(x)) x = x.replace(/\./g, "");  // 1.234 = migliaia (anche col segno)
   const v = parseFloat(x);
   return Number.isFinite(v) ? v : null;
 };
@@ -255,6 +255,61 @@ function c10_sezioniInesistenti(t) {
   else ok("C10 nessun rimando a sezioni inesistenti");
 }
 
+/* ═══════════ C11 — STESSA GRANDEZZA PER LO STESSO TITOLO, VALORI DIVERSI ════════════
+   C1 confronta le grandezze GLOBALI (patrimonio, budget, cassa) e per questo si e' lasciata
+   sfuggire il caso peggiore: la MINUSVALENZA di MSTR valeva -14.123 € nel blocco delle
+   decisioni e -12.117 € nella riga fiscale dello stesso payload. Il rapporto fra i due era
+   esattamente EUR/USD — uno dei due era in dollari col simbolo dell'euro. Un LLM reale ha
+   usato quello sbagliato per dimensionare una compensazione fiscale.
+   Qui il confronto e' PER TITOLO: la stessa etichetta sullo stesso ticker deve dare lo stesso
+   numero ovunque compaia. Se due valori differiscono, si segnala anche quando il rapporto
+   coincide col cambio — anzi, in quel caso si nomina la causa, perche' e' quasi sempre quella. */
+function c11_grandezzePerTitolo(t, ctx) {
+  const fx = Number(vm.runInContext("DATA.eurusd", ctx)) || null;
+  // Anagrafica REALE: solo questi contano come ticker. Senza il vincolo, "VETO FORTE (" faceva
+  // passare "FORTE" per un titolo e il confronto accostava grandezze di posizioni diverse.
+  const TICKER = new Set(JSON.parse(vm.runInContext(
+    "JSON.stringify([...(DATA.portfolio||[]),...(DATA.watchlist||[])].map(r=>r.ticker).filter(Boolean))", ctx)));
+  const perTicker = new Map();                 // "TICKER|etichetta" -> [{val, dove}]
+  const raccogli = (re, etichetta, iTk, iVal, dove, ammessi) => {
+    for (const m of (dove ?? t).matchAll(re)) {
+      const tk = m[iTk], v = num(m[iVal]);
+      if (!tk || v == null || (ammessi && !ammessi.has(tk))) continue;
+      const k = `${tk}|${etichetta}`;
+      if (!perTicker.has(k)) perTicker.set(k, []);
+      perTicker.get(k).push(Math.abs(v));
+    }
+  };
+  // Blocco decisioni. Il motivo del veto contiene parentesi annidate ("(Sortino -2,7 < -0.5
+  // (distruzione…))"), quindi non si puo' andare in avanti dal ticker: si risale ALL'INDIETRO
+  // da ogni "minusvalenza latente" fino al ticker aperto piu' vicino. Robusto per costruzione.
+  for (const m of t.matchAll(/minusvalenza latente\s+(-?[\d.,]+)\s*€/g)) {
+    const prima = t.slice(Math.max(0, m.index - 400), m.index);
+    const tk = [...prima.matchAll(/\b([A-Z][A-Z0-9.\-]{1,6})\s*\(/g)].filter(x => TICKER.has(x[1])).pop();
+    const v = num(m[1]);
+    if (!tk || v == null) continue;
+    const k = `${tk[1]}|minusvalenza`;
+    if (!perTicker.has(k)) perTicker.set(k, []);
+    perTicker.get(k).push(Math.abs(v));
+  }
+  // Riga fiscale, scandita SOLO su se stessa: su tutto il payload il pattern "SIGLA (numero €)"
+  // pescava anche "NAV (6156 €)" e simili.
+  const fisc = t.match(/Minusvalenze latenti utilizzabili fiscalmente[^\n]*/);
+  if (fisc) raccogli(/\b([A-Z][A-Z0-9.\-]{1,6})\s*\((-?[\d.,]+)\s*€\)/g, "minusvalenza", 1, 2, fisc[0], TICKER);
+  const guasti = [];
+  for (const [k, vals] of perTicker) {
+    const u = [...new Set(vals.map(v => Math.round(v)))];
+    if (u.length < 2) continue;
+    const [a, b] = [Math.max(...u), Math.min(...u)];
+    const causa = (fx && Math.abs(a / b - fx) < 0.01)
+      ? ` — il rapporto ${(a / b).toFixed(4)} È il cambio EUR/USD: uno dei due è in DOLLARI col simbolo €`
+      : "";
+    guasti.push(`${k.replace("|", " ")}: ${u.join(" vs ")} €${causa}`);
+  }
+  if (guasti.length) flag("C11 stessa grandezza, valori diversi (per titolo)", guasti.join(" · "));
+  else ok(`C11 grandezze per titolo coerenti fra i blocchi (${perTicker.size} confronti)`);
+}
+
 /* ---------------------------------- esecuzione ---------------------------------- */
 const { testo, ctx } = generaPayload();
 c1_valoriRipetuti(testo);
@@ -267,6 +322,7 @@ c7_budget(testo);
 c8_denominatori(testo);
 c9_istruzioniDuplicate(testo);
 c10_sezioniInesistenti(testo);
+c11_grandezzePerTitolo(testo, ctx);
 
 if (VERBOSE) PASSATI.forEach(p => console.log(`  ok   ${p}`));
 if (PROBLEMI.length) {
@@ -274,4 +330,4 @@ if (PROBLEMI.length) {
   PROBLEMI.forEach((p, i) => console.log(`  ${i + 1}. [${p.classe}] ${p.msg}\n`));
   process.exit(1);
 }
-console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 10 classi — nessuna incoerenza interna`);
+console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 11 classi — nessuna incoerenza interna`);
