@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "180";
+const BUILD_VERSION = "181";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1985,21 +1985,6 @@ function decisionVerdict() {
     return `${r.ticker} (${why.join(" + ") || "multiplo teso"})`;
   }).join(", ")}`);
   return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, squeezed, overCap, concentrationAlert, factorRisk, harvest };
-}
-
-// alert proattivi: condizioni rilevanti emerse oggi (deep value, correzione, squeeze, VIX)
-function alertsSummary() {
-  const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
-  const deep = all.filter(r => r.w52_dist_pct != null && r.w52_dist_pct <= -25);
-  const corr = all.filter(r => r.w52_dist_pct != null && r.w52_dist_pct <= -15 && r.w52_dist_pct > -25);
-  const sqz = all.filter(r => (r.stats?.short_float ?? 0) > 0.12);
-  const vix = (DATA.macro || {}).vix?.value;
-  const chips = [];
-  if (deep.length) chips.push({ t: `${deep.length} DEEP VALUE`, c: "var(--green)", tip: deep.map(r => r.ticker).join(", ") });
-  if (corr.length) chips.push({ t: `${corr.length} in correzione`, c: "var(--yellow)", tip: corr.map(r => r.ticker).join(", ") });
-  if (sqz.length) chips.push({ t: `${sqz.length} squeeze risk`, c: "var(--red)", tip: sqz.map(r => r.ticker).join(", ") });
-  if (vix != null && vix > 20) chips.push({ t: `VIX ${fmtNum.format(vix)}`, c: "var(--red)", tip: "Volatilità elevata" });
-  return chips;
 }
 
 /* ═══ PARAMETRI DI RISCHIO DEL FONDO (v122) — regole attive lette in tempo reale ═══
@@ -4843,12 +4828,6 @@ function renderMacro() {
   $("#macro-grid").innerHTML = cells.length ? cells.join("") : '<span class="muted">Dati non disponibili</span>';
 }
 
-/* ---------------- top capitalizzazioni ---------------- */
-function fmtMcap(v) {
-  if (v >= 1e12) return "$" + fmtNum.format(Math.round(v / 1e10) / 100) + "T";
-  return "$" + fmtNum.format(Math.round(v / 1e9)) + "B";
-}
-
 /* ---------------- top ETF dashboard ---------------- */
 function etfOpportunity(rsi) {
   if (rsi == null) return { label: "—", color: "var(--muted)" };
@@ -6647,16 +6626,12 @@ function buildCIOText() {
   // (confine = promptHeaderText, la fonte di verità), adiacente all'istruzione che lo richiama e
   // PRIMA dei dati grezzi, che restano come materiale di verifica. buildPrompt() NON viene toccato
   // (Regola Suprema): si ricompone solo la stringa sul confine testata↔payload.
-  // Inoltre "PROMEMORIA FINALE" (istruzioni di chiusura) veniva emesso da buildPrompt PRIMA dei
-  // 3 blocchi storici appesi da buildCIOText → un "promemoria FINALE" con 3 sezioni di dati dopo.
-  // Lo si estrae e lo si rimette in fondo a TUTTO: [brief][testata][sintesi][dati+storici][chiusura].
+  // (v180: la logica che spostava "PROMEMORIA FINALE" in coda è stata rimossa insieme al blocco —
+  // duplicava per intero testata [A2] e [D]. Restava codice morto: lastIndexOf non trovava più nulla.)
   const header = promptHeaderText();
-  const PROMEMORIA_MARK = "\nPROMEMORIA FINALE:";
-  let body = full, tail = "";
+  let body = full;
   if (full.startsWith(header)) {
-    let rest = full.slice(header.length).replace(/^\n+/, "");
-    const pi = rest.lastIndexOf(PROMEMORIA_MARK);
-    if (pi >= 0) { tail = rest.slice(pi).replace(/^\n+/, ""); rest = rest.slice(0, pi).replace(/\n+$/, ""); }
+    const rest = full.slice(header.length).replace(/^\n+/, "");
     body = header + (link ? "\n\n" + link : "") + "\n\n" + rest;
   } else if (link) {
     body = full + "\n\n" + link;   // confine non combaciante: fallback alla coda (comportamento pre-v156)
@@ -6667,8 +6642,7 @@ function buildCIOText() {
   const pad = (n) => String(n).padStart(2, "0");
   const stamp = `⟦ BUILD v${BUILD_VERSION} · generato ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())} · se questa versione è più vecchia del sito, Safari ha una pagina in cache → ricarica forzato ⟧`;
   return stamp + "\n\n" + brief + "\n\n" + body
-       + (historical ? "\n\n" + historical : "")
-       + (tail ? "\n\n" + tail : "");
+       + (historical ? "\n\n" + historical : "");
 }
 
 /* ---------- azione unica: copia il pacchetto completo e mostralo nella modal ---------- */
@@ -6945,7 +6919,6 @@ $("#margin-debt-box")?.addEventListener("click", openMarginDebtModal);
 
 /* popup Strumenti (PMC, vendite) e News */
 function showSimpleModal(id) { const m = $(id); if (m) m.hidden = false; }
-function hideSimpleModal(id) { const m = $(id); if (m) m.hidden = true; }
 $("#open-pmc")?.addEventListener("click", () => { pmcInit(); pmcCompute(); showSimpleModal("#pmc-modal"); });
 $("#open-sell")?.addEventListener("click", () => { renderSellCalc(); showSimpleModal("#sell-modal"); });
 
