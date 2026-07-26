@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "185";
+const BUILD_VERSION = "186";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5010,6 +5010,26 @@ function buildPrompt() {
   // run pipeline — orienta l'LLM su quali dati sono "il presente" (anticipatori vs live) e
   // per QUALE campana valgono gli ordini. Vedi usSessionInfo/sessionContextLine.
   lines.push(sessionContextLine());
+  // v186 — PREZZI DA SEDUTE DIVERSE. Yahoo pubblica la barra giornaliera in tempi diversi per
+  // titoli diversi (gotcha gia' noto: "barra odierna voidata"), e nei run successivi di un
+  // weekend il portafoglio si popola A PEZZI: il 26/07 quattro posizioni erano ancora alla
+  // chiusura del 23 e sei erano gia' passate al 24. Ogni RIGA lo dichiarava onestamente
+  // ("[chiusura del 23/07]"), ma gli AGGREGATI no — e patrimonio, pesi NAV, Sharpe, VaR/ES,
+  // MCR e alpha erano calcolati su un book che a nessun istante e' esistito davvero.
+  // Conseguenza vista sul campo: RGTI e' entrato fra gli stop violati fra due run domenicali
+  // solo perche' la sua barra del 24 e' arrivata, non perche' il prezzo si fosse mosso.
+  // Questo e' un FATTO sui dati, non un'istruzione: sta nel payload, non nella testata.
+  const asof = (DATA.portfolio || []).filter(r => r.qty && r.currency !== "EUR" && r.price_asof)
+    .reduce((m, r) => m.set(r.price_asof, (m.get(r.price_asof) || 0) + 1), new Map());
+  if (asof.size > 1) {
+    const per = [...asof.entries()].sort((a, b) => b[0].localeCompare(a[0]))
+      .map(([d, n]) => `${n} al ${new Date(d + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}`).join(" · ");
+    lines.push(`⚠ PREZZI DA SEDUTE DIVERSE: le posizioni non sono tutte alla stessa chiusura (${per}). `
+      + `La pipeline riceve la barra giornaliera in tempi diversi per titoli diversi, quindi il book si popola a pezzi. `
+      + `Patrimonio, pesi NAV, Sharpe, VaR/ES, MCR e alpha qui sotto sono calcolati su questo insieme MISTO — `
+      + `nessun istante in cui il portafoglio abbia avuto davvero questi valori tutti insieme. `
+      + `Anche l'appartenenza alla lista degli stop violati puo' dipendere da quale seduta e' arrivata per quel titolo.`);
+  }
   const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
   lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(Math.round(patrimonio))}${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
   // METRICHE DI RISCHIO/PORTAFOGLIO (dai popup della dashboard)
@@ -6058,9 +6078,14 @@ function buildExecutiveDelta() {
   const invested = Number.isFinite(t.eur_invested) ? t.eur_invested : (t.eur_value != null ? t.eur_value - (cashEur || 0) : null);
   // Δ dal run precedente: a mercati chiusi è ~0 PER COSTRUZIONE (stessi prezzi) — dirlo, altrimenti
   // "0%" si legge come "niente di nuovo" proprio mentre arrivano notizie non ancora prezzate.
-  const dLastTxt = (closedNow && dLast != null && Math.abs(dLast) < 0.05)
-    ? `Δ ultimo run ~0% (mercati CHIUSI: prezzi identici per costruzione — il nuovo di questo run NON è nei prezzi, è nelle notizie post-chiusura)`
-    : `Δ ultimo run ${signTxt(dLast)}`;
+  // v186: la guardia scattava solo se il delta era GIA' ~0, cioe' proprio quando non serviva.
+  // A mercati chiusi un delta NON nullo e' l'anomalia da spiegare: non e' un movimento di
+  // prezzo (i prezzi sono fermi), e' l'arrivo progressivo delle barre di chiusura per titoli
+  // diversi. Presentarlo come "-0,41%" invitava a leggerlo come una perdita del weekend.
+  const dLastTxt = !closedNow ? `Δ ultimo run ${signTxt(dLast)}`
+    : (dLast != null && Math.abs(dLast) >= 0.05)
+      ? `Δ ultimo run ${signTxt(dLast)} — NON è un movimento di mercato: a borse chiuse i prezzi sono fermi, e questo scarto viene dall'arrivo della barra di chiusura per titoli che nel run precedente erano ancora alla seduta prima`
+      : `Δ ultimo run ~0% (mercati CHIUSI: prezzi identici per costruzione — il nuovo di questo run NON è nei prezzi, è nelle notizie post-chiusura)`;
   L.push(`· Investito €${invested != null ? fmtNum.format(Math.round(invested)) : "—"} (MTM, cassa esclusa · ${dLastTxt}, Δ~7g ${signTxt(d7)} — rendimento del book cash-neutral) · Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · VIX ${dgTxt((DATA.macro || {}).vix && DATA.macro.vix.value, "", 1)} · cassa ${fmtEUR.format(Math.round(cashEur || 0))} · budget op. ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"}`);
   // BENCHMARK: UN SOLO indice su tutte le finestre — Nasdaq 100 (il mandato, memory "vs NDX"),
   // via QQQ, l'unica serie NDX-family con spark w1/m1. Prima mescolava NDX (giorno) e Nasdaq

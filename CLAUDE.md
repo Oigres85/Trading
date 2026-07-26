@@ -163,6 +163,25 @@ e C12 lo dice subito. Prima di rimettere un blocco: misura se i suoi numeri esis
 500 falsi allarmi. Ora trova Supp./Stop 2×ATR **per nome** rileggendo l'intestazione. Stessa lezione
 di C10: un registro fisso di posizioni invecchia da solo e in silenzio.
 
+## 📅 Il book può essere prezzato su SEDUTE DIVERSE (v186)
+
+Yahoo pubblica la barra giornaliera in tempi diversi per titoli diversi (stesso gotcha della
+"barra odierna voidata"). Nei run successivi di un weekend il portafoglio si popola **a pezzi**:
+il 26/07 quattro posizioni erano ancora alla chiusura del 23 e sei erano già passate al 24.
+
+Ogni RIGA lo dichiarava onestamente (`[chiusura del 23/07]`), ma **gli aggregati no**: patrimonio,
+pesi NAV, Sharpe, VaR/ES, MCR e alpha descrivevano un book mai esistito a un solo istante. E la
+conseguenza non era teorica — **RGTI è entrato fra gli stop violati fra due run domenicali solo
+perché la sua barra del 24 era arrivata**, non perché il prezzo si fosse mosso.
+
+L'invariante NON è "le date devono coincidere" (non dipende da noi): è che quando non coincidono
+il payload **lo dichiari**. Lo fa `⚠ PREZZI DA SEDUTE DIVERSE` sopra SITUAZIONE PATRIMONIALE, e
+**C13** verifica che la dichiarazione ci sia quando serve e non ci sia quando non serve.
+
+Corretta anche la riga `Δ ultimo run`: la guardia "mercati chiusi" scattava solo se il delta era
+già ~0, cioè proprio quando non serviva. A borse chiuse un delta NON nullo è l'anomalia da
+spiegare — non è un movimento di prezzo, è l'arrivo progressivo delle barre.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

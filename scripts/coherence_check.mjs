@@ -340,6 +340,32 @@ function c12_fattiSopravvissuti(t) {
   else ok(`C12 i ${ATTESI.length} fatti dei blocchi rimossi in v184 sono tutti ancora nel payload`);
 }
 
+/* ═══════════ C13 — AGGREGATI SU UN BOOK PREZZATO A SEDUTE DIVERSE ═══════════════════
+   Trovato provando il payload su me stesso (v186): il 26/07 quattro posizioni erano ancora
+   alla chiusura del 23 e sei erano gia' passate al 24, perche' Yahoo pubblica la barra
+   giornaliera in tempi diversi per titoli diversi. Ogni RIGA lo dichiarava ("[chiusura del
+   23/07]"), ma patrimonio, pesi NAV, Sharpe, VaR/ES, MCR e alpha erano calcolati sull'insieme
+   misto senza dirlo. RGTI e' entrato fra gli stop violati fra due run domenicali solo perche'
+   la sua barra del 24 era arrivata — non perche' il prezzo si fosse mosso.
+   L'invariante non e' "le date devono coincidere" (non dipende da noi): e' che quando NON
+   coincidono il payload debba DICHIARARLO, perche' chi legge sta sommando mele e pere. */
+function c13_seduteMiste(t, ctx) {
+  const date = JSON.parse(vm.runInContext(
+    "JSON.stringify((DATA.portfolio||[]).filter(r=>r.qty&&r.currency!=='EUR'&&r.price_asof).map(r=>r.price_asof))", ctx));
+  const distinte = [...new Set(date)];
+  const dichiarato = /PREZZI DA SEDUTE DIVERSE/.test(t);
+  if (distinte.length > 1 && !dichiarato) {
+    flag("C13 aggregati su sedute miste non dichiarate",
+      `il portafoglio è prezzato su ${distinte.length} sedute (${distinte.sort().join(", ")}) ma il payload non lo dichiara: `
+      + "patrimonio, pesi NAV, Sharpe, VaR/ES, MCR e alpha descrivono un book mai esistito a un solo istante");
+  } else if (distinte.length <= 1 && dichiarato) {
+    flag("C13 avviso sedute miste senza motivo",
+      "il payload dichiara prezzi da sedute diverse ma tutte le posizioni sono alla stessa chiusura");
+  } else ok(distinte.length > 1
+    ? `C13 book prezzato su ${distinte.length} sedute — e il payload lo dichiara`
+    : "C13 tutte le posizioni alla stessa chiusura");
+}
+
 /* ---------------------------------- esecuzione ---------------------------------- */
 const { testo, ctx } = generaPayload();
 c1_valoriRipetuti(testo);
@@ -354,6 +380,7 @@ c9_istruzioniDuplicate(testo);
 c10_sezioniInesistenti(testo);
 c11_grandezzePerTitolo(testo, ctx);
 c12_fattiSopravvissuti(testo);
+c13_seduteMiste(testo, ctx);
 
 if (VERBOSE) PASSATI.forEach(p => console.log(`  ok   ${p}`));
 if (PROBLEMI.length) {
@@ -361,4 +388,4 @@ if (PROBLEMI.length) {
   PROBLEMI.forEach((p, i) => console.log(`  ${i + 1}. [${p.classe}] ${p.msg}\n`));
   process.exit(1);
 }
-console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 12 classi — nessuna incoerenza interna`);
+console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 13 classi — nessuna incoerenza interna`);
