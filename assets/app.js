@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "166";
+const BUILD_VERSION = "167";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1540,6 +1540,17 @@ const RISK_PARAMS = {
   sectorAlert_frac: 0.75,  // #6 — ALERT concentrazione settoriale > 75% del capitale azionario
                            //      (mandato tech/growth: la forte esposizione è la normalità)
   minScore: 60,            // #8 — score quant minimo per candidato d'accumulo
+  maxLossPerPos_pct: 2,    // #11 — CAP SULLA PERDITA POTENZIALE: quanto può costare al NAV una
+                           //      singola posizione se il suo stop viene eseguito. Lega la
+                           //      DIMENSIONE allo STOP: un titolo volatile (stop lontano) può
+                           //      entrare solo con poche quote, uno tranquillo con molte. È il
+                           //      cap che il peso% non sa esprimere, perché 20% di un'utility e
+                           //      20% di un semi a beta 2,8 sono rischi incomparabili.
+  factorRiskAlert_pct: 60, // #12 — CONCENTRAZIONE DI FATTORE: quota massima della VARIANZA totale
+                           //      (somma degli MCR) attribuibile a un solo settore/fattore. Il veto
+                           //      qualità guarda un titolo alla volta ed è cieco alle correlazioni:
+                           //      N nomi tutti "sani" possono crollare insieme se condividono il
+                           //      fattore. Questa è la soglia che quel rischio non aveva.
   // #10 riserva tail-risk (budget = cassa − ES95): confermata dal CEO, gestita in pipeline.
   // #7 stop 2×ATR ratchet e #4 riabilitazione growth: confermati invariati.
 };
@@ -1558,6 +1569,10 @@ const RISK_PARAM_DEFS = [
     desc: "Sortino a 12 mesi sotto questo valore = titolo escluso dai nuovi acquisti (value trap: distruzione di valore sul downside). È evidenza forte, superabile solo con tesi dichiarata; più il valore è vicino a 0, più il veto è severo." },
   { key: "sectorAlert_frac", label: "Alert concentrazione settoriale (%)", unit: "%", scale: 100, min: 10, max: 100, step: 1, def: 75,
     desc: "Avviso quando il primo settore supera questa percentuale del capitale AZIONARIO (liquidità e obbligazioni escluse). Il mandato growth tollera un tech alto: la soglia dice quando dichiararlo." },
+  { key: "maxLossPerPos_pct", label: "Perdita massima per posizione (% NAV allo stop)", unit: "%", scale: 1, min: 0.25, max: 15, step: 0.25, def: 2,
+    desc: "Quanto può costare al patrimonio UNA posizione se il suo stop viene eseguito. Lega la dimensione alla distanza dello stop: più il titolo è volatile, meno quote entrano a parità di rischio. Complementare al cap sul peso, che ignora la volatilità." },
+  { key: "factorRiskAlert_pct", label: "Concentrazione di rischio per fattore (% varianza)", unit: "%", scale: 1, min: 20, max: 100, step: 5, def: 60,
+    desc: "Quota massima della varianza totale (somma degli MCR) attribuibile a un solo settore/fattore. Il veto qualità valuta un titolo per volta e non vede le correlazioni: titoli tutti sani possono scendere insieme se condividono il fattore. Solo segnalazione." },
   { key: "minScore", label: "Score minimo candidati (0–100)", unit: "", scale: 1, min: 0, max: 100, step: 1, def: 60,
     desc: "Punteggio quant minimo (Sharpe marginale + forza relativa + qualità) perché un titolo diventi candidato all'accumulo del motore. Alzarlo = meno candidati ma più selettivi." },
 ];
@@ -1901,6 +1916,27 @@ function decisionVerdict() {
   if (vetoTk.length) reasons.push(`VETO risk manager su ${vetoTk.join(", ")} — esclusi a prescindere dal supporto tecnico${vetoHeldNote}`);
   if (rehabbed.length) reasons.push(`RIABILITATI dal veto Sortino (regola growth v111 — qualità intatta + prezzo sopra SMA200 + RS 1M vs NDX positiva, criteri tutti meccanici): ${rehabbed.map(x => `${x.r.ticker} (${x.why[0]}; MA ${x.rehabWhy})`).join(" · ")} — trattali da candidati SORVEGLIATI: il trailing 12M resta negativo, la ripresa è provata dai dati correnti`);
   if (squeezed.length) reasons.push(`⚡ SETUP TURNAROUND SQUEEZE su ${squeezed.map(x => `${x.r.ticker} (short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% · RVol ${fmtNum.format(x.r.vol_ratio)}× · sopra SMA50)`).join(", ")} — il VETO growth resta: valutabile SOLO come speculazione asimmetrica dichiarata, sizing massimo METÀ dello standard, stop stretto 1×ATR, ordine limite`);
+  // v167 — CONCENTRAZIONE DI FATTORE (la soglia che mancava). Il veto qualità giudica UN TITOLO
+  // alla volta ed è cieco alle correlazioni: dieci nomi con Sortino accettabile possono scendere
+  // insieme se condividono il fattore. Qui si somma l'MCR — la quota di VARIANZA, non il peso —
+  // per settore, col bucket "Semiconduttori/memoria" che è il fattore vero di questo book.
+  // Solo segnalazione, coerente con "indicatori non dettami": nessun trim automatico.
+  const factorRisk = (() => {
+    const by = new Map();
+    for (const r of (DATA.portfolio || []).filter(isEquity)) {
+      const m = dgFin(r.risk_contrib_pct);
+      if (m == null) continue;
+      const k = thIsSemi(r) ? "Semiconduttori/memoria" : (r.sector || "Altro");
+      const cur = by.get(k) || { mcr: 0, w: 0, tk: [] };
+      cur.mcr += m; cur.w += (positionWeightPct(r) ?? 0); cur.tk.push(r.ticker);
+      by.set(k, cur);
+    }
+    const top = [...by.entries()].sort((a, b) => b[1].mcr - a[1].mcr)[0];
+    return top ? { name: top[0], ...top[1] } : null;
+  })();
+  if (factorRisk && factorRisk.mcr > RISK_PARAMS.factorRiskAlert_pct) {
+    reasons.push(`⚠ CONCENTRAZIONE DI FATTORE: ${factorRisk.tk.join("+")} (${factorRisk.name}) generano il ${fmtNum.format(Math.round(factorRisk.mcr * 10) / 10)}% della VARIANZA del fondo con il ${fmtNum.format(Math.round(factorRisk.w * 10) / 10)}% del NAV — oltre la soglia del ${fmtNum.format(RISK_PARAMS.factorRiskAlert_pct)}%. Il veto qualità guarda un titolo per volta e questo NON lo vede: sono nomi che possono scendere INSIEME perché condividono il fattore, per quanto sani siano singolarmente. Diversificare qui significa ridurre la quota di varianza, non il numero di titoli`);
+  }
   if (concentrationAlert.length) reasons.push(`⚠ ALERT CONCENTRAZIONE: ${concentrationAlert.map(x => `${x.r.ticker} ${x.w}%`).join(", ")} oltre il ${RISK_PARAMS.capAlert_pct}% del NAV — soglia di attenzione del CEO; NON è un obbligo di trim (Let Winners Run), ma valuta consapevolmente il rischio idiosincratico di un singolo nome così pesante`);
   // motivo PRECISO per titolo (non il generico "multiplo/RSI estremo": su CBRS scattava solo
   // il multiplo e l'LLM segnalava "RSI 43,6 non estremo" — v118)
@@ -1910,7 +1946,7 @@ function decisionVerdict() {
     if (r.rsi && r.rsi > 78) why.push(`RSI ${r.rsi} ipercomprato`);
     return `${r.ticker} (${why.join(" + ") || "multiplo teso"})`;
   }).join(", ")}`);
-  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, squeezed, overCap, concentrationAlert, harvest };
+  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, squeezed, overCap, concentrationAlert, factorRisk, harvest };
 }
 
 // alert proattivi: condizioni rilevanti emerse oggi (deep value, correzione, squeeze, VIX)
@@ -5125,9 +5161,24 @@ function buildPrompt() {
             const addEur = Math.round(p.r.qty * perShare / eurusdDR);
             if (addEur > 0) deRatchetTag = ` [⚠ DE-RATCHET: accumulare RESETTA il trailing da $${fmtNum.format(heldStop.stop)} a $${fmtNum.format(p.stop)} anche sulle ${fmtNum.format(p.r.qty)} quote GIÀ detenute → scopre ~${fmtEUR.format(addEur)} di downside sulla posizione esistente, oltre al rischio delle nuove quote. Se accumuli, dichiaralo]`;
           }
+          // v167 — CAP SULLA PERDITA POTENZIALE: il cap sul PESO non sa quanto costa un titolo se
+          // va male, perché ignora la distanza dello stop. Qui la quantità massima discende dal
+          // RISCHIO: quote × (limite − stop) ≤ maxLossPerPos_pct% del NAV. Su un nome volatile
+          // (stop lontano) ne entrano poche, su uno tranquillo molte — a parità di rischio in €.
+          const navTot = (DATA?.totals?.eur_invested || 0) + cashEur;
+          let lossTag = "";
+          if (p.limit > 0 && p.stop > 0 && p.limit > p.stop && navTot > 0) {
+            const perShareUsd = p.limit - p.stop;
+            const maxLossEur = RISK_PARAMS.maxLossPerPos_pct / 100 * navTot;
+            const eurusdL = DATA.eurusd || 1.08;
+            const qtyMax = Math.floor(maxLossEur * eurusdL / perShareUsd);
+            const spesaEur = Math.round(qtyMax * p.limit / eurusdL);
+            lossTag = qtyMax > 0
+              ? ` [RISCHIO/OPERAZIONE: allo stop perdi $${fmtNum.format(Math.round(perShareUsd * 100) / 100)} a quota → col tetto del ${fmtNum.format(RISK_PARAMS.maxLossPerPos_pct)}% del NAV (${fmtEUR.format(Math.round(maxLossEur))}) entrano max ~${fmtNum.format(qtyMax)} quote ≈ ${fmtEUR.format(spesaEur)} di controvalore]`
+              : ` [RISCHIO/OPERAZIONE: la distanza dallo stop ($${fmtNum.format(Math.round(perShareUsd * 100) / 100)} a quota) supera da sola il tetto del ${fmtNum.format(RISK_PARAMS.maxLossPerPos_pct)}% del NAV: nemmeno UNA quota rispetta il limite di rischio]`;
+          }
           let capTag = "";
           const wNow = p.r.qty ? positionWeightPct(p.r) : null;
-          const navTot = (DATA?.totals?.eur_invested || 0) + cashEur;
           if (wNow != null && navTot > 0 && p.limit > 0) {
             const roomEur = (RISK_PARAMS.capNoAdd_pct - wNow) / 100 * navTot;
             const eurusd = DATA.eurusd || 1.08;
@@ -5136,7 +5187,27 @@ function buildPrompt() {
               ? ` [CAP: già ${fmtNum.format(wNow)}% del NAV su un cap del ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% → capienza residua ~${fmtNum.format(maxQty)} quote a questo limite (~${fmtEUR.format(Math.round(roomEur))}); oltre, l'ingresso porta la posizione FUORI dal cap: se lo fai, dichiaralo]`
               : ` [CAP: già ${fmtNum.format(wNow)}% del NAV, cap ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% → capienza ESAURITA: qualunque acquisto sfora il cap]`;
           }
-          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)}${limT} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}${aggT}${heldTag}${deRatchetTag}${capTag}`;
+          // v167 — QUALE VINCOLO MORDE. Con tre limiti attivi (budget spendibile, capienza al cap
+          // sul peso, tetto di perdita allo stop) la quantità eseguibile è il MINIMO dei tre, e
+          // farne l'intersezione a mente è esattamente il lavoro che il sistema deve togliere.
+          let bindTag = "";
+          {
+            const eurusdB = DATA.eurusd || 1.08;
+            const cand = [];
+            const bud = DATA?.totals?.budget_operativo_spendibile;
+            if (bud > 0 && p.limit > 0) cand.push(["budget spendibile", Math.floor(bud * eurusdB / p.limit)]);
+            if (wNow != null && navTot > 0 && p.limit > 0) {
+              cand.push(["cap sul peso", Math.floor(Math.max(0, (RISK_PARAMS.capNoAdd_pct - wNow) / 100 * navTot) * eurusdB / p.limit)]);
+            }
+            if (p.limit > p.stop && navTot > 0) {
+              cand.push(["tetto di perdita allo stop", Math.floor(RISK_PARAMS.maxLossPerPos_pct / 100 * navTot * eurusdB / (p.limit - p.stop))]);
+            }
+            if (cand.length) {
+              const min = cand.reduce((a, b) => (b[1] < a[1] ? b : a));
+              bindTag = ` [→ VINCOLO PIÙ STRETTO: ${min[0]} → max ~${fmtNum.format(Math.max(0, min[1]))} quote${cand.length > 1 ? ` (gli altri concedono ${cand.filter(c => c !== min).map(c => `${fmtNum.format(Math.max(0, c[1]))} per ${c[0]}`).join(", ")})` : ""}]`;
+            }
+          }
+          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)}${limT} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}${aggT}${heldTag}${deRatchetTag}${capTag}${lossTag}${bindTag}`;
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {

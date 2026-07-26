@@ -932,6 +932,32 @@ check("v156 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi, PROME
   const iProm = t.lastIndexOf("PROMEMORIA FINALE:");
   // il blocco sintesi sta DOPO la testata ma PRIMA delle tabelle-silo; PROMEMORIA è l'ULTIMA sezione
   return iCorr > 0 && iData > iCorr && iProm > iData && !t.slice(iProm).includes("DATI AL ")`));
+check("v167 cap sulla perdita: la quantità massima scende al crescere della distanza dallo stop", run(`
+  const p = buildPrompt();
+  const line = p.split("\\n").find(l => l.includes("Livelli calcolati dal motore"));
+  if (line == null || !line.includes("RISCHIO/OPERAZIONE")) return true;
+  // il tetto cita il parametro REALE e dichiara sempre il vincolo più stretto
+  return line.includes(fmtNum.format(RISK_PARAMS.maxLossPerPos_pct) + "% del NAV")
+      && line.includes("VINCOLO PIÙ STRETTO")`));
+check("v167 cap sulla perdita: a parità di rischio un titolo volatile entra con MENO quote", run(`
+  const dv = decisionVerdict();
+  const navTot = (DATA?.totals?.eur_invested || 0) + cashEur;
+  const eur = DATA.eurusd || 1.08;
+  const qtyMax = (x) => Math.floor(RISK_PARAMS.maxLossPerPos_pct / 100 * navTot * eur / (x.limit - x.stop));
+  const validi = (dv.withPlan || []).filter(x => x.limit > x.stop && x.stop > 0);
+  if (validi.length < 2) return true;
+  // ordinati per distanza dallo stop crescente, le quantità devono essere DECRESCENTI
+  const ord = validi.slice().sort((a, b) => (a.limit - a.stop) - (b.limit - b.stop)).map(qtyMax);
+  return ord.every((v, i) => i === 0 || v <= ord[i - 1])`));
+check("v167 concentrazione di fattore: soglia sulla VARIANZA cumulata per settore, non sul peso", run(`
+  const dv = decisionVerdict();
+  const f = dv.factorRisk;
+  if (!f) return true;
+  const testo = dv.reasons.join(" ");
+  const sopra = f.mcr > RISK_PARAMS.factorRiskAlert_pct;
+  // l'alert compare se e solo se la soglia è superata, e cita varianza E peso (grandezze diverse)
+  return sopra === /CONCENTRAZIONE DI FATTORE/.test(testo)
+      && (!sopra || (/della VARIANZA/.test(testo) && /del NAV/.test(testo)))`));
 check("v164 stato CAP: se i candidati esistono ma sono TUTTI oltre il cap, il verdetto NON dice 'nessun candidato'", run(`
   const savedCap = RISK_PARAMS.capNoAdd_pct, savedWl = DATA.watchlist;
   DATA.watchlist = [];                                   // solo detenuti → il cap è l'unico collo di bottiglia
