@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=187">
+<link rel="stylesheet" href="assets/style.css?v=188">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -77,6 +77,9 @@
   <!-- MACRO & MERCATI -->
   <section class="card">
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
+    <div class="macro-actions">
+      <button class="btn btn-primary btn-sm" id="macro-details" title="Tutti i dettagli macro in una sola pagina scorrevole">📖 Dettagli macro</button>
+    </div>
     <div class="mini-cards">
       <div class="mini-card" id="macroquant-box" tabindex="0" role="button" title="MacroQuant (stile BCA) — clicca per il dettaglio"></div>
       <div class="mini-card" id="signposts-box" tabindex="0" role="button" title="BofA Bear Market Signposts — clicca per il dettaglio"></div>
@@ -98,24 +101,18 @@
   <!-- PORTAFOGLIO -->
   <section class="card">
     <div class="card-head">
-      <h2>Portafoglio &amp; Dati Tecnici</h2>
+      <h2>Portafoglio — tecnica, prezzi e fondamentali</h2>
       <button class="btn btn-primary btn-sm" id="ptf-add-top" title="Aggiungi un titolo al portafoglio con quantità e PMC">+ Aggiungi titolo</button>
     </div>
     <div class="range-bar">
-      <div class="spark-toggle" id="view-toggle" role="group" aria-label="Vista portafoglio">
-        <button class="chip chip-active" data-view="tech">Tecnica &amp; Prezzi</button>
-        <button class="chip" data-view="fund">Fondamentale (Value)</button>
-      </div>
       <span class="range-lab" id="range-lab-tech">Intervallo:</span>
       <div class="spark-toggle" id="spark-toggle" role="group" aria-label="Intervallo analisi tecnica e mini-grafico">
         <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
         <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
         <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
       </div>
+      <button class="btn btn-ghost btn-sm" id="ptf-cols" title="Scegli quali colonne vedere (non tocca il prompt AI)">⚙ Colonne</button>
       <button class="btn btn-ghost btn-sm" id="ptf-edit-values" aria-label="Modifica quantità, PMC e liquidità" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica valori</button>
-    </div>
-    <div class="table-wrap" id="ptf-fund-wrap" hidden>
-      <table id="ptf-fund-table" aria-label="Portafoglio — analisi fondamentale"><thead></thead><tbody></tbody></table>
     </div>
     <div class="table-wrap" id="ptf-tech-wrap">
       <table id="ptf-table" aria-label="Portafoglio con prezzi, valore, guadagno e analisi tecnica">
@@ -145,6 +142,19 @@
             <th>Opzioni</th>
             <th class="num">Trimestrale</th>
             <th>Grafico</th>
+            <th class="num" title="Capitalizzazione di mercato">Market Cap</th>
+            <th class="num" title="Prezzo/Utili TTM — '—' quando l'utile per azione è negativo (igiene matematica)">P/E</th>
+            <th class="num" title="Enterprise Value / EBITDA">EV/EBITDA</th>
+            <th class="num" title="Return on EQUITY (non ROIC): su società con molta leva o buyback aggressivi il denominatore si comprime e il valore si gonfia">ROE</th>
+            <th class="num">Margine netto</th>
+            <th class="num" title="Prezzo/Free Cash Flow — se molto sopra il P/E, controllare la qualità degli utili">P/FCF</th>
+            <th class="num">Cresc. ricavi</th>
+            <th class="num">Debt/Equity</th>
+            <th class="num">Div Yield</th>
+            <th class="num" title="P/E diviso la crescita attesa">PEG</th>
+            <th class="num" title="Altman Z'' (variante non-manifatturieri): sotto 1,81 = rischio default">Z-Score</th>
+            <th class="num" title="Punteggio di salute finanziaria calcolato dalla pipeline (0-100)">Financial Health</th>
+            <th class="num" title="Distanza dal target price di consenso">Target Δ</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -159,19 +169,13 @@
       <button class="btn btn-primary btn-sm" id="wl-add-top" aria-label="Cerca e aggiungi un titolo alla watchlist" title="Cerca e aggiungi un titolo">+ Aggiungi titolo</button>
     </div>
     <div class="range-bar">
-      <div class="spark-toggle" id="wl-view-toggle" role="group" aria-label="Vista watchlist">
-        <button class="chip chip-active" data-view="tech">Tecnica &amp; Prezzi</button>
-        <button class="chip" data-view="fund">Fondamentale (Value)</button>
-      </div>
       <span class="range-lab" id="wl-range-lab">Intervallo:</span>
       <div class="spark-toggle" id="spark-toggle-wl" role="group" aria-label="Intervallo analisi tecnica watchlist">
         <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
         <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
         <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
       </div>
-    </div>
-    <div class="table-wrap" id="wl-fund-wrap" hidden>
-      <table id="wl-fund-table" aria-label="Watchlist — analisi fondamentale"><thead></thead><tbody></tbody></table>
+      <button class="btn btn-ghost btn-sm" id="wl-cols" title="Scegli quali colonne vedere (non tocca il prompt AI)">⚙ Colonne</button>
     </div>
     <div class="table-wrap" id="wl-tech-wrap">
       <table id="wl-table" aria-label="Watchlist con prezzi e analisi tecnica">
@@ -197,6 +201,19 @@
             <th>Opzioni</th>
             <th class="num">Trimestrale</th>
             <th>Grafico</th>
+            <th class="num" title="Capitalizzazione di mercato">Market Cap</th>
+            <th class="num" title="Prezzo/Utili TTM — '—' quando l'utile per azione è negativo (igiene matematica)">P/E</th>
+            <th class="num" title="Enterprise Value / EBITDA">EV/EBITDA</th>
+            <th class="num" title="Return on EQUITY (non ROIC): su società con molta leva o buyback aggressivi il denominatore si comprime e il valore si gonfia">ROE</th>
+            <th class="num">Margine netto</th>
+            <th class="num" title="Prezzo/Free Cash Flow — se molto sopra il P/E, controllare la qualità degli utili">P/FCF</th>
+            <th class="num">Cresc. ricavi</th>
+            <th class="num">Debt/Equity</th>
+            <th class="num">Div Yield</th>
+            <th class="num" title="P/E diviso la crescita attesa">PEG</th>
+            <th class="num" title="Altman Z'' (variante non-manifatturieri): sotto 1,81 = rischio default">Z-Score</th>
+            <th class="num" title="Punteggio di salute finanziaria calcolato dalla pipeline (0-100)">Financial Health</th>
+            <th class="num" title="Distanza dal target price di consenso">Target Δ</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -345,6 +362,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=187"></script>
+<script src="assets/app.js?v=188"></script>
 </body>
 </html>

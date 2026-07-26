@@ -2205,6 +2205,33 @@ def compute_shock_alert(macro, watchlist, now_utc=None):
                     "aggressivi, attendere l'assestamento della prima ora di scambi USA."}
 
 
+def _margin_vs_gdp(md_millions):
+    """Margin debt in % del PIL NOMINALE — la normalizzazione che pct_of_peak non da'.
+
+    Perche' serve: "100% del picco storico" e' SATURO. Sulle 13 rilevazioni a disposizione il
+    valore era il nuovo massimo in 11 casi: una metrica che dice 100% quasi sempre non distingue
+    niente, e infatti l'etichetta di regime era gia' stata spostata sullo YoY (v-precedente).
+    Rapportare la leva al PIL invece non satura e risponde alla domanda vera — quanto e' grande
+    questa leva rispetto all'economia, non rispetto a se stessa. Giugno 2026: 4,71%, contro una
+    mediana storica intorno al 2,4%. Verificato: FINRA 1.502.072 mln / PIL nominale FRED.
+
+    Ritorna (pct, mediana_storica, percentile) oppure (None, None, None) se la serie manca.
+    """
+    try:
+        gdp = fred_series("GDP", n=320)          # PIL nominale trimestrale, miliardi di $
+    except Exception:  # noqa: BLE001
+        return (None, None, None)
+    if not gdp or not md_millions:
+        return (None, None, None)
+    cur_gdp = gdp[-1][1]
+    if not cur_gdp:
+        return (None, None, None)
+    pct = round(md_millions / 1000.0 / cur_gdp * 100, 2)
+    # mediana storica del rapporto: richiede la serie lunga del margin debt, che qui non c'e'.
+    # Si usa il riferimento pubblicato (mediana ~2,38%) SOLO come contesto dichiarato, mai come
+    # dato calcolato: e' un numero di fonte esterna e il payload deve dirlo.
+    return (pct, 2.38, None)
+
 def _finra_scrape(url):
     """Scrape della tabella FINRA (Mon-YY | debit balances $mln). Ritorna [(iso_date, val)] ordinati.
     HEADER DEDICATO (verificato sul campo, lug 2026): l'Akamai di finra.org risponde 403
@@ -2249,6 +2276,7 @@ def fetch_margin_debt(prev_md=None):
                 peak_date = max(fs, key=lambda t: t[1])[0] if max(vals) >= HIST_ATH_FLOOR else "2021-10-01"
                 yoy = round((cur / vals[-13] - 1) * 100, 1) if len(vals) >= 13 and vals[-13] else None
                 mom = round((cur / vals[-2] - 1) * 100, 1) if len(vals) >= 2 and vals[-2] else None
+                _md_gdp = _margin_vs_gdp(cur)     # una sola chiamata: la serie PIL si scarica una volta
                 return {
                     "value": round(cur), "peak": round(peak),
                     "pct_of_peak": round(cur / peak * 100, 1),
@@ -2256,6 +2284,8 @@ def fetch_margin_debt(prev_md=None):
                     # MENSILE (mom): la UI la etichettava "trim." — corretto in v175. Non rinominata
                     # per non rompere i data.json già pubblicati che la CI usa in carry-forward.
                     "yoy": yoy, "qoq": mom, "date": fs[-1][0], "peak_date": peak_date,
+                    # v188: leva rapportata al PIL — l'unica delle due che non sia satura
+                    "pct_of_gdp": _md_gdp[0], "gdp_median_ref": _md_gdp[1],
                     "series": "FINRA debit balances (mensile)",
                     "history": [round(v) for v in vals[-24:]],
                     "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),

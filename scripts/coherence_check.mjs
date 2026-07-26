@@ -83,6 +83,14 @@ function c1_valoriRipetuti(t) {
       ["QUADRO MACRO", /- VIX: ([\d.]+)/],
       ["CINEMATICA", /- VIX ([\d,]+) \(Δ7g/],
     ] },
+    // v188: HY/IG compariva a 3,51× e 2,83× perche' i due blocchi dividono per indici IG DIVERSI
+    // (US Corporate ampio vs BBB). Ora i nomi sono distinti — e questo controllo verifica che
+    // restino distinti: se qualcuno riscrivesse "HY/BBB" come "HY/IG" tornerebbe la falsa
+    // contraddizione, e C1 la vedrebbe subito come due valori della stessa grandezza.
+    { nome: "rapporto HY/IG (denominatore AMPIO)", toll: 0.02, fonti: [
+      ["Rischio Sistemico", /Rischio Sistemico[^\n]*HY\/IG ([\d.,]+)×/],
+      ["Istituzionali VS Retail", /Istituzionali VS Retail[^\n]*[,·] HY\/IG ([\d.,]+)×/],
+    ] },
     { nome: "budget operativo spendibile", toll: 1, fonti: [
       ["brief", /budget op\. ([\d.]+)/],
       ["METRICHE DI RISCHIO", /BUDGET OPERATIVO SPENDIBILE[^:]*: ([\d.]+) €/],

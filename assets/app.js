@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "187";
+const BUILD_VERSION = "188";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -15,25 +15,25 @@ const SORT_FIELDS = {
   "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg", "volume",
                 "gain", "gain_pct", "beta", "sharpe_1y", "sortino_1y", "support",
                 "resistance", "sma200_dist_pct", "rs_1m", "rs_ndx_1m", null,
-                "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null],
+                "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null,
+               // v188 — colonne fondamentali unite alla tabella principale (nell'ordine dei <th>):
+               // Market Cap, P/E, EV/EBITDA, ROE, Margine netto, P/FCF, Cresc. ricavi, D/E, Div, PEG, Z-Score
+               "stat:market_cap", "pe", "stat:ev_ebitda", "stat:roe", "stat:profit_margin",
+               "pfcf", "stat:revenue_growth", "stat:debt_to_equity", "stat:dividend_yield",
+               "stat:peg", "stat:altman_z", "fin_health", "upside_pct"],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,Beta,Sharpe 1A,Sortino 1A,Supporto,Resistenza,Δ SMA200,
   // RS 1M,RS NDX 1M,Segnale,Short %,Drawdown 52S,Opzioni,Trimestrale,Grafico
   "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume",
                "beta", "sharpe_1y", "sortino_1y", "support", "resistance", "sma200_dist_pct",
                "rs_1m", "rs_ndx_1m", null,
-               "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null],
-  // tabelle fondamentali (vista Value); allineate 1:1 alle colonne:
-  // MarketCap, P/E, EV/EBITDA, ROE, Margine, P/FCF, Crescita, D/E, Div, PEG, Z-Score, FinHealth, TargetΔ
-  "ptf-fund-table": ["name", "qty", "pmc", "price", "stat:market_cap", "pe", "stat:ev_ebitda",
-                     "stat:roe", "stat:profit_margin", "pfcf", "stat:revenue_growth",
-                     "stat:debt_to_equity", "stat:dividend_yield", "stat:peg", "stat:altman_z", "fin_health", "upside_pct"],
-  "wl-fund-table": ["name", "price", "stat:market_cap", "pe", "stat:ev_ebitda",
-                    "stat:roe", "stat:profit_margin", "pfcf", "stat:revenue_growth",
-                    "stat:debt_to_equity", "stat:dividend_yield", "stat:peg", "stat:altman_z", "fin_health", "upside_pct"],
+               "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null,
+               // v188 — stesse 11 colonne fondamentali della tabella portafoglio
+               "stat:market_cap", "pe", "stat:ev_ebitda", "stat:roe", "stat:profit_margin",
+               "pfcf", "stat:revenue_growth", "stat:debt_to_equity", "stat:dividend_yield",
+               "stat:peg", "stat:altman_z", "fin_health", "upside_pct"],
 };
 const sortState = {
   "ptf-table": { field: null, dir: 0 }, "wl-table": { field: null, dir: 0 },
-  "ptf-fund-table": { field: null, dir: 0 }, "wl-fund-table": { field: null, dir: 0 },
 };
 
 function sortVal(r, field) {
@@ -80,6 +80,90 @@ function updateSortArrows(tableId) {
    di partenza e sort/label lo usano al posto della posizione corrente nel DOM.
    ⚠ Riguarda SOLO le tabelle HTML. Le tabelle del PROMPT restano a colonne fisse: il red team
    (I6 col.16=Supp./17=Stop, I10 per nome) verifica per posizione, riordinarle romperebbe tutto. */
+/* ═══ v188 — COLONNE NASCONDIBILI (richiesta CEO).
+   ⚠ RIGUARDA SOLO LE TABELLE HTML. Il payload del prompt lo costruisce mdRow(), che non legge
+   nulla di tutto questo: nascondere una colonna nella dashboard NON toglie un dato all'LLM.
+   E' una scelta deliberata — il CEO guarda poche colonne, l'analista ne vuole tutte.
+   La chiave e' l'indice ORIGINALE della colonna (data-col), lo stesso su cui poggia il
+   riordino: cosi' nascondere e spostare si compongono senza interferire. */
+const colHiddenKey = (tid) => `colhidden_${tid}`;
+function loadColHidden(tid) {
+  try {
+    const a = JSON.parse(localStorage.getItem(colHiddenKey(tid)) || "[]");
+    return new Set(Array.isArray(a) ? a.filter(Number.isInteger) : []);
+  } catch { return new Set(); }
+}
+function saveColHidden(tid, set) {
+  try { localStorage.setItem(colHiddenKey(tid), JSON.stringify([...set])); } catch { /* quota */ }
+}
+/* applica la visibilita' a thead e righe dati, e RESTRINGE il colspan delle righe speciali
+   (TOTALE, "+ Aggiungi titolo", nota BTP) di quante colonne coperte sono nascoste — senza
+   questo la riga TOTALE sborderebbe e la tabella si disallineerebbe visivamente. */
+function applyColVisibility(tid) {
+  const head = document.querySelector(`#${tid} thead tr`);
+  if (!head) return;
+  const nascoste = loadColHidden(tid);
+  const ths = [...head.children];
+  ths.forEach((th, i) => { if (th.dataset.col == null) th.dataset.col = String(i); });
+  const nCol = ths.length;
+  const mostra = (cell) => {
+    const c = Number(cell.dataset.col ?? -1);
+    cell.hidden = c >= 0 && nascoste.has(c);
+  };
+  ths.forEach(mostra);
+  const ordine = ths.map(th => Number(th.dataset.col));      // ordine di VISUALIZZAZIONE corrente
+  document.querySelectorAll(`#${tid} tbody tr`).forEach(tr => {
+    const cells = [...tr.children];
+    if (cells.length === nCol) { cells.forEach((td, i) => { if (td.dataset.col == null) td.dataset.col = String(ordine[i]); }); cells.forEach(mostra); return; }
+    // riga speciale: si accorcia ogni colspan di quante colonne coperte sono nascoste
+    let usate = 0;
+    for (const td of cells) {
+      const span = Number(td.getAttribute("colspan") || 1);
+      if (td.dataset.span0 == null) td.dataset.span0 = String(span);
+      const orig = Number(td.dataset.span0);
+      const coperte = ordine.slice(usate, usate + orig);
+      const nasc = coperte.filter(c => nascoste.has(c)).length;
+      const nuovo = Math.max(1, orig - nasc);
+      if (orig > 1) td.setAttribute("colspan", String(nuovo)); else td.hidden = nasc > 0;
+      usate += orig;
+    }
+  });
+}
+/* pannello di scelta: una casella per colonna, nell'ordine in cui compaiono ora */
+function openColumnPicker(tid, etichetta, rerender) {
+  const head = document.querySelector(`#${tid} thead tr`);
+  if (!head) return;
+  const ths = [...head.children];
+  const nascoste = loadColHidden(tid);
+  const voci = ths.map(th => {
+    const c = Number(th.dataset.col ?? 0);
+    const nome = (th.textContent || "").trim() || `Colonna ${c + 1}`;
+    const bloccata = th.classList.contains("sticky-col");   // il nome del titolo non si nasconde
+    return `<label class="cp-item${bloccata ? " cp-locked" : ""}">
+      <input type="checkbox" data-cp="${c}" ${nascoste.has(c) ? "" : "checked"} ${bloccata ? "disabled" : ""}>
+      <span>${esc(nome)}</span>${bloccata ? '<em class="muted">sempre visibile</em>' : ""}</label>`;
+  }).join("");
+  openInfoModal(`Colonne — ${etichetta}`, `
+    <div class="cp-note muted">Scegli cosa vedere in tabella. <b>Non tocca il prompt AI</b>: il payload
+      continua a contenere tutti i dati, comprese le colonne che nascondi qui.
+      Il dettaglio completo di ogni titolo resta a un clic sul suo <b>nome</b>.</div>
+    <div class="cp-grid" data-cp-table="${tid}">${voci}</div>
+    <div class="pp-actions">
+      <button class="btn btn-ghost btn-sm" data-cp-all="${tid}">Mostra tutte</button>
+      <button class="btn btn-primary btn-sm" data-cp-done="1">Fatto</button>
+    </div>`);
+  const grid = document.querySelector(`.cp-grid[data-cp-table="${tid}"]`);
+  grid?.addEventListener("change", (e) => {
+    const cb = e.target.closest("input[data-cp]");
+    if (!cb) return;
+    const c = Number(cb.dataset.cp);
+    const set = loadColHidden(tid);
+    if (cb.checked) set.delete(c); else set.add(c);
+    saveColHidden(tid, set);
+    rerender();
+  });
+}
+
 const colOrderKey = (tid) => `colorder_${tid}`;
 function loadColOrder(tid, n) {
   try {
@@ -858,9 +942,7 @@ function renderAll() {
   renderShockAlert();
   renderDataQualityAlert();
   renderTable();
-  if (ptfView === "fund") renderFundTable();
   renderWatchlist();
-  if (wlView === "fund") renderWlFundTable();
   renderGauges();
   renderMacro();
   renderPortfolioHealth();
@@ -3327,6 +3409,54 @@ function openSharpeInfo(ticker) {
      ${pSharpe != null ? `<div class="info-line muted" style="font-size:11.5px;margin-top:8px">Sharpe complessivo del portafoglio (calcolato con la matrice di covarianza pesata per controvalore): <b style="color:${sharpeColor(pSharpe)}">${fmtNum.format(pSharpe)}</b>. Grazie alla diversificazione, lo Sharpe di portafoglio è spesso più alto della media dei singoli titoli.</div>` : ""}`);
 }
 
+/* ═══ v188 — CELLE FONDAMENTALI NELLA TABELLA PRINCIPALE.
+   Prima "Tecnica & Prezzi" e "Fondamentale (Value)" erano due tabelle alternative dietro un
+   interruttore: per confrontare il P/E col Sortino bisognava passare avanti e indietro. Ora
+   sono una tabella sola, ed e' il selettore di colonne a decidere cosa vedere — che e' la
+   ragione per cui il CEO ha chiesto le due cose insieme.
+   Le celle restano identiche a quelle della vecchia vista fondamentale: stessi campi, stesse
+   soglie, stessi flag. Cambia il contenitore, non il contenuto. */
+/* v188: buildFundTable/renderFundTable/renderWlFundTable/setPtfView/setWlView RIMOSSE.
+   Le due viste alternative "Tecnica & Prezzi" / "Fondamentale (Value)" sono diventate UNA
+   tabella con tutte le colonne (techCells + fundCells) piu' il selettore di colonne: era la
+   richiesta del CEO, e le due cose stanno insieme — si unisce perche' ora si puo' nascondere.
+   Le chiamate superstiti diventano no-op invece di sparire una per una: se un domani qualcuno
+   riaggancia un handler alla vista, trova una funzione che non rompe niente. */
+const setPtfView = () => {}, setWlView = () => {};
+const renderFundTable = () => {}, renderWlFundTable = () => {};
+
+function fundCells(r) {
+  const st = r.stats || {};
+  const pct = (v) => v == null ? "—" : (Math.round(v * 1000) / 10) + "%";
+  const x = (v, d = 1) => v == null ? "—" : fmtNum.format(Math.round(v * Math.pow(10, d)) / Math.pow(10, d)) + "×";
+  const pe = st.pe_ttm || r.pe;
+  const pfcf = (st.market_cap && st.fcf && st.fcf > 0) ? st.market_cap / st.fcf : null;
+  const roeCls = st.roe == null ? "" : st.roe > 0.15 ? "pos" : st.roe < 0 ? "neg" : "";
+  const zCls = st.altman_z == null ? "" : st.altman_z < 1.81 ? "neg" : st.altman_z > 2.6 ? "pos" : "";
+  return `<td class="num">${st.market_cap ? fmtMcapShort(st.market_cap) : "—"}</td>
+    <td class="num">${pe ? x(pe) : "—"}</td>
+    <td class="num">${x(st.ev_ebitda)}</td>
+    <td class="num ${roeCls}">${pct(st.roe)}</td>
+    <td class="num">${pct(st.profit_margin)}</td>
+    <td class="num">${x(pfcf)}</td>
+    <td class="num">${pct(st.revenue_growth)}</td>
+    <td class="num">${st.debt_to_equity == null ? "—" : fmtNum.format(Math.round(st.debt_to_equity * 10) / 10)}</td>
+    <td class="num">${pct(st.dividend_yield)}</td>
+    <td class="num">${st.peg == null ? "—" : fmtNum.format(Math.round(st.peg * 100) / 100)}</td>
+    <td class="num ${zCls}">${st.altman_z == null ? "—" : fmtNum.format(Math.round(st.altman_z * 10) / 10)}</td>
+    <td class="num">${r.fin_health == null ? "—" : `<b style="color:${scoreColor(r.fin_health)}">${r.fin_health}</b>`}</td>
+    <td class="num ${signCls(r.rating?.upside_pct)}">${r.rating?.upside_pct == null ? "—" : signTxt(r.rating.upside_pct)}</td>`;
+}
+/* market cap abbreviata: la tabella e' gia' larga, "1,2T" batte "1.200.000" */
+function fmtMcapShort(v) {
+  if (v == null) return "—";
+  const a = Math.abs(v);
+  if (a >= 1e12) return fmtNum.format(Math.round(v / 1e11) / 10) + "T";
+  if (a >= 1e9) return fmtNum.format(Math.round(v / 1e8) / 10) + "B";
+  if (a >= 1e6) return fmtNum.format(Math.round(v / 1e5) / 10) + "M";
+  return fmtNum.format(v);
+}
+
 function techCells(r) {
   const c = cur(r);
   // supporto/resistenza cambiano con il range selezionato (1S/1M/3M/1A)
@@ -3841,6 +3971,92 @@ const MACRO_INFO = {
   fed_market: ["Fed Funds Rate vs S&P 500", "Andamento storico del tasso Fed Funds sovrapposto all'S&P 500 negli ultimi 5 anni. Mostra come i cicli di rialzo/taglio della politica monetaria influenzino il mercato azionario. Tassi alti comprimono i multipli; i tagli stimolano i rally.", "Mensile (FRED FEDFUNDS + SP500)", /fed.?fund|interest.?rate|tasso.?fed|fed.?rate|monetar|fomc.*trend|tassi.*mercato/i],
 };
 
+/* ═══ v188 — POPUP UNIFICATI (richiesta CEO): un solo pannello per titolo, uno solo per la macro.
+   Il trucco che evita di riscrivere 17 funzioni: TUTTE finiscono in openInfoModal(titolo, html).
+   Si sostituisce temporaneamente quella funzione con un raccoglitore, si eseguono le funzioni
+   esistenti e si tiene il loro HTML. Ogni pannello resta l'unica fonte di verità del suo
+   contenuto — se domani cambia openMarginDebtModal, la pagina unica cambia con lei. */
+/* ═══ SCHEDA UNICA DEL TITOLO (v188) — si apre cliccando il NOME del titolo.
+   Prima i dati di un titolo erano sparsi in cinque popup diversi, ciascuno raggiungibile solo
+   cliccando la cella giusta: forza relativa sulla cella RS, Sharpe sulla cella Sharpe, conto
+   economico sulla riga fondamentale, opzioni sulla cella opzioni. Con le colonne nascondibili
+   quelle celle possono non esserci più — e con loro sparirebbe l'accesso al dato. Un solo
+   punto d'ingresso, il nome, che raccoglie tutto. */
+function openStockCard(ticker) {
+  const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
+  const r = all.find(x => x.ticker === ticker);
+  if (!r) return;
+  const panels = collectPanels([
+    { label: "Scheda — tecnica, prezzi e fondamentali", run: () => openStockDetail(ticker) },
+    { label: "Forza relativa (RS) — come si legge",     run: () => openRsInfo(ticker) },
+    { label: "Sharpe Ratio — come si legge",            run: () => openSharpeInfo(ticker) },
+    { label: "Conto economico e statistiche",           run: () => openFinancialsModal(ticker) },
+    { label: "Trimestrale e movimento implicito",       run: () => (r.earnings_date ? openEarningsInfo(ticker) : null) },
+  ]);
+  const tv = `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSymbol(r))}`;
+  const azioni = `<div class="pp-actions">
+      <button class="btn btn-ghost btn-sm" data-card-chart="${esc(r.ticker)}">📈 Grafico</button>
+      ${hasOptions(r.ticker) ? `<button class="btn btn-ghost btn-sm" data-card-opt="${esc(r.ticker)}">⛓ Catena opzioni</button>` : ""}
+      <a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">TradingView ↗</a>
+    </div>`;
+  renderPanelPage(`${r.name} (${r.ticker})`, panels, "Nessun dettaglio disponibile per questo titolo.");
+  // le azioni vanno in cima, sotto il titolo: sono le due viste che NON sono testo
+  const page = document.querySelector("#chart-modal-body .pp-page");
+  if (page) page.insertAdjacentHTML("afterbegin", azioni);
+}
+
+/* ═══ DETTAGLI MACRO IN UNA PAGINA SOLA (v188) — bottone "Dettagli macro".
+   Stessa ragione: i sette riquadri e le voci della griglia macro aprivano ciascuno il suo popup.
+   Ora c'è un indice in cima e si scorre. Le mini-card restano cliccabili per chi vuole il
+   singolo dettaglio: questo aggiunge una via d'accesso, non ne toglie. */
+function openMacroDetails() {
+  const m = (DATA && DATA.macro) || {};
+  const tasks = [
+    { label: "MacroQuant — ciclo economico",        run: openMacroQuantModal },
+    { label: "BofA Bear-Market Signposts",          run: openSignpostsModal },
+    { label: "Rotazione settoriale",                run: openTiltModal },
+    { label: "Analisi della rotazione",             run: openRotationAnalysis },
+    { label: "Stagionalità",                        run: openSeasonalityModal },
+    { label: "Sharpe del portafoglio",              run: openPortfolioSharpeModal },
+    { label: "Alpha del processo",                  run: openAlphaModal },
+    { label: "Rischio cambio EUR/USD",              run: openFxModal },
+    { label: "Margin Debt — leva a credito",        run: openMarginDebtModal },
+    { label: "Salute del portafoglio",              run: openHealthModal },
+  ];
+  // + una sezione per ogni voce della griglia macro che ha un dettaglio proprio. Le chiavi si
+  // leggono da MACRO_INFO, che e' gia' il registro di quei pannelli: nessun secondo elenco da
+  // tenere allineato (la classe di difetto che ha prodotto C10 e C12).
+  for (const k of Object.keys(MACRO_INFO || {})) tasks.push({ label: null, run: () => openMacroInfo(k) });
+  renderPanelPage("Dettagli macro — tutto in una pagina", collectPanels(tasks),
+    "Dati macro non ancora caricati.");
+}
+
+function collectPanels(tasks) {
+  const out = [];
+  const orig = openInfoModal;
+  openInfoModal = (title, bodyHTML) => out.push({ title, bodyHTML });
+  try {
+    for (const t of tasks) {
+      const prima = out.length;
+      try { t.run(); } catch (e) { /* un pannello rotto non deve far cadere la pagina intera */ }
+      // se la funzione non ha aperto nulla (dato assente) si salta: niente sezioni vuote
+      for (let i = prima; i < out.length; i++) if (t.label) out[i].title = t.label;
+    }
+  } finally { openInfoModal = orig; }
+  return out;
+}
+/* rende i pannelli raccolti in UNA pagina scorrevole con indice cliccabile in cima */
+function renderPanelPage(titolo, panels, notaVuota) {
+  if (!panels.length) { openInfoModal(titolo, `<div class="muted" style="font-size:12px">${notaVuota || "Nessun dettaglio disponibile."}</div>`); return; }
+  const slug = (t, i) => "pp-" + i + "-" + String(t).toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 30);
+  const indice = panels.length > 1
+    ? `<nav class="pp-index">${panels.map((p, i) => `<a href="#${slug(p.title, i)}">${esc(p.title)}</a>`).join("")}</nav>`
+    : "";
+  const corpo = panels.map((p, i) =>
+    `<section class="pp-sec" id="${slug(p.title, i)}"><h3 class="pp-h">${esc(p.title)}</h3>${p.bodyHTML}</section>`).join("");
+  openInfoModal(titolo, `<div class="pp-page">${indice}${corpo}</div>`);
+}
+
 function openInfoModal(title, bodyHTML) {
   $("#chart-modal-title").textContent = title;
   $("#chart-modal-body").innerHTML = bodyHTML;
@@ -4315,7 +4531,7 @@ function editPosition(ticker) {
     r.value = r.price * qty; r.gain = r.value - pmc * qty;
     r.gain_pct = Math.round((r.value / (pmc * qty) - 1) * 10000) / 100;
   }
-  recomputeTotals(); renderKPI(); renderTable(); if (ptfView === "fund") renderFundTable(); renderAllocation();
+  recomputeTotals(); renderKPI(); renderTable(); renderAllocation();
   toast(`${ticker} aggiornato — salvo nel repo…`);
   editHoldings("portfolio", cfg => {
     const p = (cfg.portfolio || []).find(x => x.ticker === ticker);
@@ -4344,6 +4560,7 @@ function renderTable() {
       <td class="num ${signCls(gEur)}">${signTxt(Math.round(gEur), " €")}${r.currency === "USD" && r.gain != null ? `<br><span class="sub-eur muted">${signTxt(Math.round(r.gain), " $")} live</span>` : ""}</td>
       <td class="num ${signCls(gPct)}"><b>${signTxt(Math.round(gPct * 100) / 100)}</b></td>
       ${techCells(r)}
+      ${fundCells(r)}
     </tr>`;
   }).join("");
 
@@ -4353,12 +4570,13 @@ function renderTable() {
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="15" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="28" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="24"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="37"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applyColOrder("ptf-table");
+  applyColVisibility("ptf-table");   // v188: dopo il riordino — legge l'ordine per accorciare i colspan
   applyColLabels("ptf-table");
 }
 
@@ -4395,16 +4613,17 @@ function renderWatchlist() {
       <td class="num">${prepostCell(r.prepost)}</td>
       ${volumeCell(r)}
       ${techCells(r)}
-    </tr>`).join("") : '<tr><td colspan="20" class="muted">Nessun dato</td></tr>';
+      ${fundCells(r)}
+    </tr>`).join("") : '<tr><td colspan="33" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="20"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="33"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   applyColOrder("wl-table");
+  applyColVisibility("wl-table");    // v188: idem
   applyColLabels("wl-table");
 }
 
 /* ---------------- vista fondamentale (Value Investing) ---------------- */
-let ptfView = localStorage.getItem("pref_ptf_view") || "tech";   // tech | fund (preferenza ricordata)
 const pctOf = (v) => v == null ? "—" : signTxt(Math.round(v * 1000) / 10);   // frazione → %
 const pctPlain = (v) => v == null ? "—" : (Math.round(v * 1000) / 10) + "%";
 function bigUsd(v) { if (v == null) return "—"; const a = Math.abs(v);
@@ -4437,96 +4656,9 @@ const FSC = {
 };
 
 // renderer fondamentale generico (riusato da portafoglio e watchlist)
-function buildFundTable(list, tableSel, withQtyPmc) {
-  const tableId = tableSel.replace("#", "");
-  const head = (withQtyPmc ? ["Titolo", "Qtà", "PMC", "Prezzo"] : ["Titolo", "Prezzo"])
-    .concat(["Market Cap", "P/E", "EV/EBITDA", "ROE", "Margine netto", "P/FCF", "Cresc. ricavi", "Debt/Equity", "Div Yield", "PEG", "Z-Score", "Financial Health", "Target Δ"]);
-  const fundColspan = 13;
-  $(`${tableSel} thead`).innerHTML = "<tr>" +
-    head.map((h, i) => `<th class="${i === 0 ? "sticky-col" : "num"}">${h}</th>`).join("") + "</tr>";
-  const orig = list;                          // ordine originale (per il ripristino "default")
-  const sorted = sortRows(list, tableId);
-  const rows = sorted.map(r => {
-    const c = cur(r), st = r.stats || {};
-    const lead = withQtyPmc
-      ? `<td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
-         <td class="num">${fmtNum.format(r.qty)}</td><td class="num">${c}${fmtNum.format(r.pmc)}</td>
-         <td class="num"><b>${r.price == null ? "…" : c + fmtNum.format(r.price)}</b></td>`
-      : `<td class="name-cell">${esc(r.name)}<span class="tk">${r.ticker}</span></td>
-         <td class="num"><b>${r.price == null ? "…" : c + fmtNum.format(r.price)}</b></td>`;
-    if (r.ticker === "BTP-V28" || !st.market_cap) {
-      return `<tr>${lead}<td colspan="${fundColspan}" class="muted">${r.ticker === "BTP-V28" ? "Titolo di Stato — cedola 4,10/4,50%" : "Dati fondamentali non disponibili"}</td></tr>`;
-    }
-    const pfcf = (st.market_cap && st.fcf) ? st.market_cap / st.fcf : null;
-    const peTtm = st.pe_ttm || r.pe;
-    const roePrem = st.roe != null && st.roe > 0.15;
-    const roeHtml = st.roe != null
-      ? (roePrem
-          ? `<span class="text-premium-green" title="ROIC/ROE > 15% — ritorno eccellente sul capitale investito">${fundBar(st.roe, pctOf, FSC.roe(st.roe))}</span>`
-          : fundBar(st.roe, pctOf, FSC.roe(st.roe)))
-      : "—";
-    const pfcfWarn = pfcf != null && pfcf > 0 && peTtm > 0 && pfcf > peTtm * 2
-      ? `<span class="fcf-warn" title="Warning: Controllare divergenza FCF/Utile — P/FCF ${fmtNum.format(Math.round(pfcf))}× >> P/E ${fmtNum.format(Math.round(peTtm))}×: il Free Cash Flow è significativamente inferiore al Net Income (possibili accrual contabili)"> !</span>` : "";
-    const pfcfHtml = pfcf == null ? "—" : pfcf < 0 ? `<span class="neg">neg.</span>` : `${fundBar(pfcf, fmtNum.format, FSC.pfcf(pfcf))}${pfcfWarn}`;
-    const revGrowthFlag = st.revenue_growth != null && st.revenue_growth < 0.05 && (st.ev_ebitda || 0) > 18
-      ? `<span style="color:var(--yellow);cursor:help;font-size:11px" title="Crescita ricavi bassa (<5%) con EV/EBITDA elevato: possibile crescita non organica da acquisizioni"> ?</span>` : "";
-    // sanity di rendering: PEG negativo e D/E fuori scala non entrano nei modelli → "n.d."
-    const pegOk = st.peg != null && st.peg > 0;
-    const deOk = st.debt_to_equity != null && st.debt_to_equity >= 0 && st.debt_to_equity < 1000;
-    return `<tr class="fund-row" data-fund-tk="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)} — clicca per conto economico e statistiche">${lead}
-      <td class="num">${bigUsd(st.market_cap)}</td>
-      <td class="num">${peTtm > 0 ? fmtNum.format(Math.round(peTtm * 10) / 10) + "×" : "n.d."}</td>
-      <td class="num">${fundBar(st.ev_ebitda, fmtNum.format, FSC.ev(st.ev_ebitda))}</td>
-      <td class="num">${roeHtml}</td>
-      <td class="num">${fundBar(st.profit_margin, pctPlain, FSC.net(st.profit_margin))}</td>
-      <td class="num">${pfcfHtml}</td>
-      <td class="num">${fundBar(st.revenue_growth, pctOf, FSC.growth(st.revenue_growth))}${revGrowthFlag}</td>
-      <td class="num" title="Debito totale / patrimonio netto (leva finanziaria, fonte yfinance)">${deOk ? fmtNum.format(Math.round(st.debt_to_equity)) + "%" : "n.d."}</td>
-      <td class="num">${st.dividend_yield ? fundBar(st.dividend_yield, pctPlain, FSC.div(st.dividend_yield)) : "—"}</td>
-      <td class="num">${pegOk ? fundBar(st.peg, fmtNum.format, FSC.peg(st.peg)) : "n.d."}</td>
-      <td class="num" title="Altman Z''-Score non-manifatturieri (rischio insolvenza): flag prudenziale <1,81 · cutoff canonici Z'': <1,1 distress, >2,6 solido${st.altman_missing ? " — proxy con 1 componente di bilancio mancante" : ""}">${st.altman_z != null ? `${fundBar(st.altman_z, fmtNum.format, FSC.zscore(st.altman_z))}${st.altman_z < 1.81 ? `<br><span class="badge badge-default-risk">[RISCHIO DEFAULT]</span>` : ""}` : "n.d."}</td>
-      <td class="num">${finHealthBar(r)}</td>
-      <td class="num">${targetBar(r.rating)}</td>
-    </tr>`;
-  }).join("");
-  $(`${tableSel} tbody`).innerHTML = rows;
-  applyColLabels(tableId);     // vista a schede su iPhone anche per i fondamentali
-  // ordinamento cliccabile sugli header (la thead è ricostruita ogni volta)
-  initSorting(tableId, () => buildFundTable(orig, tableSel, withQtyPmc));
-  updateSortArrows(tableId);
-}
 
-function renderFundTable() {
-  if (!DATA || !DATA.portfolio) return;
-  buildFundTable(DATA.portfolio, "#ptf-fund-table", true);
-}
-function renderWlFundTable() {
-  if (!DATA || !DATA.watchlist) return;
-  buildFundTable(DATA.watchlist.filter(r => r.currency !== "PTS"), "#wl-fund-table", false);
-}
 
-function setPtfView(v) {
-  ptfView = v;
-  localStorage.setItem("pref_ptf_view", v);
-  document.querySelectorAll("#view-toggle .chip").forEach(c => c.classList.toggle("chip-active", c.dataset.view === v));
-  $("#ptf-tech-wrap").hidden = v !== "tech";
-  $("#ptf-fund-wrap").hidden = v !== "fund";
-  $("#spark-toggle").style.display = v === "tech" ? "" : "none";
-  $("#range-lab-tech").style.display = v === "tech" ? "" : "none";
-  if (v === "fund") renderFundTable();
-}
 
-let wlView = localStorage.getItem("pref_wl_view") || "tech";
-function setWlView(v) {
-  wlView = v;
-  localStorage.setItem("pref_wl_view", v);
-  document.querySelectorAll("#wl-view-toggle .chip").forEach(c => c.classList.toggle("chip-active", c.dataset.view === v));
-  $("#wl-tech-wrap").hidden = v !== "tech";
-  $("#wl-fund-wrap").hidden = v !== "fund";
-  $("#spark-toggle-wl").style.display = v === "tech" ? "" : "none";
-  $("#wl-range-lab").style.display = v === "tech" ? "" : "none";
-  if (v === "fund") renderWlFundTable();
-}
 
 /* ---------------- trimestrali ---------------- */
 function impliedMoveForEarnings(r) {
@@ -5734,7 +5866,7 @@ function buildPrompt() {
   }
   if (m.systemic_risk) {
     const sr = m.systemic_risk;
-    lines.push(`- Rischio Sistemico & Credito (proxy CDS): HY OAS ${sr.hy_oas}% (${signTxt(sr.hy_chg_1m)} 1m), IG OAS ${sr.ig_oas ?? "—"}% (${sr.ig_chg_1m != null ? signTxt(sr.ig_chg_1m) : "—"} 1m), HY/IG ${sr.hy_ig ?? "—"}×${sr.stlfsi != null ? `, stress finanziario St.Louis ${signTxt(sr.stlfsi)}` : ""} — ${sr.status}`);
+    lines.push(`- Rischio Sistemico & Credito (proxy CDS): HY OAS ${sr.hy_oas}% (${signTxt(sr.hy_chg_1m)} 1m), IG OAS ${sr.ig_oas ?? "—"}% (ICE BofA US Corporate, indice IG AMPIO · ${sr.ig_chg_1m != null ? signTxt(sr.ig_chg_1m) : "—"} 1m), HY/IG ${sr.hy_ig ?? "—"}×${sr.stlfsi != null ? `, stress finanziario St.Louis ${signTxt(sr.stlfsi)}` : ""} — ${sr.status}`);
   }
   if (m.smart_money) {
     const sm = m.smart_money;
@@ -5743,7 +5875,10 @@ function buildPrompt() {
     const idxTxt = Object.values(si).map(s => `${s.label_idx}: struttura ${s.structure}, BOS ${s.bos || "n/d"}, FVG ${s.bull_fvg}↑/${s.bear_fvg}↓, bias ${s.bias}/100`).join(" · ");
     if (idxTxt) l += `. SMC indici → ${idxTxt}`;
     if (sm.vix_term_ratio != null) l += `. VIX/VIX3M ${fmtNum.format(sm.vix_term_ratio)} ${sm.vix_term_ratio > 1 ? "(backwardation=tensione)" : "(contango=calma)"}`;
-    if (sm.hy_ig_ratio != null) l += `, HY/IG ${fmtNum.format(sm.hy_ig_ratio)}`;
+    // denominatore DIVERSO dalla riga "Rischio Sistemico & Credito": qui e' il BBB, la fascia piu'
+    // bassa dell'investment grade, dove la fuga verso la qualita' si vede per prima. Il nome lo
+    // dice, cosi' i due rapporti non si leggono come lo stesso numero che si contraddice.
+    if (sm.hy_ig_ratio != null) l += `, HY/BBB ${fmtNum.format(sm.hy_ig_ratio)}× (${sm.ig_spread != null ? `BBB ${fmtNum.format(sm.ig_spread)}%, ` : ""}fascia IG piu' bassa — NON lo stesso denominatore di HY/IG sopra)`;
     const fgBp = m.fear_greed?.score;
     if (fgBp != null) {
       if (fgBp > 75 && sm.score < 30)
@@ -6969,15 +7104,15 @@ $("#market-direction")?.addEventListener("click", () => {
 // click sul termometro Financial Health → modale Conto economico
 document.addEventListener("click", e => {
   const fh = e.target.closest(".fin-health");
-  if (fh) { openFinancialsModal(fh.dataset.fin); return; }
+  if (fh) { openStockCard(fh.dataset.fin); return; }
   const fr = e.target.closest(".fund-row");            // riga vista fondamentale → conto economico + statistiche
-  if (fr) { openFinancialsModal(fr.dataset.fundTk); return; }
+  if (fr) { openStockCard(fr.dataset.fundTk); return; }
   const sc = e.target.closest(".stat-cell");           // click su una metrica → spiegazione
   if (sc) { toast(sc.dataset.info); return; }
   const rc = e.target.closest(".rs-cell");             // click su RS 1M → spiegazione forza relativa
-  if (rc && rc.dataset.rsTk) { openRsInfo(rc.dataset.rsTk); return; }
+  if (rc && rc.dataset.rsTk) { openStockCard(rc.dataset.rsTk); return; }   // v188: un solo popup per titolo
   const shc = e.target.closest(".sharpe-cell");        // click su Sharpe 1A → spiegazione
-  if (shc && shc.dataset.sharpeTk) { openSharpeInfo(shc.dataset.sharpeTk); return; }
+  if (shc && shc.dataset.sharpeTk) { openStockCard(shc.dataset.sharpeTk); return; }
   const bi = e.target.closest(".badge-info");          // badge (squeeze/deep value/correzione) → spiegazione
   if (bi && bi.dataset.badge) { e.stopPropagation(); openBadgeInfo(bi.dataset.badge); return; }
   // tap su QUALSIASI punto della riga/card del titolo (no su pulsanti, grafico, opzioni o celle
@@ -6986,7 +7121,7 @@ document.addEventListener("click", e => {
   if (tr && !tr.classList.contains("total-row") && !tr.classList.contains("add-row")
       && !e.target.closest("button, a, input, .spark-cell, [data-opt], .rs-cell, .sharpe-cell, .badge-info")) {
     const tk = tr.querySelector(".name-cell")?.dataset.tk;
-    if (tk) { openStockDetail(tk); return; }
+    if (tk) { openStockCard(tk); return; }   // v188: scheda UNICA, non piu' il solo dettaglio
   }
 });
 // accessibilità: Invio/Spazio sulla riga fondamentale aprono il dettaglio
@@ -7012,22 +7147,11 @@ document.querySelectorAll("#spark-toggle .chip, #spark-toggle-wl .chip").forEach
     renderWatchlist();
   });
 });
-// ripristina le preferenze salvate (vista tecnica/fondamentale + intervallo) all'avvio
-(function applyPrefs() {
-  document.querySelectorAll("#view-toggle .chip").forEach(c => c.classList.toggle("chip-active", c.dataset.view === ptfView));
-  $("#ptf-tech-wrap").hidden = ptfView !== "tech"; $("#ptf-fund-wrap").hidden = ptfView !== "fund";
-  if ($("#spark-toggle")) $("#spark-toggle").style.display = ptfView === "tech" ? "" : "none";
-  document.querySelectorAll("#wl-view-toggle .chip").forEach(c => c.classList.toggle("chip-active", c.dataset.view === wlView));
-  $("#wl-tech-wrap").hidden = wlView !== "tech"; $("#wl-fund-wrap").hidden = wlView !== "fund";
-  if ($("#spark-toggle-wl")) $("#spark-toggle-wl").style.display = wlView === "tech" ? "" : "none";
-  syncSparkToggles();
-})();
+// v188: la vista tecnica/fondamentale non esiste piu' (tabella unica), quindi le barre
+// dell'intervallo sono SEMPRE visibili: restava solo il ripristino dell'intervallo scelto.
+(function applyPrefs() { syncSparkToggles(); })();
 $("#wl-add-top").addEventListener("click", addWatchlist);
 $("#ptf-add-top")?.addEventListener("click", addPortfolio);
-document.querySelectorAll("#view-toggle .chip").forEach(ch =>
-  ch.addEventListener("click", () => setPtfView(ch.dataset.view)));
-document.querySelectorAll("#wl-view-toggle .chip").forEach(ch =>
-  ch.addEventListener("click", () => setWlView(ch.dataset.view)));
 document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {
   ch.addEventListener("click", () => {
     document.querySelectorAll("#alloc-toggle .chip").forEach(c => c.classList.remove("chip-active"));
@@ -7147,3 +7271,21 @@ initRiskEditor();       // editor soglie di rischio (v143): select+valore+spiega
 setInterval(() => loadData(), 5 * 60 * 1000);
 // prezzi live ogni 60 secondi
 setInterval(() => livePrices(), 60 * 1000);
+
+/* v188 — comandi delle personalizzazioni */
+$("#macro-details")?.addEventListener("click", () => openMacroDetails());
+$("#ptf-cols")?.addEventListener("click", () => openColumnPicker("ptf-table", "Portafoglio", renderTable));
+$("#wl-cols")?.addEventListener("click", () => openColumnPicker("wl-table", "Watchlist", renderWatchlist));
+document.addEventListener("click", (e) => {
+  const all = e.target.closest("[data-cp-all]");
+  if (all) { saveColHidden(all.dataset.cpAll, new Set());
+    (all.dataset.cpAll === "ptf-table" ? renderTable : renderWatchlist)();
+    openColumnPicker(all.dataset.cpAll, all.dataset.cpAll === "ptf-table" ? "Portafoglio" : "Watchlist",
+      all.dataset.cpAll === "ptf-table" ? renderTable : renderWatchlist);
+    return; }
+  if (e.target.closest("[data-cp-done]")) { $("#chart-modal").hidden = true; return; }
+  const ch = e.target.closest("[data-card-chart]");
+  if (ch) { openTickerChart(ch.dataset.cardChart); return; }
+  const op = e.target.closest("[data-card-opt]");
+  if (op) { openOptionsModal(op.dataset.cardOpt); return; }
+});

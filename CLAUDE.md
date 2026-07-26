@@ -200,6 +200,36 @@ li ha ancora (il CI rigenera su cron: senza fallback il payload resterebbe a met
 dire cosa prezza l'altra. Una riga che ne pubblica una sola a zero è **informazione mancante
 travestita da informazione presente** — la forma di errore più difficile da notare leggendo.
 
+## 🎛️ Personalizzazione dashboard (v188) — e il confine col payload
+
+Tre richieste del CEO, con UN vincolo esplicito: **nascondere colonne NON deve togliere dati al
+prompt**. Il confine regge da solo perché il payload lo costruisce `mdRow()`, che non legge nulla
+della UI. Verificato in browser: 8 colonne nascoste → payload identico al byte (69.681 char).
+
+- **Colonne nascondibili** (`⚙ Colonne` su portafoglio e watchlist). Chiave = indice ORIGINALE
+  `data-col`, lo stesso del riordino per trascinamento: nascondere e spostare si compongono.
+  `applyColVisibility` gira DOPO `applyColOrder` perché **accorcia i colspan** delle righe speciali
+  (TOTALE, "+ Aggiungi", nota BTP) di quante colonne coperte sono nascoste — senza quello la riga
+  TOTALE sborda. "Titolo" è `sticky-col` e non si può nascondere: è la porta della scheda.
+- **Tabella unica**: le viste alternative "Tecnica & Prezzi" / "Fondamentale (Value)" sono fuse
+  (`techCells` + `fundCells`, 37 colonne portafoglio / 33 watchlist). Rimosse `buildFundTable`,
+  `renderFundTable`, `renderWlFundTable`, `setPtfView`, `setWlView` — restano come no-op perché un
+  handler superstite non rompa nulla. `SORT_FIELDS` esteso e verificato 1:1 con le `<th>`.
+- **Un popup per titolo** (`openStockCard`, clic sul NOME) e **uno per la macro**
+  (`openMacroDetails`, 39 sezioni). Il meccanismo che li rende possibili senza riscrivere 17
+  funzioni: **tutte finiscono in `openInfoModal(titolo, html)`**, quindi `collectPanels()` la
+  sostituisce temporaneamente con un raccoglitore, esegue le funzioni esistenti e ne tiene l'HTML.
+  Ogni pannello resta l'unica fonte di verità del suo contenuto: se cambia `openMarginDebtModal`,
+  la pagina unica cambia con lei. Le chiavi macro si leggono da `MACRO_INFO`, non da un secondo
+  elenco (la classe di difetto di C10/C12).
+  ⚠️ Perché il popup unico è NECESSARIO, non estetico: prima RS/Sharpe/conto economico si aprivano
+  cliccando la loro cella. Con le colonne nascondibili quelle celle possono non esserci — e con
+  loro sparirebbe l'accesso al dato. Un solo ingresso, il nome, che non si può nascondere.
+
+Il test `MOBILE_KEY_COLS` cercava le etichette in `buildFundTable`: riallineato alle `<th>` (unica
+fonte) + guardia nuova che verifica che **nessuna colonna della vecchia vista fondamentale sia
+andata persa nella fusione** — ne aveva già perse due (Financial Health, Target Δ), rimesse.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

@@ -408,12 +408,20 @@ check("stampBrokerDate v113: salvataggio PORTAFOGLIO aggiorna as_of a oggi e rim
     const m = html.match(new RegExp(`<table id="${id}"[\\s\\S]*?<thead>([\\s\\S]*?)</thead>`));
     return m ? [...m[1].matchAll(/<th[^>]*>([^<]*)<\/th>/g)].map(x => x[1].replace(/&amp;/g, "&").trim()) : [];
   };
-  const headStmt = src.match(/const head = \(withQtyPmc[\s\S]*?\]\);/);
-  const fundLabels = headStmt ? [...headStmt[0].matchAll(/"([^"]+)"/g)].map(x => x[1]) : [];
-  const all = new Set([...thLabels("ptf-table"), ...thLabels("wl-table"), ...fundLabels]);
+  // v188: le viste "Tecnica & Prezzi" e "Fondamentale (Value)" sono diventate UNA tabella, quindi
+  // buildFundTable non esiste piu' e TUTTE le etichette vivono nelle <th> di index.html. Il test
+  // ne esce piu' forte: una sola fonte da confrontare invece di due che potevano divergere.
+  const all = new Set([...thLabels("ptf-table"), ...thLabels("wl-table")]);
   const keys = run("[...MOBILE_KEY_COLS]");
   const orphans = keys.filter(k => !all.has(k));
-  check("MOBILE_KEY_COLS: nessuna etichetta orfana (card iPhone)", fundLabels.length > 5 && keys.length > 5 && orphans.length === 0);
+  check("MOBILE_KEY_COLS: nessuna etichetta orfana (card iPhone)", all.size > 20 && keys.length > 5 && orphans.length === 0);
+  // e il contrario: la fusione non deve aver perso colonne che c'erano nella vista fondamentale
+  const fondamentali = ["Market Cap", "P/E", "EV/EBITDA", "ROE", "Margine netto", "P/FCF",
+                        "Cresc. ricavi", "Debt/Equity", "Div Yield", "PEG", "Z-Score",
+                        "Financial Health", "Target Δ"];
+  const perse = fondamentali.filter(l => !thLabels("ptf-table").includes(l) || !thLabels("wl-table").includes(l));
+  check("fusione v188: nessuna colonna della vecchia vista fondamentale è andata persa", perse.length === 0);
+  if (perse.length) console.log("  ⚠ colonne fondamentali perse nella fusione:", perse.join(", "));
   if (orphans.length) console.log("  ⚠ etichette senza colonna reale:", orphans.join(", "));
   // le card watchlist devono mostrare gli stessi campi del portafoglio (meno Guadagno/Guad. %,
   // che la watchlist non ha per natura) — richiesta esplicita utente (STEP1 mobile)

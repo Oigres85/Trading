@@ -1092,3 +1092,33 @@ th.col-draggable { cursor: grab; }
 th.col-draggable:active { cursor: grabbing; }
 th.col-dragging { opacity: .45; }
 th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
+
+/* ═══ v188 — personalizzazione colonne + popup unificati ═══════════════════════════════ */
+/* pagina a pannelli: un indice ancorato in cima, poi le sezioni in sequenza */
+.pp-page { max-height: 70vh; overflow-y: auto; scroll-behavior: smooth; }
+.pp-index { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 0 12px; position: sticky; top: 0;
+  background: var(--card, #12151c); border-bottom: 1px solid var(--border, #262b36); z-index: 2; }
+.pp-index a { font-size: 11px; padding: 3px 8px; border-radius: 999px; text-decoration: none;
+  border: 1px solid var(--border, #262b36); color: var(--muted, #93a0b4); white-space: nowrap; }
+.pp-index a:hover { color: var(--fg, #e6ebf2); border-color: var(--accent, #4c8dff); }
+.pp-sec { padding: 14px 0; border-bottom: 1px dashed var(--border, #262b36); scroll-margin-top: 46px; }
+.pp-sec:last-child { border-bottom: 0; }
+.pp-h { margin: 0 0 8px; font-size: 13px; letter-spacing: .02em; color: var(--accent, #4c8dff); }
+.pp-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 0; }
+
+/* selettore colonne */
+.cp-note { font-size: 12px; line-height: 1.5; margin-bottom: 10px; }
+.cp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 4px 12px;
+  max-height: 48vh; overflow-y: auto; padding: 4px 0; }
+.cp-item { display: flex; align-items: center; gap: 7px; font-size: 12px; padding: 4px 6px;
+  border-radius: 6px; cursor: pointer; }
+.cp-item:hover { background: var(--hover, #1a1f29); }
+.cp-item input { accent-color: var(--accent, #4c8dff); cursor: pointer; }
+.cp-item em { font-size: 10px; margin-left: auto; font-style: normal; }
+.cp-locked { opacity: .55; cursor: default; }
+.macro-actions { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+
+@media (max-width: 720px) {
+  .pp-page { max-height: 76vh; }
+  .cp-grid { grid-template-columns: 1fr 1fr; }
+}
