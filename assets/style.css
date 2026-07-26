@@ -999,6 +999,9 @@ tr.val-ok td { background: rgba(34,197,94,.07); }
 .rp-log { margin-top: 9px; max-height: 108px; overflow-y: auto; font-family: var(--mono); font-size: 10.5px;
   line-height: 1.55; color: var(--muted); border-top: 1px solid var(--border); padding-top: 7px; }
 .rp-log-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* esito del passo di pipeline: ✓ verde riuscito · ✗ rosso fallito · neutro in corso */
+.rp-log-line.rp-ok { color: var(--green); }
+.rp-log-line.rp-fail { color: var(--red); }
 .rp-log-line:last-child { color: var(--text); }
 
 /* ---------- v62: Refresh button states ---------- */
@@ -1068,3 +1071,24 @@ tr.val-ok td { background: rgba(34,197,94,.07); }
 .rp-editor-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .rp-editor select { flex: 1; min-width: 220px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; font-size: 12.5px; }
 .rp-editor input { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; font-size: 12.5px; font-family: var(--mono); }
+
+/* ── Diario: formato strutturato (v165) ───────────────────────────────────── */
+.diary-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 10px; }
+.diary-form #d-qty { width: 92px; } .diary-form #d-tk { width: 104px; }
+.diary-form #d-px { width: 100px; } .diary-form #d-when { width: 148px; }
+.diary-form #d-note { flex: 1 1 200px; min-width: 160px; }
+.diary-form select, .diary-form input { background: var(--bg2); border: 1px solid var(--border); color: var(--text);
+  border-radius: 7px; padding: 6px 8px; font-size: 12.5px; font-family: inherit; min-width: 0; }
+.diary-form input:focus, .diary-form select:focus { outline: none; border-color: var(--accent); }
+.diary-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.diary-op { font-size: 12.5px; letter-spacing: .01em; }
+.diary-op .pos { color: var(--green); } .diary-op .neg { color: var(--red); }
+.diary-multi { font-size: 10.5px; color: var(--muted); margin-left: 8px; font-style: italic; }
+.diary-item .diary-text { font-size: 11.5px; color: var(--muted); }
+@media (max-width: 720px) { .diary-form > * { flex: 1 1 46%; } .diary-form #diary-save { flex-basis: 100%; } }
+
+/* ── Colonne trascinabili (v165) ──────────────────────────────────────────── */
+th.col-draggable { cursor: grab; }
+th.col-draggable:active { cursor: grabbing; }
+th.col-dragging { opacity: .45; }
+th.col-over { box-shadow: inset 3px 0 0 var(--accent); }

@@ -1,18 +1,50 @@
 [
  {
   "date": "2026-07-15T15:50:25.675Z",
-  "text": "vendita SKHY 50 quote a 172 il 15 luglio 2026"
+  "text": "vendita SKHY 50 quote a 172 il 15 luglio 2026",
+  "op": {
+   "tipo": "VENDITA",
+   "qty": 50,
+   "ticker": "SKHY",
+   "prezzo": 172,
+   "quando": "15/07/2026",
+   "multi": false
+  }
  },
  {
   "date": "2026-07-15T15:49:30.107Z",
-  "text": "vendita Cerebras quantità 30 prezzo 190,10 il 15 luglio 2026"
+  "text": "vendita Cerebras quantità 30 prezzo 190,10 il 15 luglio 2026",
+  "op": {
+   "tipo": "VENDITA",
+   "qty": 30,
+   "ticker": "CBRS",
+   "prezzo": 190.1,
+   "quando": "15/07/2026",
+   "multi": false
+  }
  },
  {
   "date": "2026-07-02T04:57:27.222Z",
-  "text": "Acquisto 70 azioni oracle 1 luglio 2026 a 143 dollari"
+  "text": "Acquisto 70 azioni oracle 1 luglio 2026 a 143 dollari",
+  "op": {
+   "tipo": "ACQUISTO",
+   "qty": 70,
+   "ticker": "ORCL",
+   "prezzo": 143,
+   "quando": "01/07/2026",
+   "multi": false
+  }
  },
  {
   "date": "2026-06-29T19:15:27.982Z",
-  "text": "Alleggerito micron 20 azioni e amd  25 e venduto Intel e tesla tutto il 24 giugno  2026, incrementato di 50 azioni strategy il 26 giugno 2026 e alleggerito Cerebras di 10 azioni il 29 giugno 2026"
+  "text": "Alleggerito micron 20 azioni e amd  25 e venduto Intel e tesla tutto il 24 giugno  2026, incrementato di 50 azioni strategy il 26 giugno 2026 e alleggerito Cerebras di 10 azioni il 29 giugno 2026",
+  "op": {
+   "tipo": "VENDITA",
+   "qty": 20,
+   "ticker": "MU",
+   "prezzo": null,
+   "quando": "24/06/2026",
+   "multi": true
+  }
  }
 ]

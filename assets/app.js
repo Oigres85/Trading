@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "164";
+const BUILD_VERSION = "165";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -64,7 +64,7 @@ function updateSortArrows(tableId) {
   const { field, dir } = sortState[tableId];
   document.querySelectorAll(`#${tableId} thead th`).forEach((th, i) => {
     th.querySelector(".sort-arrow")?.remove();
-    const f = SORT_FIELDS[tableId][i];
+    const f = SORT_FIELDS[tableId][Number(th.dataset.col ?? i)];
     if (f && f === field && dir) {
       const s = document.createElement("span");
       s.className = "sort-arrow";
@@ -74,9 +74,102 @@ function updateSortArrows(tableId) {
   });
 }
 
+/* ═══ v165 — ORDINE DELLE COLONNE personalizzabile (drag & drop sull'intestazione) ═══════
+   L'ordine vive in localStorage per-tabella come permutazione degli indici ORIGINALI, così
+   SORT_FIELDS (che mappa indice→campo) resta valido: ogni th porta `data-col` con il suo indice
+   di partenza e sort/label lo usano al posto della posizione corrente nel DOM.
+   ⚠ Riguarda SOLO le tabelle HTML. Le tabelle del PROMPT restano a colonne fisse: il red team
+   (I6 col.16=Supp./17=Stop, I10 per nome) verifica per posizione, riordinarle romperebbe tutto. */
+const colOrderKey = (tid) => `colorder_${tid}`;
+function loadColOrder(tid, n) {
+  try {
+    const a = JSON.parse(localStorage.getItem(colOrderKey(tid)) || "null");
+    if (Array.isArray(a) && a.length === n && a.every(i => Number.isInteger(i) && i >= 0 && i < n)
+        && new Set(a).size === n) return a;
+  } catch { /* ordine corrotto o schema cambiato → si torna al default */ }
+  return null;
+}
+function saveColOrder(tid, order) {
+  try { localStorage.setItem(colOrderKey(tid), JSON.stringify(order)); } catch { /* quota */ }
+}
+function resetColOrder(tid) {
+  try { localStorage.removeItem(colOrderKey(tid)); } catch { /* no-op */ }
+}
+/* applica la permutazione a thead e a ogni riga dati (le righe con celle in colspan — TOTALE,
+   "+ Aggiungi titolo", note BTP — hanno un numero di celle diverso e vengono saltate) */
+function applyColOrder(tid) {
+  const head = document.querySelector(`#${tid} thead tr`);
+  if (!head || !head.children) return;
+  const ths = [...head.children];
+  ths.forEach((th, i) => { if (th.dataset.col == null) th.dataset.col = String(i); });
+  const order = loadColOrder(tid, ths.length);
+  if (!order) return;
+  const place = (row) => {
+    const cells = [...row.children];
+    if (cells.length !== order.length) return;             // riga speciale: non toccarla
+    order.forEach(orig => {
+      const c = cells.find(x => Number(x.dataset.col ?? -1) === orig);
+      if (c) row.appendChild(c);
+    });
+  };
+  head.querySelectorAll("th").forEach((th, i) => { if (th.dataset.col == null) th.dataset.col = String(i); });
+  place(head);
+  document.querySelectorAll(`#${tid} tbody tr`).forEach(tr => {
+    const cells = [...tr.children];
+    if (cells.length !== order.length) return;
+    cells.forEach((td, i) => { if (td.dataset.col == null) td.dataset.col = String(i); });
+    place(tr);
+  });
+}
+/* trascinamento dell'intestazione per spostare una colonna a sinistra/destra */
+function initColDrag(tid, rerender) {
+  const head = document.querySelector(`#${tid} thead tr`);
+  if (!head || !head.children || head.dataset?.dragReady === "1") return;
+  head.dataset.dragReady = "1";
+  const ths = [...head.children];
+  ths.forEach((th, i) => {
+    if (th.dataset.col == null) th.dataset.col = String(i);
+    th.draggable = true;
+    th.classList.add("col-draggable");
+    th.title = (th.title ? th.title + " · " : "") + "Trascina per spostare la colonna";
+    th.addEventListener("dragstart", (e) => {
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", th.dataset.col);
+      th.classList.add("col-dragging");
+    });
+    th.addEventListener("dragend", () => {
+      th.classList.remove("col-dragging");
+      document.querySelectorAll(`#${tid} thead th`).forEach(x => x.classList.remove("col-over"));
+    });
+    th.addEventListener("dragover", (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; th.classList.add("col-over"); });
+    th.addEventListener("dragleave", () => th.classList.remove("col-over"));
+    th.addEventListener("drop", (e) => {
+      e.preventDefault();
+      th.classList.remove("col-over");
+      const from = Number(e.dataTransfer.getData("text/plain"));
+      const to = Number(th.dataset.col);
+      if (!Number.isInteger(from) || !Number.isInteger(to) || from === to) return;
+      const cur = loadColOrder(tid, ths.length) || ths.map((_, k) => k);
+      const iFrom = cur.indexOf(from), iTo = cur.indexOf(to);
+      if (iFrom < 0 || iTo < 0) return;
+      cur.splice(iTo, 0, ...cur.splice(iFrom, 1));         // sposta la colonna nella posizione di rilascio
+      saveColOrder(tid, cur);
+      rerender();
+      toast("Ordine colonne aggiornato — doppio clic sull'intestazione per ripristinare");
+    });
+    // doppio clic = ripristino dell'ordine originale (scorciatoia senza UI extra)
+    th.addEventListener("dblclick", (e) => {
+      if (!loadColOrder(tid, ths.length)) return;
+      e.preventDefault(); e.stopPropagation();
+      resetColOrder(tid); rerender();
+      toast("Ordine colonne ripristinato");
+    });
+  });
+}
+
 function initSorting(tableId, rerender) {
   document.querySelectorAll(`#${tableId} thead th`).forEach((th, i) => {
-    const f = SORT_FIELDS[tableId][i];
+    const f = SORT_FIELDS[tableId][Number(th.dataset.col ?? i)];
     if (!f) return;
     th.classList.add("sortable");
     th.addEventListener("click", () => {
@@ -220,10 +313,10 @@ async function waitForNewData(prev, tries = 28) {
       rpLog(`Controllo pubblicazione dati (tentativo ${i + 1}/${tries})…`);
       const d = await fetchData();
       if (d.updated_at !== prev) {
-        rpLog("Nuovo data.json ricevuto — rendering della dashboard");
+        rpLog("Nuovo data.json ricevuto — rendering della dashboard", "ok");
         DATA = d; renderAll(); return true;
       }
-    } catch { rpLog(`Rete/CDN non pronti, riprovo (tentativo ${i + 1})`); }
+    } catch { rpLog(`Rete/CDN non pronti, riprovo (tentativo ${i + 1})`, "fail"); }
   }
   return false;
 }
@@ -244,12 +337,16 @@ const PRICE_STAGES = [
   [75, "Quasi pronto…"],
 ];
 let _lastRpMsg = "";
-function rpLog(msg) {
+/* v165 — ESITO ESPLICITO per ogni passo: il log elencava azioni senza dire quali fossero
+   riuscite e quali no, e un fallimento (rete/CDN, tentativo a vuoto) si leggeva come una riga
+   qualsiasi. Ora: ✓ riuscita · ✗ fallita · · in corso. */
+function rpLog(msg, status = "info") {
   const box = document.getElementById("rp-log");
   if (!box) return;
   const line = document.createElement("div");
-  line.className = "rp-log-line";
-  line.textContent = `${new Date().toLocaleTimeString("it-IT")} · ${msg}`;
+  line.className = `rp-log-line rp-${status}`;
+  const mark = status === "ok" ? "✓" : status === "fail" ? "✗" : "·";
+  line.textContent = `${new Date().toLocaleTimeString("it-IT")} ${mark} ${msg}`;
   box.appendChild(line);
   box.scrollTop = box.scrollHeight;
 }
@@ -281,8 +378,11 @@ function setRefreshProgress(pct, msg) {
 }
 function finishRefreshProgress(ok) {
   if (_refreshTimer) { clearInterval(_refreshTimer); _refreshTimer = null; }
+  rpLog(ok ? "Pipeline completata: dati pubblicati e dashboard aggiornata"
+           : "Pipeline NON confermata entro il tempo massimo: i dati potrebbero arrivare più tardi",
+        ok ? "ok" : "fail");
   setRefreshProgress(100, ok ? "Aggiornamento completato ✓" : "Tempo scaduto — i dati potrebbero arrivare a breve");
-  setTimeout(hideRefreshProgress, ok ? 1200 : 2500);
+  setTimeout(hideRefreshProgress, ok ? 1800 : 4000);
 }
 function hideRefreshProgress() {
   const el = document.getElementById("refresh-progress");
@@ -326,9 +426,9 @@ async function refreshAll() {
       toast("Token senza permesso Actions — rimosso. Creane uno con Actions: read & write e riprova");
       return;
     }
-    if (res.status !== 204) { toast(`Errore avvio aggiornamento (HTTP ${res.status})`); return; }
+    if (res.status !== 204) { rpLog(`Avvio pipeline RIFIUTATO da GitHub (HTTP ${res.status})`, "fail"); toast(`Errore avvio aggiornamento (HTTP ${res.status})`); return; }
     showRefreshProgress();
-    rpLog("Workflow GitHub Actions avviato (rigenerazione completa della pipeline)");
+    rpLog("Workflow GitHub Actions avviato (rigenerazione completa della pipeline)", "ok");
     waitForNewData(DATA?.updated_at).then(ok => {
       finishRefreshProgress(ok);
       const b2 = $("#btn-refresh");
@@ -1223,9 +1323,80 @@ function setDiary(arr) {
   localStorage.setItem("action_diary", JSON.stringify(arr.slice(0, 100)));
   pushDiaryCloud(arr);   // sync su GitHub se c'è un token (così è uguale su Mac e iPhone)
 }
-function saveDiaryEntry(text) {
+/* ═══ v165 — FORMATO DEL DIARIO ═══════════════════════════════════════════════
+   Il diario era testo libero: ogni voce con una forma diversa ("vendita SKHY 50 quote a 172",
+   "Acquisto 70 azioni oracle ... a 143 dollari"), difficile da leggere e impossibile da
+   incrociare con la Tabella A. Ora ogni voce ha un OP strutturato {tipo, qty, ticker, prezzo,
+   data}; il testo originale non viene mai perso (resta in `text` e viaggia nell'export AI).
+   Le voci già memorizzate vengono formattate al volo dal parser, senza riscrivere i dati. */
+const DIARY_BUY = /\b(acquist|comprat|compra|incrementat|accumulat|aggiunt)/i;
+const DIARY_SELL = /\b(vendit|vendut|vendo|alleggerit|ridott|chius|liquidat)/i;
+/* ticker dal nome esteso: la mappa si costruisce dai dati veri (portafoglio + watchlist),
+   così un nome nuovo entra da solo senza toccare il codice */
+function diaryTickerMap() {
+  const m = new Map();
+  for (const r of [...(DATA?.portfolio || []), ...(DATA?.watchlist || [])]) {
+    if (!r || !r.ticker) continue;
+    m.set(r.ticker.toUpperCase(), r.ticker);
+    const nome = String(r.name || "").replace(/\b(inc|corp|corporation|ltd|plc|group|company|co|technologies|technology|systems|platforms|holdings)\b\.?/gi, "").trim();
+    const primo = nome.split(/[\s,.]+/)[0];
+    if (primo && primo.length >= 3) m.set(primo.toUpperCase(), r.ticker);
+  }
+  // alias che i dati non possono dare (nomi commerciali usati nel diario)
+  for (const [k, v] of [["ORACLE", "ORCL"], ["MICRON", "MU"], ["STRATEGY", "MSTR"], ["CEREBRAS", "CBRS"],
+                        ["TESLA", "TSLA"], ["INTEL", "INTC"], ["ALPHABET", "GOOGL"], ["GOOGLE", "GOOGL"]]) {
+    if (!m.has(k)) m.set(k, v);
+  }
+  return m;
+}
+const MESI_IT = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+/* estrae l'operazione da una voce a testo libero — best effort, mai distruttivo */
+function parseDiaryText(text, fallbackIso) {
+  const t = String(text || "");
+  const tipo = DIARY_SELL.test(t) ? "VENDITA" : DIARY_BUY.test(t) ? "ACQUISTO" : null;
+  const map = diaryTickerMap();
+  let ticker = null;
+  for (const w of t.split(/[^A-Za-z0-9.\-]+/)) {
+    const hit = map.get(w.toUpperCase());
+    if (hit) { ticker = hit; break; }
+  }
+  // quantità: "50 quote", "quantità 30", "70 azioni", "di 10 azioni"
+  const mq = t.match(/(\d[\d.]*)\s*(?:quote|azioni|titoli|pezzi)/i) || t.match(/quantit[àa]\s*(\d[\d.]*)/i);
+  const qty = mq ? parseInt(String(mq[1]).replace(/\./g, ""), 10) : null;
+  // prezzo: "a 172", "prezzo 190,10", "a 143 dollari"
+  const mp = t.match(/(?:prezzo|a|@)\s*(\d+(?:[.,]\d+)?)\s*(?:doll|usd|\$|eur|€)?/i);
+  const prezzo = mp ? parseFloat(mp[1].replace(",", ".")) : null;
+  // data esplicita nel testo ("il 15 luglio 2026"), altrimenti la data di registrazione
+  let quando = null;
+  const md = t.match(/(\d{1,2})\s+([a-zà]+)\s+(\d{4})/i);
+  if (md) { const mi = MESI_IT.indexOf(md[2].toLowerCase()); if (mi >= 0) quando = `${String(md[1]).padStart(2, "0")}/${String(mi + 1).padStart(2, "0")}/${md[3]}`; }
+  if (!quando && fallbackIso) { const d = new Date(fallbackIso); if (!isNaN(d)) quando = d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" }); }
+  // più operazioni nella stessa voce: si dichiara, non si finge di averle strutturate tutte
+  const multi = (t.match(new RegExp(DIARY_BUY.source + "|" + DIARY_SELL.source, "gi")) || []).length > 1;
+  return { tipo, qty, ticker, prezzo, quando, multi };
+}
+/* l'operazione di una voce: quella salvata se c'è, altrimenti dedotta dal testo */
+function diaryOp(e) {
+  if (e && e.op && (e.op.tipo || e.op.ticker)) return { ...e.op, multi: !!e.op.multi };
+  return parseDiaryText(e && e.text, e && e.date);
+}
+/* riga formattata: TIPO · QTÀ TICKER · PREZZO · DATA (i campi assenti si omettono) */
+function diaryOpLine(e) {
+  const o = diaryOp(e);
+  const bits = [];
+  if (o.tipo) bits.push(`<b class="${o.tipo === "ACQUISTO" ? "pos" : "neg"}">${o.tipo}</b>`);
+  if (o.qty != null && o.ticker) bits.push(`${fmtNum.format(o.qty)} ${esc(o.ticker)}`);
+  else if (o.ticker) bits.push(esc(o.ticker));
+  else if (o.qty != null) bits.push(`${fmtNum.format(o.qty)} quote`);
+  if (o.prezzo != null) bits.push(`@ ${fmtNum.format(o.prezzo)}`);
+  if (o.quando) bits.push(o.quando);
+  if (!bits.length) return "";
+  return `<span class="diary-op">${bits.join(" · ")}</span>${o.multi ? `<span class="diary-multi" title="La voce contiene più operazioni: strutturata la prima, il testo integrale resta sotto">+ altre operazioni nel testo</span>` : ""}`;
+}
+function saveDiaryEntry(text, op) {
   const arr = loadDiary();
-  arr.unshift({ date: new Date().toISOString(), text });
+  const iso = new Date().toISOString();
+  arr.unshift({ date: iso, text, op: op || parseDiaryText(text, iso) });
   setDiary(arr);
 }
 function deleteDiaryEntry(iso) {
@@ -1359,7 +1530,10 @@ function stopOf(r) {
 const RS_VEL_RILEVANTE_PP = 3;
 const RISK_PARAMS = {
   capNoAdd_pct: 10,        // #1 — DIVIETO DI ACCUMULO se la posizione è già ≥ questo % del NAV
-                           //      (cap rigido SOLO sui nuovi acquisti; resta a 10%)
+                           //      (cap rigido SOLO sui nuovi acquisti). ⚠ QUESTO È SOLO IL DEFAULT:
+                           //      il valore OPERATIVO arriva da config/risk_params.json (editabile
+                           //      dalla card Parametri di Rischio e sincronizzato su tutti i device).
+                           //      Non dedurre dal codice quale cap sia attivo: leggilo dal config.
   capAlert_pct: 25,        // #1 — ALERT di concentrazione singolo titolo (solo avviso, NIENTE
                            //      trim automatico: sotto il 25% i vincenti corrono liberi)
   sortinoVeto: -0.3,       // #2 — soglia veto VALUE TRAP sul Sortino 1A (CEO: mantieni rigido)
@@ -2063,39 +2237,48 @@ function openDecisionModal() {
   const diaryHtml = diary.length ? diary.map(e => `
     <div class="diary-item" data-iso="${e.date}">
       <span class="diary-date">${new Date(e.date).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "2-digit" })}</span>
-      <span class="diary-text">${esc(e.text)}</span>
+      <span class="diary-body">${diaryOpLine(e)}<span class="diary-text">${esc(e.text)}</span></span>
       <button class="diary-edit" data-iso="${e.date}" title="Modifica questa voce">✎</button>
       <button class="diary-del" data-iso="${e.date}" title="Elimina">✕</button>
     </div>`).join("") : `<div class="muted" style="font-size:12px">Nessuna voce ancora. Annota le operazioni con la loro FONTE: il diario viaggia nell'export AI e alimenta l'attribuzione.</div>`;
   openInfoModal("📔 Diario delle azioni",
     `<div class="info-line muted" style="font-size:11px;margin-bottom:6px">Qui vanno SOLO le operazioni che ESEGUI davvero (tue decisioni): il diario viaggia nell'export AI e dà continuità ai consigli.</div>
-     <div class="diary-add"><textarea id="diary-input" rows="1" placeholder="Es: comprato 10 NVDA a 180 — accumulo su correzione" maxlength="400"></textarea><button class="btn btn-primary btn-sm" id="diary-save">Aggiungi</button></div>
-     <div class="diary-list" id="diary-list">${diaryHtml}</div>
-     <details style="margin-top:14px"><summary style="cursor:pointer;font-size:12.5px;font-weight:600">✅ Validatore report AI (aprilo solo se ti serve)</summary>
-     <div class="info-line muted" style="font-size:11px;margin:6px 0">Incolla la risposta dell'LLM: gli ordini vengono estratti e verificati contro gli invarianti del fondo (ticker, stop&lt;limite≤prezzo, banda 30%, veto, cap ${RISK_PARAMS.capNoAdd_pct}% NAV, budget cassa−ES95) PRIMA di andare al broker. Non scrive nulla nel diario.</div>
-     <div class="diary-add"><textarea id="val-input" rows="2" placeholder="Incolla qui il report dell'LLM…"></textarea><button class="btn btn-primary btn-sm" id="val-run">Valida ordini</button></div>
-     <div id="val-out"></div></details>`);
+     <div class="diary-form">
+       <select id="d-tipo" aria-label="Tipo operazione"><option value="ACQUISTO">Acquisto</option><option value="VENDITA">Vendita</option></select>
+       <input id="d-qty" type="number" min="1" step="1" placeholder="Quantità" aria-label="Quantità">
+       <input id="d-tk" type="text" placeholder="Ticker" aria-label="Ticker" list="d-tk-list" maxlength="12">
+       <input id="d-px" type="number" step="0.01" placeholder="Prezzo" aria-label="Prezzo">
+       <input id="d-when" type="date" aria-label="Data operazione">
+       <input id="d-note" type="text" placeholder="Nota (facoltativa)" aria-label="Nota" maxlength="200">
+       <button class="btn btn-primary btn-sm" id="diary-save">Registra</button>
+     </div>
+     <datalist id="d-tk-list">${[...new Set([...(DATA?.portfolio || []), ...(DATA?.watchlist || [])].map(r => r && r.ticker).filter(Boolean))].map(t => `<option value="${esc(t)}">`).join("")}</datalist>
+     <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
   const refresh = () => { closeChartModal(); openDecisionModal(); };
-  // v142: il diario è SOLO delle operazioni ESEGUITE dal CEO (direttiva: niente select fonte,
-  // niente registrazione dei report LLM). Il validatore resta come strumento di CONTROLLO,
-  // ripiegato e senza alcuna scrittura sul diario.
-  $("#val-run")?.addEventListener("click", () => {
-    const txt = ($("#val-input")?.value || "").trim();
-    const out = $("#val-out");
-    if (out) out.innerHTML = txt ? renderAIValidation(txt) : `<div class="muted" style="font-size:12px">Incolla prima il testo del report.</div>`;
-  });
+  // v142: il diario è SOLO delle operazioni ESEGUITE dal CEO (niente select fonte, niente
+  // registrazione dei report LLM). v165: il Validatore è stato RIMOSSO dal popup su direttiva
+  // CEO; le funzioni pure (parseAIOrders/validateAIOrders) restano, testate e riusabili.
   $("#diary-save")?.addEventListener("click", () => {
-    const inp = $("#diary-input"); const txt = (inp.value || "").trim();
-    if (txt) { saveDiaryEntry(txt); refresh(); }
+    // dal form STRUTTURATO: l'op è già nota, il testo si compone in forma canonica (e resta
+    // leggibile nell'export AI, dove il diario viaggia come prosa).
+    const tipo = $("#d-tipo")?.value || "ACQUISTO";
+    const qty = parseInt($("#d-qty")?.value || "", 10);
+    const tk = ($("#d-tk")?.value || "").trim().toUpperCase();
+    const px = parseFloat(($("#d-px")?.value || "").replace(",", "."));
+    const wRaw = $("#d-when")?.value || "";
+    const nota = ($("#d-note")?.value || "").trim();
+    if (!tk && !Number.isFinite(qty)) { toast("Indica almeno ticker e quantità"); return; }
+    const quando = wRaw ? wRaw.split("-").reverse().join("/")
+                        : new Date().toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" });
+    const op = { tipo, qty: Number.isFinite(qty) ? qty : null, ticker: tk || null,
+                 prezzo: Number.isFinite(px) ? px : null, quando, multi: false };
+    const testo = [`${tipo === "ACQUISTO" ? "Acquisto" : "Vendita"}`,
+                   Number.isFinite(qty) ? `${qty} quote` : null, tk || null,
+                   Number.isFinite(px) ? `a ${px}` : null, `il ${quando}`,
+                   nota ? `— ${nota}` : null].filter(Boolean).join(" ");
+    saveDiaryEntry(testo, op);
+    refresh();
   });
-  const di = $("#diary-input");
-  if (di) {
-    const grow = () => { di.style.height = "auto"; di.style.height = Math.min(160, di.scrollHeight) + "px"; };
-    di.addEventListener("input", grow);
-    di.addEventListener("keydown", e => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); const txt = di.value.trim(); if (txt) { saveDiaryEntry(txt); refresh(); } }
-    });
-  }
   document.querySelectorAll(".diary-del").forEach(b => b.addEventListener("click", () => { deleteDiaryEntry(b.dataset.iso); refresh(); }));
   document.querySelectorAll(".diary-edit").forEach(b => b.addEventListener("click", () => {
     const entry = loadDiary().find(x => x.date === b.dataset.iso);
@@ -4106,6 +4289,7 @@ function renderTable() {
   const addRow = editMode.portfolio
     ? `<tr class="add-row"><td colspan="24"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
+  applyColOrder("ptf-table");
   applyColLabels("ptf-table");
 }
 
@@ -4146,6 +4330,7 @@ function renderWatchlist() {
   const addRow = editMode.watchlist
     ? `<tr class="add-row"><td colspan="20"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
+  applyColOrder("wl-table");
   applyColLabels("wl-table");
 }
 
@@ -6723,6 +6908,8 @@ function quickAddFromWatchlist(ticker, price) {
 
 initSorting("ptf-table", renderTable);
 initSorting("wl-table", renderWatchlist);
+initColDrag("ptf-table", renderTable);
+initColDrag("wl-table", renderWatchlist);
 
 loadData();
 loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
