@@ -2124,6 +2124,17 @@ def _market_date(tz_name, now_utc):
     return (now_utc + timedelta(hours=_SHOCK_FALLBACK_OFFSET.get(tz_name, 0))).date()
 
 
+def _seoul_in_session(now_utc=None):
+    """Borsa di Seoul in contrattazione (09:00-15:30 KST, UTC+9 fisso, niente DST).
+
+    Serve a distinguere un prezzo VERAMENTE live dal semplice ultimo scambio disponibile:
+    fast_info restituisce sempre un valore, anche a mercato chiuso."""
+    t = (now_utc or datetime.now(timezone.utc)) + timedelta(hours=9)
+    if t.weekday() >= 5:
+        return False
+    return 540 <= t.hour * 60 + t.minute < 930
+
+
 def compute_shock_alert(macro, watchlist, now_utc=None):
     """MACRO SHOCK ALERT (v127 session-aware) — riconosce le mattinate di panico: se l'Asia
     (KOSPI) o i futures Nasdaq cedono oltre il -2% mentre Wall Street è chiusa, alza un flag che
@@ -2156,11 +2167,15 @@ def compute_shock_alert(macro, watchlist, now_utc=None):
         chg = r.get("change_pct")
         if chg is None or chg > THR:
             continue
-        if r.get("price_live"):
+        # v176 — `price_live` dice solo che il prezzo viene da fast_info, NON che la borsa sia
+        # aperta: di domenica, con Seoul ferma da venerdì, restava vero e faceva scattare lo shock
+        # su un movimento di due giorni prima, già dentro la chiusura USA di venerdì (contato due
+        # volte). Il "live" ora vale solo se Seoul è DAVVERO in sessione.
+        seoul_today = _market_date("Asia/Seoul", now_utc)
+        if r.get("price_live") and _seoul_in_session(now_utc):
             sources.append({"src": "KOSPI (Asia)", "chg": chg, "basis": "live"})
         else:
             asof = r.get("price_asof")
-            seoul_today = _market_date("Asia/Seoul", now_utc)
             if asof is not None and str(asof) == seoul_today.isoformat():
                 sources.append({"src": "KOSPI (Asia)", "chg": chg, "basis": "candle"})
             else:

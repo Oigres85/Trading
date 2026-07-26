@@ -574,18 +574,21 @@ check("CIO v130: sparkTrendRows scarta gli orizzonti a storia insufficiente (tit
   const r = sparkTrendRows().find(x => x.tk === "TST1");
   DATA.portfolio[0].sparks = saved;
   return r && r.w1 !== null && r.m1 === null && r.m3 === null && r.y1 === null && r.short === true`));
-check("shock client v141: KOSPI LIVE -8% + futures -3% → 2 fonti; recuperato 0% → sparisce; candela STANTIA -8% → esclusa (Allarme Fantasma)", run(`
+check("shock v141→v176: il KOSPI entra solo se Seoul è DAVVERO in sessione; 'live' fuori orario è un fantasma", run(`
   const savedW = DATA.watchlist, savedM = DATA.macro.futures;
-  DATA.watchlist = [{ ticker: "^KS11", change_pct: -8, price_live: true }];
   DATA.macro.futures = { nasdaq: { change_pct: -3 }, sp500: { change_pct: -0.5 } };
-  const s1 = shockSourcesLive();
-  DATA.watchlist = [{ ticker: "^KS11", change_pct: 0, price_live: true }];
-  const s2 = shockSourcesLive();
+  const inSessione = seoulSessionOpen();
+  DATA.watchlist = [{ ticker: "^KS11", change_pct: -8, price_live: true }];
+  const sLive = shockSourcesLive();
   DATA.watchlist = [{ ticker: "^KS11", change_pct: -8, price_live: false, price_asof: "2026-07-16" }];
-  const s3 = shockSourcesLive();   // candela di 2 giorni fa: il gate di sessione la scarta
+  const sStantia = shockSourcesLive();          // candela vecchia: sempre scartata
+  DATA.watchlist = [{ ticker: "^KS11", change_pct: 0, price_live: true }];
+  const sRecuperato = shockSourcesLive();       // nessun crollo: niente fonte KOSPI
   DATA.watchlist = savedW; DATA.macro.futures = savedM;
-  return s1.length === 2 && s1.some(x => x.src === "KOSPI (Asia)") && s2.length === 1 && !s2.some(x => x.src === "KOSPI (Asia)")
-      && s3.length === 1 && !s3.some(x => x.src === "KOSPI (Asia)")`));
+  const kospiIn = (a) => a.some(x => x.src === "KOSPI (Asia)");
+  // il flag "live" vale SOLO dentro l'orario di Seoul: fuori sessione è l'ultimo scambio, non una notizia
+  return kospiIn(sLive) === inSessione && !kospiIn(sStantia) && !kospiIn(sRecuperato)
+      && sStantia.length === 1 && sRecuperato.length === 1`));
 check("shock client v132: usRegularSessionOpen — 12:00 ET feriale aperto, 20:00 ET chiuso, sabato chiuso", run(`
   return usRegularSessionOpen(new Date("2026-07-17T16:00:00Z")) === true
       && usRegularSessionOpen(new Date("2026-07-18T00:00:00Z")) === false

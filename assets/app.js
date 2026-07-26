@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "175";
+const BUILD_VERSION = "176";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1249,7 +1249,14 @@ function shockSourcesLive() {
   // 18) qui reintroduceva l'Allarme Fantasma che la pipeline aveva già soppresso.
   const k = (DATA.watchlist || []).find(r => r.ticker === "^KS11");
   const kc = k ? dgFin(k.change_pct) : null;
-  const kFresh = k && (k.price_live === true || (k.price_asof && String(k.price_asof) === seoulToday()));
+  // v176 — ALLARME FANTASMA, terza incarnazione. Il gate accettava `price_live === true` come prova
+  // di freschezza, ma quel flag dice solo che il prezzo viene da fast_info: di DOMENICA, con Seoul
+  // chiusa da venerdì e price_asof nullo, restava true e faceva scattare lo shock su un -5,72% di
+  // due giorni prima — già dentro la chiusura USA di venerdì, quindi contato due volte. Ora il
+  // "live" vale solo se la borsa di Seoul è DAVVERO in sessione (seoulSessionOpen, v171); fuori
+  // sessione serve una data di rilevazione che sia oggi a Seoul. Su un allarme si sta stretti.
+  const kFresh = k && ((k.price_live === true && seoulSessionOpen())
+    || (k.price_asof && String(k.price_asof).slice(0, 10) === seoulToday()));
   if (kc != null && kc <= THR && kFresh) sources.push({ src: "KOSPI (Asia)", chg: kc });
   return sources;
 }
