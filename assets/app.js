@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "171";
+const BUILD_VERSION = "174";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2027,9 +2027,9 @@ function riskRulesRegistry() {
     { tier: "yellow", label: "Alert concentrazione", th: `singolo nome > ${RISK_PARAMS.capAlert_pct}% NAV`, active: nAl > 0,
       state: nAl > 0 ? `⚠ ${nAl} nomi oltre il 25% NAV` : `nessun nome oltre il 25% NAV`,
       why: "Avviso di rischio idiosincratico quando un singolo titolo supera il 25% del NAV. È un promemoria per una scelta consapevole, MAI un obbligo di trim (Let Winners Run).", where: "motore (decisionVerdict)" },
-    { tier: "yellow", label: "Alert concentrazione settore", th: `> ${Math.round(RISK_PARAMS.sectorAlert_frac * 100)}% azionario`, active: !!(sec && sec.pct > RISK_PARAMS.sectorAlert_frac * 100),
+    { tier: "green", label: "Concentrazione settore (capitale)", th: `contesto, > ${Math.round(RISK_PARAMS.sectorAlert_frac * 100)}% = estrema`, active: !!(sec && sec.pct > RISK_PARAMS.sectorAlert_frac * 100),
       state: sec ? `${sec.name} ${sec.pct}% del capitale azionario` : "n.d.",
-      why: "Il mandato Growth tollera forte esposizione tech come normalità strutturale: l'alert scatta solo su sbilanciamenti estremi (>75%) come promemoria per valutare rotazioni tematiche.", where: "motore + pipeline (allocation)" },
+      why: "Quota di CAPITALE nel primo settore. È contesto, non l'allarme di concentrazione: quello lo dà la CONCENTRAZIONE DI FATTORE, che somma gli MCR e ragiona sulla VARIANZA — la grandezza che determina quanto fa male una giornata storta. Su questo book le due divergono molto (56% di NAV in semi = 86% del rischio).", where: "motore + pipeline (allocation)" },
     { tier: "yellow", label: "Score minimo d'accumulo", th: `≥ ${RISK_PARAMS.minScore}/100`, active: nAcc > 0,
       state: `${nAcc} candidati con edge quant ≥${RISK_PARAMS.minScore}`,
       why: "Solo i titoli il cui score (impatto marginale sullo Sharpe 40% · forza relativa 1M 30% · qualità fondamentale 30%) supera 60 entrano nel piano d'accumulo.", where: "motore (quantScore)" },
@@ -5048,7 +5048,12 @@ function buildPrompt() {
           .forEach(a => { const k = a.sector || a.ticker; bySecR[k] = (bySecR[k] || 0) + (a.value_eur || 0); });
     const invTot = Object.values(bySecR).reduce((s, v) => s + v, 0) || 1;
     const topSec = Object.entries(bySecR).sort((a, b) => b[1] - a[1])[0];
-    if (topSec) riskBits.push(`primo settore: ${topSec[0]} ${Math.round(topSec[1] / invTot * 100)}% del capitale AZIONARIO (base del rischio correlato: liquidità e obbligazioni escluse)${topSec[1] / invTot > RISK_PARAMS.sectorAlert_frac ? ` — ⚠ ALERT: oltre il ${Math.round(RISK_PARAMS.sectorAlert_frac * 100)}% (soglia CEO per sbilanciamenti estremi; il mandato Growth tollera forte esposizione tech — valuta rotazione solo se opportuno)` : " (entro la normalità strutturale del mandato tech/growth)"}`);
+    // v174 — due allarmi settoriali su BASI DIVERSE (questo sul PESO, factorRiskAlert_pct sulla
+    // VARIANZA) si confondevano a vicenda: due campanelli sulla stessa cosa che suonano a soglie
+    // non confrontabili. Il peso resta come CONTESTO — dice quanto capitale c'è — ma il giudizio
+    // di concentrazione passa alla varianza, che è dove questo book è asimmetrico (56% di NAV in
+    // semi vale l'86% del rischio). Un solo allarme, sulla grandezza che fa male.
+    if (topSec) riskBits.push(`primo settore: ${topSec[0]} ${Math.round(topSec[1] / invTot * 100)}% del capitale AZIONARIO (quota di CAPITALE, non di rischio: il giudizio sulla concentrazione lo dà la CONCENTRAZIONE DI FATTORE nel verdetto, che ragiona sulla VARIANZA — su un book a beta disomogenee le due grandezze divergono molto)`);
     void totA;
   }
   if (cashEur > 0 && patrimonio > 0) {
@@ -6094,6 +6099,39 @@ function buildExecutiveDelta() {
   const ndxDay = (qqq && qqq.change_pct != null) ? qqq.change_pct : dgFin(bm.ndx);
   const pday = typeof portfolioDayPct === "function" ? portfolioDayPct() : null;
   const alphaDay = (pday != null && ndxDay != null) ? Math.round((pday - ndxDay) * 100) / 100 : null;
+  // v174 — ALPHA SU BASE COMPARABILE. Le finestre 1S/1M usano gain_pct = rendimento del BOOK
+  // INTERO in EUR (BTP ~15% a volatilità nulla incluso, cambio incluso) confrontato con un indice
+  // AZIONARIO in USD: grandezze non omogenee, e lo scarto è materiale in entrambe le direzioni
+  // (sul run del 26/07: l'alpha 1M passava da ≈0 a -2,9pp una volta reso comparabile).
+  // Qui si ricostruisce il rendimento del solo comparto AZIONARIO in USD dalle serie prezzi,
+  // pesato coi controvalori CORRENTI — assunzione dichiarata: se hai movimentato molto nella
+  // finestra, i pesi di oggi non sono quelli di allora.
+  const alphaEquity = (n) => {
+    const bench = ((DATA.watchlist || []).find(x => x.ticker === "^IXIC")
+      || (DATA.top_etfs || []).find(x => x.ticker === "QQQ") || {});
+    const bs = ((bench.sparks || {}).m6 || []).map(dgFin).filter(x => x != null);
+    if (bs.length <= n) return null;
+    const rendi = (a) => { const i = a.length - 1 - n; return i >= 0 ? a[a.length - 1] / a[i] - 1 : null; };
+    let num = 0, den = 0;
+    for (const r of (DATA.portfolio || [])) {
+      if (!r || r.currency !== "USD" || !(r.qty > 0)) continue;
+      const ss = ((r.sparks || {}).m6 || []).map(dgFin).filter(x => x != null);
+      const x = ss.length > n ? rendi(ss) : null;
+      if (x == null) continue;
+      const v = r.qty * r.price;
+      num += v * x; den += v;
+    }
+    const bm = rendi(bs);
+    if (!den || bm == null) return null;
+    return { ptf: num / den * 100, bm: bm * 100, alpha: (num / den - bm) * 100 };
+  };
+  const a1s = alphaEquity(5), a1m = alphaEquity(22);
+  if (a1s || a1m) {
+    L.push(`· ALPHA DEL PROCESSO (base OMOGENEA: solo comparto AZIONARIO in USD vs Nasdaq Composite, entrambi prezzi — niente BTP, niente cambio; ricostruito dalle serie prezzi ai controvalori CORRENTI, quindi approssimato se hai movimentato molto nella finestra): ${[
+      a1s ? `~1S azionario ${signTxt(Math.round(a1s.ptf * 100) / 100)} vs indice ${signTxt(Math.round(a1s.bm * 100) / 100)} → alpha ${signTxt(Math.round(a1s.alpha * 100) / 100, "pp")}` : null,
+      a1m ? `~1M azionario ${signTxt(Math.round(a1m.ptf * 100) / 100)} vs indice ${signTxt(Math.round(a1m.bm * 100) / 100)} → alpha ${signTxt(Math.round(a1m.alpha * 100) / 100, "pp")}` : null,
+    ].filter(Boolean).join(" · ")}. È QUESTO il verdetto sulla SELEZIONE dei titoli; la riga sopra misura il patrimonio (che include BTP e cambio) e risponde a una domanda diversa.`);
+  }
   L.push(`· BENCHMARK vs Nasdaq 100 (il mandato, proxy QQQ): ${dayLab} fondo ${signTxt(pday)} vs NDX ${signTxt(ndxDay)}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs NDX ${signTxt(ndxTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs NDX ${signTxt(ndxTr("m1"))} (⚠ BASI DIVERSE, non confrontare i tre alpha fra loro: "${dayLab}" è il solo comparto AZIONARIO in USD (BTP e cambio esclusi), mentre 1S e 1M sono il rendimento del book INTERO in EUR — quindi includono il BTP (~15% del book, volatilità ~0, che comprime meccanicamente il rendimento di periodo) e l'effetto cambio su un NAV per il 76% in USD non coperto. Il confronto col NDX, indice azionario in USD, è quindi indicativo sulle finestre lunghe: l'alpha di PERIODO resta il verdetto sul processo, ma il suo SEGNO può dipendere da BTP e EUR/USD prima che dalla selezione dei titoli. Finestre approssimate anche nel tempo: rilevazioni fondo vs sedute indice)`);
   const v = decisionVerdict();
   L.push(`· Verdetto motore: ${v.label} (${dgTxt(v.score, "", 0)}/100)${(v.withPlan || []).length ? ` · candidati (${v.withPlan.length}): ${v.withPlan.slice(0, 6).map(p => p.r.ticker).join(", ")}${v.withPlan.length > 6 ? ", …" : ""}` : ""}`);

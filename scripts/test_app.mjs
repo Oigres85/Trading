@@ -968,6 +968,19 @@ check("v167 cap sulla perdita: a parità di rischio un titolo volatile entra con
   // ordinati per distanza dallo stop crescente, le quantità devono essere DECRESCENTI
   const ord = validi.slice().sort((a, b) => (a.limit - a.stop) - (b.limit - b.stop)).map(qtyMax);
   return ord.every((v, i) => i === 0 || v <= ord[i - 1])`));
+check("v174 alpha comparabile: il processo si misura su base OMOGENEA (equity USD vs indice)", run(`
+  const b = buildExecutiveDelta();
+  const line = b.split("\\n").find(l => l.includes("ALPHA DEL PROCESSO"));
+  if (line == null) return true;                          // serie insufficienti in questo scenario
+  // deve dichiarare la base e l'assunzione sui pesi, e distinguersi dalla riga patrimoniale
+  return /solo comparto AZIONARIO in USD/.test(line) && /niente BTP, niente cambio/.test(line)
+      && /controvalori CORRENTI/.test(line) && /alpha/.test(line)`));
+check("v174 guardie settoriali: una sola sul giudizio (varianza), il peso resta contesto", run(`
+  const p = buildPrompt();
+  const riga = p.split("\\n").find(l => l.includes("primo settore:"));
+  if (riga == null) return true;
+  // la riga sul PESO non deve più emettere un proprio ALERT concorrente
+  return !/⚠ ALERT/.test(riga) && /quota di CAPITALE, non di rischio/.test(riga);`));
 check("v167 concentrazione di fattore: soglia sulla VARIANZA cumulata per settore, non sul peso", run(`
   const dv = decisionVerdict();
   const f = dv.factorRisk;
