@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "178";
+const BUILD_VERSION = "179";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6157,8 +6157,18 @@ function buildExecutiveDelta() {
   }
   L.push(`· BENCHMARK vs Nasdaq 100 (il mandato, proxy QQQ): ${dayLab} fondo ${signTxt(pday)} vs NDX ${signTxt(ndxDay)}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs NDX ${signTxt(ndxTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs NDX ${signTxt(ndxTr("m1"))} (⚠ BASI DIVERSE, non confrontare i tre alpha fra loro: "${dayLab}" è il solo comparto AZIONARIO in USD (BTP e cambio esclusi), mentre 1S e 1M sono il rendimento del book INTERO in EUR — quindi includono il BTP (~15% del book, volatilità ~0, che comprime meccanicamente il rendimento di periodo) e l'effetto cambio su un NAV per il 76% in USD non coperto. Il confronto col NDX, indice azionario in USD, è quindi indicativo sulle finestre lunghe: l'alpha di PERIODO resta il verdetto sul processo, ma il suo SEGNO può dipendere da BTP e EUR/USD prima che dalla selezione dei titoli. Finestre approssimate anche nel tempo: rilevazioni fondo vs sedute indice)`);
   const v = decisionVerdict();
-  L.push(`· Verdetto motore: ${v.label} (${dgTxt(v.score, "", 0)}/100)${(v.withPlan || []).length ? ` · candidati (${v.withPlan.length}): ${v.withPlan.slice(0, 6).map(p => p.r.ticker).join(", ")}${v.withPlan.length > 6 ? ", …" : ""}` : ""}`);
-  // priorità: budget 0, shock, stop violati, earnings ≤7g, veto in ptf, top/worst RS mover
+  // v179 — il VERDETTO non apre piu il payload. Era un DUPLICATO: la stessa etichetta compare
+  // sotto in OUTPUT DEL MOTORE, li' pero' accompagnata dai criteri e dai veti che la giustificano.
+  // In cima, spogliata del ragionamento e con uno score a due cifre che il backtest non ha
+  // validato, faceva una cosa sola: ANCORARE su una conclusione prima di aver visto un solo dato.
+  // Entrambe le risposte LLM reali si sono strutturate attorno all'accettare o rifiutare quel
+  // verdetto: il payload decideva l'agenda del report. Restano i FATTI che impongono una
+  // decisione; il giudizio del motore si legge dove e' argomentato.
+  if ((v.withPlan || []).length) {
+    L.push(`· Candidati del motore oggi (${v.withPlan.length}): ${v.withPlan.slice(0, 6).map(p => p.r.ticker).join(", ")}${v.withPlan.length > 6 ? ", …" : ""} — verdetto, criteri e veti nel blocco OUTPUT DEL MOTORE, dove sono argomentati`);
+  }
+  // PRIORITÀ = solo eventi che impongono una decisione (fatti databili). Il veto in portafoglio
+  // e' stato tolto: e' un GIUDIZIO del motore, non un evento, e vive gia' nel blocco motore.
   const pri = [];
   if (t.budget_operativo_spendibile != null && Math.round(t.budget_operativo_spendibile) <= 0)
     pri.push(`⛔ BUDGET 0 — nessun acquisto eseguibile (ignora cassa/budget di run precedenti, A1)`);
@@ -6169,8 +6179,6 @@ function buildExecutiveDelta() {
   const in7 = (d) => { if (!d) return false; const dd = (new Date(d) - Date.now()) / 86400000; return dd >= 0 && dd <= 7; };
   const earn = (DATA.portfolio || []).filter(r => r.qty && in7(r.earnings_date)).map(r => r.ticker);
   if (earn.length) pri.push(`📅 earnings ≤7g: ${earn.join(", ")}`);
-  const vetoPtf = (v.excluded || []).filter(x => x.r.qty).map(x => x.r.ticker);
-  if (vetoPtf.length) pri.push(`🛑 veto in ptf: ${vetoPtf.join(", ")}`);
   const movers = sparkTrendRows().filter(r => r.drs7 != null).sort((a, b) => b.drs7 - a.drs7);
   if (movers.length) pri.push(`RS Δ7g → top ${movers[0].tk} ${signTxt(movers[0].drs7, "pp")} / worst ${movers[movers.length - 1].tk} ${signTxt(movers[movers.length - 1].drs7, "pp")}`);
   const degr = sparkTrendRows().filter(r => r.degrade).map(r => r.tk);
