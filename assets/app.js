@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "168";
+const BUILD_VERSION = "169";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2069,6 +2069,16 @@ function initRiskEditor() {
     const d = RISK_PARAM_DEFS[+sel.value];
     const v = parseFloat(String(inp.value).replace(",", "."));
     if (!Number.isFinite(v) || v < d.min || v > d.max) { toast(`Valore fuori banda: serve ${d.min}–${d.max}${d.unit}`); return; }
+    // v169 — COERENZA CAP↔ALERT: l'alert deve presidiare la zona che il cap NON governa. Il cap
+    // ferma gli ACQUISTI, quindi oltre il cap ci si arriva solo per APPREZZAMENTO ed è lì che
+    // l'avviso serve. Un alert SOTTO il cap segnala una concentrazione che il sistema stesso ha
+    // appena autorizzato a costruire: allarme che si impara a ignorare. Si avvisa, non si blocca
+    // (indicatori non dettami): il valore viene comunque salvato.
+    const capFuturo = d.key === "capNoAdd_pct" ? v : RISK_PARAMS.capNoAdd_pct;
+    const alertFuturo = d.key === "capAlert_pct" ? v : RISK_PARAMS.capAlert_pct;
+    if (["capNoAdd_pct", "capAlert_pct"].includes(d.key) && alertFuturo < capFuturo) {
+      toast(`⚠ Alert ${fmtNum.format(alertFuturo)}% SOTTO il cap ${fmtNum.format(capFuturo)}%: il sistema ti avviserebbe di una concentrazione che ti ha appena autorizzato a comprare. L'alert va ≥ del cap — salvato lo stesso, ma valuta di allinearlo`, 9000);
+    }
     const ov = ovs(); ov[d.key] = v / d.scale;                       // salvo in scala interna
     ov._savedAt = new Date().toISOString();
     localStorage.setItem("risk_params_overrides", JSON.stringify(ov));
@@ -5095,6 +5105,40 @@ function buildPrompt() {
           return `${base} [ri-arm CANDIDATO se tieni: $${fmtNum.format(ra.stop)} (2×ATR sotto il supporto $${fmtNum.format(x.r.support)}) → rischio aggiuntivo ~€${fmtNum.format(riskEur)} = ${fmtNum.format(x.r.qty)} quote × $${fmtNum.format(Math.round(perShare * 100) / 100)} dal prezzo]`;
         }).join(" · ") + ".");
     }
+    // ═══ v169 — POSIZIONI CHE CHIEDONO UNA DECISIONE + BUDGET DOPO LE VENDITE ═══════════════
+    // Due lacune emerse da un report reale. (1) Le liste che forzano una decisione erano solo
+    // "stop violati" e "candidati": un nome in VETO FORTE senza stop violato — MSTR, che ha pure
+    // la minusvalenza più grande del book e una falsa accelerazione della RS — non compariva in
+    // nessuna, e infatti il report non lo ha nemmeno nominato. (2) Il BUDGET è statico (cassa−ES95)
+    // e la regola A3 lo rende vincolante: un piano che VENDE e COMPRA era costretto a sotto-
+    // investire, perché i proventi delle vendite proposte non entravano da nessuna parte.
+    {
+      const eurusdD = DATA.eurusd || 1.08;
+      const valEur = (r) => (r.val_eur > 0 ? r.val_eur : (r.qty * r.price) / eurusdD);
+      const daDecidere = [];
+      const visti = new Set();
+      for (const x of (dv.stopViolations || [])) {
+        visti.add(x.r.ticker);
+        daDecidere.push({ r: x.r, perche: `stop violato ($${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)})` });
+      }
+      for (const x of (dv.excluded || [])) {
+        const r = x.r;
+        if (!r || !r.qty || visti.has(r.ticker) || String(x.strength || "").toLowerCase() !== "forte") continue;
+        visti.add(r.ticker);
+        daDecidere.push({ r, perche: `VETO FORTE (${(x.why || [])[0] || "value trap"}) su posizione DETENUTA, senza stop violato: nessun evento tecnico la porterà davanti a te da sola` });
+      }
+      if (daDecidere.length) {
+        const liquid = daDecidere.reduce((s, x) => s + valEur(x.r), 0);
+        const bud = DATA?.totals?.budget_operativo_spendibile;
+        lines.push(`· 🔷 POSIZIONI CHE CHIEDONO UNA DECISIONE OGGI (${daDecidere.length}): ` +
+          daDecidere.map(x => {
+            const mv = dgFin(x.r.gain) != null && x.r.gain < 0 ? ` · minusvalenza latente ${fmtEUR.format(Math.round(x.r.gain))}` : "";
+            return `${x.r.ticker} (${fmtNum.format(Math.round(valEur(x.r)))} € — ${x.perche}${mv})`;
+          }).join(" · ") +
+          `. Tenere è una decisione quanto vendere, ma va DICHIARATA: questi nomi non escono da soli dal portafoglio.`);
+        lines.push(`· 💧 BUDGET SE VENDI: il BUDGET OPERATIVO SPENDIBILE (${bud != null ? fmtEUR.format(Math.round(bud)) : "n.d."}) è calcolato sulla CASSA ATTUALE e NON include i proventi delle vendite che stai valutando. Liquidando tutte le ${daDecidere.length} posizioni qui sopra libereresti ~${fmtEUR.format(Math.round(liquid))}, portando il budget a ~${bud != null ? fmtEUR.format(Math.round(bud + liquid)) : "n.d."}. Se il tuo piano include vendite, dimensiona gli acquisti sul budget POST-vendite e dichiaralo — altrimenti il vincolo A3 ti fa sotto-investire.`);
+      }
+    }
     if ((dv.withPlan || []).length) {
       lines.push("· Livelli calcolati dal motore (contesto, ordini limite + stop 2×ATR): " +
         dv.withPlan.map(p => {
@@ -5635,6 +5679,16 @@ function buildPrompt() {
   }
   if (m.forward_pe && m.forward_pe.value != null) {
     const fp = m.forward_pe;
+    // v169 — l'escalation NON può poggiare su un dato vecchio senza dirlo. Il Forward P/E viene
+    // dal WSJ, che gli IP dei runner CI trovano spesso bloccato: in quei run il valore è un
+    // carry-forward fino a 45 giorni. Verificato che non esiste un'alternativa gratuita stabile
+    // (multpl non ha la pagina forward, gurufocus risponde 403, yfinance non espone forwardPE per
+    // gli ETF sull'indice; un proxy calcolato bottom-up sui mega-cap sbaglia ~10%, troppo vicino
+    // alla soglia di 20 per pilotare un verdetto). Quindi: il verdetto sistemico si declassa a
+    // ipotesi quando l'input non è fresco, invece di affermarlo con la stessa sicurezza.
+    const fpAgeDays = (() => { const d = fp.fetched_at || fp.date; if (!d) return null;
+      const t = new Date(d); return isNaN(t) ? null : Math.round((Date.now() - t) / 86400000); })();
+    const fpStale = !!fp.carried || (fpAgeDays != null && fpAgeDays > 21);
     const sysDanger = (m.margin_debt?.pct_of_peak >= 90) && fp.value > 20;
     const carriedTag = (o) => {
       if (!o || !o.carried) return "";
@@ -5642,7 +5696,7 @@ function buildPrompt() {
       const age = d ? Math.round((Date.now() - new Date(d)) / 86400000) : null;
       return `, ⚠ CARRY-FORWARD dal run precedente${d ? ` (rilevato ${String(d).slice(0, 10)}${age != null ? `, ${age}g fa` : ""})` : ""} — la fonte era irraggiungibile: pesalo come dato DATATO, non odierno`;
     };
-    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: NON derivarne tassi di crescita impliciti]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? "RISCHIO SISTEMICO ELEVATO: leva ai massimi + valutazioni tese → vulnerabilità a deleveraging violento." : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva."}`);
+    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: NON derivarne tassi di crescita impliciti]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? (fpStale ? `RISCHIO SISTEMICO da VERIFICARE: leva ai massimi e valutazioni tese porterebbero a un giudizio di vulnerabilità a un deleveraging violento, MA questo Forward P/E non è fresco${fpAgeDays != null ? ` (${fpAgeDays}g)` : ""} — il verdetto poggia su un input datato: confermalo via web prima di usarlo come premessa.` : "RISCHIO SISTEMICO ELEVATO: leva ai massimi + valutazioni tese → vulnerabilità a deleveraging violento.") : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva."}`);
   }
   if (m.credit) {
     let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`;
@@ -5795,13 +5849,13 @@ function buildPrompt() {
   return lines.join("\n");
 }
 
-function toast(msg) {
+function toast(msg, ms = 3200) {
   document.querySelectorAll(".toast").forEach(t => t.remove());
   const el = document.createElement("div");
   el.className = "toast";
   el.textContent = msg;
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2500);
+  setTimeout(() => el.remove(), ms);
 }
 
 /* ============ ANALISI AI (v130) — UN SOLO BOTTONE, un solo flusso ============

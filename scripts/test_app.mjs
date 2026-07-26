@@ -932,6 +932,23 @@ check("v156 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi, PROME
   const iProm = t.lastIndexOf("PROMEMORIA FINALE:");
   // il blocco sintesi sta DOPO la testata ma PRIMA delle tabelle-silo; PROMEMORIA è l'ULTIMA sezione
   return iCorr > 0 && iData > iCorr && iProm > iData && !t.slice(iProm).includes("DATI AL ")`));
+check("v169 decisioni: le detenute in VETO FORTE entrano nella lista anche SENZA stop violato", run(`
+  const p = buildPrompt();
+  const dv = decisionVerdict();
+  const line = p.split("\\n").find(l => l.includes("POSIZIONI CHE CHIEDONO UNA DECISIONE"));
+  const attesi = new Set();
+  (dv.stopViolations || []).forEach(x => attesi.add(x.r.ticker));
+  (dv.excluded || []).forEach(x => { if (x.r && x.r.qty && String(x.strength||"").toLowerCase() === "forte") attesi.add(x.r.ticker); });
+  if (!attesi.size) return line == null;                 // niente da decidere: la riga non deve esserci
+  if (line == null) return false;
+  return [...attesi].every(tk => line.includes(tk));`));
+check("v169 budget: si dichiara che NON include i proventi delle vendite proposte", run(`
+  const p = buildPrompt();
+  const line = p.split("\\n").find(l => l.includes("BUDGET SE VENDI"));
+  const dv = decisionVerdict();
+  const cene = (dv.stopViolations || []).length || (dv.excluded || []).some(x => x.r && x.r.qty && String(x.strength||"").toLowerCase() === "forte");
+  if (!cene) return line == null;
+  return line != null && /NON include i proventi/.test(line) && /budget POST-vendite/.test(line);`));
 check("v167 cap sulla perdita: la quantità massima scende al crescere della distanza dallo stop", run(`
   const p = buildPrompt();
   const line = p.split("\\n").find(l => l.includes("Livelli calcolati dal motore"));
