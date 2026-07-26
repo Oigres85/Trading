@@ -174,13 +174,28 @@ check("v137 _live_is_informative: scambio ≠ chiusura → live vero; identico a
       and not ud._live_is_informative(None, 6820.6))
 
 # ---------- live-market + shock alert (v125): funzioni pure della pipeline ----------
+from datetime import datetime as _dt, timezone as _tz
 check("v125 is_live_market: cripto/futures/indici esteri sì, azioni USA e indici USA no",
       ud.is_live_market("^KS11") and ud.is_live_market("BTC-USD") and ud.is_live_market("NQ=F")
       and not ud.is_live_market("AAPL") and not ud.is_live_market("^IXIC") and not ud.is_live_market("^GSPC"))
-check("v125 compute_shock_alert: KOSPI -8,9% LIVE + futures -2,4% → alert attivo, worst -8,9%",
+# v176: il "live" del KOSPI vale SOLO dentro l'orario di Seoul — l'istante va quindi iniettato,
+# altrimenti l'esito del test dipende da quando lo si esegue (di domenica falliva).
+_SEOUL_APERTA = _dt(2026, 7, 27, 1, 0, tzinfo=_tz.utc)    # lunedì 10:00 KST
+_SEOUL_CHIUSA = _dt(2026, 7, 26, 6, 0, tzinfo=_tz.utc)    # domenica: borsa ferma
+check("v125→v176 compute_shock_alert: KOSPI -8,9% live DENTRO la sessione di Seoul → alert, worst -8,9%",
       (lambda s: s and s["active"] and s["worst_chg"] == -8.9 and len(s["sources"]) == 2)(
           ud.compute_shock_alert({"futures": {"nasdaq": {"change_pct": -2.4}, "sp500": {"change_pct": -0.5}}},
-                                 [{"ticker": "^KS11", "change_pct": -8.9, "price_live": True}])))
+                                 [{"ticker": "^KS11", "change_pct": -8.9, "price_live": True}],
+                                 now_utc=_SEOUL_APERTA)))
+check("v176 allarme fantasma: lo stesso KOSPI 'live' a Seoul CHIUSA non entra fra le fonti",
+      (lambda s: s and len(s["sources"]) == 1 and all(x["src"] != "KOSPI (Asia)" for x in s["sources"]))(
+          ud.compute_shock_alert({"futures": {"nasdaq": {"change_pct": -2.4}, "sp500": {"change_pct": -0.5}}},
+                                 [{"ticker": "^KS11", "change_pct": -8.9, "price_live": True}],
+                                 now_utc=_SEOUL_CHIUSA)))
+check("v176 _seoul_in_session: lunedì 10:00 KST aperta · domenica e sabato chiuse · lunedì 17:00 KST chiusa",
+      ud._seoul_in_session(_SEOUL_APERTA) and not ud._seoul_in_session(_SEOUL_CHIUSA)
+      and not ud._seoul_in_session(_dt(2026, 7, 27, 8, 0, tzinfo=_tz.utc))
+      and not ud._seoul_in_session(_dt(2026, 7, 25, 3, 0, tzinfo=_tz.utc)))
 check("v125 compute_shock_alert: cali sotto soglia (-1,5%) → nessun alert (None)",
       ud.compute_shock_alert({"futures": {"nasdaq": {"change_pct": -1.5}}}, [{"ticker": "^KS11", "change_pct": -1.0}]) is None)
 
@@ -294,6 +309,6 @@ check("umich: i mesi inglesi mappano al numero giusto (June=6, dicembre=12)",
 check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è il motivo del fetcher)",
       _rows[-1][0] > "2026-05-01")
 
-N_CHECKS = 57
+N_CHECKS = 59
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
