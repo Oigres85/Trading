@@ -93,6 +93,11 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
 - `node scripts/test_app.mjs` — test funzioni pure JS (motore, risk, buildPrompt)
 - `python3 scripts/test_update_data.py` — test pipeline (ratchet, risk metrics)
 - `python3 scripts/audit_data.py data/data.json` — gate qualità dati (P/E con EPS<0, MCR, ecc.)
+- `node scripts/backtest_signals.mjs` — NON è un gate: misura retroattivamente se i segnali su cui
+  poggiano i detector (RS, ΔRS, MCR) hanno davvero contenuto predittivo sullo storico già a disco.
+  Dichiara sempre il campione REALE (titoli e date distinte, non le osservazioni sovrapposte) e si
+  rifiuta di generalizzare sotto 5 titoli. Da rieseguire quando lo storico cresce: oggi il campione
+  è troppo piccolo per promuovere o togliere qualunque detector.
 - `node scripts/coherence_check.mjs` — gate COERENZA INTERNA del payload: stessa grandezza con
   valori diversi, freschezza contraddittoria, somme che non tornano, verdetti opposti sullo stesso
   titolo, terminologia divergente, denominatori non dichiarati. È la classe che audit e red team
