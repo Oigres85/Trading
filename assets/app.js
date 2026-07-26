@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "174";
+const BUILD_VERSION = "175";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -310,13 +310,14 @@ async function waitForNewData(prev, tries = 28) {
   for (let i = 0; i < tries; i++) {
     await new Promise(r => setTimeout(r, 15000));
     try {
-      rpLog(`Controllo pubblicazione dati (tentativo ${i + 1}/${tries})…`);
+      rpDone(_rpPending, "ok"); _rpPending = rpLog(`Controllo pubblicazione dati (tentativo ${i + 1}/${tries})…`);
       const d = await fetchData();
       if (d.updated_at !== prev) {
+        rpDone(_rpPending, "ok"); _rpPending = null;   // il tentativo che ha trovato i dati è riuscito
         rpLog("Nuovo data.json ricevuto — rendering della dashboard", "ok");
         DATA = d; renderAll(); return true;
       }
-    } catch { rpLog(`Rete/CDN non pronti, riprovo (tentativo ${i + 1})`, "fail"); }
+    } catch { rpDone(_rpPending, "fail"); _rpPending = null; rpLog(`Rete/CDN non pronti, riprovo (tentativo ${i + 1})`, "fail"); }
   }
   return false;
 }
@@ -349,6 +350,15 @@ function rpLog(msg, status = "info") {
   line.textContent = `${new Date().toLocaleTimeString("it-IT")} ${mark} ${msg}`;
   box.appendChild(line);
   box.scrollTop = box.scrollHeight;
+  return line;
+}
+/* segna come CONCLUSA una riga di log già emessa (si tiene il riferimento all'elemento: cercarla
+   per testo sbagliava bersaglio quando lo stesso messaggio compare più volte) */
+let _rpPending = null;
+function rpDone(el, esito = "ok") {
+  if (!el || !el.classList || !el.classList.contains("rp-info")) return;
+  el.classList.remove("rp-info"); el.classList.add(`rp-${esito}`);
+  el.textContent = el.textContent.replace(" · ", esito === "ok" ? " ✓ " : " ✗ ");
 }
 function showRefreshProgress(est = 150000, stages = REFRESH_STAGES) {
   hideRefreshProgress();
@@ -373,7 +383,13 @@ function setRefreshProgress(pct, msg) {
   const p = document.getElementById("rp-pct"); if (p) p.textContent = Math.round(pct) + "%";
   if (msg) {
     const m = document.getElementById("rp-msg"); if (m) m.textContent = msg;
-    if (msg !== _lastRpMsg) { _lastRpMsg = msg; rpLog(msg); }   // ogni nuovo step → riga di log
+    if (msg !== _lastRpMsg) {
+      // v175 — passare allo step successivo significa che il PRECEDENTE è concluso: va spuntato.
+      // Prima ogni riga restava neutra per tutta la durata e il CEO non vedeva mai un ✓ sulle
+      // singole attività, solo sull'esito finale.
+      rpDone(_rpPending, "ok");
+      _lastRpMsg = msg; _rpPending = rpLog(msg);
+    }
   }
 }
 function finishRefreshProgress(ok) {
@@ -2569,7 +2585,7 @@ function openMarginDebtModal() {
     `<div class="info-line" style="margin-bottom:8px"><b>Cos'è:</b> il debito che gli investitori contraggono presso i broker per comprare titoli a leva. Quando è vicino ai massimi storici indica euforia e fragilità: nelle discese forza vendite a catena (margin call), amplificando i crolli.</div>
      <div class="info-line" style="background:var(--card-2);border-radius:8px;padding:10px;margin-bottom:10px">
        <div style="font-size:13px">Attuale: <b>${bn(md.value)}</b> · <b style="color:${risk.c}">${md.pct_of_peak}% del picco storico</b> · leva <b style="color:${risk.c}">${risk.t}</b></div>
-       <div class="muted" style="font-size:12px;margin-top:3px">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""}${md.qoq != null ? ` · trim. ${signTxt(md.qoq)}` : ""} · picco storico ${bn(md.peak)} · agg. ${md.date}</div>
+       <div class="muted" style="font-size:12px;margin-top:3px">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""}${md.qoq != null ? ` · ultimo mese ${signTxt(md.qoq)}` : ""} · picco storico ${bn(md.peak)} · agg. ${md.date}</div>
      </div>
      <h4 style="margin:8px 0 4px">Storico (ultimi trimestri)</h4>
      <div class="psp-spark">${sparkline(md.history || [])}</div>

@@ -2223,6 +2223,9 @@ def fetch_margin_debt(prev_md=None):
                 return {
                     "value": round(cur), "peak": round(peak),
                     "pct_of_peak": round(cur / peak * 100, 1),
+                    # ⚠ la chiave si chiama "qoq" per ragioni storiche ma contiene la variazione
+                    # MENSILE (mom): la UI la etichettava "trim." — corretto in v175. Non rinominata
+                    # per non rompere i data.json già pubblicati che la CI usa in carry-forward.
                     "yoy": yoy, "qoq": mom, "date": fs[-1][0], "peak_date": peak_date,
                     "series": "FINRA debit balances (mensile)",
                     "history": [round(v) for v in vals[-24:]],
