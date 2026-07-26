@@ -1032,7 +1032,7 @@ check("v164 Sharpe n.d.: la componente 40% è ESCLUSA e dichiarata, non sostitui
   const mente = /impatto marginale sullo Sharpe \\(vs 1 attuale/.test(testo) || /vs 1 attuale/.test(p);
   const dichiara = !/criteri:/.test(testo) || /componente Sharpe \\(40% dello score\\) è ESCLUSA/.test(testo);
   return !mente && dichiara`));
-check("v163 falsa accelerazione: RS 1M che sale col PREZZO che scende = roll-off della finestra, non rimbalzo", run(`
+check("v163-v177 accelerazione RS: la riga porta RS, prezzo della stessa finestra e veto; il giudizio lo da l LLM", run(`
   const r = DATA.portfolio.find(x => x.ticker === "TST2");
   const saved = { s: r.sortino_1y, sp: r.sparks, mh: DATA.metrics_history, news: DATA.news };
   r.sortino_1y = -2.0;                                   // veto FORTE (downside profondo)
@@ -1051,8 +1051,13 @@ check("v163 falsa accelerazione: RS 1M che sale col PREZZO che scende = roll-off
   const su = marketLinkText();
   Object.assign(r, { sortino_1y: saved.s, sparks: saved.sp });
   DATA.metrics_history = saved.mh; DATA.news = saved.news;
-  return giu.includes("FALSA ACCELERAZIONE") && giu.includes("NON è rimbalzato")
-      && su.includes("il prezzo lo conferma") && !su.includes("FALSA ACCELERAZIONE")`));
+  // v177: la riga non emette piu un VERDETTO ("falsa accelerazione") ma i FATTI che permettono
+  // di darlo — RS, prezzo della stessa finestra, benchmark, veto — piu la nota sul roll-off
+  // quando il prezzo scende. Il giudizio e dell LLM: qui si verifica che abbia gli elementi.
+  const haFatti = (t) => /RS 1M /.test(t) && /prezzo /.test(t) && /veto FORTE in essere/.test(t);
+  return haFatti(giu) && haFatti(su)
+      && giu.includes("uscita del crollo precedente dalla finestra")
+      && !su.includes("uscita del crollo precedente dalla finestra")`));
 check("v163 troncamento a 8: le detenute non elencate sono DICHIARATE e restano visibili ai detector", run(`
   const txt = marketLinkText();
   for (const line of txt.split("\\n")) {
@@ -1154,7 +1159,7 @@ check("v159 track record: segnali tutti dello STESSO giorno → dichiarato il li
   DATA.verdict_track = saved;
   return p1.includes("LIMITE STATISTICO DEL CAMPIONE") && p1.includes("NON osservazioni indipendenti")
       && !p2.includes("LIMITE STATISTICO DEL CAMPIONE") && p2.includes("CAMPIONE PICCOLO")`));
-check("v159 meta-divergenza: se i candidati si concentrano nel settore già sovrappesato, il conflitto verdetto-vs-regime è dichiarato", run(`
+check("v159-v177 candidati vs concentrazione: i due numeri affiancati, senza verdetto pre-scritto", run(`
   const savedCap = RISK_PARAMS.capNoAdd_pct, savedNews = DATA.news;
   RISK_PARAMS.capNoAdd_pct = 60;                          // sblocca i detenuti come candidati
   DATA.news = [{ title: "AI chips rally", tickers: [], sentiment: "neu", source: "T", published: "2026-07-24T14:00:00Z" }];
@@ -1170,7 +1175,7 @@ check("v159 meta-divergenza: se i candidati si concentrano nel settore già sovr
   const dominante = top.length >= 2 && top.length / cands.length >= 0.5;
   const expo = (DATA.portfolio || []).filter(r => secOf(r) === Object.keys(by).find(k => by[k] === top))
     .reduce((s, r) => s + (positionWeightPct(r) ?? 0), 0);
-  return (dominante && expo >= 25) ? txt.includes("VERDETTO vs REGIME") : true`));
+  return (dominante && expo >= 25) ? txt.includes("CANDIDATI vs CONCENTRAZIONE") : true`));
 check("v158 cap headroom: OGNI candidato GIÀ detenuto dichiara la capienza residua entro il cap (quote + €)", run(`
   // cap alzato per far entrare fra i candidati un nome DETENUTO (nel fixture i pesi sono alti):
   // senza, withPlan contiene solo watchlist (peso nullo) e l'invariante sarebbe vuoto.

@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "176";
+const BUILD_VERSION = "177";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6526,10 +6526,11 @@ function marketLinkText() {
           return `${r.ticker}${c != null ? ` (corr. media col book ${fmtNum.format(c)})` : ""}`;
         });
         const altTxt = deCorr.length
-          ? ` La via alternativa NON è ipotetica: fra i candidati stessi ci sono ${deCorr.join(", ")} — fuori dal settore dominante${others.some(r => (dgFin(r.avg_corr) ?? 1) < 0.2) ? " e a correlazione bassa col book" : ""}: è lì che lo stesso budget compra diversificazione invece di raddoppiare la scommessa.`
-          : "";
+          ? ` · candidati FUORI da quel settore: ${deCorr.join(", ")}` : " · nessun candidato fuori da quel settore";
         top[1].forEach(tk => sig(tk, "verdict_vs_regime"));
-        divMeta.push(`  ⚑ VERDETTO vs REGIME: il motore dice ${dvL.label} e ${top[1].length} dei ${cands.length} candidati (${top[1].join(", ")}) sono ${top[0]} — settore su cui il book pesa GIÀ ${fmtNum.format(Math.round(expoNow * 10) / 10)}% del NAV e ${fmtNum.format(Math.round(mcrNow * 10) / 10)}% del rischio${wind != null ? `, con vento settoriale ${signTxt(wind)} a 1M` : ""}. Il motore ottimizza titolo per titolo (Sharpe marginale, RS, qualità) e NON vede il portafoglio che ne risulta: seguirlo alla lettera AUMENTA la concentrazione che le tue stesse metriche segnalano.${altTxt} Non è un divieto — è la scelta che devi fare consapevolmente: concentrare ancora sulla convinzione, o usare il budget per de-correlare. Dichiara quale delle due, e perché.`);
+        // il motore ottimizza un titolo per volta e non modella il portafoglio risultante: qui si
+        // espone il fatto (dove sono i candidati vs dove è già il rischio), la lettura è dell'LLM.
+        divMeta.push(`  ⚑ CANDIDATI vs CONCENTRAZIONE: verdetto ${dvL.label} · ${top[1].length} dei ${cands.length} candidati (${top[1].join(", ")}) sono ${top[0]} · esposizione attuale del book su quel settore ${fmtNum.format(Math.round(expoNow * 10) / 10)}% del NAV e ${fmtNum.format(Math.round(mcrNow * 10) / 10)}% della varianza${wind != null ? ` · vento settoriale ${signTxt(wind)} a 1M` : ""}${altTxt}`);
       }
     }
   }
@@ -6540,7 +6541,7 @@ function marketLinkText() {
   for (const r of (dvL && dvL.accumula || [])) {
     const s = losers.get(r.ticker);
     if (s) sig(r.ticker, "relapse");
-    if (s) divRelapse.push(`  ${r.ticker}: torna tra i candidati ACCUMULA (score ${r._q}/100) ma l'ULTIMO segnale del motore su questo nome ha reso ${signTxt(dgFin(s.ret_pct))} (vs NDX ${signTxt(dgFin(s.vs_ndx_pp), "pp")}, ${s.date}) → il motore ci ha già provato e ha perso: la sua fiducia va calibrata su questo, non ripetuta per inerzia`);
+    if (s) divRelapse.push(`  ${r.ticker}: candidato ACCUMULA oggi (score ${r._q}/100) · precedente segnale del motore su questo nome il ${s.date}: reso ${signTxt(dgFin(s.ret_pct))} (vs NDX ${signTxt(dgFin(s.vs_ndx_pp), "pp")})`);
   }
 
   // 3d) nomi in VETO FORTE con la forza relativa che ACCELERA (rimbalzo tecnico vs valore rotto)
@@ -6552,7 +6553,7 @@ function marketLinkText() {
     const rs = rsOf(r), w = wOf(r), m = mcrOf(r);
     if (m != null && w != null && m >= w * 1.6 && m >= 15) {
       sig(r.ticker, "mcr_over_weight");
-      divMcr.push(`  ${r.ticker}: pesa ${fmtNum.format(w)}% del NAV ma genera ${fmtNum.format(m)}% del rischio (${fmtNum.format(Math.round(m / w * 10) / 10)}× il suo peso) → è qui che si decide la volatilità del fondo`);
+      divMcr.push(`  ${r.ticker}: peso ${fmtNum.format(w)}% del NAV · quota di varianza ${fmtNum.format(m)}% (${fmtNum.format(Math.round(m / w * 10) / 10)}× il peso)`);
     }
     // v163: `t.targets` è la lista TRONCATA per la stampa — filtrarci sopra rendeva il detector
     // cieco sui nomi tagliati (ORCL, RS -23pp, il segnale più forte del book, veniva soppresso
@@ -6573,8 +6574,8 @@ function marketLinkText() {
       // Una debolezza relativa lunga un mese resta un fatto: le news fresche NON la spiegano e NON
       // la cancellano. La riga ora tiene insieme le due verità invece di sostituirne una all'altra.
       divTheme.push(priceBlind
-        ? `  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] con RS ${signTxt(rs, "pp")} vs NDX — debolezza relativa maturata su UN MESE, quindi un fatto acquisito e non smentibile dalle news di oggi. Però ${totUnpriced}/${totNews} di quelle news sono POSTERIORI all'ultima chiusura: NON sono ancora nel prezzo e quindi nemmeno in questa RS. Le due cose convivono — il mese dice debolezza, le notizie fresche sono un'ipotesi non ancora votata dal flusso: se decidi sulla narrativa, stai scommettendo contro un mese di prezzo`
-        : `  ${r.ticker}: è nel tema caldo [${nTheme.map(t => t.id).join(", ")}] ma la sua forza relativa è ${signTxt(rs, "pp")} vs NDX → il flusso NON conferma la narrativa delle news`);
+        ? `  ${r.ticker}: nei temi [${nTheme.map(t => t.id).join(", ")}] · RS 1M ${signTxt(rs, "pp")} vs NDX (finestra: 30 giorni) · di quelle news ${totUnpriced}/${totNews} sono POSTERIORI all'ultima chiusura, quindi non ancora nel prezzo né nella RS`
+        : `  ${r.ticker}: nei temi [${nTheme.map(t => t.id).join(", ")}] · RS 1M ${signTxt(rs, "pp")} vs NDX · di quelle news ${totUnpriced}/${totNews} sono posteriori all ultima chiusura`);
     }
     const v = vetoStrong.get(r.ticker);
     if (v) {
@@ -6598,22 +6599,23 @@ function marketLinkText() {
         const lvl = rsNow != null ? ` (RS ora ${signTxt(rsNow, "pp")})` : "";
         const px = p7 != null ? `prezzo ${signTxt(Math.round(p7 * 10) / 10)} a 7g${b7 != null ? ` vs benchmark ${signTxt(Math.round(b7 * 10) / 10)}` : ""}` : "prezzo 7g n.d.";
         sig(r.ticker, realRebound ? "accel_into_veto" : "rs_rolloff_artifact");
-        divAccel.push(realRebound
-          ? `  ${r.ticker}: la forza relativa ACCELERA (${signTxt(d, "pp")} in 7g)${lvl} E il prezzo lo conferma (${px}), ma il nome resta in VETO FORTE (${(v.why || [])[0] || "value trap"}) → qui il momentum contraddice davvero la distruzione di valore di fondo: rimbalzo tecnico da vendere in forza o inversione vera? il track record del nome decide`
-          : `  ${r.ticker}: ATTENZIONE, FALSA ACCELERAZIONE — la RS 1M migliora di ${signTxt(d, "pp")} in 7g${lvl} ma il ${px}: il titolo NON è rimbalzato, è il crollo delle settimane precedenti che ESCE dalla finestra mobile a 30 giorni. Non leggerlo come forza: il nome resta in VETO FORTE (${(v.why || [])[0] || "value trap"}) e sta ancora perdendo terreno${r.stop_violated || (r.qty && stopOf(r) && stopOf(r).violated) ? ", con lo STOP VIOLATO" : ""}`);
+        // NB: la RS 1M è una finestra MOBILE — può migliorare per il solo uscire di un crollo
+        // vecchio, senza alcun rimbalzo. Per questo si stampa accanto il prezzo della STESSA
+        // finestra: i due dati insieme dicono se l'accelerazione ha un movimento sotto o no.
+        divAccel.push(`  ${r.ticker}: RS 1M ${signTxt(d, "pp")} in 7g${lvl} · ${px} · veto FORTE in essere (${(v.why || [])[0] || "value trap"})${r.stop_violated || (r.qty && stopOf(r) && stopOf(r).violated) ? " · STOP VIOLATO" : ""}${realRebound ? "" : " · [la RS sale mentre il prezzo scende: parte del miglioramento viene dall'uscita del crollo precedente dalla finestra a 30 giorni]"}`);
       }
     }
     const st = r.qty ? stopOf(r) : null;
     if (st && st.stop > 0 && r.price > 0 && !st.violated) {
       const dist = (r.price / st.stop - 1) * 100;
       if (dist <= 3 && (w ?? 0) >= 5) sig(r.ticker, "stop_near");
-      if (dist <= 3 && (w ?? 0) >= 5) divStop.push(`  ${r.ticker}: stop a ${signTxt(Math.round(dist * 10) / 10)} dal prezzo su una posizione da ${fmtNum.format(w)}% del NAV → una seduta storta la porta in esecuzione`);
+      if (dist <= 3 && (w ?? 0) >= 5) divStop.push(`  ${r.ticker}: stop a ${signTxt(Math.round(dist * 10) / 10)} dal prezzo · posizione ${fmtNum.format(w)}% del NAV`);
     }
   }
   // la meta-divergenza apre: è la cornice dentro cui vanno lette le altre
   const div = [...divMeta, ...divRelapse, ...divMcr, ...divTheme, ...divAccel, ...divStop];
   if (div.length) {
-    L.push("· DIVERGENZE RILEVATE DAL SISTEMA (contraddizioni nei dati: spiegale, non elencarle):");
+    L.push("· DATI IN TENSIONE (coppie di numeri che il sistema accosta perché raramente stanno insieme; NON sono conclusioni: la lettura, e se ci sia davvero una contraddizione, le decidi tu):");
     L.push(...div.slice(0, 8));
   }
 
