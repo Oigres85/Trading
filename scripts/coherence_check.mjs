@@ -210,6 +210,51 @@ function c8_denominatori(t) {
   } else if (conc) ok("C8 concentrazione settoriale: denominatore dichiarato");
 }
 
+/* ═══════════ C9 — ISTRUZIONI NEL PAYLOAD CHE DUPLICANO LA TESTATA ═══════════════════
+   La classe di difetto piu' insidiosa e ricorrente di questo progetto: il payload che, oltre ai
+   dati, dice all'LLM COSA FARE — ripetendo regole gia' scritte nella Costituzione. Trovata tre
+   volte (v156 "INDIPENDENZA SUL VERDETTO", v179 il verdetto in cima al brief, v180 otto casi piu'
+   l'intero PROMEMORIA FINALE duplicato 6 concetti su 6). Ogni volta era sopravvissuta perche' si
+   guardava solo dove si era appena messo mano. Qui si cerca in modo sistematico: imperativi in
+   seconda persona dentro la CODA (dopo la fine della testata), che sono il marcatore dell'istruzione. */
+function c9_istruzioniDuplicate(t) {
+  const header = (() => { try { return readFileSync(join(ROOT, "config", "prompt_header.txt"), "utf8"); } catch { return ""; } })();
+  const finTestata = header ? t.indexOf(header) + header.length : 0;
+  const coda = finTestata > 0 ? t.slice(finTestata) : t;
+  // imperativi rivolti al lettore: sono istruzioni, e le istruzioni vivono nella testata
+  const IMPERATIVI = /\b(usalo|usali|dichiaralo|dichiarali|non ripeterlo|non rifare|non ricalcolare|valutane|pesalo|pesane|trattal[oa]|non trattarl[oa]|leggilo|non leggerlo|non inseguire|incrocia|segnala l|chiedi conferma|deduci dal|scegli tu|alza gli standard|riduci il sizing)\b/gi;
+  const colpiti = [];
+  for (const linea of coda.split("\n")) {
+    const m = linea.match(IMPERATIVI);
+    if (m) colpiti.push(`"${m[0]}" in «${linea.trim().slice(0, 58)}…»`);
+  }
+  if (colpiti.length) {
+    flag("C9 istruzione nel payload", `la coda contiene ${colpiti.length} imperativ${colpiti.length > 1 ? "i" : "o"} rivolt${colpiti.length > 1 ? "i" : "o"} all'LLM: le istruzioni appartengono alla testata, il payload porta fatti. ${colpiti.slice(0, 4).join(" · ")}`);
+  } else ok("C9 nessun imperativo nella coda: le istruzioni stanno solo nella testata");
+}
+
+/* ═══════════ C10 — RIFERIMENTI A SEZIONI INESISTENTI (I12 generalizzato) ═════════════
+   I12 nel red team controlla un registro FISSO di tre rimandi noti, e proprio per questo si e'
+   lasciato sfuggire "STEP 3" (la testata non ha STEP dal v155) e "regola A4" prima di lui. Qui
+   la ricerca e' per FORMA: qualunque rimando a una sezione strutturata deve trovare il suo
+   bersaglio nel testo completo, testata inclusa. */
+function c10_sezioniInesistenti(t) {
+  const forme = [
+    { re: /\bSTEP\s+(\d+)\b/g, esiste: (n) => new RegExp(`STEP\\s+${n}\\b`).test(t.split(/STEP\s+\d+/)[0] + t) && /\bSTEP\s+\d+\s*[—:-]/.test(t) },
+    { re: /\bregola\s+([A-D]\d)\b/gi, esiste: (n) => new RegExp(`^${n}\\s*—`, "m").test(t) },
+    { re: /\bvedi\s+([A-D]\d)\b/gi, esiste: (n) => new RegExp(`^${n}\\s*—`, "m").test(t) },
+  ];
+  const pendenti = [];
+  for (const f of forme) {
+    for (const m of t.matchAll(f.re)) {
+      if (!f.esiste(m[1])) pendenti.push(`"${m[0]}"`);
+    }
+  }
+  const unici = [...new Set(pendenti)];
+  if (unici.length) flag("C10 riferimento pendente", `il testo rimanda a sezioni che non esistono: ${unici.join(", ")}`);
+  else ok("C10 nessun rimando a sezioni inesistenti");
+}
+
 /* ---------------------------------- esecuzione ---------------------------------- */
 const { testo, ctx } = generaPayload();
 c1_valoriRipetuti(testo);
@@ -220,6 +265,8 @@ c5_soglie(testo);
 c6_terminologia(testo);
 c7_budget(testo);
 c8_denominatori(testo);
+c9_istruzioniDuplicate(testo);
+c10_sezioniInesistenti(testo);
 
 if (VERBOSE) PASSATI.forEach(p => console.log(`  ok   ${p}`));
 if (PROBLEMI.length) {
@@ -227,4 +274,4 @@ if (PROBLEMI.length) {
   PROBLEMI.forEach((p, i) => console.log(`  ${i + 1}. [${p.classe}] ${p.msg}\n`));
   process.exit(1);
 }
-console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 8 classi — nessuna incoerenza interna`);
+console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 10 classi — nessuna incoerenza interna`);

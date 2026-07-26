@@ -102,6 +102,14 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
   Dichiara sempre il campione REALE (titoli e date distinte, non le osservazioni sovrapposte) e si
   rifiuta di generalizzare sotto 5 titoli. Da rieseguire quando lo storico cresce: oggi il campione
   è troppo piccolo per promuovere o togliere qualunque detector.
+- `node scripts/coherence_check.mjs` — gate COERENZA INTERNA del payload. ⚠ REGOLA CHE SI DIMENTICA
+  DI CONTINUO: **le istruzioni vivono SOLO nella testata, il payload porta FATTI**. Ogni volta che si
+  aggiunge una riga al payload la tentazione è spiegare all'LLM cosa farne ("usalo per…", "non
+  ripeterlo", "dichiaralo") — ed è successo tre volte (v156, v179, v180: otto casi più l'intero
+  PROMEMORIA FINALE che duplicava 6 concetti su 6 della testata). C9 lo rileva cercando imperativi
+  in seconda persona nella CODA; C10 rileva i rimandi a sezioni inesistenti per FORMA (STEP n,
+  regola X1), classe che ha già prodotto "A4" e "STEP 3". Prima di aggiungere prosa al payload,
+  chiediti: è un FATTO o è un ORDINE? Se è un ordine, va in config/prompt_header.txt.
 - `node scripts/coherence_check.mjs` — gate COERENZA INTERNA del payload: stessa grandezza con
   valori diversi, freschezza contraddittoria, somme che non tornano, verdetti opposti sullo stesso
   titolo, terminologia divergente, denominatori non dichiarati. È la classe che audit e red team

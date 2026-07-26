@@ -226,11 +226,15 @@ check("prompt v112: [!EARNINGS RISK] sulla riga del piano d'ingresso (Livelli)",
   delete wl.earnings_date;
   const line = p.split("\\n").find(l => l.includes("Livelli calcolati dal motore"));
   return line && line.includes("TSTW") && line.includes("[!EARNINGS RISK: trimestrale " + fut)`));
-check("prompt v112: istruzione di incrocio diario ↔ Tabella A quando il diario è popolato", run(`
-  localStorage.setItem("action_diary", JSON.stringify([{ date: "2026-07-10", text: "acquisto test 10 azioni" }]));
+check("prompt v112→v180: col diario popolato il payload dichiara quale fonte è autoritativa (nota, non istruzione)", run(`
+  const saved = localStorage.getItem("action_diary");
+  localStorage.setItem("action_diary", JSON.stringify([{ date: new Date().toISOString(), text: "comprato 10 TST1 a 100" }]));
   const p = buildPrompt();
-  localStorage.removeItem("action_diary");
-  return p.includes("INCROCIA il diario con la Tabella A") && p.includes("acquisto test 10 azioni")`));
+  if (saved == null) localStorage.removeItem("action_diary"); else localStorage.setItem("action_diary", saved);
+  // v180: niente più imperativi nel payload ("INCROCIA", "segnala", "chiedi conferma" stavano
+  // nella testata e qui erano un doppione); resta il FATTO su quale fonte prevale.
+  return p.includes("DIARIO DELLE AZIONI") && p.includes("la Tabella A è la fonte autoritativa")
+      && !/INCROCIA il diario/.test(p) && !/chiedi conferma al CEO/.test(p)`));
 check("quantScore v112: il riabilitato usa lo Sharpe 6M (regime) e supera la soglia candidati", run(`
   DATA.watchlist.push({ ticker: "TSTR6", name: "Rehab Regime", currency: "USD", price: 100,
     sortino_1y: -0.8, sharpe_1y: -0.5, sharpe_6m: 2.6, rs_1m: 4, rs_ndx_1m: 3.5, sma200_dist_pct: 4.2, w52_dist_pct: -20,
@@ -925,16 +929,15 @@ check("v151→v156 ri-arm: livello CALCOLATO (2×ATR sotto il supporto) + rischi
   // v156: rischio = qty×(PREZZO−ri-arm) = 10×(100−91)=€90, NON qty×(stop violato−ri-arm)=10×19=€190.
   return line != null && line.includes("TST3") && line.includes("ri-arm CANDIDATO se tieni: $91")
       && line.includes("~€90 = 10 quote × $9 dal prezzo") && !line.includes("€190") && !line.includes("$19 ")`));
-check("v156 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi, PROMEMORIA FINALE chiude in coda", run(`
+check("v156→v180 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi (il PROMEMORIA non esiste più)", run(`
   const savedNews = DATA.news;
-  DATA.news = [{ title: "AI boom lifts data center chips", tickers: [], sentiment: "neu", source: "Test" }];   // tema AI/DATACENTER → TST1 (Technology)
+  DATA.news = [{ title: "AI boom lifts data center chips", tickers: [], sentiment: "neu", source: "Test", published: "2026-07-25T02:00:00Z" }];
   const t = typeof buildCIOText === "function" ? buildCIOText() : "";
   DATA.news = savedNews;
   const iCorr = t.indexOf("=== CORRELAZIONI CALCOLATE");
   const iData = t.indexOf("\\nDATI AL ");
-  const iProm = t.lastIndexOf("PROMEMORIA FINALE:");
-  // il blocco sintesi sta DOPO la testata ma PRIMA delle tabelle-silo; PROMEMORIA è l'ULTIMA sezione
-  return iCorr > 0 && iData > iCorr && iProm > iData && !t.slice(iProm).includes("DATI AL ")`));
+  // v180: il PROMEMORIA FINALE è stato rimosso perché duplicava per intero testata [A2] e [D]
+  return iCorr > 0 && iData > iCorr && !t.includes("PROMEMORIA FINALE")`));
 check("v169 decisioni: le detenute in VETO FORTE entrano nella lista anche SENZA stop violato", run(`
   const p = buildPrompt();
   const dv = decisionVerdict();
