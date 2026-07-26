@@ -93,6 +93,10 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
 - `node scripts/test_app.mjs` — test funzioni pure JS (motore, risk, buildPrompt)
 - `python3 scripts/test_update_data.py` — test pipeline (ratchet, risk metrics)
 - `python3 scripts/audit_data.py data/data.json` — gate qualità dati (P/E con EPS<0, MCR, ecc.)
+- `node scripts/backtest_diary.mjs` — NON è un gate: misura le operazioni REALI del CEO annotate
+  nel diario (prezzo di esecuzione vero) contro il prezzo di oggi e contro l'indice, e accanto
+  mostra cosa diceva il sistema quel giorno. Risponde alla domanda che conta — se il sistema stava
+  aiutando o se il CEO faceva meglio da solo — senza chiedergli di inserire nulla di nuovo.
 - `node scripts/backtest_signals.mjs` — NON è un gate: misura retroattivamente se i segnali su cui
   poggiano i detector (RS, ΔRS, MCR) hanno davvero contenuto predittivo sullo storico già a disco.
   Dichiara sempre il campione REALE (titoli e date distinte, non le osservazioni sovrapposte) e si
