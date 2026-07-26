@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "181";
+const BUILD_VERSION = "182";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1160,7 +1160,7 @@ function sessionContextLine() {
   // spingeva a leggere due volte lo stesso movimento (e ha già prodotto un allarme shock fantasma).
   const dmy = (v) => { const t = new Date(String(v).slice(0, 10)); return isNaN(t) ? "" : ` [chiusura del ${String(t.getUTCDate()).padStart(2, "0")}/${String(t.getUTCMonth() + 1).padStart(2, "0")}]`; };
   const lead = [
-    ks && ks.change_pct != null ? `KOSPI ${signTxt(ks.change_pct)}${ks.price_live ? " [LIVE]" : dmy(ks.price_asof)}` : null,
+    ks && ks.change_pct != null ? `KOSPI ${signTxt(ks.change_pct)}${(ks.price_live && seoulSessionOpen()) ? " [LIVE, Seoul in contrattazione]" : " [ultima chiusura di Seoul, borsa ferma]"}` : null,
     fut.nasdaq?.change_pct != null ? `Fut NDX ${signTxt(fut.nasdaq.change_pct)}` : null,
     fut.sp500?.change_pct != null ? `Fut S&P ${signTxt(fut.sp500.change_pct)}` : null,
     btc && btc.change_pct != null ? `BTC ${signTxt(btc.change_pct)} [24/7]` : null,
@@ -5493,7 +5493,10 @@ function buildPrompt() {
     // senza flag l'LLM legge il movimento del giorno PRIMA come se fosse quello corrente.
     // v125: [LIVE] per gli strumenti che scambiano fuori orario USA (KOSPI/BTC/futures): il
     // prezzo è l'ultimo scambio real-time, non la candela stantia. Ha priorità sullo staleTag.
-    const staleTag = r.price_live ? " [LIVE]"
+    // v182: [LIVE] solo se il mercato di quello strumento è DAVVERO in contrattazione. Cripto e
+    // futures scambiano h24; gli indici asiatici no, e fuori orario "live" e' l'ultimo scambio.
+    const liveVero = r.price_live && (/-USD$|=F$/.test(r.ticker || "") || r.ticker !== "^KS11" || seoulSessionOpen());
+    const staleTag = liveVero ? " [LIVE]"
       : (r.price_asof && DATA.updated_at && r.price_asof < DATA.updated_at.slice(0, 10)
         ? ` [chiusura del ${new Date(r.price_asof + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}]` : "");
     const priceCell = `${c}${f(r.price)}${staleTag}${(adjL != null && r.price != null && Math.abs(adjL - r.price) / r.price > 0.001) ? ` → agg. ${c}${f(adjL)} (${r.prepost?.label || "ext"})` : ""}`;

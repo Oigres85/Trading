@@ -899,7 +899,11 @@ check("v149 sessione: con KOSPI/futures/BTC nel fixture gli ANTICIPATORI compaio
   DATA.macro.futures = { nasdaq: { change_pct: 0.27 }, sp500: { change_pct: 0.14 } };
   const p = buildPrompt();
   DATA.watchlist.pop(); delete DATA.macro.futures;
-  return p.includes("ANTICIPATORI: KOSPI +4,5% [LIVE]") && p.includes("Fut NDX +0,27%")`));
+  // v182: il tag dipende dall'orario di Seoul — "live" fuori contrattazione e' l'ultimo scambio,
+  // non una notizia. Il test non puo' quindi fissare l'etichetta: verifica che sia quella GIUSTA
+  // per il momento in cui gira (un test che dipende dall'orologio e' un generatore di falsi allarmi).
+  const attesa = seoulSessionOpen() ? "[LIVE, Seoul in contrattazione]" : "[ultima chiusura di Seoul, borsa ferma]";
+  return p.includes("ANTICIPATORI: KOSPI +4,5% " + attesa) && p.includes("Fut NDX +0,27%")`));
 check("v149 validatore: ordine in RIGA TABELLA markdown (stile Gemini) → ticker/verso/qty/limite estratti", run(`
   const o = parseAIOrders("| **TSTW** | VENDI | ~595 | **$14,31** (agg. after) | — | Violazione stop. (Prezzo $14,25 · Supp. $13,41 · Stop $14,79) | 95/100 |");
   return o.length === 1 && o[0].tk === "TSTW" && o[0].action === "SELL" && o[0].qty === 595 && o[0].limit === 14.31`));
