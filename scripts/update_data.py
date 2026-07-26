@@ -13,6 +13,7 @@ Fonti (tutte gratuite):
 - RSS (solo news sui titoli in portafoglio): CNBC, Bloomberg, Yahoo Finance,
   Investing.com, Google News
 """
+import csv
 import io
 import json
 import logging
@@ -1172,6 +1173,40 @@ def jgb10_yield():
     return last
 
 
+UMICH_MONTHS = {m: i + 1 for i, m in enumerate(
+    ["January", "February", "March", "April", "May", "June",
+     "July", "August", "September", "October", "November", "December"])}
+
+
+def umich_series(n=2):
+    """Fiducia consumatori dalla fonte PRIMARIA (sca.isr.umich.edu).
+
+    Perché esiste: FRED distribuisce UMCSENT con 1-2 mesi di ritardo di LICENZA, quindi il
+    payload mostrava al CIO una rilevazione vecchia come fosse l'ultima disponibile — e non
+    è solo questione di data: nel run del 26/07/2026 FRED dava 44,8 (maggio, minimi storici)
+    mentre la fonte primaria dava già 49,5 (giugno), cioè un RECUPERO del 10,5%. Un dato
+    stantio che punta nella direzione opposta è peggio di un dato dichiarato mancante.
+    Ritorna la stessa forma di fred_series: [(data ISO, valore), ...] in ordine cronologico.
+    """
+    ua = {"User-Agent": "Mozilla/5.0 (Macintosh) AppleWebKit/537.36"}
+    txt = requests.get("https://www.sca.isr.umich.edu/files/tbmics.csv", headers=ua, timeout=20).text
+    out = []
+    for row in csv.DictReader(io.StringIO(txt)):
+        raw = (row.get("ICS_ALL") or "").strip()
+        mese = (row.get("Month") or "").strip()
+        anno = (row.get("YYYY") or "").strip()
+        if not raw or mese not in UMICH_MONTHS or not anno.isdigit():
+            continue
+        try:
+            out.append((f"{int(anno):04d}-{UMICH_MONTHS[mese]:02d}-01", float(raw)))
+        except ValueError:
+            continue
+    if not out:
+        raise ValueError("CSV UMich senza righe valide")
+    out.sort(key=lambda x: x[0])
+    return out[-n:] if n else out
+
+
 def series_fallback(label, primary, fallback=None):
     try:
         return primary()
@@ -1335,7 +1370,7 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! unrate: {e}", file=sys.stderr)
     try:
-        s = fred_series("UMCSENT", 2)
+        s = series_fallback("umich", lambda: umich_series(2), lambda: fred_series("UMCSENT", 2))
         v = s[-1][1]
         indicators.append({"key": "umich", "label": "Fiducia consumatori (UMich)",
                            "value": f"{v}", "date": s[-1][0],

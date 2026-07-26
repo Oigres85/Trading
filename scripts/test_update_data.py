@@ -271,6 +271,29 @@ check("div_yield_frac: senza tasso → fallback al campo % di Yahoo (ORCL 1.39 �
 check("div_yield_frac: cap 30% — un 453% (TLT-like) è errore di unità → None",
       ud.div_yield_frac(None, 84.0, 453.0) is None and ud.div_yield_frac(300.0, 84.0, None) is None)
 
-N_CHECKS = 54
+# --- UMich: parsing della fonte PRIMARIA (offline: si testa il PARSER, non la rete) ---
+_UMICH_CSV = """Month,YYYY,ICS_ALL
+April,2026,49.8
+May,2026,44.8
+June,2026,49.5
+July,2026,
+"""
+_rows = []
+for _r in ud.csv.DictReader(ud.io.StringIO(_UMICH_CSV)):
+    _raw = (_r.get("ICS_ALL") or "").strip()
+    _m = (_r.get("Month") or "").strip()
+    _y = (_r.get("YYYY") or "").strip()
+    if not _raw or _m not in ud.UMICH_MONTHS or not _y.isdigit():
+        continue
+    _rows.append((f"{int(_y):04d}-{ud.UMICH_MONTHS[_m]:02d}-01", float(_raw)))
+_rows.sort(key=lambda x: x[0])
+check("umich: il CSV primario si parsa in (data ISO, valore) ordinati, righe vuote scartate",
+      _rows == [("2026-04-01", 49.8), ("2026-05-01", 44.8), ("2026-06-01", 49.5)])
+check("umich: i mesi inglesi mappano al numero giusto (June=6, dicembre=12)",
+      ud.UMICH_MONTHS["June"] == 6 and ud.UMICH_MONTHS["December"] == 12)
+check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è il motivo del fetcher)",
+      _rows[-1][0] > "2026-05-01")
+
+N_CHECKS = 57
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
