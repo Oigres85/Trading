@@ -366,6 +366,28 @@ function c13_seduteMiste(t, ctx) {
     : "C13 tutte le posizioni alla stessa chiusura");
 }
 
+/* ═══════════ C14 — UNA CODA A ZERO NON SIGNIFICA NESSUN RISCHIO ═════════════════════
+   Trovato riprovando il payload su me stesso (v186). La riga FedWatch diceva "prob. taglio 0%"
+   a tre giorni dal FOMC: vera e inutile, perche' il rischio stava dall'altro lato. Il calcolo
+   della pipeline era (mid-implied)/0.25*100 dentro un max(0,...): con i futures SOPRA il punto
+   medio il valore grezzo era -38, cioe' 38% di probabilita' di RIALZO — esattamente il numero
+   pubblicato da CME FedWatch quel giorno. Il sistema aveva la cifra giusta e la cestinava.
+   L'invariante: se il payload quota una probabilita' a ZERO su una direzione, deve dire qualcosa
+   anche dell'altra. Una riga che ne pubblica una sola a zero e' un'informazione mancante travestita
+   da informazione presente — la forma di errore piu' difficile da notare leggendo. */
+function c14_codaAZero(t) {
+  const riga = (t.match(/^- FedWatch[^\n]*/m) || [])[0];
+  if (!riga) { ok("C14 nessuna riga FedWatch da controllare"); return; }
+  const rami = ["RIALZO", "taglio", "invariato"].filter(r => new RegExp(`${r} \\d+%`).test(riga));
+  const soloZeri = [...riga.matchAll(/(RIALZO|taglio|invariato) (\d+)%/g)].every(m => m[2] === "0");
+  if (rami.length < 2) {
+    flag("C14 probabilità a senso unico", `la riga FedWatch pubblica un solo ramo (${rami[0] || "nessuno"}): `
+      + "se una direzione è a zero il payload deve dire cosa prezza l'altra, altrimenti un 0% si legge come «nessun rischio»");
+  } else if (soloZeri) {
+    flag("C14 tutti i rami a zero", "la riga FedWatch non prezza nulla in nessuna direzione: probabile dato mancante travestito da zero");
+  } else ok(`C14 la riga FedWatch dichiara ${rami.length} rami (${rami.join(", ")}), non una sola coda a zero`);
+}
+
 /* ---------------------------------- esecuzione ---------------------------------- */
 const { testo, ctx } = generaPayload();
 c1_valoriRipetuti(testo);
@@ -381,6 +403,7 @@ c10_sezioniInesistenti(testo);
 c11_grandezzePerTitolo(testo, ctx);
 c12_fattiSopravvissuti(testo);
 c13_seduteMiste(testo, ctx);
+c14_codaAZero(testo);
 
 if (VERBOSE) PASSATI.forEach(p => console.log(`  ok   ${p}`));
 if (PROBLEMI.length) {
@@ -388,4 +411,4 @@ if (PROBLEMI.length) {
   PROBLEMI.forEach((p, i) => console.log(`  ${i + 1}. [${p.classe}] ${p.msg}\n`));
   process.exit(1);
 }
-console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 13 classi — nessuna incoerenza interna`);
+console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 14 classi — nessuna incoerenza interna`);

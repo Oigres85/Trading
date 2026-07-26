@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "186";
+const BUILD_VERSION = "187";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5773,7 +5773,42 @@ function buildPrompt() {
     const yr = m.yield_recession;
     lines.push(`- Curva vs Recessione (storico FRED): spread 10A-2A ${yr.current_curve != null ? (yr.current_curve > 0 ? "+" : "") + yr.current_curve + " pp (chiusura daily, stessa lettura delle righe sopra)" : "—"}${yr.curve_12m_ago != null ? ` (12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago}, media mensile del modello storico)` : ""}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. NB: irripidimento post-inversione → storicamente recessione entro ~12 mesi (curva shiftata di 12m anticipa il calo del PIL).`);
   }
-  if (m.fedwatch && (m.fedwatch.meetings || []).length) lines.push(`- FedWatch prossima riunione ${m.fedwatch.meetings[0].date}: prob. taglio ${m.fedwatch.meetings[0].cut_prob}%`);
+  // v186 — FedWatch mostra il ramo ATTIVO, non solo i tagli. "prob. taglio 0%" era vero e
+  // inutile: a fine luglio 2026 il mercato prezzava un RIALZO al 38% e il payload taceva.
+  // In più: quando Polymarket quota lo stesso evento con un numero diverso, la divergenza è
+  // essa stessa informazione (fonti che non concordano su una riunione a giorni), quindi le
+  // due cifre vanno AFFIANCATE invece di pubblicarne una sola. Sono FATTI: niente giudizio.
+  if (m.fedwatch && (m.fedwatch.meetings || []).length) {
+    const mt = { ...m.fedwatch.meetings[0] };
+    // COMPATIBILITÀ ALL'INDIETRO: data.json lo rigenera il CI su cron, quindi fino al primo run
+    // con la pipeline v186 i `meetings` non hanno hike_prob. Ricavarlo qui dal tasso implicito
+    // evita che il payload resti a metà nel frattempo — sarebbe la stessa mezza verità che il
+    // fix elimina, solo per qualche ora. Stessa formula della pipeline, segno incluso.
+    if (mt.hike_prob == null && m.fedwatch.implied_rate != null && m.fedwatch.target_range) {
+      const [lo, hi] = String(m.fedwatch.target_range).replace("%", "").split("–").map(Number);
+      if (Number.isFinite(lo) && Number.isFinite(hi)) {
+        const quarti = ((lo + hi) / 2 - m.fedwatch.implied_rate) / 0.25 * 100;
+        mt.cut_prob = Math.round(Math.max(0, Math.min(100, quarti)));
+        mt.hike_prob = Math.round(Math.max(0, Math.min(100, -quarti)));
+        mt.hold_prob = Math.max(0, 100 - mt.cut_prob - mt.hike_prob);
+      }
+    }
+    const rami = [];
+    if (mt.hike_prob) rami.push(`RIALZO ${mt.hike_prob}%`);
+    if (mt.cut_prob) rami.push(`taglio ${mt.cut_prob}%`);
+    if (mt.hold_prob != null) rami.push(`invariato ${mt.hold_prob}%`);
+    // stessa riunione quotata su Polymarket? (i mercati di previsione sono già nel payload)
+    const pm = (DATA.predictions || []).find(x => /\bfed\b/i.test(x.question || "") && /increase|hike|raise/i.test(x.question || ""));
+    // il campo di Polymarket in data.json si chiama `yes` ed e' gia' in percentuale (17 = 17%);
+    // si accettano anche le forme 0-1 e `probability` per non dipendere da un solo formato.
+    const pmRaw = pm ? (pm.yes ?? pm.probability) : null;
+    const pmPct = pmRaw != null ? Math.round(pmRaw > 1 ? pmRaw : pmRaw * 100) : null;
+    const scarto = (pmPct != null && mt.hike_prob) ? Math.abs(pmPct - mt.hike_prob) : null;
+    const conf = scarto != null
+      ? ` · lo stesso esito su Polymarket è quotato ${pmPct}%${scarto >= 10 ? ` — le due fonti divergono di ${scarto} punti sulla stessa riunione` : ""}`
+      : "";
+    lines.push(`- FedWatch prossima riunione ${mt.date} (dai futures sui Fed Funds: tasso implicito ${m.fedwatch.implied_rate}% vs punto medio del range attuale): ${rami.join(" · ")}${conf}`);
+  }
   if ((m.tilt || []).length) {
     lines.push("");
     lines.push("ROTAZIONE SETTORIALE/TEMATICA USA (ETF, performance 1M e 3M):");

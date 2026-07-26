@@ -1291,17 +1291,31 @@ def fetch_macro():
         # (stesso calendario FOMC_2026: mai più due liste divergenti nel prompt)
         fomc = [d for d in FOMC_2026
                 if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")]
-        cut_prob = round(max(0, min(100, (mid - implied) / 0.25 * 100)))
+        # v186 — IL SEGNO CONTA, ED ERA BUTTATO VIA.
+        # (mid - implied)/0.25 e' la distanza dal punto medio del range in "quarti di punto":
+        # POSITIVA quando i futures prezzano un tasso PIU BASSO (taglio atteso), NEGATIVA quando
+        # ne prezzano uno PIU ALTO (rialzo atteso). Il max(0, ...) schiacciava a zero tutto il
+        # ramo del rialzo, e il payload stampava "prob. taglio 0%" — vero e inutile, perche' il
+        # rischio stava dall'altra parte. Il 26/07/2026 il valore grezzo era -38,0: cioe' 38% di
+        # probabilita' di RIALZO, esattamente il numero pubblicato da CME FedWatch quel giorno.
+        # Il sistema aveva la cifra giusta e la cestinava a tre giorni dal FOMC.
+        quarti = (mid - implied) / 0.25 * 100
+        cut_prob = round(max(0, min(100, quarti)))
+        hike_prob = round(max(0, min(100, -quarti)))
         meetings = []
         for i, d in enumerate(fomc[:4]):
-            p = min(100, cut_prob + i * 12)      # probabilità cumulativa crescente nel tempo
-            meetings.append({"date": d, "cut_prob": p,
-                             "hold_prob": 100 - p})
+            # la cumulata cresce nel tempo sul ramo ATTIVO: se il mercato prezza rialzi, e' la
+            # probabilita' di rialzo a salire con l'orizzonte, non quella di taglio.
+            pc = min(100, cut_prob + i * 12) if cut_prob else 0
+            ph = min(100, hike_prob + i * 12) if hike_prob else 0
+            meetings.append({"date": d, "cut_prob": pc, "hike_prob": ph,
+                             "hold_prob": max(0, 100 - pc - ph)})
         macro["fedwatch"] = {
             "target_range": f"{target_low:.2f}–{target:.2f}%",
             "implied_rate": implied,
             "delta_bp": round((implied - mid) * 100),
             "next_cut_prob": cut_prob,
+            "next_hike_prob": hike_prob,
             "next_fomc": next_fomc_date(),   # data esplicita della prossima riunione FOMC
             "meetings": meetings,
             # Dot Plot: mediana SEP (Summary of Economic Projections) — da aggiornare a ogni SEP

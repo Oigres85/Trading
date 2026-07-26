@@ -182,6 +182,24 @@ Corretta anche la riga `Δ ultimo run`: la guardia "mercati chiusi" scattava sol
 già ~0, cioè proprio quando non serviva. A borse chiuse un delta NON nullo è l'anomalia da
 spiegare — non è un movimento di prezzo, è l'arrivo progressivo delle barre.
 
+## 🏦 FedWatch: il SEGNO conta (v187)
+
+`cut_prob = max(0, (mid - implied)/0.25*100)`. Quel `max(0, …)` **cancellava il ramo del rialzo**:
+quando i futures prezzano un tasso più ALTO del punto medio, il valore grezzo è negativo e
+significa "rialzo atteso". Il 26/07/2026 valeva **−38,0**, cioè il 38% di probabilità di rialzo
+pubblicato da CME FedWatch quel giorno — verificato su fonte esterna. Il payload stampava
+`prob. taglio 0%` a tre giorni dal FOMC: vero, e inutile, perché il rischio era dall'altra parte.
+
+Ora la pipeline calcola `cut_prob` e `hike_prob` (mutuamente esclusivi per costruzione, 4 test) e
+il payload mostra i **rami attivi** più il confronto con Polymarket sullo stesso evento: il 26/07
+CME 38% contro Polymarket 17%, **21 punti di divergenza fra due fonti sulla stessa riunione**, che
+è informazione a sua volta. `app.js` ricava i rami dal tasso implicito anche quando `data.json` non
+li ha ancora (il CI rigenera su cron: senza fallback il payload resterebbe a metà per ore).
+
+**C14** generalizza la lezione: se il payload quota una probabilità a ZERO su una direzione, deve
+dire cosa prezza l'altra. Una riga che ne pubblica una sola a zero è **informazione mancante
+travestita da informazione presente** — la forma di errore più difficile da notare leggendo.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

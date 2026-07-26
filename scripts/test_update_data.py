@@ -309,6 +309,32 @@ check("umich: i mesi inglesi mappano al numero giusto (June=6, dicembre=12)",
 check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è il motivo del fetcher)",
       _rows[-1][0] > "2026-05-01")
 
-N_CHECKS = 59
+N_CHECKS = 63   # +4 in v186: rami FedWatch (rialzo/taglio) — vedi in fondo al file
+
+# ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
+# Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
+# il valore grezzo e' NEGATIVO — significa rialzo atteso — e il max(0,...) lo azzerava. Il
+# 26/07/2026 valeva -38,0, cioe' il 38% di probabilita' di rialzo pubblicato da CME FedWatch
+# quel giorno: il sistema aveva la cifra esatta e stampava "prob. taglio 0%" a tre giorni dal FOMC.
+def _fedwatch_rami(target_low, target_high, implied):
+    mid = (target_low + target_high) / 2
+    quarti = (mid - implied) / 0.25 * 100
+    return (round(max(0, min(100, quarti))), round(max(0, min(100, -quarti))))
+
+# caso reale del 26/07/2026: futures a 3.72 con range 3.50-3.75
+cut, hike = _fedwatch_rami(3.50, 3.75, 3.72)
+check("fedwatch: futures SOPRA il punto medio → probabilita' di RIALZO, non taglio a zero",
+      cut == 0 and hike == 38)
+# caso simmetrico: futures sotto il punto medio → taglio
+cut, hike = _fedwatch_rami(3.50, 3.75, 3.53)
+check("fedwatch: futures SOTTO il punto medio → probabilita' di TAGLIO", hike == 0 and cut == 38)
+# nessuna aspettativa: entrambi i rami a zero
+cut, hike = _fedwatch_rami(3.50, 3.75, 3.625)
+check("fedwatch: futures AL punto medio → nessun ramo attivo", cut == 0 and hike == 0)
+# i due rami non possono essere entrambi positivi: si escludono per costruzione
+check("fedwatch: rami mutuamente esclusivi su tutto il range",
+      all(not (_fedwatch_rami(3.50, 3.75, x / 100)[0] and _fedwatch_rami(3.50, 3.75, x / 100)[1])
+          for x in range(300, 400)))
+
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
