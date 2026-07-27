@@ -230,6 +230,37 @@ Il test `MOBILE_KEY_COLS` cercava le etichette in `buildFundTable`: riallineato 
 fonte) + guardia nuova che verifica che **nessuna colonna della vecchia vista fondamentale sia
 andata persa nella fusione** — ne aveva già perse due (Financial Health, Target Δ), rimesse.
 
+## 🌏 Il ramo "Seoul aperta" e i rami mai letti (v190)
+
+Il payload ha rami di testo che compaiono solo in certe finestre orarie. Quello di Seoul aperta
+scatta dalle 02:00 CEST del lunedì — quando a New York è ancora domenica — ed **era rimasto non
+letto per tutta la sessione**. Conteneva tre difetti insieme:
+
+1. un IMPERATIVO nella coda ("Pesalo come tale") → C9 lo ha preso appena la finestra si è aperta;
+2. una **contraddizione dentro la stessa riga**: l'etichetta diceva `[ultima chiusura di Seoul,
+   borsa ferma]` mentre il testo diceva "Seoul sta scambiando ora". Entrambi derivavano da v182,
+   che distingueva solo due stati (live / ferma) e non il terzo, che è il più insidioso —
+   **mercato APERTO, dato VECCHIO**. Ora l'etichetta ha tre stati e lo dichiara;
+3. un doppio punto finale.
+
+Lezione: **un difetto in un ramo raro non è raro, è solo invisibile.** I gate girano su un solo
+istante. Quando si aggiunge un ramo temporale, va esercitato — e il test che lo copre deve
+asserire la PROPRIETÀ (l'etichetta non contraddice il testo), non il ramo, altrimenti fallisce
+a orologio come è successo qui.
+
+## 🎚️ Popup maestro-dettaglio con riordino (v191)
+
+`renderPanelPage(titolo, panels, notaVuota, ambito)`: indice a sinistra (voci trascinabili),
+contenuto a destra in un riquadro ampio (modale a 1400px quando contiene `.pp-split`).
+
+L'ordine si persiste in `panelorder_<ambito>` **per titolo di pannello**, non per indice: un
+pannello aggiunto in futuro finisce in coda invece di spostare tutto a caso.
+
+**Propagazione alla dashboard**: le voci macro che hanno una mini-card la trascinano con sé
+(`MACRO_CARD_BY_PANEL` + `applicaOrdineMiniCard`, riapplicato anche all'avvio). Le sezioni della
+scheda titolo **non hanno un elenco corrispondente** nella dashboard, quindi lì l'ordine vale solo
+dentro il popup — è scritto nella nota sotto l'indice invece di fingere una propagazione assente.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

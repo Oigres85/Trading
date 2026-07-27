@@ -886,8 +886,20 @@ check("v149 sessione: fasi deterministiche (lun 08:00 ET=pre-market · mer 12:00
 check("v149→v158 sessione: la riga CONTESTO DI SESSIONE è nel prompt con fase + guida ordini-per-campana (weekend ha la sua guida)", run(`
   const p = buildPrompt();
   return p.includes("CONTESTO DI SESSIONE (ora ET ") &&
+    // v190: il ramo weekend ha DUE varianti — Seoul chiusa e Seoul aperta (che scatta dalle 02:00
+    // CEST del lunedi', quando a New York e' ancora domenica). Il test ne elencava una sola e
+    // falliva a orologio, cioe' proprio nella finestra in cui l'Asia e' l'unica informazione nuova:
+    // un test legato a un ramo invece che alla PROPRIETA' e' un generatore di falsi allarmi.
     (p.includes("PRIMA DELLA CAMPANA") || p.includes("SESSIONE USA APERTA") || p.includes("AFTER-HOURS")
-     || p.includes("WEEKEND, MERCATI CHIUSI"))`));
+     || p.includes("WEEKEND, MERCATI CHIUSI") || p.includes("BORSA ASIATICA APERTA"))`));
+check("v190 sessione: nel ramo Seoul-aperta l'etichetta del KOSPI non contraddice il testo", run(`
+  // la riga si contraddiceva: "[ultima chiusura di Seoul, borsa ferma]" accanto a "Seoul sta
+  // scambiando ora". Lo stato mancante era mercato APERTO + dato VECCHIO, il piu' insidioso.
+  const p = buildPrompt();
+  const riga = p.split("\\n").find(r => r.startsWith("CONTESTO DI SESSIONE")) || "";
+  const diceAperta = riga.includes("BORSA ASIATICA APERTA");
+  const diceFerma = riga.includes("borsa ferma");
+  return !(diceAperta && diceFerma)`));
 check("v158 orologio del prezzo: le news dopo la chiusura USA sono separate da quelle già prezzate", run(`
   const savedN = DATA.news, savedP = DATA.portfolio[0].price_asof, savedC = DATA.portfolio[0].currency;
   DATA.portfolio[0].price_asof = "2026-07-24"; DATA.portfolio[0].currency = "USD";

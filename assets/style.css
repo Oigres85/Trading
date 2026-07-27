@@ -1122,3 +1122,47 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
   .pp-page { max-height: 76vh; }
   .cp-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ═══ v190 — popup maestro-dettaglio: indice a sinistra, contenuto a destra ═══════════ */
+.pp-split { display: grid; grid-template-columns: 250px 1fr; gap: 16px; min-height: 62vh; }
+.pp-nav { border-right: 1px solid var(--border, #262b36); padding-right: 12px; max-height: 74vh; overflow-y: auto; }
+.pp-nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.pp-nav-item { display: flex; align-items: center; gap: 7px; font-size: 12px; line-height: 1.35;
+  padding: 7px 9px; border-radius: 7px; cursor: pointer; color: var(--muted, #93a0b4);
+  border: 1px solid transparent; user-select: none; }
+.pp-nav-item:hover { background: var(--hover, #1a1f29); color: var(--fg, #e6ebf2); }
+.pp-nav-item.is-active { background: var(--hover, #1a1f29); color: var(--fg, #e6ebf2);
+  border-color: var(--accent, #4c8dff); font-weight: 600; }
+.pp-nav-txt { flex: 1; }
+.pp-drag { opacity: .35; font-size: 11px; cursor: grab; letter-spacing: -1px; }
+.pp-nav-item.pp-dragging { opacity: .45; }
+.pp-nav-item.pp-over { border-color: var(--accent, #4c8dff); border-style: dashed; }
+.pp-nav-note { font-size: 10.5px; line-height: 1.45; padding: 10px 9px 0; }
+.pp-detail { max-height: 74vh; overflow-y: auto; padding-right: 6px; font-size: 13px; }
+.pp-pane { display: none; }
+.pp-pane.is-active { display: block; }
+.pp-detail .pp-h { margin: 0 0 12px; font-size: 15px; color: var(--accent, #4c8dff); }
+.pp-detail .info-line, .pp-detail .sd-row { font-size: 13px; }
+.pp-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 12px; }
+.pp-actions .btn { font-size: 11px; }
+
+@media (max-width: 860px) {
+  .pp-split { grid-template-columns: 1fr; min-height: 0; }
+  .pp-nav { border-right: 0; border-bottom: 1px solid var(--border, #262b36); padding: 0 0 10px; max-height: 30vh; }
+  .pp-nav-list { flex-direction: row; flex-wrap: wrap; }
+  .pp-nav-item { font-size: 11px; padding: 5px 8px; }
+  .pp-detail { max-height: 52vh; }
+}
+
+/* v190 — la modale che ospita il maestro-dettaglio deve essere LARGA: con l'indice fisso a
+   250px, una modale da 920px lasciava al contenuto poco più di 600px. Richiesta esplicita del
+   CEO ("aumenta dimensioni del box per facilitare la lettura"). Si allarga solo quando dentro
+   c'è una .pp-split, così le altre modali restano come sono. */
+.modal-chart:has(.pp-split) { max-width: 1400px; width: 96vw; max-height: 92vh; }
+.modal-chart:has(.pp-split) .pp-split { grid-template-columns: 270px minmax(0, 1fr); min-height: 68vh; }
+.modal-chart:has(.pp-split) .pp-detail { max-height: 78vh; font-size: 13.5px; line-height: 1.55; }
+.modal-chart:has(.pp-split) .pp-nav { max-height: 78vh; }
+/* fallback per browser senza :has() — Safari lo supporta dal 15.4, ma non si dà per scontato */
+@supports not selector(:has(*)) {
+  .modal-chart { max-width: 1400px; width: 96vw; }
+}

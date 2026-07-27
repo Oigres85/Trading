@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "188";
+const BUILD_VERSION = "191";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1242,7 +1242,14 @@ function sessionContextLine() {
   // spingeva a leggere due volte lo stesso movimento (e ha già prodotto un allarme shock fantasma).
   const dmy = (v) => { const t = new Date(String(v).slice(0, 10)); return isNaN(t) ? "" : ` [chiusura del ${String(t.getUTCDate()).padStart(2, "0")}/${String(t.getUTCMonth() + 1).padStart(2, "0")}]`; };
   const lead = [
-    ks && ks.change_pct != null ? `KOSPI ${signTxt(ks.change_pct)}${(ks.price_live && seoulSessionOpen()) ? " [LIVE, Seoul in contrattazione]" : " [ultima chiusura di Seoul, borsa ferma]"}` : null,
+    // v190 — TRE stati, non due. Il v182 ne distingueva solo "live" e "borsa ferma", e quando
+    // Seoul apriva mentre lo snapshot era ancora quello di ieri l'etichetta diceva "borsa ferma"
+    // nella stessa riga in cui il testo di sessione diceva "Seoul sta scambiando ora": la riga
+    // si contraddiceva da sola. Lo stato mancante e' il piu' insidioso — mercato APERTO, dato VECCHIO.
+    ks && ks.change_pct != null ? `KOSPI ${signTxt(ks.change_pct)}${
+      (ks.price_live && seoulSessionOpen()) ? " [LIVE, Seoul in contrattazione]"
+      : seoulSessionOpen() ? " [Seoul APERTA ora, ma questo valore è l'ultima chiusura: lo snapshot non è ancora aggiornato]"
+      : " [ultima chiusura di Seoul, borsa ferma]"}` : null,
     fut.nasdaq?.change_pct != null ? `Fut NDX ${signTxt(fut.nasdaq.change_pct)}` : null,
     fut.sp500?.change_pct != null ? `Fut S&P ${signTxt(fut.sp500.change_pct)}` : null,
     btc && btc.change_pct != null ? `BTC ${signTxt(btc.change_pct)} [24/7]` : null,
@@ -1258,7 +1265,7 @@ function sessionContextLine() {
   const nUnp = (() => { try { return newsSplitByClose().unpriced.length; } catch { return 0; } })();
   const asiaViva = seoulSessionOpen();
   const guida = (s.phase === "weekend" && asiaViva)
-    ? `WEEKEND a New York MA BORSA ASIATICA APERTA (Seoul sta scambiando ora; apertura USA tra ~${hrs}h): questa è la finestra in cui l'Asia è l'UNICA informazione nuova. Il KOSPI qui NON è un dato di venerdì: è il primo mercato che vota sulle notizie del fine settimana, e storicamente anticipa la direzione dei semiconduttori. Pesalo come tale, insieme ai futures USA se già quotati.`
+    ? `WEEKEND a New York MA BORSA ASIATICA APERTA (Seoul sta scambiando ORA; apertura USA tra ~${hrs}h). ATTENZIONE ALLA FRESCHEZZA: la borsa coreana è aperta, ma il valore del KOSPI qui sopra viene dallo snapshot della pipeline e NON è aggiornato in tempo reale — è l'ultima chiusura, non la seduta in corso. Storicamente il primo mercato che vota sulle notizie del fine settimana è l'Asia, e i semiconduttori coreani sono i più correlati a questo book${nUnp ? `; le ${nUnp} notizie non ancora prezzate sono elencate sotto` : ""}`
     : s.phase === "weekend"
     ? `WEEKEND, MERCATI CHIUSI (apertura tra ~${hrs}h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA.${nUnp ? ` Il segnale fresco di questo run sono le ${nUnp} NOTIZIE arrivate dopo la campana, che il prezzo non ha ancora votato:` : " Nessuna notizia nuova dopo la campana:"} gli ordini valgono per l'apertura di lunedì, a limite, mai a mercato`
     : beforeBell
@@ -3999,10 +4006,11 @@ function openStockCard(ticker) {
       ${hasOptions(r.ticker) ? `<button class="btn btn-ghost btn-sm" data-card-opt="${esc(r.ticker)}">⛓ Catena opzioni</button>` : ""}
       <a class="btn btn-ghost btn-sm" href="${tv}" target="_blank" rel="noopener">TradingView ↗</a>
     </div>`;
-  renderPanelPage(`${r.name} (${r.ticker})`, panels, "Nessun dettaglio disponibile per questo titolo.");
+  PANEL_LAST_TICKER = ticker;
+  renderPanelPage(`${r.name} (${r.ticker})`, panels, "Nessun dettaglio disponibile per questo titolo.", "titolo");
   // le azioni vanno in cima, sotto il titolo: sono le due viste che NON sono testo
-  const page = document.querySelector("#chart-modal-body .pp-page");
-  if (page) page.insertAdjacentHTML("afterbegin", azioni);
+  const nav = document.querySelector("#chart-modal-body .pp-nav");
+  if (nav) nav.insertAdjacentHTML("afterbegin", azioni);
 }
 
 /* ═══ DETTAGLI MACRO IN UNA PAGINA SOLA (v188) — bottone "Dettagli macro".
@@ -4027,8 +4035,7 @@ function openMacroDetails() {
   // leggono da MACRO_INFO, che e' gia' il registro di quei pannelli: nessun secondo elenco da
   // tenere allineato (la classe di difetto che ha prodotto C10 e C12).
   for (const k of Object.keys(MACRO_INFO || {})) tasks.push({ label: null, run: () => openMacroInfo(k) });
-  renderPanelPage("Dettagli macro — tutto in una pagina", collectPanels(tasks),
-    "Dati macro non ancora caricati.");
+  renderPanelPage("Dettagli macro", collectPanels(tasks), "Dati macro non ancora caricati.", "macro");
 }
 
 function collectPanels(tasks) {
@@ -4045,17 +4052,110 @@ function collectPanels(tasks) {
   } finally { openInfoModal = orig; }
   return out;
 }
-/* rende i pannelli raccolti in UNA pagina scorrevole con indice cliccabile in cima */
-function renderPanelPage(titolo, panels, notaVuota) {
-  if (!panels.length) { openInfoModal(titolo, `<div class="muted" style="font-size:12px">${notaVuota || "Nessun dettaglio disponibile."}</div>`); return; }
-  const slug = (t, i) => "pp-" + i + "-" + String(t).toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 30);
-  const indice = panels.length > 1
-    ? `<nav class="pp-index">${panels.map((p, i) => `<a href="#${slug(p.title, i)}">${esc(p.title)}</a>`).join("")}</nav>`
-    : "";
-  const corpo = panels.map((p, i) =>
-    `<section class="pp-sec" id="${slug(p.title, i)}"><h3 class="pp-h">${esc(p.title)}</h3>${p.bodyHTML}</section>`).join("");
-  openInfoModal(titolo, `<div class="pp-page">${indice}${corpo}</div>`);
+/* rende i pannelli raccolti in una pagina MAESTRO-DETTAGLIO: indice a sinistra (riordinabile
+   per trascinamento), contenuto a destra in un riquadro ampio. v190, richiesta CEO.
+   L'ordine si persiste per "ambito" (macro / titolo) e — dove esiste una corrispondenza — si
+   propaga alla dashboard: le voci macro che hanno una mini-card la spostano con sé. Per le
+   sezioni della scheda titolo NON esiste un elenco corrispondente nella dashboard, quindi lì
+   l'ordine vale solo dentro il popup: dirlo è meglio che fingere una propagazione che non c'è. */
+const panelOrderKey = (ambito) => `panelorder_${ambito}`;
+function loadPanelOrder(ambito) {
+  try { const a = JSON.parse(localStorage.getItem(panelOrderKey(ambito)) || "null"); return Array.isArray(a) ? a : null; }
+  catch { return null; }
 }
+function savePanelOrder(ambito, titoli) {
+  try { localStorage.setItem(panelOrderKey(ambito), JSON.stringify(titoli)); } catch { /* quota */ }
+}
+/* ordina i pannelli secondo la preferenza salvata; i nuovi (non ancora in elenco) restano in coda
+   nell'ordine originale, così un pannello aggiunto in futuro non sparisce né va a caso */
+function ordinaPannelli(ambito, panels) {
+  const pref = loadPanelOrder(ambito);
+  if (!pref) return panels;
+  const pos = new Map(pref.map((t, i) => [t, i]));
+  return panels.slice().sort((a, b) => (pos.has(a.title) ? pos.get(a.title) : 1e6) - (pos.has(b.title) ? pos.get(b.title) : 1e6));
+}
+/* le voci macro che hanno una mini-card nella dashboard: riordinare nel popup riordina anche quelle */
+const MACRO_CARD_BY_PANEL = {
+  "MacroQuant — ciclo economico": "macroquant-box",
+  "BofA Bear-Market Signposts": "signposts-box",
+  "Rotazione settoriale": "tilt-box",
+  "Stagionalità": "seasonality-box",
+  "Sharpe del portafoglio": "sharpe-box",
+  "Rischio cambio EUR/USD": "fx-box",
+  "Margin Debt — leva a credito": "margin-debt-box",
+};
+function applicaOrdineMiniCard() {
+  const cont = document.querySelector(".mini-cards");
+  if (!cont) return;
+  const pref = loadPanelOrder("macro");
+  if (!pref) return;
+  for (const titolo of pref) {
+    const id = MACRO_CARD_BY_PANEL[titolo];
+    const el = id && document.getElementById(id);
+    if (el) cont.appendChild(el);          // appendChild sposta: l'ordine segue quello dei pannelli
+  }
+}
+function renderPanelPage(titolo, panels, notaVuota, ambito) {
+  if (!panels.length) { openInfoModal(titolo, `<div class="muted" style="font-size:12px">${notaVuota || "Nessun dettaglio disponibile."}</div>`); return; }
+  const ord = ambito ? ordinaPannelli(ambito, panels) : panels;
+  const voci = ord.map((p, i) =>
+    `<li class="pp-nav-item${i === 0 ? " is-active" : ""}" draggable="true" data-idx="${i}" title="${esc(p.title)} — trascina per riordinare">
+       <span class="pp-drag" aria-hidden="true">⠿</span><span class="pp-nav-txt">${esc(p.title)}</span></li>`).join("");
+  const corpi = ord.map((p, i) =>
+    `<section class="pp-pane${i === 0 ? " is-active" : ""}" data-pane="${i}">
+       <h3 class="pp-h">${esc(p.title)}</h3>${p.bodyHTML}</section>`).join("");
+  const nota = ambito === "macro"
+    ? `<div class="pp-nav-note muted">Trascina per riordinare: l'ordine si applica anche alle schede macro della dashboard.</div>`
+    : ambito ? `<div class="pp-nav-note muted">Trascina per riordinare le sezioni di questa scheda.</div>` : "";
+  openInfoModal(titolo, `<div class="pp-split" data-ambito="${esc(ambito || "")}">
+      <nav class="pp-nav"><ul class="pp-nav-list">${voci}</ul>${nota}</nav>
+      <div class="pp-detail">${corpi}</div>
+    </div>`);
+  wirePanelPage(ord.map(p => p.title), ambito);
+}
+/* selezione + trascinamento nell'indice */
+function wirePanelPage(titoli, ambito) {
+  const root = document.querySelector("#chart-modal-body .pp-split");
+  if (!root) return;
+  const mostra = (i) => {
+    root.querySelectorAll(".pp-nav-item").forEach(el => el.classList.toggle("is-active", Number(el.dataset.idx) === i));
+    root.querySelectorAll(".pp-pane").forEach(el => el.classList.toggle("is-active", Number(el.dataset.pane) === i));
+    const d = root.querySelector(".pp-detail"); if (d) d.scrollTop = 0;
+  };
+  root.querySelector(".pp-nav-list")?.addEventListener("click", (e) => {
+    const it = e.target.closest(".pp-nav-item"); if (it) mostra(Number(it.dataset.idx));
+  });
+  if (!ambito) return;
+  let from = null;
+  const lista = root.querySelector(".pp-nav-list");
+  lista?.addEventListener("dragstart", (e) => {
+    const it = e.target.closest(".pp-nav-item"); if (!it) return;
+    from = Number(it.dataset.idx); it.classList.add("pp-dragging"); e.dataTransfer.effectAllowed = "move";
+  });
+  lista?.addEventListener("dragend", (e) => {
+    e.target.closest(".pp-nav-item")?.classList.remove("pp-dragging");
+    lista.querySelectorAll(".pp-nav-item").forEach(x => x.classList.remove("pp-over"));
+  });
+  lista?.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    const it = e.target.closest(".pp-nav-item"); if (!it) return;
+    lista.querySelectorAll(".pp-nav-item").forEach(x => x.classList.toggle("pp-over", x === it));
+  });
+  lista?.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const it = e.target.closest(".pp-nav-item"); if (!it || from == null) return;
+    const to = Number(it.dataset.idx);
+    if (from === to) return;
+    const nuovo = titoli.slice();
+    nuovo.splice(to, 0, ...nuovo.splice(from, 1));
+    savePanelOrder(ambito, nuovo);
+    if (ambito === "macro") applicaOrdineMiniCard();
+    // si ridisegna il popup con il nuovo ordine, restando aperti sulla voce spostata
+    if (ambito === "macro") openMacroDetails(); else if (PANEL_LAST_TICKER) openStockCard(PANEL_LAST_TICKER);
+    toast("Ordine aggiornato" + (ambito === "macro" ? " — anche nelle schede macro della dashboard" : ""));
+  });
+}
+let PANEL_LAST_TICKER = null;
 
 function openInfoModal(title, bodyHTML) {
   $("#chart-modal-title").textContent = title;
@@ -5242,12 +5342,42 @@ function buildPrompt() {
   if (m.seasonality && m.seasonality.score != null) {
     const se = m.seasonality;
     const cm = MONTH_NAMES[(se.current_month || 1) - 1];
-    lines.push(`STAGIONALITÀ (${cm}): score ${se.score}/100 (${se.label})${se.sp_score != null ? ` · S&P ${se.sp_score}` : ""}${se.ndx_score != null ? ` · Nasdaq ${se.ndx_score}` : ""} — tendenza statistica storica del mese, da usare come contesto di probabilità.`);
+    // v189 — QUANDO IL MESE STA FINENDO, LA STAGIONALITÀ DEL MESE CORRENTE È GIÀ SPESA.
+    // Il 26/07 restavano tre sedute di luglio e il payload pubblicava solo "STAGIONALITÀ
+    // (Luglio): 75/100 Favorevole": un contesto di probabilità che vale per il passato mentre
+    // gli ordini valgono per le settimane successive. I dati del mese seguente sono GIÀ in
+    // data.json (serie a 12 mesi), non serviva altro che leggerli. Si aggiunge solo negli
+    // ultimi giorni del mese: prima sarebbe rumore.
+    const gg = new Date();
+    const ultimoDelMese = new Date(gg.getFullYear(), gg.getMonth() + 1, 0).getDate();
+    const restano = ultimoDelMese - gg.getDate();
+    let seaProx = "";
+    if (restano <= 7 && Array.isArray(se.sp500) && Array.isArray(se.ndx)) {
+      const mProx = ((se.current_month || gg.getMonth() + 1) % 12) + 1;
+      const sp = se.sp500.find(x => x.m === mProx), nd = se.ndx.find(x => x.m === mProx);
+      if (sp || nd) {
+        const sc = sp && nd ? Math.round((sp.score + nd.score) / 2) : (sp || nd).score;
+        seaProx = ` · ⏭ ${MONTH_NAMES[mProx - 1].toUpperCase()} (mancano ${restano} giorni alla fine del mese, quindi è la finestra che conta per gli ordini di adesso): score ${sc}/100`
+          + (sp ? ` · S&P ${sp.score} (media storica ${signTxt(sp.avg)}, positivo nel ${fmtNum.format(sp.pos)}% degli anni su ${sp.n})` : "")
+          + (nd ? ` · Nasdaq ${nd.score}` : "");
+      }
+    }
+    lines.push(`STAGIONALITÀ (${cm}): score ${se.score}/100 (${se.label})${se.sp_score != null ? ` · S&P ${se.sp_score}` : ""}${se.ndx_score != null ? ` · Nasdaq ${se.ndx_score}` : ""} ${seaProx} · tendenza statistica storica del mese, da usare come contesto di probabilità.`);
   }
   // SINTESI NEWS (tono complessivo)
   if ((DATA.news || []).length) {
-    const ns = newsSummary(DATA.news);
-    lines.push(`SINTESI NEWS: tono ${ns.tone.t} su ${ns.tot} notizie (${ns.bull} positive, ${ns.neu} neutre, ${ns.bear} negative).`);
+    // v189 — IL TONO SI CALCOLA SULLE NOTIZIE, NON SULLE QUOTAZIONI DI POLYMARKET.
+    // DATA.news contiene anche le righe dei mercati di previsione ("… — probabilità Sì 30%"),
+    // che hanno sentiment "neutral" per costruzione: finivano nel conteggio del tono gonfiando
+    // il denominatore e diluendo il segnale. Il payload dichiarava percio' DUE totali diversi
+    // per la stessa grandezza — "48 news" nei catalizzatori (gia' filtrate da isRealNews) e
+    // "53 notizie" nella sintesi — senza dire che le basi erano diverse. Stessa classe di
+    // HY/IG: due denominatori sotto un nome solo. Ora la base e' UNA, ed e' dichiarata.
+    const newsVere = (DATA.news || []).filter(isRealNews);
+    const ns = newsSummary(newsVere);
+    const scartate = (DATA.news || []).length - newsVere.length;
+    lines.push(`SINTESI NEWS: tono ${ns.tone.t} su ${ns.tot} notizie (${ns.bull} positive, ${ns.neu} neutre, ${ns.bear} negative)`
+      + (scartate > 0 ? ` — base: le sole notizie vere, escluse ${scartate} righe di mercati di previsione che stanno nel loro blocco (MERCATI DI PREVISIONE) e non hanno un tono giornalistico.` : "."));
   }
   // OUTPUT DEL MOTORE DELLA DASHBOARD — solo DATI di contesto sul posizionamento interno.
   // In modalità standby l'AI NON deve commentarli operativamente né trasformarli in raccomandazioni.
@@ -6252,9 +6382,23 @@ function buildExecutiveDelta() {
   // A mercati chiusi un delta NON nullo e' l'anomalia da spiegare: non e' un movimento di
   // prezzo (i prezzi sono fermi), e' l'arrivo progressivo delle barre di chiusura per titoli
   // diversi. Presentarlo come "-0,41%" invitava a leggerlo come una perdita del weekend.
+  // seduta a cui e' prezzato il book ADESSO: e' l'unico elemento verificabile che si puo'
+  // offrire al lettore per capire da solo se lo scarto e' spiegato dalle barre.
+  const dateBook = [...new Set((DATA.portfolio || []).filter(r => r.qty && r.currency !== "EUR" && r.price_asof).map(r => r.price_asof))].sort();
+  const sedutaOra = dateBook.length === 1
+    ? ` — ora il book è prezzato tutto alla chiusura del ${new Date(dateBook[0] + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}`
+    : dateBook.length > 1 ? ` — ora il book è prezzato su ${dateBook.length} sedute diverse (vedi l'avviso sopra)` : "";
   const dLastTxt = !closedNow ? `Δ ultimo run ${signTxt(dLast)}`
     : (dLast != null && Math.abs(dLast) >= 0.05)
-      ? `Δ ultimo run ${signTxt(dLast)} — NON è un movimento di mercato: a borse chiuse i prezzi sono fermi, e questo scarto viene dall'arrivo della barra di chiusura per titoli che nel run precedente erano ancora alla seduta prima`
+      // v189 — PRIMA QUESTA RIGA ASSERIVA LA CAUSA, e il sistema non la conosce.
+      // Il v186 diceva "questo scarto viene dall'arrivo della barra di chiusura": in quel caso
+      // era vero, ma il testo valeva per QUALUNQUE delta non nullo a mercati chiusi. Se domani
+      // lo scarto nascesse da una modifica delle posizioni, il payload dichiarerebbe con
+      // sicurezza una causa falsa — e una spiegazione sbagliata detta con certezza è peggio di
+      // nessuna spiegazione. Ora afferma solo ciò che SA (non è un movimento di prezzo, perché
+      // le borse sono chiuse) ed elenca le cause possibili senza sceglierne una. L'unico dato
+      // verificabile che può aggiungere lo aggiunge: a quale seduta è prezzato il book adesso.
+      ? `Δ ultimo run ${signTxt(dLast)} — NON è un movimento di mercato (a borse chiuse i prezzi sono fermi): nasce dall'aggiornamento dei DATI fra i due run. Le cause possibili sono l'arrivo della barra di chiusura per titoli che prima erano fermi alla seduta precedente, oppure una modifica delle posizioni; il sistema non distingue quale delle due, quindi non lo afferma${sedutaOra}`
       : `Δ ultimo run ~0% (mercati CHIUSI: prezzi identici per costruzione — il nuovo di questo run NON è nei prezzi, è nelle notizie post-chiusura)`;
   L.push(`· Investito €${invested != null ? fmtNum.format(Math.round(invested)) : "—"} (MTM, cassa esclusa · ${dLastTxt}, Δ~7g ${signTxt(d7)} — rendimento del book cash-neutral) · Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · VIX ${dgTxt((DATA.macro || {}).vix && DATA.macro.vix.value, "", 1)} · cassa ${fmtEUR.format(Math.round(cashEur || 0))} · budget op. ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"}`);
   // BENCHMARK: UN SOLO indice su tutte le finestre — Nasdaq 100 (il mandato, memory "vs NDX"),
@@ -7149,7 +7293,10 @@ document.querySelectorAll("#spark-toggle .chip, #spark-toggle-wl .chip").forEach
 });
 // v188: la vista tecnica/fondamentale non esiste piu' (tabella unica), quindi le barre
 // dell'intervallo sono SEMPRE visibili: restava solo il ripristino dell'intervallo scelto.
-(function applyPrefs() { syncSparkToggles(); })();
+(function applyPrefs() {
+  syncSparkToggles();
+  applicaOrdineMiniCard();   // v190: l'ordine scelto nel popup macro vale anche al caricamento
+})();
 $("#wl-add-top").addEventListener("click", addWatchlist);
 $("#ptf-add-top")?.addEventListener("click", addPortfolio);
 document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {

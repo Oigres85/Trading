@@ -91,6 +91,15 @@ function c1_valoriRipetuti(t) {
       ["Rischio Sistemico", /Rischio Sistemico[^\n]*HY\/IG ([\d.,]+)×/],
       ["Istituzionali VS Retail", /Istituzionali VS Retail[^\n]*[,·] HY\/IG ([\d.,]+)×/],
     ] },
+    // v189: il payload dichiarava "48 news" nei catalizzatori e "53 notizie" nella sintesi del
+    // tono — due basi diverse per la stessa parola, perche' la seconda contava anche le righe
+    // dei mercati di previsione. Stessa classe di HY/IG: due denominatori sotto un nome solo.
+    // NB: nel primo pattern il numero che conta e' il SECONDO (il totale, non le non-prezzate),
+    // quindi il primo va in gruppo NON catturante — C1 legge sempre m[1].
+    { nome: "numero di notizie (base del conteggio)", toll: 0, fonti: [
+      ["CATALIZZATORI", /\d+ news su (\d+) pubblicate DOPO/],
+      ["SINTESI NEWS", /SINTESI NEWS: tono [^·]*? su (\d+) notizie/],
+    ] },
     { nome: "budget operativo spendibile", toll: 1, fonti: [
       ["brief", /budget op\. ([\d.]+)/],
       ["METRICHE DI RISCHIO", /BUDGET OPERATIVO SPENDIBILE[^:]*: ([\d.]+) €/],
