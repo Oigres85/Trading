@@ -1053,7 +1053,24 @@ tr.val-ok td { background: rgba(34,197,94,.07); }
 .rp-modal-th { font-size: 13px; margin-top: 3px; }
 .rp-modal-state { font-size: 13px; margin-bottom: 10px; }
 .rp-modal-why { font-size: 12.5px; line-height: 1.55; color: var(--text); }
-@media (max-width: 820px) { .rp-grid { grid-template-columns: 1fr 1fr; } .rp-legend { display: none; } }
+/* v192 — QUESTA CARD ALLARGAVA L'INTERA PAGINA SU IPHONE, e con essa spostava i popup.
+   "1fr 1fr" non basta: le celle di una griglia hanno min-width AUTO, quindi non scendono sotto
+   la larghezza del contenuto. Le chip contengono etichetta + soglia + valore e non stavano in
+   187px: la griglia si allargava a ~598px, il documento con lei, e la modale (position: fixed,
+   centrata sul documento) finiva mezza fuori schermo. Era il vero motivo per cui i "Dettagli
+   macro" su Safari iPhone si vedevano male — non un difetto del popup.
+   Servono DUE cose insieme: una colonna sola sotto i 560px E min-width:0 per permettere alle
+   celle di restringersi davvero. */
+@media (max-width: 820px) {
+  .rp-grid { grid-template-columns: 1fr 1fr; }
+  .rp-grid > * { min-width: 0; }
+  .rp-legend { display: none; }
+}
+@media (max-width: 560px) {
+  .rp-grid { grid-template-columns: 1fr; }
+  .rp-chip { padding: 8px 9px; gap: 7px; }
+  .rp-chip-label, .rp-chip-th { overflow: hidden; text-overflow: ellipsis; }
+}
 
 /* ═══ MACRO SHOCK ALERT (v125) ═══ */
 .shock-alert-banner {
@@ -1158,11 +1175,67 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
    250px, una modale da 920px lasciava al contenuto poco più di 600px. Richiesta esplicita del
    CEO ("aumenta dimensioni del box per facilitare la lettura"). Si allarga solo quando dentro
    c'è una .pp-split, così le altre modali restano come sono. */
-.modal-chart:has(.pp-split) { max-width: 1400px; width: 96vw; max-height: 92vh; }
-.modal-chart:has(.pp-split) .pp-split { grid-template-columns: 270px minmax(0, 1fr); min-height: 68vh; }
-.modal-chart:has(.pp-split) .pp-detail { max-height: 78vh; font-size: 13.5px; line-height: 1.55; }
-.modal-chart:has(.pp-split) .pp-nav { max-height: 78vh; }
+/* v192 — SOLO DA TABLET IN SU. Prima queste regole erano globali e, avendo specificita' piu'
+   alta del media query mobile, vincevano su iPhone: il risultato era
+   "grid-template-columns: 270px 32px", cioe' un box di contenuto largo TRENTADUE PIXEL.
+   I media query non aggiungono specificita': l'unico modo pulito e' non far esistere affatto
+   la regola larga sotto il breakpoint. */
+@media (min-width: 861px) {
+  .modal-chart:has(.pp-split) { max-width: 1400px; width: 96vw; max-height: 92vh; }
+  .modal-chart:has(.pp-split) .pp-split { grid-template-columns: 270px minmax(0, 1fr); min-height: 68vh; }
+  .modal-chart:has(.pp-split) .pp-detail { max-height: 78vh; font-size: 13.5px; line-height: 1.55; }
+  .modal-chart:has(.pp-split) .pp-nav { max-height: 78vh; }
+}
 /* fallback per browser senza :has() — Safari lo supporta dal 15.4, ma non si dà per scontato */
 @supports not selector(:has(*)) {
   .modal-chart { max-width: 1400px; width: 96vw; }
+}
+
+/* ═══ v192 — DETTAGLI MACRO SU IPHONE (Safari) ═══════════════════════════════════════
+   Su schermo stretto il maestro-dettaglio diventa una lista sopra e il contenuto sotto.
+   Tre accorgimenti specifici di iOS:
+   · 100vh su Safari iOS include la barra degli indirizzi che si ritrae: il fondo del popup
+     finiva sotto il bordo dello schermo. Si usa dvh dove supportato.
+   · il contenuto dei pannelli contiene tabelle e grafici piu' larghi dello schermo: devono
+     scorrere DENTRO il loro riquadro, mai far scorrere la pagina.
+   · -webkit-overflow-scrolling per lo scorrimento inerziale, altrimenti su iOS il riquadro
+     interno sembra bloccato. */
+@media (max-width: 860px) {
+  .modal-chart { width: 96vw; max-width: 96vw; max-height: 90vh; padding: 14px 12px; }
+  .pp-split { display: block; min-height: 0; }
+  .pp-nav { border-right: 0; border-bottom: 1px solid var(--border, #262b36);
+    padding: 0 0 10px; margin-bottom: 12px; max-height: none; overflow: visible; }
+  .pp-nav-list { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: 6px;
+    padding-bottom: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .pp-nav-list::-webkit-scrollbar { display: none; }
+  .pp-nav-item { flex: 0 0 auto; font-size: 11.5px; padding: 6px 10px; white-space: nowrap;
+    border: 1px solid var(--border, #262b36); border-radius: 999px; }
+  .pp-nav-item.is-active { border-color: var(--accent, #4c8dff); }
+  .pp-drag { display: none; }                 /* su touch il trascinamento orizzontale serve a scorrere */
+  .pp-nav-note { padding: 8px 2px 0; }
+  .pp-detail { max-height: none; overflow: visible; padding-right: 0; font-size: 13px; }
+  .pp-detail .pp-h { font-size: 14px; }
+  /* NULLA dentro un pannello puo' allargare la pagina. Prima il selettore mirava a classi
+     specifiche (.info-table, .sd-grid) e le tabelle senza quelle classi sbordavano lo stesso:
+     su iPhone la colonna "SCORE" del MacroQuant finiva oltre il bordo, tagliata. La regola
+     giusta e' sul PANNELLO — qualunque cosa contenga, scorre li' dentro. */
+  .pp-pane { overflow-x: auto; -webkit-overflow-scrolling: touch; min-width: 0; }
+  .pp-detail table { min-width: 100%; }
+  .pp-detail pre, .pp-detail svg, .pp-detail img { max-width: 100%; }
+  .pp-detail .sd-grid { display: block; }
+  .pp-detail .sd-col { min-width: 0; }
+  .pp-actions { padding-bottom: 10px; }
+  .pp-actions .btn { flex: 1 1 auto; }
+}
+@supports (height: 100dvh) {
+  @media (max-width: 860px) { .modal-chart { max-height: 88dvh; } }
+}
+
+/* v192 — RETE DI SICUREZZA. Un solo elemento piu' largo dello schermo allarga il documento, e
+   con esso sposta ogni overlay position:fixed. Su mobile nessuna card puo' farlo: chi ha
+   contenuto largo lo fa scorrere al proprio interno. */
+@media (max-width: 860px) {
+  html, body { overflow-x: hidden; }
+  .card { max-width: 100%; }
+  .card > .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }

@@ -261,6 +261,31 @@ pannello aggiunto in futuro finisce in coda invece di spostare tutto a caso.
 scheda titolo **non hanno un elenco corrispondente** nella dashboard, quindi lì l'ordine vale solo
 dentro il popup — è scritto nella nota sotto l'indice invece di fingere una propagazione assente.
 
+## 📱 Il popup macro su iPhone (v192) — la causa NON era il popup
+
+Sintomo: "Dettagli macro non si visualizza correttamente su Safari iPhone". Riprodotto a 375px,
+misurato invece di indovinato. **Due difetti distinti, e il secondo non c'entrava col popup.**
+
+1. **Specificità.** `.modal-chart:has(.pp-split) .pp-split { grid-template-columns: 270px … }` era
+   globale e batteva `@media (max-width:860px) { .pp-split { … 1fr } }` — i media query **non
+   aggiungono specificità**. Risultato misurato: `270px 32px`, cioè un box di contenuto largo
+   **32 pixel**. Ora la regola larga vive dentro `@media (min-width: 861px)`: sotto il breakpoint
+   semplicemente non esiste, e non c'è nessuna guerra di specificità da vincere.
+
+2. **La card "Parametri di Rischio" allargava TUTTA LA PAGINA.** `grid-template-columns: 1fr 1fr`
+   non basta: le celle di una griglia hanno `min-width: auto`, quindi non scendono sotto la
+   larghezza del contenuto. Le chip stavano in ~298px l'una → griglia ~598px → **documento 598px
+   su uno schermo da 375**. E un overlay `position: fixed` si centra sul DOCUMENTO: il popup
+   finiva spostato e mezzo fuori. Il popup era innocente. Correzione: `min-width: 0` sulle celle
+   e una colonna sola sotto i 560px, più una rete di sicurezza (`overflow-x: hidden` su
+   html/body sotto 860px) perché nessuna card possa più allargare la pagina.
+
+Verificato dopo: documento 375px (era 598), modale centrata e dentro lo schermo, **tutti e 39 i
+pannelli** controllati uno per uno senza overflow, desktop invariato (contenuto 901px).
+
+Lezione trasferibile: **quando un overlay è mal posizionato su mobile, misura la larghezza del
+documento prima di toccare l'overlay.** Il colpevole è quasi sempre altrove nella pagina.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
