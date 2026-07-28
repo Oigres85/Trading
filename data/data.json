@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-07-28T21:57:19Z",
+ "updated_at": "2026-07-28T22:05:43Z",
  "eurusd": 1.1393,
  "totals": {
   "usd_value": 236140.24,
@@ -890,10 +890,10 @@
    "sortino_6m": 2.27,
    "prepost": {
     "label": "after",
-    "price": 458.36,
-    "change_pct": 0.82
+    "price": 458.24,
+    "change_pct": 0.8
    },
-   "prezzo_limite_aggiustato": 458.36,
+   "prezzo_limite_aggiustato": 458.24,
    "risk_reward": "1:1.8",
    "sector": "Technology",
    "stats": {
@@ -1712,10 +1712,10 @@
    "sortino_6m": 0.28,
    "prepost": {
     "label": "after",
-    "price": 197.02,
-    "change_pct": 0.01
+    "price": 197.01,
+    "change_pct": 0
    },
-   "prezzo_limite_aggiustato": 197.02,
+   "prezzo_limite_aggiustato": 197.01,
    "risk_reward": "1:1.5",
    "sector": "Technology",
    "stats": {
@@ -2699,10 +2699,10 @@
    "sortino_6m": 2.48,
    "prepost": {
     "label": "after",
-    "price": 832.19,
-    "change_pct": 1.42
+    "price": 832.76,
+    "change_pct": 1.49
    },
-   "prezzo_limite_aggiustato": 832.19,
+   "prezzo_limite_aggiustato": 832.76,
    "risk_reward": "1:2.3",
    "sector": "Technology",
    "stats": {
@@ -3528,10 +3528,10 @@
    "sortino_6m": -1.75,
    "prepost": {
     "label": "after",
-    "price": 96.88,
-    "change_pct": 0.75
+    "price": 96.84,
+    "change_pct": 0.71
    },
-   "prezzo_limite_aggiustato": 96.88,
+   "prezzo_limite_aggiustato": 96.84,
    "risk_reward": "1:1.5",
    "sector": "Technology",
    "stats": {
@@ -4083,10 +4083,10 @@
    "sortino_6m": -1.24,
    "prepost": {
     "label": "after",
-    "price": 14.56,
-    "change_pct": 0.28
+    "price": 14.54,
+    "change_pct": 0.13
    },
-   "prezzo_limite_aggiustato": 14.56,
+   "prezzo_limite_aggiustato": 14.54,
    "risk_reward": "1:2.3",
    "sector": "Technology",
    "stats": {
@@ -4838,10 +4838,10 @@
    "sortino_6m": -0.13,
    "prepost": {
     "label": "after",
-    "price": 334.47,
-    "change_pct": 0.23
+    "price": 334.89,
+    "change_pct": 0.35
    },
-   "prezzo_limite_aggiustato": 334.47,
+   "prezzo_limite_aggiustato": 334.89,
    "risk_reward": "1:2.6",
    "sector": "Communication Services",
    "stats": {
@@ -5497,10 +5497,10 @@
    "sortino_6m": -0.93,
    "prepost": {
     "label": "after",
-    "price": 594.38,
-    "change_pct": 0.16
+    "price": 594.62,
+    "change_pct": 0.2
    },
-   "prezzo_limite_aggiustato": 594.38,
+   "prezzo_limite_aggiustato": 594.62,
    "risk_reward": "1:2.9",
    "sector": "Communication Services",
    "stats": {
@@ -6059,10 +6059,10 @@
    "sortino_6m": -1.46,
    "prepost": {
     "label": "after",
-    "price": 123.61,
-    "change_pct": 0.06
+    "price": 123.71,
+    "change_pct": 0.15
    },
-   "prezzo_limite_aggiustato": 123.61,
+   "prezzo_limite_aggiustato": 123.71,
    "risk_reward": "1:1.7",
    "sector": "Technology",
    "stats": {
@@ -7035,10 +7035,10 @@
    "sortino_6m": -2,
    "prepost": {
     "label": "after",
-    "price": 120.08,
-    "change_pct": 0.1
+    "price": 120.07,
+    "change_pct": 0.09
    },
-   "prezzo_limite_aggiustato": 120.08,
+   "prezzo_limite_aggiustato": 120.07,
    "risk_reward": "1:2.3",
    "sector": "Technology",
    "stats": {
@@ -7628,10 +7628,10 @@
    "sortino_6m": -2.16,
    "prepost": {
     "label": "after",
-    "price": 39.9,
-    "change_pct": 0.81
+    "price": 39.89,
+    "change_pct": 0.79
    },
-   "prezzo_limite_aggiustato": 39.9,
+   "prezzo_limite_aggiustato": 39.89,
    "risk_reward": "1:2.6",
    "sector": "Utilities",
    "stats": {
@@ -7917,10 +7917,10 @@
    "sortino_6m": null,
    "prepost": {
     "label": "after",
-    "price": 116.34,
-    "change_pct": -0.06
+    "price": 116.5,
+    "change_pct": 0.08
    },
-   "prezzo_limite_aggiustato": 116.34,
+   "prezzo_limite_aggiustato": 116.5,
    "risk_reward": "1:2.8",
    "sector": "Industrials",
    "stats": {
@@ -9701,22 +9701,22 @@
    "name": "Bitcoin",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 63937.05,
+   "price": 63919.67,
    "price_asof": "2026-07-28",
    "price_live": false,
-   "change_pct": 0.33,
+   "change_pct": 0.31,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -49.3,
-   "sma200_dist_pct": -11,
+   "sma200_dist_pct": -11.1,
    "sma50_dist_pct": 1,
    "w52_high": 126198.07,
    "w52_dist_pct": -49.3,
    "support": 61645.75,
    "resistance": 66910.06,
-   "rsi": 48.7,
-   "volume": 25993082880,
-   "vol_ratio": 1.01,
+   "rsi": 48.6,
+   "volume": 25851316224,
+   "vol_ratio": 1,
    "atr_14": 1634.11,
    "atr_pct": 2.56,
    "signal": "Sopra SMA50",
@@ -9727,7 +9727,7 @@
      64311.81,
      65340.3,
      63724.9,
-     63937.05
+     63919.67
     ],
     "m6": [
      71309.88,
@@ -9855,7 +9855,7 @@
      64311.81,
      65340.3,
      63724.9,
-     63937.05
+     63919.67
     ],
     "all": [
      386.94,
@@ -10000,7 +10000,7 @@
      76304.32,
      73579.69,
      58558.86,
-     63937.05
+     63919.67
     ],
     "m1": [
      63297.39,
@@ -10024,7 +10024,7 @@
      64311.81,
      65340.3,
      63724.9,
-     63937.05
+     63919.67
     ],
     "m3": [
      76981.12,
@@ -10092,7 +10092,7 @@
      64311.81,
      65340.3,
      63724.9,
-     63937.05
+     63919.67
     ],
     "y1": [
      117924.48,
@@ -10168,7 +10168,7 @@
      62239.12,
      64796.6,
      65044.81,
-     63937.05
+     63919.67
     ],
     "d1": [
      63704.48,
@@ -10302,7 +10302,8 @@
      63832.13,
      63842.9,
      63957.74,
-     63938.08
+     63938.08,
+     63919.67
     ]
    },
    "earnings_date": null,
@@ -10312,10 +10313,10 @@
    "beta": null,
    "sharpe_1y": -1.27,
    "sortino_1y": -1.64,
-   "sharpe_6m": -0.77,
-   "sortino_6m": -1.03,
+   "sharpe_6m": -0.78,
+   "sortino_6m": -1.04,
    "prepost": null,
-   "prezzo_limite_aggiustato": 63937.05,
+   "prezzo_limite_aggiustato": 63919.67,
    "risk_reward": "1:1.6",
    "sector": "Altro",
    "stats": null,
@@ -10323,22 +10324,22 @@
     "w1": {
      "support": 62844.29,
      "resistance": 65760.48,
-     "change_pct": -0.25
+     "change_pct": -0.28
     },
     "m1": {
      "support": 61492.65,
      "resistance": 66910.06,
-     "change_pct": 1.01
+     "change_pct": 0.98
     },
     "m3": {
      "support": 57747.77,
      "resistance": 77990.87,
-     "change_pct": -16.94
+     "change_pct": -16.97
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -30.1
+     "change_pct": -30.12
     }
    },
    "financials": [],
@@ -10365,7 +10366,7 @@
    },
    "rs_1m": 0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 5.7,
+   "rs_ndx_1m": 5.6,
    "beta_ndx": 0.93,
    "avg_corr": 0.35,
    "max_corr": 0.78,
@@ -12860,10 +12861,10 @@
    "sortino_6m": 2.76,
    "prepost": {
     "label": "after",
-    "price": 86.58,
-    "change_pct": 0.32
+    "price": 86.69,
+    "change_pct": 0.45
    },
-   "prezzo_limite_aggiustato": 86.58,
+   "prezzo_limite_aggiustato": 86.69,
    "risk_reward": "1:3.5",
    "sector": "Technology",
    "stats": {
@@ -13692,10 +13693,10 @@
    "sortino_6m": -0.44,
    "prepost": {
     "label": "after",
-    "price": 231.15,
-    "change_pct": 0.13
+    "price": 231.25,
+    "change_pct": 0.17
    },
-   "prezzo_limite_aggiustato": 231.15,
+   "prezzo_limite_aggiustato": 231.25,
    "risk_reward": "1:2.2",
    "sector": "Consumer Cyclical",
    "stats": {
@@ -14406,10 +14407,10 @@
    "sortino_6m": -0.22,
    "prepost": {
     "label": "after",
-    "price": 28.46,
-    "change_pct": 0.04
+    "price": 28.47,
+    "change_pct": 0.07
    },
-   "prezzo_limite_aggiustato": 28.46,
+   "prezzo_limite_aggiustato": 28.47,
    "risk_reward": "1:1.9",
    "sector": "Technology",
    "stats": {
@@ -14947,7 +14948,7 @@
    "prepost": {
     "label": "after",
     "price": 12.15,
-    "change_pct": -0.34
+    "change_pct": -0.33
    },
    "prezzo_limite_aggiustato": 12.15,
    "risk_reward": "1:1.6",
@@ -15445,10 +15446,10 @@
    "sortino_6m": 2.11,
    "prepost": {
     "label": "after",
-    "price": 1129.96,
+    "price": 1130,
     "change_pct": 3.09
    },
-   "prezzo_limite_aggiustato": 1129.96,
+   "prezzo_limite_aggiustato": 1130,
    "risk_reward": "1:3.1",
    "sector": "Technology",
    "stats": {
@@ -15934,10 +15935,10 @@
    "sortino_6m": -0.32,
    "prepost": {
     "label": "after",
-    "price": 64.2,
-    "change_pct": -0.19
+    "price": 64.25,
+    "change_pct": -0.11
    },
-   "prezzo_limite_aggiustato": 64.2,
+   "prezzo_limite_aggiustato": 64.25,
    "risk_reward": "1:1.3",
    "sector": "Financial Services",
    "stats": {
@@ -16757,10 +16758,10 @@
    "sortino_6m": 0.99,
    "prepost": {
     "label": "after",
-    "price": 394.31,
-    "change_pct": 0.51
+    "price": 394.5,
+    "change_pct": 0.56
    },
-   "prezzo_limite_aggiustato": 394.31,
+   "prezzo_limite_aggiustato": 394.5,
    "risk_reward": "1:2.8",
    "sector": "Technology",
    "stats": {
@@ -18270,10 +18271,10 @@
    "sortino_6m": -0.6,
    "prepost": {
     "label": "after",
-    "price": 260.46,
-    "change_pct": 0.25
+    "price": 260,
+    "change_pct": 0.07
    },
-   "prezzo_limite_aggiustato": 260.46,
+   "prezzo_limite_aggiustato": 260,
    "risk_reward": "1:2.7",
    "sector": "Utilities",
    "stats": {
@@ -19017,10 +19018,10 @@
    "sortino_6m": -1.44,
    "prepost": {
     "label": "after",
-    "price": 180.95,
-    "change_pct": -0.3
+    "price": 181,
+    "change_pct": -0.28
    },
-   "prezzo_limite_aggiustato": 180.95,
+   "prezzo_limite_aggiustato": 181,
    "risk_reward": "1:1.9",
    "sector": "Technology",
    "stats": {
@@ -19371,10 +19372,10 @@
    "sortino_6m": null,
    "prepost": {
     "label": "after",
-    "price": 191,
-    "change_pct": -0.89
+    "price": 192,
+    "change_pct": -0.37
    },
-   "prezzo_limite_aggiustato": 191,
+   "prezzo_limite_aggiustato": 192,
    "risk_reward": "1:1.6",
    "sector": "Technology",
    "stats": {
@@ -19620,10 +19621,10 @@
    "sortino_6m": null,
    "prepost": {
     "label": "after",
-    "price": 135.51,
-    "change_pct": 4.1
+    "price": 135.79,
+    "change_pct": 4.32
    },
-   "prezzo_limite_aggiustato": 135.51,
+   "prezzo_limite_aggiustato": 135.79,
    "risk_reward": null,
    "sector": "Technology",
    "stats": {
@@ -20653,10 +20654,10 @@
    "sortino_6m": 2.17,
    "prepost": {
     "label": "after",
-    "price": 473.29,
-    "change_pct": 2.11
+    "price": 474.8,
+    "change_pct": 2.44
    },
-   "prezzo_limite_aggiustato": 473.29,
+   "prezzo_limite_aggiustato": 474.8,
    "risk_reward": "1:2.3",
    "sector": "Technology",
    "stats": {
@@ -21304,10 +21305,10 @@
    "sortino_6m": -0.87,
    "prepost": {
     "label": "after",
-    "price": 110,
-    "change_pct": -0.56
+    "price": 110.14,
+    "change_pct": -0.43
    },
-   "prezzo_limite_aggiustato": 110,
+   "prezzo_limite_aggiustato": 110.14,
    "risk_reward": "1:1.7",
    "sector": "Technology",
    "stats": {
@@ -21882,10 +21883,10 @@
    "sortino_6m": 0.39,
    "prepost": {
     "label": "after",
-    "price": 185.24,
-    "change_pct": 11.03
+    "price": 185.6,
+    "change_pct": 11.24
    },
-   "prezzo_limite_aggiustato": 185.24,
+   "prezzo_limite_aggiustato": 185.6,
    "risk_reward": "1:2.9",
    "sector": "Industrials",
    "stats": {
@@ -22673,10 +22674,10 @@
    "sortino_6m": 2.61,
    "prepost": {
     "label": "after",
-    "price": 175.8,
-    "change_pct": 0.76
+    "price": 176.39,
+    "change_pct": 1.1
    },
-   "prezzo_limite_aggiustato": 175.8,
+   "prezzo_limite_aggiustato": 176.39,
    "risk_reward": "1:3.3",
    "sector": "Technology",
    "stats": {
@@ -23929,10 +23930,10 @@
    "sortino_6m": -0.98,
    "prepost": {
     "label": "after",
-    "price": 226.51,
-    "change_pct": -0.46
+    "price": 226.63,
+    "change_pct": -0.4
    },
-   "prezzo_limite_aggiustato": 226.51,
+   "prezzo_limite_aggiustato": 226.63,
    "risk_reward": "1:4.4",
    "sector": "Technology",
    "stats": {
@@ -24895,10 +24896,10 @@
    "sortino_6m": -1.44,
    "prepost": {
     "label": "after",
-    "price": 394.02,
-    "change_pct": 0.17
+    "price": 394.49,
+    "change_pct": 0.29
    },
-   "prezzo_limite_aggiustato": 394.02,
+   "prezzo_limite_aggiustato": 394.49,
    "risk_reward": "1:1.6",
    "sector": "Technology",
    "stats": {
@@ -25580,10 +25581,10 @@
    "sortino_6m": 0.84,
    "prepost": {
     "label": "after",
-    "price": 381.82,
-    "change_pct": 0.24
+    "price": 381.93,
+    "change_pct": 0.27
    },
-   "prezzo_limite_aggiustato": 381.82,
+   "prezzo_limite_aggiustato": 381.93,
    "risk_reward": "1:1.6",
    "sector": "Technology",
    "stats": {
@@ -34473,8 +34474,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "186.54",
-    "change_pct": 0.06,
+    "value": "186.60",
+    "change_pct": 0.09,
     "suffix": "%"
    }
   ],
@@ -34482,8 +34483,8 @@
    "us10": 4.6,
    "jp10": 2.78,
    "spread": 1.83,
-   "usdjpy": 163.79,
-   "usdjpy_chg_1m": 1.24,
+   "usdjpy": 163.82,
+   "usdjpy_chg_1m": 1.26,
    "boj_rate": 0.3,
    "boj_meetings": [
     "2026-07-31",
@@ -37492,7 +37493,7 @@
   },
   "dollar_ruler": {
    "value": 101.38,
-   "chg_3m_pct": 2.94,
+   "chg_3m_pct": 2.95,
    "flag": null,
    "src": "DXY"
   },
@@ -38103,7 +38104,7 @@
      109.14,
      102.59,
      106.75,
-     108.02,
+     108.01,
      110.72,
      113.53,
      111.46,
@@ -38166,7 +38167,7 @@
      214.47,
      215.1,
      219.43,
-     224.6,
+     224.61,
      231.47,
      234.28,
      247.48,
@@ -38540,7 +38541,7 @@
     -0.005982,
     -0.007438,
     0.005405,
-    0.008322,
+    0.008323,
     -0.0029,
     0.002454,
     0.002309,
@@ -38557,7 +38558,7 @@
     -0.003187,
     -0.004624,
     0.005713,
-    0.002807,
+    0.002806,
     0.00376,
     0.003402,
     0.001151,
@@ -38602,7 +38603,7 @@
     0.00688,
     0.005444,
     -0.004576,
-    0.00185,
+    0.001851,
     0.003457,
     0.000731,
     0.001898,
@@ -39501,7 +39502,7 @@
      549,
      562.3,
      567.67,
-     598.19,
+     598.18,
      626.78,
      617,
      612.86,
@@ -39792,15 +39793,15 @@
     0.005804,
     0.004407,
     0.00852,
-    -0.000846,
+    -0.000845,
     -0.001998,
     0.008977,
     0.006747,
     0.005903,
-    -0.006664,
+    -0.006665,
     -0.003517,
     -0.004321,
-    0.004103,
+    0.004102,
     0.00462,
     0.002735,
     0.004786,
@@ -39821,7 +39822,7 @@
     -0.009681,
     0.008371,
     0.010622,
-    0.017652,
+    0.017653,
     0.00766,
     0.004493,
     -0.015407,
@@ -39854,7 +39855,7 @@
     0.001233,
     0.004087,
     -0.00324,
-    -0.019303,
+    -0.019304,
     -0.005032,
     0.00198,
     -0.018711,
@@ -40547,7 +40548,7 @@
      50.3,
      54.44,
      57.53,
-     53.2,
+     53.19,
      49.08,
      52.38,
      48.48,
@@ -41032,7 +41033,7 @@
     0.002188,
     0.00629,
     0.00739,
-    0.003978,
+    0.003979,
     -0.010795,
     0.01043,
     -0.006465,
@@ -41052,7 +41053,7 @@
     -0.008552,
     -0.008095,
     0.00562,
-    -0.003214,
+    -0.003213,
     -0.017426,
     0.014325,
     -0.017855,
@@ -41062,14 +41063,14 @@
     -0.00246,
     -0.028518,
     0.00291,
-    -0.020076,
+    -0.020075,
     0.003046,
     -0.000171,
     -0.01868,
     0.027933,
     0.018087,
     0.021567,
-    0.008814,
+    0.008813,
     0.005846,
     -0.012663,
     -0.001834,
@@ -41080,7 +41081,7 @@
     0.002071,
     0.013513,
     0.011666,
-    -0.01544,
+    -0.015441,
     -0.007592,
     -0.004743,
     -0.010701,
@@ -42852,7 +42853,7 @@
      42.73,
      40.07,
      39.96,
-     40.38,
+     40.39,
      41,
      42.71,
      43.12,
@@ -43093,7 +43094,7 @@
      80.1,
      82.41,
      83.91,
-     86.96,
+     86.95,
      88.79,
      90.57,
      85.63,
@@ -43388,7 +43389,7 @@
     -0.001153,
     0.006557,
     -0.007134,
-    -0.00747,
+    -0.007469,
     0.010918,
     0.007595,
     0.015132,
@@ -43410,7 +43411,7 @@
     0.008178,
     -0.002905,
     0.002579,
-    0.002907,
+    0.002908,
     -0.0019,
     -0.007975,
     0.005735,
@@ -43422,15 +43423,15 @@
     -0.002204,
     0.007473,
     -0.001534,
-    0.003831,
+    0.00383,
     0.004903,
     0.000652,
     -0.006867,
     0.000437,
     0.003383,
-    0.002611,
+    0.002612,
     -0.010158,
-    -0.005835,
+    -0.005836,
     -0.002986,
     -0.002504,
     0.002226,
@@ -43442,7 +43443,7 @@
     0.001777,
     -0.008245,
     -0.005722,
-    0.002472,
+    0.002473,
     -0.000337,
     -0.002023,
     0.00393,
@@ -43452,7 +43453,7 @@
     0.004423,
     -0.004755,
     -0.012527,
-    0.000451,
+    0.00045,
     0.002811,
     -0.005404,
     -0.004639,
@@ -43465,7 +43466,7 @@
     0.005477,
     -0.000911,
     0.004772,
-    -0.003739,
+    -0.00374,
     -0.002173,
     0.001601,
     0.006039,
@@ -43477,10 +43478,10 @@
     0.004929,
     -0.00206,
     0.005826,
-    -0.005025,
+    -0.005024,
     0.006618,
     -0.002961,
-    0.001709,
+    0.00171,
     0.005791,
     -0.000227,
     -0.005792,
@@ -43490,7 +43491,7 @@
     0.002733,
     0.004765,
     -0.006245,
-    -0.002281,
+    -0.00228,
     0.000228,
     -0.005608,
     -0.002861,
@@ -43503,8 +43504,8 @@
     -0.005323,
     0.013199,
     0.005476,
-    0.001671,
-    -0.003791,
+    0.00167,
+    -0.00379,
     0.001005,
     -0.002346,
     0.003684,
@@ -43535,10 +43536,10 @@
     0.013224,
     -0.001038,
     -0.000985,
-    0.006126,
+    0.006125,
     -0.001614,
-    -0.000116,
-    0.003226,
+    -0.000115,
+    0.003227,
     -0.002534,
     -0.002425,
     0.003002,
@@ -43572,7 +43573,7 @@
     0.003688,
     0.005447,
     0.004948,
-    0.002348,
+    0.002347,
     0.005145,
     0.000233,
     0.000538,
@@ -44559,17 +44560,17 @@
     0.012069,
     0.001949,
     0.008833,
-    -0.005866,
+    -0.005865,
     0.015429,
     0.001726,
     -0.003995,
     -0.006294,
     0.002896,
     -0.019082,
-    -0.007169,
+    -0.007168,
     -0.00265,
     0.01757,
-    -0.002437,
+    -0.002438,
     0.005113,
     0.007001,
     0.009867,
@@ -44582,13 +44583,13 @@
     0.001177,
     0.012924,
     0.005357,
-    0.001112,
+    0.001113,
     0.009764,
     -0.003391,
     -0.003694,
     0.017599,
     0.009299,
-    0.016035,
+    0.016034,
     -0.01033,
     -0.007402,
     -0.003022,
@@ -44602,7 +44603,7 @@
     -0.009213,
     0.016846,
     -0.000495,
-    -0.041643,
+    -0.041642,
     0.025688,
     -0.012855,
     0.009249,
@@ -44626,10 +44627,10 @@
     0.024649,
     -0.009101,
     0.001124,
-    -0.028577,
+    -0.028576,
     0.00517,
-    -0.016747,
-    -0.015052,
+    -0.016748,
+    -0.015051,
     0.006775,
     -0.0301,
     0.004447,
@@ -44675,7 +44676,7 @@
     0.007519,
     0.000981,
     0.00718,
-    0.012377,
+    0.012376,
     0.006835,
     -0.018725,
     -0.017074,
@@ -44688,7 +44689,7 @@
     -0.004294,
     0.000708,
     -0.025894,
-    0.001588,
+    0.001589,
     0.000383,
     0.009204,
     -0.004333,
@@ -44706,7 +44707,7 @@
     0.0177,
     0.000164,
     0.004158,
-    -0.019757,
+    -0.019758,
     -0.008668,
     0.014604,
     0.003374,
@@ -45817,7 +45818,7 @@
     -0.003221,
     0.016374,
     -0.005804,
-    0.007669,
+    0.007668,
     0.002047,
     0.001301,
     0.002596,
@@ -45855,7 +45856,7 @@
     0,
     -0.028192,
     0.008082,
-    0.011623,
+    0.011622,
     -0.001137,
     -0.005706,
     0.002096,
@@ -45915,7 +45916,7 @@
     -0.007927,
     -0.019358,
     -0.001476,
-    0.004054,
+    0.004055,
     0.001287,
     -0.023041,
     0.004875,
@@ -45937,7 +45938,7 @@
     -0.02011,
     -0.000774,
     0.010592,
-    0.007443,
+    0.007444,
     -0.008402,
     0.006499,
     -0.034105,
@@ -45948,7 +45949,7 @@
     -0.002531,
     -0.001756,
     0.005647,
-    -0.005256,
+    -0.005257,
     -0.012967,
     -0.004757,
     -0.005379,
@@ -47058,13 +47059,13 @@
     0.011509,
     -0.000935,
     0,
-    -0.005978,
+    -0.005979,
     0.000353,
     0.00831,
     0.006854,
     0.02017,
     0.002606,
-    -0.001586,
+    -0.001585,
     0.011158,
     0.007593,
     0.005436,
@@ -47094,8 +47095,8 @@
     0.0053,
     0.004937,
     0.001566,
-    -0.005827,
-    -0.013694,
+    -0.005828,
+    -0.013693,
     -0.02937,
     0.01352,
     -0.000116,
@@ -47111,10 +47112,10 @@
     -0.010476,
     0.007413,
     -0.005926,
-    0.007288,
+    0.007289,
     0.000113,
     -0.010837,
-    0.002635,
+    0.002634,
     0.009676,
     0.014285,
     0.009006,
@@ -47153,7 +47154,7 @@
     0.009457,
     0.007591,
     -0.005576,
-    0.020806,
+    0.020807,
     0.026801,
     -0.02702,
     -0.011237,
@@ -47184,7 +47185,7 @@
     -0.018356,
     0.006831,
     -0.011101,
-    0.018981,
+    0.018982,
     0.007275,
     -0.005452,
     0.004908,
@@ -47200,7 +47201,7 @@
     -0.004429,
     -0.012867,
     0.024517,
-    0.009258,
+    0.009259,
     0.003298,
     0.00346,
     0.01048,
@@ -47598,9 +47599,9 @@
      154.01,
      154.93,
      154.68,
-     156.33,
+     156.34,
      156.04,
-     156.33,
+     156.34,
      155.93,
      155.49,
      157.2,
@@ -48167,7 +48168,7 @@
      154.13,
      152.8,
      154.01,
-     156.33,
+     156.34,
      156.49,
      155.72,
      151.56,
@@ -48296,7 +48297,7 @@
     -0.02842,
     0.005353,
     0.014235,
-    -0.003842,
+    -0.003841,
     -0.015133,
     -0.01156,
     0.008875,
@@ -48311,15 +48312,15 @@
     -0.003351,
     0.008212,
     -0.01436,
-    0.006221,
+    0.006222,
     -0.000584,
     -0.00395,
     0.007303,
-    0.000946,
+    0.000945,
     -0.004736,
     0.003791,
     0.003414,
-    -0.000363,
+    -0.000362,
     0.005354,
     -0.009133,
     0.017254,
@@ -48341,7 +48342,7 @@
     0.011319,
     -0.004845,
     0.000763,
-    0.00194,
+    0.001939,
     -0.002217,
     -0.014531,
     -0.001127,
@@ -48350,7 +48351,7 @@
     -0.001685,
     0.006653,
     0.010553,
-    0.002345,
+    0.002346,
     0.005703,
     0.000548,
     -0.000068,
@@ -48359,14 +48360,14 @@
     -0.010158,
     0.00222,
     -0.000347,
-    0.001385,
+    0.001386,
     0.00449,
     0.003852,
     0.00192,
     0.00137,
     0.00777,
     0.022823,
-    0.014102,
+    0.014103,
     -0.000524,
     -0.005976,
     -0.000857,
@@ -48375,9 +48376,9 @@
     -0.005992,
     0.020848,
     0.004195,
-    0.022355,
+    0.022356,
     -0.002207,
-    -0.004872,
+    -0.004873,
     -0.015083,
     -0.006007,
     0.004654,
@@ -48395,14 +48396,14 @@
     0.00667,
     0.00657,
     -0.001998,
-    0.005213,
+    0.005212,
     0.001603,
     -0.001539,
     -0.000835,
     -0.005669,
     0.004576,
     -0.003027,
-    0.019481,
+    0.019482,
     0.009882,
     -0.009692,
     -0.005136,
@@ -48420,7 +48421,7 @@
     -0.007361,
     -0.00318,
     0.005963,
-    0.006121,
+    0.00612,
     -0.010265,
     0.012447,
     -0.007656,
@@ -48430,8 +48431,8 @@
     0.005905,
     -0.001601,
     0.010648,
-    -0.001904,
-    0.001904,
+    -0.001905,
+    0.001905,
     -0.002604,
     -0.002802,
     0.010908,
@@ -48452,7 +48453,7 @@
     0.008112,
     -0.009114,
     -0.016848,
-    -0.003608,
+    -0.003609,
     -0.008769,
     0.000242,
     0.000138,
@@ -49470,7 +49471,7 @@
     }
    },
    "_ret_series": [
-    -0.014276,
+    -0.014277,
     -0.014147,
     -0.002471,
     0.010182,
@@ -49481,7 +49482,7 @@
     -0.006647,
     0.005636,
     0.009286,
-    -0.007153,
+    -0.007152,
     0.005704,
     -0.008512,
     0.017062,
@@ -49508,8 +49509,8 @@
     0.00217,
     -0.006525,
     0.000218,
-    0.00544,
-    -0.009885,
+    0.005439,
+    -0.009884,
     -0.002991,
     0.009826,
     0.00033,
@@ -49980,7 +49981,7 @@
  "predictions": [
   {
    "question": "Will there be no change in Fed interest rates after the July 2026 meeting?",
-   "yes": 76,
+   "yes": 77,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting"
   },
   {
@@ -50000,7 +50001,7 @@
   },
   {
    "question": "Will Bitcoin dip to $62,500 in July?",
-   "yes": 43,
+   "yes": 45,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-62pt5k-in-july-2026-from-july-14"
   },
   {
@@ -50240,6 +50241,20 @@
    "title_it": "Il commercio di AI-Capex è crollato mentre tutti incolpavano lo Stretto di Hormuz"
   },
   {
+   "source": "MarketWatch",
+   "title": "Micron’s stock sinks toward worst monthly drop in 11 years as China fears escalate",
+   "link": "https://www.marketwatch.com/story/microns-stock-sinks-toward-worst-monthly-drop-in-11-years-as-china-fears-escalate-3c956a67?mod=mw_rss_topstories",
+   "published": "2026-07-28T21:56:00Z",
+   "tickers": [
+    "MACRO",
+    "MU"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Le azioni di Micron sprofondano verso il peggior calo mensile degli ultimi 11 anni mentre i timori sulla Cina aumentano"
+  },
+  {
    "source": "CNBC",
    "title": "Senate set to vote on Trump's pick for spy chief, ending Bill Pulte's brief tenure",
    "link": "https://www.cnbc.com/2026/07/28/jay-clayton-bill-pulte-senate-vote-trump-spy-chief.html",
@@ -50306,19 +50321,6 @@
    "inv": false,
    "sentiment": "neutral",
    "title_it": "Cambio di regime? Dentro il vacillante tentativo di Reza Pahlavi di guidare l'Iran - Reuters"
-  },
-  {
-   "source": "Google News",
-   "title": "Renewed inflation fears complicate Fed's next rate decision - National News Desk",
-   "link": "https://news.google.com/rss/articles/CBMiiwJBVV95cUxQMFJNOURaSENUVFpNbklTRUpGYzlIeDlhV05YQnkxWE04UEJQdkY0MmxOZXZFTEFpM212bnFyTllnZTZKNHNnblE2RTVGN1pPYWRFZVQyZkFfOEtQVVlGUmhIQUtSRDhZTUJ0d2R2bjM2cWFQSjRVeUJXM3JGVGtIYWNvTk03c3ZJUnpCV1VBUU82TUV2UVBSdGZ5X19CdE5xVEVKM1Jrd3pVTW9ab3hKYS1CV0VyTVZYSlJxNC1taTdNal84ektkMjhscldGeDdibFVodWVLRlVHdmFFX0Z1UEFOSk1QSGo0d2szV2dDOUkwTENEMXd2X1N5ZW12U3g1ZjhwdnY4ZGk4WE0?oc=5",
-   "published": "2026-07-28T19:55:45Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I rinnovati timori sull'inflazione complicano la prossima decisione sul tasso della Fed - National News Desk"
   },
   {
    "source": "Reuters",
@@ -50609,6 +50611,20 @@
   },
   {
    "source": "Google News",
+   "title": "Trump economy at 18 months is a tale of shocks, resilience, and signs of stalled progress - West Hawaii Today",
+   "link": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxOWkdFUVJuNXN0cXVLNlYyQkNBMWVUVmF0OXBmSGQxTk80UnlDX3libHpfdWxnREFTM0tnSlhTbDhmdHp4aUlHME03V1Zmc2JLelpBZWRGSFQ1SVVzNmpXWElvRjVLZGpmdTJVQnRPYk9HSjA3bkJhZ3JGOG42eW1xelJ5ZFBEUDN0clJkRDZrWlh3c0E1OXdrZEtvUlN2cU9IZ0VJcGRFZFVYM3VQb0JCXy03YlpmbV9FOW1ZTXotQkNlUFdmU1JURmJRSFVCNjZBNm41TExHNnRlWjhIUVFZZzJqZw?oc=5",
+   "published": "2026-07-28T10:05:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’economia di Trump a 18 mesi è una storia di shock, resilienza e segnali di stallo del progresso – West Hawaii Today"
+  },
+  {
+   "source": "Google News",
    "title": "Morning Business Report: Federal Reserve research shows fewer Americans own homes than previously thought - 41NBC News",
    "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxPc0VaMmtHZW1oUFRMRTMweTljbGpJS2VxbmRKT2xvWVE1MWE0Wi1TRUIydmZDTEthbVU1RUNpTUZuLTBjUTlGdG5McVMzaE1TeGhTa3E2ZFJna2hUZENCbXpCU1ItMDJRd3BVU05QdEl0dzNBaVRPYVZlNzNJbUI1cg?oc=5",
    "published": "2026-07-28T09:49:02Z",
@@ -50738,25 +50754,11 @@
    "title_it": "Alfabeto: le spese di capitale record stanno ripagando e accelerando il superciclo dell’intelligenza artificiale"
   },
   {
-   "source": "Investing.com",
-   "title": "AMD Is Winning Big AI Customers, but Is Nvidia Still the Better Stock to Buy?",
-   "link": "https://www.investing.com/analysis/amd-is-winning-big-ai-customers-but-is-nvidia-still-the-better-stock-to-buy-200684401",
-   "published": null,
-   "tickers": [
-    "AMD",
-    "NVDA"
-   ],
-   "topic_pri": 1,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "AMD sta conquistando grandi clienti nel campo dell'intelligenza artificiale, ma Nvidia è ancora il titolo migliore da acquistare?"
-  },
-  {
    "source": "Polymarket",
    "title": "Will there be no change in Fed interest rates after the July 2026 meeting?",
-   "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 76%",
+   "title_it": "Will there be no change in Fed interest rates after the July 2026 meeting? — probabilità Sì 77%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-july-2026-meeting",
-   "published": "2026-07-28T21:58:17Z",
+   "published": "2026-07-28T22:06:36Z",
    "tickers": [
     "MACRO"
    ],
@@ -50767,7 +50769,7 @@
    "title": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting?",
    "title_it": "Will the Fed increase interest rates by 25 bps after the July 2026 meeting? — probabilità Sì 23%",
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-july-2026-meeting",
-   "published": "2026-07-28T21:58:17Z",
+   "published": "2026-07-28T22:06:36Z",
    "tickers": [
     "MACRO"
    ],
@@ -50778,7 +50780,7 @@
    "title": "Will Bitcoin dip to $60,000 in July?",
    "title_it": "Will Bitcoin dip to $60,000 in July? — probabilità Sì 10%",
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-60000-in-july-20260706151220612-754",
-   "published": "2026-07-28T21:58:17Z",
+   "published": "2026-07-28T22:06:36Z",
    "tickers": [
     "MACRO"
    ],
@@ -50789,7 +50791,7 @@
    "title": "Fed rate hike in 2026?",
    "title_it": "Fed rate hike in 2026? — probabilità Sì 76%",
    "link": "https://polymarket.com/event/fed-rate-hike-in-2026",
-   "published": "2026-07-28T21:58:17Z",
+   "published": "2026-07-28T22:06:36Z",
    "tickers": [
     "MACRO"
    ],
@@ -50798,9 +50800,9 @@
   {
    "source": "Polymarket",
    "title": "Will Bitcoin dip to $62,500 in July?",
-   "title_it": "Will Bitcoin dip to $62,500 in July? — probabilità Sì 43%",
+   "title_it": "Will Bitcoin dip to $62,500 in July? — probabilità Sì 45%",
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-62pt5k-in-july-2026-from-july-14",
-   "published": "2026-07-28T21:58:17Z",
+   "published": "2026-07-28T22:06:36Z",
    "tickers": [
     "MACRO"
    ],
@@ -50811,7 +50813,7 @@
    "title": "Will Bitcoin reach $67,500 in July?",
    "title_it": "Will Bitcoin reach $67,500 in July? — probabilità Sì 10%",
    "link": "https://polymarket.com/event/will-bitcoin-reach-67pt5k-in-july-2026",
-   "published": "2026-07-28T21:58:17Z",
+   "published": "2026-07-28T22:06:36Z",
    "tickers": [
     "MACRO"
    ],
@@ -87883,10 +87885,10 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-07-28T21:58:17Z"
+  "generated_at": "2026-07-28T22:06:36Z"
  },
  "verdict_track": {
-  "generated": "2026-07-28T21:58:20.151Z",
+  "generated": "2026-07-28T22:06:39.697Z",
   "since": "2026-07-11",
   "episodes": 10,
   "div_track": [],
