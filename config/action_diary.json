@@ -1,5 +1,17 @@
 [
  {
+  "date": "2026-07-28T18:19:10.858Z",
+  "text": "Vendita 25 quote AVGO a 379.53 il 28/07/2026",
+  "op": {
+   "tipo": "VENDITA",
+   "qty": 25,
+   "ticker": "AVGO",
+   "prezzo": 379.53,
+   "quando": "28/07/2026",
+   "multi": false
+  }
+ },
+ {
   "date": "2026-07-28T18:18:13.611Z",
   "text": "Vendita 32 quote RGTI a 14.55 il 28/07/2026",
   "op": {
