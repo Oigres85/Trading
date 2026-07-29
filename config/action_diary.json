@@ -1,5 +1,17 @@
 [
  {
+  "date": "2026-07-29T16:23:16.428Z",
+  "text": "Vendita 100 quote RGTI a 13.48 il 29/07/2026",
+  "op": {
+   "tipo": "VENDITA",
+   "qty": 100,
+   "ticker": "RGTI",
+   "prezzo": 13.48,
+   "quando": "29/07/2026",
+   "multi": false
+  }
+ },
+ {
   "date": "2026-07-29T16:22:26.202Z",
   "text": "Vendita 30 quote META a 587.59 il 29/07/2026",
   "op": {
