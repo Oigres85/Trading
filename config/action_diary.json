@@ -1,5 +1,17 @@
 [
  {
+  "date": "2026-07-29T16:22:26.202Z",
+  "text": "Vendita 30 quote META a 587.59 il 29/07/2026",
+  "op": {
+   "tipo": "VENDITA",
+   "qty": 30,
+   "ticker": "META",
+   "prezzo": 587.59,
+   "quando": "29/07/2026",
+   "multi": false
+  }
+ },
+ {
   "date": "2026-07-28T18:19:10.858Z",
   "text": "Vendita 25 quote AVGO a 379.53 il 28/07/2026",
   "op": {
