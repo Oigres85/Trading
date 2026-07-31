@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "196";
+const BUILD_VERSION = "197";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6239,7 +6239,7 @@ function buildPrompt() {
   }
   if (m.yield_recession) {
     const yr = m.yield_recession;
-    lines.push(`- Curva vs Recessione (storico FRED): spread 10A-2A ${yr.current_curve != null ? (yr.current_curve > 0 ? "+" : "") + yr.current_curve + " pp (chiusura daily, stessa lettura delle righe sopra)" : "—"}${yr.curve_12m_ago != null ? ` (12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago}, media mensile del modello storico)` : ""}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. NB: irripidimento post-inversione → storicamente recessione entro ~12 mesi (curva shiftata di 12m anticipa il calo del PIL).`);
+    lines.push(`- Curva vs Recessione (storico FRED): spread 10A-2A ${yr.current_curve != null ? (yr.current_curve > 0 ? "+" : "") + yr.current_curve + " pp (chiusura daily, stessa lettura delle righe sopra)" : "—"}${yr.curve_12m_ago != null ? ` (12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago}, media mensile del modello storico)` : ""}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. ${yr.steepening ? "NB: la curva si sta IRRIPIDENDO dopo l'inversione — storicamente questa configurazione ha preceduto una recessione entro ~12 mesi (la curva shiftata di 12m anticipa il calo del PIL)." : `NB: la curva NON si sta irripidendo (oggi ${yr.current_curve} contro ${yr.curve_12m_ago} di 12 mesi fa): la regola \"irripidimento post-inversione → recessione entro ~12 mesi\" NON è attiva adesso, e va citata solo se e quando lo diventa.`}`);
   }
   // ═══ v195 — CICLO DEI SEMICONDUTTORI. Il book e' per oltre meta' in semi e per l'86% della
   // sua varianza: la domanda che conta non e' se quei titoli siano cari (il P/E forward del
@@ -6256,7 +6256,7 @@ function buildPrompt() {
       lines.push(`- Scorte/spedizioni prodotti informatici ed elettronici: ${fmtNum.format(i.valore)} (rilevazione ${i.data}, serie FRED ${i.serie})`
         + ` · percentile ${i.percentile}° su ${i.osservazioni} osservazioni dal ${String(i.dal).slice(0, 4)}`
         + ` · direzione ultime rilevazioni: ${i.direzione}${i.delta_3 != null ? ` (Δ ${i.delta_3 > 0 ? "+" : ""}${fmtNum.format(i.delta_3)})` : ""}`
-        + ` — rapporto BASSO = domanda che eccede l'offerta; la RISALITA è il segnale che storicamente ha preceduto l'inversione dei ricavi di settore`);
+        + ` — LETTURA DI QUESTO VALORE: al ${i.percentile}° percentile il rapporto è ${i.percentile >= 70 ? "ALTO (scorte abbondanti rispetto alle spedizioni: è la configurazione di domanda DEBOLE, non di penuria)" : i.percentile <= 30 ? "BASSO (domanda che eccede l'offerta)" : "in zona intermedia"}. Il segnale storicamente rilevante è la RISALITA del rapporto, che ha preceduto l'inversione dei ricavi di settore.`);
     }
     if (cs.produzione) {
       const p2 = cs.produzione;
