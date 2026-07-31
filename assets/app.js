@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "199";
+const BUILD_VERSION = "200";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1993,7 +1993,10 @@ function qualityVeto(r) {
     const sortinoOnly = downside && why.length === 1;
     const deep = r.sortino_1y != null ? r.sortino_1y <= RISK_PARAMS.sortinoVeto * 2.5 : true;
     const strength = (sortinoOnly && !deep) ? "debole" : "forte";
-    return { verdict: "SCARTATO - VALUE TRAP", why, strength };
+    // v200: l'etichetta "SCARTATO - VALUE TRAP" era un verdetto travestito da dato. La misura
+    // (il Sortino, lo short interest, il ROE) e' un fatto; "value trap" e' una conclusione, e le
+    // conclusioni sono il mestiere di chi legge. Resta il FILTRO, sparisce la sentenza.
+    return { verdict: "NON SUPERA IL FILTRO QUALITÀ", why, strength };
   }
   if (st.roe != null && st.roe < 0) return { verdict: "NON ACCUMULARE", why: ["ROIC/ROE negativo"], strength: "forte" };
   if (st.peg != null && st.peg < 0) return { verdict: "NON ACCUMULARE", why: ["PEG negativo"], strength: "forte" };
@@ -5678,7 +5681,24 @@ function buildPrompt() {
   // In modalità standby l'AI NON deve commentarli operativamente né trasformarli in raccomandazioni.
   try {
     const dv = decisionVerdict();
-    lines.push(`OUTPUT DEL MOTORE DELLA DASHBOARD (posizionamento interno calcolato dalla dashboard: etichetta, candidati e veti prodotti dalle regole quantitative descritte sotto): verdetto interno ${dv.label} — ${dv.reasons.join("; ")}.`);
+    // ═══ v200 — VIA IL VERDETTO E I PUNTEGGI. Decisione presa sui NUMERI, non sulle opinioni.
+    // Il motore pubblicava un'etichetta ("verdetto interno ACCUMULA") e una classifica con
+    // punteggi su 100, in cima al payload, dove ancorano chiunque legga. Il track record misurato
+    // di quella parte, che il payload pubblica poche righe sotto, e': 7 segnali maturati, ritorno
+    // medio -10,8%, sette punti percentuali PEGGIO del Nasdaq, hit-rate 29%. Un numero con quel
+    // curriculum, accanto a un avvertimento onesto, ancora lo stesso: l'ancoraggio non si batte
+    // con una nota a pie' di pagina, si batte togliendo il numero.
+    // COSA RESTA, e non e' poco: stop violati, concentrazione di fattore, livelli d'ingresso,
+    // capienze, minusvalenze. Quelle non prevedono nulla — CALCOLANO — e sono la parte del
+    // sistema che in questa sessione ha intercettato i difetti arrivati fino alle decisioni.
+    // I filtri restano ma tornano a essere FILTRI: chi passa e chi no, con la soglia dichiarata,
+    // in ordine alfabetico e senza punteggio. Ordinare e' gia' un giudizio.
+    const passa = [...(dv.accumula || [])].map(r => r.ticker).sort();
+    const bloccatiCap = [...(dv.overCap || [])].map(x => (x.r || x).ticker).sort();
+    lines.push(`FILTRI QUANTITATIVI DELLA DASHBOARD (chi supera le soglie meccaniche, in ordine alfabetico — NESSUN punteggio e NESSUN verdetto: questo blocco non classifica piu' e non consiglia, perche' l'esito misurato di quella classifica e' nel blocco TRACK RECORD DEL MOTORE qui sotto e non giustifica l'autorita' che un punteggio porta con se'):`);
+    lines.push(`· Superano tutte le soglie (${passa.length}): ${passa.length ? passa.join(", ") : "nessuno"}`
+      + (bloccatiCap.length ? ` · fermati dal cap d'ingresso, non dalla qualita': ${bloccatiCap.join(", ")}` : "")
+      + `. Le soglie sono: impatto marginale sullo Sharpe di portafoglio, forza relativa 1M vs benchmark, qualita' fondamentale, piu' i veti elencati sotto. I dati per giudicarli uno per uno — fondamentali, tecnica, correlazione col book — stanno nelle tabelle.`);
     // NOTA (v156): rimosse da qui le direttive INDIPENDENZA SUL VERDETTO e ANALISI PER-TITOLO —
     // erano una SECONDA testata dentro il payload (il payload deve essere MATERIA PRIMA, non un
     // rulebook che compete con la Costituzione). L'indipendenza vive in [B1], l'analisi per-titolo
@@ -5861,7 +5881,7 @@ function buildPrompt() {
               bindTag = ` [→ VINCOLO PIÙ STRETTO: ${min[0]} → max ~${fmtNum.format(Math.max(0, min[1]))} quote${cand.length > 1 ? ` (gli altri concedono ${cand.filter(c => c !== min).map(c => `${fmtNum.format(Math.max(0, c[1]))} per ${c[0]}`).join(", ")})` : ""}]`;
             }
           }
-          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)}${limT} / stop $${fmtNum.format(p.stop)}${resT}${rr} (score quant ${p.q}/100)${atrTag}${srcTag}${earnTag}${aggT}${heldTag}${deRatchetTag}${capTag}${lossTag}${bindTag}`;
+          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)}${limT} / stop $${fmtNum.format(p.stop)}${resT}${rr}${atrTag}${srcTag}${earnTag}${aggT}${heldTag}${deRatchetTag}${capTag}${lossTag}${bindTag}`;
         }).join(" · ") + ".");
     }
     if ((dv.trailing || []).length) {
@@ -6868,7 +6888,7 @@ function buildExecutiveDelta() {
   // verdetto: il payload decideva l'agenda del report. Restano i FATTI che impongono una
   // decisione; il giudizio del motore si legge dove e' argomentato.
   if ((v.withPlan || []).length) {
-    L.push(`· Candidati del motore oggi (${v.withPlan.length}): ${v.withPlan.slice(0, 6).map(p => p.r.ticker).join(", ")}${v.withPlan.length > 6 ? ", …" : ""} — verdetto, criteri e veti nel blocco OUTPUT DEL MOTORE, dove sono argomentati`);
+    L.push(`· Titoli che superano i filtri quantitativi (${v.withPlan.length}): ${v.withPlan.slice(0, 6).map(p => p.r.ticker).join(", ")}${v.withPlan.length > 6 ? ", …" : ""} — soglie e veti nel blocco FILTRI QUANTITATIVI. Non è una classifica e non è una raccomandazione: è l'elenco di chi passa.`);
   }
   // PRIORITÀ = solo eventi che impongono una decisione (fatti databili). Il veto in portafoglio
   // e' stato tolto: e' un GIUDIZIO del motore, non un evento, e vive gia' nel blocco motore.
@@ -7252,7 +7272,9 @@ function marketLinkText() {
   for (const r of (dvL && dvL.accumula || [])) {
     const s = losers.get(r.ticker);
     if (s) sig(r.ticker, "relapse");
-    if (s) divRelapse.push(`  ${r.ticker}: candidato ACCUMULA oggi (score ${r._q}/100) · precedente segnale del motore su questo nome il ${s.date}: reso ${signTxt(dgFin(s.ret_pct))} (vs NDX ${signTxt(dgFin(s.vs_ndx_pp), "pp")})`);
+    // v200: niente etichetta ACCUMULA e niente punteggio — resta il FATTO che conta, cioe' che
+    // il filtro ripropone oggi un nome su cui il segnale precedente ha gia' avuto un esito misurato.
+    if (s) divRelapse.push(`  ${r.ticker}: supera i filtri oggi · precedente segnale del motore su questo nome il ${s.date}: reso ${signTxt(dgFin(s.ret_pct))} (vs NDX ${signTxt(dgFin(s.vs_ndx_pp), "pp")})`);
   }
 
   // 3d) nomi in VETO FORTE con la forza relativa che ACCELERA (rimbalzo tecnico vs valore rotto)

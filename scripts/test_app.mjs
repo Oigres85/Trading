@@ -115,7 +115,8 @@ check("val_eur = prezzo×qtà (MTM), non PMC×qtà; peso sul NAV cash incluso", 
 // veto: guida il SORTINO, non lo Sharpe
 check("veto VALUE TRAP citando il Sortino (TST2: sortino -0.6, sharpe -0.2)", run(`
   const v = qualityVeto(DATA.portfolio[1]);
-  return v && v.verdict === "SCARTATO - VALUE TRAP" && /Sortino/.test(v.why[0])`));
+  // v200: si verifica che il FILTRO scatti e perche', non come si chiama l'etichetta.
+  return v && v.verdict && /FILTRO QUALIT|VALUE TRAP/.test(v.verdict) && /Sortino/.test(v.why[0])`));
 check("Sharpe -0.2 NON basta al veto se il Sortino è sano", run(`
   qualityVeto({ ...DATA.portfolio[0], sharpe_1y: -0.2, sortino_1y: 0.5 }) === null`));
 check("fallback etichettato allo Sharpe quando Sortino n.d. (TST5)", run(`
@@ -190,7 +191,8 @@ check("riabilitazione growth: RS negativa (MSFT-like) → veto Sortino CONFERMAT
   const still = { ticker: "TSTM", currency: "USD", price: 100, sortino_1y: -1.4,
     sma200_dist_pct: -8, rs_ndx_1m: -7.6, stats: { roe: 0.34, profit_margin: 0.39, peg: 1.2 } };
   const v = qualityVeto(still);
-  return v && !v.rehab && v.verdict === "SCARTATO - VALUE TRAP"`));
+  // v200: si verifica che il FILTRO scatti e perche', non come si chiama l'etichetta.
+  return v && !v.rehab && !!v.verdict && /FILTRO QUALIT|VALUE TRAP/.test(v.verdict)`));
 check("riabilitazione growth: short interest ≥15% NON è riabilitabile (rischio presente)", run(`
   const shorty = { ticker: "TSTS", currency: "USD", price: 100, sortino_1y: -0.5,
     sma200_dist_pct: 4, rs_ndx_1m: 5, stats: { roe: 0.30, profit_margin: 0.20, short_float: 0.18, peg: 1.2 } };
@@ -769,7 +771,8 @@ check("v144 veto graduato: Sortino profondo → FORTE; borderline (solo downside
   return forte.strength === "forte" && debole.strength === "debole"`));
 check("v144 veto graduato: short interest → sempre FORTE anche con Sortino borderline", run(`
   const v = qualityVeto({ stats: { roe: 0.05, short_float: 0.20, peg: 1.5, profit_margin: 0.1 }, sortino_1y: -0.4 });
-  return v.verdict === "SCARTATO - VALUE TRAP" && v.strength === "forte"`));
+  // v200: si verifica che il FILTRO scatti e perche', non come si chiama l'etichetta.
+  return !!v.verdict && /FILTRO QUALIT|VALUE TRAP/.test(v.verdict) && v.strength === "forte"`));
 check("v144 veto graduato: la severità compare nel prompt (FORTE/DEBOLE)", run(`
   const p = buildPrompt();
   return /veto (FORTE|DEBOLE)/.test(p) || /\\[(FORTE|DEBOLE)\\]/.test(p) || !(dv => (dv.excluded||[]).length)(decisionVerdict())`));

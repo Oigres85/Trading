@@ -441,6 +441,32 @@ C14 puniva questa correzione (nessun ramo pubblicato → "probabilità a senso u
 la dichiarazione esplicita di limite **purché indichi la fonte alternativa**. Un detector che
 punisce il comportamento corretto va aggiornato, non aggirato.
 
+## 🚫 Il motore predittivo è stato TOLTO dal payload (v200)
+
+Decisione presa **sui numeri, non sulle opinioni**. Il track record che il payload stesso pubblica:
+**7 segnali maturati, ritorno medio −10,8%, sette punti percentuali peggio del Nasdaq, hit-rate
+29%**. Un punteggio con quel curriculum, stampato in cima e su scala 0-100, **àncora comunque**:
+l'ancoraggio non si batte con una nota a piè di pagina, si batte togliendo il numero.
+
+**Via**: `verdetto interno <LABEL>`, i punteggi `N/100` dei candidati, la classifica ordinata,
+l'etichetta `SCARTATO - VALUE TRAP` (un verdetto travestito da dato → ora `NON SUPERA IL FILTRO
+QUALITÀ`, e la misura che lo motiva resta accanto).
+
+**Resta** — ed è la parte che in questa sessione ha intercettato i difetti arrivati fino alle
+decisioni: stop violati, concentrazione di fattore, livelli d'ingresso e capienze, R/R,
+minusvalenze fiscali, matrice di rischio. **Quelle non prevedono nulla: calcolano.**
+
+I filtri restano ma tornano a essere filtri: **chi passa e chi no, in ordine alfabetico, senza
+punteggio**. Ordinare è già un giudizio.
+
+⚠️ Tre test asserivano sulla STRINGA `"SCARTATO - VALUE TRAP"` e si sono rotti. Riallineati al
+**fatto** (il filtro scatta, con quale motivazione e quale forza) invece che alla parola: un test
+legato al testo si rompe a ogni riformulazione e non protegge nulla — **in questa sessione è già
+successo tre volte**.
+
+Se fra un mese, con ~25 osservazioni invece di 7, la misura fosse positiva, si rimette con un
+commit. La decisione è reversibile; l'ancoraggio che produceva no.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
