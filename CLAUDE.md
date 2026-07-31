@@ -315,6 +315,37 @@ documento prima di toccare l'overlay.** Il colpevole è quasi sempre altrove nel
 - **Curva 10A-2A**: "dis-inversione in corso" era incondizionato, con l'ultima inversione a 469
   sedute (~22 mesi). Ora la distanza decide la frase e il numero di sedute è scritto accanto.
 
+## 🕰️ Narrazione temporale (v194) — `scripts/historical_context.py`
+
+La dimensione che mancava: il payload sapeva il LIVELLO di un indicatore, non la sua storia.
+Tre misure, **in ordine di solidità decrescente, e l'ordine è scritto nel payload** perché non
+valgono uguale:
+
+1. **Percentile** sulla serie completa — è una descrizione, non una previsione. Solidissimo.
+2. **Durata del regime** — da quante osservazioni siamo in questo stato, e quanto sono durati
+   gli episodi passati. L'episodio in corso è ESCLUSO dalla mediana: non è ancora finito.
+3. **Episodi analoghi** — il più interessante e il più fragile. Sotto 3 episodi conclusi **non
+   si pubblica alcuna mediana**, e il campione è sempre dichiarato.
+
+Le funzioni sono **pure** (liste di coppie in ingresso) proprio per poterle provare senza rete:
+la fetch FRED la fa la pipeline in CI, la correttezza la verificano 22 test locali.
+
+⚠️ **La guardia che conta.** Provando il motore sui dati veri ha prodotto "mediana +50,7% a 63
+giorni": la serie del credito era datata, l'indice era una spark con etichette sintetiche, e
+l'allineamento per data pescava a caso. È lo stesso difetto di `backtest_signals` con le
+granularità miste — **la forma più pericolosa, perché produce un numero plausibile invece di un
+errore**. `_dominio_compatibile` ora rifiuta di calcolare quando le due serie non vivono sullo
+stesso asse temporale, e restituisce il MOTIVO invece di un numero.
+
+Corollario sui test: la prima suite usava etichette sintetiche ed era verde su una configurazione
+che in produzione non esiste. I test ora usano **date vere**, come i dati.
+
+**C2 leggeva anche la testata.** La frase "a mercati chiusi i prezzi sono FERMI" è un'istruzione
+generica, non lo stato di adesso: a borsa aperta C2 dichiarava il mercato chiuso e segnalava una
+riga VIX corretta. Ora legge solo la coda — e il confine è la RIGA `^CONTESTO DI SESSIONE (ora ET`,
+non la parola, perché la testata *nomina* quella sezione ("Leggi CONTESTO DI SESSIONE prima di
+tutto") e tagliare alla prima occorrenza lasciava dentro tutto.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

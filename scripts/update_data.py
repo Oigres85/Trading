@@ -1931,6 +1931,15 @@ def fetch_macro():
 
     try:
         macro["seasonality"] = fetch_seasonality()
+        # v194 — narrazione temporale: serie lunghe FRED + episodi analoghi. Non blocca il run:
+        # se FRED non risponde il payload semplicemente non stampa il blocco.
+        try:
+            sl = storia_lunga()
+            if sl:
+                macro["storia"] = sl
+                print(f"[storia] {len([k for k in sl if not k.startswith('_')])} indicatori con storia lunga")
+        except Exception as e:  # noqa: BLE001
+            print(f"[storia] saltata: {e}")
     except Exception as e:  # noqa: BLE001
         print(f"!! stagionalità: {e}", file=sys.stderr)
 
@@ -2203,6 +2212,50 @@ def compute_shock_alert(macro, watchlist, now_utc=None):
     return {"active": True, "threshold": THR, "sources": sources, "worst_chg": worst,
             "note": "Asia/futures Nasdaq oltre -2% con Wall Street chiusa: sospendere gli acquisti "
                     "aggressivi, attendere l'assestamento della prima ora di scambi USA."}
+
+
+def storia_lunga():
+    """NARRAZIONE TEMPORALE (v194) — serie LUNGHE da FRED per dire "le altre volte com'e' andata".
+
+    Il payload sapeva il livello degli indicatori ma non la loro storia: da quanto dura questo
+    stato, quanto e' estremo rispetto a decenni, e cosa e' successo dopo gli episodi simili.
+    Le serie ci sono e sono gratuite; mancava solo scaricarle abbastanza indietro.
+
+    Il calcolo NON sta qui: sta in scripts/historical_context.py, funzioni pure con 22 test.
+    Qui c'e' solo la fetch. Se FRED non risponde si restituisce None e il payload non stampa
+    nulla: meglio un blocco assente che un blocco inventato.
+    """
+    try:
+        from historical_context import racconto
+    except Exception:  # noqa: BLE001
+        return None
+    N = 20000        # ~80 anni di dati giornalieri: prende tutto cio' che esiste
+    try:
+        curva = fred_series("T10Y2Y", n=N)            # dal 1976
+        hy = fred_series("BAMLH0A0HYM2", n=N)         # dal 1996
+        vix = fred_series("VIXCLS", n=N)              # dal 1990
+        sp = fred_series("SP500", n=N)                # ~10 anni (limite FRED su SP500)
+        nasdaq = fred_series("NASDAQCOM", n=N)        # dal 1971
+    except Exception as e:  # noqa: BLE001
+        print(f"[storia] FRED non disponibile: {e}")
+        return None
+    idx = nasdaq or sp                                 # il benchmark del fondo e' il Nasdaq
+    if not idx:
+        return None
+    out = {}
+    def agg(chiave, nome, serie, stato, etichetta, unita):
+        if not serie or len(serie) < 250:
+            return
+        r = racconto(nome, serie, idx, stato, etichetta, unita)
+        if r:
+            out[chiave] = r
+    agg("curva", "Curva 10A-2A", curva, lambda v: v < 0, "INVERTITA", "pp")
+    agg("hy", "HY OAS (credito)", hy, lambda v: v > 5, "spread in stress (>5%)", "%")
+    agg("vix", "VIX", vix, lambda v: v > 25, "volatilita alta (>25)", "")
+    if out:
+        out["_indice"] = "Nasdaq Composite" if nasdaq else "S&P 500"
+        out["_oss_indice"] = len(idx)
+    return out or None
 
 
 def _margin_vs_gdp(md_millions):

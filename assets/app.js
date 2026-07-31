@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "193";
+const BUILD_VERSION = "194";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6205,6 +6205,40 @@ function buildPrompt() {
   if (m.yield_recession) {
     const yr = m.yield_recession;
     lines.push(`- Curva vs Recessione (storico FRED): spread 10A-2A ${yr.current_curve != null ? (yr.current_curve > 0 ? "+" : "") + yr.current_curve + " pp (chiusura daily, stessa lettura delle righe sopra)" : "—"}${yr.curve_12m_ago != null ? ` (12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago}, media mensile del modello storico)` : ""}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. NB: irripidimento post-inversione → storicamente recessione entro ~12 mesi (curva shiftata di 12m anticipa il calo del PIL).`);
+  }
+  // ═══ v194 — MEMORIA STORICA: dove siamo rispetto al passato, e le altre volte com'e' andata.
+  // E' la dimensione che mancava: il payload sapeva il LIVELLO di un indicatore e non la sua
+  // storia. Tre misure in ordine di solidita' DECRESCENTE, e l'ordine e' scritto perche' non
+  // valgono uguale: percentile (descrizione, solidissimo), durata del regime (solido), episodi
+  // analoghi (il piu' interessante e il piu' fragile — pochi e sovrapposti).
+  // Il campione e' SEMPRE dichiarato e sotto i 3 episodi non si pubblica alcuna mediana: su
+  // questo materiale un numero senza il suo campione e' peggio di nessun numero.
+  const sto = m.storia;
+  if (sto && Object.keys(sto).some(k => !k.startsWith("_"))) {
+    lines.push("");
+    lines.push(`MEMORIA STORICA (serie lunghe FRED · rendimenti successivi misurati su ${sto._indice || "indice"}):`);
+    for (const [k, r] of Object.entries(sto)) {
+      if (k.startsWith("_") || !r || !r.nome) continue;
+      const an = r.analoghi || {};
+      // arrotondamento e virgola decimale come nel resto del payload: un "-1.5043880301940324pp"
+      // e' matematicamente giusto e illeggibile, e la leggibilita' qui e' parte del dato.
+      const nv = (x, d = 2) => x == null ? "—" : fmtNum.format(Math.round(x * Math.pow(10, d)) / Math.pow(10, d));
+      const bits = [`${r.nome}: ${nv(r.valore)}${r.unita || ""}`,
+        `percentile ${r.percentile}° su ${r.osservazioni} osservazioni dal ${String(r.dal || "").slice(0, 4)}`];
+      bits.push(r.durata_stato > 0
+        ? `stato "${r.stato}" da ${r.durata_stato} osservazioni (dal ${r.stato_da})`
+        : `NON è nello stato "${r.stato}" adesso`);
+      if (r.durata_mediana_episodi_passati) bits.push(`durata mediana degli episodi passati: ${r.durata_mediana_episodi_passati} osservazioni`);
+      let coda = "";
+      if (an.non_calcolabile) coda = ` · episodi analoghi NON calcolabili (${an.non_calcolabile})`;
+      else if (!an.sufficiente) coda = ` · solo ${an.n} episodio/i concluso/i nella serie: campione insufficiente, nessuna mediana pubblicata`;
+      else {
+        const med = [63, 126, 252].filter(g => an[`mediana_${g}`] != null)
+          .map(g => `${g}g ${an[`mediana_${g}`] > 0 ? "+" : ""}${nv(an[`mediana_${g}`], 1)}% (su ${an[`n_${g}`]} episodi)`);
+        coda = ` · ${an.n} episodi passati · mediana dell'indice dopo l'ingresso nello stato: ${med.join(" · ")}`;
+      }
+      lines.push(`- ${bits.join(" · ")}${coda}`);
+    }
   }
   // v186 — FedWatch mostra il ramo ATTIVO, non solo i tagli. "prob. taglio 0%" era vero e
   // inutile: a fine luglio 2026 il mercato prezzava un RIALZO al 38% e il payload taceva.

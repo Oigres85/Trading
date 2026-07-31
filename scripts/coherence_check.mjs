@@ -130,7 +130,18 @@ function c1_valoriRipetuti(t) {
    Se il payload dichiara mercato CHIUSO, nessuna riga può dirsi "rilevazione odierna":
    è il difetto trovato sul VIX, che era l'unico dato a contraddire il contesto di sessione. */
 function c2_freschezza(t) {
-  const chiuso = /MERCATI CHIUSI|fase: (WEEKEND|NOTTE|PRE-MARKET|AFTER-HOURS)/i.test(t);
+  // v194 — SOLO LA CODA. C2 leggeva anche la TESTATA, dove "a mercati chiusi i prezzi sono
+  // FERMI all'ultima seduta" e' un'ISTRUZIONE generica, non lo stato di adesso: il 31/07 a
+  // borsa aperta il controllo dichiarava il mercato chiuso e segnalava come contraddittoria
+  // una riga VIX del tutto corretta. Lo stato della sessione lo dice una riga sola, ed e' nella
+  // coda: e' quella che va letta.
+  // NB: la testata NOMINA "CONTESTO DI SESSIONE" ("Leggi CONTESTO DI SESSIONE prima di tutto"),
+  // quindi tagliare alla PRIMA occorrenza lasciava dentro tutta la testata e il difetto restava.
+  // Il confine vero e' la RIGA che comincia con quel titolo, non la parola.
+  const mCoda = t.match(/^CONTESTO DI SESSIONE \(ora ET/m);
+  const coda = mCoda ? t.slice(mCoda.index) : t;
+  const chiuso = /MERCATI CHIUSI|fase: (WEEKEND|NOTTE|PRE-MARKET|AFTER-HOURS)/i.test(coda);
+  t = coda;
   if (!chiuso) { ok("C2 sessione aperta: nessun vincolo di freschezza da verificare"); return; }
   const colpevoli = t.split("\n").filter(l => /rilevazione odierna|\boggi\b —/i.test(l) && !/ultima seduta|chiusura del/i.test(l));
   if (colpevoli.length) {
