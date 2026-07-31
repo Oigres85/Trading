@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=198">
+<link rel="stylesheet" href="assets/style.css?v=199">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -53,14 +53,21 @@
        lo dice — "niente da decidere" e' un'informazione, non uno spazio bianco. -->
   <section class="card decision-queue" id="decision-queue" hidden></section>
 
+  <nav class="tabs" id="main-tabs" role="tablist" aria-label="Sezioni">
+    <button class="tab tab-active" data-tab="portafoglio" role="tab">Portafoglio</button>
+    <button class="tab" data-tab="watchlist" role="tab">Watchlist</button>
+    <button class="tab" data-tab="macro" role="tab">Macro</button>
+    <button class="tab" data-tab="rischio" role="tab">Rischio &amp; strumenti</button>
+  </nav>
+
   <!-- PATRIMONIO -->
-  <section class="card kpi-card">
+  <section class="card kpi-card" data-pane="portafoglio">
     <section class="kpi-grid kpi-compact" id="kpi-grid"></section>
     <div id="profit-by-currency"></div>
   </section>
 
   <!-- ALLOCAZIONE: solo torta + legenda laterale + liquidità -->
-  <section class="card">
+  <section class="card" data-pane="portafoglio">
     <div class="card-head">
       <h2>Asset allocation</h2>
       <button class="btn btn-ghost btn-sm" id="alloc-edit" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica</button>
@@ -84,7 +91,7 @@
   </section>
 
   <!-- MACRO & MERCATI -->
-  <section class="card">
+  <section class="card" data-pane="macro">
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
     <div class="macro-actions">
       <button class="btn btn-primary btn-sm" id="macro-details" title="Tutti i dettagli macro in una sola pagina scorrevole">📖 Dettagli macro</button>
@@ -108,7 +115,7 @@
 
 
   <!-- PORTAFOGLIO -->
-  <section class="card">
+  <section class="card" data-pane="portafoglio">
     <div class="card-head">
       <h2>Portafoglio — tecnica, prezzi e fondamentali</h2>
       <button class="btn btn-primary btn-sm" id="ptf-add-top" title="Aggiungi un titolo al portafoglio con quantità e PMC">+ Aggiungi titolo</button>
@@ -174,7 +181,7 @@
   </section>
 
   <!-- WATCHLIST -->
-  <section class="card">
+  <section class="card" data-pane="watchlist">
     <div class="card-head">
       <h2>Watchlist</h2>
       <button class="btn btn-primary btn-sm" id="wl-add-top" aria-label="Cerca e aggiungi un titolo alla watchlist" title="Cerca e aggiungi un titolo">+ Aggiungi titolo</button>
@@ -235,7 +242,7 @@
   </section>
 
   <!-- PARAMETRI DI RISCHIO DEL FONDO (v122): regole attive lette in tempo reale dai dati -->
-  <section class="card" id="risk-params-card">
+  <section class="card" id="risk-params-card" data-pane="rischio">
     <div class="card-head">
       <h2>Parametri di Rischio del Fondo</h2>
       <span class="muted rp-legend"><span class="rp-dot rp-red"></span>protezione capitale <span class="rp-dot rp-yellow"></span>dimensionamento <span class="rp-dot rp-green"></span>segnali</span>
@@ -255,7 +262,7 @@
   </section>
 
   <!-- STRUMENTI (compatti) -->
-  <section class="card">
+  <section class="card" data-pane="rischio">
     <div class="card-head"><h2>Strumenti</h2></div>
     <div class="tools-btns tools-btns-row">
       <button class="btn btn-ghost tool-btn" id="open-pmc">Calcolatore PMC<span class="muted">mediazione acquisto / realizzo vendita</span></button>
@@ -375,6 +382,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=198"></script>
+<script src="assets/app.js?v=199"></script>
 </body>
 </html>

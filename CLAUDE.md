@@ -421,6 +421,26 @@ denso — è più gerarchico. **Nessun dato è stato rimosso**: cambia cosa è i
 Verificato: payload **identico** passando da compatta a completa (69.096 caratteri), 0 errori
 console, la coda elenca le 6 posizioni che il payload elenca a sua volta.
 
+## 🗂️ Schede e orizzonte FedWatch (v199)
+
+**Schede** (`setTab`): portafoglio, watchlist, macro, rischio. Sono quattro *momenti* diversi;
+impilarli in una pagina sola costringeva a scorrere per trovare ciò che serve. ⚠️ Le sezioni
+**senza** `data-pane` restano SEMPRE visibili (avvisi, barra di stato, coda decisioni): un
+contenitore nuovo che nessuno ha marcato non deve sparire per omissione. Le tabelle si
+ridisegnano quando tornano visibili — larghezze e sticky si calcolano sul layout, e su un
+contenitore nascosto verrebbero sbagliate.
+
+**FedWatch: il contratto non prezzava quella riunione.** `ZQ=F` è il future Fed Funds a 30 giorni
+sul **mese corrente**. Il 31/07 il payload ne ricavava "RIALZO 2%" per la riunione del **16/09**,
+mentre Polymarket — che quota proprio settembre — dava 56%. **I 54 punti di divergenza sembravano
+disaccordo fra fonti e invece erano un errore di orizzonte nostro.** Oltre i 35 giorni il payload
+ora **non pubblica una probabilità che non significa nulla**: dichiara il limite e indica la fonte
+che quella riunione la prezza davvero. *Un numero fuori orizzonte è peggio di nessun numero.*
+
+C14 puniva questa correzione (nessun ramo pubblicato → "probabilità a senso unico"): ora riconosce
+la dichiarazione esplicita di limite **purché indichi la fonte alternativa**. Un detector che
+punisce il comportamento corretto va aggiornato, non aggirato.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

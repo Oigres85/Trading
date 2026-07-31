@@ -1301,3 +1301,15 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 /* v198 — interruttore vista compatta/completa */
 .vista-switch { display: inline-flex; align-items: center; gap: 6px; }
 .vs-lab { font-size: 10px; color: var(--muted, #93a0b4); font-variant-numeric: tabular-nums; }
+
+/* v199 — schede: quattro momenti diversi, non quattro blocchi impilati */
+.tabs { display: flex; gap: 2px; margin: 0 0 14px; border-bottom: 1px solid var(--border, #262b36); }
+.tab { background: transparent; border: 0; border-bottom: 2px solid transparent; color: var(--muted, #93a0b4);
+  font: inherit; font-size: 12.5px; padding: 9px 16px; cursor: pointer; letter-spacing: .02em; }
+.tab:hover { color: var(--fg, #e6ebf2); }
+.tab-active { color: var(--fg, #e6ebf2); border-bottom-color: var(--accent, #4c8dff); font-weight: 600; }
+@media (max-width: 860px) {
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { padding: 8px 12px; font-size: 12px; white-space: nowrap; }
+}

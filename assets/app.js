@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "198";
+const BUILD_VERSION = "199";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6468,7 +6468,25 @@ function buildPrompt() {
     const conf = scarto != null
       ? ` · lo stesso esito su Polymarket è quotato ${pmPct}%${scarto >= 10 ? ` — le due fonti divergono di ${scarto} punti sulla stessa riunione` : ""}`
       : "";
-    lines.push(`- FedWatch prossima riunione ${mt.date} (dai futures sui Fed Funds: tasso implicito ${m.fedwatch.implied_rate}% vs punto medio del range attuale): ${rami.join(" · ")}${conf}`);
+    // ═══ v199 — IL CONTRATTO NON PREZZA QUELLA RIUNIONE. ZQ=F e' il future Fed Funds a 30
+    // giorni sul MESE CORRENTE: prezza la media del mese in corso, non una riunione fra sei
+    // settimane. Il 31/07 il payload ne ricavava "RIALZO 2%" per la riunione del 16/09 mentre
+    // Polymarket, che quota proprio settembre, dava 56% — 54 punti di divergenza che sembravano
+    // disaccordo fra fonti e invece erano un ERRORE DI ORIZZONTE del nostro calcolo.
+    // Quando la riunione e' oltre la copertura del contratto non si pubblica una probabilita'
+    // che non significa nulla: si dichiara il limite e si indica la fonte che quella riunione
+    // la prezza davvero. Un numero fuori orizzonte e' peggio di nessun numero.
+    const giorniAllaRiunione = (() => {
+      const d = new Date(mt.date + "T00:00:00");
+      return isNaN(d) ? null : Math.round((d - new Date()) / 86400000);
+    })();
+    const fuoriOrizzonte = giorniAllaRiunione != null && giorniAllaRiunione > 35;
+    if (fuoriOrizzonte) {
+      lines.push(`- FedWatch — NON CALCOLABILE per la riunione del ${mt.date} (fra ${giorniAllaRiunione} giorni): il tasso implicito ${m.fedwatch.implied_rate}% viene dal future Fed Funds a 30 giorni, che prezza il MESE IN CORSO e non una riunione così lontana. Le probabilità derivate da quel contratto non riguarderebbero quella data.`
+        + (pmPct != null ? ` La fonte che quota proprio quella riunione è il mercato di previsione: rialzo ${pmPct}%.` : " Nessun mercato di previsione disponibile su quella riunione in questo payload."));
+    } else {
+      lines.push(`- FedWatch prossima riunione ${mt.date}${giorniAllaRiunione != null ? ` (fra ${giorniAllaRiunione} giorni)` : ""} (dai futures sui Fed Funds a 30 giorni: tasso implicito ${m.fedwatch.implied_rate}% vs punto medio del range attuale): ${rami.join(" · ")}${conf}`);
+    }
   }
   if ((m.tilt || []).length) {
     lines.push("");
@@ -7873,3 +7891,29 @@ document.addEventListener("click", (e) => {
   }
   (tid === "ptf-table" ? renderTable : renderWatchlist)();
 });
+
+/* ═══ v199 — SCHEDE. Portafoglio, watchlist, macro e rischio sono quattro MOMENTI diversi:
+   impilarli in una pagina sola costringeva a scorrere per trovare cio' che serviva, ed e' una
+   delle ragioni per cui la dashboard risultava confusionaria. Le schede non nascondono dati —
+   cambiano quale sta davanti. La scelta si ricorda fra le sessioni.
+   ⚠ Le sezioni SENZA data-pane restano SEMPRE visibili (avvisi, barra di stato, coda decisioni):
+   un contenitore nuovo che nessuno ha marcato non deve sparire per omissione. */
+const TAB_KEY = "pref_tab";
+function setTab(nome) {
+  const valide = [...document.querySelectorAll("#main-tabs .tab")].map(b => b.dataset.tab);
+  if (!valide.includes(nome)) nome = valide[0] || "portafoglio";
+  try { localStorage.setItem(TAB_KEY, nome); } catch { /* quota */ }
+  document.querySelectorAll("#main-tabs .tab").forEach(b =>
+    b.classList.toggle("tab-active", b.dataset.tab === nome));
+  document.querySelectorAll("[data-pane]").forEach(el => {
+    el.hidden = el.dataset.pane !== nome;
+  });
+  // le tabelle vanno ridisegnate quando tornano visibili: larghezze e sticky si calcolano
+  // sul layout, e su un contenitore nascosto verrebbero sbagliate.
+  if (nome === "portafoglio") renderTable();
+  if (nome === "watchlist") renderWatchlist();
+}
+document.querySelectorAll("#main-tabs .tab").forEach(b =>
+  b.addEventListener("click", () => setTab(b.dataset.tab)));
+
+try { setTab(localStorage.getItem(TAB_KEY) || "portafoglio"); } catch { /* DOM non pronto */ }

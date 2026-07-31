@@ -406,6 +406,18 @@ function c13_seduteMiste(t, ctx) {
 function c14_codaAZero(t) {
   const riga = (t.match(/^- FedWatch[^\n]*/m) || [])[0];
   if (!riga) { ok("C14 nessuna riga FedWatch da controllare"); return; }
+  // v199: "NON CALCOLABILE" con la ragione e la fonte alternativa SODDISFA la regola meglio di
+  // qualunque numero. C14 nasce per impedire che uno zero solitario si legga come "nessun
+  // rischio"; una riga che dice apertamente "questo contratto non prezza quella riunione, la
+  // fonte che la prezza dice X" e' esattamente il comportamento voluto. Senza questa eccezione
+  // il detector puniva la correzione che gli dava ragione.
+  if (/NON CALCOLABILE/.test(riga)) {
+    if (/mercato di previsione|Nessun mercato di previsione/.test(riga))
+      ok("C14 la riga FedWatch dichiara il limite di orizzonte e indica la fonte che quota davvero quella riunione");
+    else
+      flag("C14 limite dichiarato senza alternativa", "la riga FedWatch dice di non poter calcolare ma non indica quale fonte prezzi quella riunione");
+    return;
+  }
   const rami = ["RIALZO", "taglio", "invariato"].filter(r => new RegExp(`${r} \\d+%`).test(riga));
   const soloZeri = [...riga.matchAll(/(RIALZO|taglio|invariato) (\d+)%/g)].every(m => m[2] === "0");
   if (rami.length < 2) {
