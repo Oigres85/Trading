@@ -346,6 +346,28 @@ riga VIX corretta. Ora legge solo la coda — e il confine è la RIGA `^CONTESTO
 non la parola, perché la testata *nomina* quella sezione ("Leggi CONTESTO DI SESSIONE prima di
 tutto") e tagliare alla prima occorrenza lasciava dentro tutto.
 
+## 🔬 Ciclo dei semiconduttori (v195) — dall'analisi video del CEO
+
+Il book è per oltre metà in semi e per l'**86% della sua varianza**: la domanda che conta non è se
+quei titoli siano cari (il P/E **forward** del settore sta sotto quello del mercato) ma se il
+**ciclo** stia girando. L'anticipatore storico è il rapporto **scorte/spedizioni** dell'industria:
+basso = domanda che eccede l'offerta; la **risalita** è ciò che ha preceduto l'inversione dei
+ricavi di settore (fine 2021 → bust 2022). Il payload pubblica **direzione oltre al livello**,
+perché è la curva a dare il segnale, più la produzione industriale di semiconduttori con YoY.
+
+⚠️ **Gli ID delle serie FRED non erano verificabili da questo ambiente** (FRED non risponde dal
+sandbox). `prima_che_risponde()` prova una LISTA di candidati e tiene il primo che risponde,
+**registrando quale ha funzionato** — e il payload stampa l'ID della serie usata. Un ID indovinato
+e scritto come se fosse certo sarebbe stato peggio di un tentativo dichiarato.
+
+### Cosa il sistema NON può fare (dai due video analizzati)
+
+Non ottenibile con dati gratuiti, e va detto invece di simularlo: **dark pool prints**, **gamma
+positioning / net expirations**, **Hindenburg Omen** (serve advance-decline e new highs/lows),
+**flussi retail Vanda**, **volume profile / most-traded zone**, **anchored VWAP**. Sono dati a
+pagamento o derivati da feed che il progetto non ha. Il resto dell'analisi macro→settore→titolo
+il payload lo copre.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

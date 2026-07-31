@@ -1934,6 +1934,10 @@ def fetch_macro():
         # v194 — narrazione temporale: serie lunghe FRED + episodi analoghi. Non blocca il run:
         # se FRED non risponde il payload semplicemente non stampa il blocco.
         try:
+            cs = ciclo_semiconduttori()
+            if cs:
+                macro["ciclo_semi"] = cs
+                print(f"[semi] ciclo semiconduttori: {list(cs.keys())}")
             sl = storia_lunga()
             if sl:
                 macro["storia"] = sl
@@ -2212,6 +2216,67 @@ def compute_shock_alert(macro, watchlist, now_utc=None):
     return {"active": True, "threshold": THR, "sources": sources, "worst_chg": worst,
             "note": "Asia/futures Nasdaq oltre -2% con Wall Street chiusa: sospendere gli acquisti "
                     "aggressivi, attendere l'assestamento della prima ora di scambi USA."}
+
+
+def ciclo_semiconduttori():
+    """CICLO DEI SEMICONDUTTORI (v195) — l'indicatore anticipatore che il payload non aveva.
+
+    Perche' proprio questo. Il book e' per oltre meta' in semiconduttori e per l'86% della sua
+    varianza: la domanda che conta non e' se quei titoli siano "cari" (il P/E forward del settore
+    e' sotto quello del mercato, quindi no) ma se il CICLO stia girando. Il segnale storicamente
+    anticipatore e' il rapporto SCORTE/SPEDIZIONI dell'industria: quando scende, la domanda
+    eccede l'offerta e i prezzi dei chip salgono; quando comincia a RISALIRE, storicamente i
+    ricavi del settore hanno girato entro l'anno (fine 2021 → bust 2022).
+
+    Gli ID delle serie FRED non li posso verificare da qui, quindi si prova una LISTA di
+    candidati e si tiene il primo che risponde, registrando QUALE ha funzionato. Meglio un
+    tentativo dichiarato che un ID indovinato e scritto come se fosse certo.
+    """
+    try:
+        from historical_context import racconto, percentile
+    except Exception:  # noqa: BLE001
+        return None
+
+    def prima_che_risponde(candidati, n=20000):
+        for sid in candidati:
+            try:
+                serie = fred_series(sid, n=n)
+                if serie and len(serie) > 60:
+                    return sid, serie
+            except Exception:  # noqa: BLE001
+                continue
+        return None, None
+
+    # scorte/spedizioni dei prodotti informatici ed elettronici (Census M3 su FRED)
+    sid_is, inv_ship = prima_che_risponde(["U34MIS", "A34MIS", "U34SIS", "MNFCTRIRSA"])
+    # produzione industriale di semiconduttori (proxy dei volumi spediti)
+    sid_ip, prod = prima_che_risponde(["IPG3344S", "IPB53122S", "IPG334S"])
+    if not inv_ship and not prod:
+        print("[semi] nessuna serie di ciclo disponibile su FRED")
+        return None
+
+    out = {}
+    if inv_ship:
+        vals = [v for _, v in inv_ship]
+        ultimi = vals[-4:] if len(vals) >= 4 else vals
+        # la DIREZIONE conta piu' del livello: e' la curva all'insu' il segnale, non il valore
+        sale = len(ultimi) >= 3 and ultimi[-1] > ultimi[0]
+        out["inv_ship"] = {
+            "serie": sid_is, "valore": round(vals[-1], 3), "data": inv_ship[-1][0],
+            "percentile": percentile(inv_ship), "osservazioni": len(vals),
+            "dal": inv_ship[0][0], "direzione": "in RISALITA" if sale else "in discesa o piatto",
+            "delta_3": round(vals[-1] - ultimi[0], 3) if len(ultimi) >= 3 else None,
+        }
+    if prod:
+        vals = [v for _, v in prod]
+        yoy = None
+        if len(vals) >= 13 and vals[-13]:
+            yoy = round((vals[-1] / vals[-13] - 1) * 100, 1)
+        out["produzione"] = {
+            "serie": sid_ip, "valore": round(vals[-1], 1), "data": prod[-1][0],
+            "yoy": yoy, "percentile": percentile(prod), "osservazioni": len(vals), "dal": prod[0][0],
+        }
+    return out or None
 
 
 def storia_lunga():

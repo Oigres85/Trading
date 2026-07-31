@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "194";
+const BUILD_VERSION = "195";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6205,6 +6205,30 @@ function buildPrompt() {
   if (m.yield_recession) {
     const yr = m.yield_recession;
     lines.push(`- Curva vs Recessione (storico FRED): spread 10A-2A ${yr.current_curve != null ? (yr.current_curve > 0 ? "+" : "") + yr.current_curve + " pp (chiusura daily, stessa lettura delle righe sopra)" : "—"}${yr.curve_12m_ago != null ? ` (12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago}, media mensile del modello storico)` : ""}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. NB: irripidimento post-inversione → storicamente recessione entro ~12 mesi (curva shiftata di 12m anticipa il calo del PIL).`);
+  }
+  // ═══ v195 — CICLO DEI SEMICONDUTTORI. Il book e' per oltre meta' in semi e per l'86% della
+  // sua varianza: la domanda che conta non e' se quei titoli siano cari (il P/E forward del
+  // settore sta sotto quello del mercato) ma se il CICLO stia girando. Il rapporto
+  // SCORTE/SPEDIZIONI e' l'anticipatore storico: quando scende la domanda eccede l'offerta;
+  // quando comincia a RISALIRE, i ricavi del settore hanno storicamente girato entro l'anno.
+  // Si pubblica la DIREZIONE oltre al livello, perche' e' la curva a dare il segnale.
+  const cs = m.ciclo_semi;
+  if (cs && (cs.inv_ship || cs.produzione)) {
+    lines.push("");
+    lines.push("CICLO DEI SEMICONDUTTORI (indicatori d'industria, non di prezzo — il book ha qui la sua concentrazione):");
+    if (cs.inv_ship) {
+      const i = cs.inv_ship;
+      lines.push(`- Scorte/spedizioni prodotti informatici ed elettronici: ${fmtNum.format(i.valore)} (rilevazione ${i.data}, serie FRED ${i.serie})`
+        + ` · percentile ${i.percentile}° su ${i.osservazioni} osservazioni dal ${String(i.dal).slice(0, 4)}`
+        + ` · direzione ultime rilevazioni: ${i.direzione}${i.delta_3 != null ? ` (Δ ${i.delta_3 > 0 ? "+" : ""}${fmtNum.format(i.delta_3)})` : ""}`
+        + ` — rapporto BASSO = domanda che eccede l'offerta; la RISALITA è il segnale che storicamente ha preceduto l'inversione dei ricavi di settore`);
+    }
+    if (cs.produzione) {
+      const p2 = cs.produzione;
+      lines.push(`- Produzione industriale di semiconduttori: ${fmtNum.format(p2.valore)} (${p2.data}, serie FRED ${p2.serie})`
+        + `${p2.yoy != null ? ` · YoY ${p2.yoy > 0 ? "+" : ""}${fmtNum.format(p2.yoy)}%` : ""}`
+        + ` · percentile ${p2.percentile}° su ${p2.osservazioni} osservazioni dal ${String(p2.dal).slice(0, 4)}`);
+    }
   }
   // ═══ v194 — MEMORIA STORICA: dove siamo rispetto al passato, e le altre volte com'e' andata.
   // E' la dimensione che mancava: il payload sapeva il LIVELLO di un indicatore e non la sua
