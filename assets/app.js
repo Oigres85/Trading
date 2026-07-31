@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "200";
+const BUILD_VERSION = "201";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5699,6 +5699,18 @@ function buildPrompt() {
     lines.push(`· Superano tutte le soglie (${passa.length}): ${passa.length ? passa.join(", ") : "nessuno"}`
       + (bloccatiCap.length ? ` · fermati dal cap d'ingresso, non dalla qualita': ${bloccatiCap.join(", ")}` : "")
       + `. Le soglie sono: impatto marginale sullo Sharpe di portafoglio, forza relativa 1M vs benchmark, qualita' fondamentale, piu' i veti elencati sotto. I dati per giudicarli uno per uno — fondamentali, tecnica, correlazione col book — stanno nelle tabelle.`);
+    // ═══ v201 — LA CONCENTRAZIONE DI FATTORE TORNA, come RIGA PROPRIA.
+    // Il taglio del v200 se l'era portata via senza che me ne accorgessi: viveva dentro
+    // dv.reasons, cioe' nella lista dei motivi del VERDETTO, e togliendo il verdetto e' sparita
+    // con lui. E' il fatto di rischio piu' importante di questo portafoglio — l'86% della
+    // varianza su un fattore solo — ed e' ARITMETICA, non previsione: esattamente cio' che avevo
+    // detto che sarebbe rimasto. Ora vive per conto suo e non dipende piu' da nessun verdetto.
+    // Lezione: quando si toglie un contenitore si porta via anche cio' che ci stava dentro per
+    // caso. La ricevuta del taglio (C12) esiste per questo, e non copriva questa riga: ora si'.
+    if (dv.factorRisk) {
+      const fr = dv.factorRisk;
+      lines.push(`⚠ CONCENTRAZIONE DI FATTORE: ${fr.tk.join("+")} (${fr.name}) generano il ${fmtNum.format(fr.mcr)}% della VARIANZA del fondo con il ${fmtNum.format(fr.w)}% del NAV — oltre la soglia del ${RISK_PARAMS.factorRiskAlert_pct}%. I veti guardano un titolo per volta e questo NON lo vedono: sono nomi che possono scendere INSIEME perche' condividono il fattore, per quanto sani siano singolarmente. Ridurre qui significa ridurre la quota di VARIANZA, non il numero di titoli.`);
+    }
     // NOTA (v156): rimosse da qui le direttive INDIPENDENZA SUL VERDETTO e ANALISI PER-TITOLO —
     // erano una SECONDA testata dentro il payload (il payload deve essere MATERIA PRIMA, non un
     // rulebook che compete con la Costituzione). L'indipendenza vive in [B1], l'analisi per-titolo

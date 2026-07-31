@@ -360,6 +360,11 @@ function c12_fattiSopravvissuti(t) {
     { che: "rotazione settoriale",   re: /Semiconduttori \(SMH\)/,     era: "TOP 10 ETF", ora: "ROTAZIONE SETTORIALE" },
     // v185: aggiunto DOPO aver provato il payload su me stesso — l'avevo tolto senza che nulla
     // se ne accorgesse, ed e' esattamente il buco che C12 esiste per non lasciare aperto.
+    // v201: aggiunto DOPO che il taglio del motore se l'era portato via in silenzio. E' il fatto
+    // di rischio piu' importante del book e viveva dentro i "motivi del verdetto": togliendo il
+    // verdetto e' sparito con lui. C12 esiste esattamente per questo e non lo copriva.
+    { che: "concentrazione di fattore", re: /CONCENTRAZIONE DI FATTORE[\s\S]{0,120}della VARIANZA/,
+      era: "motivi del verdetto (v200 lo ha rimosso)", ora: "riga propria nel blocco filtri" },
     { che: "EPS dei titoli watchlist", re: /\| EPS \|/,                 era: "Tabella B (tolto per errore in v184)", ora: "Tabella B" },
   ];
   const persi = ATTESI.filter(a => !a.re.test(t));
