@@ -1250,3 +1250,7 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
   .pp-move { margin-left: 6px; }
   .pp-mv { width: 26px; height: 24px; font-size: 10px; }   /* bersaglio più grande sul dito */
 }
+
+/* v196 — voce del popup macro che non ha un riquadro in dashboard: spostarla non la muove */
+.pp-solo-popup { font-size: 9px; font-style: normal; opacity: .5; border: 1px solid var(--border, #262b36);
+  border-radius: 4px; padding: 0 4px; margin-left: 5px; white-space: nowrap; }

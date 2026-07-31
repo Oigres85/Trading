@@ -1248,5 +1248,28 @@ for (const [name, ok] of T) {
   if (!ok) fail++;
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}`);
 }
+/* ---------- v196: registro dei popup macro allineato alla griglia ---------- */
+// La griglia rende data-macro="in:umich" ma MACRO_INFO aveva ancora "in:pmi": openMacroInfo
+// usciva in silenzio (`if (!info) return;`) e cliccare "Fiducia consumatori" nella dashboard
+// NON APRIVA NULLA. Un fallimento MUTO puo' restare invisibile per mesi.
+// NB: la prima stesura di questo test cercava le chiavi LETTERALI nel sorgente e non trovava
+// nulla, perche' la griglia le costruisce da template (`data-macro="in:${i.key}"`). Un test che
+// guarda dove la chiave non c'e' e' verde su qualunque cosa. Ora si parte dai DATI, che sono
+// la fonte vera delle chiavi.
+{
+  const chiavi = run("Object.keys(MACRO_INFO || {})");
+  // il fixture non ha `indicators`: si leggono dal data.json REALE, che e' la fonte delle chiavi
+  // rese in pagina. Un test che interroga un fixture vuoto e' verde per assenza di dati, non per
+  // assenza di difetti — ed e' esattamente cosi' che questo test e' passato mentre il difetto
+  // era iniettato.
+  const reale = JSON.parse(readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null"));
+  const indicatori = ((reale.macro || {}).indicators || []).map(x => x.key);
+  const orfane = indicatori.map(k => "in:" + k).filter(k => !chiavi.includes(k));
+  check("v196 registro macro: ogni indicatore della griglia ha la sua voce in MACRO_INFO (niente popup muti)",
+        indicatori.length > 0 && orfane.length === 0);
+  if (orfane.length) console.log("  ⚠ indicatori senza voce nel registro:", orfane.join(", "));
+}
+
+
 console.log(`\n${T.length - fail}/${T.length} check superati`);
 process.exit(fail ? 1 : 0);

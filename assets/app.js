@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "195";
+const BUILD_VERSION = "196";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4049,7 +4049,7 @@ const MACRO_INFO = {
   "in:retail": ["Vendite al dettaglio", "Spesa dei consumatori, indicatore di domanda.", "Mensile, ~metà mese (Census)", /vendite|retail|consum/i],
   "in:nfp": ["Non-Farm Payrolls", "Nuovi posti di lavoro USA, market mover sui tassi.", "Mensile, primo venerdì (BLS)", /payroll|lavoro|jobs|occupa/i],
   "in:unemp": ["Disoccupazione", "Tasso di disoccupazione USA.", "Mensile, primo venerdì (BLS)", /disoccupa|unemploy|jobs/i],
-  "in:pmi": ["Fiducia consumatori", "Sentiment delle famiglie USA (Univ. Michigan).", "Mensile (preliminare + finale)", /fiducia|sentiment|consumer|michigan/i],
+  "in:umich": ["Fiducia consumatori", "Sentiment delle famiglie USA (Univ. Michigan).", "Mensile (preliminare + finale)", /fiducia|sentiment|consumer|michigan/i],
   "in:curve": ["Curva 10A-2A", "Spread dei rendimenti; se negativo (inversione) storico segnale di recessione.", "Aggiornato in continuo", /curva|treasur|yield|recess|rendiment/i],
   "mk:^TNX": ["Treasury USA 10 anni", "Rendimento del decennale USA: sale = condizioni più restrittive.", "Mercato aperto USA", /treasur|10.?anni|yield|rendiment|bond/i],
   "mk:EURUSD=X": ["Cambio EUR/USD", "Euro contro dollaro: incide sul valore in € delle azioni USA.", "Continuo (forex)", /euro|dollar|eur.?usd|cambio|fx/i],
@@ -4121,22 +4121,26 @@ function openMacroDetails() {
   // era un punteggio composito i cui tre addendi (tecnica, macro, fondamentale) hanno gia'
   // ciascuno il proprio pannello. Restano raggiungibili dalle mini-card se servono.
   const tasks = [
-    { label: "MacroQuant — ciclo economico",        run: openMacroQuantModal },
-    { label: "BofA Bear-Market Signposts",          run: openSignpostsModal },
-    { label: "Rotazione settoriale",                run: openTiltModal },
+    { label: "MacroQuant — ciclo economico",        run: openMacroQuantModal, dom: "#macroquant-box" },
+    { label: "BofA Bear-Market Signposts",          run: openSignpostsModal, dom: "#signposts-box" },
+    { label: "Rotazione settoriale",                run: openTiltModal, dom: "#tilt-box" },
 
-    { label: "Stagionalità",                        run: openSeasonalityModal },
-    { label: "Sharpe del portafoglio",              run: openPortfolioSharpeModal },
+    { label: "Stagionalità",                        run: openSeasonalityModal, dom: "#seasonality-box" },
+    { label: "Sharpe del portafoglio",              run: openPortfolioSharpeModal, dom: "#sharpe-box" },
     { label: "Alpha del processo",                  run: openAlphaModal },
-    { label: "Rischio cambio EUR/USD",              run: openFxModal },
-    { label: "Margin Debt — leva a credito",        run: openMarginDebtModal },
+    { label: "Rischio cambio EUR/USD",              run: openFxModal, dom: "#fx-box" },
+    { label: "Margin Debt — leva a credito",        run: openMarginDebtModal, dom: "#margin-debt-box" },
 
   ];
   // + una sezione per ogni voce della griglia macro che ha un dettaglio proprio. Le chiavi si
   // leggono da MACRO_INFO, che e' gia' il registro di quei pannelli: nessun secondo elenco da
   // tenere allineato (la classe di difetto che ha prodotto C10 e C12).
-  for (const k of Object.keys(MACRO_INFO || {})) tasks.push({ label: null, run: () => openMacroInfo(k) });
-  renderPanelPage("Dettagli macro", collectPanels(tasks), "Dati macro non ancora caricati.", "macro");
+  for (const k of Object.keys(MACRO_INFO || {}))
+    tasks.push({ label: null, run: () => openMacroInfo(k), dom: `[data-macro="${CSS.escape(k)}"]` });
+  const pannelli = collectPanels(tasks);
+  PANEL_DOM.clear();
+  for (const p of pannelli) if (p.dom) PANEL_DOM.set(p.title, p.dom);
+  renderPanelPage("Dettagli macro", pannelli, "Dati macro non ancora caricati.", "macro");
 }
 
 function collectPanels(tasks) {
@@ -4148,7 +4152,10 @@ function collectPanels(tasks) {
       const prima = out.length;
       try { t.run(); } catch (e) { /* un pannello rotto non deve far cadere la pagina intera */ }
       // se la funzione non ha aperto nulla (dato assente) si salta: niente sezioni vuote
-      for (let i = prima; i < out.length; i++) if (t.label) out[i].title = t.label;
+      for (let i = prima; i < out.length; i++) {
+        if (t.label) out[i].title = t.label;
+        if (t.dom) out[i].dom = t.dom;      // v196: l'aggancio alla dashboard e' DICHIARATO qui
+      }
     }
   } finally { openInfoModal = orig; }
   return out;
@@ -4185,17 +4192,42 @@ const MACRO_CARD_BY_PANEL = {
   "Rischio cambio EUR/USD": "fx-box",
   "Margin Debt — leva a credito": "margin-debt-box",
 };
-function applicaOrdineMiniCard() {
-  const cont = document.querySelector(".mini-cards");
-  if (!cont) return;
+/* v196 — L'ORDINE VALE SU TUTTA LA SEZIONE MACRO, non solo sulle sette mini-card.
+   Il CEO riordinava il popup e la dashboard non seguiva. La causa: la propagazione conosceva
+   solo MACRO_CARD_BY_PANEL, cioe' 7 pannelli su 37 — ma le voci "Inflazione CPI", "PIL USA",
+   "Curva 10A-2A" e compagnia HANNO un corrispondente in dashboard: sono i `.macro-item` della
+   griglia, con `data-macro="in:cpi"` e simili. Erano 23 gli elementi riordinabili e ne muovevo 7.
+   La mappa dei `.macro-item` si ricava da MACRO_INFO, che e' gia' il registro dei loro titoli:
+   nessun secondo elenco da tenere allineato. */
+/* v196b — L'AGGANCIO NON SI INDOVINA DAL TITOLO. Prima si cercava in MACRO_INFO la voce il cui
+   nome coincidesse col titolo del pannello: per una parte (Fiducia consumatori, VIX, FedWatch…)
+   non coincideva, quelle voci restavano ferme in cima e la griglia sembrava non seguire affatto
+   l'ordine. Ora ogni pannello DICHIARA il proprio selettore quando viene raccolto, e la mappa si
+   costruisce da li'. Accoppiare due cose per il loro nome visibile e' fragile per costruzione:
+   il nome e' fatto per essere letto, non per essere una chiave. */
+const PANEL_DOM = new Map();
+function elementoDashboardPerPannello(titolo) {
+  const sel = PANEL_DOM.get(titolo);
+  return sel ? document.querySelector(sel) : null;
+}
+function applicaOrdineMacro() {
   const pref = loadPanelOrder("macro");
   if (!pref) return;
+  // Ogni elemento si riordina DENTRO IL PROPRIO genitore: due voci in contenitori diversi non
+  // si mescolano, e non serve sapere in anticipo quali siano i contenitori. L'elenco scritto a
+  // mano (.mini-cards, #macro-grid) lasciava fermo tutto cio' che vive altrove — ed e' lo stesso
+  // difetto dei registri fissi gia' pagato con C10 e con gli indici del red team.
+  const perGenitore = new Map();
   for (const titolo of pref) {
-    const id = MACRO_CARD_BY_PANEL[titolo];
-    const el = id && document.getElementById(id);
-    if (el) cont.appendChild(el);          // appendChild sposta: l'ordine segue quello dei pannelli
+    const el = elementoDashboardPerPannello(titolo);
+    if (!el || !el.parentElement) continue;
+    if (!perGenitore.has(el.parentElement)) perGenitore.set(el.parentElement, []);
+    perGenitore.get(el.parentElement).push(el);
   }
+  for (const [cont, elems] of perGenitore) for (const el of elems) cont.appendChild(el);
 }
+/* nome storico mantenuto: era chiamato da piu' punti e da un handler */
+const applicaOrdineMiniCard = applicaOrdineMacro;
 function renderPanelPage(titolo, panels, notaVuota, ambito) {
   if (!panels.length) { openInfoModal(titolo, `<div class="muted" style="font-size:12px">${notaVuota || "Nessun dettaglio disponibile."}</div>`); return; }
   const ord = ambito ? ordinaPannelli(ambito, panels) : panels;
@@ -4205,7 +4237,7 @@ function renderPanelPage(titolo, panels, notaVuota, ambito) {
   // tastiera e dito — e il trascinamento resta come scorciatoia per chi e' al computer.
   const voci = ord.map((p, i) =>
     `<li class="pp-nav-item${i === 0 ? " is-active" : ""}" draggable="true" data-idx="${i}" title="${esc(p.title)}">
-       <span class="pp-nav-txt">${esc(p.title)}</span>
+       <span class="pp-nav-txt">${esc(p.title)}${ambito === "macro" && !elementoDashboardPerPannello(p.title) ? ' <em class="pp-solo-popup" title="Questa voce non ha un riquadro corrispondente nella dashboard: spostarla cambia solo l\'ordine qui dentro">solo qui</em>' : ""}</span>
        <span class="pp-move">
          <button class="pp-mv" data-mv="up" data-i="${i}" ${i === 0 ? "disabled" : ""} aria-label="Sposta ${esc(p.title)} in su" title="Sposta in su">▲</button>
          <button class="pp-mv" data-mv="down" data-i="${i}" ${i === ord.length - 1 ? "disabled" : ""} aria-label="Sposta ${esc(p.title)} in giù" title="Sposta in giù">▼</button>
@@ -5187,6 +5219,9 @@ function renderMacro() {
   }
 
   $("#macro-grid").innerHTML = cells.length ? cells.join("") : '<span class="muted">Dati non disponibili</span>';
+  // v196: la griglia si ricostruisce da zero a ogni render, quindi l'ordine scelto va RIAPPLICATO
+  // subito dopo — altrimenti tornerebbe quello di default al primo aggiornamento dei dati.
+  try { applicaOrdineMacro(); } catch { /* prima del wiring iniziale */ }
 }
 
 /* ---------------- top ETF dashboard ---------------- */

@@ -368,6 +368,34 @@ positioning / net expirations**, **Hindenburg Omen** (serve advance-decline e ne
 pagamento o derivati da feed che il progetto non ha. Il resto dell'analisi macro→settore→titolo
 il payload lo copre.
 
+## 🔑 L'ordine macro e la chiave morta (v196)
+
+Sintomo: "l'ordine delle tab macro differisce da quello nel popup". **Due difetti distinti.**
+
+1. **Propagazione parziale.** `MACRO_CARD_BY_PANEL` copriva 7 pannelli su 37 — ma le voci
+   "Inflazione CPI", "PIL USA", "Curva 10A-2A" **hanno** un corrispondente in dashboard: sono i
+   `.macro-item` della griglia. Erano 23 gli elementi riordinabili e se ne muovevano 7.
+   Ora ogni pannello **dichiara** il proprio selettore (`dom:`) quando viene raccolto, e la mappa
+   si costruisce da lì. Prima si cercava per TITOLO: accoppiare due cose per il loro nome
+   visibile è fragile per costruzione — il nome è fatto per essere letto, non per essere chiave.
+   Il riordino avviene **dentro il genitore di ciascun elemento**, senza un elenco di contenitori
+   scritto a mano (era lo stesso tipo di registro fisso già pagato con C10 e col red team).
+   La griglia si ricostruisce a ogni render, quindi l'ordine va **riapplicato** subito dopo.
+
+2. **Una chiave morta, e il fallimento era MUTO.** La griglia rende `data-macro="in:umich"` ma
+   `MACRO_INFO` aveva ancora `"in:pmi"` (residuo della ridenominazione già annotata qui sopra).
+   `openMacroInfo` esce in silenzio quando non trova la voce: **cliccare "Fiducia consumatori"
+   nella dashboard non apriva niente**, e nessuno se n'era accorto.
+
+Le 14 voci che davvero non hanno un riquadro (Alpha, FedWatch, Fear & Greed…) sono marcate
+**"solo qui"** nel popup, e un test verifica che l'etichetta non menta in nessuna delle due direzioni.
+
+⚠️ **Il test è stato sbagliato due volte prima di funzionare**, e vale la pena ricordarlo: la
+prima stesura cercava le chiavi *letterali* nel sorgente, dove non ci sono (la griglia le
+costruisce da template); la seconda le leggeva da un fixture che non ha `indicators`, quindi era
+verde **per assenza di dati, non di difetti** — passava con il difetto iniettato. Ora parte dal
+`data.json` reale. Un test va sempre validato iniettando il difetto che deve trovare.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
