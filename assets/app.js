@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "197";
+const BUILD_VERSION = "198";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -87,6 +87,41 @@ function updateSortArrows(tableId) {
    La chiave e' l'indice ORIGINALE della colonna (data-col), lo stesso su cui poggia il
    riordino: cosi' nascondere e spostare si compongono senza interferire. */
 const colHiddenKey = (tid) => `colhidden_${tid}`;
+/* ═══ v198 — VISTA COMPATTA DI DEFAULT. Nessuna colonna viene rimossa: cambia solo quali sono
+   ACCESE all'apertura. La tabella a 38 colonne conteneva tutto e non faceva vedere niente; una
+   a otto si legge, e le altre trenta restano a un clic da "⚙ Colonne" o nella scheda del titolo.
+   Le otto sono scelte per un criterio: sono quelle che servono a decidere se una posizione
+   richiede attenzione — peso, rischio che genera, forza relativa, risultato, e il segnale.
+   La preferenza dell'utente ha SEMPRE la precedenza: il default si applica solo la prima volta,
+   e una volta scelto qualcosa non viene mai sovrascritto. */
+const VISTA_COMPATTA = {
+  "ptf-table": [0, 1, 3, 4, 8, 15, 16, 17, 22],          // Titolo Qtà Prezzo Oggi Guad.% RS RSndx Segnale Trimestrale
+  "wl-table":  [0, 1, 2, 5, 6, 13, 18],                   // Titolo Prezzo Oggi RS RSndx Segnale Trimestrale
+};
+function applicaVistaCompattaSePrimaVolta(tid) {
+  const chiaveFatto = `vista_iniziale_${tid}`;
+  if (localStorage.getItem(chiaveFatto)) return;           // gia' deciso: non si tocca piu'
+  try { localStorage.setItem(chiaveFatto, "1"); } catch { /* quota */ }
+  if (localStorage.getItem(colHiddenKey(tid))) return;     // l'utente ha gia' scelto: si rispetta
+  const head = document.querySelector(`#${tid} thead tr`);
+  if (!head) return;
+  const visibili = new Set(VISTA_COMPATTA[tid] || []);
+  const nascoste = new Set([...head.children].map((_, i) => i).filter(i => !visibili.has(i)));
+  saveColHidden(tid, nascoste);
+}
+/* interruttore compatta/completa: una riga sola, e dice quante colonne stai vedendo */
+function renderVistaSwitch(tid, contenitore) {
+  const el = document.querySelector(contenitore);
+  if (!el) return;
+  const head = document.querySelector(`#${tid} thead tr`);
+  if (!head) return;
+  const tot = head.children.length;
+  const nasc = loadColHidden(tid).size;
+  el.innerHTML = `<span class="vs-lab">${tot - nasc}/${tot} colonne</span>
+    <button class="chip${nasc ? " chip-active" : ""}" data-vista="compatta" data-t="${tid}">Compatta</button>
+    <button class="chip${nasc ? "" : " chip-active"}" data-vista="completa" data-t="${tid}">Completa</button>`;
+}
+
 function loadColHidden(tid) {
   try {
     const a = JSON.parse(localStorage.getItem(colHiddenKey(tid)) || "[]");
@@ -664,7 +699,7 @@ function mergeManualHoldings() {
       const row = placeholderRow(h.ticker, h.currency || "USD", { qty: h.qty, pmc: h.pmc, name: h.name || h.ticker });
       const btpIdx = DATA.portfolio.findIndex(p => p.ticker === "BTP-V28");
       if (btpIdx >= 0) DATA.portfolio.splice(btpIdx, 0, row); else DATA.portfolio.push(row);
-      fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); });
+      fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderAllocation(); });
       added = true;
     });
     if (added) recomputeTotals();
@@ -681,8 +716,8 @@ function addPortfolio() {
   // aggiunta ottimistica: la riga compare subito, i dati completi arrivano col workflow
   const row = placeholderRow(ticker, "USD", { qty, pmc });
   DATA.portfolio.splice(DATA.portfolio.length - 1, 0, row);   // prima del BTP
-  renderTable(); recomputeTotals(); renderKPI(); renderAllocation();
-  fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); });
+  renderTable(); recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderAllocation();
+  fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderAllocation(); });
   // persistenza locale (sopravvive al reload anche senza token)
   saveManualHolding({ ticker, name: ticker, qty, pmc, currency: "USD" });
   toast(`${ticker} aggiunto al portafoglio ✓`);
@@ -740,7 +775,7 @@ function openEditPortfolio() {
     });
     const nc = parseFloat($("#edp-cash").value) || 0;
     if (nc !== cashEur) { cashEur = nc; localStorage.setItem("cash_eur", cashEur); changed = true; }
-    recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); renderCash();
+    recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderAllocation(); renderCash();
     closeChartModal();
     toast(changed ? "Portafoglio aggiornato ✓" : "Nessuna modifica");
     if (changed) {
@@ -808,7 +843,7 @@ function removeHolding(section, ticker) {
   if (!window.confirm(`Rimuovere ${ticker} da ${section === "portfolio" ? "portafoglio" : "watchlist"}?`)) return;
   // rimozione ottimistica immediata
   DATA[section] = (DATA[section] || []).filter(p => p.ticker !== ticker);
-  if (section === "portfolio") { removeManualHolding(ticker); recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); }
+  if (section === "portfolio") { removeManualHolding(ticker); recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderAllocation(); }
   else renderWatchlist();
   toast(`${ticker} rimosso ✓`);
   editHoldings(section, cfg => {
@@ -913,7 +948,7 @@ async function livePrices() {
   (DATA.watchlist || []).forEach(upd);
   recomputeTotals();
   refreshShockClient();         // ricalcola lo shock dai prezzi live (KOSPI/futures) — coglie crolli/recuperi
-  renderKPI(); renderTable(); renderWatchlist(); renderAllocation(); renderShockAlert();
+  renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderWatchlist(); renderAllocation(); renderShockAlert();
   const el = $("#live-badge");
   if (el) el.textContent = `Prezzi live: ${new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
 }
@@ -933,7 +968,7 @@ function renderAll() {
   }
   recomputeTotals();            // include la liquidità nei totali/allocazione
   renderCash();
-  renderKPI();
+  renderKPI(); renderStatusBar(); renderDecisionQueue();
   renderAllocation();
   renderEarnings();
   renderEarningsAlert();
@@ -1412,7 +1447,7 @@ function saveCash() {
   cashEur = parseFloat($("#cash-input").value) || 0;
   localStorage.setItem("cash_eur", cashEur);
   recomputeTotals();
-  renderCash(); renderKPI(); renderAllocation();
+  renderCash(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderAllocation();
   toast("Liquidità salvata ✓");
 }
 
@@ -1610,7 +1645,7 @@ function aggiornaPortafoglioLocale(tk, acquisto, q, px) {
   // ricalcolo e ridisegno TUTTO cio' che dipende dalle posizioni: e' la parte "devono essere
   // correlate" della richiesta — tabelle, KPI e torta dell'allocazione da una sola fonte.
   try { recomputeTotals(); } catch { /* dati incompleti: la pipeline riallinea */ }
-  try { renderKPI(); renderTable(); renderWatchlist(); renderAllocation(); } catch (e) { console.error(e); }
+  try { renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderWatchlist(); renderAllocation(); } catch (e) { console.error(e); }
 }
 
 function saveDiaryEntry(text, op) {
@@ -3059,6 +3094,98 @@ function openSignpostsModal() {
 }
 
 /* ---------------- KPI ---------------- */
+/* ═══════════ v198 — BARRA DI STATO E CODA DELLE DECISIONI ═══════════════════════════
+   Il problema che risolvono: la dashboard e' cresciuta per accumulo e metteva 38 colonne, 37
+   pannelli e una griglia da 16 voci tutti allo STESSO livello di importanza. Un terminale non e'
+   piu' denso — e' piu' gerarchico: davanti sta cio' che vincola una decisione, il resto e' a un
+   tasto. Nessun dato viene rimosso: cambia solo che cosa e' in primo piano.
+   Le sei voci della barra sono scelte per un criterio preciso: sono quelle che, se cambiano,
+   cambiano cosa puoi fare oggi. Budget, stop violati, concentrazione di fattore e leva di
+   mercato non erano visibili senza scorrere, ed erano i quattro vincoli piu' forti del book. */
+function renderStatusBar() {
+  const el = $("#statusbar");
+  if (!el || !DATA || !DATA.totals) return;
+  const t = DATA.totals, dv = (() => { try { return decisionVerdict(); } catch { return null; } })();
+  const m = DATA.macro || {};
+  const nav = t.eur_value != null ? fmtEUR.format(Math.round(t.eur_value)) : "—";
+  const gg = t.eur_gain_pct;
+  const bud = t.budget_operativo_spendibile;
+  const stopV = (dv?.stopViolations || []).length;
+  const fattore = dv?.factorRisk;
+  const md = m.margin_debt || {};
+  const vix = m.vix?.value;
+  const sess = (() => { try { return usSessionInfo().phase; } catch { return null; } })();
+  const FASI = { regular: ["SESSIONE APERTA", "ok"], "pre-market": ["PRE-MARKET", "warn"],
+                 "after-hours": ["AFTER-HOURS", "warn"], notte: ["MERCATI CHIUSI", "off"], weekend: ["WEEKEND", "off"] };
+  const [fase, faseCls] = FASI[sess] || ["—", "off"];
+
+  // ogni voce: etichetta breve, valore, e una classe che dice se e' un VINCOLO attivo
+  const voci = [
+    { k: "NAV", v: nav, cls: "" },
+    { k: "P&L", v: gg != null ? signTxt(gg) : "—", cls: gg > 0 ? "ok" : gg < 0 ? "bad" : "" },
+    { k: "Budget", v: bud != null ? fmtEUR.format(Math.round(bud)) : "—",
+      cls: bud === 0 ? "bad" : bud != null && bud < 5000 ? "warn" : "ok",
+      nota: bud === 0 ? "nessun acquisto eseguibile" : null },
+    { k: "Stop violati", v: String(stopV), cls: stopV > 0 ? "bad" : "ok" },
+    { k: "Concentr. fattore", v: fattore ? `${fmtNum.format(fattore.mcr)}% var.` : "—",
+      cls: fattore ? "bad" : "ok",
+      nota: fattore ? `${fattore.name}: ${fmtNum.format(fattore.mcr)}% della varianza con ${fmtNum.format(fattore.w)}% del NAV (${(fattore.tk || []).join(", ")})` : null },
+    { k: "Leva mercato", v: md.pct_of_peak != null ? `${md.pct_of_peak}% del picco` : "—",
+      cls: md.pct_of_peak >= 95 ? "bad" : md.pct_of_peak >= 85 ? "warn" : "ok" },
+    { k: "VIX", v: vix != null ? fmtNum.format(vix) : "—", cls: vix > 25 ? "bad" : vix > 20 ? "warn" : "ok" },
+    { k: "Sessione", v: fase, cls: faseCls },
+  ];
+  el.innerHTML = voci.map(v =>
+    `<div class="sb-item sb-${v.cls}"${v.nota ? ` title="${esc(v.nota)}"` : ""}>
+       <span class="sb-k">${v.k}</span><span class="sb-v">${v.v}</span>
+       ${v.nota ? `<span class="sb-n">${esc(v.nota)}</span>` : ""}
+     </div>`).join("");
+}
+
+/* Coda delle decisioni: le stesse posizioni che il payload elenca sotto "POSIZIONI CHE CHIEDONO
+   UNA DECISIONE OGGI", ma in cima e cliccabili. La fonte e' decisionVerdict(), la stessa del
+   prompt: una sola verita' per la dashboard e per l'LLM. */
+function renderDecisionQueue() {
+  const el = $("#decision-queue");
+  if (!el) return;
+  let dv = null;
+  try { dv = decisionVerdict(); } catch { /* dati incompleti */ }
+  if (!dv) { el.hidden = true; return; }
+  const eurusd = DATA.eurusd || 1.08;
+  const val = (r) => r.val_eur > 0 ? r.val_eur : (r.qty * r.price) / eurusd;
+  const righe = [];
+  for (const sv of (dv.stopViolations || [])) {
+    const r = sv.r;
+    if (!r) continue;
+    righe.push({ tk: r.ticker, motivo: `stop violato · ${sv.stop != null ? cur(r) + fmtNum.format(sv.stop) : "—"} contro ${cur(r)}${fmtNum.format(r.price)}`,
+                 grave: true, val: val(r), r });
+  }
+  for (const x of (dv.excluded || [])) {
+    const r = x.r;
+    if (!r || !r.qty) continue;                                  // solo posizioni DETENUTE
+    if (righe.some(y => y.tk === r.ticker)) continue;             // gia' in coda per lo stop
+    if ((x.strength || "").toUpperCase() !== "FORTE") continue;   // i veti deboli non sono urgenze
+    righe.push({ tk: r.ticker, motivo: `veto FORTE · ${((x.why || [])[0] || "value trap").replace(/\s*\(.*$/, "")}`,
+                 grave: false, val: val(r), r });
+  }
+  if (!righe.length) {
+    el.hidden = false;
+    el.innerHTML = `<div class="dq-head"><h2>Decisioni di oggi</h2></div>
+      <div class="dq-vuota">Nessuna posizione richiede una decisione oggi: nessuno stop violato, nessun veto forte su titoli detenuti.</div>`;
+    return;
+  }
+  righe.sort((a, b) => (b.grave - a.grave) || (b.val - a.val));
+  el.hidden = false;
+  el.innerHTML = `<div class="dq-head"><h2>Decisioni di oggi</h2><span class="dq-n">${righe.length}</span></div>
+    <div class="dq-list">${righe.map(x => `
+      <button class="dq-row${x.grave ? " dq-grave" : ""}" data-dq="${esc(x.tk)}">
+        <span class="dq-tk">${esc(x.tk)}</span>
+        <span class="dq-motivo">${esc(x.motivo)}</span>
+        <span class="dq-val">${fmtEUR.format(Math.round(x.val))}</span>
+        <span class="dq-go">apri ›</span>
+      </button>`).join("")}</div>`;
+}
+
 function renderKPI() {
   const t = DATA.totals;
   const b = DATA.broker;
@@ -4792,7 +4919,7 @@ function editPosition(ticker) {
     r.value = r.price * qty; r.gain = r.value - pmc * qty;
     r.gain_pct = Math.round((r.value / (pmc * qty) - 1) * 10000) / 100;
   }
-  recomputeTotals(); renderKPI(); renderTable(); renderAllocation();
+  recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderAllocation();
   toast(`${ticker} aggiornato — salvo nel repo…`);
   editHoldings("portfolio", cfg => {
     const p = (cfg.portfolio || []).find(x => x.ticker === ticker);
@@ -4836,8 +4963,10 @@ function renderTable() {
   const addRow = editMode.portfolio
     ? `<tr class="add-row"><td colspan="38"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
+  applicaVistaCompattaSePrimaVolta("ptf-table");
   applyColOrder("ptf-table");
-  applyColVisibility("ptf-table");   // v188: dopo il riordino — legge l'ordine per accorciare i colspan
+  applyColVisibility("ptf-table");
+  renderVistaSwitch("ptf-table", "#ptf-vista");   // v188: dopo il riordino — legge l'ordine per accorciare i colspan
   applyColLabels("ptf-table");
 }
 
@@ -4879,8 +5008,10 @@ function renderWatchlist() {
   const addRow = editMode.watchlist
     ? `<tr class="add-row"><td colspan="34"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
+  applicaVistaCompattaSePrimaVolta("wl-table");
   applyColOrder("wl-table");
-  applyColVisibility("wl-table");    // v188: idem
+  applyColVisibility("wl-table");
+  renderVistaSwitch("wl-table", "#wl-vista");    // v188: idem
   applyColLabels("wl-table");
 }
 
@@ -7721,4 +7852,24 @@ document.addEventListener("click", (e) => {
   if (ch) { openTickerChart(ch.dataset.cardChart); return; }
   const op = e.target.closest("[data-card-opt]");
   if (op) { openOptionsModal(op.dataset.cardOpt); return; }
+});
+
+/* v198 — la coda delle decisioni apre la scheda del titolo: un clic dalla segnalazione al dato */
+document.addEventListener("click", (e) => {
+  const row = e.target.closest("[data-dq]");
+  if (row) openStockCard(row.dataset.dq);
+});
+
+/* v198 — interruttore compatta/completa */
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-vista]");
+  if (!b) return;
+  const tid = b.dataset.t;
+  if (b.dataset.vista === "completa") saveColHidden(tid, new Set());
+  else {
+    const head = document.querySelector(`#${tid} thead tr`);
+    const vis = new Set(VISTA_COMPATTA[tid] || []);
+    saveColHidden(tid, new Set([...head.children].map((_, i) => i).filter(i => !vis.has(i))));
+  }
+  (tid === "ptf-table" ? renderTable : renderWatchlist)();
 });

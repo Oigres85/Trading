@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=197">
+<link rel="stylesheet" href="assets/style.css?v=198">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -43,6 +43,15 @@
   <div id="reconcile-alert" hidden></div>
   <!-- ALERT QUALITÀ DATI MACRO (data assertions: dati datati o implausibili) -->
   <div id="dataquality-alert" hidden></div>
+
+  <!-- ═══ v198 — BARRA DI STATO: le sei cose che cambiano una decisione, sempre visibili.
+       Prima erano sepolte dentro l'executive brief e dentro blocchi lunghi: un terminale le
+       tiene in testa perche' sono i VINCOLI, non i dettagli. -->
+  <div class="statusbar" id="statusbar" aria-label="Stato del fondo"></div>
+
+  <!-- ═══ v198 — CODA DELLE DECISIONI: solo cio' che richiede un'azione oggi. Se e' vuota,
+       lo dice — "niente da decidere" e' un'informazione, non uno spazio bianco. -->
+  <section class="card decision-queue" id="decision-queue" hidden></section>
 
   <!-- PATRIMONIO -->
   <section class="card kpi-card">
@@ -111,6 +120,7 @@
         <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
         <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
       </div>
+      <div class="vista-switch" id="ptf-vista"></div>
       <button class="btn btn-ghost btn-sm" id="ptf-cols" title="Scegli quali colonne vedere (non tocca il prompt AI)">⚙ Colonne</button>
       <button class="btn btn-ghost btn-sm" id="ptf-edit-values" aria-label="Modifica quantità, PMC e liquidità" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica valori</button>
     </div>
@@ -176,6 +186,7 @@
         <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
         <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
       </div>
+      <div class="vista-switch" id="wl-vista"></div>
       <button class="btn btn-ghost btn-sm" id="wl-cols" title="Scegli quali colonne vedere (non tocca il prompt AI)">⚙ Colonne</button>
     </div>
     <div class="table-wrap" id="wl-tech-wrap">
@@ -364,6 +375,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=197"></script>
+<script src="assets/app.js?v=198"></script>
 </body>
 </html>

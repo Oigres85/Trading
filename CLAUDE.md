@@ -396,6 +396,31 @@ costruisce da template); la seconda le leggeva da un fixture che non ha `indicat
 verde **per assenza di dati, non di difetti** — passava con il difetto iniettato. Ora parte dal
 `data.json` reale. Un test va sempre validato iniettando il difetto che deve trovare.
 
+## 🖥️ Vista terminale (v198) — gerarchia, non densità
+
+Il problema non era la quantità di dati, era che **38 colonne, 37 pannelli e una griglia da 16
+voci stavano tutti allo stesso livello di importanza**. Un terminale professionale non è più
+denso — è più gerarchico. **Nessun dato è stato rimosso**: cambia cosa è in primo piano.
+
+- **Barra di stato** (`renderStatusBar`): NAV, P&L, **budget**, **stop violati**, **concentrazione
+  di fattore**, **leva di mercato**, VIX, sessione. Il criterio di scelta è preciso: sono le voci
+  che, se cambiano, **cambiano cosa puoi fare oggi**. Quattro erano invisibili senza scorrere ed
+  erano i vincoli più forti del book. Le classi `sb-bad`/`sb-warn` accendono un bordo solo sui
+  vincoli attivi.
+- **Coda delle decisioni** (`renderDecisionQueue`): stop violati + veti FORTI su titoli detenuti,
+  ordinati per gravità e controvalore, ciascuno un clic dalla scheda del titolo. La fonte è
+  `decisionVerdict()`, **la stessa del payload**: una sola verità per dashboard e LLM. Se è vuota
+  lo dice — "niente da decidere" è informazione, non spazio bianco.
+- **Vista compatta di default**: 9 colonne su 38 (portafoglio), 7 su 34 (watchlist). Le altre
+  restano a un clic (`⚙ Colonne` o l'interruttore Compatta/Completa, che mostra sempre "N/38
+  colonne"). ⚠️ Il default si applica **una sola volta** (`vista_iniziale_<tid>`) e **mai** se
+  l'utente ha già una preferenza: una scelta dell'utente non va sovrascritta da un default.
+- **Colore come informazione**: verde/rosso solo per il segno, ambra solo per ciò che vincola.
+  Prima si colorava ovunque, ed è esattamente ciò che rendeva invisibili le righe che contano.
+
+Verificato: payload **identico** passando da compatta a completa (69.096 caratteri), 0 errori
+console, la coda elenca le 6 posizioni che il payload elenca a sua volta.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
