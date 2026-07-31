@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "192";
+const BUILD_VERSION = "193";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -18,7 +18,7 @@ const SORT_FIELDS = {
                 "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null,
                // v188 — colonne fondamentali unite alla tabella principale (nell'ordine dei <th>):
                // Market Cap, P/E, EV/EBITDA, ROE, Margine netto, P/FCF, Cresc. ricavi, D/E, Div, PEG, Z-Score
-               "stat:market_cap", "pe", "stat:ev_ebitda", "stat:roe", "stat:profit_margin",
+               "stat:market_cap", "pe", "stat:forward_pe", "stat:ev_ebitda", "stat:roe", "stat:profit_margin",
                "pfcf", "stat:revenue_growth", "stat:debt_to_equity", "stat:dividend_yield",
                "stat:peg", "stat:altman_z", "fin_health", "upside_pct"],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,Beta,Sharpe 1A,Sortino 1A,Supporto,Resistenza,Δ SMA200,
@@ -28,7 +28,7 @@ const SORT_FIELDS = {
                "rs_1m", "rs_ndx_1m", null,
                "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null,
                // v188 — stesse 11 colonne fondamentali della tabella portafoglio
-               "stat:market_cap", "pe", "stat:ev_ebitda", "stat:roe", "stat:profit_margin",
+               "stat:market_cap", "pe", "stat:forward_pe", "stat:ev_ebitda", "stat:roe", "stat:profit_margin",
                "pfcf", "stat:revenue_growth", "stat:debt_to_equity", "stat:dividend_yield",
                "stat:peg", "stat:altman_z", "fin_health", "upside_pct"],
 };
@@ -1520,11 +1520,107 @@ function diaryOpLine(e) {
   if (!bits.length) return "";
   return `<span class="diary-op">${bits.join(" · ")}</span>${o.multi ? `<span class="diary-multi" title="La voce contiene più operazioni: strutturata la prima, il testo integrale resta sotto">+ altre operazioni nel testo</span>` : ""}`;
 }
+/* ═══ v193 — IL DIARIO AGGIORNA LE POSIZIONI (richiesta CEO).
+   Prima annotare "venduto 50 GOOGL a 318" lasciava il portafoglio invariato: il motore
+   continuava a calcolare stop, pesi e MCR su una posizione che non esisteva piu'. Il banner
+   "RICONCILIA COL BROKER" segnalava lo scarto ma la correzione restava a mano.
+   La scrittura va su config/holdings.json tramite la stessa API che usa "Modifica valori":
+   e' il repo, quindi iPhone e computer leggono LA STESSA fonte — era la seconda meta' della
+   richiesta ("si deve fasare anche con safari iPhone").
+   NON silenzioso: modificare quantita' e PMC cambia i numeri su cui si decide, quindi si
+   mostra prima l'effetto esatto e si chiede conferma. Una riga sola da toccare, ma consapevole. */
+function applicaOpAlPortafoglio(op) {
+  if (!op || !op.ticker || !op.tipo) return;
+  const q = Number(op.qty), px = Number(op.prezzo);
+  if (!Number.isFinite(q) || q <= 0) { toast("Operazione senza quantità: posizioni non aggiornate"); return; }
+  const tk = String(op.ticker).toUpperCase();
+  const pos = (DATA.portfolio || []).find(r => r.ticker === tk);
+  const acquisto = /ACQUIST/i.test(op.tipo);
+
+  let descr, applica;
+  if (acquisto) {
+    const q0 = pos ? Number(pos.qty) || 0 : 0, p0 = pos ? Number(pos.pmc) || 0 : 0;
+    if (!Number.isFinite(px) || px <= 0) { toast("Acquisto senza prezzo: PMC non calcolabile, posizioni non aggiornate"); return; }
+    const q1 = q0 + q;
+    const pmc1 = Math.round(((q0 * p0 + q * px) / q1) * 10000) / 10000;   // media ponderata
+    descr = pos
+      ? `${tk}: ${q0} → ${q1} quote · PMC ${fmtNum.format(p0)} → ${fmtNum.format(pmc1)}`
+      : `${tk}: NUOVA posizione, ${q} quote a PMC ${fmtNum.format(px)}` + ((DATA.watchlist || []).some(r => r.ticker === tk) ? " (esce dalla watchlist)" : "");
+    applica = (cfg) => {
+      cfg.portfolio = cfg.portfolio || [];
+      const e = cfg.portfolio.find(r => (r.ticker || "").toUpperCase() === tk);
+      if (e) { e.qty = q1; e.pmc = pmc1; } else cfg.portfolio.push({ ticker: tk, qty: q1, pmc: pmc1 });
+      if (Array.isArray(cfg.watchlist)) cfg.watchlist = cfg.watchlist.filter(r => (typeof r === "string" ? r : r.ticker || "").toUpperCase() !== tk);
+    };
+  } else {
+    if (!pos) { toast(`${tk} non è in portafoglio: vendita annotata, posizioni non modificate`); return; }
+    const q0 = Number(pos.qty) || 0, q1 = Math.max(0, Math.round((q0 - q) * 10000) / 10000);
+    descr = q1 === 0
+      ? `${tk}: posizione CHIUSA (${q0} quote vendute) — passa in watchlist`
+      : `${tk}: ${q0} → ${q1} quote (PMC invariato: vendere non lo cambia)`;
+    applica = (cfg) => {
+      cfg.portfolio = (cfg.portfolio || []).filter(r => {
+        const t = (r.ticker || "").toUpperCase();
+        if (t !== tk) return true;
+        if (q1 === 0) return false;
+        r.qty = q1; return true;
+      });
+      if (q1 === 0) {
+        cfg.watchlist = cfg.watchlist || [];
+        if (!cfg.watchlist.some(r => (typeof r === "string" ? r : r.ticker || "").toUpperCase() === tk)) cfg.watchlist.push(tk);
+      }
+    };
+  }
+
+  if (!confirm(`Aggiorno le posizioni con questa operazione?\n\n${descr}\n\nLa modifica va su config/holdings.json: la vedrai anche da iPhone.`)) {
+    toast("Operazione annotata nel diario; posizioni NON modificate");
+    return;
+  }
+  // AGGIORNAMENTO IMMEDIATO IN LOCALE. editHoldings scrive sul repo e lascia rigenerare la
+  // pipeline (2-3 minuti): senza questo passaggio il CEO annota la vendita e continua a vedere
+  // la posizione, che e' esattamente il disallineamento che la richiesta voleva eliminare.
+  // Il repo resta la fonte autorevole; questo e' solo l'anticipo ottimistico di cio' che
+  // arrivera' col prossimo run, e i campi calcolati dalla pipeline si riallineano da soli.
+  aggiornaPortafoglioLocale(tk, acquisto, q, px);
+  editHoldings("portfolio", applica);
+}
+function aggiornaPortafoglioLocale(tk, acquisto, q, px) {
+  if (!DATA || !Array.isArray(DATA.portfolio)) return;
+  const pos = DATA.portfolio.find(r => r.ticker === tk);
+  if (acquisto) {
+    if (pos) {
+      const q0 = Number(pos.qty) || 0, p0 = Number(pos.pmc) || 0, q1 = q0 + q;
+      pos.qty = q1; pos.pmc = Math.round(((q0 * p0 + q * px) / q1) * 10000) / 10000;
+    } else {
+      // titolo nuovo: si prende la riga della watchlist se c'e' (ha gia' prezzo e statistiche),
+      // altrimenti si aspetta la pipeline — meglio nessuna riga che una riga inventata.
+      const wl = (DATA.watchlist || []).find(r => r.ticker === tk);
+      if (wl) {
+        DATA.portfolio.push({ ...wl, qty: q, pmc: px });
+        DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== tk);
+      } else { toast(`${tk} sarà in portafoglio dopo il prossimo aggiornamento dati`); }
+    }
+  } else if (pos) {
+    const q1 = Math.max(0, Math.round(((Number(pos.qty) || 0) - q) * 10000) / 10000);
+    if (q1 === 0) {
+      DATA.portfolio = DATA.portfolio.filter(r => r.ticker !== tk);
+      if (!(DATA.watchlist || []).some(r => r.ticker === tk)) (DATA.watchlist = DATA.watchlist || []).push({ ...pos, qty: null, pmc: null });
+    } else pos.qty = q1;
+  }
+  // ricalcolo e ridisegno TUTTO cio' che dipende dalle posizioni: e' la parte "devono essere
+  // correlate" della richiesta — tabelle, KPI e torta dell'allocazione da una sola fonte.
+  try { recomputeTotals(); } catch { /* dati incompleti: la pipeline riallinea */ }
+  try { renderKPI(); renderTable(); renderWatchlist(); renderAllocation(); } catch (e) { console.error(e); }
+}
+
 function saveDiaryEntry(text, op) {
   const arr = loadDiary();
   const iso = new Date().toISOString();
-  arr.unshift({ date: iso, text, op: op || parseDiaryText(text, iso) });
+  const opFin = op || parseDiaryText(text, iso);
+  arr.unshift({ date: iso, text, op: opFin });
   setDiary(arr);
+  // se l'annotazione descrive un'operazione riconoscibile, si propone di allineare le posizioni
+  if (opFin && opFin.ticker && opFin.tipo) applicaOpAlPortafoglio(opFin);
 }
 function deleteDiaryEntry(iso) {
   setDiary(loadDiary().filter(e => e.date !== iso));
@@ -3441,7 +3537,8 @@ function fundCells(r) {
   const roeCls = st.roe == null ? "" : st.roe > 0.15 ? "pos" : st.roe < 0 ? "neg" : "";
   const zCls = st.altman_z == null ? "" : st.altman_z < 1.81 ? "neg" : st.altman_z > 2.6 ? "pos" : "";
   return `<td class="num">${st.market_cap ? fmtMcapShort(st.market_cap) : "—"}</td>
-    <td class="num">${pe ? x(pe) : "—"}</td>
+    <td class="num" ${pe && st.forward_pe > 0 && pe / st.forward_pe >= 2 ? 'title="P/E trailing almeno doppio del forward: utile GAAP compresso da ammortamenti/straordinari — guarda il P/E fwd accanto"' : ""}>${pe ? x(pe) + (pe && st.forward_pe > 0 && pe / st.forward_pe >= 2 ? ' <span class="muted" style="font-size:9px">GAAP↓</span>' : "") : "—"}</td>
+    <td class="num">${st.forward_pe > 0 ? x(st.forward_pe) : "—"}</td>
     <td class="num">${x(st.ev_ebitda)}</td>
     <td class="num ${roeCls}">${pct(st.roe)}</td>
     <td class="num">${pct(st.profit_margin)}</td>
@@ -4019,17 +4116,21 @@ function openStockCard(ticker) {
    singolo dettaglio: questo aggiunge una via d'accesso, non ne toglie. */
 function openMacroDetails() {
   const m = (DATA && DATA.macro) || {};
+  // v193 — TOLTI DUE PANNELLI (richiesta CEO). "Analisi della rotazione" ripeteva la stessa
+  // classifica settoriale di "Rotazione settoriale" con parole diverse; "Salute del portafoglio"
+  // era un punteggio composito i cui tre addendi (tecnica, macro, fondamentale) hanno gia'
+  // ciascuno il proprio pannello. Restano raggiungibili dalle mini-card se servono.
   const tasks = [
     { label: "MacroQuant — ciclo economico",        run: openMacroQuantModal },
     { label: "BofA Bear-Market Signposts",          run: openSignpostsModal },
     { label: "Rotazione settoriale",                run: openTiltModal },
-    { label: "Analisi della rotazione",             run: openRotationAnalysis },
+
     { label: "Stagionalità",                        run: openSeasonalityModal },
     { label: "Sharpe del portafoglio",              run: openPortfolioSharpeModal },
     { label: "Alpha del processo",                  run: openAlphaModal },
     { label: "Rischio cambio EUR/USD",              run: openFxModal },
     { label: "Margin Debt — leva a credito",        run: openMarginDebtModal },
-    { label: "Salute del portafoglio",              run: openHealthModal },
+
   ];
   // + una sezione per ogni voce della griglia macro che ha un dettaglio proprio. Le chiavi si
   // leggono da MACRO_INFO, che e' gia' il registro di quei pannelli: nessun secondo elenco da
@@ -4098,9 +4199,17 @@ function applicaOrdineMiniCard() {
 function renderPanelPage(titolo, panels, notaVuota, ambito) {
   if (!panels.length) { openInfoModal(titolo, `<div class="muted" style="font-size:12px">${notaVuota || "Nessun dettaglio disponibile."}</div>`); return; }
   const ord = ambito ? ordinaPannelli(ambito, panels) : panels;
+  // v193 — SU IPHONE IL TRASCINAMENTO NON ESISTE. L'HTML5 drag-and-drop non e' supportato da
+  // Safari su touch: il CEO trascinava e non succedeva nulla, e la dashboard "non si allineava"
+  // semplicemente perche' l'ordine non era mai cambiato. Le frecce funzionano ovunque — mouse,
+  // tastiera e dito — e il trascinamento resta come scorciatoia per chi e' al computer.
   const voci = ord.map((p, i) =>
-    `<li class="pp-nav-item${i === 0 ? " is-active" : ""}" draggable="true" data-idx="${i}" title="${esc(p.title)} — trascina per riordinare">
-       <span class="pp-drag" aria-hidden="true">⠿</span><span class="pp-nav-txt">${esc(p.title)}</span></li>`).join("");
+    `<li class="pp-nav-item${i === 0 ? " is-active" : ""}" draggable="true" data-idx="${i}" title="${esc(p.title)}">
+       <span class="pp-nav-txt">${esc(p.title)}</span>
+       <span class="pp-move">
+         <button class="pp-mv" data-mv="up" data-i="${i}" ${i === 0 ? "disabled" : ""} aria-label="Sposta ${esc(p.title)} in su" title="Sposta in su">▲</button>
+         <button class="pp-mv" data-mv="down" data-i="${i}" ${i === ord.length - 1 ? "disabled" : ""} aria-label="Sposta ${esc(p.title)} in giù" title="Sposta in giù">▼</button>
+       </span></li>`).join("");
   const corpi = ord.map((p, i) =>
     `<section class="pp-pane${i === 0 ? " is-active" : ""}" data-pane="${i}">
        <h3 class="pp-h">${esc(p.title)}</h3>${p.bodyHTML}</section>`).join("");
@@ -4123,6 +4232,17 @@ function wirePanelPage(titoli, ambito) {
     const d = root.querySelector(".pp-detail"); if (d) d.scrollTop = 0;
   };
   root.querySelector(".pp-nav-list")?.addEventListener("click", (e) => {
+    const mv = e.target.closest(".pp-mv");
+    if (mv) {                                    // freccia: sposta di una posizione
+      e.stopPropagation();
+      if (!ambito) return;
+      const i = Number(mv.dataset.i), j = mv.dataset.mv === "up" ? i - 1 : i + 1;
+      if (j < 0 || j >= titoli.length) return;
+      const nuovo = titoli.slice();
+      [nuovo[i], nuovo[j]] = [nuovo[j], nuovo[i]];
+      applicaNuovoOrdine(ambito, nuovo, j);
+      return;
+    }
     const it = e.target.closest(".pp-nav-item"); if (it) mostra(Number(it.dataset.idx));
   });
   if (!ambito) return;
@@ -4148,12 +4268,21 @@ function wirePanelPage(titoli, ambito) {
     if (from === to) return;
     const nuovo = titoli.slice();
     nuovo.splice(to, 0, ...nuovo.splice(from, 1));
-    savePanelOrder(ambito, nuovo);
-    if (ambito === "macro") applicaOrdineMiniCard();
-    // si ridisegna il popup con il nuovo ordine, restando aperti sulla voce spostata
-    if (ambito === "macro") openMacroDetails(); else if (PANEL_LAST_TICKER) openStockCard(PANEL_LAST_TICKER);
-    toast("Ordine aggiornato" + (ambito === "macro" ? " — anche nelle schede macro della dashboard" : ""));
+    applicaNuovoOrdine(ambito, nuovo, to);
   });
+}
+/* UNA sola strada per applicare un nuovo ordine, usata sia dalle frecce sia dal trascinamento:
+   due percorsi separati avrebbero potuto divergere, ed e' la classe di difetto che questo
+   progetto ha gia' pagato piu' volte. */
+function applicaNuovoOrdine(ambito, nuovoOrdine, indiceDaMostrare) {
+  savePanelOrder(ambito, nuovoOrdine);
+  if (ambito === "macro") applicaOrdineMiniCard();
+  if (ambito === "macro") openMacroDetails(); else if (PANEL_LAST_TICKER) openStockCard(PANEL_LAST_TICKER);
+  // si resta sulla voce appena spostata, altrimenti a ogni clic si torna in cima
+  const root = document.querySelector("#chart-modal-body .pp-split");
+  const it = root?.querySelector(`.pp-nav-item[data-idx="${indiceDaMostrare}"]`);
+  if (it) it.click();
+  toast("Ordine aggiornato" + (ambito === "macro" ? " — anche nelle schede macro della dashboard" : ""));
 }
 let PANEL_LAST_TICKER = null;
 
@@ -4670,10 +4799,10 @@ function renderTable() {
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="28" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="29" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="37"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="38"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applyColOrder("ptf-table");
   applyColVisibility("ptf-table");   // v188: dopo il riordino — legge l'ordine per accorciare i colspan
@@ -4714,9 +4843,9 @@ function renderWatchlist() {
       ${volumeCell(r)}
       ${techCells(r)}
       ${fundCells(r)}
-    </tr>`).join("") : '<tr><td colspan="33" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="34" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="33"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="34"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   applyColOrder("wl-table");
   applyColVisibility("wl-table");    // v188: idem
@@ -5335,7 +5464,7 @@ function buildPrompt() {
       const bits = [];
       if (rec.staleDays != null && rec.staleDays > 14) bits.push(`snapshot broker vecchio di ${rec.staleDays} giorni (${(DATA.broker || {}).as_of})`);
       if (rec.mismatches.length) bits.push(`controvalore ricalcolato che diverge >20% dal bval broker su: ${rec.mismatches.map(m => `${m.tk} ${m.dev > 0 ? "+" : ""}${m.dev}%`).join(", ")}`);
-      lines.push(`⚠ RICONCILIAZIONE BROKER NECESSARIA (${bits.join("; ")}): i campi statici del broker potrebbero non riflettere trade recenti. Fidati dei valori RICALCOLATI (prezzo live × quantità) e segnala l'incoerenza IN APERTURA del report chiedendo conferma delle posizioni.`);
+      lines.push(`⚠ RICONCILIAZIONE BROKER NECESSARIA (${bits.join("; ")}): i campi statici del broker potrebbero non riflettere trade recenti. I valori RICALCOLATI (prezzo live × quantità) e quelli dello snapshot broker possono quindi divergere, e in questo payload le due fonti convivono.`);
     }
   } catch { /* no-op */ }
   // STAGIONALITÀ del mese corrente
@@ -5820,8 +5949,15 @@ function buildPrompt() {
   const fundItems = [...(DATA.portfolio || []), ...(DATA.watchlist || [])].filter(isEquity);
   if (fundItems.length) {
     lines.push(`ANALISI FONDAMENTALE DETTAGLIATA — ${fundItems.length} TITOLI → ${fundItems.length} righe (valutazione e qualità per le tue raccomandazioni; deve coprire gli stessi titoli del FONDAMENTALE PROFONDO):`);
-    lines.push("| Titolo | P/E TTM | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Altman Z'' | Div% | Buyback% | Note |");
-    lines.push("|---|---|---|---|---|---|---|---|---|---|---|---|---|");
+    // v193 — P/E FORWARD ACCANTO AL TRAILING. Il CEO ha chiesto se i P/E fossero "sballati":
+    // AMD 175×, PLTR 138×, CBRS 433×. I conti tornano (prezzo/EPS combacia), ma il payload
+    // pubblicava SOLO il trailing, che usa l'utile GAAP degli ultimi 12 mesi — depresso da
+    // ammortamenti e straordinari. Il forward degli stessi titoli e' 38×, 59× e 208×. Il campo
+    // stats.forward_pe era gia' in data.json e non compariva da nessuna parte: un dato non
+    // sbagliato ma INCOMPLETO, che faceva sembrare rifiutabile per prezzo un titolo che il
+    // mercato prezza su utili attesi molto piu' alti.
+    lines.push("| Titolo | P/E TTM | P/E fwd | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Altman Z'' | Div% | Buyback% | Note |");
+    lines.push("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|");
     fundItems.forEach(r => {
       const st = r.stats || {};
       const pfcf = st.market_cap && st.fcf && st.fcf > 0 ? Math.round(st.market_cap / st.fcf * 10) / 10 : null;
@@ -5830,15 +5966,19 @@ function buildPrompt() {
       const roeTag = st.roe != null && st.roe > 0.15 ? " [ROE>15%]" : "";
       const wlTag = DATA.portfolio.find(p => p.ticker === r.ticker) ? "" : " [WL]";
       // Altman Z-Score + flag [RISCHIO DEFAULT] se <1,81
+      // quando il trailing e' molto sopra il forward, l'utile GAAP corrente NON e' la base su
+      // cui il mercato sta prezzando: dirlo evita di leggere un P/E alto come "caro".
+      const peFwd = st.forward_pe > 0 ? st.forward_pe : null;
+      const gapTag = (peFwd && peTtm2 > 0 && peTtm2 / peFwd >= 2) ? " [GAAP DEPRESSO]" : "";
       const zTag = st.altman_z != null && st.altman_z < 1.81 ? " [RISCHIO DEFAULT]" : "";
       const zCell = st.altman_z != null ? fmtNum.format(st.altman_z) + zTag + (st.altman_missing ? " (proxy)" : "") : "n.d.";
       // [BILANCI VALUTA LOCALE]: la pipeline ha nullato P/B, EV/EBITDA e P/FCF perché i bilanci
       // sono in valuta diversa dal prezzo (ADR tipo TSM) — senza il tag i "—" sembrano buchi dati
       const fxTag = st.cross_currency ? " [BILANCI VALUTA LOCALE]" : "";
-      const noteTags = [roeTag.trim(), fcfWarn.trim(), zTag.trim(), fxTag.trim()].filter(Boolean).join(" ");
-      lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg > 0 ? fmtNum.format(Math.round(st.peg * 100) / 100) : "n.d."} | ${zCell} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${st.buyback_yield != null ? signTxt(Math.round(st.buyback_yield * 1000) / 10) + (st.buyback_yield < -0.005 ? " [DILUISCE]" : "") : "—"} | ${noteTags} |`);
+      const noteTags = [roeTag.trim(), fcfWarn.trim(), zTag.trim(), fxTag.trim(), gapTag.trim()].filter(Boolean).join(" ");
+      lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" + gapTag : "—"} | ${peFwd ? fmtNum.format(Math.round(peFwd * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg > 0 ? fmtNum.format(Math.round(st.peg * 100) / 100) : "n.d."} | ${zCell} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${st.buyback_yield != null ? signTxt(Math.round(st.buyback_yield * 1000) / 10) + (st.buyback_yield < -0.005 ? " [DILUISCE]" : "") : "—"} | ${noteTags} |`);
     });
-    lines.push("([ROE>15%]=Return on EQUITY oltre il 15% — NB: è ROE, non ROIC: su società con molta leva o buyback aggressivi il denominatore (patrimonio netto) si comprime e il valore si gonfia, quindi NON coincide con la qualità del capitale investito; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z''<1,81, flag prudenziale del mandato — Z'' è la variante non-manifatturieri (6.56·WC/TA+3.26·RE/TA+6.72·EBIT/TA+1.05·MVE/TL, senza Sales/TA), cutoff canonici <1,1 distress / >2,6 solido; P/E TTM='—' con EPS<0 per igiene matematica; [BILANCI VALUTA LOCALE]=ADR con bilanci in valuta diversa dal prezzo: P/B, EV/EBITDA e P/FCF nullati a monte perché a unità miste — i '—' su quelle colonne NON sono buchi dati; [WL]=watchlist; Buyback%=riacquisti NETTI delle emissioni / market cap dall'ultimo cashflow annuale — discriminante growth: >0 restituisce capitale riducendo le azioni, [DILUISCE]=emissioni>riacquisti, tipico SBC pesante che erode l'EPS per azione)");
+    lines.push("([GAAP DEPRESSO]=il P/E trailing è almeno il DOPPIO del forward: l'utile GAAP degli ultimi 12 mesi è compresso da ammortamenti/straordinari e NON è la base su cui il mercato prezza — leggere il P/E fwd accanto; [ROE>15%]=Return on EQUITY oltre il 15% — NB: è ROE, non ROIC: su società con molta leva o buyback aggressivi il denominatore (patrimonio netto) si comprime e il valore si gonfia, quindi NON coincide con la qualità del capitale investito; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z''<1,81, flag prudenziale del mandato — Z'' è la variante non-manifatturieri (6.56·WC/TA+3.26·RE/TA+6.72·EBIT/TA+1.05·MVE/TL, senza Sales/TA), cutoff canonici <1,1 distress / >2,6 solido; P/E TTM='—' con EPS<0 per igiene matematica; [BILANCI VALUTA LOCALE]=ADR con bilanci in valuta diversa dal prezzo: P/B, EV/EBITDA e P/FCF nullati a monte perché a unità miste — i '—' su quelle colonne NON sono buchi dati; [WL]=watchlist; Buyback%=riacquisti NETTI delle emissioni / market cap dall'ultimo cashflow annuale — discriminante growth: >0 restituisce capitale riducendo le azioni, [DILUISCE]=emissioni>riacquisti, tipico SBC pesante che erode l'EPS per azione)");
     if (DATA.sanity_filtered > 0) lines.push(`[!ANOMALIE FILTRATE DAL SANITY CHECK: ${DATA.sanity_filtered} — valori palesemente errati delle API (P/E assurdi, variazioni impossibili) sono stati rimossi a monte: i dati qui presenti sono già puliti]`);
     lines.push("");
   }
@@ -5885,7 +6025,17 @@ function buildPrompt() {
   // E' proprio l'indicatore su cui il CIO calibra rischio e sizing: farlo sembrare posteriore alla
   // chiusura induce a credere che esista una misura di volatilita' piu' fresca dei prezzi.
   if (vixOk != null) {
-    const vixFresco = usRegularSessionOpen();
+    // v193 — MERCATO APERTO NON SIGNIFICA DATO FRESCO. La condizione guardava solo l'orologio:
+    // il 31/07 a borsa aperta il payload scriveva "VIX 18,58 (-0,64% oggi — rilevazione
+    // odierna)" mentre lo snapshot era del 26/07, cioe' cinque giorni prima. E' la stessa
+    // classe dell'etichetta KOSPI: lo STATO DEL MERCATO e la FRESCHEZZA DEL DATO sono due
+    // cose diverse, e qui servono entrambe vere.
+    const snapshotOggi = (() => {
+      const u = DATA?.updated_at ? new Date(DATA.updated_at) : null;
+      if (!u || isNaN(u)) return false;
+      return u.toISOString().slice(0, 10) === new Date().toISOString().slice(0, 10);
+    })();
+    const vixFresco = usRegularSessionOpen() && snapshotOggi;
     const vixAsof = (() => { const c = lastUsEquityCloseUTC();
       return c ? `[chiusura del ${String(c.at.getUTCDate()).padStart(2, "0")}/${String(c.at.getUTCMonth() + 1).padStart(2, "0")}]` : "[ultima chiusura]"; })();
     lines.push(`- VIX: ${vixOk} (${signTxt(m.vix.change_pct)} ${vixFresco ? "oggi — rilevazione odierna" : `nell'ultima seduta ${vixAsof} — mercato CHIUSO: nessuna rilevazione piu' recente dei prezzi`})`);
@@ -6032,7 +6182,25 @@ function buildPrompt() {
   }
   if ((m.curve_history || []).length) {
     const cv = m.curve_history.slice(-1)[0].v;
-    lines.push(`- Curva 10A-2A: ${cv > 0 ? "+" : ""}${cv} pp (${cv < 0 ? "ancora invertita = rischio recessione" : "tornata positiva dopo l'inversione = dis-inversione in corso"})`);
+    // v193 — "DIS-INVERSIONE IN CORSO" NON PUO' ESSERE INCONDIZIONATO. Il payload lo scriveva
+    // ogni volta che la curva era positiva, anche con l'ultima inversione a 469 sedute (~22 mesi)
+    // di distanza: un evento concluso da quasi due anni presentato come processo in atto, con
+    // tutta la carica di urgenza che "in corso" porta con se'. Ora la distanza dall'inversione
+    // decide la frase, e il numero di sedute e' scritto accanto perche' il lettore lo veda.
+    // sedute dall'ultima inversione: si contano dalla serie che il payload gia' possiede
+    // (curve_history, 501 punti), non da un campo che la pipeline non produce.
+    const inv = (() => {
+      const h = (m.curve_history || []).map(x => (x && typeof x === "object" ? x.v : x));
+      if (!h.length) return null;
+      let n = 0;
+      for (let i = h.length - 1; i >= 0; i--) { if (!(h[i] > 0)) break; n++; }
+      return n === h.length ? null : n;      // mai invertita nella finestra: non si afferma nulla
+    })();
+    const desc = cv < 0 ? "ancora invertita = rischio recessione"
+      : inv != null && inv > 250 ? `positiva da tempo — l'ultima inversione risale a ${inv} sedute fa, quindi NON è una dis-inversione in corso ma una curva normalizzata da tempo`
+      : inv != null ? `tornata positiva dopo l'inversione di ${inv} sedute fa = dis-inversione recente`
+      : "positiva (distanza dall'ultima inversione non disponibile: non se ne deduce se la dis-inversione sia recente)";
+    lines.push(`- Curva 10A-2A: ${cv > 0 ? "+" : ""}${cv} pp (${desc})`);
   }
   if (m.yield_recession) {
     const yr = m.yield_recession;
@@ -6058,10 +6226,14 @@ function buildPrompt() {
         mt.hold_prob = Math.max(0, 100 - mt.cut_prob - mt.hike_prob);
       }
     }
-    const rami = [];
-    if (mt.hike_prob) rami.push(`RIALZO ${mt.hike_prob}%`);
-    if (mt.cut_prob) rami.push(`taglio ${mt.cut_prob}%`);
-    if (mt.hold_prob != null) rami.push(`invariato ${mt.hold_prob}%`);
+    // v193 — TUTTI E TRE I RAMI, SEMPRE, anche a zero (richiesta CEO). Il v187 mostrava solo
+    // quelli attivi: uno zero esplicito e' informazione ("il mercato non prezza affatto un
+    // taglio"), mentre l'assenza della voce lascia il dubbio che il dato manchi.
+    const rami = [
+      `RIALZO ${mt.hike_prob ?? 0}%`,
+      `invariato ${mt.hold_prob ?? 0}%`,
+      `taglio ${mt.cut_prob ?? 0}%`,
+    ];
     // stessa riunione quotata su Polymarket? (i mercati di previsione sono già nel payload)
     const pm = (DATA.predictions || []).find(x => /\bfed\b/i.test(x.question || "") && /increase|hike|raise/i.test(x.question || ""));
     // il campo di Polymarket in data.json si chiama `yes` ed e' gia' in percentuale (17 = 17%);
@@ -7228,6 +7400,27 @@ $("#margin-debt-box")?.addEventListener("click", openMarginDebtModal);
 
 /* popup Strumenti (PMC, vendite) e News */
 function showSimpleModal(id) { const m = $(id); if (m) m.hidden = false; }
+function hideSimpleModal(id) { const m = typeof id === "string" ? $(id) : id; if (m) m.hidden = true; }
+
+/* ═══ v193 — I MODALI SEMPLICI NON SI CHIUDEVANO. Il ✕ di "Calcolatore PMC" e "Calcolo vendite"
+   non ha MAI funzionato: i bottoni esistono in index.html da sempre, hideSimpleModal esisteva,
+   ma nessuna riga le collegava. In v181 avevo rimosso hideSimpleModal come "codice morto" —
+   ed era davvero non chiamata, ma la conclusione giusta non era "si puo' togliere": era "manca
+   un collegamento". Una funzione morta a fianco di un bottone inerte non e' surplus, e' un
+   sintomo. Ora la chiusura e' generica per TUTTI i .modal-backdrop, con le tre vie che un
+   utente si aspetta: il ✕, il fondale, e Esc. Cosi' un modale aggiunto domani nasce chiudibile. */
+document.addEventListener("click", (e) => {
+  const chiudi = e.target.closest("[id$='-modal-close'], [data-close-modal]");
+  if (chiudi) { hideSimpleModal(chiudi.closest(".modal-backdrop")); return; }
+  // clic sul fondale (non sul contenuto) chiude
+  const back = e.target.closest(".modal-backdrop");
+  if (back && e.target === back) hideSimpleModal(back);
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  const aperti = [...document.querySelectorAll(".modal-backdrop:not([hidden])")];
+  if (aperti.length) hideSimpleModal(aperti[aperti.length - 1]);   // si chiude l'ultimo aperto
+});
 $("#open-pmc")?.addEventListener("click", () => { pmcInit(); pmcCompute(); showSimpleModal("#pmc-modal"); });
 $("#open-sell")?.addEventListener("click", () => { renderSellCalc(); showSimpleModal("#sell-modal"); });
 

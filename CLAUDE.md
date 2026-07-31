@@ -286,6 +286,35 @@ pannelli** controllati uno per uno senza overflow, desktop invariato (contenuto 
 Lezione trasferibile: **quando un overlay è mal posizionato su mobile, misura la larghezza del
 documento prima di toccare l'overlay.** Il colpevole è quasi sempre altrove nella pagina.
 
+## 🔗 Diario → posizioni (v193) e altre correzioni della lista CEO
+
+- **Il diario aggiorna le posizioni.** `applicaOpAlPortafoglio` scrive su `config/holdings.json`
+  con la stessa API di "Modifica valori": è il repo, quindi **iPhone e computer leggono la stessa
+  fonte**. ACQUISTO ricalcola il PMC come media ponderata, VENDITA lascia il PMC invariato e a
+  quota zero sposta il titolo in watchlist. Non è silenzioso — mostra l'effetto esatto e chiede
+  conferma, perché cambia i numeri su cui si decide. E aggiorna **subito anche in locale**
+  (`aggiornaPortafoglioLocale` + `recomputeTotals` + i quattro render): senza quello si annota la
+  vendita e si continua a vedere la posizione per i 2-3 minuti della pipeline.
+- **I modali semplici non si chiudevano.** Il ✕ di "Calcolatore PMC" e "Calcolo vendite" non ha
+  MAI funzionato: i bottoni c'erano, `hideSimpleModal` c'era, il collegamento no. In v181 avevo
+  rimosso quella funzione come codice morto — era davvero non chiamata, ma la conclusione giusta
+  non era "si può togliere", era "manca un collegamento". **Una funzione morta accanto a un
+  bottone inerte è un sintomo, non un surplus.** Ora la chiusura è generica per tutti i
+  `.modal-backdrop`: ✕, clic sul fondale, Esc.
+- **Riordino su iPhone.** L'HTML5 drag-and-drop non esiste su Safari touch: il CEO trascinava e
+  non succedeva nulla. Aggiunte frecce ▲▼ (`applicaNuovoOrdine` è l'unica strada per applicare
+  l'ordine, condivisa con il trascinamento: due percorsi separati sarebbero divergiti).
+- **P/E "sballati": non lo erano, erano incompleti.** AMD 175×, PLTR 138×, CBRS 433× sono corretti
+  (prezzo/EPS combacia) ma sono GAAP trailing. Il forward degli stessi era 38×, 59×, 208× — e
+  `stats.forward_pe` era già in data.json, **inutilizzato**. Aggiunta la colonna "P/E fwd" in
+  dashboard e payload, più il flag `[GAAP DEPRESSO]` quando il trailing è ≥2× il forward.
+- **VIX "rilevazione odierna" a dato vecchio.** La condizione guardava `usRegularSessionOpen()`,
+  cioè l'orologio: il 31/07 a borsa aperta dichiarava odierno un VIX del 26/07. Ora serve anche
+  che lo snapshot sia di oggi. Stessa classe dell'etichetta KOSPI: **stato del mercato e
+  freschezza del dato sono due cose diverse.**
+- **Curva 10A-2A**: "dis-inversione in corso" era incondizionato, con l'ultima inversione a 469
+  sedute (~22 mesi). Ora la distanza decide la frase e il numero di sedute è scritto accanto.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

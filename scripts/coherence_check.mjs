@@ -405,6 +405,35 @@ function c14_codaAZero(t) {
   } else ok(`C14 la riga FedWatch dichiara ${rami.length} rami (${rami.join(", ")}), non una sola coda a zero`);
 }
 
+/* ═══════════ C15 — NUMERI CONGELATI NELLA TESTATA ═══════════════════════════════════
+   Trovato leggendo il prompt v192. La testata conteneva un esempio con cifre vere del giorno in
+   cui era stata scritta: "MU pesa il 18,8% del NAV e genera il 38% della varianza". Quel giorno
+   i numeri coincidevano quasi col payload (18,9% / 38,5%) e nessuno se ne accorgeva — ma sono
+   FISSI, e il payload no: appena il book si muove diventano un secondo valore per la stessa
+   grandezza, dentro lo stesso prompt, e chi legge non ha modo di sapere quale sia attuale.
+   L'invariante: la TESTATA porta istruzioni, il PAYLOAD porta numeri. Una cifra con unita' di
+   misura nella testata e' quasi sempre un dato travestito da esempio. */
+function c15_numeriNellaTestata(t, ctx) {
+  let header = "";
+  try { header = vm.runInContext("promptHeaderText()", ctx) || ""; } catch { /* nessuna testata */ }
+  if (!header) { ok("C15 nessuna testata da controllare"); return; }
+  // si ignorano le soglie METODOLOGICHE, che sono regole e non dati (es. "max ~25 parole").
+  const AMMESSI = /max ~?\d+ parole|\bA[123]\b|\bC[0-7]\b|\bB[1-5]\b|24\/7|1:\d/;
+  // NB: niente \b dopo il simbolo — "%" e lo spazio che segue sono ENTRAMBI non-parola, quindi
+  // il confine non esiste mai e il detector non trovava nulla. Difetto scoperto validandolo.
+  const sospetti = [...header.matchAll(/[^\n]{0,50}?(\d+[,.]?\d*)\s*(%|€|×|pp)(?![a-zA-Z])[^\n]{0,40}/g)]
+    .map(m => m[0].trim())
+    .filter(x => !AMMESSI.test(x))
+    // le cifre dentro un esempio VIRGOLETTATO sono didattica ("X vende il 40% a clienti che…"),
+    // non dati del fondo: il payload non pubblica la stessa grandezza e non c'e' nulla da
+    // contraddire. Falso positivo trovato validando il detector sul file reale.
+    .filter(x => !/["«][^"»]*\d/.test(x));
+  if (sospetti.length) {
+    flag("C15 cifra con unità nella testata",
+      `la testata contiene ${sospetti.length} cifra/e che sembrano DATI e non regole — se il payload pubblica la stessa grandezza, il prompt ne porta due versioni: ${sospetti.slice(0, 3).map(x => `"${x}"`).join(" · ")}`);
+  } else ok("C15 la testata non contiene cifre di dato: istruzioni e numeri restano separati");
+}
+
 /* ---------------------------------- esecuzione ---------------------------------- */
 const { testo, ctx } = generaPayload();
 c1_valoriRipetuti(testo);
@@ -421,6 +450,7 @@ c11_grandezzePerTitolo(testo, ctx);
 c12_fattiSopravvissuti(testo);
 c13_seduteMiste(testo, ctx);
 c14_codaAZero(testo);
+c15_numeriNellaTestata(testo, ctx);
 
 if (VERBOSE) PASSATI.forEach(p => console.log(`  ok   ${p}`));
 if (PROBLEMI.length) {
@@ -428,4 +458,4 @@ if (PROBLEMI.length) {
   PROBLEMI.forEach((p, i) => console.log(`  ${i + 1}. [${p.classe}] ${p.msg}\n`));
   process.exit(1);
 }
-console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 14 classi — nessuna incoerenza interna`);
+console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 15 classi — nessuna incoerenza interna`);

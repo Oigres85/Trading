@@ -1239,3 +1239,14 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
   .card { max-width: 100%; }
   .card > .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
+
+/* v193 — frecce di riordino: funzionano dove il trascinamento non arriva (Safari iPhone) */
+.pp-move { display: inline-flex; gap: 2px; margin-left: auto; flex: 0 0 auto; }
+.pp-mv { background: transparent; border: 1px solid var(--border, #262b36); color: var(--muted, #93a0b4);
+  border-radius: 5px; width: 22px; height: 20px; line-height: 1; font-size: 9px; cursor: pointer; padding: 0; }
+.pp-mv:hover:not(:disabled) { color: var(--fg, #e6ebf2); border-color: var(--accent, #4c8dff); }
+.pp-mv:disabled { opacity: .25; cursor: default; }
+@media (max-width: 860px) {
+  .pp-move { margin-left: 6px; }
+  .pp-mv { width: 26px; height: 24px; font-size: 10px; }   /* bersaglio più grande sul dito */
+}
