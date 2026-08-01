@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np
 import pandas as pd
 
-from update_data import compute_risk_metrics, ratchet_stops
+from update_data import _finestra_comune, compute_risk_metrics, ratchet_stops
 
 FAILED = []
 
@@ -72,6 +72,28 @@ check("risk: MCR somma ≈ 100%", 95 <= mcr_sum <= 105)
 check("risk: correlazioni annotate su ogni riga",
       all(r.get("avg_corr") is not None and r.get("max_corr_with") for r in panel))
 check("risk: avg_pairwise_corr in [-1,1]", risk.get("avg_pairwise_corr") is not None and -1 <= risk["avg_pairwise_corr"] <= 1)
+
+# ---------- v207: finestra comune fra due serie (disaccoppiamento / profitti) ----------
+# Il difetto: fred_series senza freq="m" restituiva la frequenza NATIVA, e SP500 su FRED e'
+# GIORNALIERA -> 36 "mesi" erano 36 sedute (7 settimane). Le due serie venivano poi rebasate a
+# 100 su date di partenza DIVERSE e i valori finali sottratti: il "gap" pubblicato nel payload
+# (-3 pp) era la differenza fra una variazione di 7 settimane e una di 3 anni.
+sp_corta = [("2026-06-10", 100.0), ("2026-07-01", 101.0), ("2026-07-31", 103.0)]
+pil_lungo = [("2023-07-01", 100.0), ("2025-01-01", 104.0), ("2026-04-01", 106.0)]
+check("v207 finestra comune: serie che non si sovrappongono -> nessun confronto (era il caso reale)",
+      _finestra_comune(sp_corta, pil_lungo) is None)
+
+sp_lunga = [("2023-07-01", 90.0), ("2024-07-01", 100.0), ("2025-07-01", 115.0),
+            ("2026-04-01", 130.0), ("2026-07-01", 134.0)]
+ris = _finestra_comune(sp_lunga, pil_lungo)
+check("v207 finestra comune: due serie a 3 anni si tagliano sull'intervallo condiviso",
+      ris is not None and ris[0][0][0] == "2023-07-01" and ris[0][-1][0] == "2026-04-01"
+      and ris[1][0][0] == "2023-07-01" and ris[1][-1][0] == "2026-04-01")
+
+check("v207 finestra comune: serie vuota -> None", _finestra_comune([], pil_lungo) is None)
+check("v207 finestra comune: meno di due osservazioni dentro la finestra -> None",
+      _finestra_comune([("2026-04-01", 1.0), ("2026-05-01", 2.0)],
+                       [("2026-04-01", 1.0), ("2026-04-02", 2.0)]) is None)
 
 # ---------- margin debt: carry-forward quando lo scrape FINRA fallisce ----------
 import update_data as ud
@@ -308,7 +330,7 @@ check("umich: i mesi inglesi mappano al numero giusto (June=6, dicembre=12)",
 check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è il motivo del fetcher)",
       _rows[-1][0] > "2026-05-01")
 
-N_CHECKS = 63   # +4 in v186: rami FedWatch (rialzo/taglio) — vedi in fondo al file
+N_CHECKS = 67   # +4 in v186: rami FedWatch · +4 in v207: finestra comune fra serie
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio

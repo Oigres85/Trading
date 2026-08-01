@@ -1103,6 +1103,30 @@ def fetch_btp():
     }
 
 
+def _finestra_comune(a, b):
+    """Ritaglia due serie [(data_iso, valore)] alla FINESTRA TEMPORALE COMUNE.
+
+    v207 — nasce da un difetto misurato: due serie normalizzate a 100 su date di partenza
+    DIVERSE non sono confrontabili, e sottrarne i valori finali non produce un "gap" ma la
+    differenza fra due periodi diversi. Il caso reale era S&P su 7 settimane contro PIL su
+    3 anni, pubblicato nel payload come "disaccoppiamento -3 pp".
+
+    Ritorna (a_tagliata, b_tagliata) oppure None se non c'è sovrapposizione utilizzabile —
+    e in quel caso il chiamante NON deve pubblicare il confronto. Le date FRED sono ISO,
+    quindi l'ordinamento lessicografico coincide con quello cronologico.
+    """
+    if not a or not b:
+        return None
+    da, fino = max(a[0][0], b[0][0]), min(a[-1][0], b[-1][0])
+    if da >= fino:
+        return None
+    ta = [(d, v) for d, v in a if da <= d <= fino]
+    tb = [(d, v) for d, v in b if da <= d <= fino]
+    if len(ta) < 2 or len(tb) < 2:
+        return None
+    return ta, tb
+
+
 def fred_series(series_id, n=14, freq=None):
     # con FRED_API_KEY (gratuita, https://fred.stlouisfed.org/docs/api/api_key.html)
     # usa l'API ufficiale, molto più affidabile del csv pubblico
@@ -1660,22 +1684,39 @@ def fetch_macro():
 
     # Disaccoppiamento Macro: S&P 500 vs PIL reale USA (normalizzati a 100)
     try:
-        sp = fred_series("SP500", 36)    # ~3 anni mensili
-        gd = fred_series("GDPC1", 12)   # ~3 anni trimestrali
-        if sp and gd:
-            sp_base, gd_base = sp[0][1], gd[0][1]
+        # ⚠ v207 — `freq="m"` NON C'ERA, e il commento diceva già "mensili": fred_series senza
+        # `freq` restituisce la frequenza NATIVA, e SP500 su FRED è GIORNALIERA. Quindi al posto
+        # di 36 mesi (3 anni) arrivavano 36 SEDUTE (7 settimane), rebasate a 100 su una data
+        # diversa da quella del PIL, e il "gap" sottraeva una variazione di 7 settimane da una
+        # di 3 anni. Misurato sui dati veri: gap pubblicato -3 pp, aritmeticamente privo di senso.
+        sp = fred_series("SP500", 40, freq="m")   # ~3 anni MENSILI
+        gd = fred_series("GDPC1", 14, freq="q")   # ~3 anni trimestrali
+        al = _finestra_comune(sp, gd)
+        if al:
+            sp2, gd2 = al
+            sp_base, gd_base = sp2[0][1], gd2[0][1]
             macro["decouple"] = {
-                "sp500": [{"d": d, "v": round(v / sp_base * 100, 1)} for d, v in sp],
-                "gdp":   [{"d": d, "v": round(v / gd_base * 100, 1)} for d, v in gd],
+                "sp500": [{"d": d, "v": round(v / sp_base * 100, 1)} for d, v in sp2],
+                "gdp":   [{"d": d, "v": round(v / gd_base * 100, 1)} for d, v in gd2],
             }
+        else:
+            print("!! decouple: le due serie non hanno una finestra comune, gap non pubblicato",
+                  file=sys.stderr)
     except Exception as e:  # noqa: BLE001
         print(f"!! decouple: {e}", file=sys.stderr)
 
     # S&P 500 + Nasdaq 100 vs Profitti Aziendali Reali USA (Corporate Profits, FRED CP)
     try:
-        cp = fred_series("CP", 20)       # ~5 anni trimestrali
-        sp_cp = fred_series("SP500", 60) # ~5 anni mensili
-        if cp and sp_cp:
+        # ⚠ v207 — stesso difetto del blocco decouple: senza `freq="m"` arrivavano 60 SEDUTE
+        # (86 giorni) invece di 60 mesi, e il gap sottraeva +1,7% di S&P su 3 mesi da +32,4% di
+        # profitti su 5 anni, pubblicando "S&P gap -30,7 pp". Il ramo NDX era invece corretto
+        # (yfinance, interval="1mo"), ed è per quello che worst_gap dava un valore sensato: il
+        # numero giusto copriva quello sbagliato.
+        cp = fred_series("CP", 22, freq="q")       # ~5 anni trimestrali
+        sp_cp = fred_series("SP500", 64, freq="m") # ~5 anni MENSILI
+        al_cp = _finestra_comune(sp_cp, cp)
+        if al_cp:
+            sp_cp, cp = al_cp
             cp_base, sp_base = cp[0][1], sp_cp[0][1]
             cur_sp = round(sp_cp[-1][1] / sp_base * 100, 1)
             cur_cp = round(cp[-1][1] / cp_base * 100, 1)

@@ -1,4 +1,4 @@
-# Da dove ripartire — handoff del 01/08/2026 (dopo v206)
+# Da dove ripartire — handoff del 01/08/2026 (dopo v207)
 
 > Leggi anche `CLAUDE.md`, che contiene le regole d'ingaggio e i difetti già vissuti.
 
@@ -12,9 +12,9 @@
   serve qualcosa di disponibile *quando decide*, non un report periodico.
 - Ha guadagnato con questo metodo. Il sistema deve stargli **ai bordi**, non al centro.
 
-## Stato del sistema (v206)
+## Stato del sistema (v207)
 
-Tutti i gate verdi: **177 test JS** · red team 32 campagne · **pipeline 63 test** · coerenza 18
+Tutti i gate verdi: **177 test JS** · red team 32 campagne · **pipeline 67 test** · coerenza 18
 controlli su 15 classi · gate valuta · audit dati.
 
 **Rimossi di recente e da NON reintrodurre senza misurare:**
@@ -61,23 +61,34 @@ all'apertura del cash → prosegue su TradingView.
 2. **Verifica** di ciò che sente su YouTube o legge su investing.com, prima di agire
 3. **Script Pine**
 
+## ✅ FATTO in v207: i cinque difetti mappati
+
+- **I grafici doppi confrontavano serie senza un giorno in comune.** L'ascissa era l'indice del
+  punto, non il tempo: "Fed Funds vs S&P — ultimi 5 anni" sovrapponeva 5 anni di tassi a 3 mesi
+  di borsa; "Disaccoppiamento" e "Profitti reali" mettevano insieme serie con **zero** giorni
+  condivisi. La causa stava nella pipeline (`freq="m"` dimenticato: FRED restituiva giorni al
+  posto di mesi) e il numero sbagliato **finiva nel prompt** — "disaccoppiamento −3 pp" era
+  +3,1% di S&P su 7 settimane meno +6,3% di PIL su 3 anni. Ora la pipeline chiede la frequenza
+  giusta, il confronto si fa solo sulla finestra comune, e quando non c'è il payload lo dichiara
+  invece di pubblicare un numero senza significato.
+- **FedWatch nel popup mostrava solo "Taglio".** I dati portavano un rialzo al 2% e al 26% e la
+  dashboard taceva: era il difetto già corretto nel payload in v187, mai arrivato alla UI. Ora la
+  derivazione dei tre rami è una sola funzione, usata da entrambi.
+- **Due riquadri erano calcolati e mai mostrati**: "Direzione mercato" e "Tracking Error vs S&P"
+  non avevano un contenitore in pagina. Aggiunti.
+- **Quattro segnali finivano solo nel prompt** (ampiezza, momentum, schiuma sugli ETF a leva,
+  futures): li leggevi nel report dell'AI senza poterli vedere. Ora sono una card.
+- **Il popup P/E prometteva "storico 10 anni"** con una sola rilevazione. Ora dice quante ne ha.
+
 ## Da dove ripartire
 
-- **Difetti trovati mappando e NON ancora sistemati** (nessuno è urgente, tutti reali):
-  - `miniDualChart` disegna **per indice, non per data**: nel popup "Fed Funds vs S&P" si
-    sovrappongono 60 punti *mensili* e 60 punti *giornalieri* sotto il titolo "ultimi 5 anni".
-    Stesso problema in "Disaccoppiamento" e "Profitti reali". Sono grafici che oggi ingannano.
-  - `macro.sp500_pe.history` ha **un solo punto**: il popup promette "storico 10 anni" e mostra
-    "Storico non disponibile".
-  - Il popup FedWatch mostra solo la colonna **Taglio** mentre i dati portano anche `hike_prob`
-    (2% e 26%): è la classe C14 già corretta nel payload in v187, sopravvissuta nella UI.
-  - `#market-direction` e `#tracking-error-box` **non esistono in index.html**: `renderMiniCards`
-    produce contenuto valido che nessuno vede.
-  - `macro.momentum`, `macro.froth`, `macro.breadth`, `macro.futures` finiscono nel prompt per
-    l'LLM e **non sono mai mostrati** in dashboard.
-- **Il gate dei test era spento fino a v205** (i check dopo il blocco `report` erano contati ma
-  non facevano fallire la CI). Se aggiungi un gruppo di check in fondo a `test_app.mjs`, il
-  blocco `report` deve restare l'ultima cosa del file.
+- **Il disaccoppiamento tornerà calcolabile al primo run del CI** con la pipeline v207: fino ad
+  allora il payload dichiara "NON CALCOLABILE in questo snapshot" ed è corretto così. Se dopo un
+  run la riga resta, vuol dire che FRED non risponde alla richiesta mensile e va guardato.
+- **`macro.sp500_pe.history` ha un solo punto** perché multpl è bloccato dagli IP del CI (stesso
+  problema noto di WSJ). Finché resta così, media a 10 anni e percentile storico non esistono.
+- Idee non ancora affrontate: la watchlist ha 27 titoli e resta la sezione più densa della
+  dashboard; il grafico della deriva mostra solo i primi quattro per contributo al rischio.
 
 ## Osservazione utile emersa dalle sue schermate
 

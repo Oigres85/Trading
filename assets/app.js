@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "206";
+const BUILD_VERSION = "207";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2722,6 +2722,42 @@ function renderMiniCards() {
       <div class="mc-value" style="color:${scoreColor(se.score)}">${se.score}% · ${se.label}</div>
       <div class="mc-sub muted">${sub}</div>`;
   }
+  /* v207 — INTERNI DI MERCATO. momentum, breadth, froth e futures esistono in data.json,
+     finiscono nel payload per l'LLM, e in dashboard NON ERANO MAI MOSTRATI: il CEO leggeva
+     nel report dell'AI conclusioni che poggiavano su numeri che la sua pagina non conteneva. */
+  const iBox = $("#internals-box");
+  if (iBox) {
+    const righe = [];
+    if (m.breadth?.divergence_pp != null) {
+      const d = m.breadth.divergence_pp;
+      righe.push([`Ampiezza (SPY vs RSP 1M)`, `${signTxt(d, " pp")}`,
+        d <= -4 ? "neg" : d < 0 ? "warn" : "pos",
+        d <= -4 ? "pochi titoli tirano l'indice" : "partecipazione allineata"]);
+    }
+    if (m.momentum?.sp500 != null) {
+      const q = m.momentum.sp500;
+      righe.push(["S&P vs media 125 sedute", signTxt(q.dist_pct), q.dist_pct >= 0 ? "pos" : "neg",
+        q.dist_pct >= 0 ? "sopra la media di lungo periodo" : "sotto la media di lungo periodo"]);
+    }
+    if (m.froth) {
+      const att = m.froth.alert === true;
+      const rv = Math.max(m.froth.soxl?.rvol ?? 0, m.froth.tqqq?.rvol ?? 0);
+      righe.push(["Schiuma su ETF a leva", att ? "ATTIVA" : "no", att ? "neg" : "pos",
+        att ? "volumi anomali su SOXL/TQQQ dentro un rialzo" : `volumi normali (RVol max ${fmtNum.format(rv)}×)`]);
+    }
+    const fut = m.futures?.nasdaq;
+    if (fut?.change_pct != null) {
+      righe.push([esc(fut.label || "Futures Nasdaq"), signTxt(fut.change_pct),
+        fut.change_pct >= 0 ? "pos" : "neg", `${fmtNum.format(fut.price)} — si muovono a mercato chiuso`]);
+    }
+    iBox.innerHTML = righe.length
+      ? `<div class="mc-title">Interni di mercato</div>
+         <div class="int-rows">${righe.map(([lab, val, cls, sub]) => `<div class="int-row">
+           <span class="int-lab">${esc(lab)}</span><span class="int-val ${cls}">${esc(String(val))}</span>
+           <span class="int-sub">${esc(sub)}</span></div>`).join("")}</div>`
+      : `<div class="mc-title">Interni di mercato</div><div class="mc-sub muted">Non disponibili in questo snapshot.</div>`;
+  }
+
   // Daily Tracking Error vs benchmark (oggi): portafoglio Day% − indice, come tachimetro
   const bm = m.benchmarks, teBox = $("#tracking-error-box");
   if (teBox && bm) {
@@ -4737,22 +4773,103 @@ function miniLineChart(pts, { w = 420, h = 70, color = "var(--blue)", zeroLine =
   </div>`;
 }
 
+/* v207 — FONTE UNICA PER I RAMI FEDWATCH.
+   Il difetto: v187 ha corretto il PAYLOAD ("prob. taglio 0%" era vero e inutile quando il
+   mercato prezzava un RIALZO al 38%), ma il popup della dashboard è rimasto indietro — mostrava
+   solo le colonne "Taglio" e "Invariato", cioè esattamente la mezza verità che il payload aveva
+   smesso di raccontare. Due implementazioni della stessa cosa divergono: qui ce n'è una sola,
+   usata da entrambi. Stessa lezione di v161 (usRegularSessionOpen derivata da usSessionInfo).
+   La derivazione dal tasso implicito serve per compatibilità all'indietro: finché il CI non
+   rigenera, i `meetings` possono non avere hike_prob. */
+function ramiFedWatch(fw, riunione) {
+  const mt = { ...(riunione || {}) };
+  if (mt.hike_prob == null && fw?.implied_rate != null && fw?.target_range) {
+    const [lo, hi] = String(fw.target_range).replace("%", "").split("–").map(Number);
+    if (Number.isFinite(lo) && Number.isFinite(hi)) {
+      const quarti = ((lo + hi) / 2 - fw.implied_rate) / 0.25 * 100;
+      mt.cut_prob = Math.round(Math.max(0, Math.min(100, quarti)));
+      mt.hike_prob = Math.round(Math.max(0, Math.min(100, -quarti)));
+      mt.hold_prob = Math.max(0, 100 - mt.cut_prob - mt.hike_prob);
+    }
+  }
+  return mt;
+}
+
+/* v207 — DUE SERIE NORMALIZZATE A 100 SU DATE DIVERSE NON SONO CONFRONTABILI.
+   Sottrarne i valori finali non produce un "gap": produce la differenza fra due periodi
+   diversi. Il caso reale: S&P rebasato su 7 settimane meno PIL rebasato su 3 anni, pubblicato
+   nel payload come "disaccoppiamento -3 pp". La pipeline è stata corretta (v207,
+   _finestra_comune + freq="m"), ma finché il CI non rigenera il file il payload leggerebbe
+   ancora i dati vecchi — quindi il controllo vive anche qui, come per i rami FedWatch di v187.
+   Ritorna i giorni di sovrapposizione, o null se le due serie non ne hanno. */
+function sovrapposizioneGiorni(a, b) {
+  const t = p => new Date(String(p.d).length <= 10 ? p.d + "T00:00:00" : p.d).getTime();
+  const ok = x => (x || []).filter(p => p && p.d != null && p.v != null && !isNaN(t(p)));
+  const A = ok(a), B = ok(b);
+  if (A.length < 2 || B.length < 2) return null;
+  const da = Math.max(Math.min(...A.map(t)), Math.min(...B.map(t)));
+  const fino = Math.min(Math.max(...A.map(t)), Math.max(...B.map(t)));
+  if (!(fino > da)) return null;
+  const dentro = x => x.filter(p => t(p) >= da && t(p) <= fino).length;
+  if (dentro(A) < 2 || dentro(B) < 2) return null;
+  return Math.round((fino - da) / 86400000);
+}
+
+/* ⚠ v207 — QUESTO GRAFICO MENTIVA, ed è il difetto più grave trovato mappando la macro.
+   L'ascissa era l'INDICE del punto: `px = i / (len - 1) * w`. Due serie con finestre temporali
+   diverse venivano quindi STIRATE sulla stessa larghezza e lette come se fossero allineate.
+   Casi reali misurati su data.json:
+     · "Fed Funds vs S&P 500 — ultimi 5 anni": 60 punti MENSILI (2021-07→2026-06) sovrapposti a
+       60 punti GIORNALIERI (2026-05-06→07-31). Cinque anni e tre mesi disegnati alla stessa
+       lunghezza, uno sopra l'altro.
+     · "Disaccoppiamento": 36 giorni di S&P contro 12 trimestri di PIL.
+     · "Profitti reali": 3 mesi giornalieri contro 5 anni trimestrali.
+   Il "gap" che questi grafici mostravano — il numero su cui poggia tutta la lettura — non
+   corrispondeva a nessun confronto reale.
+
+   Ora l'ascissa è il TEMPO, e il grafico si restringe alla FINESTRA COMUNE alle due serie:
+   fuori da lì il confronto non esiste, e disegnarlo sarebbe di nuovo inventare un allineamento.
+   Se la sovrapposizione è troppo corta per dire qualcosa, il grafico lo DICHIARA invece di
+   disegnare una linea che sembra una tendenza. */
 function miniDualChart(pts1, pts2, { w = 420, h = 80, color1 = "var(--blue)", color2 = "var(--green)", label1 = "A", label2 = "B" } = {}) {
-  if (!pts1?.length || !pts2?.length) return '<div class="muted">Dati non disponibili</div>';
-  const all = [...pts1.map(p => p.v), ...pts2.map(p => p.v)];
+  const val = (a) => (a || []).filter(p => p && p.v != null && p.d != null && !isNaN(new Date(p.d)));
+  const A = val(pts1), B = val(pts2);
+  if (A.length < 2 || B.length < 2) return '<div class="muted">Dati non disponibili</div>';
+  const t = p => new Date(String(p.d).length <= 10 ? p.d + "T00:00:00" : p.d).getTime();
+  const est = (a) => ({ da: Math.min(...a.map(t)), a: Math.max(...a.map(t)) });
+  const eA = est(A), eB = est(B);
+  const da = Math.max(eA.da, eB.da), fino = Math.min(eA.a, eB.a);
+  const giorni = (ms) => Math.round(ms / 86400000);
+  const span = (e) => giorni(e.a - e.da);
+  if (!(fino > da)) {
+    return `<div class="muted">Le due serie non si sovrappongono nel tempo (${label1}: ${dataBreve(new Date(eA.da).toISOString().slice(0, 10), true)}–${dataBreve(new Date(eA.a).toISOString().slice(0, 10), true)} · ${label2}: ${dataBreve(new Date(eB.da).toISOString().slice(0, 10), true)}–${dataBreve(new Date(eB.a).toISOString().slice(0, 10), true)}): un confronto non è calcolabile.</div>`;
+  }
+  const dentro = (a) => a.filter(p => t(p) >= da && t(p) <= fino);
+  const A2 = dentro(A), B2 = dentro(B);
+  if (A2.length < 2 || B2.length < 2) {
+    return `<div class="muted">Nella finestra comune (${giorni(fino - da)} giorni) una delle due serie ha meno di due osservazioni: il confronto non è disegnabile.</div>`;
+  }
+  const all = [...A2, ...B2].map(p => p.v);
   const mn = Math.min(...all), mx = Math.max(...all), rng = mx - mn || 1;
-  const px = (i, len) => ((i / (len - 1)) * (w - 4) + 2).toFixed(1);
+  const px = p => (((t(p) - da) / (fino - da || 1)) * (w - 4) + 2).toFixed(1);
   const py = v => (h - 4 - (v - mn) / rng * (h - 8) + 2).toFixed(1);
-  const poly = (pts) => pts.map((p, i) => `${px(i, pts.length)},${py(p.v)}`).join(" ");
+  const poly = (pts) => pts.map(p => `${px(p)},${py(p.v)}`).join(" ");
   const b100 = mn <= 100 && 100 <= mx ? `<line x1="0" y1="${py(100)}" x2="${w}" y2="${py(100)}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 2"/>` : "";
+  const uA = A2[A2.length - 1], uB = B2[B2.length - 1];
+  const iso = ms => new Date(ms).toISOString().slice(0, 10);
+  // la finestra comune è molto più corta dello storico che una delle due serie porta con sé:
+  // dirlo, altrimenti si legge "cinque anni" un grafico che ne mostra tre mesi
+  const tagliato = Math.max(span(eA), span(eB)) > giorni(fino - da) * 2;
   return `<div class="mini-chart-wrap">
     <svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px;display:block">${b100}
-      <polyline points="${poly(pts2)}" fill="none" stroke="${color2}" stroke-width="1.8"/>
-      <polyline points="${poly(pts1)}" fill="none" stroke="${color1}" stroke-width="2"/>
-      <circle cx="${px(pts1.length-1,pts1.length)}" cy="${py(pts1[pts1.length-1].v)}" r="3" fill="${color1}"/>
-      <circle cx="${px(pts2.length-1,pts2.length)}" cy="${py(pts2[pts2.length-1].v)}" r="3" fill="${color2}"/>
+      <polyline points="${poly(B2)}" fill="none" stroke="${color2}" stroke-width="1.8"/>
+      <polyline points="${poly(A2)}" fill="none" stroke="${color1}" stroke-width="2"/>
+      <circle cx="${px(uA)}" cy="${py(uA.v)}" r="3" fill="${color1}"/>
+      <circle cx="${px(uB)}" cy="${py(uB.v)}" r="3" fill="${color2}"/>
     </svg>
-    <div class="mini-chart-legend"><span style="color:${color1}">—</span> ${label1} &nbsp; <span style="color:${color2}">—</span> ${label2} &nbsp; <span class="muted">— base 100</span></div>
+    <div class="mini-chart-legend"><span style="color:${color1}">—</span> ${label1} &nbsp; <span style="color:${color2}">—</span> ${label2}${mn <= 100 && 100 <= mx ? ' &nbsp; <span class="muted">— base 100</span>' : ""}</div>
+    <div class="mini-chart-dates">${dataBreve(iso(da), true)} – ${dataBreve(iso(fino), true)} · finestra COMUNE alle due serie (${giorni(fino - da)} giorni, ${A2.length} e ${B2.length} osservazioni)${
+      tagliato ? ` · <b>lo storico più lungo arriva a ${Math.max(span(eA), span(eB))} giorni ma fuori da questa finestra le due serie non sono confrontabili</b>` : ""}</div>
   </div>`;
 }
 
@@ -5119,13 +5236,18 @@ function openMacroInfo(key) {
     }
   } else if (key === "fedwatch" && m.fedwatch) {
     const fw = m.fedwatch;
+    // v207 — la colonna RIALZO mancava: il popup mostrava "Taglio" e "Invariato" mentre i dati
+    // portavano hike_prob al 2% e al 26%. È la classe C14 (una probabilita' pubblicata a zero su
+    // una sola direzione e' informazione mancante travestita da informazione presente), corretta
+    // nel payload in v187 e sopravvissuta qui per due versioni.
+    const primo = ramiFedWatch(fw, (fw.meetings || [])[0]);
     extra = `<div class="info-line"><b>Range attuale:</b> ${fw.target_range} · implicito ${fmtNum.format(fw.implied_rate)}%</div>
-      <div class="info-line"><b>Probabilità taglio prossima riunione:</b> ${fw.next_cut_prob}%</div>`;
+      <div class="info-line"><b>Prossima riunione:</b> <span class="neg">rialzo ${primo.hike_prob ?? 0}%</span> · invariato ${primo.hold_prob ?? 0}% · <span class="pos">taglio ${primo.cut_prob ?? 0}%</span></div>`;
     if ((fw.meetings || []).length) {
-      extra += `<table class="info-table"><thead><tr><th>Riunione FOMC</th><th>Taglio</th><th>Invariato</th></tr></thead><tbody>`
-        + fw.meetings.map(mt => `<tr><td>${new Date(mt.date).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}</td>
-          <td class="pos">${mt.cut_prob}%</td><td>${mt.hold_prob}%</td></tr>`).join("")
-        + `</tbody></table><div class="info-line muted" style="font-size:11px">Probabilità stimate dai futures sui Fed Funds (stile CME FedWatch).</div>`;
+      extra += `<table class="info-table"><thead><tr><th>Riunione FOMC</th><th>Rialzo</th><th>Invariato</th><th>Taglio</th></tr></thead><tbody>`
+        + fw.meetings.map(x => { const r = ramiFedWatch(fw, x); return `<tr><td>${new Date(r.date).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}</td>
+          <td class="neg">${r.hike_prob ?? 0}%</td><td>${r.hold_prob ?? 0}%</td><td class="pos">${r.cut_prob ?? 0}%</td></tr>`; }).join("")
+        + `</tbody></table><div class="info-line muted" style="font-size:11px">Probabilità stimate dai futures sui Fed Funds (stile CME FedWatch). Tutti e tre i rami sono sempre mostrati, anche a zero: uno zero esplicito è informazione, l'assenza della voce no.</div>`;
     }
     if ((fw.dot_plot || []).length) {            // Dot Plot: mediana proiezioni FOMC
       const mx = Math.max(...fw.dot_plot.map(d => d.median));
@@ -5391,8 +5513,13 @@ function openMacroInfo(key) {
         P/E &gt;35: livelli estremi raggiunti solo nel 1999-2000 (bolla dot-com) e nel 2020-2021 (post-pandemia).<br>
         Il P/E trailing usa gli utili degli ultimi 12 mesi — è più volatile del CAPE di Shiller (10 anni), ma più reattivo.
       </div>
-      <h4 style="margin:12px 0 4px">P/E S&amp;P 500 — storico 10 anni (mensile, FRED)</h4>
-      ${miniLineChart(pe.history, { color: "var(--yellow)", zeroLine: false })}
+      ${(pe.history || []).length >= 2
+        ? `<h4 style="margin:12px 0 4px">P/E S&P 500 — ${pe.history.length} rilevazioni (${esc(pe.source || "FRED")})</h4>
+           ${miniLineChart(pe.history, { color: "var(--yellow)", zeroLine: false })}`
+        : `<div class="info-line muted" style="font-size:11.5px;margin-top:10px"><b>Storico non disponibile da questa fonte.</b>
+             Il titolo di questo riquadro prometteva "storico 10 anni" mentre la serie ha ${(pe.history || []).length} rilevazione${(pe.history || []).length === 1 ? "" : "i"}
+             (fonte: ${esc(pe.source || "n.d.")}) — e per lo stesso motivo mancano la media a 10 anni e il percentile storico.
+             Resta valido il P/E corrente qui sopra.</div>`}
       <div class="info-line muted" style="font-size:11px;margin-top:6px">
         <b>Implicazione per il portafoglio:</b> P/E elevato significa che ogni dollaro di utile è pagato di più.
         In scenari di rialzo dei tassi + P/E &gt;25, i multipli tendono a comprimersi (-15% / -30% dall'inizio storico).
@@ -6964,8 +7091,13 @@ function buildPrompt() {
     }
   }
   if (m.decouple?.sp500?.length && m.decouple?.gdp?.length) {
-    const gap = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
-    lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: gap ${gap > 0 ? "+" : ""}${gap} pp (>40 pp storicamente precede correzioni; quanta crescita è già prezzata)`);
+    const gg = sovrapposizioneGiorni(m.decouple.sp500, m.decouple.gdp);
+    if (gg) {
+      const gap = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
+      lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: gap ${gap > 0 ? "+" : ""}${gap} pp (>40 pp storicamente precede correzioni; quanta crescita è già prezzata) [serie confrontabili su ${gg} giorni comuni]`);
+    } else {
+      lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: NON CALCOLABILE in questo snapshot — le due serie non condividono nessun periodo (azionario e PIL arrivano con finestre diverse), quindi la loro differenza non sarebbe un gap ma il confronto fra due orizzonti diversi. Si ricalcola da solo al prossimo run della pipeline.`);
+    }
   }
   if ((m.curve_history || []).length) {
     const cv = m.curve_history.slice(-1)[0].v;
@@ -7009,20 +7141,9 @@ function buildPrompt() {
   // essa stessa informazione (fonti che non concordano su una riunione a giorni), quindi le
   // due cifre vanno AFFIANCATE invece di pubblicarne una sola. Sono FATTI: niente giudizio.
   if (m.fedwatch && (m.fedwatch.meetings || []).length) {
-    const mt = { ...m.fedwatch.meetings[0] };
-    // COMPATIBILITÀ ALL'INDIETRO: data.json lo rigenera il CI su cron, quindi fino al primo run
-    // con la pipeline v186 i `meetings` non hanno hike_prob. Ricavarlo qui dal tasso implicito
-    // evita che il payload resti a metà nel frattempo — sarebbe la stessa mezza verità che il
-    // fix elimina, solo per qualche ora. Stessa formula della pipeline, segno incluso.
-    if (mt.hike_prob == null && m.fedwatch.implied_rate != null && m.fedwatch.target_range) {
-      const [lo, hi] = String(m.fedwatch.target_range).replace("%", "").split("–").map(Number);
-      if (Number.isFinite(lo) && Number.isFinite(hi)) {
-        const quarti = ((lo + hi) / 2 - m.fedwatch.implied_rate) / 0.25 * 100;
-        mt.cut_prob = Math.round(Math.max(0, Math.min(100, quarti)));
-        mt.hike_prob = Math.round(Math.max(0, Math.min(100, -quarti)));
-        mt.hold_prob = Math.max(0, 100 - mt.cut_prob - mt.hike_prob);
-      }
-    }
+    // v207 — la derivazione dei rami vive ora in ramiFedWatch(), condivisa col popup della
+    // dashboard: erano due implementazioni della stessa cosa e una delle due era rimasta a metà.
+    const mt = ramiFedWatch(m.fedwatch, m.fedwatch.meetings[0]);
     // v193 — TUTTI E TRE I RAMI, SEMPRE, anche a zero (richiesta CEO). Il v187 mostrava solo
     // quelli attivi: uno zero esplicito e' informazione ("il mercato non prezza affatto un
     // taglio"), mentre l'assenza della voce lascia il dubbio che il dato manchi.
@@ -7074,7 +7195,10 @@ function buildPrompt() {
     lines.push(peLine);
   }
   if (m.corp_profit) {
-    let cpBp = `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp`;
+    const ggCp = sovrapposizioneGiorni(m.corp_profit.sp500, m.corp_profit.profits);
+    let cpBp = ggCp
+      ? `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp`
+      : `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): il gap dell'S&P NON è calcolabile in questo snapshot (la sua serie e quella dei profitti non condividono nessun periodo)`;
     if (m.corp_profit.ndx_gap != null) cpBp += `, NDX gap ${m.corp_profit.ndx_gap > 0 ? "+" : ""}${m.corp_profit.ndx_gap} pp`;
     cpBp += ` — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali)`;
     lines.push(cpBp);

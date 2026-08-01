@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=206">
+<link rel="stylesheet" href="assets/style.css?v=207">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -201,6 +201,13 @@
       <div class="mini-card" id="sharpe-box" tabindex="0" role="button" title="Sharpe Ratio del portafoglio — clicca per il dettaglio"></div>
       <div class="mini-card" id="fx-box" tabindex="0" role="button" title="Rischio cambio EUR/USD — quota del NAV in dollari non coperta — clicca per il dettaglio"></div>
       <div class="mini-card" id="margin-debt-box" tabindex="0" role="button" title="Margin Debt FINRA — leva a credito sul mercato — clicca per il dettaglio"></div>
+      <!-- v207 — QUESTI DUE CONTENITORI NON ESISTEVANO. renderMiniCards() li popolava a ogni
+           render con contenuto valido ("Direzione mercato", "Tracking Error vs S&P 500") che
+           nessuno ha mai visto, e i due addEventListener erano no-op grazie a `?.`. -->
+      <div class="mini-card" id="market-direction" tabindex="0" role="button" title="Direzione del mercato — composito degli indicatori macro"></div>
+      <div class="mini-card" id="tracking-error-box" tabindex="0" role="button" title="Scarto giornaliero del portafoglio contro il benchmark — clicca per l'alpha per titolo"></div>
+      <!-- v207 — segnali che finivano SOLO nel prompt per l'LLM e che il CEO non vedeva mai -->
+      <div class="mini-card" id="internals-box" tabindex="0" role="button" title="Interni di mercato: ampiezza, momentum, schiuma sugli ETF a leva, futures"></div>
     </div>
     <div class="gauges" id="gauges"></div>
     <div class="macro-grid macro-grid-below" id="macro-grid"></div>
@@ -483,6 +490,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=206"></script>
+<script src="assets/app.js?v=207"></script>
 </body>
 </html>

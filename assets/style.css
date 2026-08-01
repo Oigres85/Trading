@@ -1527,3 +1527,11 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 .rs-axis { position: relative; display: block; height: var(--bar-xs); background: var(--card-2); border-radius: 2px; }
 .rs-zero { position: absolute; left: 50%; top: -1px; bottom: -1px; width: 1px; background: var(--muted); opacity: .55; }
 .rs-fill { position: absolute; top: 0; height: var(--bar-xs); border-radius: 2px; }
+
+/* v207 — card "Interni di mercato": quattro segnali che finivano solo nel prompt */
+.int-rows { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+.int-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: baseline; }
+.int-lab { font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.int-val { font-family: var(--mono); font-size: 12.5px; font-weight: 700; }
+.int-val.pos { color: var(--green); } .int-val.neg { color: var(--red); } .int-val.warn { color: var(--yellow); }
+.int-sub { grid-column: 1 / -1; font-size: 10px; color: var(--muted); line-height: 1.3; }

@@ -627,6 +627,68 @@ solo il campo sbagliato in silenzio. Ora ci sono sei check, validati iniettando 
 - `line-height` globale mancante (era `normal`, ~1,2), `color-scheme: dark` mancante (su Safari iOS
   gli spinner dei number-input erano chiari dentro un tema scuro), scrollbar non tematizzate.
 
+## 📉 v207 — grafici che confrontavano serie senza un giorno in comune
+
+I cinque difetti mappati in v206, sistemati. Il primo è il più grave che questa sessione abbia
+trovato, e stava nel payload.
+
+### `miniDualChart` usava l'INDICE come ascissa
+`px = i / (len - 1) * w`. Due serie con finestre temporali diverse venivano **stirate sulla
+stessa larghezza** e lette come se fossero allineate. Misurato sui dati veri:
+- *"Fed Funds vs S&P 500 — ultimi 5 anni"*: 60 punti **mensili** (2021-07→2026-06) sopra 60 punti
+  **giornalieri** (2026-05-06→07-31). Sovrapposizione reale: **26 giorni**.
+- *"Disaccoppiamento"*: 36 giorni di S&P contro 12 trimestri di PIL → **zero giorni in comune**.
+- *"Profitti reali"*: 3 mesi giornalieri contro 5 anni trimestrali → **zero giorni in comune**.
+
+Tre grafici su quattro confrontavano serie che **non condividono un solo giorno**. Ora l'ascissa
+è il tempo, il disegno si restringe alla finestra comune, e quando la finestra non esiste il
+grafico lo **dichiara** invece di disegnare una linea che sembra una tendenza.
+
+### La causa era in pipeline, e il commento la denunciava già
+`fred_series(id, n, freq=None)` senza `freq` restituisce la frequenza **nativa**, e SP500 su FRED
+è **giornaliera**. Quindi `fred_series("SP500", 36)  # ~3 anni mensili` prendeva 36 **sedute**
+(7 settimane). Il parametro `freq="m"` esiste ed è usato correttamente 4 righe più in là nel
+blocco `yield_recession`: era solo dimenticato qui. Conseguenza pubblicata nel payload:
+`- Disaccoppiamento S&P 500 vs PIL reale: gap -3 pp (>40 pp storicamente precede correzioni)`
+dove il −3 è **+3,1% di S&P su 7 settimane meno +6,3% di PIL su 3 anni**. Stessa cosa per
+`corp_profit.gap` (−30,7). Il ramo NDX era invece corretto (yfinance `interval="1mo"`), e siccome
+`worst_gap = max(gap, ndx_gap)` prendeva quello giusto, **il numero corretto copriva quello
+sbagliato**: il difetto non si vedeva dall'esito.
+
+Fix: `freq="m"` **e** `_finestra_comune()`, che ritaglia due serie all'intervallo condiviso e
+ritorna `None` quando non esiste — perché due serie rebasate a 100 su **date di partenza diverse**
+non sono confrontabili, e sottrarne i valori finali non produce un gap ma la differenza fra due
+periodi. La guardia vive anche in `app.js` (`sovrapposizioneGiorni`), perché il CI rigenera su
+cron e fino ad allora il payload leggerebbe i dati vecchi — stessa ragione dei rami FedWatch di
+v187. Il payload ora **dichiara il limite** invece di pubblicare il numero: precedente diretto in
+v199, *un numero fuori orizzonte è peggio di nessun numero*.
+
+⚠ Verificato che il payload cambi **solo** nelle due righe volute, generandolo con `app.js`
+prima e dopo **sullo stesso `data.json`**: confrontarlo con un payload salvato prima di un run
+del CI misura i dati nuovi, non la modifica (già pagato in v185).
+
+### FedWatch: il fix di v187 non era arrivato alla UI
+Il popup mostrava le colonne **Taglio** e **Invariato** e basta, mentre i dati portano
+`hike_prob` al 2% e al 26%: la stessa classe C14 — *una probabilità pubblicata a zero su una sola
+direzione è informazione mancante travestita da informazione presente* — corretta nel payload in
+v187 e sopravvissuta nella UI per due versioni. Erano **due implementazioni della stessa
+derivazione**: ora c'è `ramiFedWatch()`, usata da entrambi (stessa lezione di v161 con
+`usRegularSessionOpen`). L'estrazione è provata output-identica.
+
+### Tre cose rese e mai mostrate
+- `#market-direction` e `#tracking-error-box` **non esistevano in index.html**: `renderMiniCards`
+  li popolava a ogni render con contenuto valido ("Direzione mercato 48% · Laterale", "Tracking
+  Error vs S&P 500 −1,59 pp") che nessuno vedeva, e i due `addEventListener` erano no-op grazie
+  al `?.`. Aggiunti i contenitori.
+- `macro.momentum`, `froth`, `breadth`, `futures` finivano **solo** nel prompt: il CEO leggeva nel
+  report dell'AI conclusioni che poggiavano su numeri che la sua pagina non conteneva. Ora sono
+  una card. ⚠ Le chiavi vanno lette da `data.json`, non indovinate: erano `divergence_pp` (non
+  `divergence`), `futures.nasdaq` (non `futures.nq`), `momentum.sp500.dist_pct`.
+- Il popup P/E prometteva *"storico 10 anni (mensile, FRED)"* con **una sola rilevazione** in
+  `history` (fonte multpl, bloccata dagli IP del CI): `miniLineChart` rispondeva "Storico non
+  disponibile" sotto quel titolo. Ora il titolo dice quante rilevazioni ci sono davvero, e con
+  meno di due spiega perché mancano anche media a 10 anni e percentile.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
