@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "204";
+const BUILD_VERSION = "205";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -970,6 +970,7 @@ function renderAll() {
   renderCash();
   renderKPI();
   renderAllocation();
+  renderStruttura();            // v205 — i cinque grafici della struttura del libro
   renderEarnings();
   renderEarningsAlert();
   renderReconcileAlert();
@@ -3293,6 +3294,410 @@ function renderAllocation() {
       <span class="alloc-val muted">${fmtEUR.format(Math.round(x.value_eur))}</span>
     </li>`;
   }).join("");
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+   v205 — VISTA STRUTTURA
+   Il vincolo che decide questa vista: i dati arrivano su cron, non tick-by-tick. Quindi NON
+   si disegnano grafici di prezzo — investing.com e TradingView li fanno meglio e in tempo
+   reale. Si disegna solo ciò che nessuno dei due può disegnare, perché non conosce il libro.
+
+   ⚠ LA COSA CHE SI SBAGLIA PER PRIMA: peso e MCR hanno DENOMINATORI DIVERSI.
+   La pipeline calcola il contributo al rischio solo sulle posizioni con ≥60 rendimenti
+   giornalieri: il BTP non ne ha, quindi la varianza NON lo contiene. Confrontare "21% del
+   NAV" con "40% della varianza del comparto azionario" è confrontare due frazioni con basi
+   diverse — la classe di difetto che il gate di coerenza chiama "denominatori non dichiarati".
+   Qui le due barre stanno entrambe sul COMPARTO AZIONARIO (sommano a 100% tutte e due) e il
+   peso sul NAV resta accanto come numero, dichiarato per quello che è.
+   ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+function strutturaUniverso() {
+  const ptf = (DATA?.portfolio || []).filter(r => r.qty > 0 && r.val_eur > 0);
+  const conMcr = ptf.filter(r => r.risk_contrib_pct != null);
+  const somma = a => a.reduce((s, r) => s + r.val_eur, 0);
+  return {
+    ptf, conMcr, fuori: ptf.filter(r => r.risk_contrib_pct == null),
+    investito: somma(ptf), azionario: somma(conMcr), cash: cashEur,
+  };
+}
+
+/* righe del grafico peso-vs-rischio, ordinate per contributo al rischio decrescente */
+function concentrazioneRows() {
+  const u = strutturaUniverso();
+  if (!u.azionario) return [];
+  return u.conMcr.map(r => {
+    const peso = Math.round(r.val_eur / u.azionario * 1000) / 10;
+    return {
+      ticker: r.ticker, name: r.name || r.ticker, valEur: r.val_eur,
+      peso, mcr: r.risk_contrib_pct,
+      pesoNav: u.investito ? Math.round(r.val_eur / u.investito * 1000) / 10 : null,
+      gap: Math.round((r.risk_contrib_pct - peso) * 10) / 10,
+    };
+  }).sort((a, b) => b.mcr - a.mcr);
+}
+
+/* correlazione di Pearson su due serie allineate a destra (la più corta comanda) */
+function pearson(a, b) {
+  const n = Math.min(a.length, b.length);
+  if (n < 20) return null;
+  const x = a.slice(-n), y = b.slice(-n);
+  const mx = x.reduce((s, v) => s + v, 0) / n, my = y.reduce((s, v) => s + v, 0) / n;
+  let num = 0, dx = 0, dy = 0;
+  for (let i = 0; i < n; i++) { const a1 = x[i] - mx, b1 = y[i] - my; num += a1 * b1; dx += a1 * a1; dy += b1 * b1; }
+  const den = Math.sqrt(dx) * Math.sqrt(dy);
+  return den ? Math.round(num / den * 100) / 100 : null;
+}
+
+function logReturns(closes) {
+  const out = [];
+  for (let i = 1; i < closes.length; i++) {
+    const p0 = closes[i - 1], p1 = closes[i];
+    if (p0 > 0 && p1 > 0) out.push(Math.log(p1 / p0));
+  }
+  return out;
+}
+
+/* MATRICE DI CORRELAZIONE.
+   1) se la pipeline l'ha pubblicata si usa quella: 252 sedute, la STESSA base con cui sono
+      calcolati avg_corr, max_corr e l'MCR — così la mappa non contraddice le colonne della
+      tabella (due numeri diversi per la stessa coppia sarebbero un difetto, non un dettaglio);
+   2) altrimenti la si calcola dalle spark m6 (126 sedute) e si DICHIARA la base diversa.
+      Il fallback serve davvero: il CI rigenera su cron, e senza di esso la mappa resterebbe
+      vuota per ore dopo il rilascio (stessa ragione dei rami FedWatch in v187). */
+function matriceCorrelazione() {
+  const held = (DATA?.portfolio || []).filter(r => r.qty > 0);
+  const cm = DATA?.corr_matrix;
+  if (cm && typeof cm === "object") {
+    const tk = held.map(r => r.ticker).filter(t => cm[t]);
+    if (tk.length >= 2) {
+      const m = tk.map(a => tk.map(b => (a === b ? 1 : (cm[a]?.[b] ?? null))));
+      return { tickers: tk, m, base: "252 sedute (12 mesi) — pipeline", sedute: 252, fallback: false };
+    }
+  }
+  const con = held.filter(r => (r.sparks?.m6 || []).length >= 30);
+  if (con.length < 2) return null;
+  const R = con.map(r => logReturns(r.sparks.m6));
+  const tk = con.map(r => r.ticker);
+  const n = Math.min(...R.map(x => x.length));
+  const m = R.map((a, i) => R.map((b, j) => (i === j ? 1 : pearson(a, b))));
+  return {
+    tickers: tk, m, sedute: n, fallback: true,
+    base: `${n} sedute (6 mesi) — calcolo locale dalle serie di chiusura, in attesa della matrice a 12 mesi della pipeline`,
+  };
+}
+
+/* DERIVA: quota di varianza delle posizioni nel tempo, da metrics_history.
+   I titoli entrano ed escono dal libro: una data senza il titolo dà un BUCO nella serie, non
+   uno zero. Uno zero direbbe "rischio nullo", il buco dice "non era in portafoglio". */
+function derivaConcentrazione(topN = 4) {
+  const mh = (DATA?.metrics_history || []).filter(m => m?.date && m.titles && Object.keys(m.titles).length);
+  if (mh.length < 2) return null;
+  const dates = mh.map(m => m.date);
+  const attuali = concentrazioneRows().slice(0, topN).map(r => r.ticker);
+  const serie = attuali.map(tk => ({
+    ticker: tk,
+    punti: mh.map(m => {
+      const v = m.titles[tk]?.mcr;
+      return typeof v === "number" ? v : null;
+    }),
+  }));
+  // Top-3 della giornata: la concentrazione del libro indipendentemente da CHI la produce
+  const top3 = mh.map(m => {
+    const vals = Object.values(m.titles).map(t => t?.mcr).filter(v => typeof v === "number");
+    if (vals.length < 3) return null;
+    return Math.round(vals.sort((a, b) => b - a).slice(0, 3).reduce((s, v) => s + v, 0) * 10) / 10;
+  });
+  return { dates, serie, top3 };
+}
+
+/* DISTANZA DALLO STOP in % del prezzo: negativa = stop già violato.
+   Usa stopOf(), la stessa funzione del payload — una sola verità per dashboard e LLM. */
+function distanzeStop() {
+  return (DATA?.portfolio || []).filter(r => r.qty > 0 && r.price > 0 && isEquity(r))
+    .map(r => {
+      const s = stopOf(r);
+      if (!s || !(s.stop > 0)) return null;
+      return {
+        ticker: r.ticker, price: r.price, stop: s.stop, ratchet: s.ratchet, src: s.src,
+        violated: s.violated, valEur: r.val_eur || 0,
+        dist: Math.round((r.price - s.stop) / r.price * 1000) / 10,
+      };
+    }).filter(Boolean).sort((a, b) => a.dist - b.dist);
+}
+
+/* allocazione per settore o per valuta — la liquidità è in euro e conta nell'esposizione */
+function allocazionePer(kind) {
+  const u = strutturaUniverso();
+  const by = new Map();
+  u.ptf.forEach(r => {
+    const k = kind === "currency" ? (r.currency || "?") : (r.sector || "Altro");
+    by.set(k, (by.get(k) || 0) + r.val_eur);
+  });
+  if (u.cash > 0) by.set(kind === "currency" ? "EUR" : "Liquidità", (by.get(kind === "currency" ? "EUR" : "Liquidità") || 0) + u.cash);
+  const tot = [...by.values()].reduce((s, v) => s + v, 0);
+  if (!tot) return [];
+  return [...by.entries()].map(([nome, val]) => ({
+    nome, val, pct: Math.round(val / tot * 1000) / 10,
+  })).sort((a, b) => b.val - a.val);
+}
+
+/* v186 — quante sedute diverse convivono nel book. Rispecchia il controllo che buildPrompt fa
+   sul payload; è ripetuto qui e non estratto perché buildPrompt non si tocca (Regola Suprema),
+   e il test sull'impronta del payload garantisce che le due letture non divergano. */
+function seduteDelBook() {
+  const per = new Map();
+  (DATA?.portfolio || []).filter(r => r.qty && r.currency !== "EUR" && r.price_asof)
+    .forEach(r => per.set(r.price_asof, (per.get(r.price_asof) || 0) + 1));
+  return per;
+}
+
+/* ---------------- rendering della vista struttura ---------------- */
+
+/* in una colonna di percentuali il decimale va SEMPRE stampato: "26%" accanto a "39,9%" fa
+   ballare l'incolonnamento e costringe a rileggere invece di guardare */
+const fmt1 = new Intl.NumberFormat("it-IT", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+function fmtPP(v) { return (v >= 0 ? "+" : "−") + fmt1.format(Math.abs(v)) + " pp"; }
+
+function renderConcentrazione() {
+  const box = $("#conc-chart"); if (!box) return;
+  const rows = concentrazioneRows(), u = strutturaUniverso();
+  const basis = $("#conc-basis"), head = $("#conc-headline"), note = $("#conc-note");
+  if (!rows.length) {
+    box.innerHTML = '<div class="muted">Nessuna posizione con contributo al rischio calcolato.</div>';
+    if (head) head.innerHTML = ""; if (basis) basis.textContent = ""; if (note) note.innerHTML = "";
+    return;
+  }
+  const max = Math.max(...rows.map(r => Math.max(r.peso, r.mcr))) || 1;
+  const top3 = Math.round(rows.slice(0, 3).reduce((s, r) => s + r.mcr, 0) * 10) / 10;
+  const primo = rows[0];
+  const violati = distanzeStop().filter(s => s.violated);
+
+  if (basis) basis.textContent = `quote del comparto azionario · ${fmtEUR.format(Math.round(u.azionario))}`;
+  if (head) {
+    const clsTop = top3 >= 75 ? "sh-bad" : top3 >= 60 ? "sh-warn" : "";
+    head.innerHTML = `
+      <div class="sh-item ${clsTop}">
+        <div class="sh-lab">Rischio nei primi 3</div>
+        <div class="sh-val ${top3 >= 75 ? "neg" : top3 >= 60 ? "warn" : ""}">${fmt1.format(top3)}%</div>
+        <div class="sh-sub">della varianza del comparto azionario</div>
+      </div>
+      <div class="sh-item ${primo.gap >= 10 ? "sh-warn" : ""}">
+        <div class="sh-lab">Massimo scarto</div>
+        <div class="sh-val ${primo.gap >= 10 ? "warn" : ""}">${primo.ticker}</div>
+        <div class="sh-sub">${fmt1.format(primo.peso)}% del capitale → ${fmt1.format(primo.mcr)}% del rischio</div>
+      </div>
+      <div class="sh-item ${violati.length ? "sh-bad" : ""}">
+        <div class="sh-lab">Stop violati</div>
+        <div class="sh-val ${violati.length ? "neg" : "pos"}">${violati.length}</div>
+        <div class="sh-sub">${violati.length ? violati.map(v => v.ticker).join(" · ") : "nessuna posizione sotto il proprio stop"}</div>
+      </div>`;
+  }
+  box.innerHTML = `
+    <div class="chart-legend">
+      <span><span class="lg-dot" style="background:var(--blue)"></span>peso nel comparto azionario</span>
+      <span><span class="lg-dot" style="background:var(--purple)"></span>quota della varianza (MCR)</span>
+      <span>scarto = rischio − peso</span>
+    </div>
+    <div class="cbars">${rows.map(r => {
+      const cls = r.gap >= 10 ? "g-bad" : r.gap >= 4 ? "g-warn" : "g-ok";
+      return `<div class="cbar-row">
+        <span class="cbar-tk" data-struct-tk="${esc(r.ticker)}" title="${esc(r.name)} — apri la scheda">${esc(r.ticker)}</span>
+        <span class="cbar-track">
+          <span class="cbar-line"><span class="cbar-bar"><span class="cbar-fill f-peso" style="width:${(r.peso / max * 100).toFixed(1)}%"></span></span><span class="cbar-num">${fmt1.format(r.peso)}%</span></span>
+          <span class="cbar-line"><span class="cbar-bar"><span class="cbar-fill f-mcr" style="width:${(r.mcr / max * 100).toFixed(1)}%"></span></span><span class="cbar-num">${fmt1.format(r.mcr)}%</span></span>
+        </span>
+        <span class="cbar-gap ${cls}" title="${fmt1.format(r.pesoNav)}% del capitale investito (BTP e liquidità inclusi)">${fmtPP(r.gap)}</span>
+      </div>`;
+    }).join("")}</div>`;
+  box.querySelectorAll("[data-struct-tk]").forEach(e =>
+    e.addEventListener("click", () => openStockCard(e.dataset.structTk)));
+  if (note) {
+    const fuori = u.fuori.map(r => r.ticker);
+    note.innerHTML = `Entrambe le barre sono quote del <b>comparto azionario</b> e sommano a 100%: sono confrontabili.
+      ${fuori.length ? `Fuori dal calcolo ${fuori.map(esc).join(", ")} e la liquidità — la varianza si calcola su chi ha una serie di rendimenti giornalieri.` : ""}
+      Il comparto azionario è ${fmt1.format(Math.round(u.azionario / (u.investito + u.cash) * 1000) / 10)}% del patrimonio (investito + liquidità).
+      Passa sopra allo scarto per il peso sul capitale investito.`;
+  }
+}
+
+/* La scala si satura a 0,7 e non a 1: fra posizioni azionarie una correlazione di 1 non esiste,
+   quindi tarare il rosso sull'unità lascerebbe TUTTA la mappa nel verde e il grafico non direbbe
+   niente. Sopra 0,7 due titoli sono di fatto la stessa scommessa — lì il colore deve gridare. */
+const CORR_SAT = 0.7;
+function corrColor(v) {
+  if (v == null) return "var(--card-2)";
+  if (v < 0) return `hsl(168 52% ${(74 - Math.min(1, -v / CORR_SAT) * 10).toFixed(0)}%)`;
+  const t = Math.min(1, v / CORR_SAT);
+  return `hsl(${(158 - t * 148).toFixed(0)} ${(38 + t * 48).toFixed(0)}% ${(76 - t * 16).toFixed(0)}%)`;
+}
+
+function renderCorrMap() {
+  const box = $("#corr-chart"); if (!box) return;
+  const basis = $("#corr-basis"), note = $("#corr-note");
+  const cm = matriceCorrelazione();
+  if (!cm) {
+    box.innerHTML = '<div class="muted">Servono almeno due posizioni con storico sufficiente.</div>';
+    if (basis) basis.textContent = ""; if (note) note.innerHTML = "";
+    return;
+  }
+  if (basis) basis.textContent = cm.base;
+  const { tickers: tk, m } = cm;
+  box.innerHTML = `<div class="corr-wrap"><table class="corr-grid"><thead><tr><th></th>${
+    tk.map(t => `<th>${esc(t)}</th>`).join("")}</tr></thead><tbody>${
+    tk.map((a, i) => `<tr><th class="corr-rowhead">${esc(a)}</th>${
+      tk.map((b, j) => {
+        const v = m[i][j];
+        if (i === j) return `<td><div class="corr-cell c-diag">—</div></td>`;
+        return `<td><div class="corr-cell" style="background:${corrColor(v)}" title="${esc(a)} / ${esc(b)}: ${v == null ? "n.d." : fmtNum.format(v)}">${v == null ? "·" : fmtNum.format(v)}</div></td>`;
+      }).join("")}</tr>`).join("")}</tbody></table></div>`;
+  // la coppia più legata del libro: è quella che rende inutile la diversificazione fra le due
+  let best = null;
+  tk.forEach((a, i) => tk.forEach((b, j) => {
+    if (j > i && m[i][j] != null && (!best || m[i][j] > best.v)) best = { a, b, v: m[i][j] };
+  }));
+  const off = [];
+  tk.forEach((a, i) => tk.forEach((b, j) => { if (j > i && m[i][j] != null) off.push(m[i][j]); }));
+  const media = off.length ? Math.round(off.reduce((s, v) => s + v, 0) / off.length * 100) / 100 : null;
+  if (note) {
+    note.innerHTML = `Correlazione dei rendimenti giornalieri fra le posizioni: 1 = si muovono insieme, 0 = indipendenti, negativo = in direzioni opposte.
+      ${best ? `La coppia più legata è <b>${esc(best.a)}–${esc(best.b)}</b> a ${fmtNum.format(best.v)}: su quelle due la diversificazione non c'è.` : ""}
+      ${media != null ? ` Media di tutte le coppie: <b>${fmtNum.format(media)}</b>.` : ""}
+      ${cm.fallback ? ` <b>⚠ Base a 6 mesi</b>, calcolata qui: la pipeline non ha ancora pubblicato la matrice a 12 mesi, quindi questi valori possono differire dalla colonna “Corr. media” della tabella, che è a 12 mesi.` : ""}`;
+  }
+}
+
+function renderDeriva() {
+  const box = $("#drift-chart"); if (!box) return;
+  const basis = $("#drift-basis"), note = $("#drift-note");
+  const d = derivaConcentrazione();
+  if (!d || d.dates.length < 2) {
+    box.innerHTML = '<div class="muted">Storico insufficiente: servono almeno due rilevazioni con i contributi al rischio.</div>';
+    if (basis) basis.textContent = ""; if (note) note.innerHTML = "";
+    return;
+  }
+  const W = 640, H = 210, L = 34, Rr = 46, T = 12, B = 24;
+  const n = d.dates.length;
+  const tutti = [...d.serie.flatMap(s => s.punti), ...d.top3].filter(v => v != null);
+  // tacche su valori TONDI: un asse che segna 23% e 68% costringe a fare i conti per leggerlo
+  const rawMax = Math.max(10, ...tutti);
+  const passo = [5, 10, 20, 25, 50].find(s => rawMax / s <= 5) || 100;
+  const maxV = Math.ceil(rawMax / passo) * passo;
+  const px = i => (L + (i / (n - 1)) * (W - L - Rr)).toFixed(1);
+  const py = v => (H - B - (v / maxV) * (H - B - T)).toFixed(1);
+  // una serie con buchi va spezzata: un titolo assente da metrics_history non era in portafoglio,
+  // e unire i due estremi disegnerebbe una continuità che non c'è stata
+  const segmenti = (punti) => {
+    const segs = []; let cur = [];
+    punti.forEach((v, i) => {
+      if (v == null) { if (cur.length > 1) segs.push(cur); cur = []; }
+      else cur.push(`${px(i)},${py(v)}`);
+    });
+    if (cur.length > 1) segs.push(cur);
+    return segs;
+  };
+  const tacche = [];
+  for (let v = 0; v <= maxV + 1e-9; v += passo) tacche.push(v);
+  const griglia = tacche.map(v =>
+    `<line x1="${L}" y1="${py(v)}" x2="${W - Rr}" y2="${py(v)}" stroke="var(--border)" stroke-width="1"/>
+      <text x="${L - 6}" y="${(+py(v) + 3.5).toFixed(1)}" text-anchor="end" font-size="9.5" fill="var(--muted)">${v.toFixed(0)}%</text>`).join("");
+  const linee = d.serie.map((s, i) => {
+    const col = ALLOC_COLORS[i % ALLOC_COLORS.length];
+    const ultimo = [...s.punti].reverse().findIndex(v => v != null);
+    const idx = ultimo === -1 ? -1 : n - 1 - ultimo;
+    return segmenti(s.punti).map(seg => `<polyline points="${seg.join(" ")}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`).join("")
+      + (idx >= 0 ? `<circle cx="${px(idx)}" cy="${py(s.punti[idx])}" r="2.8" fill="${col}"/>
+        <text x="${W - Rr + 5}" y="${(+py(s.punti[idx]) + 3.5).toFixed(1)}" font-size="10" font-weight="600" fill="${col}">${esc(s.ticker)}</text>` : "");
+  }).join("");
+  const t3 = segmenti(d.top3).map(seg =>
+    `<polyline points="${seg.join(" ")}" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="4 3"/>`).join("");
+  const dLab = i => new Date(d.dates[i] + "T00:00:00").toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
+  // niente preserveAspectRatio="none": deformerebbe le etichette dell'asse a ogni larghezza
+  box.innerHTML = `<svg class="drift-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Deriva del contributo al rischio nel tempo">
+      ${griglia}${t3}${linee}
+      <text x="${L}" y="${H - 6}" font-size="9.5" fill="var(--muted)">${dLab(0)}</text>
+      <text x="${W - Rr}" y="${H - 6}" text-anchor="end" font-size="9.5" fill="var(--muted)">${dLab(n - 1)}</text>
+    </svg>
+    <div class="drift-legend">${d.serie.map((s, i) =>
+      `<span style="color:${ALLOC_COLORS[i % ALLOC_COLORS.length]}">■ <b>${esc(s.ticker)}</b></span>`).join("")}
+      <span class="muted">╌ Top-3 del giorno</span></div>`;
+  if (basis) basis.textContent = `${n} rilevazioni · quota della varianza (MCR)`;
+  const p0 = d.top3.find(v => v != null), p1 = [...d.top3].reverse().find(v => v != null);
+  if (note) {
+    const delta = (p0 != null && p1 != null) ? Math.round((p1 - p0) * 10) / 10 : null;
+    note.innerHTML = `Quanta varianza produce ogni posizione, giorno per giorno. Le quote si ridistribuiscono da sole quando cambia la volatilità: una linea che sale senza che tu abbia comprato significa che quel titolo si sta muovendo più del resto del libro.
+      ${delta != null ? `Il Top-3 è passato da <b>${fmt1.format(p0)}%</b> a <b>${fmt1.format(p1)}%</b> (${fmtPP(delta)}) in ${n} rilevazioni.` : ""}
+      Le interruzioni sono date in cui la posizione non era in portafoglio, non zeri.`;
+  }
+}
+
+let allocGrafMode = "sector";
+function renderAllocGrafica() {
+  const box = $("#allocg-chart"); if (!box) return;
+  const list = allocazionePer(allocGrafMode);
+  const note = $("#allocg-note");
+  if (!list.length) { box.innerHTML = '<div class="muted">Nessuna posizione.</div>'; if (note) note.innerHTML = ""; return; }
+  const max = Math.max(...list.map(x => x.pct)) || 1;
+  box.innerHTML = `<div class="abars">${list.map((x, i) => `
+    <div class="abar-row">
+      <span class="abar-lab" title="${esc(x.nome)}">${esc(x.nome)}</span>
+      <span class="abar-track"><span class="abar-fill" style="width:${(x.pct / max * 100).toFixed(1)}%;background:${ALLOC_COLORS[i % ALLOC_COLORS.length]}"></span></span>
+      <span class="abar-val">${fmt1.format(x.pct)}% · ${fmtEUR.format(Math.round(x.val))}</span>
+    </div>`).join("")}</div>`;
+  if (note) {
+    const fx = fxExposure();
+    note.innerHTML = allocGrafMode === "currency"
+      ? `Quote del patrimonio per valuta di quotazione (la liquidità, se presente, è in euro). ${fx ? `L'esposizione al dollaro non coperta è <b>${fmt1.format(fx.pct)}%</b> del patrimonio: a cambio EUR/USD ${fmtNum.format(fx.eurusd)}, un movimento dell'1% sull'euro sposta ${fmtEUR.format(Math.round(fx.usdEur * 0.01))} senza che nessun prezzo si muova.` : ""}`
+      : `Quote del patrimonio per settore${strutturaUniverso().cash > 0 ? ", con la liquidità come voce a sé" : " (nessuna liquidità registrata: le quote sono sul solo investito)"}.`;
+  }
+}
+
+function renderStopDist() {
+  const box = $("#stopdist-chart"); if (!box) return;
+  const basis = $("#stop-basis"), note = $("#stopdist-note");
+  const rows = distanzeStop();
+  if (!rows.length) {
+    box.innerHTML = '<div class="muted">Nessuna posizione azionaria con stop calcolabile.</div>';
+    if (basis) basis.textContent = ""; if (note) note.innerHTML = "";
+    return;
+  }
+  // asse SIMMETRICO attorno allo zero: la stessa distanza disegna la stessa barra da entrambe
+  // le parti, così "quanto manca" e "di quanto ho sforato" restano confrontabili a vista
+  const maxAbs = Math.max(5, ...rows.map(r => Math.abs(r.dist)));
+  const zero = 50;
+  box.innerHTML = `<div class="sbars">${rows.map(r => {
+    const w = Math.abs(r.dist) / (2 * maxAbs) * 100;
+    const left = r.dist >= 0 ? zero : zero - w;
+    const col = r.dist < 0 ? "var(--red)" : r.dist < 5 ? "var(--yellow)" : "var(--green)";
+    return `<div class="sbar-row">
+      <span class="cbar-tk" data-struct-tk="${esc(r.ticker)}" title="apri la scheda">${esc(r.ticker)}</span>
+      <span class="sbar-axis" title="prezzo ${fmtNum.format(r.price)} · stop ${fmtNum.format(r.stop)} (${esc(r.src)})">
+        <span class="sbar-zero" style="left:${zero}%"></span>
+        <span class="sbar-fill" style="left:${left.toFixed(1)}%;width:${w.toFixed(1)}%;background:${col}"></span>
+      </span>
+      <span class="sbar-meta">${r.violated ? "<b class='viol'>violato</b> " : ""}${signTxt(r.dist)} · stop ${fmtNum.format(r.stop)}</span>
+    </div>`;
+  }).join("")}</div>`;
+  box.querySelectorAll("[data-struct-tk]").forEach(e =>
+    e.addEventListener("click", () => openStockCard(e.dataset.structTk)));
+  const viol = rows.filter(r => r.violated);
+  const prov = rows.filter(r => !r.ratchet);
+  const sed = seduteDelBook();
+  if (basis) basis.textContent = `${rows.length} posizioni · distanza in % del prezzo`;
+  if (note) {
+    note.innerHTML = `Quanto può scendere ogni posizione prima di toccare il proprio stop ratchet 2×ATR. A sinistra dello zero lo stop è già stato superato.
+      ${viol.length ? `<b>${viol.length} ${viol.length === 1 ? "posizione è" : "posizioni sono"} sotto lo stop</b>: ${viol.map(v => esc(v.ticker)).join(", ")}.` : "Nessuna posizione sotto il proprio stop."}
+      ${prov.length ? ` Stop non-ratchet su ${prov.map(p => esc(p.ticker)).join(", ")} (${esc(prov[0].src)}).` : ""}
+      ${sed.size > 1 ? ` <b>⚠ Prezzi da sedute diverse</b> (${[...sed.entries()].map(([d, k]) => `${k} al ${new Date(d + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}`).join(", ")}): una distanza può cambiare per l'arrivo della barra, non per un movimento.` : ""}`;
+  }
+}
+
+function renderStruttura() {
+  if (!DATA) return;
+  renderConcentrazione();
+  renderCorrMap();
+  renderDeriva();
+  renderAllocGrafica();
+  renderStopDist();
 }
 
 /* ---------------- tabella ---------------- */
@@ -7639,6 +8044,16 @@ document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {
   });
 });
 
+// v205 — interruttore settore/valuta della vista struttura
+document.querySelectorAll("#alloc-graf-toggle .chip").forEach(ch => {
+  ch.addEventListener("click", () => {
+    document.querySelectorAll("#alloc-graf-toggle .chip").forEach(c => c.classList.remove("chip-active"));
+    ch.classList.add("chip-active");
+    allocGrafMode = ch.dataset.agmode;
+    renderAllocGrafica();
+  });
+});
+
 $("#chart-modal-close").addEventListener("click", closeChartModal);
 $("#chart-modal").addEventListener("click", e => {
   if (e.target.id === "chart-modal") { closeChartModal(); return; }
@@ -7807,8 +8222,21 @@ function setTab(nome) {
   // sul layout, e su un contenitore nascosto verrebbero sbagliate.
   if (nome === "portafoglio") renderTable();
   if (nome === "watchlist") renderWatchlist();
+  if (nome === "struttura" && typeof DATA !== "undefined" && DATA) renderStruttura();
 }
 document.querySelectorAll("#main-tabs .tab").forEach(b =>
   b.addEventListener("click", () => setTab(b.dataset.tab)));
 
-try { setTab(localStorage.getItem(TAB_KEY) || "portafoglio"); } catch { /* DOM non pronto */ }
+/* v205 — la scheda d'ingresso diventa STRUTTURA: il flusso previsto è "colpo d'occhio sulla
+   struttura → copia il prompt → LLM con accesso web". Si applica UNA SOLA VOLTA e mai sopra
+   una preferenza già espressa: la scheda su cui l'utente si è fermato l'ultima volta vince
+   (stessa regola della vista compatta di v198 — un default non sovrascrive una scelta). */
+try {
+  const salvata = localStorage.getItem(TAB_KEY);
+  if (!localStorage.getItem("landing_struttura_v205")) {
+    localStorage.setItem("landing_struttura_v205", "1");
+    if (!salvata || salvata === "portafoglio") setTab("struttura"); else setTab(salvata);
+  } else {
+    setTab(salvata || "struttura");
+  }
+} catch { /* DOM non pronto */ }

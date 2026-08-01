@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=204">
+<link rel="stylesheet" href="assets/style.css?v=205">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -51,12 +51,75 @@
        (blocco FILTRI QUANTITATIVI e METRICHE DI RISCHIO) e nelle tabelle; NAV e P&L nei
        riquadri del patrimonio qui sotto. Spariva la ripetizione, non l'informazione. -->
 
+  <!-- v205 — SHELL A DUE COLONNE: barra laterale con le macro-sezioni, centro con i grafici.
+       La barra laterale NON è un elemento nuovo: è la stessa #main-tabs di v199 (stessi bottoni,
+       stesso setTab, stessa guardia anti-taglio), impaginata in verticale. Sotto gli 860px torna
+       una striscia orizzontale scorrevole — su iPhone una colonna fissa mangerebbe metà schermo. -->
+  <div class="shell">
   <nav class="tabs" id="main-tabs" role="tablist" aria-label="Sezioni">
-    <button class="tab tab-active" data-tab="portafoglio" role="tab">Portafoglio</button>
+    <button class="tab tab-active" data-tab="struttura" role="tab">Struttura</button>
+    <button class="tab" data-tab="portafoglio" role="tab">Portafoglio</button>
     <button class="tab" data-tab="watchlist" role="tab">Watchlist</button>
     <button class="tab" data-tab="macro" role="tab">Macro</button>
     <button class="tab" data-tab="rischio" role="tab">Rischio &amp; strumenti</button>
   </nav>
+
+  <div class="shell-main">
+
+  <!-- ═══ v205 — STRUTTURA DEL LIBRO ═══════════════════════════════════════════════════════
+       Il vincolo che decide questa vista: i dati arrivano su cron (GitHub Actions), non
+       tick-by-tick. Quindi NIENTE GRAFICI DI PREZZO — investing.com e TradingView li fanno
+       meglio e in tempo reale. Qui si disegna solo ciò che nessuno dei due può disegnare,
+       perché nessuno dei due conosce il libro: concentrazione, correlazione, deriva,
+       allocazione, distanza dagli stop. -->
+  <section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Concentrazione — peso contro rischio</h2>
+      <span class="muted" id="conc-basis"></span>
+    </div>
+    <div class="struct-headline" id="conc-headline"></div>
+    <div id="conc-chart"></div>
+    <div class="muted struct-note" id="conc-note"></div>
+  </section>
+
+  <section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Mappa di correlazione</h2>
+      <span class="muted" id="corr-basis"></span>
+    </div>
+    <div id="corr-chart"></div>
+    <div class="muted struct-note" id="corr-note"></div>
+  </section>
+
+  <section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Deriva della concentrazione</h2>
+      <span class="muted" id="drift-basis"></span>
+    </div>
+    <div id="drift-chart"></div>
+    <div class="muted struct-note" id="drift-note"></div>
+  </section>
+
+  <section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Allocazione</h2>
+      <div class="spark-toggle" id="alloc-graf-toggle" role="group" aria-label="Vista allocazione grafica">
+        <button class="chip chip-active" data-agmode="sector">Settore</button>
+        <button class="chip" data-agmode="currency">Valuta</button>
+      </div>
+    </div>
+    <div id="allocg-chart"></div>
+    <div class="muted struct-note" id="allocg-note"></div>
+  </section>
+
+  <section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Distanza dallo stop</h2>
+      <span class="muted" id="stop-basis"></span>
+    </div>
+    <div id="stopdist-chart"></div>
+    <div class="muted struct-note" id="stopdist-note"></div>
+  </section>
 
   <!-- PATRIMONIO -->
   <section class="card kpi-card" data-pane="portafoglio">
@@ -272,6 +335,9 @@
     Prezzi live lato client (Yahoo via proxy CORS, ogni 60s) · dati tecnici/macro/news rigenerati dal workflow ogni ~20 min.<br>
     Fonti: Yahoo Finance · CNN Fear &amp; Greed · FRED/BLS/DBnomics · NY Fed · MOF Giappone · Borsa Italiana · RSS (CNBC, Bloomberg, Yahoo, Investing, Google News, Reddit) · Polymarket. Non è consulenza finanziaria.
   </footer>
+
+  </div><!-- /.shell-main -->
+  </div><!-- /.shell -->
 </main>
 
 <!-- Modal zoom grafico -->
@@ -380,6 +446,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=204"></script>
+<script src="assets/app.js?v=205"></script>
 </body>
 </html>

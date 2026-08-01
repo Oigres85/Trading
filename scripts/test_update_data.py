@@ -73,6 +73,31 @@ check("risk: correlazioni annotate su ogni riga",
       all(r.get("avg_corr") is not None and r.get("max_corr_with") for r in panel))
 check("risk: avg_pairwise_corr in [-1,1]", risk.get("avg_pairwise_corr") is not None and -1 <= risk["avg_pairwise_corr"] <= 1)
 
+# ---------- v205: matrice completa delle correlazioni (mappa della vista struttura) ----------
+# La matrice DEVE nascere dalla stessa `corr` che produce avg_corr/max_corr sulle righe: se
+# divergessero, la mappa e la colonna della tabella direbbero due cose sulla stessa coppia.
+cmx = risk.get("corr_matrix") or {}
+tk_panel = [r["ticker"] for r in panel]
+check("v205 corr_matrix: una riga e una colonna per ogni titolo del pannello",
+      set(cmx.keys()) == set(tk_panel) and all(set(cmx[t].keys()) == set(tk_panel) for t in cmx))
+check("v205 corr_matrix: diagonale a 1 e simmetria",
+      all(abs(cmx[t][t] - 1) < 0.011 for t in cmx)
+      and all(abs(cmx[a][b] - cmx[b][a]) < 0.011 for a in cmx for b in cmx
+              if cmx[a][b] is not None and cmx[b][a] is not None))
+check("v205 corr_matrix: valori in [-1,1]",
+      all(v is None or -1.001 <= v <= 1.001 for row in cmx.values() for v in row.values()))
+# il cross-check che conta: max fuori diagonale == max_corr/max_corr_with già annotati sulla riga
+_coerenti = []
+for r in panel:
+    t = r["ticker"]
+    altri = {o: cmx[t][o] for o in tk_panel if o != t and cmx[t][o] is not None}
+    if not altri or r.get("max_corr_with") is None:
+        continue
+    top = max(altri, key=altri.get)
+    _coerenti.append(top == r["max_corr_with"] and abs(altri[top] - r["max_corr"]) < 0.011)
+check("v205 corr_matrix: il massimo di ogni riga coincide con max_corr/max_corr_with della pipeline",
+      len(_coerenti) == len(panel) and all(_coerenti))
+
 
 # ---------- margin debt: carry-forward quando lo scrape FINRA fallisce ----------
 import update_data as ud
@@ -309,7 +334,7 @@ check("umich: i mesi inglesi mappano al numero giusto (June=6, dicembre=12)",
 check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è il motivo del fetcher)",
       _rows[-1][0] > "2026-05-01")
 
-N_CHECKS = 63   # +4 in v186: rami FedWatch (rialzo/taglio) — vedi in fondo al file
+N_CHECKS = 67   # +4 in v186: rami FedWatch · +4 in v205: matrice di correlazione completa
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio

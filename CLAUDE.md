@@ -475,6 +475,65 @@ Validata togliendo le schede e verificando che le nomini.
 HTML fra due marcatori, un array di configurazione), elencare PRIMA cosa ci sta dentro e cosa sta
 in mezzo. La ricevuta del taglio va scritta prima di tagliare, non dopo aver visto cosa manca.
 
+## 📊 Vista STRUTTURA (v205) — e il gate che era spento
+
+Barra laterale con le macro-sezioni, centro con i grafici. La barra laterale **non è un elemento
+nuovo**: è la stessa `#main-tabs` di v199 impaginata in verticale sopra gli 860px — stessi bottoni,
+stesso `setTab`, stessa guardia anti-taglio. Sotto gli 860px torna una striscia orizzontale.
+
+**Il vincolo che decide la vista**: i dati arrivano su cron, non tick-by-tick. Quindi **niente
+grafici di prezzo** — investing.com e TradingView li fanno meglio e in tempo reale. Si disegna solo
+ciò che nessuno dei due può disegnare, perché non conosce il libro: concentrazione (peso vs MCR),
+mappa di correlazione, deriva della concentrazione, allocazione, distanza dagli stop.
+
+### 🛑 Il gate che contava 174 check e ne verificava 161
+
+`scripts/test_app.mjs` aveva il blocco `/* report */` — il ciclo che calcola `fail` e stampa
+PASS/FAIL — **prima** degli ultimi tre gruppi di check (v196, v204 e ora v205). Quei check
+finivano in `T` ed erano **contati nel totale**, ma `fail` era già stato calcolato: non venivano
+stampati e **non facevano uscire con codice 1**. Verificato togliendo `id="conc-chart"` da
+index.html: la suite annunciava *"174/174 superati"* ed exit 0.
+
+Cioè **la guardia anti-taglio di v204 — quella nata perché "l'attenzione non basta" — era spenta**,
+e con lei il registro macro di v196. Il report ora è l'ultima cosa del file. *Un test che non può
+rompere la CI non è un test, è un commento.* Appena riacceso ha subito trovato un mio check verde
+per la premessa sbagliata (vedi sotto).
+
+### Le trappole di questa vista, tutte già pagate
+
+- **DENOMINATORI DIVERSI.** Il peso sul NAV e l'MCR non stanno sullo stesso universo: la pipeline
+  calcola il contributo al rischio solo su chi ha ≥60 rendimenti giornalieri, quindi **il BTP non
+  è nella varianza**. Affiancare "21% del NAV" e "40% della varianza azionaria" è confrontare due
+  frazioni con basi diverse — la classe che `coherence_check` chiama *denominatori non dichiarati*.
+  Le due barre stanno **entrambe sul comparto azionario** (sommano a 100% tutte e due) e il peso
+  sul NAV resta come numero accanto, dichiarato per quello che è.
+- **`corr_matrix` pubblicata dalla pipeline** (stessa `corr` da cui escono `avg_corr`/`max_corr`):
+  senza, la dashboard ne calcolerebbe una propria su una finestra diversa e mostrerebbe, per la
+  stessa coppia, un numero che non coincide con la colonna della tabella. Finché il CI non l'ha
+  rigenerata, `app.js` la calcola dalle spark `m6` **dichiarando la base a 6 mesi** (stessa logica
+  del fallback FedWatch di v187: senza, il grafico resterebbe vuoto per ore dopo il rilascio).
+- **Un buco non è uno zero.** In `derivaConcentrazione` una data in cui il titolo non era in
+  portafoglio resta `null`: uno zero direbbe "rischio nullo" e la linea scenderebbe a terra
+  disegnando un fatto mai accaduto.
+- **La scala colori si satura a 0,7, non a 1.** Fra titoli azionari una correlazione di 1 non
+  esiste: tarare il rosso sull'unità lasciava TUTTA la mappa nel verde e il grafico non diceva
+  niente. Sopra 0,7 due titoli sono la stessa scommessa — lì il colore deve gridare.
+- **`<span>` inline che ignora `width`.** `.abar-fill` non aveva `display:block`: le barre
+  dell'allocazione sembravano **piene al 100% su ogni riga**. Nessun errore in console, nessun
+  test rosso — *un grafico che dice il falso senza rompersi*. Trovato solo misurando in browser
+  (`getComputedStyle` restituiva `"100%"` invece di un valore in px: è il sintomo).
+  Le barre gemelle non ne soffrivano perché sono figlie di un grid, che le blockifica.
+- **Isolamento dei test.** `DATA = REALE` assegna per riferimento: due check che mutano il
+  portafoglio per provare un ramo lasciavano la mutazione addosso a `REALE` e rompevano i
+  successivi. Ora ogni check parte da una copia profonda.
+- **La somma a 100% non prova nulla** se si normalizza sul proprio totale. Il check
+  dell'allocazione verifica che il totale sia il patrimonio vero e che la quota USD **coincida
+  con `fxExposure()`**, cioè con il numero già pubblicato altrove.
+
+Payload verificato **identico al byte** prima e dopo (a meno dei campi derivati dall'orologio), con
+un check dedicato che rigenera `buildPrompt()` dopo aver chiamato tutte le funzioni della vista.
+Su iPhone 375px: documento 375px, nessun taglio, la matrice scorre dentro il proprio contenitore.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

@@ -1,6 +1,5 @@
-# Da dove ripartire — handoff del 01/08/2026
+# Da dove ripartire — handoff del 01/08/2026 (dopo v205)
 
-> Scritto alla fine di una sessione lunga, per non dover ricostruire il contesto.
 > Leggi anche `CLAUDE.md`, che contiene le regole d'ingaggio e i difetti già vissuti.
 
 ## Come lavora davvero il CEO (accertato, non supposto)
@@ -13,38 +12,37 @@
   serve qualcosa di disponibile *quando decide*, non un report periodico.
 - Ha guadagnato con questo metodo. Il sistema deve stargli **ai bordi**, non al centro.
 
-## Stato del sistema (v204)
+## Stato del sistema (v205)
 
-Funzionante e con tutti i gate verdi: 161 test JS · red team 32 campagne · pipeline 63 test ·
-coerenza 18 controlli su 15 classi · gate valuta · audit dati.
+Tutti i gate verdi: **176 test JS** · red team 32 campagne · **pipeline 67 test** · coerenza 18
+controlli su 15 classi · gate valuta · audit dati.
 
 **Rimossi di recente e da NON reintrodurre senza misurare:**
 - motore predittivo (verdetto, punteggi 0-100, classifica) — track record misurato: 7 segnali,
   −11% medio, −7,5pp vs Nasdaq, hit-rate 29%
-- memoria storica e ciclo semiconduttori — mai girati con dati veri (FRED irraggiungibile dallo
-  sviluppo) e uno mostrava la serie sbagliata
+- memoria storica e ciclo semiconduttori — mai girati con dati veri
 - barra di stato e coda decisioni
 
-## Il lavoro concordato: RIMODULAZIONE GRAFICA
+## ✅ FATTO in v205: la rimodulazione grafica
 
-Il problema non sono i dati, è che sono **mille numeri da leggere**. Obiettivo: impatto visivo
-immediato.
+Barra laterale con le macro-sezioni, centro con i grafici. La scheda **Struttura** è quella
+d'ingresso (una sola volta, e mai sopra una preferenza già espressa).
 
-**Struttura**: barra laterale con le macro-sezioni, centro con grafici.
+Nessun grafico di prezzo, per la ragione concordata: i dati arrivano su cron e investing.com e
+TradingView li fanno meglio in tempo reale. Ci sono i cinque grafici che **solo noi** possiamo
+fare, perché solo noi conosciamo il libro:
 
-⚠️ **Il vincolo che decide il progetto**: i dati si aggiornano su cron (GitHub Actions), non
-tick-by-tick. Quindi **NON si disegnano grafici di prezzo** — investing.com e TradingView li fanno
-meglio e in tempo reale. Si disegna ciò che **nessuno dei due può disegnare**, perché non conosce
-il suo libro:
+1. **Concentrazione** — peso contro quota di varianza (MCR), barre affiancate, ordinate per
+   rischio, con lo scarto in evidenza. Oggi: MU 26,0% del capitale → 39,9% del rischio (+13,9 pp).
+2. **Mappa di correlazione** — heatmap di tutte le coppie. Oggi la più legata è AMD–MU a 0,66.
+3. **Deriva della concentrazione** — MCR dei primi quattro nel tempo + linea Top-3.
+4. **Allocazione** — settore / valuta, con l'esposizione al dollaro non coperta.
+5. **Distanza dallo stop** — barre divergenti dallo zero, i violati a sinistra.
 
-1. **Concentrazione**: peso NAV contro quota di varianza (MCR), a barre affiancate. Si vede in un
-   secondo che MU pesa ~21% e genera ~40% del rischio.
-2. **Mappa di correlazione** delle posizioni: dove il libro si muove insieme.
-3. **Deriva della concentrazione** nel tempo, da `metrics_history`.
-4. **Allocazione** per settore/valuta.
-5. **Stop**: distanza di ogni posizione dal proprio stop ratchet.
+In cima, tre numeri grandi: rischio nei primi 3, massimo scarto, stop violati. Sono le voci che,
+se cambiano, cambiano cosa puoi fare oggi.
 
-Tutto il resto resta accessibile ma non in primo piano.
+Il payload è rimasto **identico al byte**: la vista legge, non scrive, e c'è un check che lo prova.
 
 ## Flusso d'uso previsto
 
@@ -56,6 +54,19 @@ all'apertura del cash → prosegue su TradingView.
 1. **Struttura del libro** dopo un'operazione o quando serve
 2. **Verifica** di ciò che sente su YouTube o legge su investing.com, prima di agire
 3. **Script Pine**
+
+## Da dove ripartire
+
+- **La matrice di correlazione a 12 mesi arriva al primo run del CI.** Finché non arriva, la
+  mappa la calcola in locale su 6 mesi e lo dichiara. Al prossimo run di `update-data.yml`
+  verificare che l'avviso "Base a 6 mesi" sparisca da solo: se resta, `corr_matrix` non è
+  finita in `data.json` e va capito perché.
+- **Quattro grafici su cinque leggono numeri già nel payload, la deriva no.** Se serve, la
+  deriva della concentrazione è l'unico contenuto della vista che l'LLM non riceve.
+- **Il gate dei test era spento e ora non lo è più** (vedi CLAUDE.md, sezione v205): i check
+  dopo il blocco `report` erano contati ma non facevano fallire la CI. Se in futuro si aggiunge
+  un gruppo di check in fondo a `test_app.mjs`, il blocco `report` deve restare l'ultima cosa
+  del file.
 
 ## Osservazione utile emersa dalle sue schermate
 

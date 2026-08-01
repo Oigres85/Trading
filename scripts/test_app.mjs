@@ -1245,12 +1245,6 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   const cap = rules.find(r => r.label === "Cap d'ingresso");
   return !!cap && cap.th === "20% NAV" && cap.state.includes("≥20% NAV") && cap.why.includes("20%") && !cap.state.includes("10%")`));
 
-/* ---------- report ---------- */
-let fail = 0;
-for (const [name, ok] of T) {
-  if (!ok) fail++;
-  console.log(`${ok ? "PASS" : "FAIL"}  ${name}`);
-}
 /* ---------- v196: registro dei popup macro allineato alla griglia ---------- */
 // La griglia rende data-macro="in:umich" ma MACRO_INFO aveva ancora "in:pmi": openMacroInfo
 // usciva in silenzio (`if (!info) return;`) e cliccare "Fiducia consumatori" nella dashboard
@@ -1274,6 +1268,153 @@ for (const [name, ok] of T) {
 }
 
 
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+   v205 — VISTA STRUTTURA. I cinque grafici leggono i DATI VERI: qui si prova su data.json,
+   non sul fixture, perché il fixture non ha né sparks né metrics_history e un test che
+   interroga dati assenti è verde per assenza di dati, non di difetti (lezione v196).
+   ═══════════════════════════════════════════════════════════════════════════════════════ */
+{
+  const reale = JSON.parse(readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null"));
+  vm.runInContext(`REALE = ${JSON.stringify(reale)};`, ctx, { filename: "reale.js" });
+  // ⚠ COPIA PROFONDA, non `DATA = REALE`: due di questi check MUTANO il portafoglio per
+  // provare un ramo (portafoglio finto, corr_matrix cancellata) e con l'assegnazione per
+  // riferimento la mutazione restava addosso a REALE, facendo fallire i check successivi.
+  // Se n'è accorto il test stesso — ed è la ragione per cui i check vanno scritti isolati.
+  const suReale = (code) => run(`
+    const _salva = DATA, _cash = cashEur;
+    DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 28500; recomputeTotals();
+    try { ${code} } finally { DATA = _salva; cashEur = _cash; recomputeTotals(); }`);
+
+  // IL DIFETTO CHE QUESTA VISTA POTEVA INTRODURRE: confrontare due frazioni con basi diverse.
+  check("v205 concentrazione: peso e MCR stanno sullo STESSO universo (sommano entrambi a 100%)", suReale(`
+    const rows = concentrazioneRows();
+    const sp = rows.reduce((s, r) => s + r.peso, 0), sm = rows.reduce((s, r) => s + r.mcr, 0);
+    return rows.length >= 2 && Math.abs(sp - 100) < 0.6 && Math.abs(sm - 100) < 0.6;`));
+
+  check("v205 concentrazione: chi non ha contributo al rischio (BTP) resta fuori da ENTRAMBE le barre", suReale(`
+    const rows = concentrazioneRows();
+    const senzaMcr = DATA.portfolio.filter(r => r.qty > 0 && r.risk_contrib_pct == null).map(r => r.ticker);
+    return senzaMcr.length > 0 && senzaMcr.every(t => !rows.some(r => r.ticker === t));`));
+
+  check("v205 concentrazione: lo scarto è rischio − peso, e ordina la classifica", suReale(`
+    const rows = concentrazioneRows();
+    const gapOk = rows.every(r => Math.abs(r.gap - (r.mcr - r.peso)) < 0.15);
+    const ordinato = rows.every((r, i) => i === 0 || rows[i - 1].mcr >= r.mcr);
+    return gapOk && ordinato;`));
+
+  // CROSS-CHECK vero: la matrice calcolata qui deve riprodurre avg_corr/max_corr/max_corr_with
+  // che la PIPELINE ha scritto sulle righe. Se le due letture divergono, una delle due mente.
+  check("v205 correlazione: la matrice riproduce la coppia più correlata che la pipeline dichiara su ogni riga", suReale(`
+    const cm = matriceCorrelazione();
+    if (!cm) return false;
+    const held = DATA.portfolio.filter(r => r.qty > 0 && r.max_corr_with);
+    let confrontati = 0, coerenti = 0;
+    held.forEach(r => {
+      const i = cm.tickers.indexOf(r.ticker);
+      if (i < 0) return;
+      let best = null, bi = -1;
+      cm.m[i].forEach((v, j) => { if (j !== i && v != null && (best == null || v > best)) { best = v; bi = j; } });
+      if (bi < 0) return;
+      confrontati++;
+      if (cm.tickers[bi] === r.max_corr_with) coerenti++;
+    });
+    // la finestra può differire (6 mesi in fallback vs 12 della pipeline): si pretende la
+    // STRUTTURA, non l'uguaglianza dei decimali — ma la struttura deve reggere sui più
+    return confrontati >= 5 && coerenti / confrontati >= 0.75;`));
+
+  check("v205 correlazione: matrice simmetrica, diagonale 1, valori in [-1, 1]", suReale(`
+    const cm = matriceCorrelazione();
+    if (!cm) return false;
+    const n = cm.tickers.length;
+    for (let i = 0; i < n; i++) {
+      if (cm.m[i][i] !== 1) return false;
+      for (let j = 0; j < n; j++) {
+        const a = cm.m[i][j], b = cm.m[j][i];
+        if (a != null && (a < -1 || a > 1)) return false;
+        if (a != null && b != null && Math.abs(a - b) > 0.011) return false;
+      }
+    }
+    return n >= 2;`));
+
+  // v187: senza fallback il grafico resterebbe vuoto per ore dopo il rilascio, perché il CI
+  // rigenera su cron. Con fallback DEVE dichiarare che la base non è quella della pipeline.
+  check("v205 correlazione: senza matrice della pipeline si calcola in locale E lo dichiara", suReale(`
+    delete DATA.corr_matrix;
+    const cm = matriceCorrelazione();
+    return cm && cm.fallback === true && /6 mesi/.test(cm.base) && /calcolo locale/.test(cm.base);`));
+
+  check("v205 correlazione: con la matrice della pipeline si usa quella, senza avviso di base diversa", suReale(`
+    DATA.corr_matrix = { AAA: { AAA: 1, BBB: 0.42 }, BBB: { AAA: 0.42, BBB: 1 } };
+    DATA.portfolio = [{ ticker: "AAA", qty: 1 }, { ticker: "BBB", qty: 1 }];
+    const cm = matriceCorrelazione();
+    return cm && cm.fallback === false && cm.m[0][1] === 0.42 && /pipeline/.test(cm.base);`));
+
+  // un titolo assente da una data NON era in portafoglio: è un BUCO, non uno zero. Uno zero
+  // direbbe "rischio nullo" e la linea scenderebbe a terra disegnando un fatto mai accaduto.
+  // NB: si toglie IL TITOLO da una data che resta popolata — non si svuota la data. Una data
+  // senza `titles` viene proprio scartata da derivaConcentrazione, quindi non produrrebbe un
+  // buco ma una serie più corta: era la prima stesura di questo check, e passava per il motivo
+  // sbagliato finché il report non è stato spostato in fondo e il FAIL è diventato visibile.
+  check("v205 deriva: una data in cui il titolo non c'era resta null, non zero", suReale(`
+    const d = derivaConcentrazione();
+    if (!d || !d.serie.length) return false;
+    const tk = d.serie[0].ticker;
+    const ultima = DATA.metrics_history[DATA.metrics_history.length - 1];
+    if (!(tk in ultima.titles)) return false;     // il caso da provare deve esistere davvero
+    delete ultima.titles[tk];                     // quel giorno la posizione non era in libro
+    const d2 = derivaConcentrazione();
+    const s = (d2.serie || []).find(x => x.ticker === tk);
+    return !!s && s.punti[s.punti.length - 1] === null && s.punti.some(v => v != null);`));
+
+  check("v205 deriva: il Top-3 è la somma dei tre MCR maggiori del giorno", suReale(`
+    const d = derivaConcentrazione();
+    const ultimo = DATA.metrics_history[DATA.metrics_history.length - 1];
+    const v = Object.values(ultimo.titles).map(t => t.mcr).filter(x => typeof x === "number")
+      .sort((a, b) => b - a).slice(0, 3).reduce((s, x) => s + x, 0);
+    return Math.abs(d.top3[d.top3.length - 1] - v) < 0.11;`));
+
+  // il segno È l'informazione: negativo = stop già superato. Deve concordare con stopOf().
+  check("v205 stop: distanza negativa ⟺ stopOf dichiara la violazione", suReale(`
+    const rows = distanzeStop();
+    return rows.length >= 3 && rows.every(r => (r.dist < 0) === !!r.violated);`));
+
+  check("v205 stop: distanza = (prezzo − stop)/prezzo, ordinata dal più esposto", suReale(`
+    const rows = distanzeStop();
+    return rows.every(r => {
+      const p = DATA.portfolio.find(x => x.ticker === r.ticker);
+      return Math.abs(r.dist - (p.price - r.stop) / p.price * 100) < 0.11;
+    }) && rows.every((r, i) => i === 0 || rows[i - 1].dist <= r.dist);`));
+
+  // la somma a 100 è vera per costruzione (si normalizza sul proprio totale) e non prova nulla:
+  // si verifica che il totale sia il PATRIMONIO vero e che la quota USD coincida con fxExposure,
+  // che è il numero già pubblicato altrove. Due letture della stessa grandezza devono combaciare.
+  check("v205 allocazione: il totale è il patrimonio e la quota USD coincide con fxExposure", suReale(`
+    const inv = DATA.portfolio.filter(r => r.qty > 0).reduce((s, r) => s + r.val_eur, 0);
+    const patrimonio = inv + cashEur;
+    const set = allocazionePer("sector"), val = allocazionePer("currency");
+    const tS = set.reduce((a, x) => a + x.val, 0), tV = val.reduce((a, x) => a + x.val, 0);
+    const usd = val.find(x => x.nome === "USD");
+    const fx = fxExposure();
+    return Math.abs(tS - patrimonio) < 1 && Math.abs(tV - patrimonio) < 1
+      && Math.abs(set.reduce((a, x) => a + x.pct, 0) - 100) < 0.6
+      && !!usd && !!fx && Math.abs(usd.pct - fx.pct) < 0.15;`));
+
+  check("v205 allocazione: la liquidità entra come voce propria quando c'è", suReale(`
+    const senza = allocazionePer("sector").find(x => x.nome === "Liquidità");
+    cashEur = 50000; recomputeTotals();
+    const con = allocazionePer("sector").find(x => x.nome === "Liquidità");
+    return !!senza === (28500 > 0) && !!con && Math.abs(con.val - 50000) < 1;`));
+
+  // ⚠ REGOLA SUPREMA: la vista struttura LEGGE, non scrive. Se una sua funzione mutasse una
+  // riga del portafoglio, il payload cambierebbe senza che nessuno lo veda.
+  check("v205 la vista struttura NON tocca il payload (buildPrompt identico prima e dopo)", suReale(`
+    const prima = buildPrompt();
+    concentrazioneRows(); matriceCorrelazione(); derivaConcentrazione();
+    distanzeStop(); allocazionePer("sector"); allocazionePer("currency"); seduteDelBook();
+    return buildPrompt() === prima;`));
+}
+
+
 /* ---------- v204: STRUTTURA MINIMA DELLA PAGINA (guardia anti-taglio) ----------
    Tre volte in un'ora un taglio ha portato via un elemento VICINO a quello che doveva togliere:
    la concentrazione di fattore (viveva dentro i motivi del verdetto), cinque fatti di C12
@@ -1292,10 +1433,33 @@ for (const [name, ok] of T) {
     ["riquadri patrimonio", 'id="kpi-grid"'],
     ["parametri di rischio", 'id="risk-params-card"'],
     ["modale grafico/pannelli", 'id="chart-modal"'],
+    // v205 — la vista struttura e la shell a due colonne. Cinque contenitori vicini fra loro:
+    // esattamente la configurazione in cui un taglio ne porta via uno per sbaglio.
+    ["shell a due colonne", 'class="shell"'],
+    ["scheda struttura", 'data-tab="struttura"'],
+    ["grafico concentrazione", 'id="conc-chart"'],
+    ["mappa di correlazione", 'id="corr-chart"'],
+    ["deriva della concentrazione", 'id="drift-chart"'],
+    ["allocazione grafica", 'id="allocg-chart"'],
+    ["distanza dallo stop", 'id="stopdist-chart"'],
   ];
   const mancanti = richiesti.filter(([, sel]) => !html.includes(sel)).map(([n]) => n);
   check("v204 struttura: nessun elemento portante è sparito da index.html", mancanti.length === 0);
   if (mancanti.length) console.log("  ⚠ elementi portanti mancanti:", mancanti.join(", "));
+}
+
+/* ---------- report ----------
+   ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
+   Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
+   che calcola `fail` era già passato — non venivano stampati e, soprattutto, NON facevano
+   uscire con codice 1. Verificato togliendo `id="conc-chart"` da index.html: la suite
+   annunciava "174/174 superati" ed exit 0. La guardia anti-taglio v204, cioè proprio quella
+   nata perché "l'attenzione non basta", era spenta in silenzio.
+   Il report va per ultimo: ogni check aggiunto in fondo al file deve poter rompere la CI. */
+let fail = 0;
+for (const [name, ok] of T) {
+  if (!ok) fail++;
+  console.log(`${ok ? "PASS" : "FAIL"}  ${name}`);
 }
 
 console.log(`\n${T.length - fail}/${T.length} check superati`);
