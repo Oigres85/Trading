@@ -534,6 +534,99 @@ Payload verificato **identico al byte** prima e dopo (a meno dei campi derivati 
 un check dedicato che rigenera `buildPrompt()` dopo aver chiamato tutte le funzioni della vista.
 Su iPhone 375px: documento 375px, nessun taglio, la matrice scorre dentro il proprio contenitore.
 
+## 🎨 v206 — macro in grafici, tabelle con barre, e i registri senza guardia
+
+Tre richieste del CEO in una: **via la mappa di correlazione** ("non la capisco e non ne capisco
+l'utilità"), **macro in grafici**, **meno numeri e più grafici anche nelle tabelle**.
+
+### Il taglio della mappa: ricevuta prima, non dopo
+Elencato PRIMA di tagliare cosa vive dentro i confini (`pearson`, `logReturns`,
+`matriceCorrelazione`, `CORR_SAT`, `corrColor`, `renderCorrMap`) e chi sta **in mezzo e intorno**
+(`concentrazioneRows`/`renderConcentrazione` prima, `derivaConcentrazione`/`renderDeriva` dopo),
+con `assert` che il blocco rimosso non contenesse i vicini. Rimossa anche `corr_matrix` dalla
+pipeline: **era nata per quel grafico e non aveva altri consumatori** — `git diff` contro il
+commit pre-v205 su `update_data.py` è vuoto. L'informazione non è persa: `avg_pairwise_corr` e
+`max_corr_with` restano nel payload e nelle colonne. Un check citava ancora la funzione rimossa e
+il gate l'ha preso subito.
+
+### La macro erano 34 riquadri identici
+7 mini-card + 11 gauge + 16 tile, ognuno **un numero con sotto un termometro 0-100**. Un
+termometro che sta ovunque non porta segnale. E le serie storiche che `data.json` contiene **non
+erano disegnate in dashboard**: `curve_history` (501 punti), `credit.history` (260),
+`vix.spark` (30 — mai disegnata *nemmeno* nei popup, esisteva solo dentro il testo del prompt),
+`margin_debt.history` (13). Ora in cima ci sono tre domande, non trenta numeri:
+1. **Rotazione** — 21 ETF ordinati, con **accese le barre dei settori in cui hai i soldi**. È il
+   grafico che risponde alla domanda vera: oggi *Semiconduttori −12,9% a 1 mese, terzultimo su 21,
+   col 75% del capitale sopra*, mentre guida Energia +12,9% dove non sei. L'aggancio libro↔ETF non
+   è un elenco scritto a mano: i semi si riconoscono da `rs_bench === "sox"`, cioè dal benchmark
+   che la pipeline ha già scelto, e il resto da `sector`. Se domani non ci fossero più semi, SMH
+   smetterebbe di illuminarsi da solo.
+2. **Termometri di stress** — curva 10A-2A, HY OAS, VIX, ciascuno **con le sue soglie disegnate**.
+   Un livello senza soglia non dice niente: "HY OAS 2,84" è un numero, "2,84 contro i 4,0 della
+   tensione" è un'informazione.
+3. **Leva e stagionalità** — margin debt (100% del massimo storico, +49% a/a) e i 12 mesi con
+   quello corrente acceso.
+
+I 34 riquadri **restano tutti**, dentro un `<details>` chiuso: accessibili, non in primo piano
+(e la guardia strutturale continua a vederli).
+
+### Due primitive, non dodici grafici
+`graficoSerie()` (serie nel tempo con soglie e bande) e `barreOrdinate()` (barre che divergono
+dallo zero, con righe evidenziabili) coprono tutto. Difetti trovati provandole:
+- **`tacche()` stampava l'INDICE della tacca**: un asse 0…82,5 segnava "0 1 2 3 4" perché
+  arrotondavo `v/passo` invece di riagganciare `v` al passo.
+- **Un punto isolato fra due buchi spariva**: un segmento ha bisogno di 2 punti, quindi il dato
+  esisteva e non si vedeva. Ora si disegna come punto.
+- **⚠ IL VIEWBOX NON È UNA COSTANTE.** Dentro una card da 300px un viewBox da 640 scala il testo
+  al **47%**: le etichette a 9,5px diventavano 4,5px, cioè illeggibili, e il grafico sembrava
+  "sbagliato" senza esserlo. Ora la tela è parametrica (`compatto`, `w`) e si verifica misurando
+  `renderW / viewBox` in browser — deve stare vicino a 1.
+
+### Tabelle: la barra sta nello SFONDO, la cifra resta
+Su 38 colonne solo 3 erano davvero visive. Ora `Oggi`, `Guad. %`, `Target Δ` e `Drawdown 52S`
+hanno una barra di fondo (`td.bar-cell` + `style="--v:NN"`), `RS 1M`/`RS NDX` una barra divergente
+— **`rsBar` si chiamava così e non disegnava nessuna barra**, il nome mentiva — e `Financial
+Health` usa `finHealthBar`, che era **scritta, con il suo CSS e il suo handler di click, e non
+chiamata da nessuno**: l'handler era vivo e non poteva scattare (la classe di difetto v193
+rovesciata). Idem `targetBar`.
+- **Prima stesura sbagliata**: barre ad **altezza piena** al 20% di opacità. In una cella alta
+  30px una fascia colorata non si legge come grafico ma come *riga evidenziata*, e due colonne
+  adiacenti facevano scacchiera. Ora è una barra bassa ancorata al fondo, con la tacca dello zero.
+- **La scala deve essere CONDIVISA fra le righe**, altrimenti ogni barra è relativa a se stessa e
+  il confronto — l'unico motivo per cui la barra esiste — sparisce. `Guad. %` usa il massimo del
+  portafoglio (MU +839%) e lo **dichiara nel tooltip**.
+- Rischio-payload **zero per costruzione**: `mdRow()` legge i campi grezzi di `data.json` e non
+  tocca il DOM. Verificato rigenerando `buildCIOText()` dopo aver chiamato tutte le funzioni nuove.
+
+### 🛑 Tre registri che nessun test guardava — e uno era già rotto
+`SORT_FIELDS` deve stare 1:1 con le `<th>`, i colspan delle righe speciali col numero di colonne,
+e `VISTA_COMPATTA` con ciò che il suo commento dichiara. **Nessuno dei tre aveva un gate.**
+E il terzo era già sbagliato: la watchlist dichiarava `// Titolo Prezzo Oggi RS RSndx Segnale
+Trimestrale` ma gli indici 5 e 6 sono **Beta e Sharpe 1A** — cioè la forza relativa, il filtro
+leader/laggard su 27 titoli, **non era nella vista di default**, al contrario del commento e al
+contrario del portafoglio. L'accesso è per INDICE: sfasare una colonna non produce nessun errore,
+solo il campo sbagliato in silenzio. Ora ci sono sei check, validati iniettando i difetti.
+
+### Restyling: le fondamenta erano bucate
+- **5 variabili CSS usate 27 volte e mai definite** (`--accent`, `--fg`, `--hover`, `--card-3`,
+  `--bg2`). Dove c'era il fallback reggeva, dove non c'era la dichiarazione era **invalida e cadeva
+  in silenzio**: trascinando una colonna non si vedeva dove sarebbe caduta, il focus del diario
+  era grigio invece che blu, tre sfondi restavano trasparenti.
+- **`.btn-ghost` usata 28 volte e mai definita** → i tre bottoni secondari della topbar pesavano
+  quanto quello primario: quattro azioni gridavano insieme.
+- **NAV e P&L si leggevano a 15px** mentre i titoli della vista Struttura stanno a 21px. Rapporto
+  valore/etichetta 1,67× — sotto la soglia in cui l'occhio distingue un primo piano da uno sfondo.
+  Ora `--fs-hero: 26px`. Insieme: `height` → `min-height` sulle card (a numeri più grandi il testo
+  veniva **tagliato**) e via il `-webkit-line-clamp`.
+- Lo stesso colore scritto in tre modi (bordo `#262b36` 10×, muted `#93a0b4` 5×, testo 6×, verde
+  3×, quattro superfici di hover): tutta la scocca v188-v199 aveva un bordo **visibilmente più
+  chiaro** del resto e la pagina sembrava due prodotti cuciti insieme. Ora tutti token.
+- **38 hover contro 8 transizioni** e `prefers-reduced-motion` inesistente in 1375 righe, con 5
+  animazioni in loop perpetuo. Le transizioni stanno in un `:where()` (specificità **zero**, non
+  entra in nessuna guerra di specificità — vincolo v192) e il blocco reduced-motion c'è.
+- `line-height` globale mancante (era `normal`, ~1,2), `color-scheme: dark` mancante (su Safari iOS
+  gli spinner dei number-input erano chiari dentro un tema scuro), scrollbar non tematizzate.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

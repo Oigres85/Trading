@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "205";
+const BUILD_VERSION = "206";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -94,10 +94,41 @@ const colHiddenKey = (tid) => `colhidden_${tid}`;
    richiede attenzione — peso, rischio che genera, forza relativa, risultato, e il segnale.
    La preferenza dell'utente ha SEMPRE la precedenza: il default si applica solo la prima volta,
    e una volta scelto qualcosa non viene mai sovrascritto. */
+/* ⚠ v206 — QUI IL COMMENTO MENTIVA. La watchlist dichiarava "Titolo Prezzo Oggi RS RSndx
+   Segnale Trimestrale" ma gli indici 5 e 6 sono Beta e Sharpe 1A: la forza relativa — cioè il
+   filtro leader/laggard, l'unica ragione per cui si guarda una watchlist di 27 titoli — NON
+   era nella vista di default, al contrario di quanto il commento affermava e al contrario del
+   portafoglio. Nessun test lo intercettava. Ora gli indici seguono il commento (RS 1M = 11,
+   RS NDX 1M = 12) e un check verifica che le due cose non divergano più. */
 const VISTA_COMPATTA = {
   "ptf-table": [0, 1, 3, 4, 8, 15, 16, 17, 22],          // Titolo Qtà Prezzo Oggi Guad.% RS RSndx Segnale Trimestrale
-  "wl-table":  [0, 1, 2, 5, 6, 13, 18],                   // Titolo Prezzo Oggi RS RSndx Segnale Trimestrale
+  "wl-table":  [0, 1, 2, 11, 12, 13, 18],                // Titolo Prezzo Oggi RS RSndx Segnale Trimestrale
 };
+/* v206 — RIPARAZIONE DI UN DEFAULT SBAGLIATO, non sovrascrittura di una scelta.
+   La vista compatta si applica UNA VOLTA SOLA: un browser che ha già ricevuto il default
+   difettoso della watchlist (Beta e Sharpe al posto della forza relativa) non vedrebbe mai la
+   correzione. Ma quel contenuto non è mai stato SCELTO dall'utente — gliel'ha imposto il codice.
+   Quindi si ripara solo se le colonne nascoste sono ESATTAMENTE quelle che il vecchio default
+   produceva: se l'utente ha toccato qualcosa, anche una sola colonna, la sua scelta resta.
+   Vale una volta, poi la chiave impedisce di ripassarci. */
+const VECCHIA_COMPATTA_WL = [0, 1, 2, 5, 6, 13, 18];
+function riparaVistaCompattaWl() {
+  const tid = "wl-table", chiave = "vista_riparata_v206";
+  try {
+    if (localStorage.getItem(chiave)) return;
+    localStorage.setItem(chiave, "1");
+    const salvate = loadColHidden(tid);
+    if (!salvate.size) return;                              // mai applicata: ci pensa il default
+    const head = document.querySelector(`#${tid} thead tr`);
+    if (!head) return;
+    const vecchie = new Set([...head.children].map((_, i) => i).filter(i => !VECCHIA_COMPATTA_WL.includes(i)));
+    const uguali = vecchie.size === salvate.size && [...vecchie].every(i => salvate.has(i));
+    if (!uguali) return;                                    // l'utente ha scelto: non si tocca
+    const nuove = new Set([...head.children].map((_, i) => i).filter(i => !VISTA_COMPATTA[tid].includes(i)));
+    saveColHidden(tid, nuove);
+  } catch { /* localStorage non disponibile */ }
+}
+
 function applicaVistaCompattaSePrimaVolta(tid) {
   const chiaveFatto = `vista_iniziale_${tid}`;
   if (localStorage.getItem(chiaveFatto)) return;           // gia' deciso: non si tocca piu'
@@ -970,7 +1001,8 @@ function renderAll() {
   renderCash();
   renderKPI();
   renderAllocation();
-  renderStruttura();            // v205 — i cinque grafici della struttura del libro
+  renderStruttura();            // v205 — i grafici della struttura del libro
+  renderMacroGrafici();         // v206 — rotazione, stress, leva e stagionalità
   renderEarnings();
   renderEarningsAlert();
   renderReconcileAlert();
@@ -3336,56 +3368,6 @@ function concentrazioneRows() {
   }).sort((a, b) => b.mcr - a.mcr);
 }
 
-/* correlazione di Pearson su due serie allineate a destra (la più corta comanda) */
-function pearson(a, b) {
-  const n = Math.min(a.length, b.length);
-  if (n < 20) return null;
-  const x = a.slice(-n), y = b.slice(-n);
-  const mx = x.reduce((s, v) => s + v, 0) / n, my = y.reduce((s, v) => s + v, 0) / n;
-  let num = 0, dx = 0, dy = 0;
-  for (let i = 0; i < n; i++) { const a1 = x[i] - mx, b1 = y[i] - my; num += a1 * b1; dx += a1 * a1; dy += b1 * b1; }
-  const den = Math.sqrt(dx) * Math.sqrt(dy);
-  return den ? Math.round(num / den * 100) / 100 : null;
-}
-
-function logReturns(closes) {
-  const out = [];
-  for (let i = 1; i < closes.length; i++) {
-    const p0 = closes[i - 1], p1 = closes[i];
-    if (p0 > 0 && p1 > 0) out.push(Math.log(p1 / p0));
-  }
-  return out;
-}
-
-/* MATRICE DI CORRELAZIONE.
-   1) se la pipeline l'ha pubblicata si usa quella: 252 sedute, la STESSA base con cui sono
-      calcolati avg_corr, max_corr e l'MCR — così la mappa non contraddice le colonne della
-      tabella (due numeri diversi per la stessa coppia sarebbero un difetto, non un dettaglio);
-   2) altrimenti la si calcola dalle spark m6 (126 sedute) e si DICHIARA la base diversa.
-      Il fallback serve davvero: il CI rigenera su cron, e senza di esso la mappa resterebbe
-      vuota per ore dopo il rilascio (stessa ragione dei rami FedWatch in v187). */
-function matriceCorrelazione() {
-  const held = (DATA?.portfolio || []).filter(r => r.qty > 0);
-  const cm = DATA?.corr_matrix;
-  if (cm && typeof cm === "object") {
-    const tk = held.map(r => r.ticker).filter(t => cm[t]);
-    if (tk.length >= 2) {
-      const m = tk.map(a => tk.map(b => (a === b ? 1 : (cm[a]?.[b] ?? null))));
-      return { tickers: tk, m, base: "252 sedute (12 mesi) — pipeline", sedute: 252, fallback: false };
-    }
-  }
-  const con = held.filter(r => (r.sparks?.m6 || []).length >= 30);
-  if (con.length < 2) return null;
-  const R = con.map(r => logReturns(r.sparks.m6));
-  const tk = con.map(r => r.ticker);
-  const n = Math.min(...R.map(x => x.length));
-  const m = R.map((a, i) => R.map((b, j) => (i === j ? 1 : pearson(a, b))));
-  return {
-    tickers: tk, m, sedute: n, fallback: true,
-    base: `${n} sedute (6 mesi) — calcolo locale dalle serie di chiusura, in attesa della matrice a 12 mesi della pipeline`,
-  };
-}
-
 /* DERIVA: quota di varianza delle posizioni nel tempo, da metrics_history.
    I titoli entrano ed escono dal libro: una data senza il titolo dà un BUCO nella serie, non
    uno zero. Uno zero direbbe "rischio nullo", il buco dice "non era in portafoglio". */
@@ -3451,12 +3433,141 @@ function seduteDelBook() {
   return per;
 }
 
-/* ---------------- rendering della vista struttura ---------------- */
-
 /* in una colonna di percentuali il decimale va SEMPRE stampato: "26%" accanto a "39,9%" fa
    ballare l'incolonnamento e costringe a rileggere invece di guardare */
 const fmt1 = new Intl.NumberFormat("it-IT", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 function fmtPP(v) { return (v >= 0 ? "+" : "−") + fmt1.format(Math.abs(v)) + " pp"; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+   PRIMITIVE GRAFICHE (v206)
+   Due sole forme, riusate ovunque: una SERIE NEL TEMPO con le sue soglie, e BARRE ORDINATE
+   che divergono dallo zero. La regola che le governa è quella che ha fatto togliere la mappa
+   di correlazione: un grafico che va imparato prima di essere letto non serve a nessuno.
+   Entrambe accettano buchi (null) e NON li disegnano come zeri.
+   ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/* tacche su valori TONDI. Un asse che segna 23% e 68% costringe a fare i conti per leggerlo:
+   il passo si sceglie fra 1/2/2,5/5 × una potenza di dieci, come farebbe una carta millimetrata. */
+function tacche(min, max, maxTacche = 5) {
+  if (!(max > min)) { const v = max || 0; return { passo: 1, lista: [v], min: v - 1, max: v + 1 }; }
+  const mag = Math.pow(10, Math.floor(Math.log10((max - min) / maxTacche)));
+  const passo = [1, 2, 2.5, 5, 10].map(m => m * mag).find(p => (max - min) / p <= maxTacche) || mag * 10;
+  const lo = Math.floor(min / passo) * passo, hi = Math.ceil(max / passo) * passo;
+  const lista = [];
+  // ⚠ si RIAGGANCIA il valore al passo (Math.round(v/passo)*passo), non lo si divide per il
+  // passo: la prima stesura stampava l'INDICE della tacca — un asse 0..82,5 segnava "0 1 2 3 4".
+  const dec = Math.max(0, 1 - Math.floor(Math.log10(passo)));   // toglie lo 0,6000000000000001
+  for (let i = 0; lo + i * passo <= hi + passo * 1e-9; i++) lista.push(+((lo + i * passo).toFixed(dec)));
+  return { passo, lista, min: lo, max: hi };
+}
+
+/* etichetta di data compatta: "gen 25" per serie lunghe, "31/07" per serie brevi */
+function dataBreve(iso, lunga) {
+  const d = new Date(String(iso).length <= 10 ? iso + "T00:00:00" : iso);
+  return isNaN(d) ? String(iso) : lunga
+    ? d.toLocaleDateString("it-IT", { month: "short", year: "2-digit" })
+    : d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
+}
+
+/* SERIE NEL TEMPO.
+   serie: [{ nome, punti: [{d, v}|{d, v:null}], colore, tratteggio }]
+   opt.soglie: [{ v, testo, colore }] — le righe orizzontali che danno significato all'altezza.
+     Senza soglie un livello non dice niente: "HY OAS 2,84" è un numero, "2,84 contro i 4,0
+     dello stress" è un'informazione. È il motivo per cui questi grafici esistono.
+   opt.bande: [{ da, a, colore }] — zone di sfondo (es. "zona di inversione" sotto lo zero). */
+function graficoSerie(serie, opt = {}) {
+  const s = (serie || []).filter(x => (x.punti || []).some(p => p && p.v != null));
+  if (!s.length) return '<div class="muted">Storico non disponibile.</div>';
+  // ⚠ il viewBox NON è fisso: dentro una card da 300px un viewBox da 640 scala il testo al 47%
+  // (9,5px → 4,5px, illeggibile). `compatto` porta la tela vicino alla larghezza reale, così
+  // le etichette rendono a grandezza quasi naturale.
+  const H = opt.h || 190, W = opt.w || (opt.compatto ? 330 : 640);
+  const L = opt.assey === false ? 8 : (opt.lAsse || 44), R = opt.etichetteDx === false ? 12 : 52, T = 10, B = 22;
+  const vals = s.flatMap(x => x.punti.map(p => p && p.v)).filter(v => v != null);
+  const soglie = opt.soglie || [];
+  const lo0 = Math.min(...vals, ...soglie.map(t => t.v));
+  const hi0 = Math.max(...vals, ...soglie.map(t => t.v));
+  const tk = tacche(lo0, hi0, opt.tacche || 4);
+  const n = Math.max(...s.map(x => x.punti.length));
+  const px = i => (L + (n < 2 ? 0.5 : i / (n - 1)) * (W - L - R)).toFixed(1);
+  const py = v => (H - B - (v - tk.min) / (tk.max - tk.min || 1) * (H - B - T)).toFixed(1);
+  const lunga = n > 90;
+
+  const bande = (opt.bande || []).map(b =>
+    `<rect x="${L}" y="${py(Math.max(b.a, b.da))}" width="${W - L - R}"
+       height="${Math.abs(+py(Math.min(b.a, b.da)) - +py(Math.max(b.a, b.da))).toFixed(1)}"
+       fill="${b.colore}" opacity=".13"/>`).join("");
+
+  const griglia = tk.lista.map(v =>
+    `<line x1="${L}" y1="${py(v)}" x2="${W - R}" y2="${py(v)}" stroke="var(--border)" stroke-width="1"/>
+     <text x="${L - 7}" y="${(+py(v) + 3.5).toFixed(1)}" text-anchor="end" font-size="9.5"
+       fill="var(--muted)" font-family="var(--mono)">${(opt.fmtY || fmtNum.format)(v)}${esc(opt.unita || "")}</text>`).join("");
+
+  const righeSoglia = soglie.map(t =>
+    `<line x1="${L}" y1="${py(t.v)}" x2="${W - R}" y2="${py(t.v)}" stroke="${t.colore || "var(--muted)"}"
+       stroke-width="1.4" stroke-dasharray="5 3"/>
+     <text x="${L + 5}" y="${(+py(t.v) - 4).toFixed(1)}" font-size="9.5" font-weight="600"
+       fill="${t.colore || "var(--muted)"}">${esc(t.testo || "")}</text>`).join("");
+
+  // un buco spezza la linea: unire i due estremi disegnerebbe una continuità mai esistita
+  const linee = s.map(x => {
+    const col = x.colore || "var(--blue)";
+    // un punto ISOLATO fra due buchi non fa un segmento: va disegnato come punto, altrimenti
+    // sparisce in silenzio dal grafico pur essendo un dato che esiste
+    const segs = [], soli = []; let cur = [];
+    const chiudi = () => { if (cur.length > 1) segs.push(cur); else if (cur.length === 1) soli.push(cur[0]); cur = []; };
+    x.punti.forEach((p, i) => {
+      if (!p || p.v == null) chiudi();
+      else cur.push(`${px(i)},${py(p.v)}`);
+    });
+    chiudi();
+    const ultimo = x.punti.reduce((acc, p, i) => (p && p.v != null ? i : acc), -1);
+    const dash = x.tratteggio ? ' stroke-dasharray="4 3"' : "";
+    return segs.map(g => `<polyline points="${g.join(" ")}" fill="none" stroke="${col}"
+        stroke-width="${x.tratteggio ? 1.5 : 2}" stroke-linejoin="round" stroke-linecap="round"${dash}/>`).join("")
+      + soli.map(p => `<circle cx="${p.split(",")[0]}" cy="${p.split(",")[1]}" r="2" fill="${col}"/>`).join("")
+      + (ultimo >= 0 ? `<circle cx="${px(ultimo)}" cy="${py(x.punti[ultimo].v)}" r="3" fill="${col}"/>`
+        + (opt.etichetteDx === false ? "" : `<text x="${W - R + 5}" y="${(+py(x.punti[ultimo].v) + 3.5).toFixed(1)}"
+            font-size="10" font-weight="700" fill="${col}" font-family="var(--mono)">${fmtNum.format(x.punti[ultimo].v)}</text>`) : "");
+  }).join("");
+
+  // alcune serie di data.json sono NUMERI NUDI senza date (vix.spark, margin_debt.history):
+  // in quel caso l'asse si etichetta a mano invece di inventare una data per punto
+  const primo = s[0].punti.find(p => p && p.v != null);
+  const ultimo = [...s[0].punti].reverse().find(p => p && p.v != null);
+  const [xSx, xDx] = opt.assex || [primo && primo.d != null ? dataBreve(primo.d, lunga) : "",
+    ultimo && ultimo.d != null ? dataBreve(ultimo.d, lunga) : ""];
+  return `<svg class="g-serie" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.aria || "serie storica")}">
+      ${bande}${griglia}${righeSoglia}${linee}
+      <text x="${L}" y="${H - 5}" font-size="9.5" fill="var(--muted)">${esc(xSx || "")}</text>
+      <text x="${W - R}" y="${H - 5}" text-anchor="end" font-size="9.5" fill="var(--muted)">${esc(xDx || "")}</text>
+    </svg>`;
+}
+
+/* BARRE ORDINATE che divergono dallo zero.
+   righe: [{ nome, valore, evidenzia, nota }] — `evidenzia` accende la riga (è il TUO settore,
+   è il mese corrente): senza, una classifica di 21 voci resta una lista da leggere tutta. */
+function barreOrdinate(righe, opt = {}) {
+  const r = (righe || []).filter(x => x && x.valore != null);
+  if (!r.length) return '<div class="muted">Dati non disponibili.</div>';
+  const max = Math.max(...r.map(x => Math.abs(x.valore))) || 1;
+  const neg = r.some(x => x.valore < 0);
+  const zero = neg ? 50 : 0;      // con valori negativi lo zero sta al centro
+  return `<div class="obars">${r.map(x => {
+    const w = Math.abs(x.valore) / max * (neg ? 50 : 100);
+    const left = x.valore >= 0 ? zero : zero - w;
+    const col = x.colore || (x.valore >= 0 ? "var(--green)" : "var(--red)");
+    return `<div class="obar-row${x.evidenzia ? " obar-on" : ""}"${x.tk ? ` data-obar-tk="${esc(x.tk)}"` : ""}>
+      <span class="obar-lab" title="${esc(x.nome)}">${esc(x.nome)}</span>
+      <span class="obar-axis">${neg ? `<span class="obar-zero" style="left:${zero}%"></span>` : ""}
+        <span class="obar-fill" style="left:${left.toFixed(1)}%;width:${Math.max(w, 0.6).toFixed(1)}%;background:${col}"></span>
+      </span>
+      <span class="obar-val">${x.testo != null ? esc(x.testo) : signTxt(x.valore)}</span>
+    </div>`;
+  }).join("")}</div>${opt.nota ? `<div class="muted struct-note">${opt.nota}</div>` : ""}`;
+}
+
+/* ---------------- rendering della vista struttura ---------------- */
 
 function renderConcentrazione() {
   const box = $("#conc-chart"); if (!box) return;
@@ -3517,52 +3628,6 @@ function renderConcentrazione() {
       ${fuori.length ? `Fuori dal calcolo ${fuori.map(esc).join(", ")} e la liquidità — la varianza si calcola su chi ha una serie di rendimenti giornalieri.` : ""}
       Il comparto azionario è ${fmt1.format(Math.round(u.azionario / (u.investito + u.cash) * 1000) / 10)}% del patrimonio (investito + liquidità).
       Passa sopra allo scarto per il peso sul capitale investito.`;
-  }
-}
-
-/* La scala si satura a 0,7 e non a 1: fra posizioni azionarie una correlazione di 1 non esiste,
-   quindi tarare il rosso sull'unità lascerebbe TUTTA la mappa nel verde e il grafico non direbbe
-   niente. Sopra 0,7 due titoli sono di fatto la stessa scommessa — lì il colore deve gridare. */
-const CORR_SAT = 0.7;
-function corrColor(v) {
-  if (v == null) return "var(--card-2)";
-  if (v < 0) return `hsl(168 52% ${(74 - Math.min(1, -v / CORR_SAT) * 10).toFixed(0)}%)`;
-  const t = Math.min(1, v / CORR_SAT);
-  return `hsl(${(158 - t * 148).toFixed(0)} ${(38 + t * 48).toFixed(0)}% ${(76 - t * 16).toFixed(0)}%)`;
-}
-
-function renderCorrMap() {
-  const box = $("#corr-chart"); if (!box) return;
-  const basis = $("#corr-basis"), note = $("#corr-note");
-  const cm = matriceCorrelazione();
-  if (!cm) {
-    box.innerHTML = '<div class="muted">Servono almeno due posizioni con storico sufficiente.</div>';
-    if (basis) basis.textContent = ""; if (note) note.innerHTML = "";
-    return;
-  }
-  if (basis) basis.textContent = cm.base;
-  const { tickers: tk, m } = cm;
-  box.innerHTML = `<div class="corr-wrap"><table class="corr-grid"><thead><tr><th></th>${
-    tk.map(t => `<th>${esc(t)}</th>`).join("")}</tr></thead><tbody>${
-    tk.map((a, i) => `<tr><th class="corr-rowhead">${esc(a)}</th>${
-      tk.map((b, j) => {
-        const v = m[i][j];
-        if (i === j) return `<td><div class="corr-cell c-diag">—</div></td>`;
-        return `<td><div class="corr-cell" style="background:${corrColor(v)}" title="${esc(a)} / ${esc(b)}: ${v == null ? "n.d." : fmtNum.format(v)}">${v == null ? "·" : fmtNum.format(v)}</div></td>`;
-      }).join("")}</tr>`).join("")}</tbody></table></div>`;
-  // la coppia più legata del libro: è quella che rende inutile la diversificazione fra le due
-  let best = null;
-  tk.forEach((a, i) => tk.forEach((b, j) => {
-    if (j > i && m[i][j] != null && (!best || m[i][j] > best.v)) best = { a, b, v: m[i][j] };
-  }));
-  const off = [];
-  tk.forEach((a, i) => tk.forEach((b, j) => { if (j > i && m[i][j] != null) off.push(m[i][j]); }));
-  const media = off.length ? Math.round(off.reduce((s, v) => s + v, 0) / off.length * 100) / 100 : null;
-  if (note) {
-    note.innerHTML = `Correlazione dei rendimenti giornalieri fra le posizioni: 1 = si muovono insieme, 0 = indipendenti, negativo = in direzioni opposte.
-      ${best ? `La coppia più legata è <b>${esc(best.a)}–${esc(best.b)}</b> a ${fmtNum.format(best.v)}: su quelle due la diversificazione non c'è.` : ""}
-      ${media != null ? ` Media di tutte le coppie: <b>${fmtNum.format(media)}</b>.` : ""}
-      ${cm.fallback ? ` <b>⚠ Base a 6 mesi</b>, calcolata qui: la pipeline non ha ancora pubblicato la matrice a 12 mesi, quindi questi valori possono differire dalla colonna “Corr. media” della tabella, che è a 12 mesi.` : ""}`;
   }
 }
 
@@ -3691,10 +3756,192 @@ function renderStopDist() {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+   v206 — MACRO IN GRAFICI
+   Prima c'erano 34 riquadri della stessa identica forma (7 mini-card + 11 gauge + 16 tile),
+   ognuno un numero con sotto un termometro 0-100: un termometro che sta ovunque non porta
+   nessun segnale. E le serie storiche che il file CONTIENE non erano disegnate in dashboard
+   — curve_history (501 punti), credit.history (260), vix.spark (30, mai disegnata nemmeno
+   nei popup), margin_debt.history (13): tutte sepolte a due clic di distanza.
+   Qui salgono in superficie tre domande, non trenta numeri:
+     1. il vento è a favore o contro il MIO libro?   → rotazione settoriale
+     2. il sistema è sotto stress?                   → curva, credito, volatilità
+     3. quanta leva c'è, e che mese è?               → margin debt, stagionalità
+   Tutto il resto resta sotto, in un blocco richiudibile: accessibile, non in primo piano.
+   ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/* Aggancio fra i 21 ETF della rotazione e il libro. NON è un elenco scritto a mano di "cosa
+   possiede il CEO": è una mappa settore→ETF di quattro voci (i settori GICS non cambiano), e
+   ciò che si accende lo decide OGNI VOLTA il portafoglio vero. Se domani non ci fossero più
+   semiconduttori, SMH smetterebbe di illuminarsi da solo. */
+const ETF_DI_SETTORE = { sox: "SMH", Technology: "XLK", "Communication Services": "XLC", Energy: "XLE",
+  "Health Care": "XLV", Financials: "XLF", Industrials: "XLI", "Consumer Discretionary": "XLY" };
+
+function esposizioneRotazione() {
+  const ptf = (DATA?.portfolio || []).filter(r => r.qty > 0 && r.val_eur > 0 && isEquity(r));
+  const tot = ptf.reduce((s, r) => s + r.val_eur, 0);
+  const per = new Map();
+  ptf.forEach(r => {
+    // i semiconduttori si riconoscono dal benchmark che la pipeline ha già scelto per la forza
+    // relativa (rs_bench === "sox"), non da un elenco di ticker
+    const etf = (r.rs_bench === "sox" && ETF_DI_SETTORE.sox) || ETF_DI_SETTORE[r.sector];
+    if (etf) per.set(etf, (per.get(etf) || 0) + r.val_eur);
+  });
+  return { per, tot, quota: e => (tot ? Math.round((per.get(e) || 0) / tot * 1000) / 10 : 0) };
+}
+
+let rotOrizzonte = "m1";   // m1 | m3
+function renderRotazione() {
+  const box = $("#mg-rot"); if (!box) return;
+  const tilt = DATA?.macro?.tilt || [];
+  const nota = $("#mg-rot-note"), head = $("#mg-rot-head");
+  if (!tilt.length) { box.innerHTML = '<div class="muted">Rotazione non disponibile.</div>'; return; }
+  const exp = esposizioneRotazione();
+  const righe = [...tilt].sort((a, b) => (b[rotOrizzonte] ?? -99) - (a[rotOrizzonte] ?? -99)).map(t => ({
+    nome: t.name, valore: t[rotOrizzonte], tk: t.ticker,
+    evidenzia: exp.per.has(t.ticker),
+    testo: `${signTxt(t[rotOrizzonte])}${exp.per.has(t.ticker) ? `  ·  ${fmt1.format(exp.quota(t.ticker))}% del libro` : ""}`,
+  }));
+  box.innerHTML = barreOrdinate(righe);
+  box.querySelectorAll("[data-obar-tk]").forEach(e => e.setAttribute("title",
+    "ETF di riferimento " + e.dataset.obarTk + (exp.per.has(e.dataset.obarTk) ? " — settore in cui sei investito" : "")));
+
+  // la frase che rende il grafico una risposta invece di una classifica
+  const mie = righe.filter(r => r.evidenzia);
+  const pos = righe.findIndex(r => r.evidenzia);
+  const peggiore = [...mie].sort((a, b) => a.valore - b.valore)[0];
+  const primo = righe[0], ultimo = righe[righe.length - 1];
+  if (head) {
+    const media = mie.length ? mie.reduce((s, r) => s + r.valore * exp.quota(r.tk), 0) / (mie.reduce((s, r) => s + exp.quota(r.tk), 0) || 1) : null;
+    const contro = media != null && media < 0;
+    head.innerHTML = media == null ? "" : `
+      <div class="sh-item ${contro ? "sh-bad" : ""}">
+        <div class="sh-lab">Il vento sui tuoi settori</div>
+        <div class="sh-val ${contro ? "neg" : "pos"}">${signTxt(Math.round(media * 10) / 10)}</div>
+        <div class="sh-sub">media pesata sul capitale, ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"}</div>
+      </div>
+      <div class="sh-item">
+        <div class="sh-lab">Guida la classifica</div>
+        <div class="sh-val pos">${esc(primo.nome)}</div>
+        <div class="sh-sub">${signTxt(primo.valore)} — ${exp.per.has(primo.tk) ? "sei dentro" : "non sei dentro"}</div>
+      </div>
+      <div class="sh-item ${peggiore && peggiore.valore < -8 ? "sh-warn" : ""}">
+        <div class="sh-lab">Il tuo settore più debole</div>
+        <div class="sh-val ${peggiore && peggiore.valore < 0 ? "neg" : ""}">${peggiore ? esc(peggiore.nome) : "—"}</div>
+        <div class="sh-sub">${peggiore ? `${signTxt(peggiore.valore)} · ${fmt1.format(exp.quota(peggiore.tk))}% del capitale` : "nessun settore mappato"}</div>
+      </div>`;
+  }
+  if (nota) {
+    nota.innerHTML = `Rendimento a ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"} dei 21 ETF di settore e tema.
+      <b>Le barre accese sono i settori in cui hai i soldi</b>, con accanto la quota del capitale azionario.
+      ${mie.length ? `Oggi il tuo capitale è concentrato in ${mie.length} dei 21, che occupano le posizioni ${
+        righe.map((r, i) => r.evidenzia ? i + 1 : null).filter(Boolean).join("ª, ")}ª della classifica.` : ""}
+      ${pos > 10 ? " Stai nella metà bassa: il denaro si sta muovendo altrove." : ""}
+      ${ultimo && primo ? ` L'arco della rotazione va da ${esc(primo.nome)} ${signTxt(primo.valore)} a ${esc(ultimo.nome)} ${signTxt(ultimo.valore)}.` : ""}`;
+  }
+}
+
+/* I TRE TERMOMETRI DI STRESS, con le loro soglie disegnate.
+   Un livello senza soglia non dice niente: "HY OAS 2,84" è un numero, "2,84 contro i 4,0 della
+   tensione" è un'informazione. Le soglie sono le stesse che la pipeline già usa per gli score. */
+function renderStress() {
+  const m = DATA?.macro || {};
+  const box = $("#mg-stress"); if (!box) return;
+  const carte = [];
+
+  if ((m.curve_history || []).length > 2) {
+    const h = m.curve_history, ora = h[h.length - 1].v;
+    carte.push({
+      t: "Curva 10A-2A", v: `${ora > 0 ? "+" : ""}${fmtNum.format(ora)} pp`,
+      cls: ora < 0 ? "neg" : ora < 0.25 ? "warn" : "pos",
+      g: graficoSerie([{ nome: "curva", punti: h, colore: ora < 0 ? "var(--red)" : "var(--blue)" }],
+        { h: 120, compatto: true, soglie: [{ v: 0, testo: "inversione", colore: "var(--red)" }],
+          bande: [{ da: Math.min(...h.map(x => x.v)) - 0.05, a: 0, colore: "var(--red)" }],
+          unita: "", aria: "spread 10 anni meno 2 anni", etichetteDx: false }),
+      n: ora < 0 ? "Invertita: storicamente precede le recessioni."
+        : `Positiva da ${h.filter(x => x.v < 0).length ? "dopo l'ultima inversione" : "tutto il periodo"}. Sotto lo zero è il segnale che conta.`,
+    });
+  }
+  if ((m.credit?.history || []).length > 2) {
+    const h = m.credit.history, ora = h[h.length - 1].v;
+    carte.push({
+      t: "Credito HY (spread)", v: `${fmtNum.format(ora)}%`,
+      cls: ora >= 6 ? "neg" : ora >= 4 ? "warn" : "pos",
+      g: graficoSerie([{ nome: "hy", punti: h, colore: ora >= 4 ? "var(--yellow)" : "var(--green)" }],
+        { h: 120, compatto: true, soglie: [{ v: 4, testo: "tensione", colore: "var(--yellow)" }], unita: "%",
+          aria: "spread high yield", etichetteDx: false }),
+      n: `Quanto extra-rendimento chiede il mercato per prestare alle aziende fragili. Sopra 4% si tende, sopra 6% è stress. Ora ${fmtNum.format(ora)}%.`,
+    });
+  }
+  if ((m.vix?.spark || []).length > 2) {
+    const sp = m.vix.spark, ora = m.vix.value ?? sp[sp.length - 1];
+    carte.push({
+      t: "VIX — volatilità attesa", v: fmtNum.format(ora),
+      cls: ora >= 30 ? "neg" : ora >= 20 ? "warn" : "pos",
+      g: graficoSerie([{ nome: "vix", punti: sp.map(v => ({ d: null, v })), colore: ora >= 20 ? "var(--yellow)" : "var(--green)" }],
+        { h: 120, compatto: true, soglie: [{ v: 20, testo: "tensione", colore: "var(--yellow)" }],
+          assex: ["30 sedute fa", "oggi"], aria: "VIX ultime 30 sedute", etichetteDx: false }),
+      n: `Sotto 20 il mercato è calmo, sopra 30 ha paura. Questa serie di 30 sedute non era disegnata da nessuna parte.`,
+    });
+  }
+  box.innerHTML = carte.length ? carte.map(c => `<div class="mg-card">
+      <div class="mg-card-head"><span class="mg-t">${esc(c.t)}</span><span class="mg-v ${c.cls}">${esc(c.v)}</span></div>
+      ${c.g}<div class="muted mg-n">${c.n}</div></div>`).join("")
+    : '<div class="muted">Serie di stress non disponibili.</div>';
+}
+
+function renderLevaStagione() {
+  const m = DATA?.macro || {};
+  const box = $("#mg-leva"); if (!box) return;
+  const carte = [];
+
+  const md = m.margin_debt;
+  if ((md?.history || []).length > 2) {
+    // ⚠ history è un array di NUMERI NUDI, senza date: l'asse x si etichetta a mano coi mesi
+    // che la serie copre, non si finge una data per punto
+    const h = md.history, ora = h[h.length - 1];
+    const picco = md.peak || Math.max(...h);
+    carte.push({
+      t: "Leva a credito (margin debt)", v: `${fmt1.format(md.yoy)}% a/a`,
+      cls: md.yoy >= 25 ? "neg" : md.yoy >= 10 ? "warn" : "pos",
+      g: graficoSerie([{ nome: "md", punti: h.map(v => ({ d: null, v })), colore: "var(--purple)" }],
+        { h: 150, w: 900, lAsse: 60, fmtY: v => fmtNum.format(Math.round(v / 1000)) + " mld",
+          soglie: picco > 0 ? [{ v: picco, testo: "massimo storico", colore: "var(--red)" }] : [],
+          assex: [`${h.length} mesi fa`, md.date ? dataBreve(md.date) : "oggi"], etichetteDx: false,
+          aria: "debito a margine FINRA" }),
+      n: `Quanto denaro a prestito c'è dentro il mercato. Oggi ${fmt1.format(md.pct_of_peak)}% del massimo storico e ${signTxt(md.yoy)} in un anno: la leva sale più in fretta dei prezzi. Fonte ${esc(md.series || "FINRA")}.`,
+    });
+  }
+  const se = m.seasonality;
+  if ((se?.sp500 || []).length === 12) {
+    const MESI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+    const cur = se.current_month;
+    carte.push({
+      t: "Stagionalità S&P 500", v: `${MESI[(cur || 1) - 1]} · ${se.label || ""}`,
+      cls: (se.sp500[(cur || 1) - 1]?.avg ?? 0) < 0 ? "warn" : "pos", largo: true,
+      g: barreOrdinate(se.sp500.map(x => ({
+        nome: MESI[x.m - 1], valore: x.avg, evidenzia: x.m === cur,
+        testo: `${signTxt(x.avg)} · ${Math.round(x.pos)}% mesi positivi`,
+      })), {}),
+      n: `Rendimento medio di ogni mese su ~${se.sp500[0]?.n || 40} anni, con il mese corrente acceso. È contesto di probabilità, non una previsione.`,
+    });
+  }
+  box.innerHTML = carte.length ? carte.map(c => `<div class="mg-card${c.largo ? " mg-wide" : ""}">
+      <div class="mg-card-head"><span class="mg-t">${esc(c.t)}</span><span class="mg-v ${c.cls}">${esc(c.v)}</span></div>
+      ${c.g}<div class="muted mg-n">${c.n}</div></div>`).join("")
+    : '<div class="muted">Dati non disponibili.</div>';
+}
+
+function renderMacroGrafici() {
+  if (!DATA) return;
+  renderRotazione();
+  renderStress();
+  renderLevaStagione();
+}
+
 function renderStruttura() {
   if (!DATA) return;
   renderConcentrazione();
-  renderCorrMap();
   renderDeriva();
   renderAllocGrafica();
   renderStopDist();
@@ -3769,12 +4016,19 @@ function volumeCell(r) {
   return `<td class="num">${fmtVolume(r.volume)}${rvHtml}</td>`;
 }
 
+/* v206 — prima questa funzione si chiamava "Bar" e NON disegnava nessuna barra: il nome
+   mentiva. La forza relativa è zero-centrata per natura (batti o non batti il benchmark),
+   quindi la barra divergente è la sua resa ovvia. Scala fissa ±20pp per rendere le righe
+   confrontabili fra loro invece che ognuna sulla propria. */
 function rsBar(rs, bench) {
   if (rs == null) return "—";
   const color = rs >= 2 ? "var(--green)" : rs <= -2 ? "var(--red)" : "var(--muted)";
   const bl = bench === "sox" ? "SOX" : bench === "ndx" ? "NDX" : "S&P";
   const blHtml = bench ? ` <span class="muted" style="font-size:9px;vertical-align:middle">${bl}</span>` : "";
-  return `<span class="${rs > 0 ? "pos" : rs < 0 ? "neg" : ""}" style="font-family:var(--mono);font-size:12px;color:${color}">${rs > 0 ? "+" : ""}${fmtNum.format(rs)}%</span>${blHtml}`;
+  const w = Math.min(50, Math.abs(rs) / 20 * 50);
+  const barra = `<span class="rs-axis" title="scala fissa ±20 pp"><span class="rs-zero"></span>` +
+    `<span class="rs-fill" style="${rs >= 0 ? `left:50%` : `left:${(50 - w).toFixed(1)}%`};width:${Math.max(w, 1).toFixed(1)}%;background:${color}"></span></span>`;
+  return `<span class="rs-cell"><span class="${rs > 0 ? "pos" : rs < 0 ? "neg" : ""}" style="font-family:var(--mono);font-size:12px;color:${color}">${rs > 0 ? "+" : ""}${fmtNum.format(rs)}%</span>${blHtml}${barra}</span>`;
 }
 
 /* Popup esplicativo della colonna "RS 1M" (forza relativa vs indice di settore: SOX/NDX/S&P) */
@@ -3885,13 +4139,14 @@ function floatCell(r) {
 function drawdownCell(r) {
   const d = r.w52_dist_pct;
   if (d == null) return `<td class="num muted">—</td>`;
-  if (d <= -25) {
-    return `<td class="num"><span class="neg">${signTxt(d)}</span><br><span class="badge badge-deep-value badge-info" data-badge="deepvalue" role="button" tabindex="0" title="Clicca per la spiegazione">[DEEP VALUE]</span></td>`;
-  }
-  if (d <= -15) {
-    return `<td class="num"><span class="neg">${signTxt(d)}</span><br><span class="badge badge-correction badge-info" data-badge="correction" role="button" tabindex="0" title="Clicca per la spiegazione">[CORRECTION: Z1]</span></td>`;
-  }
-  return `<td class="num"><span class="${d < 0 ? "neg" : "pos"}">${signTxt(d)}</span></td>`;
+  // barra su scala 0…−50%: le soglie -15 (correzione) e -25 (deep value) erano scritte solo
+  // nel codice, ora sono visibili come lunghezza invece che da ricordare a memoria
+  const cls = d <= -25 ? "bar-pos" : d <= -15 ? "bar-warn" : "bar-neg";
+  const badge = d <= -25
+    ? `<br><span class="badge badge-deep-value badge-info" data-badge="deepvalue" role="button" tabindex="0" title="Clicca per la spiegazione">[DEEP VALUE]</span>`
+    : d <= -15 ? `<br><span class="badge badge-correction badge-info" data-badge="correction" role="button" tabindex="0" title="Clicca per la spiegazione">[CORRECTION: Z1]</span>` : "";
+  return cellaBarra(d, 50, `<span class="${d < 0 ? "neg" : "pos"}">${signTxt(d)}</span>${badge}`,
+    { cls, title: "distanza dal massimo 52 settimane · barra su scala 0…−50%" });
 }
 
 /* spiegazione dei badge (Squeeze Risk, Deep Value, Correzione, RSI ipervenduto) */
@@ -3993,8 +4248,9 @@ function fundCells(r) {
     <td class="num">${pct(st.dividend_yield)}</td>
     <td class="num">${st.peg == null ? "—" : fmtNum.format(Math.round(st.peg * 100) / 100)}</td>
     <td class="num ${zCls}">${st.altman_z == null ? "—" : fmtNum.format(Math.round(st.altman_z * 10) / 10)}</td>
-    <td class="num">${r.fin_health == null ? "—" : `<b style="color:${scoreColor(r.fin_health)}">${r.fin_health}</b>`}</td>
-    <td class="num ${signCls(r.rating?.upside_pct)}">${r.rating?.upside_pct == null ? "—" : signTxt(r.rating.upside_pct)}</td>`;
+    <td class="num">${finHealthBar(r)}</td>
+    ${cellaBarra(r.rating?.upside_pct, 60, r.rating?.upside_pct == null ? "—" : signTxt(r.rating.upside_pct),
+      { mid: true, title: "distanza dal target di consenso · barra su scala ±60%" })}`;
 }
 /* market cap abbreviata: la tabella e' gia' larga, "1,2T" batte "1.200.000" */
 function fmtMcapShort(v) {
@@ -4080,6 +4336,20 @@ function optImpactCell(ticker) {
     </div>
     ${(cw || pw) ? `<div class="opt-col-walls muted">${cw ? "CW " + fmtNum.format(cw) : ""}${cw && pw ? " · " : ""}${pw ? "PW " + fmtNum.format(pw) : ""}</div>` : ""}
   </td>`;
+}
+
+/* ═══ v206 — CELLE CON BARRA DI FONDO ═════════════════════════════════════════════════════
+   "Meno numeri, più grafici" senza perdere un dato: la cifra RESTA leggibile, dietro le passa
+   una barra proporzionale. Confrontare dieci righe smette di richiedere dieci letture.
+   ⚠ Vale per costruzione la regola v188: mdRow() legge i campi grezzi di data.json e non
+   guarda la UI, quindi qualunque resa grafica di una cella lascia il payload identico.
+   `scala` = il valore che riempie la cella; `mid:true` centra la barra sullo zero. */
+function cellaBarra(v, scala, testo, opt = {}) {
+  if (v == null || !isFinite(v)) return `<td class="num muted">${testo ?? "—"}</td>`;
+  const pct = Math.min(100, Math.abs(v) / (scala || 1) * 100);
+  const seg = opt.cls || (v >= 0 ? "bar-pos" : "bar-neg");
+  return `<td class="num bar-cell ${opt.mid ? "bar-mid " : ""}${seg}" style="--v:${pct.toFixed(0)}"` +
+    `${opt.title ? ` title="${esc(opt.title)}"` : ""}>${testo}</td>`;
 }
 
 function finHealthBar(r) {
@@ -5250,6 +5520,9 @@ function editPosition(ticker) {
 
 function renderTable() {
   const eurusd = DATA.eurusd || 1.08;
+  // scala comune a tutte le righe della colonna Guad. %: senza, ogni barra sarebbe relativa a
+  // se stessa e il confronto fra righe — l'unico motivo per cui la barra esiste — sparirebbe
+  const scalaGuad = Math.max(25, ...(DATA.portfolio || []).map(x => Math.abs(x.gain_pct || 0)));
   const rows = sortRows(DATA.portfolio, "ptf-table").map(r => {
     const c = cur(r);
     // guadagno EUR = verità broker (bgain) se presente, altrimenti dai prezzi live
@@ -5260,11 +5533,11 @@ function renderTable() {
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${priceTxt(r, c)}</b></td>
-      <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
+      ${cellaBarra(r.change_pct, 3, signTxt(r.change_pct), { mid: true, title: "barra su scala fissa ±3%" })}
       <td class="num">${prepostCell(r.prepost)}</td>
       ${volumeCell(r)}
       <td class="num ${signCls(gEur)}">${signTxt(Math.round(gEur), " €")}${r.currency === "USD" && r.gain != null ? `<br><span class="sub-eur muted">${signTxt(Math.round(r.gain), " $")} live</span>` : ""}</td>
-      <td class="num ${signCls(gPct)}"><b>${signTxt(Math.round(gPct * 100) / 100)}</b></td>
+      ${cellaBarra(gPct, scalaGuad, `<b>${signTxt(Math.round(gPct * 100) / 100)}</b>`, { mid: true, title: `barra su scala ±${fmtNum.format(Math.round(scalaGuad))}% (la posizione più estesa del portafoglio)` })}
       ${techCells(r)}
       ${fundCells(r)}
     </tr>`;
@@ -5317,7 +5590,7 @@ function renderWatchlist() {
   const rows = list.length ? list.map(r => `<tr>
       <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${nameDelBtn("watchlist", r.ticker)}${esc(r.name)}<span class="tk">${r.ticker}</span></td>
       <td class="num"><b>${priceTxt(r, c(r))}</b></td>
-      <td class="num ${signCls(r.change_pct)}">${signTxt(r.change_pct)}</td>
+      ${cellaBarra(r.change_pct, 3, signTxt(r.change_pct), { mid: true, title: "barra su scala fissa ±3%" })}
       <td class="num">${prepostCell(r.prepost)}</td>
       ${volumeCell(r)}
       ${techCells(r)}
@@ -5326,6 +5599,7 @@ function renderWatchlist() {
   const addRow = editMode.watchlist
     ? `<tr class="add-row"><td colspan="34"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
+  riparaVistaCompattaWl();          // v206 — ripara il default difettoso, se intatto
   applicaVistaCompattaSePrimaVolta("wl-table");
   applyColOrder("wl-table");
   applyColVisibility("wl-table");
@@ -8044,6 +8318,16 @@ document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {
   });
 });
 
+// v206 — orizzonte della rotazione settoriale
+document.querySelectorAll("#rot-toggle .chip").forEach(ch => {
+  ch.addEventListener("click", () => {
+    document.querySelectorAll("#rot-toggle .chip").forEach(c => c.classList.remove("chip-active"));
+    ch.classList.add("chip-active");
+    rotOrizzonte = ch.dataset.rot;
+    renderRotazione();
+  });
+});
+
 // v205 — interruttore settore/valuta della vista struttura
 document.querySelectorAll("#alloc-graf-toggle .chip").forEach(ch => {
   ch.addEventListener("click", () => {
@@ -8223,6 +8507,7 @@ function setTab(nome) {
   if (nome === "portafoglio") renderTable();
   if (nome === "watchlist") renderWatchlist();
   if (nome === "struttura" && typeof DATA !== "undefined" && DATA) renderStruttura();
+  if (nome === "macro" && typeof DATA !== "undefined" && DATA) renderMacroGrafici();
 }
 document.querySelectorAll("#main-tabs .tab").forEach(b =>
   b.addEventListener("click", () => setTab(b.dataset.tab)));

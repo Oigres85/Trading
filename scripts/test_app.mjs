@@ -1276,10 +1276,10 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
 {
   const reale = JSON.parse(readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null"));
   vm.runInContext(`REALE = ${JSON.stringify(reale)};`, ctx, { filename: "reale.js" });
-  // ⚠ COPIA PROFONDA, non `DATA = REALE`: due di questi check MUTANO il portafoglio per
-  // provare un ramo (portafoglio finto, corr_matrix cancellata) e con l'assegnazione per
-  // riferimento la mutazione restava addosso a REALE, facendo fallire i check successivi.
-  // Se n'è accorto il test stesso — ed è la ragione per cui i check vanno scritti isolati.
+  // ⚠ COPIA PROFONDA, non `DATA = REALE`: alcuni di questi check MUTANO il portafoglio o lo
+  // storico per provare un ramo, e con l'assegnazione per riferimento la mutazione restava
+  // addosso a REALE facendo fallire i check successivi. Se n'è accorto il test stesso — ed è
+  // la ragione per cui ogni check parte da uno stato pulito.
   const suReale = (code) => run(`
     const _salva = DATA, _cash = cashEur;
     DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 28500; recomputeTotals();
@@ -1302,55 +1302,6 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     const ordinato = rows.every((r, i) => i === 0 || rows[i - 1].mcr >= r.mcr);
     return gapOk && ordinato;`));
 
-  // CROSS-CHECK vero: la matrice calcolata qui deve riprodurre avg_corr/max_corr/max_corr_with
-  // che la PIPELINE ha scritto sulle righe. Se le due letture divergono, una delle due mente.
-  check("v205 correlazione: la matrice riproduce la coppia più correlata che la pipeline dichiara su ogni riga", suReale(`
-    const cm = matriceCorrelazione();
-    if (!cm) return false;
-    const held = DATA.portfolio.filter(r => r.qty > 0 && r.max_corr_with);
-    let confrontati = 0, coerenti = 0;
-    held.forEach(r => {
-      const i = cm.tickers.indexOf(r.ticker);
-      if (i < 0) return;
-      let best = null, bi = -1;
-      cm.m[i].forEach((v, j) => { if (j !== i && v != null && (best == null || v > best)) { best = v; bi = j; } });
-      if (bi < 0) return;
-      confrontati++;
-      if (cm.tickers[bi] === r.max_corr_with) coerenti++;
-    });
-    // la finestra può differire (6 mesi in fallback vs 12 della pipeline): si pretende la
-    // STRUTTURA, non l'uguaglianza dei decimali — ma la struttura deve reggere sui più
-    return confrontati >= 5 && coerenti / confrontati >= 0.75;`));
-
-  check("v205 correlazione: matrice simmetrica, diagonale 1, valori in [-1, 1]", suReale(`
-    const cm = matriceCorrelazione();
-    if (!cm) return false;
-    const n = cm.tickers.length;
-    for (let i = 0; i < n; i++) {
-      if (cm.m[i][i] !== 1) return false;
-      for (let j = 0; j < n; j++) {
-        const a = cm.m[i][j], b = cm.m[j][i];
-        if (a != null && (a < -1 || a > 1)) return false;
-        if (a != null && b != null && Math.abs(a - b) > 0.011) return false;
-      }
-    }
-    return n >= 2;`));
-
-  // v187: senza fallback il grafico resterebbe vuoto per ore dopo il rilascio, perché il CI
-  // rigenera su cron. Con fallback DEVE dichiarare che la base non è quella della pipeline.
-  check("v205 correlazione: senza matrice della pipeline si calcola in locale E lo dichiara", suReale(`
-    delete DATA.corr_matrix;
-    const cm = matriceCorrelazione();
-    return cm && cm.fallback === true && /6 mesi/.test(cm.base) && /calcolo locale/.test(cm.base);`));
-
-  check("v205 correlazione: con la matrice della pipeline si usa quella, senza avviso di base diversa", suReale(`
-    DATA.corr_matrix = { AAA: { AAA: 1, BBB: 0.42 }, BBB: { AAA: 0.42, BBB: 1 } };
-    DATA.portfolio = [{ ticker: "AAA", qty: 1 }, { ticker: "BBB", qty: 1 }];
-    const cm = matriceCorrelazione();
-    return cm && cm.fallback === false && cm.m[0][1] === 0.42 && /pipeline/.test(cm.base);`));
-
-  // un titolo assente da una data NON era in portafoglio: è un BUCO, non uno zero. Uno zero
-  // direbbe "rischio nullo" e la linea scenderebbe a terra disegnando un fatto mai accaduto.
   // NB: si toglie IL TITOLO da una data che resta popolata — non si svuota la data. Una data
   // senza `titles` viene proprio scartata da derivaConcentrazione, quindi non produrrebbe un
   // buco ma una serie più corta: era la prima stesura di questo check, e passava per il motivo
@@ -1409,9 +1360,62 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   // riga del portafoglio, il payload cambierebbe senza che nessuno lo veda.
   check("v205 la vista struttura NON tocca il payload (buildPrompt identico prima e dopo)", suReale(`
     const prima = buildPrompt();
-    concentrazioneRows(); matriceCorrelazione(); derivaConcentrazione();
+    concentrazioneRows(); derivaConcentrazione();
     distanzeStop(); allocazionePer("sector"); allocazionePer("currency"); seduteDelBook();
     return buildPrompt() === prima;`));
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+   v206 — REGISTRI DELLE TABELLE. Tre allineamenti che il codice dà per scontati e che
+   NESSUN test verificava: SORT_FIELDS 1:1 con le <th>, i colspan delle righe speciali, e la
+   vista compatta contro il proprio commento. Il terzo era già rotto — la watchlist dichiarava
+   di mostrare la forza relativa e mostrava Beta e Sharpe — e nessuno se n'era accorto perché
+   l'accesso è per INDICE: sfasare una colonna non produce nessun errore, solo il campo
+   sbagliato. È la stessa classe del registro fisso già pagata con C10 e col red team I6.
+   ═══════════════════════════════════════════════════════════════════════════════════════ */
+{
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const thDi = (id) => {
+    const tab = html.slice(html.indexOf(`id="${id}"`));
+    const head = tab.slice(tab.indexOf("<thead>"), tab.indexOf("</thead>"));
+    return [...head.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/g)]
+      .map(m => m[1].replace(/<[^>]*>/g, "").replace(/&amp;/g, "&").trim());
+  };
+  const ptfTh = thDi("ptf-table"), wlTh = thDi("wl-table");
+  const sf = run("JSON.stringify(SORT_FIELDS)");
+  const SF = JSON.parse(sf);
+
+  check("v206 SORT_FIELDS allineato 1:1 alle <th> del portafoglio",
+        ptfTh.length > 30 && SF["ptf-table"].length === ptfTh.length);
+  check("v206 SORT_FIELDS allineato 1:1 alle <th> della watchlist",
+        wlTh.length > 30 && SF["wl-table"].length === wlTh.length);
+  if (SF["ptf-table"].length !== ptfTh.length)
+    console.log(`  ⚠ ptf: ${ptfTh.length} <th> ma ${SF["ptf-table"].length} campi di ordinamento`);
+
+  // i colspan della riga TOTALE devono coprire ESATTAMENTE il numero di colonne, altrimenti
+  // la riga sborda (difetto già vissuto in v188 con le colonne nascondibili)
+  // NB: `run` avvolge il codice in una arrow che ritorna l'espressione — se il frammento
+  // contiene già `return` viene inserito com'è e la arrow esterna torna undefined. Qui serve
+  // quindi una ESPRESSIONE sola, non un blocco.
+  const cs = JSON.parse(run(
+    'JSON.stringify((renderTable.toString().match(/colspan="\\d+"/g) || []).map(x => +x.match(/\\d+/)[0]))'));
+  check("v206 colspan della riga TOTALE = numero di colonne del portafoglio",
+        cs.length > 0 && cs.every(c => c <= ptfTh.length) && cs.includes(ptfTh.length));
+  if (!cs.includes(ptfTh.length)) console.log(`  ⚠ colspan trovati: ${cs.join(", ")} · colonne: ${ptfTh.length}`);
+
+  // la vista compatta deve mostrare ciò che il suo commento dichiara
+  const vc = JSON.parse(run("JSON.stringify(VISTA_COMPATTA)"));
+  const nomiPtf = vc["ptf-table"].map(i => ptfTh[i]);
+  const nomiWl = vc["wl-table"].map(i => wlTh[i]);
+  check("v206 vista compatta: il portafoglio mostra la forza relativa",
+        nomiPtf.some(n => /^RS 1M$/.test(n)) && nomiPtf.some(n => /RS NDX/.test(n)));
+  check("v206 vista compatta: la watchlist mostra la forza relativa (il commento lo dichiarava, gli indici no)",
+        nomiWl.some(n => /^RS 1M$/.test(n)) && nomiWl.some(n => /RS NDX/.test(n)));
+  check("v206 vista compatta: nessun indice fuori dalle colonne esistenti",
+        vc["ptf-table"].every(i => ptfTh[i] != null) && vc["wl-table"].every(i => wlTh[i] != null));
+  console.log(`  · compatta ptf: ${nomiPtf.join(" · ")}`);
+  console.log(`  · compatta wl:  ${nomiWl.join(" · ")}`);
 }
 
 
@@ -1438,7 +1442,6 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     ["shell a due colonne", 'class="shell"'],
     ["scheda struttura", 'data-tab="struttura"'],
     ["grafico concentrazione", 'id="conc-chart"'],
-    ["mappa di correlazione", 'id="corr-chart"'],
     ["deriva della concentrazione", 'id="drift-chart"'],
     ["allocazione grafica", 'id="allocg-chart"'],
     ["distanza dallo stop", 'id="stopdist-chart"'],

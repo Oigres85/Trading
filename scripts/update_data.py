@@ -3199,18 +3199,8 @@ def compute_risk_metrics(rows, watch_rows=None):
             r["max_corr"] = round(float(cvals.max()), 2)
             r["max_corr_with"] = str(cvals.idxmax())
 
-    # v205 — MATRICE COMPLETA delle correlazioni, per la mappa della vista struttura.
-    # È la STESSA `corr` da cui escono avg_corr/max_corr qui sopra: pubblicandola si evita che
-    # la dashboard ne calcoli una propria su una finestra diversa e mostri, per la stessa
-    # coppia, un numero che non coincide con la colonna della tabella.
-    corr_matrix = {
-        t: {o: (None if pd.isna(corr.loc[t, o]) else round(float(corr.loc[t, o]), 2))
-            for o in tickers}
-        for t in tickers
-    }
-
     return {"sharpe": sharpe, "sortino": sortino, "portfolio_beta_ndx": port_beta,
-            "avg_pairwise_corr": avg_pairwise, "corr_matrix": corr_matrix,
+            "avg_pairwise_corr": avg_pairwise,
             "var95_1d_pct": var95_1d_pct, "es95_1d_pct": es95_1d_pct,
             "var95_hist_pct": var95_hist_pct, "es95_hist_pct": es95_hist_pct}
 
@@ -3474,9 +3464,6 @@ def main():
         "news": fetch_news(),
         "options": options,
         "metrics_history": metrics_history,
-        # v205 — matrice completa delle correlazioni fra posizioni (mappa della vista struttura).
-        # Stessa finestra e stessa `corr` da cui escono avg_corr/max_corr delle righe.
-        "corr_matrix": risk.get("corr_matrix"),
         "sanity_filtered": SANITY_FILTERED,   # anomalie API scartate dal sanity check in questo run
         # DATA ASSERTIONS: esito della validazione age+threshold sul macro (per UI e gate CI)
         "data_quality": validate_macro(macro),

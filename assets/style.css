@@ -12,6 +12,30 @@
   --yellow: #f59e0b;
   --cyan: #22d3ee;
   --mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* v206 — ALIAS CHE MANCAVANO. Erano usati in 27 punti del file ma non definiti da nessuna
+     parte: dove c'era il fallback la regola reggeva, dove non c'era CADEVA IN SILENZIO. Effetti
+     misurati: trascinando una colonna non si vedeva dove sarebbe caduta (--accent su
+     th.col-over), il focus del diario diventava grigio invece che blu, tre sfondi restavano
+     trasparenti. Una variabile inesistente non dà errore: rende la dichiarazione invalida. */
+  --accent: var(--blue);
+  --fg: var(--text);
+  --hover: #1b2130;
+  --card-3: #1c2231;
+  --bg2: #0d1220;
+
+  /* v206 — scale. Prima: 21 dimensioni di testo, 12 raggi, 10 altezze di barra per la stessa
+     idea. La stessa forma deve significare la stessa cosa, o l'occhio attribuisce importanza a
+     differenze che non ne hanno. */
+  --fs-hero: 26px;    /* IL numero della scheda: uno solo per card */
+  --fs-num: 18px;     /* numeri secondari nelle card */
+  --fs-lab: 11px;     /* etichette (prima 9 / 9,5 / 10 / 10,5) */
+  --bar-xs: 6px;      /* barra dentro una cella di tabella */
+  --bar-sm: 10px;     /* barra dentro una card */
+  --bar-lg: 20px;     /* barra a piena riga (formato v205) */
+  --t-fast: 130ms cubic-bezier(.4, 0, .2, 1);
+  --blue-wash: color-mix(in srgb, var(--blue) 8%, transparent);
+  color-scheme: dark;   /* spinner dei number-input e menu nativi coerenti col tema su iOS */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -21,7 +45,71 @@ body {
   color: var(--text);
   font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
+  /* senza line-height esplicito il default è ~1,2: ogni nota della pagina era compressa.
+     tabular-nums incolonna le cifre anche nelle celle in Inter (badge, etichette, schede). */
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  -webkit-text-size-adjust: 100%;
   min-height: 100vh;
+}
+
+/* v206 — MOVIMENTO. 38 hover contro 8 transizioni: l'interfaccia scattava invece di rispondere.
+   :where() ha specificità ZERO, quindi non entra in nessuna guerra di specificità (vincolo v192). */
+:where(.btn, .chip, .tab, .macro-item, .gauge-card, .mini-card, .stat-cell, .earn-card,
+       .health-banner, .rp-chip, .sh-item, .obar-row, #news-summary) {
+  transition: border-color var(--t-fast), background-color var(--t-fast),
+              transform var(--t-fast), color var(--t-fast);
+}
+:where(.macro-item, .gauge-card, .mini-card, .sh-item, .earn-card):hover { transform: translateY(-1px); }
+
+/* focus visibile sugli elementi che SONO cliccabili: hanno tutti tabindex="0" role="button"
+   da app.js e non avevano nessuna regola di focus — su iPhone mancava anche il feedback al tocco */
+:where(.macro-item, .gauge-card, .mini-card, .stat-cell, .earn-card, .rp-chip, .kpi-click,
+       #news-summary, .tab, .chip, .btn, .obar-row):focus-visible {
+  outline: 2px solid var(--blue); outline-offset: 2px;
+}
+
+/* barre di scorrimento tematizzate: una tabella da 38 colonne si scorre a mano, la barra deve
+   dire DOVE SEI senza spaccare il tema (su macOS era chiara sopra un fondo #0a0e17) */
+* { scrollbar-width: thin; scrollbar-color: #2a3145 transparent; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a3145; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+
+/* il movimento deve significare "qui è cambiato qualcosa": 5 animazioni erano in loop perpetuo
+   su decine di elementi contemporaneamente, cioè rumore di fondo. E prefers-reduced-motion non
+   esisteva in 1375 righe. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important;
+  }
+}
+
+/* v206 — DATA BAR generica per le celle di tabella: il numero RESTA (nessun dato perso, mdRow
+   non legge la UI), ma la proporzione si legge senza leggere la cifra. app.js accende la cella
+   passando una sola custom property: style="--v:73". */
+/* ⚠ prima erano blocchi ad ALTEZZA PIENA: in una cella alta 30px una fascia colorata al 20%
+   si legge come "riga evidenziata", non come grafico — e due colonne adiacenti facevano
+   scacchiera. Ora è una barra bassa, ancorata al fondo della cella: forma di grafico, e non
+   litiga con la cifra che le sta sopra. */
+td.bar-cell { position: relative; z-index: 0; }
+td.bar-cell::before {
+  content: ""; position: absolute; left: 0; bottom: 3px; z-index: -1; height: 4px;
+  width: calc(var(--v, 0) * 1%); max-width: 100%;
+  border-radius: 2px; background: var(--blue); opacity: .75;
+}
+td.bar-cell.bar-pos::before { background: var(--green); }
+td.bar-cell.bar-neg::before { background: var(--red); }
+td.bar-cell.bar-warn::before { background: var(--yellow); }
+/* zero al centro, per le percentuali col segno (Guad. %, Oggi, Target Δ): la stessa distanza
+   disegna la stessa barra da entrambe le parti */
+td.bar-mid::before { left: 50%; width: calc(var(--v, 0) * .5%); }
+td.bar-mid.bar-neg::before { left: calc(50% - var(--v, 0) * .5%); }
+td.bar-mid::after {
+  content: ""; position: absolute; left: 50%; bottom: 1px; width: 1px; height: 8px;
+  background: var(--muted); opacity: .45; z-index: -1;
 }
 
 main { max-width: 1500px; margin: 0 auto; padding: 0 20px 40px; }
@@ -57,8 +145,12 @@ main { max-width: 1500px; margin: 0 auto; padding: 0 20px 40px; }
   cursor: pointer; text-decoration: none; display: inline-flex;
   align-items: center; gap: 6px; transition: all .15s;
 }
-.btn:hover { border-color: var(--blue); background: #1a2030; }
+.btn:hover { border-color: var(--blue); background: var(--hover); }
 .btn-primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+/* v206 — .btn-ghost era usata 28 volte e non esisteva: cadeva su .btn pieno, quindi in topbar
+   quattro bottoni gridavano insieme e nessuno guidava l'occhio. */
+.btn-ghost { background: transparent; color: var(--muted); }
+.btn-ghost:hover { background: var(--hover); color: var(--text); border-color: var(--blue); }
 .btn-primary:hover { background: #3a7af0; }
 .btn-primary.spinning { opacity: .6; pointer-events: none; }
 .btn-sm { padding: 4px 10px; font-size: 12px; }
@@ -109,15 +201,15 @@ main { max-width: 1500px; margin: 0 auto; padding: 0 20px 40px; }
   background: var(--accent, var(--blue));
 }
 .kpi .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
-.kpi .value { font-family: var(--mono); font-size: 22px; font-weight: 700; }
+.kpi .value { font-family: var(--mono); font-size: var(--fs-hero); font-weight: 700; line-height: 1.15; }
 .kpi .sub { font-size: 12px; margin-top: 4px; font-family: var(--mono); }
 
 /* KPI compatti dentro la card Asset allocation */
 .kpi-grid.kpi-compact { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 8px; margin: 0 0 14px; }
 .kpi-compact .kpi { padding: 8px 10px 7px; border-radius: 8px; background: var(--card-2); }
 .kpi-compact .kpi::before { height: 2px; }
-.kpi-compact .kpi .label { font-size: 9px; letter-spacing: .4px; margin-bottom: 3px; }
-.kpi-compact .kpi .value { font-size: 15px; }
+.kpi-compact .kpi .label { font-size: var(--fs-lab); letter-spacing: .4px; margin-bottom: 3px; }
+.kpi-compact .kpi .value { font-size: var(--fs-hero); }
 .kpi-compact .kpi .sub { font-size: 9.5px; margin-top: 2px; line-height: 1.35; }
 
 /* ---------- card ---------- */
@@ -248,9 +340,9 @@ tbody tr.total-row { background: var(--card-2); font-weight: 700; }
   padding: 10px 10px 9px; text-align: center;
   display: flex; flex-direction: column; height: 118px; box-sizing: border-box; overflow: hidden;
 }
-.gauge-card .g-title { color: var(--muted); font-size: 9.5px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; height: 24px; line-height: 12px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1px; overflow: hidden; flex-shrink: 0; }
-.gauge-value { font-family: var(--mono); font-size: 15px; font-weight: 700; line-height: 1.15; flex-shrink: 0; }
-.gauge-sub { font-size: 9.5px; color: var(--muted); margin-top: 3px; line-height: 1.3; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.gauge-card .g-title { color: var(--muted); font-size: var(--fs-lab); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; height: 24px; line-height: 12px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1px; overflow: hidden; flex-shrink: 0; }
+.gauge-value { font-family: var(--mono); font-size: var(--fs-num); font-weight: 700; line-height: 1.15; flex-shrink: 0; }
+.gauge-sub { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.3; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
 /* ---------- termometro lineare unificato (sostituisce i tachimetri) ---------- */
 .tl { margin: 5px 2px 3px; }
@@ -272,7 +364,7 @@ tbody tr.total-row { background: var(--card-2); font-weight: 700; }
   background: var(--accent, var(--purple));
 }
 .macro-item .m-label { color: var(--muted); font-size: 10.5px; margin-bottom: 4px; }
-.macro-item .m-value { font-family: var(--mono); font-size: 16px; font-weight: 700; }
+.macro-item .m-value { font-family: var(--mono); font-size: var(--fs-num); font-weight: 700; line-height: 1.2; }
 .macro-item .m-date { color: var(--muted); font-size: 10px; margin-top: 3px; font-family: var(--mono); }
 
 /* seconda sezione macro: a capo riempiendo tutta la larghezza (niente spazi vuoti) */
@@ -403,7 +495,7 @@ th.sortable:hover { color: var(--text); }
 .fmeter-fill { display: block; height: 100%; border-radius: 3px; }
 
 /* ---------- vista fondamentale ---------- */
-.text-premium { color: #16e36a; font-weight: 700; }   /* ROE/ROIC alto */
+.text-premium { color: var(--green); font-weight: 700; }   /* ROE/ROIC alto */
 .warn-flag {
   display: inline-block; background: var(--red); color: #fff; border-radius: 50%;
   width: 14px; height: 14px; line-height: 14px; text-align: center; font-size: 10px; font-weight: 700;
@@ -444,7 +536,7 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
   background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-top: 14px; cursor: pointer; }
 .health-banner:hover { border-color: var(--blue); }
 .hb-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
-.hb-score { font-family: var(--mono); font-size: 20px; font-weight: 700; margin-top: 2px; }
+.hb-score { font-family: var(--mono); font-size: var(--fs-num); font-weight: 700; margin-top: 2px; }
 .hb-sub { font-size: 11px; }
 .hb-right { flex: 1; min-width: 220px; max-width: 380px; }
 .hb-parts { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
@@ -475,9 +567,9 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 .mini-card { background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px 9px; cursor: pointer;
   height: 118px; box-sizing: border-box; display: flex; flex-direction: column; text-align: center; overflow: hidden; }
 .mini-card:hover { border-color: var(--blue); }
-.mc-title { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; height: 24px; line-height: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.mc-value { font-family: var(--mono); font-weight: 700; font-size: 14px; flex-shrink: 0; }
-.mc-sub { font-size: 9.5px; color: var(--muted); margin-top: 3px; line-height: 1.3; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.mc-title { font-size: var(--fs-lab); color: var(--muted); text-transform: uppercase; letter-spacing: .5px; height: 24px; line-height: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mc-value { font-family: var(--mono); font-weight: 700; font-size: var(--fs-num); flex-shrink: 0; line-height: 1.2; }
+.mc-sub { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.3; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
 /* ---------- financial health ---------- */
 .fin-health { display: inline-flex; align-items: center; gap: 6px; min-width: 86px; background: none; border: none; cursor: pointer; padding: 0; color: var(--text); font-family: var(--mono); }
@@ -768,7 +860,7 @@ table.opt-table tbody tr:hover { background: var(--card-2); }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
 
 /* ---------- Prompt 6: formattazione condizionale fondamentale ---------- */
-.text-premium-green { color: #16e36a; font-weight: 700; }
+.text-premium-green { color: var(--green); font-weight: 700; }
 .text-danger-red { color: var(--red); font-weight: 700; }
 .fcf-warn { border-bottom: 1px dashed var(--red); cursor: help; color: var(--red); font-size: 11px; }
 
@@ -915,9 +1007,11 @@ tr.val-ok td { background: rgba(34,197,94,.07); }
 .ns-counts { white-space: nowrap; font-family: var(--mono); font-size: 11px; }
 
 /* ---------- v73: card più alte per evitare testi troncati nelle mini-tab ---------- */
-.gauge-card, .mini-card { height: 132px; }
+/* v206 — era `height`, non `min-height`: con i numeri portati a 18px il testo veniva TAGLIATO.
+   Le righe restano allineate perche' .gauges e .mini-cards hanno gia' align-items:stretch. */
+.gauge-card, .mini-card { min-height: 132px; }
 .gauge-card .g-title, .mc-title { height: auto; min-height: 24px; max-height: 30px; }
-.gauge-sub, .mc-sub { -webkit-line-clamp: 3; }
+.gauge-sub, .mc-sub { -webkit-line-clamp: unset; overflow: visible; }
 
 /* ---------- v73: allocation semplificata ---------- */
 .kpi-card { padding: 12px 16px; }
@@ -995,7 +1089,7 @@ tr.val-ok td { background: rgba(34,197,94,.07); }
   border-radius: 50%; animation: rp-rotate .8s linear infinite; flex-shrink: 0; }
 @keyframes rp-rotate { to { transform: rotate(360deg); } }
 .rp-track { height: 7px; background: var(--card-2); border-radius: 5px; overflow: hidden; }
-.rp-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #4c8dff, #16e36a); transition: width .5s ease; }
+.rp-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #4c8dff, var(--green)); transition: width .5s ease; }
 .rp-log { margin-top: 9px; max-height: 108px; overflow-y: auto; font-family: var(--mono); font-size: 10.5px;
   line-height: 1.55; color: var(--muted); border-top: 1px solid var(--border); padding-top: 7px; }
 .rp-log-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1114,13 +1208,13 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 /* pagina a pannelli: un indice ancorato in cima, poi le sezioni in sequenza */
 .pp-page { max-height: 70vh; overflow-y: auto; scroll-behavior: smooth; }
 .pp-index { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 0 12px; position: sticky; top: 0;
-  background: var(--card, #12151c); border-bottom: 1px solid var(--border, #262b36); z-index: 2; }
+  background: var(--card, #12151c); border-bottom: 1px solid var(--border); z-index: 2; }
 .pp-index a { font-size: 11px; padding: 3px 8px; border-radius: 999px; text-decoration: none;
-  border: 1px solid var(--border, #262b36); color: var(--muted, #93a0b4); white-space: nowrap; }
-.pp-index a:hover { color: var(--fg, #e6ebf2); border-color: var(--accent, #4c8dff); }
-.pp-sec { padding: 14px 0; border-bottom: 1px dashed var(--border, #262b36); scroll-margin-top: 46px; }
+  border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
+.pp-index a:hover { color: var(--fg); border-color: var(--accent); }
+.pp-sec { padding: 14px 0; border-bottom: 1px dashed var(--border); scroll-margin-top: 46px; }
 .pp-sec:last-child { border-bottom: 0; }
-.pp-h { margin: 0 0 8px; font-size: 13px; letter-spacing: .02em; color: var(--accent, #4c8dff); }
+.pp-h { margin: 0 0 8px; font-size: 13px; letter-spacing: .02em; color: var(--accent); }
 .pp-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 0; }
 
 /* selettore colonne */
@@ -1129,8 +1223,8 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
   max-height: 48vh; overflow-y: auto; padding: 4px 0; }
 .cp-item { display: flex; align-items: center; gap: 7px; font-size: 12px; padding: 4px 6px;
   border-radius: 6px; cursor: pointer; }
-.cp-item:hover { background: var(--hover, #1a1f29); }
-.cp-item input { accent-color: var(--accent, #4c8dff); cursor: pointer; }
+.cp-item:hover { background: var(--hover, var(--hover)); }
+.cp-item input { accent-color: var(--accent); cursor: pointer; }
 .cp-item em { font-size: 10px; margin-left: auto; font-style: normal; }
 .cp-locked { opacity: .55; cursor: default; }
 .macro-actions { display: flex; justify-content: flex-end; margin-bottom: 8px; }
@@ -1142,30 +1236,30 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 
 /* ═══ v190 — popup maestro-dettaglio: indice a sinistra, contenuto a destra ═══════════ */
 .pp-split { display: grid; grid-template-columns: 250px 1fr; gap: 16px; min-height: 62vh; }
-.pp-nav { border-right: 1px solid var(--border, #262b36); padding-right: 12px; max-height: 74vh; overflow-y: auto; }
+.pp-nav { border-right: 1px solid var(--border); padding-right: 12px; max-height: 74vh; overflow-y: auto; }
 .pp-nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .pp-nav-item { display: flex; align-items: center; gap: 7px; font-size: 12px; line-height: 1.35;
-  padding: 7px 9px; border-radius: 7px; cursor: pointer; color: var(--muted, #93a0b4);
+  padding: 7px 9px; border-radius: 7px; cursor: pointer; color: var(--muted);
   border: 1px solid transparent; user-select: none; }
-.pp-nav-item:hover { background: var(--hover, #1a1f29); color: var(--fg, #e6ebf2); }
-.pp-nav-item.is-active { background: var(--hover, #1a1f29); color: var(--fg, #e6ebf2);
-  border-color: var(--accent, #4c8dff); font-weight: 600; }
+.pp-nav-item:hover { background: var(--hover, var(--hover)); color: var(--fg); }
+.pp-nav-item.is-active { background: var(--hover, var(--hover)); color: var(--fg);
+  border-color: var(--accent); font-weight: 600; }
 .pp-nav-txt { flex: 1; }
 .pp-drag { opacity: .35; font-size: 11px; cursor: grab; letter-spacing: -1px; }
 .pp-nav-item.pp-dragging { opacity: .45; }
-.pp-nav-item.pp-over { border-color: var(--accent, #4c8dff); border-style: dashed; }
+.pp-nav-item.pp-over { border-color: var(--accent); border-style: dashed; }
 .pp-nav-note { font-size: 10.5px; line-height: 1.45; padding: 10px 9px 0; }
 .pp-detail { max-height: 74vh; overflow-y: auto; padding-right: 6px; font-size: 13px; }
 .pp-pane { display: none; }
 .pp-pane.is-active { display: block; }
-.pp-detail .pp-h { margin: 0 0 12px; font-size: 15px; color: var(--accent, #4c8dff); }
+.pp-detail .pp-h { margin: 0 0 12px; font-size: 15px; color: var(--accent); }
 .pp-detail .info-line, .pp-detail .sd-row { font-size: 13px; }
 .pp-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 12px; }
 .pp-actions .btn { font-size: 11px; }
 
 @media (max-width: 860px) {
   .pp-split { grid-template-columns: 1fr; min-height: 0; }
-  .pp-nav { border-right: 0; border-bottom: 1px solid var(--border, #262b36); padding: 0 0 10px; max-height: 30vh; }
+  .pp-nav { border-right: 0; border-bottom: 1px solid var(--border); padding: 0 0 10px; max-height: 30vh; }
   .pp-nav-list { flex-direction: row; flex-wrap: wrap; }
   .pp-nav-item { font-size: 11px; padding: 5px 8px; }
   .pp-detail { max-height: 52vh; }
@@ -1203,14 +1297,14 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 @media (max-width: 860px) {
   .modal-chart { width: 96vw; max-width: 96vw; max-height: 90vh; padding: 14px 12px; }
   .pp-split { display: block; min-height: 0; }
-  .pp-nav { border-right: 0; border-bottom: 1px solid var(--border, #262b36);
+  .pp-nav { border-right: 0; border-bottom: 1px solid var(--border);
     padding: 0 0 10px; margin-bottom: 12px; max-height: none; overflow: visible; }
   .pp-nav-list { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: 6px;
     padding-bottom: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .pp-nav-list::-webkit-scrollbar { display: none; }
   .pp-nav-item { flex: 0 0 auto; font-size: 11.5px; padding: 6px 10px; white-space: nowrap;
-    border: 1px solid var(--border, #262b36); border-radius: 999px; }
-  .pp-nav-item.is-active { border-color: var(--accent, #4c8dff); }
+    border: 1px solid var(--border); border-radius: 999px; }
+  .pp-nav-item.is-active { border-color: var(--accent); }
   .pp-drag { display: none; }                 /* su touch il trascinamento orizzontale serve a scorrere */
   .pp-nav-note { padding: 8px 2px 0; }
   .pp-detail { max-height: none; overflow: visible; padding-right: 0; font-size: 13px; }
@@ -1242,9 +1336,9 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 
 /* v193 — frecce di riordino: funzionano dove il trascinamento non arriva (Safari iPhone) */
 .pp-move { display: inline-flex; gap: 2px; margin-left: auto; flex: 0 0 auto; }
-.pp-mv { background: transparent; border: 1px solid var(--border, #262b36); color: var(--muted, #93a0b4);
+.pp-mv { background: transparent; border: 1px solid var(--border); color: var(--muted);
   border-radius: 5px; width: 22px; height: 20px; line-height: 1; font-size: 9px; cursor: pointer; padding: 0; }
-.pp-mv:hover:not(:disabled) { color: var(--fg, #e6ebf2); border-color: var(--accent, #4c8dff); }
+.pp-mv:hover:not(:disabled) { color: var(--fg); border-color: var(--accent); }
 .pp-mv:disabled { opacity: .25; cursor: default; }
 @media (max-width: 860px) {
   .pp-move { margin-left: 6px; }
@@ -1252,21 +1346,21 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 }
 
 /* v196 — voce del popup macro che non ha un riquadro in dashboard: spostarla non la muove */
-.pp-solo-popup { font-size: 9px; font-style: normal; opacity: .5; border: 1px solid var(--border, #262b36);
+.pp-solo-popup { font-size: 9px; font-style: normal; opacity: .5; border: 1px solid var(--border);
   border-radius: 4px; padding: 0 4px; margin-left: 5px; white-space: nowrap; }
 
 /* v204: gli stili di barra di stato e coda decisioni sono stati rimossi con i loro
    contenitori. Restano quelli dell'interruttore vista, che serve ancora. */
 /* v198 — interruttore vista compatta/completa */
 .vista-switch { display: inline-flex; align-items: center; gap: 6px; }
-.vs-lab { font-size: 10px; color: var(--muted, #93a0b4); font-variant-numeric: tabular-nums; }
+.vs-lab { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 /* v199 — schede: quattro momenti diversi, non quattro blocchi impilati */
-.tabs { display: flex; gap: 2px; margin: 0 0 14px; border-bottom: 1px solid var(--border, #262b36); }
-.tab { background: transparent; border: 0; border-bottom: 2px solid transparent; color: var(--muted, #93a0b4);
+.tabs { display: flex; gap: 2px; margin: 0 0 14px; border-bottom: 1px solid var(--border); }
+.tab { background: transparent; border: 0; border-bottom: 2px solid transparent; color: var(--muted);
   font: inherit; font-size: 12.5px; padding: 9px 16px; cursor: pointer; letter-spacing: .02em; }
-.tab:hover { color: var(--fg, #e6ebf2); }
-.tab-active { color: var(--fg, #e6ebf2); border-bottom-color: var(--accent, #4c8dff); font-weight: 600; }
+.tab:hover { color: var(--fg); }
+.tab-active { color: var(--fg); border-bottom-color: var(--accent); font-weight: 600; }
 @media (max-width: 860px) {
   .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
@@ -1336,17 +1430,6 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 .chart-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); margin-bottom: 12px; }
 .chart-legend .lg-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
 
-/* ---- heatmap di correlazione ---- */
-.corr-wrap { overflow-x: auto; }
-.corr-grid { border-collapse: collapse; font-family: var(--mono); font-size: 11px; }
-.corr-grid th { padding: 4px 6px; color: var(--muted); font-weight: 600; text-transform: none;
-  font-size: 10.5px; letter-spacing: 0; background: transparent; border: 0; position: static; }
-.corr-grid th.corr-rowhead { text-align: right; }
-.corr-grid td { padding: 0; border: 1px solid var(--card); text-align: center; }
-.corr-cell { width: 46px; height: 30px; display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 600; color: #0a0e17; }
-.corr-cell.c-diag { background: var(--card-2); color: var(--muted); font-weight: 400; }
-
 /* ---- barre di allocazione ---- */
 .abars { display: flex; flex-direction: column; gap: 8px; }
 .abar-row { display: grid; grid-template-columns: 168px minmax(0, 1fr) 96px; gap: 10px; align-items: center; }
@@ -1384,3 +1467,63 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
   .sbar-meta { grid-column: 2; text-align: left; }
   .sh-item .sh-val { font-size: 18px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+   v206 — GRAFICI MACRO e PRIMITIVE CONDIVISE
+   Le barre usano lo schema `etichetta | barra | valore` di v205: è l'unico punto del file
+   in cui barre di righe diverse partono dalla stessa ascissa, ed è ciò che le rende
+   confrontabili a colpo d'occhio invece che da leggere una per una.
+   ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+.g-serie { width: 100%; height: auto; display: block; }
+
+/* barre ordinate che divergono dallo zero */
+.obars { display: flex; flex-direction: column; gap: 4px; }
+.obar-row {
+  display: grid; grid-template-columns: 132px minmax(0, 1fr) 168px; gap: 10px;
+  align-items: center; padding: 2px 4px; border-radius: 6px; border: 1px solid transparent;
+}
+.obar-row:hover { background: var(--card-2); }
+.obar-on { background: var(--blue-wash); border-color: rgba(76, 141, 255, .35); }
+.obar-lab { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.obar-on .obar-lab { font-weight: 700; }
+.obar-axis { position: relative; min-width: 0; height: var(--bar-sm); background: var(--card-2); border-radius: 3px; }
+.obar-zero { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--muted); opacity: .6; }
+.obar-fill { position: absolute; top: 0; height: var(--bar-sm); border-radius: 3px; }
+.obar-val { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; white-space: nowrap; }
+.obar-on .obar-val { color: var(--text); }
+
+/* card di un grafico macro */
+.mg-tris { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+/* la leva e la stagionalità sono due grafici LARGHI: in tre colonne restava un buco e il
+   margin debt si leggeva in 300px */
+#mg-leva { grid-template-columns: 1fr; }
+.mg-card { min-width: 0; background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.mg-card.mg-wide { grid-column: 1 / -1; }
+.mg-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.mg-t { font-size: 12.5px; font-weight: 600; }
+.mg-v { font-family: var(--mono); font-size: var(--fs-num); font-weight: 700; white-space: nowrap; }
+.mg-v.pos { color: var(--green); } .mg-v.neg { color: var(--red); } .mg-v.warn { color: var(--yellow); }
+.mg-n { font-size: 11.5px; margin-top: 8px; line-height: 1.5; }
+
+/* i 34 riquadri storici: restano tutti, ma chiusi */
+.mg-tutti > summary {
+  cursor: pointer; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--card-2); font-size: 12.5px; font-weight: 600; list-style: none;
+  margin-bottom: 12px; transition: border-color var(--t-fast), background-color var(--t-fast);
+}
+.mg-tutti > summary:hover { border-color: var(--blue); }
+.mg-tutti > summary::-webkit-details-marker { display: none; }
+.mg-tutti > summary::before { content: "▸ "; color: var(--blue); font-weight: 700; }
+.mg-tutti[open] > summary::before { content: "▾ "; }
+
+@media (max-width: 560px) {
+  .obar-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "lab val" "bar bar"; row-gap: 3px; }
+  .obar-lab { grid-area: lab; } .obar-axis { grid-area: bar; } .obar-val { grid-area: val; }
+}
+
+/* v206 — barra della forza relativa dentro la cella (rsBar ora disegna davvero una barra) */
+.rs-cell { display: inline-flex; flex-direction: column; gap: 2px; min-width: 62px; }
+.rs-axis { position: relative; display: block; height: var(--bar-xs); background: var(--card-2); border-radius: 2px; }
+.rs-zero { position: absolute; left: 50%; top: -1px; bottom: -1px; width: 1px; background: var(--muted); opacity: .55; }
+.rs-fill { position: absolute; top: 0; height: var(--bar-xs); border-radius: 2px; }

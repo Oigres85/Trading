@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=205">
+<link rel="stylesheet" href="assets/style.css?v=206">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -82,14 +82,13 @@
     <div class="muted struct-note" id="conc-note"></div>
   </section>
 
-  <section class="card" data-pane="struttura">
-    <div class="card-head">
-      <h2>Mappa di correlazione</h2>
-      <span class="muted" id="corr-basis"></span>
-    </div>
-    <div id="corr-chart"></div>
-    <div class="muted struct-note" id="corr-note"></div>
-  </section>
+  <!-- v206 — MAPPA DI CORRELAZIONE RIMOSSA su decisione del CEO ("non la capisco e non ne
+       capisco l'utilità"). Era una matrice N×N: una forma che va imparata prima di essere
+       letta, e questa dashboard non può permetterselo. L'informazione NON è andata persa —
+       la correlazione media del book e la coppia più legata di ogni titolo restano nel
+       payload (METRICHE DI RISCHIO) e nelle colonne "Corr. media"/"Max corr" delle tabelle.
+       Rimossa con lei anche corr_matrix dalla pipeline: era nata per questo grafico e non
+       aveva altri consumatori. -->
 
   <section class="card" data-pane="struttura">
     <div class="card-head">
@@ -152,11 +151,48 @@
   </section>
 
   <!-- MACRO & MERCATI -->
+  <!-- ═══ v206 — MACRO IN GRAFICI ═════════════════════════════════════════════════════════
+       Prima questa scheda erano 34 riquadri della stessa forma (7 mini-card + 11 gauge +
+       16 tile), ognuno un numero con sotto un termometro 0-100 — e le serie storiche che il
+       file contiene (curva 501 punti, credito 260, VIX 30, margin debt 13) non erano
+       disegnate in dashboard, solo dentro i popup. Ora in cima ci sono tre domande; i 34
+       riquadri restano tutti, sotto, in un blocco richiudibile. -->
+  <section class="card" data-pane="macro">
+    <div class="card-head">
+      <h2>Rotazione — dove si muove il denaro</h2>
+      <div class="spark-toggle" id="rot-toggle" role="group" aria-label="Orizzonte della rotazione">
+        <button class="chip chip-active" data-rot="m1">1 mese</button>
+        <button class="chip" data-rot="m3">3 mesi</button>
+      </div>
+    </div>
+    <div class="struct-headline" id="mg-rot-head"></div>
+    <div id="mg-rot"></div>
+    <div class="muted struct-note" id="mg-rot-note"></div>
+  </section>
+
+  <section class="card" data-pane="macro">
+    <div class="card-head">
+      <h2>Termometri di stress</h2>
+      <span class="muted">curva dei tassi · credito · volatilità, con le loro soglie</span>
+    </div>
+    <div class="mg-tris" id="mg-stress"></div>
+  </section>
+
+  <section class="card" data-pane="macro">
+    <div class="card-head">
+      <h2>Leva e stagionalità</h2>
+      <span class="muted">quanto denaro a prestito c'è nel mercato, e che mese è</span>
+    </div>
+    <div class="mg-tris" id="mg-leva"></div>
+  </section>
+
   <section class="card" data-pane="macro">
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
     <div class="macro-actions">
       <button class="btn btn-primary btn-sm" id="macro-details" title="Tutti i dettagli macro in una sola pagina scorrevole">📖 Dettagli macro</button>
     </div>
+    <details class="mg-tutti" id="macro-riquadri">
+      <summary>Tutti i riquadri macro <span class="muted">— 34 indicatori, ciascuno cliccabile per il dettaglio</span></summary>
     <div class="mini-cards">
       <div class="mini-card" id="macroquant-box" tabindex="0" role="button" title="MacroQuant (stile BCA) — clicca per il dettaglio"></div>
       <div class="mini-card" id="signposts-box" tabindex="0" role="button" title="BofA Bear Market Signposts — clicca per il dettaglio"></div>
@@ -168,6 +204,7 @@
     </div>
     <div class="gauges" id="gauges"></div>
     <div class="macro-grid macro-grid-below" id="macro-grid"></div>
+    </details>
     <div class="macro-news">
       <div class="macro-news-head"><h3>News — portafoglio &amp; macro USA</h3><span class="muted">clicca la sintesi per tutte le notizie</span></div>
       <div id="news-summary" tabindex="0" role="button" title="Clicca per leggere tutte le notizie"></div>
@@ -446,6 +483,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=205"></script>
+<script src="assets/app.js?v=206"></script>
 </body>
 </html>

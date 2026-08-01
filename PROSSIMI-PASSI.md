@@ -1,4 +1,4 @@
-# Da dove ripartire — handoff del 01/08/2026 (dopo v205)
+# Da dove ripartire — handoff del 01/08/2026 (dopo v206)
 
 > Leggi anche `CLAUDE.md`, che contiene le regole d'ingaggio e i difetti già vissuti.
 
@@ -12,9 +12,9 @@
   serve qualcosa di disponibile *quando decide*, non un report periodico.
 - Ha guadagnato con questo metodo. Il sistema deve stargli **ai bordi**, non al centro.
 
-## Stato del sistema (v205)
+## Stato del sistema (v206)
 
-Tutti i gate verdi: **176 test JS** · red team 32 campagne · **pipeline 67 test** · coerenza 18
+Tutti i gate verdi: **177 test JS** · red team 32 campagne · **pipeline 63 test** · coerenza 18
 controlli su 15 classi · gate valuta · audit dati.
 
 **Rimossi di recente e da NON reintrodurre senza misurare:**
@@ -23,26 +23,32 @@ controlli su 15 classi · gate valuta · audit dati.
 - memoria storica e ciclo semiconduttori — mai girati con dati veri
 - barra di stato e coda decisioni
 
-## ✅ FATTO in v205: la rimodulazione grafica
+## ✅ FATTO in v205 + v206: la rimodulazione grafica
 
-Barra laterale con le macro-sezioni, centro con i grafici. La scheda **Struttura** è quella
-d'ingresso (una sola volta, e mai sopra una preferenza già espressa).
+**v205 — struttura del libro.** Barra laterale con le macro-sezioni, centro con i grafici. La
+scheda **Struttura** è quella d'ingresso. Niente grafici di prezzo (li fanno meglio investing.com
+e TradingView in tempo reale): ci sono i grafici che solo noi possiamo fare perché solo noi
+conosciamo il libro — concentrazione peso-vs-rischio, deriva, allocazione, distanza dagli stop.
 
-Nessun grafico di prezzo, per la ragione concordata: i dati arrivano su cron e investing.com e
-TradingView li fanno meglio in tempo reale. Ci sono i cinque grafici che **solo noi** possiamo
-fare, perché solo noi conosciamo il libro:
+**v206 — macro, tabelle e restyling.**
+- **Mappa di correlazione RIMOSSA** su tua richiesta, insieme a `corr_matrix` nella pipeline che
+  esisteva solo per lei. La correlazione media e la coppia più legata restano nel payload e nelle
+  colonne delle tabelle: non hai perso il dato, hai perso la matrice.
+- **Macro in grafici.** Erano 34 riquadri identici (un numero + un termometro 0-100 ciascuno).
+  Ora in cima: *Rotazione* (21 ETF, accesi i settori in cui hai i soldi — oggi Semiconduttori
+  −12,9% a un mese col 75% del capitale sopra, mentre guida Energia +12,8% dove non sei),
+  *Termometri di stress* (curva 10A-2A, credito HY, VIX, ognuno con le sue soglie disegnate),
+  *Leva e stagionalità* (margin debt sul massimo storico, +49% in un anno). I 34 riquadri restano
+  tutti sotto, in un blocco richiudibile.
+- **Tabelle: meno numeri, più grafici.** Oggi, Guad. %, Target Δ e Drawdown hanno una barra di
+  fondo su scala condivisa fra le righe; RS 1M e RS NDX una barra divergente dallo zero; Financial
+  Health una barra 0-100. Le cifre restano tutte.
+- **Restyling.** Cinque variabili CSS erano usate 27 volte e mai definite (quattro dichiarazioni
+  cadevano in silenzio); `.btn-ghost` usata 28 volte e mai definita; NAV e P&L si leggevano a 15px
+  contro i 21px di altri titoli. Sistemati, insieme a transizioni, focus visibile, scrollbar,
+  `prefers-reduced-motion` e l'unificazione dei colori scritti a mano.
 
-1. **Concentrazione** — peso contro quota di varianza (MCR), barre affiancate, ordinate per
-   rischio, con lo scarto in evidenza. Oggi: MU 26,0% del capitale → 39,9% del rischio (+13,9 pp).
-2. **Mappa di correlazione** — heatmap di tutte le coppie. Oggi la più legata è AMD–MU a 0,66.
-3. **Deriva della concentrazione** — MCR dei primi quattro nel tempo + linea Top-3.
-4. **Allocazione** — settore / valuta, con l'esposizione al dollaro non coperta.
-5. **Distanza dallo stop** — barre divergenti dallo zero, i violati a sinistra.
-
-In cima, tre numeri grandi: rischio nei primi 3, massimo scarto, stop violati. Sono le voci che,
-se cambiano, cambiano cosa puoi fare oggi.
-
-Il payload è rimasto **identico al byte**: la vista legge, non scrive, e c'è un check che lo prova.
+Il payload è rimasto **identico**: le viste leggono, non scrivono, e c'è un check che lo prova.
 
 ## Flusso d'uso previsto
 
@@ -57,16 +63,21 @@ all'apertura del cash → prosegue su TradingView.
 
 ## Da dove ripartire
 
-- **La matrice di correlazione a 12 mesi arriva al primo run del CI.** Finché non arriva, la
-  mappa la calcola in locale su 6 mesi e lo dichiara. Al prossimo run di `update-data.yml`
-  verificare che l'avviso "Base a 6 mesi" sparisca da solo: se resta, `corr_matrix` non è
-  finita in `data.json` e va capito perché.
-- **Quattro grafici su cinque leggono numeri già nel payload, la deriva no.** Se serve, la
-  deriva della concentrazione è l'unico contenuto della vista che l'LLM non riceve.
-- **Il gate dei test era spento e ora non lo è più** (vedi CLAUDE.md, sezione v205): i check
-  dopo il blocco `report` erano contati ma non facevano fallire la CI. Se in futuro si aggiunge
-  un gruppo di check in fondo a `test_app.mjs`, il blocco `report` deve restare l'ultima cosa
-  del file.
+- **Difetti trovati mappando e NON ancora sistemati** (nessuno è urgente, tutti reali):
+  - `miniDualChart` disegna **per indice, non per data**: nel popup "Fed Funds vs S&P" si
+    sovrappongono 60 punti *mensili* e 60 punti *giornalieri* sotto il titolo "ultimi 5 anni".
+    Stesso problema in "Disaccoppiamento" e "Profitti reali". Sono grafici che oggi ingannano.
+  - `macro.sp500_pe.history` ha **un solo punto**: il popup promette "storico 10 anni" e mostra
+    "Storico non disponibile".
+  - Il popup FedWatch mostra solo la colonna **Taglio** mentre i dati portano anche `hike_prob`
+    (2% e 26%): è la classe C14 già corretta nel payload in v187, sopravvissuta nella UI.
+  - `#market-direction` e `#tracking-error-box` **non esistono in index.html**: `renderMiniCards`
+    produce contenuto valido che nessuno vede.
+  - `macro.momentum`, `macro.froth`, `macro.breadth`, `macro.futures` finiscono nel prompt per
+    l'LLM e **non sono mai mostrati** in dashboard.
+- **Il gate dei test era spento fino a v205** (i check dopo il blocco `report` erano contati ma
+  non facevano fallire la CI). Se aggiungi un gruppo di check in fondo a `test_app.mjs`, il
+  blocco `report` deve restare l'ultima cosa del file.
 
 ## Osservazione utile emersa dalle sue schermate
 
