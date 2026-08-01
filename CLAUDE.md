@@ -454,6 +454,27 @@ successo tre volte**.
 Se fra un mese, con ~25 osservazioni invece di 7, la misura fosse positiva, si rimette con un
 commit. La decisione è reversibile; l'ancoraggio che produceva no.
 
+## ⛔ Tre tagli, tre vicini portati via (v201-v204) — e la guardia che ne è nata
+
+In un'ora, tre operazioni di rimozione hanno preso con sé un elemento **vicino** a quello che
+dovevano togliere:
+
+1. **v200 → v201**: togliendo il verdetto è sparita la **concentrazione di fattore**, che viveva
+   dentro `dv.reasons`. Era il fatto di rischio più importante del book.
+2. **v203**: rimuovendo memoria storica ho tolto da C12 **cinque fatti** che appartenevano al
+   taglio v184 e sono ancora tutti nel payload.
+3. **v204**: rimuovendo barra di stato e coda decisioni è sparita la **navigazione a schede**, che
+   stava fisicamente fra i due blocchi.
+
+**L'attenzione non basta**: tutte e tre le volte stavo attento, e tutte e tre le volte l'ho
+scoperto solo verificando dopo. Da qui la guardia `v204 struttura`: un elenco di elementi portanti
+di `index.html` che devono esistere, e che si rompe rumorosamente se una rimozione ne prende uno.
+Validata togliendo le schede e verificando che le nomini.
+
+**Regola operativa**: quando si toglie un CONTENITORE (un blocco di `lines.push`, una porzione di
+HTML fra due marcatori, un array di configurazione), elencare PRIMA cosa ci sta dentro e cosa sta
+in mezzo. La ricevuta del taglio va scritta prima di tagliare, non dopo aver visto cosa manca.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

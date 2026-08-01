@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=203">
+<link rel="stylesheet" href="assets/style.css?v=204">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -45,14 +45,11 @@
   <!-- ALERT QUALITÀ DATI MACRO (data assertions: dati datati o implausibili) -->
   <div id="dataquality-alert" hidden></div>
 
-  <!-- ═══ v198 — BARRA DI STATO: le sei cose che cambiano una decisione, sempre visibili.
-       Prima erano sepolte dentro l'executive brief e dentro blocchi lunghi: un terminale le
-       tiene in testa perche' sono i VINCOLI, non i dettagli. -->
-  <div class="statusbar" id="statusbar" aria-label="Stato del fondo"></div>
-
-  <!-- ═══ v198 — CODA DELLE DECISIONI: solo cio' che richiede un'azione oggi. Se e' vuota,
-       lo dice — "niente da decidere" e' un'informazione, non uno spazio bianco. -->
-  <section class="card decision-queue" id="decision-queue" hidden></section>
+  <!-- v204 — BARRA DI STATO e CODA DELLE DECISIONI rimosse su decisione del CEO.
+       Erano nate in v198 per dare gerarchia alla pagina. I dati che portavano NON sono andati
+       persi: stop violati, veti, budget, concentrazione di fattore e leva restano nel payload
+       (blocco FILTRI QUANTITATIVI e METRICHE DI RISCHIO) e nelle tabelle; NAV e P&L nei
+       riquadri del patrimonio qui sotto. Spariva la ripetizione, non l'informazione. -->
 
   <nav class="tabs" id="main-tabs" role="tablist" aria-label="Sezioni">
     <button class="tab tab-active" data-tab="portafoglio" role="tab">Portafoglio</button>
@@ -383,6 +380,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=203"></script>
+<script src="assets/app.js?v=204"></script>
 </body>
 </html>

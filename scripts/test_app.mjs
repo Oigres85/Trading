@@ -1274,5 +1274,29 @@ for (const [name, ok] of T) {
 }
 
 
+/* ---------- v204: STRUTTURA MINIMA DELLA PAGINA (guardia anti-taglio) ----------
+   Tre volte in un'ora un taglio ha portato via un elemento VICINO a quello che doveva togliere:
+   la concentrazione di fattore (viveva dentro i motivi del verdetto), cinque fatti di C12
+   (stavano nello stesso array), la barra delle schede (stava fra i due blocchi rimossi).
+   L'attenzione non basta: serve un elenco di elementi che devono ESISTERE, e che si rompe
+   rumorosamente se un'operazione di rimozione ne prende uno per sbaglio. */
+{
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const richiesti = [
+    ["navigazione a schede", 'id="main-tabs"'],
+    ["tabella portafoglio", 'id="ptf-table"'],
+    ["tabella watchlist", 'id="wl-table"'],
+    ["griglia macro", 'id="macro-grid"'],
+    ["mini-card macro", 'class="mini-cards"'],
+    ["bottone dettagli macro (topbar)", 'id="btn-macro-top"'],
+    ["riquadri patrimonio", 'id="kpi-grid"'],
+    ["parametri di rischio", 'id="risk-params-card"'],
+    ["modale grafico/pannelli", 'id="chart-modal"'],
+  ];
+  const mancanti = richiesti.filter(([, sel]) => !html.includes(sel)).map(([n]) => n);
+  check("v204 struttura: nessun elemento portante è sparito da index.html", mancanti.length === 0);
+  if (mancanti.length) console.log("  ⚠ elementi portanti mancanti:", mancanti.join(", "));
+}
+
 console.log(`\n${T.length - fail}/${T.length} check superati`);
 process.exit(fail ? 1 : 0);

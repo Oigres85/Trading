@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "203";
+const BUILD_VERSION = "204";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -699,7 +699,7 @@ function mergeManualHoldings() {
       const row = placeholderRow(h.ticker, h.currency || "USD", { qty: h.qty, pmc: h.pmc, name: h.name || h.ticker });
       const btpIdx = DATA.portfolio.findIndex(p => p.ticker === "BTP-V28");
       if (btpIdx >= 0) DATA.portfolio.splice(btpIdx, 0, row); else DATA.portfolio.push(row);
-      fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderAllocation(); });
+      fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); });
       added = true;
     });
     if (added) recomputeTotals();
@@ -716,8 +716,8 @@ function addPortfolio() {
   // aggiunta ottimistica: la riga compare subito, i dati completi arrivano col workflow
   const row = placeholderRow(ticker, "USD", { qty, pmc });
   DATA.portfolio.splice(DATA.portfolio.length - 1, 0, row);   // prima del BTP
-  renderTable(); recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderAllocation();
-  fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderAllocation(); });
+  renderTable(); recomputeTotals(); renderKPI(); renderAllocation();
+  fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); });
   // persistenza locale (sopravvive al reload anche senza token)
   saveManualHolding({ ticker, name: ticker, qty, pmc, currency: "USD" });
   toast(`${ticker} aggiunto al portafoglio ✓`);
@@ -775,7 +775,7 @@ function openEditPortfolio() {
     });
     const nc = parseFloat($("#edp-cash").value) || 0;
     if (nc !== cashEur) { cashEur = nc; localStorage.setItem("cash_eur", cashEur); changed = true; }
-    recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderAllocation(); renderCash();
+    recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); renderCash();
     closeChartModal();
     toast(changed ? "Portafoglio aggiornato ✓" : "Nessuna modifica");
     if (changed) {
@@ -843,7 +843,7 @@ function removeHolding(section, ticker) {
   if (!window.confirm(`Rimuovere ${ticker} da ${section === "portfolio" ? "portafoglio" : "watchlist"}?`)) return;
   // rimozione ottimistica immediata
   DATA[section] = (DATA[section] || []).filter(p => p.ticker !== ticker);
-  if (section === "portfolio") { removeManualHolding(ticker); recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderAllocation(); }
+  if (section === "portfolio") { removeManualHolding(ticker); recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); }
   else renderWatchlist();
   toast(`${ticker} rimosso ✓`);
   editHoldings(section, cfg => {
@@ -948,7 +948,7 @@ async function livePrices() {
   (DATA.watchlist || []).forEach(upd);
   recomputeTotals();
   refreshShockClient();         // ricalcola lo shock dai prezzi live (KOSPI/futures) — coglie crolli/recuperi
-  renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderWatchlist(); renderAllocation(); renderShockAlert();
+  renderKPI(); renderTable(); renderWatchlist(); renderAllocation(); renderShockAlert();
   const el = $("#live-badge");
   if (el) el.textContent = `Prezzi live: ${new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
 }
@@ -968,7 +968,7 @@ function renderAll() {
   }
   recomputeTotals();            // include la liquidità nei totali/allocazione
   renderCash();
-  renderKPI(); renderStatusBar(); renderDecisionQueue();
+  renderKPI();
   renderAllocation();
   renderEarnings();
   renderEarningsAlert();
@@ -1447,7 +1447,7 @@ function saveCash() {
   cashEur = parseFloat($("#cash-input").value) || 0;
   localStorage.setItem("cash_eur", cashEur);
   recomputeTotals();
-  renderCash(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderAllocation();
+  renderCash(); renderKPI(); renderAllocation();
   toast("Liquidità salvata ✓");
 }
 
@@ -1645,7 +1645,7 @@ function aggiornaPortafoglioLocale(tk, acquisto, q, px) {
   // ricalcolo e ridisegno TUTTO cio' che dipende dalle posizioni: e' la parte "devono essere
   // correlate" della richiesta — tabelle, KPI e torta dell'allocazione da una sola fonte.
   try { recomputeTotals(); } catch { /* dati incompleti: la pipeline riallinea */ }
-  try { renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderWatchlist(); renderAllocation(); } catch (e) { console.error(e); }
+  try { renderKPI(); renderTable(); renderWatchlist(); renderAllocation(); } catch (e) { console.error(e); }
 }
 
 function saveDiaryEntry(text, op) {
@@ -3097,98 +3097,8 @@ function openSignpostsModal() {
 }
 
 /* ---------------- KPI ---------------- */
-/* ═══════════ v198 — BARRA DI STATO E CODA DELLE DECISIONI ═══════════════════════════
-   Il problema che risolvono: la dashboard e' cresciuta per accumulo e metteva 38 colonne, 37
-   pannelli e una griglia da 16 voci tutti allo STESSO livello di importanza. Un terminale non e'
-   piu' denso — e' piu' gerarchico: davanti sta cio' che vincola una decisione, il resto e' a un
-   tasto. Nessun dato viene rimosso: cambia solo che cosa e' in primo piano.
-   Le sei voci della barra sono scelte per un criterio preciso: sono quelle che, se cambiano,
-   cambiano cosa puoi fare oggi. Budget, stop violati, concentrazione di fattore e leva di
-   mercato non erano visibili senza scorrere, ed erano i quattro vincoli piu' forti del book. */
-function renderStatusBar() {
-  const el = $("#statusbar");
-  if (!el || !DATA || !DATA.totals) return;
-  const t = DATA.totals, dv = (() => { try { return decisionVerdict(); } catch { return null; } })();
-  const m = DATA.macro || {};
-  const nav = t.eur_value != null ? fmtEUR.format(Math.round(t.eur_value)) : "—";
-  const gg = t.eur_gain_pct;
-  const bud = t.budget_operativo_spendibile;
-  const stopV = (dv?.stopViolations || []).length;
-  const fattore = dv?.factorRisk;
-  const md = m.margin_debt || {};
-  const vix = m.vix?.value;
-  const sess = (() => { try { return usSessionInfo().phase; } catch { return null; } })();
-  const FASI = { regular: ["SESSIONE APERTA", "ok"], "pre-market": ["PRE-MARKET", "warn"],
-                 "after-hours": ["AFTER-HOURS", "warn"], notte: ["MERCATI CHIUSI", "off"], weekend: ["WEEKEND", "off"] };
-  const [fase, faseCls] = FASI[sess] || ["—", "off"];
-
-  // ogni voce: etichetta breve, valore, e una classe che dice se e' un VINCOLO attivo
-  const voci = [
-    { k: "NAV", v: nav, cls: "" },
-    { k: "P&L", v: gg != null ? signTxt(gg) : "—", cls: gg > 0 ? "ok" : gg < 0 ? "bad" : "" },
-    { k: "Budget", v: bud != null ? fmtEUR.format(Math.round(bud)) : "—",
-      cls: bud === 0 ? "bad" : bud != null && bud < 5000 ? "warn" : "ok",
-      nota: bud === 0 ? "nessun acquisto eseguibile" : null },
-    { k: "Stop violati", v: String(stopV), cls: stopV > 0 ? "bad" : "ok" },
-    { k: "Concentr. fattore", v: fattore ? `${fmtNum.format(fattore.mcr)}% var.` : "—",
-      cls: fattore ? "bad" : "ok",
-      nota: fattore ? `${fattore.name}: ${fmtNum.format(fattore.mcr)}% della varianza con ${fmtNum.format(fattore.w)}% del NAV (${(fattore.tk || []).join(", ")})` : null },
-    { k: "Leva mercato", v: md.pct_of_peak != null ? `${md.pct_of_peak}% del picco` : "—",
-      cls: md.pct_of_peak >= 95 ? "bad" : md.pct_of_peak >= 85 ? "warn" : "ok" },
-    { k: "VIX", v: vix != null ? fmtNum.format(vix) : "—", cls: vix > 25 ? "bad" : vix > 20 ? "warn" : "ok" },
-    { k: "Sessione", v: fase, cls: faseCls },
-  ];
-  el.innerHTML = voci.map(v =>
-    `<div class="sb-item sb-${v.cls}"${v.nota ? ` title="${esc(v.nota)}"` : ""}>
-       <span class="sb-k">${v.k}</span><span class="sb-v">${v.v}</span>
-       ${v.nota ? `<span class="sb-n">${esc(v.nota)}</span>` : ""}
-     </div>`).join("");
-}
-
-/* Coda delle decisioni: le stesse posizioni che il payload elenca sotto "POSIZIONI CHE CHIEDONO
-   UNA DECISIONE OGGI", ma in cima e cliccabili. La fonte e' decisionVerdict(), la stessa del
-   prompt: una sola verita' per la dashboard e per l'LLM. */
-function renderDecisionQueue() {
-  const el = $("#decision-queue");
-  if (!el) return;
-  let dv = null;
-  try { dv = decisionVerdict(); } catch { /* dati incompleti */ }
-  if (!dv) { el.hidden = true; return; }
-  const eurusd = DATA.eurusd || 1.08;
-  const val = (r) => r.val_eur > 0 ? r.val_eur : (r.qty * r.price) / eurusd;
-  const righe = [];
-  for (const sv of (dv.stopViolations || [])) {
-    const r = sv.r;
-    if (!r) continue;
-    righe.push({ tk: r.ticker, motivo: `stop violato · ${sv.stop != null ? cur(r) + fmtNum.format(sv.stop) : "—"} contro ${cur(r)}${fmtNum.format(r.price)}`,
-                 grave: true, val: val(r), r });
-  }
-  for (const x of (dv.excluded || [])) {
-    const r = x.r;
-    if (!r || !r.qty) continue;                                  // solo posizioni DETENUTE
-    if (righe.some(y => y.tk === r.ticker)) continue;             // gia' in coda per lo stop
-    if ((x.strength || "").toUpperCase() !== "FORTE") continue;   // i veti deboli non sono urgenze
-    righe.push({ tk: r.ticker, motivo: `veto FORTE · ${((x.why || [])[0] || "value trap").replace(/\s*\(.*$/, "")}`,
-                 grave: false, val: val(r), r });
-  }
-  if (!righe.length) {
-    el.hidden = false;
-    el.innerHTML = `<div class="dq-head"><h2>Decisioni di oggi</h2></div>
-      <div class="dq-vuota">Nessuna posizione richiede una decisione oggi: nessuno stop violato, nessun veto forte su titoli detenuti.</div>`;
-    return;
-  }
-  righe.sort((a, b) => (b.grave - a.grave) || (b.val - a.val));
-  el.hidden = false;
-  el.innerHTML = `<div class="dq-head"><h2>Decisioni di oggi</h2><span class="dq-n">${righe.length}</span></div>
-    <div class="dq-list">${righe.map(x => `
-      <button class="dq-row${x.grave ? " dq-grave" : ""}" data-dq="${esc(x.tk)}">
-        <span class="dq-tk">${esc(x.tk)}</span>
-        <span class="dq-motivo">${esc(x.motivo)}</span>
-        <span class="dq-val">${fmtEUR.format(Math.round(x.val))}</span>
-        <span class="dq-go">apri ›</span>
-      </button>`).join("")}</div>`;
-}
-
+/* v204 — renderStatusBar/renderDecisionQueue RIMOSSE (decisione CEO). I dati che mostravano
+   restano tutti nel payload e nelle tabelle: era una vista, non una fonte. */
 function renderKPI() {
   const t = DATA.totals;
   const b = DATA.broker;
@@ -4922,7 +4832,7 @@ function editPosition(ticker) {
     r.value = r.price * qty; r.gain = r.value - pmc * qty;
     r.gain_pct = Math.round((r.value / (pmc * qty) - 1) * 10000) / 100;
   }
-  recomputeTotals(); renderKPI(); renderStatusBar(); renderDecisionQueue(); renderTable(); renderAllocation();
+  recomputeTotals(); renderKPI(); renderTable(); renderAllocation();
   toast(`${ticker} aggiornato — salvo nel repo…`);
   editHoldings("portfolio", cfg => {
     const p = (cfg.portfolio || []).find(x => x.ticker === ticker);
@@ -7862,11 +7772,6 @@ document.addEventListener("click", (e) => {
   if (op) { openOptionsModal(op.dataset.cardOpt); return; }
 });
 
-/* v198 — la coda delle decisioni apre la scheda del titolo: un clic dalla segnalazione al dato */
-document.addEventListener("click", (e) => {
-  const row = e.target.closest("[data-dq]");
-  if (row) openStockCard(row.dataset.dq);
-});
 
 /* v198 — interruttore compatta/completa */
 document.addEventListener("click", (e) => {
