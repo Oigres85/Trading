@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "201";
+const BUILD_VERSION = "202";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7890,6 +7890,10 @@ setInterval(() => livePrices(), 60 * 1000);
 
 /* v188 — comandi delle personalizzazioni */
 $("#macro-details")?.addEventListener("click", () => openMacroDetails());
+// v202: stesso pannello dalla topbar, visibile da ogni scheda. Spostare la macro dietro una
+// scheda l'aveva resa irraggiungibile da tutte le altre — e per l'utente "non trovabile" e'
+// indistinguibile da "non c'e'".
+$("#btn-macro-top")?.addEventListener("click", () => openMacroDetails());
 $("#ptf-cols")?.addEventListener("click", () => openColumnPicker("ptf-table", "Portafoglio", renderTable));
 $("#wl-cols")?.addEventListener("click", () => openColumnPicker("wl-table", "Watchlist", renderWatchlist));
 document.addEventListener("click", (e) => {
