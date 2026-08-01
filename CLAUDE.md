@@ -315,36 +315,23 @@ documento prima di toccare l'overlay.** Il colpevole è quasi sempre altrove nel
 - **Curva 10A-2A**: "dis-inversione in corso" era incondizionato, con l'ultima inversione a 469
   sedute (~22 mesi). Ora la distanza decide la frase e il numero di sedute è scritto accanto.
 
-## 🕰️ Narrazione temporale (v194) — `scripts/historical_context.py`
+## 🗑️ Memoria storica e ciclo semiconduttori: RIMOSSI (v203)
 
-La dimensione che mancava: il payload sapeva il LIVELLO di un indicatore, non la sua storia.
-Tre misure, **in ordine di solidità decrescente, e l'ordine è scritto nel payload** perché non
-valgono uguale:
+Erano gli unici due blocchi **mai girati con dati veri**: FRED non risponde dall'ambiente di
+sviluppo, quindi logica (22 test) e rendering (dati simulati) erano provati, la **fetch** no.
 
-1. **Percentile** sulla serie completa — è una descrizione, non una previsione. Solidissimo.
-2. **Durata del regime** — da quante osservazioni siamo in questo stato, e quanto sono durati
-   gli episodi passati. L'episodio in corso è ESCLUSO dalla mediana: non è ancora finito.
-3. **Episodi analoghi** — il più interessante e il più fragile. Sotto 3 episodi conclusi **non
-   si pubblica alcuna mediana**, e il campione è sempre dichiarato.
+E uno dei due lo dimostrava: scorte/spedizioni a **2,16** quando il rapporto di settore sta
+intorno a 1,3–1,5 — quasi certamente la serie sbagliata fra i candidati provati da
+`prima_che_risponde()`. **Pubblicare un percentile su una serie che non è quella che dichiari è
+peggio che non pubblicarlo**: dà l'autorità di un dato storico a un numero che non lo è.
 
-Le funzioni sono **pure** (liste di coppie in ingresso) proprio per poterle provare senza rete:
-la fetch FRED la fa la pipeline in CI, la correttezza la verificano 22 test locali.
+Rimossi insieme: `storia_lunga()`, `ciclo_semiconduttori()`, `scripts/historical_context.py` e i
+suoi test. Non servivano ad altro.
 
-⚠️ **La guardia che conta.** Provando il motore sui dati veri ha prodotto "mediana +50,7% a 63
-giorni": la serie del credito era datata, l'indice era una spark con etichette sintetiche, e
-l'allineamento per data pescava a caso. È lo stesso difetto di `backtest_signals` con le
-granularità miste — **la forma più pericolosa, perché produce un numero plausibile invece di un
-errore**. `_dominio_compatibile` ora rifiuta di calcolare quando le due serie non vivono sullo
-stesso asse temporale, e restituisce il MOTIVO invece di un numero.
-
-Corollario sui test: la prima suite usava etichette sintetiche ed era verde su una configurazione
-che in produzione non esiste. I test ora usano **date vere**, come i dati.
-
-**C2 leggeva anche la testata.** La frase "a mercati chiusi i prezzi sono FERMI" è un'istruzione
-generica, non lo stato di adesso: a borsa aperta C2 dichiarava il mercato chiuso e segnalava una
-riga VIX corretta. Ora legge solo la coda — e il confine è la RIGA `^CONTESTO DI SESSIONE (ora ET`,
-non la parola, perché la testata *nomina* quella sezione ("Leggi CONTESTO DI SESSIONE prima di
-tutto") e tagliare alla prima occorrenza lasciava dentro tutto.
+⚠️ Nel farlo ho tolto da C12 cinque fatti (ΔRS, ΔMCR, ΔSharpe, MCR Top-3, term structure) che
+**non appartenevano a questi blocchi** — erano la ricevuta del taglio v184 e sono tutti ancora nel
+payload. Ripristinati. **Togliere una guardia mentre si toglie una funzionalità è il modo più
+rapido di perdere la protezione senza accorgersene.**
 
 ## 🔬 Ciclo dei semiconduttori (v195) — dall'analisi video del CEO
 

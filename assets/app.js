@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "202";
+const BUILD_VERSION = "203";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6404,64 +6404,16 @@ function buildPrompt() {
     const yr = m.yield_recession;
     lines.push(`- Curva vs Recessione (storico FRED): spread 10A-2A ${yr.current_curve != null ? (yr.current_curve > 0 ? "+" : "") + yr.current_curve + " pp (chiusura daily, stessa lettura delle righe sopra)" : "—"}${yr.curve_12m_ago != null ? ` (12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago}, media mensile del modello storico)` : ""}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. ${yr.steepening ? "NB: la curva si sta IRRIPIDENDO dopo l'inversione — storicamente questa configurazione ha preceduto una recessione entro ~12 mesi (la curva shiftata di 12m anticipa il calo del PIL)." : `NB: la curva NON si sta irripidendo (oggi ${yr.current_curve} contro ${yr.curve_12m_ago} di 12 mesi fa): la regola \"irripidimento post-inversione → recessione entro ~12 mesi\" NON è attiva adesso, e va citata solo se e quando lo diventa.`}`);
   }
-  // ═══ v195 — CICLO DEI SEMICONDUTTORI. Il book e' per oltre meta' in semi e per l'86% della
-  // sua varianza: la domanda che conta non e' se quei titoli siano cari (il P/E forward del
-  // settore sta sotto quello del mercato) ma se il CICLO stia girando. Il rapporto
-  // SCORTE/SPEDIZIONI e' l'anticipatore storico: quando scende la domanda eccede l'offerta;
-  // quando comincia a RISALIRE, i ricavi del settore hanno storicamente girato entro l'anno.
-  // Si pubblica la DIREZIONE oltre al livello, perche' e' la curva a dare il segnale.
-  const cs = m.ciclo_semi;
-  if (cs && (cs.inv_ship || cs.produzione)) {
-    lines.push("");
-    lines.push("CICLO DEI SEMICONDUTTORI (indicatori d'industria, non di prezzo — il book ha qui la sua concentrazione):");
-    if (cs.inv_ship) {
-      const i = cs.inv_ship;
-      lines.push(`- Scorte/spedizioni prodotti informatici ed elettronici: ${fmtNum.format(i.valore)} (rilevazione ${i.data}, serie FRED ${i.serie})`
-        + ` · percentile ${i.percentile}° su ${i.osservazioni} osservazioni dal ${String(i.dal).slice(0, 4)}`
-        + ` · direzione ultime rilevazioni: ${i.direzione}${i.delta_3 != null ? ` (Δ ${i.delta_3 > 0 ? "+" : ""}${fmtNum.format(i.delta_3)})` : ""}`
-        + ` — LETTURA DI QUESTO VALORE: al ${i.percentile}° percentile il rapporto è ${i.percentile >= 70 ? "ALTO (scorte abbondanti rispetto alle spedizioni: è la configurazione di domanda DEBOLE, non di penuria)" : i.percentile <= 30 ? "BASSO (domanda che eccede l'offerta)" : "in zona intermedia"}. Il segnale storicamente rilevante è la RISALITA del rapporto, che ha preceduto l'inversione dei ricavi di settore.`);
-    }
-    if (cs.produzione) {
-      const p2 = cs.produzione;
-      lines.push(`- Produzione industriale di semiconduttori: ${fmtNum.format(p2.valore)} (${p2.data}, serie FRED ${p2.serie})`
-        + `${p2.yoy != null ? ` · YoY ${p2.yoy > 0 ? "+" : ""}${fmtNum.format(p2.yoy)}%` : ""}`
-        + ` · percentile ${p2.percentile}° su ${p2.osservazioni} osservazioni dal ${String(p2.dal).slice(0, 4)}`);
-    }
-  }
-  // ═══ v194 — MEMORIA STORICA: dove siamo rispetto al passato, e le altre volte com'e' andata.
-  // E' la dimensione che mancava: il payload sapeva il LIVELLO di un indicatore e non la sua
-  // storia. Tre misure in ordine di solidita' DECRESCENTE, e l'ordine e' scritto perche' non
-  // valgono uguale: percentile (descrizione, solidissimo), durata del regime (solido), episodi
-  // analoghi (il piu' interessante e il piu' fragile — pochi e sovrapposti).
-  // Il campione e' SEMPRE dichiarato e sotto i 3 episodi non si pubblica alcuna mediana: su
-  // questo materiale un numero senza il suo campione e' peggio di nessun numero.
-  const sto = m.storia;
-  if (sto && Object.keys(sto).some(k => !k.startsWith("_"))) {
-    lines.push("");
-    lines.push(`MEMORIA STORICA (serie lunghe FRED · rendimenti successivi misurati su ${sto._indice || "indice"}):`);
-    for (const [k, r] of Object.entries(sto)) {
-      if (k.startsWith("_") || !r || !r.nome) continue;
-      const an = r.analoghi || {};
-      // arrotondamento e virgola decimale come nel resto del payload: un "-1.5043880301940324pp"
-      // e' matematicamente giusto e illeggibile, e la leggibilita' qui e' parte del dato.
-      const nv = (x, d = 2) => x == null ? "—" : fmtNum.format(Math.round(x * Math.pow(10, d)) / Math.pow(10, d));
-      const bits = [`${r.nome}: ${nv(r.valore)}${r.unita || ""}`,
-        `percentile ${r.percentile}° su ${r.osservazioni} osservazioni dal ${String(r.dal || "").slice(0, 4)}`];
-      bits.push(r.durata_stato > 0
-        ? `stato "${r.stato}" da ${r.durata_stato} osservazioni (dal ${r.stato_da})`
-        : `NON è nello stato "${r.stato}" adesso`);
-      if (r.durata_mediana_episodi_passati) bits.push(`durata mediana degli episodi passati: ${r.durata_mediana_episodi_passati} osservazioni`);
-      let coda = "";
-      if (an.non_calcolabile) coda = ` · episodi analoghi NON calcolabili (${an.non_calcolabile})`;
-      else if (!an.sufficiente) coda = ` · solo ${an.n} episodio/i concluso/i nella serie: campione insufficiente, nessuna mediana pubblicata`;
-      else {
-        const med = [63, 126, 252].filter(g => an[`mediana_${g}`] != null)
-          .map(g => `${g}g ${an[`mediana_${g}`] > 0 ? "+" : ""}${nv(an[`mediana_${g}`], 1)}% (su ${an[`n_${g}`]} episodi)`);
-        coda = ` · ${an.n} episodi passati · mediana dell'indice dopo l'ingresso nello stato: ${med.join(" · ")}`;
-      }
-      lines.push(`- ${bits.join(" · ")}${coda}`);
-    }
-  }
+  // ═══ v203 — MEMORIA STORICA e CICLO DEI SEMICONDUTTORI: RIMOSSI su decisione del CEO.
+  // Erano gli unici due blocchi che non avevano MAI girato con dati veri: FRED non risponde
+  // dall'ambiente di sviluppo, quindi logica e rendering erano provati (22 test + dati
+  // simulati) ma la FETCH no. E uno dei due lo dimostrava: scorte/spedizioni a 2,16 quando il
+  // rapporto di settore sta intorno a 1,3-1,5, cioe' quasi certamente la serie sbagliata fra i
+  // candidati provati. Pubblicare un percentile su una serie che non e' quella che dichiari e'
+  // peggio che non pubblicarlo: da' l'autorita' di un dato storico a un numero che non lo e'.
+  // Con loro se ne va anche tutto il codice FRED a serie lunghe (storia_lunga,
+  // ciclo_semiconduttori, historical_context.py e i suoi test): non serviva ad altro.
+
   // v186 — FedWatch mostra il ramo ATTIVO, non solo i tagli. "prob. taglio 0%" era vero e
   // inutile: a fine luglio 2026 il mercato prezzava un RIALZO al 38% e il payload taceva.
   // In più: quando Polymarket quota lo stesso evento con un numero diverso, la divergenza è
