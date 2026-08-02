@@ -1610,3 +1610,10 @@ body {
 .mg-card.mg-click { cursor: pointer; }
 .mg-card.mg-click:hover { border-color: var(--blue); transform: translateY(-1px); }
 .mg-card.mg-click:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* v215 — barre cliccabili della classifica indicatori + crosshair sui grafici */
+.obar-row.obar-click { cursor: pointer; }
+.obar-row.obar-click:hover { background: var(--blue-wash); border-color: rgba(76,141,255,.35); }
+.obar-row.obar-click:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+svg.g-serie { cursor: crosshair; }
+.gs-hover { pointer-events: none; }

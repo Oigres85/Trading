@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "214";
+const BUILD_VERSION = "215";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3580,7 +3580,14 @@ function graficoSerie(serie, opt = {}) {
   const ultimo = [...s[0].punti].reverse().find(p => p && p.v != null);
   const [xSx, xDx] = opt.assex || [primo && primo.d != null ? dataBreve(primo.d, lunga) : "",
     ultimo && ultimo.d != null ? dataBreve(ultimo.d, lunga) : ""];
-  return `<svg class="g-serie" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.aria || "serie storica")}">
+  // v215 — INTERATTIVITÀ: i punti viaggiano nell'SVG come dati, così il crosshair li legge
+  // senza ricalcolare nulla e senza che il grafico debba essere ridisegnato al passaggio.
+  const datiHover = JSON.stringify(s.map(x => ({
+    n: x.nome, c: x.colore || "var(--blue)",
+    p: x.punti.map((q, i) => (q && q.v != null ? { x: +px(i), y: +py(q.v), v: q.v, d: q.d } : null)).filter(Boolean),
+  })));
+  return `<svg class="g-serie" data-hover='${esc(datiHover)}' data-geo='${L},${W - R},${T},${H - B}'
+      viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.aria || "serie storica")}">
       ${bande}${griglia}${righeSoglia}${linee}
       <text x="${L}" y="${H - 5}" font-size="9.5" fill="var(--muted)">${esc(xSx || "")}</text>
       <text x="${W - R}" y="${H - 5}" text-anchor="end" font-size="9.5" fill="var(--muted)">${esc(xDx || "")}</text>
@@ -4059,11 +4066,13 @@ function renderSignposts() {
 
 function renderMacroGrafici() {
   if (!DATA) return;
+  attivaHoverGrafici();
   renderRotazione();
   renderStress();
   renderLevaStagione();
   renderScomposizione();
   renderSignposts();
+  renderIndicatori();   // v215 — le 27 scatole diventano una classifica sola
 }
 
 
@@ -4126,8 +4135,133 @@ function renderVsBenchmark() {
 }
 let benchOrizzonte = "m3";
 
+/* ═══ v215 — TUTTI GLI INDICATORI, UNA SOLA CLASSIFICA ════════════════════════════════════
+   Fin qui avevo CANCELLATO le mini-card che duplicavano un grafico, ma ne restavano 27
+   intatte (11 tachimetri + 16 riquadri) dentro il blocco richiudibile: la richiesta era
+   esploderle TUTTE come grafici, non nasconderle. Il problema di 27 scatole ognuna con il suo
+   numero e il suo termometro è che non sono confrontabili: ogni termometro ha la sua scala
+   mentale. Qui diventano UNA classifica sola sullo stesso asse 0-100 (100 = favorevole al
+   libro), ordinata dal peggiore al migliore, dove si legge in un secondo che cosa pesa.
+   Ogni barra è cliccabile e apre il suo pannello di dettaglio. */
+const IND_TITOLI = {
+  fear_greed: "Fear & Greed (sentiment)", risk_sentiment: "Sentiment globale",
+  credit: "Credito high yield", systemic_risk: "Stress sistemico del credito",
+  corp_profit: "Borsa vs profitti reali", sp500_pe: "Valutazione S&P (P/E)",
+  smart_money: "Istituzionali vs retail", macroquant: "Ciclo economico",
+  seasonality: "Stagionalità del mese", thermometer: "Salute tecnica del libro",
+};
+function indicatoriClassifica() {
+  const m = DATA?.macro || {}, out = [];
+  Object.entries(IND_TITOLI).forEach(([k, nome]) => {
+    const v = m[k];
+    if (v && v.score != null) out.push({ k, nome, score: Math.round(v.score), sub: v.label || v.status || v.rating || "" });
+  });
+  (m.indicators || []).forEach(i => {
+    if (i.impact != null) out.push({ k: "in:" + i.key, nome: i.label, score: Math.round(i.impact), sub: `${i.value}${i.date ? " · " + i.date : ""}` });
+  });
+  (m.markets || []).forEach(i => {
+    const sc = marketImpact(i);
+    if (sc != null) out.push({ k: "mk:" + i.key, nome: i.label, score: Math.round(sc), sub: `${i.value} (${signTxt(i.change_pct, i.suffix || "%")} oggi)` });
+  });
+  return out.sort((a, b) => a.score - b.score);
+}
+function renderIndicatori() {
+  const box = $("#mg-tutti"); if (!box) return;
+  const nota = $("#mg-tutti-note"), head = $("#mg-tutti-head");
+  const righe = indicatoriClassifica();
+  if (righe.length < 3) { box.innerHTML = '<div class="muted">Indicatori non disponibili.</div>'; return; }
+  box.innerHTML = barreOrdinate(righe.map(r => ({
+    nome: r.nome, valore: r.score - 50, colore: scoreColor(r.score), tk: r.k,
+    testo: `${r.score}/100${r.sub ? "  ·  " + r.sub : ""}`,
+  })));
+  box.querySelectorAll("[data-obar-tk]").forEach(e => {
+    e.classList.add("obar-click");
+    const apri = () => openMacroInfo(e.dataset.obarTk);
+    e.setAttribute("tabindex", "0"); e.setAttribute("role", "button");
+    e.addEventListener("click", apri);
+    e.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); apri(); } });
+  });
+  const peggio = righe.slice(0, 3), meglio = righe.slice(-2);
+  const media = Math.round(righe.reduce((s, r) => s + r.score, 0) / righe.length);
+  if (head) head.innerHTML = `
+    <div class="sh-item ${media < 45 ? "sh-warn" : ""}">
+      <div class="sh-lab">Media di tutti</div>
+      <div class="sh-val" style="color:${scoreColor(media)}">${media}<span class="muted" style="font-size:13px">/100</span></div>
+      <div class="sh-sub">${righe.length} indicatori sullo stesso asse</div>
+    </div>
+    <div class="sh-item sh-bad">
+      <div class="sh-lab">I tre che pesano di più</div>
+      <div class="sh-val neg" style="font-size:15px">${peggio.map(r => esc(r.nome.split(" (")[0])).join(" · ")}</div>
+      <div class="sh-sub">${peggio.map(r => r.score).join(" · ")} su 100</div>
+    </div>
+    <div class="sh-item">
+      <div class="sh-lab">Quelli che tengono</div>
+      <div class="sh-val pos" style="font-size:15px">${meglio.map(r => esc(r.nome.split(" (")[0])).join(" · ")}</div>
+      <div class="sh-sub">${meglio.map(r => r.score).join(" · ")} su 100</div>
+    </div>`;
+  if (nota) nota.innerHTML = `Ogni indicatore sulla stessa scala: <b>100 = favorevole al libro, 0 = sfavorevole</b>, ordinati dal peggiore.
+    Prima erano ${righe.length} riquadri separati, ognuno col proprio termometro e la propria scala mentale: non erano confrontabili fra loro.
+    <b>Clicca una barra</b> per il dettaglio e le news di quell'indicatore.`;
+}
+
+/* v215 — CROSSHAIR sui grafici a linee. Un grafico statico costringe a stimare a occhio il
+   valore di un punto; qui il valore lo dichiara. Funziona su qualunque svg.g-serie senza che
+   il chiamante debba saperlo: si aggancia una volta sola, in delega sul documento. */
+function attivaHoverGrafici() {
+  if (attivaHoverGrafici._fatto) return;
+  attivaHoverGrafici._fatto = true;
+  const via = (svg) => { svg.querySelectorAll(".gs-hover").forEach(e => e.remove()); };
+  const muovi = (svg, ev) => {
+    let dati, geo;
+    try { dati = JSON.parse(svg.dataset.hover || "[]"); geo = (svg.dataset.geo || "").split(",").map(Number); } catch { return; }
+    if (!dati.length || geo.length !== 4) return;
+    const box = svg.getBoundingClientRect();
+    const vb = svg.viewBox.baseVal;
+    const xUser = (ev.clientX - box.left) / box.width * vb.width;
+    const [L, R, T, B] = geo;
+    if (xUser < L - 4 || xUser > R + 4) { via(svg); return; }
+    via(svg);
+    const ns = "http://www.w3.org/2000/svg";
+    const mk = (t, attrs) => { const e = document.createElementNS(ns, t); for (const k in attrs) e.setAttribute(k, attrs[k]); e.classList.add("gs-hover"); return e; };
+    let vicino = null;
+    const etichette = [];
+    dati.forEach(serie => {
+      let best = null;
+      serie.p.forEach(q => { const d = Math.abs(q.x - xUser); if (!best || d < best.d) best = { d, q }; });
+      if (!best) return;
+      if (!vicino || best.d < vicino.d) vicino = best;
+      svg.appendChild(mk("circle", { cx: best.q.x, cy: best.q.y, r: 4, fill: serie.c, stroke: "var(--card)", "stroke-width": 1.5 }));
+      etichette.push({ y: best.q.y, testo: `${fmtNum.format(best.q.v)}`, col: serie.c, nome: serie.n, d: best.q.d });
+    });
+    if (!vicino) return;
+    svg.insertBefore(mk("line", { x1: vicino.q.x, y1: T, x2: vicino.q.x, y2: B, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: .8 }), svg.firstChild);
+    const destra = vicino.q.x > (L + R) / 2;
+    etichette.forEach((e, i) => {
+      const tx = mk("text", { x: destra ? vicino.q.x - 8 : vicino.q.x + 8, y: T + 12 + i * 13,
+        "text-anchor": destra ? "end" : "start", "font-size": 11, "font-weight": 700,
+        fill: e.col, "font-family": "var(--mono)" });
+      tx.textContent = e.testo;
+      svg.appendChild(tx);
+    });
+    const dLab = etichette[0] && etichette[0].d;
+    if (dLab) {
+      const t2 = mk("text", { x: destra ? vicino.q.x - 8 : vicino.q.x + 8, y: T + 12 + etichette.length * 13,
+        "text-anchor": destra ? "end" : "start", "font-size": 9.5, fill: "var(--muted)" });
+      t2.textContent = dataBreve(dLab, true);
+      svg.appendChild(t2);
+    }
+  };
+  document.addEventListener("pointermove", (ev) => {
+    const svg = ev.target.closest ? ev.target.closest("svg.g-serie") : null;
+    document.querySelectorAll("svg.g-serie").forEach(o => { if (o !== svg) via(o); });
+    if (svg) muovi(svg, ev);
+  }, { passive: true });
+  document.addEventListener("pointerleave", () => document.querySelectorAll("svg.g-serie").forEach(via), true);
+}
+
 function renderStruttura() {
   if (!DATA) return;
+  attivaHoverGrafici();
   renderConcentrazione();
   renderDeriva();
   renderAllocGrafica();

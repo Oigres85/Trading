@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=214">
+<link rel="stylesheet" href="assets/style.css?v=215">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -200,22 +200,33 @@
   </section>
 
   <section class="card" data-pane="macro">
+    <div class="card-head">
+      <h2>Tutti gli indicatori, una classifica sola</h2>
+      <span class="muted">stesso asse 0-100 · clicca una barra per il dettaglio</span>
+    </div>
+    <div class="struct-headline" id="mg-tutti-head"></div>
+    <div id="mg-tutti"></div>
+    <div class="muted struct-note" id="mg-tutti-note"></div>
+  </section>
+
+  <section class="card" data-pane="macro">
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
     <div class="macro-actions">
       <button class="btn btn-primary btn-sm" id="macro-details" title="Tutti i dettagli macro in una sola pagina scorrevole">📖 Dettagli macro</button>
     </div>
-    <details class="mg-tutti" id="macro-riquadri">
-      <summary>Tutti i riquadri macro <span class="muted">— 34 indicatori, ciascuno cliccabile per il dettaglio</span></summary>
+        <!-- v215 — IL BLOCCO RICHIUDIBILE È SPARITO. Conteneva 11 tachimetri (#gauges) e 16
+         riquadri (#macro-grid): nasconderli non era esploderli. Ora quegli stessi indicatori
+         sono UNA classifica sola sullo stesso asse 0-100, ordinata dal peggiore, con ogni
+         barra cliccabile verso il suo pannello. Gli id #gauges e #macro-grid restano nel DOM
+         ma vuoti e nascosti: renderGauges/renderMacro continuano a girare senza errori e la
+         guardia strutturale continua a vederli, in attesa di essere rimossi con le loro
+         funzioni in un taglio dedicato (togliere codice e guardia insieme è la classe v203).
+         L'unica mini-card superstite, "Interni di mercato", è già righe di valori. -->
     <div class="mini-cards">
-      <!-- v207 — QUESTI DUE CONTENITORI NON ESISTEVANO. renderMiniCards() li popolava a ogni
-           render con contenuto valido ("Direzione mercato", "Tracking Error vs S&P 500") che
-           nessuno ha mai visto, e i due addEventListener erano no-op grazie a `?.`. -->
-      <!-- v207 — segnali che finivano SOLO nel prompt per l'LLM e che il CEO non vedeva mai -->
       <div class="mini-card" id="internals-box" tabindex="0" role="button" title="Interni di mercato: ampiezza, momentum, schiuma sugli ETF a leva, futures"></div>
     </div>
-    <div class="gauges" id="gauges"></div>
-    <div class="macro-grid macro-grid-below" id="macro-grid"></div>
-    </details>
+    <div class="gauges" id="gauges" hidden></div>
+    <div class="macro-grid macro-grid-below" id="macro-grid" hidden></div>
     <div class="macro-news">
       <div class="macro-news-head"><h3>News — portafoglio &amp; macro USA</h3><span class="muted">clicca la sintesi per tutte le notizie</span></div>
       <div id="news-summary" tabindex="0" role="button" title="Clicca per leggere tutte le notizie"></div>
@@ -510,6 +521,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=214"></script>
+<script src="assets/app.js?v=215"></script>
 </body>
 </html>
