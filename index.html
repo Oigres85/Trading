@@ -3,15 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- anti-cache per Safari/GitHub Pages: il fetch dei dati usa già no-store + ?t=timestamp;
-     questi meta forzano la revalidation dell'HTML stesso -->
+<!-- ⚠ v216 — QUESTI META NON FANNO NIENTE, e il commento che c'era prima diceva il contrario
+     ("forzano la revalidation dell'HTML stesso"). I browser ignorano le direttive di cache via
+     <meta>: vince l'header HTTP, e GitHub Pages serve questo file con `cache-control: max-age=600`
+     (verificato con curl). Dieci minuti in cui il browser NON richiede index.html — e siccome il
+     cache-busting `?v=NNN` vive DENTRO index.html, finché quel file è vecchio il browser continua
+     a chiedere le versioni vecchie di app.js e style.css. È il motivo per cui una release
+     "non si vede". Restano perché su altri host servono, ma la protezione vera è il
+     rilevatore di versione in app.js (controllaVersione), che confronta il ?v= servito ORA
+     con quello in esecuzione e propone la ricarica. -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=215">
+<link rel="stylesheet" href="assets/style.css?v=216">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -45,6 +52,8 @@
   <div id="earnings-alert" hidden></div>
   <!-- ALERT RICONCILIAZIONE BROKER (snapshot vecchio o posizioni incoerenti) -->
   <div id="reconcile-alert" hidden></div>
+  <!-- v216 — AVVISO DI PAGINA VECCHIA (cache CDN/browser): vedi controllaVersione() -->
+  <div id="version-alert" hidden></div>
   <!-- ALERT QUALITÀ DATI MACRO (data assertions: dati datati o implausibili) -->
   <div id="dataquality-alert" hidden></div>
 
@@ -521,6 +530,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=215"></script>
+<script src="assets/app.js?v=216"></script>
 </body>
 </html>

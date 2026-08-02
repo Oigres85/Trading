@@ -1617,3 +1617,10 @@ body {
 .obar-row.obar-click:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
 svg.g-serie { cursor: crosshair; }
 .gs-hover { pointer-events: none; }
+
+/* v216 — avviso di pagina vecchia (cache CDN/browser) */
+.ver-alert {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.5);
+  border-radius: 10px; padding: 11px 14px; margin-bottom: 14px; font-size: 13px;
+}

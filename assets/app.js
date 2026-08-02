@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "215";
+const BUILD_VERSION = "216";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4257,6 +4257,41 @@ function attivaHoverGrafici() {
     if (svg) muovi(svg, ev);
   }, { passive: true });
   document.addEventListener("pointerleave", () => document.querySelectorAll("svg.g-serie").forEach(via), true);
+}
+
+/* ═══ v216 — RILEVATORE DI PAGINA VECCHIA ═════════════════════════════════════════════════
+   Il CEO ha visto una release "non comparire" più volte, e la causa non era il deploy: è che
+   GitHub Pages serve index.html con `cache-control: max-age=600`. Per dieci minuti il browser
+   non lo richiede — e siccome il cache-busting `?v=NNN` vive DENTRO index.html, finché quel
+   file è vecchio il browser continua a chiedere le versioni vecchie di app.js e style.css.
+   Il `<meta http-equiv="Cache-Control">` non protegge da questo: i browser lo ignorano.
+
+   Qui si chiede al server la versione ATTUALE (fetch no-store, che salta la cache) e la si
+   confronta con quella in esecuzione. Se non coincidono, la pagina lo dichiara invece di
+   mostrare in silenzio contenuti vecchi — e la ricarica va su una URL che la cache non ha mai
+   visto, perché un semplice reload ripescherebbe lo stesso index.html cachato. */
+async function controllaVersione() {
+  try {
+    const r = await fetch(`index.html?nocache=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return;
+    const m = (await r.text()).match(/app\.js\?v=(\d+)/);
+    if (!m) return;
+    const attesa = m[1];
+    if (attesa === BUILD_VERSION) return;
+    const box = $("#version-alert");
+    if (!box) return;
+    box.hidden = false;
+    box.innerHTML = `<div class="ver-alert">
+      <div><b>Stai vedendo una versione vecchia della pagina.</b>
+        In esecuzione <b>v${esc(BUILD_VERSION)}</b>, pubblicata <b>v${esc(attesa)}</b>.
+        <span class="muted">Non è il sito: è la cache del browser (GitHub Pages tiene index.html per 10 minuti).</span></div>
+      <button class="btn btn-primary btn-sm" id="ver-reload">Ricarica la versione ${esc(attesa)}</button>
+    </div>`;
+    $("#ver-reload")?.addEventListener("click", () => {
+      // URL mai vista dalla cache: un reload normale ripescherebbe lo stesso file
+      location.replace(location.pathname + "?r=" + Date.now());
+    });
+  } catch { /* offline o file:// — nessun avviso, meglio del falso allarme */ }
 }
 
 function renderStruttura() {
@@ -8889,6 +8924,7 @@ initSorting("wl-table", renderWatchlist);
 initColDrag("ptf-table", renderTable);
 initColDrag("wl-table", renderWatchlist);
 
+controllaVersione();   // v216 — avvisa se il browser sta servendo una pagina vecchia
 loadData();
 loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
 loadPromptHeaderCloud();   // sincronizza la testata del prompt dal server (config/prompt_header.txt)
