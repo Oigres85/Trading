@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-08-02T10:27:10Z",
+ "updated_at": "2026-08-02T14:46:42Z",
  "eurusd": 1.1527,
  "totals": {
   "usd_value": 221692.29,
@@ -899,7 +899,7 @@
    "stats": {
     "market_cap": 776410431488,
     "shares": 1630600639,
-    "float_shares": 1621991068,
+    "float_shares": 1622056292,
     "float_pct": 99.5,
     "avg_volume_30d": 33033696,
     "pe_ttm": 158.7167,
@@ -2711,8 +2711,8 @@
    "stats": {
     "market_cap": 929524482048,
     "shares": 1129393151,
-    "float_shares": 1125316042,
-    "float_pct": 99.6,
+    "float_shares": 1125474157,
+    "float_pct": 99.7,
     "avg_volume_30d": 53659066,
     "pe_ttm": 18.5869,
     "forward_pe": 5.3534,
@@ -3540,7 +3540,7 @@
    "stats": {
     "market_cap": 34077014016,
     "shares": 345679375,
-    "float_shares": 350577702,
+    "float_shares": 351670215,
     "float_pct": null,
     "avg_volume_30d": 20216883,
     "pe_ttm": null,
@@ -4850,7 +4850,7 @@
    "stats": {
     "market_cap": 4355446800384,
     "shares": 5867155790,
-    "float_shares": 10926893500,
+    "float_shares": 10927015800,
     "float_pct": null,
     "avg_volume_30d": 32547438,
     "pe_ttm": 17.8601,
@@ -9051,10 +9051,10 @@
    "name": "Bitcoin",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 63068.97,
+   "price": 63083.38,
    "price_asof": "2026-08-02",
    "price_live": false,
-   "change_pct": 0.49,
+   "change_pct": 0.51,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -50,
@@ -9064,8 +9064,8 @@
    "w52_dist_pct": -50,
    "support": 62207.52,
    "resistance": 66910.06,
-   "rsi": 45.4,
-   "volume": 15510651904,
+   "rsi": 45.5,
+   "volume": 15973937152,
    "vol_ratio": 0.53,
    "atr_14": 1591.92,
    "atr_pct": 2.52,
@@ -9077,7 +9077,7 @@
      64725.31,
      62813.75,
      62763.32,
-     63068.97
+     63083.38
     ],
     "m6": [
      66691.45,
@@ -9205,7 +9205,7 @@
      64725.31,
      62813.75,
      62763.32,
-     63068.97
+     63083.38
     ],
     "all": [
      386.94,
@@ -9351,7 +9351,7 @@
      73579.69,
      58558.86,
      62813.75,
-     63068.97
+     63083.38
     ],
     "m1": [
      63758.22,
@@ -9375,7 +9375,7 @@
      64725.31,
      62813.75,
      62763.32,
-     63068.97
+     63083.38
     ],
     "m3": [
      73372.52,
@@ -9443,7 +9443,7 @@
      64725.31,
      62813.75,
      62763.32,
-     63068.97
+     63083.38
     ],
     "y1": [
      112526.91,
@@ -9519,7 +9519,7 @@
      64796.6,
      65044.81,
      63871.36,
-     63068.97
+     63083.38
     ],
     "d1": [
      62836,
@@ -9584,7 +9584,33 @@
      63210.58,
      63172.16,
      63138.2,
-     63084.51
+     63084.51,
+     63123.93,
+     63140.53,
+     63134.04,
+     63111.01,
+     63096.48,
+     63090.52,
+     63088.26,
+     63054.02,
+     62988.08,
+     63038.15,
+     63106.52,
+     63129.14,
+     63095.78,
+     63075.83,
+     63081.56,
+     63066.58,
+     63039.51,
+     63016.49,
+     63010.68,
+     63031.11,
+     63051.77,
+     63027.68,
+     63022.54,
+     63035.92,
+     63067.69,
+     63093.94
     ]
    },
    "earnings_date": null,
@@ -9594,10 +9620,10 @@
    "beta": null,
    "sharpe_1y": -1.2,
    "sortino_1y": -1.56,
-   "sharpe_6m": -0.43,
+   "sharpe_6m": -0.42,
    "sortino_6m": -0.58,
    "prepost": null,
-   "prezzo_limite_aggiustato": 63068.97,
+   "prezzo_limite_aggiustato": 63083.38,
    "risk_reward": "1:1.5",
    "sector": "Altro",
    "stats": null,
@@ -9605,22 +9631,22 @@
     "w1": {
      "support": 62233.01,
      "resistance": 65328.18,
-     "change_pct": -1.31
+     "change_pct": -1.29
     },
     "m1": {
      "support": 61769,
      "resistance": 66910.06,
-     "change_pct": -1.08
+     "change_pct": -1.06
     },
     "m3": {
      "support": 57747.77,
      "resistance": 74218.56,
-     "change_pct": -14.04
+     "change_pct": -14.02
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -28.55
+     "change_pct": -28.53
     }
    },
    "financials": [],
@@ -9645,7 +9671,7 @@
      "hi": 64799.28
     }
    },
-   "rs_1m": -1.2,
+   "rs_1m": -1.1,
    "rs_bench": "sp500",
    "rs_ndx_1m": 4.1,
    "beta_ndx": 0.87,
@@ -12879,27 +12905,27 @@
    "stats": {
     "market_cap": 2921415835648,
     "shares": 10757109436,
-    "float_shares": 9803256620,
-    "float_pct": 91.1,
+    "float_shares": 9806376984,
+    "float_pct": 91.2,
     "avg_volume_30d": 49455214,
     "pe_ttm": 21.8312,
-    "forward_pe": 26.4412,
+    "forward_pe": 26.4546,
     "eps_ttm": 12.44,
-    "eps_forward": 10.2711,
+    "eps_forward": 10.2659,
     "revenue_fy": 775680032768,
     "net_income_fy": 135281000448,
     "revenue_growth": 0.196,
     "earnings_growth": 2.423,
     "profit_margin": 0.1744,
     "roe": 0.3056,
-    "debt_to_equity": 40.468,
+    "debt_to_equity": 45.617,
     "dividend_yield": null,
     "price_to_book": 6.6089,
     "target_mean": 321.9498,
-    "fcf": 22722125824,
+    "fcf": 3219124992,
     "gross_margin": 0.5077,
-    "enterprise_value": 3028691189760,
-    "ev_ebitda": 17.931,
+    "enterprise_value": 3057994170368,
+    "ev_ebitda": 18.104,
     "peg": 1.46,
     "roa": 0.0659,
     "short_float": 0.0109,
@@ -15953,7 +15979,7 @@
    "stats": {
     "market_cap": 2096632168448,
     "shares": 5186474013,
-    "float_shares": 37843293696,
+    "float_shares": 37843708608,
     "float_pct": null,
     "avg_volume_30d": 14372320,
     "pe_ttm": 35.5854,
@@ -17968,7 +17994,7 @@
      199.33,
      197.41,
      247.62,
-     258.66,
+     258.67,
      276.31,
      303.57,
      296.44,
@@ -19874,9 +19900,9 @@
     "float_pct": 99.3,
     "avg_volume_30d": 8346240,
     "pe_ttm": 32.5667,
-    "forward_pe": 29.0619,
+    "forward_pe": 29.6668,
     "eps_ttm": 16.73,
-    "eps_forward": 18.7476,
+    "eps_forward": 18.3653,
     "revenue_fy": 11777000448,
     "net_income_fy": 6350000128,
     "revenue_growth": 0.455,
@@ -25183,7 +25209,7 @@
      198.72,
      191.95,
      159.85,
-     157.71,
+     157.72,
      161.51,
      134.5,
      92.35,
@@ -25445,13 +25471,13 @@
    "stats": {
     "market_cap": 1418222239744,
     "shares": 2205128509,
-    "float_shares": 2200535877,
+    "float_shares": 2201809630,
     "float_pct": 99.8,
     "avg_volume_30d": 18122133,
     "pe_ttm": 20.9605,
-    "forward_pe": 15.6564,
+    "forward_pe": 15.7541,
     "eps_ttm": 26.56,
-    "eps_forward": 35.558,
+    "eps_forward": 35.3375,
     "revenue_fy": 228246994944,
     "net_income_fy": 68097998848,
     "revenue_growth": 0.28,
@@ -37534,8 +37560,8 @@
   {
    "ticker": "2222.SR",
    "name": "Saudi Aramco",
-   "mcap_usd": 1714796454855,
-   "change_pct": 0.76
+   "mcap_usd": 1712219692046,
+   "change_pct": 0.61
   },
   {
    "ticker": "META",
@@ -37947,7 +37973,7 @@
      109.14,
      102.59,
      106.75,
-     108.01,
+     108.02,
      110.72,
      113.53,
      111.46,
@@ -38378,16 +38404,16 @@
     0.004178,
     0.002276,
     0.003535,
-    -0.005982,
+    -0.005981,
     -0.007438,
     0.005405,
     0.008323,
-    -0.002901,
-    0.002454,
+    -0.0029,
+    0.002453,
     0.002309,
     0.002887,
     0.008276,
-    -0.000335,
+    -0.000334,
     0.00531,
     -0.001378,
     -0.001243,
@@ -38398,7 +38424,7 @@
     -0.003187,
     -0.004624,
     0.005713,
-    0.002806,
+    0.002807,
     0.00376,
     0.003402,
     0.001151,
@@ -38411,7 +38437,7 @@
     0.015228,
     -0.001222,
     0.00443,
-    -0.006834,
+    -0.006833,
     0.00566,
     0.010347,
     -0.000015,
@@ -38448,7 +38474,7 @@
     0.000731,
     0.001898,
     -0.003009,
-    -0.000864,
+    -0.000863,
     0.00661,
     0.002324,
     -0.01081,
@@ -38457,13 +38483,13 @@
     -0.011065,
     0.007523,
     0.009023,
-    0.006211,
+    0.00621,
     0.00456,
     0.003512,
     -0.000101,
     -0.00357,
     -0.001222,
-    -0.007437,
+    -0.007436,
     0.001831,
     0.006638,
     0.00593,
@@ -38505,7 +38531,7 @@
     -0.004814,
     0.000568,
     -0.008853,
-    0.00703,
+    0.007031,
     -0.005591,
     -0.013194,
     0.008722,
@@ -38517,7 +38543,7 @@
     0.002627,
     -0.014052,
     -0.002467,
-    -0.01444,
+    -0.014439,
     0.010445,
     -0.003362,
     0.005557,
@@ -39345,7 +39371,7 @@
      549,
      562.3,
      567.67,
-     598.19,
+     598.18,
      626.78,
      617,
      612.86,
@@ -39603,17 +39629,17 @@
     }
    },
    "_ret_series": [
-    0.018283,
+    0.018284,
     -0.006813,
     0.012505,
-    0.003378,
+    0.003379,
     0.009285,
     -0.002963,
     0.01249,
     0.0005,
     -0.000776,
     -0.004407,
-    -0.000398,
+    -0.000399,
     -0.013661,
     -0.005955,
     -0.004641,
@@ -39621,7 +39647,7 @@
     -0.002889,
     0.004007,
     0.001536,
-    0.006241,
+    0.00624,
     -0.011643,
     -0.008415,
     0.007837,
@@ -39633,22 +39659,22 @@
     0.005804,
     0.004407,
     0.008521,
-    -0.000846,
+    -0.000845,
     -0.001998,
     0.008977,
     0.006747,
-    0.005902,
-    -0.006665,
+    0.005903,
+    -0.006664,
     -0.003517,
     -0.004321,
-    0.004102,
+    0.004103,
     0.00462,
     0.002735,
-    0.004785,
+    0.004786,
     0.004103,
     -0.004219,
     0.007482,
-    -0.00528,
+    -0.005279,
     0.011399,
     -0.001211,
     -0.035331,
@@ -39658,11 +39684,11 @@
     -0.00371,
     0.006545,
     0.012522,
-    -0.000262,
+    -0.000261,
     -0.009681,
     0.008371,
     0.010622,
-    0.017653,
+    0.017652,
     0.00766,
     0.004493,
     -0.015407,
@@ -39678,7 +39704,7 @@
     -0.020627,
     0.000756,
     -0.008577,
-    -0.012251,
+    -0.01225,
     0.005952,
     -0.023956,
     0.007485,
@@ -39695,7 +39721,7 @@
     0.001233,
     0.004087,
     -0.00324,
-    -0.019304,
+    -0.019303,
     -0.005032,
     0.00198,
     -0.018711,
@@ -39709,7 +39735,7 @@
     -0.002322,
     -0.0083,
     -0.001939,
-    0.007911,
+    0.007912,
     0.008748,
     0.000962,
     -0.005705,
@@ -39730,7 +39756,7 @@
     -0.012084,
     0.006843,
     -0.015483,
-    -0.017623,
+    -0.017624,
     -0.0145,
     0.020918,
     0.007631,
@@ -39739,7 +39765,7 @@
     -0.020549,
     0.002129,
     -0.001031,
-    0.007439,
+    0.00744,
     -0.003837,
     0.00881,
     -0.012229,
@@ -39747,11 +39773,11 @@
     0.014389,
     -0.012138,
     -0.003206,
-    0.001317,
+    0.001316,
     -0.010763,
     0.015128,
     -0.003017,
-    -0.015157,
+    -0.015158,
     0.013267,
     0.000017,
     -0.000132,
@@ -40520,7 +40546,7 @@
      169,
      183.61,
      192.5,
-     204.45,
+     204.44,
      207.3,
      211,
      211.58,
@@ -40854,10 +40880,10 @@
     0.012419,
     0.004975,
     0.002017,
-    -0.005893,
+    -0.005894,
     -0.001775,
-    0.018315,
-    -0.010268,
+    0.018314,
+    -0.010269,
     0.004229,
     -0.001648,
     0.002557,
@@ -40903,7 +40929,7 @@
     -0.00246,
     -0.028518,
     0.00291,
-    -0.020075,
+    -0.020076,
     0.003046,
     -0.000171,
     -0.01868,
@@ -40921,7 +40947,7 @@
     0.002071,
     0.013513,
     0.011666,
-    -0.015441,
+    -0.01544,
     -0.007592,
     -0.004743,
     -0.010701,
@@ -42815,7 +42841,7 @@
      76.92,
      77.49,
      79.11,
-     81.45,
+     81.44,
      81.24,
      81.78,
      85.64,
@@ -43210,13 +43236,13 @@
    },
    "_ret_series": [
     0.002729,
-    0.003061,
-    -0.00579,
-    -0.00171,
+    0.003062,
+    -0.005791,
+    -0.001709,
     -0.004344,
     0.001145,
     -0.005048,
-    0.008246,
+    0.008247,
     -0.007442,
     -0.00715,
     -0.002898,
@@ -43226,7 +43252,7 @@
     0.007379,
     -0.002876,
     -0.000576,
-    -0.001153,
+    -0.001154,
     0.006557,
     -0.007134,
     -0.007469,
@@ -43244,7 +43270,7 @@
     -0.010373,
     -0.001908,
     -0.003601,
-    0.006966,
+    0.006965,
     -0.003814,
     0,
     -0.0009,
@@ -43283,7 +43309,7 @@
     0.001777,
     -0.008245,
     -0.005722,
-    0.002473,
+    0.002472,
     -0.000337,
     -0.002023,
     0.00393,
@@ -43297,8 +43323,8 @@
     0.002811,
     -0.005404,
     -0.004639,
-    -0.003295,
-    0.001024,
+    -0.003294,
+    0.001023,
     0.003858,
     -0.00136,
     -0.009685,
@@ -43325,7 +43351,7 @@
     0.00579,
     -0.000226,
     -0.005792,
-    -0.013184,
+    -0.013185,
     0.007588,
     0.004343,
     0.002733,
@@ -43335,7 +43361,7 @@
     0.000228,
     -0.005608,
     -0.002861,
-    0.002423,
+    0.002424,
     -0.002539,
     0.010803,
     0.000686,
@@ -43344,12 +43370,12 @@
     -0.005323,
     0.013199,
     0.005476,
-    0.001671,
+    0.00167,
     -0.00379,
     0.001005,
     -0.002346,
     0.003684,
-    0.001781,
+    0.001782,
     0.000111,
     0.003996,
     0.006074,
@@ -43362,7 +43388,7 @@
     -0.010704,
     -0.012998,
     -0.001953,
-    -0.004957,
+    -0.004956,
     0.007712,
     0.002748,
     -0.005619,
@@ -44394,7 +44420,7 @@
     0.022477,
     -0.009,
     0.012069,
-    0.00195,
+    0.001949,
     0.008833,
     -0.005865,
     0.015428,
@@ -44412,7 +44438,7 @@
     0.009867,
     -0.015446,
     -0.010398,
-    0.004469,
+    0.00447,
     0.006674,
     0.00179,
     0.008734,
@@ -44465,8 +44491,8 @@
     0.001124,
     -0.028577,
     0.00517,
-    -0.016748,
-    -0.015052,
+    -0.016747,
+    -0.015051,
     0.006775,
     -0.0301,
     0.004447,
@@ -44512,7 +44538,7 @@
     0.007519,
     0.000981,
     0.00718,
-    0.012376,
+    0.012377,
     0.006835,
     -0.018725,
     -0.017074,
@@ -44525,7 +44551,7 @@
     -0.004294,
     0.000708,
     -0.025894,
-    0.001589,
+    0.001588,
     0.000383,
     0.009204,
     -0.004333,
@@ -44543,7 +44569,7 @@
     0.0177,
     0.000164,
     0.004158,
-    -0.019758,
+    -0.019757,
     -0.008668,
     0.014604,
     0.003374,
@@ -45662,7 +45688,7 @@
     -0.001681,
     0.010413,
     -0.018483,
-    0.000753,
+    0.000754,
     0.004321,
     -0.00338,
     0.016233,
@@ -45692,7 +45718,7 @@
     0,
     -0.028192,
     0.008082,
-    0.011623,
+    0.011622,
     -0.001137,
     -0.005706,
     0.002096,
@@ -45752,7 +45778,7 @@
     -0.007927,
     -0.019358,
     -0.001476,
-    0.004054,
+    0.004055,
     0.001287,
     -0.023041,
     0.004875,
@@ -45774,7 +45800,7 @@
     -0.02011,
     -0.000774,
     0.010592,
-    0.007443,
+    0.007444,
     -0.008402,
     0.006499,
     -0.034105,
@@ -45785,7 +45811,7 @@
     -0.002531,
     -0.001756,
     0.005647,
-    -0.005256,
+    -0.005257,
     -0.012967,
     -0.004757,
     -0.005379,
@@ -46889,7 +46915,7 @@
     0.001287,
     -0.009282,
     -0.003903,
-    0.006378,
+    0.006379,
     -0.008039,
     0.004855,
     0.011509,
@@ -46980,7 +47006,7 @@
     -0.009839,
     -0.007056,
     -0.031014,
-    0.0219,
+    0.021899,
     -0.014622,
     0,
     0.010299,
@@ -48144,7 +48170,7 @@
     0.016656,
     -0.002352,
     0.006382,
-    0.005396,
+    0.005397,
     -0.003351,
     0.008212,
     -0.01436,
@@ -48156,7 +48182,7 @@
     -0.004736,
     0.003791,
     0.003414,
-    -0.000363,
+    -0.000362,
     0.005354,
     -0.009133,
     0.017254,
@@ -48168,7 +48194,7 @@
     -0.00131,
     -0.000256,
     0.002266,
-    -0.004025,
+    -0.004024,
     -0.016709,
     0.010162,
     0.002948,
@@ -48178,7 +48204,7 @@
     0.011319,
     -0.004845,
     0.000763,
-    0.00194,
+    0.001939,
     -0.002217,
     -0.01453,
     -0.001127,
@@ -48186,12 +48212,12 @@
     0.001544,
     -0.001685,
     0.006653,
-    0.010553,
+    0.010554,
     0.002345,
     0.005703,
     0.000548,
     -0.000068,
-    0.002325,
+    0.002326,
     -0.006305,
     -0.010158,
     0.00222,
@@ -48200,7 +48226,7 @@
     0.00449,
     0.003852,
     0.00192,
-    0.00137,
+    0.001369,
     0.00777,
     0.022823,
     0.014102,
@@ -48212,12 +48238,12 @@
     -0.005992,
     0.020848,
     0.004195,
-    0.022355,
+    0.022356,
     -0.002207,
     -0.004872,
     -0.015083,
     -0.006007,
-    0.004653,
+    0.004654,
     -0.007638,
     -0.004167,
     -0.012013,
@@ -49318,9 +49344,9 @@
     -0.006647,
     0.005636,
     0.009286,
-    -0.007152,
+    -0.007153,
     0.005704,
-    -0.008512,
+    -0.008511,
     0.017062,
     0.002871,
     -0.002981,
@@ -49346,7 +49372,7 @@
     -0.006525,
     0.000218,
     0.005439,
-    -0.009885,
+    -0.009884,
     -0.002991,
     0.009826,
     0.00033,
@@ -49356,14 +49382,14 @@
     0.003726,
     -0.009452,
     -0.003651,
-    -0.005222,
+    -0.005223,
     -0.005474,
     -0.012852,
     0.006334,
     0.010208,
     0.014405,
     -0.003527,
-    0.006493,
+    0.006492,
     0.01004,
     -0.002827,
     0.004238,
@@ -49371,14 +49397,14 @@
     0.002925,
     0.002809,
     -0.019831,
-    -0.026088,
+    -0.026089,
     0.004733,
     0.002582,
     -0.001459,
     0.001683,
-    0.000896,
+    0.000897,
     -0.004828,
-    0.015413,
+    0.015412,
     -0.000554,
     0.011138,
     -0.007485,
@@ -49394,7 +49420,7 @@
     0.004403,
     0.00329,
     -0.011562,
-    -0.00355,
+    -0.003551,
     0.002553,
     -0.002442,
     -0.001112,
@@ -49403,17 +49429,17 @@
     0.003595,
     0.004364,
     -0.001229,
-    0.003125,
+    0.003126,
     -0.007383,
     0.003698,
     -0.005271,
-    -0.003831,
+    -0.00383,
     0.005124,
     -0.00068,
     0.006556,
     0.001126,
     0.002024,
-    0.00202,
+    0.002019,
     -0.008216,
     0.000339,
     0.002257,
@@ -49422,7 +49448,7 @@
     0.008887,
     0.002014,
     0.00134,
-    0.005565,
+    0.005566,
     0.008621,
     0.006909,
     0.012166,
@@ -49449,7 +49475,7 @@
     -0.011798,
     -0.002122,
     0.007511,
-    0.000105,
+    0.000106,
     0.002526,
     -0.002737,
     0.006828,
@@ -49819,34 +49845,19 @@
  ],
  "predictions": [
   {
-   "question": "Will Bitcoin dip to $62,000 July 27-August 2?",
-   "yes": 14,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-62k-july-27-august-2-2026"
+   "question": "Bitcoin Up or Down on August 2?",
+   "yes": 78,
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-august-2-2026"
   },
   {
-   "question": "Bitcoin Up or Down on August 2?",
-   "yes": 76,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-august-2-2026"
+   "question": "Will Bitcoin dip to $62,000 July 27-August 2?",
+   "yes": 16,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-62k-july-27-august-2-2026"
   },
   {
    "question": "Will there be no change in Fed interest rates after the September 2026 meeting?",
    "yes": 40,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-september-2026-meeting-615"
-  },
-  {
-   "question": "Will the Fed increase interest rates by 25 bps after the September 2026 meeting?",
-   "yes": 58,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
-  },
-  {
-   "question": "Will Bitcoin reach $66,000 July 27-August 2?",
-   "yes": 2,
-   "link": "https://polymarket.com/event/will-bitcoin-reach-66k-july-27-august-2-2026"
-  },
-  {
-   "question": "Will the Fed decrease interest rates by 25 bps after the September 2026 meeting?",
-   "yes": 2,
-   "link": "https://polymarket.com/event/will-the-fed-decrease-interest-rates-by-25-bps-after-the-september-2026-meeting-586"
   }
  ],
  "screener": [
@@ -49950,9 +49961,9 @@
  "news": [
   {
    "source": "Investing.com",
-   "title": "Trump says he will hold off on fresh Iran attack in hope of quick deal",
-   "link": "https://www.investing.com/news/commodities-news/iran-threatens-to-strike-othernations-energy-fields-if-us-launches-fresh-attacks-4829654",
-   "published": "2026-08-02T10:24:47Z",
+   "title": "Two helicopters collide as Greece battles wildfires, Hungary shuts nuclear plant",
+   "link": "https://www.investing.com/news/commodities-news/greece-battles-wildfires-hungary-shuts-nuclear-power-plant-due-to-drought-4829687",
+   "published": "2026-08-02T14:31:15Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -49960,13 +49971,13 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Trump dice che tratterrà un nuovo attacco all’Iran nella speranza di un accordo rapido"
+   "title_it": "Due elicotteri si scontrano mentre la Grecia combatte gli incendi e l'Ungheria chiude la centrale nucleare"
   },
   {
    "source": "Investing.com",
-   "title": "Ukrainian drones kill two in Russia, strike Wildberries warehouse, governors say",
+   "title": "Ukrainian drones kill eight in Russia and strike Wildberries warehouse, governors say",
    "link": "https://www.investing.com/news/stock-market-news/ukrainian-drones-kill-two-in-russia-strike-wildberries-warehouse-governors-say-4829675",
-   "published": "2026-08-02T09:18:33Z",
+   "published": "2026-08-02T14:18:26Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -49974,7 +49985,34 @@
    "topic_pri": 0,
    "inv": true,
    "sentiment": "neutral",
-   "title_it": "Droni ucraini uccidono due persone in Russia e colpiscono il magazzino di Wildberries, dicono i governatori"
+   "title_it": "Droni ucraini uccidono otto persone in Russia e colpiscono il magazzino di Wildberries, dicono i governatori"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Iran denies agreement to reopen Strait of Hormuz, says policy unchanged – Report",
+   "link": "https://www.investing.com/news/economy-news/iran-threatens-regional-energy-fields-if-the-us-launches-fresh-attacks-4829658",
+   "published": "2026-08-02T14:12:57Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "L’Iran nega l’accordo per la riapertura dello Stretto di Hormuz, afferma che la politica non è cambiata – Rapporto"
+  },
+  {
+   "source": "Investing.com",
+   "title": "Teetering US stock market faces jobs report, big earnings week",
+   "link": "https://www.investing.com/news/economy-news/teetering-us-stock-market-faces-jobs-report-big-earnings-week-4829696",
+   "published": "2026-08-02T13:00:36Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": true,
+   "sentiment": "neutral",
+   "title_it": "Il mercato azionario statunitense in bilico si trova di fronte al rapporto sull’occupazione, settimana di grandi utili"
   },
   {
    "source": "Investing.com",
@@ -49991,19 +50029,6 @@
   },
   {
    "source": "Investing.com",
-   "title": "China’s central bank pledges timely policy tool adjustment",
-   "link": "https://www.investing.com/news/economy-news/chinas-central-bank-pledges-timely-policy-tool-adjustment-4829682",
-   "published": "2026-08-02T08:48:38Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "La banca centrale cinese promette un tempestivo aggiustamento degli strumenti politici"
-  },
-  {
-   "source": "Investing.com",
    "title": "Capital One says it closed Trump Organization’s accounts after anti-money laundering probe",
    "link": "https://www.investing.com/news/stock-market-news/capital-one-says-it-closed-trump-organizations-accounts-after-antimoney-laundering-probe-4829656",
    "published": "2026-08-01T23:24:34Z",
@@ -50015,19 +50040,6 @@
    "inv": true,
    "sentiment": "bear",
    "title_it": "Capital One afferma di aver chiuso i conti della Trump Organization dopo l’indagine antiriciclaggio"
-  },
-  {
-   "source": "Investing.com",
-   "title": "What does the China reset mean for the Nike business?",
-   "link": "https://www.investing.com/news/stock-market-news/what-does-the-china-reset-mean-for-the-nike-business-4829652",
-   "published": "2026-08-01T20:22:51Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Cosa significa il reset della Cina per il business Nike?"
   },
   {
    "source": "Investing.com",
@@ -50054,6 +50066,238 @@
    "inv": true,
    "sentiment": "neutral",
    "title_it": "Il commercio di AI-Capex è crollato mentre tutti incolpavano lo Stretto di Hormuz"
+  },
+  {
+   "source": "Google News",
+   "title": "Trump’s legal loophole around the Supreme Court is keeping inflation alive - and trapping Bitcoin in the Fed's crosshairs - CryptoSlate",
+   "link": "https://news.google.com/rss/articles/CBMi2gFBVV95cUxOZVZMb0FrNkhjdG4ydjhsLTBoR2MzQ1hqSDJ4dG5DUFBDUEI5dmZrVnNTTVNVRDY0RXgzOGl0dXlyUzBqSjhJdDJDOWdoSS1ob1JTSlp6YVA2bGRZdmFhbGphVXB0b01vMTR0NW1tblJDMHZDcU9OZlpkWkVCOVhTODFuWnFsNzRqVzBUVGhxa25iaU9ad3plcHhXd1g3WUJTRG5rcjZtWHphakt4Zkx1OHkzVWRSLVRwUkdrMHcwWDVLV0R1NkU1OVZnODF5SkI1Z2tHWEp3YXlHQQ?oc=5",
+   "published": "2026-08-02T14:35:08Z",
+   "tickers": [
+    "MACRO",
+    "POL",
+    "BTC-USD"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La scappatoia legale di Trump attorno alla Corte Suprema sta mantenendo viva l'inflazione e intrappolando Bitcoin nel mirino della Fed - CryptoSlate"
+  },
+  {
+   "source": "Google News",
+   "title": "Jobs report and big earnings week ahead for US markets - Business Day",
+   "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNLWFNQXNraUdzNno3RV9VQWZ6elp4Y1RCOTljVUM3TVVNSEVYQmlGa1VRUllkRkxaMkVWcDVQNGs1ZXFCMXExdnpvR25iWW5aQVZsSWVLdmswbmFBMGM5LUFHYVI2azhGdTlYX1pERkpMN0hxMmxnYnBtbkdpUWd2ODRtRGZkS1I2SVdBelVkQkdGZFd5ODZkRjQwT3FBNWtBUVVweXlRVQ?oc=5",
+   "published": "2026-08-02T14:10:26Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Rapporto sull'occupazione e grandi guadagni in vista per la settimana sui mercati statunitensi - Giorno lavorativo"
+  },
+  {
+   "source": "MarketWatch",
+   "title": "S&P 500 profit growth is getting even wilder as Amazon makes its mark",
+   "link": "https://www.marketwatch.com/story/s-p-500-profit-growth-is-getting-even-wilder-as-amazon-makes-its-mark-5ddf2082?mod=mw_rss_topstories",
+   "published": "2026-08-02T14:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "La crescita degli utili dell’indice S&P 500 sta diventando ancora più sfrenata man mano che Amazon lascia il segno"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Bond Traders Flying Blind on Fed See Risk Yields Spiral Higher",
+   "link": "https://news.google.com/search?q=Bond%20Traders%20Flying%20Blind%20on%20Fed%20See%20Risk%20Yields%20Spiral%20Higher",
+   "published": "2026-08-02T14:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "I trader obbligazionari che guardano alla cieca la Fed vedono una spirale dei rendimenti rischiosi in rialzo"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Nides Says Iran War Needs Negotiations",
+   "link": "https://news.google.com/search?q=Nides%20Says%20Iran%20War%20Needs%20Negotiations",
+   "published": "2026-08-02T13:31:08Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Nides afferma che la guerra con l’Iran ha bisogno di negoziati"
+  },
+  {
+   "source": "CNBC",
+   "title": "OPEC agrees September oil hike, completing rollback of voluntary cuts",
+   "link": "https://www.cnbc.com/2026/08/02/opec-agrees-september-oil-hike-completing-rollback-of-voluntary-cuts.html",
+   "published": "2026-08-02T13:09:44Z",
+   "tickers": [
+    "MACRO",
+    "POL",
+    "CL=F"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "L’OPEC concorda l’aumento del petrolio a settembre, completando la riduzione dei tagli volontari"
+  },
+  {
+   "source": "Reddit",
+   "title": "Amazon says it got $600 million in Trump tariff refunds and will pass return along to some customers",
+   "link": "https://www.reddit.com/r/stocks/comments/1vdhp4q/amazon_says_it_got_600_million_in_trump_tariff/",
+   "published": "2026-08-02T13:09:18Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Amazon afferma di aver ottenuto 600 milioni di dollari in rimborsi tariffari Trump e di trasferire il rimborso ad alcuni clienti"
+  },
+  {
+   "source": "CNBC",
+   "title": "Investors scored on Iran war's oil market boom. Staying long the trade will get trickier",
+   "link": "https://www.cnbc.com/2026/08/02/oil-prices-iran-war-energy-market.html",
+   "published": "2026-08-02T13:00:01Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Gli investitori hanno guadagnato grazie al boom del mercato petrolifero causato dalla guerra in Iran. Rimanendo a lungo il commercio diventerà più complicato"
+  },
+  {
+   "source": "MarketWatch",
+   "title": "How Apple’s cheap MacBook Neo sparked a war in budget laptops",
+   "link": "https://www.marketwatch.com/story/how-apples-cheap-macbook-neo-sparked-a-war-in-budget-laptops-8fbaf839?mod=mw_rss_topstories",
+   "published": "2026-08-02T13:00:00Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bear",
+   "title_it": "Come il MacBook Neo economico di Apple ha scatenato una guerra tra i laptop economici"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Wall Street’s Favorite Bet Comes Undone as Chips Whipsaw Market",
+   "link": "https://news.google.com/search?q=Wall%20Street%E2%80%99s%20Favorite%20Bet%20Comes%20Undone%20as%20Chips%20Whipsaw%20Market",
+   "published": "2026-08-02T13:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "La scommessa preferita di Wall Street viene annullata mentre il mercato Chips Whipsaw"
+  },
+  {
+   "source": "Reuters",
+   "title": "Gulf stocks rise as Iran de-escalation hopes, earnings lift sentiment - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOZnZ5dk1rM0dBSk5iSjEwVV9FNUJRVWJhLXlEY2lKRHAwb0ZSUU5INVUwVFpKV3M3aGhVNmZNSDMxV1JQNnZDWjhwaFhITnVhUUt5X0tCZ2pBTk1rNEg4ZTQ5MUJzRVI2b2hCS1BqYXpKTHBabmc5WHpQajZuS3BfNU5FUHR1cHlfUmQ0bWtFLWdyUFZoaXF6d2ZCUWRPX2JROU5fclRkM3NyOVNXZW52YzdRUkRBRWEtZ3ZF?oc=5",
+   "published": "2026-08-02T12:48:52Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "Borsa del Golfo in rialzo mentre le speranze di allentamento dell'escalation in Iran, utili risollevano il sentiment - Reuters"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Trump Pauses Iran Strikes as Talks Resume",
+   "link": "https://news.google.com/search?q=Trump%20Pauses%20Iran%20Strikes%20as%20Talks%20Resume",
+   "published": "2026-08-02T12:20:11Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump sospende gli attacchi contro l’Iran mentre riprendono i colloqui"
+  },
+  {
+   "source": "CNBC",
+   "title": "Top Wall Street analysts are bullish on these 3 dividend stocks for passive income",
+   "link": "https://www.cnbc.com/2026/08/02/top-analysts-are-bullish-on-these-dividend-stocks-for-passive-income-.html",
+   "published": "2026-08-02T12:01:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "I principali analisti di Wall Street sono rialzisti su questi 3 titoli azionari con dividendi per il reddito passivo"
+  },
+  {
+   "source": "MarketWatch",
+   "title": "Investors are rotating into financial stocks. The Fed’s next move could determine how far the rally runs.",
+   "link": "https://www.marketwatch.com/story/investors-are-rotating-into-financial-stocks-the-feds-next-move-could-determine-how-far-the-rally-runs-662c63df?mod=mw_rss_topstories",
+   "published": "2026-08-02T12:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "Gli investitori si stanno orientando verso i titoli finanziari. La prossima mossa della Fed potrebbe determinare la portata del rally."
+  },
+  {
+   "source": "MarketWatch",
+   "title": "Financial stocks are crushing it. These charts show why the ‘breakout’ rally may have just begun.",
+   "link": "https://www.marketwatch.com/story/financial-stocks-are-crushing-it-these-charts-show-why-the-breakout-rally-may-have-just-begun-6db3cc12?mod=mw_rss_topstories",
+   "published": "2026-08-02T12:00:00Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "bull",
+   "title_it": "I titoli finanziari lo stanno schiacciando. Questi grafici mostrano perché il rally di “breakout” potrebbe essere appena iniziato."
+  },
+  {
+   "source": "Reuters",
+   "title": "Holcim to sell Philippines unit to China's Huaxin in $807 million deal - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQRVVGZmt6VDlQODNUNGdYbUhqdmtGdUNDU0gycTNuU1RaWXFEUFNXNEswbTN4LW1zNnJKdkYwTWtYTy1NZTY0UFRmRlZzNkpyZmxKQnpzMXJ4NWd4N24weXA5YlRxdV9IZU1RVDFDTFJGLU5lZE9xSWNEdkJEYi0yNG1rZ19rU0tncC1wQ2ljN19IdVI1RVBJeTFzZXhBNEg1NGJRLVFZMDRjUS1aNVZ4bzRhSEY5aHpH?oc=5",
+   "published": "2026-08-02T11:49:19Z",
+   "tickers": [
+    "MACRO"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Holcim venderà l'unità filippina alla cinese Huaxin per un accordo da 807 milioni di dollari - Reuters"
+  },
+  {
+   "source": "Reuters",
+   "title": "Hungary PM flags \"critical\" days ahead with looming nuclear shutdown - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxNZ3k3dmJWR3pfSnFZRFVOcE1KMXF6UkpsQUoyTk9JVVFLOW1XNGlLQXkxRlhnNXVuaTRnOElUT2paNnlneG1pYnNNMjhxZFVsR3R4czN3dFdab2w4S1hfZms5TC1tRDdpR3F3cGYzQnFvOVViWGtsdFdaQUpZZ1FvOFJiMl9QUk1raEF1M1BDZzdUM1NyZDB1Znp4OGlUZWdIMDRBeEptWlhpaU9BeTl2YkF6dDluS1VIRmc?oc=5",
+   "published": "2026-08-02T10:45:44Z",
+   "tickers": [
+    "MACRO",
+    "POL"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Il Primo Ministro ungherese annuncia giorni \"critici\" in vista dell'imminente chiusura nucleare - Reuters"
   },
   {
    "source": "CNBC",
@@ -50084,22 +50328,21 @@
    "title_it": "La principale società nucleare sarà presto quotata in borsa."
   },
   {
-   "source": "Reddit",
-   "title": "Why people still fearmonger the war?",
-   "link": "https://www.reddit.com/r/stocks/comments/1vdd2p8/why_people_still_fearmonger_the_war/",
-   "published": "2026-08-02T08:59:37Z",
+   "source": "Reuters",
+   "title": "China's central bank pledges timely policy tool adjustment - Reuters",
+   "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNQlBEalBMTVVxZF9lek1XdEQ3M0VjeTNvZ1BVLUE5VHRNVUV3OWx3UnhKOEotWTFvZDN0VHBvMzBUcWZrRURzcFhaQVZwZjNhVll0b1prd1JxMEtJdVJRNFZRaWVtOFNkR0s2Mkl0TExac3pQWnp0LXlQY2I4UktydFFVeE9ESGVwa1pFTjMxUVo0MkRRVW5wa2lXV1pwUjY4U2Z5ajdmOHBORl9mQmt4Vi1B?oc=5",
+   "published": "2026-08-02T08:47:43Z",
    "tickers": [
-    "MACRO",
-    "POL"
+    "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bear",
-   "title_it": "Perché le persone continuano a temere la guerra?"
+   "sentiment": "neutral",
+   "title_it": "La banca centrale cinese promette un tempestivo aggiustamento degli strumenti politici - Reuters"
   },
   {
    "source": "AP",
-   "title": "Trump says he will order halt to Iran strikes after parameters reached for deal to end war - AP News",
+   "title": "Trump says he will order halt to Iran strikes after parameters reached for deal to end war - apnews.com",
    "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNZy05LW5ObUpORjFnYnd6WWR0UmJrOVVXR19TU1JqcFBxdUtwMGRGZm5DX2hNZ3h0dWhRWk5Rd3M1cGY5WnpneE85T1JDOEdtYnZUMWl0b1AwN0JseTRCQTNmVlllQzN1djg3RzIyWENCdGx2SzdZSXJLNHJJeXFPVHVwc292NnlCbDJTdDhHQ3ZURE0zaEJvdHR2dkxyRVk1a1FoTmtoZw?oc=5",
    "published": "2026-08-02T08:45:00Z",
    "tickers": [
@@ -50109,13 +50352,13 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "Trump dice che ordinerà la fine degli attacchi contro l'Iran dopo che saranno stati raggiunti i parametri per un accordo per porre fine alla guerra - AP News"
+   "title_it": "Trump dice che ordinerà la fine degli attacchi contro l'Iran dopo che saranno stati raggiunti i parametri per un accordo per porre fine alla guerra - apnews.com"
   },
   {
    "source": "Google News",
-   "title": "President Donald Trump Expects the Stock Market to \"Go Through the Roof,\" but His Own Policies Can Prevent That From Happening - The Motley Fool",
-   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQZFhkX0E2RlJKdDlhRVpKZ3N2RHVxRzVKUVVKUnJGVzc4ckFWTmdxeWYwZHFrc09oVi02a0JUWnhBS3l1Vi1JWUZIZGdWMGdwQmtPVXYybkpVMDV6dE9fX3pncjA0blhzeHYtQWhfYUs3a215cnVranFmZER3alNvZTg4MDVJQmxSX2stRFdYN290TzgwZ180?oc=5",
-   "published": "2026-08-02T08:40:34Z",
+   "title": "President Donald Trump Expects the Stock Market to \"Go Through the Roof,\" but His Own Policies Can Prevent That From Happening - The Globe and Mail",
+   "link": "https://news.google.com/rss/articles/CBMisgJBVV95cUxPUUtIN0ZPRkFFbDZzZmk0RXNNTzRZMWlhNUUwcG11WDBxWG5hZndEOV8ta3JJX2dsSFhTV1lhRjhkNmdOWW5MMlVneHNFcTdya1diVDNUQldMN0NKdzlXRkt2Z0tabjlJaV8zX1B2OUFYX3hEVm1SVzM0Y3loNGxtNm9IMFNEVEtWVXlxVFctWVlpMVFMempveE9uZFFycFQ1S2V6REJ1MkZSOEZlWV9yaE1BVUJkWEktbkpOaHFObmNEcElJVjVsb1VuSEY0ckxKa2tzZ1lrYzBNRG8weks2aE1SUHk5cWg4Sk1ZRnlFY0Uzb3RWbEx3SWdMcU93ZGxsSDIyZ2NPUW9xNUwzQUl0RWUwOTNCSGJlZUl4ZG1oQUh3WnoxanNWYTg3a1A0UnNxVUE?oc=5",
+   "published": "2026-08-02T08:33:58Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -50123,66 +50366,24 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il presidente Donald Trump si aspetta che il mercato azionario vada alle stelle, ma le sue stesse politiche possono impedire che ciò accada - The Motley Fool"
+   "title_it": "Il presidente Donald Trump si aspetta che il mercato azionario vada alle stelle, ma le sue politiche possono impedire che ciò accada - The Globe and Mail"
   },
   {
-   "source": "Reuters",
-   "title": "OPEC+ set for September quota increase followed by pause, sources say - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOOUxtS1l6d0U4NVcxelJCQ1EwSGpaQ3BjNXJHUlpQcVlfZXJjMWU5WllQR21KdDZ0dlo2NDI0cW1RVXd3U0FiTHZMRHNDNng5ZXZseU9lT19KeG1RY18xRGNTVzBjdHpzOWpYQkwxTENWWko4NmtFQm5iQzFvQWdfeGhvQVZSMHdrZjhzRFREVnN2RWQyanBEdGp0T19mazNxR0ZiRXdFRVlvX1RZNW5mVFgyYlUxeS15QlZfOHhWY1UzSzFTZk13Yw?oc=5",
-   "published": "2026-08-02T08:12:44Z",
-   "tickers": [
-    "MACRO",
-    "POL",
-    "CL=F"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "L'OPEC+ prevede un aumento delle quote a settembre seguito da una pausa, dicono fonti - Reuters"
-  },
-  {
-   "source": "Reuters",
-   "title": "Holcim to sell majority stake in Philippines unit to China's Huaxin for $527 million - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQRVVGZmt6VDlQODNUNGdYbUhqdmtGdUNDU0gycTNuU1RaWXFEUFNXNEswbTN4LW1zNnJKdkYwTWtYTy1NZTY0UFRmRlZzNkpyZmxKQnpzMXJ4NWd4N24weXA5YlRxdV9IZU1RVDFDTFJGLU5lZE9xSWNEdkJEYi0yNG1rZ19rU0tncC1wQ2ljN19IdVI1RVBJeTFzZXhBNEg1NGJRLVFZMDRjUS1aNVZ4bzRhSEY5aHpH?oc=5",
-   "published": "2026-08-02T07:24:09Z",
+   "source": "Reddit",
+   "title": "Read the last 3 times BofA called the Fed “dovish” and said sell risk. So I backtested it.",
+   "link": "https://www.reddit.com/r/investing/comments/1vd9u12/read_the_last_3_times_bofa_called_the_fed_dovish/",
+   "published": "2026-08-02T05:53:12Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Holcim venderà la quota di maggioranza dell'unità filippina alla cinese Huaxin per 527 milioni di dollari - Reuters"
-  },
-  {
-   "source": "Google News",
-   "title": "US economy slowed more than expected as the Iran war took hold - AOL.com",
-   "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPcTRuY1lxWFpBQVhqOU1iS0ZJVV9qbU9CR1owVEZhMnljQmVNdzhwQjdSN3dtZXNIZ1A5bFJURXZiNDh1enpzVVB2dk9URjNxZ3BPWV80RlNyV1diWkd6c19uMnp5bVFJUHFINUVXd2ZvWUNRZ3RuRG4waGRvaXk1NnIyTQ?oc=5",
-   "published": "2026-08-02T05:08:48Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "L'economia statunitense ha rallentato più del previsto a causa della guerra con l'Iran - AOL.com"
-  },
-  {
-   "source": "Google News",
-   "title": "Nonfarm Payrolls Collide With Big Tech Earnings, US-Japan Joint Yen Intervention Takes Center Stage, Fed Divisions Deepen - finance.biggo.com",
-   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE51UExubVVoSk11dW14akYwZGpndktSWXhCb0hJdkhWVTBmYmtCVWVkdEJFaTBZSUtKR1FRLUx5bkp5Unp5end2U05zYlBxTEt3d2xsWXFreElJUVpoY19nWW45UEd5ay1GY3lGdFR4NC1iMUVsT3c?oc=5",
-   "published": "2026-08-02T04:05:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I libri paga del settore non agricolo si scontrano con gli utili delle grandi aziende tecnologiche, l'intervento congiunto sullo yen tra Stati Uniti e Giappone è al centro della scena, le divisioni della Fed si approfondiscono - finance.biggo.com"
+   "title_it": "Leggi le ultime 3 volte in cui BofA ha definito la Fed \"colonista\" e ha detto che \"vendi il rischio\". Quindi l'ho sottoposto a backtest."
   },
   {
    "source": "AP",
-   "title": "Iran’s leaders show a united front over the war but are divided over what the goal is - AP News",
+   "title": "Iran’s leaders show a united front over the war but are divided over what the goal is - apnews.com",
    "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxPRHVlUnB6RFd3NEl1N0l5Q2RvNVVISGRjSXhyX2ZoRURSbTVmd0RJNlg3eDY5a3dfOTBjNXFkX1FLaGxveDg0SUlpc2Vrbm5DbmJval8xci1NazI1eWFSS0IyNkpDNUFkMURvZHRVVklOZ0hFUUZxY0R6ck5sMkpiMHBQczFuVUdLT3JHOEdKdHJaTlJPS0ZJdjliUjlYdlBaSW9YMQ?oc=5",
    "published": "2026-08-02T04:00:00Z",
    "tickers": [
@@ -50192,11 +50393,11 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "I leader iraniani mostrano un fronte unito sulla guerra ma sono divisi su quale sia l’obiettivo – AP News"
+   "title_it": "I leader iraniani mostrano un fronte unito sulla guerra ma sono divisi su quale sia l’obiettivo - apnews.com"
   },
   {
    "source": "AP",
-   "title": "Trump says Mideast allies have reached outlines of deal to end Iran war, says US to stop new strikes - AP News",
+   "title": "Trump says Mideast allies have reached outlines of deal to end Iran war, says US to stop new strikes - apnews.com",
    "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOWUxMdnNIZ1MzaWNwNXBYV19IbUpVbUo2LTBiR3BiS05fVE1fOUczeVM1MVk3TEJWbjA5cmVZZmlNZ2ZLdnp6NlNLRlBmanlpTnhVbFZPc0RicnVJRjFBUS1uNU1kMldjb2F3ZnN3QTRkZGVLNW8wSklmVjZIcG52dks0TE5kXzlmdkF1d01SUW9TemFEQ09DSGlZdkxON1k?oc=5",
    "published": "2026-08-02T03:43:00Z",
    "tickers": [
@@ -50206,25 +50407,40 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bear",
-   "title_it": "Trump afferma che gli alleati del Medio Oriente hanno raggiunto un accordo per porre fine alla guerra con l'Iran, afferma che gli Stati Uniti fermeranno nuovi attacchi - AP News"
+   "title_it": "Trump afferma che gli alleati del Medio Oriente hanno raggiunto un accordo per porre fine alla guerra con l'Iran, afferma che gli Stati Uniti fermeranno nuovi attacchi - apnews.com"
   },
   {
-   "source": "CNBC",
-   "title": "Trump lashes out at Pirro after she moves to drop Reflecting Pool vandalism case, saying 'flawed installation' to blame",
-   "link": "https://www.cnbc.com/2026/07/31/trump-pirro-reflecting-pool-olympian-david-hearn.html",
-   "published": "2026-08-02T01:35:50Z",
+   "source": "Google News",
+   "title": "Trump wanted interest rate cuts to be 'Rocket Fuel' for the economy. He is losing that fight so far. - Pittsburgh Post-Gazette",
+   "link": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNSXNJcFpIZ3dURUlCV0Naa0pqV0RzczZLc1RmaTFqV0ROYVE0SVZWU3FrVmhwblNLT1lnZ2VzS3RXaWZFNjZBVkdTbGl6aXczTmRubU0wcG5VM01JbUFkZGFUYlEzU1QwZmNqVEpUaXBEUGtWOGxIOUJJbHZOVl9ncDZndW9wQlZnbXhVSUhwaDFjOEpCRExwWENHdXJSRUxWUnhrTXRvRThNQQ?oc=5",
+   "published": "2026-08-02T03:07:52Z",
+   "tickers": [
+    "MACRO",
+    "POL",
+    "BE"
+   ],
+   "topic_pri": 0,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "Trump voleva che i tagli dei tassi di interesse fossero il “carburante per missili” per l’economia. Finora sta perdendo quella battaglia. - Pittsburgh Post-Gazette"
+  },
+  {
+   "source": "Bloomberg",
+   "title": "Trump Says US to Hold Off Iran Attack If Deal Agreed",
+   "link": "https://news.google.com/search?q=Trump%20Says%20US%20to%20Hold%20Off%20Iran%20Attack%20If%20Deal%20Agreed",
+   "published": "2026-08-02T02:19:38Z",
    "tickers": [
     "MACRO",
     "POL"
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bear",
-   "title_it": "Trump si scaglia contro Pirro dopo che lei ha deciso di archiviare il caso di vandalismo sulla Reflecting Pool, dicendo che la colpa è di \"installazione difettosa\""
+   "sentiment": "neutral",
+   "title_it": "Trump dice che gli Stati Uniti reprimeranno l’attacco all’Iran se l’accordo verrà raggiunto"
   },
   {
    "source": "AP",
-   "title": "Trump stands to profit off US policy announcements by selling fast access to his social media posts - AP News",
+   "title": "Trump stands to profit off US policy announcements by selling fast access to his social media posts - apnews.com",
    "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNTnE2clhGSzhVY192V0ZoZGVCWGhJU1lWZ2tEeklTcC03dTJaU1lXMWU4LW1YbXNQcjg2QS1fQnFZd1hnM0dfbkdCSUx1Um9YcUV5bjB2bzZjMG02T2ZCQk1BR0M1U2FVZWN1NUtOZDZoclZYaHdNQ19iR1BvMG9xN0lsSjZjZWxLb2dSc1VBSDRPSzA0cGtvTGtiZGFMTmpYcjRPb09vb1NLVkxUTE9fby1VOVJ0Um9QdzMzTA?oc=5",
    "published": "2026-08-02T01:27:00Z",
    "tickers": [
@@ -50234,7 +50450,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "bull",
-   "title_it": "Trump trarrà profitto dagli annunci politici degli Stati Uniti vendendo un accesso rapido ai suoi post sui social media - AP News"
+   "title_it": "Trump trarrà profitto dagli annunci politici degli Stati Uniti vendendo un accesso rapido ai suoi post sui social media - apnews.com"
   },
   {
    "source": "Google News",
@@ -50250,22 +50466,8 @@
    "title_it": "Settimana a Wall Street: rapporto mensile sull'occupazione, guadagni di McDonald's e SpaceX - Bozeman Daily Chronicle"
   },
   {
-   "source": "Bloomberg",
-   "title": "Saudi Prince Concerned Over Trump’s Iran Strike Plan: Axios",
-   "link": "https://news.google.com/search?q=Saudi%20Prince%20Concerned%20Over%20Trump%E2%80%99s%20Iran%20Strike%20Plan%3A%20Axios",
-   "published": "2026-08-02T00:13:35Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il principe saudita preoccupato per il piano di Trump contro l’Iran: Axios"
-  },
-  {
    "source": "Reuters",
-   "title": "Israeli strikes kill at least four in Gaza despite Trump announcing breakthrough - Reuters",
+   "title": "Israeli strikes kill nine in Gaza, Israeli minister says no deal to halt attacks - Reuters",
    "link": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPNzFyTXBvZ1pGeVZXTUlTRWM3VGxjTjd5dXk4Y1RwZUYtaE9adFlFRGNkcU1tNmR6M2lCckhIN2cwMG54RUNiNzNib3RQVWxLd1FqWlY5eVZObDc4b3NCdGlLZi10a214V25teXViTkpCZXBXeDRfazBSOUNJVkZTM1RLcWt5SzUwaURiUUJMcDlOZFJFTkg5NXZXV0ZuakxZanh2YUNVMko3R1pJS3RsUFBsQjNpOXlLcHQwbHJtZ1FZWk9VdDRz?oc=5",
    "published": "2026-08-01T23:50:00Z",
    "tickers": [
@@ -50274,8 +50476,8 @@
    ],
    "topic_pri": 0,
    "inv": false,
-   "sentiment": "bull",
-   "title_it": "Attacchi israeliani uccidono almeno quattro persone a Gaza nonostante Trump abbia annunciato una svolta - Reuters"
+   "sentiment": "neutral",
+   "title_it": "Attacchi israeliani uccidono nove persone a Gaza, ministro israeliano dice che non c'è accordo per fermare gli attacchi - Reuters"
   },
   {
    "source": "Google News",
@@ -50306,7 +50508,7 @@
   },
   {
    "source": "AP",
-   "title": "Trump blasts Pirro after she refutes his claim that Reflecting Pool was damaged by vandals - AP News",
+   "title": "Trump blasts Pirro after she refutes his claim that Reflecting Pool was damaged by vandals - apnews.com",
    "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNVG1pTGpVdlZfTjVEQmFteHpjbThuQmpsbGdVb2hLT0FSLXJIZmZKVGpCckJtSjVZQ0VLd1hFaTA4dkR4enlia3BvWnQ1aUhLdGdjenNrZXM0Rm91T0FRMlNOZVlaVUFuVGlhczk1Y0lDMEJkUmd2enhUdFNWLU4weExfQlIyREhRckFEQUhHc2xBWGp3VVgyX2NfcVZrR0dPeVJuTjEtVQ?oc=5",
    "published": "2026-08-01T21:56:00Z",
    "tickers": [
@@ -50316,27 +50518,13 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Trump attacca Pirro dopo che lei ha confutato la sua affermazione secondo cui la Reflecting Pool è stata danneggiata da vandali - AP News"
-  },
-  {
-   "source": "CNBC",
-   "title": "Trump's threat to push ahead on settlement fund injects new uncertainty into attorney general talks",
-   "link": "https://www.cnbc.com/2026/08/01/trumps-settlement-fund-threat-injects-uncertainty-into-ag-talks.html",
-   "published": "2026-08-01T17:41:47Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "La minaccia di Trump di portare avanti il ​​fondo di transazione introduce nuova incertezza nei colloqui con il procuratore generale"
+   "title_it": "Trump attacca Pirro dopo che lei ha confutato la sua affermazione secondo cui la Reflecting Pool è stata danneggiata da vandali - apnews.com"
   },
   {
    "source": "AP",
-   "title": "Maryland Gov. Wes Moore says he's 'very concerned' Trump will interfere in the midterm elections - AP News",
-   "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQSGRqVG1RX1plR2pLMHZETVBQUlM1OU5jMHJMdWhSRVRmMlNRMGdqc2IxWVA2NFhkU2VLYmlPVjV2UlAwUHBDNmRPWWZlQ3Z4OGpYalRyZDJacEtYQW1ieUY1ejB2ZV9KdW1VdTdQUUpnTFNybmhDa3ZHWThwUVdPcHFiYnFzN3VndzJnekhuSEV5dmU0ZVE2NDlCbVQ2TUtaTnp3ZU9nck5rS0hUSENzRVl3?oc=5",
-   "published": "2026-08-01T15:56:00Z",
+   "title": "Trump's threat to push ahead on settlement fund injects new uncertainty into attorney general talks - apnews.com",
+   "link": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOWGgtekZvTlZXWGNlaDNEZFFCcXhpX0RYT1h4eGVCOEVBVWxNTFJMUjFDWG9EdmtvbXpQNUhDM0tSM1FwQ2k2MVU4M3NUM3BZeUZJTm9fLWRzUVNuNUN6SGlmd011ZjlEeFgxRWMzaTBPaXcyMkpteVNSTWVWa3hJR3RVNWFDc1hCRWNMQ3pFcTNOMDJjMDhFcHpXQ0p6djZnTzRTVzAycXJXRy1RdkNXazBIdTRrUHpkN3c?oc=5",
+   "published": "2026-08-01T19:38:00Z",
    "tickers": [
     "MACRO",
     "POL"
@@ -50344,62 +50532,7 @@
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Il governatore del Maryland Wes Moore afferma di essere \"molto preoccupato\" che Trump interferisca nelle elezioni di medio termine - AP News"
-  },
-  {
-   "source": "Reuters",
-   "title": "Israeli strikes kill two in Gaza, destroy medicine storage warehouses - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQejJOMUdaM3o5dDFVSU04YTE1RzhOVjhyTzdxR2tqalUtSk1uUFlxOTJFLTN1TGgtMWRqdUktaGdCQUw3dDE1MG1hZjljOUdkYUk4RWhEZnByVHJyN2JPeFVOUG9Danp4ZUZTNmVUeDJtaXVjYUNhbk5wb1lpMGN6ZnZIVEhrelIzS0RjaEdXT3czX1Vrekh6VTRTQzUtNE8zM0pPVGY4eHA4eFdSWm8xR3pIRnNtcXdZSUQw?oc=5",
-   "published": "2026-08-01T15:48:44Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Attacchi israeliani uccidono due persone a Gaza e distruggono magazzini di medicinali - Reuters"
-  },
-  {
-   "source": "CNBC",
-   "title": "U.S. Treasury intervenes to support yen after Japan steps in, FT reports",
-   "link": "https://www.cnbc.com/2026/08/01/us-treasury-intervenes-to-support-yen-after-japan-steps-in-ft.html",
-   "published": "2026-08-01T15:44:08Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il Tesoro americano interviene per sostenere lo yen dopo l’intervento del Giappone, riferisce FT"
-  },
-  {
-   "source": "CNBC",
-   "title": "Trump Media's new paid data service goes live, giving clients faster access to Trump’s posts",
-   "link": "https://www.cnbc.com/2026/08/01/trump-medias-new-data-service-gives-faster-access-to-trumps-posts.html",
-   "published": "2026-08-01T14:17:57Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il nuovo servizio dati a pagamento di Trump Media è attivo, offrendo ai clienti un accesso più rapido ai post di Trump"
-  },
-  {
-   "source": "Bloomberg",
-   "title": "Ukraine Gains Ground as Putin Faces Pressure",
-   "link": "https://news.google.com/search?q=Ukraine%20Gains%20Ground%20as%20Putin%20Faces%20Pressure",
-   "published": "2026-08-01T14:13:24Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bull",
-   "title_it": "L’Ucraina guadagna terreno mentre Putin affronta la pressione"
+   "title_it": "La minaccia di Trump di portare avanti il ​​fondo di compensazione introduce nuova incertezza nei colloqui con il procuratore generale - apnews.com"
   },
   {
    "source": "Reddit",
@@ -50415,72 +50548,17 @@
    "title_it": "Pensi che la recente svendita dell'IA sia stata principalmente dovuta alla caccia di Citadel al fondo di consapevolezza situazionale"
   },
   {
-   "source": "Bloomberg",
-   "title": "Exxon, Chevron Warn Fuel Prices to Endure as War Knocks Refining",
-   "link": "https://news.google.com/search?q=Exxon%2C%20Chevron%20Warn%20Fuel%20Prices%20to%20Endure%20as%20War%20Knocks%20Refining",
-   "published": "2026-08-01T13:30:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Exxon e Chevron avvertono che i prezzi del carburante dureranno mentre la guerra mette a dura prova la raffinazione"
-  },
-  {
-   "source": "Google News",
-   "title": "President Donald Trump Just Threw the Federal Reserve Under the Bus Yet Again Over Interest Rates - Yahoo Finance",
-   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOY1o0QWRTZjdhclhsbEZhRzVESkhLeVg4WWNVX1dweWhaWUJZblJPam5qQ1BIMTVrNjN3VENEbXFpeHVpUHg3WHpmYjNhY0VOYkhQbXhYQmg1RDVVU21fMnZvZVV4bFJ3STZXRVpzanNubjFQVExQeG55ODY0dUxkRGtvd2VOVFV1c1dJX01XV2Y3T1hTTWtycGVmLWtPWDg?oc=5",
-   "published": "2026-08-01T13:26:00Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il presidente Donald Trump ha appena gettato sotto l'autobus la Federal Reserve ancora una volta a causa dei tassi di interesse - Yahoo Finanza"
-  },
-  {
-   "source": "Reuters",
-   "title": "Crimean families queue for hot meals as Ukraine hits power supply - Reuters",
-   "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQT21kcTdmN0NtcWRQR19oc3FOMkhEQnRKajhBdU1ncTFlNGlmSEwzZjhCczhpWi1ldlhZZkNqZTdCeS1sX01haE5WMGgyMDUwd21jeTY5bEZSUXZfZEtvSFliZ0hGRTAzaG9lazVlQXAzVTRCWHZHQnFDV0tob2MyaWpRdE5reHV4bkg5dHBTaWJqa01yTGJRUnh3MDB3R3dKQlE?oc=5",
-   "published": "2026-08-01T12:26:10Z",
-   "tickers": [
-    "MACRO",
-    "POL"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Famiglie della Crimea in fila per un pasto caldo mentre l'Ucraina è senza energia elettrica - Reuters"
-  },
-  {
    "source": "Yahoo Finance",
-   "title": "Mortgage and refinance interest rates today, Saturday, August 1, 2026: Rates higher than Friday",
-   "link": "https://finance.yahoo.com/personal-finance/mortgages/article/mortgage-and-refinance-interest-rates-today-saturday-august-1-2026-rates-higher-than-friday-100000052.html",
-   "published": "2026-08-01T10:00:00Z",
+   "title": "Bond vigilantes are doing the Fed's dirty work: Chart of the Day",
+   "link": "https://finance.yahoo.com/markets/article/bond-vigilantes-are-doing-the-feds-dirty-work-chart-of-the-day-114805136.html",
+   "published": "2026-08-01T11:48:05Z",
    "tickers": [
     "MACRO"
    ],
    "topic_pri": 0,
    "inv": false,
    "sentiment": "neutral",
-   "title_it": "Tassi di interesse ipotecari e di rifinanziamento oggi, sabato 1 agosto 2026: tassi più alti rispetto a venerdì"
-  },
-  {
-   "source": "Yahoo Finance",
-   "title": "J.P. Morgan drops Fed rate bombshell over Warsh, inflation",
-   "link": "https://finance.yahoo.com/economy/policy/articles/j-p-morgan-drops-fed-060300978.html",
-   "published": "2026-08-01T06:03:00Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "topic_pri": 0,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "J.P. Morgan lancia la bomba sui tassi della Fed su Warsh e inflazione"
+   "title_it": "I vigilantes obbligazionari stanno facendo il lavoro sporco della Fed: Grafico del giorno"
   },
   {
    "source": "Investing.com",
@@ -50510,6 +50588,19 @@
    "title_it": "AMD sta conquistando grandi clienti nel campo dell'intelligenza artificiale, ma Nvidia è ancora il titolo migliore da acquistare?"
   },
   {
+   "source": "CNBC",
+   "title": "AMD and Sandisk are two of the big chip stocks with earnings momentum in the new week",
+   "link": "https://www.cnbc.com/2026/08/02/amd-sandisk-are-two-of-the-big-chip-stocks-with-earnings-momentum.html",
+   "published": "2026-08-02T11:56:25Z",
+   "tickers": [
+    "AMD"
+   ],
+   "topic_pri": 1,
+   "inv": false,
+   "sentiment": "neutral",
+   "title_it": "AMD e Sandisk sono due dei titoli di chip più importanti con slancio degli utili nella nuova settimana"
+  },
+  {
    "source": "Reddit",
    "title": "Cuban and Burry on NVDA",
    "link": "https://www.reddit.com/r/stocks/comments/1vd27eh/cuban_and_burry_on_nvda/",
@@ -50523,89 +50614,11 @@
    "title_it": "Cuban e Burry su NVDA"
   },
   {
-   "source": "Reddit",
-   "title": "New development: Micron and Sandisk subreddits are heavily deleting new posts ever since Friday. Is this a bearish sign?",
-   "link": "https://www.reddit.com/r/stocks/comments/1vd1r2s/new_development_micron_and_sandisk_subreddits_are/",
-   "published": "2026-08-01T23:14:27Z",
-   "tickers": [
-    "MU"
-   ],
-   "topic_pri": 1,
-   "inv": false,
-   "sentiment": "bear",
-   "title_it": "Nuovo sviluppo: i subreddit di Micron e Sandisk stanno cancellando pesantemente nuovi post da venerdì. È un segnale ribassista?"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Bitcoin holds above $63,000 as Coldcard losses near $89 million",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-holds-above-63000-as-coldcard-losses-near-89-million-4829683",
-   "published": "2026-08-02T09:46:11Z",
-   "tickers": [
-    "BTC-USD"
-   ],
-   "topic_pri": 2,
-   "inv": true,
-   "sentiment": "bear",
-   "title_it": "Bitcoin detiene oltre 63.000 dollari mentre Coldcard perde quasi 89 milioni di dollari"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Bitcoin consolidates at $63,477 below key resistance: Live levels",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-bull-flag-85-complete-at-65414-live-levels-93CH-4813067",
-   "published": "2026-08-02T07:02:14Z",
-   "tickers": [
-    "BTC-USD"
-   ],
-   "topic_pri": 2,
-   "inv": true,
-   "sentiment": "neutral",
-   "title_it": "Bitcoin si consolida a 63.477 dollari al di sotto della resistenza chiave: livelli live"
-  },
-  {
-   "source": "Investing.com",
-   "title": "Bitcoin slips to trade above $63,000 but records 7.5% July gain",
-   "link": "https://www.investing.com/news/cryptocurrency-news/bitcoin-slips-to-trade-above-63000-but-records-75-july-gain-4829579",
-   "published": "2026-08-01T09:01:53Z",
-   "tickers": [
-    "BTC-USD"
-   ],
-   "topic_pri": 2,
-   "inv": true,
-   "sentiment": "bull",
-   "title_it": "Bitcoin scivola sopra i 63.000 dollari, ma registra un guadagno del 7,5% a luglio"
-  },
-  {
-   "source": "Reddit",
-   "title": "The AI booty be with the users, not the shipwrights.",
-   "link": "https://www.reddit.com/r/stocks/comments/1vczhz7/the_ai_booty_be_with_the_users_not_the_shipwrights/",
-   "published": "2026-08-01T21:36:36Z",
-   "tickers": [
-    "BE"
-   ],
-   "topic_pri": 2,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "Il bottino dell’IA spetta agli utenti, non ai maestri d’ascia."
-  },
-  {
-   "source": "MarketWatch",
-   "title": "Health savings accounts can be a great retirement tool – if you’re healthy or wealthy",
-   "link": "https://www.marketwatch.com/story/hsas-can-be-a-great-retirement-tool-if-youre-healthy-or-wealthy-5a3e2991?mod=mw_rss_topstories",
-   "published": "2026-08-01T17:09:00Z",
-   "tickers": [
-    "BE"
-   ],
-   "topic_pri": 2,
-   "inv": false,
-   "sentiment": "neutral",
-   "title_it": "I conti di risparmio sanitario possono essere un ottimo strumento per la pensione, se sei sano o ricco"
-  },
-  {
    "source": "Polymarket",
-   "title": "Will Bitcoin dip to $62,000 July 27-August 2?",
-   "title_it": "Will Bitcoin dip to $62,000 July 27-August 2? — probabilità Sì 14%",
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-62k-july-27-august-2-2026",
-   "published": "2026-08-02T10:28:04Z",
+   "title": "Bitcoin Up or Down on August 2?",
+   "title_it": "Bitcoin Up or Down on August 2? — probabilità Sì 78%",
+   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-august-2-2026",
+   "published": "2026-08-02T14:47:52Z",
    "tickers": [
     "MACRO"
    ],
@@ -50613,10 +50626,10 @@
   },
   {
    "source": "Polymarket",
-   "title": "Bitcoin Up or Down on August 2?",
-   "title_it": "Bitcoin Up or Down on August 2? — probabilità Sì 76%",
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-august-2-2026",
-   "published": "2026-08-02T10:28:04Z",
+   "title": "Will Bitcoin dip to $62,000 July 27-August 2?",
+   "title_it": "Will Bitcoin dip to $62,000 July 27-August 2? — probabilità Sì 16%",
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-62k-july-27-august-2-2026",
+   "published": "2026-08-02T14:47:52Z",
    "tickers": [
     "MACRO"
    ],
@@ -50627,40 +50640,7 @@
    "title": "Will there be no change in Fed interest rates after the September 2026 meeting?",
    "title_it": "Will there be no change in Fed interest rates after the September 2026 meeting? — probabilità Sì 40%",
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-september-2026-meeting-615",
-   "published": "2026-08-02T10:28:04Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the Fed increase interest rates by 25 bps after the September 2026 meeting?",
-   "title_it": "Will the Fed increase interest rates by 25 bps after the September 2026 meeting? — probabilità Sì 58%",
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649",
-   "published": "2026-08-02T10:28:04Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will Bitcoin reach $66,000 July 27-August 2?",
-   "title_it": "Will Bitcoin reach $66,000 July 27-August 2? — probabilità Sì 2%",
-   "link": "https://polymarket.com/event/will-bitcoin-reach-66k-july-27-august-2-2026",
-   "published": "2026-08-02T10:28:04Z",
-   "tickers": [
-    "MACRO"
-   ],
-   "sentiment": "neutral"
-  },
-  {
-   "source": "Polymarket",
-   "title": "Will the Fed decrease interest rates by 25 bps after the September 2026 meeting?",
-   "title_it": "Will the Fed decrease interest rates by 25 bps after the September 2026 meeting? — probabilità Sì 2%",
-   "link": "https://polymarket.com/event/will-the-fed-decrease-interest-rates-by-25-bps-after-the-september-2026-meeting-586",
-   "published": "2026-08-02T10:28:04Z",
+   "published": "2026-08-02T14:47:52Z",
    "tickers": [
     "MACRO"
    ],
@@ -87494,10 +87474,10 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-08-02T10:28:04Z"
+  "generated_at": "2026-08-02T14:47:52Z"
  },
  "verdict_track": {
-  "generated": "2026-08-02T10:28:05.332Z",
+  "generated": "2026-08-02T14:47:53.576Z",
   "since": "2026-07-11",
   "episodes": 13,
   "div_track": [
