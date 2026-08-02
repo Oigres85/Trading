@@ -1535,7 +1535,11 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     ["parametri di rischio (griglia)", 'id="risk-params-grid"'],
     // v209 — protegge l'ACCESSO ai dettagli macro, non più il bottone della topbar: quello è
     // stato rimosso perché duplicava questo, e la porta è ora una sola, nella colonna centrale.
-    ["accesso ai dettagli macro", 'id="macro-details"'],
+    // v219 — il bottone "Dettagli macro" è stato rimosso su richiesta del CEO: il popup a 39
+    // pannelli era una seconda pagina dentro la pagina. I pannelli NON sono persi — si aprono
+    // cliccando la barra del rispettivo indicatore nella classifica (id="mg-tutti", protetto
+    // qui sopra) e passano dalla modale, che quindi diventa l'elemento portante da proteggere.
+    ["modale dei pannelli macro", 'id="chart-modal"'],
     ["scomposizione dei punteggi", 'id="mg-scomposizione"'],
     ["campanelli d'allarme", 'id="mg-signposts"'],
     ["riquadri patrimonio", 'id="kpi-grid"'],

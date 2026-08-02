@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "218";
+const BUILD_VERSION = "219";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3666,7 +3666,15 @@ function renderConcentrazione() {
         <div class="sh-sub">${violati.length ? violati.map(v => v.ticker).join(" · ") : "nessuna posizione sotto il proprio stop"}</div>
       </div>`;
   }
+  const top3n = rows.slice(0, 3).map(r => r.ticker).join(" · ");
   box.innerHTML = `
+    ${ciambella(rows.map(r => ({ nome: r.ticker, val: r.mcr, tk: r.ticker,
+        extra: `${fmt1.format(r.peso)}% del capitale → <b>${fmt1.format(r.mcr)}% del rischio</b>` })),
+      { centro: { sopra: "primi 3", grande: fmt1.format(top3) + "%", sotto: "del rischio" },
+        aria: "quota della varianza per posizione" })}
+    <div class="chart-legend" style="margin-top:16px">
+      <span>Sopra: <b>da dove viene il rischio</b> — la fetta è la quota di varianza, non il capitale.</span>
+    </div>
     <div class="chart-legend">
       <span><span class="lg-dot" style="background:var(--blue)"></span>peso nel comparto azionario</span>
       <span><span class="lg-dot" style="background:var(--purple)"></span>quota della varianza (MCR)</span>
@@ -3765,12 +3773,10 @@ function renderAllocGrafica() {
   const note = $("#allocg-note");
   if (!list.length) { box.innerHTML = '<div class="muted">Nessuna posizione.</div>'; if (note) note.innerHTML = ""; return; }
   const max = Math.max(...list.map(x => x.pct)) || 1;
-  box.innerHTML = `<div class="abars">${list.map((x, i) => `
-    <div class="abar-row">
-      <span class="abar-lab" title="${esc(x.nome)}">${esc(x.nome)}</span>
-      <span class="abar-track"><span class="abar-fill" style="width:${(x.pct / max * 100).toFixed(1)}%;background:${ALLOC_COLORS[i % ALLOC_COLORS.length]}"></span></span>
-      <span class="abar-val">${fmt1.format(x.pct)}% · ${fmtEUR.format(Math.round(x.val))}</span>
-    </div>`).join("")}</div>`;
+  box.innerHTML = ciambella(list.map(x => ({ nome: x.nome, val: x.val, extra: fmtEUR.format(Math.round(x.val)) })),
+    { centro: { sopra: allocGrafMode === "currency" ? "valuta" : "settore",
+                grande: fmt1.format(list[0].pct) + "%", sotto: list[0].nome.slice(0, 16) },
+      aria: "allocazione del patrimonio" });
   if (note) {
     const fx = fxExposure();
     note.innerHTML = allocGrafMode === "currency"
@@ -4072,7 +4078,12 @@ function renderSignposts() {
     return { nome: cat, valore: Math.round(on / list.length * 100), colore: on / list.length >= 0.7 ? "var(--red)" : on / list.length >= 0.5 ? "var(--yellow)" : "var(--green)",
              testo: `${on}/${list.length} acceso${on === 1 ? "" : "i"}`, on, list };
   }).sort((a, b) => b.valore - a.valore);
-  box.innerHTML = barreOrdinate(righe.map(r => ({ nome: r.nome, valore: r.valore, colore: r.colore, testo: r.testo })))
+  box.innerHTML = ciambella([
+      { nome: "Accesi", val: attivi, colore: "var(--red)" },
+      { nome: "Non ancora accesi", val: items.length - attivi, colore: "var(--border)" },
+    ], { centro: { sopra: "campanelli", grande: `${attivi}/${items.length}`, sotto: "accesi" },
+         aria: "campanelli BofA accesi" })
+    + barreOrdinate(righe.map(r => ({ nome: r.nome, valore: r.valore, colore: r.colore, testo: r.testo })))
     + `<div class="sp-dettaglio">${righe.map(r => `<div class="sp-cat">
         <div class="sp-cat-h">${esc(r.nome)}</div>
         ${r.list.map(i => `<span class="sp-item${i.status ? " sp-on" : ""}" title="${esc(i.desc || "")}${i.source ? " · fonte: " + esc(i.source) : ""}"><span class="sp-dot"></span>${esc(i.name)}</span>`).join("")}
@@ -4322,6 +4333,49 @@ async function controllaVersione() {
       location.replace(location.pathname + "?r=" + Date.now());
     });
   } catch { /* offline o file:// — nessun avviso, meglio del falso allarme */ }
+}
+
+/* ═══ v219 — CIAMBELLA riusabile ══════════════════════════════════════════════════════════
+   Una torta si legge senza istruzioni, ma vale SOLO per quantità che sono parti di un tutto
+   e non negative. Qui ci finiscono la quota di varianza (somma 100%), l'allocazione (somma
+   100%) e i campanelli accesi/spenti. NON ci finiscono i rendimenti di settore (hanno il
+   segno) né i punteggi 0-100 (non si sommano a niente): farne una torta darebbe una figura
+   che sembra dire qualcosa e non dice nulla.
+   voci: [{nome, val, colore}] · opt.centro = {sopra, grande, sotto} */
+function ciambella(voci, opt = {}) {
+  const v = (voci || []).filter(x => x && x.val > 0);
+  if (v.length < 2) return '<div class="muted">Dati insufficienti per la ripartizione.</div>';
+  const tot = v.reduce((s, x) => s + x.val, 0);
+  const R = 86, r = 54, C = 100, GIRO = 2 * Math.PI;
+  let acc = -Math.PI / 2;
+  const archi = v.map((x, i) => {
+    const ang = x.val / tot * GIRO, fine = acc + ang;
+    const grande = ang > Math.PI ? 1 : 0;
+    const P = (raggio, a) => `${(C + raggio * Math.cos(a)).toFixed(2)},${(C + raggio * Math.sin(a)).toFixed(2)}`;
+    const d = `M ${P(R, acc)} A ${R} ${R} 0 ${grande} 1 ${P(R, fine)} L ${P(r, fine)} A ${r} ${r} 0 ${grande} 0 ${P(r, acc)} Z`;
+    acc = fine;
+    const col = x.colore || ALLOC_COLORS[i % ALLOC_COLORS.length];
+    const pct = Math.round(x.val / tot * 1000) / 10;
+    return `<path d="${d}" fill="${col}" class="ciam-arco" data-ciam="${esc(x.nome)}"
+      data-pct="${pct}" data-val="${x.val}"><title>${esc(x.nome)}: ${fmt1.format(pct)}%</title></path>`;
+  }).join("");
+  const c = opt.centro || {};
+  return `<div class="ciam-wrap">
+    <svg viewBox="0 0 200 200" class="ciam-svg" role="img" aria-label="${esc(opt.aria || "ripartizione")}">
+      ${archi}
+      ${c.sopra ? `<text x="100" y="90" text-anchor="middle" font-size="10" fill="var(--muted)">${esc(c.sopra)}</text>` : ""}
+      ${c.grande ? `<text x="100" y="108" text-anchor="middle" font-size="19" font-weight="700" fill="var(--text)" font-family="var(--mono)">${esc(c.grande)}</text>` : ""}
+      ${c.sotto ? `<text x="100" y="124" text-anchor="middle" font-size="9.5" fill="var(--muted)">${esc(c.sotto)}</text>` : ""}
+    </svg>
+    <ul class="ciam-leg">${v.map((x, i) => {
+      const pct = Math.round(x.val / tot * 1000) / 10;
+      return `<li${x.tk ? ` data-ciam-tk="${esc(x.tk)}"` : ""}>
+        <span class="ciam-dot" style="background:${x.colore || ALLOC_COLORS[i % ALLOC_COLORS.length]}"></span>
+        <span class="ciam-nome">${esc(x.nome)}</span>
+        <b class="ciam-pct">${fmt1.format(pct)}%</b>
+        ${x.extra ? `<span class="muted ciam-extra">${x.extra}</span>` : ""}</li>`;
+    }).join("")}</ul>
+  </div>`;
 }
 
 function renderStruttura() {

@@ -18,7 +18,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=218">
+<link rel="stylesheet" href="assets/style.css?v=219">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -157,9 +157,9 @@
 
 <section class="card" data-pane="struttura">
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
-    <div class="macro-actions">
-      <button class="btn btn-primary btn-sm" id="macro-details" title="Tutti i dettagli macro in una sola pagina scorrevole">📖 Dettagli macro</button>
-    </div>
+    <!-- v219 — bottone "Dettagli macro" RIMOSSO su richiesta del CEO. Il popup a 39 pannelli
+         era una seconda pagina dentro la pagina. I singoli pannelli NON sono persi: si aprono
+         cliccando la barra del rispettivo indicatore nella classifica qui sopra. -->
         <!-- v215 — IL BLOCCO RICHIUDIBILE È SPARITO. Conteneva 11 tachimetri (#gauges) e 16
          riquadri (#macro-grid): nasconderli non era esploderli. Ora quegli stessi indicatori
          sono UNA classifica sola sullo stesso asse 0-100, ordinata dal peggiore, con ogni
@@ -546,6 +546,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=218"></script>
+<script src="assets/app.js?v=219"></script>
 </body>
 </html>

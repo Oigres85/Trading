@@ -1397,13 +1397,15 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 }
 
 /* riga di titoli grandi in cima alla prima scheda: i tre numeri che cambiano cosa puoi fare */
-.struct-headline { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.struct-headline { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; opacity: .82; }
 .sh-item {
   flex: 1 1 150px; min-width: 0; padding: 10px 12px; border-radius: 10px;
   background: var(--card-2); border: 1px solid var(--border);
 }
 .sh-item .sh-lab { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .8px; }
-.sh-item .sh-val { font-family: var(--mono); font-size: 21px; font-weight: 700; margin-top: 3px; line-height: 1.1; }
+/* v219 — i cartellini NON devono essere la cosa più in evidenza: il CEO li ha indicati
+   proprio per questo. Restano come sintesi, ma in secondo piano rispetto ai grafici. */
+.sh-item .sh-val { font-family: var(--mono); font-size: 15px; font-weight: 700; margin-top: 2px; line-height: 1.15; }
 .sh-item .sh-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
 .sh-item.sh-warn { border-color: rgba(245,158,11,.55); }
 .sh-item.sh-bad { border-color: rgba(239,68,68,.6); }
@@ -1631,3 +1633,17 @@ svg.g-serie { cursor: crosshair; }
 .sp-dettaglio .sp-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); padding: 1px 0; }
 .sp-dettaglio .sp-item.sp-on { color: var(--text); font-weight: 600; }
 .rp-sommario { font-size: 12.5px; margin-bottom: 10px; }
+
+/* v219 — ciambella riusabile: torta + legenda leggibile a fianco */
+.ciam-wrap { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 20px; align-items: center; }
+.ciam-svg { width: 210px; height: 210px; display: block; }
+.ciam-arco { cursor: default; transition: opacity var(--t-fast); }
+.ciam-wrap:hover .ciam-arco { opacity: .45; }
+.ciam-wrap .ciam-arco:hover { opacity: 1; }
+.ciam-leg { list-style: none; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.ciam-leg li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; font-size: 13px; }
+.ciam-dot { width: 11px; height: 11px; border-radius: 3px; }
+.ciam-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ciam-pct { font-family: var(--mono); font-size: 14px; }
+.ciam-extra { grid-column: 2 / -1; font-size: 11px; margin-top: -3px; }
+@media (max-width: 620px) { .ciam-wrap { grid-template-columns: 1fr; justify-items: center; } .ciam-leg { width: 100%; } }
