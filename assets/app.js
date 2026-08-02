@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "216";
+const BUILD_VERSION = "217";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1006,8 +1006,6 @@ function renderAll() {
   renderDataQualityAlert();
   renderTable();
   renderWatchlist();
-  renderGauges();
-  renderMacro();
   renderPortfolioHealth();
   renderMiniCards();
   renderRiskParams();
@@ -6197,106 +6195,7 @@ function fgGaugeCNN(score) {
     ${thermoLine(s, ["Paura", "Avidità"], { direct: true, gradient: "linear-gradient(90deg,#d23b30,#eab308,#16a34a)" })}`;
 }
 
-function renderGauges() {
-  const m = DATA.macro || {};
-  const cards = [];
-
-  if (m.risk_sentiment) {
-    const rs = m.risk_sentiment;
-    cards.push(thermoCard("sentiment", "Sentiment globale", rs.score, rs.score,
-      `<b>${rs.label}</b><br>composito F&amp;G · VIX · P/C · BTC · 10A`, ["Risk-on", "Risk-off"]));
-  }
-  if (m.fear_greed) {
-    const fg = m.fear_greed;
-    cards.push(`<div class="gauge-card" data-gauge="fear_greed" tabindex="0" role="button" title="Clicca per dettagli e news">
-      <span class="popup-dot"></span>
-      <div class="g-title">Fear &amp; Greed</div>
-      ${fgGaugeCNN(fg.score)}
-      <div class="gauge-sub"><b>${FG_LABELS[fg.rating] || fg.rating}</b> · 1 sett: ${fg.week_ago} · 1 mese: ${fg.month_ago}</div>
-    </div>`);
-  }
-  // VIX e FedWatch rimossi dai gauge: i loro valori sono già nel box MacroQuant (ciclo).
-  if (m.carry) {
-    const cy = m.carry;
-    const score = Math.max(0, Math.min(100, cy.spread / 5 * 100));
-    cards.push(thermoCard("carry", "Carry USD/JPY — Rischio", score, `${fmtNum.format(cy.spread)} pp spread`,
-      `US10A ${fmtNum.format(cy.us10)}% − JGB ${fmtNum.format(cy.jp10)}%<br>USD/JPY ${fmtNum.format(cy.usdjpy)} (${signTxt(cy.usdjpy_chg_1m)} 1m)`, ["Rischio Basso", "Rischio Elevato"]));
-  }
-  if (m.vix && m.vix.value != null) {
-    const v = m.vix.value;
-    const score = clamp(100 - (v - 10) / 30 * 100);            // 10=calmo(verde) → 40+=panico(rosso)
-    const lab = v < 15 ? "Calma" : v < 20 ? "Normale" : v < 28 ? "Tensione" : "Panico";
-    cards.push(thermoCard("vix", "VIX — Volatilità attesa", score, fmtNum.format(v),
-      `<b>${lab}</b>${m.vix.change_pct != null ? `<br>${signTxt(m.vix.change_pct)} oggi` : ""}`, ["Calma", "Panico"]));
-  }
-  if (m.credit && m.credit.spread_hy != null) {
-    cards.push(thermoCard("credit", "Rischio Credito (HY OAS)", m.credit.score ?? 50,
-      `${fmtNum.format(m.credit.spread_hy)}%`,
-      `<b>${esc(m.credit.label || "")}</b><br>&lt;4% normale · 5-7% stress · &gt;9% crisi`, ["Rilassato", "Crisi"]));
-  }
-  if (m.liquidity_split && m.liquidity_split.inst_cash_pct != null) {
-    const L = m.liquidity_split;
-    const score = clamp(L.inst_cash_pct / 20 * 100);           // più cash parcheggiato = più benzina
-    cards.push(thermoCard("liquidity", "Liquidità in attesa (Ist. vs Retail)", score,
-      `${fmtNum.format(L.inst_cash_pct)}%`,
-      `Istituzionali (proxy AUM BIL+SHV/SPY)${L.retail_mmf_bln != null ? `<br>Retail MMF $${fmtNum.format(L.retail_mmf_bln)} mld${L.retail_pctile_5y != null ? ` · ${L.retail_pctile_5y}° pct 5A` : ""}` : ""}`,
-      ["Poca benzina", "Molta benzina"], ));
-  }
-  if (m.dollar_ruler && m.dollar_ruler.chg_3m_pct != null) {
-    const D = m.dollar_ruler;
-    const score = clamp(50 - D.chg_3m_pct * 8);                // dollaro su = compressione utili = rosso
-    cards.push(thermoCard("dollar", "Righello Dollaro (3M)", score,
-      `${signTxt(D.chg_3m_pct)}`,
-      `${D.src} ${fmtNum.format(D.value)}<br><b>${D.flag ? (D.chg_3m_pct >= 5 ? "COMPRESSIONE utili esteri" : "BOOST utili esteri") : "Impatto FX neutro (±5%)"}</b>`,
-      ["Boost utili", "Compressione"]));
-  }
-  if (m.putcall) {
-    const pc = m.putcall;
-    const score = Math.max(0, Math.min(100, 100 - pc.ratio / 2 * 100));   // più call = verde
-    cards.push(thermoCard("putcall", `Put/Call ${pc.symbol}`, score, fmtNum.format(pc.ratio),
-      `<b>${pc.ratio > 1 ? "Prevalgono PUT" : "Prevalgono CALL"}</b><br>put ${pc.puts.toLocaleString("it-IT")} · call ${pc.calls.toLocaleString("it-IT")}`, ["Call", "Put"]));
-  }
-  // Rischio Credito (HY) rimosso dai gauge: già incluso nel box MacroQuant (ciclo).
-  if (m.smart_money) {
-    const sm = m.smart_money;
-    const fgGauge = m.fear_greed?.score;
-    let divTxt = "";
-    if (fgGauge != null && sm.score != null) {
-      if (fgGauge > 75 && sm.score < 30)
-        divTxt = `<br><b style="color:var(--red)">DIVERGENZA PERICOLOSA</b>`;
-      else if (fgGauge < 25 && sm.score > 70)
-        divTxt = `<br><b style="color:var(--green)">ACCUMULO ISTITUZIONALE</b>`;
-      else if (sm.divergence != null && Math.abs(sm.divergence) > 15)
-        divTxt = `<br><b style="color:var(--yellow)">${sm.divergence_label}</b>`;
-    } else if (sm.divergence != null) {
-      divTxt = `<br><b style="color:${Math.abs(sm.divergence) > 15 ? "var(--yellow)" : "var(--muted)"}">${sm.divergence_label}</b>`;
-    }
-    cards.push(thermoCard("smart_money", "Istituzionali VS Retail", sm.score,
-      `<b>${sm.label}</b>`,
-      `flussi istituzionali${divTxt}`, ["Bullish", "Bearish"]));
-  }
-  if (m.sp500_pe) {
-    const pe = m.sp500_pe;
-    const peCol = pe.current > 35 ? "var(--red)" : pe.current > 25 ? "var(--yellow)" : pe.current > 14 ? "var(--muted)" : "var(--green)";
-    const ndxStr = pe.nasdaq_pe ? ` · NDX ${pe.nasdaq_pe}×` : "";
-    cards.push(thermoCard("sp500_pe", "P/E S&P 500 / Nasdaq", pe.score,
-      `<span style="color:${peCol}">S&P ${pe.current}×</span>${ndxStr ? `<span class="muted" style="font-size:12px">${ndxStr}</span>` : ""}`,
-      `${pe.label}${pe.avg_10y != null ? ` · media 10A ${pe.avg_10y}×` : ""}${pe.pct_rank != null ? ` · percentile ${pe.pct_rank}°` : ""}`, ["Sottovalutato", "Sopravvalutato"]));
-  }
-  if (m.corp_profit) {
-    const cp = m.corp_profit;
-    const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
-    const ndxGapStr = cp.ndx_gap != null ? ` · NDX ${cp.ndx_gap > 0 ? "+" : ""}${cp.ndx_gap} pp` : "";
-    cards.push(thermoCard("corp_profit", "S&P+NDX vs Profitti Reali", cp.score,
-      `<span style="color:${gapCol}">S&P ${cp.gap > 0 ? "+" : ""}${cp.gap} pp${ndxGapStr}</span>`,
-      `<b style="color:${gapCol}">${cp.label}</b>`, ["Allineati", "Asset Inflation"]));
-  }
-  $("#gauges").innerHTML = cards.join("") || '<span class="muted">Dati non disponibili</span>';
-}
-
 /* ---------------- macro ---------------- */
-const MACRO_ACCENTS = { cpi: "var(--red)", pce: "var(--yellow)", gdp: "var(--blue)", retail: "var(--purple)", nfp: "var(--green)", unemp: "var(--cyan)", pmi: "var(--blue)", "BTC-USD": "var(--yellow)", "CL=F": "var(--purple)", "^KS11": "var(--cyan)", "^IXIC": "var(--blue)" };
-
 function marketImpact(m) {
   // variazione giornaliera → impatto 0-100 (rendimenti in pp: salita = restrittivo)
   if (m.change_pct === null || m.change_pct === undefined) return null;
@@ -6304,101 +6203,6 @@ function marketImpact(m) {
   return Math.round(Math.max(0, Math.min(100, 50 + m.change_pct * 12)));
 }
 
-function renderMacro() {
-  const m = DATA.macro || {};
-  // termometro coerente: verde a sx (favorevole per il portafoglio) → rosso a dx (sfavorevole)
-  const macroThermo = (score) => score == null ? "" :
-    compactSemiGauge(score, ["favorevole", "sfavorevole"]);
-  const markets = (DATA.macro?.markets || []).map(m => `
-    <div class="macro-item" data-macro="mk:${m.key}" tabindex="0" role="button" title="Clicca per dettagli e news" style="--accent:${MACRO_ACCENTS[m.key] || "var(--blue)"}">
-      <span class="popup-dot"></span>
-      <div class="m-label">${m.label}</div>
-      <div class="m-value">${m.value}</div>
-      <div class="m-sub ${signCls(m.change_pct)}">${signTxt(m.change_pct, m.suffix || "%")} oggi</div>
-      ${macroThermo(marketImpact(m))}
-    </div>`);
-  const indicators = (DATA.macro?.indicators || []).map(i => `
-    <div class="macro-item" data-macro="in:${i.key}" tabindex="0" role="button" title="Clicca per dettagli e news" style="--accent:${MACRO_ACCENTS[i.key] || "var(--purple)"}">
-      <span class="popup-dot"></span>
-      <div class="m-label">${i.label}</div>
-      <div class="m-value">${i.value}</div>
-      <div class="m-date">${i.date}</div>
-      ${macroThermo(i.impact)}
-    </div>`);
-  const cells = markets.concat(indicators);
-
-  // Disaccoppiamento macro: S&P 500 vs PIL reale
-  const dc = DATA.macro?.decouple;
-  if (dc?.sp500?.length && dc?.gdp?.length) {
-    const spLast = dc.sp500[dc.sp500.length - 1].v;
-    const gdLast = dc.gdp[dc.gdp.length - 1].v;
-    const gap = Math.round(spLast - gdLast);
-    const gapCol = gap > 40 ? "var(--red)" : gap > 20 ? "var(--yellow)" : "var(--green)";
-    const gapScore = Math.max(0, Math.min(100, 100 - gap / 1.2));
-    cells.push(`<div class="macro-item" data-macro="decouple" tabindex="0" role="button" title="Clicca per grafico S&P vs PIL" style="--accent:var(--blue)">
-      <span class="popup-dot"></span>
-      <div class="m-label">Disaccoppiamento Macro</div>
-      <div class="m-value" style="color:${gapCol}">${gap > 0 ? "+" : ""}${gap} pp</div>
-      <div class="m-date">S&amp;P ${signTxt(Math.round(spLast - 100))} · PIL ${signTxt(Math.round(gdLast - 100))}</div>
-      ${macroThermo(gapScore)}
-    </div>`);
-  }
-  if (m.sp500_pe) {
-    const pe = m.sp500_pe;
-    const peCol = pe.current > 35 ? "var(--red)" : pe.current > 25 ? "var(--yellow)" : pe.current > 14 ? "var(--muted)" : "var(--green)";
-    const ndxLine = pe.nasdaq_pe ? `<div class="m-date" style="margin-top:2px">NDX (QQQ): <b>${pe.nasdaq_pe}×</b></div>` : "";
-    cells.push(`<div class="macro-item" data-macro="sp500_pe" tabindex="0" role="button" title="Clicca per storico P/E" style="--accent:var(--yellow)">
-      <span class="popup-dot"></span>
-      <div class="m-label">P/E S&amp;P 500 / Nasdaq</div>
-      <div class="m-value" style="color:${peCol}">${pe.current}×</div>
-      <div class="m-date">S&amp;P · ${pe.label}${pe.avg_10y != null ? ` · media 10A ${pe.avg_10y}×` : ""}</div>
-      ${ndxLine}
-      ${macroThermo(pe.score)}
-    </div>`);
-  }
-  if (m.fed_market) {
-    const fm = m.fed_market;
-    const rateCol = fm.current_rate > 4.5 ? "var(--red)" : fm.current_rate > 2.5 ? "var(--yellow)" : "var(--green)";
-    const rateScore = clamp(100 - (fm.current_rate - 0) / 6 * 100);
-    cells.push(`<div class="macro-item" data-macro="fed_market" tabindex="0" role="button" title="Clicca per grafico Fed Funds vs S&P" style="--accent:var(--red)">
-      <span class="popup-dot"></span>
-      <div class="m-label">Fed Funds vs Mercato</div>
-      <div class="m-value" style="color:${rateCol}">${fm.current_rate}%</div>
-      <div class="m-date">tasso Fed attuale · clicca per storico</div>
-      ${macroThermo(rateScore)}
-    </div>`);
-  }
-  if (m.yield_recession) {
-    const yr = m.yield_recession;
-    const cc = yr.current_curve;
-    const col = cc == null ? "var(--muted)" : cc < 0 ? "var(--red)" : yr.steepening ? "var(--yellow)" : "var(--green)";
-    // score favorevolezza: invertita o irripidimento post-inversione = sfavorevole
-    const score = cc == null ? 50 : (yr.steepening && yr.was_inverted_24m) ? 25 : cc < 0 ? 15 : clamp(50 + cc * 25);
-    cells.push(`<div class="macro-item" data-macro="yield_recession" tabindex="0" role="button" title="Clicca per l'analisi curva vs recessioni" style="--accent:var(--blue)">
-      <span class="popup-dot"></span>
-      <div class="m-label">Curva &amp; Recessione</div>
-      <div class="m-value" style="color:${col}">${cc != null ? (cc > 0 ? "+" : "") + fmtNum.format(cc) + " pp" : "—"}</div>
-      <div class="m-date">${esc((yr.label || "").split(" — ")[0])}</div>
-      ${macroThermo(score)}
-    </div>`);
-  }
-  if (m.systemic_risk) {
-    const sr = m.systemic_risk;
-    const col = sr.rising ? "var(--red)" : sr.score >= 60 ? "var(--green)" : sr.score <= 40 ? "var(--red)" : "var(--yellow)";
-    cells.push(`<div class="macro-item" data-macro="systemic_risk" tabindex="0" role="button" title="Clicca per il dettaglio rischio sistemico e credito" style="--accent:var(--red)">
-      <span class="popup-dot"></span>
-      <div class="m-label">Rischio Sistemico (CDS)</div>
-      <div class="m-value" style="color:${col}">${sr.hy_oas != null ? fmtNum.format(sr.hy_oas) + "%" : "—"}${sr.hy_chg_1m != null ? ` <span style="font-size:11px" class="${signCls(sr.hy_chg_1m)}">${signTxt(sr.hy_chg_1m)} 1m</span>` : ""}</div>
-      <div class="m-date">${esc((sr.status || "").split(" — ")[0])}</div>
-      ${macroThermo(sr.score)}
-    </div>`);
-  }
-
-  $("#macro-grid").innerHTML = cells.length ? cells.join("") : '<span class="muted">Dati non disponibili</span>';
-  // v196: la griglia si ricostruisce da zero a ogni render, quindi l'ordine scelto va RIAPPLICATO
-  // subito dopo — altrimenti tornerebbe quello di default al primo aggiornamento dei dati.
-  try { applicaOrdineMacro(); } catch { /* prima del wiring iniziale */ }
-}
 
 /* ---------------- top ETF dashboard ---------------- */
 function etfOpportunity(rsi) {

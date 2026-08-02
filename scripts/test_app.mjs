@@ -1522,7 +1522,12 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     ["navigazione a schede", 'id="main-tabs"'],
     ["tabella portafoglio", 'id="ptf-table"'],
     ["tabella watchlist", 'id="wl-table"'],
-    ["griglia macro", 'id="macro-grid"'],
+    // v217 — #macro-grid e #gauges rimossi: erano 16 riquadri e 11 tachimetri sostituiti dalla
+    // classifica unica. La guardia si sposta su ciò che ora porta quella stessa informazione,
+    // così il macro resta protetto invece di restare scoperto.
+    ["classifica indicatori macro", 'id="mg-tutti"'],
+    ["scomposizione dei punteggi", 'id="mg-scomposizione"'],
+    ["rotazione settoriale", 'id="mg-rot"'],
     ["mini-card macro", 'class="mini-cards"'],
     // v209 — protegge l'ACCESSO ai dettagli macro, non più il bottone della topbar: quello è
     // stato rimosso perché duplicava questo, e la porta è ora una sola, nella colonna centrale.
