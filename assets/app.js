@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "213";
+const BUILD_VERSION = "214";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4066,12 +4066,73 @@ function renderMacroGrafici() {
   renderSignposts();
 }
 
+
+/* ═══ v214 — IL FONDO CONTRO IL SUO INDICE ════════════════════════════════════════════════
+   È la domanda del mandato ("crescita composta vs NDX") e non era disegnata da nessuna parte:
+   viveva come tachimetro in una mini-card che mostrava lo scarto di UN GIORNO. La serie c'è —
+   history.m3 porta 66 date con il valore del fondo e quello dell'indice — e rebasata a 100
+   sulla stessa data risponde a colpo d'occhio: la distanza fra le due linee È l'alpha.
+   ⚠ Le due serie condividono per costruzione date e punto di partenza (stesso array), quindi
+   qui il problema delle finestre disallineate di v207 non si pone. */
+function renderVsBenchmark() {
+  const box = $("#bench-chart"); if (!box) return;
+  const nota = $("#bench-note"), head = $("#bench-head");
+  const H = DATA?.history || {};
+  const per = benchOrizzonte;
+  const h = H[per];
+  if (!h || !(h.values || []).length || !(h.ndx || []).length || h.values.length < 3) {
+    box.innerHTML = '<div class="muted">Storico non disponibile per questo orizzonte.</div>';
+    if (head) head.innerHTML = ""; if (nota) nota.innerHTML = "";
+    return;
+  }
+  const base = (a) => { const b0 = a.find(v => v > 0); return b0 ? a.map(v => (v > 0 ? v / b0 * 100 : null)) : null; };
+  const f = base(h.values), n = base(h.ndx);
+  if (!f || !n) { box.innerHTML = '<div class="muted">Serie non normalizzabile.</div>'; return; }
+  const d = h.dates || [];
+  const punti = (arr) => arr.map((v, i) => ({ d: d[i] || null, v }));
+  box.innerHTML = graficoSerie([
+    { nome: "Fondo", punti: punti(f), colore: "var(--blue)" },
+    { nome: "Nasdaq 100", punti: punti(n), colore: "var(--muted)", tratteggio: true },
+  ], { h: 200, w: 760, soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }],
+       aria: "fondo contro Nasdaq 100, base 100" })
+    + `<div class="chart-legend" style="margin-top:8px">
+         <span><span class="lg-dot" style="background:var(--blue)"></span>il tuo fondo</span>
+         <span><span class="lg-dot" style="background:var(--muted)"></span>Nasdaq 100</span>
+         <span>entrambi a 100 il ${d[0] ? dataBreve(d[0], true) : ""}</span></div>`;
+  const fF = f[f.length - 1], nF = n[n.length - 1], alpha = Math.round((fF - nF) * 10) / 10;
+  if (head) {
+    head.innerHTML = `
+      <div class="sh-item ${alpha < 0 ? "sh-bad" : ""}">
+        <div class="sh-lab">Scarto dal Nasdaq</div>
+        <div class="sh-val ${alpha >= 0 ? "pos" : "neg"}">${fmtPP(alpha)}</div>
+        <div class="sh-sub">nel periodo, a parità di punto di partenza</div>
+      </div>
+      <div class="sh-item">
+        <div class="sh-lab">Il tuo fondo</div>
+        <div class="sh-val ${fF >= 100 ? "pos" : "neg"}">${signTxt(Math.round((fF - 100) * 10) / 10)}</div>
+        <div class="sh-sub">${d.length} rilevazioni</div>
+      </div>
+      <div class="sh-item">
+        <div class="sh-lab">Nasdaq 100</div>
+        <div class="sh-val ${nF >= 100 ? "pos" : "neg"}">${signTxt(Math.round((nF - 100) * 10) / 10)}</div>
+        <div class="sh-sub">stesso periodo</div>
+      </div>`;
+  }
+  if (nota) {
+    nota.innerHTML = `Le due linee partono dallo stesso punto: <b>la distanza fra loro è l'alpha</b>, e non serve sottrarre due percentuali a mente.
+      ${alpha >= 0 ? "Sopra la linea grigia il processo sta aggiungendo valore rispetto al semplice comprare l'indice." : "Sotto la linea grigia l'indice avrebbe fatto meglio: è il metro che il mandato ha scelto."}
+      ⚠ Il valore del fondo include il BTP (volatilità ~0) e l'effetto cambio su un NAV in larga parte in dollari: su finestre corte il segno può dipendere da quelli prima che dalla selezione dei titoli.`;
+  }
+}
+let benchOrizzonte = "m3";
+
 function renderStruttura() {
   if (!DATA) return;
   renderConcentrazione();
   renderDeriva();
   renderAllocGrafica();
   renderStopDist();
+  renderVsBenchmark();   // v214 — il fondo contro il suo indice
 }
 
 /* ---------------- tabella ---------------- */
@@ -8554,6 +8615,16 @@ document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {
     ch.classList.add("chip-active");
     allocMode = ch.dataset.mode;
     renderAllocation();
+  });
+});
+
+// v214 — orizzonte del confronto col benchmark
+document.querySelectorAll("#bench-toggle .chip").forEach(ch => {
+  ch.addEventListener("click", () => {
+    document.querySelectorAll("#bench-toggle .chip").forEach(c => c.classList.remove("chip-active"));
+    ch.classList.add("chip-active");
+    benchOrizzonte = ch.dataset.bench;
+    renderVsBenchmark();
   });
 });
 
