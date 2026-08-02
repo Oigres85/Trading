@@ -1030,7 +1030,10 @@ check("v167 cap sulla perdita: a parità di rischio un titolo volatile entra con
   return ord.every((v, i) => i === 0 || v <= ord[i - 1])`));
 check("v174 alpha comparabile: il processo si misura su base OMOGENEA (equity USD vs indice)", run(`
   const b = buildExecutiveDelta();
-  const line = b.split("\\n").find(l => l.includes("ALPHA DEL PROCESSO"));
+  const line = b.split("\\n").find(l => l.startsWith("· ALPHA DEL PROCESSO"));
+  // v221 — ancorato all'INIZIO della riga: cercandola con includes() il check pescava la riga
+  // BENCHMARK non appena questa ha iniziato a CITARE "ALPHA DEL PROCESSO" per rimando. Un nome
+  // citato non identifica una riga; la sua posizione sì.
   if (line == null) return true;                          // serie insufficienti in questo scenario
   // deve dichiarare la base e l'assunzione sui pesi, e distinguersi dalla riga patrimoniale
   return /solo comparto AZIONARIO in USD/.test(line) && /niente BTP, niente cambio/.test(line)
