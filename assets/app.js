@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "208";
+const BUILD_VERSION = "210";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2786,9 +2786,21 @@ function renderMiniCards() {
       const subBits = [];
       if (so != null) subBits.push(`Sortino ${fmtNum.format(so)}`);
       if (varE != null) subBits.push(`VaR95 1g ${fmtEUR.format(varE)}`);
+      // v209 — al posto del termometro, la SERIE: lo Sharpe ha 36 rilevazioni in
+      // metrics_history e non erano mai state disegnate. Un termometro dice "dove sei",
+      // una linea dice "da dove vieni", che su una metrica di regime è l'informazione.
+      const serie = (DATA.metrics_history || [])
+        .filter(x => x?.date && typeof x.sharpe === "number")
+        .map(x => ({ d: x.date, v: x.sharpe }));
+      const graf = serie.length >= 2
+        ? graficoSerie([{ nome: "sharpe", punti: serie, colore: sharpeColor(ps) }],
+            { h: 92, compatto: true, etichetteDx: false, tacche: 3,
+              soglie: [{ v: 2, testo: "target 2,0", colore: "var(--muted)" }],
+              assex: [`${serie.length} rilevaz.`, "oggi"], aria: "Sharpe del portafoglio nel tempo" })
+        : thermoLine(score, ["Efficiente", "Rischioso"]);
       shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
         <div class="mc-value" style="color:${sharpeColor(ps)}">${fmtNum.format(ps)} · ${lab} ${metricTrend("sharpe")}</div>
-        ${thermoLine(score, ["Efficiente", "Rischioso"])}
+        ${graf}
         <div class="mc-sub muted">${subBits.length ? subBits.join(" · ") : "rendimento corretto per il rischio"}</div>`;
     } else {
       shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
@@ -3963,11 +3975,82 @@ function renderLevaStagione() {
     : '<div class="muted">Dati non disponibili.</div>';
 }
 
+/* ═══ v209 — SCOMPOSIZIONE DEI PUNTEGGI COMPOSITI ═════════════════════════════════════════
+   "MacroQuant 55 · Rallentamento" con sotto un termometro è la forma meno informativa che un
+   dato possa assumere: dice quanto, non dice DI CHI È COLPA. I componenti stavano già in
+   data.json — 13 per MacroQuant, 7 per Fear & Greed, 5 per il sentiment globale, 4 per
+   istituzionali-vs-retail — e non erano disegnati da nessuna parte: `risk_sentiment.components`
+   non compariva nemmeno nei popup.
+   Le barre divergono da 50, non da zero: su una scala 0-100 il neutro è il centro, e ciò che
+   conta è da che parte sta ogni fattore rispetto ad esso. */
+const COMPOSITI = [
+  { k: "macroquant", t: "Ciclo economico", sub: "riproduzione trasparente stile BCA MacroQuant" },
+  { k: "fear_greed", t: "Fear &amp; Greed", sub: "sentiment CNN" },
+  { k: "risk_sentiment", t: "Sentiment globale", sub: "composito risk-on / risk-off" },
+  { k: "smart_money", t: "Istituzionali vs retail", sub: "struttura SMC, term del VIX, put/call" },
+];
+function renderScomposizione() {
+  const box = $("#mg-scomposizione"); if (!box) return;
+  const m = DATA?.macro || {};
+  const carte = COMPOSITI.map(c => {
+    const v = m[c.k]; const comp = (v?.components || []).filter(x => x && x.score != null);
+    if (!v || comp.length < 2) return null;
+    const righe = [...comp].sort((a, b) => a.score - b.score).map(x => ({
+      nome: x.label, valore: Math.round(x.score - 50), colore: scoreColor(x.score),
+      testo: `${Math.round(x.score)}/100`,
+    }));
+    const peggio = righe[0], meglio = righe[righe.length - 1];
+    const sc = v.score ?? Math.round(comp.reduce((s, x) => s + x.score, 0) / comp.length);
+    return `<div class="mg-card mg-wide">
+      <div class="mg-card-head">
+        <span class="mg-t">${c.t} <span class="muted" style="font-weight:400">— ${esc(c.sub)}</span></span>
+        <span class="mg-v" style="color:${scoreColor(sc)}">${sc}<span class="muted" style="font-size:12px">/100</span></span>
+      </div>
+      ${barreOrdinate(righe)}
+      <div class="muted mg-n">${comp.length} fattori, ordinati dal peggiore al migliore, con lo scarto dal neutro (50).
+        Oggi tira giù <b>${esc(peggio.nome)}</b> (${peggio.testo}) e tiene su <b>${esc(meglio.nome)}</b> (${meglio.testo}).</div>
+    </div>`;
+  }).filter(Boolean);
+  box.innerHTML = carte.length ? carte.join("")
+    : '<div class="muted">Nessun punteggio composito disponibile in questo snapshot.</div>';
+}
+
+/* v209 — i 10 campanelli BofA: erano una tabella dentro un popup. Sono booleani, quindi la
+   loro resa naturale non è una barra ma un conteggio visibile: quanti sono accesi e QUALI. */
+function renderSignposts() {
+  const box = $("#mg-signposts"); if (!box) return;
+  const sp = DATA?.macro?.signposts; const items = sp?.items || [];
+  const head = $("#mg-sign-head"), note = $("#mg-sign-note");
+  if (!items.length) {
+    box.innerHTML = '<div class="muted">Indicatori non disponibili.</div>';
+    if (head) head.textContent = ""; if (note) note.innerHTML = ""; return;
+  }
+  const attivi = items.filter(i => i.status).length;
+  const q = attivi / items.length;
+  const cls = q >= 0.7 ? "neg" : q >= 0.5 ? "warn" : "pos";
+  if (head) head.innerHTML = `<b class="${cls}" style="font-family:var(--mono);font-size:15px">${attivi}/${items.length}</b> accesi`;
+  const perCat = new Map();
+  items.forEach(i => { const c = i.category || "Altro"; if (!perCat.has(c)) perCat.set(c, []); perCat.get(c).push(i); });
+  box.innerHTML = `<div class="sp-cats">${[...perCat.entries()].map(([cat, list]) => `
+    <div class="sp-cat">
+      <div class="sp-cat-h">${esc(cat)} <span class="muted">${list.filter(i => i.status).length}/${list.length}</span></div>
+      ${list.map(i => `<div class="sp-item${i.status ? " sp-on" : ""}" title="${esc(i.desc || "")}${i.source ? " · fonte: " + esc(i.source) : ""}">
+        <span class="sp-dot"></span><span class="sp-name">${esc(i.name)}</span></div>`).join("")}
+    </div>`).join("")}</div>`;
+  if (note) {
+    note.innerHTML = `I dieci segnali che BofA usa per riconoscere un massimo di mercato. Acceso = condizione verificata.
+      Non è una previsione e non c'è una soglia magica: contano <b>quanti</b> si accendono e <b>quanto in fretta</b>.
+      Oggi ${attivi} su ${items.length}${q >= 0.7 ? " — la maggioranza" : q >= 0.5 ? " — circa metà" : " — una minoranza"}.`;
+  }
+}
+
 function renderMacroGrafici() {
   if (!DATA) return;
   renderRotazione();
   renderStress();
   renderLevaStagione();
+  renderScomposizione();
+  renderSignposts();
 }
 
 function renderStruttura() {
@@ -6518,7 +6601,22 @@ function buildPrompt() {
           // a −6% su un nome al 100° percentile 52S non è "prudente": è un ordine che si riempie
           // solo se il trend si rompe. Il payload dava i due numeri separati e mai la loro distanza.
           const dLimit = (p.r.price > 0 && p.limit > 0) ? (p.limit / p.r.price - 1) * 100 : null;
-          const limT = dLimit != null ? ` (${signTxt(Math.round(dLimit * 10) / 10)} dal prezzo)` : "";
+          // v210 — il commento qui sopra descriveva il problema dal v160 ma NESSUNO LO CONTROLLAVA:
+          // il payload stampava la distanza e basta. Trovato provando il prompt su me stesso —
+          // MSFT a −16,5% e WDC a −22,5% passavano senza un flag, mentre il TARGET ha da sempre il
+          // suo avviso ("⚠ il target è di fatto AL PREZZO ATTUALE"). Asimmetria: si avvisava quando
+          // il premio era illusorio, non quando l'ingresso era irraggiungibile — e un ordine che non
+          // si riempie mai, riportato come azione, dà la sensazione di aver agito senza aver agito.
+          // La distanza si misura in ATR, non in percentuale secca: −16,5% su un titolo con ATR
+          // 3,45% (4,8 ATR) e −22,5% su uno con ATR 9,92% (2,3 ATR) NON sono lo stesso ordine.
+          const atrPc = atrOf(p.r)?.pct;
+          const inAtr = (dLimit != null && atrPc > 0) ? Math.abs(dLimit) / atrPc : null;
+          const limFar = inAtr != null && inAtr >= 3
+            ? ` ⚠ sono ${fmtNum.format(Math.round(inAtr * 10) / 10)} ATR sotto il prezzo: questo ordine si riempie solo se il trend si rompe, non è "entrare in prudenza"`
+            : "";
+          const limT = dLimit != null
+            ? ` (${signTxt(Math.round(dLimit * 10) / 10)} dal prezzo${inAtr != null ? ` = ${fmtNum.format(Math.round(inAtr * 10) / 10)}×ATR` : ""})${limFar}`
+            : "";
           // se il prezzo esteso ha già mosso, dichiaralo QUI: la legenda dice "usa → agg. per gli
           // ordini limite" ma questo limite è calcolato sul supporto della chiusura → istruzioni in
           // conflitto se non si esplicita il rapporto fra i due.
@@ -8564,7 +8662,11 @@ $("#macro-details")?.addEventListener("click", () => openMacroDetails());
 // v202: stesso pannello dalla topbar, visibile da ogni scheda. Spostare la macro dietro una
 // scheda l'aveva resa irraggiungibile da tutte le altre — e per l'utente "non trovabile" e'
 // indistinguibile da "non c'e'".
-$("#btn-macro-top")?.addEventListener("click", () => openMacroDetails());
+// v209 — l'handler di #btn-macro-top è uscito col suo bottone. `openMacroDetails` resta
+// raggiungibile da #macro-details, dentro la scheda Macro: una sola porta, nella colonna
+// centrale. La guardia strutturale è stata aggiornata di conseguenza — protegge l'ACCESSO
+// ai dettagli macro, non quel particolare bottone (v203: mai zittire una guardia, cambiarle
+// l'invariante quando l'invariante è cambiato davvero).
 $("#ptf-cols")?.addEventListener("click", () => openColumnPicker("ptf-table", "Portafoglio", renderTable));
 $("#wl-cols")?.addEventListener("click", () => openColumnPicker("wl-table", "Watchlist", renderWatchlist));
 document.addEventListener("click", (e) => {

@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=208">
+<link rel="stylesheet" href="assets/style.css?v=210">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -29,7 +29,10 @@
   </div>
   <div class="actions">
     <button class="btn btn-primary" id="btn-cio" aria-label="Copia il pacchetto completo per l'analisi AI: storico macro, tecnica, fondamentali e ultime news" title="Copia il pacchetto completo (storico macro + tecnica + fondamentali + news) da incollare in Claude">📋 Copia Analisi AI</button>
-    <button class="btn btn-ghost" id="btn-macro-top" aria-label="Dettagli macro" title="Tutti i dettagli macro in una pagina — raggiungibile da qualsiasi scheda">📖 Macro</button>
+    <!-- v209 — bottone "📖 Macro" RIMOSSO dalla topbar su richiesta del CEO. Duplicava
+         "📖 Dettagli macro", che vive già dentro la scheda Macro: due porte per la stessa
+         stanza. Ora la macro si raggiunge da un posto solo — la voce Macro nella barra
+         laterale — e tutto il suo contenuto sta nella colonna centrale. -->
     <button class="btn btn-ghost" id="btn-diary" aria-label="Diario delle azioni e dettaglio verdetto" title="Diario delle azioni (finisce nell'export AI) + dettaglio verdetto motore">📔 Diario</button>
     <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: prezzi live subito + rigenerazione completa via pipeline (~2-3 min)">⟳ Aggiorna tutto</button>
   </div>
@@ -184,6 +187,27 @@
       <span class="muted">quanto denaro a prestito c'è nel mercato, e che mese è</span>
     </div>
     <div class="mg-tris" id="mg-leva"></div>
+  </section>
+
+  <!-- v209 — LE MINI-CARD DIVENTANO GRAFICI. Un punteggio composito 0-100 con sotto un
+       termometro è la forma meno informativa possibile: dice "55" e non dice di CHI è colpa.
+       I componenti esistevano già in data.json (13 + 7 + 5 + 4) e non erano disegnati da
+       nessuna parte — risk_sentiment.components non era reso nemmeno nei popup. -->
+  <section class="card" data-pane="macro">
+    <div class="card-head">
+      <h2>Da cosa nascono i punteggi</h2>
+      <span class="muted">un numero 0-100 da solo non dice niente: qui si vede chi lo tira giù</span>
+    </div>
+    <div class="mg-tris" id="mg-scomposizione"></div>
+  </section>
+
+  <section class="card" data-pane="macro">
+    <div class="card-head">
+      <h2>Campanelli d'allarme</h2>
+      <span class="muted" id="mg-sign-head"></span>
+    </div>
+    <div id="mg-signposts"></div>
+    <div class="muted struct-note" id="mg-sign-note"></div>
   </section>
 
   <section class="card" data-pane="macro">
@@ -468,6 +492,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=208"></script>
+<script src="assets/app.js?v=210"></script>
 </body>
 </html>

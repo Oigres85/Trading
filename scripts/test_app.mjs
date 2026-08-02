@@ -1386,6 +1386,32 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
 }
 
 
+/* v210 — LIMITE D'INGRESSO IRRAGGIUNGIBILE. Trovato eseguendo il prompt su me stesso: il
+   payload avvisava quando il TARGET era illusorio ma non quando l'INGRESSO era irraggiungibile,
+   e un ordine che non si riempie mai — riportato come azione — dà la sensazione di aver agito.
+   La distanza si misura in ATR, non in percentuale secca: il caso reale è WDC a −22,5% che NON
+   va segnalato (ATR 9,92% → 2,3 ATR) mentre MSFT a −16,5% sì (ATR 3,45% → 4,8 ATR). Una soglia
+   in percentuale avrebbe segnalato esattamente il titolo sbagliato. */
+{
+  const p = run("buildPrompt()");
+  const riga = p.split("\n").find(l => /Livelli calcolati dal motore/.test(l)) || "";
+  const conAtr = (riga.match(/×ATR/g) || []).length;
+  const conAvviso = (riga.match(/ATR sotto il prezzo: questo ordine si riempie solo se il trend si rompe/g) || []).length;
+  check("v210 ogni limite d'ingresso dichiara la distanza anche in ATR", conAtr >= 3);
+  // l'avviso deve scattare SOLO oltre le 3 ATR: si verifica che ogni riga segnalata lo superi
+  const segmenti = riga.split(" · ").filter(x => /limite d'ingresso/.test(x));
+  const sbagliati = segmenti.filter(x => {
+    const m = x.match(/=\s*([\d,]+)×ATR/); if (!m) return false;
+    const atr = parseFloat(m[1].replace(",", "."));
+    const flag = /si riempie solo se il trend si rompe/.test(x);
+    return flag !== (atr >= 3);
+  });
+  check("v210 l'avviso scatta esattamente sopra le 3 ATR, né prima né dopo", segmenti.length > 0 && sbagliati.length === 0);
+  if (sbagliati.length) console.log("  ⚠ righe con avviso incoerente:", sbagliati.map(x => x.slice(0, 60)).join(" | "));
+  console.log(`  · limiti con distanza in ATR: ${conAtr} · segnalati come irraggiungibili: ${conAvviso}`);
+}
+
+
 /* ═══════════════════════════════════════════════════════════════════════════════════════
    v206 — REGISTRI DELLE TABELLE. Tre allineamenti che il codice dà per scontati e che
    NESSUN test verificava: SORT_FIELDS 1:1 con le <th>, i colspan delle righe speciali, e la
@@ -1456,7 +1482,11 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     ["tabella watchlist", 'id="wl-table"'],
     ["griglia macro", 'id="macro-grid"'],
     ["mini-card macro", 'class="mini-cards"'],
-    ["bottone dettagli macro (topbar)", 'id="btn-macro-top"'],
+    // v209 — protegge l'ACCESSO ai dettagli macro, non più il bottone della topbar: quello è
+    // stato rimosso perché duplicava questo, e la porta è ora una sola, nella colonna centrale.
+    ["accesso ai dettagli macro", 'id="macro-details"'],
+    ["scomposizione dei punteggi", 'id="mg-scomposizione"'],
+    ["campanelli d'allarme", 'id="mg-signposts"'],
     ["riquadri patrimonio", 'id="kpi-grid"'],
     ["parametri di rischio", 'id="risk-params-card"'],
     ["modale grafico/pannelli", 'id="chart-modal"'],

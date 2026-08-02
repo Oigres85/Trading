@@ -1535,3 +1535,72 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 .int-val { font-family: var(--mono); font-size: 12.5px; font-weight: 700; }
 .int-val.pos { color: var(--green); } .int-val.neg { color: var(--red); } .int-val.warn { color: var(--yellow); }
 .int-sub { grid-column: 1 / -1; font-size: 10px; color: var(--muted); line-height: 1.3; }
+
+/* ═══ v209 — CAMPANELLI D'ALLARME (booleani, non barre) ═══════════════════════════════════ */
+.sp-cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.sp-cat { min-width: 0; }
+.sp-cat-h { font-size: var(--fs-lab); text-transform: uppercase; letter-spacing: .6px;
+  color: var(--muted); margin-bottom: 7px; font-weight: 600; }
+.sp-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 7px;
+  border: 1px solid transparent; font-size: 12px; color: var(--muted);
+  transition: background-color var(--t-fast), border-color var(--t-fast); }
+.sp-item:hover { background: var(--card-2); }
+.sp-dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto;
+  background: transparent; border: 1.5px solid var(--muted); }
+.sp-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-on { color: var(--text); background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.32); }
+.sp-on .sp-dot { background: var(--yellow); border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(245,158,11,.18); }
+
+/* ═══ v209 — PASSATA DI MODERNIZZAZIONE ═══════════════════════════════════════════════════
+   Il tema "terminale" resta: cambia il modo in cui le superfici si staccano dal fondo. Prima
+   ogni card era un rettangolo con un bordo da 1px e raggio 4-10px, tutte allo stesso piano.
+   Ora c'è una gerarchia di profondità (fondo → card → card interna) e i raggi sono coerenti. */
+:root { --r-card: 14px; --r-inner: 10px; --r-chip: 8px; }
+
+body {
+  /* alone appena percepibile in alto: dà un "sopra" alla pagina senza cambiare il tema */
+  background:
+    radial-gradient(1200px 520px at 50% -180px, rgba(76,141,255,.10), transparent 70%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+.card {
+  border-radius: var(--r-card);
+  background: linear-gradient(180deg, rgba(255,255,255,.022), transparent 120px), var(--card);
+  box-shadow: 0 1px 2px rgba(0,0,0,.28);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+.card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.32); }
+
+.mg-card, .sh-item, .kpi, .gauge-card, .mini-card, .macro-item { border-radius: var(--r-inner); }
+.btn, .chip { border-radius: var(--r-chip); }
+
+/* barra laterale: la voce attiva si distingue per una barra d'accento e un fondo sfumato,
+   non solo per il colore del testo */
+@media (min-width: 861px) {
+  .shell > .tabs .tab-active {
+    background: linear-gradient(90deg, var(--blue-wash), transparent);
+    box-shadow: inset 2px 0 0 var(--blue);
+  }
+}
+
+/* i numeri che contano hanno un'ombra di colore appena accennata: li stacca dal fondo senza
+   aggiungere un solo pixel di inchiostro in più */
+.kpi .value, .sh-val { text-shadow: 0 0 22px currentColor; }
+.kpi .value.pos, .sh-val.pos { --glow: var(--green); }
+
+.topbar { background: rgba(10,14,23,.78); border-bottom-color: rgba(255,255,255,.06); }
+
+/* v209 — dentro una card a piena larghezza l'etichetta ha spazio: 132px la troncava
+   ("Fiducia consumatori …", "Struttura SMC indici (…"). Il valore resta incolonnato. */
+@media (min-width: 861px) {
+  /* ⚠ la colonna del VALORE va ad `auto`, non a una larghezza fissa: la stagionalità scrive
+     "+0,98% · 63% mesi positivi" (179px) e con 96px fissi sfondava la cella — `white-space:
+     nowrap` non tronca, spinge — producendo 44px di scorrimento ORIZZONTALE su tutta la
+     pagina. Nessun elemento sporgeva dal viewport: l'overflow si vedeva solo confrontando
+     scrollWidth e clientWidth risalendo la catena dei contenitori. */
+  .mg-wide .obar-row { grid-template-columns: minmax(180px, 24%) minmax(0, 1fr) auto; }
+  .mg-wide .obar-val { font-size: 11.5px; }
+}

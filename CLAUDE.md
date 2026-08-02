@@ -731,6 +731,63 @@ un domani si tagliano colonne **in mezzo**, quelle vanno ricalcolate — l'acces
    vederlo su ciò che possiedi. Stretta alla tabella del portafoglio, l'innesto viene catturato.
    *Un check si valida iniettando il difetto, non rileggendolo.*
 
+## 📊 v209-v210 — la macro in colonna centrale, e la prova del prompt su me stesso
+
+**v209 — una porta sola.** Il bottone "📖 Macro" della topbar duplicava "📖 Dettagli macro" che
+vive dentro la scheda: due porte per la stessa stanza. Rimosso; la macro si raggiunge solo dalla
+barra laterale e tutto il suo contenuto sta al centro. ⚠ La guardia strutturale proteggeva
+`id="btn-macro-top"`: NON è stata zittita, le è cambiato l'invariante — ora protegge l'ACCESSO
+(`id="macro-details"`), che è la cosa che conta.
+
+**Le mini-card diventano grafici.** "MacroQuant 55 · Rallentamento" con sotto un termometro è la
+forma meno informativa che un dato possa assumere: dice *quanto*, non dice *di chi è colpa*. I
+componenti erano già in `data.json` (13 + 7 + 5 + 4) e non erano disegnati da nessuna parte —
+`risk_sentiment.components` non compariva nemmeno nei popup. Ora sono barre che divergono da 50
+(su una scala 0-100 il neutro è il centro), ordinate dal peggiore al migliore: oggi il ciclo è
+tirato giù dalla fiducia dei consumatori (26/100) e tenuto su dal credito (96/100). Anche i 10
+campanelli BofA e lo Sharpe (36 rilevazioni, mai disegnate) sono diventati grafici.
+
+⚠ **Una regola CSS scritta per allargare le etichette ha prodotto uno scorrimento orizzontale di
+44px su tutta la pagina.** `grid-template-columns: … 96px` sulla colonna del valore: la
+stagionalità scrive "+0,98% · 63% mesi positivi" (179px) e `white-space: nowrap` non tronca,
+**spinge**. Il sintomo è invisibile a occhio e invisibile anche a un controllo sui rect: nessun
+elemento sporgeva dal viewport. Si trova solo confrontando `scrollWidth` e `clientWidth`
+risalendo la catena dei contenitori. Colonna del valore ad `auto`, mai a larghezza fissa.
+
+### 🔬 La prova del prompt su me stesso (l'esercizio ricorrente di questo file)
+
+Payload reale: 71.786 caratteri, 390 righe, ~20k token. Eseguito come lettore, non come revisore.
+
+**Il fix v207 è atterrato, e cambia la lettura della macro.** Il CI ha rigenerato con `freq="m"`
+e `_finestra_comune`: le due serie ora partono e finiscono **alla stessa data** (2023-04-01 →
+2026-04-01, 1096 giorni comuni, entrambe rebasate a 100 lì). Conseguenza sui numeri pubblicati:
+| | prima (sbagliato) | ora (corretto) |
+|---|---|---|
+| Disaccoppiamento S&P vs PIL | −3 pp | **+61 pp** |
+| S&P vs profitti reali | −30,7 pp | **+34,9 pp** |
+Entrambe le righe dichiarano soglia 40 pp. Prima il payload diceva implicitamente "niente da
+vedere"; ora due misuratori indipendenti sfondano la soglia. **Non è un peggioramento del
+mercato: è che prima il numero era una sottrazione fra periodi diversi.**
+
+**Difetto trovato e corretto (v210): il limite d'ingresso irraggiungibile.** Il payload avvisa da
+sempre quando il *target* è illusorio (`⚠ il target è di fatto AL PREZZO ATTUALE`) ma **non**
+quando l'*ingresso* è irraggiungibile. Il commento nel codice descriveva il problema dal v160
+("un limite a −6% … è un ordine che si riempie solo se il trend si rompe") e **nessuno lo
+controllava**: si stampava la distanza e basta. Un ordine che non si riempie mai, riportato come
+azione, dà la sensazione di aver agito senza aver agito.
+⚠ **La soglia va in ATR, non in percentuale**, ed è il caso reale a dimostrarlo: WDC a −22,5%
+NON va segnalato (ATR 9,92% → 2,3 ATR) mentre MSFT a −16,5% sì (ATR 3,45% → 4,8 ATR). Una soglia
+percentuale avrebbe segnalato esattamente il titolo sbagliato.
+
+**Attrito segnalato alla TESTATA (non implementabile da qui).** La riga dei dati dice
+*"[ATTENZIONE: snapshot di 10 ore fa — i prezzi potrebbero essere disallineati dal mercato live;
+verifica online i livelli critici]"* e la riga SUCCESSIVA dice *"WEEKEND, MERCATI CHIUSI"*. A
+mercati chiusi i prezzi non possono essere disallineati: non c'è un mercato vivo. Come modello
+ricevente spenderei la ricerca web obbligatoria di [A]1 a verificare prezzi congelati invece che
+sulle 40 notizie non ancora prezzate, che la riga dopo indica come "il segnale fresco di questo
+run". È la classe v193 rovesciata: **stato del mercato e freschezza del dato sono due cose
+diverse**, e qui l'avviso di freschezza ignora lo stato del mercato.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
