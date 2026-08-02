@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "212";
+const BUILD_VERSION = "213";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8444,11 +8444,7 @@ document.querySelectorAll("#pmc-mode .chip").forEach(c =>
 /* liquidità + mini-card */
 $("#cash-save").addEventListener("click", saveCash);
 $("#cash-input").addEventListener("keydown", e => { if (e.key === "Enter") saveCash(); });
-$("#signposts-box").addEventListener("click", openSignpostsModal);
-$("#tilt-box").addEventListener("click", openTiltModal);
 $("#portfolio-health")?.addEventListener("click", openHealthModal);
-$("#macroquant-box").addEventListener("click", openMacroQuantModal);
-$("#seasonality-box").addEventListener("click", openSeasonalityModal);
 $("#tracking-error-box")?.addEventListener("click", openAlphaModal);
 $("#ptf-edit-values")?.addEventListener("click", openEditPortfolio);
 $("#alloc-edit")?.addEventListener("click", openEditPortfolio);
@@ -8613,15 +8609,22 @@ document.addEventListener("click", (e) => {
   if (e.target.closest('[data-action="rot-analyze"]')) { openRotationAnalysis(); return; }
 });
 
+/* v213 — QUI SI ROMPEVA TUTTO. Quattro addEventListener puntavano alle mini-card rimosse in
+   v212 e NON avevano il `?.`: lo script moriva su `$("#signposts-box").addEventListener` e
+   TUTTO IL WIRING SOTTO non veniva mai eseguito — compreso loadData(). La pagina restava vuota
+   con "Aggiornamento totale: —", e io l'avevo attribuito alla rete del sandbox. Non era la rete.
+   È la terza volta in questo progetto che un elemento rimosso rompe l'intero caricamento
+   (CLAUDE.md lo dichiara come convenzione fissa), quindi ora c'è un gate che lo intercetta. */
+
 /* modifica posizioni */
 $("#ptf-edit")?.addEventListener("click", () => {
   editMode.portfolio = !editMode.portfolio;
-  $("#ptf-edit").classList.toggle("chip-active", editMode.portfolio);
+  $("#ptf-edit")?.classList.toggle("chip-active", editMode.portfolio);
   renderTable();
 });
 $("#wl-edit")?.addEventListener("click", () => {
   editMode.watchlist = !editMode.watchlist;
-  $("#wl-edit").classList.toggle("chip-active", editMode.watchlist);
+  $("#wl-edit")?.classList.toggle("chip-active", editMode.watchlist);
   renderWatchlist();
 });
 document.addEventListener("click", (e) => {
@@ -8672,7 +8675,7 @@ function quickAddFromWatchlist(ticker, price) {
   $("#pmc-q2").value = "";
   $("#pmc-p2").value = price || "";   // prezzo del nuovo acquisto
   pmcCompute();
-  $("#pmc-calc").scrollIntoView({ behavior: "smooth" });
+  $("#pmc-calc")?.scrollIntoView({ behavior: "smooth" });
   toast(`${ticker} caricato nel calcolatore PMC — inserisci la quantità da simulare`);
 }
 

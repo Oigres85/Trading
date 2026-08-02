@@ -1475,6 +1475,41 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
 }
 
 
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+   v213 — IL GATE CHE MANCAVA: nessun accesso NON protetto a un elemento inesistente.
+   CLAUDE.md lo dichiara come convenzione fissa da versioni ("un addEventListener su elemento
+   rimosso ha già rotto l'intero wiring più volte") e non c'era nessun controllo. In v212 ho
+   rimosso quattro mini-card e lasciato i loro handler: lo script è morto alla prima riga di
+   wiring e TUTTO ciò che veniva dopo — incluso il caricamento dei dati — non è mai partito.
+   La pagina restava vuota e l'ho perfino attribuito alla rete.
+   Il controllo è statico: ogni `$("#id")` senza `?.` deve riferirsi a un id presente in
+   index.html, oppure a un elemento creato dinamicamente (riconosciuto perché quell'id compare
+   anche in un template di app.js). ═══════════════════════════════════════════════════════ */
+{
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const js = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const idsPagina = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
+  // id generati da app.js dentro una stringa di template (es. il centro della ciambella)
+  const idsDinamici = new Set([...js.matchAll(/id="([A-Za-z0-9_-]+)"/g)].map(m => m[1]));
+  // ⚠ i commenti vanno tolti PRIMA di cercare: questo stesso file, e app.js, contengono dentro
+  // un commento il frammento di codice che DESCRIVE il difetto — e il gate lo segnalava come
+  // difetto vero. Un controllo statico che legge anche la prosa trova se stesso.
+  const codice = js.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const righe = codice.split("\n");
+  const nudi = [];
+  righe.forEach((l, i) => {
+    for (const m of l.matchAll(/\$\("#([A-Za-z0-9_-]+)"\)(\??)[.[]/g)) {
+      const [, id, sicuro] = m;
+      if (sicuro === "?") continue;
+      if (idsPagina.has(id) || idsDinamici.has(id)) continue;
+      nudi.push(`#${id} (riga ${i + 1})`);
+    }
+  });
+  check("v213 wiring: nessun $(\"#id\") senza ?. punta a un elemento che non esiste", nudi.length === 0);
+  if (nudi.length) console.log("  ⚠ rompono il caricamento:", nudi.join(", "));
+}
+
+
 /* ---------- v204: STRUTTURA MINIMA DELLA PAGINA (guardia anti-taglio) ----------
    Tre volte in un'ora un taglio ha portato via un elemento VICINO a quello che doveva togliere:
    la concentrazione di fattore (viveva dentro i motivi del verdetto), cinque fatti di C12
