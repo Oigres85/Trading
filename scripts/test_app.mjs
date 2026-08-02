@@ -988,13 +988,20 @@ check("v156→v180 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi
 check("v169 decisioni: le detenute in VETO FORTE entrano nella lista anche SENZA stop violato", run(`
   const p = buildPrompt();
   const dv = decisionVerdict();
-  const line = p.split("\\n").find(l => l.includes("POSIZIONI CHE CHIEDONO UNA DECISIONE"));
+  // v211 — ancorato al MARCATORE, non al testo: la riga è stata riformulata (da "CHIEDONO UNA
+  // DECISIONE OGGI" a "DA GUARDARE", separando eventi e condizioni permanenti) e un check legato
+  // alla frase si rompe a ogni riscrittura senza proteggere nulla. È già successo tre volte.
+  const line = p.split("\\n").find(l => l.includes("🔷"));
   const attesi = new Set();
   (dv.stopViolations || []).forEach(x => attesi.add(x.r.ticker));
   (dv.excluded || []).forEach(x => { if (x.r && x.r.qty && String(x.strength||"").toLowerCase() === "forte") attesi.add(x.r.ticker); });
   if (!attesi.size) return line == null;                 // niente da decidere: la riga non deve esserci
   if (line == null) return false;
-  return [...attesi].every(tk => line.includes(tk));`));
+  if (![...attesi].every(tk => line.includes(tk))) return false;
+  // v211 — e la riga deve DISTINGUERE l'evento dalla condizione permanente: metterle sotto la
+  // stessa etichetta "OGGI" su 6 posizioni di 8 costruisce un'urgenza che i dati non hanno, ed è
+  // ciò che ha prodotto il report "vendi tutto".
+  return /EVENTO/.test(line) && /CONDIZIONE PERMANENTE/.test(line);`));
 check("v170 budget: il capitale liquidabile è CONTESTO, mai capienza di spesa di oggi", run(`
   const p = buildPrompt();
   const line = p.split("\\n").find(l => l.includes("CAPITALE IMMOBILIZZATO"));

@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "210";
+const BUILD_VERSION = "211";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4842,6 +4842,20 @@ function miniLineChart(pts, { w = 420, h = 70, color = "var(--blue)", zeroLine =
   </div>`;
 }
 
+/* v211 — QUANTO SPESSO QUESTO "ALLARME" È ACCESO.
+   Nasce dal report che diceva di vendere tutto. Il payload pubblicava «margin debt = 100% del
+   picco storico → RISCHIO SISTEMICO» senza dire che la serie è al proprio massimo in 11 mesi
+   su 13: una misura che sta al suo massimo l'85% del tempo non è un allarme, è una costante,
+   e un LLM che la legge come evento la conta come prova. CLAUDE.md lo annotava già
+   ("pct_of_peak saturo 13/13") ma la riga del payload continuava a metterla per prima. */
+function mesiAlPicco(serie) {
+  const h = (serie || []).filter(v => typeof v === "number");
+  if (h.length < 3) return null;
+  let picco = -Infinity, conta = 0;
+  h.forEach(v => { if (v >= picco) { conta++; picco = v; } else if (v > picco) picco = v; });
+  return { conta, tot: h.length };
+}
+
 /* v207 — FONTE UNICA PER I RAMI FEDWATCH.
    Il difetto: v187 ha corretto il PAYLOAD ("prob. taglio 0%" era vero e inutile quando il
    mercato prezzava un RIALZO al 38%), ma il popup della dashboard è rimasto indietro — mostrava
@@ -6546,7 +6560,9 @@ function buildPrompt() {
       if (daDecidere.length) {
         const liquid = daDecidere.reduce((s, x) => s + valEur(x.r), 0);
         const bud = DATA?.totals?.budget_operativo_spendibile;
-        lines.push(`· 🔷 POSIZIONI CHE CHIEDONO UNA DECISIONE OGGI (${daDecidere.length}): ` +
+        const nEventi = (dv.stopViolations || []).length;
+        const nPermanenti = daDecidere.length - nEventi;
+        lines.push(`· 🔷 POSIZIONI DA GUARDARE (${daDecidere.length} su ${(DATA.portfolio || []).filter(r => r.qty > 0).length}) — ${nEventi} per un EVENTO di oggi (stop violato: il prezzo ha attraversato un livello) e ${nPermanenti} per una CONDIZIONE PERMANENTE (veto di qualità su una posizione detenuta: è vera da settimane, non è successo nulla oggi). ⚠ Le due cose NON hanno la stessa urgenza e non vanno risolte con lo stesso gesto; in particolare una condizione permanente non diventa un'operazione solo perché compare in un elenco: ` +
           daDecidere.map(x => {
             // v183: EUR, come il controvalore accanto. Stessa scala di valEur() — `gain` grezzo
             // e' in valuta del titolo e stamparlo con fmtEUR creava un secondo valore, piu' alto
@@ -6556,7 +6572,7 @@ function buildPrompt() {
             const mv = gEur != null && gEur < 0 ? ` · minusvalenza latente ${fmtEUR.format(Math.round(gEur))}` : "";
             return `${x.r.ticker} (${fmtNum.format(Math.round(valEur(x.r)))} € — ${x.perche}${mv})`;
           }).join(" · ") +
-          `. Tenere è una decisione quanto vendere, ma va DICHIARATA: questi nomi non escono da soli dal portafoglio.`);
+          `. Tenere è una decisione quanto vendere, ma va DICHIARATA: questi nomi non escono da soli dal portafoglio. ⚠ E il numero di nomi in questo elenco NON è una misura di quanto rischio ridurre: il mandato è "Let Winners Run" e lo stop ratchet esiste proprio per non dover uscire in anticipo.`);
         // v170 — il CEO ha corretto (giustamente) la formulazione precedente: finché non hai VENDUTO,
         // il budget è quello ATTUALE, non quello presunto. Le vendite sono ordini a LIMITE — possono
         // non riempirsi — e comunque regolano a T+2. Invitare a dimensionare gli acquisti sui proventi
@@ -7113,7 +7129,12 @@ function buildPrompt() {
     const conf = mds.confirmed ? " → RISCHIO SISTEMICO (Forward P/E >20)"
       : (mds.high && mds.fpe != null) ? " (il Forward P/E attuale non conferma il livello estremo)" : "";
     const mdFlag = dqV.flags.margin_debt ? ` ${dqV.flags.margin_debt}` : "";
-    lines.push(`- Margin Debt (leva a credito, serie ${md.series || "FRED"}${md.carried ? ", carry-forward dal run precedente" : ""}): $${fmtNum.format(Math.round((md.value || 0) / 1000))} mld = ${md.pct_of_peak}% del picco storico${md.peak_date ? ` (ATH ${md.peak_date})` : ""} — ${mds.label}${conf}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""} (rilevazione ${md.date}).${mdFlag} Leva alta/estrema = mercato fragile, le discese possono innescare margin call a catena (drawdown più violenti sul tech ad alta beta).`);
+    lines.push(`- Margin Debt (leva a credito, serie ${md.series || "FRED"}${md.carried ? ", carry-forward dal run precedente" : ""}): $${fmtNum.format(Math.round((md.value || 0) / 1000))} mld = ${md.pct_of_peak}% del picco storico${md.peak_date ? ` (ATH ${md.peak_date})` : ""} — ${mds.label}${conf}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""} (rilevazione ${md.date}).${mdFlag}${(() => {
+      const mp = mesiAlPicco(md.history);
+      return mp && mp.conta >= mp.tot * 0.6
+        ? ` ⚠ CONTESTO DI FREQUENZA: questa serie è al proprio massimo in ${mp.conta} mesi su ${mp.tot} dello storico disponibile — "al picco storico" è la CONDIZIONE ORDINARIA di una fase espansiva, non un evento. Ciò che cambia stato è la DIREZIONE (YoY ${signTxt(md.yoy)}) o un'inversione, non il livello.`
+        : "";
+    })()} Leva alta/estrema = mercato fragile, le discese possono innescare margin call a catena (drawdown più violenti sul tech ad alta beta).`);
   }
   if (m.forward_pe && m.forward_pe.value != null) {
     const fp = m.forward_pe;
@@ -7178,7 +7199,8 @@ function buildPrompt() {
     const gg = sovrapposizioneGiorni(m.decouple.sp500, m.decouple.gdp);
     if (gg) {
       const gap = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
-      lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: gap ${gap > 0 ? "+" : ""}${gap} pp (>40 pp storicamente precede correzioni; quanta crescita è già prezzata) [serie confrontabili su ${gg} giorni comuni]`);
+      const anni = Math.round(gg / 365 * 10) / 10;
+      lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: gap ${gap > 0 ? "+" : ""}${gap} pp su una finestra di ${anni} anni (azionario ${signTxt(Math.round((m.decouple.sp500.slice(-1)[0].v - 100) * 10) / 10)} contro PIL reale ${signTxt(Math.round((m.decouple.gdp.slice(-1)[0].v - 100) * 10) / 10)} dal ${m.decouple.sp500[0].d}). ⚠ COME SI LEGGE: è una differenza CUMULATA, quindi cresce meccanicamente con la lunghezza della finestra — la soglia dei "40 pp" citata in letteratura NON è confrontabile con finestre di durata diversa, e su ${anni} anni di mercato al rialzo viene superata quasi sempre. Serve come contesto di valutazione, NON come segnale di uscita.`);
     } else {
       lines.push(`- Disaccoppiamento S&P 500 vs PIL reale: NON CALCOLABILE in questo snapshot — le due serie non condividono nessun periodo (azionario e PIL arrivano con finestre diverse), quindi la loro differenza non sarebbe un gap ma il confronto fra due orizzonti diversi. Si ricalcola da solo al prossimo run della pipeline.`);
     }
@@ -7284,7 +7306,7 @@ function buildPrompt() {
       ? `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp`
       : `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): il gap dell'S&P NON è calcolabile in questo snapshot (la sua serie e quella dei profitti non condividono nessun periodo)`;
     if (m.corp_profit.ndx_gap != null) cpBp += `, NDX gap ${m.corp_profit.ndx_gap > 0 ? "+" : ""}${m.corp_profit.ndx_gap} pp`;
-    cpBp += ` — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali)`;
+    cpBp += ` — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). Contarli come due prove separate raddoppia un segnale solo.`;
     lines.push(cpBp);
   }
   if (m.fed_market) lines.push(`- Fed Funds Rate attuale: ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}); tasso>4% storicamente comprime i multipli P/E in 12-18 mesi`);
