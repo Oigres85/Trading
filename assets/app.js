@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "219";
+const BUILD_VERSION = "220";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6641,7 +6641,23 @@ function buildPrompt() {
     // caso. La ricevuta del taglio (C12) esiste per questo, e non copriva questa riga: ora si'.
     if (dv.factorRisk) {
       const fr = dv.factorRisk;
-      lines.push(`⚠ CONCENTRAZIONE DI FATTORE: ${fr.tk.join("+")} (${fr.name}) generano il ${fmtNum.format(fr.mcr)}% della VARIANZA del fondo con il ${fmtNum.format(fr.w)}% del NAV — oltre la soglia del ${RISK_PARAMS.factorRiskAlert_pct}%. I veti guardano un titolo per volta e questo NON lo vedono: sono nomi che possono scendere INSIEME perche' condividono il fattore, per quanto sani siano singolarmente. Ridurre qui significa ridurre la quota di VARIANZA, non il numero di titoli.`);
+      lines.push(`⚠ CONCENTRAZIONE DI FATTORE: ${fr.tk.join("+")} (${fr.name}) generano il ${fmtNum.format(fr.mcr)}% della VARIANZA del fondo con il ${fmtNum.format(fr.w)}% del NAV — oltre la soglia del ${RISK_PARAMS.factorRiskAlert_pct}%. I veti guardano un titolo per volta e questo NON lo vedono: sono nomi che possono scendere INSIEME perche' condividono il fattore, per quanto sani siano singolarmente. Ridurre qui significa ridurre la quota di VARIANZA, non il numero di titoli.${(() => {
+        // variazione della quota di fattore vs ~7 rilevazioni fa: senza questo numero la regola
+        // B4 ("rimetti la riduzione sul tavolo solo se SALE") non sarebbe verificabile dal payload,
+        // e un rimando a un dato che non c'è è la classe di difetto che il gate C10 intercetta
+        const mh = (DATA.metrics_history || []).filter(m => m?.titles);
+        if (mh.length < 2) return "";
+        const prima = mh[Math.max(0, mh.length - 8)];
+        const q = (punto) => fr.tk.reduce((sum, t) => sum + (punto.titles?.[t]?.mcr ?? 0), 0);
+        const q0 = q(prima), q1 = fr.mcr;
+        if (!(q0 > 0)) return "";
+        const d = Math.round((q1 - q0) * 10) / 10;
+        const gg = mh.length - 1 - Math.max(0, mh.length - 8);
+        return ` [VARIAZIONE: era ${fmtNum.format(Math.round(q0 * 10) / 10)}% ${gg} rilevazioni fa → ${d > 0 ? "+" : ""}${fmtNum.format(d)} pp. ${
+          Math.abs(d) < 3 ? "STABILE: la concentrazione non è aumentata, quindi non è un fatto nuovo di oggi"
+          : d > 0 ? "IN AUMENTO: il fattore sta assorbendo più varianza di prima"
+          : "IN CALO: il fattore sta assorbendo meno varianza di prima"}]`;
+      })()}`);
     }
     // NOTA (v156): rimosse da qui le direttive INDIPENDENZA SUL VERDETTO e ANALISI PER-TITOLO —
     // erano una SECONDA testata dentro il payload (il payload deve essere MATERIA PRIMA, non un
