@@ -18,7 +18,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=217">
+<link rel="stylesheet" href="assets/style.css?v=218">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -72,7 +72,8 @@
     <button class="tab tab-active" data-tab="struttura" role="tab">Struttura</button>
     <button class="tab" data-tab="portafoglio" role="tab">Portafoglio</button>
     <button class="tab" data-tab="watchlist" role="tab">Watchlist</button>
-    <button class="tab" data-tab="macro" role="tab">Macro</button>
+    <!-- v218 — voce "Macro" RIMOSSA: tutto il suo contenuto vive ora dentro Struttura,
+         che è quello che il CEO chiedeva da quattro messaggi. Una stanza sola. -->
     <button class="tab" data-tab="rischio" role="tab">Rischio &amp; strumenti</button>
   </nav>
 
@@ -98,6 +99,85 @@
     <div class="muted struct-note" id="conc-note"></div>
   </section>
 
+<section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Rotazione — dove si muove il denaro</h2>
+      <div class="spark-toggle" id="rot-toggle" role="group" aria-label="Orizzonte della rotazione">
+        <button class="chip chip-active" data-rot="m1">1 mese</button>
+        <button class="chip" data-rot="m3">3 mesi</button>
+      </div>
+    </div>
+    <div class="struct-headline" id="mg-rot-head"></div>
+    <div id="mg-rot"></div>
+    <div class="muted struct-note" id="mg-rot-note"></div>
+  </section>
+
+<section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Termometri di stress</h2>
+      <span class="muted">curva dei tassi · credito · volatilità, con le loro soglie</span>
+    </div>
+    <div class="mg-tris" id="mg-stress"></div>
+  </section>
+
+<section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Leva e stagionalità</h2>
+      <span class="muted">quanto denaro a prestito c'è nel mercato, e che mese è</span>
+    </div>
+    <div class="mg-tris" id="mg-leva"></div>
+  </section>
+
+<section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Da cosa nascono i punteggi</h2>
+      <span class="muted">un numero 0-100 da solo non dice niente: qui si vede chi lo tira giù</span>
+    </div>
+    <div class="mg-tris" id="mg-scomposizione"></div>
+  </section>
+
+<section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Campanelli d'allarme</h2>
+      <span class="muted" id="mg-sign-head"></span>
+    </div>
+    <div id="mg-signposts"></div>
+    <div class="muted struct-note" id="mg-sign-note"></div>
+  </section>
+
+<section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Tutti gli indicatori, una classifica sola</h2>
+      <span class="muted">stesso asse 0-100 · clicca una barra per il dettaglio</span>
+    </div>
+    <div class="struct-headline" id="mg-tutti-head"></div>
+    <div id="mg-tutti"></div>
+    <div class="muted struct-note" id="mg-tutti-note"></div>
+  </section>
+
+<section class="card" data-pane="struttura">
+    <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
+    <div class="macro-actions">
+      <button class="btn btn-primary btn-sm" id="macro-details" title="Tutti i dettagli macro in una sola pagina scorrevole">📖 Dettagli macro</button>
+    </div>
+        <!-- v215 — IL BLOCCO RICHIUDIBILE È SPARITO. Conteneva 11 tachimetri (#gauges) e 16
+         riquadri (#macro-grid): nasconderli non era esploderli. Ora quegli stessi indicatori
+         sono UNA classifica sola sullo stesso asse 0-100, ordinata dal peggiore, con ogni
+         barra cliccabile verso il suo pannello. Gli id #gauges e #macro-grid restano nel DOM
+         ma vuoti e nascosti: renderGauges/renderMacro continuano a girare senza errori e la
+         guardia strutturale continua a vederli, in attesa di essere rimossi con le loro
+         funzioni in un taglio dedicato (togliere codice e guardia insieme è la classe v203).
+         L'unica mini-card superstite, "Interni di mercato", è già righe di valori. -->
+    <!-- v218 — ULTIMA MINI-CARD RIMOSSA. "Interni di mercato" erano quattro righe di valori con
+         unità diverse (pp, %, un booleano): ora stanno nella classifica unica, sulla stessa
+         scala 0-100 di tutto il resto, dove si possono finalmente confrontare. -->
+    </div>
+    <div class="macro-news">
+      <div class="macro-news-head"><h3>News — portafoglio &amp; macro USA</h3><span class="muted">clicca la sintesi per tutte le notizie</span></div>
+      <div id="news-summary" tabindex="0" role="button" title="Clicca per leggere tutte le notizie"></div>
+    </div>
+  </section>
+
   <!-- v206 — MAPPA DI CORRELAZIONE RIMOSSA su decisione del CEO ("non la capisco e non ne
        capisco l'utilità"). Era una matrice N×N: una forma che va imparata prima di essere
        letta, e questa dashboard non può permetterselo. L'informazione NON è andata persa —
@@ -106,14 +186,7 @@
        Rimossa con lei anche corr_matrix dalla pipeline: era nata per questo grafico e non
        aveva altri consumatori. -->
 
-  <section class="card" data-pane="struttura">
-    <div class="card-head">
-      <h2>Deriva della concentrazione</h2>
-      <span class="muted" id="drift-basis"></span>
-    </div>
-    <div id="drift-chart"></div>
-    <div class="muted struct-note" id="drift-note"></div>
-  </section>
+  
 
   
 
@@ -158,87 +231,23 @@
        file contiene (curva 501 punti, credito 260, VIX 30, margin debt 13) non erano
        disegnate in dashboard, solo dentro i popup. Ora in cima ci sono tre domande; i 34
        riquadri restano tutti, sotto, in un blocco richiudibile. -->
-  <section class="card" data-pane="macro">
-    <div class="card-head">
-      <h2>Rotazione — dove si muove il denaro</h2>
-      <div class="spark-toggle" id="rot-toggle" role="group" aria-label="Orizzonte della rotazione">
-        <button class="chip chip-active" data-rot="m1">1 mese</button>
-        <button class="chip" data-rot="m3">3 mesi</button>
-      </div>
-    </div>
-    <div class="struct-headline" id="mg-rot-head"></div>
-    <div id="mg-rot"></div>
-    <div class="muted struct-note" id="mg-rot-note"></div>
-  </section>
+  
 
-  <section class="card" data-pane="macro">
-    <div class="card-head">
-      <h2>Termometri di stress</h2>
-      <span class="muted">curva dei tassi · credito · volatilità, con le loro soglie</span>
-    </div>
-    <div class="mg-tris" id="mg-stress"></div>
-  </section>
+  
 
-  <section class="card" data-pane="macro">
-    <div class="card-head">
-      <h2>Leva e stagionalità</h2>
-      <span class="muted">quanto denaro a prestito c'è nel mercato, e che mese è</span>
-    </div>
-    <div class="mg-tris" id="mg-leva"></div>
-  </section>
+  
 
   <!-- v209 — LE MINI-CARD DIVENTANO GRAFICI. Un punteggio composito 0-100 con sotto un
        termometro è la forma meno informativa possibile: dice "55" e non dice di CHI è colpa.
        I componenti esistevano già in data.json (13 + 7 + 5 + 4) e non erano disegnati da
        nessuna parte — risk_sentiment.components non era reso nemmeno nei popup. -->
-  <section class="card" data-pane="macro">
-    <div class="card-head">
-      <h2>Da cosa nascono i punteggi</h2>
-      <span class="muted">un numero 0-100 da solo non dice niente: qui si vede chi lo tira giù</span>
-    </div>
-    <div class="mg-tris" id="mg-scomposizione"></div>
-  </section>
+  
 
-  <section class="card" data-pane="macro">
-    <div class="card-head">
-      <h2>Campanelli d'allarme</h2>
-      <span class="muted" id="mg-sign-head"></span>
-    </div>
-    <div id="mg-signposts"></div>
-    <div class="muted struct-note" id="mg-sign-note"></div>
-  </section>
+  
 
-  <section class="card" data-pane="macro">
-    <div class="card-head">
-      <h2>Tutti gli indicatori, una classifica sola</h2>
-      <span class="muted">stesso asse 0-100 · clicca una barra per il dettaglio</span>
-    </div>
-    <div class="struct-headline" id="mg-tutti-head"></div>
-    <div id="mg-tutti"></div>
-    <div class="muted struct-note" id="mg-tutti-note"></div>
-  </section>
+  
 
-  <section class="card" data-pane="macro">
-    <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
-    <div class="macro-actions">
-      <button class="btn btn-primary btn-sm" id="macro-details" title="Tutti i dettagli macro in una sola pagina scorrevole">📖 Dettagli macro</button>
-    </div>
-        <!-- v215 — IL BLOCCO RICHIUDIBILE È SPARITO. Conteneva 11 tachimetri (#gauges) e 16
-         riquadri (#macro-grid): nasconderli non era esploderli. Ora quegli stessi indicatori
-         sono UNA classifica sola sullo stesso asse 0-100, ordinata dal peggiore, con ogni
-         barra cliccabile verso il suo pannello. Gli id #gauges e #macro-grid restano nel DOM
-         ma vuoti e nascosti: renderGauges/renderMacro continuano a girare senza errori e la
-         guardia strutturale continua a vederli, in attesa di essere rimossi con le loro
-         funzioni in un taglio dedicato (togliere codice e guardia insieme è la classe v203).
-         L'unica mini-card superstite, "Interni di mercato", è già righe di valori. -->
-    <div class="mini-cards">
-      <div class="mini-card" id="internals-box" tabindex="0" role="button" title="Interni di mercato: ampiezza, momentum, schiuma sugli ETF a leva, futures"></div>
-    </div>
-    <div class="macro-news">
-      <div class="macro-news-head"><h3>News — portafoglio &amp; macro USA</h3><span class="muted">clicca la sintesi per tutte le notizie</span></div>
-      <div id="news-summary" tabindex="0" role="button" title="Clicca per leggere tutte le notizie"></div>
-    </div>
-  </section>
+  
 
 
 <section class="card" data-pane="portafoglio">
@@ -277,6 +286,15 @@
     <div class="struct-headline" id="bench-head"></div>
     <div id="bench-chart"></div>
     <div class="muted struct-note" id="bench-note"></div>
+  </section>
+
+<section class="card" data-pane="portafoglio">
+    <div class="card-head">
+      <h2>Deriva della concentrazione</h2>
+      <span class="muted" id="drift-basis"></span>
+    </div>
+    <div id="drift-chart"></div>
+    <div class="muted struct-note" id="drift-note"></div>
   </section>
 
   <!-- PORTAFOGLIO -->
@@ -528,6 +546,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=217"></script>
+<script src="assets/app.js?v=218"></script>
 </body>
 </html>

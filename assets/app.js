@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "217";
+const BUILD_VERSION = "218";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2375,13 +2375,28 @@ function renderRiskParams() {
   const grid = $("#risk-params-grid");
   if (!grid || !DATA) return;
   const rules = riskRulesRegistry();
-  grid.innerHTML = rules.map((r, i) => `
-    <button class="rp-chip rp-${r.tier}${r.active ? " rp-active" : ""}" data-rp="${i}" title="${esc(r.state)}">
-      <span class="rp-chip-dot"></span>
-      <span class="rp-chip-body"><span class="rp-chip-label">${esc(r.label)}</span><span class="rp-chip-th">${esc(r.th)}</span></span>
-      ${r.active ? '<span class="rp-chip-flag">attiva</span>' : ""}
-    </button>`).join("");
-  grid.querySelectorAll(".rp-chip").forEach(b => b.addEventListener("click", () => openRiskRuleModal(rules[+b.dataset.rp])));
+  // v218 — erano 15 chip tutte uguali: per sapere che cosa ti vincola OGGI andavano lette una
+  // per una. Ora sono barre ordinate — prima le regole ATTIVE (quelle che stanno effettivamente
+  // limitando cosa puoi fare), poi le altre — e il colore è la gravità già dichiarata dal tier.
+  const COL = { red: "var(--red)", yellow: "var(--yellow)", green: "var(--green)" };
+  const ord = rules.map((r, i) => ({ r, i, peso: (r.active ? 100 : 0) + ({ red: 3, yellow: 2, green: 1 }[r.tier] || 0) }))
+    .sort((a, b) => b.peso - a.peso);
+  const attive = rules.filter(r => r.active).length;
+  grid.innerHTML = `<div class="muted rp-sommario">${attive === 0
+      ? "<b>Nessuna regola sta vincolando le tue scelte in questo momento.</b>"
+      : `<b>${attive} regol${attive === 1 ? "a" : "e"} su ${rules.length} ${attive === 1 ? "sta limitando" : "stanno limitando"} cosa puoi fare oggi</b> — sono quelle in cima.`}</div>`
+    + barreOrdinate(ord.map(({ r, i }) => ({
+        nome: r.label, valore: r.active ? 100 : 22, colore: r.active ? COL[r.tier] : "var(--border)",
+        tk: String(i), testo: `${r.active ? "ATTIVA · " : ""}${r.th}`,
+      })));
+  grid.querySelectorAll("[data-obar-tk]").forEach(e => {
+    e.classList.add("obar-click"); e.setAttribute("tabindex", "0"); e.setAttribute("role", "button");
+    const rr = ord[[...grid.querySelectorAll("[data-obar-tk]")].indexOf(e)];
+    e.setAttribute("title", esc(rr.r.state));
+    const apri = () => openRiskRuleModal(rr.r);
+    e.addEventListener("click", apri);
+    e.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); apri(); } });
+  });
 }
 function openRiskRuleModal(r) {
   if (!r) return;
@@ -4047,19 +4062,21 @@ function renderSignposts() {
   const q = attivi / items.length;
   const cls = q >= 0.7 ? "neg" : q >= 0.5 ? "warn" : "pos";
   if (head) head.innerHTML = `<b class="${cls}" style="font-family:var(--mono);font-size:15px">${attivi}/${items.length}</b> accesi`;
+  // v218 — erano pallini accesi/spenti raggruppati: leggibile solo contandoli a occhio.
+  // Ogni categoria diventa una barra di riempimento (quanti accesi su quanti), più la barra
+  // totale: la domanda "quanto siamo avanti nel conto alla rovescia" si legge senza contare.
   const perCat = new Map();
   items.forEach(i => { const c = i.category || "Altro"; if (!perCat.has(c)) perCat.set(c, []); perCat.get(c).push(i); });
-  box.innerHTML = `<div class="sp-cats">${[...perCat.entries()].map(([cat, list]) => `
-    <div class="sp-cat">
-      <div class="sp-cat-h">${esc(cat)} <span class="muted">${list.filter(i => i.status).length}/${list.length}</span></div>
-      ${list.map(i => `<div class="sp-item${i.status ? " sp-on" : ""}" title="${esc(i.desc || "")}${i.source ? " · fonte: " + esc(i.source) : ""}">
-        <span class="sp-dot"></span><span class="sp-name">${esc(i.name)}</span></div>`).join("")}
-    </div>`).join("")}</div>`;
-  if (note) {
-    note.innerHTML = `I dieci segnali che BofA usa per riconoscere un massimo di mercato. Acceso = condizione verificata.
-      Non è una previsione e non c'è una soglia magica: contano <b>quanti</b> si accendono e <b>quanto in fretta</b>.
-      Oggi ${attivi} su ${items.length}${q >= 0.7 ? " — la maggioranza" : q >= 0.5 ? " — circa metà" : " — una minoranza"}.`;
-  }
+  const righe = [...perCat.entries()].map(([cat, list]) => {
+    const on = list.filter(i => i.status).length;
+    return { nome: cat, valore: Math.round(on / list.length * 100), colore: on / list.length >= 0.7 ? "var(--red)" : on / list.length >= 0.5 ? "var(--yellow)" : "var(--green)",
+             testo: `${on}/${list.length} acceso${on === 1 ? "" : "i"}`, on, list };
+  }).sort((a, b) => b.valore - a.valore);
+  box.innerHTML = barreOrdinate(righe.map(r => ({ nome: r.nome, valore: r.valore, colore: r.colore, testo: r.testo })))
+    + `<div class="sp-dettaglio">${righe.map(r => `<div class="sp-cat">
+        <div class="sp-cat-h">${esc(r.nome)}</div>
+        ${r.list.map(i => `<span class="sp-item${i.status ? " sp-on" : ""}" title="${esc(i.desc || "")}${i.source ? " · fonte: " + esc(i.source) : ""}"><span class="sp-dot"></span>${esc(i.name)}</span>`).join("")}
+      </div>`).join("")}</div>`;
 }
 
 function renderMacroGrafici() {
@@ -4161,6 +4178,17 @@ function indicatoriClassifica() {
     const sc = marketImpact(i);
     if (sc != null) out.push({ k: "mk:" + i.key, nome: i.label, score: Math.round(sc), sub: `${i.value} (${signTxt(i.change_pct, i.suffix || "%")} oggi)` });
   });
+  // v218 — gli INTERNI DI MERCATO erano l'ultima mini-card: quattro righe di valori con unità
+  // diverse (pp, %, un booleano) che nessuno poteva confrontare fra loro. Portati sulla stessa
+  // scala 0-100 entrano nella classifica insieme a tutto il resto, e la mini-card sparisce.
+  if (m.breadth?.divergence_pp != null) out.push({ k: "breadth", nome: "Ampiezza del mercato (SPY vs RSP)",
+    score: Math.round(clamp(50 + m.breadth.divergence_pp * 8)), sub: `${signTxt(m.breadth.divergence_pp, " pp")} a 1 mese` });
+  if (m.momentum?.sp500?.dist_pct != null) out.push({ k: "momentum", nome: "S&P vs media 125 sedute",
+    score: Math.round(clamp(50 + m.momentum.sp500.dist_pct * 4)), sub: signTxt(m.momentum.sp500.dist_pct) });
+  if (m.froth) out.push({ k: "froth", nome: "Schiuma sugli ETF a leva",
+    score: m.froth.alert ? 18 : 78, sub: m.froth.alert ? "volumi anomali dentro un rialzo" : `volumi normali (RVol max ${fmtNum.format(Math.max(m.froth.soxl?.rvol ?? 0, m.froth.tqqq?.rvol ?? 0))}×)` });
+  if (m.futures?.nasdaq?.change_pct != null) out.push({ k: "futures", nome: "Futures Nasdaq (fuori orario)",
+    score: Math.round(clamp(50 + m.futures.nasdaq.change_pct * 10)), sub: signTxt(m.futures.nasdaq.change_pct) });
   return out.sort((a, b) => a.score - b.score);
 }
 function renderIndicatori() {
@@ -4172,7 +4200,11 @@ function renderIndicatori() {
     nome: r.nome, valore: r.score - 50, colore: scoreColor(r.score), tk: r.k,
     testo: `${r.score}/100${r.sub ? "  ·  " + r.sub : ""}`,
   })));
+  const conPannello = new Set(Object.keys(MACRO_INFO || {}));
   box.querySelectorAll("[data-obar-tk]").forEach(e => {
+    // v218 — solo le voci che hanno davvero un pannello diventano cliccabili: un bottone che
+    // non apre niente è peggio di nessun bottone (openMacroInfo esce in silenzio, difetto v196)
+    if (!conPannello.has(e.dataset.obarTk)) return;
     e.classList.add("obar-click");
     const apri = () => openMacroInfo(e.dataset.obarTk);
     e.setAttribute("tabindex", "0"); e.setAttribute("role", "button");
@@ -8802,7 +8834,8 @@ function setTab(nome) {
   if (nome === "portafoglio") renderTable();
   if (nome === "watchlist") renderWatchlist();
   if (nome === "struttura" && typeof DATA !== "undefined" && DATA) renderStruttura();
-  if (nome === "macro" && typeof DATA !== "undefined" && DATA) renderMacroGrafici();
+  // v218 — la scheda "macro" non esiste più: il suo contenuto sta dentro Struttura
+  if (nome === "struttura" && typeof DATA !== "undefined" && DATA) renderMacroGrafici();
 }
 document.querySelectorAll("#main-tabs .tab").forEach(b =>
   b.addEventListener("click", () => setTab(b.dataset.tab)));

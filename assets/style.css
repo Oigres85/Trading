@@ -1624,3 +1624,10 @@ svg.g-serie { cursor: crosshair; }
   background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.5);
   border-radius: 10px; padding: 11px 14px; margin-bottom: 14px; font-size: 13px;
 }
+
+/* v218 — dettaglio dei campanelli sotto le barre, e sommario dei parametri di rischio */
+.sp-dettaglio { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.sp-dettaglio .sp-cat-h { font-size: var(--fs-lab); color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+.sp-dettaglio .sp-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); padding: 1px 0; }
+.sp-dettaglio .sp-item.sp-on { color: var(--text); font-weight: 600; }
+.rp-sommario { font-size: 12.5px; margin-bottom: 10px; }

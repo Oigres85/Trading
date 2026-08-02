@@ -1528,7 +1528,11 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     ["classifica indicatori macro", 'id="mg-tutti"'],
     ["scomposizione dei punteggi", 'id="mg-scomposizione"'],
     ["rotazione settoriale", 'id="mg-rot"'],
-    ["mini-card macro", 'class="mini-cards"'],
+    // v218 — le mini-card non esistono più: l'ultima ("Interni di mercato") è confluita nella
+    // classifica unica, già protetta qui sopra da id="mg-tutti". La guardia si sposta sui due
+    // blocchi convertiti in questa versione, che sono i nuovi portatori di quell'informazione.
+    ["campanelli d'allarme", 'id="mg-signposts"'],
+    ["parametri di rischio (griglia)", 'id="risk-params-grid"'],
     // v209 — protegge l'ACCESSO ai dettagli macro, non più il bottone della topbar: quello è
     // stato rimosso perché duplicava questo, e la porta è ora una sola, nella colonna centrale.
     ["accesso ai dettagli macro", 'id="macro-details"'],
