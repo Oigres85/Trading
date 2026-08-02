@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "211";
+const BUILD_VERSION = "212";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3992,8 +3992,15 @@ const COMPOSITI = [
 function renderScomposizione() {
   const box = $("#mg-scomposizione"); if (!box) return;
   const m = DATA?.macro || {};
-  const carte = COMPOSITI.map(c => {
-    const v = m[c.k]; const comp = (v?.components || []).filter(x => x && x.score != null);
+  // v212 — la Direzione mercato è un composito come gli altri, ma i suoi 10 fattori li calcola
+  // directionComponents() invece di arrivare da data.json: la si innesta qui invece di lasciarla
+  // come tachimetro in una mini-card, che è il formato che stiamo togliendo.
+  const dirComp = directionComponents();
+  const tutti = [...COMPOSITI, ...(dirComp.length >= 2
+    ? [{ k: "_direzione", t: "Direzione mercato", sub: "composito di tutti gli indicatori macro", comp: dirComp }] : [])];
+  const carte = tutti.map(c => {
+    const v = c.comp ? { components: c.comp } : m[c.k];
+    const comp = (v?.components || []).filter(x => x && x.score != null);
     if (!v || comp.length < 2) return null;
     const righe = [...comp].sort((a, b) => a.score - b.score).map(x => ({
       nome: x.label, valore: Math.round(x.score - 50), colore: scoreColor(x.score),
@@ -4001,7 +4008,8 @@ function renderScomposizione() {
     }));
     const peggio = righe[0], meglio = righe[righe.length - 1];
     const sc = v.score ?? Math.round(comp.reduce((s, x) => s + x.score, 0) / comp.length);
-    return `<div class="mg-card mg-wide">
+    const apri = c.k.startsWith("_") ? "" : ` data-mg-panel="${c.k}" role="button" tabindex="0" title="Apri il dettaglio di ${esc(c.t.replace(/&amp;/g, "&"))}"`;
+    return `<div class="mg-card mg-wide${apri ? " mg-click" : ""}"${apri}>
       <div class="mg-card-head">
         <span class="mg-t">${c.t} <span class="muted" style="font-weight:400">— ${esc(c.sub)}</span></span>
         <span class="mg-v" style="color:${scoreColor(sc)}">${sc}<span class="muted" style="font-size:12px">/100</span></span>
@@ -4013,6 +4021,11 @@ function renderScomposizione() {
   }).filter(Boolean);
   box.innerHTML = carte.length ? carte.join("")
     : '<div class="muted">Nessun punteggio composito disponibile in questo snapshot.</div>';
+  box.querySelectorAll("[data-mg-panel]").forEach(e => {
+    const apri = () => openMacroInfo(e.dataset.mgPanel);
+    e.addEventListener("click", apri);
+    e.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); apri(); } });
+  });
 }
 
 /* v209 — i 10 campanelli BofA: erano una tabella dentro un popup. Sono booleani, quindi la

@@ -11,7 +11,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=211">
+<link rel="stylesheet" href="assets/style.css?v=212">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -69,7 +69,11 @@
 
   <div class="shell-main">
 
-  <!-- ═══ v205 — STRUTTURA DEL LIBRO ═══════════════════════════════════════════════════════
+  <!-- ═══ v212 — STRUTTURA = SOLO LA VARIANZA (richiesta CEO "nella struttura lascia solo
+       varianza"). Restano i due grafici che SONO la varianza: la sua ripartizione fra le
+       posizioni oggi, e la stessa quota nel tempo. Allocazione e Distanza dallo stop non sono
+       state buttate — parlano di posizioni, quindi sono passate in Portafoglio.
+       ═══ v205 — STRUTTURA DEL LIBRO ═══════════════════════════════════════════════════════
        Il vincolo che decide questa vista: i dati arrivano su cron (GitHub Actions), non
        tick-by-tick. Quindi NIENTE GRAFICI DI PREZZO — investing.com e TradingView li fanno
        meglio e in tempo reale. Qui si disegna solo ciò che nessuno dei due può disegnare,
@@ -102,26 +106,9 @@
     <div class="muted struct-note" id="drift-note"></div>
   </section>
 
-  <section class="card" data-pane="struttura">
-    <div class="card-head">
-      <h2>Allocazione</h2>
-      <div class="spark-toggle" id="alloc-graf-toggle" role="group" aria-label="Vista allocazione grafica">
-        <button class="chip chip-active" data-agmode="sector">Settore</button>
-        <button class="chip" data-agmode="currency">Valuta</button>
-      </div>
-    </div>
-    <div id="allocg-chart"></div>
-    <div class="muted struct-note" id="allocg-note"></div>
-  </section>
+  
 
-  <section class="card" data-pane="struttura">
-    <div class="card-head">
-      <h2>Distanza dallo stop</h2>
-      <span class="muted" id="stop-basis"></span>
-    </div>
-    <div id="stopdist-chart"></div>
-    <div class="muted struct-note" id="stopdist-note"></div>
-  </section>
+  
 
   <!-- PATRIMONIO -->
   <section class="card kpi-card" data-pane="portafoglio">
@@ -132,16 +119,18 @@
   <!-- ALLOCAZIONE: solo torta + legenda laterale + liquidità -->
   <section class="card" data-pane="portafoglio">
     <div class="card-head">
-      <h2>Asset allocation</h2>
+      <h2>Peso delle posizioni</h2>
       <button class="btn btn-ghost btn-sm" id="alloc-edit" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica</button>
     </div>
     <div class="alloc-top">
       <div class="alloc-donut-wrap"><div id="alloc-donut"></div></div>
       <ul class="alloc-legend" id="alloc-legend"></ul>
     </div>
-    <div class="spark-toggle alloc-toggle-below" id="alloc-toggle" role="group" aria-label="Vista allocazione">
+    <!-- v212 — via il chip "Per settore": ora settore e valuta li disegna la card
+         "Allocazione per settore e valuta" qui sotto, con barre confrontabili. Due card che
+         mostravano la stessa ripartizione in due forme diverse erano una duplicazione. -->
+    <div class="spark-toggle alloc-toggle-below" id="alloc-toggle" role="group" aria-label="Vista allocazione" hidden>
       <button class="chip chip-active" data-mode="ticker">Per titolo</button>
-      <button class="chip" data-mode="sector">Per settore</button>
     </div>
     <section class="cash-box cash-box-inline alloc-cash">
       <label for="cash-input">Liquidità disponibile (€)</label>
@@ -218,17 +207,10 @@
     <details class="mg-tutti" id="macro-riquadri">
       <summary>Tutti i riquadri macro <span class="muted">— 34 indicatori, ciascuno cliccabile per il dettaglio</span></summary>
     <div class="mini-cards">
-      <div class="mini-card" id="macroquant-box" tabindex="0" role="button" title="MacroQuant (stile BCA) — clicca per il dettaglio"></div>
-      <div class="mini-card" id="signposts-box" tabindex="0" role="button" title="BofA Bear Market Signposts — clicca per il dettaglio"></div>
-      <div class="mini-card" id="tilt-box" tabindex="0" role="button" title="Rotazione settoriale — clicca per il dettaglio"></div>
-      <div class="mini-card" id="seasonality-box" tabindex="0" role="button" title="Stagionalità S&amp;P 500 / Nasdaq — clicca per il dettaglio"></div>
       <div class="mini-card" id="sharpe-box" tabindex="0" role="button" title="Sharpe Ratio del portafoglio — clicca per il dettaglio"></div>
-      <div class="mini-card" id="fx-box" tabindex="0" role="button" title="Rischio cambio EUR/USD — quota del NAV in dollari non coperta — clicca per il dettaglio"></div>
-      <div class="mini-card" id="margin-debt-box" tabindex="0" role="button" title="Margin Debt FINRA — leva a credito sul mercato — clicca per il dettaglio"></div>
       <!-- v207 — QUESTI DUE CONTENITORI NON ESISTEVANO. renderMiniCards() li popolava a ogni
            render con contenuto valido ("Direzione mercato", "Tracking Error vs S&P 500") che
            nessuno ha mai visto, e i due addEventListener erano no-op grazie a `?.`. -->
-      <div class="mini-card" id="market-direction" tabindex="0" role="button" title="Direzione del mercato — composito degli indicatori macro"></div>
       <div class="mini-card" id="tracking-error-box" tabindex="0" role="button" title="Scarto giornaliero del portafoglio contro il benchmark — clicca per l'alpha per titolo"></div>
       <!-- v207 — segnali che finivano SOLO nel prompt per l'LLM e che il CEO non vedeva mai -->
       <div class="mini-card" id="internals-box" tabindex="0" role="button" title="Interni di mercato: ampiezza, momentum, schiuma sugli ETF a leva, futures"></div>
@@ -242,6 +224,27 @@
     </div>
   </section>
 
+
+<section class="card" data-pane="portafoglio">
+    <div class="card-head">
+      <h2>Allocazione per settore e valuta</h2>
+      <div class="spark-toggle" id="alloc-graf-toggle" role="group" aria-label="Vista allocazione grafica">
+        <button class="chip chip-active" data-agmode="sector">Settore</button>
+        <button class="chip" data-agmode="currency">Valuta</button>
+      </div>
+    </div>
+    <div id="allocg-chart"></div>
+    <div class="muted struct-note" id="allocg-note"></div>
+  </section>
+
+<section class="card" data-pane="portafoglio">
+    <div class="card-head">
+      <h2>Distanza dallo stop</h2>
+      <span class="muted" id="stop-basis"></span>
+    </div>
+    <div id="stopdist-chart"></div>
+    <div class="muted struct-note" id="stopdist-note"></div>
+  </section>
 
   <!-- PORTAFOGLIO -->
   <section class="card" data-pane="portafoglio">
@@ -492,6 +495,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=211"></script>
+<script src="assets/app.js?v=212"></script>
 </body>
 </html>
