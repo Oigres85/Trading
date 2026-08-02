@@ -417,13 +417,33 @@ check("stampBrokerDate v113: salvataggio PORTAFOGLIO aggiorna as_of a oggi e rim
   const keys = run("[...MOBILE_KEY_COLS]");
   const orphans = keys.filter(k => !all.has(k));
   check("MOBILE_KEY_COLS: nessuna etichetta orfana (card iPhone)", all.size > 20 && keys.length > 5 && orphans.length === 0);
-  // e il contrario: la fusione non deve aver perso colonne che c'erano nella vista fondamentale
-  const fondamentali = ["Market Cap", "P/E", "EV/EBITDA", "ROE", "Margine netto", "P/FCF",
-                        "Cresc. ricavi", "Debt/Equity", "Div Yield", "PEG", "Z-Score",
-                        "Financial Health", "Target Δ"];
-  const perse = fondamentali.filter(l => !thLabels("ptf-table").includes(l) || !thLabels("wl-table").includes(l));
-  check("fusione v188: nessuna colonna della vecchia vista fondamentale è andata persa", perse.length === 0);
-  if (perse.length) console.log("  ⚠ colonne fondamentali perse nella fusione:", perse.join(", "));
+  /* v208 — QUESTA GUARDIA HA CAMBIATO INVARIANTE, e la ragione conta.
+     Prima chiedeva "le 13 colonne fondamentali esistono nella tabella". Ma la tabella è un
+     modo di MOSTRARE un fatto, non il fatto: quando in v208 le colonne che l'LLM riceve già
+     dal payload sono state tolte dalla pagina, quella guardia sarebbe scattata su un taglio
+     corretto — e riscriverla per farla tacere sarebbe stato il modo classico di perdere la
+     protezione (v203: togliere una guardia mentre si toglie una funzionalità).
+     Ora chiede la cosa che conta davvero: OGNI fatto fondamentale deve restare raggiungibile,
+     o dal payload (se l'LLM lo riceve) o dalla tabella (se vive solo lì). Se un domani sparisce
+     da entrambi, il fatto è uscito dal sistema e il check lo dice. */
+  const payload = run("buildPrompt()");
+  const FATTI = [
+    ["Market Cap", /market ?cap|Mkt ?Cap|\bCap\.?\b/i], ["P/E", /\bP\/E\b/],
+    ["EV/EBITDA", /EV\/EBITDA/i], ["ROE", /\bROE\b/], ["Margine netto", /margine|margin/i],
+    ["P/FCF", /P\/FCF/i], ["Cresc. ricavi", /ricavi|revenue/i], ["PEG", /\bPEG\b/],
+    ["Z-Score", /altman|z.?score/i], ["Target Δ", /target/i],
+    ["Debt/Equity", /debt.?\/?.?equity|\bD\/E\b/i], ["Div Yield", /div\.? ?yield|dividend/i],
+    ["Financial Health", /fin\.? ?health|financial ?health|salute/i],
+  ];
+  // ⚠ si guarda la tabella del PORTAFOGLIO, non l'unione delle due: un fatto che resta solo
+  // in watchlist non è più visibile su cio' che possiedi davvero. La prima stesura univa le
+  // due tabelle e infatti NON ha morso quando ho iniettato la perdita (il fatto sopravviveva
+  // nella watchlist) — un check si valida iniettando il difetto, non rileggendolo.
+  const inPtf = new Set(thLabels("ptf-table"));
+  const sparite = FATTI.filter(([lab, re]) => !inPtf.has(lab) && !re.test(payload)).map(([l]) => l);
+  check("v208 nessun fatto fondamentale è uscito dal sistema (o è nel payload, o è in tabella)",
+        sparite.length === 0);
+  if (sparite.length) console.log("  ⚠ fatti spariti da payload E tabella:", sparite.join(", "));
   if (orphans.length) console.log("  ⚠ etichette senza colonna reale:", orphans.join(", "));
   // le card watchlist devono mostrare gli stessi campi del portafoglio (meno Guadagno/Guad. %,
   // che la watchlist non ha per natura) — richiesta esplicita utente (STEP1 mobile)
@@ -1386,10 +1406,13 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   const sf = run("JSON.stringify(SORT_FIELDS)");
   const SF = JSON.parse(sf);
 
+  // NB: il controllo di sanità è "l'estrazione ha trovato l'intestazione vera", non "ci sono
+  // almeno N colonne". Un fondo numerico fisso invecchia da solo al primo taglio di colonne —
+  // ed è successo in v208: il gate falliva sul numero, non sul disallineamento che deve trovare.
   check("v206 SORT_FIELDS allineato 1:1 alle <th> del portafoglio",
-        ptfTh.length > 30 && SF["ptf-table"].length === ptfTh.length);
+        ptfTh[0] === "Titolo" && SF["ptf-table"].length === ptfTh.length);
   check("v206 SORT_FIELDS allineato 1:1 alle <th> della watchlist",
-        wlTh.length > 30 && SF["wl-table"].length === wlTh.length);
+        wlTh[0] === "Titolo" && SF["wl-table"].length === wlTh.length);
   if (SF["ptf-table"].length !== ptfTh.length)
     console.log(`  ⚠ ptf: ${ptfTh.length} <th> ma ${SF["ptf-table"].length} campi di ordinamento`);
 

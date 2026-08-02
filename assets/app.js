@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "207";
+const BUILD_VERSION = "208";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -16,21 +16,16 @@ const SORT_FIELDS = {
                 "gain", "gain_pct", "beta", "sharpe_1y", "sortino_1y", "support",
                 "resistance", "sma200_dist_pct", "rs_1m", "rs_ndx_1m", null,
                 "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null,
-               // v188 — colonne fondamentali unite alla tabella principale (nell'ordine dei <th>):
-               // Market Cap, P/E, EV/EBITDA, ROE, Margine netto, P/FCF, Cresc. ricavi, D/E, Div, PEG, Z-Score
-               "stat:market_cap", "pe", "stat:forward_pe", "stat:ev_ebitda", "stat:roe", "stat:profit_margin",
-               "pfcf", "stat:revenue_growth", "stat:debt_to_equity", "stat:dividend_yield",
-               "stat:peg", "stat:altman_z", "fin_health", "upside_pct"],
+               // v208 — restano le tre che il payload non porta (vedi fundCells)
+               "stat:debt_to_equity", "stat:dividend_yield", "fin_health"],
   // Titolo,Prezzo,Oggi,Pre/After,Volume,Beta,Sharpe 1A,Sortino 1A,Supporto,Resistenza,Δ SMA200,
   // RS 1M,RS NDX 1M,Segnale,Short %,Drawdown 52S,Opzioni,Trimestrale,Grafico
   "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume",
                "beta", "sharpe_1y", "sortino_1y", "support", "resistance", "sma200_dist_pct",
                "rs_1m", "rs_ndx_1m", null,
                "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null,
-               // v188 — stesse 11 colonne fondamentali della tabella portafoglio
-               "stat:market_cap", "pe", "stat:forward_pe", "stat:ev_ebitda", "stat:roe", "stat:profit_margin",
-               "pfcf", "stat:revenue_growth", "stat:debt_to_equity", "stat:dividend_yield",
-               "stat:peg", "stat:altman_z", "fin_health", "upside_pct"],
+               // v208 — stesse tre della tabella portafoglio
+               "stat:debt_to_equity", "stat:dividend_yield", "fin_health"],
 };
 const sortState = {
   "ptf-table": { field: null, dir: 0 }, "wl-table": { field: null, dir: 0 },
@@ -4264,29 +4259,20 @@ function openSharpeInfo(ticker) {
 const setPtfView = () => {}, setWlView = () => {};
 const renderFundTable = () => {}, renderWlFundTable = () => {};
 
+/* v208 — LE COLONNE FONDAMENTALI SONO STATE TAGLIATE, MA NON A CASO.
+   Regola applicata: si toglie dalla pagina ciò che l'LLM RICEVE GIÀ dal payload, si tiene ciò
+   che vive SOLO qui. Verificato generando il payload sui dati veri prima di tagliare: Market
+   Cap, P/E, P/E fwd, EV/EBITDA, ROE, margine, P/FCF, crescita ricavi, PEG, Z-Score e Target Δ
+   ci sono tutti (da 1 a 49 occorrenze ciascuno) — quelle sono uscite. Debt/Equity, Div Yield e
+   Financial Health NON c'erano: tagliarle le avrebbe fatte sparire dal sistema, non dalla
+   pagina. È esattamente la classe v201-v204 (un taglio che si porta via il vicino), evitata
+   perché la ricevuta è stata scritta PRIMA. */
 function fundCells(r) {
   const st = r.stats || {};
   const pct = (v) => v == null ? "—" : (Math.round(v * 1000) / 10) + "%";
-  const x = (v, d = 1) => v == null ? "—" : fmtNum.format(Math.round(v * Math.pow(10, d)) / Math.pow(10, d)) + "×";
-  const pe = st.pe_ttm || r.pe;
-  const pfcf = (st.market_cap && st.fcf && st.fcf > 0) ? st.market_cap / st.fcf : null;
-  const roeCls = st.roe == null ? "" : st.roe > 0.15 ? "pos" : st.roe < 0 ? "neg" : "";
-  const zCls = st.altman_z == null ? "" : st.altman_z < 1.81 ? "neg" : st.altman_z > 2.6 ? "pos" : "";
-  return `<td class="num">${st.market_cap ? fmtMcapShort(st.market_cap) : "—"}</td>
-    <td class="num" ${pe && st.forward_pe > 0 && pe / st.forward_pe >= 2 ? 'title="P/E trailing almeno doppio del forward: utile GAAP compresso da ammortamenti/straordinari — guarda il P/E fwd accanto"' : ""}>${pe ? x(pe) + (pe && st.forward_pe > 0 && pe / st.forward_pe >= 2 ? ' <span class="muted" style="font-size:9px">GAAP↓</span>' : "") : "—"}</td>
-    <td class="num">${st.forward_pe > 0 ? x(st.forward_pe) : "—"}</td>
-    <td class="num">${x(st.ev_ebitda)}</td>
-    <td class="num ${roeCls}">${pct(st.roe)}</td>
-    <td class="num">${pct(st.profit_margin)}</td>
-    <td class="num">${x(pfcf)}</td>
-    <td class="num">${pct(st.revenue_growth)}</td>
-    <td class="num">${st.debt_to_equity == null ? "—" : fmtNum.format(Math.round(st.debt_to_equity * 10) / 10)}</td>
+  return `<td class="num">${st.debt_to_equity == null ? "—" : fmtNum.format(Math.round(st.debt_to_equity * 10) / 10)}</td>
     <td class="num">${pct(st.dividend_yield)}</td>
-    <td class="num">${st.peg == null ? "—" : fmtNum.format(Math.round(st.peg * 100) / 100)}</td>
-    <td class="num ${zCls}">${st.altman_z == null ? "—" : fmtNum.format(Math.round(st.altman_z * 10) / 10)}</td>
-    <td class="num">${finHealthBar(r)}</td>
-    ${cellaBarra(r.rating?.upside_pct, 60, r.rating?.upside_pct == null ? "—" : signTxt(r.rating.upside_pct),
-      { mid: true, title: "distanza dal target di consenso · barra su scala ±60%" })}`;
+    <td class="num">${finHealthBar(r)}</td>`;
 }
 /* market cap abbreviata: la tabella e' gia' larga, "1,2T" batte "1.200.000" */
 function fmtMcapShort(v) {
@@ -5676,10 +5662,10 @@ function renderTable() {
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="29" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="18" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="38"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="27"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applicaVistaCompattaSePrimaVolta("ptf-table");
   applyColOrder("ptf-table");
@@ -5693,7 +5679,7 @@ function renderTable() {
 // tecniche, head[] di buildFundTable per le fondamentali): un mismatch fa sparire la colonna
 // dalle card mobile (test di guardia in test_app.mjs).
 const MOBILE_KEY_COLS = new Set(["Titolo", "Prezzo", "Oggi", "Guad. %", "Segnale", "Drawdown 52S", "Trimestrale",
-  "Market Cap", "P/E", "ROE", "Margine netto", "Cresc. ricavi", "Financial Health", "Target Δ"]);   // + chiavi vista fondamentale su iPhone
+  "Financial Health"]);   // v208 — le fondamentali tolte dalla tabella sono uscite anche da qui
 function applyColLabels(tableId) {
   // textContent può contenere la freccia di sort (" ▼"/" ▲") appesa da updateSortArrows: va tolta
   const ths = [...document.querySelectorAll(`#${tableId} thead th`)].map(t => t.textContent.replace(/[▲▼]/g, "").trim());
@@ -5722,9 +5708,9 @@ function renderWatchlist() {
       ${volumeCell(r)}
       ${techCells(r)}
       ${fundCells(r)}
-    </tr>`).join("") : '<tr><td colspan="34" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="23" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="34"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   riparaVistaCompattaWl();          // v206 — ripara il default difettoso, se intatto
   applicaVistaCompattaSePrimaVolta("wl-table");

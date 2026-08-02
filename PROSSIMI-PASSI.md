@@ -1,4 +1,4 @@
-# Da dove ripartire — handoff del 01/08/2026 (dopo v207)
+# Da dove ripartire — handoff del 02/08/2026 (dopo v208)
 
 > Leggi anche `CLAUDE.md`, che contiene le regole d'ingaggio e i difetti già vissuti.
 
@@ -12,7 +12,7 @@
   serve qualcosa di disponibile *quando decide*, non un report periodico.
 - Ha guadagnato con questo metodo. Il sistema deve stargli **ai bordi**, non al centro.
 
-## Stato del sistema (v207)
+## Stato del sistema (v208)
 
 Tutti i gate verdi: **177 test JS** · red team 32 campagne · **pipeline 67 test** · coerenza 18
 controlli su 15 classi · gate valuta · audit dati.
@@ -60,6 +60,40 @@ all'apertura del cash → prosegue su TradingView.
 1. **Struttura del libro** dopo un'operazione o quando serve
 2. **Verifica** di ciò che sente su YouTube o legge su investing.com, prima di agire
 3. **Script Pine**
+
+## ✅ FATTO in v208: la sfoltita, con la macro intatta
+
+Regola applicata: **si toglie dalla pagina ciò che l'LLM riceve già dal payload, si tiene ciò
+che vive solo lì.** Verificato generando il payload sui dati veri PRIMA di tagliare.
+
+- **Portafoglio 38 → 27 colonne, watchlist 34 → 23.** Via Market Cap, P/E, P/E fwd, EV/EBITDA,
+  ROE, margine netto, P/FCF, crescita ricavi, PEG, Z-Score e Target Δ: le ricevi tutte
+  nell'analisi che incolli nell'LLM, quindi sulla pagina erano solo inchiostro.
+- **Tenute Debt/Equity, Div Yield e Financial Health**: sono le uniche tre che NON erano nel
+  payload. Tagliarle le avrebbe fatte sparire dal sistema, non dalla pagina.
+- **La macro è rimasta intera** come chiesto: rotazione, termometri di stress, leva e
+  stagionalità, più tutti i 34 riquadri nel blocco richiudibile.
+- **Payload identico al byte.**
+
+⚠ È una sfoltita, non il quinto di codice di cui avevamo parlato: le tabelle restano perché
+servono a modificare le posizioni e ad aprire la scheda di un titolo. La riduzione vera si
+misura sulla pagina (11 colonne in meno per riga), non sulle righe di codice.
+
+## ⏭️ Il passo che decide tutto
+
+Usa la dashboard **un mese senza toccare il codice**, annota le operazioni nel diario, poi:
+
+```bash
+node scripts/backtest_diary.mjs
+```
+
+Oggi sono 4 operazioni, +0,2pp contro l'indice, 1 su 4 a valore positivo — troppo poco per
+concludere. Con venti si sa. E se dice che il sistema non aiuta, si chiude **con una misura,
+non per stanchezza**.
+
+Già misurato e da non riaprire senza nuovi dati: i segnali per-titolo (RS, ΔRS, MCR) **non hanno
+contenuto predittivo** (`backtest_signals.mjs`, tutti e cinque sotto il riferimento) — è la
+seconda volta, dopo il motore predittivo tolto in v200.
 
 ## ✅ FATTO in v207: i cinque difetti mappati
 

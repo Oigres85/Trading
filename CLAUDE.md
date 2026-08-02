@@ -689,6 +689,48 @@ derivazione**: ora c'è `ramiFedWatch()`, usata da entrambi (stessa lezione di v
   disponibile" sotto quel titolo. Ora il titolo dice quante rilevazioni ci sono davvero, e con
   meno di due spiega perché mancano anche media a 10 anni e percentile.
 
+## ✂️ v208 — la regola del taglio: si toglie ciò che l'LLM riceve già
+
+Il CEO ha chiesto di ridurre la pagina, tenendo la macro. La domanda non era *quanto* tagliare
+ma **come decidere cosa**. La regola applicata, che vale anche per i tagli futuri:
+
+> **Si toglie dalla pagina ciò che il payload porta già. Si tiene ciò che vive solo lì.**
+
+Applicata alle 14 colonne fondamentali, con la ricevuta scritta PRIMA generando il payload sui
+dati veri e cercandoci dentro ogni fatto:
+
+| in payload | esito |
+|---|---|
+| Market Cap, P/E, P/E fwd, EV/EBITDA, ROE, margine, P/FCF, cresc. ricavi, PEG, Z-Score, Target Δ | **tolte** (da 1 a 49 occorrenze ciascuna nel payload) |
+| **Debt/Equity, Div Yield, Financial Health** | **tenute** — non erano nel payload |
+
+Senza quella verifica il taglio avrebbe fatto sparire **tre fatti dal sistema**, non dalla pagina:
+è la classe v201-v204 (un taglio che si porta via il vicino), evitata solo perché la ricevuta è
+stata scritta prima. Portafoglio 38→27 colonne, watchlist 34→23, **payload identico al byte**
+(provato generandolo con `app.js` prima e dopo sullo stesso `data.json`).
+
+⚠ Le 11 colonne tolte erano le **ultime** della tabella: un blocco in coda non sposta nessun
+indice precedente, quindi `VISTA_COMPATTA` (che arriva al massimo a 22) non è stata toccata. Se
+un domani si tagliano colonne **in mezzo**, quelle vanno ricalcolate — l'accesso è per indice.
+
+### Due gate riscritti, e perché non è stato un aggiramento
+
+1. **`SORT_FIELDS` aveva un fondo fisso** (`length > 30`) come controllo di sanità. Al primo
+   taglio di colonne il gate è fallito **sul numero, non sul disallineamento che deve trovare**:
+   un fondo numerico invecchia da solo, esattamente come il registro fisso di C10 e degli indici
+   16/17 del red team. Ora la sanità è una PROPRIETÀ (`ptfTh[0] === "Titolo"`, cioè l'estrazione
+   ha davvero trovato l'intestazione), non un conteggio.
+2. **La guardia v188** chiedeva *"le 13 colonne fondamentali esistono nella tabella"* e sarebbe
+   scattata su un taglio corretto. Riscriverla per farla tacere sarebbe stato il modo classico di
+   perdere la protezione (v203). Ha invece **cambiato invariante**: ogni fatto deve restare
+   raggiungibile *o dal payload o dalla tabella del portafoglio*; se esce da entrambi, il check
+   lo dice. È l'invariante che conta davvero — la tabella è un modo di mostrare un fatto, non il
+   fatto.
+   ⚠ La prima stesura univa le due tabelle (`ptf ∪ wl`) e **NON ha morso** quando ho iniettato la
+   perdita: il fatto sopravviveva nella watchlist. Ma perderlo sul portafoglio significa non
+   vederlo su ciò che possiedi. Stretta alla tabella del portafoglio, l'innesto viene catturato.
+   *Un check si valida iniettando il difetto, non rileggendolo.*
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
