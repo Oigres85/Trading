@@ -1051,6 +1051,40 @@ la difesa va agganciata a **quella su cui si decide**, non a quella su cui è co
 - **Sesta rottura di un check ancorato a una stringa letterale** (v125, `[STOP A RISCHIO AFTER`).
   Riagganciato al fatto: la riga nomina la sessione estesa e lo stop.
 
+## 🛡️ La suite controlla se stessa — tre errori di metodo chiusi alla radice
+
+In una sola sessione ho ripetuto **sei volte** gli stessi tre sbagli, correggendoli ogni volta uno
+per uno. Corretti a mano tornano: qui sono resi **impossibili o rumorosi**.
+
+1. **`check()` accetta SOLO un boolean.** Prima accettava qualunque valore truthy, quindi
+   `check("x", () => { … })` passava una **funzione**: verde **senza aver mai eseguito il proprio
+   corpo**. Me ne sono accorto solo perché le iniezioni di validazione non mordevano — senza
+   quelle, sarebbero rimasti in suite check permanentemente verdi che non verificano nulla.
+   *La forma peggiore di test non è quello che fallisce a torto: è quello che passa a vuoto.*
+2. **I dati veri hanno UNA copia sola.** Erano sei (`REALE`×2, `REALE2`…`REALE6`) con altrettanti
+   helper locali, uno dei quali con lo **stesso nome del globale ma contratto diverso**. Quella
+   duplicazione è la causa concreta dell'errore fatto **quattro volte**: scrivere un check che
+   gira sulla **fixture**, che non ha `macro.indicators`, `seasonality`, `signposts` né `^KS11` —
+   e quindi **non contiene il fenomeno da misurare**. Ora c'è un solo `REALE` e un solo
+   `suVeri()`. *Un check che gira su dati privi del fenomeno non è un check.*
+3. **Quattro meta-check sorvegliano la suite**: nessuna arrow nuda passata a `check()`; una sola
+   copia dei dati e un solo helper; **nessun nome di check duplicato** (due nomi uguali rendono un
+   fallimento non attribuibile); **nessun check dopo il blocco report** (regola v205).
+
+⚠ **I meta-check hanno trovato SE STESSI, due volte**: l'esempio `check("x", () => {…})` scritto
+nella nota che *spiega* la trappola veniva contato **come** trappola, e il pattern `REALE` con una
+cifra compare per forza nel codice che lo cerca. È l'inciampo del gate v213, che si autodenunciava.
+La scansione ora esclude il proprio blocco e **toglie i commenti** prima di leggere.
+
+### La regola generale
+> **Un difetto di metodo ripetuto non si corregge con l'attenzione: si corregge cambiando lo
+> strumento perché non lo accetti più.** Se ti accorgi di correggere due volte lo stesso sbaglio
+> di scrittura, la terza correzione va fatta all'attrezzo, non al caso.
+
+Corollario già pagato altrove in questo file: **una validazione per iniezione senza `assert` è un
+no-op silenzioso** — se il `replace` non trova la stringa, il file resta intatto e il test "passa".
+Ogni iniezione deve asserire di aver modificato il file prima di eseguire la suite.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
