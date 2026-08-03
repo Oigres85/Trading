@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "229";
+const BUILD_VERSION = "230";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7098,10 +7098,25 @@ function buildPrompt() {
         if (!(q0 > 0)) return "";
         const d = Math.round((q1 - q0) * 10) / 10;
         const gg = mh.length - 1 - Math.max(0, mh.length - 8);
-        return ` [VARIAZIONE: era ${fmtNum.format(Math.round(q0 * 10) / 10)}% ${gg} rilevazioni fa → ${d > 0 ? "+" : ""}${fmtNum.format(d)} pp. ${
-          Math.abs(d) < 3 ? "STABILE: la concentrazione non è aumentata, quindi non è un fatto nuovo di oggi"
-          : d > 0 ? "IN AUMENTO: il fattore sta assorbendo più varianza di prima"
-          : "IN CALO: il fattore sta assorbendo meno varianza di prima"}]`;
+        /* ⚠ v230 — "IN AUMENTO" APRIVA LA PORTA A B4 SENZA DIRE QUANTO FOSSE GRANDE. La testata
+           riapre la riduzione della concentrazione solo se la quota di varianza sale "in modo
+           materiale", e il payload decideva quella parola con una soglia FISSA di 3 pp: sopra 3
+           scriveva IN AUMENTO, e l'LLM la leggeva come il trigger. Ma una soglia fissa non sa se
+           quel movimento sia ordinario per QUESTA serie — e' il registro fisso che invecchia da
+           solo (C10, red team I6). Ora il numero porta il proprio percentile sullo storico: oggi
+           +4,2 pp e' il MASSIMO mai osservato (mediana 2,1) e la riga lo dice. La difesa non
+           addolcisce: quando il movimento e' davvero eccezionale lo dichiara, e quando sara'
+           ordinario dira' quello. */
+        const passi = [];
+        for (let i = 7; i < mh.length; i++) passi.push(Math.abs(q(mh[i]) - q(mh[i - 7])));
+        passi.sort((u, v) => u - v);
+        const perc = passi.length >= 6 ? Math.round(passi.filter(v => v <= Math.abs(d)).length / passi.length * 100) : null;
+        const mediana = passi.length >= 6 ? Math.round(passi[Math.floor(passi.length / 2)] * 10) / 10 : null;
+        const contesto = perc == null ? " (storico troppo corto per dire se sia un movimento ordinario)"
+          : perc >= 90 ? ` — e' il movimento PIU' AMPIO dello storico (${perc}° percentile su ${passi.length} finestre, mediana ${fmtNum.format(mediana)} pp): questo NON e' il livello di sempre, e' un cambiamento`
+          : perc <= 60 ? ` — movimento ORDINARIO per questa serie (${perc}° percentile su ${passi.length} finestre, mediana ${fmtNum.format(mediana)} pp): la quota oscilla cosi' di continuo, non e' un fatto nuovo di oggi`
+          : ` — movimento nella norma alta (${perc}° percentile su ${passi.length} finestre, mediana ${fmtNum.format(mediana)} pp)`;
+        return ` [VARIAZIONE: era ${fmtNum.format(Math.round(q0 * 10) / 10)}% ${gg} rilevazioni fa → ${d > 0 ? "+" : ""}${fmtNum.format(d)} pp${contesto}]`;
       })()}`);
     }
     // NOTA (v156): rimosse da qui le direttive INDIPENDENZA SUL VERDETTO e ANALISI PER-TITOLO —
@@ -7151,11 +7166,34 @@ function buildPrompt() {
           const gStop = (x.r.pmc > 0) ? (x.stop / x.r.pmc - 1) * 100 : null;
           const breach = (x.r.price / x.stop - 1) * 100;
           const quota = (gOra > 0) ? Math.abs(breach) / gOra * 100 : null;
+          const scala = (q) => q == null ? ""
+            : q < 3 ? " — su questa scala e' RUMORE, non una rottura della tesi: e' il trailing che ha seguito il prezzo fin qui sotto"
+            : q > 25 ? " — qui lo stop taglia una quota RILEVANTE del guadagno: e' un evento di tesi, non un sussulto"
+            : "";
+          /* ═══ v230 — LA PROSPETTIVA PARLAVA DI UN PREZZO CHE NON E' PIU' QUELLO ═════════════
+             Misurato su un report reale: l'LLM ha venduto MU (+839%) e AMD (+209%) citando
+             "stop violato -4,32% in pre-market". Quel -4,32% e' il GAP pre/chiusura stampato
+             nella tabella, mentre la PROSPETTIVA — la difesa che esiste apposta per non
+             liquidare i vincitori — era calcolata sulla CHIUSURA e diceva "0,31% della corsa".
+             Due numeri sullo stesso titolo, uno vecchio e rassicurante, uno fresco e allarmante:
+             l'LLM ha creduto al piu' fresco, ed era ragionevole.
+             Ora, quando esiste un prezzo esteso che cambia la lettura, la prospettiva la RIFA su
+             quello. Non e' un addolcimento: su AMD la quota passa da 1,79% a ~3,1% e la riga
+             smette di dire RUMORE. E' la stessa classe v193 — stato del mercato e freschezza del
+             dato sono due cose diverse — applicata al numero che regge la decisione. */
+          const pf = x.r.prezzo_limite_aggiustato;
+          const usaPf = pf != null && x.r.price > 0 && Math.abs(pf / x.r.price - 1) > 0.005;
+          const gPf = (usaPf && x.r.pmc > 0) ? (pf / x.r.pmc - 1) * 100 : null;
+          const brPf = usaPf ? (pf / x.stop - 1) * 100 : null;
+          /* solo se il prezzo fresco e' ANCORA SOTTO lo stop: se e' sopra, la violazione e'
+             rientrata e lo dice gia' la riga "MA IL DATO PIU' FRESCO LA CONTRADDICE" (v229) —
+             un secondo periodo che parla di "sfondamento +0,5%" direbbe una cosa senza senso */
+          const qPf = (gPf > 0 && brPf < 0) ? Math.abs(brPf) / gPf * 100 : null;
+          const suFresco = (qPf != null)
+            ? ` RIFATTO SUL PREZZO PIU' FRESCO (${esc(x.r.prepost?.label || "esteso")} $${fmtNum.format(pf)}, che e' il dato su cui deciderai): posizione a ${signTxt(Math.round(gPf))}, sfondamento ${signTxt(Math.round(brPf * 10) / 10)} = ${fmtNum.format(Math.round(qPf * 100) / 100)}% della corsa${scala(qPf)}.`
+            : "";
           const prosp = (gOra != null && gStop != null)
-            ? ` [PROSPETTIVA: posizione a ${signTxt(Math.round(gOra))} sul PMC; uscire allo stop cristallizzerebbe ${signTxt(Math.round(gStop))}. Lo sfondamento vale il ${quota != null ? fmtNum.format(Math.round(quota * 100) / 100) : "—"}% della corsa fatta finora${
-                quota != null && quota < 3 ? " — su questa scala e' RUMORE, non una rottura della tesi: e' il trailing che ha seguito il prezzo fin qui sotto"
-                : quota != null && quota > 25 ? " — qui lo stop taglia una quota RILEVANTE del guadagno: e' un evento di tesi, non un sussulto"
-                : ""}]`
+            ? ` [PROSPETTIVA: posizione a ${signTxt(Math.round(gOra))} sul PMC; uscire allo stop cristallizzerebbe ${signTxt(Math.round(gStop))}. Lo sfondamento vale il ${quota != null ? fmtNum.format(Math.round(quota * 100) / 100) : "—"}% della corsa fatta finora${scala(quota)}${suFresco ? " ·" + suFresco : ""}]`
             : "";
           return `${base} [ri-arm CANDIDATO se tieni: $${fmtNum.format(ra.stop)} (2×ATR sotto il supporto $${fmtNum.format(x.r.support)}) → rischio aggiuntivo ~€${fmtNum.format(riskEur)} = ${fmtNum.format(x.r.qty)} quote × $${fmtNum.format(Math.round(perShare * 100) / 100)} dal prezzo]${prosp}`;
         }).join(" · ") + ".");
@@ -7476,8 +7514,19 @@ function buildPrompt() {
     if (r.qty && st && st.violated) flags.push("[STOP VIOLATO]");
     // ORARIO ESTESO v125 (Risultato 2): un movimento pre/after >1% che porta il prezzo esteso
     // a ridosso o sotto lo stop ratchet è un pericolo che matura mentre Wall Street è chiusa.
+    /* ⚠ v230 — IL NUMERO NEL TAG NON ERA QUELLO CHE SEMBRAVA. Stampava il GAP pre/chiusura, e
+       un report reale l'ha letto come lo sfondamento dello stop ("stop violato -4,32% in
+       pre-market": -4,32% era il gap, non la distanza dallo stop). Peggio: su PLTR il tag diceva
+       "STOP A RISCHIO … +2,63%" mentre quel movimento portava il prezzo SOPRA lo stop, cioe'
+       fuori dalla violazione — l'etichetta affermava il contrario di cio' che il numero mostrava.
+       Ora il tag dichiara la DISTANZA DALLO STOP, che e' la grandezza di cui parla, e cambia
+       parola quando il prezzo esteso e' sopra. */
     if (r.qty && st && r.prepost && Math.abs(r.prepost.change_pct ?? 0) > 1 && r.prepost.price <= st.stop * 1.02) {
-      flags.push(`[STOP A RISCHIO ${(r.prepost.label || "ext").toUpperCase()} ${signTxt(r.prepost.change_pct)}]`);
+      const dSt = (r.prepost.price / st.stop - 1) * 100;
+      const et = (r.prepost.label || "ext").toUpperCase();
+      flags.push(dSt < 0
+        ? `[${et} $${fmtNum.format(r.prepost.price)} SOTTO LO STOP $${fmtNum.format(st.stop)}: ${signTxt(Math.round(dSt * 10) / 10)}]`
+        : `[${et} $${fmtNum.format(r.prepost.price)} A RIDOSSO DELLO STOP $${fmtNum.format(st.stop)}: ${signTxt(Math.round(dSt * 10) / 10)}, sopra ma vicino]`);
     }
     if (earningsRiskDays(r) != null) flags.push("[!EARNINGS RISK]");
     if (isIlliquid(r)) flags.push("[ILLIQUIDO]");

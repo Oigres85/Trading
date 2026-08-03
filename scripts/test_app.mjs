@@ -558,7 +558,12 @@ check("v125 stop a rischio orario esteso: prepost >1% a ridosso dello stop → f
   const p = buildPrompt();
   r.prepost = saved;
   const row = p.split("\\n").find(l => l.includes("(TST1)"));
-  return row && row.includes("[STOP A RISCHIO AFTER");`));
+  /* ⚠ v230 — riagganciato al FATTO, non alla stringa. Prima cercava "[STOP A RISCHIO AFTER" e si
+     e' rotto quando il tag e' stato riformulato per dichiarare la DISTANZA DALLO STOP invece del
+     gap pre/chiusura (un report reale aveva letto il gap come lo sfondamento). L'invariante che
+     conta e' che la riga porti un avviso che nomina la sessione estesa E lo stop: e' la SESTA
+     volta in questo progetto che un check legato al testo si rompe senza che manchi nulla. */
+  return !!row && /\\[AFTER \\$/.test(row) && /STOP \\$/.test(row);`));
 
 check("v126 froth: alert schiuma speculativa nel prompt con direttiva (no acquisti tech, solo ratchet, ES95 salva)", run(`
   DATA.macro.froth = { soxl: { symbol: "SOXL", rvol: 3.1, chg_5d_pct: 12.4 }, tqqq: { symbol: "TQQQ", rvol: 1.2, chg_5d_pct: 4 },
@@ -1886,6 +1891,78 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     }
     DATA = _d; cashEur = _c; recomputeTotals();
     return esito === true;`));
+}
+
+/* ═══ v230 — I TRE MOTIVI PER CUI UN REPORT REALE HA LIQUIDATO I VINCENTI ═══════════════════
+   Un LLM ha venduto MU (+839%) e AMD (+209%) citando "stop violato -4,32% in pre-market".
+   Leggendo il payload come il ricevente, i tre difetti che ce l'hanno portato:
+     1. quel -4,32% era il GAP pre/chiusura, non la distanza dallo stop, ma il tag si chiamava
+        "STOP A RISCHIO" e il numero sembrava lo sfondamento;
+     2. la PROSPETTIVA — la difesa che esiste per non liquidare i vincitori — era calcolata sulla
+        CHIUSURA ("0,31% della corsa") mentre la decisione si prendeva sul prezzo ESTESO: due
+        numeri sullo stesso titolo, uno vecchio e rassicurante, uno fresco e allarmante;
+     3. "IN AUMENTO" sulla concentrazione apriva l'eccezione B4 con una soglia FISSA di 3 pp,
+        senza dire se quel movimento fosse ordinario per la serie.
+   ⚠ Nessuna delle tre correzioni addolcisce: sul prezzo fresco AMD ESCE da "rumore" (3,06%) e
+   la concentrazione oggi dichiara di essere al massimo storico. Si e' resa la lettura onesta,
+   non favorevole. */
+{
+  vm.runInContext(`REALE4 = ${readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null")};`, ctx, { filename: "reale4.js" });
+
+  // scenario: una posizione violata col prezzo esteso ANCORA SOTTO lo stop
+  const scenario = (sotto) => `
+    const _d = DATA, _c = cashEur;
+    DATA = JSON.parse(JSON.stringify(REALE4)); cashEur = 56000; recomputeTotals();
+    const v = (decisionVerdict().stopViolations || [])[0];
+    let out = null;
+    if (v) {
+      const r = DATA.portfolio.find(x => x.ticker === v.ticker || x.ticker === v.r.ticker);
+      const px = v.stop * ${sotto ? "0.94" : "1.01"};
+      r.prezzo_limite_aggiustato = px;
+      r.prepost = { label: "pre", price: px, change_pct: (px / r.price - 1) * 100 };
+      recomputeTotals();
+      out = buildCIOText();
+    }
+    DATA = _d; cashEur = _c; recomputeTotals();
+    return out;`;
+
+  check("v230 prospettiva: col prezzo esteso ANCORA sotto lo stop, viene rifatta su quello", (() => {
+    const t = run(scenario(true));
+    return t != null && /RIFATTO SUL PREZZO PIU' FRESCO/.test(t) && /della corsa/.test(t);
+  })());
+
+  /* e NON deve comparire quando l'esteso e' sopra lo stop: li' la violazione e' rientrata e lo
+     dice gia' la riga v229 — un secondo periodo con "sfondamento +0,5%" sarebbe un controsenso */
+  check("v230 prospettiva: col prezzo esteso SOPRA lo stop non si parla di sfondamento", (() => {
+    const t = run(scenario(false));
+    return t != null && !/RIFATTO SUL PREZZO PIU' FRESCO/.test(t)
+      && /MA IL DATO PIU' FRESCO LA CONTRADDICE/.test(t);
+  })());
+
+  check("v230 tag pre: dichiara la distanza dallo STOP, non il gap pre/chiusura", (() => {
+    const t = run(scenario(true));
+    if (t == null) return false;
+    const tag = (t.match(/\[PRE \$[^\]]*\]/) || [""])[0];
+    return /SOTTO LO STOP \$/.test(tag) && !/STOP A RISCHIO/.test(t);
+  })());
+
+  check("v230 tag pre: se l'esteso è sopra lo stop non lo chiama 'a rischio'", (() => {
+    const t = run(scenario(false));
+    if (t == null) return false;
+    const tag = (t.match(/\[PRE \$[^\]]*\]/) || [""])[0];
+    return tag === "" || /sopra ma vicino/.test(tag);
+  })());
+
+  check("v230 concentrazione: la variazione porta il proprio percentile storico", (() => {
+    const t = run(`
+      const _d = DATA, _c = cashEur;
+      DATA = JSON.parse(JSON.stringify(REALE4)); cashEur = 56000; recomputeTotals();
+      const out = buildCIOText();
+      DATA = _d; cashEur = _c; recomputeTotals();
+      return out;`);
+    const v = (t.match(/\[VARIAZIONE:[^\]]*\]/) || [""])[0];
+    return v === "" || (/percentile su \d+ finestre/.test(v) && /mediana/.test(v));
+  })());
 }
 
 /* ---------- report ----------
