@@ -1706,9 +1706,6 @@ svg.g-serie { cursor: crosshair; }
 .in-riordino > section.sez-trascinata { outline: 2px solid var(--accent); opacity: .9; }
 
 /* v225 — la rosa dell'anno */
-.anno-c { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.anno-c svg { width: 100%; max-width: 320px; height: auto; display: block; }
-.anno-legenda { font-size: 11px; text-align: center; }
 
 /* ═══ v226 — ragnatela + punti su un asse ═══════════════════════════════════════════════════ */
 /* v226 — IMPILATI, non affiancati: in due colonne l'asse rendeva a scala 0,55 e il suo testo
@@ -1730,3 +1727,4 @@ svg.g-serie { cursor: crosshair; }
 .sp-quota { height: 5px; border-radius: 3px; background: var(--card-2); margin: 5px 0 8px; overflow: hidden; }
 .sp-quota i { display: block; height: 100%; border-radius: 3px; }
 /* la ragnatela si disegna entrando; con reduced-motion resta ferma (blocco gia' presente in v206) */
+.sp-barre { margin-top: 16px; }

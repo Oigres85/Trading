@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "228";
+const BUILD_VERSION = "229";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3885,51 +3885,15 @@ function renderStress() {
     : '<div class="muted">Serie di stress non disponibili.</div>';
 }
 
-/* ═══ v225 — L'ANNO COME ROSA CIRCOLARE ═════════════════════════════════════════════════════
-   La stagionalità era 12 barre ordinate: la forma giusta in astratto e illeggibile in pratica,
-   perché la domanda vera non è "quanto rende marzo" ma "in che punto dell'anno siamo, e la
-   stagione che ci aspetta tira su o giù". Un anno è un CERCHIO, e su un cerchio quella domanda
-   si legge senza leggere: i mesi buoni sporgono in fuori dall'anello, quelli cattivi rientrano.
-   Risponde alla richiesta del CEO — "se proprio non ci sono dati crea un tipo di grafico più di
-   impatto" — con la stessa struttura di card dei termometri di stress. */
-function annoCircolare(mesi, cur, opt = {}) {
-  const M = ["G", "F", "M", "A", "M", "G", "L", "A", "S", "O", "N", "D"];
-  const NOMI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
-                "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
-  const S = 300, c = S / 2, R0 = 78, AMPI = 38;
-  const maxAbs = Math.max(0.5, ...mesi.map(x => Math.abs(x.avg || 0)));
-  const ang = (i) => (i * 30 - 90) * Math.PI / 180;          // -90 = gennaio in cima
-  const P = (r, a) => `${(c + r * Math.cos(a)).toFixed(2)} ${(c + r * Math.sin(a)).toFixed(2)}`;
-  const settori = mesi.map((x, i) => {
-    const v = x.avg || 0;
-    const R1 = R0 + (v / maxAbs) * AMPI;                     // sopra l'anello = mese positivo
-    const a0 = ang(i) + 0.022, a1 = ang(i + 1) - 0.022;
-    const dentro = Math.min(R0, R1), fuori = Math.max(R0, R1);
-    const col = v >= 0 ? "var(--green)" : "var(--red)";
-    const attivo = x.m === cur;
-    return `<path d="M ${P(dentro, a0)} A ${dentro} ${dentro} 0 0 1 ${P(dentro, a1)}
-        L ${P(fuori, a1)} A ${fuori} ${fuori} 0 0 0 ${P(fuori, a0)} Z"
-      fill="${col}" fill-opacity="${attivo ? .95 : .42}"
-      stroke="${attivo ? "var(--text)" : "none"}" stroke-width="${attivo ? 1.6 : 0}">
-      <title>${NOMI[i]}: ${signTxt(v)} in media, ${Math.round(x.pos || 0)}% di anni positivi</title></path>`;
-  }).join("");
-  const etichette = mesi.map((x, i) => {
-    const a = (ang(i) + ang(i + 1)) / 2;
-    const [ex, ey] = P(R0 + AMPI + 16, a).split(" ");
-    return `<text x="${ex}" y="${ey}" text-anchor="middle" dominant-baseline="central" font-size="11"
-      font-weight="${x.m === cur ? 700 : 400}" fill="${x.m === cur ? "var(--text)" : "var(--muted)"}">${M[i]}</text>`;
-  }).join("");
-  const oggi = mesi.find(x => x.m === cur);
-  return `<div class="anno-c"><svg viewBox="0 0 ${S} ${S}" role="img" aria-label="${esc(opt.aria || "stagionalità mese per mese")}">
-    <circle cx="${c}" cy="${c}" r="${R0}" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 3"/>
-    ${settori}${etichette}
-    ${oggi ? `<text x="${c}" y="${c - 12}" text-anchor="middle" font-size="11" fill="var(--muted)">siamo a</text>
-      <text x="${c}" y="${c + 10}" text-anchor="middle" font-size="19" font-weight="700" fill="var(--text)">${NOMI[cur - 1]}</text>
-      <text x="${c}" y="${c + 30}" text-anchor="middle" font-size="14" font-family="var(--mono)"
-        fill="${(oggi.avg || 0) >= 0 ? "var(--green)" : "var(--red)"}">${signTxt(oggi.avg)}</text>` : ""}
-  </svg><div class="anno-legenda muted">fuori dall'anello = mese storicamente positivo · dentro = negativo</div></div>`;
-}
-
+/* v229 — `annoCircolare()` RIMOSSA. Era la rosa dei 12 mesi: leggibile, ma da imparare — e il
+   CEO ha chiesto la stagionalita' "a barre". Dodici barre affiancate col mese corrente acceso si
+   leggono senza istruzioni, ed e' la forma che aveva prima della v225.
+   RICEVUTA DEL TAGLIO: 1 chiamante, convertito a barreOrdinate(); 0 riferimenti nei test; dentro
+   i confini del blocco non vive nessun'altra funzione. ⚠ La prima stesura di questo assert ha
+   MORSO: avevo assunto che il vicino a valle fosse renderLevaStagione(), mentre fra le due era
+   stato inserito l'intero modulo v226 (FAMIGLIE_MACRO, puntiSuAsse, agganciaMacroDinamico).
+   E' la terza volta in quattro versioni che la ricevuta scritta PRIMA di tagliare intercetta un
+   confine sbagliato — la classe v201-v204 non e' teorica. */
 /* ═══ v226 — RAGNATELA + PUNTI SU UN ASSE: il quadro, poi il dettaglio ══════════════════════
    Storia di questa decisione, perche' e' costata tre tentativi: la barra 0-100 e' stata
    respinta, il quadrante ad arco pure. La diagnosi giusta non era la FORMA del widget — era
@@ -4071,7 +4035,13 @@ function renderLevaStagione() {
     carte.push({
       t: "Stagionalità S&P 500", v: `${MESI[(cur || 1) - 1]} · ${se.label || ""}`,
       cls: (se.sp500[(cur || 1) - 1]?.avg ?? 0) < 0 ? "warn" : "pos", largo: true,
-      g: annoCircolare(se.sp500, cur, { aria: "stagionalità S&P 500 mese per mese" }),
+      /* v229 — TORNA A BARRE su richiesta del CEO. La rosa circolare era leggibile ma va
+         imparata; dodici barre affiancate, una per mese, con quello corrente acceso, si
+         leggono senza istruzioni. Divergono dallo zero perche' il segno E' l'informazione. */
+      g: barreOrdinate(se.sp500.map(x => ({
+        nome: MESI[x.m - 1], valore: x.avg, evidenzia: x.m === cur,
+        testo: `${signTxt(x.avg)} · ${Math.round(x.pos)}% anni positivi`,
+      })), {}),
       n: `Rendimento medio di ogni mese su ~${se.sp500[0]?.n || 40} anni, con il mese corrente acceso. È contesto di probabilità, non una previsione.`,
     });
   }
@@ -4119,7 +4089,13 @@ function renderScomposizione() {
       </div>
       <div class="muted mg-n" style="margin:0 0 10px">${comp.length} fattori, dal peggiore al migliore.
         Oggi tira giù <b>${esc(peggio.nome)}</b> (${peggio.val}/100) e tiene su <b>${esc(meglio.nome)}</b> (${meglio.val}/100).</div>
-      ${puntiSuAsse([{ n: "fattori", v: righe.map(x => ({ nome: x.nome, score: x.val })), m: sc }], { lAsse: 76 })}
+      ${/* v229 — a BARRE su richiesta del CEO. Divergono da 50, non da zero: su una scala 0-100
+            il neutro e' il centro, e cio' che conta e' da che parte sta ogni fattore. */""}
+      ${barreOrdinate(righe.map(x => ({
+        nome: x.nome, valore: x.val - 50,
+        colore: scoreColor(x.val),
+        testo: `${x.val}/100`,
+      })), {})}
     </div>`;
   }).filter(Boolean);
   box.innerHTML = carte.length ? carte.join("")
@@ -4161,7 +4137,13 @@ function renderSignposts() {
       { nome: "Non ancora accesi", val: items.length - attivi, colore: "var(--border)" },
     ], { centro: { sopra: "campanelli", grande: `${attivi}/${items.length}`, sotto: "accesi" },
          aria: "campanelli BofA accesi" })
-    + ""
+    /* v229 — TORTA per il totale (quanto siamo avanti nel conto alla rovescia) e BARRE per
+       categoria (quale famiglia si sta accendendo), su richiesta del CEO. Le barre misurano
+       la QUOTA accesa, non un punteggio: una categoria con 2 campanelli su 2 e' piena. */
+    + `<div class="sp-barre">${barreOrdinate(righe.map(r => ({
+        nome: r.nome, valore: r.valore, colore: r.colore,
+        testo: `${r.on}/${r.list.length} acceso${r.on === 1 ? "" : "i"}`,
+      })), {})}</div>`
     + `<div class="sp-dettaglio">${righe.map(r => `<div class="sp-cat">
         <div class="sp-cat-h">${esc(r.nome)} <b style="font-family:var(--mono);color:${r.valore >= 70 ? "var(--red)" : r.valore >= 50 ? "var(--yellow)" : "var(--green)"}">${r.on}/${r.list.length}</b></div>
         <div class="sp-quota"><i style="width:${r.valore}%;background:${r.valore >= 70 ? "var(--red)" : r.valore >= 50 ? "var(--yellow)" : "var(--green)"}"></i></div>
@@ -7139,7 +7121,22 @@ function buildPrompt() {
       const eurusdRA = DATA.eurusd || 1.08;
       lines.push("· ⚠ STOP VIOLATI (il prezzo è SOTTO lo stop trailing ancorato — dedica a ciascuno una raccomandazione esplicita (uscire o ri-armare), con motivazione): " +
         dv.stopViolations.map(x => {
-          const base = `${x.r.ticker} stop $${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)} (${signTxt(Math.round((x.r.price / x.stop - 1) * 1000) / 10)})`;
+          /* ═══ v229 — L'EVENTO PIU' URGENTE CONTRADDETTO DAL PREZZO PIU' FRESCO ══════════
+             Trovato leggendo il payload come il ricevente. PLTR era dichiarato STOP VIOLATO sulla
+             CHIUSURA ($123,06 sotto lo stop $124,81) mentre il prezzo esteso pre-market era gia'
+             a $125,44, cioe' SOPRA lo stop: la violazione era gia' rientrata sul dato piu' fresco
+             che lo stesso payload pubblica due righe piu' in la' ("→ agg."). Il blocco che
+             impone "una raccomandazione esplicita per ciascuno" chiedeva quindi una decisione
+             su un evento che il mercato aveva gia' disfatto.
+             E' la classe v193 — stato del mercato e freschezza del dato sono due cose diverse —
+             applicata all'evento che il payload tratta come il piu' urgente di tutti.
+             NON si cambia la violazione (lo stop e' ancorato alla chiusura, e il ratchet ragiona
+             su chiusure): si DICHIARA che l'esteso la contraddice, e di quanto. */
+          const ext = x.r.prezzo_limite_aggiustato;
+          const rientrato = (ext != null && ext > x.stop && x.r.price < x.stop)
+            ? ` [⚠ MA IL DATO PIU' FRESCO LA CONTRADDICE: ${esc(x.r.prepost?.label || "esteso")} $${fmtNum.format(ext)} è SOPRA lo stop $${fmtNum.format(x.stop)} (${signTxt(Math.round((ext / x.stop - 1) * 1000) / 10)}) — sulla chiusura lo stop è violato, sull'ultimo scambio no. La violazione è calcolata sulle CHIUSURE perché il ratchet vive su quelle, ma questa non è ancora una rottura confermata: all'apertura può non esistere]`
+            : "";
+          const base = `${x.r.ticker} stop $${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)} (${signTxt(Math.round((x.r.price / x.stop - 1) * 1000) / 10)})${rientrato}`;
           const ra = (x.r.support > 0 && x.r.support < x.r.price) ? atrStop(x.r.support, x.r) : null;
           if (!ra || !(ra.stop > 0) || !(ra.stop < x.r.price)) return base;
           const perShare = x.r.price - ra.stop;
@@ -7748,7 +7745,36 @@ function buildPrompt() {
   (m.markets || []).filter(x => !/EUR\/JPY/i.test(x.label || "")).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
   // ogni indicatore economico con la sua data di pubblicazione ESPLICITA: la latenza del dato
   // deve essere palese all'AI (CPI/NFP = mensili con ~1 mese di ritardo; PIL = trimestrale)
-  (m.indicators || []).forEach(i => lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile" : i.key === "curve" ? "serie GIORNALIERA FRED T10Y2Y, ultima chiusura" : i.key === "umich" ? "serie mensile via FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui — verificale prima di trarne conclusioni sul consumatore" : "serie mensile, normale ritardo di pubblicazione"})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`));
+  /* ═══ v229 — ACCORPAMENTO NEL PAYLOAD (era già stato fatto in dashboard in v225) ══════════
+     Il QUADRO MACRO pubblicava l'inflazione su DUE righe (CPI e PCE, oggi entrambe 3.7%) e la
+     curva 10A-2A su TRE (questa, quella dedicata con la distanza dall'inversione, e quella del
+     modello recessione). Nessuna delle tre era sbagliata, ma un lettore che conta i segnali ne
+     conta tre dove ce n'è uno: è la stessa classe che il payload dichiara già altrove
+     ("NON è una seconda conferma indipendente… contarli come due prove raddoppia un segnale
+     solo"), applicata qui invece che solo annotata.
+     · CPI e PCE → una riga sola, entrambi i numeri, con quale guarda la Fed.
+     · curva → esce da questo elenco e la sua RILEVAZIONE si trasferisce alla riga dedicata,
+       che è la sola a portare la distanza dall'ultima inversione. */
+  /* ⚠ `curve` esce dall'elenco SOLO se la riga dedicata verra' davvero emessa (serve
+     curve_history). Senza questa condizione, uno snapshot senza storico della curva la faceva
+     SPARIRE dal payload: un accorpamento che perde il dato invece di unirlo. Preso dal test
+     v138, che asserisce l'etichetta "serie GIORNALIERA" — la guardia proteggeva la label e ha
+     intercettato la perdita del fatto. */
+  const curvaAltrove = (m.curve_history || []).length > 0;
+  const accorpate = new Set(curvaAltrove ? ["cpi", "pce", "curve"] : ["cpi", "pce"]);
+  const noteSerie = (i) => i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile"
+    : i.key === "curve" ? "serie GIORNALIERA FRED T10Y2Y, ultima chiusura"
+    : i.key === "umich" ? "serie mensile via FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui — verificale prima di trarne conclusioni sul consumatore"
+    : "serie mensile, normale ritardo di pubblicazione";
+  (m.indicators || []).filter(i => !accorpate.has(i.key)).forEach(i =>
+    lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${noteSerie(i)})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`));
+  {
+    const c2 = (m.indicators || []).find(i => i.key === "cpi");
+    const p2 = (m.indicators || []).find(i => i.key === "pce");
+    const fl = [c2, p2].filter(Boolean).map(i => dqV.flags[i.key]).filter(Boolean).join(" ");
+    if (c2 && p2) lines.push(`- Inflazione (a/a): CPI ${c2.value} · PCE ${p2.value} — due misure della STESSA grandezza, non due segnali: la Fed guarda il PCE. Rilevazioni ${c2.date} / ${p2.date}, serie mensili con il normale ritardo di pubblicazione.${fl ? " " + fl : ""}`);
+    else if (c2 || p2) { const u = c2 || p2; lines.push(`- ${u.label}: ${u.value} (rilevazione ${u.date} — serie mensile, normale ritardo di pubblicazione)${dqV.flags[u.key] ? " " + dqV.flags[u.key] : ""}`); }
+  }
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
   const mds = marginDebtState();
@@ -7855,11 +7881,15 @@ function buildPrompt() {
       : inv != null && inv > 250 ? `positiva da tempo — l'ultima inversione risale a ${inv} sedute fa, quindi NON è una dis-inversione in corso ma una curva normalizzata da tempo`
       : inv != null ? `tornata positiva dopo l'inversione di ${inv} sedute fa = dis-inversione recente`
       : "positiva (distanza dall'ultima inversione non disponibile: non se ne deduce se la dis-inversione sia recente)";
-    lines.push(`- Curva 10A-2A: ${cv > 0 ? "+" : ""}${cv} pp (${desc})`);
+    const cIn = (m.indicators || []).find(i => i.key === "curve");
+    lines.push(`- Curva 10A-2A: ${cv > 0 ? "+" : ""}${cv} pp${cIn ? ` (rilevazione ${cIn.date}, serie GIORNALIERA FRED T10Y2Y, ultima chiusura)` : ""} — ${desc}${cIn && dqV.flags.curve ? " " + dqV.flags.curve : ""}`);
   }
   if (m.yield_recession) {
     const yr = m.yield_recession;
-    lines.push(`- Curva vs Recessione (storico FRED): spread 10A-2A ${yr.current_curve != null ? (yr.current_curve > 0 ? "+" : "") + yr.current_curve + " pp (chiusura daily, stessa lettura delle righe sopra)" : "—"}${yr.curve_12m_ago != null ? ` (12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago}, media mensile del modello storico)` : ""}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. ${yr.steepening ? "NB: la curva si sta IRRIPIDENDO dopo l'inversione — storicamente questa configurazione ha preceduto una recessione entro ~12 mesi (la curva shiftata di 12m anticipa il calo del PIL)." : `NB: la curva NON si sta irripidendo (oggi ${yr.current_curve} contro ${yr.curve_12m_ago} di 12 mesi fa): la regola \"irripidimento post-inversione → recessione entro ~12 mesi\" NON è attiva adesso, e va citata solo se e quando lo diventa.`}`);
+    // v229 — NON ripete il valore della curva: e' lo STESSO numero della riga sopra, e ripeterlo
+    // lo faceva sembrare una seconda rilevazione. Qui sta solo cio' che questa riga aggiunge:
+    // il confronto a 12 mesi del modello storico e la regola dell'irripidimento.
+    lines.push(`- Curva vs Recessione (modello storico FRED, stessa curva della riga qui sopra): ${yr.curve_12m_ago != null ? `12m fa ${yr.curve_12m_ago > 0 ? "+" : ""}${yr.curve_12m_ago} pp (media mensile del modello)` : "confronto a 12 mesi non disponibile"}, ${yr.label}. PIL reale YoY ${yr.gdp_last != null ? yr.gdp_last + "%" : "—"}, sussidi disocc. ${yr.claims_last ?? "—"}. ${yr.steepening ? "NB: la curva si sta IRRIPIDENDO dopo l'inversione — storicamente questa configurazione ha preceduto una recessione entro ~12 mesi (la curva shiftata di 12m anticipa il calo del PIL)." : `NB: la curva NON si sta irripidendo (oggi ${yr.current_curve} contro ${yr.curve_12m_ago} di 12 mesi fa): la regola \"irripidimento post-inversione → recessione entro ~12 mesi\" NON è attiva adesso, e va citata solo se e quando lo diventa.`}`);
   }
   // ═══ v203 — MEMORIA STORICA e CICLO DEI SEMICONDUTTORI: RIMOSSI su decisione del CEO.
   // Erano gli unici due blocchi che non avevano MAI girato con dati veri: FRED non risponde

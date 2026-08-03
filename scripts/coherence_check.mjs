@@ -353,7 +353,13 @@ function c12_fattiSopravvissuti(t) {
     { che: "MCR Top-3",              re: /MCR Top-3 \d+%/,             era: "CINEMATICA DEI SEGNALI", ora: "REGIME DI VARIANZA" },
     { che: "P/E S&P 500 e Nasdaq",   re: /P\/E Ratio S&P 500[^\n]*Nasdaq 100/, era: "CONTESTO ECONOMIA USA", ora: "ROTAZIONE SETTORIALE" },
     { che: "tasso Fed",              re: /Fed Funds Rate/,             era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
-    { che: "CPI e PCE",              re: /Inflazione CPI[\s\S]{0,400}Inflazione PCE/, era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
+    /* ⚠ v229 — riagganciata al FATTO, non alle parole. La ricevuta cercava le due etichette
+       "Inflazione CPI" … "Inflazione PCE" su righe separate; dalla v229 le due misure stanno
+       su UNA riga sola (sono la stessa grandezza e contarle due volte raddoppiava un segnale).
+       Il fatto — entrambi i valori nel payload — non e' andato perso, e questa e' la quinta
+       volta in questo progetto che un check ancorato a una stringa letterale si rompe su una
+       riformulazione senza che nulla sia davvero mancante. */
+    { che: "CPI e PCE",              re: /CPI\s+[\d.,]+%?[\s\S]{0,120}PCE\s+[\d.,]+%?|Inflazione CPI[\s\S]{0,400}Inflazione PCE/, era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
     { che: "curva 10A-2A",           re: /Curva 10A-2A/,               era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
     { che: "peso NAV per titolo",    re: /% NAV · MCR /,               era: "MATRICE DI RISCHIO (colonna)", ora: "CORRELAZIONI news↔book" },
     { che: "beta NDX per titolo",    re: /\| Beta NDX \|/,             era: "MATRICE DI RISCHIO (colonna)", ora: "Tabella A" },

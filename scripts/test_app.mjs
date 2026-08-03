@@ -1721,8 +1721,34 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
      erano un widget per indicatore (un muro di trenta), la ragnatela era un grafico solo ma
      che va spiegato prima di poter essere letto. Se una qualunque rientrasse, rientrerebbe il
      problema — quindi il check le guarda tutte e tre. */
-  check("v228: nessuna delle tre forme respinte è rientrata (misuratore, quadrante, ragnatela)",
-    !/function\s+(misuratore|quadrante|radarFamiglie)\s*\(/.test(src));
+  check("v229: nessuna delle forme respinte è rientrata (misuratore, quadrante, ragnatela, rosa)",
+    !/function\s+(misuratore|quadrante|radarFamiglie|annoCircolare)\s*\(/.test(src));
+
+  /* v229 — i tre blocchi che il CEO ha chiesto "a barre o torte" devono disegnarle DAVVERO.
+     Si verifica sull'HTML prodotto dal render, non sul sorgente: e' la lezione v227 — un check
+     che non percorre la strada del codice vero certifica una strada immaginaria. */
+  check("v229 render: stagionalità, scomposizione e campanelli disegnano barre (o torte)", suReale(`
+    const box = { innerHTML: "", querySelector: () => null, querySelectorAll: () => [] };
+    const altro = () => ({ innerHTML: "", textContent: "", querySelector: () => null,
+                           querySelectorAll: () => [], addEventListener() {} });
+    const veroQS = document.querySelector;
+    const prendi = (id, fn) => {
+      box.innerHTML = "";
+      document.querySelector = (sel) => sel === id ? box : altro();
+      try { fn(); } finally { document.querySelector = veroQS; }
+      return box.innerHTML;
+    };
+    const leva = prendi("#mg-leva", renderLevaStagione);
+    const scomp = prendi("#mg-scomposizione", renderScomposizione);
+    const sign = prendi("#mg-signposts", renderSignposts);
+    const barre = (h) => (h.match(/class="obar-row/g) || []).length;
+    /* leva: 12 barre = i 12 mesi, con obar-on sul corrente · scomp: i fattori di un composito
+       · sign: barre per categoria PIU' la torta (un <svg> nel blocco).
+       ⚠ nessun commento in coda all'ULTIMA riga: suReale appende " } finally {…}" sulla stessa
+       riga e un // se lo mangerebbe. Stessa famiglia dei backtick dentro un template literal. */
+    return barre(leva) >= 12 && /obar-on/.test(leva)
+      && barre(scomp) >= 4
+      && barre(sign) >= 2 && /<svg/.test(sign);`));
 
   // e il gestore del clic sulla ragnatela non deve sopravviverle: un handler vivo su un
   // elemento che non esiste piu' e' il sintomo v193, non un residuo innocuo
@@ -1787,6 +1813,79 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   check("v228: entrambi i punti di stampa dei promossi ordinano alfabeticamente",
     (src.match(/withPlan[\s\S]{0,180}?localeCompare/g) || []).length >= 2);
 
+}
+
+/* ═══ v229 — ACCORPAMENTO NEL PAYLOAD e VIOLAZIONE CONTRADDETTA DAL DATO PIU' FRESCO ═══════
+   Due difetti segnalati leggendo il payload reale del CEO. Entrambi appartengono alla stessa
+   famiglia: il payload pubblicava PIU' RIGHE per UN solo fatto, e un lettore che conta i segnali
+   ne contava di piu' di quanti ce ne fossero. */
+{
+  vm.runInContext(`REALE3 = ${readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null")};`, ctx, { filename: "reale3.js" });
+  /* ⚠ SUI DATI VERI, non sulla fixture: la fixture non ha `macro.indicators`, quindi questi due
+     check misuravano zero righe e sarebbero stati verdi (o rossi) per ragioni che non c'entrano
+     col difetto. E' la terza volta in questa sessione — un check che gira su dati che non
+     contengono il fenomeno non e' un check. */
+  const suVeri = (code) => run(`
+    const _d = DATA, _c = cashEur;
+    DATA = JSON.parse(JSON.stringify(REALE3)); cashEur = 28500; recomputeTotals();
+    const p = buildPrompt();
+    DATA = _d; cashEur = _c; recomputeTotals();
+    ${code}`);
+
+  check("v229 macro: l'inflazione è UNA riga con entrambe le misure, non due righe", suVeri(`
+    const NL = String.fromCharCode(10);   // niente escape: in un template literal diventerebbe un a capo vero
+    const righe = p.split(NL).filter(l => /^- .*Inflazione/.test(l));
+    return righe.length === 1 && /CPI/.test(righe[0]) && /PCE/.test(righe[0]);`));
+
+  check("v229 macro: il LIVELLO della curva 10A-2A è dichiarato una volta sola", suVeri(`
+    return p.split(String.fromCharCode(10)).filter(l => /^- Curva 10A-2A:/.test(l)).length === 1;`));
+
+  // ⚠ l'accorpamento NON deve perdere il dato: senza storico della curva la riga dedicata non
+  // viene emessa, e la curva deve tornare nell'elenco generico invece di sparire.
+  check("v229 macro: senza curve_history la curva NON sparisce dal payload", run(`
+    const _h = DATA.macro.curve_history, _i = DATA.macro.indicators;
+    DATA.macro.curve_history = [];
+    DATA.macro.indicators = [...(_i || []).filter(x => x.key !== "curve"),
+      { key: "curve", label: "Curva 10A-2A", value: "+0.41 pp", date: "2026-07-16" }];
+    const p = buildPrompt();
+    DATA.macro.curve_history = _h; DATA.macro.indicators = _i;
+    return /Curva 10A-2A/.test(p) && p.includes("serie GIORNALIERA FRED T10Y2Y");`));
+
+  /* PLTR era STOP VIOLATO sulla chiusura mentre il pre-market era gia' SOPRA lo stop: il payload
+     chiedeva "una raccomandazione esplicita" su un evento che il dato piu' fresco — pubblicato
+     due righe dopo, nella cella "→ agg." — aveva gia' disfatto. Classe v193. */
+  check("v229 stop: se il prezzo esteso è sopra lo stop, la violazione lo dichiara", run(`
+    const _d = DATA, _c = cashEur;
+    DATA = JSON.parse(JSON.stringify(REALE3)); cashEur = 28500; recomputeTotals();
+    const viol = (decisionVerdict().stopViolations || [])[0];
+    let esito = "nessuna violazione nello snapshot";
+    if (viol) {
+      const r = DATA.portfolio.find(x => x.ticker === viol.r.ticker);
+      r.prezzo_limite_aggiustato = viol.stop * 1.02;      // esteso SOPRA lo stop
+      r.prepost = { label: "pre" };
+      recomputeTotals();
+      esito = buildPrompt().includes("MA IL DATO PIU' FRESCO LA CONTRADDICE");
+    }
+    DATA = _d; cashEur = _c; recomputeTotals();
+    return esito === true;`));
+
+  check("v229 stop: se l'esteso resta SOTTO lo stop, non si dichiara nessuna contraddizione", run(`
+    const _d = DATA, _c = cashEur;
+    DATA = JSON.parse(JSON.stringify(REALE3)); cashEur = 28500; recomputeTotals();
+    const viols = decisionVerdict().stopViolations || [];
+    let esito = "nessuna violazione nello snapshot";
+    if (viols.length) {
+      // ⚠ su TUTTE le violate: bastava una sola posizione con l'esteso sopra il proprio stop
+      // per far comparire la dichiarazione, e il check falliva su un ramo corretto
+      viols.forEach(v => {
+        const r = DATA.portfolio.find(x => x.ticker === v.r.ticker);
+        r.prezzo_limite_aggiustato = v.stop * 0.98;       // esteso ancora SOTTO
+      });
+      recomputeTotals();
+      esito = !buildPrompt().includes("MA IL DATO PIU' FRESCO LA CONTRADDICE");
+    }
+    DATA = _d; cashEur = _c; recomputeTotals();
+    return esito === true;`));
 }
 
 /* ---------- report ----------
