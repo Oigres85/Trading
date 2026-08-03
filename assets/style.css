@@ -1662,3 +1662,18 @@ svg.g-serie { cursor: crosshair; }
 [data-pane] + [data-pane] { scroll-margin-top: 90px; }
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* v223 — MISURATORE dentro la tessera: dove sta questo valore sulla sua scala */
+.mis { margin: 4px 0 2px; }
+.mis-track { position: relative; height: var(--bar-sm); background: var(--card); border-radius: 4px; overflow: hidden; }
+.mis-fill { height: 100%; border-radius: 4px; transition: width var(--t-fast); }
+.mis-neutro { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--muted); opacity: .55; }
+.mis-scala { display: flex; justify-content: space-between; font-size: 9.5px; color: var(--muted); margin-top: 3px; }
+/* la griglia delle tessere si stringe: molte card piccole invece di poche grandi */
+.mg-tris { grid-template-columns: repeat(auto-fit, minmax(232px, 1fr)); gap: 11px; }
+.mg-card .mg-n { font-size: 11px; margin-top: 7px; }
+/* v223 — rotazione compattata: righe più fitte, il grafico occupa meno */
+#mg-rot .obar-row { grid-template-columns: 118px minmax(0, 1fr) 150px; padding: 0 4px; }
+#mg-rot .obar-axis { height: var(--bar-xs); }
+#mg-rot .obar-fill { height: var(--bar-xs); }
+#mg-rot .obars { gap: 2px; }

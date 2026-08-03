@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "222";
+const BUILD_VERSION = "223";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3647,25 +3647,9 @@ function renderConcentrazione() {
   const violati = distanzeStop().filter(s => s.violated);
 
   if (basis) basis.textContent = `quote del comparto azionario · ${fmtEUR.format(Math.round(u.azionario))}`;
-  if (head) {
-    const clsTop = top3 >= 75 ? "sh-bad" : top3 >= 60 ? "sh-warn" : "";
-    head.innerHTML = `
-      <div class="sh-item ${clsTop}">
-        <div class="sh-lab">Rischio nei primi 3</div>
-        <div class="sh-val ${top3 >= 75 ? "neg" : top3 >= 60 ? "warn" : ""}">${fmt1.format(top3)}%</div>
-        <div class="sh-sub">della varianza del comparto azionario</div>
-      </div>
-      <div class="sh-item ${primo.gap >= 10 ? "sh-warn" : ""}">
-        <div class="sh-lab">Massimo scarto</div>
-        <div class="sh-val ${primo.gap >= 10 ? "warn" : ""}">${primo.ticker}</div>
-        <div class="sh-sub">${fmt1.format(primo.peso)}% del capitale → ${fmt1.format(primo.mcr)}% del rischio</div>
-      </div>
-      <div class="sh-item ${violati.length ? "sh-bad" : ""}">
-        <div class="sh-lab">Stop violati</div>
-        <div class="sh-val ${violati.length ? "neg" : "pos"}">${violati.length}</div>
-        <div class="sh-sub">${violati.length ? violati.map(v => v.ticker).join(" · ") : "nessuna posizione sotto il proprio stop"}</div>
-      </div>`;
-  }
+  // v223 — i tre cartellini (RISCHIO NEI PRIMI 3 / MASSIMO SCARTO / STOP VIOLATI) rimossi:
+  // il totale dei primi tre e' gia' al centro della ciambella e gli stop hanno la loro sezione.
+  if (head) head.innerHTML = "";
   const top3n = rows.slice(0, 3).map(r => r.ticker).join(" · ");
   box.innerHTML = `
     ${ciambella(rows.map(r => ({ nome: r.ticker, val: r.mcr, tk: r.ticker,
@@ -3880,26 +3864,8 @@ function renderRotazione() {
   const pos = righe.findIndex(r => r.evidenzia);
   const peggiore = [...mie].sort((a, b) => a.valore - b.valore)[0];
   const primo = righe[0], ultimo = righe[righe.length - 1];
-  if (head) {
-    const media = mie.length ? mie.reduce((s, r) => s + r.valore * exp.quota(r.tk), 0) / (mie.reduce((s, r) => s + exp.quota(r.tk), 0) || 1) : null;
-    const contro = media != null && media < 0;
-    head.innerHTML = media == null ? "" : `
-      <div class="sh-item ${contro ? "sh-bad" : ""}">
-        <div class="sh-lab">Il vento sui tuoi settori</div>
-        <div class="sh-val ${contro ? "neg" : "pos"}">${signTxt(Math.round(media * 10) / 10)}</div>
-        <div class="sh-sub">media pesata sul capitale, ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"}</div>
-      </div>
-      <div class="sh-item">
-        <div class="sh-lab">Guida la classifica</div>
-        <div class="sh-val pos">${esc(primo.nome)}</div>
-        <div class="sh-sub">${signTxt(primo.valore)} — ${exp.per.has(primo.tk) ? "sei dentro" : "non sei dentro"}</div>
-      </div>
-      <div class="sh-item ${peggiore && peggiore.valore < -8 ? "sh-warn" : ""}">
-        <div class="sh-lab">Il tuo settore più debole</div>
-        <div class="sh-val ${peggiore && peggiore.valore < 0 ? "neg" : ""}">${peggiore ? esc(peggiore.nome) : "—"}</div>
-        <div class="sh-sub">${peggiore ? `${signTxt(peggiore.valore)} · ${fmt1.format(exp.quota(peggiore.tk))}% del capitale` : "nessun settore mappato"}</div>
-      </div>`;
-  }
+  // v223 — via anche i tre cartellini della rotazione: la stessa cosa la dicono le barre accese.
+  if (head) head.innerHTML = "";
   if (nota) {
     nota.innerHTML = `Rendimento a ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"} dei 21 ETF di settore e tema.
       <b>Le barre accese sono i settori in cui hai i soldi</b>, con accanto la quota del capitale azionario.
@@ -4028,10 +3994,7 @@ function renderScomposizione() {
     const v = c.comp ? { components: c.comp } : m[c.k];
     const comp = (v?.components || []).filter(x => x && x.score != null);
     if (!v || comp.length < 2) return null;
-    const righe = [...comp].sort((a, b) => a.score - b.score).map(x => ({
-      nome: x.label, valore: Math.round(x.score - 50), colore: scoreColor(x.score),
-      testo: `${Math.round(x.score)}/100`,
-    }));
+    const righe = [...comp].sort((a, b) => a.score - b.score).map(x => ({ nome: x.label, val: Math.round(x.score) }));
     const peggio = righe[0], meglio = righe[righe.length - 1];
     const sc = v.score ?? Math.round(comp.reduce((s, x) => s + x.score, 0) / comp.length);
     const apri = c.k.startsWith("_") ? "" : ` data-mg-panel="${c.k}" role="button" tabindex="0" title="Apri il dettaglio di ${esc(c.t.replace(/&amp;/g, "&"))}"`;
@@ -4040,9 +4003,10 @@ function renderScomposizione() {
         <span class="mg-t">${c.t} <span class="muted" style="font-weight:400">— ${esc(c.sub)}</span></span>
         <span class="mg-v" style="color:${scoreColor(sc)}">${sc}<span class="muted" style="font-size:12px">/100</span></span>
       </div>
-      ${barreOrdinate(righe)}
-      <div class="muted mg-n">${comp.length} fattori, ordinati dal peggiore al migliore, con lo scarto dal neutro (50).
-        Oggi tira giù <b>${esc(peggio.nome)}</b> (${peggio.testo}) e tiene su <b>${esc(meglio.nome)}</b> (${meglio.testo}).</div>
+      <div class="muted mg-n" style="margin:0 0 10px">${comp.length} fattori, dal peggiore al migliore.
+        Oggi tira giù <b>${esc(peggio.nome)}</b> (${peggio.val}/100) e tiene su <b>${esc(meglio.nome)}</b> (${meglio.val}/100).</div>
+      <div class="mg-tris">${righe.map(x => tessera({ t: x.nome, v: `${x.val}<span class="muted" style="font-size:12px">/100</span>`,
+        cls: clsScore(x.val), grafico: misuratore(x.val) })).join("")}</div>
     </div>`;
   }).filter(Boolean);
   box.innerHTML = carte.length ? carte.join("")
@@ -4083,7 +4047,12 @@ function renderSignposts() {
       { nome: "Non ancora accesi", val: items.length - attivi, colore: "var(--border)" },
     ], { centro: { sopra: "campanelli", grande: `${attivi}/${items.length}`, sotto: "accesi" },
          aria: "campanelli BofA accesi" })
-    + barreOrdinate(righe.map(r => ({ nome: r.nome, valore: r.valore, colore: r.colore, testo: r.testo })))
+    + `<div class="mg-tris" style="margin-top:14px">${righe.map(r => tessera({
+        t: r.nome, v: `${r.on}<span class="muted" style="font-size:13px">/${r.list.length}</span>`,
+        cls: r.valore >= 70 ? "neg" : r.valore >= 50 ? "warn" : "pos",
+        grafico: misuratore(100 - r.valore, { sx: "tutti accesi", dx: "nessuno acceso", colore: r.colore }),
+        n: r.list.map(x => `<span class="${x.status ? "sp-on" : ""}">${x.status ? "●" : "○"} ${esc(x.name)}</span>`).join("<br>"),
+      })).join("")}</div>`
     + `<div class="sp-dettaglio">${righe.map(r => `<div class="sp-cat">
         <div class="sp-cat-h">${esc(r.nome)}</div>
         ${r.list.map(i => `<span class="sp-item${i.status ? " sp-on" : ""}" title="${esc(i.desc || "")}${i.source ? " · fonte: " + esc(i.source) : ""}"><span class="sp-dot"></span>${esc(i.name)}</span>`).join("")}
@@ -4258,21 +4227,14 @@ function renderIndicatori() {
   const nota = $("#mg-tutti-note"), head = $("#mg-tutti-head");
   const righe = indicatoriClassifica();
   if (righe.length < 3) { box.innerHTML = '<div class="muted">Indicatori non disponibili.</div>'; return; }
-  box.innerHTML = barreOrdinate(righe.map(r => ({
-    nome: r.nome, valore: r.score - 50, colore: scoreColor(r.score), tk: r.k,
-    testo: `${r.score}/100${r.sub ? "  ·  " + r.sub : ""}`,
-  })));
-  const conPannello = new Set(Object.keys(MACRO_INFO || {}));
-  box.querySelectorAll("[data-obar-tk]").forEach(e => {
-    // v218 — solo le voci che hanno davvero un pannello diventano cliccabili: un bottone che
-    // non apre niente è peggio di nessun bottone (openMacroInfo esce in silenzio, difetto v196)
-    if (!conPannello.has(e.dataset.obarTk)) return;
-    e.classList.add("obar-click");
-    const apri = () => openMacroInfo(e.dataset.obarTk);
-    e.setAttribute("tabindex", "0"); e.setAttribute("role", "button");
-    e.addEventListener("click", apri);
-    e.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); apri(); } });
-  });
+  const conPan = new Set(Object.keys(MACRO_INFO || {}));
+  box.innerHTML = `<div class="mg-tris">${righe.map(r => tessera({
+    t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
+    cls: clsScore(r.score), grafico: misuratore(r.score), n: esc(r.sub || ""),
+    tk: conPan.has(r.k) ? r.k : null,
+  })).join("")}</div>`;
+  agganciaTessere(box);
+
   const peggio = righe.slice(0, 3), meglio = righe.slice(-2);
   const media = Math.round(righe.reduce((s, r) => s + r.score, 0) / righe.length);
   if (head) head.innerHTML = `
@@ -4428,6 +4390,33 @@ function ciambella(voci, opt = {}) {
     }).join("")}</ul>
   </div>`;
 }
+
+/* ═══ v223 — LA TESSERA: un solo formato per tutto ════════════════════════════════════════
+   Il CEO ha indicato "Termometri di stress" come l'unico blocco che legge senza sforzo, e ha
+   chiesto che TUTTI i grafici abbiano quella struttura, con una regola precisa: "ogni barra
+   deve essere un grafico, non devi accorpare tutto". Quindi le liste ordinate (35 indicatori,
+   39 fattori, le categorie dei campanelli) si sciolgono in tessere: titolo, valore grande, un
+   misuratore che mostra DOVE sta quel valore sulla sua scala, una riga di senso. */
+function misuratore(score, opt = {}) {
+  const v = Math.max(0, Math.min(100, score));
+  return `<div class="mis"><div class="mis-track">
+      <div class="mis-fill" style="width:${v}%;background:${opt.colore || scoreColor(v)}"></div>
+      <div class="mis-neutro" style="left:${opt.neutro ?? 50}%"></div>
+    </div><div class="mis-scala"><span>${esc(opt.sx || "sfavorevole")}</span><span>${esc(opt.dx || "favorevole")}</span></div></div>`;
+}
+function tessera({ t, v, cls, grafico, n, tk }) {
+  return `<div class="mg-card${tk ? " mg-click" : ""}"${tk ? ` data-tess-tk="${esc(tk)}" role="button" tabindex="0"` : ""}>
+    <div class="mg-card-head"><span class="mg-t">${esc(t)}</span><span class="mg-v ${cls || ""}">${v}</span></div>
+    ${grafico || ""}${n ? `<div class="muted mg-n">${n}</div>` : ""}</div>`;
+}
+function agganciaTessere(box) {
+  box.querySelectorAll("[data-tess-tk]").forEach(e => {
+    const apri = () => openMacroInfo(e.dataset.tessTk);
+    e.addEventListener("click", apri);
+    e.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); apri(); } });
+  });
+}
+const clsScore = (v) => v < 40 ? "neg" : v < 55 ? "warn" : "pos";
 
 function renderStruttura() {
   if (!DATA) return;
@@ -6732,7 +6721,23 @@ function buildPrompt() {
           if (!ra || !(ra.stop > 0) || !(ra.stop < x.r.price)) return base;
           const perShare = x.r.price - ra.stop;
           const riskEur = Math.round(x.r.qty * perShare / eurusdRA);
-          return `${base} [ri-arm CANDIDATO se tieni: $${fmtNum.format(ra.stop)} (2×ATR sotto il supporto $${fmtNum.format(x.r.support)}) → rischio aggiuntivo ~€${fmtNum.format(riskEur)} = ${fmtNum.format(x.r.qty)} quote × $${fmtNum.format(Math.round(perShare * 100) / 100)} dal prezzo]`;
+          // ⚠ v223 — SENZA QUESTO, "STOP VIOLATO" SUONA UGUALE SU TUTTO. Misurato sui dati veri:
+          // MU e' violato del 2,6% su una posizione a +839% (lo 0,31% della corsa fatta), PLTR
+          // dell'1,4% su una a +8% (il 16,7% della corsa). Il primo e' il ratchet che ha seguito
+          // un vincitore fin sotto il prezzo; il secondo e' una tesi che si sta sgretolando. Il
+          // payload li presentava IDENTICI, ed e' il motivo per cui il report proponeva di
+          // liquidare i cavalli vincenti insieme ai cavalli zoppi.
+          const gOra = (x.r.pmc > 0) ? (x.r.price / x.r.pmc - 1) * 100 : null;
+          const gStop = (x.r.pmc > 0) ? (x.stop / x.r.pmc - 1) * 100 : null;
+          const breach = (x.r.price / x.stop - 1) * 100;
+          const quota = (gOra > 0) ? Math.abs(breach) / gOra * 100 : null;
+          const prosp = (gOra != null && gStop != null)
+            ? ` [PROSPETTIVA: posizione a ${signTxt(Math.round(gOra))} sul PMC; uscire allo stop cristallizzerebbe ${signTxt(Math.round(gStop))}. Lo sfondamento vale il ${quota != null ? fmtNum.format(Math.round(quota * 100) / 100) : "—"}% della corsa fatta finora${
+                quota != null && quota < 3 ? " — su questa scala e' RUMORE, non una rottura della tesi: e' il trailing che ha seguito il prezzo fin qui sotto"
+                : quota != null && quota > 25 ? " — qui lo stop taglia una quota RILEVANTE del guadagno: e' un evento di tesi, non un sussulto"
+                : ""}]`
+            : "";
+          return `${base} [ri-arm CANDIDATO se tieni: $${fmtNum.format(ra.stop)} (2×ATR sotto il supporto $${fmtNum.format(x.r.support)}) → rischio aggiuntivo ~€${fmtNum.format(riskEur)} = ${fmtNum.format(x.r.qty)} quote × $${fmtNum.format(Math.round(perShare * 100) / 100)} dal prezzo]${prosp}`;
         }).join(" · ") + ".");
     }
     // ═══ v169 — POSIZIONI CHE CHIEDONO UNA DECISIONE + BUDGET DOPO LE VENDITE ═══════════════
@@ -8953,34 +8958,25 @@ const TAB_KEY = "pref_tab";
    cose che non si vedevano solo perche' stavano in un pannello chiuso. Ora TUTTO e' in pagina,
    sempre: la barra laterale non commuta piu' niente, porta il punto — e' un indice, e si
    evidenzia da sola sulla sezione che stai guardando. Zero contenuti nascosti. */
+/* v223 — la barra laterale torna a COMMUTARE ("solo cliccando nelle voci della barra a
+   sinistra posso passare da una sezione all'altra"). In v222 era tutto in pagina e si
+   scorreva: troppo lungo. Una sezione per volta, e il clic e' l'unico modo di cambiarla. */
 function setTab(nome) {
   const valide = [...document.querySelectorAll("#main-tabs .tab")].map(b => b.dataset.tab);
   if (!valide.includes(nome)) nome = valide[0] || "struttura";
   try { localStorage.setItem(TAB_KEY, nome); } catch { /* quota */ }
   document.querySelectorAll("#main-tabs .tab").forEach(b =>
     b.classList.toggle("tab-active", b.dataset.tab === nome));
-  document.querySelectorAll("[data-pane]").forEach(el => { el.hidden = false; });
-  const primo = document.querySelector(`[data-pane="${nome}"]`);
-  if (primo) primo.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.querySelectorAll("[data-pane]").forEach(el => { el.hidden = el.dataset.pane !== nome; });
+  window.scrollTo?.({ top: 0, behavior: "auto" });   // ?. — l'harness dei test non ha scrollTo
   if (typeof DATA !== "undefined" && DATA) {
     if (nome === "portafoglio") renderTable();
     if (nome === "watchlist") renderWatchlist();
+    if (nome === "struttura") { renderStruttura(); renderMacroGrafici(); }
   }
 }
-function seguiScroll() {
-  if (seguiScroll._fatto) return; seguiScroll._fatto = true;
-  const bottoni = [...document.querySelectorAll("#main-tabs .tab")];
-  if (!bottoni.length || typeof IntersectionObserver !== "function") return;
-  const visibili = new Map();
-  const io = new IntersectionObserver(voci => {
-    voci.forEach(v => visibili.set(v.target, v.isIntersecting ? v.intersectionRatio : 0));
-    let best = null, bestR = 0;
-    visibili.forEach((r, el) => { if (r > bestR) { bestR = r; best = el; } });
-    if (!best) return;
-    bottoni.forEach(b => b.classList.toggle("tab-active", b.dataset.tab === best.dataset.pane));
-  }, { rootMargin: "-15% 0px -60% 0px", threshold: [0, .25, .5, 1] });
-  document.querySelectorAll("[data-pane]").forEach(el => io.observe(el));
-}
+
+
 
 document.querySelectorAll("#main-tabs .tab").forEach(b =>
   b.addEventListener("click", () => setTab(b.dataset.tab)));
@@ -8991,5 +8987,4 @@ document.querySelectorAll("#main-tabs .tab").forEach(b =>
    (stessa regola della vista compatta di v198 — un default non sovrascrive una scelta). */
 /* v222 — tutte le sezioni visibili dal primo istante, nessun ripristino di scheda e nessuno
    scroll automatico all'avvio: la pagina si apre dalla cima e mostra tutto. */
-document.querySelectorAll("[data-pane]").forEach(el => { el.hidden = false; });
-seguiScroll();
+try { setTab(localStorage.getItem(TAB_KEY) || "struttura"); } catch { setTab("struttura"); }
