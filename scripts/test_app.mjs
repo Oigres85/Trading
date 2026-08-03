@@ -951,7 +951,14 @@ check("v149 sessione: con KOSPI/futures/BTC nel fixture gli ANTICIPATORI compaio
   // non una notizia. Il test non puo' quindi fissare l'etichetta: verifica che sia quella GIUSTA
   // per il momento in cui gira (un test che dipende dall'orologio e' un generatore di falsi allarmi).
   const attesa = seoulSessionOpen() ? "[LIVE, Seoul in contrattazione]" : "[ultima chiusura di Seoul, borsa ferma]";
-  return p.includes("ANTICIPATORI: KOSPI +4,5% " + attesa) && p.includes("Fut NDX +0,27%")`));
+  /* ⚠ v232 — riagganciato al FATTO. Prima cercava la parola "ANTICIPATORI", che dalla v232
+     dipende dalla FASE: a sessione USA aperta quei dati non anticipano nulla (la seduta che
+     dovrebbero precedere sta gia' scambiando) e l'etichetta lo dichiara. L'invariante che conta
+     e' che i tre strumenti compaiano INLINE nella riga di sessione, col tag di freschezza
+     giusto — SETTIMA volta che un check legato al testo si rompe senza che manchi nulla. */
+  const riga = p.split(String.fromCharCode(10)).find(l => l.startsWith("CONTESTO DI SESSIONE (")) || "";
+  return riga.includes("KOSPI +4,5% " + attesa) && riga.includes("Fut NDX +0,27%")
+    && /ANTICIPATORI|NON anticipatori|non anticipano/.test(riga)`));
 check("v149 validatore: ordine in RIGA TABELLA markdown (stile Gemini) → ticker/verso/qty/limite estratti", run(`
   const o = parseAIOrders("| **TSTW** | VENDI | ~595 | **$14,31** (agg. after) | — | Violazione stop. (Prezzo $14,25 · Supp. $13,41 · Stop $14,79) | 95/100 |");
   return o.length === 1 && o[0].tk === "TSTW" && o[0].action === "SELL" && o[0].qty === 595 && o[0].limit === 14.31`));
@@ -2020,6 +2027,41 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
       + rendi("#mg-signposts", "renderSignposts");
     const larghezze = [...h.matchAll(/viewBox="0 0 (\d+)/g)].map(m => +m[1]);
     return larghezze.length > 0 && larghezze.every(w => w <= 340);
+  })());
+}
+
+/* ═══ v232 — L'ETICHETTA DEVE ESSERE VERA NELLA FASE IN CUI COMPARE ════════════════════════
+   Trovato eseguendo il payload su me stesso a mercato APERTO: la riga presentava KOSPI (chiusura
+   di ieri) e i futures come "ANTICIPATORI" e tre parole dopo dichiarava "SESSIONE USA APERTA: i
+   prezzi live hanno priorita'". Anticipare cosa? La seduta che dovrebbero precedere sta gia'
+   scambiando. Stessa lezione di v158, applicata allora al testo della guida ma non all'etichetta. */
+{
+  vm.runInContext(`REALE6 = ${readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null")};`, ctx, { filename: "reale6.js" });
+  /* ⚠ sui DATI VERI: la fixture non ha ^KS11 in watchlist ne' macro.futures, quindi `lead` esce
+     vuoto e l'etichetta non viene MAI stampata — i check fallivano sul codice corretto. Quarta
+     volta in questa sessione che un check gira su dati privi del fenomeno. */
+  const conFase = (fase) => run(`
+    const _d = DATA, _f = usSessionInfo;
+    DATA = JSON.parse(JSON.stringify(REALE6)); recomputeTotals();
+    usSessionInfo = () => ({ etHHMM: "14:26", phase: "${fase}", minsToOpen: 60 });
+    let out = "";
+    try { out = sessionContextLine(); } catch (e) { out = "ERR " + e.message; }
+    usSessionInfo = _f; DATA = _d; recomputeTotals();
+    return out;`);
+
+  check("v232 sessione: a mercato APERTO non li chiama anticipatori", (() => {
+    const r = conFase("regular");
+    return typeof r === "string" && !/\bANTICIPATORI\b/.test(r) && /NON anticipatori/.test(r);
+  })());
+
+  check("v232 sessione: prima della campana e in after-hours restano ANTICIPATORI", (() => {
+    return /\bANTICIPATORI\b/.test(conFase("after")) && /\bANTICIPATORI\b/.test(conFase("pre-market"));
+  })());
+
+  // ⚠ e il WEEKEND non deve dirsi "anticipatori": la guida sotto afferma il contrario
+  check("v232 sessione: nel weekend l'etichetta non contraddice la guida che segue", (() => {
+    const w = conFase("weekend");
+    return typeof w === "string" && !/\bANTICIPATORI\b/.test(w) && /FERMI/.test(w);
   })());
 }
 

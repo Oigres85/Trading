@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "231";
+const BUILD_VERSION = "232";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1334,7 +1334,29 @@ function sessionContextLine() {
     : s.phase === "regular"
       ? `SESSIONE USA APERTA: i prezzi live hanno priorità; gli ordini limite sono eseguibili oggi`
       : `USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~${hrs}h); il "→ agg." incorpora già il gap after`;
-  return `CONTESTO DI SESSIONE (ora ET ${s.etHHMM}, fase: ${s.phase.toUpperCase()} — festività USA non considerate)${lead ? ` · ANTICIPATORI: ${lead}` : ""} · ${guida}.`;
+  /* ═══ v232 — "ANTICIPATORI" NON E' VERO IN OGNI FASE ═══════════════════════════════════════
+     Trovato eseguendo il payload su me stesso a mercato APERTO. La riga diceva
+       "fase: REGULAR … · ANTICIPATORI: KOSPI -5,12% [chiusura di Seoul, borsa ferma] · Fut NDX
+        +0,72% · … · SESSIONE USA APERTA: i prezzi live hanno priorita'"
+     cioe' presentava come anticipatori due dati che NON anticipano piu' niente: la cosa che
+     dovrebbero precedere — la seduta americana — sta gia' scambiando, e quei valori sono dentro
+     i prezzi live che la riga stessa dichiara prioritari. Il lettore trova la parola
+     ANTICIPATORI e la contraddizione tre parole dopo.
+     La lezione e' quella di v158 (KOSPI e futures nel weekend "sono gia' dentro l'ultima
+     chiusura USA e NON anticipano nulla"), applicata allora al TESTO della guida ma non
+     all'ETICHETTA — che e' la parola che l'LLM legge per prima. Ora l'etichetta segue la fase:
+     anticipano solo quando c'e' davvero un'apertura davanti. */
+  /* ⚠ NON basta `beforeBell`: quella include il WEEKEND, dove la guida qui sopra dice
+     testualmente che KOSPI e futures "sono gia' dentro l'ultima chiusura USA e NON anticipano
+     nulla di nuovo" — l'etichetta avrebbe contraddetto il testo tre righe sotto, cioe' lo stesso
+     difetto che sto correggendo, solo in un altro ramo. Anticipano quando c'e' davvero
+     un'apertura davanti e il dato e' piu' fresco dell'ultima chiusura: notte, pre-market, after. */
+  const etLead = (s.phase === "notte" || s.phase === "pre-market" || s.phase === "after")
+    ? "ANTICIPATORI"
+    : s.phase === "regular"
+      ? "CONTESTO — NON anticipatori: la sessione USA e' aperta, quindi questi dati sono gia' dentro i prezzi live"
+      : "FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA";
+  return `CONTESTO DI SESSIONE (ora ET ${s.etHHMM}, fase: ${s.phase.toUpperCase()} — festività USA non considerate)${lead ? ` · ${etLead}: ${lead}` : ""} · ${guida}.`;
 }
 /* ── OROLOGIO DEL PREZZO vs OROLOGIO DELLE NOTIZIE (v158) ─────────────────────────
    Il payload mescola due orologi: i PREZZI si fermano alla campana (venerdì 16:00 ET), le NEWS
