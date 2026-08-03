@@ -901,6 +901,66 @@ che nessun testo esca dai confini del suo `<svg>`.
 ⚠ **`display:flex` + `align-items:center` stringe un figlio al suo contenuto**: la ragnatela
 rendeva a 300px su una tela da 520 (scala 0,58) finché non le ho dato `width:100%` esplicito.
 
+## 📅 v228 — la trimestrale di OGGI spariva dalle priorità
+
+Trovato eseguendo il payload su me stesso (l'esercizio ricorrente di questo file). **PLTR
+riportava gli utili OGGI, era in portafoglio e aveva lo stop violato**: il caso più urgente del
+run. La tabella lo segnalava con `[!EARNINGS RISK]`; la riga **PRIORITÀ** del brief no.
+
+Due derivazioni della stessa grandezza, che divergono esattamente a **zero giorni**:
+| dove | formula | esito su "oggi" |
+|---|---|---|
+| tabella | `Math.ceil((data − adesso)/86400000)` | −0,45 → `-0` → **passa** |
+| brief | `(data − adesso)/86400000 >= 0` | −0,45 → **non passa** |
+
+`new Date("2026-08-03")` è la **mezzanotte** di quel giorno: alle 10:48 è già passata, quindi la
+trimestrale del giorno stesso risultava nel passato. È la classe v161/v207 — *due implementazioni
+della stessa domanda, coerenti solo per fortuna* — e qui il difetto **nascondeva l'evento più
+urgente proprio nella riga che si chiama PRIORITÀ**.
+
+Ora `giorniAllaTrimestrale()` conta **giorni di calendario in ora locale** (oggi = 0) ed è
+l'unica strada: le **cinque** derivazioni sparse nel file passano tutte da lì. La riga ordina per
+urgenza e marca il giorno stesso (`PLTR (OGGI), AMD (1g), RGTI (3g)`).
+
+## 🔤 v228 — l'ordine per punteggio era sopravvissuto alla rimozione della classifica
+
+v200 ha tolto la classifica del motore perché *"ordinare è già un giudizio"*, e il blocco FILTRI
+lo **dichiara**: "in ordine alfabetico … questo blocco non classifica più". Ma il brief e il
+blocco dei livelli stampavano la **stessa lista** ordinata per punteggio: `GOOGL, AVGO, MSFT,
+AMZN, WDC` contro `AMZN, AVGO, GOOGL, MSFT, WDC`. Stessa lista, due ordini — e uno dei due
+comunicava una preferenza che il sistema dichiara di non esprimere più.
+
+**Regola**: quando si rimuove un giudizio, cercarne i residui **nell'ORDINE**, non solo nelle
+etichette. Un elenco ordinato per punteggio è un punteggio, anche senza numeri accanto.
+
+⚠ Il check che lo sorveglia è stato **sbagliato due volte**:
+1. girava sulla **fixture**, dove non c'è nessun promosso → le estrazioni tornavano `null`, il
+   check usciva `true` ed era **verde col difetto iniettato**. *Verde per assenza di dati, non di
+   difetti* — la trappola già pagata in v196;
+2. la seconda stesura ricostruiva lo scenario del CEO dentro il vm (cap 25% da
+   `config/risk_params.json`, cassa reale) ed era **più fragile del difetto che sorvegliava**.
+La terza verifica una **proprietà osservabile** (ogni elenco stampato è alfabetico) più il fatto
+che entrambi i punti di stampa ordinino. *Se un check richiede di ricostruire mezzo mondo per
+funzionare, sta misurando la cosa sbagliata.*
+
+## 🕸️ v228 — la terza forma respinta, e perché stavolta la ragione è diversa
+
+Barra → quadrante → **ragnatela**. Le prime due erano lo stesso errore (un widget per ogni
+indicatore, trenta di fila); la ragnatela era **un grafico solo**, ma *"i grafici non li capisco"*.
+Un radar chiede di sapere **cos'è un radar** prima di poter essere letto.
+
+> **Un grafico che va spiegato non è un grafico leggibile, per elegante che sia.**
+
+Resta l'**asse coi pallini**, che parla la stessa lingua dei termometri di stress (una scala con
+le sue soglie disegnate), spostato subito sotto di essi su richiesta del CEO. Rimosso anche il
+gestore del clic sulla ragnatela: *un handler vivo su un elemento che non esiste più è il sintomo
+v193, non un residuo innocuo.*
+
+⚠ **L'ordine salvato dall'utente VINCE su quello di `index.html`.** Spostare una sezione nel
+sorgente non la sposta per chi ha già trascinato qualcosa (v225, `sezioni_ordine` +
+`config/ui_order.json`). Verificato misurando su un browser pulito. Quando si riordina una
+sezione nel sorgente, dirlo all'utente: per lui potrebbe non cambiare nulla.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
