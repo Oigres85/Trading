@@ -1014,6 +1014,43 @@ fra le due era stato inserito **l'intero modulo v226** (`FAMIGLIE_MACRO`, `punti
 per `quadrante()` in v226. **La classe v201-v204 non è teorica: in quattro versioni ha morso tre
 volte.** La ricevuta del taglio va scritta prima, e deve essere eseguibile, non un commento.
 
+## 🐎 v230 — perché un report reale ha liquidato MU (+839%) e AMD (+209%)
+
+Il CEO ha incollato l'output di un LLM sul payload v229: ha venduto entrambi i vincitori citando
+*"stop violato -4,32% in pre-market"*. Tre difetti concorrenti, tutti trovati leggendo il payload
+come il ricevente. **Nessuna delle correzioni addolcisce la lettura: due su tre la rendono più
+severa.** Si è resa onesta, non favorevole.
+
+1. **Il numero nel tag non era quello che sembrava.** `[STOP A RISCHIO PRE -4,32%]` stampava il
+   **gap pre/chiusura**, e il report l'ha letto come lo sfondamento dello stop. Peggio: su PLTR il
+   tag diceva *"STOP A RISCHIO … +2,63%"* mentre quel movimento portava il prezzo **sopra** lo
+   stop, cioè fuori dalla violazione — l'etichetta affermava il contrario del numero. Ora il tag
+   dichiara la **distanza dallo stop**, che è la grandezza di cui parla.
+2. **La PROSPETTIVA parlava di un prezzo che non è più quello.** La difesa v223 era calcolata
+   sulla **chiusura** (*"MU: 0,31% della corsa"*) mentre la decisione si prende sul prezzo
+   **esteso**: due numeri sullo stesso titolo, uno vecchio e rassicurante, uno fresco e
+   allarmante. L'LLM ha creduto al più fresco, **ed era ragionevole**. Ora si rifà su quel prezzo
+   quando è ancora sotto lo stop — misurato: MU resta rumore (0,85%), **AMD ne esce** (3,06% da
+   1,79%). *La difesa ricalcola, non protegge a prescindere.*
+3. **"IN AUMENTO" apriva l'eccezione B4 con una soglia fissa di 3 pp.** Una soglia fissa non sa se
+   il movimento sia ordinario per quella serie — il registro che invecchia da solo (C10, red team
+   I6). Ora il numero porta il proprio **percentile**: +4,2 pp è il movimento più ampio dello
+   storico (94° su 17 finestre, mediana 2,1), e la riga lo dichiara. Oggi B4 è scattata a ragione,
+   e ora il payload lo **dimostra** invece di lasciarlo dedurre da una soglia arbitraria.
+
+**Regola che ne esce**: quando esistono due letture della stessa grandezza a freschezze diverse,
+la difesa va agganciata a **quella su cui si decide**, non a quella su cui è comodo calcolarla.
+
+### 🧪 Tre errori di metodo nella stessa sessione — riconoscerli a vista
+- **`check()` vuole un BOOLEANO.** Avevo passato cinque *arrow function*: una funzione è truthy,
+  quindi erano **verdi a vuoto** e le iniezioni non mordevano. Se un check nuovo passa anche col
+  difetto dentro, la prima cosa da guardare è **cosa gli hai passato**, non il codice.
+- **Un'iniezione di validazione senza `assert` è un no-op silenzioso.** Il `replace` non trovava
+  la stringa, il file restava intatto e il test "passava". Ogni iniezione deve **asserire di aver
+  modificato il file** prima di eseguire la suite.
+- **Sesta rottura di un check ancorato a una stringa letterale** (v125, `[STOP A RISCHIO AFTER`).
+  Riagganciato al fatto: la riga nomina la sessione estesa e lo stop.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
