@@ -1443,13 +1443,6 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 .abar-val { font-family: var(--mono); font-size: 11.5px; text-align: right; color: var(--muted); white-space: nowrap; }
 
 /* ---- distanza dallo stop: barre divergenti dallo zero ---- */
-.sbars { display: flex; flex-direction: column; gap: 8px; }
-.sbar-row { display: grid; grid-template-columns: 74px minmax(0, 1fr) 150px; gap: 10px; align-items: center; }
-.sbar-axis { position: relative; height: 22px; min-width: 0; background: var(--card-2); border-radius: 4px; }
-.sbar-zero { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--muted); opacity: .7; }
-.sbar-fill { position: absolute; top: 4px; height: 14px; border-radius: 3px; min-width: 2px; }
-.sbar-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; white-space: nowrap; }
-.sbar-meta b.viol { color: var(--red); }
 
 /* ---- deriva: grafico a linee ---- */
 .drift-svg { width: 100%; height: auto; display: block; }
@@ -1465,8 +1458,6 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
   .abar-lab { grid-area: lab; }
   .abar-track { grid-area: bar; }
   .abar-val { grid-area: val; }
-  .sbar-row { grid-template-columns: 60px minmax(0, 1fr); }
-  .sbar-meta { grid-column: 2; text-align: left; }
   .sh-item .sh-val { font-size: 18px; }
 }
 
@@ -1664,11 +1655,6 @@ svg.g-serie { cursor: crosshair; }
    sembrare che le sezioni fossero collegate. */
 
 /* v223 — MISURATORE dentro la tessera: dove sta questo valore sulla sua scala */
-.mis { margin: 4px 0 2px; }
-.mis-track { position: relative; height: var(--bar-sm); background: var(--card); border-radius: 4px; overflow: hidden; }
-.mis-fill { height: 100%; border-radius: 4px; transition: width var(--t-fast); }
-.mis-neutro { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--muted); opacity: .55; }
-.mis-scala { display: flex; justify-content: space-between; font-size: 9.5px; color: var(--muted); margin-top: 3px; }
 /* la griglia delle tessere si stringe: molte card piccole invece di poche grandi */
 .mg-tris { grid-template-columns: repeat(auto-fit, minmax(232px, 1fr)); gap: 11px; }
 .mg-card .mg-n { font-size: 11px; margin-top: 7px; }
@@ -1690,3 +1676,38 @@ svg.g-serie { cursor: crosshair; }
 .mg-v { line-height: 1.15; white-space: nowrap; }
 .mg-card { display: flex; flex-direction: column; }
 .mg-card .mg-n { margin-top: auto; padding-top: 7px; }
+
+/* v225 — quadrante ad arco: la posizione della lancetta e' il messaggio */
+.quad { display: flex; justify-content: center; margin: 2px 0 0; }
+.quad svg { width: 100%; max-width: 190px; height: auto; display: block; }
+
+/* ═══ v225 — comandi di riordino delle sezioni ═══════════════════════════════════════════════
+   Stanno in alto a destra DENTRO la card, non dentro .card-head: quella e' una flex con
+   justify-content:space-between e infilarci un terzo figlio spingerebbe il titolo al centro. */
+.card[data-sez] { position: relative; }
+.sez-cmd {
+  position: absolute; top: 8px; right: 10px; z-index: 2;
+  display: flex; gap: 2px; opacity: 0; transition: opacity .15s ease;
+}
+.card[data-sez]:hover .sez-cmd, .sez-cmd:focus-within, .in-riordino .sez-cmd { opacity: 1; }
+@media (hover: none) { .sez-cmd { opacity: .55; } }   /* su touch non c'e' hover: sempre visibili */
+.sez-cmd button {
+  width: 26px; height: 26px; padding: 0; line-height: 1;
+  font-size: 12px; color: var(--muted);
+  background: var(--card-2); border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+}
+.sez-cmd button:hover { color: var(--text); border-color: var(--accent); }
+.sez-grip { cursor: grab; touch-action: none; }       /* touch-action:none = il dito trascina, non scorre */
+.sez-grip:active { cursor: grabbing; }
+
+/* durante il trascinamento ogni card si riduce alla propria intestazione: l'elenco del pane sta
+   tutto sullo schermo e si vede dove si sta lasciando la sezione, anche su iPhone */
+.in-riordino > section[data-sez] > *:not(.card-head):not(.sez-cmd) { display: none; }
+.in-riordino > section[data-sez] > .card-head { margin-bottom: 0; }
+.in-riordino > section[data-sez] { outline: 1px dashed var(--border); }
+.in-riordino > section.sez-trascinata { outline: 2px solid var(--accent); opacity: .9; }
+
+/* v225 — la rosa dell'anno */
+.anno-c { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.anno-c svg { width: 100%; max-width: 320px; height: auto; display: block; }
+.anno-legenda { font-size: 11px; text-align: center; }

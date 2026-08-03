@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "224";
+const BUILD_VERSION = "225";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3769,46 +3769,6 @@ function renderAllocGrafica() {
   }
 }
 
-function renderStopDist() {
-  const box = $("#stopdist-chart"); if (!box) return;
-  const basis = $("#stop-basis"), note = $("#stopdist-note");
-  const rows = distanzeStop();
-  if (!rows.length) {
-    box.innerHTML = '<div class="muted">Nessuna posizione azionaria con stop calcolabile.</div>';
-    if (basis) basis.textContent = ""; if (note) note.innerHTML = "";
-    return;
-  }
-  // asse SIMMETRICO attorno allo zero: la stessa distanza disegna la stessa barra da entrambe
-  // le parti, così "quanto manca" e "di quanto ho sforato" restano confrontabili a vista
-  const maxAbs = Math.max(5, ...rows.map(r => Math.abs(r.dist)));
-  const zero = 50;
-  box.innerHTML = `<div class="sbars">${rows.map(r => {
-    const w = Math.abs(r.dist) / (2 * maxAbs) * 100;
-    const left = r.dist >= 0 ? zero : zero - w;
-    const col = r.dist < 0 ? "var(--red)" : r.dist < 5 ? "var(--yellow)" : "var(--green)";
-    return `<div class="sbar-row">
-      <span class="cbar-tk" data-struct-tk="${esc(r.ticker)}" title="apri la scheda">${esc(r.ticker)}</span>
-      <span class="sbar-axis" title="prezzo ${fmtNum.format(r.price)} · stop ${fmtNum.format(r.stop)} (${esc(r.src)})">
-        <span class="sbar-zero" style="left:${zero}%"></span>
-        <span class="sbar-fill" style="left:${left.toFixed(1)}%;width:${w.toFixed(1)}%;background:${col}"></span>
-      </span>
-      <span class="sbar-meta">${r.violated ? "<b class='viol'>violato</b> " : ""}${signTxt(r.dist)} · stop ${fmtNum.format(r.stop)}</span>
-    </div>`;
-  }).join("")}</div>`;
-  box.querySelectorAll("[data-struct-tk]").forEach(e =>
-    e.addEventListener("click", () => openStockCard(e.dataset.structTk)));
-  const viol = rows.filter(r => r.violated);
-  const prov = rows.filter(r => !r.ratchet);
-  const sed = seduteDelBook();
-  if (basis) basis.textContent = `${rows.length} posizioni · distanza in % del prezzo`;
-  if (note) {
-    note.innerHTML = `Quanto può scendere ogni posizione prima di toccare il proprio stop ratchet 2×ATR. A sinistra dello zero lo stop è già stato superato.
-      ${viol.length ? `<b>${viol.length} ${viol.length === 1 ? "posizione è" : "posizioni sono"} sotto lo stop</b>: ${viol.map(v => esc(v.ticker)).join(", ")}.` : "Nessuna posizione sotto il proprio stop."}
-      ${prov.length ? ` Stop non-ratchet su ${prov.map(p => esc(p.ticker)).join(", ")} (${esc(prov[0].src)}).` : ""}
-      ${sed.size > 1 ? ` <b>⚠ Prezzi da sedute diverse</b> (${[...sed.entries()].map(([d, k]) => `${k} al ${new Date(d + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}`).join(", ")}): una distanza può cambiare per l'arrivo della barra, non per un movimento.` : ""}`;
-  }
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════════════════
    v206 — MACRO IN GRAFICI
    Prima c'erano 34 riquadri della stessa identica forma (7 mini-card + 11 gauge + 16 tile),
@@ -3925,6 +3885,51 @@ function renderStress() {
     : '<div class="muted">Serie di stress non disponibili.</div>';
 }
 
+/* ═══ v225 — L'ANNO COME ROSA CIRCOLARE ═════════════════════════════════════════════════════
+   La stagionalità era 12 barre ordinate: la forma giusta in astratto e illeggibile in pratica,
+   perché la domanda vera non è "quanto rende marzo" ma "in che punto dell'anno siamo, e la
+   stagione che ci aspetta tira su o giù". Un anno è un CERCHIO, e su un cerchio quella domanda
+   si legge senza leggere: i mesi buoni sporgono in fuori dall'anello, quelli cattivi rientrano.
+   Risponde alla richiesta del CEO — "se proprio non ci sono dati crea un tipo di grafico più di
+   impatto" — con la stessa struttura di card dei termometri di stress. */
+function annoCircolare(mesi, cur, opt = {}) {
+  const M = ["G", "F", "M", "A", "M", "G", "L", "A", "S", "O", "N", "D"];
+  const NOMI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+                "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+  const S = 300, c = S / 2, R0 = 78, AMPI = 38;
+  const maxAbs = Math.max(0.5, ...mesi.map(x => Math.abs(x.avg || 0)));
+  const ang = (i) => (i * 30 - 90) * Math.PI / 180;          // -90 = gennaio in cima
+  const P = (r, a) => `${(c + r * Math.cos(a)).toFixed(2)} ${(c + r * Math.sin(a)).toFixed(2)}`;
+  const settori = mesi.map((x, i) => {
+    const v = x.avg || 0;
+    const R1 = R0 + (v / maxAbs) * AMPI;                     // sopra l'anello = mese positivo
+    const a0 = ang(i) + 0.022, a1 = ang(i + 1) - 0.022;
+    const dentro = Math.min(R0, R1), fuori = Math.max(R0, R1);
+    const col = v >= 0 ? "var(--green)" : "var(--red)";
+    const attivo = x.m === cur;
+    return `<path d="M ${P(dentro, a0)} A ${dentro} ${dentro} 0 0 1 ${P(dentro, a1)}
+        L ${P(fuori, a1)} A ${fuori} ${fuori} 0 0 0 ${P(fuori, a0)} Z"
+      fill="${col}" fill-opacity="${attivo ? .95 : .42}"
+      stroke="${attivo ? "var(--text)" : "none"}" stroke-width="${attivo ? 1.6 : 0}">
+      <title>${NOMI[i]}: ${signTxt(v)} in media, ${Math.round(x.pos || 0)}% di anni positivi</title></path>`;
+  }).join("");
+  const etichette = mesi.map((x, i) => {
+    const a = (ang(i) + ang(i + 1)) / 2;
+    const [ex, ey] = P(R0 + AMPI + 16, a).split(" ");
+    return `<text x="${ex}" y="${ey}" text-anchor="middle" dominant-baseline="central" font-size="11"
+      font-weight="${x.m === cur ? 700 : 400}" fill="${x.m === cur ? "var(--text)" : "var(--muted)"}">${M[i]}</text>`;
+  }).join("");
+  const oggi = mesi.find(x => x.m === cur);
+  return `<div class="anno-c"><svg viewBox="0 0 ${S} ${S}" role="img" aria-label="${esc(opt.aria || "stagionalità mese per mese")}">
+    <circle cx="${c}" cy="${c}" r="${R0}" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 3"/>
+    ${settori}${etichette}
+    ${oggi ? `<text x="${c}" y="${c - 12}" text-anchor="middle" font-size="11" fill="var(--muted)">siamo a</text>
+      <text x="${c}" y="${c + 10}" text-anchor="middle" font-size="19" font-weight="700" fill="var(--text)">${NOMI[cur - 1]}</text>
+      <text x="${c}" y="${c + 30}" text-anchor="middle" font-size="14" font-family="var(--mono)"
+        fill="${(oggi.avg || 0) >= 0 ? "var(--green)" : "var(--red)"}">${signTxt(oggi.avg)}</text>` : ""}
+  </svg><div class="anno-legenda muted">fuori dall'anello = mese storicamente positivo · dentro = negativo</div></div>`;
+}
+
 function renderLevaStagione() {
   const m = DATA?.macro || {};
   const box = $("#mg-leva"); if (!box) return;
@@ -3954,10 +3959,7 @@ function renderLevaStagione() {
     carte.push({
       t: "Stagionalità S&P 500", v: `${MESI[(cur || 1) - 1]} · ${se.label || ""}`,
       cls: (se.sp500[(cur || 1) - 1]?.avg ?? 0) < 0 ? "warn" : "pos", largo: true,
-      g: barreOrdinate(se.sp500.map(x => ({
-        nome: MESI[x.m - 1], valore: x.avg, evidenzia: x.m === cur,
-        testo: `${signTxt(x.avg)} · ${Math.round(x.pos)}% mesi positivi`,
-      })), {}),
+      g: annoCircolare(se.sp500, cur, { aria: "stagionalità S&P 500 mese per mese" }),
       n: `Rendimento medio di ogni mese su ~${se.sp500[0]?.n || 40} anni, con il mese corrente acceso. È contesto di probabilità, non una previsione.`,
     });
   }
@@ -4006,7 +4008,7 @@ function renderScomposizione() {
       <div class="muted mg-n" style="margin:0 0 10px">${comp.length} fattori, dal peggiore al migliore.
         Oggi tira giù <b>${esc(peggio.nome)}</b> (${peggio.val}/100) e tiene su <b>${esc(meglio.nome)}</b> (${meglio.val}/100).</div>
       <div class="mg-tris">${righe.map(x => tessera({ t: x.nome, v: `${x.val}<span class="muted" style="font-size:12px">/100</span>`,
-        cls: clsScore(x.val), grafico: misuratore(x.val) })).join("")}</div>
+        cls: clsScore(x.val), grafico: quadrante(x.val, { aria: x.nome }) })).join("")}</div>
     </div>`;
   }).filter(Boolean);
   box.innerHTML = carte.length ? carte.join("")
@@ -4050,7 +4052,7 @@ function renderSignposts() {
     + `<div class="mg-tris" style="margin-top:14px">${righe.map(r => tessera({
         t: r.nome, v: `${r.on}<span class="muted" style="font-size:13px">/${r.list.length}</span>`,
         cls: r.valore >= 70 ? "neg" : r.valore >= 50 ? "warn" : "pos",
-        grafico: misuratore(100 - r.valore, { sx: "tutti accesi", dx: "nessuno acceso", colore: r.colore }),
+        grafico: quadrante(100 - r.valore, { sx: "tutti accesi", dx: "nessuno acceso", colore: r.colore, aria: r.nome }),
         n: r.list.map(x => `<span class="${x.status ? "sp-on" : ""}">${x.status ? "●" : "○"} ${esc(x.name)}</span>`).join("<br>"),
       })).join("")}</div>`
     + `<div class="sp-dettaglio">${righe.map(r => `<div class="sp-cat">
@@ -4209,6 +4211,34 @@ function indicatoriClassifica() {
   }
   orf.forEach(x => out.push(x));
 
+  /* ═══ v225 — ACCORPAMENTO: due tessere per la stessa cosa sono due tessere di troppo ══════
+     Diverse voci misurano la STESSA grandezza con un secondo denominatore, e finivano affiancate
+     come se fossero due letture indipendenti — la classe di difetto che questo progetto insegue
+     da versioni (contare due volte un segnale solo). Qui si fondono in una tessera che porta
+     entrambi i numeri: il punteggio e' quello della voce PRINCIPALE, l'altra diventa contesto. */
+  const FUSIONI = [
+    { p: "in:cpi", s: "in:pce", nome: "Inflazione (CPI e PCE)",
+      sub: (a2, b2) => `CPI ${a2.sub.split(" ")[0]} · PCE ${b2.sub.split(" ")[0]} — due misure della stessa cosa, la Fed guarda il PCE` },
+    { p: "credit", s: "systemic_risk", nome: "Stress del credito",
+      sub: (a2, b2) => `${a2.sub} · stress sistemico ${b2.score}/100 — stessa famiglia, spread HY e IG` },
+    { p: "sp500_pe", s: "forward_pe", nome: "Valutazione S&P (trailing e forward)",
+      sub: (a2, b2) => `${a2.sub} · forward ${b2.sub}` },
+    { p: "corp_profit", s: "decouple", nome: "Borsa vs economia reale",
+      sub: (a2, b2) => `${a2.sub} · e contro il PIL: ${b2.sub} — NON due prove, la stessa su due denominatori` },
+    { p: "in:unemp", s: "in:nfp", nome: "Mercato del lavoro",
+      sub: (a2, b2) => `disoccupazione ${a2.sub.split(" ")[0]} · nuovi posti ${b2.sub.split(" ")[0]}` },
+    { p: "in:curve", s: "yield_recession", nome: "Curva dei tassi 10A-2A",
+      sub: (a2) => `${a2.sub} — sotto zero e' il segnale che conta` },
+  ];
+  for (const f of FUSIONI) {
+    const ip = out.findIndex(x => x.k === f.p), is = out.findIndex(x => x.k === f.s);
+    if (ip < 0 || is < 0) continue;
+    const A = out[ip], B = out[is];
+    A.nome = f.nome;
+    try { A.sub = f.sub(A, B); } catch { /* sub assente: si tiene quello originale */ }
+    out.splice(is, 1);
+  }
+
   // v218 — gli INTERNI DI MERCATO erano l'ultima mini-card: quattro righe di valori con unità
   // diverse (pp, %, un booleano) che nessuno poteva confrontare fra loro. Portati sulla stessa
   // scala 0-100 entrano nella classifica insieme a tutto il resto, e la mini-card sparisce.
@@ -4232,7 +4262,7 @@ function renderIndicatori() {
     t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
     cls: clsScore(r.score), grafico: (() => {
       const se = serieIndicatore(r.k);
-      if (!se) return misuratore(r.score);
+      if (!se) return quadrante(r.score, { aria: r.nome });
       if (se.doppia) return graficoSerie(se.doppia, { h: 108, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome });
       return graficoSerie([{ nome: r.nome, punti: se.punti, colore: scoreColor(r.score) }],
         { h: 108, compatto: true, soglie: se.soglie, unita: se.unita, assex: se.assex, fmtY: se.fmtY,
@@ -4405,13 +4435,12 @@ function ciambella(voci, opt = {}) {
    deve essere un grafico, non devi accorpare tutto". Quindi le liste ordinate (35 indicatori,
    39 fattori, le categorie dei campanelli) si sciolgono in tessere: titolo, valore grande, un
    misuratore che mostra DOVE sta quel valore sulla sua scala, una riga di senso. */
-function misuratore(score, opt = {}) {
-  const v = Math.max(0, Math.min(100, score));
-  return `<div class="mis"><div class="mis-track">
-      <div class="mis-fill" style="width:${v}%;background:${opt.colore || scoreColor(v)}"></div>
-      <div class="mis-neutro" style="left:${opt.neutro ?? 50}%"></div>
-    </div><div class="mis-scala"><span>${esc(opt.sx || "sfavorevole")}</span><span>${esc(opt.dx || "favorevole")}</span></div></div>`;
-}
+/* v225 — `misuratore()` RIMOSSA. Era la barra 0-100 orizzontale: l'ultima forma che il CEO ha
+   respinto ("vedo ancora tante barre, voglio i grafici"). Sostituita ovunque da `quadrante()`,
+   un arco con lancetta — la posizione dell'ago si legge senza decodificare una scala.
+   RICEVUTA DEL TAGLIO, scritta PRIMA di tagliare (regola v201-v204): 2 chiamanti, entrambi
+   convertiti (renderScomposizione, renderSignposts); 0 riferimenti nei test; dentro i confini
+   del blocco rimosso non vive nessun'altra funzione — il vicino a valle, tessera(), e' intatto. */
 function tessera({ t, v, cls, grafico, n, tk }) {
   return `<div class="mg-card${tk ? " mg-click" : ""}"${tk ? ` data-tess-tk="${esc(tk)}" role="button" tabindex="0"` : ""}>
     <div class="mg-card-head"><span class="mg-t">${esc(t)}</span><span class="mg-v ${cls || ""}">${v}</span></div>
@@ -4488,13 +4517,203 @@ function serieIndicatore(k) {
   }
 }
 
+/* ═══ v225 — IL QUADRANTE: per chi non ha una serie, un grafico che si legge in un istante ══
+   Il misuratore era ancora una BARRA, e il CEO ha ragione: fra 28 barre uguali non si legge
+   niente al volo. Un quadrante ad arco con la lancetta si interpreta senza pensarci — la
+   posizione dell'ago È il messaggio — ed è diverso a colpo d'occhio da una linea nel tempo,
+   quindi si capisce subito quali indicatori hanno uno storico e quali no. */
+function quadrante(score, opt = {}) {
+  const v = Math.max(0, Math.min(100, score));
+  const col = opt.colore || scoreColor(v);
+  const W = 180, H = 104, cx = 90, cy = 92, R = 74, sp = 15;
+  const P = (r, a) => `${(cx + r * Math.cos(a)).toFixed(2)},${(cy - r * Math.sin(a)).toFixed(2)}`;
+  const arco = (da, a, raggio, largo) => `M ${P(raggio, da)} A ${raggio} ${raggio} 0 ${largo} 0 ${P(raggio, a)}`;
+  const ang = (pct) => Math.PI * (1 - pct / 100);
+  // fondo grigio + arco colorato fino al valore
+  const fondo = `<path d="${arco(Math.PI, 0, R, 0)}" fill="none" stroke="var(--card)" stroke-width="${sp}" stroke-linecap="round"/>`;
+  const pieno = `<path d="${arco(Math.PI, ang(v), R, v > 50 ? 0 : 0)}" fill="none" stroke="${col}" stroke-width="${sp}" stroke-linecap="round"/>`;
+  // tacche a 25/50/75 per dare riferimento senza scrivere numeri
+  const tacche = [25, 50, 75].map(t => {
+    const a = ang(t);
+    return `<line x1="${P(R - sp / 2 - 1, a).split(",")[0]}" y1="${P(R - sp / 2 - 1, a).split(",")[1]}"
+      x2="${P(R + sp / 2 + 1, a).split(",")[0]}" y2="${P(R + sp / 2 + 1, a).split(",")[1]}"
+      stroke="var(--bg)" stroke-width="${t === 50 ? 2 : 1.2}" opacity="${t === 50 ? .9 : .5}"/>`;
+  }).join("");
+  // lancetta
+  const a = ang(v);
+  const lanc = `<line x1="${cx}" y1="${cy}" x2="${P(R - 4, a).split(",")[0]}" y2="${P(R - 4, a).split(",")[1]}"
+      stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="4.5" fill="${col}"/>`;
+  return `<div class="quad"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.aria || "punteggio")} ${v} su 100">
+      ${fondo}${pieno}${tacche}${lanc}
+      <text x="14" y="${H - 2}" font-size="9" fill="var(--muted)">${esc(opt.sx || "sfavorevole")}</text>
+      <text x="${W - 14}" y="${H - 2}" text-anchor="end" font-size="9" fill="var(--muted)">${esc(opt.dx || "favorevole")}</text>
+    </svg></div>`;
+}
+
+/* ═══ v225 — L'ORDINE DELLE SEZIONI, TRASCINABILE E UGUALE SU OGNI DEVICE ═══════════════════
+   Richiesta CEO: "dammi la possibilità di trascinarli per ordinarli e se lo faccio questo deve
+   essere salvato cosicché l'ordine rimanga a prescindere se apro la pagina da mac o iphone".
+
+   Tre decisioni, ognuna con una ragione già pagata in questo progetto:
+
+   1. LA CHIAVE E' `data-sez`, NON IL TITOLO NE' L'INDICE. Accoppiare due cose per il loro nome
+      visibile e' fragile per costruzione (v196); per indice invecchia da solo (C10, red team
+      I6). Una sezione nuova non sposta niente: finisce in coda (stessa regola di v191).
+   2. SI PERMUTANO LE POSIZIONI, NON SI SPOSTANO GLI ELEMENTI NEL DOM LIBERAMENTE. Le sezioni di
+      un pane non sono contigue e ci sono elementi senza `data-pane` che devono restare dove
+      sono. Si piantano dei segnaposto nelle posizioni attuali e ci si rimettono dentro le
+      sezioni nell'ordine nuovo: cio' che non e' una sezione del pane non si muove mai.
+   3. POINTER EVENTS, NON HTML5 DRAG-AND-DROP. Il drag HTML5 non esiste su Safari touch — il CEO
+      trascinava e non succedeva nulla (v193). Le frecce ▲▼ restano come seconda strada, e
+      passano dalla STESSA funzione: due percorsi separati divergerebbero.
+
+   La persistenza e' quella gia' collaudata per cap/veto (v-risk_params): file nel repo via
+   Contents API. localStorage da solo NON soddisfa la richiesta — e' per-browser, quindi Mac e
+   iPhone resterebbero diversi, che e' esattamente il difetto corretto sui parametri di rischio. */
+const SEZ_ORDER_PATH = "config/ui_order.json";
+const SEZ_ORDER_KEY = "sezioni_ordine";
+
+function caricaOrdineSezioni() {
+  try { const o = JSON.parse(localStorage.getItem(SEZ_ORDER_KEY) || "{}"); return (o && typeof o === "object") ? o : {}; }
+  catch { return {}; }
+}
+
+function sezioniDelPane(pane) {
+  const main = document.querySelector(".shell-main"); if (!main) return [];
+  return [...main.children].filter(el => el.matches?.(`section[data-sez][data-pane="${pane}"]`));
+}
+
+/* Rimette le sezioni di un pane nelle POSIZIONI che occupano adesso, ma nell'ordine chiesto.
+   I segnaposto sono commenti: invisibili, non impaginano, e ancorano una posizione che non si
+   sposta mentre si muovono gli elementi. */
+function disponiSezioni(pane, chiavi) {
+  const lista = sezioniDelPane(pane);
+  if (lista.length < 2) return;
+  const noti = chiavi.map(k => lista.find(el => el.dataset.sez === k)).filter(Boolean);
+  const resto = lista.filter(el => !noti.includes(el));          // sezioni nuove → in coda
+  const nuovo = [...noti, ...resto];
+  if (nuovo.every((el, i) => el === lista[i])) return;           // gia' cosi': non toccare il DOM
+  const ancore = lista.map(el => { const c = document.createComment("sez"); el.replaceWith(c); return c; });
+  nuovo.forEach((el, i) => ancore[i].after(el));
+  ancore.forEach(c => c.remove());
+}
+
+function applicaOrdineSezioni() {
+  const ord = caricaOrdineSezioni();
+  for (const pane of Object.keys(ord)) if (Array.isArray(ord[pane])) disponiSezioni(pane, ord[pane]);
+}
+
+function salvaOrdineSezioni(pane) {
+  const ord = caricaOrdineSezioni();
+  ord[pane] = sezioniDelPane(pane).map(el => el.dataset.sez);
+  ord._savedAt = new Date().toISOString();
+  try { localStorage.setItem(SEZ_ORDER_KEY, JSON.stringify(ord)); } catch { /* quota */ }
+  if (localStorage.getItem("gh_token")) pushOrdineSezioniCloud(ord);
+  else toast("Ordine salvato solo su questo browser: senza token GitHub non arriva su iPhone");
+}
+
+async function pushOrdineSezioniCloud(ord) {
+  const token = localStorage.getItem("gh_token");
+  if (!token) return;
+  try {
+    let sha;
+    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${SEZ_ORDER_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
+    if (g.ok) sha = (await g.json()).sha;
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${SEZ_ORDER_PATH}`, {
+      method: "PUT", headers: ghHeaders(token),
+      body: JSON.stringify({ message: "Ordine sezioni dashboard (da dashboard)", content: btoa(unescape(encodeURIComponent(JSON.stringify(ord, null, 1)))), sha }),
+    });
+    toast(r.ok ? "Ordine salvato — sarà lo stesso su Mac e iPhone" : "Ordine salvato in locale: GitHub ha rifiutato la scrittura");
+  } catch { toast("Ordine salvato in locale: nessuna rete verso GitHub"); }
+}
+
+async function loadOrdineSezioniCloud() {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${SEZ_ORDER_PATH}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return;
+    const cloud = await r.json();
+    if (!cloud || typeof cloud !== "object") return;
+    const local = caricaOrdineSezioni();
+    if ((cloud._savedAt || "") > (local._savedAt || "")) {      // vince il piu' recente
+      localStorage.setItem(SEZ_ORDER_KEY, JSON.stringify(cloud));
+      applicaOrdineSezioni();
+    }
+  } catch { /* nessun file remoto: vale l'ordine di index.html */ }
+}
+
+/* ── i comandi: una maniglia per trascinare, due frecce per chi trascina male (o su iPhone) ── */
+function montaComandiSezioni() {
+  document.querySelectorAll(".shell-main > section[data-sez]").forEach(sez => {
+    if (sez.querySelector(":scope > .sez-cmd")) return;
+    const c = document.createElement("div");
+    c.className = "sez-cmd";
+    c.innerHTML = `<button class="sez-grip" type="button" aria-label="Trascina per spostare la sezione" title="Trascina per spostare">⠿</button>
+      <button class="sez-su" type="button" aria-label="Sposta la sezione in su" title="Sposta in su">▲</button>
+      <button class="sez-giu" type="button" aria-label="Sposta la sezione in giù" title="Sposta in giù">▼</button>`;
+    sez.prepend(c);
+    c.querySelector(".sez-su").addEventListener("click", () => spostaSezione(sez, -1));
+    c.querySelector(".sez-giu").addEventListener("click", () => spostaSezione(sez, +1));
+    c.querySelector(".sez-grip").addEventListener("pointerdown", e => iniziaTrascinamento(e, sez));
+  });
+}
+
+/* UNICA strada per applicare un ordine nuovo: frecce e trascinamento passano entrambe di qui. */
+function spostaSezione(sez, delta) {
+  const pane = sez.dataset.pane;
+  const lista = sezioniDelPane(pane);
+  const i = lista.indexOf(sez), j = i + delta;
+  if (i < 0 || j < 0 || j >= lista.length) return;
+  lista.splice(j, 0, lista.splice(i, 1)[0]);
+  disponiSezioni(pane, lista.map(el => el.dataset.sez));
+  salvaOrdineSezioni(pane);
+  sez.scrollIntoView({ block: "nearest" });
+}
+
+function iniziaTrascinamento(e, sez) {
+  if (e.button > 0) return;
+  e.preventDefault();                       // su touch impedisce che il gesto diventi uno scroll
+  const pane = sez.dataset.pane;
+  const main = document.querySelector(".shell-main");
+  let ordine = sezioniDelPane(pane);
+  if (ordine.length < 2) return;
+  /* Mentre si trascina le card si riducono alla loro intestazione: una card alta 600px farebbe
+     saltare il layout a ogni scambio e costringerebbe a scorrere per vedere dove si sta
+     lasciando. Cosi' l'elenco del pane sta tutto sullo schermo, anche su iPhone. */
+  main.classList.add("in-riordino");
+  sez.classList.add("sez-trascinata");
+  const grip = e.currentTarget;
+  try { grip.setPointerCapture(e.pointerId); } catch { /* browser senza capture */ }
+
+  const muovi = ev => {
+    const y = ev.clientY;
+    const altri = ordine.filter(x => x !== sez);
+    const idx = altri.filter(x => { const r = x.getBoundingClientRect(); return r.top + r.height / 2 < y; }).length;
+    altri.splice(idx, 0, sez);
+    if (altri.some((el, i) => el !== ordine[i])) {
+      ordine = altri;
+      disponiSezioni(pane, ordine.map(el => el.dataset.sez));
+    }
+  };
+  const finisci = () => {
+    grip.removeEventListener("pointermove", muovi);
+    grip.removeEventListener("pointerup", finisci);
+    grip.removeEventListener("pointercancel", finisci);
+    main.classList.remove("in-riordino");
+    sez.classList.remove("sez-trascinata");
+    salvaOrdineSezioni(pane);
+  };
+  grip.addEventListener("pointermove", muovi);
+  grip.addEventListener("pointerup", finisci);
+  grip.addEventListener("pointercancel", finisci);
+}
+
 function renderStruttura() {
   if (!DATA) return;
   attivaHoverGrafici();
   renderConcentrazione();
   renderDeriva();
   renderAllocGrafica();
-  renderStopDist();
   renderVsBenchmark();   // v214 — il fondo contro il suo indice
 }
 
@@ -8968,6 +9187,9 @@ loadData();
 loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
 loadPromptHeaderCloud();   // sincronizza la testata del prompt dal server (config/prompt_header.txt)
 loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
+montaComandiSezioni();   // maniglia ⠿ + frecce ▲▼ su ogni sezione
+applicaOrdineSezioni();  // ordine gia' noto a questo browser: subito, senza aspettare la rete
+loadOrdineSezioniCloud();// e poi quello del repo, se piu' recente → Mac e iPhone allineati
 loadRiskParamsCloud();   // sincronizza i parametri di rischio del CEO (config/risk_params.json) — cap/veto uguali su ogni device
 initRiskEditor();       // editor soglie di rischio (v143): select+valore+spiegazione
 // ricarica completa (tecnici, news, storico) ogni 5 minuti

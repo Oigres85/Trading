@@ -1555,11 +1555,101 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     ["grafico concentrazione", 'id="conc-chart"'],
     ["deriva della concentrazione", 'id="drift-chart"'],
     ["allocazione grafica", 'id="allocg-chart"'],
-    ["distanza dallo stop", 'id="stopdist-chart"'],
+    // v225 — "distanza dallo stop" e' stata rimossa su richiesta del CEO. La guardia NON si
+    // cancella: si sposta sulla tabella del portafoglio, che e' l'elemento portante rimasto in
+    // quel riquadro. (distanzeStop() sopravvive e continua a essere verificata piu' sopra.)
+    ["tabella portafoglio", 'id="ptf-table"'],
   ];
   const mancanti = richiesti.filter(([, sel]) => !html.includes(sel)).map(([n]) => n);
   check("v204 struttura: nessun elemento portante è sparito da index.html", mancanti.length === 0);
   if (mancanti.length) console.log("  ⚠ elementi portanti mancanti:", mancanti.join(", "));
+}
+
+/* ═══ v225 — I TAG DI index.html DEVONO BILANCIARSI ═════════════════════════════════════════
+   Difetto trovato in v225, e nessuno dei 180 check lo vedeva: un </div> ORFANO a meta' pagina,
+   residuo del blocco <details> tolto in v215/v218. Non e' cosmetico. Il parser HTML, davanti a
+   un </div> di troppo, chiude il primo div APERTO in scope — cioe' .shell-main. Misurato sul
+   sito vivo prima della correzione: 8 sezioni su 18 finivano come figlie dirette di .shell, che
+   e' una griglia 178px | 1038px, e su Portafoglio le card si alternavano fra le due colonne
+   ("Peso delle posizioni" disegnato largo 178px, dentro la colonna della barra laterale).
+   E' la "sovrapposizione del testo" segnalata due volte dal CEO: la causa non era nel CSS.
+
+   Perche' serve un gate e non l'attenzione: l'HTML malformato NON produce nessun errore. Il
+   browser ripara in silenzio, la console resta pulita, i test sulle funzioni pure passano tutti.
+   Stessa famiglia di .abar-fill senza display:block (v205) — un difetto che non si rompe.
+
+   Il secondo check e' quello che conta davvero: ogni sezione con data-pane deve essere figlia
+   DIRETTA di .shell-main, perche' e' li' che vivono l'impaginazione e il riordino v225. */
+{
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const VUOTI = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"]);
+  const pulito = html
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "<script></script>")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "<style></style>");
+  /* Scanner a CARATTERI, non a regex: il favicon di questa pagina e' un data-URI che contiene
+     <svg …><rect/><text>T</text></svg> DENTRO un attributo. Una regex sui tag lo legge come
+     markup vero e denuncia uno sbilanciamento che non esiste — la prima stesura di questa
+     guardia ha fatto esattamente questo. Qui le virgolette degli attributi si rispettano. */
+  const pila = [], errori = [], fuoriPosto = [];
+  const rigaDi = (k) => (pulito.slice(0, k).match(/\n/g) || []).length + 1;
+  for (let k = 0; k < pulito.length; k++) {
+    if (pulito[k] !== "<") continue;
+    const chiude = pulito[k + 1] === "/";
+    const nome = /^[a-zA-Z]/.test(pulito[k + (chiude ? 2 : 1)] || "");
+    if (!nome) continue;                                  // <!DOCTYPE, <! …: non sono elementi
+    let q = 0, e = k + 1;
+    for (; e < pulito.length; e++) {                      // trova il > che chiude DAVVERO il tag
+      const c = pulito[e];
+      if (q) { if (c === q) q = 0; continue; }
+      if (c === '"' || c === "'") { q = c; continue; }
+      if (c === ">") break;
+    }
+    const grezzo = pulito.slice(k, e + 1);
+    const t = (grezzo.match(/^<\/?([a-zA-Z][a-zA-Z0-9]*)/) || [, ""])[1].toLowerCase();
+    const auto = /\/>$/.test(grezzo);
+    const riga = rigaDi(k);
+    k = e;
+    if (VUOTI.has(t) || auto) continue;
+    if (!chiude) {
+      if (t === "section" && /data-pane=/.test(grezzo)) {  // deve nascere dentro .shell-main
+        const g = pila[pila.length - 1];
+        if (!g || !/class="shell-main"/.test(g.attr)) fuoriPosto.push(`riga ${riga} dentro <${g ? g.t : "?"}>`);
+      }
+      pila.push({ t, attr: grezzo, riga });
+    } else {
+      if (!pila.length) { errori.push(`</${t}> di troppo a riga ${riga}: non c'e' niente di aperto`); continue; }
+      const apre = pila[pila.length - 1];
+      if (apre.t !== t) {
+        errori.push(`</${t}> a riga ${riga} chiude <${apre.t}> aperto a riga ${apre.riga}`);
+        const idx = pila.map(x => x.t).lastIndexOf(t);
+        if (idx < 0) continue;                            // orfano puro: si ignora e si prosegue
+        pila.length = idx;                                // il browser poppa fino al tag: idem qui
+      } else pila.pop();
+    }
+  }
+  const aperti = pila.map(x => `<${x.t}> a riga ~${x.riga}`);
+  check("v225 index.html: i tag si bilanciano (nessun </div> orfano che chiuda .shell-main)",
+    errori.length === 0 && aperti.length === 0);
+  if (errori.length) console.log("  ⚠ tag sbilanciati:", errori.slice(0, 5).join(" · "));
+  if (aperti.length) console.log("  ⚠ rimasti aperti:", aperti.slice(0, 5).join(" · "));
+
+  check("v225 index.html: ogni sezione con data-pane è figlia diretta di .shell-main",
+    fuoriPosto.length === 0);
+  if (fuoriPosto.length) console.log("  ⚠ sezioni fuori posto:", fuoriPosto.join(" · "));
+
+  // v225 — le chiavi del riordino: stabili, uniche, e presenti su OGNI sezione di pane.
+  // Se una sezione ne resta priva non e' trascinabile e non entra nell'ordine salvato; se due
+  // la condividono, spostarne una sposta l'altra. Nessuna delle due cose fa rumore da sola.
+  const sez = [...html.matchAll(/<section\b[^>]*\bdata-pane="([a-z]+)"[^>]*>/g)].map(m => m[0]);
+  const chiavi = sez.map(t => (t.match(/data-sez="([^"]+)"/) || [])[1]);
+  check("v225 riordino: ogni sezione di pane ha una chiave data-sez, tutte distinte",
+    sez.length >= 15 && chiavi.every(Boolean) && new Set(chiavi).size === chiavi.length);
+
+  // e la chiave deve essere una CHIAVE, non il titolo: se domani si rinomina una sezione
+  // l'ordine salvato dal CEO non deve andare perso (lezione v196).
+  check("v225 riordino: il modulo legge data-sez e non il titolo della sezione",
+    /dataset\.sez/.test(src) && !/\.sez\b.*querySelector\("h2"\)/.test(src));
 }
 
 /* ---------- report ----------

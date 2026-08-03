@@ -18,7 +18,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=224">
+<link rel="stylesheet" href="assets/style.css?v=225">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -81,15 +81,15 @@
 
   <!-- ═══ v212 — STRUTTURA = SOLO LA VARIANZA (richiesta CEO "nella struttura lascia solo
        varianza"). Restano i due grafici che SONO la varianza: la sua ripartizione fra le
-       posizioni oggi, e la stessa quota nel tempo. Allocazione e Distanza dallo stop non sono
-       state buttate — parlano di posizioni, quindi sono passate in Portafoglio.
+       posizioni oggi, e la stessa quota nel tempo. Allocazione e' passata in Portafoglio perche' parla di posizioni;
+       Distanza dallo stop e' stata rimossa in v225 (la lettura resta nel conteggio stop violati).
        ═══ v205 — STRUTTURA DEL LIBRO ═══════════════════════════════════════════════════════
        Il vincolo che decide questa vista: i dati arrivano su cron (GitHub Actions), non
        tick-by-tick. Quindi NIENTE GRAFICI DI PREZZO — investing.com e TradingView li fanno
        meglio e in tempo reale. Qui si disegna solo ciò che nessuno dei due può disegnare,
-       perché nessuno dei due conosce il libro: concentrazione, correlazione, deriva,
-       allocazione, distanza dagli stop. -->
-  <section class="card" data-pane="struttura">
+       perché nessuno dei due conosce il libro: concentrazione, correlazione, deriva
+       e allocazione. -->
+  <section class="card" data-pane="struttura" data-sez="concentrazione">
     <div class="card-head">
       <h2>Concentrazione — peso contro rischio</h2>
       <span class="muted" id="conc-basis"></span>
@@ -99,7 +99,7 @@
     <div class="muted struct-note" id="conc-note"></div>
   </section>
 
-<section class="card" data-pane="struttura">
+<section class="card" data-pane="struttura" data-sez="deriva">
     <div class="card-head">
       <h2>Deriva della concentrazione</h2>
       <span class="muted" id="drift-basis"></span>
@@ -108,7 +108,7 @@
     <div class="muted struct-note" id="drift-note"></div>
   </section>
 
-<section class="card" data-pane="struttura">
+<section class="card" data-pane="struttura" data-sez="benchmark">
     <div class="card-head">
       <h2>Il fondo contro il suo indice</h2>
       <div class="spark-toggle" id="bench-toggle" role="group" aria-label="Orizzonte del confronto">
@@ -122,7 +122,7 @@
     <div class="muted struct-note" id="bench-note"></div>
   </section>
 
-<section class="card" data-pane="struttura">
+<section class="card" data-pane="struttura" data-sez="rotazione">
     <div class="card-head">
       <h2>Rotazione — dove si muove il denaro</h2>
       <div class="spark-toggle" id="rot-toggle" role="group" aria-label="Orizzonte della rotazione">
@@ -135,7 +135,7 @@
     <div class="muted struct-note" id="mg-rot-note"></div>
   </section>
 
-<section class="card" data-pane="struttura">
+<section class="card" data-pane="struttura" data-sez="stress">
     <div class="card-head">
       <h2>Termometri di stress</h2>
       <span class="muted">curva dei tassi · credito · volatilità, con le loro soglie</span>
@@ -143,7 +143,7 @@
     <div class="mg-tris" id="mg-stress"></div>
   </section>
 
-<section class="card" data-pane="struttura">
+<section class="card" data-pane="struttura" data-sez="leva">
     <div class="card-head">
       <h2>Leva e stagionalità</h2>
       <span class="muted">quanto denaro a prestito c'è nel mercato, e che mese è</span>
@@ -151,7 +151,7 @@
     <div class="mg-tris" id="mg-leva"></div>
   </section>
 
-<section class="card" data-pane="struttura">
+<section class="card" data-pane="struttura" data-sez="scomposizione">
     <div class="card-head">
       <h2>Da cosa nascono i punteggi</h2>
       <span class="muted">un numero 0-100 da solo non dice niente: qui si vede chi lo tira giù</span>
@@ -159,7 +159,7 @@
     <div class="mg-tris" id="mg-scomposizione"></div>
   </section>
 
-<section class="card" data-pane="struttura">
+<section class="card" data-pane="struttura" data-sez="campanelli">
     <div class="card-head">
       <h2>Campanelli d'allarme</h2>
       <span class="muted" id="mg-sign-head"></span>
@@ -168,7 +168,7 @@
     <div class="muted struct-note" id="mg-sign-note"></div>
   </section>
 
-<section class="card" data-pane="struttura">
+<section class="card" data-pane="struttura" data-sez="classifica">
     <div class="card-head">
       <h2>Tutti gli indicatori, una classifica sola</h2>
       <span class="muted">stesso asse 0-100 · clicca una barra per il dettaglio</span>
@@ -178,7 +178,7 @@
     <div class="muted struct-note" id="mg-tutti-note"></div>
   </section>
 
-<section class="card" data-pane="struttura">
+<section class="card" data-pane="struttura" data-sez="macro">
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
     <!-- v219 — bottone "Dettagli macro" RIMOSSO su richiesta del CEO. Il popup a 39 pannelli
          era una seconda pagina dentro la pagina. I singoli pannelli NON sono persi: si aprono
@@ -194,7 +194,12 @@
     <!-- v218 — ULTIMA MINI-CARD RIMOSSA. "Interni di mercato" erano quattro righe di valori con
          unità diverse (pp, %, un booleano): ora stanno nella classifica unica, sulla stessa
          scala 0-100 di tutto il resto, dove si possono finalmente confrontare. -->
-    </div>
+    <!-- v225 — QUI C'ERA UN </div> ORFANO, residuo del blocco <details> tolto in v215/v218.
+         Non era cosmetico: il parser HTML chiude il primo div APERTO in scope, cioe' .shell-main,
+         quindi 8 sezioni su 18 finivano fuori, come figlie dirette di .shell — che e' una griglia
+         a due colonne (178px | 1038px). Misurato sul sito vivo: su Portafoglio le sezioni si
+         alternavano 1038px / 178px, cioe' "Peso delle posizioni" veniva disegnato dentro la
+         colonna della barra laterale. E' la sovrapposizione segnalata due volte dal CEO. -->
     <div class="macro-news">
       <div class="macro-news-head"><h3>News — portafoglio &amp; macro USA</h3><span class="muted">clicca la sintesi per tutte le notizie</span></div>
       <div id="news-summary" tabindex="0" role="button" title="Clicca per leggere tutte le notizie"></div>
@@ -216,13 +221,13 @@
   
 
   <!-- PATRIMONIO -->
-  <section class="card kpi-card" data-pane="portafoglio">
+  <section class="card kpi-card" data-pane="portafoglio" data-sez="patrimonio">
     <section class="kpi-grid kpi-compact" id="kpi-grid"></section>
     <div id="profit-by-currency"></div>
   </section>
 
   <!-- ALLOCAZIONE: solo torta + legenda laterale + liquidità -->
-  <section class="card" data-pane="portafoglio">
+  <section class="card" data-pane="portafoglio" data-sez="peso">
     <div class="card-head">
       <h2>Peso delle posizioni</h2>
       <button class="btn btn-ghost btn-sm" id="alloc-edit" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica</button>
@@ -273,7 +278,7 @@
   
 
 
-<section class="card" data-pane="portafoglio">
+<section class="card" data-pane="portafoglio" data-sez="allocazione">
     <div class="card-head">
       <h2>Allocazione per settore e valuta</h2>
       <div class="spark-toggle" id="alloc-graf-toggle" role="group" aria-label="Vista allocazione grafica">
@@ -285,14 +290,11 @@
     <div class="muted struct-note" id="allocg-note"></div>
   </section>
 
-<section class="card" data-pane="portafoglio">
-    <div class="card-head">
-      <h2>Distanza dallo stop</h2>
-      <span class="muted" id="stop-basis"></span>
-    </div>
-    <div id="stopdist-chart"></div>
-    <div class="muted struct-note" id="stopdist-note"></div>
-  </section>
+<!-- v225 — "Distanza dallo stop" RIMOSSA su richiesta esplicita del CEO. RICEVUTA: spariscono
+     il riquadro e renderStopDist(); NON sparisce distanzeStop(), che resta la fonte del conteggio
+     "stop violati" dentro renderConcentrazione() e di due check in test_app.mjs. Il fatto che uno
+     stop sia superato continua quindi ad arrivare al payload e alla vista: si e' tolto il disegno,
+     non l'informazione. -->
 
   <!-- v214 — LA DOMANDA DEL MANDATO: il fondo sta battendo il suo indice? Era un tachimetro in
        una mini-card che mostrava lo scarto di UN GIORNO; la serie di 66 date esisteva e non era
@@ -302,7 +304,7 @@
 
 
   <!-- PORTAFOGLIO -->
-  <section class="card" data-pane="portafoglio">
+  <section class="card" data-pane="portafoglio" data-sez="tabella-ptf">
     <div class="card-head">
       <h2>Portafoglio — tecnica, prezzi e fondamentali</h2>
       <button class="btn btn-primary btn-sm" id="ptf-add-top" title="Aggiungi un titolo al portafoglio con quantità e PMC">+ Aggiungi titolo</button>
@@ -357,7 +359,7 @@
   </section>
 
   <!-- WATCHLIST -->
-  <section class="card" data-pane="watchlist">
+  <section class="card" data-pane="watchlist" data-sez="tabella-wl">
     <div class="card-head">
       <h2>Watchlist</h2>
       <button class="btn btn-primary btn-sm" id="wl-add-top" aria-label="Cerca e aggiungi un titolo alla watchlist" title="Cerca e aggiungi un titolo">+ Aggiungi titolo</button>
@@ -407,7 +409,7 @@
   </section>
 
   <!-- PARAMETRI DI RISCHIO DEL FONDO (v122): regole attive lette in tempo reale dai dati -->
-  <section class="card" id="risk-params-card" data-pane="rischio">
+  <section class="card" id="risk-params-card" data-pane="rischio" data-sez="parametri">
     <div class="card-head">
       <h2>Parametri di Rischio del Fondo</h2>
       <span class="muted rp-legend"><span class="rp-dot rp-red"></span>protezione capitale <span class="rp-dot rp-yellow"></span>dimensionamento <span class="rp-dot rp-green"></span>segnali</span>
@@ -427,7 +429,7 @@
   </section>
 
   <!-- STRUMENTI (compatti) -->
-  <section class="card" data-pane="rischio">
+  <section class="card" data-pane="rischio" data-sez="strumenti">
     <div class="card-head"><h2>Strumenti</h2></div>
     <div class="tools-btns tools-btns-row">
       <button class="btn btn-ghost tool-btn" id="open-pmc">Calcolatore PMC<span class="muted">mediazione acquisto / realizzo vendita</span></button>
@@ -550,6 +552,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=224"></script>
+<script src="assets/app.js?v=225"></script>
 </body>
 </html>
