@@ -3086,6 +3086,29 @@ def clean_nan(obj):
     return obj
 
 
+def _macro_scores(macro):
+    """Punteggi 0-100 di ogni indicatore macro, per accumularne lo storico (v224).
+
+    Le chiavi coincidono con quelle usate dalla dashboard (`in:<key>` per gli indicatori USA,
+    `mk:<key>` per i mercati, il nome nudo per i compositi), cosi' la UI li ritrova senza una
+    seconda tabella di corrispondenze da tenere allineata — il tipo di registro che in questo
+    progetto e' gia' costato caro (C10).
+    """
+    out = {}
+    for k in ("fear_greed", "risk_sentiment", "credit", "systemic_risk", "corp_profit",
+              "sp500_pe", "smart_money", "macroquant", "seasonality", "thermometer"):
+        v = (macro.get(k) or {}).get("score")
+        if isinstance(v, (int, float)):
+            out[k] = round(float(v))
+    for i in macro.get("indicators") or []:
+        if isinstance(i.get("impact"), (int, float)):
+            out["in:" + i["key"]] = round(float(i["impact"]))
+    sp = macro.get("signposts") or {}
+    if isinstance(sp.get("pct"), (int, float)):
+        out["signposts"] = round(100 - float(sp["pct"]))
+    return out
+
+
 def compute_risk_metrics(rows, watch_rows=None):
     """Motore di rischio istituzionale sul pannello dei LOG-rendimenti giornalieri allineati (12M).
     Pesi = controvalore ATTUALE mark-to-market (mai il costo storico). Calcola e annota:
@@ -3454,6 +3477,13 @@ def main():
         "titles": {r["ticker"]: {"rs": r.get("rs_ndx_1m"), "mcr": r.get("risk_contrib_pct")}
                    for r in equities
                    if r.get("qty") and (r.get("rs_ndx_1m") is not None or r.get("risk_contrib_pct") is not None)},
+        # v224 — STORICO DEGLI INDICATORI MACRO. La dashboard mostra ogni indicatore come una
+        # tessera con la sua linea nel tempo, ma per la maggior parte (CPI, PCE, NFP, UMich,
+        # i mercati, i compositi) data.json porta SOLO il valore di oggi: una linea da un punto
+        # non si disegna, e fingerla sarebbe peggio che non averla. Da qui in avanti il punteggio
+        # di ogni indicatore viene salvato giorno per giorno insieme al resto: appena ci sono due
+        # rilevazioni la linea compare da sola, senza toccare la UI.
+        "macro_scores": _macro_scores(macro),
     }
     metrics_history = [p for p in prev_hist if p.get("date") != today]
     metrics_history.append(point)

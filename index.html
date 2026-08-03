@@ -18,7 +18,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=223">
+<link rel="stylesheet" href="assets/style.css?v=224">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -97,6 +97,15 @@
     <div class="struct-headline" id="conc-headline"></div>
     <div id="conc-chart"></div>
     <div class="muted struct-note" id="conc-note"></div>
+  </section>
+
+<section class="card" data-pane="struttura">
+    <div class="card-head">
+      <h2>Deriva della concentrazione</h2>
+      <span class="muted" id="drift-basis"></span>
+    </div>
+    <div id="drift-chart"></div>
+    <div class="muted struct-note" id="drift-note"></div>
   </section>
 
 <section class="card" data-pane="struttura">
@@ -290,14 +299,7 @@
        disegnata da nessuna parte. -->
   
 
-<section class="card" data-pane="portafoglio">
-    <div class="card-head">
-      <h2>Deriva della concentrazione</h2>
-      <span class="muted" id="drift-basis"></span>
-    </div>
-    <div id="drift-chart"></div>
-    <div class="muted struct-note" id="drift-note"></div>
-  </section>
+
 
   <!-- PORTAFOGLIO -->
   <section class="card" data-pane="portafoglio">
@@ -548,6 +550,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=223"></script>
+<script src="assets/app.js?v=224"></script>
 </body>
 </html>

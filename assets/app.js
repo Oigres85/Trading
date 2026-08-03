@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "223";
+const BUILD_VERSION = "224";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4230,7 +4230,15 @@ function renderIndicatori() {
   const conPan = new Set(Object.keys(MACRO_INFO || {}));
   box.innerHTML = `<div class="mg-tris">${righe.map(r => tessera({
     t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
-    cls: clsScore(r.score), grafico: misuratore(r.score), n: esc(r.sub || ""),
+    cls: clsScore(r.score), grafico: (() => {
+      const se = serieIndicatore(r.k);
+      if (!se) return misuratore(r.score);
+      if (se.doppia) return graficoSerie(se.doppia, { h: 108, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome });
+      return graficoSerie([{ nome: r.nome, punti: se.punti, colore: scoreColor(r.score) }],
+        { h: 108, compatto: true, soglie: se.soglie, unita: se.unita, assex: se.assex, fmtY: se.fmtY,
+          etichetteDx: false, aria: r.nome });
+    })(),
+    n: esc(r.sub || "") + (serieIndicatore(r.k) ? "" : ' <span class="muted">· nessuno storico nel file per questa voce: la pipeline ha iniziato ad accumularlo</span>'),
     tk: conPan.has(r.k) ? r.k : null,
   })).join("")}</div>`;
   agganciaTessere(box);
@@ -4417,6 +4425,68 @@ function agganciaTessere(box) {
   });
 }
 const clsScore = (v) => v < 40 ? "neg" : v < 55 ? "warn" : "pos";
+
+/* ═══ v224 — LA SERIE DIETRO OGNI INDICATORE ══════════════════════════════════════════════
+   Il CEO vuole che ogni tessera abbia un grafico come la Curva 10A-2A: una linea nel tempo con
+   la sua soglia. Ma un grafico nel tempo ha bisogno di punti nel tempo, e il file ne ha solo
+   per una parte degli indicatori. Qui si disegna la linea SOLO dove la serie esiste davvero;
+   dove non esiste resta il misuratore e la tessera lo DICHIARA, invece di far finta con una
+   riga piatta a un punto. Per gli altri la pipeline ha cominciato ad accumulare (v224):
+   fra qualche settimana avranno anche loro la loro linea, e comparira' da sola. */
+function serieIndicatore(k) {
+  const m = DATA?.macro || {};
+  const perc = (h, lo, hi) => (h || []).map(x => ({ d: x.d, v: x.v }));
+  switch (k) {
+    case "in:curve": case "yield_recession":
+      return (m.curve_history || []).length > 2
+        ? { punti: m.curve_history, soglie: [{ v: 0, testo: "inversione", colore: "var(--red)" }], unita: "" } : null;
+    case "credit": case "systemic_risk":
+      return (m.credit?.history || []).length > 2
+        ? { punti: m.credit.history, soglie: [{ v: 4, testo: "tensione", colore: "var(--yellow)" }], unita: "%" } : null;
+    case "vix":
+      return (m.vix?.spark || []).length > 2
+        ? { punti: m.vix.spark.map(v => ({ d: null, v })), soglie: [{ v: 20, testo: "tensione", colore: "var(--yellow)" }],
+            assex: ["30 sedute fa", "oggi"] } : null;
+    case "margin_debt":
+      return (m.margin_debt?.history || []).length > 2
+        ? { punti: m.margin_debt.history.map(v => ({ d: null, v })), assex: ["13 mesi fa", "oggi"],
+            fmtY: v => fmtNum.format(Math.round(v / 1000)) + " mld" } : null;
+    case "fear_greed": {
+      const f = m.fear_greed || {}; const p = [];
+      if (f.year_ago != null) p.push({ d: null, v: f.year_ago });
+      if (f.month_ago != null) p.push({ d: null, v: f.month_ago });
+      if (f.week_ago != null) p.push({ d: null, v: f.week_ago });
+      if (f.score != null) p.push({ d: null, v: f.score });
+      return p.length > 2 ? { punti: p, soglie: [{ v: 50, testo: "neutro", colore: "var(--muted)" }],
+        assex: ["1 anno fa", "oggi"] } : null;
+    }
+    case "fed_market":
+      return (m.fed_market?.fedfunds || []).length > 2
+        ? { punti: m.fed_market.fedfunds, soglie: [{ v: 4, testo: "comprime i multipli", colore: "var(--yellow)" }], unita: "%" } : null;
+    case "decouple": {
+      const dc = m.decouple || {};
+      return (dc.sp500 || []).length > 2 && (dc.gdp || []).length > 2
+        ? { doppia: [{ nome: "S&P 500", punti: dc.sp500, colore: "var(--blue)" },
+                     { nome: "PIL reale", punti: dc.gdp, colore: "var(--muted)", tratteggio: true }],
+            soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }] } : null;
+    }
+    case "corp_profit": {
+      const cp = m.corp_profit || {};
+      return (cp.ndx || []).length > 2 && (cp.profits || []).length > 2
+        ? { doppia: [{ nome: "Nasdaq 100", punti: cp.ndx, colore: "var(--purple)" },
+                     { nome: "Profitti reali", punti: cp.profits, colore: "var(--muted)", tratteggio: true }],
+            soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }] } : null;
+    }
+    default: {
+      // serie accumulata dalla pipeline giorno per giorno (v224): compare da sola appena
+      // ci sono almeno due rilevazioni
+      const st = (DATA?.metrics_history || []).map(x => ({ d: x.date, v: x.macro_scores?.[k] }))
+        .filter(x => typeof x.v === "number");
+      return st.length > 2 ? { punti: st, soglie: [{ v: 50, testo: "neutro", colore: "var(--muted)" }],
+        accumulata: true } : null;
+    }
+  }
+}
 
 function renderStruttura() {
   if (!DATA) return;

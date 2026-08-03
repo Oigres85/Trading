@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import numpy as np
 import pandas as pd
 
-from update_data import _finestra_comune, compute_risk_metrics, ratchet_stops
+from update_data import _finestra_comune, _macro_scores, compute_risk_metrics, ratchet_stops
 
 FAILED = []
 
@@ -94,6 +94,20 @@ check("v207 finestra comune: serie vuota -> None", _finestra_comune([], pil_lung
 check("v207 finestra comune: meno di due osservazioni dentro la finestra -> None",
       _finestra_comune([("2026-04-01", 1.0), ("2026-05-01", 2.0)],
                        [("2026-04-01", 1.0), ("2026-04-02", 2.0)]) is None)
+
+# ---------- v224: storico dei punteggi macro (le linee che oggi mancano) ----------
+_mk = {"fear_greed": {"score": 42}, "credit": {"score": 96}, "macroquant": {"score": 55},
+       "indicators": [{"key": "cpi", "impact": 49}, {"key": "nfp", "impact": 39}],
+       "signposts": {"pct": 60}, "vix": {"value": 16}}
+_sc = _macro_scores(_mk)
+check("v224 macro_scores: i compositi con score entrano con la loro chiave nuda",
+      _sc.get("fear_greed") == 42 and _sc.get("credit") == 96 and _sc.get("macroquant") == 55)
+check("v224 macro_scores: gli indicatori USA entrano come in:<key>, come li cerca la dashboard",
+      _sc.get("in:cpi") == 49 and _sc.get("in:nfp") == 39)
+check("v224 macro_scores: i signposts sono INVERTITI (60% acceso -> 40 favorevole)",
+      _sc.get("signposts") == 40)
+check("v224 macro_scores: chi non ha un punteggio non entra (niente chiavi vuote)",
+      "vix" not in _sc and all(isinstance(v, int) for v in _sc.values()))
 
 # ---------- margin debt: carry-forward quando lo scrape FINRA fallisce ----------
 import update_data as ud
@@ -330,7 +344,7 @@ check("umich: i mesi inglesi mappano al numero giusto (June=6, dicembre=12)",
 check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è il motivo del fetcher)",
       _rows[-1][0] > "2026-05-01")
 
-N_CHECKS = 67   # +4 in v186: rami FedWatch · +4 in v207: finestra comune fra serie
+N_CHECKS = 71   # +4 v186 FedWatch · +4 v207 finestra comune · +4 v224 storico macro
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio

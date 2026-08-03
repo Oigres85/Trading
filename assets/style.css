@@ -1659,9 +1659,9 @@ svg.g-serie { cursor: crosshair; }
   .shell > .tabs .tab-active::after { opacity: 1; }
 }
 /* separatore fra i gruppi, così scorrendo si capisce dove finisce uno e inizia l'altro */
-[data-pane] + [data-pane] { scroll-margin-top: 90px; }
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+/* v224 — scroll-behavior RIMOSSO: residuo della versione a pagina unica. La navigazione
+   e' solo a clic e ogni sezione si apre dall'alto, quindi lo scorrimento morbido faceva solo
+   sembrare che le sezioni fossero collegate. */
 
 /* v223 — MISURATORE dentro la tessera: dove sta questo valore sulla sua scala */
 .mis { margin: 4px 0 2px; }
@@ -1677,3 +1677,16 @@ html { scroll-behavior: smooth; }
 #mg-rot .obar-axis { height: var(--bar-xs); }
 #mg-rot .obar-fill { height: var(--bar-xs); }
 #mg-rot .obars { gap: 2px; }
+
+/* v224 — TESTATA DELLA TESSERA: i titoli su due righe rendevano le card di una stessa riga
+   disallineate e facevano sembrare che il numero si staccasse dal titolo. Ora e' una griglia
+   con il valore in colonna propria, allineato in alto, e il titolo con altezza minima di due
+   righe: tutte le tessere partono dalla stessa ascissa e dallo stesso rigo. */
+.mg-card-head {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px;
+  align-items: start; margin-bottom: 8px;
+}
+.mg-t { min-height: 2.5em; display: flex; align-items: flex-start; line-height: 1.25; }
+.mg-v { line-height: 1.15; white-space: nowrap; }
+.mg-card { display: flex; flex-direction: column; }
+.mg-card .mg-n { margin-top: auto; padding-top: 7px; }
