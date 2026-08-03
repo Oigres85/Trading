@@ -961,6 +961,59 @@ sorgente non la sposta per chi ha già trascinato qualcosa (v225, `sezioni_ordin
 `config/ui_order.json`). Verificato misurando su un browser pulito. Quando si riordina una
 sezione nel sorgente, dirlo all'utente: per lui potrebbe non cambiare nulla.
 
+## 🧮 v229 — accorpare nel PAYLOAD, non solo in dashboard
+
+L'accorpamento macro di v225 era rimasto **solo nella UI**: il payload continuava a pubblicare
+l'inflazione su **due** righe (CPI e PCE, oggi entrambe 3.7%) e la curva 10A-2A su **tre**.
+Nessuna riga era sbagliata, ma chi conta i segnali ne contava cinque dove ce n'erano due — la
+stessa classe che il payload **dichiara già altrove** ("contarli come due prove raddoppia un
+segnale solo"), finalmente applicata invece che solo annotata.
+
+⚠ **Il primo tentativo perdeva il dato invece di unirlo**, ed è stato preso dal gate v138:
+togliendo `curve` dall'elenco generico, uno snapshot **senza `curve_history`** faceva sparire la
+curva dal payload. Ora esce dall'elenco **solo se la riga dedicata verrà davvero emessa**.
+*Un accorpamento va scritto con la condizione "l'altro posto esiste", non con l'assunzione.*
+
+⚠ **C12 si è rotta e non era un difetto**: la ricevuta del taglio v184 cercava le due ETICHETTE
+`Inflazione CPI` … `Inflazione PCE` su righe separate. Riagganciata al **fatto** (entrambi i
+valori presenti). È la **quinta** volta in questo progetto che un check ancorato a una stringa
+letterale si rompe su una riformulazione senza che manchi nulla.
+
+## ⏱️ v229 — l'evento più urgente contraddetto dal dato più fresco
+
+PLTR era `[STOP VIOLATO]` sulla **chiusura** ($123,06 sotto lo stop $124,81) mentre il pre-market
+era già a **$125,44, sopra lo stop** — dato che lo **stesso payload pubblica due righe più in là**
+nella cella `→ agg.`. Il blocco che impone *"una raccomandazione esplicita per ciascuno"* chiedeva
+quindi una decisione su un evento che il mercato aveva già disfatto.
+
+Classe **v193** — *stato del mercato e freschezza del dato sono due cose diverse* — applicata
+all'evento che il payload tratta come il più urgente di tutti. **Non si cambia la violazione**
+(lo stop è ancorato alle chiusure e il ratchet vive su quelle): si **dichiara** che l'esteso la
+contraddice, e di quanto.
+
+## 🧪 v229 — tre check sbagliati per lo stesso motivo, in una sessione sola
+
+Tutti e tre giravano sulla **fixture**, che non ha `macro.indicators` — quindi **non contenevano
+il fenomeno che dovevano misurare**. Uno era verde col difetto iniettato, gli altri rossi sul
+codice corretto.
+
+> **Un check che gira su dati privi del fenomeno non è un check.** Prima di scriverlo, chiedersi:
+> *questi dati contengono la cosa che sto misurando?* Se no, va agganciato a `data.json`.
+
+Più due sviste di stesura che si ripetono e vale la pena riconoscere a vista:
+- un **commento in coda all'ultima riga** si mangia il ` } finally {…}` che `suReale` appende
+  sulla stessa riga (stessa famiglia dei **backtick dentro un template literal**, che lo chiudono);
+- **`\n` dentro un template literal diventa un a capo vero**: per una regex o uno split serve
+  `String.fromCharCode(10)` o un doppio escape.
+
+## ✂️ v229 — la terza ricevuta che morde in quattro versioni
+
+Rimuovendo `annoCircolare()` avevo assunto che il vicino a valle fosse `renderLevaStagione()`:
+fra le due era stato inserito **l'intero modulo v226** (`FAMIGLIE_MACRO`, `puntiSuAsse`,
+`agganciaMacroDinamico`). L'`assert` scritto **prima** di tagliare l'ha intercettato — come già
+per `quadrante()` in v226. **La classe v201-v204 non è teorica: in quattro versioni ha morso tre
+volte.** La ricevuta del taglio va scritta prima, e deve essere eseguibile, non un commento.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
