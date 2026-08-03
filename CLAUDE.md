@@ -788,6 +788,64 @@ sulle 40 notizie non ancora prezzate, che la riga dopo indica come "il segnale f
 run". È la classe v193 rovesciata: **stato del mercato e freschezza del dato sono due cose
 diverse**, e qui l'avviso di freschezza ignora lo stato del mercato.
 
+## 🩹 v225 — il `</div>` orfano, e perché nessun gate lo vedeva
+
+Il CEO ha segnalato **due volte** "la formattazione crea problemi di sovrapposizione del testo".
+Entrambe le volte ho cercato nel CSS. La causa era in `index.html`: un `</div>` di troppo,
+residuo del blocco `<details>` rimosso in v215/v218.
+
+Davanti a un `</div>` in eccesso il parser HTML chiude il primo `div` **aperto in scope** — cioè
+`.shell-main`. Misurato sul sito vivo prima della correzione: **8 sezioni su 18** finivano come
+figlie dirette di `.shell`, che è una griglia `178px | 1038px`. Su Portafoglio le card si
+alternavano fra le due colonne: *"Peso delle posizioni" disegnato largo 178px, dentro la colonna
+della barra laterale.*
+
+**Perché serviva un gate e non l'attenzione**: l'HTML malformato **non produce nessun errore**.
+Il browser ripara in silenzio, la console resta pulita, i 180 check sulle funzioni pure passano
+tutti. Stessa famiglia di `.abar-fill` senza `display:block` (v205) — *un difetto che non si
+rompe*. Ora `test_app.mjs` verifica il bilanciamento dei tag e che ogni `section[data-pane]` sia
+figlia **diretta** di `.shell-main`.
+
+⚠ **Lo scanner dei tag va scritto a CARATTERI, non a regex.** Il favicon di questa pagina è un
+data-URI che contiene `<svg …><rect/><text>T</text></svg>` **dentro un attributo**: una regex sui
+tag lo legge come markup vero e denuncia uno sbilanciamento inesistente. La prima stesura della
+guardia ci è cascata. Le virgolette degli attributi vanno rispettate.
+
+⚠ **Misurare in browser richiede di verificare il viewport nella STESSA chiamata.** Durante la
+verifica il pannello si è richiuso a larghezza 0 fra due chiamate e le misure dicevano che le
+sezioni erano larghe 34-38px: stavo per dichiarare una catastrofe inesistente. `innerWidth` è il
+primo campo da leggere in ogni misura, e va letto **insieme** ai rect, non prima.
+
+## 🎚️ v225 — l'ordine delle sezioni: trascinabile e uguale su ogni device
+
+Richiesta CEO: trascinare per riordinare, e che l'ordine resti *"a prescindere se apro la pagina
+da mac o iphone"*. Tre decisioni, ognuna già pagata altrove in questo progetto:
+
+1. **La chiave è `data-sez`**, non il titolo (accoppiare per nome visibile è fragile — v196) e non
+   l'indice (invecchia da solo — C10, red team I6). Una sezione nuova finisce in coda (v191).
+2. **Si permutano le POSIZIONI, non si spostano gli elementi liberamente.** Le sezioni di un pane
+   non sono contigue e ciò che non ha `data-pane` non deve muoversi mai: si piantano segnaposto
+   (nodi commento) nelle posizioni attuali e ci si rimettono dentro le sezioni nell'ordine nuovo.
+3. **Pointer events, non HTML5 drag-and-drop** (che non esiste su Safari touch — v193). Le frecce
+   ▲▼ restano e passano dalla **stessa** funzione: due percorsi separati divergerebbero.
+
+Mentre si trascina, le card si riducono alla loro intestazione (`.in-riordino`): una card alta
+600px farebbe saltare il layout a ogni scambio. Persistenza su `config/ui_order.json` via Contents
+API — **localStorage da solo non soddisfa la richiesta**, è per-browser, ed è esattamente il
+difetto già corretto sui parametri di rischio. Senza token il salvataggio è locale **e lo dice**.
+
+## 📐 v225 — la barra 0-100 è stata RIMOSSA, non nascosta
+
+`misuratore()` non esiste più. Il CEO ha respinto quella forma tre volte ("vedo ancora tante
+barre"): al suo posto `quadrante()`, un arco con lancetta dove la posizione dell'ago è il
+messaggio e non c'è una scala da decodificare. Per la stagionalità — 12 valori, non uno — è nato
+`annoCircolare()`: l'anno è un cerchio, i mesi buoni sporgono in fuori dall'anello, quelli cattivi
+rientrano, il mese corrente è acceso e scritto al centro.
+
+**Regola che ne esce**: quando un utente rifiuta una forma grafica più di una volta, non si
+migliora quella forma — si cambia forma. Le prime due iterazioni avevano reso la barra più bella,
+più allineata e meglio spaziata; era sempre una barra.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
