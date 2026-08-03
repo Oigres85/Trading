@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "226";
+const BUILD_VERSION = "227";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4037,9 +4037,9 @@ function puntiSuAsse(fam, opt = {}) {
     return `<g class="pt-riga" data-fam="${esc(f.n)}">
       <text x="${L - 12}" y="${y}" text-anchor="end" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text)">${esc(f.n)}</text>
       <line x1="${X(mn)}" y1="${y}" x2="${X(mx)}" y2="${y}" stroke="var(--card-2)" stroke-width="3" stroke-linecap="round"/>
-      ${f.v.map(x => `<circle class="pt-punto${x.k ? " pt-click" : ""}" cx="${X(x.score)}" cy="${y}" r="7"
+      ${f.v.map(x => `<circle class="pt-punto${x.pan ? " pt-click" : ""}" cx="${X(x.score)}" cy="${y}" r="7"
         fill="${scoreColor(x.score)}" fill-opacity=".9" stroke="var(--card)" stroke-width="1.5"
-        ${x.k ? `data-mp="${esc(x.k)}" role="button" tabindex="0"` : ""}
+        ${x.pan ? `data-mp="${esc(x.pan)}" role="button" tabindex="0"` : ""}
         data-nome="${esc(x.nome)}" data-score="${x.score}"><title>${esc(x.nome)}: ${x.score}/100</title></circle>`).join("")}
       <circle cx="${X(f.m)}" cy="${y}" r="3" fill="var(--bg)"><title>media ${f.n}: ${f.m}</title></circle></g>`;
   }).join("");
@@ -4410,7 +4410,11 @@ function renderIndicatori() {
   const righe = indicatoriClassifica();
   if (righe.length < 3) { box.innerHTML = '<div class="muted">Indicatori non disponibili.</div>'; return; }
   const conPan = new Set(Object.keys(MACRO_INFO || {}));
-  const fam = famiglieMacro(righe.map(r => ({ ...r, k: conPan.has(r.k) ? r.k : null, _k: r.k })));
+  /* ⚠ `k` serve a DUE cose diverse e non vanno confuse: classificare la famiglia e aprire il
+     pannello. Nella prima stesura azzeravo `k` per gli indicatori senza pannello e poi
+     raggruppavo su quella stessa chiave azzerata → finivano tutti in "Altro", e sul sito vivo
+     compariva un settimo spicchio fantasma. Il campo del pannello ora e' `pan`, separato. */
+  const fam = famiglieMacro(righe.map(r => ({ ...r, pan: conPan.has(r.k) ? r.k : null })));
 
   /* Sotto ai due grafici restano SOLO gli indicatori che hanno una serie storica vera, disegnati
      come i termometri di stress — la forma che il CEO ha approvato ("i grafici sono perfetti").
