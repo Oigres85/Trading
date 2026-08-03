@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "227";
+const BUILD_VERSION = "228";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1024,7 +1024,7 @@ function renderEarningsAlert() {
   if (!box) return;
   const all = [...DATA.portfolio, ...(DATA.watchlist || [])];
   const items = all.filter(r => r.earnings_date)
-    .map(r => ({ ...r, days: Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) }))
+    .map(r => ({ ...r, days: giorniAllaTrimestrale(r.earnings_date) }))
     .filter(r => r.days >= 0 && r.days <= 7)
     .sort((a, b) => a.days - b.days);
   if (!items.length) { box.hidden = true; box.innerHTML = ""; box.className = ""; return; }
@@ -3980,46 +3980,15 @@ function larghezzaTela(max) {
   return Math.round(Math.min(max, Math.max(320, w - 96)));
 }
 
-function radarFamiglie(fam) {
-  if (fam.length < 3) return "";
-  /* La tela NON e' quadrata: il contenuto e' un esagono piu' le etichette, che sporgono molto in
-     orizzontale (il testo) e poco in verticale. Con una tela quadrata restavano ~100px di vuoto
-     sopra e sotto — misurati in browser. Altezza calcolata sul contenuto reale.
-     Il vincolo che decide il raggio e' ORIZZONTALE: l'etichetta sporge dal proprio ancoraggio di
-     quanto e' LARGO il suo testo. Alla prima stesura avevo STIMATO 86px e "Mercato e tecnica"
-     usciva tagliata: il margine ora si calcola dal nome piu' lungo, non si indovina. */
-  const S = larghezzaTela(660), cx = S / 2, N = fam.length;
-  const lungo = Math.max(...fam.map(f => f.n.length));
-  const margine = Math.round(lungo * 6.9 + 14);             // ~6,9px per carattere a 12,5px
-  const R = Math.max(64, Math.round((cx - margine) / 1.1));
-  const RL = R * 1.1 + 24;                                  // dove cadono le etichette
-  const cy = Math.round(RL + 16), H = cy * 2 + 6;
-  const A = i => (i / N * 2 * Math.PI) - Math.PI / 2;
-  const P = (i, v, r) => [cx + (r ?? R) * (v / 100) * Math.cos(A(i)), cy + (r ?? R) * (v / 100) * Math.sin(A(i))];
-  const pts = v => fam.map((f, i) => P(i, typeof v === "function" ? v(f) : v).map(n => n.toFixed(1)).join(",")).join(" ");
-  const griglia = [25, 50, 75, 100].map(g => `<polygon points="${pts(g)}" fill="none"
-    stroke="${g === 50 ? "var(--muted)" : "var(--border)"}" stroke-width="${g === 50 ? 1.4 : 1}"
-    ${g === 50 ? 'stroke-dasharray="4 3"' : ""}/>`).join("");
-  const raggi = fam.map((_, i) => `<line x1="${cx}" y1="${cy}" x2="${P(i, 100)[0].toFixed(1)}" y2="${P(i, 100)[1].toFixed(1)}" stroke="var(--border)"/>`).join("");
-  const eti = fam.map((f, i) => {
-    const [x, y] = P(i, 100, RL), an = A(i);
-    const anc = Math.abs(Math.cos(an)) < .3 ? "middle" : (Math.cos(an) > 0 ? "start" : "end");
-    return `<g class="rd-fam" data-fam="${esc(f.n)}" role="button" tabindex="0" aria-label="isola la famiglia ${esc(f.n)}">
-      <text x="${x.toFixed(1)}" y="${(y - 7).toFixed(1)}" text-anchor="${anc}" dominant-baseline="central"
-        font-size="12.5" font-weight="600" fill="var(--text)">${esc(f.n)}</text>
-      <text x="${x.toFixed(1)}" y="${(y + 10).toFixed(1)}" text-anchor="${anc}" dominant-baseline="central"
-        font-size="14" font-family="var(--mono)" font-weight="700" fill="${scoreColor(f.m)}">${f.m}</text></g>`;
-  }).join("");
-  const punti = fam.map((f, i) => { const [x, y] = P(i, f.m);
-    return `<circle class="rd-p" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" fill="${scoreColor(f.m)}"
-      stroke="var(--card)" stroke-width="2"><title>${esc(f.n)}: ${f.m}/100 — media di ${f.v.length} indicatori</title></circle>`; }).join("");
-  return `<div class="rd"><svg viewBox="0 0 ${S} ${H}" style="max-width:${S}px" role="img" aria-label="punteggio medio delle famiglie macro">
-    ${griglia}${raggi}
-    <polygon class="rd-area" points="${pts(f => f.m)}" fill="var(--accent)" fill-opacity=".22"
-      stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round"/>
-    ${punti}${eti}
-  </svg><div class="rd-nota muted">l\u2019anello tratteggiato è il neutro (50): dentro = sfavorevole, fuori = favorevole</div></div>`;
-}
+/* v228 — `radarFamiglie()` RIMOSSA. Terza forma respinta dal CEO in tre versioni, e la ragione
+   qui e' diversa dalle prime due (barra e quadrante erano un muro di widget ripetuti): il radar
+   era UN grafico solo, ma chiede di sapere COS'E' un radar prima di poterlo leggere. "I grafici
+   non li capisco" — un grafico che va spiegato non e' leggibile, per elegante che sia.
+   RICEVUTA DEL TAGLIO: 0 chiamanti nel render; `famiglieMacro`/`famigliaDi` SOPRAVVIVONO perche'
+   raggruppano anche l'asse coi pallini; il vicino a valle, puntiSuAsse(), e' intatto; il
+   gestore .rd-fam in agganciaMacroDinamico resta innocuo (querySelectorAll su zero nodi) ma
+   viene tolto insieme, per non lasciare un handler vivo su un elemento che non esiste piu'
+   — la classe v193 (una funzione morta accanto a un bottone inerte e' un sintomo). */
 
 function puntiSuAsse(fam, opt = {}) {
   const W = larghezzaTela(880);
@@ -4069,21 +4038,8 @@ function agganciaMacroDinamico(box) {
       p.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); apri(); } });
     }
   });
-  // clic su una famiglia della ragnatela → l'asse isola quella riga (ri-clic = tutte)
-  box.querySelectorAll(".rd-fam").forEach(g => {
-    const scegli = () => {
-      const gia = g.classList.contains("rd-sel");
-      box.querySelectorAll(".rd-fam").forEach(x => x.classList.remove("rd-sel"));
-      box.querySelectorAll(".pt-riga").forEach(r => r.classList.remove("pt-off"));
-      if (gia) return;
-      g.classList.add("rd-sel");
-      box.querySelectorAll(".pt-riga").forEach(r => {
-        if (r.dataset.fam !== g.dataset.fam) r.classList.add("pt-off");
-      });
-    };
-    g.addEventListener("click", scegli);
-    g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); scegli(); } });
-  });
+  /* v228 — il gestore del clic sulla ragnatela e' stato tolto con la ragnatela stessa: senza
+     bersaglio sarebbe rimasto vivo e mai scattabile, che e' esattamente il sintomo v193. */
 }
 
 function renderLevaStagione() {
@@ -4420,7 +4376,12 @@ function renderIndicatori() {
      come i termometri di stress — la forma che il CEO ha approvato ("i grafici sono perfetti").
      Gli altri NON prendono un widget di ripiego: vivono nella ragnatela e sull'asse. */
   const conSerie = righe.filter(r => serieIndicatore(r.k));
-  box.innerHTML = `<div class="mg-due">${radarFamiglie(fam)}${puntiSuAsse(fam)}</div>`
+  /* v228 — RAGNATELA RIMOSSA dal render su richiesta del CEO ("i grafici non li capisco,
+     allora portali con i termometri quelli con i pallini"). Resta l'asse coi pallini, che e' la
+     stessa grammatica dei termometri di stress — una scala con le sue soglie disegnate — e la
+     sezione e' stata spostata subito sotto di essi. Un grafico che va spiegato non e' un
+     grafico leggibile, per bravo che sia: il radar chiede di sapere cos'e' un radar. */
+  box.innerHTML = `<div class="mg-due">${puntiSuAsse(fam)}</div>`
     + (conSerie.length ? `<div class="mg-sotto">Di questi, ${conSerie.length} ${conSerie.length === 1 ? "ha" : "hanno"} una storia nel file: ecco come ci sono arrivati.</div>
       <div class="mg-tris">${conSerie.map(r => {
         const se = serieIndicatore(r.k);
@@ -5202,18 +5163,39 @@ function techCells(r) {
       <td class="spark-cell" data-tk="${r.ticker}" title="Clicca per ingrandire">${sparkline((r.sparks || {})[sparkRange])}</td>`;
 }
 
+/* ═══ v228 — GIORNI DI CALENDARIO ALLA TRIMESTRALE, UNA SOLA VOLTA ═════════════════════════
+   Trovato eseguendo il payload su me stesso. PLTR riportava gli utili OGGI (2026-08-03), aveva
+   lo stop violato ed era in portafoglio: il caso piu' urgente che esista. Nella tabella portava
+   [!EARNINGS RISK], ma nella riga PRIORITÀ del brief NON compariva — c'erano solo AMD e RGTI,
+   che riportano DOPO. Causa: due implementazioni della stessa domanda.
+     · la tabella: Math.ceil((data − adesso)/86400000)  → -0,45 diventa -0 → passa
+     · il brief:   (data − adesso)/86400000 >= 0        → -0,45 → NON passa
+   `new Date("2026-08-03")` e' la MEZZANOTTE di oggi, che alle 10:48 e' gia' passata: la
+   trimestrale del giorno stesso risultava nel passato. E' la classe v161/v207 — due derivazioni
+   della stessa grandezza divergono in silenzio — e qui il difetto nascondeva l'evento piu'
+   urgente proprio nella riga che si chiama PRIORITÀ.
+   Qui si contano GIORNI DI CALENDARIO in ora locale: oggi = 0, domani = 1. Chiunque chieda
+   "fra quanto riporta" passa da questa funzione, cosi' non possono piu' divergere. */
+function giorniAllaTrimestrale(iso) {
+  if (!iso) return null;
+  const d = new Date(String(iso).length === 10 ? iso + "T00:00:00" : iso);   // locale, non UTC
+  if (isNaN(d)) return null;
+  const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+  const quel = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  return Math.round((quel - oggi) / 86400000);
+}
+
 /* trimestrale entro 14 giorni solari = rischio evento binario → flag [!EARNINGS RISK] */
 function earningsRiskDays(r) {
-  if (!r.earnings_date) return null;
-  const days = Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000);
-  return (days >= 0 && days < 14) ? days : null;
+  const days = giorniAllaTrimestrale(r.earnings_date);
+  return (days != null && days >= 0 && days < 14) ? days : null;
 }
 
 /* cella Trimestrale in tabella: data earnings + Implied Move (±%) + flag rischio evento */
 function earningsCell(r) {
   if (!r.earnings_date) return `<td class="num muted">—</td>`;
-  const days = Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000);
-  if (days < -1) return `<td class="num muted">—</td>`;
+  const days = giorniAllaTrimestrale(r.earnings_date);
+  if (days == null || days < -1) return `<td class="num muted">—</td>`;
   const d = new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
   const col = days <= 7 ? "var(--red)" : days <= 21 ? "var(--yellow)" : "var(--muted)";
   const im = typeof impliedMoveForEarnings === "function" ? impliedMoveForEarnings(r) : null;
@@ -6466,7 +6448,7 @@ function openMacroInfo(key) {
 function openEarningsInfo(ticker) {
   const r = (DATA.portfolio || []).find(x => x.ticker === ticker);
   if (!r) return;
-  const days = r.earnings_date ? Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) : null;
+  const days = giorniAllaTrimestrale(r.earnings_date);
   const rx = new RegExp(`${ticker}|${(r.name || "").split(" ")[0]}|earnings|trimestral|utili|risultati`, "i");
   const RAT_SCORE = { strong_buy: 100, buy: 75, hold: 50, sell: 25, strong_sell: 0 };
   const RAT_LABEL = { strong_buy: "Strong Buy", buy: "Buy", hold: "Hold", sell: "Sell", strong_sell: "Strong Sell" };
@@ -6686,7 +6668,7 @@ function renderEarnings() {
   const all = [...DATA.portfolio, ...(DATA.watchlist || [])];
   const items = all
     .filter(r => r.earnings_date)
-    .map(r => ({ ...r, days: Math.ceil((new Date(r.earnings_date) - Date.now()) / 86400000) }))
+    .map(r => ({ ...r, days: giorniAllaTrimestrale(r.earnings_date) }))
     .filter(r => r.days >= -1)
     .sort((a, b) => a.days - b.days);
   const ptfTickers = new Set(DATA.portfolio.map(x => x.ticker));
@@ -7229,8 +7211,10 @@ function buildPrompt() {
       }
     }
     if ((dv.withPlan || []).length) {
-      lines.push("· Livelli calcolati dal motore (contesto, ordini limite + stop 2×ATR): " +
-        dv.withPlan.map(p => {
+      // v228 — stesso ordine alfabetico del blocco FILTRI: qui l'ordine per punteggio era
+      // l'ultimo residuo della classifica rimossa in v200 (vedi la nota nel brief).
+      lines.push("· Livelli calcolati dal motore (contesto, in ordine alfabetico, ordini limite + stop 2×ATR): " +
+        [...dv.withPlan].sort((x, y) => x.r.ticker.localeCompare(y.r.ticker)).map(p => {
           const atrTag = p.atr ? ` [stop = ingresso − 2×ATR ${p.atr.src}, ATR ${fmtNum.format(p.atr.pct)}%]` : " [stop fallback −8%: ATR n.d.]";
           // trimestrale <14gg su un CANDIDATO d'ingresso: il flag va NELLA riga del piano —
           // in tabella si perde e l'LLM rischia di suggerire un limite che scavalca l'evento (v112)
@@ -8324,7 +8308,14 @@ function buildExecutiveDelta() {
   // verdetto: il payload decideva l'agenda del report. Restano i FATTI che impongono una
   // decisione; il giudizio del motore si legge dove e' argomentato.
   if ((v.withPlan || []).length) {
-    L.push(`· Titoli che superano i filtri quantitativi (${v.withPlan.length}): ${v.withPlan.slice(0, 6).map(p => p.r.ticker).join(", ")}${v.withPlan.length > 6 ? ", …" : ""} — soglie e veti nel blocco FILTRI QUANTITATIVI. Non è una classifica e non è una raccomandazione: è l'elenco di chi passa.`);
+    /* ⚠ v228 — ORDINARE E' GIA' UN GIUDIZIO (la ragione per cui v200 ha tolto la classifica).
+       La classifica era stata rimossa dal blocco FILTRI, che infatti dichiara "in ordine
+       alfabetico … questo blocco non classifica piu'" — ma l'ordine per punteggio era
+       SOPRAVVISSUTO qui e nel blocco dei livelli, che elencavano "GOOGL, AVGO, MSFT, AMZN, WDC"
+       mentre i FILTRI dicevano "AMZN, AVGO, GOOGL, MSFT, WDC". Stessa lista, due ordini: uno dei
+       due comunicava una preferenza che il sistema dichiara di non esprimere piu'. */
+    const nomi = v.withPlan.map(p => p.r.ticker).sort((a, b) => a.localeCompare(b));
+    L.push(`· Titoli che superano i filtri quantitativi (${nomi.length}, in ordine alfabetico): ${nomi.slice(0, 6).join(", ")}${nomi.length > 6 ? ", …" : ""} — soglie e veti nel blocco FILTRI QUANTITATIVI. Non è una classifica e non è una raccomandazione: è l'elenco di chi passa.`);
   }
   // PRIORITÀ = solo eventi che impongono una decisione (fatti databili). Il veto in portafoglio
   // e' stato tolto: e' un GIUDIZIO del motore, non un evento, e vive gia' nel blocco motore.
@@ -8335,8 +8326,12 @@ function buildExecutiveDelta() {
   if (sh && sh.active) pri.push(`🚨 SHOCK ${(sh.sources || []).map(s => `${s.src} ${signTxt(s.chg)}`).join("/")}`);
   const sv = (v.stopViolations || []).map(x => x.r.ticker);
   if (sv.length) pri.push(`⛔ stop violati: ${sv.join(", ")}`);
-  const in7 = (d) => { if (!d) return false; const dd = (new Date(d) - Date.now()) / 86400000; return dd >= 0 && dd <= 7; };
-  const earn = (DATA.portfolio || []).filter(r => r.qty && in7(r.earnings_date)).map(r => r.ticker);
+  // stessa funzione della tabella: oggi = 0 giorni, e OGGI e' il caso piu' urgente, non il meno
+  const earn = (DATA.portfolio || []).filter(r => {
+    const g = giorniAllaTrimestrale(r.earnings_date); return r.qty && g != null && g >= 0 && g <= 7;
+  }).map(r => ({ tk: r.ticker, g: giorniAllaTrimestrale(r.earnings_date) }))
+    .sort((x, y) => x.g - y.g)                       // OGGI prima di domani: e' una riga di priorita'
+    .map(x => x.g === 0 ? `${x.tk} (OGGI)` : `${x.tk} (${x.g}g)`);
   if (earn.length) pri.push(`📅 earnings ≤7g: ${earn.join(", ")}`);
   const movers = sparkTrendRows().filter(r => r.drs7 != null).sort((a, b) => b.drs7 - a.drs7);
   if (movers.length) pri.push(`RS Δ7g → top ${movers[0].tk} ${signTxt(movers[0].drs7, "pp")} / worst ${movers[movers.length - 1].tk} ${signTxt(movers[movers.length - 1].drs7, "pp")}`);

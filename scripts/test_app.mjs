@@ -1709,18 +1709,84 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
 
   // i due grafici devono DISEGNARE tutti i punti che dichiarano: un pallino perso e' un
   // indicatore invisibile, e non produce nessun errore (la classe .abar-fill di v205).
-  check("v226 grafici: l'asse disegna un pallino per ogni indicatore, la ragnatela un vertice per famiglia", suReale(`
+  check("v226 grafici: l'asse disegna un pallino per ogni indicatore, con una riga per famiglia", suReale(`
     const fam = famiglieMacro(indicatoriClassifica());
     const tot = fam.reduce((s, f) => s + f.v.length, 0);
-    const asse = puntiSuAsse(fam), rad = radarFamiglie(fam);
+    const asse = puntiSuAsse(fam);
     const pallini = (asse.match(/class="pt-punto/g) || []).length;
-    const vertici = (rad.match(/class="rd-fam"/g) || []).length;
-    return pallini === tot && vertici === fam.length
-      && rad.includes("rd-area") && asse.includes("pt-tip");`));
+    const righe = (asse.match(/class="pt-riga"/g) || []).length;
+    return pallini === tot && righe === fam.length && asse.includes("pt-tip");`));
 
-  // il CEO ha respinto barra e quadrante: se una delle due tornasse, tornerebbe il muro di widget
-  check("v226: nessun widget-per-indicatore è rientrato (né misuratore né quadrante)",
-    !/function\s+(misuratore|quadrante)\s*\(/.test(src));
+  /* Il CEO ha respinto TRE forme in tre versioni, per due ragioni diverse: barra e quadrante
+     erano un widget per indicatore (un muro di trenta), la ragnatela era un grafico solo ma
+     che va spiegato prima di poter essere letto. Se una qualunque rientrasse, rientrerebbe il
+     problema — quindi il check le guarda tutte e tre. */
+  check("v228: nessuna delle tre forme respinte è rientrata (misuratore, quadrante, ragnatela)",
+    !/function\s+(misuratore|quadrante|radarFamiglie)\s*\(/.test(src));
+
+  // e il gestore del clic sulla ragnatela non deve sopravviverle: un handler vivo su un
+  // elemento che non esiste piu' e' il sintomo v193, non un residuo innocuo
+  check("v228: rimosso anche il gestore della ragnatela, non solo la ragnatela",
+    !/querySelectorAll\(["'`]\.rd-fam/.test(src));
+}
+
+/* ═══ v228 — LA TRIMESTRALE DI OGGI E' LA PIU' URGENTE, NON LA MENO ════════════════════════
+   Trovato eseguendo il payload su me stesso. PLTR riportava gli utili OGGI, era in portafoglio
+   e aveva lo stop violato: il caso più urgente del run. La TABELLA lo segnalava, la riga
+   PRIORITÀ del brief NO. Due derivazioni della stessa grandezza (Math.ceil sui millisecondi vs
+   confronto grezzo >= 0) che divergono esattamente a zero giorni, perché `new Date("2026-08-03")`
+   è la MEZZANOTTE di quel giorno e a mercato aperto è già passata.
+   Classe v161/v207: due implementazioni della stessa domanda, coerenti solo per fortuna. */
+{
+  vm.runInContext(`REALE2 = ${readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null")};`, ctx, { filename: "reale2.js" });
+  vm.runInContext(`PARAMS_CEO = ${JSON.stringify(readFileSync(join(ROOT, "config", "risk_params.json"), "utf8"))};`, ctx, { filename: "params.js" });
+  check("v228 trimestrali: oggi = 0 giorni, ieri negativo, domani 1 (non dipende dall'ora)",
+    run(`
+      const iso = new Date().toISOString().slice(0, 10);
+      const ieri = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      const dom  = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+      return giorniAllaTrimestrale(iso) === 0 && giorniAllaTrimestrale(dom) === 1
+        && giorniAllaTrimestrale(ieri) === -1 && giorniAllaTrimestrale(null) === null;`));
+
+  check("v228 trimestrali: una sola derivazione — nessun ricalcolo a mano dei giorni",
+    !/Math\.ceil\(\(new Date\([^)]*earnings/.test(src));
+
+  check("v228 priorità: una trimestrale OGGI su posizione detenuta finisce nel brief, marcata", run(`
+    const _d = DATA, _c = cashEur;
+    DATA = JSON.parse(JSON.stringify(REALE2)); cashEur = 28500;
+    const oggi = new Date().toISOString().slice(0, 10);
+    const pos = DATA.portfolio.find(r => r.qty > 0);
+    pos.earnings_date = oggi;
+    DATA.portfolio.filter(r => r !== pos).forEach(r => { r.earnings_date = null; });
+    recomputeTotals();
+    const t = buildCIOText();
+    DATA = _d; cashEur = _c; recomputeTotals();
+    const riga = t.split("\\n").find(l => l.startsWith("· PRIORITÀ")) || "";
+    return riga.includes(pos.ticker + " (OGGI)");`));
+
+  /* ⚠ ORDINARE E' GIA' UN GIUDIZIO — la ragione per cui v200 ha tolto la classifica del motore.
+     L'ordine per punteggio era sopravvissuto in DUE blocchi che elencano gli stessi titoli:
+     il brief e i livelli dicevano "GOOGL, AVGO, MSFT, AMZN, WDC" mentre il blocco FILTRI, che
+     dichiara di essere alfabetico, diceva "AMZN, AVGO, GOOGL, MSFT, WDC". Stessa lista, due
+     ordini: uno dei due comunicava una preferenza che il sistema dichiara di non esprimere. */
+  /* ⚠ La prima stesura girava sulla FIXTURE, dove non c'e' nessun promosso: le estrazioni
+     tornavano null e il check usciva VERDE col difetto iniettato — verde per assenza di DATI,
+     non di difetti (la trappola di CLAUDE.md, gia' pagata in v196). La seconda provava a
+     ricostruire lo scenario del CEO dentro il vm e si e' rivelata piu' fragile del difetto che
+     doveva sorvegliare. Qui si verifica la PROPRIETA' su ogni elenco di promossi che il testo
+     contenga davvero, piu' il fatto che entrambi i punti di stampa ordinino: due asserzioni
+     semplici che non dipendono da quali titoli passino oggi. */
+  check("v228: ogni elenco di promossi stampato è in ordine alfabetico", run(`
+    const t = buildCIOText();
+    const liste = [...t.matchAll(/(?:superano i filtri quantitativi|Superano tutte le soglie) \\([^)]*\\): ([A-Z]{1,6}(?:, [A-Z]{1,6})+)/g)]
+      .map(m => m[1].split(", "));
+    return liste.every(l => l.every((x, i) => i === 0 || l[i - 1].localeCompare(x) <= 0));`));
+
+  // e i due punti che stampano quell'elenco devono ORDINARE: se uno smette, l'ordine per
+  // punteggio rientra dalla sua porta e nessun elenco lo dichiara
+  check("v228: entrambi i punti di stampa dei promossi ordinano alfabeticamente",
+    (src.match(/withPlan[\s\S]{0,180}?localeCompare/g) || []).length >= 2);
+
 }
 
 /* ---------- report ----------

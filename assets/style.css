@@ -1714,11 +1714,7 @@ svg.g-serie { cursor: crosshair; }
 /* v226 — IMPILATI, non affiancati: in due colonne l'asse rendeva a scala 0,55 e il suo testo
    arrivava a 5,8px (lezione v206). A tutta larghezza ogni tela rende ~1:1. */
 .mg-due { display: flex; flex-direction: column; align-items: center; gap: 22px; }
-.mg-due > .pt, .mg-due > .rd { width: 100%; }   /* senza questo il flex li stringe al contenuto e la tela rende a 0,58 */
-.rd svg, .pt svg { width: 100%; height: auto; display: block; margin: 0 auto; }
-.rd-fam { cursor: pointer; }
-.rd-fam:hover text, .rd-fam:focus-visible text { text-decoration: underline; }
-.rd-sel text:first-child { fill: var(--accent); }
+.mg-due > .pt { width: 100%; }   /* senza questo il flex li stringe al contenuto e la tela rende a 0,58 */
 .pt { position: relative; }
 .pt-riga { transition: opacity .18s ease; }
 .pt-off { opacity: .16; }
@@ -1734,6 +1730,3 @@ svg.g-serie { cursor: crosshair; }
 .sp-quota { height: 5px; border-radius: 3px; background: var(--card-2); margin: 5px 0 8px; overflow: hidden; }
 .sp-quota i { display: block; height: 100%; border-radius: 3px; }
 /* la ragnatela si disegna entrando; con reduced-motion resta ferma (blocco gia' presente in v206) */
-@keyframes rd-in { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
-.rd-area { animation: rd-in .5s ease both; transform-origin: center; }
-.rd-nota { font-size: 11.5px; text-align: center; margin-top: 2px; }

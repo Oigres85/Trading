@@ -18,7 +18,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=227">
+<link rel="stylesheet" href="assets/style.css?v=228">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -143,6 +143,16 @@
     <div class="mg-tris" id="mg-stress"></div>
   </section>
 
+<section class="card" data-pane="struttura" data-sez="classifica">
+    <div class="card-head">
+      <h2>Tutti gli indicatori, una classifica sola</h2>
+      <span class="muted">gli stessi termometri per tutti e 30 · passa sopra un pallino per il nome, cliccalo per il dettaglio</span>
+    </div>
+    <div class="struct-headline" id="mg-tutti-head"></div>
+    <div id="mg-tutti"></div>
+    <div class="muted struct-note" id="mg-tutti-note"></div>
+  </section>
+
 <section class="card" data-pane="struttura" data-sez="leva">
     <div class="card-head">
       <h2>Leva e stagionalità</h2>
@@ -168,15 +178,6 @@
     <div class="muted struct-note" id="mg-sign-note"></div>
   </section>
 
-<section class="card" data-pane="struttura" data-sez="classifica">
-    <div class="card-head">
-      <h2>Tutti gli indicatori, una classifica sola</h2>
-      <span class="muted">stesso asse 0-100 · clicca una barra per il dettaglio</span>
-    </div>
-    <div class="struct-headline" id="mg-tutti-head"></div>
-    <div id="mg-tutti"></div>
-    <div class="muted struct-note" id="mg-tutti-note"></div>
-  </section>
 
 <section class="card" data-pane="struttura" data-sez="macro">
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
@@ -552,6 +553,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=227"></script>
+<script src="assets/app.js?v=228"></script>
 </body>
 </html>
