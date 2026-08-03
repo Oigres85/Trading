@@ -846,6 +846,61 @@ rientrano, il mese corrente è acceso e scritto al centro.
 migliora quella forma — si cambia forma. Le prime due iterazioni avevano reso la barra più bella,
 più allineata e meglio spaziata; era sempre una barra.
 
+## 🎨 v226-v227 — tre tentativi per capire che il problema non era la forma
+
+Il CEO ha respinto la barra 0-100 (`misuratore`), poi il quadrante ad arco (`quadrante`), poi ha
+chiesto di **vedere delle alternative prima** che toccassi altro. Aveva ragione tutte e tre le
+volte, e la diagnosi giusta è arrivata solo alla terza:
+
+> **Il problema non era la FORMA del widget — era che ce n'erano TRENTA IDENTICI in fila.**
+> Nessuna forma sopravvive a essere ripetuta trenta volte.
+
+Le prime due iterazioni avevano cambiato la geometria (barra → arco) lasciando intatta la
+ripetizione: due muri indistinti invece di uno. **Regola operativa: quando un utente rifiuta una
+resa grafica la seconda volta, non rifinirla — cambia FAMIGLIA visiva; e chiediti se ciò che
+rifiuta è il singolo elemento o la sua moltiplicazione.**
+
+Cosa c'è ora al posto dei 30 widget: **due grafici**. La RAGNATELA (30 indicatori in 6 famiglie,
+un poligono: dove rientra verso il centro il quadro è debole) e i **PUNTI SU UN ASSE** (tutti sulla
+stessa scala 0-100, una riga per famiglia — mostra dove si addensano e, cosa che nessuna media
+dice, **quanto sono in disaccordo fra loro**). Sotto restano SOLO gli indicatori con una serie
+storica vera, come i termometri di stress. Gli altri non prendono un widget di ripiego.
+Caso per caso: i **campanelli sono booleani**, non punteggi → niente grafico a punteggio, restano
+ciambella (quanti accesi) ed elenco (quali).
+
+⚠ **Prima di proporre, RENDERE.** Le quattro alternative sono state disegnate sui dati veri e
+sottoposte al CEO prima di scrivere una riga di produzione. Dopo due miss, una domanda con
+anteprime costa un messaggio e vale più di un terzo tentativo a indovinare.
+
+### 🛑 Il test era VERDE su un difetto che avevo già spedito
+La v226 pubblicata disegnava **sette** spicchi mentre `famiglieMacro()` ne restituiva sei: il
+settimo era "Altro". Causa: in `renderIndicatori` la chiave `k` serviva a due cose diverse
+(classificare la famiglia **e** aprire il pannello); la azzeravo per gli indicatori senza pannello
+e poi raggruppavo su quella chiave azzerata.
+
+**Ma il punto non è il bug, è il test.** Il check "nessun indicatore resta fuori dalle famiglie"
+chiamava `famiglieMacro(indicatoriClassifica())` **direttamente** — una strada che nessuno percorre.
+Era verde mentre la pagina vera disegnava lo spicchio fantasma. *Un test che non passa dal codice
+reale certifica una strada immaginaria.* Il check nuovo esegue `renderIndicatori()` intercettando
+`document.querySelector` e legge l'HTML **davvero prodotto**.
+Trovato solo perché dopo il push ho **contato i vertici disegnati** invece di rileggere la funzione.
+
+⚠ Due sviste di stesura del test, che si ripetono: intercettare `globalThis.$` non funziona
+(`$` è un `const` di modulo — si intercetta `document.querySelector`, che è ciò che `$` usa
+dentro), e un **backtick dentro un template literal** lo chiude.
+
+### Il viewBox, ripagato due volte in una versione
+Prima stesura: ragnatela e asse **affiancati** in due colonne, tela fissa a 760. Misurato in
+browser: l'asse rendeva a 416px, **scala 0,55** → etichette da 10,5px all'occhio a 5,8px. Non era
+"sbagliato", era illeggibile per un motivo invisibile leggendo il codice. Ora la tela si sceglie
+sullo spazio reale (`larghezzaTela`) e i grafici sono impilati: **scala 1,00 misurata dopo**.
+Stessa classe subito dopo: il margine per le etichette del radar era **stimato** a 86px e
+"Mercato e tecnica" usciva tagliata → ora si calcola dal nome più lungo, e un controllo verifica
+che nessun testo esca dai confini del suo `<svg>`.
+
+⚠ **`display:flex` + `align-items:center` stringe un figlio al suo contenuto**: la ragnatela
+rendeva a 300px su una tela da 520 (scala 0,58) finché non le ho dato `width:100%` esplicito.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
