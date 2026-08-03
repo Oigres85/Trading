@@ -1652,6 +1652,58 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /dataset\.sez/.test(src) && !/\.sez\b.*querySelector\("h2"\)/.test(src));
 }
 
+/* ═══ v226 — NESSUN INDICATORE PUO' RESTARE FUORI DALLE FAMIGLIE ═══════════════════════════
+   La ragnatela raggruppa 30 indicatori in 6 famiglie tramite un elenco di chiavi scritto a mano.
+   E' esattamente la forma che questo progetto ha gia' pagato tre volte: il registro fisso che
+   invecchia in silenzio (C10, gli indici 16/17 del red team, MACRO_CARD_BY_PANEL di v196). Un
+   indicatore nuovo in pipeline non deve SPARIRE dal grafico perche' nessuno ha aggiornato
+   l'elenco: famigliaDi() lo fa cadere in una famiglia per prefisso e, all'estremo, in "Altro".
+   Questi check verificano il RISULTATO (nessuno perso, i conti tornano), non l'elenco. */
+{
+  const reale = JSON.parse(readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null"));
+  vm.runInContext(`REALE = ${JSON.stringify(reale)};`, ctx, { filename: "reale.js" });
+  // stessa COPIA PROFONDA del blocco v205: nessun check deve lasciare mutazioni agli altri
+  const suReale = (code) => run(`
+    const _salva = DATA, _cash = cashEur;
+    DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 28500; recomputeTotals();
+    try { ${code} } finally { DATA = _salva; cashEur = _cash; recomputeTotals(); }`);
+
+  check("v226 famiglie: ogni indicatore finisce in una famiglia, nessuno perso", suReale(`
+    const righe = indicatoriClassifica();
+    const fam = famiglieMacro(righe);
+    const dentro = fam.reduce((s, f) => s + f.v.length, 0);
+    const nomi = new Set(fam.flatMap(f => f.v.map(x => x.nome)));
+    return dentro === righe.length && nomi.size === righe.length && fam.length >= 4;`));
+
+  check("v226 famiglie: una chiave sconosciuta NON sparisce, cade in una famiglia", suReale(`
+    const finto = [{ k: "chiave:mai:vista", nome: "Indicatore nuovo", score: 42 },
+                   { k: "in:qualcosa_di_nuovo", nome: "Macro nuova", score: 60 },
+                   { k: "mk:^NUOVO", nome: "Mercato nuovo", score: 55 }];
+    const fam = famiglieMacro(finto);
+    return fam.reduce((s, f) => s + f.v.length, 0) === 3
+      && famigliaDi("chiave:mai:vista") === "Altro"
+      && famigliaDi("in:qualcosa_di_nuovo") === "Ciclo USA";`));
+
+  check("v226 famiglie: la media di ogni famiglia è la media dei suoi indicatori", suReale(`
+    return famiglieMacro(indicatoriClassifica()).every(f =>
+      Math.abs(f.m - Math.round(f.v.reduce((s, x) => s + x.score, 0) / f.v.length)) < 0.51);`));
+
+  // i due grafici devono DISEGNARE tutti i punti che dichiarano: un pallino perso e' un
+  // indicatore invisibile, e non produce nessun errore (la classe .abar-fill di v205).
+  check("v226 grafici: l'asse disegna un pallino per ogni indicatore, la ragnatela un vertice per famiglia", suReale(`
+    const fam = famiglieMacro(indicatoriClassifica());
+    const tot = fam.reduce((s, f) => s + f.v.length, 0);
+    const asse = puntiSuAsse(fam), rad = radarFamiglie(fam);
+    const pallini = (asse.match(/class="pt-punto/g) || []).length;
+    const vertici = (rad.match(/class="rd-fam"/g) || []).length;
+    return pallini === tot && vertici === fam.length
+      && rad.includes("rd-area") && asse.includes("pt-tip");`));
+
+  // il CEO ha respinto barra e quadrante: se una delle due tornasse, tornerebbe il muro di widget
+  check("v226: nessun widget-per-indicatore è rientrato (né misuratore né quadrante)",
+    !/function\s+(misuratore|quadrante)\s*\(/.test(src));
+}
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

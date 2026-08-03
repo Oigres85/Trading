@@ -1678,8 +1678,6 @@ svg.g-serie { cursor: crosshair; }
 .mg-card .mg-n { margin-top: auto; padding-top: 7px; }
 
 /* v225 — quadrante ad arco: la posizione della lancetta e' il messaggio */
-.quad { display: flex; justify-content: center; margin: 2px 0 0; }
-.quad svg { width: 100%; max-width: 190px; height: auto; display: block; }
 
 /* ═══ v225 — comandi di riordino delle sezioni ═══════════════════════════════════════════════
    Stanno in alto a destra DENTRO la card, non dentro .card-head: quella e' una flex con
@@ -1711,3 +1709,31 @@ svg.g-serie { cursor: crosshair; }
 .anno-c { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .anno-c svg { width: 100%; max-width: 320px; height: auto; display: block; }
 .anno-legenda { font-size: 11px; text-align: center; }
+
+/* ═══ v226 — ragnatela + punti su un asse ═══════════════════════════════════════════════════ */
+/* v226 — IMPILATI, non affiancati: in due colonne l'asse rendeva a scala 0,55 e il suo testo
+   arrivava a 5,8px (lezione v206). A tutta larghezza ogni tela rende ~1:1. */
+.mg-due { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.mg-due > .pt, .mg-due > .rd { width: 100%; }   /* senza questo il flex li stringe al contenuto e la tela rende a 0,58 */
+.rd svg, .pt svg { width: 100%; height: auto; display: block; margin: 0 auto; }
+.rd-fam { cursor: pointer; }
+.rd-fam:hover text, .rd-fam:focus-visible text { text-decoration: underline; }
+.rd-sel text:first-child { fill: var(--accent); }
+.pt { position: relative; }
+.pt-riga { transition: opacity .18s ease; }
+.pt-off { opacity: .16; }
+.pt-punto { transition: r .12s ease; }
+.pt-click { cursor: pointer; }
+.pt-punto:hover, .pt-punto:focus-visible { r: 9.5; stroke: var(--text); }
+.pt-tip {
+  position: absolute; z-index: 5; pointer-events: none; white-space: nowrap;
+  background: var(--card-2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 5px 9px; font-size: 12px; color: var(--text); box-shadow: 0 4px 14px rgba(0,0,0,.5);
+}
+.mg-sotto { margin: 20px 0 10px; font-size: 12px; color: var(--muted); }
+.sp-quota { height: 5px; border-radius: 3px; background: var(--card-2); margin: 5px 0 8px; overflow: hidden; }
+.sp-quota i { display: block; height: 100%; border-radius: 3px; }
+/* la ragnatela si disegna entrando; con reduced-motion resta ferma (blocco gia' presente in v206) */
+@keyframes rd-in { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+.rd-area { animation: rd-in .5s ease both; transform-origin: center; }
+.rd-nota { font-size: 11.5px; text-align: center; margin-top: 2px; }

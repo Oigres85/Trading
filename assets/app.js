@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "225";
+const BUILD_VERSION = "226";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3930,6 +3930,162 @@ function annoCircolare(mesi, cur, opt = {}) {
   </svg><div class="anno-legenda muted">fuori dall'anello = mese storicamente positivo · dentro = negativo</div></div>`;
 }
 
+/* ═══ v226 — RAGNATELA + PUNTI SU UN ASSE: il quadro, poi il dettaglio ══════════════════════
+   Storia di questa decisione, perche' e' costata tre tentativi: la barra 0-100 e' stata
+   respinta, il quadrante ad arco pure. La diagnosi giusta non era la FORMA del widget — era
+   che ce n'erano 30 IDENTICI in fila. Nessuna forma sopravvive a essere ripetuta 30 volte.
+   Il CEO ha poi chiesto GRAFICI, comprensibili e dinamici, scegliendo fra alternative rese sui
+   dati veri. Qui la lettura ha due livelli e nessun widget ripetuto:
+     1. la RAGNATELA: 30 indicatori in 6 famiglie, un poligono solo. Dove rientra verso il
+        centro, quella parte del quadro e' debole. Si legge senza numeri, da lontano.
+     2. i PUNTI SU UN ASSE: tutti sulla stessa scala 0-100, una riga per famiglia. Si vede dove
+        si addensano e, cosa che nessuna media dice, quanto sono in DISACCORDO fra loro.
+   Dinamici: si passa sopra un punto e compare il nome, si clicca e si apre il pannello, si
+   clicca una famiglia sulla ragnatela e l'asse isola quella. */
+
+const FAMIGLIE_MACRO = [
+  { n: "Ciclo USA", k: ["in:umich", "in:cpi", "in:pce", "in:gdp", "in:retail", "in:unemp", "in:nfp", "macroquant"] },
+  { n: "Tassi e credito", k: ["mk:^TNX", "in:curve", "yield_recession", "credit", "systemic_risk", "fed_market", "fedwatch", "liquidity", "carry"] },
+  { n: "Sentiment", k: ["fear_greed", "risk_sentiment", "smart_money", "putcall", "froth"] },
+  { n: "Valutazione", k: ["sp500_pe", "forward_pe", "corp_profit", "decouple"] },
+  { n: "Mercato e tecnica", k: ["breadth", "momentum", "futures", "thermometer", "_alpha", "witching", "seasonality", "signposts"] },
+  { n: "Valute", k: ["mk:EURJPY=X", "mk:EURUSD=X", "dollar"] },
+];
+/* ⚠ NIENTE registro fisso e muto (la classe C10 / red team I6): una chiave che non conosco NON
+   deve sparire. Cade in una famiglia per prefisso, e se nemmeno quello la classifica finisce in
+   "Altro" — visibile, non persa. Un test verifica che nessun indicatore resti fuori. */
+function famigliaDi(k) {
+  const f = FAMIGLIE_MACRO.find(x => x.k.includes(k));
+  if (f) return f.n;
+  if (String(k).startsWith("in:")) return "Ciclo USA";
+  if (String(k).startsWith("mk:")) return "Mercato e tecnica";
+  return "Altro";
+}
+function famiglieMacro(righe) {
+  const m = new Map();
+  FAMIGLIE_MACRO.forEach(f => m.set(f.n, []));
+  righe.forEach(r => { const n = famigliaDi(r.k); if (!m.has(n)) m.set(n, []); m.get(n).push(r); });
+  return [...m.entries()].filter(([, v]) => v.length)
+    .map(([n, v]) => ({ n, v, m: Math.round(v.reduce((s, x) => s + x.score, 0) / v.length) }));
+}
+
+/* ⚠ IL VIEWBOX NON E' UNA COSTANTE — lezione v206, ripagata qui. Prima stesura: ragnatela e asse
+   affiancati in due colonne, tela fissa a 620 e 760. Misurato in browser: l'asse rendeva a
+   larghezza 416 su una tela da 760, cioe' SCALA 0,55 — le etichette da 10,5px arrivavano
+   all'occhio a 5,8px. Il grafico non era "sbagliato", era illeggibile per un motivo che non si
+   vede leggendo il codice. Qui la tela si sceglie sullo spazio REALE, cosi' un'unita' utente
+   resta ~un pixel e i corpi del testo sono quelli scritti. */
+function larghezzaTela(max) {
+  const w = (typeof window !== "undefined" && window.innerWidth) ? window.innerWidth : 1180;
+  return Math.round(Math.min(max, Math.max(320, w - 96)));
+}
+
+function radarFamiglie(fam) {
+  if (fam.length < 3) return "";
+  /* La tela NON e' quadrata: il contenuto e' un esagono piu' le etichette, che sporgono molto in
+     orizzontale (il testo) e poco in verticale. Con una tela quadrata restavano ~100px di vuoto
+     sopra e sotto — misurati in browser. Altezza calcolata sul contenuto reale.
+     Il vincolo che decide il raggio e' ORIZZONTALE: l'etichetta sporge dal proprio ancoraggio di
+     quanto e' LARGO il suo testo. Alla prima stesura avevo STIMATO 86px e "Mercato e tecnica"
+     usciva tagliata: il margine ora si calcola dal nome piu' lungo, non si indovina. */
+  const S = larghezzaTela(660), cx = S / 2, N = fam.length;
+  const lungo = Math.max(...fam.map(f => f.n.length));
+  const margine = Math.round(lungo * 6.9 + 14);             // ~6,9px per carattere a 12,5px
+  const R = Math.max(64, Math.round((cx - margine) / 1.1));
+  const RL = R * 1.1 + 24;                                  // dove cadono le etichette
+  const cy = Math.round(RL + 16), H = cy * 2 + 6;
+  const A = i => (i / N * 2 * Math.PI) - Math.PI / 2;
+  const P = (i, v, r) => [cx + (r ?? R) * (v / 100) * Math.cos(A(i)), cy + (r ?? R) * (v / 100) * Math.sin(A(i))];
+  const pts = v => fam.map((f, i) => P(i, typeof v === "function" ? v(f) : v).map(n => n.toFixed(1)).join(",")).join(" ");
+  const griglia = [25, 50, 75, 100].map(g => `<polygon points="${pts(g)}" fill="none"
+    stroke="${g === 50 ? "var(--muted)" : "var(--border)"}" stroke-width="${g === 50 ? 1.4 : 1}"
+    ${g === 50 ? 'stroke-dasharray="4 3"' : ""}/>`).join("");
+  const raggi = fam.map((_, i) => `<line x1="${cx}" y1="${cy}" x2="${P(i, 100)[0].toFixed(1)}" y2="${P(i, 100)[1].toFixed(1)}" stroke="var(--border)"/>`).join("");
+  const eti = fam.map((f, i) => {
+    const [x, y] = P(i, 100, RL), an = A(i);
+    const anc = Math.abs(Math.cos(an)) < .3 ? "middle" : (Math.cos(an) > 0 ? "start" : "end");
+    return `<g class="rd-fam" data-fam="${esc(f.n)}" role="button" tabindex="0" aria-label="isola la famiglia ${esc(f.n)}">
+      <text x="${x.toFixed(1)}" y="${(y - 7).toFixed(1)}" text-anchor="${anc}" dominant-baseline="central"
+        font-size="12.5" font-weight="600" fill="var(--text)">${esc(f.n)}</text>
+      <text x="${x.toFixed(1)}" y="${(y + 10).toFixed(1)}" text-anchor="${anc}" dominant-baseline="central"
+        font-size="14" font-family="var(--mono)" font-weight="700" fill="${scoreColor(f.m)}">${f.m}</text></g>`;
+  }).join("");
+  const punti = fam.map((f, i) => { const [x, y] = P(i, f.m);
+    return `<circle class="rd-p" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" fill="${scoreColor(f.m)}"
+      stroke="var(--card)" stroke-width="2"><title>${esc(f.n)}: ${f.m}/100 — media di ${f.v.length} indicatori</title></circle>`; }).join("");
+  return `<div class="rd"><svg viewBox="0 0 ${S} ${H}" style="max-width:${S}px" role="img" aria-label="punteggio medio delle famiglie macro">
+    ${griglia}${raggi}
+    <polygon class="rd-area" points="${pts(f => f.m)}" fill="var(--accent)" fill-opacity=".22"
+      stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round"/>
+    ${punti}${eti}
+  </svg><div class="rd-nota muted">l\u2019anello tratteggiato è il neutro (50): dentro = sfavorevole, fuori = favorevole</div></div>`;
+}
+
+function puntiSuAsse(fam, opt = {}) {
+  const W = larghezzaTela(880);
+  const L = Math.min(opt.lAsse || 150, Math.round(W * 0.26));   // la colonna dei nomi non puo' mangiarsi l'asse
+  const R = W - 26, rowH = 44, H = fam.length * rowH + 54;
+  const X = v => L + (Math.max(0, Math.min(100, v)) / 100) * (R - L);
+  const bande = `<rect x="${X(0)}" y="26" width="${X(45) - X(0)}" height="${fam.length * rowH}" fill="var(--red)" opacity=".07"/>
+    <rect x="${X(55)}" y="26" width="${X(100) - X(55)}" height="${fam.length * rowH}" fill="var(--green)" opacity=".07"/>`;
+  const assi = [0, 25, 50, 75, 100].map(t => `<line x1="${X(t)}" y1="26" x2="${X(t)}" y2="${26 + fam.length * rowH}"
+      stroke="${t === 50 ? "var(--muted)" : "var(--border)"}" ${t === 50 ? 'stroke-dasharray="4 3"' : ""}/>
+    <text x="${X(t)}" y="17" text-anchor="middle" font-size="10.5" fill="var(--muted)" font-family="var(--mono)">${t}</text>`).join("");
+  const righe = fam.map((f, i) => {
+    const y = 26 + i * rowH + rowH / 2;
+    const mn = Math.min(...f.v.map(x => x.score)), mx = Math.max(...f.v.map(x => x.score));
+    return `<g class="pt-riga" data-fam="${esc(f.n)}">
+      <text x="${L - 12}" y="${y}" text-anchor="end" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text)">${esc(f.n)}</text>
+      <line x1="${X(mn)}" y1="${y}" x2="${X(mx)}" y2="${y}" stroke="var(--card-2)" stroke-width="3" stroke-linecap="round"/>
+      ${f.v.map(x => `<circle class="pt-punto${x.k ? " pt-click" : ""}" cx="${X(x.score)}" cy="${y}" r="7"
+        fill="${scoreColor(x.score)}" fill-opacity=".9" stroke="var(--card)" stroke-width="1.5"
+        ${x.k ? `data-mp="${esc(x.k)}" role="button" tabindex="0"` : ""}
+        data-nome="${esc(x.nome)}" data-score="${x.score}"><title>${esc(x.nome)}: ${x.score}/100</title></circle>`).join("")}
+      <circle cx="${X(f.m)}" cy="${y}" r="3" fill="var(--bg)"><title>media ${f.n}: ${f.m}</title></circle></g>`;
+  }).join("");
+  return `<div class="pt"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="tutti gli indicatori sulla stessa scala 0-100">
+    ${bande}${assi}${righe}
+    <text x="${L}" y="${H - 8}" font-size="11" fill="var(--muted)">ogni pallino è un indicatore · la barretta è l'intervallo della famiglia · il puntino scuro è la media</text>
+  </svg><div class="pt-tip" hidden></div></div>`;
+}
+
+/* ── la parte DINAMICA: nome al passaggio, pannello al clic, famiglia isolata dalla ragnatela ── */
+function agganciaMacroDinamico(box) {
+  const tip = box.querySelector(".pt-tip");
+  box.querySelectorAll(".pt-punto").forEach(p => {
+    p.addEventListener("pointerenter", () => {
+      if (!tip) return;
+      tip.textContent = `${p.dataset.nome} — ${p.dataset.score}/100`;
+      const r = p.getBoundingClientRect(), b = box.getBoundingClientRect();
+      tip.hidden = false;
+      // si posiziona DOPO essere visibile: a display:none la larghezza e' 0 e finirebbe storto
+      tip.style.left = `${Math.max(4, Math.min(b.width - tip.offsetWidth - 4, r.left - b.left + r.width / 2 - tip.offsetWidth / 2))}px`;
+      tip.style.top = `${r.top - b.top - tip.offsetHeight - 8}px`;
+    });
+    p.addEventListener("pointerleave", () => { if (tip) tip.hidden = true; });
+    if (p.dataset.mp) {
+      const apri = () => openMacroInfo(p.dataset.mp);
+      p.addEventListener("click", apri);
+      p.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); apri(); } });
+    }
+  });
+  // clic su una famiglia della ragnatela → l'asse isola quella riga (ri-clic = tutte)
+  box.querySelectorAll(".rd-fam").forEach(g => {
+    const scegli = () => {
+      const gia = g.classList.contains("rd-sel");
+      box.querySelectorAll(".rd-fam").forEach(x => x.classList.remove("rd-sel"));
+      box.querySelectorAll(".pt-riga").forEach(r => r.classList.remove("pt-off"));
+      if (gia) return;
+      g.classList.add("rd-sel");
+      box.querySelectorAll(".pt-riga").forEach(r => {
+        if (r.dataset.fam !== g.dataset.fam) r.classList.add("pt-off");
+      });
+    };
+    g.addEventListener("click", scegli);
+    g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); scegli(); } });
+  });
+}
+
 function renderLevaStagione() {
   const m = DATA?.macro || {};
   const box = $("#mg-leva"); if (!box) return;
@@ -4007,12 +4163,12 @@ function renderScomposizione() {
       </div>
       <div class="muted mg-n" style="margin:0 0 10px">${comp.length} fattori, dal peggiore al migliore.
         Oggi tira giù <b>${esc(peggio.nome)}</b> (${peggio.val}/100) e tiene su <b>${esc(meglio.nome)}</b> (${meglio.val}/100).</div>
-      <div class="mg-tris">${righe.map(x => tessera({ t: x.nome, v: `${x.val}<span class="muted" style="font-size:12px">/100</span>`,
-        cls: clsScore(x.val), grafico: quadrante(x.val, { aria: x.nome }) })).join("")}</div>
+      ${puntiSuAsse([{ n: "fattori", v: righe.map(x => ({ nome: x.nome, score: x.val })), m: sc }], { lAsse: 76 })}
     </div>`;
   }).filter(Boolean);
   box.innerHTML = carte.length ? carte.join("")
     : '<div class="muted">Nessun punteggio composito disponibile in questo snapshot.</div>';
+  agganciaMacroDinamico(box);
   box.querySelectorAll("[data-mg-panel]").forEach(e => {
     const apri = () => openMacroInfo(e.dataset.mgPanel);
     e.addEventListener("click", apri);
@@ -4049,14 +4205,10 @@ function renderSignposts() {
       { nome: "Non ancora accesi", val: items.length - attivi, colore: "var(--border)" },
     ], { centro: { sopra: "campanelli", grande: `${attivi}/${items.length}`, sotto: "accesi" },
          aria: "campanelli BofA accesi" })
-    + `<div class="mg-tris" style="margin-top:14px">${righe.map(r => tessera({
-        t: r.nome, v: `${r.on}<span class="muted" style="font-size:13px">/${r.list.length}</span>`,
-        cls: r.valore >= 70 ? "neg" : r.valore >= 50 ? "warn" : "pos",
-        grafico: quadrante(100 - r.valore, { sx: "tutti accesi", dx: "nessuno acceso", colore: r.colore, aria: r.nome }),
-        n: r.list.map(x => `<span class="${x.status ? "sp-on" : ""}">${x.status ? "●" : "○"} ${esc(x.name)}</span>`).join("<br>"),
-      })).join("")}</div>`
+    + ""
     + `<div class="sp-dettaglio">${righe.map(r => `<div class="sp-cat">
-        <div class="sp-cat-h">${esc(r.nome)}</div>
+        <div class="sp-cat-h">${esc(r.nome)} <b style="font-family:var(--mono);color:${r.valore >= 70 ? "var(--red)" : r.valore >= 50 ? "var(--yellow)" : "var(--green)"}">${r.on}/${r.list.length}</b></div>
+        <div class="sp-quota"><i style="width:${r.valore}%;background:${r.valore >= 70 ? "var(--red)" : r.valore >= 50 ? "var(--yellow)" : "var(--green)"}"></i></div>
         ${r.list.map(i => `<span class="sp-item${i.status ? " sp-on" : ""}" title="${esc(i.desc || "")}${i.source ? " · fonte: " + esc(i.source) : ""}"><span class="sp-dot"></span>${esc(i.name)}</span>`).join("")}
       </div>`).join("")}</div>`;
 }
@@ -4258,28 +4410,39 @@ function renderIndicatori() {
   const righe = indicatoriClassifica();
   if (righe.length < 3) { box.innerHTML = '<div class="muted">Indicatori non disponibili.</div>'; return; }
   const conPan = new Set(Object.keys(MACRO_INFO || {}));
-  box.innerHTML = `<div class="mg-tris">${righe.map(r => tessera({
-    t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
-    cls: clsScore(r.score), grafico: (() => {
-      const se = serieIndicatore(r.k);
-      if (!se) return quadrante(r.score, { aria: r.nome });
-      if (se.doppia) return graficoSerie(se.doppia, { h: 108, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome });
-      return graficoSerie([{ nome: r.nome, punti: se.punti, colore: scoreColor(r.score) }],
-        { h: 108, compatto: true, soglie: se.soglie, unita: se.unita, assex: se.assex, fmtY: se.fmtY,
-          etichetteDx: false, aria: r.nome });
-    })(),
-    n: esc(r.sub || "") + (serieIndicatore(r.k) ? "" : ' <span class="muted">· nessuno storico nel file per questa voce: la pipeline ha iniziato ad accumularlo</span>'),
-    tk: conPan.has(r.k) ? r.k : null,
-  })).join("")}</div>`;
-  agganciaTessere(box);
+  const fam = famiglieMacro(righe.map(r => ({ ...r, k: conPan.has(r.k) ? r.k : null, _k: r.k })));
+
+  /* Sotto ai due grafici restano SOLO gli indicatori che hanno una serie storica vera, disegnati
+     come i termometri di stress — la forma che il CEO ha approvato ("i grafici sono perfetti").
+     Gli altri NON prendono un widget di ripiego: vivono nella ragnatela e sull'asse. */
+  const conSerie = righe.filter(r => serieIndicatore(r.k));
+  box.innerHTML = `<div class="mg-due">${radarFamiglie(fam)}${puntiSuAsse(fam)}</div>`
+    + (conSerie.length ? `<div class="mg-sotto">Di questi, ${conSerie.length} ${conSerie.length === 1 ? "ha" : "hanno"} una storia nel file: ecco come ci sono arrivati.</div>
+      <div class="mg-tris">${conSerie.map(r => {
+        const se = serieIndicatore(r.k);
+        const g = se.doppia
+          ? graficoSerie(se.doppia, { h: 108, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome })
+          : graficoSerie([{ nome: r.nome, punti: se.punti, colore: scoreColor(r.score) }],
+              { h: 108, compatto: true, soglie: se.soglie, unita: se.unita, assex: se.assex, fmtY: se.fmtY,
+                etichetteDx: false, aria: r.nome });
+        return tessera({ t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
+          cls: clsScore(r.score), grafico: g, n: esc(r.sub || ""), tk: conPan.has(r.k) ? r.k : null });
+      }).join("")}</div>` : "");
+  agganciaMacroDinamico(box); agganciaTessere(box);
 
   const peggio = righe.slice(0, 3), meglio = righe.slice(-2);
   const media = Math.round(righe.reduce((s, r) => s + r.score, 0) / righe.length);
+  const debole = [...fam].sort((a, b) => a.m - b.m)[0];
   if (head) head.innerHTML = `
     <div class="sh-item ${media < 45 ? "sh-warn" : ""}">
       <div class="sh-lab">Media di tutti</div>
       <div class="sh-val" style="color:${scoreColor(media)}">${media}<span class="muted" style="font-size:13px">/100</span></div>
-      <div class="sh-sub">${righe.length} indicatori sullo stesso asse</div>
+      <div class="sh-sub">${righe.length} indicatori in ${fam.length} famiglie</div>
+    </div>
+    <div class="sh-item sh-bad">
+      <div class="sh-lab">La famiglia più debole</div>
+      <div class="sh-val neg" style="font-size:15px">${esc(debole.n)}</div>
+      <div class="sh-sub">${debole.m} su 100 · ${debole.v.length} indicatori</div>
     </div>
     <div class="sh-item sh-bad">
       <div class="sh-lab">I tre che pesano di più</div>
@@ -4291,9 +4454,10 @@ function renderIndicatori() {
       <div class="sh-val pos" style="font-size:15px">${meglio.map(r => esc(r.nome.split(" (")[0])).join(" · ")}</div>
       <div class="sh-sub">${meglio.map(r => r.score).join(" · ")} su 100</div>
     </div>`;
-  if (nota) nota.innerHTML = `Ogni indicatore sulla stessa scala: <b>100 = favorevole al libro, 0 = sfavorevole</b>, ordinati dal peggiore.
-    Prima erano ${righe.length} riquadri separati, ognuno col proprio termometro e la propria scala mentale: non erano confrontabili fra loro.
-    <b>Clicca una barra</b> per il dettaglio e le news di quell'indicatore.`;
+  if (nota) nota.innerHTML = `Stessa scala per tutti: <b>100 = favorevole al libro, 0 = sfavorevole</b>.
+    La ragnatela dà il quadro, l'asse sotto mostra i singoli — e quanto sono in <b>disaccordo</b> dentro la stessa famiglia,
+    che è la cosa che una media non dice. <b>Passa sopra un pallino</b> per il nome, <b>cliccalo</b> per il dettaglio,
+    <b>clicca una famiglia</b> sulla ragnatela per isolarla.`;
 }
 
 /* v215 — CROSSHAIR sui grafici a linee. Un grafico statico costringe a stimare a occhio il
@@ -4522,34 +4686,14 @@ function serieIndicatore(k) {
    niente al volo. Un quadrante ad arco con la lancetta si interpreta senza pensarci — la
    posizione dell'ago È il messaggio — ed è diverso a colpo d'occhio da una linea nel tempo,
    quindi si capisce subito quali indicatori hanno uno storico e quali no. */
-function quadrante(score, opt = {}) {
-  const v = Math.max(0, Math.min(100, score));
-  const col = opt.colore || scoreColor(v);
-  const W = 180, H = 104, cx = 90, cy = 92, R = 74, sp = 15;
-  const P = (r, a) => `${(cx + r * Math.cos(a)).toFixed(2)},${(cy - r * Math.sin(a)).toFixed(2)}`;
-  const arco = (da, a, raggio, largo) => `M ${P(raggio, da)} A ${raggio} ${raggio} 0 ${largo} 0 ${P(raggio, a)}`;
-  const ang = (pct) => Math.PI * (1 - pct / 100);
-  // fondo grigio + arco colorato fino al valore
-  const fondo = `<path d="${arco(Math.PI, 0, R, 0)}" fill="none" stroke="var(--card)" stroke-width="${sp}" stroke-linecap="round"/>`;
-  const pieno = `<path d="${arco(Math.PI, ang(v), R, v > 50 ? 0 : 0)}" fill="none" stroke="${col}" stroke-width="${sp}" stroke-linecap="round"/>`;
-  // tacche a 25/50/75 per dare riferimento senza scrivere numeri
-  const tacche = [25, 50, 75].map(t => {
-    const a = ang(t);
-    return `<line x1="${P(R - sp / 2 - 1, a).split(",")[0]}" y1="${P(R - sp / 2 - 1, a).split(",")[1]}"
-      x2="${P(R + sp / 2 + 1, a).split(",")[0]}" y2="${P(R + sp / 2 + 1, a).split(",")[1]}"
-      stroke="var(--bg)" stroke-width="${t === 50 ? 2 : 1.2}" opacity="${t === 50 ? .9 : .5}"/>`;
-  }).join("");
-  // lancetta
-  const a = ang(v);
-  const lanc = `<line x1="${cx}" y1="${cy}" x2="${P(R - 4, a).split(",")[0]}" y2="${P(R - 4, a).split(",")[1]}"
-      stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="${cx}" cy="${cy}" r="4.5" fill="${col}"/>`;
-  return `<div class="quad"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.aria || "punteggio")} ${v} su 100">
-      ${fondo}${pieno}${tacche}${lanc}
-      <text x="14" y="${H - 2}" font-size="9" fill="var(--muted)">${esc(opt.sx || "sfavorevole")}</text>
-      <text x="${W - 14}" y="${H - 2}" text-anchor="end" font-size="9" fill="var(--muted)">${esc(opt.dx || "favorevole")}</text>
-    </svg></div>`;
-}
+/* v226 — `quadrante()` RIMOSSA, come `misuratore()` prima di lei. Erano due geometrie diverse
+   dello stesso errore: UN widget per OGNI indicatore, trenta volte di fila. Il CEO le ha
+   respinte entrambe e aveva ragione due volte — il problema non era l'arco o la barra, era la
+   RIPETIZIONE. Ora i 30 indicatori sono DUE grafici (ragnatela + punti su un asse), non 30.
+   RICEVUTA DEL TAGLIO, scritta prima di tagliare: 0 chiamanti residui, 0 riferimenti nei test,
+   e dentro i confini del blocco non vive nessun'altra funzione — verificato con un assert,
+   che alla prima stesura ha MORSO: il confine sbagliato si sarebbe portato via l'intero modulo
+   del riordino v225. E' esattamente la classe v201-v204 (un taglio che prende il vicino). */
 
 /* ═══ v225 — L'ORDINE DELLE SEZIONI, TRASCINABILE E UGUALE SU OGNI DEVICE ═══════════════════
    Richiesta CEO: "dammi la possibilità di trascinarli per ordinarli e se lo faccio questo deve
@@ -6783,9 +6927,13 @@ function buildPrompt() {
     const futBits = [fut.nasdaq, fut.sp500].filter(f => f && f.change_pct != null)
       .map(f => `${f.label || f.symbol || "Fut"} ${signTxt(f.change_pct)}`).join(" · ");
     const futLine = futBits
-      ? `Conferma incrociata USA (dato più fresco, ha PRIORITÀ sull'Asia): ${futBits}. Se i futures USA NON confermano la caduta (verdi o piatti mentre l'Asia crolla), è un ALLARME FANTASMA localizzato: dichiaralo al CEO e procedi normalmente.`
-      : `Conferma incrociata USA: futures non nel payload → verificali via web PRIMA di trarre conclusioni.`;
-    lines.push(`🚨 [SEGNALE DI SHOCK — verifica prima di agire, NON è un ordine]: ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} (oltre ${shock.threshold}% con Wall Street chiusa). È un INDIZIO da validare, non un verdetto. WORKFLOW DI VERIFICA in ordine: 1) conferma il dato (Tabella B/web) · 2) escludi cache/feed rotto · 3) ${futLine} · 4) SOLO se il regime è confermato: alza gli standard d'ingresso, non inseguire i limiti calcolati su dati pre-shock, marca gli ingressi "CONDIZIONATO all'assestamento della prima ora" e rivaluta gli stop contro il gap atteso. La decisione resta tua e pesata sui 4 pilastri — mai una sospensione automatica.`);
+      /* v226 — era un ORDINE nella coda ("dichiaralo al CEO e procedi normalmente"), e il gate
+         C9 lo prendeva ogni volta che il ramo shock si attivava — cioè raramente, quindi era
+         rimasto a lungo invisibile (la classe v190: un difetto in un ramo raro non è raro, è
+         solo non letto). Ora la riga AFFERMA il fatto: le istruzioni vivono nella testata. */
+      ? `Conferma incrociata USA (dato più fresco, ha PRIORITÀ sull'Asia): ${futBits}. Futures USA verdi o piatti mentre l'Asia crolla = ALLARME FANTASMA localizzato all'Asia, cioè una caduta che il mercato di riferimento di questo libro non ha confermato.`
+      : `Conferma incrociata USA: i futures non sono nel payload, quindi la caduta asiatica resta senza controprova sul mercato che conta per questo libro.`;
+    lines.push(`🚨 [SEGNALE DI SHOCK — verifica prima di agire, NON è un ordine]: ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} (oltre ${shock.threshold}% con Wall Street chiusa). È un INDIZIO da validare, non un verdetto. WORKFLOW DI VERIFICA in ordine: 1) conferma il dato (Tabella B/web) · 2) escludi cache/feed rotto · 3) ${futLine} · 4) cosa cambia se il regime è confermato: i livelli d'ingresso e i target di questo payload sono calcolati su prezzi PRE-shock, e gli stop 2×ATR sono misurati su una volatilità che non contiene il gap atteso — due numeri costruiti su un mercato che potrebbe non esistere più all'apertura. Questo blocco è un INDIZIO, non una sospensione automatica.`);
     lines.push("");
   }
   // ORDINE WEB-SEARCH IN CIMA: se ci sono dati mancanti/inaffidabili, l'imperativo va visto
