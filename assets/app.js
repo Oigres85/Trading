@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "221";
+const BUILD_VERSION = "222";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4189,6 +4189,57 @@ function indicatoriClassifica() {
     const sc = marketImpact(i);
     if (sc != null) out.push({ k: "mk:" + i.key, nome: i.label, score: Math.round(sc), sub: `${i.value} (${signTxt(i.change_pct, i.suffix || "%")} oggi)` });
   });
+  // ⚠ v222 — GLI UNDICI ORFANI. Togliendo i riquadri (v217) E il popup dei dettagli (v219) ho
+  // lasciato SENZA CASA undici indicatori che prima erano visibili: carry, put/call, liquidità
+  // in attesa, righello dollaro, Fed funds, curva-vs-recessione, disaccoppiamento, forward P/E,
+  // FedWatch, streghe, scarto vs indice. NON erano duplicati di un grafico: erano informazione,
+  // e l'ho fatta sparire. Rientrano qui, sulla stessa scala 0-100 (100 = favorevole al libro):
+  // non torna il riquadro, torna il DATO in forma confrontabile con tutti gli altri.
+  const cl = (x) => Math.round(Math.max(0, Math.min(100, x)));
+  const orf = [];
+  if (m.carry?.spread != null) orf.push({ k: "carry", nome: "Carry USA-Giappone",
+    score: cl(50 + (m.carry.spread - 2) * 15),
+    sub: `spread ${fmtNum.format(m.carry.spread)} pp${m.carry.usdjpy != null ? ` · USD/JPY ${fmtNum.format(m.carry.usdjpy)}` : ""}` });
+  if (m.putcall?.ratio != null) orf.push({ k: "putcall", nome: "Put/Call ratio (SPY)",
+    score: cl(100 - (m.putcall.ratio - 0.7) / 0.008),
+    sub: `${fmtNum.format(m.putcall.ratio)} — sopra 1 più copertura che scommessa` });
+  if (m.liquidity_split?.retail_mmf_bln != null) orf.push({ k: "liquidity", nome: "Liquidità in attesa (dry powder)",
+    score: cl(40 + (m.liquidity_split.retail_pctile_5y ?? 50) * 0.4),
+    sub: `fondi monetari $${fmtNum.format(Math.round(m.liquidity_split.retail_mmf_bln))} mld${m.liquidity_split.retail_yoy_pct != null ? ` · YoY ${signTxt(m.liquidity_split.retail_yoy_pct)}` : ""}` });
+  if (m.dollar_ruler?.value != null) orf.push({ k: "dollar", nome: "Righello dollaro (DXY)",
+    score: cl(50 - (m.dollar_ruler.chg_3m_pct ?? 0) * 6),
+    sub: `${fmtNum.format(m.dollar_ruler.value)} · 3 mesi ${signTxt(m.dollar_ruler.chg_3m_pct ?? 0)}` });
+  if (m.fed_market?.current_rate != null) orf.push({ k: "fed_market", nome: "Tasso Fed Funds",
+    score: cl(100 - (m.fed_market.current_rate - 1) * 20),
+    sub: `${fmtNum.format(m.fed_market.current_rate)}% — sopra il 4% comprime i multipli` });
+  if (m.yield_recession?.current != null) orf.push({ k: "yield_recession", nome: "Curva vs recessione",
+    score: cl(50 + m.yield_recession.current * 60),
+    sub: `spread ${signTxt(m.yield_recession.current, " pp")} · ${m.yield_recession.was_inverted_24m ? "invertita negli ultimi 24 mesi" : "nessuna inversione recente"}` });
+  if ((m.decouple?.sp500 || []).length && (m.decouple?.gdp || []).length) {
+    const gapD = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
+    orf.push({ k: "decouple", nome: "Borsa vs economia reale", score: cl(100 - gapD * 0.9),
+      sub: `gap ${signTxt(gapD, " pp")} su 3 anni — cumulato, cresce con la finestra` });
+  }
+  if (m.forward_pe?.value != null) orf.push({ k: "forward_pe", nome: "Valutazione S&P (P/E forward)",
+    score: cl(100 - (m.forward_pe.value - 13) * 8),
+    sub: `${fmtNum.format(m.forward_pe.value)}× vs media storica ${fmtNum.format(m.forward_pe.avg ?? 16.5)}×` });
+  if ((m.fedwatch?.meetings || []).length) {
+    const rf = ramiFedWatch(m.fedwatch, m.fedwatch.meetings[0]);
+    orf.push({ k: "fedwatch", nome: "Attese sui tassi (prossimo FOMC)",
+      score: cl(50 + (rf.cut_prob ?? 0) * 0.5 - (rf.hike_prob ?? 0) * 0.5),
+      sub: `rialzo ${rf.hike_prob ?? 0}% · invariato ${rf.hold_prob ?? 0}% · taglio ${rf.cut_prob ?? 0}%` });
+  }
+  if (m.witching?.days != null) orf.push({ k: "witching", nome: "Prossima scadenza tecnica",
+    score: m.witching.days <= 5 ? 30 : m.witching.days <= 15 ? 45 : 62,
+    sub: `fra ${m.witching.days} giorni — volatilità attesa attorno alla data` });
+  const bmk = m.benchmarks, pdOggi = typeof portfolioDayPct === "function" ? portfolioDayPct() : null;
+  if (bmk && pdOggi != null) {
+    const rif = bmk.sp500 ?? bmk.ndx ?? bmk.sox;
+    if (rif != null) orf.push({ k: "_alpha", nome: "Scarto di oggi vs indice",
+      score: cl(50 + (pdOggi - rif) * 12), sub: `${signTxt(Math.round((pdOggi - rif) * 100) / 100, " pp")} nella seduta` });
+  }
+  orf.forEach(x => out.push(x));
+
   // v218 — gli INTERNI DI MERCATO erano l'ultima mini-card: quattro righe di valori con unità
   // diverse (pp, %, un booleano) che nessuno poteva confrontare fra loro. Portati sulla stessa
   // scala 0-100 entrano nella classifica insieme a tutto il resto, e la mini-card sparisce.
@@ -7476,7 +7527,13 @@ function buildPrompt() {
     const bySec = {};
     alloc.forEach(a => { const k = a.sector || a.ticker; bySec[k] = (bySec[k] || 0) + (a.value_eur || 0); });
     const secs = Object.entries(bySec).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${Math.round(v / tot * 100)}%`);
-    lines.push(`- Concentrazione per settore (% del PATRIMONIO TOTALE, liquidità e obbligazioni incluse, somma 100%): ${secs.join(" · ")}. NB: la "regola correlazione >25%" nelle METRICHE DI RISCHIO usa invece la % del solo capitale azionario — denominatore diverso, non un'incoerenza.. ⚠ v221 — qui prima c'era scritto "portafoglio fortemente sbilanciato sul tech/semi → priorità al de-risking": era un ORDINE dentro il payload, che deve portare FATTI. Il detector C9 non l'ha preso perché cerca imperativi in seconda persona e quello era un sostantivo. La quota è il fatto; che cosa farne lo decide chi legge, con la regola B4 della testata.`);
+    // ⚠ v222 — questa riga finiva con "portafoglio fortemente sbilanciato sul tech/semi →
+    // priorità al de-risking": un ORDINE dentro il payload, che deve portare solo FATTI (il
+    // detector C9 non l'ha preso perché cerca imperativi in SECONDA PERSONA e quello era un
+    // sostantivo). In v221 avevo tolto l'ordine ma scritto la SPIEGAZIONE dentro il payload —
+    // che è lo stesso errore due volte: la nota spiegava un difetto a chi legge il prompt,
+    // e ripeteva pure la frase incriminata. La spiegazione vive qui, nel codice.
+    lines.push(`- Concentrazione per settore (% del PATRIMONIO TOTALE, liquidità e obbligazioni incluse, somma 100%): ${secs.join(" · ")}. NB: la "regola correlazione >25%" nelle METRICHE DI RISCHIO usa invece la % del solo capitale azionario — denominatore diverso, non un'incoerenza.`);
   }
   // IDEE DI ROTAZIONE (v144): compounder di qualità ESTERNI al portafoglio, dai settori in
   // accelerazione — la materia prima POSITIVA per rompere la monocultura tech. Dati reali dal
@@ -8891,23 +8948,40 @@ document.addEventListener("click", (e) => {
    ⚠ Le sezioni SENZA data-pane restano SEMPRE visibili (avvisi, barra di stato, coda decisioni):
    un contenitore nuovo che nessuno ha marcato non deve sparire per omissione. */
 const TAB_KEY = "pref_tab";
+/* v222 — UNA PAGINA SOLA. "porta tutto sulla index principale": le schede nascondevano tre
+   quarti della dashboard dietro un clic, e per quattro versioni ho creduto di aver spostato
+   cose che non si vedevano solo perche' stavano in un pannello chiuso. Ora TUTTO e' in pagina,
+   sempre: la barra laterale non commuta piu' niente, porta il punto — e' un indice, e si
+   evidenzia da sola sulla sezione che stai guardando. Zero contenuti nascosti. */
 function setTab(nome) {
   const valide = [...document.querySelectorAll("#main-tabs .tab")].map(b => b.dataset.tab);
-  if (!valide.includes(nome)) nome = valide[0] || "portafoglio";
+  if (!valide.includes(nome)) nome = valide[0] || "struttura";
   try { localStorage.setItem(TAB_KEY, nome); } catch { /* quota */ }
   document.querySelectorAll("#main-tabs .tab").forEach(b =>
     b.classList.toggle("tab-active", b.dataset.tab === nome));
-  document.querySelectorAll("[data-pane]").forEach(el => {
-    el.hidden = el.dataset.pane !== nome;
-  });
-  // le tabelle vanno ridisegnate quando tornano visibili: larghezze e sticky si calcolano
-  // sul layout, e su un contenitore nascosto verrebbero sbagliate.
-  if (nome === "portafoglio") renderTable();
-  if (nome === "watchlist") renderWatchlist();
-  if (nome === "struttura" && typeof DATA !== "undefined" && DATA) renderStruttura();
-  // v218 — la scheda "macro" non esiste più: il suo contenuto sta dentro Struttura
-  if (nome === "struttura" && typeof DATA !== "undefined" && DATA) renderMacroGrafici();
+  document.querySelectorAll("[data-pane]").forEach(el => { el.hidden = false; });
+  const primo = document.querySelector(`[data-pane="${nome}"]`);
+  if (primo) primo.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (typeof DATA !== "undefined" && DATA) {
+    if (nome === "portafoglio") renderTable();
+    if (nome === "watchlist") renderWatchlist();
+  }
 }
+function seguiScroll() {
+  if (seguiScroll._fatto) return; seguiScroll._fatto = true;
+  const bottoni = [...document.querySelectorAll("#main-tabs .tab")];
+  if (!bottoni.length || typeof IntersectionObserver !== "function") return;
+  const visibili = new Map();
+  const io = new IntersectionObserver(voci => {
+    voci.forEach(v => visibili.set(v.target, v.isIntersecting ? v.intersectionRatio : 0));
+    let best = null, bestR = 0;
+    visibili.forEach((r, el) => { if (r > bestR) { bestR = r; best = el; } });
+    if (!best) return;
+    bottoni.forEach(b => b.classList.toggle("tab-active", b.dataset.tab === best.dataset.pane));
+  }, { rootMargin: "-15% 0px -60% 0px", threshold: [0, .25, .5, 1] });
+  document.querySelectorAll("[data-pane]").forEach(el => io.observe(el));
+}
+
 document.querySelectorAll("#main-tabs .tab").forEach(b =>
   b.addEventListener("click", () => setTab(b.dataset.tab)));
 
@@ -8915,12 +8989,7 @@ document.querySelectorAll("#main-tabs .tab").forEach(b =>
    struttura → copia il prompt → LLM con accesso web". Si applica UNA SOLA VOLTA e mai sopra
    una preferenza già espressa: la scheda su cui l'utente si è fermato l'ultima volta vince
    (stessa regola della vista compatta di v198 — un default non sovrascrive una scelta). */
-try {
-  const salvata = localStorage.getItem(TAB_KEY);
-  if (!localStorage.getItem("landing_struttura_v205")) {
-    localStorage.setItem("landing_struttura_v205", "1");
-    if (!salvata || salvata === "portafoglio") setTab("struttura"); else setTab(salvata);
-  } else {
-    setTab(salvata || "struttura");
-  }
-} catch { /* DOM non pronto */ }
+/* v222 — tutte le sezioni visibili dal primo istante, nessun ripristino di scheda e nessuno
+   scroll automatico all'avvio: la pagina si apre dalla cima e mostra tutto. */
+document.querySelectorAll("[data-pane]").forEach(el => { el.hidden = false; });
+seguiScroll();

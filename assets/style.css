@@ -1647,3 +1647,18 @@ svg.g-serie { cursor: crosshair; }
 .ciam-pct { font-family: var(--mono); font-size: 14px; }
 .ciam-extra { grid-column: 2 / -1; font-size: 11px; margin-top: -3px; }
 @media (max-width: 620px) { .ciam-wrap { grid-template-columns: 1fr; justify-items: center; } .ciam-leg { width: 100%; } }
+
+/* v222 — UNA PAGINA SOLA: la barra laterale è un indice, non un commutatore. Resta appiccicata
+   in alto e si evidenzia da sola sulla sezione che stai guardando. */
+@media (min-width: 861px) {
+  .shell > .tabs .tab { position: relative; }
+  .shell > .tabs .tab::after {
+    content: ""; position: absolute; left: -2px; top: 6px; bottom: 6px; width: 2px;
+    background: var(--blue); border-radius: 2px; opacity: 0; transition: opacity var(--t-fast);
+  }
+  .shell > .tabs .tab-active::after { opacity: 1; }
+}
+/* separatore fra i gruppi, così scorrendo si capisce dove finisce uno e inizia l'altro */
+[data-pane] + [data-pane] { scroll-margin-top: 90px; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
