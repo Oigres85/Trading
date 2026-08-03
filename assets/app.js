@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "230";
+const BUILD_VERSION = "231";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4020,8 +4020,14 @@ function renderLevaStagione() {
     carte.push({
       t: "Leva a credito (margin debt)", v: `${fmt1.format(md.yoy)}% a/a`,
       cls: md.yoy >= 25 ? "neg" : md.yoy >= 10 ? "warn" : "pos",
+      /* ⚠ v231 — ERA `w: 900`, cioe' una tela pensata per un blocco a tutta larghezza. Dentro
+         una mini tab quel viewBox NON si restringe: forzava la traccia della griglia a 990px e
+         faceva collassare .mg-tris a UNA colonna sola — le due schede finivano impilate a tutta
+         pagina. Non si vedeva dal viewport (nessuno sbordamento): si trova misurando la
+         gridTemplateColumns risolta. Terza volta che il viewBox non-costante presenta il conto
+         (v206, v226, qui). `compatto` usa la stessa tela dei termometri di stress. */
       g: graficoSerie([{ nome: "md", punti: h.map(v => ({ d: null, v })), colore: "var(--purple)" }],
-        { h: 150, w: 900, lAsse: 60, fmtY: v => fmtNum.format(Math.round(v / 1000)) + " mld",
+        { h: 120, compatto: true, lAsse: 46, fmtY: v => fmtNum.format(Math.round(v / 1000)) + " mld",
           soglie: picco > 0 ? [{ v: picco, testo: "massimo storico", colore: "var(--red)" }] : [],
           assex: [`${h.length} mesi fa`, md.date ? dataBreve(md.date) : "oggi"], etichetteDx: false,
           aria: "debito a margine FINRA" }),
@@ -4034,7 +4040,7 @@ function renderLevaStagione() {
     const cur = se.current_month;
     carte.push({
       t: "Stagionalità S&P 500", v: `${MESI[(cur || 1) - 1]} · ${se.label || ""}`,
-      cls: (se.sp500[(cur || 1) - 1]?.avg ?? 0) < 0 ? "warn" : "pos", largo: true,
+      cls: (se.sp500[(cur || 1) - 1]?.avg ?? 0) < 0 ? "warn" : "pos",
       /* v229 — TORNA A BARRE su richiesta del CEO. La rosa circolare era leggibile ma va
          imparata; dodici barre affiancate, una per mese, con quello corrente acceso, si
          leggono senza istruzioni. Divergono dallo zero perche' il segno E' l'informazione. */
@@ -4045,7 +4051,12 @@ function renderLevaStagione() {
       n: `Rendimento medio di ogni mese su ~${se.sp500[0]?.n || 40} anni, con il mese corrente acceso. È contesto di probabilità, non una previsione.`,
     });
   }
-  box.innerHTML = carte.length ? carte.map(c => `<div class="mg-card${c.largo ? " mg-wide" : ""}">
+  /* v231 — MINI TAB da "Leva e stagionalità" in giù (richiesta CEO). `mg-wide` fa
+     grid-column: 1/-1, cioè trasformava queste schede in blocchi a tutta larghezza: tolto, la
+     griglia .mg-tris le rimette affiancate. I GRAFICI RESTANO DENTRO — margin debt tiene la sua
+     serie storica, la stagionalità le sue 12 barre: "se quelle all'interno portavano dei grafici
+     con le informazioni riporta direttamente quelle". Cambia il contenitore, non il contenuto. */
+  box.innerHTML = carte.length ? carte.map(c => `<div class="mg-card">
       <div class="mg-card-head"><span class="mg-t">${esc(c.t)}</span><span class="mg-v ${c.cls}">${esc(c.v)}</span></div>
       ${c.g}<div class="muted mg-n">${c.n}</div></div>`).join("")
     : '<div class="muted">Dati non disponibili.</div>';
@@ -4082,12 +4093,12 @@ function renderScomposizione() {
     const peggio = righe[0], meglio = righe[righe.length - 1];
     const sc = v.score ?? Math.round(comp.reduce((s, x) => s + x.score, 0) / comp.length);
     const apri = c.k.startsWith("_") ? "" : ` data-mg-panel="${c.k}" role="button" tabindex="0" title="Apri il dettaglio di ${esc(c.t.replace(/&amp;/g, "&"))}"`;
-    return `<div class="mg-card mg-wide${apri ? " mg-click" : ""}"${apri}>
+    return `<div class="mg-card${apri ? " mg-click" : ""}"${apri}>
       <div class="mg-card-head">
-        <span class="mg-t">${c.t} <span class="muted" style="font-weight:400">— ${esc(c.sub)}</span></span>
+        <span class="mg-t">${c.t}</span>
         <span class="mg-v" style="color:${scoreColor(sc)}">${sc}<span class="muted" style="font-size:12px">/100</span></span>
       </div>
-      <div class="muted mg-n" style="margin:0 0 10px">${comp.length} fattori, dal peggiore al migliore.
+      <div class="muted mg-n" style="margin:0 0 10px">${esc(c.sub)} · ${comp.length} fattori, dal peggiore al migliore.
         Oggi tira giù <b>${esc(peggio.nome)}</b> (${peggio.val}/100) e tiene su <b>${esc(meglio.nome)}</b> (${meglio.val}/100).</div>
       ${/* v229 — a BARRE su richiesta del CEO. Divergono da 50, non da zero: su una scala 0-100
             il neutro e' il centro, e cio' che conta e' da che parte sta ogni fattore. */""}
@@ -4132,23 +4143,27 @@ function renderSignposts() {
     return { nome: cat, valore: Math.round(on / list.length * 100), colore: on / list.length >= 0.7 ? "var(--red)" : on / list.length >= 0.5 ? "var(--yellow)" : "var(--green)",
              testo: `${on}/${list.length} acceso${on === 1 ? "" : "i"}`, on, list };
   }).sort((a, b) => b.valore - a.valore);
-  box.innerHTML = ciambella([
-      { nome: "Accesi", val: attivi, colore: "var(--red)" },
-      { nome: "Non ancora accesi", val: items.length - attivi, colore: "var(--border)" },
-    ], { centro: { sopra: "campanelli", grande: `${attivi}/${items.length}`, sotto: "accesi" },
-         aria: "campanelli BofA accesi" })
-    /* v229 — TORTA per il totale (quanto siamo avanti nel conto alla rovescia) e BARRE per
-       categoria (quale famiglia si sta accendendo), su richiesta del CEO. Le barre misurano
-       la QUOTA accesa, non un punteggio: una categoria con 2 campanelli su 2 e' piena. */
-    + `<div class="sp-barre">${barreOrdinate(righe.map(r => ({
-        nome: r.nome, valore: r.valore, colore: r.colore,
-        testo: `${r.on}/${r.list.length} acceso${r.on === 1 ? "" : "i"}`,
-      })), {})}</div>`
-    + `<div class="sp-dettaglio">${righe.map(r => `<div class="sp-cat">
-        <div class="sp-cat-h">${esc(r.nome)} <b style="font-family:var(--mono);color:${r.valore >= 70 ? "var(--red)" : r.valore >= 50 ? "var(--yellow)" : "var(--green)"}">${r.on}/${r.list.length}</b></div>
-        <div class="sp-quota"><i style="width:${r.valore}%;background:${r.valore >= 70 ? "var(--red)" : r.valore >= 50 ? "var(--yellow)" : "var(--green)"}"></i></div>
-        ${r.list.map(i => `<span class="sp-item${i.status ? " sp-on" : ""}" title="${esc(i.desc || "")}${i.source ? " · fonte: " + esc(i.source) : ""}"><span class="sp-dot"></span>${esc(i.name)}</span>`).join("")}
-      </div>`).join("")}</div>`;
+  /* v231 — MINI TAB anche qui. Prima era un blocco unico: torta grande, barre per categoria e
+     l'elenco completo, tutto a tutta larghezza. Ora ogni categoria e' una scheda della griglia
+     col PROPRIO grafico dentro (la quota accesa) e i propri campanelli elencati sotto; la torta
+     d'insieme resta, come prima scheda. "Se quelle all'interno portavano dei grafici con le
+     informazioni riporta direttamente quelle": il grafico non sparisce, entra nella scheda. */
+  box.innerHTML = `<div class="mg-tris">`
+    + `<div class="mg-card">
+        <div class="mg-card-head"><span class="mg-t">Quanti sono accesi</span><span class="mg-v ${cls}">${attivi}<span class="muted" style="font-size:13px">/${items.length}</span></span></div>
+        ${ciambella([
+          { nome: "Accesi", val: attivi, colore: "var(--red)" },
+          { nome: "Non ancora accesi", val: items.length - attivi, colore: "var(--border)" },
+        ], { centro: { sopra: "campanelli", grande: `${attivi}/${items.length}`, sotto: "accesi" },
+             aria: "campanelli BofA accesi" })}
+        <div class="muted mg-n">Il conto alla rovescia di BofA: piu' se ne accendono, piu' il mercato somiglia a un massimo.</div>
+      </div>`
+    + righe.map(r => `<div class="mg-card">
+        <div class="mg-card-head"><span class="mg-t">${esc(r.nome)}</span><span class="mg-v" style="color:${r.colore}">${r.on}<span class="muted" style="font-size:13px">/${r.list.length}</span></span></div>
+        ${barreOrdinate([{ nome: "accesi", valore: r.valore, colore: r.colore, testo: `${r.on} su ${r.list.length}` }], {})}
+        <div class="muted mg-n">${r.list.map(i => `<span class="sp-item${i.status ? " sp-on" : ""}" title="${esc(i.desc || "")}${i.source ? " · fonte: " + esc(i.source) : ""}"><span class="sp-dot"></span>${esc(i.name)}</span>`).join("")}</div>
+      </div>`).join("")
+    + `</div>`;
 }
 
 function renderMacroGrafici() {

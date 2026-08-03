@@ -1490,7 +1490,10 @@ th.col-over { box-shadow: inset 3px 0 0 var(--accent); }
 .mg-tris { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
 /* la leva e la stagionalità sono due grafici LARGHI: in tre colonne restava un buco e il
    margin debt si leggeva in 300px */
-#mg-leva { grid-template-columns: 1fr; }
+/* v231 — RIMOSSA `#mg-leva { grid-template-columns: 1fr }`. Era di quando questa sezione aveva
+   due schede a tutta larghezza; da v231 sono mini tab e devono stare affiancate. Un selettore ID
+   batte .mg-tris, quindi la griglia restava a UNA colonna e le due schede si impilavano — e non
+   si vedeva da nessuna misura di sbordamento: si trova solo leggendo quale regola vince. */
 .mg-card { min-width: 0; background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
 .mg-card.mg-wide { grid-column: 1 / -1; }
 .mg-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
@@ -1728,3 +1731,37 @@ svg.g-serie { cursor: crosshair; }
 .sp-quota i { display: block; height: 100%; border-radius: 3px; }
 /* la ragnatela si disegna entrando; con reduced-motion resta ferma (blocco gia' presente in v206) */
 .sp-barre { margin-top: 16px; }
+
+/* ⚠ v231 — DENTRO UNA MINI TAB IL NOME VA SOPRA LA BARRA, non in una colonna a sinistra.
+   Prima stesura: colonna etichette al 38% di una scheda da 245px = ~84px, e misurando
+   scrollWidth vs clientWidth ho trovato fino a 72px di testo TAGLIATO per riga — "Fiducia
+   consumatori (UMich)" diventava "Fiducia consu…". Un nome troncato non e' un'informazione, ed
+   e' esattamente cio' che la richiesta chiedeva di portare dentro la scheda. Impilato, il nome
+   ha tutta la larghezza e la barra sta sotto. */
+/* IMPILATO IN OGNI MINI TAB (nome sopra, barra sotto): dentro una scheda da ~250px la colonna
+   delle etichette tagliava i nomi. Unica eccezione i 12 mesi, dove l'etichetta e' di tre lettere
+   e impilare raddoppiava l'altezza per niente — misurato, da ~340px a ~700px: l'override
+   #mg-leva piu' sotto ha specificita' maggiore e vince. */
+.mg-card .obar-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "lab val" "axis axis";
+  row-gap: 3px; padding: 4px 6px;
+}
+.mg-card .obar-lab { grid-area: lab; font-size: 11.5px; white-space: normal; }
+.mg-card .obar-val { grid-area: val; font-size: 11px; }
+.mg-card .obar-axis { grid-area: axis; }
+/* ⚠ per tornare in riga non basta ridefinire le COLONNE: le grid-template-areas della regola
+   generale continuavano ad applicarsi e tenevano la barra su una riga sua. Vanno azzerate. */
+#mg-leva .mg-card .obar-row { grid-template-columns: 34px minmax(0, 1fr) auto; grid-template-areas: none; row-gap: 0; }
+#mg-leva .mg-card .obar-lab, #mg-leva .mg-card .obar-axis, #mg-leva .mg-card .obar-val { grid-area: auto; }
+#mg-leva .mg-card .obar-lab, #mg-leva .mg-card .obar-val { font-size: 11px; }
+/* le schede non si allungano per pareggiare la vicina: il margin debt lasciava mezza colonna vuota */
+.mg-tris { align-items: start; }
+.mg-card .sp-item { display: inline-flex; align-items: center; gap: 4px; margin: 0 8px 2px 0; }
+
+/* v231 — ⚠ LA COLONNA FISSA DENTRO UN CONTENITORE STRETTO: .ciam-wrap ha
+   grid-template-columns: 210px …, e in una mini tab da 245px sbordava di 66px (misurato con
+   scrollWidth vs clientWidth, non a occhio: dal viewport non si vedeva). Stessa causa del
+   difetto v209. Dentro una scheda la ciambella si impila e la tela diventa fluida. */
+.mg-card .ciam-wrap { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.mg-card .ciam-svg { width: 100%; max-width: 190px; height: auto; margin: 0 auto; }

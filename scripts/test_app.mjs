@@ -1965,6 +1965,64 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   })());
 }
 
+/* ═══ v231 — MINI TAB da "Leva e stagionalità" in giù ══════════════════════════════════════
+   Richiesta CEO: "sostituisci tutti i grafici con le mini tab e se quelle all'interno portavano
+   dei grafici con le informazioni riporta direttamente quelle". Cambia il CONTENITORE (blocchi a
+   tutta larghezza → schede della griglia), NON il contenuto: i grafici restano dentro le schede.
+   Il check guarda l'HTML davvero prodotto dal render, non il sorgente (lezione v227). */
+{
+  vm.runInContext(`REALE5 = ${readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null")};`, ctx, { filename: "reale5.js" });
+  /* ⚠ SUI DATI VERI: la fixture non ha macro.seasonality/signposts/components, quindi questi
+     render producevano "dati non disponibili" e i check fallivano sul codice CORRETTO. E' la
+     stessa trappola gia' pagata due volte in questa sessione — un check che gira su dati privi
+     del fenomeno non misura niente, in nessuna delle due direzioni. */
+  const rendi = (id, fn) => run(`
+    const _d = DATA, _c = cashEur;
+    DATA = JSON.parse(JSON.stringify(REALE5)); cashEur = 56000; recomputeTotals();
+    let html = "";
+    const box = { set innerHTML(v) { html = v; }, get innerHTML() { return html; },
+                  querySelector: () => null, querySelectorAll: () => [] };
+    const altro = () => ({ innerHTML: "", textContent: "", querySelector: () => null,
+                           querySelectorAll: () => [], addEventListener() {} });
+    const vero = document.querySelector;
+    document.querySelector = (sel) => sel === "${id}" ? box : altro();
+    try { ${fn}(); } finally { document.querySelector = vero; DATA = _d; cashEur = _c; recomputeTotals(); }
+    return html;`);
+
+  check("v231 mini tab: nessuna scheda a tutta larghezza da leva in giù", (() => {
+    const h = rendi("#mg-leva", "renderLevaStagione")
+      + rendi("#mg-scomposizione", "renderScomposizione")
+      + rendi("#mg-signposts", "renderSignposts");
+    return !/mg-wide/.test(h);
+  })());
+
+  check("v231 mini tab: i grafici NON spariscono, restano dentro le schede", (() => {
+    const leva = rendi("#mg-leva", "renderLevaStagione");
+    const sc = rendi("#mg-scomposizione", "renderScomposizione");
+    const sp = rendi("#mg-signposts", "renderSignposts");
+    return /<svg/.test(leva)                                  // margin debt: serie storica vera
+      && (leva.match(/class="obar-row/g) || []).length >= 12   // stagionalita': i 12 mesi
+      && (sc.match(/class="obar-row/g) || []).length >= 4      // i fattori dei compositi
+      && /<svg/.test(sp)                                       // la torta dei campanelli
+      // ⚠ non basta contare le SCHEDE: la prima stesura passava anche togliendo la griglia che
+      // le dispone (restavano .mg-card dentro un div nudo, impilate). Si chiede anche il contenitore.
+      && /class="mg-tris"/.test(sp)
+      && (sp.match(/class="mg-card"/g) || []).length >= 2;     // e le sue schede per categoria
+  })());
+
+  /* ⚠ Il grafico del margin debt aveva `w: 900`, una tela pensata per un blocco a tutta
+     larghezza: dentro una mini tab NON si restringe e forzava la traccia della griglia a 990px,
+     facendo collassare .mg-tris a UNA colonna. Terza volta che il viewBox non-costante presenta
+     il conto (v206, v226, v231) — qui il check lo blocca sul nascere. */
+  check("v231 mini tab: nessuna tela larga oltre la scheda che la contiene", (() => {
+    const h = rendi("#mg-leva", "renderLevaStagione")
+      + rendi("#mg-scomposizione", "renderScomposizione")
+      + rendi("#mg-signposts", "renderSignposts");
+    const larghezze = [...h.matchAll(/viewBox="0 0 (\d+)/g)].map(m => +m[1]);
+    return larghezze.length > 0 && larghezze.every(w => w <= 340);
+  })());
+}
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
