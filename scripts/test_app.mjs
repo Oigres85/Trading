@@ -99,9 +99,44 @@ Object.assign(DATA.totals, { portfolio_sharpe_ratio: 1.87, portfolio_sortino_rat
 `;
 vm.runInContext(fixture, ctx, { filename: "fixture.js" });
 
+/* ═══ I DATI VERI: UNA COPIA SOLA, UN HELPER SOLO ══════════════════════════════════════════
+   Prima erano SEI copie (REALE, REALE, REALE…REALE) caricate in blocchi diversi, ognuna col
+   proprio helper locale. Quella duplicazione e' la causa concreta di un errore che in una sola
+   sessione ho ripetuto QUATTRO volte: scrivere un check che gira sulla FIXTURE — che non ha
+   macro.indicators, ne' seasonality/signposts, ne' ^KS11 in watchlist — e quindi NON CONTIENE
+   IL FENOMENO da misurare. Un check cosi' e' verde (o rosso) per la ragione sbagliata: nel caso
+   peggiore resta verde col difetto iniettato dentro.
+   Con una sola porta d'ingresso ai dati veri, "su quali dati gira questo check" smette di essere
+   una domanda a cui si puo' rispondere male per distrazione. */
+const REALE_JSON = readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null");
+vm.runInContext("REALE = " + REALE_JSON + ";", ctx, { filename: "reale.js" });
+const reale = JSON.parse(REALE_JSON);      // stessi dati lato Node, per i check che li ispezionano
+/* copia PROFONDA a ogni uso: alcuni check MUTANO il portafoglio per provare un ramo, e con
+   l'assegnazione per riferimento la mutazione restava addosso ai check successivi (v205). */
+const suVeri = (code, cash = 28500) => run(`
+  const _salva = DATA, _cash = cashEur;
+  DATA = JSON.parse(JSON.stringify(REALE)); cashEur = ${cash}; recomputeTotals();
+  try { ${code} } finally { DATA = _salva; cashEur = _cash; recomputeTotals(); }`);
+const suReale = suVeri;          // nome storico, stessa funzione
+
 /* ---------- checks ---------- */
 const T = [];
-const check = (name, expr) => T.push([name, expr]);
+/* ═══ check() ACCETTA SOLO UN BOOLEANO ═════════════════════════════════════════════════════
+   Prima accettava qualunque valore e lo trattava come verita': `check("x", () => {…})` passava
+   una FUNZIONE, che e' truthy, quindi il check era VERDE SENZA AVER MAI ESEGUITO IL SUO CORPO.
+   In una sola sessione e' successo due volte, e tutte e due le volte me ne sono accorto solo
+   perche' le iniezioni di validazione non mordevano: senza quelle, sarebbero rimasti in suite
+   dei check permanentemente verdi che non verificano niente — la forma peggiore di test.
+   Ora un tipo diverso da boolean non e' un dettaglio da notare: e' un FALLIMENTO, col nome del
+   check e il tipo ricevuto. La trappola non e' piu' commettibile. */
+const check = (name, expr) => {
+  if (typeof expr !== "boolean") {
+    T.push([`${name}   ⛔ CHECK MALFORMATO: check() vuole un BOOLEANO, ha ricevuto ${typeof expr}` +
+      (typeof expr === "function" ? ' — hai passato una arrow: invocala, `(() => { … })()`' : ""), false]);
+    return;
+  }
+  T.push([name, expr]);
+};
 // ogni assert in una IIFE: i const/let top-level resterebbero nel lexical env globale del vm
 const run = (code) => vm.runInContext(`(() => { ${code.includes("return") ? code : `return (${code})`} })()`, ctx, { filename: "assert.js" });
 
@@ -1301,7 +1336,6 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   // rese in pagina. Un test che interroga un fixture vuoto e' verde per assenza di dati, non per
   // assenza di difetti — ed e' esattamente cosi' che questo test e' passato mentre il difetto
   // era iniettato.
-  const reale = JSON.parse(readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null"));
   const indicatori = ((reale.macro || {}).indicators || []).map(x => x.key);
   const orfane = indicatori.map(k => "in:" + k).filter(k => !chiavi.includes(k));
   check("v196 registro macro: ogni indicatore della griglia ha la sua voce in MACRO_INFO (niente popup muti)",
@@ -1316,16 +1350,10 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
    interroga dati assenti è verde per assenza di dati, non di difetti (lezione v196).
    ═══════════════════════════════════════════════════════════════════════════════════════ */
 {
-  const reale = JSON.parse(readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null"));
-  vm.runInContext(`REALE = ${JSON.stringify(reale)};`, ctx, { filename: "reale.js" });
   // ⚠ COPIA PROFONDA, non `DATA = REALE`: alcuni di questi check MUTANO il portafoglio o lo
   // storico per provare un ramo, e con l'assegnazione per riferimento la mutazione restava
   // addosso a REALE facendo fallire i check successivi. Se n'è accorto il test stesso — ed è
   // la ragione per cui ogni check parte da uno stato pulito.
-  const suReale = (code) => run(`
-    const _salva = DATA, _cash = cashEur;
-    DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 28500; recomputeTotals();
-    try { ${code} } finally { DATA = _salva; cashEur = _cash; recomputeTotals(); }`);
 
   // IL DIFETTO CHE QUESTA VISTA POTEVA INTRODURRE: confrontare due frazioni con basi diverse.
   check("v205 concentrazione: peso e MCR stanno sullo STESSO universo (sommano entrambi a 100%)", suReale(`
@@ -1672,13 +1700,7 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
    l'elenco: famigliaDi() lo fa cadere in una famiglia per prefisso e, all'estremo, in "Altro".
    Questi check verificano il RISULTATO (nessuno perso, i conti tornano), non l'elenco. */
 {
-  const reale = JSON.parse(readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null"));
-  vm.runInContext(`REALE = ${JSON.stringify(reale)};`, ctx, { filename: "reale.js" });
   // stessa COPIA PROFONDA del blocco v205: nessun check deve lasciare mutazioni agli altri
-  const suReale = (code) => run(`
-    const _salva = DATA, _cash = cashEur;
-    DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 28500; recomputeTotals();
-    try { ${code} } finally { DATA = _salva; cashEur = _cash; recomputeTotals(); }`);
 
   /* ⚠ QUESTO CHECK VA FATTO PASSARE DAL RENDER, non da famigliaMacro() a mano. La prima
      stesura chiamava famiglieMacro(indicatoriClassifica()) direttamente ed era VERDE mentre il
@@ -1776,7 +1798,6 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
    è la MEZZANOTTE di quel giorno e a mercato aperto è già passata.
    Classe v161/v207: due implementazioni della stessa domanda, coerenti solo per fortuna. */
 {
-  vm.runInContext(`REALE2 = ${readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null")};`, ctx, { filename: "reale2.js" });
   vm.runInContext(`PARAMS_CEO = ${JSON.stringify(readFileSync(join(ROOT, "config", "risk_params.json"), "utf8"))};`, ctx, { filename: "params.js" });
   check("v228 trimestrali: oggi = 0 giorni, ieri negativo, domani 1 (non dipende dall'ora)",
     run(`
@@ -1791,7 +1812,7 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
 
   check("v228 priorità: una trimestrale OGGI su posizione detenuta finisce nel brief, marcata", run(`
     const _d = DATA, _c = cashEur;
-    DATA = JSON.parse(JSON.stringify(REALE2)); cashEur = 28500;
+    DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 28500;
     const oggi = new Date().toISOString().slice(0, 10);
     const pos = DATA.portfolio.find(r => r.qty > 0);
     pos.earnings_date = oggi;
@@ -1832,24 +1853,21 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
    famiglia: il payload pubblicava PIU' RIGHE per UN solo fatto, e un lettore che conta i segnali
    ne contava di piu' di quanti ce ne fossero. */
 {
-  vm.runInContext(`REALE3 = ${readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null")};`, ctx, { filename: "reale3.js" });
   /* ⚠ SUI DATI VERI, non sulla fixture: la fixture non ha `macro.indicators`, quindi questi due
      check misuravano zero righe e sarebbero stati verdi (o rossi) per ragioni che non c'entrano
      col difetto. E' la terza volta in questa sessione — un check che gira su dati che non
      contengono il fenomeno non e' un check. */
-  const suVeri = (code) => run(`
-    const _d = DATA, _c = cashEur;
-    DATA = JSON.parse(JSON.stringify(REALE3)); cashEur = 28500; recomputeTotals();
-    const p = buildPrompt();
-    DATA = _d; cashEur = _c; recomputeTotals();
-    ${code}`);
+  // un helper LOCALE con lo stesso nome del globale ma contratto diverso e' shadowing silenzioso:
+  // qui si usa il globale suVeri() e il payload lo costruisce il check.
 
   check("v229 macro: l'inflazione è UNA riga con entrambe le misure, non due righe", suVeri(`
+    const p = buildPrompt();
     const NL = String.fromCharCode(10);   // niente escape: in un template literal diventerebbe un a capo vero
     const righe = p.split(NL).filter(l => /^- .*Inflazione/.test(l));
     return righe.length === 1 && /CPI/.test(righe[0]) && /PCE/.test(righe[0]);`));
 
   check("v229 macro: il LIVELLO della curva 10A-2A è dichiarato una volta sola", suVeri(`
+    const p = buildPrompt();
     return p.split(String.fromCharCode(10)).filter(l => /^- Curva 10A-2A:/.test(l)).length === 1;`));
 
   // ⚠ l'accorpamento NON deve perdere il dato: senza storico della curva la riga dedicata non
@@ -1868,7 +1886,7 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
      due righe dopo, nella cella "→ agg." — aveva gia' disfatto. Classe v193. */
   check("v229 stop: se il prezzo esteso è sopra lo stop, la violazione lo dichiara", run(`
     const _d = DATA, _c = cashEur;
-    DATA = JSON.parse(JSON.stringify(REALE3)); cashEur = 28500; recomputeTotals();
+    DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 28500; recomputeTotals();
     const viol = (decisionVerdict().stopViolations || [])[0];
     let esito = "nessuna violazione nello snapshot";
     if (viol) {
@@ -1883,7 +1901,7 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
 
   check("v229 stop: se l'esteso resta SOTTO lo stop, non si dichiara nessuna contraddizione", run(`
     const _d = DATA, _c = cashEur;
-    DATA = JSON.parse(JSON.stringify(REALE3)); cashEur = 28500; recomputeTotals();
+    DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 28500; recomputeTotals();
     const viols = decisionVerdict().stopViolations || [];
     let esito = "nessuna violazione nello snapshot";
     if (viols.length) {
@@ -1914,12 +1932,11 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
    la concentrazione oggi dichiara di essere al massimo storico. Si e' resa la lettura onesta,
    non favorevole. */
 {
-  vm.runInContext(`REALE4 = ${readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null")};`, ctx, { filename: "reale4.js" });
 
   // scenario: una posizione violata col prezzo esteso ANCORA SOTTO lo stop
   const scenario = (sotto) => `
     const _d = DATA, _c = cashEur;
-    DATA = JSON.parse(JSON.stringify(REALE4)); cashEur = 56000; recomputeTotals();
+    DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 56000; recomputeTotals();
     const v = (decisionVerdict().stopViolations || [])[0];
     let out = null;
     if (v) {
@@ -1963,7 +1980,7 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   check("v230 concentrazione: la variazione porta il proprio percentile storico", (() => {
     const t = run(`
       const _d = DATA, _c = cashEur;
-      DATA = JSON.parse(JSON.stringify(REALE4)); cashEur = 56000; recomputeTotals();
+      DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 56000; recomputeTotals();
       const out = buildCIOText();
       DATA = _d; cashEur = _c; recomputeTotals();
       return out;`);
@@ -1978,14 +1995,13 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
    tutta larghezza → schede della griglia), NON il contenuto: i grafici restano dentro le schede.
    Il check guarda l'HTML davvero prodotto dal render, non il sorgente (lezione v227). */
 {
-  vm.runInContext(`REALE5 = ${readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null")};`, ctx, { filename: "reale5.js" });
   /* ⚠ SUI DATI VERI: la fixture non ha macro.seasonality/signposts/components, quindi questi
      render producevano "dati non disponibili" e i check fallivano sul codice CORRETTO. E' la
      stessa trappola gia' pagata due volte in questa sessione — un check che gira su dati privi
      del fenomeno non misura niente, in nessuna delle due direzioni. */
   const rendi = (id, fn) => run(`
     const _d = DATA, _c = cashEur;
-    DATA = JSON.parse(JSON.stringify(REALE5)); cashEur = 56000; recomputeTotals();
+    DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 56000; recomputeTotals();
     let html = "";
     const box = { set innerHTML(v) { html = v; }, get innerHTML() { return html; },
                   querySelector: () => null, querySelectorAll: () => [] };
@@ -2036,13 +2052,12 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
    prezzi live hanno priorita'". Anticipare cosa? La seduta che dovrebbero precedere sta gia'
    scambiando. Stessa lezione di v158, applicata allora al testo della guida ma non all'etichetta. */
 {
-  vm.runInContext(`REALE6 = ${readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null")};`, ctx, { filename: "reale6.js" });
   /* ⚠ sui DATI VERI: la fixture non ha ^KS11 in watchlist ne' macro.futures, quindi `lead` esce
      vuoto e l'etichetta non viene MAI stampata — i check fallivano sul codice corretto. Quarta
      volta in questa sessione che un check gira su dati privi del fenomeno. */
   const conFase = (fase) => run(`
     const _d = DATA, _f = usSessionInfo;
-    DATA = JSON.parse(JSON.stringify(REALE6)); recomputeTotals();
+    DATA = JSON.parse(JSON.stringify(REALE)); recomputeTotals();
     usSessionInfo = () => ({ etHHMM: "14:26", phase: "${fase}", minsToOpen: 60 });
     let out = "";
     try { out = sessionContextLine(); } catch (e) { out = "ERR " + e.message; }
@@ -2063,6 +2078,53 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     const w = conFase("weekend");
     return typeof w === "string" && !/\bANTICIPATORI\b/.test(w) && /FERMI/.test(w);
   })());
+}
+
+/* ═══ LA SUITE CONTROLLA SE STESSA ═══ ═════════════════════════════════════════════════
+   Tre difetti di METODO, non di prodotto, che in questa sessione mi sono costati piu' tempo dei
+   difetti veri. Non si correggono "stando attenti": si rendono impossibili o rumorosi.
+     1. arrow passata a check()  → gia' impossibile: check() accetta solo un boolean.
+     2. dati veri in N copie     → gia' impossibile: REALE e suVeri() sono unici.
+     3. nomi di check duplicati  → due check con lo stesso nome sono indistinguibili nell'output:
+        se uno fallisce non si sa quale, e uno dei due puo' restare rotto per sempre.
+   Piu' la regola dell'ordine (v205): il report deve stare in fondo, o i check aggiunti dopo
+   finiscono contati ma incapaci di far fallire la CI. */
+{
+  /* ⚠ IL BLOCCO META VA ESCLUSO DALLA SCANSIONE, o trova SE STESSO: le espressioni che cerca
+     ("una arrow passata a check", "REALE" con una cifra) compaiono per forza nel proprio codice.
+     E' lo stesso inciampo del gate v213, che si autodenunciava. Si taglia da qui in giu'. */
+  const MARCA = "═══ LA SUITE CONTROLLA SE STESSA ═══";
+  const tutto = readFileSync(join(ROOT, "scripts", "test_app.mjs"), "utf8");
+  /* ⚠ e i COMMENTI vanno tolti: l'esempio `check("x", () => {…})` scritto nella nota che spiega
+     la trappola VENIVA CONTATO come trappola. Identico al gate v213, che si autodenunciava. */
+  const src2 = tutto.slice(0, tutto.indexOf(MARCA) >= 0 ? tutto.indexOf(MARCA) : tutto.length)
+    .replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+
+  // ⚠ una arrow passata nuda a check() non esegue mai il proprio corpo
+  const nude = (src2.match(/check\([^)]*?,\s*\(\)\s*=>\s*\{/g) || []).length;
+  check("meta: nessun check riceve una arrow non invocata", nude === 0);
+
+  // ⚠ una sola copia dei dati veri e un solo helper: era la duplicazione a farmi sbagliare scope
+  check("meta: i dati veri hanno UNA sola copia e UN solo helper",
+    (src2.match(/REALE_JSON =/g) || []).length === 1
+    && !/REALE[2-9]/.test(src2)
+    && (src2.match(/const suVeri = /g) || []).length === 1);
+
+  // ⚠ nomi duplicati: se due check si chiamano uguale, un fallimento non si sa a chi appartenga
+  const nomi = T.map(([n]) => n.replace(/\s+⛔.*$/, ""));
+  const doppi = nomi.filter((n, i) => nomi.indexOf(n) !== i);
+  check("meta: nessun nome di check duplicato", doppi.length === 0);
+  if (doppi.length) console.log("  ⚠ nomi duplicati:", [...new Set(doppi)].slice(0, 5).join(" · "));
+
+  // ⚠ il report DEVE restare l'ultima cosa del file (v205): altrimenti i check che vengono dopo
+  // sono contati nel totale ma `fail` e' gia' stato calcolato e la CI esce 0 con la suite rossa
+  /* questo va misurato sul file INTERO (il report sta dopo il blocco meta, quindi in src2 non
+     c'e' proprio) e sulle RIGHE, non sugli indici: dopo il marcatore del report non deve esserci
+     nessuna chiamata a check(), o quei check finiscono contati ma incapaci di rompere la CI. */
+  const dopoReport = tutto.slice(tutto.lastIndexOf("/* ---------- report ----------"));
+  check("meta: dopo il blocco report non c'è nessun check (v205)",
+    tutto.includes("/* ---------- report ----------")
+    && !/^\s*check\(/m.test(dopoReport));
 }
 
 /* ---------- report ----------
