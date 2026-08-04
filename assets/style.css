@@ -1771,3 +1771,10 @@ svg.g-serie { cursor: crosshair; }
   word-break: break-word; line-height: 1.25; }
 .mg-dalpan th:first-child, .mg-dalpan td:first-child { text-align: left; }
 .mg-dalpan thead th { color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+
+/* ⚠ v235 — IL CONTENUTO ESTRATTO NON PUO' FAR ESPLODERE LA SCHEDA. Misurato in browser: la
+   tabella del Put/Call rendeva la sua scheda alta 1373px contro gli 89px della piu' piccola —
+   in una griglia impaccata una scheda cosi' occupa una colonna intera e vanifica l'impaccamento.
+   Si limita l'altezza e si lascia scorrere: nessun dato si perde, e il pop-up resta a un clic. */
+.mg-dalpan { max-height: 210px; overflow-y: auto; }
+.mg-dalpan .info-line { font-size: 11px; line-height: 1.4; margin: 1px 0; }

@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "235";
+const BUILD_VERSION = "236";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4127,6 +4127,8 @@ function renderMacroGrafici() {
   renderScomposizione();
   renderSignposts();
   renderIndicatori();   // v215 — le 27 scatole diventano una classifica sola
+  // v235 — ORA le schede esistono: si misura e si impacca
+  impaccaGriglia(document.querySelector(".shell-main"));
 }
 
 
@@ -4840,9 +4842,10 @@ function renderStruttura() {
   renderDeriva();
   renderAllocGrafica();
   renderVsBenchmark();   // v214 — il fondo contro il suo indice
-  // v235 — l'impaccamento va DOPO che tutte le schede esistono, e va rifatto a ogni render
+  // v235 — l'impaccamento sta in fondo a renderMacroGrafici: e' QUELLA a riempire #mg-tutti,
+  // e gira DOPO renderStruttura (setTab le chiama in quest'ordine). Chiamarlo qui misurava una
+  // griglia ancora vuota: 0 schede toccate, verificato in browser.
   registraImpaccamento();
-  impaccaGriglia(document.querySelector(".shell-main"));
 }
 
 /* ---------------- tabella ---------------- */
