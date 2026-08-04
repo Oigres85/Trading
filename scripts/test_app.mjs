@@ -2130,6 +2130,64 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /seoulSessionOpen\(snap\)/.test(src));
 }
 
+/* ═══ v240 — UNA SOGLIA DISEGNATA E' UN'AFFERMAZIONE, E VA SOSTENUTA ═══════════════════════
+   Il CEO ha chiesto: "spero tu non abbia inventato dati". I VALORI no, vengono tutti da
+   data.json. Ma le soglie che avevo disegnato sugli assi erano in parte scelte mie, presentate
+   con l'autorita' di una misura. Tre erano indifendibili:
+     · EUR/JPY "zona intervento 185" — inventata; la BoJ e' intervenuta su USD/JPY, non su EUR/JPY;
+     · UMich "media storica 85" — quel numero non e' nel file;
+     · disoccupazione "soglia Sahm 4,5%" — FALSA: la regola di Sahm e' un MOVIMENTO (media a 3
+       mesi che sale di 0,5 pp sopra il minimo dei 12), non un livello. E contraddiceva la
+       spiegazione scritta nella stessa scheda, che invece la enunciava correttamente.
+   Piu' una quarta: la media 16,5 disegnata sulla scala del P/E TRAILING e' la media del FORWARD
+   (forward_pe.avg_hist), e sp500_pe.avg_10y nel file e' null — due metodologie confrontate come
+   se fossero una, che e' proprio cio' che il payload avverte di non fare.
+   E' la classe v195: "un ID indovinato e scritto come se fosse certo sarebbe stato peggio di un
+   tentativo dichiarato". Ora ogni scala DICHIARA da dove vengono le sue bande. */
+{
+  const htmlIndicatori = suVeri(`
+    let html = "";
+    const box = { set innerHTML(v) { html = v; }, get innerHTML() { return html; },
+                  querySelector: () => null, querySelectorAll: () => [] };
+    const altro = () => ({ innerHTML: "", textContent: "", querySelector: () => null,
+                           querySelectorAll: () => [], addEventListener() {} });
+    const vero = document.querySelector;
+    document.querySelector = (sel) => sel === "#mg-tutti" ? box : altro();
+    try { renderIndicatori(); } finally { document.querySelector = vero; }
+    return html;`, 56000);
+
+  check("v240 scale: OGNI scala dichiara da dove vengono le sue bande", (() => {
+    const scale = (htmlIndicatori.match(/class="sc"/g) || []).length;
+    // ⚠ ancoraggio esatto: `class="sc-fonte` matcherebbe anche `sc-fonte-qualcosa`, e la
+    // guardia non mordeva quando ho iniettato il rinomino della classe.
+    const fonti = (htmlIndicatori.match(/class="sc-fonte muted"/g) || []).length;
+    return scale > 0 && scale === fonti;
+  })());
+
+  /* ⚠ i COMMENTI vanno tolti prima di scandire: le note che SPIEGANO perche' quelle soglie sono
+     state rimosse le contengono per forza, e il check trovava se stesso — l'inciampo del gate
+     v213, terza volta in questa sessione. Si guarda l'HTML RESO piu' il codice senza commenti. */
+  check("v240 scale: nessuna delle tre soglie inventate è rientrata", (() => {
+    const senzaNote = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    return !/zona intervento|soglia Sahm/.test(senzaNote)
+      && !/zona intervento|soglia Sahm/.test(htmlIndicatori);
+  })());
+
+  /* ⚠ la piu' importante: NON si disegna una media storica quando il file non ce l'ha.
+     sp500_pe.avg_10y e' null, quindi sulla scheda del P/E trailing quella tacca non puo' esserci. */
+  check("v240 scale: nessuna 'media storica' disegnata dove il file non la contiene", (() => {
+    const avg10 = ((reale.macro || {}).sp500_pe || {}).avg_10y;
+    if (avg10 != null) return true;                       // se un giorno ci sara', si potra' disegnare
+    /* si guarda la scheda del P/E: la si trova dal titolo, tollerando l'escape dell'ampersand.
+       La riga di PROVENIENZA e' esclusa: li' "media storica" puo' comparire per DIRE che non c'e'. */
+    const scheda = htmlIndicatori.split(/<div class="mg-card(?!-head)/)
+      .find(c => /Valutazione S(&amp;|&)P/.test(c));
+    if (!scheda) return false;                      // se la scheda non c'e', il check non misura
+    const senzaFonte = scheda.replace(/<div class="sc-fonte[\s\S]*?<\/div>/g, "");
+    return !/media storica/.test(senzaFonte);
+  })());
+}
+
 /* ═══ v239 — LA CATENA DI RENDER DEVE GIRARE, NON SOLO COMPILARE ═══════════════════════════
    La v238 e' andata in produzione con la pagina MORTA: il taglio di renderDeriva() si era
    portato via `let allocGrafMode = "sector"`, che stava FRA quella funzione e la successiva.

@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "239";
+const BUILD_VERSION = "240";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4297,7 +4297,8 @@ function scala(v, opt = {}) {
         font-family="var(--mono)" fill="var(--text)">${esc(fmt(v))}${esc(opt.unita || "")}</text>
       <text x="${L}" y="${y - 7}" font-size="8.5" fill="var(--muted)">${esc(fmt(min))}</text>
       <text x="${R}" y="${y - 7}" text-anchor="end" font-size="8.5" fill="var(--muted)">${esc(fmt(max))}</text>
-    </svg>${dentro ? `<div class="sc-zona" style="color:${dentro.colore}">${esc(dentro.nome)}</div>` : ""}</div>`;
+    </svg>${dentro ? `<div class="sc-zona" style="color:${dentro.colore}">${esc(dentro.nome)}</div>` : ""}
+    <div class="sc-fonte muted">${esc(opt.fonte || "bande di lettura convenzionali, non soglie calcolate dai dati")}</div></div>`;
 }
 
 /* conto alla rovescia per le date: un numero di giorni e' un fatto, la sequenza delle prossime
@@ -4328,10 +4329,16 @@ const FORMA_INDICATORE = {
     const q = (m.markets || []).find(x => x.key === "EURJPY=X"); if (!q) return null;
     const v = parseFloat(String(q.value).replace(",", ".")); const c = m.carry || {};
     return { g: scala(v, { min: 150, max: 200, unita: "", aria: "EUR/JPY",
-        zone: [{ da: 150, a: 170, nome: "yen forte", colore: "var(--green)" },
-               { da: 170, a: 185, nome: "fascia recente", colore: "var(--muted)" },
+        /* ⚠ v240 — QUI AVEVO INVENTATO. La prima stesura segnava una "zona intervento" a 185 e
+           chiamava 170-185 "fascia recente": nessuno dei due numeri esiste nel file, e la BoJ e'
+           intervenuta storicamente su USD/JPY, non su EUR/JPY. Erano due affermazioni con
+           l'autorita' di un dato e nessun dato dietro — la classe che v195 chiama "un ID
+           indovinato scritto come se fosse certo". Restano bande di sola LETTURA, dichiarate
+           come tali, e l'unico riferimento tracciato e' il tasso BoJ, che nel file c'e'. */
+        zone: [{ da: 150, a: 170, nome: "yen relativamente forte", colore: "var(--green)" },
+               { da: 170, a: 185, nome: "fascia intermedia", colore: "var(--muted)" },
                { da: 185, a: 200, nome: "yen molto debole", colore: "var(--red)" }],
-        soglie: [{ v: 185, testo: "zona intervento" }] }),
+        fonte: "bande di sola lettura: nel file non c'e' un intervallo storico di EUR/JPY" }),
       n: `Oggi ${q.value} (${signTxt(q.change_pct)} nella seduta).${c.boj_rate != null ? ` Tasso BoJ ${c.boj_rate}%.` : ""}
         <b>Come si legge:</b> più il numero sale, più lo yen è debole e più conviene finanziarsi in yen per comprare asset in dollari — è il carry trade che sostiene il tech. Uno yen che si rafforza di colpo costringe a chiudere quelle posizioni, e le chiusure partono dai titoli più affollati.` };
   },
@@ -4342,7 +4349,9 @@ const FORMA_INDICATORE = {
         zone: [{ da: 50, a: 70, nome: "pessimismo profondo", colore: "var(--red)" },
                { da: 70, a: 90, nome: "cautela", colore: "var(--yellow)" },
                { da: 90, a: 110, nome: "ottimismo", colore: "var(--green)" }],
-        soglie: [{ v: 85, testo: "media storica" }] }),
+        /* ⚠ v240 — tolta la tacca "media storica 85": quel numero NON e' nel file. Scriverlo
+           sull'asse gli dava l'autorita' di un dato calcolato, che non aveva. */
+        fonte: "bande di sola lettura: il file porta il valore corrente, non la serie storica" }),
       n: `${i.value} · rilevazione ${i.date}. <b>Come si legge:</b> misura quanto le famiglie si sentono sicure di spendere, e i consumi sono i due terzi del PIL americano. Sotto 70 è un livello da recessione; il dato arriva da FRED con 1-2 mesi di ritardo di licenza, quindi è più lento di quanto sembri.` };
   },
   dollar: (m) => {
@@ -4351,7 +4360,8 @@ const FORMA_INDICATORE = {
         zone: [{ da: -10, a: -5, nome: "dollaro debole: aiuta gli utili esteri", colore: "var(--green)" },
                { da: -5, a: 5, nome: "impatto valutario neutro", colore: "var(--muted)" },
                { da: 5, a: 10, nome: "dollaro forte: comprime gli utili esteri", colore: "var(--red)" }],
-        soglie: [{ v: 0, testo: "invariato" }] }),
+        soglie: [{ v: 0, testo: "invariato" }],
+        fonte: "la banda ±5% è la convenzione già usata dal sistema per l'impatto valutario" }),
       n: `DXY ${fmtNum.format(d.value)} · ${signTxt(d.chg_3m_pct)} in 3 mesi. <b>Come si legge:</b> conta la VARIAZIONE, non il livello. Le multinazionali americane fatturano molto all'estero: un dollaro che si rafforza di oltre il 5% in un trimestre taglia gli utili convertiti, uno che si indebolisce li gonfia. Dentro ±5% l'effetto è rumore.` };
   },
   "mk:EURUSD=X": (m) => {
@@ -4360,7 +4370,8 @@ const FORMA_INDICATORE = {
     return { g: scala(v, { min: 1.0, max: 1.3, unita: "", aria: "EUR/USD", fmt: (x) => fmtNum.format(Math.round(x * 1000) / 1000),
         zone: [{ da: 1.0, a: 1.08, nome: "euro debole", colore: "var(--red)" },
                { da: 1.08, a: 1.18, nome: "fascia ordinaria", colore: "var(--muted)" },
-               { da: 1.18, a: 1.3, nome: "euro forte", colore: "var(--green)" }] }),
+               { da: 1.18, a: 1.3, nome: "euro forte", colore: "var(--green)" }],
+        fonte: "bande di sola lettura: nel file c'è il cambio corrente, non il suo intervallo storico" }),
       n: `${q.value} (${signTxt(q.change_pct)} oggi). <b>Come si legge:</b> il libro è per la maggior parte in dollari e non coperto, quindi questo cambio muove il patrimonio in euro anche a prezzi fermi. Euro che sale = il tuo controvalore in euro scende, e viceversa: è il motivo per cui l'alpha in euro e quello in dollari possono avere segni diversi.` };
   },
   "in:gdp": (m) => {
@@ -4371,7 +4382,8 @@ const FORMA_INDICATORE = {
         zone: [{ da: -2, a: 0, nome: "contrazione", colore: "var(--red)" },
                { da: 0, a: 2, nome: "crescita sotto il trend", colore: "var(--yellow)" },
                { da: 2, a: 6, nome: "crescita solida", colore: "var(--green)" }],
-        soglie: [{ v: 2, testo: "trend" }] }),
+        soglie: [{ v: 2, testo: "trend" }],
+        fonte: "la soglia del 2% è quella dichiarata dalla pipeline (crescita >2% positiva)" }),
       n: `${i.value} trimestrale annualizzato · rilevazione ${i.date}${yoy != null ? ` · ${signTxt(yoy)} anno su anno` : ""}. <b>Come si legge:</b> sotto il 2% l'economia cresce meno del proprio potenziale, e i multipli azionari fanno più fatica a essere giustificati dagli utili. È il dato più lento del quadro: trimestrale e rivisto due volte.` };
   },
   "in:cpi": (m) => {
@@ -4382,7 +4394,8 @@ const FORMA_INDICATORE = {
         zone: [{ da: 0, a: 2, nome: "sotto il target", colore: "var(--green)" },
                { da: 2, a: 3.5, nome: "sopra il target ma gestibile", colore: "var(--yellow)" },
                { da: 3.5, a: 8, nome: "inflazione che tiene alti i tassi", colore: "var(--red)" }],
-        soglie: [{ v: 2, testo: "target Fed" }] }),
+        soglie: [{ v: 2, testo: "target Fed" }],
+        fonte: "il 2% è il target dichiarato della Federal Reserve" }),
       n: `CPI ${c.value}${p ? ` · PCE ${p.value}` : ""} · rilevazione ${c.date}. <b>Come si legge:</b> due misure della stessa cosa, e la Fed guarda il PCE. Finché resta sopra il 2% la Fed non ha motivo di tagliare, e senza tagli i multipli del growth restano sotto pressione: è il canale per cui questo numero arriva al tuo portafoglio.` };
   },
   macroquant: (m) => barreComposito(m.macroquant, "Ciclo economico",
@@ -4394,7 +4407,8 @@ const FORMA_INDICATORE = {
         zone: [{ da: -1.5, a: 0, nome: "consumi in calo", colore: "var(--red)" },
                { da: 0, a: 0.5, nome: "crescita debole", colore: "var(--yellow)" },
                { da: 0.5, a: 1.5, nome: "consumi solidi", colore: "var(--green)" }],
-        soglie: [{ v: 0, testo: "fermo" }] }),
+        soglie: [{ v: 0, testo: "fermo" }],
+        fonte: "bande di sola lettura; lo zero è il dato (variazione mese su mese)" }),
       n: `${i.value} mese su mese · rilevazione ${i.date}. <b>Come si legge:</b> è il termometro più veloce dei consumi, e i consumi sono i due terzi del PIL. Un mese sotto zero non fa una tendenza; due o tre di fila anticipano il rallentamento prima che lo veda il PIL, che esce con un trimestre di ritardo.` };
   },
   risk_sentiment: (m) => barreComposito(m.risk_sentiment, "Sentiment globale",
@@ -4414,7 +4428,8 @@ const FORMA_INDICATORE = {
         zone: [{ da: -4, a: -0.5, nome: "sotto l'indice", colore: "var(--red)" },
                { da: -0.5, a: 0.5, nome: "in linea", colore: "var(--muted)" },
                { da: 0.5, a: 4, nome: "sopra l'indice", colore: "var(--green)" }],
-        soglie: [{ v: 0, testo: "pari" }] }),
+        soglie: [{ v: 0, testo: "pari" }],
+        fonte: "lo zero è il pareggio con l'indice; le bande sono di sola lettura" }),
       n: `Il Nasdaq 100 ha fatto ${signTxt(b.ndx)} nella seduta${b.sp500 != null ? `, l'S&P ${signTxt(b.sp500)}` : ""}${b.sox != null ? `, i semiconduttori ${signTxt(b.sox)}` : ""}. <b>Come si legge:</b> è lo scarto di UNA seduta, quindi rumore quasi sempre: serve a vedere se il libro si è mosso col mercato o contro. Il giudizio sul processo sta nell'alpha di periodo, non qui.` };
   },
   witching: (m) => {
@@ -4429,7 +4444,8 @@ const FORMA_INDICATORE = {
         zone: [{ da: 2, a: 3.5, nome: "tassi che sostengono i multipli", colore: "var(--green)" },
                { da: 3.5, a: 4.5, nome: "fascia neutra", colore: "var(--muted)" },
                { da: 4.5, a: 6, nome: "tassi che comprimono i multipli", colore: "var(--red)" }],
-        soglie: [{ v: 4, testo: "4%" }] }),
+        soglie: [{ v: 4, testo: "4%" }],
+        fonte: "la soglia del 4% è quella già usata dal sistema (sopra comprime i multipli)" }),
       n: `${q.value} (${signTxt(q.change_pct)} pp nella seduta). <b>Come si legge:</b> è il tasso privo di rischio con cui si scontano gli utili futuri. Più sale, meno vale oggi un utile lontano nel tempo — ed è per questo che colpisce il growth più del value: i suoi utili stanno più avanti.` };
   },
   momentum: (m) => {
@@ -4439,7 +4455,8 @@ const FORMA_INDICATORE = {
         zone: [{ da: -15, a: -3, nome: "sotto la media: trend primario deteriorato", colore: "var(--red)" },
                { da: -3, a: 3, nome: "sulla media", colore: "var(--muted)" },
                { da: 3, a: 15, nome: "sopra la media: trend primario integro", colore: "var(--green)" }],
-        soglie: [{ v: 0, testo: "media 125" }] }),
+        soglie: [{ v: 0, testo: "media 125" }],
+        fonte: "lo zero è la media a 125 sedute calcolata dalla pipeline" }),
       n: `S&P 500 a ${fmtNum.format(s.price)} contro una media a 125 sedute di ${fmtNum.format(s.sma125)}${n2 ? ` · Nasdaq 100 ${signTxt(n2.dist_pct)}` : ""}. <b>Come si legge:</b> 125 sedute sono circa sei mesi: è la linea che separa un ribasso dentro un rialzo da un cambio di regime. Finché il prezzo sta sopra, le discese sono correzioni; sotto, vanno trattate diversamente.` };
   },
   liquidity: (m) => {
@@ -4448,7 +4465,8 @@ const FORMA_INDICATORE = {
         zone: [{ da: 0, a: 40, nome: "poca benzina a bordo campo", colore: "var(--yellow)" },
                { da: 40, a: 75, nome: "liquidità nella norma", colore: "var(--muted)" },
                { da: 75, a: 100, nome: "molta liquidità ferma", colore: "var(--green)" }],
-        soglie: [{ v: 50, testo: "mediana 5A" }] }),
+        soglie: [{ v: 50, testo: "mediana 5A" }],
+        fonte: "il percentile e la sua mediana vengono dal dato (5 anni di fondi monetari)" }),
       n: `Fondi monetari retail ${fmtNum.format(l.retail_mmf_bln)} mld (${signTxt(l.retail_yoy_pct)} in un anno, ${l.retail_pctile_5y}° percentile su 5 anni) · istituzionali ${l.inst_cash_pct}% in liquidità. <b>Come si legge:</b> ha due letture opposte e vanno tenute insieme. Molta liquidità ferma è benzina potenziale per i rialzi; ma se sta AUMENTANDO significa che qualcuno sta uscendo dal rischio adesso. Guarda il livello e la direzione, non uno solo dei due. Sono proxy dichiarati, non i flussi veri.` };
   },
   breadth: (m) => {
@@ -4463,9 +4481,17 @@ const FORMA_INDICATORE = {
     const p2 = m.sp500_pe, f = m.forward_pe; if (!p2 || p2.current == null) return null;
     return { g: scala(p2.current, { min: 10, max: 40, unita: "×", aria: "P/E S&P 500",
         zone: [{ da: 10, a: 18, nome: "valutazione contenuta", colore: "var(--green)" },
-               { da: 18, a: 25, nome: "sopra la media storica", colore: "var(--yellow)" },
+               /* ⚠ v240 — si chiamava "sopra la media storica": anche il NOME di una zona e'
+                  un'affermazione, e quella media nel file non c'e' (sp500_pe.avg_10y e' null).
+                  Il nome ora descrive il livello senza rivendicare un confronto che non ho. */
+               { da: 18, a: 25, nome: "valutazione piena", colore: "var(--yellow)" },
                { da: 25, a: 40, nome: "valutazione tesa", colore: "var(--red)" }],
-        soglie: [{ v: 16.5, testo: "media storica" }] }),
+        /* ⚠ v240 — la tacca "media storica 16,5" era la media del FORWARD (forward_pe.avg_hist)
+           disegnata su una scala del TRAILING: due metodologie diverse confrontate come se
+           fossero la stessa, che e' proprio cio' che il payload avverte di non fare. E
+           sp500_pe.avg_10y nel file e' null, quindi una media storica del trailing NON esiste:
+           non si disegna. Il forward e il suo riferimento restano scritti nella nota. */
+        fonte: "bande di sola lettura: nel file non c'e' una media storica del P/E trailing" }),
       n: `Trailing ${fmtNum.format(p2.current)}×${p2.nasdaq_pe ? ` · Nasdaq 100 ${fmtNum.format(p2.nasdaq_pe)}×` : ""}${f && f.value != null ? ` · forward ${fmtNum.format(f.value)}×` : ""}. <b>Come si legge:</b> il trailing guarda gli utili già fatti, il forward quelli attesi — e la differenza fra i due dice quanta crescita il mercato sta già prezzando. Un multiplo alto non è di per sé un segnale di vendita: diventa fragile quando i tassi salgono, perché è proprio il multiplo a comprimersi per primo.` };
   },
   "in:unemp": (m) => {
@@ -4476,7 +4502,12 @@ const FORMA_INDICATORE = {
         zone: [{ da: 3, a: 4.5, nome: "piena occupazione", colore: "var(--green)" },
                { da: 4.5, a: 5.5, nome: "mercato in raffreddamento", colore: "var(--yellow)" },
                { da: 5.5, a: 8, nome: "recessione del lavoro", colore: "var(--red)" }],
-        soglie: [{ v: 4.5, testo: "soglia Sahm" }] }),
+        /* ⚠ v240 — TOLTA la tacca "soglia Sahm" a 4,5%: la regola di Sahm NON e' un livello, e'
+           un MOVIMENTO (media a 3 mesi che sale di 0,5 pp sopra il minimo dei 12). Segnarla come
+           livello era falso, e contraddiceva la spiegazione scritta due righe sotto nella stessa
+           scheda — che invece la enuncia correttamente. Il file non ha la media a 3 mesi, quindi
+           la regola non e' calcolabile qui e non si finge che lo sia. */
+        fonte: "bande di sola lettura: la regola di Sahm guarda la SALITA, non il livello, e il file non ha la media a 3 mesi" }),
       n: `Disoccupazione ${u.value}${n2 ? ` · nuovi posti ${n2.value}` : ""} · rilevazione ${u.date}. <b>Come si legge:</b> conta la DIREZIONE più del livello. La regola di Sahm dice che quando la media a 3 mesi sale di mezzo punto sopra il minimo dell'anno la recessione è già cominciata — il livello assoluto è ancora basso quando il segnale scatta, ed è per questo che si guarda la salita, non il valore.` };
   },
   froth: (m) => {

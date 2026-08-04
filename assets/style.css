@@ -1790,3 +1790,4 @@ svg.g-serie { cursor: crosshair; }
 .cdr-el span { font-size: 10.5px; font-family: var(--mono); color: var(--muted);
   border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; }
 .cdr-el .cdr-on { color: var(--text); border-color: var(--accent); }
+.sc-fonte { font-size: 10px; text-align: center; margin-top: 3px; line-height: 1.3; opacity: .75; }
