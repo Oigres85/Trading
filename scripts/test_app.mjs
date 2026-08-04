@@ -2130,6 +2130,35 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /seoulSessionOpen\(snap\)/.test(src));
 }
 
+/* ═══ v239 — LA CATENA DI RENDER DEVE GIRARE, NON SOLO COMPILARE ═══════════════════════════
+   La v238 e' andata in produzione con la pagina MORTA: il taglio di renderDeriva() si era
+   portato via `let allocGrafMode = "sector"`, che stava FRA quella funzione e la successiva.
+   Risultato: `allocGrafMode is not defined` dentro renderAllocGrafica → renderStruttura →
+   renderAll → loadData, cioe' l'intera pagina non si disegnava. E la suite era VERDE: 219 check
+   passati, `node --check` passato, red team passato — perche' nessuno ESEGUIVA il render.
+   E' la classe v213 ("la pagina era morta") che si ripresenta con una causa diversa: allora era
+   un addEventListener su un elemento rimosso, qui una dichiarazione portata via da un taglio.
+   La lezione comune: la sintassi valida non dice niente sull'esecuzione.
+   ⚠ E la ricevuta del taglio non l'ha vista perche' contava quante `function` cadevano nei
+   confini — un `let` in mezzo non e' una function. Una ricevuta deve contare TUTTE le
+   dichiarazioni di primo livello, non solo quelle che ti aspetti. */
+{
+  const renderGira = (fn) => run(`
+    const _d = DATA, _c = cashEur;
+    DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 56000; recomputeTotals();
+    let esito = true;
+    try { ${fn}(); } catch (e) { esito = "ECCEZIONE: " + e.message; }
+    DATA = _d; cashEur = _c; recomputeTotals();
+    return esito;`);
+
+  for (const fn of ["renderStruttura", "renderMacroGrafici", "renderIndicatori",
+                    "renderSignposts", "renderLevaStagione", "renderRotazione", "renderStress"]) {
+    const esito = renderGira(fn);
+    check(`v239 render: ${fn}() gira sui dati veri senza eccezioni`, esito === true);
+    if (esito !== true) console.log(`  ⚠ ${fn}:`, esito);
+  }
+}
+
 /* ═══ LA SUITE CONTROLLA SE STESSA ═══ ═════════════════════════════════════════════════
    Tre difetti di METODO, non di prodotto, che in questa sessione mi sono costati piu' tempo dei
    difetti veri. Non si correggono "stando attenti": si rendono impossibili o rumorosi.

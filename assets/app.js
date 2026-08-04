@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "238";
+const BUILD_VERSION = "239";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3729,6 +3729,14 @@ function renderConcentrazione() {
 /* v238 — `renderDeriva()` RIMOSSA col suo riquadro (richiesta CEO). RICEVUTA: la funzione pura
    `derivaConcentrazione()` SOPRAVVIVE — e' usata dai check e il payload non la pubblica, quindi
    toglierla porterebbe via una protezione senza togliere nulla di visibile (classe v203). */
+/* ⚠ v239 — QUESTA RIGA ERA STATA PORTATA VIA dal taglio di renderDeriva() in v238, e il sito e'
+   rimasto ROTTO: `allocGrafMode is not defined` faceva morire renderAllocGrafica → renderStruttura
+   → renderAll → loadData, cioe' l'intera pagina. La dichiarazione stava FRA le due funzioni, e il
+   mio assert contava solo quante `function` cadevano nei confini: un `let` in mezzo non lo vedeva.
+   E' la classe v201-v204 per la QUARTA volta, e stavolta e' passata perche' la ricevuta
+   controllava la cosa sbagliata. La ricevuta di un taglio deve contare TUTTE le dichiarazioni di
+   primo livello dentro i confini, non solo le funzioni. */
+let allocGrafMode = "sector";
 function renderAllocGrafica() {
   const box = $("#allocg-chart"); if (!box) return;
   const list = allocazionePer(allocGrafMode);
