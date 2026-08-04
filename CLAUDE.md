@@ -1085,6 +1085,42 @@ Corollario già pagato altrove in questo file: **una validazione per iniezione s
 no-op silenzioso** — se il `replace` non trova la stringa, il file resta intatto e il test "passa".
 Ogni iniezione deve asserire di aver modificato il file prima di eseguire la suite.
 
+## 🇰🇷 v234 — un ramo irraggiungibile non è una protezione
+
+Dal controllo del payload su me stesso. La riga diceva `KOSPI -5,12% [LIVE, Seoul in
+contrattazione]` mentre quel valore veniva dallo **snapshot delle 07:54 KST**, un'ora prima
+dell'apertura coreana.
+
+La condizione era `price_live && seoulSessionOpen()`, e **nessuna delle due dice quando il dato è
+stato preso**: `price_live` è un flag della pipeline, `seoulSessionOpen()` guarda l'orologio di
+**adesso**. Mancava il timestamp dello snapshot.
+
+> **Il punto vero**: v190 aveva già scritto **tre** stati (live · mercato APERTO ma dato VECCHIO ·
+> borsa ferma) proprio perché il secondo è il più insidioso — ma con quella condizione lo stato di
+> mezzo **non poteva mai scattare**. Era codice morto da v190, ed è per questo che il difetto è
+> sopravvissuto a tre correzioni della stessa riga.
+> **Un ramo che non può essere raggiunto non è una protezione: è un commento che sembra codice.**
+> Quando si aggiunge uno stato, va scritto un check che lo ESERCITA, o non si saprà mai se esiste.
+
+## 🧩 v233 — quello che il pop-up aveva dentro, portato fuori
+
+Richiesta CEO: mini tab, e *"se il rispettivo pop up forniva dei grafici o tabelle, riporta
+direttamente quelli in struttura"*. L'estrazione riusa `collectPanels` (v188): ogni pannello resta
+l'**unica fonte di verità** del proprio contenuto, quindi non nasce un secondo elenco da tenere
+allineato (classe C10/C12). Si estraggono solo `<svg>` e `<table>`, non la prosa.
+
+⚠ **Misurato prima di scrivere il codice**: dei 30 indicatori solo **3** hanno un grafico nel
+pannello e **4** una tabella. Gli altri 23 **non prendono un riempitivo** — inventare una forma per
+far sembrare pieni i riquadri vuoti è l'errore delle barre e dei quadranti, respinto tre volte.
+
+Due trappole di impaginazione dentro una scheda stretta: `white-space: nowrap` **taglia** le
+tabelle, e `table-layout: fixed` le **comprime invece di farle scorrere** (28px persi per cella).
+Con `width: max-content` la tabella larga scorre dentro il proprio contenitore e non perde nulla.
+
+⚠ **Un check che misura i dati del giorno invece della proprietà va rosso da solo**: il check v230
+modificava UNA sola posizione violata ma asseriva sull'intero payload — appena il numero di
+violazioni nel `data.json` è cambiato è diventato rosso senza che nulla fosse rotto.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
