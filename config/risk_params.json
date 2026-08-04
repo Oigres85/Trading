@@ -1,9 +1,10 @@
 {
  "capNoAdd_pct": 30,
- "_savedAt": "2026-08-04T06:03:51.061Z",
+ "_savedAt": "2026-08-04T06:04:07.612Z",
  "capAlert_pct": 50,
  "sortinoVeto": -0.5,
  "sectorAlert_frac": 0.8,
  "maxLossPerPos_pct": 5,
- "factorRiskAlert_pct": 80
+ "factorRiskAlert_pct": 80,
+ "minScore": 60
 }
