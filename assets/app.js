@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "236";
+const BUILD_VERSION = "237";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4323,7 +4323,7 @@ function indicatoriClassifica() {
    ⚠ MISURATO PRIMA DI SCRIVERE: su 30 indicatori solo 3 hanno un grafico e 4 una tabella. Gli
    altri 23 non prendono un riempitivo: la mini tab col numero e la sua nota e' tutto quello che
    c'e', e dirlo e' meglio che inventare una forma per far sembrare pieni i riquadri vuoti. */
-function contenutoDalPannello(k) {
+function contenutoDalPannello(k, notaGia = "") {
   if (!k || typeof MACRO_INFO === "undefined" || !MACRO_INFO[k]) return "";
   let html = "";
   try {
@@ -4338,7 +4338,21 @@ function contenutoDalPannello(k) {
      nove righe di dati, e usciva solo la tabella. Ora esce tutto il CONTENUTO INFORMATIVO;
      resta dentro solo la prosa esplicativa (cos'e' l'indicatore, come si legge), che nella
      scheda sarebbe rumore e nel popup e' a un clic. */
-  const pezzi = [...html.matchAll(/<svg[\s\S]*?<\/svg>|<table[\s\S]*?<\/table>|<div class="info-line[\s\S]*?<\/div>/g)].map(m => m[0]);
+  /* ⚠ v237 — LO STESSO DATO NON VA MOSTRATO DUE VOLTE. Misurato in browser dopo la v235: 8
+     schede su 30 dicevano il valore corrente nella NOTA e di nuovo nella riga estratta —
+     "55.2 · 2026-07-01" e sotto "Valore attuale: 55.2 (2026-07-01)". E' esattamente la classe
+     che questo payload combatte altrove ("lo stesso dato che si presentava come due dati", v184)
+     e l'ho introdotta io portando fuori le righe senza confrontarle con quello che la scheda
+     gia' diceva. Ora una riga che non aggiunge NIENTE alla nota viene scartata. */
+  const numeriNota = (String(notaGia).match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2);
+  const ridondante = (frammento) => {
+    const testo = frammento.replace(/<[^>]*>/g, " ");
+    if (!/Valore attuale|Rilevazione|Ultimo dato/i.test(testo)) return false;
+    const numeri = (testo.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2);
+    return numeri.length > 0 && numeri.every(n => numeriNota.includes(n));
+  };
+  const pezzi = [...html.matchAll(/<svg[\s\S]*?<\/svg>|<table[\s\S]*?<\/table>|<div class="info-line[\s\S]*?<\/div>/g)]
+    .map(m => m[0]).filter(x => !ridondante(x));
   return pezzi.length ? `<div class="mg-dalpan">${pezzi.join("")}</div>` : "";
 }
 
@@ -4400,7 +4414,7 @@ function renderIndicatori() {
        diverse (la storia e il valore corrente con la sua data e il suo impatto), e prima chi
        aveva una serie perdeva le seconde. Ora la scheda porta entrambe. */
     const se = serieIndicatore(r.k);
-    const dal = contenutoDalPannello(conPan.has(r.k) ? r.k : null);
+    const dal = contenutoDalPannello(conPan.has(r.k) ? r.k : null, r.sub || "");
     const linea = se
       ? (se.doppia
           ? graficoSerie(se.doppia, { h: 104, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome })

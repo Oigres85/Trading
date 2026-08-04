@@ -1744,6 +1744,27 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     return disponibili >= 10 && portati === disponibili;
   })());
 
+  /* ⚠ v237 — E LO STESSO DATO NON DEVE COMPARIRE DUE VOLTE NELLA STESSA SCHEDA. Misurato in
+     browser dopo la v235: 8 schede su 30 dicevano il valore corrente nella nota e di nuovo nella
+     riga estratta dal pannello. E' la classe "lo stesso dato che si presentava come due dati"
+     (v184), reintrodotta portando fuori le righe senza confrontarle con la nota. */
+  check("v237 classifica: il valore corrente non è ripetuto fra nota e riga estratta", (() => {
+    const html = rendiTutti();
+    const schede = html.split('<div class="mg-card').slice(1);
+    const doppie = schede.filter(c => {
+      const nota = (c.match(/class="muted mg-n">([\s\S]*?)<\/div>/) || ["", ""])[1].replace(/<[^>]*>/g, " ");
+      const num = (nota.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2);
+      if (!num.length) return false;
+      return [...c.matchAll(/<div class="info-line[\s\S]*?<\/div>/g)].some(m => {
+        const t2 = m[0].replace(/<[^>]*>/g, " ");
+        if (!/Valore attuale|Rilevazione|Ultimo dato/i.test(t2)) return false;
+        const n2 = (t2.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2);
+        return n2.length > 0 && n2.every(x => num.includes(x));
+      });
+    });
+    return schede.length >= 20 && doppie.length === 0;
+  })());
+
   // ⚠ e il grafico della serie non deve comparire DUE volte (una dalla serie, una dal pannello)
   /* ⚠ la prima stesura confrontava i TOTALI con un margine, ed era cosi' larga da non mordere
      quando ho iniettato il duplicato. Si misura per SCHEDA: chi ha il grafico della serie non
