@@ -1569,7 +1569,9 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     // classifica unica. La guardia si sposta su ciò che ora porta quella stessa informazione,
     // così il macro resta protetto invece di restare scoperto.
     ["classifica indicatori macro", 'id="mg-tutti"'],
-    ["scomposizione dei punteggi", 'id="mg-scomposizione"'],
+    /* v238 — "Da cosa nascono i punteggi" e' stata rimossa: i fattori dei compositi vivono ora
+       nelle schede della classifica. La guardia si SPOSTA sul contenitore che li porta. */
+    ["classifica indicatori", 'id="mg-tutti"'],
     ["rotazione settoriale", 'id="mg-rot"'],
     // v218 — le mini-card non esistono più: l'ultima ("Interni di mercato") è confluita nella
     // classifica unica, già protetta qui sopra da id="mg-tutti". La guardia si sposta sui due
@@ -1583,7 +1585,7 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     // cliccando la barra del rispettivo indicatore nella classifica (id="mg-tutti", protetto
     // qui sopra) e passano dalla modale, che quindi diventa l'elemento portante da proteggere.
     ["modale dei pannelli macro", 'id="chart-modal"'],
-    ["scomposizione dei punteggi", 'id="mg-scomposizione"'],
+    ["campanelli d'allarme", 'id="mg-signposts"'],
     ["campanelli d'allarme", 'id="mg-signposts"'],
     ["riquadri patrimonio", 'id="kpi-grid"'],
     ["parametri di rischio", 'id="risk-params-card"'],
@@ -1593,7 +1595,10 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     ["shell a due colonne", 'class="shell"'],
     ["scheda struttura", 'data-tab="struttura"'],
     ["grafico concentrazione", 'id="conc-chart"'],
-    ["deriva della concentrazione", 'id="drift-chart"'],
+    /* v238 — "deriva della concentrazione" e' stata rimossa su richiesta del CEO. La guardia NON
+       si cancella: si sposta sulla griglia degli indicatori, che e' l'elemento portante rimasto
+       in quella zona della vista (togliere codice e guardia insieme e' la classe v203). */
+    ["classifica indicatori", 'id="mg-tutti"'],
     ["allocazione grafica", 'id="allocg-chart"'],
     // v225 — "distanza dallo stop" e' stata rimossa su richiesta del CEO. La guardia NON si
     // cancella: si sposta sulla tabella del portafoglio, che e' l'elemento portante rimasto in
@@ -1727,21 +1732,26 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   /* ⚠ MISURATO PRIMA DI SCRIVERE IL CODICE: dei 30 indicatori solo 3 hanno un grafico nel
      pannello e 4 una tabella. Il check non pretende che ce ne siano molti — pretende che quelli
      che ESISTONO arrivino nella scheda invece di restare dietro un clic, che e' la richiesta. */
-  /* ⚠ v235 — l'invariante si e' ALLARGATO, non indebolito: prima contava solo gli indicatori
-     SENZA serie e solo <svg>/<table>; ora ogni indicatore il cui pannello ha contenuto
-     informativo (grafico, tabella O righe di dati) deve portarlo nella scheda, anche se ha
-     gia' un grafico di serie — sono due cose diverse (la storia e il valore corrente). */
-  check("v233 classifica: il contenuto informativo dei pannelli finisce NELLA scheda", (() => {
+  /* ⚠ v238 — L'INVARIANTE SI E' ALLARGATO ANCORA, ed e' la richiesta del CEO alla lettera:
+     "voglio tutti grafici in struttura". Non piu' "chi ha contenuto nel pannello lo porta fuori"
+     (che lasciava scoperti gli indicatori senza pannello), ma: OGNI scheda deve contenere una
+     forma disegnata — una scala con le sue zone, barre, una linea nel tempo, un conto alla
+     rovescia o una tabella. Una scheda col solo numero non e' piu' ammessa. */
+  check("v238 classifica: OGNI scheda ha una forma disegnata, nessuna col solo numero", (() => {
     const html = rendiTutti();
-    const disponibili = suVeri(`
-      let n = 0;
-      for (const r of indicatoriClassifica()) {
-        if (!MACRO_INFO[r.k]) continue;
-        if (/<svg|<table|info-line/.test(contenutoDalPannello(r.k))) n++;
-      }
-      return n;`, 56000);
-    const portati = (html.match(/class="mg-dalpan"/g) || []).length;
-    return disponibili >= 10 && portati === disponibili;
+    const schede = html.split(/<div class="mg-card(?!-head)/).slice(1);
+    const nude = schede.filter(c => !/(<svg|<table|class="obar-row|class="cdr")/.test(c));
+    return schede.length >= 20 && nude.length === 0;
+  })());
+
+  /* e ogni scheda deve portare la sua SPIEGAZIONE DI LETTURA: il CEO ha chiesto "dati dettagliati
+     e spiegazioni di lettura del dato", e un grafico senza la riga che dice cosa guardare e'
+     esattamente la forma che ha respinto tre volte. */
+  check("v238 classifica: la maggior parte delle schede spiega come si legge il dato", (() => {
+    const html = rendiTutti();
+    const schede = html.split(/<div class="mg-card(?!-head)/).slice(1);
+    const conLettura = schede.filter(c => /Come si legge/.test(c)).length;
+    return schede.length >= 20 && conLettura >= Math.round(schede.length * 0.6);
   })());
 
   /* ⚠ v237 — E LO STESSO DATO NON DEVE COMPARIRE DUE VOLTE NELLA STESSA SCHEDA. Misurato in
@@ -1750,7 +1760,7 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
      (v184), reintrodotta portando fuori le righe senza confrontarle con la nota. */
   check("v237 classifica: il valore corrente non è ripetuto fra nota e riga estratta", (() => {
     const html = rendiTutti();
-    const schede = html.split('<div class="mg-card').slice(1);
+    const schede = html.split(/<div class="mg-card(?!-head)/).slice(1);
     const doppie = schede.filter(c => {
       const nota = (c.match(/class="muted mg-n">([\s\S]*?)<\/div>/) || ["", ""])[1].replace(/<[^>]*>/g, " ");
       const num = (nota.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2);
@@ -1771,7 +1781,7 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
      deve portare anche quello del pannello, che disegnerebbe la stessa cosa due volte. */
   check("v233 classifica: nessuna scheda ha il grafico due volte (serie + pannello)", (() => {
     const html = rendiTutti();
-    const schede = html.split('<div class="mg-card').slice(1);
+    const schede = html.split(/<div class="mg-card(?!-head)/).slice(1);
     const doppie = schede.filter(c => /class="g-serie/.test(c) && (c.match(/<svg/g) || []).length > 1);
     return schede.length >= 20 && doppie.length === 0;
   })());
@@ -2013,18 +2023,15 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
 
   check("v231 mini tab: nessuna scheda a tutta larghezza da leva in giù", (() => {
     const h = rendi("#mg-leva", "renderLevaStagione")
-      + rendi("#mg-scomposizione", "renderScomposizione")
       + rendi("#mg-signposts", "renderSignposts");
     return !/mg-wide/.test(h);
   })());
 
   check("v231 mini tab: i grafici NON spariscono, restano dentro le schede", (() => {
     const leva = rendi("#mg-leva", "renderLevaStagione");
-    const sc = rendi("#mg-scomposizione", "renderScomposizione");
     const sp = rendi("#mg-signposts", "renderSignposts");
     return /<svg/.test(leva)                                  // margin debt: serie storica vera
       && (leva.match(/class="obar-row/g) || []).length >= 12   // stagionalita': i 12 mesi
-      && (sc.match(/class="obar-row/g) || []).length >= 4      // i fattori dei compositi
       && /<svg/.test(sp)                                       // la torta dei campanelli
       // ⚠ non basta contare le SCHEDE: la prima stesura passava anche togliendo la griglia che
       // le dispone (restavano .mg-card dentro un div nudo, impilate). Si chiede anche il contenitore.
@@ -2038,7 +2045,6 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
      il conto (v206, v226, v231) — qui il check lo blocca sul nascere. */
   check("v231 mini tab: nessuna tela larga oltre la scheda che la contiene", (() => {
     const h = rendi("#mg-leva", "renderLevaStagione")
-      + rendi("#mg-scomposizione", "renderScomposizione")
       + rendi("#mg-signposts", "renderSignposts");
     const larghezze = [...h.matchAll(/viewBox="0 0 (\d+)/g)].map(m => +m[1]);
     return larghezze.length > 0 && larghezze.every(w => w <= 340);

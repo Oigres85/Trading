@@ -1778,3 +1778,15 @@ svg.g-serie { cursor: crosshair; }
    Si limita l'altezza e si lascia scorrere: nessun dato si perde, e il pop-up resta a un clic. */
 .mg-dalpan { max-height: 210px; overflow-y: auto; }
 .mg-dalpan .info-line { font-size: 11px; line-height: 1.4; margin: 1px 0; }
+
+/* v238 — la scala con le zone nominate, e il conto alla rovescia */
+.sc { min-width: 0; }
+.sc svg { width: 100%; max-width: 100%; height: auto; display: block; }
+.sc-zona { font-size: 11px; font-weight: 600; text-align: center; margin-top: 2px; }
+.cdr { text-align: center; padding: 6px 0 2px; }
+.cdr-n { font-family: var(--mono); font-size: 30px; font-weight: 700; line-height: 1; color: var(--text); }
+.cdr-u { font-family: var(--sans, inherit); font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 5px; }
+.cdr-el { display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.cdr-el span { font-size: 10.5px; font-family: var(--mono); color: var(--muted);
+  border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; }
+.cdr-el .cdr-on { color: var(--text); border-color: var(--accent); }

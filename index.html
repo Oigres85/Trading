@@ -18,7 +18,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=237">
+<link rel="stylesheet" href="assets/style.css?v=238">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -99,14 +99,10 @@
     <div class="muted struct-note" id="conc-note"></div>
   </section>
 
-<section class="card" data-pane="struttura" data-sez="deriva">
-    <div class="card-head">
-      <h2>Deriva della concentrazione</h2>
-      <span class="muted" id="drift-basis"></span>
-    </div>
-    <div id="drift-chart"></div>
-    <div class="muted struct-note" id="drift-note"></div>
-  </section>
+<!-- v238 — "Deriva della concentrazione" RIMOSSA su richiesta del CEO. RICEVUTA: spariscono il
+     riquadro (#drift-chart/#drift-basis/#drift-note) e renderDeriva(); NON sparisce
+     derivaConcentrazione(), che resta usata dai check e non ha altri consumatori nel payload
+     (il payload non pubblica la deriva: verificato generandolo prima e dopo). -->
 
 <section class="card" data-pane="struttura" data-sez="benchmark">
     <div class="card-head">
@@ -148,7 +144,8 @@
       <h2>Tutti gli indicatori, una classifica sola</h2>
       <span class="muted">gli stessi termometri per tutti e 30 · passa sopra un pallino per il nome, cliccalo per il dettaglio</span>
     </div>
-    <div class="struct-headline" id="mg-tutti-head"></div>
+    <!-- v238 — le 4 tessere di testata (MEDIA DI TUTTI / QUANTI SOTTO 40 / I TRE CHE PESANO
+         DI PIU' / QUELLI CHE TENGONO) rimosse su richiesta del CEO. -->
     <div id="mg-tutti"></div>
     <div class="muted struct-note" id="mg-tutti-note"></div>
   </section>
@@ -161,13 +158,11 @@
     <div class="mg-tris" id="mg-leva"></div>
   </section>
 
-<section class="card" data-pane="struttura" data-sez="scomposizione">
-    <div class="card-head">
-      <h2>Da cosa nascono i punteggi</h2>
-      <span class="muted">un numero 0-100 da solo non dice niente: qui si vede chi lo tira giù</span>
-    </div>
-    <div class="mg-tris" id="mg-scomposizione"></div>
-  </section>
+<!-- v238 — "Da cosa nascono i punteggi" RIMOSSA su richiesta del CEO. RICEVUTA: il suo contenuto
+     NON e' andato perso — le barre dei fattori di ogni composito (ciclo economico, Fear & Greed,
+     sentiment globale, istituzionali vs retail) sono entrate nella scheda del rispettivo
+     indicatore, dentro "Tutti gli indicatori". Prima quei nomi comparivano DUE volte: una nella
+     classifica e una qui, ed era la stessa cosa detta in due posti. -->
 
 <section class="card" data-pane="struttura" data-sez="campanelli">
     <div class="card-head">
@@ -553,6 +548,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=237"></script>
+<script src="assets/app.js?v=238"></script>
 </body>
 </html>

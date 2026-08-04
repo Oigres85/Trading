@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "237";
+const BUILD_VERSION = "238";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3726,71 +3726,9 @@ function renderConcentrazione() {
   }
 }
 
-function renderDeriva() {
-  const box = $("#drift-chart"); if (!box) return;
-  const basis = $("#drift-basis"), note = $("#drift-note");
-  const d = derivaConcentrazione();
-  if (!d || d.dates.length < 2) {
-    box.innerHTML = '<div class="muted">Storico insufficiente: servono almeno due rilevazioni con i contributi al rischio.</div>';
-    if (basis) basis.textContent = ""; if (note) note.innerHTML = "";
-    return;
-  }
-  const W = 640, H = 210, L = 34, Rr = 46, T = 12, B = 24;
-  const n = d.dates.length;
-  const tutti = [...d.serie.flatMap(s => s.punti), ...d.top3].filter(v => v != null);
-  // tacche su valori TONDI: un asse che segna 23% e 68% costringe a fare i conti per leggerlo
-  const rawMax = Math.max(10, ...tutti);
-  const passo = [5, 10, 20, 25, 50].find(s => rawMax / s <= 5) || 100;
-  const maxV = Math.ceil(rawMax / passo) * passo;
-  const px = i => (L + (i / (n - 1)) * (W - L - Rr)).toFixed(1);
-  const py = v => (H - B - (v / maxV) * (H - B - T)).toFixed(1);
-  // una serie con buchi va spezzata: un titolo assente da metrics_history non era in portafoglio,
-  // e unire i due estremi disegnerebbe una continuità che non c'è stata
-  const segmenti = (punti) => {
-    const segs = []; let cur = [];
-    punti.forEach((v, i) => {
-      if (v == null) { if (cur.length > 1) segs.push(cur); cur = []; }
-      else cur.push(`${px(i)},${py(v)}`);
-    });
-    if (cur.length > 1) segs.push(cur);
-    return segs;
-  };
-  const tacche = [];
-  for (let v = 0; v <= maxV + 1e-9; v += passo) tacche.push(v);
-  const griglia = tacche.map(v =>
-    `<line x1="${L}" y1="${py(v)}" x2="${W - Rr}" y2="${py(v)}" stroke="var(--border)" stroke-width="1"/>
-      <text x="${L - 6}" y="${(+py(v) + 3.5).toFixed(1)}" text-anchor="end" font-size="9.5" fill="var(--muted)">${v.toFixed(0)}%</text>`).join("");
-  const linee = d.serie.map((s, i) => {
-    const col = ALLOC_COLORS[i % ALLOC_COLORS.length];
-    const ultimo = [...s.punti].reverse().findIndex(v => v != null);
-    const idx = ultimo === -1 ? -1 : n - 1 - ultimo;
-    return segmenti(s.punti).map(seg => `<polyline points="${seg.join(" ")}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`).join("")
-      + (idx >= 0 ? `<circle cx="${px(idx)}" cy="${py(s.punti[idx])}" r="2.8" fill="${col}"/>
-        <text x="${W - Rr + 5}" y="${(+py(s.punti[idx]) + 3.5).toFixed(1)}" font-size="10" font-weight="600" fill="${col}">${esc(s.ticker)}</text>` : "");
-  }).join("");
-  const t3 = segmenti(d.top3).map(seg =>
-    `<polyline points="${seg.join(" ")}" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="4 3"/>`).join("");
-  const dLab = i => new Date(d.dates[i] + "T00:00:00").toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
-  // niente preserveAspectRatio="none": deformerebbe le etichette dell'asse a ogni larghezza
-  box.innerHTML = `<svg class="drift-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Deriva del contributo al rischio nel tempo">
-      ${griglia}${t3}${linee}
-      <text x="${L}" y="${H - 6}" font-size="9.5" fill="var(--muted)">${dLab(0)}</text>
-      <text x="${W - Rr}" y="${H - 6}" text-anchor="end" font-size="9.5" fill="var(--muted)">${dLab(n - 1)}</text>
-    </svg>
-    <div class="drift-legend">${d.serie.map((s, i) =>
-      `<span style="color:${ALLOC_COLORS[i % ALLOC_COLORS.length]}">■ <b>${esc(s.ticker)}</b></span>`).join("")}
-      <span class="muted">╌ Top-3 del giorno</span></div>`;
-  if (basis) basis.textContent = `${n} rilevazioni · quota della varianza (MCR)`;
-  const p0 = d.top3.find(v => v != null), p1 = [...d.top3].reverse().find(v => v != null);
-  if (note) {
-    const delta = (p0 != null && p1 != null) ? Math.round((p1 - p0) * 10) / 10 : null;
-    note.innerHTML = `Quanta varianza produce ogni posizione, giorno per giorno. Le quote si ridistribuiscono da sole quando cambia la volatilità: una linea che sale senza che tu abbia comprato significa che quel titolo si sta muovendo più del resto del libro.
-      ${delta != null ? `Il Top-3 è passato da <b>${fmt1.format(p0)}%</b> a <b>${fmt1.format(p1)}%</b> (${fmtPP(delta)}) in ${n} rilevazioni.` : ""}
-      Le interruzioni sono date in cui la posizione non era in portafoglio, non zeri.`;
-  }
-}
-
-let allocGrafMode = "sector";
+/* v238 — `renderDeriva()` RIMOSSA col suo riquadro (richiesta CEO). RICEVUTA: la funzione pura
+   `derivaConcentrazione()` SOPRAVVIVE — e' usata dai check e il payload non la pubblica, quindi
+   toglierla porterebbe via una protezione senza togliere nulla di visibile (classe v203). */
 function renderAllocGrafica() {
   const box = $("#allocg-chart"); if (!box) return;
   const list = allocazionePer(allocGrafMode);
@@ -4015,62 +3953,12 @@ function renderLevaStagione() {
     : '<div class="muted">Dati non disponibili.</div>';
 }
 
-/* ═══ v209 — SCOMPOSIZIONE DEI PUNTEGGI COMPOSITI ═════════════════════════════════════════
-   "MacroQuant 55 · Rallentamento" con sotto un termometro è la forma meno informativa che un
-   dato possa assumere: dice quanto, non dice DI CHI È COLPA. I componenti stavano già in
-   data.json — 13 per MacroQuant, 7 per Fear & Greed, 5 per il sentiment globale, 4 per
-   istituzionali-vs-retail — e non erano disegnati da nessuna parte: `risk_sentiment.components`
-   non compariva nemmeno nei popup.
-   Le barre divergono da 50, non da zero: su una scala 0-100 il neutro è il centro, e ciò che
-   conta è da che parte sta ogni fattore rispetto ad esso. */
-const COMPOSITI = [
-  { k: "macroquant", t: "Ciclo economico", sub: "riproduzione trasparente stile BCA MacroQuant" },
-  { k: "fear_greed", t: "Fear &amp; Greed", sub: "sentiment CNN" },
-  { k: "risk_sentiment", t: "Sentiment globale", sub: "composito risk-on / risk-off" },
-  { k: "smart_money", t: "Istituzionali vs retail", sub: "struttura SMC, term del VIX, put/call" },
-];
-function renderScomposizione() {
-  const box = $("#mg-scomposizione"); if (!box) return;
-  const m = DATA?.macro || {};
-  // v212 — la Direzione mercato è un composito come gli altri, ma i suoi 10 fattori li calcola
-  // directionComponents() invece di arrivare da data.json: la si innesta qui invece di lasciarla
-  // come tachimetro in una mini-card, che è il formato che stiamo togliendo.
-  const dirComp = directionComponents();
-  const tutti = [...COMPOSITI, ...(dirComp.length >= 2
-    ? [{ k: "_direzione", t: "Direzione mercato", sub: "composito di tutti gli indicatori macro", comp: dirComp }] : [])];
-  const carte = tutti.map(c => {
-    const v = c.comp ? { components: c.comp } : m[c.k];
-    const comp = (v?.components || []).filter(x => x && x.score != null);
-    if (!v || comp.length < 2) return null;
-    const righe = [...comp].sort((a, b) => a.score - b.score).map(x => ({ nome: x.label, val: Math.round(x.score) }));
-    const peggio = righe[0], meglio = righe[righe.length - 1];
-    const sc = v.score ?? Math.round(comp.reduce((s, x) => s + x.score, 0) / comp.length);
-    const apri = c.k.startsWith("_") ? "" : ` data-mg-panel="${c.k}" role="button" tabindex="0" title="Apri il dettaglio di ${esc(c.t.replace(/&amp;/g, "&"))}"`;
-    return `<div class="mg-card${apri ? " mg-click" : ""}"${apri}>
-      <div class="mg-card-head">
-        <span class="mg-t">${c.t}</span>
-        <span class="mg-v" style="color:${scoreColor(sc)}">${sc}<span class="muted" style="font-size:12px">/100</span></span>
-      </div>
-      <div class="muted mg-n" style="margin:0 0 10px">${esc(c.sub)} · ${comp.length} fattori, dal peggiore al migliore.
-        Oggi tira giù <b>${esc(peggio.nome)}</b> (${peggio.val}/100) e tiene su <b>${esc(meglio.nome)}</b> (${meglio.val}/100).</div>
-      ${/* v229 — a BARRE su richiesta del CEO. Divergono da 50, non da zero: su una scala 0-100
-            il neutro e' il centro, e cio' che conta e' da che parte sta ogni fattore. */""}
-      ${barreOrdinate(righe.map(x => ({
-        nome: x.nome, valore: x.val - 50,
-        colore: scoreColor(x.val),
-        testo: `${x.val}/100`,
-      })), {})}
-    </div>`;
-  }).filter(Boolean);
-  box.innerHTML = carte.length ? carte.join("")
-    : '<div class="muted">Nessun punteggio composito disponibile in questo snapshot.</div>';
-  box.querySelectorAll("[data-mg-panel]").forEach(e => {
-    const apri = () => openMacroInfo(e.dataset.mgPanel);
-    e.addEventListener("click", apri);
-    e.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); apri(); } });
-  });
-}
-
+/* v238 — `renderScomposizione()` e la costante COMPOSITI RIMOSSE col loro riquadro.
+   RICEVUTA DEL TAGLIO, verificata con assert: dentro i confini vive UNA sola funzione piu' la
+   costante; il vicino a valle, renderSignposts(), e' intatto.
+   ⚠ IL CONTENUTO NON E' PERSO: le barre dei fattori di ogni composito sono ora dentro la scheda
+   del rispettivo indicatore (FORMA_INDICATORE → barreComposito). Prima quei nomi comparivano DUE
+   volte, una nella classifica e una qui: e' la classe v184, lo stesso dato presentato come due. */
 /* v209 — i 10 campanelli BofA: erano una tabella dentro un popup. Sono booleani, quindi la
    loro resa naturale non è una barra ma un conteggio visibile: quanti sono accesi e QUALI. */
 function renderSignposts() {
@@ -4124,7 +4012,6 @@ function renderMacroGrafici() {
   renderRotazione();
   renderStress();
   renderLevaStagione();
-  renderScomposizione();
   renderSignposts();
   renderIndicatori();   // v215 — le 27 scatole diventano una classifica sola
   // v235 — ORA le schede esistono: si misura e si impacca
@@ -4270,6 +4157,7 @@ function indicatoriClassifica() {
   }
   orf.forEach(x => out.push(x));
 
+
   /* ═══ v225 — ACCORPAMENTO: due tessere per la stessa cosa sono due tessere di troppo ══════
      Diverse voci misurano la STESSA grandezza con un secondo denominatore, e finivano affiancate
      come se fossero due letture indipendenti — la classe di difetto che questo progetto insegue
@@ -4309,7 +4197,15 @@ function indicatoriClassifica() {
     score: m.froth.alert ? 18 : 78, sub: m.froth.alert ? "volumi anomali dentro un rialzo" : `volumi normali (RVol max ${fmtNum.format(Math.max(m.froth.soxl?.rvol ?? 0, m.froth.tqqq?.rvol ?? 0))}×)` });
   if (m.futures?.nasdaq?.change_pct != null) out.push({ k: "futures", nome: "Futures Nasdaq (fuori orario)",
     score: Math.round(clamp(50 + m.futures.nasdaq.change_pct * 10)), sub: signTxt(m.futures.nasdaq.change_pct) });
-  return out.sort((a, b) => a.score - b.score);
+  /* ⚠ v238 — IL FILTRO VA QUI, non a meta' funzione: la prima stesura lo metteva subito dopo
+     gli "orfani" e "futures" veniva aggiunto DOPO, quindi sopravviveva. Misurato: 30 voci → 28
+     invece di 27. In fondo, appena prima dell'ordinamento, vede tutto quello che e' stato messo.
+     TRE VOCI ESCONO su richiesta del CEO: "Salute tecnica del libro" e "Futures Nasdaq (fuori
+     orario)" eliminate; "Stagionalità del mese" e' la STESSA cosa del riquadro "Leva e
+     stagionalità", che pero' ha i 12 mesi disegnati — si tiene quello col grafico e si toglie il
+     doppione, che diceva lo stesso fatto con meno informazione (classe v184). */
+  const FUORI = new Set(["thermometer", "futures", "seasonality"]);
+  return out.filter(x => !FUORI.has(x.k)).sort((a, b) => a.score - b.score);
 }
 /* ═══ v233 — QUELLO CHE IL POPUP AVEVA DENTRO, PORTATO FUORI ════════════════════════════════
    Richiesta CEO: "i grafici riportali all'originaria forma di mini tab e se il rispettivo pop up
@@ -4356,6 +4252,247 @@ function contenutoDalPannello(k, notaGia = "") {
   return pezzi.length ? `<div class="mg-dalpan">${pezzi.join("")}</div>` : "";
 }
 
+/* ═══ v238 — LA SCALA: un valore singolo non e' un numero nudo, e' una POSIZIONE ═════════════
+   Richiesta CEO: "fornisci dati dettagliati e spiegazioni di lettura del dato, se possibile con
+   grafico, istogramma, torta o termometro" per sedici indicatori che hanno UN solo valore e
+   nessuno storico nel file.
+   ⚠ Perche' NON e' la barra 0-100 gia' respinta tre volte: quella chiedeva di stimare una
+   lunghezza contro un asse implicito e senza riferimenti. Qui l'asse porta le ZONE NOMINATE
+   (dove comincia la recessione, dov'e' il target della Fed, dove i multipli si comprimono) e la
+   lettura e' la POSIZIONE dentro una di esse. Il numero non e' il messaggio: lo e' la zona in
+   cui cade, che ha un nome scritto sotto. */
+function scala(v, opt = {}) {
+  if (v == null || isNaN(v)) return "";
+  const zone = (opt.zone || []).filter(z => z && z.a > z.da);
+  if (!zone.length) return "";
+  const min = opt.min != null ? opt.min : Math.min(...zone.map(z => z.da));
+  const max = opt.max != null ? opt.max : Math.max(...zone.map(z => z.a));
+  if (!(max > min)) return "";
+  const W = 320, H = 62, L = 6, R = W - 6, y = 26, alt = 13;
+  const X = (x) => L + (Math.max(min, Math.min(max, x)) - min) / (max - min) * (R - L);
+  const fasce = zone.map(z => `<rect x="${X(z.da).toFixed(1)}" y="${y}" width="${(X(z.a) - X(z.da)).toFixed(1)}"
+      height="${alt}" fill="${z.colore}" fill-opacity=".55"><title>${esc(z.nome)}</title></rect>`).join("");
+  const conf = (opt.soglie || []).filter(t => t && t.v > min && t.v < max).map(t =>
+    `<line x1="${X(t.v).toFixed(1)}" y1="${y - 4}" x2="${X(t.v).toFixed(1)}" y2="${y + alt + 4}"
+       stroke="var(--text)" stroke-width="1" stroke-dasharray="2 2" opacity=".7"/>
+     <text x="${X(t.v).toFixed(1)}" y="${y - 7}" text-anchor="middle" font-size="8.5" fill="var(--muted)">${esc(t.testo)}</text>`).join("");
+  const px = X(v);
+  const fmt = opt.fmt || ((x) => fmtNum.format(x));
+  // il valore si scrive dove sta il marcatore, ma senza uscire dalla tela
+  const tx = Math.max(L + 22, Math.min(R - 22, px));
+  const dentro = zone.find(z => v >= z.da && v <= z.a);
+  return `<div class="sc"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.aria || "scala")}: ${fmt(v)}">
+      ${fasce}${conf}
+      <polygon points="${px.toFixed(1)},${y - 2} ${(px - 4).toFixed(1)},${y - 9} ${(px + 4).toFixed(1)},${y - 9}" fill="var(--text)"/>
+      <line x1="${px.toFixed(1)}" y1="${y - 2}" x2="${px.toFixed(1)}" y2="${y + alt + 2}" stroke="var(--text)" stroke-width="1.8"/>
+      <text x="${tx.toFixed(1)}" y="${y + alt + 15}" text-anchor="middle" font-size="12" font-weight="700"
+        font-family="var(--mono)" fill="var(--text)">${esc(fmt(v))}${esc(opt.unita || "")}</text>
+      <text x="${L}" y="${y - 7}" font-size="8.5" fill="var(--muted)">${esc(fmt(min))}</text>
+      <text x="${R}" y="${y - 7}" text-anchor="end" font-size="8.5" fill="var(--muted)">${esc(fmt(max))}</text>
+    </svg>${dentro ? `<div class="sc-zona" style="color:${dentro.colore}">${esc(dentro.nome)}</div>` : ""}</div>`;
+}
+
+/* conto alla rovescia per le date: un numero di giorni e' un fatto, la sequenza delle prossime
+   scadenze e' il contesto che dice se quella data e' isolata o parte di un ritmo */
+function contoAllaRovescia(giorni, date, opt = {}) {
+  if (giorni == null) return "";
+  const el = (date || []).slice(0, 4);
+  return `<div class="cdr"><div class="cdr-n">${giorni}<span class="cdr-u">giorni</span></div>
+    ${el.length ? `<div class="cdr-el">${el.map((d, i) => `<span class="${i === 0 ? "cdr-on" : ""}">${esc(dataBreve(d))}</span>`).join("")}</div>` : ""}
+    ${opt.nota ? `<div class="muted cdr-nota">${opt.nota}</div>` : ""}</div>`;
+}
+
+/* ═══ v238 — OGNI INDICATORE HA LA SUA FORMA E LA SUA LETTURA ═══════════════════════════════
+   Richiesta CEO: "voglio tutti grafici in struttura", con "dati dettagliati e spiegazioni di
+   lettura del dato". Il registro assegna a ciascuno la forma che i suoi dati permettono
+   davvero — misurata prima, non ipotizzata:
+     · chi ha COMPONENTI (i compositi) → barre dei fattori, dal peggiore al migliore. E' cio' che
+       mostrava la sezione "Da cosa nascono i punteggi", che infatti sparisce: il contenuto entra
+       nella scheda del suo indicatore invece di vivere in un blocco separato che ripeteva i nomi.
+     · chi ha una SERIE → la linea nel tempo (gia' gestita da serieIndicatore).
+     · chi ha UN VALORE SOLO → la scala con le zone nominate. Il numero da solo non dice niente:
+       "3,7%" diventa informazione quando l'asse mostra dov'e' il target della Fed.
+     · le date → conto alla rovescia con le prossime scadenze.
+   Ogni voce porta anche COME SI LEGGE: una riga che dice cosa guardare, non cosa fare (le
+   istruzioni vivono nella testata del prompt, non qui — e questa e' UI, non payload). */
+const FORMA_INDICATORE = {
+  "mk:EURJPY=X": (m) => {
+    const q = (m.markets || []).find(x => x.key === "EURJPY=X"); if (!q) return null;
+    const v = parseFloat(String(q.value).replace(",", ".")); const c = m.carry || {};
+    return { g: scala(v, { min: 150, max: 200, unita: "", aria: "EUR/JPY",
+        zone: [{ da: 150, a: 170, nome: "yen forte", colore: "var(--green)" },
+               { da: 170, a: 185, nome: "fascia recente", colore: "var(--muted)" },
+               { da: 185, a: 200, nome: "yen molto debole", colore: "var(--red)" }],
+        soglie: [{ v: 185, testo: "zona intervento" }] }),
+      n: `Oggi ${q.value} (${signTxt(q.change_pct)} nella seduta).${c.boj_rate != null ? ` Tasso BoJ ${c.boj_rate}%.` : ""}
+        <b>Come si legge:</b> più il numero sale, più lo yen è debole e più conviene finanziarsi in yen per comprare asset in dollari — è il carry trade che sostiene il tech. Uno yen che si rafforza di colpo costringe a chiudere quelle posizioni, e le chiusure partono dai titoli più affollati.` };
+  },
+  "in:umich": (m) => {
+    const i = (m.indicators || []).find(x => x.key === "umich"); if (!i) return null;
+    const v = parseFloat(String(i.value).replace(",", "."));
+    return { g: scala(v, { min: 50, max: 110, unita: "", aria: "fiducia consumatori",
+        zone: [{ da: 50, a: 70, nome: "pessimismo profondo", colore: "var(--red)" },
+               { da: 70, a: 90, nome: "cautela", colore: "var(--yellow)" },
+               { da: 90, a: 110, nome: "ottimismo", colore: "var(--green)" }],
+        soglie: [{ v: 85, testo: "media storica" }] }),
+      n: `${i.value} · rilevazione ${i.date}. <b>Come si legge:</b> misura quanto le famiglie si sentono sicure di spendere, e i consumi sono i due terzi del PIL americano. Sotto 70 è un livello da recessione; il dato arriva da FRED con 1-2 mesi di ritardo di licenza, quindi è più lento di quanto sembri.` };
+  },
+  dollar: (m) => {
+    const d = m.dollar_ruler; if (!d || d.chg_3m_pct == null) return null;
+    return { g: scala(d.chg_3m_pct, { min: -10, max: 10, unita: "%", aria: "dollaro 3 mesi",
+        zone: [{ da: -10, a: -5, nome: "dollaro debole: aiuta gli utili esteri", colore: "var(--green)" },
+               { da: -5, a: 5, nome: "impatto valutario neutro", colore: "var(--muted)" },
+               { da: 5, a: 10, nome: "dollaro forte: comprime gli utili esteri", colore: "var(--red)" }],
+        soglie: [{ v: 0, testo: "invariato" }] }),
+      n: `DXY ${fmtNum.format(d.value)} · ${signTxt(d.chg_3m_pct)} in 3 mesi. <b>Come si legge:</b> conta la VARIAZIONE, non il livello. Le multinazionali americane fatturano molto all'estero: un dollaro che si rafforza di oltre il 5% in un trimestre taglia gli utili convertiti, uno che si indebolisce li gonfia. Dentro ±5% l'effetto è rumore.` };
+  },
+  "mk:EURUSD=X": (m) => {
+    const q = (m.markets || []).find(x => x.key === "EURUSD=X"); if (!q) return null;
+    const v = parseFloat(String(q.value).replace(",", "."));
+    return { g: scala(v, { min: 1.0, max: 1.3, unita: "", aria: "EUR/USD", fmt: (x) => fmtNum.format(Math.round(x * 1000) / 1000),
+        zone: [{ da: 1.0, a: 1.08, nome: "euro debole", colore: "var(--red)" },
+               { da: 1.08, a: 1.18, nome: "fascia ordinaria", colore: "var(--muted)" },
+               { da: 1.18, a: 1.3, nome: "euro forte", colore: "var(--green)" }] }),
+      n: `${q.value} (${signTxt(q.change_pct)} oggi). <b>Come si legge:</b> il libro è per la maggior parte in dollari e non coperto, quindi questo cambio muove il patrimonio in euro anche a prezzi fermi. Euro che sale = il tuo controvalore in euro scende, e viceversa: è il motivo per cui l'alpha in euro e quello in dollari possono avere segni diversi.` };
+  },
+  "in:gdp": (m) => {
+    const i = (m.indicators || []).find(x => x.key === "gdp"); if (!i) return null;
+    const v = parseFloat(String(i.value).replace(",", ".").replace("%", ""));
+    const yoy = (m.yield_recession || {}).gdp_last;
+    return { g: scala(v, { min: -2, max: 6, unita: "%", aria: "PIL",
+        zone: [{ da: -2, a: 0, nome: "contrazione", colore: "var(--red)" },
+               { da: 0, a: 2, nome: "crescita sotto il trend", colore: "var(--yellow)" },
+               { da: 2, a: 6, nome: "crescita solida", colore: "var(--green)" }],
+        soglie: [{ v: 2, testo: "trend" }] }),
+      n: `${i.value} trimestrale annualizzato · rilevazione ${i.date}${yoy != null ? ` · ${signTxt(yoy)} anno su anno` : ""}. <b>Come si legge:</b> sotto il 2% l'economia cresce meno del proprio potenziale, e i multipli azionari fanno più fatica a essere giustificati dagli utili. È il dato più lento del quadro: trimestrale e rivisto due volte.` };
+  },
+  "in:cpi": (m) => {
+    const c = (m.indicators || []).find(x => x.key === "cpi"); if (!c) return null;
+    const p = (m.indicators || []).find(x => x.key === "pce");
+    const v = parseFloat(String(c.value).replace(",", ".").replace("%", ""));
+    return { g: scala(v, { min: 0, max: 8, unita: "%", aria: "inflazione",
+        zone: [{ da: 0, a: 2, nome: "sotto il target", colore: "var(--green)" },
+               { da: 2, a: 3.5, nome: "sopra il target ma gestibile", colore: "var(--yellow)" },
+               { da: 3.5, a: 8, nome: "inflazione che tiene alti i tassi", colore: "var(--red)" }],
+        soglie: [{ v: 2, testo: "target Fed" }] }),
+      n: `CPI ${c.value}${p ? ` · PCE ${p.value}` : ""} · rilevazione ${c.date}. <b>Come si legge:</b> due misure della stessa cosa, e la Fed guarda il PCE. Finché resta sopra il 2% la Fed non ha motivo di tagliare, e senza tagli i multipli del growth restano sotto pressione: è il canale per cui questo numero arriva al tuo portafoglio.` };
+  },
+  macroquant: (m) => barreComposito(m.macroquant, "Ciclo economico",
+    "Tredici indicatori del ciclo americano su una scala 0-100, dal peggiore al migliore. <b>Come si legge:</b> il punteggio d'insieme dice poco; quello che conta è CHI lo tira giù, perché è lì che il ciclo si sta rompendo per primo."),
+  "in:retail": (m) => {
+    const i = (m.indicators || []).find(x => x.key === "retail"); if (!i) return null;
+    const v = parseFloat(String(i.value).replace(",", ".").replace("%", ""));
+    return { g: scala(v, { min: -1.5, max: 1.5, unita: "%", aria: "vendite al dettaglio",
+        zone: [{ da: -1.5, a: 0, nome: "consumi in calo", colore: "var(--red)" },
+               { da: 0, a: 0.5, nome: "crescita debole", colore: "var(--yellow)" },
+               { da: 0.5, a: 1.5, nome: "consumi solidi", colore: "var(--green)" }],
+        soglie: [{ v: 0, testo: "fermo" }] }),
+      n: `${i.value} mese su mese · rilevazione ${i.date}. <b>Come si legge:</b> è il termometro più veloce dei consumi, e i consumi sono i due terzi del PIL. Un mese sotto zero non fa una tendenza; due o tre di fila anticipano il rallentamento prima che lo veda il PIL, che esce con un trimestre di ritardo.` };
+  },
+  risk_sentiment: (m) => barreComposito(m.risk_sentiment, "Sentiment globale",
+    "I fattori risk-on / risk-off che compongono il sentiment, dal peggiore al migliore. <b>Come si legge:</b> quando i fattori sono tutti d'accordo il sentiment è un segnale; quando sono in disaccordo il punteggio medio nasconde più di quanto mostri — e il disaccordo si vede dalla dispersione delle barre."),
+  smart_money: (m) => barreComposito(m.smart_money, "Istituzionali vs retail",
+    "I quattro segnali che distinguono il denaro istituzionale da quello retail. <b>Come si legge:</b> struttura di mercato, term structure del VIX, spread di credito e put/call. Quando divergono dal comportamento del retail, storicamente conta di più quello che fanno gli istituzionali."),
+  fear_greed: (m) => {
+    const f = m.fear_greed; if (!f || !(f.components || []).length) return null;
+    const b = barreComposito(f, "Fear & Greed", "");
+    if (!b) return null;
+    const st = [f.week_ago, f.month_ago, f.year_ago].filter(x => x != null);
+    return { g: b.g, n: `${st.length ? `Una settimana fa ${f.week_ago} · un mese fa ${f.month_ago} · un anno fa ${f.year_ago}. ` : ""}Sette componenti, dal peggiore al migliore. <b>Come si legge:</b> è un contrarian: la paura estrema è storicamente un momento di acquisto e l'avidità estrema un momento di cautela. Il livello di oggi conta meno della DIREZIONE rispetto alle rilevazioni passate.` };
+  },
+  _alpha: (m) => {
+    const b = m.benchmarks || {}; if (b.ndx == null) return null;
+    return { g: scala(b.ndx, { min: -4, max: 4, unita: " pp", aria: "scarto vs indice",
+        zone: [{ da: -4, a: -0.5, nome: "sotto l'indice", colore: "var(--red)" },
+               { da: -0.5, a: 0.5, nome: "in linea", colore: "var(--muted)" },
+               { da: 0.5, a: 4, nome: "sopra l'indice", colore: "var(--green)" }],
+        soglie: [{ v: 0, testo: "pari" }] }),
+      n: `Il Nasdaq 100 ha fatto ${signTxt(b.ndx)} nella seduta${b.sp500 != null ? `, l'S&P ${signTxt(b.sp500)}` : ""}${b.sox != null ? `, i semiconduttori ${signTxt(b.sox)}` : ""}. <b>Come si legge:</b> è lo scarto di UNA seduta, quindi rumore quasi sempre: serve a vedere se il libro si è mosso col mercato o contro. Il giudizio sul processo sta nell'alpha di periodo, non qui.` };
+  },
+  witching: (m) => {
+    const w = m.witching; if (!w || w.days == null) return null;
+    return { g: contoAllaRovescia(w.days, w.upcoming, {}),
+      n: `Prossima quadrupla scadenza il ${dataBreve(w.next)}. <b>Come si legge:</b> nel giorno delle scadenze tecniche scadono insieme opzioni e futures su indici e singole azioni, e i volumi esplodono per ragioni che non hanno a che fare coi fondamentali. Sotto i 30 giorni conviene evitare di leggere i movimenti come segnale, e non piazzare ordini limite stretti in quella seduta.` };
+  },
+  "mk:^TNX": (m) => {
+    const q = (m.markets || []).find(x => x.key === "^TNX"); if (!q) return null;
+    const v = parseFloat(String(q.value).replace(",", ".").replace("%", ""));
+    return { g: scala(v, { min: 2, max: 6, unita: "%", aria: "Treasury 10 anni",
+        zone: [{ da: 2, a: 3.5, nome: "tassi che sostengono i multipli", colore: "var(--green)" },
+               { da: 3.5, a: 4.5, nome: "fascia neutra", colore: "var(--muted)" },
+               { da: 4.5, a: 6, nome: "tassi che comprimono i multipli", colore: "var(--red)" }],
+        soglie: [{ v: 4, testo: "4%" }] }),
+      n: `${q.value} (${signTxt(q.change_pct)} pp nella seduta). <b>Come si legge:</b> è il tasso privo di rischio con cui si scontano gli utili futuri. Più sale, meno vale oggi un utile lontano nel tempo — ed è per questo che colpisce il growth più del value: i suoi utili stanno più avanti.` };
+  },
+  momentum: (m) => {
+    const s = (m.momentum || {}).sp500; if (!s || s.dist_pct == null) return null;
+    const n2 = (m.momentum || {}).ndx;
+    return { g: scala(s.dist_pct, { min: -15, max: 15, unita: "%", aria: "distanza dalla media 125",
+        zone: [{ da: -15, a: -3, nome: "sotto la media: trend primario deteriorato", colore: "var(--red)" },
+               { da: -3, a: 3, nome: "sulla media", colore: "var(--muted)" },
+               { da: 3, a: 15, nome: "sopra la media: trend primario integro", colore: "var(--green)" }],
+        soglie: [{ v: 0, testo: "media 125" }] }),
+      n: `S&P 500 a ${fmtNum.format(s.price)} contro una media a 125 sedute di ${fmtNum.format(s.sma125)}${n2 ? ` · Nasdaq 100 ${signTxt(n2.dist_pct)}` : ""}. <b>Come si legge:</b> 125 sedute sono circa sei mesi: è la linea che separa un ribasso dentro un rialzo da un cambio di regime. Finché il prezzo sta sopra, le discese sono correzioni; sotto, vanno trattate diversamente.` };
+  },
+  liquidity: (m) => {
+    const l = m.liquidity_split; if (!l || l.retail_pctile_5y == null) return null;
+    return { g: scala(l.retail_pctile_5y, { min: 0, max: 100, unita: "° pct", aria: "liquidità retail",
+        zone: [{ da: 0, a: 40, nome: "poca benzina a bordo campo", colore: "var(--yellow)" },
+               { da: 40, a: 75, nome: "liquidità nella norma", colore: "var(--muted)" },
+               { da: 75, a: 100, nome: "molta liquidità ferma", colore: "var(--green)" }],
+        soglie: [{ v: 50, testo: "mediana 5A" }] }),
+      n: `Fondi monetari retail ${fmtNum.format(l.retail_mmf_bln)} mld (${signTxt(l.retail_yoy_pct)} in un anno, ${l.retail_pctile_5y}° percentile su 5 anni) · istituzionali ${l.inst_cash_pct}% in liquidità. <b>Come si legge:</b> ha due letture opposte e vanno tenute insieme. Molta liquidità ferma è benzina potenziale per i rialzi; ma se sta AUMENTANDO significa che qualcuno sta uscendo dal rischio adesso. Guarda il livello e la direzione, non uno solo dei due. Sono proxy dichiarati, non i flussi veri.` };
+  },
+  breadth: (m) => {
+    const b = m.breadth; if (!b || b.divergence_pp == null) return null;
+    return { g: barreOrdinate([
+        { nome: "SPY — le grandi", valore: b.spy_1m_pct, colore: "var(--blue)", testo: `${signTxt(b.spy_1m_pct)} a 1 mese` },
+        { nome: "RSP — tutte uguali", valore: b.rsp_1m_pct, colore: "var(--purple)", testo: `${signTxt(b.rsp_1m_pct)} a 1 mese` },
+      ], {}),
+      n: `Scarto ${signTxt(b.divergence_pp)} pp. <b>Come si legge:</b> SPY pesa le società per capitalizzazione, RSP le tratta tutte uguali. Se SPY sale molto più di RSP il rialzo lo fanno poche mega-cap e la partecipazione è stretta — il tipo di rialzo che si rompe in fretta. Se salgono insieme, il movimento è largo e più solido. Allarme sopra i 4 pp di scarto: oggi ${Math.abs(b.divergence_pp) > 4 ? "è attivo" : "non è attivo"}.` };
+  },
+  sp500_pe: (m) => {
+    const p2 = m.sp500_pe, f = m.forward_pe; if (!p2 || p2.current == null) return null;
+    return { g: scala(p2.current, { min: 10, max: 40, unita: "×", aria: "P/E S&P 500",
+        zone: [{ da: 10, a: 18, nome: "valutazione contenuta", colore: "var(--green)" },
+               { da: 18, a: 25, nome: "sopra la media storica", colore: "var(--yellow)" },
+               { da: 25, a: 40, nome: "valutazione tesa", colore: "var(--red)" }],
+        soglie: [{ v: 16.5, testo: "media storica" }] }),
+      n: `Trailing ${fmtNum.format(p2.current)}×${p2.nasdaq_pe ? ` · Nasdaq 100 ${fmtNum.format(p2.nasdaq_pe)}×` : ""}${f && f.value != null ? ` · forward ${fmtNum.format(f.value)}×` : ""}. <b>Come si legge:</b> il trailing guarda gli utili già fatti, il forward quelli attesi — e la differenza fra i due dice quanta crescita il mercato sta già prezzando. Un multiplo alto non è di per sé un segnale di vendita: diventa fragile quando i tassi salgono, perché è proprio il multiplo a comprimersi per primo.` };
+  },
+  "in:unemp": (m) => {
+    const u = (m.indicators || []).find(x => x.key === "unemp"); if (!u) return null;
+    const v = parseFloat(String(u.value).replace(",", ".").replace("%", ""));
+    const n2 = (m.indicators || []).find(x => x.key === "nfp");
+    return { g: scala(v, { min: 3, max: 8, unita: "%", aria: "disoccupazione",
+        zone: [{ da: 3, a: 4.5, nome: "piena occupazione", colore: "var(--green)" },
+               { da: 4.5, a: 5.5, nome: "mercato in raffreddamento", colore: "var(--yellow)" },
+               { da: 5.5, a: 8, nome: "recessione del lavoro", colore: "var(--red)" }],
+        soglie: [{ v: 4.5, testo: "soglia Sahm" }] }),
+      n: `Disoccupazione ${u.value}${n2 ? ` · nuovi posti ${n2.value}` : ""} · rilevazione ${u.date}. <b>Come si legge:</b> conta la DIREZIONE più del livello. La regola di Sahm dice che quando la media a 3 mesi sale di mezzo punto sopra il minimo dell'anno la recessione è già cominciata — il livello assoluto è ancora basso quando il segnale scatta, ed è per questo che si guarda la salita, non il valore.` };
+  },
+  froth: (m) => {
+    const f = m.froth; if (!f || !f.soxl) return null;
+    const righe = [["SOXL — semi 3×", f.soxl], ["TQQQ — Nasdaq 3×", f.tqqq]].filter(([, x]) => x && x.rvol != null)
+      .map(([nome, x]) => ({ nome, valore: x.rvol, colore: x.rvol >= 2.5 ? "var(--red)" : x.rvol >= 1.5 ? "var(--yellow)" : "var(--green)",
+                             testo: `RVol ${fmtNum.format(x.rvol)}× · ${signTxt(x.chg_5d_pct)} in 5 sedute` }));
+    if (!righe.length) return null;
+    return { g: barreOrdinate(righe, {}),
+      n: `<b>Come si legge:</b> sono ETF a leva tripla, comprati quasi solo dal retail per scommettere in fretta. Volumi molto sopra la media MENTRE il prezzo sale sono euforia speculativa, che storicamente precede le correzioni; volumi alti mentre il prezzo scende sono invece capitolazione, che è l'opposto. L'allarme scatta sopra 2,5× con prezzo in salita: oggi ${f.alert ? "è attivo" : "non è attivo"}.` };
+  },
+};
+/* le barre dei fattori di un composito: e' cio' che mostrava "Da cosa nascono i punteggi", ora
+   dentro la scheda del suo indicatore invece che in un blocco separato che ne ripeteva i nomi */
+function barreComposito(c, nome, comeSiLegge) {
+  const comp = ((c || {}).components || []).filter(x => x && x.score != null);
+  if (comp.length < 2) return null;
+  const righe = [...comp].sort((a, b) => a.score - b.score)
+    .map(x => ({ nome: x.label, valore: Math.round(x.score) - 50, colore: scoreColor(x.score), testo: `${Math.round(x.score)}/100` }));
+  const peggio = righe[0], meglio = righe[righe.length - 1];
+  return { g: barreOrdinate(righe, {}),
+    n: `${comeSiLegge}${comeSiLegge ? " " : ""}Oggi tira giù <b>${esc(peggio.nome)}</b> (${peggio.testo}) e tiene su <b>${esc(meglio.nome)}</b> (${meglio.testo}).` };
+}
+
 /* ═══ v235 — IMPACCAMENTO A MASONRY DELLA GRIGLIA ══════════════════════════════════════════
    Richiesta CEO: "ottimizza la distribuzione di ogni singolo oggetto in struttura".
    Il problema misurato: le schede hanno altezze molto diverse (una col grafico e nove righe di
@@ -4399,7 +4536,7 @@ function registraImpaccamento() {
 
 function renderIndicatori() {
   const box = $("#mg-tutti"); if (!box) return;
-  const nota = $("#mg-tutti-note"), head = $("#mg-tutti-head");
+  const nota = $("#mg-tutti-note");
   const righe = indicatoriClassifica();
   if (righe.length < 3) { box.innerHTML = '<div class="muted">Indicatori non disponibili.</div>'; return; }
   const conPan = new Set(Object.keys(MACRO_INFO || {}));
@@ -4413,8 +4550,11 @@ function renderIndicatori() {
     /* ⚠ v235 — il grafico della serie NON esclude le righe di dati del pannello: sono due cose
        diverse (la storia e il valore corrente con la sua data e il suo impatto), e prima chi
        aveva una serie perdeva le seconde. Ora la scheda porta entrambe. */
-    const se = serieIndicatore(r.k);
-    const dal = contenutoDalPannello(conPan.has(r.k) ? r.k : null, r.sub || "");
+    /* v238 — l'ordine di precedenza: prima la forma DEDICATA del registro (che porta anche la
+       spiegazione di lettura), poi la serie storica, poi il contenuto del pannello. */
+    const forma = (() => { try { return FORMA_INDICATORE[r.k]?.(DATA.macro || {}) || null; } catch { return null; } })();
+    const se = forma ? null : serieIndicatore(r.k);
+    const dal = forma ? "" : contenutoDalPannello(conPan.has(r.k) ? r.k : null, r.sub || "");
     const linea = se
       ? (se.doppia
           ? graficoSerie(se.doppia, { h: 104, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome })
@@ -4422,36 +4562,16 @@ function renderIndicatori() {
               { h: 104, compatto: true, soglie: se.soglie, unita: se.unita, assex: se.assex,
                 fmtY: se.fmtY, etichetteDx: false, aria: r.nome }))
       : "";
-    const g = linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
+    const g = forma ? forma.g : linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
     return tessera({ t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
-      cls: clsScore(r.score), grafico: g, n: esc(r.sub || ""), tk: conPan.has(r.k) ? r.k : null });
+      cls: clsScore(r.score), grafico: g, n: forma ? forma.n : esc(r.sub || ""),
+      tk: conPan.has(r.k) ? r.k : null });
   }).join("")}</div>`;
   agganciaTessere(box);
 
-  const peggio = righe.slice(0, 3), meglio = righe.slice(-2);
-  const media = Math.round(righe.reduce((s, r) => s + r.score, 0) / righe.length);
-  const rossi = righe.filter(r => r.score < 40).length;
-  if (head) head.innerHTML = `
-    <div class="sh-item ${media < 45 ? "sh-warn" : ""}">
-      <div class="sh-lab">Media di tutti</div>
-      <div class="sh-val" style="color:${scoreColor(media)}">${media}<span class="muted" style="font-size:13px">/100</span></div>
-      <div class="sh-sub">${righe.length} indicatori sullo stesso asse</div>
-    </div>
-    <div class="sh-item ${rossi > righe.length / 2 ? "sh-bad" : ""}">
-      <div class="sh-lab">Quanti sotto 40</div>
-      <div class="sh-val" style="color:${scoreColor(100 - rossi / righe.length * 100)}">${rossi}<span class="muted" style="font-size:13px">/${righe.length}</span></div>
-      <div class="sh-sub">su 100, dove 100 è favorevole</div>
-    </div>
-    <div class="sh-item sh-bad">
-      <div class="sh-lab">I tre che pesano di più</div>
-      <div class="sh-val neg" style="font-size:15px">${peggio.map(r => esc(r.nome.split(" (")[0])).join(" · ")}</div>
-      <div class="sh-sub">${peggio.map(r => r.score).join(" · ")} su 100</div>
-    </div>
-    <div class="sh-item">
-      <div class="sh-lab">Quelli che tengono</div>
-      <div class="sh-val pos" style="font-size:15px">${meglio.map(r => esc(r.nome.split(" (")[0])).join(" · ")}</div>
-      <div class="sh-sub">${meglio.map(r => r.score).join(" · ")} su 100</div>
-    </div>`;
+  /* v238 — le quattro tessere di testata (media, quanti sotto 40, i tre peggiori, quelli che
+     tengono) sono state rimosse su richiesta del CEO: erano un riassunto della griglia che sta
+     appena sotto, cioe' gli stessi fatti detti due volte. */
   if (nota) nota.innerHTML = `Una scheda per indicatore, tutte sulla stessa scala: <b>100 = favorevole al libro, 0 = sfavorevole</b>, ordinate dalla peggiore.
     Dove esiste una storia il grafico la mostra; dove il pannello di dettaglio portava un grafico o una tabella, quelli sono <b>qui dentro</b> invece che dietro un clic.
     <b>Clicca una scheda</b> per il resto del pannello e le news di quell'indicatore.`;
@@ -4853,7 +4973,6 @@ function renderStruttura() {
   if (!DATA) return;
   attivaHoverGrafici();
   renderConcentrazione();
-  renderDeriva();
   renderAllocGrafica();
   renderVsBenchmark();   // v214 — il fondo contro il suo indice
   // v235 — l'impaccamento sta in fondo a renderMacroGrafici: e' QUELLA a riempire #mg-tutti,
