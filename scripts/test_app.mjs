@@ -1727,17 +1727,32 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   /* ⚠ MISURATO PRIMA DI SCRIVERE IL CODICE: dei 30 indicatori solo 3 hanno un grafico nel
      pannello e 4 una tabella. Il check non pretende che ce ne siano molti — pretende che quelli
      che ESISTONO arrivino nella scheda invece di restare dietro un clic, che e' la richiesta. */
-  check("v233 classifica: i grafici e le tabelle dei pannelli finiscono NELLA scheda", (() => {
+  /* ⚠ v235 — l'invariante si e' ALLARGATO, non indebolito: prima contava solo gli indicatori
+     SENZA serie e solo <svg>/<table>; ora ogni indicatore il cui pannello ha contenuto
+     informativo (grafico, tabella O righe di dati) deve portarlo nella scheda, anche se ha
+     gia' un grafico di serie — sono due cose diverse (la storia e il valore corrente). */
+  check("v233 classifica: il contenuto informativo dei pannelli finisce NELLA scheda", (() => {
     const html = rendiTutti();
     const disponibili = suVeri(`
       let n = 0;
       for (const r of indicatoriClassifica()) {
-        if (!MACRO_INFO[r.k] || serieIndicatore(r.k)) continue;
-        if (/<svg|<table/.test(contenutoDalPannello(r.k))) n++;
+        if (!MACRO_INFO[r.k]) continue;
+        if (/<svg|<table|info-line/.test(contenutoDalPannello(r.k))) n++;
       }
       return n;`, 56000);
     const portati = (html.match(/class="mg-dalpan"/g) || []).length;
-    return disponibili === 0 || portati === disponibili;
+    return disponibili >= 10 && portati === disponibili;
+  })());
+
+  // ⚠ e il grafico della serie non deve comparire DUE volte (una dalla serie, una dal pannello)
+  /* ⚠ la prima stesura confrontava i TOTALI con un margine, ed era cosi' larga da non mordere
+     quando ho iniettato il duplicato. Si misura per SCHEDA: chi ha il grafico della serie non
+     deve portare anche quello del pannello, che disegnerebbe la stessa cosa due volte. */
+  check("v233 classifica: nessuna scheda ha il grafico due volte (serie + pannello)", (() => {
+    const html = rendiTutti();
+    const schede = html.split('<div class="mg-card').slice(1);
+    const doppie = schede.filter(c => /class="g-serie/.test(c) && (c.match(/<svg/g) || []).length > 1);
+    return schede.length >= 20 && doppie.length === 0;
   })());
 
   // e chi non ha ne' serie ne' pannello non deve prendere un riempitivo inventato

@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "234";
+const BUILD_VERSION = "235";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4328,8 +4328,57 @@ function contenutoDalPannello(k) {
     const p = collectPanels([{ run: () => openMacroInfo(k) }]);
     html = p.length ? (p[0].bodyHTML || "") : "";
   } catch { return ""; }                      // un pannello rotto non deve rompere la griglia
-  const pezzi = [...html.matchAll(/<svg[\s\S]*?<\/svg>|<table[\s\S]*?<\/table>/g)].map(m => m[0]);
+  /* ⚠ v235 — NON SOLO GRAFICI E TABELLE. Misurato sui pannelli veri: 4 hanno un <svg>, 4 una
+     <table>, ma VENTUNO su 30 hanno righe `info-line` — che sono i dati veri e propri ("Valore
+     attuale: 55.2 (2026-07-01)", "Impatto: sfavorevole ai mercati", "Prossima pubblicazione
+     stimata: …"). In v233 restavano dentro il popup, e la scheda mostrava il solo punteggio.
+     Il CEO ha indicato "Istituzionali vs retail" come esempio: quel pannello ha una tabella E
+     nove righe di dati, e usciva solo la tabella. Ora esce tutto il CONTENUTO INFORMATIVO;
+     resta dentro solo la prosa esplicativa (cos'e' l'indicatore, come si legge), che nella
+     scheda sarebbe rumore e nel popup e' a un clic. */
+  const pezzi = [...html.matchAll(/<svg[\s\S]*?<\/svg>|<table[\s\S]*?<\/table>|<div class="info-line[\s\S]*?<\/div>/g)].map(m => m[0]);
   return pezzi.length ? `<div class="mg-dalpan">${pezzi.join("")}</div>` : "";
+}
+
+/* ═══ v235 — IMPACCAMENTO A MASONRY DELLA GRIGLIA ══════════════════════════════════════════
+   Richiesta CEO: "ottimizza la distribuzione di ogni singolo oggetto in struttura".
+   Il problema misurato: le schede hanno altezze molto diverse (una col grafico e nove righe di
+   dati sta a ~360px, una col solo punteggio a ~90px) e una griglia CSS allinea per RIGHE — la
+   riga e' alta quanto la scheda piu' alta, e sotto le altre resta un buco. Su 30 schede il
+   vuoto e' piu' della meta' dello schermo.
+   `columns` CSS impaccherebbe da solo, ma legge in COLONNE — dall'alto in basso e poi a capo —
+   e questa griglia e' ORDINATA dal peggiore al migliore: leggerla per colonne cambierebbe il
+   significato dell'ordine. Qui si tiene la griglia (ordine sinistra→destra intatto) e si dice a
+   ogni scheda quante righe da 8px occupare: le successive risalgono a riempire il vuoto.
+   ⚠ Va rieseguito quando cambia la larghezza: il numero di colonne cambia e con esso l'altezza
+   delle schede (il testo va a capo diversamente). */
+function impaccaGriglia(box) {
+  if (!box || typeof getComputedStyle !== "function") return;   // harness senza layout: no-op
+  box.querySelectorAll?.(".mg-tris").forEach(g => {
+    let cs;
+    try { cs = getComputedStyle(g); } catch { return; }
+    if (cs.display !== "grid") return;
+    const passo = 8, gap = parseFloat(cs.rowGap) || 14;
+    g.style.gridAutoRows = passo + "px";
+    g.style.alignItems = "start";
+    g.querySelectorAll(":scope > .mg-card").forEach(c => {
+      c.style.gridRowEnd = "";                                  // si riparte dall'altezza vera
+      const h = c.getBoundingClientRect?.().height || 0;
+      if (h > 0) c.style.gridRowEnd = `span ${Math.ceil((h + gap) / (passo + gap))}`;
+    });
+  });
+}
+/* una sola registrazione, in delega: al ridimensionamento le colonne cambiano e le altezze con
+   loro. Senza questo l'impaccamento resterebbe quello della prima misura (difetto della stessa
+   famiglia del viewBox non-costante: una misura presa una volta e usata per sempre). */
+let _impaccaTimer = null;
+function registraImpaccamento() {
+  if (registraImpaccamento._fatto) return;
+  registraImpaccamento._fatto = true;
+  window.addEventListener?.("resize", () => {
+    clearTimeout(_impaccaTimer);
+    _impaccaTimer = setTimeout(() => impaccaGriglia(document.querySelector(".shell-main")), 120);
+  });
 }
 
 function renderIndicatori() {
@@ -4345,14 +4394,19 @@ function renderIndicatori() {
      dentro; dove non c'e' ne' l'una ne' l'altra la scheda resta il numero e la sua nota, senza
      riempitivi. Il clic continua ad aprire il pannello completo. */
   box.innerHTML = `<div class="mg-tris">${righe.map(r => {
+    /* ⚠ v235 — il grafico della serie NON esclude le righe di dati del pannello: sono due cose
+       diverse (la storia e il valore corrente con la sua data e il suo impatto), e prima chi
+       aveva una serie perdeva le seconde. Ora la scheda porta entrambe. */
     const se = serieIndicatore(r.k);
-    const g = se
+    const dal = contenutoDalPannello(conPan.has(r.k) ? r.k : null);
+    const linea = se
       ? (se.doppia
           ? graficoSerie(se.doppia, { h: 104, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome })
           : graficoSerie([{ nome: r.nome, punti: se.punti, colore: scoreColor(r.score) }],
               { h: 104, compatto: true, soglie: se.soglie, unita: se.unita, assex: se.assex,
                 fmtY: se.fmtY, etichetteDx: false, aria: r.nome }))
-      : contenutoDalPannello(conPan.has(r.k) ? r.k : null);
+      : "";
+    const g = linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
     return tessera({ t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
       cls: clsScore(r.score), grafico: g, n: esc(r.sub || ""), tk: conPan.has(r.k) ? r.k : null });
   }).join("")}</div>`;
@@ -4786,6 +4840,9 @@ function renderStruttura() {
   renderDeriva();
   renderAllocGrafica();
   renderVsBenchmark();   // v214 — il fondo contro il suo indice
+  // v235 — l'impaccamento va DOPO che tutte le schede esistono, e va rifatto a ogni render
+  registraImpaccamento();
+  impaccaGriglia(document.querySelector(".shell-main"));
 }
 
 /* ---------------- tabella ---------------- */
