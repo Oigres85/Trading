@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "233";
+const BUILD_VERSION = "234";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1307,10 +1307,28 @@ function sessionContextLine() {
     // Seoul apriva mentre lo snapshot era ancora quello di ieri l'etichetta diceva "borsa ferma"
     // nella stessa riga in cui il testo di sessione diceva "Seoul sta scambiando ora": la riga
     // si contraddiceva da sola. Lo stato mancante e' il piu' insidioso — mercato APERTO, dato VECCHIO.
-    ks && ks.change_pct != null ? `KOSPI ${signTxt(ks.change_pct)}${
-      (ks.price_live && seoulSessionOpen()) ? " [LIVE, Seoul in contrattazione]"
-      : seoulSessionOpen() ? " [Seoul APERTA ora, ma questo valore è l'ultima chiusura: lo snapshot non è ancora aggiornato]"
-      : " [ultima chiusura di Seoul, borsa ferma]"}` : null,
+    /* ⚠ v234 — IL TERZO STATO DI v190 C'ERA MA NON SCATTAVA MAI. La condizione del "LIVE" era
+       `price_live && seoulSessionOpen()`: due cose che INSIEME non stabiliscono la freschezza.
+       `price_live` e' un flag della pipeline ("yfinance ha dato una quotazione live-ish"), non
+       "catturata mentre Seoul scambiava"; `seoulSessionOpen()` guarda l'OROLOGIO DI ADESSO, non
+       quello dello snapshot. Misurato sui dati veri: KOSPI -5,12% con price_live=true, snapshot
+       delle 22:54Z = 07:54 a Seoul, cioe' un'ora PRIMA dell'apertura coreana — eppure la riga
+       diceva "[LIVE, Seoul in contrattazione]" solo perche' alle 00:38 ET Seoul e' aperta.
+       Manca il pezzo che conta: QUANDO e' stato preso il dato. Ora il LIVE richiede che lo
+       snapshot stesso sia caduto dentro una sessione coreana — cosi' il terzo stato (mercato
+       APERTO, dato VECCHIO), che v190 aveva scritto proprio per questo caso, diventa
+       raggiungibile invece di restare codice morto. Classe v182/v193: stato del mercato e
+       freschezza del dato sono due cose diverse. */
+    ks && ks.change_pct != null ? (() => {
+      const snap = DATA.updated_at ? new Date(DATA.updated_at) : null;
+      const snapVivo = snap && !isNaN(snap) && seoulSessionOpen(snap);
+      const oraKst = snap && !isNaN(snap)
+        ? new Date(snap.getTime() + 9 * 3600e3).toISOString().slice(11, 16) : null;
+      return `KOSPI ${signTxt(ks.change_pct)}${
+        (ks.price_live && seoulSessionOpen() && snapVivo) ? " [LIVE, Seoul in contrattazione]"
+        : seoulSessionOpen() ? ` [Seoul APERTA ora, ma questo valore viene dallo snapshot${oraKst ? ` delle ${oraKst} KST` : ""}, preso FUORI dalla sessione coreana: non è aggiornato in tempo reale]`
+        : " [ultima chiusura di Seoul, borsa ferma]"}`;
+    })() : null,
     fut.nasdaq?.change_pct != null ? `Fut NDX ${signTxt(fut.nasdaq.change_pct)}` : null,
     fut.sp500?.change_pct != null ? `Fut S&P ${signTxt(fut.sp500.change_pct)}` : null,
     btc && btc.change_pct != null ? `BTC ${signTxt(btc.change_pct)} [24/7]` : null,

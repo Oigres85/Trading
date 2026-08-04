@@ -1892,13 +1892,21 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   const scenario = (sotto) => `
     const _d = DATA, _c = cashEur;
     DATA = JSON.parse(JSON.stringify(REALE)); cashEur = 56000; recomputeTotals();
-    const v = (decisionVerdict().stopViolations || [])[0];
+    /* ⚠ SU TUTTE le posizioni violate, non solo la prima: il check asserisce sull'INTERO testo,
+       e con due violazioni bastava che la seconda restasse col prezzo sotto il proprio stop per
+       far comparire comunque la riga che il ramo negativo pretende assente. Il check e' andato
+       rosso quando il numero di violazioni nel data.json e' cambiato — cioe' misurava i dati
+       del giorno, non la proprieta'. */
+    const viols = decisionVerdict().stopViolations || [];
     let out = null;
-    if (v) {
-      const r = DATA.portfolio.find(x => x.ticker === v.ticker || x.ticker === v.r.ticker);
-      const px = v.stop * ${sotto ? "0.94" : "1.01"};
-      r.prezzo_limite_aggiustato = px;
-      r.prepost = { label: "pre", price: px, change_pct: (px / r.price - 1) * 100 };
+    if (viols.length) {
+      for (const v of viols) {
+        const r = DATA.portfolio.find(x => x.ticker === v.ticker || x.ticker === v.r.ticker);
+        if (!r) continue;
+        const px = v.stop * ${sotto ? "0.94" : "1.01"};
+        r.prezzo_limite_aggiustato = px;
+        r.prepost = { label: "pre", price: px, change_pct: (px / r.price - 1) * 100 };
+      }
       recomputeTotals();
       out = buildCIOText();
     }
@@ -2033,6 +2041,51 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     const w = conFase("weekend");
     return typeof w === "string" && !/\bANTICIPATORI\b/.test(w) && /FERMI/.test(w);
   })());
+}
+
+/* ═══ v234 — IL TERZO STATO DEL KOSPI DEVE ESSERE RAGGIUNGIBILE ════════════════════════════
+   v190 aveva scritto TRE stati (live · mercato aperto ma dato vecchio · borsa ferma) proprio
+   perche' il secondo e' il piu' insidioso. Ma la condizione del "LIVE" era
+   `price_live && seoulSessionOpen()`, e nessuna delle due dice QUANDO il dato e' stato preso:
+   `price_live` e' un flag della pipeline, `seoulSessionOpen()` guarda l'orologio di adesso.
+   Risultato misurato: KOSPI con price_live=true e snapshot delle 07:54 KST (un'ora PRIMA
+   dell'apertura coreana) veniva etichettato "[LIVE, Seoul in contrattazione]" — e lo stato di
+   mezzo, scritto apposta per quel caso, era CODICE MORTO da v190.
+   ⚠ Un ramo che non puo' essere raggiunto non e' una protezione: e' un commento che sembra
+   codice. Questi tre check lo esercitano tutto. */
+{
+  const conSnapshot = (isoSnapshot) => suVeri(`
+    const _u = DATA.updated_at;
+    DATA.updated_at = ${JSON.stringify(isoSnapshot)};
+    const k = DATA.watchlist.find(x => x.ticker === "^KS11");
+    const _l = k && k.price_live;
+    if (k) k.price_live = true;
+    let out = "";
+    try { out = sessionContextLine(); } catch (e) { out = "ERR " + e.message; }
+    DATA.updated_at = _u; if (k) k.price_live = _l;
+    return out;`, 56000);
+
+  /* Seoul: 09:00-15:30 KST (UTC+9). 2026-08-04 è un martedì.
+     03:00Z = 12:00 KST → dentro la sessione · 22:54Z = 07:54 KST del giorno dopo → fuori. */
+  const dentroSessione = "2026-08-04T03:00:00Z";
+  const fuoriSessione  = "2026-08-03T22:54:00Z";
+
+  check("v234 KOSPI: snapshot preso DENTRO la sessione coreana → si può dire LIVE", (() => {
+    const r = conSnapshot(dentroSessione);
+    return typeof r === "string" && (!/KOSPI/.test(r) || /LIVE, Seoul in contrattazione|ultima chiusura/.test(r));
+  })());
+
+  check("v234 KOSPI: snapshot preso FUORI dalla sessione → non si spaccia per LIVE", (() => {
+    const r = conSnapshot(fuoriSessione);
+    if (typeof r !== "string" || !/KOSPI/.test(r)) return false;
+    // o dichiara che il dato non è aggiornato, o dice che la borsa è ferma: mai "LIVE"
+    return !/LIVE, Seoul in contrattazione/.test(r);
+  })());
+
+  // ⚠ e la condizione deve guardare lo SNAPSHOT, non solo l'orologio: se tornasse a fidarsi del
+  // solo price_live, il terzo stato ridiventerebbe irraggiungibile senza che nulla lo segnali
+  check("v234 KOSPI: la freschezza si decide sul timestamp dello snapshot",
+    /seoulSessionOpen\(snap\)/.test(src));
 }
 
 /* ═══ LA SUITE CONTROLLA SE STESSA ═══ ═════════════════════════════════════════════════
