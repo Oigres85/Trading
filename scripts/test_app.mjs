@@ -2130,6 +2130,69 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /seoulSessionOpen\(snap\)/.test(src));
 }
 
+/* ═══ v241 — LE SCHEDE SI TRASCINANO, E L'ORDINE VIVE NEL REPO ═════════════════════════════
+   Richiesta CEO: trascinare le schede "come se fosse un desktop", con l'ordine che si presenta
+   "su qualsiasi terminale". Le tre cose che rendono vera quella frase, ognuna gia' pagata:
+     · POINTER EVENTS: su Safari touch il drag HTML5 non esiste (v193) — su iPhone non
+       succederebbe niente e la funzionalita' sarebbe vera solo sul Mac;
+     · CHIAVE STABILE `data-scheda`: il titolo e' fragile (v196), l'indice invecchia (C10);
+     · PERSISTENZA NEL REPO: localStorage e' per-browser, quindi "su qualsiasi terminale" NON
+       sarebbe soddisfatto — e' esattamente il difetto corretto sui parametri di rischio. */
+{
+  const htmlSchede = suVeri(`
+    let html = "";
+    const box = { set innerHTML(v) { html = v; }, get innerHTML() { return html; },
+                  querySelector: () => null, querySelectorAll: () => [] };
+    const altro = () => ({ innerHTML: "", textContent: "", querySelector: () => null,
+                           querySelectorAll: () => [], addEventListener() {} });
+    const vero = document.querySelector;
+    document.querySelector = (sel) => sel === "#mg-tutti" ? box : altro();
+    try { renderIndicatori(); } finally { document.querySelector = vero; }
+    return html;`, 56000);
+
+  check("v241 schede: OGNI scheda porta la sua chiave stabile per il riordino", (() => {
+    const schede = (htmlSchede.match(/class="mg-card-head"/g) || []).length;
+    const chiavi = [...htmlSchede.matchAll(/data-scheda="([^"]+)"/g)].map(m => m[1]);
+    return schede > 0 && chiavi.length === schede && new Set(chiavi).size === chiavi.length;
+  })());
+
+  // ⚠ la chiave dev'essere la chiave dell'indicatore, non il titolo: un titolo riscritto non
+  // deve far perdere al CEO il posto che ha dato a quella scheda
+  check("v241 schede: la chiave è quella dell'indicatore, non il suo titolo", (() => {
+    const chiavi = [...htmlSchede.matchAll(/data-scheda="([^"]+)"/g)].map(m => m[1]);
+    const attese = suVeri("return indicatoriClassifica().map(r => r.k);", 56000);
+    return chiavi.length > 0 && chiavi.every(k => attese.includes(k));
+  })());
+
+  check("v241 schede: l'ordine si salva nello stesso file del repo delle sezioni",
+    /ord\.schede\[id\]\s*=/.test(src) && /pushOrdineSezioniCloud\(ord\)/.test(src)
+    && (src.match(/const SEZ_ORDER_PATH = "config\/ui_order\.json"/g) || []).length === 1);
+
+  /* ⚠ su Safari touch il drag HTML5 non funziona: se qualcuno lo reintroducesse, il
+     trascinamento sarebbe vero solo sul Mac e la richiesta del CEO resterebbe mezza. */
+  /* ⚠ la prima stesura vietava il drag HTML5 OVUNQUE e pescava due usi PREESISTENTI e legittimi
+     (riordino delle colonne di tabella, elenco dei pannelli): entrambi solo-Mac da sempre, e
+     documentati come tali. Il check si restringe alla macchina delle SCHEDE, che e' quella che
+     deve funzionare anche su iPhone. */
+  check("v241 schede: la macchina delle schede usa i pointer event, non il drag HTML5", (() => {
+    const i = src.indexOf("function montaTrascinamentoSchede");
+    const j = src.indexOf("\nfunction renderStruttura", i);
+    if (i < 0 || j < 0) return false;
+    const blocco = src.slice(i, j);
+    return /pointerdown/.test(blocco) && /setPointerCapture/.test(blocco)
+      && !/dragstart|draggable/.test(blocco);
+  })());
+
+  // e l'ordine dev'essere RIAPPLICATO a ogni render: la griglia si ricostruisce da capo
+  /* ⚠ senza togliere i commenti la guardia non morde: una chiamata COMMENTATA contiene ancora
+     il testo cercato. Quarta volta in questa sessione che una scansione del sorgente inciampa
+     nei commenti — vale come regola: chi cerca codice nel sorgente li toglie prima. */
+  check("v241 schede: l'ordine salvato si riapplica dopo ogni render", (() => {
+    const vivo = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    return /applicaOrdineSchede\(griglia, "indicatori"\)/.test(vivo);
+  })());
+}
+
 /* ═══ v240 — UNA SOGLIA DISEGNATA E' UN'AFFERMAZIONE, E VA SOSTENUTA ═══════════════════════
    Il CEO ha chiesto: "spero tu non abbia inventato dati". I VALORI no, vengono tutti da
    data.json. Ma le soglie che avevo disegnato sugli assi erano in parte scelte mie, presentate

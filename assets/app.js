@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "240";
+const BUILD_VERSION = "241";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4604,9 +4604,14 @@ function renderIndicatori() {
     const g = forma ? forma.g : linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
     return tessera({ t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
       cls: clsScore(r.score), grafico: g, n: forma ? forma.n : esc(r.sub || ""),
-      tk: conPan.has(r.k) ? r.k : null });
+      tk: conPan.has(r.k) ? r.k : null, id: r.k });
   }).join("")}</div>`;
   agganciaTessere(box);
+  /* v241 — l'ordine scelto dal CEO si riapplica a OGNI render (la griglia si ricostruisce da
+     capo ogni volta), e i comandi di trascinamento si rimontano sulle schede nuove. */
+  const griglia = box.querySelector(".mg-tris");
+  applicaOrdineSchede(griglia, "indicatori");
+  montaTrascinamentoSchede(griglia, "indicatori");
 
   /* v238 — le quattro tessere di testata (media, quanti sotto 40, i tre peggiori, quelli che
      tengono) sono state rimosse su richiesta del CEO: erano un riassunto della griglia che sta
@@ -4761,8 +4766,11 @@ function ciambella(voci, opt = {}) {
    RICEVUTA DEL TAGLIO, scritta PRIMA di tagliare (regola v201-v204): 2 chiamanti, entrambi
    convertiti (renderScomposizione, renderSignposts); 0 riferimenti nei test; dentro i confini
    del blocco rimosso non vive nessun'altra funzione — il vicino a valle, tessera(), e' intatto. */
-function tessera({ t, v, cls, grafico, n, tk }) {
-  return `<div class="mg-card${tk ? " mg-click" : ""}"${tk ? ` data-tess-tk="${esc(tk)}" role="button" tabindex="0"` : ""}>
+function tessera({ t, v, cls, grafico, n, tk, id }) {
+  /* v241 — `id` e' la CHIAVE STABILE della scheda per il riordino: la chiave dell'indicatore
+     (in:cpi, dollar, macroquant…), non il titolo e non la posizione. Una scheda rinominata non
+     perde il posto che il CEO le ha dato, e una nuova finisce in coda invece di spostare tutto. */
+  return `<div class="mg-card${tk ? " mg-click" : ""}"${id ? ` data-scheda="${esc(id)}"` : ""}${tk ? ` data-tess-tk="${esc(tk)}" role="button" tabindex="0"` : ""}>
     <div class="mg-card-head"><span class="mg-t">${esc(t)}</span><span class="mg-v ${cls || ""}">${v}</span></div>
     ${grafico || ""}${n ? `<div class="muted mg-n">${n}</div>` : ""}</div>`;
 }
@@ -5002,6 +5010,116 @@ function iniziaTrascinamento(e, sez) {
     main.classList.remove("in-riordino");
     sez.classList.remove("sez-trascinata");
     salvaOrdineSezioni(pane);
+  };
+  grip.addEventListener("pointermove", muovi);
+  grip.addEventListener("pointerup", finisci);
+  grip.addEventListener("pointercancel", finisci);
+}
+
+/* ═══ v241 — LE SCHEDE SI TRASCINANO COME SU UNA SCRIVANIA ══════════════════════════════════
+   Richiesta CEO: "puoi anche consentirmi di trascinare e modificare le schede come se fosse un
+   desktop? l'ordine che poi salvo dovrà presentarsi su qualsiasi terminale".
+   Si riusa per intero la macchina delle SEZIONI (v225), che gia' risolve i tre problemi veri:
+     · POINTER EVENTS, non HTML5 drag — su Safari touch il drag HTML5 non esiste (v193), quindi
+       su iPhone non succederebbe niente;
+     · la CHIAVE e' `data-scheda` (la chiave dell'indicatore: in:cpi, dollar, macroquant…), non
+       il titolo (fragile, v196) e non l'indice (invecchia da solo, C10);
+     · la PERSISTENZA sta nello stesso `config/ui_order.json` scritto via Contents API. E' questo
+       che soddisfa "su qualsiasi terminale": localStorage e' per-browser, e Mac e iPhone
+       resterebbero diversi — il difetto gia' corretto sui parametri di rischio.
+   ⚠ Differenza vera rispetto alle sezioni: le schede stanno in una griglia BIDIMENSIONALE
+   impaccata a masonry, non in una colonna. Il bersaglio non si trova confrontando le sole y:
+   si guarda quale scheda sta SOTTO il puntatore. */
+function schedeDi(box) {
+  return box ? [...box.querySelectorAll(":scope > .mg-card[data-scheda]")] : [];
+}
+
+/* stessa tecnica delle sezioni: si piantano segnaposto invisibili nelle posizioni attuali e ci
+   si rimettono dentro le schede nell'ordine nuovo, cosi' non si sposta nient'altro */
+function disponiSchede(box, chiavi) {
+  const lista = schedeDi(box);
+  if (lista.length < 2) return;
+  const noti = chiavi.map(k => lista.find(el => el.dataset.scheda === k)).filter(Boolean);
+  const resto = lista.filter(el => !noti.includes(el));       // schede nuove → in coda
+  const nuovo = [...noti, ...resto];
+  if (nuovo.every((el, i) => el === lista[i])) return;
+  const ancore = lista.map(el => { const c = document.createComment("sk"); el.replaceWith(c); return c; });
+  nuovo.forEach((el, i) => ancore[i].after(el));
+  ancore.forEach(c => c.remove());
+}
+
+function applicaOrdineSchede(box, id) {
+  if (!box) return;
+  const c = (caricaOrdineSezioni().schede || {})[id];
+  if (Array.isArray(c) && c.length) disponiSchede(box, c);
+}
+
+function salvaOrdineSchede(box, id) {
+  const ord = caricaOrdineSezioni();
+  ord.schede = ord.schede || {};
+  ord.schede[id] = schedeDi(box).map(el => el.dataset.scheda);
+  ord._savedAt = new Date().toISOString();
+  try { localStorage.setItem(SEZ_ORDER_KEY, JSON.stringify(ord)); } catch { /* quota */ }
+  if (localStorage.getItem("gh_token")) pushOrdineSezioniCloud(ord);
+  else toast("Ordine salvato solo su questo browser: senza token GitHub non arriva su iPhone");
+}
+
+function montaTrascinamentoSchede(box, id) {
+  if (!box) return;
+  schedeDi(box).forEach(card => {
+    if (card.querySelector(":scope > .sk-grip")) return;
+    const g = document.createElement("button");
+    g.className = "sk-grip"; g.type = "button"; g.textContent = "⠿";
+    g.title = "Trascina per spostare la scheda";
+    g.setAttribute("aria-label", `Sposta la scheda ${card.dataset.scheda}`);
+    card.prepend(g);
+    g.addEventListener("pointerdown", e => trascinaScheda(e, card, box, id));
+    // tastiera: frecce per chi non trascina (e per l'accessibilita')
+    g.addEventListener("keydown", ev => {
+      const d = ev.key === "ArrowLeft" ? -1 : ev.key === "ArrowRight" ? 1 : 0;
+      if (!d) return;
+      ev.preventDefault();
+      const l = schedeDi(box), i = l.indexOf(card), j = i + d;
+      if (j < 0 || j >= l.length) return;
+      l.splice(j, 0, l.splice(i, 1)[0]);
+      disponiSchede(box, l.map(x => x.dataset.scheda));
+      salvaOrdineSchede(box, id);
+      impaccaGriglia(document.querySelector(".shell-main"));
+      g.focus();
+    });
+  });
+}
+
+function trascinaScheda(e, card, box, id) {
+  if (e.button > 0) return;
+  e.preventDefault();                        // su touch impedisce che il gesto diventi uno scroll
+  if (schedeDi(box).length < 2) return;
+  box.classList.add("in-riordino-schede");
+  card.classList.add("sk-trascinata");
+  const grip = e.currentTarget;
+  try { grip.setPointerCapture(e.pointerId); } catch { /* browser senza capture */ }
+
+  const muovi = ev => {
+    /* ⚠ in una griglia 2D il bersaglio NON si trova confrontando le y (era il metodo delle
+       sezioni, che stanno in colonna): si guarda quale scheda e' sotto il puntatore. */
+    const sotto = document.elementFromPoint(ev.clientX, ev.clientY);
+    const target = sotto && sotto.closest ? sotto.closest(".mg-card[data-scheda]") : null;
+    if (!target || target === card || target.parentElement !== box) return;
+    const l = schedeDi(box);
+    const i = l.indexOf(card), j = l.indexOf(target);
+    if (i < 0 || j < 0) return;
+    l.splice(j, 0, l.splice(i, 1)[0]);
+    disponiSchede(box, l.map(x => x.dataset.scheda));
+    impaccaGriglia(document.querySelector(".shell-main"));
+  };
+  const finisci = () => {
+    grip.removeEventListener("pointermove", muovi);
+    grip.removeEventListener("pointerup", finisci);
+    grip.removeEventListener("pointercancel", finisci);
+    box.classList.remove("in-riordino-schede");
+    card.classList.remove("sk-trascinata");
+    salvaOrdineSchede(box, id);
+    impaccaGriglia(document.querySelector(".shell-main"));
   };
   grip.addEventListener("pointermove", muovi);
   grip.addEventListener("pointerup", finisci);
