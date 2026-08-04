@@ -2183,6 +2183,17 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
       && !/dragstart|draggable/.test(blocco);
   })());
 
+  /* ⚠ senza scorrimento automatico il trascinamento e' vero solo per spostamenti CORTI: le 27
+     schede occupano ~3000px e `elementFromPoint` restituisce null fuori dal viewport, quindi il
+     punto d'arrivo lontano semplicemente non esiste. Misurato provandolo nel browser. */
+  check("v241 schede: il trascinamento fa scorrere la pagina ai bordi", (() => {
+    const vivo = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    const i = vivo.indexOf("function trascinaScheda");
+    if (i < 0) return false;
+    const blocco = vivo.slice(i, i + 2600);
+    return /window\.scrollBy/.test(blocco) && /clearInterval/.test(blocco);
+  })());
+
   // e l'ordine dev'essere RIAPPLICATO a ogni render: la griglia si ricostruisce da capo
   /* ⚠ senza togliere i commenti la guardia non morde: una chiamata COMMENTATA contiene ancora
      il testo cercato. Quarta volta in questa sessione che una scansione del sorgente inciampa

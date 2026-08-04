@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "241";
+const BUILD_VERSION = "242";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5099,7 +5099,23 @@ function trascinaScheda(e, card, box, id) {
   const grip = e.currentTarget;
   try { grip.setPointerCapture(e.pointerId); } catch { /* browser senza capture */ }
 
+  /* ═══ SCORRIMENTO AUTOMATICO AI BORDI ═════════════════════════════════════════════════════
+     ⚠ Senza questo il trascinamento e' vero solo per spostamenti CORTI. Misurato: le 27 schede
+     occupano ~3000px, e `elementFromPoint` — che e' come si trova il bersaglio — restituisce
+     null fuori dal viewport, per definizione. Quindi portare la prima scheda in ventesima
+     posizione era semplicemente impossibile: il punto d'arrivo non e' sullo schermo.
+     Vicino al bordo la pagina scorre da sola, come su una scrivania vera. */
+  let scorri = null;
+  const autoScorrimento = (y) => {
+    const banda = 90, passo = 14;
+    const v = y < banda ? -passo : y > innerHeight - banda ? passo : 0;
+    if (!v) { clearInterval(scorri); scorri = null; return; }
+    if (scorri) return;
+    scorri = setInterval(() => window.scrollBy(0, v), 16);
+  };
+
   const muovi = ev => {
+    autoScorrimento(ev.clientY);
     /* ⚠ in una griglia 2D il bersaglio NON si trova confrontando le y (era il metodo delle
        sezioni, che stanno in colonna): si guarda quale scheda e' sotto il puntatore. */
     const sotto = document.elementFromPoint(ev.clientX, ev.clientY);
@@ -5113,6 +5129,7 @@ function trascinaScheda(e, card, box, id) {
     impaccaGriglia(document.querySelector(".shell-main"));
   };
   const finisci = () => {
+    clearInterval(scorri); scorri = null;      // lo scorrimento non deve sopravvivere al rilascio
     grip.removeEventListener("pointermove", muovi);
     grip.removeEventListener("pointerup", finisci);
     grip.removeEventListener("pointercancel", finisci);
