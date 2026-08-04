@@ -1165,6 +1165,35 @@ due volte; il selettore giusto è `/<div class="mg-card(?!-head)/`.
 ⚠ E un filtro va messo **dove vede tutto**: quello che toglieva le voci dalla classifica stava a
 metà funzione, e `futures` veniva aggiunto dopo — sopravviveva.
 
+## 🎚️ v240 — una soglia disegnata è un'AFFERMAZIONE, e va sostenuta
+
+Il CEO ha chiesto: *"spero tu non abbia inventato dati"*. Audit riga per riga: **i valori no**
+(vengono tutti da `data.json`), **le soglie in parte sì**. Quattro erano indifendibili:
+
+| soglia | difetto |
+|---|---|
+| EUR/JPY "zona intervento 185" | **inventata** — nel file non c'è nulla sugli interventi, e la BoJ è intervenuta su USD/JPY |
+| UMich "media storica 85" | **non è nel file** |
+| disoccupazione "soglia Sahm 4,5%" | **falsa** — Sahm è un MOVIMENTO (+0,5 pp della media a 3 mesi sul minimo dei 12), non un livello; e la spiegazione nella stessa scheda la enunciava correttamente, quindi l'asse **contraddiceva il testo sotto di sé** |
+| P/E "media storica 16,5" | è `forward_pe.avg_hist`, la media del **forward**, disegnata su una scala del **trailing** — e `sp500_pe.avg_10y` è `null`, quindi quella media **non esiste** |
+
+Classe **v195**: *un ID indovinato e scritto come se fosse certo sarebbe stato peggio di un
+tentativo dichiarato.*
+
+> **Regola**: ogni tacca e ogni NOME DI ZONA disegnati su un asse sono affermazioni. O vengono dal
+> dato (e si dice da quale campo), o sono una convenzione di lettura — e allora va **scritto** che
+> lo sono. Anche il nome di una fascia è un'affermazione: "sopra la media storica" rivendica un
+> confronto che il file non permette.
+
+Ora ogni `scala()` porta la propria **provenienza**, e la differenza si legge:
+*"il 2% è il target dichiarato della Federal Reserve"* contro *"bande di sola lettura: nel file
+non c'è un intervallo storico di EUR/JPY"*.
+
+⚠ **Terza volta in una sessione** che un gate trova sé stesso: le note che *spiegano* la soglia
+rimossa la contengono per forza. La scansione toglie i commenti (come v213).
+⚠ E una guardia non mordeva perché `class="sc-fonte` matcha anche `sc-fonte-qualsiasi`: quando si
+ancora a una classe CSS, l'ancoraggio va chiuso.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
