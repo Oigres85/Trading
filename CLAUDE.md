@@ -1121,6 +1121,50 @@ Con `width: max-content` la tabella larga scorre dentro il proprio contenitore e
 modificava UNA sola posizione violata ma asseriva sull'intero payload — appena il numero di
 violazioni nel `data.json` è cambiato è diventato rosso senza che nulla fosse rotto.
 
+## 💀 v238-v239 — la pagina è andata MORTA in produzione con 219 test verdi
+
+Il taglio di `renderDeriva()` si è portato via `let allocGrafMode = "sector"`, che stava **fra**
+quella funzione e la successiva. Conseguenza: `allocGrafMode is not defined` dentro
+`renderAllocGrafica` → `renderStruttura` → `renderAll` → `loadData`, cioè **l'intera pagina non
+si disegnava**.
+
+**Due lezioni, e la seconda è più grave della prima.**
+
+1. **La ricevuta del taglio controllava la cosa sbagliata.** L'`assert` contava quante `function`
+   cadevano dentro i confini — e un `let` non è una function. È la classe v201-v204 per la
+   **quarta** volta, passata proprio perché la protezione guardava altrove.
+   > Una ricevuta di taglio deve contare **tutte le dichiarazioni di primo livello** dentro i
+   > confini, non solo quelle che ti aspetti di trovare.
+2. **La suite era VERDE**: 219 check, `node --check`, red team, coerenza — tutti passati, perché
+   **nessuno eseguiva il render**. È la classe v213 ("la pagina era morta") che torna con una
+   causa diversa: allora un `addEventListener` su un elemento rimosso, qui una dichiarazione
+   portata via da un taglio.
+   > **La sintassi valida non dice niente sull'esecuzione.**
+
+**Gate nuovo**: la catena di render (`renderStruttura`, `renderMacroGrafici`, `renderIndicatori`,
+`renderSignposts`, `renderLevaStagione`, `renderRotazione`, `renderStress`) gira sui dati veri e
+**qualunque eccezione è un fallimento**. Validato ritogliendo la dichiarazione: `node --check`
+continua a passare, il gate no.
+
+## 📏 v238 — la scala con le zone nominate
+
+Sedici indicatori hanno **un valore e nessuno storico**. La barra 0-100 è stata respinta tre
+volte perché chiedeva di stimare una lunghezza contro un asse implicito e **senza riferimenti**.
+La scala porta le **zone nominate** — dove comincia la recessione, dov'è il target della Fed, dove
+i multipli si comprimono — e sotto c'è scritto il nome della zona in cui il valore cade.
+
+> **Il numero non è il messaggio: lo è la zona.** "3,7%" non dice niente; "3,7% · sopra il target
+> ma gestibile", col 2% segnato sull'asse, sì.
+
+E ogni scheda porta il suo **"come si legge"**: cosa guardare e *attraverso quale canale* quel dato
+arriva a questo portafoglio. Un grafico senza quella riga è la forma già respinta.
+
+⚠ Ricorrente e da riconoscere a vista: **`class="mg-card` matcha anche `mg-card-head`** — lo split
+delle schede contava il doppio dei blocchi, e metà erano intestazioni senza grafico. Mi è costato
+due volte; il selettore giusto è `/<div class="mg-card(?!-head)/`.
+⚠ E un filtro va messo **dove vede tutto**: quello che toglieva le voci dalla classifica stava a
+metà funzione, e `futures` veniva aggiunto dopo — sopravviveva.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
