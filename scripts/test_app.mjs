@@ -1692,102 +1692,57 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /dataset\.sez/.test(src) && !/\.sez\b.*querySelector\("h2"\)/.test(src));
 }
 
-/* ═══ v226 — NESSUN INDICATORE PUO' RESTARE FUORI DALLE FAMIGLIE ═══════════════════════════
-   La ragnatela raggruppa 30 indicatori in 6 famiglie tramite un elenco di chiavi scritto a mano.
-   E' esattamente la forma che questo progetto ha gia' pagato tre volte: il registro fisso che
-   invecchia in silenzio (C10, gli indici 16/17 del red team, MACRO_CARD_BY_PANEL di v196). Un
-   indicatore nuovo in pipeline non deve SPARIRE dal grafico perche' nessuno ha aggiornato
-   l'elenco: famigliaDi() lo fa cadere in una famiglia per prefisso e, all'estremo, in "Altro".
-   Questi check verificano il RISULTATO (nessuno perso, i conti tornano), non l'elenco. */
+/* ═══ v233 — NESSUN INDICATORE PUO' SPARIRE DALLA GRIGLIA ══════════════════════════════════
+   Erede diretto dei check v226. Quelli verificavano che nessun indicatore andasse perso nel
+   RAGGRUPPAMENTO IN FAMIGLIE; le famiglie non esistono piu' (la vista a pallini e' stata
+   rimossa in v233), ma l'invariante che proteggevano vale identico: OGNI indicatore deve avere
+   la sua scheda, e la strada per verificarlo e' il render vero, non una funzione pura.
+   ⚠ Le guardie si SPOSTANO col meccanismo, non si cancellano con esso — classe v203. */
 {
-  // stessa COPIA PROFONDA del blocco v205: nessun check deve lasciare mutazioni agli altri
-
-  /* ⚠ QUESTO CHECK VA FATTO PASSARE DAL RENDER, non da famigliaMacro() a mano. La prima
-     stesura chiamava famiglieMacro(indicatoriClassifica()) direttamente ed era VERDE mentre il
-     sito vivo disegnava un settimo spicchio "Altro": renderIndicatori azzerava `k` per gli
-     indicatori senza pannello e poi raggruppava su quella chiave azzerata. Un test che non
-     percorre la strada del codice vero certifica una strada che nessuno percorre. */
-  check("v226 render: nessuna famiglia \"Altro\" fantasma nel grafico realmente disegnato", suReale(`
-    // il dollaro e' definito come (sel) => document.querySelector(sel): si intercetta document
-    const box = { innerHTML: "", querySelector: () => null, querySelectorAll: () => [] };
+  const rendiTutti = () => suVeri(`
+    let html = "";
+    const box = { set innerHTML(v) { html = v; }, get innerHTML() { return html; },
+                  querySelector: () => null, querySelectorAll: () => [] };
     const altro = () => ({ innerHTML: "", textContent: "", querySelector: () => null,
                            querySelectorAll: () => [], addEventListener() {} });
-    const veroQS = document.querySelector;
+    const vero = document.querySelector;
     document.querySelector = (sel) => sel === "#mg-tutti" ? box : altro();
-    try { renderIndicatori(); } finally { document.querySelector = veroQS; }
-    const html = box.innerHTML;
-    const fam = [...html.matchAll(/data-fam="([^"]+)"/g)].map(m => m[1]);
-    const pallini = (html.match(/class="pt-punto/g) || []).length;
-    return fam.length >= 4 && !fam.includes("Altro")
-      && pallini === indicatoriClassifica().length;`));
+    try { renderIndicatori(); } finally { document.querySelector = vero; }
+    return html;`, 56000);
 
-  check("v226 famiglie: ogni indicatore finisce in una famiglia, nessuno perso", suReale(`
-    const righe = indicatoriClassifica();
-    const fam = famiglieMacro(righe);
-    const dentro = fam.reduce((s, f) => s + f.v.length, 0);
-    const nomi = new Set(fam.flatMap(f => f.v.map(x => x.nome)));
-    return dentro === righe.length && nomi.size === righe.length && fam.length >= 4;`));
+  check("v233 classifica: una scheda per OGNI indicatore, nessuno perso", (() => {
+    const html = rendiTutti();
+    // ⚠ `class="mg-card` matcha anche `mg-card-head`: contava il doppio. Si ancora
+    // all'intestazione, che c'e' una e una sola volta per scheda.
+    const schede = (html.match(/class="mg-card-head"/g) || []).length;
+    const attesi = suVeri("return indicatoriClassifica().length;", 56000);
+    return schede === attesi && attesi >= 20;
+  })());
 
-  check("v226 famiglie: una chiave sconosciuta NON sparisce, cade in una famiglia", suReale(`
-    const finto = [{ k: "chiave:mai:vista", nome: "Indicatore nuovo", score: 42 },
-                   { k: "in:qualcosa_di_nuovo", nome: "Macro nuova", score: 60 },
-                   { k: "mk:^NUOVO", nome: "Mercato nuovo", score: 55 }];
-    const fam = famiglieMacro(finto);
-    return fam.reduce((s, f) => s + f.v.length, 0) === 3
-      && famigliaDi("chiave:mai:vista") === "Altro"
-      && famigliaDi("in:qualcosa_di_nuovo") === "Ciclo USA";`));
+  check("v233 classifica: è una griglia di mini tab, non un grafico unico", (() => {
+    const html = rendiTutti();
+    return /class="mg-tris"/.test(html) && !/pt-punto|rd-fam/.test(html);
+  })());
 
-  check("v226 famiglie: la media di ogni famiglia è la media dei suoi indicatori", suReale(`
-    return famiglieMacro(indicatoriClassifica()).every(f =>
-      Math.abs(f.m - Math.round(f.v.reduce((s, x) => s + x.score, 0) / f.v.length)) < 0.51);`));
+  /* ⚠ MISURATO PRIMA DI SCRIVERE IL CODICE: dei 30 indicatori solo 3 hanno un grafico nel
+     pannello e 4 una tabella. Il check non pretende che ce ne siano molti — pretende che quelli
+     che ESISTONO arrivino nella scheda invece di restare dietro un clic, che e' la richiesta. */
+  check("v233 classifica: i grafici e le tabelle dei pannelli finiscono NELLA scheda", (() => {
+    const html = rendiTutti();
+    const disponibili = suVeri(`
+      let n = 0;
+      for (const r of indicatoriClassifica()) {
+        if (!MACRO_INFO[r.k] || serieIndicatore(r.k)) continue;
+        if (/<svg|<table/.test(contenutoDalPannello(r.k))) n++;
+      }
+      return n;`, 56000);
+    const portati = (html.match(/class="mg-dalpan"/g) || []).length;
+    return disponibili === 0 || portati === disponibili;
+  })());
 
-  // i due grafici devono DISEGNARE tutti i punti che dichiarano: un pallino perso e' un
-  // indicatore invisibile, e non produce nessun errore (la classe .abar-fill di v205).
-  check("v226 grafici: l'asse disegna un pallino per ogni indicatore, con una riga per famiglia", suReale(`
-    const fam = famiglieMacro(indicatoriClassifica());
-    const tot = fam.reduce((s, f) => s + f.v.length, 0);
-    const asse = puntiSuAsse(fam);
-    const pallini = (asse.match(/class="pt-punto/g) || []).length;
-    const righe = (asse.match(/class="pt-riga"/g) || []).length;
-    return pallini === tot && righe === fam.length && asse.includes("pt-tip");`));
-
-  /* Il CEO ha respinto TRE forme in tre versioni, per due ragioni diverse: barra e quadrante
-     erano un widget per indicatore (un muro di trenta), la ragnatela era un grafico solo ma
-     che va spiegato prima di poter essere letto. Se una qualunque rientrasse, rientrerebbe il
-     problema — quindi il check le guarda tutte e tre. */
-  check("v229: nessuna delle forme respinte è rientrata (misuratore, quadrante, ragnatela, rosa)",
-    !/function\s+(misuratore|quadrante|radarFamiglie|annoCircolare)\s*\(/.test(src));
-
-  /* v229 — i tre blocchi che il CEO ha chiesto "a barre o torte" devono disegnarle DAVVERO.
-     Si verifica sull'HTML prodotto dal render, non sul sorgente: e' la lezione v227 — un check
-     che non percorre la strada del codice vero certifica una strada immaginaria. */
-  check("v229 render: stagionalità, scomposizione e campanelli disegnano barre (o torte)", suReale(`
-    const box = { innerHTML: "", querySelector: () => null, querySelectorAll: () => [] };
-    const altro = () => ({ innerHTML: "", textContent: "", querySelector: () => null,
-                           querySelectorAll: () => [], addEventListener() {} });
-    const veroQS = document.querySelector;
-    const prendi = (id, fn) => {
-      box.innerHTML = "";
-      document.querySelector = (sel) => sel === id ? box : altro();
-      try { fn(); } finally { document.querySelector = veroQS; }
-      return box.innerHTML;
-    };
-    const leva = prendi("#mg-leva", renderLevaStagione);
-    const scomp = prendi("#mg-scomposizione", renderScomposizione);
-    const sign = prendi("#mg-signposts", renderSignposts);
-    const barre = (h) => (h.match(/class="obar-row/g) || []).length;
-    /* leva: 12 barre = i 12 mesi, con obar-on sul corrente · scomp: i fattori di un composito
-       · sign: barre per categoria PIU' la torta (un <svg> nel blocco).
-       ⚠ nessun commento in coda all'ULTIMA riga: suReale appende " } finally {…}" sulla stessa
-       riga e un // se lo mangerebbe. Stessa famiglia dei backtick dentro un template literal. */
-    return barre(leva) >= 12 && /obar-on/.test(leva)
-      && barre(scomp) >= 4
-      && barre(sign) >= 2 && /<svg/.test(sign);`));
-
-  // e il gestore del clic sulla ragnatela non deve sopravviverle: un handler vivo su un
-  // elemento che non esiste piu' e' il sintomo v193, non un residuo innocuo
-  check("v228: rimosso anche il gestore della ragnatela, non solo la ragnatela",
-    !/querySelectorAll\(["'`]\.rd-fam/.test(src));
+  // e chi non ha ne' serie ne' pannello non deve prendere un riempitivo inventato
+  check("v233 classifica: nessuna forma respinta è rientrata come riempitivo",
+    !/function\s+(misuratore|quadrante|radarFamiglie|annoCircolare|puntiSuAsse)\s*\(/.test(src));
 }
 
 /* ═══ v228 — LA TRIMESTRALE DI OGGI E' LA PIU' URGENTE, NON LA MENO ════════════════════════

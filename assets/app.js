@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "232";
+const BUILD_VERSION = "233";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3929,105 +3929,18 @@ function renderStress() {
    Dinamici: si passa sopra un punto e compare il nome, si clicca e si apre il pannello, si
    clicca una famiglia sulla ragnatela e l'asse isola quella. */
 
-const FAMIGLIE_MACRO = [
-  { n: "Ciclo USA", k: ["in:umich", "in:cpi", "in:pce", "in:gdp", "in:retail", "in:unemp", "in:nfp", "macroquant"] },
-  { n: "Tassi e credito", k: ["mk:^TNX", "in:curve", "yield_recession", "credit", "systemic_risk", "fed_market", "fedwatch", "liquidity", "carry"] },
-  { n: "Sentiment", k: ["fear_greed", "risk_sentiment", "smart_money", "putcall", "froth"] },
-  { n: "Valutazione", k: ["sp500_pe", "forward_pe", "corp_profit", "decouple"] },
-  { n: "Mercato e tecnica", k: ["breadth", "momentum", "futures", "thermometer", "_alpha", "witching", "seasonality", "signposts"] },
-  { n: "Valute", k: ["mk:EURJPY=X", "mk:EURUSD=X", "dollar"] },
-];
-/* ⚠ NIENTE registro fisso e muto (la classe C10 / red team I6): una chiave che non conosco NON
-   deve sparire. Cade in una famiglia per prefisso, e se nemmeno quello la classifica finisce in
-   "Altro" — visibile, non persa. Un test verifica che nessun indicatore resti fuori. */
-function famigliaDi(k) {
-  const f = FAMIGLIE_MACRO.find(x => x.k.includes(k));
-  if (f) return f.n;
-  if (String(k).startsWith("in:")) return "Ciclo USA";
-  if (String(k).startsWith("mk:")) return "Mercato e tecnica";
-  return "Altro";
-}
-function famiglieMacro(righe) {
-  const m = new Map();
-  FAMIGLIE_MACRO.forEach(f => m.set(f.n, []));
-  righe.forEach(r => { const n = famigliaDi(r.k); if (!m.has(n)) m.set(n, []); m.get(n).push(r); });
-  return [...m.entries()].filter(([, v]) => v.length)
-    .map(([n, v]) => ({ n, v, m: Math.round(v.reduce((s, x) => s + x.score, 0) / v.length) }));
-}
-
-/* ⚠ IL VIEWBOX NON E' UNA COSTANTE — lezione v206, ripagata qui. Prima stesura: ragnatela e asse
-   affiancati in due colonne, tela fissa a 620 e 760. Misurato in browser: l'asse rendeva a
-   larghezza 416 su una tela da 760, cioe' SCALA 0,55 — le etichette da 10,5px arrivavano
-   all'occhio a 5,8px. Il grafico non era "sbagliato", era illeggibile per un motivo che non si
-   vede leggendo il codice. Qui la tela si sceglie sullo spazio REALE, cosi' un'unita' utente
-   resta ~un pixel e i corpi del testo sono quelli scritti. */
-function larghezzaTela(max) {
-  const w = (typeof window !== "undefined" && window.innerWidth) ? window.innerWidth : 1180;
-  return Math.round(Math.min(max, Math.max(320, w - 96)));
-}
-
-/* v228 — `radarFamiglie()` RIMOSSA. Terza forma respinta dal CEO in tre versioni, e la ragione
-   qui e' diversa dalle prime due (barra e quadrante erano un muro di widget ripetuti): il radar
-   era UN grafico solo, ma chiede di sapere COS'E' un radar prima di poterlo leggere. "I grafici
-   non li capisco" — un grafico che va spiegato non e' leggibile, per elegante che sia.
-   RICEVUTA DEL TAGLIO: 0 chiamanti nel render; `famiglieMacro`/`famigliaDi` SOPRAVVIVONO perche'
-   raggruppano anche l'asse coi pallini; il vicino a valle, puntiSuAsse(), e' intatto; il
-   gestore .rd-fam in agganciaMacroDinamico resta innocuo (querySelectorAll su zero nodi) ma
-   viene tolto insieme, per non lasciare un handler vivo su un elemento che non esiste piu'
-   — la classe v193 (una funzione morta accanto a un bottone inerte e' un sintomo). */
-
-function puntiSuAsse(fam, opt = {}) {
-  const W = larghezzaTela(880);
-  const L = Math.min(opt.lAsse || 150, Math.round(W * 0.26));   // la colonna dei nomi non puo' mangiarsi l'asse
-  const R = W - 26, rowH = 44, H = fam.length * rowH + 54;
-  const X = v => L + (Math.max(0, Math.min(100, v)) / 100) * (R - L);
-  const bande = `<rect x="${X(0)}" y="26" width="${X(45) - X(0)}" height="${fam.length * rowH}" fill="var(--red)" opacity=".07"/>
-    <rect x="${X(55)}" y="26" width="${X(100) - X(55)}" height="${fam.length * rowH}" fill="var(--green)" opacity=".07"/>`;
-  const assi = [0, 25, 50, 75, 100].map(t => `<line x1="${X(t)}" y1="26" x2="${X(t)}" y2="${26 + fam.length * rowH}"
-      stroke="${t === 50 ? "var(--muted)" : "var(--border)"}" ${t === 50 ? 'stroke-dasharray="4 3"' : ""}/>
-    <text x="${X(t)}" y="17" text-anchor="middle" font-size="10.5" fill="var(--muted)" font-family="var(--mono)">${t}</text>`).join("");
-  const righe = fam.map((f, i) => {
-    const y = 26 + i * rowH + rowH / 2;
-    const mn = Math.min(...f.v.map(x => x.score)), mx = Math.max(...f.v.map(x => x.score));
-    return `<g class="pt-riga" data-fam="${esc(f.n)}">
-      <text x="${L - 12}" y="${y}" text-anchor="end" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text)">${esc(f.n)}</text>
-      <line x1="${X(mn)}" y1="${y}" x2="${X(mx)}" y2="${y}" stroke="var(--card-2)" stroke-width="3" stroke-linecap="round"/>
-      ${f.v.map(x => `<circle class="pt-punto${x.pan ? " pt-click" : ""}" cx="${X(x.score)}" cy="${y}" r="7"
-        fill="${scoreColor(x.score)}" fill-opacity=".9" stroke="var(--card)" stroke-width="1.5"
-        ${x.pan ? `data-mp="${esc(x.pan)}" role="button" tabindex="0"` : ""}
-        data-nome="${esc(x.nome)}" data-score="${x.score}"><title>${esc(x.nome)}: ${x.score}/100</title></circle>`).join("")}
-      <circle cx="${X(f.m)}" cy="${y}" r="3" fill="var(--bg)"><title>media ${f.n}: ${f.m}</title></circle></g>`;
-  }).join("");
-  return `<div class="pt"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="tutti gli indicatori sulla stessa scala 0-100">
-    ${bande}${assi}${righe}
-    <text x="${L}" y="${H - 8}" font-size="11" fill="var(--muted)">ogni pallino è un indicatore · la barretta è l'intervallo della famiglia · il puntino scuro è la media</text>
-  </svg><div class="pt-tip" hidden></div></div>`;
-}
-
-/* ── la parte DINAMICA: nome al passaggio, pannello al clic, famiglia isolata dalla ragnatela ── */
-function agganciaMacroDinamico(box) {
-  const tip = box.querySelector(".pt-tip");
-  box.querySelectorAll(".pt-punto").forEach(p => {
-    p.addEventListener("pointerenter", () => {
-      if (!tip) return;
-      tip.textContent = `${p.dataset.nome} — ${p.dataset.score}/100`;
-      const r = p.getBoundingClientRect(), b = box.getBoundingClientRect();
-      tip.hidden = false;
-      // si posiziona DOPO essere visibile: a display:none la larghezza e' 0 e finirebbe storto
-      tip.style.left = `${Math.max(4, Math.min(b.width - tip.offsetWidth - 4, r.left - b.left + r.width / 2 - tip.offsetWidth / 2))}px`;
-      tip.style.top = `${r.top - b.top - tip.offsetHeight - 8}px`;
-    });
-    p.addEventListener("pointerleave", () => { if (tip) tip.hidden = true; });
-    if (p.dataset.mp) {
-      const apri = () => openMacroInfo(p.dataset.mp);
-      p.addEventListener("click", apri);
-      p.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); apri(); } });
-    }
-  });
-  /* v228 — il gestore del clic sulla ragnatela e' stato tolto con la ragnatela stessa: senza
-     bersaglio sarebbe rimasto vivo e mai scattabile, che e' esattamente il sintomo v193. */
-}
-
+/* v233 — RIMOSSA LA VISTA A PALLINI (FAMIGLIE_MACRO, famigliaDi, famiglieMacro, larghezzaTela,
+   puntiSuAsse, agganciaMacroDinamico). Il CEO ha chiesto di riportare "Tutti gli indicatori" alla
+   forma di MINI TAB: l'asse coi pallini non ha piu' chiamanti, e con lui il raggruppamento in
+   famiglie che serviva solo a disporre quei pallini.
+   RICEVUTA DEL TAGLIO, scritta prima di tagliare e verificata con assert: dentro i confini vivono
+   esattamente quelle 5 funzioni piu' la costante; il vicino a valle, renderLevaStagione(), e'
+   intatto; `larghezzaTela` era usata SOLO da radarFamiglie (v228, gia' rimossa) e da puntiSuAsse,
+   quindi esce con loro.
+   ⚠ E LE GUARDIE NON SI CANCELLANO CON LA FUNZIONALITA' (classe v203): i check v226 verificavano
+   che NESSUN indicatore andasse perso nel raggruppamento. Quell'invariante vale ancora — ogni
+   indicatore deve avere la SUA scheda — e infatti i check sono stati riscritti su quella, non
+   tolti: cambia il meccanismo, non la cosa da proteggere. */
 function renderLevaStagione() {
   const m = DATA?.macro || {};
   const box = $("#mg-leva"); if (!box) return;
@@ -4133,7 +4046,6 @@ function renderScomposizione() {
   }).filter(Boolean);
   box.innerHTML = carte.length ? carte.join("")
     : '<div class="muted">Nessun punteggio composito disponibile in questo snapshot.</div>';
-  agganciaMacroDinamico(box);
   box.querySelectorAll("[data-mg-panel]").forEach(e => {
     const apri = () => openMacroInfo(e.dataset.mgPanel);
     e.addEventListener("click", apri);
@@ -4379,54 +4291,68 @@ function indicatoriClassifica() {
     score: Math.round(clamp(50 + m.futures.nasdaq.change_pct * 10)), sub: signTxt(m.futures.nasdaq.change_pct) });
   return out.sort((a, b) => a.score - b.score);
 }
+/* ═══ v233 — QUELLO CHE IL POPUP AVEVA DENTRO, PORTATO FUORI ════════════════════════════════
+   Richiesta CEO: "i grafici riportali all'originaria forma di mini tab e se il rispettivo pop up
+   forniva dei grafici o tabelle, riporta direttamente quelli in struttura".
+   La macchina esiste gia' dal v188: `collectPanels` sostituisce temporaneamente `openInfoModal`
+   con un raccoglitore, esegue la funzione del pannello e ne tiene l'HTML — cosi' ogni pannello
+   resta l'UNICA fonte di verita' del proprio contenuto e non nasce un secondo elenco da tenere
+   allineato (la classe di difetto C10/C12).
+   Qui si estraggono SOLO gli elementi che portano dati — <svg> e <table> — e si lascia fuori la
+   prosa esplicativa, che nella scheda sarebbe rumore e nel popup resta a un clic.
+   ⚠ MISURATO PRIMA DI SCRIVERE: su 30 indicatori solo 3 hanno un grafico e 4 una tabella. Gli
+   altri 23 non prendono un riempitivo: la mini tab col numero e la sua nota e' tutto quello che
+   c'e', e dirlo e' meglio che inventare una forma per far sembrare pieni i riquadri vuoti. */
+function contenutoDalPannello(k) {
+  if (!k || typeof MACRO_INFO === "undefined" || !MACRO_INFO[k]) return "";
+  let html = "";
+  try {
+    const p = collectPanels([{ run: () => openMacroInfo(k) }]);
+    html = p.length ? (p[0].bodyHTML || "") : "";
+  } catch { return ""; }                      // un pannello rotto non deve rompere la griglia
+  const pezzi = [...html.matchAll(/<svg[\s\S]*?<\/svg>|<table[\s\S]*?<\/table>/g)].map(m => m[0]);
+  return pezzi.length ? `<div class="mg-dalpan">${pezzi.join("")}</div>` : "";
+}
+
 function renderIndicatori() {
   const box = $("#mg-tutti"); if (!box) return;
   const nota = $("#mg-tutti-note"), head = $("#mg-tutti-head");
   const righe = indicatoriClassifica();
   if (righe.length < 3) { box.innerHTML = '<div class="muted">Indicatori non disponibili.</div>'; return; }
   const conPan = new Set(Object.keys(MACRO_INFO || {}));
-  /* ⚠ `k` serve a DUE cose diverse e non vanno confuse: classificare la famiglia e aprire il
-     pannello. Nella prima stesura azzeravo `k` per gli indicatori senza pannello e poi
-     raggruppavo su quella stessa chiave azzerata → finivano tutti in "Altro", e sul sito vivo
-     compariva un settimo spicchio fantasma. Il campo del pannello ora e' `pan`, separato. */
-  const fam = famiglieMacro(righe.map(r => ({ ...r, pan: conPan.has(r.k) ? r.k : null })));
 
-  /* Sotto ai due grafici restano SOLO gli indicatori che hanno una serie storica vera, disegnati
-     come i termometri di stress — la forma che il CEO ha approvato ("i grafici sono perfetti").
-     Gli altri NON prendono un widget di ripiego: vivono nella ragnatela e sull'asse. */
-  const conSerie = righe.filter(r => serieIndicatore(r.k));
-  /* v228 — RAGNATELA RIMOSSA dal render su richiesta del CEO ("i grafici non li capisco,
-     allora portali con i termometri quelli con i pallini"). Resta l'asse coi pallini, che e' la
-     stessa grammatica dei termometri di stress — una scala con le sue soglie disegnate — e la
-     sezione e' stata spostata subito sotto di essi. Un grafico che va spiegato non e' un
-     grafico leggibile, per bravo che sia: il radar chiede di sapere cos'e' un radar. */
-  box.innerHTML = `<div class="mg-due">${puntiSuAsse(fam)}</div>`
-    + (conSerie.length ? `<div class="mg-sotto">Di questi, ${conSerie.length} ${conSerie.length === 1 ? "ha" : "hanno"} una storia nel file: ecco come ci sono arrivati.</div>
-      <div class="mg-tris">${conSerie.map(r => {
-        const se = serieIndicatore(r.k);
-        const g = se.doppia
-          ? graficoSerie(se.doppia, { h: 108, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome })
+  /* v233 — MINI TAB, la forma originaria. Ogni indicatore e' una scheda: nome, punteggio, nota.
+     Dove ha una SERIE STORICA vera si disegna la linea nel tempo con le sue soglie (la forma dei
+     termometri di stress); dove il POPUP portava un grafico o una tabella, quelli vengono qui
+     dentro; dove non c'e' ne' l'una ne' l'altra la scheda resta il numero e la sua nota, senza
+     riempitivi. Il clic continua ad aprire il pannello completo. */
+  box.innerHTML = `<div class="mg-tris">${righe.map(r => {
+    const se = serieIndicatore(r.k);
+    const g = se
+      ? (se.doppia
+          ? graficoSerie(se.doppia, { h: 104, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome })
           : graficoSerie([{ nome: r.nome, punti: se.punti, colore: scoreColor(r.score) }],
-              { h: 108, compatto: true, soglie: se.soglie, unita: se.unita, assex: se.assex, fmtY: se.fmtY,
-                etichetteDx: false, aria: r.nome });
-        return tessera({ t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
-          cls: clsScore(r.score), grafico: g, n: esc(r.sub || ""), tk: conPan.has(r.k) ? r.k : null });
-      }).join("")}</div>` : "");
-  agganciaMacroDinamico(box); agganciaTessere(box);
+              { h: 104, compatto: true, soglie: se.soglie, unita: se.unita, assex: se.assex,
+                fmtY: se.fmtY, etichetteDx: false, aria: r.nome }))
+      : contenutoDalPannello(conPan.has(r.k) ? r.k : null);
+    return tessera({ t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
+      cls: clsScore(r.score), grafico: g, n: esc(r.sub || ""), tk: conPan.has(r.k) ? r.k : null });
+  }).join("")}</div>`;
+  agganciaTessere(box);
 
   const peggio = righe.slice(0, 3), meglio = righe.slice(-2);
   const media = Math.round(righe.reduce((s, r) => s + r.score, 0) / righe.length);
-  const debole = [...fam].sort((a, b) => a.m - b.m)[0];
+  const rossi = righe.filter(r => r.score < 40).length;
   if (head) head.innerHTML = `
     <div class="sh-item ${media < 45 ? "sh-warn" : ""}">
       <div class="sh-lab">Media di tutti</div>
       <div class="sh-val" style="color:${scoreColor(media)}">${media}<span class="muted" style="font-size:13px">/100</span></div>
-      <div class="sh-sub">${righe.length} indicatori in ${fam.length} famiglie</div>
+      <div class="sh-sub">${righe.length} indicatori sullo stesso asse</div>
     </div>
-    <div class="sh-item sh-bad">
-      <div class="sh-lab">La famiglia più debole</div>
-      <div class="sh-val neg" style="font-size:15px">${esc(debole.n)}</div>
-      <div class="sh-sub">${debole.m} su 100 · ${debole.v.length} indicatori</div>
+    <div class="sh-item ${rossi > righe.length / 2 ? "sh-bad" : ""}">
+      <div class="sh-lab">Quanti sotto 40</div>
+      <div class="sh-val" style="color:${scoreColor(100 - rossi / righe.length * 100)}">${rossi}<span class="muted" style="font-size:13px">/${righe.length}</span></div>
+      <div class="sh-sub">su 100, dove 100 è favorevole</div>
     </div>
     <div class="sh-item sh-bad">
       <div class="sh-lab">I tre che pesano di più</div>
@@ -4438,10 +4364,9 @@ function renderIndicatori() {
       <div class="sh-val pos" style="font-size:15px">${meglio.map(r => esc(r.nome.split(" (")[0])).join(" · ")}</div>
       <div class="sh-sub">${meglio.map(r => r.score).join(" · ")} su 100</div>
     </div>`;
-  if (nota) nota.innerHTML = `Stessa scala per tutti: <b>100 = favorevole al libro, 0 = sfavorevole</b>.
-    La ragnatela dà il quadro, l'asse sotto mostra i singoli — e quanto sono in <b>disaccordo</b> dentro la stessa famiglia,
-    che è la cosa che una media non dice. <b>Passa sopra un pallino</b> per il nome, <b>cliccalo</b> per il dettaglio,
-    <b>clicca una famiglia</b> sulla ragnatela per isolarla.`;
+  if (nota) nota.innerHTML = `Una scheda per indicatore, tutte sulla stessa scala: <b>100 = favorevole al libro, 0 = sfavorevole</b>, ordinate dalla peggiore.
+    Dove esiste una storia il grafico la mostra; dove il pannello di dettaglio portava un grafico o una tabella, quelli sono <b>qui dentro</b> invece che dietro un clic.
+    <b>Clicca una scheda</b> per il resto del pannello e le news di quell'indicatore.`;
 }
 
 /* v215 — CROSSHAIR sui grafici a linee. Un grafico statico costringe a stimare a occhio il

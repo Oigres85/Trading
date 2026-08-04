@@ -1713,15 +1713,6 @@ svg.g-serie { cursor: crosshair; }
 /* ═══ v226 — ragnatela + punti su un asse ═══════════════════════════════════════════════════ */
 /* v226 — IMPILATI, non affiancati: in due colonne l'asse rendeva a scala 0,55 e il suo testo
    arrivava a 5,8px (lezione v206). A tutta larghezza ogni tela rende ~1:1. */
-.mg-due { display: flex; flex-direction: column; align-items: center; gap: 22px; }
-.mg-due > .pt { width: 100%; }   /* senza questo il flex li stringe al contenuto e la tela rende a 0,58 */
-.pt { position: relative; }
-.pt-riga { transition: opacity .18s ease; }
-.pt-off { opacity: .16; }
-.pt-punto { transition: r .12s ease; }
-.pt-click { cursor: pointer; }
-.pt-punto:hover, .pt-punto:focus-visible { r: 9.5; stroke: var(--text); }
-.pt-tip {
   position: absolute; z-index: 5; pointer-events: none; white-space: nowrap;
   background: var(--card-2); border: 1px solid var(--border); border-radius: 6px;
   padding: 5px 9px; font-size: 12px; color: var(--text); box-shadow: 0 4px 14px rgba(0,0,0,.5);
@@ -1765,3 +1756,18 @@ svg.g-serie { cursor: crosshair; }
    difetto v209. Dentro una scheda la ciambella si impila e la tela diventa fluida. */
 .mg-card .ciam-wrap { grid-template-columns: minmax(0, 1fr); gap: 10px; }
 .mg-card .ciam-svg { width: 100%; max-width: 190px; height: auto; margin: 0 auto; }
+
+/* v233 — contenuto estratto dai pannelli, dentro una mini tab */
+.mg-dalpan { margin-top: 4px; min-width: 0; overflow-x: auto; }
+.mg-dalpan svg { width: 100%; max-width: 100%; height: auto; display: block; }
+/* ⚠ `table-layout: fixed` COMPRIME invece di far scorrere: la tabella SMC (5 colonne) veniva
+   tagliata di 28px per cella dentro una scheda da 230px. Con `width: max-content` la tabella
+   larga scorre dentro il proprio contenitore (che ha overflow-x: auto) e non perde nulla —
+   stessa soluzione della matrice di correlazione, che scorre dentro il suo riquadro. */
+.mg-dalpan table { width: max-content; min-width: 100%; border-collapse: collapse; font-size: 10px; }
+/* ⚠ `nowrap` tagliava le tabelle dentro una scheda da ~250px: "RIUNIONE FOMC | RIALZO |
+   INVARIAT…" e "Fermi cor…". In una mini tab le celle devono andare a capo, non sparire. */
+.mg-dalpan th, .mg-dalpan td { padding: 2px 3px; text-align: right; white-space: normal;
+  word-break: break-word; line-height: 1.25; }
+.mg-dalpan th:first-child, .mg-dalpan td:first-child { text-align: left; }
+.mg-dalpan thead th { color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
