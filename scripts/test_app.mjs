@@ -1576,7 +1576,9 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     // v218 — le mini-card non esistono più: l'ultima ("Interni di mercato") è confluita nella
     // classifica unica, già protetta qui sopra da id="mg-tutti". La guardia si sposta sui due
     // blocchi convertiti in questa versione, che sono i nuovi portatori di quell'informazione.
-    ["campanelli d'allarme", 'id="mg-signposts"'],
+    /* v243 — "campanelli d'allarme" rimossa su richiesta del CEO: la guardia si SPOSTA sul
+       contenitore portante rimasto nella vista, non si cancella con la sezione (classe v203). */
+    ["classifica indicatori", 'id="mg-tutti"'],
     ["parametri di rischio (griglia)", 'id="risk-params-grid"'],
     // v209 — protegge l'ACCESSO ai dettagli macro, non più il bottone della topbar: quello è
     // stato rimosso perché duplicava questo, e la porta è ora una sola, nella colonna centrale.
@@ -1585,8 +1587,8 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     // cliccando la barra del rispettivo indicatore nella classifica (id="mg-tutti", protetto
     // qui sopra) e passano dalla modale, che quindi diventa l'elemento portante da proteggere.
     ["modale dei pannelli macro", 'id="chart-modal"'],
-    ["campanelli d'allarme", 'id="mg-signposts"'],
-    ["campanelli d'allarme", 'id="mg-signposts"'],
+    ["termometri di stress", 'id="mg-stress"'],
+    ["leva e stagionalità", 'id="mg-leva"'],
     ["riquadri patrimonio", 'id="kpi-grid"'],
     ["parametri di rischio", 'id="risk-params-card"'],
     ["modale grafico/pannelli", 'id="chart-modal"'],
@@ -1688,8 +1690,15 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   // la condividono, spostarne una sposta l'altra. Nessuna delle due cose fa rumore da sola.
   const sez = [...html.matchAll(/<section\b[^>]*\bdata-pane="([a-z]+)"[^>]*>/g)].map(m => m[0]);
   const chiavi = sez.map(t => (t.match(/data-sez="([^"]+)"/) || [])[1]);
+  /* ⚠ v243 — il fondo era `sez.length >= 15`, un CONTEGGIO FISSO: ogni sezione rimossa su
+     richiesta del CEO lo faceva scattare senza che nulla fosse rotto (e' successo tre volte:
+     deriva, scomposizione, campanelli). E' la classe v208 — "un fondo numerico invecchia da
+     solo, la sanita' dev'essere una PROPRIETA'". La proprieta' vera: ogni pane esistente ha
+     almeno una sezione, e ogni sezione ha la sua chiave, tutte distinte. */
+  const pani = new Set([...html.matchAll(/data-pane="([a-z]+)"/g)].map(m => m[1]));
   check("v225 riordino: ogni sezione di pane ha una chiave data-sez, tutte distinte",
-    sez.length >= 15 && chiavi.every(Boolean) && new Set(chiavi).size === chiavi.length);
+    sez.length > 0 && pani.size >= 3 && chiavi.every(Boolean)
+    && new Set(chiavi).size === chiavi.length);
 
   // e la chiave deve essere una CHIAVE, non il titolo: se domani si rinomina una sezione
   // l'ordine salvato dal CEO non deve andare perso (lezione v196).
@@ -1758,17 +1767,24 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
      browser dopo la v235: 8 schede su 30 dicevano il valore corrente nella nota e di nuovo nella
      riga estratta dal pannello. E' la classe "lo stesso dato che si presentava come due dati"
      (v184), reintrodotta portando fuori le righe senza confrontarle con la nota. */
+  /* ⚠ v243 — il confronto deve NORMALIZZARE i formati: la nota scrive "4.69" (formato del dato)
+     e il pannello "4,69%" (formato italiano). Confrontando le stringhe grezze la ripetizione non
+     veniva riconosciuta, e sulla scheda del carry gli stessi numeri comparivano due volte. */
   check("v237 classifica: il valore corrente non è ripetuto fra nota e riga estratta", (() => {
     const html = rendiTutti();
     const schede = html.split(/<div class="mg-card(?!-head)/).slice(1);
     const doppie = schede.filter(c => {
       const nota = (c.match(/class="muted mg-n">([\s\S]*?)<\/div>/) || ["", ""])[1].replace(/<[^>]*>/g, " ");
-      const num = (nota.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2);
+      const nn = (x) => String(x).replace(/[.,]/g, "");
+      const num = (nota.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2).map(nn);
       if (!num.length) return false;
+      /* ⚠ v243 — non piu' solo le righe etichettate "Valore attuale": la ridondanza non dipende
+         dall'etichetta. E i numeri si confrontano NORMALIZZATI, perche' la nota scrive "4.69" e
+         il pannello "4,69%" — confrontando le stringhe grezze la ripetizione non si vedeva, ed
+         e' cosi' che sulla scheda del carry gli stessi valori comparivano due volte. */
       return [...c.matchAll(/<div class="info-line[\s\S]*?<\/div>/g)].some(m => {
         const t2 = m[0].replace(/<[^>]*>/g, " ");
-        if (!/Valore attuale|Rilevazione|Ultimo dato/i.test(t2)) return false;
-        const n2 = (t2.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2);
+        const n2 = (t2.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2).map(nn);
         return n2.length > 0 && n2.every(x => num.includes(x));
       });
     });
@@ -2023,20 +2039,17 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
 
   check("v231 mini tab: nessuna scheda a tutta larghezza da leva in giù", (() => {
     const h = rendi("#mg-leva", "renderLevaStagione")
-      + rendi("#mg-signposts", "renderSignposts");
+;
     return !/mg-wide/.test(h);
   })());
 
   check("v231 mini tab: i grafici NON spariscono, restano dentro le schede", (() => {
     const leva = rendi("#mg-leva", "renderLevaStagione");
-    const sp = rendi("#mg-signposts", "renderSignposts");
     return /<svg/.test(leva)                                  // margin debt: serie storica vera
       && (leva.match(/class="obar-row/g) || []).length >= 12   // stagionalita': i 12 mesi
-      && /<svg/.test(sp)                                       // la torta dei campanelli
       // ⚠ non basta contare le SCHEDE: la prima stesura passava anche togliendo la griglia che
       // le dispone (restavano .mg-card dentro un div nudo, impilate). Si chiede anche il contenitore.
-      && /class="mg-tris"/.test(sp)
-      && (sp.match(/class="mg-card"/g) || []).length >= 2;     // e le sue schede per categoria
+;
   })());
 
   /* ⚠ Il grafico del margin debt aveva `w: 900`, una tela pensata per un blocco a tutta
@@ -2045,7 +2058,7 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
      il conto (v206, v226, v231) — qui il check lo blocca sul nascere. */
   check("v231 mini tab: nessuna tela larga oltre la scheda che la contiene", (() => {
     const h = rendi("#mg-leva", "renderLevaStagione")
-      + rendi("#mg-signposts", "renderSignposts");
+;
     const larghezze = [...h.matchAll(/viewBox="0 0 (\d+)/g)].map(m => +m[1]);
     return larghezze.length > 0 && larghezze.every(w => w <= 340);
   })());
@@ -2128,6 +2141,59 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   // solo price_live, il terzo stato ridiventerebbe irraggiungibile senza che nulla lo segnali
   check("v234 KOSPI: la freschezza si decide sul timestamp dello snapshot",
     /seoulSessionOpen\(snap\)/.test(src));
+}
+
+/* ═══ v243 — CINQUE TACHIMETRI, NON TRENTA ════════════════════════════════════════════════
+   Il CEO ha chiesto un tachimetro per cinque voci precise. ⚠ NON e' il ritorno del `quadrante`
+   respinto in v226: quello era lo STESSO widget su TRENTA indicatori — un muro indistinto — con
+   una scala nuda senza riferimenti. Qui sono cinque strumenti scelti uno per uno e l'arco porta
+   ZONE NOMINATE. La guardia protegge proprio quella differenza: il tachimetro non deve
+   moltiplicarsi, e le sue bande devono dichiarare da dove vengono (regola v240). */
+{
+  const htmlTach = suVeri(`
+    let html = "";
+    const box = { set innerHTML(v) { html = v; }, get innerHTML() { return html; },
+                  querySelector: () => null, querySelectorAll: () => [] };
+    const altro = () => ({ innerHTML: "", textContent: "", querySelector: () => null,
+                           querySelectorAll: () => [], addEventListener() {} });
+    const vero = document.querySelector;
+    document.querySelector = (sel) => sel === "#mg-tutti" ? box : altro();
+    try { renderIndicatori(); } finally { document.querySelector = vero; }
+    return html;`, 56000);
+
+  const CINQUE = ["carry", "fear_greed", "smart_money", "risk_sentiment", "froth"];
+  check("v243 tachimetro: c'è su tutte e cinque le voci chieste dal CEO", (() => {
+    const schede = htmlTach.split(/<div class="mg-card(?!-head)/).slice(1);
+    return CINQUE.every(k => {
+      const c = schede.find(x => x.includes(`data-scheda="${k}"`));
+      return c && /class="tk"/.test(c);
+    });
+  })());
+
+  /* ⚠ e SOLO su quelle: se il tachimetro si moltiplicasse tornerebbe il muro di widget uguali
+     che il CEO ha respinto tre volte. Il numero non e' un fondo arbitrario: e' la lista. */
+  check("v243 tachimetro: non si è moltiplicato oltre le cinque voci", (() => {
+    const schede = htmlTach.split(/<div class="mg-card(?!-head)/).slice(1);
+    const conTach = schede.filter(c => /class="tk"/.test(c))
+      .map(c => (c.match(/data-scheda="([^"]+)"/) || [])[1]);
+    return conTach.length === CINQUE.length && conTach.every(k => CINQUE.includes(k));
+  })());
+
+  // e ogni tachimetro dichiara da dove vengono le sue bande, come le scale (regola v240)
+  check("v243 tachimetro: ogni quadrante dichiara la provenienza delle bande", (() => {
+    const t = (htmlTach.match(/class="tk"/g) || []).length;
+    const f = (htmlTach.match(/class="tk-fonte muted"/g) || []).length;
+    return t > 0 && t === f;
+  })());
+
+  // il tachimetro AGGIUNGE, non sostituisce: le barre dei fattori restano dove c'erano
+  check("v243 tachimetro: non ha tolto i fattori che le schede già mostravano", (() => {
+    const schede = htmlTach.split(/<div class="mg-card(?!-head)/).slice(1);
+    return ["fear_greed", "smart_money", "risk_sentiment"].every(k => {
+      const c = schede.find(x => x.includes(`data-scheda="${k}"`));
+      return c && /class="obar-row/.test(c);
+    });
+  })());
 }
 
 /* ═══ v241 — LE SCHEDE SI TRASCINANO, E L'ORDINE VIVE NEL REPO ═════════════════════════════
@@ -2284,7 +2350,7 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     return esito;`);
 
   for (const fn of ["renderStruttura", "renderMacroGrafici", "renderIndicatori",
-                    "renderSignposts", "renderLevaStagione", "renderRotazione", "renderStress"]) {
+                    "renderLevaStagione", "renderRotazione", "renderStress"]) {
     const esito = renderGira(fn);
     check(`v239 render: ${fn}() gira sui dati veri senza eccezioni`, esito === true);
     if (esito !== true) console.log(`  ⚠ ${fn}:`, esito);

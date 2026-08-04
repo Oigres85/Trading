@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "242";
+const BUILD_VERSION = "243";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3967,60 +3967,18 @@ function renderLevaStagione() {
    ⚠ IL CONTENUTO NON E' PERSO: le barre dei fattori di ogni composito sono ora dentro la scheda
    del rispettivo indicatore (FORMA_INDICATORE → barreComposito). Prima quei nomi comparivano DUE
    volte, una nella classifica e una qui: e' la classe v184, lo stesso dato presentato come due. */
-/* v209 — i 10 campanelli BofA: erano una tabella dentro un popup. Sono booleani, quindi la
-   loro resa naturale non è una barra ma un conteggio visibile: quanti sono accesi e QUALI. */
-function renderSignposts() {
-  const box = $("#mg-signposts"); if (!box) return;
-  const sp = DATA?.macro?.signposts; const items = sp?.items || [];
-  const head = $("#mg-sign-head"), note = $("#mg-sign-note");
-  if (!items.length) {
-    box.innerHTML = '<div class="muted">Indicatori non disponibili.</div>';
-    if (head) head.textContent = ""; if (note) note.innerHTML = ""; return;
-  }
-  const attivi = items.filter(i => i.status).length;
-  const q = attivi / items.length;
-  const cls = q >= 0.7 ? "neg" : q >= 0.5 ? "warn" : "pos";
-  if (head) head.innerHTML = `<b class="${cls}" style="font-family:var(--mono);font-size:15px">${attivi}/${items.length}</b> accesi`;
-  // v218 — erano pallini accesi/spenti raggruppati: leggibile solo contandoli a occhio.
-  // Ogni categoria diventa una barra di riempimento (quanti accesi su quanti), più la barra
-  // totale: la domanda "quanto siamo avanti nel conto alla rovescia" si legge senza contare.
-  const perCat = new Map();
-  items.forEach(i => { const c = i.category || "Altro"; if (!perCat.has(c)) perCat.set(c, []); perCat.get(c).push(i); });
-  const righe = [...perCat.entries()].map(([cat, list]) => {
-    const on = list.filter(i => i.status).length;
-    return { nome: cat, valore: Math.round(on / list.length * 100), colore: on / list.length >= 0.7 ? "var(--red)" : on / list.length >= 0.5 ? "var(--yellow)" : "var(--green)",
-             testo: `${on}/${list.length} acceso${on === 1 ? "" : "i"}`, on, list };
-  }).sort((a, b) => b.valore - a.valore);
-  /* v231 — MINI TAB anche qui. Prima era un blocco unico: torta grande, barre per categoria e
-     l'elenco completo, tutto a tutta larghezza. Ora ogni categoria e' una scheda della griglia
-     col PROPRIO grafico dentro (la quota accesa) e i propri campanelli elencati sotto; la torta
-     d'insieme resta, come prima scheda. "Se quelle all'interno portavano dei grafici con le
-     informazioni riporta direttamente quelle": il grafico non sparisce, entra nella scheda. */
-  box.innerHTML = `<div class="mg-tris">`
-    + `<div class="mg-card">
-        <div class="mg-card-head"><span class="mg-t">Quanti sono accesi</span><span class="mg-v ${cls}">${attivi}<span class="muted" style="font-size:13px">/${items.length}</span></span></div>
-        ${ciambella([
-          { nome: "Accesi", val: attivi, colore: "var(--red)" },
-          { nome: "Non ancora accesi", val: items.length - attivi, colore: "var(--border)" },
-        ], { centro: { sopra: "campanelli", grande: `${attivi}/${items.length}`, sotto: "accesi" },
-             aria: "campanelli BofA accesi" })}
-        <div class="muted mg-n">Il conto alla rovescia di BofA: piu' se ne accendono, piu' il mercato somiglia a un massimo.</div>
-      </div>`
-    + righe.map(r => `<div class="mg-card">
-        <div class="mg-card-head"><span class="mg-t">${esc(r.nome)}</span><span class="mg-v" style="color:${r.colore}">${r.on}<span class="muted" style="font-size:13px">/${r.list.length}</span></span></div>
-        ${barreOrdinate([{ nome: "accesi", valore: r.valore, colore: r.colore, testo: `${r.on} su ${r.list.length}` }], {})}
-        <div class="muted mg-n">${r.list.map(i => `<span class="sp-item${i.status ? " sp-on" : ""}" title="${esc(i.desc || "")}${i.source ? " · fonte: " + esc(i.source) : ""}"><span class="sp-dot"></span>${esc(i.name)}</span>`).join("")}</div>
-      </div>`).join("")
-    + `</div>`;
-}
-
+/* v243 — `renderSignposts()` RIMOSSA col suo riquadro (richiesta CEO).
+   RICEVUTA DEL TAGLIO: dentro i confini vive UNA sola dichiarazione di primo livello, verificata
+   contando function/const/let/var e non solo le function — la svista che in v238 ha portato via
+   `let allocGrafMode` e ucciso la pagina. Il vicino a valle, renderMacroGrafici(), e' intatto.
+   ⚠ IL DATO NON E' PERSO: macro.signposts resta in data.json e la riga "BofA Bear-Market
+   Signposts: N/10 attivi" resta nel payload. Si e' tolta la resa, non l'informazione. */
 function renderMacroGrafici() {
   if (!DATA) return;
   attivaHoverGrafici();
   renderRotazione();
   renderStress();
   renderLevaStagione();
-  renderSignposts();
   renderIndicatori();   // v215 — le 27 scatole diventano una classifica sola
   // v235 — ORA le schede esistono: si misura e si impacca
   impaccaGriglia(document.querySelector(".shell-main"));
@@ -4248,11 +4206,23 @@ function contenutoDalPannello(k, notaGia = "") {
      che questo payload combatte altrove ("lo stesso dato che si presentava come due dati", v184)
      e l'ho introdotta io portando fuori le righe senza confrontarle con quello che la scheda
      gia' diceva. Ora una riga che non aggiunge NIENTE alla nota viene scartata. */
-  const numeriNota = (String(notaGia).match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2);
+  /* ⚠ i numeri vanno NORMALIZZATI prima di confrontarli: la nota scrive "4.69" (formato del
+     dato) e il pannello "4,69%" (formato italiano). Confrontando le stringhe grezze il filtro
+     non riconosceva la ripetizione, ed e' per questo che sulla scheda del carry gli stessi
+     valori comparivano due volte. Si tolgono i separatori e si confrontano le cifre. */
+  const norm = (x) => String(x).replace(/[.,]/g, "");
+  const numeriNota = (String(notaGia).match(/[\d][\d.,]{1,}/g) || [])
+    .filter(x => x.length > 2).map(norm);
+  /* ⚠ v243 — il filtro guardava solo le righe etichettate "Valore attuale / Rilevazione / Ultimo
+     dato". Ma la ridondanza non dipende dall'ETICHETTA: sulla scheda del carry le righe del
+     pannello ("Treasury 10A: 4,69% · JGB 10A: 2,82% · Differenziale 1,88 pp") ripetevano
+     esattamente i numeri della nota due righe sotto, con etichette diverse. Il criterio vero e'
+     numerico: se TUTTI i numeri di una riga sono gia' nella nota, quella riga non aggiunge nulla.
+     Resta prudente — basta UN numero nuovo perche' la riga sopravviva. */
   const ridondante = (frammento) => {
     const testo = frammento.replace(/<[^>]*>/g, " ");
-    if (!/Valore attuale|Rilevazione|Ultimo dato/i.test(testo)) return false;
-    const numeri = (testo.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2);
+    if (/<svg|<table/.test(frammento)) return false;      // grafici e tabelle non si scartano mai
+    const numeri = (testo.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2).map(norm);
     return numeri.length > 0 && numeri.every(n => numeriNota.includes(n));
   };
   const pezzi = [...html.matchAll(/<svg[\s\S]*?<\/svg>|<table[\s\S]*?<\/table>|<div class="info-line[\s\S]*?<\/div>/g)]
@@ -4311,6 +4281,51 @@ function contoAllaRovescia(giorni, date, opt = {}) {
     ${opt.nota ? `<div class="muted cdr-nota">${opt.nota}</div>` : ""}</div>`;
 }
 
+/* ═══ v243 — IL TACHIMETRO: cinque strumenti, non trenta ════════════════════════════════════
+   Richiesta CEO: un tachimetro per carry USA-Giappone, Fear & Greed, istituzionali vs retail,
+   sentiment globale e schiuma ETF.
+   ⚠ NON e' il ritorno del `quadrante` respinto in v226. Quello era un widget IDENTICO ripetuto
+   su TRENTA indicatori — un muro indistinto — e con una scala nuda "sfavorevole → favorevole"
+   senza riferimenti. Qui sono CINQUE strumenti scelti uno per uno, e l'arco porta le ZONE
+   NOMINATE: la lancetta non indica un punto su una scala anonima, indica una zona che ha un nome
+   scritto sotto. La differenza fra i due casi e' quella fra un cruscotto e un muro di quadranti
+   uguali. Come per la scala, ogni tachimetro DICHIARA da dove vengono le sue bande. */
+function tachimetro(v, opt = {}) {
+  if (v == null || isNaN(v)) return "";
+  const val = Math.max(0, Math.min(100, Math.round(v)));
+  const zone = (opt.zone || []).filter(z => z && z.a > z.da);
+  if (!zone.length) return "";
+  /* ⚠ il numero stava a cy-24, DENTRO l'arco: e' esattamente dove passa la lancetta, e a meta'
+     scala i due si sovrapponevano (misurato a colpo d'occhio su 53 e 55). L'arco e' aperto in
+     basso, quindi sotto il perno c'e' spazio libero: il numero va li'. */
+  const W = 300, H = 186, cx = W / 2, cy = 138, R = 112, sp = 22;
+  const ang = (p) => Math.PI * (1 - p / 100);
+  const P = (r, a) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy - r * Math.sin(a)).toFixed(2)}`;
+  const arco = zone.map(z => {
+    const a0 = ang(z.da), a1 = ang(z.a);
+    return `<path d="M ${P(R, a0)} A ${R} ${R} 0 ${(z.a - z.da) > 50 ? 1 : 0} 1 ${P(R, a1)}"
+      fill="none" stroke="${z.colore}" stroke-width="${sp}" stroke-opacity=".8"
+      ><title>${esc(z.nome)}: da ${z.da} a ${z.a}</title></path>`;
+  }).join("");
+  const tacche = [0, 25, 50, 75, 100].map(t => {
+    const a = ang(t), i = P(R - sp / 2 - 2, a).split(" "), o = P(R + sp / 2 + 2, a).split(" ");
+    return `<line x1="${i[0]}" y1="${i[1]}" x2="${o[0]}" y2="${o[1]}"
+       stroke="var(--bg)" stroke-width="${t === 50 ? 2.4 : 1.4}" opacity="${t === 50 ? .95 : .6}"/>`;
+  }).join("");
+  const a = ang(val), punta = P(R - 16, a).split(" ");
+  const dentro = zone.find(z => val >= z.da && val <= z.a);
+  const col = dentro ? dentro.colore : scoreColor(val);
+  return `<div class="tk"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.aria || "tachimetro")}: ${val} su 100">
+      ${arco}${tacche}
+      <line x1="${cx}" y1="${cy}" x2="${punta[0]}" y2="${punta[1]}" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="${cy}" r="7" fill="var(--text)"/><circle cx="${cx}" cy="${cy}" r="3" fill="var(--card-2)"/>
+      <text x="${cx}" y="${cy + 36}" text-anchor="middle" font-size="30" font-weight="700" font-family="var(--mono)" fill="${col}">${val}</text>
+      <text x="12" y="${cy + 15}" font-size="9.5" fill="var(--muted)">0</text>
+      <text x="${W - 12}" y="${cy + 15}" text-anchor="end" font-size="9.5" fill="var(--muted)">100</text>
+    </svg>${dentro ? `<div class="tk-zona" style="color:${dentro.colore}">${esc(dentro.nome)}</div>` : ""}
+    <div class="tk-fonte muted">${esc(opt.fonte || "bande di lettura convenzionali, non soglie calcolate dai dati")}</div></div>`;
+}
+
 /* ═══ v238 — OGNI INDICATORE HA LA SUA FORMA E LA SUA LETTURA ═══════════════════════════════
    Richiesta CEO: "voglio tutti grafici in struttura", con "dati dettagliati e spiegazioni di
    lettura del dato". Il registro assegna a ciascuno la forma che i suoi dati permettono
@@ -4324,7 +4339,36 @@ function contoAllaRovescia(giorni, date, opt = {}) {
      · le date → conto alla rovescia con le prossime scadenze.
    Ogni voce porta anche COME SI LEGGE: una riga che dice cosa guardare, non cosa fare (le
    istruzioni vivono nella testata del prompt, non qui — e questa e' UI, non payload). */
+/* v243 — le bande dei punteggi 0-100 del sistema: una convenzione di LETTURA, dichiarata come
+   tale. Non sono soglie calcolate: il punteggio e' gia' normalizzato dal motore, e queste bande
+   servono solo a dare un nome alla zona in cui cade la lancetta. */
+const ZONE_PUNTEGGIO = [
+  { da: 0, a: 35, nome: "sfavorevole al libro", colore: "var(--red)" },
+  { da: 35, a: 45, nome: "debole", colore: "var(--yellow)" },
+  { da: 45, a: 55, nome: "neutro", colore: "var(--muted)" },
+  { da: 55, a: 70, nome: "favorevole", colore: "var(--green)" },
+  { da: 70, a: 100, nome: "molto favorevole", colore: "var(--green)" },
+];
+const punteggioDi = (k) => { try { return (indicatoriClassifica().find(x => x.k === k) || {}).score ?? null; } catch { return null; } };
+/* aggiunge il tachimetro davanti a quello che la voce gia' mostrava, senza toglierle niente */
+function conTachimetro(comp, base, aria) {
+  if (!base) return null;
+  const t = tachimetro((comp || {}).score, { aria,
+    zone: ZONE_PUNTEGGIO, fonte: "bande di lettura convenzionali sul punteggio 0-100 del sistema" });
+  return { g: t + base.g, n: base.n };
+}
+
 const FORMA_INDICATORE = {
+  carry: (m) => {
+    const c = m.carry; if (!c || c.spread == null) return null;
+    const p = punteggioDi("carry");
+    return { g: tachimetro(p, { aria: "carry USA-Giappone", zone: ZONE_PUNTEGGIO,
+        fonte: "bande di lettura convenzionali sul punteggio 0-100 del sistema" })
+        /* ⚠ la nota va PASSATA al filtro di ridondanza (v237), o le righe del pannello
+           ripetono gli stessi numeri che scrivo due righe sotto — il difetto gia' corretto. */
+        + contenutoDalPannello("carry", `${c.spread} ${c.usdjpy} ${c.usdjpy_chg_1m} ${c.boj_rate} ${c.us10} ${c.jp10}`),
+      n: `Spread 10A USA−Giappone ${fmtNum.format(c.spread)} pp · USD/JPY ${fmtNum.format(c.usdjpy)} (${signTxt(c.usdjpy_chg_1m)} in un mese) · tasso BoJ ${c.boj_rate}%. <b>Come si legge:</b> più lo spread è ampio e più lo yen è debole, più conviene finanziarsi in yen per comprare asset in dollari — è il carry trade che ha alimentato il tech. Lo spread in compressione o uno yen che si rafforza forzano la chiusura di quelle posizioni, e le vendite partono dai titoli più affollati.` };
+  },
   "mk:EURJPY=X": (m) => {
     const q = (m.markets || []).find(x => x.key === "EURJPY=X"); if (!q) return null;
     const v = parseFloat(String(q.value).replace(",", ".")); const c = m.carry || {};
@@ -4411,16 +4455,26 @@ const FORMA_INDICATORE = {
         fonte: "bande di sola lettura; lo zero è il dato (variazione mese su mese)" }),
       n: `${i.value} mese su mese · rilevazione ${i.date}. <b>Come si legge:</b> è il termometro più veloce dei consumi, e i consumi sono i due terzi del PIL. Un mese sotto zero non fa una tendenza; due o tre di fila anticipano il rallentamento prima che lo veda il PIL, che esce con un trimestre di ritardo.` };
   },
-  risk_sentiment: (m) => barreComposito(m.risk_sentiment, "Sentiment globale",
-    "I fattori risk-on / risk-off che compongono il sentiment, dal peggiore al migliore. <b>Come si legge:</b> quando i fattori sono tutti d'accordo il sentiment è un segnale; quando sono in disaccordo il punteggio medio nasconde più di quanto mostri — e il disaccordo si vede dalla dispersione delle barre."),
-  smart_money: (m) => barreComposito(m.smart_money, "Istituzionali vs retail",
-    "I quattro segnali che distinguono il denaro istituzionale da quello retail. <b>Come si legge:</b> struttura di mercato, term structure del VIX, spread di credito e put/call. Quando divergono dal comportamento del retail, storicamente conta di più quello che fanno gli istituzionali."),
+  risk_sentiment: (m) => conTachimetro(m.risk_sentiment, barreComposito(m.risk_sentiment, "Sentiment globale",
+    "I fattori risk-on / risk-off che compongono il sentiment, dal peggiore al migliore. <b>Come si legge:</b> quando i fattori sono tutti d'accordo il sentiment è un segnale; quando sono in disaccordo il punteggio medio nasconde più di quanto mostri — e il disaccordo si vede dalla dispersione delle barre."), "sentiment globale"),
+  smart_money: (m) => conTachimetro(m.smart_money, barreComposito(m.smart_money, "Istituzionali vs retail",
+    "I quattro segnali che distinguono il denaro istituzionale da quello retail. <b>Come si legge:</b> struttura di mercato, term structure del VIX, spread di credito e put/call. Quando divergono dal comportamento del retail, storicamente conta di più quello che fanno gli istituzionali."), "istituzionali vs retail"),
   fear_greed: (m) => {
     const f = m.fear_greed; if (!f || !(f.components || []).length) return null;
     const b = barreComposito(f, "Fear & Greed", "");
     if (!b) return null;
+    /* le bande del Fear & Greed sono quelle pubblicate da CNN (0-25 paura estrema, 25-45 paura,
+       45-55 neutro, 55-75 avidita', 75-100 avidita' estrema): sono una convenzione DELL'INDICE,
+       non una mia scelta, e si puo' dire da dove viene. */
+    const tach = tachimetro(f.score, { aria: "Fear & Greed",
+      zone: [{ da: 0, a: 25, nome: "paura estrema", colore: "var(--red)" },
+             { da: 25, a: 45, nome: "paura", colore: "var(--yellow)" },
+             { da: 45, a: 55, nome: "neutro", colore: "var(--muted)" },
+             { da: 55, a: 75, nome: "avidità", colore: "var(--green)" },
+             { da: 75, a: 100, nome: "avidità estrema", colore: "var(--green)" }],
+      fonte: "le cinque bande sono quelle pubblicate da CNN per questo indice" });
     const st = [f.week_ago, f.month_ago, f.year_ago].filter(x => x != null);
-    return { g: b.g, n: `${st.length ? `Una settimana fa ${f.week_ago} · un mese fa ${f.month_ago} · un anno fa ${f.year_ago}. ` : ""}Sette componenti, dal peggiore al migliore. <b>Come si legge:</b> è un contrarian: la paura estrema è storicamente un momento di acquisto e l'avidità estrema un momento di cautela. Il livello di oggi conta meno della DIREZIONE rispetto alle rilevazioni passate.` };
+    return { g: tach + b.g, n: `${st.length ? `Una settimana fa ${f.week_ago} · un mese fa ${f.month_ago} · un anno fa ${f.year_ago}. ` : ""}Sette componenti, dal peggiore al migliore. <b>Come si legge:</b> è un contrarian: la paura estrema è storicamente un momento di acquisto e l'avidità estrema un momento di cautela. Il livello di oggi conta meno della DIREZIONE rispetto alle rilevazioni passate.` };
   },
   _alpha: (m) => {
     const b = m.benchmarks || {}; if (b.ndx == null) return null;
@@ -4516,7 +4570,8 @@ const FORMA_INDICATORE = {
       .map(([nome, x]) => ({ nome, valore: x.rvol, colore: x.rvol >= 2.5 ? "var(--red)" : x.rvol >= 1.5 ? "var(--yellow)" : "var(--green)",
                              testo: `RVol ${fmtNum.format(x.rvol)}× · ${signTxt(x.chg_5d_pct)} in 5 sedute` }));
     if (!righe.length) return null;
-    return { g: barreOrdinate(righe, {}),
+    return { g: tachimetro(punteggioDi("froth"), { aria: "schiuma speculativa", zone: ZONE_PUNTEGGIO,
+        fonte: "bande di lettura convenzionali sul punteggio 0-100 del sistema" }) + barreOrdinate(righe, {}),
       n: `<b>Come si legge:</b> sono ETF a leva tripla, comprati quasi solo dal retail per scommettere in fretta. Volumi molto sopra la media MENTRE il prezzo sale sono euforia speculativa, che storicamente precede le correzioni; volumi alti mentre il prezzo scende sono invece capitolazione, che è l'opposto. L'allarme scatta sopra 2,5× con prezzo in salita: oggi ${f.alert ? "è attivo" : "non è attivo"}.` };
   },
 };

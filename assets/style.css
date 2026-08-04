@@ -1808,3 +1808,9 @@ svg.g-serie { cursor: crosshair; }
 .in-riordino-schede .mg-card { outline: 1px dashed var(--border); }
 .in-riordino-schede .sk-trascinata { outline: 2px solid var(--accent); opacity: .85; }
 .in-riordino-schede .sk-grip { opacity: 1; }
+
+/* v243 — il tachimetro */
+.tk { min-width: 0; }
+.tk svg { width: 100%; max-width: 100%; height: auto; display: block; }
+.tk-zona { font-size: 11.5px; font-weight: 600; text-align: center; margin-top: 1px; }
+.tk-fonte { font-size: 10px; text-align: center; margin-top: 3px; line-height: 1.3; opacity: .75; }
