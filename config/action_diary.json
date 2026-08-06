@@ -1,5 +1,17 @@
 [
  {
+  "date": "2026-08-06T20:15:42.351Z",
+  "text": "Acquisto 25 quote WDC a 458 il 06/08/2026",
+  "op": {
+   "tipo": "ACQUISTO",
+   "qty": 25,
+   "ticker": "WDC",
+   "prezzo": 458,
+   "quando": "06/08/2026",
+   "multi": false
+  }
+ },
+ {
   "date": "2026-08-06T17:24:19.370Z",
   "text": "Acquisto 42 quote MRVL a 214.08 il 06/08/2026",
   "op": {
