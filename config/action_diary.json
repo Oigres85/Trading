@@ -1,5 +1,17 @@
 [
  {
+  "date": "2026-08-07T20:30:16.214Z",
+  "text": "Acquisto 40 quote BE a 214 il 07/08/2026",
+  "op": {
+   "tipo": "ACQUISTO",
+   "qty": 40,
+   "ticker": "BE",
+   "prezzo": 214,
+   "quando": "07/08/2026",
+   "multi": false
+  }
+ },
+ {
   "date": "2026-08-07T20:29:26.715Z",
   "text": "Acquisto 45 quote SKHY a 139 il 07/08/2026",
   "op": {
