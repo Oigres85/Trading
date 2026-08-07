@@ -2143,6 +2143,63 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /seoulSessionOpen\(snap\)/.test(src));
 }
 
+/* ═══ v244 — LO STATO DEL PORTAFOGLIO DEVE SEGUIRE IL CEO FRA I DISPOSITIVI ═══════════════
+   Segnalato dal CEO: cambia cassa o acquisti sul Mac, apre da iPhone e trova i vecchi valori.
+   Causa: `cash_eur`, `manual_holdings` e `btp_override` vivevano in localStorage e basta,
+   mentre diario, ordine sezioni, override macro, testata e parametri di rischio andavano già
+   nel repo. Una svista di COMPLETEZZA sulla cosa che cambia più spesso.
+   ⚠ La fusione è PER CAMPO: cassa cambiata sul Mac e posizioni su iPhone si tengono entrambe.
+   Con un timestamp unico per tutto il blocco la modifica più vecchia sparirebbe in silenzio. */
+{
+  const vivo = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+
+  check("v244 sync: esiste il percorso nel repo per lo stato del portafoglio",
+    /const STATO_PTF_PATH = "config\/portfolio_state\.json"/.test(src));
+
+  /* ⚠ il punto della segnalazione: OGNI punto che cambia cassa, posizioni o BTP deve anche
+     spedire. Una sola chiamata dimenticata riporta il bug su quel percorso soltanto. */
+  check("v244 sync: ogni scrittura locale dello stato spedisce anche al repo", (() => {
+    const scritture = [...vivo.matchAll(/localStorage\.setItem\("(cash_eur|manual_holdings|btp_override)"[\s\S]{0,260}/g)];
+    if (scritture.length < 5) return false;
+    // in `statoPortafoglioLocale` e `loadStatoPortafoglioCloud` si scrive SENZA spedire, ed è
+    // corretto: lì si sta ricevendo, non modificando. Si escludono per nome di funzione.
+    return scritture.every(m => {
+      const prima = vivo.slice(0, m.index);
+      const fn = (prima.match(/function\s+([A-Za-z_$][\w$]*)/g) || []).pop() || "";
+      if (/loadStatoPortafoglioCloud|statoPortafoglioLocale/.test(fn)) return true;
+      return /salvaStatoPortafoglio\(/.test(m[0]);
+    });
+  })());
+
+  check("v244 sync: all'avvio lo stato viene riletto dal repo",
+    /loadStatoPortafoglioCloud\(\);/.test(vivo));
+
+  // la fusione per campo: se qualcuno la riducesse a un timestamp unico, si perderebbero dati
+  check("v244 sync: la fusione confronta CAMPO per CAMPO, non l'intero blocco", (() => {
+    const i = vivo.indexOf("async function loadStatoPortafoglioCloud");
+    if (i < 0) return false;
+    const b = vivo.slice(i, i + 2200);
+    /* ⚠ il confronto va richiesto ATTACCATO alla chiave: con una finestra larga il blocco
+       SUCCESSIVO soddisfaceva il controllo, e togliendo il confronto su `holdings` la guardia
+       restava verde. È la classe "ancoraggio troppo lasco" già vista sulle classi CSS. */
+    return ["cash", "holdings", "btp"].every(k =>
+      new RegExp('cloud\\.' + k + ' && \\(cloud\\.' + k + '\\.at \\|\\| ""\\) >').test(b));
+  })());
+
+  /* ⚠ ricevere non basta: quando arriva un valore nuovo va RIFATTA la fusione col portafoglio
+     e ridisegnato tutto, o resta invisibile fino a un reload manuale — e il CEO concluderebbe
+     di nuovo che non si sincronizza. */
+  check("v244 sync: dopo la ricezione si rifà la fusione e si ridisegna", (() => {
+    const i = vivo.indexOf("async function loadStatoPortafoglioCloud");
+    const b = vivo.slice(i, i + 2600);
+    return /mergeManualHoldings\(\)/.test(b) && /recomputeTotals\(\)/.test(b) && /renderKPI/.test(b);
+  })());
+
+  // senza token non si finge: si dice che è rimasto locale
+  check("v244 sync: senza token GitHub lo dichiara invece di fingere",
+    /salvaStatoPortafoglio[\s\S]{0,420}senza token GitHub non arriva su iPhone/.test(vivo));
+}
+
 /* ═══ v243 — CINQUE TACHIMETRI, NON TRENTA ════════════════════════════════════════════════
    Il CEO ha chiesto un tachimetro per cinque voci precise. ⚠ NON e' il ritorno del `quadrante`
    respinto in v226: quello era lo STESSO widget su TRENTA indicatori — un muro indistinto — con

@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "243";
+const BUILD_VERSION = "244";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -673,6 +673,99 @@ async function editHoldings(section, mutate) {
   }
 }
 
+/* ═══ v244 — LO STATO DEL PORTAFOGLIO SEGUE IL CEO FRA I DISPOSITIVI ═══════════════════════
+   Il CEO: "quando cambio parametri, es. aggiornamento di acquisti o di cash, questi non si
+   sincronizzano quando mi collego dalla stessa pagina da iPhone."
+   Aveva ragione, ed era una svista di COMPLETEZZA: quando abbiamo costruito la sincronizzazione
+   abbiamo coperto diario, ordine sezioni, override macro, testata e parametri di rischio — e ci
+   siamo dimenticati proprio del portafoglio, cioè la cosa che cambia più spesso.
+   Restavano in localStorage, quindi vive solo sul browser dove le scrivi:
+     · cash_eur         la liquidità
+     · manual_holdings  gli acquisti inseriti a mano
+     · btp_override     quantità e prezzo di carico del BTP
+   ⚠ Fusione PER CAMPO, non a blocco: ogni campo porta il suo istante. Se cambi la cassa sul Mac
+   e le posizioni su iPhone, si tengono ENTRAMBE. Con un timestamp unico per tutto il blocco, la
+   modifica più vecchia sparirebbe in silenzio — e una perdita silenziosa è peggio di un conflitto. */
+const STATO_PTF_PATH = "config/portfolio_state.json";
+
+function statoPortafoglioLocale() {
+  const num = parseFloat(localStorage.getItem("cash_eur"));
+  let hold = [], btp = null;
+  try { hold = JSON.parse(localStorage.getItem("manual_holdings") || "[]"); } catch { /* corrotto */ }
+  try { btp = JSON.parse(localStorage.getItem("btp_override") || "null"); } catch { /* corrotto */ }
+  let ts = {};
+  try { ts = JSON.parse(localStorage.getItem("stato_ptf_ts") || "{}"); } catch { /* corrotto */ }
+  return {
+    cash:     { v: isNaN(num) ? 0 : num, at: ts.cash || "" },
+    holdings: { v: Array.isArray(hold) ? hold : [], at: ts.holdings || "" },
+    btp:      { v: btp, at: ts.btp || "" },
+  };
+}
+
+/* segna QUALE campo è cambiato e quando, poi salva e spedisce */
+function salvaStatoPortafoglio(campo) {
+  let ts = {};
+  try { ts = JSON.parse(localStorage.getItem("stato_ptf_ts") || "{}"); } catch { /* corrotto */ }
+  ts[campo] = new Date().toISOString();
+  try { localStorage.setItem("stato_ptf_ts", JSON.stringify(ts)); } catch { /* quota */ }
+  if (localStorage.getItem("gh_token")) pushStatoPortafoglioCloud(statoPortafoglioLocale());
+  else toast("Salvato solo su questo browser: senza token GitHub non arriva su iPhone");
+}
+
+async function pushStatoPortafoglioCloud(s) {
+  const token = localStorage.getItem("gh_token");
+  if (!token) return;
+  try {
+    let sha;
+    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${STATO_PTF_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
+    if (g.ok) sha = (await g.json()).sha;
+    await fetch(`https://api.github.com/repos/${REPO}/contents/${STATO_PTF_PATH}`, {
+      method: "PUT", headers: ghHeaders(token),
+      body: JSON.stringify({ message: "Stato portafoglio (cassa, posizioni, BTP)", content: btoa(unescape(encodeURIComponent(JSON.stringify(s, null, 1)))), sha }),
+    });
+  } catch { /* offline: resta in locale, riparte al prossimo salvataggio */ }
+}
+
+/* rilegge dal repo e tiene, PER OGNI CAMPO, la versione più recente */
+async function loadStatoPortafoglioCloud() {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${STATO_PTF_PATH}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return false;                       // 404 = non è mai stato salvato: nulla da fare
+    const cloud = await r.json();
+    if (!cloud || typeof cloud !== "object") return false;
+    const loc = statoPortafoglioLocale();
+    let ts = {}; try { ts = JSON.parse(localStorage.getItem("stato_ptf_ts") || "{}"); } catch { /* corrotto */ }
+    let cambiato = false;
+    // confronto esplicito campo per campo: più lungo di un ciclo, ma si legge cosa vince e perché
+    if (cloud.cash && (cloud.cash.at || "") > (loc.cash.at || "")) {
+      cashEur = parseFloat(cloud.cash.v) || 0;
+      localStorage.setItem("cash_eur", cashEur);
+      ts.cash = cloud.cash.at; cambiato = true;
+    }
+    if (cloud.holdings && (cloud.holdings.at || "") > (loc.holdings.at || "") && Array.isArray(cloud.holdings.v)) {
+      localStorage.setItem("manual_holdings", JSON.stringify(cloud.holdings.v));
+      ts.holdings = cloud.holdings.at; cambiato = true;
+    }
+    if (cloud.btp && (cloud.btp.at || "") > (loc.btp.at || "")) {
+      if (cloud.btp.v) localStorage.setItem("btp_override", JSON.stringify(cloud.btp.v));
+      else localStorage.removeItem("btp_override");
+      ts.btp = cloud.btp.at; cambiato = true;
+    }
+    if (!cambiato) return false;
+    try { localStorage.setItem("stato_ptf_ts", JSON.stringify(ts)); } catch { /* quota */ }
+    /* ⚠ i dati sono già stati fusi in DATA quando questa arriva: va rifatta la fusione e
+       ridisegnato tutto, altrimenti il valore nuovo resta invisibile fino a un reload manuale. */
+    mergeManualHoldings();
+    recomputeTotals();
+    if (typeof renderKPI === "function") renderKPI();
+    if (typeof renderTable === "function") renderTable();
+    if (typeof renderAllocation === "function") renderAllocation();
+    if (typeof renderCash === "function") renderCash();
+    toast("Portafoglio sincronizzato da un altro dispositivo ✓");
+    return true;
+  } catch { return false; }
+}
+
 /* --- posizioni aggiunte a mano: persistite in localStorage così sopravvivono al reload
    anche senza token GitHub. Quando la pipeline le include in data.json, vengono ignorate. --- */
 function loadManualHoldings() {
@@ -683,10 +776,12 @@ function saveManualHolding(h) {
   const arr = loadManualHoldings().filter(x => x.ticker !== h.ticker);
   arr.push(h);
   localStorage.setItem("manual_holdings", JSON.stringify(arr));
+  salvaStatoPortafoglio("holdings");
 }
 function removeManualHolding(ticker) {
   localStorage.setItem("manual_holdings",
     JSON.stringify(loadManualHoldings().filter(x => x.ticker !== ticker)));
+  salvaStatoPortafoglio("holdings");
 }
 /* unisce le posizioni manuali al DATA.portfolio appena caricato da data.json */
 function mergeManualHoldings() {
@@ -796,11 +891,13 @@ function openEditPortfolio() {
           r.gain_pct = r.pmc ? Math.round((r.price / r.pmc - 1) * 10000) / 100 : 0;
         }
         localStorage.setItem("btp_override", JSON.stringify({ qty: r.qty, pmc: r.pmc }));   // persiste tra i reload
+        salvaStatoPortafoglio("btp");
       }
       if (r.ticker !== "BTP-V28") saveManualHolding({ ticker: tk, name: r.name, qty: r.qty, pmc: r.pmc, currency: r.currency || "USD" });
     });
     const nc = parseFloat($("#edp-cash").value) || 0;
-    if (nc !== cashEur) { cashEur = nc; localStorage.setItem("cash_eur", cashEur); changed = true; }
+    if (nc !== cashEur) { cashEur = nc; localStorage.setItem("cash_eur", cashEur); changed = true; salvaStatoPortafoglio("cash"); }
+    if (changed) salvaStatoPortafoglio("holdings");   // v244: posizioni e BTP seguono il CEO fra i device
     recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); renderCash();
     closeChartModal();
     toast(changed ? "Portafoglio aggiornato ✓" : "Nessuna modifica");
@@ -1512,6 +1609,7 @@ function renderCash() {
 function saveCash() {
   cashEur = parseFloat($("#cash-input").value) || 0;
   localStorage.setItem("cash_eur", cashEur);
+  salvaStatoPortafoglio("cash");           // v244: la liquidità arriva anche su iPhone
   recomputeTotals();
   renderCash(); renderKPI(); renderAllocation();
   toast("Liquidità salvata ✓");
@@ -9818,6 +9916,7 @@ loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
 montaComandiSezioni();   // maniglia ⠿ + frecce ▲▼ su ogni sezione
 applicaOrdineSezioni();  // ordine gia' noto a questo browser: subito, senza aspettare la rete
 loadOrdineSezioniCloud();// e poi quello del repo, se piu' recente → Mac e iPhone allineati
+loadStatoPortafoglioCloud();   // v244: cassa, posizioni manuali e BTP dal repo — la sincronizzazione che mancava
 loadRiskParamsCloud();   // sincronizza i parametri di rischio del CEO (config/risk_params.json) — cap/veto uguali su ogni device
 initRiskEditor();       // editor soglie di rischio (v143): select+valore+spiegazione
 // ricarica completa (tecnici, news, storico) ogni 5 minuti
