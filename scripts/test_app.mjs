@@ -2143,6 +2143,91 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /seoulSessionOpen\(snap\)/.test(src));
 }
 
+/* ═══ v245 — DIARIO E PORTAFOGLIO NON POSSONO DIVERGERE IN SILENZIO ═══════════════════════
+   Segnalato dal CEO: "gli acquisti/vendite in diario non hanno aggiornato watchlist e
+   portafoglio automaticamente." Il meccanismo c'era ed era corretto in ogni pezzo; il guasto
+   era l'unico punto di passaggio, un `confirm()`. Chiuso quello, l'operazione spariva senza
+   lasciare traccia, e reconcileState non poteva vederla perche' confronta solo le posizioni
+   PRESENTI col broker — una posizione ASSENTE non ha nulla da confrontare.
+   MISURATO: data.json aveva 9 righe, il broker 13. Ogni analisi AI girava su 4 posizioni in
+   meno. ⚠ Un dato mancante in silenzio e' peggio di un dato sbagliato che urla. */
+{
+  const vivo = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  // ⚠ `html` è locale agli altri blocchi, non globale: va riletto qui
+  const htmlIdx = readFileSync(join(ROOT, "index.html"), "utf8");
+
+  /* ⚠ la prova sui DATI VERI: si costruisce lo scenario esatto del 07/08 — diario con un
+     acquisto di un titolo che nel portafoglio non c'e' — e si pretende che venga trovato.
+     Un check che gira su un portafoglio coerente non misurerebbe il fenomeno. */
+  const scenario = (diario, extraPtf) => suVeri(`
+    const _ld = loadDiary;
+    loadDiary = () => ${JSON.stringify(diario)};
+    DATA.broker = DATA.broker || {}; DATA.broker.as_of = "2026-07-29";
+    ${extraPtf || ""}
+    try { return JSON.stringify(divergenzaDiario()); } finally { loadDiary = _ld; }`);
+
+  const compra = (tk, qty, iso) => ({ date: iso + "T10:00:00.000Z",
+    text: `Acquisto ${qty} quote ${tk}`, op: { tipo: "ACQUISTO", qty, ticker: tk, prezzo: 100, quando: iso } });
+
+  check("v245 divergenza: un acquisto annotato e assente dal portafoglio viene TROVATO", (() => {
+    const d = JSON.parse(scenario([compra("ZZZZ", 40, "2026-08-06")]));
+    return d.needed === true && d.certe.length === 1 && d.certe[0].ticker === "ZZZZ";
+  })());
+
+  /* ⚠ le operazioni ANTERIORI allo snapshot del broker sono gia' incorporate: se il filtro
+     saltasse, il banner riproporrebbe in eterno operazioni vecchie e diventerebbe rumore
+     che il CEO imparerebbe a ignorare — che e' il modo in cui un allarme muore. */
+  check("v245 divergenza: le operazioni anteriori allo snapshot broker sono ignorate", (() => {
+    const d = JSON.parse(scenario([compra("ZZZZ", 40, "2026-07-01")]));
+    return d.needed === false && d.certe.length === 0;
+  })());
+
+  check("v245 divergenza: un portafoglio allineato NON produce falsi allarmi", (() => {
+    const tk = (reale.portfolio || []).map(r => r.ticker).find(t => t && t !== "BTP-V28");
+    const d = JSON.parse(scenario([compra(tk, 1, "2026-08-06")]));
+    return d.certe.length === 0;      // il titolo c'e': al massimo "da verificare", mai "certo"
+  })());
+
+  // stessa voce salvata due volte non deve contarsi due volte
+  check("v245 divergenza: una voce duplicata non raddoppia l'allarme", (() => {
+    const v = compra("ZZZZ", 40, "2026-08-06");
+    const d = JSON.parse(scenario([v, JSON.parse(JSON.stringify(v))]));
+    return d.certe.length === 1;
+  })());
+
+  /* ⚠ IL PUNTO PIU' IMPORTANTE: il payload deve DICHIARARE il portafoglio incompleto. E' li'
+     che il danno si e' prodotto — un'analisi su dati mancanti sembra corretta. */
+  check("v245 divergenza: il payload dichiara il portafoglio incompleto", (() => {
+    const p = suVeri(`
+      const _ld = loadDiary;
+      loadDiary = () => ${JSON.stringify([compra("ZZZZ", 40, "2026-08-06")])};
+      DATA.broker = DATA.broker || {}; DATA.broker.as_of = "2026-07-29";
+      try { return buildPrompt(); } finally { loadDiary = _ld; }`);
+    return /PORTAFOGLIO INCOMPLETO/.test(p) && /ZZZZ/.test(p);
+  })());
+
+  // e quando tutto torna, il payload NON deve contenere l'avviso
+  check("v245 divergenza: senza divergenza il payload non porta l'avviso", (() => {
+    const p = suVeri(`
+      const _ld = loadDiary;
+      loadDiary = () => [];
+      try { return buildPrompt(); } finally { loadDiary = _ld; }`);
+    return !/PORTAFOGLIO INCOMPLETO/.test(p);
+  })());
+
+  // il banner deve esistere nel documento, o il rilevatore parlerebbe al vuoto
+  check("v245 divergenza: il contenitore del banner esiste ed è disegnato a ogni render",
+    /id="divergenza-alert"/.test(htmlIdx) && /renderDivergenzaDiario\(\);/.test(vivo));
+
+  /* ⚠ e si ricontrolla ANCHE quando il confirm viene rifiutato: e' precisamente il caso in cui
+     il vecchio codice si arrendeva. */
+  check("v245 divergenza: si ricontrolla dopo ogni scrittura sul diario, confirm rifiutato compreso", (() => {
+    const i = vivo.indexOf("function saveDiaryEntry");
+    if (i < 0) return false;
+    return /renderDivergenzaDiario/.test(vivo.slice(i, i + 700));
+  })());
+}
+
 /* ═══ v244 — LO STATO DEL PORTAFOGLIO DEVE SEGUIRE IL CEO FRA I DISPOSITIVI ═══════════════
    Segnalato dal CEO: cambia cassa o acquisti sul Mac, apre da iPhone e trova i vecchi valori.
    Causa: `cash_eur`, `manual_holdings` e `btp_override` vivevano in localStorage e basta,

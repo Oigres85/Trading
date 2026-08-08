@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "244";
+const BUILD_VERSION = "245";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1097,6 +1097,7 @@ function renderAll() {
   renderMacroGrafici();         // v206 — rotazione, stress, leva e stagionalità
   renderEarnings();
   renderEarningsAlert();
+  renderDivergenzaDiario();   // v245: diario vs portafoglio — prima della riconciliazione
   renderReconcileAlert();
   refreshShockClient();         // allinea il banner shock ai prezzi live già presenti
   renderShockAlert();
@@ -1585,6 +1586,101 @@ function renderDataQualityAlert() {
   box.onclick = openDataQualityModal;
 }
 
+/* ═══ v245 — IL DIARIO E IL PORTAFOGLIO NON POSSONO DIVERGERE IN SILENZIO ══════════════════
+   Segnalato dal CEO: "gli acquisti/vendite in diario non hanno aggiornato watchlist e
+   portafoglio automaticamente."
+   INDAGINE. Il meccanismo c'era ed era corretto: parseDiaryText legge bene l'operazione,
+   applicaOpAlPortafoglio calcola bene il nuovo stato, editHoldings scrive bene sul repo.
+   Il guasto stava nell'UNICO PUNTO DI PASSAGGIO: un `confirm()`. Se lo chiudi — per errore, o
+   perche' su iPhone sembra un avviso di sistema — l'operazione si perde e NESSUNO te lo ricorda
+   piu'. E reconcileState non poteva accorgersene, perche' confronta solo le posizioni PRESENTI
+   col valore del broker: una posizione ASSENTE non ha nulla da confrontare.
+   MISURATO IL 07/08/2026: data.json aveva 9 righe, il broker 13. Mancavano BE, MRVL, SKHY e WDC
+   da due giorni, e OGNI analisi AI in quei due giorni ha ragionato su un terzo di portafoglio
+   che non esisteva. Un dato mancante in silenzio e' peggio di un dato sbagliato che urla.
+   ⚠ La correzione non e' "rendere il confirm piu' insistente": e' non far dipendere piu' la
+   correttezza da un clic che puo' andare perso. La divergenza si RILEVA a ogni render, si
+   MOSTRA finche' esiste, e finisce NEL PAYLOAD. */
+function divergenzaDiario() {
+  const out = { certe: [], daVerificare: [], asOf: (DATA?.broker || {}).as_of || null };
+  if (!DATA || !Array.isArray(DATA.portfolio)) return out;
+  let voci = [];
+  try { voci = loadDiary(); } catch { return out; }
+  if (!Array.isArray(voci) || !voci.length) return out;
+
+  const inPtf = new Map((DATA.portfolio || []).map(r => [String(r.ticker || "").toUpperCase(), r]));
+  /* ⚠ si guardano SOLO le operazioni successive allo snapshot del broker: prima di quella data
+     il broker e' la fonte autorevole e ha gia' incorporato tutto. Senza questo filtro il
+     banner riproporrebbe in eterno operazioni vecchie gia' assorbite. */
+  const soglia = out.asOf ? out.asOf : null;
+  const visti = new Set();
+
+  for (const e of voci) {
+    const o = (typeof diaryOp === "function") ? diaryOp(e) : (e.op || null);
+    if (!o || !o.ticker || !o.tipo) continue;
+    const iso = String(e.date || "").slice(0, 10);
+    if (soglia && iso && iso <= soglia) continue;         // gia' dentro lo snapshot del broker
+    const tk = String(o.ticker).toUpperCase();
+    const chiave = `${iso}|${tk}|${o.tipo}|${o.qty}`;
+    if (visti.has(chiave)) continue;                      // stessa voce salvata due volte
+    visti.add(chiave);
+    const pos = inPtf.get(tk);
+    const acquisto = /ACQUIST|COMPR|INCREMENT|ACCUMUL|AGGIUNT/i.test(o.tipo);
+
+    if (acquisto && !pos) {
+      // CERTO: hai annotato un acquisto e quel titolo non e' in portafoglio. Non c'e' lettura
+      // alternativa, ed e' esattamente il caso di BE, MRVL, SKHY e WDC.
+      out.certe.push({ ...o, ticker: tk, iso, motivo: "acquisto annotato, titolo assente dal portafoglio" });
+    } else if (!acquisto && pos && o.qty != null && Number(pos.qty) > 0) {
+      /* NON e' certo: potrebbe essere una vendita parziale gia' applicata. Si dichiara come
+         da verificare invece di affermare un errore che potrebbe non esserci. */
+      out.daVerificare.push({ ...o, ticker: tk, iso, qtaAttuale: Number(pos.qty),
+        motivo: `vendita annotata di ${o.qty}, in portafoglio ce ne sono ancora ${Number(pos.qty)}` });
+    } else if (acquisto && pos && o.qty != null) {
+      out.daVerificare.push({ ...o, ticker: tk, iso, qtaAttuale: Number(pos.qty),
+        motivo: `acquisto annotato di ${o.qty}, in portafoglio ce ne sono ${Number(pos.qty)}` });
+    }
+  }
+  out.needed = out.certe.length > 0 || out.daVerificare.length > 0;
+  return out;
+}
+
+/* il banner: resta finche' la divergenza esiste, e porta il bottone che APPLICA.
+   Non e' un promemoria da leggere: e' la via d'uscita dal problema. */
+function renderDivergenzaDiario() {
+  const box = document.querySelector("#divergenza-alert");
+  if (!box) return;
+  const d = divergenzaDiario();
+  if (!d.needed) { box.hidden = true; box.innerHTML = ""; box.className = ""; return; }
+  const pezzi = [];
+  if (d.certe.length) {
+    pezzi.push(`<b>${d.certe.length} operazion${d.certe.length === 1 ? "e" : "i"} annotate nel diario non sono nel portafoglio</b>: ` +
+      d.certe.map(x => `${esc(x.ticker)} (${x.qty ?? "?"} quote del ${esc(x.iso)})`).join(" · "));
+  }
+  if (d.daVerificare.length) {
+    pezzi.push(`da verificare: ${d.daVerificare.map(x => esc(x.motivo)).join(" · ")}`);
+  }
+  box.hidden = false;
+  box.className = "data-error";
+  box.innerHTML = `⚠ <b>DIARIO E PORTAFOGLIO NON COINCIDONO</b> — ${pezzi.join(". ")}. ` +
+    `Finché non le allinei, <b>ogni analisi AI ragiona su un portafoglio che non esiste</b>.` +
+    (d.certe.length ? ` <button class="btn btn-ghost btn-sm" id="div-applica" style="margin-left:8px">✎ Applica le operazioni mancanti</button>` : "");
+  const b = box.querySelector("#div-applica");
+  if (b) b.onclick = () => applicaDivergenzeMancanti(d.certe);
+}
+
+/* applica in sequenza le operazioni certe. Una per volta e con conferma singola: applicarle
+   tutte insieme in silenzio sarebbe lo stesso errore al contrario. */
+async function applicaDivergenzeMancanti(certe) {
+  for (const op of certe) {
+    if (typeof applicaOpAlPortafoglio === "function") {
+      applicaOpAlPortafoglio(op);
+      await new Promise(r => setTimeout(r, 400));   // le scritture sul repo vanno serializzate
+    }
+  }
+  renderDivergenzaDiario();
+}
+
 function renderReconcileAlert() {
   const box = $("#reconcile-alert");
   if (!box) return;
@@ -1820,6 +1916,9 @@ function saveDiaryEntry(text, op) {
   setDiary(arr);
   // se l'annotazione descrive un'operazione riconoscibile, si propone di allineare le posizioni
   if (opFin && opFin.ticker && opFin.tipo) applicaOpAlPortafoglio(opFin);
+  /* ⚠ v245: si ricontrolla SEMPRE, anche se il confirm è stato rifiutato. È proprio il caso
+     in cui il vecchio codice si arrendeva, e l'operazione spariva senza lasciare traccia. */
+  if (typeof renderDivergenzaDiario === "function") renderDivergenzaDiario();
 }
 function deleteDiaryEntry(iso) {
   setDiary(loadDiary().filter(e => e.date !== iso));
@@ -7413,6 +7512,22 @@ function buildPrompt() {
   const ageMin = Math.round((Date.now() - new Date(DATA.updated_at).getTime()) / 60000);
   const lagNote = ageMin > 90 ? ` [ATTENZIONE: snapshot di ${ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min"} fa — i prezzi potrebbero essere disallineati dal mercato live; verifica online i livelli critici prima di ragionarci sopra]` : "";
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")} (prezzi: snapshot pipeline + refresh live lato client ogni 60s)${lagNote}`);
+
+  /* ⚠ v245 — SE IL PORTAFOGLIO E' INCOMPLETO, L'LLM DEVE SAPERLO PRIMA DI TUTTO IL RESTO.
+     Il 07/08/2026 il payload girava su 8 azioni mentre il CEO ne aveva 12: quattro acquisti
+     annotati nel diario non erano mai stati applicati, perche' l'unica via di passaggio era un
+     `confirm()` che si puo' chiudere. Un'analisi su un terzo di portafoglio mancante non e'
+     imprecisa: e' sbagliata, e sembra corretta — che e' la combinazione peggiore.
+     Questo blocco sta SUBITO SOTTO la data, prima di ogni altro numero, perche' cambia il
+     significato di tutti quelli che seguono: pesi, concentrazione, budget, alpha. */
+  try {
+    const dv = divergenzaDiario();
+    if (dv.needed && dv.certe.length) {
+      lines.push(`🚨 PORTAFOGLIO INCOMPLETO — ATTENZIONE PRIMA DI OGNI CALCOLO: il diario del CEO registra ${dv.certe.length} acquisto/i che NON sono nelle tabelle qui sotto: ${dv.certe.map(x => `${x.ticker} ${x.qty ?? "?"} quote a ${x.prezzo ?? "?"} del ${x.iso}`).join(" · ")}. TUTTI i numeri che dipendono dalla composizione — pesi sul NAV, concentrazione di fattore, quota di varianza, budget operativo, alpha, correlazioni — sono calcolati SENZA queste posizioni e quindi NON descrivono il portafoglio reale. Finche' la divergenza esiste, quei numeri descrivono un portafoglio diverso da quello reale.`);
+    } else if (dv.needed && dv.daVerificare.length) {
+      lines.push(`⚠ DIARIO E TABELLE DA VERIFICARE: ${dv.daVerificare.map(x => x.motivo).join(" · ")}. Potrebbero essere operazioni parziali gia' applicate; non e' certo che manchi qualcosa.`);
+    }
+  } catch { /* il payload non deve mai rompersi per un controllo accessorio */ }
   // CONTESTO DI SESSIONE (v149): la fase della seduta USA calcolata ADESSO (client), non al
   // run pipeline — orienta l'LLM su quali dati sono "il presente" (anticipatori vs live) e
   // per QUALE campana valgono gli ordini. Vedi usSessionInfo/sessionContextLine.
