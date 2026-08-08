@@ -195,7 +195,8 @@ check("cap d'ingresso v121: TST1 (peso ≥10% NAV) NON è candidato ad accumulo 
   const dv = decisionVerdict();
   return !dv.accumula.some(r => r.ticker === "TST1") &&
     dv.overCap.some(x => x.r.ticker === "TST1") &&
-    dv.reasons.some(s => s.includes("cap d'ingresso") && s.includes("TST1") && s.includes("Let Winners Run"))`));
+    (dv.overCap || []).some(x => (x.r || x).ticker === "TST1")     // v247: classifica sì, verdetto nel payload no
+    && !buildPrompt().includes("Cap d'ingresso")`));
 check("Let Winners Run v121: una posizione tra 10% e 25% NON genera trim né alert (cresce libera)", run(`
   // porto TST1 a un peso tra 10% e 25% (qty 28 → ~15%): overCap (no accumulo) MA nessun alert
   const r = DATA.portfolio.find(x => x.ticker === "TST1");
@@ -206,7 +207,7 @@ check("Let Winners Run v121: una posizione tra 10% e 25% NON genera trim né ale
   return w > 10 && w < 25 &&
     dv.overCap.some(x => x.r.ticker === "TST1") &&
     !dv.concentrationAlert.some(x => x.r.ticker === "TST1") &&
-    !dv.reasons.some(s => s.includes("ALERT CONCENTRAZIONE"))`));
+    !(dv.concentrationAlert || []).length`));
 check("alert concentrazione v121: SOLO sopra il 25% del NAV, come avviso (non trim)", run(`
   // gonfio TST1 oltre il 25%: deve comparire l'alert concentrazione, mai un obbligo di trim
   const r = DATA.portfolio.find(x => x.ticker === "TST1");
@@ -214,7 +215,8 @@ check("alert concentrazione v121: SOLO sopra il 25% del NAV, come avviso (non tr
   const dv = decisionVerdict();
   r.qty = oldQty; recomputeTotals();
   return dv.concentrationAlert.some(x => x.r.ticker === "TST1") &&
-    dv.reasons.some(s => s.includes("ALERT CONCENTRAZIONE") && s.includes("NON è un obbligo di trim"))`));
+    (dv.concentrationAlert || []).length > 0                       // v247: classifica sì
+    && !buildPrompt().includes("ALERT CONCENTRAZIONE")`));
 
 // ---- RIABILITAZIONE GROWTH (v111): il veto Sortino è revocato SOLO con qualità+trend+RS ----
 check("riabilitazione growth: Sortino negativo MA ROE>15% + sopra SMA200 + RS>0 → eleggibile, tag RIABILITATO", run(`
@@ -245,7 +247,7 @@ check("decisionVerdict: riabilitato entra tra gli eleggibili e nei reasons come 
   DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== "TSTR");
   return dv.rehabbed.some(x => x.r.ticker === "TSTR") &&
     !dv.excluded.some(x => x.r.ticker === "TSTR") &&
-    dv.reasons.some(s => s.includes("RIABILITATI") && s.includes("TSTR"))`));
+    (dv.rehabbed || []).some(x => (x.r || x).ticker === "TSTR")`));
 
 // ---- v112: staleness dichiarata, indici non operabili, earnings sul piano, diario, Sharpe 6M ----
 check("prompt v112: prezzo stale flaggato '[chiusura del …]' e indici PTS senza stop/R:R", run(`
@@ -282,8 +284,9 @@ check("quantScore v112: il riabilitato usa lo Sharpe 6M (regime) e supera la sog
   const dv = decisionVerdict();
   DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== "TSTR6");
   const cand = dv.accumula.find(r => r.ticker === "TSTR6");
-  const rl = dv.reasons.find(s => s.includes("RIABILITATI"));
-  return !!cand && cand._q >= 60 && rl.includes("Sharpe 6M 2,6")`));
+  // v247: la riabilitazione non è più una riga di verdetto; resta la CLASSIFICAZIONE e il fatto
+  // che il candidato superi la soglia usando lo Sharpe 6M (che è ciò che il check misura davvero)
+  return !!cand && cand._q >= 60 && (dv.rehabbed || []).some(x => (x.r || x).ticker === "TSTR6")`));
 
 // ---- TRIM PEG-aware (v111, let winners run): P/E ottico alto ma PEG sano → niente trim ----
 check("trim growth: P/E 185 con PEG 1.2 (AMD-like) NON va in trim; PEG n.d. (CBRS-like) sì", run(`
@@ -331,18 +334,21 @@ check("prompt: colonna Sortino 1A (6M) nella tabella PORTAFOGLIO", has("| Sortin
 check("prompt: consegna minima (leading KOSPI/Nasdaq/BTC, quote esatte, news, gap pre/after)", has("KOSPI") && has("Bitcoin") && has("calcolo MATEMATICO ESATTO della quantità") && has("NEWS SPECIFICHE") && has("GAP PRE/AFTER-MARKET"));
 check("prompt: matrice di rischio per posizione", has("MATRICE DI RISCHIO PER POSIZIONE"));
 check("prompt: flag [STOP VIOLATO] su TST3", /\[STOP VIOLATO\][\s\S]*TST3|TST3[^\n]*\[STOP VIOLATO\]/.test(prompt));
-check("prompt: VaR storico primario", has("STORICO, percentili empirici"));
-check("prompt: igiene dati, gap overnight e verifica web obbligatoria sui flag", has("IGIENE DEI DATI") && has("ordini LIMITE") && has("double-check") && has("ricerca web"));
-check("prompt: niente RICONCILIAZIONE nel baseline pulito", !has("RICONCILIAZIONE BROKER NECESSARIA"));
-check("prompt: nessun 'undefined' nel payload", !has("undefined"));
-check("prompt: nessun 'NaN' nel payload", !/\bNaN\b/.test(prompt));
-check("prompt: chiusura standby v87 rimossa", !has("In attesa di interrogazioni tattiche"));
-
-
-// data assertions: il fallback client-side deve urlare su margin debt non-FINRA
-check("validateMacroData: margin debt Z.1 → UNRELIABLE (fallback client)", run(`
-  const v = validateMacroData();
-  return v.bad.some(b => b.key === "margin_debt") && /UNRELIABLE/.test(v.flags.margin_debt || "")`));
+/* ⚠ v247 — INVARIANTE ROVESCIATO. Sorvegliava che il VaR pubblicato fosse quello STORICO
+   (più prudente sulle code grasse) e non il parametrico. Ora VaR ed ES sono FUORI dal payload
+   per scelta del CEO: erano il divisore del budget operativo, cioè il vincolo di spesa.
+   ⚠ La pipeline continua a CALCOLARLI — servono altrove e toglierli dal calcolo sarebbe stato
+   perdere un fatto, non un giudizio (classe v208). Cambia solo cosa arriva all'LLM. */
+/* ⚠ su `run()` (fixture) i campi VaR/ES non esistono: il check sarebbe verde per ASSENZA di
+   dati, non di difetti — la trappola già pagata quattro volte in questo progetto. Va sui dati VERI. */
+check("v247 VaR: fuori dal payload, ma la pipeline continua a calcolarlo", suVeri(`
+  const p = buildPrompt();
+  /* ⚠ si cerca la RIGA che generavo io, non la parola: "Expected Shortfall" compare anche nella
+     TESTATA (config/prompt_header.txt), che è il file del CEO e non si tocca. Una guardia che
+     cerca la parola nuda punirebbe il contenuto di cui non sono responsabile. */
+  const fuori = !/VaR 95% a 1 giorno/.test(p) && !/Expected Shortfall 95% a 1 GIORNO/.test(p);
+  const calcolato = DATA?.totals?.es95_hist_eur != null || DATA?.totals?.var95_hist_eur != null;
+  return fuori && calcolato`));
 check("prompt: DATA QUALITY REPORT e flag inline sul margin debt", run(`
   const p2 = buildPrompt();
   return p2.includes("DATA QUALITY REPORT") && p2.includes("[!!! DATATO / UNRELIABLE !!!")`));
@@ -390,7 +396,12 @@ check("squeezeSetup: short≥20% + RVol>2 + sopra SMA50 → setup; posizione det
     squeezeSetup({ ...base, qty: 10 }) === false &&
     squeezeSetup({ ...base, vol_ratio: 1.2 }) === false &&
     squeezeSetup({ ...base, sma50_dist_pct: -1 }) === false`));
-check("decisionVerdict: escluso con setup squeeze → dv.squeezed + reason ⚡ + flag in tabella prompt", run(`
+/* ⚠ v247 — INVARIANTE CAMBIATO, non zittito. Prima chiedeva che il payload PRESCRIVESSE il
+   trattamento dello squeeze (sizing dimezzato, stop 1×ATR, mai media al ribasso): è esattamente
+   il genere di riga che il CEO ha fatto togliere. Ora chiede due cose insieme — che il MOTORE
+   continui a classificarlo (la dashboard lo usa) e che il PAYLOAD non porti più la prescrizione.
+   Zittire la guardia avrebbe perso la protezione (classe v203); cambiarle invariante la conserva. */
+check("v247 squeeze: il motore lo classifica ancora, il payload non lo prescrive più", run(`
   DATA.watchlist.push({ ticker: "TSTQ", name: "Squeeze Co", currency: "USD", price: 50,
     sortino_1y: -0.9, sharpe_1y: -0.6, vol_ratio: 2.6, sma50_dist_pct: 2.0, w52_dist_pct: -60,
     support: 45, resistance: 70, rsi: 55, atr_14: 2, atr_pct: 4,
@@ -402,9 +413,15 @@ check("decisionVerdict: escluso con setup squeeze → dv.squeezed + reason ⚡ +
   const p = buildPrompt();
   DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== "TSTQ");
   const row = p.split("\\n").find(l => l.includes("Squeeze Co"));
-  return dv.squeezed.some(x => x.r.ticker === "TSTQ") &&
-    dv.reasons.some(s => s.includes("TURNAROUND SQUEEZE") && s.includes("TSTQ")) &&
-    p.includes("[TURNAROUND SQUEEZE RISK] (contesto") && row.includes("[TURNAROUND SQUEEZE RISK]")`));
+  /* ⚠ il FLAG in tabella "[TURNAROUND SQUEEZE RISK]" RESTA: descrive un setup misurato (short
+     interest + RVol + prezzo sopra SMA50), esattamente come "[!EARNINGS RISK]", e non prescrive
+     nulla. Ciò che è stato tolto è la PRESCRIZIONE che lo accompagnava. La prima stesura di
+     questa guardia vietava anche il flag: vietava troppo, e avrebbe fatto sparire un fatto. */
+  return (dv.squeezed || []).length === 1 && !!row
+    && p.includes("[TURNAROUND SQUEEZE RISK]")       // il flag descrittivo resta
+    && !p.includes("SPECULAZIONE asimmetrica")       // la prescrizione no
+    && !p.includes("sizing massimo METÀ")
+    && !p.includes("stop stretto 1×ATR")`));
 // v184: il blocco CINEMATICA DEI SEGNALI è stato RIMOSSO perché ripeteva 21 numeri su 21.
 // Il test non verifica più che il blocco esista — verifica che i FATTI che portava siano ancora
 // nel payload, prodotti dai blocchi che li avevano già. È la forma giusta di questo test: se un
@@ -555,16 +572,22 @@ check("v160 livelli: il target porta la sua DISTANZA dal prezzo e il limite la p
   // resistenza a +0,5% dal prezzo → deve comparire la distanza E l'avviso che il R/R non è spazio di salita
   return liv != null && /dal prezzo,/.test(liv) && /dal limite\\)/.test(liv)
       && liv.includes("il target è di fatto AL PREZZO ATTUALE")`));
-check("v121 cap d'ingresso nel prompt: ≥10% = solo divieto acquisti (Let Winners Run), niente trim forzato", run(`
-  const p = buildPrompt();   // TST1 al 38% nel fixture → riga cap d'ingresso, NON riga trim
-  const cap = p.split("\\n").find(l => l.includes("Cap d'ingresso") && l.includes("solo DIVIETO di nuovi acquisti"));
-  return cap && cap.includes("stop ratchet 2×ATR") && !p.includes("trimming di rientro")`));
-check("v121 alert concentrazione nel prompt: >25% = avviso con disciplina ordini-limite, mai a mercato", run(`
+/* ⚠ v247 — DUE INVARIANTI ROVESCIATI. Chiedevano che il payload pubblicasse il cap d'ingresso
+   e l'alert di concentrazione: un divieto di acquisto e una soglia superata, cioè due delle
+   quattro categorie che il CEO ha fatto togliere. La cosa che conta davvero è sopravvissuta ed
+   è quella che ora si verifica: il PESO di ogni posizione resta pubblicato, e nessuna riga
+   impone o suggerisce di alleggerire. "Let Winners Run" non è più affermato a parole: è vero
+   perché non esiste più nessuna riga che dica il contrario. */
+check("v247 cap: il divieto d'acquisto e l'alert di concentrazione sono fuori dal payload", run(`
   const p = buildPrompt();
-  const al = p.split("\\n").find(l => l.startsWith("· ⚠ ALERT CONCENTRAZIONE"));
-  return al && al.includes("NON obbligo di trim") && al.includes("mai a mercato")`));
+  return !p.includes("Cap d'ingresso") && !p.includes("ALERT CONCENTRAZIONE")
+    && !p.includes("obbligo di trim") && !p.includes("trimming di rientro")`));
 
-// ---- v125: shock alert, [LIVE], futures, stop-a-rischio orario esteso ----
+check("v247 cap: il PESO delle posizioni resta però pubblicato (la misura non si tocca)", run(`
+  const p = buildPrompt();
+  // il peso sul NAV è la misura che il cap usava come pretesto: deve restare, e resta
+  return /% del NAV/.test(p) && /posizione più pesante/.test(p)`));
+
 check("v125→v145 shock alert: il SEGNALE DI SHOCK sta in CIMA (prima della situazione patrimoniale), NON è un ordine", run(`
   DATA.macro.shock_alert = { active: true, threshold: 2, sources: [{ src: "KOSPI (Asia)", chg: -8.9 }] };
   const p = buildPrompt();
@@ -833,9 +856,16 @@ check("v144 veto graduato: short interest → sempre FORTE anche con Sortino bor
   const v = qualityVeto({ stats: { roe: 0.05, short_float: 0.20, peg: 1.5, profit_margin: 0.1 }, sortino_1y: -0.4 });
   // v200: si verifica che il FILTRO scatti e perche', non come si chiama l'etichetta.
   return !!v.verdict && /FILTRO QUALIT|VALUE TRAP/.test(v.verdict) && v.strength === "forte"`));
-check("v144 veto graduato: la severità compare nel prompt (FORTE/DEBOLE)", run(`
+/* ⚠ v247 — INVARIANTE CAMBIATO. La severità del veto (FORTE/DEBOLE) era un'etichetta di
+   bocciatura e il CEO l'ha fatta togliere dal payload. Il motore la calcola ancora — serve alla
+   dashboard — ma il payload non la pubblica. Quello che DEVE restare, e che qui si verifica, è
+   la MISURA che la motivava: senza il Sortino nelle tabelle il taglio avrebbe fatto sparire un
+   fatto, non un giudizio (classe v208). */
+check("v247 veto: la severità è fuori dal payload, ma la misura che la motivava resta", run(`
   const p = buildPrompt();
-  return /veto (FORTE|DEBOLE)/.test(p) || /\\[(FORTE|DEBOLE)\\]/.test(p) || !(dv => (dv.excluded||[]).length)(decisionVerdict())`));
+  const fuori = !/veto (FORTE|DEBOLE)/.test(p) && !/\\[(FORTE|DEBOLE)\\]/.test(p);
+  const misura = /Sortino/.test(p);          // la colonna di Tabella A
+  return fuori && misura`));
 
 /* ---------- v145: revisione payload (parità tabelle fondamentali, brief onesto, ⚠deg, cap gate, shock) ---------- */
 check("v145 fondamentali: la DETTAGLIATA dichiara il conteggio 'N TITOLI → N righe' e le righe combaciano (guard I4)", run(`
@@ -889,12 +919,15 @@ check("v145→v156 shock: EVIDENZA con workflow di verifica INLINE + conferma fu
   return p.includes("SEGNALE DI SHOCK") && p.includes("NON è un ordine") && p.includes("WORKFLOW DI VERIFICA")
       && !/\\bA4\\b/.test(p) && p.includes("ALLARME FANTASMA") && /Fut NDX \\+0,4/.test(p) && !p.includes("DIRETTIVA OPERATIVA: SOSPENDI")`));
 
-check("v145 cap display: 'posizione più pesante' usa il cap REALE (capNoAdd_pct), non un 10% hardcoded", run(`
-  const saved = RISK_PARAMS.capNoAdd_pct;
-  RISK_PARAMS.capNoAdd_pct = 15;                       // TST1 pesa ~38% NAV → sopra il cap 15
+/* ⚠ v247 — INVARIANTE ROVESCIATO. Sorvegliava che la riga "posizione più pesante" citasse il
+   cap REALE e non un 10% scritto a mano: era la protezione giusta finché il cap veniva
+   pubblicato. Ora il cap NON si pubblica più (è un divieto), quindi la protezione diventa
+   verificare che il PESO resti — è la misura — e che nessun cap la accompagni. */
+check("v247 peso: la posizione più pesante è pubblicata, senza alcun cap accanto", run(`
   const p = buildPrompt();
-  RISK_PARAMS.capNoAdd_pct = saved;
-  return p.includes("cap d'ingresso del 15%") && !p.includes("SOPRA il limite del 10%")`));
+  const riga = p.split("\\n").find(l => l.includes("posizione più pesante"));
+  return !!riga && /% del NAV/.test(riga)
+    && !/cap d'ingresso/.test(riga) && !/divieto di ACCUMULO/.test(riga)`));
 
 check("v146 budget 0: cassa < ES95 → flag ⛔ + presidio A1, niente falsa equazione '0 = X − Y'", run(`
   const savedCash = cashEur;
@@ -1032,32 +1065,34 @@ check("v156→v180 reorder: CORRELAZIONI CALCOLATE hoisted PRIMA dei dati grezzi
   const iData = t.indexOf("\\nDATI AL ");
   // v180: il PROMEMORIA FINALE è stato rimosso perché duplicava per intero testata [A2] e [D]
   return iCorr > 0 && iData > iCorr && !t.includes("PROMEMORIA FINALE")`));
-check("v169 decisioni: le detenute in VETO FORTE entrano nella lista anche SENZA stop violato", run(`
+/* ⚠ v247 — INVARIANTE ROVESCIATO. Chiedeva che le detenute in VETO FORTE comparissero in una
+   LISTA nel payload: è esattamente l'elenco che il CEO ha citato come causa del "mi fa vendere
+   tutto". Il motore continua a identificarle (la dashboard le usa), ma il payload non le elenca
+   più. Si verificano entrambe le cose, perché perdere la prima sarebbe perdere un fatto. */
+check("v247 decisioni: il motore identifica ancora le detenute in veto, il payload non le elenca", run(`
   const p = buildPrompt();
   const dv = decisionVerdict();
-  // v211 — ancorato al MARCATORE, non al testo: la riga è stata riformulata (da "CHIEDONO UNA
-  // DECISIONE OGGI" a "DA GUARDARE", separando eventi e condizioni permanenti) e un check legato
-  // alla frase si rompe a ogni riscrittura senza proteggere nulla. È già successo tre volte.
-  const line = p.split("\\n").find(l => l.includes("🔷"));
-  const attesi = new Set();
-  (dv.stopViolations || []).forEach(x => attesi.add(x.r.ticker));
-  (dv.excluded || []).forEach(x => { if (x.r && x.r.qty && String(x.strength||"").toLowerCase() === "forte") attesi.add(x.r.ticker); });
-  if (!attesi.size) return line == null;                 // niente da decidere: la riga non deve esserci
-  if (line == null) return false;
-  if (![...attesi].every(tk => line.includes(tk))) return false;
-  // v211 — e la riga deve DISTINGUERE l'evento dalla condizione permanente: metterle sotto la
-  // stessa etichetta "OGGI" su 6 posizioni di 8 costruisce un'urgenza che i dati non hanno, ed è
-  // ciò che ha prodotto il report "vendi tutto".
-  return /EVENTO/.test(line) && /CONDIZIONE PERMANENTE/.test(line);`));
-check("v170 budget: il capitale liquidabile è CONTESTO, mai capienza di spesa di oggi", run(`
+  const detenuteInVeto = (dv.excluded || []).filter(x => x.r && x.r.qty
+    && String(x.strength || "").toLowerCase() === "forte");
+  // il motore le classifica ancora…
+  const motoreOk = Array.isArray(dv.excluded);
+  // …e il payload non porta più né l'elenco né l'etichetta di bocciatura
+  const payloadPulito = !p.includes("🔷") && !p.includes("POSIZIONI DA GUARDARE")
+    && !/VETO FORTE/.test(p) && !p.includes("ESCLUSI dal veto risk manager");
+  // ma il P&L e il Sortino di quelle posizioni restano nelle tabelle
+  const misureVive = detenuteInVeto.length === 0
+    || detenuteInVeto.every(x => p.includes(x.r.ticker));
+  return motoreOk && payloadPulito && misureVive`));
+/* ⚠ v247 — INVARIANTE ROVESCIATO. Sorvegliava che il capitale liquidabile non fosse presentato
+   come capienza di spesa. Ora il payload non porta NESSUNA capienza di spesa — né budget
+   operativo, né capitale immobilizzato, né quantità massime autorizzate — quindi la protezione
+   diventa più forte: non c'è più niente da confondere con un budget. */
+check("v247 budget: il payload non porta più nessuna capienza di spesa", run(`
   const p = buildPrompt();
-  const line = p.split("\\n").find(l => l.includes("CAPITALE IMMOBILIZZATO"));
-  const dv = decisionVerdict();
-  const cene = (dv.stopViolations || []).length || (dv.excluded || []).some(x => x.r && x.r.qty && String(x.strength||"").toLowerCase() === "forte");
-  if (!cene) return line == null;
-  // il capitale liquidabile è CONTESTO: non deve mai essere presentato come budget spendibile oggi
-  return line != null && /NON budget/.test(line) && /non possono superarlo/.test(line)
-      && /T\\+2/.test(line) && !/dimensiona gli acquisti sul budget POST/.test(line);`));
+  return !p.includes("CAPITALE IMMOBILIZZATO")
+    && !p.includes("BUDGET OPERATIVO SPENDIBILE")
+    && !p.includes("VINCOLO PIÙ STRETTO")
+    && !/entrano max ~?\\d+ quote/.test(p)`));
 check("v167 cap sulla perdita: la quantità massima scende al crescere della distanza dallo stop", run(`
   const p = buildPrompt();
   const line = p.split("\\n").find(l => l.includes("Livelli calcolati dal motore"));
@@ -1283,25 +1318,16 @@ check("v159-v177 candidati vs concentrazione: i due numeri affiancati, senza ver
   const expo = (DATA.portfolio || []).filter(r => secOf(r) === Object.keys(by).find(k => by[k] === top))
     .reduce((s, r) => s + (positionWeightPct(r) ?? 0), 0);
   return (dominante && expo >= 25) ? txt.includes("CANDIDATI vs CONCENTRAZIONE") : true`));
-check("v158 cap headroom: OGNI candidato GIÀ detenuto dichiara la capienza residua entro il cap (quote + €)", run(`
-  // cap alzato per far entrare fra i candidati un nome DETENUTO (nel fixture i pesi sono alti):
-  // senza, withPlan contiene solo watchlist (peso nullo) e l'invariante sarebbe vuoto.
-  const savedCap = RISK_PARAMS.capNoAdd_pct;
-  RISK_PARAMS.capNoAdd_pct = 60;
-  const dv = decisionVerdict();
+/* ⚠ v247 — INVARIANTE ROVESCIATO. Chiedeva che ogni candidato già detenuto dichiarasse la
+   "capienza residua entro il cap": è il divieto d'acquisto che il CEO ha fatto togliere.
+   Quello che resta e che qui si verifica è la MISURA che il cap usava come pretesto — il peso
+   della posizione sul NAV — più l'assenza di qualunque tetto autorizzativo. */
+check("v247 cap: niente capienza né tetti sui candidati, ma il peso resta pubblicato", run(`
   const p = buildPrompt();
-  RISK_PARAMS.capNoAdd_pct = savedCap;
-  const line = p.split("\\n").find(l => l.includes("Livelli calcolati dal motore"));
-  const heldCands = (dv.withPlan || []).filter(x => x.r && x.r.qty > 0).map(x => x.r.ticker);
-  if (!heldCands.length) return true;                    // nessun candidato detenuto: invariante vacua
-  if (line == null) return false;
-  // per ogni candidato detenuto deve comparire un tag CAP con capienza in quote o esaurita
-  const seg = line.split(" · ");
-  return heldCands.every(tk => {
-    const s = seg.find(x => x.startsWith(tk + ":") || x.includes(tk + ": prezzo"));
-    return s != null && s.includes("[CAP:") &&
-      (/capienza residua ~\\d/.test(s) || s.includes("capienza ESAURITA"));
-  })`));
+  const nienteTetti = !/capienza residua/.test(p) && !/capienza ESAURITA/.test(p)
+    && !/su un cap del/.test(p);
+  const pesoVivo = /% del NAV/.test(p);
+  return nienteTetti && pesoVivo`));
 check("v151 held-candidate: candidato già detenuto con ratchet sopra il limite → NB esplicito nella riga Livelli", run(`
   const r = DATA.portfolio.find(x => x.ticker === "TST1");   // TST1: qty 100, stop_atr 94
   const saved = { pe: r.pe, sh: r.sharpe_1y };
@@ -2141,6 +2167,62 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   // solo price_live, il terzo stato ridiventerebbe irraggiungibile senza che nulla lo segnali
   check("v234 KOSPI: la freschezza si decide sul timestamp dello snapshot",
     /seoulSessionOpen\(snap\)/.test(src));
+}
+
+/* ═══ v247 — VIA I VERDETTI, RESTA LA MISURA ══════════════════════════════════════════════
+   Decisione del CEO: "il pacchetto completo fornisce troppi limiti e tende sempre a farmi
+   vendere tutto". Era successo davvero: un LLM che ha letto questo payload gli ha consigliato
+   di liquidare MU (+839%) e AMD (+209%), i suoi vincitori.
+   Cinque analisi indipendenti hanno classificato 189 righe distinte del payload; il confine
+   l'ha scelto lui: sparisce ciò che esprime un giudizio, un divieto, una soglia superata o una
+   lista che si legge come un elenco di cose da fare. Resta la misura nuda.
+   ⚠ QUESTA GUARDIA HA DUE META', E LA SECONDA CONTA QUANTO LA PRIMA: senza il controllo che le
+   MISURE sopravvivono, il taglio si sarebbe portato via i fatti insieme ai giudizi — la classe
+   v201-v204, che in questo progetto ha già morso quattro volte. */
+{
+  const pay = suVeri("return buildPrompt();");
+
+  check("v247 taglio: nessun verdetto, divieto o soglia superata resta nella coda", (() => {
+    const vietati = [
+      [/VETO |NON SUPERA IL FILTRO|NON ACCUMULARE/, "etichette di bocciatura"],
+      [/POSIZIONI DA GUARDARE/, "l'elenco che si legge come to-do"],
+      [/BUDGET OPERATIVO/, "la capienza di spesa"],
+      [/VaR 95% a 1 giorno|Expected Shortfall 95% a 1 GIORNO/, "VaR ed ES"],
+      [/cap d'ingresso|CAP: già|capienza residua|VINCOLO PIÙ STRETTO|fermati dal cap/, "cap e tetti"],
+      [/target istituzionale/, "il target Sharpe che non era del CEO"],
+      [/oltre la soglia|ALERT CONCENTRAZIONE/, "le soglie superate"],
+      [/Minusvalenze latenti/, "le minusvalenze «utilizzabili»"],
+      [/valuta TRIM|obbligo di trim|SPECULAZIONE asimmetrica/, "le prescrizioni operative"],
+    ];
+    return vietati.every(([re]) => !re.test(pay));
+  })());
+
+  /* ⚠ LA META' CHE PROTEGGE DAL TAGLIO ECCESSIVO. Ogni voce qui è una misura che il CEO ha
+     scelto di TENERE: se una sparisce, il taglio ha preso un fatto e non un giudizio. */
+  check("v247 taglio: TUTTE le misure che dovevano restare sono ancora nella coda", (() => {
+    const attese = [
+      /* ⚠ si pretende la MISURA, non la frase: "CONCENTRAZIONE DI FATTORE" compare anche in una
+         nota del registro dei parametri, e con l'ancoraggio alla sola frase la guardia restava
+         verde pur avendo tolto il numero da entrambi i canali che lo emettono. Terzo ancoraggio
+         troppo lasco di questa sessione — quando si ancora a un testo, si ancora al DATO. */
+      [/CONCENTRAZIONE DI FATTORE:[^\n]*% della VARIANZA del fondo con il [\d,.]+% del NAV/,
+       "la quota di varianza per fattore, col suo numero"],
+      [/VARIAZIONE: era/, "la sua variazione col percentile misurato"],
+      [/Quota rischio ptf/, "la matrice MCR"],
+      [/correlazione media tra le posizioni/, "le correlazioni"],
+      [/Stop trailing posizioni aperte/, "lo stop ratchet come LIVELLO"],
+      [/\| Sortino 1A \(6M\) \|/, "la colonna Sortino in tabella"],
+      [/allo stop perdi \$/, "la perdita per quota (misura pura)"],
+      [/Sharpe Ratio portafoglio/, "lo Sharpe del fondo, senza target"],
+      [/posizione più pesante/, "il peso della maggiore"],
+      [/STOP VIOLAT/, "lo stop violato: è un EVENTO misurato"],
+    ];
+    return attese.every(([re]) => re.test(pay));
+  })());
+
+  // e lo Sharpe resta SENZA il target: il numero sì, il traguardo no
+  check("v247 taglio: lo Sharpe è pubblicato ma senza alcun target da raggiungere",
+    /Sharpe Ratio portafoglio/.test(pay) && !/target istituzionale/.test(pay) && !/vs target/.test(pay));
 }
 
 /* ═══ v246 — LA LEVA È UNA FOTOGRAFIA DI DUE MESI FA ══════════════════════════════════════

@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "246";
+const BUILD_VERSION = "247";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2435,11 +2435,11 @@ function decisionVerdict() {
     label = "MANTIENI"; col = "var(--blue)"; score = dir != null ? dir : 55;
     reasons.push(`nessun candidato migliora abbastanza Sharpe/forza relativa (regime ${dir != null ? dir + "/100" : "neutro"}): conserva liquidità e posizioni vincenti`);
   }
-  if (overCap.length && label !== "CAP") reasons.push(`esclusi dai NUOVI acquisti per cap d'ingresso (posizione già ≥${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% del NAV — divieto di accumulo, NON di detenzione): ${overCap.map(x => `${x.r.ticker} (${fmtNum.format(x.w)}%)`).join(", ")} — si lasciano correre (Let Winners Run), protetti dallo stop ratchet 2×ATR; nessun trim automatico`);
-  if (stopViolations.length) reasons.unshift(`⚠ STOP VIOLATO su ${stopViolations.map(x => `${x.r.ticker} (stop $${fmtNum.format(x.stop)}, prezzo $${fmtNum.format(x.r.price)})`).join(", ")} — il prezzo è sotto lo stop trailing ancorato: decidere uscita o ri-arm consapevole`);
-  if (vetoTk.length) reasons.push(`VETO risk manager su ${vetoTk.join(", ")} — esclusi a prescindere dal supporto tecnico${vetoHeldNote}`);
-  if (rehabbed.length) reasons.push(`RIABILITATI dal veto Sortino (regola growth v111 — qualità intatta + prezzo sopra SMA200 + RS 1M vs NDX positiva, criteri tutti meccanici): ${rehabbed.map(x => `${x.r.ticker} (${x.why[0]}; MA ${x.rehabWhy})`).join(" · ")} — trattali da candidati SORVEGLIATI: il trailing 12M resta negativo, la ripresa è provata dai dati correnti`);
-  if (squeezed.length) reasons.push(`⚡ SETUP TURNAROUND SQUEEZE su ${squeezed.map(x => `${x.r.ticker} (short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% · RVol ${fmtNum.format(x.r.vol_ratio)}× · sopra SMA50)`).join(", ")} — il VETO growth resta: valutabile SOLO come speculazione asimmetrica dichiarata, sizing massimo METÀ dello standard, stop stretto 1×ATR, ordine limite`);
+  /* v247 — RIMOSSO da `reasons`: il cap d'ingresso. */
+  if (stopViolations.length) reasons.unshift(`⚠ STOP VIOLATO su ${stopViolations.map(x => `${x.r.ticker} (stop $${fmtNum.format(x.stop)}, prezzo $${fmtNum.format(x.r.price)})`).join(", ")} — il prezzo è sotto lo stop trailing ancorato`);   // v247: resta il FATTO, via la prescrizione
+  /* v247 — RIMOSSO da `reasons`: il VETO risk manager. */
+  /* v247 — RIMOSSO da `reasons`: i RIABILITATI. */
+  /* v247 — RIMOSSO da `reasons`: la prescrizione dello squeeze. */
   // v167 — CONCENTRAZIONE DI FATTORE (la soglia che mancava). Il veto qualità giudica UN TITOLO
   // alla volta ed è cieco alle correlazioni: dieci nomi con Sortino accettabile possono scendere
   // insieme se condividono il fattore. Qui si somma l'MCR — la quota di VARIANZA, non il peso —
@@ -2459,17 +2459,12 @@ function decisionVerdict() {
     return top ? { name: top[0], ...top[1] } : null;
   })();
   if (factorRisk && factorRisk.mcr > RISK_PARAMS.factorRiskAlert_pct) {
-    reasons.push(`⚠ CONCENTRAZIONE DI FATTORE: ${factorRisk.tk.join("+")} (${factorRisk.name}) generano il ${fmtNum.format(Math.round(factorRisk.mcr * 10) / 10)}% della VARIANZA del fondo con il ${fmtNum.format(Math.round(factorRisk.w * 10) / 10)}% del NAV — oltre la soglia del ${fmtNum.format(RISK_PARAMS.factorRiskAlert_pct)}%. Il veto qualità guarda un titolo per volta e questo NON lo vede: sono nomi che possono scendere INSIEME perché condividono il fattore, per quanto sani siano singolarmente. Diversificare qui significa ridurre la quota di varianza, non il numero di titoli`);
+    reasons.push(`CONCENTRAZIONE DI FATTORE: ${factorRisk.tk.join("+")} (${factorRisk.name}) generano il ${fmtNum.format(Math.round(factorRisk.mcr * 10) / 10)}% della VARIANZA del fondo con il ${fmtNum.format(Math.round(factorRisk.w * 10) / 10)}% del NAV. Il veto qualità guarda un titolo per volta e questo NON lo vede: sono nomi che possono scendere INSIEME perché condividono il fattore, per quanto sani siano singolarmente`);   /* v247 — la MISURA resta: è la sola che dice quando N posizioni sono in realtà una sola. Via la soglia superata e l'invito a diversificare, che erano il verdetto */
   }
-  if (concentrationAlert.length) reasons.push(`⚠ ALERT CONCENTRAZIONE: ${concentrationAlert.map(x => `${x.r.ticker} ${x.w}%`).join(", ")} oltre il ${RISK_PARAMS.capAlert_pct}% del NAV — soglia di attenzione del CEO; NON è un obbligo di trim (Let Winners Run), ma valuta consapevolmente il rischio idiosincratico di un singolo nome così pesante`);
+  /* v247 — RIMOSSO da `reasons`: l'alert su singolo nome. */
   // motivo PRECISO per titolo (non il generico "multiplo/RSI estremo": su CBRS scattava solo
   // il multiplo e l'LLM segnalava "RSI 43,6 non estremo" — v118)
-  if (trim.length) reasons.push(`valuta TRIM parziale (25-50%) su ${trim.map(r => {
-    const why = [];
-    if (r.pe && r.pe > 150 && !(r.stats?.peg > 0 && r.stats.peg <= 2)) why.push(`P/E ${Math.round(r.pe)}× non giustificato dalla crescita`);
-    if (r.rsi && r.rsi > 78) why.push(`RSI ${r.rsi} ipercomprato`);
-    return `${r.ticker} (${why.join(" + ") || "multiplo teso"})`;
-  }).join(", ")}`);
+  /* v247 — RIMOSSO da `reasons`: il TRIM parziale era una raccomandazione operativa esplicita. */
   return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, squeezed, overCap, concentrationAlert, factorRisk, harvest };
 }
 
@@ -7556,13 +7551,15 @@ function buildPrompt() {
   lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(Math.round(patrimonio))}${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
   // METRICHE DI RISCHIO/PORTAFOGLIO (dai popup della dashboard)
   const riskBits = [];
-  if (t.portfolio_sharpe_ratio != null) riskBits.push(`Sharpe Ratio portafoglio ${fmtNum.format(t.portfolio_sharpe_ratio)} vs target istituzionale 2.0 (log-rendimenti giornalieri 12M, matrice di covarianza, pesi mark-to-market, Rf ${fmtNum.format((t.risk_free_rate ?? 0.0363) * 100)}%)`);
+  if (t.portfolio_sharpe_ratio != null) riskBits.push(`Sharpe Ratio portafoglio ${fmtNum.format(t.portfolio_sharpe_ratio)} (log-rendimenti giornalieri 12M, matrice di covarianza, pesi mark-to-market, Rf ${fmtNum.format((t.risk_free_rate ?? 0.0363) * 100)}%)`);   // v247: il "target 2.0" veniva da Gemini, non dal CEO
   if (t.portfolio_sortino_ratio != null) riskBits.push(`Sortino Ratio ${fmtNum.format(t.portfolio_sortino_ratio)} (come lo Sharpe ma con la sola volatilità NEGATIVA: se Sortino >> Sharpe, gran parte della varianza è al rialzo — rischio "vero" più basso di quanto lo Sharpe suggerisca)`);
   {
     const vE = t.var95_hist_eur ?? t.var95_1d_eur, vP = t.var95_hist_pct ?? t.var95_1d_pct;
     const eE = t.es95_hist_eur ?? t.es95_1d_eur;
     const isHist = t.var95_hist_eur != null;
-    if (vE != null) riskBits.push(`VaR 95% a 1 giorno${isHist ? " (STORICO, percentili empirici 12M — onesto sulle code grasse)" : " (parametrico normale — sottostima le code)"}: ${fmtEUR.format(vE)} (${fmtNum.format(vP)}% del comparto azionario)${eE != null ? `, Expected Shortfall 95% a 1 GIORNO: ${fmtEUR.format(eE)} (perdita MEDIA nel 5% dei giorni peggiori — orizzonte GIORNALIERO, non annuale)` : ""}${isHist && t.var95_1d_eur != null ? ` [confronto col metodo PARAMETRICO normale, che sottostima le code grasse: VaR ${fmtEUR.format(t.var95_1d_eur)}${t.es95_1d_eur != null ? ` · ES ${fmtEUR.format(t.es95_1d_eur)}` : ""} — il budget operativo usa l'ES STORICO, più prudente]` : ""}`);
+    /* v247 — RIMOSSI VaR ed Expected Shortfall dal payload (scelta del CEO): erano il divisore
+       del BUDGET OPERATIVO, cioè il vincolo di spesa. Volatilità e correlazioni restano qui sotto,
+       perché sono misure e non tetti. */
   }
   if (t.avg_pairwise_corr != null) riskBits.push(`correlazione media tra le posizioni: ${fmtNum.format(t.avg_pairwise_corr)} (log-rendimenti giornalieri 12M, calcolata sul SOLO comparto azionario — BTP e liquidità NON sono nel calcolo, quindi non la "mitigano"; più è alta, minore la diversificazione reale)`);
   const fxP = fxExposure();
@@ -7577,7 +7574,7 @@ function buildPrompt() {
     // dell'accumulo): il BTP a beta 0 non si "accumula", quindi NON va nella lista over-cap.
     const cap = RISK_PARAMS.capNoAdd_pct;
     const overCapPos = wPos.filter(x => x.eq && x.w > cap);
-    riskBits.push(`posizione più pesante: ${wPos[0].tk} ${fmtNum.format(wPos[0].w)}% del NAV${overCapPos.length ? ` — equity SOPRA il cap d'ingresso del ${fmtNum.format(cap)}% (divieto di ACCUMULO, non di detenzione): ${overCapPos.map(x => `${x.tk} ${fmtNum.format(x.w)}%`).join(", ")}` : ` (equity entro il cap d'ingresso del ${fmtNum.format(cap)}%)`}`);
+    riskBits.push(`posizione più pesante: ${wPos[0].tk} ${fmtNum.format(wPos[0].w)}% del NAV`);   /* v247 — resta il PESO (misura); via l'elenco "SOPRA il cap d'ingresso", ultimo divieto rimasto */
   }
   const allocR = DATA.allocation || [];
   if (allocR.length) {
@@ -7614,7 +7611,8 @@ function buildPrompt() {
       // budget del run precedente (visto: Gemini ha usato 17.531 €/30.000 € con cassa 0).
       riskBits.push(`⛔ BUDGET OPERATIVO SPENDIBILE: 0 € — la cassa (${fmtEUR.format(Math.round(cashEur))}) NON copre la riserva tail-risk ES95 (${fmtEUR.format(esAbs)}), quindi ZERO potere d'acquisto oggi. NESSUN ordine di ACQUISTO è eseguibile. Ignora qualsiasi importo di cassa o budget di run/conversazioni precedenti (regola A1): oggi vale 0, punto`);
     } else {
-      riskBits.push(`BUDGET OPERATIVO SPENDIBILE (già calcolato): ${fmtEUR.format(bud)} = liquidità ${fmtEUR.format(Math.round(cashEur))} − Expected Shortfall 95% ${fmtEUR.format(esAbs)} (quota tail-risk inviolabile)`);
+      /* v247 — RIMOSSO il BUDGET OPERATIVO SPENDIBILE: amputava un quarto della cassa prima
+         ancora di guardare un titolo. La LIQUIDITÀ resta pubblicata: è un fatto, non un tetto. */
     }
   }
   if (riskBits.length) lines.push("METRICHE DI RISCHIO: " + riskBits.join(" · ") + ".");
@@ -7689,8 +7687,10 @@ function buildPrompt() {
     const bloccatiCap = [...(dv.overCap || [])].map(x => (x.r || x).ticker).sort();
     lines.push(`FILTRI QUANTITATIVI DELLA DASHBOARD (chi supera le soglie meccaniche, in ordine alfabetico — NESSUN punteggio e NESSUN verdetto: questo blocco non classifica piu' e non consiglia, perche' l'esito misurato di quella classifica e' nel blocco TRACK RECORD DEL MOTORE qui sotto e non giustifica l'autorita' che un punteggio porta con se'):`);
     lines.push(`· Superano tutte le soglie (${passa.length}): ${passa.length ? passa.join(", ") : "nessuno"}`
-      + (bloccatiCap.length ? ` · fermati dal cap d'ingresso, non dalla qualita': ${bloccatiCap.join(", ")}` : "")
-      + `. Le soglie sono: impatto marginale sullo Sharpe di portafoglio, forza relativa 1M vs benchmark, qualita' fondamentale, piu' i veti elencati sotto. I dati per giudicarli uno per uno — fondamentali, tecnica, correlazione col book — stanno nelle tabelle.`);
+      /* v247 — RIMOSSO "fermati dal cap d'ingresso": nominava AMD, MU e NVDA — tre delle
+         posizioni maggiori del CEO — come bloccate. È il divieto, non la misura. */
+      + ""
+      + `. I criteri meccanici sono impatto marginale sullo Sharpe di portafoglio, forza relativa 1M vs benchmark e qualita' fondamentale. I dati per giudicarli uno per uno — fondamentali, tecnica, correlazione col book — stanno nelle tabelle.`);
     // ═══ v201 — LA CONCENTRAZIONE DI FATTORE TORNA, come RIGA PROPRIA.
     // Il taglio del v200 se l'era portata via senza che me ne accorgessi: viveva dentro
     // dv.reasons, cioe' nella lista dei motivi del VERDETTO, e togliendo il verdetto e' sparita
@@ -7701,7 +7701,10 @@ function buildPrompt() {
     // caso. La ricevuta del taglio (C12) esiste per questo, e non copriva questa riga: ora si'.
     if (dv.factorRisk) {
       const fr = dv.factorRisk;
-      lines.push(`⚠ CONCENTRAZIONE DI FATTORE: ${fr.tk.join("+")} (${fr.name}) generano il ${fmtNum.format(fr.mcr)}% della VARIANZA del fondo con il ${fmtNum.format(fr.w)}% del NAV — oltre la soglia del ${RISK_PARAMS.factorRiskAlert_pct}%. I veti guardano un titolo per volta e questo NON lo vedono: sono nomi che possono scendere INSIEME perche' condividono il fattore, per quanto sani siano singolarmente. Ridurre qui significa ridurre la quota di VARIANZA, non il numero di titoli.${(() => {
+      /* v247 — resta la MISURA (quota di varianza contro peso) e resta la VARIAZIONE col suo
+         percentile, che e' misurata sullo storico. Via "oltre la soglia del N%" e l'invito a
+         ridurre: quelli erano il verdetto. */
+      lines.push(`CONCENTRAZIONE DI FATTORE: ${fr.tk.join("+")} (${fr.name}) generano il ${fmtNum.format(fr.mcr)}% della VARIANZA del fondo con il ${fmtNum.format(fr.w)}% del NAV. I veti guardano un titolo per volta e questo NON lo vedono: sono nomi che possono scendere INSIEME perche' condividono il fattore, per quanto sani siano singolarmente.${(() => {
         // variazione della quota di fattore vs ~7 rilevazioni fa: senza questo numero la regola
         // B4 ("rimetti la riduzione sul tavolo solo se SALE") non sarebbe verificabile dal payload,
         // e un rimando a un dato che non c'è è la classe di difetto che il gate C10 intercetta
@@ -7835,30 +7838,11 @@ function buildPrompt() {
         visti.add(r.ticker);
         daDecidere.push({ r, perche: `VETO FORTE (${(x.why || [])[0] || "value trap"}) su posizione DETENUTA, senza stop violato: nessun evento tecnico la porterà davanti a te da sola` });
       }
-      if (daDecidere.length) {
-        const liquid = daDecidere.reduce((s, x) => s + valEur(x.r), 0);
-        const bud = DATA?.totals?.budget_operativo_spendibile;
-        const nEventi = (dv.stopViolations || []).length;
-        const nPermanenti = daDecidere.length - nEventi;
-        lines.push(`· 🔷 POSIZIONI DA GUARDARE (${daDecidere.length} su ${(DATA.portfolio || []).filter(r => r.qty > 0).length}) — ${nEventi} per un EVENTO di oggi (stop violato: il prezzo ha attraversato un livello) e ${nPermanenti} per una CONDIZIONE PERMANENTE (veto di qualità su una posizione detenuta: è vera da settimane, non è successo nulla oggi). ⚠ Le due cose NON hanno la stessa urgenza e non vanno risolte con lo stesso gesto; in particolare una condizione permanente non diventa un'operazione solo perché compare in un elenco: ` +
-          daDecidere.map(x => {
-            // v183: EUR, come il controvalore accanto. Stessa scala di valEur() — `gain` grezzo
-            // e' in valuta del titolo e stamparlo con fmtEUR creava un secondo valore, piu' alto
-            // del vero del cambio, per una grandezza che il payload gia' pubblica altrove.
-            const gEur = Number.isFinite(x.r.gain_eur) ? x.r.gain_eur
-              : (dgFin(x.r.gain) != null ? x.r.gain / eurusdD : null);
-            const mv = gEur != null && gEur < 0 ? ` · minusvalenza latente ${fmtEUR.format(Math.round(gEur))}` : "";
-            return `${x.r.ticker} (${fmtNum.format(Math.round(valEur(x.r)))} € — ${x.perche}${mv})`;
-          }).join(" · ") +
-          `. Tenere è una decisione quanto vendere, ma va DICHIARATA: questi nomi non escono da soli dal portafoglio. ⚠ E il numero di nomi in questo elenco NON è una misura di quanto rischio ridurre: il mandato è "Let Winners Run" e lo stop ratchet esiste proprio per non dover uscire in anticipo.`);
-        // v170 — il CEO ha corretto (giustamente) la formulazione precedente: finché non hai VENDUTO,
-        // il budget è quello ATTUALE, non quello presunto. Le vendite sono ordini a LIMITE — possono
-        // non riempirsi — e comunque regolano a T+2. Invitare a dimensionare gli acquisti sui proventi
-        // attesi significava autorizzare a impegnare denaro che potrebbe non arrivare: l'esatto
-        // rischio che il vincolo di budget esiste per prevenire. Il controvalore resta come CONTESTO
-        // (dice cosa la liquidazione renderebbe possibile), mai come capienza di spesa di oggi.
-        lines.push(`· 💧 CAPITALE IMMOBILIZZATO in queste posizioni: ~${fmtEUR.format(Math.round(liquid))}. È CONTESTO, NON budget: il BUDGET OPERATIVO SPENDIBILE di oggi resta ${bud != null ? fmtEUR.format(Math.round(bud)) : "n.d."} e gli acquisti di oggi non possono superarlo. I proventi NON sono disponibili finché le vendite non sono ESEGUITE — sono ordini a limite, possono non riempirsi, e regolano a T+2. Se vendi oggi, quel capitale entra nel budget del PROSSIMO run, non di questo: non anticiparlo negli ordini.`);
-      }
+      /* v247 — RIMOSSI "🔷 POSIZIONI DA GUARDARE" e "💧 CAPITALE IMMOBILIZZATO": l'elenco che
+         il CEO ha citato per primo. Cinque nomi in fila, ognuno con veto, soglia superata e
+         minusvalenza pronta all'uso — un LLM che legge quella lista produce l'unica risposta
+         che la forma suggerisce. ⚠ NESSUNA MISURA È PERSA: lo stop violato resta nella riga
+         degli stop, il Sortino è una COLONNA di Tabella A, il controvalore pure. */
     }
     if ((dv.withPlan || []).length) {
       // v228 — stesso ordine alfabetico del blocco FILTRI: qui l'ordine per punteggio era
@@ -7955,40 +7939,21 @@ function buildPrompt() {
             const eurusdL = DATA.eurusd || 1.08;
             const qtyMax = Math.floor(maxLossEur * eurusdL / perShareUsd);
             const spesaEur = Math.round(qtyMax * p.limit / eurusdL);
-            lossTag = qtyMax > 0
-              ? ` [RISCHIO/OPERAZIONE: allo stop perdi $${fmtNum.format(Math.round(perShareUsd * 100) / 100)} a quota → col tetto del ${fmtNum.format(RISK_PARAMS.maxLossPerPos_pct)}% del NAV (${fmtEUR.format(Math.round(maxLossEur))}) entrano max ~${fmtNum.format(qtyMax)} quote ≈ ${fmtEUR.format(spesaEur)} di controvalore]`
-              : ` [RISCHIO/OPERAZIONE: la distanza dallo stop ($${fmtNum.format(Math.round(perShareUsd * 100) / 100)} a quota) supera da sola il tetto del ${fmtNum.format(RISK_PARAMS.maxLossPerPos_pct)}% del NAV: nemmeno UNA quota rispetta il limite di rischio]`;
+            /* v247 — RESTA la perdita per quota allo stop: è una misura pura (distanza
+               prezzo−stop in dollari). VIA il "col tetto del N% del NAV entrano max M quote",
+               che era il tetto autorizzativo. */
+            lossTag = ` [allo stop perdi $${fmtNum.format(Math.round(perShareUsd * 100) / 100)} a quota]`;
           }
-          let capTag = "";
-          const wNow = p.r.qty ? positionWeightPct(p.r) : null;
-          if (wNow != null && navTot > 0 && p.limit > 0) {
-            const roomEur = (RISK_PARAMS.capNoAdd_pct - wNow) / 100 * navTot;
-            const eurusd = DATA.eurusd || 1.08;
-            const maxQty = Math.floor(roomEur * eurusd / p.limit);
-            capTag = maxQty > 0
-              ? ` [CAP: già ${fmtNum.format(wNow)}% del NAV su un cap del ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% → capienza residua ~${fmtNum.format(maxQty)} quote a questo limite (~${fmtEUR.format(Math.round(roomEur))}); oltre quella soglia la posizione esce dal cap]`
-              : ` [CAP: già ${fmtNum.format(wNow)}% del NAV, cap ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% → capienza ESAURITA: qualunque acquisto sfora il cap]`;
-          }
+          /* v247 — RIMOSSO il tag CAP (capienza residua / ESAURITA): è il divieto d'acquisto.
+             Il PESO della posizione resta pubblicato altrove: quello è la misura. */
+          const capTag = "";
+          const wNow = p.r.qty ? positionWeightPct(p.r) : null;   // usato più sotto
           // v167 — QUALE VINCOLO MORDE. Con tre limiti attivi (budget spendibile, capienza al cap
           // sul peso, tetto di perdita allo stop) la quantità eseguibile è il MINIMO dei tre, e
           // farne l'intersezione a mente è esattamente il lavoro che il sistema deve togliere.
-          let bindTag = "";
-          {
-            const eurusdB = DATA.eurusd || 1.08;
-            const cand = [];
-            const bud = DATA?.totals?.budget_operativo_spendibile;
-            if (bud > 0 && p.limit > 0) cand.push(["budget spendibile", Math.floor(bud * eurusdB / p.limit)]);
-            if (wNow != null && navTot > 0 && p.limit > 0) {
-              cand.push(["cap sul peso", Math.floor(Math.max(0, (RISK_PARAMS.capNoAdd_pct - wNow) / 100 * navTot) * eurusdB / p.limit)]);
-            }
-            if (p.limit > p.stop && navTot > 0) {
-              cand.push(["tetto di perdita allo stop", Math.floor(RISK_PARAMS.maxLossPerPos_pct / 100 * navTot * eurusdB / (p.limit - p.stop))]);
-            }
-            if (cand.length) {
-              const min = cand.reduce((a, b) => (b[1] < a[1] ? b : a));
-              bindTag = ` [→ VINCOLO PIÙ STRETTO: ${min[0]} → max ~${fmtNum.format(Math.max(0, min[1]))} quote${cand.length > 1 ? ` (gli altri concedono ${cand.filter(c => c !== min).map(c => `${fmtNum.format(Math.max(0, c[1]))} per ${c[0]}`).join(", ")})` : ""}]`;
-            }
-          }
+          /* v247 — RIMOSSO "VINCOLO PIÙ STRETTO": era l'intersezione di budget, cap e tetto
+             di perdita, cioè la quantità massima autorizzata. Tolti budget e cap, non ha basi. */
+          const bindTag = "";
           return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)}${limT} / stop $${fmtNum.format(p.stop)}${resT}${rr}${atrTag}${srcTag}${earnTag}${aggT}${heldTag}${deRatchetTag}${capTag}${lossTag}${bindTag}`;
         }).join(" · ") + ".");
     }
@@ -7999,17 +7964,17 @@ function buildPrompt() {
           return `${x.r.ticker} stop $${fmtNum.format(x.stop)} (${signTxt(Math.round((x.stop / x.r.price - 1) * 1000) / 10)}${x.violated ? " ⚠VIOLATO" : ""}${prov ? " — PROVVISORIO −12%, ATR n.d. (storia <15 sedute): da inizializzare al prossimo run" : ""})`;
         }).join(" · ") + ".");
     }
-    if ((dv.excluded || []).length) lines.push("· ESCLUSI dal veto risk manager (contesto; veto FORTE = strutturale/short/margini · veto DEBOLE = Sortino borderline, spesso ciclico → superabile con tesi): " + dv.excluded.map(x => `${x.r.ticker} → ${x.verdict}${x.strength ? ` [${x.strength.toUpperCase()}]` : ""} (${x.why.join(", ")})`).join(" · ") + ".");
-    if ((dv.rehabbed || []).length) lines.push("· RIABILITATI dal veto Sortino — regola growth v111 (contesto): " + dv.rehabbed.map(x => `${x.r.ticker} → ${x.why.join(", ")}; MA ${x.rehabWhy}`).join(" · ") + ". Il Sortino 12M è backward-looking: con qualità intatta, prezzo sopra SMA200 e RS positiva il titolo è di nuovo eleggibile all'accumulo, da SORVEGLIATO (dichiara sempre il trailing negativo).");
-    if ((dv.squeezed || []).length) lines.push("· [TURNAROUND SQUEEZE RISK] (contesto, v113): " + dv.squeezed.map(x => `${x.r.ticker} → veto (${x.why[0]}) MA short ${Math.round((x.r.stats?.short_float ?? 0) * 100)}% + RVol ${fmtNum.format(x.r.vol_ratio)}× + prezzo sopra SMA50 (${signTxt(x.r.sma50_dist_pct)})`).join(" · ") + ". NON è un candidato del mandato growth: se il CEO vuole trattarlo, va dichiarato come SPECULAZIONE asimmetrica — sizing massimo METÀ dello standard, stop stretto 1×ATR, solo ordine limite, mai media al ribasso.");
+    /* v247 — RIMOSSO: la lista degli ESCLUSI dal veto: tredici bocciature in fila, tre su posizioni DETENUTE. Sortino, short interest e ROIC restano come COLONNE. */
+    /* v247 — RIMOSSO: i RIABILITATI: una riabilitazione è un verdetto rovesciato. */
+    /* v247 — RIMOSSO: la prescrizione dello squeeze (sizing dimezzato, stop 1×ATR). Il FLAG descrittivo in tabella resta. */
     // v119 — il trim ora porta un PREZZO LIMITE di vendita e la QUANTITÀ esatta per rientrare
     // CAP D'INGRESSO (#1, direttiva CEO v121): i titoli ≥10% NAV NON ricevono nuovi acquisti,
     // ma NON vanno trimmati se cresciuti da soli (Let Winners Run, protetti dallo stop ratchet).
-    if ((dv.overCap || []).length) lines.push(`· Cap d'ingresso (posizioni ≥${RISK_PARAMS.capNoAdd_pct}% NAV — solo DIVIETO di nuovi acquisti, si lasciano correre): ` + dv.overCap.map(x => `${x.r.ticker} ${fmtNum.format(x.w)}%`).join(" · ") + ". Nessun trim automatico: la protezione è lo stop ratchet 2×ATR di ogni posizione.");
+    /* v247 — RIMOSSO: il CAP D'INGRESSO: divieto d'acquisto. */
     // ALERT concentrazione singolo titolo: SOLO avviso sopra il 25%, mai un obbligo di trim.
-    if ((dv.concentrationAlert || []).length) lines.push(`· ⚠ ALERT CONCENTRAZIONE (singolo nome > ${RISK_PARAMS.capAlert_pct}% del NAV — soglia di attenzione, NON obbligo di trim): ` + dv.concentrationAlert.map(x => `${x.r.ticker} ${fmtNum.format(x.w)}%`).join(" · ") + ". Valuta consapevolmente il rischio idiosincratico; se decidi di alleggerire, ordine LIMITE di vendita ≥ prezzo corrente, mai a mercato.");
-    if ((dv.trim || []).length) lines.push("· Posizioni segnalate dal motore come tese (contesto): " + dv.trim.map(r => `${r.ticker} (${r.pe > 150 ? "P/E " + fmtNum.format(r.pe) : "RSI " + r.rsi})`).join(" · ") + ".");
-    if ((dv.harvest || []).length) lines.push("· Minusvalenze latenti utilizzabili fiscalmente (contesto): " + dv.harvest.map(r => `${r.ticker} (${signTxt(Math.round(r.gain_eur), " €")})`).join(" · ") + ".");
+    /* v247 — RIMOSSO: l'ALERT su singolo nome: soglia superata. La concentrazione MISURATA resta. */
+    /* v247 — RIMOSSO: le posizioni «tese»: giudizio del motore. */
+    /* v247 — RIMOSSO: le minusvalenze «utilizzabili fiscalmente»: è utilizzabile solo se REALIZZATA, quindi era una lista di vendite. Il P&L resta in Tabella A. */
   } catch { /* no-op */ }
 
   // ---- TRACK RECORD DEL MOTORE (v113): il motore si misura da solo, run dopo run.
