@@ -7793,6 +7793,38 @@ function buildPrompt() {
       + `nessun istante in cui il portafoglio abbia avuto davvero questi valori tutti insieme. `
       + `Anche l'appartenenza alla lista degli stop violati puo' dipendere da quale seduta e' arrivata per quel titolo.`);
   }
+  /* ⚠ v253 — IL LIBRO IN QUESTO PACCHETTO PUÒ ESSERE INDIETRO, E FINORA NON LO DICEVA.
+     Trovato eseguendo il payload su me stesso: `config/holdings.json` aveva 12 posizioni e il
+     pacchetto ne portava 9. Non era un difetto di calcolo — la pipeline gira su cron e non
+     aveva ancora rigenerato — ma l'LLM riceveva un book amputato di un terzo SENZA UN SEGNO
+     che lo fosse, e ha analizzato quel book come se fosse completo. È la stessa classe di
+     ⚠ PREZZI DA SEDUTE DIVERSE (v186): non si può correggere il ritardo, si può DICHIARARLO.
+     La fonte è il diario, che vive nel repo e non dipende dal cron: un'operazione marcata
+     `applicata` è già dentro holdings.json per costruzione, quindi se il suo titolo non
+     compare qui, la differenza è esattamente il ritardo della pipeline. Si azzera da solo al
+     run successivo. FATTO, non istruzione (C9). */
+  try {
+    const inPtf = new Set((DATA.portfolio || []).map(r => String(r.ticker || "").toUpperCase()));
+    const asOf = (DATA.broker || {}).as_of || null;
+    const mancanti = new Map();
+    for (const e of (typeof loadDiary === "function" ? loadDiary() : [])) {
+      if (!e || !e.applicata) continue;
+      const iso = String(e.date || "").slice(0, 10);
+      if (asOf && iso && iso <= asOf) continue;
+      const o = (typeof diaryOp === "function") ? diaryOp(e) : null;
+      if (!o || !o.ticker || !/ACQUIST|COMPR|INCREMENT|ACCUMUL|AGGIUNT/i.test(o.tipo || "")) continue;
+      const tk = String(o.ticker).toUpperCase();
+      if (!inPtf.has(tk)) mancanti.set(tk, o.qty != null ? `${tk} (${fmtNum.format(o.qty)})` : tk);
+    }
+    if (mancanti.size) {
+      lines.push(`⚠ LIBRO INCOMPLETO IN QUESTO PACCHETTO: ${mancanti.size} `
+        + `${mancanti.size === 1 ? "acquisto già registrato nel portafoglio non compare" : "acquisti già registrati nel portafoglio non compaiono"} `
+        + `nei dati di questo run — ${[...mancanti.values()].join(", ")}. La pipeline dati gira a intervalli e non ha ancora rigenerato: `
+        + `il portafoglio reale ha ${(DATA.portfolio || []).filter(r => r.qty).length + mancanti.size} posizioni, le tabelle qui sotto ne mostrano `
+        + `${(DATA.portfolio || []).filter(r => r.qty).length}. Patrimonio, pesi NAV, MCR, correlazioni e concentrazione di fattore sono calcolati `
+        + `SENZA i titoli elencati, quindi sottostimano l'esposizione ai loro settori.`);
+    }
+  } catch { /* il payload non deve mai rompersi per un controllo accessorio */ }
   const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
   lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(Math.round(patrimonio))}${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
   // METRICHE DI RISCHIO/PORTAFOGLIO (dai popup della dashboard)
@@ -8398,12 +8430,12 @@ function buildPrompt() {
     // mostrata solo per i riabilitati. È il dato ODIERNO che la SIMMETRIA DEL VETO richiede:
     // 1A negativo + 6M in recupero = veto ciclico; entrambi negativi = strutturale.
     const so6 = r.sortino_6m != null ? ` (6M ${fmtNum.format(r.sortino_6m)})` : "";
-    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so}${so6} | ${dd} | ${shortF} | ${floatCell} | ${suppCell} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${signalTxt(r)} | ${optNote} |`;
+    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so}${so6} | ${dd} | ${shortF} | ${floatCell} | ${suppCell} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${optNote} |`;   /* v252 — via anche qui la colonna Segnale: in v251 l'avevo tolta solo dalla DASHBOARD, e il payload continuava a portarla. Classe "due implementazioni della stessa cosa" (v161, v207). */
   };
   // NB v148: "Supp." resta il NOME esatto della colonna (il red team I10 la cerca per nome; I6
   // legge gli indici 16/17) — la resistenza vive DENTRO la cella ("$X → res $Y"), il Sortino 6M
   // dentro la cella Sortino ("-0,4 (6M 0,2)"): niente colonne nuove, niente indici spostati.
-  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A (6M) | Drawdown 52S | Short% | Float | Supp. | Stop 2×ATR | R/R teorico | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Segnale | Opzioni (CW/PW) |";
+  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A (6M) | Drawdown 52S | Short% | Float | Supp. | Stop 2×ATR | R/R teorico | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Opzioni (CW/PW) |";
   const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
   lines.push(head); lines.push(sep);
   DATA.portfolio.forEach(r => lines.push(mdRow(r)));
@@ -9057,12 +9089,12 @@ function buildHistoricalDigests() {
   const m = DATA.macro || {};
   const out = [];
 
-  const md = m.margin_debt || {};
-  const mdh = Array.isArray(md.history) ? md.history.map(dgFin).filter(x => x != null) : [];
-  out.push({ label: "Margin Debt (FINRA, mensile)", text: mdh.length >= 2
-    ? `${fmtNum.format(mdh[mdh.length - 1])} M$ · Δ1M ${signTxt(dgDelta(mdh, 1))} · Δ6M ${signTxt(dgDelta(mdh, 6))} · YoY ${signTxt(dgFin(md.yoy))} · ${dgTxt(md.pct_of_peak, "% del picco")} · regime ${(dgFin(md.qoq) ?? 0) < -2 || (dgFin(md.yoy) ?? 0) < 0 ? "DELEVERAGING (rollover della leva: storicamente precede i drawdown)" : "espansione della leva"}`
-    : "—" });
-
+  /* ⚠ v252 — MARGIN DEBT TOLTO ANCHE DAI DIGEST STORICI. In v249 l'avevo tolto dal QUADRO
+     MACRO, ma `buildCIOText()` appende i digest e il dato rientrava da lì: il pacchetto che il
+     CEO incolla lo conteneva ancora. È la classe "due implementazioni della stessa cosa"
+     (v161, v207), trovata solo eseguendo il payload su me stesso invece di rileggere il codice.
+     La motivazione resta quella del v249: dato onesto ma lento (68 giorni), presentato come
+     stato attuale. Resta in dashboard con la sua data. */
   const cr = m.credit || {};
   const crh = Array.isArray(cr.history) ? cr.history.map(x => dgFin(x && x.v)).filter(x => x != null) : [];
   const crPct = dgPercentile(crh, cr.spread_hy);
@@ -9339,7 +9371,7 @@ function historicalDigestText() {
     L.push("|---|---|---|---|---|");
     for (const t of deep) L.push(`| ${t.tk} | ${dgTxt(t.revCagr, "%")}${t.span ? ` (${t.span}A)` : ""} | ${dgTxt(t.niCagr, "%")} | ${dgTxt(t.effGap, "pp")} | ${dgTxt(t.epsG, "%")} |`);
   }
-  L.push("USO METODOLOGICO: il CAGR pluriennale e il YoY delle tabelle misurano cose diverse — un YoY gonfiato da un punto basso del ciclo (es. rimbalzo delle memorie) può convivere con un CAGR piatto, e in quel caso la crescita è ciclica, non strutturale. Sulle serie macro, sia i valori ESTREMI (Margin Debt a ridosso del picco, HY OAS ai minimi del range) sia le INVERSIONI DI TENDENZA (leva in deleveraging, spread in allargamento, curva in dis-inversione) sono i due modi in cui questi indicatori hanno storicamente anticipato i punti di svolta.");
+  L.push("USO METODOLOGICO: il CAGR pluriennale e il YoY delle tabelle misurano cose diverse — un YoY gonfiato da un punto basso del ciclo (es. rimbalzo delle memorie) può convivere con un CAGR piatto, e in quel caso la crescita è ciclica, non strutturale. Sulle serie macro, sia i valori ESTREMI (HY OAS ai minimi del range, VIX ai minimi della sua distribuzione) sia le INVERSIONI DI TENDENZA (spread in allargamento, curva in dis-inversione) sono i due modi in cui questi indicatori hanno storicamente anticipato i punti di svolta.");
   return L.join("\n");
 }
 /* ═══════════════════ MOTORE DI CORRELAZIONE (v154) ═══════════════════

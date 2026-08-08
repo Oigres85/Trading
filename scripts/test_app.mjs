@@ -649,12 +649,12 @@ check("CIO v130: buildCIOText = prompt esistente + ANALISI STORICA + FONDAMENTAL
 check("CIO v128: digest null-safe — fixture senza serie storiche → '—', mai undefined/NaN", run(`
   const t = historicalDigestText();
   return !t.includes("undefined") && !/\\bNaN\\b/.test(t) && t.includes("—")`));
-check("CIO v128: digest Margin Debt calcola pendenze da history (Δ1M +10%, Δ6M +25%)", run(`
-  const saved = DATA.macro.margin_debt;
-  DATA.macro.margin_debt = { history: [100, 100, 100, 100, 100, 100, 104, 110, 110, 112, 115, 118, 125, 137.5], yoy: 37.5, qoq: 10, pct_of_peak: 100 };
-  const d = buildHistoricalDigests().find(x => x.label.startsWith("Margin Debt"));
-  DATA.macro.margin_debt = saved;
-  return d.text.includes("+10") && d.text.includes("+25") && d.text.includes("espansione")`));
+/* ⚠ v252 — INVARIANTE ROVESCIATO. Il digest Margin Debt non esiste più: il CEO l'ha tolto
+   perché con 68 giorni di ritardo è fuorviante come "stato attuale". Il test ora presidia il
+   TAGLIO — se qualcuno rimette la serie FINRA nel pacchetto, questo check fallisce. */
+check("v252 Margin Debt: nessun digest storico lo rimette nel pacchetto", run(`
+  const t = historicalDigestText();
+  return !/[Mm]argin [Dd]ebt/.test(t) && !/FINRA/.test(t) && t.length > 200`));
 check("CIO v128: digest HY OAS — percentile nel range e allarme compressione", run(`
   const saved = DATA.macro.credit;
   DATA.macro.credit = { spread_hy: 2.7, history: Array.from({length: 250}, (_, i) => ({ d: "x", v: 2.7 + (i % 50) / 50 })) };
@@ -707,13 +707,16 @@ check("ASIMM: Sortino>1,7×Sharpe (entrambi>0) e RSI>55 → true; ratio basso / 
 check("ASIMM: signalTxt appende il tag solo ai titoli qualificati", run(`
   return signalTxt({ signal: "Sopra SMA50", sharpe_1y: 1, sortino_1y: 2, rsi: 60 }).includes("[⚡ASIMM]")
       && !signalTxt({ signal: "Neutrale", sharpe_1y: 1, sortino_1y: 1.2, rsi: 60 }).includes("ASIMM")`));
-check("ASIMM: compare nella Tabella A del prompt per una posizione qualificata", run(`
-  const r = DATA.portfolio.find(x => x.qty);
-  const s1 = r.sharpe_1y, so1 = r.sortino_1y, rsi = r.rsi;
-  r.sharpe_1y = 1; r.sortino_1y = 2.5; r.rsi = 60;
-  const has = buildPrompt().includes("[⚡ASIMM]");
-  r.sharpe_1y = s1; r.sortino_1y = so1; r.rsi = rsi;
-  return has`));
+/* ⚠ v252 — INVARIANTE CAMBIATO. ⚡ASIMM viveva dentro la colonna "Segnale", che è uscita dal
+   payload perché era un'etichetta calcolata da RSI e distanza dalla SMA200 — due colonne già
+   presenti. ASIMM è della stessa natura: deriva da Sortino > 1,7× Sharpe con RSI>55, e tutti e
+   tre sono COLONNE della tabella. Quindi l'invariante che conta non è "l'etichetta c'è", è
+   "le misure che la generano ci sono": l'LLM può ricostruirla, e senza un'etichetta in mezzo. */
+check("v252 ASIMM: l'etichetta è uscita, ma le misure che la generano restano in Tabella A", run(`
+  const p = buildPrompt();
+  const testa = p.split("\\n").find(l => l.startsWith("| Titolo | Qtà"));
+  return !!testa && !/\\| Segnale \\|/.test(testa)
+    && /Sortino 1A/.test(testa) && /Sharpe 1A/.test(testa) && /RSI/.test(testa)`));
 check("Polymarket Δ7g: con storico di ≥7g calcola il delta; senza storico → null", run(`
   const d8 = new Date(Date.now() - 8 * 86400000).toISOString().slice(0, 10);   // 8 giorni fa (≤ target 7g)
   const d0 = new Date().toISOString().slice(0, 10);                            // oggi (dopo il target)
@@ -2886,6 +2889,35 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     tutto.includes("/* ---------- report ----------")
     && !/^\s*check\(/m.test(dopoReport));
 }
+
+/* ═══ v253 — il payload DICHIARA quando il libro è indietro rispetto al repo ═══
+   Trovato eseguendo il pacchetto su me stesso: config/holdings.json aveva 12 posizioni e il
+   payload ne portava 9, senza un segno che ne mancassero quattro. Validato iniettando il
+   fenomeno E togliendolo: un check di sola presenza passerebbe anche su una riga incondizionata. */
+check("v253 libro indietro: il payload lo DICHIARA quando il diario ha un acquisto applicato assente dai dati", suVeri(`
+  const salvo = localStorage.getItem("action_diary");
+  localStorage.setItem("action_diary", JSON.stringify([{ date: "2099-01-01",
+    text: "acquisto 10 ZZTEST a 100", applicata: true,
+    op: { tipo: "ACQUISTO", qty: 10, ticker: "ZZTEST", prezzo: 100 } }]));
+  let p; try { p = buildPrompt(); } finally {
+    if (salvo == null) localStorage.removeItem("action_diary"); else localStorage.setItem("action_diary", salvo); }
+  return /LIBRO INCOMPLETO IN QUESTO PACCHETTO/.test(p) && p.includes("ZZTEST")`));
+
+check("v253 libro allineato: senza operazioni pendenti la dichiarazione NON compare", suVeri(`
+  const salvo = localStorage.getItem("action_diary");
+  localStorage.setItem("action_diary", "[]");
+  let p; try { p = buildPrompt(); } finally {
+    if (salvo == null) localStorage.removeItem("action_diary"); else localStorage.setItem("action_diary", salvo); }
+  return !/LIBRO INCOMPLETO IN QUESTO PACCHETTO/.test(p)`));
+
+check("v253 la dichiarazione ignora le operazioni NON ancora applicate (quelle le copre il banner del diario)", suVeri(`
+  const salvo = localStorage.getItem("action_diary");
+  localStorage.setItem("action_diary", JSON.stringify([{ date: "2099-01-01",
+    text: "acquisto 10 ZZTEST a 100",
+    op: { tipo: "ACQUISTO", qty: 10, ticker: "ZZTEST", prezzo: 100 } }]));
+  let p; try { p = buildPrompt(); } finally {
+    if (salvo == null) localStorage.removeItem("action_diary"); else localStorage.setItem("action_diary", salvo); }
+  return !/LIBRO INCOMPLETO IN QUESTO PACCHETTO/.test(p)`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
