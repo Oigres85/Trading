@@ -2232,6 +2232,46 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /Sharpe Ratio portafoglio/.test(pay) && !/target istituzionale/.test(pay) && !/vs target/.test(pay));
 }
 
+/* ═══ v252 — IL CICLO ECONOMICO RIPETEVA I SUOI COMPONENTI ═══════════════════════════════
+   Richiesta del CEO: se i componenti del ciclo hanno già una scheda ciascuno, la scheda del
+   ciclo con le barre dentro è un riquadro che ripete gli altri dodici. Verificato prima di
+   tagliare: dodici componenti su tredici avevano già la propria scheda, e al tredicesimo (VIX)
+   gliel'ho data in v251. ⚠ Il PUNTEGGIO resta in pipeline e nel payload: è una sintesi utile a
+   chi legge il pacchetto, e toglierla dal calcolo sarebbe stato togliere un fatto (classe v208). */
+{
+  check("v252 ciclo: la scheda «Ciclo economico» è uscita dalla classifica", (() => {
+    const nomi = JSON.parse(suVeri("return JSON.stringify(indicatoriClassifica().map(x => x.nome));"));
+    return !nomi.some(n => /Ciclo economico/i.test(n));
+  })());
+
+  /* ⚠ la ricevuta: ogni componente del ciclo deve avere la SUA scheda, o il taglio avrebbe
+     fatto sparire un'informazione invece di una duplicazione. Si confronta la lista vera dei
+     componenti con la lista vera delle schede, non un elenco scritto a mano. */
+  check("v252 ciclo: ogni suo componente resta raggiungibile da una scheda propria", (() => {
+    const dati = JSON.parse(suVeri(`
+      const comp = ((DATA.macro || {}).macroquant || {}).components || [];
+      return JSON.stringify({ comp: comp.map(c => c.label || c.key),
+                              schede: indicatoriClassifica().map(x => x.nome) });`));
+    const norm = (x) => String(x).toLowerCase().replace(/[()]/g, "");
+    // le corrispondenze note dove il nome della scheda accorpa o riformula il componente
+    const ALIAS = { "inflazione cpi a/a": "inflazione", "inflazione pce a/a": "inflazione",
+      "non-farm payrolls": "mercato del lavoro", "disoccupazione": "mercato del lavoro",
+      "rischio credito hy": "stress del credito", "smart money vix+hy/ig+p/c": "istituzionali",
+      "segnali ribassisti bofa": null, "volatilità vix": "vix" };
+    const mancanti = dati.comp.filter(c => {
+      const k = norm(c);
+      if (k in ALIAS) { const a = ALIAS[k]; return a === null ? false : !dati.schede.some(s => norm(s).includes(a)); }
+      return !dati.schede.some(s => norm(s).includes(k.slice(0, 14)) || k.includes(norm(s).slice(0, 14)));
+    });
+    if (mancanti.length) console.log("  ⚠ componenti del ciclo senza scheda:", mancanti.join(", "));
+    return mancanti.length === 0;
+  })());
+
+  // il punteggio NON esce dal payload: è una sintesi, non un duplicato
+  check("v252 ciclo: il punteggio resta nel payload",
+    /MacroQuant \(ciclo economico/.test(suVeri("return buildPrompt();")));
+}
+
 /* ═══ v251 — TABELLA DA ANALISTA, E L'IDEMPOTENZA CHE MANCAVA ════════════════════════════
    ⚠ IL DIFETTO PIÙ GRAVE: applicando due volte le stesse operazioni le quantità si SONO
    RADDOPPIATE sul repo (BE 40→80, SKHY 45→90, WDC 25→50, MRVL 42→84). Causa: il banner si

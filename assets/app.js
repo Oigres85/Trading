@@ -4445,7 +4445,12 @@ const IND_TITOLI = {
   fear_greed: "Fear & Greed (sentiment)", risk_sentiment: "Sentiment globale",
   credit: "Credito high yield", systemic_risk: "Stress sistemico del credito",
   corp_profit: "Borsa vs profitti reali", sp500_pe: "Valutazione S&P (P/E)",
-  smart_money: "Istituzionali vs retail", macroquant: "Ciclo economico",
+  smart_money: "Istituzionali vs retail",
+  /* ⚠ v252 — "Ciclo economico" RIMOSSO dalla classifica su richiesta del CEO: i suoi TREDICI
+     componenti hanno già ognuno la propria scheda (dodici le avevano, il VIX gliel'ho data in
+     v251), quindi la scheda del ciclo era un tredicesimo riquadro che ripeteva gli altri
+     dodici sotto forma di barre. Il PUNTEGGIO resta calcolato dalla pipeline e resta nel
+     payload: è una sintesi utile a chi legge, ma in dashboard duplicava. */
   seasonality: "Stagionalità del mese", thermometer: "Salute tecnica del libro",
 };
 /* ⚠ v251 — IL VIX NON AVEVA UNA SCHEDA PROPRIA. Il CEO ha chiesto che ogni variabile del Ciclo
@@ -4850,19 +4855,8 @@ const FORMA_INDICATORE = {
         fonte: "il 2% è il target dichiarato della Federal Reserve" }),
       n: `CPI ${c.value}${p ? ` · PCE ${p.value}` : ""} · rilevazione ${c.date}. <b>Come si legge:</b> due misure della stessa cosa, e la Fed guarda il PCE. Finché resta sopra il 2% la Fed non ha motivo di tagliare, e senza tagli i multipli del growth restano sotto pressione: è il canale per cui questo numero arriva al tuo portafoglio.` };
   },
-  macroquant: (m) => barreComposito(m.macroquant, "Ciclo economico",
-    "Tredici indicatori del ciclo americano su una scala 0-100, dal peggiore al migliore. <b>Come si legge:</b> il punteggio d'insieme dice poco; quello che conta è CHI lo tira giù, perché è lì che il ciclo si sta rompendo per primo."),
-  "in:retail": (m) => {
-    const i = (m.indicators || []).find(x => x.key === "retail"); if (!i) return null;
-    const v = parseFloat(String(i.value).replace(",", ".").replace("%", ""));
-    return { g: scala(v, { min: -1.5, max: 1.5, unita: "%", aria: "vendite al dettaglio",
-        zone: [{ da: -1.5, a: 0, nome: "consumi in calo", colore: "var(--red)" },
-               { da: 0, a: 0.5, nome: "crescita debole", colore: "var(--yellow)" },
-               { da: 0.5, a: 1.5, nome: "consumi solidi", colore: "var(--green)" }],
-        soglie: [{ v: 0, testo: "fermo" }],
-        fonte: "bande di sola lettura; lo zero è il dato (variazione mese su mese)" }),
-      n: `${i.value} mese su mese · rilevazione ${i.date}. <b>Come si legge:</b> è il termometro più veloce dei consumi, e i consumi sono i due terzi del PIL. Un mese sotto zero non fa una tendenza; due o tre di fila anticipano il rallentamento prima che lo veda il PIL, che esce con un trimestre di ritardo.` };
-  },
+  /* v252 — la forma a barre del ciclo economico non serve più: la scheda è uscita dalla
+     classifica perché i suoi componenti hanno già le proprie. */
   risk_sentiment: (m) => conTachimetro(m.risk_sentiment, barreComposito(m.risk_sentiment, "Sentiment globale",
     "I fattori risk-on / risk-off che compongono il sentiment, dal peggiore al migliore. <b>Come si legge:</b> quando i fattori sono tutti d'accordo il sentiment è un segnale; quando sono in disaccordo il punteggio medio nasconde più di quanto mostri — e il disaccordo si vede dalla dispersione delle barre."), "sentiment globale"),
   smart_money: (m) => conTachimetro(m.smart_money, barreComposito(m.smart_money, "Istituzionali vs retail",
