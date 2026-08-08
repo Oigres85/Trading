@@ -2143,6 +2143,68 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /seoulSessionOpen\(snap\)/.test(src));
 }
 
+/* ═══ v246 — LA LEVA È UNA FOTOGRAFIA DI DUE MESI FA ══════════════════════════════════════
+   Segnalato dal CEO: "il grafico porta ancora la leva al massimo ma sembra che ci sia stata una
+   pulizia della leva (vedi calo KOSPI), forse c'è un calcolo errato."
+   IL CALCOLO NON ERA SBAGLIATO: l'ultimo punto della serie È il massimo, 100% è esatto.
+   Sbagliata era la PRESENTAZIONE: il payload scriveva "(rilevazione 2026-06-01)" lasciando la
+   sottrazione a chi legge. Sono 68 giorni, e un LLM che legge "leva al massimo" senza l'età
+   conclude sul presente. Peggio: il sistema AVEVA la prova contraria — il KOSPI a −33% dal
+   massimo — e non la collegava. Verificato su fonti aperte: i prestiti a margine coreani sono
+   passati da 38,6 T won di fine giugno a 27,4 T del 4 agosto.
+   ⚠ Non si inventa un dato più fresco: si dichiara l'età e si nomina l'evidenza contraria che
+   il payload già contiene. */
+{
+  const conLeva = (over) => suVeri(`
+    DATA.macro = DATA.macro || {};
+    ${over}
+    return buildPrompt();`);
+
+  const vecchia = `const dd = new Date(); dd.setDate(dd.getDate() - 68);
+    DATA.macro.margin_debt = { value: 1502072, peak: 1502072, pct_of_peak: 100, yoy: 49,
+      date: dd.toISOString().slice(0,10), peak_date: dd.toISOString().slice(0,10),
+      series: "FINRA debit balances (mensile)", history: [1000000,1100000,1200000,1300000,1400000,1502072] };`;
+
+  check("v246 leva: il payload dichiara l'ETÀ del dato in giorni, non solo la data",
+    /\d+ GIORNI FA/.test(conLeva(vecchia)));
+
+  /* ⚠ e la dichiara SOLO quando serve: su un dato fresco l'avviso sarebbe rumore, e il rumore
+     è il modo in cui un allarme smette di essere letto (stessa lezione del banner v245). */
+  check("v246 leva: su un dato FRESCO l'avviso sull'età non compare", (() => {
+    const oggi = `const dd = new Date();
+      DATA.macro.margin_debt = { value: 1502072, peak: 1502072, pct_of_peak: 100, yoy: 49,
+        date: dd.toISOString().slice(0,10), peak_date: dd.toISOString().slice(0,10),
+        series: "FINRA debit balances (mensile)", history: [1000000,1100000,1200000,1300000,1400000,1502072] };`;
+    return !/ETA' DEL DATO/.test(conLeva(oggi));
+  })());
+
+  /* ⚠ IL PUNTO DELLA SEGNALAZIONE: il testimone. Il KOSPI in drawdown profondo è la prova che
+     un unwind è avvenuto DOPO la rilevazione, e il payload lo possedeva già senza usarlo. */
+  check("v246 leva: con dato vecchio e KOSPI in drawdown profondo, il payload cita il testimone", (() => {
+    const p = conLeva(vecchia + `
+      DATA.watchlist = (DATA.watchlist || []).filter(r => r.ticker !== "^KS11");
+      DATA.watchlist.push({ ticker: "^KS11", name: "KOSPI", w52_dist_pct: -33.3, rs_ndx_1m: -13.6 });`);
+    return /KOSPI/.test(p) && /incompatibile con una leva ancora ai massimi/.test(p);
+  })());
+
+  // e NON lo cita quando il KOSPI sta bene: sarebbe un nesso inventato
+  check("v246 leva: con KOSPI vicino ai massimi il testimone NON viene citato", (() => {
+    const p = conLeva(vecchia + `
+      DATA.watchlist = (DATA.watchlist || []).filter(r => r.ticker !== "^KS11");
+      DATA.watchlist.push({ ticker: "^KS11", name: "KOSPI", w52_dist_pct: -2.1, rs_ndx_1m: 0.4 });`);
+    return !/incompatibile con una leva ancora ai massimi/.test(p);
+  })());
+
+  /* ⚠ la chiave del campo va LETTA dal file, non indovinata: la prima stesura cercava
+     `drawdown_52w` mentre il campo è `w52_dist_pct`, e il ramo era silenziosamente morto —
+     classe v234, un ramo irraggiungibile non è una protezione. */
+  check("v246 leva: il testimone legge il campo che esiste davvero nei dati reali", (() => {
+    const k = (reale.watchlist || []).find(r => r.ticker === "^KS11");
+    if (!k) return true;                       // se un domani non c'è, il check non pretende
+    return k.w52_dist_pct !== undefined;
+  })());
+}
+
 /* ═══ v245 — DIARIO E PORTAFOGLIO NON POSSONO DIVERGERE IN SILENZIO ═══════════════════════
    Segnalato dal CEO: "gli acquisti/vendite in diario non hanno aggiornato watchlist e
    portafoglio automaticamente." Il meccanismo c'era ed era corretto in ogni pezzo; il guasto

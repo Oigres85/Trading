@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "245";
+const BUILD_VERSION = "246";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8441,6 +8441,45 @@ function buildPrompt() {
   }
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
+/* ═══ v246 — LA LEVA È UNA FOTOGRAFIA DI DUE MESI FA, E IL KOSPI LO DICE ═══════════════════
+   Segnalato dal CEO: "il grafico porta ancora la leva al massimo ma sembra che ci sia stata una
+   pulizia della leva (vedi calo KOSPI), forse c'e' un calcolo errato".
+   IL CALCOLO NON E' SBAGLIATO: l'ultimo punto della serie E' il massimo, quindi 100% e' esatto.
+   Sbagliata era la PRESENTAZIONE. Due cose che il payload non diceva:
+   1. QUANTO E' VECCHIO. Scriveva "(rilevazione 2026-06-01)" e lasciava fare la sottrazione a chi
+      legge. Sono 68 giorni. FINRA pubblica il mese M nella terza settimana di M+1, quindi giugno
+      E' il dato piu' recente che esista — ma "piu' recente disponibile" e "attuale" sono cose
+      diverse, e un LLM che legge "leva al massimo" senza l'eta' conclude sul presente.
+   2. CHE NEL FRATTEMPO E' SUCCESSO. Il sistema HA la prova e non la collegava: il KOSPI e' in
+      drawdown profondo, ed e' l'indice dove la leva retail e' piu' visibile al mondo. Verificato
+      su fonti aperte il 07/08/2026: i prestiti a margine coreani sono passati da 38,6 T won di
+      fine giugno a 27,4 T del 4 agosto. Un deleveraging gia' avvenuto, che una serie FINRA di
+      giugno non puo' contenere per costruzione.
+   ⚠ Non si INVENTA un dato piu' fresco: si dichiara l'eta' e si nomina l'evidenza contraria che
+   il payload gia' contiene. La differenza fra un dato vecchio spacciato per attuale e un dato
+   vecchio dichiarato tale e' tutta la fiducia che si puo' avere nel sistema. */
+function etaLeva(md) {
+  try {
+    const d = new Date(String(md.date).slice(0, 10) + "T00:00:00");
+    if (isNaN(d)) return null;
+    const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+    return Math.round((oggi - d) / 86400000);
+  } catch { return null; }
+}
+/* il KOSPI come testimone: e' l'indice dove la leva retail e' piu' visibile, e il payload lo
+   porta gia' fra gli anticipatori. Qui si legge il suo DRAWDOWN, non il movimento di giornata:
+   un unwind e' una discesa profonda, non una seduta storta. */
+function testimoneLeva() {
+  const k = (DATA?.watchlist || []).find(r => r.ticker === "^KS11" || r.ticker === "KOSPI");
+  if (!k) return null;
+  /* ⚠ il campo si chiama `w52_dist_pct`, non `drawdown_52w`: il nome va LETTO dal file, non
+     indovinato. Con la chiave sbagliata la funzione tornava null e il testimone non compariva
+     mai — un ramo silenziosamente morto, la classe v234. */
+  const dd = k.w52_dist_pct != null ? Number(k.w52_dist_pct) : null;
+  if (dd == null || isNaN(dd)) return null;
+  const m1 = k.rs_ndx_1m != null ? Number(k.rs_ndx_1m) : null;
+  return { dd, m1 };
+}
   const mds = marginDebtState();
   if (mds) {
     const md = mds.md;
@@ -8449,7 +8488,19 @@ function buildPrompt() {
     const conf = mds.confirmed ? " → RISCHIO SISTEMICO (Forward P/E >20)"
       : (mds.high && mds.fpe != null) ? " (il Forward P/E attuale non conferma il livello estremo)" : "";
     const mdFlag = dqV.flags.margin_debt ? ` ${dqV.flags.margin_debt}` : "";
-    lines.push(`- Margin Debt (leva a credito, serie ${md.series || "FRED"}${md.carried ? ", carry-forward dal run precedente" : ""}): $${fmtNum.format(Math.round((md.value || 0) / 1000))} mld = ${md.pct_of_peak}% del picco storico${md.peak_date ? ` (ATH ${md.peak_date})` : ""} — ${mds.label}${conf}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""} (rilevazione ${md.date}).${mdFlag}${(() => {
+    lines.push(`- Margin Debt (leva a credito, serie ${md.series || "FRED"}${md.carried ? ", carry-forward dal run precedente" : ""}): $${fmtNum.format(Math.round((md.value || 0) / 1000))} mld = ${md.pct_of_peak}% del picco storico${md.peak_date ? ` (ATH ${md.peak_date})` : ""} — ${mds.label}${conf}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""} (rilevazione ${md.date}${(() => {
+      const g = etaLeva(md);
+      return g == null ? "" : `, ${g} GIORNI FA`;
+    })()}).${mdFlag}${(() => {
+      /* ⚠ l'eta' da sola non basta: va detto CHE COSA puo' essere successo dopo. Il KOSPI e'
+         gia' nel payload e il suo drawdown e' la misura piu' tempestiva che il sistema abbia
+         di un unwind di leva retail. Fatto, non ordine (regola C9). */
+      const g = etaLeva(md), t = testimoneLeva();
+      if (g == null || g <= 45) return "";
+      const riga = ` ⚠ ETA' DEL DATO: e' il piu' recente pubblicato da FINRA (cadenza mensile, il mese M esce nella terza settimana di M+1), ma misura ${md.date} e NON puo' contenere nulla di quanto accaduto dopo.`;
+      if (!t || t.dd == null || t.dd > -15) return riga;
+      return riga + ` Nello stesso intervallo il KOSPI — l'indice dove la leva retail e' piu' visibile, gia' fra gli anticipatori di questo payload — e' a ${fmtNum.format(Math.round(t.dd))}% dal proprio massimo a 52 settimane${t.m1 != null ? ` (${signTxt(Math.round(t.m1 * 10) / 10)} a un mese)` : ""}: un drawdown di quella profondita' e' incompatibile con una leva ancora ai massimi su quel mercato, e la serie FINRA di ${md.date} non lo puo' registrare.`;
+    })()}${(() => {
       const mp = mesiAlPicco(md.history);
       return mp && mp.conta >= mp.tot * 0.6
         ? ` ⚠ CONTESTO DI FREQUENZA: questa serie è al proprio massimo in ${mp.conta} mesi su ${mp.tot} dello storico disponibile — "al picco storico" è la CONDIZIONE ORDINARIA di una fase espansiva, non un evento. Ciò che cambia stato è la DIREZIONE (YoY ${signTxt(md.yoy)}) o un'inversione, non il livello.`
