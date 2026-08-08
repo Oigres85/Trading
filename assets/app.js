@@ -1124,7 +1124,6 @@ function renderAll() {
   renderWatchlist();
   renderPortfolioHealth();
   renderMiniCards();
-  renderRiskParams();
   recordPolymarket();   // accumula lo storico Polymarket (un punto/giorno) per la derivata Δ7g
   renderNews();
   renderBtpInfo();
@@ -2693,83 +2692,16 @@ const RP_TIER = { red: { c: "var(--red)", lab: "Protezione capitale" }, yellow: 
 /* editor soglie (v143): select + valore + spiegazione. Gli override mutano RISK_PARAMS e
    rilanciano renderAll: verdetto, chips e export AI riflettono subito la nuova soglia. */
 function rpShownValue(d) { return d ? Math.round(RISK_PARAMS[d.key] * d.scale * 100) / 100 : ""; }
-function initRiskEditor() {
-  const sel = $("#rp-param"), inp = $("#rp-value"), desc = $("#rp-desc");
-  // guardia headless (v143.1): nell'harness CI (log_verdict/test) il DOM è uno stub senza
-  // .value reale → senza questa uscita anticipata sel.value=undefined → indice NaN → crash.
-  if (!sel || !inp || !desc || typeof sel.value !== "string") return;
-  sel.innerHTML = RISK_PARAM_DEFS.map((d, i) => `<option value="${i}">${esc(d.label)}</option>`).join("");
-  const ovs = () => { try { return JSON.parse(localStorage.getItem("risk_params_overrides") || "{}"); } catch { return {}; } };
-  const show = () => {
-    const d = RISK_PARAM_DEFS[+sel.value] || RISK_PARAM_DEFS[0];
-    if (!d) return;
-    inp.value = rpShownValue(d);
-    inp.min = d.min; inp.max = d.max; inp.step = d.step;
-    const custom = ovs()[d.key] != null;
-    desc.innerHTML = `${esc(d.desc)} <span class="muted">Banda valida: ${d.min}–${d.max}${d.unit} · default ${d.def}${d.unit}${custom ? ' · <b style="color:var(--yellow)">valore PERSONALIZZATO attivo</b>' : ""}</span>`;
-  };
-  sel.addEventListener("change", show);
-  $("#rp-save")?.addEventListener("click", () => {
-    const d = RISK_PARAM_DEFS[+sel.value];
-    const v = parseFloat(String(inp.value).replace(",", "."));
-    if (!Number.isFinite(v) || v < d.min || v > d.max) { toast(`Valore fuori banda: serve ${d.min}–${d.max}${d.unit}`); return; }
-    // v169 — COERENZA CAP↔ALERT: l'alert deve presidiare la zona che il cap NON governa. Il cap
-    // ferma gli ACQUISTI, quindi oltre il cap ci si arriva solo per APPREZZAMENTO ed è lì che
-    // l'avviso serve. Un alert SOTTO il cap segnala una concentrazione che il sistema stesso ha
-    // appena autorizzato a costruire: allarme che si impara a ignorare. Si avvisa, non si blocca
-    // (indicatori non dettami): il valore viene comunque salvato.
-    const capFuturo = d.key === "capNoAdd_pct" ? v : RISK_PARAMS.capNoAdd_pct;
-    const alertFuturo = d.key === "capAlert_pct" ? v : RISK_PARAMS.capAlert_pct;
-    if (["capNoAdd_pct", "capAlert_pct"].includes(d.key) && alertFuturo < capFuturo) {
-      toast(`⚠ Alert ${fmtNum.format(alertFuturo)}% SOTTO il cap ${fmtNum.format(capFuturo)}%: il sistema ti avviserebbe di una concentrazione che ti ha appena autorizzato a comprare. L'alert va ≥ del cap — salvato lo stesso, ma valuta di allinearlo`, 9000);
-    }
-    const ov = ovs(); ov[d.key] = v / d.scale;                       // salvo in scala interna
-    ov._savedAt = new Date().toISOString();
-    localStorage.setItem("risk_params_overrides", JSON.stringify(ov));
-    pushRiskParamsCloud(ov);   // sync su GitHub se c'è token (così è uguale su Mac e iPhone)
-    applyRiskOverrides(); renderAll(); show();
-    toast(`${d.label} → ${v}${d.unit} ✓ (motore, verdetto ed export usano subito la nuova soglia; sincronizzata sui tuoi dispositivi se c'è il token GitHub)`);
-  });
-  $("#rp-reset")?.addEventListener("click", () => {
-    const d = RISK_PARAM_DEFS[+sel.value];
-    const ov = ovs(); delete ov[d.key];
-    ov._savedAt = new Date().toISOString();
-    localStorage.setItem("risk_params_overrides", JSON.stringify(ov));
-    pushRiskParamsCloud(ov);
-    RISK_PARAMS[d.key] = d.scale === 100 ? d.def / 100 : d.def;
-    applyRiskOverrides(); renderAll(); show();
-    toast(`${d.label} riportato al default (${d.def}${d.unit})`);
-  });
-  show();
-}
 
-function renderRiskParams() {
-  const grid = $("#risk-params-grid");
-  if (!grid || !DATA) return;
-  const rules = riskRulesRegistry();
-  // v218 — erano 15 chip tutte uguali: per sapere che cosa ti vincola OGGI andavano lette una
-  // per una. Ora sono barre ordinate — prima le regole ATTIVE (quelle che stanno effettivamente
-  // limitando cosa puoi fare), poi le altre — e il colore è la gravità già dichiarata dal tier.
-  const COL = { red: "var(--red)", yellow: "var(--yellow)", green: "var(--green)" };
-  const ord = rules.map((r, i) => ({ r, i, peso: (r.active ? 100 : 0) + ({ red: 3, yellow: 2, green: 1 }[r.tier] || 0) }))
-    .sort((a, b) => b.peso - a.peso);
-  const attive = rules.filter(r => r.active).length;
-  grid.innerHTML = `<div class="muted rp-sommario">${attive === 0
-      ? "<b>Nessuna regola sta vincolando le tue scelte in questo momento.</b>"
-      : `<b>${attive} regol${attive === 1 ? "a" : "e"} su ${rules.length} ${attive === 1 ? "sta limitando" : "stanno limitando"} cosa puoi fare oggi</b> — sono quelle in cima.`}</div>`
-    + barreOrdinate(ord.map(({ r, i }) => ({
-        nome: r.label, valore: r.active ? 100 : 22, colore: r.active ? COL[r.tier] : "var(--border)",
-        tk: String(i), testo: `${r.active ? "ATTIVA · " : ""}${r.th}`,
-      })));
-  grid.querySelectorAll("[data-obar-tk]").forEach(e => {
-    e.classList.add("obar-click"); e.setAttribute("tabindex", "0"); e.setAttribute("role", "button");
-    const rr = ord[[...grid.querySelectorAll("[data-obar-tk]")].indexOf(e)];
-    e.setAttribute("title", esc(rr.r.state));
-    const apri = () => openRiskRuleModal(rr.r);
-    e.addEventListener("click", apri);
-    e.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); apri(); } });
-  });
-}
+/* ⚠ v253 — renderRiskParams() e initRiskEditor() RIMOSSE. Scrivevano su #risk-params-grid
+   e sui cinque campi dell'editor soglie: contenitori che non esistono più da quando il CEO
+   ha chiesto di togliere la scheda "Parametri di Rischio del Fondo" (restano solo il
+   Calcolatore PMC e il Calcolo vendite). Grazie a `?.` non davano errore: giravano a ogni
+   render e scrivevano nel vuoto. Ricevuta scritta PRIMA del taglio: dentro i confini di
+   entrambe non c'era NESSUNA altra dichiarazione di primo livello — è il controllo che in
+   v238 guardava solo le `function` e lasciò passare un `let`, uccidendo la pagina.
+   RISK_PARAMS, rpShownValue e openRiskRuleModal RESTANO: hanno altri consumatori. */
+
 function openRiskRuleModal(r) {
   if (!r) return;
   const tier = RP_TIER[r.tier];
@@ -3068,6 +3000,58 @@ function rigaCadenza(chiave, dataRilevazione) {
   const it = (s) => { const [a, m, g] = [s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)]; return `${g}/${m}/${a}`; };
   return `rilevazione ${it(c.rilevato)} (${c.eta} giorni fa) · prossimo atteso ${it(c.prossimo)}` +
          (c.scaduto ? " ⚠ ERA ATTESO E NON È ARRIVATO" : "") + ` · ${c.fonte}, ${c.passo}`;
+}
+
+/* ═══ v253 — LE CARD DI MERCATO NON DICEVANO QUANDO SONO STATE RILEVATE ═══════════════
+   Misurato sulla pagina viva: 6 card su 27 portavano la riga di cadenza, 21 no. Non è che
+   mancasse il dato — VIX, Fear & Greed, EUR/USD, put/call, DXY, curva, spread di credito e
+   compagnia non hanno un calendario di pubblicazione: si aggiornano a OGNI run della
+   pipeline. Ma "si aggiorna spesso" non è ciò che il CEO ha chiesto: ha chiesto di sapere
+   di quando è il numero che sta guardando, e su quelle 21 card la risposta non c'era.
+   Gli orari qui sotto sono il calendario DICHIARATO in .github/workflows/update-data.yml,
+   non una stima — e un check li rilegge da quel file, perché un registro copiato a mano
+   invecchia da solo (è la classe C10 e degli indici fissi del red team). */
+const RUN_FISSI_UTC = [[4, 0], [5, 0], [8, 0], [9, 0], [13, 30], [14, 30], [15, 0], [16, 0], [19, 0], [20, 0], [21, 0]];
+const RUN_ORARIO_UTC = { da: 13, a: 22, feriali: true };   // cron "0 13-22 * * 1-5"
+
+/* prossimo run atteso della pipeline, in UTC. Considera sia i run fissi sia quello orario
+   dei giorni feriali; guarda fino a 48 ore avanti e poi si arrende invece di indovinare. */
+function prossimoRunPipeline(adesso = new Date()) {
+  /* ⚠ la prima stesura avanzava a passi di 10 minuti da ADESSO: il minuto restava congruo a
+     quello di partenza, quindi alle 18:53 la sequenza era 19:03, 19:13… e il run delle 19:00
+     non veniva MAI incontrato. Si costruiscono invece i candidati del giorno, che è ciò che
+     il cron fa davvero. */
+  for (let g = 0; g <= 2; g++) {
+    const base = new Date(adesso.getTime() + g * 86400000);
+    const gi = base.getUTCDay(), feriale = gi >= 1 && gi <= 5;
+    const cand = RUN_FISSI_UTC.map(([H, M]) => [H, M]);
+    if (RUN_ORARIO_UTC.feriali && feriale) {
+      for (let h = RUN_ORARIO_UTC.da; h <= RUN_ORARIO_UTC.a; h++) cand.push([h, 0]);
+    }
+    const oggi = cand
+      .map(([H, M]) => Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate(), H, M))
+      .filter((ms) => ms > adesso.getTime())
+      .sort((a, b) => a - b);
+    if (oggi.length) return new Date(oggi[0]);
+  }
+  return null;
+}
+
+/* la riga di freschezza per un dato che si aggiorna a ogni run (non ha un calendario di
+   pubblicazione). Si basa su DATA.updated_at, che è il timestamp REALE del run che ha
+   prodotto questo file — non sull'orologio del browser. */
+function rigaFreschezzaMercato() {
+  const iso = DATA && DATA.updated_at;
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d)) return "";
+  const oreFa = Math.max(0, Math.round((Date.now() - d.getTime()) / 3600000));
+  const hhmm = (x) => x.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+  const p = prossimoRunPipeline();
+  return `rilevazione al run delle ${hhmm(d)} del ${d.toLocaleDateString("it-IT").slice(0, 5)}`
+       + ` (${oreFa === 0 ? "meno di un'ora fa" : oreFa === 1 ? "1 ora fa" : `${oreFa} ore fa`})`
+       + (p ? ` · prossimo run atteso alle ${hhmm(p)}` : "")
+       + " · dato di mercato, si aggiorna a ogni run";
 }
 
 function marginDebtState() {
@@ -4584,7 +4568,16 @@ function indicatoriClassifica() {
      stagionalità", che pero' ha i 12 mesi disegnati — si tiene quello col grafico e si toglie il
      doppione, che diceva lo stesso fatto con meno informazione (classe v184). */
   const FUORI = new Set(["thermometer", "futures", "seasonality"]);
-  return out.filter(x => !FUORI.has(x.k)).sort((a, b) => a.score - b.score);
+  /* ⚠ v253 — LA FRESCHEZZA SI ASSEGNA IN UN PUNTO SOLO, QUI IN FONDO. La prima stesura la
+     agganciava ai singoli `out.push`: ce ne sono NOVE sparsi per la funzione, e un decimo
+     aggiunto un domani nascerebbe senza — è lo stesso motivo per cui il filtro FUORI qui
+     sopra è stato spostato in fondo in v238 ("futures" veniva aggiunto DOPO e sopravviveva).
+     Chi ha già un calendario di pubblicazione (rigaCadenza) se lo tiene; tutti gli altri
+     sono dati che rinascono a ogni run, e questa riga lo dice. */
+  const mercato = rigaFreschezzaMercato();
+  return out.filter(x => !FUORI.has(x.k))
+    .map(x => (x.cadenza ? x : { ...x, cadenza: mercato }))
+    .sort((a, b) => a.score - b.score);
 }
 /* ═══ v233 — QUELLO CHE IL POPUP AVEVA DENTRO, PORTATO FUORI ════════════════════════════════
    Richiesta CEO: "i grafici riportali all'originaria forma di mini tab e se il rispettivo pop up
@@ -10324,7 +10317,6 @@ applicaOrdineSezioni();  // ordine gia' noto a questo browser: subito, senza asp
 loadOrdineSezioniCloud();// e poi quello del repo, se piu' recente → Mac e iPhone allineati
 loadStatoPortafoglioCloud();   // v244: cassa, posizioni manuali e BTP dal repo — la sincronizzazione che mancava
 loadRiskParamsCloud();   // sincronizza i parametri di rischio del CEO (config/risk_params.json) — cap/veto uguali su ogni device
-initRiskEditor();       // editor soglie di rischio (v143): select+valore+spiegazione
 // ricarica completa (tecnici, news, storico) ogni 5 minuti
 setInterval(() => loadData(), 5 * 60 * 1000);
 // prezzi live ogni 60 secondi

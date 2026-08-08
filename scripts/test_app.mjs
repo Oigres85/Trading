@@ -21,6 +21,15 @@ function el() {
     appendChild() {}, remove() {}, after() {}, focus() {}, click() {},
     scrollIntoView() {}, querySelector: () => el(), querySelectorAll: () => [],
     dispatchEvent() {}, closest: () => null, setAttribute() {},
+    /* ⚠ v253 — `children` mancava, e renderTable/renderWatchlist lo iterano per riallineare
+       le intestazioni: nel gate di render lanciavano "head.children is not iterable", che NON
+       è un difetto di produzione (in browser le due tabelle si disegnano, misurate 10 righe
+       portafoglio e 27 watchlist) ma un buco dello stub. Uno stub incompleto produce un
+       fallimento che sembra un bug e un bug che sembra uno stub incompleto: va chiuso, non
+       aggirato escludendo le due funzioni dal gate. */
+    children: [], childNodes: [], parentNode: null, insertBefore() {}, removeChild() {},
+    getAttribute: () => null, hasAttribute: () => false, contains: () => false,
+    getBoundingClientRect: () => ({ width: 0, height: 0, top: 0, left: 0, right: 0, bottom: 0 }),
   };
 }
 const storage = new Map();
@@ -830,15 +839,17 @@ check("v143 risk editor: l'override del cap cambia DAVVERO il verdetto (posizion
 check("v143.1 rpShownValue null-safe: def assente → '' (non crasha su d.key)", run(`
   return rpShownValue(undefined) === "" && rpShownValue(null) === ""
       && rpShownValue(RISK_PARAM_DEFS[0]) === RISK_PARAMS.capNoAdd_pct`));
-check("v143.1 initRiskEditor: con select senza .value stringa (stub CI) esce senza eccezioni", run(`
-  const orig = document.querySelector;
-  document.querySelector = (sel) => (sel === "#rp-param" || sel === "#rp-value" || sel === "#rp-desc")
-    ? { addEventListener() {}, innerHTML: "" }   // stub SENZA .value (come l'harness log_verdict)
-    : orig(sel);
-  let ok = true;
-  try { initRiskEditor(); } catch { ok = false; }
-  document.querySelector = orig;
-  return ok`));
+/* ⚠ v253 — INVARIANTE ROVESCIATO, non zittito. initRiskEditor() e renderRiskParams() sono
+   state rimosse: scrivevano su contenitori spariti quando il CEO ha tolto la scheda
+   "Parametri di Rischio del Fondo". Il check ora presidia il TAGLIO — se qualcuno le
+   reintroduce senza rimettere i contenitori, tornano due funzioni che girano nel vuoto. */
+check("v253 le funzioni dell'editor soglie sono uscite insieme alla loro scheda", (() => {
+  const app = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const html2 = readFileSync(join(ROOT, "index.html"), "utf8");
+  const ci = /function (?:initRiskEditor|renderRiskParams)\b/.test(app);
+  const contenitore = /id="risk-params-grid"/.test(html2);
+  return ci === contenitore;      // o ci sono entrambe, o nessuna delle due
+})());
 
 /* ---------- v144: screener idee di rotazione + gradazione veto ---------- */
 check("v144 screener: il blocco IDEE DI ROTAZIONE compare nel prompt con i dati del candidato", run(`
@@ -2835,12 +2846,36 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     DATA = _d; cashEur = _c; recomputeTotals();
     return esito;`);
 
-  for (const fn of ["renderStruttura", "renderMacroGrafici", "renderIndicatori",
-                    "renderLevaStagione", "renderRotazione", "renderStress"]) {
+  /* ⚠ v253 — L'ELENCO SI RICAVA DA renderAll, NON SI SCRIVE A MANO. Il gate v239 nasceva da
+     una pagina andata MORTA in produzione con 219 test verdi, e copriva SEI funzioni: ma
+     quella che gira davvero al caricamento è renderAll, che ne chiama oltre venti. Una
+     chiamata aggiunta lì domani nascerebbe fuori dal gate — è il registro che invecchia da
+     solo, la classe che questo progetto ha già pagato con C10, con gli indici 16/17 del red
+     team e con la chiave morta "in:pmi". Ora la lista si legge dal corpo di renderAll. */
+  const corpo = (() => {
+    const i = src.indexOf("function renderAll(");
+    if (i < 0) return "";
+    let d = 0;
+    for (let j = i; j < src.length; j++) {
+      if (src[j] === "{") d++;
+      else if (src[j] === "}") { d--; if (d === 0) return src.slice(i, j + 1); }
+    }
+    return "";
+  })();
+  const daRenderAll = [...new Set([...corpo.matchAll(/^\s*(?:if \([^)]*\) )?([a-zA-Z][a-zA-Z0-9_]*)\(\);/gm)].map(m => m[1]))]
+    .filter(f => new RegExp(`^(?:async )?function ${f}\\b`, "m").test(src));
+  check("v253 il gate di render copre TUTTE le chiamate di renderAll (elenco ricavato, non scritto a mano)",
+    daRenderAll.length >= 15);
+
+  const CHIAMATE = [...new Set(["renderStruttura", "renderMacroGrafici", "renderIndicatori",
+                    "renderLevaStagione", "renderRotazione", "renderStress", ...daRenderAll])];
+  const rotte = [];
+  for (const fn of CHIAMATE) {
     const esito = renderGira(fn);
-    check(`v239 render: ${fn}() gira sui dati veri senza eccezioni`, esito === true);
-    if (esito !== true) console.log(`  ⚠ ${fn}:`, esito);
+    if (esito !== true) rotte.push(`${fn}: ${esito}`);
   }
+  check(`v239+v253 render: le ${CHIAMATE.length} funzioni della catena girano sui dati veri senza eccezioni`, rotte.length === 0);
+  for (const r of rotte) console.log("  ⚠", r);
 }
 
 /* ═══ LA SUITE CONTROLLA SE STESSA ═══ ═════════════════════════════════════════════════
@@ -2889,6 +2924,37 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     tutto.includes("/* ---------- report ----------")
     && !/^\s*check\(/m.test(dopoReport));
 }
+
+/* ═══ v253 — il registro degli orari di run NON deve invecchiare da solo ═══════════════
+   RUN_FISSI_UTC in app.js è una COPIA del cron di .github/workflows/update-data.yml, e questo
+   progetto ha già pagato più volte i registri copiati a mano (C10, gli indici fissi 16/17 del
+   red team, la chiave morta "in:pmi" di v196). Il check rilegge il file del workflow: se
+   qualcuno cambia il cron, le card macro smettono di dire il vero e questo test lo dice. */
+{
+  const yml = readFileSync(join(ROOT, ".github", "workflows", "update-data.yml"), "utf8");
+  const fissi = [...yml.matchAll(/- cron: "(\d+) (\d+) \* \* \*"/g)].map(m => [+m[2], +m[1]]);
+  const src3 = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const tab = src3.match(/const RUN_FISSI_UTC = \[([^\]]*(?:\][^;]*?)*?)\];/);
+  const dichiarati = tab ? [...tab[1].matchAll(/\[(\d+),\s*(\d+)\]/g)].map(m => [+m[1], +m[2]]) : [];
+  const k = (a) => a.map(x => x.join(":")).sort().join(" ");
+  check("v253 gli orari di run nelle card macro combaciano col cron del workflow",
+    fissi.length > 0 && dichiarati.length > 0 && k(fissi) === k(dichiarati));
+  if (k(fissi) !== k(dichiarati)) console.log("  ⚠ workflow:", k(fissi), "\n  ⚠ app.js:  ", k(dichiarati));
+  const orario = /- cron: "0 (\d+)-(\d+) \* \* 1-5"/.exec(yml);
+  const oDich = /RUN_ORARIO_UTC = \{ da: (\d+), a: (\d+)/.exec(src3);
+  check("v253 anche la finestra del run orario feriale combacia col cron",
+    !!orario && !!oDich && orario[1] === oDich[1] && orario[2] === oDich[2]);
+}
+
+check("v253 prossimoRunPipeline trova davvero il run successivo (la prima stesura saltava le 19:00)", run(`
+  const t = new Date(Date.UTC(2026, 7, 8, 18, 53, 0));      // sabato: valgono solo i run fissi
+  const p = prossimoRunPipeline(t);
+  return p != null && p.getTime() === Date.UTC(2026, 7, 8, 19, 0, 0)`));
+
+check("v253 nel weekend NON si annuncia il run orario feriale", run(`
+  const sab = new Date(Date.UTC(2026, 7, 8, 13, 5, 0));     // sabato 13:05 UTC
+  const p = prossimoRunPipeline(sab);
+  return p != null && p.getUTCHours() === 13 && p.getUTCMinutes() === 30`));
 
 /* ═══ v253 — il payload DICHIARA quando il libro è indietro rispetto al repo ═══
    Trovato eseguendo il pacchetto su me stesso: config/holdings.json aveva 12 posizioni e il
