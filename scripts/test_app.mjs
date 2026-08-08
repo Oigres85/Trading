@@ -1607,7 +1607,6 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /* v243 — "campanelli d'allarme" rimossa su richiesta del CEO: la guardia si SPOSTA sul
        contenitore portante rimasto nella vista, non si cancella con la sezione (classe v203). */
     ["classifica indicatori", 'id="mg-tutti"'],
-    ["parametri di rischio (griglia)", 'id="risk-params-grid"'],
     // v209 — protegge l'ACCESSO ai dettagli macro, non più il bottone della topbar: quello è
     // stato rimosso perché duplicava questo, e la porta è ora una sola, nella colonna centrale.
     // v219 — il bottone "Dettagli macro" è stato rimosso su richiesta del CEO: il popup a 39
@@ -1618,7 +1617,13 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     ["termometri di stress", 'id="mg-stress"'],
     ["leva e stagionalità", 'id="mg-leva"'],
     ["riquadri patrimonio", 'id="kpi-grid"'],
-    ["parametri di rischio", 'id="risk-params-card"'],
+    /* ⚠ v249 — la card "Parametri di Rischio del Fondo" è stata RIMOSSA su richiesta del CEO
+       ("avevo detto di lasciare solo calcolatore pmc e calcolo vendite"). Il registro NON è
+       stato zittito: gli è cambiato il contenuto, e al posto della card entrano i due strumenti
+       che devono sopravvivere. Se un domani un taglio si portasse via anche quelli, il gate lo
+       direbbe — che è esattamente il motivo per cui questo registro esiste (v204). */
+    ["calcolatore PMC", 'id="open-pmc"'],
+    ["calcolo vendite", 'id="open-sell"'],
     ["modale grafico/pannelli", 'id="chart-modal"'],
     // v205 — la vista struttura e la shell a due colonne. Cinque contenitori vicini fra loro:
     // esattamente la configurazione in cui un taglio ne porta via uno per sbaglio.
@@ -2227,66 +2232,33 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /Sharpe Ratio portafoglio/.test(pay) && !/target istituzionale/.test(pay) && !/vs target/.test(pay));
 }
 
-/* ═══ v246 — LA LEVA È UNA FOTOGRAFIA DI DUE MESI FA ══════════════════════════════════════
-   Segnalato dal CEO: "il grafico porta ancora la leva al massimo ma sembra che ci sia stata una
-   pulizia della leva (vedi calo KOSPI), forse c'è un calcolo errato."
-   IL CALCOLO NON ERA SBAGLIATO: l'ultimo punto della serie È il massimo, 100% è esatto.
-   Sbagliata era la PRESENTAZIONE: il payload scriveva "(rilevazione 2026-06-01)" lasciando la
-   sottrazione a chi legge. Sono 68 giorni, e un LLM che legge "leva al massimo" senza l'età
-   conclude sul presente. Peggio: il sistema AVEVA la prova contraria — il KOSPI a −33% dal
-   massimo — e non la collegava. Verificato su fonti aperte: i prestiti a margine coreani sono
-   passati da 38,6 T won di fine giugno a 27,4 T del 4 agosto.
-   ⚠ Non si inventa un dato più fresco: si dichiara l'età e si nomina l'evidenza contraria che
-   il payload già contiene. */
+/* ═══ v249 — IL MARGIN DEBT È USCITO DAL PAYLOAD, e le guardie v246 cambiano invariante ═══
+   In v246 avevo aggiunto l'età in giorni e il testimone KOSPI perché il dato di 68 giorni non
+   fosse letto come attuale. Non è bastato: l'etichetta "Espansione leva ESTREMA → RISCHIO
+   SISTEMICO" resta la prima cosa che si legge, e il CEO l'ha rilevato da solo ("forse è troppo
+   datato e diventa fuorviante"). Ora è fuori dal payload e resta in dashboard.
+   ⚠ Le due guardie v246 NON sono state zittite: gli è cambiato l'invariante. Prima chiedevano
+   che l'età fosse dichiarata NEL PAYLOAD; ora chiedono che il payload non porti più quel dato
+   E che il MOTORE continui a calcolarlo, perché la card lo usa. Se un domani qualcuno lo
+   rimettesse senza dichiararne l'età, la prima guardia lo direbbe. */
 {
-  const conLeva = (over) => suVeri(`
-    DATA.macro = DATA.macro || {};
-    ${over}
-    return buildPrompt();`);
+  const payMD = suVeri("return buildPrompt();");
 
-  const vecchia = `const dd = new Date(); dd.setDate(dd.getDate() - 68);
-    DATA.macro.margin_debt = { value: 1502072, peak: 1502072, pct_of_peak: 100, yoy: 49,
-      date: dd.toISOString().slice(0,10), peak_date: dd.toISOString().slice(0,10),
-      series: "FINRA debit balances (mensile)", history: [1000000,1100000,1200000,1300000,1400000,1502072] };`;
+  check("v249 leva: il margin debt non è più nel payload",
+    !/Margin Debt \(leva a credito/.test(payMD) && !/Espansione leva/.test(payMD));
 
-  check("v246 leva: il payload dichiara l'ETÀ del dato in giorni, non solo la data",
-    /\d+ GIORNI FA/.test(conLeva(vecchia)));
-
-  /* ⚠ e la dichiara SOLO quando serve: su un dato fresco l'avviso sarebbe rumore, e il rumore
-     è il modo in cui un allarme smette di essere letto (stessa lezione del banner v245). */
-  check("v246 leva: su un dato FRESCO l'avviso sull'età non compare", (() => {
-    const oggi = `const dd = new Date();
-      DATA.macro.margin_debt = { value: 1502072, peak: 1502072, pct_of_peak: 100, yoy: 49,
-        date: dd.toISOString().slice(0,10), peak_date: dd.toISOString().slice(0,10),
-        series: "FINRA debit balances (mensile)", history: [1000000,1100000,1200000,1300000,1400000,1502072] };`;
-    return !/ETA' DEL DATO/.test(conLeva(oggi));
+  /* ⚠ il MOTORE deve continuare a calcolarlo: la card della dashboard lo mostra, e toglierlo
+     dal calcolo sarebbe stato un taglio che si porta via un fatto (classe v208). */
+  check("v249 leva: il motore continua a calcolarlo per la dashboard", (() => {
+    const st = suVeri("const s = marginDebtState(); return s ? JSON.stringify({v: s.md && s.md.value, l: s.label}) : null;");
+    if (!st) return (reale.macro || {}).margin_debt == null;   // se il dato non c'è, nulla da pretendere
+    const o = JSON.parse(st);
+    return o.v != null && !!o.l;
   })());
 
-  /* ⚠ IL PUNTO DELLA SEGNALAZIONE: il testimone. Il KOSPI in drawdown profondo è la prova che
-     un unwind è avvenuto DOPO la rilevazione, e il payload lo possedeva già senza usarlo. */
-  check("v246 leva: con dato vecchio e KOSPI in drawdown profondo, il payload cita il testimone", (() => {
-    const p = conLeva(vecchia + `
-      DATA.watchlist = (DATA.watchlist || []).filter(r => r.ticker !== "^KS11");
-      DATA.watchlist.push({ ticker: "^KS11", name: "KOSPI", w52_dist_pct: -33.3, rs_ndx_1m: -13.6 });`);
-    return /KOSPI/.test(p) && /incompatibile con una leva ancora ai massimi/.test(p);
-  })());
-
-  // e NON lo cita quando il KOSPI sta bene: sarebbe un nesso inventato
-  check("v246 leva: con KOSPI vicino ai massimi il testimone NON viene citato", (() => {
-    const p = conLeva(vecchia + `
-      DATA.watchlist = (DATA.watchlist || []).filter(r => r.ticker !== "^KS11");
-      DATA.watchlist.push({ ticker: "^KS11", name: "KOSPI", w52_dist_pct: -2.1, rs_ndx_1m: 0.4 });`);
-    return !/incompatibile con una leva ancora ai massimi/.test(p);
-  })());
-
-  /* ⚠ la chiave del campo va LETTA dal file, non indovinata: la prima stesura cercava
-     `drawdown_52w` mentre il campo è `w52_dist_pct`, e il ramo era silenziosamente morto —
-     classe v234, un ramo irraggiungibile non è una protezione. */
-  check("v246 leva: il testimone legge il campo che esiste davvero nei dati reali", (() => {
-    const k = (reale.watchlist || []).find(r => r.ticker === "^KS11");
-    if (!k) return true;                       // se un domani non c'è, il check non pretende
-    return k.w52_dist_pct !== undefined;
-  })());
+  // e le funzioni che dichiarano l'età restano vive: servono alla card, non erano del payload
+  check("v249 leva: etaLeva e testimoneLeva sopravvivono al taglio",
+    /function etaLeva\(/.test(src) && /function testimoneLeva\(/.test(src));
 }
 
 /* ═══ v245 — DIARIO E PORTAFOGLIO NON POSSONO DIVERGERE IN SILENZIO ═══════════════════════

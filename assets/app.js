@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "248";
+const BUILD_VERSION = "249";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8445,33 +8445,17 @@ function testimoneLeva() {
   const m1 = k.rs_ndx_1m != null ? Number(k.rs_ndx_1m) : null;
   return { dd, m1 };
 }
-  const mds = marginDebtState();
-  if (mds) {
-    const md = mds.md;
-    // etichetta 1:1 con la card e il popup della dashboard (marginDebtState) — niente hardcode.
-    // La label già esprime lo stato; conf aggiunge solo la sfumatura di conferma senza duplicare.
-    const conf = mds.confirmed ? " → RISCHIO SISTEMICO (Forward P/E >20)"
-      : (mds.high && mds.fpe != null) ? " (il Forward P/E attuale non conferma il livello estremo)" : "";
-    const mdFlag = dqV.flags.margin_debt ? ` ${dqV.flags.margin_debt}` : "";
-    lines.push(`- Margin Debt (leva a credito, serie ${md.series || "FRED"}${md.carried ? ", carry-forward dal run precedente" : ""}): $${fmtNum.format(Math.round((md.value || 0) / 1000))} mld = ${md.pct_of_peak}% del picco storico${md.peak_date ? ` (ATH ${md.peak_date})` : ""} — ${mds.label}${conf}${md.yoy != null ? `, YoY ${signTxt(md.yoy)}` : ""} (rilevazione ${md.date}${(() => {
-      const g = etaLeva(md);
-      return g == null ? "" : `, ${g} GIORNI FA`;
-    })()}).${mdFlag}${(() => {
-      /* ⚠ l'eta' da sola non basta: va detto CHE COSA puo' essere successo dopo. Il KOSPI e'
-         gia' nel payload e il suo drawdown e' la misura piu' tempestiva che il sistema abbia
-         di un unwind di leva retail. Fatto, non ordine (regola C9). */
-      const g = etaLeva(md), t = testimoneLeva();
-      if (g == null || g <= 45) return "";
-      const riga = ` ⚠ ETA' DEL DATO: e' il piu' recente pubblicato da FINRA (cadenza mensile, il mese M esce nella terza settimana di M+1), ma misura ${md.date} e NON puo' contenere nulla di quanto accaduto dopo.`;
-      if (!t || t.dd == null || t.dd > -15) return riga;
-      return riga + ` Nello stesso intervallo il KOSPI — l'indice dove la leva retail e' piu' visibile, gia' fra gli anticipatori di questo payload — e' a ${fmtNum.format(Math.round(t.dd))}% dal proprio massimo a 52 settimane${t.m1 != null ? ` (${signTxt(Math.round(t.m1 * 10) / 10)} a un mese)` : ""}: un drawdown di quella profondita' e' incompatibile con una leva ancora ai massimi su quel mercato, e la serie FINRA di ${md.date} non lo puo' registrare.`;
-    })()}${(() => {
-      const mp = mesiAlPicco(md.history);
-      return mp && mp.conta >= mp.tot * 0.6
-        ? ` ⚠ CONTESTO DI FREQUENZA: questa serie è al proprio massimo in ${mp.conta} mesi su ${mp.tot} dello storico disponibile — "al picco storico" è la CONDIZIONE ORDINARIA di una fase espansiva, non un evento. Ciò che cambia stato è la DIREZIONE (YoY ${signTxt(md.yoy)}) o un'inversione, non il livello.`
-        : "";
-    })()} Leva alta/estrema = mercato fragile, le discese possono innescare margin call a catena (drawdown più violenti sul tech ad alta beta).`);
-  }
+    /* v249 — MARGIN DEBT FUORI DAL PAYLOAD, su dubbio del CEO: "forse è troppo datato e
+       diventa fuorviante per l'analisi". Aveva ragione, e la misura lo conferma: la rilevazione
+       è di 68 giorni (FINRA pubblica il mese M nella terza settimana di M+1, quindi giugno È il
+       dato più recente che esista) MA veniva presentata come uno STATO — "Espansione leva
+       ESTREMA → RISCHIO SISTEMICO" — su una variabile che nel frattempo si è mossa molto: nello
+       stesso intervallo i prestiti a margine coreani sono passati da 38,6 a 27,4 T won.
+       ⚠ Non è un dato INAFFIDABILE: è onesto ma LENTO, etichettato come se fosse attuale. v246
+       aveva aggiunto l'età e il testimone KOSPI, e non è bastato: l'etichetta di rischio
+       sistemico resta la prima cosa che si legge. Fuori dal payload; RESTA in dashboard, dove
+       il CEO lo guarda sapendo di che mese è. `etaLeva`/`testimoneLeva` restano: le usa la card,
+       e portarsele via sarebbe il taglio che prende il vicino (classe v201-v204). */
   if (m.forward_pe && m.forward_pe.value != null) {
     const fp = m.forward_pe;
     // v169 — l'escalation NON può poggiare su un dato vecchio senza dirlo. Il Forward P/E viene
