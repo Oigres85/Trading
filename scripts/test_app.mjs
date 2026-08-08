@@ -2232,6 +2232,116 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /Sharpe Ratio portafoglio/.test(pay) && !/target istituzionale/.test(pay) && !/vs target/.test(pay));
 }
 
+/* ═══ v250 — OGNI DATO MACRO DICE QUANDO ARRIVA IL PROSSIMO ══════════════════════════════
+   Richiesta CEO dopo il dubbio sul margin debt: "fornisci data aggiornamento dato e prossimo
+   aggiornamento". È la risposta strutturale a quel dubbio — un dato di 68 giorni con scritto
+   quando esce il prossimo è informazione; lo stesso dato senza quella riga è una trappola.
+   ⚠ Le cadenze sono il CALENDARIO DICHIARATO DALLE FONTI (BLS, BEA, Census, FINRA), non stime:
+   ogni voce porta scritto da dove viene la regola. Dove non c'è calendario si tace invece di
+   inventare una data — classe v240, una data indovinata è peggio di una assente. */
+{
+  check("v250 cadenza: il payload dichiara rilevazione, età e prossimo atteso", (() => {
+    const p = suVeri("return buildPrompt();");
+    const righe = p.split("\n").filter(l => /prossimo atteso/.test(l));
+    if (righe.length < 3) return false;
+    // ogni riga deve portare tutte e tre le informazioni, non una sola
+    return righe.every(l => /rilevazione \d{2}\/\d{2}\/\d{4}/.test(l)
+      && /\(\d+ giorni fa\)/.test(l) && /prossimo atteso \d{2}\/\d{2}\/\d{4}/.test(l));
+  })());
+
+  check("v250 cadenza: la fonte del calendario è dichiarata, non implicita", (() => {
+    const p = suVeri("return buildPrompt();");
+    const righe = p.split("\n").filter(l => /prossimo atteso/.test(l));
+    return righe.length > 0 && righe.every(l => /· (BLS|BEA|Census|FINRA|UMich via FRED), (mensile|trimestrale)/.test(l));
+  })());
+
+  /* ⚠ dove la fonte non ha un calendario noto NON si inventa una data: si tiene la nota
+     generica. Un "prossimo atteso" inventato sarebbe la classe v240 esatta. */
+  check("v250 cadenza: senza calendario noto non si inventa una data", (() => {
+    const r = run(`return JSON.stringify([rigaCadenza("chiave_inesistente", "2026-01-01"), rigaCadenza("cpi", null)]);`);
+    const [a, b] = JSON.parse(r);
+    return a === "" && b === "";
+  })());
+
+  // e il calcolo del prossimo deve muoversi con la rilevazione, non essere fisso
+  check("v250 cadenza: il prossimo atteso dipende dalla data di rilevazione", (() => {
+    const r = run(`return JSON.stringify([rigaCadenza("cpi", "2026-01-01"), rigaCadenza("cpi", "2026-06-01")]);`);
+    const [a, b] = JSON.parse(r);
+    return a && b && a !== b;
+  })());
+
+  // le card della dashboard portano la stessa riga
+  check("v250 cadenza: le card macro mostrano la riga di cadenza", (() => {
+    const html = suVeri(`
+      let out = "";
+      const box = { set innerHTML(v) { out = v; }, get innerHTML() { return out; },
+                    querySelector: () => null, querySelectorAll: () => [] };
+      const altro = () => ({ innerHTML: "", textContent: "", querySelector: () => null,
+                             querySelectorAll: () => [], addEventListener() {} });
+      const vero = document.querySelector;
+      document.querySelector = (sel) => sel === "#mg-tutti" ? box : altro();
+      try { renderIndicatori(); } finally { document.querySelector = vero; }
+      return out;`);
+    return /class="mg-cad muted"/.test(html) && /prossimo atteso/.test(html);
+  })());
+}
+
+/* ═══ v250 — N SCRITTURE SULLO STESSO FILE SONO UN ERRORE DI DISEGNO ══════════════════════
+   Segnalato dal CEO: "anche se applico rimane sempre il banner", e la concentrazione non si
+   aggiornava. MISURATO sul repo: config/holdings.json era ancora a 8 posizioni.
+   CAUSA MIA, dal v245: il ciclo chiamava `applicaOpAlPortafoglio` una volta per operazione con
+   400 ms in mezzo. Quella funzione NON restituiva la promessa di `editHoldings` — quindi non
+   c'era nulla da attendere — e 400 ms non bastano per lettura SHA + scrittura sull'API GitHub.
+   Le quattro scritture leggevano lo STESSO sha e si annullavano: nessuna arrivava.
+   ⚠ E l'esito era MUTO: `editHoldings` tornava `undefined` sia in caso di successo sia di 409,
+   quindi il chiamante ridisegnava il banner come se avesse funzionato. */
+{
+  const vivo = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+
+  check("v250 applica: una sola scrittura, non una per operazione", (() => {
+    const i = vivo.indexOf("async function applicaDivergenzeMancanti");
+    if (i < 0) return false;
+    const b = vivo.slice(i, i + 2200);
+    // ⚠ la proprietà: UNA chiamata a editHoldings, e nessuna attesa a tempo (che era il rattoppo)
+    return (b.match(/editHoldings\(/g) || []).length === 1
+      && !/setTimeout\(r, \d+\)/.test(b);
+  })());
+
+  check("v250 applica: le mutazioni si compongono sullo stesso cfg", (() => {
+    const i = vivo.indexOf("async function applicaDivergenzeMancanti");
+    const b = vivo.slice(i, i + 2200);
+    return /for \(const m of mut\) \{ if \(m\.applica\(cfg\)\) /.test(b);
+  })());
+
+  /* ⚠ ogni mutazione deve rileggere la quantità DAL FILE, non da DATA: componendone due sullo
+     stesso titolo, la seconda deve partire da ciò che la prima ha appena scritto. */
+  check("v250 mutazione: la quantità si rilegge dal file, non dallo stato in memoria", (() => {
+    const i = vivo.indexOf("function mutazionePerOp");
+    if (i < 0) return false;
+    const b = vivo.slice(i, i + 2600);
+    return /const qa = Number\(e\.qty\)/.test(b) && /const qa = Number\(r\.qty\)/.test(b);
+  })());
+
+  // e comporne due sullo stesso ticker deve sommare, non sovrascrivere
+  check("v250 mutazione: due acquisti sullo stesso titolo si SOMMANO", run(`
+    DATA.portfolio = DATA.portfolio.filter(r => r.ticker !== "TSTZ");
+    const m1 = mutazionePerOp({ ticker: "TSTZ", tipo: "ACQUISTO", qty: 10, prezzo: 100 });
+    const m2 = mutazionePerOp({ ticker: "TSTZ", tipo: "ACQUISTO", qty: 10, prezzo: 200 });
+    const cfg = { portfolio: [], watchlist: [] };
+    m1.applica(cfg); m2.applica(cfg);
+    const e = cfg.portfolio.find(r => r.ticker === "TSTZ");
+    return !!e && e.qty === 20 && Math.abs(e.pmc - 150) < 0.01`));
+
+  /* ⚠ l'esito della scrittura deve tornare a chi chiama, o il banner mente: è il difetto che
+     ha reso invisibile il fallimento delle quattro scritture in corsa. */
+  check("v250 editHoldings: restituisce l'esito invece di tacere", (() => {
+    const i = vivo.indexOf("async function editHoldings");
+    if (i < 0) return false;
+    const b = vivo.slice(i, i + 2600);
+    return /return esito;/.test(b) && /return false;/.test(b);
+  })());
+}
+
 /* ═══ v249 — IL MARGIN DEBT È USCITO DAL PAYLOAD, e le guardie v246 cambiano invariante ═══
    In v246 avevo aggiunto l'età in giorni e il testimone KOSPI perché il dato di 68 giorni non
    fosse letto come attuale. Non è bastato: l'etichetta "Espansione leva ESTREMA → RISCHIO

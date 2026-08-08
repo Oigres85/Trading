@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "249";
+const BUILD_VERSION = "250";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -636,8 +636,9 @@ function stampBrokerDate(cfg, section) {
 }
 
 async function editHoldings(section, mutate) {
+  let esito = false;                          // v250: l'esito deve tornare a chi chiama
   const token = getToken();
-  if (!token) { toast("Serve un token GitHub (permessi Actions + Contents) per modificare le posizioni"); return; }
+  if (!token) { toast("Serve un token GitHub (permessi Actions + Contents) per modificare le posizioni"); return false; }
   toast("Salvo la modifica…");
   try {
     // 1) leggi config/holdings.json con il suo SHA
@@ -651,7 +652,7 @@ async function editHoldings(section, mutate) {
     }
     const file = await r.json();
     const cfg = JSON.parse(decodeURIComponent(escape(atob((file.content || "").replace(/\s/g, "")))));
-    if (!mutate(cfg)) return;                 // mutate ritorna false se annullato/invalido
+    if (!mutate(cfg)) return false;           // mutate ritorna false se annullato/invalido
     stampBrokerDate(cfg, section);            // auto-timestamp snapshot (v113, vedi helper)
     // 2) scrivi il nuovo config
     const body = {
@@ -662,15 +663,26 @@ async function editHoldings(section, mutate) {
     const put = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
       method: "PUT", headers: ghHeaders(token), body: JSON.stringify(body),
     });
-    if (!put.ok) { toast(`Errore salvataggio (HTTP ${put.status})`); return; }
+    if (!put.ok) {
+      /* ⚠ v250 — un 409 (conflitto di SHA) qui era MUTO per chi chiamava: la funzione tornava
+         `undefined` e il chiamante non sapeva se avesse scritto. È così che quattro scritture
+         in corsa sono fallite tutte senza che nulla lo dicesse. */
+      toast(put.status === 409
+        ? "Conflitto: il file è cambiato nel frattempo. Ricarica e riprova."
+        : `Errore salvataggio (HTTP ${put.status})`);
+      return false;
+    }
     // 3) rigenera i dati in background (NON blocca la UI: la modifica è già visibile)
     dispatchWorkflow(token).catch(() => {});
     toast("Salvato ✓ — dati completi tra ~2-3 min");
+    esito = true;
     waitForNewData(DATA?.updated_at).then(ok => { if (ok) toast("Dati aggiornati ✓"); });
   } catch (e) {
     console.error(e);
     toast("Errore durante il salvataggio della modifica");
+    return false;
   }
+  return esito;
 }
 
 /* ═══ v244 — LO STATO DEL PORTAFOGLIO SEGUE IL CEO FRA I DISPOSITIVI ═══════════════════════
@@ -1671,13 +1683,38 @@ function renderDivergenzaDiario() {
 
 /* applica in sequenza le operazioni certe. Una per volta e con conferma singola: applicarle
    tutte insieme in silenzio sarebbe lo stesso errore al contrario. */
+/* v250 — UNA CONFERMA, UNA SCRITTURA. La versione v245 ne faceva N con 400 ms di distanza e
+   nessuna arrivava: leggevano tutte lo stesso SHA e si annullavano a vicenda. */
 async function applicaDivergenzeMancanti(certe) {
+  const mut = [], errori = [];
   for (const op of certe) {
-    if (typeof applicaOpAlPortafoglio === "function") {
-      applicaOpAlPortafoglio(op);
-      await new Promise(r => setTimeout(r, 400));   // le scritture sul repo vanno serializzate
-    }
+    const m = mutazionePerOp(op);
+    if (!m) continue;
+    if (m.errore) { errori.push(m.errore); continue; }
+    mut.push(m);
   }
+  if (!mut.length) {
+    toast(errori.length ? `Nessuna applicabile: ${errori.join(" · ")}` : "Nessuna operazione da applicare");
+    return;
+  }
+  const testo = mut.map(m => "· " + m.descr).join("\n");
+  if (!confirm(`Applico ${mut.length} operazion${mut.length === 1 ? "e" : "i"} al portafoglio?\n\n${testo}\n\n` +
+      `Una sola modifica su config/holdings.json: la vedrai anche da iPhone.` +
+      (errori.length ? `\n\nNON applicabili: ${errori.join(" · ")}` : ""))) {
+    toast("Posizioni NON modificate");
+    return;
+  }
+  // anticipo ottimistico in locale, come per l'operazione singola (v193)
+  for (const m of mut) aggiornaPortafoglioLocale(m.tk, m.acquisto, m.q, m.px);
+  const ok = await editHoldings("portfolio", (cfg) => {
+    /* ⚠ le mutazioni si compongono SULLO STESSO cfg, in ordine: ognuna rilegge dal file ciò
+       che la precedente ha scritto. È la ragione per cui non si può fare una scrittura per
+       operazione — e anche la ragione per cui l'ordine conta. */
+    let almeno = false;
+    for (const m of mut) { if (m.applica(cfg)) almeno = true; }
+    return almeno;
+  });
+  if (ok === false) toast("Scrittura non riuscita: le posizioni NON sono state aggiornate");
   renderDivergenzaDiario();
 }
 
@@ -1824,6 +1861,69 @@ function diaryOpLine(e) {
    richiesta ("si deve fasare anche con safari iPhone").
    NON silenzioso: modificare quantita' e PMC cambia i numeri su cui si decide, quindi si
    mostra prima l'effetto esatto e si chiede conferma. Una riga sola da toccare, ma consapevole. */
+/* ═══ v250 — LE OPERAZIONI SI APPLICANO IN UNA SOLA SCRITTURA ══════════════════════════════
+   Segnalato dal CEO: "anche se applico rimane sempre il banner", e la concentrazione non si
+   aggiornava. MISURATO: config/holdings.json era ancora a 8 posizioni dopo l'applicazione.
+   LA CAUSA È MIA, dal v245: `applicaDivergenzeMancanti` chiamava `applicaOpAlPortafoglio` una
+   volta per operazione con 400 ms di attesa in mezzo. Ma quella funzione NON restituisce la
+   promessa di `editHoldings`, quindi non c'era niente da aspettare, e 400 ms non bastano
+   comunque per un giro completo sull'API GitHub (lettura SHA + scrittura). Le quattro
+   scritture leggevano lo STESSO sha e andavano in conflitto: nessuna arrivava a destinazione.
+   ⚠ Non è "aspettare di più": è che N scritture sullo stesso file sono un errore di disegno.
+   Si compone UNA mutazione con dentro tutte le operazioni e si scrive UNA volta sola — una
+   conferma, un commit, nessuna corsa. */
+function mutazionePerOp(op) {
+  if (!op || !op.ticker || !op.tipo) return null;
+  const q = Number(op.qty), px = Number(op.prezzo);
+  if (!Number.isFinite(q) || q <= 0) return { errore: `${op.ticker}: operazione senza quantità` };
+  const tk = String(op.ticker).toUpperCase();
+  const pos = (DATA.portfolio || []).find(r => r.ticker === tk);
+  const acquisto = /ACQUIST|COMPR|INCREMENT|ACCUMUL|AGGIUNT/i.test(op.tipo);
+  if (acquisto) {
+    if (!Number.isFinite(px) || px <= 0) return { errore: `${tk}: acquisto senza prezzo, PMC non calcolabile` };
+    const q0 = pos ? Number(pos.qty) || 0 : 0, p0 = pos ? Number(pos.pmc) || 0 : 0;
+    const q1 = q0 + q, pmc1 = Math.round(((q0 * p0 + q * px) / q1) * 10000) / 10000;
+    return {
+      tk, acquisto, q, px,
+      descr: pos ? `${tk}: ${q0} → ${q1} quote · PMC ${fmtNum.format(p0)} → ${fmtNum.format(pmc1)}`
+                 : `${tk}: NUOVA posizione, ${q} quote a PMC ${fmtNum.format(px)}`,
+      applica: (cfg) => {
+        cfg.portfolio = cfg.portfolio || [];
+        /* ⚠ si rilegge la quantità DAL FILE, non da DATA: componendo più operazioni la seconda
+           deve partire da ciò che la prima ha appena scritto, non dallo stato iniziale. */
+        const e = cfg.portfolio.find(r => (r.ticker || "").toUpperCase() === tk);
+        if (e) {
+          const qa = Number(e.qty) || 0, pa = Number(e.pmc) || 0, qn = qa + q;
+          e.qty = qn; e.pmc = Math.round(((qa * pa + q * px) / qn) * 10000) / 10000;
+        } else cfg.portfolio.push({ ticker: tk, qty: q, pmc: px });
+        if (Array.isArray(cfg.watchlist)) cfg.watchlist = cfg.watchlist.filter(r => (typeof r === "string" ? r : r.ticker || "").toUpperCase() !== tk);
+        return true;
+      },
+    };
+  }
+  if (!pos) return { errore: `${tk} non è in portafoglio: vendita solo annotata` };
+  const q0 = Number(pos.qty) || 0, q1 = Math.max(0, Math.round((q0 - q) * 10000) / 10000);
+  return {
+    tk, acquisto, q, px,
+    descr: q1 === 0 ? `${tk}: posizione CHIUSA (${q0} quote vendute) — passa in watchlist`
+                    : `${tk}: ${q0} → ${q1} quote (PMC invariato: vendere non lo cambia)`,
+    applica: (cfg) => {
+      let chiusa = false;
+      cfg.portfolio = (cfg.portfolio || []).filter(r => {
+        if ((r.ticker || "").toUpperCase() !== tk) return true;
+        const qa = Number(r.qty) || 0, qn = Math.max(0, Math.round((qa - q) * 10000) / 10000);
+        if (qn === 0) { chiusa = true; return false; }
+        r.qty = qn; return true;
+      });
+      if (chiusa) {
+        cfg.watchlist = cfg.watchlist || [];
+        if (!cfg.watchlist.some(r => (typeof r === "string" ? r : r.ticker || "").toUpperCase() === tk)) cfg.watchlist.push(tk);
+      }
+      return true;
+    },
+  };
+}
+
 function applicaOpAlPortafoglio(op) {
   if (!op || !op.ticker || !op.tipo) return;
   const q = Number(op.qty), px = Number(op.prezzo);
@@ -2876,6 +2976,60 @@ function metricTrend(field) {
 /* Stato Margin Debt condiviso 1:1 tra card, popup e prompt AI (niente stringhe divergenti).
    Logica AND: rosso "ESTREMA" SOLO se leva ≥90% del picco E Forward P/E >20 conferma;
    ≥90% senza conferma → giallo (con nota esplicita se il P/E manca). */
+/* ═══ v250 — OGNI DATO MACRO DICE QUANDO È STATO RILEVATO E QUANDO ARRIVA IL PROSSIMO ══════
+   Richiesta CEO: "nelle card macro fornisci data aggiornamento dato e prossimo aggiornamento".
+   È la risposta strutturale al dubbio sul margin debt: il problema non era che il dato fosse
+   sbagliato, era che NON SI SAPEVA di che mese fosse né quando ne sarebbe arrivato uno nuovo.
+   Un dato di 68 giorni con scritto "il prossimo esce il 20 agosto" è informazione; lo stesso
+   dato senza quella riga è una trappola.
+   ⚠ Le cadenze qui sotto sono il CALENDARIO DICHIARATO DALLE FONTI, non una stima mia:
+   ogni voce porta scritto da dove viene la regola. Dove la data esatta non è deducibile si
+   dichiara la cadenza e basta, invece di inventare un giorno. */
+const CADENZA_FONTE = {
+  margin_debt: { nome: "FINRA", giorniLag: 20, passo: "mensile",
+                 nota: "FINRA pubblica il mese M nella terza settimana di M+1" },
+  cpi:    { nome: "BLS", giorniLag: 13, passo: "mensile", nota: "CPI del mese M esce a metà M+1" },
+  pce:    { nome: "BEA", giorniLag: 30, passo: "mensile", nota: "PCE del mese M esce a fine M+1" },
+  nfp:    { nome: "BLS", giorniLag: 5,  passo: "mensile", nota: "primo venerdì del mese successivo" },
+  unemp:  { nome: "BLS", giorniLag: 5,  passo: "mensile", nota: "esce col dato sugli occupati" },
+  retail: { nome: "Census", giorniLag: 15, passo: "mensile", nota: "vendite del mese M a metà M+1" },
+  umich:  { nome: "UMich via FRED", giorniLag: 45, passo: "mensile",
+            nota: "FRED sconta 1-2 mesi di ritardo di LICENZA: alla fonte esistono letture più recenti" },
+  gdp:    { nome: "BEA", giorniLag: 30, passo: "trimestrale", nota: "stima avanzata ~1 mese dopo il trimestre" },
+};
+
+/* Restituisce { rilevato, eta, prossimo, passo, fonte, nota } o null se non si può dire nulla.
+   ⚠ `prossimo` è una DATA ATTESA, non una certezza: si scrive sempre col "atteso". */
+function cadenzaDato(chiave, dataRilevazione) {
+  const c = CADENZA_FONTE[chiave];
+  if (!c || !dataRilevazione) return null;
+  const d = new Date(String(dataRilevazione).slice(0, 10) + "T00:00:00");
+  if (isNaN(d)) return null;
+  const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+  const eta = Math.round((oggi - d) / 86400000);
+  /* il prossimo dato copre il periodo SUCCESSIVO a quello rilevato, e arriva `giorniLag`
+     dopo la fine di quel periodo: si somma un passo alla rilevazione e poi il ritardo. */
+  const p = new Date(d);
+  if (c.passo === "trimestrale") p.setMonth(p.getMonth() + 6);
+  else p.setMonth(p.getMonth() + 2);
+  p.setDate(Math.min(c.giorniLag || 15, 28));
+  return {
+    rilevato: String(dataRilevazione).slice(0, 10), eta,
+    prossimo: p.toISOString().slice(0, 10),
+    scaduto: p < oggi,                       // il prossimo era atteso e non è arrivato
+    passo: c.passo, fonte: c.nome, nota: c.nota,
+  };
+}
+
+/* la riga da mostrare sotto una card macro e da mettere nel payload */
+function rigaCadenza(chiave, dataRilevazione) {
+  const c = cadenzaDato(chiave, dataRilevazione);
+  if (!c) return "";
+  const it = (s) => { const [a, m, g] = [s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)]; return `${g}/${m}/${a}`; };
+  return `rilevazione ${it(c.rilevato)} (${c.eta} giorni fa) · prossimo atteso ${it(c.prossimo)}` +
+         (c.scaduto ? " ⚠ ERA ATTESO E NON È ARRIVATO" : "") + ` · ${c.fonte}, ${c.passo}`;
+}
+
 function marginDebtState() {
   /* METODOLOGIA v106 (post-audit): il "% del picco" è SATURO in un bull market — verificato
      13/13 mesi a >=95% del picco: allarme permanente = potere discriminante zero. La label è
@@ -4258,7 +4412,11 @@ function indicatoriClassifica() {
     if (v && v.score != null) out.push({ k, nome, score: Math.round(v.score), sub: v.label || v.status || v.rating || "" });
   });
   (m.indicators || []).forEach(i => {
-    if (i.impact != null) out.push({ k: "in:" + i.key, nome: i.label, score: Math.round(i.impact), sub: `${i.value}${i.date ? " · " + i.date : ""}` });
+    /* v250 — la card porta la CADENZA: quando è stato rilevato, quanti giorni ha, quando ne
+       arriva uno nuovo. Richiesta del CEO dopo il dubbio sul margin debt — un dato vecchio con
+       la data del prossimo è informazione, lo stesso dato senza è una trappola. */
+    if (i.impact != null) out.push({ k: "in:" + i.key, nome: i.label, score: Math.round(i.impact),
+      sub: `${i.value}${i.date ? " · " + i.date : ""}`, cadenza: rigaCadenza(i.key, i.date) });
   });
   (m.markets || []).forEach(i => {
     const sc = marketImpact(i);
@@ -4850,7 +5008,10 @@ function renderIndicatori() {
       : "";
     const g = forma ? forma.g : linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
     return tessera({ t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
-      cls: clsScore(r.score), grafico: g, n: forma ? forma.n : esc(r.sub || ""),
+      cls: clsScore(r.score), grafico: g,
+      /* v250 — sotto ogni card macro, la riga di cadenza: rilevazione, età, prossimo atteso.
+         Sta in FONDO e in piccolo: è contesto sul dato, non il dato. */
+      n: (forma ? forma.n : esc(r.sub || "")) + (r.cadenza ? `<div class="mg-cad muted">${esc(r.cadenza)}</div>` : ""),
       tk: conPan.has(r.k) ? r.k : null, id: r.k });
   }).join("")}</div>`;
   agganciaTessere(box);
@@ -8395,14 +8556,27 @@ function buildPrompt() {
     : i.key === "curve" ? "serie GIORNALIERA FRED T10Y2Y, ultima chiusura"
     : i.key === "umich" ? "serie mensile via FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui — verificale prima di trarne conclusioni sul consumatore"
     : "serie mensile, normale ritardo di pubblicazione";
-  (m.indicators || []).filter(i => !accorpate.has(i.key)).forEach(i =>
-    lines.push(`- ${i.label}: ${i.value} (rilevazione ${i.date} — ${noteSerie(i)})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`));
+  (m.indicators || []).filter(i => !accorpate.has(i.key)).forEach(i => {
+    /* v250 — dove esiste un calendario dichiarato dalla fonte si scrive QUANDO è stato rilevato,
+       quanti giorni ha e QUANDO ne arriva uno nuovo. Altrove resta la nota generica: meglio una
+       nota vaga che una data inventata. */
+    const cad = rigaCadenza(i.key, i.date);
+    lines.push(`- ${i.label}: ${i.value} (${cad || `rilevazione ${i.date} — ${noteSerie(i)}`})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`);
+  });
   {
     const c2 = (m.indicators || []).find(i => i.key === "cpi");
     const p2 = (m.indicators || []).find(i => i.key === "pce");
     const fl = [c2, p2].filter(Boolean).map(i => dqV.flags[i.key]).filter(Boolean).join(" ");
-    if (c2 && p2) lines.push(`- Inflazione (a/a): CPI ${c2.value} · PCE ${p2.value} — due misure della STESSA grandezza, non due segnali: la Fed guarda il PCE. Rilevazioni ${c2.date} / ${p2.date}, serie mensili con il normale ritardo di pubblicazione.${fl ? " " + fl : ""}`);
-    else if (c2 || p2) { const u = c2 || p2; lines.push(`- ${u.label}: ${u.value} (rilevazione ${u.date} — serie mensile, normale ritardo di pubblicazione)${dqV.flags[u.key] ? " " + dqV.flags[u.key] : ""}`); }
+    if (c2 && p2) lines.push(`- Inflazione (a/a): CPI ${c2.value} · PCE ${p2.value} — due misure della STESSA grandezza, non due segnali: la Fed guarda il PCE. Rilevazioni: CPI ${rigaCadenza("cpi", c2.date) || c2.date} · PCE ${rigaCadenza("pce", p2.date) || p2.date}.${fl ? " " + fl : ""}`);
+    else if (c2 || p2) {
+      const u = c2 || p2;
+      /* v250 — la riga di cadenza sostituisce il generico "normale ritardo di pubblicazione":
+         dice QUANDO è stato rilevato, quanti giorni ha, e QUANDO ne arriva uno nuovo. È la
+         risposta strutturale al dubbio del CEO sul margin debt — un dato vecchio con la data
+         del prossimo è informazione, lo stesso dato senza è una trappola. */
+      const cad = rigaCadenza(u.key, u.date);
+      lines.push(`- ${u.label}: ${u.value} (${cad || `rilevazione ${u.date} — serie mensile, normale ritardo di pubblicazione`})${dqV.flags[u.key] ? " " + dqV.flags[u.key] : ""}`);
+    }
   }
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
