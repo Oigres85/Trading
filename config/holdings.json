@@ -47,6 +47,26 @@
    "name": "ORCL",
    "qty": 70,
    "pmc": 143
+  },
+  {
+   "ticker": "BE",
+   "qty": 40,
+   "pmc": 214
+  },
+  {
+   "ticker": "SKHY",
+   "qty": 45,
+   "pmc": 139
+  },
+  {
+   "ticker": "WDC",
+   "qty": 25,
+   "pmc": 458
+  },
+  {
+   "ticker": "MRVL",
+   "qty": 42,
+   "pmc": 214.08
   }
  ],
  "watchlist": [
@@ -151,27 +171,7 @@
    "currency": "USD"
   },
   {
-   "ticker": "SKHY",
-   "name": null,
-   "currency": "USD"
-  },
-  {
-   "ticker": "WDC",
-   "name": null,
-   "currency": "USD"
-  },
-  {
    "ticker": "NOW",
-   "name": null,
-   "currency": "USD"
-  },
-  {
-   "ticker": "BE",
-   "name": null,
-   "currency": "USD"
-  },
-  {
-   "ticker": "MRVL",
    "name": null,
    "currency": "USD"
   },
@@ -197,7 +197,7 @@
   }
  ],
  "broker": {
-  "as_of": "2026-07-29",
+  "as_of": "2026-08-08",
   "controvalore_investimenti": 230267.24,
   "controvalore_btp": 41628.8,
   "investimenti": 118331.53,
