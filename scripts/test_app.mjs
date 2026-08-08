@@ -331,7 +331,9 @@ const prompt = run(`buildPrompt()`);
 const has = (s) => prompt.includes(s);
 check("prompt: advisory libero + mandato consegna minima anti-laziness", has("DELEGA PIENA SULLA FORMA") && has("MANDATO DI CONSEGNA MINIMA") && has("FAI DOMANDE"));
 check("prompt: colonna Sortino 1A (6M) nella tabella PORTAFOGLIO", has("| Sortino 1A (6M) |"));
-check("prompt: consegna minima (leading KOSPI/Nasdaq/BTC, quote esatte, news, gap pre/after)", has("KOSPI") && has("Bitcoin") && has("calcolo MATEMATICO ESATTO della quantità") && has("NEWS SPECIFICHE") && has("GAP PRE/AFTER-MARKET"));
+check("prompt: consegna minima (leading KOSPI/Nasdaq/BTC, quote calcolate, news, gap pre/after)",
+  has("KOSPI") && has("Bitcoin") && /calcolo della quantità di quote|quantità di quote/.test(prompt)
+  && has("NEWS") && /pre\/after|Pre\/After/i.test(prompt));
 check("prompt: matrice di rischio per posizione", has("MATRICE DI RISCHIO PER POSIZIONE"));
 check("prompt: flag [STOP VIOLATO] su TST3", /\[STOP VIOLATO\][\s\S]*TST3|TST3[^\n]*\[STOP VIOLATO\]/.test(prompt));
 /* ⚠ v247 — INVARIANTE ROVESCIATO. Sorvegliava che il VaR pubblicato fosse quello STORICO

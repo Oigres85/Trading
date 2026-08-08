@@ -1713,6 +1713,7 @@ def fetch_macro():
         # (yfinance, interval="1mo"), ed è per quello che worst_gap dava un valore sensato: il
         # numero giusto copriva quello sbagliato.
         cp = fred_series("CP", 22, freq="q")       # ~5 anni trimestrali
+        cp_raw = list(cp)                          # v248: copia PRIMA del ritaglio sull'S&P
         sp_cp = fred_series("SP500", 64, freq="m") # ~5 anni MENSILI
         al_cp = _finestra_comune(sp_cp, cp)
         if al_cp:
@@ -1721,17 +1722,36 @@ def fetch_macro():
             cur_sp = round(sp_cp[-1][1] / sp_base * 100, 1)
             cur_cp = round(cp[-1][1] / cp_base * 100, 1)
             gap = round(cur_sp - cur_cp, 1)
-            # Nasdaq 100 (^NDX) — mensile 5 anni via yfinance
+            # Nasdaq 100 (^NDX) — mensile 5 anni via yfinance.
+            # ⚠ v248 — IL RAMO NDX NON ERA ALLINEATO, e nessuno se n'era accorto perché il
+            # commento qui sopra lo dichiarava "corretto": lo era sulla FREQUENZA (interval="1mo"),
+            # non sulla FINESTRA. Il difetto misurato l'08/08/2026 sui dati veri:
+            #   · ndx_hist ribasato sul PROPRIO primo punto (~2021-08), misurato al 2026-08-01
+            #   · cur_cp ribasato sulla finestra comune con l'S&P, misurato al 2026-01-01
+            # Basi diverse E date finali diverse: sette mesi di Nasdaq senza profitti a fronte.
+            # E siccome worst_gap = max(gap, ndx_gap) prendeva proprio l'NDX (69,9 contro 34,9),
+            # il numero SBAGLIATO era quello pubblicato in cima, con l'etichetta "(driver: NDX)".
+            # È la classe v207 identica, sopravvissuta nel ramo che quel commit dichiarava sano.
             ndx_hist = None
             ndx_gap = None
             try:
                 ndx_raw = yf.Ticker("^NDX").history(period="5y", interval="1mo",
                                                      auto_adjust=True)["Close"].dropna()
                 if len(ndx_raw) > 10:
+                    ndx_pairs = [(str(d.date()), float(v)) for d, v in ndx_raw.items()]
+                    # si allinea l'NDX ai profitti GREZZI (cp_raw), non a `cp` già ritagliato
+                    # sull'S&P: due ritagli in cascata darebbero una finestra più corta del vero.
+                    al_ndx = _finestra_comune(ndx_pairs, cp_raw)
+                    if al_ndx:
+                        ndx_al, cp_al = al_ndx
+                        nb, cb = ndx_al[0][1], cp_al[0][1]
+                        if nb and cb:
+                            ndx_gap = round(ndx_al[-1][1] / nb * 100 - cp_al[-1][1] / cb * 100, 1)
+                    # la serie per il grafico resta a base propria: serve a disegnare l'andamento,
+                    # non a calcolare il gap — e il gap ora NON la usa più.
                     ndx_base_v = float(ndx_raw.iloc[0])
                     ndx_hist = [{"d": str(d.date()), "v": round(float(v) / ndx_base_v * 100, 1)}
                                 for d, v in ndx_raw.items()]
-                    ndx_gap = round(ndx_hist[-1]["v"] - cur_cp, 1)
             except Exception:
                 pass
             # score/label sul gap PEGGIORE, non sulla media: con S&P a -24 e NDX a +59 la

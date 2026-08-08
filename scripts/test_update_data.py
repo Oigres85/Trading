@@ -344,7 +344,7 @@ check("umich: i mesi inglesi mappano al numero giusto (June=6, dicembre=12)",
 check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è il motivo del fetcher)",
       _rows[-1][0] > "2026-05-01")
 
-N_CHECKS = 71   # +4 v186 FedWatch · +4 v207 finestra comune · +4 v224 storico macro
+N_CHECKS = 75   # +4 v248 finestra comune NDX · +4 v186 FedWatch · +4 v207 finestra comune · +4 v224 storico macro
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -371,5 +371,27 @@ check("fedwatch: rami mutuamente esclusivi su tutto il range",
       all(not (_fedwatch_rami(3.50, 3.75, x / 100)[0] and _fedwatch_rami(3.50, 3.75, x / 100)[1])
           for x in range(300, 400)))
 
+# ══ v248 — IL RAMO NDX CONFRONTAVA DATE DIVERSE ═══════════════════════════════════════════
+# Emerso controllando le date delle serie: corp_profit.ndx arrivava al 2026-08 mentre i profitti
+# si fermavano al 2026-01. Il gap NDX nasceva fra l'ultimo punto Nasdaq (ribasato sul PROPRIO
+# primo punto, 5 anni fa) e i profitti ribasati sulla finestra comune con l'S&P: BASI DIVERSE e
+# DATE FINALI DIVERSE. MISURATO sui dati veri l'08/08/2026: pubblicato 69,9 pp, corretto 40,0 pp,
+# 29,9 pp di scarto — e worst_gap = max(gap, ndx_gap) prendeva proprio l'NDX, quindi il numero
+# sbagliato era il TITOLO, con la soglia "Asset Inflation" fissata a 40.
+# ⚠ Il commento nel codice dichiarava quel ramo "corretto" dal v207: lo era sulla FREQUENZA, non
+#    sulla FINESTRA. Una dichiarazione di correttezza non è una verifica.
+_prof248 = [("2021-04-01", 100.0), ("2021-07-01", 105.0), ("2025-10-01", 127.0), ("2026-01-01", 132.4)]
+_ndx248 = [("2021-09-01", 100.0), ("2022-01-01", 110.0), ("2026-01-01", 180.0), ("2026-08-01", 220.0)]
+_al248 = _finestra_comune(_ndx248, _prof248)
+
+check("v248 NDX: esiste una finestra comune fra Nasdaq e profitti", _al248 is not None)
+check("v248 NDX: le due serie finiscono alla STESSA data",
+      bool(_al248) and _al248[0][-1][0] == _al248[1][-1][0])
+check("v248 NDX: il punto senza controparte (2026-08) resta FUORI dal confronto",
+      bool(_al248) and _al248[0][-1][0] != "2026-08-01")
+check("v248 NDX: allineare RIDUCE il gap gonfiato dai mesi scoperti", bool(_al248) and
+      round(_al248[0][-1][1] / _al248[0][0][1] * 100 - _al248[1][-1][1] / _al248[1][0][1] * 100, 1)
+      < round(220.0 - 132.4, 1))
 print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
+

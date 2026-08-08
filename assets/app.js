@@ -3,7 +3,7 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "247";
+const BUILD_VERSION = "248";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7434,14 +7434,14 @@ DELEGA PIENA SULLA FORMA: decidi TU come strutturare il report — numero di sez
 
 MANDATO DI CONSEGNA MINIMA (NON è una gabbia sulla forma, è il contenuto che il report DEVE contenere, comunque tu decida di organizzarlo — non "dimenticarlo" per fare narrativa macro):
 A. INDICI LEADING: leggi SEMPRE, anche in poche righe, lo stato di KOSPI (^KS11), Nasdaq Composite (^IXIC) e Bitcoin (BTC-USD) come anticipatori — il KOSPI chiude prima dell'apertura USA (proxy del sentiment tech/semiconduttori), Bitcoin è il termometro dell'appetito al rischio globale e ha correlazione diretta con MSTR/nomi ad alta beta. Se sono nel payload, NON ignorarli.
-B. ESECUZIONE COMPLETA: per OGNI operazione suggerita (COMPRA o VENDI) fornisci SEMPRE il calcolo MATEMATICO ESATTO della quantità di quote. Regola di sizing: dimensiona sul budget disponibile mantenendo SEMPRE una quota di liquidità di sicurezza strategica (Dry Powder). Dimensiona la liquidità di sicurezza (Dry Powder) calcolandola autonomamente in base ai dati di Expected Shortfall e VaR presenti nel payload, spiegando al CEO la logica matematica della tua copertura. Mostra il conto (es. "budget allocato 5.000$ ÷ prezzo 180$ = 27 quote. Liquidità residua preservata").
+B. ESECUZIONE COMPLETA: per OGNI operazione suggerita (COMPRA o VENDI) fornisci il calcolo della quantità di quote e mostralo (es. "12.000$ ÷ prezzo 180$ = 66 quote"). Il payload pubblica la liquidità disponibile come FATTO, non un tetto di spesa: quanto impegnarne è una decisione tua, da dichiarare insieme alla ragione. Non ricostruire vincoli che il sistema non impone.
 Per gli ORDINI di VENDITA o TRIM: rispetta le proporzioni matematiche fornite dal payload (quote possedute, MCR, stop, pesi) — NON inventare liquidazioni totali della posizione se non sono supportate dalla gestione del rischio.
 C. INCROCIO CON LE NEWS SPECIFICHE: il payload contiene NEWS PER SINGOLO TITOLO (catalizzatori micro). Incrociale con la tecnica e i fondamentali di QUEL titolo — non liquidarle con un riassunto macro generico. Se una raccomandazione poggia su una notizia, cita quale. MAI inventare un catalizzatore che non è nel payload.
 D. GAP PRE/AFTER-MARKET: la colonna Pre/After mostra dove scambia il titolo FUORI dalla sessione ufficiale. Quando il dato esiste, usalo per calibrare il limite ed EVITA esplicitamente i gap in apertura; quando manca, dichiaralo come incognita.
 
 BRIEFING SUI PROBLEMI NOTI DEL SISTEMA (osservazioni strategiche, NON divieti assoluti):
 1. LATENZA MACRO: usa la ricerca web per fare double-check sui dati flaggati come datati o inaffidabili.
-2. GESTIONE LIQUIDITÀ (DRY POWDER) E RISCHIO CAMBIO: Non azzerare mai la liquidità. Mantenere cassa per i ribassi è una scelta strategica vitale. Valuta anche che impiegare liquidità su asset USA aumenta il rischio FX non coperto se l'Euro è forte.
+2. LIQUIDITÀ E RISCHIO CAMBIO: mantenere cassa per i ribassi è una scelta strategica, non un obbligo del sistema. Valuta che impiegare liquidità su asset USA aumenta il rischio di cambio non coperto quando l'Euro è forte.
 3. LET WINNERS RUN E MCR: Non siamo un fondo regolamentato: non c'è NESSUN obbligo di vendere se un titolo supera il 10% del NAV. Lascia correre i profitti sulle aziende eccellenti. Usa il 10% e l'MCR solo per far riflettere il CEO sulla volatilità, non come divieti imperativi.
 4. CONCENTRAZIONE SETTORIALE (IL PARADOSSO DIVERSIFICAZIONE): Se suggerisci un acquisto forte (es. SNDK) ma il fondo ha già posizioni enormi nello stesso settore (es. MU), NON omettere il suggerimento, ma fai NOTARE esplicitamente al CEO che l'operazione aumenterebbe la concentrazione settoriale e annullerebbe la diversificazione. Il trade va esposto, la scelta resta al CEO.
 5. IGIENE DEI DATI E ISTRUZIONI: "n.d." = dato non disponibile, non inventarlo. Preferisci ordini LIMITE.
