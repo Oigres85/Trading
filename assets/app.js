@@ -3,29 +3,32 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "250";
+const BUILD_VERSION = "251";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
 /* ordinamento tabelle: click su intestazione → desc → asc → default */
 const SORT_FIELDS = {
-  // allineato 1:1 alle <th>: Titolo,Qtà,PMC,Prezzo,Oggi,Pre/After,Volume,Guadagno,Guad.%,
-  // Beta,Sharpe 1A,Sortino 1A,Supporto,Resistenza,Δ SMA200,RS 1M,RS NDX 1M,Segnale,Short %,
-  // Drawdown 52S,Opzioni,Trimestrale,Grafico
+  /* ⚠ v251 — RICALCOLATI. Il taglio di "Segnale" (indice 17) stava IN MEZZO alla tabella e ha
+     spostato ogni indice successivo: CLAUDE.md avverte che l'accesso è per INDICE e che un
+     taglio interno va ricalcolato, a differenza dei tagli in coda del v208.
+     ptf: Titolo,Qtà,PMC,Prezzo,Oggi,Pre/After,Volume,Guadagno,Guad.%,Beta,Sharpe,Sortino,
+          Supporto,Resistenza,ΔSMA200,RS 1M,RS NDX,Short%,Float,Drawdown,Opzioni,Trimestrale,
+          Debt/Equity,Div Yield,Ricavi,Utile netto,Marg.netto,Cresc.ricavi  → 28 */
   "ptf-table": ["name", "qty", "pmc", "price", "change_pct", "prepost_chg", "volume",
                 "gain", "gain_pct", "beta", "sharpe_1y", "sortino_1y", "support",
-                "resistance", "sma200_dist_pct", "rs_1m", "rs_ndx_1m", null,
-                "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null,
-               // v208 — restano le tre che il payload non porta (vedi fundCells)
-               "stat:debt_to_equity", "stat:dividend_yield", "fin_health"],
-  // Titolo,Prezzo,Oggi,Pre/After,Volume,Beta,Sharpe 1A,Sortino 1A,Supporto,Resistenza,Δ SMA200,
-  // RS 1M,RS NDX 1M,Segnale,Short %,Drawdown 52S,Opzioni,Trimestrale,Grafico
+                "resistance", "sma200_dist_pct", "rs_1m", "rs_ndx_1m",
+                "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date",
+                "stat:debt_to_equity", "stat:dividend_yield",
+                "fin:revenue", "fin:net_income", "fin:margin", "fin:cagr"],
+  /* wl: Titolo,Prezzo,Oggi,Pre/After,Volume,Beta,Sharpe,Sortino,Supporto,Resistenza,ΔSMA200,
+         RS 1M,RS NDX,Short%,Float,Drawdown,Opzioni,Trimestrale,Debt/Equity,Div Yield,
+         Ricavi,Utile netto,Marg.netto,Cresc.ricavi  → 24 */
   "wl-table": ["name", "price", "change_pct", "prepost_chg", "volume",
                "beta", "sharpe_1y", "sortino_1y", "support", "resistance", "sma200_dist_pct",
-               "rs_1m", "rs_ndx_1m", null,
-               "stat:short_float", "stat:float_shares", "w52_dist_pct", null, "earnings_date", null,
-               // v208 — stesse tre della tabella portafoglio
-               "stat:debt_to_equity", "stat:dividend_yield", "fin_health"],
+               "rs_1m", "rs_ndx_1m", "stat:short_float", "stat:float_shares", "w52_dist_pct",
+               null, "earnings_date", "stat:debt_to_equity", "stat:dividend_yield",
+               "fin:revenue", "fin:net_income", "fin:margin", "fin:cagr"],
 };
 const sortState = {
   "ptf-table": { field: null, dir: 0 }, "wl-table": { field: null, dir: 0 },
@@ -96,8 +99,11 @@ const colHiddenKey = (tid) => `colhidden_${tid}`;
    portafoglio. Nessun test lo intercettava. Ora gli indici seguono il commento (RS 1M = 11,
    RS NDX 1M = 12) e un check verifica che le due cose non divergano più. */
 const VISTA_COMPATTA = {
-  "ptf-table": [0, 1, 3, 4, 8, 15, 16, 17, 22],          // Titolo Qtà Prezzo Oggi Guad.% RS RSndx Segnale Trimestrale
-  "wl-table":  [0, 1, 2, 11, 12, 13, 18],                // Titolo Prezzo Oggi RS RSndx Segnale Trimestrale
+  /* ⚠ v251 — RICALCOLATA insieme a SORT_FIELDS: "Segnale" era l'indice 17 del portafoglio e il
+     13 della watchlist, entrambi DENTRO la vista compatta. Al suo posto entra il MARGINE NETTO,
+     che è un fatto e non un'etichetta derivata. */
+  "ptf-table": [0, 1, 3, 4, 8, 15, 16, 21, 26],   // Titolo Qtà Prezzo Oggi Guad.% RS RSndx Trimestrale Marg.netto
+  "wl-table":  [0, 1, 2, 11, 12, 17, 22],          // Titolo Prezzo Oggi RS RSndx Trimestrale Marg.netto
 };
 /* v206 — RIPARAZIONE DI UN DEFAULT SBAGLIATO, non sovrascrittura di una scelta.
    La vista compatta si applica UNA VOLTA SOLA: un browser che ha già ricevuto il default
@@ -1633,6 +1639,15 @@ function divergenzaDiario() {
     const iso = String(e.date || "").slice(0, 10);
     if (soglia && iso && iso <= soglia) continue;         // gia' dentro lo snapshot del broker
     const tk = String(o.ticker).toUpperCase();
+    /* ⚠ v251 — IDEMPOTENZA. Il banner si calcolava contro DATA.portfolio, che arriva da
+       data.json e resta indietro di 2-3 minuti finché la pipeline non rigenera. Dopo aver
+       applicato, un semplice ricaricamento faceva RIAPPARIRE il banner — e il CEO, vedendolo,
+       ha ricliccato: le quantità sono state applicate DUE VOLTE (BE 40→80, SKHY 45→90,
+       WDC 25→50, MRVL 42→84). Una scrittura che si può ripetere senza accorgersene è un
+       difetto peggiore di una che fallisce, perché fallisce in silenzio nella direzione
+       sbagliata. La marcatura sta nel DIARIO, che è persistito nel repo e non dipende dal
+       ritardo della pipeline. */
+    if (e.applicata) continue;
     const chiave = `${iso}|${tk}|${o.tipo}|${o.qty}`;
     if (visti.has(chiave)) continue;                      // stessa voce salvata due volte
     visti.add(chiave);
@@ -1685,6 +1700,24 @@ function renderDivergenzaDiario() {
    tutte insieme in silenzio sarebbe lo stesso errore al contrario. */
 /* v250 — UNA CONFERMA, UNA SCRITTURA. La versione v245 ne faceva N con 400 ms di distanza e
    nessuna arrivava: leggevano tutte lo stesso SHA e si annullavano a vicenda. */
+/* marca nel DIARIO le voci già applicate al portafoglio, così non possono esserlo due volte.
+   Il diario vive in config/action_diary.json: la marcatura segue il CEO fra i dispositivi. */
+function marcaVociApplicate(ops) {
+  const chiavi = new Set(ops.map(o => `${o.iso}|${String(o.ticker).toUpperCase()}|${o.tipo}|${o.qty}`));
+  let arr;
+  try { arr = loadDiary(); } catch { return; }
+  if (!Array.isArray(arr)) return;
+  let tocc = 0;
+  for (const e of arr) {
+    const o = (typeof diaryOp === "function") ? diaryOp(e) : (e.op || null);
+    if (!o || !o.ticker || !o.tipo) continue;
+    const k = `${String(e.date || "").slice(0, 10)}|${String(o.ticker).toUpperCase()}|${o.tipo}|${o.qty}`;
+    if (chiavi.has(k) && !e.applicata) { e.applicata = new Date().toISOString(); tocc++; }
+  }
+  if (tocc) setDiary(arr);
+  return tocc;
+}
+
 async function applicaDivergenzeMancanti(certe) {
   const mut = [], errori = [];
   for (const op of certe) {
@@ -1714,7 +1747,14 @@ async function applicaDivergenzeMancanti(certe) {
     for (const m of mut) { if (m.applica(cfg)) almeno = true; }
     return almeno;
   });
-  if (ok === false) toast("Scrittura non riuscita: le posizioni NON sono state aggiornate");
+  if (ok === false) {
+    toast("Scrittura non riuscita: le posizioni NON sono state aggiornate");
+    renderDivergenzaDiario();
+    return;
+  }
+  /* ⚠ si marca SOLO dopo una scrittura riuscita: marcare prima significherebbe perdere
+     l'operazione se il salvataggio fallisce, cioè l'errore opposto e altrettanto grave. */
+  marcaVociApplicate(certe);
   renderDivergenzaDiario();
 }
 
@@ -4082,6 +4122,9 @@ function renderConcentrazione() {
    E' la classe v201-v204 per la QUARTA volta, e stavolta e' passata perche' la ricevuta
    controllava la cosa sbagliata. La ricevuta di un taglio deve contare TUTTE le dichiarazioni di
    primo livello dentro i confini, non solo le funzioni. */
+/* v251 — resta la sola modalità SETTORE: la chip "Valuta" è stata rimossa su richiesta del CEO.
+   La variabile sopravvive perché `allocazionePer` la usa e perché toglierla ha già ucciso la
+   pagina una volta (v238-v239): un taglio che si porta via una dichiarazione vicina. */
 let allocGrafMode = "sector";
 function renderAllocGrafica() {
   const box = $("#allocg-chart"); if (!box) return;
@@ -4405,8 +4448,23 @@ const IND_TITOLI = {
   smart_money: "Istituzionali vs retail", macroquant: "Ciclo economico",
   seasonality: "Stagionalità del mese", thermometer: "Salute tecnica del libro",
 };
+/* ⚠ v251 — IL VIX NON AVEVA UNA SCHEDA PROPRIA. Il CEO ha chiesto che ogni variabile del Ciclo
+   economico ne abbia una: confrontando i 13 componenti con le 27 schede, dodici c'erano già
+   (alcune accorpate: CPI+PCE in una, NFP e disoccupazione dentro il mercato del lavoro, il
+   credito in "Stress del credito", lo smart money in "Istituzionali vs retail") e UNO no.
+   Il VIX vive in `macro.vix`, che non ha un campo `score`: gliene serve uno per entrare nella
+   classifica, ed è la stessa formula che il ciclo economico usa già per pesarlo — non una
+   scala nuova inventata qui. */
+function vixComeIndicatore(m) {
+  const v = m && m.vix;
+  if (!v || v.value == null) return null;
+  return { k: "vix", nome: "Volatilità (VIX)",
+           score: Math.round(Math.max(0, Math.min(100, 100 - v.value / 50 * 100))),
+           sub: `${fmtNum.format(v.value)}${v.change_pct != null ? ` (${signTxt(v.change_pct)} oggi)` : ""}` };
+}
 function indicatoriClassifica() {
   const m = DATA?.macro || {}, out = [];
+  { const vx = vixComeIndicatore(m); if (vx) out.push(vx); }   // v251
   Object.entries(IND_TITOLI).forEach(([k, nome]) => {
     const v = m[k];
     if (v && v.score != null) out.push({ k, nome, score: Math.round(v.score), sub: v.label || v.status || v.rating || "" });
@@ -5852,12 +5910,33 @@ const renderFundTable = () => {}, renderWlFundTable = () => {};
    Financial Health NON c'erano: tagliarle le avrebbe fatte sparire dal sistema, non dalla
    pagina. È esattamente la classe v201-v204 (un taglio che si porta via il vicino), evitata
    perché la ricevuta è stata scritta PRIMA. */
+/* ═══ v251 — FINANCIAL HEALTH È UN PUNTEGGIO: al suo posto vanno i NUMERI che lo compongono ═
+   Richiesta CEO: "in financial health i contenuti portali nella tabella principale".
+   `fin_health` è un 0-100 fatto per il 40% dalla crescita dei ricavi, 30% dalla costanza degli
+   utili e 30% dalla stabilità del margine. I dati grezzi ci sono già in `financials` (fino a 5
+   anni di ricavi, utile netto e margine) e NON SONO MAI STATI MOSTRATI da nessuna parte.
+   ⚠ Un punteggio composito nasconde di chi è il merito: 90/100 non dice se l'azienda cresce e
+   guadagna poco o cresce poco e guadagna tanto. I tre numeri sì. */
+function finanziariCells(r) {
+  const f = (r.financials || []).slice().sort((a, b) => a.year - b.year);
+  if (!f.length) return `<td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td>`;
+  const u = f[f.length - 1];
+  // crescita: CAGR sui ricavi della serie disponibile — è il 40% del punteggio che sostituisce
+  const cagr = f.length >= 2 && f[0].revenue > 0
+    ? (Math.pow(u.revenue / f[0].revenue, 1 / (f.length - 1)) - 1) * 100 : null;
+  const seg = (v) => v == null ? "" : (v >= 0 ? "pos" : "neg");
+  const anni = f.map(x => `${x.year}: ricavi ${fmtMcapShort(x.revenue)} · utile ${fmtMcapShort(x.net_income)} · margine ${fmtNum.format(x.margin)}%`).join("\n");
+  return `<td class="num" title="${esc(anni)}">${fmtMcapShort(u.revenue)}</td>
+    <td class="num ${seg(u.net_income)}" title="${esc(anni)}">${fmtMcapShort(u.net_income)}</td>
+    <td class="num ${seg(u.margin)}">${fmtNum.format(u.margin)}%</td>
+    <td class="num ${seg(cagr)}">${cagr == null ? "—" : signTxt(Math.round(cagr * 10) / 10)}</td>`;
+}
 function fundCells(r) {
   const st = r.stats || {};
   const pct = (v) => v == null ? "—" : (Math.round(v * 1000) / 10) + "%";
   return `<td class="num">${st.debt_to_equity == null ? "—" : fmtNum.format(Math.round(st.debt_to_equity * 10) / 10)}</td>
     <td class="num">${pct(st.dividend_yield)}</td>
-    <td class="num">${finHealthBar(r)}</td>`;
+    ${finanziariCells(r)}`;
 }
 /* market cap abbreviata: la tabella e' gia' larga, "1,2T" batte "1.200.000" */
 function fmtMcapShort(v) {
@@ -5891,13 +5970,21 @@ function techCells(r) {
       ${r.rs_ndx_1m != null
         ? `<td class="num" title="Sovra/sotto-performance a 1 mese vs Nasdaq 100 (metro del mandato)"><span class="${signCls(r.rs_ndx_1m)}">${signTxt(r.rs_ndx_1m, " pp")}</span></td>`
         : `<td class="num muted" title="Disponibile dopo il prossimo run della pipeline">n.d.</td>`}
-      <td title="Logica del segnale: prezzo vs SMA50/SMA200 (trend) + RSI(14), calcolati su base giornaliera (daily). Golden setup = prezzo > SMA50 > SMA200 con RSI non estremo."><span class="badge ${r.signal_class}">${r.signal}</span>${isAsimm(r) ? ` <span class="badge badge-asimm" title="Motore di volatilità asimmetrica rialzista: Sortino 1A > 1,7× Sharpe 1A con RSI>55. Niente prese di beneficio da ipercomprato — solo stop ratchet 2×ATR.">⚡ASIMM</span>` : ""}${r.qty && r.stop_violated ? `<br><span class="badge badge-earnrisk" title="Il prezzo è SOTTO lo stop trailing ancorato ($${fmtNum.format(r.stop_atr)}): la disciplina prevede uscita o ri-arm consapevole. Lo stop ratchet non si riabbassa da solo.">[STOP VIOLATO]</span>` : ""}</td>
+      /* v251 — COLONNA "Segnale" RIMOSSA: era un'etichetta calcolata da RSI e distanza dalla
+         SMA200, cioè da DUE COLONNE già presenti nella stessa riga. Un verdetto travestito da
+         dato, e il CEO l'ha nominata per prima.
+         ⚠ Dentro quella cella vivevano ANCHE [STOP VIOLATO] e ⚡ASIMM, che verdetti non sono:
+         lo stop violato è spostato sulla colonna Titolo (fissa, non nascondibile), dove un
+         allarme deve stare. ⚡ASIMM esce: è un'etichetta derivata da Sortino e Sharpe, entrambi
+         colonne. Classe v201-v204 evitata scrivendo la ricevuta prima del taglio. */
+
       ${shortFloatCell(r)}
       ${floatCell(r)}
       ${drawdownCell(r)}
       ${optImpactCell(r.ticker)}
       ${earningsCell(r)}
-      <td class="spark-cell" data-tk="${r.ticker}" title="Clicca per ingrandire">${sparkline((r.sparks || {})[sparkRange])}</td>`;
+      /* v251 — COLONNA "Grafico" RIMOSSA (richiesta CEO: elimina i grafici dalla tabella).
+         Lo sparkline resta raggiungibile dalla scheda del titolo, che si apre dal nome. */`;
 }
 
 /* ═══ v228 — GIORNI DI CALENDARIO ALLA TRIMESTRALE, UNA SOLA VOLTA ═════════════════════════
@@ -7262,7 +7349,7 @@ function renderTable() {
     const gEur = r.gain_eur != null ? r.gain_eur : (r.currency === "EUR" ? (r.gain || 0) : (r.gain || 0) / eurusd);
     const gPct = (r.bval != null && (r.bval - r.bgain)) ? r.bgain / (r.bval - r.bgain) * 100 : r.gain_pct;
     return `<tr>
-      <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${nameDelBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
+      <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${r.qty && r.stop_violated ? `<span class="badge badge-earnrisk" title="Il prezzo è SOTTO lo stop trailing ancorato ($${fmtNum.format(r.stop_atr)}): uscita o ri-arm consapevole. Lo stop ratchet non si riabbassa da solo.">[STOP VIOLATO]</span> ` : ""}${nameDelBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
       <td class="num">${fmtNum.format(r.qty)}</td>
       <td class="num">${c}${fmtNum.format(r.pmc)}</td>
       <td class="num"><b>${priceTxt(r, c)}</b></td>
@@ -7282,10 +7369,10 @@ function renderTable() {
     <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
     <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
     <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="18" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
+    <td colspan="19" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
   </tr>`;
   const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="27"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="28"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
   applicaVistaCompattaSePrimaVolta("ptf-table");
   applyColOrder("ptf-table");
@@ -7298,8 +7385,12 @@ function renderTable() {
 // ⚠ Le stringhe devono coincidere ESATTAMENTE con i testi delle <th> (index.html per le viste
 // tecniche, head[] di buildFundTable per le fondamentali): un mismatch fa sparire la colonna
 // dalle card mobile (test di guardia in test_app.mjs).
-const MOBILE_KEY_COLS = new Set(["Titolo", "Prezzo", "Oggi", "Guad. %", "Segnale", "Drawdown 52S", "Trimestrale",
-  "Financial Health"]);   // v208 — le fondamentali tolte dalla tabella sono uscite anche da qui
+/* ⚠ v251 — RIALLINEATO alle colonne nuove: "Segnale" e "Financial Health" non esistono più,
+   e un'etichetta orfana qui è muta (nessun errore, solo una colonna che su iPhone non viene
+   mai evidenziata). Al loro posto entra il MARGINE NETTO, che su uno schermo stretto dice più
+   di un punteggio composito. */
+const MOBILE_KEY_COLS = new Set(["Titolo", "Prezzo", "Oggi", "Guad. %", "Drawdown 52S",
+  "Trimestrale", "Marg. netto"]);
 function applyColLabels(tableId) {
   // textContent può contenere la freccia di sort (" ▼"/" ▲") appesa da updateSortArrows: va tolta
   const ths = [...document.querySelectorAll(`#${tableId} thead th`)].map(t => t.textContent.replace(/[▲▼]/g, "").trim());
@@ -7328,9 +7419,9 @@ function renderWatchlist() {
       ${volumeCell(r)}
       ${techCells(r)}
       ${fundCells(r)}
-    </tr>`).join("") : '<tr><td colspan="23" class="muted">Nessun dato</td></tr>';
+    </tr>`).join("") : '<tr><td colspan="24" class="muted">Nessun dato</td></tr>';
   const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="23"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
+    ? `<tr class="add-row"><td colspan="24"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
   $("#wl-table tbody").innerHTML = rows + addRow;
   riparaVistaCompattaWl();          // v206 — ripara il default difettoso, se intatto
   applicaVistaCompattaSePrimaVolta("wl-table");

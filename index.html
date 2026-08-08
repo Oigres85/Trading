@@ -18,7 +18,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=250">
+<link rel="stylesheet" href="assets/style.css?v=251">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -278,7 +278,8 @@
       <h2>Allocazione per settore e valuta</h2>
       <div class="spark-toggle" id="alloc-graf-toggle" role="group" aria-label="Vista allocazione grafica">
         <button class="chip chip-active" data-agmode="sector">Settore</button>
-        <button class="chip" data-agmode="currency">Valuta</button>
+        <!-- v251 — modalità "Valuta" RIMOSSA su richiesta del CEO: la quota in USD non
+             coperta è già pubblicata come misura nel rischio di cambio, e qui duplicava. -->
       </div>
     </div>
     <div id="allocg-chart"></div>
@@ -336,16 +337,16 @@
             <th class="num" title="Distanza % dalla media mobile a 200 giorni (price action pura)">Δ SMA200</th>
             <th class="num" title="Forza relativa 1 mese vs benchmark settoriale (SOX/NDX/S&P)">RS 1M</th>
             <th class="num" title="Forza relativa 1 mese vs Nasdaq 100 — metro diretto del mandato di sovraperformance">RS NDX 1M</th>
-            <th>Segnale</th>
+            
             <th class="num">Short %</th>
             <th class="num" title="Flottante: azioni liberamente scambiabili (M/B e % sul totale). Low float (<50M) + Short alto + RVol alto = rischio short squeeze / volatilità asimmetrica">Float</th>
             <th class="num">Drawdown 52S</th>
             <th>Opzioni</th>
             <th class="num">Trimestrale</th>
-            <th>Grafico</th>
+            
             <th class="num">Debt/Equity</th>
             <th class="num">Div Yield</th>
-            <th class="num" title="Punteggio di salute finanziaria calcolato dalla pipeline (0-100)">Financial Health</th>
+            <th class="num" title="Ricavi dell'ultimo esercizio disponibile (passa il mouse per la serie completa)">Ricavi</th><th class="num" title="Utile netto dell'ultimo esercizio (passa il mouse per la serie)">Utile netto</th><th class="num" title="Margine netto dell'ultimo esercizio: utile netto / ricavi">Marg. netto</th><th class="num" title="Crescita annua composta dei ricavi sulla serie disponibile">Cresc. ricavi</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -386,16 +387,16 @@
             <th class="num" title="Distanza % dalla media mobile a 200 giorni (price action pura)">Δ SMA200</th>
             <th class="num" title="Forza relativa 1 mese vs benchmark settoriale (SOX/NDX/S&P)">RS 1M</th>
             <th class="num" title="Forza relativa 1 mese vs Nasdaq 100 — metro diretto del mandato di sovraperformance">RS NDX 1M</th>
-            <th>Segnale</th>
+            
             <th class="num">Short %</th>
             <th class="num" title="Flottante: azioni liberamente scambiabili (M/B e % sul totale). Low float (<50M) + Short alto + RVol alto = rischio short squeeze / volatilità asimmetrica">Float</th>
             <th class="num">Drawdown 52S</th>
             <th>Opzioni</th>
             <th class="num">Trimestrale</th>
-            <th>Grafico</th>
+            
             <th class="num">Debt/Equity</th>
             <th class="num">Div Yield</th>
-            <th class="num" title="Punteggio di salute finanziaria calcolato dalla pipeline (0-100)">Financial Health</th>
+            <th class="num" title="Ricavi dell'ultimo esercizio disponibile (passa il mouse per la serie completa)">Ricavi</th><th class="num" title="Utile netto dell'ultimo esercizio (passa il mouse per la serie)">Utile netto</th><th class="num" title="Margine netto dell'ultimo esercizio: utile netto / ricavi">Marg. netto</th><th class="num" title="Crescita annua composta dei ricavi sulla serie disponibile">Cresc. ricavi</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -532,6 +533,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=250"></script>
+<script src="assets/app.js?v=251"></script>
 </body>
 </html>

@@ -2232,6 +2232,79 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     /Sharpe Ratio portafoglio/.test(pay) && !/target istituzionale/.test(pay) && !/vs target/.test(pay));
 }
 
+/* ═══ v251 — TABELLA DA ANALISTA, E L'IDEMPOTENZA CHE MANCAVA ════════════════════════════
+   ⚠ IL DIFETTO PIÙ GRAVE: applicando due volte le stesse operazioni le quantità si SONO
+   RADDOPPIATE sul repo (BE 40→80, SKHY 45→90, WDC 25→50, MRVL 42→84). Causa: il banner si
+   calcolava contro DATA.portfolio, che viene da data.json e resta indietro di 2-3 minuti
+   finché la pipeline non rigenera. Dopo l'applicazione bastava un ricaricamento perché il
+   banner tornasse, e il CEO — vedendolo — ha ricliccato.
+   Una scrittura ripetibile senza accorgersene è peggio di una che fallisce: fallisce in
+   silenzio nella direzione sbagliata. Ora la voce di diario applicata viene MARCATA, e la
+   marcatura vive nel diario (persistito nel repo), non in DATA. */
+{
+  const vivo = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const htmlIdx = readFileSync(join(ROOT, "index.html"), "utf8");
+
+  check("v251 idempotenza: una voce già applicata non viene riproposta", (() => {
+    const v = { date: "2026-08-06T10:00:00.000Z", text: "Acquisto 40 quote ZZZZ",
+                op: { tipo: "ACQUISTO", qty: 40, ticker: "ZZZZ", prezzo: 100 }, applicata: "2026-08-08T10:00:00.000Z" };
+    const r = suVeri(`
+      const _ld = loadDiary; loadDiary = () => ${JSON.stringify([v])};
+      DATA.broker = DATA.broker || {}; DATA.broker.as_of = "2026-07-29";
+      try { return JSON.stringify(divergenzaDiario()); } finally { loadDiary = _ld; }`);
+    return JSON.parse(r).certe.length === 0;
+  })());
+
+  // …e una NON applicata sì: la marcatura non deve spegnere il rilevatore
+  check("v251 idempotenza: una voce NON applicata viene ancora rilevata", (() => {
+    const v = { date: "2026-08-06T10:00:00.000Z", text: "Acquisto 40 quote ZZZZ",
+                op: { tipo: "ACQUISTO", qty: 40, ticker: "ZZZZ", prezzo: 100 } };
+    const r = suVeri(`
+      const _ld = loadDiary; loadDiary = () => ${JSON.stringify([v])};
+      DATA.broker = DATA.broker || {}; DATA.broker.as_of = "2026-07-29";
+      try { return JSON.stringify(divergenzaDiario()); } finally { loadDiary = _ld; }`);
+    return JSON.parse(r).certe.length === 1;
+  })());
+
+  /* ⚠ si marca SOLO dopo una scrittura riuscita: marcare prima perderebbe l'operazione se il
+     salvataggio fallisce — l'errore opposto, altrettanto grave. */
+  check("v251 idempotenza: la marcatura avviene DOPO la scrittura, non prima", (() => {
+    const i = vivo.indexOf("async function applicaDivergenzeMancanti");
+    const b = vivo.slice(i, i + 2400);
+    const iw = b.indexOf("await editHoldings"), im = b.indexOf("marcaVociApplicate");
+    return iw > 0 && im > iw;
+  })());
+
+  // colonne: via il verdetto derivato, dentro i numeri che stavano sotto un punteggio
+  check("v251 colonne: via Segnale, Grafico e Financial Health", (() => {
+    const th = [...htmlIdx.matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map(m => m[1].replace(/<[^>]+>/g, "").trim());
+    return !th.includes("Segnale") && !th.includes("Grafico") && !th.includes("Financial Health");
+  })());
+
+  check("v251 colonne: dentro ricavi, utile netto, margine netto e crescita", (() => {
+    const th = [...htmlIdx.matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map(m => m[1].replace(/<[^>]+>/g, "").trim());
+    return ["Ricavi", "Utile netto", "Marg. netto", "Cresc. ricavi"].every(c => th.includes(c));
+  })());
+
+  /* ⚠ il badge [STOP VIOLATO] viveva DENTRO la cella "Segnale": tagliando la colonna se lo
+     sarebbe portato via. È la classe v201-v204, evitata spostandolo sul Titolo — che è la
+     colonna fissa e non si può nascondere. */
+  check("v251 colonne: lo [STOP VIOLATO] è sopravvissuto al taglio, sulla colonna fissa", (() => {
+    const i = vivo.indexOf('<td class="name-cell" data-tk=');
+    if (i < 0) return false;
+    return /STOP VIOLATO/.test(vivo.slice(i, i + 700));
+  })());
+
+  check("v251 allocazione: la modalità Valuta è stata rimossa",
+    !/data-agmode="currency"/.test(htmlIdx));
+
+  // ogni variabile del ciclo economico deve avere una scheda macro
+  check("v251 macro: il VIX ha una scheda propria nella classifica", (() => {
+    const nomi = suVeri("return JSON.stringify(indicatoriClassifica().map(x => x.nome));");
+    return JSON.parse(nomi).some(n => /VIX/.test(n));
+  })());
+}
+
 /* ═══ v250 — OGNI DATO MACRO DICE QUANDO ARRIVA IL PROSSIMO ══════════════════════════════
    Richiesta CEO dopo il dubbio sul margin debt: "fornisci data aggiornamento dato e prossimo
    aggiornamento". È la risposta strutturale a quel dubbio — un dato di 68 giorni con scritto
