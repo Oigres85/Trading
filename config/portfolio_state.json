@@ -1,0 +1,74 @@
+{
+ "cash": {
+  "v": 10000,
+  "at": "2026-08-08T13:03:07.191Z"
+ },
+ "holdings": {
+  "v": [
+   {
+    "ticker": "AMD",
+    "name": "AMD",
+    "qty": 100,
+    "pmc": 153.916,
+    "currency": "USD"
+   },
+   {
+    "ticker": "NVDA",
+    "name": "NVIDIA",
+    "qty": 270,
+    "pmc": 81.167,
+    "currency": "USD"
+   },
+   {
+    "ticker": "MU",
+    "name": "Micron",
+    "qty": 70,
+    "pmc": 87.63,
+    "currency": "USD"
+   },
+   {
+    "ticker": "MSTR",
+    "name": "Strategy",
+    "qty": 173,
+    "pmc": 173.304,
+    "currency": "USD"
+   },
+   {
+    "ticker": "RGTI",
+    "name": "Rigetti",
+    "qty": 595,
+    "pmc": 26.504,
+    "currency": "USD"
+   },
+   {
+    "ticker": "GOOGL",
+    "name": "Alphabet Inc",
+    "qty": 50,
+    "pmc": 340.2,
+    "currency": "USD"
+   },
+   {
+    "ticker": "PLTR",
+    "name": "Palantir",
+    "qty": 100,
+    "pmc": 113.5,
+    "currency": "USD"
+   },
+   {
+    "ticker": "ORCL",
+    "name": "ORCL",
+    "qty": 70,
+    "pmc": 143,
+    "currency": "USD"
+   }
+  ],
+  "at": ""
+ },
+ "btp": {
+  "v": {
+   "qty": 40000,
+   "pmc": 100
+  },
+  "at": ""
+ }
+}
