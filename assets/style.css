@@ -1841,3 +1841,15 @@ svg.g-serie { cursor: crosshair; }
   overflow-wrap: anywhere; }
 .va-vuoto { padding: 14px; border: 1px dashed var(--border); border-radius: 8px; font-size: 13px; }
 @media (max-width: 560px) { .va-tag { margin-left: 0; } }
+
+/* ═══ v256 — PAGINA UNICA: analisi spot del titolo e correlazione macro ═══════════════ */
+.shell-unica { grid-template-columns: 1fr; }        /* niente barra laterale: una stanza sola */
+.tk-riga { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+#tk-input { flex: 1 1 240px; min-width: 0; font-size: 15px; letter-spacing: .04em;
+  text-transform: uppercase; }
+#tk-esito { margin-top: 8px; font-size: 12.5px; min-height: 1.2em; }
+#corr-macro { display: grid; gap: 12px; }
+@media (min-width: 861px) { #corr-macro { grid-template-columns: 1fr 1fr; } }
+#corr-macro .mg-card { min-width: 0; }              /* v192: le celle di un grid non scendono
+                                                        sotto il contenuto senza min-width:0 */
+#corr-macro-note { margin-top: 10px; font-size: 12.5px; }

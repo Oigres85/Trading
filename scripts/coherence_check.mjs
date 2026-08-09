@@ -344,39 +344,30 @@ function c11_grandezzePerTitolo(t, ctx) {
    blocco che li ospita, il taglio smette di essere gratuito e diventa una perdita di dati, in
    silenzio. Questo controllo e' la ricevuta del taglio — gira sul payload VERO, non su un
    fixture, perche' e' li' che quei numeri esistono. */
+/* ⚠ v256 — C12 RIALLINEATA ALLA PAGINA MACRO, non spenta.
+   La ricevuta del taglio v184 elencava fatti che vivevano nelle tabelle per-titolo: ΔRS, ΔMCR,
+   MCR Top-3, peso NAV, beta NDX, concentrazione di fattore, EPS della watchlist. Quelle tabelle
+   non esistono piu' — il CEO ha chiuso portafoglio, watchlist e news — quindi cercarle sarebbe
+   pretendere la ricevuta di un taglio che nessuno ha piu' fatto.
+   Ma l'INVARIANTE resta identico e vale ancora: i fatti MACRO che i blocchi tagliati portavano
+   devono essere ancora nel payload. Sono questi, e sono tutti verificabili sul pacchetto vero. */
 function c12_fattiSopravvissuti(t) {
   const ATTESI = [
-    { che: "ΔRS 7g per titolo",      re: /ΔRS 7g/,                    era: "CINEMATICA DEI SEGNALI", ora: "tabella CINEMATICA & TREND PER TITOLO" },
-    { che: "ΔMCR 7g per titolo",     re: /ΔMCR 7g/,                   era: "CINEMATICA DEI SEGNALI", ora: "tabella CINEMATICA & TREND PER TITOLO" },
-    { che: "term structure VIX",     re: /VIX\/VIX3M [\d,]+/,          era: "CINEMATICA DEI SEGNALI", ora: "QUADRO MACRO" },
-    { che: "Δ7g dello Sharpe",       re: /Sharpe [\d,]+ \(Δ7 [\d,-]+\)/, era: "CINEMATICA DEI SEGNALI", ora: "digest ANALISI STORICA" },
-    { che: "MCR Top-3",              re: /MCR Top-3 \d+%/,             era: "CINEMATICA DEI SEGNALI", ora: "REGIME DI VARIANZA" },
-    { che: "P/E S&P 500 e Nasdaq",   re: /P\/E Ratio S&P 500[^\n]*Nasdaq 100/, era: "CONTESTO ECONOMIA USA", ora: "ROTAZIONE SETTORIALE" },
-    { che: "tasso Fed",              re: /Fed Funds Rate/,             era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
-    /* ⚠ v229 — riagganciata al FATTO, non alle parole. La ricevuta cercava le due etichette
-       "Inflazione CPI" … "Inflazione PCE" su righe separate; dalla v229 le due misure stanno
-       su UNA riga sola (sono la stessa grandezza e contarle due volte raddoppiava un segnale).
-       Il fatto — entrambi i valori nel payload — non e' andato perso, e questa e' la quinta
-       volta in questo progetto che un check ancorato a una stringa letterale si rompe su una
-       riformulazione senza che nulla sia davvero mancante. */
-    { che: "CPI e PCE",              re: /CPI\s+[\d.,]+%?[\s\S]{0,120}PCE\s+[\d.,]+%?|Inflazione CPI[\s\S]{0,400}Inflazione PCE/, era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
-    { che: "curva 10A-2A",           re: /Curva 10A-2A/,               era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
-    { che: "peso NAV per titolo",    re: /% NAV · MCR /,               era: "MATRICE DI RISCHIO (colonna)", ora: "CORRELAZIONI news↔book" },
-    { che: "beta NDX per titolo",    re: /\| Beta NDX \|/,             era: "MATRICE DI RISCHIO (colonna)", ora: "Tabella A" },
-    { che: "rotazione settoriale",   re: /Semiconduttori \(SMH\)/,     era: "TOP 10 ETF", ora: "ROTAZIONE SETTORIALE" },
-    // v185: aggiunto DOPO aver provato il payload su me stesso — l'avevo tolto senza che nulla
-    // se ne accorgesse, ed e' esattamente il buco che C12 esiste per non lasciare aperto.
-    // v201: aggiunto DOPO che il taglio del motore se l'era portato via in silenzio. E' il fatto
-    // di rischio piu' importante del book e viveva dentro i "motivi del verdetto": togliendo il
-    // verdetto e' sparito con lui. C12 esiste esattamente per questo e non lo copriva.
-    { che: "concentrazione di fattore", re: /CONCENTRAZIONE DI FATTORE[\s\S]{0,120}della VARIANZA/,
-      era: "motivi del verdetto (v200 lo ha rimosso)", ora: "riga propria nel blocco filtri" },
-    { che: "EPS dei titoli watchlist", re: /\| EPS \|/,                 era: "Tabella B (tolto per errore in v184)", ora: "Tabella B" },
+    { che: "term structure VIX",   re: /VIX\/VIX3M [\d,]+/,                       era: "CINEMATICA DEI SEGNALI", ora: "QUADRO MACRO" },
+    { che: "P/E S&P 500 e Nasdaq", re: /P\/E Ratio S&P 500[^\n]*Nasdaq 100/,      era: "CONTESTO ECONOMIA USA",  ora: "ROTAZIONE" },
+    { che: "tasso Fed",            re: /Fed Funds Rate/,                          era: "CONTESTO ECONOMIA USA",  ora: "QUADRO MACRO" },
+    { che: "CPI e PCE",            re: /CPI\s+[\d.,]+%?[\s\S]{0,160}PCE\s+[\d.,]+%?/, era: "CONTESTO ECONOMIA USA", ora: "QUADRO MACRO" },
+    { che: "curva 10A-2A",         re: /Curva 10A-2A/,                            era: "CONTESTO ECONOMIA USA",  ora: "QUADRO MACRO" },
+    /* v256 — la ricevuta del taglio NUOVO: il pacchetto macro ha perso portafoglio, watchlist
+       e news, e questi sono i fatti che DOVEVANO sopravvivere a quel taglio. */
+    { che: "rotazione settoriale", re: /ROTAZIONE SETTORIALE/,                     era: "pagina portafoglio",     ora: "ROTAZIONE" },
+    { che: "disaccordo macro",     re: /DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO/, era: "CORRELAZIONI news↔book", ora: "blocco proprio" },
+    { che: "serie storiche macro", re: /ANALISI STORICA DELLE SERIE MACRO/,        era: "digest per titolo",      ora: "digest macro" },
+    { che: "fase della seduta",    re: /CONTESTO DI SESSIONE|SESSIONE USA/i,       era: "blocco portafoglio",     ora: "sopra il quadro macro" },
   ];
   const persi = ATTESI.filter(a => !a.re.test(t));
   if (persi.length) flag("C12 fatto perso in un taglio", persi.map(a =>
     `"${a.che}" non è più nel payload: stava in ${a.era}, doveva restare in ${a.ora}`).join(" · "));
-  else ok(`C12 i ${ATTESI.length} fatti dei blocchi rimossi in v184 sono tutti ancora nel payload`);
 }
 
 /* ═══════════ C13 — AGGREGATI SU UN BOOK PREZZATO A SEDUTE DIVERSE ═══════════════════

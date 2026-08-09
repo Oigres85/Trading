@@ -34,43 +34,8 @@ const sortState = {
   "ptf-table": { field: null, dir: 0 }, "wl-table": { field: null, dir: 0 },
 };
 
-function sortVal(r, field) {
-  if (field === "prepost_chg") return r.prepost?.change_pct ?? null;
-  if (field === "upside_pct") return r.rating?.upside_pct ?? null;
-  if (field === "pfcf") {                    // P/FCF calcolato al volo
-    const st = r.stats || {};
-    return (st.market_cap && st.fcf) ? st.market_cap / st.fcf : null;
-  }
-  if (field && field.startsWith("stat:")) return r.stats?.[field.slice(5)] ?? null;
-  return r[field] ?? null;
-}
 
-function sortRows(rows, tableId) {
-  const { field, dir } = sortState[tableId];
-  if (!field || !dir) return rows;
-  return [...rows].sort((a, b) => {
-    const va = sortVal(a, field), vb = sortVal(b, field);
-    if (va === null && vb === null) return 0;
-    if (va === null) return 1;          // i valori mancanti sempre in fondo
-    if (vb === null) return -1;
-    if (typeof va === "string") return dir === 1 ? vb.localeCompare(va) : va.localeCompare(vb);
-    return dir === 1 ? vb - va : va - vb;
-  });
-}
 
-function updateSortArrows(tableId) {
-  const { field, dir } = sortState[tableId];
-  document.querySelectorAll(`#${tableId} thead th`).forEach((th, i) => {
-    th.querySelector(".sort-arrow")?.remove();
-    const f = SORT_FIELDS[tableId][Number(th.dataset.col ?? i)];
-    if (f && f === field && dir) {
-      const s = document.createElement("span");
-      s.className = "sort-arrow";
-      s.textContent = dir === 1 ? " ▼" : " ▲";
-      th.appendChild(s);
-    }
-  });
-}
 
 /* ═══ v165 — ORDINE DELLE COLONNE personalizzabile (drag & drop sull'intestazione) ═══════
    L'ordine vive in localStorage per-tabella come permutazione degli indici ORIGINALI, così
@@ -113,46 +78,8 @@ const VISTA_COMPATTA = {
    produceva: se l'utente ha toccato qualcosa, anche una sola colonna, la sua scelta resta.
    Vale una volta, poi la chiave impedisce di ripassarci. */
 const VECCHIA_COMPATTA_WL = [0, 1, 2, 5, 6, 13, 18];
-function riparaVistaCompattaWl() {
-  const tid = "wl-table", chiave = "vista_riparata_v206";
-  try {
-    if (localStorage.getItem(chiave)) return;
-    localStorage.setItem(chiave, "1");
-    const salvate = loadColHidden(tid);
-    if (!salvate.size) return;                              // mai applicata: ci pensa il default
-    const head = document.querySelector(`#${tid} thead tr`);
-    if (!head) return;
-    const vecchie = new Set([...head.children].map((_, i) => i).filter(i => !VECCHIA_COMPATTA_WL.includes(i)));
-    const uguali = vecchie.size === salvate.size && [...vecchie].every(i => salvate.has(i));
-    if (!uguali) return;                                    // l'utente ha scelto: non si tocca
-    const nuove = new Set([...head.children].map((_, i) => i).filter(i => !VISTA_COMPATTA[tid].includes(i)));
-    saveColHidden(tid, nuove);
-  } catch { /* localStorage non disponibile */ }
-}
 
-function applicaVistaCompattaSePrimaVolta(tid) {
-  const chiaveFatto = `vista_iniziale_${tid}`;
-  if (localStorage.getItem(chiaveFatto)) return;           // gia' deciso: non si tocca piu'
-  try { localStorage.setItem(chiaveFatto, "1"); } catch { /* quota */ }
-  if (localStorage.getItem(colHiddenKey(tid))) return;     // l'utente ha gia' scelto: si rispetta
-  const head = document.querySelector(`#${tid} thead tr`);
-  if (!head) return;
-  const visibili = new Set(VISTA_COMPATTA[tid] || []);
-  const nascoste = new Set([...head.children].map((_, i) => i).filter(i => !visibili.has(i)));
-  saveColHidden(tid, nascoste);
-}
 /* interruttore compatta/completa: una riga sola, e dice quante colonne stai vedendo */
-function renderVistaSwitch(tid, contenitore) {
-  const el = document.querySelector(contenitore);
-  if (!el) return;
-  const head = document.querySelector(`#${tid} thead tr`);
-  if (!head) return;
-  const tot = head.children.length;
-  const nasc = loadColHidden(tid).size;
-  el.innerHTML = `<span class="vs-lab">${tot - nasc}/${tot} colonne</span>
-    <button class="chip${nasc ? " chip-active" : ""}" data-vista="compatta" data-t="${tid}">Compatta</button>
-    <button class="chip${nasc ? "" : " chip-active"}" data-vista="completa" data-t="${tid}">Completa</button>`;
-}
 
 function loadColHidden(tid) {
   try {
@@ -166,36 +93,6 @@ function saveColHidden(tid, set) {
 /* applica la visibilita' a thead e righe dati, e RESTRINGE il colspan delle righe speciali
    (TOTALE, "+ Aggiungi titolo", nota BTP) di quante colonne coperte sono nascoste — senza
    questo la riga TOTALE sborderebbe e la tabella si disallineerebbe visivamente. */
-function applyColVisibility(tid) {
-  const head = document.querySelector(`#${tid} thead tr`);
-  if (!head) return;
-  const nascoste = loadColHidden(tid);
-  const ths = [...head.children];
-  ths.forEach((th, i) => { if (th.dataset.col == null) th.dataset.col = String(i); });
-  const nCol = ths.length;
-  const mostra = (cell) => {
-    const c = Number(cell.dataset.col ?? -1);
-    cell.hidden = c >= 0 && nascoste.has(c);
-  };
-  ths.forEach(mostra);
-  const ordine = ths.map(th => Number(th.dataset.col));      // ordine di VISUALIZZAZIONE corrente
-  document.querySelectorAll(`#${tid} tbody tr`).forEach(tr => {
-    const cells = [...tr.children];
-    if (cells.length === nCol) { cells.forEach((td, i) => { if (td.dataset.col == null) td.dataset.col = String(ordine[i]); }); cells.forEach(mostra); return; }
-    // riga speciale: si accorcia ogni colspan di quante colonne coperte sono nascoste
-    let usate = 0;
-    for (const td of cells) {
-      const span = Number(td.getAttribute("colspan") || 1);
-      if (td.dataset.span0 == null) td.dataset.span0 = String(span);
-      const orig = Number(td.dataset.span0);
-      const coperte = ordine.slice(usate, usate + orig);
-      const nasc = coperte.filter(c => nascoste.has(c)).length;
-      const nuovo = Math.max(1, orig - nasc);
-      if (orig > 1) td.setAttribute("colspan", String(nuovo)); else td.hidden = nasc > 0;
-      usate += orig;
-    }
-  });
-}
 /* pannello di scelta: una casella per colonna, nell'ordine in cui compaiono ora */
 function openColumnPicker(tid, etichetta, rerender) {
   const head = document.querySelector(`#${tid} thead tr`);
@@ -232,107 +129,10 @@ function openColumnPicker(tid, etichetta, rerender) {
 }
 
 const colOrderKey = (tid) => `colorder_${tid}`;
-function loadColOrder(tid, n) {
-  try {
-    const a = JSON.parse(localStorage.getItem(colOrderKey(tid)) || "null");
-    if (Array.isArray(a) && a.length === n && a.every(i => Number.isInteger(i) && i >= 0 && i < n)
-        && new Set(a).size === n) return a;
-  } catch { /* ordine corrotto o schema cambiato → si torna al default */ }
-  return null;
-}
-function saveColOrder(tid, order) {
-  try { localStorage.setItem(colOrderKey(tid), JSON.stringify(order)); } catch { /* quota */ }
-}
-function resetColOrder(tid) {
-  try { localStorage.removeItem(colOrderKey(tid)); } catch { /* no-op */ }
-}
 /* applica la permutazione a thead e a ogni riga dati (le righe con celle in colspan — TOTALE,
    "+ Aggiungi titolo", note BTP — hanno un numero di celle diverso e vengono saltate) */
-function applyColOrder(tid) {
-  const head = document.querySelector(`#${tid} thead tr`);
-  if (!head || !head.children) return;
-  const ths = [...head.children];
-  ths.forEach((th, i) => { if (th.dataset.col == null) th.dataset.col = String(i); });
-  const order = loadColOrder(tid, ths.length);
-  if (!order) return;
-  const place = (row) => {
-    const cells = [...row.children];
-    if (cells.length !== order.length) return;             // riga speciale: non toccarla
-    order.forEach(orig => {
-      const c = cells.find(x => Number(x.dataset.col ?? -1) === orig);
-      if (c) row.appendChild(c);
-    });
-  };
-  head.querySelectorAll("th").forEach((th, i) => { if (th.dataset.col == null) th.dataset.col = String(i); });
-  place(head);
-  document.querySelectorAll(`#${tid} tbody tr`).forEach(tr => {
-    const cells = [...tr.children];
-    if (cells.length !== order.length) return;
-    cells.forEach((td, i) => { if (td.dataset.col == null) td.dataset.col = String(i); });
-    place(tr);
-  });
-}
 /* trascinamento dell'intestazione per spostare una colonna a sinistra/destra */
-function initColDrag(tid, rerender) {
-  const head = document.querySelector(`#${tid} thead tr`);
-  if (!head || !head.children || head.dataset?.dragReady === "1") return;
-  head.dataset.dragReady = "1";
-  const ths = [...head.children];
-  ths.forEach((th, i) => {
-    if (th.dataset.col == null) th.dataset.col = String(i);
-    th.draggable = true;
-    th.classList.add("col-draggable");
-    th.title = (th.title ? th.title + " · " : "") + "Trascina per spostare la colonna";
-    th.addEventListener("dragstart", (e) => {
-      e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("text/plain", th.dataset.col);
-      th.classList.add("col-dragging");
-    });
-    th.addEventListener("dragend", () => {
-      th.classList.remove("col-dragging");
-      document.querySelectorAll(`#${tid} thead th`).forEach(x => x.classList.remove("col-over"));
-    });
-    th.addEventListener("dragover", (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; th.classList.add("col-over"); });
-    th.addEventListener("dragleave", () => th.classList.remove("col-over"));
-    th.addEventListener("drop", (e) => {
-      e.preventDefault();
-      th.classList.remove("col-over");
-      const from = Number(e.dataTransfer.getData("text/plain"));
-      const to = Number(th.dataset.col);
-      if (!Number.isInteger(from) || !Number.isInteger(to) || from === to) return;
-      const cur = loadColOrder(tid, ths.length) || ths.map((_, k) => k);
-      const iFrom = cur.indexOf(from), iTo = cur.indexOf(to);
-      if (iFrom < 0 || iTo < 0) return;
-      cur.splice(iTo, 0, ...cur.splice(iFrom, 1));         // sposta la colonna nella posizione di rilascio
-      saveColOrder(tid, cur);
-      rerender();
-      toast("Ordine colonne aggiornato — doppio clic sull'intestazione per ripristinare");
-    });
-    // doppio clic = ripristino dell'ordine originale (scorciatoia senza UI extra)
-    th.addEventListener("dblclick", (e) => {
-      if (!loadColOrder(tid, ths.length)) return;
-      e.preventDefault(); e.stopPropagation();
-      resetColOrder(tid); rerender();
-      toast("Ordine colonne ripristinato");
-    });
-  });
-}
 
-function initSorting(tableId, rerender) {
-  document.querySelectorAll(`#${tableId} thead th`).forEach((th, i) => {
-    const f = SORT_FIELDS[tableId][Number(th.dataset.col ?? i)];
-    if (!f) return;
-    th.classList.add("sortable");
-    th.addEventListener("click", () => {
-      const st = sortState[tableId];
-      if (st.field !== f) { st.field = f; st.dir = 1; }
-      else st.dir = (st.dir + 1) % 3;     // desc → asc → default
-      if (!st.dir) st.field = null;
-      rerender();
-      updateSortArrows(tableId);
-    });
-  });
-}
 
 const $ = (sel) => document.querySelector(sel);
 const fmtEUR = new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
@@ -358,8 +158,6 @@ function isAsimm(r) {
   const sh = r.sharpe_1y, so = r.sortino_1y, rsi = r.rsi;
   return sh != null && so != null && sh > 0 && so / sh > 1.7 && rsi != null && rsi > 55;
 }
-function signalTxt(r) { return `${r.signal ?? "—"}${isAsimm(r) ? " [⚡ASIMM]" : ""}`; }
-
 // Polymarket Δ7g (v136): storico client-side delle probabilità (localStorage, un punto/giorno)
 // → velocità del sentiment speculativo macro. Senza 7 giorni di storico → "[Δ7g —]".
 function pmHist() { try { return JSON.parse(localStorage.getItem("polymarket_hist") || "{}"); } catch { return {}; } }
@@ -414,7 +212,8 @@ async function loadData(showSpin = false) {
       catch (e) { lastErr = e; await new Promise(r => setTimeout(r, 1200 * (i + 1))); }
     }
     if (lastErr) throw lastErr;
-    mergeManualHoldings();        // reintegra le posizioni aggiunte a mano (localStorage)
+    /* v256 — mergeManualHoldings(): reintegrava le posizioni aggiunte a mano. Niente
+       portafoglio, niente posizioni da reintegrare. */
     applyMacroOverrides();        // correzioni manuali dei dati macro flaggati (decadono da sole)
     renderAll();
     livePrices();
@@ -423,7 +222,7 @@ async function loadData(showSpin = false) {
     console.error(e);
     // se non ho mai caricato dati, mostro un avviso invece di una pagina vuota
     if (!DATA) {
-      const el = $("#earnings-alert");
+      const el = $("#dataquality-alert");   // v256: #earnings-alert non esiste piu'
       if (el) { el.hidden = false; el.className = "data-error"; el.innerHTML = `⚠ Impossibile caricare i dati (rete/proxy). <button class="btn btn-ghost btn-sm" onclick="loadData(true)">Riprova</button>`; }
     }
     if (showSpin) toast("Errore nel caricamento dati — riprovo tra poco");
@@ -627,19 +426,6 @@ const editMode = { portfolio: false, watchlist: false };
    si aggiorna DA SOLA alla data odierna. Prima restava ferma e il banner "RICONCILIA COL
    BROKER" continuava a suonare a vuoto finché l'utente non editava holdings.json a mano.
    Le modifiche alla sola watchlist non toccano le posizioni → data invariata. */
-function stampBrokerDate(cfg, section) {
-  if (section !== "watchlist" && cfg && cfg.broker) {
-    cfg.broker.as_of = new Date().toISOString().slice(0, 10);
-    // Il timbro vale per le POSIZIONI (qty/PMC appena riconciliati a mano), NON per i
-    // controvalori bval/bgain, che appartengono al VECCHIO snapshot: tenerli con la data
-    // nuova stringerebbe la banda del drift (scala con √giorni) e il banner RICONCILIA
-    // griderebbe al lupo su puro movimento di mercato (visto sul campo: RGTI -22% dal
-    // 22/06 = mercato, non trade fantasma). Via i campi stale: tornano col prossimo
-    // snapshot completo incollato dal broker in holdings.json.
-    (cfg.portfolio || []).forEach(p => { delete p.bval; delete p.bgain; });
-  }
-  return cfg;
-}
 
 /* ⚠ v254 — IL `name` MANCANTE HA UCCISO LA PIPELINE, E IL SINTOMO SEMBRAVA UN ALTRO.
    Le posizioni create da qui uscivano come {ticker, qty, pmc}, mentre `update_data.py` faceva
@@ -654,66 +440,7 @@ function stampBrokerDate(cfg, section) {
    ticker: mai assente. Il fallback c'è anche in `update_data.py` — un'etichetta da mostrare
    non deve poter fermare l'acquisizione dei prezzi. Due reti, perché il difetto è passato
    proprio dove non ce n'era nessuna. */
-function nomeTitolo(tk, cfg) {
-  const T = String(tk || "").toUpperCase();
-  const daWl = (cfg && Array.isArray(cfg.watchlist) ? cfg.watchlist : [])
-    .find(r => String(r.ticker || "").toUpperCase() === T);
-  if (daWl && daWl.name) return daWl.name;
-  const daDati = [...((typeof DATA !== "undefined" && DATA?.watchlist) || []),
-                  ...((typeof DATA !== "undefined" && DATA?.portfolio) || [])]
-    .find(r => String(r.ticker || "").toUpperCase() === T);
-  return (daDati && daDati.name) || T;
-}
 
-async function editHoldings(section, mutate) {
-  let esito = false;                          // v250: l'esito deve tornare a chi chiama
-  const token = getToken();
-  if (!token) { toast("Serve un token GitHub (permessi Actions + Contents) per modificare le posizioni"); return false; }
-  toast("Salvo la modifica…");
-  try {
-    // 1) leggi config/holdings.json con il suo SHA
-    const path = "config/holdings.json";
-    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: ghHeaders(token), cache: "no-store" });
-    if (!r.ok) {
-      if ([401, 403].includes(r.status)) { localStorage.removeItem("gh_token"); toast("Token senza permesso Contents/Actions — rimosso. Creane uno con quei permessi e riprova"); }
-      else if (r.status === 404) { toast("config/holdings.json non trovato sul repo"); }
-      else toast(`Errore lettura config (HTTP ${r.status})`);
-      return;
-    }
-    const file = await r.json();
-    const cfg = JSON.parse(decodeURIComponent(escape(atob((file.content || "").replace(/\s/g, "")))));
-    if (!mutate(cfg)) return false;           // mutate ritorna false se annullato/invalido
-    stampBrokerDate(cfg, section);            // auto-timestamp snapshot (v113, vedi helper)
-    // 2) scrivi il nuovo config
-    const body = {
-      message: `Aggiorna posizioni (${section})`,
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(cfg, null, 1)))),
-      sha: file.sha,
-    };
-    const put = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-      method: "PUT", headers: ghHeaders(token), body: JSON.stringify(body),
-    });
-    if (!put.ok) {
-      /* ⚠ v250 — un 409 (conflitto di SHA) qui era MUTO per chi chiamava: la funzione tornava
-         `undefined` e il chiamante non sapeva se avesse scritto. È così che quattro scritture
-         in corsa sono fallite tutte senza che nulla lo dicesse. */
-      toast(put.status === 409
-        ? "Conflitto: il file è cambiato nel frattempo. Ricarica e riprova."
-        : `Errore salvataggio (HTTP ${put.status})`);
-      return false;
-    }
-    // 3) rigenera i dati in background (NON blocca la UI: la modifica è già visibile)
-    dispatchWorkflow(token).catch(() => {});
-    toast("Salvato ✓ — dati completi tra ~2-3 min");
-    esito = true;
-    waitForNewData(DATA?.updated_at).then(ok => { if (ok) toast("Dati aggiornati ✓"); });
-  } catch (e) {
-    console.error(e);
-    toast("Errore durante il salvataggio della modifica");
-    return false;
-  }
-  return esito;
-}
 
 /* ═══ v244 — LO STATO DEL PORTAFOGLIO SEGUE IL CEO FRA I DISPOSITIVI ═══════════════════════
    Il CEO: "quando cambio parametri, es. aggiornamento di acquisti o di cash, questi non si
@@ -730,294 +457,24 @@ async function editHoldings(section, mutate) {
    modifica più vecchia sparirebbe in silenzio — e una perdita silenziosa è peggio di un conflitto. */
 const STATO_PTF_PATH = "config/portfolio_state.json";
 
-function statoPortafoglioLocale() {
-  const num = parseFloat(localStorage.getItem("cash_eur"));
-  let hold = [], btp = null;
-  try { hold = JSON.parse(localStorage.getItem("manual_holdings") || "[]"); } catch { /* corrotto */ }
-  try { btp = JSON.parse(localStorage.getItem("btp_override") || "null"); } catch { /* corrotto */ }
-  let ts = {};
-  try { ts = JSON.parse(localStorage.getItem("stato_ptf_ts") || "{}"); } catch { /* corrotto */ }
-  return {
-    cash:     { v: isNaN(num) ? 0 : num, at: ts.cash || "" },
-    holdings: { v: Array.isArray(hold) ? hold : [], at: ts.holdings || "" },
-    btp:      { v: btp, at: ts.btp || "" },
-  };
-}
 
 /* segna QUALE campo è cambiato e quando, poi salva e spedisce */
-function salvaStatoPortafoglio(campo) {
-  let ts = {};
-  try { ts = JSON.parse(localStorage.getItem("stato_ptf_ts") || "{}"); } catch { /* corrotto */ }
-  ts[campo] = new Date().toISOString();
-  try { localStorage.setItem("stato_ptf_ts", JSON.stringify(ts)); } catch { /* quota */ }
-  if (localStorage.getItem("gh_token")) pushStatoPortafoglioCloud(statoPortafoglioLocale());
-  else toast("Salvato solo su questo browser: senza token GitHub non arriva su iPhone");
-}
 
-async function pushStatoPortafoglioCloud(s) {
-  const token = localStorage.getItem("gh_token");
-  if (!token) return;
-  try {
-    let sha;
-    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${STATO_PTF_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
-    if (g.ok) sha = (await g.json()).sha;
-    await fetch(`https://api.github.com/repos/${REPO}/contents/${STATO_PTF_PATH}`, {
-      method: "PUT", headers: ghHeaders(token),
-      body: JSON.stringify({ message: "Stato portafoglio (cassa, posizioni, BTP)", content: btoa(unescape(encodeURIComponent(JSON.stringify(s, null, 1)))), sha }),
-    });
-  } catch { /* offline: resta in locale, riparte al prossimo salvataggio */ }
-}
 
 /* rilegge dal repo e tiene, PER OGNI CAMPO, la versione più recente */
-async function loadStatoPortafoglioCloud() {
-  try {
-    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${STATO_PTF_PATH}?t=${Date.now()}`, { cache: "no-store" });
-    if (!r.ok) return false;                       // 404 = non è mai stato salvato: nulla da fare
-    const cloud = await r.json();
-    if (!cloud || typeof cloud !== "object") return false;
-    const loc = statoPortafoglioLocale();
-    let ts = {}; try { ts = JSON.parse(localStorage.getItem("stato_ptf_ts") || "{}"); } catch { /* corrotto */ }
-    let cambiato = false;
-    // confronto esplicito campo per campo: più lungo di un ciclo, ma si legge cosa vince e perché
-    if (cloud.cash && (cloud.cash.at || "") > (loc.cash.at || "")) {
-      cashEur = parseFloat(cloud.cash.v) || 0;
-      localStorage.setItem("cash_eur", cashEur);
-      ts.cash = cloud.cash.at; cambiato = true;
-    }
-    if (cloud.holdings && (cloud.holdings.at || "") > (loc.holdings.at || "") && Array.isArray(cloud.holdings.v)) {
-      localStorage.setItem("manual_holdings", JSON.stringify(cloud.holdings.v));
-      ts.holdings = cloud.holdings.at; cambiato = true;
-    }
-    if (cloud.btp && (cloud.btp.at || "") > (loc.btp.at || "")) {
-      if (cloud.btp.v) localStorage.setItem("btp_override", JSON.stringify(cloud.btp.v));
-      else localStorage.removeItem("btp_override");
-      ts.btp = cloud.btp.at; cambiato = true;
-    }
-    if (!cambiato) return false;
-    try { localStorage.setItem("stato_ptf_ts", JSON.stringify(ts)); } catch { /* quota */ }
-    /* ⚠ i dati sono già stati fusi in DATA quando questa arriva: va rifatta la fusione e
-       ridisegnato tutto, altrimenti il valore nuovo resta invisibile fino a un reload manuale. */
-    mergeManualHoldings();
-    recomputeTotals();
-    if (typeof renderKPI === "function") renderKPI();
-    if (typeof renderTable === "function") renderTable();
-    if (typeof renderAllocation === "function") renderAllocation();
-    if (typeof renderCash === "function") renderCash();
-    toast("Portafoglio sincronizzato da un altro dispositivo ✓");
-    return true;
-  } catch { return false; }
-}
 
 /* --- posizioni aggiunte a mano: persistite in localStorage così sopravvivono al reload
    anche senza token GitHub. Quando la pipeline le include in data.json, vengono ignorate. --- */
-function loadManualHoldings() {
-  try { return JSON.parse(localStorage.getItem("manual_holdings") || "[]"); }
-  catch { return []; }
-}
-function saveManualHolding(h) {
-  const arr = loadManualHoldings().filter(x => x.ticker !== h.ticker);
-  arr.push(h);
-  localStorage.setItem("manual_holdings", JSON.stringify(arr));
-  salvaStatoPortafoglio("holdings");
-}
-function removeManualHolding(ticker) {
-  localStorage.setItem("manual_holdings",
-    JSON.stringify(loadManualHoldings().filter(x => x.ticker !== ticker)));
-  salvaStatoPortafoglio("holdings");
-}
 /* unisce le posizioni manuali al DATA.portfolio appena caricato da data.json */
-function mergeManualHoldings() {
-  try {
-    if (!DATA || !Array.isArray(DATA.portfolio)) return;
-    // override BTP salvato a mano (qty/PMC) — persiste tra i reload senza toccare la pipeline
-    try {
-      const bo = JSON.parse(localStorage.getItem("btp_override") || "null");
-      const btp = bo && DATA.portfolio.find(p => p.ticker === "BTP-V28");
-      if (btp) {
-        if (bo.qty > 0) btp.qty = bo.qty;
-        if (bo.pmc > 0) btp.pmc = bo.pmc;
-        btp.bval = null; btp.bgain = null;
-        if (btp.price) { btp.value = btp.qty * btp.price / 100; btp.gain = btp.value - btp.qty * btp.pmc / 100; }
-      }
-    } catch { /* nessun override BTP */ }
-    const manual = loadManualHoldings();
-    if (!manual.length) return;
-    let added = false;
-    manual.forEach(h => {
-      const ex = DATA.portfolio.find(p => p.ticker === h.ticker);
-      if (ex) {
-        // le mie correzioni manuali PREVALGONO sullo snapshot (a volte stale) del broker:
-        // applico qty/PMC e azzero bval/bgain così il valore si calcola dal prezzo live reale.
-        if (h.qty > 0) ex.qty = h.qty;
-        if (h.pmc > 0) ex.pmc = h.pmc;
-        ex.bval = null; ex.bgain = null;
-        if (ex.price && ex.currency === "USD") {
-          ex.value = ex.price * ex.qty;
-          ex.gain = ex.value - ex.pmc * ex.qty;
-          ex.gain_pct = Math.round((ex.value / (ex.pmc * ex.qty) - 1) * 10000) / 100;
-        }
-        added = true;
-        return;
-      }
-      const row = placeholderRow(h.ticker, h.currency || "USD", { qty: h.qty, pmc: h.pmc, name: h.name || h.ticker });
-      const btpIdx = DATA.portfolio.findIndex(p => p.ticker === "BTP-V28");
-      if (btpIdx >= 0) DATA.portfolio.splice(btpIdx, 0, row); else DATA.portfolio.push(row);
-      fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); });
-      added = true;
-    });
-    if (added) recomputeTotals();
-  } catch (e) { console.error("mergeManualHoldings", e); }
-}
 
-function addPortfolio() {
-  const ticker = (window.prompt("Ticker da aggiungere al portafoglio (es. AAPL):") || "").trim().toUpperCase();
-  if (!ticker) return;
-  if ((DATA.portfolio || []).some(p => p.ticker === ticker)) { toast(`${ticker} è già in portafoglio`); return; }
-  const qty = parseFloat(window.prompt(`Quantità di ${ticker}:`) || "");
-  const pmc = parseFloat(window.prompt(`Prezzo medio di carico (PMC) di ${ticker} in USD:`) || "");
-  if (!(qty > 0) || !(pmc > 0)) { toast("Quantità/PMC non validi"); return; }
-  // aggiunta ottimistica: la riga compare subito, i dati completi arrivano col workflow
-  const row = placeholderRow(ticker, "USD", { qty, pmc });
-  DATA.portfolio.splice(DATA.portfolio.length - 1, 0, row);   // prima del BTP
-  renderTable(); recomputeTotals(); renderKPI(); renderAllocation();
-  fillLivePrice(row, () => { recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); });
-  // persistenza locale (sopravvive al reload anche senza token)
-  saveManualHolding({ ticker, name: ticker, qty, pmc, currency: "USD" });
-  toast(`${ticker} aggiunto al portafoglio ✓`);
-  // persistenza sul repo (se c'è un token): la pipeline rigenera i dati completi
-  editHoldings("portfolio", cfg => {
-    cfg.portfolio = cfg.portfolio || [];
-    if (cfg.portfolio.some(p => p.ticker === ticker)) return false;
-    cfg.portfolio.push({ ticker, name: ticker, qty, pmc });
-    return true;
-  });
-}
 
 /* Modale "Modifica valori": edita qty + PMC di ogni posizione e la liquidità in un colpo solo.
    Salva localmente (sopravvive al reload) e, se c'è un token, persiste su config/holdings.json. */
-function openEditPortfolio() {
-  const rows = (DATA.portfolio || []);   // include anche il BTP (modificabile)
-  const body = `
-    <div class="info-line muted" style="font-size:11.5px;margin-bottom:8px">Modifica quantità e PMC di ogni posizione (BTP incluso) e la liquidità disponibile. Patrimonio, allocazione e KPI si aggiornano al salvataggio.</div>
-    <div class="edp-row edp-head"><span>Titolo</span><span>Quantità</span><span>PMC</span></div>
-    ${rows.map(r => `<div class="edp-row" data-edp="${r.ticker}">
-      <span class="edp-tk">${esc(r.name)} <span class="tk">${r.ticker}</span></span>
-      <input type="number" class="edp-qty" data-tk="${r.ticker}" value="${r.qty ?? ""}" step="any" min="0">
-      <input type="number" class="edp-pmc" data-tk="${r.ticker}" value="${r.pmc ?? ""}" step="any" min="0">
-    </div>`).join("")}
-    <div class="edp-row edp-cash"><span>Liquidità disponibile (€)</span><input type="number" id="edp-cash" value="${cashEur || ""}" step="any" min="0"><span></span></div>
-    <div class="edp-actions"><button class="btn btn-primary" id="edp-save">Salva modifiche</button>
-      <span class="muted" style="font-size:11px">le variazioni sono immediate; con token GitHub vengono anche salvate sul repo</span></div>`;
-  openInfoModal("Modifica valori portafoglio", body);
-  $("#edp-save")?.addEventListener("click", () => {
-    let changed = false;
-    document.querySelectorAll(".edp-row[data-edp]").forEach(div => {
-      const tk = div.dataset.edp;
-      const r = DATA.portfolio.find(x => x.ticker === tk);
-      if (!r) return;
-      const nq = parseFloat(div.querySelector(".edp-qty").value);
-      const np = parseFloat(div.querySelector(".edp-pmc").value);
-      if (nq > 0 && nq !== r.qty) { r.qty = nq; changed = true; }
-      if (np > 0 && np !== r.pmc) { r.pmc = np; changed = true; }
-      // ricalcola valore/guadagno dal prezzo corrente (no bval snapshot: ora è una posizione editata a mano)
-      if (r.price && r.currency === "USD") {
-        r.bval = null; r.bgain = null;
-        r.value = r.price * r.qty;
-        r.gain = r.value - r.pmc * r.qty;
-        r.gain_pct = Math.round((r.value / (r.pmc * r.qty) - 1) * 10000) / 100;
-      } else if (r.ticker === "BTP-V28") {                   // BTP: valore = nominale × prezzo/100
-        r.bval = null; r.bgain = null;
-        if (r.price) {
-          r.value = r.qty * r.price / 100;
-          r.gain = r.value - r.qty * r.pmc / 100;
-          r.gain_pct = r.pmc ? Math.round((r.price / r.pmc - 1) * 10000) / 100 : 0;
-        }
-        localStorage.setItem("btp_override", JSON.stringify({ qty: r.qty, pmc: r.pmc }));   // persiste tra i reload
-        salvaStatoPortafoglio("btp");
-      }
-      if (r.ticker !== "BTP-V28") saveManualHolding({ ticker: tk, name: r.name, qty: r.qty, pmc: r.pmc, currency: r.currency || "USD" });
-    });
-    const nc = parseFloat($("#edp-cash").value) || 0;
-    if (nc !== cashEur) { cashEur = nc; localStorage.setItem("cash_eur", cashEur); changed = true; salvaStatoPortafoglio("cash"); }
-    if (changed) salvaStatoPortafoglio("holdings");   // v244: posizioni e BTP seguono il CEO fra i device
-    recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); renderCash();
-    closeChartModal();
-    toast(changed ? "Portafoglio aggiornato ✓" : "Nessuna modifica");
-    if (changed) {
-      // persistenza sul repo (best-effort, se c'è un token)
-      editHoldings("portfolio", cfg => {
-        cfg.portfolio = (cfg.portfolio || []).map(p => {
-          const r = DATA.portfolio.find(x => x.ticker === p.ticker);
-          return r ? { ...p, qty: r.qty, pmc: r.pmc } : p;
-        });
-        return true;
-      });
-    }
-  });
-}
 
-function addWatchlist() {
-  const ticker = (window.prompt("Ticker da aggiungere alla watchlist (es. AAPL, ^GSPC, BTC-USD):") || "").trim().toUpperCase();
-  if (!ticker) return;
-  if ((DATA.watchlist || []).some(p => p.ticker === ticker)) { toast(`${ticker} è già in watchlist`); return; }
-  const currency = ticker.startsWith("^") ? "PTS" : "USD";
-  const row = placeholderRow(ticker, currency, {});
-  (DATA.watchlist = DATA.watchlist || []).push(row);
-  renderWatchlist(); fillLivePrice(row, renderWatchlist);
-  toast(`${ticker} aggiunto ✓`);
-  editHoldings("watchlist", cfg => {
-    cfg.watchlist = cfg.watchlist || [];
-    if (cfg.watchlist.some(p => p.ticker === ticker)) return false;
-    cfg.watchlist.push({ ticker, name: null, currency });
-    return true;
-  });
-}
 
 // riga segnaposto finché il workflow non porta i dati tecnici completi
-function placeholderRow(ticker, currency, extra) {
-  // valore provvisorio = costo (PMC × qtà): rende l'allocazione subito congrua,
-  // poi fillLivePrice lo raffina col prezzo reale. Evita posizioni "a 0" se il quote fallisce.
-  const provValue = (currency === "USD" && extra && extra.qty && extra.pmc) ? extra.qty * extra.pmc : 0;
-  return {
-    ticker, name: ticker, currency, price: extra && extra.pmc || null, change_pct: null,
-    value: provValue, gain: 0, gain_pct: null, pe: null, eps: null, beta: null,
-    ath: null, ath_dist_pct: null, support: null, resistance: null, rsi: null,
-    volume: null, vol_ratio: null, signal: "in caricamento…", signal_class: "neutral",
-    sparks: {}, tech_by_range: {}, rating: null, prepost: null, stats: null,
-    earnings_date: null, fin_health: null, sector: "—", _loading: true, ...extra,
-  };
-}
 
-function fillLivePrice(row, after) {
-  fetchQuote(row.ticker).then(q => {
-    if (q) {
-      row.price = Math.round(q.price * 100) / 100;
-      row.change_pct = Math.round((q.price / q.prev - 1) * 10000) / 100;
-      if (row.currency === "USD" && row.qty) {
-        row.value = row.price * row.qty;
-        row.gain = row.value - row.pmc * row.qty;
-        row.gain_pct = Math.round((row.value / (row.pmc * row.qty) - 1) * 10000) / 100;
-      }
-    }
-    row._loading = false;
-    if (after) after();   // anche se il quote fallisce: l'allocazione resta congrua col valore provvisorio
-  }).catch(() => { row._loading = false; if (after) after(); });
-}
 
-function removeHolding(section, ticker) {
-  if (!window.confirm(`Rimuovere ${ticker} da ${section === "portfolio" ? "portafoglio" : "watchlist"}?`)) return;
-  // rimozione ottimistica immediata
-  DATA[section] = (DATA[section] || []).filter(p => p.ticker !== ticker);
-  if (section === "portfolio") { removeManualHolding(ticker); recomputeTotals(); renderKPI(); renderTable(); renderAllocation(); }
-  else renderWatchlist();
-  toast(`${ticker} rimosso ✓`);
-  editHoldings(section, cfg => {
-    const arr = cfg[section] || [];
-    const n = arr.length;
-    cfg[section] = arr.filter(p => p.ticker !== ticker);
-    return cfg[section].length < n;
-  });
-}
 
 /* ---------------- prezzi live lato client (CORS proxy → Yahoo) ---------------- */
 const CORS_PROXIES = [
@@ -1113,65 +570,49 @@ async function livePrices() {
   (DATA.watchlist || []).forEach(upd);
   recomputeTotals();
   refreshShockClient();         // ricalcola lo shock dai prezzi live (KOSPI/futures) — coglie crolli/recuperi
-  renderKPI(); renderTable(); renderWatchlist(); renderAllocation(); renderShockAlert();
+  /* ⚠ v256 — QUESTA RIGA HA UCCISO LA PAGINA IN LOCALE, e il gate non l'ha vista: chiamava
+     renderKPI/renderTable/renderWatchlist/renderAllocation, tolte con il portafoglio. Il gate
+     di render ricava la sua lista da renderAll — e questa riga sta in refreshLivePrices, che
+     renderAll non chiama. E' la classe v238 per la quinta volta: la sintassi valida non dice
+     niente sull'esecuzione, e un gate copre solo la catena che gli hai dato. Trovata solo
+     aprendo la pagina. Sotto, la guardia e' stata estesa a TUTTE le funzioni di primo livello. */
+  renderShockAlert();
   const el = $("#live-badge");
   if (el) el.textContent = `Prezzi live: ${new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
 }
 
 function renderAll() {
+  /* v256 — LA CATENA DI RENDER E' SOLO MACRO. Escono renderCash, renderKPI, renderAllocation,
+     renderStruttura, renderEarningsAlert, renderDivergenzaDiario, renderReconcileAlert,
+     renderTable, renderWatchlist, renderNews: i loro contenitori non esistono piu' in
+     index.html, e senza portafoglio non avrebbero comunque nulla da disegnare.
+     ⚠ Il gate di render (v253) ricava la sua lista DA QUI: una chiamata tolta esce dal gate
+     insieme alla funzione, una aggiunta ci entra da sola. */
   const d = new Date(DATA.updated_at);
   const at = $("#updated-at");
-  at.textContent = d.toLocaleString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
-  // badge "dati vecchi": se il workflow non rigenera da >8 ore, avviso (la pipeline gira più volte al dì)
-  const ageH = (Date.now() - d.getTime()) / 3600000;
-  const upd = at.closest(".upd-item");
-  if (upd) {
-    upd.classList.toggle("stale", ageH > 8);
-    at.title = ageH > 8 ? `Dati di ${Math.round(ageH)} ore fa — premi "↻ Rigenera tutto" per aggiornarli` : "";
-    upd.querySelector(".stale-tag")?.remove();
-    if (ageH > 8) { const s = document.createElement("span"); s.className = "stale-tag"; s.textContent = ` ⚠ ${Math.round(ageH)}h fa`; at.after(s); }
+  if (at) {
+    at.textContent = d.toLocaleString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    const ageH = (Date.now() - d.getTime()) / 3600000;
+    const upd = at.closest(".upd-item");
+    if (upd) {
+      upd.classList.toggle("stale", ageH > 8);
+      at.title = ageH > 8 ? `Dati di ${Math.round(ageH)} ore fa` : "";
+      upd.querySelector(".stale-tag")?.remove();
+      if (ageH > 8) { const sp = document.createElement("span"); sp.className = "stale-tag"; sp.textContent = " (vecchi)"; upd.appendChild(sp); }
+    }
   }
-  recomputeTotals();            // include la liquidità nei totali/allocazione
-  renderCash();
-  renderKPI();
-  renderAllocation();
-  renderStruttura();            // v205 — i grafici della struttura del libro
-  renderMacroGrafici();         // v206 — rotazione, stress, leva e stagionalità
-  renderEarningsAlert();
-  renderDivergenzaDiario();   // v245: diario vs portafoglio — prima della riconciliazione
-  renderReconcileAlert();
-  refreshShockClient();         // allinea il banner shock ai prezzi live già presenti
+  recomputeTotals();
+  renderMacroGrafici();         // rotazione, stress, leva e stagionalità
+  renderCorrMacro();            // v256 — dove gli indicatori non sono d'accordo
+  refreshShockClient();
   renderShockAlert();
   renderDataQualityAlert();
-  renderTable();
-  renderWatchlist();
-  recordPolymarket();   // accumula lo storico Polymarket (un punto/giorno) per la derivata Δ7g
-  renderNews();
-  // NON ricostruire la tabella vendite mentre il popup è aperto: l'auto-refresh (ogni 5 min)
-  // azzerava gli input e chiudeva la tastiera mentre l'utente stava scrivendo
+  recordPolymarket();           // storico Polymarket (un punto/giorno) per la derivata Δ7g
   if ($("#sell-modal")?.hidden !== false) renderSellCalc();
   pmcInit();
 }
 
 /* banner di alert: trimestrali entro 7 giorni (rischio binario) con Implied Move */
-function renderEarningsAlert() {
-  const box = $("#earnings-alert");
-  if (!box) return;
-  const all = [...DATA.portfolio, ...(DATA.watchlist || [])];
-  const items = all.filter(r => r.earnings_date)
-    .map(r => ({ ...r, days: giorniAllaTrimestrale(r.earnings_date) }))
-    .filter(r => r.days >= 0 && r.days <= 7)
-    .sort((a, b) => a.days - b.days);
-  if (!items.length) { box.hidden = true; box.innerHTML = ""; box.className = ""; return; }
-  const ptf = new Set(DATA.portfolio.map(x => x.ticker));
-  box.hidden = false;
-  box.className = "earnings-alert";
-  box.innerHTML = `<span class="ea-lab">⚠ Trimestrali entro 7 giorni</span>` + items.map(r => {
-    const im = typeof impliedMoveForEarnings === "function" ? impliedMoveForEarnings(r) : null;
-    const when = r.days <= 0 ? "oggi" : r.days === 1 ? "domani" : `tra ${r.days}gg`;
-    return `<span class="ea-chip${ptf.has(r.ticker) ? "" : " ea-wl"}" title="${esc(r.name)}${ptf.has(r.ticker) ? "" : " (watchlist)"}">${r.ticker} · ${when}${im != null ? ` · ±${im}%` : ""}</span>`;
-  }).join("");
-}
 
 /* riconciliazione col broker: niente API, quindi qty/PMC/bval sono aggiornati A MANO.
    Due segnali di disallineamento (il buco più pericoloso: un trade eseguito ma non
@@ -1180,27 +621,6 @@ function renderEarningsAlert() {
    2) incoerenza per posizione: controvalore ricalcolato (prezzo live × qtà, in €) che
       diverge >20% dal bval del broker — quasi sempre qty/PMC non allineati o bval stantio
       (la soglia larga assorbe il drift di mercato di un paio di settimane). */
-function reconcileState() {
-  const b = DATA?.broker || {};
-  const out = { staleDays: null, mismatches: [] };
-  if (b.as_of) {
-    const d = Math.floor((Date.now() - new Date(b.as_of + "T00:00:00")) / 86400000);
-    if (d >= 0) out.staleDays = d;
-  }
-  (DATA?.portfolio || []).forEach(r => {
-    if (r.val_eur == null || r.bval == null || r.bval <= 0) return;
-    const dev = r.val_eur / r.bval - 1;
-    // soglia volatility-aware: banda ~2σ del titolo sull'età dello snapshot (σ_d ≈ ATR%/1,4),
-    // col floor al 20%. Senza: i nomi ultra-volatili (MSTR, IPO) sforerebbero per puro
-    // drift di mercato e il banner griderebbe al lupo.
-    const days = Math.max(out.staleDays ?? 7, 1);
-    const sigmaD = r.atr_pct != null ? r.atr_pct / 100 / 1.4 : 0.025;
-    const thr = Math.max(0.20, 2 * sigmaD * Math.sqrt(days));
-    if (Math.abs(dev) > thr) out.mismatches.push({ tk: r.ticker, dev: Math.round(dev * 100) });
-  });
-  out.needed = (out.staleDays != null && out.staleDays > 14) || out.mismatches.length > 0;
-  return out;
-}
 
 
 /* DATA ASSERTIONS lato client (post-incidente margin debt congelato a $622 mld Z.1):
@@ -1407,24 +827,12 @@ function usRegularSessionOpen(now = new Date()) {
    l'APERTURA; una delle 15:00 ET ragiona sui prezzi live. Senza questa riga l'LLM ignorava
    il KOSPI +4,5% live in pre-apertura (visto sul run del 21/07). Festività USA non considerate
    (approssimazione dichiarata). */
-function usSessionInfo(now = new Date()) {
-  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
-  const day = et.getDay(), mins = et.getHours() * 60 + et.getMinutes();
-  const weekend = day === 0 || day === 6;
-  const phase = weekend ? "weekend"
-    : mins >= 240 && mins < 570 ? "pre-market"
-    : mins >= 570 && mins < 960 ? "regular"
-    : mins >= 960 && mins < 1200 ? "after-hours"
-    : "notte";
-  let minsToOpen = null;
-  if (!weekend && mins < 570) minsToOpen = 570 - mins;
-  else {
-    let ahead = 1;
-    while ([0, 6].includes((day + ahead) % 7)) ahead++;
-    minsToOpen = ahead * 1440 - mins + 570;
-  }
-  return { phase, minsToOpen, etHHMM: `${String(et.getHours()).padStart(2, "0")}:${String(et.getMinutes()).padStart(2, "0")}` };
-}
+/* ⚠ v256 — sessionContextLine() RIMESSA. Lo sfoltimento l'aveva tolta perché il suo unico
+   chiamante stava dentro il blocco portafoglio; ma la fase della seduta NON è un dato di
+   portafoglio: dice se VIX, futures e ampiezza sono rilevazioni vive o l'ultima chiusura, e
+   senza quella riga il pacchetto macro presenterebbe numeri congelati come se fossero di
+   adesso. È la classe v193 — stato del mercato e freschezza del dato sono due cose diverse —
+   e qui serve proprio a tenerle distinte. */
 function sessionContextLine() {
   const s = usSessionInfo();
   const hrs = Math.round(s.minsToOpen / 60 * 10) / 10;
@@ -1511,6 +919,25 @@ function sessionContextLine() {
       : "FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA";
   return `CONTESTO DI SESSIONE (ora ET ${s.etHHMM}, fase: ${s.phase.toUpperCase()} — festività USA non considerate)${lead ? ` · ${etLead}: ${lead}` : ""} · ${guida}.`;
 }
+
+function usSessionInfo(now = new Date()) {
+  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const day = et.getDay(), mins = et.getHours() * 60 + et.getMinutes();
+  const weekend = day === 0 || day === 6;
+  const phase = weekend ? "weekend"
+    : mins >= 240 && mins < 570 ? "pre-market"
+    : mins >= 570 && mins < 960 ? "regular"
+    : mins >= 960 && mins < 1200 ? "after-hours"
+    : "notte";
+  let minsToOpen = null;
+  if (!weekend && mins < 570) minsToOpen = 570 - mins;
+  else {
+    let ahead = 1;
+    while ([0, 6].includes((day + ahead) % 7)) ahead++;
+    minsToOpen = ahead * 1440 - mins + 570;
+  }
+  return { phase, minsToOpen, etHHMM: `${String(et.getHours()).padStart(2, "0")}:${String(et.getMinutes()).padStart(2, "0")}` };
+}
 /* ── OROLOGIO DEL PREZZO vs OROLOGIO DELLE NOTIZIE (v158) ─────────────────────────
    Il payload mescola due orologi: i PREZZI si fermano alla campana (venerdì 16:00 ET), le NEWS
    continuano ad arrivare. Senza questa distinzione il sistema commette un errore logico grave:
@@ -1537,17 +964,6 @@ function lastUsEquityCloseUTC() {
 /* news pubblicate DOPO l'ultima chiusura = non ancora nel prezzo.
    Esclude le voci sintetiche Polymarket (sono snapshot di probabilità, non notizie). */
 const isRealNews = (n) => !!(n && n.title) && !/— probabilità Sì/.test(n.title_it || n.title);
-function newsSplitByClose() {
-  const close = lastUsEquityCloseUTC();
-  const real = (DATA.news || []).filter(isRealNews);
-  if (!close) return { unpriced: [], priced: real, close: null, total: real.length };
-  const unpriced = [], priced = [];
-  for (const n of real) {
-    const t = n.published ? new Date(n.published) : null;
-    (t && !isNaN(t) && t > close.at ? unpriced : priced).push(n);
-  }
-  return { unpriced, priced, close, total: real.length };
-}
 const seoulToday = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // UTC+9, niente DST
 /* v171 — L'ASIA APRE MENTRE A NEW YORK È ANCORA DOMENICA. Il ramo "weekend" assumeva che tutto
    fosse fermo, ma il KOSPI apre alle 09:00 KST = 02:00 CEST del lunedì, quando l'orologio di New
@@ -1777,35 +1193,9 @@ async function applicaDivergenzeMancanti(certe) {
   renderDivergenzaDiario();
 }
 
-function renderReconcileAlert() {
-  const box = $("#reconcile-alert");
-  if (!box) return;
-  const rec = reconcileState();
-  if (!rec.needed) { box.hidden = true; box.innerHTML = ""; box.className = ""; return; }
-  const bits = [];
-  if (rec.staleDays != null && rec.staleDays > 14) bits.push(`snapshot broker di <b>${rec.staleDays} giorni</b> fa (${esc((DATA.broker || {}).as_of || "")})`);
-  if (rec.mismatches.length) bits.push(`posizioni incoerenti col broker: <b>${rec.mismatches.map(m => `${m.tk} ${m.dev > 0 ? "+" : ""}${m.dev}%`).join(", ")}</b>`);
-  box.hidden = false;
-  box.className = "data-error";
-  box.innerHTML = `⚠ <b>RICONCILIA COL BROKER</b> — ${bits.join(" · ")}. Se hai operato senza aggiornare quantità/PMC, il motore sta ragionando su un portafoglio che non esiste più: usa "✎ Modifica valori" e aggiorna lo snapshot in holdings.json.`;
-}
 
 /* ---------------- liquidità (cash) ---------------- */
-function renderCash() {
-  const inp = $("#cash-input");
-  if (inp && document.activeElement !== inp) inp.value = cashEur || "";
-  const note = $("#cash-note");
-  if (note) note.textContent = cashEur > 0 ? `inclusa nel totale e nell'allocazione (${fmtEUR.format(cashEur)})` : "";
-}
 
-function saveCash() {
-  cashEur = parseFloat($("#cash-input").value) || 0;
-  localStorage.setItem("cash_eur", cashEur);
-  salvaStatoPortafoglio("cash");           // v244: la liquidità arriva anche su iPhone
-  recomputeTotals();
-  renderCash(); renderKPI(); renderAllocation();
-  toast("Liquidità salvata ✓");
-}
 
 /* ---------------- mini-card: direzione mercato + BofA signposts ---------------- */
 // aggregatore: raccoglie TUTTI i segnali del sistema con etichetta e punteggio 0-100
@@ -1899,18 +1289,6 @@ function diaryOp(e) {
   return parseDiaryText(e && e.text, e && e.date);
 }
 /* riga formattata: TIPO · QTÀ TICKER · PREZZO · DATA (i campi assenti si omettono) */
-function diaryOpLine(e) {
-  const o = diaryOp(e);
-  const bits = [];
-  if (o.tipo) bits.push(`<b class="${o.tipo === "ACQUISTO" ? "pos" : "neg"}">${o.tipo}</b>`);
-  if (o.qty != null && o.ticker) bits.push(`${fmtNum.format(o.qty)} ${esc(o.ticker)}`);
-  else if (o.ticker) bits.push(esc(o.ticker));
-  else if (o.qty != null) bits.push(`${fmtNum.format(o.qty)} quote`);
-  if (o.prezzo != null) bits.push(`@ ${fmtNum.format(o.prezzo)}`);
-  if (o.quando) bits.push(o.quando);
-  if (!bits.length) return "";
-  return `<span class="diary-op">${bits.join(" · ")}</span>${o.multi ? `<span class="diary-multi" title="La voce contiene più operazioni: strutturata la prima, il testo integrale resta sotto">+ altre operazioni nel testo</span>` : ""}`;
-}
 /* ═══ v193 — IL DIARIO AGGIORNA LE POSIZIONI (richiesta CEO).
    Prima annotare "venduto 50 GOOGL a 318" lasciava il portafoglio invariato: il motore
    continuava a calcolare stop, pesi e MCR su una posizione che non esisteva piu'. Il banner
@@ -1983,105 +1361,7 @@ function mutazionePerOp(op) {
   };
 }
 
-function applicaOpAlPortafoglio(op) {
-  if (!op || !op.ticker || !op.tipo) return;
-  const q = Number(op.qty), px = Number(op.prezzo);
-  if (!Number.isFinite(q) || q <= 0) { toast("Operazione senza quantità: posizioni non aggiornate"); return; }
-  const tk = String(op.ticker).toUpperCase();
-  const pos = (DATA.portfolio || []).find(r => r.ticker === tk);
-  const acquisto = /ACQUIST/i.test(op.tipo);
 
-  let descr, applica;
-  if (acquisto) {
-    const q0 = pos ? Number(pos.qty) || 0 : 0, p0 = pos ? Number(pos.pmc) || 0 : 0;
-    if (!Number.isFinite(px) || px <= 0) { toast("Acquisto senza prezzo: PMC non calcolabile, posizioni non aggiornate"); return; }
-    const q1 = q0 + q;
-    const pmc1 = Math.round(((q0 * p0 + q * px) / q1) * 10000) / 10000;   // media ponderata
-    descr = pos
-      ? `${tk}: ${q0} → ${q1} quote · PMC ${fmtNum.format(p0)} → ${fmtNum.format(pmc1)}`
-      : `${tk}: NUOVA posizione, ${q} quote a PMC ${fmtNum.format(px)}` + ((DATA.watchlist || []).some(r => r.ticker === tk) ? " (esce dalla watchlist)" : "");
-    applica = (cfg) => {
-      cfg.portfolio = cfg.portfolio || [];
-      const e = cfg.portfolio.find(r => (r.ticker || "").toUpperCase() === tk);
-      if (e) { e.qty = q1; e.pmc = pmc1; } else cfg.portfolio.push({ ticker: tk, name: nomeTitolo(tk, cfg), qty: q1, pmc: pmc1 });
-      if (Array.isArray(cfg.watchlist)) cfg.watchlist = cfg.watchlist.filter(r => (typeof r === "string" ? r : r.ticker || "").toUpperCase() !== tk);
-    };
-  } else {
-    if (!pos) { toast(`${tk} non è in portafoglio: vendita annotata, posizioni non modificate`); return; }
-    const q0 = Number(pos.qty) || 0, q1 = Math.max(0, Math.round((q0 - q) * 10000) / 10000);
-    descr = q1 === 0
-      ? `${tk}: posizione CHIUSA (${q0} quote vendute) — passa in watchlist`
-      : `${tk}: ${q0} → ${q1} quote (PMC invariato: vendere non lo cambia)`;
-    applica = (cfg) => {
-      cfg.portfolio = (cfg.portfolio || []).filter(r => {
-        const t = (r.ticker || "").toUpperCase();
-        if (t !== tk) return true;
-        if (q1 === 0) return false;
-        r.qty = q1; return true;
-      });
-      if (q1 === 0) {
-        cfg.watchlist = cfg.watchlist || [];
-        if (!cfg.watchlist.some(r => (typeof r === "string" ? r : r.ticker || "").toUpperCase() === tk)) cfg.watchlist.push(tk);
-      }
-    };
-  }
-
-  if (!confirm(`Aggiorno le posizioni con questa operazione?\n\n${descr}\n\nLa modifica va su config/holdings.json: la vedrai anche da iPhone.`)) {
-    toast("Operazione annotata nel diario; posizioni NON modificate");
-    return;
-  }
-  // AGGIORNAMENTO IMMEDIATO IN LOCALE. editHoldings scrive sul repo e lascia rigenerare la
-  // pipeline (2-3 minuti): senza questo passaggio il CEO annota la vendita e continua a vedere
-  // la posizione, che e' esattamente il disallineamento che la richiesta voleva eliminare.
-  // Il repo resta la fonte autorevole; questo e' solo l'anticipo ottimistico di cio' che
-  // arrivera' col prossimo run, e i campi calcolati dalla pipeline si riallineano da soli.
-  aggiornaPortafoglioLocale(tk, acquisto, q, px);
-  editHoldings("portfolio", applica);
-}
-function aggiornaPortafoglioLocale(tk, acquisto, q, px) {
-  if (!DATA || !Array.isArray(DATA.portfolio)) return;
-  const pos = DATA.portfolio.find(r => r.ticker === tk);
-  if (acquisto) {
-    if (pos) {
-      const q0 = Number(pos.qty) || 0, p0 = Number(pos.pmc) || 0, q1 = q0 + q;
-      pos.qty = q1; pos.pmc = Math.round(((q0 * p0 + q * px) / q1) * 10000) / 10000;
-    } else {
-      // titolo nuovo: si prende la riga della watchlist se c'e' (ha gia' prezzo e statistiche),
-      // altrimenti si aspetta la pipeline — meglio nessuna riga che una riga inventata.
-      const wl = (DATA.watchlist || []).find(r => r.ticker === tk);
-      if (wl) {
-        DATA.portfolio.push({ ...wl, qty: q, pmc: px });
-        DATA.watchlist = DATA.watchlist.filter(r => r.ticker !== tk);
-      } else { toast(`${tk} sarà in portafoglio dopo il prossimo aggiornamento dati`); }
-    }
-  } else if (pos) {
-    const q1 = Math.max(0, Math.round(((Number(pos.qty) || 0) - q) * 10000) / 10000);
-    if (q1 === 0) {
-      DATA.portfolio = DATA.portfolio.filter(r => r.ticker !== tk);
-      if (!(DATA.watchlist || []).some(r => r.ticker === tk)) (DATA.watchlist = DATA.watchlist || []).push({ ...pos, qty: null, pmc: null });
-    } else pos.qty = q1;
-  }
-  // ricalcolo e ridisegno TUTTO cio' che dipende dalle posizioni: e' la parte "devono essere
-  // correlate" della richiesta — tabelle, KPI e torta dell'allocazione da una sola fonte.
-  try { recomputeTotals(); } catch { /* dati incompleti: la pipeline riallinea */ }
-  try { renderKPI(); renderTable(); renderWatchlist(); renderAllocation(); } catch (e) { console.error(e); }
-}
-
-function saveDiaryEntry(text, op) {
-  const arr = loadDiary();
-  const iso = new Date().toISOString();
-  const opFin = op || parseDiaryText(text, iso);
-  arr.unshift({ date: iso, text, op: opFin });
-  setDiary(arr);
-  // se l'annotazione descrive un'operazione riconoscibile, si propone di allineare le posizioni
-  if (opFin && opFin.ticker && opFin.tipo) applicaOpAlPortafoglio(opFin);
-  /* ⚠ v245: si ricontrolla SEMPRE, anche se il confirm è stato rifiutato. È proprio il caso
-     in cui il vecchio codice si arrendeva, e l'operazione spariva senza lasciare traccia. */
-  if (typeof renderDivergenzaDiario === "function") renderDivergenzaDiario();
-}
-function deleteDiaryEntry(iso) {
-  setDiary(loadDiary().filter(e => e.date !== iso));
-}
 const DIARY_PATH = "config/action_diary.json";
 /* salva il diario su GitHub (config/action_diary.json) — solo se c'è già un token salvato (no prompt) */
 async function pushDiaryCloud(arr) {
@@ -2098,56 +1378,14 @@ async function pushDiaryCloud(arr) {
   } catch { /* offline o senza permessi: resta comunque in locale */ }
 }
 /* carica il diario dal cloud all'avvio e lo fonde col locale (per date univoche) */
-async function loadDiaryCloud() {
-  try {
-    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${DIARY_PATH}?t=${Date.now()}`, { cache: "no-store" });
-    if (!r.ok) return;
-    const cloud = await r.json();
-    if (!Array.isArray(cloud)) return;
-    const byDate = {};
-    [...cloud, ...loadDiary()].forEach(e => { if (e && e.date) byDate[e.date] = e; });
-    const merged = Object.values(byDate).sort((a, b) => (a.date < b.date ? 1 : -1));
-    localStorage.setItem("action_diary", JSON.stringify(merged.slice(0, 100)));
-  } catch { /* nessun diario remoto ancora */ }
-}
 
 /* ---------------- motore decisionale (mandato quant: Sharpe > 2.0 + sovraperformance vs NDX) ---------------- */
 // solo titoli AZIONARI USA (esclude indici ^, cripto/commodity con - o =, BTP, valuta PTS)
-function isEquity(r) {
-  return r && r.currency === "USD" && !/[\^=]/.test(r.ticker) && !r.ticker.includes("-") && r.ticker !== "BTP-V28";
-}
 
 /* ATR del titolo: dato pipeline (ATR 14 Wilder) se disponibile, altrimenti proxy statistico
    documentato: σ giornaliera dei rendimenti 1M × prezzo × 1,4 (per un processo diffusivo il
    True Range medio ≈ 1,4·σ). Il proxy sparisce da solo al primo run della pipeline. */
-function atrOf(r) {
-  if (r.atr_14 != null && r.price) {
-    return { atr: r.atr_14, pct: r.atr_pct ?? Math.round(r.atr_14 / r.price * 10000) / 100, src: "ATR14" };
-  }
-  const m1 = (r.sparks || {}).m1 || [];
-  if (m1.length >= 10 && r.price) {
-    const rets = [];
-    for (let i = 1; i < m1.length; i++) if (m1[i - 1]) rets.push(m1[i] / m1[i - 1] - 1);
-    const mean = avg(rets);
-    const sd = Math.sqrt(avg(rets.map(x => (x - mean) ** 2)));
-    if (sd > 0) return { atr: r.price * sd * 1.4, pct: Math.round(sd * 1.4 * 10000) / 100, src: "proxy σ1M" };
-  }
-  return null;
-}
 /* stop loss dinamico: 2×ATR sotto il prezzo di riferimento (ingresso o prezzo attuale per trailing) */
-function atrStop(refPrice, r) {
-  const a = atrOf(r);
-  if (!a || !(refPrice > 0) || !(a.atr > 0)) return null;
-  let stop = refPrice - 2 * a.atr;
-  // SCUDO SOTTO-ZERO (v115): uno stop loss non esiste in territorio negativo. Se 2×ATR
-  // mangia più del 50% del riferimento (ATR avvelenato da barre-glitch o riferimento
-  // sbagliato — visto sul campo: SNDK stop -$366) il numero non è risk management:
-  // pavimento al 50% del riferimento, SEMPRE dichiarato nella sorgente.
-  const floored = stop < refPrice * 0.5;
-  if (floored) stop = refPrice * 0.5;
-  return { stop: Math.round(stop * 100) / 100, atr: a.atr, pct: a.pct,
-           src: a.src + (floored ? " — PAVIMENTO 50%: 2×ATR anomalo, verificare il dato" : "") };
-}
 
 /* PARACADUTE ORDINI (v115, post-incidente SNDK limite $40,1 su quotazione $1915):
    il supporto per un ORDINE deve venire dal passato RECENTE (pipeline: min Low 20 sedute,
@@ -2155,47 +1393,10 @@ function atrStop(refPrice, r) {
    del grafico (y1 = minimo di un anno fa = preistoria). Se nessun supporto è plausibile,
    fallback DICHIARATO: SMA50 → pullback 2×ATR → -5%. Niente scarti silenziosi. */
 const ORDER_SUPPORT_MAX_GAP = 0.25;   // un limite >25% sotto il mercato non è un ordine: è una preghiera
-function saneEntryLimit(r) {
-  const price = r.price;
-  if (!(price > 0)) return null;
-  const ok = (s) => s > 0 && s <= price && s >= price * (1 - ORDER_SUPPORT_MAX_GAP);
-  const cands = [r.support, r.tech_by_range?.m1?.support, r.tech_by_range?.w1?.support].filter(ok);
-  if (cands.length) return { limit: Math.max(...cands), src: "supporto recente", fallback: false };
-  const sma50 = r.sma50_dist_pct != null ? price / (1 + r.sma50_dist_pct / 100) : null;
-  if (ok(sma50)) return { limit: Math.round(sma50 * 100) / 100, src: "SMA50", fallback: true };
-  const a = atrOf(r);
-  const atrPull = a && a.atr > 0 ? price - 2 * a.atr : null;
-  if (ok(atrPull)) return { limit: Math.round(atrPull * 100) / 100, src: "pullback 2×ATR", fallback: true };
-  return { limit: Math.round(price * 0.95 * 100) / 100, src: "-5% dal prezzo (nessun supporto plausibile)", fallback: true };
-}
 
 /* stop operativo di una POSIZIONE APERTA: priorità allo stop RATCHET della pipeline
    (stop_atr: sale col prezzo e non ridiscende — persistito tra i run), fallback al
    calcolo client 2×ATR dal prezzo attuale (non ancorato, etichettato). */
-function stopOf(r) {
-  // cintura client (v115): uno stop ratchet ≤ 0 o assurdo (>3× il prezzo) è un residuo
-  // di run avvelenato — si ignora e si ricalcola dal vivo, mai fidarsi di un numero malato
-  if (r.stop_atr != null && r.stop_atr > 0 && (!(r.price > 0) || r.stop_atr <= r.price * 3)) {
-    return { stop: r.stop_atr, violated: !!r.stop_violated, ratchet: true,
-             pct: r.atr_pct ?? null, src: "ratchet 2×ATR" };
-  }
-  const st = atrStop(r.price, r);
-  if (!st) {
-    // STOP PROVVISORIO v119: una posizione DETENUTA senza ATR (IPO con storia <15 sedute,
-    // es. SKHYV) resterebbe SENZA PROTEZIONE — un titolo in portafoglio senza stop è un buco
-    // di risk management. Finché la serie non basta al 2×ATR, stop provvisorio −12% dal
-    // prezzo (dichiarato), sostituito dal ratchet reale appena l'ATR è disponibile.
-    if (r.qty && r.price > 0) {
-      const prov = Math.round(r.price * 0.88 * 100) / 100;
-      return { stop: prov, violated: r.price < prov, ratchet: false, pct: 12,
-               src: "provvisorio −12% (ATR n.d.: storia <15 sedute, da inizializzare)" };
-    }
-    return null;
-  }
-  const inGain = r.qty && r.pmc != null && r.price > r.pmc;
-  const stop = inGain ? Math.max(st.stop, r.pmc) : st.stop;
-  return { stop: Math.round(stop * 100) / 100, violated: r.price < stop, ratchet: false, pct: st.pct, src: st.src };
-}
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════
    PARAMETRI DI RISCHIO DEL FONDO (v121) — direttive del CEO, calibrate il 12/07/2026.
@@ -2292,11 +1493,6 @@ async function loadRiskParamsCloud() {
 
 /* beta effettivo di un titolo: PRIORITÀ alla regressione della pipeline sui log-rendimenti
    12M vs Nasdaq 100 (beta_ndx); fallback al beta Yahoo (5A mensile vs S&P) solo se manca. */
-function betaOf(r) {
-  if (r.beta_ndx != null) return r.beta_ndx;
-  if (r.ticker === "BTP-V28") return 0;   // esposizione azionaria nulla
-  return r.beta ?? null;
-}
 
 
 /* Rischio cambio EUR/USD: quota % del NAV (investito + liquidità EUR) denominata in USD
@@ -2311,33 +1507,8 @@ function fxExposure() {
 
 /* rischio liquidità/slippage: la posizione vale più del 5% del volume medio giornaliero in $
    (uscire muoverebbe il prezzo). Usa avg_volume_30d dalle stats; solo posizioni possedute. */
-function isIlliquid(r) {
-  const st = r.stats || {};
-  if (!r.qty || !r.price || !st.avg_volume_30d) return false;
-  const posValueUsd = r.qty * r.price;               // controvalore posizione in $
-  const advUsd = st.avg_volume_30d * r.price;         // dollar volume medio giornaliero
-  return advUsd > 0 && posValueUsd / advUsd > 0.05;
-}
 
 /* peso % di una posizione sul NAV (investito + liquidità) — per la regola di sizing 10% */
-function positionWeightPct(r) {
-  const t = DATA?.totals || {};
-  const nav = (t.eur_invested || 0) + cashEur;
-  if (!nav) return null;
-  // val_eur lo setta recomputeTotals; se per una race non è ancora presente su una posizione
-  // DETENUTA (qty>0), ricavalo da prezzo×qty (mirror di recomputeTotals). Senza questo fallback
-  // positionWeightPct tornava null e il CAP GATE dell'accumulo (w != null && w ≥ cap) falliva
-  // APERTO: un nome già oltre il 10% NAV (es. AMD 14,7% nello snapshot) sfuggiva alla soglia e
-  // finiva TRA I CANDIDATI, in aperta violazione di B3 "Let Winners Run". Watchlist (no qty) →
-  // resta null → passa il gate (peso 0, corretto).
-  let ve = r.val_eur;
-  if (!(ve > 0) && r.qty && r.price != null) {
-    const eurusd = DATA.eurusd || 1.08;
-    ve = r.currency === "EUR" ? (r.value || r.price * r.qty) : (r.price * r.qty) / eurusd;
-  }
-  if (!(ve > 0)) return null;
-  return Math.round(ve / nav * 1000) / 10;
-}
 
 /* VETO del risk manager (non scavalcabile da alcun supporto tecnico):
    - VALUE TRAP se, anche singolarmente: Sharpe 1A < -0.3 · Short Interest ≥ 15% ·
@@ -2359,347 +1530,16 @@ function positionWeightPct(r) {
    asimmetrico che il CEO deve VEDERE, dichiarato come tale (sizing dimezzato, stop
    stretto 1×ATR). Solo watchlist: su una posizione detenuta non è un'idea d'ingresso.
    Il veto del mandato growth RESTA: questo è un tag informativo, non una promozione. */
-function squeezeSetup(r) {
-  const st = r.stats || {};
-  return !r.qty && st.short_float != null && st.short_float >= 0.20 &&
-    r.vol_ratio != null && r.vol_ratio > 2.0 &&
-    r.sma50_dist_pct != null && r.sma50_dist_pct > 0;
-}
 
-function qualityVeto(r) {
-  const st = r.stats || {};
-  const why = [];
-  // metro del veto: SORTINO (downside deviation) — punisce la distruzione di valore reale,
-  // non i rally; un titolo volatile al rialzo non finisce in value trap per lo Sharpe basso.
-  // Fallback etichettato allo Sharpe finché la pipeline non popola sortino_1y.
-  let downside = null;
-  if (r.sortino_1y != null) {
-    if (r.sortino_1y < RISK_PARAMS.sortinoVeto) downside = `Sortino 1A ${fmtNum.format(r.sortino_1y)} < ${RISK_PARAMS.sortinoVeto} (distruzione di valore sul downside)`;
-  } else if (r.sharpe_1y != null && r.sharpe_1y < RISK_PARAMS.sortinoVeto) {
-    downside = `Sharpe 1A ${fmtNum.format(r.sharpe_1y)} < ${RISK_PARAMS.sortinoVeto} (proxy: Sortino n.d. fino al prossimo run pipeline)`;
-  }
-  if (st.short_float != null && st.short_float >= 0.15) why.push(`Short Interest ${Math.round(st.short_float * 1000) / 10}% ≥ 15%`);
-  const pegBroken = st.peg == null || st.peg <= 0;   // la pipeline azzera già i PEG ≤ 0 → n.d.
-  if (st.profit_margin != null && st.profit_margin < 0 && pegBroken) why.push("margine netto negativo con PEG non calcolabile");
-  if (downside) {
-    const rsNow = r.rs_ndx_1m ?? r.rs_1m;
-    const rehab = !why.length &&
-      st.roe != null && st.roe > 0.15 &&
-      st.profit_margin != null && st.profit_margin > 0 &&
-      r.sma200_dist_pct != null && r.sma200_dist_pct > 0 &&
-      rsNow != null && rsNow > 0;
-    if (rehab) return {
-      verdict: "RIABILITATO (growth)", rehab: true, why: [downside],
-      rehabWhy: `ROE ${Math.round(st.roe * 100)}% · ${signTxt(Math.round(r.sma200_dist_pct * 10) / 10)} vs SMA200 · RS 1M vs NDX ${signTxt(Math.round(rsNow * 10) / 10, "pp")}${r.sharpe_6m != null ? ` · Sharpe 6M ${fmtNum.format(r.sharpe_6m)} (finestra di regime)` : ""}`,
-    };
-    why.unshift(downside);
-  }
-  if (why.length) {
-    // GRADAZIONE DEL VETO (v144): il muro di "SCARTATO" identici nasconde la differenza tra un
-    // Sortino -2,7 STRUTTURALE e un -0,4 che una brutta settimana ha spinto sotto soglia. Un veto
-    // è DEBOLE se è guidato SOLO dal downside e resta entro ~2,5× la soglia (borderline, spesso
-    // ciclico → l'LLM può superarlo con tesi più facilmente); FORTE se profondo o con short/margini.
-    const sortinoOnly = downside && why.length === 1;
-    const deep = r.sortino_1y != null ? r.sortino_1y <= RISK_PARAMS.sortinoVeto * 2.5 : true;
-    const strength = (sortinoOnly && !deep) ? "debole" : "forte";
-    // v200: l'etichetta "SCARTATO - VALUE TRAP" era un verdetto travestito da dato. La misura
-    // (il Sortino, lo short interest, il ROE) e' un fatto; "value trap" e' una conclusione, e le
-    // conclusioni sono il mestiere di chi legge. Resta il FILTRO, sparisce la sentenza.
-    return { verdict: "NON SUPERA IL FILTRO QUALITÀ", why, strength };
-  }
-  if (st.roe != null && st.roe < 0) return { verdict: "NON ACCUMULARE", why: ["ROIC/ROE negativo"], strength: "forte" };
-  if (st.peg != null && st.peg < 0) return { verdict: "NON ACCUMULARE", why: ["PEG negativo"], strength: "forte" };
-  return null;
-}
 
-function decisionVerdict() {
-  const t = DATA.totals || {};
-  const dir = marketDirectionScore();
-  const eurusd = DATA.eurusd || 1.08;
-  const ps = t.portfolio_sharpe_ratio;
-  const universe = [...(DATA.portfolio || []), ...(DATA.watchlist || [])].filter(isEquity);
-
-  // 1) VETO fondamentale: value trap e qualità rotta escluse a prescindere dal drawdown.
-  //    I RIABILITATI (veto Sortino revocato dalla regola growth) tornano eleggibili ma
-  //    restano dichiarati come sorvegliati: trailing negativo, ripresa provata.
-  const excluded = [];
-  const eligible = [];
-  const rehabbed = [];
-  universe.forEach(r => {
-    const v = qualityVeto(r);
-    if (v && v.rehab) { rehabbed.push({ r, ...v }); eligible.push(r); }
-    else if (v) excluded.push({ r, ...v, squeeze: squeezeSetup(r) });
-    else eligible.push(r);
-  });
-  // setup speculativi TURNAROUND SQUEEZE tra gli esclusi (v113): esposti, non promossi
-  const squeezed = excluded.filter(x => x.squeeze);
-
-  // 2) score quant 0-100 sui soli eleggibili: impatto marginale sullo Sharpe (40%),
-  //    forza relativa 1M vs benchmark/NDX (30%), qualità fondamentale (30%).
-  //    Per i RIABILITATI la componente Sharpe usa la finestra 6M quando disponibile (v112):
-  //    il 12M resta contaminato dal crash per mesi e schiaccerebbe lo score proprio dei
-  //    titoli che la regola growth ha appena riammesso — il 6M misura il regime corrente.
-  const rehabSet = new Set(rehabbed.map(x => x.r.ticker));
-  // v164: il fallback silenzioso a 1 era doppiamente dannoso — (a) stampava "vs 1 attuale" mentre
-  // la riga di sintesi dello stesso payload diceva "Sharpe —", (b) ricalibrava la componente 40%
-  // dello score su una baseline INVENTATA (nello scenario di prova i candidati passavano da 4 a 8).
-  // Ora resta null: lo score esclude la componente Sharpe e rinormalizza sugli altri pesi.
-  const refSharpe = ps != null ? ps : null;   // baseline: Sharpe attuale del portafoglio (null = n.d.)
-  const quantScore = (r) => {
-    const st = r.stats || {};
-    const parts = [];
-    const shBase = rehabSet.has(r.ticker) && r.sharpe_6m != null ? r.sharpe_6m : r.sharpe_1y;
-    if (shBase != null && refSharpe != null) parts.push([clamp(50 + (shBase - refSharpe) * 25), .40]);
-    // forza relativa: metro diretto del mandato = RS vs NDX (fallback sul benchmark settoriale)
-    const rsq = r.rs_ndx_1m ?? r.rs_1m;
-    if (rsq != null) parts.push([clamp(50 + rsq * 4), .30]);
-    let q = 50;
-    if (st.roe != null) q += clamp(st.roe * 120, -30, 30);
-    if (st.profit_margin != null) q += clamp(st.profit_margin * 60, -15, 15);
-    if (st.revenue_growth != null) q += clamp(st.revenue_growth * 40, -10, 15);
-    if (r.fin_health != null) q = (q + r.fin_health) / 2;
-    parts.push([clamp(q), .30]);
-    const wTot = parts.reduce((s, p) => s + p[1], 0) || 1;
-    return Math.round(parts.reduce((s, p) => s + p[0] * p[1], 0) / wTot);
-  };
-
-  // candidati ACCUMULO: migliorano il profilo rischio/rendimento (score ≥ minScore) e hanno
-  // Sharpe noto. Il drawdown non è più la porta d'ingresso: è solo un tiebreaker di prezzo.
-  // CAP D'INGRESSO (#1, direttiva CEO v121): una posizione GIÀ ≥ capNoAdd_pct del NAV non può
-  // ricevere NUOVI acquisti — il cap rigido vale SOLO sull'accumulo, mai come trim forzato.
-  const overCap = [];
-  const accumula = eligible
-    .filter(r => r.price && r.sharpe_1y != null)
-    .filter(r => {
-      const w = positionWeightPct(r);
-      if (w != null && w >= RISK_PARAMS.capNoAdd_pct) { overCap.push({ r, w }); return false; }
-      return true;
-    })
-    .map(r => ({ ...r, _q: quantScore(r) }))
-    .filter(r => r._q >= RISK_PARAMS.minScore)
-    .sort((a, b) => (b._q - a._q) || ((a.w52_dist_pct ?? 0) - (b.w52_dist_pct ?? 0)));
-
-  // 3) CONCENTRAZIONE SINGOLO TITOLO (#1, direttiva CEO v121): NESSUN trim automatico su ciò che
-  // è cresciuto per apprezzamento organico — "Let Winners Run", la protezione è lo stop ratchet
-  // 2×ATR. Solo un ALERT informativo se un nome supera capAlert_pct (25%) del NAV. Le posizioni
-  // tra capNoAdd (10%) e capAlert (25%) corrono libere: niente trim, niente allarme.
-  const concentrationAlert = (DATA.portfolio || []).filter(isEquity)
-    .map(r => ({ r, w: positionWeightPct(r) }))
-    .filter(x => x.w != null && x.w > RISK_PARAMS.capAlert_pct)
-    .sort((a, b) => b.w - a.w);
-  // alleggerimenti tattici: multipli NON GIUSTIFICATI dalla crescita o ipercomprato estremo
-  // (solo posizioni possedute). Mandato growth "let winners run" (v111): un P/E ottico alto
-  // con PEG ≤ 2 è crescita pagata al prezzo giusto, non un motivo di trim — si trimma quando
-  // anche la crescita non copre il multiplo (PEG > 2 o non calcolabile) o l'RSI è estremo.
-  const trim = (DATA.portfolio || []).filter(isEquity)
-    .filter(r => {
-      const peg = r.stats?.peg;
-      const unjustified = r.pe && r.pe > 150 && !(peg > 0 && peg <= 2);
-      return r.qty && (unjustified || (r.rsi && r.rsi > 78));
-    })
-    .sort((a, b) => (b.pe || 0) - (a.pe || 0));
-  // TAX ALPHA: posizioni in perdita latente con veto qualità → minusvalenze come scudo fiscale
-  // (i riabilitati NON sono candidati harvest: la regola growth dice tenerli, non venderli)
-  const harvest = (DATA.portfolio || []).filter(isEquity)
-    .filter(r => {
-      const v = r.qty && r.gain_eur != null && r.gain_eur < 0 ? qualityVeto(r) : null;
-      return v && !v.rehab;
-    })
-    .sort((a, b) => a.gain_eur - b.gain_eur);
-
-  // 4) piano operativo: ordini limite al supporto, stop a 2×ATR (volatilità, non % fissa)
-  // ALLINEAMENTO LOGICO v124: il sizing degli ingressi usa la STESSA base del budget dichiarato
-  // al prompt — il BUDGET OPERATIVO SPENDIBILE (cassa − ES95, riserva tail-risk inviolabile),
-  // non la cassa piena. Prima il motore dimensionava su cashUsd intero mentre la testata diceva
-  // all'LLM "spendibile = cassa − ES95": le quantità suggerite potevano sforare la riserva.
-  // Ora coincidono: le due metriche di base sono la stessa.
-  const es95Eur = t.es95_hist_eur ?? t.es95_1d_eur ?? 0;
-  const budgetOpEur = t.budget_operativo_spendibile != null ? t.budget_operativo_spendibile : Math.max(0, cashEur - es95Eur);
-  const budgetOpUsd = budgetOpEur * eurusd;   // base di sizing = budget operativo (post riserva ES95)
-  // sizing regime-aware: i budget d'ingresso si riducono quando la volatilità di mercato
-  // sale (VIX) — stessa logica degli stop ATR ma a livello di PORTAFOGLIO: in regime
-  // nervoso si rischia meno per operazione, non si spegne il motore.
-  const vixV = (DATA.macro || {}).vix?.value;
-  const riskScale = vixV == null ? 1 : vixV > 30 ? 0.4 : vixV > 25 ? 0.5 : vixV > 20 ? 0.75 : 1;
-  const withPlan = accumula.map((r, i) => {
-    // MAI il range del GRAFICO negli ordini (v115): sparkRange è una preferenza di
-    // visualizzazione — con "1A" selezionato il piano pescava il minimo di un anno fa
-    // (SNDK limite $40,1 su quotazione $1915, stop -$366). saneEntryLimit usa solo
-    // supporti RECENTI in banda ±25% dal prezzo, con fallback dichiarato SMA50/ATR/-5%.
-    const pick = saneEntryLimit(r) || { limit: r.price, src: "prezzo", fallback: false };
-    const limit = Math.min(pick.limit, r.price);
-    const budget = budgetOpUsd * (i === 0 ? 0.35 : i === 1 ? 0.25 : 0.15) * riskScale;
-    const qty = limit > 0 ? Math.floor(budget / limit) : 0;
-    const st = atrStop(limit, r);
-    return { r, limit, qty, dd: r.w52_dist_pct, q: r._q, stop: st ? st.stop : Math.round(limit * 0.92 * 100) / 100, atr: st,
-             limitSrc: pick.src, limitFallback: pick.fallback };
-  }).filter(x => x.qty > 0 && x.limit > 0 && x.stop > 0 && x.stop < x.limit);
-  // stop TRAILING sulle posizioni esistenti: ratchet pipeline (stopOf) — sale, non ridiscende
-  const trailing = (DATA.portfolio || []).filter(isEquity).filter(r => r.qty && r.price)
-    .map(r => {
-      const st = stopOf(r);
-      return st ? { r, stop: st.stop, violated: st.violated, ratchet: st.ratchet, atr: st } : null;
-    }).filter(Boolean);
-  const stopViolations = trailing.filter(x => x.violated);
-
-  const reasons = [];
-  let label, score, col;
-  // il veto su una POSIZIONE detenuta significa "non incrementare", non "vendi subito":
-  // senza il distinguo l'LLM leggeva "META SCARTATO - VALUE TRAP" su un titolo in portafoglio
-  // e doveva indovinare se fosse un ordine di vendita (v110). Tag corto + legenda unica in coda.
-  const vetoTk = excluded.map(x => `${x.r.ticker}${x.r.qty ? " [in ptf]" : ""} (${x.verdict === "SCARTATO - VALUE TRAP" ? "VALUE TRAP" : x.why[0]}${x.strength ? `, veto ${x.strength.toUpperCase()}` : ""})`);
-  const vetoHeldNote = excluded.some(x => x.r.qty)
-    ? " ([in ptf] = posizione detenuta: il veto vieta l'ACCUMULO, la decisione tenere/vendere resta aperta)" : "";
-  // COERENZA CASSA↔VERDETTO (v123): il ramo ACCUMULA scatta solo se c'è ALMENO UN ORDINE
-  // ESEGUIBILE (withPlan non vuoto). Prima il gate era `cashUsd > 0`: con cassa a 0 (o troppo
-  // piccola per 1 azione) il verdetto cadeva in MANTIENI stampando "nessun candidato migliora
-  // abbastanza" — FALSO, i candidati esistevano (accumula.length>0). Ora i tre stati sono
-  // distinti: (a) candidati + cassa → ACCUMULA · (b) candidati MA cassa esaurita → segnala
-  // l'opportunità bloccata dalla liquidità · (c) davvero nessun candidato → MANTIENI/PRUDENZA.
-  if (accumula.length >= 1 && withPlan.length > 0) {
-    label = "ACCUMULA"; col = "var(--green)"; score = 72;
-    reasons.push(`${accumula.length} candidati migliorano il profilo Sharpe/RS del portafoglio (score quant ≥${RISK_PARAMS.minScore}): ${accumula.slice(0, 8).map(r => `${r.ticker} ${r._q}/100`).join(", ")}${accumula.length > 8 ? ", …" : ""}`);
-    reasons.push(refSharpe != null
-      ? `criteri: impatto marginale sullo Sharpe (vs ${fmtNum.format(refSharpe)} attuale, target 2.0) · forza relativa 1M vs benchmark · qualità fondamentale`
-      : `criteri: forza relativa 1M vs benchmark · qualità fondamentale — ⚠ lo Sharpe di portafoglio non è disponibile in questo run: la componente Sharpe (40% dello score) è ESCLUSA e i pesi rinormalizzati, quindi il ranking è meno informativo del solito`);
-    reasons.push(`ordini LIMITE ai supporti con stop a 2×ATR(14): il rischio per operazione si adatta alla volatilità del titolo`);
-    if (riskScale < 1) reasons.push(`regime di volatilità: VIX ${fmtNum.format(vixV)} → budget d'ingresso ridotti al ${Math.round(riskScale * 100)}% (sizing regime-aware: in mercato nervoso si rischia meno per operazione)`);
-  } else if (accumula.length >= 1) {
-    // candidati PRONTI ma nessun ordine eseguibile: la liquidità è il collo di bottiglia, NON la mancanza di idee
-    label = "LIQUIDITÀ"; col = "var(--yellow)"; score = 50;
-    reasons.push(`⚠ ${accumula.length} candidati d'ingresso PRONTI (${accumula.slice(0, 5).map(r => `${r.ticker} ${r._q}/100`).join(", ")}${accumula.length > 5 ? ", …" : ""}) MA liquidità esaurita (cassa ${fmtEUR.format(cashEur)}${t.budget_operativo_spendibile != null ? `, budget operativo ${fmtEUR.format(Math.round(t.budget_operativo_spendibile))}` : ""}): nessun ingresso ESEGUIBILE oggi. Non è "niente da comprare" — è "niente con cui comprare". Per attivarli, libera cassa: trim tattico, uscita dai nomi in veto (es. MSTR), o nuovo versamento.`);
-  } else if (overCap.length) {
-    // v164 — TERZO COLLO DI BOTTIGLIA (simmetrico a LIQUIDITÀ): i candidati esistevano e passavano
-    // lo score, li ha fermati il CAP D'INGRESSO. Dirlo "nessun candidato migliora abbastanza" era
-    // una diagnosi FALSA e opposta alla realtà ("c'è un buon nome, ma è già troppo pesante").
-    label = "CAP"; col = "var(--yellow)"; score = 50;
-    reasons.push(`⚠ nessun ingresso possibile per CAP D'INGRESSO, non per mancanza di idee: ${overCap.map(x => `${x.r.ticker} (${fmtNum.format(x.w)}%)`).join(", ")} ${overCap.length > 1 ? "superano" : "supera"} già il ${fmtNum.format(RISK_PARAMS.capNoAdd_pct)}% del NAV. Non è "niente di buono da comprare" — è "il buono che vedo lo ho già, e in dose piena". Le vie aperte restano: lasciar correre (Let Winners Run, protetto dal ratchet), alzare il cap DICHIARANDOLO, o cercare fuori dal book nomi a bassa correlazione.`);
-  } else if (dir != null && dir < 40) {
-    label = "PRUDENZA"; col = "var(--yellow)"; score = 32;
-    reasons.push(`regime debole (segnali ${dir}/100) e nessun candidato con edge quant: nessun nuovo ingresso, disciplina sugli stop 2×ATR`);
-  } else {
-    label = "MANTIENI"; col = "var(--blue)"; score = dir != null ? dir : 55;
-    reasons.push(`nessun candidato migliora abbastanza Sharpe/forza relativa (regime ${dir != null ? dir + "/100" : "neutro"}): conserva liquidità e posizioni vincenti`);
-  }
-  /* v247 — RIMOSSO da `reasons`: il cap d'ingresso. */
-  if (stopViolations.length) reasons.unshift(`⚠ STOP VIOLATO su ${stopViolations.map(x => `${x.r.ticker} (stop $${fmtNum.format(x.stop)}, prezzo $${fmtNum.format(x.r.price)})`).join(", ")} — il prezzo è sotto lo stop trailing ancorato`);   // v247: resta il FATTO, via la prescrizione
-  /* v247 — RIMOSSO da `reasons`: il VETO risk manager. */
-  /* v247 — RIMOSSO da `reasons`: i RIABILITATI. */
-  /* v247 — RIMOSSO da `reasons`: la prescrizione dello squeeze. */
-  // v167 — CONCENTRAZIONE DI FATTORE (la soglia che mancava). Il veto qualità giudica UN TITOLO
-  // alla volta ed è cieco alle correlazioni: dieci nomi con Sortino accettabile possono scendere
-  // insieme se condividono il fattore. Qui si somma l'MCR — la quota di VARIANZA, non il peso —
-  // per settore, col bucket "Semiconduttori/memoria" che è il fattore vero di questo book.
-  // Solo segnalazione, coerente con "indicatori non dettami": nessun trim automatico.
-  const factorRisk = (() => {
-    const by = new Map();
-    for (const r of (DATA.portfolio || []).filter(isEquity)) {
-      const m = dgFin(r.risk_contrib_pct);
-      if (m == null) continue;
-      const k = thIsSemi(r) ? "Semiconduttori/memoria" : (r.sector || "Altro");
-      const cur = by.get(k) || { mcr: 0, w: 0, tk: [] };
-      cur.mcr += m; cur.w += (positionWeightPct(r) ?? 0); cur.tk.push(r.ticker);
-      by.set(k, cur);
-    }
-    const top = [...by.entries()].sort((a, b) => b[1].mcr - a[1].mcr)[0];
-    return top ? { name: top[0], ...top[1] } : null;
-  })();
-  if (factorRisk && factorRisk.mcr > RISK_PARAMS.factorRiskAlert_pct) {
-    reasons.push(`CONCENTRAZIONE DI FATTORE: ${factorRisk.tk.join("+")} (${factorRisk.name}) generano il ${fmtNum.format(Math.round(factorRisk.mcr * 10) / 10)}% della VARIANZA del fondo con il ${fmtNum.format(Math.round(factorRisk.w * 10) / 10)}% del NAV. Il veto qualità guarda un titolo per volta e questo NON lo vede: sono nomi che possono scendere INSIEME perché condividono il fattore, per quanto sani siano singolarmente`);   /* v247 — la MISURA resta: è la sola che dice quando N posizioni sono in realtà una sola. Via la soglia superata e l'invito a diversificare, che erano il verdetto */
-  }
-  /* v247 — RIMOSSO da `reasons`: l'alert su singolo nome. */
-  // motivo PRECISO per titolo (non il generico "multiplo/RSI estremo": su CBRS scattava solo
-  // il multiplo e l'LLM segnalava "RSI 43,6 non estremo" — v118)
-  /* v247 — RIMOSSO da `reasons`: il TRIM parziale era una raccomandazione operativa esplicita. */
-  return { label, col, score, reasons, dir, accumula, trim, withPlan, trailing, stopViolations, excluded, rehabbed, squeezed, overCap, concentrationAlert, factorRisk, harvest };
-}
 
 /* ═══ PARAMETRI DI RISCHIO DEL FONDO (v122) — regole attive lette in tempo reale ═══
    Registro DICHIARATIVO: ogni regola = soglia (da RISK_PARAMS) + stato LIVE calcolato dai
    dati correnti. Tier per impatto: red = protezione del capitale, yellow = dimensionamento,
    green = segnali. Un'unica fonte per la card e il popup. */
-function topEquitySectorPct() {
-  const allocR = (DATA.allocation || []).filter(a => a.sector !== "Liquidità" && a.sector !== "Obbligazioni");
-  const bySec = {};
-  allocR.forEach(a => { const k = a.sector || a.ticker; bySec[k] = (bySec[k] || 0) + (a.value_eur || 0); });
-  const tot = Object.values(bySec).reduce((s, v) => s + v, 0) || 1;
-  const top = Object.entries(bySec).sort((a, b) => b[1] - a[1])[0];
-  return top ? { name: top[0], pct: Math.round(top[1] / tot * 100) } : null;
-}
-function riskRulesRegistry() {
-  const t = DATA.totals || {};
-  let dv = {}; try { dv = decisionVerdict(); } catch { dv = {}; }
-  const ptf = (DATA.portfolio || []).filter(isEquity);
-  const allEq = [...ptf, ...(DATA.watchlist || []).filter(isEquity)];
-  const es95 = t.es95_hist_eur ?? t.es95_1d_eur;
-  const budget = t.budget_operativo_spendibile;
-  const vix = (DATA.macro || {}).vix?.value;
-  const rScale = vix == null ? 1 : vix > 30 ? 0.4 : vix > 25 ? 0.5 : vix > 20 ? 0.75 : 1;
-  const sec = topEquitySectorPct();
-  const maxCorr = Math.max(0, ...ptf.map(r => r.max_corr ?? 0));
-  const trimTac = ptf.filter(r => r.qty && ((r.pe && r.pe > 150 && !(r.stats?.peg > 0 && r.stats.peg <= 2)) || (r.rsi && r.rsi > 78)));
-  const altman = allEq.filter(r => r.stats?.altman_z != null && r.stats.altman_z < 1.81);
-  const earn = ptf.filter(r => earningsRiskDays(r) != null);
-  const eur = (v) => v == null ? "n.d." : fmtEUR.format(Math.round(v));
-  const nOv = (dv.overCap || []).length, nAl = (dv.concentrationAlert || []).length, nVeto = (dv.excluded || []).length;
-  const nAcc = (dv.accumula || []).length, nReh = (dv.rehabbed || []).length, nSq = (dv.squeezed || []).length;
-  const nStopV = (dv.stopViolations || []).length, nTrail = (dv.trailing || []).length;
-  return [
-    // 🔴 RED — protezione del capitale / gate rigidi
-    { tier: "red", label: "Cap d'ingresso", th: `${RISK_PARAMS.capNoAdd_pct}% NAV`, active: nOv > 0,
-      state: `${nOv} posizioni ≥${RISK_PARAMS.capNoAdd_pct}% NAV: divieto di NUOVI acquisti (si lasciano correre)`,
-      why: `Un singolo nome non deve poter crescere OLTRE il ${RISK_PARAMS.capNoAdd_pct}% del NAV con capitale FRESCO (rischio idiosincratico d'ingresso). Ciò che supera il cap per apprezzamento organico NON viene trimmato — Let Winners Run, protetto dallo stop ratchet.`, where: "motore (decisionVerdict)" },
-    { tier: "red", label: "Veto Value Trap", th: `Sortino 1A < ${RISK_PARAMS.sortinoVeto}`, active: nVeto > 0,
-      state: `${nVeto} titoli in veto (Sortino<${RISK_PARAMS.sortinoVeto} · Short≥15% · margine neg+PEG rotto)`,
-      why: "Divieto di ACCUMULO su titoli che distruggono valore corretto per il rischio (downside deviation) o con short interest da squeeze. Non media al ribasso sul coltello che cade. Il veto vieta l'accumulo, non impone la vendita.", where: "motore (qualityVeto)" },
-    { tier: "red", label: "Riserva tail-risk ES95", th: `budget = cassa − ES95`, active: true,
-      state: `ES95 ${eur(es95)} accantonato · budget operativo ${eur(budget)}`,
-      why: "La perdita MEDIA nel 5% dei giorni peggiori resta intoccabile: protegge l'INTERO portafoglio da un crollo di mercato senza cappare i vincenti. Confermata dal CEO.", where: "pipeline (totals)" },
-    { tier: "red", label: "Stop ratchet 2×ATR", th: `trailing, sale e non scende`, active: nStopV > 0,
-      state: nStopV > 0 ? `⚠ ${nStopV} STOP VIOLATI su ${nTrail} posizioni` : `${nTrail} stop attivi, nessuno violato`,
-      why: "Stop dinamico a 2×ATR(14) sotto il prezzo, ancorato: sale coi massimi e non ridiscende. È la difesa principale su ogni posizione — sostituisce il cap sizing come protezione dei vincenti.", where: "pipeline (ratchet_stops)" },
-    // 🟡 YELLOW — dimensionamento / esecuzione
-    { tier: "yellow", label: "Alert concentrazione", th: `singolo nome > ${RISK_PARAMS.capAlert_pct}% NAV`, active: nAl > 0,
-      state: nAl > 0 ? `⚠ ${nAl} nomi oltre il 25% NAV` : `nessun nome oltre il 25% NAV`,
-      why: "Avviso di rischio idiosincratico quando un singolo titolo supera il 25% del NAV. È un promemoria per una scelta consapevole, MAI un obbligo di trim (Let Winners Run).", where: "motore (decisionVerdict)" },
-    { tier: "green", label: "Concentrazione settore (capitale)", th: `contesto, > ${Math.round(RISK_PARAMS.sectorAlert_frac * 100)}% = estrema`, active: !!(sec && sec.pct > RISK_PARAMS.sectorAlert_frac * 100),
-      state: sec ? `${sec.name} ${sec.pct}% del capitale azionario` : "n.d.",
-      why: "Quota di CAPITALE nel primo settore. È contesto, non l'allarme di concentrazione: quello lo dà la CONCENTRAZIONE DI FATTORE, che somma gli MCR e ragiona sulla VARIANZA — la grandezza che determina quanto fa male una giornata storta. Su questo book le due divergono molto (56% di NAV in semi = 86% del rischio).", where: "motore + pipeline (allocation)" },
-    { tier: "yellow", label: "Score minimo d'accumulo", th: `≥ ${RISK_PARAMS.minScore}/100`, active: nAcc > 0,
-      state: `${nAcc} candidati con edge quant ≥${RISK_PARAMS.minScore}`,
-      why: "Solo i titoli il cui score (impatto marginale sullo Sharpe 40% · forza relativa 1M 30% · qualità fondamentale 30%) supera 60 entrano nel piano d'accumulo.", where: "motore (quantScore)" },
-    { tier: "yellow", label: "Regime sizing VIX", th: `×0,75/0,5/0,4 a VIX>20/25/30`, active: rScale < 1,
-      state: vix != null ? `VIX ${fmtNum.format(vix)} → budget d'ingresso ×${rScale}` : "VIX n.d.",
-      why: "In mercato nervoso si rischia meno per operazione: il budget d'ingresso si riduce all'aumentare della volatilità implicita, senza spegnere il motore.", where: "motore (decisionVerdict)" },
-    { tier: "yellow", label: "Riabilitazione growth", th: `ROE>15% + >SMA200 + RS>0`, active: nReh > 0,
-      state: nReh > 0 ? `${nReh} titoli riabilitati (sorvegliati)` : "nessuna riabilitazione attiva",
-      why: "Revoca il veto Sortino a un leader in recupero: il Sortino 12M guarda indietro e penalizza chi si sta riprendendo. Il riabilitato torna eleggibile ma resta SORVEGLIATO (trailing negativo dichiarato).", where: "motore (qualityVeto)" },
-    { tier: "yellow", label: "Paracadute limite d'ordine", th: `supporto entro ±25% dal prezzo`, active: false,
-      state: "attivo su ogni ordine d'ingresso",
-      why: "Un limite d'acquisto più lontano del 25% dal prezzo non è un ordine ma un residuo di dato sporco: scatta un fallback dichiarato (SMA50 → 2×ATR → -5%). Nato dall'incidente SNDK.", where: "motore (saneEntryLimit)" },
-    // 🟢 GREEN — segnali informativi
-    { tier: "green", label: "Turnaround squeeze", th: `short≥20% + RVol>2 + >SMA50`, active: nSq > 0,
-      state: nSq > 0 ? `${nSq} setup speculativi esposti` : "nessun setup squeeze",
-      why: "Un titolo vetato ma con risveglio istituzionale improvviso viene esposto come speculazione asimmetrica dichiarata (sizing dimezzato, stop 1×ATR), mai promosso a investimento del mandato.", where: "motore (squeezeSetup)" },
-    { tier: "green", label: "Trim tattico valutazione", th: `P/E>150 non giust. o RSI>78`, active: trimTac.length > 0,
-      state: trimTac.length > 0 ? `${trimTac.map(r => r.ticker).join(", ")} (multiplo/ipercomprato)` : "nessuno",
-      why: "Segnala multipli non giustificati dalla crescita (P/E>150 con PEG fuori scala) o ipercomprato estremo (RSI>78) come candidati opzionali a un free-ride. Non è un obbligo.", where: "motore (decisionVerdict)" },
-    { tier: "green", label: "Rischio default (Altman)", th: `Altman Z'' < 1,81`, active: altman.length > 0,
-      state: altman.length > 0 ? `${altman.map(r => r.ticker).join(", ")}` : "nessun titolo in distress",
-      why: "Flag prudenziale di solidità di bilancio (Altman Z'' non-manifatturieri): sotto 1,81 il titolo è nella zona grigia di rischio insolvenza. Solo segnalazione.", where: "pipeline (stats.altman_z)" },
-    { tier: "green", label: "Earnings imminenti", th: `trimestrale < 14 giorni`, active: earn.length > 0,
-      state: earn.length > 0 ? `${earn.map(r => r.ticker).join(", ")}` : "nessuna trimestrale <14gg",
-      why: "Rischio evento binario: il gap post-earnings può scavalcare stop e supporti. Su un candidato d'ingresso impone la scelta esplicita ingresso post-evento o sizing ridotto.", where: "pipeline (earnings_date)" },
-    { tier: "green", label: "Correlazione fra posizioni", th: `coppia > 0,75`, active: maxCorr > 0.75,
-      state: `correlazione max in portafoglio ${fmtNum.format(Math.round(maxCorr * 100) / 100)}`,
-      why: "Due posizioni troppo correlate non diversificano: la soglia 0,75 segnala quando la diversificazione apparente è illusoria. Oggi la coppia più correlata è sotto soglia.", where: "pipeline (matrice correlazioni)" },
-  ];
-}
 const RP_TIER = { red: { c: "var(--red)", lab: "Protezione capitale" }, yellow: { c: "var(--yellow)", lab: "Dimensionamento" }, green: { c: "var(--green)", lab: "Segnale" } };
 /* editor soglie (v143): select + valore + spiegazione. Gli override mutano RISK_PARAMS e
    rilanciano renderAll: verdetto, chips e export AI riflettono subito la nuova soglia. */
-function rpShownValue(d) { return d ? Math.round(RISK_PARAMS[d.key] * d.scale * 100) / 100 : ""; }
-
 /* ⚠ v253 — renderRiskParams() e initRiskEditor() RIMOSSE. Scrivevano su #risk-params-grid
    e sui cinque campi dell'editor soglie: contenitori che non esistono più da quando il CEO
    ha chiesto di togliere la scheda "Parametri di Rischio del Fondo" (restano solo il
@@ -2720,22 +1560,6 @@ function rpShownValue(d) { return d ? Math.round(RISK_PARAMS[d.key] * d.scale * 
    NAV, budget cassa−ES95). Un LLM che allucina un limite folle non arriva mai al broker. */
 
 // numeri in formato italiano (1.325,03) O anglosassone (1,325.03) O semplice (626 / 626.5)
-function parseMoneyLoose(s) {
-  s = String(s || "").replace(/[$€\s]/g, "");
-  if (!s) return null;
-  const lastDot = s.lastIndexOf("."), lastCom = s.lastIndexOf(",");
-  let v;
-  if (lastDot >= 0 && lastCom >= 0) {                    // entrambi: l'ULTIMO separatore è il decimale
-    const dec = Math.max(lastDot, lastCom);
-    v = parseFloat(s.slice(0, dec).replace(/[.,]/g, "") + "." + s.slice(dec + 1));
-  } else if (lastCom >= 0) {                             // solo virgola: 1-2 cifre dopo = decimale it
-    v = (s.length - lastCom - 1) <= 2 ? parseFloat(s.slice(0, lastCom).replace(/,/g, "") + "." + s.slice(lastCom + 1))
-                                      : parseFloat(s.replace(/,/g, ""));
-  } else if (lastDot >= 0) {                             // solo punto: 3 cifre dopo = migliaia it ($1.325)
-    v = ((s.length - lastDot - 1) === 3 && s.length > 4) ? parseFloat(s.replace(/\./g, "")) : parseFloat(s);
-  } else v = parseFloat(s);
-  return Number.isFinite(v) ? v : null;
-}
 
 const AI_BUY = /\b(COMPRA|ACCUMULA|NUOVO\s+INGRESSO)\b/i;
 const AI_SELL = /\b(VENDI|TRIM(?:MA)?|ALLEGGERISCI|RIDUCI)\b/i;
@@ -2743,119 +1567,9 @@ const AI_SELL = /\b(VENDI|TRIM(?:MA)?|ALLEGGERISCI|RIDUCI)\b/i;
 /* estrae gli ordini dal testo libero del report AI: righe con un ticker NOTO + verbo d'azione.
    Formato canonico della testata: "[TICKER] — COMPRA ~N quote a limite $X con stop $Y",
    ma il parser tollera variazioni (limite/a/ingresso; stop/stop loss). */
-function parseAIOrders(text) {
-  const known = new Map();
-  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) if (r.ticker) known.set(r.ticker.toUpperCase(), r);
-  const orders = [];
-  const seen = new Set();
-  for (const rawLine of String(text || "").split("\n")) {
-    // NORMALIZZAZIONE v149: gli LLM emettono ordini anche in TABELLE markdown ("| **RGTI** |
-    // VENDI | ~595 | **$14,31** …") nonostante il formato canonico A2 — visto su Gemini 21/07.
-    // Via grassetto e pipe→separatore, così ticker/verbo/importi tornano estraibili.
-    const line = rawLine.replace(/\*\*/g, "").replace(/\s*\|\s*/g, " · ").trim();
-    if (line.length < 8) continue;
-    const isBuy = AI_BUY.test(line), isSell = AI_SELL.test(line);
-    if (!isBuy && !isSell) continue;
-    // ticker noto presente come parola (evita match dentro altre parole)
-    let tk = null;
-    for (const k of known.keys()) {
-      if (new RegExp(`(^|[^A-Z0-9.\\-])${k.replace(/[-=^.]/g, "\\$&")}([^A-Z0-9.\\-]|$)`).test(line.toUpperCase())) { tk = k; break; }
-    }
-    if (!tk) {
-      // riga in formato ordine canonico ("[XXX] — VERBO…") su ticker NON nel payload:
-      // NON ignorarla in silenzio — è l'allucinazione che il validatore esiste per beccare
-      const m = line.match(/^\[?([A-Z][A-Z0-9.\-=^]{0,9})\]?\s*—/);
-      if (m && !known.has(m[1].toUpperCase())) {
-        orders.push({ tk: m[1].toUpperCase(), action: isBuy ? "BUY" : "SELL", qty: null, limit: null, stop: null,
-                      line: line.slice(0, 160), unknown: true });
-      }
-      continue;
-    }
-    const sig = tk + "|" + (isBuy ? "B" : "S");
-    if (seen.has(sig)) continue;                        // primo ordine per ticker/verso (il resto è prosa)
-    seen.add(sig);
-    const num = "([\\d.,]+)";
-    // fallback tabellare v149: "~595" nudo (colonna Quantità, senza "quote") e primo "$X" della
-    // riga NON preceduto da parole di tracciabilità (Prezzo/Supp./Stop/res/PMC: sono citazioni,
-    // non il limite). Niente lookbehind (Safari vecchi): scansione esplicita dei "$X" con la
-    // parola precedente in blocklist. Il formato canonico resta prioritario.
-    const qtyM = line.match(new RegExp(`~?\\s*(\\d+)\\s*(?:quote|azioni)`, "i"))
-              || line.match(/~\s*(\d+)(?![\d.,%])/);
-    let limM = line.match(new RegExp(`(?:limite|ingresso)\\s*(?:di|d'|a)?\\s*\\$?\\s*${num}`, "i"))
-            || line.match(new RegExp(`\\ba\\s+\\$\\s*${num}`, "i"));
-    if (!limM) {
-      for (const m of line.matchAll(new RegExp(`(\\S*)\\s*\\$\\s*${num}`, "g"))) {
-        if (!/^(prezzo|supp|stop|res|pmc)/i.test((m[1] || "").replace(/[^A-Za-z.]/g, ""))) { limM = [m[0], m[2]]; break; }
-      }
-    }
-    const stopM = line.match(new RegExp(`stop(?:\\s*loss)?\\s*(?:\\(2×ATR\\))?\\s*(?:a|di)?\\s*\\$?\\s*${num}`, "i"));
-    orders.push({ tk, action: isBuy ? "BUY" : "SELL", qty: qtyM ? parseInt(qtyM[1], 10) : null,
-                  limit: limM ? parseMoneyLoose(limM[1]) : null, stop: stopM ? parseMoneyLoose(stopM[1]) : null,
-                  line: line.slice(0, 160) });
-  }
-  return orders;
-}
 
 /* verifica gli ordini estratti contro gli invarianti del sistema. Ritorna righe con esito
    hard/warn/ok + verifica budget aggregata. STESSE classi di violazione del red team I1. */
-function validateAIOrders(orders) {
-  const t = DATA.totals || {};
-  const eurusd = DATA.eurusd || 1.08;
-  const rows = [];
-  const byTk = new Map();
-  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) if (r.ticker) byTk.set(r.ticker.toUpperCase(), r);
-  const usdNav = dgFin(t.usd_value);
-  /* ⚠ v255 — IL CONTROLLO SUL BUDGET È USCITO. Leggeva `budget_operativo_spendibile`, che il
-     CEO ha tolto dal payload perché era il numero che produceva il "vendi tutto", e la sua
-     testata ora dice a chiare lettere che "il payload NON pubblica un tetto di spesa: quanto
-     impegnare è una decisione tua, non un vincolo del sistema". Un validatore che rimettesse
-     quel tetto contraddirebbe la testata dalla porta di servizio. Resta il CONTROVALORE
-     complessivo degli acquisti proposti, come FATTO da leggere accanto alla liquidità. */
-  let buyNotional = 0;
-  for (const o of orders) {
-    const hard = [], warn = [];
-    const r = byTk.get(o.tk);
-    if (!r) { rows.push({ ...o, level: "hard", msgs: ["ticker non presente nel payload (allucinazione)"] }); continue; }
-    const price = dgFin(r.price);
-    if (o.action === "BUY") {
-      /* ⚠ v255 — VETO E CAP SONO SEGNALAZIONI, NON BLOCCHI. La filosofia del CEO è che i
-         parametri sono evidenza diagnostica, non dettami: un filtro di qualità e una soglia
-         di concentrazione sono GIUDIZI, e un giudizio che si presenta come impossibilità
-         mente sulla propria natura. Restano BLOCCANTI solo i fatti che l'aritmetica rende
-         impossibili — vendere ciò che non hai, uno stop sopra il limite, un ticker che nel
-         payload non esiste. Tutto il resto si dichiara e decide lui. */
-      const veto = typeof qualityVeto === "function" ? qualityVeto(r) : null;
-      if (veto && !veto.rehab) warn.push(`non supera il filtro qualità (${(veto.why || [veto.verdict]).join(", ")}) — è un giudizio del sistema, non un divieto`);
-      else if (veto && veto.rehab) warn.push("riabilitato dal veto Sortino: SORVEGLIATO, sizing prudente");
-      const vUsd = r.currency === "EUR" ? (dgFin(r.value) ?? 0) * eurusd : dgFin(r.value);
-      const w = (vUsd && usdNav) ? vUsd / usdNav * 100 : null;
-      if (r.qty && w != null && w >= (RISK_PARAMS?.capNoAdd_pct ?? 30)) warn.push(`cap d'ingresso: posizione già ${fmtNum.format(Math.round(w * 10) / 10)}% del NAV (divieto di accumulo)`);
-      if (o.limit == null) warn.push("nessun prezzo LIMITE rilevato (gli ordini a mercato sono vietati dalla disciplina)");
-      else {
-        if (!(o.limit > 0)) hard.push("limite ≤ 0");
-        if (price && o.limit > price * 1.02) hard.push(`limite $${fmtNum.format(o.limit)} SOPRA il prezzo corrente $${fmtNum.format(price)}`);
-        if (price && (price - o.limit) / price > 0.30) hard.push(`limite $${fmtNum.format(o.limit)} oltre il 30% dal prezzo $${fmtNum.format(price)} (classe incidente SNDK)`);
-      }
-      if (o.stop == null) warn.push("nessuno stop rilevato: proteggi l'ingresso col 2×ATR");
-      else {
-        if (!(o.stop > 0)) hard.push("stop ≤ 0");
-        if (o.limit != null && o.stop >= o.limit) hard.push(`stop $${fmtNum.format(o.stop)} ≥ limite $${fmtNum.format(o.limit)} (ordine long impossibile)`);
-      }
-      const in7 = r.earnings_date && (new Date(r.earnings_date) - Date.now()) / 86400000 <= 7 && (new Date(r.earnings_date) - Date.now()) >= 0;
-      if (in7) warn.push(`earnings ${String(r.earnings_date).slice(5, 10)} entro 7g: ingresso post-evento o sizing dimezzato`);
-      if (o.qty && o.limit) buyNotional += o.qty * o.limit;
-    } else {
-      if (!r.qty) hard.push("vendita di un titolo NON detenuto (è in watchlist)");
-      else if (o.qty && o.qty > r.qty) hard.push(`quantità ${o.qty} > posseduta ${r.qty}`);
-      if (o.limit != null && price && o.limit < price * 0.95) warn.push(`limite di vendita $${fmtNum.format(o.limit)} molto sotto il mercato $${fmtNum.format(price)} (svendita?)`);
-    }
-    rows.push({ ...o, level: hard.length ? "hard" : warn.length ? "warn" : "ok", msgs: [...hard, ...warn] });
-  }
-  const budget = { spend: Math.round(buyNotional), budget: null, ok: true };   // v255: nessun tetto
-  return { rows, budget, spesaProposta: Math.round(buyNotional),
-           hardCount: rows.filter(x => x.level === "hard").length,
-           warnCount: rows.filter(x => x.level === "warn").length };
-}
 
 /* ═══ v255 — LA RISPOSTA DELL'AI TORNA DENTRO IL SISTEMA ═══════════════════════════════════
    `parseAIOrders` e `validateAIOrders` esistevano dal v149 con otto test e NON erano collegate
@@ -2867,118 +1581,12 @@ function validateAIOrders(orders) {
    La distinzione non è estetica — è la filosofia del CEO ("i parametri sono evidenza
    diagnostica, non dettami"), ed è ciò che tiene questo controllo dall'altra parte del
    confine rispetto al "vendi tutto" che aveva tolto dal payload. */
-function renderVerificaAI(testo) {
-  const box = $("#verifica-esito");
-  if (!box) return null;
-  const ordini = parseAIOrders(testo);
-  if (!ordini.length) {
-    box.innerHTML = `<div class="va-vuoto">Nessun ordine riconosciuto nel testo.<br>
-      <span class="muted">Il formato che la testata chiede (A2) è
-      <code>[TICKER] — COMPRA ~N quote a limite $X con stop $Z</code>. Il parser legge anche le
-      tabelle markdown. Se l'AI non ha proposto operazioni, questo esito è corretto.</span></div>`;
-    return { ordini: 0 };
-  }
-  const v = validateAIOrders(ordini);
-  const ICONA = { hard: "⛔", warn: "⚠", ok: "✓" };
-  const ETICH = { hard: "IMPOSSIBILE", warn: "DA GUARDARE", ok: "coerente col libro" };
-  const righe = v.rows.map(r => `
-    <div class="va-riga va-${r.level}">
-      <div class="va-cap"><b>${ICONA[r.level]} ${esc(r.tk)}</b> · ${r.action === "BUY" ? "COMPRA" : "VENDI"}
-        ${r.qty != null ? `~${fmtNum.format(r.qty)} quote` : "<i>quantità non rilevata</i>"}
-        ${r.limit != null ? ` · limite $${fmtNum.format(r.limit)}` : ""}
-        ${r.stop != null ? ` · stop $${fmtNum.format(r.stop)}` : ""}
-        <span class="va-tag">${ETICH[r.level]}</span></div>
-      ${r.msgs && r.msgs.length ? `<ul class="va-msg">${r.msgs.map(m => `<li>${esc(m)}</li>`).join("")}</ul>` : ""}
-      <div class="va-orig muted">${esc(r.line || "")}</div>
-    </div>`).join("");
-  /* Il controvalore è un FATTO messo accanto alla liquidità, non un tetto: la testata dice
-     che quanto impegnare è una decisione del CEO. Si mostra il numero e basta. */
-  const cassa = dgFin((DATA.totals || {}).cash);
-  const spesa = v.spesaProposta || 0;
-  const eurusd = DATA.eurusd || 1.08;
-  const riepilogo = `<div class="va-sommario">
-    <b>${v.rows.length} ordini letti</b> · ${v.hardCount} impossibili · ${v.warnCount} da guardare
-    ${spesa > 0 ? ` · controvalore acquisti proposti <b>${fmtEUR.format(Math.round(spesa / eurusd))}</b>${
-      cassa != null ? ` a fronte di ${fmtEUR.format(Math.round(cassa))} di liquidità` : ""}` : ""}
-  </div>`;
-  box.innerHTML = riepilogo + righe;
-  return { ordini: v.rows.length, hard: v.hardCount, warn: v.warnCount };
-}
 
-$("#btn-verifica")?.addEventListener("click", () => {
-  const m = $("#verifica-modal");
-  if (!m) return;
-  m.hidden = false;
-  $("#verifica-text")?.focus();
-});
-$("#verifica-run")?.addEventListener("click", () => renderVerificaAI($("#verifica-text")?.value || ""));
-$("#verifica-clear")?.addEventListener("click", () => {
-  const t = $("#verifica-text"); if (t) t.value = "";
-  const e = $("#verifica-esito"); if (e) e.innerHTML = "";
-});
+/* v256 — wiring del modale "Verifica risposta AI": rimosso col modale. Validava gli ordini
+   proposti dall'LLM contro il portafoglio, che non esiste piu'. */
 
 
 
-function openDecisionModal() {
-  // v141: il modal è SOLO Diario + Validatore (la "sintesi delle operazioni" del motore è stata
-  // rimossa su direttiva CEO: il verdetto operativo vive nell'export AI, non in un popup).
-  const diary = loadDiary();
-  const diaryHtml = diary.length ? diary.map(e => `
-    <div class="diary-item" data-iso="${e.date}">
-      <span class="diary-date">${new Date(e.date).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "2-digit" })}</span>
-      <span class="diary-body">${diaryOpLine(e)}<span class="diary-text">${esc(e.text)}</span></span>
-      <button class="diary-edit" data-iso="${e.date}" title="Modifica questa voce">✎</button>
-      <button class="diary-del" data-iso="${e.date}" title="Elimina">✕</button>
-    </div>`).join("") : `<div class="muted" style="font-size:12px">Nessuna voce ancora. Annota le operazioni con la loro FONTE: il diario viaggia nell'export AI e alimenta l'attribuzione.</div>`;
-  openInfoModal("📔 Diario delle azioni",
-    `<div class="info-line muted" style="font-size:11px;margin-bottom:6px">Qui vanno SOLO le operazioni che ESEGUI davvero (tue decisioni): il diario viaggia nell'export AI e dà continuità ai consigli.</div>
-     <div class="diary-form">
-       <select id="d-tipo" aria-label="Tipo operazione"><option value="ACQUISTO">Acquisto</option><option value="VENDITA">Vendita</option></select>
-       <input id="d-qty" type="number" min="1" step="1" placeholder="Quantità" aria-label="Quantità">
-       <input id="d-tk" type="text" placeholder="Ticker" aria-label="Ticker" list="d-tk-list" maxlength="12">
-       <input id="d-px" type="number" step="0.01" placeholder="Prezzo" aria-label="Prezzo">
-       <input id="d-when" type="date" aria-label="Data operazione">
-       <input id="d-note" type="text" placeholder="Nota (facoltativa)" aria-label="Nota" maxlength="200">
-       <button class="btn btn-primary btn-sm" id="diary-save">Registra</button>
-     </div>
-     <datalist id="d-tk-list">${[...new Set([...(DATA?.portfolio || []), ...(DATA?.watchlist || [])].map(r => r && r.ticker).filter(Boolean))].map(t => `<option value="${esc(t)}">`).join("")}</datalist>
-     <div class="diary-list" id="diary-list">${diaryHtml}</div>`);
-  const refresh = () => { closeChartModal(); openDecisionModal(); };
-  // v142: il diario è SOLO delle operazioni ESEGUITE dal CEO (niente select fonte, niente
-  // registrazione dei report LLM). v165: il Validatore è stato RIMOSSO dal popup su direttiva
-  // CEO; le funzioni pure (parseAIOrders/validateAIOrders) restano, testate e riusabili.
-  $("#diary-save")?.addEventListener("click", () => {
-    // dal form STRUTTURATO: l'op è già nota, il testo si compone in forma canonica (e resta
-    // leggibile nell'export AI, dove il diario viaggia come prosa).
-    const tipo = $("#d-tipo")?.value || "ACQUISTO";
-    const qty = parseInt($("#d-qty")?.value || "", 10);
-    const tk = ($("#d-tk")?.value || "").trim().toUpperCase();
-    const px = parseFloat(($("#d-px")?.value || "").replace(",", "."));
-    const wRaw = $("#d-when")?.value || "";
-    const nota = ($("#d-note")?.value || "").trim();
-    if (!tk && !Number.isFinite(qty)) { toast("Indica almeno ticker e quantità"); return; }
-    const quando = wRaw ? wRaw.split("-").reverse().join("/")
-                        : new Date().toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" });
-    const op = { tipo, qty: Number.isFinite(qty) ? qty : null, ticker: tk || null,
-                 prezzo: Number.isFinite(px) ? px : null, quando, multi: false };
-    const testo = [`${tipo === "ACQUISTO" ? "Acquisto" : "Vendita"}`,
-                   Number.isFinite(qty) ? `${qty} quote` : null, tk || null,
-                   Number.isFinite(px) ? `a ${px}` : null, `il ${quando}`,
-                   nota ? `— ${nota}` : null].filter(Boolean).join(" ");
-    saveDiaryEntry(testo, op);
-    refresh();
-  });
-  document.querySelectorAll(".diary-del").forEach(b => b.addEventListener("click", () => { deleteDiaryEntry(b.dataset.iso); refresh(); }));
-  document.querySelectorAll(".diary-edit").forEach(b => b.addEventListener("click", () => {
-    const entry = loadDiary().find(x => x.date === b.dataset.iso);
-    if (!entry) return;
-    deleteDiaryEntry(b.dataset.iso);
-    const inp = $("#diary-input");
-    if (inp) { inp.value = entry.text; inp.dispatchEvent(new Event("input")); inp.focus(); }
-    document.querySelector(`.diary-item[data-iso="${b.dataset.iso}"]`)?.remove();
-    toast("Voce caricata nel campo: modifica e premi Aggiungi");
-  }));
-}
 
 /* mini-trend di una metrica vs ~1 settimana fa (dallo storico metrics_history della pipeline) */
 
@@ -3451,56 +2059,6 @@ function openSignpostsModal() {
 /* ---------------- KPI ---------------- */
 /* v204 — renderStatusBar/renderDecisionQueue RIMOSSE (decisione CEO). I dati che mostravano
    restano tutti nel payload e nelle tabelle: era una vista, non una fonte. */
-function renderKPI() {
-  const t = DATA.totals;
-  const b = DATA.broker;
-  // i totali sono calcolati da recomputeTotals usando lo snapshot reale del broker (bval/bgain)
-  const controvalore = t.eur_invested;               // controvalore investimenti (no liquidità)
-  const invested = t.eur_cost;                        // capitale investito (costo)
-  const gain = t.eur_gain;
-  const gainPct = t.eur_gain_pct;
-  const net = t.eur_gain_net ?? t.eur_gain;
-  const src = (b && b.as_of) ? `dati broker · agg. ${new Date(b.as_of).toLocaleDateString("it-IT")}` : "stima dai prezzi";
-  // la liquidità la inserisce l'utente: patrimonio = investimenti + liquidità
-  const patrimonio = controvalore + cashEur;
-  const kpis = [
-    { label: "Patrimonio totale (€)", value: fmtEUR.format(patrimonio),
-      sub: `investimenti ${fmtEUR.format(controvalore)}${cashEur > 0 ? ` + liquidità ${fmtEUR.format(cashEur)}` : " · liquidità da inserire"}`,
-      accent: "var(--blue)" },
-    { label: "Capitale investito (€)", value: fmtEUR.format(invested),
-      sub: src, accent: "var(--purple)" },
-    { label: "Guadagno totale (€)", value: signTxt(Math.round(gain), " €"),
-      sub: `${signTxt(Math.round(gainPct * 100) / 100)} sul capitale investito`,
-      subCls: signCls(gain), accent: gain >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(gain) },
-    { label: "Guadagno netto tasse (€)", value: signTxt(Math.round(net), " €"),
-      sub: `dopo tasse stimate (26% azioni · 12,5% BTP)${b && b.cedole_btp ? ` · cedole BTP ${fmtEUR.format(b.cedole_btp)}` : ""}`,
-      subCls: signCls(net), accent: net >= 0 ? "var(--green)" : "var(--red)", valueCls: signCls(net) },
-  ];
-  // Daily Tracking Error e Sharpe Ratio: ora mini-card con termometro tra i tab macro
-  // (renderMiniCards → #tracking-error-box, #sharpe-box). Niente più KPI dedicate.
-
-  $("#kpi-grid").innerHTML = kpis.map(k => `
-    <div class="kpi${k.kpiKey ? " kpi-click" : ""}" style="--accent:${k.accent}"${k.kpiKey ? ` data-kpi="${k.kpiKey}" role="button" tabindex="0" title="Clicca per il dettaglio"` : ""}>
-      <div class="label">${k.label}</div>
-      <div class="value ${k.valueCls || ""}"${k.valueStyle ? ` style="${k.valueStyle}"` : ""}>${k.value}</div>
-      <div class="sub ${k.subCls || ""}">${k.sub || ""}</div>
-    </div>`).join("");
-
-  // DETTAGLIO PROFITTO PER VALUTA (stile broker): azioni USD + obbligazioni EUR
-  const pbc = $("#profit-by-currency");
-  if (pbc) {
-    const usdG = t.usd_gain, usdGp = t.usd_gain_pct;
-    const btp = (DATA.portfolio || []).find(r => r.ticker === "BTP-V28");
-    const btpGp = btp?.gain_pct, btpG = t.eur_btp_gain;
-    const row = (lab, pct, abs, cur) => pct == null ? "" :
-      `<div class="pbc-row"><span class="pbc-lab">${lab}</span>
-        <span class="pbc-val ${signCls(pct)}">${signTxt(Math.round(pct * 100) / 100)} <span class="muted">(${signTxt(Math.round(abs), " " + cur)})</span></span></div>`;
-    pbc.innerHTML = `<div class="pbc-head muted">Dettaglio profitto per valuta</div>
-      ${row("EUR (BTP)", btpGp, btpG, "€")}
-      ${row("USD (azioni)", usdGp, usdG, "$")}`;
-  }
-
-}
 
 
 /* variazione % giornaliera del portafoglio = media pesata (per controvalore) dei titoli USD */
@@ -3557,76 +2115,6 @@ let allocMode = "ticker";   // ticker | sector
 const ALLOC_COLORS = ["#4c8dff", "#8b5cf6", "#22c55e", "#f59e0b", "#ef4444", "#22d3ee",
   "#ec4899", "#14b8a6", "#a3a3a3", "#eab308", "#6366f1"];
 
-function renderAllocation() {
-  const src = DATA.allocation || [];
-  if (!src.length) { $("#alloc-donut").innerHTML = ""; $("#alloc-legend").innerHTML = ""; return; }
-  let list;
-  if (allocMode === "sector") {
-    const by = {};
-    src.forEach(x => {
-      const s = x.sector || "Altro";
-      (by[s] = by[s] || { value_eur: 0, gain_eur: 0, hasGain: false }).value_eur += x.value_eur;
-      if (x.gain_eur != null) { by[s].gain_eur += x.gain_eur; by[s].hasGain = true; }
-    });
-    list = Object.entries(by).map(([name, o]) => ({
-      name, ticker: "", value_eur: o.value_eur,
-      gain_eur: o.hasGain ? o.gain_eur : null,
-      gain_pct: (o.hasGain && (o.value_eur - o.gain_eur) > 0) ? Math.round(o.gain_eur / (o.value_eur - o.gain_eur) * 1000) / 10 : null,
-    })).sort((a, b) => b.value_eur - a.value_eur);
-  } else {
-    list = src;
-  }
-  const total = list.reduce((s, x) => s + x.value_eur, 0);
-  const R = 70, r = 44, cx = 80, cy = 80;
-  let a0 = -Math.PI / 2;
-  const arcs = list.map((x, i) => {
-    const frac = x.value_eur / total;
-    const a1 = a0 + frac * 2 * Math.PI;
-    const large = frac > 0.5 ? 1 : 0;
-    const p = (ang, rad) => `${(cx + rad * Math.cos(ang)).toFixed(2)},${(cy + rad * Math.sin(ang)).toFixed(2)}`;
-    const d = `M ${p(a0, R)} A ${R} ${R} 0 ${large} 1 ${p(a1, R)} L ${p(a1, r)} A ${r} ${r} 0 ${large} 0 ${p(a0, r)} Z`;
-    a0 = a1;
-    return `<path d="${d}" fill="${ALLOC_COLORS[i % ALLOC_COLORS.length]}" class="alloc-arc" style="cursor:pointer"
-      data-name="${esc(x.name)}" data-pct="${(frac * 100).toFixed(1)}" data-val="${Math.round(x.value_eur)}">
-      <title>${esc(x.name)}: ${fmtEUR.format(x.value_eur)} (${(frac * 100).toFixed(1)}%)</title></path>`;
-  }).join("");
-  const totalTxt = fmtEUR.format(Math.round(total));
-  $("#alloc-donut").innerHTML = `<svg viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Ripartizione del portafoglio">
-    ${arcs}
-    <circle cx="80" cy="80" r="44" fill="transparent" id="alloc-center" style="cursor:pointer"><title>Clicca al centro per tornare al totale</title></circle>
-    <text x="80" y="74" text-anchor="middle" font-size="10" fill="var(--muted)" id="alloc-c1" pointer-events="none">Totale</text>
-    <text x="80" y="90" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text)" id="alloc-c2" pointer-events="none">${totalTxt}</text>
-    <text x="80" y="104" text-anchor="middle" font-size="9" fill="var(--muted)" id="alloc-c3" pointer-events="none"></text>
-  </svg>`;
-  const resetCenter = () => {
-    $("#alloc-c1").textContent = "Totale";
-    $("#alloc-c2").textContent = totalTxt;
-    $("#alloc-c3").textContent = "";
-  };
-  $("#alloc-donut").querySelectorAll(".alloc-arc").forEach(pth => {
-    pth.addEventListener("click", () => {
-      $("#alloc-c1").textContent = pth.dataset.name;
-      $("#alloc-c2").textContent = pth.dataset.pct + "%";
-      $("#alloc-c3").textContent = fmtEUR.format(+pth.dataset.val);
-      toast(`${pth.dataset.name}: ${pth.dataset.pct}% · ${fmtEUR.format(+pth.dataset.val)}`);
-    });
-  });
-  $("#alloc-center").addEventListener("click", resetCenter);
-  $("#alloc-legend").innerHTML = list.map((x, i) => {
-    const pct = (x.value_eur / total * 100).toFixed(1);
-    // guadagno/perdita della posizione: freccia verde ↑ se in gain, rossa ↓ se in perdita
-    const g = x.gain_pct, ge = x.gain_eur;
-    const gainHtml = (g != null && ge != null)
-      ? `<span class="alloc-gain ${g >= 0 ? "pos" : "neg"}" title="P&L della posizione: ${signTxt(Math.round(ge), " €")}">${g >= 0 ? "▲" : "▼"} ${signTxt(g)} <span class="alloc-gain-eur">(${signTxt(Math.round(ge), " €")})</span></span>`
-      : "";
-    return `<li class="alloc-item">
-      <span class="alloc-dot" style="background:${ALLOC_COLORS[i % ALLOC_COLORS.length]}"></span>
-      <span class="alloc-name">${esc(x.name)} ${x.ticker ? `<span class="tk">${x.ticker}</span>` : ""}${x.ticker && x.sector ? ` <span class="muted" style="font-size:10px">(${esc(x.sector)})</span>` : ""} ${gainHtml}</span>
-      <span class="alloc-pct">${pct}%</span>
-      <span class="alloc-val muted">${fmtEUR.format(Math.round(x.value_eur))}</span>
-    </li>`;
-  }).join("");
-}
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════
    v205 — VISTA STRUTTURA
@@ -3654,58 +2142,13 @@ function strutturaUniverso() {
 }
 
 /* righe del grafico peso-vs-rischio, ordinate per contributo al rischio decrescente */
-function concentrazioneRows() {
-  const u = strutturaUniverso();
-  if (!u.azionario) return [];
-  return u.conMcr.map(r => {
-    const peso = Math.round(r.val_eur / u.azionario * 1000) / 10;
-    return {
-      ticker: r.ticker, name: r.name || r.ticker, valEur: r.val_eur,
-      peso, mcr: r.risk_contrib_pct,
-      pesoNav: u.investito ? Math.round(r.val_eur / u.investito * 1000) / 10 : null,
-      gap: Math.round((r.risk_contrib_pct - peso) * 10) / 10,
-    };
-  }).sort((a, b) => b.mcr - a.mcr);
-}
 
 /* DERIVA: quota di varianza delle posizioni nel tempo, da metrics_history.
    I titoli entrano ed escono dal libro: una data senza il titolo dà un BUCO nella serie, non
    uno zero. Uno zero direbbe "rischio nullo", il buco dice "non era in portafoglio". */
-function derivaConcentrazione(topN = 4) {
-  const mh = (DATA?.metrics_history || []).filter(m => m?.date && m.titles && Object.keys(m.titles).length);
-  if (mh.length < 2) return null;
-  const dates = mh.map(m => m.date);
-  const attuali = concentrazioneRows().slice(0, topN).map(r => r.ticker);
-  const serie = attuali.map(tk => ({
-    ticker: tk,
-    punti: mh.map(m => {
-      const v = m.titles[tk]?.mcr;
-      return typeof v === "number" ? v : null;
-    }),
-  }));
-  // Top-3 della giornata: la concentrazione del libro indipendentemente da CHI la produce
-  const top3 = mh.map(m => {
-    const vals = Object.values(m.titles).map(t => t?.mcr).filter(v => typeof v === "number");
-    if (vals.length < 3) return null;
-    return Math.round(vals.sort((a, b) => b - a).slice(0, 3).reduce((s, v) => s + v, 0) * 10) / 10;
-  });
-  return { dates, serie, top3 };
-}
 
 /* DISTANZA DALLO STOP in % del prezzo: negativa = stop già violato.
    Usa stopOf(), la stessa funzione del payload — una sola verità per dashboard e LLM. */
-function distanzeStop() {
-  return (DATA?.portfolio || []).filter(r => r.qty > 0 && r.price > 0 && isEquity(r))
-    .map(r => {
-      const s = stopOf(r);
-      if (!s || !(s.stop > 0)) return null;
-      return {
-        ticker: r.ticker, price: r.price, stop: s.stop, ratchet: s.ratchet, src: s.src,
-        violated: s.violated, valEur: r.val_eur || 0,
-        dist: Math.round((r.price - s.stop) / r.price * 1000) / 10,
-      };
-    }).filter(Boolean).sort((a, b) => a.dist - b.dist);
-}
 
 /* allocazione per settore o per valuta — la liquidità è in euro e conta nell'esposizione */
 function allocazionePer(kind) {
@@ -3726,18 +2169,10 @@ function allocazionePer(kind) {
 /* v186 — quante sedute diverse convivono nel book. Rispecchia il controllo che buildPrompt fa
    sul payload; è ripetuto qui e non estratto perché buildPrompt non si tocca (Regola Suprema),
    e il test sull'impronta del payload garantisce che le due letture non divergano. */
-function seduteDelBook() {
-  const per = new Map();
-  (DATA?.portfolio || []).filter(r => r.qty && r.currency !== "EUR" && r.price_asof)
-    .forEach(r => per.set(r.price_asof, (per.get(r.price_asof) || 0) + 1));
-  return per;
-}
 
 /* in una colonna di percentuali il decimale va SEMPRE stampato: "26%" accanto a "39,9%" fa
    ballare l'incolonnamento e costringe a rileggere invece di guardare */
 const fmt1 = new Intl.NumberFormat("it-IT", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-function fmtPP(v) { return (v >= 0 ? "+" : "−") + fmt1.format(Math.abs(v)) + " pp"; }
-
 /* ═══════════════════════════════════════════════════════════════════════════════════════
    PRIMITIVE GRAFICHE (v206)
    Due sole forme, riusate ovunque: una SERIE NEL TEMPO con le sue soglie, e BARRE ORDINATE
@@ -3876,59 +2311,6 @@ function barreOrdinate(righe, opt = {}) {
 
 /* ---------------- rendering della vista struttura ---------------- */
 
-function renderConcentrazione() {
-  const box = $("#conc-chart"); if (!box) return;
-  const rows = concentrazioneRows(), u = strutturaUniverso();
-  const basis = $("#conc-basis"), head = $("#conc-headline"), note = $("#conc-note");
-  if (!rows.length) {
-    box.innerHTML = '<div class="muted">Nessuna posizione con contributo al rischio calcolato.</div>';
-    if (head) head.innerHTML = ""; if (basis) basis.textContent = ""; if (note) note.innerHTML = "";
-    return;
-  }
-  const max = Math.max(...rows.map(r => Math.max(r.peso, r.mcr))) || 1;
-  const top3 = Math.round(rows.slice(0, 3).reduce((s, r) => s + r.mcr, 0) * 10) / 10;
-  const primo = rows[0];
-  const violati = distanzeStop().filter(s => s.violated);
-
-  if (basis) basis.textContent = `quote del comparto azionario · ${fmtEUR.format(Math.round(u.azionario))}`;
-  // v223 — i tre cartellini (RISCHIO NEI PRIMI 3 / MASSIMO SCARTO / STOP VIOLATI) rimossi:
-  // il totale dei primi tre e' gia' al centro della ciambella e gli stop hanno la loro sezione.
-  if (head) head.innerHTML = "";
-  const top3n = rows.slice(0, 3).map(r => r.ticker).join(" · ");
-  box.innerHTML = `
-    ${ciambella(rows.map(r => ({ nome: r.ticker, val: r.mcr, tk: r.ticker,
-        extra: `${fmt1.format(r.peso)}% del capitale → <b>${fmt1.format(r.mcr)}% del rischio</b>` })),
-      { centro: { sopra: "primi 3", grande: fmt1.format(top3) + "%", sotto: "del rischio" },
-        aria: "quota della varianza per posizione" })}
-    <div class="chart-legend" style="margin-top:16px">
-      <span>Sopra: <b>da dove viene il rischio</b> — la fetta è la quota di varianza, non il capitale.</span>
-    </div>
-    <div class="chart-legend">
-      <span><span class="lg-dot" style="background:var(--blue)"></span>peso nel comparto azionario</span>
-      <span><span class="lg-dot" style="background:var(--purple)"></span>quota della varianza (MCR)</span>
-      <span>scarto = rischio − peso</span>
-    </div>
-    <div class="cbars">${rows.map(r => {
-      const cls = r.gap >= 10 ? "g-bad" : r.gap >= 4 ? "g-warn" : "g-ok";
-      return `<div class="cbar-row">
-        <span class="cbar-tk" data-struct-tk="${esc(r.ticker)}" title="${esc(r.name)} — apri la scheda">${esc(r.ticker)}</span>
-        <span class="cbar-track">
-          <span class="cbar-line"><span class="cbar-bar"><span class="cbar-fill f-peso" style="width:${(r.peso / max * 100).toFixed(1)}%"></span></span><span class="cbar-num">${fmt1.format(r.peso)}%</span></span>
-          <span class="cbar-line"><span class="cbar-bar"><span class="cbar-fill f-mcr" style="width:${(r.mcr / max * 100).toFixed(1)}%"></span></span><span class="cbar-num">${fmt1.format(r.mcr)}%</span></span>
-        </span>
-        <span class="cbar-gap ${cls}" title="${fmt1.format(r.pesoNav)}% del capitale investito (BTP e liquidità inclusi)">${fmtPP(r.gap)}</span>
-      </div>`;
-    }).join("")}</div>`;
-  box.querySelectorAll("[data-struct-tk]").forEach(e =>
-    e.addEventListener("click", () => openStockCard(e.dataset.structTk)));
-  if (note) {
-    const fuori = u.fuori.map(r => r.ticker);
-    note.innerHTML = `Entrambe le barre sono quote del <b>comparto azionario</b> e sommano a 100%: sono confrontabili.
-      ${fuori.length ? `Fuori dal calcolo ${fuori.map(esc).join(", ")} e la liquidità — la varianza si calcola su chi ha una serie di rendimenti giornalieri.` : ""}
-      Il comparto azionario è ${fmt1.format(Math.round(u.azionario / (u.investito + u.cash) * 1000) / 10)}% del patrimonio (investito + liquidità).
-      Passa sopra allo scarto per il peso sul capitale investito.`;
-  }
-}
 
 /* v238 — `renderDeriva()` RIMOSSA col suo riquadro (richiesta CEO). RICEVUTA: la funzione pura
    `derivaConcentrazione()` SOPRAVVIVE — e' usata dai check e il payload non la pubblica, quindi
@@ -3983,49 +2365,33 @@ function renderAllocGrafica() {
 const ETF_DI_SETTORE = { sox: "SMH", Technology: "XLK", "Communication Services": "XLC", Energy: "XLE",
   "Health Care": "XLV", Financials: "XLF", Industrials: "XLI", "Consumer Discretionary": "XLY" };
 
-function esposizioneRotazione() {
-  const ptf = (DATA?.portfolio || []).filter(r => r.qty > 0 && r.val_eur > 0 && isEquity(r));
-  const tot = ptf.reduce((s, r) => s + r.val_eur, 0);
-  const per = new Map();
-  ptf.forEach(r => {
-    // i semiconduttori si riconoscono dal benchmark che la pipeline ha già scelto per la forza
-    // relativa (rs_bench === "sox"), non da un elenco di ticker
-    const etf = (r.rs_bench === "sox" && ETF_DI_SETTORE.sox) || ETF_DI_SETTORE[r.sector];
-    if (etf) per.set(etf, (per.get(etf) || 0) + r.val_eur);
-  });
-  return { per, tot, quota: e => (tot ? Math.round((per.get(e) || 0) / tot * 1000) / 10 : 0) };
-}
 
 let rotOrizzonte = "m1";   // m1 | m3
 function renderRotazione() {
+  /* ⚠ v256 — VIA L'AGGANCIO AL LIBRO. Questo grafico accendeva le barre dei settori "in cui hai
+     i soldi" e scriveva accanto la quota del capitale — la sua idea migliore quando c'era un
+     portafoglio, e un residuo che parla di un libro inesistente adesso. Trovato guardando la
+     pagina viva, non rileggendo il codice: la barra dei Semiconduttori diceva ancora "63,3%
+     del libro". Resta la classifica dei 21 ETF, che e' un fatto macro a se' stante: dove si sta
+     muovendo il denaro, con l'arco fra il primo e l'ultimo. */
   const box = $("#mg-rot"); if (!box) return;
   const tilt = DATA?.macro?.tilt || [];
   const nota = $("#mg-rot-note"), head = $("#mg-rot-head");
   if (!tilt.length) { box.innerHTML = '<div class="muted">Rotazione non disponibile.</div>'; return; }
-  const exp = esposizioneRotazione();
   const righe = [...tilt].sort((a, b) => (b[rotOrizzonte] ?? -99) - (a[rotOrizzonte] ?? -99)).map(t => ({
-    nome: t.name, valore: t[rotOrizzonte], tk: t.ticker,
-    evidenzia: exp.per.has(t.ticker),
-    testo: `${signTxt(t[rotOrizzonte])}${exp.per.has(t.ticker) ? `  ·  ${fmt1.format(exp.quota(t.ticker))}% del libro` : ""}`,
+    nome: t.name, valore: t[rotOrizzonte], tk: t.ticker, testo: signTxt(t[rotOrizzonte]),
   }));
   box.innerHTML = barreOrdinate(righe);
-  box.querySelectorAll("[data-obar-tk]").forEach(e => e.setAttribute("title",
-    "ETF di riferimento " + e.dataset.obarTk + (exp.per.has(e.dataset.obarTk) ? " — settore in cui sei investito" : "")));
-
-  // la frase che rende il grafico una risposta invece di una classifica
-  const mie = righe.filter(r => r.evidenzia);
-  const pos = righe.findIndex(r => r.evidenzia);
-  const peggiore = [...mie].sort((a, b) => a.valore - b.valore)[0];
-  const primo = righe[0], ultimo = righe[righe.length - 1];
-  // v223 — via anche i tre cartellini della rotazione: la stessa cosa la dicono le barre accese.
+  box.querySelectorAll("[data-obar-tk]").forEach(e =>
+    e.setAttribute("title", "ETF di riferimento " + e.dataset.obarTk));
   if (head) head.innerHTML = "";
+  const primo = righe[0], ultimo = righe[righe.length - 1];
+  const sopraZero = righe.filter(r => (r.valore ?? 0) > 0).length;
   if (nota) {
-    nota.innerHTML = `Rendimento a ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"} dei 21 ETF di settore e tema.
-      <b>Le barre accese sono i settori in cui hai i soldi</b>, con accanto la quota del capitale azionario.
-      ${mie.length ? `Oggi il tuo capitale è concentrato in ${mie.length} dei 21, che occupano le posizioni ${
-        righe.map((r, i) => r.evidenzia ? i + 1 : null).filter(Boolean).join("ª, ")}ª della classifica.` : ""}
-      ${pos > 10 ? " Stai nella metà bassa: il denaro si sta muovendo altrove." : ""}
-      ${ultimo && primo ? ` L'arco della rotazione va da ${esc(primo.nome)} ${signTxt(primo.valore)} a ${esc(ultimo.nome)} ${signTxt(ultimo.valore)}.` : ""}`;
+    nota.innerHTML = `Rendimento a ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"} dei ${righe.length} ETF di settore e tema, ordinati. `
+      + `${sopraZero} su ${righe.length} sono in positivo. `
+      + (primo && ultimo ? `L'arco della rotazione va da ${esc(primo.nome)} ${signTxt(primo.valore)} a ${esc(ultimo.nome)} ${signTxt(ultimo.valore)}: `
+         + `piu' l'arco e' largo, piu' il mercato sta scegliendo invece di salire insieme.` : "");
   }
 }
 
@@ -4199,56 +2565,6 @@ function renderMacroGrafici() {
    sulla stessa data risponde a colpo d'occhio: la distanza fra le due linee È l'alpha.
    ⚠ Le due serie condividono per costruzione date e punto di partenza (stesso array), quindi
    qui il problema delle finestre disallineate di v207 non si pone. */
-function renderVsBenchmark() {
-  const box = $("#bench-chart"); if (!box) return;
-  const nota = $("#bench-note"), head = $("#bench-head");
-  const H = DATA?.history || {};
-  const per = benchOrizzonte;
-  const h = H[per];
-  if (!h || !(h.values || []).length || !(h.ndx || []).length || h.values.length < 3) {
-    box.innerHTML = '<div class="muted">Storico non disponibile per questo orizzonte.</div>';
-    if (head) head.innerHTML = ""; if (nota) nota.innerHTML = "";
-    return;
-  }
-  const base = (a) => { const b0 = a.find(v => v > 0); return b0 ? a.map(v => (v > 0 ? v / b0 * 100 : null)) : null; };
-  const f = base(h.values), n = base(h.ndx);
-  if (!f || !n) { box.innerHTML = '<div class="muted">Serie non normalizzabile.</div>'; return; }
-  const d = h.dates || [];
-  const punti = (arr) => arr.map((v, i) => ({ d: d[i] || null, v }));
-  box.innerHTML = graficoSerie([
-    { nome: "Fondo", punti: punti(f), colore: "var(--blue)" },
-    { nome: "Nasdaq 100", punti: punti(n), colore: "var(--muted)", tratteggio: true },
-  ], { h: 200, w: 760, soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }],
-       aria: "fondo contro Nasdaq 100, base 100" })
-    + `<div class="chart-legend" style="margin-top:8px">
-         <span><span class="lg-dot" style="background:var(--blue)"></span>il tuo fondo</span>
-         <span><span class="lg-dot" style="background:var(--muted)"></span>Nasdaq 100</span>
-         <span>entrambi a 100 il ${d[0] ? dataBreve(d[0], true) : ""}</span></div>`;
-  const fF = f[f.length - 1], nF = n[n.length - 1], alpha = Math.round((fF - nF) * 10) / 10;
-  if (head) {
-    head.innerHTML = `
-      <div class="sh-item ${alpha < 0 ? "sh-bad" : ""}">
-        <div class="sh-lab">Scarto dal Nasdaq</div>
-        <div class="sh-val ${alpha >= 0 ? "pos" : "neg"}">${fmtPP(alpha)}</div>
-        <div class="sh-sub">nel periodo, a parità di punto di partenza</div>
-      </div>
-      <div class="sh-item">
-        <div class="sh-lab">Il tuo fondo</div>
-        <div class="sh-val ${fF >= 100 ? "pos" : "neg"}">${signTxt(Math.round((fF - 100) * 10) / 10)}</div>
-        <div class="sh-sub">${d.length} rilevazioni</div>
-      </div>
-      <div class="sh-item">
-        <div class="sh-lab">Nasdaq 100</div>
-        <div class="sh-val ${nF >= 100 ? "pos" : "neg"}">${signTxt(Math.round((nF - 100) * 10) / 10)}</div>
-        <div class="sh-sub">stesso periodo</div>
-      </div>`;
-  }
-  if (nota) {
-    nota.innerHTML = `Le due linee partono dallo stesso punto: <b>la distanza fra loro è l'alpha</b>, e non serve sottrarre due percentuali a mente.
-      ${alpha >= 0 ? "Sopra la linea grigia il processo sta aggiungendo valore rispetto al semplice comprare l'indice." : "Sotto la linea grigia l'indice avrebbe fatto meglio: è il metro che il mandato ha scelto."}
-      ⚠ Il valore del fondo include il BTP (volatilità ~0) e l'effetto cambio su un NAV in larga parte in dollari: su finestre corte il segno può dipendere da quelli prima che dalla selezione dei titoli.`;
-  }
-}
 let benchOrizzonte = "m3";
 
 /* ═══ v215 — TUTTI GLI INDICATORI, UNA SOLA CLASSIFICA ════════════════════════════════════
@@ -5430,17 +3746,6 @@ function trascinaScheda(e, card, box, id) {
   grip.addEventListener("pointercancel", finisci);
 }
 
-function renderStruttura() {
-  if (!DATA) return;
-  attivaHoverGrafici();
-  renderConcentrazione();
-  renderAllocGrafica();
-  renderVsBenchmark();   // v214 — il fondo contro il suo indice
-  // v235 — l'impaccamento sta in fondo a renderMacroGrafici: e' QUELLA a riempire #mg-tutti,
-  // e gira DOPO renderStruttura (setTab le chiama in quest'ordine). Chiamarlo qui misurava una
-  // griglia ancora vuota: 0 schede toccate, verificato in browser.
-  registraImpaccamento();
-}
 
 /* ---------------- tabella ---------------- */
 function sparkline(values) {
@@ -5471,55 +3776,16 @@ const RATING_LABELS = {
 };
 
 
-function betaBar(r) {
-  // beta vs NDX dalla regressione pipeline (betaOf), fallback Yahoo se non ancora disponibile
-  const beta = typeof r === "object" ? betaOf(r) : r;
-  const tk = typeof r === "object" ? r.ticker : null;
-  const src = typeof r === "object" && r.beta_ndx != null ? "regressione 12M vs NDX" : "Yahoo (5A vs S&P)";
-  if (beta === null || beta === undefined) return "—";
-  const bar = meterBar(Math.min(beta, 3) / 3 * 100, scoreColor(clamp(100 - (beta - 0.5) * 55)), fmtNum.format(beta));
-  if (!tk) return bar;
-  return `<span class="beta-cell" data-beta-tk="${tk}" title="Beta ${src} (regressione log-rendimenti 12M vs Nasdaq 100)">${bar}</span>`;
-}
 
-function prepostCell(pp) {
-  if (!pp || !pp.price) return '<span class="muted">—</span>';
-  return `<span class="muted" style="font-size:10px">${pp.label}</span> ${fmtNum.format(pp.price)}
-    <span class="${signCls(pp.change_pct)}">${signTxt(pp.change_pct)}</span>`;
-}
 
-function fmtVolume(v) {
-  if (!v) return "—";
-  if (v >= 1e9) return fmtNum.format(v / 1e9) + "B";
-  if (v >= 1e6) return fmtNum.format(v / 1e6) + "M";
-  if (v >= 1e3) return fmtNum.format(v / 1e3) + "K";
-  return String(v);
-}
 
 /* cella Volume con RVol (Volume Relativo = volume oggi / media 30gg, dalla pipeline):
    RVol > 1.5 = flussi anomali (istituzionali in movimento) → flag [Volumi Anomali] */
-function volumeCell(r) {
-  const rv = r.vol_ratio;
-  const rvHtml = rv != null
-    ? `<br><span style="font-size:9.5px;color:${rv > 1.5 ? "var(--yellow)" : "var(--muted)"};font-family:var(--mono)">RVol ${fmtNum.format(rv)}×</span>${rv > 1.5 ? `<br><span class="badge badge-anom" title="Volume Relativo ${fmtNum.format(rv)}× la media 30gg: flussi anomali in corso (accumulo/distribuzione istituzionale o evento). Incrociare con news e price action.">[Volumi Anomali]</span>` : ""}`
-    : "";
-  return `<td class="num">${fmtVolume(r.volume)}${rvHtml}</td>`;
-}
 
 /* v206 — prima questa funzione si chiamava "Bar" e NON disegnava nessuna barra: il nome
    mentiva. La forza relativa è zero-centrata per natura (batti o non batti il benchmark),
    quindi la barra divergente è la sua resa ovvia. Scala fissa ±20pp per rendere le righe
    confrontabili fra loro invece che ognuna sulla propria. */
-function rsBar(rs, bench) {
-  if (rs == null) return "—";
-  const color = rs >= 2 ? "var(--green)" : rs <= -2 ? "var(--red)" : "var(--muted)";
-  const bl = bench === "sox" ? "SOX" : bench === "ndx" ? "NDX" : "S&P";
-  const blHtml = bench ? ` <span class="muted" style="font-size:9px;vertical-align:middle">${bl}</span>` : "";
-  const w = Math.min(50, Math.abs(rs) / 20 * 50);
-  const barra = `<span class="rs-axis" title="scala fissa ±20 pp"><span class="rs-zero"></span>` +
-    `<span class="rs-fill" style="${rs >= 0 ? `left:50%` : `left:${(50 - w).toFixed(1)}%`};width:${Math.max(w, 1).toFixed(1)}%;background:${color}"></span></span>`;
-  return `<span class="rs-cell"><span class="${rs > 0 ? "pos" : rs < 0 ? "neg" : ""}" style="font-family:var(--mono);font-size:12px;color:${color}">${rs > 0 ? "+" : ""}${fmtNum.format(rs)}%</span>${blHtml}${barra}</span>`;
-}
 
 /* Popup esplicativo della colonna "RS 1M" (forza relativa vs indice di settore: SOX/NDX/S&P) */
 /* scheda completa del titolo (tecnica + fondamentale) — utile soprattutto su iPhone (tap sul titolo) */
@@ -5606,38 +3872,10 @@ function openRsInfo(ticker) {
      <div class="info-line muted" style="font-size:11px;margin-top:8px">Regola operativa: forza relativa positiva e crescente = mantieni/accumula (capitale in entrata). Forza relativa molto negativa = laggard: candidato a rotazione o, se i fondamentali sono rotti (ROIC<0), a "scudo fiscale" (Tax Alpha).</div>`);
 }
 
-function shortFloatCell(r) {
-  const sf = (r.stats || {}).short_float;
-  if (sf == null) return `<td class="num muted">—</td>`;
-  const pct = Math.round(sf * 1000) / 10;
-  const squeeze = pct > 12;
-  return `<td class="num">${pct}%${squeeze ? `<br><span class="badge badge-squeeze badge-info" data-badge="squeeze" role="button" tabindex="0" title="Clicca per la spiegazione">[Squeeze Risk]</span>` : ""}</td>`;
-}
 
 /* Flottante: azioni liberamente scambiabili. Evidenzia il rischio short squeeze quando il
    float è ridotto (<50M) E lo short interest è elevato (>=15%) E i volumi sono anomali (>1,5×). */
-function floatCell(r) {
-  const st = r.stats || {};
-  const fs = st.float_shares;
-  if (fs == null) return `<td class="num muted">—</td>`;
-  const txt = fs >= 1e9 ? (fs / 1e9).toFixed(1) + "B" : Math.round(fs / 1e6) + "M";
-  const pct = st.float_pct != null ? `<br><span class="muted" style="font-size:9px">${fmtNum.format(st.float_pct)}%</span>` : "";
-  const squeeze = fs < 50e6 && (st.short_float ?? 0) >= 0.15 && (r.vol_ratio ?? 0) > 1.5;
-  return `<td class="num" title="Flottante ${fmtNum.format(Math.round(fs / 1e6))}M azioni${st.float_pct != null ? ` (${fmtNum.format(st.float_pct)}% del totale)` : ""}${squeeze ? " — LOW FLOAT + Short≥15% + RVol>1,5: rischio short squeeze" : ""}">${squeeze ? `<b class="neg">${txt}</b>` : txt}${pct}${squeeze ? `<br><span class="badge badge-squeeze">[LOW FLOAT]</span>` : ""}</td>`;
-}
 
-function drawdownCell(r) {
-  const d = r.w52_dist_pct;
-  if (d == null) return `<td class="num muted">—</td>`;
-  // barra su scala 0…−50%: le soglie -15 (correzione) e -25 (deep value) erano scritte solo
-  // nel codice, ora sono visibili come lunghezza invece che da ricordare a memoria
-  const cls = d <= -25 ? "bar-pos" : d <= -15 ? "bar-warn" : "bar-neg";
-  const badge = d <= -25
-    ? `<br><span class="badge badge-deep-value badge-info" data-badge="deepvalue" role="button" tabindex="0" title="Clicca per la spiegazione">[DEEP VALUE]</span>`
-    : d <= -15 ? `<br><span class="badge badge-correction badge-info" data-badge="correction" role="button" tabindex="0" title="Clicca per la spiegazione">[CORRECTION: Z1]</span>` : "";
-  return cellaBarra(d, 50, `<span class="${d < 0 ? "neg" : "pos"}">${signTxt(d)}</span>${badge}`,
-    { cls, title: "distanza dal massimo 52 settimane · barra su scala 0…−50%" });
-}
 
 /* spiegazione dei badge (Squeeze Risk, Deep Value, Correzione, RSI ipervenduto) */
 const BADGE_INFO = {
@@ -5661,18 +3899,7 @@ function sharpeColor(s) {
   if (s >= 0) return "var(--muted)";
   return "var(--red)";                // negativo = sottoperforma il risk-free
 }
-function sharpeCell(r) {
-  const s = r.sharpe_1y;
-  if (s == null) return `<td class="num muted">—</td>`;
-  return `<td class="num sharpe-cell" data-sharpe-tk="${r.ticker}" role="button" tabindex="0" title="Sharpe Ratio 12 mesi — clicca per la spiegazione"><b style="color:${sharpeColor(s)};font-family:var(--mono)">${fmtNum.format(s)}</b></td>`;
-}
 
-function sortinoCell(r) {
-  const s = r.sortino_1y;
-  if (s == null) return `<td class="num muted" title="Sortino n.d. — arriva col prossimo run della pipeline">—</td>`;
-  const veto = s < -0.3;
-  return `<td class="num" title="Sortino 12 mesi (solo volatilità negativa) — metro del veto value trap${veto ? ": SOTTO la soglia -0.3" : ""}"><b style="color:${veto ? "var(--red)" : sharpeColor(s)};font-family:var(--mono)">${fmtNum.format(s)}</b>${veto ? '<br><span class="badge badge-squeeze">[VETO]</span>' : ""}</td>`;
-}
 
 function openSharpeInfo(ticker) {
   const all = [...(DATA.portfolio || []), ...(DATA.watchlist || [])];
@@ -5733,75 +3960,8 @@ const renderFundTable = () => {}, renderWlFundTable = () => {};
    anni di ricavi, utile netto e margine) e NON SONO MAI STATI MOSTRATI da nessuna parte.
    ⚠ Un punteggio composito nasconde di chi è il merito: 90/100 non dice se l'azienda cresce e
    guadagna poco o cresce poco e guadagna tanto. I tre numeri sì. */
-function finanziariCells(r) {
-  const f = (r.financials || []).slice().sort((a, b) => a.year - b.year);
-  if (!f.length) return `<td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">—</td>`;
-  const u = f[f.length - 1];
-  // crescita: CAGR sui ricavi della serie disponibile — è il 40% del punteggio che sostituisce
-  const cagr = f.length >= 2 && f[0].revenue > 0
-    ? (Math.pow(u.revenue / f[0].revenue, 1 / (f.length - 1)) - 1) * 100 : null;
-  const seg = (v) => v == null ? "" : (v >= 0 ? "pos" : "neg");
-  const anni = f.map(x => `${x.year}: ricavi ${fmtMcapShort(x.revenue)} · utile ${fmtMcapShort(x.net_income)} · margine ${fmtNum.format(x.margin)}%`).join("\n");
-  return `<td class="num" title="${esc(anni)}">${fmtMcapShort(u.revenue)}</td>
-    <td class="num ${seg(u.net_income)}" title="${esc(anni)}">${fmtMcapShort(u.net_income)}</td>
-    <td class="num ${seg(u.margin)}">${fmtNum.format(u.margin)}%</td>
-    <td class="num ${seg(cagr)}">${cagr == null ? "—" : signTxt(Math.round(cagr * 10) / 10)}</td>`;
-}
-function fundCells(r) {
-  const st = r.stats || {};
-  const pct = (v) => v == null ? "—" : (Math.round(v * 1000) / 10) + "%";
-  return `<td class="num">${st.debt_to_equity == null ? "—" : fmtNum.format(Math.round(st.debt_to_equity * 10) / 10)}</td>
-    <td class="num">${pct(st.dividend_yield)}</td>
-    ${finanziariCells(r)}`;
-}
 /* market cap abbreviata: la tabella e' gia' larga, "1,2T" batte "1.200.000" */
-function fmtMcapShort(v) {
-  if (v == null) return "—";
-  const a = Math.abs(v);
-  if (a >= 1e12) return fmtNum.format(Math.round(v / 1e11) / 10) + "T";
-  if (a >= 1e9) return fmtNum.format(Math.round(v / 1e8) / 10) + "B";
-  if (a >= 1e6) return fmtNum.format(Math.round(v / 1e5) / 10) + "M";
-  return fmtNum.format(v);
-}
 
-function techCells(r) {
-  const c = cur(r);
-  // supporto/resistenza cambiano con il range selezionato (1S/1M/3M/1A)
-  const tw = (r.tech_by_range || {})[sparkRange];
-  const support = tw ? tw.support : r.support;
-  const resistance = tw ? tw.resistance : r.resistance;
-  // Δ SMA200: sopra la media di lungo = trend sano; sotto = trend compromesso (price action pura)
-  const sma = r.sma200_dist_pct;
-  const smaCell = sma != null
-    ? `<td class="num"><span class="${sma >= 0 ? "pos" : "neg"}">${signTxt(sma)}</span></td>`
-    : `<td class="num muted">n.d.</td>`;
-  return `
-      <td class="num">${betaBar(r)}</td>
-      ${sharpeCell(r)}
-      ${sortinoCell(r)}
-      <td class="num">${support ? c + fmtNum.format(support) : "—"}</td>
-      <td class="num">${resistance ? c + fmtNum.format(resistance) : "—"}</td>
-      ${smaCell}
-      <td class="num rs-cell" data-rs-tk="${r.ticker}" role="button" tabindex="0" title="Clicca per la spiegazione della forza relativa (RS)">${rsBar(r.rs_1m, r.rs_bench)}</td>
-      ${r.rs_ndx_1m != null
-        ? `<td class="num" title="Sovra/sotto-performance a 1 mese vs Nasdaq 100 (metro del mandato)"><span class="${signCls(r.rs_ndx_1m)}">${signTxt(r.rs_ndx_1m, " pp")}</span></td>`
-        : `<td class="num muted" title="Disponibile dopo il prossimo run della pipeline">n.d.</td>`}
-      /* v251 — COLONNA "Segnale" RIMOSSA: era un'etichetta calcolata da RSI e distanza dalla
-         SMA200, cioè da DUE COLONNE già presenti nella stessa riga. Un verdetto travestito da
-         dato, e il CEO l'ha nominata per prima.
-         ⚠ Dentro quella cella vivevano ANCHE [STOP VIOLATO] e ⚡ASIMM, che verdetti non sono:
-         lo stop violato è spostato sulla colonna Titolo (fissa, non nascondibile), dove un
-         allarme deve stare. ⚡ASIMM esce: è un'etichetta derivata da Sortino e Sharpe, entrambi
-         colonne. Classe v201-v204 evitata scrivendo la ricevuta prima del taglio. */
-
-      ${shortFloatCell(r)}
-      ${floatCell(r)}
-      ${drawdownCell(r)}
-      ${optImpactCell(r.ticker)}
-      ${earningsCell(r)}
-      /* v251 — COLONNA "Grafico" RIMOSSA (richiesta CEO: elimina i grafici dalla tabella).
-         Lo sparkline resta raggiungibile dalla scheda del titolo, che si apre dal nome. */`;
-}
 
 /* ═══ v228 — GIORNI DI CALENDARIO ALLA TRIMESTRALE, UNA SOLA VOLTA ═════════════════════════
    Trovato eseguendo il payload su me stesso. PLTR riportava gli utili OGGI (2026-08-03), aveva
@@ -5826,48 +3986,9 @@ function giorniAllaTrimestrale(iso) {
 }
 
 /* trimestrale entro 14 giorni solari = rischio evento binario → flag [!EARNINGS RISK] */
-function earningsRiskDays(r) {
-  const days = giorniAllaTrimestrale(r.earnings_date);
-  return (days != null && days >= 0 && days < 14) ? days : null;
-}
 
 /* cella Trimestrale in tabella: data earnings + Implied Move (±%) + flag rischio evento */
-function earningsCell(r) {
-  if (!r.earnings_date) return `<td class="num muted">—</td>`;
-  const days = giorniAllaTrimestrale(r.earnings_date);
-  if (days == null || days < -1) return `<td class="num muted">—</td>`;
-  const d = new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
-  const col = days <= 7 ? "var(--red)" : days <= 21 ? "var(--yellow)" : "var(--muted)";
-  const im = typeof impliedMoveForEarnings === "function" ? impliedMoveForEarnings(r) : null;
-  const imHtml = im != null ? `<br><span style="font-size:9px;color:${im >= 10 ? "var(--yellow)" : "var(--muted)"}">±${im}%</span>` : "";
-  const riskHtml = earningsRiskDays(r) != null
-    ? `<br><span class="badge badge-earnrisk" title="Trimestrale tra ${days} giorni (<14): rischio evento binario — il gap post-earnings può scavalcare stop e supporti. Dimensiona/copri di conseguenza.">[!EARNINGS RISK]</span>` : "";
-  return `<td class="num" style="white-space:nowrap"><span style="color:${col}">${d}</span>${imHtml}${riskHtml}</td>`;
-}
 
-function optImpactCell(ticker) {
-  const chain = optChain(ticker);
-  if (!chain || !(chain.expiries || []).length) return `<td class="num opt-col">—</td>`;
-  const exp = chain.expiries[0];
-  const avgVol = chain.avg_volume || 0;
-  const optVol = exp.opt_volume || 0;
-  const cw = exp.call_wall, pw = exp.put_wall;
-  if (!avgVol) return `<td class="opt-col" style="cursor:pointer" data-opt="${ticker}">
-    <span class="opt-col-walls muted">${cw ? "CW " + fmtNum.format(cw) : ""}${cw && pw ? " · " : ""}${pw ? "PW " + fmtNum.format(pw) : ""}</span>
-  </td>`;
-  const ratioPct = optVol * 100 / avgVol * 100;
-  const fill = Math.max(2, Math.min(100, ratioPct));
-  const [lab, , col] = ratioPct >= 30 ? ["ALTO", "", "var(--red)"]
-                     : ratioPct >= 10 ? ["MEDIO", "", "var(--yellow)"]
-                     : ["BASSO", "", "var(--green)"];
-  return `<td class="opt-col" style="cursor:pointer" data-opt="${ticker}">
-    <div class="opt-col-bar-wrap">
-      <div class="opt-col-bar-track"><div class="opt-col-bar-fill" style="width:${fill.toFixed(0)}%;background:${col}"></div></div>
-      <span class="opt-col-lab" style="color:${col}">${lab}</span>
-    </div>
-    ${(cw || pw) ? `<div class="opt-col-walls muted">${cw ? "CW " + fmtNum.format(cw) : ""}${cw && pw ? " · " : ""}${pw ? "PW " + fmtNum.format(pw) : ""}</div>` : ""}
-  </td>`;
-}
 
 /* ═══ v206 — CELLE CON BARRA DI FONDO ═════════════════════════════════════════════════════
    "Meno numeri, più grafici" senza perdere un dato: la cifra RESTA leggibile, dietro le passa
@@ -5875,13 +3996,6 @@ function optImpactCell(ticker) {
    ⚠ Vale per costruzione la regola v188: mdRow() legge i campi grezzi di data.json e non
    guarda la UI, quindi qualunque resa grafica di una cella lascia il payload identico.
    `scala` = il valore che riempie la cella; `mid:true` centra la barra sullo zero. */
-function cellaBarra(v, scala, testo, opt = {}) {
-  if (v == null || !isFinite(v)) return `<td class="num muted">${testo ?? "—"}</td>`;
-  const pct = Math.min(100, Math.abs(v) / (scala || 1) * 100);
-  const seg = opt.cls || (v >= 0 ? "bar-pos" : "bar-neg");
-  return `<td class="num bar-cell ${opt.mid ? "bar-mid " : ""}${seg}" style="--v:${pct.toFixed(0)}"` +
-    `${opt.title ? ` title="${esc(opt.title)}"` : ""}>${testo}</td>`;
-}
 
 
 /* modale "Conto economico": barre ricavi/utile + linea margine netto */
@@ -7087,78 +5201,10 @@ function openEarningsInfo(ticker) {
 }
 
 // pulsante elimina SEMPRE visibile accanto al nome (no edit-mode); BTP escluso
-function nameDelBtn(section, ticker) {
-  if (ticker === "BTP-V28") return "";
-  return `<button class="row-del row-del-inline" data-sec="${section}" data-tk="${ticker}" title="Rimuovi ${ticker}" aria-label="Rimuovi ${ticker}">×</button>`;
-}
 
 // modifica quantità e prezzo medio di carico di una posizione esistente
-function editPosition(ticker) {
-  const r = (DATA.portfolio || []).find(x => x.ticker === ticker);
-  if (!r) return;
-  const qty = parseFloat(window.prompt(`Nuova quantità di ${ticker}:`, r.qty) || "");
-  if (!(qty >= 0)) { toast("Quantità non valida"); return; }
-  const pmc = parseFloat(window.prompt(`Nuovo prezzo medio di carico (PMC) di ${ticker}:`, r.pmc) || "");
-  if (!(pmc > 0)) { toast("PMC non valido"); return; }
-  // aggiornamento IMMEDIATO su dashboard e riga (poi salva su config in background)
-  r.qty = qty; r.pmc = pmc;
-  if (r.currency === "USD" && r.price != null) {
-    r.value = r.price * qty; r.gain = r.value - pmc * qty;
-    r.gain_pct = Math.round((r.value / (pmc * qty) - 1) * 10000) / 100;
-  }
-  recomputeTotals(); renderKPI(); renderTable(); renderAllocation();
-  toast(`${ticker} aggiornato — salvo nel repo…`);
-  editHoldings("portfolio", cfg => {
-    const p = (cfg.portfolio || []).find(x => x.ticker === ticker);
-    if (!p) return false;
-    p.qty = qty; p.pmc = pmc;
-    return true;
-  });
-}
 
 
-function renderTable() {
-  const eurusd = DATA.eurusd || 1.08;
-  // scala comune a tutte le righe della colonna Guad. %: senza, ogni barra sarebbe relativa a
-  // se stessa e il confronto fra righe — l'unico motivo per cui la barra esiste — sparirebbe
-  const scalaGuad = Math.max(25, ...(DATA.portfolio || []).map(x => Math.abs(x.gain_pct || 0)));
-  const rows = sortRows(DATA.portfolio, "ptf-table").map(r => {
-    const c = cur(r);
-    // guadagno EUR = verità broker (bgain) se presente, altrimenti dai prezzi live
-    const gEur = r.gain_eur != null ? r.gain_eur : (r.currency === "EUR" ? (r.gain || 0) : (r.gain || 0) / eurusd);
-    const gPct = (r.bval != null && (r.bval - r.bgain)) ? r.bgain / (r.bval - r.bgain) * 100 : r.gain_pct;
-    return `<tr>
-      <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${r.qty && r.stop_violated ? `<span class="badge badge-earnrisk" title="Il prezzo è SOTTO lo stop trailing ancorato ($${fmtNum.format(r.stop_atr)}): uscita o ri-arm consapevole. Lo stop ratchet non si riabbassa da solo.">[STOP VIOLATO]</span> ` : ""}${nameDelBtn("portfolio", r.ticker)}${r.name}<span class="tk">${r.ticker}</span></td>
-      <td class="num">${fmtNum.format(r.qty)}</td>
-      <td class="num">${c}${fmtNum.format(r.pmc)}</td>
-      <td class="num"><b>${priceTxt(r, c)}</b></td>
-      ${cellaBarra(r.change_pct, 3, signTxt(r.change_pct), { mid: true, title: "barra su scala fissa ±3%" })}
-      <td class="num">${prepostCell(r.prepost)}</td>
-      ${volumeCell(r)}
-      <td class="num ${signCls(gEur)}">${signTxt(Math.round(gEur), " €")}${r.currency === "USD" && r.gain != null ? `<br><span class="sub-eur muted">${signTxt(Math.round(r.gain), " $")} live</span>` : ""}</td>
-      ${cellaBarra(gPct, scalaGuad, `<b>${signTxt(Math.round(gPct * 100) / 100)}</b>`, { mid: true, title: `barra su scala ±${fmtNum.format(Math.round(scalaGuad))}% (la posizione più estesa del portafoglio)` })}
-      ${techCells(r)}
-      ${fundCells(r)}
-    </tr>`;
-  }).join("");
-
-  const t = DATA.totals;
-  const usdValue = DATA.portfolio.filter(r => r.currency === "USD").reduce((s, r) => s + r.value, 0);
-  const totalRow = `<tr class="total-row">
-    <td class="name-cell" colspan="7">TOTALE — ${fmtEUR.format(t.eur_value)} · azioni $${fmtNum.format(Math.round(usdValue))}</td>
-    <td class="num ${signCls(t.eur_gain)}">${signTxt(Math.round(t.eur_gain), " €")}</td>
-    <td class="num ${signCls(t.eur_gain_pct)}"><b>${signTxt(t.eur_gain_pct)}</b></td>
-    <td colspan="19" class="muted" style="font-family:Inter,sans-serif">netto tasse stimato: <b class="${signCls(t.eur_gain_net)}">${signTxt(Math.round(t.eur_gain_net ?? t.eur_gain), " €")}</b></td>
-  </tr>`;
-  const addRow = editMode.portfolio
-    ? `<tr class="add-row"><td colspan="28"><button class="btn btn-ghost btn-sm" id="ptf-add">+ Aggiungi titolo</button></td></tr>` : "";
-  $("#ptf-table tbody").innerHTML = rows + totalRow + addRow;
-  applicaVistaCompattaSePrimaVolta("ptf-table");
-  applyColOrder("ptf-table");
-  applyColVisibility("ptf-table");
-  renderVistaSwitch("ptf-table", "#ptf-vista");   // v188: dopo il riordino — legge l'ordine per accorciare i colspan
-  applyColLabels("ptf-table");
-}
 
 // Etichette colonne sui td (per la vista "a schede" su iPhone) + marcatura colonne chiave.
 // ⚠ Le stringhe devono coincidere ESATTAMENTE con i testi delle <th> (index.html per le viste
@@ -7187,28 +5233,6 @@ function applyColLabels(tableId) {
   });
 }
 
-function renderWatchlist() {
-  const list = sortRows(DATA.watchlist || [], "wl-table");
-  const c = (r) => r.currency === "PTS" ? "" : "$";
-  const rows = list.length ? list.map(r => `<tr>
-      <td class="name-cell" data-tk="${r.ticker}" title="Clicca per la scheda completa">${nameDelBtn("watchlist", r.ticker)}${esc(r.name)}<span class="tk">${r.ticker}</span></td>
-      <td class="num"><b>${priceTxt(r, c(r))}</b></td>
-      ${cellaBarra(r.change_pct, 3, signTxt(r.change_pct), { mid: true, title: "barra su scala fissa ±3%" })}
-      <td class="num">${prepostCell(r.prepost)}</td>
-      ${volumeCell(r)}
-      ${techCells(r)}
-      ${fundCells(r)}
-    </tr>`).join("") : '<tr><td colspan="24" class="muted">Nessun dato</td></tr>';
-  const addRow = editMode.watchlist
-    ? `<tr class="add-row"><td colspan="24"><button class="btn btn-ghost btn-sm" id="wl-add">+ Aggiungi titolo</button></td></tr>` : "";
-  $("#wl-table tbody").innerHTML = rows + addRow;
-  riparaVistaCompattaWl();          // v206 — ripara il default difettoso, se intatto
-  applicaVistaCompattaSePrimaVolta("wl-table");
-  applyColOrder("wl-table");
-  applyColVisibility("wl-table");
-  renderVistaSwitch("wl-table", "#wl-vista");    // v188: idem
-  applyColLabels("wl-table");
-}
 
 /* ---------------- vista fondamentale (Value Investing) ---------------- */
 const pctOf = (v) => v == null ? "—" : signTxt(Math.round(v * 1000) / 10);   // frazione → %
@@ -7236,26 +5260,6 @@ const FSC = {
 
 
 /* ---------------- trimestrali ---------------- */
-function impliedMoveForEarnings(r) {
-  const chain = optChain(r.ticker);
-  if (!chain || !chain.expiries?.length || !r.earnings_date || !r.price) return null;
-  const eDate = r.earnings_date;
-  // trova la prima scadenza uguale o successiva alla data trimestrale
-  const exp = chain.expiries.find(e => e.date >= eDate) || chain.expiries[0];
-  if (!exp) return null;
-  const spot = r.price;
-  // trova call e put ATM (strike più vicino al prezzo corrente)
-  const bestCall = (exp.calls || []).reduce((best, o) => {
-    if (!o.price || o.price <= 0) return best;
-    return !best || Math.abs(o.strike - spot) < Math.abs(best.strike - spot) ? o : best;
-  }, null);
-  const bestPut = (exp.puts || []).reduce((best, o) => {
-    if (!o.price || o.price <= 0) return best;
-    return !best || Math.abs(o.strike - spot) < Math.abs(best.strike - spot) ? o : best;
-  }, null);
-  if (!bestCall || !bestPut || spot <= 0) return null;
-  return Math.round(((bestCall.price + bestPut.price) / spot) * 1000) / 10;
-}
 
 
 /* ---------------- gauges ---------------- */
@@ -7301,80 +5305,12 @@ function marketImpact(m) {
 /* ---------------- top ETF dashboard ---------------- */
 
 /* ---------------- news ---------------- */
-function timeAgo(iso) {
-  if (!iso) return "";
-  const mins = Math.round((Date.now() - new Date(iso)) / 60000);
-  if (mins < 60) return `${mins} min fa`;
-  if (mins < 1440) return `${Math.round(mins / 60)} h fa`;
-  return `${Math.round(mins / 1440)} gg fa`;
-}
 
 const TOPIC_LABEL = t => t === "MACRO" ? "Macro" : t === "POL" ? "Politica" : t;
 
 /* sintesi globale di tutte le news: tono complessivo, conteggi, titoli più citati */
-function newsSummary(list) {
-  const ptf = new Set([...(DATA.portfolio || []), ...(DATA.watchlist || [])].map(r => r.ticker));
-  let bull = 0, bear = 0, neu = 0;
-  const tkCount = {}, tkTone = {};
-  list.forEach(n => {
-    const s = n.sentiment;
-    if (s === "bull") bull++; else if (s === "bear") bear++; else neu++;
-    (n.tickers || []).forEach(tk => {
-      tkCount[tk] = (tkCount[tk] || 0) + 1;
-      tkTone[tk] = (tkTone[tk] || 0) + (s === "bull" ? 1 : s === "bear" ? -1 : 0);
-    });
-  });
-  const tot = list.length || 1;
-  const net = bull - bear;
-  const tone = net >= 3 ? { t: "COSTRUTTIVO", c: "var(--green)" }
-    : net <= -3 ? { t: "CAUTO / RISK-OFF", c: "var(--red)" }
-    : { t: "MISTO / NEUTRO", c: "var(--yellow)" };
-  // titoli del portafoglio più citati, con tono
-  const top = Object.entries(tkCount)
-    .filter(([tk]) => ptf.has(tk))
-    .sort((a, b) => b[1] - a[1]).slice(0, 6)
-    .map(([tk, c]) => {
-      const tone = tkTone[tk] > 0 ? "pos" : tkTone[tk] < 0 ? "neg" : "muted";
-      return `<span class="ns-chip ${tone}">${tk} <b>${c}</b>${tkTone[tk] > 0 ? " ▲" : tkTone[tk] < 0 ? " ▼" : ""}</span>`;
-    }).join("");
-  return { bull, bear, neu, tot, tone, top };
-}
 
-function renderNewsSummary(list) {
-  const box = $("#news-summary");
-  if (!box) return;
-  if (!list.length) { box.innerHTML = ""; return; }
-  const s = newsSummary(list);
-  const pct = v => Math.round(v / s.tot * 100);
-  // riga unica e compatta: tono + barra + conteggi (dettaglio completo nel popup)
-  box.innerHTML = `
-    <div class="ns-line">
-      <b style="color:${s.tone.c}">${s.tone.t}</b>
-      <span class="ns-bar" title="positive ${s.bull} · neutre ${s.neu} · negative ${s.bear}">
-        <span class="ns-seg ns-bull" style="width:${pct(s.bull)}%"></span>
-        <span class="ns-seg ns-neu" style="width:${pct(s.neu)}%"></span>
-        <span class="ns-seg ns-bear" style="width:${pct(s.bear)}%"></span>
-      </span>
-      <span class="ns-counts muted"><span class="pos">▲${s.bull}</span> <span class="neg">▼${s.bear}</span> · ${s.tot} news ›</span>
-    </div>`;
-}
 
-function renderNews() {
-  // solo notizie delle ultime 24 ore (oltre a quanto già filtrato dalla pipeline)
-  const cutoff = Date.now() - 26 * 3600 * 1000;
-  let list = (DATA.news || []).filter(n => !n.published || new Date(n.published).getTime() >= cutoff);
-  if (!list.length) list = DATA.news || [];   // fallback: se tutte vecchie, mostra comunque
-  renderNewsSummary(list);
-  $("#news-list").innerHTML = list.length ? list.map(n => `
-    <li class="news-item">
-      <a href="${esc(n.link)}" target="_blank" rel="noopener" title="${esc(n.title)}">${esc(n.title_it || n.title)}</a>
-      <div class="news-meta">
-        <span class="news-src ${n.source === "Polymarket" ? "src-poly" : ""}">${esc(n.source)}</span>
-        <span class="news-time">${timeAgo(n.published)}</span>
-        ${n.tickers.map(t => `<span class="news-tk">${TOPIC_LABEL(t)}</span>`).join("")}
-      </div>
-    </li>`).join("") : '<li class="muted">Nessuna news recente</li>';
-}
 
 
 /* ---------------- prompt AI ---------------- */
@@ -7393,26 +5329,35 @@ function renderNews() {
    La "CODA" (payload dati: tabelle/macro/news/fondamentali/portafoglio) è generata dalle
    funzioni JS piu sotto e NON va toccata/semplificata. Vedi CLAUDE.md nella root.
    ██████████████████████████████████████████████████████████████████████████████████ */
-const PROMPT_HEADER_PATH = "config/prompt_header.txt";
-const DEFAULT_PROMPT_HEADER = `RUOLO: Sei il Comitato di Investimento Senior (analisti quantitativi, fondamentali e macro) di un fondo Growth. Riporti all'Amministratore Delegato (l'utente). Non sei un esecutore di format: sei un comitato di Wall Street che pensa. Esponi i fatti, i conflitti tra matematica e mercato, e le tue raccomandazioni — l'ultima parola spetta al CEO.
+/* ⚠ v256 — LA TESTATA DEL PACCHETTO MACRO E' UN FILE NUOVO. `config/prompt_header.txt` resta
+   INTATTO sul repo (regola di progetto: non si sovrascrive mai il file del CEO), ma non viene
+   piu' letto: e' scritto per decidere su un portafoglio — ordini a limite, stop, concentrazione
+   del libro, capienze — e un pacchetto che di posizioni non ne porta piu' nessuna lo renderebbe
+   una lista di istruzioni impossibili. E' esattamente la classe C10 che i gate presidiano: un
+   rimando a qualcosa che nel payload non esiste.
+   Se un domani il portafoglio torna, si torna a leggere quel file cambiando questa costante. */
+const PROMPT_HEADER_PATH = "config/prompt_header_macro.txt";
+/* ⚠ v256 — FALLBACK OFFLINE riallineato al pacchetto MACRO. Era la Costituzione del
+   fondo (ruolo di Comitato Investimenti, ordini, stop): senza portafoglio nel payload
+   sarebbe stata una testata che chiede cose che i dati non permettono. Il file vero e'
+   config/prompt_header_macro.txt; questo serve solo al primo caricamento senza rete. */
+const DEFAULT_PROMPT_HEADER = `Sei un analista macro. Ricevi il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno. Non hai davanti nessun portafoglio: questo pacchetto contiene SOLO dati macro e la loro tensione interna. Non proporre operazioni su titoli, non dimensionare posizioni, non dare consigli di acquisto o vendita.
 
-DELEGA PIENA SULLA FORMA: decidi TU come strutturare il report — numero di sezioni, ordine, formato e lunghezza — in base a ciò che i dati di oggi meritano: un giorno denso di news e violazioni merita un report ricco; una domenica piatta merita poche righe oneste, non riempitivi. Se qualcosa non ti torna — una strategia ambigua, un dato contraddittorio, un'intenzione del CEO che non conosci — FAI DOMANDE invece di assumere.
+[A] REGOLE SUI DATI
+A1 — PROVENIENZA E VERIFICA. Ogni numero che citi viene da questo payload, e lo scrivi come lo trovi. Quando un'affermazione poggia su un fatto ESTERNO al payload (una notizia, una dichiarazione di banca centrale, un dato uscito dopo lo snapshot), verificala online e marcala [VERIFICATO] con la fonte. Chiudi con un elenco "FONTI DA CONTROLLARE": una riga per ogni [VERIFICATO] su cui poggia una conclusione, col suo URL. Mai inventare valori: un dato che manca si dichiara "n.d.". Ignora prezzi e conclusioni di conversazioni precedenti — conta solo questo payload.
+A2 — LA DATA DEL DATO E' PARTE DEL DATO. Ogni serie porta la propria rilevazione e il prossimo aggiornamento atteso. Un numero di 68 giorni non e' lo stato di oggi: se lo usi, dichiara quanto e' vecchio. Dove il payload dichiara un LIMITE (finestra comune assente, orizzonte del contratto superato) quel limite si riporta, non si aggira con una stima.
+A3 — I NUMERI GIA' CALCOLATI si usano come sono: percentili, ampiezze, mediane, distanze dalle soglie. Non rifarli.
 
-MANDATO DI CONSEGNA MINIMA (NON è una gabbia sulla forma, è il contenuto che il report DEVE contenere, comunque tu decida di organizzarlo — non "dimenticarlo" per fare narrativa macro):
-A. INDICI LEADING: leggi SEMPRE, anche in poche righe, lo stato di KOSPI (^KS11), Nasdaq Composite (^IXIC) e Bitcoin (BTC-USD) come anticipatori — il KOSPI chiude prima dell'apertura USA (proxy del sentiment tech/semiconduttori), Bitcoin è il termometro dell'appetito al rischio globale e ha correlazione diretta con MSTR/nomi ad alta beta. Se sono nel payload, NON ignorarli.
-B. ESECUZIONE COMPLETA: per OGNI operazione suggerita (COMPRA o VENDI) fornisci il calcolo della quantità di quote e mostralo (es. "12.000$ ÷ prezzo 180$ = 66 quote"). Il payload pubblica la liquidità disponibile come FATTO, non un tetto di spesa: quanto impegnarne è una decisione tua, da dichiarare insieme alla ragione. Non ricostruire vincoli che il sistema non impone.
-Per gli ORDINI di VENDITA o TRIM: rispetta le proporzioni matematiche fornite dal payload (quote possedute, MCR, stop, pesi) — NON inventare liquidazioni totali della posizione se non sono supportate dalla gestione del rischio.
-C. INCROCIO CON LE NEWS SPECIFICHE: il payload contiene NEWS PER SINGOLO TITOLO (catalizzatori micro). Incrociale con la tecnica e i fondamentali di QUEL titolo — non liquidarle con un riassunto macro generico. Se una raccomandazione poggia su una notizia, cita quale. MAI inventare un catalizzatore che non è nel payload.
-D. GAP PRE/AFTER-MARKET: la colonna Pre/After mostra dove scambia il titolo FUORI dalla sessione ufficiale. Quando il dato esiste, usalo per calibrare il limite ed EVITA esplicitamente i gap in apertura; quando manca, dichiaralo come incognita.
+[B] COME VOGLIO CHE RAGIONI
+B1 — IL MECCANISMO, NON LA CORRELAZIONE. Non basta dire che due cose si muovono insieme: dimmi attraverso quale canale una arriva all'altra — quale tasso, quale flusso, quale voce di costo, quale vincolo regolatorio. Se il meccanismo non lo conosci, dillo invece di inventarlo.
+B2 — IL DISACCORDO E' IL SEGNALE. Il blocco "DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO" e' il punto di partenza, non un'appendice: un composito a 58/100 con i componenti che vanno da 19 a 98 non descrive un'economia neutra, descrive un'economia che tira in due direzioni. Dimmi quale delle due sta vincendo e da cosa lo deduci.
+B3 — CONTA I SEGNALI UNA VOLTA SOLA. Due misure della stessa grandezza (CPI e PCE, curva e recessione, Fear & Greed e sentiment globale) sono un segnale, non due. Il payload lo dichiara dove succede: rispettalo.
+B4 — DOVE TI ASPETTERESTI DI SBAGLIARE. Chiudi indicando quale dato, se uscisse diverso dalle attese al prossimo aggiornamento, ribalterebbe la lettura che hai appena dato. Un'analisi che non sa cosa la smentirebbe non e' un'analisi.
 
-BRIEFING SUI PROBLEMI NOTI DEL SISTEMA (osservazioni strategiche, NON divieti assoluti):
-1. LATENZA MACRO: usa la ricerca web per fare double-check sui dati flaggati come datati o inaffidabili.
-2. LIQUIDITÀ E RISCHIO CAMBIO: mantenere cassa per i ribassi è una scelta strategica, non un obbligo del sistema. Valuta che impiegare liquidità su asset USA aumenta il rischio di cambio non coperto quando l'Euro è forte.
-3. LET WINNERS RUN E MCR: Non siamo un fondo regolamentato: non c'è NESSUN obbligo di vendere se un titolo supera il 10% del NAV. Lascia correre i profitti sulle aziende eccellenti. Usa il 10% e l'MCR solo per far riflettere il CEO sulla volatilità, non come divieti imperativi.
-4. CONCENTRAZIONE SETTORIALE (IL PARADOSSO DIVERSIFICAZIONE): Se suggerisci un acquisto forte (es. SNDK) ma il fondo ha già posizioni enormi nello stesso settore (es. MU), NON omettere il suggerimento, ma fai NOTARE esplicitamente al CEO che l'operazione aumenterebbe la concentrazione settoriale e annullerebbe la diversificazione. Il trade va esposto, la scelta resta al CEO.
-5. IGIENE DEI DATI E ISTRUZIONI: "n.d." = dato non disponibile, non inventarlo. Preferisci ordini LIMITE.
-
-Sii proattivo e spietato sui rischi: se vedi un problema che il CEO non ti ha chiesto di guardare, sollevalo tu.`;
+[C] FORMA
+C1 — Scrivi in italiano, in prosa, senza scalette rigide e senza ripetere il payload. Non ho bisogno che tu mi riassuma i numeri: li ho gia'. Ho bisogno di sapere cosa vogliono dire insieme.
+C2 — Niente domande in chiusura e niente offerte di approfondimento: quello che serve, dillo qui.
+C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.`;
 function promptHeaderText() {
   const ov = localStorage.getItem("prompt_header");
   return (ov && ov.trim()) ? ov : DEFAULT_PROMPT_HEADER;
@@ -7473,798 +5418,20 @@ function buildPrompt() {
   const ageMin = Math.round((Date.now() - new Date(DATA.updated_at).getTime()) / 60000);
   const lagNote = ageMin > 90 ? ` [ATTENZIONE: snapshot di ${ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min"} fa — i prezzi potrebbero essere disallineati dal mercato live; verifica online i livelli critici prima di ragionarci sopra]` : "";
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")} (prezzi: snapshot pipeline + refresh live lato client ogni 60s)${lagNote}`);
+  lines.push(sessionContextLine());   // v256: fase della seduta USA, calcolata ADESSO lato client
 
-  /* ⚠ v245 — SE IL PORTAFOGLIO E' INCOMPLETO, L'LLM DEVE SAPERLO PRIMA DI TUTTO IL RESTO.
-     Il 07/08/2026 il payload girava su 8 azioni mentre il CEO ne aveva 12: quattro acquisti
-     annotati nel diario non erano mai stati applicati, perche' l'unica via di passaggio era un
-     `confirm()` che si puo' chiudere. Un'analisi su un terzo di portafoglio mancante non e'
-     imprecisa: e' sbagliata, e sembra corretta — che e' la combinazione peggiore.
-     Questo blocco sta SUBITO SOTTO la data, prima di ogni altro numero, perche' cambia il
-     significato di tutti quelli che seguono: pesi, concentrazione, budget, alpha. */
-  try {
-    const dv = divergenzaDiario();
-    if (dv.needed && dv.certe.length) {
-      lines.push(`🚨 PORTAFOGLIO INCOMPLETO — ATTENZIONE PRIMA DI OGNI CALCOLO: il diario del CEO registra ${dv.certe.length} acquisto/i che NON sono nelle tabelle qui sotto: ${dv.certe.map(x => `${x.ticker} ${x.qty ?? "?"} quote a ${x.prezzo ?? "?"} del ${x.iso}`).join(" · ")}. TUTTI i numeri che dipendono dalla composizione — pesi sul NAV, concentrazione di fattore, quota di varianza, budget operativo, alpha, correlazioni — sono calcolati SENZA queste posizioni e quindi NON descrivono il portafoglio reale. Finche' la divergenza esiste, quei numeri descrivono un portafoglio diverso da quello reale.`);
-    } else if (dv.needed && dv.daVerificare.length) {
-      lines.push(`⚠ DIARIO E TABELLE DA VERIFICARE: ${dv.daVerificare.map(x => x.motivo).join(" · ")}. Potrebbero essere operazioni parziali gia' applicate; non e' certo che manchi qualcosa.`);
-    }
-  } catch { /* il payload non deve mai rompersi per un controllo accessorio */ }
-  // CONTESTO DI SESSIONE (v149): la fase della seduta USA calcolata ADESSO (client), non al
-  // run pipeline — orienta l'LLM su quali dati sono "il presente" (anticipatori vs live) e
-  // per QUALE campana valgono gli ordini. Vedi usSessionInfo/sessionContextLine.
-  lines.push(sessionContextLine());
-  // v186 — PREZZI DA SEDUTE DIVERSE. Yahoo pubblica la barra giornaliera in tempi diversi per
-  // titoli diversi (gotcha gia' noto: "barra odierna voidata"), e nei run successivi di un
-  // weekend il portafoglio si popola A PEZZI: il 26/07 quattro posizioni erano ancora alla
-  // chiusura del 23 e sei erano gia' passate al 24. Ogni RIGA lo dichiarava onestamente
-  // ("[chiusura del 23/07]"), ma gli AGGREGATI no — e patrimonio, pesi NAV, Sharpe, VaR/ES,
-  // MCR e alpha erano calcolati su un book che a nessun istante e' esistito davvero.
-  // Conseguenza vista sul campo: RGTI e' entrato fra gli stop violati fra due run domenicali
-  // solo perche' la sua barra del 24 e' arrivata, non perche' il prezzo si fosse mosso.
-  // Questo e' un FATTO sui dati, non un'istruzione: sta nel payload, non nella testata.
-  const asof = (DATA.portfolio || []).filter(r => r.qty && r.currency !== "EUR" && r.price_asof)
-    .reduce((m, r) => m.set(r.price_asof, (m.get(r.price_asof) || 0) + 1), new Map());
-  if (asof.size > 1) {
-    const per = [...asof.entries()].sort((a, b) => b[0].localeCompare(a[0]))
-      .map(([d, n]) => `${n} al ${new Date(d + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}`).join(" · ");
-    lines.push(`⚠ PREZZI DA SEDUTE DIVERSE: le posizioni non sono tutte alla stessa chiusura (${per}). `
-      + `La pipeline riceve la barra giornaliera in tempi diversi per titoli diversi, quindi il book si popola a pezzi. `
-      + `Patrimonio, pesi NAV, Sharpe, VaR/ES, MCR e alpha qui sotto sono calcolati su questo insieme MISTO — `
-      + `nessun istante in cui il portafoglio abbia avuto davvero questi valori tutti insieme. `
-      + `Anche l'appartenenza alla lista degli stop violati puo' dipendere da quale seduta e' arrivata per quel titolo.`);
-  }
-  /* ⚠ v253 — IL LIBRO IN QUESTO PACCHETTO PUÒ ESSERE INDIETRO, E FINORA NON LO DICEVA.
-     Trovato eseguendo il payload su me stesso: `config/holdings.json` aveva 12 posizioni e il
-     pacchetto ne portava 9. Non era un difetto di calcolo — la pipeline gira su cron e non
-     aveva ancora rigenerato — ma l'LLM riceveva un book amputato di un terzo SENZA UN SEGNO
-     che lo fosse, e ha analizzato quel book come se fosse completo. È la stessa classe di
-     ⚠ PREZZI DA SEDUTE DIVERSE (v186): non si può correggere il ritardo, si può DICHIARARLO.
-     La fonte è il diario, che vive nel repo e non dipende dal cron: un'operazione marcata
-     `applicata` è già dentro holdings.json per costruzione, quindi se il suo titolo non
-     compare qui, la differenza è esattamente il ritardo della pipeline. Si azzera da solo al
-     run successivo. FATTO, non istruzione (C9). */
-  try {
-    const inPtf = new Set((DATA.portfolio || []).map(r => String(r.ticker || "").toUpperCase()));
-    const asOf = (DATA.broker || {}).as_of || null;
-    const mancanti = new Map();
-    for (const e of (typeof loadDiary === "function" ? loadDiary() : [])) {
-      if (!e || !e.applicata) continue;
-      const iso = String(e.date || "").slice(0, 10);
-      if (asOf && iso && iso <= asOf) continue;
-      const o = (typeof diaryOp === "function") ? diaryOp(e) : null;
-      if (!o || !o.ticker || !/ACQUIST|COMPR|INCREMENT|ACCUMUL|AGGIUNT/i.test(o.tipo || "")) continue;
-      const tk = String(o.ticker).toUpperCase();
-      if (!inPtf.has(tk)) mancanti.set(tk, o.qty != null ? `${tk} (${fmtNum.format(o.qty)})` : tk);
-    }
-    if (mancanti.size) {
-      lines.push(`⚠ LIBRO INCOMPLETO IN QUESTO PACCHETTO: ${mancanti.size} `
-        + `${mancanti.size === 1 ? "acquisto già registrato nel portafoglio non compare" : "acquisti già registrati nel portafoglio non compaiono"} `
-        + `nei dati di questo run — ${[...mancanti.values()].join(", ")}. La pipeline dati gira a intervalli e non ha ancora rigenerato: `
-        + `il portafoglio reale ha ${(DATA.portfolio || []).filter(r => r.qty).length + mancanti.size} posizioni, le tabelle qui sotto ne mostrano `
-        + `${(DATA.portfolio || []).filter(r => r.qty).length}. Patrimonio, pesi NAV, MCR, correlazioni e concentrazione di fattore sono calcolati `
-        + `SENZA i titoli elencati, quindi sottostimano l'esposizione ai loro settori.`);
-    }
-  } catch { /* il payload non deve mai rompersi per un controllo accessorio */ }
-  const cashLine = t.cash ? ` · liquidità ${fmtEUR.format(t.cash)}` : "";
-  lines.push(`SITUAZIONE PATRIMONIALE: patrimonio totale ${fmtEUR.format(Math.round(patrimonio))}${cashLine} · capitale investito (costo) ${fmtEUR.format(t.eur_cost ?? t.eur_invested)} · guadagno lordo ${signTxt(Math.round(t.eur_gain), " €")} (${signTxt(Math.round(t.eur_gain_pct * 100) / 100)})${t.eur_gain_net != null ? ` · netto tasse stimato ${signTxt(Math.round(t.eur_gain_net), " €")}` : ""}.`);
-  // METRICHE DI RISCHIO/PORTAFOGLIO (dai popup della dashboard)
-  const riskBits = [];
-  if (t.portfolio_sharpe_ratio != null) riskBits.push(`Sharpe Ratio portafoglio ${fmtNum.format(t.portfolio_sharpe_ratio)} (log-rendimenti giornalieri 12M, matrice di covarianza, pesi mark-to-market, Rf ${fmtNum.format((t.risk_free_rate ?? 0.0363) * 100)}%)`);   // v247: il "target 2.0" veniva da Gemini, non dal CEO
-  if (t.portfolio_sortino_ratio != null) riskBits.push(`Sortino Ratio ${fmtNum.format(t.portfolio_sortino_ratio)} (come lo Sharpe ma con la sola volatilità NEGATIVA: se Sortino >> Sharpe, gran parte della varianza è al rialzo — rischio "vero" più basso di quanto lo Sharpe suggerisca)`);
-  {
-    const vE = t.var95_hist_eur ?? t.var95_1d_eur, vP = t.var95_hist_pct ?? t.var95_1d_pct;
-    const eE = t.es95_hist_eur ?? t.es95_1d_eur;
-    const isHist = t.var95_hist_eur != null;
-    /* v247 — RIMOSSI VaR ed Expected Shortfall dal payload (scelta del CEO): erano il divisore
-       del BUDGET OPERATIVO, cioè il vincolo di spesa. Volatilità e correlazioni restano qui sotto,
-       perché sono misure e non tetti. */
-  }
-  if (t.avg_pairwise_corr != null) riskBits.push(`correlazione media tra le posizioni: ${fmtNum.format(t.avg_pairwise_corr)} (log-rendimenti giornalieri 12M, calcolata sul SOLO comparto azionario — BTP e liquidità NON sono nel calcolo, quindi non la "mitigano"; più è alta, minore la diversificazione reale)`);
-  const fxP = fxExposure();
-  if (fxP) riskBits.push(`Rischio cambio EUR/USD: ${fmtNum.format(fxP.pct)}% del NAV denominato in USD NON coperto${fxP.eurusd ? ` (EUR/USD ${fmtNum.format(fxP.eurusd)})` : ""} — un apprezzamento dell'euro dell'1% costa ~${fmtEUR.format(Math.round(fxP.usdEur * 0.01))} a parità di prezzi`);
-  // concentrazione: posizione più pesante e primo settore (per le regole di sizing/correlazione)
-  const wPos = (DATA.portfolio || []).map(r => ({ tk: r.ticker, w: positionWeightPct(r), eq: isEquity(r) })).filter(x => x.w != null).sort((a, b) => b.w - a.w);
-  if (wPos.length) {
-    // Soglia = il cap d'ingresso REALE del motore (RISK_PARAMS.capNoAdd_pct, override-abile dalla
-    // dashboard), NON un 10% hardcoded. Prima la riga diceva "SOPRA il limite del 10%" mentre il
-    // motore usava un cap diverso (es. 15%): un nome tra 10% e il cap risultava "sopra il limite"
-    // QUI ma restava candidato → contraddizione. E il cap vale sulle sole EQUITY (universo
-    // dell'accumulo): il BTP a beta 0 non si "accumula", quindi NON va nella lista over-cap.
-    const cap = RISK_PARAMS.capNoAdd_pct;
-    const overCapPos = wPos.filter(x => x.eq && x.w > cap);
-    riskBits.push(`posizione più pesante: ${wPos[0].tk} ${fmtNum.format(wPos[0].w)}% del NAV`);   /* v247 — resta il PESO (misura); via l'elenco "SOPRA il cap d'ingresso", ultimo divieto rimasto */
-  }
-  const allocR = DATA.allocation || [];
-  if (allocR.length) {
-    const totA = allocR.reduce((s, a) => s + (a.value_eur || 0), 0) || 1;
-    const bySecR = {};
-    // v118 — la regola di CONCENTRAZIONE settoriale misura il rischio CORRELATO: base = solo
-    // capitale AZIONARIO (liquidità E obbligazioni escluse — il BTP è beta 0, non fa parte
-    // del book correlato). Prima la base includeva le obbligazioni ("dell'investito") e dava
-    // una % diversa da "Concentrazione per settore" (patrimonio totale) → l'LLM la leggeva
-    // come incoerenza. Ora le due cifre hanno denominatori ESPLICITI e distinti.
-    allocR.filter(a => a.sector !== "Liquidità" && a.sector !== "Obbligazioni")
-          .forEach(a => { const k = a.sector || a.ticker; bySecR[k] = (bySecR[k] || 0) + (a.value_eur || 0); });
-    const invTot = Object.values(bySecR).reduce((s, v) => s + v, 0) || 1;
-    const topSec = Object.entries(bySecR).sort((a, b) => b[1] - a[1])[0];
-    // v174 — due allarmi settoriali su BASI DIVERSE (questo sul PESO, factorRiskAlert_pct sulla
-    // VARIANZA) si confondevano a vicenda: due campanelli sulla stessa cosa che suonano a soglie
-    // non confrontabili. Il peso resta come CONTESTO — dice quanto capitale c'è — ma il giudizio
-    // di concentrazione passa alla varianza, che è dove questo book è asimmetrico (56% di NAV in
-    // semi vale l'86% del rischio). Un solo allarme, sulla grandezza che fa male.
-    if (topSec) riskBits.push(`primo settore: ${topSec[0]} ${Math.round(topSec[1] / invTot * 100)}% del capitale AZIONARIO (quota di CAPITALE, non di rischio: il giudizio sulla concentrazione lo dà la CONCENTRAZIONE DI FATTORE nel verdetto, che ragiona sulla VARIANZA — su un book a beta disomogenee le due grandezze divergono molto)`);
-    void totA;
-  }
-  if (cashEur > 0 && patrimonio > 0) {
-    const cFrac = cashEur / patrimonio;
-    riskBits.push(`Liquidità infruttifera: ${(cFrac * 100).toFixed(1)}% del patrimonio a rendimento 0 (drag strutturale sul rendimento composto e sullo Sharpe complessivo)`);
-  }
-  if (t.budget_operativo_spendibile != null && (t.es95_hist_eur ?? t.es95_1d_eur) != null) {
-    const esAbs = t.es95_hist_eur ?? t.es95_1d_eur;
-    const bud = Math.round(t.budget_operativo_spendibile);
-    if (bud <= 0) {
-      // Budget clampato a 0 (cassa < ES95): NON stampare la falsa equazione "0 = X − Y" (era
-      // "0 € = liquidità 0 € − ES95 12.469 €", un'uguaglianza matematicamente falsa che l'LLM
-      // legge male) e METTI UN PRESIDIO A1: un LLM con contesto sporco tende a riportare cassa/
-      // budget del run precedente (visto: Gemini ha usato 17.531 €/30.000 € con cassa 0).
-      riskBits.push(`⛔ BUDGET OPERATIVO SPENDIBILE: 0 € — la cassa (${fmtEUR.format(Math.round(cashEur))}) NON copre la riserva tail-risk ES95 (${fmtEUR.format(esAbs)}), quindi ZERO potere d'acquisto oggi. NESSUN ordine di ACQUISTO è eseguibile. Ignora qualsiasi importo di cassa o budget di run/conversazioni precedenti (regola A1): oggi vale 0, punto`);
-    } else {
-      /* v247 — RIMOSSO il BUDGET OPERATIVO SPENDIBILE: amputava un quarto della cassa prima
-         ancora di guardare un titolo. La LIQUIDITÀ resta pubblicata: è un fatto, non un tetto. */
-    }
-  }
-  if (riskBits.length) lines.push("METRICHE DI RISCHIO: " + riskBits.join(" · ") + ".");
-  // riconciliazione broker: se i dati manuali sono stantii/incoerenti l'AI deve saperlo
-  try {
-    const rec = reconcileState();
-    if (rec.needed) {
-      const bits = [];
-      if (rec.staleDays != null && rec.staleDays > 14) bits.push(`snapshot broker vecchio di ${rec.staleDays} giorni (${(DATA.broker || {}).as_of})`);
-      if (rec.mismatches.length) bits.push(`controvalore ricalcolato che diverge >20% dal bval broker su: ${rec.mismatches.map(m => `${m.tk} ${m.dev > 0 ? "+" : ""}${m.dev}%`).join(", ")}`);
-      lines.push(`⚠ RICONCILIAZIONE BROKER NECESSARIA (${bits.join("; ")}): i campi statici del broker potrebbero non riflettere trade recenti. I valori RICALCOLATI (prezzo live × quantità) e quelli dello snapshot broker possono quindi divergere, e in questo payload le due fonti convivono.`);
-    }
-  } catch { /* no-op */ }
-  // STAGIONALITÀ del mese corrente
-  if (m.seasonality && m.seasonality.score != null) {
-    const se = m.seasonality;
-    const cm = MONTH_NAMES[(se.current_month || 1) - 1];
-    // v189 — QUANDO IL MESE STA FINENDO, LA STAGIONALITÀ DEL MESE CORRENTE È GIÀ SPESA.
-    // Il 26/07 restavano tre sedute di luglio e il payload pubblicava solo "STAGIONALITÀ
-    // (Luglio): 75/100 Favorevole": un contesto di probabilità che vale per il passato mentre
-    // gli ordini valgono per le settimane successive. I dati del mese seguente sono GIÀ in
-    // data.json (serie a 12 mesi), non serviva altro che leggerli. Si aggiunge solo negli
-    // ultimi giorni del mese: prima sarebbe rumore.
-    const gg = new Date();
-    const ultimoDelMese = new Date(gg.getFullYear(), gg.getMonth() + 1, 0).getDate();
-    const restano = ultimoDelMese - gg.getDate();
-    let seaProx = "";
-    if (restano <= 7 && Array.isArray(se.sp500) && Array.isArray(se.ndx)) {
-      const mProx = ((se.current_month || gg.getMonth() + 1) % 12) + 1;
-      const sp = se.sp500.find(x => x.m === mProx), nd = se.ndx.find(x => x.m === mProx);
-      if (sp || nd) {
-        const sc = sp && nd ? Math.round((sp.score + nd.score) / 2) : (sp || nd).score;
-        seaProx = ` · ⏭ ${MONTH_NAMES[mProx - 1].toUpperCase()} (mancano ${restano} giorni alla fine del mese, quindi è la finestra che conta per gli ordini di adesso): score ${sc}/100`
-          + (sp ? ` · S&P ${sp.score} (media storica ${signTxt(sp.avg)}, positivo nel ${fmtNum.format(sp.pos)}% degli anni su ${sp.n})` : "")
-          + (nd ? ` · Nasdaq ${nd.score}` : "");
-      }
-    }
-    lines.push(`STAGIONALITÀ (${cm}): score ${se.score}/100 (${se.label})${se.sp_score != null ? ` · S&P ${se.sp_score}` : ""}${se.ndx_score != null ? ` · Nasdaq ${se.ndx_score}` : ""} ${seaProx} · tendenza statistica storica del mese, da usare come contesto di probabilità.`);
-  }
-  // SINTESI NEWS (tono complessivo)
-  if ((DATA.news || []).length) {
-    // v189 — IL TONO SI CALCOLA SULLE NOTIZIE, NON SULLE QUOTAZIONI DI POLYMARKET.
-    // DATA.news contiene anche le righe dei mercati di previsione ("… — probabilità Sì 30%"),
-    // che hanno sentiment "neutral" per costruzione: finivano nel conteggio del tono gonfiando
-    // il denominatore e diluendo il segnale. Il payload dichiarava percio' DUE totali diversi
-    // per la stessa grandezza — "48 news" nei catalizzatori (gia' filtrate da isRealNews) e
-    // "53 notizie" nella sintesi — senza dire che le basi erano diverse. Stessa classe di
-    // HY/IG: due denominatori sotto un nome solo. Ora la base e' UNA, ed e' dichiarata.
-    const newsVere = (DATA.news || []).filter(isRealNews);
-    const ns = newsSummary(newsVere);
-    const scartate = (DATA.news || []).length - newsVere.length;
-    lines.push(`SINTESI NEWS: tono ${ns.tone.t} su ${ns.tot} notizie (${ns.bull} positive, ${ns.neu} neutre, ${ns.bear} negative)`
-      + (scartate > 0 ? ` — base: le sole notizie vere, escluse ${scartate} righe di mercati di previsione che stanno nel loro blocco (MERCATI DI PREVISIONE) e non hanno un tono giornalistico.` : "."));
-  }
-  // OUTPUT DEL MOTORE DELLA DASHBOARD — solo DATI di contesto sul posizionamento interno.
-  // In modalità standby l'AI NON deve commentarli operativamente né trasformarli in raccomandazioni.
-  try {
-    const dv = decisionVerdict();
-    // ═══ v200 — VIA IL VERDETTO E I PUNTEGGI. Decisione presa sui NUMERI, non sulle opinioni.
-    // Il motore pubblicava un'etichetta ("verdetto interno ACCUMULA") e una classifica con
-    // punteggi su 100, in cima al payload, dove ancorano chiunque legga. Il track record misurato
-    // di quella parte, che il payload pubblica poche righe sotto, e': 7 segnali maturati, ritorno
-    // medio -10,8%, sette punti percentuali PEGGIO del Nasdaq, hit-rate 29%. Un numero con quel
-    // curriculum, accanto a un avvertimento onesto, ancora lo stesso: l'ancoraggio non si batte
-    // con una nota a pie' di pagina, si batte togliendo il numero.
-    // COSA RESTA, e non e' poco: stop violati, concentrazione di fattore, livelli d'ingresso,
-    // capienze, minusvalenze. Quelle non prevedono nulla — CALCOLANO — e sono la parte del
-    // sistema che in questa sessione ha intercettato i difetti arrivati fino alle decisioni.
-    // I filtri restano ma tornano a essere FILTRI: chi passa e chi no, con la soglia dichiarata,
-    // in ordine alfabetico e senza punteggio. Ordinare e' gia' un giudizio.
-    const passa = [...(dv.accumula || [])].map(r => r.ticker).sort();
-    const bloccatiCap = [...(dv.overCap || [])].map(x => (x.r || x).ticker).sort();
-    lines.push(`FILTRI QUANTITATIVI DELLA DASHBOARD (chi supera le soglie meccaniche, in ordine alfabetico — NESSUN punteggio e NESSUN verdetto: questo blocco non classifica piu' e non consiglia, perche' l'esito misurato di quella classifica e' nel blocco TRACK RECORD DEL MOTORE qui sotto e non giustifica l'autorita' che un punteggio porta con se'):`);
-    lines.push(`· Superano tutte le soglie (${passa.length}): ${passa.length ? passa.join(", ") : "nessuno"}`
-      /* v247 — RIMOSSO "fermati dal cap d'ingresso": nominava AMD, MU e NVDA — tre delle
-         posizioni maggiori del CEO — come bloccate. È il divieto, non la misura. */
-      + ""
-      + `. I criteri meccanici sono impatto marginale sullo Sharpe di portafoglio, forza relativa 1M vs benchmark e qualita' fondamentale. I dati per giudicarli uno per uno — fondamentali, tecnica, correlazione col book — stanno nelle tabelle.`);
-    // ═══ v201 — LA CONCENTRAZIONE DI FATTORE TORNA, come RIGA PROPRIA.
-    // Il taglio del v200 se l'era portata via senza che me ne accorgessi: viveva dentro
-    // dv.reasons, cioe' nella lista dei motivi del VERDETTO, e togliendo il verdetto e' sparita
-    // con lui. E' il fatto di rischio piu' importante di questo portafoglio — l'86% della
-    // varianza su un fattore solo — ed e' ARITMETICA, non previsione: esattamente cio' che avevo
-    // detto che sarebbe rimasto. Ora vive per conto suo e non dipende piu' da nessun verdetto.
-    // Lezione: quando si toglie un contenitore si porta via anche cio' che ci stava dentro per
-    // caso. La ricevuta del taglio (C12) esiste per questo, e non copriva questa riga: ora si'.
-    if (dv.factorRisk) {
-      const fr = dv.factorRisk;
-      /* v247 — resta la MISURA (quota di varianza contro peso) e resta la VARIAZIONE col suo
-         percentile, che e' misurata sullo storico. Via "oltre la soglia del N%" e l'invito a
-         ridurre: quelli erano il verdetto. */
-      lines.push(`CONCENTRAZIONE DI FATTORE: ${fr.tk.join("+")} (${fr.name}) generano il ${fmtNum.format(fr.mcr)}% della VARIANZA del fondo con il ${fmtNum.format(fr.w)}% del NAV. I veti guardano un titolo per volta e questo NON lo vedono: sono nomi che possono scendere INSIEME perche' condividono il fattore, per quanto sani siano singolarmente.${(() => {
-        // variazione della quota di fattore vs ~7 rilevazioni fa: senza questo numero la regola
-        // B4 ("rimetti la riduzione sul tavolo solo se SALE") non sarebbe verificabile dal payload,
-        // e un rimando a un dato che non c'è è la classe di difetto che il gate C10 intercetta
-        const mh = (DATA.metrics_history || []).filter(m => m?.titles);
-        if (mh.length < 2) return "";
-        const prima = mh[Math.max(0, mh.length - 8)];
-        const q = (punto) => fr.tk.reduce((sum, t) => sum + (punto.titles?.[t]?.mcr ?? 0), 0);
-        const q0 = q(prima), q1 = fr.mcr;
-        if (!(q0 > 0)) return "";
-        const d = Math.round((q1 - q0) * 10) / 10;
-        const gg = mh.length - 1 - Math.max(0, mh.length - 8);
-        /* ⚠ v230 — "IN AUMENTO" APRIVA LA PORTA A B4 SENZA DIRE QUANTO FOSSE GRANDE. La testata
-           riapre la riduzione della concentrazione solo se la quota di varianza sale "in modo
-           materiale", e il payload decideva quella parola con una soglia FISSA di 3 pp: sopra 3
-           scriveva IN AUMENTO, e l'LLM la leggeva come il trigger. Ma una soglia fissa non sa se
-           quel movimento sia ordinario per QUESTA serie — e' il registro fisso che invecchia da
-           solo (C10, red team I6). Ora il numero porta il proprio percentile sullo storico: oggi
-           +4,2 pp e' il MASSIMO mai osservato (mediana 2,1) e la riga lo dice. La difesa non
-           addolcisce: quando il movimento e' davvero eccezionale lo dichiara, e quando sara'
-           ordinario dira' quello. */
-        const passi = [];
-        for (let i = 7; i < mh.length; i++) passi.push(Math.abs(q(mh[i]) - q(mh[i - 7])));
-        passi.sort((u, v) => u - v);
-        const perc = passi.length >= 6 ? Math.round(passi.filter(v => v <= Math.abs(d)).length / passi.length * 100) : null;
-        const mediana = passi.length >= 6 ? Math.round(passi[Math.floor(passi.length / 2)] * 10) / 10 : null;
-        const contesto = perc == null ? " (storico troppo corto per dire se sia un movimento ordinario)"
-          : perc >= 90 ? ` — e' il movimento PIU' AMPIO dello storico (${perc}° percentile su ${passi.length} finestre, mediana ${fmtNum.format(mediana)} pp): questo NON e' il livello di sempre, e' un cambiamento`
-          : perc <= 60 ? ` — movimento ORDINARIO per questa serie (${perc}° percentile su ${passi.length} finestre, mediana ${fmtNum.format(mediana)} pp): la quota oscilla cosi' di continuo, non e' un fatto nuovo di oggi`
-          : ` — movimento nella norma alta (${perc}° percentile su ${passi.length} finestre, mediana ${fmtNum.format(mediana)} pp)`;
-        return ` [VARIAZIONE: era ${fmtNum.format(Math.round(q0 * 10) / 10)}% ${gg} rilevazioni fa → ${d > 0 ? "+" : ""}${fmtNum.format(d)} pp${contesto}]`;
-      })()}`);
-    }
-    // NOTA (v156): rimosse da qui le direttive INDIPENDENZA SUL VERDETTO e ANALISI PER-TITOLO —
-    // erano una SECONDA testata dentro il payload (il payload deve essere MATERIA PRIMA, non un
-    // rulebook che compete con la Costituzione). L'indipendenza vive in [B1], l'analisi per-titolo
-    // nelle domande [C], il materiale di rotazione nel blocco CORRELAZIONI + IDEE DI ROTAZIONE.
-    lines.push("· NOTA METODOLOGICA: gli Stop Loss sulle posizioni sono TRAILING RATCHET su base 2×ATR(14 Wilder): partono 2×ATR sotto il prezzo e da lì possono solo SALIRE coi massimi — non si riabbassano nei ribassi (persistiti tra i run, reset solo se il trade cambia). NON sono percentuali fisse. Il verdetto di accumulo è ritarato sul mandato quant: impatto marginale sullo Sharpe, forza relativa 1M vs benchmark, qualità fondamentale; gli asset in veto (value trap / ROIC<0 / PEG<0) sono esclusi a prescindere dal supporto tecnico.");
-    if ((dv.stopViolations || []).length) {
-      // RI-ARM CANDIDATO (v151): la testata chiede "se ri-armi dichiara il NUOVO livello e il
-      // rischio in €" ma A1 vieta all'LLM di INVENTARE stop → il livello lo calcola il SISTEMA:
-      // stop teorico 2×ATR ancorato al SUPPORTO della riga (sempre < supporto per costruzione),
-      // col rischio aggiuntivo già quantificato. BASE = PREZZO CORRENTE, non lo stop violato:
-      // il prezzo è GIÀ sotto lo stop ancorato, quindi la perdita stop→prezzo è già maturata e
-      // uscendo ora la realizzi comunque. Il rischio che il ri-arm AGGIUNGE è solo quello da
-      // "esco adesso al prezzo" fino al nuovo stop = quote × (prezzo − ri-arm). Usare (stop−ri-arm)
-      // gonfiava il numero contando una perdita già incassata (v156).
-      const eurusdRA = DATA.eurusd || 1.08;
-      lines.push("· ⚠ STOP VIOLATI (il prezzo è SOTTO lo stop trailing ancorato — dedica a ciascuno una raccomandazione esplicita (uscire o ri-armare), con motivazione): " +
-        dv.stopViolations.map(x => {
-          /* ═══ v229 — L'EVENTO PIU' URGENTE CONTRADDETTO DAL PREZZO PIU' FRESCO ══════════
-             Trovato leggendo il payload come il ricevente. PLTR era dichiarato STOP VIOLATO sulla
-             CHIUSURA ($123,06 sotto lo stop $124,81) mentre il prezzo esteso pre-market era gia'
-             a $125,44, cioe' SOPRA lo stop: la violazione era gia' rientrata sul dato piu' fresco
-             che lo stesso payload pubblica due righe piu' in la' ("→ agg."). Il blocco che
-             impone "una raccomandazione esplicita per ciascuno" chiedeva quindi una decisione
-             su un evento che il mercato aveva gia' disfatto.
-             E' la classe v193 — stato del mercato e freschezza del dato sono due cose diverse —
-             applicata all'evento che il payload tratta come il piu' urgente di tutti.
-             NON si cambia la violazione (lo stop e' ancorato alla chiusura, e il ratchet ragiona
-             su chiusure): si DICHIARA che l'esteso la contraddice, e di quanto. */
-          const ext = x.r.prezzo_limite_aggiustato;
-          const rientrato = (ext != null && ext > x.stop && x.r.price < x.stop)
-            ? ` [⚠ MA IL DATO PIU' FRESCO LA CONTRADDICE: ${esc(x.r.prepost?.label || "esteso")} $${fmtNum.format(ext)} è SOPRA lo stop $${fmtNum.format(x.stop)} (${signTxt(Math.round((ext / x.stop - 1) * 1000) / 10)}) — sulla chiusura lo stop è violato, sull'ultimo scambio no. La violazione è calcolata sulle CHIUSURE perché il ratchet vive su quelle, ma questa non è ancora una rottura confermata: all'apertura può non esistere]`
-            : "";
-          const base = `${x.r.ticker} stop $${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)} (${signTxt(Math.round((x.r.price / x.stop - 1) * 1000) / 10)})${rientrato}`;
-          const ra = (x.r.support > 0 && x.r.support < x.r.price) ? atrStop(x.r.support, x.r) : null;
-          if (!ra || !(ra.stop > 0) || !(ra.stop < x.r.price)) return base;
-          const perShare = x.r.price - ra.stop;
-          const riskEur = Math.round(x.r.qty * perShare / eurusdRA);
-          // ⚠ v223 — SENZA QUESTO, "STOP VIOLATO" SUONA UGUALE SU TUTTO. Misurato sui dati veri:
-          // MU e' violato del 2,6% su una posizione a +839% (lo 0,31% della corsa fatta), PLTR
-          // dell'1,4% su una a +8% (il 16,7% della corsa). Il primo e' il ratchet che ha seguito
-          // un vincitore fin sotto il prezzo; il secondo e' una tesi che si sta sgretolando. Il
-          // payload li presentava IDENTICI, ed e' il motivo per cui il report proponeva di
-          // liquidare i cavalli vincenti insieme ai cavalli zoppi.
-          const gOra = (x.r.pmc > 0) ? (x.r.price / x.r.pmc - 1) * 100 : null;
-          const gStop = (x.r.pmc > 0) ? (x.stop / x.r.pmc - 1) * 100 : null;
-          const breach = (x.r.price / x.stop - 1) * 100;
-          const quota = (gOra > 0) ? Math.abs(breach) / gOra * 100 : null;
-          const scala = (q) => q == null ? ""
-            : q < 3 ? " — su questa scala e' RUMORE, non una rottura della tesi: e' il trailing che ha seguito il prezzo fin qui sotto"
-            : q > 25 ? " — qui lo stop taglia una quota RILEVANTE del guadagno: e' un evento di tesi, non un sussulto"
-            : "";
-          /* ═══ v230 — LA PROSPETTIVA PARLAVA DI UN PREZZO CHE NON E' PIU' QUELLO ═════════════
-             Misurato su un report reale: l'LLM ha venduto MU (+839%) e AMD (+209%) citando
-             "stop violato -4,32% in pre-market". Quel -4,32% e' il GAP pre/chiusura stampato
-             nella tabella, mentre la PROSPETTIVA — la difesa che esiste apposta per non
-             liquidare i vincitori — era calcolata sulla CHIUSURA e diceva "0,31% della corsa".
-             Due numeri sullo stesso titolo, uno vecchio e rassicurante, uno fresco e allarmante:
-             l'LLM ha creduto al piu' fresco, ed era ragionevole.
-             Ora, quando esiste un prezzo esteso che cambia la lettura, la prospettiva la RIFA su
-             quello. Non e' un addolcimento: su AMD la quota passa da 1,79% a ~3,1% e la riga
-             smette di dire RUMORE. E' la stessa classe v193 — stato del mercato e freschezza del
-             dato sono due cose diverse — applicata al numero che regge la decisione. */
-          const pf = x.r.prezzo_limite_aggiustato;
-          const usaPf = pf != null && x.r.price > 0 && Math.abs(pf / x.r.price - 1) > 0.005;
-          const gPf = (usaPf && x.r.pmc > 0) ? (pf / x.r.pmc - 1) * 100 : null;
-          const brPf = usaPf ? (pf / x.stop - 1) * 100 : null;
-          /* solo se il prezzo fresco e' ANCORA SOTTO lo stop: se e' sopra, la violazione e'
-             rientrata e lo dice gia' la riga "MA IL DATO PIU' FRESCO LA CONTRADDICE" (v229) —
-             un secondo periodo che parla di "sfondamento +0,5%" direbbe una cosa senza senso */
-          const qPf = (gPf > 0 && brPf < 0) ? Math.abs(brPf) / gPf * 100 : null;
-          const suFresco = (qPf != null)
-            ? ` RIFATTO SUL PREZZO PIU' FRESCO (${esc(x.r.prepost?.label || "esteso")} $${fmtNum.format(pf)}, che e' il dato su cui deciderai): posizione a ${signTxt(Math.round(gPf))}, sfondamento ${signTxt(Math.round(brPf * 10) / 10)} = ${fmtNum.format(Math.round(qPf * 100) / 100)}% della corsa${scala(qPf)}.`
-            : "";
-          const prosp = (gOra != null && gStop != null)
-            ? ` [PROSPETTIVA: posizione a ${signTxt(Math.round(gOra))} sul PMC; uscire allo stop cristallizzerebbe ${signTxt(Math.round(gStop))}. Lo sfondamento vale il ${quota != null ? fmtNum.format(Math.round(quota * 100) / 100) : "—"}% della corsa fatta finora${scala(quota)}${suFresco ? " ·" + suFresco : ""}]`
-            : "";
-          return `${base} [ri-arm CANDIDATO se tieni: $${fmtNum.format(ra.stop)} (2×ATR sotto il supporto $${fmtNum.format(x.r.support)}) → rischio aggiuntivo ~€${fmtNum.format(riskEur)} = ${fmtNum.format(x.r.qty)} quote × $${fmtNum.format(Math.round(perShare * 100) / 100)} dal prezzo]${prosp}`;
-        }).join(" · ") + ".");
-    }
-    // ═══ v169 — POSIZIONI CHE CHIEDONO UNA DECISIONE + BUDGET DOPO LE VENDITE ═══════════════
-    // Due lacune emerse da un report reale. (1) Le liste che forzano una decisione erano solo
-    // "stop violati" e "candidati": un nome in VETO FORTE senza stop violato — MSTR, che ha pure
-    // la minusvalenza più grande del book e una falsa accelerazione della RS — non compariva in
-    // nessuna, e infatti il report non lo ha nemmeno nominato. (2) Il BUDGET è statico (cassa−ES95)
-    // e la regola A3 lo rende vincolante: un piano che VENDE e COMPRA era costretto a sotto-
-    // investire, perché i proventi delle vendite proposte non entravano da nessuna parte.
-    {
-      const eurusdD = DATA.eurusd || 1.08;
-      const valEur = (r) => (r.val_eur > 0 ? r.val_eur : (r.qty * r.price) / eurusdD);
-      const daDecidere = [];
-      const visti = new Set();
-      for (const x of (dv.stopViolations || [])) {
-        visti.add(x.r.ticker);
-        daDecidere.push({ r: x.r, perche: `stop violato ($${fmtNum.format(x.stop)} vs prezzo $${fmtNum.format(x.r.price)})` });
-      }
-      for (const x of (dv.excluded || [])) {
-        const r = x.r;
-        if (!r || !r.qty || visti.has(r.ticker) || String(x.strength || "").toLowerCase() !== "forte") continue;
-        visti.add(r.ticker);
-        daDecidere.push({ r, perche: `VETO FORTE (${(x.why || [])[0] || "value trap"}) su posizione DETENUTA, senza stop violato: nessun evento tecnico la porterà davanti a te da sola` });
-      }
-      /* v247 — RIMOSSI "🔷 POSIZIONI DA GUARDARE" e "💧 CAPITALE IMMOBILIZZATO": l'elenco che
-         il CEO ha citato per primo. Cinque nomi in fila, ognuno con veto, soglia superata e
-         minusvalenza pronta all'uso — un LLM che legge quella lista produce l'unica risposta
-         che la forma suggerisce. ⚠ NESSUNA MISURA È PERSA: lo stop violato resta nella riga
-         degli stop, il Sortino è una COLONNA di Tabella A, il controvalore pure. */
-    }
-    if ((dv.withPlan || []).length) {
-      // v228 — stesso ordine alfabetico del blocco FILTRI: qui l'ordine per punteggio era
-      // l'ultimo residuo della classifica rimossa in v200 (vedi la nota nel brief).
-      lines.push("· Livelli calcolati dal motore (contesto, in ordine alfabetico, ordini limite + stop 2×ATR): " +
-        [...dv.withPlan].sort((x, y) => x.r.ticker.localeCompare(y.r.ticker)).map(p => {
-          const atrTag = p.atr ? ` [stop = ingresso − 2×ATR ${p.atr.src}, ATR ${fmtNum.format(p.atr.pct)}%]` : " [stop fallback −8%: ATR n.d.]";
-          // trimestrale <14gg su un CANDIDATO d'ingresso: il flag va NELLA riga del piano —
-          // in tabella si perde e l'LLM rischia di suggerire un limite che scavalca l'evento (v112)
-          const ed = earningsRiskDays(p.r);
-          const earnTag = ed != null ? ` [!EARNINGS RISK: trimestrale ${p.r.earnings_date} tra ${ed}gg — valuta ingresso post-evento o sizing ridotto]` : "";
-          // paracadute v115: se il supporto API era fuori banda, il limite viene da un
-          // fallback e l'LLM deve saperlo (mai fallback silenziosi)
-          const srcTag = p.limitFallback ? ` [supporto API fuori banda ±25%: limite da ${p.limitSrc}]` : "";
-          // v119 — TUTTI i campi della citazione tracciabilità (prezzo, limite, stop, R/R) su
-          // UNA riga: prima l'LLM doveva assemblarli cercando in tabella e sbagliava (metteva il
-          // limite nello slot "Prezzo" della citazione). Ora cita direttamente da qui.
-          const rr = p.r.risk_reward ? ` / R/R ${p.r.risk_reward}` : "";
-          // target = resistenza (v148): è il numeratore del R/R — senza stamparlo l'LLM vedeva
-          // il rapporto ma non il livello a cui punta il reward. Stessa banda di plausibilità.
-          // v160 — il TARGET senza la sua DISTANZA dal prezzo è mezza informazione: HG mostrava
-          // "target res. $36,28" con R/R 1:2.3 mentre il prezzo era già $36,16 (+0,3%). In tabella la
-          // distanza c'era (v148), nella riga che genera gli ORDINI no — proprio dove serve. Un target
-          // che coincide col prezzo rende il R/R aritmeticamente vero ed economicamente vuoto.
-          const resT = (p.r.resistance != null && p.r.price > 0 && p.r.resistance > p.limit && p.r.resistance <= p.r.price * 2)
-            ? (() => {
-                const dFromPrice = (p.r.resistance / p.r.price - 1) * 100;
-                const dFromLimit = (p.r.resistance / p.limit - 1) * 100;
-                const warn = dFromPrice < 2
-                  ? ` ⚠ il target è di fatto AL PREZZO ATTUALE: il R/R misura la distanza supporto→resistenza, non spazio di salita da qui`
-                  : "";
-                return ` / target res. $${fmtNum.format(p.r.resistance)} (${signTxt(Math.round(dFromPrice * 10) / 10)} dal prezzo, ${signTxt(Math.round(dFromLimit * 10) / 10)} dal limite)${warn}`;
-              })()
-            : "";
-          // distanza del LIMITE dal prezzo = probabilità che l'ordine venga MAI eseguito. Un limite
-          // a −6% su un nome al 100° percentile 52S non è "prudente": è un ordine che si riempie
-          // solo se il trend si rompe. Il payload dava i due numeri separati e mai la loro distanza.
-          const dLimit = (p.r.price > 0 && p.limit > 0) ? (p.limit / p.r.price - 1) * 100 : null;
-          // v210 — il commento qui sopra descriveva il problema dal v160 ma NESSUNO LO CONTROLLAVA:
-          // il payload stampava la distanza e basta. Trovato provando il prompt su me stesso —
-          // MSFT a −16,5% e WDC a −22,5% passavano senza un flag, mentre il TARGET ha da sempre il
-          // suo avviso ("⚠ il target è di fatto AL PREZZO ATTUALE"). Asimmetria: si avvisava quando
-          // il premio era illusorio, non quando l'ingresso era irraggiungibile — e un ordine che non
-          // si riempie mai, riportato come azione, dà la sensazione di aver agito senza aver agito.
-          // La distanza si misura in ATR, non in percentuale secca: −16,5% su un titolo con ATR
-          // 3,45% (4,8 ATR) e −22,5% su uno con ATR 9,92% (2,3 ATR) NON sono lo stesso ordine.
-          const atrPc = atrOf(p.r)?.pct;
-          const inAtr = (dLimit != null && atrPc > 0) ? Math.abs(dLimit) / atrPc : null;
-          const limFar = inAtr != null && inAtr >= 3
-            ? ` ⚠ sono ${fmtNum.format(Math.round(inAtr * 10) / 10)} ATR sotto il prezzo: questo ordine si riempie solo se il trend si rompe, non è "entrare in prudenza"`
-            : "";
-          const limT = dLimit != null
-            ? ` (${signTxt(Math.round(dLimit * 10) / 10)} dal prezzo${inAtr != null ? ` = ${fmtNum.format(Math.round(inAtr * 10) / 10)}×ATR` : ""})${limFar}`
-            : "";
-          // se il prezzo esteso ha già mosso, dichiaralo QUI: la legenda dice "usa → agg. per gli
-          // ordini limite" ma questo limite è calcolato sul supporto della chiusura → istruzioni in
-          // conflitto se non si esplicita il rapporto fra i due.
-          const pp = p.r.prepost || {};
-          const aggP = dgFin(pp.price);
-          const aggT = (aggP && p.r.price > 0 && Math.abs(aggP / p.r.price - 1) >= 0.01)
-            ? ` [NB ${pp.label || "esteso"} $${fmtNum.format(aggP)} (${signTxt(Math.round((aggP / p.r.price - 1) * 1000) / 10)}): questo limite è calcolato sul supporto della CHIUSURA, non sul gap — se l'esteso tiene, il limite dista ${signTxt(Math.round((p.limit / aggP - 1) * 1000) / 10)} da lì]` : "";
-          // v151 — candidato GIÀ DETENUTO col ratchet sopra il limite d'ingresso: raggiungere il
-          // limite implica lo stop della posizione GIÀ scattato. Senza flag i due piani (accumulo
-          // vs protezione) sembrano indipendenti e l'LLM deve dedurre il conflitto da solo.
-          const heldStop = p.r.qty ? stopOf(p.r) : null;
-          const heldTag = (heldStop && heldStop.stop > p.limit)
-            ? ` [NB: posizione GIÀ detenuta con stop ratchet $${fmtNum.format(heldStop.stop)} SOPRA questo limite — il prezzo arriva al limite solo DOPO aver violato lo stop: decidi prima la sorte della posizione]` : "";
-          // v158 — CAPIENZA RESIDUA AL CAP: il gate blocca chi è GIÀ oltre il cap, ma un candidato
-          // appena sotto (MU 18,9% con cap 20%) lo ATTRAVERSA comprando, e il payload non dava
-          // all'LLM alcun numero per accorgersene. Qui la capienza è CALCOLATA (quote entro il cap),
-          // dichiarata come evidenza — non come divieto: sforare resta una scelta del CEO, ma esplicita.
-          // v164 — DE-RATCHET: il ratchet si resetta quando cambia la quantità
-          // (update_data.py: `stop = max(prev_stop, raw) if (prev_ok and same_pos) else raw`),
-          // quindi ACCUMULARE fa cadere il trailing anche sulle quote GIÀ possedute, dal livello
-          // ancorato a quello nuovo più basso. Il payload quantificava con precisione il rischio
-          // del ri-arm sugli stop violati ma lasciava INVISIBILE questo costo simmetrico: un CIO
-          // leggeva "COMPRA con stop $429" credendo il rischio limitato alle nuove quote.
-          let deRatchetTag = "";
-          if (p.r.qty > 0 && heldStop && heldStop.stop > p.stop && p.stop > 0) {
-            const perShare = heldStop.stop - p.stop;
-            const eurusdDR = DATA.eurusd || 1.08;
-            const addEur = Math.round(p.r.qty * perShare / eurusdDR);
-            if (addEur > 0) deRatchetTag = ` [⚠ DE-RATCHET: accumulare RESETTA il trailing da $${fmtNum.format(heldStop.stop)} a $${fmtNum.format(p.stop)} anche sulle ${fmtNum.format(p.r.qty)} quote GIÀ detenute → scopre ~${fmtEUR.format(addEur)} di downside sulla posizione esistente, oltre al rischio delle nuove quote.]`;
-          }
-          // v167 — CAP SULLA PERDITA POTENZIALE: il cap sul PESO non sa quanto costa un titolo se
-          // va male, perché ignora la distanza dello stop. Qui la quantità massima discende dal
-          // RISCHIO: quote × (limite − stop) ≤ maxLossPerPos_pct% del NAV. Su un nome volatile
-          // (stop lontano) ne entrano poche, su uno tranquillo molte — a parità di rischio in €.
-          const navTot = (DATA?.totals?.eur_invested || 0) + cashEur;
-          let lossTag = "";
-          if (p.limit > 0 && p.stop > 0 && p.limit > p.stop && navTot > 0) {
-            const perShareUsd = p.limit - p.stop;
-            const maxLossEur = RISK_PARAMS.maxLossPerPos_pct / 100 * navTot;
-            const eurusdL = DATA.eurusd || 1.08;
-            const qtyMax = Math.floor(maxLossEur * eurusdL / perShareUsd);
-            const spesaEur = Math.round(qtyMax * p.limit / eurusdL);
-            /* v247 — RESTA la perdita per quota allo stop: è una misura pura (distanza
-               prezzo−stop in dollari). VIA il "col tetto del N% del NAV entrano max M quote",
-               che era il tetto autorizzativo. */
-            lossTag = ` [allo stop perdi $${fmtNum.format(Math.round(perShareUsd * 100) / 100)} a quota]`;
-          }
-          /* v247 — RIMOSSO il tag CAP (capienza residua / ESAURITA): è il divieto d'acquisto.
-             Il PESO della posizione resta pubblicato altrove: quello è la misura. */
-          const capTag = "";
-          const wNow = p.r.qty ? positionWeightPct(p.r) : null;   // usato più sotto
-          // v167 — QUALE VINCOLO MORDE. Con tre limiti attivi (budget spendibile, capienza al cap
-          // sul peso, tetto di perdita allo stop) la quantità eseguibile è il MINIMO dei tre, e
-          // farne l'intersezione a mente è esattamente il lavoro che il sistema deve togliere.
-          /* v247 — RIMOSSO "VINCOLO PIÙ STRETTO": era l'intersezione di budget, cap e tetto
-             di perdita, cioè la quantità massima autorizzata. Tolti budget e cap, non ha basi. */
-          const bindTag = "";
-          return `${p.r.ticker}: prezzo $${fmtNum.format(p.r.price)} → limite d'ingresso $${fmtNum.format(Math.round(p.limit * 100) / 100)}${limT} / stop $${fmtNum.format(p.stop)}${resT}${rr}${atrTag}${srcTag}${earnTag}${aggT}${heldTag}${deRatchetTag}${capTag}${lossTag}${bindTag}`;
-        }).join(" · ") + ".");
-    }
-    if ((dv.trailing || []).length) {
-      lines.push("· Stop trailing posizioni aperte (ratchet 2×ATR, ancorati — non ridiscendono): " +
-        dv.trailing.map(x => {
-          const prov = (x.atr?.src || "").includes("provvisorio");
-          return `${x.r.ticker} stop $${fmtNum.format(x.stop)} (${signTxt(Math.round((x.stop / x.r.price - 1) * 1000) / 10)}${x.violated ? " ⚠VIOLATO" : ""}${prov ? " — PROVVISORIO −12%, ATR n.d. (storia <15 sedute): da inizializzare al prossimo run" : ""})`;
-        }).join(" · ") + ".");
-    }
-    /* v247 — RIMOSSO: la lista degli ESCLUSI dal veto: tredici bocciature in fila, tre su posizioni DETENUTE. Sortino, short interest e ROIC restano come COLONNE. */
-    /* v247 — RIMOSSO: i RIABILITATI: una riabilitazione è un verdetto rovesciato. */
-    /* v247 — RIMOSSO: la prescrizione dello squeeze (sizing dimezzato, stop 1×ATR). Il FLAG descrittivo in tabella resta. */
-    // v119 — il trim ora porta un PREZZO LIMITE di vendita e la QUANTITÀ esatta per rientrare
-    // CAP D'INGRESSO (#1, direttiva CEO v121): i titoli ≥10% NAV NON ricevono nuovi acquisti,
-    // ma NON vanno trimmati se cresciuti da soli (Let Winners Run, protetti dallo stop ratchet).
-    /* v247 — RIMOSSO: il CAP D'INGRESSO: divieto d'acquisto. */
-    // ALERT concentrazione singolo titolo: SOLO avviso sopra il 25%, mai un obbligo di trim.
-    /* v247 — RIMOSSO: l'ALERT su singolo nome: soglia superata. La concentrazione MISURATA resta. */
-    /* v247 — RIMOSSO: le posizioni «tese»: giudizio del motore. */
-    /* v247 — RIMOSSO: le minusvalenze «utilizzabili fiscalmente»: è utilizzabile solo se REALIZZATA, quindi era una lista di vendite. Il P&L resta in Tabella A. */
-  } catch { /* no-op */ }
+  /* ═══ v256 — IL PAYLOAD È SOLO MACRO. Decisione del CEO: "elimina tutto e lascia solo una
+     pagina con i dati macro e la relativa correlazione con esportazione prompt ai".
+     Qui cadono, insieme: portafoglio incompleto, prezzi da sedute diverse, libro incompleto,
+     situazione patrimoniale, metriche di rischio, riconciliazione broker, stagionalità,
+     sintesi news, filtri quantitativi, concentrazione di fattore, stop violati, livelli
+     d'ingresso, stop trailing, track record del motore, diario, Tabella A (portafoglio),
+     matrice di rischio, Tabella B (watchlist), analisi fondamentale.
+     ⚠ RICEVUTA scritta PRIMA del taglio ed ESEGUIBILE: dentro i confini non cade nessuna
+     dichiarazione di primo livello e le graffe si bilanciano — è il controllo che in v238
+     guardava solo le `function` e lasciò passare un `let`, uccidendo la pagina.
+     Restano il contesto di sessione, il report di qualità dati e tutto il quadro macro. */
 
-  // ---- TRACK RECORD DEL MOTORE (v113): il motore si misura da solo, run dopo run.
-  // I segnali ACCUMULA vengono loggati dal CI (scripts/log_verdict.mjs → verdict_track in
-  // data.json) e valutati a 7/30 giorni: l'LLM deve CALIBRARE la fiducia nel motore sugli
-  // esiti reali, non presumerla. Un advisory che non misura se stesso è solo narrativa.
-  lines.push("");
-  const vt = DATA.verdict_track;
-  if (vt && ((vt.mature30 || {}).n || (vt.mature7 || {}).n)) {
-    const fmtB = (b, lab) => b && b.n ? `${lab}: ${b.n} segnali · ritorno medio ${signTxt(b.avg_ret)} · vs NDX ${signTxt(b.avg_vs_ndx, "pp")} · hit-rate vs NDX ${b.hit_pct}%` : null;
-    const bits = [fmtB(vt.mature30, "maturazione ≥30g"), fmtB(vt.mature7, "maturazione ≥7g")].filter(Boolean);
-    lines.push(`TRACK RECORD DEL MOTORE (esito dei segnali ACCUMULA passati, ipotesi di acquisto alla chiusura del giorno del segnale — esiti misurati dei segnali passati): ${bits.join(" · ")}.`);
-    if ((vt.last || []).length) lines.push("· Ultimi segnali maturati: " + vt.last.map(s => `${s.tk} ${signTxt(s.ret_pct)} (vs NDX ${signTxt(s.vs_ndx_pp, "pp")}, segnale ${s.date})`).join(" · ") + ".");
-    // v159 — ONESTÀ STATISTICA: un "hit-rate 0% su 4 segnali" suona come una condanna del motore, ma
-    // se i 4 segnali sono dello STESSO GIORNO su nomi correlati non sono 4 osservazioni indipendenti:
-    // è UN evento di mercato osservato 4 volte, e non autorizza nessuna calibrazione. Senza questa
-    // riga il payload induce un errore di inferenza (l'LLM conclude "il motore è rotto" da n=1).
-    // v160 — TRACK RECORD DELLE DIVERGENZE: il sistema misura le PROPRIE affermazioni. Ogni divergenza
-    // di cautela è una previsione implicita ("questo nome sottoperformerà"); il CI la scora da solo sui
-    // prezzi, senza input manuale. Serve a sapere QUALI detector meritano fiducia e quali sono rumore.
-    const dt = (vt.div_track || []).filter(x => x && x.n >= 3);
-    if (dt.length) {
-      const lab = { theme_rs: "flusso-non-conferma-narrativa", mcr_over_weight: "rischio≫peso",
-                    verdict_vs_regime: "verdetto-vs-regime", relapse: "candidato-già-fallito",
-                    accel_into_veto: "momentum-dentro-veto" };
-      lines.push("· TRACK RECORD DELLE DIVERGENZE (il sistema misura le proprie segnalazioni: extra-rendimento medio vs NDX dopo ≥7g dalla segnalazione; per i segnali di CAUTELA \"azzeccato\" = il nome ha poi sottoperformato — un detector con hit-rate basso va pesato meno, non ripetuto): " +
-        dt.map(x => `${lab[x.kind] || x.kind} — ${x.n} casi, media ${signTxt(x.avg_rel_pp, "pp")}${x.hit_pct != null ? `, azzeccati ${x.hit_pct}%` : " (segnale dichiarato ambiguo: si misura la direzione, non la ragione)"}`).join(" · ") + ".");
-    } else if ((vt.div_open || 0) > 0) {
-      lines.push(`· TRACK RECORD DELLE DIVERGENZE: in costruzione — le ${vt.div_open} divergenze di oggi vengono loggate e valutate sui prezzi fra 7 e 30 giorni, automaticamente. Finché non matura, trattale come ipotesi argomentate, non come detector provati.`);
-    }
-    const days = [...new Set((vt.last || []).map(s => s.date).filter(Boolean))];
-    const nSig = ((vt.mature7 || {}).n || 0) + ((vt.mature30 || {}).n || 0);
-    if (days.length === 1 && (vt.last || []).length > 1) {
-      lines.push(`· ⚠ LIMITE STATISTICO DEL CAMPIONE: tutti i segnali maturati provengono da UN SOLO giorno (${days[0]}) e da nomi fortemente correlati — è un evento osservato più volte, NON osservazioni indipendenti. Un hit-rate calcolato così NON è una misura della bontà del motore: in quella finestra il motore ha comprato debolezza che è poi peggiorata, ma su un solo evento. Il campione diventa informativo con segnali distribuiti su più date.`);
-    } else if (nSig > 0 && nSig < 10) {
-      lines.push(`· ⚠ CAMPIONE PICCOLO (${nSig} segnali su ${days.length} date distinte): indizio direzionale, non evidenza statistica — non trarne conclusioni forti sulla bontà del motore.`);
-    }
-  } else {
-    lines.push("TRACK RECORD DEL MOTORE: storico in costruzione — i segnali ACCUMULA vengono loggati a ogni run e valutati dopo 7 e 30 giorni di maturazione. Finché non matura, tratta i candidati del motore come ipotesi da validare, non come raccomandazioni provate.");
-  }
-
-  // ---- CINEMATICA DEI SEGNALI: RIMOSSA dal payload (v184, come TOP 10 CAPITALIZZAZIONI in v138).
-  // Misurato prima di togliere: 21 numeri su 21 comparivano GIÀ altrove nel payload — Sharpe e il
-  // suo Δ7g in SITUAZIONE PATRIMONIALE e nel digest storico, VIX e VIX/VIX3M in QUADRO MACRO,
-  // ΔRS e ΔMCR sono COLONNE della tabella CINEMATICA & TREND PER TITOLO. Zero informazione persa,
-  // un allineamento in meno da mantenere (è la classe di difetto che ha prodotto C11).
-  // Il calcolo per-titolo resta vivo: lo fa titleKinematics(), usata dalla tabella e dalla UI.
-  // DIARIO DELLE AZIONI (storico operazioni e motivazioni dell'utente)
-  const diary = loadDiary();
-  if (diary.length) {
-    lines.push("");
-    lines.push("DIARIO DELLE AZIONI (operazioni eseguite dal CEO, col prezzo reale annotato):");
-    diary.slice(0, 30).forEach(e => lines.push(`- ${new Date(e.date).toLocaleDateString("it-IT")}: ${e.text}`));
-    lines.push("(NB sulle fonti: il diario è testo libero scritto dal CEO, la Tabella A è generata dai dati del broker. Se le due non concordano su quantità o PMC, la Tabella A è la fonte autoritativa.)");
-  } else {
-    // l'analisi per-titolo cita il diario: se è vuoto va DETTO (anti-allucinazione),
-    // non lasciato all'LLM da indovinare cercando una sezione che non c'è
-    lines.push("");
-    lines.push("DIARIO DELLE AZIONI: vuoto — nessuna operazione registrata di recente.");
-  }
-  lines.push("");
-  lines.push(`PORTAFOGLIO — ${DATA.portfolio.length} POSIZIONI (Tabella A — i tuoi dati per posizione: controvalore e P&L reali; Sharpe 1A = rendimento/rischio; Drawdown 52S = distanza dal max; ±ImpMove = movimento implicito earnings; RVol = volume oggi/media 30gg; Stop 2×ATR = stop dinamico su volatilità. È la tua materia prima: cita la cella dove regge una decisione, NON riprodurre la tabella):`);
-  const f = (v, d = 2) => v === null || v === undefined ? "—" : fmtNum.format(v);
-  const mdRow = (r) => {
-    const c = cur(r);
-    const optC = (DATA.options || {})[r.ticker];
-    // wall sanity: un muro fuori da 0.4×–2.5× lo spot è un relitto di chain degenere → n.d.
-    const wallOk = (w) => (w != null && r.price != null && w >= r.price * 0.4 && w <= r.price * 2.5) ? w : null;
-    let cw = wallOk(optC?.expiries?.[0]?.call_wall), pw = wallOk(optC?.expiries?.[0]?.put_wall);
-    if (cw != null && cw === pw && r.price && Math.abs(cw / r.price - 1) > 0.25) { cw = pw = null; }   // firma chain artefatta
-    const optNote = (cw != null || pw != null) ? `CW:${cw != null ? c + f(cw) : "n.d."} PW:${pw != null ? c + f(pw) : "n.d."}` : "—";
-    const rsBench = r.rs_bench === "sox" ? "SOX" : r.rs_bench === "ndx" ? "NDX" : "S&P";
-    const rsCell = r.rs_1m != null ? `${r.rs_1m > 0 ? "+" : ""}${r.rs_1m}% (vs ${rsBench})` : "—";
-    const rsNdxCell = r.rs_ndx_1m != null ? `${r.rs_ndx_1m > 0 ? "+" : ""}${r.rs_ndx_1m}pp` : "—";
-    const sh = r.sharpe_1y != null ? fmtNum.format(r.sharpe_1y) : "—";
-    const so = r.sortino_1y != null ? fmtNum.format(r.sortino_1y) : "—";
-    const dd = r.w52_dist_pct != null ? signTxt(r.w52_dist_pct) : "—";
-    const im = impliedMoveForEarnings ? impliedMoveForEarnings(r) : null;
-    const imTxt = im != null ? `±${im}%` : "—";
-    const shortF = r.stats?.short_float != null ? fmtNum.format(Math.round(r.stats.short_float * 1000) / 10) + "%" : "—";
-    // Flottante (azioni liberamente scambiabili): milioni/miliardi + % sul totale se disponibile.
-    // Rischio short squeeze / volatilità asimmetrica: low float + short alto + RVol alto = polveriera.
-    const fsh = r.stats?.float_shares;
-    const floatCell = fsh != null
-      ? (fsh >= 1e9 ? (fsh / 1e9).toFixed(1) + "B" : Math.round(fsh / 1e6) + "M") + (r.stats?.float_pct != null ? ` (${fmtNum.format(r.stats.float_pct)}%)` : "")
-      : "—";
-    // RVol (Volume Relativo) + flag Volumi Anomali (>1,5×)
-    const rv = r.vol_ratio;
-    const rvCell = rv != null ? `${fmtNum.format(rv)}×${rv > 1.5 ? " [Volumi Anomali]" : ""}` : "—";
-    // Stop trailing: ratchet della pipeline sulle posizioni, 2×ATR client su watchlist.
-    // Gli INDICI (currency PTS: KOSPI, ^IXIC…) non sono comprabili: stop e R/R sarebbero
-    // rumore che invita l'LLM a "operare" su un benchmark → n.d. esplicito (v112).
-    // v118 — COERENZA DI RIGA: sui candidati watchlist lo stop teorico si ancora al SUPPORTO
-    // MOSTRATO nella riga stessa (colonna Supp.), non al prezzo corrente. Prima, su ATR alto
-    // (SNDK: 2×ATR=$406, prezzo $1916, supporto $1485) lo stop-da-prezzo usciva $1509 → SOPRA
-    // il supporto → stop-loss long impossibile. Ancorando a r.support, stop = supp − 2×ATR è
-    // SEMPRE sotto il supporto per costruzione (ATR>0): la riga è coerente con sé stessa
-    // (invariante I6 del red team). Fallback a saneEntryLimit/prezzo se il supporto manca.
-    const isIndex = r.currency === "PTS";
-    const entryRef = (!isIndex && !r.qty)
-      ? ((r.support > 0 && r.support <= r.price) ? r.support : (saneEntryLimit(r)?.limit ?? r.price))
-      : r.price;
-    const st = isIndex ? null : (r.qty ? stopOf(r) : atrStop(entryRef, r));
-    let stopCell = "—";
-    if (st) {
-      // "provvisorio" ha priorità sul tag generico: uno stop −12% senza ATR (SKHYV young)
-      // NON è un ratchet ancorato, e l'LLM lo deve sapere (v119)
-      const tag = (st.src || "").includes("provvisorio") ? "provvisorio" : (r.qty ? (st.ratchet ? "ratchet" : "client") : "teorico");
-      stopCell = `${c}${f(st.stop)} (${tag})`;
-    }
-    // flag di rischio inline nel nome: stop violato, earnings imminenti, illiquidità, FX
-    const flags = [];
-    const dr = (DATA.macro || {}).dollar_ruler;
-    if (dr && dr.flag && (r.stats?.market_cap ?? 0) >= 100e9) {
-      flags.push(dr.chg_3m_pct >= 5 ? "[FX HEADWIND]" : "[FX TAILWIND]");   // large cap: utili esteri sensibili al dollaro
-    }
-    if (r.qty && st && st.violated) flags.push("[STOP VIOLATO]");
-    // ORARIO ESTESO v125 (Risultato 2): un movimento pre/after >1% che porta il prezzo esteso
-    // a ridosso o sotto lo stop ratchet è un pericolo che matura mentre Wall Street è chiusa.
-    /* ⚠ v230 — IL NUMERO NEL TAG NON ERA QUELLO CHE SEMBRAVA. Stampava il GAP pre/chiusura, e
-       un report reale l'ha letto come lo sfondamento dello stop ("stop violato -4,32% in
-       pre-market": -4,32% era il gap, non la distanza dallo stop). Peggio: su PLTR il tag diceva
-       "STOP A RISCHIO … +2,63%" mentre quel movimento portava il prezzo SOPRA lo stop, cioe'
-       fuori dalla violazione — l'etichetta affermava il contrario di cio' che il numero mostrava.
-       Ora il tag dichiara la DISTANZA DALLO STOP, che e' la grandezza di cui parla, e cambia
-       parola quando il prezzo esteso e' sopra. */
-    if (r.qty && st && r.prepost && Math.abs(r.prepost.change_pct ?? 0) > 1 && r.prepost.price <= st.stop * 1.02) {
-      const dSt = (r.prepost.price / st.stop - 1) * 100;
-      const et = (r.prepost.label || "ext").toUpperCase();
-      flags.push(dSt < 0
-        ? `[${et} $${fmtNum.format(r.prepost.price)} SOTTO LO STOP $${fmtNum.format(st.stop)}: ${signTxt(Math.round(dSt * 10) / 10)}]`
-        : `[${et} $${fmtNum.format(r.prepost.price)} A RIDOSSO DELLO STOP $${fmtNum.format(st.stop)}: ${signTxt(Math.round(dSt * 10) / 10)}, sopra ma vicino]`);
-    }
-    if (earningsRiskDays(r) != null) flags.push("[!EARNINGS RISK]");
-    if (isIlliquid(r)) flags.push("[ILLIQUIDO]");
-    if (squeezeSetup(r)) flags.push("[TURNAROUND SQUEEZE RISK]");
-    const nameCell = `${r.name} (${r.ticker})${flags.length ? " " + flags.join(" ") : ""}`;
-    // R/R teorico per la Tabella B: pipeline (risk_reward) o fallback client stessa formula.
-    // Banda di plausibilità v115: un supporto sotto il 50% del prezzo è preistoria/garbage
-    // → il R/R che ne uscirebbe è spazzatura con la virgola: meglio n.d.
-    let rrCell = isIndex ? null : (r.risk_reward ?? null);
-    if (rrCell == null && !isIndex && r.support && r.resistance && r.support > 0 && r.price > 0
-        && r.support >= r.price * 0.5 && r.resistance <= r.price * 2) {   // resistenza >2× il prezzo = garbage (v116)
-      const aObj = atrOf(r);
-      if (aObj && aObj.atr > 0) {
-        const reward = r.resistance - r.support, risk = 2 * aObj.atr;
-        rrCell = (reward > 0 && risk > 0) ? `1:${(reward / risk).toFixed(1)}` : null;
-      }
-    }
-    rrCell = rrCell ?? (isIndex ? "—" : "n.d.");
-    const adjL = r.prezzo_limite_aggiustato;
-    // STALENESS dichiarata (v112): se l'ultima chiusura valida è più vecchia della data del
-    // run (barra odierna voidata da Yahoo — visto sul KOSPI leading), il prompt lo dice:
-    // senza flag l'LLM legge il movimento del giorno PRIMA come se fosse quello corrente.
-    // v125: [LIVE] per gli strumenti che scambiano fuori orario USA (KOSPI/BTC/futures): il
-    // prezzo è l'ultimo scambio real-time, non la candela stantia. Ha priorità sullo staleTag.
-    // v182: [LIVE] solo se il mercato di quello strumento è DAVVERO in contrattazione. Cripto e
-    // futures scambiano h24; gli indici asiatici no, e fuori orario "live" e' l'ultimo scambio.
-    const liveVero = r.price_live && (/-USD$|=F$/.test(r.ticker || "") || r.ticker !== "^KS11" || seoulSessionOpen());
-    const staleTag = liveVero ? " [LIVE]"
-      : (r.price_asof && DATA.updated_at && r.price_asof < DATA.updated_at.slice(0, 10)
-        ? ` [chiusura del ${new Date(r.price_asof + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}]` : "");
-    const priceCell = `${c}${f(r.price)}${staleTag}${(adjL != null && r.price != null && Math.abs(adjL - r.price) / r.price > 0.001) ? ` → agg. ${c}${f(adjL)} (${r.prepost?.label || "ext"})` : ""}`;
-    // Supp. + resistenza NELLA STESSA CELLA (v148): la resistenza era calcolata (è il "reward"
-    // del R/R teorico) ma MAI stampata — l'LLM vedeva il rapporto senza il livello target.
-    // In-cell (non nuova colonna) per non spostare gli indici I6 del red team (16=Supp., 17=Stop)
-    // e perché euro()/parseIt leggono il PRIMO numero → i validatori continuano a leggere il
-    // supporto. Stessa banda di plausibilità del R/R (res ≤ 2× prezzo, res > supp).
-    const resOk = r.resistance != null && r.support > 0 && r.resistance > r.support
-      && r.price > 0 && r.resistance <= r.price * 2;
-    // v150: distanza % della res dal prezzo IN CELLA — una res lontana (es. +51% su un nome
-    // crollato) gonfia otticamente il R/R teorico: col numero accanto l'LLM pesa l'orizzonte.
-    const suppCell = r.support ? `${c}${f(r.support)}${resOk ? ` → res ${c}${f(r.resistance)} (${signTxt(Math.round((r.resistance / r.price - 1) * 1000) / 10)})` : ""}` : "—";
-    // Sortino 6M accanto all'1A (v148): la "finestra di regime" era calcolata per tutti ma
-    // mostrata solo per i riabilitati. È il dato ODIERNO che la SIMMETRIA DEL VETO richiede:
-    // 1A negativo + 6M in recupero = veto ciclico; entrambi negativi = strutturale.
-    const so6 = r.sortino_6m != null ? ` (6M ${fmtNum.format(r.sortino_6m)})` : "";
-    return `| ${nameCell} | ${r.qty ? fmtNum.format(r.qty) : "—"} | ${r.qty ? c + f(r.pmc) : "—"} | ${priceCell} | ${signTxt(r.change_pct)} | ${r.qty ? signTxt(r.gain_pct) : "—"} | ${r.rsi ?? "—"} | ${rvCell} | ${rsCell} | ${rsNdxCell} | ${sh} | ${so}${so6} | ${dd} | ${shortF} | ${floatCell} | ${suppCell} | ${stopCell} | ${rrCell} | ${r.pe && r.pe > 0 ? f(r.pe) : "—"} | ${f(r.eps)} | ${f(betaOf(r))} | ${r.rating?.upside_pct != null ? signTxt(r.rating.upside_pct) : "—"} | ${r.earnings_date || "—"}${im != null ? ` ${imTxt}` : ""} | ${optNote} |`;   /* v252 — via anche qui la colonna Segnale: in v251 l'avevo tolta solo dalla DASHBOARD, e il payload continuava a portarla. Classe "due implementazioni della stessa cosa" (v161, v207). */
-  };
-  // NB v148: "Supp." resta il NOME esatto della colonna (il red team I10 la cerca per nome; I6
-  // legge gli indici 16/17) — la resistenza vive DENTRO la cella ("$X → res $Y"), il Sortino 6M
-  // dentro la cella Sortino ("-0,4 (6M 0,2)"): niente colonne nuove, niente indici spostati.
-  const head = "| Titolo | Qtà | PMC | Prezzo | Oggi | Guad.% | RSI | RVol | RS 1M (vs bench) | RS 1M vs NDX | Sharpe 1A | Sortino 1A (6M) | Drawdown 52S | Short% | Float | Supp. | Stop 2×ATR | R/R teorico | P/E | EPS | Beta NDX | Target Δ | Trimestrale (±ImpMove) | Opzioni (CW/PW) |";
-  const sep = "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|";
-  lines.push(head); lines.push(sep);
-  DATA.portfolio.forEach(r => lines.push(mdRow(r)));
-  lines.push("(Stop = TRAILING RATCHET: parte a 2×ATR(14 Wilder) sotto il prezzo e da lì può solo SALIRE coi massimi — non si riabbassa nei ribassi; persistito tra i run, si resetta se il trade cambia. \"client\"=ricalcolato ora senza ancoraggio, \"teorico\"=watchlist. [STOP VIOLATO] = prezzo sotto lo stop ancorato → disciplina: uscita o ri-arm dichiarato. Sortino 1A = Sharpe con la sola volatilità NEGATIVA: è il metro del veto value trap (< ${fmtNum.format(RISK_PARAMS.sortinoVeto)} = distruzione di valore sul downside — soglia LETTA dai parametri attivi, non scritta a mano); il \"(6M …)\" accanto è la FINESTRA DI REGIME: 1A negativo con 6M in recupero = danno ciclico in via di riassorbimento (evidenza ODIERNA per la simmetria del veto), entrambi negativi = strutturale. Supp. = supporto; \"→ res $Y (+Z%)\" nella stessa cella = RESISTENZA col suo distacco dal prezzo (il target del R/R teorico: reward = res − supp) — sono i due estremi su cui è calcolato il R/R teorico; quando la resistenza è molto distante (+30% e oltre) il rapporto risulta alto per via dell'orizzonte implicito, non della qualità del setup. Beta NDX = regressione log-rendimenti 12M vs Nasdaq 100 (non il beta 5A Yahoo). [Volumi Anomali] = RVol>1,5. [!EARNINGS RISK] = trimestrale <14gg. [ILLIQUIDO] = posizione >5% del volume medio giornaliero → slippage rilevante. Float = azioni fluttuanti liberamente scambiabili (milioni/miliardi, e % sul totale). R/R teorico = già calcolato dal sistema (reward = resistenza − supporto; risk = 2×ATR); n.d. = non calcolabile. \"→ agg. $X\" = prezzo limite già aggiustato dal sistema sul gap pre/after (la chiusura da sola non lo incorpora). [FX HEADWIND/TAILWIND] = large cap (mcap≥$100B) esposta al Righello Dollaro attivo.)");
-  lines.push("· [LOW FLOAT RISK]: Un titolo con flottante ridotto (Low Float < 50M azioni) unito a uno Short Interest ≥ 15% e Volumi Anomali (RVol > 1.5) indica un rischio imminente di Short Squeeze o volatilità asimmetrica estrema. L'AI deve evidenziarlo come un'opportunità o un pericolo immediato di liquidità.");
-  // MATRICE DI RISCHIO PER POSIZIONE: pesi MTM, MCR, beta NDX, correlazioni reali
-  const riskRows = (DATA.portfolio || []).filter(r => r.qty && (r.risk_contrib_pct != null || r.avg_corr != null || r.beta_ndx != null));
-  if (riskRows.length) {
-    lines.push("");
-    lines.push("MATRICE DI RISCHIO PER POSIZIONE (log-rendimenti giornalieri 12M, pesi mark-to-market — usa QUESTI numeri per correlazione e concentrazione del rischio, non stime a memoria):");
-    lines.push("| Titolo | Quota rischio ptf (MCR) | Corr. media vs ptf | Corr. max (con) |");
-    lines.push("|---|---|---|---|");
-    riskRows.slice().sort((a, b) => (b.risk_contrib_pct ?? -1) - (a.risk_contrib_pct ?? -1)).forEach(r => {
-      // v184: "Peso % NAV" e "Beta NDX" tolti — il peso e' gia' accanto a ogni titolo nelle
-      // CORRELAZIONI ("MU (18,9% NAV · MCR 39,8% · RS -2,8pp)") e il beta e' una colonna della
-      // Tabella A. Restano MCR (unica classifica completa del rischio, ordinata, somma 100%) e
-      // le due correlazioni, che non esistono da nessun'altra parte del payload.
-      lines.push(`| ${r.ticker} | ${r.risk_contrib_pct != null ? fmtNum.format(r.risk_contrib_pct) + "%" : "—"} | ${r.avg_corr != null ? fmtNum.format(r.avg_corr) : "—"} | ${r.max_corr != null ? `${fmtNum.format(r.max_corr)} (${r.max_corr_with})` : "—"} |`);
-    });
-    lines.push("(MCR = contributo marginale al rischio: quota % della varianza totale del portafoglio attribuibile alla posizione — la somma fa 100%. Una posizione con MCR molto sopra il suo peso concentra il rischio. I titoli con storia <60 sedute — IPO e nuove quotazioni — sono esclusi da beta/correlazioni/MCR BY DESIGN, soglia statistica minima: non è un buco dati.)");
-  }
-  if ((DATA.watchlist || []).length) {
-    lines.push("");
-    lines.push(`WATCHLIST — ${DATA.watchlist.length} TITOLI (Tabella B — nessuna posizione, è il tuo universo di caccia: cita un nome solo se entra in una tesi operativa, NON riprodurre la tabella):`);
-    // v184 — colonne tolte alla sola Tabella B (la dashboard NON cambia): 2 Qta, 3 PMC,
-    // 6 Guad.% (sempre vuote senza posizione) e 19 P/E, 20 EPS (gia' in ANALISI FONDAMENTALE
-    // per tutti i titoli della watchlist). Gli indici sono quelli della `head` condivisa e la
-    // proiezione avviene DOPO mdRow, cosi' la Tabella A e il red team (che legge gli indici
-    // 16/17 e il nome "Supp.") restano invariati.
-    // v185: EPS (20) RIMESSO. Provando il payload su me stesso e' emerso il caso Bloom Energy:
-    // nel fondamentale BE mostra "P/E —" con ROE +1,3% e margine +0,3%, tutto in apparenza sano,
-    // e senza EPS non c'e' modo di sapere che l'utile per azione e' NEGATIVO (-0,04). Per gli
-    // altri cinque titoli senza P/E il segno lo davano ROE o margine, per BE no. La convenzione
-    // della tabella e' "P/E = '—' quando EPS<0 per igiene matematica": togliere EPS rendeva quel
-    // trattino ambiguo fra "dato mancante" e "societa' in perdita". P/E resta tolto: quello e'
-    // davvero duplicato in ANALISI FONDAMENTALE per tutti e 25 i titoli.
-    const TAGLIA_WL = new Set([2, 3, 6, 19]);
-    const proietta = (riga) => {
-      const c = riga.split("|");
-      return c.filter((_, i) => !TAGLIA_WL.has(i)).join("|");
-    };
-    lines.push(proietta(head)); lines.push(proietta(sep));
-    DATA.watchlist.forEach(r => lines.push(proietta(mdRow(r))));
-    // correlazione dei candidati watchlist vs il portafoglio ESISTENTE (per la regola n.2)
-    const wlCorr = (DATA.watchlist || []).filter(r => r.avg_corr != null || r.max_corr != null);
-    if (wlCorr.length) {
-      lines.push("· Correlazione dei candidati watchlist vs il portafoglio attuale (per la regola CORRELAZIONE E SOVRAESPOSIZIONE): " +
-        wlCorr.map(r => `${r.ticker} media ${fmtNum.format(r.avg_corr)}${r.max_corr != null ? `, max ${fmtNum.format(r.max_corr)} con ${r.max_corr_with}` : ""}`).join(" · ") + ".");
-    }
-  }
-  lines.push("");
-  // ANALISI FONDAMENTALE DETTAGLIATA per ticker
-  // Universo = STESSO predicato del FONDAMENTALE PROFONDO (isEquity): le due tabelle fondamentali
-  // devono coprire gli STESSI titoli. Prima il filtro era `r.stats?.market_cap`: quando l'API
-  // azzerava il market_cap di un nome che aveva comunque P/E/ROE/PEG (capitava su AMD/MU/CRM),
-  // la riga spariva SOLO da qui — senza conteggio-guardia che se ne accorgesse — mentre restava
-  // nel PROFONDO. Ora l'inclusione non dipende dal market_cap (serve solo al P/FCF, che diventa
-  // "—" se manca) e il conteggio "N TITOLI → N righe" fa scattare l'invariante I4 su ogni drop.
-  const fundItems = [...(DATA.portfolio || []), ...(DATA.watchlist || [])].filter(isEquity);
-  if (fundItems.length) {
-    lines.push(`ANALISI FONDAMENTALE DETTAGLIATA — ${fundItems.length} TITOLI → ${fundItems.length} righe (valutazione e qualità per le tue raccomandazioni; deve coprire gli stessi titoli del FONDAMENTALE PROFONDO):`);
-    // v193 — P/E FORWARD ACCANTO AL TRAILING. Il CEO ha chiesto se i P/E fossero "sballati":
-    // AMD 175×, PLTR 138×, CBRS 433×. I conti tornano (prezzo/EPS combacia), ma il payload
-    // pubblicava SOLO il trailing, che usa l'utile GAAP degli ultimi 12 mesi — depresso da
-    // ammortamenti e straordinari. Il forward degli stessi titoli e' 38×, 59× e 208×. Il campo
-    // stats.forward_pe era gia' in data.json e non compariva da nessuna parte: un dato non
-    // sbagliato ma INCOMPLETO, che faceva sembrare rifiutabile per prezzo un titolo che il
-    // mercato prezza su utili attesi molto piu' alti.
-    lines.push("| Titolo | P/E TTM | P/E fwd | P/FCF | EV/EBITDA | ROE | Marg.netto | Cresc.ricavi | P/B | PEG | Altman Z'' | Div% | Buyback% | Note |");
-    lines.push("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|");
-    fundItems.forEach(r => {
-      const st = r.stats || {};
-      const pfcf = st.market_cap && st.fcf && st.fcf > 0 ? Math.round(st.market_cap / st.fcf * 10) / 10 : null;
-      const peTtm2 = st.pe_ttm || r.pe;
-      const fcfWarn = pfcf != null && peTtm2 > 0 && pfcf > peTtm2 * 2 ? " [!FCF]" : "";
-      const roeTag = st.roe != null && st.roe > 0.15 ? " [ROE>15%]" : "";
-      const wlTag = DATA.portfolio.find(p => p.ticker === r.ticker) ? "" : " [WL]";
-      // Altman Z-Score + flag [RISCHIO DEFAULT] se <1,81
-      // quando il trailing e' molto sopra il forward, l'utile GAAP corrente NON e' la base su
-      // cui il mercato sta prezzando: dirlo evita di leggere un P/E alto come "caro".
-      const peFwd = st.forward_pe > 0 ? st.forward_pe : null;
-      const gapTag = (peFwd && peTtm2 > 0 && peTtm2 / peFwd >= 2) ? " [GAAP DEPRESSO]" : "";
-      const zTag = st.altman_z != null && st.altman_z < 1.81 ? " [RISCHIO DEFAULT]" : "";
-      const zCell = st.altman_z != null ? fmtNum.format(st.altman_z) + zTag + (st.altman_missing ? " (proxy)" : "") : "n.d.";
-      // [BILANCI VALUTA LOCALE]: la pipeline ha nullato P/B, EV/EBITDA e P/FCF perché i bilanci
-      // sono in valuta diversa dal prezzo (ADR tipo TSM) — senza il tag i "—" sembrano buchi dati
-      const fxTag = st.cross_currency ? " [BILANCI VALUTA LOCALE]" : "";
-      const noteTags = [roeTag.trim(), fcfWarn.trim(), zTag.trim(), fxTag.trim(), gapTag.trim()].filter(Boolean).join(" ");
-      lines.push(`| ${r.ticker}${wlTag} | ${peTtm2 > 0 ? fmtNum.format(Math.round(peTtm2 * 10) / 10) + "×" + gapTag : "—"} | ${peFwd ? fmtNum.format(Math.round(peFwd * 10) / 10) + "×" : "—"} | ${pfcf ? fmtNum.format(pfcf) + "×" + fcfWarn : "—"} | ${st.ev_ebitda ? fmtNum.format(Math.round(st.ev_ebitda * 10) / 10) + "×" : "—"} | ${st.roe ? pctOf(st.roe) + roeTag : "—"} | ${st.profit_margin ? pctPlain(st.profit_margin) : "—"} | ${st.revenue_growth ? pctOf(st.revenue_growth) : "—"} | ${st.price_to_book ? fmtNum.format(Math.round(st.price_to_book * 10) / 10) + "×" : "—"} | ${st.peg > 0 ? fmtNum.format(Math.round(st.peg * 100) / 100) : "n.d."} | ${zCell} | ${st.dividend_yield ? pctPlain(st.dividend_yield) : "—"} | ${st.buyback_yield != null ? signTxt(Math.round(st.buyback_yield * 1000) / 10) + (st.buyback_yield < -0.005 ? " [DILUISCE]" : "") : "—"} | ${noteTags} |`);
-    });
-    lines.push("([GAAP DEPRESSO]=il P/E trailing è almeno il DOPPIO del forward: l'utile GAAP degli ultimi 12 mesi è compresso da ammortamenti/straordinari e NON è la base su cui il mercato prezza — leggere il P/E fwd accanto; [ROE>15%]=Return on EQUITY oltre il 15% — NB: è ROE, non ROIC: su società con molta leva o buyback aggressivi il denominatore (patrimonio netto) si comprime e il valore si gonfia, quindi NON coincide con la qualità del capitale investito; [!FCF]=P/FCF >> P/E → controllare accrual/earnings quality; [RISCHIO DEFAULT]=Altman Z''<1,81, flag prudenziale del mandato — Z'' è la variante non-manifatturieri (6.56·WC/TA+3.26·RE/TA+6.72·EBIT/TA+1.05·MVE/TL, senza Sales/TA), cutoff canonici <1,1 distress / >2,6 solido; P/E TTM='—' con EPS<0 per igiene matematica; [BILANCI VALUTA LOCALE]=ADR con bilanci in valuta diversa dal prezzo: P/B, EV/EBITDA e P/FCF nullati a monte perché a unità miste — i '—' su quelle colonne NON sono buchi dati; [WL]=watchlist; Buyback%=riacquisti NETTI delle emissioni / market cap dall'ultimo cashflow annuale — discriminante growth: >0 restituisce capitale riducendo le azioni, [DILUISCE]=emissioni>riacquisti, tipico SBC pesante che erode l'EPS per azione)");
-    if (DATA.sanity_filtered > 0) lines.push(`[!ANOMALIE FILTRATE DAL SANITY CHECK: ${DATA.sanity_filtered} — valori palesemente errati delle API (P/E assurdi, variazioni impossibili) sono stati rimossi a monte: i dati qui presenti sono già puliti]`);
-    lines.push("");
-  }
-  // contesto economia USA (stile Macrotrends): P/E mercato, tassi Fed, inflazione, PIL, curva
-  const usEco = [];
-  if (m.sp500_pe) usEco.push(`P/E S&P 500 ${m.sp500_pe.current}×${m.sp500_pe.avg_10y != null ? ` (media 10A ${m.sp500_pe.avg_10y}×)` : ""}${m.sp500_pe.nasdaq_pe ? `, P/E Nasdaq 100 ${m.sp500_pe.nasdaq_pe}×` : ""}`);
-  if (m.fed_market) usEco.push(`tasso Fed ${m.fed_market.current_rate}%`);
-  const cpiI = (m.indicators || []).find(i => i.key === "cpi");
-  const pceI = (m.indicators || []).find(i => i.key === "pce");
-  if (cpiI) usEco.push(`inflazione CPI ${cpiI.value}`);
-  if (pceI) usEco.push(`PCE ${pceI.value}`);
-  if (m.yield_recession?.gdp_last != null) usEco.push(`PIL reale YoY ${signTxt(m.yield_recession.gdp_last)}`);
-  if (m.yield_recession?.current_curve != null) usEco.push(`curva 10A-2A ${signTxt(m.yield_recession.current_curve)} pp`);
-  // CONTESTO ECONOMIA USA: RIMOSSO dal payload (v184). Verificato numero per numero: P/E S&P e
-  // Nasdaq stanno in ROTAZIONE SETTORIALE, tasso Fed / CPI / PCE / curva 10A-2A in QUADRO MACRO,
-  // e il PIL reale YoY compariva DUE VOLTE con formati diversi ("+2,68%" qui, "2.68%" nella riga
-  // Curva vs Recessione) — cioè lo stesso dato che si presentava come due dati.
-  void usEco;
   // DATA QUALITY REPORT: i dati flaggati dalle assertions vengono dichiarati PRIMA del quadro
   // macro, con l'ordine esplicito di fare double-check web su ciò che è datato/inaffidabile
   if (!dqV.ok) {
@@ -8279,7 +5446,8 @@ function buildPrompt() {
   }
   lines.push("QUADRO MACRO:");
   if (m.risk_sentiment) lines.push(`- Sentiment globale: ${m.risk_sentiment.label} (${m.risk_sentiment.score}/100)`);
-  if (m.thermometer) lines.push(`- Termometro tecnico del portafoglio: ${m.thermometer.label} (${m.thermometer.score}/100)`);
+  /* v256 — "Termometro tecnico del portafoglio" tolto: era un punteggio calcolato sui
+     titoli in portafoglio, non un dato macro. Senza libro non misura niente. */
   if (m.fear_greed) {
     let fgl = `- Fear & Greed: ${m.fear_greed.score} (${FG_LABELS[m.fear_greed.rating] || m.fear_greed.rating}), 1 settimana fa ${m.fear_greed.week_ago}, 1 mese fa ${m.fear_greed.month_ago}${m.fear_greed.year_ago ? `, 1 anno fa ${m.fear_greed.year_ago}` : ""}`;
     if ((m.fear_greed.components || []).length) fgl += ` [componenti: ${m.fear_greed.components.map(c => `${c.label} ${c.rating}${c.score != null ? ` ${c.score}` : ""}`).join("; ")}]`;
@@ -8434,28 +5602,9 @@ function buildPrompt() {
    ⚠ Non si INVENTA un dato piu' fresco: si dichiara l'eta' e si nomina l'evidenza contraria che
    il payload gia' contiene. La differenza fra un dato vecchio spacciato per attuale e un dato
    vecchio dichiarato tale e' tutta la fiducia che si puo' avere nel sistema. */
-function etaLeva(md) {
-  try {
-    const d = new Date(String(md.date).slice(0, 10) + "T00:00:00");
-    if (isNaN(d)) return null;
-    const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
-    return Math.round((oggi - d) / 86400000);
-  } catch { return null; }
-}
 /* il KOSPI come testimone: e' l'indice dove la leva retail e' piu' visibile, e il payload lo
    porta gia' fra gli anticipatori. Qui si legge il suo DRAWDOWN, non il movimento di giornata:
    un unwind e' una discesa profonda, non una seduta storta. */
-function testimoneLeva() {
-  const k = (DATA?.watchlist || []).find(r => r.ticker === "^KS11" || r.ticker === "KOSPI");
-  if (!k) return null;
-  /* ⚠ il campo si chiama `w52_dist_pct`, non `drawdown_52w`: il nome va LETTO dal file, non
-     indovinato. Con la chiave sbagliata la funzione tornava null e il testimone non compariva
-     mai — un ramo silenziosamente morto, la classe v234. */
-  const dd = k.w52_dist_pct != null ? Number(k.w52_dist_pct) : null;
-  if (dd == null || isNaN(dd)) return null;
-  const m1 = k.rs_ndx_1m != null ? Number(k.rs_ndx_1m) : null;
-  return { dd, m1 };
-}
     /* v249 — MARGIN DEBT FUORI DAL PAYLOAD, su dubbio del CEO: "forse è troppo datato e
        diventa fuorviante per l'analisi". Aveva ragione, e la misura lo conferma: la rilevazione
        è di 68 giorni (FINRA pubblica il mese M nella terza settimana di M+1, quindi giugno È il
@@ -8647,49 +5796,13 @@ function testimoneLeva() {
   if (m.fed_market) lines.push(`- Fed Funds Rate attuale: ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}); tasso>4% storicamente comprime i multipli P/E in 12-18 mesi`);
   // 4 streghe SOLO se imminenti (v138): a >30 giorni è rumore senza valore operativo
   if (m.witching && m.witching.days != null && m.witching.days < 30) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg — volumi record e prezzo "attratto" dai muri di opzioni: prudenza sugli ordini a ridosso)`);
-  // salute del portafoglio (blend tecnica + macro + fondamentale)
-  if (typeof portfolioHealthScore === "function") {
-    const ph = portfolioHealthScore();
-    if (ph != null) {
-      const parts = (typeof portfolioHealthParts === "function") ? portfolioHealthParts() : [];
-      lines.push(`- Salute del portafoglio (blend): ${ph}/100${parts.length ? ` [${parts.map(p => `${p[0]} ${p[1]}`).join("; ")}]` : ""}`);
-    }
-  }
-  // concentrazione per settore (utile per il de-risking)
-  const alloc = DATA.allocation || [];
-  if (alloc.length) {
-    const tot = alloc.reduce((s, a) => s + (a.value_eur || 0), 0) || 1;
-    const bySec = {};
-    alloc.forEach(a => { const k = a.sector || a.ticker; bySec[k] = (bySec[k] || 0) + (a.value_eur || 0); });
-    const secs = Object.entries(bySec).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${Math.round(v / tot * 100)}%`);
-    // ⚠ v222 — questa riga finiva con "portafoglio fortemente sbilanciato sul tech/semi →
-    // priorità al de-risking": un ORDINE dentro il payload, che deve portare solo FATTI (il
-    // detector C9 non l'ha preso perché cerca imperativi in SECONDA PERSONA e quello era un
-    // sostantivo). In v221 avevo tolto l'ordine ma scritto la SPIEGAZIONE dentro il payload —
-    // che è lo stesso errore due volte: la nota spiegava un difetto a chi legge il prompt,
-    // e ripeteva pure la frase incriminata. La spiegazione vive qui, nel codice.
-    lines.push(`- Concentrazione per settore (% del PATRIMONIO TOTALE, liquidità e obbligazioni incluse, somma 100%): ${secs.join(" · ")}. NB: la "regola correlazione >25%" nelle METRICHE DI RISCHIO usa invece la % del solo capitale azionario — denominatore diverso, non un'incoerenza.`);
-  }
-  // IDEE DI ROTAZIONE (v144): compounder di qualità ESTERNI al portafoglio, dai settori in
-  // accelerazione — la materia prima POSITIVA per rompere la monocultura tech. Dati reali dal
-  // motore (ROE, RS, PEG): l'LLM le VALUTA, non le esegue (vanno prima messe in watchlist).
-  const scr = DATA.screener || [];
-  if (scr.length) {
-    lines.push("");
-    lines.push("IDEE DI ROTAZIONE (screening automatico — compounder ad alta ROE (non ROIC: vedi nota della tabella fondamentale) ESTERNI al portafoglio, dai settori che stanno ACCELERANDO; servono a de-concentrare la monocultura tech/semi con nomi a bassa correlazione. NON sono ordini né candidati: sono nomi ESTERNI al portafoglio, non ancora passati dal motore né dai veti):");
-    lines.push("| Titolo | Settore (ETF 1M) | Prezzo | 1M | RS 1M vs NDX | ROE | Cresc.ricavi | Fwd P/E | PEG | Upside target | RSI |");
-    lines.push("|---|---|---|---|---|---|---|---|---|---|---|");
-    scr.forEach(r => lines.push(`| ${r.name} (${r.ticker}) | ${r.sector_name}${r.sector_m1 != null ? ` (${signTxt(r.sector_m1)})` : ""} | $${fmtNum.format(r.price)} | ${signTxt(r.m1_pct)} | ${r.rs_ndx_1m != null ? signTxt(r.rs_ndx_1m, "pp") : "—"} | ${r.roe_pct != null ? signTxt(r.roe_pct) : "—"} | ${r.rev_growth_pct != null ? signTxt(r.rev_growth_pct) : "—"} | ${r.forward_pe ?? "—"} | ${r.peg ?? "—"} | ${r.target_upside_pct != null ? signTxt(r.target_upside_pct) : "—"} | ${r.rsi ?? "—"} |`));
-  }
-  // statistiche di performance dal broker
-  if (DATA.broker) {
-    const b = DATA.broker;
-    const pf = [];
-    if (b.ytd_pct != null) pf.push(`YTD ${signTxt(b.ytd_pct)}`);
-    if (b.y1_pct != null) pf.push(`1 anno ${signTxt(b.y1_pct)}`);
-    if (b.inception_pct != null) pf.push(`dall'inizio ${signTxt(b.inception_pct)}`);
-    if (pf.length) lines.push(`- Performance storica (broker): ${pf.join(" · ")}`);
-  }
+  /* v256 — QUATTRO BLOCCHI RELATIVI AL PORTAFOGLIO TOLTI DAL QUADRO MACRO: salute del
+     portafoglio (blend), concentrazione per settore, IDEE DI ROTAZIONE (screening di
+     compounder "ESTERNI al portafoglio": senza un portafoglio, "esterni" non significa
+     niente) e performance storica del broker. Sono sopravvissuti al taglio grande perché
+     stavano DENTRO il blocco macro, non prima: è la classe v201-v204, un vicino che resta
+     in piedi perché il confine gli passa accanto invece che addosso. */
+
   // liquidità e capitale
   // "controvalore (mark-to-market)", NON "capitale investito": la SITUAZIONE PATRIMONIALE usa
   // già "capitale investito (costo)" per il costo storico — stesso nome per due grandezze
@@ -8706,17 +5819,10 @@ function testimoneLeva() {
     lines.push("MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):");
     DATA.predictions.forEach(p => { const d = pmDelta7(p.question, p.yes); lines.push(`- ${p.question}: ${p.yes}% [Δ7g ${d == null ? "—" : (d > 0 ? "+" : "") + d + "pp"}]`); });
   }
-  lines.push("");
-  lines.push("ULTIME NEWS (sentiment | titolo | fonte · tono aggregato nella SINTESI NEWS):");
-  (DATA.news || []).slice(0, 12).forEach(n => {
-    const s = n.sentiment === "bull" ? "[POS]" : n.sentiment === "bear" ? "[NEG]" : "[NEU]";
-    lines.push(`- ${s} [${n.tickers.join(",")}] ${n.title} (${n.source})`);
-  });
-  lines.push("");
-  // Le news per singolo titolo NON si duplicano qui (v145 anti-bloat): vivono nel blocco
-  // "NEWS VERTICALE PER TITOLO ATTIVO" più sotto — stessa fonte, titoli in italiano, flag [ptf]
-  // e Deduzione Zero. Un solo posto = meno token, niente doppione da riconciliare per l'LLM.
-  lines.push("");
+  /* v256 — ULTIME NEWS fuori dal payload: le news escono dal sistema con il portafoglio.
+     La lettura delle notizie su un singolo nome torna, quando serve, dall'analisi spot del
+     titolo — dove l'LLM le cerca sul mercato vivo invece di leggerle da uno snapshot su cron. */
+
   // v180 — PROMEMORIA FINALE RIMOSSO: era un secondo esemplare della testata. Tutti e sei i suoi
   // concetti (ordini a limite, niente domande in chiusura, violazioni dichiarate, assunzione
   // quando un dato manca, forma libera, verifica dei dati datati) sono gia' in [A2] e [D], e
@@ -8780,26 +5886,6 @@ const dgPercentile = (arr, v) => {   // posizione % di v nel range della serie
 };
 
 /* ---------- fondamentale PROFONDO: CAGR pluriennale dai bilanci già in pipeline ---------- */
-function titleDeepData(r) {
-  const s = r.stats || {};
-  const fin = Array.isArray(r.financials) ? [...r.financials].sort((a, b) => a.year - b.year) : [];
-  let revCagr = null, niCagr = null, span = null;
-  if (fin.length >= 2) {
-    const a = fin[0], b = fin[fin.length - 1];
-    span = b.year - a.year;
-    const cagr = (x, y) => (x > 0 && y > 0 && span > 0) ? (Math.pow(y / x, 1 / span) - 1) : null;
-    revCagr = cagr(a.revenue, b.revenue);
-    niCagr = cagr(a.net_income, b.net_income);        // utili: solo se entrambi positivi (cagr lo garantisce)
-  }
-  const epsG = (s.eps_ttm > 0 && s.eps_forward > 0) ? s.eps_forward / s.eps_ttm - 1 : null;
-  // efficienza pluriennale: divergenza CAGR utili − CAGR ricavi = leva operativa (se >0) o
-  // erosione margini (se <0). Altman Z'' = distanza dal distress (variante non-manifatturieri).
-  const effGap = (revCagr != null && niCagr != null) ? dgPct(niCagr - revCagr) : null;
-  return { tk: r.ticker, span, revCagr: dgPct(revCagr), niCagr: dgPct(niCagr),
-           revYoY: dgPct(s.revenue_growth), epsG: dgPct(epsG), effGap,
-           altman: dgFin(s.altman_z), fwdPe: dgFin(s.forward_pe), peg: dgFin(s.peg),
-           upside: dgPct((s.target_mean > 0 && r.price > 0) ? s.target_mean / r.price - 1 : null) };
-}
 
 /* ---------- DIGEST STORICI: le serie che i popup disegnano, tradotte in numeri ----------
    Un analista guarda le TRAIETTORIE (pendenza, percentile nel range, inversioni), non i livelli:
@@ -8849,249 +5935,40 @@ function buildHistoricalDigests() {
 /* CINEMATICA per-titolo (v131): derivate reali da metrics_history. I titles per-titolo esistono
    dai run dell'11/07 → il lookback dev'essere TITOLATO (nearest snapshot con dati per quel ticker),
    altrimenti cade prima che i titles esistano e la derivata risulta "vuota" (bug del placeholder). */
-function titleKinematics(tk) {
-  const titled = (DATA.metrics_history || []).filter(s => s && s.titles && s.titles[tk]);
-  if (titled.length < 2) return { drs7: null, drs30: null, dmcr7: null, mcr: titled[0] ? dgFin(titled[0].titles[tk].mcr) : null, span: titled.length };
-  const cur = titled[titled.length - 1].titles[tk];
-  const back = (days) => { const target = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
-    let best = null; for (const s of titled) if (s.date <= target) best = s; return best; };
-  const b7 = back(7) || titled[0];                 // <7g di storico → il più vecchio titolato (finestra reale <7g)
-  const b30 = back(30);
-  const d = (a, b) => (dgFin(a) != null && dgFin(b) != null) ? Math.round((a - b) * 10) / 10 : null;
-  return {
-    drs7: (b7 && b7 !== titled[titled.length - 1]) ? d(cur.rs, b7.titles[tk].rs) : null,
-    drs30: (b30 && b30.titles[tk]) ? d(cur.rs, b30.titles[tk].rs) : null,
-    dmcr7: (b7 && b7 !== titled[titled.length - 1]) ? d(cur.mcr, b7.titles[tk].mcr) : null,
-    mcr: dgFin(cur.mcr), span: titled.length,
-  };
-}
 /* percentile del prezzo nel range 52 settimane (da sparks.y1: dove sta OGGI tra minimo e massimo) */
-function price52wPct(r) {
-  const y1 = Array.isArray(r.sparks && r.sparks.y1) ? r.sparks.y1.map(dgFin).filter(x => x != null) : [];
-  if (y1.length < 10 || !(r.price > 0)) return null;
-  const lo = Math.min(r.price, ...y1), hi = Math.max(r.price, ...y1);
-  return hi > lo ? Math.round((r.price - lo) / (hi - lo) * 100) : null;
-}
 /* trend multi-orizzonte + cinematica per titolo */
-function sparkTrendRows() {
-  const rows = [];
-  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) {
-    if (!r || r.currency !== "USD" || !(r.price > 0)) continue;
-    const sp = r.sparks || {};
-    // ogni orizzonte richiede abbastanza barre da COPRIRLO davvero: su un titolo appena quotato
-    // (es. SKHY) le serie sono troncate e 1S=1M=3M darebbero lo STESSO numero (falso multi-orizzonte).
-    const tr = (k, minLen) => { const a = Array.isArray(sp[k]) ? sp[k].map(dgFin).filter(x => x != null) : [];
-      return a.length >= minLen ? (a[a.length - 1] / a[0] - 1) * 100 : null; };
-    const w1 = tr("w1", 4), m1 = tr("m1", 18), m3 = tr("m3", 50), y1 = tr("y1", 45);
-    if ([w1, m1, m3, y1].every(v => v == null)) continue;
-    const kin = titleKinematics(r.ticker);
-    // REGIME DI VARIANZA per titolo: MCR che SALE (rischio che si concentra) mentre la RS SCENDE
-    // (forza relativa che degrada) = cinematica in deterioramento PRIMA che il supporto ceda.
-    // ⚠deg = degradazione cinematica REALE (MCR che sale + RS che decelera), non rumore. Prima
-    // bastava drs7<0 e scattava su -0,3pp (META) — contraddicendo la soglia di rilevanza 3pp che
-    // il payload dichiara altrove. Ora la decelerazione dev'essere RILEVANTE per la STESSA soglia:
-    // un ⚠deg significa "entrambi i lati materiali", quindi affidabile come pre-allarme.
-    const degrade = kin.dmcr7 != null && kin.dmcr7 > 0 && kin.drs7 != null && kin.drs7 <= -RS_VEL_RILEVANTE_PP;
-    rows.push({ tk: r.ticker, w1, m1, m3, y1, held: !!r.qty,
-                short: [w1, m1, m3, y1].filter(v => v != null).length < 2,
-                pct52: price52wPct(r), ...kin, degrade });
-  }
-  return rows;
-}
 
 /* news mappate al singolo titolo attivo (100% dei titoli): usa i tag ticker già nel feed */
-function activeTitleNews() {
-  const news = DATA.news || [];
-  const out = [];
-  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) {
-    if (!r || r.currency !== "USD" || !(r.price > 0)) continue;
-    const hits = news.filter(n => Array.isArray(n.tickers) && n.tickers.includes(r.ticker)).slice(0, 3);
-    out.push({ tk: r.ticker, held: !!r.qty, hits });
-  }
-  return out;
-}
 
 /* EXECUTIVE BRIEF (v131): Δ dall'ultimo storico + priorità operativa — l'orientamento in cima
    che trasforma il dump in un brief. Solo INPUT per l'analisi, NON decisioni (quelle le prende Claude). */
-function buildExecutiveDelta() {
-  // v159 — a mercato CHIUSO "oggi" non esiste: i prezzi sono quelli dell'ultima seduta e il Δ dal run
-  // precedente è ~0 per costruzione. Etichettare quei numeri "oggi" (e un Δ 0% come "non è cambiato
-  // nulla") contraddiceva il blocco CATALIZZATORI NON PREZZATI, che nello stesso payload elenca
-  // decine di novità. Il brief ora dichiara quale orologio sta leggendo.
-  const closedNow = !usRegularSessionOpen();
-  const dayLab = closedNow ? "ultima seduta" : "oggi";
-  const L = [`=== EXECUTIVE BRIEF — Δ dall'ultimo storico + priorità ${closedNow ? "per la prossima apertura" : "di oggi"} (INPUT per l'analisi, non decisioni) ===`];
-  const t = DATA.totals || {};
-  const mh = (DATA.metrics_history || []).filter(x => x);
-  // RENDIMENTI DEL BOOK cash-flow-neutral (da gain_pct), NON dai delta di eur_value: quella serie
-  // ha un break di definizione (cassa inclusa→esclusa, metà lug 2026) + i movimenti di cassa la
-  // inquinano → era la vera causa del paradosso "1S peggio di 1M" e del -8,35% sovrastimato.
-  const gps = mh.map(x => ({ d: x.date, g: dgFin(x.gain_pct) })).filter(x => x.g != null);
-  const dLast = gps.length >= 2 ? ((1 + gps[gps.length - 1].g / 100) / (1 + gps[gps.length - 2].g / 100) - 1) * 100 : null;
-  const d7 = bookReturnPct(mh, 7);
-  const fund1m = bookReturnPct(mh, 30);
-  // "Investito" = capitale MTM cassa ESCLUSA (eur_invested), NON eur_value (che include la cassa):
-  // prima la riga stampava il patrimonio TOTALE etichettato "Investito" e ci appiccicava delta
-  // calcolati sulla serie invested → doppio disallineamento.
-  const invested = Number.isFinite(t.eur_invested) ? t.eur_invested : (t.eur_value != null ? t.eur_value - (cashEur || 0) : null);
-  // Δ dal run precedente: a mercati chiusi è ~0 PER COSTRUZIONE (stessi prezzi) — dirlo, altrimenti
-  // "0%" si legge come "niente di nuovo" proprio mentre arrivano notizie non ancora prezzate.
-  // v186: la guardia scattava solo se il delta era GIA' ~0, cioe' proprio quando non serviva.
-  // A mercati chiusi un delta NON nullo e' l'anomalia da spiegare: non e' un movimento di
-  // prezzo (i prezzi sono fermi), e' l'arrivo progressivo delle barre di chiusura per titoli
-  // diversi. Presentarlo come "-0,41%" invitava a leggerlo come una perdita del weekend.
-  // seduta a cui e' prezzato il book ADESSO: e' l'unico elemento verificabile che si puo'
-  // offrire al lettore per capire da solo se lo scarto e' spiegato dalle barre.
-  const dateBook = [...new Set((DATA.portfolio || []).filter(r => r.qty && r.currency !== "EUR" && r.price_asof).map(r => r.price_asof))].sort();
-  const sedutaOra = dateBook.length === 1
-    ? ` — ora il book è prezzato tutto alla chiusura del ${new Date(dateBook[0] + "T00:00:00").toLocaleDateString("it-IT").slice(0, 5)}`
-    : dateBook.length > 1 ? ` — ora il book è prezzato su ${dateBook.length} sedute diverse (vedi l'avviso sopra)` : "";
-  const dLastTxt = !closedNow ? `Δ ultimo run ${signTxt(dLast)}`
-    : (dLast != null && Math.abs(dLast) >= 0.05)
-      // v189 — PRIMA QUESTA RIGA ASSERIVA LA CAUSA, e il sistema non la conosce.
-      // Il v186 diceva "questo scarto viene dall'arrivo della barra di chiusura": in quel caso
-      // era vero, ma il testo valeva per QUALUNQUE delta non nullo a mercati chiusi. Se domani
-      // lo scarto nascesse da una modifica delle posizioni, il payload dichiarerebbe con
-      // sicurezza una causa falsa — e una spiegazione sbagliata detta con certezza è peggio di
-      // nessuna spiegazione. Ora afferma solo ciò che SA (non è un movimento di prezzo, perché
-      // le borse sono chiuse) ed elenca le cause possibili senza sceglierne una. L'unico dato
-      // verificabile che può aggiungere lo aggiunge: a quale seduta è prezzato il book adesso.
-      ? `Δ ultimo run ${signTxt(dLast)} — NON è un movimento di mercato (a borse chiuse i prezzi sono fermi): nasce dall'aggiornamento dei DATI fra i due run. Le cause possibili sono l'arrivo della barra di chiusura per titoli che prima erano fermi alla seduta precedente, oppure una modifica delle posizioni; il sistema non distingue quale delle due, quindi non lo afferma${sedutaOra}`
-      : `Δ ultimo run ~0% (mercati CHIUSI: prezzi identici per costruzione — il nuovo di questo run NON è nei prezzi, è nelle notizie post-chiusura)`;
-  L.push(`· Investito €${invested != null ? fmtNum.format(Math.round(invested)) : "—"} (MTM, cassa esclusa · ${dLastTxt}, Δ~7g ${signTxt(d7)} — rendimento del book cash-neutral) · Sharpe ${dgTxt(t.portfolio_sharpe_ratio, "", 2)} · VIX ${dgTxt((DATA.macro || {}).vix && DATA.macro.vix.value, "", 1)} · cassa ${fmtEUR.format(Math.round(cashEur || 0))} · budget op. ${t.budget_operativo_spendibile != null ? fmtEUR.format(Math.round(t.budget_operativo_spendibile)) : "—"}`);
-  // BENCHMARK: UN SOLO indice su tutte le finestre — Nasdaq 100 (il mandato, memory "vs NDX"),
-  // via QQQ, l'unica serie NDX-family con spark w1/m1. Prima mescolava NDX (giorno) e Nasdaq
-  // COMPOSITE (settimana/mese): indici DIVERSI, alpha non confrontabili tra finestre.
-  const qqq = (DATA.top_etfs || []).find(r => r.ticker === "QQQ");
-  const ndxTr = (k) => { const a = ((qqq || {}).sparks || {})[k] || []; const xs = a.map(dgFin).filter(x => x != null);
-    return xs.length >= 2 ? (xs[xs.length - 1] / xs[0] - 1) * 100 : null; };
-  const bm = (DATA.macro || {}).benchmarks || {};
-  const ndxDay = (qqq && qqq.change_pct != null) ? qqq.change_pct : dgFin(bm.ndx);
-  const pday = typeof portfolioDayPct === "function" ? portfolioDayPct() : null;
-  const alphaDay = (pday != null && ndxDay != null) ? Math.round((pday - ndxDay) * 100) / 100 : null;
-  // v174 — ALPHA SU BASE COMPARABILE. Le finestre 1S/1M usano gain_pct = rendimento del BOOK
-  // INTERO in EUR (BTP ~15% a volatilità nulla incluso, cambio incluso) confrontato con un indice
-  // AZIONARIO in USD: grandezze non omogenee, e lo scarto è materiale in entrambe le direzioni
-  // (sul run del 26/07: l'alpha 1M passava da ≈0 a -2,9pp una volta reso comparabile).
-  // Qui si ricostruisce il rendimento del solo comparto AZIONARIO in USD dalle serie prezzi,
-  // pesato coi controvalori CORRENTI — assunzione dichiarata: se hai movimentato molto nella
-  // finestra, i pesi di oggi non sono quelli di allora.
-  const alphaEquity = (n) => {
-    const bench = ((DATA.watchlist || []).find(x => x.ticker === "^IXIC")
-      || (DATA.top_etfs || []).find(x => x.ticker === "QQQ") || {});
-    const bs = ((bench.sparks || {}).m6 || []).map(dgFin).filter(x => x != null);
-    if (bs.length <= n) return null;
-    const rendi = (a) => { const i = a.length - 1 - n; return i >= 0 ? a[a.length - 1] / a[i] - 1 : null; };
-    let num = 0, den = 0;
-    for (const r of (DATA.portfolio || [])) {
-      if (!r || r.currency !== "USD" || !(r.qty > 0)) continue;
-      const ss = ((r.sparks || {}).m6 || []).map(dgFin).filter(x => x != null);
-      const x = ss.length > n ? rendi(ss) : null;
-      if (x == null) continue;
-      const v = r.qty * r.price;
-      num += v * x; den += v;
-    }
-    const bm = rendi(bs);
-    if (!den || bm == null) return null;
-    return { ptf: num / den * 100, bm: bm * 100, alpha: (num / den - bm) * 100 };
-  };
-  const a1s = alphaEquity(5), a1m = alphaEquity(22);
-  const alphaOmogeneoPresente = !!(a1s || a1m);
-  if (a1s || a1m) {
-    L.push(`· ALPHA DEL PROCESSO (base OMOGENEA: solo comparto AZIONARIO in USD vs Nasdaq Composite, entrambi prezzi — niente BTP, niente cambio; ricostruito dalle serie prezzi ai controvalori CORRENTI, quindi approssimato se hai movimentato molto nella finestra): ${[
-      a1s ? `~1S azionario ${signTxt(Math.round(a1s.ptf * 100) / 100)} vs indice ${signTxt(Math.round(a1s.bm * 100) / 100)} → alpha ${signTxt(Math.round(a1s.alpha * 100) / 100, "pp")}` : null,
-      a1m ? `~1M azionario ${signTxt(Math.round(a1m.ptf * 100) / 100)} vs indice ${signTxt(Math.round(a1m.bm * 100) / 100)} → alpha ${signTxt(Math.round(a1m.alpha * 100) / 100, "pp")}` : null,
-    ].filter(Boolean).join(" · ")}. È QUESTO il verdetto sulla SELEZIONE dei titoli, ed è l'UNICO alpha del payload calcolato su basi omogenee (stesso comparto, stessa valuta, stesso tipo di prezzo). La riga BENCHMARK qui sotto misura un'altra cosa — il patrimonio intero, BTP e cambio compresi — e quando i due segni non coincidono NON è una contraddizione da risolvere: è la differenza fra 'ho scelto bene i titoli' e 'il mio patrimonio è cresciuto'.`);
-  }
-  L.push(`· BENCHMARK vs Nasdaq 100 (il mandato, proxy QQQ): ${dayLab} fondo ${signTxt(pday)} vs NDX ${signTxt(ndxDay)}${alphaDay != null ? ` (alpha ${signTxt(alphaDay, "pp")})` : ""} · ~1S fondo ${signTxt(d7)} vs NDX ${signTxt(ndxTr("w1"))} · ~1M fondo ${signTxt(fund1m)} vs NDX ${signTxt(ndxTr("m1"))} (⚠ BASI DIVERSE, non confrontare i tre alpha fra loro: "${dayLab}" è il solo comparto AZIONARIO in USD (BTP e cambio esclusi), mentre 1S e 1M sono il rendimento del book INTERO in EUR — quindi includono il BTP (~15% del book, volatilità ~0, che comprime meccanicamente il rendimento di periodo) e l'effetto cambio su un NAV per il 76% in USD non coperto. Il confronto col NDX, indice azionario in USD, è quindi indicativo sulle finestre lunghe: ${alphaOmogeneoPresente ? "⚠ questa riga NON è il verdetto sul processo — quello è la prima riga del brief, l'unica calcolata su base omogenea. Qui il SEGNO può dipendere dal BTP e dall'EUR/USD prima che dalla selezione dei titoli, quindi usala per il patrimonio, non per giudicare le scelte" : "⚠ in questo snapshot NON esiste un alpha su base omogenea (serie insufficienti), quindi questa riga è l'unica disponibile: leggila sapendo che il suo SEGNO può dipendere dal BTP e dall'EUR/USD prima che dalla selezione dei titoli"}. Finestre approssimate anche nel tempo: rilevazioni fondo vs sedute indice)`);
-  const v = decisionVerdict();
-  // v179 — il VERDETTO non apre piu il payload. Era un DUPLICATO: la stessa etichetta compare
-  // sotto in OUTPUT DEL MOTORE, li' pero' accompagnata dai criteri e dai veti che la giustificano.
-  // In cima, spogliata del ragionamento e con uno score a due cifre che il backtest non ha
-  // validato, faceva una cosa sola: ANCORARE su una conclusione prima di aver visto un solo dato.
-  // Entrambe le risposte LLM reali si sono strutturate attorno all'accettare o rifiutare quel
-  // verdetto: il payload decideva l'agenda del report. Restano i FATTI che impongono una
-  // decisione; il giudizio del motore si legge dove e' argomentato.
-  if ((v.withPlan || []).length) {
-    /* ⚠ v228 — ORDINARE E' GIA' UN GIUDIZIO (la ragione per cui v200 ha tolto la classifica).
-       La classifica era stata rimossa dal blocco FILTRI, che infatti dichiara "in ordine
-       alfabetico … questo blocco non classifica piu'" — ma l'ordine per punteggio era
-       SOPRAVVISSUTO qui e nel blocco dei livelli, che elencavano "GOOGL, AVGO, MSFT, AMZN, WDC"
-       mentre i FILTRI dicevano "AMZN, AVGO, GOOGL, MSFT, WDC". Stessa lista, due ordini: uno dei
-       due comunicava una preferenza che il sistema dichiara di non esprimere piu'. */
-    const nomi = v.withPlan.map(p => p.r.ticker).sort((a, b) => a.localeCompare(b));
-    L.push(`· Titoli che superano i filtri quantitativi (${nomi.length}, in ordine alfabetico): ${nomi.slice(0, 6).join(", ")}${nomi.length > 6 ? ", …" : ""} — soglie e veti nel blocco FILTRI QUANTITATIVI. Non è una classifica e non è una raccomandazione: è l'elenco di chi passa.`);
-  }
-  // PRIORITÀ = solo eventi che impongono una decisione (fatti databili). Il veto in portafoglio
-  // e' stato tolto: e' un GIUDIZIO del motore, non un evento, e vive gia' nel blocco motore.
-  const pri = [];
-  if (t.budget_operativo_spendibile != null && Math.round(t.budget_operativo_spendibile) <= 0)
-    pri.push(`⛔ BUDGET 0 — nessun acquisto eseguibile (ignora cassa/budget di run precedenti, A1)`);
-  const sh = (DATA.macro || {}).shock_alert;
-  if (sh && sh.active) pri.push(`🚨 SHOCK ${(sh.sources || []).map(s => `${s.src} ${signTxt(s.chg)}`).join("/")}`);
-  const sv = (v.stopViolations || []).map(x => x.r.ticker);
-  if (sv.length) pri.push(`⛔ stop violati: ${sv.join(", ")}`);
-  // stessa funzione della tabella: oggi = 0 giorni, e OGGI e' il caso piu' urgente, non il meno
-  const earn = (DATA.portfolio || []).filter(r => {
-    const g = giorniAllaTrimestrale(r.earnings_date); return r.qty && g != null && g >= 0 && g <= 7;
-  }).map(r => ({ tk: r.ticker, g: giorniAllaTrimestrale(r.earnings_date) }))
-    .sort((x, y) => x.g - y.g)                       // OGGI prima di domani: e' una riga di priorita'
-    .map(x => x.g === 0 ? `${x.tk} (OGGI)` : `${x.tk} (${x.g}g)`);
-  if (earn.length) pri.push(`📅 earnings ≤7g: ${earn.join(", ")}`);
-  const movers = sparkTrendRows().filter(r => r.drs7 != null).sort((a, b) => b.drs7 - a.drs7);
-  if (movers.length) pri.push(`RS Δ7g → top ${movers[0].tk} ${signTxt(movers[0].drs7, "pp")} / worst ${movers[movers.length - 1].tk} ${signTxt(movers[movers.length - 1].drs7, "pp")}`);
-  const degr = sparkTrendRows().filter(r => r.degrade).map(r => r.tk);
-  if (degr.length) pri.push(`⚠ cinematica in degrado (MCR↑ + RS↓): ${degr.join(", ")}`);
-  L.push("· PRIORITÀ: " + (pri.length ? pri.join(" · ") : "nessun evento forcing rilevato"));
-  return L.join("\n");
-}
+/* ⚠ v256 — marketLinkText() e buildExecutiveDelta() RIMOSSE. La prima costruiva il blocco
+   "CORRELAZIONI CALCOLATE — COSA MUOVE IL TUO PORTAFOGLIO OGGI": un join news↔settori↔POSIZIONI,
+   e tutte e sei le sue famiglie di divergenza (relapse, MCR, tema, accelerazione, stop, meta)
+   erano per-titolo. La seconda era il brief sul delta del NAV. Senza portafoglio e senza news
+   nessuna delle due ha più un ingresso.
+   ⚠ IL CEO HA CHIESTO DI TENERE "la relativa correlazione". Non poteva essere questa: si regge
+   sulle posizioni che ha appena tolto. La correlazione che sopravvive è quella FRA GLI
+   INDICATORI MACRO — dove famiglie che di solito si muovono insieme oggi dicono cose opposte —
+   ed è ciò che costruisce correlazioniMacro() qui sotto. Assunzione dichiarata, non nascosta. */
+
 
 /* ---------- testo per l'analisi AI: executive brief + prompt esistente + digest storici ---------- */
 function historicalDigestText() {
+  /* v256 — DIGEST SOLO MACRO. Cadono con il portafoglio: CINEMATICA & TREND PER TITOLO (32
+     righe di ticker), REGIME DI VARIANZA (MCR Top-3), NEWS VERTICALE PER TITOLO ATTIVO,
+     FONDAMENTALE PROFONDO. Restano le serie storiche macro — HY OAS, curva 10A-2A, VIX — che
+     sono la "lettura quantitativa dei grafici" per cui il blocco e' nato: pendenze, percentili
+     nel range, inversioni, calcolate da serie gia' in data.json. Null-safe: serie assente → "—". */
   const L = [];
-  L.push("=== ANALISI STORICA — LETTURA QUANTITATIVA DEI GRAFICI (traiettorie delle serie: usa pendenze e percentili, non solo i livelli) ===");
-  for (const d of buildHistoricalDigests()) L.push(`· ${d.label}: ${d.text}`);
-
-  const tr = sparkTrendRows();
-  if (tr.length) {
-    const top3 = tr.filter(r => r.held && r.mcr != null).sort((a, b) => b.mcr - a.mcr).slice(0, 3);
-    const top3sum = top3.reduce((s, r) => s + (r.mcr || 0), 0);
-    L.push(`CINEMATICA & TREND PER TITOLO — ${tr.length} TITOLI → ${tr.length} righe (variazione % nel range · Perc.52S = posizione del prezzo nel range 52 settimane · ΔRS = velocità della forza relativa vs NDX · ΔMCR = accelerazione della concentrazione del rischio · ⚠deg = MCR↑ con RS↓, cinematica in degrado PRIMA della rottura del supporto):`);
-    L.push("| Titolo | 1S | 1M | 3M | 1A | Perc.52S | ΔRS 7g | ΔRS 30g | ΔMCR 7g |");
-    L.push("|---|---|---|---|---|---|---|---|---|");
-    for (const r of tr) L.push(`| ${r.tk}${r.held ? " [ptf]" : ""}${r.degrade ? " ⚠deg" : ""}${r.short ? " [storia insuff.]" : ""} | ${signTxt(r.w1)} | ${signTxt(r.m1)} | ${signTxt(r.m3)} | ${signTxt(r.y1)} | ${dgTxt(r.pct52, "°", 0)} | ${r.drs7 != null ? signTxt(r.drs7, "pp") : "—"} | ${r.drs30 != null ? signTxt(r.drs30, "pp") : "— (storico <30g)"} | ${r.dmcr7 != null ? signTxt(r.dmcr7, "pp") : "—"} |`);
-    // REGIME DI VARIANZA a livello di portafoglio: concentrazione top-3 vs qualità (Sharpe) in trend
-    const shp = (DATA.metrics_history || []).map(x => dgFin(x && x.sharpe)).filter(x => x != null);
-    const dShp = shp.length >= 8 ? Math.round((shp[shp.length - 1] - shp[shp.length - 8]) * 100) / 100 : null;
-    if (top3.length) L.push(`REGIME DI VARIANZA: MCR Top-3 ${dgTxt(top3sum, "%", 0)} (${top3.map(r => r.tk).join("+")}) su Sharpe ptf ${dgTxt((DATA.totals || {}).portfolio_sharpe_ratio, "", 2)}${dShp != null ? ` (Δ7 ${signTxt(dShp, "")})` : ""} → concentrazione alta + qualità ${dShp != null && dShp < 0 ? "in deterioramento = fragilità della varianza (il rischio si addensa mentre il rendimento/rischio cala)" : "stabile"}.`);
-  }
-
-  const news = activeTitleNews();
-  const withNews = news.filter(n => n.hits.length);
-  if (news.length) {
-    // NB: lista, non tabella "| " → dicitura SENZA "— N TITOLI" per non innescare l'invariante I4 (righe=conteggio)
-    // Anti-bloat v145: elenco SOLO i titoli con news; i restanti in UNA riga (ticker + Deduzione Zero),
-    // invece di ~20 righe "TICKER: —" a segnale zero. L'istruzione Deduzione Zero resta esplicita.
-    const noNews = news.filter(n => !n.hits.length);
-    L.push(`NEWS VERTICALE PER TITOLO ATTIVO (${withNews.length}/${news.length} titoli attivi con news oggi · catalizzatori/rischi specifici):`);
-    for (const n of withNews) {
-      L.push(`  ${n.tk}${n.held ? " [ptf]" : ""}: ${n.hits.map(h => `[${(h.sentiment || "neu").slice(0, 3)}] ${h.title_it || h.title}`).join(" · ")}`);
-    }
-    if (noNews.length) L.push(`  Altri ${noNews.length} titoli attivi (${noNews.map(n => `${n.tk}${n.held ? " [ptf]" : ""}`).join(", ")}): nessuna news verticale oggi.`);
-  }
-
-  const deep = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
-    .filter(r => r && r.currency === "USD" && r.price > 0 && !/^[\^]/.test(r.ticker) && !/[=]F$|-USD$/.test(r.ticker))
-    .map(titleDeepData);
-  if (deep.length) {
-    // SOLO le colonne NUOVE non già in Tabella A/B (CAGR pluriennale + EPS ttm→fwd): PEG, crescita
-    // YoY, Fwd P/E e upside sono già nella tabella fondamentale e in Tabella A/B → tolte (anti-ridondanza).
-    L.push(`=== FONDAMENTALE PROFONDO — ${deep.length} TITOLI → ${deep.length} righe (efficienza PLURIENNALE — ciò che le tabelle YoY NON mostrano; EPS impl. = eps_forward/eps_ttm−1; Δeff = CAGR utili − CAGR ricavi, >0 = leva operativa / <0 = erosione margini. NB: l'Altman Z'' NON è ripetuto qui — è un dato puntuale, non pluriennale, e vive nella tabella ANALISI FONDAMENTALE con la sua metodologia e il flag [RISCHIO DEFAULT]) ===`);
-    L.push("| Titolo | CAGR ricavi | CAGR utili | Δeff (utili−ricavi) | EPS ttm→fwd |");
-    L.push("|---|---|---|---|---|");
-    for (const t of deep) L.push(`| ${t.tk} | ${dgTxt(t.revCagr, "%")}${t.span ? ` (${t.span}A)` : ""} | ${dgTxt(t.niCagr, "%")} | ${dgTxt(t.effGap, "pp")} | ${dgTxt(t.epsG, "%")} |`);
-  }
-  L.push("USO METODOLOGICO: il CAGR pluriennale e il YoY delle tabelle misurano cose diverse — un YoY gonfiato da un punto basso del ciclo (es. rimbalzo delle memorie) può convivere con un CAGR piatto, e in quel caso la crescita è ciclica, non strutturale. Sulle serie macro, sia i valori ESTREMI (HY OAS ai minimi del range, VIX ai minimi della sua distribuzione) sia le INVERSIONI DI TENDENZA (spread in allargamento, curva in dis-inversione) sono i due modi in cui questi indicatori hanno storicamente anticipato i punti di svolta.");
+  const righe = buildHistoricalDigests().filter(d => d && d.text && d.text !== "—");
+  if (!righe.length) return "";
+  L.push("=== ANALISI STORICA DELLE SERIE MACRO (traiettorie: pendenze, percentili nel range, inversioni) ===");
+  for (const d of righe) L.push(`\u00b7 ${d.label}: ${d.text}`);
+  L.push("USO METODOLOGICO: sulle serie macro sia i valori ESTREMI (HY OAS ai minimi del range, "
+       + "VIX ai minimi della sua distribuzione) sia le INVERSIONI DI TENDENZA (spread in "
+       + "allargamento, curva in dis-inversione) sono i due modi in cui questi indicatori hanno "
+       + "storicamente anticipato i punti di svolta.");
   return L.join("\n");
 }
 /* ═══════════════════ MOTORE DI CORRELAZIONE (v154) ═══════════════════
@@ -9151,379 +6028,196 @@ const NEWS_THEMES = [
     m: (en, it) => /antitrust|\bEU fine|probe into tech|privacy fine|alphabet|\bgoogle\b|\bmeta\b/i.test(en) || /antitrust|multe dell.UE|aziende tecnolog/i.test(it) },
 ];
 /* membri di un tema: predicato sui dati del titolo + eventuale seed semantico */
-function themeMembers(th, universe) {
-  const seed = THEME_SEED[th.id] || [];
-  const out = new Map();
-  for (const r of universe.values()) if (th.sel && th.sel(r)) out.set(r.ticker, r);
-  for (const t of seed) { const r = universe.get(t); if (r) out.set(t, r); }
-  return [...out.values()];
-}
 /* ultimo set di divergenze in forma strutturata (popolato da marketLinkText, letto dal CI) */
 let LAST_DIV_SIGNALS = [];
-function marketLinkText() {
-  const L = [];
-  const ptf = (DATA.portfolio || []).filter(isEquity);
-  // universo dei temi: equity + le ANCORE tematiche non-equity della watchlist (petrolio, crypto:
-  // servono a dare un bersaglio ai temi ENERGIA/CRYPTO). Gli INDICI (currency PTS o prefisso ^)
-  // restano fuori: sono benchmark, non posizioni tematizzabili.
-  const wl = (DATA.watchlist || []).filter(r => r && r.price > 0 && r.currency !== "PTS"
-    && !/^\^/.test(r.ticker || "") && (isEquity(r) || /[-=]/.test(r.ticker || "")));
-  const held = new Map(ptf.map(r => [r.ticker, r]));
-  const universe = new Map([...ptf, ...wl].map(r => [r.ticker, r]));
-  const wOf = (r) => positionWeightPct(r);
-  const rsOf = (r) => dgFin(r.rs_ndx_1m ?? r.rs_1m);
-  const mcrOf = (r) => dgFin(r.risk_contrib_pct);
-  const tag = (r) => {
-    const w = wOf(r), rs = rsOf(r), m = mcrOf(r);
-    const bits = [];
-    if (w != null) bits.push(`${fmtNum.format(w)}% NAV`);
-    if (m != null) bits.push(`MCR ${fmtNum.format(m)}%`);
-    if (rs != null) bits.push(`RS ${signTxt(rs, "pp")}`);
-    return `${r.ticker}${held.has(r.ticker) ? "" : " [wl]"}${bits.length ? ` (${bits.join(" · ")})` : ""}`;
-  };
 
-  // ── 1) TEMI DELLE NEWS → POSIZIONI TOCCATE ────────────────────────────────
-  const news = (DATA.news || []).filter(isRealNews);
-  /* v161 — CODA EDITORIALE fuori dal matching. I titoli arrivano con la fonte in coda
-     ("… - Reuters", "… - Kavout | AI"): il matcher /\bAI\b/ agganciava la SIGLA DELLA FONTE e
-     classificava come AI/DATACENTER una notizia sul rapporto occupazione, che finiva pure a fare
-     da titolo-esempio del tema più importante per questo book. Qui la coda si toglie prima del
-     match: segmento finale dopo " - " o " | ", corto e senza punteggiatura di frase, max 2 giri. */
-  const newsCore = (t) => {
-    let s = String(t || "");
-    for (let i = 0; i < 2; i++) {
-      const m = s.match(/^(.*?)\s+[-|]\s+([^-|]{1,30})$/);
-      if (!m || /[.!?;:]/.test(m[2])) break;
-      s = m[1];
-    }
-    return s;
-  };
-  // OROLOGIO DEL PREZZO (v158): quali news il prezzo ha GIÀ votato e quali no. Serve sia al blocco
-  // dei catalizzatori non prezzati sia a non dichiarare divergenze logicamente impossibili.
-  const split = newsSplitByClose();
-  const marketClosed = !usRegularSessionOpen();
-  const unpricedSet = new Set(split.unpriced.map(n => n.title));
-  const themed = [];
-  for (const th of NEWS_THEMES) {
-    const hits = news.filter(n => th.m(newsCore(n.title), newsCore(n.title_it)));
-    if (!hits.length) continue;
-    const nUnpriced = hits.filter(n => unpricedSet.has(n.title)).length;
-    let targets;
-    if (th.sel) targets = themeMembers(th, universe);
-    else {   // temi TASSI/GEOPOLITICA: colpiscono chi paga multiplo/beta — i più sensibili del book
-      targets = [...universe.values()]
-        .filter(r => (dgFin(r.beta_ndx) ?? 0) >= 1.5 || (dgFin(r.pe) ?? 0) >= 60)
-        .sort((a, b) => (dgFin(b.beta_ndx) ?? 0) - (dgFin(a.beta_ndx) ?? 0));
-    }
-    // le posizioni DETENUTE vanno prima e, fra queste, quelle che PESANO di più: la lista viene
-    // troncata a 8 e il taglio deve cadere sui nomi meno rilevanti, non su quelli che capitano
-    // ultimi nell'ordine di portafoglio (v163: ORCL, RS -23pp, veniva tagliato mentre restavano
-    // nomi a peso minore).
-    targets.sort((a, b) => (held.has(b.ticker) ? 1 : 0) - (held.has(a.ticker) ? 1 : 0)
-      || (wOf(b) ?? 0) - (wOf(a) ?? 0));
-    const inPtf = targets.filter(r => held.has(r.ticker));
-    if (!targets.length) continue;
-    const expo = inPtf.reduce((s, r) => s + (wOf(r) ?? 0), 0);
-    // l'esemplare del tema: prima una news che nomina un titolo dell'universo (segnale specifico),
-    // poi la più recente. hits[0] era l'ordine di arrivo del feed — arbitrario, e su AI/DATACENTER
-    // metteva in vetrina un falso positivo invece della notizia che muove il book.
-    // …ma il criterio dipende dal TIPO di tema: su un tema di titoli (SEMI, AI, CLOUD…) la news
-    // che cita un ticker è la più informativa; su un tema MACRO (TASSI, GEOPOLITICA — quelli senza
-    // predicato `sel`) citare un ticker non c'entra, e preferirlo metteva in vetrina un pezzo sul
-    // Bitcoin come esemplare del tema Fed. Lì vince semplicemente la notizia più recente.
-    // v163: il predicato guardava `universe`, che include per costruzione le ANCORE non-equity
-    // (BTC-USD, CL=F). Una news che cita SOLO il Bitcoin vinceva così il rango di "segnale
-    // specifico" sul tema DAZI (56% del NAV in semi), scavalcando per recency le notizie sulle
-    // tariffe: il tema più pesante del book veniva presentato con un titolo sul Bitcoin. Il
-    // predicato ora è relativo ai BERSAGLI DEL TEMA, non all'universo.
-    const tset = new Set(targets.map(r => r.ticker));
-    const ranked = hits.slice().sort((a, b) => {
-      const sp = (x) => (th.sel && (x.tickers || []).some(t => tset.has(t))) ? 1 : 0;
-      return sp(b) - sp(a) || String(b.published || "").localeCompare(String(a.published || ""));
+
+/* ═══ v256 — LA CORRELAZIONE CHE SOPRAVVIVE AL PORTAFOGLIO ═════════════════════════════════
+   Il CEO ha chiesto di tenere "i dati macro e la relativa correlazione". Quella vecchia era il
+   join news↔settori↔POSIZIONI: si regge su un portafoglio che non c'è più. Questa si regge
+   solo su dati macro, ed è la stessa sostanza — DUE NUMERI CHE RARAMENTE STANNO INSIEME.
+
+   Da dove viene, senza inventare niente:
+   · i quattro compositi che `data.json` pubblica CON I PROPRI COMPONENTI (macroquant 13,
+     fear_greed 7, risk_sentiment 5, smart_money 4). Un composito è una media: quando i suoi
+     componenti sono in disaccordo fra loro, quella media nasconde più di quanto mostri, e la
+     dispersione è il fatto che il numero singolo cancella;
+   · la classifica completa degli indicatori (`indicatoriClassifica`), sulla stessa scala
+     0-100 dove 100 è favorevole, per la fotografia d'insieme.
+   ⚠ NON si dichiara nessuna correlazione STORICA fra indicatori: nel file non ci sono serie
+   appaiate per calcolarla, e affermarla sarebbe la classe v240 (una soglia disegnata è
+   un'affermazione, e va sostenuta). Qui si misura solo il disaccordo di OGGI. */
+function correlazioniMacro() {
+  const m = (typeof DATA !== "undefined" && DATA && DATA.macro) || {};
+  const mediana = (a) => { const x = [...a].sort((p, q) => p - q); const n = x.length;
+    return n ? (n % 2 ? x[(n - 1) / 2] : (x[n / 2 - 1] + x[n / 2]) / 2) : null; };
+  const NOMI = { macroquant: "Ciclo economico", fear_greed: "Fear & Greed",
+                 risk_sentiment: "Sentiment globale", smart_money: "Istituzionali vs retail" };
+  const compositi = [];
+  for (const k of Object.keys(NOMI)) {
+    const v = m[k];
+    if (!v || !Array.isArray(v.components) || v.components.length < 3) continue;
+    const parti = v.components
+      .map(c => ({ nome: String(c.label || "").trim(), score: Number(c.score) }))
+      .filter(c => c.nome && Number.isFinite(c.score));
+    if (parti.length < 3) continue;
+    const punti = parti.map(c => c.score);
+    const min = Math.min(...punti), max = Math.max(...punti);
+    parti.sort((a, b) => a.score - b.score);
+    compositi.push({
+      key: k, nome: NOMI[k], score: Number(v.score),
+      n: parti.length, min, max, spread: max - min, mediana: mediana(punti),
+      peggiore: parti[0], migliore: parti[parti.length - 1], parti,
     });
-    const shownT = targets.slice(0, 8);
-    // `allTargets` = elenco COMPLETO: i detector di divergenza devono girare su questo, non sulla
-    // lista troncata per la stampa (altrimenti un nome tagliato non può generare segnale).
-    themed.push({ id: th.id, n: hits.length, nUnpriced, th, sample: newsCore(ranked[0].title_it || ranked[0].title).slice(0, 110),
-                  targets: shownT, allTargets: targets, expo,
-                  expoShown: shownT.filter(r => held.has(r.ticker)).reduce((s, r) => s + (wOf(r) ?? 0), 0),
-                  hiddenPtf: inPtf.length - shownT.filter(r => held.has(r.ticker)).length,
-                  inPtf: inPtf.length });
   }
-  themed.sort((a, b) => b.expo - a.expo || b.n - a.n);
-  if (themed.length) {
-    // v161 — ANTI-RIPETIZIONE: gli stessi titoli ricorrono in quasi tutti i temi, e stampare per
-    // ognuno "(peso NAV · MCR · RS)" ogni volta significava ripetere ~40 volte gli stessi numeri:
-    // 2-3k caratteri che DILUISCONO il segnale invece di aggiungerlo. Il tag completo si stampa
-    // alla PRIMA comparsa del titolo (dove informa davvero), poi basta il ticker.
-    const tagged = new Set();
-    const tagOnce = (r) => {
-      if (tagged.has(r.ticker)) return `${r.ticker}${held.has(r.ticker) ? "" : " [wl]"}`;
-      tagged.add(r.ticker); return tag(r);
-    };
-    L.push("· TEMI DELLE NEWS DI OGGI → LE TUE POSIZIONI ESPOSTE (il collegamento news↔book, che i ticker delle news NON danno · peso NAV/MCR/RS indicati alla prima comparsa di ogni titolo):");
-    for (const t of themed) {
-      const unp = (marketClosed && t.nUnpriced) ? ` · ⏰ ${t.nUnpriced}/${t.n} NON ancora prezzate` : "";
-      // v163: la % dichiarata è calcolata su TUTTI i detenuti del tema ma se ne stampano max 8 →
-      // la somma dei nomi visibili non tornava e il CIO trovava un dato che non quadra. Il resto
-      // ora è dichiarato esplicitamente invece di sparire in silenzio.
-      const extra = t.hiddenPtf > 0
-        ? ` (+${t.hiddenPtf} detenute non elencate: ${fmtNum.format(Math.round((t.expo - t.expoShown) * 10) / 10)}% del NAV)` : "";
-      L.push(`  [${t.id}] ${t.n} news${unp} · es. "${t.sample}" → ${t.targets.map(tagOnce).join(" · ")}${extra}${t.inPtf ? ` — esposizione in PTF ${fmtNum.format(Math.round(t.expo * 10) / 10)}% del NAV` : " — nessuna posizione detenuta (solo watchlist)"}`);
-    }
+  compositi.sort((a, b) => b.spread - a.spread);
+
+  const tutti = (typeof indicatoriClassifica === "function" ? indicatoriClassifica() : [])
+    .filter(x => Number.isFinite(x.score));
+  const punteggi = tutti.map(x => x.score);
+  const quadro = punteggi.length ? {
+    n: punteggi.length,
+    mediana: mediana(punteggi),
+    sotto50: punteggi.filter(x => x < 50).length,
+    sopra50: punteggi.filter(x => x > 50).length,
+    peggiori: tutti.slice(0, 3).map(x => ({ nome: x.nome, score: x.score })),
+    migliori: tutti.slice(-3).reverse().map(x => ({ nome: x.nome, score: x.score })),
+  } : null;
+  return { compositi, quadro };
+}
+
+/* il blocco per il pacchetto AI. FATTI, non istruzioni (regola C9). */
+function testoCorrelazioniMacro() {
+  const { compositi, quadro } = correlazioniMacro();
+  if (!compositi.length && !quadro) return "";
+  const L = [];
+  L.push("=== DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO ===");
+  L.push("(scala unica 0-100, 100 = favorevole agli attivi rischiosi. Il disaccordo e' misurato "
+       + "DENTRO ciascun composito, fra i componenti che la pipeline pubblica: e' l'informazione "
+       + "che la media cancella. Nessuna correlazione storica fra indicatori e' dichiarata: nel "
+       + "file non ci sono serie appaiate per calcolarla.)");
+  if (quadro) {
+    L.push(`- Quadro d'insieme: ${quadro.n} indicatori · mediana ${fmtNum.format(quadro.mediana)}/100 · `
+         + `${quadro.sotto50} sotto 50 e ${quadro.sopra50} sopra.`);
+    L.push(`  I tre piu' sfavorevoli: ${quadro.peggiori.map(x => `${x.nome} ${x.score}`).join(" · ")}`);
+    L.push(`  I tre piu' favorevoli: ${quadro.migliori.map(x => `${x.nome} ${x.score}`).join(" · ")}`);
   }
-
-  // ── 1-bis) CATALIZZATORI NON ANCORA PREZZATI (v158) ───────────────────────
-  // A mercato chiuso il prezzo è congelato alla campana: le news arrivate dopo NON sono nel prezzo.
-  // Sono le uniche che possono muovere la PROSSIMA apertura — e il payload prima non le distingueva
-  // dalle news già digerite, seppellendo un catalizzatore su misura del book in mezzo alle altre.
-  if (marketClosed && split.unpriced.length && split.close) {
-    const dt = split.close.at;
-    const dd = `${String(dt.getUTCDate()).padStart(2, "0")}/${String(dt.getUTCMonth() + 1).padStart(2, "0")}`;
-    // ogni news non prezzata → titoli toccati: prima i ticker espliciti della news, poi i temi
-    const rows = [];
-    const cut = (s, n) => { const x = String(s); if (x.length <= n) return x; const c = x.slice(0, n); const sp = c.lastIndexOf(" "); return (sp > n * 0.6 ? c.slice(0, sp) : c) + "…"; };
-    for (const n of split.unpriced) {
-      const en = newsCore(n.title), it = newsCore(n.title_it);
-      // una news che CITA il ticker vale molto più di un macro-tema che si sventaglia su mezzo book:
-      // la specificità è il criterio di ordinamento, non la sola esposizione.
-      const direct = (n.tickers || []).map(t => universe.get(t)).filter(r => r && held.has(r.ticker));
-      const ths = NEWS_THEMES.filter(t => t.m(en, it) && t.sel);
-      const viaTheme = ths.flatMap(t => themeMembers(t, held));
-      const hit = [...new Map([...direct, ...viaTheme].map(r => [r.ticker, r])).values()]
-        .filter(r => held.has(r.ticker))
-        .sort((a, b) => (direct.includes(b) ? 1 : 0) - (direct.includes(a) ? 1 : 0) || (wOf(b) ?? 0) - (wOf(a) ?? 0));
-      if (!hit.length) continue;                         // solo ciò che tocca il book: niente rumore macro
-      const expo = hit.reduce((s, r) => s + (wOf(r) ?? 0), 0);
-      const when = n.published ? new Date(n.published) : null;
-      const hhmm = when && !isNaN(when) ? `${String(when.getUTCDate()).padStart(2, "0")}/${String(when.getUTCMonth() + 1).padStart(2, "0")} ${String(when.getUTCHours()).padStart(2, "0")}:${String(when.getUTCMinutes()).padStart(2, "0")}Z` : "—";
-      const names = hit.slice(0, 4).map(r => `${r.ticker}${direct.includes(r) ? "◄citata" : ""} ${fmtNum.format(wOf(r) ?? 0)}%`).join(" · ");
-      // firma dei bersagli: più news macro che colpiscono ESATTAMENTE lo stesso gruppo si contano, non si ripetono
-      const sig = hit.map(r => r.ticker).join(",");
-      rows.push({ expo, sig, direct: direct.length > 0,
-        txt: `  ${hhmm} · "${cut(it || en, 105)}" → ${names}${hit.length > 4 ? ` +${hit.length - 4}` : ""} = ${fmtNum.format(Math.round(expo * 10) / 10)}% NAV${ths.length ? ` [${ths.map(t => t.id).join(", ")}]` : ""}` });
-    }
-    // prima le news che citano un mio titolo, poi per esposizione
-    rows.sort((a, b) => (b.direct ? 1 : 0) - (a.direct ? 1 : 0) || b.expo - a.expo);
-    const shown = [], dupCount = new Map();
-    for (const r of rows) {
-      const k = r.direct ? `direct:${r.txt}` : r.sig;
-      if (!r.direct && dupCount.has(k)) { dupCount.set(k, dupCount.get(k) + 1); continue; }
-      dupCount.set(k, 1); shown.push(r);
-    }
-    if (shown.length) {
-      L.push(`· ⏰ CATALIZZATORI NON ANCORA PREZZATI (${split.unpriced.length} news su ${split.total} pubblicate DOPO la chiusura del ${dd}: il prezzo che vedi NON le ha ancora viste). NON spiegano il passato — sono ciò che può muovere la PROSSIMA apertura, ed è qui che un ordine limite si vince o si perde. "◄citata" = la news nomina quel titolo (segnale specifico); senza, è esposizione tematica:`);
-      for (const r of shown.slice(0, 6)) {
-        const extra = !r.direct && dupCount.get(r.sig) > 1 ? `  (+${dupCount.get(r.sig) - 1} altre news sullo stesso gruppo)` : "";
-        L.push(r.txt + extra);
-      }
-      if (shown.length > 6) L.push(`  (+${shown.length - 6} altri gruppi non prezzati a impatto minore)`);
-    }
+  for (const c of compositi) {
+    L.push(`- ${c.nome}: ${fmtNum.format(c.score)}/100 come sintesi, ma i suoi ${c.n} componenti `
+         + `vanno da ${c.min} a ${c.max} (ampiezza ${c.spread} punti, mediana ${fmtNum.format(c.mediana)}). `
+         + `Lo tira giu' "${c.peggiore.nome}" a ${c.peggiore.score}; lo tiene su "${c.migliore.nome}" a ${c.migliore.score}.`);
   }
+  return L.join("\n");
+}
 
-  // ── 2) ROTAZIONE SETTORIALE → MIA ESPOSIZIONE ─────────────────────────────
-  const tilt = ((DATA.macro || {}).tilt || []).filter(x => x && dgFin(x.m1) != null);
-  if (tilt.length) {
-    const themeOf = (name) => NEWS_THEMES.find(t => new RegExp(t.id.split("/")[0], "i").test(name)
-      || (t.id === "SEMI/CHIP" && /semicondut/i.test(name)) || (t.id === "ENERGIA/OIL" && /energia/i.test(name))
-      || (t.id === "NUCLEARE/UTILITY" && /utilit/i.test(name)) || (t.id === "CLOUD/SOFTWARE" && /software|cloud/i.test(name)));
-    // ordina per ESPOSIZIONE (dove il book è pesante), non per performance del settore: il vento
-    // che conta di più è quello sul 53% in semi, non il +11% dell'energia dove non hai nulla (v156).
-    const rows = [];
-    for (const s of tilt) {
-      const th = themeOf(s.name || "");
-      const mine = th && th.sel ? themeMembers(th, held) : [];
-      if (!mine.length) continue;
-      const expo = mine.reduce((acc, r) => acc + (wOf(r) ?? 0), 0);
-      const rsAvg = mine.map(rsOf).filter(x => x != null);
-      rows.push({ expo, txt: `  ${s.name} (${s.ticker}) ${signTxt(dgFin(s.m1))} 1M → tue posizioni: ${mine.map(r => r.ticker).join("+")} = ${fmtNum.format(Math.round(expo * 10) / 10)}% del NAV${rsAvg.length ? ` · RS media ${signTxt(Math.round(rsAvg.reduce((a, b) => a + b, 0) / rsAvg.length * 10) / 10, "pp")}` : ""}` });
-    }
-    if (rows.length) {
-      rows.sort((a, b) => b.expo - a.expo);
-      L.push("· VENTO SETTORIALE vs DOVE SEI PESANTE (rotazione 1M incrociata col book, dal settore dove pesi di più):");
-      L.push(...rows.map(r => r.txt));
-    }
+/* la scheda in pagina: le stesse barre gia' usate per la macro, una riga per componente,
+   divergenti da 50 perche' su una scala 0-100 il neutro e' il centro (v209). */
+function renderCorrMacro() {
+  const box = $("#corr-macro");
+  if (!box) return;
+  const { compositi, quadro } = correlazioniMacro();
+  if (!compositi.length) { box.innerHTML = `<div class="muted">Componenti dei compositi non disponibili in questo snapshot.</div>`; return; }
+  const blocchi = compositi.map(c => {
+    /* ⚠ lo schema di riga di barreOrdinate e' {nome, valore, testo} — non {etichetta, nota}.
+       Un campo con il nome sbagliato non da' errore: la barra si disegna e l'etichetta resta
+       vuota. E' la classe dei difetti che non si rompono (v205, .abar-fill senza display:block). */
+    const righe = c.parti.map(p => ({ nome: p.nome, valore: p.score - 50, testo: `${p.score}/100`,
+                                      evidenzia: Math.abs(p.score - c.score) >= 20 }));
+    return `<div class="mg-card">
+      <div class="mg-card-head"><b>${esc(c.nome)}</b>
+        <span class="muted">sintesi ${fmtNum.format(c.score)}/100 · componenti da ${c.min} a ${c.max} · ampiezza ${c.spread} punti</span></div>
+      ${barreOrdinate(righe, { nota: `barre divergenti da 50: a sinistra i componenti sfavorevoli, a destra i favorevoli. Accesi quelli che si scostano di 20+ punti dalla sintesi.` })}
+    </div>`;
+  }).join("");
+  box.innerHTML = blocchi;
+  const nota = $("#corr-macro-note");
+  if (nota && quadro) {
+    nota.textContent = `${quadro.n} indicatori sulla stessa scala: mediana ${fmtNum.format(quadro.mediana)}/100, `
+      + `${quadro.sotto50} sotto 50 e ${quadro.sopra50} sopra. Piu' l'ampiezza di un composito e' larga, `
+      + `meno la sua sintesi descrive i suoi pezzi.`;
   }
+}
 
-  // ── 3) DIVERGENZE: dove i dati si contraddicono (gli SPUNTI da spiegare) ──
-  // v156: oltre alle contraddizioni INTRA-titolo (tema caldo/RS debole, MCR≫peso, stop vicino)
-  // il motore ora incrocia BLOCCHI che prima restavano scollegati: il candidato d'accumulo contro
-  // il TRACK RECORD del motore su quello stesso nome, e la RS che ACCELERA su un nome in veto FORTE
-  // (momentum di brevissimo vs distruzione di valore di fondo). Sono le contraddizioni che l'LLM
-  // non vede da solo perché vivono in tabelle lontane nel payload.
-  const divRelapse = [], divMcr = [], divTheme = [], divAccel = [], divStop = [], divMeta = [];
-  // v160 — SEGNALI STRUTTURATI per l'auto-misurazione. Le divergenze sono AFFERMAZIONI verificabili
-  // ("il flusso non conferma la narrativa su MU"): fra 7-30 giorni i prezzi dicono da soli se erano
-  // informative. Esporle in forma strutturata permette al CI (log_verdict.mjs) di scorarle SENZA
-  // alcun input manuale — è l'unico modo di misurare la qualità dell'analisi a costo zero per il CEO.
-  LAST_DIV_SIGNALS = [];
-  const sig = (tk, kind) => { LAST_DIV_SIGNALS.push({ tk, kind }); };
-  let dvL = null;
-  try { dvL = decisionVerdict(); } catch { dvL = null; }
 
-  // 3z) META-DIVERGENZA (v159): il VERDETTO del motore contro il REGIME di rischio del motore stesso.
-  // È la contraddizione che contiene tutte le altre e che il sistema non calcolava: i singoli detector
-  // dicevano "MU concentra il rischio", "AMD idem", ma nessuno diceva che il motore sta CHIEDENDO di
-  // aumentare proprio quella concentrazione. Un CIO che legge 5 candidati e non nota che 4 sono dello
-  // stesso settore in cui è già sovrappesato (in un settore che per giunta perde) sta subendo il
-  // verdetto invece di pesarlo. Qui il conflitto si dichiara, non si risolve: la scelta resta del CEO.
-  if (dvL && (dvL.accumula || []).length) {
-    const cands = dvL.accumula;
-    const secOf = (r) => thIsSemi(r) ? "Semiconduttori/memoria" : (r.sector || "n.d.");
-    const bySec = new Map();
-    for (const r of cands) { const s = secOf(r); bySec.set(s, [...(bySec.get(s) || []), r.ticker]); }
-    // settore dominante fra i candidati
-    let top = null;
-    for (const [s, tks] of bySec) if (!top || tks.length > top[1].length) top = [s, tks];
-    if (top && top[1].length >= 2 && top[1].length / cands.length >= 0.5) {
-      // esposizione ATTUALE del book su quel settore + vento settoriale 1M
-      const mine = ptf.filter(r => secOf(r) === top[0]);
-      const expoNow = mine.reduce((s, r) => s + (wOf(r) ?? 0), 0);
-      const mcrNow = mine.reduce((s, r) => s + (mcrOf(r) ?? 0), 0);
-      const tiltRow = ((DATA.macro || {}).tilt || []).find(x => /semicond/i.test(x.name || "") ) ;
-      const wind = (top[0].startsWith("Semi") && tiltRow && dgFin(tiltRow.m1) != null) ? dgFin(tiltRow.m1) : null;
-      if (expoNow >= 25) {
-        // ONESTÀ VERSO IL MOTORE: se fra i candidati c'è già un nome FUORI dal settore dominante e
-        // a bassa correlazione col book, la via di de-correlazione non è un'idea astratta — è una
-        // riga della stessa lista. Nominarla evita che la meta-divergenza suoni come "il motore
-        // sbaglia sempre": spesso il motore la de-correlazione l'ha già proposta, in cima.
-        const others = cands.filter(r => !top[1].includes(r.ticker));
-        const deCorr = others.map(r => {
-          const c = dgFin(r.avg_corr);
-          return `${r.ticker}${c != null ? ` (corr. media col book ${fmtNum.format(c)})` : ""}`;
-        });
-        const altTxt = deCorr.length
-          ? ` · candidati FUORI da quel settore: ${deCorr.join(", ")}` : " · nessun candidato fuori da quel settore";
-        top[1].forEach(tk => sig(tk, "verdict_vs_regime"));
-        // il motore ottimizza un titolo per volta e non modella il portafoglio risultante: qui si
-        // espone il fatto (dove sono i candidati vs dove è già il rischio), la lettura è dell'LLM.
-        divMeta.push(`  ⚑ CANDIDATI vs CONCENTRAZIONE: verdetto ${dvL.label} · ${top[1].length} dei ${cands.length} candidati (${top[1].join(", ")}) sono ${top[0]} · esposizione attuale del book su quel settore ${fmtNum.format(Math.round(expoNow * 10) / 10)}% del NAV e ${fmtNum.format(Math.round(mcrNow * 10) / 10)}% della varianza${wind != null ? ` · vento settoriale ${signTxt(wind)} a 1M` : ""}${altTxt}`);
-      }
-    }
-  }
+/* ═══ v256 — ANALISI SPOT DI UN TITOLO ═════════════════════════════════════════════════════
+   Richiesta del CEO: un box dove scrive un ticker e ottiene un'analisi tecnica, fondamentale,
+   con le news e con la correlazione al macro. "Questa analisi non sara' salvata": nessun
+   localStorage, nessuna scrittura sul repo, nessuna riga in data.json — si genera, si copia,
+   finisce li'.
+   ⚠ IL VINCOLO CHE DECIDE LA FORMA: questa pagina e' statica su GitHub Pages e la pipeline
+   conosce solo i ticker che le vengono dati. Per un titolo qualsiasi il sistema NON ha prezzi,
+   fondamentali ne' news, e non puo' averli (le API di Yahoo sono bloccate dal CORS lato
+   browser). Quindi non si finge di avere quei dati: il pacchetto chiede all'LLM di procurarseli
+   e verificarli, e gli porta l'unica cosa che il sistema sa davvero e che l'LLM da solo non
+   ricostruirebbe — il quadro macro di oggi con la sua tensione interna.
+   E' la stessa regola che questo progetto applica dal v195: un dato indovinato e scritto come
+   certo e' peggio di un dato dichiarato mancante. */
+function buildPromptTicker(tkGrezzo) {
+  const tk = String(tkGrezzo || "").trim().toUpperCase();
+  if (!tk) return "";
+  const macro = buildPrompt();
+  const header = promptHeaderText();
+  // si toglie la testata macro: qui le istruzioni sono altre, e due testate in un pacchetto
+  // solo si contraddicono (classe C10 — un rimando a una sezione che non governa piu' nulla)
+  const soloDati = macro.startsWith(header) ? macro.slice(header.length).replace(/^\n+/, "") : macro;
+  const disaccordo = testoCorrelazioniMacro();
+  const storico = historicalDigestText();
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const oggi = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+  const rilevazione = DATA && DATA.updated_at
+    ? new Date(DATA.updated_at).toLocaleString("it-IT") : "n.d.";
 
-  // 3a) candidato d'accumulo che il motore ha GIÀ giocato e perso (track record del nome)
-  const losers = new Map(((DATA.verdict_track || {}).last || [])
-    .filter(s => s && dgFin(s.ret_pct) != null && dgFin(s.ret_pct) < 0).map(s => [s.tk, s]));
-  for (const r of (dvL && dvL.accumula || [])) {
-    const s = losers.get(r.ticker);
-    if (s) sig(r.ticker, "relapse");
-    // v200: niente etichetta ACCUMULA e niente punteggio — resta il FATTO che conta, cioe' che
-    // il filtro ripropone oggi un nome su cui il segnale precedente ha gia' avuto un esito misurato.
-    if (s) divRelapse.push(`  ${r.ticker}: supera i filtri oggi · precedente segnale del motore su questo nome il ${s.date}: reso ${signTxt(dgFin(s.ret_pct))} (vs NDX ${signTxt(dgFin(s.vs_ndx_pp), "pp")})`);
-  }
+  const istruzioni = [
+`ANALISI SPOT DI UN TITOLO: ${tk}`,
+``,
+`Sei un analista azionario. Devi analizzare ${tk} sotto tre profili — tecnico, fondamentale e notizie — e poi agganciarlo al quadro macro che trovi in coda a questo messaggio. Oggi e' il ${oggi}.`,
+``,
+`[1] I DATI SU ${tk} DEVI PROCURARTELI TU, E VERIFICARLI.`,
+`Questo pacchetto NON contiene prezzi, fondamentali ne' notizie su ${tk}: il sistema che lo genera segue solo dati macro. Cerca online prezzo corrente, medie mobili, RSI, ATR, volumi, multipli (P/E trailing e forward, EV/EBITDA, P/FCF), margini, crescita di ricavi e utili, debito, data della prossima trimestrale e le notizie delle ultime due settimane. Ogni numero che riporti va marcato [VERIFICATO] con la fonte e la data. Un dato che non trovi si dichiara "n.d.": non stimarlo.`,
+``,
+`[2] IL MACRO IN CODA E' IL CONTESTO, E VA USATO COME TALE.`,
+`Il quadro macro qui sotto e' rilevato dal sistema il ${rilevazione} e ogni serie porta la propria data. Non riassumerlo: usalo. La domanda che deve guidarti e': attraverso quale canale concreto una di quelle grandezze arriva al conto economico o al multiplo di ${tk}? Un tasso che muove il costo del debito, un cambio che muove i ricavi esteri, uno spread di credito che muove il rifinanziamento, un ciclo settoriale che muove i volumi. "${tk} e' esposto al tema X" non e' analisi: lo diventa quando dici quale voce di bilancio si muove e di quanto.`,
+``,
+`[3] IL DISACCORDO MACRO E' PARTE DELLA RISPOSTA.`,
+`Il blocco "DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO" misura quanto i componenti di ogni composito tirino in direzioni opposte. Dimmi da quale lato di quel disaccordo sta ${tk}: se il ciclo economico e' tenuto su dal credito e tirato giu' dall'occupazione, questo titolo vive piu' dell'uno o dell'altra?`,
+``,
+`[4] COSA VOGLIO LEGGERE.`,
+`Prosa in italiano, niente scalette rigide, niente ripetizione dei dati che mi hai gia' dato sopra. Nell'ordine: dove sta il titolo tecnicamente e cosa servirebbe perche' quel quadro cambi; se i fondamentali giustificano il prezzo e con quale ipotesi implicita di crescita; quali notizie recenti NON sono ancora nel prezzo e perche' lo pensi; il meccanismo macro che piu' conta per questo nome. Chiudi con la cosa che, se uscisse diversa dalle attese, ribalterebbe la tua lettura — e con l'elenco delle fonti che hai verificato, una riga per URL.`,
+``,
+`[5] LIMITI.`,
+`Non conosco la tua posizione su ${tk} e tu non la chiedi: niente dimensionamenti, niente "quante quote", niente stop calcolati su un capitale che non ti ho detto. Se ritieni che ci sia un livello tecnico rilevante, dillo come livello del titolo, non come ordine per me. Ignora prezzi e conclusioni di conversazioni precedenti.`,
+``,
+`──────────────────────────────────────────────────────────────────`,
+`QUADRO MACRO DI RIFERIMENTO (generato dal sistema, non da te)`,
+`──────────────────────────────────────────────────────────────────`,
+].join("\n");
 
-  // 3d) nomi in VETO FORTE con la forza relativa che ACCELERA (rimbalzo tecnico vs valore rotto)
-  const vetoStrong = new Map((dvL && dvL.excluded || [])
-    .filter(x => x && x.r && held.has(x.r.ticker) && String(x.strength || "").toLowerCase() === "forte")
-    .map(x => [x.r.ticker, x]));
-
-  for (const r of ptf) {
-    const rs = rsOf(r), w = wOf(r), m = mcrOf(r);
-    if (m != null && w != null && m >= w * 1.6 && m >= 15) {
-      sig(r.ticker, "mcr_over_weight");
-      divMcr.push(`  ${r.ticker}: peso ${fmtNum.format(w)}% del NAV · quota di varianza ${fmtNum.format(m)}% (${fmtNum.format(Math.round(m / w * 10) / 10)}× il peso)`);
-    }
-    // v163: `t.targets` è la lista TRONCATA per la stampa — filtrarci sopra rendeva il detector
-    // cieco sui nomi tagliati (ORCL, RS -23pp, il segnale più forte del book, veniva soppresso
-    // mentre GOOGL a -3,7pp passava). Si filtra sull'elenco completo.
-    const nTheme = themed.filter(t => (t.allTargets || t.targets).some(x => x.ticker === r.ticker));
-    if (nTheme.length && rs != null && rs <= -3) {
-      // v158 — QUALIFICATORE TEMPORALE: se la maggioranza delle news del tema è arrivata DOPO la
-      // chiusura, il prezzo non ha ancora potuto votarle: chiamarla "il flusso non conferma" è un
-      // errore logico (si confronta un prezzo di venerdì con una notizia di sabato). In quel caso
-      // la riga cambia natura: non è una contraddizione, è una tesi ancora da verificare all'apertura.
-      const totNews = nTheme.reduce((s, t) => s + t.n, 0);
-      const totUnpriced = nTheme.reduce((s, t) => s + (t.nUnpriced || 0), 0);
-      const priceBlind = marketClosed && totNews > 0 && totUnpriced / totNews >= 0.5;
-      sig(r.ticker, priceBlind ? "theme_rs_blind" : "theme_rs");
-      // v166 — SCALE TEMPORALI: la RS è una misura a UN MESE. Dire "il prezzo non ha ancora votato"
-      // la annullava del tutto per via di news di poche ore — l'errore speculare a quello del
-      // roll-off corretto in v163 (confondere l'orizzonte della metrica con quello dell'evento).
-      // Una debolezza relativa lunga un mese resta un fatto: le news fresche NON la spiegano e NON
-      // la cancellano. La riga ora tiene insieme le due verità invece di sostituirne una all'altra.
-      divTheme.push(priceBlind
-        ? `  ${r.ticker}: nei temi [${nTheme.map(t => t.id).join(", ")}] · RS 1M ${signTxt(rs, "pp")} vs NDX (finestra: 30 giorni) · di quelle news ${totUnpriced}/${totNews} sono POSTERIORI all'ultima chiusura, quindi non ancora nel prezzo né nella RS`
-        : `  ${r.ticker}: nei temi [${nTheme.map(t => t.id).join(", ")}] · RS 1M ${signTxt(rs, "pp")} vs NDX · di quelle news ${totUnpriced}/${totNews} sono posteriori all ultima chiusura`);
-    }
-    const v = vetoStrong.get(r.ticker);
-    if (v) {
-      const d = dgFin(titleKinematics(r.ticker).drs7);
-      if (d != null && d >= 5) {
-        // v163 — LA RS CHE SALE NON È UN RIMBALZO. drs7 è il Δ7g della RS a 1 MESE: una finestra
-        // mobile. Se un crollo di 4 settimane fa ESCE dalla finestra, la RS migliora di colpo
-        // mentre il prezzo continua a scendere. Il payload verbalizzava quel salto come "momentum
-        // di brevissimo" e chiedeva "vendere in forza o inversione vera?" su nomi che stavano
-        // facendo nuovi minimi (MSTR -6,3% e ORCL -5,3% nei 7g citati, entrambi PEGGIO dell'indice,
-        // ORCL pure con lo stop violato): entrambe le opzioni presupponevano un rimbalzo inesistente.
-        // Ora si guarda il PREZZO nella stessa finestra e la riga dice la verità in entrambi i casi.
-        const p7 = (() => { const a = ((r.sparks || {}).w1 || []).map(dgFin).filter(x => x != null);
-          return a.length >= 2 ? (a[a.length - 1] / a[0] - 1) * 100 : null; })();
-        const b7 = (() => { const bm = (DATA.watchlist || []).find(x => x.ticker === "^IXIC")
-            || (DATA.top_etfs || []).find(x => x.ticker === "QQQ");
-          const a = ((bm || {}).sparks || {}).w1 || []; const xs = a.map(dgFin).filter(x => x != null);
-          return xs.length >= 2 ? (xs[xs.length - 1] / xs[0] - 1) * 100 : null; })();
-        const realRebound = p7 != null && (b7 == null ? p7 > 0 : p7 > b7);
-        const rsNow = rsOf(r);
-        const lvl = rsNow != null ? ` (RS ora ${signTxt(rsNow, "pp")})` : "";
-        const px = p7 != null ? `prezzo ${signTxt(Math.round(p7 * 10) / 10)} a 7g${b7 != null ? ` vs benchmark ${signTxt(Math.round(b7 * 10) / 10)}` : ""}` : "prezzo 7g n.d.";
-        sig(r.ticker, realRebound ? "accel_into_veto" : "rs_rolloff_artifact");
-        // NB: la RS 1M è una finestra MOBILE — può migliorare per il solo uscire di un crollo
-        // vecchio, senza alcun rimbalzo. Per questo si stampa accanto il prezzo della STESSA
-        // finestra: i due dati insieme dicono se l'accelerazione ha un movimento sotto o no.
-        divAccel.push(`  ${r.ticker}: RS 1M ${signTxt(d, "pp")} in 7g${lvl} · ${px} · veto FORTE in essere (${(v.why || [])[0] || "value trap"})${r.stop_violated || (r.qty && stopOf(r) && stopOf(r).violated) ? " · STOP VIOLATO" : ""}${realRebound ? "" : " · [la RS sale mentre il prezzo scende: parte del miglioramento viene dall'uscita del crollo precedente dalla finestra a 30 giorni]"}`);
-      }
-    }
-    const st = r.qty ? stopOf(r) : null;
-    if (st && st.stop > 0 && r.price > 0 && !st.violated) {
-      const dist = (r.price / st.stop - 1) * 100;
-      if (dist <= 3 && (w ?? 0) >= 5) sig(r.ticker, "stop_near");
-      if (dist <= 3 && (w ?? 0) >= 5) divStop.push(`  ${r.ticker}: stop a ${signTxt(Math.round(dist * 10) / 10)} dal prezzo · posizione ${fmtNum.format(w)}% del NAV`);
-    }
-  }
-  // la meta-divergenza apre: è la cornice dentro cui vanno lette le altre
-  const div = [...divMeta, ...divRelapse, ...divMcr, ...divTheme, ...divAccel, ...divStop];
-  if (div.length) {
-    L.push("· DATI IN TENSIONE (coppie di numeri che il sistema accosta perché raramente stanno insieme; NON sono conclusioni: la lettura, e se ci sia davvero una contraddizione, le decidi tu):");
-    L.push(...div.slice(0, 8));
-  }
-
-  if (!L.length) return "";
-  return "=== CORRELAZIONI CALCOLATE — COSA MUOVE IL TUO PORTAFOGLIO OGGI ===\n"
-       + "(join news↔settori↔posizioni calcolato dal sistema: sotto ci sono i collegamenti già fatti, non le loro conseguenze)\n"
-       + L.join("\n");
+  return [istruzioni, disaccordo, soloDati, storico].filter(Boolean).join("\n\n");
 }
 
 function buildCIOText() {
-  const link = marketLinkText();
-  const brief = buildExecutiveDelta();
+  /* v256 — IL PACCHETTO È MACRO. Prima era: timbro + brief sul NAV + testata + correlazioni
+     news↔posizioni + payload + digest. Brief e correlazioni sono usciti con il portafoglio;
+     al loro posto, subito dopo la testata, va il blocco che il CEO ha chiesto di TENERE — dove
+     gli indicatori macro non sono d'accordo fra loro. Sta in ALTO e non in coda per la stessa
+     ragione di v156: un blocco di sintesi appeso in fondo a 36k caratteri viene letto per
+     ultimo, cioè quando la conclusione è già stata scritta. */
   const full = buildPrompt();
   const historical = historicalDigestText();
-  // HOISTING del blocco sintesi (v156) — la testata è costruita attorno a "Parti dal blocco
-  // CORRELAZIONI CALCOLATE / le DIVERGENZE sono il cuore del lavoro", ma appeso in coda quel blocco
-  // finiva al ~78% del payload: DOPO tutte le tabelle-silo e persino dopo "PROMEMORIA FINALE" (che
-  // legge come chiusura). Il lettore incontrava la SINTESI per ultima, dopo 49k caratteri di dump →
-  // esattamente ciò che spinge alla parafrasi. Ora lo splice mette il blocco SUBITO dopo la testata
-  // (confine = promptHeaderText, la fonte di verità), adiacente all'istruzione che lo richiama e
-  // PRIMA dei dati grezzi, che restano come materiale di verifica. buildPrompt() NON viene toccato
-  // (Regola Suprema): si ricompone solo la stringa sul confine testata↔payload.
-  // (v180: la logica che spostava "PROMEMORIA FINALE" in coda è stata rimossa insieme al blocco —
-  // duplicava per intero testata [A2] e [D]. Restava codice morto: lastIndexOf non trovava più nulla.)
+  const disaccordo = testoCorrelazioniMacro();
   const header = promptHeaderText();
   let body = full;
   if (full.startsWith(header)) {
     const rest = full.slice(header.length).replace(/^\n+/, "");
-    body = header + (link ? "\n\n" + link : "") + "\n\n" + rest;
-  } else if (link) {
-    body = full + "\n\n" + link;   // confine non combaciante: fallback alla coda (comportamento pre-v156)
+    body = header + (disaccordo ? "\n\n" + disaccordo : "") + "\n\n" + rest;
+  } else if (disaccordo) {
+    body = full + "\n\n" + disaccordo;   // confine non combaciante: fallback alla coda
   }
-  // TIMBRO DI BUILD in cima a tutto: versione del codice (prova che Safari non ha servito una
-  // pagina in cache) + ora di generazione lato client (prova che il run è di adesso).
   const now = new Date();
   const pad = (n) => String(n).padStart(2, "0");
-  const stamp = `⟦ BUILD v${BUILD_VERSION} · generato ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())} · se questa versione è più vecchia del sito, Safari ha una pagina in cache → ricarica forzato ⟧`;
-  return stamp + "\n\n" + brief + "\n\n" + body
-       + (historical ? "\n\n" + historical : "");
+  const stamp = `\u27e6 BUILD v${BUILD_VERSION} \u00b7 generato ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())} \u27e7`;
+  return stamp + "\n\n" + body + (historical ? "\n\n" + historical : "");
 }
 
 /* ---------- azione unica: copia il pacchetto completo e mostralo nella modal ---------- */
@@ -9539,12 +6233,43 @@ async function copyCIOText() {
 }
 
 
+/* ═══ v256 — ANALISI SPOT DEL TITOLO: il box, e cosa fa davvero ═══════════════════════════
+   Il ticker non si salva da nessuna parte: nessun localStorage, nessuna scrittura sul repo.
+   Il pacchetto si genera al clic, si copia, e la modale lo mostra per un'ultima occhiata —
+   stesso percorso del pacchetto macro, perche' due strade separate per la stessa azione
+   divergono (v161, v207). */
+async function copiaAnalisiTitolo() {
+  const inp = $("#tk-input");
+  const esito = $("#tk-esito");
+  const tk = String(inp?.value || "").trim().toUpperCase();
+  if (!tk) { if (esito) esito.textContent = "Scrivi un ticker."; inp?.focus(); return; }
+  if (!/^[A-Z0-9][A-Z0-9.\-=^]{0,11}$/.test(tk)) {
+    if (esito) esito.textContent = `"${tk}" non sembra un ticker. Usa la forma del mercato: NVDA, ASML.AS, 005930.KS.`;
+    return;
+  }
+  if (!DATA) { if (esito) esito.textContent = "Dati macro non ancora caricati, riprova tra un attimo."; return; }
+  const testo = buildPromptTicker(tk);
+  const box = $("#prompt-text");
+  if (box) box.value = testo;
+  const modale = $("#modal");
+  if (modale) modale.hidden = false;
+  try {
+    await navigator.clipboard.writeText(testo);
+    if (esito) esito.textContent = `Analisi di ${tk} copiata — incollala in un LLM. Non e' stata salvata da nessuna parte.`;
+    toast(`Analisi ${tk} copiata \u2713`);
+  } catch {
+    if (esito) esito.textContent = `Analisi di ${tk} pronta nel riquadro: copiala da li' (la clipboard non e' disponibile).`;
+  }
+}
+
 /* ---------------- eventi ---------------- */
-$("#btn-refresh").addEventListener("click", refreshAll);
+$("#btn-refresh")?.addEventListener("click", refreshAll);
+$("#tk-go")?.addEventListener("click", copiaAnalisiTitolo);
+$("#tk-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") copiaAnalisiTitolo(); });
 $("#btn-cio")?.addEventListener("click", copyCIOText);
-$("#modal-close").addEventListener("click", () => { $("#modal").hidden = true; });
-$("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
-$("#btn-copy").addEventListener("click", async () => {
+$("#modal-close")?.addEventListener("click", () => { $("#modal").hidden = true; });
+$("#modal")?.addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
+$("#btn-copy")?.addEventListener("click", async () => {
   await navigator.clipboard.writeText($("#prompt-text").value);   // copia il testo EDITATO
   toast("Copiato (con le tue modifiche) ✓");
 });
@@ -9782,14 +6507,8 @@ document.querySelectorAll("#pmc-mode .chip").forEach(c =>
   $(id).addEventListener("input", pmcCompute));
 
 /* liquidità + mini-card */
-$("#cash-save").addEventListener("click", saveCash);
-$("#cash-input").addEventListener("keydown", e => { if (e.key === "Enter") saveCash(); });
 $("#portfolio-health")?.addEventListener("click", openHealthModal);
 $("#tracking-error-box")?.addEventListener("click", openAlphaModal);
-$("#ptf-edit-values")?.addEventListener("click", openEditPortfolio);
-$("#alloc-edit")?.addEventListener("click", openEditPortfolio);
-$("#kpi-edit")?.addEventListener("click", openEditPortfolio);
-$("#btn-diary")?.addEventListener("click", openDecisionModal);
 $("#sharpe-box")?.addEventListener("click", openPortfolioSharpeModal);
 $("#fx-box")?.addEventListener("click", openFxModal);
 $("#margin-debt-box")?.addEventListener("click", openMarginDebtModal);
@@ -9875,46 +6594,16 @@ document.addEventListener("keydown", e => {
   if (rc && rc.dataset.rsTk) { e.preventDefault(); openRsInfo(rc.dataset.rsTk); }
 });
 
-// due barre range (sopra portafoglio e sopra watchlist) sincronizzate
-function syncSparkToggles() {
-  document.querySelectorAll("#spark-toggle .chip, #spark-toggle-wl .chip").forEach(c =>
-    c.classList.toggle("chip-active", c.dataset.range === sparkRange));
-}
-document.querySelectorAll("#spark-toggle .chip, #spark-toggle-wl .chip").forEach(ch => {
-  ch.addEventListener("click", () => {
-    sparkRange = ch.dataset.range;
-    localStorage.setItem("pref_range", sparkRange);   // ricorda l'intervallo scelto
-    syncSparkToggles();
-    renderTable();
-    renderWatchlist();
-  });
-});
-// v188: la vista tecnica/fondamentale non esiste piu' (tabella unica), quindi le barre
-// dell'intervallo sono SEMPRE visibili: restava solo il ripristino dell'intervallo scelto.
+/* v256 — le barre dell'intervallo (#spark-toggle) governavano le sparkline delle tabelle
+   portafoglio/watchlist: senza tabelle non hanno piu' nulla da regolare. Resta il ripristino
+   dell'ordine delle mini-card macro, che e' una preferenza ancora viva. */
 (function applyPrefs() {
-  syncSparkToggles();
   applicaOrdineMiniCard();   // v190: l'ordine scelto nel popup macro vale anche al caricamento
 })();
-$("#wl-add-top").addEventListener("click", addWatchlist);
-$("#ptf-add-top")?.addEventListener("click", addPortfolio);
-document.querySelectorAll("#alloc-toggle .chip").forEach(ch => {
-  ch.addEventListener("click", () => {
-    document.querySelectorAll("#alloc-toggle .chip").forEach(c => c.classList.remove("chip-active"));
-    ch.classList.add("chip-active");
-    allocMode = ch.dataset.mode;
-    renderAllocation();
-  });
-});
+
 
 // v214 — orizzonte del confronto col benchmark
-document.querySelectorAll("#bench-toggle .chip").forEach(ch => {
-  ch.addEventListener("click", () => {
-    document.querySelectorAll("#bench-toggle .chip").forEach(c => c.classList.remove("chip-active"));
-    ch.classList.add("chip-active");
-    benchOrizzonte = ch.dataset.bench;
-    renderVsBenchmark();
-  });
-});
+
 
 // v206 — orizzonte della rotazione settoriale
 document.querySelectorAll("#rot-toggle .chip").forEach(ch => {
@@ -9975,83 +6664,29 @@ document.addEventListener("click", (e) => {
    È la terza volta in questo progetto che un elemento rimosso rompe l'intero caricamento
    (CLAUDE.md lo dichiara come convenzione fissa), quindi ora c'è un gate che lo intercetta. */
 
-/* modifica posizioni */
-$("#ptf-edit")?.addEventListener("click", () => {
-  editMode.portfolio = !editMode.portfolio;
-  $("#ptf-edit")?.classList.toggle("chip-active", editMode.portfolio);
-  renderTable();
-});
-$("#wl-edit")?.addEventListener("click", () => {
-  editMode.watchlist = !editMode.watchlist;
-  $("#wl-edit")?.classList.toggle("chip-active", editMode.watchlist);
-  renderWatchlist();
-});
-document.addEventListener("click", (e) => {
-  const del = e.target.closest(".row-del");
-  if (del) { removeHolding(del.dataset.sec, del.dataset.tk); return; }
-  const mv = e.target.closest(".row-move");
-  if (mv) { moveHolding(mv.dataset.sec, mv.dataset.tk, +mv.dataset.dir); return; }
-  const ed = e.target.closest(".row-edit");
-  if (ed) { editPosition(ed.dataset.tk); return; }
-  const add = e.target.closest(".row-add");
-  if (add) { quickAddFromWatchlist(add.dataset.tk, parseFloat(add.dataset.price)); return; }
-  if (e.target.id === "ptf-add" || e.target.id === "wl-add") {
-    (e.target.id === "ptf-add" ? addPortfolio : addWatchlist)(); return;
-  }
-  // clic su un nome in watchlist → calcolatore PMC
-  const nameCell = e.target.closest("#wl-table .name-cell");
-  if (nameCell && !e.target.closest("button")) {
-    const tr = nameCell.closest("tr");
-    const tk = tr.querySelector(".tk")?.textContent;
-    const row = (DATA.watchlist || []).find(w => w.ticker === tk);
-    if (row) quickAddFromWatchlist(tk, row.price);
-  }
-});
+/* v256 — WIRING DELLE POSIZIONI RIMOSSO: modifica in linea, cancellazione riga, spostamento
+   e apertura dell'editor di posizione. Tutti puntavano a funzioni uscite col portafoglio, e
+   tutti su elementi (#ptf-edit, #wl-edit, .row-del, .row-move, .row-edit) che non esistono
+   piu' in una pagina senza tabelle. */
+
 
 /* sposta una posizione su (-1) o giù (+1); aggiorna subito e salva su config */
-function moveHolding(section, ticker, dir) {
-  const arr = DATA[section];
-  const i = arr.findIndex(r => r.ticker === ticker);
-  const j = i + dir;
-  if (i < 0 || j < 0 || j >= arr.length) return;
-  [arr[i], arr[j]] = [arr[j], arr[i]];          // riordina subito (feedback istantaneo)
-  section === "portfolio" ? renderTable() : renderWatchlist();
-  editHoldings(section, cfg => {                 // persiste l'ordine su config/holdings.json
-    const a = cfg[section] || [];
-    const x = a.findIndex(r => r.ticker === ticker);
-    const y = x + dir;
-    if (x < 0 || y < 0 || y >= a.length) return false;
-    [a[x], a[y]] = [a[y], a[x]];
-    return true;
-  });
-}
 
 /* dalla watchlist al calcolatore PMC / aggiungi al portafoglio */
 // clic su un titolo della watchlist → precompila il "Nuovo acquisto" nel calcolatore PMC
-function quickAddFromWatchlist(ticker, price) {
-  $("#pmc-q1").value = 0;        // posizione attuale: nessuna (è in watchlist)
-  $("#pmc-p1").value = 0;
-  $("#pmc-q2").value = "";
-  $("#pmc-p2").value = price || "";   // prezzo del nuovo acquisto
-  pmcCompute();
-  $("#pmc-calc")?.scrollIntoView({ behavior: "smooth" });
-  toast(`${ticker} caricato nel calcolatore PMC — inserisci la quantità da simulare`);
-}
 
-initSorting("ptf-table", renderTable);
-initSorting("wl-table", renderWatchlist);
-initColDrag("ptf-table", renderTable);
-initColDrag("wl-table", renderWatchlist);
+/* v256 — ordinamento e trascinamento delle colonne: erano agganciati alle due tabelle di
+   titoli, che non esistono piu'. */
 
 controllaVersione();   // v216 — avvisa se il browser sta servendo una pagina vecchia
 loadData();
-loadDiaryCloud();   // sincronizza il diario azioni dal cloud (se presente)
-loadPromptHeaderCloud();   // sincronizza la testata del prompt dal server (config/prompt_header.txt)
+/* v256 — il diario delle azioni esce col portafoglio: non c'e' piu' niente da annotare. */
+loadPromptHeaderCloud();   // testata del pacchetto macro (config/prompt_header_macro.txt)
 loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
 montaComandiSezioni();   // maniglia ⠿ + frecce ▲▼ su ogni sezione
 applicaOrdineSezioni();  // ordine gia' noto a questo browser: subito, senza aspettare la rete
 loadOrdineSezioniCloud();// e poi quello del repo, se piu' recente → Mac e iPhone allineati
-loadStatoPortafoglioCloud();   // v244: cassa, posizioni manuali e BTP dal repo — la sincronizzazione che mancava
+/* v256 — cassa, posizioni manuali e BTP: non c'e' piu' un portafoglio da sincronizzare. */
 loadRiskParamsCloud();   // sincronizza i parametri di rischio del CEO (config/risk_params.json) — cap/veto uguali su ogni device
 // ricarica completa (tecnici, news, storico) ogni 5 minuti
 setInterval(() => loadData(), 5 * 60 * 1000);
@@ -10068,7 +6703,6 @@ $("#macro-details")?.addEventListener("click", () => openMacroDetails());
 // centrale. La guardia strutturale è stata aggiornata di conseguenza — protegge l'ACCESSO
 // ai dettagli macro, non quel particolare bottone (v203: mai zittire una guardia, cambiarle
 // l'invariante quando l'invariante è cambiato davvero).
-$("#ptf-cols")?.addEventListener("click", () => openColumnPicker("ptf-table", "Portafoglio", renderTable));
 $("#wl-cols")?.addEventListener("click", () => openColumnPicker("wl-table", "Watchlist", renderWatchlist));
 document.addEventListener("click", (e) => {
   const all = e.target.closest("[data-cp-all]");
@@ -10114,30 +6748,10 @@ const TAB_KEY = "pref_tab";
 /* v223 — la barra laterale torna a COMMUTARE ("solo cliccando nelle voci della barra a
    sinistra posso passare da una sezione all'altra"). In v222 era tutto in pagina e si
    scorreva: troppo lungo. Una sezione per volta, e il clic e' l'unico modo di cambiarla. */
-function setTab(nome) {
-  const valide = [...document.querySelectorAll("#main-tabs .tab")].map(b => b.dataset.tab);
-  if (!valide.includes(nome)) nome = valide[0] || "struttura";
-  try { localStorage.setItem(TAB_KEY, nome); } catch { /* quota */ }
-  document.querySelectorAll("#main-tabs .tab").forEach(b =>
-    b.classList.toggle("tab-active", b.dataset.tab === nome));
-  document.querySelectorAll("[data-pane]").forEach(el => { el.hidden = el.dataset.pane !== nome; });
-  window.scrollTo?.({ top: 0, behavior: "auto" });   // ?. — l'harness dei test non ha scrollTo
-  if (typeof DATA !== "undefined" && DATA) {
-    if (nome === "portafoglio") renderTable();
-    if (nome === "watchlist") renderWatchlist();
-    if (nome === "struttura") { renderStruttura(); renderMacroGrafici(); }
-  }
-}
 
 
 
-document.querySelectorAll("#main-tabs .tab").forEach(b =>
-  b.addEventListener("click", () => setTab(b.dataset.tab)));
-
-/* v205 — la scheda d'ingresso diventa STRUTTURA: il flusso previsto è "colpo d'occhio sulla
-   struttura → copia il prompt → LLM con accesso web". Si applica UNA SOLA VOLTA e mai sopra
-   una preferenza già espressa: la scheda su cui l'utente si è fermato l'ultima volta vince
-   (stessa regola della vista compatta di v198 — un default non sovrascrive una scelta). */
-/* v222 — tutte le sezioni visibili dal primo istante, nessun ripristino di scheda e nessuno
-   scroll automatico all'avvio: la pagina si apre dalla cima e mostra tutto. */
-try { setTab(localStorage.getItem(TAB_KEY) || "struttura"); } catch { setTab("struttura"); }
+/* v256 — LE SCHEDE NON ESISTONO PIU'. #main-tabs governava sei pane (struttura, portafoglio,
+   watchlist, rischio…); con una pagina sola la barra navigava verso una stanza sola. Tolto il
+   wiring insieme alla barra: tutte le sezioni sono visibili dal primo istante, che e' gia' il
+   comportamento dichiarato in v222. */

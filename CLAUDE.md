@@ -1,5 +1,54 @@
 # CLAUDE.md — Regole d'ingaggio del progetto Trading Dashboard
 
+> ## 🔻 v256 — IL SISTEMA È CAMBIATO ALLA RADICE. LEGGI QUESTO PRIMA DI TUTTO IL RESTO.
+>
+> Decisione del CEO (09/08/2026), testuale: *"elimina tutto e lascia solo una pagina con i dati
+> macro e la relativa correlazione con esportazione prompt ai … lascia attivi calcolo pmc e
+> calcolo vendite … portafoglio watchlist e news andranno tutti via … un box dove io andrò ad
+> inserirti il ticker e tu lo analizzerai … analisi spot, non salvata"*.
+>
+> **Cosa esiste oggi**: UNA pagina (`index.html`, ~280 righe) con il quadro macro, la
+> correlazione fra indicatori, il box per l'analisi spot di un titolo, e i due strumenti
+> (Calcolatore PMC, Calcolo vendite). Niente schede, niente tabelle di titoli, niente news.
+>
+> **Cosa NON esiste più**: portafoglio, watchlist, news, diario, verdetto del motore, stop
+> ratchet, matrice di rischio, filtri quantitativi, concentrazione di fattore, validatore degli
+> ordini AI, parametri di rischio, riordino delle sezioni per pane. `app.js` è passato da
+> 10.062 a ~6.700 righe; il pacchetto AI da 69.934 a ~14.000 caratteri.
+>
+> **⚠ GRAN PARTE DI QUESTO FILE DESCRIVE QUEL SISTEMA.** Le sezioni su Tabella A/B, SORT_FIELDS,
+> colonne, verdetto, MCR, stop, diario, cap d'ingresso, budget operativo **raccontano codice che
+> non c'è più**: valgono come STORIA e come lezioni di metodo (le trappole sono reali e si
+> ripetono), non come descrizione dell'attuale. Non cercare di "riallineare" quel codice: non
+> esiste. Le lezioni di metodo — ricevuta del taglio scritta prima, check validati per iniezione,
+> registri che invecchiano da soli, gate che trovano se stessi, la sintassi che non dice niente
+> sull'esecuzione — valgono TUTTE e sono costate care.
+>
+> **La pipeline `scripts/update_data.py` NON è stata toccata**: continua a leggere
+> `config/holdings.json` e a produrre portafoglio, watchlist e news in `data/data.json`. È
+> deliberato — la macro poggia su quei benchmark, e "Calcolo vendite" ha bisogno delle posizioni
+> per calcolare plus/minus e tasse. Quello che è cambiato è chi LEGGE quei dati: la pagina e il
+> pacchetto AI non li mostrano più.
+>
+> **Le due testate**: `config/prompt_header_macro.txt` è quella in uso (pacchetto macro).
+> `config/prompt_header.txt` — la Costituzione del fondo, scritta dal CEO — resta sul repo,
+> INTATTA e non letta: parla di ordini, stop e concentrazione del libro, e su un pacchetto senza
+> posizioni sarebbe una lista di istruzioni impossibili. Se il portafoglio tornasse, si torna a
+> leggerla cambiando `PROMPT_HEADER_PATH`.
+>
+> **I gate oggi**: `test_app.mjs` (51), `test_update_data.py` (78), `redteam.mjs` (32),
+> `coherence_check.mjs` (11), `fx_check.mjs`, `audit_data.py`. La suite JS è passata da 282 a 51
+> check: non è stata indebolita, è stata **potata** — i check tolti sorvegliavano funzionalità
+> che il CEO ha chiuso, e quelli strutturali (wiring, elementi portanti, gate di render, chiamate
+> a funzioni inesistenti) sono stati riscritti sul mondo nuovo, non zittiti.
+>
+> **⚠ La lezione nuova di questa versione**: il gate di render copriva la catena di `renderAll`,
+> e il difetto vero stava in `refreshLivePrices` — che `renderAll` non chiama. `node --check`
+> passava, 76 check passavano, e la pagina moriva al primo refresh dei prezzi. Ora c'è una
+> guardia che non guarda una catena ma **tutte le invocazioni del file**, e verifica che il
+> bersaglio esista. Se togli funzioni, è quella che ti salva.
+
+
 > Leggi questo file PRIMA di modificare qualsiasi cosa. Riassume decisioni architetturali che
 > non sono ovvie dal codice e che, se ignorate, rompono il sistema. Aggiornalo quando prendi
 > una decisione strutturale nuova.

@@ -15,10 +15,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Trading Dashboard — Portafoglio</title>
+<title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=255">
+<link rel="stylesheet" href="assets/style.css?v=256">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -26,7 +26,7 @@
 <header class="topbar">
   <div class="brand">
     <div>
-      <h1>Trading Dashboard</h1>
+      <h1>Quadro macro</h1>
       <div class="updated">
         <span class="upd-item">Aggiornamento totale: <b id="updated-at">—</b></span>
         <span class="upd-sep">·</span>
@@ -35,94 +35,47 @@
     </div>
   </div>
   <div class="actions">
-    <button class="btn btn-primary" id="btn-cio" aria-label="Copia il pacchetto completo per l'analisi AI: storico macro, tecnica, fondamentali e ultime news" title="Copia il pacchetto completo (storico macro + tecnica + fondamentali + news) da incollare in Claude">📋 Copia Analisi AI</button>
-    <!-- v209 — bottone "📖 Macro" RIMOSSO dalla topbar su richiesta del CEO. Duplicava
-         "📖 Dettagli macro", che vive già dentro la scheda Macro: due porte per la stessa
-         stanza. Ora la macro si raggiunge da un posto solo — la voce Macro nella barra
-         laterale — e tutto il suo contenuto sta nella colonna centrale. -->
-    <button class="btn btn-ghost" id="btn-verifica" aria-label="Verifica la risposta dell'AI contro il portafoglio reale" title="Incolla qui la risposta dell'LLM: il sistema estrae gli ordini proposti e li controlla contro il libro vero (ticker inesistenti, vendite di titoli non posseduti, stop sopra il limite, quantità superiori al posseduto)">🧪 Verifica risposta AI</button>
-    <button class="btn btn-ghost" id="btn-diary" aria-label="Diario delle azioni e dettaglio verdetto" title="Diario delle azioni (finisce nell'export AI) + dettaglio verdetto motore">📔 Diario</button>
-    <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: prezzi live subito + rigenerazione completa via pipeline (~2-3 min)">⟳ Aggiorna tutto</button>
+    <button class="btn btn-primary" id="btn-cio" aria-label="Copia il quadro macro completo per l'analisi AI" title="Copia il quadro macro completo (indicatori, serie storiche, rotazione, correlazioni fra blocchi) da incollare in un LLM">📋 Copia analisi macro</button>
+    <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: rigenerazione completa via pipeline (~2-3 min)">↻ Rigenera</button>
   </div>
 </header>
 
 <main>
-  <!-- MACRO SHOCK ALERT (v125): Asia/futures oltre -2% con Wall Street chiusa -->
-  <div id="shock-alert" hidden></div>
-  <!-- ALERT EARNINGS IMMINENTI -->
-  <div id="earnings-alert" hidden></div>
-  <!-- ALERT RICONCILIAZIONE BROKER (snapshot vecchio o posizioni incoerenti) -->
-  <!-- v245 — diario e portafoglio che divergono: sta PRIMA della riconciliazione perché
-       una posizione mancante è più grave di una quantità imprecisa -->
-  <div id="divergenza-alert" hidden></div>
-  <div id="reconcile-alert" hidden></div>
+  <!-- ═══ v256 — LA PAGINA È UNA SOLA (decisione CEO: "elimina tutto e lascia solo una pagina
+       con i dati macro e la relativa correlazione con esportazione prompt ai … lascia attivi
+       calcolo pmc e calcolo vendite … un box dove inserire il ticker per l'analisi").
+       Via portafoglio, watchlist e news: non esistono più né come pagina né come payload.
+       Con loro se ne vanno le schede (#main-tabs): con due pane su sei restava una barra di
+       navigazione che navigava verso una stanza sola. -->
   <!-- v216 — AVVISO DI PAGINA VECCHIA (cache CDN/browser): vedi controllaVersione() -->
   <div id="version-alert" hidden></div>
   <!-- ALERT QUALITÀ DATI MACRO (data assertions: dati datati o implausibili) -->
   <div id="dataquality-alert" hidden></div>
+  <!-- MACRO SHOCK ALERT (v125): Asia/futures oltre -2% con Wall Street chiusa -->
+  <div id="shock-alert" hidden></div>
 
-  <!-- v204 — BARRA DI STATO e CODA DELLE DECISIONI rimosse su decisione del CEO.
-       Erano nate in v198 per dare gerarchia alla pagina. I dati che portavano NON sono andati
-       persi: stop violati, veti, budget, concentrazione di fattore e leva restano nel payload
-       (blocco FILTRI QUANTITATIVI e METRICHE DI RISCHIO) e nelle tabelle; NAV e P&L nei
-       riquadri del patrimonio qui sotto. Spariva la ripetizione, non l'informazione. -->
-
-  <!-- v205 — SHELL A DUE COLONNE: barra laterale con le macro-sezioni, centro con i grafici.
-       La barra laterale NON è un elemento nuovo: è la stessa #main-tabs di v199 (stessi bottoni,
-       stesso setTab, stessa guardia anti-taglio), impaginata in verticale. Sotto gli 860px torna
-       una striscia orizzontale scorrevole — su iPhone una colonna fissa mangerebbe metà schermo. -->
-  <div class="shell">
-  <nav class="tabs" id="main-tabs" role="tablist" aria-label="Sezioni">
-    <button class="tab tab-active" data-tab="struttura" role="tab">Struttura</button>
-    <button class="tab" data-tab="portafoglio" role="tab">Portafoglio</button>
-    <button class="tab" data-tab="watchlist" role="tab">Watchlist</button>
-    <!-- v218 — voce "Macro" RIMOSSA: tutto il suo contenuto vive ora dentro Struttura,
-         che è quello che il CEO chiedeva da quattro messaggi. Una stanza sola. -->
-    <button class="tab" data-tab="rischio" role="tab">Rischio &amp; strumenti</button>
-  </nav>
-
+  <div class="shell shell-unica">
   <div class="shell-main">
 
-  <!-- ═══ v212 — STRUTTURA = SOLO LA VARIANZA (richiesta CEO "nella struttura lascia solo
-       varianza"). Restano i due grafici che SONO la varianza: la sua ripartizione fra le
-       posizioni oggi, e la stessa quota nel tempo. Allocazione e' passata in Portafoglio perche' parla di posizioni;
-       Distanza dallo stop e' stata rimossa in v225 (la lettura resta nel conteggio stop violati).
-       ═══ v205 — STRUTTURA DEL LIBRO ═══════════════════════════════════════════════════════
-       Il vincolo che decide questa vista: i dati arrivano su cron (GitHub Actions), non
-       tick-by-tick. Quindi NIENTE GRAFICI DI PREZZO — investing.com e TradingView li fanno
-       meglio e in tempo reale. Qui si disegna solo ciò che nessuno dei due può disegnare,
-       perché nessuno dei due conosce il libro: concentrazione, correlazione, deriva
-       e allocazione. -->
-  <section class="card" data-pane="struttura" data-sez="concentrazione">
+  <!-- ═══ v256 — ANALISI SPOT DI UN TITOLO. Il CEO scrive un ticker, il sistema costruisce il
+       pacchetto da incollare in un LLM: cosa chiedere (tecnica, fondamentali, news) e il
+       QUADRO MACRO REALE come contesto, così l'analisi del singolo nome nasce già agganciata
+       al ciclo invece di galleggiare. NON si salva niente: nessun localStorage, nessuna
+       scrittura sul repo — è un'analisi spot, come richiesto. -->
+  <section class="card" data-sez="titolo">
     <div class="card-head">
-      <h2>Concentrazione — peso contro rischio</h2>
-      <span class="muted" id="conc-basis"></span>
+      <h2>Analisi di un titolo</h2>
+      <span class="muted">spot, non salvata · tecnica + fondamentali + news, sul quadro macro di oggi</span>
     </div>
-    <div class="struct-headline" id="conc-headline"></div>
-    <div id="conc-chart"></div>
-    <div class="muted struct-note" id="conc-note"></div>
+    <div class="tk-riga">
+      <input id="tk-input" type="text" inputmode="latin" autocapitalize="characters" spellcheck="false"
+             placeholder="Ticker (es. NVDA, ASML.AS, 005930.KS)" aria-label="Ticker da analizzare">
+      <button class="btn btn-primary" id="tk-go">Copia analisi per l'AI</button>
+    </div>
+    <div id="tk-esito" class="muted"></div>
   </section>
 
-<!-- v238 — "Deriva della concentrazione" RIMOSSA su richiesta del CEO. RICEVUTA: spariscono il
-     riquadro (#drift-chart/#drift-basis/#drift-note) e renderDeriva(); NON sparisce
-     derivaConcentrazione(), che resta usata dai check e non ha altri consumatori nel payload
-     (il payload non pubblica la deriva: verificato generandolo prima e dopo). -->
-
-<section class="card" data-pane="struttura" data-sez="benchmark">
-    <div class="card-head">
-      <h2>Il fondo contro il suo indice</h2>
-      <div class="spark-toggle" id="bench-toggle" role="group" aria-label="Orizzonte del confronto">
-        <button class="chip" data-bench="m1">1 mese</button>
-        <button class="chip chip-active" data-bench="m3">3 mesi</button>
-        <button class="chip" data-bench="y1">1 anno</button>
-      </div>
-    </div>
-    <div class="struct-headline" id="bench-head"></div>
-    <div id="bench-chart"></div>
-    <div class="muted struct-note" id="bench-note"></div>
-  </section>
-
-<section class="card" data-pane="struttura" data-sez="rotazione">
+<section class="card" data-sez="rotazione">
     <div class="card-head">
       <h2>Rotazione — dove si muove il denaro</h2>
       <div class="spark-toggle" id="rot-toggle" role="group" aria-label="Orizzonte della rotazione">
@@ -135,7 +88,7 @@
     <div class="muted struct-note" id="mg-rot-note"></div>
   </section>
 
-<section class="card" data-pane="struttura" data-sez="stress">
+<section class="card" data-sez="stress">
     <div class="card-head">
       <h2>Termometri di stress</h2>
       <span class="muted">curva dei tassi · credito · volatilità, con le loro soglie</span>
@@ -143,7 +96,7 @@
     <div class="mg-tris" id="mg-stress"></div>
   </section>
 
-<section class="card" data-pane="struttura" data-sez="classifica">
+<section class="card" data-sez="classifica">
     <div class="card-head">
       <h2>Tutti gli indicatori, una classifica sola</h2>
       <span class="muted">gli stessi termometri per tutti e 30 · passa sopra un pallino per il nome, cliccalo per il dettaglio</span>
@@ -154,7 +107,7 @@
     <div class="muted struct-note" id="mg-tutti-note"></div>
   </section>
 
-<section class="card" data-pane="struttura" data-sez="leva">
+<section class="card" data-sez="leva">
     <div class="card-head">
       <h2>Leva e stagionalità</h2>
       <span class="muted">quanto denaro a prestito c'è nel mercato, e che mese è</span>
@@ -162,19 +115,7 @@
     <div class="mg-tris" id="mg-leva"></div>
   </section>
 
-<!-- v238 — "Da cosa nascono i punteggi" RIMOSSA su richiesta del CEO. RICEVUTA: il suo contenuto
-     NON e' andato perso — le barre dei fattori di ogni composito (ciclo economico, Fear & Greed,
-     sentiment globale, istituzionali vs retail) sono entrate nella scheda del rispettivo
-     indicatore, dentro "Tutti gli indicatori". Prima quei nomi comparivano DUE volte: una nella
-     classifica e una qui, ed era la stessa cosa detta in due posti. -->
-
-<!-- v243 — "Campanelli d'allarme" RIMOSSA su richiesta del CEO. RICEVUTA: sparisce il riquadro
-     (#mg-signposts / #mg-sign-head / #mg-sign-note) e renderSignposts(); NON sparisce il dato —
-     macro.signposts resta in data.json e la riga "BofA Bear-Market Signposts: N/10 attivi" resta
-     nel payload, dove l'LLM la legge. Si e' tolta la resa, non l'informazione. -->
-
-
-<section class="card" data-pane="struttura" data-sez="macro">
+<section class="card" data-sez="macro">
     <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
     <!-- v219 — bottone "Dettagli macro" RIMOSSO su richiesta del CEO. Il popup a 39 pannelli
          era una seconda pagina dentro la pagina. I singoli pannelli NON sono persi: si aprono
@@ -202,216 +143,20 @@
     </div>
   </section>
 
-  <!-- v206 — MAPPA DI CORRELAZIONE RIMOSSA su decisione del CEO ("non la capisco e non ne
-       capisco l'utilità"). Era una matrice N×N: una forma che va imparata prima di essere
-       letta, e questa dashboard non può permetterselo. L'informazione NON è andata persa —
-       la correlazione media del book e la coppia più legata di ogni titolo restano nel
-       payload (METRICHE DI RISCHIO) e nelle colonne "Corr. media"/"Max corr" delle tabelle.
-       Rimossa con lei anche corr_matrix dalla pipeline: era nata per questo grafico e non
-       aveva altri consumatori. -->
-
-  
-
-  
-
-  
-
-  <!-- PATRIMONIO -->
-  <section class="card kpi-card" data-pane="portafoglio" data-sez="patrimonio">
-    <section class="kpi-grid kpi-compact" id="kpi-grid"></section>
-    <div id="profit-by-currency"></div>
-  </section>
-
-  <!-- ALLOCAZIONE: solo torta + legenda laterale + liquidità -->
-  <section class="card" data-pane="portafoglio" data-sez="peso">
+  <!-- v256 — CORRELAZIONE FRA I BLOCCHI MACRO. Con il portafoglio fuori, "correlazione" non
+       può più voler dire correlazione fra titoli: qui è la relazione FRA GLI INDICATORI —
+       dove due famiglie che di solito si muovono insieme oggi dicono cose opposte. È la
+       stessa sostanza delle divergenze cross-blocco che il payload pubblica dal v156. -->
+  <section class="card" data-sez="correlazione">
     <div class="card-head">
-      <h2>Peso delle posizioni</h2>
-      <button class="btn btn-ghost btn-sm" id="alloc-edit" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica</button>
+      <h2>Dove gli indicatori non sono d'accordo</h2>
+      <span class="muted">famiglie macro a confronto: la dispersione conta più della media</span>
     </div>
-    <div class="alloc-top">
-      <div class="alloc-donut-wrap"><div id="alloc-donut"></div></div>
-      <ul class="alloc-legend" id="alloc-legend"></ul>
-    </div>
-    <!-- v212 — via il chip "Per settore": ora settore e valuta li disegna la card
-         "Allocazione per settore e valuta" qui sotto, con barre confrontabili. Due card che
-         mostravano la stessa ripartizione in due forme diverse erano una duplicazione. -->
-    <div class="spark-toggle alloc-toggle-below" id="alloc-toggle" role="group" aria-label="Vista allocazione" hidden>
-      <button class="chip chip-active" data-mode="ticker">Per titolo</button>
-    </div>
-    <section class="cash-box cash-box-inline alloc-cash">
-      <label for="cash-input">Liquidità disponibile (€)</label>
-      <div class="cash-row">
-        <input type="number" id="cash-input" min="0" step="any" placeholder="es. 20000" aria-label="Liquidità disponibile in euro">
-        <button class="btn btn-primary btn-sm" id="cash-save">Salva</button>
-      </div>
-      <span class="muted" id="cash-note"></span>
-    </section>
+    <div id="corr-macro"></div>
+    <div id="corr-macro-note" class="muted"></div>
   </section>
 
-  <!-- MACRO & MERCATI -->
-  <!-- ═══ v206 — MACRO IN GRAFICI ═════════════════════════════════════════════════════════
-       Prima questa scheda erano 34 riquadri della stessa forma (7 mini-card + 11 gauge +
-       16 tile), ognuno un numero con sotto un termometro 0-100 — e le serie storiche che il
-       file contiene (curva 501 punti, credito 260, VIX 30, margin debt 13) non erano
-       disegnate in dashboard, solo dentro i popup. Ora in cima ci sono tre domande; i 34
-       riquadri restano tutti, sotto, in un blocco richiudibile. -->
-  
-
-  
-
-  
-
-  <!-- v209 — LE MINI-CARD DIVENTANO GRAFICI. Un punteggio composito 0-100 con sotto un
-       termometro è la forma meno informativa possibile: dice "55" e non dice di CHI è colpa.
-       I componenti esistevano già in data.json (13 + 7 + 5 + 4) e non erano disegnati da
-       nessuna parte — risk_sentiment.components non era reso nemmeno nei popup. -->
-  
-
-  
-
-  
-
-  
-
-
-<section class="card" data-pane="portafoglio" data-sez="allocazione">
-    <div class="card-head">
-      <h2>Allocazione per settore e valuta</h2>
-      <div class="spark-toggle" id="alloc-graf-toggle" role="group" aria-label="Vista allocazione grafica">
-        <button class="chip chip-active" data-agmode="sector">Settore</button>
-        <!-- v251 — modalità "Valuta" RIMOSSA su richiesta del CEO: la quota in USD non
-             coperta è già pubblicata come misura nel rischio di cambio, e qui duplicava. -->
-      </div>
-    </div>
-    <div id="allocg-chart"></div>
-    <div class="muted struct-note" id="allocg-note"></div>
-  </section>
-
-<!-- v225 — "Distanza dallo stop" RIMOSSA su richiesta esplicita del CEO. RICEVUTA: spariscono
-     il riquadro e renderStopDist(); NON sparisce distanzeStop(), che resta la fonte del conteggio
-     "stop violati" dentro renderConcentrazione() e di due check in test_app.mjs. Il fatto che uno
-     stop sia superato continua quindi ad arrivare al payload e alla vista: si e' tolto il disegno,
-     non l'informazione. -->
-
-  <!-- v214 — LA DOMANDA DEL MANDATO: il fondo sta battendo il suo indice? Era un tachimetro in
-       una mini-card che mostrava lo scarto di UN GIORNO; la serie di 66 date esisteva e non era
-       disegnata da nessuna parte. -->
-  
-
-
-
-  <!-- PORTAFOGLIO -->
-  <section class="card" data-pane="portafoglio" data-sez="tabella-ptf">
-    <div class="card-head">
-      <h2>Portafoglio — tecnica, prezzi e fondamentali</h2>
-      <button class="btn btn-primary btn-sm" id="ptf-add-top" title="Aggiungi un titolo al portafoglio con quantità e PMC">+ Aggiungi titolo</button>
-    </div>
-    <div class="range-bar">
-      <span class="range-lab" id="range-lab-tech">Intervallo:</span>
-      <div class="spark-toggle" id="spark-toggle" role="group" aria-label="Intervallo analisi tecnica e mini-grafico">
-        <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
-        <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
-        <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
-      </div>
-      <div class="vista-switch" id="ptf-vista"></div>
-      <button class="btn btn-ghost btn-sm" id="ptf-cols" title="Scegli quali colonne vedere (non tocca il prompt AI)">⚙ Colonne</button>
-      <button class="btn btn-ghost btn-sm" id="ptf-edit-values" aria-label="Modifica quantità, PMC e liquidità" title="Modifica quantità, PMC e liquidità di tutte le posizioni">✎ Modifica valori</button>
-    </div>
-    <div class="table-wrap" id="ptf-tech-wrap">
-      <table id="ptf-table" aria-label="Portafoglio con prezzi, valore, guadagno e analisi tecnica">
-        <thead>
-          <tr>
-            <th class="sticky-col">Titolo</th>
-            <th class="num">Qtà</th>
-            <th class="num">PMC</th>
-            <th class="num">Prezzo</th>
-            <th class="num">Oggi</th>
-            <th class="num" title="Variazione pre-market / after-hours (dallo snapshot pipeline)">Pre/After</th>
-            <th class="num">Volume</th>
-            <th class="num">Guadagno</th>
-            <th class="num">Guad. %</th>
-            <th class="num" title="Beta vs Nasdaq 100 — regressione sui log-rendimenti 12M calcolata dalla pipeline; se n.d. usa il beta Yahoo (5A mensile vs S&P), sempre etichettato">Beta</th>
-            <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
-            <th class="num" title="Sortino Ratio 12 mesi — come lo Sharpe ma con la sola volatilità NEGATIVA (downside deviation): è il metro del veto value trap (< -0.3 = distruzione di valore)">Sortino 1A</th>
-            <th class="num">Supporto</th>
-            <th class="num">Resistenza</th>
-            <th class="num" title="Distanza % dalla media mobile a 200 giorni (price action pura)">Δ SMA200</th>
-            <th class="num" title="Forza relativa 1 mese vs benchmark settoriale (SOX/NDX/S&P)">RS 1M</th>
-            <th class="num" title="Forza relativa 1 mese vs Nasdaq 100 — metro diretto del mandato di sovraperformance">RS NDX 1M</th>
-            
-            <th class="num">Short %</th>
-            <th class="num" title="Flottante: azioni liberamente scambiabili (M/B e % sul totale). Low float (<50M) + Short alto + RVol alto = rischio short squeeze / volatilità asimmetrica">Float</th>
-            <th class="num">Drawdown 52S</th>
-            <th>Opzioni</th>
-            <th class="num">Trimestrale</th>
-            
-            <th class="num">Debt/Equity</th>
-            <th class="num">Div Yield</th>
-            <th class="num" title="Ricavi dell'ultimo esercizio disponibile (passa il mouse per la serie completa)">Ricavi</th><th class="num" title="Utile netto dell'ultimo esercizio (passa il mouse per la serie)">Utile netto</th><th class="num" title="Margine netto dell'ultimo esercizio: utile netto / ricavi">Marg. netto</th><th class="num" title="Crescita annua composta dei ricavi sulla serie disponibile">Cresc. ricavi</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- WATCHLIST -->
-  <section class="card" data-pane="watchlist" data-sez="tabella-wl">
-    <div class="card-head">
-      <h2>Watchlist</h2>
-      <button class="btn btn-primary btn-sm" id="wl-add-top" aria-label="Cerca e aggiungi un titolo alla watchlist" title="Cerca e aggiungi un titolo">+ Aggiungi titolo</button>
-    </div>
-    <div class="range-bar">
-      <span class="range-lab" id="wl-range-lab">Intervallo:</span>
-      <div class="spark-toggle" id="spark-toggle-wl" role="group" aria-label="Intervallo analisi tecnica watchlist">
-        <button class="chip" data-range="d1" aria-label="Un giorno">1G</button>
-        <button class="chip chip-active" data-range="m1" aria-label="Un mese">1M</button>
-        <button class="chip" data-range="y1" aria-label="Un anno">1A</button>
-      </div>
-      <div class="vista-switch" id="wl-vista"></div>
-      <button class="btn btn-ghost btn-sm" id="wl-cols" title="Scegli quali colonne vedere (non tocca il prompt AI)">⚙ Colonne</button>
-    </div>
-    <div class="table-wrap" id="wl-tech-wrap">
-      <table id="wl-table" aria-label="Watchlist con prezzi e analisi tecnica">
-        <thead>
-          <tr>
-            <th class="sticky-col">Titolo</th>
-            <th class="num">Prezzo</th>
-            <th class="num">Oggi</th>
-            <th class="num" title="Variazione pre-market / after-hours (dallo snapshot pipeline)">Pre/After</th>
-            <th class="num">Volume</th>
-            <th class="num" title="Beta vs Nasdaq 100 — regressione sui log-rendimenti 12M calcolata dalla pipeline; se n.d. usa il beta Yahoo (5A mensile vs S&P), sempre etichettato">Beta</th>
-            <th class="num" title="Sharpe Ratio annualizzato 12 mesi (rendimento corretto per il rischio)">Sharpe 1A</th>
-            <th class="num" title="Sortino Ratio 12 mesi — come lo Sharpe ma con la sola volatilità NEGATIVA (downside deviation): è il metro del veto value trap (< -0.3 = distruzione di valore)">Sortino 1A</th>
-            <th class="num">Supporto</th>
-            <th class="num">Resistenza</th>
-            <th class="num" title="Distanza % dalla media mobile a 200 giorni (price action pura)">Δ SMA200</th>
-            <th class="num" title="Forza relativa 1 mese vs benchmark settoriale (SOX/NDX/S&P)">RS 1M</th>
-            <th class="num" title="Forza relativa 1 mese vs Nasdaq 100 — metro diretto del mandato di sovraperformance">RS NDX 1M</th>
-            
-            <th class="num">Short %</th>
-            <th class="num" title="Flottante: azioni liberamente scambiabili (M/B e % sul totale). Low float (<50M) + Short alto + RVol alto = rischio short squeeze / volatilità asimmetrica">Float</th>
-            <th class="num">Drawdown 52S</th>
-            <th>Opzioni</th>
-            <th class="num">Trimestrale</th>
-            
-            <th class="num">Debt/Equity</th>
-            <th class="num">Div Yield</th>
-            <th class="num" title="Ricavi dell'ultimo esercizio disponibile (passa il mouse per la serie completa)">Ricavi</th><th class="num" title="Utile netto dell'ultimo esercizio (passa il mouse per la serie)">Utile netto</th><th class="num" title="Margine netto dell'ultimo esercizio: utile netto / ricavi">Marg. netto</th><th class="num" title="Crescita annua composta dei ricavi sulla serie disponibile">Cresc. ricavi</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- v249 — CARD "Parametri di Rischio del Fondo" RIMOSSA su richiesta del CEO: nella
-       scheda Rischio restano solo Calcolatore PMC e Calcolo vendite. Le SOGLIE restano
-       in RISK_PARAMS e continuano a filtrare i candidati; quello che sparisce è il
-       pannello che le esponeva come un cruscotto di regole. -->
-
-  <!-- STRUMENTI (compatti) -->
-  <section class="card" data-pane="rischio" data-sez="strumenti">
+  <section class="card" data-sez="strumenti">
     <div class="card-head"><h2>Strumenti</h2></div>
     <div class="tools-btns tools-btns-row">
       <button class="btn btn-ghost tool-btn" id="open-pmc">Calcolatore PMC<span class="muted">mediazione acquisto / realizzo vendita</span></button>
@@ -420,15 +165,18 @@
   </section>
 
   <footer>
-    Prezzi live lato client (Yahoo via proxy CORS, ogni 60s) · dati tecnici/macro/news rigenerati dal workflow ogni ~20 min.<br>
-    Fonti: Yahoo Finance · CNN Fear &amp; Greed · FRED/BLS/DBnomics · NY Fed · MOF Giappone · Borsa Italiana · RSS (CNBC, Bloomberg, Yahoo, Investing, Google News, Reddit) · Polymarket. Non è consulenza finanziaria.
+    Dati macro rigenerati dal workflow ogni ~2-4 ore · l'analisi la fa un LLM sul pacchetto che copi da qui.<br>
+    Fonti: Yahoo Finance · CNN Fear &amp; Greed · FRED/BLS/DBnomics · NY Fed · MOF Giappone · CME FedWatch · Polymarket
   </footer>
 
   </div><!-- /.shell-main -->
   </div><!-- /.shell -->
 </main>
 
-<!-- Modal zoom grafico -->
+<!-- v256 — MODALI RIMOSSI: "Verifica risposta AI" (validava gli ordini proposti dall'LLM
+     contro il portafoglio, che non esiste più: senza posizioni "vendita di un titolo non
+     posseduto" e "quantità superiore al posseduto" non significano nulla) e il popup delle
+     news (le news escono dal sistema come pagina e come payload). -->
 <div class="modal-backdrop" id="chart-modal" hidden>
   <div class="modal modal-chart">
     <div class="modal-head">
@@ -441,26 +189,7 @@
 </div>
 
 <!-- Modal prompt AI -->
-<!-- v255 — VERIFICA DELLA RISPOSTA AI. Chiude il cerchio: il payload esce da "📋 Copia
-     Analisi AI", la risposta dell'LLM rientra da qui. Il validatore (parseAIOrders +
-     validateAIOrders) esisteva con otto test dal v149 e non era collegato a NIENTE: la
-     testata del CEO lo PROMETTE in A2 ("un validatore automatico estrae ticker/quote/limite/
-     stop dal testo") e per versioni quella promessa è stata falsa. -->
-<div class="modal-backdrop" id="verifica-modal" hidden>
-  <div class="modal">
-    <div class="modal-head">
-      <h3>Verifica risposta AI</h3>
-      <button class="btn btn-ghost" id="verifica-modal-close" data-close-modal>✕</button>
-    </div>
-    <p class="muted">Incolla qui la risposta dell'LLM. Il sistema estrae gli ordini proposti e li confronta col portafoglio reale. <b>Blocca solo ciò che è impossibile</b> (ticker inesistente, vendita di un titolo non posseduto, stop sopra il limite, quantità maggiore del posseduto); tutto il resto è una segnalazione, e la decisione resta tua.</p>
-    <textarea id="verifica-text" spellcheck="false" placeholder="Incolla qui il report dell'AI…"></textarea>
-    <div id="verifica-esito"></div>
-    <div class="modal-foot">
-      <button class="btn btn-primary" id="verifica-run">Controlla gli ordini</button>
-      <button class="btn btn-ghost" id="verifica-clear">Svuota</button>
-    </div>
-  </div>
-</div>
+
 
 <div class="modal-backdrop" id="modal" hidden>
   <div class="modal">
@@ -477,16 +206,7 @@
   </div>
 </div>
 
-<!-- Modal NEWS -->
-<div class="modal-backdrop" id="news-modal" hidden>
-  <div class="modal">
-    <div class="modal-head">
-      <h3>News — portafoglio &amp; macro USA</h3>
-      <button class="btn btn-ghost" id="news-modal-close">✕</button>
-    </div>
-    <ul class="news-list" id="news-list" aria-label="Elenco notizie"></ul>
-  </div>
-</div>
+
 
 <!-- Modal PMC -->
 <div class="modal-backdrop" id="pmc-modal" hidden>
@@ -555,6 +275,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=255"></script>
+<script src="assets/app.js?v=256"></script>
 </body>
 </html>

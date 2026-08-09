@@ -118,21 +118,20 @@ const violations = [];
 function fail(where, what) { violations.push(`[${where}] ${what}`); }
 
 function checkCampaign(name, ctx) {
-  // verdetto (piano + trailing) — solo i campi che servono, mai gli oggetti riga interi
-  const dv = JSON.parse(vm.runInContext(`(() => { const v = decisionVerdict(); return JSON.stringify({
-    plan: v.withPlan.map(p => ({ tk: p.r.ticker, price: p.r.price, limit: p.limit, stop: p.stop })),
-    trail: v.trailing.map(x => ({ tk: x.r.ticker, price: x.r.price, stop: x.stop })) }) })()`, ctx));
-  for (const p of dv.plan) {
-    if (!(p.stop > 0)) fail(name, `I1 ${p.tk}: stop ${p.stop} ≤ 0 nel piano`);
-    if (!(p.limit > 0)) fail(name, `I1 ${p.tk}: limite ${p.limit} ≤ 0 nel piano`);
-    if (!(p.stop < p.limit)) fail(name, `I1 ${p.tk}: stop ${p.stop} ≥ limite ${p.limit}`);
-    if (!(p.limit <= p.price * 1.001)) fail(name, `I1 ${p.tk}: limite ${p.limit} sopra il prezzo ${p.price}`);
-    if ((p.price - p.limit) / p.price > 0.30) fail(name, `I1 ${p.tk}: limite ${p.limit} oltre il 30% dal prezzo ${p.price} (incidente SNDK)`);
+  /* ⚠ v256 — I1 e I2 ROVESCIATI, non rimossi. Verificavano che ogni ordine del piano avesse
+     stop < limite ≤ prezzo e che gli stop trailing fossero plausibili: invarianti su un
+     VERDETTO che non esiste piu' (decisionVerdict e' uscito col portafoglio). Cancellarli
+     avrebbe lasciato un buco silenzioso; ora presidiano il TAGLIO — un pacchetto macro che
+     tornasse a proporre operazioni sarebbe una regressione, non una funzionalita'. */
+  const pOrd = vm.runInContext("buildCIOText()", ctx);
+  const testataOrd = vm.runInContext("promptHeaderText()", ctx);
+  const datiOrd = pOrd.slice(pOrd.indexOf(testataOrd) + testataOrd.length);
+  for (const [et, re] of [["ordini", /COMPRA ~|VENDI ~|quote a limite/],
+                          ["stop per posizione", /[Ss]top trailing|STOP VIOLATO/],
+                          ["tabelle di titoli", /PORTAFOGLIO — \d+ POSIZIONI|WATCHLIST — \d+ TITOLI/]]) {
+    if (re.test(datiOrd)) fail(name, `I1 il pacchetto macro contiene ${et}: il portafoglio e' fuori dal sistema`);
   }
-  for (const t of dv.trail) {
-    if (!(t.stop > 0)) fail(name, `I2 ${t.tk}: stop trailing ${t.stop} ≤ 0`);
-    if (t.price > 0 && t.stop > t.price * 3) fail(name, `I2 ${t.tk}: stop trailing ${t.stop} oltre 3× il prezzo ${t.price}`);
-  }
+
   // v128: audita il PACCHETTO COMPLETO (payload + digest storici del Report CIO) se presente —
   // i digest devono reggere null-storm e dati avvelenati esattamente come la coda del prompt
   const p = vm.runInContext("typeof buildCIOText === 'function' ? buildCIOText() : buildPrompt()", ctx);
