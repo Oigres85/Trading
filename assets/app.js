@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "258";
+const BUILD_VERSION = "260";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2728,7 +2728,50 @@ function indicatoriClassifica() {
      orario)" eliminate; "Stagionalità del mese" e' la STESSA cosa del riquadro "Leva e
      stagionalità", che pero' ha i 12 mesi disegnati — si tiene quello col grafico e si toglie il
      doppione, che diceva lo stesso fatto con meno informazione (classe v184). */
-  const FUORI = new Set(["thermometer", "futures", "seasonality"]);
+  /* ═══ v258 — I COMPONENTI DI FEAR & GREED DIVENTANO SCHEDE A SE' ═══════════════════════════
+     Richiesta del CEO: "nella tab fear and greed ci sono informazioni come vix momentum etc.
+     portale fuori come macro tab a parte qualora non ve ne sia gia' una presente".
+     I sette componenti li pubblica la CNN dentro `fear_greed.components`, ciascuno col proprio
+     punteggio 0-100 e la propria etichetta: sono indicatori veri, non pezzi di un totale, ed
+     erano leggibili solo dentro la scheda del composito.
+     ⚠ IL "QUALORA NON VE NE SIA GIA' UNA PRESENTE" E' LA PARTE DELICATA. La deduplica si fa sui
+     NOMI, ed e' un'euristica — questo progetto ha gia' pagato l'accoppiamento per nome visibile
+     (v196). La differenza e' il modo di fallire: qui il caso peggiore e' una scheda duplicata,
+     non un dato perso, e il check v258 stampa cosa e' stato saltato cosi' la deduplica resta
+     ispezionabile invece che silenziosa. */
+  const fgComp = ((m.fear_greed || {}).components || [])
+    .filter(c => c && c.label && Number.isFinite(Number(c.score)));
+  if (fgComp.length) {
+    const chiaveNome = (x) => String(x).toLowerCase()
+      .replace(/[()]/g, " ").replace(/\s+/g, " ").trim();
+    /* i token che identificano un indicatore gia' presente: si confrontano le PAROLE, non le
+       stringhe intere ("Volatilita' (VIX)" e "Volatilita' (VIX)" combaciano, ma anche
+       "Opzioni Put/Call" e "Put/Call ratio (SPY)" condividono "put/call") */
+    const tokenEsistenti = new Set(out.flatMap(x => chiaveNome(x.nome).split(" ").filter(w => w.length > 3)));
+    for (const c of fgComp) {
+      const tok = chiaveNome(c.label).split(" ").filter(w => w.length > 3);
+      const gia = tok.length > 0 && tok.some(w => tokenEsistenti.has(w));
+      if (gia) continue;
+      out.push({ k: "fg:" + chiaveNome(c.label).replace(/[^a-z0-9]+/g, "-"),
+                 nome: c.label, score: Math.round(Number(c.score)),
+                 sub: `${c.rating ? (FG_LABELS[c.rating] || c.rating) + " · " : ""}componente di Fear & Greed (CNN)`,
+                 cadenza: rigaFreschezzaMercato() });
+    }
+  }
+
+  /* ═══ v259 — DUE COMPOSITI TOLTI SU RICHIESTA DEL CEO ═══════════════════════════════════════
+     "Sentiment globale e Istituzionali vs retail vanno eliminati perche' credo siano gia'
+     presenti e non voglio dati aggregati come questi se gia' presenti in altri macro TAB".
+     VERIFICATO, e ha ragione: Sentiment globale (risk_sentiment) e' costruito su Fear & Greed,
+     Put/Call, VIX, credito e Bitcoin — cinque componenti che hanno TUTTI una scheda propria.
+     Istituzionali vs retail (smart_money) e' costruito su struttura SMC degli indici, VIX term,
+     HY/IG e put/call: anche li' tre su quattro hanno una scheda.
+     Sono medie di cose gia' visibili, e una media di segnali gia' contati li conta due volte —
+     esattamente cio' che il payload dichiara di non voler fare ("contarli come due prove
+     raddoppia un segnale solo", v229). Non si perde informazione: si perde una ripetizione.
+     ⚠ I loro COMPONENTI restano tutti: le schede singole ci sono, e la dispersione interna
+     continua a vivere nel blocco del disaccordo, che legge macroquant e fear_greed. */
+  const FUORI = new Set(["thermometer", "futures", "seasonality", "risk_sentiment", "smart_money"]);
   /* ⚠ v253 — LA FRESCHEZZA SI ASSEGNA IN UN PUNTO SOLO, QUI IN FONDO. La prima stesura la
      agganciava ai singoli `out.push`: ce ne sono NOVE sparsi per la funzione, e un decimo
      aggiunto un domani nascerebbe senza — è lo stesso motivo per cui il filtro FUORI qui
@@ -2792,8 +2835,19 @@ function contenutoDalPannello(k, notaGia = "") {
     const numeri = (testo.match(/[\d][\d.,]{1,}/g) || []).filter(x => x.length > 2).map(norm);
     return numeri.length > 0 && numeri.every(n => numeriNota.includes(n));
   };
-  const pezzi = [...html.matchAll(/<svg[\s\S]*?<\/svg>|<table[\s\S]*?<\/table>|<div class="info-line[\s\S]*?<\/div>/g)]
-    .map(m => m[0]).filter(x => !ridondante(x));
+  /* ⚠ v258 — ORA ESCE ANCHE LA PROSA. Richiesta del CEO: "tutto cio' che si legge nei pop up
+     che apro cliccando in una tab deve essere portato fuori nella tab stessa, uniformando le
+     informazioni". Fino a v235 uscivano solo grafici, tabelle e righe di dati: restava dentro
+     la spiegazione — cos'e' l'indicatore, come si legge, attraverso quale canale tocca il
+     portafoglio. Era la parte che il CEO doveva andare a cercare con un clic, ed e' proprio
+     quella che rende leggibile il numero (e' la stessa ragione per cui in v238 ogni scheda ha
+     il suo "come si legge": un grafico senza quella riga e' la forma gia' respinta).
+     Il filtro anti-ridondanza resta identico e vale anche sulla prosa: una riga che ripete
+     numeri gia' presenti nella nota non entra. */
+  const pezzi = [...html.matchAll(/<svg[\s\S]*?<\/svg>|<table[\s\S]*?<\/table>|<div class="info-line[\s\S]*?<\/div>|<p[\s\S]*?<\/p>|<ul[\s\S]*?<\/ul>/g)]
+    .map(m => m[0]).filter(x => !ridondante(x))
+    /* la prosa va marcata: nella scheda deve leggersi come contesto, non come un dato in piu' */
+    .map(x => /^<p/.test(x) ? x.replace(/^<p/, '<p class="mg-spieg"') : x);
   return pezzi.length ? `<div class="mg-dalpan">${pezzi.join("")}</div>` : "";
 }
 
@@ -5455,8 +5509,41 @@ function buildPrompt() {
   if ((dqV.overrides || []).length) {
     lines.push(`OVERRIDE MANUALI ATTIVI (valori inseriti dall'utente perché la fonte era ko — trattali come dati validi ma verifica se puoi): ${dqV.overrides.map(o => `${o.key} [MANUAL_OVERRIDE del ${o.date || "n.d."}]`).join(" · ")}.`);
   }
+  /* ═══ v259 — LA QUALITA' TEMPORALE DI OGNI DATO, DICHIARATA IN CIMA ═══════════════════════
+     Osservazione del CEO, ed e' CORRETTA: "i dati dovrebbero essere indicati con la data
+     dell'ultimo aggiornamento e la data del prossimo, affinche' anche il prompt LLM capisca la
+     qualita' temporale del dato e non lo interpreti come assoluto".
+     Le SCHEDE la portavano gia' da v250/v253 — il PAYLOAD no, se non su otto serie con un
+     calendario di pubblicazione. Tutto il resto arrivava all'LLM come se fosse di adesso.
+     L'audit indipendente delle fonti lanciato in questa sessione ha trovato la stessa cosa dal
+     lato pipeline: i blocchi macro (vix, breadth, froth, tilt, momentum) NON hanno un `asof`
+     proprio, ereditano solo `updated_at` — e in un run di domenica il VIX e' la chiusura di
+     venerdi' senza che nulla lo dica.
+     Questa riga chiude il buco dal lato payload: dichiara le TRE classi di freschezza che
+     convivono nel pacchetto, cosi' l'LLM sa quale numero e' di adesso e quale ha settimane.
+     E' un FATTO sui dati, non un'istruzione (C9). */
+  {
+    const iso = DATA.updated_at ? new Date(DATA.updated_at) : null;
+    const quando = iso && !isNaN(iso) ? iso.toLocaleString("it-IT") : "n.d.";
+    const prossimo = (typeof prossimoRunPipeline === "function" && prossimoRunPipeline())
+      ? prossimoRunPipeline().toLocaleString("it-IT") : null;
+    const conCalendario = (m.indicators || [])
+      .filter(i => i && i.key && typeof CADENZA_FONTE !== "undefined" && CADENZA_FONTE[i.key] && i.date)
+      .map(i => `${i.label || i.key} (${String(i.date).slice(0, 10)})`);
+    lines.push(`FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:`);
+    lines.push(`· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, `
+      + `momentum): rilevati al run delle ${quando}${prossimo ? `, prossimo run ${prossimo}` : ""}. `
+      + `A borse chiuse sono l'ULTIMA CHIUSURA, non il presente: le righe che lo sanno lo scrivono accanto al valore.`);
+    if (conCalendario.length) {
+      lines.push(`· STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): `
+        + `${conCalendario.join(" · ")}. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e `
+        + `il prossimo dato atteso.`);
+    }
+    lines.push(`· SERIE STORICHE E PERCENTILI (curva, HY OAS, VIX): calcolati su finestre che finiscono `
+      + `all'ultima rilevazione disponibile della serie, non a oggi.`);
+  }
   lines.push("QUADRO MACRO:");
-  if (m.risk_sentiment) lines.push(`- Sentiment globale: ${m.risk_sentiment.label} (${m.risk_sentiment.score}/100)`);
+  /* v259 — "Sentiment globale" fuori dal payload: media di componenti gia' pubblicati uno per uno. */
   /* v256 — "Termometro tecnico del portafoglio" tolto: era un punteggio calcolato sui
      titoli in portafoglio, non un dato macro. Senza libro non misura niente. */
   if (m.fear_greed) {
@@ -5658,31 +5745,8 @@ function buildPrompt() {
     const sr = m.systemic_risk;
     lines.push(`- Rischio Sistemico & Credito (proxy CDS): HY OAS ${sr.hy_oas}% (${signTxt(sr.hy_chg_1m)} 1m), IG OAS ${sr.ig_oas ?? "—"}% (ICE BofA US Corporate, indice IG AMPIO · ${sr.ig_chg_1m != null ? signTxt(sr.ig_chg_1m) : "—"} 1m), HY/IG ${sr.hy_ig ?? "—"}×${sr.stlfsi != null ? `, stress finanziario St.Louis ${signTxt(sr.stlfsi)}` : ""} — ${sr.status}`);
   }
-  if (m.smart_money) {
-    const sm = m.smart_money;
-    let l = `- Istituzionali VS Retail: ${sm.label} (${sm.score}/100, basato su SMC di S&P 500 e Nasdaq + VIX term + HY/IG + put/call)`;
-    const si = sm.smc_indices || {};
-    const idxTxt = Object.values(si).map(s => `${s.label_idx}: struttura ${s.structure}, BOS ${s.bos || "n/d"}, FVG ${s.bull_fvg}↑/${s.bear_fvg}↓, bias ${s.bias}/100`).join(" · ");
-    if (idxTxt) l += `. SMC indici → ${idxTxt}`;
-    if (sm.vix_term_ratio != null) l += `. VIX/VIX3M ${fmtNum.format(sm.vix_term_ratio)} ${sm.vix_term_ratio > 1 ? "(backwardation=tensione)" : "(contango=calma)"}`;
-    // denominatore DIVERSO dalla riga "Rischio Sistemico & Credito": qui e' il BBB, la fascia piu'
-    // bassa dell'investment grade, dove la fuga verso la qualita' si vede per prima. Il nome lo
-    // dice, cosi' i due rapporti non si leggono come lo stesso numero che si contraddice.
-    if (sm.hy_ig_ratio != null) l += `, HY/BBB ${fmtNum.format(sm.hy_ig_ratio)}× (${sm.ig_spread != null ? `BBB ${fmtNum.format(sm.ig_spread)}%, ` : ""}fascia IG piu' bassa — NON lo stesso denominatore di HY/IG sopra)`;
-    const fgBp = m.fear_greed?.score;
-    if (fgBp != null) {
-      if (fgBp > 75 && sm.score < 30)
-        l += ` — *** ALERT DIVERGENZA PERICOLOSA: retail F&G ${fgBp}/100 (LONG ESTREMO) vs istituzionali ${sm.score}/100 (SHORT) — rischio distribuzione imminente, storicamente precede correzioni ***`;
-      else if (fgBp < 25 && sm.score > 70)
-        l += ` — *** ALERT ACCUMULO ISTITUZIONALE: retail F&G ${fgBp}/100 (PAURA ESTREMA) vs istituzionali ${sm.score}/100 (AGGRESSIVI) — possibile bottom, setup rialzista ***`;
-      else if (sm.divergence != null) l += ` — divergenza col retail: ${sm.divergence_label}`;
-    } else if (sm.divergence != null) {
-      l += ` — divergenza col retail: ${sm.divergence_label}`;
-    }
-    lines.push(l);
-    /* v257 — SMC PER TITOLO tolto: era la struttura di mercato delle POSIZIONI. Il blocco
-       Istituzionali-vs-retail resta, perche' misura S&P 500 e Nasdaq — indici, non il libro. */
-  }
+  /* v259 — "Istituzionali VS Retail" fuori dal payload: stessa ragione del sentiment
+     globale — e' una media di SMC indici, VIX term, HY/IG e put/call, tutti gia' pubblicati. */
   if (m.decouple?.sp500?.length && m.decouple?.gdp?.length) {
     const gg = sovrapposizioneGiorni(m.decouple.sp500, m.decouple.gdp);
     if (gg) {
@@ -6052,8 +6116,12 @@ function correlazioniMacro() {
   const m = (typeof DATA !== "undefined" && DATA && DATA.macro) || {};
   const mediana = (a) => { const x = [...a].sort((p, q) => p - q); const n = x.length;
     return n ? (n % 2 ? x[(n - 1) / 2] : (x[n / 2 - 1] + x[n / 2]) / 2) : null; };
-  const NOMI = { macroquant: "Ciclo economico", fear_greed: "Fear & Greed",
-                 risk_sentiment: "Sentiment globale", smart_money: "Istituzionali vs retail" };
+  /* ⚠ v259 — restano DUE compositi, non quattro. Il CEO ha chiesto di togliere "Sentiment
+     globale" e "Istituzionali vs retail" perche' aggregano cose gia' visibili altrove: toglierli
+     dalle schede e lasciarli qui sarebbe stato rimetterli dalla porta di servizio.
+     Restano il ciclo economico (13 componenti macro, che schede proprie NON hanno) e Fear &
+     Greed, che il CEO ha esplicitamente voluto tenere chiedendo di estrarne i componenti. */
+  const NOMI = { macroquant: "Ciclo economico", fear_greed: "Fear & Greed" };
   const compositi = [];
   for (const k of Object.keys(NOMI)) {
     const v = m[k];
@@ -6164,7 +6232,13 @@ function renderCorrMacro() {
    scritta una volta e persistita — non la sua watchlist di Investing travestita da tale.
    ⚠ E' l'unica dipendenza esterna della pagina: se lo script non risponde, il riquadro lo dice
    e il resto continua a funzionare (l'onerror sotto). */
-const TV_STUDIES = ["STD;Volume", "STD;RSI", "STD;Pivot%1Points%1Standard", "STD;SMA"];
+/* ⚠ v259 — PIVOT TOLTI. Il CEO ha mandato la foto: i pivot standard disegnano R1..R5 e S1..S5
+   per OGNI seduta dello storico, quindi su un grafico giornaliero a un anno diventano centinaia
+   di etichette arancioni sovrapposte che coprono le candele. Non erano "un indicatore da
+   tarare": erano illeggibili per costruzione su quell'orizzonte. Restano volumi, RSI e due medie
+   — i supporti e le resistenze veri li disegna l'LLM nell'analisi, dove hanno un perche' accanto
+   (zona di volume, massimo precedente) invece di una linea per ogni giorno. */
+const TV_STUDIES = ["STD;Volume", "STD;RSI", "STD;SMA", "STD;EMA"];
 let tvSimboloCorrente = "";
 let tvIntervallo = "D";
 
@@ -6226,15 +6300,26 @@ function montaGraficoTV(tk, intervallo) {
   };
   cont.appendChild(sc);
   box.appendChild(cont);
+  /* ⚠ v259 — LA LEGENDA DEGLI INDICATORI STA FUORI DAL GRAFICO. Richiesta del CEO: capire
+     cosa sono le linee che vede. Dentro il widget la spiegazione non c'e' (TradingView mostra
+     solo la sigla), e il widget e' un iframe di terze parti: non possiamo leggerne il contenuto
+     ne' scriverci dentro. Quindi la spiegazione vive qui, accanto, dove la controlliamo noi.
+     ⚠ E NON PROMETTO UNA LETTURA IN TEMPO REALE DEL GRAFICO: il CEO l'ha chiesta ("un sistema
+     che legga il grafico in tempo reale dentro il sistema stesso") ed e' impossibile da una
+     pagina statica — l'iframe e' cross-origin, il browser non ci fa leggere nulla di quello
+     che c'e' dentro, e non e' una limitazione aggirabile. Fingere di leggerlo sarebbe la classe
+     v195: un dato indovinato scritto come certo. */
   if (nota) {
-    nota.innerHTML = `Widget pubblico di TradingView: <b>nessun account e nessuna credenziale</b>. `
-      + `Indicatori caricati: volumi, RSI, pivot standard (i pivot sono i supporti e le resistenze `
-      + `calcolati sulla seduta precedente) e media mobile. Puoi aggiungerne altri e disegnare `
-      + `direttamente dentro il grafico. `
-      + (String(tk).includes(".") ? `⚠ "${esc(tk)}" ha un suffisso di borsa alla Yahoo: TradingView usa una `
-         + `nomenclatura diversa, quindi il simbolo potrebbe non agganciarsi — scrivilo come lo vedi su `
-         + `TradingView (per esempio <code>EURONEXT:ASML</code>).` : "");
+    nota.innerHTML = `<div class="tv-legenda">
+      <div><b>Volume</b><span>Quante azioni sono passate di mano in quella seduta. Barre alte = il movimento e' stato fatto da molti; barre basse = pochi scambi, quindi il livello regge meno.</span></div>
+      <div><b>RSI (14)</b><span>Quanto e' stata forte la spinta recente, su una scala 0-100. Sopra 70 il titolo ha corso molto in poco tempo, sotto 30 e' stato venduto molto. Non e' un segnale di acquisto o vendita: e' una misura di quanto e' teso il movimento.</span></div>
+      <div><b>SMA</b><span>Media semplice degli ultimi N prezzi: la linea del "prezzo normale" recente. Il prezzo sopra = tendenza intatta, sotto = tendenza in discussione.</span></div>
+      <div><b>EMA</b><span>Come la SMA ma pesa di piu' i giorni recenti: gira prima quando il movimento cambia. Le due insieme dicono se il cambio e' appena iniziato (EMA gira, SMA no) o consolidato (girano entrambe).</span></div>
+    </div>
+    <div class="tv-piede">Widget pubblico di TradingView: <b>nessun account, nessuna credenziale</b>. Puoi aggiungere altri indicatori dal bottone "Indicatori" dentro il grafico e disegnarci sopra: le modifiche restano nella tua sessione del browser.
+    ${String(tk).includes(".") ? ` ⚠ "${esc(tk)}" ha un suffisso di borsa alla Yahoo: TradingView usa una nomenclatura diversa e il simbolo potrebbe non agganciarsi — scrivilo come lo vedi su TradingView (per esempio <code>EURONEXT:ASML</code>).` : ""}</div>`;
   }
+
 }
 
 $("#tv-tf")?.addEventListener("click", (e) => {
@@ -6399,6 +6484,23 @@ function buildPromptTicker(tkGrezzo) {
 `· consenso analisti e target → stockanalysis.com/stocks/${tk}/forecast · marketbeat · tipranks`,
 `Ogni numero che riporti va marcato [VERIFICATO] con la fonte e la DATA della rilevazione.`,
 ``,
+`══ GERARCHIA DELLE FONTI — imparata da una risposta reale ══`,
+`Un LLM ha gia' prodotto un'analisi su questo formato citando [VERIFICATO] con fonte "Reddit" le medie mobili, l'RSI, i supporti, i target degli analisti e lo short interest: cioe' i numeri su cui poi si decide. Non succeda di nuovo.`,
+`1. FONTE PRIMARIA — la societa' (comunicati IR, presentazioni), i filing SEC, l'exchange. Per un numero di bilancio o di guidance, e' l'unica che vale.`,
+`2. DATI DI MERCATO — Yahoo Finance, stockanalysis.com, investing.com, il tuo broker. Prezzi, volumi, medie, multipli.`,
+`3. STAMPA FINANZIARIA — Reuters, Bloomberg, WSJ, CNBC, Barron's, FT. Per i fatti e le reazioni.`,
+`4. AGGREGATORI DI CONSENSO — stockanalysis, marketbeat, tipranks, FactSet. Per i target: dichiara SEMPRE quanti analisti e a quale data, perche' la media di 35 analisti e quella di 5 non sono lo stesso numero.`,
+`NON SONO FONTI, e non si marcano [VERIFICATO]: Reddit, X/Twitter, StockTwits, forum, blog anonimi, video, "si dice", e qualunque pagina che riporti un numero senza dire da dove viene. Se un numero lo trovi solo li', scrivi "n.d." e vai avanti: e' un dato che non hai.`,
+`Se una fonte di rango 2-4 contraddice una di rango 1, vince la 1 e lo dici.`,
+``,
+`══ IL PREZZO DI RIFERIMENTO E' UNO SOLO ══`,
+`Prima di tutto il resto fissa UN prezzo di riferimento: valore, data e ora, borsa. Tutto il resto — distanze dai livelli, capitalizzazione, rendimento da inizio anno, upside sui target — si calcola su QUELLO e lo dichiara ("−6% dal riferimento").`,
+`Un'analisi che cita $476 nella scheda, $482 nel commento sugli utili e "chiusura del 31/07" nella tecnica sta descrivendo tre giorni diversi come se fossero oggi: e' successo davvero, ed e' il modo piu' facile di sbagliare un livello d'ingresso.`,
+`Se il mercato e' chiuso, il riferimento e' l'ultima chiusura e lo scrivi.`,
+``,
+`══ NIENTE [VERIFICATO] DERIVATO ══`,
+`[VERIFICATO] vale per un numero che hai LETTO in una fonte, non per uno che hai ricavato. "Capitalizzazione circa 780-790 mld, ricavabile da 807 mld di due settimane fa piu' il calo del prezzo" e' una stima: si scrive [STIMA] col calcolo accanto, oppure "n.d.".`,
+``,
 `══ COSA DEVI CONSEGNARE ══`,
 ``,
 `1) SCHEDA DI IDENTITA' — una tabella:`,
@@ -6470,14 +6572,43 @@ function buildCIOText() {
 
 /* ---------- azione unica: copia il pacchetto completo e mostralo nella modal ---------- */
 async function copyCIOText() {
+  /* ⚠ v259 — UN SOLO BOTTONE. Ce n'erano due, "Copia analisi macro" in topbar e "Copia analisi
+     per l'AI" nel box del titolo, e il CEO ha chiesto di unirli: "ci dovrebbe essere un unico
+     pulsante che crea il prompt da copiare all'llm".
+     Aveva ragione anche per una ragione che non ha detto: il pacchetto del titolo CONTIENE gia'
+     tutto il quadro macro, quindi i due bottoni non producevano due cose diverse — producevano
+     lo stesso quadro macro, una volta da solo e una volta dentro un'analisi. Due porte per la
+     stessa stanza (la classe v209).
+     Ora la scelta la fa il contenuto del box: ticker scritto → analisi di quel titolo; box vuoto
+     → solo quadro macro. E lo dice, invece di lasciarlo indovinare. */
   if (!DATA) { toast("Dati non ancora caricati, riprova tra un attimo"); return; }
-  const text = buildCIOText();
-  $("#prompt-text").value = text;   // visibile/editabile nel box (e copiabile a mano se la clipboard manca, es. iOS)
-  $("#modal").hidden = false;
+  const tk = String($("#tk-input")?.value || "").trim().toUpperCase();
+  const esito = $("#tk-esito");
+  let testo, che;
+  if (tk) {
+    if (!/^[A-Z0-9][A-Z0-9.\-=^:]{0,15}$/.test(tk)) {
+      if (esito) esito.textContent = `"${tk}" non sembra un ticker. Svuota il campo per il solo quadro macro, o scrivilo come lo vedi sul mercato.`;
+      $("#tk-input")?.focus();
+      return;
+    }
+    montaGraficoTV(tk);
+    testo = buildPromptTicker(tk);
+    che = `Analisi di ${tk}`;
+  } else {
+    testo = buildCIOText();
+    che = "Quadro macro";
+  }
+  const box = $("#prompt-text");
+  if (box) box.value = testo;
+  const modale = $("#modal");
+  if (modale) modale.hidden = false;
   try {
-    await navigator.clipboard.writeText(text);
-    toast("Analisi AI copiata ✓ — incollala in Claude");
-  } catch { /* clipboard non disponibile: si copia dal box */ }
+    await navigator.clipboard.writeText(testo);
+    if (esito) esito.textContent = `${che} copiato (${(testo.length / 1000).toFixed(1)}k caratteri). Non e' stato salvato da nessuna parte.`;
+    toast(`${che} copiato \u2713`);
+  } catch {
+    if (esito) esito.textContent = `${che} pronto nel riquadro: copialo da li' (la clipboard non e' disponibile).`;
+  }
 }
 
 
@@ -6486,36 +6617,14 @@ async function copyCIOText() {
    Il pacchetto si genera al clic, si copia, e la modale lo mostra per un'ultima occhiata —
    stesso percorso del pacchetto macro, perche' due strade separate per la stessa azione
    divergono (v161, v207). */
-async function copiaAnalisiTitolo() {
-  const inp = $("#tk-input");
-  const esito = $("#tk-esito");
-  const tk = String(inp?.value || "").trim().toUpperCase();
-  if (!tk) { if (esito) esito.textContent = "Scrivi un ticker."; inp?.focus(); return; }
-  if (!/^[A-Z0-9][A-Z0-9.\-=^]{0,11}$/.test(tk)) {
-    if (esito) esito.textContent = `"${tk}" non sembra un ticker. Usa la forma del mercato: NVDA, ASML.AS, 005930.KS.`;
-    return;
-  }
-  if (!DATA) { if (esito) esito.textContent = "Dati macro non ancora caricati, riprova tra un attimo."; return; }
-  montaGraficoTV(tk);   // v257: il grafico segue il ticker che si sta analizzando
-  const testo = buildPromptTicker(tk);
-  const box = $("#prompt-text");
-  if (box) box.value = testo;
-  const modale = $("#modal");
-  if (modale) modale.hidden = false;
-  try {
-    await navigator.clipboard.writeText(testo);
-    if (esito) esito.textContent = `Analisi di ${tk} copiata — incollala in un LLM. Non e' stata salvata da nessuna parte.`;
-    toast(`Analisi ${tk} copiata \u2713`);
-  } catch {
-    if (esito) esito.textContent = `Analisi di ${tk} pronta nel riquadro: copiala da li' (la clipboard non e' disponibile).`;
-  }
-}
+/* v259 — copiaAnalisiTitolo() rimossa: era la seconda strada per la stessa azione, e due
+   strade separate per la stessa cosa divergono (v161, v207). Ora c'e' solo copyCIOText. */
+
 
 /* ---------------- eventi ---------------- */
 $("#btn-refresh")?.addEventListener("click", refreshAll);
-$("#tk-go")?.addEventListener("click", copiaAnalisiTitolo);
-$("#tk-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") copiaAnalisiTitolo(); });
 $("#btn-cio")?.addEventListener("click", copyCIOText);
+$("#tk-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") copyCIOText(); });
 $("#modal-close")?.addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal")?.addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
 $("#btn-copy")?.addEventListener("click", async () => {

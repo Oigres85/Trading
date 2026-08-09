@@ -625,7 +625,10 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
   const html4 = readFileSync(join(ROOT, "index.html"), "utf8");
   const PORTANTI = [
     'id="updated-at"', 'id="btn-cio"', 'id="btn-refresh"',
-    'id="tk-input"', 'id="tk-go"', 'id="tk-esito"',            // analisi spot del titolo
+    /* v259 — 'id="tk-go"' NON e' piu' un elemento portante: il CEO ha chiesto UN SOLO bottone
+       e i due sono stati fusi in #btn-cio, che decide dal contenuto del box. La guardia non e'
+       stata indebolita — l'invariante che conta e' che l'AZIONE esista, e #btn-cio la porta. */
+    'id="tk-input"', 'id="tk-esito"',                           // analisi spot del titolo
     'id="tv-chart"', 'id="tv-tf"', 'id="tv-nota"',              // v257 grafico TradingView
     'id="wl-input"', 'id="wl-salva"', 'id="wl-chips"', 'id="wl-tv"',   // v257 watchlist propria
     'id="mg-rot"', 'id="mg-stress"', 'id="mg-leva"', 'id="mg-tutti"',   // macro in grafici
@@ -676,6 +679,71 @@ check("v257 watchlist: senza token il salvataggio e' locale E LO DICHIARA", (() 
   const appW = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
   return /SU QUESTO BROWSER/.test(appW) && /config\/ui_watchlist\.json/.test(appW);
 })());
+
+/* ── v258 — i componenti di Fear & Greed hanno una scheda propria, senza duplicare ── */
+check("v258 F&G: i componenti diventano schede a se', e quelli gia' presenti NON si duplicano", suVeri(`
+  const tutti = indicatoriClassifica();
+  const nuovi = tutti.filter(x => String(x.k).startsWith("fg:"));
+  if (!nuovi.length) return false;                       // i dati veri hanno 7 componenti
+  const nomi = tutti.map(x => x.nome.toLowerCase());
+  const dupVix = nomi.filter(n => /\\bvix\\b/.test(n)).length;
+  const dupPC  = nomi.filter(n => /put\\/call/.test(n)).length;
+  return dupVix === 1 && dupPC === 1 && nuovi.every(x => Number.isFinite(x.score) && x.cadenza)`));
+
+check("v258 F&G: ogni scheda nuova dichiara di essere un componente, non un indicatore autonomo", suVeri(`
+  const nuovi = indicatoriClassifica().filter(x => String(x.k).startsWith("fg:"));
+  return nuovi.length > 0 && nuovi.every(x => /componente di Fear & Greed/.test(x.sub || ""))`));
+
+/* ── v258 — la spiegazione del popup vive anche nella scheda ── */
+check("v258 il contenuto del popup esce nella scheda, prosa compresa", (() => {
+  const appP = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const fn = appP.slice(appP.indexOf("function contenutoDalPannello"));
+  const corpo = fn.slice(0, fn.indexOf("\nfunction ", 10));
+  return /<p\[\\\\s\\\\S\]\*\?<\\\/p>/.test(corpo.replace(/\\\\/g, "\\\\")) || /<p\[/.test(corpo);
+})());
+
+/* ── ⚠ v259 — I TRE DIFETTI DIAGNOSTICATI SU UNA RISPOSTA REALE ──
+   Il CEO ha incollato l'output di ChatGPT sul pacchetto di AMD. Il prompt ha funzionato — la
+   struttura c'era tutta — ma tre cose sono andate storte, e sono difetti del prompt, non del
+   modello: (1) sei numeri decisivi marcati [VERIFICATO] con fonte "Reddit", fra cui medie
+   mobili, supporti, target degli analisti e short interest; (2) tre prezzi diversi nello stesso
+   documento (476, 482, "chiusura del 31/07") senza un riferimento unico; (3) una
+   capitalizzazione RICAVATA da un dato di due settimane prima e presentata come [VERIFICATO]. */
+check("v259 analisi titolo: la gerarchia delle fonti c'e' e i forum sono esclusi per nome", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /GERARCHIA DELLE FONTI/.test(t)
+      && /FONTE PRIMARIA/.test(t)
+      && /NON SONO FONTI/.test(t) && /Reddit/.test(t) && /StockTwits/.test(t)`));
+
+check("v259 analisi titolo: impone UN prezzo di riferimento con data e ora", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /IL PREZZO DI RIFERIMENTO E' UNO SOLO/.test(t)
+      && /valore, data e ora/.test(t)
+      && /tre giorni diversi/.test(t)`));
+
+check("v259 analisi titolo: vieta il [VERIFICATO] su un numero ricavato", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  /* ⚠ le parentesi quadre vanno escapate DUE volte: una per la regex, una perche' il check
+     vive dentro un template literal che passa per vm.runInContext. La prima stesura ne aveva
+     una sola e la regex cercava una classe di caratteri invece del letterale. */
+  return /NIENTE .VERIFICATO. DERIVATO/.test(t) && /.STIMA./.test(t) && /si scrive/.test(t)`));
+
+/* ── v259 — la freschezza dei dati e' dichiarata nel payload, non solo nelle schede ── */
+check("v259 payload: dichiara le tre classi di freschezza prima del quadro macro", suVeri(`
+  const t = buildPrompt();
+  const i = t.indexOf("FRESCHEZZA DEI DATI DI QUESTO PACCHETTO");
+  const j = t.indexOf("QUADRO MACRO:");
+  return i > 0 && j > i && /DATI DI MERCATO/.test(t) && /STATISTICHE UFFICIALI/.test(t)
+      && /SERIE STORICHE E PERCENTILI/.test(t)`));
+
+/* ── v259 — i due compositi che il CEO ha chiesto di togliere non rientrano da nessuna porta ── */
+check("v259 nessun aggregato duplicato: ne' fra le schede ne' nel payload ne' nel disaccordo", suVeri(`
+  const schede = indicatoriClassifica().map(x => x.nome.toLowerCase()).join(" | ");
+  const t = buildCIOText();
+  const testata = promptHeaderText();
+  const dati = t.slice(t.indexOf(testata) + testata.length);
+  return !/sentiment globale/.test(schede) && !/istituzionali vs retail/.test(schede)
+      && !/Sentiment globale/.test(dati) && !/Istituzionali [Vv][Ss] [Rr]etail/.test(dati)`));
 
 /* ── il wiring: nessun accesso non protetto a un elemento che non esiste ── */
 {
@@ -756,7 +824,14 @@ check("v257 watchlist: senza token il salvataggio e' locale E LO DICHIARA", (() 
     "clearTimeout","alert","confirm","prompt","encodeURIComponent","decodeURIComponent","Promise",
     "RegExp","Error","Boolean","Symbol","BigInt","structuredClone","queueMicrotask","requestAnimationFrame"]);
   const mancanti = new Set();
-  for (const m of codice.matchAll(/(?<![.\w$'"`])([a-z][A-Za-z0-9_$]{2,})\s*\(/g)) {
+  /* ⚠ v259 — SI TOLGONO ANCHE LE STRINGHE, non solo i commenti. La guardia ha denunciato
+     "copiato" come funzione inesistente: veniva da un template literal (`${che} copiato ✓`),
+     dove "copiato (" e' testo per l'utente, non una chiamata. E' la quinta volta che un gate
+     legge la prosa come codice. */
+  const soloCodice = codice
+    .replace(/`(?:[^`\\]|\\.)*`/g, "``").replace(/"(?:[^"\\]|\\.)*"/g, '""')
+    .replace(/'(?:[^'\\]|\\.)*'/g, "''");
+  for (const m of soloCodice.matchAll(/(?<![.\w$'"`])([a-z][A-Za-z0-9_$]{2,})\s*\(/g)) {
     const nome = m[1];
     if (GLOBALI.has(nome) || definite.has(nome)) continue;
     // solo i nomi in camelCase tipici delle funzioni di questo file, per non inseguire le API

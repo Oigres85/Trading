@@ -1868,7 +1868,22 @@ svg.g-serie { cursor: crosshair; }
 .wl-chip { font-family: ui-monospace, Menlo, monospace; cursor: pointer; }
 #wl-input { flex: 1 1 260px; min-width: 0; }
 #wl-nota { margin-top: 8px; font-size: 12.5px; }
-/* rotazione compatta: righe più basse, non meno dati (richiesta CEO) */
-.obars-compatte .obar-row { min-height: 0; padding: 1px 0; font-size: 11.5px; }
-.obars-compatte .obar-axis { height: 8px; }
+/* ⚠ v259 — LA ROTAZIONE ERA ANCORA TROPPO ALTA, e la prima correzione non aveva morso.
+   Il CEO l'ha dovuto ridire. Causa: avevo messo `min-height: 0` e `padding` su .obar-row, ma
+   l'altezza di quella riga non veniva da lì — veniva dalla barra (.obar-axis, --bar-sm 10px)
+   e dal `gap` della griglia. Ridurre un vincolo che non era quello attivo non cambia niente:
+   e' la stessa lezione delle barre dell'allocazione (v205), dove il valore calcolato diceva
+   una cosa diversa da quella che avevo scritto. Qui si stringe cio' che DAVVERO fa altezza —
+   barra, riga, etichetta — e si misura dopo. 21 righe da ~26px passano a ~15px. */
+.obars-compatte .obar-row { padding: 0 4px; font-size: 11px; gap: 8px;
+  grid-template-columns: 116px minmax(0, 1fr) 92px; }
+.obars-compatte .obar-axis { height: 6px; }
+.obars-compatte .obar-lab, .obars-compatte .obar-val { font-size: 11px; line-height: 1.25; }
+.obars-compatte { display: grid; gap: 1px; }
 @media (max-width: 560px) { .tv-chart { height: 380px; } .tv-chips { margin-left: 0; } }
+
+/* v258 — la prosa del pannello dentro la scheda: contesto, non un dato in più.
+   Più piccola e smorzata del valore, con un filo a sinistra che la separa dai numeri. */
+.mg-dalpan .mg-spieg { font-size: 11.5px; line-height: 1.45; color: var(--muted);
+  margin: 6px 0 0; padding-left: 8px; border-left: 2px solid var(--border); }
+.mg-dalpan ul { font-size: 11.5px; margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
