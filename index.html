@@ -18,7 +18,7 @@
 <title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=256">
+<link rel="stylesheet" href="assets/style.css?v=258">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -74,6 +74,58 @@
     </div>
     <div id="tk-esito" class="muted"></div>
   </section>
+
+  <!-- ═══ v257 — GRAFICO TRADINGVIEW, PILOTATO DAL BOX DEL TICKER ═══════════════════════════
+       Richiesta CEO: il grafico di TradingView con volumi, supporti/resistenze e indicatori
+       tecnici della versione gratuita.
+       ⚠ NESSUNA CREDENZIALE, E NON SERVE: questo e' il widget PUBBLICO di TradingView. Non
+       richiede account, non richiede login, e le credenziali del CEO non andrebbero comunque
+       date a nessun sistema — le ho rifiutate. Il widget carica uno script di terze parti
+       (s3.tradingview.com) dentro un iframe: e' l'unica dipendenza esterna della pagina, ed e'
+       isolata qui dentro. Se TradingView non risponde, il riquadro lo dichiara e il resto
+       della pagina continua a funzionare. -->
+  <section class="card" data-sez="grafico">
+    <div class="card-head">
+      <h2>Grafico</h2>
+      <span class="muted">TradingView · volumi, pivot, RSI e medie · scrivi un ticker qui sopra per cambiarlo</span>
+    </div>
+    <div class="tv-barra">
+      <span class="muted" id="tv-simbolo">—</span>
+      <div class="tv-chips" id="tv-tf" role="group" aria-label="Intervallo del grafico">
+        <button class="chip" data-tv-int="60">1h</button>
+        <button class="chip chip-active" data-tv-int="D">Giorno</button>
+        <button class="chip" data-tv-int="W">Settimana</button>
+      </div>
+    </div>
+    <div id="tv-chart" class="tv-chart"></div>
+    <div id="tv-nota" class="muted"></div>
+  </section>
+
+  <!-- ═══ v257 — LA WATCHLIST, E COSA E' DAVVERO POSSIBILE ═══════════════════════════════════
+       Il CEO ha chiesto di incorporare la SUA watchlist di Investing.com. Non e' possibile, e
+       va detto invece di consegnare un surrogato spacciato per quello: ne' Investing.com ne'
+       TradingView espongono la watchlist PRIVATA di un account in un widget incorporabile — i
+       widget mostrano i simboli scritti nel codice di incorporamento, non quelli salvati nel
+       profilo. Nessuna credenziale cambierebbe la cosa.
+       Quello che si puo' fare, e che qui si fa: la watchlist la scrive lui, resta salvata, e la
+       segue su ogni device (localStorage subito, config/ui_watchlist.json sul repo se c'e' il
+       token — la stessa strada dell'ordine delle sezioni). Un clic su un simbolo lo porta nel
+       grafico e nel box dell'analisi. -->
+  <section class="card" data-sez="watchlist-tv">
+    <div class="card-head">
+      <h2>La mia watchlist</h2>
+      <span class="muted">simboli tuoi, salvati · clic su uno per vederlo nel grafico</span>
+    </div>
+    <div class="tk-riga">
+      <input id="wl-input" type="text" spellcheck="false" autocapitalize="characters"
+             placeholder="NVDA, AMD, ASML.AS, 005930.KS" aria-label="Simboli della watchlist">
+      <button class="btn btn-ghost" id="wl-salva">Salva</button>
+    </div>
+    <div id="wl-chips" class="wl-chips"></div>
+    <div id="wl-tv" class="tv-wl"></div>
+    <div id="wl-nota" class="muted"></div>
+  </section>
+
 
 <section class="card" data-sez="rotazione">
     <div class="card-head">
@@ -275,6 +327,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=256"></script>
+<script src="assets/app.js?v=258"></script>
 </body>
 </html>

@@ -3,7 +3,15 @@ const REPO = "Oigres85/Trading";
 /* Versione del build: DEVE combaciare col ?v=NN in index.html — bump insieme a ogni release.
    Timbrata in cima al payload (buildCIOText) così il CEO verifica a colpo d'occhio se Safari ha
    servito il codice aggiornato: se il timbro dice una versione vecchia = pagina in cache stale. */
-const BUILD_VERSION = "251";
+/* ⚠ v257 — QUESTA COSTANTE ERA FERMA A "251" DA SEI VERSIONI, e produceva DUE bugie insieme:
+   il banner "stai vedendo una versione vecchia" restava acceso per sempre (confrontava 251 col
+   256 pubblicato, e nessun ricaricamento poteva farlo coincidere), e il timbro in cima al
+   pacchetto AI dichiarava "BUILD v251" su codice v256. Il CEO se n'e' accorto incollandomi un
+   prompt: il contenuto era nuovo, il numero vecchio.
+   La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
+   il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
+   combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
+const BUILD_VERSION = "258";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2381,7 +2389,10 @@ function renderRotazione() {
   const righe = [...tilt].sort((a, b) => (b[rotOrizzonte] ?? -99) - (a[rotOrizzonte] ?? -99)).map(t => ({
     nome: t.name, valore: t[rotOrizzonte], tk: t.ticker, testo: signTxt(t[rotOrizzonte]),
   }));
-  box.innerHTML = barreOrdinate(righe);
+  /* v257 — RIQUADRO PIU' BASSO su richiesta del CEO: 21 barre a piena altezza occupavano da
+     sole quasi uno schermo. La classe `obars-compatte` stringe riga e testo; i dati sono gli
+     stessi, cambia solo quanto spazio si prendono. */
+  box.innerHTML = barreOrdinate(righe).replace('<div class="obars">', '<div class="obars obars-compatte">');
   box.querySelectorAll("[data-obar-tk]").forEach(e =>
     e.setAttribute("title", "ETF di riferimento " + e.dataset.obarTk));
   if (head) head.innerHTML = "";
@@ -5669,11 +5680,8 @@ function buildPrompt() {
       l += ` — divergenza col retail: ${sm.divergence_label}`;
     }
     lines.push(l);
-    // SMC per titolo del portafoglio
-    const ptfSmc = (DATA.portfolio || []).filter(r => r.smc);
-    if (ptfSmc.length) {
-      lines.push("- SMC per titolo (struttura/BOS/FVG/bias): " + ptfSmc.map(r => `${r.ticker} ${r.smc.structure}${r.smc.bos ? "/BOS " + r.smc.bos : ""} FVG ${r.smc.bull_fvg}↑${r.smc.bear_fvg}↓ bias ${r.smc.bias}`).join(" · "));
-    }
+    /* v257 — SMC PER TITOLO tolto: era la struttura di mercato delle POSIZIONI. Il blocco
+       Istituzionali-vs-retail resta, perche' misura S&P 500 e Nasdaq — indici, non il libro. */
   }
   if (m.decouple?.sp500?.length && m.decouple?.gdp?.length) {
     const gg = sovrapposizioneGiorni(m.decouple.sp500, m.decouple.gdp);
@@ -5803,11 +5811,8 @@ function buildPrompt() {
      stavano DENTRO il blocco macro, non prima: è la classe v201-v204, un vicino che resta
      in piedi perché il confine gli passa accanto invece che addosso. */
 
-  // liquidità e capitale
-  // "controvalore (mark-to-market)", NON "capitale investito": la SITUAZIONE PATRIMONIALE usa
-  // già "capitale investito (costo)" per il costo storico — stesso nome per due grandezze
-  // diverse (175k costo vs 287k MTM) mandava in confusione l'LLM ricevente
-  if (t.cash) lines.push(`- Liquidità disponibile: ${fmtEUR.format(t.cash)} · controvalore investito (mark-to-market): ${fmtEUR.format(t.eur_invested)}`);
+  /* v257 — LIQUIDITA' E CONTROVALORE INVESTITO tolti dal quadro macro: sono le due grandezze
+     piu' private del portafoglio, ed erano rimaste dentro un blocco che si chiama MACRO. */
   // TOP 10 CAPITALIZZAZIONI rimosso dal payload (v138): nessun valore decisionale per il
   // fondo (i nomi rilevanti sono già in ptf/watchlist con dati completi); resta nella UI.
   // TOP 10 ETF: RIMOSSO dal payload (v184), come TOP 10 CAPITALIZZAZIONI in v138 — e resta nella UI.
@@ -5922,12 +5927,8 @@ function buildHistoricalDigests() {
     ? `${dgTxt(vx.value, "", 1)} · oggi ${signTxt(dgFin(vx.change_pct))} · percentile finestra ${dgTxt(vxPct, "°", 0)} · term VIX/VIX3M ${dgTxt((m.smart_money || {}).vix_term_ratio, "", 2)}${dgFin((m.smart_money || {}).vix_term_ratio) != null ? ((m.smart_money || {}).vix_term_ratio >= 1 ? " (BACKWARDATION: stress)" : " (contango: calma)") : ""}`
     : "—" });
 
-  const mh = Array.isArray(DATA.metrics_history) ? DATA.metrics_history : [];
-  const navs = mh.map(x => dgFin(x && x.eur_value)).filter(x => x != null);
-  const shp = mh.map(x => dgFin(x && x.sharpe)).filter(x => x != null);
-  out.push({ label: `Controvalore investito & Sharpe del fondo (storico ${mh.length} rilevazioni)`, text: navs.length >= 2
-    ? `investito €${fmtNum.format(Math.round(navs[navs.length - 1]))} (MTM, cassa esclusa) · Δ~7g ${signTxt(bookReturnPct(mh, 7))} (rendimento del book cash-neutral, non delta di eur_value) · Sharpe ${dgTxt(shp[shp.length - 1], "", 2)} (Δ7 ${shp.length >= 8 ? dgTxt(shp[shp.length - 1] - shp[shp.length - 8], "", 2) : "—"})`
-    : "—" });
+  /* v257 — CONTROVALORE E SHARPE DEL FONDO tolti dai digest: erano l'ultima traccia del
+     portafoglio nel pacchetto, ed e' il CEO che l'ha vista incollandomi il prompt. */
 
   return out;
 }
@@ -6152,13 +6153,222 @@ function renderCorrMacro() {
    ricostruirebbe — il quadro macro di oggi con la sua tensione interna.
    E' la stessa regola che questo progetto applica dal v195: un dato indovinato e scritto come
    certo e' peggio di un dato dichiarato mancante. */
+
+/* ═══ v257 — GRAFICO TRADINGVIEW E WATCHLIST PROPRIA ═══════════════════════════════════════
+   ⚠ SULLE CREDENZIALI: il CEO ha offerto quelle del suo account TradingView. Non servono e non
+   vanno date: questo e' il widget PUBBLICO, funziona senza login, e delle credenziali non farei
+   nulla comunque. Vale anche per Investing.com.
+   ⚠ SUL LIMITE, DICHIARATO INVECE CHE AGGIRATO: ne' TradingView ne' Investing.com espongono la
+   watchlist PRIVATA di un account in un widget incorporabile. I widget mostrano i simboli
+   scritti nel codice, non quelli salvati nel profilo. Quindi qui la watchlist e' la SUA lista,
+   scritta una volta e persistita — non la sua watchlist di Investing travestita da tale.
+   ⚠ E' l'unica dipendenza esterna della pagina: se lo script non risponde, il riquadro lo dice
+   e il resto continua a funzionare (l'onerror sotto). */
+const TV_STUDIES = ["STD;Volume", "STD;RSI", "STD;Pivot%1Points%1Standard", "STD;SMA"];
+let tvSimboloCorrente = "";
+let tvIntervallo = "D";
+
+/* TradingView vuole "BORSA:TICKER" ma accetta anche il ticker nudo, risolvendolo da solo.
+   I suffissi di Yahoo (.AS, .KS, .MI) NON sono simboli TradingView: si passano nudi e si
+   lascia risolvere al widget, dichiarando che l'aggancio potrebbe non essere esatto. */
+function simboloTradingView(tk) {
+  const T = String(tk || "").trim().toUpperCase();
+  if (!T) return "";
+  return T.includes(":") ? T : T.replace(/\.[A-Z]{1,3}$/, "");
+}
+
+function montaGraficoTV(tk, intervallo) {
+  const box = $("#tv-chart");
+  if (!box) return;
+  const sym = simboloTradingView(tk);
+  if (!sym) { box.innerHTML = `<div class="muted tv-vuoto">Scrivi un ticker qui sopra per vedere il grafico.</div>`; return; }
+  tvSimboloCorrente = sym;
+  if (intervallo) tvIntervallo = intervallo;
+  /* ⚠ v257 — QUESTA FUNZIONE COSTRUISCE NODI DOM VERI, non stringhe: e' l'unico punto della
+     pagina che lo fa, perche' il widget TradingView vuole uno <script> con la configurazione
+     nel corpo, e `innerHTML` non esegue gli script inseriti. Conseguenza: negli harness Node
+     (coherence_check, fx_check) `createElement` restituisce uno stub senza appendChild e la
+     funzione lanciava, fermando due gate. Non e' un difetto di produzione — e' un pezzo di DOM
+     dentro un mondo senza DOM. Si esce prima, invece di far cadere il gate. */
+  if (typeof document === "undefined" || typeof document.createElement !== "function") return;
+  const prova = document.createElement("div");
+  if (!prova || typeof prova.appendChild !== "function") return;
+  const et = $("#tv-simbolo"); if (et) et.textContent = sym;
+  box.innerHTML = "";
+  const cont = document.createElement("div");
+  cont.className = "tradingview-widget-container";
+  const inner = document.createElement("div");
+  inner.className = "tradingview-widget-container__widget";
+  cont.appendChild(inner);
+  const sc = document.createElement("script");
+  sc.type = "text/javascript";
+  sc.async = true;
+  sc.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+  sc.innerHTML = JSON.stringify({
+    autosize: true,
+    symbol: sym,
+    interval: tvIntervallo,
+    timezone: "Europe/Rome",
+    theme: "dark",
+    style: "1",
+    locale: "it",
+    hide_side_toolbar: false,
+    allow_symbol_change: true,
+    withdateranges: true,
+    details: true,
+    studies: TV_STUDIES,
+    support_host: "https://www.tradingview.com",
+  });
+  const nota = $("#tv-nota");
+  sc.onerror = () => {
+    box.innerHTML = `<div class="muted tv-vuoto">TradingView non risponde (rete o blocco degli script di terze parti).
+      Il resto della pagina funziona lo stesso.</div>`;
+  };
+  cont.appendChild(sc);
+  box.appendChild(cont);
+  if (nota) {
+    nota.innerHTML = `Widget pubblico di TradingView: <b>nessun account e nessuna credenziale</b>. `
+      + `Indicatori caricati: volumi, RSI, pivot standard (i pivot sono i supporti e le resistenze `
+      + `calcolati sulla seduta precedente) e media mobile. Puoi aggiungerne altri e disegnare `
+      + `direttamente dentro il grafico. `
+      + (String(tk).includes(".") ? `⚠ "${esc(tk)}" ha un suffisso di borsa alla Yahoo: TradingView usa una `
+         + `nomenclatura diversa, quindi il simbolo potrebbe non agganciarsi — scrivilo come lo vedi su `
+         + `TradingView (per esempio <code>EURONEXT:ASML</code>).` : "");
+  }
+}
+
+$("#tv-tf")?.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-tv-int]");
+  if (!b) return;
+  $("#tv-tf")?.querySelectorAll(".chip").forEach(c => c.classList.remove("chip-active"));
+  b.classList.add("chip-active");
+  montaGraficoTV(tvSimboloCorrente || ($("#tk-input")?.value || ""), b.dataset.tvInt);
+});
+
+/* ── la watchlist: sua, salvata, e la segue su ogni device ── */
+const WL_KEY = "watchlist_simboli";
+const WL_PATH = "config/ui_watchlist.json";
+
+function leggiWatchlist() {
+  try {
+    const raw = localStorage.getItem(WL_KEY);
+    const a = raw ? JSON.parse(raw) : [];
+    return Array.isArray(a) ? a.filter(x => typeof x === "string" && x.trim()) : [];
+  } catch { return []; }
+}
+
+function renderWatchlistTV() {
+  const simboli = leggiWatchlist();
+  const chips = $("#wl-chips");
+  const inp = $("#wl-input");
+  if (inp && !inp.value) inp.value = simboli.join(", ");
+  if (chips) {
+    chips.innerHTML = simboli.length
+      ? simboli.map(s => `<button class="chip wl-chip" data-wl="${esc(s)}">${esc(s)}</button>`).join("")
+      : `<span class="muted">Nessun simbolo: scrivili qui sopra separati da virgola e premi Salva.</span>`;
+  }
+  const box = $("#wl-tv");
+  if (!box) return;
+  if (!simboli.length) { box.innerHTML = ""; return; }
+  box.innerHTML = "";
+  const cont = document.createElement("div");
+  cont.className = "tradingview-widget-container";
+  const inner = document.createElement("div");
+  inner.className = "tradingview-widget-container__widget";
+  cont.appendChild(inner);
+  const sc = document.createElement("script");
+  sc.type = "text/javascript";
+  sc.async = true;
+  sc.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js";
+  sc.innerHTML = JSON.stringify({
+    width: "100%", height: 400, symbolsGroups: [{ name: "La mia watchlist",
+      symbols: simboli.map(s => ({ name: simboloTradingView(s) })) }],
+    showSymbolLogo: true, isTransparent: true, colorTheme: "dark", locale: "it",
+  });
+  sc.onerror = () => { box.innerHTML = `<div class="muted tv-vuoto">TradingView non risponde: le quotazioni della watchlist non sono disponibili ora.</div>`; };
+  cont.appendChild(sc);
+  box.appendChild(cont);
+}
+
+async function salvaWatchlist() {
+  const inp = $("#wl-input");
+  const nota = $("#wl-nota");
+  const simboli = String(inp?.value || "").split(/[,\s;]+/)
+    .map(x => x.trim().toUpperCase()).filter(Boolean).slice(0, 40);
+  localStorage.setItem(WL_KEY, JSON.stringify(simboli));
+  renderWatchlistTV();
+  /* stessa strada dell'ordine delle sezioni (v225): localStorage da solo e' PER-BROWSER, e il
+     CEO usa Mac e iPhone. Col token va sul repo e lo segue; senza token resta locale E LO DICE,
+     invece di far credere a una sincronizzazione che non c'e'. */
+  const token = localStorage.getItem("gh_token");
+  if (!token) {
+    if (nota) nota.textContent = `${simboli.length} simboli salvati SU QUESTO BROWSER. Senza token GitHub non seguono su iPhone.`;
+    return;
+  }
+  try {
+    const url = `https://api.github.com/repos/${REPO}/contents/${WL_PATH}`;
+    let sha = null;
+    const g = await fetch(url, { headers: ghHeaders(token), cache: "no-store" });
+    if (g.ok) sha = (await g.json()).sha;
+    const r = await fetch(url, { method: "PUT", headers: ghHeaders(token),
+      body: JSON.stringify({ message: "Aggiorna watchlist (da dashboard)",
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(simboli, null, 2) + "\n"))),
+        ...(sha ? { sha } : {}) }) });
+    if (nota) nota.textContent = r.ok
+      ? `${simboli.length} simboli salvati sul repo: li ritrovi su ogni device.`
+      : `Salvati in locale, ma la scrittura sul repo non e' riuscita (${r.status}).`;
+  } catch {
+    if (nota) nota.textContent = "Salvati in locale: la scrittura sul repo non e' riuscita (rete).";
+  }
+}
+
+async function caricaWatchlistCloud() {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${WL_PATH}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return;
+    const a = JSON.parse(await r.text());
+    if (Array.isArray(a) && a.length) {
+      localStorage.setItem(WL_KEY, JSON.stringify(a));
+      const inp = $("#wl-input"); if (inp) inp.value = a.join(", ");
+      renderWatchlistTV();
+    }
+  } catch { /* offline: resta la copia locale */ }
+}
+
+$("#wl-salva")?.addEventListener("click", salvaWatchlist);
+$("#wl-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") salvaWatchlist(); });
+$("#wl-chips")?.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-wl]");
+  if (!b) return;
+  const inp = $("#tk-input"); if (inp) inp.value = b.dataset.wl;
+  montaGraficoTV(b.dataset.wl);
+  document.querySelector('[data-sez="grafico"]')?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
 function buildPromptTicker(tkGrezzo) {
+  /* ═══ v257 — RISCRITTO DOPO UN FALLIMENTO REALE ═══════════════════════════════════════════
+     Il CEO ha incollato il pacchetto in Gemini e si e' sentito rispondere: "Tutti i dati tecnici
+     e fondamentali specifici su MRVL, cosi' come le notizie, sono stati classificati e registrati
+     come n.d. in ottemperanza ai limiti imposti sull'impossibilita' di stima in assenza di
+     accesso a feed live". Cioe': il modello ha usato la MIA regola anti-invenzione come permesso
+     per non fare niente.
+     La causa e' mia. Dicevo "cercali online" e subito dopo "un dato che manca si dichiara n.d.":
+     due istruzioni che, lette insieme da un modello prudente, rendono l'inazione la risposta
+     conforme. La regola anti-invenzione serve a impedire i NUMERI FALSI, non a giustificare un
+     referto vuoto — e non lo diceva.
+     Tre correzioni, tutte necessarie insieme:
+     1. la ricerca e' il PRIMO passo obbligatorio, non un'opzione, e il pacchetto elenca DOVE
+        guardare con gli URL — un modello che sa dove andare non si arrende alla prima difficolta';
+     2. se il modello NON PUO' navigare deve DIRLO IN UNA RIGA E FERMARSI, non riempire di "n.d.":
+        un referto tutto n.d. e' peggio di un rifiuto, perche' sembra un'analisi;
+     3. "n.d." e' ammesso per il singolo campo introvabile DOPO aver cercato, mai come politica.
+     ⚠ IL VINCOLO NON E' CAMBIATO: questa pagina e' statica, la pipeline conosce solo i suoi
+     ticker e il CORS chiude Yahoo dal browser. I dati del titolo li deve prendere l'LLM. Quello
+     che e' cambiato e' che ora glielo si chiede in modo che non possa scambiarlo per un divieto. */
   const tk = String(tkGrezzo || "").trim().toUpperCase();
   if (!tk) return "";
   const macro = buildPrompt();
   const header = promptHeaderText();
-  // si toglie la testata macro: qui le istruzioni sono altre, e due testate in un pacchetto
-  // solo si contraddicono (classe C10 — un rimando a una sezione che non governa piu' nulla)
   const soloDati = macro.startsWith(header) ? macro.slice(header.length).replace(/^\n+/, "") : macro;
   const disaccordo = testoCorrelazioniMacro();
   const storico = historicalDigestText();
@@ -6167,29 +6377,67 @@ function buildPromptTicker(tkGrezzo) {
   const oggi = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
   const rilevazione = DATA && DATA.updated_at
     ? new Date(DATA.updated_at).toLocaleString("it-IT") : "n.d.";
+  const prossimoRun = (typeof prossimoRunPipeline === "function" && prossimoRunPipeline())
+    ? prossimoRunPipeline().toLocaleString("it-IT") : "n.d.";
 
   const istruzioni = [
-`ANALISI SPOT DI UN TITOLO: ${tk}`,
+`ANALISI DI ${tk} — ${oggi}`,
 ``,
-`Sei un analista azionario. Devi analizzare ${tk} sotto tre profili — tecnico, fondamentale e notizie — e poi agganciarlo al quadro macro che trovi in coda a questo messaggio. Oggi e' il ${oggi}.`,
+`Sei un analista azionario senior. Devi produrre un'analisi operativa su ${tk}: tecnica, fondamentale, notizie, e il collegamento col quadro macro che trovi in coda.`,
 ``,
-`[1] I DATI SU ${tk} DEVI PROCURARTELI TU, E VERIFICARLI.`,
-`Questo pacchetto NON contiene prezzi, fondamentali ne' notizie su ${tk}: il sistema che lo genera segue solo dati macro. Cerca online prezzo corrente, medie mobili, RSI, ATR, volumi, multipli (P/E trailing e forward, EV/EBITDA, P/FCF), margini, crescita di ricavi e utili, debito, data della prossima trimestrale e le notizie delle ultime due settimane. Ogni numero che riporti va marcato [VERIFICATO] con la fonte e la data. Un dato che non trovi si dichiara "n.d.": non stimarlo.`,
+`══ PASSO 0 — OBBLIGATORIO, PRIMA DI SCRIVERE QUALSIASI COSA ══`,
+`CERCA ONLINE i dati aggiornati su ${tk}. Non e' un'opzione ed e' la prima cosa che fai.`,
+`SE NON PUOI NAVIGARE IN RETE: scrivi UNA SOLA RIGA — "Non ho accesso al web: non posso produrre questa analisi" — e FERMATI.`,
+`NON compilare il referto con "n.d." su tutti i campi: un'analisi tutta "n.d." e' peggio di un rifiuto, perche' ha la forma di un lavoro fatto e non ne ha la sostanza. "n.d." vale per il SINGOLO dato che non hai trovato DOPO averlo cercato, mai come politica generale.`,
 ``,
-`[2] IL MACRO IN CODA E' IL CONTESTO, E VA USATO COME TALE.`,
-`Il quadro macro qui sotto e' rilevato dal sistema il ${rilevazione} e ogni serie porta la propria data. Non riassumerlo: usalo. La domanda che deve guidarti e': attraverso quale canale concreto una di quelle grandezze arriva al conto economico o al multiplo di ${tk}? Un tasso che muove il costo del debito, un cambio che muove i ricavi esteri, uno spread di credito che muove il rifinanziamento, un ciclo settoriale che muove i volumi. "${tk} e' esposto al tema X" non e' analisi: lo diventa quando dici quale voce di bilancio si muove e di quanto.`,
+`DOVE CERCARE (in ordine; usa piu' fonti e confrontale):`,
+`· prezzo, volumi, medie mobili, RSI, ATR, massimi/minimi 52 settimane → finance.yahoo.com/quote/${tk} · stockanalysis.com/stocks/${tk} · investing.com`,
+`· fondamentali, margini, debito, crescita, multipli → stockanalysis.com/stocks/${tk}/financials · macrotrends.net · il sito investor-relations della societa'`,
+`· ultima trimestrale (numeri, guidance, reazione del titolo) → comunicato stampa sul sito IR · SEC EDGAR (sec.gov/cgi-bin/browse-edgar) per 10-Q/10-K/8-K`,
+`· quote di mercato e concorrenti → ultimo 10-K (sezione Competition) · report di settore recenti`,
+`· notizie ultime due settimane → Reuters, Bloomberg, CNBC, Barron's, il sito IR`,
+`· consenso analisti e target → stockanalysis.com/stocks/${tk}/forecast · marketbeat · tipranks`,
+`Ogni numero che riporti va marcato [VERIFICATO] con la fonte e la DATA della rilevazione.`,
 ``,
-`[3] IL DISACCORDO MACRO E' PARTE DELLA RISPOSTA.`,
-`Il blocco "DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO" misura quanto i componenti di ogni composito tirino in direzioni opposte. Dimmi da quale lato di quel disaccordo sta ${tk}: se il ciclo economico e' tenuto su dal credito e tirato giu' dall'occupazione, questo titolo vive piu' dell'uno o dell'altra?`,
+`══ COSA DEVI CONSEGNARE ══`,
 ``,
-`[4] COSA VOGLIO LEGGERE.`,
-`Prosa in italiano, niente scalette rigide, niente ripetizione dei dati che mi hai gia' dato sopra. Nell'ordine: dove sta il titolo tecnicamente e cosa servirebbe perche' quel quadro cambi; se i fondamentali giustificano il prezzo e con quale ipotesi implicita di crescita; quali notizie recenti NON sono ancora nel prezzo e perche' lo pensi; il meccanismo macro che piu' conta per questo nome. Chiudi con la cosa che, se uscisse diversa dalle attese, ribalterebbe la tua lettura — e con l'elenco delle fonti che hai verificato, una riga per URL.`,
+`1) SCHEDA DI IDENTITA' — una tabella:`,
+`| Voce | Valore | Fonte + data |`,
+`con: nome completo, borsa e valuta, settore e sotto-settore, capitalizzazione, prezzo attuale, variazione da inizio anno, massimo e minimo a 52 settimane, volume medio, prossima trimestrale attesa.`,
 ``,
-`[5] LIMITI.`,
-`Non conosco la tua posizione su ${tk} e tu non la chiedi: niente dimensionamenti, niente "quante quote", niente stop calcolati su un capitale che non ti ho detto. Se ritieni che ci sia un livello tecnico rilevante, dillo come livello del titolo, non come ordine per me. Ignora prezzi e conclusioni di conversazioni precedenti.`,
+`2) DOVE OPERA E CONTRO CHI — una tabella dei concorrenti diretti:`,
+`| Concorrente | Ticker | Cap. mercato | Quota di mercato stimata | Cosa fa meglio / peggio di ${tk} |`,
+`Scrivi da dove viene la quota di mercato e a quale anno si riferisce. Se una quota non e' pubblica, dillo e usa un proxy dichiarato (ricavi del segmento sul totale del mercato indirizzabile). Chiudi con una riga su come il settore sta crescendo e chi sta guadagnando terreno.`,
+``,
+`3) ULTIMA TRIMESTRALE — una scheda:`,
+`| Voce | Dato | Attesa consenso | Sorpresa | Trimestre precedente |`,
+`con ricavi, utile per azione, margine lordo e operativo, flusso di cassa, e le voci specifiche del business (per un semiconduttore i segmenti; per un software i ricavi ricorrenti; per un industriale il portafoglio ordini). Poi in prosa: cosa ha detto il management sulla guidance, cosa ha sorpreso, e come ha reagito il titolo nei giorni successivi.`,
+``,
+`4) TECNICA — dove sta il prezzo, dove sono i livelli:`,
+`| Livello | Prezzo | Perche' e' li' (volume, massimo precedente, media mobile) |`,
+`Supporti e resistenze VERI (zone dove ha scambiato volume, non numeri tondi), medie mobili 50/125/200, RSI, ATR, e la struttura: trend integro, laterale, o rotto. Dimmi cosa dovrebbe succedere perche' quel quadro cambi.`,
+``,
+`5) IL PONTE COL MACRO — la parte che nessun altro puo' scrivere al posto tuo:`,
+`Il quadro macro in coda e' rilevato dal sistema il ${rilevazione}, e ogni serie porta la propria data e il prossimo aggiornamento atteso. Il prossimo run del sistema e' previsto per il ${prossimoRun}.`,
+`Prendi le due o tre grandezze macro che contano davvero per ${tk} e dimmi ATTRAVERSO QUALE CANALE arrivano al suo conto economico: un tasso che muove il costo del debito o il multiplo, un cambio che muove i ricavi esteri, uno spread di credito che muove il rifinanziamento, un ciclo settoriale che muove i volumi, un prezzo di input che muove il margine lordo. Quantifica dove puoi ("un punto di dollaro forte vale circa X sui ricavi, perche' il Y% e' fuori dagli USA").`,
+`Poi guarda il blocco "DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO": dimmi da quale lato di quel disaccordo sta ${tk}.`,
+``,
+`6) SENTIMENT E POSIZIONAMENTO:`,
+`consenso degli analisti (quanti compra/mantieni/vendi, target medio e distanza dal prezzo), revisioni delle stime negli ultimi 90 giorni (in salita o in discesa), interesse short sul flottante, operazioni degli insider, e il tono delle notizie recenti. Distingui cio' che il prezzo ha gia' incorporato da cio' che non ha ancora visto.`,
+``,
+`7) ENTRARE O USCIRE, E A CHE PREZZO — la conclusione operativa:`,
+`Non un voto: un ragionamento con dei numeri sopra. Dimmi a quale prezzo il rischio-rendimento diventa favorevole e perche' proprio li' (quale supporto, quale multiplo, quale evento), a quale prezzo la tesi e' smentita, e quale evento nei prossimi 90 giorni deciderebbe la questione. Se pensi che oggi non ci sia niente da fare, dillo: e' una conclusione anche quella.`,
+``,
+`══ REGOLE ══`,
+`· Italiano, prosa densa, tabelle dove sono utili. Non riassumere il quadro macro: usalo.`,
+`· Ogni dato esterno va [VERIFICATO] con fonte e data. Chiudi con "FONTI" — una riga per URL.`,
+`· Se due fonti danno numeri diversi sulla stessa grandezza, dillo e scegli motivando.`,
+`· Non conosco la tua posizione su ${tk} e tu non la chiedi: niente dimensionamenti, niente "quante quote", niente stop calcolati su un capitale che non ti ho detto. I livelli sono livelli del titolo, non ordini per me.`,
+`· Ignora prezzi e conclusioni di conversazioni precedenti: conta questo pacchetto e cio' che trovi ADESSO in rete.`,
 ``,
 `──────────────────────────────────────────────────────────────────`,
-`QUADRO MACRO DI RIFERIMENTO (generato dal sistema, non da te)`,
+`QUADRO MACRO DI RIFERIMENTO (rilevato dal sistema, non da te)`,
+`Snapshot del ${rilevazione} · prossimo aggiornamento atteso ${prossimoRun}`,
 `──────────────────────────────────────────────────────────────────`,
 ].join("\n");
 
@@ -6248,6 +6496,7 @@ async function copiaAnalisiTitolo() {
     return;
   }
   if (!DATA) { if (esito) esito.textContent = "Dati macro non ancora caricati, riprova tra un attimo."; return; }
+  montaGraficoTV(tk);   // v257: il grafico segue il ticker che si sta analizzando
   const testo = buildPromptTicker(tk);
   const box = $("#prompt-text");
   if (box) box.value = testo;
@@ -6682,6 +6931,12 @@ controllaVersione();   // v216 — avvisa se il browser sta servendo una pagina 
 loadData();
 /* v256 — il diario delle azioni esce col portafoglio: non c'e' piu' niente da annotare. */
 loadPromptHeaderCloud();   // testata del pacchetto macro (config/prompt_header_macro.txt)
+/* v257 — la watchlist e il grafico all'avvio: prima la copia locale (subito, senza rete), poi
+   quella del repo quando arriva. Stessa logica dell'ordine delle sezioni: l'attesa della rete
+   non deve lasciare la pagina vuota. */
+renderWatchlistTV();
+montaGraficoTV((leggiWatchlist()[0]) || "SPY");
+caricaWatchlistCloud();
 loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
 montaComandiSezioni();   // maniglia ⠿ + frecce ▲▼ su ogni sezione
 applicaOrdineSezioni();  // ordine gia' noto a questo browser: subito, senza aspettare la rete

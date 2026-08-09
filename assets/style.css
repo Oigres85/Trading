@@ -1853,3 +1853,22 @@ svg.g-serie { cursor: crosshair; }
 #corr-macro .mg-card { min-width: 0; }              /* v192: le celle di un grid non scendono
                                                         sotto il contenuto senza min-width:0 */
 #corr-macro-note { margin-top: 10px; font-size: 12.5px; }
+
+/* ═══ v257 — GRAFICO TRADINGVIEW, WATCHLIST, ROTAZIONE COMPATTA ═════════════════════════ */
+.tv-chart { height: 520px; min-height: 320px; border-radius: 8px; overflow: hidden; }
+.tv-chart .tradingview-widget-container,
+.tv-chart .tradingview-widget-container__widget { height: 100%; }
+.tv-wl { min-height: 120px; margin-top: 8px; }
+.tv-vuoto { padding: 24px; text-align: center; border: 1px dashed var(--border); border-radius: 8px; }
+.tv-barra { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.tv-chips { display: flex; gap: 6px; margin-left: auto; }
+#tv-simbolo { font-family: ui-monospace, Menlo, monospace; font-size: 13px; letter-spacing: .04em; }
+#tv-nota { margin-top: 8px; font-size: 12px; }
+.wl-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.wl-chip { font-family: ui-monospace, Menlo, monospace; cursor: pointer; }
+#wl-input { flex: 1 1 260px; min-width: 0; }
+#wl-nota { margin-top: 8px; font-size: 12.5px; }
+/* rotazione compatta: righe più basse, non meno dati (richiesta CEO) */
+.obars-compatte .obar-row { min-height: 0; padding: 1px 0; font-size: 11.5px; }
+.obars-compatte .obar-axis { height: 8px; }
+@media (max-width: 560px) { .tv-chart { height: 380px; } .tv-chips { margin-left: 0; } }

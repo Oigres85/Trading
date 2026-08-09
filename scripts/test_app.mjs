@@ -601,12 +601,33 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
     fileMacro.length > 400 && !/COMPRA ~|VENDI ~|quote a limite/.test(fileMacro));
 }
 
+/* ── ⚠ v257 — IL NUMERO DI VERSIONE VIVE IN DUE POSTI E DEVONO COINCIDERE ──
+   BUILD_VERSION in app.js e il ?v= di index.html. Sono rimasti disallineati per SEI versioni
+   (251 contro 256) e hanno prodotto due bugie: il banner "stai vedendo una versione vecchia"
+   acceso per sempre — nessun ricaricamento poteva farlo coincidere — e il timbro del pacchetto
+   AI che dichiarava v251 su codice v256. Il CEO l'ha scoperto incollandomi un prompt.
+   Un registro copiato a mano invecchia da solo: e' la classe C10, e ora ha il suo gate. */
+{
+  const appSrc7 = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const html7 = readFileSync(join(ROOT, "index.html"), "utf8");
+  const inCodice = (appSrc7.match(/const BUILD_VERSION = "(\d+)"/) || [])[1];
+  const inPagina = (html7.match(/app\.js\?v=(\d+)/) || [])[1];
+  check("v257 BUILD_VERSION coincide col ?v= di index.html (o il banner versione mente per sempre)",
+    !!inCodice && inCodice === inPagina);
+  if (inCodice !== inPagina) console.log(`  ⚠ app.js dice v${inCodice}, index.html serve v${inPagina}`);
+
+  const cssV = (html7.match(/style\.css\?v=(\d+)/) || [])[1];
+  check("v257 anche il CSS e' bustato con la stessa versione", cssV === inPagina);
+}
+
 /* ── gli elementi portanti della pagina nuova ── */
 {
   const html4 = readFileSync(join(ROOT, "index.html"), "utf8");
   const PORTANTI = [
     'id="updated-at"', 'id="btn-cio"', 'id="btn-refresh"',
     'id="tk-input"', 'id="tk-go"', 'id="tk-esito"',            // analisi spot del titolo
+    'id="tv-chart"', 'id="tv-tf"', 'id="tv-nota"',              // v257 grafico TradingView
+    'id="wl-input"', 'id="wl-salva"', 'id="wl-chips"', 'id="wl-tv"',   // v257 watchlist propria
     'id="mg-rot"', 'id="mg-stress"', 'id="mg-leva"', 'id="mg-tutti"',   // macro in grafici
     'id="corr-macro"',                                          // correlazione fra indicatori
     'id="open-pmc"', 'id="open-sell"',                          // gli strumenti che il CEO tiene
@@ -621,6 +642,40 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
   check("v256 ogni sezione ha una chiave data-sez, tutte distinte",
     sez.length >= 6 && new Set(sez).size === sez.length);
 }
+
+/* ── ⚠ v257 — IL WIDGET TRADINGVIEW E' L'UNICA DIPENDENZA ESTERNA: che resti tale ──
+   Uno script di terze parti dentro una pagina che finora non ne aveva nessuno merita un gate.
+   Tre invarianti: si carica SOLO dal dominio ufficiale, ha un onerror che degrada invece di
+   lasciare un buco muto, e NON riceve mai credenziali (il CEO le ha offerte, sono state
+   rifiutate: il widget e' pubblico e con le credenziali non ci si farebbe nulla). */
+{
+  const appTV = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const srcTV = [...appTV.matchAll(/sc\.src\s*=\s*"([^"]+)"/g)].map(m => m[1]);
+  check("v257 TradingView: gli script esterni vengono SOLO da s3.tradingview.com",
+    srcTV.length >= 2 && srcTV.every(u => u.startsWith("https://s3.tradingview.com/external-embedding/")));
+  check("v257 TradingView: ogni widget ha un onerror che degrada in modo visibile",
+    (appTV.match(/sc\.onerror\s*=/g) || []).length >= 2);
+  /* ⚠ QUARTA VOLTA che un gate trova SE STESSO. La prima stesura cercava la parola
+     "credenzial" vicino a "tradingview" — e la trovava nella nota che RASSICURA il CEO
+     ("nessun account e nessuna credenziale"). Cercare una parola non e' cercare un
+     comportamento: ora si guarda se una credenziale viene LETTA o SPEDITA. */
+  const codiceTV = appTV.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const leggeCredenziali = /localStorage\.getItem\(\s*["'`][^"'`]*(pass|cred|tradingview|investing)/i.test(codiceTV);
+  const campoPassword = /type\s*=\s*["']password["']/i.test(readFileSync(join(ROOT, "index.html"), "utf8"));
+  const nelConfig = /symbol[\s\S]{0,300}?(password|user(name)?|auth|token)\s*:/i.test(codiceTV);
+  check("v257 TradingView: nessuna credenziale viene letta o spedita al widget",
+    !leggeCredenziali && !campoPassword && !nelConfig);
+
+  const htmlTV = readFileSync(join(ROOT, "index.html"), "utf8");
+  check("v257 la watchlist e' dichiarata per quello che e': simboli scelti dal CEO, non quella di Investing",
+    /simboli tuoi, salvati/.test(htmlTV));
+}
+
+/* ── v257 — la watchlist segue il CEO su ogni device, o lo dice ── */
+check("v257 watchlist: senza token il salvataggio e' locale E LO DICHIARA", (() => {
+  const appW = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  return /SU QUESTO BROWSER/.test(appW) && /config\/ui_watchlist\.json/.test(appW);
+})());
 
 /* ── il wiring: nessun accesso non protetto a un elemento che non esiste ── */
 {
@@ -743,16 +798,44 @@ check("v256 correlazione macro: misura la dispersione DENTRO i compositi, non un
   return ok && /Nessuna correlazione storica/.test(testo)`));
 
 /* ── analisi spot del titolo ── */
-check("v256 analisi titolo: il pacchetto nomina il ticker, chiede la verifica e porta il macro", suVeri(`
+/* ⚠ v257 — INVARIANTI RISCRITTI DOPO UN FALLIMENTO REALE. Il CEO ha incollato il pacchetto in
+   Gemini e la risposta e' stata: tutti i dati su MRVL "registrati come n.d. in ottemperanza ai
+   limiti imposti sull'impossibilita' di stima in assenza di accesso a feed live". Il modello ha
+   usato la regola anti-invenzione come permesso per non fare niente — e la colpa e' del prompt,
+   che diceva "cercali online" e subito dopo "cio' che manca si dichiara n.d.".
+   I check vecchi verificavano che il pacchetto DICHIARASSE di non avere i dati. Ora verificano
+   che ORDINI di cercarli, che dica DOVE, e che chiuda la scappatoia del referto tutto-n.d. */
+check("v257 analisi titolo: la ricerca online e' il PASSO 0, obbligatorio e prima di tutto", suVeri(`
   const t = buildPromptTicker("nvda");
-  return /ANALISI SPOT DI UN TITOLO: NVDA/.test(t)
-      && /\\[VERIFICATO\\]/.test(t)
-      && /QUADRO MACRO/.test(t)
-      && /DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO/.test(t)`));
+  return /PASSO 0/.test(t) && /OBBLIGATORIO/.test(t)
+      && /CERCA ONLINE/.test(t) && /Non e' un'opzione/.test(t)`));
 
-check("v256 analisi titolo: NON finge di avere prezzi o fondamentali del titolo", suVeri(`
-  const t = buildPromptTicker("ZZZZ");
-  return /NON contiene prezzi/.test(t) && /non stimarlo/.test(t)`));
+check("v257 analisi titolo: chiude la scappatoia del referto tutto-n.d.", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /SE NON PUOI NAVIGARE/.test(t)
+      && /FERMATI/.test(t)
+      && /mai come politica generale/.test(t)`));
+
+check("v257 analisi titolo: dice DOVE cercare, con fonti nominate e il ticker nell'URL", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /DOVE CERCARE/.test(t) && /finance\\.yahoo\\.com\\/quote\\/NVDA/.test(t)
+      && /stockanalysis\\.com/.test(t) && /sec\\.gov/.test(t)`));
+
+check("v257 analisi titolo: chiede le sei consegne che il CEO ha elencato", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /SCHEDA DI IDENTITA/.test(t) && /Concorrente/.test(t) && /[Qq]uota di mercato/.test(t)
+      && /ULTIMA TRIMESTRALE/.test(t) && /Supporti e resistenze/.test(t)
+      && /SENTIMENT/.test(t) && /ENTRARE O USCIRE/.test(t)`));
+
+check("v257 analisi titolo: dichiara data del dato macro e prossimo aggiornamento", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /Snapshot del /.test(t) && /prossimo aggiornamento atteso/.test(t)
+      && /prossimo run del sistema/.test(t)`));
+
+check("v257 analisi titolo: porta il quadro macro e il blocco del disaccordo", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /ANALISI DI NVDA/.test(t) && /QUADRO MACRO/.test(t)
+      && /DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO/.test(t)`));
 
 check("v256 analisi titolo: niente dimensionamenti, perché il sistema non conosce il capitale", suVeri(`
   const t = buildPromptTicker("NVDA");
