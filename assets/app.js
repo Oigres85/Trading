@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "261";
+const BUILD_VERSION = "262";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -611,7 +611,9 @@ function renderAll() {
   }
   recomputeTotals();
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
-  renderCorrMacro();            // v256 — dove gli indicatori non sono d'accordo
+  /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
+     pagina. La funzione RESTA perche' testoCorrelazioniMacro() usa lo stesso calcolo per il
+     pacchetto AI, dove il blocco e' il primo dopo la testata. */
   refreshShockClient();
   renderShockAlert();
   renderDataQualityAlert();
@@ -2421,35 +2423,41 @@ const ETF_DI_SETTORE = { sox: "SMH", Technology: "XLK", "Communication Services"
   "Health Care": "XLV", Financials: "XLF", Industrials: "XLI", "Consumer Discretionary": "XLY" };
 
 
-let rotOrizzonte = "m1";   // m1 | m3
+let rotOrizzonte = "m1";
+let rotTutte = false;   // v262: gli estremi di default, la classifica intera a un clic   // m1 | m3
 function renderRotazione() {
-  /* ⚠ v256 — VIA L'AGGANCIO AL LIBRO. Questo grafico accendeva le barre dei settori "in cui hai
-     i soldi" e scriveva accanto la quota del capitale — la sua idea migliore quando c'era un
-     portafoglio, e un residuo che parla di un libro inesistente adesso. Trovato guardando la
-     pagina viva, non rileggendo il codice: la barra dei Semiconduttori diceva ancora "63,3%
-     del libro". Resta la classifica dei 21 ETF, che e' un fatto macro a se' stante: dove si sta
-     muovendo il denaro, con l'arco fra il primo e l'ultimo. */
+  /* ⚠ v262 — TERZA VOLTA CHE IL CEO CHIEDE DI RIDURRE QUESTO RIQUADRO ("riduci le dimensioni
+     del box!!"). Le prime due volte ho stretto il CSS: prima il vincolo sbagliato (v259), poi
+     quello giusto ma non abbastanza. Quando una richiesta torna tre volte il problema non e' la
+     misura, e' la FORMA — la stessa lezione delle barre 0-100 respinte tre volte in v225-v228.
+     Ventuno barre, per quanto basse, restano ventuno righe da leggere.
+     Ora il riquadro mostra I DUE ESTREMI, che sono la risposta alla domanda "dove si muove il
+     denaro": i cinque settori che tirano e i cinque che perdono. Gli altri undici stanno in
+     mezzo e non dicono niente di piu'. Il resto della classifica e' a un clic, e il pacchetto
+     per l'LLM continua a portarli TUTTI e 21 — si accorcia la pagina, non l'informazione. */
   const box = $("#mg-rot"); if (!box) return;
   const tilt = DATA?.macro?.tilt || [];
   const nota = $("#mg-rot-note"), head = $("#mg-rot-head");
   if (!tilt.length) { box.innerHTML = '<div class="muted">Rotazione non disponibile.</div>'; return; }
-  const righe = [...tilt].sort((a, b) => (b[rotOrizzonte] ?? -99) - (a[rotOrizzonte] ?? -99)).map(t => ({
-    nome: t.name, valore: t[rotOrizzonte], tk: t.ticker, testo: signTxt(t[rotOrizzonte]),
-  }));
-  /* v257 — RIQUADRO PIU' BASSO su richiesta del CEO: 21 barre a piena altezza occupavano da
-     sole quasi uno schermo. La classe `obars-compatte` stringe riga e testo; i dati sono gli
-     stessi, cambia solo quanto spazio si prendono. */
-  box.innerHTML = barreOrdinate(righe).replace('<div class="obars">', '<div class="obars obars-compatte">');
+  const tutte = [...tilt].sort((a, b) => (b[rotOrizzonte] ?? -99) - (a[rotOrizzonte] ?? -99))
+    .map(t => ({ nome: t.name, valore: t[rotOrizzonte], tk: t.ticker, testo: signTxt(t[rotOrizzonte]) }));
+  const N = 5;
+  const mostrate = rotTutte ? tutte : [...tutte.slice(0, N), ...tutte.slice(-N)];
+  box.innerHTML = barreOrdinate(mostrate).replace('<div class="obars">', '<div class="obars obars-compatte">')
+    + (tutte.length > 2 * N
+        ? `<button class="btn btn-ghost btn-sm" id="rot-tutte">${rotTutte ? "Mostra solo gli estremi" : `Mostra tutti e ${tutte.length}`}</button>`
+        : "");
   box.querySelectorAll("[data-obar-tk]").forEach(e =>
     e.setAttribute("title", "ETF di riferimento " + e.dataset.obarTk));
+  $("#rot-tutte")?.addEventListener("click", () => { rotTutte = !rotTutte; renderRotazione(); });
   if (head) head.innerHTML = "";
-  const primo = righe[0], ultimo = righe[righe.length - 1];
-  const sopraZero = righe.filter(r => (r.valore ?? 0) > 0).length;
+  const primo = tutte[0], ultimo = tutte[tutte.length - 1];
+  const sopraZero = tutte.filter(r => (r.valore ?? 0) > 0).length;
   if (nota) {
-    nota.innerHTML = `Rendimento a ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"} dei ${righe.length} ETF di settore e tema, ordinati. `
-      + `${sopraZero} su ${righe.length} sono in positivo. `
-      + (primo && ultimo ? `L'arco della rotazione va da ${esc(primo.nome)} ${signTxt(primo.valore)} a ${esc(ultimo.nome)} ${signTxt(ultimo.valore)}: `
-         + `piu' l'arco e' largo, piu' il mercato sta scegliendo invece di salire insieme.` : "");
+    nota.innerHTML = (rotTutte ? "" : `<b>I ${N} che tirano e i ${N} che perdono</b>, su ${tutte.length} settori. `)
+      + `Rendimento a ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"}. ${sopraZero} su ${tutte.length} in positivo. `
+      + (primo && ultimo ? `L'arco va da ${esc(primo.nome)} ${signTxt(primo.valore)} a ${esc(ultimo.nome)} ${signTxt(ultimo.valore)}: `
+         + `piu' e' largo, piu' il mercato sta scegliendo invece di salire insieme.` : "");
   }
 }
 
@@ -2561,7 +2569,22 @@ function renderLevaStagione() {
           soglie: picco > 0 ? [{ v: picco, testo: "massimo storico", colore: "var(--red)" }] : [],
           assex: [`${h.length} mesi fa`, md.date ? dataBreve(md.date) : "oggi"], etichetteDx: false,
           aria: "debito a margine FINRA" }),
-      n: `Quanto denaro a prestito c'è dentro il mercato. Oggi ${fmt1.format(md.pct_of_peak)}% del massimo storico e ${signTxt(md.yoy)} in un anno: la leva sale più in fretta dei prezzi. Fonte ${esc(md.series || "FINRA")}.`,
+      /* ⚠ v262 — LA DATA MANCAVA PROPRIO QUI, ED È LA SCHEDA CHE PIÙ NE HA BISOGNO.
+         Il CEO l'ha chiesta tre volte e ha detto perché: "questo dato continua a darmi dubbi
+         incidendo pesantemente e non in modo corretto sull'analisi". Ha ragione due volte.
+         FINRA pubblica il margin debt del mese M nella terza settimana di M+1: il numero in
+         pagina ha strutturalmente fra 40 e 70 giorni. Letto senza data dice "la leva è al
+         massimo storico ADESSO" — e su quella lettura si conclude che il mercato è fragile
+         oggi. Con la data dice un'altra cosa: "a fine giugno la leva era al massimo storico,
+         e da allora non sappiamo". Sono due affermazioni diverse, e finora la scheda mostrava
+         la seconda con la faccia della prima.
+         La riga di cadenza (rigaCadenza) esisteva dal v250 ma questa scheda non passa da
+         `indicatoriClassifica` — è costruita a mano qui — quindi non la riceveva. Classe
+         "due implementazioni della stessa cosa" (v161, v207): una strada aveva la data, l'altra no. */
+      n: (typeof rigaCadenza === "function"
+            ? `<div class="mg-cad muted"><b>⚠ ${esc(rigaCadenza("margin_debt", md.date) || "data di rilevazione non disponibile")}</b></div>`
+            : "")
+        + `Quanto denaro a prestito c'era nel mercato ALLA RILEVAZIONE qui sopra, non oggi. Allora era ${fmt1.format(md.pct_of_peak)}% del massimo storico, ${signTxt(md.yoy)} a/a. FINRA pubblica il mese M nella terza settimana di M+1: fra la rilevazione e oggi il mercato si è mosso e questo numero non lo sa.`,
     });
   }
   const se = m.seasonality;
@@ -2818,7 +2841,21 @@ function indicatoriClassifica() {
      raddoppia un segnale solo", v229). Non si perde informazione: si perde una ripetizione.
      ⚠ I loro COMPONENTI restano tutti: le schede singole ci sono, e la dispersione interna
      continua a vivere nel blocco del disaccordo, che legge macroquant e fear_greed. */
-  const FUORI = new Set(["thermometer", "futures", "seasonality", "risk_sentiment", "smart_money"]);
+  /* ⚠ v262 — TRE VOCI IN PIU' FUORI, per ragioni diverse e tutte verificate sui dati.
+     · "_alpha" (Scarto di oggi vs indice) — richiesta esplicita del CEO: "è correlato al
+       portafoglio che il sistema non deve leggere più". E' l'ULTIMA scheda che leggeva
+       DATA.portfolio: passate in rassegna tutte e 29, era l'unica rimasta.
+     · "fg:momentum-s-p-500" — e' la STESSA GRANDEZZA di "momentum" (S&P vs media 125 sedute):
+       la componente Momentum di CNN e' il prezzo dell'S&P contro la sua media a 125 giorni.
+       La deduplica per nome di v258 non l'ha vista perche' i due nomi non condividono una
+       parola ("Momentum S&P 500" contro "S&P vs media 125 sedute") — ed e' la dimostrazione
+       del limite dichiarato allora: accoppiare per nome visibile fallisce quando due nomi
+       diversi indicano la stessa cosa (v196). Qui la deduplica e' per SOSTANZA, a mano.
+     · "fg:domanda-bond-high-yield" — e' lo spread high yield, cioe' la stessa misura di
+       "Stress del credito" (HY OAS) letta da un'altra fonte. Due letture della stessa
+       grandezza sono un segnale, non due. */
+  const FUORI = new Set(["thermometer", "futures", "seasonality", "risk_sentiment", "smart_money",
+                         "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield"]);
   /* ⚠ v253 — LA FRESCHEZZA SI ASSEGNA IN UN PUNTO SOLO, QUI IN FONDO. La prima stesura la
      agganciava ai singoli `out.push`: ce ne sono NOVE sparsi per la funzione, e un decimo
      aggiunto un domani nascerebbe senza — è lo stesso motivo per cui il filtro FUORI qui
@@ -3035,6 +3072,39 @@ function conTachimetro(comp, base, aria) {
 }
 
 const FORMA_INDICATORE = {
+  /* ═══ v262 — L'AMPIEZZA NELLA FORMA CHE IL CEO SA LEGGERE ═════════════════════════════════
+     Ha chiesto: "il dato ed il grafico deve essere più immediato e se non lo ritieni essenziale
+     eliminalo". E poi ha detto la cosa che risolve il problema: "i grafici termometri di stress
+     per me sono di facile lettura".
+     ESSENZIALE LO E': l'ampiezza risponde a una domanda che nessun altro indicatore pone —
+     se il rialzo lo stanno facendo tutte le azioni o solo le prime dieci. Un indice che sale
+     con l'azione media ferma e' un indice fragile, e non si vede guardando l'indice.
+     Quindi non si toglie: si cambia forma. Prima era "SPY +2,87% vs RSP +3,09%, spread
+     -0,22pp" — tre numeri che chiedono di sapere cos'e' RSP prima di dire qualcosa. Ora e' la
+     stessa scala a zone nominate dei termometri di stress, con la conclusione scritta sopra.
+     ⚠ La soglia dei 4 pp NON e' inventata: e' quella che la pipeline usa da sempre per alzare
+     il proprio alert (`spread > 4` in fetch_market_breadth), quindi viene dal sistema, non da
+     me. Le altre due bande sono dichiarate come convenzione di lettura (regola v240). */
+  breadth: (m) => {
+    const b = m.breadth; if (!b || b.divergence_pp == null) return null;
+    const d = Number(b.divergence_pp);
+    const conclusione = d > 4
+      ? "SOLO LE MEGACAP: l'indice sale, l'azione media resta indietro"
+      : d < -2 ? "PARTECIPAZIONE LARGA: l'azione media fa meglio dell'indice"
+      : "RIALZO CONDIVISO: indice e azione media si muovono insieme";
+    return {
+      g: scala(d, { min: -6, max: 8, unita: " pp", zone: [
+            { da: -6, a: -2, nome: "azione media avanti", colore: "var(--green)" },
+            { da: -2, a: 4, nome: "insieme", colore: "var(--yellow)" },
+            { da: 4, a: 8, nome: "solo megacap", colore: "var(--red)" },
+          ],
+          fonte: "la soglia dei 4 pp e' quella con cui la pipeline stessa alza l'allarme; le altre due bande sono convenzioni di lettura" }),
+      n: `<b>${conclusione}.</b> Confronta l'S&P pesato per capitalizzazione (SPY, dove le prime dieci societa' contano per un terzo) con lo stesso indice a pesi uguali (RSP, dove ogni azione vale come le altre). `
+        + `A un mese: SPY ${signTxt(b.spy_1m_pct)}, RSP ${signTxt(b.rsp_1m_pct)}, differenza ${signTxt(d, " pp")}. `
+        + `Come si legge: se la differenza cresce, il rialzo si sta stringendo su poche societa' e diventa piu' fragile — basta che una di quelle inciampi.`,
+    };
+  },
+
   carry: (m) => {
     const c = m.carry; if (!c || c.spread == null) return null;
     const p = punteggioDi("carry");
@@ -3125,9 +3195,14 @@ const FORMA_INDICATORE = {
   smart_money: (m) => conTachimetro(m.smart_money, barreComposito(m.smart_money, "Istituzionali vs retail",
     "I quattro segnali che distinguono il denaro istituzionale da quello retail. <b>Come si legge:</b> struttura di mercato, term structure del VIX, spread di credito e put/call. Quando divergono dal comportamento del retail, storicamente conta di più quello che fanno gli istituzionali."), "istituzionali vs retail"),
   fear_greed: (m) => {
-    const f = m.fear_greed; if (!f || !(f.components || []).length) return null;
-    const b = barreComposito(f, "Fear & Greed", "");
-    if (!b) return null;
+    const f = m.fear_greed; if (!f || f.score == null) return null;
+    /* ⚠ v262 — VIA LE BARRE DEI COMPONENTI. Il CEO l'ha segnalato due volte: "Fear & Greed
+       Index ha ancora al suo interno altri valori come vix etc!!! portali fuori e fai schede a
+       parte qualora non ve ne siano già ed elimina questi valori lasciando solo Fear & Greed".
+       Da v258 tutti e sette i componenti hanno una scheda propria — quattro create allora, tre
+       (VIX, Put/Call, Ampiezza) che esistevano gia' — quindi `barreComposito` qui dentro
+       ripeteva sette numeri gia' visibili altrove. Resta l'indice con le sue bande CNN, che e'
+       la cosa che questa scheda deve dire. */
     /* le bande del Fear & Greed sono quelle pubblicate da CNN (0-25 paura estrema, 25-45 paura,
        45-55 neutro, 55-75 avidita', 75-100 avidita' estrema): sono una convenzione DELL'INDICE,
        non una mia scelta, e si puo' dire da dove viene. */
@@ -3139,7 +3214,7 @@ const FORMA_INDICATORE = {
              { da: 75, a: 100, nome: "avidità estrema", colore: "var(--green)" }],
       fonte: "le cinque bande sono quelle pubblicate da CNN per questo indice" });
     const st = [f.week_ago, f.month_ago, f.year_ago].filter(x => x != null);
-    return { g: tach + b.g, n: `${st.length ? `Una settimana fa ${f.week_ago} · un mese fa ${f.month_ago} · un anno fa ${f.year_ago}. ` : ""}Sette componenti, dal peggiore al migliore. <b>Come si legge:</b> è un contrarian: la paura estrema è storicamente un momento di acquisto e l'avidità estrema un momento di cautela. Il livello di oggi conta meno della DIREZIONE rispetto alle rilevazioni passate.` };
+    return { g: tach, n: `${st.length ? `Una settimana fa ${f.week_ago} · un mese fa ${f.month_ago} · un anno fa ${f.year_ago}. ` : ""}I sette componenti hanno ciascuno la propria scheda qui sotto. <b>Come si legge:</b> è un contrarian: la paura estrema è storicamente un momento di acquisto e l'avidità estrema un momento di cautela. Il livello di oggi conta meno della DIREZIONE rispetto alle rilevazioni passate.` };
   },
   _alpha: (m) => {
     const b = m.benchmarks || {}; if (b.ndx == null) return null;
@@ -3188,14 +3263,10 @@ const FORMA_INDICATORE = {
         fonte: "il percentile e la sua mediana vengono dal dato (5 anni di fondi monetari)" }),
       n: `Fondi monetari retail ${fmtNum.format(l.retail_mmf_bln)} mld (${signTxt(l.retail_yoy_pct)} in un anno, ${l.retail_pctile_5y}° percentile su 5 anni) · istituzionali ${l.inst_cash_pct}% in liquidità. <b>Come si legge:</b> ha due letture opposte e vanno tenute insieme. Molta liquidità ferma è benzina potenziale per i rialzi; ma se sta AUMENTANDO significa che qualcuno sta uscendo dal rischio adesso. Guarda il livello e la direzione, non uno solo dei due. Sono proxy dichiarati, non i flussi veri.` };
   },
-  breadth: (m) => {
-    const b = m.breadth; if (!b || b.divergence_pp == null) return null;
-    return { g: barreOrdinate([
-        { nome: "SPY — le grandi", valore: b.spy_1m_pct, colore: "var(--blue)", testo: `${signTxt(b.spy_1m_pct)} a 1 mese` },
-        { nome: "RSP — tutte uguali", valore: b.rsp_1m_pct, colore: "var(--purple)", testo: `${signTxt(b.rsp_1m_pct)} a 1 mese` },
-      ], {}),
-      n: `Scarto ${signTxt(b.divergence_pp)} pp. <b>Come si legge:</b> SPY pesa le società per capitalizzazione, RSP le tratta tutte uguali. Se SPY sale molto più di RSP il rialzo lo fanno poche mega-cap e la partecipazione è stretta — il tipo di rialzo che si rompe in fretta. Se salgono insieme, il movimento è largo e più solido. Allarme sopra i 4 pp di scarto: oggi ${Math.abs(b.divergence_pp) > 4 ? "è attivo" : "non è attivo"}.` };
-  },
+  /* v262 — la vecchia `breadth` e' stata sostituita da quella nella forma dei termometri,
+     piu' in alto. ⚠ Stava DOPO nell'oggetto letterale, quindi vinceva lei: due chiavi uguali
+     in un oggetto non danno errore, l'ultima sovrascrive la prima in silenzio — e per un giro
+     ho creduto che la mia versione non funzionasse. */
   sp500_pe: (m) => {
     const p2 = m.sp500_pe, f = m.forward_pe; if (!p2 || p2.current == null) return null;
     return { g: scala(p2.current, { min: 10, max: 40, unita: "×", aria: "P/E S&P 500",
@@ -3313,7 +3384,14 @@ function renderIndicatori() {
        spiegazione di lettura), poi la serie storica, poi il contenuto del pannello. */
     const forma = (() => { try { return FORMA_INDICATORE[r.k]?.(DATA.macro || {}) || null; } catch { return null; } })();
     const se = forma ? null : serieIndicatore(r.k);
-    const dal = forma ? "" : contenutoDalPannello(conPan.has(r.k) ? r.k : null, r.sub || "");
+    /* ⚠ v262 — LA SCHEDA DI FEAR & GREED NON RIPETE I SUOI COMPONENTI. Il CEO l'ha segnalato
+       due volte: "ha ancora al suo interno altri valori come vix etc". Da v258 tutti e sette i
+       componenti hanno una scheda propria (quattro nuove, tre — VIX, Put/Call, Ampiezza — che
+       esistevano gia'), quindi l'elenco dentro la scheda del composito e' diventato una
+       ripetizione: gli stessi numeri due volte, che e' esattamente cio' che il sistema dichiara
+       di non voler fare. Resta l'indice con la sua storia; i pezzi si leggono nelle loro schede. */
+    const soloIndice = r.k === "fear_greed";
+    const dal = (forma || soloIndice) ? "" : contenutoDalPannello(conPan.has(r.k) ? r.k : null, r.sub || "");
     const linea = se
       ? (se.doppia
           ? graficoSerie(se.doppia, { h: 104, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome })
@@ -6308,7 +6386,7 @@ function renderCorrMacro() {
    tarare": erano illeggibili per costruzione su quell'orizzonte. Restano volumi, RSI e due medie
    — i supporti e le resistenze veri li disegna l'LLM nell'analisi, dove hanno un perche' accanto
    (zona di volume, massimo precedente) invece di una linea per ogni giorno. */
-const TV_STUDIES = ["STD;Volume", "STD;RSI", "STD;SMA", "STD;EMA"];
+const TV_STUDIES = ["STD;RSI", "STD;SMA", "STD;EMA"];   // v262: niente "STD;Volume", il grafico a candele lo disegna gia' da solo
 let tvSimboloCorrente = "";
 let tvIntervallo = "D";
 
@@ -6379,16 +6457,28 @@ function montaGraficoTV(tk, intervallo) {
      pagina statica — l'iframe e' cross-origin, il browser non ci fa leggere nulla di quello
      che c'e' dentro, e non e' una limitazione aggirabile. Fingere di leggerlo sarebbe la classe
      v195: un dato indovinato scritto come certo. */
+  /* ⚠ v262 — LEGENDA RISCRITTA. Il CEO ha chiesto di togliere la frase sul widget pubblico
+     (l'aveva gia' letta), di spiegare i COLORI delle linee, e di dire cosa c'e' nella barra
+     laterale. E aveva un dubbio giusto: i volumi sembravano doppi.
+     ⚠ ERANO DAVVERO DOPPI, e la causa era mia: il grafico a candele di TradingView disegna gia'
+     le barre del volume sul fondo, e io avevo aggiunto ANCHE lo studio "STD;Volume" — quindi
+     due pannelli di volume, uno sopra l'altro. Tolto lo studio; le barre native restano. */
   if (nota) {
     nota.innerHTML = `<div class="tv-legenda">
-      <div><b>Volume</b><span>Quante azioni sono passate di mano in quella seduta. Barre alte = il movimento e' stato fatto da molti; barre basse = pochi scambi, quindi il livello regge meno.</span></div>
-      <div><b>RSI (14)</b><span>Quanto e' stata forte la spinta recente, su una scala 0-100. Sopra 70 il titolo ha corso molto in poco tempo, sotto 30 e' stato venduto molto. Non e' un segnale di acquisto o vendita: e' una misura di quanto e' teso il movimento.</span></div>
-      <div><b>SMA</b><span>Media semplice degli ultimi N prezzi: la linea del "prezzo normale" recente. Il prezzo sopra = tendenza intatta, sotto = tendenza in discussione.</span></div>
-      <div><b>EMA</b><span>Come la SMA ma pesa di piu' i giorni recenti: gira prima quando il movimento cambia. Le due insieme dicono se il cambio e' appena iniziato (EMA gira, SMA no) o consolidato (girano entrambe).</span></div>
+      <div><b>Candele</b><span>Ogni candela e' una seduta: il corpo va da apertura a chiusura, i fili sono massimo e minimo. <b class="tv-verde">Verde</b> = ha chiuso sopra l'apertura, <b class="tv-rosso">rossa</b> = sotto. Corpi lunghi = giornata decisa, corpi corti con fili lunghi = incertezza.</span></div>
+      <div><b>Volume</b><span>Le barre in basso: quante azioni sono passate di mano. La regola che conta e' il CONFRONTO — un movimento con volume sopra la media e' stato fatto da molti e regge; lo stesso movimento con volume basso e' fragile. Anche le barre del volume sono verdi o rosse come la loro seduta.</span></div>
+      <div><b class="tv-blu">SMA blu</b><span>Media semplice: il prezzo "normale" delle ultime N sedute, dove ogni giorno pesa uguale. Prezzo sopra la linea = tendenza intatta; sotto = tendenza in discussione. E' il livello che tanti guardano, quindi spesso fa da appoggio.</span></div>
+      <div><b class="tv-arancio">EMA arancio</b><span>Stessa idea ma i giorni recenti pesano di piu': gira PRIMA della SMA quando il movimento cambia. Le due insieme dicono a che punto e' il cambio — solo l'arancio ha girato: e' appena iniziato; hanno girato entrambe e l'arancio ha incrociato la blu: e' consolidato.</span></div>
+      <div><b class="tv-viola">RSI</b><span>Nel riquadro sotto, scala 0-100: quanto e' stata forte la spinta delle ultime 14 sedute. Sopra 70 il titolo ha corso molto in poco tempo, sotto 30 e' stato venduto molto. NON e' un segnale di acquisto o vendita — un titolo in tendenza forte puo' restare sopra 70 per settimane. Serve a vedere quando la spinta si esaurisce mentre il prezzo sale ancora.</span></div>
     </div>
-    <div class="tv-piede">Widget pubblico di TradingView: <b>nessun account, nessuna credenziale</b>. Puoi aggiungere altri indicatori dal bottone "Indicatori" dentro il grafico e disegnarci sopra: le modifiche restano nella tua sessione del browser.
-    ${String(tk).includes(".") ? ` ⚠ "${esc(tk)}" ha un suffisso di borsa alla Yahoo: TradingView usa una nomenclatura diversa e il simbolo potrebbe non agganciarsi — scrivilo come lo vedi su TradingView (per esempio <code>EURONEXT:ASML</code>).` : ""}</div>`;
+    <div class="tv-legenda tv-legenda-lat">
+      <div><b>Barra laterale sinistra</b><span>Sono gli strumenti per disegnare, dall'alto: il mirino (croce), le LINEE DI TENDENZA (per unire due minimi o due massimi), le forme (rettangoli per marcare una zona di prezzo), le misure (trascina per leggere quanto vale un movimento in % e in giorni), il testo, e in fondo la gomma e il lucchetto. Quello che disegni resta nel tuo browser.</span></div>
+      <div><b>Barra in alto</b><span>Il campo con la lente cambia titolo; i numeri (1m, 30m, 1h, D) cambiano l'unita' di ogni candela — su D ogni candela e' una giornata, su 1h un'ora; il bottone "Indicatori" apre il catalogo, dove puoi aggiungerne altri (nel piano gratuito ne convivono pochi per grafico: se ne aggiungi troppi TradingView toglie i primi).</span></div>
+      <div><b>In basso a destra</b><span>Le date, e il selettore dell'intervallo visibile (1G, 5G, 1M, 6M, 1A, 5A, Tutto). L'intervallo visibile NON cambia il calcolo degli indicatori: una media a 200 giorni resta a 200 giorni anche se guardi un mese.</span></div>
+    </div>
+    ${String(tk).includes(".") ? `<div class="tv-piede">⚠ "${esc(tk)}" ha un suffisso di borsa alla Yahoo: TradingView usa una nomenclatura diversa e il simbolo potrebbe non agganciarsi — scrivilo come lo vedi su TradingView (per esempio <code>EURONEXT:ASML</code>).</div>` : ""}`;
   }
+
 
 }
 

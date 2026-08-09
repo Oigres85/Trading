@@ -18,7 +18,7 @@
 <title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=261">
+<link rel="stylesheet" href="assets/style.css?v=262">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -167,46 +167,20 @@
     <div class="mg-tris" id="mg-leva"></div>
   </section>
 
-<section class="card" data-sez="macro">
-    <div class="card-head"><h2>Macro &amp; Mercati</h2></div>
-    <!-- v219 — bottone "Dettagli macro" RIMOSSO su richiesta del CEO. Il popup a 39 pannelli
-         era una seconda pagina dentro la pagina. I singoli pannelli NON sono persi: si aprono
-         cliccando la barra del rispettivo indicatore nella classifica qui sopra. -->
-        <!-- v215 — IL BLOCCO RICHIUDIBILE È SPARITO. Conteneva 11 tachimetri (#gauges) e 16
-         riquadri (#macro-grid): nasconderli non era esploderli. Ora quegli stessi indicatori
-         sono UNA classifica sola sullo stesso asse 0-100, ordinata dal peggiore, con ogni
-         barra cliccabile verso il suo pannello. Gli id #gauges e #macro-grid restano nel DOM
-         ma vuoti e nascosti: renderGauges/renderMacro continuano a girare senza errori e la
-         guardia strutturale continua a vederli, in attesa di essere rimossi con le loro
-         funzioni in un taglio dedicato (togliere codice e guardia insieme è la classe v203).
-         L'unica mini-card superstite, "Interni di mercato", è già righe di valori. -->
-    <!-- v218 — ULTIMA MINI-CARD RIMOSSA. "Interni di mercato" erano quattro righe di valori con
-         unità diverse (pp, %, un booleano): ora stanno nella classifica unica, sulla stessa
-         scala 0-100 di tutto il resto, dove si possono finalmente confrontare. -->
-    <!-- v225 — QUI C'ERA UN </div> ORFANO, residuo del blocco <details> tolto in v215/v218.
-         Non era cosmetico: il parser HTML chiude il primo div APERTO in scope, cioe' .shell-main,
-         quindi 8 sezioni su 18 finivano fuori, come figlie dirette di .shell — che e' una griglia
-         a due colonne (178px | 1038px). Misurato sul sito vivo: su Portafoglio le sezioni si
-         alternavano 1038px / 178px, cioe' "Peso delle posizioni" veniva disegnato dentro la
-         colonna della barra laterale. E' la sovrapposizione segnalata due volte dal CEO. -->
-    <div class="macro-news">
-      <div class="macro-news-head"><h3>News — portafoglio &amp; macro USA</h3><span class="muted">clicca la sintesi per tutte le notizie</span></div>
-      <div id="news-summary" tabindex="0" role="button" title="Clicca per leggere tutte le notizie"></div>
-    </div>
-  </section>
+
 
   <!-- v256 — CORRELAZIONE FRA I BLOCCHI MACRO. Con il portafoglio fuori, "correlazione" non
        può più voler dire correlazione fra titoli: qui è la relazione FRA GLI INDICATORI —
        dove due famiglie che di solito si muovono insieme oggi dicono cose opposte. È la
        stessa sostanza delle divergenze cross-blocco che il payload pubblica dal v156. -->
-  <section class="card" data-sez="correlazione">
-    <div class="card-head">
-      <h2>Dove gli indicatori non sono d'accordo</h2>
-      <span class="muted">famiglie macro a confronto: la dispersione conta più della media</span>
-    </div>
-    <div id="corr-macro"></div>
-    <div id="corr-macro-note" class="muted"></div>
-  </section>
+    <!-- v262 — DUE SEZIONI RIMOSSE su richiesta del CEO ("elimina tab in chiusura: Dove gli
+       indicatori non sono d'accordo — Macro & Mercati").
+       RICEVUTA scritta prima del taglio: "Macro & Mercati" conteneva SOLO #news-summary, un
+       contenitore rimasto vuoto da quando le news sono uscite dal sistema (v256) — non portava
+       via niente. "Dove gli indicatori non sono d'accordo" conteneva #corr-macro: quello che
+       mostrava resta INTERO nel pacchetto per l'LLM, dove è il primo blocco dopo la testata ed
+       è la parte su cui l'analisi si regge. Sparisce dalla pagina, non dal sistema. -->
+
 
   <section class="card" data-sez="strumenti">
     <div class="card-head"><h2>Strumenti</h2></div>
@@ -327,6 +301,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=261"></script>
+<script src="assets/app.js?v=262"></script>
 </body>
 </html>

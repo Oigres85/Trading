@@ -632,7 +632,10 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
     'id="tv-chart"', 'id="tv-tf"', 'id="tv-nota"',              // v257 grafico TradingView
     'id="wl-input"', 'id="wl-salva"', 'id="wl-chips"', 'id="wl-tv"',   // v257 watchlist propria
     'id="mg-rot"', 'id="mg-stress"', 'id="mg-leva"', 'id="mg-tutti"',   // macro in grafici
-    'id="corr-macro"',                                          // correlazione fra indicatori
+    /* v262 — 'id="corr-macro"' non e' piu' un elemento portante: il CEO ha chiesto di togliere
+       quella sezione dalla pagina. L'invariante NON e' stato indebolito, e' stato SPOSTATO dove
+       la cosa vive adesso — il blocco del disaccordo nel pacchetto AI, che il check v256 piu'
+       sotto verifica essere presente e in alto. */
     'id="open-pmc"', 'id="open-sell"',                          // gli strumenti che il CEO tiene
     'id="pmc-modal"', 'id="sell-modal"', 'id="modal"', 'id="chart-modal"',
     'id="dataquality-alert"', 'id="version-alert"', 'id="shock-alert"',
@@ -834,7 +837,7 @@ check("v261 il payload dichiara la data della barra, non solo l'ora del run", su
   const daRenderAll = [...new Set([...corpo.matchAll(/^\s*(?:if \([^)]*\) )?([a-zA-Z][a-zA-Z0-9_]*)\(\);/gm)].map(m => m[1]))]
     .filter(f => new RegExp(`^(?:async )?function ${f}\\b`, "m").test(src6));
   check("v256 il gate di render ricava la lista da renderAll e trova la catena vera",
-    daRenderAll.length >= 5 && daRenderAll.includes("renderMacroGrafici") && daRenderAll.includes("renderCorrMacro"));
+    daRenderAll.length >= 5 && daRenderAll.includes("renderMacroGrafici"));
 
   const renderGira = (fn) => run(`
     const _d = DATA;
