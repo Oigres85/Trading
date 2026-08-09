@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "260";
+const BUILD_VERSION = "261";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1693,11 +1693,58 @@ function prossimoRunPipeline(adesso = new Date()) {
 /* la riga di freschezza per un dato che si aggiorna a ogni run (non ha un calendario di
    pubblicazione). Si basa su DATA.updated_at, che è il timestamp REALE del run che ha
    prodotto questo file — non sull'orologio del browser. */
-function rigaFreschezzaMercato() {
+/* ═══ v261 — LA BARRA DA CUI VIENE IL DATO, NON L'ORA DEL RUN ══════════════════════════════
+   La pipeline gira ~20 volte al giorno; la barra giornaliera sotto quel run puo' essere di
+   ieri, di venerdi' o di tre giorni fa. Il portafoglio lo dichiarava per ogni titolo
+   (`price_asof`); i blocchi MACRO no — ereditavano solo `updated_at`, quindi in un run di
+   domenica il VIX di venerdi' arrivava all'LLM come se fosse di adesso.
+   Ora la pipeline scrive un `asof` per blocco (v261 in update_data.py). ⚠ MA IL CI RIGENERA SU
+   CRON: fino al prossimo run `data.json` quel campo non ce l'ha, e senza un ripiego la pagina
+   resterebbe muta per ore proprio sulla cosa che sto correggendo — stessa ragione dei rami
+   FedWatch di v187 e della matrice di v205.
+   Il ripiego onesto c'e' ed e' gia' nel file: le posizioni portano `price_asof`, cioe' la data
+   dell'ultima barra che Yahoo ha pubblicato. E' la STESSA barra da cui nascono VIX, ampiezza e
+   rotazione, perche' vengono tutti dallo stesso download giornaliero. */
+function ultimaBarraDisponibile() {
+  const date = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .map(r => r && r.price_asof).filter(x => typeof x === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x));
+  if (!date.length) return null;
+  return date.sort()[date.length - 1];          // la piu' recente fra quelle pubblicate
+}
+
+/* la data del dato di un blocco macro: prima quella dichiarata dalla pipeline, poi il ripiego */
+function asofBlocco(blocco) {
+  const dichiarata = blocco && typeof blocco === "object" && blocco.asof;
+  if (typeof dichiarata === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dichiarata)) {
+    return { data: dichiarata, dedotta: false };
+  }
+  const dedotta = ultimaBarraDisponibile();
+  return dedotta ? { data: dedotta, dedotta: true } : null;
+}
+
+function rigaFreschezzaMercato(blocco) {
   const iso = DATA && DATA.updated_at;
   if (!iso) return "";
   const d = new Date(iso);
   if (isNaN(d)) return "";
+  /* ⚠ v261 — SE LA BARRA E' PIU' VECCHIA DEL RUN, LO DICE. Prima questa riga scriveva sempre
+     "rilevazione al run delle HH:MM": vero per l'ORA in cui il numero e' stato scaricato, falso
+     per il MOMENTO a cui si riferisce. In un run domenicale erano due giorni di differenza, e
+     la riga li nascondeva entrambi dietro la stessa formula. */
+  const ab = asofBlocco(blocco);
+  if (ab) {
+    const barra = new Date(ab.data + "T00:00:00");
+    const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+    const giorni = Math.round((oggi - barra) / 86400000);
+    if (giorni >= 1) {
+      const it = ab.data.slice(8, 10) + "/" + ab.data.slice(5, 7);
+      const p = prossimoRunPipeline();
+      return `ultima rilevazione: CHIUSURA DEL ${it}` + (giorni === 1 ? " (ieri)" : ` (${giorni} giorni fa)`)
+        + ` · il run delle ${d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })} l'ha solo riscaricata, non e' un dato nuovo`
+        + (p ? ` · prossimo run ${p.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}` : "")
+        + (ab.dedotta ? " · data dedotta dalle barre dei titoli" : "");
+    }
+  }
   const oreFa = Math.max(0, Math.round((Date.now() - d.getTime()) / 3600000));
   const hhmm = (x) => x.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
   const p = prossimoRunPipeline();
@@ -2755,7 +2802,7 @@ function indicatoriClassifica() {
       out.push({ k: "fg:" + chiaveNome(c.label).replace(/[^a-z0-9]+/g, "-"),
                  nome: c.label, score: Math.round(Number(c.score)),
                  sub: `${c.rating ? (FG_LABELS[c.rating] || c.rating) + " · " : ""}componente di Fear & Greed (CNN)`,
-                 cadenza: rigaFreschezzaMercato() });
+                 cadenza: rigaFreschezzaMercato(m.fear_greed) });
     }
   }
 
@@ -2778,9 +2825,17 @@ function indicatoriClassifica() {
      sopra è stato spostato in fondo in v238 ("futures" veniva aggiunto DOPO e sopravviveva).
      Chi ha già un calendario di pubblicazione (rigaCadenza) se lo tiene; tutti gli altri
      sono dati che rinascono a ogni run, e questa riga lo dice. */
-  const mercato = rigaFreschezzaMercato();
+  /* ⚠ v261 — LA FRESCHEZZA E' PER BLOCCO, non una sola per tutti. Prima si calcolava UNA riga
+     e la si copiava su ogni scheda: comodo e sbagliato appena i blocchi hanno barre diverse
+     (Yahoo pubblica in tempi diversi, gia' pagato in v186 sul portafoglio). Ogni scheda ora
+     chiede la propria: `k` porta la chiave del blocco macro, e da li' si risale al suo `asof`. */
   return out.filter(x => !FUORI.has(x.k))
-    .map(x => (x.cadenza ? x : { ...x, cadenza: mercato }))
+    .map(x => {
+      if (x.cadenza) return x;
+      const chiave = String(x.k || "").replace(/^(in:|mk:|fg:)/, "");
+      const blocco = m[chiave] || m[x.k] || null;
+      return { ...x, cadenza: rigaFreschezzaMercato(blocco) };
+    })
     .sort((a, b) => a.score - b.score);
 }
 /* ═══ v233 — QUELLO CHE IL POPUP AVEVA DENTRO, PORTATO FUORI ════════════════════════════════
@@ -5531,9 +5586,24 @@ function buildPrompt() {
       .filter(i => i && i.key && typeof CADENZA_FONTE !== "undefined" && CADENZA_FONTE[i.key] && i.date)
       .map(i => `${i.label || i.key} (${String(i.date).slice(0, 10)})`);
     lines.push(`FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:`);
+    /* ⚠ v261 — LA BARRA, NON IL RUN. Questa riga diceva "rilevati al run delle HH:MM" e lasciava
+       all'LLM il compito di capire che in un run domenicale quel numero e' di venerdi'. Ora la
+       data della barra e' scritta, e la differenza in giorni pure: e' la stessa distinzione che
+       il portafoglio faceva gia' per ogni titolo con `price_asof` (v186) e che ai blocchi macro
+       mancava. */
+    const barra = ultimaBarraDisponibile();
+    let etaBarra = null;
+    if (barra) {
+      const b = new Date(barra + "T00:00:00");
+      const oggi0 = new Date(); oggi0.setHours(0, 0, 0, 0);
+      etaBarra = Math.round((oggi0 - b) / 86400000);
+    }
     lines.push(`· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, `
-      + `momentum): rilevati al run delle ${quando}${prossimo ? `, prossimo run ${prossimo}` : ""}. `
-      + `A borse chiuse sono l'ULTIMA CHIUSURA, non il presente: le righe che lo sanno lo scrivono accanto al valore.`);
+      + `momentum): scaricati al run delle ${quando}${prossimo ? `, prossimo run ${prossimo}` : ""}. `
+      + (barra && etaBarra >= 1
+          ? `⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL ${barra} — ${etaBarra} ${etaBarra === 1 ? "giorno" : "giorni"} fa. `
+            + `Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.`
+          : `La barra giornaliera sotto quei numeri e' di oggi (${barra || "data non disponibile"}).`));
     if (conCalendario.length) {
       lines.push(`· STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): `
         + `${conCalendario.join(" · ")}. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e `

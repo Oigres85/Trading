@@ -516,6 +516,31 @@ def risk_ratios(daily_ret):
     return sharpe, sortino
 
 
+def bar_asof(serie_o_df):
+    """Data della BARRA da cui nasce un dato di mercato, in ISO (YYYY-MM-DD).
+
+    ⚠ v261 — PERCHE' SERVE, e perche' non basta `updated_at`.
+    La pipeline gira ~20 volte al giorno e ogni run timbra `updated_at`. Ma la barra
+    giornaliera sotto quel run puo' essere di ieri, di venerdi', o di tre giorni fa: nei weekend,
+    nei festivi, nelle mezze sedute e quando Yahoo pubblica la barra in ritardo. Il portafoglio
+    lo dichiarava gia' per ogni titolo (`price_asof`); i blocchi MACRO no — ereditavano solo
+    `updated_at`, quindi in un run di domenica il VIX di venerdi' arrivava all'LLM come se fosse
+    di adesso. Trovato da un audit indipendente delle fonti e confermato dal CEO, che ha chiesto
+    che ogni dato dichiari quando e' stato rilevato "affinche' anche il prompt LLM capisca la
+    qualita' temporale del dato e non lo interpreti come assoluto".
+    Null-safe per costruzione: se l'indice non e' temporale o la serie e' vuota, torna None e
+    chi legge ricade sul comportamento precedente — meglio nessuna data di una data inventata."""
+    try:
+        idx = getattr(serie_o_df, "index", None)
+        if idx is None or len(idx) == 0:
+            return None
+        ultimo = idx[-1]
+        d = getattr(ultimo, "date", None)
+        return d().isoformat() if callable(d) else str(ultimo)[:10]
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def drop_void_bars(hist):
     """Barre senza Close via. Yahoo può appendere la barra ODIERNA con Close=NaN e volume
     valorizzato (visto sul campo, lug 2026: ^KS11 dopo la chiusura coreana) → il prezzo
@@ -1298,6 +1323,7 @@ def fetch_macro():
             "value": round(float(h.iloc[-1]), 2),
             "change_pct": round((float(h.iloc[-1]) / float(h.iloc[-2]) - 1) * 100, 2),
             "spark": [round(float(c), 2) for c in h.tail(30)],
+            "asof": bar_asof(h),          # v261: la barra da cui viene, non il run
         }
     except Exception as e:  # noqa: BLE001
         print(f"!! vix: {e}", file=sys.stderr)
@@ -2112,7 +2138,8 @@ def fetch_momentum():
             if len(h) >= 125:
                 px = float(h.iloc[-1]); sma = float(h.rolling(125).mean().iloc[-1])
                 out[key] = {"price": round(px, 2), "sma125": round(sma, 2),
-                            "dist_pct": round((px / sma - 1) * 100, 2)}
+                            "dist_pct": round((px / sma - 1) * 100, 2),
+                            "asof": bar_asof(h)}          # v261
         except Exception as e:  # noqa: BLE001
             print(f"!! momentum {sym}: {e}", file=sys.stderr)
     return out or None
@@ -2158,7 +2185,8 @@ def fetch_speculative_froth():
             chg5 = (float(closes.iloc[-1]) / float(closes.iloc[-6]) - 1) * 100 if len(closes) >= 6 else None
             if v_avg > 0:
                 out[key] = {"symbol": sym, "rvol": round(v_last / v_avg, 2),
-                            "chg_5d_pct": round(chg5, 2) if chg5 is not None else None}
+                            "chg_5d_pct": round(chg5, 2) if chg5 is not None else None,
+                            "asof": bar_asof(closes)}     # v261
         except Exception as e:  # noqa: BLE001
             print(f"!! froth {sym}: {e}", file=sys.stderr)
     if not out:
@@ -2184,10 +2212,12 @@ def fetch_market_breadth():
             if len(h) < 22:
                 return None
             rets[sym] = (float(h.iloc[-1]) / float(h.iloc[-22]) - 1) * 100
+            ultima_barra = bar_asof(h)                     # v261: stessa barra per entrambi i simboli
         spread = rets["SPY"] - rets["RSP"]
         alert = (rets["SPY"] > 0 and rets["RSP"] < 0) or spread > 4
         out = {"spy_1m_pct": round(rets["SPY"], 2), "rsp_1m_pct": round(rets["RSP"], 2),
-               "divergence_pp": round(spread, 2), "alert": alert}
+               "divergence_pp": round(spread, 2), "alert": alert,
+               "asof": ultima_barra}                       # v261
         if alert:
             out["note"] = (f"SPY {rets['SPY']:+.1f}% vs RSP {rets['RSP']:+.1f}% a 1M "
                            f"(spread {spread:+.1f}pp): il rally è retto dalle megacap, l'azione media non partecipa.")
@@ -2684,6 +2714,7 @@ def fetch_sector_tilt():
                 m3 = (last / float(s.iloc[-66]) - 1) * 100
                 d1 = (last / float(s.iloc[-2]) - 1) * 100
                 rows.append({"ticker": sym, "name": name, "group": group,
+                             "asof": bar_asof(s),         # v261: la barra della rotazione
                              "price": round(last, 2), "d1": round(d1, 2),
                              "m1": round(m1, 1), "m3": round(m3, 1),
                              "score": round(clamp(50 + (m1 * 0.6 + m3 * 0.4) * 2.5))})

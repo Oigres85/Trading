@@ -745,6 +745,57 @@ check("v259 nessun aggregato duplicato: ne' fra le schede ne' nel payload ne' ne
   return !/sentiment globale/.test(schede) && !/istituzionali vs retail/.test(schede)
       && !/Sentiment globale/.test(dati) && !/Istituzionali [Vv][Ss] [Rr]etail/.test(dati)`));
 
+/* ── ⚠ v261 — LA DATA DELLA BARRA: il ramo va ESERCITATO, non solo scritto ──
+   v234 lo insegna: un ramo che non puo' essere raggiunto non e' una protezione, e' un commento
+   che sembra codice. Qui il ramo "la barra e' vecchia" scatta solo nei weekend e nei festivi,
+   quindi sui dati di oggi non lo si vedrebbe mai. I check lo forzano in entrambe le direzioni. */
+check("v261 barra vecchia: la scheda dichiara la CHIUSURA e non spaccia il run per un dato nuovo", suVeri(`
+  const vecchia = "2026-08-07";
+  DATA.portfolio.forEach(r => { r.price_asof = vecchia; });
+  (DATA.watchlist || []).forEach(r => { r.price_asof = vecchia; });
+  const r = rigaFreschezzaMercato(DATA.macro && DATA.macro.vix);
+  /* ⚠ l'apostrofo di "non e' un dato nuovo" chiude la stringa quando il check viene passato a
+     vm dentro un template literal: si cerca il pezzo senza apostrofi. */
+  return /CHIUSURA DEL 07.08/.test(r) && /un dato nuovo/.test(r) && /2 giorni fa/.test(r)`));
+
+check("v261 barra di oggi: NESSUN falso allarme (il ramo non scatta quando non serve)", suVeri(`
+  const oggi = new Date().toISOString().slice(0, 10);
+  DATA.portfolio.forEach(r => { r.price_asof = oggi; });
+  (DATA.watchlist || []).forEach(r => { r.price_asof = oggi; });
+  const r = rigaFreschezzaMercato(DATA.macro && DATA.macro.vix);
+  return !/CHIUSURA DEL/.test(r) && /si aggiorna a ogni run/.test(r)`));
+
+check("v261 l'asof DICHIARATO dalla pipeline vince sulla data dedotta", suVeri(`
+  DATA.portfolio.forEach(r => { r.price_asof = "2026-08-09"; });
+  DATA.macro.vix = Object.assign({}, DATA.macro.vix, { asof: "2026-08-06" });
+  const a = asofBlocco(DATA.macro.vix);
+  return a && a.data === "2026-08-06" && a.dedotta === false`));
+
+check("v261 senza asof si deduce dalle barre dei titoli, e lo DICHIARA", suVeri(`
+  DATA.portfolio.forEach(r => { r.price_asof = "2026-08-07"; });
+  (DATA.watchlist || []).forEach(r => { r.price_asof = "2026-08-07"; });
+  if (DATA.macro.vix) delete DATA.macro.vix.asof;
+  const a = asofBlocco(DATA.macro.vix);
+  const r = rigaFreschezzaMercato(DATA.macro.vix);
+  return a && a.data === "2026-08-07" && a.dedotta === true && /data dedotta/.test(r)`));
+
+check("v261 il payload dichiara la data della barra, non solo l'ora del run", suVeri(`
+  DATA.portfolio.forEach(r => { r.price_asof = "2026-08-07"; });
+  (DATA.watchlist || []).forEach(r => { r.price_asof = "2026-08-07"; });
+  const t = buildPrompt();
+  return /LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-08-07/.test(t)
+      && /non sono prezzi di adesso/.test(t)`));
+
+/* ── v261 — la pipeline scrive l'asof: il gate legge il SORGENTE, non i dati (il CI non ha ancora girato) ── */
+{
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  check("v261 pipeline: bar_asof esiste ed e' null-safe", /def bar_asof\(/.test(py) && /return None/.test(py));
+  const blocchi = (py.match(/"asof": bar_asof\(/g) || []).length;
+  check("v261 pipeline: l'asof e' scritto sui blocchi di mercato (vix, momentum, froth, rotazione)",
+    blocchi >= 4);
+  if (blocchi < 4) console.log(`  ⚠ solo ${blocchi} blocchi dichiarano l'asof`);
+}
+
 /* ── il wiring: nessun accesso non protetto a un elemento che non esiste ── */
 {
   /* ⚠ v256 — SI TOLGONO I COMMENTI PRIMA DI LEGGERE. Alla prima stesura la guardia ha trovato
