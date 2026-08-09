@@ -1818,3 +1818,26 @@ svg.g-serie { cursor: crosshair; }
 /* v250 — cadenza del dato sotto le card macro: quando è stato rilevato e quando ne arriva uno nuovo */
 .mg-cad { font-size: 10px; line-height: 1.35; margin-top: 5px; padding-top: 4px;
   border-top: 1px dotted var(--border); opacity: .8; }
+
+/* ═══ v255 — VERIFICA RISPOSTA AI ═══════════════════════════════════════════════════════
+   Il colore porta UNA sola distinzione, quella che conta: rosso = impossibile, ambra = da
+   guardare, verde = coerente col libro. Niente gradazioni intermedie — è la regola v198
+   ("verde/rosso solo per il segno, ambra solo per ciò che vincola") applicata qui. */
+#verifica-text { width: 100%; min-height: 180px; resize: vertical; }
+#verifica-esito { margin-top: 12px; max-height: 46vh; overflow-y: auto; }
+.va-sommario { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--card-2); margin-bottom: 10px; font-size: 13px; }
+.va-riga { border-left: 3px solid var(--border); border-radius: 0 8px 8px 0;
+  background: var(--card-2); padding: 9px 12px; margin-bottom: 8px; }
+.va-riga.va-hard { border-left-color: var(--red); }
+.va-riga.va-warn { border-left-color: var(--yellow); }
+.va-riga.va-ok   { border-left-color: var(--green); }
+.va-cap { font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.va-tag { margin-left: auto; font-size: 10.5px; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--muted); white-space: nowrap; }
+.va-msg { margin: 6px 0 0; padding-left: 18px; font-size: 12.5px; }
+.va-msg li { margin: 2px 0; }
+.va-orig { font-size: 11px; margin-top: 6px; font-family: ui-monospace, Menlo, monospace;
+  overflow-wrap: anywhere; }
+.va-vuoto { padding: 14px; border: 1px dashed var(--border); border-radius: 8px; font-size: 13px; }
+@media (max-width: 560px) { .va-tag { margin-left: 0; } }

@@ -2805,7 +2805,12 @@ function validateAIOrders(orders) {
   const byTk = new Map();
   for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) if (r.ticker) byTk.set(r.ticker.toUpperCase(), r);
   const usdNav = dgFin(t.usd_value);
-  const budgetUsd = (dgFin(t.budget_operativo_spendibile) ?? 0) * eurusd;
+  /* ⚠ v255 — IL CONTROLLO SUL BUDGET È USCITO. Leggeva `budget_operativo_spendibile`, che il
+     CEO ha tolto dal payload perché era il numero che produceva il "vendi tutto", e la sua
+     testata ora dice a chiare lettere che "il payload NON pubblica un tetto di spesa: quanto
+     impegnare è una decisione tua, non un vincolo del sistema". Un validatore che rimettesse
+     quel tetto contraddirebbe la testata dalla porta di servizio. Resta il CONTROVALORE
+     complessivo degli acquisti proposti, come FATTO da leggere accanto alla liquidità. */
   let buyNotional = 0;
   for (const o of orders) {
     const hard = [], warn = [];
@@ -2813,12 +2818,18 @@ function validateAIOrders(orders) {
     if (!r) { rows.push({ ...o, level: "hard", msgs: ["ticker non presente nel payload (allucinazione)"] }); continue; }
     const price = dgFin(r.price);
     if (o.action === "BUY") {
+      /* ⚠ v255 — VETO E CAP SONO SEGNALAZIONI, NON BLOCCHI. La filosofia del CEO è che i
+         parametri sono evidenza diagnostica, non dettami: un filtro di qualità e una soglia
+         di concentrazione sono GIUDIZI, e un giudizio che si presenta come impossibilità
+         mente sulla propria natura. Restano BLOCCANTI solo i fatti che l'aritmetica rende
+         impossibili — vendere ciò che non hai, uno stop sopra il limite, un ticker che nel
+         payload non esiste. Tutto il resto si dichiara e decide lui. */
       const veto = typeof qualityVeto === "function" ? qualityVeto(r) : null;
-      if (veto && !veto.rehab) hard.push(`titolo in VETO risk manager (${(veto.why || [veto.verdict]).join(", ")})`);
+      if (veto && !veto.rehab) warn.push(`non supera il filtro qualità (${(veto.why || [veto.verdict]).join(", ")}) — è un giudizio del sistema, non un divieto`);
       else if (veto && veto.rehab) warn.push("riabilitato dal veto Sortino: SORVEGLIATO, sizing prudente");
       const vUsd = r.currency === "EUR" ? (dgFin(r.value) ?? 0) * eurusd : dgFin(r.value);
       const w = (vUsd && usdNav) ? vUsd / usdNav * 100 : null;
-      if (r.qty && w != null && w >= (RISK_PARAMS?.capNoAdd_pct ?? 10)) hard.push(`cap d'ingresso: posizione già ${fmtNum.format(Math.round(w * 10) / 10)}% del NAV (divieto di accumulo)`);
+      if (r.qty && w != null && w >= (RISK_PARAMS?.capNoAdd_pct ?? 30)) warn.push(`cap d'ingresso: posizione già ${fmtNum.format(Math.round(w * 10) / 10)}% del NAV (divieto di accumulo)`);
       if (o.limit == null) warn.push("nessun prezzo LIMITE rilevato (gli ordini a mercato sono vietati dalla disciplina)");
       else {
         if (!(o.limit > 0)) hard.push("limite ≤ 0");
@@ -2840,11 +2851,72 @@ function validateAIOrders(orders) {
     }
     rows.push({ ...o, level: hard.length ? "hard" : warn.length ? "warn" : "ok", msgs: [...hard, ...warn] });
   }
-  const budget = { spend: Math.round(buyNotional), budget: Math.round(budgetUsd),
-                   ok: !(budgetUsd > 0 && buyNotional > budgetUsd * 1.05) };
-  return { rows, budget, hardCount: rows.filter(x => x.level === "hard").length + (budget.ok ? 0 : 1),
+  const budget = { spend: Math.round(buyNotional), budget: null, ok: true };   // v255: nessun tetto
+  return { rows, budget, spesaProposta: Math.round(buyNotional),
+           hardCount: rows.filter(x => x.level === "hard").length,
            warnCount: rows.filter(x => x.level === "warn").length };
 }
+
+/* ═══ v255 — LA RISPOSTA DELL'AI TORNA DENTRO IL SISTEMA ═══════════════════════════════════
+   `parseAIOrders` e `validateAIOrders` esistevano dal v149 con otto test e NON erano collegate
+   a niente: la testata del CEO le promette in A2 ("un validatore automatico estrae
+   ticker/quote/limite/stop dal testo") e per versioni quella promessa è stata falsa. È il
+   sintomo v193 nella sua forma più costosa — non una funzione morta accanto a un bottone
+   inerte, ma accanto a un bottone che non è mai esistito.
+   Cosa BLOCCA: solo ciò che l'aritmetica rende impossibile. Cosa SEGNALA: tutto il resto.
+   La distinzione non è estetica — è la filosofia del CEO ("i parametri sono evidenza
+   diagnostica, non dettami"), ed è ciò che tiene questo controllo dall'altra parte del
+   confine rispetto al "vendi tutto" che aveva tolto dal payload. */
+function renderVerificaAI(testo) {
+  const box = $("#verifica-esito");
+  if (!box) return null;
+  const ordini = parseAIOrders(testo);
+  if (!ordini.length) {
+    box.innerHTML = `<div class="va-vuoto">Nessun ordine riconosciuto nel testo.<br>
+      <span class="muted">Il formato che la testata chiede (A2) è
+      <code>[TICKER] — COMPRA ~N quote a limite $X con stop $Z</code>. Il parser legge anche le
+      tabelle markdown. Se l'AI non ha proposto operazioni, questo esito è corretto.</span></div>`;
+    return { ordini: 0 };
+  }
+  const v = validateAIOrders(ordini);
+  const ICONA = { hard: "⛔", warn: "⚠", ok: "✓" };
+  const ETICH = { hard: "IMPOSSIBILE", warn: "DA GUARDARE", ok: "coerente col libro" };
+  const righe = v.rows.map(r => `
+    <div class="va-riga va-${r.level}">
+      <div class="va-cap"><b>${ICONA[r.level]} ${esc(r.tk)}</b> · ${r.action === "BUY" ? "COMPRA" : "VENDI"}
+        ${r.qty != null ? `~${fmtNum.format(r.qty)} quote` : "<i>quantità non rilevata</i>"}
+        ${r.limit != null ? ` · limite $${fmtNum.format(r.limit)}` : ""}
+        ${r.stop != null ? ` · stop $${fmtNum.format(r.stop)}` : ""}
+        <span class="va-tag">${ETICH[r.level]}</span></div>
+      ${r.msgs && r.msgs.length ? `<ul class="va-msg">${r.msgs.map(m => `<li>${esc(m)}</li>`).join("")}</ul>` : ""}
+      <div class="va-orig muted">${esc(r.line || "")}</div>
+    </div>`).join("");
+  /* Il controvalore è un FATTO messo accanto alla liquidità, non un tetto: la testata dice
+     che quanto impegnare è una decisione del CEO. Si mostra il numero e basta. */
+  const cassa = dgFin((DATA.totals || {}).cash);
+  const spesa = v.spesaProposta || 0;
+  const eurusd = DATA.eurusd || 1.08;
+  const riepilogo = `<div class="va-sommario">
+    <b>${v.rows.length} ordini letti</b> · ${v.hardCount} impossibili · ${v.warnCount} da guardare
+    ${spesa > 0 ? ` · controvalore acquisti proposti <b>${fmtEUR.format(Math.round(spesa / eurusd))}</b>${
+      cassa != null ? ` a fronte di ${fmtEUR.format(Math.round(cassa))} di liquidità` : ""}` : ""}
+  </div>`;
+  box.innerHTML = riepilogo + righe;
+  return { ordini: v.rows.length, hard: v.hardCount, warn: v.warnCount };
+}
+
+$("#btn-verifica")?.addEventListener("click", () => {
+  const m = $("#verifica-modal");
+  if (!m) return;
+  m.hidden = false;
+  $("#verifica-text")?.focus();
+});
+$("#verifica-run")?.addEventListener("click", () => renderVerificaAI($("#verifica-text")?.value || ""));
+$("#verifica-clear")?.addEventListener("click", () => {
+  const t = $("#verifica-text"); if (t) t.value = "";
+  const e = $("#verifica-esito"); if (e) e.innerHTML = "";
+});
+
 
 
 function openDecisionModal() {
@@ -9734,7 +9806,16 @@ function hideSimpleModal(id) { const m = typeof id === "string" ? $(id) : id; if
    sintomo. Ora la chiusura e' generica per TUTTI i .modal-backdrop, con le tre vie che un
    utente si aspetta: il ✕, il fondale, e Esc. Cosi' un modale aggiunto domani nasce chiudibile. */
 document.addEventListener("click", (e) => {
-  const chiudi = e.target.closest("[id$='-modal-close'], [data-close-modal]");
+  /* ⚠ v255 — LA PROMESSA "un modale aggiunto domani nasce chiudibile" ERA CONDIZIONATA A UN
+     NOME. Il selettore chiedeva un id che FINISSE per "-modal-close": il ✕ del modale nuovo si
+     chiamava "verifica-close" e non chiudeva niente — Esc sì, il ✕ no. È lo stesso difetto
+     v193 che questo blocco è nato per correggere, ripetuto dal blocco stesso, perché una
+     convenzione di nomi che nessuno verifica non è una convenzione: è una speranza.
+     Ora chiude anche QUALUNQUE bottone dentro una .modal-head, che è ciò che l'utente vede;
+     e un check verifica che ogni .modal-backdrop di index.html abbia un ✕ che il selettore
+     intercetta davvero. */
+  const chiudi = e.target.closest("[id$='-modal-close'], [data-close-modal]")
+    || (e.target.closest(".modal-head") ? e.target.closest("button") : null);
   if (chiudi) { hideSimpleModal(chiudi.closest(".modal-backdrop")); return; }
   // clic sul fondale (non sul contenuto) chiude
   const back = e.target.closest(".modal-backdrop");

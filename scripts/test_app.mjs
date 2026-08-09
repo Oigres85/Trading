@@ -766,9 +766,32 @@ check("validatore: limite oltre il 30% sotto il prezzo → hard (classe SNDK)", 
 check("validatore: vendita di titolo non detenuto (watchlist) → hard", run(`
   const v = validateAIOrders([{ tk: "TSTW", action: "SELL", qty: 5, limit: null, stop: null }]);
   return v.rows[0].level === "hard" && v.rows[0].msgs.some(m => m.includes("NON detenuto"))`));
-check("validatore: acquisto su titolo in VETO (TST2 value trap) → hard", run(`
+/* ⚠ v255 — INVARIANTE CAMBIATO, non zittito. Il filtro qualità era BLOCCANTE: ora è una
+   segnalazione. La testata del CEO dice che il payload non impone vincoli e che le decisioni
+   di dimensionamento sono sue; un filtro di qualità è un GIUDIZIO, e un giudizio che si
+   presenta come impossibilità mente sulla propria natura. Restano bloccanti solo i fatti che
+   l'aritmetica rende impossibili. Il check verifica che il giudizio COMPAIA — toglierlo del
+   tutto sarebbe stato perdere l'informazione invece di declassarla. */
+/* ⚠ v255 — INVARIANTE CAMBIATO, non zittito. Il filtro qualità era BLOCCANTE: ora è una
+   segnalazione. La testata del CEO dice che il payload non impone vincoli e che quanto
+   impegnare è una decisione sua; un filtro di qualità è un GIUDIZIO, e un giudizio che si
+   presenta come impossibilità mente sulla propria natura. Restano bloccanti solo i fatti che
+   l'aritmetica rende impossibili (vendere ciò che non hai, stop sopra il limite, un ticker
+   che nel payload non esiste, un limite d'acquisto SOPRA il prezzo corrente).
+   ⚠ La prima stesura usava limite 95 su un titolo che ne vale 80: restava `hard` per la
+   regola del limite sopra il mercato, e il check accusava il codice invece di sé stesso.
+   Un check che non isola la regola che misura sta misurando un'altra cosa. */
+check("v255 validatore: chi non passa il filtro qualità è SEGNALATO, non bloccato", run(`
+  const v = validateAIOrders([{ tk: "TST2", action: "BUY", qty: 5, limit: 78, stop: 70 }]);
+  return v.rows[0].level === "warn" && v.rows[0].msgs.some(m => /filtro qualità/.test(m))`));
+
+check("v255 validatore: il limite d'acquisto SOPRA il prezzo resta bloccante (è aritmetica)", run(`
   const v = validateAIOrders([{ tk: "TST2", action: "BUY", qty: 5, limit: 95, stop: 88 }]);
-  return v.rows[0].level === "hard" && v.rows[0].msgs.some(m => m.includes("VETO"))`));
+  return v.rows[0].level === "hard" && v.rows[0].msgs.some(m => /SOPRA il prezzo/.test(m))`));
+
+check("v255 validatore: nessun tetto di spesa reintrodotto dalla porta di servizio", run(`
+  const v = validateAIOrders([{ tk: "TSTW", action: "BUY", qty: 9999, limit: 95, stop: 88 }]);
+  return v.hardCount === 0 && v.budget.budget === null && v.spesaProposta > 0`));
 
 /* ---------- v138: pulizia payload (streghe condizionali, tagli, buyback, curva) ---------- */
 check("v138 streghe: nel prompt SOLO se <30 giorni; a 62g sparisce", run(`
@@ -2923,6 +2946,28 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
   check("meta: dopo il blocco report non c'è nessun check (v205)",
     tutto.includes("/* ---------- report ----------")
     && !/^\s*check\(/m.test(dopoReport));
+}
+
+/* ═══ v255 — OGNI MODALE DEVE ESSERE CHIUDIBILE COL ✕ ════════════════════════════════════
+   Il blocco di chiusura generica (v193) prometteva "un modale aggiunto domani nasce
+   chiudibile", ma il selettore chiedeva un id che FINISSE per "-modal-close". Il ✕ del modale
+   di verifica si chiamava "verifica-close": Esc funzionava, il ✕ no. Una convenzione di nomi
+   che nessuno verifica non è una convenzione. Il check la verifica. */
+{
+  const html3 = readFileSync(join(ROOT, "index.html"), "utf8");
+  const senzaX = [];
+  for (const m of html3.matchAll(/<div class="modal-backdrop" id="([a-z0-9-]+)"[\s\S]*?<div class="modal-head">([\s\S]*?)<\/div>/g)) {
+    const [, id, testa] = m;
+    const ok = /id="[a-z0-9-]*-modal-close"/.test(testa) || /data-close-modal/.test(testa)
+            || /<button[\s\S]*?>/.test(testa);   // qualunque bottone nella testa: il fallback v255
+    if (!ok) senzaX.push(id);
+  }
+  check("v255 ogni modale di index.html ha un ✕ che il gestore generico intercetta", senzaX.length === 0);
+  if (senzaX.length) console.log("  ⚠ modali senza ✕ collegato:", senzaX.join(", "));
+
+  const appSrc3 = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  check("v255 la chiusura non dipende SOLO dal nome dell'id (fallback su .modal-head)",
+    /modal-head"\)\s*\?\s*e\.target\.closest\("button"\)/.test(appSrc3));
 }
 
 /* ═══ v254 — OGNI POSIZIONE SCRITTA DA app.js DEVE AVERE UN `name` ═══════════════════════

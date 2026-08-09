@@ -18,7 +18,7 @@
 <title>Trading Dashboard — Portafoglio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=254">
+<link rel="stylesheet" href="assets/style.css?v=255">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -40,6 +40,7 @@
          "📖 Dettagli macro", che vive già dentro la scheda Macro: due porte per la stessa
          stanza. Ora la macro si raggiunge da un posto solo — la voce Macro nella barra
          laterale — e tutto il suo contenuto sta nella colonna centrale. -->
+    <button class="btn btn-ghost" id="btn-verifica" aria-label="Verifica la risposta dell'AI contro il portafoglio reale" title="Incolla qui la risposta dell'LLM: il sistema estrae gli ordini proposti e li controlla contro il libro vero (ticker inesistenti, vendite di titoli non posseduti, stop sopra il limite, quantità superiori al posseduto)">🧪 Verifica risposta AI</button>
     <button class="btn btn-ghost" id="btn-diary" aria-label="Diario delle azioni e dettaglio verdetto" title="Diario delle azioni (finisce nell'export AI) + dettaglio verdetto motore">📔 Diario</button>
     <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: prezzi live subito + rigenerazione completa via pipeline (~2-3 min)">⟳ Aggiorna tutto</button>
   </div>
@@ -440,6 +441,27 @@
 </div>
 
 <!-- Modal prompt AI -->
+<!-- v255 — VERIFICA DELLA RISPOSTA AI. Chiude il cerchio: il payload esce da "📋 Copia
+     Analisi AI", la risposta dell'LLM rientra da qui. Il validatore (parseAIOrders +
+     validateAIOrders) esisteva con otto test dal v149 e non era collegato a NIENTE: la
+     testata del CEO lo PROMETTE in A2 ("un validatore automatico estrae ticker/quote/limite/
+     stop dal testo") e per versioni quella promessa è stata falsa. -->
+<div class="modal-backdrop" id="verifica-modal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Verifica risposta AI</h3>
+      <button class="btn btn-ghost" id="verifica-modal-close" data-close-modal>✕</button>
+    </div>
+    <p class="muted">Incolla qui la risposta dell'LLM. Il sistema estrae gli ordini proposti e li confronta col portafoglio reale. <b>Blocca solo ciò che è impossibile</b> (ticker inesistente, vendita di un titolo non posseduto, stop sopra il limite, quantità maggiore del posseduto); tutto il resto è una segnalazione, e la decisione resta tua.</p>
+    <textarea id="verifica-text" spellcheck="false" placeholder="Incolla qui il report dell'AI…"></textarea>
+    <div id="verifica-esito"></div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" id="verifica-run">Controlla gli ordini</button>
+      <button class="btn btn-ghost" id="verifica-clear">Svuota</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="modal" hidden>
   <div class="modal">
     <div class="modal-head">
@@ -533,6 +555,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=254"></script>
+<script src="assets/app.js?v=255"></script>
 </body>
 </html>
