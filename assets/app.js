@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "262";
+const BUILD_VERSION = "263";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5696,7 +5696,12 @@ function buildPrompt() {
      titoli in portafoglio, non un dato macro. Senza libro non misura niente. */
   if (m.fear_greed) {
     let fgl = `- Fear & Greed: ${m.fear_greed.score} (${FG_LABELS[m.fear_greed.rating] || m.fear_greed.rating}), 1 settimana fa ${m.fear_greed.week_ago}, 1 mese fa ${m.fear_greed.month_ago}${m.fear_greed.year_ago ? `, 1 anno fa ${m.fear_greed.year_ago}` : ""}`;
-    if ((m.fear_greed.components || []).length) fgl += ` [componenti: ${m.fear_greed.components.map(c => `${c.label} ${c.rating}${c.score != null ? ` ${c.score}` : ""}`).join("; ")}]`;
+    /* v263 — VIA L'ELENCO DEI COMPONENTI anche dal payload. La scheda non li mostra piu'
+       (v262, richiesta del CEO) perche' hanno tutti una scheda propria; il payload continuava a
+       portarli, e per due di loro — "Momentum S&P 500" e "Domanda bond high yield" — la pagina
+       li ha addirittura tolti come duplicati di altre schede. Pagina e pacchetto dicevano cose
+       diverse sullo stesso indicatore. La dispersione dei sette resta nel blocco del
+       disaccordo, che e' il posto dove serve. */
     lines.push(fgl);
   }
   // sanity finale sul payload: un valore impossibile diventa "n.d." e NON entra nell'analisi
@@ -5756,7 +5761,22 @@ function buildPrompt() {
     const fu = m.futures;
     const fp = (k, lab) => fu[k] ? `${lab} ${fmtNum.format(fu[k].price)} (${signTxt(fu[k].change_pct)})` : null;
     const fs = [fp("nasdaq", "Nasdaq 100 (NQ)"), fp("sp500", "S&P 500 (ES)")].filter(Boolean);
-    if (fs.length) lines.push(`- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): ${fs.join(" · ")} — negativi marcati = apertura USA in gap-down attesa.`);
+    if (fs.length) {
+      /* ⚠ v263 — QUESTA RIGA CONTRADDICEVA QUELLA DUE SOPRA. Trovato leggendo il pacchetto come
+         il modello ricevente: il CONTESTO DI SESSIONE dichiara "WEEKEND, MERCATI CHIUSI · FERMI
+         — non anticipano nulla di nuovo", e subito dopo questa riga li chiamava "LIVE" e
+         "anticipo direzione pre-apertura". Lo stesso dato, due letture opposte a tre righe di
+         distanza: e' la classe v190 (l'etichetta che contraddice il testo accanto) e la classe
+         v193 (stato del mercato e freschezza del dato sono due cose diverse).
+         I future CME chiudono il venerdi' alle 22:00 CET e riaprono la domenica alle 23:00: nel
+         mezzo quel numero non anticipa niente, e' l'ultima quotazione prima della chiusura.
+         Ora l'etichetta segue lo stato reale invece di essere sempre la stessa. */
+      const fase = (typeof usSessionInfo === "function") ? usSessionInfo() : null;
+      const futuriFermi = fase && (fase.phase === "weekend" || fase.weekend || /weekend/i.test(fase.label || ""));
+      lines.push(futuriFermi
+        ? `- Futures USA [FERMI, mercato dei future chiuso]: ${fs.join(" · ")} — sono l'ultima quotazione prima della chiusura, gia' dentro l'ultima seduta: NON anticipano niente di nuovo.`
+        : `- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): ${fs.join(" · ")} — negativi marcati = apertura USA in gap-down attesa.`);
+    }
   }
   // RADAR SCHIUMA SPECULATIVA v126 (ETF a leva 3x): l'euforia retail terminale sul tech/semi
   // è il contesto in cui questo portafoglio (87% tech) rischia di comprare l'ultimo massimo.

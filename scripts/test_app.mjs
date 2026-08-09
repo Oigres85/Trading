@@ -284,11 +284,31 @@ check("v247 cap: il divieto d'acquisto e l'alert di concentrazione sono fuori da
 
 
 
-check("v125 futures nel prompt: NQ/ES live come leading pre-apertura", run(`
-  DATA.macro.futures = { nasdaq: { price: 20000, change_pct: -2.4 }, sp500: { price: 6500, change_pct: -1.1 } };
+/* ⚠ v263 — INVARIANTE ROVESCIATO, non zittito. Il check chiedeva che i future fossero SEMPRE
+   etichettati "LIVE ... anticipo pre-apertura". Trovato leggendo il pacchetto come il modello
+   ricevente: nel weekend quella riga contraddiceva il CONTESTO DI SESSIONE tre righe sopra, che
+   dichiara "FERMI, non anticipano nulla di nuovo". I future CME chiudono il venerdi' alle 22:00
+   e riaprono la domenica alle 23:00: nel mezzo non anticipano niente.
+   L'invariante che conta non e' l'etichetta fissa — e' che l'etichetta NON contraddica lo stato
+   dichiarato accanto. Stessa correzione fatta in v190 sull'etichetta di Seoul, e il test deve
+   asserire la PROPRIETA', non il ramo, o fallisce a orologio. */
+check("v263 futures: l'etichetta segue lo stato del mercato e non contraddice il contesto di sessione", suVeri(`
   const p = buildPrompt();
-  delete DATA.macro.futures;
-  return p.includes("Futures USA LIVE") && p.includes("Nasdaq 100 (NQ)")`));
+  const riga = p.split(String.fromCharCode(10)).find(l => /^- Futures USA/.test(l));
+  if (!riga) return true;                                  // niente future nello snapshot: nulla da contraddire
+  const weekend = /WEEKEND/.test(p);
+  return weekend
+    ? /FERMI/.test(riga) && /NON anticipano/.test(riga)
+    : /LIVE/.test(riga) && /anticipo/.test(riga)`));
+
+check("v263 Fear & Greed: il payload non elenca i componenti (hanno una scheda ciascuno)", suVeri(`
+  /* ⚠ niente regex complicate qui: due livelli di escape dentro un template literal passato a
+     vm sono gia' costati due check in questa sessione. Si cerca la riga del QUADRO MACRO per
+     una sottostringa che solo lei ha, e si guarda se elenca i componenti. */
+  const NL = String.fromCharCode(10);
+  const riga = buildPrompt().split(NL)
+    .find(l => l.indexOf("- Fear & Greed: ") === 0 && l.indexOf("settimana fa") > 0);
+  return !!riga && riga.indexOf("componenti") < 0`));
 
 
 check("v126 froth: alert schiuma speculativa nel prompt con direttiva (no acquisti tech, solo ratchet, ES95 salva)", run(`
