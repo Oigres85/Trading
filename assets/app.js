@@ -1137,7 +1137,6 @@ function renderAll() {
   renderAllocation();
   renderStruttura();            // v205 — i grafici della struttura del libro
   renderMacroGrafici();         // v206 — rotazione, stress, leva e stagionalità
-  renderEarnings();
   renderEarningsAlert();
   renderDivergenzaDiario();   // v245: diario vs portafoglio — prima della riconciliazione
   renderReconcileAlert();
@@ -1146,11 +1145,8 @@ function renderAll() {
   renderDataQualityAlert();
   renderTable();
   renderWatchlist();
-  renderPortfolioHealth();
-  renderMiniCards();
   recordPolymarket();   // accumula lo storico Polymarket (un punto/giorno) per la derivata Δ7g
   renderNews();
-  renderBtpInfo();
   // NON ricostruire la tabella vendite mentre il popup è aperto: l'auto-refresh (ogni 5 min)
   // azzerava gli input e chiudeva la tastiera mentre l'utente stava scrivendo
   if ($("#sell-modal")?.hidden !== false) renderSellCalc();
@@ -2278,19 +2274,6 @@ applyRiskOverrides();   // gli override del CEO valgono da subito, prima di qual
    senza localStorage = il "device nuovo"). Chiave _savedAt = merge whole-object: vince il
    più recente; applyRiskOverrides la ignora (accetta solo numeri in banda). */
 const RISK_PARAMS_PATH = "config/risk_params.json";
-async function pushRiskParamsCloud(ov) {
-  const token = localStorage.getItem("gh_token");
-  if (!token) return;
-  try {
-    let sha;
-    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${RISK_PARAMS_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
-    if (g.ok) sha = (await g.json()).sha;
-    await fetch(`https://api.github.com/repos/${REPO}/contents/${RISK_PARAMS_PATH}`, {
-      method: "PUT", headers: ghHeaders(token),
-      body: JSON.stringify({ message: "Parametri di rischio (da dashboard)", content: btoa(unescape(encodeURIComponent(JSON.stringify(ov, null, 1)))), sha }),
-    });
-  } catch { /* offline: resta in locale */ }
-}
 async function loadRiskParamsCloud() {
   try {
     const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${RISK_PARAMS_PATH}?t=${Date.now()}`, { cache: "no-store" });
@@ -2726,19 +2709,6 @@ function rpShownValue(d) { return d ? Math.round(RISK_PARAMS[d.key] * d.scale * 
    v238 guardava solo le `function` e lasciò passare un `let`, uccidendo la pagina.
    RISK_PARAMS, rpShownValue e openRiskRuleModal RESTANO: hanno altri consumatori. */
 
-function openRiskRuleModal(r) {
-  if (!r) return;
-  const tier = RP_TIER[r.tier];
-  const body = `
-    <div class="rp-modal-head" style="border-left:4px solid ${tier.c}">
-      <div class="rp-modal-tier" style="color:${tier.c}">${tier.lab}${r.active ? ' · <b>ATTIVA ORA</b>' : ""}</div>
-      <div class="rp-modal-th">Soglia: <b>${esc(r.th)}</b></div>
-    </div>
-    <div class="rp-modal-state"><span class="muted">Stato corrente:</span> ${esc(r.state)}</div>
-    <div class="rp-modal-why">${esc(r.why)}</div>
-    <div class="info-line muted" style="font-size:11px;margin-top:10px">Vive in: ${esc(r.where)} · le soglie principali si modificano dal menu in cima a questa sezione (Parametri di Rischio → scegli parametro, inserisci valore, Salva).</div>`;
-  openInfoModal(r.label, body);
-}
 
 /* v135: la barra "Decisione operativa" in cima è stata RIMOSSA (il verdetto vive nell'export
    AI). Il DIARIO delle azioni resta accessibile dal bottone "📔 Diario" della topbar, che
@@ -2876,20 +2846,6 @@ function validateAIOrders(orders) {
            warnCount: rows.filter(x => x.level === "warn").length };
 }
 
-function renderAIValidation(text) {
-  const orders = parseAIOrders(text);
-  if (!orders.length) return `<div class="muted" style="font-size:12px;margin-top:6px">Nessun ordine riconosciuto nel testo (cerco righe con un ticker del payload + COMPRA/ACCUMULA/VENDI/TRIM). Il formato canonico "[TICKER] — COMPRA ~N quote a limite $X con stop $Y" è il più affidabile.</div>`;
-  const v = validateAIOrders(orders);
-  const ico = { ok: "✅", warn: "⚠️", hard: "⛔" };
-  const rows = v.rows.map(x => `<tr class="val-${x.level}">
-    <td class="tk">${esc(x.tk)}</td><td>${x.action === "BUY" ? "Acquisto" : "Vendita"}</td>
-    <td class="num">${x.qty ?? "—"}</td><td class="num">${x.limit != null ? "$" + fmtNum.format(x.limit) : "—"}</td>
-    <td class="num">${x.stop != null ? "$" + fmtNum.format(x.stop) : "—"}</td>
-    <td>${ico[x.level]} ${x.msgs.length ? esc(x.msgs.join(" · ")) : "invarianti rispettate"}</td></tr>`).join("");
-  return `<table class="info-table" style="margin-top:8px"><thead><tr><th>Titolo</th><th>Azione</th><th class="num">Qtà</th><th class="num">Limite</th><th class="num">Stop</th><th>Esito</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="info-line ${v.budget.ok ? "" : "neg"}" style="font-size:12px;margin-top:6px">${v.budget.ok ? "✅" : "⛔"} Spesa d'acquisto ~$${fmtNum.format(v.budget.spend)} vs budget operativo $${fmtNum.format(v.budget.budget)} (cassa − ES95)${v.budget.ok ? "" : " — SFORATO"}</div>
-    <div class="info-line" style="font-size:12.5px;margin-top:4px"><b>${v.hardCount ? `⛔ ${v.hardCount} violazioni HARD — NON eseguire questi ordini senza correggerli` : v.warnCount ? `⚠️ nessuna violazione hard, ${v.warnCount} avvisi` : "✅ tutti gli ordini rispettano gli invarianti del fondo"}</b></div>`;
-}
 
 function openDecisionModal() {
   // v141: il modal è SOLO Diario + Validatore (la "sintesi delle operazioni" del motore è stata
@@ -2953,21 +2909,6 @@ function openDecisionModal() {
 }
 
 /* mini-trend di una metrica vs ~1 settimana fa (dallo storico metrics_history della pipeline) */
-function metricTrend(field) {
-  const h = DATA.metrics_history || [];
-  if (h.length < 2) return "";
-  const cur = h[h.length - 1]?.[field];
-  const past = h[Math.max(0, h.length - 8)]?.[field];   // ~7 punti (giorni) fa
-  if (cur == null || past == null) return "";
-  const d = cur - past;
-  const eps = field === "sharpe" ? 0.05 : 0.3;
-  const dTxt = field === "sharpe" ? (d > 0 ? "+" : "") + fmtNum.format(Math.round(d * 100) / 100)
-    : (d > 0 ? "+" : "") + fmtNum.format(Math.round(d * 10) / 10) + " pp";
-  if (Math.abs(d) < eps) return `<span class="trend trend-flat" title="stabile vs ~1 settimana fa">→</span>`;
-  return d > 0
-    ? `<span class="trend trend-up" title="${dTxt} vs ~1 settimana fa">▲</span>`
-    : `<span class="trend trend-down" title="${dTxt} vs ~1 settimana fa">▼</span>`;
-}
 
 /* Stato Margin Debt condiviso 1:1 tra card, popup e prompt AI (niente stringhe divergenti).
    Logica AND: rosso "ESTREMA" SOLO se leva ≥90% del picco E Forward P/E >20 conferma;
@@ -3104,198 +3045,6 @@ function marginDebtState() {
   return { md, fpe, high: extreme || high, confirmed, rollover, label, labelShort, col, score };
 }
 
-function renderMiniCards() {
-  const m = DATA.macro || {};
-  const dir = marketDirectionScore();
-  const dBox = $("#market-direction");
-  if (dBox && dir != null) {
-    const lab = dir >= 60 ? "Rialzista" : dir <= 40 ? "Ribassista" : "Laterale";
-    dBox.innerHTML = `<div class="mc-title">Direzione mercato</div>
-      ${compactSemiGauge(dir, ["Ribasso", "Rialzo"])}
-      <div class="mc-value" style="color:${scoreColor(dir)}">${dir}% · ${lab}</div>
-      <div class="mc-sub muted">media di tutti i segnali tecnici e macro</div>`;
-  }
-  const sp = m.signposts, sBox = $("#signposts-box");
-  if (sBox && sp) {
-    const risk = sp.pct >= 70 ? "Rischio alto" : sp.pct >= 40 ? "Rischio medio" : "Rischio basso";
-    sBox.innerHTML = `<div class="mc-title">BofA Bear-Market Signposts</div>
-      ${compactSemiGauge(100 - sp.pct, ["Solido", "Ribassista"])}
-      <div class="mc-value" style="color:${scoreColor(100 - sp.pct)}">${sp.active}/${sp.total} attivi · ${risk}</div>
-      <div class="mc-sub muted">clicca per il dettaglio dei 10 segnali</div>`;
-  }
-  // Rotazione settoriale (Tilt): settore leader (overweight) e fanalino
-  const tilt = m.tilt, tBox = $("#tilt-box");
-  if (tBox && tilt && tilt.length) {
-    const sorted = [...tilt].sort((a, b) => b.m1 - a.m1);
-    const defensives = ["Utilities", "Consumi difens.", "Salute", "Oro"];
-    const defAvg = avg(tilt.filter(s => defensives.includes(s.name)).map(s => s.m1));
-    const tech = tilt.find(s => s.ticker === "XLK");
-    const isDef = (defAvg != null && tech) ? defAvg > tech.m1 : null;
-    const regime = isDef == null ? "—" : isDef ? "Difensiva" : "Pro-rischio";
-    const regimeCol = isDef == null ? "var(--muted)" : isDef ? "var(--yellow)" : "var(--green)";
-    // score termometro: pro-rischio (tech>difensivi) = favorevole (alto)
-    const score = (defAvg != null && tech) ? clamp(50 + (tech.m1 - defAvg) * 8) : 50;
-    const lead = sorted[0], lag = sorted[sorted.length - 1];
-    tBox.innerHTML = `<div class="mc-title">Rotazione settoriale</div>
-      <div class="mc-value" style="color:${regimeCol}">${regime}</div>
-      ${thermoLine(score, ["Pro-rischio", "Difensivo"])}
-      <div class="mc-sub muted">↑ ${esc(lead.name.split(" ")[0])} ${signTxt(lead.m1)} · ↓ ${esc(lag.name.split(" ")[0])} ${signTxt(lag.m1)}</div>`;
-  }
-  // Quadruple Witching (4 streghe): ora mostrata nel popup del box Put/Call (vedi openMacroInfo "putcall")
-  // MacroQuant (stile BCA)
-  const mq = m.macroquant, mqBox = $("#macroquant-box");
-  if (mqBox && mq) {
-    const mqLab = mq.score >= 60 ? "Ciclo espansivo" : mq.score >= 40 ? "Ciclo neutro" : "Rischio recessione";
-    mqBox.innerHTML = `<div class="mc-title">MacroQuant (Ciclo)</div>
-      ${compactSemiGauge(mq.score, ["Crescita", "Recessione"])}
-      <div class="mc-value" style="color:${scoreColor(mq.score)}">${mq.score}% · ${mqLab}</div>
-      <div class="mc-sub muted">salute ciclo: PIL · lavoro · inflazione · credito</div>`;
-  }
-  // Stagionalità (S&P 500 / Nasdaq): tachimetro del mese corrente
-  const se = m.seasonality, seBox = $("#seasonality-box");
-  if (seBox && se && se.score != null) {
-    const cm = MONTH_NAMES[(se.current_month || 1) - 1];
-    const both = se.sp_score != null && se.ndx_score != null;
-    const sub = both
-      ? `${cm}: S&P ${se.sp_score}% · NDX ${se.ndx_score}%`
-      : `${cm} · ${se.sp_score != null ? "S&P" : "Nasdaq"}`;
-    seBox.innerHTML = `<div class="mc-title">Stagionalità (${cm})</div>
-      ${compactSemiGauge(se.score, ["Favorevole", "Sfavorevole"])}
-      <div class="mc-value" style="color:${scoreColor(se.score)}">${se.score}% · ${se.label}</div>
-      <div class="mc-sub muted">${sub}</div>`;
-  }
-  /* v207 — INTERNI DI MERCATO. momentum, breadth, froth e futures esistono in data.json,
-     finiscono nel payload per l'LLM, e in dashboard NON ERANO MAI MOSTRATI: il CEO leggeva
-     nel report dell'AI conclusioni che poggiavano su numeri che la sua pagina non conteneva. */
-  const iBox = $("#internals-box");
-  if (iBox) {
-    const righe = [];
-    if (m.breadth?.divergence_pp != null) {
-      const d = m.breadth.divergence_pp;
-      righe.push([`Ampiezza (SPY vs RSP 1M)`, `${signTxt(d, " pp")}`,
-        d <= -4 ? "neg" : d < 0 ? "warn" : "pos",
-        d <= -4 ? "pochi titoli tirano l'indice" : "partecipazione allineata"]);
-    }
-    if (m.momentum?.sp500 != null) {
-      const q = m.momentum.sp500;
-      righe.push(["S&P vs media 125 sedute", signTxt(q.dist_pct), q.dist_pct >= 0 ? "pos" : "neg",
-        q.dist_pct >= 0 ? "sopra la media di lungo periodo" : "sotto la media di lungo periodo"]);
-    }
-    if (m.froth) {
-      const att = m.froth.alert === true;
-      const rv = Math.max(m.froth.soxl?.rvol ?? 0, m.froth.tqqq?.rvol ?? 0);
-      righe.push(["Schiuma su ETF a leva", att ? "ATTIVA" : "no", att ? "neg" : "pos",
-        att ? "volumi anomali su SOXL/TQQQ dentro un rialzo" : `volumi normali (RVol max ${fmtNum.format(rv)}×)`]);
-    }
-    const fut = m.futures?.nasdaq;
-    if (fut?.change_pct != null) {
-      righe.push([esc(fut.label || "Futures Nasdaq"), signTxt(fut.change_pct),
-        fut.change_pct >= 0 ? "pos" : "neg", `${fmtNum.format(fut.price)} — si muovono a mercato chiuso`]);
-    }
-    iBox.innerHTML = righe.length
-      ? `<div class="mc-title">Interni di mercato</div>
-         <div class="int-rows">${righe.map(([lab, val, cls, sub]) => `<div class="int-row">
-           <span class="int-lab">${esc(lab)}</span><span class="int-val ${cls}">${esc(String(val))}</span>
-           <span class="int-sub">${esc(sub)}</span></div>`).join("")}</div>`
-      : `<div class="mc-title">Interni di mercato</div><div class="mc-sub muted">Non disponibili in questo snapshot.</div>`;
-  }
-
-  // Daily Tracking Error vs benchmark (oggi): portafoglio Day% − indice, come tachimetro
-  const bm = m.benchmarks, teBox = $("#tracking-error-box");
-  if (teBox && bm) {
-    const pday = portfolioDayPct();
-    const ref = bm.sp500 != null ? "sp500" : bm.ndx != null ? "ndx" : "sox";
-    const refLab = { sp500: "S&P 500", ndx: "Nasdaq 100", sox: "SOX" }[ref];
-    const alpha = (pday != null && bm[ref] != null) ? pday - bm[ref] : null;
-    if (alpha != null) {
-      const score = clamp(50 + alpha * 12);   // sovraperformance → verde
-      const lab = alpha >= 0.3 ? "Sovraperforma" : alpha <= -0.3 ? "Sottoperforma" : "In linea";
-      teBox.innerHTML = `<div class="mc-title">Tracking Error vs ${refLab}</div>
-        ${compactSemiGauge(score, ["Sottoperf.", "Sovraperf."])}
-        <div class="mc-value" style="color:${scoreColor(score)}">${signTxt(Math.round(alpha * 100) / 100)} pp · ${lab}</div>
-        <div class="mc-sub muted">portaf. oggi ${pday != null ? signTxt(Math.round(pday * 100) / 100) : "—"} · clicca per dettaglio</div>`;
-    } else {
-      teBox.innerHTML = `<div class="mc-title">Tracking Error vs ${refLab}</div>
-        ${compactSemiGauge(50, ["Sottoperf.", "Sovraperf."])}
-        <div class="mc-value muted">—</div><div class="mc-sub muted">dati intraday non disponibili</div>`;
-    }
-  }
-  // Sharpe Ratio del portafoglio (rendimento corretto per il rischio)
-  const shBox = $("#sharpe-box");
-  if (shBox) {
-    const ps = (DATA.totals || {}).portfolio_sharpe_ratio;
-    if (ps != null) {
-      const score = clamp(33 + ps * 22);   // ~0=33, 1=55, 2=77, 3=99
-      const lab = ps > 2 ? "Eccellente" : ps >= 1 ? "Buono" : ps >= 0 ? "Debole" : "Negativo";
-      const so = (DATA.totals || {}).portfolio_sortino_ratio;
-      // VaR: preferisci la stima STORICA (percentili empirici — onesta sulle code grasse)
-      const varE = (DATA.totals || {}).var95_hist_eur ?? (DATA.totals || {}).var95_1d_eur;
-      const subBits = [];
-      if (so != null) subBits.push(`Sortino ${fmtNum.format(so)}`);
-      if (varE != null) subBits.push(`VaR95 1g ${fmtEUR.format(varE)}`);
-      // v209 — al posto del termometro, la SERIE: lo Sharpe ha 36 rilevazioni in
-      // metrics_history e non erano mai state disegnate. Un termometro dice "dove sei",
-      // una linea dice "da dove vieni", che su una metrica di regime è l'informazione.
-      const serie = (DATA.metrics_history || [])
-        .filter(x => x?.date && typeof x.sharpe === "number")
-        .map(x => ({ d: x.date, v: x.sharpe }));
-      const graf = serie.length >= 2
-        ? graficoSerie([{ nome: "sharpe", punti: serie, colore: sharpeColor(ps) }],
-            { h: 92, compatto: true, etichetteDx: false, tacche: 3,
-              soglie: [{ v: 2, testo: "target 2,0", colore: "var(--muted)" }],
-              assex: [`${serie.length} rilevaz.`, "oggi"], aria: "Sharpe del portafoglio nel tempo" })
-        : thermoLine(score, ["Efficiente", "Rischioso"]);
-      shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
-        <div class="mc-value" style="color:${sharpeColor(ps)}">${fmtNum.format(ps)} · ${lab} ${metricTrend("sharpe")}</div>
-        ${graf}
-        <div class="mc-sub muted">${subBits.length ? subBits.join(" · ") : "rendimento corretto per il rischio"}</div>`;
-    } else {
-      shBox.innerHTML = `<div class="mc-title">Sharpe Ratio portafoglio</div>
-        <div class="mc-value muted">—</div>
-        ${thermoLine(50, ["Efficiente", "Rischioso"])}
-        <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
-    }
-  }
-  // Margin Debt: stato condiviso 1:1 con popup e prompt (marginDebtState)
-  const mdBox = $("#margin-debt-box");
-  if (mdBox) {
-    const mds = marginDebtState();
-    if (mds) {
-      const md = mds.md;
-      // label qualitativa nella card (il "100% del picco" nudo era inutilmente ansiogeno):
-      // i numeri esatti restano nel popup di dettaglio. Solo rendering, zero impatti sui calcoli.
-      const pctLab = md.pct_of_peak >= 95 ? "Sui massimi storici"
-        : md.pct_of_peak >= 80 ? "Vicino ai massimi"
-        : md.pct_of_peak >= 60 ? "Zona intermedia" : "Lontano dai massimi";
-      mdBox.innerHTML = `<div class="mc-title">Margin Debt (leva mercato)</div>
-        <div class="mc-value" style="color:${mds.col}">${pctLab} · ${mds.labelShort}</div>
-        ${thermoLine(mds.score, ["Bassa", "Estrema"])}
-        <div class="mc-sub muted">${md.yoy != null ? `YoY ${signTxt(md.yoy)}` : ""} · ${md.series || "FINRA/FRED"} · ${md.date || ""}</div>`;
-    } else {
-      mdBox.innerHTML = `<div class="mc-title">Margin Debt (leva mercato)</div>
-        <div class="mc-value muted">—</div>${thermoLine(50, ["Bassa", "Estrema"])}
-        <div class="mc-sub muted">disponibile dopo la pipeline</div>`;
-    }
-  }
-  // Rischio Cambio EUR/USD: quota del NAV in USD non coperta
-  const fxBox = $("#fx-box");
-  if (fxBox) {
-    const fx = fxExposure();
-    if (fx) {
-      // esposizione valutaria: oltre ~70% del NAV in USD = rischio cambio strutturale
-      const score = clamp(100 - fx.pct);
-      const lab = fx.pct >= 70 ? "Strutturale" : fx.pct >= 40 ? "Rilevante" : "Contenuto";
-      fxBox.innerHTML = `<div class="mc-title">Rischio Cambio EUR/USD</div>
-        <div class="mc-value" style="color:${scoreColor(score)}">${fmtNum.format(fx.pct)}% NAV in USD</div>
-        ${thermoLine(score, ["Coperto", "Esposto"])}
-        <div class="mc-sub muted">non coperto · ${lab}${fx.eurusd ? ` · EUR/USD ${fmtNum.format(fx.eurusd)}` : ""}</div>`;
-    } else {
-      fxBox.innerHTML = `<div class="mc-title">Rischio Cambio EUR/USD</div>
-        <div class="mc-value muted">—</div>${thermoLine(50, ["Coperto", "Esposto"])}
-        <div class="mc-sub muted">in attesa dei dati</div>`;
-    }
-  }
-}
 
 /* Popup Rischio Cambio: esposizione USD, sensibilità e razionale */
 function openFxModal() {
@@ -3474,17 +3223,25 @@ function portfolioHealthScore() {
   const p = portfolioHealthParts();
   return p.length ? Math.round(avg(p.map(x => x[1]))) : null;
 }
-function renderPortfolioHealth() {
-  const box = $("#portfolio-health");
-  if (!box) return;
-  const score = portfolioHealthScore();
-  if (score == null) { box.innerHTML = ""; return; }
-  const lab = score >= 60 ? "Solido" : score <= 40 ? "Da monitorare" : "Equilibrato";
-  box.innerHTML = `<div class="mc-title">Salute del portafoglio</div>
-    <div class="mc-value" style="color:${scoreColor(score)}">${score}/100 · ${lab}</div>
-    ${thermoLine(score, ["Solido", "Fragile"])}
-    <div class="mc-sub muted">tecnica + macro + fondamentale</div>`;
-}
+/* ⚠ v254 — DICIASSETTE FUNZIONI RIMOSSE INSIEME, perché insieme erano un blocco morto.
+   Le cinque render (renderMiniCards, renderPortfolioHealth, renderBtpInfo, renderEarnings,
+   renderAIValidation) scrivevano su #fx-box, #internals-box, #macroquant-box,
+   #margin-debt-box, #market-direction, #seasonality-box, #sharpe-box, #tracking-error-box,
+   #portfolio-health, #btp-info, #earnings-strip — contenitori usciti da index.html quando la
+   macro è diventata grafici (v206-v218). Grazie a `?.` non davano errore: giravano a OGNI
+   render e scrivevano nel vuoto. Le dodici funzioni di supporto servivano solo a loro o a
+   colonne tolte in v208/v251 (finHealthBar, targetBar, fundBar) o all'editor soglie tolto in
+   v253 (openRiskRuleModal, pushRiskParamsCloud).
+   ⚠ TAGLIATE INSIEME PER FORZA: al primo tentativo avevo tolto solo le dodici di supporto e
+   il gate di render ha subito detto "renderMiniCards: metricTrend is not defined". È il gate
+   nuovo di v253 che fa il suo lavoro — con quello vecchio, che copriva sei funzioni scelte a
+   mano, questa sarebbe stata un'altra pagina morta in produzione come in v238.
+   ⚠ NON tagliate, benché senza chiamanti: parseAIOrders e validateAIOrders (8 test), che
+   leggono gli ordini proposti dall'LLM nel formato della testata e li verificano contro il
+   libro vero; riskRulesRegistry, rpShownValue, signalTxt, seduteDelBook, etaLeva,
+   testimoneLeva, derivaConcentrazione. Hanno tutte dei test: la domanda giusta non è "si può
+   togliere" ma "perché non è collegata" — è la lezione v193, dove una funzione morta accanto
+   a un bottone inerte era il sintomo di un collegamento mancante, non un surplus. */
 function openHealthModal() {
   const score = portfolioHealthScore();
   if (score == null) return;
@@ -3722,25 +3479,6 @@ let histBenchKey = "ndx";   // none | nasdaq | ndx | sp500 — default: confront
 const BENCH_LABEL = { nasdaq: "Nasdaq Comp.", ndx: "Nasdaq 100", sp500: "S&P 500", russell: "Russell 2000" };
 
 /* ---------------- info BTP (riga unica sotto i KPI) ---------------- */
-function renderBtpInfo() {
-  const box = $("#btp-info");
-  if (!box) return;
-  const cedoleInc = DATA.broker?.cedole_btp;
-  // BTP Valore Ott 2028: cedola trimestrale (10 gen/apr/lug/ott), 4,10% fino a ott 2026 poi 4,50%
-  const nominal = 40000, now = new Date();
-  let next = null;
-  for (let y = now.getFullYear(); y <= now.getFullYear() + 1 && !next; y++)
-    for (const mth of [0, 3, 6, 9]) {
-      const d = new Date(y, mth, 10);
-      if (d > now) { next = d; break; }
-    }
-  const rate = next && next < new Date(2026, 9, 11) ? 0.041 : 0.045;
-  const grossQ = Math.round(nominal * rate / 4), netQ = Math.round(grossQ * (1 - 0.125));
-  const nextStr = next ? next.toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" }) : "—";
-  // niente più blocco capitale/patrimonio qui (era duplicato e in conflitto con i KPI broker in alto)
-  box.innerHTML =
-    `<div class="btp-line">BTP Valore Ott 2028 — ${cedoleInc != null ? `cedole incassate ${fmtEUR.format(cedoleInc)} lorde · ` : ""}prossima cedola ${nextStr}: ${fmtEUR.format(grossQ)} lordi (${fmtEUR.format(netQ)} netti, tassazione 12,5%).</div>`;
-}
 
 /* ---------------- asset allocation (donut) ---------------- */
 let allocMode = "ticker";   // ticker | sector
@@ -5660,11 +5398,6 @@ const RATING_LABELS = {
   sell: ["Sell", "bad"], strong_sell: ["Strong Sell", "bad"],
 };
 
-function targetBar(r) {
-  if (!r || r.upside_pct === null || r.upside_pct === undefined) return "—";
-  const u = r.upside_pct;   // upside alto = verde, negativo = rosso
-  return meterBar(Math.abs(u) * 2, scoreColor(clamp(50 + u * 2.5)), signTxt(u));
-}
 
 function betaBar(r) {
   // beta vs NDX dalla regressione pipeline (betaOf), fallback Yahoo se non ancora disponibile
@@ -6078,16 +5811,6 @@ function cellaBarra(v, scala, testo, opt = {}) {
     `${opt.title ? ` title="${esc(opt.title)}"` : ""}>${testo}</td>`;
 }
 
-function finHealthBar(r) {
-  if (r.fin_health === null || r.fin_health === undefined) return "—";
-  const m3 = (r.financials || []).slice(-3).map(f => f.margin);
-  const avgM = m3.length ? (m3.reduce((a, b) => a + b, 0) / m3.length).toFixed(1) : "—";
-  const lab = r.fin_health >= 71 ? "Eccellente" : r.fin_health > 40 ? "Solido" : "Debole";
-  return `<button class="fin-health" data-fin="${r.ticker}" title="${lab} — margine netto medio 3 anni: ${avgM}%">
-    <span class="meter-txt">${r.fin_health}</span>
-    <span class="meter-track"><span class="meter-fill" style="width:${Math.max(4, r.fin_health)}%;background:${scoreColor(r.fin_health)}"></span></span>
-  </button>`;
-}
 
 /* modale "Conto economico": barre ricavi/utile + linea margine netto */
 // metriche "Statistiche chiave": [etichetta, formato, spiegazione]
@@ -6236,26 +5959,6 @@ const CM_YF = {
   m6: ["6mo", "1d"], y1: ["1y", "1d"], all: ["max", "1wk"],
 };
 
-async function fetchOHLC(symbol, range, interval) {
-  const yurl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}`;
-  for (const make of CORS_PROXIES) {
-    try {
-      const r = await fetch(make(yurl), { cache: "no-store" });
-      if (!r.ok) continue;
-      const j = await r.json();
-      const res = j?.chart?.result?.[0];
-      const q = res?.indicators?.quote?.[0];
-      if (!res?.timestamp || !q) continue;
-      const out = [];
-      for (let i = 0; i < res.timestamp.length; i++) {
-        if (q.open[i] == null || q.close[i] == null) continue;
-        out.push({ t: res.timestamp[i] * 1000, o: q.open[i], h: q.high[i], l: q.low[i], c: q.close[i] });
-      }
-      if (out.length > 1) return out;
-    } catch { /* prossimo proxy */ }
-  }
-  return null;
-}
 
 /* simbolo TradingView: exchange noto per i titoli core, altrimenti ticker nudo */
 const TV_EXCHANGE = {
@@ -6469,13 +6172,6 @@ function miniLineChart(pts, { w = 420, h = 70, color = "var(--blue)", zeroLine =
    su 13: una misura che sta al suo massimo l'85% del tempo non è un allarme, è una costante,
    e un LLM che la legge come evento la conta come prova. CLAUDE.md lo annotava già
    ("pct_of_peak saturo 13/13") ma la riga del payload continuava a metterla per prima. */
-function mesiAlPicco(serie) {
-  const h = (serie || []).filter(v => typeof v === "number");
-  if (h.length < 3) return null;
-  let picco = -Infinity, conta = 0;
-  h.forEach(v => { if (v >= picco) { conta++; picco = v; } else if (v > picco) picco = v; });
-  return { conta, tot: h.length };
-}
 
 /* v207 — FONTE UNICA PER I RAMI FEDWATCH.
    Il difetto: v187 ha corretto il PAYLOAD ("prob. taglio 0%" era vero e inutile quando il
@@ -7445,21 +7141,9 @@ function renderWatchlist() {
 /* ---------------- vista fondamentale (Value Investing) ---------------- */
 const pctOf = (v) => v == null ? "—" : signTxt(Math.round(v * 1000) / 10);   // frazione → %
 const pctPlain = (v) => v == null ? "—" : (Math.round(v * 1000) / 10) + "%";
-function bigUsd(v) { if (v == null) return "—"; const a = Math.abs(v);
-  if (a >= 1e12) return "$" + (v / 1e12).toFixed(2) + "T";
-  if (a >= 1e9) return "$" + (v / 1e9).toFixed(1) + "B";
-  if (a >= 1e6) return "$" + (v / 1e6).toFixed(0) + "M"; return "$" + fmtNum.format(v); }
 
 /* indicatore di impatto visivo per la vista fondamentale (come i bar della vista tecnica):
    score 0-100 (100 = favorevole/verde). Mostra valore colorato + mini-barra. */
-function fundBar(val, fmt, score) {
-  if (val == null || val === "" ) return "—";
-  const txt = fmt(val);
-  if (score == null) return txt;
-  const s = Math.max(0, Math.min(100, score));
-  return `<span class="fund-metric"><span style="color:${scoreColor(s)}">${txt}</span>
-    <span class="fmeter"><span class="fmeter-fill" style="width:${Math.max(6, s)}%;background:${scoreColor(s)}"></span></span></span>`;
-}
 // punteggi di favorevolezza (frazioni dove indicato). higher=meglio salvo lowerBetter
 const FSC = {
   roe: v => v == null ? null : clamp(v * 400),                 // 0,25→100 · 0,15→60
@@ -7501,35 +7185,6 @@ function impliedMoveForEarnings(r) {
   return Math.round(((bestCall.price + bestPut.price) / spot) * 1000) / 10;
 }
 
-function renderEarnings() {
-  const strip = $("#earnings-strip");
-  if (!strip) return;   // strip rimossa: le trimestrali sono ora nella colonna di tabella
-  const all = [...DATA.portfolio, ...(DATA.watchlist || [])];
-  const items = all
-    .filter(r => r.earnings_date)
-    .map(r => ({ ...r, days: giorniAllaTrimestrale(r.earnings_date) }))
-    .filter(r => r.days >= -1)
-    .sort((a, b) => a.days - b.days);
-  const ptfTickers = new Set(DATA.portfolio.map(x => x.ticker));
-  strip.innerHTML = items.length ? items.map(r => {
-    const d = new Date(r.earnings_date).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
-    const when = r.days <= 0 ? "oggi" : r.days === 1 ? "domani" : `tra ${r.days} gg`;
-    const pct = Math.max(6, Math.min(100, 100 - r.days * 1.1));
-    const color = r.days <= 7 ? "var(--red)" : r.days <= 21 ? "var(--yellow)" : "var(--green)";
-    const im = impliedMoveForEarnings(r);
-    const imHtml = im != null
-      ? `<div class="earn-im" style="color:${im >= 10 ? "var(--yellow)" : "var(--muted)"}" title="Implied Move (straddle ATM)">[+/- ${im}%]</div>`
-      : "";
-    const isWl = !ptfTickers.has(r.ticker);
-    const wlMark = isWl ? `<span class="earn-wl" title="Watchlist">WL</span>` : "";
-    return `<div class="earn-card${isWl ? " earn-card-wl" : ""}" data-earn="${r.ticker}" tabindex="0" role="button" title="${esc(r.name)}${isWl ? " (watchlist)" : ""} — clicca per dettagli">
-      <div class="earn-top"><span class="earn-tk">${r.ticker}${wlMark}</span><span class="earn-date">${d}</span></div>
-      <div class="earn-when" style="color:${color}">${when}</div>
-      ${imHtml}
-      <div class="impact"><span class="impact-fill" style="width:${pct}%;background:${color}"></span></div>
-    </div>`;
-  }).join("") : "";
-}
 
 /* ---------------- gauges ---------------- */
 const FG_LABELS = { "extreme fear": "Paura estrema", fear: "Paura", neutral: "Neutrale", greed: "Avidità", "extreme greed": "Avidità estrema" };
@@ -7559,25 +7214,8 @@ function thermoBar(score, ends) { return thermoLine(score, ends); }
 function compactSemiGauge(score, ends) { return thermoLine(score, ends); }
 
 /* card termometro uniforme e compatta; score 0-100 (100=positivo/verde, a sinistra). key per il popup */
-function thermoCard(key, title, score, valueText, subText, ends) {
-  const s = Math.max(0, Math.min(100, score ?? 50));
-  const col = scoreColor(s);
-  return `<div class="gauge-card" data-gauge="${key}" tabindex="0" role="button" title="Clicca per dettagli e news">
-    <span class="popup-dot"></span>
-    <div class="g-title">${title}</div>
-    <div class="gauge-value" style="color:${col}">${valueText}</div>
-    ${thermoLine(s, ends)}
-    <div class="gauge-sub">${subText}</div>
-  </div>`;
-}
 
 /* Fear & Greed come termometro lineare (paura=rosso sx, avidità=verde dx, marker diretto su score) */
-function fgGaugeCNN(score) {
-  const s = Math.max(0, Math.min(100, score));
-  const col = s >= 55 ? "var(--green)" : s >= 45 ? "var(--yellow)" : "var(--red)";
-  return `<div class="gauge-value" style="color:${col}">${Math.round(s)}</div>
-    ${thermoLine(s, ["Paura", "Avidità"], { direct: true, gradient: "linear-gradient(90deg,#d23b30,#eab308,#16a34a)" })}`;
-}
 
 /* ---------------- macro ---------------- */
 function marketImpact(m) {
@@ -7589,13 +7227,6 @@ function marketImpact(m) {
 
 
 /* ---------------- top ETF dashboard ---------------- */
-function etfOpportunity(rsi) {
-  if (rsi == null) return { label: "—", color: "var(--muted)" };
-  if (rsi < 35) return { label: "Ipervenduto — possibile ingresso", color: "var(--green)" };
-  if (rsi < 48) return { label: "Zona neutro-bassa — da monitorare", color: "var(--yellow)" };
-  if (rsi < 65) return { label: "Momentum positivo", color: "var(--muted)" };
-  return { label: "Ipercomprato — attendere ritracciamento", color: "var(--red)" };
-}
 
 /* ---------------- news ---------------- */
 function timeAgo(iso) {
