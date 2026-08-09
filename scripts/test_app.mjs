@@ -2925,6 +2925,26 @@ check("v152 registry: il chip Cap d'ingresso segue capNoAdd_pct in soglia/stato/
     && !/^\s*check\(/m.test(dopoReport));
 }
 
+/* ═══ v254 — OGNI POSIZIONE SCRITTA DA app.js DEVE AVERE UN `name` ═══════════════════════
+   La pipeline fa `pos["name"]`: una posizione senza quel campo non degrada, ABBATTE il run.
+   È successo davvero — BE, SKHY, WDC e MRVL scritte dal diario con {ticker, qty, pmc} hanno
+   fatto morire OGNI run del CI con KeyError: 'name', e per un giorno il sintomo visibile
+   ("data.json fermo a 9 posizioni") è sembrato latenza del cron. Due check: il file com'è
+   adesso, e il codice che lo scrive. */
+{
+  const hold = JSON.parse(readFileSync(join(ROOT, "config", "holdings.json"), "utf8"));
+  const senzaNome = (hold.portfolio || []).filter(r => !r.name).map(r => r.ticker);
+  check("v254 ogni posizione in holdings.json ha il campo `name` (senza, la pipeline muore)",
+    senzaNome.length === 0);
+  if (senzaNome.length) console.log("  ⚠ posizioni senza name:", senzaNome.join(", "));
+
+  const appSrc = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const scritture = [...appSrc.matchAll(/cfg\.portfolio\.push\(\{[^}]*\}/g)].map(m => m[0]);
+  check("v254 ogni cfg.portfolio.push() scrive anche il nome",
+    scritture.length > 0 && scritture.every(t => /\bname\s*:/.test(t)));
+  for (const t of scritture) if (!/\bname\s*:/.test(t)) console.log("  ⚠ push senza name:", t.slice(0, 90));
+}
+
 /* ═══ v253 — il registro degli orari di run NON deve invecchiare da solo ═══════════════
    RUN_FISSI_UTC in app.js è una COPIA del cron di .github/workflows/update-data.yml, e questo
    progetto ha già pagato più volte i registri copiati a mano (C10, gli indici fissi 16/17 del

@@ -14,7 +14,16 @@ from update_data import _finestra_comune, _macro_scores, compute_risk_metrics, r
 FAILED = []
 
 
+ESEGUITI = []
+
+
 def check(name, cond):
+    # ⚠ v254 — IL TOTALE SI CONTA, NON SI DICHIARA. `N_CHECKS` era una costante scritta a mano
+    # (75) e il report la stampava a prescindere: due check aggiunti in fondo giravano davvero
+    # ma l'annuncio continuava a dire "75/75". Un conteggio che non misura niente e' peggio di
+    # nessun conteggio, perche' sembra una verifica. Stessa famiglia del registro fisso di C10
+    # e del report messo prima dei check in v205.
+    ESEGUITI.append(name)
     print(f"{'PASS' if cond else 'FAIL'}  {name}")
     if not cond:
         FAILED.append(name)
@@ -344,7 +353,9 @@ check("umich: i mesi inglesi mappano al numero giusto (June=6, dicembre=12)",
 check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è il motivo del fetcher)",
       _rows[-1][0] > "2026-05-01")
 
-N_CHECKS = 75   # +4 v248 finestra comune NDX · +4 v186 FedWatch · +4 v207 finestra comune · +4 v224 storico macro
+# v254 — la soglia minima resta come rete anti-regressione (se qualcuno cancella meta' suite
+# il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
+N_CHECKS_MINIMO = 75
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -392,6 +403,29 @@ check("v248 NDX: il punto senza controparte (2026-08) resta FUORI dal confronto"
 check("v248 NDX: allineare RIDUCE il gap gonfiato dai mesi scoperti", bool(_al248) and
       round(_al248[0][-1][1] / _al248[0][0][1] * 100 - _al248[1][-1][1] / _al248[1][0][1] * 100, 1)
       < round(220.0 - 132.4, 1))
-print(f"\n{('TUTTI I ' + str(N_CHECKS - len(FAILED)) + f'/{N_CHECKS} CHECK OK') if not FAILED else str(len(FAILED)) + ' FALLITI: ' + ', '.join(FAILED)}")
+# ═══ v254 — UNA POSIZIONE SENZA `name` NON DEVE FERMARE L'ACQUISIZIONE ═══════════════════
+# `pos["name"]` sollevava KeyError e uccideva l'INTERO run prima di scaricare un solo prezzo:
+# quattro posizioni scritte dal diario senza quel campo hanno tenuto data.json fermo a 9
+# posizioni per un giorno, mentre il portafoglio vero ne aveva 13. Il nome e' un'etichetta da
+# mostrare; che la sua assenza abbatta la pipeline dei prezzi e' una fragilita' a se' stante.
+# ⚠ Il check va PRIMA del blocco report, o e' contato e non puo' far fallire la CI (v205).
+import json as _json
+_RADICE = Path(__file__).resolve().parent.parent
+_riga_ptf = None
+for _l in (_RADICE / "scripts" / "update_data.py").read_text(encoding="utf-8").splitlines():
+    if "row = fetch_symbol(pos[" in _l:
+        _riga_ptf = _l.strip()
+check("v254 il ramo portafoglio non fa pos['name'] secco (un nome mancante ucciderebbe il run)",
+      _riga_ptf is not None and 'pos["name"]' not in _riga_ptf and '.get("name")' in _riga_ptf)
+
+_hold = _json.loads((_RADICE / "config" / "holdings.json").read_text(encoding="utf-8"))
+check("v254 nessuna posizione in holdings.json e' priva di `name`",
+      all(r.get("name") for r in _hold.get("portfolio", [])))
+
+_TOT = len(ESEGUITI)
+check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
+      _TOT >= N_CHECKS_MINIMO)
+_TOT = len(ESEGUITI)
+print(f"\n{('TUTTI I ' + str(_TOT - len(FAILED)) + f'/{_TOT} CHECK OK') if not FAILED else str(len(FAILED)) + f'/{_TOT} CHECK FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
 

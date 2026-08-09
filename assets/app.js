@@ -641,6 +641,30 @@ function stampBrokerDate(cfg, section) {
   return cfg;
 }
 
+/* ⚠ v254 — IL `name` MANCANTE HA UCCISO LA PIPELINE, E IL SINTOMO SEMBRAVA UN ALTRO.
+   Le posizioni create da qui uscivano come {ticker, qty, pmc}, mentre `update_data.py` faceva
+   `pos["name"]`: dal momento in cui BE, SKHY, WDC e MRVL sono entrate in holdings.json, OGNI
+   run del CI è morto con KeyError: 'name' PRIMA di scaricare un solo prezzo.
+   Il sintomo visibile era un altro — "data.json è fermo a 9 posizioni" — e l'ho letto per un
+   giorno come latenza del cron, scrivendo perfino nel payload che la pipeline "non ha ancora
+   rigenerato". Non era in ritardo: era spenta. È la lezione v238 in versione dati: la
+   sintassi valida non dice nulla sull'esecuzione, e un difetto scoperto guardando l'ESITO
+   (dati fermi) si spiega troppo facilmente con una causa innocente.
+   Il nome si prende dalla watchlist (che ce l'ha), poi dai dati vivi, e in ultima istanza è il
+   ticker: mai assente. Il fallback c'è anche in `update_data.py` — un'etichetta da mostrare
+   non deve poter fermare l'acquisizione dei prezzi. Due reti, perché il difetto è passato
+   proprio dove non ce n'era nessuna. */
+function nomeTitolo(tk, cfg) {
+  const T = String(tk || "").toUpperCase();
+  const daWl = (cfg && Array.isArray(cfg.watchlist) ? cfg.watchlist : [])
+    .find(r => String(r.ticker || "").toUpperCase() === T);
+  if (daWl && daWl.name) return daWl.name;
+  const daDati = [...((typeof DATA !== "undefined" && DATA?.watchlist) || []),
+                  ...((typeof DATA !== "undefined" && DATA?.portfolio) || [])]
+    .find(r => String(r.ticker || "").toUpperCase() === T);
+  return (daDati && daDati.name) || T;
+}
+
 async function editHoldings(section, mutate) {
   let esito = false;                          // v250: l'esito deve tornare a chi chiama
   const token = getToken();
@@ -1934,7 +1958,7 @@ function mutazionePerOp(op) {
         if (e) {
           const qa = Number(e.qty) || 0, pa = Number(e.pmc) || 0, qn = qa + q;
           e.qty = qn; e.pmc = Math.round(((qa * pa + q * px) / qn) * 10000) / 10000;
-        } else cfg.portfolio.push({ ticker: tk, qty: q, pmc: px });
+        } else cfg.portfolio.push({ ticker: tk, name: nomeTitolo(tk, cfg), qty: q, pmc: px });
         if (Array.isArray(cfg.watchlist)) cfg.watchlist = cfg.watchlist.filter(r => (typeof r === "string" ? r : r.ticker || "").toUpperCase() !== tk);
         return true;
       },
@@ -1983,7 +2007,7 @@ function applicaOpAlPortafoglio(op) {
     applica = (cfg) => {
       cfg.portfolio = cfg.portfolio || [];
       const e = cfg.portfolio.find(r => (r.ticker || "").toUpperCase() === tk);
-      if (e) { e.qty = q1; e.pmc = pmc1; } else cfg.portfolio.push({ ticker: tk, qty: q1, pmc: pmc1 });
+      if (e) { e.qty = q1; e.pmc = pmc1; } else cfg.portfolio.push({ ticker: tk, name: nomeTitolo(tk, cfg), qty: q1, pmc: pmc1 });
       if (Array.isArray(cfg.watchlist)) cfg.watchlist = cfg.watchlist.filter(r => (typeof r === "string" ? r : r.ticker || "").toUpperCase() !== tk);
     };
   } else {

@@ -1011,7 +1011,14 @@ def fetch_equities():
 
     rows = []
     for pos in PORTFOLIO:
-        row = fetch_symbol(pos["ticker"], pos["name"])
+        # ⚠ v254 — UN NOME MANCANTE NON PUÒ FERMARE L'INTERA ACQUISIZIONE.
+        # `pos["name"]` ha sollevato KeyError su BE/SKHY/WDC/MRVL, scritte in holdings.json
+        # dal diario senza il campo `name`: ogni run del CI moriva QUI, prima di scaricare un
+        # solo prezzo, e data.json e' rimasto fermo a 9 posizioni per un giorno intero mentre
+        # il portafoglio vero ne aveva 13. La causa e' stata corretta a monte (in app.js), ma
+        # il nome e' un'ETICHETTA DA MOSTRARE: che la sua assenza abbatta la pipeline dei
+        # prezzi e' una fragilita' a se' stante. Senza nome si usa il ticker.
+        row = fetch_symbol(pos["ticker"], pos.get("name") or pos["ticker"])
         if not row:
             continue
         value = row["price"] * pos["qty"]
