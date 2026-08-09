@@ -819,6 +819,34 @@ check("v261 il payload dichiara la data della barra, non solo l'ora del run", su
   if (blocchi < 4) console.log(`  ⚠ solo ${blocchi} blocchi dichiarano l'asof`);
 }
 
+/* ── ⚠ v264 — DUE DIFETTI TROVATI LEGGENDO IL PACCHETTO DA ANALISTA ──
+   Nessuno dei due era un errore di calcolo: erano due modi di presentare un numero che ne
+   cambiavano il significato. Sono la classe piu' difficile da vedere rileggendo il codice,
+   perche' il codice e' corretto — sbagliata e' la frase. */
+check("v264 il tasso Fed non compare due volte con lo stesso nome e numeri diversi", suVeri(`
+  const NL = String.fromCharCode(10);
+  const righe = buildPrompt().split(NL).filter(l => l.indexOf("Fed Funds Rate") >= 0);
+  /* una sola riga puo' chiamarsi "Fed Funds Rate": e' il TARGET. Il tasso effettivo ha un
+     nome suo (EFFR) e dichiara di stare dentro quel target. */
+  return righe.length === 1 && righe[0].indexOf("range ATTUALE") > 0`));
+
+check("v264 il tasso effettivo si dichiara come tale e si riconcilia col target", suVeri(`
+  const NL = String.fromCharCode(10);
+  const riga = buildPrompt().split(NL).find(l => l.indexOf("Tasso EFFETTIVO") >= 0);
+  return !!riga && riga.indexOf("DENTRO il target") > 0`));
+
+check("v264 i campanelli sono un CONTEGGIO, non una probabilita' travestita", suVeri(`
+  const NL = String.fromCharCode(10);
+  const riga = buildPrompt().split(NL).find(l => l.indexOf("Signposts") >= 0);
+  if (!riga) return true;
+  return riga.indexOf("CONTEGGIO") > 0 && riga.indexOf("rischio ribassista") < 0`));
+
+check("v264 i campanelli accesi sono NOMINATI (cinque sul credito non sono cinque sparsi)", suVeri(`
+  const NL = String.fromCharCode(10);
+  const riga = buildPrompt().split(NL).find(l => l.indexOf("Signposts") >= 0);
+  const attesi = ((DATA.macro.signposts || {}).items || []).filter(x => x && x.status === true).length;
+  return !riga || attesi === 0 || riga.indexOf("accesi:") > 0`));
+
 /* ── il wiring: nessun accesso non protetto a un elemento che non esiste ── */
 {
   /* ⚠ v256 — SI TOLGONO I COMMENTI PRIMA DI LEGGERE. Alla prima stesura la guardia ha trovato

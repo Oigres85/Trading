@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "263";
+const BUILD_VERSION = "264";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -5850,7 +5850,22 @@ function buildPrompt() {
     }
   }
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
-  if (m.signposts) lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 attivi (${m.signposts.pct}% rischio ribassista)`);
+  /* ⚠ v264 — "5/10 attivi (50% RISCHIO RIBASSISTA)" ERA UN CONTEGGIO TRAVESTITO DA PROBABILITA'.
+     Cinque campanelli su dieci non fanno il 50% di probabilita' di un mercato orso: fanno cinque
+     campanelli su dieci. Chiamare percentuale il rapporto fra acceso e totale gli da' l'autorita'
+     di una stima che nessuno ha fatto — e' la stessa classe del punteggio 0-100 tolto in v200 e
+     delle soglie inventate di v240. Resta il conteggio, che e' il fatto, e i nomi di quelli
+     accesi, che sono l'informazione vera: cinque campanelli sul credito non sono cinque
+     campanelli sparsi. */
+  if (m.signposts) {
+    /* ⚠ il campo e' `status`, non `active`: verificato sul file vero invece di indovinarlo —
+       le chiavi vanno lette da data.json, non dedotte dal nome (lezione v207). */
+    const accesi = (m.signposts.items || []).filter(x => x && x.status === true)
+      .map(x => x.name || x.label).filter(Boolean);
+    lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 campanelli accesi `
+      + `(e' un CONTEGGIO, non una probabilita': cinque su dieci non significa 50% di probabilita' di ribasso)`
+      + (accesi.length ? ` — accesi: ${accesi.join(" · ")}` : ""));
+  }
 /* ═══ v246 — LA LEVA È UNA FOTOGRAFIA DI DUE MESI FA, E IL KOSPI LO DICE ═══════════════════
    Segnalato dal CEO: "il grafico porta ancora la leva al massimo ma sembra che ci sia stata una
    pulizia della leva (vedi calo KOSPI), forse c'e' un calcolo errato".
@@ -6033,7 +6048,15 @@ function buildPrompt() {
     cpBp += ` — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). Contarli come due prove separate raddoppia un segnale solo.`;
     lines.push(cpBp);
   }
-  if (m.fed_market) lines.push(`- Fed Funds Rate attuale: ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}); tasso>4% storicamente comprime i multipli P/E in 12-18 mesi`);
+  if (m.fed_market) /* ⚠ v264 — DICEVA "Fed Funds Rate" PER LA SECONDA VOLTA, CON UN NUMERO DIVERSO. In QUADRO
+       MACRO: "range ATTUALE 3.50-3.75%". Cinquanta righe dopo: "Fed Funds Rate attuale: 3.63%".
+       Sono due grandezze diverse — il TARGET che decide il FOMC e il tasso EFFETTIVO a cui le
+       banche si prestano dentro quel target — ma si chiamavano uguale e non si riconciliavano.
+       Un analista che legge la seconda e la confronta con la soglia del 4% nella stessa riga
+       usa il numero giusto per caso. Classe "stessa grandezza, valori diversi", trovata a mano
+       perche' i due nomi non sono identici al carattere. E stava dentro ROTAZIONE SETTORIALE,
+       dove un tasso non c'entra niente. */
+    lines.push(`- Tasso EFFETTIVO (EFFR) ${m.fed_market.current_rate}% (rilevazione ${m.fed_market.rate_date}) — e' dove le banche si prestano DENTRO il target 3,50-3,75% dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria. Sopra il 4% storicamente comprime i multipli P/E in 12-18 mesi.`);
   // 4 streghe SOLO se imminenti (v138): a >30 giorni è rumore senza valore operativo
   if (m.witching && m.witching.days != null && m.witching.days < 30) lines.push(`- Prossime "4 streghe" (quadruple witching): ${new Date(m.witching.next).toLocaleDateString("it-IT")} (tra ${m.witching.days} gg — volumi record e prezzo "attratto" dai muri di opzioni: prudenza sugli ordini a ridosso)`);
   /* v256 — QUATTRO BLOCCHI RELATIVI AL PORTAFOGLIO TOLTI DAL QUADRO MACRO: salute del
