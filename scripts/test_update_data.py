@@ -467,6 +467,22 @@ check("v272 pipeline: il BTP non entra nella lista da scaricare da Yahoo",
 
 # ⚠ rame, petrolio, oro e SOX fuori dai mercati macro: ora stanno in watchlist, e tenerli in
 # tutti e due i posti significava scaricarli DUE VOLTE e mostrarli due volte.
+# ═══ v279 — LA PIPELINE DEVE REGGERE UN PORTAFOGLIO VUOTO ═══════════════════════════════
+# Trovata ESEGUENDOLA, non leggendola: da v272 non ci sono piu' posizioni, quindi `usd_cost` e
+# `cost_eur` valgono ZERO e tre righe morivano con ZeroDivisionError. Sarebbe morto il primo
+# cron dopo la push — la stessa famiglia del KeyError che fermo' la pipeline per un giorno.
+# ⚠ NESSUN GATE L'AVEVA PRESA, e non poteva: nessuno esegue la pipeline (servono le chiamate di
+# rete). Questi check guardano il CODICE, che e' il massimo che si possa fare senza rete.
+check("v279 pipeline: nessuna divisione per il costo senza proteggersi dal costo nullo",
+      all(f"if {d}" in _src for d in ("usd_cost", "cost_eur"))
+      and "/ usd_cost - 1) * 100, 2) if usd_cost" in _src
+      and _src.count("/ cost_eur - 1) * 100, 2) if cost_eur") == 2)
+
+# ⚠ un rendimento percentuale su un costo nullo non e' ZERO: NON ESISTE. Scriverlo 0,00%
+# direbbe "non hai guadagnato niente" invece di "non c'e' niente da misurare".
+check("v279 pipeline: senza costo il rendimento e' None, non zero",
+      "if usd_cost else None" in _src and "if cost_eur else None" in _src)
+
 check("v272 pipeline: rame, petrolio, oro e SOX non sono piu' nei mercati macro",
       not any(f'("{k}=F"' in _src or f'("{k}"' in _src
               for k in ("HG", "GC")) and '"Semiconduttori (SOX)"' not in _src)

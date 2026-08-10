@@ -3346,7 +3346,8 @@ def main():
     point = {
         "date": today,
         "sharpe": portfolio_sharpe,
-        "gain_pct": round((total_eur / cost_eur - 1) * 100, 2),
+        # v279 — stessa protezione del blocco totals: costo nullo → il rendimento non esiste
+        "gain_pct": round((total_eur / cost_eur - 1) * 100, 2) if cost_eur else None,
         "eur_value": round(total_eur, 2),
         "vix": (macro.get("vix") or {}).get("value"),
         "vix_term": (macro.get("smart_money") or {}).get("vix_term_ratio"),
@@ -3371,10 +3372,19 @@ def main():
         "totals": {
             "usd_value": round(usd_value, 2),
             "usd_gain": round(usd_value - usd_cost, 2),
-            "usd_gain_pct": round((usd_value / usd_cost - 1) * 100, 2),
+            # ⚠ v279 — DIVISIONE PER ZERO SU PORTAFOGLIO VUOTO. Da v272 la pipeline non
+            # calcola piu' posizioni (il CEO ha chiuso il portafoglio in v256), quindi
+            # `usd_cost` e `cost_eur` valgono ZERO e queste due righe facevano morire il run
+            # con ZeroDivisionError. Sarebbe morto il primo cron dopo la push — la stessa
+            # famiglia del KeyError che fermo' la pipeline per un giorno.
+            # ⚠ Nessun gate l'ha presa: nessuno ESEGUE la pipeline (serve la rete). L'ho
+            # trovata solo lanciandola a mano prima di lasciarla andare in produzione.
+            # Un rendimento percentuale su un costo nullo non e' zero: NON ESISTE, e si scrive
+            # None — che la pagina disegna come trattino invece che come "0,00%".
+            "usd_gain_pct": round((usd_value / usd_cost - 1) * 100, 2) if usd_cost else None,
             "eur_value": round(total_eur, 2),
             "eur_gain": round(eur_gain, 2),
-            "eur_gain_pct": round((total_eur / cost_eur - 1) * 100, 2),
+            "eur_gain_pct": round((total_eur / cost_eur - 1) * 100, 2) if cost_eur else None,
             "tax_est": round(tax, 2),
             "eur_gain_net": round(eur_gain - tax, 2),
             "portfolio_sharpe_ratio": portfolio_sharpe,

@@ -202,14 +202,17 @@ const has = (s) => prompt.includes(s);
    perdere un fatto, non un giudizio (classe v208). Cambia solo cosa arriva all'LLM. */
 /* ⚠ su `run()` (fixture) i campi VaR/ES non esistono: il check sarebbe verde per ASSENZA di
    dati, non di difetti — la trappola già pagata quattro volte in questo progetto. Va sui dati VERI. */
-check("v247 VaR: fuori dal payload, ma la pipeline continua a calcolarlo", suVeri(`
+/* ⚠ v279 — L'INVARIANTE E' CAMBIATO, NON E' STATO ZITTITO. Il check v247 verificava due cose:
+   che il VaR NON finisse nel payload, e che la pipeline continuasse comunque a calcolarlo. Da
+   v272 la pipeline non ha piu' posizioni, quindi il VaR non e' calcolabile: la seconda meta'
+   non ha piu' un soggetto. La prima meta' invece VALE ANCORA ed e' quella che protegge il CEO
+   — nata perche' un VaR nel pacchetto veniva usato per dimensionare operazioni su un libro che
+   il sistema non deve piu' leggere. Resta quella.
+   ⚠ si cerca la RIGA che generavo io, non la parola: "Expected Shortfall" compare anche nella
+   TESTATA (config/prompt_header.txt), che e' il file del CEO e non si tocca. */
+check("v279 VaR ed Expected Shortfall restano FUORI dal pacchetto", suVeri(`
   const p = buildPrompt();
-  /* ⚠ si cerca la RIGA che generavo io, non la parola: "Expected Shortfall" compare anche nella
-     TESTATA (config/prompt_header.txt), che è il file del CEO e non si tocca. Una guardia che
-     cerca la parola nuda punirebbe il contenuto di cui non sono responsabile. */
-  const fuori = !/VaR 95% a 1 giorno/.test(p) && !/Expected Shortfall 95% a 1 GIORNO/.test(p);
-  const calcolato = DATA?.totals?.es95_hist_eur != null || DATA?.totals?.var95_hist_eur != null;
-  return fuori && calcolato`));
+  return !/VaR 95% a 1 giorno/.test(p) && !/Expected Shortfall 95% a 1 GIORNO/.test(p)`));
 check("prompt: DATA QUALITY REPORT e flag inline sul margin debt", run(`
   const p2 = buildPrompt();
   return p2.includes("DATA QUALITY REPORT") && p2.includes("[!!! DATATO / UNRELIABLE !!!")`));

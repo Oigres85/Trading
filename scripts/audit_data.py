@@ -99,10 +99,22 @@ for a in (d.get("data_quality") or {}).get("alerts", []):
     soft.append(f"data_quality: {a}")
 
 # SOFT: campi quant attesi dopo un run completo
+# ⚠ v279 — SOLO SE C'E' UN PORTAFOGLIO. Sharpe, Sortino, VaR e beta sono metriche DI POSIZIONI:
+# da v272 la pipeline non ne calcola piu' (il CEO ha chiuso il portafoglio in v256), quindi
+# questi quattro campi sono null per costruzione e l'audit avvisava a ogni run. Un avviso che
+# suona sempre viene ignorato — e allora smette di servire anche il giorno in cui ha ragione.
+# Non e' un controllo indebolito: e' un controllo che ha smesso di avere un soggetto, e resta
+# armato per il giorno in cui il portafoglio tornasse.
 t = d.get("totals", {})
-for k in ("portfolio_sharpe_ratio", "portfolio_sortino_ratio", "var95_hist_pct", "portfolio_beta_ndx"):
-    if t.get(k) is None:
-        soft.append(f"totals.{k} n.d.")
+# ⚠ solo le posizioni AZIONARIE: Sharpe, Sortino, VaR e beta si calcolano sul comparto
+# azionario, e il BTP non ha una serie di rendimenti (la pipeline lo esclude dalla varianza —
+# e' la stessa distinzione, "denominatori diversi", gia' documentata in CLAUDE.md per v205).
+# Con il solo BTP in portafoglio quei quattro campi sono null a ragione, non per un guasto.
+_azioni = [r for r in (d.get("portfolio") or []) if r.get("qty") and r.get("currency") != "EUR"]
+if _azioni:
+    for k in ("portfolio_sharpe_ratio", "portfolio_sortino_ratio", "var95_hist_pct", "portfolio_beta_ndx"):
+        if t.get(k) is None:
+            soft.append(f"totals.{k} n.d.")
 n_sortino = sum(1 for r in rows if r.get("sortino_1y") is not None)
 if rows and n_sortino < len(rows) * 0.7:
     soft.append(f"sortino_1y presente solo su {n_sortino}/{len(rows)} titoli")
