@@ -169,6 +169,23 @@ for (const s of SUITE) {
   check(`${s.file}: passa`, codice === 0);
 }
 
+/* ⚠ v283 — FUNZIONI DEFINITE E MAI RICHIAMATE. Il controllo speculare a quello sopra: li'
+   si cerca chi viene chiamato senza esistere, qui chi esiste senza essere chiamato. Nasce da
+   sei funzioni sopravvissute ai tagli di v256 e v275 — fetchQuote sostituita da quotaLive,
+   pushDiaryCloud rimasta col diario, renderCorrMacro tenuta viva da un commento che diceva una
+   cosa inesatta (sosteneva servisse al pacchetto, ma quello che i due condividono e' il
+   CALCOLO, non il render). Una funzione tenuta per una ragione sbagliata e' peggio di una
+   dimenticata: sembra protetta.
+   ⚠ Rimuoverle e' costato un errore: il taglio si e' portato via `esc`, `cur` e `clamp` perche'
+   `priceTxt` e' una riga singola incastrata fra loro senza righe vuote, e risalivo all'ultima
+   riga vuota per prendere i commenti. La ricevuta giusta CONTA le funzioni prima e dopo e
+   pretende che siano sparite esattamente quelle volute. */
+const usateDaQualcuno = (nome) => (senzaCommenti.match(new RegExp("\\b" + nome + "\\b", "g")) || []).length > 1;
+const definiteQui = [...senzaCommenti.matchAll(/^(?:async )?function ([A-Za-z_$][\w$]*)/gm)].map(m => m[1]);
+const maiChiamate = definiteQui.filter(n => !usateDaQualcuno(n));
+check("nessuna funzione definita e mai richiamata da nessuno", maiChiamate.length === 0);
+if (maiChiamate.length) console.log("  ⚠ definite e mai chiamate:", maiChiamate.join(", "));
+
 /* ─────────────────────────────────────────────────────────────────────────────────────────
    3. COERENZA FRA I PEZZI CHE DEVONO MUOVERSI INSIEME
    ───────────────────────────────────────────────────────────────────────────────────────── */

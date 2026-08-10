@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "282";
+const BUILD_VERSION = "283";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -153,7 +153,6 @@ function esc(s) {
 }
 function cur(row) { return row.currency === "EUR" ? "€" : row.currency === "PTS" ? "" : "$"; }
 function clamp(v, lo = 0, hi = 100) { return Math.max(lo, Math.min(hi, v)); }
-function priceTxt(r, c) { return r.price == null ? "…" : (c ?? cur(r)) + fmtNum.format(r.price); }
 function signCls(v) { return v > 0 ? "pos" : v < 0 ? "neg" : ""; }
 function signTxt(v, suffix = "%") {
   if (v === null || v === undefined) return "—";
@@ -665,22 +664,6 @@ async function quotaLive(symbol, range = "1d") {
   }
   if (v) cacheQuote.set(k, { t: Date.now(), v });
   return v;
-}
-
-async function fetchQuote(symbol) {
-  const yurl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=1d&interval=1d`;
-  for (const make of CORS_PROXIES) {
-    try {
-      const r = await fetch(make(yurl), { cache: "no-store" });
-      if (!r.ok) continue;
-      const j = await r.json();
-      const m = j && j.chart && j.chart.result && j.chart.result[0] && j.chart.result[0].meta;
-      if (m && m.regularMarketPrice) {
-        return { price: +m.regularMarketPrice, prev: +(m.chartPreviousClose ?? m.previousClose ?? m.regularMarketPrice) };
-      }
-    } catch { /* prova il proxy successivo */ }
-  }
-  return null;
 }
 
 let cashEur = parseFloat(localStorage.getItem("cash_eur")) || 0;
@@ -1260,47 +1243,8 @@ function renderDataQualityAlert() {
 
 /* ---------------- mini-card: direzione mercato + BofA signposts ---------------- */
 // aggregatore: raccoglie TUTTI i segnali del sistema con etichetta e punteggio 0-100
-function directionComponents() {
-  const m = DATA.macro || {};
-  const c = [];
-  if (m.risk_sentiment) c.push(["Sentiment globale", m.risk_sentiment.score]);
-  if (m.thermometer) c.push(["Termometro portafoglio", m.thermometer.score]);
-  if (m.fear_greed) c.push(["Fear & Greed", m.fear_greed.score]);
-  if (m.vix) c.push(["Volatilità (VIX)", clamp(100 - m.vix.value / 50 * 100)]);
-  if (m.signposts) c.push(["Segnali ribassisti BofA", 100 - m.signposts.pct]);
-  if (m.macroquant) c.push(["MacroQuant (ciclo)", m.macroquant.score]);
-  if (m.fedwatch && m.fedwatch.next_cut_prob != null) c.push(["Politica Fed (tagli attesi)", clamp(40 + m.fedwatch.next_cut_prob * 0.6)]);
-  if (m.carry) c.push(["Carry USA-Giappone", clamp(50 + (m.carry.spread - 2) * 15)]);
-  // media impatto degli indicatori macro (CPI, NFP, curva, ecc.)
-  const imp = (m.indicators || []).filter(i => i.impact != null).map(i => i.impact);
-  if (imp.length) c.push(["Dati macro USA (media)", Math.round(imp.reduce((a, b) => a + b, 0) / imp.length)]);
-  // rotazione settoriale: settori ciclici forti = pro-rischio
-  if ((m.tilt || []).length) c.push(["Rotazione settoriale", Math.round(m.tilt.reduce((a, s) => a + s.score, 0) / m.tilt.length)]);
-  return c.map(([label, score]) => ({ label, score: Math.round(score) }));
-}
-function marketDirectionScore() {
-  const c = directionComponents();
-  if (!c.length) return null;
-  return Math.round(c.reduce((a, b) => a + b.score, 0) / c.length);
-}
-
-
-
 const DIARY_PATH = "config/action_diary.json";
 /* salva il diario su GitHub (config/action_diary.json) — solo se c'è già un token salvato (no prompt) */
-async function pushDiaryCloud(arr) {
-  const token = localStorage.getItem("gh_token");
-  if (!token) return;
-  try {
-    let sha;
-    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${DIARY_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
-    if (g.ok) sha = (await g.json()).sha;
-    await fetch(`https://api.github.com/repos/${REPO}/contents/${DIARY_PATH}`, {
-      method: "PUT", headers: ghHeaders(token),
-      body: JSON.stringify({ message: "Aggiorna diario azioni", content: btoa(unescape(encodeURIComponent(JSON.stringify(arr, null, 1)))), sha }),
-    });
-  } catch { /* offline o senza permessi: resta comunque in locale */ }
-}
 /* carica il diario dal cloud all'avvio e lo fonde col locale (per date univoche) */
 
 /* ---------------- motore decisionale (mandato quant: Sharpe > 2.0 + sovraperformance vs NDX) ---------------- */
@@ -1907,20 +1851,6 @@ function perfColor(p) {
 function avg(a) { return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; }
 
 /* salute del portafoglio = media di TECNICA (titoli) + MACRO (direzione) + FONDAMENTALE (titoli) */
-function portfolioHealthParts() {
-  const m = DATA.macro || {};
-  const parts = [];
-  if (m.thermometer) parts.push(["Tecnica titoli", m.thermometer.score]);
-  const dir = (typeof marketDirectionScore === "function") ? marketDirectionScore() : null;
-  if (dir != null) parts.push(["Macro & mercato", dir]);
-  const fin = (DATA.portfolio || []).map(r => r.fin_health).filter(v => v != null);
-  if (fin.length) parts.push(["Fondamentale titoli", Math.round(avg(fin))]);
-  return parts;
-}
-function portfolioHealthScore() {
-  const p = portfolioHealthParts();
-  return p.length ? Math.round(avg(p.map(x => x[1]))) : null;
-}
 /* ⚠ v254 — DICIASSETTE FUNZIONI RIMOSSE INSIEME, perché insieme erano un blocco morto.
    Le cinque render (renderMiniCards, renderPortfolioHealth, renderBtpInfo, renderEarnings,
    renderAIValidation) scrivevano su #fx-box, #internals-box, #macroquant-box,
@@ -1940,17 +1870,6 @@ function portfolioHealthScore() {
    testimoneLeva, derivaConcentrazione. Hanno tutte dei test: la domanda giusta non è "si può
    togliere" ma "perché non è collegata" — è la lezione v193, dove una funzione morta accanto
    a un bottone inerte era il sintomo di un collegamento mancante, non un surplus. */
-function openHealthModal() {
-  const score = portfolioHealthScore();
-  if (score == null) return;
-  const parts = portfolioHealthParts();
-  openInfoModal("Salute del portafoglio",
-    `<div class="info-line"><b>Punteggio complessivo:</b> <span style="color:${scoreColor(score)}">${score}/100</span> — media dei tre pilastri.</div>
-     <table class="info-table"><tbody>${parts.map(p =>
-      `<tr><td>${esc(p[0])}</td><td style="min-width:140px">${meterBar(p[1], scoreColor(p[1]), String(p[1]))}</td></tr>`).join("")}</tbody></table>
-     <div class="info-line muted" style="margin-top:8px">Tecnica = RSI/trend/momentum medi dei titoli · Macro = direzione mercato aggregata · Fondamentale = Financial Health medio dei titoli. Verde = favorevole, rosso = rischio.</div>`);
-}
-
 // heatmap + istogramma + sintesi della rotazione (mostrati nel popup del widget Tilt)
 function rotationDetailHtml() {
   const tilt = (DATA.macro || {}).tilt || [];
@@ -6498,20 +6417,6 @@ const dgDelta = (arr, n) => {   // variazione % ultimo vs n passi indietro (seri
    i delta di eur_value sono inquinati (a) dal break di definizione cassa-inclusa→esclusa di
    metà luglio 2026 e (b), sempre, da versamenti/prelievi di liquidità. Lookback per DATA (per
    allinearsi alle finestre degli indici); fallback per conteggio rilevazioni se le date mancano. */
-function bookReturnPct(mh, daysBack) {
-  const gps = (mh || []).map(x => ({ d: x && x.date, g: dgFin(x && x.gain_pct) })).filter(x => x.g != null);
-  if (gps.length < 2) return null;
-  const last = gps[gps.length - 1];
-  let prev;
-  if (last.d) {
-    const target = new Date(last.d).getTime() - daysBack * 86400000;
-    prev = gps.reduce((best, e) => (e.d && Math.abs(new Date(e.d).getTime() - target) < Math.abs(new Date(best.d).getTime() - target)) ? e : best, gps[0]);
-  } else {
-    prev = gps[Math.max(0, gps.length - 1 - daysBack)];
-  }
-  if (!prev || prev === last || prev.g == null) return null;
-  return ((1 + last.g / 100) / (1 + prev.g / 100) - 1) * 100;
-}
 const dgPercentile = (arr, v) => {   // posizione % di v nel range della serie
   const xs = (arr || []).map(dgFin).filter(x => x != null);
   const x = dgFin(v);
@@ -6757,33 +6662,6 @@ function testoCorrelazioniMacro() {
 
 /* la scheda in pagina: le stesse barre gia' usate per la macro, una riga per componente,
    divergenti da 50 perche' su una scala 0-100 il neutro e' il centro (v209). */
-function renderCorrMacro() {
-  const box = $("#corr-macro");
-  if (!box) return;
-  const { compositi, quadro } = correlazioniMacro();
-  if (!compositi.length) { box.innerHTML = `<div class="muted">Componenti dei compositi non disponibili in questo snapshot.</div>`; return; }
-  const blocchi = compositi.map(c => {
-    /* ⚠ lo schema di riga di barreOrdinate e' {nome, valore, testo} — non {etichetta, nota}.
-       Un campo con il nome sbagliato non da' errore: la barra si disegna e l'etichetta resta
-       vuota. E' la classe dei difetti che non si rompono (v205, .abar-fill senza display:block). */
-    const righe = c.parti.map(p => ({ nome: p.nome, valore: p.score - 50, testo: `${p.score}/100`,
-                                      evidenzia: Math.abs(p.score - c.score) >= 20 }));
-    return `<div class="mg-card">
-      <div class="mg-card-head"><b>${esc(c.nome)}</b>
-        <span class="muted">sintesi ${fmtNum.format(c.score)}/100 · componenti da ${c.min} a ${c.max} · ampiezza ${c.spread} punti</span></div>
-      ${barreOrdinate(righe, { nota: `barre divergenti da 50: a sinistra i componenti sfavorevoli, a destra i favorevoli. Accesi quelli che si scostano di 20+ punti dalla sintesi.` })}
-    </div>`;
-  }).join("");
-  box.innerHTML = blocchi;
-  const nota = $("#corr-macro-note");
-  if (nota && quadro) {
-    nota.textContent = `${quadro.n} indicatori sulla stessa scala: mediana ${fmtNum.format(quadro.mediana)}/100, `
-      + `${quadro.sotto50} sotto 50 e ${quadro.sopra50} sopra. Piu' l'ampiezza di un composito e' larga, `
-      + `meno la sua sintesi descrive i suoi pezzi.`;
-  }
-}
-
-
 /* ═══ v256 — ANALISI SPOT DI UN TITOLO ═════════════════════════════════════════════════════
    Richiesta del CEO: un box dove scrive un ticker e ottiene un'analisi tecnica, fondamentale,
    con le news e con la correlazione al macro. "Questa analisi non sara' salvata": nessun

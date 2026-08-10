@@ -483,13 +483,16 @@ check("v144 screener: assente/vuoto → nessun blocco (niente sezione vuota)", r
 
 
 
-check("v145 rendimento book: da gain_pct (cash-neutral), IMMUNE al break/movimenti di cassa in eur_value", run(`
-  const mh = [
-    { date: "2026-07-01", gain_pct: 50, eur_value: 300000 },   // cassa inclusa (pre-break)
-    { date: "2026-07-08", gain_pct: 53, eur_value: 270000 },   // −30k = artefatto cassa, non perdita
-  ];
-  const r = bookReturnPct(mh, 7);   // (1,53/1,50)−1 = +2,00%, NON il −10% dei delta di eur_value
-  return r != null && Math.abs(r - 2) < 0.05`));
+/* ⚠ v283 — IL CHECK v145 E' USCITO CON LA SUA FUNZIONE, ma la lezione va lasciata scritta
+   perche' e' costata cara e tornerebbe identica.
+   `bookReturnPct` calcolava il rendimento del libro da `gain_pct` e NON dai delta di
+   `eur_value`, perche' quest'ultimo include la cassa: un versamento o un prelievo lo muove
+   senza che il portafoglio abbia guadagnato o perso niente. Nel caso che il check misurava,
+   -30.000 € di cassa sarebbero stati letti come -10% di performance mentre il libro faceva
+   +2%. La funzione e' stata rimossa in v283 perche' il brief che la usava non esiste piu' da
+   v256 (nessuna chiamata nel file), e un check senza soggetto va col soggetto.
+   SE IL PORTAFOGLIO TORNASSE: il rendimento si calcola da gain_pct, mai dai delta di un
+   controvalore che contiene la liquidita'. */
 
 check("v145→v156 shock: EVIDENZA con workflow di verifica INLINE + conferma futures, NON più 'DIRETTIVA: SOSPENDI' né riferimento 'A4' pendente", run(`
   const saved = DATA.macro.shock_alert, savedF = DATA.macro.futures;
