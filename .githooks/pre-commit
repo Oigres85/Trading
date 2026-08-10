@@ -1,0 +1,27 @@
+#!/bin/sh
+# ═══ v278 — NON SI COMMITTA UN SORGENTE ROTTO ═══════════════════════════════════════════════
+# In una sessione ho lasciato QUATTRO tagli a meta' su assets/app.js, e una volta ho committato
+# una suite svuotata che usciva 0 senza stampare niente. La CI li avrebbe presi — dopo il push,
+# e dopo che il CEO poteva gia' aver aperto la pagina.
+# Questo hook chiude la finestra fra la modifica e il push. E' volutamente VELOCE: verifica la
+# sintassi dei sorgenti e che le suite non siano state svuotate. I test veri restano in CI.
+#
+# Attivazione (una volta sola, per macchina):   git config core.hooksPath .githooks
+set -e
+cd "$(git rev-parse --show-toplevel)"
+
+echo "· verifica sintassi dei sorgenti…"
+python3 scripts/modifica_sicura.py >/dev/null || {
+  echo "✗ COMMIT BLOCCATO: un sorgente non regge. Dettagli:"
+  python3 scripts/modifica_sicura.py
+  exit 1
+}
+
+echo "· autocontrollo del sistema…"
+node scripts/self_check.mjs >/dev/null || {
+  echo "✗ COMMIT BLOCCATO: l'autocontrollo ha trovato qualcosa. Dettagli:"
+  node scripts/self_check.mjs
+  exit 1
+}
+
+echo "✓ sorgenti validi e sistema coerente"

@@ -164,6 +164,24 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
   titolo, terminologia divergente, denominatori non dichiarati. È la classe che audit e red team
   non vedono: un payload che si contraddice non è invalido, è INAFFIDABILE. Ogni detector è stato
   validato iniettando l'incoerenza che deve trovare (`--verbose` mostra anche i controlli passati).
+- `python3 scripts/modifica_sicura.py` — **VERIFICA DEI SORGENTI (v278)**, e soprattutto la
+  libreria che ogni script di modifica deve usare: `modifica(percorso, trasforma)` legge,
+  trasforma, **VERIFICA e solo allora scrive**. Se il risultato non regge, il file originale
+  non viene toccato.
+  ⚠ Nasce da **quattro tagli lasciati a metà su `assets/app.js` in una sola sessione**. Ogni
+  volta uno script ad hoc trovava i confini di una funzione con un'euristica ("la prossima riga
+  a colonna zero", "conta le parentesi"), sbagliava su un caso non previsto — una regex che
+  contiene virgolette, una chiusura non seguita da una riga a colonna zero — **e scriveva
+  comunque**. Una volta ha prodotto un DUPLICATO di quattro funzioni, che in JS non rompe
+  niente e passa tutti i gate.
+  Rifiuta anche il **cambiamento nullo**: un `replace` che non trova la stringa è un no-op
+  silenzioso, la classe "iniezione senza assert" già documentata qui sopra.
+  Validato per iniezione su cinque difetti (JS rotto, funzione troncata, replace a vuoto,
+  Python rotto, HTML sbilanciato): tutti rifiutati, file intatti.
+- **`.githooks/pre-commit`** — chiude la finestra fra la modifica e il push: verifica i sorgenti
+  ed esegue l'autocontrollo prima di lasciar committare. La CI li prendeva comunque, ma *dopo*
+  il push e dopo che il CEO poteva già aver aperto la pagina.
+  Attivazione, una volta per macchina: `git config core.hooksPath .githooks`
 - `node scripts/self_check.mjs` — **AUTOCONTROLLO (v277)**: l'unico gate che guarda il SISTEMA
   invece dei dati. Nasce da due errori fatti nello stesso giorno che nessun altro gate ha preso,
   perché tutti gli altri controllano il PRODOTTO e nessuno l'OPERAZIONE che lo modifica:

@@ -33,6 +33,11 @@ jobs:
       - name: Autocontrollo del sistema (duplicati, suite vive, riferimenti orfani)
         run: node scripts/self_check.mjs
 
+      # VERIFICA SORGENTI (v278): sintassi di ogni file sorgente. E' l'ultima rete dopo l'hook
+      # pre-commit — che pero' vive sulla macchina di chi committa, quindi qui si ricontrolla.
+      - name: Verifica sintassi dei sorgenti
+        run: python3 scripts/modifica_sicura.py
+
       # RED TEAM (v116, gate HARD): invarianti finanziari su tutte le combinazioni di
       # stato UI × scenari di dati avvelenati. Codice che può produrre un ordine
       # impossibile (incidente SNDK: limite $40,1 / stop -$366) NON si pusha.
