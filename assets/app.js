@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "276";
+const BUILD_VERSION = "277";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1091,7 +1091,10 @@ function sessionContextLine() {
   // blocco CATALIZZATORI si genera solo se almeno una di quelle notizie tocca il book, quindi un
   // rimando incondizionato poteva puntare a una sezione assente (news post-chiusura tutte estranee
   // al portafoglio). Un'affermazione vera in ogni caso non può diventare pendente.
-  const nUnp = (() => { try { return newsSplitByClose().unpriced.length; } catch { return 0; } })();
+  /* ⚠ v277 — RAMO MORTO. Chiamava newsSplitByClose(), uscita col blocco news in v256: il
+     try/catch la mascherava e il valore era SEMPRE 0. Un ramo che non puo' dare altro che zero
+     non e' una protezione, e' un commento che sembra codice (classe v234). */
+  const nUnp = 0;
   const asiaViva = seoulSessionOpen();
   const guida = (s.phase === "weekend" && asiaViva)
     ? `WEEKEND a New York MA BORSA ASIATICA APERTA (Seoul sta scambiando ORA; apertura USA tra ~${hrs}h). ATTENZIONE ALLA FRESCHEZZA: la borsa coreana è aperta, ma il valore del KOSPI qui sopra viene dallo snapshot della pipeline e NON è aggiornato in tempo reale — è l'ultima chiusura, non la seduta in corso. Storicamente il primo mercato che vota sulle notizie del fine settimana è l'Asia, e i semiconduttori coreani sono i più correlati a questo book${nUnp ? `; le ${nUnp} notizie non ancora prezzate sono elencate sotto` : ""}`
@@ -1246,159 +1249,9 @@ function renderDataQualityAlert() {
   box.onclick = openDataQualityModal;
 }
 
-/* ═══ v245 — IL DIARIO E IL PORTAFOGLIO NON POSSONO DIVERGERE IN SILENZIO ══════════════════
-   Segnalato dal CEO: "gli acquisti/vendite in diario non hanno aggiornato watchlist e
-   portafoglio automaticamente."
-   INDAGINE. Il meccanismo c'era ed era corretto: parseDiaryText legge bene l'operazione,
-   applicaOpAlPortafoglio calcola bene il nuovo stato, editHoldings scrive bene sul repo.
-   Il guasto stava nell'UNICO PUNTO DI PASSAGGIO: un `confirm()`. Se lo chiudi — per errore, o
-   perche' su iPhone sembra un avviso di sistema — l'operazione si perde e NESSUNO te lo ricorda
-   piu'. E reconcileState non poteva accorgersene, perche' confronta solo le posizioni PRESENTI
-   col valore del broker: una posizione ASSENTE non ha nulla da confrontare.
-   MISURATO IL 07/08/2026: data.json aveva 9 righe, il broker 13. Mancavano BE, MRVL, SKHY e WDC
-   da due giorni, e OGNI analisi AI in quei due giorni ha ragionato su un terzo di portafoglio
-   che non esisteva. Un dato mancante in silenzio e' peggio di un dato sbagliato che urla.
-   ⚠ La correzione non e' "rendere il confirm piu' insistente": e' non far dipendere piu' la
-   correttezza da un clic che puo' andare perso. La divergenza si RILEVA a ogni render, si
-   MOSTRA finche' esiste, e finisce NEL PAYLOAD. */
-function divergenzaDiario() {
-  const out = { certe: [], daVerificare: [], asOf: (DATA?.broker || {}).as_of || null };
-  if (!DATA || !Array.isArray(DATA.portfolio)) return out;
-  let voci = [];
-  try { voci = loadDiary(); } catch { return out; }
-  if (!Array.isArray(voci) || !voci.length) return out;
 
-  const inPtf = new Map((DATA.portfolio || []).map(r => [String(r.ticker || "").toUpperCase(), r]));
-  /* ⚠ si guardano SOLO le operazioni successive allo snapshot del broker: prima di quella data
-     il broker e' la fonte autorevole e ha gia' incorporato tutto. Senza questo filtro il
-     banner riproporrebbe in eterno operazioni vecchie gia' assorbite. */
-  const soglia = out.asOf ? out.asOf : null;
-  const visti = new Set();
 
-  for (const e of voci) {
-    const o = (typeof diaryOp === "function") ? diaryOp(e) : (e.op || null);
-    if (!o || !o.ticker || !o.tipo) continue;
-    const iso = String(e.date || "").slice(0, 10);
-    if (soglia && iso && iso <= soglia) continue;         // gia' dentro lo snapshot del broker
-    const tk = String(o.ticker).toUpperCase();
-    /* ⚠ v251 — IDEMPOTENZA. Il banner si calcolava contro DATA.portfolio, che arriva da
-       data.json e resta indietro di 2-3 minuti finché la pipeline non rigenera. Dopo aver
-       applicato, un semplice ricaricamento faceva RIAPPARIRE il banner — e il CEO, vedendolo,
-       ha ricliccato: le quantità sono state applicate DUE VOLTE (BE 40→80, SKHY 45→90,
-       WDC 25→50, MRVL 42→84). Una scrittura che si può ripetere senza accorgersene è un
-       difetto peggiore di una che fallisce, perché fallisce in silenzio nella direzione
-       sbagliata. La marcatura sta nel DIARIO, che è persistito nel repo e non dipende dal
-       ritardo della pipeline. */
-    if (e.applicata) continue;
-    const chiave = `${iso}|${tk}|${o.tipo}|${o.qty}`;
-    if (visti.has(chiave)) continue;                      // stessa voce salvata due volte
-    visti.add(chiave);
-    const pos = inPtf.get(tk);
-    const acquisto = /ACQUIST|COMPR|INCREMENT|ACCUMUL|AGGIUNT/i.test(o.tipo);
 
-    if (acquisto && !pos) {
-      // CERTO: hai annotato un acquisto e quel titolo non e' in portafoglio. Non c'e' lettura
-      // alternativa, ed e' esattamente il caso di BE, MRVL, SKHY e WDC.
-      out.certe.push({ ...o, ticker: tk, iso, motivo: "acquisto annotato, titolo assente dal portafoglio" });
-    } else if (!acquisto && pos && o.qty != null && Number(pos.qty) > 0) {
-      /* NON e' certo: potrebbe essere una vendita parziale gia' applicata. Si dichiara come
-         da verificare invece di affermare un errore che potrebbe non esserci. */
-      out.daVerificare.push({ ...o, ticker: tk, iso, qtaAttuale: Number(pos.qty),
-        motivo: `vendita annotata di ${o.qty}, in portafoglio ce ne sono ancora ${Number(pos.qty)}` });
-    } else if (acquisto && pos && o.qty != null) {
-      out.daVerificare.push({ ...o, ticker: tk, iso, qtaAttuale: Number(pos.qty),
-        motivo: `acquisto annotato di ${o.qty}, in portafoglio ce ne sono ${Number(pos.qty)}` });
-    }
-  }
-  out.needed = out.certe.length > 0 || out.daVerificare.length > 0;
-  return out;
-}
-
-/* il banner: resta finche' la divergenza esiste, e porta il bottone che APPLICA.
-   Non e' un promemoria da leggere: e' la via d'uscita dal problema. */
-function renderDivergenzaDiario() {
-  const box = document.querySelector("#divergenza-alert");
-  if (!box) return;
-  const d = divergenzaDiario();
-  if (!d.needed) { box.hidden = true; box.innerHTML = ""; box.className = ""; return; }
-  const pezzi = [];
-  if (d.certe.length) {
-    pezzi.push(`<b>${d.certe.length} operazion${d.certe.length === 1 ? "e" : "i"} annotate nel diario non sono nel portafoglio</b>: ` +
-      d.certe.map(x => `${esc(x.ticker)} (${x.qty ?? "?"} quote del ${esc(x.iso)})`).join(" · "));
-  }
-  if (d.daVerificare.length) {
-    pezzi.push(`da verificare: ${d.daVerificare.map(x => esc(x.motivo)).join(" · ")}`);
-  }
-  box.hidden = false;
-  box.className = "data-error";
-  box.innerHTML = `⚠ <b>DIARIO E PORTAFOGLIO NON COINCIDONO</b> — ${pezzi.join(". ")}. ` +
-    `Finché non le allinei, <b>ogni analisi AI ragiona su un portafoglio che non esiste</b>.` +
-    (d.certe.length ? ` <button class="btn btn-ghost btn-sm" id="div-applica" style="margin-left:8px">✎ Applica le operazioni mancanti</button>` : "");
-  const b = box.querySelector("#div-applica");
-  if (b) b.onclick = () => applicaDivergenzeMancanti(d.certe);
-}
-
-/* applica in sequenza le operazioni certe. Una per volta e con conferma singola: applicarle
-   tutte insieme in silenzio sarebbe lo stesso errore al contrario. */
-/* v250 — UNA CONFERMA, UNA SCRITTURA. La versione v245 ne faceva N con 400 ms di distanza e
-   nessuna arrivava: leggevano tutte lo stesso SHA e si annullavano a vicenda. */
-/* marca nel DIARIO le voci già applicate al portafoglio, così non possono esserlo due volte.
-   Il diario vive in config/action_diary.json: la marcatura segue il CEO fra i dispositivi. */
-function marcaVociApplicate(ops) {
-  const chiavi = new Set(ops.map(o => `${o.iso}|${String(o.ticker).toUpperCase()}|${o.tipo}|${o.qty}`));
-  let arr;
-  try { arr = loadDiary(); } catch { return; }
-  if (!Array.isArray(arr)) return;
-  let tocc = 0;
-  for (const e of arr) {
-    const o = (typeof diaryOp === "function") ? diaryOp(e) : (e.op || null);
-    if (!o || !o.ticker || !o.tipo) continue;
-    const k = `${String(e.date || "").slice(0, 10)}|${String(o.ticker).toUpperCase()}|${o.tipo}|${o.qty}`;
-    if (chiavi.has(k) && !e.applicata) { e.applicata = new Date().toISOString(); tocc++; }
-  }
-  if (tocc) setDiary(arr);
-  return tocc;
-}
-
-async function applicaDivergenzeMancanti(certe) {
-  const mut = [], errori = [];
-  for (const op of certe) {
-    const m = mutazionePerOp(op);
-    if (!m) continue;
-    if (m.errore) { errori.push(m.errore); continue; }
-    mut.push(m);
-  }
-  if (!mut.length) {
-    toast(errori.length ? `Nessuna applicabile: ${errori.join(" · ")}` : "Nessuna operazione da applicare");
-    return;
-  }
-  const testo = mut.map(m => "· " + m.descr).join("\n");
-  if (!confirm(`Applico ${mut.length} operazion${mut.length === 1 ? "e" : "i"} al portafoglio?\n\n${testo}\n\n` +
-      `Una sola modifica su config/holdings.json: la vedrai anche da iPhone.` +
-      (errori.length ? `\n\nNON applicabili: ${errori.join(" · ")}` : ""))) {
-    toast("Posizioni NON modificate");
-    return;
-  }
-  // anticipo ottimistico in locale, come per l'operazione singola (v193)
-  for (const m of mut) aggiornaPortafoglioLocale(m.tk, m.acquisto, m.q, m.px);
-  const ok = await editHoldings("portfolio", (cfg) => {
-    /* ⚠ le mutazioni si compongono SULLO STESSO cfg, in ordine: ognuna rilegge dal file ciò
-       che la precedente ha scritto. È la ragione per cui non si può fare una scrittura per
-       operazione — e anche la ragione per cui l'ordine conta. */
-    let almeno = false;
-    for (const m of mut) { if (m.applica(cfg)) almeno = true; }
-    return almeno;
-  });
-  if (ok === false) {
-    toast("Scrittura non riuscita: le posizioni NON sono state aggiornate");
-    renderDivergenzaDiario();
-    return;
-  }
-  /* ⚠ si marca SOLO dopo una scrittura riuscita: marcare prima significherebbe perdere
-     l'operazione se il salvataggio fallisce, cioè l'errore opposto e altrettanto grave. */
-  marcaVociApplicate(certe);
-  renderDivergenzaDiario();
-}
 
 
 /* ---------------- liquidità (cash) ---------------- */
@@ -1430,143 +1283,6 @@ function marketDirectionScore() {
   return Math.round(c.reduce((a, b) => a + b.score, 0) / c.length);
 }
 
-/* ---------------- Top bar "Decisione" + diario delle azioni ---------------- */
-function loadDiary() {
-  try { return JSON.parse(localStorage.getItem("action_diary") || "[]"); } catch { return []; }
-}
-function setDiary(arr) {
-  localStorage.setItem("action_diary", JSON.stringify(arr.slice(0, 100)));
-  pushDiaryCloud(arr);   // sync su GitHub se c'è un token (così è uguale su Mac e iPhone)
-}
-/* ═══ v165 — FORMATO DEL DIARIO ═══════════════════════════════════════════════
-   Il diario era testo libero: ogni voce con una forma diversa ("vendita SKHY 50 quote a 172",
-   "Acquisto 70 azioni oracle ... a 143 dollari"), difficile da leggere e impossibile da
-   incrociare con la Tabella A. Ora ogni voce ha un OP strutturato {tipo, qty, ticker, prezzo,
-   data}; il testo originale non viene mai perso (resta in `text` e viaggia nell'export AI).
-   Le voci già memorizzate vengono formattate al volo dal parser, senza riscrivere i dati. */
-const DIARY_BUY = /\b(acquist|comprat|compra|incrementat|accumulat|aggiunt)/i;
-const DIARY_SELL = /\b(vendit|vendut|vendo|alleggerit|ridott|chius|liquidat)/i;
-/* ticker dal nome esteso: la mappa si costruisce dai dati veri (portafoglio + watchlist),
-   così un nome nuovo entra da solo senza toccare il codice */
-function diaryTickerMap() {
-  const m = new Map();
-  for (const r of [...(DATA?.portfolio || []), ...(DATA?.watchlist || [])]) {
-    if (!r || !r.ticker) continue;
-    m.set(r.ticker.toUpperCase(), r.ticker);
-    const nome = String(r.name || "").replace(/\b(inc|corp|corporation|ltd|plc|group|company|co|technologies|technology|systems|platforms|holdings)\b\.?/gi, "").trim();
-    const primo = nome.split(/[\s,.]+/)[0];
-    if (primo && primo.length >= 3) m.set(primo.toUpperCase(), r.ticker);
-  }
-  // alias che i dati non possono dare (nomi commerciali usati nel diario)
-  for (const [k, v] of [["ORACLE", "ORCL"], ["MICRON", "MU"], ["STRATEGY", "MSTR"], ["CEREBRAS", "CBRS"],
-                        ["TESLA", "TSLA"], ["INTEL", "INTC"], ["ALPHABET", "GOOGL"], ["GOOGLE", "GOOGL"]]) {
-    if (!m.has(k)) m.set(k, v);
-  }
-  return m;
-}
-const MESI_IT = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
-/* estrae l'operazione da una voce a testo libero — best effort, mai distruttivo */
-function parseDiaryText(text, fallbackIso) {
-  const t = String(text || "");
-  const tipo = DIARY_SELL.test(t) ? "VENDITA" : DIARY_BUY.test(t) ? "ACQUISTO" : null;
-  const map = diaryTickerMap();
-  let ticker = null;
-  for (const w of t.split(/[^A-Za-z0-9.\-]+/)) {
-    const hit = map.get(w.toUpperCase());
-    if (hit) { ticker = hit; break; }
-  }
-  // quantità: "50 quote", "quantità 30", "70 azioni", "di 10 azioni"
-  const mq = t.match(/(\d[\d.]*)\s*(?:quote|azioni|titoli|pezzi)/i) || t.match(/quantit[àa]\s*(\d[\d.]*)/i);
-  const qty = mq ? parseInt(String(mq[1]).replace(/\./g, ""), 10) : null;
-  // prezzo: "a 172", "prezzo 190,10", "a 143 dollari"
-  const mp = t.match(/(?:prezzo|a|@)\s*(\d+(?:[.,]\d+)?)\s*(?:doll|usd|\$|eur|€)?/i);
-  const prezzo = mp ? parseFloat(mp[1].replace(",", ".")) : null;
-  // data esplicita nel testo ("il 15 luglio 2026"), altrimenti la data di registrazione
-  let quando = null;
-  const md = t.match(/(\d{1,2})\s+([a-zà]+)\s+(\d{4})/i);
-  if (md) { const mi = MESI_IT.indexOf(md[2].toLowerCase()); if (mi >= 0) quando = `${String(md[1]).padStart(2, "0")}/${String(mi + 1).padStart(2, "0")}/${md[3]}`; }
-  if (!quando && fallbackIso) { const d = new Date(fallbackIso); if (!isNaN(d)) quando = d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" }); }
-  // più operazioni nella stessa voce: si dichiara, non si finge di averle strutturate tutte
-  const multi = (t.match(new RegExp(DIARY_BUY.source + "|" + DIARY_SELL.source, "gi")) || []).length > 1;
-  return { tipo, qty, ticker, prezzo, quando, multi };
-}
-/* l'operazione di una voce: quella salvata se c'è, altrimenti dedotta dal testo */
-function diaryOp(e) {
-  if (e && e.op && (e.op.tipo || e.op.ticker)) return { ...e.op, multi: !!e.op.multi };
-  return parseDiaryText(e && e.text, e && e.date);
-}
-/* riga formattata: TIPO · QTÀ TICKER · PREZZO · DATA (i campi assenti si omettono) */
-/* ═══ v193 — IL DIARIO AGGIORNA LE POSIZIONI (richiesta CEO).
-   Prima annotare "venduto 50 GOOGL a 318" lasciava il portafoglio invariato: il motore
-   continuava a calcolare stop, pesi e MCR su una posizione che non esisteva piu'. Il banner
-   "RICONCILIA COL BROKER" segnalava lo scarto ma la correzione restava a mano.
-   La scrittura va su config/holdings.json tramite la stessa API che usa "Modifica valori":
-   e' il repo, quindi iPhone e computer leggono LA STESSA fonte — era la seconda meta' della
-   richiesta ("si deve fasare anche con safari iPhone").
-   NON silenzioso: modificare quantita' e PMC cambia i numeri su cui si decide, quindi si
-   mostra prima l'effetto esatto e si chiede conferma. Una riga sola da toccare, ma consapevole. */
-/* ═══ v250 — LE OPERAZIONI SI APPLICANO IN UNA SOLA SCRITTURA ══════════════════════════════
-   Segnalato dal CEO: "anche se applico rimane sempre il banner", e la concentrazione non si
-   aggiornava. MISURATO: config/holdings.json era ancora a 8 posizioni dopo l'applicazione.
-   LA CAUSA È MIA, dal v245: `applicaDivergenzeMancanti` chiamava `applicaOpAlPortafoglio` una
-   volta per operazione con 400 ms di attesa in mezzo. Ma quella funzione NON restituisce la
-   promessa di `editHoldings`, quindi non c'era niente da aspettare, e 400 ms non bastano
-   comunque per un giro completo sull'API GitHub (lettura SHA + scrittura). Le quattro
-   scritture leggevano lo STESSO sha e andavano in conflitto: nessuna arrivava a destinazione.
-   ⚠ Non è "aspettare di più": è che N scritture sullo stesso file sono un errore di disegno.
-   Si compone UNA mutazione con dentro tutte le operazioni e si scrive UNA volta sola — una
-   conferma, un commit, nessuna corsa. */
-function mutazionePerOp(op) {
-  if (!op || !op.ticker || !op.tipo) return null;
-  const q = Number(op.qty), px = Number(op.prezzo);
-  if (!Number.isFinite(q) || q <= 0) return { errore: `${op.ticker}: operazione senza quantità` };
-  const tk = String(op.ticker).toUpperCase();
-  const pos = (DATA.portfolio || []).find(r => r.ticker === tk);
-  const acquisto = /ACQUIST|COMPR|INCREMENT|ACCUMUL|AGGIUNT/i.test(op.tipo);
-  if (acquisto) {
-    if (!Number.isFinite(px) || px <= 0) return { errore: `${tk}: acquisto senza prezzo, PMC non calcolabile` };
-    const q0 = pos ? Number(pos.qty) || 0 : 0, p0 = pos ? Number(pos.pmc) || 0 : 0;
-    const q1 = q0 + q, pmc1 = Math.round(((q0 * p0 + q * px) / q1) * 10000) / 10000;
-    return {
-      tk, acquisto, q, px,
-      descr: pos ? `${tk}: ${q0} → ${q1} quote · PMC ${fmtNum.format(p0)} → ${fmtNum.format(pmc1)}`
-                 : `${tk}: NUOVA posizione, ${q} quote a PMC ${fmtNum.format(px)}`,
-      applica: (cfg) => {
-        cfg.portfolio = cfg.portfolio || [];
-        /* ⚠ si rilegge la quantità DAL FILE, non da DATA: componendo più operazioni la seconda
-           deve partire da ciò che la prima ha appena scritto, non dallo stato iniziale. */
-        const e = cfg.portfolio.find(r => (r.ticker || "").toUpperCase() === tk);
-        if (e) {
-          const qa = Number(e.qty) || 0, pa = Number(e.pmc) || 0, qn = qa + q;
-          e.qty = qn; e.pmc = Math.round(((qa * pa + q * px) / qn) * 10000) / 10000;
-        } else cfg.portfolio.push({ ticker: tk, name: nomeTitolo(tk, cfg), qty: q, pmc: px });
-        if (Array.isArray(cfg.watchlist)) cfg.watchlist = cfg.watchlist.filter(r => (typeof r === "string" ? r : r.ticker || "").toUpperCase() !== tk);
-        return true;
-      },
-    };
-  }
-  if (!pos) return { errore: `${tk} non è in portafoglio: vendita solo annotata` };
-  const q0 = Number(pos.qty) || 0, q1 = Math.max(0, Math.round((q0 - q) * 10000) / 10000);
-  return {
-    tk, acquisto, q, px,
-    descr: q1 === 0 ? `${tk}: posizione CHIUSA (${q0} quote vendute) — passa in watchlist`
-                    : `${tk}: ${q0} → ${q1} quote (PMC invariato: vendere non lo cambia)`,
-    applica: (cfg) => {
-      let chiusa = false;
-      cfg.portfolio = (cfg.portfolio || []).filter(r => {
-        if ((r.ticker || "").toUpperCase() !== tk) return true;
-        const qa = Number(r.qty) || 0, qn = Math.max(0, Math.round((qa - q) * 10000) / 10000);
-        if (qn === 0) { chiusa = true; return false; }
-        r.qty = qn; return true;
-      });
-      if (chiusa) {
-        cfg.watchlist = cfg.watchlist || [];
-        if (!cfg.watchlist.some(r => (typeof r === "string" ? r : r.ticker || "").toUpperCase() === tk)) cfg.watchlist.push(tk);
-      }
-      return true;
-    },
-  };
-}
 
 
 const DIARY_PATH = "config/action_diary.json";
@@ -7889,12 +7605,6 @@ document.querySelectorAll("#pmc-mode .chip").forEach(c =>
   $(id).addEventListener("input", pmcCompute));
 
 /* liquidità + mini-card */
-$("#portfolio-health")?.addEventListener("click", openHealthModal);
-$("#tracking-error-box")?.addEventListener("click", openAlphaModal);
-$("#sharpe-box")?.addEventListener("click", openPortfolioSharpeModal);
-$("#fx-box")?.addEventListener("click", openFxModal);
-$("#margin-debt-box")?.addEventListener("click", openMarginDebtModal);
-
 /* popup Strumenti (PMC, vendite) e News */
 function showSimpleModal(id) { const m = $(id); if (m) m.hidden = false; }
 function hideSimpleModal(id) { const m = typeof id === "string" ? $(id) : id; if (m) m.hidden = true; }
@@ -7933,17 +7643,6 @@ $("#open-sell")?.addEventListener("click", () => { renderSellCalc(); showSimpleM
 /* v141: l'editor UI della testata (⚙ Impostazioni Prompt) è stato RIMOSSO su direttiva CEO:
    la Costituzione in config/prompt_header.txt si mantiene via repo. loadPromptHeaderCloud()
    resta: il file è ancora la fonte di verità caricata a ogni avvio. */
-$("#market-direction")?.addEventListener("click", () => {
-  const d = marketDirectionScore();
-  const comps = directionComponents();
-  const lab = d >= 60 ? "Rialzista" : d <= 40 ? "Ribassista" : "Laterale";
-  const rows = comps.map(c =>
-    `<tr><td>${esc(c.label)}</td><td style="min-width:130px">${meterBar(c.score, scoreColor(c.score), String(c.score))}</td></tr>`).join("");
-  openInfoModal("Direzione di mercato — sintesi di tutti i segnali",
-    `<div class="info-line">Punteggio aggregato: <b style="color:${scoreColor(d)}">${d}% · ${lab}</b></div>
-     <p class="muted" style="margin:4px 0 8px">Media di TUTTI gli indicatori del sistema (sentiment, F&amp;G, VIX, valutazione, BofA, MacroQuant, Fed, carry, dati macro, rotazione settoriale). >60% rialzista, <40% ribassista.</p>
-     <table class="info-table"><thead><tr><th>Segnale</th><th>Punteggio (0–100)</th></tr></thead><tbody>${rows}</tbody></table>`);
-});
 // click sul termometro Financial Health → modale Conto economico
 document.addEventListener("click", e => {
   const fh = e.target.closest(".fin-health");
@@ -8091,7 +7790,6 @@ setInterval(() => livePrices(), 60 * 1000);
    quando lui vuole il numero adesso. */
 
 /* v188 — comandi delle personalizzazioni */
-$("#macro-details")?.addEventListener("click", () => openMacroDetails());
 // v202: stesso pannello dalla topbar, visibile da ogni scheda. Spostare la macro dietro una
 // scheda l'aveva resa irraggiungibile da tutte le altre — e per l'utente "non trovabile" e'
 // indistinguibile da "non c'e'".
@@ -8100,7 +7798,6 @@ $("#macro-details")?.addEventListener("click", () => openMacroDetails());
 // centrale. La guardia strutturale è stata aggiornata di conseguenza — protegge l'ACCESSO
 // ai dettagli macro, non quel particolare bottone (v203: mai zittire una guardia, cambiarle
 // l'invariante quando l'invariante è cambiato davvero).
-$("#wl-cols")?.addEventListener("click", () => openColumnPicker("wl-table", "Watchlist", renderWatchlist));
 document.addEventListener("click", (e) => {
   const all = e.target.closest("[data-cp-all]");
   if (all) { saveColHidden(all.dataset.cpAll, new Set());

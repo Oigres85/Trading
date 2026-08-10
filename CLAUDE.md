@@ -164,6 +164,23 @@ tabelle del prompt, è ad alto rischio: fallo solo se richiesto esplicitamente e
   titolo, terminologia divergente, denominatori non dichiarati. È la classe che audit e red team
   non vedono: un payload che si contraddice non è invalido, è INAFFIDABILE. Ogni detector è stato
   validato iniettando l'incoerenza che deve trovare (`--verbose` mostra anche i controlli passati).
+- `node scripts/self_check.mjs` — **AUTOCONTROLLO (v277)**: l'unico gate che guarda il SISTEMA
+  invece dei dati. Nasce da due errori fatti nello stesso giorno che nessun altro gate ha preso,
+  perché tutti gli altri controllano il PRODOTTO e nessuno l'OPERAZIONE che lo modifica:
+  (a) una rimozione che ha **duplicato quattro funzioni** — in JS la seconda definizione vince in
+  silenzio, il file girava e 120 check passavano; (b) uno script che, togliendo check, si è
+  mangiato **metà suite compreso il blocco report**: `node scripts/test_app.mjs` usciva con
+  **codice 0 senza stampare niente**, cioè verde per assenza di test.
+  Controlla: nessuna funzione/costante duplicata, nessuna chiave scritta due volte in un
+  oggetto, ogni suite **esegue e parla** (firma del rapporto + pavimento sul numero di check),
+  BUILD_VERSION allineata al `?v=`, nessuna funzione citata dopo essere stata rimossa, nessun
+  `$("#x").` senza guardia su un id che il markup non ha.
+  ⚠ **I pavimenti si alzano quando la suite cresce, mai si abbassano per far passare una
+  modifica.** Se una suite perde check, la domanda è perché — non come zittirlo.
+  ⚠ **Scrivendolo mi sono procurato la trappola che doveva impedire**: cercava gli id nel
+  sorgente con le stringhe rimosse, quindi ne trovava ZERO ed era verde a vuoto (0 contro 111
+  sul sorgente vero). Un controllo nuovo va **validato iniettando il difetto** — vale anche
+  quando lo scrivi tu, e specialmente allora.
 - `node scripts/fx_check.mjs` — gate VALUTA. Genera il payload DUE VOLTE con EUR/USD diversi: ogni
   importo in € che non si muove col cambio o è un euro vero (cassa, VaR/ES già convertiti dalla
   pipeline) o è un DOLLARO col simbolo sbagliato. Nato dal v183: la minusvalenza latente nel blocco
