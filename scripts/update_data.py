@@ -1660,6 +1660,101 @@ def fetch_macro():
     if materie:
         macro["materie"] = materie
 
+    # ═══ v281 — ETF DI LUNGO PERIODO: DIECI ANNI, A UNIVERSO FISSO ═════════════════════════
+    # Richiesta del CEO: "possiamo inserire i migliori 10 etf come media degli ultimi 10 anni e
+    # capire il loro andamento, cosi' da capire su quale ETF entrare in ottica di lungo periodo?"
+    #
+    # ⚠ NON SONO "I MIGLIORI 10", ED E' LA DECISIONE PIU' IMPORTANTE DI QUESTO BLOCCO.
+    # Selezionare i primi dieci per rendimento passato costruisce una macchina che raccomanda
+    # cio' che e' GIA' salito: la lista cambierebbe ogni anno inseguendo i vincitori, e a dieci
+    # anni questo non e' piu' predittivo che a tre mesi. E' lo stesso motivo per cui in v200 e'
+    # stato tolto il motore di punteggio ("ordinare e' gia' un giudizio", hit-rate 29%).
+    # Qui l'universo e' FISSO e DICHIARATO: dieci ETF grandi, liquidi e con almeno dieci anni di
+    # storia, scelti per COPRIRE le scelte di lungo periodo (mercato ampio, tecnologia, estero,
+    # emergenti, obbligazioni, oro, immobiliare, difensivo), non per il loro rendimento. Restano
+    # gli stessi anno dopo anno, cosi' il confronto e' fra alternative e non fra vincitori.
+    #
+    # ⚠ RENDIMENTO TOTALE, NON DI PREZZO, e la differenza decide la lettura. Misurato sui dati
+    # veri: AGG fa -1,45% l'anno di solo prezzo e +1,38% col dividendo reinvestito; VNQ +0,63%
+    # contro +4,70%. Col prezzo nudo un ETF obbligazionario sembrerebbe aver perso per dieci
+    # anni. yfinance con auto_adjust=True restituisce la serie gia' aggiustata per dividendi e
+    # frazionamenti: e' quella che va usata, e va SCRITTO che e' quella.
+    UNIVERSO_ETF = [
+        ("VTI", "Mercato USA totale", "azionario ampio"),
+        ("SPY", "S&P 500", "azionario ampio"),
+        ("QQQ", "Nasdaq 100", "tecnologia"),
+        ("XLK", "Tecnologia USA", "tecnologia"),
+        ("XLV", "Salute USA", "difensivo"),
+        ("VEA", "Sviluppati ex-USA", "estero"),
+        ("VWO", "Mercati emergenti", "estero"),
+        ("AGG", "Obbligazioni USA", "obbligazionario"),
+        ("VNQ", "Immobiliare USA", "immobiliare"),
+        ("GLD", "Oro fisico", "materie prime"),
+    ]
+    etf_lungo = []
+    for sym, etichetta, categoria in UNIVERSO_ETF:
+        try:
+            t = yf.Ticker(sym)
+            h = t.history(period="10y", auto_adjust=True)["Close"].dropna()
+            if len(h) < 2000:          # ~8 anni di sedute: sotto, "dieci anni" sarebbe una bugia
+                print(f"!! etf {sym}: solo {len(h)} barre, salto", file=sys.stderr)
+                continue
+            anni = (h.index[-1] - h.index[0]).days / 365.25
+            cagr = ((float(h.iloc[-1]) / float(h.iloc[0])) ** (1 / anni) - 1) * 100
+            # massima perdita subita nel periodo, e quanto ci ha messo a tornare sopra
+            picco = h.cummax()
+            dd = (h / picco - 1) * 100
+            i_fondo = dd.idxmin()
+            dd_max = float(dd.min())
+            picco_prima = float(picco.loc[i_fondo])
+            dopo = h.loc[i_fondo:]
+            recuperi = dopo[dopo >= picco_prima]
+            # ⚠ "MAI RECUPERATO" E "ANCORA IN CORSO" SONO DUE COSE DIVERSE, e confonderle
+            # inganna. Misurato sui dati veri: AGG non recupera dal 2022 (tre anni sotto il
+            # picco: e' un fatto), l'oro ha il suo peggior calo LO SCORSO MESE — dire "mai
+            # recuperato" di entrambi metterebbe sullo stesso piano una ferita vecchia e una
+            # fresca. Chi legge deve poter distinguere, quindi si scrive da quanti giorni dura.
+            giorni_rec = int((recuperi.index[0] - i_fondo).days) if len(recuperi) else None
+            giorni_sotto = None if len(recuperi) else int((h.index[-1] - i_fondo).days)
+            # volatilita' annualizzata: due curve con lo stesso rendimento non si tengono uguale
+            rend = h.pct_change().dropna()
+            vol = float(rend.std() * (252 ** 0.5) * 100) if len(rend) > 30 else None
+            # serie MENSILE rebasata a 100: dieci anni di barre giornaliere sarebbero 2500 punti
+            mens = h.resample("ME").last().dropna()
+            base = float(mens.iloc[0])
+            serie = [{"d": d.strftime("%Y-%m"), "v": round(float(v) / base * 100, 1)}
+                     for d, v in mens.items()]
+            ter = None
+            try:
+                info = t.info
+                ter = info.get("netExpenseRatio") or info.get("annualReportExpenseRatio")
+                ter = round(float(ter), 3) if ter is not None else None
+            except Exception:  # noqa: BLE001
+                pass
+            etf_lungo.append({
+                "symbol": sym, "label": etichetta, "categoria": categoria,
+                "anni": round(anni, 1),
+                "cagr": round(cagr, 2),
+                "totale_pct": round((float(h.iloc[-1]) / float(h.iloc[0]) - 1) * 100, 1),
+                "dd_max": round(dd_max, 1),
+                "dd_quando": i_fondo.strftime("%Y-%m"),
+                "giorni_recupero": giorni_rec,
+                "giorni_sotto": giorni_sotto,      # se non ha ancora recuperato: da quanto
+                "vol": round(vol, 1) if vol else None,
+                "ter": ter,
+                "serie": serie,
+            })
+        except Exception as e:  # noqa: BLE001
+            print(f"!! etf {sym}: {e}", file=sys.stderr)
+    if etf_lungo:
+        # ⚠ ORDINE FISSO, quello dell'universo: ordinarli per rendimento sarebbe la classifica
+        # che questo blocco esiste per NON fare.
+        macro["etf_lungo"] = {
+            "dal": etf_lungo[0]["serie"][0]["d"],
+            "al": etf_lungo[0]["serie"][-1]["d"],
+            "voci": etf_lungo,
+        }
+
     # Carry trade USA-Giappone (differenziale rendimenti 10 anni + trend USD/JPY)
     try:
         us10 = float(yf.Ticker("^TNX").fast_info.last_price)

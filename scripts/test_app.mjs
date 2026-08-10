@@ -1543,6 +1543,69 @@ check("v280 put/call: il pannello non costruisce piu' tabelle sui titoli del por
   DATA.portfolio = saved;
   return !/ZZOLD/.test(html) && !/PRESSIONE DI ROLLING/i.test(html)`));
 
+/* ══ v281 — ETF DI LUNGO PERIODO: L'INVARIANTE E' CHE NON SIA UNA CLASSIFICA ═════════════
+   Il CEO: "i migliori 10 etf come media degli ultimi 10 anni ... cosi' da capire su quale ETF
+   entrare in ottica di lungo periodo". La sezione da' i numeri e NON la risposta, per una
+   ragione misurata in questo progetto: in v200 il motore di punteggio e' stato tolto perche'
+   "ordinare e' gia' un giudizio", con un hit-rate del 29%. A dieci anni non cambia. */
+
+/* ⚠ IL CHECK PIU' IMPORTANTE: l'ordine e' quello dell'UNIVERSO, non del rendimento. Se un
+   domani qualcuno "migliora" la tabella ordinandola per CAGR, la sezione diventa una
+   raccomandazione travestita da dato — che e' esattamente cio' che non deve essere. */
+check("v281 ETF: la tabella NON e' ordinata per rendimento", (() => {
+  const i = src.indexOf("function renderEtfLungo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10)).replace(/\/\*[\s\S]*?\*\//g, "");
+  return !/\.sort\(/.test(corpo) && /e\.voci\.map/.test(corpo);
+})());
+
+check("v281 ETF: la pipeline usa un universo FISSO, non i primi per rendimento", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  const i = py.indexOf("UNIVERSO_ETF = [");
+  const blocco = py.slice(i, py.indexOf("]", i));
+  /* dieci simboli scritti a mano, e nessun ordinamento per rendimento nel blocco che li usa */
+  const n = (blocco.match(/\(\"[A-Z]{3}\"/g) || []).length;
+  const usa = py.slice(i, i + 5000).replace(/#[^\n]*/g, "");
+  return n === 10 && !/sort\(.*cagr|sorted\(.*cagr/.test(usa);
+})());
+
+/* ⚠ RENDIMENTO TOTALE, non di prezzo, e la differenza decide la lettura: misurato sui dati
+   veri AGG fa -1,45% l'anno di solo prezzo e +1,38% col dividendo reinvestito. Col prezzo nudo
+   un obbligazionario sembrerebbe aver perso per dieci anni. */
+check("v281 ETF: si usa il rendimento TOTALE (auto_adjust), e la nota lo dichiara", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  const i = src.indexOf("function renderEtfLungo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /period="10y", auto_adjust=True/.test(py) && /dividendi reinvestiti/.test(corpo);
+})());
+
+/* ⚠ "MAI RECUPERATO" e "ANCORA IN CORSO" sono due cose diverse: AGG non recupera dal 2022,
+   l'oro ha il suo peggior calo del mese scorso. Metterli sotto la stessa etichetta
+   confonderebbe una ferita vecchia con una fresca. */
+check("v281 ETF: un calo non ancora recuperato dichiara da QUANTO dura", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  const i = src.indexOf("function renderEtfLungo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /giorni_sotto/.test(py) && /sotto da \$\{Math\.round\(v\.giorni_sotto/.test(corpo);
+})());
+
+/* ⚠ la tabella senza gli avvisi si legge come una classifica di cosa comprare. Non sono
+   decorazione: sono la differenza fra un dato e una raccomandazione. */
+check("v281 ETF: gli avvisi che impediscono di leggerla come raccomandazione ci sono", (() => {
+  const i = src.indexOf("function renderEtfLungo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /non sono "i migliori dieci"/i.test(corpo)
+      && /Non sono un consulente finanziario/i.test(corpo)
+      && /Il rendimento medio nasconde il percorso/i.test(corpo)
+      && /Il costo si moltiplica/i.test(corpo);
+})());
+
+check("v281 ETF: la sezione e' nella catena di render e ha il suo posto in pagina", (() => {
+  const html6 = readFileSync(join(ROOT, "index.html"), "utf8");
+  const i = src.indexOf("function renderAll()");
+  return /renderEtfLungo\(\)/.test(src.slice(i, src.indexOf("\nfunction ", i + 1)))
+      && html6.includes('id="etf-lungo-tab"') && html6.includes('id="etf-lungo-grafico"');
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

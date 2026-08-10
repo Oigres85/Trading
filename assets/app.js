@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "280";
+const BUILD_VERSION = "281";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -807,6 +807,7 @@ function renderAll() {
      resta ferma su "non disponibili" anche dopo che i dati sono arrivati. Chi disegna al
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
+  renderEtfLungo();             // v281 — ETF di lungo periodo, universo fisso
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
      pagina. La funzione RESTA perche' testoCorrelazioniMacro() usa lo stesso calcolo per il
@@ -2343,6 +2344,92 @@ function barreOrdinate(righe, opt = {}) {
    La variabile sopravvive perché `allocazionePer` la usa e perché toglierla ha già ucciso la
    pagina una volta (v238-v239): un taglio che si porta via una dichiarazione vicina. */
 let allocGrafMode = "sector";
+/* ═══ v281 — ETF DI LUNGO PERIODO ══════════════════════════════════════════════════════════
+   Richiesta del CEO: "i migliori 10 etf come media degli ultimi 10 anni ... cosi' da capire su
+   quale ETF entrare in ottica di lungo periodo".
+   ⚠ COSA QUESTA SEZIONE NON FA, e il perche' vale piu' di cosa fa: non sceglie, non ordina per
+   rendimento e non dice quale comprare. Selezionare "i migliori" sul passato costruisce una
+   lista che insegue i vincitori — a dieci anni non e' piu' predittiva che a tre mesi — ed e' lo
+   stesso motivo per cui in v200 il motore di punteggio e' stato tolto: "ordinare e' gia' un
+   giudizio", con un hit-rate del 29%.
+   Quello che fa: mette le dieci curve sulla stessa scala (tutte a 100 il primo mese, cosi' si
+   confrontano i PERCORSI e non i prezzi) e accanto i numeri che il rendimento medio nasconde —
+   quanto ha perso nel momento peggiore, quanto ci ha messo a tornare sopra, quanto oscilla, e
+   quanto costa ogni anno. Due ETF con lo stesso 10% annuo possono averglielo dato in modi che
+   uno dei due non gli avrebbe fatto tenere fino in fondo. */
+function renderEtfLungo() {
+  const box = $("#etf-lungo-grafico");
+  if (!box) return;
+  const e = (DATA && DATA.macro && DATA.macro.etf_lungo) || null;
+  const tab = $("#etf-lungo-tab");
+  const nota = $("#etf-lungo-nota");
+  if (!e || !Array.isArray(e.voci) || !e.voci.length) {
+    box.innerHTML = '<div class="muted">Arriva col prossimo giro della pipeline.</div>';
+    if (tab) tab.innerHTML = "";
+    if (nota) nota.innerHTML = "";
+    return;
+  }
+  const COLORI = ["#2962ff", "#26a69a", "#ef5350", "#ffa726", "#ab47bc",
+                  "#26c6da", "#8d6e63", "#66bb6a", "#ec407a", "#ffca28"];
+  const serie = e.voci.map((v, i) => ({
+    nome: `${v.symbol} · ${v.label}`,
+    punti: (v.serie || []).map(p => ({ d: p.d + "-01", v: p.v })),
+    colore: COLORI[i % COLORI.length],
+  })).filter(s => s.punti.length > 2);
+  box.innerHTML = serie.length
+    ? graficoSerie(serie, { h: 260, soglie: [{ v: 100, testo: "punto di partenza", colore: "var(--muted)" }],
+        aria: "andamento a dieci anni dei dieci ETF", etichetteDx: true })
+    : '<div class="muted">Serie non disponibili.</div>';
+
+  /* ⚠ ORDINE DELL'UNIVERSO, NON DEL RENDIMENTO. La tabella e' ordinabile per colonna se lui
+     vuole confrontare, ma NON si apre gia' ordinata sul rendimento: una classifica pre-fatta
+     e' una raccomandazione travestita da dato. */
+  const num = (v, suff = "", dec = 1) => Number.isFinite(Number(v))
+    ? `<td class="num">${signTxt(Math.round(Number(v) * 10 ** dec) / 10 ** dec, suff)}</td>`
+    : '<td class="num muted">—</td>';
+  const righe = e.voci.map((v, i) => {
+    const rec = v.giorni_recupero != null
+      ? `${Math.round(v.giorni_recupero / 30)} mesi`
+      : (v.giorni_sotto != null
+          ? `<b class="neg">sotto da ${Math.round(v.giorni_sotto / 30)} mesi</b>`
+          : "—");
+    return `<tr>
+      <td><span class="etf-punto" style="background:${COLORI[i % COLORI.length]}"></span>
+          <b>${esc(v.symbol)}</b><span class="etf-lab">${esc(v.label)}</span></td>
+      <td class="muted etf-cat">${esc(v.categoria || "")}</td>
+      ${num(v.cagr, "%", 2)}
+      <td class="num neg">${fmtNum.format(v.dd_max)}%<span class="etf-quando">${esc(v.dd_quando || "")}</span></td>
+      <td class="num">${rec}</td>
+      <td class="num">${Number.isFinite(Number(v.vol)) ? fmtNum.format(v.vol) + "%" : "—"}</td>
+      <td class="num">${Number.isFinite(Number(v.ter)) ? fmtNum.format(v.ter) + "%" : "n.d."}</td>
+    </tr>`;
+  }).join("");
+  if (tab) {
+    tab.innerHTML = `<div class="etf-scroll"><table class="etf-tab"><thead><tr>
+      <th>ETF</th><th>copre</th><th class="num" title="rendimento annualizzato, dividendi reinvestiti">Annuo</th>
+      <th class="num" title="la perdita massima subita nel periodo, dal picco al fondo">Peggior calo</th>
+      <th class="num" title="quanto ci ha messo a tornare sopra il picco precedente">Recupero</th>
+      <th class="num" title="oscillazione annualizzata: quanto e' stato mosso il percorso">Oscillazione</th>
+      <th class="num" title="costo annuo dichiarato dall'emittente">Costo</th>
+      </tr></thead><tbody>${righe}</tbody></table></div>`;
+  }
+  if (nota) {
+    nota.innerHTML = `Dal ${esc(e.dal)} al ${esc(e.al)} · <b>rendimento totale</b>, con i dividendi reinvestiti — `
+      + `sul solo prezzo un obbligazionario sembrerebbe in perdita (AGG: −1,45% l'anno contro +1,38%).`
+      + `<div class="etf-avvisi">`
+      + `<div>⚠ <b>Questi non sono "i migliori dieci".</b> Sono dieci ETF scelti per COPRIRE le alternative di lungo periodo `
+      + `— mercato ampio, tecnologia, estero, emergenti, obbligazioni, oro, immobiliare, difensivo — e restano gli stessi ogni anno. `
+      + `Sceglierli in base a come sono andati costruirebbe una lista che insegue i vincitori, e a dieci anni il passato non predice più che a tre mesi.</div>`
+      + `<div>⚠ <b>Il rendimento medio nasconde il percorso.</b> Guarda insieme le tre colonne dopo "Annuo": `
+      + `un ETF che ha reso di più perdendo il 40% e restando sotto per tre anni è una cosa diversa da uno che ha reso meno in linea retta. `
+      + `La domanda non è quale ha reso di più, è quale saresti riuscito a tenere fino in fondo.</div>`
+      + `<div>⚠ <b>Il costo si moltiplica.</b> Mezzo punto l'anno per dieci anni è circa il 5% del capitale, e si paga comunque vada.</div>`
+      + `<div>⚠ <b>Non sono un consulente finanziario e questa tabella non dice cosa comprare</b>: dice cos'è successo dal ${esc(e.dal)} a oggi. `
+      + `Nessuno di questi numeri è una previsione.</div>`
+      + `</div>`;
+  }
+}
+
 function renderAllocGrafica() {
   const box = $("#allocg-chart"); if (!box) return;
   const list = allocazionePer(allocGrafMode);
