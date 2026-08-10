@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "283";
+const BUILD_VERSION = "284";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6721,12 +6721,29 @@ function statoOpzioni(tk) {
   const T = String(tk || "").toUpperCase().replace(/^[A-Z]+:/, "");
   const o = (DATA && DATA.options && DATA.options[T]) || null;
   if (!o || !Array.isArray(o.expiries) || !o.expiries.length) return null;
-  const e = o.expiries[0];                       // la scadenza piu' vicina: e' quella che muove il prezzo
+  /* ⚠ v284 — LA SCADENZA CON PIU' CONTRATTI APERTI, NON LA PIU' VICINA. Trovato rileggendo il
+     pacchetto di AMD: la prima scadenza era a UN GIORNO con 4.191 contratti call, mentre quella
+     successiva ne aveva 19.536 — quasi cinque volte. I "muri" di una settimanale che scade
+     domani descrivono un contratto che sta per sparire, e il giorno dopo saltano altrove: sul
+     grafico erano passati da 460 a 700 in poche ore senza che il mercato avesse fatto niente.
+     Un livello che si sposta del 50% da solo non e' un livello.
+     Si sceglie dove i contratti stanno DAVVERO, e la scheda dichiara quale scadenza ha scelto:
+     e' la stessa regola dei denominatori dichiarati che vale in tutto questo sistema. */
+  const conOI = (x) => ["calls", "puts"].reduce((t, lato) =>
+    t + (x[lato] || []).reduce((s, o) => s + (Number(o.oi) || 0), 0), 0);
+  const e = [...o.expiries].sort((a, b) => conOI(b) - conOI(a))[0];
+  const oiScelta = conOI(e);
+  const oiPrima = conOI(o.expiries[0]);
   const somma = (a) => (a || []).reduce((t, x) => t + (Number(x.vol) || 0), 0);
   const put = somma(e.puts), call = somma(e.calls);
   return { tk: T, spot: Number(o.spot), scadenza: e.date, put, call,
            ratio: call > 0 ? put / call : null,
-           callWall: Number(e.call_wall), putWall: Number(e.put_wall) };
+           callWall: Number(e.call_wall), putWall: Number(e.put_wall),
+           oi: oiScelta,
+           /* vero quando la scadenza scelta NON e' la piu' vicina: la scheda lo dice, perche'
+              altrimenti "scadenza 14/08" accanto a un titolo che scade il 12 sembra un errore. */
+           nonLaPiuVicina: e.date !== o.expiries[0].date,
+           oiPiuVicina: oiPrima };
 }
 
 /* ═══ v266 — I LIVELLI DEL TITOLO SU UNA SCALA SOLA ════════════════════════════════════════
@@ -6960,7 +6977,9 @@ async function renderOpzioniGrafico(tk) {
       <div class="tvo-riga"><span class="tvo-rosso">PUT ${fmtNum.format(o.put)}</span>
         <span class="muted">rapporto ${fmtNum.format(Math.round(o.ratio * 100) / 100)}</span>
         <span class="tvo-verde">CALL ${fmtNum.format(o.call)}</span></div>
-      <div class="muted tvo-nota">Volumi della scadenza ${esc(o.scadenza)}: ${stato}.</div>
+      <div class="muted tvo-nota">Volumi della scadenza ${esc(o.scadenza)}: ${stato}.${o.nonLaPiuVicina
+        ? ` <b>Non è la scadenza più vicina</b>: quella ha ${fmtNum.format(o.oiPiuVicina)} contratti aperti contro ${fmtNum.format(o.oi)}, e i muri di una scadenza quasi esaurita saltano da soli senza che il mercato si muova.`
+        : ""}</div>
     </div>`;
   }
 
@@ -7277,7 +7296,10 @@ function datiNostriDelTitolo(tk) {
   f.livelli.forEach(x => L.push(`- ${x.nome}: ${x.v}${dist(x.v)} — ${x.fonte}`));
   if (f.opzioni && f.opzioni.ratio != null) {
     L.push(`- Rapporto put/call di ${T} sulla scadenza ${f.opzioni.scadenza}: `
-      + `${Math.round(f.opzioni.ratio * 100) / 100} (put ${f.opzioni.put}, call ${f.opzioni.call})`);
+      + `${Math.round(f.opzioni.ratio * 100) / 100} (put ${f.opzioni.put}, call ${f.opzioni.call})`
+      + (f.opzioni.nonLaPiuVicina
+          ? `. ⚠ NON e' la scadenza piu' vicina: e' quella con piu' contratti aperti (${f.opzioni.oi} contro ${f.opzioni.oiPiuVicina}). I muri di una scadenza quasi esaurita si spostano da soli senza che il mercato si muova, quindi non sono livelli.`
+          : ""));
   }
   const t = f.tecnici;
   if (t) {

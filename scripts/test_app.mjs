@@ -1636,6 +1636,36 @@ check("v282 vendite: la valuta di una riga manuale si deduce dal simbolo, non si
   return /\.MI\$\/\.test\(tk\)/.test(corpo) && /currency: eur \? "EUR" : "USD"/.test(corpo);
 })());
 
+/* ══ v284 — I MURI SI LEGGONO DOVE STANNO I CONTRATTI ════════════════════════════════════
+   Trovato rileggendo il pacchetto di AMD, come chiede il CEO di fare periodicamente.
+   Il sistema usava sempre `expiries[0]`, la scadenza piu' VICINA. Su AMD quella scadeva il
+   giorno dopo con 7.277 contratti aperti, mentre la successiva ne aveva 33.024 — quattro volte
+   tanto. Conseguenza misurata: il muro delle call risultava a 700, cioe' +47% dal prezzo, e in
+   mattinata era 460. Un livello che si sposta del 50% in poche ore senza che il mercato faccia
+   niente NON e' un livello: e' rumore di una settimanale che sta morendo.
+   Col muro giusto (507,5, +6,9%) l'analisi cambia di senso: prima diceva che sopra il prezzo
+   non c'era resistenza dalle opzioni per quasi meta' del valore del titolo. */
+check("v284 opzioni: si sceglie la scadenza con piu' contratti aperti, non la piu' vicina", run(`
+  const saved = DATA.options;
+  const strike = (s, oi) => ({ strike: s, oi, vol: 1 });
+  DATA.options = { ZZOPT: { spot: 100, expiries: [
+    { date: "2026-01-02", calls: [strike(150, 10)], puts: [strike(50, 10)], call_wall: 150, put_wall: 50 },
+    { date: "2026-01-16", calls: [strike(110, 900)], puts: [strike(90, 900)], call_wall: 110, put_wall: 90 },
+  ] } };
+  const o = statoOpzioni("ZZOPT");
+  DATA.options = saved;
+  return o.scadenza === "2026-01-16" && o.callWall === 110 && o.nonLaPiuVicina === true`));
+
+/* ⚠ e quando la scelta NON e' la piu' vicina va DETTO: "scadenza 14/08" accanto a un titolo
+   che scade il 12 sembra un errore, e un numero che sembra sbagliato viene ignorato. */
+check("v284 opzioni: la scheda e il pacchetto dichiarano se la scadenza non e' la piu' vicina", (() => {
+  const i = src.indexOf("async function renderOpzioniGrafico");
+  const scheda = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  const j = src.indexOf("function datiNostriDelTitolo");
+  const pac = src.slice(j, src.indexOf("\nfunction ", j + 10));
+  return /Non è la scadenza più vicina/.test(scheda) && /NON e' la scadenza piu' vicina/.test(pac);
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
