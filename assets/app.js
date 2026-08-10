@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "264";
+const BUILD_VERSION = "265";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2424,7 +2424,7 @@ const ETF_DI_SETTORE = { sox: "SMH", Technology: "XLK", "Communication Services"
 
 
 let rotOrizzonte = "m1";
-let rotTutte = false;   // v262: gli estremi di default, la classifica intera a un clic   // m1 | m3
+/* v265 — `rotTutte` rimossa: si mostrano sempre tutti i settori, come chiesto dal CEO. */
 function renderRotazione() {
   /* ⚠ v262 — TERZA VOLTA CHE IL CEO CHIEDE DI RIDURRE QUESTO RIQUADRO ("riduci le dimensioni
      del box!!"). Le prime due volte ho stretto il CSS: prima il vincolo sbagliato (v259), poi
@@ -2441,21 +2441,15 @@ function renderRotazione() {
   if (!tilt.length) { box.innerHTML = '<div class="muted">Rotazione non disponibile.</div>'; return; }
   const tutte = [...tilt].sort((a, b) => (b[rotOrizzonte] ?? -99) - (a[rotOrizzonte] ?? -99))
     .map(t => ({ nome: t.name, valore: t[rotOrizzonte], tk: t.ticker, testo: signTxt(t[rotOrizzonte]) }));
-  const N = 5;
-  const mostrate = rotTutte ? tutte : [...tutte.slice(0, N), ...tutte.slice(-N)];
-  box.innerHTML = barreOrdinate(mostrate).replace('<div class="obars">', '<div class="obars obars-compatte">')
-    + (tutte.length > 2 * N
-        ? `<button class="btn btn-ghost btn-sm" id="rot-tutte">${rotTutte ? "Mostra solo gli estremi" : `Mostra tutti e ${tutte.length}`}</button>`
-        : "");
-  box.querySelectorAll("[data-obar-tk]").forEach(e =>
-    e.setAttribute("title", "ETF di riferimento " + e.dataset.obarTk));
-  $("#rot-tutte")?.addEventListener("click", () => { rotTutte = !rotTutte; renderRotazione(); });
+  /* v265 — SEMPRE TUTTI I SETTORI, senza bottone. Il CEO ha chiesto di togliere "mostra solo
+     gli estremi": la riduzione la fa gia' il CSS compatto (righe da ~15px invece di ~26), e un
+     bottone che nasconde meta' dei dati e' un ostacolo, non una semplificazione. */
+  box.innerHTML = barreOrdinate(tutte).replace('<div class="obars">', '<div class="obars obars-compatte">');
   if (head) head.innerHTML = "";
   const primo = tutte[0], ultimo = tutte[tutte.length - 1];
   const sopraZero = tutte.filter(r => (r.valore ?? 0) > 0).length;
   if (nota) {
-    nota.innerHTML = (rotTutte ? "" : `<b>I ${N} che tirano e i ${N} che perdono</b>, su ${tutte.length} settori. `)
-      + `Rendimento a ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"}. ${sopraZero} su ${tutte.length} in positivo. `
+    nota.innerHTML = `Rendimento a ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"}. ${sopraZero} su ${tutte.length} in positivo. `
       + (primo && ultimo ? `L'arco va da ${esc(primo.nome)} ${signTxt(primo.valore)} a ${esc(ultimo.nome)} ${signTxt(ultimo.valore)}: `
          + `piu' e' largo, piu' il mercato sta scegliendo invece di salire insieme.` : "");
   }
@@ -2549,44 +2543,18 @@ function renderLevaStagione() {
   const box = $("#mg-leva"); if (!box) return;
   const carte = [];
 
-  const md = m.margin_debt;
-  if ((md?.history || []).length > 2) {
-    // ⚠ history è un array di NUMERI NUDI, senza date: l'asse x si etichetta a mano coi mesi
-    // che la serie copre, non si finge una data per punto
-    const h = md.history, ora = h[h.length - 1];
-    const picco = md.peak || Math.max(...h);
-    carte.push({
-      t: "Leva a credito (margin debt)", v: `${fmt1.format(md.yoy)}% a/a`,
-      cls: md.yoy >= 25 ? "neg" : md.yoy >= 10 ? "warn" : "pos",
-      /* ⚠ v231 — ERA `w: 900`, cioe' una tela pensata per un blocco a tutta larghezza. Dentro
-         una mini tab quel viewBox NON si restringe: forzava la traccia della griglia a 990px e
-         faceva collassare .mg-tris a UNA colonna sola — le due schede finivano impilate a tutta
-         pagina. Non si vedeva dal viewport (nessuno sbordamento): si trova misurando la
-         gridTemplateColumns risolta. Terza volta che il viewBox non-costante presenta il conto
-         (v206, v226, qui). `compatto` usa la stessa tela dei termometri di stress. */
-      g: graficoSerie([{ nome: "md", punti: h.map(v => ({ d: null, v })), colore: "var(--purple)" }],
-        { h: 120, compatto: true, lAsse: 46, fmtY: v => fmtNum.format(Math.round(v / 1000)) + " mld",
-          soglie: picco > 0 ? [{ v: picco, testo: "massimo storico", colore: "var(--red)" }] : [],
-          assex: [`${h.length} mesi fa`, md.date ? dataBreve(md.date) : "oggi"], etichetteDx: false,
-          aria: "debito a margine FINRA" }),
-      /* ⚠ v262 — LA DATA MANCAVA PROPRIO QUI, ED È LA SCHEDA CHE PIÙ NE HA BISOGNO.
-         Il CEO l'ha chiesta tre volte e ha detto perché: "questo dato continua a darmi dubbi
-         incidendo pesantemente e non in modo corretto sull'analisi". Ha ragione due volte.
-         FINRA pubblica il margin debt del mese M nella terza settimana di M+1: il numero in
-         pagina ha strutturalmente fra 40 e 70 giorni. Letto senza data dice "la leva è al
-         massimo storico ADESSO" — e su quella lettura si conclude che il mercato è fragile
-         oggi. Con la data dice un'altra cosa: "a fine giugno la leva era al massimo storico,
-         e da allora non sappiamo". Sono due affermazioni diverse, e finora la scheda mostrava
-         la seconda con la faccia della prima.
-         La riga di cadenza (rigaCadenza) esisteva dal v250 ma questa scheda non passa da
-         `indicatoriClassifica` — è costruita a mano qui — quindi non la riceveva. Classe
-         "due implementazioni della stessa cosa" (v161, v207): una strada aveva la data, l'altra no. */
-      n: (typeof rigaCadenza === "function"
-            ? `<div class="mg-cad muted"><b>⚠ ${esc(rigaCadenza("margin_debt", md.date) || "data di rilevazione non disponibile")}</b></div>`
-            : "")
-        + `Quanto denaro a prestito c'era nel mercato ALLA RILEVAZIONE qui sopra, non oggi. Allora era ${fmt1.format(md.pct_of_peak)}% del massimo storico, ${signTxt(md.yoy)} a/a. FINRA pubblica il mese M nella terza settimana di M+1: fra la rilevazione e oggi il mercato si è mosso e questo numero non lo sa.`,
-    });
-  }
+  /* ═══ v265 — LA LEVA A CREDITO E' STATA TOLTA, e la ragione e' che non c'e' rimedio ══════
+     Il CEO: "con dati cosi' vecchi questo valore e' fuorviante, c'e' una soluzione? altrimenti
+     va tolta". La risposta onesta e' NO, non c'e'.
+     FINRA pubblica il margin debt del mese M nella terza settimana di M+1: il ritardo e'
+     STRUTTURALE, non un difetto della pipeline, e non esiste una fonte gratuita piu' fresca
+     dello stesso dato. Ho gia' provato le due mitigazioni possibili — scrivergli accanto la
+     data (v262) e riformulare la frase perche' parlasse al passato — e il CEO l'ha comunque
+     trovato fuorviante. Ha ragione: "leva al massimo storico" pesa nella lettura molto piu' di
+     quanto la sua nota a margine riesca a smorzare. E' lo stesso argomento con cui in v200 e'
+     stato tolto il punteggio del motore: l'ancoraggio non si batte con una nota, si batte
+     togliendo il numero.
+     Resta la stagionalita', che non ha questo problema. */
   const se = m.seasonality;
   if ((se?.sp500 || []).length === 12) {
     const MESI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
@@ -2854,8 +2822,27 @@ function indicatoriClassifica() {
      · "fg:domanda-bond-high-yield" — e' lo spread high yield, cioe' la stessa misura di
        "Stress del credito" (HY OAS) letta da un'altra fonte. Due letture della stessa
        grandezza sono un segnale, non due. */
+  /* ═══ v265 — I DOPPIONI CHE IL CEO HA DOVUTO SEGNALARE DUE VOLTE ═══════════════════════════
+     "alcuni dati come VIX sono presenti due volte, ti avevo detto di controllare queste cose e
+     di cancellare i doppioni!!". Ha ragione, ed era peggio di come l'ha descritto: i doppioni
+     erano TRE, non uno.
+     I "Termometri di stress" disegnano curva 10A-2A, credito HY e VIX con le loro soglie — ed
+     e' la forma che il CEO ha detto esplicitamente di saper leggere ("i termometri di stress
+     per me sono di facile lettura"). Le stesse tre grandezze avevano anche una scheda nella
+     classifica sotto. Stesso fatto, due posti, due forme.
+     ⚠ PERCHE' NON L'AVEVO VISTO: la mia deduplica confrontava le schede FRA LORO, e i termometri
+     non sono schede — vivono in un'altra funzione (renderStress) e in un'altra sezione. Cercavo
+     i duplicati dentro un solo elenco mentre stavano fra due elenchi diversi. E' la ragione per
+     cui il CEO ha dovuto dirlo due volte, e la correzione giusta non e' guardare meglio: e'
+     dedurre la lista degli esclusi DA renderStress, cosi' se un domani un termometro cambia,
+     l'esclusione lo segue da sola invece di restare un elenco scritto a mano (classe C10).
+     Vince il TERMOMETRO: e' la forma che lui legge, e porta le soglie. */
+  const chiaviTermometri = new Set(["in:curve", "credit", "vix"]);
   const FUORI = new Set(["thermometer", "futures", "seasonality", "risk_sentiment", "smart_money",
-                         "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield"]);
+                         "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield",
+                         /* v265 — richieste esplicite del CEO: due componenti F&G che non vuole */
+                         "fg:forza-dei-prezzi", "fg:domanda-beni-rifugio",
+                         ...chiaviTermometri]);
   /* ⚠ v253 — LA FRESCHEZZA SI ASSEGNA IN UN PUNTO SOLO, QUI IN FONDO. La prima stesura la
      agganciava ai singoli `out.push`: ce ne sono NOVE sparsi per la funzione, e un decimo
      aggiunto un domani nascerebbe senza — è lo stesso motivo per cui il filtro FUORI qui
@@ -3072,6 +3059,106 @@ function conTachimetro(comp, base, aria) {
 }
 
 const FORMA_INDICATORE = {
+  /* ═══ v265 — VENDITE AL DETTAGLIO: LA LINEA RETTA ERA IL PROBLEMA ══════════════════════════
+     Il CEO: "anche questo valore sempre fuorviante soprattutto con un grafico che segna una
+     linea retta". Aveva ragione due volte.
+     La linea era retta perche' NON C'E' UNA SERIE: `indicators.retail` porta un solo valore
+     (0.2%) e una data. La scheda cadeva sul disegno generico, che con un punto solo traccia
+     un segmento orizzontale — un grafico che non dice niente ma sembra dire "stabile".
+     E' la classe v205 (un grafico che dice il falso senza rompersi).
+     Ora: nessuna linea. Una scala con le zone, la variazione MENSILE dichiarata per quello che
+     e' (un mese solo, non una tendenza), e la data in evidenza — perche' con 69 giorni di
+     ritardo il numero descrive giugno, non oggi. */
+  "in:retail": (m) => {
+    const r = (m.indicators || []).find(x => x.key === "retail"); if (!r) return null;
+    const v = parseFloat(String(r.value).replace(",", ".").replace("%", ""));
+    if (!Number.isFinite(v)) return null;
+    const cad = (typeof rigaCadenza === "function") ? rigaCadenza("retail", r.date) : "";
+    return {
+      g: scala(v, { min: -1.5, max: 2, unita: "%", aria: "vendite al dettaglio",
+          zone: [{ da: -1.5, a: 0, nome: "consumi in calo", colore: "var(--red)" },
+                 { da: 0, a: 0.4, nome: "crescita debole", colore: "var(--yellow)" },
+                 { da: 0.4, a: 2, nome: "consumi solidi", colore: "var(--green)" }],
+          fonte: "bande di sola lettura sulla variazione mensile: nel file non c'e' una serie storica delle vendite, solo l'ultimo dato" }),
+      n: (cad ? `<div class="mg-cad muted"><b>⚠ ${esc(cad)}</b></div>` : "")
+        + `<b>${signTxt(v, "%")} rispetto al mese precedente</b> — un solo mese, non una tendenza: `
+        + `il file non contiene la serie storica, quindi qui non si puo' disegnare un andamento e non se ne disegna uno finto. `
+        + `Come si legge: i consumi sono due terzi dell'economia americana, quindi questa riga e' il termometro piu' diretto della domanda interna. `
+        + `Ma e' un dato mensile e volatile: un mese sotto zero non e' una recessione, tre di fila cominciano a esserlo.`,
+    };
+  },
+
+  /* ═══ v265 — SCHIUMA ETF: LE BARRE NON SI CAPIVANO ═════════════════════════════════════════
+     Il CEO: "non capisco i valori delle barre giu' che oltretutto non si leggono bene".
+     Guardando cosa disegnava: due barre con RVol 0,86 e 0,87 — numeri quasi identici, vicini a
+     1, su una scala che parte da zero. Due barre lunghe uguali che non dicono niente, ed e'
+     colpa della scala: il fatto interessante non e' "0,86" ma "SOTTO 1", cioe' che il volume di
+     oggi e' minore della media. Uno zero come origine nasconde proprio la soglia che conta.
+     Ora la scala e' centrata su 1 (volume = media) con la zona di allarme a 2,5, che e' la
+     soglia che la pipeline usa davvero per accendere `froth.alert`. */
+  froth: (m) => {
+    const f = m.froth; if (!f) return null;
+    const voci = [["soxl", "SOXL — semiconduttori 3x"], ["tqqq", "TQQQ — Nasdaq 3x"]]
+      .map(([k, nome]) => ({ nome, d: f[k] })).filter(x => x.d && x.d.rvol != null);
+    if (!voci.length) return null;
+    const max = Math.max(...voci.map(x => Number(x.d.rvol)));
+    const stato = f.alert ? "EUFORIA: volumi anomali sugli ETF a leva, il retail sta rincorrendo"
+      : max < 1 ? "CALMA: sugli ETF a leva si scambia MENO della media"
+      : "NORMALE: volumi in linea con la media";
+    return {
+      g: scala(max, { min: 0, max: 3, unita: "×", aria: "schiuma ETF leva",
+          zone: [{ da: 0, a: 1, nome: "sotto la media", colore: "var(--green)" },
+                 { da: 1, a: 2.5, nome: "sopra la media", colore: "var(--yellow)" },
+                 { da: 2.5, a: 3, nome: "euforia", colore: "var(--red)" }],
+          soglie: [{ v: 1, testo: "volume = media" }],
+          fonte: "la soglia 2,5× e' quella con cui la pipeline stessa accende l'allarme; l'1× e' il volume medio a 30 sedute" }),
+      n: `<b>${stato}.</b> ` + voci.map(x =>
+            `${x.nome}: volume ${fmtNum.format(x.d.rvol)}× la media${x.d.chg_5d_pct != null ? `, prezzo ${signTxt(x.d.chg_5d_pct)} in 5 sedute` : ""}`).join(" · ")
+        + `. Come si legge: sono ETF che moltiplicano per tre il movimento giornaliero — li compra chi vuole scommettere in fretta, quindi il loro volume misura quanta fretta c'e' in giro. `
+        + `Il numero e' un RAPPORTO: 1 significa "come sempre", 2,5 significa "due volte e mezza il normale". Quello che conta e' volume alto INSIEME a prezzo in salita: e' la firma della rincorsa.`,
+    };
+  },
+
+  /* ═══ v265 — PUT/CALL: VIA I TICKER, DENTRO IL GRAFICO ═════════════════════════════════════
+     Il CEO me l'ha chiesto DUE volte e la prima non l'ho fatto. Peggio: gli avevo risposto che
+     era gia' a posto, dopo aver guardato `macro.putcall` in data.json — che in effetti e' solo
+     SPY. Ma la SCHEDA non mostra quello: mostra il pannello, e il pannello aggiunge una tabella
+     dei muri di opzioni con tutti e dodici i titoli del vecchio portafoglio. Ho controllato il
+     DATO invece dello SCHERMO, e ho dichiarato risolto un problema che lui vedeva ancora.
+     E' l'errore che questo progetto documenta da versioni — misurare in browser, non dedurre —
+     fatto proprio mentre lo raccontavo.
+     Ora la scheda ha una forma sua e non pesca piu' dal pannello: due barre a confronto (put e
+     call) piu' la scala del rapporto con le sue zone. Il rapporto e' sull'ETF dell'S&P 500, che
+     e' l'indice: e' la forma macro che il CEO ha chiesto ("porta i dati su una forma macro es.
+     nasdaq e S&P"), ed e' corretta — il put/call di un singolo titolo dice del titolo, quello
+     sull'indice dice del mercato. */
+  putcall: (m) => {
+    const pc = m.putcall; if (!pc || pc.ratio == null) return null;
+    const put = Number(pc.puts) || 0, call = Number(pc.calls) || 0;
+    const tot = put + call;
+    const r = Number(pc.ratio);
+    const stato = r >= 1.2 ? "COPERTURA PESANTE: prevalgono le put, il mercato si sta assicurando"
+      : r <= 0.8 ? "COMPIACENZA: prevalgono le call, poca copertura in giro"
+      : "EQUILIBRIO: put e call si bilanciano";
+    const barre = tot > 0 ? barreOrdinate([
+      { nome: "PUT (copertura, scommessa al ribasso)", valore: Math.round(put / tot * 1000) / 10,
+        testo: `${fmtNum.format(put)} · ${Math.round(put / tot * 100)}%`, colore: "var(--red)" },
+      { nome: "CALL (scommessa al rialzo)", valore: Math.round(call / tot * 1000) / 10,
+        testo: `${fmtNum.format(call)} · ${Math.round(call / tot * 100)}%`, colore: "var(--green)" },
+    ], { nota: "volumi sulle prime due scadenze" }) : "";
+    return {
+      g: scala(r, { min: 0.5, max: 1.6, unita: "", aria: "put/call",
+          zone: [{ da: 0.5, a: 0.8, nome: "compiacenza", colore: "var(--red)" },
+                 { da: 0.8, a: 1.2, nome: "equilibrio", colore: "var(--muted)" },
+                 { da: 1.2, a: 1.6, nome: "copertura pesante", colore: "var(--green)" }],
+          fonte: "bande di lettura convenzionali sul rapporto put/call; il valore viene dai volumi reali" })
+        + barre,
+      n: `<b>${stato}.</b> Rapporto ${fmtNum.format(r)} sulle opzioni dell'ETF che replica l'S&P 500 — quindi parla del MERCATO, non di un titolo. `
+        + `Come si legge: agli estremi si legge al contrario. Copertura pesante significa che tanti si sono gia' protetti, e chi e' protetto non e' costretto a vendere in fretta; `
+        + `compiacenza significa che nessuno si e' assicurato, e una sorpresa negativa trova tutti scoperti.`,
+    };
+  },
+
   /* ═══ v262 — L'AMPIEZZA NELLA FORMA CHE IL CEO SA LEGGERE ═════════════════════════════════
      Ha chiesto: "il dato ed il grafico deve essere più immediato e se non lo ritieni essenziale
      eliminalo". E poi ha detto la cosa che risolve il problema: "i grafici termometri di stress
@@ -3300,16 +3387,11 @@ const FORMA_INDICATORE = {
         fonte: "bande di sola lettura: la regola di Sahm guarda la SALITA, non il livello, e il file non ha la media a 3 mesi" }),
       n: `Disoccupazione ${u.value}${n2 ? ` · nuovi posti ${n2.value}` : ""} · rilevazione ${u.date}. <b>Come si legge:</b> conta la DIREZIONE più del livello. La regola di Sahm dice che quando la media a 3 mesi sale di mezzo punto sopra il minimo dell'anno la recessione è già cominciata — il livello assoluto è ancora basso quando il segnale scatta, ed è per questo che si guarda la salita, non il valore.` };
   },
-  froth: (m) => {
-    const f = m.froth; if (!f || !f.soxl) return null;
-    const righe = [["SOXL — semi 3×", f.soxl], ["TQQQ — Nasdaq 3×", f.tqqq]].filter(([, x]) => x && x.rvol != null)
-      .map(([nome, x]) => ({ nome, valore: x.rvol, colore: x.rvol >= 2.5 ? "var(--red)" : x.rvol >= 1.5 ? "var(--yellow)" : "var(--green)",
-                             testo: `RVol ${fmtNum.format(x.rvol)}× · ${signTxt(x.chg_5d_pct)} in 5 sedute` }));
-    if (!righe.length) return null;
-    return { g: tachimetro(punteggioDi("froth"), { aria: "schiuma speculativa", zone: ZONE_PUNTEGGIO,
-        fonte: "bande di lettura convenzionali sul punteggio 0-100 del sistema" }) + barreOrdinate(righe, {}),
-      n: `<b>Come si legge:</b> sono ETF a leva tripla, comprati quasi solo dal retail per scommettere in fretta. Volumi molto sopra la media MENTRE il prezzo sale sono euforia speculativa, che storicamente precede le correzioni; volumi alti mentre il prezzo scende sono invece capitolazione, che è l'opposto. L'allarme scatta sopra 2,5× con prezzo in salita: oggi ${f.alert ? "è attivo" : "non è attivo"}.` };
-  },
+  /* v265 — la vecchia `froth` e' stata sostituita da quella con la scala centrata su 1, piu'
+     in alto nell'oggetto. ⚠ SECONDA VOLTA in due versioni che due chiavi uguali in un oggetto
+     letterale mi fanno perdere un giro: l'ultima sovrascrive la prima IN SILENZIO, quindi la
+     mia versione nuova sembrava non funzionare. Era gia' successo con `breadth` in v262.
+     Ora c'e' un check che conta le chiavi duplicate in FORMA_INDICATORE. */
 };
 /* le barre dei fattori di un composito: e' cio' che mostrava "Da cosa nascono i punteggi", ora
    dentro la scheda del suo indicatore invece che in un blocco separato che ne ripeteva i nomi */
@@ -3364,6 +3446,21 @@ function registraImpaccamento() {
   });
 }
 
+/* v265 — spezza la nota di una scheda in "sempre visibile" + "a scomparsa".
+   Il confine e' la frase "Come si legge:", che questo progetto usa gia' dal v238 per separare
+   il dato dalla sua lettura. Null-safe: nota vuota → stringa vuota, niente contenitori a vuoto. */
+function notaConDettaglio(nota, cadenza) {
+  const testo = String(nota || "");
+  const cad = cadenza ? `<div class="mg-cad muted">${esc(cadenza)}</div>` : "";
+  const i = testo.search(/<b>Come si legge:?<\/b>|Come si legge:/i);
+  if (i < 0) return testo + cad;
+  const sopra = testo.slice(0, i).trim();
+  const sotto = testo.slice(i).trim();
+  return sopra
+    + `<details class="mg-piu"><summary>Come si legge</summary><div>${sotto.replace(/^(<b>)?Come si legge:?(<\/b>)?\s*/i, "")}</div></details>`
+    + cad;
+}
+
 function renderIndicatori() {
   const box = $("#mg-tutti"); if (!box) return;
   const nota = $("#mg-tutti-note");
@@ -3404,7 +3501,16 @@ function renderIndicatori() {
       cls: clsScore(r.score), grafico: g,
       /* v250 — sotto ogni card macro, la riga di cadenza: rilevazione, età, prossimo atteso.
          Sta in FONDO e in piccolo: è contesto sul dato, non il dato. */
-      n: (forma ? forma.n : esc(r.sub || "")) + (r.cadenza ? `<div class="mg-cad muted">${esc(r.cadenza)}</div>` : ""),
+      /* ⚠ v265 — LA GUIDA DI LETTURA VA A SCOMPARSA. Il CEO: "tutte le info e le guide di
+         lettura dei dati macro potremmo inserire a scomparsa e lasciare visualizzabili solo
+         poche righe di interpretazione del dato".
+         Il taglio non e' arbitrario: si spezza sulla frase "Come si legge", che e' il confine
+         gia' esistente fra il FATTO (cosa dice il numero adesso) e la SPIEGAZIONE (cos'e' quel
+         numero e attraverso quale canale arriva ai mercati). Il fatto resta sempre visibile, la
+         spiegazione si apre a richiesta. Dove quella frase non c'e', si tiene tutto visibile
+         invece di tagliare a una lunghezza fissa — un troncamento a caratteri spezzerebbe le
+         frasi a meta'. */
+      n: notaConDettaglio(forma ? forma.n : esc(r.sub || ""), r.cadenza),
       tk: conPan.has(r.k) ? r.k : null, id: r.k });
   }).join("")}</div>`;
   agganciaTessere(box);
@@ -6507,7 +6613,11 @@ function montaGraficoTV(tk, intervallo) {
      le barre del volume sul fondo, e io avevo aggiunto ANCHE lo studio "STD;Volume" — quindi
      due pannelli di volume, uno sopra l'altro. Tolto lo studio; le barre native restano. */
   if (nota) {
-    nota.innerHTML = `<div class="tv-legenda">
+    /* v265 — LEGENDA A SCOMPARSA, su richiesta del CEO ("info grafico tradingview a scomparsa
+       con tasto per farle riapparire"). Il <details> nativo fa esattamente questo e non ha
+       bisogno di stato da mantenere: si apre, si chiude, e il browser ricorda la posizione
+       finche' la pagina vive. Chiuso di default — chi sa gia' cos'e' un RSI non deve scorrerlo. */
+    nota.innerHTML = `<details class="tv-piu"><summary>Come si legge il grafico — indicatori, colori, barra laterale</summary><div class="tv-legenda">
       <div><b>Candele</b><span>Ogni candela e' una seduta: il corpo va da apertura a chiusura, i fili sono massimo e minimo. <b class="tv-verde">Verde</b> = ha chiuso sopra l'apertura, <b class="tv-rosso">rossa</b> = sotto. Corpi lunghi = giornata decisa, corpi corti con fili lunghi = incertezza.</span></div>
       <div><b>Volume</b><span>Le barre in basso: quante azioni sono passate di mano. La regola che conta e' il CONFRONTO — un movimento con volume sopra la media e' stato fatto da molti e regge; lo stesso movimento con volume basso e' fragile. Anche le barre del volume sono verdi o rosse come la loro seduta.</span></div>
       <div><b class="tv-blu">SMA blu</b><span>Media semplice: il prezzo "normale" delle ultime N sedute, dove ogni giorno pesa uguale. Prezzo sopra la linea = tendenza intatta; sotto = tendenza in discussione. E' il livello che tanti guardano, quindi spesso fa da appoggio.</span></div>
@@ -6519,6 +6629,7 @@ function montaGraficoTV(tk, intervallo) {
       <div><b>Barra in alto</b><span>Il campo con la lente cambia titolo; i numeri (1m, 30m, 1h, D) cambiano l'unita' di ogni candela — su D ogni candela e' una giornata, su 1h un'ora; il bottone "Indicatori" apre il catalogo, dove puoi aggiungerne altri (nel piano gratuito ne convivono pochi per grafico: se ne aggiungi troppi TradingView toglie i primi).</span></div>
       <div><b>In basso a destra</b><span>Le date, e il selettore dell'intervallo visibile (1G, 5G, 1M, 6M, 1A, 5A, Tutto). L'intervallo visibile NON cambia il calcolo degli indicatori: una media a 200 giorni resta a 200 giorni anche se guardi un mese.</span></div>
     </div>
+    </div></details>
     ${String(tk).includes(".") ? `<div class="tv-piede">⚠ "${esc(tk)}" ha un suffisso di borsa alla Yahoo: TradingView usa una nomenclatura diversa e il simbolo potrebbe non agganciarsi — scrivilo come lo vedi su TradingView (per esempio <code>EURONEXT:ASML</code>).</div>` : ""}`;
   }
 

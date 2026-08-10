@@ -1901,3 +1901,17 @@ svg.g-serie { cursor: crosshair; }
 .tv-blu { color: #2962ff; } .tv-arancio { color: #ff9800; } .tv-viola { color: #7e57c2; }
 .tv-piede { margin-top: 8px; font-size: 12px; color: var(--muted); }
 @media (max-width: 560px) { .tv-legenda > div, .tv-legenda-lat > div { grid-template-columns: 1fr; gap: 2px; } }
+
+/* v265 — "a scomparsa": il fatto resta, la spiegazione si apre. Niente animazioni, niente
+   frecce disegnate a mano: il <details> nativo è accessibile da tastiera e non ha stato da
+   mantenere. */
+.mg-piu, .tv-piu { margin-top: 6px; }
+.mg-piu > summary, .tv-piu > summary { cursor: pointer; font-size: 11.5px; color: var(--muted);
+  list-style: none; padding: 3px 0; user-select: none; }
+.mg-piu > summary::-webkit-details-marker, .tv-piu > summary::-webkit-details-marker { display: none; }
+.mg-piu > summary::before, .tv-piu > summary::before { content: "▸ "; }
+.mg-piu[open] > summary::before, .tv-piu[open] > summary::before { content: "▾ "; }
+.mg-piu > summary:hover, .tv-piu > summary:hover { color: var(--text); }
+.mg-piu > div { font-size: 11.5px; line-height: 1.5; color: var(--muted); padding-left: 8px;
+  border-left: 2px solid var(--border); margin-top: 4px; }
+.tv-piu > summary { font-size: 12.5px; padding: 6px 0; }

@@ -704,18 +704,23 @@ check("v257 watchlist: senza token il salvataggio e' locale E LO DICHIARA", (() 
 })());
 
 /* ── v258 — i componenti di Fear & Greed hanno una scheda propria, senza duplicare ── */
-check("v258 F&G: i componenti diventano schede a se', e quelli gia' presenti NON si duplicano", suVeri(`
-  const tutti = indicatoriClassifica();
-  const nuovi = tutti.filter(x => String(x.k).startsWith("fg:"));
-  if (!nuovi.length) return false;                       // i dati veri hanno 7 componenti
-  const nomi = tutti.map(x => x.nome.toLowerCase());
-  const dupVix = nomi.filter(n => /\\bvix\\b/.test(n)).length;
-  const dupPC  = nomi.filter(n => /put\\/call/.test(n)).length;
-  return dupVix === 1 && dupPC === 1 && nuovi.every(x => Number.isFinite(x.score) && x.cadenza)`));
+/* ⚠ v265 — INVARIANTE ROVESCIATO. In v258 avevo promosso i sette componenti di Fear & Greed a
+   schede proprie. Il CEO ne ha poi chiesta la rimozione uno per uno — "Momentum S&P 500" e
+   "Domanda bond high yield" perche' duplicavano altre schede, "Forza dei prezzi" e "Domanda beni
+   rifugio" per scelta sua — e di VIX, Put/Call e Ampiezza non ne erano mai nate perche' gia'
+   presenti. Risultato: di quella promozione non resta niente, ed e' giusto cosi'.
+   Il check ora presidia il TAGLIO e la cosa che conta davvero: che nessuna grandezza compaia
+   DUE volte fra le schede, che era il difetto che il CEO ha dovuto segnalarmi due volte. */
+check("v265 nessuna grandezza compare due volte fra le schede", suVeri(`
+  const nomi = indicatoriClassifica().map(x => x.nome.toLowerCase());
+  /* ⚠ niente regex con la barra: dentro un template literal passato a vm il "/" della classe
+     put/call chiude il letterale. Si contano sottostringhe. */
+  const conta = (t) => nomi.filter(n => n.indexOf(t) >= 0).length;
+  return conta("vix") <= 1 && conta("put") <= 1 && conta("credito") <= 1
+      && conta("curva") <= 1 && conta("momentum") <= 1 && conta("ampiezza") <= 1`));
 
-check("v258 F&G: ogni scheda nuova dichiara di essere un componente, non un indicatore autonomo", suVeri(`
-  const nuovi = indicatoriClassifica().filter(x => String(x.k).startsWith("fg:"));
-  return nuovi.length > 0 && nuovi.every(x => /componente di Fear & Greed/.test(x.sub || ""))`));
+check("v265 i componenti di Fear & Greed non sono piu' schede a se' (richiesta CEO)", suVeri(`
+  return indicatoriClassifica().every(x => String(x.k).indexOf("fg:") !== 0)`));
 
 /* ── v258 — la spiegazione del popup vive anche nella scheda ── */
 check("v258 il contenuto del popup esce nella scheda, prosa compresa", (() => {
@@ -776,16 +781,19 @@ check("v261 barra vecchia: la scheda dichiara la CHIUSURA e non spaccia il run p
   const vecchia = "2026-08-07";
   DATA.portfolio.forEach(r => { r.price_asof = vecchia; });
   (DATA.watchlist || []).forEach(r => { r.price_asof = vecchia; });
-  const r = rigaFreschezzaMercato(DATA.macro && DATA.macro.vix);
+  const r = rigaFreschezzaMercato(DATA.macro && DATA.macro.froth);
   /* ⚠ l'apostrofo di "non e' un dato nuovo" chiude la stringa quando il check viene passato a
      vm dentro un template literal: si cerca il pezzo senza apostrofi. */
-  return /CHIUSURA DEL 07.08/.test(r) && /un dato nuovo/.test(r) && /2 giorni fa/.test(r)`));
+  /* ⚠ la prima stesura asseriva "2 giorni fa": e' andata rossa da sola appena la data e'
+     cambiata. E' la classe v233 — un check che misura i dati del giorno invece della
+     PROPRIETA'. Ora verifica che l'eta' sia dichiarata, non quale sia. */
+  return /CHIUSURA DEL 07.08/.test(r) && /un dato nuovo/.test(r) && /giorn[oi] fa/.test(r)`));
 
 check("v261 barra di oggi: NESSUN falso allarme (il ramo non scatta quando non serve)", suVeri(`
   const oggi = new Date().toISOString().slice(0, 10);
   DATA.portfolio.forEach(r => { r.price_asof = oggi; });
   (DATA.watchlist || []).forEach(r => { r.price_asof = oggi; });
-  const r = rigaFreschezzaMercato(DATA.macro && DATA.macro.vix);
+  const r = rigaFreschezzaMercato(DATA.macro && DATA.macro.froth);
   return !/CHIUSURA DEL/.test(r) && /si aggiorna a ogni run/.test(r)`));
 
 check("v261 l'asof DICHIARATO dalla pipeline vince sulla data dedotta", suVeri(`
@@ -846,6 +854,27 @@ check("v264 i campanelli accesi sono NOMINATI (cinque sul credito non sono cinqu
   const riga = buildPrompt().split(NL).find(l => l.indexOf("Signposts") >= 0);
   const attesi = ((DATA.macro.signposts || {}).items || []).filter(x => x && x.status === true).length;
   return !riga || attesi === 0 || riga.indexOf("accesi:") > 0`));
+
+/* ── ⚠ v265 — DUE CHIAVI UGUALI IN FORMA_INDICATORE: l'ultima vince IN SILENZIO ──
+   Mi e' costato un giro due volte in due versioni (breadth in v262, froth in v265): scrivevo
+   una forma nuova, la pagina mostrava ancora la vecchia, e sembrava che il codice nuovo non
+   girasse. JavaScript non da' nessun errore su una chiave duplicata in un oggetto letterale.
+   Il check lo trasforma in un fallimento rumoroso. */
+{
+  const appF = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i0 = appF.indexOf("const FORMA_INDICATORE = {");
+  let d = 0, j = i0, fine = i0;
+  for (; j < appF.length; j++) {
+    if (appF[j] === "{") d++;
+    else if (appF[j] === "}") { d--; if (d === 0) { fine = j; break; } }
+  }
+  const corpo = appF.slice(i0, fine).replace(/\/\*[\s\S]*?\*\//g, "");
+  const chiavi = [...corpo.matchAll(/^\s{2}("?[\w:.-]+"?):\s*\(m\)/gm)].map(m => m[1].replace(/"/g, ""));
+  const dup = chiavi.filter((k, n) => chiavi.indexOf(k) !== n);
+  check("v265 FORMA_INDICATORE non ha chiavi duplicate (l'ultima vincerebbe in silenzio)",
+    chiavi.length > 5 && dup.length === 0);
+  if (dup.length) console.log("  ⚠ chiavi duplicate:", [...new Set(dup)].join(", "));
+}
 
 /* ── il wiring: nessun accesso non protetto a un elemento che non esiste ── */
 {
