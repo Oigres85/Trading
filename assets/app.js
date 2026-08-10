@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "281";
+const BUILD_VERSION = "282";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7511,9 +7511,30 @@ $("#btn-copy")?.addEventListener("click", async () => {
 const sellPriceOv = {};   // prezzo di vendita inserito a mano per ticker (override del prezzo di mercato)
 const sellQtyOv = {};     // quantità da vendere digitate: sopravvivono a un eventuale re-render
 
+/* ═══ v282 — LE POSIZIONI LE INSERISCE LUI ═════════════════════════════════════════════════
+   Il CEO: "no, inserirò io i dati". Verificato che fosse possibile, e per meta' non lo era:
+   il Calcolatore PMC ha campi numerici liberi (il menu' precompila e basta), ma il Calcolo
+   vendite costruiva la tabella SOLO da DATA.portfolio — "Le tue posizioni sono gia' caricate".
+   Da v272 la pipeline non produce piu' posizioni: quello strumento stava per diventare una
+   tabella vuota senza modo di metterci niente dentro, cioe' la sua frase non sarebbe stata
+   eseguibile.
+   Le righe manuali vivono in localStorage (sono sue, non del sistema) e si sommano a quello
+   che il file eventualmente porta ancora — il BTP, per esempio. Non c'e' scrittura sul repo:
+   sono dati di una simulazione, non un portafoglio da sincronizzare. */
+const SELL_KEY = "vendite_manuali";
+function sellManuali() {
+  try {
+    const a = JSON.parse(localStorage.getItem(SELL_KEY) || "[]");
+    return Array.isArray(a) ? a.filter(r => r && r.ticker && r.qty > 0 && r.pmc > 0) : [];
+  } catch { return []; }
+}
+function salvaSellManuali(a) {
+  try { localStorage.setItem(SELL_KEY, JSON.stringify(a)); } catch { /* modalita' privata */ }
+}
+
 function sellRows() {
   const eur = DATA.eurusd || 1.08;
-  return DATA.portfolio.map(r => {
+  return [...(DATA.portfolio || []), ...sellManuali()].map(r => {
     const toEur = r.currency === "EUR" ? 1 : 1 / eur;
     const price = sellPriceOv[r.ticker] != null ? sellPriceOv[r.ticker] : r.price;   // override manuale
     const plPerShare = (price - r.pmc) * toEur;   // utile/perdita per azione in €
@@ -7538,6 +7559,49 @@ function renderSellCalc() {
       <td class="num sell-pl" data-tk="${r.ticker}">—</td>
     </tr>`;
   }).join("");
+  /* v282 — la riga per aggiungere una posizione a mano, in coda alla tabella. Il ✕ toglie
+     solo quelle manuali: quelle che arrivano dal file non sono sue da cancellare qui. */
+  const corpo = $("#sell-table tbody");
+  if (corpo) {
+    const manuali = new Set(sellManuali().map(r => r.ticker));
+    corpo.querySelectorAll("tr[data-tk]").forEach(tr => {
+      if (!manuali.has(tr.dataset.tk)) return;
+      const ultima = tr.querySelector("td:last-child");
+      if (ultima) ultima.insertAdjacentHTML("beforeend",
+        ` <button class="sell-del" data-tk="${esc(tr.dataset.tk)}" title="Togli questa riga">×</button>`);
+    });
+    corpo.insertAdjacentHTML("beforeend", `<tr class="sell-nuova">
+      <td class="name-cell"><input type="text" id="sn-tk" placeholder="TICKER" spellcheck="false"
+          autocapitalize="characters" style="width:92px" aria-label="Simbolo"></td>
+      <td class="num"><input type="number" id="sn-qty" placeholder="quantità" min="0" step="any" style="width:80px" aria-label="Quantità possedute"></td>
+      <td class="num"><input type="number" id="sn-pmc" placeholder="PMC" min="0" step="any" style="width:80px" aria-label="Prezzo medio di carico"></td>
+      <td class="num"><input type="number" id="sn-px" placeholder="prezzo" min="0" step="any" style="width:80px" aria-label="Prezzo attuale"></td>
+      <td class="num" colspan="2"><button class="btn btn-ghost btn-sm" id="sn-add">+ Aggiungi</button>
+        <span class="muted sn-nota">valuta: EUR se il ticker finisce per .MI o è un BTP, altrimenti USD</span></td>
+    </tr>`);
+    $("#sn-add")?.addEventListener("click", () => {
+      const tk = String($("#sn-tk")?.value || "").trim().toUpperCase();
+      const qty = parseFloat($("#sn-qty")?.value), pmc = parseFloat($("#sn-pmc")?.value);
+      const px = parseFloat($("#sn-px")?.value);
+      if (!tk || !(qty > 0) || !(pmc > 0)) { toast("Servono ticker, quantità e PMC"); return; }
+      /* ⚠ la valuta decide la conversione in € e la tassa: sbagliarla falserebbe il risultato
+         netto. Si deduce dal simbolo, e la regola e' scritta accanto al campo invece di essere
+         indovinata in silenzio. */
+      const eur = /\.MI$/.test(tk) || /^BTP/.test(tk);
+      const a = sellManuali().filter(r => r.ticker !== tk);
+      a.push({ ticker: tk, name: tk, qty, pmc, price: Number.isFinite(px) && px > 0 ? px : pmc,
+               currency: eur ? "EUR" : "USD", manuale: true });
+      salvaSellManuali(a);
+      renderSellCalc();
+      computeSell();
+    });
+    corpo.querySelectorAll(".sell-del").forEach(b => b.addEventListener("click", () => {
+      salvaSellManuali(sellManuali().filter(r => r.ticker !== b.dataset.tk));
+      delete sellQtyOv[b.dataset.tk]; delete sellPriceOv[b.dataset.tk];
+      renderSellCalc(); computeSell();
+    }));
+  }
+
   document.querySelectorAll(".sell-in").forEach(i => i.addEventListener("input", () => {
     const v = parseFloat(i.value);
     if (v > 0) sellQtyOv[i.dataset.tk] = i.value; else delete sellQtyOv[i.dataset.tk];

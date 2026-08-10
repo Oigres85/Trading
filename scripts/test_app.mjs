@@ -1606,6 +1606,33 @@ check("v281 ETF: la sezione e' nella catena di render e ha il suo posto in pagin
       && html6.includes('id="etf-lungo-tab"') && html6.includes('id="etf-lungo-grafico"');
 })());
 
+/* ══ v282 — "INSERIRO' IO I DATI" DEVE ESSERE POSSIBILE ══════════════════════════════════
+   Il CEO ha scelto di inserire a mano le posizioni invece di farmi ricollegare gli strumenti al
+   portafoglio. Verificando che fosse fattibile ho trovato che per meta' non lo era: il
+   Calcolatore PMC ha campi liberi, ma il Calcolo vendite costruiva la tabella SOLO da
+   DATA.portfolio — e da v272 la pipeline non produce piu' posizioni. Stava per diventare una
+   tabella vuota senza modo di metterci niente dentro: la sua frase non sarebbe stata
+   eseguibile. Non e' una funzionalita' in piu', e' cio' che serve perche' la sua scelta stia
+   in piedi. */
+check("v282 vendite: si puo' inserire una posizione a mano, e resta salvata", run(`
+  const salva = DATA.portfolio;
+  DATA.portfolio = [];
+  const prima = sellRows().length;
+  localStorage.setItem("vendite_manuali", JSON.stringify(
+    [{ ticker: "ZZAPL", name: "ZZAPL", qty: 100, pmc: 150, price: 220, currency: "USD", manuale: true }]));
+  const dopo = sellRows();
+  localStorage.removeItem("vendite_manuali");
+  DATA.portfolio = salva;
+  return prima === 0 && dopo.length === 1 && dopo[0].ticker === "ZZAPL" && dopo[0].plPerShare > 0`));
+
+/* ⚠ la valuta decide conversione e aliquota: una riga manuale in EUR tassata al 26% invece che
+   al 12,5%, o convertita quando non va convertita, falserebbe il netto. */
+check("v282 vendite: la valuta di una riga manuale si deduce dal simbolo, non si presume", (() => {
+  const i = src.indexOf('$("#sn-add")?.addEventListener');
+  const corpo = src.slice(i, i + 1400);
+  return /\.MI\$\/\.test\(tk\)/.test(corpo) && /currency: eur \? "EUR" : "USD"/.test(corpo);
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
