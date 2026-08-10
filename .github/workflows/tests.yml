@@ -21,18 +21,6 @@ jobs:
           node --check assets/app.js
           node scripts/test_app.mjs
 
-      # AUTOCONTROLLO (v277, gate HARD): guarda il SISTEMA, non i dati. Nasce da due errori
-      # fatti nello stesso giorno che NESSUN gate ha preso, perche' tutti gli altri controllano
-      # il prodotto e nessuno l'operazione che lo modifica:
-      #   · quattro funzioni DUPLICATE da una rimozione (in JS la seconda vince in silenzio:
-      #     il file girava e 120 check passavano);
-      #   · una suite tagliata a meta' che usciva 0 SENZA STAMPARE NIENTE — verde per assenza
-      #     di test. Questo gate esegue ogni suite e pretende che parli.
-      # Sta DOPO test_app perche' lo esegue a sua volta, e separato perche' una delle cose che
-      # sorveglia e' che le suite non vengano svuotate.
-      - name: Autocontrollo del sistema (duplicati, suite vive, riferimenti orfani)
-        run: node scripts/self_check.mjs
-
       # VERIFICA SORGENTI (v278): sintassi di ogni file sorgente. E' l'ultima rete dopo l'hook
       # pre-commit — che pero' vive sulla macchina di chi committa, quindi qui si ricontrolla.
       - name: Verifica sintassi dei sorgenti
@@ -52,3 +40,23 @@ jobs:
       - run: pip install -r scripts/requirements.txt
       - name: Test funzioni pure pipeline (offline)
         run: python scripts/test_update_data.py
+
+      # ⚠ v285 — L'AUTOCONTROLLO STA QUI, DOPO PYTHON, E NON PRIMA. Da v277 era il primo passo
+      # dopo i test JS: ma self_check ESEGUE tutte le suite, compresa test_update_data.py che
+      # importa numpy e pandas — e a quel punto del workflow `setup-python` e `pip install` non
+      # erano ancora girati. Risultato: la suite falliva per una dipendenza assente, e
+      # l'autocontrollo la segnalava come "non passa". LA CI E' STATA ROSSA PER OTTO VERSIONI
+      # (v277→v284) e me l'ha dovuto dire il CEO: ho spinto senza mai guardare l'esito.
+      # Un gate che esegue altri gate va messo dove tutte le loro dipendenze esistono gia'.
+      # AUTOCONTROLLO (v277, gate HARD): guarda il SISTEMA, non i dati. Nasce da due errori
+      # fatti nello stesso giorno che NESSUN gate ha preso, perche' tutti gli altri controllano
+      # il prodotto e nessuno l'operazione che lo modifica:
+      #   · quattro funzioni DUPLICATE da una rimozione (in JS la seconda vince in silenzio:
+      #     il file girava e 120 check passavano);
+      #   · una suite tagliata a meta' che usciva 0 SENZA STAMPARE NIENTE — verde per assenza
+      #     di test. Questo gate esegue ogni suite e pretende che parli.
+      # Sta DOPO test_app perche' lo esegue a sua volta, e separato perche' una delle cose che
+      # sorveglia e' che le suite non vengano svuotate.
+      - name: Autocontrollo del sistema (duplicati, suite vive, riferimenti orfani)
+        run: node scripts/self_check.mjs
+

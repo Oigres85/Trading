@@ -166,7 +166,13 @@ for (const s of SUITE) {
     codice = e.status == null ? 1 : e.status;
   }
   check(`${s.file}: stampa un rapporto invece di uscire in silenzio`, s.firma.test(uscita));
-  check(`${s.file}: passa`, codice === 0);
+  /* ⚠ v285 — SI DICE PERCHE' NON PASSA. Per otto versioni la CI e' stata rossa perche' questo
+     passo girava PRIMA di `pip install`: test_update_data.py non trovava numpy, e il log
+     diceva solo "non passa" — vero e inservibile. Un gate che fallisce senza spiegare costringe
+     chi legge a rifare da capo la diagnosi, e nel mio caso mi ha fatto ignorare il rosso per
+     otto push. Se la causa e' una dipendenza assente, ora si legge nel titolo del check. */
+  const manca = (uscita.match(/(?:ModuleNotFoundError|ImportError)[^\n]*/) || [])[0];
+  check(`${s.file}: passa` + (manca && codice !== 0 ? ` — ${manca.slice(0, 90)}` : ""), codice === 0);
 }
 
 /* ⚠ v283 — FUNZIONI DEFINITE E MAI RICHIAMATE. Il controllo speculare a quello sopra: li'
