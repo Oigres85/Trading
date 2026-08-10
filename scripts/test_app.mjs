@@ -1133,6 +1133,121 @@ check("v266 watchlist: i simboli senza dato restano in fondo in tutti e due i ve
   return /Number\.isFinite\(a\[col\.k\]\)/.test(corpo) && !/-Infinity/.test(corpo);
 })());
 
+/* ⚠ v266 — LA LEGENDA DEL GRAFICO SPIEGA GLI INDICATORI, NON I BOTTONI DI TRADINGVIEW. Il
+   CEO: "elimina info barra laterale (sinistra, alto e destra) mentre spiega meglio gli altri
+   indicatori presenti perche' cosi non li capisco". Le voci sul cromo dell'interfaccia
+   descrivevano dove si clicca — cosa che si scopre cliccando — e rubavano spazio a cio' che
+   davvero non si indovina: cosa vuol dire un numero. */
+check("v266 grafico: la legenda non descrive piu' la barra laterale, in alto e in basso a destra", (() => {
+  const i = src.indexOf('<details class="tv-piu">');
+  const fine = src.indexOf("</details>", i);
+  const leg = src.slice(i, fine);
+  return !/Barra laterale|Barra in alto|In basso a destra/.test(leg);
+})());
+
+check("v266 grafico: candele, volume, SMA, EMA e RSI restano spiegati", (() => {
+  const i = src.indexOf('<details class="tv-piu">');
+  const leg = src.slice(i, src.indexOf("</details>", i));
+  return ["Candele", "Volume", "SMA blu", "EMA arancio", "RSI"].every(x => leg.includes(x));
+})());
+
+/* ⚠ v266 — la spiegazione deve dire cosa fare del numero, non solo cos'e'. Le trappole sono la
+   parte che il CEO non poteva indovinare: l'RSI che non e' un segnale di vendita, la media a 9
+   che e' corta, il volume che vale solo nel confronto. */
+check("v266 grafico: la legenda porta le trappole, non solo le definizioni", (() => {
+  const i = src.indexOf('<details class="tv-piu">');
+  const leg = src.slice(i, src.indexOf("</details>", i));
+  return /NON e' un segnale di acquisto o di vendita/.test(leg)
+      && /media <b>corta<\/b>/.test(leg)
+      && /CONFRONTO con le barre vicine/.test(leg);
+})());
+
+/* ⚠ v266 — chi disegna al montaggio deve ridisegnare all'arrivo dei dati: il montaggio precede
+   sempre il fetch. Vale per la watchlist e vale per la striscia dei livelli, che ha ripetuto lo
+   stesso difetto nella stessa versione. */
+check("v266 grafico: la striscia dei livelli si ridisegna quando arrivano i dati", (() => {
+  const i = src.indexOf("function renderAll()");
+  return /renderOpzioniGrafico\(/.test(src.slice(i, src.indexOf("\nfunction ", i + 1)));
+})());
+
+/* ⚠ v266 — UNA FUSIONE VERSO UNA TESSERA ESCLUSA CANCELLAVA IL DATO. `in:curve` non si mostra
+   (è già un termometro di stress, v265): fondere `in:curve3m` dentro di lei toglieva il 10A-3M
+   dalla lista e poi il filtro toglieva anche l'ospite. Il dato spariva del tutto, in silenzio. */
+check("v266 fusioni: il secondario sopravvive se il primario non viene mostrato", run(`
+  const saved = DATA.macro.indicators;
+  DATA.macro.indicators = (saved || []).concat([
+    { key: "curve3m", label: "Curva 10A-3M", value: "+0.78 pp", date: "2026-08-07", impact: 81 }]);
+  const k = indicatoriClassifica().map(x => x.k);
+  DATA.macro.indicators = saved;
+  return k.includes("in:curve3m")`));
+
+/* ⚠ v266 — IL FUSO ORARIO SPOSTAVA INDIETRO LA DATA ATTESA. Le date si costruiscono a
+   mezzanotte locale, che a Roma è il giorno prima in UTC: toISOString() tornava indietro di un
+   giorno e una serie giornaliera appena pubblicata usciva con "ERA ATTESO E NON È ARRIVATO". */
+/* ⚠ si misura la PROPRIETA' (il prossimo cade dopo la rilevazione e non e' un sabato), non la
+   distanza da oggi: un check ancorato al calendario diventa rosso da solo quando gira la data —
+   errore gia' fatto in questo progetto e ripetuto scrivendo questo. */
+check("v266 cadenza: il prossimo atteso di una serie giornaliera cade DOPO la rilevazione", run(`
+  const c = cadenzaDato("t30", "2026-08-06");
+  if (!c || !(c.prossimo > "2026-08-06")) return false;
+  const g = new Date(c.prossimo + "T12:00:00").getDay();
+  return g !== 0 && g !== 6`));
+
+check("v266 cadenza: un giorno di festa non accende l'allarme dato mancante", run(`
+  const ieri = new Date(); ieri.setDate(ieri.getDate() - 2);
+  const iso = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  const c = cadenzaDato("t30", iso(ieri));
+  return !!c && !c.scaduto`));
+
+check("v266 cadenza: le serie giornaliere hanno un calendario, non solo le mensili", (() => {
+  const i = src.indexOf("const CADENZA_FONTE");
+  const blocco = src.slice(i, src.indexOf("};", i));
+  return ["curve:", "curve3m:", "t30:", "real10:", "breakeven:", "philly:"].every(k => blocco.includes(k));
+})());
+
+/* ⚠ v266 — un indicatore senza cadenza non deve poter partire: la regola del CEO ("ogni dato
+   macro dice quando si aggiorna") vale anche per le serie che verranno aggiunte domani. */
+check("v266 pipeline: un indicatore senza cadenza rompe il run invece di uscire muto", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  return /indicatori senza cadenza in NEXT_RELEASE/.test(py) && /raise RuntimeError/.test(py);
+})());
+
+/* ⚠ v266 — FRED rifiuta lo user-agent da browser: il ripiego csv era morto per TUTTE le serie
+   e non si vedeva perché in CI si passa dall'API con la chiave. */
+check("v266 pipeline: su FRED ci si identifica, altrimenti il ripiego csv non risponde", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  return /UA_ONESTO/.test(py) && /stlouisfed\.org.*in url|in url.*stlouisfed/.test(py);
+})());
+
+/* ── v266 — livelli e opzioni sotto il grafico (richieste del CEO) ────────────────────────── */
+check("v266 grafico: i livelli del titolo stanno su UNA scala di prezzi, col prezzo dentro", (() => {
+  const i = src.indexOf("function renderOpzioniGrafico");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  return /Prezzo ora/.test(corpo) && /tvo-tab/.test(corpo);
+})());
+
+check("v266 grafico: supporto e resistenza sono nei livelli insieme ai muri delle opzioni", (() => {
+  const i = src.indexOf("function livelliTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  return /r\.support/.test(corpo) && /r\.resistance/.test(corpo)
+      && /callWall/.test(corpo) && /putWall/.test(corpo);
+})());
+
+/* ⚠ il lato di un livello è un fatto misurabile su questo prezzo, non una proprietà del nome:
+   il muro delle call di AMD stava SOTTO il prezzo e veniva dipinto come un tetto. */
+check("v266 grafico: sopra o sotto il prezzo si misura, non si presume", (() => {
+  const i = src.indexOf("function livelliTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1))
+    .replace(/\/\*[\s\S]*?\*\//g, "");
+  return /x\.tipo = x\.v > spot/.test(corpo);
+})());
+
+check("v266 grafico: dentro l'iframe TradingView non si finge di disegnare", (() => {
+  const i = src.indexOf("function statoOpzioni");
+  const testa = src.slice(Math.max(0, i - 1400), i);
+  return /iframe/.test(testa) && /non si puo'/.test(testa);
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

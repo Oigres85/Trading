@@ -1896,11 +1896,10 @@ svg.g-serie { cursor: crosshair; }
   align-items: start; padding: 6px 8px; background: var(--card-2); border-radius: 6px; }
 .tv-legenda b { font-size: 12px; }
 .tv-legenda span { color: var(--muted); line-height: 1.45; }
-.tv-legenda-lat > div { grid-template-columns: 132px minmax(0, 1fr); }
 .tv-verde { color: var(--green); } .tv-rosso { color: var(--red); }
 .tv-blu { color: #2962ff; } .tv-arancio { color: #ff9800; } .tv-viola { color: #7e57c2; }
 .tv-piede { margin-top: 8px; font-size: 12px; color: var(--muted); }
-@media (max-width: 560px) { .tv-legenda > div, .tv-legenda-lat > div { grid-template-columns: 1fr; gap: 2px; } }
+@media (max-width: 560px) { .tv-legenda > div { grid-template-columns: 1fr; gap: 2px; } }
 
 /* v265 — "a scomparsa": il fatto resta, la spiegazione si apre. Niente animazioni, niente
    frecce disegnate a mano: il <details> nativo è accessibile da tastiera e non ha stato da
@@ -1939,3 +1938,56 @@ svg.g-serie { cursor: crosshair; }
 .wl-x { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 15px;
   line-height: 1; padding: 0 4px; }
 .wl-x:hover { color: var(--red); }
+
+/* ═══ v266 — LIVELLI E OPZIONI SOTTO IL GRAFICO ═══════════════════════════════════════════
+   Richieste del CEO: "aggiungere lo stato delle put e calls sul grafico" e "aggiungere anche
+   supporti e resistenze rendendo tutto leggibile". Dentro il widget non si disegna (iframe di
+   un altro dominio), quindi sta sotto; e "leggibile" qui vuol dire una scala di prezzi sola,
+   col prezzo di adesso dentro l'elenco e non in un riquadro a parte. */
+.tv-opzioni { margin-top: 10px; }
+.tvo-piu > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.tvo-piu > summary:hover { color: var(--fg); }
+.tvo { display: grid; gap: 10px; margin-top: 6px; }
+/* ⚠ v266 — `min-width: 0` SUI FIGLI, altrimenti la tabella non sta nel suo box. I figli di una
+   griglia hanno `min-width: auto`: non scendono sotto la propria larghezza a contenuto intero,
+   quindi il box con `overflow-x: auto` cresceva invece di far scorrere, e su telefono la
+   tabella misurava 1625px dentro uno schermo da 297. Misurato a 375px prima di spedire. */
+.tvo > * { min-width: 0; }
+.tvo-corsia-barra { position: relative; height: 8px; border-radius: 99px;
+  background: linear-gradient(90deg, var(--green) 0%, var(--panel) 50%, var(--red) 100%); opacity: .55; }
+.tvo-corsia-ora { position: absolute; top: -3px; width: 3px; height: 14px; border-radius: 2px;
+  background: var(--fg); transform: translateX(-50%); }
+.tvo-corsia-et { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px;
+  color: var(--muted); margin-top: 5px; }
+.tvo-corsia-et b { color: var(--fg); }
+.tvo-corsia-nota { font-size: 11.5px; margin-top: 2px; }
+.tvo-scroll { overflow-x: auto; }
+.tvo-tab { width: 100%; border-collapse: collapse; font-size: 12.5px;
+  font-variant-numeric: tabular-nums; }
+.tvo-tab th { text-align: left; font-weight: 600; font-size: 11px; color: var(--muted);
+  padding: 3px 8px 5px 0; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.tvo-tab td { padding: 5px 8px 5px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.tvo-tab .num { text-align: right; }
+.tvo-tab tr:last-child td { border-bottom: 0; }
+/* il prezzo di adesso e' una riga come le altre, ma si deve vedere subito dov'e' */
+.tvo-tab tr.tvo-ora td { background: var(--panel); font-weight: 600; }
+.tvo-tab tr.tvo-t td:first-child { box-shadow: inset 2px 0 0 var(--red); padding-left: 8px; }
+.tvo-tab tr.tvo-p td:first-child { box-shadow: inset 2px 0 0 var(--green); padding-left: 8px; }
+/* ⚠ v266 — LA REGOLA GLOBALE `table { white-space: nowrap }` (riga 235) teneva la spiegazione
+   su una riga sola: la tabella misurava 1625px dentro uno schermo da 297. Non basta il
+   `min-width: 0` sul figlio della griglia — il testo non andava a capo per una regola scritta
+   dieci schermate piu' su. Qui si annulla, per questa colonna soltanto. */
+.tvo-tab td:last-child { white-space: normal; max-width: 340px; }
+.tvo-spiega { display: block; font-size: 11px; opacity: .85; white-space: normal; }
+.tvo-barra { height: 10px; border-radius: 99px; background: var(--green); overflow: hidden; }
+.tvo-put { height: 100%; background: var(--red); }
+.tvo-riga { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; margin-top: 4px; }
+.tvo-rosso { color: var(--red); } .tvo-verde { color: var(--green); }
+.tvo-nota, .tvo-fine { font-size: 11.5px; line-height: 1.45; }
+.tvo-vuoto { font-size: 12px; }
+@media (max-width: 560px) {
+  .tvo-corsia-et { flex-wrap: wrap; }
+  .tvo-tab { font-size: 12px; }
+  /* su telefono la colonna della provenienza va a capo invece di allargare la tabella */
+  .tvo-tab td:last-child { min-width: 160px; }
+}

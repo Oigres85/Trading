@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "266";
+const BUILD_VERSION = "267";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -617,6 +617,11 @@ function renderAll() {
      non avvenire, e i trattini restavano — cioe' esattamente "sembra che i dati siano fermi",
      il difetto da cui e' nata questa tabella. Il render non deve dipendere da un caso. */
   renderWatchlistTV();
+  /* ⚠ v266 — STESSA RAGIONE DELLA WATCHLIST, e l'ho ripetuta scrivendo la funzione nuova: la
+     striscia dei livelli si monta col grafico, quando DATA e' ancora null, e senza questa riga
+     resta ferma su "non disponibili" anche dopo che i dati sono arrivati. Chi disegna al
+     montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
+  if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
      pagina. La funzione RESTA perche' testoCorrelazioniMacro() usa lo stesso calcolo per il
@@ -1630,6 +1635,17 @@ const CADENZA_FONTE = {
   umich:  { nome: "UMich via FRED", giorniLag: 45, passo: "mensile",
             nota: "FRED sconta 1-2 mesi di ritardo di LICENZA: alla fonte esistono letture più recenti" },
   gdp:    { nome: "BEA", giorniLag: 30, passo: "trimestrale", nota: "stima avanzata ~1 mese dopo il trimestre" },
+  /* ⚠ v266 — LE SERIE GIORNALIERE NON AVEVANO CADENZA, NEMMENO LA CURVA CHE C'ERA GIA'. Senza
+     una voce qui rigaCadenza() restituisce stringa vuota e la card esce muta sulla propria eta':
+     la regola "ogni dato dice quando si aggiorna" valeva solo per i mensili. Le serie FRED
+     giornaliere escono col ritardo di un giorno lavorativo o due. */
+  curve:     { nome: "FRED", giorniLag: 1, passo: "giornaliero", nota: "spread 10A-2A, aggiornato ogni giorno lavorativo" },
+  curve3m:   { nome: "FRED", giorniLag: 1, passo: "giornaliero", nota: "spread 10A-3M, il tratto che la Fed usa per la recessione" },
+  t30:       { nome: "FRED", giorniLag: 1, passo: "giornaliero", nota: "rendimento del Treasury a 30 anni" },
+  real10:    { nome: "FRED", giorniLag: 1, passo: "giornaliero", nota: "rendimento TIPS 10A, cioe' al netto dell'inflazione" },
+  breakeven: { nome: "FRED", giorniLag: 1, passo: "giornaliero", nota: "differenza fra nominale e reale a 10 anni" },
+  philly:    { nome: "Philadelphia Fed", giorniLag: 18, passo: "mensile",
+               nota: "l'ISM e' sotto licenza e non e' ridistribuibile: questa e' la stessa specie di indagine, dichiarata" },
 };
 
 /* Restituisce { rilevato, eta, prossimo, passo, fonte, nota } o null se non si può dire nulla.
@@ -1644,13 +1660,32 @@ function cadenzaDato(chiave, dataRilevazione) {
   /* il prossimo dato copre il periodo SUCCESSIVO a quello rilevato, e arriva `giorniLag`
      dopo la fine di quel periodo: si somma un passo alla rilevazione e poi il ritardo. */
   const p = new Date(d);
-  if (c.passo === "trimestrale") p.setMonth(p.getMonth() + 6);
-  else p.setMonth(p.getMonth() + 2);
-  p.setDate(Math.min(c.giorniLag || 15, 28));
+  if (c.passo === "giornaliero") {
+    /* il prossimo e' il giorno lavorativo dopo: sabato e domenica non pubblica nessuno. */
+    p.setDate(p.getDate() + 1);
+    while (p.getDay() === 0 || p.getDay() === 6) p.setDate(p.getDate() + 1);
+  } else if (c.passo === "trimestrale") {
+    p.setMonth(p.getMonth() + 6);
+    p.setDate(Math.min(c.giorniLag || 15, 28));
+  } else {
+    p.setMonth(p.getMonth() + 2);
+    p.setDate(Math.min(c.giorniLag || 15, 28));
+  }
+  /* ⚠ v266 — LA DATA SI COMPONE DAI PEZZI LOCALI, NON DA toISOString(). Le date qui sono
+     costruite a mezzanotte LOCALE: a Roma sono le 22:00 UTC del giorno prima, quindi
+     toISOString() restituiva il giorno PRECEDENTE. Sulle serie giornaliere si vedeva subito —
+     un dato del 6 agosto usciva con "prossimo atteso 06/08 ⚠ ERA ATTESO E NON E' ARRIVATO",
+     cioe' un allarme di dato mancante su un dato appena pubblicato. Sui mensili l'errore c'era
+     lo stesso, solo meno visibile: uno scarto di un giorno su un ritardo di trenta. */
+  const iso = (d2) => `${d2.getFullYear()}-${String(d2.getMonth() + 1).padStart(2, "0")}-${String(d2.getDate()).padStart(2, "0")}`;
   return {
     rilevato: String(dataRilevazione).slice(0, 10), eta,
-    prossimo: p.toISOString().slice(0, 10),
-    scaduto: p < oggi,                       // il prossimo era atteso e non è arrivato
+    prossimo: iso(p),
+    /* ⚠ v266 — LE SERIE GIORNALIERE HANNO DUE GIORNI DI GRAZIA. Il Treasury non pubblica nei
+       giorni di festa americana, e senza tolleranza ogni 4 luglio o Thanksgiving avrebbe acceso
+       "ERA ATTESO E NON E' ARRIVATO" su un dato regolarissimo. Un allarme che suona quando non
+       succede niente insegna a ignorarlo, e allora non serve piu' il giorno che serve. */
+    scaduto: c.passo === "giornaliero" ? p.getTime() + 2 * 86400000 < oggi.getTime() : p < oggi,
     passo: c.passo, fonte: c.nome, nota: c.nota,
   };
 }
@@ -2732,6 +2767,18 @@ function indicatoriClassifica() {
      come se fossero due letture indipendenti — la classe di difetto che questo progetto insegue
      da versioni (contare due volte un segnale solo). Qui si fondono in una tessera che porta
      entrambi i numeri: il punteggio e' quello della voce PRINCIPALE, l'altra diventa contesto. */
+  /* ⚠ v266 — DICHIARATO QUI, NON PIU' IN FONDO. Il ciclo delle FUSIONI ha bisogno di sapere
+     chi verra' escluso (v266: una fusione verso una tessera che poi sparisce cancella il dato),
+     e leggerlo prima della sua `const` significava zona morta temporale — un ReferenceError che
+     spegneva la funzione intera. Il filtro continua ad APPLICARSI in fondo come da v238; qui
+     cambia solo dove si dichiara. */
+  const chiaviTermometri = new Set(["in:curve", "credit", "vix"]);
+  const FUORI = new Set(["thermometer", "futures", "seasonality", "risk_sentiment", "smart_money",
+                         "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield",
+                         /* v265 — richieste esplicite del CEO: due componenti F&G che non vuole */
+                         "fg:forza-dei-prezzi", "fg:domanda-beni-rifugio",
+                         ...chiaviTermometri]);
+
   const FUSIONI = [
     { p: "in:cpi", s: "in:pce", nome: "Inflazione (CPI e PCE)",
       sub: (a2, b2) => `CPI ${a2.sub.split(" ")[0]} · PCE ${b2.sub.split(" ")[0]} — due misure della stessa cosa, la Fed guarda il PCE` },
@@ -2745,10 +2792,27 @@ function indicatoriClassifica() {
       sub: (a2, b2) => `disoccupazione ${a2.sub.split(" ")[0]} · nuovi posti ${b2.sub.split(" ")[0]}` },
     { p: "in:curve", s: "yield_recession", nome: "Curva dei tassi 10A-2A",
       sub: (a2) => `${a2.sub} — sotto zero e' il segnale che conta` },
+    /* ⚠ v266 — 10A-2A e 10A-3M SONO LA STESSA CURVA su due tratti. Affiancate sarebbero due
+       tessere che dicono la stessa cosa, cioe' esattamente il doppione che il CEO ha gia'
+       dovuto segnalare due volte. Si fondono, e la tessera porta tutti e due i numeri: quando
+       i due tratti non concordano, quello e' il fatto interessante. */
+    { p: "in:curve", s: "in:curve3m", nome: "Curva dei tassi (10A-2A e 10A-3M)",
+      sub: (a2, b2) => `10A-2A ${a2.sub.split(" ")[0]} · 10A-3M ${b2.sub.split(" ")[0]} — due tratti della STESSA curva, non due segnali` },
+    /* reale e attesa sono i due pezzi in cui si scompone il rendimento nominale: separati
+       sembrano indipendenti, e non lo sono. */
+    { p: "in:real10", s: "in:breakeven", nome: "Tasso reale e inflazione attesa (10A)",
+      sub: (a2, b2) => `reale ${a2.sub.split(" ")[0]} · attesa ${b2.sub.split(" ")[0]} — sommati danno il rendimento nominale a 10 anni` },
   ];
+  /* ⚠ v266 — UNA FUSIONE VERSO UNA TESSERA CHE VERRA' TOLTA CANCELLA IL DATO. Misurato con la
+     curva: `in:curve` esce dalle schede perche' e' gia' un termometro di stress (v265), quindi
+     fondere `in:curve3m` dentro di lei toglieva il 10A-3M dall'elenco e poi il filtro toglieva
+     anche l'ospite — il dato spariva del tutto, in silenzio. E' la stessa trappola gia' scritta
+     nel payload per la curva ("un accorpamento che perde il dato invece di unirlo"), qui in
+     un'altra funzione. Quando il primario non si vede, il secondario resta in piedi da solo. */
   for (const f of FUSIONI) {
     const ip = out.findIndex(x => x.k === f.p), is = out.findIndex(x => x.k === f.s);
     if (ip < 0 || is < 0) continue;
+    if (FUORI.has(f.p) && !FUORI.has(f.s)) continue;
     const A = out[ip], B = out[is];
     A.nome = f.nome;
     try { A.sub = f.sub(A, B); } catch { /* sub assente: si tiene quello originale */ }
@@ -2844,12 +2908,6 @@ function indicatoriClassifica() {
      dedurre la lista degli esclusi DA renderStress, cosi' se un domani un termometro cambia,
      l'esclusione lo segue da sola invece di restare un elenco scritto a mano (classe C10).
      Vince il TERMOMETRO: e' la forma che lui legge, e porta le soglie. */
-  const chiaviTermometri = new Set(["in:curve", "credit", "vix"]);
-  const FUORI = new Set(["thermometer", "futures", "seasonality", "risk_sentiment", "smart_money",
-                         "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield",
-                         /* v265 — richieste esplicite del CEO: due componenti F&G che non vuole */
-                         "fg:forza-dei-prezzi", "fg:domanda-beni-rifugio",
-                         ...chiaviTermometri]);
   /* ⚠ v253 — LA FRESCHEZZA SI ASSEGNA IN UN PUNTO SOLO, QUI IN FONDO. La prima stesura la
      agganciava ai singoli `out.push`: ce ne sono NOVE sparsi per la funzione, e un decimo
      aggiunto un domani nascerebbe senza — è lo stesso motivo per cui il filtro FUORI qui
@@ -4780,6 +4838,11 @@ const MACRO_INFO = {
   "in:unemp": ["Disoccupazione", "Tasso di disoccupazione USA.", "Mensile, primo venerdì (BLS)", /disoccupa|unemploy|jobs/i],
   "in:umich": ["Fiducia consumatori", "Sentiment delle famiglie USA (Univ. Michigan).", "Mensile (preliminare + finale)", /fiducia|sentiment|consumer|michigan/i],
   "in:curve": ["Curva 10A-2A", "Spread dei rendimenti; se negativo (inversione) storico segnale di recessione.", "Aggiornato in continuo", /curva|treasur|yield|recess|rendiment/i],
+  "in:curve3m": ["Curva 10A-3M", "Lo stesso spread sul tratto che la Fed usa davvero per la recessione: 10 anni meno 3 mesi.", "Giornaliero (FRED T10Y3M)", /curva|10a.?3m|recess/i],
+  "in:t30": ["Treasury USA 30A", "Il rendimento a 30 anni: è il tasso con cui si scontano gli utili lontani, quindi tocca soprattutto i titoli di crescita.", "Giornaliero (FRED DGS30)", /30.?anni|trentenn|long.?bond|dgs30/i],
+  "in:real10": ["Tasso reale 10A", "Rendimento dei TIPS a 10 anni: quanto rende un Treasury al NETTO dell'inflazione attesa. È il vero costo del denaro.", "Giornaliero (FRED DFII10)", /tasso.?real|tips|real.?yield/i],
+  "in:breakeven": ["Inflazione attesa 10A", "Nominale meno reale: l'inflazione che il mercato PREZZA per i prossimi dieci anni, non quella già osservata.", "Giornaliero (FRED T10YIE)", /breakeven|inflazione.?attes|aspettative.?inflaz/i],
+  "in:philly": ["Manifattura Philly Fed", "Indagine mensile sulla manifattura del distretto di Philadelphia. Sta al posto dell'ISM, che è sotto licenza e non è ridistribuibile.", "Mensile (Philadelphia Fed)", /philly|philadelphia|ism|manifattur|pmi/i],
   "mk:^TNX": ["Treasury USA 10 anni", "Rendimento del decennale USA: sale = condizioni più restrittive.", "Mercato aperto USA", /treasur|10.?anni|yield|rendiment|bond/i],
   "mk:EURUSD=X": ["Cambio EUR/USD", "Euro contro dollaro: incide sul valore in € delle azioni USA.", "Continuo (forex)", /euro|dollar|eur.?usd|cambio|fx/i],
   "mk:EURJPY=X": ["Cambio EUR/JPY", "Euro contro yen.", "Continuo (forex)", /yen|jpy|euro|cambio/i],
@@ -5938,14 +6001,29 @@ function buildPrompt() {
   const accorpate = new Set(curvaAltrove ? ["cpi", "pce", "curve"] : ["cpi", "pce"]);
   const noteSerie = (i) => i.key === "gdp" ? "serie TRIMESTRALE, il dato più recente disponibile"
     : i.key === "curve" ? "serie GIORNALIERA FRED T10Y2Y, ultima chiusura"
+    : i.key === "curve3m" ? "serie GIORNALIERA FRED T10Y3M, ultima chiusura — è lo STESSO segnale della curva 10A-2A su un altro tratto, non un secondo segnale"
+    : i.key === "t30" ? "serie GIORNALIERA FRED DGS30, ultima chiusura"
+    : i.key === "real10" ? "serie GIORNALIERA FRED DFII10 (TIPS 10A): è il rendimento AL NETTO dell'inflazione attesa"
+    : i.key === "breakeven" ? "serie GIORNALIERA FRED T10YIE: nominale meno reale, cioè l'inflazione che il mercato PREZZA, non quella osservata — non sommarla al CPI come se fossero due misure della stessa cosa"
+    : i.key === "philly" ? "indagine mensile della Federal Reserve di Philadelphia (FRED GACDFSA066MSFRBPHI). NON è l'ISM: l'ISM è sotto licenza e non è ridistribuibile. Stessa specie di misura (diffusion index sulla manifattura, esce prima dell'ISM), ma copre un distretto, non il paese: usala come indicazione di direzione, non come il livello nazionale"
     : i.key === "umich" ? "serie mensile via FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui — verificale prima di trarne conclusioni sul consumatore"
     : "serie mensile, normale ritardo di pubblicazione";
+  /* ⚠ v266 — LA CADENZA NON DEVE MANGIARSI L'IDENTIFICAZIONE DELLA SERIE. Aggiungendo le
+     cadenze giornaliere, `cad` ha cominciato a esistere anche per la curva e ha preso il posto
+     della nota che dice QUALE serie e' (FRED T10Y2Y) e come va letta. Sono due informazioni
+     diverse — quando è stata rilevata, e cos'è — e il test v138 ha intercettato la perdita.
+     Per queste chiavi la nota porta un avvertimento che la cadenza non contiene, quindi vanno
+     scritte tutte e due. */
+  const NOTA_INSOSTITUIBILE = new Set(["gdp", "curve", "curve3m", "t30", "real10", "breakeven", "philly", "umich"]);
   (m.indicators || []).filter(i => !accorpate.has(i.key)).forEach(i => {
     /* v250 — dove esiste un calendario dichiarato dalla fonte si scrive QUANDO è stato rilevato,
        quanti giorni ha e QUANDO ne arriva uno nuovo. Altrove resta la nota generica: meglio una
        nota vaga che una data inventata. */
     const cad = rigaCadenza(i.key, i.date);
-    lines.push(`- ${i.label}: ${i.value} (${cad || `rilevazione ${i.date} — ${noteSerie(i)}`})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`);
+    const testa = cad
+      ? (NOTA_INSOSTITUIBILE.has(i.key) ? `${cad} · ${noteSerie(i)}` : cad)
+      : `rilevazione ${i.date} — ${noteSerie(i)}`;
+    lines.push(`- ${i.label}: ${i.value} (${testa})${dqV.flags[i.key] ? " " + dqV.flags[i.key] : ""}`);
   });
   {
     const c2 = (m.indicators || []).find(i => i.key === "cpi");
@@ -6555,6 +6633,167 @@ function simboloTradingView(tk) {
   return T.includes(":") ? T : T.replace(/\.[A-Z]{1,3}$/, "");
 }
 
+/* ═══ v266 — LO STATO DI PUT E CALL ACCANTO AL GRAFICO ═════════════════════════════════════
+   Richiesta del CEO: "puoi aggiungere lo stato delle put e calls sul grafico tradingview".
+   ⚠ SUL grafico non si puo', e va detto invece di fingere: il widget TradingView e' un iframe
+   servito da un altro dominio, quindi nessuno da questa pagina puo' disegnarci dentro o leggere
+   cosa mostra. Nessuna credenziale cambierebbe la cosa — e' il confine del browser, non un
+   permesso mancante. Quello che si puo' fare, e che si fa qui, e' metterlo SOTTO il grafico,
+   agganciato al simbolo che il grafico sta mostrando.
+   Cosa c'e' dentro, e perche' proprio questo: il file porta le catene complete di 30 titoli
+   (strike, volumi, open interest, muro delle call e muro delle put) e finora nessuno le
+   leggeva. Accanto a un grafico di prezzo la parte utile sono i MURI, perche' sono livelli:
+   stanno sull'asse dei prezzi come le candele, e si confrontano a colpo d'occhio con dove sta
+   il titolo adesso. Il rapporto put/call da solo e' un numero senza posto sul grafico. */
+function statoOpzioni(tk) {
+  const T = String(tk || "").toUpperCase().replace(/^[A-Z]+:/, "");
+  const o = (DATA && DATA.options && DATA.options[T]) || null;
+  if (!o || !Array.isArray(o.expiries) || !o.expiries.length) return null;
+  const e = o.expiries[0];                       // la scadenza piu' vicina: e' quella che muove il prezzo
+  const somma = (a) => (a || []).reduce((t, x) => t + (Number(x.vol) || 0), 0);
+  const put = somma(e.puts), call = somma(e.calls);
+  return { tk: T, spot: Number(o.spot), scadenza: e.date, put, call,
+           ratio: call > 0 ? put / call : null,
+           callWall: Number(e.call_wall), putWall: Number(e.put_wall) };
+}
+
+/* ═══ v266 — I LIVELLI DEL TITOLO SU UNA SCALA SOLA ════════════════════════════════════════
+   Il CEO, subito dopo le opzioni: "ed aggiungere anche supporti e resistenze rendendo tutto
+   leggibile". La seconda meta' della frase decide la forma.
+   Muro delle call, muro delle put, supporto, resistenza, massimo e minimo dell'anno sono tutti
+   PREZZI. Messi in riquadri separati costringono a confrontare numeri a mente — quattro scatole
+   con dentro 452,50 e 470,00 e 483,36 e chi legge deve ricostruirsi l'ordine da solo. Su una
+   scala unica l'ordine si vede: sopra il prezzo c'e' il tetto piu' vicino, sotto il pavimento
+   piu' vicino, e la distanza fra le due righe E' la distanza vera.
+   Ogni riga porta da dove viene: le opzioni dalla catena, supporto e resistenza dai 20 giorni
+   di barre, i due estremi dall'anno. Livelli calcolati in modi diversi non si mescolano in
+   silenzio, si etichettano. */
+function livelliTitolo(tk) {
+  const T = String(tk || "").toUpperCase().replace(/^[A-Z]+:/, "");
+  const r = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .find(x => String(x.ticker || "").toUpperCase() === T);
+  const o = statoOpzioni(T);
+  const spot = Number(o ? o.spot : (r ? r.price : NaN));
+  if (!Number.isFinite(spot)) return null;
+  const L = [];
+  /* ⚠ `breve` porta gia' l'articolo. Comporre "prima del " + nome dava "prima del resistenza":
+     in italiano l'articolo dipende dal nome, non dalla posizione nella frase. */
+  const agg = (nome, breve, v, fonte, spiega) => {
+    const n = Number(v);
+    if (Number.isFinite(n) && n > 0) L.push({ nome, breve, v: n, fonte, spiega });
+  };
+  if (o) {
+    agg("Muro delle CALL", "del muro delle call", o.callWall, `opzioni, scadenza ${o.scadenza}`,
+        "lo strike con piu' contratti call aperti: chi le ha vendute si copre qui, e il prezzo tende a rallentare");
+    agg("Muro delle PUT", "del muro delle put", o.putWall, `opzioni, scadenza ${o.scadenza}`,
+        "lo strike con piu' contratti put aperti: stessa meccanica al contrario, tende a fare da pavimento");
+  }
+  if (r) {
+    agg("Resistenza", "della resistenza", r.resistance, "massimo delle ultime 20 sedute",
+        "l'ultima volta che ci e' arrivato si e' fermato: sopra, quel massimo non ce l'ha piu' sopra la testa");
+    agg("Supporto", "del supporto", r.support, "minimo delle ultime 20 sedute",
+        "il punto dove nell'ultimo mese hanno ricomprato; rotto al ribasso smette di essere un supporto");
+    agg("Massimo 52 settimane", "del massimo dell'anno", r.w52_high, "un anno di barre", "il punto piu' alto degli ultimi dodici mesi");
+    agg("Minimo 52 settimane", "del minimo dell'anno", r.w52_low, "un anno di barre", "il punto piu' basso degli ultimi dodici mesi");
+  }
+  if (!L.length) return null;
+  /* ⚠ SOPRA O SOTTO SI GUARDA, NON SI PRESUME. Prima "muro delle call" era marcato tetto per
+     definizione: su AMD il muro delle call stava a 460 con il titolo a 483, cioe' SOTTO, e la
+     scheda lo dipingeva come un tetto mentre il prezzo l'aveva gia' superato. Il lato di un
+     livello e' un fatto misurabile su questo prezzo, oggi. */
+  L.forEach(x => {
+    x.dist = (x.v / spot - 1) * 100;
+    x.tipo = x.v > spot ? "tetto" : "pavimento";
+    if (/muro delle call/i.test(x.breve) && x.v <= spot)
+      x.spiega += " — qui sta SOTTO il prezzo: il titolo l'ha gia' superato, e da tetto diventa semmai un appoggio";
+    if (/muro delle put/i.test(x.breve) && x.v > spot)
+      x.spiega += " — qui sta SOPRA il prezzo: il titolo ci e' sceso sotto, e quel pavimento non e' piu' sotto di lui";
+  });
+  L.sort((a, b) => b.v - a.v);
+  const sopra = L.filter(x => x.v > spot), sotto = L.filter(x => x.v <= spot);
+  return { tk: T, spot, livelli: L, opzioni: o,
+           tetto: sopra.length ? sopra[sopra.length - 1] : null,   // il piu' vicino sopra
+           pavimento: sotto.length ? sotto[0] : null };            // il piu' vicino sotto
+}
+
+function renderOpzioniGrafico(tk) {
+  const box = $("#tv-opzioni");
+  if (!box) return;
+  const S = livelliTitolo(tk);
+  const o = statoOpzioni(tk);
+  if (!S) {
+    /* ⚠ niente silenzio e niente ripiego travestito: se di quel simbolo non si sa nulla lo si
+       dice, e il dato di mercato si offre come contesto ETICHETTATO — non come se fosse suo. */
+    const pc = (DATA && DATA.macro && DATA.macro.putcall) || null;
+    box.innerHTML = `<div class="tvo-vuoto muted">Per questo simbolo la pipeline non ha né livelli né opzioni`
+      + ` (segue le catene di ${Object.keys((DATA && DATA.options) || {}).length} titoli).`
+      + (pc && pc.ratio != null ? ` Come contesto di MERCATO, non di questo titolo: put/call ${fmtNum.format(pc.ratio)} su ${esc(pc.symbol || "SPY")}.` : "")
+      + `</div>`;
+    return;
+  }
+
+  /* la corsia: dove sta il prezzo fra il pavimento e il tetto piu' vicini. E' la sola domanda
+     che si fa guardando un grafico — quanto spazio ho prima di sbattere, da una parte e dall'altra. */
+  const t = S.tetto, p = S.pavimento;
+  let corsia = "";
+  if (t && p && t.v > p.v) {
+    const q = (S.spot - p.v) / (t.v - p.v) * 100;
+    corsia = `<div class="tvo-corsia">
+      <div class="tvo-corsia-barra"><div class="tvo-corsia-ora" style="left:${q.toFixed(1)}%"></div></div>
+      <div class="tvo-corsia-et"><span>${fmtNum.format(p.v)} · ${esc(p.nome.toLowerCase())}</span>
+        <b>ora ${fmtNum.format(S.spot)}</b>
+        <span>${fmtNum.format(t.v)} · ${esc(t.nome.toLowerCase())}</span></div>
+      <div class="muted tvo-corsia-nota">Ha <b>${fmtNum.format(Math.abs(Math.round((S.spot / p.v - 1) * 1000) / 10))}%</b> di spazio sotto prima ${esc(p.breve)}, <b>${fmtNum.format(Math.round((t.v / S.spot - 1) * 1000) / 10)}%</b> sopra prima ${esc(t.breve)}.</div>
+    </div>`;
+  }
+
+  /* la scala: tutti i livelli in ordine di prezzo, col prezzo di adesso al suo posto dentro
+     l'elenco — non in un riquadro a parte, che e' il modo per non far capire dov'e'. */
+  const righe = [];
+  let messo = false;
+  for (const x of S.livelli) {
+    if (!messo && x.v <= S.spot) {
+      righe.push(`<tr class="tvo-ora"><td>Prezzo ora</td><td class="num">${fmtNum.format(S.spot)}</td><td class="num">—</td><td class="muted">il titolo adesso</td></tr>`);
+      messo = true;
+    }
+    const cls = x.tipo === "tetto" ? "tvo-t" : "tvo-p";
+    righe.push(`<tr class="${cls}"><td>${esc(x.nome)}</td><td class="num">${fmtNum.format(x.v)}</td>`
+      + `<td class="num ${x.dist > 0 ? "pos" : "neg"}">${signTxt(Math.round(x.dist * 10) / 10, "%")}</td>`
+      + `<td class="muted">${esc(x.fonte)}<span class="tvo-spiega">${esc(x.spiega)}</span></td></tr>`);
+  }
+  if (!messo) righe.push(`<tr class="tvo-ora"><td>Prezzo ora</td><td class="num">${fmtNum.format(S.spot)}</td><td class="num">—</td><td class="muted">il titolo adesso</td></tr>`);
+
+  /* le opzioni: put contro call sulla scadenza vicina. Sta DOPO i livelli perche' e' l'unico
+     pezzo che non e' un prezzo, e mescolarlo alla scala lo renderebbe illeggibile. */
+  let opz = "";
+  if (o && o.ratio != null) {
+    const tot = o.put + o.call, quotaPut = tot > 0 ? o.put / tot * 100 : 0;
+    const stato = o.ratio >= 1.2 ? `<b class="tvo-rosso">prevalgono le PUT</b>: su questa scadenza si stanno coprendo`
+      : o.ratio <= 0.8 ? `<b class="tvo-verde">prevalgono le CALL</b>: su questa scadenza scommettono al rialzo`
+      : `<b>put e call in equilibrio</b> su questa scadenza`;
+    opz = `<div class="tvo-opz">
+      <div class="tvo-barra" role="img" aria-label="quota put ${Math.round(quotaPut)} per cento">
+        <div class="tvo-put" style="width:${quotaPut.toFixed(1)}%"></div></div>
+      <div class="tvo-riga"><span class="tvo-rosso">PUT ${fmtNum.format(o.put)}</span>
+        <span class="muted">rapporto ${fmtNum.format(Math.round(o.ratio * 100) / 100)}</span>
+        <span class="tvo-verde">CALL ${fmtNum.format(o.call)}</span></div>
+      <div class="muted tvo-nota">Volumi della scadenza ${esc(o.scadenza)}: ${stato}.</div>
+    </div>`;
+  }
+
+  box.innerHTML = `<details class="tvo-piu"><summary>Livelli di <b>${esc(S.tk)}</b> — supporti, resistenze e opzioni</summary>
+    <div class="tvo">
+      ${corsia}
+      <div class="tvo-scroll"><table class="tvo-tab"><thead><tr>
+        <th>Livello</th><th class="num">Prezzo</th><th class="num">Distanza</th><th>Da dove viene</th>
+      </tr></thead><tbody>${righe.join("")}</tbody></table></div>
+      ${opz}
+      <div class="muted tvo-fine">I livelli non sono previsioni: dicono dove il prezzo ha gia' incontrato
+        qualcosa, non dove andra'. Quelli delle opzioni valgono per la loro scadenza e si spostano quando
+        cambia; supporto e resistenza guardano venti sedute e si aggiornano ogni giorno.</div>
+    </div></details>`;
+}
+
 function montaGraficoTV(tk, intervallo) {
   const box = $("#tv-chart");
   if (!box) return;
@@ -6572,6 +6811,7 @@ function montaGraficoTV(tk, intervallo) {
   const prova = document.createElement("div");
   if (!prova || typeof prova.appendChild !== "function") return;
   const et = $("#tv-simbolo"); if (et) et.textContent = sym;
+  renderOpzioniGrafico(tk);      // v266 — le opzioni seguono il simbolo a grafico
   box.innerHTML = "";
   const cont = document.createElement("div");
   cont.className = "tradingview-widget-container";
@@ -6624,18 +6864,13 @@ function montaGraficoTV(tk, intervallo) {
        con tasto per farle riapparire"). Il <details> nativo fa esattamente questo e non ha
        bisogno di stato da mantenere: si apre, si chiude, e il browser ricorda la posizione
        finche' la pagina vive. Chiuso di default — chi sa gia' cos'e' un RSI non deve scorrerlo. */
-    nota.innerHTML = `<details class="tv-piu"><summary>Come si legge il grafico — indicatori, colori, barra laterale</summary><div class="tv-legenda">
-      <div><b>Candele</b><span>Ogni candela e' una seduta: il corpo va da apertura a chiusura, i fili sono massimo e minimo. <b class="tv-verde">Verde</b> = ha chiuso sopra l'apertura, <b class="tv-rosso">rossa</b> = sotto. Corpi lunghi = giornata decisa, corpi corti con fili lunghi = incertezza.</span></div>
-      <div><b>Volume</b><span>Le barre in basso: quante azioni sono passate di mano. La regola che conta e' il CONFRONTO — un movimento con volume sopra la media e' stato fatto da molti e regge; lo stesso movimento con volume basso e' fragile. Anche le barre del volume sono verdi o rosse come la loro seduta.</span></div>
-      <div><b class="tv-blu">SMA blu</b><span>Media semplice: il prezzo "normale" delle ultime N sedute, dove ogni giorno pesa uguale. Prezzo sopra la linea = tendenza intatta; sotto = tendenza in discussione. E' il livello che tanti guardano, quindi spesso fa da appoggio.</span></div>
-      <div><b class="tv-arancio">EMA arancio</b><span>Stessa idea ma i giorni recenti pesano di piu': gira PRIMA della SMA quando il movimento cambia. Le due insieme dicono a che punto e' il cambio — solo l'arancio ha girato: e' appena iniziato; hanno girato entrambe e l'arancio ha incrociato la blu: e' consolidato.</span></div>
-      <div><b class="tv-viola">RSI</b><span>Nel riquadro sotto, scala 0-100: quanto e' stata forte la spinta delle ultime 14 sedute. Sopra 70 il titolo ha corso molto in poco tempo, sotto 30 e' stato venduto molto. NON e' un segnale di acquisto o vendita — un titolo in tendenza forte puo' restare sopra 70 per settimane. Serve a vedere quando la spinta si esaurisce mentre il prezzo sale ancora.</span></div>
-    </div>
-    <div class="tv-legenda tv-legenda-lat">
-      <div><b>Barra laterale sinistra</b><span>Sono gli strumenti per disegnare, dall'alto: il mirino (croce), le LINEE DI TENDENZA (per unire due minimi o due massimi), le forme (rettangoli per marcare una zona di prezzo), le misure (trascina per leggere quanto vale un movimento in % e in giorni), il testo, e in fondo la gomma e il lucchetto. Quello che disegni resta nel tuo browser.</span></div>
-      <div><b>Barra in alto</b><span>Il campo con la lente cambia titolo; i numeri (1m, 30m, 1h, D) cambiano l'unita' di ogni candela — su D ogni candela e' una giornata, su 1h un'ora; il bottone "Indicatori" apre il catalogo, dove puoi aggiungerne altri (nel piano gratuito ne convivono pochi per grafico: se ne aggiungi troppi TradingView toglie i primi).</span></div>
-      <div><b>In basso a destra</b><span>Le date, e il selettore dell'intervallo visibile (1G, 5G, 1M, 6M, 1A, 5A, Tutto). L'intervallo visibile NON cambia il calcolo degli indicatori: una media a 200 giorni resta a 200 giorni anche se guardi un mese.</span></div>
-    </div>
+    nota.innerHTML = `<details class="tv-piu"><summary>Come si legge il grafico — candele, volume, medie, RSI</summary><div class="tv-legenda">
+      <div><b>I numeri in alto a sinistra</b><span>Sono la candela su cui hai il mouse, non l'ultimo prezzo: <b>Aper.</b> a quanto ha aperto, <b>Max</b> e <b>Min</b> i due estremi della seduta, <b>Chius.</b> a quanto ha chiuso, e accanto quanto ha guadagnato o perso rispetto al giorno prima. Sposti il mouse e cambiano: e' cosi' che leggi una singola giornata senza aprire altro.</span></div>
+      <div><b>Candele</b><span>Ogni candela e' una seduta. Il <b>corpo</b> va da apertura a chiusura, i <b>fili</b> arrivano al massimo e al minimo toccati durante il giorno. <b class="tv-verde">Verde</b> = ha chiuso sopra l'apertura, <b class="tv-rosso">rossa</b> = sotto.<br>Cosa ti dice la FORMA: corpo lungo = una direzione ha comandato tutto il giorno. Corpo corto con fili lunghi da tutte e due le parti = compratori e venditori si sono equivalsi, giornata indecisa. Filo lungo solo sotto = hanno provato a spingerlo giu' e i compratori hanno ricomprato tutto: e' un rifiuto di quel livello, ed e' il pezzo di informazione piu' utile di una candela.</span></div>
+      <div><b>Volume</b><span>Le barre in basso: quante azioni sono passate di mano quel giorno. Da solo il numero non dice niente — conta il <b>CONFRONTO con le barre vicine</b>. Un rialzo con barre piu' alte della media e' stato fatto da molti e regge; lo stesso rialzo con barre basse e' fatto da pochi ed e' fragile. Il caso da conoscere: prezzo che sale mentre le barre si accorciano seduta dopo seduta = la spinta si sta esaurendo. Le barre sono verdi o rosse come la loro seduta.</span></div>
+      <div><b class="tv-blu">SMA blu</b><span>Media semplice: la media dei prezzi di chiusura delle ultime N sedute, dove ogni giorno pesa uguale. Il numero scritto accanto alla sigla e' <b>N</b>, e il valore che segue e' quanto vale la media adesso — con <code>SMA 9</code> stai guardando la media di NOVE sedute, cioe' due settimane scarse: e' una media <b>corta</b>, si muove quasi come il prezzo e cambia idea spesso. Le medie che il mercato guarda per la tendenza di fondo sono la 50 e la 200; se ti servono quelle, cambiale dal pannello indicatori.<br>Come si usa: prezzo sopra la linea = chi ha comprato di recente e' in guadagno, e la linea tende a fare da appoggio quando il prezzo ci torna sopra. Sotto = il contrario, e diventa un tetto.</span></div>
+      <div><b class="tv-arancio">EMA arancio</b><span>Stessa cosa, ma le sedute recenti pesano di piu' delle vecchie. Conseguenza pratica: <b>gira prima della SMA</b> quando il movimento cambia direzione.<br>Le due insieme ti dicono <b>a che punto e' il cambio</b>: ha girato solo l'arancio = e' appena cominciato, puo' ancora rientrare; hanno girato entrambe e l'arancio ha incrociato la blu = il cambio si e' consolidato. Quando sono appiattite e appiccicate, non c'e' tendenza: sono lo strumento sbagliato per quel momento, e leggerle li' produce solo falsi segnali.</span></div>
+      <div><b class="tv-viola">RSI</b><span>Nel riquadro sotto, scala fissa 0-100: misura quanto e' stata forte la spinta delle ultime 14 sedute, confrontando le giornate di rialzo con quelle di ribasso. I numeri accanto alla sigla sono <b>due</b>: il primo e' l'RSI di oggi, il secondo la sua media — quando l'RSI sta sopra la propria media la spinta sta accelerando, sotto sta rallentando.<br>Sopra 70 il titolo ha corso molto in poco tempo, sotto 30 e' stato venduto molto. <b>NON e' un segnale di acquisto o di vendita</b>: un titolo in tendenza forte resta sopra 70 per settimane, e chi vende a 70 vende all'inizio della corsa. Serve per una cosa sola e la fa bene: vedere quando <b>il prezzo fa un nuovo massimo e l'RSI no</b>. Vuol dire che il movimento continua ma con meno forza dietro — e' il primo posto dove si vede che una salita si sta stancando.</span></div>
     </div></details>
     ${String(tk).includes(".") ? `<div class="tv-piede">⚠ "${esc(tk)}" ha un suffisso di borsa alla Yahoo: TradingView usa una nomenclatura diversa e il simbolo potrebbe non agganciarsi — scrivilo come lo vedi su TradingView (per esempio <code>EURONEXT:ASML</code>).</div>` : ""}`;
   }

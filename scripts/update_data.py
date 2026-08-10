@@ -250,11 +250,24 @@ PORTFOLIO_KEYWORDS = {
 }
 
 
+# ⚠ v266 — FRED RIFIUTA LO USER-AGENT DA BROWSER. Misurato: la stessa URL csv risponde 200 a
+# `curl` e a un UA che si dichiara, e va in timeout con lo UA finto-Chrome che usiamo altrove —
+# la protezione anti-bot vede un browser che non si comporta da browser. Conseguenza: il ripiego
+# csv di FRED era MORTO per tutte le serie (CPI, PCE, PIL, vendite, NFP, disoccupazione, curva),
+# non solo per quelle nuove. Non si vedeva perche' in CI c'e' FRED_API_KEY e si passa dall'API
+# ufficiale: il ripiego non veniva mai esercitato, quindi il guasto stava li' in silenzio ad
+# aspettare il giorno in cui l'API avrebbe fallito. Su FRED ci si identifica per quello che
+# siamo, che oltre a funzionare e' anche la cosa onesta.
+UA_ONESTO = {"User-Agent": "Trading-dashboard/1.0 (+https://github.com/Oigres85/Trading)",
+             "Accept": "*/*"}
+
+
 def http_get(url, tries=3, timeout=25):
     last = None
+    intestazioni = UA_ONESTO if "stlouisfed.org" in url else UA
     for i in range(tries):
         try:
-            r = requests.get(url, headers=UA, timeout=timeout)
+            r = requests.get(url, headers=intestazioni, timeout=timeout)
             if r.status_code == 200:
                 return r
             last = Exception(f"HTTP {r.status_code}")
@@ -1465,6 +1478,53 @@ def fetch_macro():
                            "date": s[-1][0], "impact": round(clamp(50 + v * 40))})
     except Exception as e:  # noqa: BLE001
         print(f"!! curve: {e}", file=sys.stderr)
+    # ── v266 — LE SERIE CHE MANCAVANO (richiesta del CEO: 3 mesi, 30 anni, tassi reali e
+    # inflazione attesa, attivita' manifatturiera). Tutte da FRED, tutte con la loro data:
+    # un numero senza rilevazione qui non entra.
+    try:
+        s3 = fred_series("T10Y3M", 1)            # 10A-3M: la curva che la Fed guarda per la recessione
+        v = s3[-1][1]
+        indicators.append({"key": "curve3m", "label": "Curva 10A-3M", "value": f"{v:+.2f} pp",
+                           "date": s3[-1][0], "impact": round(clamp(50 + v * 40))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! curve3m: {e}", file=sys.stderr)
+    try:
+        s30 = fred_series("DGS30", 1)
+        v = s30[-1][1]
+        # ⚠ IMPACT AL CONTRARIO degli altri: il 30 anni alto SCONTA i titoli a lunga duration.
+        # Il neutro sta al 4%, e ogni punto in piu' toglie 25 punti d'impatto.
+        indicators.append({"key": "t30", "label": "Treasury USA 30A", "value": f"{v:.2f}%",
+                           "date": s30[-1][0], "impact": round(clamp(50 - (v - 4.0) * 25))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! t30: {e}", file=sys.stderr)
+    try:
+        sr = fred_series("DFII10", 1)            # TIPS 10A = tasso REALE, il costo del denaro al netto dell'inflazione
+        v = sr[-1][1]
+        indicators.append({"key": "real10", "label": "Tasso reale 10A (TIPS)", "value": f"{v:.2f}%",
+                           "date": sr[-1][0], "impact": round(clamp(50 - (v - 1.0) * 25))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! real10: {e}", file=sys.stderr)
+    try:
+        sb = fred_series("T10YIE", 1)            # breakeven 10A = inflazione che il mercato SI ASPETTA
+        v = sb[-1][1]
+        indicators.append({"key": "breakeven", "label": "Inflazione attesa 10A (breakeven)",
+                           "value": f"{v:.2f}%", "date": sb[-1][0],
+                           "impact": round(clamp(100 - abs(v - 2) * 30))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! breakeven: {e}", file=sys.stderr)
+    try:
+        # ⚠ NON E' L'ISM, ED E' DETTO. L'ISM e' sotto licenza e non e' ridistribuibile: FRED lo
+        # ha tolto nel 2016 e non esiste una fonte gratuita legittima. Il Philly Fed e' la stessa
+        # specie di misura — indagine mensile sulla manifattura, diffusion index, pubblicata
+        # PRIMA dell'ISM — e viene etichettata per quello che e'. Meglio un sostituto dichiarato
+        # che un ISM inventato: e' la regola che vale per ogni altro dato di questo sistema.
+        sp = fred_series("GACDFSA066MSFRBPHI", 1)
+        v = sp[-1][1]
+        indicators.append({"key": "philly", "label": "Manifattura Philly Fed (al posto dell'ISM)",
+                           "value": f"{v:+.1f}", "date": sp[-1][0],
+                           "impact": round(clamp(50 + v * 1.2))})
+    except Exception as e:  # noqa: BLE001
+        print(f"!! philly: {e}", file=sys.stderr)
     try:
         ch = fred_series("T10Y2Y", 520)          # ~2 anni giornalieri per il grafico storico
         macro["curve_history"] = [{"d": d, "v": v} for d, v in ch if v is not None]
@@ -1547,9 +1607,23 @@ def fetch_macro():
         "unemp": "Primo venerdì del mese (BLS) · disoccupazione bassa positiva",
         "umich": "Fine mese (UMich) · fiducia dei consumatori",
         "curve": "Giornaliero (FRED) · curva invertita = rischio recessione",
+        "curve3m": "Giornaliero (FRED) · il tratto 10A-3M è quello che la Fed guarda per la recessione",
+        "t30": "Giornaliero (FRED) · il 30 anni alto pesa sui titoli a lunga duration",
+        "real10": "Giornaliero (FRED) · rendimento al netto dell'inflazione: è il vero costo del denaro",
+        "breakeven": "Giornaliero (FRED) · l'inflazione che il mercato si aspetta a 10 anni",
+        "philly": "Mensile, ~terza settimana (Philadelphia Fed) · sostituto dichiarato dell'ISM, che è sotto licenza",
     }
+    # ⚠ v266 — UN INDICATORE SENZA CADENZA NON PARTE. Il CEO ha chiesto che ogni dato macro
+    # porti quando è stato rilevato e quando si aggiorna, "affinché anche il prompt LLM capisca
+    # la qualità temporale del dato e non lo interpreti come assoluto". Col .get(key, "") un
+    # indicatore nuovo usciva con la cadenza VUOTA e nessuno se ne accorgeva: la regola valeva
+    # solo per le serie già scritte. Ora la dimenticanza rompe il run invece di passare.
+    orfani = [i["key"] for i in indicators if not NEXT_RELEASE.get(i["key"])]
+    if orfani:
+        raise RuntimeError(f"indicatori senza cadenza in NEXT_RELEASE: {orfani} — "
+                           "ogni dato macro deve dire quando si aggiorna")
     for ind in indicators:
-        ind["next_release"] = NEXT_RELEASE.get(ind["key"], "")
+        ind["next_release"] = NEXT_RELEASE[ind["key"]]
     macro["indicators"] = indicators
 
     # Mercati di riferimento (BTC, WTI, KOSPI e Nasdaq sono in watchlist)
@@ -1558,6 +1632,12 @@ def fetch_macro():
         ("^TNX", "Treasury USA 10A", "{v:.2f}%", 2, " pp"),
         ("EURUSD=X", "EUR/USD", "{v:.4f}", 2, "%"),
         ("EURJPY=X", "EUR/JPY", "{v:.2f}", 2, "%"),
+        # v266 — le materie prime che il CEO ha chiesto. Petrolio e rame sono anche nella sua
+        # watchlist, dove restavano righe vuote perche' nessuno li seguiva.
+        ("CL=F", "Petrolio WTI", "{v:.2f}", 2, "%"),
+        ("HG=F", "Rame", "{v:.3f}", 2, "%"),
+        ("GC=F", "Oro", "{v:.0f}", 2, "%"),
+        ("^SOX", "Semiconduttori (SOX)", "{v:.0f}", 2, "%"),
     ]:
         try:
             h = yf.Ticker(sym).history(period="5d")["Close"].dropna()
