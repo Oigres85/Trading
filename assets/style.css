@@ -1997,5 +1997,8 @@ svg.g-serie { cursor: crosshair; }
    sezione?" — si puo', ma nessuna delle due viste fa quello che fa l'altra, quindi si sceglie. */
 .wl-viste { display: flex; align-items: center; gap: 6px; margin: 8px 0 6px; flex-wrap: wrap; }
 .wl-viste .btn { margin-left: auto; }
+/* il widget si dimensiona da se' sull'altezza calcolata: qui non si vincola, o si torna a
+   tagliare le righe. */
 .wl-tv { margin-top: 6px; min-height: 60px; }
+.wl-tv .tradingview-widget-container, .wl-tv iframe { width: 100% !important; }
 @media (max-width: 560px) { .wl-viste .btn { margin-left: 0; } }

@@ -1369,6 +1369,65 @@ check("v268 rete: livePrices e la watchlist condividono UNA cache, non due giri"
   return /quotaLive\(/.test(corpo) && !/fetchQuote\(/.test(corpo);
 })());
 
+/* ══ v270 — IL WIDGET TRADINGVIEW DELLA WATCHLIST ════════════════════════════════════════
+   Il CEO: "utilizza box tradingview embedded ma credo vada ottimizzato, controlla perche' non
+   si vede bene". Non si vedeva niente per due ragioni, misurate entrambe a schermo:
+     1. riceveva i ticker scritti alla Yahoo, e UN SOLO simbolo che non risolve svuota
+        l'INTERO riquadro (non una riga: tutte);
+     2. l'altezza era fissa a 460 e il widget non scorre, taglia: con 16-21 simboli se ne
+        vedevano nove.
+
+   ⚠⚠ IL CHECK PIU' IMPORTANTE DI QUESTO BLOCCO. Su TradingView esistono ticker con lo stesso
+   nome che sono STRUMENTI COMPLETAMENTE DIVERSI, e il widget li mostra con la faccia di un
+   dato buono. Verificato a schermo:
+       RUT  → "RUT CHAIN DATA"                     NON e' il Russell 2000
+       NQ1! → "QLD EVENING PEAK LOAD ELECTRICITY"  elettricita' australiana, NON il future Nasdaq
+       SPX  → "SPACE EXPLORATION TECHNOLOGIES"     SpaceX, NON l'indice S&P 500
+   Se un domani qualcuno "completa" la mappa con queste tre, il CEO si ritrova il prezzo
+   dell'elettricita' australiana in watchlist sotto l'etichetta "future Nasdaq". */
+check("v270 widget: la mappa NON contiene i ticker che risolvono in un altro strumento", (() => {
+  const i = src.indexOf("const TV_MAPPA");
+  const mappa = src.slice(i, src.indexOf("};", i));
+  return !/tv:\s*"(RUT|NQ1!|SPX|NDX)"/.test(mappa);
+})());
+
+check("v270 widget: i simboli scritti alla Yahoo restano fuori invece di svuotare il riquadro", run(`
+  return simboloWidgetTV("^RUT") === null && simboloWidgetTV("NQ=F") === null
+      && simboloWidgetTV("^SOX") === null && simboloWidgetTV("BTP-V28") === null
+      && simboloWidgetTV("ASML.AS") === null`));
+
+check("v270 widget: le mappature verificate ci sono e sono quelle giuste", run(`
+  return simboloWidgetTV("^VIX") === "VIX" && simboloWidgetTV("EURUSD=X") === "EURUSD"
+      && simboloWidgetTV("BTC-USD") === "BTCUSD" && simboloWidgetTV("CL=F") === "USOIL"
+      && simboloWidgetTV("HG=F") === "COPPER"`));
+
+/* ⚠ i titoli americani vanno col ticker NUDO: "SKHY" risolve, "AMEX:SKHY" no; "VIX" risolve,
+   "TVC:VIX" e "CBOE:VIX" no. Il prefisso di borsa peggiora le cose. */
+check("v270 widget: i titoli americani passano col ticker nudo, senza prefisso di borsa", run(`
+  return simboloWidgetTV("MU") === "MU" && simboloWidgetTV("SKHY") === "SKHY"`));
+
+check("v270 widget: l'altezza si calcola dalle righe, il widget non scorre", (() => {
+  const i = src.indexOf("function montaWatchlistTV");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1))
+    .replace(/\/\*[\s\S]*?\*\//g, "");
+  return /simboli\.length \* 45/.test(corpo) && !/height: 460/.test(corpo);
+})());
+
+/* ⚠ il CEO e' passato a questa vista PER TOGLIERE IL RITARDO, e il ritardo qui c'e' lo stesso:
+   TradingView lo dichiara con una "D" accanto a ogni prezzo. Se la nota non lo dice, la vista
+   mente per omissione proprio sul punto per cui e' stata scelta. */
+check("v270 widget: la nota dichiara che le azioni americane sono comunque in ritardo", (() => {
+  const i = src.indexOf("function applicaVistaWatchlist");
+  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1));
+  return /in ritardo/.test(corpo) && /<b>D<\/b>/.test(corpo);
+})());
+
+check("v270 widget: i simboli che il widget non mostra vengono elencati, non spariscono", (() => {
+  const i = src.indexOf("function applicaVistaWatchlist");
+  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1));
+  return /Fuori dal widget/.test(corpo);
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

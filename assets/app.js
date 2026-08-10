@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "269";
+const BUILD_VERSION = "270";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7254,14 +7254,58 @@ let wlInCorso = false;
 const WL_VISTA_KEY = "watchlist_vista";
 let wlVista = (() => { try { return localStorage.getItem(WL_VISTA_KEY) === "tv" ? "tv" : "tabella"; } catch { return "tabella"; } })();
 
+/* ═══ v270 — I SIMBOLI CHE IL WIDGET GRATUITO REGGE DAVVERO ════════════════════════════════
+   Il CEO: "utilizza box tradingview embedded ma credo vada ottimizzato, controlla perche' non
+   si vede bene". Non si vedeva niente, ed ecco perche': il widget riceveva i ticker scritti
+   alla Yahoo (^VIX, NQ=F, EURUSD=X, BTC-USD, BTP-V28) e UN SOLO SIMBOLO CHE NON RISOLVE
+   SVUOTA L'INTERO RIQUADRO. Non una riga mancante: tutte. Misurato montando i simboli uno per
+   uno con widget separati.
+   ⚠⚠ LA TRAPPOLA PIU' PERICOLOSA, E PER QUESTO LA MAPPA E' CORTA: su TradingView esistono
+   ticker con lo stesso nome che sono STRUMENTI COMPLETAMENTE DIVERSI, e il widget li mostra
+   con la stessa faccia di un dato buono. Verificato a schermo:
+       RUT  → "RUT CHAIN DATA"                      NON e' il Russell 2000
+       NQ1! → "QLD EVENING PEAK LOAD ELECTRICITY"   elettricita' australiana, NON il future Nasdaq
+       SPX  → "SPACE EXPLORATION TECHNOLOGIES"      SpaceX, NON l'indice S&P 500
+   Mappare "^RUT"→"RUT" o "NQ=F"→"NQ1!" avrebbe messo il prezzo dell'elettricita' australiana
+   in watchlist sotto l'etichetta "future Nasdaq": un numero plausibile, aggiornato, e di
+   un'altra cosa. Qui entra SOLO cio' che ho visto risolvere nello strumento giusto.
+   I titoli americani vanno col ticker NUDO: "SKHY" funziona, "AMEX:SKHY" no; "VIX" funziona,
+   "TVC:VIX" e "CBOE:VIX" no. Il prefisso di borsa peggiora le cose invece di aiutare. */
+const TV_MAPPA = {
+  "^VIX": { tv: "VIX", nota: "indice di volatilita'" },
+  "EURUSD=X": { tv: "EURUSD", nota: "cambio" },
+  "BTC-USD": { tv: "BTCUSD", nota: "bitcoin" },
+  /* ⚠ questi due sono CFD, non i future del CME: il prezzo segue da vicino ma non e' lo
+     stesso contratto. Va detto, non nascosto dentro una riga che sembra il future. */
+  "CL=F": { tv: "USOIL", nota: "CFD sul petrolio WTI, non il future CME" },
+  "HG=F": { tv: "COPPER", nota: "CFD sul rame, non il future COMEX" },
+};
+/* Verificati come NON disponibili nel widget gratuito ("Questo simbolo e' disponibile solo su
+   TradingView"): ^SOX, ^KS11, ^RUT, NQ=F. Piu' BTP-V28, che e' un nostro ticker sintetico.
+   Restano fuori dal widget — e la nota li elenca, invece di lasciarli sparire in silenzio. */
+function simboloWidgetTV(tk) {
+  const T = String(tk || "").trim().toUpperCase();
+  if (!T) return null;
+  if (TV_MAPPA[T]) return TV_MAPPA[T].tv;
+  /* niente decorazioni alla Yahoo: ^ per gli indici, =F per i future, =X per i cambi, e i
+     suffissi di borsa. Se ne resta una, il simbolo non e' di TradingView e non si tira a
+     indovinare: si lascia fuori. */
+  if (/[\^=]/.test(T) || T.includes("-")) return null;
+  if (/\.[A-Z]{1,3}$/.test(T)) return null;      // ASML.AS e simili: nomenclatura diversa
+  return T;
+}
+
 function montaWatchlistTV() {
   const box = $("#wl-tv");
   if (!box) return;
   if (typeof document === "undefined" || typeof document.createElement !== "function") return;
   const prova = document.createElement("div");
   if (!prova || typeof prova.appendChild !== "function") return;   // harness senza DOM (v257)
-  const simboli = leggiWatchlist().map(simboloTradingView).filter(Boolean);
-  if (!simboli.length) { box.innerHTML = '<div class="muted">Nessun simbolo in watchlist.</div>'; return; }
+  const tutti = leggiWatchlist();
+  const simboli = [], fuori = [];
+  tutti.forEach(x => { const t = simboloWidgetTV(x); if (t) simboli.push(t); else fuori.push(x); });
+  if (!simboli.length) { box.innerHTML = '<div class="muted">Nessun simbolo di questa watchlist è mostrabile dal widget di TradingView.</div>'; return; }
+  box.dataset.fuori = fuori.join(" ");
   box.innerHTML = "";
   const cont = document.createElement("div");
   cont.className = "tradingview-widget-container";
@@ -7272,8 +7316,16 @@ function montaWatchlistTV() {
   sc.type = "text/javascript";
   sc.async = true;
   sc.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js";
+  /* ⚠ v270 — L'ALTEZZA SI CALCOLA DAL NUMERO DI RIGHE. Era fissa a 460 e il widget NON
+     SCORRE: taglia. Con 16-21 simboli se ne vedevano nove e gli altri sparivano senza un
+     bordo, una barra, niente — "non si vede bene". Misurato a schermo: intestazione ~46px,
+     ogni riga ~45px. Si somma, invece di sperare che ci stiano.
+     ⚠ `isTransparent: false`: su fondo scuro il trasparente rendeva il testo poco leggibile.
+     Le prove che ho fatto per validare i simboli usavano false, e questa e' la stessa
+     configurazione — si spedisce quella verificata, non una variante non provata. */
+  const alt = 46 + simboli.length * 45 + 10;
   sc.text = JSON.stringify({
-    width: "100%", height: 460, colorTheme: "dark", locale: "it", isTransparent: true,
+    width: "100%", height: alt, colorTheme: "dark", locale: "it", isTransparent: false,
     showSymbolLogo: true,
     symbolsGroups: [{ name: "La mia watchlist", symbols: simboli.map(s => ({ name: s })) }],
   });
@@ -7299,12 +7351,21 @@ function applicaVistaWatchlist() {
   const nota = $("#wl-nota");
   if (wlVista === "tv") {
     montaWatchlistTV();
-    /* ⚠ la nota cambia perche' cambia la VERITA': in questa vista i numeri non sono nostri e
-       non possiamo garantirne niente, nemmeno l'ora. Dirlo e' l'unica cosa onesta. */
+    /* ⚠ v270 — LA NOTA DICE LE TRE COSE MISURATE, perche' il CEO e' passato a questa vista
+       per togliere il ritardo e il ritardo qui c'e' lo stesso. TradingView lo dichiara da
+       sola: accanto a ogni prezzo mette una "D" in apice, che nella sua documentazione vuol
+       dire dato ritardato. Verificato su MU, AMD, NVDA, ORCL, WDC, MSTR, SKHY, QQQ — tutti
+       con la D, e con gli stessi numeri che dava Yahoo. Senza ritardo, misurati: VIX, EURUSD,
+       bitcoin, petrolio e rame. */
+    const fuori = ($("#wl-tv")?.dataset.fuori || "").split(" ").filter(Boolean);
     if (nota) nota.innerHTML = "Widget di TradingView: prezzi loro, aggiornati da loro. "
-      + "In questa vista non si può ordinare né togliere una riga, e i numeri non entrano nel "
-      + "pacchetto per l'analisi — è un riquadro di un altro sito dentro la pagina. "
-      + "Per ordinare, cancellare o usare i dati, torna a <b>Tabella</b>.";
+      + "<b>Le azioni americane arrivano comunque in ritardo</b>: TradingView lo segna da sé con una "
+      + "<b>D</b> accanto al prezzo, e i valori coincidono con quelli della vista Tabella. "
+      + "Senza ritardo qui ci sono VIX, cambi, bitcoin, petrolio e rame."
+      + (fuori.length ? ` <b>Fuori dal widget:</b> ${esc(fuori.join(", "))} — il widget gratuito non li mostra `
+          + "(basta un simbolo che non riconosce per lasciare il riquadro vuoto, ed è per questo che prima non si vedeva niente)." : "")
+      + " In questa vista non si può ordinare né togliere una riga, e i numeri non entrano nel "
+      + "pacchetto per l'analisi. Per quelli, torna a <b>Tabella</b>.";
   } else {
     renderWatchlistTV();
   }
@@ -7457,6 +7518,10 @@ async function caricaWatchlistCloud() {
     if (Array.isArray(a) && a.length) {
       const locale = leggiWatchlist();
       if (localStorage.getItem(WL_LOCALE) && JSON.stringify(locale) !== JSON.stringify(a)) {
+        /* ⚠ v270 — in vista TradingView la nota spiega il ritardo e cosa il widget non mostra:
+           sovrascriverla con l'avviso di sincronizzazione toglieva proprio l'informazione per
+           cui il CEO era passato a quella vista. L'avviso si tiene per la vista Tabella. */
+        if (wlVista === "tv") return;
         const nota = $("#wl-nota");
         if (nota) nota.innerHTML = `Su questo browser hai <b>${locale.length} simboli</b>, sul repo ce ne sono `
           + `<b>${a.length}</b>: le tue modifiche non sono arrivate sul repo (manca il token GitHub). `
