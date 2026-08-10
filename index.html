@@ -18,7 +18,7 @@
 <title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=267">
+<link rel="stylesheet" href="assets/style.css?v=268">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -125,6 +125,17 @@
       <button class="btn btn-ghost" id="wl-salva">Salva</button>
     </div>
     <div id="wl-chips" class="wl-chips"></div>
+    <!-- v268 — DUE VISTE, PERCHE' NESSUNA DELLE DUE PUO' FARE TUTTO. Il CEO: "non puoi lasciare
+         box tradingview embedded anche per questa sezione?". Si puo', e conviene averle
+         entrambe: la TABELLA e' nostra (si ordina, si cancella una riga, i numeri si possono
+         leggere e mettere nel prompt) e da v268 ha i prezzi dal vivo; il WIDGET TradingView e'
+         un iframe che non si ordina e non si legge, ma porta il grafico e i dati come li vede
+         lui su TradingView. Il bottone sceglie, e la scelta resta. -->
+    <div class="wl-viste" role="group" aria-label="Vista della watchlist">
+      <button class="chip chip-active" data-wl-vista="tabella">Tabella</button>
+      <button class="chip" data-wl-vista="tv">TradingView</button>
+      <button class="btn btn-ghost btn-sm" id="wl-aggiorna" title="Rilegge subito i prezzi">↻ Aggiorna</button>
+    </div>
     <!-- v266 — LA WATCHLIST COME TABELLA, non come widget muto. Il CEO: "sembra che i dati siano
          fermi ... struttura i dati come quelli nella foto ... con possibilità di eliminarli o
          ordinarli cliccando sulle variabili delle colonne".
@@ -135,6 +146,7 @@
          pipeline gia' seguiva sono veri; per gli altri la tabella lo DICHIARA invece di lasciare
          una cella vuota che sembra un dato fermo. -->
     <div id="wl-tab" class="wl-tab"></div>
+    <div id="wl-tv" class="wl-tv" hidden></div>
     <div id="wl-nota" class="muted"></div>
   </section>
 
@@ -313,6 +325,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=267"></script>
+<script src="assets/app.js?v=268"></script>
 </body>
 </html>

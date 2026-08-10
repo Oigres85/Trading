@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "267";
+const BUILD_VERSION = "268";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -485,11 +485,135 @@ const STATO_PTF_PATH = "config/portfolio_state.json";
 
 
 /* ---------------- prezzi live lato client (CORS proxy → Yahoo) ---------------- */
+/* ⚠ v268 — I PROXY SONO GRATUITI E CONDIVISI, E SI ARRABBIANO. Misurato mentre scrivevo
+   questa versione: corsproxy.io ha cominciato a rispondere "HTTP 429 Rate limit reached" dopo
+   qualche minuto di richieste — perche' la pagina ne faceva 21 al minuto per la watchlist PIU'
+   quelle di livePrices, sugli stessi simboli. Due giri separati per lo stesso dato: il doppio
+   del traffico e, peggio, due verita' possibili sullo stesso prezzo nella stessa pagina.
+   Da qui: un giro solo, una cache sola, e chi prende un 429 va in castigo per un po' invece di
+   essere richiamato subito (riprovare in fretta e' il modo per restare bloccati). */
 const CORS_PROXIES = [
   u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
   u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
   u => `https://thingproxy.freeboard.io/fetch/${u}`,
 ];
+const proxyInCastigo = new Map();          // indice del proxy → quando torna utilizzabile
+const CASTIGO_MS = 5 * 60 * 1000;
+
+/* ═══ v268 — QUOTAZIONI VERE PER QUALSIASI SIMBOLO, DAL BROWSER ════════════════════════════
+   Il CEO: "se cambio ticker nel box ricerca la risposta e': per questo simbolo la pipeline non
+   ha ne' livelli ne' opzioni" e "La mia watchlist come faccio ad aggiornare valori? e da dove
+   prende questi dati?".
+   LA RISPOSTA STAVA GIA' IN CASA. Questa pagina interroga Yahoo dal browser da sempre
+   (fetchQuote, sopra): non aveva bisogno della pipeline per i prezzi, li chiedeva solo per
+   l'ultimo scambio e buttava via il resto della risposta. Lo stesso endpoint, con un `range`
+   piu' lungo, restituisce le BARRE — e da quelle si ricavano massimo e minimo del giorno,
+   volume, supporto, resistenza e i due estremi dell'anno con le stesse formule della pipeline
+   (minimo/massimo delle ultime 20 sedute; vedi update_data.py, "support"/"resistance").
+   Misurato prima di scrivere questo: 7 simboli in parallelo in 152 ms, compresi ^SOX e HG=F
+   che la pipeline non segue. BTP-V28 risponde "Not Found" — e' un ticker sintetico nostro, non
+   esiste su Yahoo, e la riga lo dira' invece di restare in bianco.
+   ⚠ IL LIMITE, DICHIARATO: si passa da un proxy CORS pubblico e gratuito (Yahoo non manda gli
+   header CORS: misurato, la chiamata diretta fallisce). Se il proxy cade, i prezzi non
+   arrivano — e allora si mostra il dato della pipeline DICENDO che e' quello, invece di una
+   cella vuota. Le opzioni (muri di put e call) restano appannaggio della pipeline: nessuna
+   fonte gratuita le espone al browser.
+   ⚠ NON e' un dato "ufficiale": e' l'ultimo scambio che Yahoo pubblica, con i suoi ritardi. */
+const QUOTE_TTL = 90 * 1000;          // i prezzi si rileggono al massimo ogni minuto e mezzo
+const BARRE_TTL = 15 * 60 * 1000;     // un anno di barre cambia poco: si tiene un quarto d'ora
+const cacheQuote = new Map();
+
+function yahooChart(symbol, range) {
+  return `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=1d`;
+}
+
+/* Chiede le barre a Yahoo passando dai proxy in ordine. Ritorna null se nessuno risponde:
+   il chiamante deve poter distinguere "non risponde" da "non esiste", e infatti sono due
+   valori diversi — null contro { assente: true }. */
+async function barreYahoo(symbol, range) {
+  const url = yahooChart(symbol, range);
+  for (let i = 0; i < CORS_PROXIES.length; i++) {
+    const fino = proxyInCastigo.get(i);
+    if (fino && Date.now() < fino) continue;          // ha appena detto 429: si salta
+    const make = CORS_PROXIES[i];
+    try {
+      const r = await fetch(make(url), { cache: "no-store" });
+      if (r.status === 429) { proxyInCastigo.set(i, Date.now() + CASTIGO_MS); continue; }
+      if (r.ok) proxyInCastigo.delete(i);
+      if (!r.ok) continue;
+      const j = await r.json();
+      if (j && j.chart && j.chart.error) return { assente: true, motivo: j.chart.error.description || j.chart.error.code };
+      const res = j && j.chart && j.chart.result && j.chart.result[0];
+      if (!res || !res.meta) continue;
+      const q = (res.indicators && res.indicators.quote && res.indicators.quote[0]) || {};
+      return {
+        meta: res.meta,
+        high: (q.high || []).map(Number), low: (q.low || []).map(Number),
+        close: (q.close || []).map(Number), open: (q.open || []).map(Number),
+        volume: (q.volume || []).map(Number),
+      };
+    } catch { /* proxy successivo */ }
+  }
+  return null;
+}
+
+/* la quotazione di un simbolo con quello che serve alle colonne del broker.
+   `range` corto per la tabella (una barra basta), lungo per i livelli. */
+async function quotaLive(symbol, range = "5d") {
+  const k = `${symbol}|${range}`;
+  const ttl = range === "5d" ? QUOTE_TTL : BARRE_TTL;
+  const c = cacheQuote.get(k);
+  if (c && Date.now() - c.t < ttl) return c.v;
+  const b = await barreYahoo(symbol, range);
+  let v = null;
+  if (b && b.assente) v = { assente: true, motivo: b.motivo };
+  else if (b) {
+    const m = b.meta;
+    const ok = (a) => (a || []).filter(Number.isFinite);
+    const hi = ok(b.high), lo = ok(b.low), vol = ok(b.volume);
+    const px = Number(m.regularMarketPrice);
+    /* ⚠ v268 — `chartPreviousClose` NON E' LA CHIUSURA DI IERI: e' la chiusura PRIMA della
+       finestra richiesta. Misurato su WDC con range=5d: chartPreviousClose valeva 544,84 (il
+       31 luglio) mentre la seduta precedente aveva chiuso a 451,52 — la variazione usciva
+       -20,29% invece di -3,81%. Un numero plausibile e sbagliato di cinque volte, che nessun
+       controllo di forma avrebbe intercettato perche' era un numero perfettamente valido.
+       La chiusura precedente e' la penultima barra buona, e basta guardarla. `previousClose`
+       del meta si usa solo se c'e' (spesso manca) e la serie e' troppo corta.
+       ⚠ Questo vale anche col mercato aperto: l'ultima barra e' quella di oggi (parziale) e la
+       penultima e' la chiusura di ieri — in tutti e due i casi il conto e' lo stesso. */
+    const chiusure = ok(b.close);
+    const prev = chiusure.length >= 2 ? chiusure[chiusure.length - 2]
+               : Number(m.previousClose != null ? m.previousClose : m.chartPreviousClose);
+    v = {
+      price: px,
+      /* ⚠ il massimo del giorno lo porta il META (regularMarketDayHigh), che e' quello vero
+         della seduta in corso; l'ultima barra e' gia' chiusa quando il mercato e' chiuso e
+         coincide, ma durante la seduta il meta e' piu' fresco. Si preferisce il meta e si
+         ripiega sull'ultima barra. */
+      dayHigh: Number.isFinite(Number(m.regularMarketDayHigh)) ? Number(m.regularMarketDayHigh) : hi[hi.length - 1],
+      dayLow: Number.isFinite(Number(m.regularMarketDayLow)) ? Number(m.regularMarketDayLow) : lo[lo.length - 1],
+      /* un indice non ha volume: Yahoo manda 0, e "0K" in tabella sembra un mercato fermo.
+         Zero qui vuol dire "non esiste", e si scrive come le altre assenze. */
+      vol: (() => {
+        const v0 = Number.isFinite(Number(m.regularMarketVolume)) ? Number(m.regularMarketVolume) : vol[vol.length - 1];
+        return Number.isFinite(v0) && v0 > 0 ? v0 : NaN;
+      })(),
+      prev,
+      chg: Number.isFinite(px) && Number.isFinite(prev) ? px - prev : NaN,
+      chgPct: Number.isFinite(px) && Number.isFinite(prev) && prev ? (px / prev - 1) * 100 : NaN,
+      valuta: m.currency,
+      /* i livelli si calcolano solo quando si e' chiesta la storia: con 5 giorni un
+         "supporto a 20 sedute" sarebbe un numero costruito su 5, cioe' una bugia comoda. */
+      sup20: hi.length >= 20 ? Math.min(...lo.slice(-20)) : NaN,
+      res20: hi.length >= 20 ? Math.max(...hi.slice(-20)) : NaN,
+      max52: hi.length >= 200 ? Math.max(...hi) : NaN,
+      min52: lo.length >= 200 ? Math.min(...lo) : NaN,
+      barre: hi.length,
+    };
+  }
+  if (v) cacheQuote.set(k, { t: Date.now(), v });
+  return v;
+}
 
 async function fetchQuote(symbol) {
   const yurl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=1d&interval=1d`;
@@ -560,7 +684,17 @@ async function livePrices() {
     ...DATA.portfolio.filter(r => r.ticker !== "BTP-V28").map(r => r.ticker),
     ...(DATA.watchlist || []).map(r => r.ticker),
   ])];
-  const res = await Promise.allSettled(syms.map(s => fetchQuote(s).then(q => [s, q])));
+  /* ⚠ v268 — LO STESSO GIRO CHE SERVE LA WATCHLIST. Prima questa funzione chiamava fetchQuote
+     e la watchlist ne faceva un altro sugli STESSI simboli: doppio traffico verso un proxy
+     gratuito (che infatti ha risposto 429) e due prezzi possibili per lo stesso titolo nella
+     stessa pagina. Ora si passa da quotaLive, che ha una cache con scadenza: la seconda
+     richiesta dello stesso simbolo non esce nemmeno, e i due posti mostrano lo stesso numero
+     perche' leggono lo stesso oggetto. */
+  const res = await Promise.allSettled(syms.map(async (s) => {
+    const q = await quotaLive(s, "5d");
+    if (q && !q.assente) quoteLive.set(String(s).toUpperCase(), q);
+    return [s, q && !q.assente && Number.isFinite(q.price) ? { price: q.price, prev: q.prev } : null];
+  }));
   const map = {}; let any = false;
   res.forEach(x => { if (x.status === "fulfilled" && x.value[1]) { map[x.value[0]] = x.value[1]; any = true; } });
   if (!any) return;
@@ -6673,7 +6807,19 @@ function livelliTitolo(tk) {
   const r = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
     .find(x => String(x.ticker || "").toUpperCase() === T);
   const o = statoOpzioni(T);
-  const spot = Number(o ? o.spot : (r ? r.price : NaN));
+  /* ⚠ v268 — I LIVELLI NON DIPENDONO PIU' DA COSA SEGUE LA PIPELINE. Il CEO: "se cambio ticker
+     nel box ricerca la risposta e': per questo simbolo la pipeline non ha ne' livelli ne'
+     opzioni". Era vero e inutile — a lui non serve sapere cosa segue la pipeline, gli servono i
+     livelli del titolo che sta guardando.
+     Le barre dell'anno arrivano dal browser (quotaLive con range 1y) e supporto, resistenza e
+     i due estremi si calcolano QUI con le stesse formule della pipeline: minimo/massimo delle
+     ultime 20 sedute, minimo/massimo dell'anno. Non e' un'approssimazione, e' lo stesso conto
+     su barre della stessa fonte.
+     Resta pipeline-only una cosa sola, e va detta: i MURI delle opzioni. Nessuna fonte
+     gratuita espone le catene al browser, quindi per i titoli fuori dai 30 seguiti quelle due
+     righe non ci sono — e la scheda lo dichiara invece di lasciarle immaginare. */
+  const live = quoteLive.get(T + "|1y");
+  const spot = Number(o ? o.spot : (live && !live.assente && Number.isFinite(live.price) ? live.price : (r ? r.price : NaN)));
   if (!Number.isFinite(spot)) return null;
   const L = [];
   /* ⚠ `breve` porta gia' l'articolo. Comporre "prima del " + nome dava "prima del resistenza":
@@ -6688,7 +6834,18 @@ function livelliTitolo(tk) {
     agg("Muro delle PUT", "del muro delle put", o.putWall, `opzioni, scadenza ${o.scadenza}`,
         "lo strike con piu' contratti put aperti: stessa meccanica al contrario, tende a fare da pavimento");
   }
-  if (r) {
+  /* le barre del browser vengono PRIMA di quelle della pipeline: sono dello stesso giorno o
+     piu' fresche, e coprono anche i simboli che la pipeline non segue. */
+  if (live && !live.assente && Number.isFinite(live.res20)) {
+    agg("Resistenza", "della resistenza", live.res20, "massimo delle ultime 20 sedute (Yahoo, dal vivo)",
+        "l'ultima volta che ci e' arrivato si e' fermato: sopra, quel massimo non ce l'ha piu' sopra la testa");
+    agg("Supporto", "del supporto", live.sup20, "minimo delle ultime 20 sedute (Yahoo, dal vivo)",
+        "il punto dove nell'ultimo mese hanno ricomprato; rotto al ribasso smette di essere un supporto");
+    agg("Massimo 52 settimane", "del massimo dell'anno", live.max52, "un anno di barre (Yahoo, dal vivo)",
+        "il punto piu' alto degli ultimi dodici mesi");
+    agg("Minimo 52 settimane", "del minimo dell'anno", live.min52, "un anno di barre (Yahoo, dal vivo)",
+        "il punto piu' basso degli ultimi dodici mesi");
+  } else if (r) {
     agg("Resistenza", "della resistenza", r.resistance, "massimo delle ultime 20 sedute",
         "l'ultima volta che ci e' arrivato si e' fermato: sopra, quel massimo non ce l'ha piu' sopra la testa");
     agg("Supporto", "del supporto", r.support, "minimo delle ultime 20 sedute",
@@ -6716,18 +6873,40 @@ function livelliTitolo(tk) {
            pavimento: sotto.length ? sotto[0] : null };            // il piu' vicino sotto
 }
 
-function renderOpzioniGrafico(tk) {
+async function renderOpzioniGrafico(tk) {
   const box = $("#tv-opzioni");
   if (!box) return;
+  /* ⚠ v268 — SI CHIEDONO LE BARRE PRIMA DI DISEGNARE, e nel frattempo si dice che si sta
+     leggendo. Senza questa riga la scheda disegnava con quello che aveva (spesso niente) e
+     nessuno la ridisegnava all'arrivo: lo stesso difetto "sembra fermo" gia' corretto due
+     volte in questa versione. Qui l'attesa e' esplicita perche' il dato arriva dalla rete. */
+  const T = String(tk || "").toUpperCase().replace(/^[A-Z]+:/, "");
+  if (!quoteLive.has(T + "|1y")) {
+    if (!box.innerHTML) box.innerHTML = '<div class="tvo-vuoto muted">Leggo i livelli di ' + esc(T) + '…</div>';
+    try {
+      const q = await quotaLive(T, "1y");
+      if (q) quoteLive.set(T + "|1y", q);
+    } catch { /* proxy muto: si continua con quello che c'e' */ }
+    /* nel frattempo il CEO puo' aver cambiato simbolo: se non e' piu' il suo, non si disegna
+       sopra la richiesta piu' recente. */
+    const attuale = String(tvSimboloCorrente || "").toUpperCase().replace(/^[A-Z]+:/, "");
+    if (attuale && attuale !== T) return;
+  }
   const S = livelliTitolo(tk);
   const o = statoOpzioni(tk);
   if (!S) {
     /* ⚠ niente silenzio e niente ripiego travestito: se di quel simbolo non si sa nulla lo si
        dice, e il dato di mercato si offre come contesto ETICHETTATO — non come se fosse suo. */
-    const pc = (DATA && DATA.macro && DATA.macro.putcall) || null;
-    box.innerHTML = `<div class="tvo-vuoto muted">Per questo simbolo la pipeline non ha né livelli né opzioni`
-      + ` (segue le catene di ${Object.keys((DATA && DATA.options) || {}).length} titoli).`
-      + (pc && pc.ratio != null ? ` Come contesto di MERCATO, non di questo titolo: put/call ${fmtNum.format(pc.ratio)} su ${esc(pc.symbol || "SPY")}.` : "")
+    /* ⚠ il messaggio dice cosa e' successo DAVVERO, e sono due cose diverse: o Yahoo non
+       conosce quel simbolo (di solito e' scritto in un altro modo), o il proxy non ha
+       risposto. Prima si diceva "la pipeline non lo segue", che era vero e non serviva a
+       niente — al CEO non interessa cosa segue la pipeline. */
+    const q = quoteLive.get(T + "|1y");
+    box.innerHTML = `<div class="tvo-vuoto muted">`
+      + (q && q.assente
+          ? `<b>${esc(T)}</b> non esiste su Yahoo con questo nome: probabilmente si scrive in un altro modo `
+            + `(le borse europee vogliono il suffisso — ASML.AS, RACE.MI — e gli indici la ^, come ^SOX).`
+          : `Non sono riuscito a leggere i livelli di <b>${esc(T)}</b>: il servizio che gira le richieste a Yahoo non ha risposto. Riprovo al prossimo giro.`)
       + `</div>`;
     return;
   }
@@ -6781,13 +6960,17 @@ function renderOpzioniGrafico(tk) {
     </div>`;
   }
 
-  box.innerHTML = `<details class="tvo-piu"><summary>Livelli di <b>${esc(S.tk)}</b> — supporti, resistenze e opzioni</summary>
+  /* il titolo promette solo quello che c'e' dentro: per i titoli fuori dai 30 seguiti le
+     opzioni non ci sono, e annunciarle sarebbe una promessa non mantenuta. */
+  const conOpz = !!(o && o.ratio != null);
+  box.innerHTML = `<details class="tvo-piu"><summary>Livelli di <b>${esc(S.tk)}</b> — supporti, resistenze${conOpz ? " e opzioni" : ""}</summary>
     <div class="tvo">
       ${corsia}
       <div class="tvo-scroll"><table class="tvo-tab"><thead><tr>
         <th>Livello</th><th class="num">Prezzo</th><th class="num">Distanza</th><th>Da dove viene</th>
       </tr></thead><tbody>${righe.join("")}</tbody></table></div>
       ${opz}
+      ${conOpz ? "" : "<div class=\"muted tvo-fine\">Di questo titolo non ci sono le opzioni: le catene (muri di put e call) le scarica la pipeline per 30 titoli, e nessuna fonte gratuita le espone al browser. Supporti, resistenze ed estremi dell'anno invece ci sono, letti dal vivo.</div>"}
       <div class="muted tvo-fine">I livelli non sono previsioni: dicono dove il prezzo ha gia' incontrato
         qualcosa, non dove andra'. Quelli delle opzioni valgono per la loro scadenza e si spostano quando
         cambia; supporto e resistenza guardano venti sedute e si aggiornano ogni giorno.</div>
@@ -6940,10 +7123,40 @@ const WL_COLONNE = [
 ];
 
 /* i dati di un simbolo, da data.json. Null dove la pipeline non lo segue: dichiarato, non finto. */
+/* ⚠ v268 — `Number(null)` FA ZERO, NON NaN. E' la trappola che ha fatto uscire il BTP con
+   "Massimo 0 · Minimo 0 · 0%": nel file quei campi sono `null` (per un titolo non quotato in
+   borsa NON ESISTONO), e la conversione li ha trasformati in zeri, cioe' in numeri veri. Uno
+   zero come prezzo e' un valore che non puo' esistere, e mostrato accanto a 102,95 sembra un
+   crollo totale. Questa funzione tiene l'assenza distinta dal valore: null, undefined e stringa
+   vuota diventano NaN, che la tabella disegna come trattino. */
+function numero(v) {
+  if (v == null || v === "") return NaN;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+/* ⚠ v268 — la quotazione live, quando c'e', VINCE sul dato della pipeline: e' piu' fresca
+   dello stesso ordine di grandezza con cui il CEO guarda la pagina. Ma la riga dice sempre da
+   dove viene il suo numero: "live", "pipeline", o l'assenza dichiarata. Mescolare le due fonti
+   senza etichetta era il modo per non far capire perche' due celle non tornano fra loro. */
+const quoteLive = new Map();
+
 function datiSimbolo(tk) {
   const T = String(tk || "").toUpperCase();
+  const q = quoteLive.get(T);
+  if (q && !q.assente && Number.isFinite(q.price)) {
+    const nome = nomeSimbolo(T);
+    return { tk: T, nome, seguito: true, fonte: "live", price: q.price,
+             high: q.dayHigh, low: q.dayLow, chg: q.chg, chg_pct: q.chgPct, vol: q.vol };
+  }
   const r = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
     .find(x => String(x.ticker || "").toUpperCase() === T);
+  /* ⚠ v268 — "Yahoo non ha questo simbolo" e "la pipeline non lo segue" sono due cose diverse
+     e vanno dette diverse. BTP-V28 e' un ticker sintetico nostro: Yahoo risponde Not Found ed
+     e' la risposta CORRETTA, non un guasto. Se pero' la pipeline quel simbolo ce l'ha (il BTP
+     lo calcola lei), il dato della pipeline resta e vince: l'assenza su Yahoo non deve
+     cancellare un numero che abbiamo. */
+  if (q && q.assente && !r) return { tk: T, nome: nomeSimbolo(T), seguito: false, ignoto: true };
   /* ⚠ v266 — PRIMA DI DICHIARARE "non seguito", SI GUARDA ANCHE NEL BLOCCO MACRO. Cinque dei
      simboli del CEO (VIX, futures Nasdaq, SOX, EUR/USD, rame) non stanno negli array dei titoli
      ma i loro numeri sono nel file lo stesso, dentro `macro`. Dichiararli "non seguiti" sarebbe
@@ -6952,9 +7165,9 @@ function datiSimbolo(tk) {
      sbagliato" (v207) rovesciata — qui il dato giusto sarebbe rimasto nascosto. */
   if (!r) {
     const m = (DATA && DATA.macro) || {};
-    const daMacro = (nome, val, pct) => Number.isFinite(Number(val))
-      ? { tk: T, nome, seguito: true, price: Number(val), high: NaN, low: NaN,
-          chg: NaN, chg_pct: Number(pct), vol: NaN, fonte: "macro" } : null;
+    const daMacro = (nome, val, pct) => Number.isFinite(numero(val))
+      ? { tk: T, nome, seguito: true, price: numero(val), high: NaN, low: NaN,
+          chg: NaN, chg_pct: numero(pct), vol: NaN, fonte: "pipeline" } : null;
     if (T === "^VIX" && m.vix) return daMacro("Volatilità (VIX)", m.vix.value, m.vix.change_pct);
     for (const f of Object.values(m.futures || {})) {
       if (String(f && f.symbol).toUpperCase() === T) return daMacro(f.label || T, f.price, f.change_pct);
@@ -6963,18 +7176,35 @@ function datiSimbolo(tk) {
     if (mk) return daMacro(mk.label || T, String(mk.value).replace(/[^\d.,-]/g, "").replace(",", "."), mk.change_pct);
     return { tk: T, nome: T, seguito: false };
   }
-  const px = Number(r.price);
-  const pct = Number(r.change_pct);
+  const px = numero(r.price);
+  const pct = numero(r.change_pct);
   const chg = (Number.isFinite(px) && Number.isFinite(pct) && pct !== -100)
     ? px - px / (1 + pct / 100) : NaN;
-  return { tk: T, nome: r.name || T, seguito: true, price: px,
+  return { tk: T, nome: r.name || T, seguito: true, fonte: "pipeline", price: px,
     /* ⚠ v266 — NIENTE RIPIEGO SUL MASSIMO A 52 SETTIMANE. Le colonne sono quelle del broker
        del CEO, dove "Massimo" e "Minimo" sono quelli DI OGGI. Ripiegando sul dato annuale la
        tabella mostrava 207,52 accanto a un prezzo di 172,01: un numero vero sotto
        un'intestazione che ne promette un altro. Se la barra del giorno non c'e', la cella
        resta un trattino — visibilmente mancante invece che invisibilmente sbagliata. */
-    high: Number(r.day_high), low: Number(r.day_low),
-    chg, chg_pct: pct, vol: Number(r.volume != null ? r.volume : r.avg_volume_30d) };
+    high: numero(r.day_high), low: numero(r.day_low),
+    chg, chg_pct: pct, vol: numero(r.volume != null ? r.volume : r.avg_volume_30d) };
+}
+
+/* il nome per esteso lo sa la pipeline (o il blocco macro); Yahoo lo darebbe in
+   `meta.shortName` ma non su tutti i simboli, e un nome che balla a ogni giro e' peggio di un
+   simbolo stabile. Si prende quello che gia' conosciamo, e si ripiega sul ticker. */
+function nomeSimbolo(T) {
+  const r = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .find(x => String(x.ticker || "").toUpperCase() === T);
+  if (r && r.name) return r.name;
+  const m = (DATA && DATA.macro) || {};
+  for (const f of Object.values(m.futures || {})) {
+    if (String(f && f.symbol).toUpperCase() === T && f.label) return f.label;
+  }
+  const mk = (m.markets || []).find(x => String(x.key || "").toUpperCase() === T);
+  if (mk && mk.label) return mk.label;
+  if (T === "^VIX") return "Volatilità (VIX)";
+  return T;
 }
 
 function cellaWl(r, col) {
@@ -6999,6 +7229,112 @@ function cellaWl(r, col) {
   return '<td class="' + cls + '">' + t + '</td>';
 }
 
+/* ═══ v268 — CHI AGGIORNA I VALORI DELLA WATCHLIST, E QUANDO ══════════════════════════════
+   Domanda del CEO: "La mia watchlist come faccio ad aggiornare valori?".
+   Finora la risposta onesta sarebbe stata "non puoi": la tabella leggeva data.json, che cambia
+   solo quando gira il cron. Adesso i prezzi li chiede la pagina, e la nota sotto la tabella
+   dice a che ora l'ha fatto — cosi' la domanda non deve nemmeno nascere.
+   Quando: al caricamento, a ogni giro dei prezzi live (60 secondi) e a comando col bottone.
+   ⚠ IN PARALLELO MA UNA VOLTA SOLA PER GIRO. Ventidue simboli in fila sarebbero ventidue
+   attese in fila; in parallelo sono 152 ms misurati. La cache con la sua scadenza impedisce
+   che due render ravvicinati raddoppino le chiamate al proxy, che e' gratuito e condiviso. */
+let wlUltimoAggiornamento = null;
+let wlInCorso = false;
+
+/* ═══ v268 — LA VISTA TRADINGVIEW DELLA WATCHLIST ═════════════════════════════════════════
+   Il CEO: "non puoi lasciare box tradingview embedded anche per questa sezione?". Si puo', e
+   le due viste non si escludono: fanno cose diverse e nessuna delle due le fa tutte.
+     TABELLA (nostra)  → si ordina, si cancella una riga, i numeri si possono leggere e finire
+                         nel pacchetto per l'LLM; da v268 i prezzi sono dal vivo.
+     TRADINGVIEW       → un iframe di un altro dominio: non si ordina, non si legge, non se ne
+                         possono estrarre i numeri. In cambio porta il mini-grafico e li mostra
+                         come li vede lui su TradingView.
+   ⚠ La scelta e' del CEO e va RICORDATA, altrimenti a ogni ricarica torna quella che ho scelto
+     io — che e' il modo per far sembrare che il sistema ignori i comandi. */
+const WL_VISTA_KEY = "watchlist_vista";
+let wlVista = (() => { try { return localStorage.getItem(WL_VISTA_KEY) === "tv" ? "tv" : "tabella"; } catch { return "tabella"; } })();
+
+function montaWatchlistTV() {
+  const box = $("#wl-tv");
+  if (!box) return;
+  if (typeof document === "undefined" || typeof document.createElement !== "function") return;
+  const prova = document.createElement("div");
+  if (!prova || typeof prova.appendChild !== "function") return;   // harness senza DOM (v257)
+  const simboli = leggiWatchlist().map(simboloTradingView).filter(Boolean);
+  if (!simboli.length) { box.innerHTML = '<div class="muted">Nessun simbolo in watchlist.</div>'; return; }
+  box.innerHTML = "";
+  const cont = document.createElement("div");
+  cont.className = "tradingview-widget-container";
+  const inner = document.createElement("div");
+  inner.className = "tradingview-widget-container__widget";
+  cont.appendChild(inner);
+  const sc = document.createElement("script");
+  sc.type = "text/javascript";
+  sc.async = true;
+  sc.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js";
+  sc.text = JSON.stringify({
+    width: "100%", height: 460, colorTheme: "dark", locale: "it", isTransparent: true,
+    showSymbolLogo: true,
+    symbolsGroups: [{ name: "La mia watchlist", symbols: simboli.map(s => ({ name: s })) }],
+  });
+  /* ⚠ se lo script di TradingView non arriva (rete, blocco, adblock) il riquadro resterebbe
+     vuoto e muto: un box bianco si legge come "rotto", e chi guarda non sa che fare. Si dice
+     cos'e' successo e si indica la strada che funziona sempre, cioe' la nostra tabella. */
+  sc.onerror = () => {
+    box.innerHTML = '<div class="muted">Il widget di TradingView non si è caricato '
+      + '(rete o blocco degli script di terze parti). La vista <b>Tabella</b> funziona lo stesso: '
+      + 'i suoi prezzi non passano da TradingView.</div>';
+  };
+  cont.appendChild(sc);
+  box.appendChild(cont);
+}
+
+function applicaVistaWatchlist() {
+  const tab = $("#wl-tab"), tv = $("#wl-tv");
+  if (tab) tab.hidden = wlVista === "tv";
+  if (tv) tv.hidden = wlVista !== "tv";
+  document.querySelectorAll("[data-wl-vista]").forEach(b => {
+    b.classList.toggle("chip-active", b.dataset.wlVista === wlVista);
+  });
+  const nota = $("#wl-nota");
+  if (wlVista === "tv") {
+    montaWatchlistTV();
+    /* ⚠ la nota cambia perche' cambia la VERITA': in questa vista i numeri non sono nostri e
+       non possiamo garantirne niente, nemmeno l'ora. Dirlo e' l'unica cosa onesta. */
+    if (nota) nota.innerHTML = "Widget di TradingView: prezzi loro, aggiornati da loro. "
+      + "In questa vista non si può ordinare né togliere una riga, e i numeri non entrano nel "
+      + "pacchetto per l'analisi — è un riquadro di un altro sito dentro la pagina. "
+      + "Per ordinare, cancellare o usare i dati, torna a <b>Tabella</b>.";
+  } else {
+    renderWatchlistTV();
+  }
+}
+
+async function aggiornaQuoteWatchlist(forza) {
+  if (wlInCorso) return;
+  wlInCorso = true;
+  try {
+    const simboli = leggiWatchlist();
+    if (forza) simboli.forEach(x => cacheQuote.delete(`${String(x).toUpperCase()}|5d`));
+    /* i simboli che livePrices copre gia' sono nella cache con la loro scadenza: quotaLive li
+       ritorna senza uscire in rete. Qui si chiedono davvero solo quelli in piu'. */
+    const esiti = await Promise.all(simboli.map(async (x) => {
+      const T = String(x).toUpperCase();
+      try { return [T, await quotaLive(T, "5d")]; } catch { return [T, null]; }
+    }));
+    let vivi = 0;
+    esiti.forEach(([T, q]) => {
+      if (!q) return;                       // proxy muto: si tiene quello che c'era, non si svuota
+      quoteLive.set(T, q);
+      if (!q.assente) vivi++;
+    });
+    if (vivi) wlUltimoAggiornamento = new Date();
+    renderWatchlistTV();
+  } finally {
+    wlInCorso = false;
+  }
+}
+
 function renderWatchlistTV() {
   const simboli = leggiWatchlist();
   const chips = $("#wl-chips");
@@ -7011,6 +7347,7 @@ function renderWatchlistTV() {
   }
   const box = $("#wl-tab");
   if (!box) return;
+  if (wlVista === "tv") return;          // in vista TradingView la tabella non si ridisegna
   if (!simboli.length) { box.innerHTML = ""; return; }
 
   const righe = simboli.map(datiSimbolo);
@@ -7043,6 +7380,7 @@ function renderWatchlistTV() {
     + '<th></th></tr></thead><tbody>' + tr + '</tbody></table></div>';
 
   const fuori = righe.filter(r => !r.seguito).length;
+  const ignoti = righe.filter(r => r.ignoto).length;
   const nota = $("#wl-nota");
   if (nota) {
     const barra = ultimaBarraDisponibile();
@@ -7050,11 +7388,29 @@ function renderWatchlistTV() {
        giorno non ci sono ancora — la pipeline ha cominciato a scriverli in v266 — la nota lo
        dice: manca il giro, non il dato. */
     const senzaGiornata = righe.filter(r => r.seguito).every(r => !Number.isFinite(r.high));
-    nota.innerHTML = "Prezzi dalla pipeline" + (barra ? ", barra del " + barra : "")
+    /* ⚠ v268 — LA NOTA RISPONDE A "DA DOVE PRENDE QUESTI DATI?". La domanda del CEO non era
+       retorica: la tabella mostrava numeri senza dire di chi fossero. Ora la nota lo riassume
+       con l'ora dell'ultima lettura, perche' "aggiornato" senza un orario e' una parola, non
+       un'informazione. E i simboli che nessuna delle due fonti conosce si contano a parte:
+       "non seguito dalla pipeline" non e' piu' la stessa cosa di "non esiste su Yahoo". */
+    const nLive = righe.filter(r => r.fonte === "live").length;
+    const nPipe = righe.filter(r => r.seguito && r.fonte !== "live").length;
+    const ora = wlUltimoAggiornamento
+      ? wlUltimoAggiornamento.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+      : null;
+    nota.innerHTML = (nLive
+        ? `<b>${nLive} ${nLive === 1 ? "simbolo aggiornato" : "simboli aggiornati"} dal vivo</b> (Yahoo Finance, `
+          /* ⚠ la nota deve dire il ritmo VERO: il giro e' passato a tre minuti quando ho
+             scoperto il 429, e una nota rimasta a "ogni minuto" sarebbe una promessa che il
+             codice non mantiene — il tipo di dettaglio da cui nasce "i dati sembrano fermi". */
+          + `${ora ? "alle " + ora : "lettura in corso"}; si rileggono da soli, o subito col tasto ↻)`
+          + (nPipe ? ` · ${nPipe} dalla pipeline${barra ? ", barra del " + barra : ""}` : "")
+        : "Prezzi dalla pipeline" + (barra ? ", barra del " + barra : ""))
       + " · clic sull'intestazione per ordinare, sul nome per vederlo nel grafico, sulla × per togliere."
-      + (fuori ? ' <b>' + fuori + (fuori === 1 ? " simbolo non è seguito" : " simboli non sono seguiti")
-         + ' dalla pipeline</b>: le celle sono vuote per questo, non perché il dato sia fermo.' : "")
-      + (senzaGiornata ? " Massimo e minimo del giorno arrivano col prossimo giro della pipeline." : "");
+      + (fuori ? ' <b>' + fuori + (fuori === 1 ? " simbolo senza dati" : " simboli senza dati") + '</b>: '
+         + (ignoti === fuori ? "Yahoo non li conosce con questo nome — controlla come si scrivono."
+                             : "né la pipeline né Yahoo li conoscono con questo nome.") : "")
+      + (senzaGiornata && !nLive ? " Massimo e minimo del giorno arrivano col prossimo giro della pipeline." : "");
   }
 }
 
@@ -7116,6 +7472,21 @@ async function caricaWatchlistCloud() {
 }
 
 $("#wl-salva")?.addEventListener("click", salvaWatchlist);
+/* v268 — lo scambio fra le due viste, e il bottone che rilegge i prezzi subito. */
+document.querySelectorAll("[data-wl-vista]").forEach(b => b.addEventListener("click", () => {
+  wlVista = b.dataset.wlVista === "tv" ? "tv" : "tabella";
+  try { localStorage.setItem(WL_VISTA_KEY, wlVista); } catch { /* modalita' privata */ }
+  applicaVistaWatchlist();
+}));
+$("#wl-aggiorna")?.addEventListener("click", async (e) => {
+  const b = e.currentTarget;
+  const testo = b.textContent;
+  b.disabled = true; b.textContent = "⏳ Leggo…";
+  try {
+    if (wlVista === "tv") { montaWatchlistTV(); }
+    else { await aggiornaQuoteWatchlist(true); }   // forza: salta la cache
+  } finally { b.disabled = false; b.textContent = testo; }
+});
 $("#wl-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") salvaWatchlist(); });
 /* ⚠ v266 — UN SOLO HANDLER PER TUTTA LA SEZIONE, delegato. La tabella si ridisegna a ogni
    ordinamento e a ogni cancellazione: agganciare gli eventi ai bottoni significherebbe
@@ -7785,6 +8156,17 @@ loadRiskParamsCloud();   // sincronizza i parametri di rischio del CEO (config/r
 setInterval(() => loadData(), 5 * 60 * 1000);
 // prezzi live ogni 60 secondi
 setInterval(() => livePrices(), 60 * 1000);
+/* v268 — la watchlist si aggiorna da sola sullo stesso ritmo: e' la risposta alla domanda
+   "come faccio ad aggiornare valori?". Il primo giro parte subito, senza aspettare i 60
+   secondi, altrimenti la prima cosa che si vede e' ancora il dato della pipeline. */
+applicaVistaWatchlist();     // la vista che ha scelto lui, non quella che ho scelto io
+aggiornaQuoteWatchlist();
+/* ⚠ TRE MINUTI, non uno. I proxy sono gratuiti e condivisi: 21 simboli ogni minuto sono 1260
+   richieste all'ora e portano dritti al 429 (misurato). I prezzi di livePrices continuano a
+   girare ogni minuto e riempiono la stessa cache, quindi la tabella resta fresca lo stesso —
+   questo giro serve solo ai simboli che la pipeline non segue. E c'e' il tasto Aggiorna per
+   quando lui vuole il numero adesso. */
+setInterval(() => aggiornaQuoteWatchlist(), 3 * 60 * 1000);
 
 /* v188 — comandi delle personalizzazioni */
 $("#macro-details")?.addEventListener("click", () => openMacroDetails());

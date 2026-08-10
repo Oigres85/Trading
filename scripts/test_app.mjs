@@ -1248,6 +1248,127 @@ check("v266 grafico: dentro l'iframe TradingView non si finge di disegnare", (()
   return /iframe/.test(testa) && /non si puo'/.test(testa);
 })());
 
+/* ══ v268 — PREZZI DAL VIVO PER QUALSIASI SIMBOLO ════════════════════════════════════════
+   Il CEO: "La mia watchlist come faccio ad aggiornare valori? e da dove prende questi dati?" e
+   "se cambio ticker nel box ricerca la risposta e': per questo simbolo la pipeline non ha ne'
+   livelli ne' opzioni". La pagina interrogava gia' Yahoo dal browser e buttava via tutto
+   tranne l'ultimo prezzo. */
+
+/* ⚠ IL DIFETTO PIU' PERICOLOSO DI QUESTO GIRO. `chartPreviousClose` non e' la chiusura di
+   ieri: e' quella PRIMA della finestra richiesta. Misurato su WDC con range=5d: 544,84 (31
+   luglio) invece di 451,52, cioe' -20,29% invece di -3,81%. Un numero valido, plausibile e
+   sbagliato di cinque volte — nessun controllo di forma lo avrebbe preso. */
+check("v268 quotazioni: la variazione usa la PENULTIMA barra, non chartPreviousClose", (() => {
+  const i = src.indexOf("async function quotaLive");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1))
+    .replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  return /chiusure\[chiusure\.length - 2\]/.test(corpo)
+      && !/const prev = Number\(m\.chartPreviousClose/.test(corpo);
+})());
+
+/* ⚠ `Number(null)` fa ZERO, non NaN: il BTP usciva con "Massimo 0 · Minimo 0 · 0%". Uno zero
+   come prezzo e' un valore che non puo' esistere, e accanto a 102,95 sembra un crollo. */
+check("v268 tabella: un campo assente resta assente, non diventa zero", run(`
+  return Number.isNaN(numero(null)) && Number.isNaN(numero(undefined))
+      && Number.isNaN(numero("")) && numero("12.5") === 12.5 && numero(0) === 0`));
+
+check("v268 tabella: una riga con soli null non mostra zeri", run(`
+  const saved = DATA.watchlist;
+  DATA.watchlist = [{ ticker: "ZZTEST", name: "Prova", price: 100, day_high: null,
+                      day_low: null, change_pct: null, volume: null }];
+  const d = datiSimbolo("ZZTEST");
+  DATA.watchlist = saved;
+  return d.price === 100 && Number.isNaN(d.high) && Number.isNaN(d.low) && Number.isNaN(d.chg_pct)`));
+
+/* ⚠ un volume 0 su un indice vuol dire "non ne ha", e "0K" in tabella sembra un mercato fermo. */
+check("v268 quotazioni: volume zero e' un'assenza, non un valore", (() => {
+  const i = src.indexOf("async function quotaLive");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  return /v0 > 0 \? v0 : NaN/.test(corpo);
+})());
+
+/* ⚠ chiavi duplicate nello stesso oggetto: la seconda vince in silenzio. In questo progetto
+   e' gia' costato due giri (breadth v262, froth v265) e stava per costarne un terzo con
+   `fonte` scritta due volte in datiSimbolo. */
+check("v268 datiSimbolo: nessuna chiave scritta due volte nello stesso oggetto", (() => {
+  const i = src.indexOf("function datiSimbolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  const oggetti = corpo.match(/\{[^{}]*\}/g) || [];
+  return !oggetti.some(o => {
+    const k = (o.match(/(^|[{,\s])([a-zA-Z_$][\w$]*)\s*:/g) || [])
+      .map(x => x.replace(/[{,\s:]/g, ""));
+    return new Set(k).size !== k.length;
+  });
+})());
+
+/* ── v268 — la watchlist dice da dove vengono i suoi numeri e quando li ha letti ── */
+check("v268 watchlist: ogni riga porta la sua fonte (live o pipeline)", (() => {
+  const i = src.indexOf("function datiSimbolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  return /fonte: "live"/.test(corpo) && /fonte: "pipeline"/.test(corpo);
+})());
+
+check("v268 watchlist: la nota dice l'ORA dell'ultima lettura, non solo 'aggiornato'", (() => {
+  const i = src.indexOf("function renderWatchlistTV");
+  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1) > 0
+    ? Math.min(src.indexOf("\nasync function", i + 1), src.indexOf("\nfunction ", i + 1))
+    : src.indexOf("\nfunction ", i + 1));
+  return /wlUltimoAggiornamento/.test(corpo) && /toLocaleTimeString/.test(corpo);
+})());
+
+/* ⚠ "Yahoo non conosce questo simbolo" e "la pipeline non lo segue" sono due cose diverse:
+   BTP-V28 e' un ticker sintetico nostro e il Not Found e' la risposta CORRETTA. */
+check("v268 watchlist: simbolo ignoto a Yahoo distinto da simbolo non seguito", (() => {
+  const i = src.indexOf("function datiSimbolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  return /ignoto: true/.test(corpo);
+})());
+
+/* ── v268 — i livelli non dipendono piu' da cosa segue la pipeline ── */
+check("v268 livelli: supporto e resistenza si calcolano dalle barre lette dal browser", (() => {
+  const i = src.indexOf("function livelliTitolo");
+  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1));
+  return /live\.res20/.test(corpo) && /live\.sup20/.test(corpo) && /live\.max52/.test(corpo);
+})());
+
+check("v268 livelli: con meno di 20 sedute NON si inventa un supporto a 20 sedute", (() => {
+  const i = src.indexOf("async function quotaLive");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  return /hi\.length >= 20 \? Math\.min/.test(corpo) && /hi\.length >= 200 \? Math\.max/.test(corpo);
+})());
+
+/* ── v268 — le due viste della watchlist (richiesta esplicita del CEO) ── */
+check("v268 watchlist: esistono due viste e la scelta del CEO viene ricordata", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  return /data-wl-vista="tabella"/.test(html) && /data-wl-vista="tv"/.test(html)
+      && /WL_VISTA_KEY/.test(src) && /localStorage\.setItem\(WL_VISTA_KEY/.test(src);
+})());
+
+/* ⚠ nella vista TradingView i numeri non sono nostri: non si puo' ordinare, non si puo'
+   cancellare, non si possono usare. La nota deve DIRLO invece di lasciar credere il contrario. */
+check("v268 watchlist: la vista TradingView dichiara cosa NON si puo' fare", (() => {
+  const i = src.indexOf("function applicaVistaWatchlist");
+  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1));
+  return /non si può ordinare/.test(corpo) && /non entrano nel/.test(corpo);
+})());
+
+/* ⚠ v268 — I PROXY GRATUITI RISPONDONO 429. Misurato durante lo sviluppo: 21 simboli al
+   minuto per la watchlist PIU' quelli di livePrices sugli stessi simboli hanno esaurito la
+   quota di corsproxy.io. Due giri separati per lo stesso dato erano anche due verita'
+   possibili sullo stesso prezzo nella stessa pagina. */
+check("v268 rete: un proxy che risponde 429 va in castigo, non si richiama subito", (() => {
+  const i = src.indexOf("async function barreYahoo");
+  const corpo = src.slice(i, src.indexOf("\n/* la quotazione", i));
+  return /status === 429/.test(corpo) && /proxyInCastigo\.set/.test(corpo)
+      && /Date\.now\(\) < fino/.test(corpo);
+})());
+
+check("v268 rete: livePrices e la watchlist condividono UNA cache, non due giri", (() => {
+  const i = src.indexOf("async function livePrices");
+  const corpo = src.slice(i, i + 1800);
+  return /quotaLive\(/.test(corpo) && !/fetchQuote\(/.test(corpo);
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

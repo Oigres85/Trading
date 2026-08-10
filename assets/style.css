@@ -1991,3 +1991,11 @@ svg.g-serie { cursor: crosshair; }
   /* su telefono la colonna della provenienza va a capo invece di allargare la tabella */
   .tvo-tab td:last-child { min-width: 160px; }
 }
+
+/* v268 — due viste per la watchlist (tabella nostra / widget TradingView) e il tasto che
+   rilegge i prezzi. Il CEO: "non puoi lasciare box tradingview embedded anche per questa
+   sezione?" — si puo', ma nessuna delle due viste fa quello che fa l'altra, quindi si sceglie. */
+.wl-viste { display: flex; align-items: center; gap: 6px; margin: 8px 0 6px; flex-wrap: wrap; }
+.wl-viste .btn { margin-left: auto; }
+.wl-tv { margin-top: 6px; min-height: 60px; }
+@media (max-width: 560px) { .wl-viste .btn { margin-left: 0; } }
