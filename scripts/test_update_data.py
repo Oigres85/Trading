@@ -441,6 +441,25 @@ check("v269 pipeline: il dizionario finale non riscrive i blocchi morti",
 check("v269 pipeline: predictions (Polymarket) e' rimasta, la usa il pacchetto macro",
       '"predictions": fetch_predictions()' in _src)
 
+# ═══ v272 — UNA SOLA LISTA DI SIMBOLI ═══════════════════════════════════════════════════
+# Il CEO: "ci sono punti morti del precedente sistema che rallentano il workflow?". Si': la
+# pipeline scaricava 37 simboli e 21 non erano nella watchlist che lui guarda.
+check("v272 pipeline: la lista dei simboli viene da config/ui_watchlist.json",
+      "UI_WATCHLIST" in _src and "ui_watchlist.json" in _src)
+
+check("v272 pipeline: il portafoglio non si calcola piu' (era uscito dal prodotto in v256)",
+      "return [], wl, None" in _src)
+
+# ⚠ il BTP ha la sua funzione: chiederlo a Yahoo e' una chiamata sprecata che finisce in errore.
+check("v272 pipeline: il BTP non entra nella lista da scaricare da Yahoo",
+      'if t == "BTP-V28":' in _src)
+
+# ⚠ rame, petrolio, oro e SOX fuori dai mercati macro: ora stanno in watchlist, e tenerli in
+# tutti e due i posti significava scaricarli DUE VOLTE e mostrarli due volte.
+check("v272 pipeline: rame, petrolio, oro e SOX non sono piu' nei mercati macro",
+      not any(f'("{k}=F"' in _src or f'("{k}"' in _src
+              for k in ("HG", "GC")) and '"Semiconduttori (SOX)"' not in _src)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)

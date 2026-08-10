@@ -1471,6 +1471,59 @@ check("v271 cadenza: la grazia si conta in giorni lavorativi", (() => {
   return i > 0 && /getDay\(\) !== 0 && x\.getDay\(\) !== 6/.test(src.slice(i, i + 400));
 })());
 
+/* ══ v272 — RICHIESTE DEL CEO: pre/after market, tab macro senza grafico, punti morti ═════ */
+
+/* ⚠ LA CHIUSURA PRECEDENTE DIPENDE DAL PASSO DELLE BARRE, e sbagliarlo da' sempre un numero
+   plausibile. Con barre da 5 minuti la "penultima barra" e' di cinque minuti fa: NVDA usciva
+   -0,23% invece di +2,27%. Con barre giornaliere e' la chiusura di ieri, e li' va usata quella
+   (v268: col range=5d chartPreviousClose era la chiusura prima dell'INTERA finestra). */
+check("v272 quotazioni: intraday usa chartPreviousClose, giornaliero la penultima barra", (() => {
+  const i = src.indexOf("async function quotaLive");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1)).replace(/\/\*[\s\S]*?\*\//g, "");
+  return /const prev = intraday\s*\?\s*prevMeta/.test(corpo)
+      && /chiusure\[chiusure\.length - 2\]/.test(corpo);
+})());
+
+/* ⚠ con barre da 5 minuti "le ultime 20" sono un'ora e mezza: un supporto calcolato li'
+   sarebbe un numero vero di un'altra grandezza. */
+check("v272 livelli: non si calcolano su barre intraday", (() => {
+  const i = src.indexOf("async function quotaLive");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  return /!intraday && hi\.length >= 20/.test(corpo) && /!intraday && hi\.length >= 200/.test(corpo);
+})());
+
+check("v272 watchlist: la colonna pre/after esiste e porta l'ora", (() => {
+  const i = src.indexOf("const WL_COLONNE");
+  const blocco = src.slice(i, src.indexOf("];", i));
+  const j = src.indexOf("function cellaWl");
+  const cella = src.slice(j, src.indexOf("\nfunction ", j + 1));
+  return /t: "Pre\/After"/.test(blocco) && /toLocaleTimeString/.test(cella);
+})());
+
+/* ⚠ in seduta ordinaria un "prezzo fuori orario" NON esiste: riempire la cella con l'ultimo
+   prezzo normale sarebbe la solita cella che sembra un dato e non lo e'. */
+check("v272 watchlist: in seduta ordinaria la colonna pre/after resta vuota", (() => {
+  const i = src.indexOf("function fuoriOrario");
+  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1) > 0
+    ? src.indexOf("\nasync function", i + 1) : i + 2000);
+  return /fase === "regolare"\) return null/.test(corpo);
+})());
+
+/* ── v272 — le schede macro che non avevano un grafico (richiesta esplicita) ── */
+check("v272 macro: le schede senza grafico hanno preso una forma", (() => {
+  const i = src.indexOf("const FORMA_INDICATORE");
+  const blocco = src.slice(i, src.indexOf("\n};", i));
+  return ['"in:t30"', '"in:real10"', '"in:curve3m"', '"in:philly"', "fedwatch:"]
+    .every(k => blocco.includes(k));
+})());
+
+/* ── v272 — punti morti del vecchio sistema nel flusso di rigenerazione ── */
+check("v272 rigenera: niente passi che annunciano lavori che non si fanno piu'", (() => {
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  return !/PRICE_STAGES = \[/.test(codice) && !/Sharpe Ratio, opzioni e SMC/.test(codice)
+      && !/controvalori e P&L/.test(codice);
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

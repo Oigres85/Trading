@@ -73,16 +73,57 @@ DEFAULT_WATCHLIST = [
 ]
 
 
+# ═══ v272 — LA PIPELINE SEGUE LA WATCHLIST DEL CEO, E BASTA ══════════════════════════════
+# Domanda del CEO: "quando premo rigenera ci sono punti morti del precedente sistema che
+# aggiorna e che in effetti andrebbero tolti perche' rallentano il workflow?". Si', ed erano
+# la maggioranza. Misurato: la pipeline scaricava 37 simboli (12 portafoglio + 25 watchlist)
+# e VENTUNO non erano nella watchlist che lui guarda — OKLO, SPCX, INTC, AMZN, SMCI, PATH,
+# SNDK, CRCL, TSMC, LUMN, US2000, CEG, CRM, CBRS, NOW, IBM, MSFT, AVGO, META e altri: resti
+# del sistema di prima, scaricati a ogni run e letti da nessuno. Ogni simbolo costa un giro
+# di fetch_symbol (prezzi, storico, fondamentali, tecnici) piu' la catena opzioni.
+# Da qui la lista e' UNA SOLA: config/ui_watchlist.json, quella che il CEO scrive dalla
+# pagina. Quello che aggiunge in watchlist la pipeline lo segue al giro dopo; quello che
+# toglie smette di costare. Spariscono anche le due liste scollegate che erano la causa dei
+# buchi ("^SOX non seguito") di cui si era lamentato.
+# ⚠ IL PORTAFOGLIO NON SI CALCOLA PIU'. Era gia' uscito dal prodotto in v256 per sua
+# decisione ("portafoglio watchlist e news andranno tutti via"), ma la pipeline continuava a
+# calcolarne quantita', prezzo medio di carico, plusvalenze, contributo al rischio, Sharpe,
+# Sortino e correlazioni: 86.197 caratteri per run che nessuna riga della pagina leggeva.
+UI_WATCHLIST = ROOT / "config" / "ui_watchlist.json"
+
+
 def load_holdings():
-    """Legge le posizioni da config/holdings.json (modificabile da UI), con fallback ai default."""
+    """La lista dei simboli da seguire: config/ui_watchlist.json (scritta dalla UI).
+    Ripiego su config/holdings.json e poi sui default, cosi' un file rotto non lascia la
+    pipeline senza niente da fare."""
+    try:
+        simboli = json.loads(UI_WATCHLIST.read_text())
+        if isinstance(simboli, list) and simboli:
+            wl = []
+            for t in simboli:
+                t = str(t).strip().upper()
+                if not t:
+                    continue
+                # ⚠ il BTP ha la sua funzione (fetch_btp): non e' su Yahoo, e chiederglielo
+                # sarebbe una chiamata sprecata che finisce in errore a ogni run.
+                if t == "BTP-V28":
+                    continue
+                # gli indici e i future non hanno una valuta di quotazione utile: "PTS" e' la
+                # convenzione gia' usata qui per dire "punti, non dollari".
+                cur = "PTS" if t.startswith("^") or t.endswith("=F") else "USD"
+                if t.endswith("=X"):
+                    cur = "PTS"
+                wl.append({"ticker": t, "name": None, "currency": cur})
+            print(f"lista simboli da config/ui_watchlist.json: {len(wl)} titoli", file=sys.stderr)
+            return [], wl, None
+    except Exception as e:  # noqa: BLE001
+        print(f"!! ui_watchlist non leggibile ({e}), ripiego su holdings.json", file=sys.stderr)
     try:
         cfg = json.loads(CONFIG.read_text())
-        pf = cfg.get("portfolio") or DEFAULT_PORTFOLIO
-        wl = cfg.get("watchlist") or DEFAULT_WATCHLIST
-        return pf, wl, cfg.get("broker")
+        return [], cfg.get("watchlist") or DEFAULT_WATCHLIST, cfg.get("broker")
     except Exception as e:  # noqa: BLE001
         print(f"!! config holdings non leggibile, uso default: {e}", file=sys.stderr)
-        return DEFAULT_PORTFOLIO, DEFAULT_WATCHLIST, None
+        return [], DEFAULT_WATCHLIST, None
 
 
 PORTFOLIO, WATCHLIST, BROKER = load_holdings()
@@ -1567,12 +1608,11 @@ def fetch_macro():
         ("^TNX", "Treasury USA 10A", "{v:.2f}%", 2, " pp"),
         ("EURUSD=X", "EUR/USD", "{v:.4f}", 2, "%"),
         ("EURJPY=X", "EUR/JPY", "{v:.2f}", 2, "%"),
-        # v266 — le materie prime che il CEO ha chiesto. Petrolio e rame sono anche nella sua
-        # watchlist, dove restavano righe vuote perche' nessuno li seguiva.
-        ("CL=F", "Petrolio WTI", "{v:.2f}", 2, "%"),
-        ("HG=F", "Rame", "{v:.3f}", 2, "%"),
-        ("GC=F", "Oro", "{v:.0f}", 2, "%"),
-        ("^SOX", "Semiconduttori (SOX)", "{v:.0f}", 2, "%"),
+        # ⚠ v272 — RAME, PETROLIO, ORO E SOX SONO USCITI DA QUI. Il CEO: "elimina in macro
+        # rame, petrolio, oro, sox perche' devono essere presenti in watchlist". Aveva
+        # ragione due volte: adesso la pipeline segue la sua watchlist, quindi quei simboli
+        # li scarica gia' di la' — tenerli anche qui significava scaricarli DUE VOLTE e
+        # mostrarli in due posti, che e' il doppione che mi ha gia' fatto notare per il VIX.
     ]:
         try:
             h = yf.Ticker(sym).history(period="5d")["Close"].dropna()

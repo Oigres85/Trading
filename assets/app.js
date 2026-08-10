@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "271";
+const BUILD_VERSION = "272";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -286,15 +286,15 @@ const REFRESH_STAGES = [
   [0,  "Avvio pipeline su GitHub Actions…"],
   [12, "Download prezzi e fondamentali (Yahoo Finance)…"],
   [32, "Elaborazione indici, macro e rotazione settoriale…"],
-  [52, "Calcolo Sharpe Ratio, opzioni e SMC…"],
+  /* v272 — diceva "Sharpe Ratio, opzioni e SMC": Sharpe e SMC erano del portafoglio, che la
+     pipeline non calcola piu'. Una barra di avanzamento che annuncia passi inesistenti fa
+     sembrare lungo un lavoro che non si sta facendo. */
+  [52, "Calcolo opzioni, correlazioni e indicatori tecnici…"],
   [72, "Generazione e validazione data.json…"],
   [88, "Quasi pronto, attendo la pubblicazione…"],
 ];
-const PRICE_STAGES = [
-  [0,  "Scarico i prezzi live (Yahoo)…"],
-  [45, "Aggiorno controvalori e P&L…"],
-  [75, "Quasi pronto…"],
-];
+/* v272 — PRICE_STAGES tolto: non lo chiamava nessuno (zero riferimenti oltre alla propria
+   definizione) e parlava di "controvalori e P&L", che non esistono da v256. */
 let _lastRpMsg = "";
 /* v165 — ESITO ESPLICITO per ogni passo: il log elencava azioni senza dire quali fossero
    riuscite e quali no, e un fallimento (rete/CDN, tentativo a vuoto) si leggeva come una riga
@@ -523,8 +523,45 @@ const QUOTE_TTL = 90 * 1000;          // i prezzi si rileggono al massimo ogni m
 const BARRE_TTL = 15 * 60 * 1000;     // un anno di barre cambia poco: si tiene un quarto d'ora
 const cacheQuote = new Map();
 
+/* ⚠ v272 — DUE RICHIESTE DIVERSE, PERCHE' SERVONO DUE COSE DIVERSE.
+   · giornata in corso → range=1d, barre da 5 minuti, includePrePost=true. E' l'unico modo per
+     avere il PRE e l'AFTER market: il `meta` non li porta (verificato: preMarketPrice e
+     postMarketPrice arrivano sempre null anche con includePrePost), ma le BARRE fuori orario
+     ci sono, e `meta.currentTradingPeriod` dice in che fase siamo. Misurato alle 07:41 ET:
+     NVDA a 224,37 in pre-market contro 223,96 di chiusura precedente.
+   · storia → range lungo, barre giornaliere, per supporto, resistenza ed estremi dell'anno.
+   ⚠ E c'e' un motivo in piu' per il range=1d: li' `chartPreviousClose` E' davvero la chiusura
+   di ieri. Col range=5d era la chiusura PRIMA della finestra, ed e' il difetto che dava a WDC
+   un -20,29% invece di -3,81% (v268). */
 function yahooChart(symbol, range) {
-  return `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=1d`;
+  const oggi = range === "1d";
+  const q = oggi ? "range=1d&interval=5m&includePrePost=true" : `range=${range}&interval=1d`;
+  return `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?${q}`;
+}
+
+/* La fase di mercato e il prezzo fuori orario, dalle barre. Ritorna null quando siamo in
+   seduta ordinaria (li' il prezzo "fuori orario" non esiste e inventarlo sarebbe peggio). */
+function fuoriOrario(meta, ts, close) {
+  const cp = meta && meta.currentTradingPeriod;
+  if (!cp || !cp.regular || !ts || !ts.length) return null;
+  const inizioReg = Number(cp.regular.start), fineReg = Number(cp.regular.end);
+  const ora = Math.floor(Date.now() / 1000);
+  const fase = ora < inizioReg ? "pre" : ora >= fineReg ? "after" : "regolare";
+  if (fase === "regolare") return null;
+  /* l'ultima barra VALIDA fuori dall'orario ordinario: prima della campana se siamo in pre,
+     dopo la chiusura se siamo in after. */
+  let ultimo = null;
+  for (let i = ts.length - 1; i >= 0; i--) {
+    const t = Number(ts[i]), c = Number(close[i]);
+    if (!Number.isFinite(c)) continue;
+    const dentro = t >= inizioReg && t < fineReg;
+    if (dentro) { if (fase === "after") break; else continue; }
+    if (fase === "pre" && t >= inizioReg) continue;
+    ultimo = { t, c };
+    break;
+  }
+  if (!ultimo) return null;
+  return { fase, prezzo: ultimo.c, quando: new Date(ultimo.t * 1000) };
 }
 
 /* Chiede le barre a Yahoo passando dai proxy in ordine. Ritorna null se nessuno risponde:
@@ -547,7 +584,7 @@ async function barreYahoo(symbol, range) {
       if (!res || !res.meta) continue;
       const q = (res.indicators && res.indicators.quote && res.indicators.quote[0]) || {};
       return {
-        meta: res.meta,
+        meta: res.meta, ts: (res.timestamp || []).map(Number),
         high: (q.high || []).map(Number), low: (q.low || []).map(Number),
         close: (q.close || []).map(Number), open: (q.open || []).map(Number),
         volume: (q.volume || []).map(Number),
@@ -559,11 +596,12 @@ async function barreYahoo(symbol, range) {
 
 /* la quotazione di un simbolo con quello che serve alle colonne del broker.
    `range` corto per la tabella (una barra basta), lungo per i livelli. */
-async function quotaLive(symbol, range = "5d") {
+async function quotaLive(symbol, range = "1d") {
   const k = `${symbol}|${range}`;
-  const ttl = range === "5d" ? QUOTE_TTL : BARRE_TTL;
+  const ttl = range === "1d" ? QUOTE_TTL : BARRE_TTL;
   const c = cacheQuote.get(k);
   if (c && Date.now() - c.t < ttl) return c.v;
+  const intraday = range === "1d";      // barre da 5 minuti, non giornaliere
   const b = await barreYahoo(symbol, range);
   let v = null;
   if (b && b.assente) v = { assente: true, motivo: b.motivo };
@@ -581,9 +619,19 @@ async function quotaLive(symbol, range = "5d") {
        del meta si usa solo se c'e' (spesso manca) e la serie e' troppo corta.
        ⚠ Questo vale anche col mercato aperto: l'ultima barra e' quella di oggi (parziale) e la
        penultima e' la chiusura di ieri — in tutti e due i casi il conto e' lo stesso. */
+    /* ⚠ v272 — DA DOVE VIENE LA CHIUSURA PRECEDENTE DIPENDE DAL PASSO DELLE BARRE, e
+       sbagliarlo produce sempre un numero plausibile.
+       · barre GIORNALIERE (range lungo): la penultima barra E' la chiusura di ieri.
+       · barre da 5 MINUTI (giornata in corso): la penultima barra e' di cinque minuti fa, e
+         usarla dava a NVDA -0,23% invece di +2,27%. Li' la chiusura di ieri e'
+         `chartPreviousClose`, che con range=1d e' esattamente quella (a differenza del
+         range=5d, dove era la chiusura prima dell'intera finestra — il difetto di v268).
+       Due casi opposti, e in tutti e due il numero sbagliato ha l'aria di uno giusto. */
     const chiusure = ok(b.close);
-    const prev = chiusure.length >= 2 ? chiusure[chiusure.length - 2]
-               : Number(m.previousClose != null ? m.previousClose : m.chartPreviousClose);
+    const prevMeta = Number(m.chartPreviousClose != null ? m.chartPreviousClose : m.previousClose);
+    const prev = intraday
+      ? prevMeta
+      : (chiusure.length >= 2 ? chiusure[chiusure.length - 2] : prevMeta);
     v = {
       price: px,
       /* ⚠ il massimo del giorno lo porta il META (regularMarketDayHigh), che e' quello vero
@@ -604,11 +652,15 @@ async function quotaLive(symbol, range = "5d") {
       valuta: m.currency,
       /* i livelli si calcolano solo quando si e' chiesta la storia: con 5 giorni un
          "supporto a 20 sedute" sarebbe un numero costruito su 5, cioe' una bugia comoda. */
-      sup20: hi.length >= 20 ? Math.min(...lo.slice(-20)) : NaN,
-      res20: hi.length >= 20 ? Math.max(...hi.slice(-20)) : NaN,
-      max52: hi.length >= 200 ? Math.max(...hi) : NaN,
-      min52: lo.length >= 200 ? Math.min(...lo) : NaN,
+      /* ⚠ con barre da 5 minuti "le ultime 20" sono un'ora e mezza, non venti sedute: un
+         supporto calcolato li' sarebbe un numero vero di un'altra grandezza. I livelli si
+         calcolano SOLO sulle barre giornaliere. */
+      sup20: !intraday && hi.length >= 20 ? Math.min(...lo.slice(-20)) : NaN,
+      res20: !intraday && hi.length >= 20 ? Math.max(...hi.slice(-20)) : NaN,
+      max52: !intraday && hi.length >= 200 ? Math.max(...hi) : NaN,
+      min52: !intraday && lo.length >= 200 ? Math.min(...lo) : NaN,
       barre: hi.length,
+      ext: fuoriOrario(m, b.ts, b.close),      // pre/after market, o null se siamo in seduta
     };
   }
   if (v) cacheQuote.set(k, { t: Date.now(), v });
@@ -691,7 +743,7 @@ async function livePrices() {
      richiesta dello stesso simbolo non esce nemmeno, e i due posti mostrano lo stesso numero
      perche' leggono lo stesso oggetto. */
   const res = await Promise.allSettled(syms.map(async (s) => {
-    const q = await quotaLive(s, "5d");
+    const q = await quotaLive(s, "1d");
     if (q && !q.assente) quoteLive.set(String(s).toUpperCase(), q);
     return [s, q && !q.assente && Number.isFinite(q.price) ? { price: q.price, prev: q.prev } : null];
   }));
@@ -3285,6 +3337,108 @@ const FORMA_INDICATORE = {
      Ora: nessuna linea. Una scala con le zone, la variazione MENSILE dichiarata per quello che
      e' (un mese solo, non una tendenza), e la data in evidenza — perche' con 69 giorni di
      ritardo il numero descrive giugno, non oggi. */
+  /* ═══ v272 — LE SCHEDE CHE NON AVEVANO UN GRAFICO ═══════════════════════════════════════
+     Il CEO: "alcune tab macro non hanno indicatori grafici, inseriscili". Erano nove; quattro
+     (rame, petrolio, oro, SOX) escono da sole perche' ha chiesto di toglierle dal macro.
+     Restano queste cinque, e prendono tutte la forma che lui ha detto di leggere bene: la
+     scala con le zone, la stessa dei termometri di stress ("per me sono di facile lettura").
+     ⚠ Le bande NON sono soglie di mercato inventate da me: sono livelli di lettura
+     convenzionali, e ogni scheda dichiara da dove viene la sua. Dove non c'e' una convenzione
+     difendibile si scrive che e' una scala di sola lettura. */
+  /* fedwatch: qui non c'e' una grandezza continua da mettere su una scala, ci sono TRE
+     probabilita' su tre riunioni. Le barre le mostrano tutte e tre insieme, che e' il punto:
+     il mercato non prezza "un rialzo", prezza una traiettoria. */
+  fedwatch: (m) => {
+    const f = m.fedwatch; if (!f || !Array.isArray(f.meetings) || !f.meetings.length) return null;
+    const it = (d) => { const [a, me, g] = String(d).split("-"); return `${g}/${me}`; };
+    const barre = barreOrdinate(f.meetings.slice(0, 3).map(x => ({
+      nome: `Rialzo entro il ${it(x.date)}`,
+      valore: Math.round(Number(x.hike_prob) || 0),
+      testo: `${Math.round(Number(x.hike_prob) || 0)}%`,
+      colore: (Number(x.hike_prob) || 0) >= 60 ? "var(--red)" : (Number(x.hike_prob) || 0) >= 35 ? "var(--yellow)" : "var(--muted)",
+    })), { nota: "probabilita' implicite, riunione per riunione" });
+    if (!barre) return null;
+    const p1 = Math.round(Number(f.meetings[0].hike_prob) || 0);
+    const stato = p1 >= 60 ? "il mercato SI ASPETTA un rialzo alla prossima riunione"
+      : p1 >= 35 ? "il mercato e' diviso sulla prossima riunione"
+      : "il mercato non si aspetta un rialzo alla prossima riunione";
+    return {
+      g: barre,
+      n: `<b>${stato}</b> (${p1}%). Range attuale ${esc(f.target_range || "n.d.")}, tasso implicito ${f.implied_rate}%. `
+        + `Come si legge: la riga che conta non e' la prima ma la DIFFERENZA fra le tre — se la probabilita' cresce di riunione in riunione, `
+        + `il mercato non sta prezzando "se" ma "quando", e quello sposta la curva dei tassi molto prima che la Fed faccia qualcosa. `
+        + `Sono prezzi di mercato, non previsioni: dicono cosa costa coprirsi, non cosa succedera'.`,
+    };
+  },
+
+  "in:t30": (m) => {
+    const r = (m.indicators || []).find(x => x.key === "t30"); if (!r) return null;
+    const v = parseFloat(String(r.value).replace("%", "")); if (!Number.isFinite(v)) return null;
+    return {
+      g: scala(v, { min: 2, max: 7, unita: "%", aria: "Treasury 30 anni",
+          zone: [{ da: 2, a: 4, nome: "denaro a lungo economico", colore: "var(--green)" },
+                 { da: 4, a: 5, nome: "normale", colore: "var(--muted)" },
+                 { da: 5, a: 7, nome: "costoso: pesa sui titoli di crescita", colore: "var(--red)" }],
+          fonte: "bande di lettura sul rendimento nominale a 30 anni; il 4-5% e' la zona in cui il trentennale e' stato per la maggior parte degli ultimi vent'anni" }),
+      n: `<b>${v}%</b> — e' il tasso con cui il mercato sconta gli utili LONTANI nel tempo. `
+        + `Come si legge: piu' sale, piu' valgono poco i profitti che una societa' fara' fra dieci anni, `
+        + `e sono proprio quelli che giustificano i multipli alti dei titoli di crescita. Un titolo che vale `
+        + `per quello che guadagnera' nel 2035 soffre il trentennale molto piu' di uno che guadagna oggi.`,
+    };
+  },
+
+  "in:real10": (m) => {
+    const rr = (m.indicators || []).find(x => x.key === "real10");
+    const be = (m.indicators || []).find(x => x.key === "breakeven");
+    if (!rr) return null;
+    const v = parseFloat(String(rr.value).replace("%", ""));
+    const b = be ? parseFloat(String(be.value).replace("%", "")) : NaN;
+    if (!Number.isFinite(v)) return null;
+    return {
+      g: scala(v, { min: -1, max: 3.5, unita: "%", aria: "tasso reale 10 anni",
+          zone: [{ da: -1, a: 0.5, nome: "denaro gratis o quasi", colore: "var(--green)" },
+                 { da: 0.5, a: 2, nome: "normale", colore: "var(--muted)" },
+                 { da: 2, a: 3.5, nome: "restrittivo", colore: "var(--red)" }],
+          fonte: "bande di lettura sul rendimento TIPS a 10 anni: sopra il 2% e' il territorio in cui la politica monetaria e' considerata restrittiva" }),
+      n: `<b>${v}%</b> reale${Number.isFinite(b) ? ` · inflazione attesa <b>${b}%</b> (i due sommati danno il nominale a 10 anni)` : ""}. `
+        + `Come si legge: e' quanto rende un Treasury AL NETTO dell'inflazione che il mercato si aspetta, cioe' il vero costo del denaro. `
+        + `Il canale verso le azioni e' diretto: un tasso reale alto rende un titolo di stato un'alternativa seria all'azionario, `
+        + `e comprime i multipli senza bisogno che succeda nient'altro. Il pezzo che conta e' questo, non l'inflazione osservata di ieri.`,
+    };
+  },
+
+  "in:curve3m": (m) => {
+    const r = (m.indicators || []).find(x => x.key === "curve3m"); if (!r) return null;
+    const v = parseFloat(String(r.value).replace(" pp", "")); if (!Number.isFinite(v)) return null;
+    return {
+      g: scala(v, { min: -1.5, max: 2.5, unita: " pp", aria: "curva 10 anni meno 3 mesi",
+          zone: [{ da: -1.5, a: 0, nome: "invertita: segnale di recessione", colore: "var(--red)" },
+                 { da: 0, a: 1, nome: "piatta", colore: "var(--yellow)" },
+                 { da: 1, a: 2.5, nome: "normale", colore: "var(--green)" }],
+          fonte: "lo zero non e' una convenzione: e' il punto in cui il tratto 10A-3M si inverte, quello che la ricerca della Fed di New York usa nel modello di probabilita' di recessione" }),
+      n: `<b>${v > 0 ? "+" : ""}${v} pp</b> fra il decennale e il tre mesi. `
+        + `E' lo STESSO segnale della curva 10A-2A su un altro tratto, non un secondo segnale: quando i due non concordano, il disaccordo e' il fatto interessante. `
+        + `Come si legge: sotto zero le banche prendono a prestito a breve piu' caro di quanto rendano i prestiti a lunga, quindi smettono di prestare — ed e' quello il canale, non una profezia statistica.`,
+    };
+  },
+
+  "in:philly": (m) => {
+    const r = (m.indicators || []).find(x => x.key === "philly"); if (!r) return null;
+    const v = parseFloat(String(r.value)); if (!Number.isFinite(v)) return null;
+    const cad = (typeof rigaCadenza === "function") ? rigaCadenza("philly", r.date) : "";
+    return {
+      g: scala(v, { min: -40, max: 50, unita: "", aria: "manifattura Philly Fed",
+          zone: [{ da: -40, a: 0, nome: "attivita' in contrazione", colore: "var(--red)" },
+                 { da: 0, a: 20, nome: "espansione", colore: "var(--muted)" },
+                 { da: 20, a: 50, nome: "espansione forte", colore: "var(--green)" }],
+          fonte: "e' un diffusion index: lo ZERO separa chi vede migliorare da chi vede peggiorare, e non e' una soglia scelta da me" }),
+      n: (cad ? `<div class="mg-cad muted"><b>⚠ ${esc(cad)}</b></div>` : "")
+        + `<b>${v > 0 ? "+" : ""}${v}</b> — differenza fra la quota di aziende che segnala miglioramento e quella che segnala peggioramento. `
+        + `<b>NON e' l'ISM</b>: l'ISM e' sotto licenza e non e' ridistribuibile. Questa e' la stessa specie di misura ed esce prima, ma copre UN distretto, non il paese. `
+        + `Come si legge: usala per la DIREZIONE, non per il livello nazionale, e ricordati che e' un dato mensile — a meta' mese descrive il mese scorso.`,
+    };
+  },
+
   "in:retail": (m) => {
     const r = (m.indicators || []).find(x => x.key === "retail"); if (!r) return null;
     const v = parseFloat(String(r.value).replace(",", ".").replace("%", ""));
@@ -3531,7 +3685,17 @@ const FORMA_INDICATORE = {
   },
   witching: (m) => {
     const w = m.witching; if (!w || w.days == null) return null;
-    return { g: contoAllaRovescia(w.days, w.upcoming, {}),
+    /* ⚠ v272 — il conto alla rovescia non disegnava nulla di leggibile a colpo d'occhio: era
+       un numero e due date. Il CEO ha chiesto un grafico anche qui. La scala mostra DOVE
+       siamo rispetto alla scadenza, che e' l'unica cosa che si vuole sapere — e i 30 giorni
+       sono la soglia che questa stessa scheda dichiara nella sua nota, non una inventata ora. */
+    const g = scala(Math.min(Number(w.days) || 0, 100), {
+      min: 0, max: 100, unita: " g", aria: "giorni alla scadenza tecnica",
+      zone: [{ da: 0, a: 10, nome: "dentro la finestra: volumi distorti", colore: "var(--red)" },
+             { da: 10, a: 30, nome: "si avvicina", colore: "var(--yellow)" },
+             { da: 30, a: 100, nome: "lontana: nessun effetto", colore: "var(--green)" }],
+      fonte: "i 30 giorni sono la soglia gia' usata da questa scheda, non una nuova" });
+    return { g: (g || "") + contoAllaRovescia(w.days, w.upcoming, {}),
       n: `Prossima quadrupla scadenza il ${dataBreve(w.next)}. <b>Come si legge:</b> nel giorno delle scadenze tecniche scadono insieme opzioni e futures su indici e singole azioni, e i volumi esplodono per ragioni che non hanno a che fare coi fondamentali. Sotto i 30 giorni conviene evitare di leggere i movimenti come segnale, e non piazzare ordini limite stretti in quella seduta.` };
   },
   "mk:^TNX": (m) => {
@@ -7137,6 +7301,12 @@ const WL_COLONNE = [
   { k: "chg", t: "Var.", num: true, segno: true },
   { k: "chg_pct", t: "Var. %", num: true, segno: true, pct: true },
   { k: "vol", t: "Vol.", num: true, volume: true },
+  /* ⚠ v272 — RICHIESTA DEL CEO: "possiamo mettere i prezzi di after e pre market". La colonna
+     esiste solo quando la fase c'e' davvero: in seduta ordinaria un "prezzo fuori orario" non
+     esiste, e riempirla con l'ultimo prezzo normale sarebbe la solita cella che sembra un dato
+     e non lo e'. Fuori orario la riga porta il prezzo, la variazione rispetto alla chiusura e
+     l'ora — perche' un prezzo di pre-market senza l'ora non dice quanto e' fresco. */
+  { k: "ext", t: "Pre/After", ext: true },
 ];
 
 /* i dati di un simbolo, da data.json. Null dove la pipeline non lo segue: dichiarato, non finto. */
@@ -7164,7 +7334,8 @@ function datiSimbolo(tk) {
   if (q && !q.assente && Number.isFinite(q.price)) {
     const nome = nomeSimbolo(T);
     return { tk: T, nome, seguito: true, fonte: "live", price: q.price,
-             high: q.dayHigh, low: q.dayLow, chg: q.chg, chg_pct: q.chgPct, vol: q.vol };
+             high: q.dayHigh, low: q.dayLow, chg: q.chg, chg_pct: q.chgPct, vol: q.vol,
+             ext: q.ext || null };
   }
   const r = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
     .find(x => String(x.ticker || "").toUpperCase() === T);
@@ -7231,6 +7402,17 @@ function cellaWl(r, col) {
     const sotto = String(r.nome).toUpperCase() === r.tk ? "" : '<span class="wl-tk">' + esc(r.tk) + '</span>';
     return '<td class="wl-nome"><button class="wl-link" data-wl="' + esc(r.tk) + '">' + esc(r.nome)
       + '</button>' + sotto + '</td>';
+  }
+  if (col.ext) {
+    const e = r.ext;
+    if (!e || !Number.isFinite(e.prezzo)) return '<td class="num muted">—</td>';
+    const base = Number.isFinite(r.price) ? r.price : NaN;
+    const d = Number.isFinite(base) && base ? (e.prezzo / base - 1) * 100 : NaN;
+    const cls = Number.isFinite(d) ? (d > 0 ? "pos" : d < 0 ? "neg" : "") : "";
+    const ora = e.quando.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    return '<td class="num wl-ext"><b class="' + cls + '">' + fmtNum.format(Math.round(e.prezzo * 100) / 100) + '</b>'
+      + (Number.isFinite(d) ? '<span class="' + cls + '">' + signTxt(Math.round(d * 100) / 100, "%") + '</span>' : "")
+      + '<span class="muted">' + (e.fase === "pre" ? "pre" : "after") + " " + esc(ora) + '</span></td>';
   }
   const v = r[col.k];
   if (!r.seguito || !Number.isFinite(v)) return '<td class="num muted">—</td>';
@@ -7393,12 +7575,12 @@ async function aggiornaQuoteWatchlist(forza) {
   wlInCorso = true;
   try {
     const simboli = leggiWatchlist();
-    if (forza) simboli.forEach(x => cacheQuote.delete(`${String(x).toUpperCase()}|5d`));
+    if (forza) simboli.forEach(x => cacheQuote.delete(`${String(x).toUpperCase()}|1d`));
     /* i simboli che livePrices copre gia' sono nella cache con la loro scadenza: quotaLive li
        ritorna senza uscire in rete. Qui si chiedono davvero solo quelli in piu'. */
     const esiti = await Promise.all(simboli.map(async (x) => {
       const T = String(x).toUpperCase();
-      try { return [T, await quotaLive(T, "5d")]; } catch { return [T, null]; }
+      try { return [T, await quotaLive(T, "1d")]; } catch { return [T, null]; }
     }));
     let vivi = 0;
     esiti.forEach(([T, q]) => {
@@ -7438,6 +7620,12 @@ function renderWatchlistTV() {
     /* i simboli che la pipeline non segue stanno in fondo SEMPRE, anche ordinando per nome:
        altrimenti "^SOX" apriva la tabella con una riga di trattini. */
     if (a.seguito !== b.seguito) return a.seguito ? -1 : 1;
+    if (col.ext) {
+      const pa = a.ext && Number.isFinite(a.ext.prezzo) ? a.ext.prezzo : null;
+      const pb = b.ext && Number.isFinite(b.ext.prezzo) ? b.ext.prezzo : null;
+      if (pa == null || pb == null) return pa === pb ? 0 : (pa != null ? -1 : 1);
+      return (pa - pb) * wlOrdine.verso;
+    }
     const va = Number.isFinite(a[col.k]), vb = Number.isFinite(b[col.k]);
     if (col.num) {
       if (!va || !vb) return va === vb ? 0 : (va ? -1 : 1);
