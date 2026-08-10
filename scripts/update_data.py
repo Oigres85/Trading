@@ -31,7 +31,6 @@ try:
 except Exception:                            # noqa: BLE001 — ambiente minimale senza modulo
     ZoneInfo = None
 
-import feedparser
 import numpy as np
 import pandas as pd
 import requests
@@ -173,81 +172,11 @@ TOP_CAP_CANDIDATES = {
     "MA": "Mastercard", "COST": "Costco", "ASML": "ASML", "2222.SR": "Saudi Aramco",
 }
 
-def gnews(query):
-    return ("https://news.google.com/rss/search?q="
-            + urllib.parse.quote(f"{query} when:1d") + "&hl=en-US&gl=US&ceid=US:en")
 
 
-def build_feeds():
-    """Feed costruiti dinamicamente: fonti dirette diverse + un feed per ogni titolo in
-    portafoglio/watchlist (così le news si adattano e variano)."""
-    feeds = [
-        # Investing.com — fonte prioritaria (più sezioni)
-        ("Investing.com", "https://www.investing.com/rss/news.rss"),
-        ("Investing.com", "https://www.investing.com/rss/news_25.rss"),       # stock market
-        ("Investing.com", "https://www.investing.com/rss/news_285.rss"),      # economy
-        ("Investing.com", "https://www.investing.com/rss/news_1.rss"),        # forex
-        ("Investing.com", "https://www.investing.com/rss/stock_Stocks.rss"),
-        ("Investing.com", "https://www.investing.com/rss/news_301.rss"),      # cryptocurrency
-        # altre testate dirette
-        ("CNBC", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114"),
-        ("CNBC Markets", "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258"),
-        ("Yahoo Finance", "https://finance.yahoo.com/news/rssindex"),
-        ("MarketWatch", "https://feeds.content.dowjones.io/public/rss/mw_topstories"),
-        ("Bloomberg", "https://feeds.bloomberg.com/markets/news.rss"),
-        ("Reddit", "https://www.reddit.com/r/stocks/.rss"),
-        ("Reddit", "https://www.reddit.com/r/investing/.rss"),
-        # macro / geopolitica (per fonte, via Google con site:)
-        ("Reuters", gnews("site:reuters.com (markets OR economy OR Fed OR Iran OR stocks OR tariffs)")),
-        ("AP", gnews("site:apnews.com (economy OR markets OR Iran OR Fed OR Trump OR China)")),
-        ("CNBC", gnews("site:cnbc.com (Fed OR inflation OR market OR earnings)")),
-        ("Google News", gnews("Federal Reserve OR US inflation OR White House economy OR tariffs OR jobs report")),
-        ("Google News", gnews("Iran OR Israel OR Ukraine OR Russia OR China trade OR OPEC oil (markets OR economy OR war)")),
-        ("Google News", gnews('"BCA Research" OR MacroQuant OR "recession probability" OR "business cycle" market outlook')),
-    ]
-    # un feed dedicato per ogni posizione e titolo in watchlist
-    for p in PORTFOLIO + WATCHLIST:
-        nm = (p.get("name") or p["ticker"])
-        if p["ticker"] in ("BTC-USD",):
-            q = "Bitcoin OR crypto"
-        elif p["ticker"] == "BTP-V28":
-            q = '"BTP Valore" OR "Italian bonds" OR BTP'
-        elif p.get("currency") == "PTS":
-            continue
-        else:
-            q = f'"{nm}" OR {p["ticker"]} stock'
-        feeds.append(("Google News", gnews(q)))
-    return feeds
 
 
-# domini a pagamento: le loro notizie restano, ma il link punta a una ricerca Google
-# (così trovi una versione leggibile gratis invece del paywall)
-PAYWALL_DOMAINS = ("wsj.com", "ft.com", "barrons.com", "economist.com", "seekingalpha.com",
-                   "bloomberg.com", "nytimes.com", "thetimes", "telegraph.co.uk",
-                   "businessinsider.com", "theinformation.com")
 
-# pattern regex (word boundary) per associare le news ai titoli
-PORTFOLIO_KEYWORDS = {
-    "NVDA": [r"\bnvidia\b", r"\bnvda\b"], "AMD": [r"\bamd\b", r"advanced micro"],
-    "MU": [r"\bmicron\b"], "INTC": [r"\bintel\b"], "TSLA": [r"\btesla\b", r"\bmusk\b"],
-    "MSTR": [r"\bmicrostrategy\b", r"\bstrategy inc\b", r"\bmstr\b", r"\bsaylor\b"],
-    "RGTI": [r"\brigetti\b"], "OKLO": [r"\boklo\b"], "ARBE": [r"\barbe\b"],
-    "BTP-V28": [r"\bbtp\b", r"italian bond", r"italy bond"],
-    # macro, politica USA e geopolitica (notizie che muovono i mercati)
-    "MACRO": [
-        # politica monetaria / macro USA
-        r"\bfed\b", r"federal reserve", r"\binflation\b", r"\bcpi\b", r"\bpce\b",
-        r"\btariff", r"white house", r"\btrump\b", r"\bcongress\b", r"\btreasur",
-        r"\bgdp\b", r"\bpowell\b", r"rate cut", r"rate hike", r"interest rate",
-        r"\bjobs report\b", r"payrolls", r"unemployment", r"recession", r"debt ceiling",
-        r"government shutdown", r"\bsenate\b", r"\bbiden\b", r"stimulus", r"\bopec\b",
-        # geopolitica e mercati globali
-        r"\biran\b", r"\bisrael\b", r"\bgaza\b", r"middle east", r"\bwar\b", r"conflict",
-        r"\brussia\b", r"\bukraine\b", r"\bchina\b", r"sanction", r"geopolit",
-        r"oil price", r"crude oil", r"\bnato\b", r"strait of hormuz", r"nuclear",
-        r"stock market", r"wall street", r"\bs&p 500\b", r"\bdow\b", r"selloff", r"rally",
-    ],
-}
 
 
 # ⚠ v266 — FRED RIFIUTA LO USER-AGENT DA BROWSER. Misurato: la stessa URL csv risponde 200 a
@@ -2965,87 +2894,10 @@ def fetch_portfolio_history(btp_value_eur):
         return None
 
 
-def fetch_top_caps(n=10):
-    """Classifica delle aziende più capitalizzate (candidati noti, ordinati per market cap)."""
-    rows, fx = [], {}
-    for sym, name in TOP_CAP_CANDIDATES.items():
-        try:
-            fi = yf.Ticker(sym).fast_info
-            mc = fi.market_cap
-            if not mc:
-                continue
-            curr = (fi.currency or "USD").upper()
-            if curr != "USD":
-                if curr not in fx:
-                    fx[curr] = float(yf.Ticker(f"{curr}USD=X").fast_info.last_price)
-                mc *= fx[curr]
-            chg = (float(fi.last_price) / float(fi.previous_close) - 1) * 100
-            rows.append({"ticker": sym, "name": name,
-                         "mcap_usd": round(mc), "change_pct": round(chg, 2)})
-        except Exception as e:  # noqa: BLE001
-            print(f"!! topcap {sym}: {e}", file=sys.stderr)
-    rows.sort(key=lambda x: x["mcap_usd"], reverse=True)
-    return rows[:n]
 
 
-def fetch_top_etfs():
-    """Dati live per i 10 ETF principali: prezzo, performance, RSI, PE, dividendo."""
-    rows = []
-    for ticker, name in TOP_ETF_LIST:
-        row = fetch_symbol(ticker, name)
-        if not row:
-            continue
-        try:
-            info = yf.Ticker(ticker).info
-            row["pe"]        = round(float(info["trailingPE"]), 1) if info.get("trailingPE") else None
-            # div_yield_frac: tasso assoluto/prezzo (non ambiguo) + cap 30% (TLT usciva "453%")
-            _dr = info.get("dividendRate") or info.get("trailingAnnualDividendRate")
-            row["div_yield"] = round((div_yield_frac(_dr, row.get("price"), info.get("dividendYield")) or 0) * 100, 2)
-            aum = info.get("totalAssets")
-            row["aum"] = round(aum / 1e9, 1) if aum else None
-        except Exception:  # noqa: BLE001
-            pass
-        rows.append(row)
-    return rows
 
 
-def parse_feed_entries(url):
-    """Restituisce [(title, link, ts)] da un feed RSS; se bloccato usa rss2json."""
-    out = []
-    try:
-        # Reddit rate-limita (HTTP 429) UA generici/datacenter → UA browser realistico + Accept
-        if "reddit.com" in url:
-            r = requests.get(url, timeout=20, headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                              "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-                "Accept": "application/rss+xml,application/xml;q=0.9,text/html;q=0.8,*/*;q=0.7"})
-        else:
-            r = http_get(url, timeout=20)
-        feed = feedparser.parse(r.content)
-        for e in feed.entries[:25]:
-            ts = None
-            for k in ("published_parsed", "updated_parsed"):
-                if e.get(k):
-                    ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", e[k])
-                    break
-            out.append((e.get("title", "").strip(), e.get("link", ""), ts))
-    except Exception as e:  # noqa: BLE001
-        print(f"!! feed diretto ko ({url[:40]}): {e}", file=sys.stderr)
-    if not out:  # fallback gratuito rss2json
-        try:
-            j = http_get("https://api.rss2json.com/v1/api.json?rss_url="
-                         + urllib.parse.quote(url), timeout=20).json()
-            for e in (j.get("items") or [])[:25]:
-                ts = None
-                if e.get("pubDate"):
-                    try:
-                        ts = datetime.strptime(e["pubDate"][:19], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%dT%H:%M:%SZ")
-                    except ValueError:
-                        ts = None
-                out.append((e.get("title", "").strip(), e.get("link", ""), ts))
-        except Exception as e:  # noqa: BLE001
-            print(f"!! rss2json ko ({url[:40]}): {e}", file=sys.stderr)
-    return out
 
 
 def fetch_predictions(limit=6):
@@ -3095,44 +2947,10 @@ BEAR_WORDS = re.compile(r"\b(plunge|slump|crash|fall|falls|drop|drops|miss|misse
                         r"layoff|tariff|sanction|war|conflict|fear|selloff|loss|losses|weak|slowdown|ban)\b", re.I)
 
 
-def news_sentiment(title):
-    b = len(BULL_WORDS.findall(title))
-    s = len(BEAR_WORDS.findall(title))
-    if b > s:
-        return "bull"
-    if s > b:
-        return "bear"
-    return "neutral"
 
 
-# gruppo Politica/geopolitica (distinto dal Macro economico)
-POL_KEYWORDS = [r"\btrump\b", r"white house", r"\bcongress\b", r"\bsenate\b", r"\bbiden\b",
-                r"election", r"\biran\b", r"\bisrael\b", r"\bgaza\b", r"\bwar\b", r"conflict",
-                r"\brussia\b", r"\bukraine\b", r"sanction", r"tariff", r"geopolit",
-                r"\bnato\b", r"\bopec\b", r"government shutdown", r"middle east", r"nuclear"]
 
 
-def build_keywords():
-    """Parole chiave news: macro + politica + ticker/nome di ogni posizione in
-    portafoglio E watchlist (le news si adattano quando aggiungi/rimuovi titoli)."""
-    kw = {"MACRO": PORTFOLIO_KEYWORDS["MACRO"], "POL": POL_KEYWORDS}
-    for p in PORTFOLIO + [w for w in WATCHLIST if w.get("currency") != "PTS"]:
-        tk = p["ticker"]
-        if tk == "BTP-V28":
-            kw[tk] = [r"\bbtp\b", r"italian bond", r"italy bond"]
-            continue
-        if tk in ("BTC-USD",):
-            kw[tk] = [r"\bbitcoin\b", r"\bcrypto\b"]
-            continue
-        if tk in ("CL=F",):
-            kw[tk] = [r"oil price", r"crude oil", r"\bopec\b"]
-            continue
-        terms = [re.escape(tk.lower())]
-        nm = (p.get("name") or "").lower().split(" ")[0]
-        if len(nm) >= 3 and nm not in ("the", "inc", "corp"):
-            terms.append(re.escape(nm))
-        kw[tk] = [rf"\b{t}\b" for t in terms]
-    return kw
 
 
 STOPWORDS = set("the a an of to in on for and or with at by from is are be as has have new "
@@ -3155,72 +2973,6 @@ def is_duplicate_topic(key, kept_keys):
     return False
 
 
-def fetch_news():
-    """News sui titoli in portafoglio (dinamiche) + macro/politica/geopolitica, tradotte.
-    Esclude articoli a pagamento e doppioni sullo stesso argomento. Include Polymarket."""
-    keywords = build_keywords()
-    # solo notizie delle ultime 30 ore (≈1 giorno)
-    cutoff = datetime.now(timezone.utc).timestamp() - 30 * 3600
-    def fresh(ts):
-        if not ts:
-            return True   # senza data: tenuta (molti feed sono comunque recenti)
-        try:
-            return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp() >= cutoff
-        except ValueError:
-            return True
-    items, seen_titles, kept_keys, per_source = [], set(), [], {}
-    for source, url in build_feeds():
-        for title, link, ts in parse_feed_entries(url):
-            if not title or title.lower() in seen_titles:
-                continue
-            if not fresh(ts):                      # niente notizie più vecchie di ~1 giorno
-                continue
-            # paywall: non scartare, ma punta a una ricerca Google (versione gratuita)
-            if any(d in (link or "").lower() for d in PAYWALL_DOMAINS):
-                link = "https://news.google.com/search?q=" + urllib.parse.quote(title)
-            tickers = [tk for tk, kws in keywords.items()
-                       if any(re.search(kw, title.lower()) for kw in kws)]
-            if not tickers:
-                continue
-            key = topic_key(title)
-            if is_duplicate_topic(key, kept_keys):     # niente doppioni di argomento
-                continue
-            cap = 16 if source == "Investing.com" else 6   # Investing prioritario
-            if per_source.get(source, 0) >= cap:
-                continue
-            seen_titles.add(title.lower())
-            kept_keys.append(key)
-            per_source[source] = per_source.get(source, 0) + 1
-            # priorità ARGOMENTO: macro/politica (0) > portafoglio (1) > watchlist (2) > resto (3)
-            pf_tk = {p["ticker"] for p in PORTFOLIO}
-            wl_tk = {w["ticker"] for w in WATCHLIST}
-            if "MACRO" in tickers or "POL" in tickers:
-                topic_pri = 0
-            elif any(t in pf_tk for t in tickers):
-                topic_pri = 1
-            elif any(t in wl_tk for t in tickers):
-                topic_pri = 2
-            else:
-                topic_pri = 3
-            items.append({"source": source, "title": title, "link": link,
-                          "published": ts, "tickers": tickers,
-                          "topic_pri": topic_pri, "inv": source == "Investing.com",
-                          "sentiment": news_sentiment(title)})
-    # ordina: prima per argomento (macro/politica→portafoglio→watchlist→resto),
-    # dentro ogni gruppo Investing.com in cima e poi per data
-    items.sort(key=lambda x: x["published"] or "", reverse=True)
-    items.sort(key=lambda x: (x["topic_pri"], 0 if x["inv"] else 1))
-    items = items[:48]
-    for it in items:
-        it["title_it"] = translate_it(it["title"])
-    # mercati di previsione Polymarket, integrati nelle news
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    for p in fetch_predictions():
-        items.append({"source": "Polymarket", "title": p["question"],
-                      "title_it": f"{p['question']} — probabilità Sì {p['yes']}%",
-                      "link": p["link"], "published": now,
-                      "tickers": ["MACRO"], "sentiment": "neutral"})
-    return items
 
 
 def clean_nan(obj):
@@ -3479,63 +3231,6 @@ SCREENER_UNIVERSE = {
 }
 
 
-def fetch_screener(held_tickers, tilt_rows):
-    """Ritorna i migliori candidati di ROTAZIONE: qualità alta (ROE>15%), NON già in portafoglio/
-    watchlist, in un settore che sta ACCELERANDO (ETF con m1>0). Best-effort: ogni fetch protetto,
-    [] se tutto fallisce. Serve a rompere la monocultura tech: bassa correlazione col book."""
-    held = {t.upper() for t in held_tickers}
-    tilt = {r["ticker"]: r for r in (tilt_rows or [])}
-    # rendimento 1M del Nasdaq 100 per la forza relativa dei candidati (una sola chiamata)
-    ndx_m1 = None
-    try:
-        ns = yf.Ticker("^NDX").history(period="3mo", interval="1d")["Close"].dropna()
-        if len(ns) >= 22:
-            ndx_m1 = (float(ns.iloc[-1]) / float(ns.iloc[-22]) - 1) * 100
-    except Exception:  # noqa: BLE001
-        pass
-    out = []
-    for tk, etf in SCREENER_UNIVERSE.items():
-        if tk.upper() in held:
-            continue
-        try:
-            t = yf.Ticker(tk)
-            hist = drop_void_bars(t.history(period="3mo", interval="1d", auto_adjust=True))
-            closes = hist["Close"].dropna()
-            if len(closes) < 22:
-                continue
-            price = float(closes.iloc[-1])
-            m1 = (price / float(closes.iloc[-22]) - 1) * 100
-            info = t.info or {}
-            roe = info.get("returnOnEquity")
-            if roe is None or roe < 0.15:                 # SOLO qualità eccellente del capitale
-                continue
-            sec = tilt.get(etf) or {}
-            sec_m1 = sec.get("m1")
-            if sec_m1 is not None and sec_m1 < -1:        # scarta i settori in contrazione netta
-                continue
-            rsi = rsi14(closes)
-            tgt = info.get("targetMeanPrice")
-            out.append({
-                "ticker": tk, "name": (info.get("shortName") or tk)[:26],
-                "sector_etf": etf, "sector_name": (sec.get("name") or etf),
-                "sector_m1": round(sec_m1, 1) if sec_m1 is not None else None,
-                "price": round(price, 2), "m1_pct": round(m1, 1),
-                "rs_ndx_1m": round(m1 - ndx_m1, 1) if ndx_m1 is not None else None,
-                "roe_pct": round(roe * 100, 1),
-                "rev_growth_pct": round(info.get("revenueGrowth") * 100, 1) if info.get("revenueGrowth") is not None else None,
-                "forward_pe": round(info.get("forwardPE"), 1) if info.get("forwardPE") else None,
-                "peg": round(info.get("pegRatio") or info.get("trailingPegRatio"), 2) if (info.get("pegRatio") or info.get("trailingPegRatio")) else None,
-                "rsi": rsi,
-                "target_upside_pct": round((tgt / price - 1) * 100, 1) if (tgt and price) else None,
-                # score: forza del settore (rotazione) + forza relativa del titolo + bonus qualità
-                "_score": (sec_m1 or 0) * 1.5 + (m1 - (ndx_m1 or 0)) + min(roe * 100, 40) * 0.3,
-            })
-        except Exception as e:  # noqa: BLE001
-            print(f"!! screener {tk}: {e}", file=sys.stderr)
-    out.sort(key=lambda x: x["_score"], reverse=True)
-    for r in out:
-        r.pop("_score", None)
-    return out[:6]                                        # i 6 migliori: idee, non una watchlist infinita
 
 
 def main():
@@ -3675,12 +3370,21 @@ def main():
         "history": fetch_portfolio_history(btp["value"]),
         "macro": macro,
         "broker": BROKER,
-        "top_caps": fetch_top_caps(),
-        "top_etfs": fetch_top_etfs(),
+        # ═══ v269 — QUATTRO BLOCCHI CHE NESSUNO LEGGEVA PIU' ═══════════════════════════
+        # Il CEO ha chiesto di alleggerire la pipeline. Misurato su data.json (1,33 MB, che
+        # gzippato fa 168 KB e il browser scarica a ogni apertura):
+        #   top_etfs  121.518 caratteri (9,1%)   news  28.983 (2,2%)
+        #   screener    1.677                    top_caps  861
+        # In assets/app.js i riferimenti VERI a questi blocchi sono ZERO: quelli che restavano
+        # erano commenti ed etichette rimasti dopo v256, quando il CEO ha chiuso portafoglio,
+        # watchlist e news. Nessun gate li legge — verificato su test_app, redteam,
+        # coherence_check, audit_data, test_update_data e fx_check.
+        # ⚠ IL RISPARMIO VERO NON E' IL PESO, E' IL TEMPO. build_feeds() metteva insieme una
+        # VENTINA di feed fissi PIU' uno per ogni titolo in portafoglio e watchlist: circa 57
+        # richieste RSS a ogni run, per riempire un blocco che nessuno apriva.
+        # `predictions` RESTA: e' Polymarket, e le sue righe finiscono davvero nel pacchetto
+        # macro (buildPrompt legge DATA.predictions per le probabilita' sulla Fed).
         "predictions": fetch_predictions(),
-        "screener": fetch_screener([r["ticker"] for r in equities] + [r["ticker"] for r in watchlist],
-                                   macro.get("tilt")),
-        "news": fetch_news(),
         "options": options,
         "metrics_history": metrics_history,
         "sanity_filtered": SANITY_FILTERED,   # anomalie API scartate dal sanity check in questo run

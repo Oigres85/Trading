@@ -422,10 +422,30 @@ _hold = _json.loads((_RADICE / "config" / "holdings.json").read_text(encoding="u
 check("v254 nessuna posizione in holdings.json e' priva di `name`",
       all(r.get("name") for r in _hold.get("portfolio", [])))
 
+# ═══ v269 — LO SFOLTIMENTO NON DEVE TORNARE INDIETRO ═══════════════════════════════════════
+# Il CEO: "alleggerire la pipeline". Tolti quattro blocchi che nessuno leggeva piu' dopo v256
+# (top_etfs, news, screener, top_caps) e con loro le ~57 richieste RSS per run di build_feeds.
+# Questi check esistono perche' un blocco morto si riaggiunge senza accorgersene: basta una
+# riga nel dizionario finale, e nessuno se ne accorge finche' il file non e' di nuovo grosso.
+_src = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+
+for _morto in ("fetch_news", "fetch_top_etfs", "fetch_top_caps", "fetch_screener",
+               "build_feeds", "parse_feed_entries"):
+    check(f"v269 pipeline: {_morto} non e' tornata", f"def {_morto}(" not in _src)
+
+check("v269 pipeline: il dizionario finale non riscrive i blocchi morti",
+      not any(f'"{k}":' in _src for k in ("top_etfs", "news", "screener", "top_caps")))
+
+# ⚠ predictions RESTA: e' Polymarket, e le sue righe finiscono nel pacchetto macro. Un taglio
+# che si porta via anche i vivi e' peggio di nessun taglio.
+check("v269 pipeline: predictions (Polymarket) e' rimasta, la usa il pacchetto macro",
+      '"predictions": fetch_predictions()' in _src)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)
 _TOT = len(ESEGUITI)
+
 print(f"\n{('TUTTI I ' + str(_TOT - len(FAILED)) + f'/{_TOT} CHECK OK') if not FAILED else str(len(FAILED)) + f'/{_TOT} CHECK FALLITI: ' + ', '.join(FAILED)}")
 sys.exit(1 if FAILED else 0)
 
