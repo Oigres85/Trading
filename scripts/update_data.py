@@ -1612,6 +1612,54 @@ def fetch_macro():
             print(f"!! mercato {sym}: {e}", file=sys.stderr)
     macro["markets"] = markets
 
+    # ═══ v280 — MATERIE PRIME E SEMICONDUTTORI, COL LORO STORICO ═══════════════════════════
+    # Richiesta del CEO, una per messaggio: "Semiconduttori (SOX) / rame / petrolio / oro
+    # inserisci grafico storico nella tab macro".
+    # ⚠ NON E' UN RITORNO INDIETRO rispetto a v272, dove li aveva fatti togliere. Allora erano
+    # schede-NUMERO che duplicavano la sua watchlist ("devono essere presenti in watchlist");
+    # oggi la watchlist non c'e' piu' (v275) e quello che chiede e' un'altra cosa: la SERIE nel
+    # tempo. Un livello dice dov'e' il rame adesso, la curva dice se il ciclo industriale sta
+    # girando — ed e' l'unica delle due che il suo broker non gli mostra accanto al prezzo.
+    # ⚠ BLOCCO AUTOSUFFICIENTE, non agganciato alla watchlist: tre di questi simboli sono anche
+    # in config/ui_watchlist.json e sarebbe stato piu' economico riusare quelle barre, ma allora
+    # le schede macro sparirebbero il giorno in cui il CEO toglie un simbolo dalla sua lista.
+    # Il quadro macro non deve dipendere da una preferenza di visualizzazione.
+    materie = {}
+    for chiave, sym, label, dec, unita in [
+        ("sox", "^SOX", "Semiconduttori (SOX)", 0, ""),
+        ("rame", "HG=F", "Rame", 3, "$/lb"),
+        ("petrolio", "CL=F", "Petrolio WTI", 2, "$"),
+        ("oro", "GC=F", "Oro", 0, "$/oz"),
+    ]:
+        try:
+            h = yf.Ticker(sym).history(period="1y")["Close"].dropna()
+            if len(h) < 30:
+                print(f"!! materie {sym}: solo {len(h)} barre, salto", file=sys.stderr)
+                continue
+            # ⚠ si DIRADA a ~120 punti invece di spedirne 250: su una card larga 300px due punti
+            # per pixel non si vedono, e pesano nel file che il browser scarica ogni volta.
+            passo = max(1, len(h) // 120)
+            storia = [{"d": d.strftime("%Y-%m-%d"), "v": round(float(v), dec if dec else 2)}
+                      for d, v in list(h.items())[::passo]]
+            if storia and storia[-1]["d"] != h.index[-1].strftime("%Y-%m-%d"):
+                storia.append({"d": h.index[-1].strftime("%Y-%m-%d"), "v": round(float(h.iloc[-1]), dec if dec else 2)})
+            ultimo, prec = float(h.iloc[-1]), float(h.iloc[-2])
+            anno_min, anno_max = float(h.min()), float(h.max())
+            materie[chiave] = {
+                "symbol": sym, "label": label, "unita": unita,
+                "value": round(ultimo, dec) if dec else round(ultimo),
+                "change_pct": round((ultimo / prec - 1) * 100, 2),
+                # posizione nel range dell'anno: e' la lettura che un livello da solo non da'
+                "pct_1y": round((ultimo / float(h.iloc[0]) - 1) * 100, 1),
+                "min_1y": round(anno_min, dec) if dec else round(anno_min),
+                "max_1y": round(anno_max, dec) if dec else round(anno_max),
+                "history": storia,
+            }
+        except Exception as e:  # noqa: BLE001
+            print(f"!! materie {sym}: {e}", file=sys.stderr)
+    if materie:
+        macro["materie"] = materie
+
     # Carry trade USA-Giappone (differenziale rendimenti 10 anni + trend USD/JPY)
     try:
         us10 = float(yf.Ticker("^TNX").fast_info.last_price)

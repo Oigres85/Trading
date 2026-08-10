@@ -1488,6 +1488,61 @@ check("v276 pacchetto: il Fear & Greed doppio e' dichiarato come una misura sola
   const p = buildPrompt();
   return /UNA misura guardata da due lati, non due segnali/.test(p)`));
 
+/* ══ v280 — MATERIE PRIME E SEMICONDUTTORI COL LORO STORICO ══════════════════════════════
+   Quattro richieste del CEO, una per messaggio. NON e' un ritorno indietro rispetto a v272:
+   allora erano schede-NUMERO che duplicavano la watchlist, oggi la watchlist non c'e' piu' e
+   quello che chiede e' la SERIE nel tempo — che il suo broker non gli mette accanto al prezzo. */
+check("v280 materie: le quattro schede hanno una forma col grafico", (() => {
+  const i = src.indexOf("const MATERIE = {");
+  const blocco = src.slice(i, i + 2500);
+  return ["sox:", "rame:", "petrolio:", "oro:"].every(k => blocco.includes(k))
+      && /graficoSerie\(\[\{ nome: cfg\.titolo/.test(src);
+})());
+
+check("v280 materie: entrano in classifica e portano la loro serie", run(`
+  const saved = DATA.macro.materie;
+  const st = (b) => Array.from({length: 40}, (_, i) => ({ d: "2026-01-01", v: b * (1 + i / 100) }));
+  DATA.macro.materie = { rame: { label: "Rame", unita: "$/lb", value: 6.6, change_pct: 0.8,
+    pct_1y: 38, min_1y: 4.4, max_1y: 6.7, history: st(6) } };
+  const c = indicatoriClassifica().filter(x => x.k === "mat:rame");
+  const f = FORMA_INDICATORE["mat:rame"](DATA.macro);
+  DATA.macro.materie = saved;
+  return c.length === 1 && !!f && typeof f.g === "string" && f.g.length > 200`));
+
+/* ⚠ IL PUNTEGGIO E' POSIZIONALE, NON UN GIUDIZIO: un petrolio al 90% del suo intervallo e'
+   inflazione (male), un rame al 90% e' domanda industriale (bene) — stesso numero, segni
+   opposti. Metterli nella mediana del quadro d'insieme direbbe una cosa priva di senso: e' lo
+   stesso errore che il Philly Fed a punteggio pieno ha reso visibile in v274. */
+/* ⚠ `suVeri` e non `run`: sulla fixture non c'e' macro.indicators, quindi `quadro` e' null e
+   il check moriva su `null.n` — misurando i dati di prova invece del codice. E' la stessa
+   trappola gia' documentata in CLAUDE.md e ripetuta oggi per la terza volta. */
+check("v280 materie: i punteggi posizionali NON votano nel quadro d'insieme", suVeri(`
+  const saved = DATA.macro.materie;
+  const st = (b) => Array.from({length: 40}, (_, i) => ({ d: "2026-01-01", v: b }));
+  const prima = correlazioniMacro().quadro.n;
+  DATA.macro.materie = { rame: { label: "Rame", value: 6.6, change_pct: 0, pct_1y: 0,
+    min_1y: 4, max_1y: 7, history: st(6) } };
+  const dopo = correlazioniMacro().quadro.n;
+  DATA.macro.materie = saved;
+  return prima === dopo`));
+
+/* ══ v280 — IL PUT/CALL NON MOSTRA PIU' IL VECCHIO PORTAFOGLIO ═══════════════════════════
+   ⚠ TERZA VOLTA che il CEO deve segnalare questa stessa cosa. In v265 avevo corretto la SCHEDA
+   e dichiarato risolto guardando i DATI (`macro.putcall` e' solo SPY) invece dello SCHERMO: il
+   pannello ricostruiva la tabella "PRESSIONE DI ROLLING PER TITOLO" da DATA.portfolio +
+   DATA.watchlist per conto suo, e mostrava AMD, NVDA, MU, MSTR, RGTI.
+   Questo check guarda l'HTML PRODOTTO, non il codice: e' l'unico modo di non ripetere l'errore
+   di aver dedotto invece di guardare. */
+check("v280 put/call: il pannello non costruisce piu' tabelle sui titoli del portafoglio", run(`
+  const saved = DATA.portfolio;
+  DATA.portfolio = [{ ticker: "ZZOLD", qty: 10, currency: "USD", price: 100, name: "Vecchio" }];
+  DATA.options = Object.assign({}, DATA.options, { ZZOLD: { spot: 100, expiries: [
+    { date: "2026-09-18", calls: [{ strike: 110, oi: 99, vol: 5 }], puts: [{ strike: 90, oi: 88, vol: 4 }],
+      call_wall: 110, put_wall: 90, opt_volume: 9 }] } });
+  const html = contenutoDalPannello("putcall", "") || "";
+  DATA.portfolio = saved;
+  return !/ZZOLD/.test(html) && !/PRESSIONE DI ROLLING/i.test(html)`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

@@ -483,9 +483,20 @@ check("v279 pipeline: nessuna divisione per il costo senza proteggersi dal costo
 check("v279 pipeline: senza costo il rendimento e' None, non zero",
       "if usd_cost else None" in _src and "if cost_eur else None" in _src)
 
-check("v272 pipeline: rame, petrolio, oro e SOX non sono piu' nei mercati macro",
-      not any(f'("{k}=F"' in _src or f'("{k}"' in _src
-              for k in ("HG", "GC")) and '"Semiconduttori (SOX)"' not in _src)
+# ⚠ v280 — L'INVARIANTE E' IL DOPPIONE, NON IL NOME. Il check cercava i simboli nel sorgente
+# e vietava che comparissero: cosi' scritto ha punito la richiesta successiva del CEO
+# ("rame/petrolio/oro/SOX inserisci grafico storico nella tab macro"), che li rimette — ma in
+# un blocco DIVERSO e con la loro serie, che e' informazione nuova, non una ripetizione.
+# Quello che non deve tornare e' che lo stesso simbolo stia in DUE posti: era quello il
+# doppione che il CEO mi ha fatto notare per il VIX. Ora si controlla proprio quello.
+_righe_markets = _src[_src.index("markets = []"):_src.index('macro["markets"] = markets')]
+check("v280 pipeline: rame, petrolio, oro e SOX non sono nei MERCATI (stanno in materie)",
+      not any(s in _righe_markets for s in ('"HG=F"', '"GC=F"', '"CL=F"', '"^SOX"')))
+check("v280 pipeline: le materie prime hanno il loro blocco con lo storico",
+      'macro["materie"] = materie' in _src and '"history": storia' in _src)
+# ⚠ e nessuno dei quattro deve finire in TUTTI E DUE i blocchi: e' il doppione vero.
+check("v280 pipeline: nessun simbolo sta sia nei mercati sia nelle materie",
+      not set(s for s in ('"HG=F"', '"GC=F"', '"CL=F"', '"^SOX"') if s in _righe_markets))
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

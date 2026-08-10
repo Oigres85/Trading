@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "279";
+const BUILD_VERSION = "280";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2631,6 +2631,19 @@ function indicatoriClassifica() {
          addosso la spiegazione. */
       proxy: i.key === "philly" ? "sostituto dell'ISM: un distretto, non il paese" : null });
   });
+  /* v280 — le quattro materie prime entrano in classifica con un punteggio che dice DOVE sta
+     il prezzo nel suo intervallo dell'anno. Non e' un giudizio su "buono/cattivo" — per il
+     petrolio alto e' inflazione e per il rame alto e' domanda industriale, cioe' due segni
+     opposti sullo stesso 100 — quindi il punteggio e' POSIZIONALE e la nota lo dice. */
+  Object.entries((m.materie || {})).forEach(([chiave, d]) => {
+    if (!d || !Number.isFinite(Number(d.value))) return;
+    const dentro = (Number.isFinite(d.max_1y) && Number.isFinite(d.min_1y) && d.max_1y > d.min_1y)
+      ? Math.round((d.value - d.min_1y) / (d.max_1y - d.min_1y) * 100) : 50;
+    out.push({ k: "mat:" + chiave, nome: d.label || chiave, score: Math.round(clamp(dentro)),
+      sub: `${fmtNum.format(d.value)}${d.unita ? " " + d.unita : ""} · ${signTxt(d.pct_1y, "%")} in 12 mesi`,
+      posizionale: true });
+  });
+
   (m.markets || []).forEach(i => {
     const sc = marketImpact(i);
     if (sc != null) out.push({ k: "mk:" + i.key, nome: i.label, score: Math.round(sc), sub: `${i.value} (${signTxt(i.change_pct, i.suffix || "%")} oggi)` });
@@ -2697,6 +2710,11 @@ function indicatoriClassifica() {
      e leggerlo prima della sua `const` significava zona morta temporale — un ReferenceError che
      spegneva la funzione intera. Il filtro continua ad APPLICARSI in fondo come da v238; qui
      cambia solo dove si dichiara. */
+  /* ⚠ v280 — le materie prime hanno un punteggio POSIZIONALE (dove sta il prezzo nel range
+     dell'anno), non un giudizio favorevole/sfavorevole: petrolio alto = inflazione, rame alto
+     = domanda industriale, cioe' due segni opposti sullo stesso 100. Metterle nella mediana
+     del quadro d'insieme, o fra "i tre piu' favorevoli", direbbe una cosa che non significa
+     niente — l'errore che il Philly Fed a punteggio pieno ha gia' fatto vedere (v274). */
   const chiaviTermometri = new Set(["in:curve", "credit", "vix"]);
   const FUORI = new Set(["thermometer", "futures", "seasonality", "risk_sentiment", "smart_money",
                          "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield",
@@ -3092,6 +3110,47 @@ const FORMA_INDICATORE = {
         + `Sono prezzi di mercato, non previsioni: dicono cosa costa coprirsi, non cosa succedera'.`,
     };
   },
+
+  /* ═══ v280 — MATERIE PRIME E SEMICONDUTTORI, COL LORO STORICO ═══════════════════════════
+     Quattro richieste del CEO, una per messaggio: "Semiconduttori (SOX) / rame / petrolio /
+     oro inserisci grafico storico nella tab macro".
+     ⚠ NON e' un ritorno indietro rispetto a v272, dove li aveva fatti togliere: allora erano
+     schede-NUMERO che duplicavano la sua watchlist ("devono essere presenti in watchlist"),
+     oggi la watchlist non c'e' piu' (v275) e quello che chiede e' un'altra cosa — la SERIE nel
+     tempo. Il livello dice dov'e' il rame adesso; la curva dice se il ciclo industriale sta
+     girando, ed e' l'unica delle due che il suo broker non gli mette accanto al prezzo.
+     La scala Y non parte da zero: su una materia prima che oscilla fra 4,4 e 6,7 uno zero
+     schiaccerebbe un anno di movimento in un quinto dell'altezza. graficoSerie si adatta al
+     range dei dati, ed e' il comportamento giusto QUI (non lo sarebbe su una percentuale). */
+  ...(() => {
+    const MATERIE = {
+      sox:       { titolo: "Semiconduttori (SOX)", come: "e' l'indice dei semiconduttori: gira PRIMA del resto della tecnologia, perche' i chip si ordinano mesi prima del prodotto finito. Quando il SOX rompe la sua tendenza e il Nasdaq no, di solito ha ragione il SOX." },
+      rame:      { titolo: "Rame", come: "lo chiamano <b>dottor Rame</b> perche' e' nell'edilizia, nelle auto, nella rete elettrica e nei data center: sale quando qualcuno sta costruendo davvero. E' il termometro della domanda industriale MONDIALE, e anticipa i dati ufficiali di mesi." },
+      petrolio:  { titolo: "Petrolio WTI", come: "entra nei costi di quasi tutto (trasporti, chimica, plastica) e quindi nell'inflazione: un rialzo veloce e' una tassa sui consumi che arriva al CPI con qualche mese di ritardo. Il livello conta meno della VELOCITA' con cui cambia." },
+      oro:       { titolo: "Oro", come: "non paga cedole, quindi tenerlo costa quanto rende un titolo di stato: sale quando i tassi REALI scendono o quando qualcuno cerca un posto fuori dal sistema. Un oro che sale con i tassi reali alti e' la segnalazione piu' seria che manda questo grafico." },
+    };
+    const forme = {};
+    for (const [chiave, cfg] of Object.entries(MATERIE)) {
+      forme["mat:" + chiave] = (m) => {
+        const d = (m.materie || {})[chiave];
+        if (!d || !(d.history || []).length) return null;
+        const g = graficoSerie([{ nome: cfg.titolo, punti: d.history, colore: scoreColor(clamp(50 + (d.pct_1y || 0))) }],
+          { h: 104, compatto: true, etichetteDx: false, aria: cfg.titolo,
+            fmtY: (v) => fmtNum.format(Math.round(v * 100) / 100) });
+        if (!g) return null;
+        const dentro = (Number.isFinite(d.max_1y) && Number.isFinite(d.min_1y) && d.max_1y > d.min_1y)
+          ? Math.round((d.value - d.min_1y) / (d.max_1y - d.min_1y) * 100) : null;
+        return {
+          g,
+          n: `<b>${fmtNum.format(d.value)}${d.unita ? " " + esc(d.unita) : ""}</b> `
+            + `(${signTxt(d.change_pct, "%")} nella seduta) · <b>${signTxt(d.pct_1y, "%")}</b> in dodici mesi`
+            + (dentro != null ? ` — oggi sta al <b>${dentro}%</b> del suo intervallo dell'anno (${fmtNum.format(d.min_1y)}–${fmtNum.format(d.max_1y)})` : "")
+            + `. Come si legge: ${cfg.come}`,
+        };
+      };
+    }
+    return forme;
+  })(),
 
   "in:t30": (m) => {
     const r = (m.indicators || []).find(x => x.key === "t30"); if (!r) return null;
@@ -5337,37 +5396,21 @@ function openMacroInfo(key) {
         <span style="color:var(--red)">PUT ${pc.puts.toLocaleString("it-IT")}</span>
       </div>
       <div class="info-line muted" style="font-size:11px;margin-top:8px">
-        Volumi sulle prime due scadenze. <b>Per il portafoglio:</b> un ratio in forte salita segnala aumento di copertura (possibile risk-off in arrivo); un ratio molto basso segnala compiacenza (rischio di correzione su sorprese negative).
+        Volumi sulle prime due scadenze. <b>Come si legge:</b> un ratio in forte salita segnala aumento di copertura (possibile risk-off in arrivo); un ratio molto basso segnala compiacenza (rischio di correzione su sorprese negative).
       </div>`;
-    // QUADRUPLE WITCHING (4 streghe): per ogni titolo (portafoglio + watchlist) la barra indica
-    // la PRESSIONE DI ROLLING/CHIUSURA dei contratti (volume opzioni vs volume medio del titolo +
-    // open interest in scadenza), NON il tempo che manca.
-    const w = m.witching;
-    const seen = new Set();
-    const optTk = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
-      .filter(r => { if (seen.has(r.ticker) || !DATA.options?.[r.ticker]?.expiries?.length) return false; seen.add(r.ticker); return true; });
-    if (optTk.length) {
-      const rows = optTk.map(r => {
-        const ch = DATA.options[r.ticker], ex = ch.expiries[0];
-        const callOI = (ex.calls || []).reduce((s, o) => s + (o.oi || 0), 0);
-        const putOI = (ex.puts || []).reduce((s, o) => s + (o.oi || 0), 0);
-        const totOI = callOI + putOI;
-        const pcr = callOI ? putOI / callOI : null;
-        const ratio = ch.avg_volume ? (ex.opt_volume || 0) * 100 / ch.avg_volume * 100 : 0;
-        const lvl = ratio >= 30 ? ["ALTO", "var(--red)"] : ratio >= 10 ? ["MEDIO", "var(--yellow)"] : ["BASSO", "var(--green)"];
-        const bw = Math.max(4, Math.min(100, ratio));
-        return `<tr><td><b>${r.ticker}</b></td>
-          <td class="num pos">${ex.call_wall ? cur(r) + fmtNum.format(ex.call_wall) : "—"}</td>
-          <td class="num neg">${ex.put_wall ? cur(r) + fmtNum.format(ex.put_wall) : "—"}</td>
-          <td class="num">${totOI ? fmtBig(totOI) : "—"}</td>
-          <td class="num">${pcr != null ? fmtNum.format(Math.round(pcr * 100) / 100) : "—"}</td>
-          <td><span class="roll-bar"><span class="roll-fill" style="width:${bw.toFixed(0)}%;background:${lvl[1]}"></span></span> <span style="color:${lvl[1]};font-size:11px;font-family:var(--mono)">${lvl[0]}</span></td></tr>`;
-      }).join("");
-      extra += `<h4 style="margin:14px 0 4px">Quadruple Witching (4 streghe) — pressione di rolling per titolo</h4>
-        <div class="info-line muted" style="font-size:11px;margin-bottom:4px">Alle "4 streghe" (3° venerdì di mar/giu/set/dic) gli operatori devono <b>chiudere o rinnovare (rolling)</b> i contratti in scadenza: si generano volumi record e alta volatilità, con il prezzo "attratto" verso i muri di opzioni (Call/Put Wall). La <b>barra</b> misura la pressione di rolling del titolo = volume opzioni rispetto al volume medio (ALTO = forte attività derivati).${w?.next ? ` Prossima scadenza: <b>${new Date(w.next).toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric" })}</b>.` : ""}</div>
-        <table class="info-table"><thead><tr><th>Titolo</th><th>Call Wall</th><th>Put Wall</th><th>OI tot.</th><th>P/C OI</th><th>Pressione rolling</th></tr></thead><tbody>${rows}</tbody></table>
-        <div class="info-line muted" style="font-size:11px;margin-top:6px">OI tot. = open interest totale (call+put) sulla scadenza più vicina · P/C OI = rapporto put/call OI. Strategia: nei giorni di scadenza attenzione agli spike intraday; valuta di chiudere/rollare le tue opzioni 1-2 giorni prima.</div>`;
-    }
+    /* ⚠⚠ v280 — LA TABELLA DEI MURI PER TITOLO E' USCITA, ED E' LA TERZA VOLTA CHE IL CEO
+       DEVE SEGNALARMI QUESTA STESSA COSA.
+       Mostrava "PRESSIONE DI ROLLING PER TITOLO" con AMD, NVDA, MU, MSTR, RGTI — cioe' il suo
+       VECCHIO PORTAFOGLIO, che il sistema non deve piu' leggere da v256.
+       In v265 avevo corretto la SCHEDA e dichiarato risolto senza aprire il POPUP: la scheda
+       pescava dal pannello, e il pannello ricostruiva la tabella da DATA.portfolio +
+       DATA.watchlist per conto suo. Ho guardato i DATI (`macro.putcall` e' solo SPY) invece
+       dello SCHERMO, e ho concluso che il problema non esistesse. Lui ha dovuto scrivermi
+       "NON HAI ESEGUITO QUESTA OPERAZIONE", e anche dopo quella volta e' rimasto qui.
+       I muri delle opzioni non spariscono dal sistema: vivono sotto il grafico, per il titolo
+       che sta guardando in quel momento (v266) — il posto dove servono. Qui erano una
+       classifica di titoli che non possiede piu'. */
+
   } else if (key === "yield_recession" && m.yield_recession) {
     const yr = m.yield_recession;
     const cc = yr.current_curve, c12 = yr.curve_12m_ago;
@@ -6577,8 +6620,14 @@ function correlazioniMacro() {
   }
   compositi.sort((a, b) => b.spread - a.spread);
 
+  /* ⚠ v280 — FUORI I PUNTEGGI POSIZIONALI. Le materie prime portano "dove sta il prezzo nel
+     range dell'anno", non un giudizio favorevole/sfavorevole: un petrolio al 90% del suo
+     intervallo e' inflazione (male) mentre un rame al 90% e' domanda industriale (bene), e
+     sono lo stesso numero. Nella mediana del quadro d'insieme, o fra "i tre piu' favorevoli",
+     direbbero una cosa priva di senso — lo stesso errore che il Philly Fed a punteggio pieno
+     ha reso visibile in v274. Restano schede con la loro serie, e non votano. */
   const tutti = (typeof indicatoriClassifica === "function" ? indicatoriClassifica() : [])
-    .filter(x => Number.isFinite(x.score));
+    .filter(x => Number.isFinite(x.score) && !x.posizionale);
   const punteggi = tutti.map(x => x.score);
   const quadro = punteggi.length ? {
     n: punteggi.length,
