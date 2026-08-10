@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "273";
+const BUILD_VERSION = "274";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2907,7 +2907,14 @@ function indicatoriClassifica() {
        arriva uno nuovo. Richiesta del CEO dopo il dubbio sul margin debt — un dato vecchio con
        la data del prossimo è informazione, lo stesso dato senza è una trappola. */
     if (i.impact != null) out.push({ k: "in:" + i.key, nome: i.label, score: Math.round(i.impact),
-      sub: `${i.value}${i.date ? " · " + i.date : ""}`, cadenza: rigaCadenza(i.key, i.date) });
+      sub: `${i.value}${i.date ? " · " + i.date : ""}`, cadenza: rigaCadenza(i.key, i.date),
+      /* ⚠ v274 — PUNTO 5: IL PHILLY FED E' UN PROXY E DEVE DIRLO ANCHE IN CLASSIFICA. Sta al
+         posto dell'ISM (che e' sotto licenza), ma copre UN distretto invece del paese e arriva
+         con ~40 giorni di ritardo. In mezzo agli altri 29 indicatori con lo stesso peso si
+         legge come una misura nazionale, e nel pacchetto finiva perfino in cima ai "piu'
+         favorevoli". Un numero che va spiegato ogni volta che lo si legge deve portarsi
+         addosso la spiegazione. */
+      proxy: i.key === "philly" ? "sostituto dell'ISM: un distretto, non il paese" : null });
   });
   (m.markets || []).forEach(i => {
     const sc = marketImpact(i);
@@ -3877,7 +3884,8 @@ function renderIndicatori() {
                 fmtY: se.fmtY, etichetteDx: false, aria: r.nome }))
       : "";
     const g = forma ? forma.g : linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
-    return tessera({ t: r.nome, v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
+    return tessera({ t: r.nome, tag: r.proxy || null,
+      v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
       cls: clsScore(r.score), grafico: g,
       /* v250 — sotto ogni card macro, la riga di cadenza: rilevazione, età, prossimo atteso.
          Sta in FONDO e in piccolo: è contesto sul dato, non il dato. */
@@ -4053,12 +4061,17 @@ function ciambella(voci, opt = {}) {
    RICEVUTA DEL TAGLIO, scritta PRIMA di tagliare (regola v201-v204): 2 chiamanti, entrambi
    convertiti (renderScomposizione, renderSignposts); 0 riferimenti nei test; dentro i confini
    del blocco rimosso non vive nessun'altra funzione — il vicino a valle, tessera(), e' intatto. */
-function tessera({ t, v, cls, grafico, n, tk, id }) {
+/* ⚠ v274 — `tag` E' UN PARAMETRO A PARTE, non HTML infilato nel titolo. Avevo provato a
+   passare `<span class="tag-proxy">` dentro `t`, e `esc(t)` l'ha stampato come testo — che e'
+   il comportamento GIUSTO: quel titolo puo' contenere nomi che arrivano dai dati, e
+   l'escaping e' la garanzia che un nome non diventi markup. Quando serve del markup si
+   aggiunge un campo, non si aggira la protezione. */
+function tessera({ t, v, cls, grafico, n, tk, id, tag }) {
   /* v241 — `id` e' la CHIAVE STABILE della scheda per il riordino: la chiave dell'indicatore
      (in:cpi, dollar, macroquant…), non il titolo e non la posizione. Una scheda rinominata non
      perde il posto che il CEO le ha dato, e una nuova finisce in coda invece di spostare tutto. */
   return `<div class="mg-card${tk ? " mg-click" : ""}"${id ? ` data-scheda="${esc(id)}"` : ""}${tk ? ` data-tess-tk="${esc(tk)}" role="button" tabindex="0"` : ""}>
-    <div class="mg-card-head"><span class="mg-t">${esc(t)}</span><span class="mg-v ${cls || ""}">${v}</span></div>
+    <div class="mg-card-head"><span class="mg-t">${esc(t)}${tag ? `<span class="tag-proxy" title="${esc(tag)}">proxy</span>` : ""}</span><span class="mg-v ${cls || ""}">${v}</span></div>
     ${grafico || ""}${n ? `<div class="muted mg-n">${n}</div>` : ""}</div>`;
 }
 function agganciaTessere(box) {
@@ -6865,8 +6878,12 @@ function testoCorrelazioniMacro() {
   if (quadro) {
     L.push(`- Quadro d'insieme: ${quadro.n} indicatori · mediana ${fmtNum.format(quadro.mediana)}/100 · `
          + `${quadro.sotto50} sotto 50 e ${quadro.sopra50} sopra.`);
-    L.push(`  I tre piu' sfavorevoli: ${quadro.peggiori.map(x => `${x.nome} ${x.score}`).join(" · ")}`);
-    L.push(`  I tre piu' favorevoli: ${quadro.migliori.map(x => `${x.nome} ${x.score}`).join(" · ")}`);
+    /* ⚠ v274 — anche nel pacchetto un proxy si dichiara. Il Philly Fed finiva in cima ai "piu'
+       favorevoli" a punteggio quasi pieno, e l'LLM non aveva modo di sapere che e' un
+       distretto e non il paese: nella riga che lo espone di piu' e' proprio dove serve. */
+    const et = (x) => `${x.nome}${x.proxy ? ` [proxy: ${x.proxy}]` : ""} ${x.score}`;
+    L.push(`  I tre piu' sfavorevoli: ${quadro.peggiori.map(et).join(" · ")}`);
+    L.push(`  I tre piu' favorevoli: ${quadro.migliori.map(et).join(" · ")}`);
   }
   for (const c of compositi) {
     L.push(`- ${c.nome}: ${fmtNum.format(c.score)}/100 come sintesi, ma i suoi ${c.n} componenti `
@@ -6983,75 +7000,127 @@ function statoOpzioni(tk) {
    Ogni riga porta da dove viene: le opzioni dalla catena, supporto e resistenza dai 20 giorni
    di barre, i due estremi dall'anno. Livelli calcolati in modi diversi non si mescolano in
    silenzio, si etichettano. */
-function livelliTitolo(tk) {
+/* ═══ v274 — UN POSTO SOLO DOVE SI SA COSA SAPPIAMO DI UN TITOLO ══════════════════════════
+   Punto 1 della revisione, e il difetto che mi e' costato tre giri di fila: pagina e pacchetto
+   erano costruiti da funzioni SEPARATE che ricavavano gli stessi fatti ognuna per conto suo —
+   datiSimbolo, livelliTitolo, statoOpzioni e datiNostriDelTitolo leggevano tutte e quattro
+   DATA.portfolio, DATA.watchlist, quoteLive e DATA.options in modo indipendente. Aggiungere un
+   campo voleva dire ricordarsene quattro volte, e ogni volta me ne sono dimenticato in almeno
+   una: i muri delle opzioni finiti solo nella scheda, il pre-market finito solo in tabella
+   mentre il pacchetto continuava a dire "usa i futures, sono il dato piu' fresco".
+   Non era distrazione: era che non esisteva un posto dove la domanda "cosa sappiamo di questo
+   titolo?" avesse UNA risposta. Adesso c'e'. Chi disegna e chi scrive il pacchetto leggono da
+   qui, quindi un campo aggiunto una volta compare in tutti e due — e se manca, manca a
+   entrambi, che e' un difetto visibile invece che silenzioso. */
+function fattiTitolo(tk) {
   const T = String(tk || "").toUpperCase().replace(/^[A-Z]+:/, "");
-  const r = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
-    .find(x => String(x.ticker || "").toUpperCase() === T);
-  const o = statoOpzioni(T);
-  /* ⚠ v268 — I LIVELLI NON DIPENDONO PIU' DA COSA SEGUE LA PIPELINE. Il CEO: "se cambio ticker
-     nel box ricerca la risposta e': per questo simbolo la pipeline non ha ne' livelli ne'
-     opzioni". Era vero e inutile — a lui non serve sapere cosa segue la pipeline, gli servono i
-     livelli del titolo che sta guardando.
-     Le barre dell'anno arrivano dal browser (quotaLive con range 1y) e supporto, resistenza e
-     i due estremi si calcolano QUI con le stesse formule della pipeline: minimo/massimo delle
-     ultime 20 sedute, minimo/massimo dell'anno. Non e' un'approssimazione, e' lo stesso conto
-     su barre della stessa fonte.
-     Resta pipeline-only una cosa sola, e va detta: i MURI delle opzioni. Nessuna fonte
-     gratuita espone le catene al browser, quindi per i titoli fuori dai 30 seguiti quelle due
-     righe non ci sono — e la scheda lo dichiara invece di lasciarle immaginare. */
-  const live = quoteLive.get(T + "|1y");
-  const spot = Number(o ? o.spot : (live && !live.assente && Number.isFinite(live.price) ? live.price : (r ? r.price : NaN)));
-  if (!Number.isFinite(spot)) return null;
+  const riga = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .find(x => String(x.ticker || "").toUpperCase() === T) || null;
+  const giorno = quoteLive.get(T) || null;          // quotazione di oggi (5 minuti, con pre/after)
+  const anno = quoteLive.get(T + "|1y") || null;    // barre giornaliere, per i livelli
+  const opz = statoOpzioni(T);
+  const vivo = giorno && !giorno.assente ? giorno : null;
+  const storia = anno && !anno.assente ? anno : null;
+
+  /* ⚠ v274 — IL BLOCCO MACRO E' UNA TERZA STANZA, e consolidando me l'ero persa: VIX, future
+     Nasdaq ed EUR/USD non stanno negli array dei titoli ma i loro numeri sono in `macro`.
+     Dichiararli "non seguiti" sarebbe vero della struttura e falso del contenuto (v266). Il
+     check l'ha ripreso al volo — ed e' la ragione per cui questi controlli esistono. */
+  const daMacro = (() => {
+    if (vivo || riga) return null;
+    const m = (DATA && DATA.macro) || {};
+    const fatto = (nome, val, pct) => Number.isFinite(numero(val))
+      ? { nome, prezzo: numero(val), varPct: numero(pct) } : null;
+    if (T === "^VIX" && m.vix) return fatto("Volatilità (VIX)", m.vix.value, m.vix.change_pct);
+    for (const f of Object.values(m.futures || {})) {
+      if (String(f && f.symbol).toUpperCase() === T) return fatto(f.label || T, f.price, f.change_pct);
+    }
+    const mk = (m.markets || []).find(x => String(x.key || "").toUpperCase() === T);
+    if (mk) return fatto(mk.label || T, String(mk.value).replace(/[^\d.,-]/g, "").replace(",", "."), mk.change_pct);
+    return null;
+  })();
+
+  const prezzo = Number.isFinite(vivo && vivo.price) ? vivo.price
+               : Number.isFinite(opz && opz.spot) ? opz.spot
+               : Number.isFinite(numero(riga && riga.price)) ? numero(riga.price)
+               : (daMacro ? daMacro.prezzo : NaN);
+
+  /* i livelli, con la loro provenienza. Le barre lette dal browser vengono PRIMA di quelle
+     della pipeline: stesso giorno o piu' fresche, e coprono anche i simboli non seguiti. */
   const L = [];
-  /* ⚠ `breve` porta gia' l'articolo. Comporre "prima del " + nome dava "prima del resistenza":
-     in italiano l'articolo dipende dal nome, non dalla posizione nella frase. */
   const agg = (nome, breve, v, fonte, spiega) => {
-    const n = Number(v);
+    const n = numero(v);
     if (Number.isFinite(n) && n > 0) L.push({ nome, breve, v: n, fonte, spiega });
   };
-  if (o) {
-    agg("Muro delle CALL", "del muro delle call", o.callWall, `opzioni, scadenza ${o.scadenza}`,
+  if (opz) {
+    agg("Muro delle CALL", "del muro delle call", opz.callWall, `opzioni, scadenza ${opz.scadenza}`,
         "lo strike con piu' contratti call aperti: chi le ha vendute si copre qui, e il prezzo tende a rallentare");
-    agg("Muro delle PUT", "del muro delle put", o.putWall, `opzioni, scadenza ${o.scadenza}`,
+    agg("Muro delle PUT", "del muro delle put", opz.putWall, `opzioni, scadenza ${opz.scadenza}`,
         "lo strike con piu' contratti put aperti: stessa meccanica al contrario, tende a fare da pavimento");
   }
-  /* le barre del browser vengono PRIMA di quelle della pipeline: sono dello stesso giorno o
-     piu' fresche, e coprono anche i simboli che la pipeline non segue. */
-  if (live && !live.assente && Number.isFinite(live.res20)) {
-    agg("Resistenza", "della resistenza", live.res20, "massimo delle ultime 20 sedute (Yahoo, dal vivo)",
+  const daVivo = storia && Number.isFinite(storia.res20);
+  const src = daVivo ? storia : riga;
+  if (src) {
+    const et = daVivo ? " (Yahoo, dal vivo)" : "";
+    agg("Resistenza", "della resistenza", daVivo ? storia.res20 : riga.resistance,
+        "massimo delle ultime 20 sedute" + et,
         "l'ultima volta che ci e' arrivato si e' fermato: sopra, quel massimo non ce l'ha piu' sopra la testa");
-    agg("Supporto", "del supporto", live.sup20, "minimo delle ultime 20 sedute (Yahoo, dal vivo)",
+    agg("Supporto", "del supporto", daVivo ? storia.sup20 : riga.support,
+        "minimo delle ultime 20 sedute" + et,
         "il punto dove nell'ultimo mese hanno ricomprato; rotto al ribasso smette di essere un supporto");
-    agg("Massimo 52 settimane", "del massimo dell'anno", live.max52, "un anno di barre (Yahoo, dal vivo)",
-        "il punto piu' alto degli ultimi dodici mesi");
-    agg("Minimo 52 settimane", "del minimo dell'anno", live.min52, "un anno di barre (Yahoo, dal vivo)",
-        "il punto piu' basso degli ultimi dodici mesi");
-  } else if (r) {
-    agg("Resistenza", "della resistenza", r.resistance, "massimo delle ultime 20 sedute",
-        "l'ultima volta che ci e' arrivato si e' fermato: sopra, quel massimo non ce l'ha piu' sopra la testa");
-    agg("Supporto", "del supporto", r.support, "minimo delle ultime 20 sedute",
-        "il punto dove nell'ultimo mese hanno ricomprato; rotto al ribasso smette di essere un supporto");
-    agg("Massimo 52 settimane", "del massimo dell'anno", r.w52_high, "un anno di barre", "il punto piu' alto degli ultimi dodici mesi");
-    agg("Minimo 52 settimane", "del minimo dell'anno", r.w52_low, "un anno di barre", "il punto piu' basso degli ultimi dodici mesi");
+    agg("Massimo 52 settimane", "del massimo dell'anno", daVivo ? storia.max52 : riga.w52_high,
+        "un anno di barre" + et, "il punto piu' alto degli ultimi dodici mesi");
+    agg("Minimo 52 settimane", "del minimo dell'anno", daVivo ? storia.min52 : riga.w52_low,
+        "un anno di barre" + et, "il punto piu' basso degli ultimi dodici mesi");
   }
-  if (!L.length) return null;
-  /* ⚠ SOPRA O SOTTO SI GUARDA, NON SI PRESUME. Prima "muro delle call" era marcato tetto per
-     definizione: su AMD il muro delle call stava a 460 con il titolo a 483, cioe' SOTTO, e la
-     scheda lo dipingeva come un tetto mentre il prezzo l'aveva gia' superato. Il lato di un
-     livello e' un fatto misurabile su questo prezzo, oggi. */
-  L.forEach(x => {
-    x.dist = (x.v / spot - 1) * 100;
-    x.tipo = x.v > spot ? "tetto" : "pavimento";
-    if (/muro delle call/i.test(x.breve) && x.v <= spot)
-      x.spiega += " — qui sta SOTTO il prezzo: il titolo l'ha gia' superato, e da tetto diventa semmai un appoggio";
-    if (/muro delle put/i.test(x.breve) && x.v > spot)
-      x.spiega += " — qui sta SOPRA il prezzo: il titolo ci e' sceso sotto, e quel pavimento non e' piu' sotto di lui";
-  });
-  L.sort((a, b) => b.v - a.v);
-  const sopra = L.filter(x => x.v > spot), sotto = L.filter(x => x.v <= spot);
-  return { tk: T, spot, livelli: L, opzioni: o,
-           tetto: sopra.length ? sopra[sopra.length - 1] : null,   // il piu' vicino sopra
-           pavimento: sotto.length ? sotto[0] : null };            // il piu' vicino sotto
+  /* ⚠ SOPRA O SOTTO SI MISURA, NON SI PRESUME (v266): il muro delle call di AMD stava sotto il
+     prezzo e veniva dipinto come un tetto. */
+  if (Number.isFinite(prezzo)) {
+    L.forEach(x => {
+      x.dist = (x.v / prezzo - 1) * 100;
+      x.tipo = x.v > prezzo ? "tetto" : "pavimento";
+      if (/muro delle call/i.test(x.breve) && x.v <= prezzo)
+        x.spiega += " — qui sta SOTTO il prezzo: il titolo l'ha gia' superato, e da tetto diventa semmai un appoggio";
+      if (/muro delle put/i.test(x.breve) && x.v > prezzo)
+        x.spiega += " — qui sta SOPRA il prezzo: il titolo ci e' sceso sotto, e quel pavimento non e' piu' sotto di lui";
+    });
+    L.sort((a, b) => b.v - a.v);
+  }
+  const sopra = L.filter(x => x.v > prezzo), sotto = L.filter(x => x.v <= prezzo);
+
+  return {
+    tk: T,
+    nome: (riga && riga.name) || (daMacro && daMacro.nome) || nomeSimbolo(T),
+    prezzo,
+    fonte: vivo ? "live" : (riga || daMacro) ? "pipeline" : null,
+    ignoto: !!(giorno && giorno.assente && !riga && !daMacro),
+    seguito: !!(vivo || riga || daMacro),
+    barraDel: riga ? riga.price_asof : null,
+    giorno: vivo ? { alto: vivo.dayHigh, basso: vivo.dayLow, vol: vivo.vol,
+                     var: vivo.chg, varPct: vivo.chgPct }
+                 : riga ? { alto: numero(riga.day_high), basso: numero(riga.day_low),
+                            vol: numero(riga.volume != null ? riga.volume : riga.avg_volume_30d),
+                            var: NaN, varPct: numero(riga.change_pct) }
+                 : daMacro ? { alto: NaN, basso: NaN, vol: NaN, var: NaN, varPct: daMacro.varPct }
+                        : null,
+    ext: (vivo && vivo.ext) || null,
+    livelli: L,
+    tetto: sopra.length ? sopra[sopra.length - 1] : null,
+    pavimento: sotto.length ? sotto[0] : null,
+    opzioni: opz,
+    tecnici: riga ? { rsi: numero(riga.rsi), atr: numero(riga.atr_14), atrPct: numero(riga.atr_pct),
+                      sma50: numero(riga.sma50_dist_pct), sma200: numero(riga.sma200_dist_pct),
+                      pe: numero(riga.pe), settore: riga.sector || null,
+                      trimestrale: riga.earnings_date || null } : null,
+  };
+}
+
+function livelliTitolo(tk) {
+  /* v274 — vista su fattiTitolo: la scheda non ricava piu' niente da sola. */
+  const f = fattiTitolo(tk);
+  if (!f || !Number.isFinite(f.prezzo) || !f.livelli.length) return null;
+  return { tk: f.tk, spot: f.prezzo, livelli: f.livelli, opzioni: f.opzioni,
+           tetto: f.tetto, pavimento: f.pavimento };
 }
 
 async function renderOpzioniGrafico(tk) {
@@ -7329,53 +7398,22 @@ function numero(v) {
 const quoteLive = new Map();
 
 function datiSimbolo(tk) {
-  const T = String(tk || "").toUpperCase();
-  const q = quoteLive.get(T);
-  if (q && !q.assente && Number.isFinite(q.price)) {
-    const nome = nomeSimbolo(T);
-    return { tk: T, nome, seguito: true, fonte: "live", price: q.price,
-             high: q.dayHigh, low: q.dayLow, chg: q.chg, chg_pct: q.chgPct, vol: q.vol,
-             ext: q.ext || null };
-  }
-  const r = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
-    .find(x => String(x.ticker || "").toUpperCase() === T);
-  /* ⚠ v268 — "Yahoo non ha questo simbolo" e "la pipeline non lo segue" sono due cose diverse
-     e vanno dette diverse. BTP-V28 e' un ticker sintetico nostro: Yahoo risponde Not Found ed
-     e' la risposta CORRETTA, non un guasto. Se pero' la pipeline quel simbolo ce l'ha (il BTP
-     lo calcola lei), il dato della pipeline resta e vince: l'assenza su Yahoo non deve
-     cancellare un numero che abbiamo. */
-  if (q && q.assente && !r) return { tk: T, nome: nomeSimbolo(T), seguito: false, ignoto: true };
-  /* ⚠ v266 — PRIMA DI DICHIARARE "non seguito", SI GUARDA ANCHE NEL BLOCCO MACRO. Cinque dei
-     simboli del CEO (VIX, futures Nasdaq, SOX, EUR/USD, rame) non stanno negli array dei titoli
-     ma i loro numeri sono nel file lo stesso, dentro `macro`. Dichiararli "non seguiti" sarebbe
-     stato vero della struttura e falso del contenuto: il dato c'e', e' solo in un'altra stanza.
-     E' la classe di difetto che questo progetto chiama "il numero corretto copriva quello
-     sbagliato" (v207) rovesciata — qui il dato giusto sarebbe rimasto nascosto. */
-  if (!r) {
-    const m = (DATA && DATA.macro) || {};
-    const daMacro = (nome, val, pct) => Number.isFinite(numero(val))
-      ? { tk: T, nome, seguito: true, price: numero(val), high: NaN, low: NaN,
-          chg: NaN, chg_pct: numero(pct), vol: NaN, fonte: "pipeline" } : null;
-    if (T === "^VIX" && m.vix) return daMacro("Volatilità (VIX)", m.vix.value, m.vix.change_pct);
-    for (const f of Object.values(m.futures || {})) {
-      if (String(f && f.symbol).toUpperCase() === T) return daMacro(f.label || T, f.price, f.change_pct);
-    }
-    const mk = (m.markets || []).find(x => String(x.key || "").toUpperCase() === T);
-    if (mk) return daMacro(mk.label || T, String(mk.value).replace(/[^\d.,-]/g, "").replace(",", "."), mk.change_pct);
-    return { tk: T, nome: T, seguito: false };
-  }
-  const px = numero(r.price);
-  const pct = numero(r.change_pct);
-  const chg = (Number.isFinite(px) && Number.isFinite(pct) && pct !== -100)
-    ? px - px / (1 + pct / 100) : NaN;
-  return { tk: T, nome: r.name || T, seguito: true, fonte: "pipeline", price: px,
-    /* ⚠ v266 — NIENTE RIPIEGO SUL MASSIMO A 52 SETTIMANE. Le colonne sono quelle del broker
-       del CEO, dove "Massimo" e "Minimo" sono quelli DI OGGI. Ripiegando sul dato annuale la
-       tabella mostrava 207,52 accanto a un prezzo di 172,01: un numero vero sotto
-       un'intestazione che ne promette un altro. Se la barra del giorno non c'e', la cella
-       resta un trattino — visibilmente mancante invece che invisibilmente sbagliata. */
-    high: numero(r.day_high), low: numero(r.day_low),
-    chg, chg_pct: pct, vol: numero(r.volume != null ? r.volume : r.avg_volume_30d) };
+  /* v274 — vista sui fatti, per la tabella. Non legge piu' niente da sola: se un campo esiste
+     in fattiTitolo compare qui, e se non c'e' manca anche al pacchetto — visibile invece che
+     silenzioso. */
+  const f = fattiTitolo(tk);
+  if (!f) return { tk: String(tk || "").toUpperCase(), nome: String(tk || "").toUpperCase(), seguito: false };
+  if (!f.seguito) return { tk: f.tk, nome: f.nome, seguito: false, ignoto: f.ignoto };
+  const g = f.giorno || {};
+  return {
+    tk: f.tk, nome: f.nome, seguito: true, fonte: f.fonte, price: f.prezzo,
+    high: numero(g.alto), low: numero(g.basso), vol: numero(g.vol),
+    chg: Number.isFinite(g.var) ? g.var
+       : (Number.isFinite(f.prezzo) && Number.isFinite(g.varPct) && g.varPct !== -100
+          ? f.prezzo - f.prezzo / (1 + g.varPct / 100) : NaN),
+    chg_pct: numero(g.varPct),
+    ext: f.ext,
+  };
 }
 
 /* il nome per esteso lo sa la pipeline (o il blocco macro); Yahoo lo darebbe in
@@ -7664,6 +7702,13 @@ function renderWatchlistTV() {
     const ora = wlUltimoAggiornamento
       ? wlUltimoAggiornamento.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
       : null;
+    /* ⚠ v274 — PUNTO 3: IL RITARDO SI DICHIARA DOVE SI LEGGONO I PREZZI, non in una nota
+       lontana. Misurato confrontando le due viste: Yahoo e TradingView danno lo STESSO numero,
+       e TradingView lo marca "D" (ritardato) di suo. Nessuna delle due lo toglie: sulle azioni
+       americane il tempo reale richiede un feed a pagamento, e questa riga esiste perche' il
+       CEO possa DECIDERE se gli serve, invece di cambiare fonte sperando che cambi qualcosa. */
+    const avvisoRitardo = " <b>Le azioni americane sono ritardate</b> (~15 minuti: è così su ogni "
+      + "fonte gratuita, TradingView compresa). Cambi, indici di volatilità, cripto e materie prime no.";
     nota.innerHTML = (nLive
         ? `<b>${nLive} ${nLive === 1 ? "simbolo aggiornato" : "simboli aggiornati"} dal vivo</b> (Yahoo Finance, `
           /* ⚠ la nota deve dire il ritmo VERO: il giro e' passato a tre minuti quando ho
@@ -7676,7 +7721,8 @@ function renderWatchlistTV() {
       + (fuori ? ' <b>' + fuori + (fuori === 1 ? " simbolo senza dati" : " simboli senza dati") + '</b>: '
          + (ignoti === fuori ? "Yahoo non li conosce con questo nome — controlla come si scrivono."
                              : "né la pipeline né Yahoo li conoscono con questo nome.") : "")
-      + (senzaGiornata && !nLive ? " Massimo e minimo del giorno arrivano col prossimo giro della pipeline." : "");
+      + (senzaGiornata && !nLive ? " Massimo e minimo del giorno arrivano col prossimo giro della pipeline." : "")
+      + avvisoRitardo;
   }
 }
 
@@ -7840,36 +7886,21 @@ function buildPromptTicker(tkGrezzo) {
 ``,
 `Sei un analista azionario senior. Devi produrre un'analisi operativa su ${tk}: tecnica, fondamentale, notizie, e il collegamento col quadro macro che trovi in coda.`,
 ``,
-`══ PASSO 0 — OBBLIGATORIO, PRIMA DI SCRIVERE QUALSIASI COSA ══`,
-`CERCA ONLINE i dati aggiornati su ${tk}. Non e' un'opzione ed e' la prima cosa che fai.`,
-`SE NON PUOI NAVIGARE IN RETE: scrivi UNA SOLA RIGA — "Non ho accesso al web: non posso produrre questa analisi" — e FERMATI.`,
-`NON compilare il referto con "n.d." su tutti i campi: un'analisi tutta "n.d." e' peggio di un rifiuto, perche' ha la forma di un lavoro fatto e non ne ha la sostanza. "n.d." vale per il SINGOLO dato che non hai trovato DOPO averlo cercato, mai come politica generale.`,
-``,
-`DOVE CERCARE (in ordine; usa piu' fonti e confrontale):`,
-`· prezzo, volumi, medie mobili, RSI, ATR, massimi/minimi 52 settimane → finance.yahoo.com/quote/${tk} · stockanalysis.com/stocks/${tk} · investing.com`,
-`· fondamentali, margini, debito, crescita, multipli → stockanalysis.com/stocks/${tk}/financials · macrotrends.net · il sito investor-relations della societa'`,
-`· ultima trimestrale (numeri, guidance, reazione del titolo) → comunicato stampa sul sito IR · SEC EDGAR (sec.gov/cgi-bin/browse-edgar) per 10-Q/10-K/8-K`,
-`· quote di mercato e concorrenti → ultimo 10-K (sezione Competition) · report di settore recenti`,
-`· notizie ultime due settimane → Reuters, Bloomberg, CNBC, Barron's, il sito IR`,
-`· consenso analisti e target → stockanalysis.com/stocks/${tk}/forecast · marketbeat · tipranks`,
-`Ogni numero che riporti va marcato [VERIFICATO] con la fonte e la DATA della rilevazione.`,
-``,
-`══ GERARCHIA DELLE FONTI — imparata da una risposta reale ══`,
-`Un LLM ha gia' prodotto un'analisi su questo formato citando [VERIFICATO] con fonte "Reddit" le medie mobili, l'RSI, i supporti, i target degli analisti e lo short interest: cioe' i numeri su cui poi si decide. Non succeda di nuovo.`,
-`1. FONTE PRIMARIA — la societa' (comunicati IR, presentazioni), i filing SEC, l'exchange. Per un numero di bilancio o di guidance, e' l'unica che vale.`,
-`2. DATI DI MERCATO — Yahoo Finance, stockanalysis.com, investing.com, il tuo broker. Prezzi, volumi, medie, multipli.`,
-`3. STAMPA FINANZIARIA — Reuters, Bloomberg, WSJ, CNBC, Barron's, FT. Per i fatti e le reazioni.`,
-`4. AGGREGATORI DI CONSENSO — stockanalysis, marketbeat, tipranks, FactSet. Per i target: dichiara SEMPRE quanti analisti e a quale data, perche' la media di 35 analisti e quella di 5 non sono lo stesso numero.`,
-`NON SONO FONTI, e non si marcano [VERIFICATO]: Reddit, X/Twitter, StockTwits, forum, blog anonimi, video, "si dice", e qualunque pagina che riporti un numero senza dire da dove viene. Se un numero lo trovi solo li', scrivi "n.d." e vai avanti: e' un dato che non hai.`,
-`Se una fonte di rango 2-4 contraddice una di rango 1, vince la 1 e lo dici.`,
-``,
-`══ IL PREZZO DI RIFERIMENTO E' UNO SOLO ══`,
-`Prima di tutto il resto fissa UN prezzo di riferimento: valore, data e ora, borsa. Tutto il resto — distanze dai livelli, capitalizzazione, rendimento da inizio anno, upside sui target — si calcola su QUELLO e lo dichiara ("−6% dal riferimento").`,
-`Un'analisi che cita $476 nella scheda, $482 nel commento sugli utili e "chiusura del 31/07" nella tecnica sta descrivendo tre giorni diversi come se fossero oggi: e' successo davvero, ed e' il modo piu' facile di sbagliare un livello d'ingresso.`,
-`Se il mercato e' chiuso, il riferimento e' l'ultima chiusura e lo scrivi.`,
-``,
-`══ NIENTE [VERIFICATO] DERIVATO ══`,
-`[VERIFICATO] vale per un numero che hai LETTO in una fonte, non per uno che hai ricavato. "Capitalizzazione circa 780-790 mld, ricavabile da 807 mld di due settimane fa piu' il calo del prezzo" e' una stima: si scrive [STIMA] col calcolo accanto, oppure "n.d.".`,
+/* ═══ v274 — QUATTRO BLOCCHI DIFENSIVI IN UNO ═════════════════════════════════════════════
+   Punto 2 della revisione. Erano PASSO 0, GERARCHIA DELLE FONTI, IL PREZZO E' UNO SOLO e
+   NIENTE [VERIFICATO] DERIVATO: 3.532 caratteri che dicevano quattro volte "attenzione ai
+   numeri" con quattro intestazioni diverse. Ogni regola nasce da un fallimento vero e nessuna
+   si perde — cambia che stanno insieme, perche' insieme e' come vanno applicate.
+   ⚠ Da non tagliare, per quanto sembrino ovvie: il "se non puoi navigare fermati" nasce da
+   Gemini che rispose tutto "n.d."; il bando ai forum da un LLM che marco' [VERIFICATO] con
+   fonte Reddit medie mobili e target; il prezzo unico da un'analisi che citava tre giorni
+   diversi come se fossero oggi. */
+`══ REGOLE SUI NUMERI — le quattro che decidono se l'analisi vale ══`,
+`1. PASSO 0 — OBBLIGATORIO: CERCA ONLINE prima di scrivere qualsiasi cosa. Non e' un'opzione. SE NON PUOI NAVIGARE: scrivi una riga — "Non ho accesso al web: non posso produrre questa analisi" — e FERMATI. Non compilare il referto con "n.d." dappertutto: ha la forma di un lavoro fatto e non ne ha la sostanza. "n.d." vale per il singolo dato non trovato DOPO averlo cercato, mai come politica generale.`,
+`   DOVE CERCARE: prezzi e tecnici → finance.yahoo.com/quote/${tk} · stockanalysis.com/stocks/${tk} · investing.com — fondamentali → stockanalysis.com/stocks/${tk}/financials · macrotrends · sito IR — trimestrale → comunicato IR · SEC EDGAR (sec.gov/cgi-bin/browse-edgar) — concorrenti e quote → ultimo 10-K (Competition) — notizie → Reuters, Bloomberg, CNBC, Barron's — consenso → stockanalysis/forecast · marketbeat · tipranks.`,
+`2. GERARCHIA DELLE FONTI: vince il rango piu' alto. (1) FONTE PRIMARIA — societa' e filing SEC, l'unica valida per bilancio e guidance · (2) dati di mercato: Yahoo, stockanalysis, investing · (3) stampa finanziaria: Reuters, Bloomberg, WSJ, CNBC, FT · (4) aggregatori di consenso, dichiarando SEMPRE quanti analisti e a che data. NON SONO FONTI e non si marcano [VERIFICATO]: Reddit, X, StockTwits, forum, blog anonimi, video, e ogni pagina che riporta un numero senza dire da dove viene — se un numero lo trovi solo li', e' un dato che non hai. Se il rango 2-4 contraddice il rango 1, vince l'1 e lo dici.`,
+`3. IL PREZZO DI RIFERIMENTO E' UNO SOLO: valore, data e ora, borsa. Distanze dai livelli, capitalizzazione, rendimento da inizio anno e upside si calcolano su QUELLO e lo dichiarano ("−6% dal riferimento"). Citare $476 nella scheda, $482 nel commento e "chiusura del 31/07" nella tecnica significa descrivere tre giorni diversi come se fossero oggi — e' successo, ed e' il modo piu' facile di sbagliare un ingresso. A mercato chiuso il riferimento e' l'ultima chiusura, e lo scrivi.`,
+`4. NIENTE [VERIFICATO] DERIVATO: vale su cio' che hai LETTO in una fonte, mai su cio' che hai ricavato. "Capitalizzazione 780-790 mld, ricavabile da 807 mld di due settimane fa piu' il calo" e' una stima: si scrive [STIMA] col calcolo accanto, oppure "n.d.". Ogni numero esterno porta fonte e data.`,
 ``,
 `══ COSA DEVI CONSEGNARE ══`,
 ``,
@@ -7930,55 +7961,52 @@ function buildPromptTicker(tkGrezzo) {
    ⚠ Restano FATTI, non istruzioni (regola C9): qui si dichiara cosa sappiamo, con la data e
    con il metodo di calcolo, e si dice all'LLM cosa fare se cio' che trova fuori non torna. */
 function datiNostriDelTitolo(tk) {
-  const T = String(tk || "").toUpperCase();
-  const r = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
-    .find(x => String(x.ticker || "").toUpperCase() === T);
-  const o = (typeof statoOpzioni === "function") ? statoOpzioni(T) : null;
-  if (!r && !o) return "";
-  const L = [];
-  const n = (v) => Number.isFinite(Number(v)) ? Number(v) : null;
-  if (r) {
-    const px = n(r.price);
-    const dist = (v) => (px && n(v)) ? ` (${v > px ? "+" : ""}${Math.round((v / px - 1) * 1000) / 10}% dal riferimento)` : "";
-    if (px) L.push(`- Prezzo di riferimento del sistema: ${px}${r.price_asof ? ` (barra del ${r.price_asof}${r.price_live ? ", ultimo scambio live" : ", ultima chiusura"})` : ""}`);
-    if (n(r.support)) L.push(`- Supporto: ${r.support}${dist(r.support)} — minimo delle ultime 20 sedute`);
-    if (n(r.resistance)) L.push(`- Resistenza: ${r.resistance}${dist(r.resistance)} — massimo delle ultime 20 sedute`);
-    if (n(r.w52_high)) L.push(`- Massimo 52 settimane: ${r.w52_high}${dist(r.w52_high)}`);
-    if (n(r.w52_low)) L.push(`- Minimo 52 settimane: ${r.w52_low}${dist(r.w52_low)}`);
-    if (n(r.rsi)) L.push(`- RSI(14): ${r.rsi}`);
-    if (n(r.atr_14)) L.push(`- ATR(14): ${r.atr_14}${n(r.atr_pct) ? ` (${r.atr_pct}% del prezzo — l'ampiezza tipica di una seduta)` : ""}`);
-    if (n(r.sma50_dist_pct) != null) L.push(`- Distanza dalla media a 50 sedute: ${r.sma50_dist_pct > 0 ? "+" : ""}${r.sma50_dist_pct}%`);
-    if (n(r.sma200_dist_pct) != null) L.push(`- Distanza dalla media a 200 sedute: ${r.sma200_dist_pct > 0 ? "+" : ""}${r.sma200_dist_pct}%`);
-    if (n(r.pe)) L.push(`- P/E (trailing): ${r.pe}×`);
-    if (r.sector) L.push(`- Settore secondo la nostra classificazione: ${r.sector}`);
-    if (r.earnings_date) L.push(`- Prossima trimestrale attesa: ${r.earnings_date}`);
+  /* v274 — SCRITTO SUI FATTI, non ricavato di nuovo. Prima questa funzione rileggeva
+     DATA.portfolio, DATA.watchlist, DATA.options e quoteLive per conto suo, e ogni volta che
+     aggiungevo un dato alla pagina mi dimenticavo di aggiungerlo qui: i muri delle opzioni,
+     poi il pre-market. Adesso legge lo stesso oggetto che disegna la scheda, quindi non c'e'
+     piu' un "qui" e un "li'" da tenere allineati a mano. */
+  const f = fattiTitolo(tk);
+  if (!f || !f.seguito) return "";
+  const T = f.tk, L = [];
+  const dist = (v) => (Number.isFinite(f.prezzo) && Number.isFinite(v))
+    ? ` (${v > f.prezzo ? "+" : ""}${Math.round((v / f.prezzo - 1) * 1000) / 10}% dal riferimento)` : "";
+
+  if (Number.isFinite(f.prezzo)) {
+    L.push(`- Prezzo di riferimento del sistema: ${Math.round(f.prezzo * 100) / 100}`
+      + (f.fonte === "live" ? " (ultima quotazione letta dal browser)"
+         : f.barraDel ? ` (barra del ${f.barraDel})` : ""));
   }
-  if (o && (n(o.callWall) || n(o.putWall))) {
-    const px = n(o.spot);
-    const d = (v) => (px && n(v)) ? ` (${v > px ? "+" : ""}${Math.round((v / px - 1) * 1000) / 10}%)` : "";
-    if (n(o.callWall)) L.push(`- Muro delle CALL: ${o.callWall}${d(o.callWall)} — lo strike con piu' contratti call aperti sulla scadenza ${o.scadenza}`);
-    if (n(o.putWall)) L.push(`- Muro delle PUT: ${o.putWall}${d(o.putWall)} — stesso conto sulle put`);
-    if (o.ratio != null) L.push(`- Rapporto put/call di ${T} sulla scadenza ${o.scadenza}: ${Math.round(o.ratio * 100) / 100} (put ${o.put}, call ${o.call})`);
-  }
-  /* ⚠ v273 — IL PREZZO FUORI ORARIO VA NEL PACCHETTO, non solo in tabella. Aggiungendolo alla
-     watchlist (v272) e non qui avevo creato una situazione peggiore di prima: il pacchetto
-     continua a dire all'LLM che "prima della campana i futures sono il dato piu' fresco",
-     mentre la pagina ha il prezzo pre-market DI QUEL TITOLO — piu' fresco e piu' specifico di
-     qualunque future sull'indice. Il sistema sapeva una cosa e ne faceva scrivere un'altra. */
-  const q = quoteLive.get(T);
-  if (q && q.ext && Number.isFinite(q.ext.prezzo)) {
-    const base = Number(r && r.price);
-    const d = Number.isFinite(base) && base ? Math.round((q.ext.prezzo / base - 1) * 1000) / 10 : null;
-    const ora = q.ext.quando.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
-    L.push(`- Prezzo ${q.ext.fase === "pre" ? "PRE-MARKET" : "AFTER-HOURS"} adesso: ${Math.round(q.ext.prezzo * 100) / 100}`
+  /* il prezzo fuori orario, quando c'e', batte i futures sull'indice: parla di QUESTO titolo. */
+  if (f.ext && Number.isFinite(f.ext.prezzo)) {
+    const d = Number.isFinite(f.prezzo) && f.prezzo
+      ? Math.round((f.ext.prezzo / f.prezzo - 1) * 1000) / 10 : null;
+    L.push(`- Prezzo ${f.ext.fase === "pre" ? "PRE-MARKET" : "AFTER-HOURS"} adesso: ${Math.round(f.ext.prezzo * 100) / 100}`
       + (d != null ? ` (${d > 0 ? "+" : ""}${d}% rispetto alla chiusura)` : "")
-      + ` — rilevato alle ${ora}, ora italiana. E' piu' fresco della chiusura e riguarda QUESTO titolo:`
-      + ` pesalo piu' dei futures sull'indice, che parlano del mercato e non di lui.`);
+      + ` — rilevato alle ${f.ext.quando.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}, ora italiana.`
+      + ` E' piu' fresco della chiusura e riguarda QUESTO titolo: pesalo piu' dei futures sull'indice, che parlano del mercato e non di lui.`);
+  }
+  /* i livelli arrivano gia' ordinati, col lato misurato e la provenienza dichiarata. */
+  f.livelli.forEach(x => L.push(`- ${x.nome}: ${x.v}${dist(x.v)} — ${x.fonte}`));
+  if (f.opzioni && f.opzioni.ratio != null) {
+    L.push(`- Rapporto put/call di ${T} sulla scadenza ${f.opzioni.scadenza}: `
+      + `${Math.round(f.opzioni.ratio * 100) / 100} (put ${f.opzioni.put}, call ${f.opzioni.call})`);
+  }
+  const t = f.tecnici;
+  if (t) {
+    if (Number.isFinite(t.rsi)) L.push(`- RSI(14): ${t.rsi}`);
+    if (Number.isFinite(t.atr)) L.push(`- ATR(14): ${t.atr}${Number.isFinite(t.atrPct) ? ` (${t.atrPct}% del prezzo — l'ampiezza tipica di una seduta)` : ""}`);
+    if (Number.isFinite(t.sma50)) L.push(`- Distanza dalla media a 50 sedute: ${t.sma50 > 0 ? "+" : ""}${t.sma50}%`);
+    if (Number.isFinite(t.sma200)) L.push(`- Distanza dalla media a 200 sedute: ${t.sma200 > 0 ? "+" : ""}${t.sma200}%`);
+    if (Number.isFinite(t.pe)) L.push(`- P/E (trailing): ${t.pe}×`);
+    if (t.settore) L.push(`- Settore secondo la nostra classificazione: ${t.settore}`);
+    if (t.trimestrale) L.push(`- Prossima trimestrale attesa: ${t.trimestrale}`);
   }
   if (!L.length) return "";
   return [
     `=== QUELLO CHE IL SISTEMA SA GIA' DI ${T} (non cercarlo altrove: e' qui) ===`,
-    `Questi numeri sono calcolati dalla nostra pipeline sulle stesse barre che disegnano il grafico, e sono quelli che il CEO vede sulla pagina.`,
+    `Questi numeri sono calcolati sulle stesse barre che disegnano il grafico, e sono quelli che il CEO vede sulla pagina.`,
+    `⚠ SUL RITARDO: i prezzi delle azioni americane arrivano da fonti gratuite e sono ritardati di circa 15 minuti — vale per questo pacchetto come per qualunque fonte gratuita, TradingView compresa. Cambi, indici di volatilita', cripto e materie prime sono in tempo reale. Se il titolo si sta muovendo forte adesso, dillo invece di trattare il prezzo come l'ultimo scambio.`,
     `USALI COME RIFERIMENTO. Se cio' che trovi in rete diverge in modo materiale (piu' del 2% su un livello di prezzo), NON scegliere in silenzio: riporta tutti e due, di' quale usi e perche'.`,
     `Restano da cercare online le cose che qui NON ci sono: fondamentali di bilancio, trimestrale, concorrenti e quote di mercato, notizie, consenso analisti.`,
     ...L,

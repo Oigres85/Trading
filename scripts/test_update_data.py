@@ -418,9 +418,20 @@ for _l in (_RADICE / "scripts" / "update_data.py").read_text(encoding="utf-8").s
 check("v254 il ramo portafoglio non fa pos['name'] secco (un nome mancante ucciderebbe il run)",
       _riga_ptf is not None and 'pos["name"]' not in _riga_ptf and '.get("name")' in _riga_ptf)
 
-_hold = _json.loads((_RADICE / "config" / "holdings.json").read_text(encoding="utf-8"))
-check("v254 nessuna posizione in holdings.json e' priva di `name`",
-      all(r.get("name") for r in _hold.get("portfolio", [])))
+# ⚠ v274 — config/holdings.json E' STATO CANCELLATO (punto 4 della revisione: finche' esisteva
+# qualcuno poteva ricollegarlo per sbaglio e riportarsi dentro 37 simboli e un portafoglio
+# chiuso in v256). Il check v254 nasceva da un guasto vero — una posizione senza `name` mandava
+# la pipeline in KeyError e la fermava per un giorno — quindi NON si cancella: si sposta sulla
+# lista che comanda adesso. La proprieta' e' la stessa: nessuna voce malformata deve poter
+# entrare nella pipeline.
+_ui = _json.loads((_RADICE / "config" / "ui_watchlist.json").read_text(encoding="utf-8"))
+check("v274 ui_watchlist.json e' una lista di stringhe non vuote",
+      isinstance(_ui, list) and len(_ui) > 0
+      and all(isinstance(t, str) and t.strip() for t in _ui))
+check("v274 nessun simbolo duplicato nella watchlist",
+      len({t.strip().upper() for t in _ui}) == len(_ui))
+check("v274 config/holdings.json non esiste piu'",
+      not (_RADICE / "config" / "holdings.json").exists())
 
 # ═══ v269 — LO SFOLTIMENTO NON DEVE TORNARE INDIETRO ═══════════════════════════════════════
 # Il CEO: "alleggerire la pipeline". Tolti quattro blocchi che nessuno leggeva piu' dopo v256

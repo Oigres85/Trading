@@ -43,7 +43,6 @@ logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "data.json"
 PREV_DATA: dict = {}   # snapshot del run precedente (settato da main; usato da carry-forward/ratchet)
-CONFIG = ROOT / "config" / "holdings.json"
 
 UA = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -51,17 +50,6 @@ UA = {
     "Accept": "*/*",
 }
 
-# posizioni di default (usate se config/holdings.json manca)
-DEFAULT_PORTFOLIO = [
-    {"ticker": "NVDA", "name": "NVIDIA",         "qty": 270,  "pmc": 87.17},
-    {"ticker": "AMD",  "name": "AMD",            "qty": 125,  "pmc": 153.92},
-    {"ticker": "MU",   "name": "Micron",         "qty": 90,   "pmc": 87.63},
-    {"ticker": "INTC", "name": "Intel",          "qty": 380,  "pmc": 25.75},
-    {"ticker": "TSLA", "name": "Tesla",          "qty": 60,   "pmc": 358.22},
-    {"ticker": "MSTR", "name": "Strategy",       "qty": 123,  "pmc": 210.22},
-    {"ticker": "RGTI", "name": "Rigetti",        "qty": 515,  "pmc": 27.30},
-    {"ticker": "ARBE", "name": "Arbe Robotics",  "qty": 1150, "pmc": 3.35},
-]
 DEFAULT_WATCHLIST = [
     {"ticker": "OKLO", "name": None, "currency": "USD"},
     {"ticker": "SPCX", "name": None, "currency": "USD"},
@@ -117,13 +105,12 @@ def load_holdings():
             print(f"lista simboli da config/ui_watchlist.json: {len(wl)} titoli", file=sys.stderr)
             return [], wl, None
     except Exception as e:  # noqa: BLE001
-        print(f"!! ui_watchlist non leggibile ({e}), ripiego su holdings.json", file=sys.stderr)
-    try:
-        cfg = json.loads(CONFIG.read_text())
-        return [], cfg.get("watchlist") or DEFAULT_WATCHLIST, cfg.get("broker")
-    except Exception as e:  # noqa: BLE001
-        print(f"!! config holdings non leggibile, uso default: {e}", file=sys.stderr)
-        return [], DEFAULT_WATCHLIST, None
+        print(f"!! ui_watchlist non leggibile ({e}), uso i default", file=sys.stderr)
+    # ⚠ v274 — NIENTE PIU' RIPIEGO SU holdings.json. Il file e' stato cancellato: finche'
+    # esisteva, qualcuno (io, fra un mese) poteva ricollegarlo per sbaglio e riportarsi dentro
+    # 37 simboli e un portafoglio che il CEO ha chiuso in v256. Un ripiego verso un file morto
+    # non e' una rete di sicurezza: e' una strada che riporta indietro.
+    return [], DEFAULT_WATCHLIST, None
 
 
 PORTFOLIO, WATCHLIST, BROKER = load_holdings()

@@ -1102,10 +1102,12 @@ check("v266 watchlist: Massimo/Minimo sono del giorno, senza ripiego sul dato a 
   /* ⚠ la finestra si prende fino alla fine VERA della funzione (la prossima dichiarazione a
      livello zero): con un tetto a caratteri fissi il check leggeva codice di altri e falliva
      su un `w52_high` che non era suo — un gate che misura il posto sbagliato. */
-  const i = src.indexOf("function datiSimbolo");
-  const fine = src.indexOf("\nfunction ", i + 1);
-  const corpo = src.slice(i, fine > 0 ? fine : i + 3000);
-  return /r\.day_high/.test(corpo) && /r\.day_low/.test(corpo) && !/w52_high/.test(corpo);
+  const i = src.indexOf("function fattiTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction livelliTitolo", i));
+  /* il massimo del giorno viene dalla barra del giorno (vivo.dayHigh) o dal campo giornaliero
+     della pipeline (riga.day_high): mai dal massimo a 52 settimane, che e' un'altra grandezza. */
+  return /vivo\.dayHigh/.test(corpo) && /riga\.day_high/.test(corpo)
+      && !/alto: numero\(riga\.w52_high\)/.test(corpo);
 })());
 
 check("v266 pipeline: scrive massimo e minimo del giorno", (() => {
@@ -1226,20 +1228,23 @@ check("v266 grafico: i livelli del titolo stanno su UNA scala di prezzi, col pre
   return /Prezzo ora/.test(corpo) && /tvo-tab/.test(corpo);
 })());
 
+/* v274 — l'invariante non e' cambiata, e' cambiata la CASA: la logica dei livelli vive in
+   fattiTitolo, il punto unico da cui leggono sia la pagina sia il pacchetto. Si sposta
+   l'ancoraggio, non si abbassa il controllo. */
 check("v266 grafico: supporto e resistenza sono nei livelli insieme ai muri delle opzioni", (() => {
-  const i = src.indexOf("function livelliTitolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
-  return /r\.support/.test(corpo) && /r\.resistance/.test(corpo)
+  const i = src.indexOf("function fattiTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction livelliTitolo", i));
+  return /riga\.support/.test(corpo) && /riga\.resistance/.test(corpo)
       && /callWall/.test(corpo) && /putWall/.test(corpo);
 })());
 
 /* ⚠ il lato di un livello è un fatto misurabile su questo prezzo, non una proprietà del nome:
    il muro delle call di AMD stava SOTTO il prezzo e veniva dipinto come un tetto. */
 check("v266 grafico: sopra o sotto il prezzo si misura, non si presume", (() => {
-  const i = src.indexOf("function livelliTitolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1))
+  const i = src.indexOf("function fattiTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction livelliTitolo", i))
     .replace(/\/\*[\s\S]*?\*\//g, "");
-  return /x\.tipo = x\.v > spot/.test(corpo);
+  return /x\.tipo = x\.v > prezzo/.test(corpo);
 })());
 
 check("v266 grafico: dentro l'iframe TradingView non si finge di disegnare", (() => {
@@ -1303,9 +1308,9 @@ check("v268 datiSimbolo: nessuna chiave scritta due volte nello stesso oggetto",
 
 /* ── v268 — la watchlist dice da dove vengono i suoi numeri e quando li ha letti ── */
 check("v268 watchlist: ogni riga porta la sua fonte (live o pipeline)", (() => {
-  const i = src.indexOf("function datiSimbolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
-  return /fonte: "live"/.test(corpo) && /fonte: "pipeline"/.test(corpo);
+  const i = src.indexOf("function fattiTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction livelliTitolo", i));
+  return /fonte: vivo \? "live"/.test(corpo) && /"pipeline"/.test(corpo);
 })());
 
 check("v268 watchlist: la nota dice l'ORA dell'ultima lettura, non solo 'aggiornato'", (() => {
@@ -1319,16 +1324,16 @@ check("v268 watchlist: la nota dice l'ORA dell'ultima lettura, non solo 'aggiorn
 /* ⚠ "Yahoo non conosce questo simbolo" e "la pipeline non lo segue" sono due cose diverse:
    BTP-V28 e' un ticker sintetico nostro e il Not Found e' la risposta CORRETTA. */
 check("v268 watchlist: simbolo ignoto a Yahoo distinto da simbolo non seguito", (() => {
-  const i = src.indexOf("function datiSimbolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
-  return /ignoto: true/.test(corpo);
+  const i = src.indexOf("function fattiTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction livelliTitolo", i));
+  return /ignoto: !!\(giorno && giorno\.assente/.test(corpo);
 })());
 
 /* ── v268 — i livelli non dipendono piu' da cosa segue la pipeline ── */
 check("v268 livelli: supporto e resistenza si calcolano dalle barre lette dal browser", (() => {
-  const i = src.indexOf("function livelliTitolo");
-  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1));
-  return /live\.res20/.test(corpo) && /live\.sup20/.test(corpo) && /live\.max52/.test(corpo);
+  const i = src.indexOf("function fattiTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction livelliTitolo", i));
+  return /storia\.res20/.test(corpo) && /storia\.sup20/.test(corpo) && /storia\.max52/.test(corpo);
 })());
 
 check("v268 livelli: con meno di 20 sedute NON si inventa un supporto a 20 sedute", (() => {
@@ -1529,9 +1534,65 @@ check("v272 rigenera: niente passi che annunciano lavori che non si fanno piu'",
    "prima della campana i futures sono il dato piu' fresco", mentre la pagina aveva il prezzo
    pre-market di QUEL titolo. Il sistema sapeva una cosa e ne faceva scrivere un'altra. */
 check("v273 pacchetto titolo: il prezzo pre/after entra nel pacchetto, non solo in tabella", (() => {
+  /* v274 — il pre/after non si rilegge piu' da quoteLive qui dentro: arriva da fattiTitolo,
+     il punto unico. La proprieta' da controllare resta che il pacchetto lo PORTI. */
   const i = src.indexOf("function datiNostriDelTitolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
-  return /quoteLive\.get\(T\)/.test(corpo) && /PRE-MARKET/.test(corpo) && /AFTER-HOURS/.test(corpo);
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /f\.ext/.test(corpo) && /PRE-MARKET/.test(corpo) && /AFTER-HOURS/.test(corpo);
+})());
+
+/* ══ v274 — I DUE CERVELLI ADESSO NE SONO UNO ════════════════════════════════════════════
+   Punto 1 della revisione che il CEO ha approvato. Pagina e pacchetto erano costruiti da
+   funzioni separate che ricavavano gli stessi fatti ognuna per conto suo: aggiungere un campo
+   voleva dire ricordarsene quattro volte, e me ne sono dimenticato tre volte di fila (i muri
+   delle opzioni solo nella scheda, il pre-market solo in tabella).
+   ⚠ QUESTO CHECK E' LA RAGIONE PER CUI IL DIFETTO NON TORNA: se un consumatore ricomincia a
+   leggersi i dati da solo, qui si accende. Non misura uno stile: misura che esista UN posto
+   dove la domanda "cosa sappiamo di questo titolo?" ha una risposta sola. */
+check("v274 fatti: la tabella, la scheda livelli e il pacchetto leggono tutti da fattiTitolo", (() => {
+  const puro = (nome, finoA) => {
+    const i = src.indexOf("function " + nome);
+    if (i < 0) return "";
+    const j = finoA ? src.indexOf(finoA, i) : src.indexOf("\nfunction ", i + 10);
+    return src.slice(i, j > 0 ? j : i + 4000).replace(/\/\*[\s\S]*?\*\//g, "");
+  };
+  const consumatori = ["datiSimbolo", "livelliTitolo", "datiNostriDelTitolo"];
+  return consumatori.every(n => {
+    const c = puro(n);
+    /* deve chiamare fattiTitolo e NON rifarsi i conti da solo su DATA */
+    return /fattiTitolo\(/.test(c)
+        && !/DATA\.portfolio/.test(c) && !/DATA\.watchlist/.test(c) && !/DATA\.options/.test(c);
+  });
+})());
+
+check("v274 fatti: fattiTitolo e' l'unico che legge le fonti grezze", (() => {
+  const i = src.indexOf("function fattiTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction livelliTitolo", i));
+  return /DATA\.portfolio/.test(corpo) && /DATA\.watchlist/.test(corpo)
+      && /quoteLive\.get/.test(corpo) && /DATA\.macro/.test(corpo);
+})());
+
+/* ⚠ v274 — PUNTO 5: un indicatore che sta al posto di un altro deve dirlo DOVE SI LEGGE.
+   Il Philly Fed sostituisce l'ISM (sotto licenza) ma copre un distretto, non il paese, e
+   arriva con ~40 giorni di ritardo: in classifica con lo stesso peso degli altri si legge
+   come una misura nazionale, e nel pacchetto finiva in cima ai "piu' favorevoli". */
+check("v274 macro: il Philly Fed si dichiara proxy in classifica e nel pacchetto", (() => {
+  const i = src.indexOf("function indicatoriClassifica");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  const nelPacchetto = /x\.proxy \? ` \[proxy: \$\{x\.proxy\}\]`/.test(src);
+  return /proxy: i\.key === "philly"/.test(corpo) && nelPacchetto;
+})());
+
+/* ⚠ v274 — PUNTO 3: il ritardo si dichiara dove si leggono i prezzi. Misurato: Yahoo e
+   TradingView danno lo stesso numero e TradingView lo marca "D" di suo. Nessuna delle due lo
+   toglie — sulle azioni USA il tempo reale costa — e questa riga esiste perche' il CEO possa
+   DECIDERE, invece di cambiare fonte sperando che cambi qualcosa. */
+check("v274 prezzi: il ritardo e' dichiarato in tabella e nel pacchetto", (() => {
+  const i = src.indexOf("function renderWatchlistTV");
+  const tab = src.slice(i, src.indexOf("\nasync function", i + 1));
+  const j = src.indexOf("function datiNostriDelTitolo");
+  const pac = src.slice(j, src.indexOf("\nfunction ", j + 10));
+  return /azioni americane sono ritardate/.test(tab) && /ritardati di circa 15 minuti/.test(pac);
 })());
 
 /* ---------- report ----------

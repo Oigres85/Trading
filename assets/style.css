@@ -2009,3 +2009,9 @@ svg.g-serie { cursor: crosshair; }
 .wl-ext { line-height: 1.25; }
 .wl-ext b { display: block; font-weight: 600; }
 .wl-ext span { display: block; font-size: 10.5px; }
+
+/* v274 — un indicatore che sta al posto di un altro lo dichiara dove si legge, non solo nella
+   nota lunga: il Philly Fed sta al posto dell'ISM ma copre un distretto, non il paese. */
+.tag-proxy { font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  padding: 1px 5px; border-radius: 999px; vertical-align: middle; margin-left: 4px;
+  background: rgba(245,158,11,.15); color: var(--yellow); border: 1px solid rgba(245,158,11,.4); }
