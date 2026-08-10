@@ -1915,3 +1915,27 @@ svg.g-serie { cursor: crosshair; }
 .mg-piu > div { font-size: 11.5px; line-height: 1.5; color: var(--muted); padding-left: 8px;
   border-left: 2px solid var(--border); margin-top: 4px; }
 .tv-piu > summary { font-size: 12.5px; padding: 6px 0; }
+
+/* v266 — la watchlist come tabella: densa come quella del broker, ordinabile, con la × per
+   togliere. Numeri a destra e tabulari, così le cifre si incolonnano e il confronto è a occhio. */
+.wl-tab { margin-top: 10px; }
+.wl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.wl-tabella { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.wl-tabella th { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border);
+  color: var(--muted); font-weight: 600; white-space: nowrap; cursor: pointer; user-select: none; }
+.wl-tabella th:hover { color: var(--text); }
+.wl-tabella th.wl-ord { color: var(--text); }
+.wl-tabella td { padding: 6px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.wl-tabella tr:hover td { background: var(--card-2); }
+.wl-tabella .num { text-align: right; font-variant-numeric: tabular-nums; }
+.wl-tabella th.num { text-align: right; }
+.wl-tabella .pos { color: var(--green); } .wl-tabella .neg { color: var(--red); }
+.wl-link { background: none; border: 0; color: var(--blue); cursor: pointer; padding: 0;
+  font-size: 12.5px; font-weight: 600; }
+.wl-link:hover { text-decoration: underline; }
+.wl-tk { color: var(--muted); font-size: 11px; margin-left: 6px;
+  font-family: ui-monospace, Menlo, monospace; }
+.wl-fuori td { opacity: .62; }
+.wl-x { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 15px;
+  line-height: 1; padding: 0 4px; }
+.wl-x:hover { color: var(--red); }

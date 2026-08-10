@@ -650,7 +650,11 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
        stata indebolita — l'invariante che conta e' che l'AZIONE esista, e #btn-cio la porta. */
     'id="tk-input"', 'id="tk-esito"',                           // analisi spot del titolo
     'id="tv-chart"', 'id="tv-tf"', 'id="tv-nota"',              // v257 grafico TradingView
-    'id="wl-input"', 'id="wl-salva"', 'id="wl-chips"', 'id="wl-tv"',   // v257 watchlist propria
+    /* v266 — 'id="wl-tv"' (il widget quotazioni di TradingView) e' stato sostituito da
+       'id="wl-tab"', la tabella nostra: il widget e' un iframe che non si puo' ordinare ne'
+       modificare, e il CEO ha chiesto proprio quelle due cose. L'invariante non e' indebolito,
+       segue la cosa: la watchlist deve avere un posto dove mostrarsi. */
+    'id="wl-input"', 'id="wl-salva"', 'id="wl-chips"', 'id="wl-tab"',   // v266 watchlist propria
     'id="mg-rot"', 'id="mg-stress"', 'id="mg-leva"', 'id="mg-tutti"',   // macro in grafici
     /* v262 — 'id="corr-macro"' non e' piu' un elemento portante: il CEO ha chiesto di togliere
        quella sezione dalla pagina. L'invariante NON e' stato indebolito, e' stato SPOSTATO dove
@@ -677,10 +681,13 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
 {
   const appTV = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
   const srcTV = [...appTV.matchAll(/sc\.src\s*=\s*"([^"]+)"/g)].map(m => m[1]);
-  check("v257 TradingView: gli script esterni vengono SOLO da s3.tradingview.com",
-    srcTV.length >= 2 && srcTV.every(u => u.startsWith("https://s3.tradingview.com/external-embedding/")));
-  check("v257 TradingView: ogni widget ha un onerror che degrada in modo visibile",
-    (appTV.match(/sc\.onerror\s*=/g) || []).length >= 2);
+  /* v266 — resta UN widget solo (il grafico): la watchlist e' diventata una tabella nostra.
+     L'invariante che conta e' la stessa — ogni script esterno viene dal dominio ufficiale e
+     degrada in modo visibile — cambia solo quanti ce ne sono. */
+  check("v266 TradingView: gli script esterni vengono SOLO da s3.tradingview.com",
+    srcTV.length >= 1 && srcTV.every(u => u.startsWith("https://s3.tradingview.com/external-embedding/")));
+  check("v266 TradingView: ogni widget ha un onerror che degrada in modo visibile",
+    (appTV.match(/sc\.onerror\s*=/g) || []).length >= srcTV.length);
   /* ⚠ QUARTA VOLTA che un gate trova SE STESSO. La prima stesura cercava la parola
      "credenzial" vicino a "tradingview" — e la trovava nella nota che RASSICURA il CEO
      ("nessun account e nessuna credenziale"). Cercare una parola non e' cercare un
@@ -1054,6 +1061,77 @@ check("v256 analisi titolo: una sola testata nel pacchetto (quella spot), non du
   const t = buildPromptTicker("NVDA");
   const h = promptHeaderText();
   return !t.includes(h)`));
+
+/* ── v266 — la watchlist e' una TABELLA NOSTRA, ordinabile e cancellabile ──────────────────
+   Il CEO: "sembra che i dati siano fermi ... con possibilita' di eliminarli o ordinarli
+   cliccando sulle variabili delle colonne". Queste tre proprieta' sono il suo requisito. */
+check("v266 watchlist: colonne della sua foto, e ognuna ordinabile", (() => {
+  const c = ["Nome", "Ultimo", "Massimo", "Minimo", "Var.", "Var. %", "Vol."];
+  return c.every(x => src.includes(`t: "${x}"`)) && /data-wl-ord=/.test(src);
+})());
+
+check("v266 watchlist: ogni riga si puo' togliere", /data-wl-del=/.test(src) && /wlDel/.test(src));
+
+check("v266 watchlist: un simbolo non seguito lo DICHIARA, non lascia la cella muta", suVeri(`
+  const r = datiSimbolo("ZZZZ-INESISTENTE");
+  return r.seguito === false`));
+
+/* ⚠ i cinque simboli della foto che non stanno negli array dei titoli (VIX, future Nasdaq,
+   EUR/USD) hanno i loro numeri dentro macro: dichiararli "non seguiti" sarebbe stato vero
+   della struttura e falso del contenuto. */
+check("v266 watchlist: VIX e future Nasdaq letti da macro, non dati per persi", suVeri(`
+  const v = datiSimbolo("^VIX"), n = datiSimbolo("NQ=F");
+  return v.seguito && Number.isFinite(v.price) && n.seguito && Number.isFinite(n.price)`));
+
+/* ⚠ v266 — IL DIFETTO CHE RESUSCITAVA I SIMBOLI CANCELLATI. Senza token la cancellazione
+   restava locale, e al reload il file del repo la sovrascriveva: il comando risultava
+   eseguito e non lo era (la classe Put/Call). Il marcatore deve esistere, va alzato quando
+   il salvataggio NON arriva sul repo, e il caricamento dal cloud deve rispettarlo. */
+check("v266 watchlist: una lista non sincronizzata non viene sovrascritta dal repo", (() => {
+  const i = src.indexOf("async function caricaWatchlistCloud");
+  const corpo = src.slice(i, i + 1200);
+  return /WL_LOCALE/.test(corpo) && /return;/.test(corpo)
+      && /localStorage\.setItem\(WL_LOCALE/.test(src)
+      && /localStorage\.removeItem\(WL_LOCALE\)/.test(src);
+})());
+
+/* ⚠ v266 — "Massimo"/"Minimo" sono le colonne del broker: il massimo DI OGGI. Il ripiego sul
+   massimo a 52 settimane metteva un numero vero sotto un'intestazione che ne promette un altro.
+   Il ripiego non deve tornare, ne' qui ne' nella pipeline che i due campi li deve scrivere. */
+check("v266 watchlist: Massimo/Minimo sono del giorno, senza ripiego sul dato a 52 settimane", (() => {
+  /* ⚠ la finestra si prende fino alla fine VERA della funzione (la prossima dichiarazione a
+     livello zero): con un tetto a caratteri fissi il check leggeva codice di altri e falliva
+     su un `w52_high` che non era suo — un gate che misura il posto sbagliato. */
+  const i = src.indexOf("function datiSimbolo");
+  const fine = src.indexOf("\nfunction ", i + 1);
+  const corpo = src.slice(i, fine > 0 ? fine : i + 3000);
+  return /r\.day_high/.test(corpo) && /r\.day_low/.test(corpo) && !/w52_high/.test(corpo);
+})());
+
+check("v266 pipeline: scrive massimo e minimo del giorno", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  return /"day_high": round/.test(py) && /"day_low": round/.test(py);
+})());
+
+/* ⚠ v266 — IL DIFETTO "SEMBRA CHE I DATI SIANO FERMI", ALLA RADICE. La tabella si monta
+   quando DATA e' ancora null e mostra trattini; se nessuno la ridisegna all'arrivo dei dati,
+   i trattini restano. Finora la salvava per caso il caricamento della lista dal repo. Il
+   render deve stare nella catena di renderAll, non dipendere da un giro accidentale. */
+check("v266 watchlist: ridisegnata quando arrivano i dati, non solo al montaggio", (() => {
+  const i = src.indexOf("function renderAll()");
+  const fine = src.indexOf("\nfunction ", i + 1);
+  return /renderWatchlistTV\(\)/.test(src.slice(i, fine));
+})());
+
+check("v266 watchlist: i simboli senza dato restano in fondo in tutti e due i versi", (() => {
+  const i = src.indexOf("function renderWatchlistTV");
+  const fine = src.indexOf("\nfunction ", i + 1);
+  /* ⚠ SENZA COMMENTI. Un check che cerca una parola nel sorgente trova anche la frase che
+     spiega perche' quella parola non c'e' piu': e' successo sei volte in questo progetto.
+     Si misura il CODICE. */
+  const corpo = src.slice(i, fine).replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  return /Number\.isFinite\(a\[col\.k\]\)/.test(corpo) && !/-Infinity/.test(corpo);
+})());
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

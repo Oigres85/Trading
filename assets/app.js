@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "265";
+const BUILD_VERSION = "266";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -610,6 +610,13 @@ function renderAll() {
     }
   }
   recomputeTotals();
+  /* ⚠ v266 — LA WATCHLIST VA RIDISEGNATA QUANDO ARRIVANO I DATI, non solo al montaggio. La
+     tabella si monta subito, quando DATA e' ancora null: senza questa riga resta a trattini e
+     nessuno la tocca piu'. Finora la salvava per caso caricaWatchlistCloud(), che ridisegnava
+     dopo il fetch del file remoto; chiuso il difetto della lista resuscitata quel giro puo'
+     non avvenire, e i trattini restavano — cioe' esattamente "sembra che i dati siano fermi",
+     il difetto da cui e' nata questa tabella. Il render non deve dipendere da un caso. */
+  renderWatchlistTV();
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
      pagina. La funzione RESTA perche' testoCorrelazioniMacro() usa lo stesso calcolo per il
@@ -6647,13 +6654,114 @@ $("#tv-tf")?.addEventListener("click", (e) => {
 /* ── la watchlist: sua, salvata, e la segue su ogni device ── */
 const WL_KEY = "watchlist_simboli";
 const WL_PATH = "config/ui_watchlist.json";
+/* ⚠ v266 — IL MARCATORE "SOLO LOCALE". Senza token la lista si salva nel browser ma NON sul
+   repo; al giro dopo caricaWatchlistCloud() rileggeva il file remoto e la sovrascriveva, cioe'
+   RESUSCITAVA i simboli appena cancellati. E' la stessa classe del difetto Put/Call: il comando
+   risultava eseguito e non lo era. Da qui in avanti una lista che non e' arrivata sul repo si
+   marca, e il caricamento dal cloud non la tocca — lo DICE invece di sovrascriverla in
+   silenzio. */
+const WL_LOCALE = WL_KEY + "_solo_locale";
+
+/* ⚠ v266 — LA WATCHLIST NASCE GIA' PIENA. Il CEO ha chiesto di inserirgli direttamente i
+   ticker della sua foto. Il default vive in config/ui_watchlist.json (sul repo, quindi lo
+   segue su ogni device); localStorage lo sovrascrive appena lui la modifica, e da quel momento
+   comanda la sua scelta — un default non deve mai vincere su una scelta gia' espressa, e' la
+   regola di v198 sulla vista compatta. */
+const WL_DEFAULT = ["MU", "AMD", "NVDA", "GOOGL", "PLTR", "ORCL", "WDC", "MRVL", "RGTI", "BE",
+                    "SKHY", "MSTR", "BTC-USD", "^VIX", "NQ=F", "^KS11", "^SOX", "^RUT",
+                    "EURUSD=X", "BTP-V28", "HG=F", "CL=F"];
 
 function leggiWatchlist() {
   try {
     const raw = localStorage.getItem(WL_KEY);
-    const a = raw ? JSON.parse(raw) : [];
-    return Array.isArray(a) ? a.filter(x => typeof x === "string" && x.trim()) : [];
-  } catch { return []; }
+    if (raw == null) return [...WL_DEFAULT];        // mai vista prima: parte dai simboli del CEO
+    const a = JSON.parse(raw);
+    return Array.isArray(a) ? a.filter(x => typeof x === "string" && x.trim()) : [...WL_DEFAULT];
+  } catch { return [...WL_DEFAULT]; }
+}
+
+/* ═══ v266 — LA WATCHLIST DIVENTA UNA TABELLA NOSTRA ═══════════════════════════════════════
+   Il CEO: "sembra che i dati siano fermi ... struttura i dati del box come quelli nella foto ...
+   con possibilita' di eliminarli o ordinarli cliccando sulle variabili delle colonne".
+   ⚠ PERCHE' IL WIDGET TRADINGVIEW NON POTEVA BASTARE, e perche' i dati sembravano fermi: quel
+   widget e' un IFRAME cross-origin. Non si puo' ordinare, non si puo' togliere una riga, non se
+   ne puo' leggere il contenuto — e quando la rete e' lenta resta a lungo sui valori iniziali,
+   che e' esattamente l'impressione che ha avuto.
+   La tabella nostra risolve tutto questo, ma introduce un vincolo da DICHIARARE: i prezzi
+   vengono da data.json, cioe' dalla pipeline, che segue solo i simboli che le sono stati dati.
+   Per un simbolo nuovo la riga lo DICE ("non seguito") invece di mostrare una cella vuota che
+   sembra un dato fermo — che sarebbe la classe di difetto peggiore, quella che non si rompe.
+   Le colonne sono quelle della foto del CEO: Nome, Ultimo, Massimo, Minimo, Var., Var.%, Vol. */
+let wlOrdine = { campo: "nome", verso: 1 };
+
+const WL_COLONNE = [
+  { k: "nome", t: "Nome" },
+  { k: "price", t: "Ultimo", num: true },
+  { k: "high", t: "Massimo", num: true },
+  { k: "low", t: "Minimo", num: true },
+  { k: "chg", t: "Var.", num: true, segno: true },
+  { k: "chg_pct", t: "Var. %", num: true, segno: true, pct: true },
+  { k: "vol", t: "Vol.", num: true, volume: true },
+];
+
+/* i dati di un simbolo, da data.json. Null dove la pipeline non lo segue: dichiarato, non finto. */
+function datiSimbolo(tk) {
+  const T = String(tk || "").toUpperCase();
+  const r = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .find(x => String(x.ticker || "").toUpperCase() === T);
+  /* ⚠ v266 — PRIMA DI DICHIARARE "non seguito", SI GUARDA ANCHE NEL BLOCCO MACRO. Cinque dei
+     simboli del CEO (VIX, futures Nasdaq, SOX, EUR/USD, rame) non stanno negli array dei titoli
+     ma i loro numeri sono nel file lo stesso, dentro `macro`. Dichiararli "non seguiti" sarebbe
+     stato vero della struttura e falso del contenuto: il dato c'e', e' solo in un'altra stanza.
+     E' la classe di difetto che questo progetto chiama "il numero corretto copriva quello
+     sbagliato" (v207) rovesciata — qui il dato giusto sarebbe rimasto nascosto. */
+  if (!r) {
+    const m = (DATA && DATA.macro) || {};
+    const daMacro = (nome, val, pct) => Number.isFinite(Number(val))
+      ? { tk: T, nome, seguito: true, price: Number(val), high: NaN, low: NaN,
+          chg: NaN, chg_pct: Number(pct), vol: NaN, fonte: "macro" } : null;
+    if (T === "^VIX" && m.vix) return daMacro("Volatilità (VIX)", m.vix.value, m.vix.change_pct);
+    for (const f of Object.values(m.futures || {})) {
+      if (String(f && f.symbol).toUpperCase() === T) return daMacro(f.label || T, f.price, f.change_pct);
+    }
+    const mk = (m.markets || []).find(x => String(x.key || "").toUpperCase() === T);
+    if (mk) return daMacro(mk.label || T, String(mk.value).replace(/[^\d.,-]/g, "").replace(",", "."), mk.change_pct);
+    return { tk: T, nome: T, seguito: false };
+  }
+  const px = Number(r.price);
+  const pct = Number(r.change_pct);
+  const chg = (Number.isFinite(px) && Number.isFinite(pct) && pct !== -100)
+    ? px - px / (1 + pct / 100) : NaN;
+  return { tk: T, nome: r.name || T, seguito: true, price: px,
+    /* ⚠ v266 — NIENTE RIPIEGO SUL MASSIMO A 52 SETTIMANE. Le colonne sono quelle del broker
+       del CEO, dove "Massimo" e "Minimo" sono quelli DI OGGI. Ripiegando sul dato annuale la
+       tabella mostrava 207,52 accanto a un prezzo di 172,01: un numero vero sotto
+       un'intestazione che ne promette un altro. Se la barra del giorno non c'e', la cella
+       resta un trattino — visibilmente mancante invece che invisibilmente sbagliata. */
+    high: Number(r.day_high), low: Number(r.day_low),
+    chg, chg_pct: pct, vol: Number(r.volume != null ? r.volume : r.avg_volume_30d) };
+}
+
+function cellaWl(r, col) {
+  if (col.k === "nome") {
+    /* il simbolo sotto il nome serve a distinguerli; quando coincidono ("^RUT" / "^RUT") era
+       solo un raddoppio da leggere due volte. */
+    const sotto = String(r.nome).toUpperCase() === r.tk ? "" : '<span class="wl-tk">' + esc(r.tk) + '</span>';
+    return '<td class="wl-nome"><button class="wl-link" data-wl="' + esc(r.tk) + '">' + esc(r.nome)
+      + '</button>' + sotto + '</td>';
+  }
+  const v = r[col.k];
+  if (!r.seguito || !Number.isFinite(v)) return '<td class="num muted">—</td>';
+  if (col.volume) {
+    const t = v >= 1e9 ? fmtNum.format(Math.round(v / 1e8) / 10) + "Mld"     // il volume di BTC dava "12.185,6M"
+            : v >= 1e6 ? fmtNum.format(Math.round(v / 1e5) / 10) + "M"
+                       : fmtNum.format(Math.round(v / 1000)) + "K";
+    return '<td class="num">' + t + '</td>';
+  }
+  const cls = col.segno ? (v > 0 ? "num pos" : v < 0 ? "num neg" : "num") : "num";
+  const t = col.segno ? signTxt(Math.round(v * 100) / 100, col.pct ? "%" : "")
+                      : fmtNum.format(Math.round(v * 100) / 100);
+  return '<td class="' + cls + '">' + t + '</td>';
 }
 
 function renderWatchlistTV() {
@@ -6663,30 +6771,56 @@ function renderWatchlistTV() {
   if (inp && !inp.value) inp.value = simboli.join(", ");
   if (chips) {
     chips.innerHTML = simboli.length
-      ? simboli.map(s => `<button class="chip wl-chip" data-wl="${esc(s)}">${esc(s)}</button>`).join("")
-      : `<span class="muted">Nessun simbolo: scrivili qui sopra separati da virgola e premi Salva.</span>`;
+      ? simboli.map(x => '<span class="chip wl-chip" data-wl="' + esc(x) + '">' + esc(x) + '</span>').join("")
+      : '<span class="muted">Nessun simbolo: scrivili qui sopra separati da virgola e premi Salva.</span>';
   }
-  const box = $("#wl-tv");
+  const box = $("#wl-tab");
   if (!box) return;
   if (!simboli.length) { box.innerHTML = ""; return; }
-  box.innerHTML = "";
-  const cont = document.createElement("div");
-  cont.className = "tradingview-widget-container";
-  const inner = document.createElement("div");
-  inner.className = "tradingview-widget-container__widget";
-  cont.appendChild(inner);
-  const sc = document.createElement("script");
-  sc.type = "text/javascript";
-  sc.async = true;
-  sc.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js";
-  sc.innerHTML = JSON.stringify({
-    width: "100%", height: 400, symbolsGroups: [{ name: "La mia watchlist",
-      symbols: simboli.map(s => ({ name: simboloTradingView(s) })) }],
-    showSymbolLogo: true, isTransparent: true, colorTheme: "dark", locale: "it",
+
+  const righe = simboli.map(datiSimbolo);
+  const col = WL_COLONNE.find(x => x.k === wlOrdine.campo) || WL_COLONNE[0];
+  righe.sort((a, b) => {
+    /* ⚠ le righe senza dato vanno SEMPRE in fondo, in tutti e due i versi. Con un
+       -Infinity dentro il confronto, ordinando per "Var. %" decrescente i simboli senza
+       numeri finivano IN CIMA: la prima cosa che si legge sarebbe stata una fila di
+       trattini. Si separano prima, e si ordina solo cio' che ha un valore. */
+    /* i simboli che la pipeline non segue stanno in fondo SEMPRE, anche ordinando per nome:
+       altrimenti "^SOX" apriva la tabella con una riga di trattini. */
+    if (a.seguito !== b.seguito) return a.seguito ? -1 : 1;
+    const va = Number.isFinite(a[col.k]), vb = Number.isFinite(b[col.k]);
+    if (col.num) {
+      if (!va || !vb) return va === vb ? 0 : (va ? -1 : 1);
+      return (a[col.k] - b[col.k]) * wlOrdine.verso;
+    }
+    return String(a[col.k] || "").localeCompare(String(b[col.k] || "")) * wlOrdine.verso;
   });
-  sc.onerror = () => { box.innerHTML = `<div class="muted tv-vuoto">TradingView non risponde: le quotazioni della watchlist non sono disponibili ora.</div>`; };
-  cont.appendChild(sc);
-  box.appendChild(cont);
+
+  const th = WL_COLONNE.map(c =>
+    '<th class="' + (c.num ? "num" : "") + (wlOrdine.campo === c.k ? " wl-ord" : "")
+    + '" data-wl-ord="' + c.k + '" role="button" tabindex="0">' + esc(c.t)
+    + (wlOrdine.campo === c.k ? (wlOrdine.verso > 0 ? " ▲" : " ▼") : "") + '</th>').join("");
+  const tr = righe.map(r =>
+    '<tr' + (r.seguito ? "" : ' class="wl-fuori"') + '>'
+    + WL_COLONNE.map(c => cellaWl(r, c)).join("")
+    + '<td class="num"><button class="wl-x" data-wl-del="' + esc(r.tk) + '" title="Togli ' + esc(r.tk) + '">×</button></td></tr>').join("");
+  box.innerHTML = '<div class="wl-scroll"><table class="wl-tabella"><thead><tr>' + th
+    + '<th></th></tr></thead><tbody>' + tr + '</tbody></table></div>';
+
+  const fuori = righe.filter(r => !r.seguito).length;
+  const nota = $("#wl-nota");
+  if (nota) {
+    const barra = ultimaBarraDisponibile();
+    /* ⚠ una colonna interamente vuota si legge come "rotto". Se il massimo e il minimo del
+       giorno non ci sono ancora — la pipeline ha cominciato a scriverli in v266 — la nota lo
+       dice: manca il giro, non il dato. */
+    const senzaGiornata = righe.filter(r => r.seguito).every(r => !Number.isFinite(r.high));
+    nota.innerHTML = "Prezzi dalla pipeline" + (barra ? ", barra del " + barra : "")
+      + " · clic sull'intestazione per ordinare, sul nome per vederlo nel grafico, sulla × per togliere."
+      + (fuori ? ' <b>' + fuori + (fuori === 1 ? " simbolo non è seguito" : " simboli non sono seguiti")
+         + ' dalla pipeline</b>: le celle sono vuote per questo, non perché il dato sia fermo.' : "")
+      + (senzaGiornata ? " Massimo e minimo del giorno arrivano col prossimo giro della pipeline." : "");
+  }
 }
 
 async function salvaWatchlist() {
@@ -6701,6 +6835,7 @@ async function salvaWatchlist() {
      invece di far credere a una sincronizzazione che non c'e'. */
   const token = localStorage.getItem("gh_token");
   if (!token) {
+    localStorage.setItem(WL_LOCALE, "1");
     if (nota) nota.textContent = `${simboli.length} simboli salvati SU QUESTO BROWSER. Senza token GitHub non seguono su iPhone.`;
     return;
   }
@@ -6713,10 +6848,12 @@ async function salvaWatchlist() {
       body: JSON.stringify({ message: "Aggiorna watchlist (da dashboard)",
         content: btoa(unescape(encodeURIComponent(JSON.stringify(simboli, null, 2) + "\n"))),
         ...(sha ? { sha } : {}) }) });
+    if (r.ok) localStorage.removeItem(WL_LOCALE); else localStorage.setItem(WL_LOCALE, "1");
     if (nota) nota.textContent = r.ok
       ? `${simboli.length} simboli salvati sul repo: li ritrovi su ogni device.`
       : `Salvati in locale, ma la scrittura sul repo non e' riuscita (${r.status}).`;
   } catch {
+    localStorage.setItem(WL_LOCALE, "1");
     if (nota) nota.textContent = "Salvati in locale: la scrittura sul repo non e' riuscita (rete).";
   }
 }
@@ -6727,7 +6864,16 @@ async function caricaWatchlistCloud() {
     if (!r.ok) return;
     const a = JSON.parse(await r.text());
     if (Array.isArray(a) && a.length) {
+      const locale = leggiWatchlist();
+      if (localStorage.getItem(WL_LOCALE) && JSON.stringify(locale) !== JSON.stringify(a)) {
+        const nota = $("#wl-nota");
+        if (nota) nota.innerHTML = `Su questo browser hai <b>${locale.length} simboli</b>, sul repo ce ne sono `
+          + `<b>${a.length}</b>: le tue modifiche non sono arrivate sul repo (manca il token GitHub). `
+          + `Tengo la tua lista, non quella del repo.`;
+        return;
+      }
       localStorage.setItem(WL_KEY, JSON.stringify(a));
+      localStorage.removeItem(WL_LOCALE);
       const inp = $("#wl-input"); if (inp) inp.value = a.join(", ");
       renderWatchlistTV();
     }
@@ -6736,13 +6882,47 @@ async function caricaWatchlistCloud() {
 
 $("#wl-salva")?.addEventListener("click", salvaWatchlist);
 $("#wl-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") salvaWatchlist(); });
-$("#wl-chips")?.addEventListener("click", (e) => {
-  const b = e.target.closest("[data-wl]");
-  if (!b) return;
-  const inp = $("#tk-input"); if (inp) inp.value = b.dataset.wl;
-  montaGraficoTV(b.dataset.wl);
-  document.querySelector('[data-sez="grafico"]')?.scrollIntoView({ behavior: "smooth", block: "start" });
-});
+/* ⚠ v266 — UN SOLO HANDLER PER TUTTA LA SEZIONE, delegato. La tabella si ridisegna a ogni
+   ordinamento e a ogni cancellazione: agganciare gli eventi ai bottoni significherebbe
+   riagganciarli ogni volta, e un giro dimenticato lascia la tabella inerte — il difetto v213
+   che in questo progetto ha gia' ucciso il wiring due volte. Delegando sulla sezione, i bottoni
+   nuovi funzionano da soli. */
+function agganciaWatchlist(root) {
+  root?.addEventListener("click", (e) => {
+    const del = e.target.closest("[data-wl-del]");
+    if (del) {
+      const tk = del.dataset.wlDel;
+      const restanti = leggiWatchlist().filter(x => x !== tk);
+      localStorage.setItem(WL_KEY, JSON.stringify(restanti));
+      const inp = $("#wl-input"); if (inp) inp.value = restanti.join(", ");
+      renderWatchlistTV();
+      salvaWatchlist();          // rimanda anche sul repo, cosi' la rimozione segue sui device
+      return;
+    }
+    const ord = e.target.closest("[data-wl-ord]");
+    if (ord) {
+      const campo = ord.dataset.wlOrd;
+      /* stesso campo → inverte il verso; campo nuovo → parte crescente sui nomi e DECRESCENTE
+         sui numeri, che e' quello che ci si aspetta cliccando "Var. %" (prima i migliori). */
+      if (wlOrdine.campo === campo) wlOrdine.verso = -wlOrdine.verso;
+      else wlOrdine = { campo, verso: campo === "nome" ? 1 : -1 };
+      renderWatchlistTV();
+      return;
+    }
+    const vai = e.target.closest("[data-wl]");
+    if (vai) {
+      const inp = $("#tk-input"); if (inp) inp.value = vai.dataset.wl;
+      montaGraficoTV(vai.dataset.wl);
+      document.querySelector('[data-sez="grafico"]')?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+  root?.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const ord = e.target.closest("[data-wl-ord]");
+    if (ord) { e.preventDefault(); ord.click(); }
+  });
+}
+agganciaWatchlist(document.querySelector('[data-sez="watchlist-tv"]'));
 
 function buildPromptTicker(tkGrezzo) {
   /* ═══ v257 — RISCRITTO DOPO UN FALLIMENTO REALE ═══════════════════════════════════════════
