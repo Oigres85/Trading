@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "270";
+const BUILD_VERSION = "271";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1784,6 +1784,17 @@ const CADENZA_FONTE = {
 
 /* Restituisce { rilevato, eta, prossimo, passo, fonte, nota } o null se non si può dire nulla.
    ⚠ `prossimo` è una DATA ATTESA, non una certezza: si scrive sempre col "atteso". */
+/* somma N giorni LAVORATIVI a una data (sabato e domenica non contano). */
+function sommaGiorniLavorativi(d, n) {
+  const x = new Date(d.getTime());
+  let restanti = n;
+  while (restanti > 0) {
+    x.setDate(x.getDate() + 1);
+    if (x.getDay() !== 0 && x.getDay() !== 6) restanti--;
+  }
+  return x;
+}
+
 function cadenzaDato(chiave, dataRilevazione) {
   const c = CADENZA_FONTE[chiave];
   if (!c || !dataRilevazione) return null;
@@ -1819,7 +1830,13 @@ function cadenzaDato(chiave, dataRilevazione) {
        giorni di festa americana, e senza tolleranza ogni 4 luglio o Thanksgiving avrebbe acceso
        "ERA ATTESO E NON E' ARRIVATO" su un dato regolarissimo. Un allarme che suona quando non
        succede niente insegna a ignorarlo, e allora non serve piu' il giorno che serve. */
-    scaduto: c.passo === "giornaliero" ? p.getTime() + 2 * 86400000 < oggi.getTime() : p < oggi,
+    /* ⚠ v271 — LA GRAZIA SI CONTA IN GIORNI LAVORATIVI, non di calendario. Misurato leggendo
+       il pacchetto: il Treasury 30A rilevato venerdi' 06/08 usciva lunedi' mattina con
+       "⚠ ERA ATTESO E NON E' ARRIVATO" — un allarme di dato mancante su un dato normalissimo,
+       perche' i due giorni di grazia se li era mangiati il fine settimana. Un allarme che
+       suona di lunedi' su ogni serie giornaliera insegna a ignorarlo, e allora non serve piu'
+       il giorno che serve davvero. */
+    scaduto: c.passo === "giornaliero" ? sommaGiorniLavorativi(p, 2) < oggi : p < oggi,
     passo: c.passo, fonte: c.nome, nota: c.nota,
   };
 }
@@ -7708,7 +7725,61 @@ function buildPromptTicker(tkGrezzo) {
 `──────────────────────────────────────────────────────────────────`,
 ].join("\n");
 
-  return [istruzioni, disaccordo, soloDati, storico].filter(Boolean).join("\n\n");
+  return [istruzioni, datiNostriDelTitolo(tk), disaccordo, soloDati, storico].filter(Boolean).join("\n\n");
+}
+
+/* ═══ v271 — QUELLO CHE SAPPIAMO GIA' DEL TITOLO, INVECE DI FARLO CERCARE ═════════════════
+   Trovato rileggendo il pacchetto di NVDA come lo leggerebbe un analista: la scheda TECNICA
+   chiedeva all'LLM di andare a cercare online supporti, resistenze, RSI, ATR e medie mobili —
+   e questi numeri il sistema LI HA GIA', calcolati dalla sua pipeline e mostrati sulla pagina
+   due centimetri piu' su. Su NVDA: supporto 190,01, resistenza 224,76, RSI 64,4, ATR 7,64,
+   muro delle call 215, muro delle put 115.
+   Due danni, non uno. Il primo e' lo spreco. Il secondo e' peggio: l'LLM va a prendere quegli
+   stessi livelli da un'altra parte, torna con numeri diversi, e il CEO si ritrova la pagina
+   che dice una cosa e l'analisi che ne dice un'altra sullo stesso titolo — senza sapere quale
+   credere. Un sistema che tiene un numero e ne fa cercare un altro sta preparando quella
+   contraddizione.
+   ⚠ Restano FATTI, non istruzioni (regola C9): qui si dichiara cosa sappiamo, con la data e
+   con il metodo di calcolo, e si dice all'LLM cosa fare se cio' che trova fuori non torna. */
+function datiNostriDelTitolo(tk) {
+  const T = String(tk || "").toUpperCase();
+  const r = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .find(x => String(x.ticker || "").toUpperCase() === T);
+  const o = (typeof statoOpzioni === "function") ? statoOpzioni(T) : null;
+  if (!r && !o) return "";
+  const L = [];
+  const n = (v) => Number.isFinite(Number(v)) ? Number(v) : null;
+  if (r) {
+    const px = n(r.price);
+    const dist = (v) => (px && n(v)) ? ` (${v > px ? "+" : ""}${Math.round((v / px - 1) * 1000) / 10}% dal riferimento)` : "";
+    if (px) L.push(`- Prezzo di riferimento del sistema: ${px}${r.price_asof ? ` (barra del ${r.price_asof}${r.price_live ? ", ultimo scambio live" : ", ultima chiusura"})` : ""}`);
+    if (n(r.support)) L.push(`- Supporto: ${r.support}${dist(r.support)} — minimo delle ultime 20 sedute`);
+    if (n(r.resistance)) L.push(`- Resistenza: ${r.resistance}${dist(r.resistance)} — massimo delle ultime 20 sedute`);
+    if (n(r.w52_high)) L.push(`- Massimo 52 settimane: ${r.w52_high}${dist(r.w52_high)}`);
+    if (n(r.w52_low)) L.push(`- Minimo 52 settimane: ${r.w52_low}${dist(r.w52_low)}`);
+    if (n(r.rsi)) L.push(`- RSI(14): ${r.rsi}`);
+    if (n(r.atr_14)) L.push(`- ATR(14): ${r.atr_14}${n(r.atr_pct) ? ` (${r.atr_pct}% del prezzo — l'ampiezza tipica di una seduta)` : ""}`);
+    if (n(r.sma50_dist_pct) != null) L.push(`- Distanza dalla media a 50 sedute: ${r.sma50_dist_pct > 0 ? "+" : ""}${r.sma50_dist_pct}%`);
+    if (n(r.sma200_dist_pct) != null) L.push(`- Distanza dalla media a 200 sedute: ${r.sma200_dist_pct > 0 ? "+" : ""}${r.sma200_dist_pct}%`);
+    if (n(r.pe)) L.push(`- P/E (trailing): ${r.pe}×`);
+    if (r.sector) L.push(`- Settore secondo la nostra classificazione: ${r.sector}`);
+    if (r.earnings_date) L.push(`- Prossima trimestrale attesa: ${r.earnings_date}`);
+  }
+  if (o && (n(o.callWall) || n(o.putWall))) {
+    const px = n(o.spot);
+    const d = (v) => (px && n(v)) ? ` (${v > px ? "+" : ""}${Math.round((v / px - 1) * 1000) / 10}%)` : "";
+    if (n(o.callWall)) L.push(`- Muro delle CALL: ${o.callWall}${d(o.callWall)} — lo strike con piu' contratti call aperti sulla scadenza ${o.scadenza}`);
+    if (n(o.putWall)) L.push(`- Muro delle PUT: ${o.putWall}${d(o.putWall)} — stesso conto sulle put`);
+    if (o.ratio != null) L.push(`- Rapporto put/call di ${T} sulla scadenza ${o.scadenza}: ${Math.round(o.ratio * 100) / 100} (put ${o.put}, call ${o.call})`);
+  }
+  if (!L.length) return "";
+  return [
+    `=== QUELLO CHE IL SISTEMA SA GIA' DI ${T} (non cercarlo altrove: e' qui) ===`,
+    `Questi numeri sono calcolati dalla nostra pipeline sulle stesse barre che disegnano il grafico, e sono quelli che il CEO vede sulla pagina.`,
+    `USALI COME RIFERIMENTO. Se cio' che trovi in rete diverge in modo materiale (piu' del 2% su un livello di prezzo), NON scegliere in silenzio: riporta tutti e due, di' quale usi e perche'.`,
+    `Restano da cercare online le cose che qui NON ci sono: fondamentali di bilancio, trimestrale, concorrenti e quote di mercato, notizie, consenso analisti.`,
+    ...L,
+  ].join("\n");
 }
 
 function buildCIOText() {

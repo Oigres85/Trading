@@ -1451,7 +1451,13 @@ def fetch_macro():
         v = sp[-1][1]
         indicators.append({"key": "philly", "label": "Manifattura Philly Fed (al posto dell'ISM)",
                            "value": f"{v:+.1f}", "date": sp[-1][0],
-                           "impact": round(clamp(50 + v * 1.2))})
+                           # ⚠ v271 — PENDENZA ABBASSATA, PERCHE' SATURAVA. Con 1.2 un +41,4
+                           # dava 99,7 → 100, e il pacchetto lo presentava come l'indicatore
+                           # PIU' FAVOREVOLE di trenta, a punteggio pieno: un'indagine di un
+                           # solo distretto, vecchia di quaranta giorni, messa in cima a tutto.
+                           # Un punteggio che tocca il tetto non distingue piu' "molto forte"
+                           # da "fortissimo", ed e' li' che una scala smette di informare.
+                           "impact": round(clamp(50 + v * 0.9))})
     except Exception as e:  # noqa: BLE001
         print(f"!! philly: {e}", file=sys.stderr)
     try:

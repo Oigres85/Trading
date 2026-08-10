@@ -1428,6 +1428,49 @@ check("v270 widget: i simboli che il widget non mostra vengono elencati, non spa
   return /Fuori dal widget/.test(corpo);
 })());
 
+/* ══ v271 — DIFETTI TROVATI RILEGGENDO IL PACCHETTO DI UN TITOLO ═════════════════════════
+   Il CEO: "controlla infine su te stesso prompt analisi ai che ora si genera sulla base un
+   ticker a tua scelta". Letto quello di NVDA riga per riga, come lo leggerebbe un analista. */
+
+/* ⚠ IL DIFETTO PIU' UTILE. La scheda TECNICA faceva cercare online supporti, resistenze, RSI,
+   ATR e medie mobili — numeri che il sistema HA GIA' e mostra sulla pagina due centimetri piu'
+   su. Lo spreco e' il danno minore: quello grosso e' che l'LLM torna con numeri diversi, e il
+   CEO si ritrova la pagina che dice una cosa e l'analisi un'altra sullo stesso titolo. */
+check("v271 pacchetto titolo: porta i livelli che il sistema gia' conosce", run(`
+  const p = buildPromptTicker("NVDA");
+  const r = (DATA.watchlist || []).concat(DATA.portfolio || []).find(x => x.ticker === "NVDA");
+  if (!r) return true;
+  return p.includes("QUELLO CHE IL SISTEMA SA GIA'")
+      && p.includes(String(r.support)) && p.includes(String(r.resistance))
+      && p.includes(String(r.rsi))`));
+
+/* ⚠ si misura la funzione che il testo lo produce, non un pacchetto che in questo harness puo'
+   legittimamente non avere quel titolo: un check che dipende dai dati di prova misura i dati
+   di prova, non il codice. */
+check("v271 pacchetto titolo: dice cosa fare se il web diverge, invece di lasciar scegliere in silenzio", (() => {
+  const i = src.indexOf("function datiNostriDelTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  return /NON scegliere in silenzio/.test(corpo) && /riporta tutti e due/.test(corpo);
+})());
+
+/* ⚠ per un titolo che la pipeline NON segue il blocco non deve esistere: inventare un
+   "supporto del sistema" che il sistema non ha calcolato sarebbe la bugia peggiore. */
+check("v271 pacchetto titolo: nessun blocco per un titolo che la pipeline non segue", run(`
+  return !buildPromptTicker("ZZZZ-INESISTENTE").includes("QUELLO CHE IL SISTEMA SA GIA'")`));
+
+/* ⚠ IL FALSO ALLARME DEL LUNEDI'. Il Treasury 30A rilevato venerdi' usciva lunedi' mattina
+   con "ERA ATTESO E NON E' ARRIVATO": i due giorni di grazia se li mangiava il fine settimana.
+   Un allarme che suona ogni lunedi' su ogni serie giornaliera insegna a ignorarlo. */
+check("v271 cadenza: un dato di venerdi' non e' 'mancante' il lunedi'", run(`
+  const c = cadenzaDato("t30", "2026-08-06");   // giovedi
+  const d = cadenzaDato("t30", "2026-08-07");   // venerdi
+  return c && d && !c.scaduto && !d.scaduto`));
+
+check("v271 cadenza: la grazia si conta in giorni lavorativi", (() => {
+  const i = src.indexOf("function sommaGiorniLavorativi");
+  return i > 0 && /getDay\(\) !== 0 && x\.getDay\(\) !== 6/.test(src.slice(i, i + 400));
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
