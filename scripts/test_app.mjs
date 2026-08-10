@@ -1459,6 +1459,32 @@ check("v275 watchlist: uscita da markup, codice e stile, senza residui", (() => 
   return !nelHtml && !nelCodice && !nelCss;
 })());
 
+/* ══ v276 — TRE DIFETTI TROVATI RILEGGENDO IL PACCHETTO DI AMD ═══════════════════════════ */
+
+/* ⚠ I FLOAT GREZZI DI YAHOO finivano nel pacchetto: "Massimo 52 settimane: 584.72998046875",
+   "Supporto: 424.0299987792969". La pagina li arrotondava disegnandoli, il pacchetto no —
+   due strade e una sola che ripulisce, cioe' il difetto che v274 doveva chiudere, rimasto
+   aperto un livello piu' sotto. Dodici decimali dichiarano una precisione che non esiste. */
+check("v276 pacchetto: i livelli sono arrotondati alla fonte, non solo a schermo", suVeri(`
+  const f = fattiTitolo("NVDA");
+  const troppiDecimali = (n) => Number.isFinite(n) && String(n).split(".")[1]?.length > 4;
+  return !troppiDecimali(f.prezzo) && !f.livelli.some(x => troppiDecimali(x.v))`));
+
+/* ⚠ un prezzo senza ora non dice quanto e' fresco: se il CEO incolla alle 16:00 e l'LLM
+   risponde alle 16:30, quel numero ha mezz'ora e nessuno dei due lo sa. */
+check("v276 pacchetto: il prezzo di riferimento porta l'ora della lettura", (() => {
+  const i = src.indexOf("function datiNostriDelTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /letto dal browser alle \$\{ora\}/.test(corpo);
+})());
+
+/* ⚠ "Fear & Greed" compariva due volte con lo stesso numero, in due blocchi. Sono
+   complementari, ma la testata impone di CONTARE I SEGNALI UNA VOLTA SOLA e due righe uguali
+   sono precisamente cio' che porta a contarne due. Il payload lo dichiara gia' per CPI/PCE. */
+check("v276 pacchetto: il Fear & Greed doppio e' dichiarato come una misura sola", suVeri(`
+  const p = buildPrompt();
+  return /UNA misura guardata da due lati, non due segnali/.test(p)`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

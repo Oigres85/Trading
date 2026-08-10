@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "275";
+const BUILD_VERSION = "276";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6205,6 +6205,17 @@ function buildPrompt() {
        li ha addirittura tolti come duplicati di altre schede. Pagina e pacchetto dicevano cose
        diverse sullo stesso indicatore. La dispersione dei sette resta nel blocco del
        disaccordo, che e' il posto dove serve. */
+    /* ⚠ v276 — IL RIMANDO AL BLOCCO DEL DISACCORDO. Rileggendo il pacchetto di AMD, "Fear &
+       Greed" compare due volte con lo stesso 64: qui col suo storico, e nel blocco del
+       disaccordo con la dispersione dei sette componenti. Sono complementari, non in
+       contraddizione — ma la testata impone all'LLM di CONTARE I SEGNALI UNA VOLTA SOLA, e
+       due righe con la stessa etichetta e lo stesso numero sono precisamente cio' che lo
+       porta a contarne due. Il payload lo dichiara gia' per CPI/PCE e per il disaccoppiamento:
+       qui mancava, e la regola vale allo stesso modo. */
+    /* ⚠ la frase NON nomina i pezzi dell'indice: una guardia (v263) vieta di elencarli su
+       questa riga, ed e' nata da un difetto vero — pagina e pacchetto che dicevano cose
+       diverse sugli stessi indicatori. Il rimando si puo' fare senza riaprire quella porta. */
+    fgl += " — lo stesso indice torna piu' sopra nel blocco del disaccordo, visto dal lato della sua dispersione interna: e' UNA misura guardata da due lati, non due segnali.";
     lines.push(fgl);
   }
   // sanity finale sul payload: un valore impossibile diventa "n.d." e NON entra nell'analisi
@@ -7039,16 +7050,30 @@ function fattiTitolo(tk) {
     return null;
   })();
 
-  const prezzo = Number.isFinite(vivo && vivo.price) ? vivo.price
+  const grezzo = Number.isFinite(vivo && vivo.price) ? vivo.price
                : Number.isFinite(opz && opz.spot) ? opz.spot
                : Number.isFinite(numero(riga && riga.price)) ? numero(riga.price)
                : (daMacro ? daMacro.prezzo : NaN);
+  const prezzo = Number.isFinite(grezzo)
+    ? (Math.abs(grezzo) >= 1 ? Math.round(grezzo * 100) / 100 : Math.round(grezzo * 10000) / 10000)
+    : grezzo;
 
   /* i livelli, con la loro provenienza. Le barre lette dal browser vengono PRIMA di quelle
      della pipeline: stesso giorno o piu' fresche, e coprono anche i simboli non seguiti. */
   const L = [];
+  /* ⚠ v276 — I LIVELLI SI ARROTONDANO QUI, ALLA FONTE. Rileggendo il pacchetto di AMD:
+     "Massimo 52 settimane: 584.72998046875", "Supporto: 424.0299987792969". Sono i float
+     grezzi delle barre di Yahoo. La pagina li arrotondava disegnandoli (fmtNum), il pacchetto
+     no — di nuovo due strade e una sola che ripulisce, cioe' il difetto che v274 doveva
+     chiudere e che qui era rimasto aperto un livello piu' sotto.
+     Non e' solo bruttezza: dodici decimali su un livello di prezzo dichiarano una precisione
+     che non esiste, e un LLM che li ricopia produce "resistenza a 574,2000122" in un referto
+     che il CEO deve poter leggere. Due decimali, e per i titoli sotto l'euro quattro — sotto
+     quella soglia il secondo decimale e' meta' del movimento tipico. */
+  const arrotonda = (n) => Number.isFinite(n)
+    ? (Math.abs(n) >= 1 ? Math.round(n * 100) / 100 : Math.round(n * 10000) / 10000) : n;
   const agg = (nome, breve, v, fonte, spiega) => {
-    const n = numero(v);
+    const n = arrotonda(numero(v));
     if (Number.isFinite(n) && n > 0) L.push({ nome, breve, v: n, fonte, spiega });
   };
   if (opz) {
@@ -7500,8 +7525,13 @@ function datiNostriDelTitolo(tk) {
     ? ` (${v > f.prezzo ? "+" : ""}${Math.round((v / f.prezzo - 1) * 1000) / 10}% dal riferimento)` : "";
 
   if (Number.isFinite(f.prezzo)) {
-    L.push(`- Prezzo di riferimento del sistema: ${Math.round(f.prezzo * 100) / 100}`
-      + (f.fonte === "live" ? " (ultima quotazione letta dal browser)"
+    /* ⚠ v276 — L'ORA DELLA LETTURA. "Ultima quotazione letta dal browser" non dice QUANDO: se
+       il CEO incolla il pacchetto alle 16:00 e l'LLM risponde alle 16:30, quel prezzo ha
+       mezz'ora e nessuno dei due lo sa. E' la stessa regola che ho gia' applicato al
+       pre-market e alle cadenze macro — un numero senza ora non dice quanto e' fresco. */
+    const ora = new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    L.push(`- Prezzo di riferimento del sistema: ${f.prezzo}`
+      + (f.fonte === "live" ? ` (letto dal browser alle ${ora}, ora italiana)`
          : f.barraDel ? ` (barra del ${f.barraDel})` : ""));
   }
   /* il prezzo fuori orario, quando c'e', batte i futures sull'indice: parla di QUESTO titolo. */
