@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "272";
+const BUILD_VERSION = "273";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6216,7 +6216,7 @@ function buildPrompt() {
     const vixFresco = usRegularSessionOpen() && snapshotOggi;
     const vixAsof = (() => { const c = lastUsEquityCloseUTC();
       return c ? `[chiusura del ${String(c.at.getUTCDate()).padStart(2, "0")}/${String(c.at.getUTCMonth() + 1).padStart(2, "0")}]` : "[ultima chiusura]"; })();
-    lines.push(`- VIX: ${vixOk} (${signTxt(m.vix.change_pct)} ${vixFresco ? "oggi — rilevazione odierna" : `nell'ultima seduta ${vixAsof} — mercato CHIUSO: nessuna rilevazione piu' recente dei prezzi`})`);
+    lines.push(`- VIX: ${vixOk} (${signTxt(m.vix.change_pct)} ${vixFresco ? "oggi — rilevazione odierna" : `nell'ultima seduta ${vixAsof} — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario`})`);
   }
   else if (m.vix) lines.push("- VIX: n.d. (valore scartato dal sanity check)");
   if (m.fedwatch) lines.push(`- Fed Funds Rate: range ATTUALE ${m.fedwatch.target_range} · tasso implicito futures ${m.fedwatch.implied_rate}%${m.fedwatch.next_fomc ? ` · PROSSIMA RIUNIONE FOMC: ${new Date(m.fedwatch.next_fomc + "T00:00:00").toLocaleDateString("it-IT")}` : ""} (il tasso resta valido fino alla prossima decisione FOMC)`);
@@ -7959,6 +7959,21 @@ function datiNostriDelTitolo(tk) {
     if (n(o.callWall)) L.push(`- Muro delle CALL: ${o.callWall}${d(o.callWall)} — lo strike con piu' contratti call aperti sulla scadenza ${o.scadenza}`);
     if (n(o.putWall)) L.push(`- Muro delle PUT: ${o.putWall}${d(o.putWall)} — stesso conto sulle put`);
     if (o.ratio != null) L.push(`- Rapporto put/call di ${T} sulla scadenza ${o.scadenza}: ${Math.round(o.ratio * 100) / 100} (put ${o.put}, call ${o.call})`);
+  }
+  /* ⚠ v273 — IL PREZZO FUORI ORARIO VA NEL PACCHETTO, non solo in tabella. Aggiungendolo alla
+     watchlist (v272) e non qui avevo creato una situazione peggiore di prima: il pacchetto
+     continua a dire all'LLM che "prima della campana i futures sono il dato piu' fresco",
+     mentre la pagina ha il prezzo pre-market DI QUEL TITOLO — piu' fresco e piu' specifico di
+     qualunque future sull'indice. Il sistema sapeva una cosa e ne faceva scrivere un'altra. */
+  const q = quoteLive.get(T);
+  if (q && q.ext && Number.isFinite(q.ext.prezzo)) {
+    const base = Number(r && r.price);
+    const d = Number.isFinite(base) && base ? Math.round((q.ext.prezzo / base - 1) * 1000) / 10 : null;
+    const ora = q.ext.quando.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    L.push(`- Prezzo ${q.ext.fase === "pre" ? "PRE-MARKET" : "AFTER-HOURS"} adesso: ${Math.round(q.ext.prezzo * 100) / 100}`
+      + (d != null ? ` (${d > 0 ? "+" : ""}${d}% rispetto alla chiusura)` : "")
+      + ` — rilevato alle ${ora}, ora italiana. E' piu' fresco della chiusura e riguarda QUESTO titolo:`
+      + ` pesalo piu' dei futures sull'indice, che parlano del mercato e non di lui.`);
   }
   if (!L.length) return "";
   return [

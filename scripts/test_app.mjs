@@ -1524,6 +1524,16 @@ check("v272 rigenera: niente passi che annunciano lavori che non si fanno piu'",
       && !/controvalori e P&L/.test(codice);
 })());
 
+/* ⚠ v273 — il prezzo fuori orario deve stare anche NEL PACCHETTO. Metterlo in tabella e non
+   qui creava una situazione peggiore di prima: il pacchetto continuava a dire all'LLM che
+   "prima della campana i futures sono il dato piu' fresco", mentre la pagina aveva il prezzo
+   pre-market di QUEL titolo. Il sistema sapeva una cosa e ne faceva scrivere un'altra. */
+check("v273 pacchetto titolo: il prezzo pre/after entra nel pacchetto, non solo in tabella", (() => {
+  const i = src.indexOf("function datiNostriDelTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  return /quoteLive\.get\(T\)/.test(corpo) && /PRE-MARKET/.test(corpo) && /AFTER-HOURS/.test(corpo);
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
