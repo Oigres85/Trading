@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "274";
+const BUILD_VERSION = "275";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -802,8 +802,7 @@ function renderAll() {
      dopo il fetch del file remoto; chiuso il difetto della lista resuscitata quel giro puo'
      non avvenire, e i trattini restavano — cioe' esattamente "sembra che i dati siano fermi",
      il difetto da cui e' nata questa tabella. Il render non deve dipendere da un caso. */
-  renderWatchlistTV();
-  /* ⚠ v266 — STESSA RAGIONE DELLA WATCHLIST, e l'ho ripetuta scrivendo la funzione nuova: la
+    /* ⚠ v266 — STESSA RAGIONE DELLA WATCHLIST, e l'ho ripetuta scrivendo la funzione nuova: la
      striscia dei livelli si monta col grafico, quando DATA e' ancora null, e senza questa riga
      resta ferma su "non disponibili" anche dopo che i dati sono arrivati. Chi disegna al
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
@@ -7244,6 +7243,7 @@ function montaGraficoTV(tk, intervallo) {
   const prova = document.createElement("div");
   if (!prova || typeof prova.appendChild !== "function") return;
   const et = $("#tv-simbolo"); if (et) et.textContent = sym;
+  try { localStorage.setItem("ultimo_ticker", String(tk).toUpperCase()); } catch { /* privata */ }
   renderOpzioniGrafico(tk);      // v266 — le opzioni seguono il simbolo a grafico
   box.innerHTML = "";
   const cont = document.createElement("div");
@@ -7319,35 +7319,6 @@ $("#tv-tf")?.addEventListener("click", (e) => {
   montaGraficoTV(tvSimboloCorrente || ($("#tk-input")?.value || ""), b.dataset.tvInt);
 });
 
-/* ── la watchlist: sua, salvata, e la segue su ogni device ── */
-const WL_KEY = "watchlist_simboli";
-const WL_PATH = "config/ui_watchlist.json";
-/* ⚠ v266 — IL MARCATORE "SOLO LOCALE". Senza token la lista si salva nel browser ma NON sul
-   repo; al giro dopo caricaWatchlistCloud() rileggeva il file remoto e la sovrascriveva, cioe'
-   RESUSCITAVA i simboli appena cancellati. E' la stessa classe del difetto Put/Call: il comando
-   risultava eseguito e non lo era. Da qui in avanti una lista che non e' arrivata sul repo si
-   marca, e il caricamento dal cloud non la tocca — lo DICE invece di sovrascriverla in
-   silenzio. */
-const WL_LOCALE = WL_KEY + "_solo_locale";
-
-/* ⚠ v266 — LA WATCHLIST NASCE GIA' PIENA. Il CEO ha chiesto di inserirgli direttamente i
-   ticker della sua foto. Il default vive in config/ui_watchlist.json (sul repo, quindi lo
-   segue su ogni device); localStorage lo sovrascrive appena lui la modifica, e da quel momento
-   comanda la sua scelta — un default non deve mai vincere su una scelta gia' espressa, e' la
-   regola di v198 sulla vista compatta. */
-const WL_DEFAULT = ["MU", "AMD", "NVDA", "GOOGL", "PLTR", "ORCL", "WDC", "MRVL", "RGTI", "BE",
-                    "SKHY", "MSTR", "BTC-USD", "^VIX", "NQ=F", "^KS11", "^SOX", "^RUT",
-                    "EURUSD=X", "BTP-V28", "HG=F", "CL=F"];
-
-function leggiWatchlist() {
-  try {
-    const raw = localStorage.getItem(WL_KEY);
-    if (raw == null) return [...WL_DEFAULT];        // mai vista prima: parte dai simboli del CEO
-    const a = JSON.parse(raw);
-    return Array.isArray(a) ? a.filter(x => typeof x === "string" && x.trim()) : [...WL_DEFAULT];
-  } catch { return [...WL_DEFAULT]; }
-}
-
 /* ═══ v266 — LA WATCHLIST DIVENTA UNA TABELLA NOSTRA ═══════════════════════════════════════
    Il CEO: "sembra che i dati siano fermi ... struttura i dati del box come quelli nella foto ...
    con possibilita' di eliminarli o ordinarli cliccando sulle variabili delle colonne".
@@ -7360,23 +7331,7 @@ function leggiWatchlist() {
    Per un simbolo nuovo la riga lo DICE ("non seguito") invece di mostrare una cella vuota che
    sembra un dato fermo — che sarebbe la classe di difetto peggiore, quella che non si rompe.
    Le colonne sono quelle della foto del CEO: Nome, Ultimo, Massimo, Minimo, Var., Var.%, Vol. */
-let wlOrdine = { campo: "nome", verso: 1 };
 
-const WL_COLONNE = [
-  { k: "nome", t: "Nome" },
-  { k: "price", t: "Ultimo", num: true },
-  { k: "high", t: "Massimo", num: true },
-  { k: "low", t: "Minimo", num: true },
-  { k: "chg", t: "Var.", num: true, segno: true },
-  { k: "chg_pct", t: "Var. %", num: true, segno: true, pct: true },
-  { k: "vol", t: "Vol.", num: true, volume: true },
-  /* ⚠ v272 — RICHIESTA DEL CEO: "possiamo mettere i prezzi di after e pre market". La colonna
-     esiste solo quando la fase c'e' davvero: in seduta ordinaria un "prezzo fuori orario" non
-     esiste, e riempirla con l'ultimo prezzo normale sarebbe la solita cella che sembra un dato
-     e non lo e'. Fuori orario la riga porta il prezzo, la variazione rispetto alla chiusura e
-     l'ora — perche' un prezzo di pre-market senza l'ora non dice quanto e' fresco. */
-  { k: "ext", t: "Pre/After", ext: true },
-];
 
 /* i dati di un simbolo, da data.json. Null dove la pipeline non lo segue: dichiarato, non finto. */
 /* ⚠ v268 — `Number(null)` FA ZERO, NON NaN. E' la trappola che ha fatto uscire il BTP con
@@ -7397,25 +7352,6 @@ function numero(v) {
    senza etichetta era il modo per non far capire perche' due celle non tornano fra loro. */
 const quoteLive = new Map();
 
-function datiSimbolo(tk) {
-  /* v274 — vista sui fatti, per la tabella. Non legge piu' niente da sola: se un campo esiste
-     in fattiTitolo compare qui, e se non c'e' manca anche al pacchetto — visibile invece che
-     silenzioso. */
-  const f = fattiTitolo(tk);
-  if (!f) return { tk: String(tk || "").toUpperCase(), nome: String(tk || "").toUpperCase(), seguito: false };
-  if (!f.seguito) return { tk: f.tk, nome: f.nome, seguito: false, ignoto: f.ignoto };
-  const g = f.giorno || {};
-  return {
-    tk: f.tk, nome: f.nome, seguito: true, fonte: f.fonte, price: f.prezzo,
-    high: numero(g.alto), low: numero(g.basso), vol: numero(g.vol),
-    chg: Number.isFinite(g.var) ? g.var
-       : (Number.isFinite(f.prezzo) && Number.isFinite(g.varPct) && g.varPct !== -100
-          ? f.prezzo - f.prezzo / (1 + g.varPct / 100) : NaN),
-    chg_pct: numero(g.varPct),
-    ext: f.ext,
-  };
-}
-
 /* il nome per esteso lo sa la pipeline (o il blocco macro); Yahoo lo darebbe in
    `meta.shortName` ma non su tutti i simboli, e un nome che balla a ogni giro e' peggio di un
    simbolo stabile. Si prende quello che gia' conosciamo, e si ripiega sul ticker. */
@@ -7433,418 +7369,9 @@ function nomeSimbolo(T) {
   return T;
 }
 
-function cellaWl(r, col) {
-  if (col.k === "nome") {
-    /* il simbolo sotto il nome serve a distinguerli; quando coincidono ("^RUT" / "^RUT") era
-       solo un raddoppio da leggere due volte. */
-    const sotto = String(r.nome).toUpperCase() === r.tk ? "" : '<span class="wl-tk">' + esc(r.tk) + '</span>';
-    return '<td class="wl-nome"><button class="wl-link" data-wl="' + esc(r.tk) + '">' + esc(r.nome)
-      + '</button>' + sotto + '</td>';
-  }
-  if (col.ext) {
-    const e = r.ext;
-    if (!e || !Number.isFinite(e.prezzo)) return '<td class="num muted">—</td>';
-    const base = Number.isFinite(r.price) ? r.price : NaN;
-    const d = Number.isFinite(base) && base ? (e.prezzo / base - 1) * 100 : NaN;
-    const cls = Number.isFinite(d) ? (d > 0 ? "pos" : d < 0 ? "neg" : "") : "";
-    const ora = e.quando.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
-    return '<td class="num wl-ext"><b class="' + cls + '">' + fmtNum.format(Math.round(e.prezzo * 100) / 100) + '</b>'
-      + (Number.isFinite(d) ? '<span class="' + cls + '">' + signTxt(Math.round(d * 100) / 100, "%") + '</span>' : "")
-      + '<span class="muted">' + (e.fase === "pre" ? "pre" : "after") + " " + esc(ora) + '</span></td>';
-  }
-  const v = r[col.k];
-  if (!r.seguito || !Number.isFinite(v)) return '<td class="num muted">—</td>';
-  if (col.volume) {
-    const t = v >= 1e9 ? fmtNum.format(Math.round(v / 1e8) / 10) + "Mld"     // il volume di BTC dava "12.185,6M"
-            : v >= 1e6 ? fmtNum.format(Math.round(v / 1e5) / 10) + "M"
-                       : fmtNum.format(Math.round(v / 1000)) + "K";
-    return '<td class="num">' + t + '</td>';
-  }
-  const cls = col.segno ? (v > 0 ? "num pos" : v < 0 ? "num neg" : "num") : "num";
-  const t = col.segno ? signTxt(Math.round(v * 100) / 100, col.pct ? "%" : "")
-                      : fmtNum.format(Math.round(v * 100) / 100);
-  return '<td class="' + cls + '">' + t + '</td>';
-}
 
-/* ═══ v268 — CHI AGGIORNA I VALORI DELLA WATCHLIST, E QUANDO ══════════════════════════════
-   Domanda del CEO: "La mia watchlist come faccio ad aggiornare valori?".
-   Finora la risposta onesta sarebbe stata "non puoi": la tabella leggeva data.json, che cambia
-   solo quando gira il cron. Adesso i prezzi li chiede la pagina, e la nota sotto la tabella
-   dice a che ora l'ha fatto — cosi' la domanda non deve nemmeno nascere.
-   Quando: al caricamento, a ogni giro dei prezzi live (60 secondi) e a comando col bottone.
-   ⚠ IN PARALLELO MA UNA VOLTA SOLA PER GIRO. Ventidue simboli in fila sarebbero ventidue
-   attese in fila; in parallelo sono 152 ms misurati. La cache con la sua scadenza impedisce
-   che due render ravvicinati raddoppino le chiamate al proxy, che e' gratuito e condiviso. */
-let wlUltimoAggiornamento = null;
-let wlInCorso = false;
 
-/* ═══ v268 — LA VISTA TRADINGVIEW DELLA WATCHLIST ═════════════════════════════════════════
-   Il CEO: "non puoi lasciare box tradingview embedded anche per questa sezione?". Si puo', e
-   le due viste non si escludono: fanno cose diverse e nessuna delle due le fa tutte.
-     TABELLA (nostra)  → si ordina, si cancella una riga, i numeri si possono leggere e finire
-                         nel pacchetto per l'LLM; da v268 i prezzi sono dal vivo.
-     TRADINGVIEW       → un iframe di un altro dominio: non si ordina, non si legge, non se ne
-                         possono estrarre i numeri. In cambio porta il mini-grafico e li mostra
-                         come li vede lui su TradingView.
-   ⚠ La scelta e' del CEO e va RICORDATA, altrimenti a ogni ricarica torna quella che ho scelto
-     io — che e' il modo per far sembrare che il sistema ignori i comandi. */
-const WL_VISTA_KEY = "watchlist_vista";
-let wlVista = (() => { try { return localStorage.getItem(WL_VISTA_KEY) === "tv" ? "tv" : "tabella"; } catch { return "tabella"; } })();
 
-/* ═══ v270 — I SIMBOLI CHE IL WIDGET GRATUITO REGGE DAVVERO ════════════════════════════════
-   Il CEO: "utilizza box tradingview embedded ma credo vada ottimizzato, controlla perche' non
-   si vede bene". Non si vedeva niente, ed ecco perche': il widget riceveva i ticker scritti
-   alla Yahoo (^VIX, NQ=F, EURUSD=X, BTC-USD, BTP-V28) e UN SOLO SIMBOLO CHE NON RISOLVE
-   SVUOTA L'INTERO RIQUADRO. Non una riga mancante: tutte. Misurato montando i simboli uno per
-   uno con widget separati.
-   ⚠⚠ LA TRAPPOLA PIU' PERICOLOSA, E PER QUESTO LA MAPPA E' CORTA: su TradingView esistono
-   ticker con lo stesso nome che sono STRUMENTI COMPLETAMENTE DIVERSI, e il widget li mostra
-   con la stessa faccia di un dato buono. Verificato a schermo:
-       RUT  → "RUT CHAIN DATA"                      NON e' il Russell 2000
-       NQ1! → "QLD EVENING PEAK LOAD ELECTRICITY"   elettricita' australiana, NON il future Nasdaq
-       SPX  → "SPACE EXPLORATION TECHNOLOGIES"      SpaceX, NON l'indice S&P 500
-   Mappare "^RUT"→"RUT" o "NQ=F"→"NQ1!" avrebbe messo il prezzo dell'elettricita' australiana
-   in watchlist sotto l'etichetta "future Nasdaq": un numero plausibile, aggiornato, e di
-   un'altra cosa. Qui entra SOLO cio' che ho visto risolvere nello strumento giusto.
-   I titoli americani vanno col ticker NUDO: "SKHY" funziona, "AMEX:SKHY" no; "VIX" funziona,
-   "TVC:VIX" e "CBOE:VIX" no. Il prefisso di borsa peggiora le cose invece di aiutare. */
-const TV_MAPPA = {
-  "^VIX": { tv: "VIX", nota: "indice di volatilita'" },
-  "EURUSD=X": { tv: "EURUSD", nota: "cambio" },
-  "BTC-USD": { tv: "BTCUSD", nota: "bitcoin" },
-  /* ⚠ questi due sono CFD, non i future del CME: il prezzo segue da vicino ma non e' lo
-     stesso contratto. Va detto, non nascosto dentro una riga che sembra il future. */
-  "CL=F": { tv: "USOIL", nota: "CFD sul petrolio WTI, non il future CME" },
-  "HG=F": { tv: "COPPER", nota: "CFD sul rame, non il future COMEX" },
-};
-/* Verificati come NON disponibili nel widget gratuito ("Questo simbolo e' disponibile solo su
-   TradingView"): ^SOX, ^KS11, ^RUT, NQ=F. Piu' BTP-V28, che e' un nostro ticker sintetico.
-   Restano fuori dal widget — e la nota li elenca, invece di lasciarli sparire in silenzio. */
-function simboloWidgetTV(tk) {
-  const T = String(tk || "").trim().toUpperCase();
-  if (!T) return null;
-  if (TV_MAPPA[T]) return TV_MAPPA[T].tv;
-  /* niente decorazioni alla Yahoo: ^ per gli indici, =F per i future, =X per i cambi, e i
-     suffissi di borsa. Se ne resta una, il simbolo non e' di TradingView e non si tira a
-     indovinare: si lascia fuori. */
-  if (/[\^=]/.test(T) || T.includes("-")) return null;
-  if (/\.[A-Z]{1,3}$/.test(T)) return null;      // ASML.AS e simili: nomenclatura diversa
-  return T;
-}
-
-function montaWatchlistTV() {
-  const box = $("#wl-tv");
-  if (!box) return;
-  if (typeof document === "undefined" || typeof document.createElement !== "function") return;
-  const prova = document.createElement("div");
-  if (!prova || typeof prova.appendChild !== "function") return;   // harness senza DOM (v257)
-  const tutti = leggiWatchlist();
-  const simboli = [], fuori = [];
-  tutti.forEach(x => { const t = simboloWidgetTV(x); if (t) simboli.push(t); else fuori.push(x); });
-  if (!simboli.length) { box.innerHTML = '<div class="muted">Nessun simbolo di questa watchlist è mostrabile dal widget di TradingView.</div>'; return; }
-  box.dataset.fuori = fuori.join(" ");
-  box.innerHTML = "";
-  const cont = document.createElement("div");
-  cont.className = "tradingview-widget-container";
-  const inner = document.createElement("div");
-  inner.className = "tradingview-widget-container__widget";
-  cont.appendChild(inner);
-  const sc = document.createElement("script");
-  sc.type = "text/javascript";
-  sc.async = true;
-  sc.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js";
-  /* ⚠ v270 — L'ALTEZZA SI CALCOLA DAL NUMERO DI RIGHE. Era fissa a 460 e il widget NON
-     SCORRE: taglia. Con 16-21 simboli se ne vedevano nove e gli altri sparivano senza un
-     bordo, una barra, niente — "non si vede bene". Misurato a schermo: intestazione ~46px,
-     ogni riga ~45px. Si somma, invece di sperare che ci stiano.
-     ⚠ `isTransparent: false`: su fondo scuro il trasparente rendeva il testo poco leggibile.
-     Le prove che ho fatto per validare i simboli usavano false, e questa e' la stessa
-     configurazione — si spedisce quella verificata, non una variante non provata. */
-  const alt = 46 + simboli.length * 45 + 10;
-  sc.text = JSON.stringify({
-    width: "100%", height: alt, colorTheme: "dark", locale: "it", isTransparent: false,
-    showSymbolLogo: true,
-    symbolsGroups: [{ name: "La mia watchlist", symbols: simboli.map(s => ({ name: s })) }],
-  });
-  /* ⚠ se lo script di TradingView non arriva (rete, blocco, adblock) il riquadro resterebbe
-     vuoto e muto: un box bianco si legge come "rotto", e chi guarda non sa che fare. Si dice
-     cos'e' successo e si indica la strada che funziona sempre, cioe' la nostra tabella. */
-  sc.onerror = () => {
-    box.innerHTML = '<div class="muted">Il widget di TradingView non si è caricato '
-      + '(rete o blocco degli script di terze parti). La vista <b>Tabella</b> funziona lo stesso: '
-      + 'i suoi prezzi non passano da TradingView.</div>';
-  };
-  cont.appendChild(sc);
-  box.appendChild(cont);
-}
-
-function applicaVistaWatchlist() {
-  const tab = $("#wl-tab"), tv = $("#wl-tv");
-  if (tab) tab.hidden = wlVista === "tv";
-  if (tv) tv.hidden = wlVista !== "tv";
-  document.querySelectorAll("[data-wl-vista]").forEach(b => {
-    b.classList.toggle("chip-active", b.dataset.wlVista === wlVista);
-  });
-  const nota = $("#wl-nota");
-  if (wlVista === "tv") {
-    montaWatchlistTV();
-    /* ⚠ v270 — LA NOTA DICE LE TRE COSE MISURATE, perche' il CEO e' passato a questa vista
-       per togliere il ritardo e il ritardo qui c'e' lo stesso. TradingView lo dichiara da
-       sola: accanto a ogni prezzo mette una "D" in apice, che nella sua documentazione vuol
-       dire dato ritardato. Verificato su MU, AMD, NVDA, ORCL, WDC, MSTR, SKHY, QQQ — tutti
-       con la D, e con gli stessi numeri che dava Yahoo. Senza ritardo, misurati: VIX, EURUSD,
-       bitcoin, petrolio e rame. */
-    const fuori = ($("#wl-tv")?.dataset.fuori || "").split(" ").filter(Boolean);
-    if (nota) nota.innerHTML = "Widget di TradingView: prezzi loro, aggiornati da loro. "
-      + "<b>Le azioni americane arrivano comunque in ritardo</b>: TradingView lo segna da sé con una "
-      + "<b>D</b> accanto al prezzo, e i valori coincidono con quelli della vista Tabella. "
-      + "Senza ritardo qui ci sono VIX, cambi, bitcoin, petrolio e rame."
-      + (fuori.length ? ` <b>Fuori dal widget:</b> ${esc(fuori.join(", "))} — il widget gratuito non li mostra `
-          + "(basta un simbolo che non riconosce per lasciare il riquadro vuoto, ed è per questo che prima non si vedeva niente)." : "")
-      + " In questa vista non si può ordinare né togliere una riga, e i numeri non entrano nel "
-      + "pacchetto per l'analisi. Per quelli, torna a <b>Tabella</b>.";
-  } else {
-    renderWatchlistTV();
-  }
-}
-
-async function aggiornaQuoteWatchlist(forza) {
-  if (wlInCorso) return;
-  wlInCorso = true;
-  try {
-    const simboli = leggiWatchlist();
-    if (forza) simboli.forEach(x => cacheQuote.delete(`${String(x).toUpperCase()}|1d`));
-    /* i simboli che livePrices copre gia' sono nella cache con la loro scadenza: quotaLive li
-       ritorna senza uscire in rete. Qui si chiedono davvero solo quelli in piu'. */
-    const esiti = await Promise.all(simboli.map(async (x) => {
-      const T = String(x).toUpperCase();
-      try { return [T, await quotaLive(T, "1d")]; } catch { return [T, null]; }
-    }));
-    let vivi = 0;
-    esiti.forEach(([T, q]) => {
-      if (!q) return;                       // proxy muto: si tiene quello che c'era, non si svuota
-      quoteLive.set(T, q);
-      if (!q.assente) vivi++;
-    });
-    if (vivi) wlUltimoAggiornamento = new Date();
-    renderWatchlistTV();
-  } finally {
-    wlInCorso = false;
-  }
-}
-
-function renderWatchlistTV() {
-  const simboli = leggiWatchlist();
-  const chips = $("#wl-chips");
-  const inp = $("#wl-input");
-  if (inp && !inp.value) inp.value = simboli.join(", ");
-  if (chips) {
-    chips.innerHTML = simboli.length
-      ? simboli.map(x => '<span class="chip wl-chip" data-wl="' + esc(x) + '">' + esc(x) + '</span>').join("")
-      : '<span class="muted">Nessun simbolo: scrivili qui sopra separati da virgola e premi Salva.</span>';
-  }
-  const box = $("#wl-tab");
-  if (!box) return;
-  if (wlVista === "tv") return;          // in vista TradingView la tabella non si ridisegna
-  if (!simboli.length) { box.innerHTML = ""; return; }
-
-  const righe = simboli.map(datiSimbolo);
-  const col = WL_COLONNE.find(x => x.k === wlOrdine.campo) || WL_COLONNE[0];
-  righe.sort((a, b) => {
-    /* ⚠ le righe senza dato vanno SEMPRE in fondo, in tutti e due i versi. Con un
-       -Infinity dentro il confronto, ordinando per "Var. %" decrescente i simboli senza
-       numeri finivano IN CIMA: la prima cosa che si legge sarebbe stata una fila di
-       trattini. Si separano prima, e si ordina solo cio' che ha un valore. */
-    /* i simboli che la pipeline non segue stanno in fondo SEMPRE, anche ordinando per nome:
-       altrimenti "^SOX" apriva la tabella con una riga di trattini. */
-    if (a.seguito !== b.seguito) return a.seguito ? -1 : 1;
-    if (col.ext) {
-      const pa = a.ext && Number.isFinite(a.ext.prezzo) ? a.ext.prezzo : null;
-      const pb = b.ext && Number.isFinite(b.ext.prezzo) ? b.ext.prezzo : null;
-      if (pa == null || pb == null) return pa === pb ? 0 : (pa != null ? -1 : 1);
-      return (pa - pb) * wlOrdine.verso;
-    }
-    const va = Number.isFinite(a[col.k]), vb = Number.isFinite(b[col.k]);
-    if (col.num) {
-      if (!va || !vb) return va === vb ? 0 : (va ? -1 : 1);
-      return (a[col.k] - b[col.k]) * wlOrdine.verso;
-    }
-    return String(a[col.k] || "").localeCompare(String(b[col.k] || "")) * wlOrdine.verso;
-  });
-
-  const th = WL_COLONNE.map(c =>
-    '<th class="' + (c.num ? "num" : "") + (wlOrdine.campo === c.k ? " wl-ord" : "")
-    + '" data-wl-ord="' + c.k + '" role="button" tabindex="0">' + esc(c.t)
-    + (wlOrdine.campo === c.k ? (wlOrdine.verso > 0 ? " ▲" : " ▼") : "") + '</th>').join("");
-  const tr = righe.map(r =>
-    '<tr' + (r.seguito ? "" : ' class="wl-fuori"') + '>'
-    + WL_COLONNE.map(c => cellaWl(r, c)).join("")
-    + '<td class="num"><button class="wl-x" data-wl-del="' + esc(r.tk) + '" title="Togli ' + esc(r.tk) + '">×</button></td></tr>').join("");
-  box.innerHTML = '<div class="wl-scroll"><table class="wl-tabella"><thead><tr>' + th
-    + '<th></th></tr></thead><tbody>' + tr + '</tbody></table></div>';
-
-  const fuori = righe.filter(r => !r.seguito).length;
-  const ignoti = righe.filter(r => r.ignoto).length;
-  const nota = $("#wl-nota");
-  if (nota) {
-    const barra = ultimaBarraDisponibile();
-    /* ⚠ una colonna interamente vuota si legge come "rotto". Se il massimo e il minimo del
-       giorno non ci sono ancora — la pipeline ha cominciato a scriverli in v266 — la nota lo
-       dice: manca il giro, non il dato. */
-    const senzaGiornata = righe.filter(r => r.seguito).every(r => !Number.isFinite(r.high));
-    /* ⚠ v268 — LA NOTA RISPONDE A "DA DOVE PRENDE QUESTI DATI?". La domanda del CEO non era
-       retorica: la tabella mostrava numeri senza dire di chi fossero. Ora la nota lo riassume
-       con l'ora dell'ultima lettura, perche' "aggiornato" senza un orario e' una parola, non
-       un'informazione. E i simboli che nessuna delle due fonti conosce si contano a parte:
-       "non seguito dalla pipeline" non e' piu' la stessa cosa di "non esiste su Yahoo". */
-    const nLive = righe.filter(r => r.fonte === "live").length;
-    const nPipe = righe.filter(r => r.seguito && r.fonte !== "live").length;
-    const ora = wlUltimoAggiornamento
-      ? wlUltimoAggiornamento.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-      : null;
-    /* ⚠ v274 — PUNTO 3: IL RITARDO SI DICHIARA DOVE SI LEGGONO I PREZZI, non in una nota
-       lontana. Misurato confrontando le due viste: Yahoo e TradingView danno lo STESSO numero,
-       e TradingView lo marca "D" (ritardato) di suo. Nessuna delle due lo toglie: sulle azioni
-       americane il tempo reale richiede un feed a pagamento, e questa riga esiste perche' il
-       CEO possa DECIDERE se gli serve, invece di cambiare fonte sperando che cambi qualcosa. */
-    const avvisoRitardo = " <b>Le azioni americane sono ritardate</b> (~15 minuti: è così su ogni "
-      + "fonte gratuita, TradingView compresa). Cambi, indici di volatilità, cripto e materie prime no.";
-    nota.innerHTML = (nLive
-        ? `<b>${nLive} ${nLive === 1 ? "simbolo aggiornato" : "simboli aggiornati"} dal vivo</b> (Yahoo Finance, `
-          /* ⚠ la nota deve dire il ritmo VERO: il giro e' passato a tre minuti quando ho
-             scoperto il 429, e una nota rimasta a "ogni minuto" sarebbe una promessa che il
-             codice non mantiene — il tipo di dettaglio da cui nasce "i dati sembrano fermi". */
-          + `${ora ? "alle " + ora : "lettura in corso"}; si rileggono da soli, o subito col tasto ↻)`
-          + (nPipe ? ` · ${nPipe} dalla pipeline${barra ? ", barra del " + barra : ""}` : "")
-        : "Prezzi dalla pipeline" + (barra ? ", barra del " + barra : ""))
-      + " · clic sull'intestazione per ordinare, sul nome per vederlo nel grafico, sulla × per togliere."
-      + (fuori ? ' <b>' + fuori + (fuori === 1 ? " simbolo senza dati" : " simboli senza dati") + '</b>: '
-         + (ignoti === fuori ? "Yahoo non li conosce con questo nome — controlla come si scrivono."
-                             : "né la pipeline né Yahoo li conoscono con questo nome.") : "")
-      + (senzaGiornata && !nLive ? " Massimo e minimo del giorno arrivano col prossimo giro della pipeline." : "")
-      + avvisoRitardo;
-  }
-}
-
-async function salvaWatchlist() {
-  const inp = $("#wl-input");
-  const nota = $("#wl-nota");
-  const simboli = String(inp?.value || "").split(/[,\s;]+/)
-    .map(x => x.trim().toUpperCase()).filter(Boolean).slice(0, 40);
-  localStorage.setItem(WL_KEY, JSON.stringify(simboli));
-  renderWatchlistTV();
-  /* stessa strada dell'ordine delle sezioni (v225): localStorage da solo e' PER-BROWSER, e il
-     CEO usa Mac e iPhone. Col token va sul repo e lo segue; senza token resta locale E LO DICE,
-     invece di far credere a una sincronizzazione che non c'e'. */
-  const token = localStorage.getItem("gh_token");
-  if (!token) {
-    localStorage.setItem(WL_LOCALE, "1");
-    if (nota) nota.textContent = `${simboli.length} simboli salvati SU QUESTO BROWSER. Senza token GitHub non seguono su iPhone.`;
-    return;
-  }
-  try {
-    const url = `https://api.github.com/repos/${REPO}/contents/${WL_PATH}`;
-    let sha = null;
-    const g = await fetch(url, { headers: ghHeaders(token), cache: "no-store" });
-    if (g.ok) sha = (await g.json()).sha;
-    const r = await fetch(url, { method: "PUT", headers: ghHeaders(token),
-      body: JSON.stringify({ message: "Aggiorna watchlist (da dashboard)",
-        content: btoa(unescape(encodeURIComponent(JSON.stringify(simboli, null, 2) + "\n"))),
-        ...(sha ? { sha } : {}) }) });
-    if (r.ok) localStorage.removeItem(WL_LOCALE); else localStorage.setItem(WL_LOCALE, "1");
-    if (nota) nota.textContent = r.ok
-      ? `${simboli.length} simboli salvati sul repo: li ritrovi su ogni device.`
-      : `Salvati in locale, ma la scrittura sul repo non e' riuscita (${r.status}).`;
-  } catch {
-    localStorage.setItem(WL_LOCALE, "1");
-    if (nota) nota.textContent = "Salvati in locale: la scrittura sul repo non e' riuscita (rete).";
-  }
-}
-
-async function caricaWatchlistCloud() {
-  try {
-    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${WL_PATH}?t=${Date.now()}`, { cache: "no-store" });
-    if (!r.ok) return;
-    const a = JSON.parse(await r.text());
-    if (Array.isArray(a) && a.length) {
-      const locale = leggiWatchlist();
-      if (localStorage.getItem(WL_LOCALE) && JSON.stringify(locale) !== JSON.stringify(a)) {
-        /* ⚠ v270 — in vista TradingView la nota spiega il ritardo e cosa il widget non mostra:
-           sovrascriverla con l'avviso di sincronizzazione toglieva proprio l'informazione per
-           cui il CEO era passato a quella vista. L'avviso si tiene per la vista Tabella. */
-        if (wlVista === "tv") return;
-        const nota = $("#wl-nota");
-        if (nota) nota.innerHTML = `Su questo browser hai <b>${locale.length} simboli</b>, sul repo ce ne sono `
-          + `<b>${a.length}</b>: le tue modifiche non sono arrivate sul repo (manca il token GitHub). `
-          + `Tengo la tua lista, non quella del repo.`;
-        return;
-      }
-      localStorage.setItem(WL_KEY, JSON.stringify(a));
-      localStorage.removeItem(WL_LOCALE);
-      const inp = $("#wl-input"); if (inp) inp.value = a.join(", ");
-      renderWatchlistTV();
-    }
-  } catch { /* offline: resta la copia locale */ }
-}
-
-$("#wl-salva")?.addEventListener("click", salvaWatchlist);
-/* v268 — lo scambio fra le due viste, e il bottone che rilegge i prezzi subito. */
-document.querySelectorAll("[data-wl-vista]").forEach(b => b.addEventListener("click", () => {
-  wlVista = b.dataset.wlVista === "tv" ? "tv" : "tabella";
-  try { localStorage.setItem(WL_VISTA_KEY, wlVista); } catch { /* modalita' privata */ }
-  applicaVistaWatchlist();
-}));
-$("#wl-aggiorna")?.addEventListener("click", async (e) => {
-  const b = e.currentTarget;
-  const testo = b.textContent;
-  b.disabled = true; b.textContent = "⏳ Leggo…";
-  try {
-    if (wlVista === "tv") { montaWatchlistTV(); }
-    else { await aggiornaQuoteWatchlist(true); }   // forza: salta la cache
-  } finally { b.disabled = false; b.textContent = testo; }
-});
-$("#wl-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") salvaWatchlist(); });
-/* ⚠ v266 — UN SOLO HANDLER PER TUTTA LA SEZIONE, delegato. La tabella si ridisegna a ogni
-   ordinamento e a ogni cancellazione: agganciare gli eventi ai bottoni significherebbe
-   riagganciarli ogni volta, e un giro dimenticato lascia la tabella inerte — il difetto v213
-   che in questo progetto ha gia' ucciso il wiring due volte. Delegando sulla sezione, i bottoni
-   nuovi funzionano da soli. */
-function agganciaWatchlist(root) {
-  root?.addEventListener("click", (e) => {
-    const del = e.target.closest("[data-wl-del]");
-    if (del) {
-      const tk = del.dataset.wlDel;
-      const restanti = leggiWatchlist().filter(x => x !== tk);
-      localStorage.setItem(WL_KEY, JSON.stringify(restanti));
-      const inp = $("#wl-input"); if (inp) inp.value = restanti.join(", ");
-      renderWatchlistTV();
-      salvaWatchlist();          // rimanda anche sul repo, cosi' la rimozione segue sui device
-      return;
-    }
-    const ord = e.target.closest("[data-wl-ord]");
-    if (ord) {
-      const campo = ord.dataset.wlOrd;
-      /* stesso campo → inverte il verso; campo nuovo → parte crescente sui nomi e DECRESCENTE
-         sui numeri, che e' quello che ci si aspetta cliccando "Var. %" (prima i migliori). */
-      if (wlOrdine.campo === campo) wlOrdine.verso = -wlOrdine.verso;
-      else wlOrdine = { campo, verso: campo === "nome" ? 1 : -1 };
-      renderWatchlistTV();
-      return;
-    }
-    const vai = e.target.closest("[data-wl]");
-    if (vai) {
-      const inp = $("#tk-input"); if (inp) inp.value = vai.dataset.wl;
-      montaGraficoTV(vai.dataset.wl);
-      document.querySelector('[data-sez="grafico"]')?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  });
-  root?.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    const ord = e.target.closest("[data-wl-ord]");
-    if (ord) { e.preventDefault(); ord.click(); }
-  });
-}
-agganciaWatchlist(document.querySelector('[data-sez="watchlist-tv"]'));
 
 function buildPromptTicker(tkGrezzo) {
   /* ═══ v257 — RISCRITTO DOPO UN FALLIMENTO REALE ═══════════════════════════════════════════
@@ -8510,9 +8037,10 @@ loadPromptHeaderCloud();   // testata del pacchetto macro (config/prompt_header_
 /* v257 — la watchlist e il grafico all'avvio: prima la copia locale (subito, senza rete), poi
    quella del repo quando arriva. Stessa logica dell'ordine delle sezioni: l'attesa della rete
    non deve lasciare la pagina vuota. */
-renderWatchlistTV();
-montaGraficoTV((leggiWatchlist()[0]) || "SPY");
-caricaWatchlistCloud();
+/* ⚠ v275 — IL SIMBOLO INIZIALE NON VIENE PIU' DALLA WATCHLIST, che non c'e' piu'. Si tiene
+   l'ULTIMO che il CEO ha analizzato: e' quello a cui stava lavorando, ed e' l'unica scelta che
+   non sia arbitraria. Al primo accesso SPY — il mercato, non un titolo scelto da me. */
+montaGraficoTV(localStorage.getItem("ultimo_ticker") || "SPY");
 loadOverridesCloud();   // sincronizza gli override macro manuali (se presenti)
 montaComandiSezioni();   // maniglia ⠿ + frecce ▲▼ su ogni sezione
 applicaOrdineSezioni();  // ordine gia' noto a questo browser: subito, senza aspettare la rete
@@ -8526,14 +8054,11 @@ setInterval(() => livePrices(), 60 * 1000);
 /* v268 — la watchlist si aggiorna da sola sullo stesso ritmo: e' la risposta alla domanda
    "come faccio ad aggiornare valori?". Il primo giro parte subito, senza aspettare i 60
    secondi, altrimenti la prima cosa che si vede e' ancora il dato della pipeline. */
-applicaVistaWatchlist();     // la vista che ha scelto lui, non quella che ho scelto io
-aggiornaQuoteWatchlist();
 /* ⚠ TRE MINUTI, non uno. I proxy sono gratuiti e condivisi: 21 simboli ogni minuto sono 1260
    richieste all'ora e portano dritti al 429 (misurato). I prezzi di livePrices continuano a
    girare ogni minuto e riempiono la stessa cache, quindi la tabella resta fresca lo stesso —
    questo giro serve solo ai simboli che la pipeline non segue. E c'e' il tasto Aggiorna per
    quando lui vuole il numero adesso. */
-setInterval(() => aggiornaQuoteWatchlist(), 3 * 60 * 1000);
 
 /* v188 — comandi delle personalizzazioni */
 $("#macro-details")?.addEventListener("click", () => openMacroDetails());

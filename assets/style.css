@@ -1864,8 +1864,6 @@ svg.g-serie { cursor: crosshair; }
 .tv-chips { display: flex; gap: 6px; margin-left: auto; }
 #tv-simbolo { font-family: ui-monospace, Menlo, monospace; font-size: 13px; letter-spacing: .04em; }
 #tv-nota { margin-top: 8px; font-size: 12px; }
-.wl-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
-.wl-chip { font-family: ui-monospace, Menlo, monospace; cursor: pointer; }
 #wl-input { flex: 1 1 260px; min-width: 0; }
 #wl-nota { margin-top: 8px; font-size: 12.5px; }
 /* ⚠ v259 — LA ROTAZIONE ERA ANCORA TROPPO ALTA, e la prima correzione non aveva morso.
@@ -1915,29 +1913,6 @@ svg.g-serie { cursor: crosshair; }
   border-left: 2px solid var(--border); margin-top: 4px; }
 .tv-piu > summary { font-size: 12.5px; padding: 6px 0; }
 
-/* v266 — la watchlist come tabella: densa come quella del broker, ordinabile, con la × per
-   togliere. Numeri a destra e tabulari, così le cifre si incolonnano e il confronto è a occhio. */
-.wl-tab { margin-top: 10px; }
-.wl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.wl-tabella { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-.wl-tabella th { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border);
-  color: var(--muted); font-weight: 600; white-space: nowrap; cursor: pointer; user-select: none; }
-.wl-tabella th:hover { color: var(--text); }
-.wl-tabella th.wl-ord { color: var(--text); }
-.wl-tabella td { padding: 6px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-.wl-tabella tr:hover td { background: var(--card-2); }
-.wl-tabella .num { text-align: right; font-variant-numeric: tabular-nums; }
-.wl-tabella th.num { text-align: right; }
-.wl-tabella .pos { color: var(--green); } .wl-tabella .neg { color: var(--red); }
-.wl-link { background: none; border: 0; color: var(--blue); cursor: pointer; padding: 0;
-  font-size: 12.5px; font-weight: 600; }
-.wl-link:hover { text-decoration: underline; }
-.wl-tk { color: var(--muted); font-size: 11px; margin-left: 6px;
-  font-family: ui-monospace, Menlo, monospace; }
-.wl-fuori td { opacity: .62; }
-.wl-x { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 15px;
-  line-height: 1; padding: 0 4px; }
-.wl-x:hover { color: var(--red); }
 
 /* ═══ v266 — LIVELLI E OPZIONI SOTTO IL GRAFICO ═══════════════════════════════════════════
    Richieste del CEO: "aggiungere lo stato delle put e calls sul grafico" e "aggiungere anche
@@ -1992,23 +1967,12 @@ svg.g-serie { cursor: crosshair; }
   .tvo-tab td:last-child { min-width: 160px; }
 }
 
-/* v268 — due viste per la watchlist (tabella nostra / widget TradingView) e il tasto che
-   rilegge i prezzi. Il CEO: "non puoi lasciare box tradingview embedded anche per questa
-   sezione?" — si puo', ma nessuna delle due viste fa quello che fa l'altra, quindi si sceglie. */
-.wl-viste { display: flex; align-items: center; gap: 6px; margin: 8px 0 6px; flex-wrap: wrap; }
-.wl-viste .btn { margin-left: auto; }
 /* il widget si dimensiona da se' sull'altezza calcolata: qui non si vincola, o si torna a
    tagliare le righe. */
-.wl-tv { margin-top: 6px; min-height: 60px; }
-.wl-tv .tradingview-widget-container, .wl-tv iframe { width: 100% !important; }
-@media (max-width: 560px) { .wl-viste .btn { margin-left: 0; } }
 
 /* v272 — pre/after market: prezzo, scarto dalla chiusura e ORA, incolonnati. Senza l'ora un
    prezzo di pre-market non dice quanto e' fresco, e a mercato chiuso e' l'unica cosa che
    distingue un dato di stamattina da uno di tre giorni fa. */
-.wl-ext { line-height: 1.25; }
-.wl-ext b { display: block; font-weight: 600; }
-.wl-ext span { display: block; font-size: 10.5px; }
 
 /* v274 — un indicatore che sta al posto di un altro lo dichiara dove si legge, non solo nella
    nota lunga: il Philly Fed sta al posto dell'ISM ma copre un distretto, non il paese. */

@@ -650,11 +650,14 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
        stata indebolita — l'invariante che conta e' che l'AZIONE esista, e #btn-cio la porta. */
     'id="tk-input"', 'id="tk-esito"',                           // analisi spot del titolo
     'id="tv-chart"', 'id="tv-tf"', 'id="tv-nota"',              // v257 grafico TradingView
-    /* v266 — 'id="wl-tv"' (il widget quotazioni di TradingView) e' stato sostituito da
-       'id="wl-tab"', la tabella nostra: il widget e' un iframe che non si puo' ordinare ne'
-       modificare, e il CEO ha chiesto proprio quelle due cose. L'invariante non e' indebolito,
-       segue la cosa: la watchlist deve avere un posto dove mostrarsi. */
-    'id="wl-input"', 'id="wl-salva"', 'id="wl-chips"', 'id="wl-tab"',   // v266 watchlist propria
+    /* ⚠ v275 — LA WATCHLIST NON E' PIU' PORTANTE PERCHE' NON C'E' PIU'. Richiesta del CEO:
+       "elimina La mia watchlist che vedro' con i tempi aggiornati dal mio broker" — conseguenza
+       coerente di cio' che avevamo misurato: ogni fonte gratuita ritarda di ~15 minuti sulle
+       azioni americane, il suo broker no.
+       ⚠ NON e' una guardia indebolita per far passare il codice: e' una guardia il cui SOGGETTO
+       e' stato rimosso su decisione del CEO. La differenza si vede da cosa e' successo agli
+       invarianti che valevano ancora — assenza-non-zero, blocco macro, ritardo dichiarato: non
+       sono spariti, sono stati SPOSTATI su fattiTitolo e sul pacchetto. */
     'id="mg-rot"', 'id="mg-stress"', 'id="mg-leva"', 'id="mg-tutti"',   // macro in grafici
     /* v262 — 'id="corr-macro"' non e' piu' un elemento portante: il CEO ha chiesto di togliere
        quella sezione dalla pagina. L'invariante NON e' stato indebolito, e' stato SPOSTATO dove
@@ -700,15 +703,7 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
     !leggeCredenziali && !campoPassword && !nelConfig);
 
   const htmlTV = readFileSync(join(ROOT, "index.html"), "utf8");
-  check("v257 la watchlist e' dichiarata per quello che e': simboli scelti dal CEO, non quella di Investing",
-    /simboli tuoi, salvati/.test(htmlTV));
-}
-
-/* ── v257 — la watchlist segue il CEO su ogni device, o lo dice ── */
-check("v257 watchlist: senza token il salvataggio e' locale E LO DICHIARA", (() => {
-  const appW = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
-  return /SU QUESTO BROWSER/.test(appW) && /config\/ui_watchlist\.json/.test(appW);
-})());
+  }
 
 /* ── v258 — i componenti di Fear & Greed hanno una scheda propria, senza duplicare ── */
 /* ⚠ v265 — INVARIANTE ROVESCIATO. In v258 avevo promosso i sette componenti di Fear & Greed a
@@ -1065,51 +1060,9 @@ check("v256 analisi titolo: una sola testata nel pacchetto (quella spot), non du
 /* ── v266 — la watchlist e' una TABELLA NOSTRA, ordinabile e cancellabile ──────────────────
    Il CEO: "sembra che i dati siano fermi ... con possibilita' di eliminarli o ordinarli
    cliccando sulle variabili delle colonne". Queste tre proprieta' sono il suo requisito. */
-check("v266 watchlist: colonne della sua foto, e ognuna ordinabile", (() => {
-  const c = ["Nome", "Ultimo", "Massimo", "Minimo", "Var.", "Var. %", "Vol."];
-  return c.every(x => src.includes(`t: "${x}"`)) && /data-wl-ord=/.test(src);
-})());
-
-check("v266 watchlist: ogni riga si puo' togliere", /data-wl-del=/.test(src) && /wlDel/.test(src));
-
-check("v266 watchlist: un simbolo non seguito lo DICHIARA, non lascia la cella muta", suVeri(`
-  const r = datiSimbolo("ZZZZ-INESISTENTE");
-  return r.seguito === false`));
-
-/* ⚠ i cinque simboli della foto che non stanno negli array dei titoli (VIX, future Nasdaq,
-   EUR/USD) hanno i loro numeri dentro macro: dichiararli "non seguiti" sarebbe stato vero
-   della struttura e falso del contenuto. */
-check("v266 watchlist: VIX e future Nasdaq letti da macro, non dati per persi", suVeri(`
-  const v = datiSimbolo("^VIX"), n = datiSimbolo("NQ=F");
-  return v.seguito && Number.isFinite(v.price) && n.seguito && Number.isFinite(n.price)`));
-
-/* ⚠ v266 — IL DIFETTO CHE RESUSCITAVA I SIMBOLI CANCELLATI. Senza token la cancellazione
-   restava locale, e al reload il file del repo la sovrascriveva: il comando risultava
-   eseguito e non lo era (la classe Put/Call). Il marcatore deve esistere, va alzato quando
-   il salvataggio NON arriva sul repo, e il caricamento dal cloud deve rispettarlo. */
-check("v266 watchlist: una lista non sincronizzata non viene sovrascritta dal repo", (() => {
-  const i = src.indexOf("async function caricaWatchlistCloud");
-  const corpo = src.slice(i, i + 1200);
-  return /WL_LOCALE/.test(corpo) && /return;/.test(corpo)
-      && /localStorage\.setItem\(WL_LOCALE/.test(src)
-      && /localStorage\.removeItem\(WL_LOCALE\)/.test(src);
-})());
-
 /* ⚠ v266 — "Massimo"/"Minimo" sono le colonne del broker: il massimo DI OGGI. Il ripiego sul
    massimo a 52 settimane metteva un numero vero sotto un'intestazione che ne promette un altro.
    Il ripiego non deve tornare, ne' qui ne' nella pipeline che i due campi li deve scrivere. */
-check("v266 watchlist: Massimo/Minimo sono del giorno, senza ripiego sul dato a 52 settimane", (() => {
-  /* ⚠ la finestra si prende fino alla fine VERA della funzione (la prossima dichiarazione a
-     livello zero): con un tetto a caratteri fissi il check leggeva codice di altri e falliva
-     su un `w52_high` che non era suo — un gate che misura il posto sbagliato. */
-  const i = src.indexOf("function fattiTitolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction livelliTitolo", i));
-  /* il massimo del giorno viene dalla barra del giorno (vivo.dayHigh) o dal campo giornaliero
-     della pipeline (riga.day_high): mai dal massimo a 52 settimane, che e' un'altra grandezza. */
-  return /vivo\.dayHigh/.test(corpo) && /riga\.day_high/.test(corpo)
-      && !/alto: numero\(riga\.w52_high\)/.test(corpo);
-})());
-
 check("v266 pipeline: scrive massimo e minimo del giorno", (() => {
   const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
   return /"day_high": round/.test(py) && /"day_low": round/.test(py);
@@ -1119,22 +1072,6 @@ check("v266 pipeline: scrive massimo e minimo del giorno", (() => {
    quando DATA e' ancora null e mostra trattini; se nessuno la ridisegna all'arrivo dei dati,
    i trattini restano. Finora la salvava per caso il caricamento della lista dal repo. Il
    render deve stare nella catena di renderAll, non dipendere da un giro accidentale. */
-check("v266 watchlist: ridisegnata quando arrivano i dati, non solo al montaggio", (() => {
-  const i = src.indexOf("function renderAll()");
-  const fine = src.indexOf("\nfunction ", i + 1);
-  return /renderWatchlistTV\(\)/.test(src.slice(i, fine));
-})());
-
-check("v266 watchlist: i simboli senza dato restano in fondo in tutti e due i versi", (() => {
-  const i = src.indexOf("function renderWatchlistTV");
-  const fine = src.indexOf("\nfunction ", i + 1);
-  /* ⚠ SENZA COMMENTI. Un check che cerca una parola nel sorgente trova anche la frase che
-     spiega perche' quella parola non c'e' piu': e' successo sei volte in questo progetto.
-     Si misura il CODICE. */
-  const corpo = src.slice(i, fine).replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
-  return /Number\.isFinite\(a\[col\.k\]\)/.test(corpo) && !/-Infinity/.test(corpo);
-})());
-
 /* ⚠ v266 — LA LEGENDA DEL GRAFICO SPIEGA GLI INDICATORI, NON I BOTTONI DI TRADINGVIEW. Il
    CEO: "elimina info barra laterale (sinistra, alto e destra) mentre spiega meglio gli altri
    indicatori presenti perche' cosi non li capisco". Le voci sul cromo dell'interfaccia
@@ -1276,59 +1213,11 @@ check("v268 quotazioni: la variazione usa la PENULTIMA barra, non chartPreviousC
 check("v268 tabella: un campo assente resta assente, non diventa zero", run(`
   return Number.isNaN(numero(null)) && Number.isNaN(numero(undefined))
       && Number.isNaN(numero("")) && numero("12.5") === 12.5 && numero(0) === 0`));
-
-check("v268 tabella: una riga con soli null non mostra zeri", run(`
-  const saved = DATA.watchlist;
-  DATA.watchlist = [{ ticker: "ZZTEST", name: "Prova", price: 100, day_high: null,
-                      day_low: null, change_pct: null, volume: null }];
-  const d = datiSimbolo("ZZTEST");
-  DATA.watchlist = saved;
-  return d.price === 100 && Number.isNaN(d.high) && Number.isNaN(d.low) && Number.isNaN(d.chg_pct)`));
-
-/* ⚠ un volume 0 su un indice vuol dire "non ne ha", e "0K" in tabella sembra un mercato fermo. */
-check("v268 quotazioni: volume zero e' un'assenza, non un valore", (() => {
-  const i = src.indexOf("async function quotaLive");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
-  return /v0 > 0 \? v0 : NaN/.test(corpo);
-})());
-
 /* ⚠ chiavi duplicate nello stesso oggetto: la seconda vince in silenzio. In questo progetto
    e' gia' costato due giri (breadth v262, froth v265) e stava per costarne un terzo con
    `fonte` scritta due volte in datiSimbolo. */
-check("v268 datiSimbolo: nessuna chiave scritta due volte nello stesso oggetto", (() => {
-  const i = src.indexOf("function datiSimbolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
-  const oggetti = corpo.match(/\{[^{}]*\}/g) || [];
-  return !oggetti.some(o => {
-    const k = (o.match(/(^|[{,\s])([a-zA-Z_$][\w$]*)\s*:/g) || [])
-      .map(x => x.replace(/[{,\s:]/g, ""));
-    return new Set(k).size !== k.length;
-  });
-})());
-
-/* ── v268 — la watchlist dice da dove vengono i suoi numeri e quando li ha letti ── */
-check("v268 watchlist: ogni riga porta la sua fonte (live o pipeline)", (() => {
-  const i = src.indexOf("function fattiTitolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction livelliTitolo", i));
-  return /fonte: vivo \? "live"/.test(corpo) && /"pipeline"/.test(corpo);
-})());
-
-check("v268 watchlist: la nota dice l'ORA dell'ultima lettura, non solo 'aggiornato'", (() => {
-  const i = src.indexOf("function renderWatchlistTV");
-  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1) > 0
-    ? Math.min(src.indexOf("\nasync function", i + 1), src.indexOf("\nfunction ", i + 1))
-    : src.indexOf("\nfunction ", i + 1));
-  return /wlUltimoAggiornamento/.test(corpo) && /toLocaleTimeString/.test(corpo);
-})());
-
 /* ⚠ "Yahoo non conosce questo simbolo" e "la pipeline non lo segue" sono due cose diverse:
    BTP-V28 e' un ticker sintetico nostro e il Not Found e' la risposta CORRETTA. */
-check("v268 watchlist: simbolo ignoto a Yahoo distinto da simbolo non seguito", (() => {
-  const i = src.indexOf("function fattiTitolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction livelliTitolo", i));
-  return /ignoto: !!\(giorno && giorno\.assente/.test(corpo);
-})());
-
 /* ── v268 — i livelli non dipendono piu' da cosa segue la pipeline ── */
 check("v268 livelli: supporto e resistenza si calcolano dalle barre lette dal browser", (() => {
   const i = src.indexOf("function fattiTitolo");
@@ -1342,21 +1231,8 @@ check("v268 livelli: con meno di 20 sedute NON si inventa un supporto a 20 sedut
   return /hi\.length >= 20 \? Math\.min/.test(corpo) && /hi\.length >= 200 \? Math\.max/.test(corpo);
 })());
 
-/* ── v268 — le due viste della watchlist (richiesta esplicita del CEO) ── */
-check("v268 watchlist: esistono due viste e la scelta del CEO viene ricordata", (() => {
-  const html = readFileSync(join(ROOT, "index.html"), "utf8");
-  return /data-wl-vista="tabella"/.test(html) && /data-wl-vista="tv"/.test(html)
-      && /WL_VISTA_KEY/.test(src) && /localStorage\.setItem\(WL_VISTA_KEY/.test(src);
-})());
-
 /* ⚠ nella vista TradingView i numeri non sono nostri: non si puo' ordinare, non si puo'
    cancellare, non si possono usare. La nota deve DIRLO invece di lasciar credere il contrario. */
-check("v268 watchlist: la vista TradingView dichiara cosa NON si puo' fare", (() => {
-  const i = src.indexOf("function applicaVistaWatchlist");
-  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1));
-  return /non si può ordinare/.test(corpo) && /non entrano nel/.test(corpo);
-})());
-
 /* ⚠ v268 — I PROXY GRATUITI RISPONDONO 429. Misurato durante lo sviluppo: 21 simboli al
    minuto per la watchlist PIU' quelli di livePrices sugli stessi simboli hanno esaurito la
    quota di corsproxy.io. Due giri separati per lo stesso dato erano anche due verita'
@@ -1390,49 +1266,9 @@ check("v268 rete: livePrices e la watchlist condividono UNA cache, non due giri"
        SPX  → "SPACE EXPLORATION TECHNOLOGIES"     SpaceX, NON l'indice S&P 500
    Se un domani qualcuno "completa" la mappa con queste tre, il CEO si ritrova il prezzo
    dell'elettricita' australiana in watchlist sotto l'etichetta "future Nasdaq". */
-check("v270 widget: la mappa NON contiene i ticker che risolvono in un altro strumento", (() => {
-  const i = src.indexOf("const TV_MAPPA");
-  const mappa = src.slice(i, src.indexOf("};", i));
-  return !/tv:\s*"(RUT|NQ1!|SPX|NDX)"/.test(mappa);
-})());
-
-check("v270 widget: i simboli scritti alla Yahoo restano fuori invece di svuotare il riquadro", run(`
-  return simboloWidgetTV("^RUT") === null && simboloWidgetTV("NQ=F") === null
-      && simboloWidgetTV("^SOX") === null && simboloWidgetTV("BTP-V28") === null
-      && simboloWidgetTV("ASML.AS") === null`));
-
-check("v270 widget: le mappature verificate ci sono e sono quelle giuste", run(`
-  return simboloWidgetTV("^VIX") === "VIX" && simboloWidgetTV("EURUSD=X") === "EURUSD"
-      && simboloWidgetTV("BTC-USD") === "BTCUSD" && simboloWidgetTV("CL=F") === "USOIL"
-      && simboloWidgetTV("HG=F") === "COPPER"`));
-
-/* ⚠ i titoli americani vanno col ticker NUDO: "SKHY" risolve, "AMEX:SKHY" no; "VIX" risolve,
-   "TVC:VIX" e "CBOE:VIX" no. Il prefisso di borsa peggiora le cose. */
-check("v270 widget: i titoli americani passano col ticker nudo, senza prefisso di borsa", run(`
-  return simboloWidgetTV("MU") === "MU" && simboloWidgetTV("SKHY") === "SKHY"`));
-
-check("v270 widget: l'altezza si calcola dalle righe, il widget non scorre", (() => {
-  const i = src.indexOf("function montaWatchlistTV");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1))
-    .replace(/\/\*[\s\S]*?\*\//g, "");
-  return /simboli\.length \* 45/.test(corpo) && !/height: 460/.test(corpo);
-})());
-
 /* ⚠ il CEO e' passato a questa vista PER TOGLIERE IL RITARDO, e il ritardo qui c'e' lo stesso:
    TradingView lo dichiara con una "D" accanto a ogni prezzo. Se la nota non lo dice, la vista
    mente per omissione proprio sul punto per cui e' stata scelta. */
-check("v270 widget: la nota dichiara che le azioni americane sono comunque in ritardo", (() => {
-  const i = src.indexOf("function applicaVistaWatchlist");
-  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1));
-  return /in ritardo/.test(corpo) && /<b>D<\/b>/.test(corpo);
-})());
-
-check("v270 widget: i simboli che il widget non mostra vengono elencati, non spariscono", (() => {
-  const i = src.indexOf("function applicaVistaWatchlist");
-  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1));
-  return /Fuori dal widget/.test(corpo);
-})());
-
 /* ══ v271 — DIFETTI TROVATI RILEGGENDO IL PACCHETTO DI UN TITOLO ═════════════════════════
    Il CEO: "controlla infine su te stesso prompt analisi ai che ora si genera sulla base un
    ticker a tua scelta". Letto quello di NVDA riga per riga, come lo leggerebbe un analista. */
@@ -1496,24 +1332,8 @@ check("v272 livelli: non si calcolano su barre intraday", (() => {
   const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
   return /!intraday && hi\.length >= 20/.test(corpo) && /!intraday && hi\.length >= 200/.test(corpo);
 })());
-
-check("v272 watchlist: la colonna pre/after esiste e porta l'ora", (() => {
-  const i = src.indexOf("const WL_COLONNE");
-  const blocco = src.slice(i, src.indexOf("];", i));
-  const j = src.indexOf("function cellaWl");
-  const cella = src.slice(j, src.indexOf("\nfunction ", j + 1));
-  return /t: "Pre\/After"/.test(blocco) && /toLocaleTimeString/.test(cella);
-})());
-
 /* ⚠ in seduta ordinaria un "prezzo fuori orario" NON esiste: riempire la cella con l'ultimo
    prezzo normale sarebbe la solita cella che sembra un dato e non lo e'. */
-check("v272 watchlist: in seduta ordinaria la colonna pre/after resta vuota", (() => {
-  const i = src.indexOf("function fuoriOrario");
-  const corpo = src.slice(i, src.indexOf("\nasync function", i + 1) > 0
-    ? src.indexOf("\nasync function", i + 1) : i + 2000);
-  return /fase === "regolare"\) return null/.test(corpo);
-})());
-
 /* ── v272 — le schede macro che non avevano un grafico (richiesta esplicita) ── */
 check("v272 macro: le schede senza grafico hanno preso una forma", (() => {
   const i = src.indexOf("const FORMA_INDICATORE");
@@ -1549,14 +1369,16 @@ check("v273 pacchetto titolo: il prezzo pre/after entra nel pacchetto, non solo 
    ⚠ QUESTO CHECK E' LA RAGIONE PER CUI IL DIFETTO NON TORNA: se un consumatore ricomincia a
    leggersi i dati da solo, qui si accende. Non misura uno stile: misura che esista UN posto
    dove la domanda "cosa sappiamo di questo titolo?" ha una risposta sola. */
-check("v274 fatti: la tabella, la scheda livelli e il pacchetto leggono tutti da fattiTitolo", (() => {
+check("v274 fatti: la scheda livelli e il pacchetto leggono tutti da fattiTitolo", (() => {
   const puro = (nome, finoA) => {
     const i = src.indexOf("function " + nome);
     if (i < 0) return "";
     const j = finoA ? src.indexOf(finoA, i) : src.indexOf("\nfunction ", i + 10);
     return src.slice(i, j > 0 ? j : i + 4000).replace(/\/\*[\s\S]*?\*\//g, "");
   };
-  const consumatori = ["datiSimbolo", "livelliTitolo", "datiNostriDelTitolo"];
+  /* v275 — datiSimbolo e' uscito con la watchlist; i consumatori sono due, e la regola non
+     cambia: nessuno si rifa' i conti da solo sulle fonti grezze. */
+  const consumatori = ["livelliTitolo", "datiNostriDelTitolo"];
   return consumatori.every(n => {
     const c = puro(n);
     /* deve chiamare fattiTitolo e NON rifarsi i conti da solo su DATA */
@@ -1587,12 +1409,54 @@ check("v274 macro: il Philly Fed si dichiara proxy in classifica e nel pacchetto
    TradingView danno lo stesso numero e TradingView lo marca "D" di suo. Nessuna delle due lo
    toglie — sulle azioni USA il tempo reale costa — e questa riga esiste perche' il CEO possa
    DECIDERE, invece di cambiare fonte sperando che cambi qualcosa. */
-check("v274 prezzi: il ritardo e' dichiarato in tabella e nel pacchetto", (() => {
-  const i = src.indexOf("function renderWatchlistTV");
-  const tab = src.slice(i, src.indexOf("\nasync function", i + 1));
+/* v275 — la tabella e' uscita; il pacchetto resta il posto dove quel ritardo va dichiarato,
+   perche' e' li' che i prezzi vengono letti da qualcuno che poi ci ragiona sopra. */
+check("v275 prezzi: il ritardo e' dichiarato nel pacchetto per l'analisi", (() => {
   const j = src.indexOf("function datiNostriDelTitolo");
   const pac = src.slice(j, src.indexOf("\nfunction ", j + 10));
-  return /azioni americane sono ritardate/.test(tab) && /ritardati di circa 15 minuti/.test(pac);
+  return /ritardati di circa 15 minuti/.test(pac);
+})());
+
+/* ══ v275 — LA WATCHLIST E' USCITA, MA NON LE SUE LEZIONI ═══════════════════════════════
+   Il CEO: "elimina La mia watchlist che vedro' con i tempi aggiornati dal mio broker".
+   Venti check sono usciti col loro soggetto. Questi tre NO, perche' la proprieta' che
+   proteggono vale ancora — vive solo in un altro posto, fattiTitolo. Cancellarli insieme al
+   resto avrebbe buttato via difese pagate con difetti veri. */
+
+check("v275 fatti: un simbolo che nessuno conosce lo DICHIARA invece di fingere un dato", suVeri(`
+  const f = fattiTitolo("ZZZZ-INESISTENTE");
+  return f.seguito === false && !Number.isFinite(f.prezzo)`));
+
+/* ⚠ il blocco macro e' una terza stanza: VIX, future Nasdaq ed EUR/USD non stanno negli array
+   dei titoli ma i loro numeri sono in `macro`. Dichiararli "non seguiti" sarebbe vero della
+   struttura e falso del contenuto — e consolidando in fattiTitolo me l'ero gia' perso una
+   volta, in v274: e' stato un check a riprenderlo. */
+/* ⚠ `suVeri` e non `run`: questo check ha bisogno del blocco macro REALE, e con i dati stub
+   fallirebbe misurando i dati di prova invece del codice — errore gia' fatto in v271. */
+check("v275 fatti: VIX e future Nasdaq letti da macro, non dati per persi", suVeri(`
+  const v = fattiTitolo("^VIX"), n = fattiTitolo("NQ=F");
+  return v.seguito && Number.isFinite(v.prezzo) && n.seguito && Number.isFinite(n.prezzo)`));
+
+/* ⚠ `Number(null)` fa ZERO, non NaN: il BTP usciva con "Massimo 0 · Minimo 0 · 0%". Uno zero
+   come prezzo e' un valore che non puo' esistere. La tabella non c'e' piu', la trappola si'. */
+check("v275 fatti: un campo assente resta assente, non diventa zero", run(`
+  const saved = DATA.watchlist;
+  DATA.watchlist = [{ ticker: "ZZTEST", name: "Prova", price: 100, day_high: null,
+                      day_low: null, change_pct: null, volume: null }];
+  const f = fattiTitolo("ZZTEST");
+  DATA.watchlist = saved;
+  return f.prezzo === 100 && Number.isNaN(f.giorno.alto) && Number.isNaN(f.giorno.basso)`));
+
+/* ⚠ una rimozione A META' lascia handler che cercano nodi inesistenti e stile che pesa senza
+   servire: silenziosa finche' non rompe qualcos'altro. Si controllano tutte e tre le parti. */
+check("v275 watchlist: uscita da markup, codice e stile, senza residui", (() => {
+  const html5 = readFileSync(join(ROOT, "index.html"), "utf8");
+  const css5 = readFileSync(join(ROOT, "assets", "style.css"), "utf8");
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const nelHtml = /wl-(tab|tv|input|salva|chips|nota|viste|aggiorna)/.test(html5);
+  const nelCodice = /(leggiWatchlist|renderWatchlistTV|aggiornaQuoteWatchlist|montaWatchlistTV|applicaVistaWatchlist|agganciaWatchlist|salvaWatchlist|caricaWatchlistCloud|datiSimbolo|WL_COLONNE|TV_MAPPA|simboloWidgetTV)\s*[\(=]/.test(codice);
+  const nelCss = /\.wl-(tabella|chip|viste|ext|tv|tab)\b/.test(css5);
+  return !nelHtml && !nelCodice && !nelCss;
 })());
 
 /* ---------- report ----------
