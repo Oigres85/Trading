@@ -2713,7 +2713,7 @@
     "target": 302.83,
     "upside_pct": 39.4
    },
-   "health": 80,
+   "health": 81,
    "eps": 6.53,
    "beta": 2.21,
    "sharpe_1y": 0.39,
@@ -5075,7 +5075,7 @@
    },
    "rs_1m": 7.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 9.3
+   "rs_ndx_1m": 9.4
   },
   {
    "ticker": "WDC",
@@ -6027,7 +6027,7 @@
     "market_cap": 151377494016.0,
     "shares": 344682131.0,
     "float_shares": 337305500.0,
-    "float_pct": 97.9,
+    "float_pct": null,
     "avg_volume_30d": 8468214.0,
     "pe_ttm": 18.0881,
     "forward_pe": 13.8545,
@@ -8024,7 +8024,7 @@
    },
    "rs_1m": -11.6,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -9.7
+   "rs_ndx_1m": -9.8
   },
   {
    "ticker": "SKHY",
@@ -23967,8 +23967,8 @@
      "label": "Mercato USA totale",
      "categoria": "azionario ampio",
      "anni": 10.0,
-     "cagr": 14.83,
-     "totale_pct": 298.6,
+     "cagr": 14.84,
+     "totale_pct": 298.8,
      "dd_max": -35.0,
      "dd_quando": "2020-03",
      "giorni_recupero": 142,
@@ -24458,7 +24458,7 @@
       },
       {
        "d": "2026-08",
-       "v": 400.4
+       "v": 400.6
       }
      ]
     },
@@ -24468,7 +24468,7 @@
      "categoria": "azionario ampio",
      "anni": 10.0,
      "cagr": 15.25,
-     "totale_pct": 313.3,
+     "totale_pct": 313.5,
      "dd_max": -33.7,
      "dd_quando": "2020-03",
      "giorni_recupero": 140,
@@ -24958,7 +24958,7 @@
       },
       {
        "d": "2026-08",
-       "v": 415.7
+       "v": 415.9
       }
      ]
     },
@@ -29219,7 +29219,7 @@
     "price": 86.99,
     "d1": 0.09,
     "m1": -1.2,
-    "m3": 7.9,
+    "m3": 7.8,
     "score": 56
    },
    {
@@ -31886,7 +31886,7 @@
     },
     {
      "m": 8,
-     "avg": -0.18,
+     "avg": -0.17,
      "pos": 57.1,
      "n": 42,
      "score": 51
@@ -43040,7 +43040,7 @@
        "strike": 149.0,
        "bid": 0.6,
        "ask": 0.71,
-       "iv": 51.3,
+       "iv": 52.3,
        "vol": 25,
        "oi": 40
       },
@@ -43590,7 +43590,7 @@
       },
       {
        "strike": 22.0,
-       "bid": 3.85,
+       "bid": 3.65,
        "ask": 4.5,
        "iv": 165.2,
        "vol": 4,
@@ -43598,7 +43598,7 @@
       },
       {
        "strike": 22.5,
-       "bid": 3.95,
+       "bid": 4.3,
        "ask": 5.1,
        "iv": 132.0,
        "vol": 2,
@@ -43622,7 +43622,7 @@
       },
       {
        "strike": 24.0,
-       "bid": 5.8,
+       "bid": 5.6,
        "ask": 6.45,
        "iv": 197.7,
        "vol": 3,
