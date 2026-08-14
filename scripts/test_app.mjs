@@ -1964,22 +1964,42 @@ check("v290 calendario: le serie giornaliere non sono eventi", suVeri(`
   const ev = prossimiEventi(30).eventi.filter(e => e.tipo === "macro");
   return ev.every(e => e.passo !== "giornaliero")`));
 
-/* ⚠ RIMPICCIOLIRE UN GRAFICO NON E' CAMBIARGLI L'ALTEZZA. Senza `compatto` la primitiva
-   disegna su una tela da 640px: dentro mezza card il browser la scala a meta' e il testo passa
-   da 9,5px a ~4,8px. La trappola e' scritta dentro `graficoSerie` stessa, e il grafico ETF ci
-   era finito dentro nel momento in cui l'ho stretto a una tessera. */
-check("v290 tessere: ogni grafico stretto a meta' card e' disegnato compatto", (() => {
-  const html = readFileSync(join(ROOT, "index.html"), "utf8");
-  const id = [...html.matchAll(/id="([\w-]+)"[^>]*class="[^"]*graf-tessera/g)].map(m => m[1]);
-  if (!id.length) return false;
-  // i contenitori a tessera che ricevono graficoSerie devono passare compatto: true
-  for (const x of ["#etf-lungo-grafico", "#tassi-serie"]) {
-    const i = src.indexOf(x);
-    if (i < 0) return false;
-    const intorno = src.slice(i, i + 900);
-    if (/graficoSerie\(/.test(intorno) && !/compatto: true/.test(intorno)) return false;
+/* ⚠⚠ v291 — QUESTO CANCELLO CONGELAVA IL MIO ERRORE. In v290 pretendeva `compatto: true` sui
+   grafici a tessera, convinto che "stretto" volesse dire "tela piccola". E' il contrario: la
+   tela piccola dentro un contenitore LARGO si INGRANDISCE — `height:auto` scala l'SVG alla
+   larghezza disponibile, e 330x180 dentro 595px diventava 595x325, cioe' 1,8 volte la tessera
+   TradingView che dovevo eguagliare. Il cancello passava verde su un difetto visibile a occhio,
+   ed e' la lezione: un check scritto sulla regola sbagliata non protegge, protegge l'errore.
+   LA MISURA CHE CONTA E' IL RAPPORTO H/W, perche' il reso e' larghezza x (H/W). */
+check("v291 tessere: il rapporto della tela sta sotto quello della tessera TradingView", (() => {
+  /* la tessera e' 595x236 => 0,397. Sopra quel rapporto il pannello e' piu' alto di lei. */
+  const LIMITE = 0.40;
+  const casi = [];
+  const i = src.indexOf("function curvaTassi");
+  const m = src.slice(i, i + 900).match(/const W = (\d+), H = (\d+)/);
+  if (m) casi.push(["curvaTassi", +m[2] / +m[1]]);
+  for (const [nome, ancora] of [["ETF", "#etf-lungo-grafico"], ["storico tassi", "#tassi-serie"]]) {
+    const k = src.indexOf(ancora);
+    if (k < 0) return false;
+    /* ⚠ finestra larga: a 900 caratteri la chiamata dell'ETF restava tagliata a meta' e il
+       cancello falliva su un codice corretto — un rosso per miopia del check, non per difetto. */
+    const g = src.slice(k, k + 1600).match(/graficoSerie\([^{)]*\{([^}]*)\}/);
+    if (!g) return false;
+    const h = g[1].match(/h:\s*(\d+)/);
+    const w = /compatto:\s*true/.test(g[1]) ? 330 : 640;   // le due tele di graficoSerie
+    if (!h) return false;
+    casi.push([nome, +h[1] / w]);
   }
-  return true;
+  return casi.length === 3 && casi.every(([, r]) => r <= LIMITE);
+})());
+
+/* ⚠ e il testo deve restare leggibile DOPO lo scalamento: 9,5px su una tela da 640 dentro 595px
+   rendono 8,8px; su una tela da 330 renderebbero 17px, grandi ma dentro un pannello alto il
+   doppio. Il CEO ha gia' respinto tre volte una forma illeggibile: qui si misura, non si spera. */
+check("v291 tessere: un tetto in pixel veri, non solo sulla tela", (() => {
+  const css = readFileSync(join(ROOT, "assets", "style.css"), "utf8");
+  return /\.graf-tessera\s*\{[^}]*max-height:\s*\d+px/.test(css)
+      && /#mg-rot\.graf-tessera\s*\{[^}]*max-height:\s*\d+px[^}]*overflow-y:\s*auto/.test(css);
 })());
 
 /* ---------- report ----------

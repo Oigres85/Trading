@@ -2082,3 +2082,13 @@ svg.g-serie { cursor: crosshair; }
    Stretto cio' che non porta informazione — l'etichetta e il numero — perche' la barra e' il
    pannello. */
 .graf-tessera .obars-compatte .obar-row { grid-template-columns: 92px minmax(0, 1fr) 68px; gap: 6px; }
+
+/* ═══ v291 — L'ALTEZZA SI MISURA SUL RESO, NON SULLA TELA ══════════════════════════════════
+   In v290 avevo eguagliato la tessera TradingView guardando il viewBox e non il pixel finale:
+   un SVG con `height:auto` si scala alla larghezza del contenitore, quindi 330x180 dentro
+   595px diventava 595x325. Qui si fissa il tetto in pixel VERI e si verifica in pagina. */
+.graf-tessera { max-height: 240px; }
+.graf-tessera svg { max-height: 240px; }
+
+/* la rotazione ha 21 righe: si scorre invece di nasconderne otto. */
+#mg-rot.graf-tessera { max-height: 236px; overflow-y: auto; }

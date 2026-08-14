@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "290";
+const BUILD_VERSION = "291";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2383,7 +2383,9 @@ const TV_MACRO = [
 function curvaTassi(dati) {
   const p = (dati.scadenze || []).filter(x => Number.isFinite(Number(x.value)));
   if (p.length < 3) return "";
-  const W = 320, H = 150, L = 34, R = W - 10, T = 12, B = H - 24;
+  /* v291 — tela larga come quella di `graficoSerie`: dentro un contenitore da 595px il
+     reso e' 595x(H/W), e 640x225 da' ~209px, cioe' la misura della tessera TradingView. */
+  const W = 640, H = 225, L = 44, R = W - 16, T = 14, B = H - 30;
   /* asse x logaritmico sulle scadenze: fra 3 mesi e 2 anni c'e' piu' informazione che fra 20 e
      30, e su una scala lineare i tenori corti si schiacciano tutti a sinistra. */
   const lx = (a) => Math.log(Math.max(0.25, a));
@@ -2474,7 +2476,7 @@ function renderTassi() {
         return { nome: x.nome, colore: x.colore,
                  punti: date.map(d => ({ d, v: m.has(d) ? m.get(d) : null })) };
       });
-      serie.innerHTML = graficoSerie(dati, { h: 180, compatto: true, unita: "%" })
+      serie.innerHTML = graficoSerie(dati, { h: 225, unita: "%" })
         + `<div class="tassi-leg">${CHI.map(x => `<span><i style="background:${x.colore}"></i>${esc(x.nome)}</span>`).join("")}`
         + `<span class="muted">${date.length} giorni di rilevazione, dal ${esc(date[0])}</span></div>`;
     }
@@ -2611,7 +2613,7 @@ function renderEtfLungo() {
     colore: COLORI[i % COLORI.length],
   })).filter(s => s.punti.length > 2);
   box.innerHTML = serie.length
-    ? graficoSerie(serie, { h: 180, compatto: true, soglie: [{ v: 100, testo: "punto di partenza", colore: "var(--muted)" }],
+    ? graficoSerie(serie, { h: 225, soglie: [{ v: 100, testo: "punto di partenza", colore: "var(--muted)" }],
         aria: "andamento a dieci anni dei dieci ETF", etichetteDx: true })
     : '<div class="muted">Serie non disponibili.</div>';
 
