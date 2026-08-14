@@ -2002,6 +2002,50 @@ check("v291 tessere: un tetto in pixel veri, non solo sulla tela", (() => {
       && /#mg-rot\.graf-tessera\s*\{[^}]*max-height:\s*\d+px[^}]*overflow-y:\s*auto/.test(css);
 })());
 
+/* ══ v292 — LA TRAIETTORIA DEGLI INDICATORI MACRO ════════════════════════════════════════
+   Il CEO ha chiesto i dati macro "con la stessa logica del VIX" del box TradingView. Da
+   TradingView non si puo': misurato in browser, i simboli ECONOMICS:* (USIRYY, USNFP, USUR,
+   USGDPQQ, USCCI, USRSMM) rispondono tutti "disponibile solo su TradingView", col VIX che
+   rende nella stessa pagina come controllo positivo. La forma pero' si da' con i nostri dati. */
+
+/* ⚠⚠ L'ULTIMA PUNTA DEL GRAFICO DEVE COINCIDERE COL NUMERO IN EVIDENZA. E' l'invariante che
+   conta: un grafico che finisce dove il titolo dice un'altra cosa e' peggio di nessun grafico.
+   Ha gia' morso una volta — UMich veniva da FRED (49,5 di giugno) sotto un titolo di 55,2 di
+   luglio preso dalla fonte primaria, perche' FRED distribuisce con 1-2 mesi di ritardo di
+   LICENZA: avrebbe disegnato una DISCESA sotto un numero che dice risalita. Lo storico esce
+   dalla stessa fonte del valore, sempre. */
+check("v292 macro: ogni serie finisce dove il suo titolo dice", suVeri(`
+  const ind = (DATA.macro && DATA.macro.indicators) || [];
+  const conSerie = ind.filter(i => (i.storico || []).length > 2);
+  if (!conSerie.length) return true;              // pipeline non ancora girata
+  return conSerie.every(i => {
+    const ultimo = i.storico[i.storico.length - 1].v;
+    const titolo = parseFloat(String(i.value).replace(/[+%K]|\\s*pp/g, ""));
+    if (!Number.isFinite(titolo) || !Number.isFinite(ultimo)) return true;
+    const tolleranza = i.key === "nfp" ? 12 : 0.16;   // arrotondamenti di pubblicazione
+    return Math.abs(ultimo - titolo) <= tolleranza;
+  })`));
+
+/* ⚠ e la serie dev'essere nella STESSA GRANDEZZA del titolo: il CPI a/a, non l'indice
+   CPIAUCSL che sale da sempre per costruzione. Il controllo e' indiretto ma efficace — se
+   qualcuno attaccasse l'indice grezzo, i valori sarebbero centinaia e non unita'. */
+check("v292 macro: le serie sono trasformate, non indici grezzi", suVeri(`
+  const ind = (DATA.macro && DATA.macro.indicators) || [];
+  const perc = ind.filter(i => (i.storico || []).length > 2
+                            && ["cpi","pce","retail","gdp","unemp"].includes(i.key));
+  return perc.every(i => i.storico.every(p => Math.abs(p.v) < 60))`));
+
+/* ⚠ la traiettoria vera deve avere la precedenza sulla scala convenzionale di v272: quella
+   era il ripiego per le schede senza storico, e tenerla davanti vorrebbe dire preferire una
+   convenzione di lettura mia a un dato osservato. */
+check("v292 macro: la serie osservata batte la scala convenzionale", (() => {
+  const i = src.indexOf("function renderIndicatori");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  const posSerie = corpo.indexOf("const se = serieIndicatore");
+  const posForma = corpo.indexOf("const forma =");
+  return posSerie > -1 && posForma > posSerie;
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

@@ -1762,6 +1762,89 @@ def fetch_macro():
     # ⚠ I BUCHI RESTANO BUCHI. Le serie giornaliere di FRED non hanno osservazioni nei giorni di
     # chiusura, e riempirli con l'ultimo valore disegnerebbe un tratto piatto che nessun mercato
     # ha fatto — cioe' un dato presunto travestito da dato. Si pubblica solo cio' che esiste.
+    # ═══ v292 — LO STORICO DEI 13 INDICATORI: LA TRAIETTORIA, NON SOLO IL PUNTO ═══════════
+    # Il CEO: "possiamo ottenere i dati macro con la stessa logica del VIX nel box TradingView?".
+    # Da TradingView no — misurato: i simboli ECONOMICS:* (USIRYY, USNFP, USUR, USGDPQQ, USCCI,
+    # USRSMM) rispondono tutti "disponibile solo su TradingView", col VIX che rende nella stessa
+    # pagina come controllo. Ma la FORMA si puo' dare lo stesso, con i nostri dati, e questa e'
+    # la parte che mancava: le schede macro cadevano sulla "scala con le zone" di v272 non per
+    # scelta grafica, ma perche' NON C'ERA UNA SERIE — un solo valore non fa una linea.
+    #
+    # ⚠⚠ IL GRAFICO DEVE MOSTRARE LA STESSA GRANDEZZA DEL TITOLO. Se la scheda dice "CPI 3,5%
+    # a/a", la linea dev'essere l'a/a: disegnare l'indice CPIAUCSL (che sale da sempre, per
+    # costruzione) sotto un titolo che parla di variazione annua e' un grafico che dice il falso
+    # senza rompersi — la classe di difetto v205, gia' costata una volta. Percio' ogni serie
+    # porta la SUA trasformazione, la stessa che produce il numero in evidenza.
+    #
+    # ⚠ I punti sono OSSERVAZIONI pubblicate, come per la curva dei tassi: niente riempimenti,
+    # niente interpolazioni. Dove la fonte non ha pubblicato, non c'e' punto.
+    STORICO_IND = [
+        # chiave     serie FRED               trasformazione  quanti punti
+        ("cpi",      "CPIAUCSL",              "yoy",          60),
+        ("pce",      "PCEPI",                 "yoy",          60),
+        ("gdp",      "A191RL1Q225SBEA",       "diretta",      24),
+        ("retail",   "RSAFS",                 "mom",          60),
+        ("nfp",      "PAYEMS",                "delta_k",      60),
+        ("unemp",    "UNRATE",                "diretta",      60),
+        ("umich",    "PRIMARIA:umich",        "diretta",      60),   # v292 — vedi nota sotto
+        ("philly",   "GACDFSA066MSFRBPHI",    "diretta",      60),
+        ("curve",    "T10Y2Y",                "diretta",     250),
+        ("curve3m",  "T10Y3M",                "diretta",     250),
+        ("t30",      "DGS30",                 "diretta",     250),
+        ("real10",   "DFII10",                "diretta",     250),
+        ("breakeven","T10YIE",                "diretta",     250),
+    ]
+    per_chiave = {i.get("key"): i for i in indicators}
+    for chiave, sid, modo, quanti in STORICO_IND:
+        ind = per_chiave.get(chiave)
+        if not ind:
+            continue
+        try:
+            # yoy serve 12 osservazioni in piu', mom e delta ne servono 1: si chiede il margine
+            extra = 13 if modo == "yoy" else (2 if modo in ("mom", "delta_k") else 1)
+            # ⚠⚠ UMICH VIENE DALLA FONTE PRIMARIA, NON DA FRED, E LO STORICO DEVE SEGUIRLO.
+            # FRED distribuisce UMCSENT con 1-2 mesi di RITARDO DI LICENZA — cosa che questa
+            # pipeline sapeva gia' (vedi `umich_series`) ma solo per il valore in evidenza.
+            # Misurato oggi: la pagina mostra 55,2 di luglio dalla fonte primaria, FRED e' fermo
+            # a 49,5 di giugno. Attaccare lo storico FRED sotto quel titolo avrebbe disegnato una
+            # DISCESA sotto un numero che dice risalita: non un ritardo, una contraddizione — ed
+            # e' testualmente il caso che il commento di `umich_series` chiama "peggio di un dato
+            # dichiarato mancante". La regola generale: lo storico esce dalla STESSA fonte del
+            # valore, altrimenti la punta del grafico smentisce il titolo.
+            if sid.startswith("PRIMARIA:"):
+                s = umich_series(quanti + extra)
+            else:
+                s = fred_series(sid, quanti + extra)
+            if not s or len(s) < 3:
+                continue
+            punti = []
+            if modo == "diretta":
+                punti = [{"d": d, "v": round(float(v), 2)} for d, v in s]
+            elif modo == "yoy":
+                for i in range(12, len(s)):
+                    prima = float(s[i - 12][1])
+                    if prima:
+                        punti.append({"d": s[i][0],
+                                      "v": round((float(s[i][1]) / prima - 1) * 100, 2)})
+            elif modo == "mom":
+                for i in range(1, len(s)):
+                    prima = float(s[i - 1][1])
+                    if prima:
+                        punti.append({"d": s[i][0],
+                                      "v": round((float(s[i][1]) / prima - 1) * 100, 2)})
+            elif modo == "delta_k":
+                # PAYEMS e' in migliaia di occupati: la variazione mensile E' il dato che si cita
+                for i in range(1, len(s)):
+                    punti.append({"d": s[i][0], "v": round(float(s[i][1]) - float(s[i - 1][1]))})
+            if len(punti) >= 3:
+                ind["storico"] = punti[-quanti:]
+                ind["storico_serie"] = ("sca.isr.umich.edu (fonte primaria)"
+                                        if sid.startswith("PRIMARIA:") else sid)
+        except Exception as e:  # noqa: BLE001
+            print(f"!! storico {chiave} ({sid}): {e}", file=sys.stderr)
+    quanti_ok = sum(1 for i in indicators if i.get("storico"))
+    print(f"   storico indicatori: {quanti_ok}/{len(indicators)} con serie")
+
     TASSI_FRED = [
         ("m3",  "DGS3MO", "3 mesi",   0.25),
         ("a2",  "DGS2",   "2 anni",   2),

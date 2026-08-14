@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "291";
+const BUILD_VERSION = "292";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3963,8 +3963,13 @@ function renderIndicatori() {
        aveva una serie perdeva le seconde. Ora la scheda porta entrambe. */
     /* v238 — l'ordine di precedenza: prima la forma DEDICATA del registro (che porta anche la
        spiegazione di lettura), poi la serie storica, poi il contenuto del pannello. */
-    const forma = (() => { try { return FORMA_INDICATORE[r.k]?.(DATA.macro || {}) || null; } catch { return null; } })();
-    const se = forma ? null : serieIndicatore(r.k);
+    /* ⚠⚠ v292 — LA SERIE VERA HA LA PRECEDENZA SULLA SCALA. Prima era il contrario, e aveva
+       senso finche' le serie non c'erano: la scala con le zone (v272) era il ripiego per le
+       schede senza storico. Ora che la pipeline porta la traiettoria, tenere la scala davanti
+       vorrebbe dire preferire una MIA convenzione di lettura a un dato osservato. La scala
+       resta il ripiego dove la serie ancora manca. */
+    const se = serieIndicatore(r.k);
+    const forma = se ? null : (() => { try { return FORMA_INDICATORE[r.k]?.(DATA.macro || {}) || null; } catch { return null; } })();
     /* ⚠ v262 — LA SCHEDA DI FEAR & GREED NON RIPETE I SUOI COMPONENTI. Il CEO l'ha segnalato
        due volte: "ha ancora al suo interno altri valori come vix etc". Da v258 tutti e sette i
        componenti hanno una scheda propria (quattro nuove, tre — VIX, Put/Call, Ampiezza — che
@@ -4232,6 +4237,36 @@ function serieIndicatore(k) {
             soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }] } : null;
     }
     default: {
+      /* ═══ v292 — LA TRAIETTORIA DEGLI INDICATORI MACRO ══════════════════════════════════
+         Il CEO: i dati macro "con la stessa logica del VIX" del box TradingView. Da
+         TradingView non si puo' — misurato: i simboli ECONOMICS:* (USIRYY, USNFP, USUR,
+         USGDPQQ, USCCI, USRSMM) rispondono tutti "disponibile solo su TradingView", col VIX
+         che rende nella stessa pagina come controllo positivo. La FORMA pero' si da' lo
+         stesso, con i nostri dati, ed e' la parte che mancava.
+         ⚠ Queste schede cadevano sulla "scala con le zone" di v272 non per scelta grafica ma
+         perche' NON C'ERA UNA SERIE: un valore solo non fa una linea. Ora la pipeline porta
+         lo storico e la linea vera batte la scala — la scala restava una lettura mia, la
+         traiettoria e' il dato.
+         ⚠⚠ LA SERIE STA NELLA STESSA GRANDEZZA DEL TITOLO (la pipeline trasforma: a/a per il
+         CPI, m/m per le vendite, variazione mensile per i payroll). Disegnare l'indice
+         CPIAUCSL sotto "CPI 3,5% a/a" sarebbe un grafico che dice il falso senza rompersi. */
+      if (String(k).startsWith("in:")) {
+        const chiave = String(k).slice(3);
+        const ind = ((m.indicators) || []).find(x => x && x.key === chiave);
+        const st = (ind && ind.storico) || [];
+        if (st.length > 2) {
+          const UNITA = { nfp: "K", curve: " pp", curve3m: " pp", umich: "", philly: "" };
+          /* ⚠ lo zero si segna SOLO dove e' un confine vero: curva invertita, occupazione che
+             cala, vendite o PIL che si contraggono. Altrove sarebbe una soglia inventata, e
+             questo progetto ne ha gia' tolte una volta (v240). */
+          const CONFINE = { curve: "inversione", curve3m: "inversione", nfp: "posti persi",
+                            retail: "vendite in calo", gdp: "contrazione" };
+          return { punti: st,
+                   unita: (chiave in UNITA) ? UNITA[chiave] : "%",
+                   soglie: CONFINE[chiave] ? [{ v: 0, testo: CONFINE[chiave], colore: "var(--red)" }] : [],
+                   fonteSerie: ind.storico_serie || "" };
+        }
+      }
       // serie accumulata dalla pipeline giorno per giorno (v224): compare da sola appena
       // ci sono almeno due rilevazioni
       const st = (DATA?.metrics_history || []).map(x => ({ d: x.date, v: x.macro_scores?.[k] }))
