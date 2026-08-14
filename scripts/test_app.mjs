@@ -295,13 +295,25 @@ check("v247 cap: il divieto d'acquisto e l'alert di concentrazione sono fuori da
    L'invariante che conta non e' l'etichetta fissa — e' che l'etichetta NON contraddica lo stato
    dichiarato accanto. Stessa correzione fatta in v190 sull'etichetta di Seoul, e il test deve
    asserire la PROPRIETA', non il ramo, o fallisce a orologio. */
+/* ⚠ v286 — TRE STATI, NON DUE. Il check asseriva "weekend → FERMI, altrimenti → anticipo", e
+   quel "altrimenti" copriva due situazioni diverse: mercato chiuso ma future vivi (li' i future
+   ANTICIPANO davvero) e mercato GIA' APERTO (li' non anticipano un bel niente). Con la sessione
+   aperta alle 14:20 ET il pacchetto diceva "apertura USA in gap-down attesa" mentre tre righe
+   sopra dichiarava fase REGULAR: due parti dello stesso pacchetto su due momenti diversi.
+   E' la classe v190/v234, e la lezione gia' scritta in CLAUDE.md dice come si chiude: il test
+   asserisce la PROPRIETA' — la riga non promette un'apertura quando il mercato e' aperto — non
+   il ramo, altrimenti fallisce a orologio. */
 check("v263 futures: l'etichetta segue lo stato del mercato e non contraddice il contesto di sessione", suVeri(`
+  const NL = String.fromCharCode(10);
   const p = buildPrompt();
-  const riga = p.split(String.fromCharCode(10)).find(l => /^- Futures USA/.test(l));
+  const riga = p.split(NL).find(l => /^- Futures USA/.test(l));
   if (!riga) return true;                                  // niente future nello snapshot: nulla da contraddire
-  const weekend = /WEEKEND/.test(p);
-  return weekend
-    ? /FERMI/.test(riga) && /NON anticipano/.test(riga)
+  if (/WEEKEND/.test(p)) return /FERMI/.test(riga) && /NON anticipano/.test(riga);
+  const apertaOra = /fase: REGULAR/.test(p) || /SESSIONE USA APERTA/.test(p);
+  /* la proprieta': a mercato APERTO la riga non deve parlare di apertura attesa; a mercato
+     chiuso ma future vivi deve dire che anticipano. */
+  return apertaOra
+    ? /LIVE/.test(riga) && !/apertura USA in gap-down attesa/.test(riga) && /GIA' APERTA/.test(riga)
     : /LIVE/.test(riga) && /anticipo/.test(riga)`));
 
 check("v263 Fear & Greed: il payload non elenca i componenti (hanno una scheda ciascuno)", suVeri(`
@@ -1308,10 +1320,29 @@ check("v271 pacchetto titolo: nessun blocco per un titolo che la pipeline non se
 /* ⚠ IL FALSO ALLARME DEL LUNEDI'. Il Treasury 30A rilevato venerdi' usciva lunedi' mattina
    con "ERA ATTESO E NON E' ARRIVATO": i due giorni di grazia se li mangiava il fine settimana.
    Un allarme che suona ogni lunedi' su ogni serie giornaliera insegna a ignorarlo. */
-check("v271 cadenza: un dato di venerdi' non e' 'mancante' il lunedi'", run(`
-  const c = cadenzaDato("t30", "2026-08-06");   // giovedi
-  const d = cadenzaDato("t30", "2026-08-07");   // venerdi
-  return c && d && !c.scaduto && !d.scaduto`));
+/* ⚠ v287 — RISCRITTO RELATIVO A OGGI, e l'errore era mio. La prima stesura usava le date
+   FISSE 2026-08-06 e 2026-08-07 per dire "un dato di giovedi'/venerdi' non e' mancante il
+   lunedi'". Quattro giorni dopo quelle date sono davvero vecchie, `scaduto` e' diventato vero
+   a ragione, e il check e' andato rosso DA SOLO senza che nulla fosse rotto.
+   La cosa che brucia: nel commento della v271 avevo scritto testualmente "si misura la
+   PROPRIETA', non la distanza da oggi: un check ancorato al calendario diventa rosso da solo
+   quando gira la data — errore gia' fatto in questo progetto e ripetuto scrivendo questo".
+   L'ho scritto e l'ho rifatto nella stessa riga. Ora la data si costruisce ALL'INDIETRO da
+   oggi: l'ultimo giorno lavorativo, che e' il caso che la proprieta' descrive. */
+check("v271 cadenza: l'ultimo dato lavorativo non risulta 'mancante'", run(`
+  const iso = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")
+                   + "-" + String(d.getDate()).padStart(2, "0");
+  const indietroLavorativi = (n) => {
+    const d = new Date(); d.setHours(0, 0, 0, 0);
+    while (n > 0) { d.setDate(d.getDate() - 1); if (d.getDay() !== 0 && d.getDay() !== 6) n--; }
+    return d;
+  };
+  const uno = cadenzaDato("t30", iso(indietroLavorativi(1)));
+  const due = cadenzaDato("t30", iso(indietroLavorativi(2)));
+  /* uno e due giorni LAVORATIVI fa sono dentro la grazia; cinque no, e il check verifica
+     anche quello — altrimenti passerebbe pure una grazia infinita. */
+  const cinque = cadenzaDato("t30", iso(indietroLavorativi(5)));
+  return uno && due && cinque && !uno.scaduto && !due.scaduto && cinque.scaduto`));
 
 check("v271 cadenza: la grazia si conta in giorni lavorativi", (() => {
   const i = src.indexOf("function sommaGiorniLavorativi");
@@ -1404,10 +1435,14 @@ check("v274 fatti: fattiTitolo e' l'unico che legge le fonti grezze", (() => {
    Il Philly Fed sostituisce l'ISM (sotto licenza) ma copre un distretto, non il paese, e
    arriva con ~40 giorni di ritardo: in classifica con lo stesso peso degli altri si legge
    come una misura nazionale, e nel pacchetto finiva in cima ai "piu' favorevoli". */
-check("v274 macro: il Philly Fed si dichiara proxy in classifica e nel pacchetto", (() => {
+/* ⚠ v287 — la riga "i tre piu' favorevoli", dove il tag [proxy: ...] viveva nel pacchetto, e'
+   uscita col verdetto aggregato. L'invariante NON cambia — il Philly Fed deve dichiararsi
+   sostituto dell'ISM sia sulla scheda sia nel pacchetto — cambia DOVE lo fa: nel pacchetto ora
+   lo dice la nota della serie, che e' il posto naturale e non dipende da una classifica. */
+check("v274 macro: il Philly Fed si dichiara proxy sulla scheda e nel pacchetto", (() => {
   const i = src.indexOf("function indicatoriClassifica");
   const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  const nelPacchetto = /x\.proxy \? ` \[proxy: \$\{x\.proxy\}\]`/.test(src);
+  const nelPacchetto = /NON è l'ISM: l'ISM è sotto licenza/.test(src);
   return /proxy: i\.key === "philly"/.test(corpo) && nelPacchetto;
 })());
 
@@ -1664,6 +1699,97 @@ check("v284 opzioni: la scheda e il pacchetto dichiarano se la scadenza non e' l
   const j = src.indexOf("function datiNostriDelTitolo");
   const pac = src.slice(j, src.indexOf("\nfunction ", j + 10));
   return /Non è la scadenza più vicina/.test(scheda) && /NON e' la scadenza piu' vicina/.test(pac);
+})());
+
+/* ══ v286 — TRE DIFETTI TROVATI NEL PACCHETTO CHE IL CEO MI HA INCOLLATO ═════════════════ */
+
+/* ⚠ VOLUMI E CONTRATTI APERTI SONO DUE GRANDEZZE DIVERSE, e stavano nella stessa frase senza
+   etichetta: "put 6434, call 15041" (volumi del giorno) accanto a "33024 contratti" (open
+   interest). Non tornano e non devono tornare — ma chi legge prova a farli quadrare, e quando
+   non ci riesce dubita di tutto il blocco. E' la classe "denominatori non dichiarati". */
+check("v286 opzioni: volumi e contratti aperti sono etichettati per quello che sono", (() => {
+  const i = src.indexOf("function datiNostriDelTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /volumi scambiati oggi/.test(corpo) && /CONTRATTI APERTI/.test(corpo)
+      && /grandezza diversa dai volumi/.test(corpo);
+})());
+
+/* ⚠ IL CONTEGGIO NON CHIUDEVA: "26 indicatori · 10 sotto 50 e 13 sopra" lascia tre indicatori
+   senza posto — quelli esattamente a 50. Un conteggio che non torna invita a dubitare del
+   resto, ed e' un difetto gratuito perche' il terzo gruppo esiste ed e' calcolabile. */
+check("v286 quadro d'insieme: il conteggio degli indicatori chiude", suVeri(`
+  const NL = String.fromCharCode(10);
+  const riga = buildPrompt().split(NL).find(l => l.indexOf("Quadro d") >= 0);
+  if (!riga) return true;
+  const n = riga.match(/(\d+) indicatori/);
+  const giu = riga.match(/(\d+) sotto 50/);
+  const su = riga.match(/(\d+) sopra/);
+  const pari = riga.match(/(\d+) esattamente a 50/);
+  if (!n || !giu || !su) return false;
+  return +n[1] === +giu[1] + +su[1] + (pari ? +pari[1] : 0)`));
+
+/* ══ v287 — IL SOFTWARE SMETTE DI DARE UN VERDETTO SUL QUADRO MACRO ══════════════════════
+   Osservazione di ChatGPT che condivido, e che questo progetto aveva gia' applicato una volta:
+   in v200 il motore di punteggio e' stato tolto perche' "ordinare e' gia' un giudizio", con un
+   hit-rate del 29%. Il verdetto aggregato sul macro era la stessa cosa, sopravvissuta. */
+
+/* ⚠ IL CHECK CHE IMPEDISCE IL RITORNO. Il pacchetto non deve piu' contare, mediare o
+   classificare gli indicatori: quei punteggi 0-100 sono formule mie, e la prova che la scala
+   era arbitraria e' che ho dovuto ritararla tre volte (Philly Fed v271, materie posizionali
+   v280, pareggi non contati v286). Il valore, la data e la fonte di ogni indicatore restano —
+   e' quello che serve all'LLM per giudicare da se'. */
+check("v287 pacchetto: nessun verdetto aggregato sul quadro macro", suVeri(`
+  const p = buildPrompt();
+  return !/Quadro d'insieme/.test(p)
+      && !/I tre piu' favorevoli/.test(p)
+      && !/I tre piu' sfavorevoli/.test(p)
+      && !/sotto 50 e \d+ sopra/.test(p)`));
+
+/* ⚠ ma la DISPERSIONE dentro un composito resta, e non e' la stessa cosa: dice che una media
+   nasconde componenti che vanno da 32 a 99, ed e' un fatto sul dato. Toglierla insieme al
+   verdetto avrebbe buttato via l'informazione per tenere solo il rumore. */
+/* ⚠ il blocco del disaccordo NON sta in buildPrompt: e' un pezzo a se' che buildPromptTicker
+   e buildCIOText innestano (v156). Cercarlo nel posto sbagliato dava un rosso su codice sano. */
+check("v287 pacchetto: la dispersione dentro i compositi sopravvive", suVeri(`
+  const t = testoCorrelazioniMacro() || "";
+  return t.indexOf("come sintesi, ma i suoi") >= 0 && t.indexOf("componenti vanno da") >= 0`));
+
+/* ══ v287 — CALENDARIO: COSA ARRIVA, NON SOLO COSA E' USCITO ═════════════════════════════
+   Il quadro macro diceva benissimo cosa e' gia' uscito e taceva su cosa sta per uscire.
+   Costruito su dati che il sistema ha gia': le uscite macro dal calendario dichiarato dalle
+   fonti, le trimestrali da `earnings_date`. Zero API nuove — Alpha Vantage o Finnhub avrebbero
+   voluto dire una chiave in un repository PUBBLICO per dati gia' in casa. */
+check("v287 calendario: unisce uscite macro e trimestrali in una finestra", suVeri(`
+  const r = prossimiEventi(30);
+  if (!r || !Array.isArray(r.eventi)) return false;
+  const tipi = new Set(r.eventi.map(e => e.tipo));
+  /* almeno un tipo dev'esserci; se ci sono entrambi, meglio — ma dipende dal mese, e un check
+     che pretende entrambi diventerebbe rosso a calendario invece che a difetto. */
+  return r.eventi.length > 0 && [...tipi].every(t => t === "macro" || t === "utili")`));
+
+/* ⚠⚠ TUTTE LE DATE SONO STIME E OGNI RIGA LO DEVE DIRE. La data della prossima uscita macro e'
+   una MIA proiezione dal ritardo tipico della fonte; le date delle trimestrali le cambia
+   l'emittente di continuo. Presentarle come appuntamenti confermati sarebbe la classe di
+   difetto peggiore di questo progetto: un dato che sembra piu' solido di quanto sia. */
+check("v287 calendario: ogni evento e' marcato come stimato", suVeri(`
+  const r = prossimiEventi(30);
+  return r.eventi.length === 0 || r.eventi.every(e => e.stimata === true)`));
+
+check("v287 calendario: la nota dichiara che non sono appuntamenti confermati", (() => {
+  const i = src.indexOf("function renderCalendario");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /non appuntamenti confermati|stime, non appuntamenti/.test(corpo)
+      && /verifica sul sito della fonte/.test(corpo);
+})());
+
+/* ⚠ nessuna chiave di API in un repository pubblico: il calendario si costruisce su dati che
+   la pipeline gia' scarica. Se un domani qualcuno aggiunge Alpha Vantage o Finnhub, qui si
+   accende — non perche' siano cattive fonti, ma perche' la chiave finirebbe in chiaro. */
+check("v287 calendario: nessuna nuova API con chiave introdotta", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  const senza = (t) => t.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*(\/\/|#).*$/gm, "");
+  const tutto = senza(src) + senza(py);
+  return !/alphavantage|finnhub/i.test(tutto);
 })());
 
 /* ---------- report ----------

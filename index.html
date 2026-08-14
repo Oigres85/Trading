@@ -18,7 +18,7 @@
 <title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=285">
+<link rel="stylesheet" href="assets/style.css?v=287">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -125,6 +125,20 @@
      FISSO — dieci ETF scelti per COPRIRE le alternative di lungo periodo, non per come sono
      andati — e l'ordine e' quello dell'universo, mai quello del rendimento: ordinare e' gia'
      un giudizio (v200). I numeri ci sono tutti; la classifica la fa lui, se la vuole fare. -->
+<!-- v287 — CALENDARIO: cosa esce nei prossimi sette giorni. Il quadro macro diceva benissimo
+     cosa E' USCITO e taceva su cosa STA PER USCIRE. Costruito su dati che il sistema ha gia':
+     nessuna API nuova, nessuna chiave in un repository pubblico. Tutte le date sono STIME e la
+     nota lo dice — presentarle come appuntamenti confermati sarebbe la classe di difetto
+     peggiore di questo progetto: un dato che sembra piu' solido di quanto sia. -->
+<section class="card" data-sez="calendario">
+    <div class="card-head">
+      <h2>Prossime due settimane</h2>
+      <span class="muted">uscite macro e trimestrali · date stimate, non appuntamenti confermati</span>
+    </div>
+    <div id="cal-eventi" class="cal-eventi"></div>
+    <div id="cal-nota" class="muted"></div>
+  </section>
+
 <section class="card" data-sez="etf-lungo">
     <div class="card-head">
       <h2>ETF a dieci anni — cosa è successo davvero</h2>
@@ -309,6 +323,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=285"></script>
+<script src="assets/app.js?v=287"></script>
 </body>
 </html>

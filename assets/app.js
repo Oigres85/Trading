@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "285";
+const BUILD_VERSION = "287";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -790,6 +790,7 @@ function renderAll() {
      resta ferma su "non disponibili" anche dopo che i dati sono arrivati. Chi disegna al
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
+  renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderEtfLungo();             // v281 — ETF di lungo periodo, universo fisso
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
@@ -2276,6 +2277,98 @@ let allocGrafMode = "sector";
    quanto ha perso nel momento peggiore, quanto ci ha messo a tornare sopra, quanto oscilla, e
    quanto costa ogni anno. Due ETF con lo stesso 10% annuo possono averglielo dato in modi che
    uno dei due non gli avrebbe fatto tenere fino in fondo. */
+/* ═══ v287 — CALENDARIO: COSA ARRIVA NEI PROSSIMI SETTE GIORNI ════════════════════════════
+   Proposta di ChatGPT che condivido e che il sistema non aveva: il quadro macro diceva
+   benissimo cosa E' USCITO e taceva su cosa STA PER USCIRE. Il CEO leggeva "prossima
+   trimestrale attesa 2026-11-03" per il singolo titolo che stava analizzando e non aveva
+   nessuna vista d'insieme.
+   ⚠ COSTRUITO SU DATI CHE ABBIAMO GIA', zero API nuove: le uscite macro le calcola
+   `cadenzaDato()` dal calendario dichiarato dalle fonti (BLS, BEA, Census, FRED), le
+   trimestrali arrivano da `earnings_date` che la pipeline gia' scarica per i titoli seguiti.
+   Aggiungere Alpha Vantage o Finnhub avrebbe voluto dire una chiave in un repository PUBBLICO
+   e un free tier da verificare, per dati che sono gia' in casa.
+   ⚠⚠ SONO TUTTE STIME, E VA SCRITTO. La data della prossima uscita macro e' una MIA
+   proiezione dal ritardo tipico della fonte (il CPI di luglio esce "a meta' agosto", non il
+   14 esatto); le date delle trimestrali che yfinance restituisce per il futuro sono stime
+   dell'emittente. Presentarle come certe sarebbe la classe di difetto peggiore di questo
+   progetto: un dato che sembra piu' solido di quanto sia. Ogni riga porta [stimata]. */
+function prossimiEventi(giorni = 7) {
+  const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+  const limite = new Date(oggi); limite.setDate(limite.getDate() + giorni);
+  const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const ev = [];
+
+  /* MACRO: la prossima uscita attesa di ogni serie che ha un calendario dichiarato. */
+  for (const i of ((DATA && DATA.macro && DATA.macro.indicators) || [])) {
+    const c = (typeof cadenzaDato === "function") ? cadenzaDato(i.key, i.date) : null;
+    if (!c || !c.prossimo) continue;
+    const d = new Date(c.prossimo + "T00:00:00");
+    if (isNaN(d) || d < oggi || d > limite) continue;
+    ev.push({ giorno: c.prossimo, tipo: "macro", nome: i.label,
+              fonte: c.fonte || "", passo: c.passo || "",
+              /* il valore precedente e' un FATTO e serve a leggere il dato nuovo quando esce */
+              precedente: i.value, stimata: true });
+  }
+
+  /* TRIMESTRALI: i titoli che la pipeline segue e per cui ha una data. */
+  const titoli = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])];
+  const visti = new Set();
+  for (const r of titoli) {
+    const tk = String(r.ticker || "").toUpperCase();
+    if (!r.earnings_date || visti.has(tk)) continue;
+    const d = new Date(String(r.earnings_date).slice(0, 10) + "T00:00:00");
+    if (isNaN(d) || d < oggi || d > limite) continue;
+    visti.add(tk);
+    ev.push({ giorno: String(r.earnings_date).slice(0, 10), tipo: "utili", nome: tk,
+              societa: r.name || tk, fonte: "Yahoo Finance", stimata: true });
+  }
+
+  ev.sort((a, b) => a.giorno.localeCompare(b.giorno) || a.tipo.localeCompare(b.tipo));
+  return { dal: iso(oggi), al: iso(limite), eventi: ev };
+}
+
+function renderCalendario() {
+  const box = $("#cal-eventi");
+  if (!box) return;
+  const GIORNI_CALENDARIO = 14;   // misurato: a 7 giorni la sezione era quasi sempre vuota
+  const { eventi } = prossimiEventi(GIORNI_CALENDARIO);
+  const nota = $("#cal-nota");
+  if (!eventi.length) {
+    box.innerHTML = '<div class="muted">Nessuna uscita macro né trimestrale attesa nelle prossime due settimane fra le serie e i titoli che il sistema segue.</div>';
+    if (nota) nota.innerHTML = "";
+    return;
+  }
+  const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+  const GIORNI = ["dom", "lun", "mar", "mer", "gio", "ven", "sab"];
+  const MESI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+  const perGiorno = new Map();
+  for (const e of eventi) (perGiorno.get(e.giorno) || perGiorno.set(e.giorno, []).get(e.giorno)).push(e);
+
+  box.innerHTML = [...perGiorno.entries()].map(([g, lista]) => {
+    const d = new Date(g + "T00:00:00");
+    const scarto = Math.round((d - oggi) / 86400000);
+    const etichetta = scarto === 0 ? "OGGI" : scarto === 1 ? "DOMANI"
+      : `${GIORNI[d.getDay()]} ${d.getDate()} ${MESI[d.getMonth()]}`;
+    const righe = lista.map(e => e.tipo === "utili"
+      ? `<div class="cal-riga"><span class="cal-tag cal-utili">utili</span>
+           <b>${esc(e.nome)}</b><span class="cal-sub">${esc(e.societa || "")}</span>
+           <span class="cal-st">stimata</span></div>`
+      : `<div class="cal-riga"><span class="cal-tag cal-macro">macro</span>
+           <b>${esc(e.nome)}</b><span class="cal-sub">${esc(e.fonte)}${e.precedente ? ` · precedente ${esc(String(e.precedente))}` : ""}</span>
+           <span class="cal-st">stimata</span></div>`).join("");
+    return `<div class="cal-giorno${scarto === 0 ? " cal-oggi" : ""}">
+      <div class="cal-data">${etichetta}</div>${righe}</div>`;
+  }).join("");
+
+  if (nota) {
+    nota.innerHTML = "⚠ <b>Tutte le date sono stime, non appuntamenti confermati.</b> "
+      + "Le uscite macro le calcolo dal ritardo tipico dichiarato dalla fonte (il CPI di un mese esce "
+      + "«a metà del successivo», non il 14 esatto); le date delle trimestrali sono quelle che l'emittente "
+      + "ha comunicato a Yahoo e cambiano spesso. Per una data che conta, verifica sul sito della fonte "
+      + "o su quello investor relations della società.";
+  }
+}
+
 function renderEtfLungo() {
   const box = $("#etf-lungo-grafico");
   if (!box) return;
@@ -6054,7 +6147,15 @@ function buildPrompt() {
       const futuriFermi = fase && (fase.phase === "weekend" || fase.weekend || /weekend/i.test(fase.label || ""));
       lines.push(futuriFermi
         ? `- Futures USA [FERMI, mercato dei future chiuso]: ${fs.join(" · ")} — sono l'ultima quotazione prima della chiusura, gia' dentro l'ultima seduta: NON anticipano niente di nuovo.`
-        : `- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): ${fs.join(" · ")} — negativi marcati = apertura USA in gap-down attesa.`);
+        /* ⚠ v286 — L'INTERPRETAZIONE SEGUE LA FASE, non e' sempre la stessa. La riga diceva
+           "apertura USA in gap-down attesa" anche alle 14:20 ET, con la sessione aperta da
+           quattro ore e il blocco di sessione tre righe sopra che dichiarava REGULAR: due parti
+           dello stesso pacchetto che descrivevano due momenti diversi. E' la classe v190/v234 —
+           un ramo il cui TESTO non segue lo STATO — e qui il difetto era che il ramo "mercato
+           aperto" non esisteva proprio: c'erano solo weekend e pre-apertura. */
+        : (fase && fase.phase === "regular"
+            ? `- Futures USA LIVE: ${fs.join(" · ")} — la sessione e' GIA' APERTA, quindi non anticipano niente: servono a vedere se il movimento in corso e' coerente col resto o se il cash si sta staccando dai future.`
+            : `- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): ${fs.join(" · ")} — negativi marcati = apertura USA in gap-down attesa.`));
     }
   }
   // RADAR SCHIUMA SPECULATIVA v126 (ETF a leva 3x): l'euforia retail terminale sul tech/semi
@@ -6642,16 +6743,27 @@ function testoCorrelazioniMacro() {
        + "DENTRO ciascun composito, fra i componenti che la pipeline pubblica: e' l'informazione "
        + "che la media cancella. Nessuna correlazione storica fra indicatori e' dichiarata: nel "
        + "file non ci sono serie appaiate per calcolarla.)");
-  if (quadro) {
-    L.push(`- Quadro d'insieme: ${quadro.n} indicatori · mediana ${fmtNum.format(quadro.mediana)}/100 · `
-         + `${quadro.sotto50} sotto 50 e ${quadro.sopra50} sopra.`);
-    /* ⚠ v274 — anche nel pacchetto un proxy si dichiara. Il Philly Fed finiva in cima ai "piu'
-       favorevoli" a punteggio quasi pieno, e l'LLM non aveva modo di sapere che e' un
-       distretto e non il paese: nella riga che lo espone di piu' e' proprio dove serve. */
-    const et = (x) => `${x.nome}${x.proxy ? ` [proxy: ${x.proxy}]` : ""} ${x.score}`;
-    L.push(`  I tre piu' sfavorevoli: ${quadro.peggiori.map(et).join(" · ")}`);
-    L.push(`  I tre piu' favorevoli: ${quadro.migliori.map(et).join(" · ")}`);
-  }
+  /* ⚠⚠ v287 — IL VERDETTO AGGREGATO E' USCITO DAL PACCHETTO, ED E' LA CORREZIONE PIU'
+     IMPORTANTE DI QUESTO GIRO.
+     Diceva: "Quadro d'insieme: 26 indicatori · mediana 51,5/100 · 10 sotto 50 e 13 sopra · i
+     tre piu' sfavorevoli … i tre piu' favorevoli …". Sembra un fatto e non lo e': quei
+     punteggi 0-100 li calcolo IO, con formule mie — `clamp(100 - abs(v - 2) * 30)`
+     sull'inflazione, `clamp(50 + v * 40)` sulla curva, e via cosi' per tredici indicatori.
+     Contarli, mediarli e classificarli produce un GIUDIZIO SUL QUADRO MACRO travestito da
+     misura, e lo mette in cima al pacchetto dove ancora tutto e' da leggere.
+     Tre prove che la scala era arbitraria, tutte pagate in questa sessione:
+       · il Philly Fed saturava a 100 e ho dovuto cambiare la pendenza da 1,2 a 0,9 (v271);
+       · le materie prime hanno un punteggio POSIZIONALE che con lo stesso 90 significa
+         "inflazione" sul petrolio e "domanda industriale" sul rame (v280);
+       · il conteggio non chiudeva, e la toppa e' stata dichiarare i pareggi (v286).
+     Quando una scala va ritarata tre volte per farla sembrare sensata, il problema non e' la
+     taratura. E' che questo sistema ha gia' rimosso una volta un motore di punteggio, in
+     v200, per la stessa ragione: "ordinare e' gia' un giudizio".
+     ⚠ COSA RESTA, e perche' non e' la stessa cosa: la DISPERSIONE dentro i compositi (sotto)
+     sopravvive quando i componenti portano punteggi ALTRUI — quelli di Fear & Greed vengono
+     da CNN. Li' "i sette componenti vanno da 32 a 99" e' un fatto sul dato, non una mia
+     opinione travestita. E ogni indicatore continua ad avere valore, data e fonte: e' quello
+     che serve all'LLM per giudicare da se'. */
   for (const c of compositi) {
     L.push(`- ${c.nome}: ${fmtNum.format(c.score)}/100 come sintesi, ma i suoi ${c.n} componenti `
          + `vanno da ${c.min} a ${c.max} (ampiezza ${c.spread} punti, mediana ${fmtNum.format(c.mediana)}). `
@@ -7296,9 +7408,9 @@ function datiNostriDelTitolo(tk) {
   f.livelli.forEach(x => L.push(`- ${x.nome}: ${x.v}${dist(x.v)} — ${x.fonte}`));
   if (f.opzioni && f.opzioni.ratio != null) {
     L.push(`- Rapporto put/call di ${T} sulla scadenza ${f.opzioni.scadenza}: `
-      + `${Math.round(f.opzioni.ratio * 100) / 100} (put ${f.opzioni.put}, call ${f.opzioni.call})`
+      + `${Math.round(f.opzioni.ratio * 100) / 100} (volumi scambiati oggi: put ${f.opzioni.put}, call ${f.opzioni.call})`
       + (f.opzioni.nonLaPiuVicina
-          ? `. ⚠ NON e' la scadenza piu' vicina: e' quella con piu' contratti aperti (${f.opzioni.oi} contro ${f.opzioni.oiPiuVicina}). I muri di una scadenza quasi esaurita si spostano da soli senza che il mercato si muova, quindi non sono livelli.`
+          ? `. ⚠ NON e' la scadenza piu' vicina: e' quella con piu' CONTRATTI APERTI (${f.opzioni.oi} contro ${f.opzioni.oiPiuVicina} — grandezza diversa dai volumi qui sopra, non provare a farli tornare). I muri di una scadenza quasi esaurita si spostano da soli senza che il mercato si muova, quindi non sono livelli.`
           : ""));
   }
   const t = f.tecnici;

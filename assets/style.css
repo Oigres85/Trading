@@ -2011,3 +2011,21 @@ svg.g-serie { cursor: crosshair; }
 .sell-del { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 14px;
   padding: 0 4px; }
 .sell-del:hover { color: var(--red); }
+
+/* v287 — calendario dei prossimi sette giorni. Compatto per scelta: deve dire cosa arriva, non
+   diventare una tabella da leggere. Ogni riga porta "stimata" perché lo è davvero. */
+.cal-eventi { display: grid; gap: 10px; margin-top: 8px; }
+.cal-giorno { border-left: 2px solid var(--border); padding-left: 10px; }
+.cal-giorno.cal-oggi { border-left-color: var(--accent, #2962ff); }
+.cal-data { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 4px; }
+.cal-oggi .cal-data { color: var(--accent, #2962ff); }
+.cal-riga { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  padding: 3px 0; font-size: 12.5px; }
+.cal-tag { font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  padding: 1px 5px; border-radius: 999px; border: 1px solid; }
+.cal-macro { color: var(--cyan, #22d3ee); border-color: rgba(34,211,238,.4); background: rgba(34,211,238,.12); }
+.cal-utili { color: var(--yellow); border-color: rgba(245,158,11,.4); background: rgba(245,158,11,.12); }
+.cal-sub { font-size: 11px; color: var(--muted); }
+.cal-st { font-size: 10px; color: var(--muted); margin-left: auto; opacity: .8; }
+@media (max-width: 560px) { .cal-st { margin-left: 0; } }
