@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "288";
+const BUILD_VERSION = "289";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -790,6 +790,7 @@ function renderAll() {
      resta ferma su "non disponibili" anche dopo che i dati sono arrivati. Chi disegna al
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
+  renderTassi();                // v289 — curva dei tassi, osservazioni FRED
   montaTvMacro();               // v288 — contesto macro da TradingView (una volta sola)
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderEtfLungo();             // v281 — ETF di lungo periodo, universo fisso
@@ -2361,6 +2362,132 @@ const TV_MACRO = [
   { s: "FX:USDJPY", t: "USD/JPY", perche: "la gamba del carry trade Giappone: quando si rafforza lo yen si chiudono posizioni in tutto il mondo" },
   { s: "CRYPTO:BTCUSD", t: "Bitcoin", perche: "il termometro dell'appetito al rischio che scambia 24 ore su 24, anche quando le borse sono chiuse" },
 ];
+
+/* ═══ v289 — LA CURVA DEI TASSI, DISEGNATA SU OSSERVAZIONI PUBBLICATE ═════════════════════
+   Il CEO: "ok ma non con dati presunti ma dati effettivi". Qui non c'e' niente da stimare: ogni
+   punto e' un'osservazione che FRED ha pubblicato, con la sua data. Nessuna interpolazione,
+   nessun valore riempito, nessuna proiezione — l'opposto del calendario di v287, dove le date
+   sono stime e ogni riga lo dichiara.
+   ⚠ LA CURVA E' UNA FORMA, NON CINQUE NUMERI. La pagina mostrava 10A e 30A come due valori
+   separati: il fatto che conta e' come stanno FRA LORO. Una curva che sale poco fra 3 mesi e
+   30 anni dice che il mercato non si aspetta crescita; una che si irripidisce dice il
+   contrario. Per questo l'asse x sono le SCADENZE, non il tempo, e accanto c'e' la stessa
+   curva di tre mesi fa: due fotografie vere, non una tendenza ricostruita. */
+function curvaTassi(dati) {
+  const p = (dati.scadenze || []).filter(x => Number.isFinite(Number(x.value)));
+  if (p.length < 3) return "";
+  const W = 320, H = 150, L = 34, R = W - 10, T = 12, B = H - 24;
+  /* asse x logaritmico sulle scadenze: fra 3 mesi e 2 anni c'e' piu' informazione che fra 20 e
+     30, e su una scala lineare i tenori corti si schiacciano tutti a sinistra. */
+  const lx = (a) => Math.log(Math.max(0.25, a));
+  const xs = p.map(x => lx(x.anni));
+  const xmin = Math.min(...xs), xmax = Math.max(...xs);
+  const X = (a) => L + (lx(a) - xmin) / ((xmax - xmin) || 1) * (R - L);
+  const vals = p.flatMap(x => [Number(x.value), Number(x.value_3m)]).filter(Number.isFinite);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const marg = Math.max(0.15, (hi - lo) * 0.25);
+  lo -= marg; hi += marg;
+  const Y = (v) => B - (v - lo) / ((hi - lo) || 1) * (B - T);
+
+  const linea = (campo, colore, largh, tratteggio) => {
+    const punti = p.filter(x => Number.isFinite(Number(x[campo])));
+    if (punti.length < 2) return "";
+    return `<polyline points="${punti.map(x => `${X(x.anni).toFixed(1)},${Y(Number(x[campo])).toFixed(1)}`).join(" ")}" `
+      + `fill="none" stroke="${colore}" stroke-width="${largh}"${tratteggio ? ` stroke-dasharray="${tratteggio}"` : ""}/>`
+      + punti.map(x => `<circle cx="${X(x.anni).toFixed(1)}" cy="${Y(Number(x[campo])).toFixed(1)}" r="${largh > 1.8 ? 3 : 2}" fill="${colore}"/>`).join("");
+  };
+  const tacche = [lo + (hi - lo) * 0.15, lo + (hi - lo) * 0.5, lo + (hi - lo) * 0.85]
+    .map(v => `<line x1="${L}" y1="${Y(v).toFixed(1)}" x2="${R}" y2="${Y(v).toFixed(1)}" stroke="var(--border)" stroke-width="0.5"/>`
+      + `<text x="4" y="${(Y(v) + 3).toFixed(1)}" font-size="9" fill="var(--muted)">${fmtNum.format(Math.round(v * 100) / 100)}%</text>`).join("");
+  const etichette = p.map(x => `<text x="${X(x.anni).toFixed(1)}" y="${H - 8}" font-size="9" fill="var(--muted)" text-anchor="middle">${esc(x.label.replace(" anni", "a").replace(" mesi", "m"))}</text>`).join("");
+
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
+      aria-label="curva dei rendimenti dei titoli di stato americani per scadenza">
+    ${tacche}${etichette}
+    ${linea("value_3m", "var(--muted)", 1.4, "4 3")}
+    ${linea("value", "var(--cyan, #22d3ee)", 2.2, "")}
+  </svg>`;
+}
+
+function renderTassi() {
+  const box = $("#tassi-curva");
+  if (!box) return;
+  const t = (DATA && DATA.macro && DATA.macro.tassi) || null;
+  const nota = $("#tassi-nota");
+  const storico = $("#tassi-storico");
+  if (!t || !(t.scadenze || []).length) {
+    box.innerHTML = '<div class="muted">Arriva col prossimo giro della pipeline.</div>';
+    if (nota) nota.innerHTML = "";
+    if (storico) storico.innerHTML = "";
+    return;
+  }
+  box.innerHTML = curvaTassi(t);
+
+  const per = (k) => (t.scadenze || []).find(x => x.key === k);
+  const corto = per("m3") || per("a2"), lungo = per("a30") || per("a10");
+  const pendenza = (corto && lungo && Number.isFinite(lungo.value) && Number.isFinite(corto.value))
+    ? Math.round((lungo.value - corto.value) * 100) / 100 : null;
+  const pendenza3m = (corto && lungo && Number.isFinite(lungo.value_3m) && Number.isFinite(corto.value_3m))
+    ? Math.round((lungo.value_3m - corto.value_3m) * 100) / 100 : null;
+
+  /* le righe: valore, data VERA dell'osservazione, e lo scarto dalla stessa scadenza tre mesi
+     fa — anche quello un'osservazione, non una tendenza stimata. */
+  const righe = (t.scadenze || []).map(x => {
+    const d = (Number.isFinite(x.value) && Number.isFinite(x.value_3m))
+      ? Math.round((x.value - x.value_3m) * 100) / 100 : null;
+    return `<tr><td>${esc(x.label)}</td>
+      <td class="num"><b>${fmtNum.format(x.value)}%</b></td>
+      <td class="num ${d > 0 ? "neg" : d < 0 ? "pos" : "muted"}">${d != null ? signTxt(d, " pp") : "—"}</td>
+      <td class="muted tassi-fonte">${esc(x.series_id)} · oss. ${esc(x.observation_date)}</td></tr>`;
+  }).join("");
+  if (storico) {
+    storico.innerHTML = `<div class="tassi-scroll"><table class="tassi-tab"><thead><tr>
+      <th>Scadenza</th><th class="num">Rendimento</th><th class="num">vs 3 mesi fa</th><th>Serie FRED · osservazione</th>
+      </tr></thead><tbody>${righe}</tbody></table></div>`;
+  }
+  /* ⚠ LA STORIA DELLE TRE SCADENZE, ALLINEATA SULLE DATE VERE. Le serie vanno unite su un
+     asse di date comune, non affiancate per posizione: se il 30 anni ha un'osservazione che il
+     2 anni non ha, disegnarle per indice sfaserebbe le curve fra loro e il confronto — che e'
+     tutto il punto — direbbe una cosa falsa. Dove una serie non ha il dato passa `null`, e
+     `graficoSerie` spezza la linea invece di ricucire due estremi lontani. */
+  const serie = $("#tassi-serie");
+  if (serie) {
+    const st = t.storico || {};
+    const CHI = [
+      { k: "a2",  nome: "2 anni",  colore: "var(--green)" },
+      { k: "a10", nome: "10 anni", colore: "var(--blue)" },
+      { k: "a30", nome: "30 anni", colore: "var(--purple)" },
+    ].filter(x => (st[x.k] || []).length > 1);
+    if (!CHI.length) {
+      serie.innerHTML = "";
+    } else {
+      const date = [...new Set(CHI.flatMap(x => st[x.k].map(p => p.d)))].sort();
+      const dati = CHI.map(x => {
+        const m = new Map(st[x.k].map(p => [p.d, p.v]));
+        return { nome: x.nome, colore: x.colore,
+                 punti: date.map(d => ({ d, v: m.has(d) ? m.get(d) : null })) };
+      });
+      serie.innerHTML = graficoSerie(dati, { h: 210, compatto: true, unita: "%" })
+        + `<div class="tassi-leg">${CHI.map(x => `<span><i style="background:${x.colore}"></i>${esc(x.nome)}</span>`).join("")}`
+        + `<span class="muted">${date.length} giorni di rilevazione, dal ${esc(date[0])}</span></div>`;
+    }
+  }
+
+  if (nota) {
+    const dataUlt = (t.scadenze || []).map(x => x.observation_date).filter(Boolean).sort().pop();
+    nota.innerHTML = `<b>Osservazioni pubblicate da ${esc(t.fonte || "FRED")}</b>, non stime: `
+      + `ogni punto è un valore che la fonte ha pubblicato in quella data. L'ultima è del ${esc(dataUlt || "n.d.")}. `
+      + `La linea tratteggiata è la stessa curva tre mesi fa — anche quella osservata, non ricostruita. `
+      + `L'asse del grafico storico conta i giorni in cui la fonte ha RILEVATO, non i giorni di calendario: un giorno di chiusura non diventa un valore piatto, e dove una serie non ha il dato la linea si spezza invece di ricucire due estremi lontani.`
+      + (pendenza != null
+          ? `<div class="tassi-pend">Fra ${esc(corto.label)} e ${esc(lungo.label)} ci sono <b>${signTxt(pendenza, " pp")}</b>`
+            + (pendenza3m != null ? `, erano ${signTxt(pendenza3m, " pp")} tre mesi fa` : "")
+            + `. <b>Come si legge:</b> è la differenza che le banche incassano prestando a lunga e finanziandosi a breve — `
+            + `quando si assottiglia smettono di prestare, e quello è il canale per cui una curva piatta arriva all'economia reale, `
+            + `non una profezia statistica.</div>`
+          : "");
+  }
+}
 
 function montaTvMacro() {
   const box = $("#tvm-griglia");

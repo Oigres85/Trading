@@ -1840,6 +1840,89 @@ check("v288 TradingView macro: la nota dichiara cosa manca e perche'", (() => {
       && /li disegniamo già noi/.test(corpo);
 })());
 
+/* ══ v289 — LA CURVA DEI TASSI: "NON DATI PRESUNTI MA DATI EFFETTIVI" ════════════════════
+   Vincolo del CEO, e questi cancelli lo tengono. La differenza col calendario di v287 e'
+   netta e va tenuta netta: la' le date sono STIME e ogni riga lo dichiara, qui non c'e'
+   niente da stimare — il rendimento del decennale del 12 agosto e' un numero che FRED ha
+   pubblicato il 12 agosto. Se un domani qualcuno "migliora" il grafico riempiendo i buchi,
+   qui si accende. */
+
+/* ⚠ OGNI PUNTO PORTA LA SUA DATA DI OSSERVAZIONE. Un valore senza data e' un valore di cui
+   non si puo' dire quando e' vero: la settimana scorsa? stamattina? E' esattamente il modo
+   in cui un dato presunto si traveste da dato. */
+check("v289 tassi: ogni scadenza porta serie FRED e data di osservazione", suVeri(`
+  const t = DATA.macro && DATA.macro.tassi;
+  if (!t || !(t.scadenze||[]).length) return true;   // pipeline non ancora girata
+  return t.scadenze.every(x => /^DGS/.test(x.series_id||"")
+                            && /^\\d{4}-\\d{2}-\\d{2}$/.test(x.observation_date||""))`));
+
+/* ⚠⚠ I BUCHI RESTANO BUCHI. Le serie giornaliere di FRED non hanno osservazioni nei giorni di
+   chiusura. Riempirli con l'ultimo valore disegnerebbe un tratto piatto che nessun mercato ha
+   fatto: un dato presunto travestito da dato, cioe' proprio cio' che il CEO ha escluso. */
+check("v289 tassi: la pipeline non riempie i giorni senza osservazione", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  const i = py.indexOf("TASSI_FRED = [");
+  if (i < 0) return false;
+  const blocco = py.slice(i, py.indexOf("if etf_lungo:", i));
+  return !/ffill|fillna|forward.fill|interpolat|resample/i.test(blocco);
+})());
+
+/* ⚠ e nemmeno il disegno deve inventare: la linea salta i punti che non ci sono invece di
+   tirare una retta fra due estremi lontani. */
+check("v289 tassi: il grafico disegna solo valori finiti, non li stima", (() => {
+  const i = src.indexOf("function curvaTassi");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /Number\.isFinite/.test(corpo) && !/interpol|stima|previst/i.test(corpo);
+})());
+
+/* ⚠ LA CURVA E' UNA FORMA: l'asse x sono le SCADENZE, non il tempo. La pagina aveva gia' 10A
+   e 30A come due numeri separati; il fatto che aggiunge questo pannello e' come stanno FRA
+   loro. Se qualcuno lo riconverte in una serie temporale, il pannello torna a dire cio' che
+   la pagina diceva gia'. */
+check("v289 tassi: almeno tre scadenze diverse, altrimenti non e' una curva", suVeri(`
+  const t = DATA.macro && DATA.macro.tassi;
+  if (!t || !(t.scadenze||[]).length) return true;
+  const anni = new Set(t.scadenze.map(x => x.anni));
+  return anni.size >= 3 && Math.max(...anni) >= 10 && Math.min(...anni) <= 2`));
+
+/* ⚠ il confronto con tre mesi fa e' un'ALTRA osservazione, non una tendenza ricostruita: se
+   manca, la riga deve tacere invece di stimarla. */
+check("v289 tassi: il confronto a tre mesi e' un'osservazione datata, o niente", suVeri(`
+  const t = DATA.macro && DATA.macro.tassi;
+  if (!t || !(t.scadenze||[]).length) return true;
+  return t.scadenze.every(x => x.value_3m == null
+    ? x.observation_date_3m == null
+    : /^\\d{4}-\\d{2}-\\d{2}$/.test(x.observation_date_3m||""))`));
+
+/* ⚠ la pagina deve DIRE che sono osservazioni, non lasciarlo capire. E' la stessa regola per
+   cui il calendario deve dire "stimata": chi legge non deve indovinare quanto e' solido un
+   numero. */
+check("v289 tassi: il pannello dichiara la fonte e che sono osservazioni", (() => {
+  const i = src.indexOf("function renderTassi");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /Osservazioni pubblicate da/.test(corpo) && /non stime/.test(corpo);
+})());
+
+/* ⚠ LO STORICO PESA 36k CARATTERI IN data.json: se nessuno lo disegna e' peso morto spedito a
+   ogni caricamento, ed e' esattamente il grasso che abbiamo tolto portando il file da 1,3M a
+   647k. O si usa o si toglie dalla pipeline. */
+check("v289 tassi: lo storico spedito viene davvero disegnato", (() => {
+  const i = src.indexOf("function renderTassi");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /t\.storico/.test(corpo) && /graficoSerie\(/.test(corpo);
+})());
+
+/* ⚠⚠ LE SERIE VANNO ALLINEATE SULLE DATE, NON AFFIANCATE PER POSIZIONE. `graficoSerie` mappa
+   l'asse x per INDICE: se il 30 anni ha un'osservazione che il 2 anni non ha, disegnarle per
+   posizione sfaserebbe le curve fra loro — e il confronto fra scadenze e' tutto il punto del
+   pannello. L'unione delle date con `null` dove manca il dato e' cio' che tiene onesto il
+   grafico, perche' sui null la primitiva spezza la linea invece di ricucire. */
+check("v289 tassi: lo storico e' allineato su un asse di date comune", (() => {
+  const i = src.indexOf("function renderTassi");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /new Set\(CHI\.flatMap/.test(corpo) && /m\.has\(d\) \? m\.get\(d\) : null/.test(corpo);
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

@@ -18,7 +18,7 @@
 <title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=288">
+<link rel="stylesheet" href="assets/style.css?v=289">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -138,6 +138,22 @@
      pannello "tassi" resterebbe vuoto — e quei tassi li abbiamo gia' da FRED, fonte primaria,
      con data e prossima uscita. Oro, petrolio e rame funzionerebbero ma li disegniamo gia' noi
      con un anno di storia: sarebbe il doppione che abbiamo tolto altrove. -->
+<!-- v289 — LA CURVA DEI TASSI, da osservazioni pubblicate da FRED. Il CEO: "non con dati
+     presunti ma dati effettivi" — qui non c'e' niente da stimare: ogni punto e' un valore che
+     la fonte primaria ha pubblicato, con la sua data. I giorni senza osservazione restano
+     vuoti. L'asse x sono le SCADENZE, non il tempo: la curva e' una forma, e il fatto che
+     conta e' come stanno fra loro i tenori, non i singoli livelli. -->
+<section class="card" data-sez="tassi">
+    <div class="card-head">
+      <h2>La curva dei tassi</h2>
+      <span class="muted">osservazioni FRED · oggi contro tre mesi fa</span>
+    </div>
+    <div id="tassi-curva" class="tassi-curva"></div>
+    <div id="tassi-serie"></div>
+    <div id="tassi-storico"></div>
+    <div id="tassi-nota" class="muted"></div>
+  </section>
+
 <section class="card" data-sez="tv-macro">
     <div class="card-head">
       <h2>Contesto macro — TradingView</h2>
@@ -340,6 +356,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=288"></script>
+<script src="assets/app.js?v=289"></script>
 </body>
 </html>

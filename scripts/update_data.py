@@ -1746,6 +1746,58 @@ def fetch_macro():
             })
         except Exception as e:  # noqa: BLE001
             print(f"!! etf {sym}: {e}", file=sys.stderr)
+    # ═══ v289 — LA CURVA DEI TASSI, DA OSSERVAZIONI PUBBLICATE ════════════════════════════
+    # Il CEO: "ok ma non con dati presunti ma dati effettivi". Vincolo giusto e questo blocco lo
+    # rispetta alla lettera: ogni punto e' un'OSSERVAZIONE pubblicata da FRED, con la sua data
+    # vera. Niente interpolazioni, niente proiezioni, niente valori riempiti.
+    # ⚠ E' l'opposto del calendario di v287, dove le date sono STIME e ogni riga lo dichiara.
+    # Qui non c'e' niente da stimare: il rendimento del decennale del 12 agosto e' un numero
+    # pubblicato il 12 agosto.
+    #
+    # ⚠ GLI ID SONO STATI VERIFICATI UNO PER UNO, non indovinati: `DGS02` — la forma che veniva
+    # spontanea — restituisce HTTP 404, quello giusto e' `DGS2`. In questo progetto c'e' gia'
+    # una regola su questo (v195: "un ID indovinato e scritto come se fosse certo sarebbe stato
+    # peggio di un tentativo dichiarato"), e stavolta e' bastato provarli prima.
+    #
+    # ⚠ I BUCHI RESTANO BUCHI. Le serie giornaliere di FRED non hanno osservazioni nei giorni di
+    # chiusura, e riempirli con l'ultimo valore disegnerebbe un tratto piatto che nessun mercato
+    # ha fatto — cioe' un dato presunto travestito da dato. Si pubblica solo cio' che esiste.
+    TASSI_FRED = [
+        ("m3",  "DGS3MO", "3 mesi",   0.25),
+        ("a2",  "DGS2",   "2 anni",   2),
+        ("a5",  "DGS5",   "5 anni",   5),
+        ("a10", "DGS10",  "10 anni",  10),
+        ("a30", "DGS30",  "30 anni",  30),
+    ]
+    tassi = {"scadenze": [], "storico": {}, "fonte": "FRED (Federal Reserve Bank of St. Louis)"}
+    for chiave, sid, etichetta, anni in TASSI_FRED:
+        try:
+            s = fred_series(sid, 380)
+            if not s:
+                continue
+            # la CURVA DI OGGI e quella di tre mesi fa: due fotografie vere, non una tendenza
+            # ricostruita. Il confronto dice se la curva si e' irripidita o appiattita, ed e'
+            # la lettura che un livello da solo non da'.
+            ultimo_d, ultimo_v = s[-1]
+            prima = next((x for x in reversed(s[:-1])
+                          if (datetime.strptime(ultimo_d, "%Y-%m-%d")
+                              - datetime.strptime(x[0], "%Y-%m-%d")).days >= 90), None)
+            tassi["scadenze"].append({
+                "key": chiave, "series_id": sid, "label": etichetta, "anni": anni,
+                "value": round(float(ultimo_v), 2),
+                "observation_date": ultimo_d,
+                "value_3m": round(float(prima[1]), 2) if prima else None,
+                "observation_date_3m": prima[0] if prima else None,
+            })
+            # storico solo per i tre tenori che la pagina gia' cita: 380 punti × 5 serie
+            # peserebbero senza aggiungere lettura.
+            if chiave in ("a2", "a10", "a30"):
+                tassi["storico"][chiave] = [{"d": d, "v": round(float(v), 2)} for d, v in s]
+        except Exception as e:  # noqa: BLE001
+            print(f"!! tassi {sid}: {e}", file=sys.stderr)
+    if tassi["scadenze"]:
+        macro["tassi"] = tassi
+
     if etf_lungo:
         # ⚠ ORDINE FISSO, quello dell'universo: ordinarli per rendimento sarebbe la classifica
         # che questo blocco esiste per NON fare.
