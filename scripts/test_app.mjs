@@ -1792,6 +1792,54 @@ check("v287 calendario: nessuna nuova API con chiave introdotta", (() => {
   return !/alphavantage|finnhub/i.test(tutto);
 })());
 
+/* ══ v288 — IL SECONDO BOX TRADINGVIEW, E COSA NON CI STA DENTRO ═════════════════════════
+   Domanda del CEO: si possono portare i dati macro in un box TradingView? Due cose diverse:
+   mettere le NOSTRE serie dentro il widget non si puo' (disegna le sue); aggiungere un box con
+   gli strumenti macro si', e la mia risposta di prima era troppo larga — il ritardo che avevo
+   misurato riguarda le AZIONI, non VIX/cambi/cripto.
+   ⚠ Misurato con widget single-quote, uno per simbolo: BLOCCATI tutti i rendimenti Treasury
+   (US10Y, US02Y, US03MY, US05Y, US30Y), il DXY e tutti gli indici (SPX, NDX, RUT). Un pannello
+   "tassi" costruito li' sopra resterebbe vuoto. */
+check("v288 TradingView macro: solo simboli verificati, nessun tasso o indice bloccato", (() => {
+  const i = src.indexOf("const TV_MACRO");
+  const blocco = src.slice(i, src.indexOf("];", i));
+  const vietati = /US10Y|US02Y|US03MY|US05Y|US30Y|TVC:DXY|TVC:SPX|TVC:NDX|TVC:RUT/;
+  return /VIX/.test(blocco) && /FX:EURUSD/.test(blocco) && !vietati.test(blocco);
+})());
+
+/* ⚠⚠ NIENTE DOPPIONI: oro, petrolio e rame FUNZIONEREBBERO nel widget, ma li disegniamo gia'
+   noi con un anno di storia (v280). Metterli in tutti e due i posti e' esattamente il doppione
+   che il CEO mi ha fatto togliere per il VIX e poi per le materie prime dal macro. */
+check("v288 TradingView macro: non ripete oro, petrolio e rame che disegniamo gia'", (() => {
+  const i = src.indexOf("const TV_MACRO");
+  const blocco = src.slice(i, src.indexOf("];", i));
+  return !/GOLD|USOIL|COPPER/.test(blocco);
+})());
+
+/* ⚠ il primo box (grafico del titolo) non si tocca: e' lo strumento di analisi del CEO. */
+check("v288 TradingView: il box del titolo esiste ancora ed e' separato dal nuovo", (() => {
+  const html7 = readFileSync(join(ROOT, "index.html"), "utf8");
+  return html7.includes('id="tv-chart"') && html7.includes('id="tvm-griglia"')
+      && /function montaGraficoTV/.test(src) && /function montaTvMacro/.test(src);
+})());
+
+/* ⚠ un widget che non carica deve dirlo: un riquadro bianco si legge come "rotto". */
+check("v288 TradingView macro: il widget degrada in modo visibile se non carica", (() => {
+  const i = src.indexOf("function montaTvMacro");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /sc\.onerror = \(\) =>/.test(corpo) && /non si è caricato/.test(corpo);
+})());
+
+/* ⚠ e la nota deve dire cosa NON c'e' e perche', altrimenti il CEO cerca i tassi e non li
+   trova senza capire se manca il dato o il widget. */
+check("v288 TradingView macro: la nota dichiara cosa manca e perche'", (() => {
+  const i = src.indexOf("function montaTvMacro");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /Non ci sono i rendimenti dei Treasury/.test(corpo)
+      && /fonte primaria FRED/.test(corpo)
+      && /li disegniamo già noi/.test(corpo);
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

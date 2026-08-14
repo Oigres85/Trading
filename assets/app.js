@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "287";
+const BUILD_VERSION = "288";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -790,6 +790,7 @@ function renderAll() {
      resta ferma su "non disponibili" anche dopo che i dati sono arrivati. Chi disegna al
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
+  montaTvMacro();               // v288 — contesto macro da TradingView (una volta sola)
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderEtfLungo();             // v281 — ETF di lungo periodo, universo fisso
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
@@ -2325,6 +2326,93 @@ function prossimiEventi(giorni = 7) {
 
   ev.sort((a, b) => a.giorno.localeCompare(b.giorno) || a.tipo.localeCompare(b.tipo));
   return { dal: iso(oggi), al: iso(limite), eventi: ev };
+}
+
+/* ═══ v288 — IL SECONDO BOX TRADINGVIEW: SOLO CIO' CHE NOI NON DISEGNIAMO ═════════════════
+   Domanda del CEO: "non c'e' un modo per ottenere i nostri dati macro riportandoli in un nuovo
+   box di tradingview?". Due cose diverse, e vanno separate.
+   · METTERE I NOSTRI DATI DENTRO TRADINGVIEW: no, e non e' una cautela. Il widget disegna le
+     serie di TradingView; non esiste un modo pubblico per dargli in pasto una serie nostra.
+   · UN SECONDO BOX CON GLI STRUMENTI MACRO: si', e la mia risposta di prima era troppo larga.
+     Il ritardo che avevo misurato riguarda le AZIONI americane; VIX, cambi e cripto arrivano
+     senza la "D", cioe' in tempo reale.
+
+   ⚠ COSA HO MISURATO, PRIMA DI SCEGLIERE (widget single-quote, uno per simbolo):
+     funzionano  → VIX, FX:EURUSD, FX:USDJPY, TVC:GOLD, TVC:USOIL, COPPER, CRYPTO:BTCUSD
+     BLOCCATI    → TVC:US10Y, US02Y, US03MY, US05Y, US30Y, TVC:DXY, TVC:SPX, TVC:NDX, TVC:RUT
+                   ("Questo simbolo e' disponibile solo su TradingView")
+   Cioe': tutti i rendimenti dei Treasury, l'indice del dollaro e tutti gli indici azionari —
+   proprio il pannello "RATES" che il documento metteva al centro — NON sono disponibili nel
+   widget gratuito. Un box che li promettesse resterebbe vuoto.
+
+   ⚠⚠ E QUI LA DIVISIONE DEL LAVORO VIENE AL CONTRARIO DI COME SE L'ERA IMMAGINATA IL DOCUMENTO,
+   il che e' la parte utile della scoperta: TradingView copre bene cambi, volatilita' e cripto;
+   i TASSI li abbiamo gia' noi dalla fonte PRIMARIA (FRED: 10A, 30A, 10A-2A, 10A-3M, reale,
+   breakeven) con la data di rilevazione e la prossima uscita attesa — che e' piu' di quanto un
+   grafico saprebbe dire. Non c'e' niente da spostare: c'e' da NON duplicare.
+
+   ⚠ ORO, PETROLIO E RAME NON SONO QUI PUR FUNZIONANDO: li disegniamo gia' noi con un anno di
+   storia (v280, richiesta sua). Metterli anche nel box sarebbe lo stesso doppione che mi ha
+   fatto togliere per il VIX e per le materie prime dal macro. Restano i quattro strumenti di
+   cui la pagina ha SOLO il numero e nessuna traiettoria. */
+const TV_MACRO = [
+  { s: "VIX", t: "Volatilità S&P 500", perche: "la pagina ne mostra il livello con le sue soglie; qui si vede il PERCORSO degli ultimi mesi" },
+  { s: "FX:EURUSD", t: "EUR/USD", perche: "il cambio con cui si convertono i suoi conti: la pagina ne ha solo il numero di oggi" },
+  { s: "FX:USDJPY", t: "USD/JPY", perche: "la gamba del carry trade Giappone: quando si rafforza lo yen si chiudono posizioni in tutto il mondo" },
+  { s: "CRYPTO:BTCUSD", t: "Bitcoin", perche: "il termometro dell'appetito al rischio che scambia 24 ore su 24, anche quando le borse sono chiuse" },
+];
+
+function montaTvMacro() {
+  const box = $("#tvm-griglia");
+  if (!box) return;
+  if (typeof document === "undefined" || typeof document.createElement !== "function") return;
+  const prova = document.createElement("div");
+  if (!prova || typeof prova.appendChild !== "function") return;   // harness senza DOM (v257)
+  if (box.dataset.montato === "1") return;                         // una volta sola: sono iframe
+  box.dataset.montato = "1";
+  box.innerHTML = "";
+  for (const v of TV_MACRO) {
+    const cella = document.createElement("div");
+    cella.className = "tvm-cella";
+    const et = document.createElement("div");
+    et.className = "tvm-et";
+    et.innerHTML = `<b>${esc(v.t)}</b><span class="muted">${esc(v.perche)}</span>`;
+    cella.appendChild(et);
+    const host = document.createElement("div");
+    cella.appendChild(host);
+    box.appendChild(cella);
+
+    const cont = document.createElement("div");
+    cont.className = "tradingview-widget-container";
+    const inner = document.createElement("div");
+    inner.className = "tradingview-widget-container__widget";
+    cont.appendChild(inner);
+    const sc = document.createElement("script");
+    sc.type = "text/javascript";
+    sc.async = true;
+    sc.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
+    sc.text = JSON.stringify({
+      symbol: v.s, width: "100%", height: 180, locale: "it", dateRange: "3M",
+      colorTheme: "dark", isTransparent: false, autosize: false, chartOnly: false,
+    });
+    /* ⚠ se lo script non arriva (rete, blocco di terze parti) il riquadro resterebbe vuoto e
+       muto: un box bianco si legge come "rotto" e chi guarda non sa che fare. */
+    sc.onerror = () => {
+      host.innerHTML = `<div class="muted tvm-ko">Il grafico di ${esc(v.t)} non si è caricato `
+        + `(rete o blocco degli script di terze parti). Gli altri dati della pagina non passano da TradingView.</div>`;
+    };
+    cont.appendChild(sc);
+    host.appendChild(cont);
+  }
+  const nota = $("#tvm-nota");
+  if (nota) {
+    nota.innerHTML = "Grafici di TradingView, in tempo reale su questi quattro strumenti "
+      + "(le azioni americane invece arrivano con ~15 minuti di ritardo su ogni fonte gratuita). "
+      + "<b>Non ci sono i rendimenti dei Treasury, il dollaro e gli indici</b>: il widget gratuito non li espone — "
+      + "e i tassi li abbiamo già dalla fonte primaria FRED, con la data di rilevazione e la prossima uscita attesa, "
+      + "che è più di quanto direbbe un grafico. <b>Oro, petrolio e rame non sono qui</b> perché li disegniamo già noi "
+      + "con un anno di storia: due volte lo stesso dato è il doppione che abbiamo tolto altrove.";
+  }
 }
 
 function renderCalendario() {
