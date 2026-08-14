@@ -2043,7 +2043,7 @@ svg.g-serie { cursor: crosshair; }
 /* v289 — curva dei tassi. L'asse x sono le scadenze: la curva è una forma, e la forma è il
    messaggio. La riga con la serie FRED e la data dell'osservazione sta accanto a ogni valore
    perché "dati effettivi" vuol dire poter risalire al numero pubblicato. */
-.tassi-curva { max-width: 520px; margin: 6px auto 2px; }
+.tassi-curva { margin: 6px 0 2px; }
 .tassi-scroll { overflow-x: auto; margin-top: 6px; }
 .tassi-scroll > * { min-width: 0; }
 .tassi-tab { width: 100%; border-collapse: collapse; font-size: 12.5px;
@@ -2060,3 +2060,25 @@ svg.g-serie { cursor: crosshair; }
   font-size: 11px; margin-top: 2px; }
 .tassi-leg i { display: inline-block; width: 10px; height: 3px; border-radius: 2px;
   margin-right: 5px; vertical-align: middle; }
+
+/* ═══ v290 — TRE PANNELLI ALLA MISURA DI UNA TESSERA TRADINGVIEW ══════════════════════════
+   Richiesta del CEO: la curva dei tassi, gli ETF a dieci anni e la rotazione erano larghi
+   quanto tutta la card e alti fino a 260px, mentre "Volatilità S&P 500" nel contesto macro
+   sta in una tessera da mezza larghezza e 180px. Tre grafici grandi il doppio non erano tre
+   volte piu' informativi: erano solo tre schermate di scorrimento in piu' fra un dato e il
+   successivo.
+   ⚠ LA LARGHEZZA E' QUELLA DELLA TESSERA, CALCOLATA DALLA STESSA REGOLA, non un numero
+   copiato: la griglia TradingView e' `repeat(2, 1fr)` con 12px di gap, quindi una cella vale
+   (100% - 12px) / 2. Se un domani la griglia passa a tre colonne, questa formula va cambiata
+   insieme a quella — sono la stessa misura scritta due volte, e il commento serve a ricordarlo.
+   ⚠⚠ SOTTO I 700px SI TORNA A TUTTA LARGHEZZA, esattamente dove `.tvm-griglia` passa a una
+   colonna sola: su telefono meta' larghezza vorrebbe dire ~160px di tela, e le etichette
+   diventerebbero illeggibili — che e' il difetto contro cui il CEO si e' gia' espresso. */
+.graf-tessera { max-width: calc((100% - 12px) / 2); min-width: 0; }
+@media (max-width: 700px) { .graf-tessera { max-width: 100%; } }
+
+/* ⚠ le barre della rotazione hanno colonne fisse (116px etichetta + 92px valore): a meta'
+   larghezza restavano ~100px per la barra, cioe' la barra spariva e restava una tabella.
+   Stretto cio' che non porta informazione — l'etichetta e il numero — perche' la barra e' il
+   pannello. */
+.graf-tessera .obars-compatte .obar-row { grid-template-columns: 92px minmax(0, 1fr) 68px; gap: 6px; }

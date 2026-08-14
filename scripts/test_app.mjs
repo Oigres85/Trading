@@ -1923,6 +1923,65 @@ check("v289 tassi: lo storico e' allineato su un asse di date comune", (() => {
   return /new Set\(CHI\.flatMap/.test(corpo) && /m\.has\(d\) \? m\.get\(d\) : null/.test(corpo);
 })());
 
+/* ══ v290 — CIO' CHE SI DISEGNA IN PAGINA DEVE ARRIVARE ANCHE ALL'LLM ════════════════════
+   Difetto mio e ripetuto due volte: il calendario (v287) e la curva dei tassi (v289) erano
+   stati costruiti, disegnati, testati — e mai messi nel pacchetto. Chi leggeva l'analisi
+   generata vedeva meno di chi guardava la pagina che la genera, che e' il contrario di cio'
+   che serve. Il CEO l'ha chiesto ("abbiamo tenuto conto anche nella generazione del prompt?")
+   e la risposta era meta' no. Questi due cancelli fanno in modo che non si ripeta in silenzio. */
+check("v290 payload: la curva dei tassi arriva all'LLM, non solo allo schermo", suVeri(`
+  const p = buildPrompt();
+  const t = DATA.macro && DATA.macro.tassi;
+  if (!t || !(t.scadenze||[]).length) return true;
+  return /CURVA DEI TASSI USA/.test(p) && /OSSERVAZIONI PUBBLICATE/.test(p)
+      && t.scadenze.every(x => p.includes(x.label))`));
+
+/* ⚠ e con la data: un tasso senza la sua rilevazione, dentro un payload, l'LLM lo legge come
+   "di adesso" — e' la ragione per cui v250 ha messo la data di rilevazione su ogni statistica
+   ufficiale. Qui la riga deve dire a chiare lettere che NON e' di oggi. */
+check("v290 payload: la curva dichiara la data e che non e' di oggi", suVeri(`
+  const p = buildPrompt();
+  const t = DATA.macro && DATA.macro.tassi;
+  if (!t || !(t.scadenze||[]).length) return true;
+  return /quindi NON di oggi/.test(p)
+      && p.includes(t.scadenze.map(x => x.observation_date).filter(Boolean).sort().pop())`));
+
+/* ⚠⚠ PAGINA E PACCHETTO DEVONO GUARDARE LA STESSA FINESTRA. Se la pagina mostra due settimane
+   e il payload una, il CEO legge un'analisi che ignora la trimestrale che vede sullo schermo —
+   e non ha modo di capire perche'. Due numeri scritti in due punti diversi divergono sempre. */
+check("v290 payload: il calendario usa la stessa finestra della pagina", (() => {
+  const i = src.indexOf("function renderCalendario");
+  const g = src.slice(i, src.indexOf("\nfunction ", i + 10)).match(/prossimiEventi\((\w+)\)/);
+  const cost = src.match(/const GIORNI_CALENDARIO = (\d+)/);
+  const nelPayload = src.slice(src.indexOf("function buildPrompt")).match(/prossimiEventi\((\d+)\)/);
+  if (!g || !cost || !nelPayload) return false;
+  return Number(nelPayload[1]) === Number(cost[1]);
+})());
+
+/* ⚠ una serie GIORNALIERA non e' un appuntamento: "Curva 10A-2A in uscita domani" e' vero e
+   inutile, perche' esce ogni giorno di mercato. Tre righe cosi' annegavano l'unica utile. */
+check("v290 calendario: le serie giornaliere non sono eventi", suVeri(`
+  const ev = prossimiEventi(30).eventi.filter(e => e.tipo === "macro");
+  return ev.every(e => e.passo !== "giornaliero")`));
+
+/* ⚠ RIMPICCIOLIRE UN GRAFICO NON E' CAMBIARGLI L'ALTEZZA. Senza `compatto` la primitiva
+   disegna su una tela da 640px: dentro mezza card il browser la scala a meta' e il testo passa
+   da 9,5px a ~4,8px. La trappola e' scritta dentro `graficoSerie` stessa, e il grafico ETF ci
+   era finito dentro nel momento in cui l'ho stretto a una tessera. */
+check("v290 tessere: ogni grafico stretto a meta' card e' disegnato compatto", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const id = [...html.matchAll(/id="([\w-]+)"[^>]*class="[^"]*graf-tessera/g)].map(m => m[1]);
+  if (!id.length) return false;
+  // i contenitori a tessera che ricevono graficoSerie devono passare compatto: true
+  for (const x of ["#etf-lungo-grafico", "#tassi-serie"]) {
+    const i = src.indexOf(x);
+    if (i < 0) return false;
+    const intorno = src.slice(i, i + 900);
+    if (/graficoSerie\(/.test(intorno) && !/compatto: true/.test(intorno)) return false;
+  }
+  return true;
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

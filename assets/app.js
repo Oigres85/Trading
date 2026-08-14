@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "289";
+const BUILD_VERSION = "290";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2304,6 +2304,13 @@ function prossimiEventi(giorni = 7) {
   for (const i of ((DATA && DATA.macro && DATA.macro.indicators) || [])) {
     const c = (typeof cadenzaDato === "function") ? cadenzaDato(i.key, i.date) : null;
     if (!c || !c.prossimo) continue;
+    /* ⚠ v290 — UNA SERIE GIORNALIERA NON E' UN APPUNTAMENTO. "Curva 10A-2A in uscita domani" e'
+       vero e inutile: quella serie esce ogni giorno di mercato, come il prezzo di un'azione.
+       Il calendario serve a dire che mercoledi' esce il CPI — un evento che sposta i prezzi
+       perche' arriva in un istante noto e con un consenso da battere. Mescolare le due cose
+       annega l'unica utile sotto tre righe di rumore: e' il difetto per cui il TOP-10 e' uscito
+       dal payload in v184, "mai citato in nessuno dei tre report reali". */
+    if (c.passo === "giornaliero") continue;
     const d = new Date(c.prossimo + "T00:00:00");
     if (isNaN(d) || d < oggi || d > limite) continue;
     ev.push({ giorno: c.prossimo, tipo: "macro", nome: i.label,
@@ -2467,7 +2474,7 @@ function renderTassi() {
         return { nome: x.nome, colore: x.colore,
                  punti: date.map(d => ({ d, v: m.has(d) ? m.get(d) : null })) };
       });
-      serie.innerHTML = graficoSerie(dati, { h: 210, compatto: true, unita: "%" })
+      serie.innerHTML = graficoSerie(dati, { h: 180, compatto: true, unita: "%" })
         + `<div class="tassi-leg">${CHI.map(x => `<span><i style="background:${x.colore}"></i>${esc(x.nome)}</span>`).join("")}`
         + `<span class="muted">${date.length} giorni di rilevazione, dal ${esc(date[0])}</span></div>`;
     }
@@ -2604,7 +2611,7 @@ function renderEtfLungo() {
     colore: COLORI[i % COLORI.length],
   })).filter(s => s.punti.length > 2);
   box.innerHTML = serie.length
-    ? graficoSerie(serie, { h: 260, soglie: [{ v: 100, testo: "punto di partenza", colore: "var(--muted)" }],
+    ? graficoSerie(serie, { h: 180, compatto: true, soglie: [{ v: 100, testo: "punto di partenza", colore: "var(--muted)" }],
         aria: "andamento a dieci anni dei dieci ETF", etichetteDx: true })
     : '<div class="muted">Serie non disponibili.</div>';
 
@@ -6459,6 +6466,54 @@ function buildPrompt() {
       lines.push(`- ${u.label}: ${u.value} (${cad || `rilevazione ${u.date} — serie mensile, normale ritardo di pubblicazione`})${dqV.flags[u.key] ? " " + dqV.flags[u.key] : ""}`);
     }
   }
+  /* ⚠ v290 — LA CURVA DEI TASSI ARRIVA ANCHE ALL'LLM, non solo allo schermo.
+     Difetto mio, e ripetuto: in v287 avevo costruito il calendario e in v289 la curva, li avevo
+     disegnati in pagina e non li avevo messi nel pacchetto. Chi legge l'analisi vedeva un
+     terminale piu' ricco della pagina che gliela genera — il contrario di cio' che serve.
+     ⚠⚠ QUI VANNO SOLO FATTI (regola C9). Niente "curva piatta = recessione": e' esattamente il
+     verdetto aggregato che v287 ha tolto da questo stesso payload, e in v200 il motore di
+     punteggio se n'era andato per lo stesso motivo. I cinque numeri con le loro date, lo scarto
+     osservato a tre mesi e la pendenza — che e' una sottrazione, non un giudizio. Cosa voglia
+     dire lo decide chi legge. */
+  if (m.tassi && (m.tassi.scadenze || []).length >= 3) {
+    const sc = m.tassi.scadenze.filter(x => Number.isFinite(x.value));
+    const dataOss = sc.map(x => x.observation_date).filter(Boolean).sort().pop();
+    const pezzi = sc.map(x => {
+      const d = Number.isFinite(x.value_3m) ? ` [${signTxt(Math.round((x.value - x.value_3m) * 100) / 100, "")} vs ${fmtNum.format(x.value_3m)}% del ${x.observation_date_3m}]` : "";
+      return `${x.label} ${fmtNum.format(x.value)}%${d}`;
+    });
+    const c = sc[0], l = sc[sc.length - 1];
+    const pend = Math.round((l.value - c.value) * 100) / 100;
+    const pend3 = (Number.isFinite(l.value_3m) && Number.isFinite(c.value_3m))
+      ? Math.round((l.value_3m - c.value_3m) * 100) / 100 : null;
+    lines.push(`- CURVA DEI TASSI USA (${m.tassi.fonte || "FRED"}, OSSERVAZIONI PUBBLICATE — non stime, `
+      + `ultima del ${dataOss}, quindi NON di oggi: la fonte pubblica con qualche giorno di ritardo): `
+      + `${pezzi.join(" · ")}. Pendenza ${c.label}→${l.label}: ${signTxt(pend, " pp")}`
+      + (pend3 != null ? `, era ${signTxt(pend3, " pp")} tre mesi fa` : "")
+      + `. Fra parentesi quadre lo scarto dalla stessa scadenza tre mesi fa: e' un confronto fra `
+      + `due osservazioni datate, non una tendenza ricostruita.`);
+  }
+
+  /* ⚠ v290 — COSA ESCE NEI PROSSIMI SETTE GIORNI. Il payload diceva benissimo cosa E' USCITO e
+     taceva su cosa STA PER USCIRE: un'analisi scritta il giorno prima del CPI e una scritta il
+     giorno dopo non sono la stessa analisi, e l'LLM non aveva modo di saperlo.
+     ⚠⚠ SONO TUTTE STIME E OGNI RIGA LO DEVE DIRE, come in pagina: le uscite macro le proietto
+     dal ritardo tipico della fonte, le trimestrali le sposta l'emittente. Un appuntamento che
+     sembra confermato senza esserlo e' la classe di difetto peggiore di questo progetto. */
+  if (typeof prossimiEventi === "function") {
+    const pv = prossimiEventi(14);   // v290 — la stessa finestra della pagina: a 7 giorni era vuota
+    if (pv && pv.eventi && pv.eventi.length) {
+      const macro = pv.eventi.filter(e => e.tipo === "macro")
+        .map(e => `${e.giorno} ${e.nome}${e.precedente != null ? ` (precedente ${e.precedente})` : ""}`);
+      const utili = pv.eventi.filter(e => e.tipo === "utili").map(e => `${e.giorno} ${e.nome}`);
+      lines.push(`- IN USCITA NELLE PROSSIME 2 SETTIMANE — TUTTE DATE STIMATE, non appuntamenti confermati `
+        + `(le macro proiettate dal ritardo tipico della fonte, le trimestrali le sposta l'emittente): `
+        + (macro.length ? `dati macro: ${macro.join(" · ")}. ` : "nessun dato macro atteso. ")
+        + (utili.length ? `trimestrali dei titoli seguiti: ${utili.join(" · ")}.` : "nessuna trimestrale fra i titoli seguiti.")
+        + ` Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.`);
+    }
+  }
+
   if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
   /* ⚠ v264 — "5/10 attivi (50% RISCHIO RIBASSISTA)" ERA UN CONTEGGIO TRAVESTITO DA PROBABILITA'.
      Cinque campanelli su dieci non fanno il 50% di probabilita' di un mercato orso: fanno cinque
