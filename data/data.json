@@ -38330,7 +38330,34 @@
     "d1": -2.11,
     "m1": 21.2,
     "m3": 31.7,
-    "score": 100
+    "score": 100,
+    "prime": [
+     {
+      "tk": "NTNX",
+      "nome": "Nutanix Inc Class A",
+      "peso": 4.3
+     },
+     {
+      "tk": "ANET",
+      "nome": "Arista Networks Inc",
+      "peso": 4.0
+     },
+     {
+      "tk": "MSFT",
+      "nome": "Microsoft Corp",
+      "peso": 3.8
+     },
+     {
+      "tk": "P",
+      "nome": "Everpure Inc Class A",
+      "peso": 3.6
+     },
+     {
+      "tk": "GOOGL",
+      "nome": "Alphabet Inc Class A",
+      "peso": 3.3
+     }
+    ]
    },
    {
     "ticker": "IGV",
@@ -38341,7 +38368,34 @@
     "d1": -2.07,
     "m1": 11.1,
     "m3": 16.4,
-    "score": 83
+    "score": 83,
+    "prime": [
+     {
+      "tk": "PANW",
+      "nome": "Palo Alto Networks Inc",
+      "peso": 9.7
+     },
+     {
+      "tk": "MSFT",
+      "nome": "Microsoft Corp",
+      "peso": 9.6
+     },
+     {
+      "tk": "PLTR",
+      "nome": "Palantir Technologies Inc Ordinary Sha",
+      "peso": 7.8
+     },
+     {
+      "tk": "CRWD",
+      "nome": "CrowdStrike Holdings Inc Class A",
+      "peso": 7.0
+     },
+     {
+      "tk": "CRM",
+      "nome": "Salesforce Inc",
+      "peso": 5.4
+     }
+    ]
    },
    {
     "ticker": "ITA",
@@ -38352,7 +38406,34 @@
     "d1": 1.41,
     "m1": 7.7,
     "m3": 13.9,
-    "score": 75
+    "score": 75,
+    "prime": [
+     {
+      "tk": "GE",
+      "nome": "GE Aerospace",
+      "peso": 22.1
+     },
+     {
+      "tk": "RTX",
+      "nome": "RTX Corp",
+      "peso": 17.0
+     },
+     {
+      "tk": "BA",
+      "nome": "Boeing Co",
+      "peso": 9.0
+     },
+     {
+      "tk": "HWM",
+      "nome": "Howmet Aerospace Inc",
+      "peso": 4.8
+     },
+     {
+      "tk": "GD",
+      "nome": "General Dynamics Corp",
+      "peso": 4.8
+     }
+    ]
    },
    {
     "ticker": "XBI",
@@ -38363,7 +38444,34 @@
     "d1": 0.35,
     "m1": 3.6,
     "m3": 16.8,
-    "score": 72
+    "score": 72,
+    "prime": [
+     {
+      "tk": "APGE",
+      "nome": "Apogee Therapeutics Inc",
+      "peso": 1.6
+     },
+     {
+      "tk": "ORKA",
+      "nome": "Oruka Therapeutics Inc",
+      "peso": 1.5
+     },
+     {
+      "tk": "DNTH",
+      "nome": "Dianthus Therapeutics Inc",
+      "peso": 1.4
+     },
+     {
+      "tk": "ERAS",
+      "nome": "Erasca Inc",
+      "peso": 1.4
+     },
+     {
+      "tk": "TWST",
+      "nome": "Twist Bioscience Corp",
+      "peso": 1.4
+     }
+    ]
    },
    {
     "ticker": "IBB",
@@ -38374,7 +38482,34 @@
     "d1": -0.34,
     "m1": 4.6,
     "m3": 15.1,
-    "score": 72
+    "score": 72,
+    "prime": [
+     {
+      "tk": "AMGN",
+      "nome": "Amgen Inc",
+      "peso": 8.5
+     },
+     {
+      "tk": "VRTX",
+      "nome": "Vertex Pharmaceuticals Inc",
+      "peso": 7.9
+     },
+     {
+      "tk": "GILD",
+      "nome": "Gilead Sciences Inc",
+      "peso": 7.2
+     },
+     {
+      "tk": "REGN",
+      "nome": "Regeneron Pharmaceuticals Inc",
+      "peso": 6.1
+     },
+     {
+      "tk": "ARGX",
+      "nome": "argenx SE ADR",
+      "peso": 3.5
+     }
+    ]
    },
    {
     "ticker": "XLV",
@@ -38385,7 +38520,34 @@
     "d1": -0.6,
     "m1": 3.4,
     "m3": 15.3,
-    "score": 70
+    "score": 70,
+    "prime": [
+     {
+      "tk": "LLY",
+      "nome": "Eli Lilly and Co",
+      "peso": 15.5
+     },
+     {
+      "tk": "JNJ",
+      "nome": "Johnson & Johnson",
+      "peso": 10.5
+     },
+     {
+      "tk": "ABBV",
+      "nome": "AbbVie Inc",
+      "peso": 7.5
+     },
+     {
+      "tk": "UNH",
+      "nome": "UnitedHealth Group Inc",
+      "peso": 6.4
+     },
+     {
+      "tk": "MRK",
+      "nome": "Merck & Co Inc",
+      "peso": 5.5
+     }
+    ]
    },
    {
     "ticker": "XLE",
@@ -38396,7 +38558,34 @@
     "d1": 1.39,
     "m1": 8.6,
     "m3": 8.3,
-    "score": 71
+    "score": 71,
+    "prime": [
+     {
+      "tk": "XOM",
+      "nome": "ExxonMobil Holdings Corp",
+      "peso": 20.6
+     },
+     {
+      "tk": "CVX",
+      "nome": "Chevron Corp",
+      "peso": 15.3
+     },
+     {
+      "tk": "COP",
+      "nome": "ConocoPhillips",
+      "peso": 6.1
+     },
+     {
+      "tk": "MPC",
+      "nome": "Marathon Petroleum Corp",
+      "peso": 4.9
+     },
+     {
+      "tk": "PSX",
+      "nome": "Phillips 66",
+      "peso": 4.9
+     }
+    ]
    },
    {
     "ticker": "XLF",
@@ -38407,7 +38596,34 @@
     "d1": -0.17,
     "m1": 2.5,
     "m3": 13.2,
-    "score": 67
+    "score": 67,
+    "prime": [
+     {
+      "tk": "JPM",
+      "nome": "JPMorgan Chase & Co",
+      "peso": 11.7
+     },
+     {
+      "tk": "BRK-B",
+      "nome": "Berkshire Hathaway Inc Class B",
+      "peso": 11.7
+     },
+     {
+      "tk": "V",
+      "nome": "Visa Inc Class A",
+      "peso": 7.6
+     },
+     {
+      "tk": "MA",
+      "nome": "Mastercard Inc Class A",
+      "peso": 5.7
+     },
+     {
+      "tk": "BAC",
+      "nome": "Bank of America Corp",
+      "peso": 5.0
+     }
+    ]
    },
    {
     "ticker": "XLK",
@@ -38418,7 +38634,34 @@
     "d1": -0.4,
     "m1": 7.0,
     "m3": 8.6,
-    "score": 69
+    "score": 69,
+    "prime": [
+     {
+      "tk": "NVDA",
+      "nome": "NVIDIA Corp",
+      "peso": 13.8
+     },
+     {
+      "tk": "AAPL",
+      "nome": "Apple Inc",
+      "peso": 12.9
+     },
+     {
+      "tk": "MSFT",
+      "nome": "Microsoft Corp",
+      "peso": 9.8
+     },
+     {
+      "tk": "AVGO",
+      "nome": "Broadcom Inc",
+      "peso": 5.2
+     },
+     {
+      "tk": "AMD",
+      "nome": "Advanced Micro Devices Inc",
+      "peso": 4.2
+     }
+    ]
    },
    {
     "ticker": "XLI",
@@ -38429,7 +38672,34 @@
     "d1": 0.39,
     "m1": 3.5,
     "m3": 7.2,
-    "score": 63
+    "score": 63,
+    "prime": [
+     {
+      "tk": "GE",
+      "nome": "GE Aerospace",
+      "peso": 6.7
+     },
+     {
+      "tk": "CAT",
+      "nome": "Caterpillar Inc",
+      "peso": 6.7
+     },
+     {
+      "tk": "RTX",
+      "nome": "RTX Corp",
+      "peso": 5.2
+     },
+     {
+      "tk": "GEV",
+      "nome": "GE Vernova Inc",
+      "peso": 4.8
+     },
+     {
+      "tk": "UNP",
+      "nome": "Union Pacific Corp",
+      "peso": 3.1
+     }
+    ]
    },
    {
     "ticker": "SMH",
@@ -38440,7 +38710,34 @@
     "d1": -0.22,
     "m1": 3.3,
     "m3": 4.7,
-    "score": 60
+    "score": 60,
+    "prime": [
+     {
+      "tk": "NVDA",
+      "nome": "NVIDIA Corp",
+      "peso": 20.8
+     },
+     {
+      "tk": "TSM",
+      "nome": "Taiwan Semiconductor Manufacturing Co ",
+      "peso": 9.6
+     },
+     {
+      "tk": "AVGO",
+      "nome": "Broadcom Inc",
+      "peso": 6.6
+     },
+     {
+      "tk": "AMD",
+      "nome": "Advanced Micro Devices Inc",
+      "peso": 5.7
+     },
+     {
+      "tk": "MU",
+      "nome": "Micron Technology Inc",
+      "peso": 5.2
+     }
+    ]
    },
    {
     "ticker": "IYT",
@@ -38451,7 +38748,34 @@
     "d1": -0.79,
     "m1": -0.7,
     "m3": 8.5,
-    "score": 57
+    "score": 57,
+    "prime": [
+     {
+      "tk": "UNP",
+      "nome": "Union Pacific Corp",
+      "peso": 17.4
+     },
+     {
+      "tk": "UBER",
+      "nome": "Uber Technologies Inc",
+      "peso": 14.3
+     },
+     {
+      "tk": "CSX",
+      "nome": "CSX Corp",
+      "peso": 9.4
+     },
+     {
+      "tk": "UPS",
+      "nome": "United Parcel Service Inc Class B",
+      "peso": 5.6
+     },
+     {
+      "tk": "UAL",
+      "nome": "United Airlines Holdings Inc",
+      "peso": 4.9
+     }
+    ]
    },
    {
     "ticker": "XLB",
@@ -38462,7 +38786,34 @@
     "d1": 0.44,
     "m1": 3.8,
     "m3": 2.2,
-    "score": 58
+    "score": 58,
+    "prime": [
+     {
+      "tk": "LIN",
+      "nome": "Linde PLC",
+      "peso": 13.1
+     },
+     {
+      "tk": "NEM",
+      "nome": "Newmont Corp",
+      "peso": 5.9
+     },
+     {
+      "tk": "FCX",
+      "nome": "Freeport-McMoRan Inc",
+      "peso": 5.3
+     },
+     {
+      "tk": "SHW",
+      "nome": "Sherwin-Williams Co",
+      "peso": 4.9
+     },
+     {
+      "tk": "ECL",
+      "nome": "Ecolab Inc",
+      "peso": 4.7
+     }
+    ]
    },
    {
     "ticker": "ARKK",
@@ -38473,7 +38824,34 @@
     "d1": -1.8,
     "m1": 1.9,
     "m3": 1.3,
-    "score": 54
+    "score": 54,
+    "prime": [
+     {
+      "tk": "TSLA",
+      "nome": "Tesla Inc",
+      "peso": 9.4
+     },
+     {
+      "tk": "SPCX",
+      "nome": "Space Exploration Technologies Corp Cl",
+      "peso": 4.9
+     },
+     {
+      "tk": "TEM",
+      "nome": "Tempus AI Inc Class A common stock",
+      "peso": 4.8
+     },
+     {
+      "tk": "CRSP",
+      "nome": "CRISPR Therapeutics AG",
+      "peso": 4.7
+     },
+     {
+      "tk": "COIN",
+      "nome": "Coinbase Global Inc Ordinary Shares - ",
+      "peso": 4.5
+     }
+    ]
    },
    {
     "ticker": "XLP",
@@ -38484,7 +38862,34 @@
     "d1": 0.1,
     "m1": 0.3,
     "m3": 2.7,
-    "score": 53
+    "score": 53,
+    "prime": [
+     {
+      "tk": "WMT",
+      "nome": "Walmart Inc",
+      "peso": 10.4
+     },
+     {
+      "tk": "COST",
+      "nome": "Costco Wholesale Corp",
+      "peso": 9.0
+     },
+     {
+      "tk": "KO",
+      "nome": "Coca-Cola Co",
+      "peso": 7.2
+     },
+     {
+      "tk": "PG",
+      "nome": "Procter & Gamble Co",
+      "peso": 7.2
+     },
+     {
+      "tk": "PM",
+      "nome": "Philip Morris International Inc",
+      "peso": 6.3
+     }
+    ]
    },
    {
     "ticker": "GLD",
@@ -38506,7 +38911,34 @@
     "d1": 0.33,
     "m1": -0.4,
     "m3": 2.4,
-    "score": 52
+    "score": 52,
+    "prime": [
+     {
+      "tk": "WELL",
+      "nome": "Welltower Inc",
+      "peso": 11.1
+     },
+     {
+      "tk": "PLD",
+      "nome": "Prologis Inc",
+      "peso": 9.0
+     },
+     {
+      "tk": "EQIX",
+      "nome": "Equinix Inc",
+      "peso": 6.7
+     },
+     {
+      "tk": "AMT",
+      "nome": "American Tower Corp",
+      "peso": 5.4
+     },
+     {
+      "tk": "SPG",
+      "nome": "Simon Property Group Inc",
+      "peso": 5.0
+     }
+    ]
    },
    {
     "ticker": "XLY",
@@ -38517,7 +38949,34 @@
     "d1": -0.21,
     "m1": 0.7,
     "m3": 0.1,
-    "score": 51
+    "score": 51,
+    "prime": [
+     {
+      "tk": "AMZN",
+      "nome": "Amazon.com Inc",
+      "peso": 25.6
+     },
+     {
+      "tk": "TSLA",
+      "nome": "Tesla Inc",
+      "peso": 14.7
+     },
+     {
+      "tk": "HD",
+      "nome": "The Home Depot Inc",
+      "peso": 5.5
+     },
+     {
+      "tk": "MCD",
+      "nome": "McDonald's Corp",
+      "peso": 4.2
+     },
+     {
+      "tk": "TJX",
+      "nome": "TJX Companies Inc",
+      "peso": 4.1
+     }
+    ]
    },
    {
     "ticker": "XLC",
@@ -38528,7 +38987,34 @@
     "d1": 0.36,
     "m1": 1.3,
     "m3": -3.2,
-    "score": 49
+    "score": 49,
+    "prime": [
+     {
+      "tk": "META",
+      "nome": "Meta Platforms Inc Class A",
+      "peso": 16.6
+     },
+     {
+      "tk": "GOOGL",
+      "nome": "Alphabet Inc Class A",
+      "peso": 11.0
+     },
+     {
+      "tk": "GOOG",
+      "nome": "Alphabet Inc Class C",
+      "peso": 8.9
+     },
+     {
+      "tk": "T",
+      "nome": "AT&T Inc",
+      "peso": 4.8
+     },
+     {
+      "tk": "VZ",
+      "nome": "Verizon Communications Inc",
+      "peso": 4.8
+     }
+    ]
    },
    {
     "ticker": "XLU",
@@ -38539,7 +39025,34 @@
     "d1": 0.61,
     "m1": -2.6,
     "m3": -1.3,
-    "score": 45
+    "score": 45,
+    "prime": [
+     {
+      "tk": "NEE",
+      "nome": "NextEra Energy Inc",
+      "peso": 13.0
+     },
+     {
+      "tk": "SO",
+      "nome": "Southern Co",
+      "peso": 7.7
+     },
+     {
+      "tk": "DUK",
+      "nome": "Duke Energy Corp",
+      "peso": 7.0
+     },
+     {
+      "tk": "CEG",
+      "nome": "Constellation Energy Corp",
+      "peso": 6.0
+     },
+     {
+      "tk": "AEP",
+      "nome": "American Electric Power Co Inc",
+      "peso": 5.0
+     }
+    ]
    },
    {
     "ticker": "TAN",
@@ -38550,7 +39063,34 @@
     "d1": -0.95,
     "m1": -4.1,
     "m3": -15.7,
-    "score": 28
+    "score": 28,
+    "prime": [
+     {
+      "tk": "FSLR",
+      "nome": "First Solar Inc",
+      "peso": 10.0
+     },
+     {
+      "tk": "NXT",
+      "nome": "Nextpower Inc Class A",
+      "peso": 9.3
+     },
+     {
+      "tk": "ENLT.TA",
+      "nome": "Enlight Renewable Energy Ltd",
+      "peso": 7.6
+     },
+     {
+      "tk": "ENPH",
+      "nome": "Enphase Energy Inc",
+      "peso": 6.5
+     },
+     {
+      "tk": "DORL.TA",
+      "nome": "Doral Group Renewable Eneryy Resources",
+      "peso": 4.6
+     }
+    ]
    }
   ],
   "witching": {

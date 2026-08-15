@@ -2032,13 +2032,6 @@ svg.g-serie { cursor: crosshair; }
 
 /* v288 — secondo box TradingView: contesto macro. Quattro mini-grafici, uno per strumento,
    ognuno con scritto PERCHE' sta li' — un grafico senza quella riga è decorazione. */
-.tvm-griglia { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
-.tvm-cella { border: 1px solid var(--border); border-radius: 8px; padding: 8px; min-width: 0; }
-.tvm-et { margin-bottom: 4px; line-height: 1.35; }
-.tvm-et b { font-size: 12.5px; }
-.tvm-et span { display: block; font-size: 11px; }
-.tvm-ko { font-size: 11.5px; padding: 12px 4px; }
-@media (max-width: 700px) { .tvm-griglia { grid-template-columns: 1fr; } }
 
 /* v289 — curva dei tassi. L'asse x sono le scadenze: la curva è una forma, e la forma è il
    messaggio. La riga con la serie FRED e la data dell'osservazione sta accanto a ogni valore
@@ -2071,7 +2064,6 @@ svg.g-serie { cursor: crosshair; }
    copiato: la griglia TradingView e' `repeat(2, 1fr)` con 12px di gap, quindi una cella vale
    (100% - 12px) / 2. Se un domani la griglia passa a tre colonne, questa formula va cambiata
    insieme a quella — sono la stessa misura scritta due volte, e il commento serve a ricordarlo.
-   ⚠⚠ SOTTO I 700px SI TORNA A TUTTA LARGHEZZA, esattamente dove `.tvm-griglia` passa a una
    colonna sola: su telefono meta' larghezza vorrebbe dire ~160px di tela, e le etichette
    diventerebbero illeggibili — che e' il difetto contro cui il CEO si e' gia' espresso. */
 .graf-tessera { max-width: calc((100% - 12px) / 2); min-width: 0; }
@@ -2099,12 +2091,9 @@ svg.g-serie { cursor: crosshair; }
 
 /* v294 — i gruppi di indicatori. Un <details> chiuso deve leggersi come una scatola etichettata,
    non come un buco: per questo l'intestazione porta il conteggio ed è cliccabile per intero. */
-.mg-fam { border: 1px solid var(--border); border-radius: 8px; margin: 8px 0; }
-.mg-fam > summary { cursor: pointer; padding: 8px 10px; font-size: 13px; list-style: none;
   display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
-.mg-fam > summary::-webkit-details-marker { display: none; }
-.mg-fam > summary::before { content: "▸"; color: var(--muted); font-size: 11px; }
-.mg-fam[open] > summary::before { content: "▾"; }
-.mg-fam[open] > summary { border-bottom: 1px solid var(--border); }
-.mg-fam > .mg-tris { padding: 8px; }
-.mg-fam-avviso { color: var(--yellow); font-size: 11px; }
+
+/* v298 — il decennale da solo: un numero grande e la sua provenienza, senza curva da leggere. */
+.tassi-dieci { display: flex; flex-direction: column; gap: 2px; margin: 4px 0 2px; }
+.tassi-dieci b { font-size: 26px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.tassi-dieci span { font-size: 11.5px; }

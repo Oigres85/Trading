@@ -1609,69 +1609,6 @@ check("v280 put/call: il pannello non costruisce piu' tabelle sui titoli del por
   DATA.portfolio = saved;
   return !/ZZOLD/.test(html) && !/PRESSIONE DI ROLLING/i.test(html)`));
 
-/* ══ v281 — ETF DI LUNGO PERIODO: L'INVARIANTE E' CHE NON SIA UNA CLASSIFICA ═════════════
-   Il CEO: "i migliori 10 etf come media degli ultimi 10 anni ... cosi' da capire su quale ETF
-   entrare in ottica di lungo periodo". La sezione da' i numeri e NON la risposta, per una
-   ragione misurata in questo progetto: in v200 il motore di punteggio e' stato tolto perche'
-   "ordinare e' gia' un giudizio", con un hit-rate del 29%. A dieci anni non cambia. */
-
-/* ⚠ IL CHECK PIU' IMPORTANTE: l'ordine e' quello dell'UNIVERSO, non del rendimento. Se un
-   domani qualcuno "migliora" la tabella ordinandola per CAGR, la sezione diventa una
-   raccomandazione travestita da dato — che e' esattamente cio' che non deve essere. */
-check("v281 ETF: la tabella NON e' ordinata per rendimento", (() => {
-  const i = src.indexOf("function renderEtfLungo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10)).replace(/\/\*[\s\S]*?\*\//g, "");
-  return !/\.sort\(/.test(corpo) && /e\.voci\.map/.test(corpo);
-})());
-
-check("v281 ETF: la pipeline usa un universo FISSO, non i primi per rendimento", (() => {
-  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
-  const i = py.indexOf("UNIVERSO_ETF = [");
-  const blocco = py.slice(i, py.indexOf("]", i));
-  /* dieci simboli scritti a mano, e nessun ordinamento per rendimento nel blocco che li usa */
-  const n = (blocco.match(/\(\"[A-Z]{3}\"/g) || []).length;
-  const usa = py.slice(i, i + 5000).replace(/#[^\n]*/g, "");
-  return n === 10 && !/sort\(.*cagr|sorted\(.*cagr/.test(usa);
-})());
-
-/* ⚠ RENDIMENTO TOTALE, non di prezzo, e la differenza decide la lettura: misurato sui dati
-   veri AGG fa -1,45% l'anno di solo prezzo e +1,38% col dividendo reinvestito. Col prezzo nudo
-   un obbligazionario sembrerebbe aver perso per dieci anni. */
-check("v281 ETF: si usa il rendimento TOTALE (auto_adjust), e la nota lo dichiara", (() => {
-  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
-  const i = src.indexOf("function renderEtfLungo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /period="10y", auto_adjust=True/.test(py) && /dividendi reinvestiti/.test(corpo);
-})());
-
-/* ⚠ "MAI RECUPERATO" e "ANCORA IN CORSO" sono due cose diverse: AGG non recupera dal 2022,
-   l'oro ha il suo peggior calo del mese scorso. Metterli sotto la stessa etichetta
-   confonderebbe una ferita vecchia con una fresca. */
-check("v281 ETF: un calo non ancora recuperato dichiara da QUANTO dura", (() => {
-  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
-  const i = src.indexOf("function renderEtfLungo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /giorni_sotto/.test(py) && /sotto da \$\{Math\.round\(v\.giorni_sotto/.test(corpo);
-})());
-
-/* ⚠ la tabella senza gli avvisi si legge come una classifica di cosa comprare. Non sono
-   decorazione: sono la differenza fra un dato e una raccomandazione. */
-check("v281 ETF: gli avvisi che impediscono di leggerla come raccomandazione ci sono", (() => {
-  const i = src.indexOf("function renderEtfLungo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /non sono "i migliori dieci"/i.test(corpo)
-      && /Non sono un consulente finanziario/i.test(corpo)
-      && /Il rendimento medio nasconde il percorso/i.test(corpo)
-      && /Il costo si moltiplica/i.test(corpo);
-})());
-
-check("v281 ETF: la sezione e' nella catena di render e ha il suo posto in pagina", (() => {
-  const html6 = readFileSync(join(ROOT, "index.html"), "utf8");
-  const i = src.indexOf("function renderAll()");
-  return /renderEtfLungo\(\)/.test(src.slice(i, src.indexOf("\nfunction ", i + 1)))
-      && html6.includes('id="etf-lungo-tab"') && html6.includes('id="etf-lungo-grafico"');
-})());
-
 /* ══ v282 — "INSERIRO' IO I DATI" DEVE ESSERE POSSIBILE ══════════════════════════════════
    Il CEO ha scelto di inserire a mano le posizioni invece di farmi ricollegare gli strumenti al
    portafoglio. Verificando che fosse fattibile ho trovato che per meta' non lo era: il
@@ -1820,60 +1757,15 @@ check("v287 calendario: nessuna nuova API con chiave introdotta", (() => {
   return !/alphavantage|finnhub/i.test(tutto);
 })());
 
-/* ══ v288 — IL SECONDO BOX TRADINGVIEW, E COSA NON CI STA DENTRO ═════════════════════════
-   Domanda del CEO: si possono portare i dati macro in un box TradingView? Due cose diverse:
-   mettere le NOSTRE serie dentro il widget non si puo' (disegna le sue); aggiungere un box con
-   gli strumenti macro si', e la mia risposta di prima era troppo larga — il ritardo che avevo
-   misurato riguarda le AZIONI, non VIX/cambi/cripto.
-   ⚠ Misurato con widget single-quote, uno per simbolo: BLOCCATI tutti i rendimenti Treasury
-   (US10Y, US02Y, US03MY, US05Y, US30Y), il DXY e tutti gli indici (SPX, NDX, RUT). Un pannello
-   "tassi" costruito li' sopra resterebbe vuoto. */
-check("v288 TradingView macro: solo simboli verificati, nessun tasso o indice bloccato", (() => {
-  const i = src.indexOf("const TV_MACRO");
-  const blocco = src.slice(i, src.indexOf("];", i));
-  const vietati = /US10Y|US02Y|US03MY|US05Y|US30Y|TVC:DXY|TVC:SPX|TVC:NDX|TVC:RUT/;
-  return /VIX/.test(blocco) && /FX:EURUSD/.test(blocco) && !vietati.test(blocco);
-})());
-
-/* ⚠⚠ NIENTE DOPPIONI: oro, petrolio e rame FUNZIONEREBBERO nel widget, ma li disegniamo gia'
-   noi con un anno di storia (v280). Metterli in tutti e due i posti e' esattamente il doppione
-   che il CEO mi ha fatto togliere per il VIX e poi per le materie prime dal macro. */
-check("v288 TradingView macro: non ripete oro, petrolio e rame che disegniamo gia'", (() => {
-  const i = src.indexOf("const TV_MACRO");
-  const blocco = src.slice(i, src.indexOf("];", i));
-  return !/GOLD|USOIL|COPPER/.test(blocco);
-})());
-
 /* ⚠ il primo box (grafico del titolo) non si tocca: e' lo strumento di analisi del CEO. */
-check("v288 TradingView: il box del titolo esiste ancora ed e' separato dal nuovo", (() => {
-  const html7 = readFileSync(join(ROOT, "index.html"), "utf8");
-  return html7.includes('id="tv-chart"') && html7.includes('id="tvm-griglia"')
-      && /function montaGraficoTV/.test(src) && /function montaTvMacro/.test(src);
+/* ⚠ v298 — il "box nuovo" (contesto macro TradingView) e' stato tolto su richiesta del
+   CEO. Il check non si zittisce: gli resta l'invariante che conta davvero, cioe' che il
+   grafico TradingView DEL TITOLO — quello su cui si guardano i livelli — sia ancora li'. */
+check("v298 TradingView: il grafico del titolo e' ancora montato", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  return /id="tv-chart"|tradingview-widget-container/.test(html)
+      && /function montaGraficoTV/.test(src);
 })());
-
-/* ⚠ un widget che non carica deve dirlo: un riquadro bianco si legge come "rotto". */
-check("v288 TradingView macro: il widget degrada in modo visibile se non carica", (() => {
-  const i = src.indexOf("function montaTvMacro");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /sc\.onerror = \(\) =>/.test(corpo) && /non si è caricato/.test(corpo);
-})());
-
-/* ⚠ e la nota deve dire cosa NON c'e' e perche', altrimenti il CEO cerca i tassi e non li
-   trova senza capire se manca il dato o il widget. */
-check("v288 TradingView macro: la nota dichiara cosa manca e perche'", (() => {
-  const i = src.indexOf("function montaTvMacro");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /Non ci sono i rendimenti dei Treasury/.test(corpo)
-      && /fonte primaria FRED/.test(corpo)
-      && /li disegniamo già noi/.test(corpo);
-})());
-
-/* ══ v289 — LA CURVA DEI TASSI: "NON DATI PRESUNTI MA DATI EFFETTIVI" ════════════════════
-   Vincolo del CEO, e questi cancelli lo tengono. La differenza col calendario di v287 e'
-   netta e va tenuta netta: la' le date sono STIME e ogni riga lo dichiara, qui non c'e'
-   niente da stimare — il rendimento del decennale del 12 agosto e' un numero che FRED ha
-   pubblicato il 12 agosto. Se un domani qualcuno "migliora" il grafico riempiendo i buchi,
-   qui si accende. */
 
 /* ⚠ OGNI PUNTO PORTA LA SUA DATA DI OSSERVAZIONE. Un valore senza data e' un valore di cui
    non si puo' dire quando e' vero: la settimana scorsa? stamattina? E' esattamente il modo
@@ -1891,16 +1783,21 @@ check("v289 tassi: la pipeline non riempie i giorni senza osservazione", (() => 
   const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
   const i = py.indexOf("TASSI_FRED = [");
   if (i < 0) return false;
-  const blocco = py.slice(i, py.indexOf("if etf_lungo:", i));
+  /* ⚠ v298 — il confine era "if etf_lungo:", tolto con la sezione ETF: un ancoraggio
+     a codice altrui invecchia appena quel codice se ne va. */
+  const blocco = py.slice(i, py.indexOf("# Carry trade USA-Giappone", i));
   return !/ffill|fillna|forward.fill|interpolat|resample/i.test(blocco);
 })());
 
-/* ⚠ e nemmeno il disegno deve inventare: la linea salta i punti che non ci sono invece di
-   tirare una retta fra due estremi lontani. */
-check("v289 tassi: il grafico disegna solo valori finiti, non li stima", (() => {
-  const i = src.indexOf("function curvaTassi");
+/* ⚠ v298 — la curva per scadenze non c'e' piu' (il CEO ha chiesto il solo decennale), quindi
+   `curvaTassi` e' uscita del tutto. L'invariante NON era "quella funzione filtra i finiti": era
+   che il pannello dei tassi non stimi nulla. Ora vale sul valore in evidenza e sullo storico. */
+check("v298 tassi: il pannello pubblica solo osservazioni, non stime", (() => {
+  const i = src.indexOf("function renderTassi");
   const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /Number\.isFinite/.test(corpo) && !/interpol|stima|previst/i.test(corpo);
+  return /Number\.isFinite/.test(corpo)
+      && /Osservazioni pubblicate da/.test(corpo)
+      && !/interpol|stima|previst/i.test(corpo.replace(/\/\*[\s\S]*?\*\//g, ""));
 })());
 
 /* ⚠ LA CURVA E' UNA FORMA: l'asse x sono le SCADENZE, non il tempo. La pagina aveva gia' 10A
@@ -1992,33 +1889,28 @@ check("v290 calendario: le serie giornaliere non sono eventi", suVeri(`
   const ev = prossimiEventi(30).eventi.filter(e => e.tipo === "macro");
   return ev.every(e => e.passo !== "giornaliero")`));
 
-/* ⚠⚠ v291 — QUESTO CANCELLO CONGELAVA IL MIO ERRORE. In v290 pretendeva `compatto: true` sui
-   grafici a tessera, convinto che "stretto" volesse dire "tela piccola". E' il contrario: la
-   tela piccola dentro un contenitore LARGO si INGRANDISCE — `height:auto` scala l'SVG alla
-   larghezza disponibile, e 330x180 dentro 595px diventava 595x325, cioe' 1,8 volte la tessera
-   TradingView che dovevo eguagliare. Il cancello passava verde su un difetto visibile a occhio,
-   ed e' la lezione: un check scritto sulla regola sbagliata non protegge, protegge l'errore.
-   LA MISURA CHE CONTA E' IL RAPPORTO H/W, perche' il reso e' larghezza x (H/W). */
-check("v291 tessere: il rapporto della tela sta sotto quello della tessera TradingView", (() => {
-  /* la tessera e' 595x236 => 0,397. Sopra quel rapporto il pannello e' piu' alto di lei. */
-  const LIMITE = 0.40;
+/* ⚠⚠ v298 — IL METRO ERA LA TESSERA TRADINGVIEW, CHE NON C'E' PIU'. Il CEO ha tolto quel
+   box, quindi il confronto non ha piu' un termine. Ma l'invariante che serviva NON era
+   "uguale a loro": era che questi pannelli restino BASSI, perche' il difetto originario
+   era che occupavano mezzo schermo su Safari. Si ancora al tetto in pixel veri, che e'
+   la cosa che il CEO vede. E il rapporto della tela resta sorvegliato perche' un SVG con
+   height:auto si scala alla larghezza: e' cosi' che in v290 ho creduto di aver ridotto
+   un pannello guardando il viewBox mentre il reso era 1,8 volte piu' alto. */
+check("v298 pannelli: restano bassi, e il rapporto della tela lo consente", (() => {
+  const css = readFileSync(join(ROOT, "assets", "style.css"), "utf8");
+  const tetto = /\.graf-tessera\s*\{[^}]*max-height:\s*(\d+)px/.exec(css);
+  if (!tetto || Number(tetto[1]) > 260) return false;
   const casi = [];
-  const i = src.indexOf("function curvaTassi");
-  const m = src.slice(i, i + 900).match(/const W = (\d+), H = (\d+)/);
-  if (m) casi.push(["curvaTassi", +m[2] / +m[1]]);
-  for (const [nome, ancora] of [["ETF", "#etf-lungo-grafico"], ["storico tassi", "#tassi-serie"]]) {
-    const k = src.indexOf(ancora);
-    if (k < 0) return false;
-    /* ⚠ finestra larga: a 900 caratteri la chiamata dell'ETF restava tagliata a meta' e il
-       cancello falliva su un codice corretto — un rosso per miopia del check, non per difetto. */
-    const g = src.slice(k, k + 1600).match(/graficoSerie\([^{)]*\{([^}]*)\}/);
-    if (!g) return false;
+  const k = src.indexOf("#tassi-serie");
+  const g = src.slice(k, k + 1600).match(/graficoSerie\([^{)]*\{([^}]*)\}/);
+  if (g) {
     const h = g[1].match(/h:\s*(\d+)/);
-    const w = /compatto:\s*true/.test(g[1]) ? 330 : 640;   // le due tele di graficoSerie
-    if (!h) return false;
-    casi.push([nome, +h[1] / w]);
+    const w = /compatto:\s*true/.test(g[1]) ? 330 : 640;
+    if (h) casi.push(+h[1] / w);
   }
-  return casi.length === 3 && casi.every(([, r]) => r <= LIMITE);
+  /* ⚠ v298 — con la curva per scadenze rimossa resta UN solo grafico a tessera:
+     pretenderne due farebbe fallire il check su una pagina corretta. */
+  return casi.length >= 1 && casi.every(r => r <= 0.40);
 })());
 
 /* ⚠ e il testo deve restare leggibile DOPO lo scalamento: 9,5px su una tela da 640 dentro 595px
@@ -2141,24 +2033,6 @@ check("v293 tecnica: i livelli di Fibonacci tornano col range dichiarato", suVer
   if (!meta) return false;
   return Math.abs(parseFloat(meta[1]) - (hi - 0.5 * (hi - lo))) < 0.02`));
 
-/* ══ v294 — I GRUPPI, E IL CASSETTO CHE NON DEVE RIEMPIRSI ═══════════════════════════════
-   Il CEO: "ci sono troppe schede da monitorare". La scheda degli indicatori pesava 23.747
-   caratteri, dieci volte ogni altra: 27 tessere in fila. Ora sono sette gruppi <details>.
-   ⚠⚠ IL CANCELLO CHE CONTA E' QUESTO: un indicatore nuovo che nessuno classifica finirebbe in
-   un gruppo "Non ancora classificati" — visibile, non nascosto — e qui si accende. Senza,
-   sarebbe il registro fisso che invecchia da solo (C10, red team I6) piu' lo spicchio fantasma
-   di v226, dove una famiglia "Altro" comparve senza che nessuno l'avesse voluta. */
-check("v294 gruppi: nessun indicatore resta senza famiglia", suVeri(`
-  const chiavi = indicatoriClassifica().map(x => x.k);
-  const orfani = chiavi.filter(k => !FAMIGLIA_INDICATORE[k]);
-  return orfani.length === 0`));
-
-/* ⚠ e ogni famiglia dichiarata deve avere un posto nell'ordine: una famiglia fuori elenco
-   finirebbe in coda per caso invece che per scelta. */
-check("v294 gruppi: ogni famiglia usata compare nell'ordine dichiarato", suVeri(`
-  const usate = new Set(Object.values(FAMIGLIA_INDICATORE));
-  return [...usate].every(f => ORDINE_FAMIGLIE.includes(f))`));
-
 /* ⚠⚠ I DOPPIONI TOLTI DALLA PAGINA DEVONO RESTARE NEL PACCHETTO. E' la regola v208 — "si toglie
    dalla pagina cio' che il payload porta gia'" — e senza questo check un domani qualcuno
    toglierebbe l'indicatore anche a monte credendo di completare la pulizia, facendo sparire il
@@ -2239,6 +2113,14 @@ check("v296 contraddittorio: obbliga ai numeri del pacchetto, a scegliere, e a u
       && /QUALE FATTO OSSERVABILE E DATATO/.test(b)
       && /Non ti e' consentito rispondere che entrambe le tesi hanno merito/.test(b)`));
 
+/* ⚠ v298 — la lista NON si congela: era scritta a mano e sarebbe invecchiata alla prima
+   sezione aggiunta o tolta (e ne ho tolte due in questo stesso commit). Si rilegge da
+   index.html a ogni esecuzione: il registro fisso che invecchia da solo e' la classe
+   C10 / red team I6, gia' pagata piu' volte qui. */
+const SEZIONI_DI_INDEX = [...readFileSync(join(ROOT, "index.html"), "utf8")
+  .matchAll(/<section class="card"[^>]*data-sez="([^"]+)"([^>]*)>/g)]
+  .map(m => ({ sez: m[1], pane: (m[2].match(/data-pane="([^"]+)"/) || [])[1] || null }));
+
 /* ══ v297 — IL TRASCINAMENTO DELLE SEZIONI ERA MORTO DA QUARANTA VERSIONI ════════════════
    Segnalato dal CEO: "non riesco piu' ad ordinare i box". `sezioniDelPane` filtrava su
    `[data-pane="${pane}"]` mentre `data-pane` non esiste piu' nel markup da v256: lista vuota,
@@ -2248,7 +2130,7 @@ check("v296 contraddittorio: obbliga ai numeri del pacchetto, a scegliere, e a u
    passato benissimo mentre la funzione restituiva zero — la differenza fra guardare il codice
    ed ESEGUIRLO, che qui e' gia' costata la pagina morta di v238 con 219 test verdi. */
 check("v297 riordino: sezioniDelPane trova davvero le sezioni di index.html", suVeri(`
-  const sezioni = [{"sez": "titolo", "pane": null}, {"sez": "grafico", "pane": null}, {"sez": "tassi", "pane": null}, {"sez": "tv-macro", "pane": null}, {"sez": "calendario", "pane": null}, {"sez": "etf-lungo", "pane": null}, {"sez": "rotazione", "pane": null}, {"sez": "stress", "pane": null}, {"sez": "classifica", "pane": null}, {"sez": "leva", "pane": null}, {"sez": "strumenti", "pane": null}];
+  const sezioni = ${JSON.stringify(SEZIONI_DI_INDEX)};
   const finte = sezioni.map(x => ({
     dataset: { sez: x.sez, pane: x.pane || undefined },
     matches: (sel) => sel.indexOf(":not([data-pane])") >= 0 ? !x.pane : !!x.pane,
@@ -2268,6 +2150,54 @@ check("v297 riordino: la chiave dell'ordine non e' la stringa 'undefined'", (() 
   const i = src.indexOf("function salvaOrdineSezioni");
   const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
   return /senzaPane\(pane\) \? PANE_UNICO : pane/.test(corpo);
+})());
+
+/* ⚠⚠ v298 — GLI SPREAD DEVONO SOPRAVVIVERE ALLA RIDUZIONE AL SOLO DECENNALE. Sembrano
+   "altri tenori" e la tentazione di toglierli insieme agli altri e' forte, ma sono grandezze
+   proprie pubblicate da FRED (T10Y2Y, T10Y3M) e parlano del decennale: quanto rende rispetto
+   al breve. Toglierli farebbe sparire il 10A-3M dalla pagina, dove e' arrivato in v294 proprio
+   togliendo la sua tessera doppia — la pulizia che si porta via il fatto, classe v201-v204,
+   gia' costata tre volte qui. */
+check("v298 tassi: la riduzione al decennale non porta via gli spread", (() => {
+  const i = src.indexOf("function renderTassi");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /#tassi-spread/.test(corpo) && /10 anni − 2 anni/.test(corpo) && /10 anni − 3 mesi/.test(corpo);
+})());
+
+/* ══ v298 — LE PRIME CINQUE DEL COMPARTO AL PASSAGGIO DEL MOUSE ══════════════════════════
+   Richiesta del CEO. Sono le PARTECIPAZIONI VERE dell'ETF col loro peso, prese dal fornitore,
+   non un elenco scritto a mano: un registro di titoli compilato da me invecchierebbe alla prima
+   ribilanciata del fondo — classe C10 / red team I6, gia' pagata piu' volte qui.
+   ⚠⚠ NOTA DI METODO, dopo esserci ricascato quattro volte in una sessione: dentro un template
+   literal `\d` collassa in "d" e `\n` diventa un a capo vero, quindi ogni regex scritta qui
+   dentro va con la barra doppia. La correzione vera non e' ricordarselo — e' NON USARE REGEX
+   qui dentro: `includes` e `indexOf` non hanno escape e dicono la stessa cosa. */
+check("v298 rotazione: il tooltip porta le prime del comparto, coi pesi", suVeri(`
+  const tilt = (DATA.macro && DATA.macro.tilt) || [];
+  const conPrime = tilt.filter(t => (t.prime || []).length);
+  if (!conPrime.length) return true;                  // pipeline non ancora girata
+  const q = document.querySelector;
+  let reso = "";
+  try {
+    document.querySelector = (sel) => sel === "#mg-rot"
+      ? { set innerHTML(v) { reso = v; }, get innerHTML() { return reso; },
+          querySelectorAll: () => [], classList: { add() {}, remove() {} } }
+      : q.call(document, sel);
+    renderRotazione();
+  } finally { document.querySelector = q; }
+  /* ogni ETF che HA le partecipazioni dev'essere coperto, col suo ticker nel testo */
+  return conPrime.every(t => reso.includes('title="Prime ' + t.prime.length + " di " + t.ticker + ':'))`));
+
+/* ⚠⚠ E DOVE IL FORNITORE NON LE DA', IL TOOLTIP TACE. Alla prova mancavano su 1 ETF su 21:
+   mostrare una riga vuota, o peggio nomi vecchi presentati come attuali, sarebbe la classe di
+   difetto peggiore di questo progetto — un dato che sembra piu' solido di quanto e'. */
+check("v298 rotazione: senza partecipazioni il tooltip non compare", (() => {
+  const i = src.indexOf("function renderRotazione");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  const j = src.indexOf("function barreOrdinate");
+  const barre = src.slice(j, src.indexOf("\nfunction ", j + 10));
+  /* il ramo senza partecipazioni produce stringa vuota, e la barra omette l'attributo */
+  return corpo.includes(': ""') && barre.includes("x.suggerimento ?");
 })());
 
 /* ---------- report ----------

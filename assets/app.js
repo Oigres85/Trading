@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "297";
+const BUILD_VERSION = "298";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -791,9 +791,7 @@ function renderAll() {
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
   renderTassi();                // v289 — curva dei tassi, osservazioni FRED
-  montaTvMacro();               // v288 — contesto macro da TradingView (una volta sola)
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
-  renderEtfLungo();             // v281 — ETF di lungo periodo, universo fisso
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
      pagina. La funzione RESTA perche' testoCorrelazioniMacro() usa lo stesso calcolo per il
@@ -2239,7 +2237,10 @@ function barreOrdinate(righe, opt = {}) {
     const w = Math.abs(x.valore) / max * (neg ? 50 : 100);
     const left = x.valore >= 0 ? zero : zero - w;
     const col = x.colore || (x.valore >= 0 ? "var(--green)" : "var(--red)");
-    return `<div class="obar-row${x.evidenzia ? " obar-on" : ""}"${x.tk ? ` data-obar-tk="${esc(x.tk)}"` : ""}>
+    /* ⚠ v298 — il tooltip sta sulla RIGA INTERA, non sull'etichetta: il CEO l'ha chiesto
+       "quando passo il mouse sopra ad una barra", e la barra e' la parte larga. `title` nativo
+       invece di un pannello disegnato: nessun JavaScript, e su touch non ruba il tap. */
+    return `<div class="obar-row${x.evidenzia ? " obar-on" : ""}"${x.tk ? ` data-obar-tk="${esc(x.tk)}"` : ""}${x.suggerimento ? ` title="${esc(x.suggerimento)}"` : ""}>
       <span class="obar-lab" title="${esc(x.nome)}">${esc(x.nome)}</span>
       <span class="obar-axis">${neg ? `<span class="obar-zero" style="left:${zero}%"></span>` : ""}
         <span class="obar-fill" style="left:${left.toFixed(1)}%;width:${Math.max(w, 0.6).toFixed(1)}%;background:${col}"></span>
@@ -2336,87 +2337,6 @@ function prossimiEventi(giorni = 7) {
   return { dal: iso(oggi), al: iso(limite), eventi: ev };
 }
 
-/* ═══ v288 — IL SECONDO BOX TRADINGVIEW: SOLO CIO' CHE NOI NON DISEGNIAMO ═════════════════
-   Domanda del CEO: "non c'e' un modo per ottenere i nostri dati macro riportandoli in un nuovo
-   box di tradingview?". Due cose diverse, e vanno separate.
-   · METTERE I NOSTRI DATI DENTRO TRADINGVIEW: no, e non e' una cautela. Il widget disegna le
-     serie di TradingView; non esiste un modo pubblico per dargli in pasto una serie nostra.
-   · UN SECONDO BOX CON GLI STRUMENTI MACRO: si', e la mia risposta di prima era troppo larga.
-     Il ritardo che avevo misurato riguarda le AZIONI americane; VIX, cambi e cripto arrivano
-     senza la "D", cioe' in tempo reale.
-
-   ⚠ COSA HO MISURATO, PRIMA DI SCEGLIERE (widget single-quote, uno per simbolo):
-     funzionano  → VIX, FX:EURUSD, FX:USDJPY, TVC:GOLD, TVC:USOIL, COPPER, CRYPTO:BTCUSD
-     BLOCCATI    → TVC:US10Y, US02Y, US03MY, US05Y, US30Y, TVC:DXY, TVC:SPX, TVC:NDX, TVC:RUT
-                   ("Questo simbolo e' disponibile solo su TradingView")
-   Cioe': tutti i rendimenti dei Treasury, l'indice del dollaro e tutti gli indici azionari —
-   proprio il pannello "RATES" che il documento metteva al centro — NON sono disponibili nel
-   widget gratuito. Un box che li promettesse resterebbe vuoto.
-
-   ⚠⚠ E QUI LA DIVISIONE DEL LAVORO VIENE AL CONTRARIO DI COME SE L'ERA IMMAGINATA IL DOCUMENTO,
-   il che e' la parte utile della scoperta: TradingView copre bene cambi, volatilita' e cripto;
-   i TASSI li abbiamo gia' noi dalla fonte PRIMARIA (FRED: 10A, 30A, 10A-2A, 10A-3M, reale,
-   breakeven) con la data di rilevazione e la prossima uscita attesa — che e' piu' di quanto un
-   grafico saprebbe dire. Non c'e' niente da spostare: c'e' da NON duplicare.
-
-   ⚠ ORO, PETROLIO E RAME NON SONO QUI PUR FUNZIONANDO: li disegniamo gia' noi con un anno di
-   storia (v280, richiesta sua). Metterli anche nel box sarebbe lo stesso doppione che mi ha
-   fatto togliere per il VIX e per le materie prime dal macro. Restano i quattro strumenti di
-   cui la pagina ha SOLO il numero e nessuna traiettoria. */
-const TV_MACRO = [
-  { s: "VIX", t: "Volatilità S&P 500", perche: "la pagina ne mostra il livello con le sue soglie; qui si vede il PERCORSO degli ultimi mesi" },
-  { s: "FX:EURUSD", t: "EUR/USD", perche: "il cambio con cui si convertono i suoi conti: la pagina ne ha solo il numero di oggi" },
-  { s: "FX:USDJPY", t: "USD/JPY", perche: "la gamba del carry trade Giappone: quando si rafforza lo yen si chiudono posizioni in tutto il mondo" },
-  { s: "CRYPTO:BTCUSD", t: "Bitcoin", perche: "il termometro dell'appetito al rischio che scambia 24 ore su 24, anche quando le borse sono chiuse" },
-];
-
-/* ═══ v289 — LA CURVA DEI TASSI, DISEGNATA SU OSSERVAZIONI PUBBLICATE ═════════════════════
-   Il CEO: "ok ma non con dati presunti ma dati effettivi". Qui non c'e' niente da stimare: ogni
-   punto e' un'osservazione che FRED ha pubblicato, con la sua data. Nessuna interpolazione,
-   nessun valore riempito, nessuna proiezione — l'opposto del calendario di v287, dove le date
-   sono stime e ogni riga lo dichiara.
-   ⚠ LA CURVA E' UNA FORMA, NON CINQUE NUMERI. La pagina mostrava 10A e 30A come due valori
-   separati: il fatto che conta e' come stanno FRA LORO. Una curva che sale poco fra 3 mesi e
-   30 anni dice che il mercato non si aspetta crescita; una che si irripidisce dice il
-   contrario. Per questo l'asse x sono le SCADENZE, non il tempo, e accanto c'e' la stessa
-   curva di tre mesi fa: due fotografie vere, non una tendenza ricostruita. */
-function curvaTassi(dati) {
-  const p = (dati.scadenze || []).filter(x => Number.isFinite(Number(x.value)));
-  if (p.length < 3) return "";
-  /* v291 — tela larga come quella di `graficoSerie`: dentro un contenitore da 595px il
-     reso e' 595x(H/W), e 640x225 da' ~209px, cioe' la misura della tessera TradingView. */
-  const W = 640, H = 225, L = 44, R = W - 16, T = 14, B = H - 30;
-  /* asse x logaritmico sulle scadenze: fra 3 mesi e 2 anni c'e' piu' informazione che fra 20 e
-     30, e su una scala lineare i tenori corti si schiacciano tutti a sinistra. */
-  const lx = (a) => Math.log(Math.max(0.25, a));
-  const xs = p.map(x => lx(x.anni));
-  const xmin = Math.min(...xs), xmax = Math.max(...xs);
-  const X = (a) => L + (lx(a) - xmin) / ((xmax - xmin) || 1) * (R - L);
-  const vals = p.flatMap(x => [Number(x.value), Number(x.value_3m)]).filter(Number.isFinite);
-  let lo = Math.min(...vals), hi = Math.max(...vals);
-  const marg = Math.max(0.15, (hi - lo) * 0.25);
-  lo -= marg; hi += marg;
-  const Y = (v) => B - (v - lo) / ((hi - lo) || 1) * (B - T);
-
-  const linea = (campo, colore, largh, tratteggio) => {
-    const punti = p.filter(x => Number.isFinite(Number(x[campo])));
-    if (punti.length < 2) return "";
-    return `<polyline points="${punti.map(x => `${X(x.anni).toFixed(1)},${Y(Number(x[campo])).toFixed(1)}`).join(" ")}" `
-      + `fill="none" stroke="${colore}" stroke-width="${largh}"${tratteggio ? ` stroke-dasharray="${tratteggio}"` : ""}/>`
-      + punti.map(x => `<circle cx="${X(x.anni).toFixed(1)}" cy="${Y(Number(x[campo])).toFixed(1)}" r="${largh > 1.8 ? 3 : 2}" fill="${colore}"/>`).join("");
-  };
-  const tacche = [lo + (hi - lo) * 0.15, lo + (hi - lo) * 0.5, lo + (hi - lo) * 0.85]
-    .map(v => `<line x1="${L}" y1="${Y(v).toFixed(1)}" x2="${R}" y2="${Y(v).toFixed(1)}" stroke="var(--border)" stroke-width="0.5"/>`
-      + `<text x="4" y="${(Y(v) + 3).toFixed(1)}" font-size="9" fill="var(--muted)">${fmtNum.format(Math.round(v * 100) / 100)}%</text>`).join("");
-  const etichette = p.map(x => `<text x="${X(x.anni).toFixed(1)}" y="${H - 8}" font-size="9" fill="var(--muted)" text-anchor="middle">${esc(x.label.replace(" anni", "a").replace(" mesi", "m"))}</text>`).join("");
-
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
-      aria-label="curva dei rendimenti dei titoli di stato americani per scadenza">
-    ${tacche}${etichette}
-    ${linea("value_3m", "var(--muted)", 1.4, "4 3")}
-    ${linea("value", "var(--cyan, #22d3ee)", 2.2, "")}
-  </svg>`;
-}
 
 function renderTassi() {
   const box = $("#tassi-curva");
@@ -2430,7 +2350,25 @@ function renderTassi() {
     if (storico) storico.innerHTML = "";
     return;
   }
-  box.innerHTML = curvaTassi(t);
+  /* ═══ v298 — SOLO IL DECENNALE ═══════════════════════════════════════════════════════
+     Il CEO: "La curva dei tassi lascia solo dato a 10 anni". Con un tenore solo non c'e' una
+     curva da disegnare, quindi `curvaTassi` esce del tutto invece di restare a disegnare un
+     punto: un grafico con un punto e' la stessa forma vuota che v265 ha gia' tolto dalle
+     vendite al dettaglio ("la linea retta era il problema").
+     ⚠ GLI SPREAD RESTANO. Sembrano "altri tenori" ma non lo sono: sono grandezze proprie
+     pubblicate da FRED come serie a se' (T10Y2Y, T10Y3M) e parlano del DECENNALE — quanto rende
+     rispetto al breve. Toglierli farebbe sparire il 10A-3M dalla pagina, dove e' arrivato in
+     v294 proprio togliendo la sua tessera doppia: sarebbe la classe v201-v204, la pulizia che
+     si porta via il fatto. Un cancello lo verifica. */
+  const dieci = (t.scadenze || []).find(x => x.key === "a10");
+  box.innerHTML = dieci
+    ? `<div class="tassi-dieci"><b>${fmtNum.format(dieci.value)}%</b>`
+      + `<span class="muted">Treasury USA 10 anni · ${esc(dieci.series_id)} · osservazione del ${esc(dieci.observation_date)}</span>`
+      + (Number.isFinite(dieci.value_3m)
+         ? `<span class="muted">tre mesi fa ${fmtNum.format(dieci.value_3m)}% (${esc(dieci.observation_date_3m)}) — `
+           + `${signTxt(Math.round((dieci.value - dieci.value_3m) * 100) / 100, " pp")}</span>` : "")
+      + `</div>`
+    : '<div class="muted">Arriva col prossimo giro della pipeline.</div>';
 
   const per = (k) => (t.scadenze || []).find(x => x.key === k);
   const corto = per("m3") || per("a2"), lungo = per("a30") || per("a10");
@@ -2441,7 +2379,7 @@ function renderTassi() {
 
   /* le righe: valore, data VERA dell'osservazione, e lo scarto dalla stessa scadenza tre mesi
      fa — anche quello un'osservazione, non una tendenza stimata. */
-  const righe = (t.scadenze || []).map(x => {
+  const righe = (t.scadenze || []).filter(x => x.key === "a10").map(x => {
     const d = (Number.isFinite(x.value) && Number.isFinite(x.value_3m))
       ? Math.round((x.value - x.value_3m) * 100) / 100 : null;
     return `<tr><td>${esc(x.label)}</td>
@@ -2463,9 +2401,7 @@ function renderTassi() {
   if (serie) {
     const st = t.storico || {};
     const CHI = [
-      { k: "a2",  nome: "2 anni",  colore: "var(--green)" },
-      { k: "a10", nome: "10 anni", colore: "var(--blue)" },
-      { k: "a30", nome: "30 anni", colore: "var(--purple)" },
+      { k: "a10", nome: "10 anni", colore: "var(--blue)" },   // v298 — solo il decennale
     ].filter(x => (st[x.k] || []).length > 1);
     if (!CHI.length) {
       serie.innerHTML = "";
@@ -2524,59 +2460,6 @@ function renderTassi() {
   }
 }
 
-function montaTvMacro() {
-  const box = $("#tvm-griglia");
-  if (!box) return;
-  if (typeof document === "undefined" || typeof document.createElement !== "function") return;
-  const prova = document.createElement("div");
-  if (!prova || typeof prova.appendChild !== "function") return;   // harness senza DOM (v257)
-  if (box.dataset.montato === "1") return;                         // una volta sola: sono iframe
-  box.dataset.montato = "1";
-  box.innerHTML = "";
-  for (const v of TV_MACRO) {
-    const cella = document.createElement("div");
-    cella.className = "tvm-cella";
-    const et = document.createElement("div");
-    et.className = "tvm-et";
-    et.innerHTML = `<b>${esc(v.t)}</b><span class="muted">${esc(v.perche)}</span>`;
-    cella.appendChild(et);
-    const host = document.createElement("div");
-    cella.appendChild(host);
-    box.appendChild(cella);
-
-    const cont = document.createElement("div");
-    cont.className = "tradingview-widget-container";
-    const inner = document.createElement("div");
-    inner.className = "tradingview-widget-container__widget";
-    cont.appendChild(inner);
-    const sc = document.createElement("script");
-    sc.type = "text/javascript";
-    sc.async = true;
-    sc.src = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
-    sc.text = JSON.stringify({
-      symbol: v.s, width: "100%", height: 180, locale: "it", dateRange: "3M",
-      colorTheme: "dark", isTransparent: false, autosize: false, chartOnly: false,
-    });
-    /* ⚠ se lo script non arriva (rete, blocco di terze parti) il riquadro resterebbe vuoto e
-       muto: un box bianco si legge come "rotto" e chi guarda non sa che fare. */
-    sc.onerror = () => {
-      host.innerHTML = `<div class="muted tvm-ko">Il grafico di ${esc(v.t)} non si è caricato `
-        + `(rete o blocco degli script di terze parti). Gli altri dati della pagina non passano da TradingView.</div>`;
-    };
-    cont.appendChild(sc);
-    host.appendChild(cont);
-  }
-  const nota = $("#tvm-nota");
-  if (nota) {
-    nota.innerHTML = "Grafici di TradingView, in tempo reale su questi quattro strumenti "
-      + "(le azioni americane invece arrivano con ~15 minuti di ritardo su ogni fonte gratuita). "
-      + "<b>Non ci sono i rendimenti dei Treasury, il dollaro e gli indici</b>: il widget gratuito non li espone — "
-      + "e i tassi li abbiamo già dalla fonte primaria FRED, con la data di rilevazione e la prossima uscita attesa, "
-      + "che è più di quanto direbbe un grafico. <b>Oro, petrolio e rame non sono qui</b> perché li disegniamo già noi "
-      + "con un anno di storia: due volte lo stesso dato è il doppione che abbiamo tolto altrove.";
-  }
-}
-
 function renderCalendario() {
   const box = $("#cal-eventi");
   if (!box) return;
@@ -2616,79 +2499,6 @@ function renderCalendario() {
       + "«a metà del successivo», non il 14 esatto); le date delle trimestrali sono quelle che l'emittente "
       + "ha comunicato a Yahoo e cambiano spesso. Per una data che conta, verifica sul sito della fonte "
       + "o su quello investor relations della società.";
-  }
-}
-
-function renderEtfLungo() {
-  const box = $("#etf-lungo-grafico");
-  if (!box) return;
-  const e = (DATA && DATA.macro && DATA.macro.etf_lungo) || null;
-  const tab = $("#etf-lungo-tab");
-  const nota = $("#etf-lungo-nota");
-  if (!e || !Array.isArray(e.voci) || !e.voci.length) {
-    box.innerHTML = '<div class="muted">Arriva col prossimo giro della pipeline.</div>';
-    if (tab) tab.innerHTML = "";
-    if (nota) nota.innerHTML = "";
-    return;
-  }
-  const COLORI = ["#2962ff", "#26a69a", "#ef5350", "#ffa726", "#ab47bc",
-                  "#26c6da", "#8d6e63", "#66bb6a", "#ec407a", "#ffca28"];
-  const serie = e.voci.map((v, i) => ({
-    nome: `${v.symbol} · ${v.label}`,
-    punti: (v.serie || []).map(p => ({ d: p.d + "-01", v: p.v })),
-    colore: COLORI[i % COLORI.length],
-  })).filter(s => s.punti.length > 2);
-  box.innerHTML = serie.length
-    ? graficoSerie(serie, { h: 225, soglie: [{ v: 100, testo: "punto di partenza", colore: "var(--muted)" }],
-        aria: "andamento a dieci anni dei dieci ETF", etichetteDx: true })
-    : '<div class="muted">Serie non disponibili.</div>';
-
-  /* ⚠ ORDINE DELL'UNIVERSO, NON DEL RENDIMENTO. La tabella e' ordinabile per colonna se lui
-     vuole confrontare, ma NON si apre gia' ordinata sul rendimento: una classifica pre-fatta
-     e' una raccomandazione travestita da dato. */
-  const num = (v, suff = "", dec = 1) => Number.isFinite(Number(v))
-    ? `<td class="num">${signTxt(Math.round(Number(v) * 10 ** dec) / 10 ** dec, suff)}</td>`
-    : '<td class="num muted">—</td>';
-  const righe = e.voci.map((v, i) => {
-    const rec = v.giorni_recupero != null
-      ? `${Math.round(v.giorni_recupero / 30)} mesi`
-      : (v.giorni_sotto != null
-          ? `<b class="neg">sotto da ${Math.round(v.giorni_sotto / 30)} mesi</b>`
-          : "—");
-    return `<tr>
-      <td><span class="etf-punto" style="background:${COLORI[i % COLORI.length]}"></span>
-          <b>${esc(v.symbol)}</b><span class="etf-lab">${esc(v.label)}</span></td>
-      <td class="muted etf-cat">${esc(v.categoria || "")}</td>
-      ${num(v.cagr, "%", 2)}
-      <td class="num neg">${fmtNum.format(v.dd_max)}%<span class="etf-quando">${esc(v.dd_quando || "")}</span></td>
-      <td class="num">${rec}</td>
-      <td class="num">${Number.isFinite(Number(v.vol)) ? fmtNum.format(v.vol) + "%" : "—"}</td>
-      <td class="num">${Number.isFinite(Number(v.ter)) ? fmtNum.format(v.ter) + "%" : "n.d."}</td>
-    </tr>`;
-  }).join("");
-  if (tab) {
-    tab.innerHTML = `<div class="etf-scroll"><table class="etf-tab"><thead><tr>
-      <th>ETF</th><th>copre</th><th class="num" title="rendimento annualizzato, dividendi reinvestiti">Annuo</th>
-      <th class="num" title="la perdita massima subita nel periodo, dal picco al fondo">Peggior calo</th>
-      <th class="num" title="quanto ci ha messo a tornare sopra il picco precedente">Recupero</th>
-      <th class="num" title="oscillazione annualizzata: quanto e' stato mosso il percorso">Oscillazione</th>
-      <th class="num" title="costo annuo dichiarato dall'emittente">Costo</th>
-      </tr></thead><tbody>${righe}</tbody></table></div>`;
-  }
-  if (nota) {
-    nota.innerHTML = `Dal ${esc(e.dal)} al ${esc(e.al)} · <b>rendimento totale</b>, con i dividendi reinvestiti — `
-      + `sul solo prezzo un obbligazionario sembrerebbe in perdita (AGG: −1,45% l'anno contro +1,38%).`
-      + `<div class="etf-avvisi">`
-      + `<div>⚠ <b>Questi non sono "i migliori dieci".</b> Sono dieci ETF scelti per COPRIRE le alternative di lungo periodo `
-      + `— mercato ampio, tecnologia, estero, emergenti, obbligazioni, oro, immobiliare, difensivo — e restano gli stessi ogni anno. `
-      + `Sceglierli in base a come sono andati costruirebbe una lista che insegue i vincitori, e a dieci anni il passato non predice più che a tre mesi.</div>`
-      + `<div>⚠ <b>Il rendimento medio nasconde il percorso.</b> Guarda insieme le tre colonne dopo "Annuo": `
-      + `un ETF che ha reso di più perdendo il 40% e restando sotto per tre anni è una cosa diversa da uno che ha reso meno in linea retta. `
-      + `La domanda non è quale ha reso di più, è quale saresti riuscito a tenere fino in fondo.</div>`
-      + `<div>⚠ <b>Il costo si moltiplica.</b> Mezzo punto l'anno per dieci anni è circa il 5% del capitale, e si paga comunque vada.</div>`
-      + `<div>⚠ <b>Non sono un consulente finanziario e questa tabella non dice cosa comprare</b>: dice cos'è successo dal ${esc(e.dal)} a oggi. `
-      + `Nessuno di questi numeri è una previsione.</div>`
-      + `</div>`;
   }
 }
 
@@ -2749,7 +2559,20 @@ function renderRotazione() {
   const nota = $("#mg-rot-note"), head = $("#mg-rot-head");
   if (!tilt.length) { box.innerHTML = '<div class="muted">Rotazione non disponibile.</div>'; return; }
   const tutte = [...tilt].sort((a, b) => (b[rotOrizzonte] ?? -99) - (a[rotOrizzonte] ?? -99))
-    .map(t => ({ nome: t.name, valore: t[rotOrizzonte], tk: t.ticker, testo: signTxt(t[rotOrizzonte]) }));
+    .map(t => {
+      /* ⚠⚠ v298 — LE PRIME CINQUE DEL COMPARTO, richiesta del CEO. Sono le partecipazioni VERE
+         dell'ETF col loro peso, prese dalla pipeline: un elenco scritto da me invecchierebbe
+         alla prima ribilanciata del fondo — il registro fisso (C10, red team I6) gia' pagato.
+         ⚠ Se il fornitore non le da' — su 21 ETF ne mancava uno alla prova — il tooltip TACE,
+         invece di mostrare nomi vecchi presentati come attuali. */
+      const p = (t.prime || []).filter(x => x && x.tk);
+      return { nome: t.name, valore: t[rotOrizzonte], tk: t.ticker,
+               testo: signTxt(t[rotOrizzonte]),
+               suggerimento: p.length
+                 ? `Prime ${p.length} di ${t.ticker}: `
+                   + p.map(x => `${x.tk}${x.peso != null ? ` ${fmtNum.format(x.peso)}%` : ""}`).join(" · ")
+                 : "" };
+    });
   /* v265 — SEMPRE TUTTI I SETTORI, senza bottone. Il CEO ha chiesto di togliere "mostra solo
      gli estremi": la riduzione la fa gia' il CSS compatto (righe da ~15px invece di ~26), e un
      bottone che nasconde meta' dei dati e' un ostacolo, non una semplificazione. */
@@ -3076,7 +2899,11 @@ function indicatoriClassifica() {
      portarli tutti e tre all'LLM — esce solo la tessera doppia dalla pagina. E' la regola v208
      ("si toglie dalla pagina cio' che il payload porta gia'"), applicata a una duplicazione
      interna alla pagina invece che fra pagina e pacchetto. */
-  const FUORI = new Set(["in:t30", "mk:^TNX", "in:curve3m",
+  /* ⚠ v298 — EUR/JPY tolto su richiesta del CEO ("in valute: EUR/JPY"). Era gia' fuori dal
+     PAYLOAD da v138 come ridondante — il rischio yen sta nel blocco Carry USA-Giappone, che
+     porta lo stesso fatto con il meccanismo accanto. Ora esce anche dalla pagina, dove era
+     l'ultimo posto in cui compariva da solo. */
+  const FUORI = new Set(["mk:EURJPY=X", "in:t30", "mk:^TNX", "in:curve3m",
                          "thermometer", "futures", "seasonality", "risk_sentiment", "smart_money",
                          "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield",
                          /* v265 — richieste esplicite del CEO: due componenti F&G che non vuole */
@@ -3983,64 +3810,6 @@ function notaConDettaglio(nota, cadenza) {
     + cad;
 }
 
-/* ⚠ v294 — la mappa e' un registro, e i registri in questo progetto invecchiano in silenzio.
-   Due difese: l'inclassificato NON viene nascosto (finisce in un gruppo che lo dichiara) e un
-   cancello verifica che quel gruppo sia vuoto. Aggiungere un indicatore senza classificarlo
-   accende un rosso invece di produrre un cassetto. */
-const FAMIGLIA_INDICATORE = {
-  "in:real10": "Tassi e Fed", fed_market: "Tassi e Fed", fedwatch: "Tassi e Fed",
-  "in:cpi": "Inflazione e crescita", "in:gdp": "Inflazione e crescita",
-  "in:retail": "Inflazione e crescita", "in:umich": "Inflazione e crescita",
-  "in:unemp": "Inflazione e crescita", "in:philly": "Inflazione e crescita",
-  dollar: "Valute", "mk:EURUSD=X": "Valute", "mk:EURJPY=X": "Valute", carry: "Valute",
-  "mat:oro": "Materie prime e settori", "mat:petrolio": "Materie prime e settori",
-  "mat:rame": "Materie prime e settori", "mat:sox": "Materie prime e settori",
-  sp500_pe: "Valutazione e utili", corp_profit: "Valutazione e utili",
-  putcall: "Sentiment e posizionamento", fear_greed: "Sentiment e posizionamento",
-  froth: "Sentiment e posizionamento", breadth: "Sentiment e posizionamento",
-  momentum: "Sentiment e posizionamento", liquidity: "Sentiment e posizionamento",
-  witching: "Sentiment e posizionamento",
-  systemic_risk: "Credito e stress",
-};
-const ORDINE_FAMIGLIE = ["Tassi e Fed", "Inflazione e crescita", "Credito e stress",
-  "Valutazione e utili", "Sentiment e posizionamento", "Valute", "Materie prime e settori"];
-const FAMIGLIA_NON_CLASSIFICATI = "Non ancora classificati";
-
-function raggruppaPerFamiglia(box) {
-  if (!box || typeof box.querySelectorAll !== "function") return;   // harness senza DOM
-  if (typeof document === "undefined" || typeof document.createElement !== "function") return;
-  /* ⚠ `.mg-card` matcha anche `.mg-card-head`: e' costato due volte in v238. Qui e' escluso. */
-  const tessere = [...box.querySelectorAll(".mg-card:not(.mg-card-head)")];
-  if (!tessere.length) return;
-  const per = new Map();
-  for (const el of tessere) {
-    const id = (typeof el.getAttribute === "function" && el.getAttribute("data-scheda")) || "";
-    const fam = FAMIGLIA_INDICATORE[id] || FAMIGLIA_NON_CLASSIFICATI;
-    if (!per.has(fam)) per.set(fam, []);
-    per.get(fam).push(el);
-  }
-  const ordine = [...ORDINE_FAMIGLIE.filter(f => per.has(f)),
-                  ...[...per.keys()].filter(f => !ORDINE_FAMIGLIE.includes(f))];
-  const pezzi = [];
-  ordine.forEach((fam, i) => {
-    const d = document.createElement("details");
-    d.className = "mg-fam";
-    if (i === 0) d.open = true;
-    const sm = document.createElement("summary");
-    const n = per.get(fam).length;
-    sm.innerHTML = `<b>${esc(fam)}</b> <span class="muted">${n} ${n === 1 ? "indicatore" : "indicatori"}</span>`
-      + (fam === FAMIGLIA_NON_CLASSIFICATI
-         ? ' <span class="mg-fam-avviso">— nessuno li ha ancora assegnati a una famiglia</span>' : "");
-    d.appendChild(sm);
-    const g = document.createElement("div");
-    g.className = "mg-tris";
-    per.get(fam).forEach(el => g.appendChild(el));
-    d.appendChild(g);
-    pezzi.push(d);
-  });
-  box.innerHTML = "";
-  pezzi.forEach(d => box.appendChild(d));
-}
 
 function renderIndicatori() {
   const box = $("#mg-tutti"); if (!box) return;
@@ -4116,18 +3885,6 @@ function renderIndicatori() {
       tk: conPan.has(r.k) ? r.k : null, id: r.k });
   }).join("")}</div>`;
 
-  /* ═══ v294 — LE TESSERE IN FILA DIVENTANO GRUPPI ═══════════════════════════════════════
-     Il CEO: "ci sono troppe schede da monitorare e sarebbe utile un modo per avere le
-     informazioni in modo piu' ordinato". Questa scheda pesava 23.747 caratteri, dieci volte
-     ogni altra della pagina: e' qui che il problema si concentrava.
-     ⚠ NON SI NASCONDE NIENTE: i gruppi sono <details>, il primo aperto, e ogni intestazione
-     dice quante tessere contiene — un gruppo chiuso non e' un buco, e' una scatola etichettata.
-     ⚠⚠ E NON C'E' UN CASSETTO "ALTRO". Un indicatore che nessuno ha classificato finirebbe li'
-     in silenzio: e' la classe del registro fisso che invecchia da solo (C10, red team I6) piu'
-     lo spicchio fantasma di v226, dove una famiglia "Altro" comparve senza che nessuno l'avesse
-     voluta. Qui l'inclassificato resta VISIBILE in un gruppo che dichiara di non essere una
-     famiglia, e un cancello lo conta: se compare, qualcuno deve decidere. */
-  raggruppaPerFamiglia(box);
   agganciaTessere(box);
   /* v241 — l'ordine scelto dal CEO si riapplica a OGNI render (la griglia si ricostruisce da
      capo ogni volta), e i comandi di trascinamento si rimontano sulle schede nuove. */
