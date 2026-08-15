@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "312";
+const BUILD_VERSION = "313";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -791,7 +791,6 @@ function renderAll() {
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
   renderPortafoglio();          // v307 — le posizioni, e il clic che apre il grafico
-  montaSelettoreSettori();      // v305 — l'elenco dei settori, dai dati
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
@@ -2649,6 +2648,10 @@ function renderVerifica() {
 const POSIZIONI_PATH = "config/posizioni.json";
 const WATCHLIST_PATH = "config/ui_watchlist.json";
 let pfInModifica = false;
+/* ⚠ v313 — il settore scelto per l'analisi. Il CEO ha tolto il selettore: si sceglie cliccando
+   un comparto in "Rotazione", con la stessa logica del portafoglio. Una variabile sola, scritta
+   da un punto solo (`scegliSettore`), perche' due strade per la stessa scelta divergono. */
+let settoreScelto = null;
 
 function posizioniCorrenti() {
   /* ⚠ si legge da cio' che il sistema HA disegnato, non da una copia parallela: due elenchi
@@ -2743,6 +2746,101 @@ async function salvaPosizioni() {
 /* ⚠ UNA SOLA STRADA per portare un simbolo nel grafico: la usano il clic sul portafoglio e il
    selettore dei settori. Due percorsi separati divergerebbero — e' la lezione v225 sulle
    frecce e il trascinamento, e quella v161/v207 sulle doppie derivazioni. */
+/* ⚠ v313 — RIMESSE DOPO UN TAGLIO CHE SE LE ERA PORTATE VIA. Vivevano fra
+   `montaSelettoreSettori` e la funzione successiva, e il confine che ho usato era
+   `\nfunction` — cioe' esattamente l'errore che avevo documentato e corretto in v303
+   ("il confine e' la prossima dichiarazione DI QUALUNQUE TIPO"). Scritta la regola e non
+   applicata: settima volta di questa classe (v201-v204, v238, v303). */
+/* ⚠ v307 — cambiare settore porta il suo ETF nel grafico. Il CEO: "se cambio analizza settore
+   macro, puoi modificare anche il ticker nel grafico di tradingview?". Passa dalla STESSA
+   funzione del clic sul portafoglio: due strade per la stessa azione divergono sempre. */
+/* ═══ v311 — i comandi del portafoglio, in DELEGA sul documento ═══════════════════════════
+   I bottoni nascono e muoiono a ogni ridisegno: agganciarli uno per uno lascerebbe handler
+   morti al primo render successivo — il difetto v193/v213 che ha gia' rotto il wiring piu'
+   volte in questo progetto. */
+document.addEventListener("click", (e) => {
+  const t = e.target && e.target.closest ? e.target : null;
+  if (t && t.closest && t.closest("#ver-controlla")) { renderVerifica(); return; }
+  if (!t || !t.closest) return;
+  if (t.closest("#pf-modifica")) { pfInModifica = true; renderPortafoglio(); return; }
+  if (t.closest("#pf-annulla")) { pfInModifica = false; renderPortafoglio(); return; }
+  if (t.closest("#pf-salva")) { salvaPosizioni(); return; }
+  if (t.closest("#pf-aggiungi")) {
+    const corpo = document.querySelector(".pf-tab-edit tbody");
+    if (corpo && corpo.lastElementChild) {
+      corpo.appendChild(corpo.lastElementChild.cloneNode(true));
+      const nuova = corpo.lastElementChild;
+      nuova.querySelectorAll("input").forEach(i => { i.value = ""; });
+      nuova.setAttribute("data-pf-edit", "");
+      const primo = nuova.querySelector(".pf-in-tk");
+      if (primo && typeof primo.focus === "function") primo.focus();
+    }
+    return;
+  }
+  const togli = t.closest(".pf-togli");
+  if (togli) {
+    /* ⚠ la riga sparisce dal FORM, non dai dati: il salvataggio e' l'unico momento in cui
+       qualcosa viene scritto. Annulla deve poter riportare tutto indietro. */
+    const tr = togli.closest("[data-pf-edit]");
+    if (tr && tr.parentNode) tr.parentNode.removeChild(tr);
+  }
+});
+
+$("#set-input")?.addEventListener("change", (e) => {
+  const v = e.target && e.target.value;
+  if (v) apriNelGrafico(v);
+});
+
+$("#set-copia")?.addEventListener("click", async () => {
+  const sel = $("#set-input");
+  const esito = $("#set-esito");
+  const v = sel && sel.value;
+  if (!v) { if (esito) esito.textContent = "Scegli prima un settore dall'elenco."; return; }
+  try {
+    const testo = buildPromptSettore(v);
+    await navigator.clipboard.writeText(testo);
+    if (esito) esito.innerHTML = `Copiato: <b>${esc(sel.options[sel.selectedIndex].textContent)}</b> — `
+      + `${testo.length.toLocaleString("it")} caratteri. Incollalo in una chat NUOVA.`;
+  } catch (e) {
+    if (esito) esito.textContent = "Non sono riuscito a copiare negli appunti: " + (e && e.message ? e.message : e);
+  }
+});
+$("#modal-close")?.addEventListener("click", () => { $("#modal").hidden = true; });
+$("#modal")?.addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
+$("#btn-copy")?.addEventListener("click", async () => {
+  await navigator.clipboard.writeText($("#prompt-text").value);   // copia il testo EDITATO
+  toast("Copiato (con le tue modifiche) ✓");
+});
+/* ---------------- calcolo vendite (plus/minusvalenze) ---------------- */
+const sellPriceOv = {};   // prezzo di vendita inserito a mano per ticker (override del prezzo di mercato)
+const sellQtyOv = {};     // quantità da vendere digitate: sopravvivono a un eventuale re-render
+
+/* ═══ v282 — LE POSIZIONI LE INSERISCE LUI ═════════════════════════════════════════════════
+   Il CEO: "no, inserirò io i dati". Verificato che fosse possibile, e per meta' non lo era:
+   il Calcolatore PMC ha campi numerici liberi (il menu' precompila e basta), ma il Calcolo
+   vendite costruiva la tabella SOLO da DATA.portfolio — "Le tue posizioni sono gia' caricate".
+   Da v272 la pipeline non produce piu' posizioni: quello strumento stava per diventare una
+   tabella vuota senza modo di metterci niente dentro, cioe' la sua frase non sarebbe stata
+   eseguibile.
+   Le righe manuali vivono in localStorage (sono sue, non del sistema) e si sommano a quello
+   che il file eventualmente porta ancora — il BTP, per esempio. Non c'e' scrittura sul repo:
+   sono dati di una simulazione, non un portafoglio da sincronizzare. */
+const SELL_KEY = "vendite_manuali";
+
+/* ⚠ scegliere un settore fa DUE cose: lo porta nel grafico e lo rende quello che il bottone
+   copierebbe. Erano due gesti separati (selettore + grafico), ora e' un clic solo. */
+function scegliSettore(tk) {
+  const t = String(tk || "").trim().toUpperCase();
+  if (!t) return;
+  settoreScelto = t;
+  const et = $("#set-scelto");
+  if (et) {
+    const s2 = settorePerChiave(t);
+    et.innerHTML = s2 ? `settore scelto: <b>${esc(s2.name)}</b> (${esc(s2.ticker)})` : "";
+  }
+  apriNelGrafico(t);
+}
+
 function apriNelGrafico(tk) {
   const t = String(tk || "").trim().toUpperCase();
   if (!t) return;
@@ -3101,7 +3199,9 @@ function indicatoriClassifica() {
      volta vista in mezzo alle altre non guadagnava il suo posto. EUR/USD resta nel PACCHETTO —
      e' il cambio con cui si convertono i suoi conti — e resta nel blocco macro: esce la
      tessera, non il fatto (regola v208). */
-  const FUORI = new Set(["seasonality", "mk:EURUSD=X", "in:umich",
+  /* ⚠ v313 — "Prossima scadenza tecnica" (witching) fuori su richiesta del CEO. Resta nel
+     PACCHETTO, dove una scadenza tecnica in arrivo e' un fatto che spiega volumi anomali. */
+  const FUORI = new Set(["witching", "seasonality", "mk:EURUSD=X", "in:umich",
                          "mat:petrolio", "mat:rame", "mat:oro",
                          "mk:EURJPY=X", "in:t30", "mk:^TNX", "in:curve3m",
                          "thermometer", "futures", "risk_sentiment", "smart_money",   // v303: stagionalità rientra
@@ -3488,86 +3588,108 @@ const FORMA_INDICATORE = {
      ⚠ Il mese corrente e' acceso, e i prossimi tre portano il loro intervallo per esteso:
      e' li' che la tentazione di leggere la media come previsione e' piu' forte. */
   stagionalita_ndx: (m) => {
+    /* ═══ v313 — UNA SOLA DOMANDA, UNA SOLA CODIFICA ═══════════════════════════════════════
+       Il CEO: "la parte inerente le midterm non mi e' chiara e non comprendo il significato
+       delle tacche". Aveva ragione, e la diagnosi e' la stessa gia' pagata tre volte: la prima
+       stesura metteva DUE codifiche nello stesso grafico — la barra per gli anni di midterm e
+       una tacca per la media di tutti gli anni — e obbligava a decodificare prima di leggere.
+       "Un grafico che va spiegato non e' un grafico leggibile" e' la frase di v228, quando fu
+       respinta la ragnatela.
+       Ora la barra risponde a UNA domanda sola: <b>quanto un anno di midterm cambia questo
+       mese rispetto al normale</b>. Sopra lo zero il mese e' andato meglio del solito negli
+       anni di midterm, sotto peggio. Le due medie restano, ma scritte in parole sotto i
+       prossimi tre mesi — dove si leggono, invece che dedotte da una tacca. */
     const st = m.stagionalita_ndx; if (!st || !(st.mesi || []).length) return null;
     const MESI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
-    const mesi = st.mesi.filter(x => x && Number.isFinite(x.media));
-    const vals = mesi.flatMap(x => [x.media, Number.isFinite(x.media_mid) ? x.media_mid : x.media]);
-    const lo = Math.min(0, ...vals), hi = Math.max(0, ...vals);
-    const W = 330, H = 150, L = 26, R = W - 8, T = 12, B = H - 22;
-    const X = (i) => L + (i + 0.5) / mesi.length * (R - L);
-    const Y = (v) => B - (v - lo) / ((hi - lo) || 1) * (B - T);
-    const larg = (R - L) / mesi.length * 0.56;
-    const zero = Y(0);
-    const barre = mesi.map((x, i) => {
-      const v = Number.isFinite(x.media_mid) ? x.media_mid : null;
-      if (v == null) return "";
-      const y = Math.min(Y(v), zero), h = Math.abs(Y(v) - zero);
+    const NOMI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+                  "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+    const mesi = (st.mesi || []).filter(x => x && Number.isFinite(x.media) && Number.isFinite(x.media_mid));
+    if (mesi.length < 6) return null;
+    const diff = mesi.map(x => ({ ...x, d: Math.round((x.media_mid - x.media) * 100) / 100 }));
+    const lim = Math.max(...diff.map(x => Math.abs(x.d))) || 1;
+    const W = 330, H = 138, L = 30, R = W - 8, T = 10, B = H - 22;
+    const X = (i) => L + (i + 0.5) / diff.length * (R - L);
+    const zero = (T + B) / 2;
+    const Y = (v) => zero - (v / lim) * ((B - T) / 2);
+    const larg = (R - L) / diff.length * 0.6;
+    const barre = diff.map((x, i) => {
+      const y = Math.min(Y(x.d), zero), h = Math.abs(Y(x.d) - zero);
       const ora = x.mese === st.mese_ora;
       return `<rect x="${(X(i) - larg / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${larg.toFixed(1)}"
-        height="${Math.max(h, 0.8).toFixed(1)}" fill="${v >= 0 ? "var(--green)" : "var(--red)"}"
-        opacity="${ora ? 1 : 0.55}"><title>${MESI[x.mese - 1]}: midterm ${fmtNum.format(v)}% su ${x.n_mid} anni · tutti ${fmtNum.format(x.media)}%</title></rect>`;
+        height="${Math.max(h, 1).toFixed(1)}" rx="1.5" fill="${x.d >= 0 ? "var(--green)" : "var(--red)"}"
+        opacity="${ora ? 1 : 0.5}"><title>${NOMI[x.mese - 1]}: negli anni di midterm ${fmtNum.format(x.media_mid)}%, in tutti gli anni ${fmtNum.format(x.media)}% — differenza ${fmtNum.format(x.d)} punti</title></rect>`;
     }).join("");
-    const tacche = mesi.map((x, i) =>
-      `<line x1="${(X(i) - larg / 2 - 1).toFixed(1)}" y1="${Y(x.media).toFixed(1)}"
-         x2="${(X(i) + larg / 2 + 1).toFixed(1)}" y2="${Y(x.media).toFixed(1)}"
-         stroke="var(--text)" stroke-width="1.6"/>`).join("");
-    const etich = mesi.map((x, i) =>
-      `<text x="${X(i).toFixed(1)}" y="${H - 8}" font-size="8.5" text-anchor="middle"
+    const etich = diff.map((x, i) =>
+      `<text x="${X(i).toFixed(1)}" y="${H - 7}" font-size="8.5" text-anchor="middle"
         fill="${x.mese === st.mese_ora ? "var(--text)" : "var(--muted)"}"
         font-weight="${x.mese === st.mese_ora ? "700" : "400"}">${MESI[x.mese - 1]}</text>`).join("");
     const g = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
-        aria-label="stagionalità mensile del Nasdaq 100, anni di midterm contro tutti gli anni">
-      <line x1="${L}" y1="${zero.toFixed(1)}" x2="${R}" y2="${zero.toFixed(1)}" stroke="var(--border)" stroke-width="1"/>
-      <text x="4" y="${(zero + 3).toFixed(1)}" font-size="8.5" fill="var(--muted)">0%</text>
-      ${barre}${tacche}${etich}</svg>`;
+        aria-label="quanto un anno di elezioni di midterm cambia ogni mese del Nasdaq 100 rispetto alla media di tutti gli anni">
+      <line x1="${L}" y1="${zero}" x2="${R}" y2="${zero}" stroke="var(--border)" stroke-width="1"/>
+      <text x="2" y="${(T + 8).toFixed(1)}" font-size="8" fill="var(--muted)">meglio</text>
+      <text x="2" y="${(B - 1).toFixed(1)}" font-size="8" fill="var(--muted)">peggio</text>
+      ${barre}${etich}</svg>`;
 
-    /* i prossimi tre mesi, con l'intervallo per esteso: e' li' che una media diventa profezia */
-    const prossimi = [0, 1, 2].map(k => mesi.find(x => x.mese === ((st.mese_ora - 1 + k) % 12) + 1))
-      .filter(x => x && Number.isFinite(x.media_mid));
-    const testo = prossimi.map(x => `<b>${MESI[x.mese - 1]}</b> ${signTxt(x.media_mid)} `
-      + `<span class="muted">(${x.pos_mid}% positivi, da ${signTxt(x.peggio_mid)} a ${signTxt(x.meglio_mid)})</span>`).join(" · ");
+    const prossimi = [0, 1, 2].map(k => diff.find(x => x.mese === ((st.mese_ora - 1 + k) % 12) + 1)).filter(Boolean);
+    const testo = prossimi.map(x =>
+      `<div class="stag-riga"><b>${NOMI[x.mese - 1]}</b>: negli anni di midterm <b>${signTxt(x.media_mid)}</b>, `
+      + `in tutti gli anni ${signTxt(x.media)} <span class="muted">(${x.pos_mid}% dei casi positivo; `
+      + `i singoli anni sono andati da ${signTxt(x.peggio_mid)} a ${signTxt(x.meglio_mid)})</span></div>`).join("");
 
     return {
       g,
-      n: `<b>Barra</b> = media dei soli anni di <b>midterm</b>; <b>tacca</b> = media di tutti gli anni. `
-        + `Campione ${st.dal}–${st.al}, <b>${(st.anni_midterm || []).length} anni di midterm</b>`
-        + (st.ciclo_ora === 2 ? ` — e il ${st.al + 1} è uno di quelli.` : ".")
-        + `<br>Prossimi tre mesi negli anni di midterm: ${testo || "n.d."}.`
-        + `<br>⚠⚠ <b>Dieci osservazioni per mese sono pochissime.</b> Guardi gli intervalli qui sopra: `
-        + `dove la media è +3,9% i singoli anni vanno da −8,7% a +18,9%. Non è una previsione, è `
-        + `il conto di cosa è successo — e cosa è successo dieci volte non dice cosa succederà l'undicesima. `
-        + `<b>Come si legge:</b> serve a sapere quando NON stupirsi, non a decidere quando comprare.`,
+      n: `<b>Ogni barra dice una cosa sola:</b> quanto quel mese è andato <b>meglio (verde) o peggio (rosso)</b> `
+        + `negli anni di elezioni di midterm rispetto alla media di tutti gli anni. Il mese in corso è acceso.`
+        + `<div class="stag-blocco">${testo}</div>`
+        + `Campione ${st.dal}–${st.al}: <b>${(st.anni_midterm || []).length} anni di midterm</b>`
+        + (st.ciclo_ora === 2 ? `, e il ${st.al + 1} è uno di quelli.` : ".")
+        + ` <b>Perché i midterm:</b> negli Stati Uniti si vota a metà mandato ogni quattro anni, e storicamente `
+        + `i mesi prima del voto sono più incerti e quelli dopo più forti — è la regolarità che questa scheda misura, `
+        + `non una causa dimostrata.`
+        + `<br>⚠⚠ <b>Dieci osservazioni per mese sono pochissime.</b> Guardi gli intervalli qui sopra: dove la media `
+        + `è +3,9% i singoli anni vanno da −8,7% a +18,9%. Non è una previsione: serve a sapere quando un movimento `
+        + `è ordinario per il periodo, non a dedurne uno.`,
     };
   },
 
-  /* ═══ v303 — ROTAZIONE E TASSI DIVENTANO TESSERE ═══════════════════════════════════════
-     Il CEO: "sposta Rotazione, Leva e stagionalità e La curva dei tassi in Tutti gli
-     indicatori, armonizzando la grafica e le dimensioni".
-     ⚠⚠ ARMONIZZARE LE DIMENSIONI COSTA UNA SCELTA, non e' un copia e incolla: la rotazione ha
-     VENTUNO barre, e ventuno barre dentro una tessera sarebbero righe da 6px, illeggibili — la
-     forma che il CEO ha gia' respinto tre volte. Nella tessera stanno i CINQUE che guidano e i
-     CINQUE che restano indietro, che e' la domanda a cui la sezione risponde ("dove si muove il
-     denaro"): i settori di mezzo non dicono niente e occupavano i due terzi dello spazio.
-     ⚠ Le prime cinque azioni del comparto restano al passaggio del mouse, come in v302. */
   rotazione: (m) => {
+    /* ═══ v313 — DUE ELENCHI NOMINATI, NON DIECI BARRE ═══════════════════════════════════════
+       Il CEO: "poco intuitivo… il comparto verde mi dira' le azioni di chi ha avuto un
+       andamento positivo mentre la parte rossa quelle di chi ha perso di piu'; in ogni caso la
+       lettura non e' intuitiva e leggibile".
+       ⚠⚠ LA DESCRIZIONE CHE LUI HA DATO E' GIA' LA FORMA GIUSTA: due gruppi, chi sale e chi
+       scende. Dieci barre che divergono da uno zero, dentro una tessera, chiedono di confrontare
+       lunghezze in due direzioni — ed e' la famiglia di forme che questo progetto ha gia'
+       respinto tre volte (barra 0-100 in v225, quadrante in v226, ragnatela in v228).
+       Ora sono due colonne con l'intestazione a parole, il numero accanto al nome e le prime
+       azioni del comparto sotto. Il clic porta il settore nel grafico E lo sceglie per la copia
+       dell'analisi di settore. */
     const tilt = m.tilt || [];
     if (tilt.length < 6) return null;
-    const ord = [...tilt].sort((a, b) => (b.m1 ?? -99) - (a.m1 ?? -99));
-    const scelti = [...ord.slice(0, 5), ...ord.slice(-5)];
-    const barre = scelti.map(t => ({
-      nome: t.name, valore: t.m1, tk: t.ticker, testo: signTxt(t.m1),
-      suggerimento: (t.prime || []).length
-        ? `Prime ${(t.prime || []).length} di ${t.ticker}: `
-          + t.prime.map(x => `${x.tk}${x.peso != null ? ` ${fmtNum.format(x.peso)}%` : ""}`).join(" · ")
-        : "",
-    }));
+    const ord = [...tilt].filter(t => Number.isFinite(t.m1)).sort((a, b) => b.m1 - a.m1);
+    if (ord.length < 6) return null;
+    const su = ord.slice(0, 5), giu = ord.slice(-5).reverse();
     const sopraZero = tilt.filter(t => (t.m1 ?? 0) > 0).length;
+    const riga = (t) => {
+      const p = (t.prime || []).filter(x => x && x.tk).slice(0, 5);
+      return `<div class="rot-riga" data-graf-tk="${esc(t.ticker)}" data-rot-tk="${esc(t.ticker)}"
+          role="button" tabindex="0" title="Apri ${esc(t.ticker)} nel grafico e scegli questo settore">
+        <span class="rot-nome">${esc(t.name)}</span>
+        <span class="rot-val ${t.m1 >= 0 ? "pos" : "neg"}">${signTxt(t.m1)}</span>
+        ${p.length ? `<span class="rot-prime">${p.map(x => esc(x.tk)).join(" · ")}</span>` : ""}
+      </div>`;
+    };
     return {
-      g: barreOrdinate(barre).replace('<div class="obars">', '<div class="obars obars-compatte">'),
-      n: `Rendimento a 1 mese dei 21 ETF settoriali: qui i <b>cinque che guidano e i cinque che restano indietro</b> — `
-        + `i settori di mezzo non cambiano la lettura. <b>${sopraZero} su ${tilt.length}</b> sono in positivo. `
-        + `<b>Come si legge:</b> passa sopra una barra per le prime cinque azioni di quel comparto. `
-        + `Il denaro che esce da un settore entra in un altro: guarda la distanza fra i due estremi, non il segno del primo.`,
+      g: `<div class="rot-due">
+        <div class="rot-col"><div class="rot-testa rot-su">SALE — dove il denaro sta entrando</div>${su.map(riga).join("")}</div>
+        <div class="rot-col"><div class="rot-testa rot-giu">SCENDE — dove sta uscendo</div>${giu.map(riga).join("")}</div>
+      </div>`,
+      n: `Rendimento a <b>1 mese</b> dei 21 ETF settoriali: qui i cinque che salgono di piu' e i cinque `
+        + `che scendono di piu'. <b>${sopraZero} su ${tilt.length}</b> sono in positivo. `
+        + `Sotto ogni comparto ci sono le sue <b>prime azioni per peso</b>, cioè i titoli che lo muovono. `
+        + `<b>Clicca un comparto</b> per vederlo nel grafico qui sopra e sceglierlo per l'analisi di settore. `
+        + `<b>Come si legge:</b> il denaro che esce da un settore entra in un altro — conta la <b>distanza</b> `
+        + `fra le due colonne, non il segno della prima riga.`,
     };
   },
 
@@ -4155,7 +4277,20 @@ function renderIndicatori() {
   const nota = $("#mg-tutti-note");
   const righe = indicatoriClassifica();
   if (righe.length < 3) { box.innerHTML = '<div class="muted">Indicatori non disponibili.</div>'; return; }
+  /* ═══ v313 — I POPUP SPARISCONO, IL LORO CONTENUTO NO ══════════════════════════════════
+     Il CEO: "elimina pop up di tutte le tab macro tranne per S&P vs Profitti Reali e P/E
+     Storico → per queste accorpa il contenuto del pop up nella tab stessa".
+     ⚠⚠ IL PUNTO E' CHE NON SI PERDE NIENTE. Un popup tolto senza portare fuori il suo
+     contenuto sarebbe la classe v201-v204 (la pulizia che si porta via il fatto), gia' pagata
+     quattro volte qui. `contenutoDalPannello` estrae gia' grafici, tabelle e righe di dati dal
+     pannello e li mette nella tessera: per queste due si estrae TUTTO, per le altre resta
+     quello che gia' arrivava.
+     ⚠ Nessuna tessera apre piu' un popup: `tk` resta null e sparisce l'affordance di clic. Il
+     popup completo resta raggiungibile dalla pagina "Dettagli macro", che e' un'altra
+     superficie e non e' stata toccata — un contenuto che esiste in un solo posto sparisce, uno
+     che esiste in due si sposta. */
   const conPan = new Set(Object.keys(MACRO_INFO || {}));
+  const ACCORPATI = new Set(["corp_profit", "sp500_pe"]);
 
   /* v233 — MINI TAB, la forma originaria. Ogni indicatore e' una scheda: nome, punteggio, nota.
      Dove ha una SERIE STORICA vera si disegna la linea nel tempo con le sue soglie (la forma dei
@@ -4197,7 +4332,11 @@ function renderIndicatori() {
        ripetizione: gli stessi numeri due volte, che e' esattamente cio' che il sistema dichiara
        di non voler fare. Resta l'indice con la sua storia; i pezzi si leggono nelle loro schede. */
     const soloIndice = r.k === "fear_greed";
-    const dal = (forma || soloIndice) ? "" : contenutoDalPannello(conPan.has(r.k) ? r.k : null, r.sub || "");
+    /* per le due accorpate si prende il pannello SEMPRE, anche quando c'e' gia' una forma:
+       e' esattamente cio' che il CEO ha chiesto di portare dentro. */
+    const dal = ACCORPATI.has(r.k)
+      ? contenutoDalPannello(conPan.has(r.k) ? r.k : null, r.sub || "")
+      : ((forma || soloIndice) ? "" : contenutoDalPannello(conPan.has(r.k) ? r.k : null, r.sub || ""));
     const linea = se
       ? (se.doppia
           ? graficoSerie(se.doppia, { h: 104, compatto: true, soglie: se.soglie, etichetteDx: false, aria: r.nome })
@@ -4221,7 +4360,9 @@ function renderIndicatori() {
          invece di tagliare a una lunghezza fissa — un troncamento a caratteri spezzerebbe le
          frasi a meta'. */
       n: notaConDettaglio(forma ? forma.n : esc(r.sub || ""), r.cadenza),
-      tk: conPan.has(r.k) ? r.k : null, id: r.k });
+      /* ⚠ v313 — niente piu' popup dalle tessere: `tk` null toglie sia l'apertura sia
+         l'affordance di clic. Il contenuto e' gia' dentro (sopra), quindi non si perde. */
+      tk: null, id: r.k });
   }).join("")}</div>`;
 
   agganciaTessere(box);
@@ -4434,7 +4575,9 @@ function agganciaTessere(box) {
       if (!b) return;
       ev.preventDefault();
       ev.stopPropagation();
-      apriNelGrafico(b.dataset.grafTk);
+      /* una riga della rotazione SCEGLIE il settore; un bottone di tessera apre e basta */
+      if (b.dataset.rotTk) scegliSettore(b.dataset.rotTk);
+      else apriNelGrafico(b.dataset.grafTk);
     });
   }
   box.querySelectorAll("[data-tess-tk]").forEach(e => {
@@ -8682,99 +8825,6 @@ $("#btn-refresh")?.addEventListener("click", refreshAll);
 $("#btn-cio")?.addEventListener("click", copyCIOText);
 $("#tk-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") copyCIOText(); });
 
-/* ═══ v305 — IL SELETTORE DEI SETTORI ══════════════════════════════════════════════════════
-   ⚠ L'elenco si costruisce dai dati, non a mano: i 21 ETF sono gia' in `macro.tilt`, e un
-   secondo elenco scritto qui divergerebbe alla prima aggiunta — la classe C10/C12 gia' pagata
-   piu' volte in questo progetto. */
-function montaSelettoreSettori() {
-  const sel = $("#set-input");
-  if (!sel || sel.dataset.montato === "1") return;
-  const tilt = (DATA && DATA.macro && DATA.macro.tilt) || [];
-  if (!tilt.length) return;
-  sel.dataset.montato = "1";
-  for (const t of [...tilt].sort((a, b) => String(a.name).localeCompare(String(b.name)))) {
-    const o = document.createElement("option");
-    o.value = t.ticker;
-    o.textContent = `${t.name} (${t.ticker})`;
-    sel.appendChild(o);
-  }
-}
-
-/* ⚠ v307 — cambiare settore porta il suo ETF nel grafico. Il CEO: "se cambio analizza settore
-   macro, puoi modificare anche il ticker nel grafico di tradingview?". Passa dalla STESSA
-   funzione del clic sul portafoglio: due strade per la stessa azione divergono sempre. */
-/* ═══ v311 — i comandi del portafoglio, in DELEGA sul documento ═══════════════════════════
-   I bottoni nascono e muoiono a ogni ridisegno: agganciarli uno per uno lascerebbe handler
-   morti al primo render successivo — il difetto v193/v213 che ha gia' rotto il wiring piu'
-   volte in questo progetto. */
-document.addEventListener("click", (e) => {
-  const t = e.target && e.target.closest ? e.target : null;
-  if (t && t.closest && t.closest("#ver-controlla")) { renderVerifica(); return; }
-  if (!t || !t.closest) return;
-  if (t.closest("#pf-modifica")) { pfInModifica = true; renderPortafoglio(); return; }
-  if (t.closest("#pf-annulla")) { pfInModifica = false; renderPortafoglio(); return; }
-  if (t.closest("#pf-salva")) { salvaPosizioni(); return; }
-  if (t.closest("#pf-aggiungi")) {
-    const corpo = document.querySelector(".pf-tab-edit tbody");
-    if (corpo && corpo.lastElementChild) {
-      corpo.appendChild(corpo.lastElementChild.cloneNode(true));
-      const nuova = corpo.lastElementChild;
-      nuova.querySelectorAll("input").forEach(i => { i.value = ""; });
-      nuova.setAttribute("data-pf-edit", "");
-      const primo = nuova.querySelector(".pf-in-tk");
-      if (primo && typeof primo.focus === "function") primo.focus();
-    }
-    return;
-  }
-  const togli = t.closest(".pf-togli");
-  if (togli) {
-    /* ⚠ la riga sparisce dal FORM, non dai dati: il salvataggio e' l'unico momento in cui
-       qualcosa viene scritto. Annulla deve poter riportare tutto indietro. */
-    const tr = togli.closest("[data-pf-edit]");
-    if (tr && tr.parentNode) tr.parentNode.removeChild(tr);
-  }
-});
-
-$("#set-input")?.addEventListener("change", (e) => {
-  const v = e.target && e.target.value;
-  if (v) apriNelGrafico(v);
-});
-
-$("#set-copia")?.addEventListener("click", async () => {
-  const sel = $("#set-input");
-  const esito = $("#set-esito");
-  const v = sel && sel.value;
-  if (!v) { if (esito) esito.textContent = "Scegli prima un settore dall'elenco."; return; }
-  try {
-    const testo = buildPromptSettore(v);
-    await navigator.clipboard.writeText(testo);
-    if (esito) esito.innerHTML = `Copiato: <b>${esc(sel.options[sel.selectedIndex].textContent)}</b> — `
-      + `${testo.length.toLocaleString("it")} caratteri. Incollalo in una chat NUOVA.`;
-  } catch (e) {
-    if (esito) esito.textContent = "Non sono riuscito a copiare negli appunti: " + (e && e.message ? e.message : e);
-  }
-});
-$("#modal-close")?.addEventListener("click", () => { $("#modal").hidden = true; });
-$("#modal")?.addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
-$("#btn-copy")?.addEventListener("click", async () => {
-  await navigator.clipboard.writeText($("#prompt-text").value);   // copia il testo EDITATO
-  toast("Copiato (con le tue modifiche) ✓");
-});
-/* ---------------- calcolo vendite (plus/minusvalenze) ---------------- */
-const sellPriceOv = {};   // prezzo di vendita inserito a mano per ticker (override del prezzo di mercato)
-const sellQtyOv = {};     // quantità da vendere digitate: sopravvivono a un eventuale re-render
-
-/* ═══ v282 — LE POSIZIONI LE INSERISCE LUI ═════════════════════════════════════════════════
-   Il CEO: "no, inserirò io i dati". Verificato che fosse possibile, e per meta' non lo era:
-   il Calcolatore PMC ha campi numerici liberi (il menu' precompila e basta), ma il Calcolo
-   vendite costruiva la tabella SOLO da DATA.portfolio — "Le tue posizioni sono gia' caricate".
-   Da v272 la pipeline non produce piu' posizioni: quello strumento stava per diventare una
-   tabella vuota senza modo di metterci niente dentro, cioe' la sua frase non sarebbe stata
-   eseguibile.
-   Le righe manuali vivono in localStorage (sono sue, non del sistema) e si sommano a quello
-   che il file eventualmente porta ancora — il BTP, per esempio. Non c'e' scrittura sul repo:
-   sono dati di una simulazione, non un portafoglio da sincronizzare. */
-const SELL_KEY = "vendite_manuali";
 function sellManuali() {
   try {
     const a = JSON.parse(localStorage.getItem(SELL_KEY) || "[]");

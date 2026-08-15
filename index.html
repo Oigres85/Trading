@@ -18,7 +18,7 @@
 <title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=312">
+<link rel="stylesheet" href="assets/style.css?v=313">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -78,11 +78,11 @@
          comparto del Nasdaq/S&P letto come ciclo — a che punto sta, cosa lo farebbe girare, e
          attraverso quale canale il macro ci arriva. Stessa scatola dell'analisi di un titolo:
          si sceglie e si copia, niente da salvare. -->
+    <!-- v313 — via il selettore: il settore si sceglie cliccandolo in "Rotazione", con la
+         stessa logica del portafoglio. Resta il bottone, che dice QUALE settore copierebbe. -->
     <div class="tk-riga tk-riga-settore">
-      <select id="set-input" aria-label="Settore da analizzare">
-        <option value="">Analizza un settore del Nasdaq / S&amp;P…</option>
-      </select>
       <button id="set-copia" class="btn btn-ghost" type="button">📋 Copia analisi settore</button>
+      <span id="set-scelto" class="muted"></span>
     </div>
     <div id="set-esito" class="muted"></div>
   </section>
@@ -332,6 +332,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=312"></script>
+<script src="assets/app.js?v=313"></script>
 </body>
 </html>

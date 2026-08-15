@@ -2188,29 +2188,6 @@ check("v303 tassi: la tessera dichiara serie FRED e data di osservazione", suVer
   const f = FORMA_INDICATORE["tassi10"](DATA.macro || {});
   return !!f && f.n.indexOf(d.series_id) >= 0 && f.n.indexOf(d.observation_date) >= 0`));
 
-/* ⚠⚠ VENTUNO BARRE IN UNA TESSERA SAREBBERO RIGHE DA 6px, cioe' la forma illeggibile che il
-   CEO ha respinto tre volte. La tessera mostra i cinque che guidano e i cinque che restano
-   indietro, e DICE che lo sta facendo — un taglio non dichiarato e' un dato mancante travestito
-   da dato presente. */
-check("v303 rotazione: la tessera mostra gli estremi e dichiara di farlo", suVeri(`
-  const tilt = (DATA.macro && DATA.macro.tilt) || [];
-  if (tilt.length < 6) return true;
-  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
-  if (!f) return false;
-  const barre = (f.g.match(/obar-row/g) || []).length;
-  return barre === 10 && f.n.indexOf("cinque che guidano") >= 0
-      && f.n.indexOf(String(tilt.length)) >= 0`));
-
-/* ⚠ e le prime cinque azioni del comparto restano al passaggio del mouse: era la richiesta che
-   il CEO ha dovuto ripetere ("non hai eseguito la funzione"), e una fusione non deve
-   riportarla indietro. */
-check("v303 rotazione: le prime cinque del comparto sopravvivono alla fusione", suVeri(`
-  const tilt = (DATA.macro && DATA.macro.tilt) || [];
-  const conPrime = tilt.filter(t => (t.prime || []).length);
-  if (!conPrime.length) return true;
-  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
-  return !!f && f.g.indexOf("obar-prime") >= 0 && f.g.indexOf("Prime ") >= 0`));
-
 /* ══ v304 — NEWS MACRO: TRE FONTI, NON CINQUANTASETTE ════════════════════════════════════
    Il CEO le ha richieste nel calendario. Erano uscite in v269 e il motivo NON era che fossero
    inutili: erano ~57 richieste RSS a ogni run per un blocco che nessuno apriva. Qui sono TRE.
@@ -2306,19 +2283,6 @@ check("v305 settore: dichiara che i flussi retail non li abbiamo, e perche'", su
 check("v305 settore: una chiave sconosciuta elenca i settori disponibili", suVeri(`
   const p = buildPromptSettore("NONESISTE");
   return p.indexOf("Settore non riconosciuto") === 0 && p.indexOf("SMH") >= 0`));
-
-/* ⚠ l'elenco del selettore si costruisce DAI DATI: un secondo elenco scritto a mano
-   divergerebbe alla prima aggiunta (classe C10/C12, gia' pagata piu' volte qui). */
-check("v305 settore: il selettore si costruisce dai dati, non da un elenco a mano", (() => {
-  const i = src.indexOf("function montaSelettoreSettori");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  return corpo.includes("DATA.macro.tilt") && !corpo.includes("XLK") && !corpo.includes("SMH");
-})());
-
-/* ══ v307 — IL PORTAFOGLIO IN PAGINA ═════════════════════════════════════════════════════
-   Il CEO ha dato il suo estratto e ha chiesto che cliccando un ticker si apra nel grafico. La
-   domanda presupponeva il portafoglio VISIBILE, che v256 aveva tolto perche' non c'erano
-   posizioni. Ora ci sono. */
 
 /* ⚠⚠ UN'OBBLIGAZIONE NON SI MOLTIPLICA COME UN'AZIONE, e il primo disegno lo dimostrava: il
    BTP quota in PERCENTUALE del nominale, quindi 40.000 a 102,86 valgono 41.144 euro e non
@@ -2418,15 +2382,6 @@ check("v309 grafico: il clic sul bottone non apre anche il pannello", (() => {
   const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
   return corpo.includes("stopPropagation") && corpo.includes("box.addEventListener");
 })());
-
-/* ⚠ e ogni barra di settore porta al grafico del SUO ETF: era la richiesta "per ogni settore
-   se ci clicco sopra". */
-check("v309 grafico: ogni barra di settore ha il proprio simbolo", suVeri(`
-  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
-  if (!f) return true;
-  const n = (f.g.match(/data-graf-tk=/g) || []).length;
-  const barre = (f.g.match(/obar-row/g) || []).length;
-  return n === barre && n >= 6`));
 
 /* ══ v310 — CIO' CHE SI DISEGNA DEVE ARRIVARE ALL'LLM: IL CANCELLO CHE CHIUDE LA CLASSE ══
    ⚠⚠ E' LA TERZA VOLTA. Il calendario (v287) e la curva dei tassi (v289) erano stati costruiti,
@@ -2617,6 +2572,52 @@ check("v312 verifica: si dichiara euristica, non prova", (() => {
       && corpo.includes("dove guardare")
       && corpo.includes("NON VERIFICATO");
 })());
+
+/* ══ v313 — LA ROTAZIONE CAMBIA FORMA, GLI INVARIANTI RESTANO ═══════════════════════════
+   Il CEO: "poco intuitivo… la lettura non e' intuitiva e leggibile", e la forma che ha
+   descritto lui — verde chi sale, rosso chi scende — era gia' quella giusta. Via le dieci
+   barre divergenti, due elenchi nominati. I check che sorvegliavano le barre non hanno piu' un
+   soggetto; quelli che seguono sorvegliano i FATTI, che non sono cambiati. */
+check("v313 rotazione: mostra i cinque che salgono e i cinque che scendono, e lo dichiara", suVeri(`
+  const tilt = (DATA.macro && DATA.macro.tilt) || [];
+  if (tilt.length < 6) return true;
+  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
+  if (!f) return false;
+  const righe = (f.g.match(/rot-riga/g) || []).length;
+  return righe === 10
+      && f.g.indexOf("SALE") >= 0 && f.g.indexOf("SCENDE") >= 0
+      && f.n.indexOf("cinque che salgono") >= 0
+      && f.n.indexOf(String(tilt.length)) >= 0`));
+
+/* ⚠ le prime azioni del comparto sono la richiesta che il CEO ha dovuto ripetere ("non hai
+   eseguito la funzione"): un cambio di forma non deve riportarla indietro. */
+check("v313 rotazione: le prime azioni del comparto sopravvivono al cambio di forma", suVeri(`
+  const tilt = (DATA.macro && DATA.macro.tilt) || [];
+  const conPrime = tilt.filter(t => (t.prime || []).length);
+  if (!conPrime.length) return true;
+  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
+  return !!f && f.g.indexOf("rot-prime") >= 0`));
+
+/* ⚠⚠ IL SELETTORE NON C'E' PIU', ma la funzione che serviva si': scegliere un comparto per
+   l'analisi. Ora la scelta e' UN CLIC nella rotazione, che fa due cose insieme — porta il
+   settore nel grafico e lo rende quello che il bottone copierebbe. Due gesti diventati uno,
+   e una sola strada per scriverlo (`scegliSettore`), perche' due strade divergono. */
+check("v313 settore: si sceglie cliccando la rotazione, e la copia resta", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  return html.indexOf('id="set-input"') < 0            // la barra e' sparita
+      && html.indexOf('id="set-copia"') >= 0           // il bottone resta
+      && src.indexOf("function scegliSettore") >= 0
+      && src.indexOf("b.dataset.rotTk") >= 0
+      && src.indexOf("settoreScelto") >= 0;
+})());
+
+/* ⚠ e ogni comparto porta al grafico del suo ETF: era "per ogni settore se ci clicco sopra". */
+check("v313 grafico: ogni riga di settore ha il proprio simbolo", suVeri(`
+  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
+  if (!f) return true;
+  const n = (f.g.match(/data-graf-tk=/g) || []).length;
+  const righe = (f.g.match(/rot-riga/g) || []).length;
+  return n === righe && n >= 6`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
