@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "293";
+const BUILD_VERSION = "294";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2482,6 +2482,32 @@ function renderTassi() {
     }
   }
 
+  /* ═══ v294 — GLI SPREAD ENTRANO QUI, DOVE SONO UNA PROPRIETA' DELLA CURVA ═══════════════
+     Il CEO: "vedi se ci sono doppioni, ovvero se più schede mostrano lo stesso dato". Ce n'erano:
+     "Treasury USA 10A" e "Treasury USA 30A" avevano una scheda ciascuno nella classifica mentre
+     questa card mostra gli stessi rendimenti CON lo storico, e "Curva 10A-3M" ne aveva una terza
+     per una grandezza che e' la distanza fra due punti gia' disegnati qui.
+     ⚠ GLI SPREAD SI PRENDONO DALLE SERIE UFFICIALI (T10Y2Y, T10Y3M via `macro.indicators`), NON
+     si ricalcolano sottraendo i nostri tenori: sarebbero due derivazioni della stessa grandezza,
+     coerenti solo per fortuna — la classe v161/v207, gia' pagata due volte in questo progetto.
+     FRED pubblica lo spread come serie propria, con la sua data: quella si usa. */
+  const spread = $("#tassi-spread");
+  if (spread) {
+    const ind = ((DATA && DATA.macro && DATA.macro.indicators) || []);
+    const q = (k) => ind.find(x => x && x.key === k);
+    const righe = [["curve", "10 anni − 2 anni"], ["curve3m", "10 anni − 3 mesi"]]
+      .map(([k, et]) => { const x = q(k); return x ? { et, v: x.value, d: x.date, key: k } : null; })
+      .filter(Boolean);
+    spread.innerHTML = righe.length
+      ? `<div class="tassi-spread">${righe.map(x =>
+          `<span><b>${esc(x.et)}: ${esc(String(x.v))}</b> <span class="muted">(serie FRED propria, oss. ${esc(x.d)})</span></span>`
+        ).join("")}</div>`
+        + `<div class="muted tassi-spread-nota">Sono la <b>pendenza</b> della curva qui sopra, presa dalle serie che `
+        + `la fonte pubblica come tali — non ricalcolata sottraendo i nostri tenori, che darebbe un secondo numero `
+        + `per la stessa grandezza. Sotto zero la curva è invertita: chi presta a dieci anni incassa meno di chi presta a tre mesi.</div>`
+      : "";
+  }
+
   if (nota) {
     const dataUlt = (t.scadenze || []).map(x => x.observation_date).filter(Boolean).sort().pop();
     nota.innerHTML = `<b>Osservazioni pubblicate da ${esc(t.fonte || "FRED")}</b>, non stime: `
@@ -3039,7 +3065,19 @@ function indicatoriClassifica() {
      del quadro d'insieme, o fra "i tre piu' favorevoli", direbbe una cosa che non significa
      niente — l'errore che il Philly Fed a punteggio pieno ha gia' fatto vedere (v274). */
   const chiaviTermometri = new Set(["in:curve", "credit", "vix"]);
-  const FUORI = new Set(["thermometer", "futures", "seasonality", "risk_sentiment", "smart_money",
+  /* ⚠ v294 — TRE DOPPIONI TOLTI, e la ragione va scritta perche' un domani sembrera' una
+     dimenticanza. Il CEO: "vedi se ci sono doppioni, ovvero se piu' schede mostrano lo stesso
+     dato". Questi tre portano numeri che la scheda "La curva dei tassi" mostra gia', e meglio,
+     perche' li' hanno lo storico e stanno accanto agli altri tenori:
+     · in:t30      → il 30 anni e' un punto della curva
+     · mk:^TNX     → il 10 anni idem
+     · in:curve3m  → e' la DISTANZA fra due punti gia' disegnati, ed e' passata li' come pendenza
+     ⚠⚠ NON SI PERDE NIENTE: `macro.indicators` resta intatto, quindi il PAYLOAD continua a
+     portarli tutti e tre all'LLM — esce solo la tessera doppia dalla pagina. E' la regola v208
+     ("si toglie dalla pagina cio' che il payload porta gia'"), applicata a una duplicazione
+     interna alla pagina invece che fra pagina e pacchetto. */
+  const FUORI = new Set(["in:t30", "mk:^TNX", "in:curve3m",
+                         "thermometer", "futures", "seasonality", "risk_sentiment", "smart_money",
                          "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield",
                          /* v265 — richieste esplicite del CEO: due componenti F&G che non vuole */
                          "fg:forza-dei-prezzi", "fg:domanda-beni-rifugio",
@@ -3945,6 +3983,65 @@ function notaConDettaglio(nota, cadenza) {
     + cad;
 }
 
+/* ⚠ v294 — la mappa e' un registro, e i registri in questo progetto invecchiano in silenzio.
+   Due difese: l'inclassificato NON viene nascosto (finisce in un gruppo che lo dichiara) e un
+   cancello verifica che quel gruppo sia vuoto. Aggiungere un indicatore senza classificarlo
+   accende un rosso invece di produrre un cassetto. */
+const FAMIGLIA_INDICATORE = {
+  "in:real10": "Tassi e Fed", fed_market: "Tassi e Fed", fedwatch: "Tassi e Fed",
+  "in:cpi": "Inflazione e crescita", "in:gdp": "Inflazione e crescita",
+  "in:retail": "Inflazione e crescita", "in:umich": "Inflazione e crescita",
+  "in:unemp": "Inflazione e crescita", "in:philly": "Inflazione e crescita",
+  dollar: "Valute", "mk:EURUSD=X": "Valute", "mk:EURJPY=X": "Valute", carry: "Valute",
+  "mat:oro": "Materie prime e settori", "mat:petrolio": "Materie prime e settori",
+  "mat:rame": "Materie prime e settori", "mat:sox": "Materie prime e settori",
+  sp500_pe: "Valutazione e utili", corp_profit: "Valutazione e utili",
+  putcall: "Sentiment e posizionamento", fear_greed: "Sentiment e posizionamento",
+  froth: "Sentiment e posizionamento", breadth: "Sentiment e posizionamento",
+  momentum: "Sentiment e posizionamento", liquidity: "Sentiment e posizionamento",
+  witching: "Sentiment e posizionamento",
+  systemic_risk: "Credito e stress",
+};
+const ORDINE_FAMIGLIE = ["Tassi e Fed", "Inflazione e crescita", "Credito e stress",
+  "Valutazione e utili", "Sentiment e posizionamento", "Valute", "Materie prime e settori"];
+const FAMIGLIA_NON_CLASSIFICATI = "Non ancora classificati";
+
+function raggruppaPerFamiglia(box) {
+  if (!box || typeof box.querySelectorAll !== "function") return;   // harness senza DOM
+  if (typeof document === "undefined" || typeof document.createElement !== "function") return;
+  /* ⚠ `.mg-card` matcha anche `.mg-card-head`: e' costato due volte in v238. Qui e' escluso. */
+  const tessere = [...box.querySelectorAll(".mg-card:not(.mg-card-head)")];
+  if (!tessere.length) return;
+  const per = new Map();
+  for (const el of tessere) {
+    const id = (typeof el.getAttribute === "function" && el.getAttribute("data-scheda")) || "";
+    const fam = FAMIGLIA_INDICATORE[id] || FAMIGLIA_NON_CLASSIFICATI;
+    if (!per.has(fam)) per.set(fam, []);
+    per.get(fam).push(el);
+  }
+  const ordine = [...ORDINE_FAMIGLIE.filter(f => per.has(f)),
+                  ...[...per.keys()].filter(f => !ORDINE_FAMIGLIE.includes(f))];
+  const pezzi = [];
+  ordine.forEach((fam, i) => {
+    const d = document.createElement("details");
+    d.className = "mg-fam";
+    if (i === 0) d.open = true;
+    const sm = document.createElement("summary");
+    const n = per.get(fam).length;
+    sm.innerHTML = `<b>${esc(fam)}</b> <span class="muted">${n} ${n === 1 ? "indicatore" : "indicatori"}</span>`
+      + (fam === FAMIGLIA_NON_CLASSIFICATI
+         ? ' <span class="mg-fam-avviso">— nessuno li ha ancora assegnati a una famiglia</span>' : "");
+    d.appendChild(sm);
+    const g = document.createElement("div");
+    g.className = "mg-tris";
+    per.get(fam).forEach(el => g.appendChild(el));
+    d.appendChild(g);
+    pezzi.push(d);
+  });
+  box.innerHTML = "";
+  pezzi.forEach(d => box.appendChild(d));
+}
+
 function renderIndicatori() {
   const box = $("#mg-tutti"); if (!box) return;
   const nota = $("#mg-tutti-note");
@@ -4003,6 +4100,19 @@ function renderIndicatori() {
       n: notaConDettaglio(forma ? forma.n : esc(r.sub || ""), r.cadenza),
       tk: conPan.has(r.k) ? r.k : null, id: r.k });
   }).join("")}</div>`;
+
+  /* ═══ v294 — LE TESSERE IN FILA DIVENTANO GRUPPI ═══════════════════════════════════════
+     Il CEO: "ci sono troppe schede da monitorare e sarebbe utile un modo per avere le
+     informazioni in modo piu' ordinato". Questa scheda pesava 23.747 caratteri, dieci volte
+     ogni altra della pagina: e' qui che il problema si concentrava.
+     ⚠ NON SI NASCONDE NIENTE: i gruppi sono <details>, il primo aperto, e ogni intestazione
+     dice quante tessere contiene — un gruppo chiuso non e' un buco, e' una scatola etichettata.
+     ⚠⚠ E NON C'E' UN CASSETTO "ALTRO". Un indicatore che nessuno ha classificato finirebbe li'
+     in silenzio: e' la classe del registro fisso che invecchia da solo (C10, red team I6) piu'
+     lo spicchio fantasma di v226, dove una famiglia "Altro" comparve senza che nessuno l'avesse
+     voluta. Qui l'inclassificato resta VISIBILE in un gruppo che dichiara di non essere una
+     famiglia, e un cancello lo conta: se compare, qualcuno deve decidere. */
+  raggruppaPerFamiglia(box);
   agganciaTessere(box);
   /* v241 — l'ordine scelto dal CEO si riapplica a OGNI render (la griglia si ricostruisce da
      capo ogni volta), e i comandi di trascinamento si rimontano sulle schede nuove. */

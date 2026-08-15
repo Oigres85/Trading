@@ -2092,3 +2092,19 @@ svg.g-serie { cursor: crosshair; }
 
 /* la rotazione ha 21 righe: si scorre invece di nasconderne otto. */
 #mg-rot.graf-tessera { max-height: 236px; overflow-y: auto; }
+
+/* v294 — gli spread di curva stanno con la curva: sono la sua pendenza, non un altro dato. */
+.tassi-spread { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 12.5px; margin-top: 8px; }
+.tassi-spread-nota { font-size: 11.5px; line-height: 1.45; margin-top: 4px; }
+
+/* v294 — i gruppi di indicatori. Un <details> chiuso deve leggersi come una scatola etichettata,
+   non come un buco: per questo l'intestazione porta il conteggio ed è cliccabile per intero. */
+.mg-fam { border: 1px solid var(--border); border-radius: 8px; margin: 8px 0; }
+.mg-fam > summary { cursor: pointer; padding: 8px 10px; font-size: 13px; list-style: none;
+  display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.mg-fam > summary::-webkit-details-marker { display: none; }
+.mg-fam > summary::before { content: "▸"; color: var(--muted); font-size: 11px; }
+.mg-fam[open] > summary::before { content: "▾"; }
+.mg-fam[open] > summary { border-bottom: 1px solid var(--border); }
+.mg-fam > .mg-tris { padding: 8px; }
+.mg-fam-avviso { color: var(--yellow); font-size: 11px; }

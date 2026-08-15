@@ -1138,15 +1138,33 @@ check("v266 grafico: la striscia dei livelli si ridisegna quando arrivano i dati
 })());
 
 /* ⚠ v266 — UNA FUSIONE VERSO UNA TESSERA ESCLUSA CANCELLAVA IL DATO. `in:curve` non si mostra
-   (è già un termometro di stress, v265): fondere `in:curve3m` dentro di lei toglieva il 10A-3M
-   dalla lista e poi il filtro toglieva anche l'ospite. Il dato spariva del tutto, in silenzio. */
-check("v266 fusioni: il secondario sopravvive se il primario non viene mostrato", run(`
-  const saved = DATA.macro.indicators;
-  DATA.macro.indicators = (saved || []).concat([
-    { key: "curve3m", label: "Curva 10A-3M", value: "+0.78 pp", date: "2026-08-07", impact: 81 }]);
-  const k = indicatoriClassifica().map(x => x.k);
-  DATA.macro.indicators = saved;
-  return k.includes("in:curve3m")`));
+   (è già un termometro di stress, v265): fondere `in:curve3m` dentro di lei lo toglieva dalla
+   lista e poi il filtro toglieva anche l'ospite. Il dato spariva del tutto, in silenzio.
+
+   ⚠⚠ v294 — L'INVARIANTE CAMBIA, LA PROTEZIONE NO. In v294 `in:curve3m` esce dalla classifica
+   di proposito, perche' la scheda "La curva dei tassi" lo mostra come pendenza accanto ai
+   tenori da cui nasce. Il check com'era scritto pretendeva che restasse NELLA CLASSIFICA — cioe'
+   sorvegliava il POSTO invece del FATTO, ed e' lo stesso errore che ha gia' rotto sei check in
+   questo progetto. Riscriverlo per farlo tacere sarebbe il modo classico di perdere la
+   protezione (v203); qui invece verifica cio' che conta davvero: che il 10A-3M sia ancora
+   RAGGIUNGIBILE — in pagina o nel pacchetto. Se un domani sparisce da entrambi, si accende. */
+check("v266/v294 fusioni: il 10A-3M resta raggiungibile, in pagina o nel pacchetto", suVeri(`
+  const c3 = ((DATA.macro && DATA.macro.indicators) || []).find(x => x && x.key === "curve3m");
+  if (!c3) return true;                                  // il dato non c'e' a monte: altro caso
+  /* (a) il pacchetto lo porta comunque all'LLM */
+  const nelPayload = buildPrompt().includes(String(c3.value));
+  /* (b) e la scheda dei tassi lo disegna come pendenza */
+  const box = { innerHTML: "" };
+  const q = document.querySelector;
+  let reso = "";
+  try {
+    document.querySelector = (sel) => sel === "#tassi-spread"
+      ? { set innerHTML(v) { reso = v; }, get innerHTML() { return reso; } }
+      : q.call(document, sel);
+    renderTassi();
+  } finally { document.querySelector = q; }
+  const inPagina = /10 anni − 3 mesi/.test(reso) && reso.includes(String(c3.value));
+  return nelPayload && inPagina`));
 
 /* ⚠ v266 — IL FUSO ORARIO SPOSTAVA INDIETRO LA DATA ATTESA. Le date si costruiscono a
    mezzanotte locale, che a Roma è il giorno prima in UTC: toISOString() tornava indietro di un
@@ -2106,6 +2124,37 @@ check("v293 tecnica: i livelli di Fibonacci tornano col range dichiarato", suVer
   const meta = m[3].match(/50% a ([\\d.]+)/);
   if (!meta) return false;
   return Math.abs(parseFloat(meta[1]) - (hi - 0.5 * (hi - lo))) < 0.02`));
+
+/* ══ v294 — I GRUPPI, E IL CASSETTO CHE NON DEVE RIEMPIRSI ═══════════════════════════════
+   Il CEO: "ci sono troppe schede da monitorare". La scheda degli indicatori pesava 23.747
+   caratteri, dieci volte ogni altra: 27 tessere in fila. Ora sono sette gruppi <details>.
+   ⚠⚠ IL CANCELLO CHE CONTA E' QUESTO: un indicatore nuovo che nessuno classifica finirebbe in
+   un gruppo "Non ancora classificati" — visibile, non nascosto — e qui si accende. Senza,
+   sarebbe il registro fisso che invecchia da solo (C10, red team I6) piu' lo spicchio fantasma
+   di v226, dove una famiglia "Altro" comparve senza che nessuno l'avesse voluta. */
+check("v294 gruppi: nessun indicatore resta senza famiglia", suVeri(`
+  const chiavi = indicatoriClassifica().map(x => x.k);
+  const orfani = chiavi.filter(k => !FAMIGLIA_INDICATORE[k]);
+  return orfani.length === 0`));
+
+/* ⚠ e ogni famiglia dichiarata deve avere un posto nell'ordine: una famiglia fuori elenco
+   finirebbe in coda per caso invece che per scelta. */
+check("v294 gruppi: ogni famiglia usata compare nell'ordine dichiarato", suVeri(`
+  const usate = new Set(Object.values(FAMIGLIA_INDICATORE));
+  return [...usate].every(f => ORDINE_FAMIGLIE.includes(f))`));
+
+/* ⚠⚠ I DOPPIONI TOLTI DALLA PAGINA DEVONO RESTARE NEL PACCHETTO. E' la regola v208 — "si toglie
+   dalla pagina cio' che il payload porta gia'" — e senza questo check un domani qualcuno
+   toglierebbe l'indicatore anche a monte credendo di completare la pulizia, facendo sparire il
+   fatto dal sistema invece che dallo schermo. E' successo tre volte in questo progetto. */
+check("v294 doppioni: cio' che esce dalla pagina resta nel pacchetto", suVeri(`
+  const ind = (DATA.macro && DATA.macro.indicators) || [];
+  const p = buildPrompt();
+  for (const k of ["t30", "curve3m"]) {
+    const x = ind.find(y => y && y.key === k);
+    if (x && !p.includes(String(x.value))) return false;
+  }
+  return true`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
