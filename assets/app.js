@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "301";
+const BUILD_VERSION = "302";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -791,7 +791,6 @@ function renderAll() {
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
   renderTassi();                // v289 — curva dei tassi, osservazioni FRED
-  renderOggi();                 // v299 — cosa si è mosso, cosa esce, cosa è a un estremo
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
@@ -2238,14 +2237,22 @@ function barreOrdinate(righe, opt = {}) {
     const w = Math.abs(x.valore) / max * (neg ? 50 : 100);
     const left = x.valore >= 0 ? zero : zero - w;
     const col = x.colore || (x.valore >= 0 ? "var(--green)" : "var(--red)");
-    /* ⚠ v298 — il tooltip sta sulla RIGA INTERA, non sull'etichetta: il CEO l'ha chiesto
-       "quando passo il mouse sopra ad una barra", e la barra e' la parte larga. `title` nativo
-       invece di un pannello disegnato: nessun JavaScript, e su touch non ruba il tap. */
+    /* ⚠⚠ v302 — IL `title` NATIVO NON BASTAVA, e il CEO l'ha detto: "non hai eseguito la
+       funzione richiesta". Tecnicamente lo faceva — ma un tooltip di sistema compare dopo circa
+       un secondo di immobilita' e con la grafica del sistema operativo: chi passa il mouse
+       scorrendo non lo vede mai. Una funzione che c'e' e non si manifesta, per chi la usa, non
+       c'e' — stessa lezione del ✕ che non chiudeva (v193) e della barra piena al 100% che non
+       rompeva niente (v205).
+       Ora le prime cinque sono una RIGA VERA della griglia, alta zero, che si apre al
+       passaggio: compare subito, ha la grafica della pagina, e resta DENTRO il contenitore che
+       scorre — un pannello in posizione assoluta verrebbe tagliato da `overflow`.
+       ⚠ Il `title` resta come rete per il touch, dove il passaggio del mouse non esiste. */
     return `<div class="obar-row${x.evidenzia ? " obar-on" : ""}"${x.tk ? ` data-obar-tk="${esc(x.tk)}"` : ""}${x.suggerimento ? ` title="${esc(x.suggerimento)}"` : ""}>
       <span class="obar-lab" title="${esc(x.nome)}">${esc(x.nome)}</span>
       <span class="obar-axis">${neg ? `<span class="obar-zero" style="left:${zero}%"></span>` : ""}
         <span class="obar-fill" style="left:${left.toFixed(1)}%;width:${Math.max(w, 0.6).toFixed(1)}%;background:${col}"></span>
       </span>
+      ${x.suggerimento ? `<span class="obar-prime">${esc(x.suggerimento)}</span>` : ""}
       <span class="obar-val">${x.testo != null ? esc(x.testo) : signTxt(x.valore)}</span>
     </div>`;
   }).join("")}</div>${opt.nota ? `<div class="muted struct-note">${opt.nota}</div>` : ""}`;
@@ -2483,96 +2490,6 @@ function renderTassi() {
    UMich NON lo sono: "+31,1%" su un indice e' un'unita' sbagliata su un numero giusto, ed e' il
    modo piu' rapido di far diffidare di un pannello corretto. */
 const UNITA_INDICATORE = { nfp: "K", curve: " pp", curve3m: " pp", umich: "", philly: "" };
-const unitaDi = (k) => (k in UNITA_INDICATORE) ? UNITA_INDICATORE[k] : "%";
-
-function scartiNotevoli(quanti = 3) {
-  /* ⚠⚠ v300 — RISCRITTA. La prima stesura (v299) misurava il movimento sui PUNTEGGI 0-100 di
-     `metrics_history.macro_scores`: cioe' proprio i numeri che v200 ha tolto dal pacchetto dopo
-     aver misurato un hit-rate del 29%. Avevo costruito il rilevatore sui numeri che questo
-     progetto ha deciso di non credere — e parlava il 7% dei giorni (3 su 42 misurati).
-     Ora misura sui VALORI PUBBLICATI: l'ultimo scarto di ciascuna serie diviso per la
-     deviazione tipica dei suoi scarti. Sul dato vero il segnale c'e': PCE -0,41 = 1,4 volte il
-     suo movimento tipico, UMich +5,7 = 1,4 volte.
-     ⚠ NESSUNA SOGLIA. Si ordina per scarto normalizzato e si mostrano i primi, dichiarando
-     quante volte il tipico ciascuno vale: una soglia ("segnala sopra 2") sarebbe una mia
-     decisione su cosa merita attenzione, ed e' il genere di giudizio che questo sistema non da'
-     (v200: "ordinare e' gia' un giudizio" — qui si ordina per un FATTO misurato, e si scrive
-     qual e', cosi' chi legge puo' non essere d'accordo).
-     ⚠⚠ E NON E' "RISPETTO A IERI": una serie mensile non si muove ogni giorno. E' rispetto
-     all'ULTIMA RILEVAZIONE PRECEDENTE, e la data si scrive — altrimenti "il PCE si e' mosso"
-     letto di martedi' fa pensare che sia uscito lunedi'. */
-  const ind = ((DATA && DATA.macro && DATA.macro.indicators) || []);
-  const out = [];
-  for (const i of ind) {
-    const st = (i.storico || []).filter(p => p && typeof p.v === "number");
-    if (st.length < 12) continue;                 // troppo poca storia per una deviazione onesta
-    const d = [];
-    for (let k = 1; k < st.length; k++) d.push(st[k].v - st[k - 1].v);
-    const media = d.reduce((a, b) => a + b, 0) / d.length;
-    const sd = Math.sqrt(d.reduce((a, b) => a + (b - media) ** 2, 0) / d.length);
-    if (!Number.isFinite(sd) || sd === 0) continue;
-    const ultimo = d[d.length - 1];
-    out.push({ key: i.key, label: i.label, value: i.value,
-               scarto: Math.round(ultimo * 100) / 100,
-               volte: Math.round(Math.abs(ultimo - media) / sd * 10) / 10,
-               quando: st[st.length - 1].d });
-  }
-  return out.sort((a, b) => b.volte - a.volte).slice(0, quanti);
-}
-
-function estremiAnnuali(quanti = 3) {
-  const ind = ((DATA && DATA.macro && DATA.macro.indicators) || []);
-  const out = [];
-  for (const i of ind) {
-    const st = (i.storico || []).map(p => p && p.v).filter(v => typeof v === "number");
-    if (st.length < 24) continue;               // meno di due anni di mensili: percentile fragile
-    const v = st[st.length - 1];
-    const sotto = st.filter(x => x < v).length;
-    const pct = Math.round(sotto / st.length * 100);
-    if (pct >= 90 || pct <= 10) out.push({ label: i.label, value: i.value, pct, n: st.length });
-  }
-  return out.sort((a, b) => Math.abs(b.pct - 50) - Math.abs(a.pct - 50)).slice(0, quanti);
-}
-
-function renderOggi() {
-  const box = $("#oggi-righe");
-  if (!box) return;
-  const mossi = scartiNotevoli(3);
-  /* ⚠ la STESSA finestra della sezione dedicata: due numeri diversi in due punti della
-     pagina si contraddicono a vista (lezione v290, li' fra pagina e pacchetto). */
-  const eventi = (typeof prossimiEventi === "function") ? prossimiEventi(14).eventi : [];
-  const estremi = estremiAnnuali(3);
-
-  const righe = [];
-  righe.push(mossi.length
-    ? `<div class="oggi-riga"><span class="oggi-et">SI È MOSSO</span>`
-      + mossi.map(m => `<b>${esc(m.label)}</b> ${signTxt(m.scarto, unitaDi(m.key))} `
-          + `<span class="muted">(${fmtNum.format(m.volte)}× il suo tipico · rilevazione ${esc(m.quando)})</span>`).join(" · ")
-      + `</div>`
-    : `<div class="oggi-riga"><span class="oggi-et">SI È MOSSO</span><span class="muted">nessuna serie ha abbastanza storia per misurare un movimento</span></div>`);
-
-  righe.push(eventi.length
-    ? `<div class="oggi-riga"><span class="oggi-et">IN USCITA</span>`
-      + eventi.slice(0, 4).map(e => `<b>${esc(e.nome)}</b> <span class="muted">${esc(e.giorno)}${e.stimata ? " (stimata)" : ""}</span>`).join(" · ")
-      + (eventi.length > 4 ? ` <span class="muted">e altri ${eventi.length - 4}</span>` : "")
-      + `</div>`
-    : `<div class="oggi-riga"><span class="oggi-et">IN USCITA</span><span class="muted">niente nelle prossime due settimane fra le serie e i titoli seguiti</span></div>`);
-
-  righe.push(estremi.length
-    ? `<div class="oggi-riga"><span class="oggi-et">AGLI ESTREMI</span>`
-      + estremi.map(e => `<b>${esc(e.label)}</b> ${esc(String(e.value))} <span class="muted">(${e.pct}° percentile su ${e.n} rilevazioni)</span>`).join(" · ")
-      + `</div>`
-    : `<div class="oggi-riga"><span class="oggi-et">AGLI ESTREMI</span><span class="muted">nessun indicatore nel primo o ultimo decile del proprio storico</span></div>`);
-
-  box.innerHTML = righe.join("");
-  const nota = $("#oggi-nota");
-  if (nota) {
-    nota.innerHTML = `<b>Come si legge.</b> "Si è mosso" prende l'ultimo scarto pubblicato di ogni serie e lo divide per `
-      + `la deviazione tipica dei suoi scarti: "1,4× il suo tipico" vuol dire che quel movimento è più ampio del solito PER QUELLA serie. `+ `Non c'è una soglia: sono i primi tre in ordine, col loro numero accanto, così può non essere d'accordo. `+ `Una serie mensile non si muove ogni giorno: la data accanto dice QUANDO è uscito quel dato. `
-      + `"Agli estremi" è il percentile sullo storico vero dell'indicatore. Le date in uscita sono <b>stime</b> `
-      + `(v. sezione dedicata). Se una riga tace, tace perché non c'è niente da dire: non è un errore.`;
-  }
-}
 
 function renderCalendario() {
   const box = $("#cal-eventi");
@@ -3017,7 +2934,12 @@ function indicatoriClassifica() {
      PAYLOAD da v138 come ridondante — il rischio yen sta nel blocco Carry USA-Giappone, che
      porta lo stesso fatto con il meccanismo accanto. Ora esce anche dalla pagina, dove era
      l'ultimo posto in cui compariva da solo. */
-  const FUORI = new Set(["mk:EURJPY=X", "in:t30", "mk:^TNX", "in:curve3m",
+  /* ⚠ v302 — petrolio, rame e oro fuori su richiesta del CEO. Restano nel PAYLOAD (la pipeline
+     continua a pubblicarli in `macro.materie`), esce solo la tessera: e' la regola v208, si
+     toglie dalla pagina cio' che il pacchetto porta gia'. Il SOX resta perche' non e' stato
+     chiesto di toglierlo ed e' il benchmark del suo fattore principale. */
+  const FUORI = new Set(["mat:petrolio", "mat:rame", "mat:oro",
+                         "mk:EURJPY=X", "in:t30", "mk:^TNX", "in:curve3m",
                          "thermometer", "futures", "seasonality", "risk_sentiment", "smart_money",
                          "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield",
                          /* v265 — richieste esplicite del CEO: due componenti F&G che non vuole */
@@ -6566,18 +6488,29 @@ function buildPrompt() {
      ⚠⚠ SONO TUTTE STIME E OGNI RIGA LO DEVE DIRE, come in pagina: le uscite macro le proietto
      dal ritardo tipico della fonte, le trimestrali le sposta l'emittente. Un appuntamento che
      sembra confermato senza esserlo e' la classe di difetto peggiore di questo progetto. */
-  /* ⚠ v299 — DOVE STA OGGI CIASCUN INDICATORE NEL PROPRIO STORICO. E' informazione NUOVA,
-     non una ripetizione: il payload dava il valore e la data, non se quel valore sia alto o
-     basso PER QUELLA SERIE. "Philly Fed +41,4" non dice niente; "+41,4, 97° percentile su 60
-     rilevazioni" dice che e' un estremo. ⚠ E' un percentile sullo storico VERO, non un
-     punteggio 0-100 costruito da me: quelli sono usciti in v200 e non rientrano. */
-  if (typeof estremiAnnuali === "function") {
-    const est = estremiAnnuali(6);
-    if (est.length) {
-      lines.push(`- AGLI ESTREMI DEL PROPRIO STORICO (percentile calcolato sulle osservazioni pubblicate della serie stessa, `
-        + `non su una scala costruita dal sistema): `
-        + est.map(e => `${e.label} ${e.value} = ${e.pct}° percentile su ${e.n} rilevazioni`).join(" · ")
-        + `. Un valore al 5° o al 95° percentile non e' un giudizio: e' dove sta quel numero nella sua stessa storia.`);
+  /* ═══ v302 — LE MATERIE PRIME ENTRANO NEL PACCHETTO, PROPRIO MENTRE ESCONO DALLA PAGINA ══
+     Il CEO ha chiesto di togliere petrolio, rame e oro dalla pagina. Il cancello v302 ha
+     scoperto che `macro.materie` NON era nel payload: vivevano solo sulla schermata, quindi
+     togliere la tessera le avrebbe cancellate dal SISTEMA invece che spostarle. E' la classe
+     v201-v204 — la pulizia che si porta via il fatto — presa in tempo dal check scritto un
+     minuto prima per un'altra ragione.
+     ⚠ Sono fatti che contano per questo libro: il rame e' la domanda industriale (e i semi
+     sono ciclici), il petrolio e' inflazione dal lato dei costi, l'oro e' il termometro della
+     sfiducia. Una riga sola, col valore, la variazione e dove sta nel proprio anno. */
+  if (m.materie && Object.keys(m.materie).length) {
+    const pezzi = [];
+    for (const [k, v] of Object.entries(m.materie)) {
+      if (!v || v.value == null) continue;
+      pezzi.push(`${v.label || k} ${v.value}${v.unita ? " " + v.unita : ""}`
+        + (v.change_pct != null ? ` (${signTxt(v.change_pct)} oggi)` : "")
+        + (v.pct_1y != null ? ` — ${Math.round(v.pct_1y)}° percentile dell'anno`
+            + (v.min_1y != null && v.max_1y != null ? `, range ${v.min_1y}–${v.max_1y}` : "") : ""));
+    }
+    if (pezzi.length) {
+      lines.push(`- MATERIE PRIME E SEMICONDUTTORI: ${pezzi.join(" · ")}. `
+        + `Il percentile dice DOVE sta il prezzo nel suo anno, non se sia caro: rame alto = domanda `
+        + `industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo `
+        + `stesso numero — non sommarli in un giudizio unico.`);
     }
   }
 

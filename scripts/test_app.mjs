@@ -1565,15 +1565,24 @@ check("v280 materie: le quattro schede hanno una forma col grafico", (() => {
       && /graficoSerie\(\[\{ nome: cfg\.titolo/.test(src);
 })());
 
-check("v280 materie: entrano in classifica e portano la loro serie", run(`
-  const saved = DATA.macro.materie;
-  const st = (b) => Array.from({length: 40}, (_, i) => ({ d: "2026-01-01", v: b * (1 + i / 100) }));
-  DATA.macro.materie = { rame: { label: "Rame", unita: "$/lb", value: 6.6, change_pct: 0.8,
-    pct_1y: 38, min_1y: 4.4, max_1y: 6.7, history: st(6) } };
-  const c = indicatoriClassifica().filter(x => x.k === "mat:rame");
-  const f = FORMA_INDICATORE["mat:rame"](DATA.macro);
-  DATA.macro.materie = saved;
-  return c.length === 1 && !!f && typeof f.g === "string" && f.g.length > 200`));
+/* ⚠⚠ v302 — L'INVARIANTE CAMBIA PERCHE' IL CEO HA DECISO, NON PERCHE' IL CHECK DAVA FASTIDIO.
+   Petrolio, rame e oro escono dalla PAGINA su sua richiesta. Il check pretendeva che entrassero
+   in classifica: sorvegliava il POSTO. Cio' che conta e' che il FATTO non sparisca dal sistema —
+   la pipeline continua a pubblicare `macro.materie` e il pacchetto continua a portarle all'LLM.
+   E' la regola v208 ("si toglie dalla pagina cio' che il payload porta gia'") piu' la lezione
+   v201-v204: tre volte in questo progetto una pulizia si e' portata via il fatto insieme alla
+   sua ripetizione, e questo check e' cio' che lo impedisce. */
+check("v302 materie: tolte dalla pagina, restano nel pacchetto", suVeri(`
+  const mat = (DATA.macro && DATA.macro.materie) || {};
+  const nomi = Object.keys(mat);
+  if (!nomi.length) return true;
+  const p = buildPrompt();
+  /* nessuna delle tre ha piu' una tessera... */
+  const inPagina = indicatoriClassifica().map(x => x.k);
+  const fuori = ["mat:petrolio", "mat:rame", "mat:oro"].every(k => !inPagina.includes(k));
+  /* ...ma i loro valori sono ancora nel pacchetto */
+  const dentro = ["petrolio", "rame", "oro"].every(k => !mat[k] || p.includes(String(mat[k].value)));
+  return fuori && dentro`));
 
 /* ⚠ IL PUNTEGGIO E' POSIZIONALE, NON UN GIUDIZIO: un petrolio al 90% del suo intervallo e'
    inflazione (male), un rame al 90% e' domanda industriale (bene) — stesso numero, segni
@@ -2124,7 +2133,6 @@ const SEZIONI_DI_INDEX = [...readFileSync(join(ROOT, "index.html"), "utf8")
                   conta dieci sezioni dove la funzione ne trova nove ed e' cieco al filtro nuovo.
                   Un check che non modella la realta' che sorveglia non e' un check. */
                fissa: /data-fissa/.test(m[2]) }));
-const SEZIONI_MOBILI = SEZIONI_DI_INDEX.filter(x => !x.fissa);
 
 /* ══ v297 — IL TRASCINAMENTO DELLE SEZIONI ERA MORTO DA QUARANTA VERSIONI ════════════════
    Segnalato dal CEO: "non riesco piu' ad ordinare i box". `sezioniDelPane` filtrava su
@@ -2135,7 +2143,7 @@ const SEZIONI_MOBILI = SEZIONI_DI_INDEX.filter(x => !x.fissa);
    passato benissimo mentre la funzione restituiva zero — la differenza fra guardare il codice
    ed ESEGUIRLO, che qui e' gia' costata la pagina morta di v238 con 219 test verdi. */
 check("v297 riordino: sezioniDelPane trova davvero le sezioni di index.html", suVeri(`
-  const sezioni = ${JSON.stringify(SEZIONI_MOBILI)};
+  const sezioni = ${JSON.stringify(SEZIONI_DI_INDEX)};
   const finte = sezioni.map(x => ({
     dataset: { sez: x.sez, pane: x.pane || undefined },
     matches: (sel) => {
@@ -2243,106 +2251,6 @@ check("v299 pacchetto titolo: elenca cosa non ha e obbliga a dichiarare i buchi"
   return p.includes("QUELLO CHE IL SISTEMA NON HA")
       && p.includes("NON VERIFICATO:")
       && p.includes("Un numero plausibile inventato e' peggio di un buco dichiarato")`));
-
-/* ⚠⚠ v300 — L'INVARIANTE SI RAFFORZA, DOPO CHE LA REVISIONE HA TROVATO UN MIO ERRORE. La
-   prima stesura misurava il movimento sui PUNTEGGI 0-100 di `metrics_history.macro_scores`:
-   cioe' esattamente i numeri che v200 ha tolto dal pacchetto dopo aver misurato un hit-rate
-   del 29%. Avevo costruito il rilevatore sui numeri che questo progetto ha deciso di non
-   credere, e parlava il 7% dei giorni (3 su 42 misurati sullo storico vero).
-   Ora misura sui VALORI PUBBLICATI degli indicatori, e non c'e' nessuna soglia: si ordina per
-   scarto normalizzato e si mostra quante volte il tipico vale ciascuno, perche' scegliere una
-   soglia sarebbe decidere io cosa merita attenzione. */
-check("v300 oggi: il movimento si misura sui valori pubblicati, non sui punteggi", (() => {
-  const nl = String.fromCharCode(10);
-  const i = src.indexOf("function scartiNotevoli");
-  /* ⚠ SENZA COMMENTI: la nota che spiega l'errore corretto cita per forza `macro_scores`, e il
-     gate trovava se stesso — quinta volta in questo progetto (v213, v226, v238, v240). */
-  const corpo = src.slice(i, src.indexOf(nl + "function ", i + 10))
-    .replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  return corpo.includes("DATA.macro.indicators")
-      && corpo.includes("Math.sqrt")
-      && !corpo.includes("macro_scores")          // il difetto che questa riscrittura chiude
-      && !corpo.includes(">= 2");                 // nessuna soglia inventata: si ordina e si dichiara
-})());
-
-/* ⚠ e l'unita' di misura vive in UN SOLO POSTO: "+31,1%" su Philly Fed, che e' un indice, era
-   un'unita' sbagliata su un numero giusto — il modo piu' rapido di far diffidare di un
-   pannello corretto. Due copie della stessa tabella divergono (lezione v161/v207). */
-check("v300 oggi: le unita' degli indicatori stanno in una tabella sola", (() => {
-  const occorrenze = (src.match(/nfp: "K", curve: " pp"/g) || []).length;
-  return occorrenze === 1 && src.includes("const unitaDi =") && src.includes("unitaDi(m.key)");
-})());
-
-/* ⚠ e i percentili si calcolano sullo storico VERO dell'indicatore, non su una scala 0-100
-   costruita dal sistema: quelle sono uscite in v200 e non rientrano. */
-check("v299 oggi: gli estremi sono percentili sulla serie stessa", suVeri(`
-  const e = estremiAnnuali(6);
-  if (!e.length) return true;
-  const ind = (DATA.macro && DATA.macro.indicators) || [];
-  return e.every(x => {
-    const i = ind.find(y => y && y.label === x.label);
-    return i && (i.storico || []).length === x.n && x.pct >= 0 && x.pct <= 100;
-  })`));
-
-/* ⚠⚠ E LE TRE RIGHE NON RESTANO MAI VUOTE: una riga bianca si legge come "rotto", una che dice
-   "niente" si legge come "controllato". E' la differenza fra un buco e un'informazione, la
-   stessa ragione per cui la coda delle decisioni di v198 dichiarava "niente da decidere". */
-check("v299 oggi: ogni riga parla, anche quando non ha niente da dire", suVeri(`
-  const q = document.querySelector;
-  let reso = "";
-  try {
-    document.querySelector = (sel) => sel === "#oggi-righe"
-      ? { set innerHTML(v) { reso = v; }, get innerHTML() { return reso; } }
-      : q.call(document, sel);
-    renderOggi();
-  } finally { document.querySelector = q; }
-  return reso.includes("SI È MOSSO") && reso.includes("IN USCITA") && reso.includes("AGLI ESTREMI")`));
-
-/* ⚠ e la finestra dev'essere la STESSA della sezione dedicata: due numeri diversi in due punti
-   della pagina si contraddicono a vista (lezione v290, li' fra pagina e pacchetto). */
-check("v299 oggi: guarda la stessa finestra della sezione calendario", (() => {
-  const nl = String.fromCharCode(10);
-  const i = src.indexOf("function renderOggi");
-  const a = src.slice(i, src.indexOf(nl + "function ", i + 10));
-  const j = src.indexOf("function renderCalendario");
-  const b = src.slice(j, src.indexOf(nl + "function ", j + 10));
-  const nA = (a.match(/prossimiEventi\((\d+)\)/) || [])[1];
-  const cost = (src.match(/const GIORNI_CALENDARIO = (\d+)/) || [])[1];
-  return nA && cost && Number(nA) === Number(cost) && b.includes("GIORNI_CALENDARIO");
-})());
-
-/* ⚠ i percentili entrano anche nel PACCHETTO: e' informazione nuova (il payload dava il valore
-   e la data, non se quel valore sia alto o basso per quella serie), e cio' che si disegna in
-   pagina deve arrivare all'LLM — il difetto ripetuto due volte in v287 e v289. */
-check("v299 payload: i percentili arrivano anche all'LLM", suVeri(`
-  const est = estremiAnnuali(6);
-  if (!est.length) return true;
-  const p = buildPrompt();
-  return p.includes("AGLI ESTREMI DEL PROPRIO STORICO")
-      && est.every(e => p.includes(e.label))`));
-
-/* ══ v301 — «OGGI» E' FISSA IN CIMA ══════════════════════════════════════════════════════
-   Il commento nel markup lo dichiarava gia' e il codice non lo faceva: l'ordine salvato dal
-   CEO, che per progetto mette in coda le sezioni nuove (v191), aveva spedito IN FONDO la
-   sezione nata per essere la prima cosa che si guarda la mattina. Verificato in produzione.
-   ⚠ Un'intenzione scritta in un commento non e' una regola: e' la classe v234 rovesciata. */
-check("v301 oggi: la sezione d'ingresso e' esclusa dal riordino", (() => {
-  const html = readFileSync(join(ROOT, "index.html"), "utf8");
-  const i = html.indexOf('data-sez="oggi"');
-  if (i < 0) return false;
-  const tag = html.slice(html.lastIndexOf("<section", i), html.indexOf(">", i) + 1);
-  return tag.includes("data-fissa")
-      && src.includes(':not([data-fissa])');
-})());
-
-/* ⚠ e non deve avere una maniglia: un comando che non fa niente e' peggio di un comando
-   assente — chi lo trascina pensa che il sistema non risponda, ed e' esattamente il sintomo
-   che il CEO ha segnalato per il riordino rotto di v297. */
-check("v301 oggi: nessuna maniglia sulle sezioni fisse", (() => {
-  const i = src.indexOf("function montaComandiSezioni");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  return corpo.includes(':not([data-fissa])');
-})());
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

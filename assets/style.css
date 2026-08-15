@@ -2106,3 +2106,15 @@ svg.g-serie { cursor: crosshair; }
 .oggi-et { flex: 0 0 92px; font-size: 10.5px; letter-spacing: .04em; color: var(--muted);
   font-weight: 600; padding-top: 2px; }
 @media (max-width: 560px) { .oggi-et { flex-basis: 100%; } }
+
+/* ═══ v302 — LE PRIME CINQUE DEL COMPARTO, VISIBILI AL PASSAGGIO ═══════════════════════════
+   Il `title` nativo compariva dopo ~1s con la grafica del sistema: chi scorre non lo vede mai,
+   e il CEO ha giustamente detto che la funzione non c'era. Ora è una riga della griglia alta
+   ZERO che si apre al passaggio: compare subito, ha la grafica della pagina, e resta DENTRO il
+   contenitore che scorre — un pannello in posizione assoluta verrebbe tagliato da overflow. */
+.obar-prime { grid-column: 1 / -1; max-height: 0; overflow: hidden; opacity: 0;
+  font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums;
+  transition: max-height var(--t-fast, .15s) ease, opacity var(--t-fast, .15s) ease; }
+.obar-row:hover .obar-prime,
+.obar-row:focus-within .obar-prime { max-height: 34px; opacity: 1; padding: 2px 0 3px; }
+@media (hover: none) { .obar-prime { max-height: 34px; opacity: 1; padding: 2px 0 3px; } }
