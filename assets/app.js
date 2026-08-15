@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "307";
+const BUILD_VERSION = "308";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7311,7 +7311,10 @@ function fattiTitolo(tk) {
                       rs1m: numero(riga.rs_1m), rsBench: riga.rs_bench || null,
                       rsNdx: numero(riga.rs_ndx_1m), sortino: numero(riga.sortino_1y),
                       rischioRendimento: riga.risk_reward || null,
-                      w52hi: numero(riga.w52_high), w52lo: numero(riga.w52_low) } : null,
+                      w52hi: numero(riga.w52_high), w52lo: numero(riga.w52_low),
+                      /* v308 — la posizione, quando c'e': il pacchetto non deve piu' negare di saperlo */
+                      qta: numero(riga.qta), pmc: numero(riga.pmc),
+                      gainPos: numero(riga.gain_pct_pos) } : null,
   };
 }
 
@@ -7668,16 +7671,77 @@ function buildPromptSettore(chiave) {
   }
 
   /* ── (a) I PROXY DELL'EUFORIA, dichiarati per quello che sono ── */
+  /* ═══ v308 — QUANTO PESA QUESTO COMPARTO NEL SUO LIBRO ═══════════════════════════════
+     Trovato rileggendo il pacchetto come lo leggerebbe un analista: il sistema conosce le
+     posizioni dalla v307, e un'analisi di settore per chi ci ha dentro tre quarti del
+     portafoglio NON e' la stessa che per chi non ce l'ha. Il pacchetto lo taceva.
+     ⚠ E' un FATTO (peso misurato), non un ordine: cosa farne lo decide chi legge. */
+  {
+    const posiz = ((DATA && DATA.watchlist) || []).filter(r => r && numero(r.qta) > 0 && numero(r.price) > 0);
+    if (posiz.length) {
+      const fx = numero(DATA && DATA.eurusd) || 1;
+      const eur = (r) => (r.currency === "EUR" ? 1 : 1 / fx) * numero(r.price) * numero(r.qta);
+      const tot = posiz.reduce((acc, r) => acc + eur(r), 0);
+      const dentro = posiz.filter(r => (s.prime || [])
+        .some(p => p && String(p.tk).toUpperCase() === String(r.ticker).toUpperCase()));
+      if (tot > 0) {
+        const quota = dentro.reduce((acc, r) => acc + eur(r), 0);
+        F.push(`- IL SUO LIBRO, DENTRO QUESTO COMPARTO: ${dentro.length} delle ${posiz.length} posizioni azionarie `
+          + `sono fra le prime posizioni di ${s.ticker} e valgono il ${Math.round(quota / tot * 100)}% del `
+          + `controvalore azionario`
+          + (dentro.length ? `: ` + dentro.sort((x, y) => eur(y) - eur(x))
+              .map(r => `${r.ticker} ${Math.round(eur(r) / tot * 100)}% (carico ${r.pmc}, oggi ${signTxt(numero(r.gain_pct_pos))})`)
+              .join(" · ") : "")
+          + `. ⚠ E' il peso sulle sole azioni: esclude il BTP e la liquidita', che il sistema non conosce. `
+          + `Il prezzo di carico non cambia cosa fa il titolo — cambia cosa costa uscirne, ed e' un fatto `
+          + `diverso dal giudizio sul comparto.`);
+      }
+    }
+  }
+
   F.push(`- SUL PRIMO INGREDIENTE (chi possiede le azioni) IL SISTEMA NON HA IL DATO. `
     + `I flussi retail negli ETF e la ripartizione istituzionali/retail non hanno una fonte gratuita `
     + `affidabile: i 13F sono trimestrali e in ritardo, e le azioni in circolazione di un ETF che `
     + `yfinance espone sono incoerenti col patrimonio dichiarato (undici milioni di quote per un NAV `
     + `di 584 dollari fanno 6,8 miliardi contro i 68 dichiarati). Quello che il sistema ha sono PROXY, `
-    + `e sono proxy dell'euforia generale del mercato, non di questo settore:`);
-  if (m.froth) F.push(`    schiuma sugli ETF a leva 3x: ${m.froth.label || ""} ${m.froth.score != null ? `(${m.froth.score}/100)` : ""}`);
-  if (m.putcall && m.putcall.ratio != null) F.push(`    rapporto put/call sull'S&P: ${m.putcall.ratio}`);
-  if (m.breadth) F.push(`    ampiezza del mercato (SPY contro RSP): ${m.breadth.label || m.breadth.divergence_pp + " pp"}`);
-  if (m.margin_debt) F.push(`    debito a margine: ${m.margin_debt.label || ""} — dato FINRA, ritardo strutturale di ~6 settimane`);
+    + `e vanno letti per quello che sono: il put/call e l'ampiezza parlano del MERCATO, mentre `
+    + `l'ETF a leva 3x sul comparto e il debito a margine sono i piu' vicini al primo ingrediente `
+    + `che i dati gratuiti consentano:`);
+  /* ⚠⚠ v308 — LE CHIAVI VANNO LETTE DA data.json, NON DEDOTTE DAL NOME. La prima stesura
+     cercava `m.froth.label`, `m.froth.score` e `m.margin_debt.label`: campi che NON ESISTONO.
+     Il risultato era una riga con l'etichetta e niente dopo — "schiuma sugli ETF a leva 3x:"
+     seguito dal vuoto. E' testualmente la lezione v207, e ci sono ricascato.
+     ⚠⚠⚠ E LEGGENDO I CAMPI VERI SI SCOPRE UNA COSA CHE CAMBIA L'ANALISI: `froth.soxl` e' SOXL,
+     l'ETF a leva 3x SUI SEMICONDUTTORI. Avevo scritto che questi sono "proxy dell'euforia
+     generale del mercato, non di questo settore" — per i semiconduttori e' FALSO: SOXL e'
+     esattamente il proxy di settore, ed e' il piu' vicino che i dati gratuiti consentano
+     all'ingrediente (a), quello che dichiaravo di non avere. Il volume relativo di un ETF a
+     leva 3x su un comparto E' la misura di quanto denaro emotivo ci sta dentro. */
+  if (m.froth) {
+    const lev = Object.entries(m.froth).filter(([, v]) => v && v.symbol && v.rvol != null);
+    if (lev.length) {
+      const suoi = lev.filter(([, v]) => /SOX/i.test(String(v.symbol)));
+      F.push(`    ETF A LEVA 3x — volume rispetto al loro tipico: `
+        + lev.map(([, v]) => `${v.symbol} ${fmtNum.format(v.rvol)}×`
+            + (v.chg_5d_pct != null ? ` (${signTxt(v.chg_5d_pct)} in 5 sedute)` : "")).join(" · ")
+        + (m.froth.alert ? ` ⚠ il sistema segnala schiuma.` : ` Nessun allarme dal sistema.`)
+        + (suoi.length ? ` ⚠ ${suoi.map(([, v]) => v.symbol).join(", ")} e' a leva 3x SU QUESTO COMPARTO: `
+            + `non e' un proxy del mercato, e' il piu' vicino che i dati gratuiti consentano al primo `
+            + `ingrediente — quanto denaro emotivo e a leva sta dentro questo settore.` : ""));
+    }
+  }
+  if (m.putcall && m.putcall.ratio != null) {
+    F.push(`    rapporto put/call sull'S&P: ${m.putcall.ratio} (put ${m.putcall.puts}, call ${m.putcall.calls}) — mercato, non settore`);
+  }
+  if (m.breadth && m.breadth.divergence_pp != null) {
+    F.push(`    ampiezza (SPY contro RSP a 1 mese): ${signTxt(m.breadth.divergence_pp, " pp")} `
+      + `— SPY ${signTxt(m.breadth.spy_1m_pct)}, RSP ${signTxt(m.breadth.rsp_1m_pct)}. Sotto zero: la salita e' dei grandi.`);
+  }
+  if (m.margin_debt && m.margin_debt.pct_of_peak != null) {
+    F.push(`    debito a margine: ${m.margin_debt.pct_of_peak}% del massimo storico, `
+      + `${signTxt(m.margin_debt.yoy)} sull'anno e ${signTxt(m.margin_debt.qoq)} sul trimestre `
+      + `— fonte FINRA, ritardo STRUTTURALE di ~6 settimane: descrive il mese scorso, non oggi.`);
+  }
 
   const istruzioni = [
 `ANALISI DEL SETTORE ${s.name.toUpperCase()} (${s.ticker}) — ${oggi}`,
@@ -7893,8 +7957,12 @@ function buildPromptTicker(tkGrezzo) {
 `  cio' che hai gia' detto. Se una frase non porta un fatto o un giudizio, va tolta.`,
 `· Ogni dato esterno va [VERIFICATO] con fonte e data. Chiudi con "FONTI" — una riga per URL.`,
 `· Se due fonti danno numeri diversi sulla stessa grandezza, dillo e scegli motivando.`,
-`· Non conosco la tua posizione su ${tk} e tu non la chiedi: niente dimensionamenti, niente`,
-`  "quante quote", niente stop in euro. I prezzi si', le quantita' no.`,
+`· Se il pacchetto dichiara che il titolo e' gia' in portafoglio, tienine conto: e' una decisione`,
+`  di MANTENIMENTO, non di ingresso, e va detto a quale prezzo la tesi si romperebbe. Se non lo`,
+`  dichiara, il sistema non ha quella posizione e tu non la chiedi.`,
+`· In nessun caso dimensionare: niente "quante quote comprare", niente stop in euro, niente`,
+`  percentuali di portafoglio. Il sistema non conosce liquidita' ne' situazione fiscale, e un`,
+`  dimensionamento senza quei due dati e' un numero che sembra un consiglio.`,
 `· Ignora prezzi e conclusioni di conversazioni precedenti: conta questo pacchetto e cio' che`,
 `  trovi ADESSO in rete.`,
 `· Niente domande in chiusura e niente offerte di approfondimento: quello che serve, dillo qui.`,
@@ -7999,6 +8067,24 @@ function datiNostriDelTitolo(tk) {
       + ` — calcolo esatto sui due estremi, contati DAL MASSIMO verso il basso. Non sono previsioni: `
       + `sono le quote che quella convenzione indica.`);
   }
+  /* ═══ v308 — SE IL TITOLO E' IN PORTAFOGLIO, IL PACCHETTO LO DICE ═══════════════════════
+     Trovato rileggendo il pacchetto come lo leggerebbe un analista: dalla v307 il sistema
+     CONOSCE le posizioni, e il pacchetto continuava a dichiarare "non conosco la tua posizione".
+     Su AMD significava proporre un ingresso a 514 dollari a chi ha carico 153,92 e un +234%
+     aperto: due decisioni diverse, e la seconda ha dentro una domanda fiscale che la prima non
+     ha. Un pacchetto che nega di sapere cio' che sa e' la peggiore forma di incoerenza.
+     ⚠ E' un FATTO, non un ordine: quante quote, a che prezzo, quanto vale oggi. Cosa farne lo
+     decide chi legge — e l'istruzione corrispondente sta nella testata, dove vanno gli ordini. */
+  if (Number.isFinite(numero(tec.qta)) && numero(tec.qta) > 0 && Number.isFinite(numero(tec.pmc))) {
+    const q = numero(tec.qta), pmc = numero(tec.pmc);
+    const g = Number.isFinite(numero(tec.gainPos)) ? numero(tec.gainPos) : null;
+    L.push(`- ⚠ QUESTO TITOLO E' GIA' IN PORTAFOGLIO: ${fmtNum.format(q)} quote a un prezzo medio di carico `
+      + `di ${pmc}${g != null ? `, oggi ${signTxt(Math.round(g * 10) / 10)}` : ""}. `
+      + `Non e' una decisione di ingresso ma di mantenimento: il prezzo di carico non cambia cosa fa il `
+      + `titolo, cambia cosa costa uscirne e quale plusvalenza si realizzerebbe. Il sistema NON conosce `
+      + `la liquidita' disponibile, il resto del libro in dettaglio, ne' la sua situazione fiscale.`);
+  }
+
   /* ═══ v299 — I CONTI E IL RISCHIO, DA QUI E NON DALLA RETE ═════════════════════════════
      Ogni riga porta l'unita' e cosa significa: un LLM che riceve "beta 2,49" senza sapere
      contro quale indice non puo' usarlo, e uno che riceve "rs 1m -1,9" senza il benchmark

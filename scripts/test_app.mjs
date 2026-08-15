@@ -1086,9 +1086,30 @@ check("v257 analisi titolo: porta il quadro macro e il blocco del disaccordo", s
   return /ANALISI DI NVDA/.test(t) && /QUADRO MACRO/.test(t)
       && /DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO/.test(t)`));
 
-check("v256 analisi titolo: niente dimensionamenti, perché il sistema non conosce il capitale", suVeri(`
+/* ⚠⚠ v308 — L'INVARIANTE E' IL DIVIETO, NON LA FRASE. Il check cercava le parole "niente
+   dimensionamenti", che nascevano da "non conosco la tua posizione". Dalla v307 il sistema LA
+   CONOSCE, e continuare a dichiarare il contrario era la peggiore forma di incoerenza: su AMD
+   significava proporre un ingresso a 514 a chi ha carico 153,92 e un +234% aperto.
+   Cio' che NON deve cambiare e' il divieto di dimensionare — e la ragione ora e' piu' precisa:
+   non "non so cosa possiedi" ma "non conosco liquidita' ne' situazione fiscale, e un
+   dimensionamento senza quei due dati e' un numero che sembra un consiglio". */
+check("v308 analisi titolo: il divieto di dimensionare resta, con la ragione giusta", suVeri(`
   const t = buildPromptTicker("NVDA");
-  return /niente dimensionamenti/.test(t) && !/quote a limite/.test(t)`));
+  return t.indexOf("In nessun caso dimensionare") >= 0
+      && t.indexOf("niente stop in euro") >= 0
+      && t.indexOf("non conosce liquidita'") >= 0
+      && t.indexOf("Non conosco la tua posizione") < 0`));
+
+/* ⚠ e quando il titolo E' in portafoglio il pacchetto deve dirlo, col carico: e' il fatto che
+   distingue una decisione di mantenimento da una di ingresso. Quando NON lo e', non deve
+   inventarselo. */
+check("v308 analisi titolo: dichiara la posizione se c'e', tace se non c'e'", suVeri(`
+  const dentro = ((DATA.watchlist || []).find(r => r && r.qta > 0 && r.pmc > 0) || {}).ticker;
+  if (!dentro) return true;
+  const conPos = buildPromptTicker(dentro);
+  const senzaPos = buildPromptTicker("TSLA");
+  return conPos.indexOf("GIA' IN PORTAFOGLIO") >= 0
+      && senzaPos.indexOf("GIA' IN PORTAFOGLIO") < 0`));
 
 check("v256 analisi titolo: ticker vuoto non produce nessun pacchetto", suVeri(`
   return buildPromptTicker("") === "" && buildPromptTicker("   ") === ""`));
