@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "300";
+const BUILD_VERSION = "301";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4335,7 +4335,15 @@ function senzaPane(p) { return p == null || p === "undefined" || p === PANE_UNIC
 
 function sezioniDelPane(pane) {
   const main = document.querySelector(".shell-main"); if (!main) return [];
-  const tutte = () => [...main.children].filter(el => el.matches?.("section[data-sez]:not([data-pane])"));
+  /* ⚠⚠ v301 — «Oggi» E' FISSA IN CIMA, e va imposto invece che sperato. Il commento nel markup
+     diceva gia' "sta in cima e non si trascina via", il codice non lo faceva, e l'ordine salvato
+     dal CEO — che per progetto mette in coda le sezioni nuove (v191) — l'ha spedita IN FONDO:
+     la sezione nata per essere la prima cosa che si guarda la mattina era l'ultima della pagina.
+     Un commento che dichiara un comportamento che il codice non ha e' la classe v234, "un ramo
+     che sembra codice"; qui era un'intenzione che sembrava una regola.
+     ⚠ Escluderla dal riordino le toglie una liberta' al CEO, ed e' deliberato: una sezione che
+     risponde a "da dove comincio" non puo' stare dove capita. Tutte le altre restano mobili. */
+  const tutte = () => [...main.children].filter(el => el.matches?.("section[data-sez]:not([data-pane]):not([data-fissa])"));
   if (senzaPane(pane)) return tutte();
   const suo = [...main.children].filter(el => el.matches?.(`section[data-sez][data-pane="${pane}"]`));
   return suo.length ? suo : tutte();
@@ -4403,7 +4411,9 @@ async function loadOrdineSezioniCloud() {
 
 /* ── i comandi: una maniglia per trascinare, due frecce per chi trascina male (o su iPhone) ── */
 function montaComandiSezioni() {
-  document.querySelectorAll(".shell-main > section[data-sez]").forEach(sez => {
+  /* ⚠ niente maniglia sulle sezioni fisse: un comando che non fa niente e' peggio di un
+     comando assente — chi lo usa pensa che il sistema non risponda. */
+  document.querySelectorAll(".shell-main > section[data-sez]:not([data-fissa])").forEach(sez => {
     if (sez.querySelector(":scope > .sez-cmd")) return;
     const c = document.createElement("div");
     c.className = "sez-cmd";

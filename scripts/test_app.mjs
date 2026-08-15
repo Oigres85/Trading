@@ -2119,7 +2119,12 @@ check("v296 contraddittorio: obbliga ai numeri del pacchetto, a scegliere, e a u
    C10 / red team I6, gia' pagata piu' volte qui. */
 const SEZIONI_DI_INDEX = [...readFileSync(join(ROOT, "index.html"), "utf8")
   .matchAll(/<section class="card"[^>]*data-sez="([^"]+)"([^>]*)>/g)]
-  .map(m => ({ sez: m[1], pane: (m[2].match(/data-pane="([^"]+)"/) || [])[1] || null }));
+  .map(m => ({ sez: m[1], pane: (m[2].match(/data-pane="([^"]+)"/) || [])[1] || null,
+               /* ⚠ v301 — il finto DOM deve modellare ANCHE `data-fissa`, altrimenti il check
+                  conta dieci sezioni dove la funzione ne trova nove ed e' cieco al filtro nuovo.
+                  Un check che non modella la realta' che sorveglia non e' un check. */
+               fissa: /data-fissa/.test(m[2]) }));
+const SEZIONI_MOBILI = SEZIONI_DI_INDEX.filter(x => !x.fissa);
 
 /* ══ v297 — IL TRASCINAMENTO DELLE SEZIONI ERA MORTO DA QUARANTA VERSIONI ════════════════
    Segnalato dal CEO: "non riesco piu' ad ordinare i box". `sezioniDelPane` filtrava su
@@ -2130,10 +2135,13 @@ const SEZIONI_DI_INDEX = [...readFileSync(join(ROOT, "index.html"), "utf8")
    passato benissimo mentre la funzione restituiva zero — la differenza fra guardare il codice
    ed ESEGUIRLO, che qui e' gia' costata la pagina morta di v238 con 219 test verdi. */
 check("v297 riordino: sezioniDelPane trova davvero le sezioni di index.html", suVeri(`
-  const sezioni = ${JSON.stringify(SEZIONI_DI_INDEX)};
+  const sezioni = ${JSON.stringify(SEZIONI_MOBILI)};
   const finte = sezioni.map(x => ({
     dataset: { sez: x.sez, pane: x.pane || undefined },
-    matches: (sel) => sel.indexOf(":not([data-pane])") >= 0 ? !x.pane : !!x.pane,
+    matches: (sel) => {
+      if (sel.indexOf(":not([data-fissa])") >= 0 && x.fissa) return false;
+      return sel.indexOf(":not([data-pane])") >= 0 ? !x.pane : !!x.pane;
+    },
   }));
   const q = document.querySelector;
   let trovate = [];
@@ -2312,6 +2320,29 @@ check("v299 payload: i percentili arrivano anche all'LLM", suVeri(`
   const p = buildPrompt();
   return p.includes("AGLI ESTREMI DEL PROPRIO STORICO")
       && est.every(e => p.includes(e.label))`));
+
+/* ══ v301 — «OGGI» E' FISSA IN CIMA ══════════════════════════════════════════════════════
+   Il commento nel markup lo dichiarava gia' e il codice non lo faceva: l'ordine salvato dal
+   CEO, che per progetto mette in coda le sezioni nuove (v191), aveva spedito IN FONDO la
+   sezione nata per essere la prima cosa che si guarda la mattina. Verificato in produzione.
+   ⚠ Un'intenzione scritta in un commento non e' una regola: e' la classe v234 rovesciata. */
+check("v301 oggi: la sezione d'ingresso e' esclusa dal riordino", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const i = html.indexOf('data-sez="oggi"');
+  if (i < 0) return false;
+  const tag = html.slice(html.lastIndexOf("<section", i), html.indexOf(">", i) + 1);
+  return tag.includes("data-fissa")
+      && src.includes(':not([data-fissa])');
+})());
+
+/* ⚠ e non deve avere una maniglia: un comando che non fa niente e' peggio di un comando
+   assente — chi lo trascina pensa che il sistema non risponda, ed e' esattamente il sintomo
+   che il CEO ha segnalato per il riordino rotto di v297. */
+check("v301 oggi: nessuna maniglia sulle sezioni fisse", (() => {
+  const i = src.indexOf("function montaComandiSezioni");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes(':not([data-fissa])');
+})());
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
