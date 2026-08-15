@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "310";
+const BUILD_VERSION = "311";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2394,9 +2394,49 @@ const UNITA_INDICATORE = { nfp: "K", curve: " pp", curve3m: " pp", umich: "", ph
    ⚠⚠ ORDINE PER PESO, NON PER GUADAGNO: ordinare per guadagno metterebbe in cima i vincitori,
    che e' esattamente la lettura che fa tenere i perdenti. Il peso dice quanto conta ciascuno
    nelle decisioni di oggi — ed e' un fatto, non un giudizio. */
+/* ⚠ v311 — la modalita' MODIFICA e' un secondo disegno della stessa tabella, non una seconda
+   tabella: le colonne e l'ordine restano quelli, cambiano solo le celle in campi. Due tabelle
+   separate divergerebbero al primo cambio di colonna (C10/C12). */
+function formaPosizioni() {
+  const box = $("#pf-righe");
+  if (!box) return;
+  const righe = posizioniCorrenti();
+  const riga = (p) => `<tr data-pf-edit="${esc(p ? p.ticker : "")}">
+    <td>${p ? `<b>${esc(p.ticker)}</b><input type="hidden" class="pf-in-tk" value="${esc(p.ticker)}">`
+            : `<input class="pf-in-tk" type="text" placeholder="TICKER" inputmode="latin"
+                 autocapitalize="characters" spellcheck="false" aria-label="Ticker">`}</td>
+    <td class="num"><input class="pf-in-q" type="text" inputmode="decimal" value="${p ? p.qta : ""}"
+        placeholder="quote" aria-label="Quantità"></td>
+    <td class="num"><input class="pf-in-p" type="text" inputmode="decimal" value="${p ? p.pmc : ""}"
+        placeholder="carico" aria-label="Prezzo medio di carico"></td>
+    <td class="num"><button type="button" class="pf-togli" title="Togli questa riga"
+        aria-label="Togli ${esc(p ? p.ticker : "questa riga")}">✕</button></td>
+  </tr>`;
+  box.innerHTML = `<div class="pf-scroll"><table class="pf-tab pf-tab-edit"><thead><tr>
+      <th>Titolo</th><th class="num">Quote</th><th class="num">Carico</th><th class="num"></th>
+    </tr></thead><tbody>${righe.map(riga).join("")}${riga(null)}</tbody></table></div>
+    <div class="pf-azioni">
+      <button type="button" id="pf-aggiungi" class="btn btn-ghost">+ Riga</button>
+      <button type="button" id="pf-salva" class="btn btn-primary">Salva</button>
+      <button type="button" id="pf-annulla" class="btn btn-ghost">Annulla</button>
+    </div>
+    <div id="pf-esito" class="muted pf-esito"></div>`;
+
+  const nota = $("#pf-nota");
+  if (nota) {
+    nota.innerHTML = `<b>Il carico è il prezzo medio di acquisto</b>, nella valuta del titolo `
+      + `(dollari per le azioni americane; per il BTP è la percentuale del nominale, quindi 100 = alla pari). `
+      + `⚠ Un titolo aggiunto qui viene messo <b>anche nella watchlist</b>: senza, la pipeline non ne prende `
+      + `il prezzo e la riga resterebbe senza valore. `
+      + `⚠ Senza token GitHub il salvataggio resta <b>su questo browser</b> e la pipeline non lo legge — `
+      + `lo dico invece di lasciarglielo scoprire dall'iPhone.`;
+  }
+}
+
 function renderPortafoglio() {
   const box = $("#pf-righe");
   if (!box) return;
+  if (pfInModifica) { formaPosizioni(); return; }
   const nota = $("#pf-nota");
   const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
     .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
@@ -2469,6 +2509,7 @@ function renderPortafoglio() {
       + `moltiplicarlo come un'azione lo farebbe risultare il 93% del portafoglio. `
       + `Non è il suo patrimonio: manca la liquidità e il cambio di carico posizione per posizione, `
       + `che conosce il suo broker. I guadagni percentuali sono invarianti al cambio, gli importi no.`
+      + ` <button type="button" id="pf-modifica" class="btn btn-ghost pf-mod">✎ Modifica</button>`
       + (p.non_seguite && p.non_seguite.length
           ? ` ⚠ Posizioni su titoli non seguiti dalla pipeline, quindi senza prezzo: ${esc(p.non_seguite.join(", "))}.` : "");
   }
@@ -2483,6 +2524,113 @@ function renderPortafoglio() {
     const tr = e.target && e.target.closest ? e.target.closest("[data-pf-tk]") : null;
     if (tr) { e.preventDefault(); apriNelGrafico(tr.dataset.pfTk); }
   });
+}
+
+/* ═══ v311 — IL PORTAFOGLIO SI MODIFICA DALLA PAGINA ══════════════════════════════════════
+   Richiesta del CEO: cambiare i valori, aggiungere e togliere titoli. Si scrive
+   `config/posizioni.json` con la stessa macchina che questo progetto usa gia' per l'ordine
+   delle sezioni e la testata del prompt — la GitHub Contents API col token in localStorage,
+   che e' il "backend" di un sito statico.
+   ⚠⚠ SENZA TOKEN SI SALVA IN LOCALE E LO SI DICE. Un salvataggio che sembra riuscito e resta
+   su un browser solo e' il difetto gia' corretto sui parametri di rischio: il CEO aprirebbe
+   l'iPhone e troverebbe i vecchi numeri senza capire perche'.
+   ⚠⚠⚠ UN TICKER NUOVO NON BASTA METTERLO QUI. `posizioni.json` e' una SOVRAPPOSIZIONE e non e'
+   una fonte di simboli (v274: "un ripiego verso un file morto e' una strada che riporta
+   indietro"). Se il titolo non e' nella watchlist la pipeline non ne prende il prezzo, e la
+   riga resterebbe senza valore: allora si scrive ANCHE `config/ui_watchlist.json`, e lo si
+   dichiara invece di farlo di nascosto. */
+const POSIZIONI_PATH = "config/posizioni.json";
+const WATCHLIST_PATH = "config/ui_watchlist.json";
+let pfInModifica = false;
+
+function posizioniCorrenti() {
+  /* ⚠ si legge da cio' che il sistema HA disegnato, non da una copia parallela: due elenchi
+     della stessa cosa divergono (C10/C12, gia' pagata piu' volte qui). */
+  return [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0)
+    .map(r => ({ ticker: String(r.ticker || "").toUpperCase(),
+                 qta: numero(r.qta ?? r.qty), pmc: numero(r.pmc),
+                 valuta: r.currency === "EUR" ? "EUR" : "USD" }));
+}
+
+function leggiFormPosizioni() {
+  const righe = [...document.querySelectorAll("[data-pf-edit]")];
+  const out = [], errori = [];
+  for (const tr of righe) {
+    const tk = String((tr.querySelector(".pf-in-tk") || {}).value || tr.dataset.pfEdit || "").trim().toUpperCase();
+    const q = Number(String((tr.querySelector(".pf-in-q") || {}).value || "").replace(",", "."));
+    const p = Number(String((tr.querySelector(".pf-in-p") || {}).value || "").replace(",", "."));
+    if (!tk) continue;                       // riga vuota: si ignora, non e' un errore
+    if (!Number.isFinite(q) || q <= 0) { errori.push(`${tk}: quantità non valida`); continue; }
+    if (!Number.isFinite(p) || p <= 0) { errori.push(`${tk}: prezzo di carico non valido`); continue; }
+    if (out.some(x => x.ticker === tk)) { errori.push(`${tk}: compare due volte`); continue; }
+    out.push({ ticker: tk, qta: q, pmc: Math.round(p * 10000) / 10000,
+               valuta: tk.startsWith("BTP") ? "EUR" : "USD" });
+  }
+  return { posizioni: out, errori };
+}
+
+async function salvaPosizioni() {
+  const { posizioni, errori } = leggiFormPosizioni();
+  const esito = $("#pf-esito");
+  if (errori.length) {
+    if (esito) esito.innerHTML = `⚠ Non ho salvato niente: ${esc(errori.join(" · "))}. `
+      + `Correggi e riprova — un salvataggio parziale sarebbe peggio di nessun salvataggio.`;
+    return;
+  }
+  if (!posizioni.length) {
+    if (esito) esito.textContent = "⚠ Non ho salvato: la lista è vuota. Per svuotare davvero il portafoglio, dimmelo esplicitamente.";
+    return;
+  }
+  /* ⚠ i simboli che la pipeline non segue non avrebbero prezzo: si aggiungono alla watchlist */
+  const seguiti = new Set([...((DATA && DATA.watchlist) || []), ...((DATA && DATA.portfolio) || [])]
+    .map(r => String(r.ticker || "").toUpperCase()));
+  const nuovi = posizioni.map(p => p.ticker).filter(t => !seguiti.has(t));
+
+  const file = {
+    _nota: "Posizioni del CEO. NON e' la lista dei simboli da seguire: quella resta config/ui_watchlist.json. Questo file e' una SOVRAPPOSIZIONE.",
+    _fonte: "modificato dalla dashboard",
+    aggiornato: new Date().toISOString().slice(0, 10),
+    posizioni,
+  };
+  const token = localStorage.getItem("gh_token");
+  if (!token) {
+    try { localStorage.setItem("posizioni_locali", JSON.stringify(file)); } catch { /* quota */ }
+    if (esito) esito.innerHTML = `Salvato <b>solo su questo browser</b>: senza token GitHub non arriva `
+      + `su iPhone e la pipeline non lo legge. I numeri qui sopra restano quelli del run precedente `
+      + `finché il file non è sul repository.`;
+    return;
+  }
+  const scrivi = async (path, contenuto, messaggio) => {
+    let sha;
+    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,
+      { headers: ghHeaders(token), cache: "no-store" });
+    if (g.ok) sha = (await g.json()).sha;
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+      method: "PUT", headers: ghHeaders(token),
+      body: JSON.stringify({ message: messaggio, sha,
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(contenuto, null, 1) + "\n"))) }),
+    });
+    return r.ok;
+  };
+  try {
+    const ok1 = await scrivi(POSIZIONI_PATH, file, "Posizioni aggiornate dalla dashboard");
+    let ok2 = true;
+    if (nuovi.length) {
+      const wl = [...seguiti, ...nuovi];
+      ok2 = await scrivi(WATCHLIST_PATH, wl, `Watchlist: aggiunti ${nuovi.join(", ")} (posizioni nuove)`);
+    }
+    if (esito) {
+      esito.innerHTML = (ok1 && ok2)
+        ? `Salvato: <b>${posizioni.length} posizioni</b>.`
+          + (nuovi.length ? ` Ho aggiunto anche alla watchlist <b>${esc(nuovi.join(", "))}</b>, `
+              + `altrimenti la pipeline non ne prenderebbe il prezzo e la riga resterebbe senza valore.` : "")
+          + ` I prezzi e i guadagni si aggiornano al prossimo giro della pipeline.`
+        : `⚠ GitHub ha rifiutato la scrittura. Controlla che il token abbia il permesso di scrivere sul repository.`;
+    }
+  } catch (e) {
+    if (esito) esito.textContent = "Non sono riuscito a scrivere su GitHub: " + (e && e.message ? e.message : e);
+  }
 }
 
 /* ⚠ UNA SOLA STRADA per portare un simbolo nel grafico: la usano il clic sul portafoglio e il
@@ -8448,6 +8596,37 @@ function montaSelettoreSettori() {
 /* ⚠ v307 — cambiare settore porta il suo ETF nel grafico. Il CEO: "se cambio analizza settore
    macro, puoi modificare anche il ticker nel grafico di tradingview?". Passa dalla STESSA
    funzione del clic sul portafoglio: due strade per la stessa azione divergono sempre. */
+/* ═══ v311 — i comandi del portafoglio, in DELEGA sul documento ═══════════════════════════
+   I bottoni nascono e muoiono a ogni ridisegno: agganciarli uno per uno lascerebbe handler
+   morti al primo render successivo — il difetto v193/v213 che ha gia' rotto il wiring piu'
+   volte in questo progetto. */
+document.addEventListener("click", (e) => {
+  const t = e.target && e.target.closest ? e.target : null;
+  if (!t || !t.closest) return;
+  if (t.closest("#pf-modifica")) { pfInModifica = true; renderPortafoglio(); return; }
+  if (t.closest("#pf-annulla")) { pfInModifica = false; renderPortafoglio(); return; }
+  if (t.closest("#pf-salva")) { salvaPosizioni(); return; }
+  if (t.closest("#pf-aggiungi")) {
+    const corpo = document.querySelector(".pf-tab-edit tbody");
+    if (corpo && corpo.lastElementChild) {
+      corpo.appendChild(corpo.lastElementChild.cloneNode(true));
+      const nuova = corpo.lastElementChild;
+      nuova.querySelectorAll("input").forEach(i => { i.value = ""; });
+      nuova.setAttribute("data-pf-edit", "");
+      const primo = nuova.querySelector(".pf-in-tk");
+      if (primo && typeof primo.focus === "function") primo.focus();
+    }
+    return;
+  }
+  const togli = t.closest(".pf-togli");
+  if (togli) {
+    /* ⚠ la riga sparisce dal FORM, non dai dati: il salvataggio e' l'unico momento in cui
+       qualcosa viene scritto. Annulla deve poter riportare tutto indietro. */
+    const tr = togli.closest("[data-pf-edit]");
+    if (tr && tr.parentNode) tr.parentNode.removeChild(tr);
+  }
+});
+
 $("#set-input")?.addEventListener("change", (e) => {
   const v = e.target && e.target.value;
   if (v) apriNelGrafico(v);

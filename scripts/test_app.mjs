@@ -2507,6 +2507,67 @@ check("v310 fatti: il peso nel libro nasce in fattiTitolo, non in chi lo stampa"
       && !disegna.includes("DATA.eurusd");
 })());
 
+/* ══ v311 — IL PORTAFOGLIO SI MODIFICA DALLA PAGINA ═════════════════════════════════════
+   E' un percorso di SCRITTURA sui dati del CEO: i check qui sono piu' stretti del solito,
+   perche' un difetto qui non produce un numero sbagliato — produce un file sbagliato. */
+
+/* ⚠⚠ NIENTE SALVATAGGI PARZIALI. Se una riga non e' valida non si scrive NIENTE: salvare
+   metà portafoglio e dire "fatto" e' peggio di non salvare, perche' il CEO non ha modo di
+   sapere quale metà. */
+check("v311 portafoglio: input non valido = nessuna scrittura, e lo dice", (() => {
+  const i = src.indexOf("async function salvaPosizioni");
+  const corpo = src.slice(i, src.indexOf("async function", i + 10) > 0
+    ? src.indexOf("async function", i + 10) : src.length);
+  return corpo.includes("Non ho salvato niente")
+      && corpo.includes("un salvataggio parziale sarebbe peggio")
+      && /if \(errori\.length\)[\s\S]{0,200}return;/.test(corpo);
+})());
+
+/* ⚠⚠ UN TICKER NUOVO VA ANCHE NELLA WATCHLIST, altrimenti la pipeline non ne prende il prezzo
+   e la riga resta senza valore — un dato mancante travestito da posizione. E `posizioni.json`
+   NON diventa una fonte di simboli: e' la lezione v274 ("un ripiego verso un file morto e' una
+   strada che riporta indietro"), quindi si scrivono DUE file e lo si dichiara. */
+check("v311 portafoglio: un titolo nuovo entra anche nella watchlist, dichiarandolo", (() => {
+  const i = src.indexOf("async function salvaPosizioni");
+  const corpo = src.slice(i, i + 4200);
+  return corpo.includes("WATCHLIST_PATH")
+      && corpo.includes("Ho aggiunto anche alla watchlist")
+      && corpo.includes("la pipeline non ne prenderebbe il prezzo");
+})());
+
+/* ⚠ senza token il salvataggio resta su un browser: dirlo, non lasciarlo scoprire dall'iPhone.
+   E' il difetto gia' corretto sui parametri di rischio e sull'ordine delle sezioni. */
+check("v311 portafoglio: senza token dichiara che il salvataggio e' locale", (() => {
+  const i = src.indexOf("async function salvaPosizioni");
+  const corpo = src.slice(i, i + 4200);
+  return corpo.includes("solo su questo browser") && corpo.includes("la pipeline non lo legge");
+})());
+
+/* ⚠ togliere una riga tocca il FORM, non i dati: il salvataggio e' l'unico momento in cui
+   qualcosa viene scritto, e Annulla deve poter riportare tutto indietro. */
+check("v311 portafoglio: togliere una riga non scrive niente finche' non si salva", (() => {
+  const i = src.indexOf('const togli = t.closest(".pf-togli")');
+  const corpo = src.slice(i, i + 500);
+  return corpo.includes("removeChild") && !corpo.includes("salvaPosizioni")
+      && src.includes('t.closest("#pf-annulla")');
+})());
+
+/* ⚠ i comandi nascono e muoiono a ogni ridisegno: la delega sta sul documento, non sui
+   bottoni — difetto v193/v213, che ha gia' rotto il wiring piu' volte qui. */
+check("v311 portafoglio: i comandi sono in delega, non agganciati ai bottoni", (() => {
+  return src.includes('document.addEventListener("click"')
+      && src.includes('t.closest("#pf-salva")')
+      && !/\$\("#pf-salva"\)\?\.addEventListener/.test(src);
+})());
+
+/* ⚠ e la modifica legge le posizioni da cio' che il sistema HA, non da una copia parallela:
+   due elenchi della stessa cosa divergono (C10/C12). */
+check("v311 portafoglio: la forma parte dai dati veri, non da un elenco separato", (() => {
+  const i = src.indexOf("function posizioniCorrenti");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("DATA.portfolio") && corpo.includes("DATA.watchlist");
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
