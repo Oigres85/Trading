@@ -2244,3 +2244,13 @@ svg.g-serie { cursor: crosshair; }
 .rot-prime { grid-column: 1 / -1; font-size: 9.5px; color: var(--muted);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 560px) { .rot-due { grid-template-columns: 1fr; } }
+
+/* v315 — il comando di modifica nella testata della scheda, dove si cerca un comando.
+   Prima era in fondo alla nota, piccolo e trasparente: il CEO non è riuscito a usarlo. */
+.pf-mod-testa { margin-left: auto; font-size: 12px; padding: 5px 12px; }
+
+/* v315 — intestazioni ordinabili e riga del totale. */
+.pf-th { cursor: pointer; user-select: none; white-space: nowrap; }
+.pf-th:hover, .pf-th:focus-visible { color: var(--text); outline: none; }
+.pf-th-on { color: var(--text); }
+.pf-tab tfoot td { border-top: 1px solid var(--border); padding-top: 6px; font-size: 12.5px; }

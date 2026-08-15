@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "314";
+const BUILD_VERSION = "315";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2435,6 +2435,11 @@ function formaPosizioni() {
 function renderPortafoglio() {
   const box = $("#pf-righe");
   if (!box) return;
+  /* ⚠ v315 — il bottone vive nel markup e cambia etichetta: un comando che dice cosa fara'
+     e' un comando che si trova. Prima era in fondo alla nota, 74x22px e trasparente: il CEO
+     non e' riuscito a usarlo, e la diagnosi e' la stessa del tooltip di v302. */
+  const bMod = $("#pf-modifica");
+  if (bMod) bMod.textContent = pfInModifica ? "✕ Chiudi modifica" : "✎ Modifica";
   if (pfInModifica) { formaPosizioni(); return; }
   const nota = $("#pf-nota");
   const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
@@ -2474,28 +2479,63 @@ function renderPortafoglio() {
   const tot = righe.reduce((a, r) => a + (valEur(r) || 0), 0);
   righe.sort((a, b) => (valEur(b) || 0) - (valEur(a) || 0));
 
-  box.innerHTML = `<div class="pf-scroll"><table class="pf-tab"><thead><tr>
-    <th>Titolo</th><th class="num">Quote</th><th class="num">Carico</th><th class="num">Ultimo</th>
-    <th class="num">Guad.</th><th class="num">Controvalore</th><th class="num">Peso</th>
-    </tr></thead><tbody>${righe.map(r => {
+  /* ═══ v315 — COLONNE ORDINABILI E CONTROVALORE IN EURO ═══════════════════════════════
+     Il CEO: "consenti di ordinare in portafoglio sulla base dei valori (es. peso, controvalore
+     etc.) inserisci anche controvalore euro".
+     ⚠ L'ordine di DEFAULT resta il peso: ordinare per guadagno mette in cima i vincitori, che
+     e' la lettura che fa tenere i perdenti. Ma ora e' una scelta sua, non mia — cliccare
+     un'intestazione ordina, e il verso si inverte al secondo clic.
+     ⚠⚠ IL CONTROVALORE IN EURO E' UNA CONVERSIONE AL CAMBIO DI OGGI, NON IL SUO COSTO. Il cambio
+     di carico e' diverso posizione per posizione e il sistema non lo conosce: sono due
+     grandezze diverse e la nota lo dice. Sommare euro convertiti oggi con euro spesi allora
+     darebbe un patrimonio che non e' mai esistito — la classe del gate valuta (v183). */
+  const col = [
+    { k: "ticker", et: "Titolo",        num: false, v: (r) => String(r.ticker || "") },
+    { k: "qta",    et: "Quote",         num: true,  v: (r) => numero(r.qta ?? r.qty) },
+    { k: "pmc",    et: "Carico",        num: true,  v: (r) => numero(r.pmc) },
+    { k: "prezzo", et: "Ultimo",        num: true,  v: (r) => numero(r.price ?? r.prezzo) },
+    { k: "gain",   et: "Guad.",         num: true,  v: (r) => Number.isFinite(numero(r.gain_pct_pos)) ? numero(r.gain_pct_pos) : null },
+    { k: "val",    et: "Controvalore",  num: true,  v: (r) => val(r) },
+    { k: "eur",    et: "In euro",       num: true,  v: (r) => valEur(r) },
+    { k: "peso",   et: "Peso",          num: true,  v: (r) => valEur(r) },
+  ];
+  const attivo = col.find(c => c.k === pfOrdine.campo) || col.find(c => c.k === "peso");
+  righe.sort((a, b) => {
+    const x = attivo.v(a), y = attivo.v(b);
+    if (x == null && y == null) return 0;
+    if (x == null) return 1;
+    if (y == null) return -1;
+    const d = attivo.num ? (y - x) : String(x).localeCompare(String(y));
+    return pfOrdine.verso === "su" ? -d : d;
+  });
+
+  box.innerHTML = `<div class="pf-scroll"><table class="pf-tab"><thead><tr>${
+    col.map(c => `<th class="${c.num ? "num " : ""}pf-th${attivo.k === c.k ? " pf-th-on" : ""}"
+        data-pf-ord="${c.k}" role="button" tabindex="0"
+        title="Ordina per ${esc(c.et)}">${esc(c.et)}${attivo.k === c.k ? (pfOrdine.verso === "su" ? " ▲" : " ▼") : ""}</th>`).join("")
+    }</tr></thead><tbody>${righe.map(r => {
       const tk = String(r.ticker || "");
       const q = numero(r.qta ?? r.qty), pmc = numero(r.pmc);
       const p = numero(r.price ?? r.prezzo);
-      const g = Number.isFinite(r.gain_pct_pos) ? numero(r.gain_pct_pos)
+      const g = Number.isFinite(numero(r.gain_pct_pos)) ? numero(r.gain_pct_pos)
               : (Number.isFinite(p) && Number.isFinite(pmc) ? (p / pmc - 1) * 100 : null);
-      const v = val(r);
+      const v = val(r), e = valEur(r);
       const cur = r.currency === "EUR" ? "€" : "$";
-      return `<tr class="pf-riga" data-pf-tk="${esc(tk)}" tabindex="0"
-                  title="Apri ${esc(tk)} nel grafico">
-        <td><b>${esc(tk)}</b> <span class="muted pf-nome">${esc(String(r.name || "").slice(0, 26))}</span></td>
+      return `<tr class="pf-riga" data-pf-tk="${esc(tk)}" tabindex="0" title="Apri ${esc(tk)} nel grafico">
+        <td><b>${esc(tk)}</b> <span class="muted pf-nome">${esc(String(r.name || "").slice(0, 24))}</span></td>
         <td class="num">${fmtNum.format(q)}</td>
         <td class="num">${cur}${fmtNum.format(pmc)}</td>
         <td class="num">${Number.isFinite(p) ? cur + fmtNum.format(p) : "—"}</td>
         <td class="num ${g > 0 ? "pos" : g < 0 ? "neg" : "muted"}">${g != null ? signTxt(Math.round(g * 10) / 10) : "—"}</td>
         <td class="num">${v != null ? cur + fmtNum.format(Math.round(v)) : "—"}</td>
-        <td class="num muted">${(() => { const e = valEur(r); return e != null && tot ? Math.round(e / tot * 100) + "%" : "—"; })()}</td>
+        <td class="num">${e != null ? "€" + fmtNum.format(Math.round(e)) : "—"}</td>
+        <td class="num muted">${e != null && tot ? Math.round(e / tot * 100) + "%" : "—"}</td>
       </tr>`;
-    }).join("")}</tbody></table></div>`;
+    }).join("")}</tbody>
+    <tfoot><tr><td><b>Totale</b></td><td colspan="5"></td>
+      <td class="num"><b>€${fmtNum.format(Math.round(tot))}</b></td>
+      <td class="num muted">100%</td></tr></tfoot>
+    </table></div>`;
 
   if (nota) {
     const p = (DATA && DATA.macro && DATA.macro.posizioni) || {};
@@ -2508,7 +2548,6 @@ function renderPortafoglio() {
       + `moltiplicarlo come un'azione lo farebbe risultare il 93% del portafoglio. `
       + `Non è il suo patrimonio: manca la liquidità e il cambio di carico posizione per posizione, `
       + `che conosce il suo broker. I guadagni percentuali sono invarianti al cambio, gli importi no.`
-      + ` <button type="button" id="pf-modifica" class="btn btn-ghost pf-mod">✎ Modifica</button>`
       + (p.non_seguite && p.non_seguite.length
           ? ` ⚠ Posizioni su titoli non seguiti dalla pipeline, quindi senza prezzo: ${esc(p.non_seguite.join(", "))}.` : "");
   }
@@ -2668,6 +2707,9 @@ let pfInModifica = false;
    un comparto in "Rotazione", con la stessa logica del portafoglio. Una variabile sola, scritta
    da un punto solo (`scegliSettore`), perche' due strade per la stessa scelta divergono. */
 let settoreScelto = null;
+/* v315 — l'ordinamento del portafoglio. Il DEFAULT resta il peso: ordinare per guadagno mette
+   in cima i vincitori, che e' la lettura che fa tenere i perdenti. Ma ora e' una scelta del CEO. */
+let pfOrdine = { campo: "peso", verso: "giu" };
 
 function posizioniCorrenti() {
   /* ⚠ si legge da cio' che il sistema HA disegnato, non da una copia parallela: due elenchi
@@ -2778,7 +2820,29 @@ document.addEventListener("click", (e) => {
   const t = e.target && e.target.closest ? e.target : null;
   if (t && t.closest && t.closest("#ver-controlla")) { renderVerifica(); return; }
   if (!t || !t.closest) return;
-  if (t.closest("#pf-modifica")) { pfInModifica = true; renderPortafoglio(); return; }
+  if (t.closest("#pf-copia")) {
+    const esito = $("#pf-nota");
+    try {
+      const testo = buildPromptPortafoglio();
+      navigator.clipboard.writeText(testo).then(() => {
+        if (esito) esito.innerHTML = `<b>Analisi del portafoglio copiata</b> — ${testo.length.toLocaleString("it")} `
+          + `caratteri. Incollala in una chat NUOVA. ` + esito.innerHTML;
+      });
+    } catch (err) { if (esito) esito.textContent = "Non sono riuscito a copiare: " + err; }
+    return;
+  }
+  if (t.closest("#pf-modifica")) { pfInModifica = !pfInModifica; renderPortafoglio(); return; }
+  const th = t.closest("[data-pf-ord]");
+  if (th) {
+    /* stesso campo = si inverte il verso; campo nuovo = si parte dal piu' grande, che e' cio'
+       che si vuole vedere per primo su quantita' e controvalori. */
+    const k = th.dataset.pfOrd;
+    pfOrdine = (pfOrdine.campo === k)
+      ? { campo: k, verso: pfOrdine.verso === "giu" ? "su" : "giu" }
+      : { campo: k, verso: "giu" };
+    renderPortafoglio();
+    return;
+  }
   if (t.closest("#pf-annulla")) { pfInModifica = false; renderPortafoglio(); return; }
   if (t.closest("#pf-salva")) { salvaPosizioni(); return; }
   if (t.closest("#pf-aggiungi")) {
@@ -8172,6 +8236,132 @@ function settorePerChiave(chiave) {
       || tilt.find(x => String(x.name || "").toUpperCase() === t)
       || tilt.find(x => String(x.name || "").toUpperCase().includes(t))
       || null;
+}
+
+/* ═══ v315 — ANALISI DEL PORTAFOGLIO INTERO ═══════════════════════════════════════════════
+   Richiesta del CEO. E' il terzo pacchetto dopo titolo e settore, e risponde a una domanda che
+   nessuno dei due poteva porre: non "cosa fa questo titolo" ma "cosa ho costruito, senza
+   accorgermene, mettendo insieme questi titoli".
+   ⚠⚠ LA CONCENTRAZIONE E' IL FATTO CHE NESSUNA ANALISI PER SINGOLO TITOLO PUO' VEDERE. Tre
+   posizioni valgono il 62% del controvalore azionario e stanno tutte nello stesso comparto: e'
+   una scommessa sola scritta tre volte, e la si vede solo guardando il libro insieme.
+   ⚠ QUELLO CHE IL SISTEMA NON SA VA DICHIARATO IN CIMA, non in nota: non conosce la liquidita',
+   non conosce altri conti, non conosce la situazione fiscale. Senza quei tre dati qualunque
+   dimensionamento e' un numero che sembra un consiglio — ed e' la ragione per cui il pacchetto
+   li chiede a chi legge invece di stimarli. */
+function buildPromptPortafoglio() {
+  const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
+  if (!righe.length) {
+    return "Nessuna posizione: config/posizioni.json non e' stato letto dalla pipeline, "
+      + "oppure il portafoglio e' vuoto. Non c'e' niente da analizzare.";
+  }
+  const fx = numero(DATA && DATA.eurusd) || 1;
+  const obbl = (r) => String(r.ticker || "").startsWith("BTP") || r.currency === "EUR";
+  const val = (r) => {
+    const p = numero(r.price ?? r.prezzo), q = numero(r.qta ?? r.qty);
+    if (!Number.isFinite(p) || !Number.isFinite(q)) return null;
+    return obbl(r) ? q * p / 100 : p * q;      // obbligazione: nominale x prezzo percentuale
+  };
+  const eur = (r) => { const v = val(r); return v == null ? null : (obbl(r) ? v : v / fx); };
+  const tot = righe.reduce((a, r) => a + (eur(r) || 0), 0);
+  const senzaPrezzo = righe.filter(r => eur(r) == null).map(r => r.ticker);
+
+  const macro = buildPrompt();
+  const header = promptHeaderText();
+  const soloDati = macro.startsWith(header) ? macro.slice(header.length).replace(/^\n+/, "") : macro;
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const oggi = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+
+  const F = [];
+  F.push(`=== IL LIBRO, POSIZIONE PER POSIZIONE (${righe.length} posizioni) ===`);
+  F.push(`Quote e prezzi medi di carico vengono dall'estratto del broker; i prezzi correnti dalla `
+    + `pipeline. Il peso converte tutto in euro al cambio di OGGI (EUR/USD ${fmtNum.format(fx)}): `
+    + `NON e' il cambio di carico, che e' diverso posizione per posizione e che il sistema non conosce.`);
+  [...righe].sort((a, b) => (eur(b) || 0) - (eur(a) || 0)).forEach(r => {
+    const q = numero(r.qta ?? r.qty), p = numero(r.price ?? r.prezzo);
+    const g = numero(r.gain_pct_pos);
+    const e = eur(r);
+    F.push(`- ${r.ticker}${r.name ? ` (${r.name})` : ""}: ${fmtNum.format(q)} `
+      + `${obbl(r) ? "di nominale" : "quote"} a carico ${r.pmc}, oggi ${Number.isFinite(p) ? p : "n.d."}`
+      + (Number.isFinite(g) ? `, ${signTxt(Math.round(g * 10) / 10)}` : "")
+      + (e != null ? ` — ${Math.round(e).toLocaleString("it-IT")} € pari al ${Math.round(e / tot * 100)}% del libro` : " — senza prezzo, escluso dai pesi")
+      + (r.sector ? ` · settore ${r.sector}` : "") + (r.rs_bench ? ` · benchmark ${String(r.rs_bench).toUpperCase()}` : ""));
+  });
+  F.push(`- Totale del libro conosciuto dal sistema: ${Math.round(tot).toLocaleString("it-IT")} €.`
+    + (senzaPrezzo.length ? ` ⚠ ${senzaPrezzo.join(", ")} non hanno prezzo e sono fuori dal totale.` : ""));
+
+  /* ── la concentrazione: il fatto che nessuna analisi di singolo titolo puo' vedere ── */
+  const perSettore = new Map();
+  for (const r of righe) {
+    const e = eur(r); if (e == null) continue;
+    const k = obbl(r) ? "Obbligazionario" : (r.sector || "Non classificato");
+    perSettore.set(k, (perSettore.get(k) || 0) + e);
+  }
+  const ord = [...perSettore.entries()].sort((a, b) => b[1] - a[1]);
+  F.push(`- CONCENTRAZIONE PER SETTORE: ` + ord.map(([k, v]) => `${k} ${Math.round(v / tot * 100)}%`).join(" · ")
+    + `. ⚠ E' il fatto che nessuna analisi di un singolo titolo puo' vedere: piu' posizioni nello `
+    + `stesso comparto sono UNA scommessa scritta piu' volte, e si muovono insieme quando conta.`);
+  const primo = [...righe].filter(r => eur(r) != null).sort((a, b) => eur(b) - eur(a))[0];
+  if (primo) {
+    F.push(`- La posizione piu' grande e' ${primo.ticker} al ${Math.round(eur(primo) / tot * 100)}% del libro; `
+      + `le prime tre valgono il ${Math.round([...righe].filter(r => eur(r) != null)
+          .sort((a, b) => eur(b) - eur(a)).slice(0, 3).reduce((a, r) => a + eur(r), 0) / tot * 100)}%.`);
+  }
+  const vinc = righe.filter(r => numero(r.gain_pct_pos) > 0).length;
+  F.push(`- ${vinc} posizioni su ${righe.length} sono in guadagno. `
+    + `⚠ Il prezzo di carico non cambia cosa fara' un titolo: cambia cosa costa uscirne e quale `
+    + `plusvalenza si realizzerebbe. Sono due domande diverse e vanno tenute separate.`);
+
+  const istruzioni = [
+`ANALISI DEL PORTAFOGLIO — ${oggi}`,
+``,
+`Sei un analista di Wall Street. Devi dire cosa questo libro E' — non cosa fa ogni singolo`,
+`titolo, che si vede altrove — e cosa lo romperebbe. BUDGET: 900-1.100 parole.`,
+``,
+`⚠ QUELLO CHE IL SISTEMA NON SA, e che quindi non devi assumere: la liquidita' disponibile, la`,
+`presenza di altri conti o strumenti, la situazione fiscale, l'orizzonte e gli obblighi di spesa`,
+`di chi lo detiene. Senza questi, qualunque dimensionamento e' un numero che sembra un consiglio:`,
+`non dare quantita', non dare percentuali di ribilanciamento, non dare stop in euro. I livelli`,
+`di prezzo si', le quantita' no. Se una conclusione dipende da uno di quei dati, dillo e fermati li'.`,
+``,
+`0) COS'E' QUESTO LIBRO — cinque righe. Se dovessi descriverlo a un collega in una frase, che`,
+`   scommessa e'? Poi: qual e' il rischio che chi lo detiene probabilmente NON sta vedendo.`,
+``,
+`1) LA CONCENTRAZIONE. Guarda i pesi e i settori qui sotto. Quante scommesse DISTINTE ci sono`,
+`   davvero, contro quante posizioni? Due titoli dello stesso comparto che si muovono insieme`,
+`   sono una posizione sola con due nomi. Dillo con i numeri.`,
+``,
+`2) COSA TIENE IN PIEDI IL LIBRO E COSA LO ZAVORRA. Non l'elenco dei guadagni: quali posizioni`,
+`   contano davvero per il risultato, e quali sono troppo piccole per spostarlo in un senso o`,
+`   nell'altro qualunque cosa facciano.`,
+``,
+`3) IL PONTE COL MACRO — la parte che nessun altro puo' scrivere. Prendi dal quadro in coda le`,
+`   due o tre grandezze che arrivano a QUESTO libro e di' attraverso quale canale: quale tasso,`,
+`   quale costo, quale domanda finale. Un libro concentrato in un settore ha un canale dominante:`,
+`   nominalo.`,
+``,
+`4) COSA LO ROMPEREBBE. Un evento osservabile e datato — non "se il mercato scende". Quale dato,`,
+`   quale trimestrale, quale livello: e quanto del libro ne verrebbe colpito insieme.`,
+``,
+`5) LA TESI CONTRARIA — massimo 8 righe, obbligatoria. Argomenta che questo libro va bene com'e',`,
+`   se hai concluso il contrario, o il contrario se hai concluso che va bene. Usa i NUMERI di`,
+`   questo pacchetto. Poi di' quale delle due regge meglio e quale fatto osservabile le separa.`,
+`   Non ti e' consentito rispondere che entrambe hanno merito.`,
+``,
+`══ REGOLE ══`,
+`· Italiano, prosa densa, niente frasi di cortesia e niente riassunti di cio' che hai gia' detto.`,
+`· Ogni dato esterno va [VERIFICATO] con fonte e data. Chiudi con "NON VERIFICATO:" elencando`,
+`  cosa non sei riuscito a confermare.`,
+`· Cerca le notizie delle ULTIME 48 ORE sui titoli piu' pesanti del libro: il pacchetto porta i`,
+`  titoli macro recenti ma non quelli societari.`,
+`· Niente domande in chiusura e niente offerte di approfondimento.`,
+``,
+`──────────────────────────────────────────────────────────────────`,
+  ].join("\n");
+
+  return [istruzioni, F.join("\n"), testoCorrelazioniMacro(), soloDati].filter(Boolean).join("\n\n");
 }
 
 function buildPromptSettore(chiave) {

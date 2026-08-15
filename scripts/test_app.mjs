@@ -2649,6 +2649,108 @@ check("v314 medie: SMA ed EMA dichiarano entrambe il livello", suVeri(`
   if (!/Medie esponenziali/.test(p)) return sma;
   return sma && ema`));
 
+/* ══ v315 — IL PORTAFOGLIO SI MODIFICA, SI ORDINA, E SI ANALIZZA INTERO ══════════════════
+   Il CEO ha segnalato DUE VOLTE di non riuscire a modificare il portafoglio. La modalita'
+   funzionava: il bottone era 74x22 pixel, trasparente, in coda a 400 caratteri di prosa dentro
+   una nota grigia. ⚠ "La funzione esiste" e "la funzione e' raggiungibile" sono due cose diverse,
+   e la seconda e' l'unica che conta per chi usa la pagina: un comando che nessuno trova non e'
+   un comando. Il check guarda DOVE sta il bottone, non se la funzione esiste. */
+check("v315 portafoglio: il comando di modifica sta nell'intestazione, non sepolto nella nota", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const i = html.indexOf('id="pf-modifica"');
+  if (i < 0) return false;
+  const testa = html.lastIndexOf('class="card-head"', i);
+  const chiude = html.indexOf("</div>", testa);
+  return testa >= 0 && i < chiude              // sta dentro l'intestazione della card
+      && src.indexOf('nota.innerHTML') >= 0
+      && !/nota\.innerHTML[\s\S]{0,900}?pf-modifica/.test(src);   // e NON dentro la prosa
+})());
+
+check("v315 portafoglio: il bottone e' un interruttore e lo dichiara", (() => (
+  src.indexOf("pfInModifica = !pfInModifica") >= 0
+  && src.indexOf('pfInModifica ? "✕ Chiudi modifica" : "✎ Modifica"') >= 0
+))());
+
+/* ⚠ L'ORDINAMENTO E' UNA SCELTA DEL CEO, MA IL DEFAULT E' UNA NOSTRA AFFERMAZIONE.
+   Il default resta il PESO: ordinare per guadagno mette in cima i vincitori, che e' la lettura
+   che fa tenere i perdenti. Se un domani qualcuno cambia il default in "gain", questo check lo
+   dice — non perche' sia vietato, ma perche' dev'essere una decisione presa, non una svista. */
+check("v315 portafoglio: si ordina di default per peso, non per guadagno", (() => (
+  /let pfOrdine = \{ campo: "peso"/.test(src)
+))());
+
+check("v315 portafoglio: ogni colonna ordina davvero, e il verso si inverte", suVeri(`
+  const q = document.querySelector, presi = {};
+  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "", classList: { add(){}, remove(){}, toggle(){}, contains: () => false }, style: {}, dataset: {}, querySelectorAll: () => [], addEventListener(){} });
+  document.querySelector = (s) => finto(s);
+  const leggi = (campo, verso) => {
+    pfOrdine = { campo, verso }; renderPortafoglio();
+    const t = finto("#pf-righe").innerHTML;
+    return (t.match(/data-pf-tk="([^"]+)"/g) || []).map(x => x.slice(12, -1));
+  };
+  try {
+    const peso = leggi("peso", "giu"), pesoSu = leggi("peso", "su"), gain = leggi("gain", "giu");
+    /* invertire il verso deve rovesciare l'elenco, e un campo diverso deve dare un ordine diverso:
+       due proprieta' osservabili, non un elenco atteso che invecchia col portafoglio */
+    return peso.length >= 5
+      && JSON.stringify(pesoSu) === JSON.stringify([...peso].reverse())
+      && JSON.stringify(gain) !== JSON.stringify(peso);
+  } finally { document.querySelector = q; }`));
+
+/* ⚠⚠ IL CONTROVALORE IN EURO E' UNA CONVERSIONE AL CAMBIO DI OGGI, NON IL COSTO SOSTENUTO.
+   E' la classe del gate valuta (v183): un dollaro col simbolo dell'euro accanto a un euro vero
+   ha gia' prodotto un dimensionamento sbagliato in un referto reale. Qui il check verifica che
+   l'obbligazione NON sia valutata come un'azione (quote x prezzo darebbe 4,1 milioni invece di
+   41 mila) e che il totale sia la somma dichiarata, non una normalizzazione su se stessa. */
+check("v315 portafoglio: la colonna in euro converte e il BTP resta nominale x prezzo", suVeri(`
+  const q = document.querySelector, presi = {};
+  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "", classList: { add(){}, remove(){}, toggle(){}, contains: () => false }, style: {}, dataset: {}, querySelectorAll: () => [], addEventListener(){} });
+  document.querySelector = (s) => finto(s);
+  try {
+    renderPortafoglio();
+    const t = finto("#pf-righe").innerHTML;
+    if (!/In euro/.test(t)) return false;
+    const btp = (DATA.portfolio || []).concat(DATA.watchlist || []).find(r => r && String(r.ticker).startsWith("BTP"));
+    if (!btp) return true;
+    const atteso = Math.round(btp.qta * btp.price / 100);
+    return t.indexOf("€" + fmtNum.format(atteso)) >= 0;
+  } finally { document.querySelector = q; }`));
+
+/* ══ IL PACCHETTO SUL LIBRO INTERO ══════════════════════════════════════════════════════════
+   Terzo pacchetto dopo titolo e settore. Porta il fatto che nessuno degli altri due puo' vedere:
+   piu' posizioni nello stesso comparto sono UNA scommessa scritta piu' volte.
+   ⚠ E DEVE DICHIARARE CIO' CHE NON SA. Il sistema non conosce liquidita', altri conti, situazione
+   fiscale: senza quei tre, qualunque quantita' e' un numero che sembra un consiglio. Il divieto
+   di dimensionare non e' prudenza formale — e' l'unica cosa che tiene il pacchetto dalla parte
+   dei fatti, che e' la riga di condotta di tutto il sistema. */
+check("v315 pacchetto libro: pubblica pesi, concentrazione e la posizione piu' grande", suVeri(`
+  const p = buildPromptPortafoglio();
+  return /IL LIBRO, POSIZIONE PER POSIZIONE \\(\\d+ posizioni\\)/.test(p)
+      && /CONCENTRAZIONE PER SETTORE/.test(p)
+      && /La posizione piu' grande e' [A-Z]+ al \\d+% del libro/.test(p)
+      && /le prime tre valgono il \\d+%/.test(p)
+      && p.length > 8000`));
+
+check("v315 pacchetto libro: dichiara cosa NON sa e vieta di dimensionare", suVeri(`
+  const p = buildPromptPortafoglio();
+  const testa = p.slice(0, p.indexOf("=== IL LIBRO"));
+  return /liquidita/.test(testa) && /fiscale/.test(testa)
+      && /non dare quantita/.test(testa)
+      && /non dare stop in euro/.test(testa)
+      && /le quantita' no/.test(testa)`));
+
+/* ⚠ e il cambio dev'essere dichiarato per quello che e': quello di OGGI, non quello di carico. */
+check("v315 pacchetto libro: il cambio dichiarato e' quello di oggi, non quello di carico", suVeri(`
+  const p = buildPromptPortafoglio();
+  return /cambio di OGGI/.test(p) && /NON e' il cambio di carico/.test(p)`));
+
+/* ⚠ un pacchetto che non trova posizioni deve DIRLO, non produrre un'analisi di un libro vuoto:
+   e' la classe "verde per assenza di dati" applicata al prodotto invece che al test. */
+check("v315 pacchetto libro: senza posizioni lo dice invece di analizzare il vuoto", run(`
+  const _s = DATA;
+  DATA = JSON.parse(JSON.stringify(REALE)); DATA.portfolio = []; DATA.watchlist = [];
+  try { return /Nessuna posizione/.test(buildPromptPortafoglio()); } finally { DATA = _s; recomputeTotals(); }`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
