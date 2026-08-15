@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "296";
+const BUILD_VERSION = "297";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4065,8 +4065,23 @@ function renderIndicatori() {
        schede senza storico. Ora che la pipeline porta la traiettoria, tenere la scala davanti
        vorrebbe dire preferire una MIA convenzione di lettura a un dato osservato. La scala
        resta il ripiego dove la serie ancora manca. */
-    const se = serieIndicatore(r.k);
-    const forma = se ? null : (() => { try { return FORMA_INDICATORE[r.k]?.(DATA.macro || {}) || null; } catch { return null; } })();
+    /* ⚠⚠ v297 — LA SOGLIA CHE MANCAVA, E CHE HA COSTATO IL TACHIMETRO DEL FEAR & GREED.
+       In v292 ho invertito la precedenza (serie > forma) e avevo ragione sul principio: una
+       traiettoria osservata batte una scala convenzionale. Ma non ho messo un PAVIMENTO, e cosi'
+       una serie di QUATTRO punti (anno fa · mese fa · settimana fa · oggi) ha scalzato il
+       tachimetro con le bande CNN, e una di 13 ha scalzato la scala del P/E. Il CEO se n'e'
+       accorto e ha chiesto il tachimetro indietro.
+       Quattro punti non sono una traiettoria: sono quattro numeri con una linea in mezzo, e
+       dicono MENO di un quadrante che mostra in quale banda cade il valore. La regola giusta non
+       e' "la serie vince" ma "la serie vince quando e' davvero una serie". */
+    const SERIE_MINIMA = 20;   // sotto, una linea dice meno di una scala con le zone nominate
+    const seGrezza = serieIndicatore(r.k);
+    const quanti = seGrezza
+      ? (seGrezza.punti ? seGrezza.punti.length
+         : seGrezza.doppia ? Math.min(...seGrezza.doppia.map(x => (x.punti || []).length)) : 0)
+      : 0;
+    const forma = (() => { try { return FORMA_INDICATORE[r.k]?.(DATA.macro || {}) || null; } catch { return null; } })();
+    const se = (forma && quanti < SERIE_MINIMA) ? null : seGrezza;
     /* ⚠ v262 — LA SCHEDA DI FEAR & GREED NON RIPETE I SUOI COMPONENTI. Il CEO l'ha segnalato
        due volte: "ha ancora al suo interno altri valori come vix etc". Da v258 tutti e sette i
        componenti hanno una scheda propria (quattro nuove, tre — VIX, Put/Call, Ampiezza — che
@@ -4082,7 +4097,7 @@ function renderIndicatori() {
               { h: 104, compatto: true, soglie: se.soglie, unita: se.unita, assex: se.assex,
                 fmtY: se.fmtY, etichetteDx: false, aria: r.nome }))
       : "";
-    const g = forma ? forma.g : linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
+    const g = (!se && forma) ? forma.g : linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
     return tessera({ t: r.nome, tag: r.proxy || null,
       v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
       cls: clsScore(r.score), grafico: g,
@@ -4429,9 +4444,30 @@ function caricaOrdineSezioni() {
   catch { return {}; }
 }
 
+/* ⚠⚠ v297 — IL TRASCINAMENTO DELLE SEZIONI ERA MORTO, E IN SILENZIO. Segnalato dal CEO: "non
+   riesco piu' ad ordinare i box, non me li fa trascinare". Diagnosticato in browser: le 11
+   maniglie ⠿ erano montate, visibili e cliccabili, il `pointerdown` partiva senza errori — e
+   non succedeva niente.
+   La causa: questa funzione filtrava su `[data-pane="${pane}"]`, ma `data-pane` NEL MARKUP NON
+   ESISTE PIU' — l'ha tolto v256 insieme alle schede a pane. Con `pane` undefined il selettore
+   diventava `[data-pane="undefined"]`, la lista usciva VUOTA, e `iniziaTrascinamento` usciva
+   sulla guardia `ordine.length < 2` senza dire niente. Stessa sorte per le frecce ▲▼ e per il
+   salvataggio: tutti e cinque i punti passano di qui.
+   ⚠ E' la classe v234 — "un ramo che non puo' essere raggiunto non e' una protezione, e' un
+   commento che sembra codice" — applicata a una funzionalita' intera: nessun errore in console,
+   nessun test rosso, e una richiesta esplicita del CEO (v225) spenta per quaranta versioni.
+   ⚠ La struttura a pane resta gestita, se un domani tornasse: senza pane si lavora sull'insieme
+   unico, con pane sul suo. E una chiave salvata che non corrisponde a nessuna sezione (un ordine
+   scritto prima che i pane sparissero) ricade sull'insieme unico invece di restituire il vuoto. */
+const PANE_UNICO = "_tutte";
+function senzaPane(p) { return p == null || p === "undefined" || p === PANE_UNICO; }
+
 function sezioniDelPane(pane) {
   const main = document.querySelector(".shell-main"); if (!main) return [];
-  return [...main.children].filter(el => el.matches?.(`section[data-sez][data-pane="${pane}"]`));
+  const tutte = () => [...main.children].filter(el => el.matches?.("section[data-sez]:not([data-pane])"));
+  if (senzaPane(pane)) return tutte();
+  const suo = [...main.children].filter(el => el.matches?.(`section[data-sez][data-pane="${pane}"]`));
+  return suo.length ? suo : tutte();
 }
 
 /* Rimette le sezioni di un pane nelle POSIZIONI che occupano adesso, ma nell'ordine chiesto.
@@ -4456,7 +4492,9 @@ function applicaOrdineSezioni() {
 
 function salvaOrdineSezioni(pane) {
   const ord = caricaOrdineSezioni();
-  ord[pane] = sezioniDelPane(pane).map(el => el.dataset.sez);
+  /* ⚠ la chiave dev'essere leggibile e stabile: con `pane` undefined diventava la stringa
+     "undefined" dentro config/ui_order.json — funzionante ma incomprensibile a chi apre il file. */
+  ord[senzaPane(pane) ? PANE_UNICO : pane] = sezioniDelPane(pane).map(el => el.dataset.sez);
   ord._savedAt = new Date().toISOString();
   try { localStorage.setItem(SEZ_ORDER_KEY, JSON.stringify(ord)); } catch { /* quota */ }
   if (localStorage.getItem("gh_token")) pushOrdineSezioniCloud(ord);

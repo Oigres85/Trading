@@ -2066,13 +2066,29 @@ check("v292 macro: le serie sono trasformate, non indici grezzi", suVeri(`
 /* ⚠ la traiettoria vera deve avere la precedenza sulla scala convenzionale di v272: quella
    era il ripiego per le schede senza storico, e tenerla davanti vorrebbe dire preferire una
    convenzione di lettura mia a un dato osservato. */
-check("v292 macro: la serie osservata batte la scala convenzionale", (() => {
+/* ⚠⚠ v297 — LA REGOLA SI RAFFINA: la serie batte la forma SE E' DAVVERO UNA SERIE. In v292
+   avevo scritto "la traiettoria vince sempre" e mancava il pavimento: una serie di QUATTRO
+   punti (Fear & Greed: anno fa, mese fa, settimana fa, oggi) ha scalzato il tachimetro con le
+   bande CNN, e una di 13 ha scalzato la scala del P/E. Il CEO ha chiesto il tachimetro indietro.
+   Quattro punti non sono una traiettoria: sono quattro numeri con una linea in mezzo, e dicono
+   meno di un quadrante che mostra in quale banda cade il valore. */
+check("v297 macro: una serie batte la forma solo se e' lunga abbastanza", (() => {
   const i = src.indexOf("function renderIndicatori");
   const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  const posSerie = corpo.indexOf("const se = serieIndicatore");
-  const posForma = corpo.indexOf("const forma =");
-  return posSerie > -1 && posForma > posSerie;
+  return /const SERIE_MINIMA = (\d+)/.test(corpo)
+      && Number(corpo.match(/const SERIE_MINIMA = (\d+)/)[1]) >= 10
+      && /quanti < SERIE_MINIMA/.test(corpo);
 })());
+
+/* ⚠ e il caso concreto che il CEO ha segnalato: il Fear & Greed deve tornare un TACHIMETRO. */
+check("v297 macro: Fear & Greed e' reso come tachimetro, non come linea a quattro punti", suVeri(`
+  const se = serieIndicatore("fear_greed");
+  const fo = (FORMA_INDICATORE["fear_greed"] || (() => null))(DATA.macro || {});
+  if (!fo) return true;
+  const n = se && se.punti ? se.punti.length : 0;
+  /* la serie del F&G e' cortissima per costruzione: deve perdere contro la forma */
+  return n < 20 && /viewBox="0 0 300 186"/.test(fo.g || "")
+      && /<title>paura estrema: da 0 a 25<\\/title>/.test(fo.g || "")`));
 
 /* ══ v293 — LA CONSEGNA CHIESTA DAL CEO, E IL SUO TETTO ══════════════════════════════════
    "mi fornisce un quadro troppo lungo": la vecchia consegna aveva sette blocchi con tabelle e
@@ -2222,6 +2238,37 @@ check("v296 contraddittorio: obbliga ai numeri del pacchetto, a scegliere, e a u
       && /non obiezioni generiche/.test(b)
       && /QUALE FATTO OSSERVABILE E DATATO/.test(b)
       && /Non ti e' consentito rispondere che entrambe le tesi hanno merito/.test(b)`));
+
+/* ══ v297 — IL TRASCINAMENTO DELLE SEZIONI ERA MORTO DA QUARANTA VERSIONI ════════════════
+   Segnalato dal CEO: "non riesco piu' ad ordinare i box". `sezioniDelPane` filtrava su
+   `[data-pane="${pane}"]` mentre `data-pane` non esiste piu' nel markup da v256: lista vuota,
+   `iniziaTrascinamento` usciva sulla guardia `length < 2`, e nessun errore da nessuna parte.
+   Le maniglie erano montate, visibili e cliccabili: il guasto era invisibile a ogni controllo.
+   ⚠⚠ IL CHECK DEV'ESSERE COMPORTAMENTALE. Uno che cercasse "data-pane" nel sorgente sarebbe
+   passato benissimo mentre la funzione restituiva zero — la differenza fra guardare il codice
+   ed ESEGUIRLO, che qui e' gia' costata la pagina morta di v238 con 219 test verdi. */
+check("v297 riordino: sezioniDelPane trova davvero le sezioni di index.html", suVeri(`
+  const sezioni = [{"sez": "titolo", "pane": null}, {"sez": "grafico", "pane": null}, {"sez": "tassi", "pane": null}, {"sez": "tv-macro", "pane": null}, {"sez": "calendario", "pane": null}, {"sez": "etf-lungo", "pane": null}, {"sez": "rotazione", "pane": null}, {"sez": "stress", "pane": null}, {"sez": "classifica", "pane": null}, {"sez": "leva", "pane": null}, {"sez": "strumenti", "pane": null}];
+  const finte = sezioni.map(x => ({
+    dataset: { sez: x.sez, pane: x.pane || undefined },
+    matches: (sel) => sel.indexOf(":not([data-pane])") >= 0 ? !x.pane : !!x.pane,
+  }));
+  const q = document.querySelector;
+  let trovate = [];
+  try {
+    document.querySelector = (sel) => sel === ".shell-main" ? { children: finte } : q.call(document, sel);
+    trovate = sezioniDelPane(undefined);
+  } finally { document.querySelector = q; }
+  /* la guardia che spegneva tutto era \`ordine.length < 2\`: qui devono esserci tutte */
+  return trovate.length === sezioni.length && trovate.length >= 2`));
+
+/* ⚠ e la chiave salvata dev'essere leggibile: senza pane finiva la stringa "undefined" dentro
+   config/ui_order.json — funzionante e incomprensibile a chi apre il file. */
+check("v297 riordino: la chiave dell'ordine non e' la stringa 'undefined'", (() => {
+  const i = src.indexOf("function salvaOrdineSezioni");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /senzaPane\(pane\) \? PANE_UNICO : pane/.test(corpo);
+})());
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
