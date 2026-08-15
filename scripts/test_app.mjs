@@ -2619,6 +2619,36 @@ check("v313 grafico: ogni riga di settore ha il proprio simbolo", suVeri(`
   const righe = (f.g.match(/rot-riga/g) || []).length;
   return n === righe && n >= 6`));
 
+/* ══ v314 — DUE CONVENZIONI OPPOSTE, E UN LLM VERO CI E' CASCATO ═════════════════════════
+   Il CEO ha portato il referto reale di ChatGPT su MU. Ottimo referto — ma contiene una frase
+   falsa: "la SMA200 e' circa il 75,9% sotto il riferimento". Se il prezzo sta +75,9% SOPRA la
+   media, la media sta il 43,1% sotto il prezzo, non il 75,9%.
+   ⚠⚠ LA COLPA ERA NOSTRA. Nello stesso blocco convivevano due convenzioni opposte per la stessa
+   grandezza, a due righe di distanza e senza dichiararle: le EMA scrivevano il LIVELLO rispetto
+   al prezzo ("EMA 20 904.38 (-6.9% dal riferimento)"), le SMA il PREZZO rispetto al livello
+   ("+75.9%"). E' la classe "denominatori non dichiarati", sfuggita a `coherence_check` perche'
+   qui e' una questione di VERSO, non di valore. */
+check("v314 medie: il verso e' scritto in parole, non lasciato dedurre", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU" && x.sma200_dist_pct != null);
+  if (!r) return true;
+  const p = buildPromptTicker("MU");
+  const m = p.match(/Media a 200 sedute: ([\\d.]+) — il prezzo le sta ([+-][\\d,]+%), cioe' (SOPRA|SOTTO)/);
+  if (!m) return false;
+  /* il livello dev'essere coerente col prezzo e con la distanza: se il prezzo sta +75,9%
+     sopra, la media vale prezzo/1,759 — un controllo aritmetico, non testuale */
+  const liv = Number(m[1]);
+  const atteso = r.price / (1 + r.sma200_dist_pct / 100);
+  return Math.abs(liv - atteso) < 0.5 && m[3] === (r.sma200_dist_pct >= 0 ? "SOPRA" : "SOTTO")`));
+
+/* ⚠ e le due famiglie di medie devono usare la STESSA base: se una dice il livello e l'altra
+   il prezzo, chi legge inverte — ed e' successo davvero. */
+check("v314 medie: SMA ed EMA dichiarano entrambe il livello", suVeri(`
+  const p = buildPromptTicker("MU");
+  const sma = /Media a \\d+ sedute: [\\d.]+ —/.test(p);
+  const ema = /EMA \\d+ [\\d.]+ \\([+-]/.test(p);
+  if (!/Medie esponenziali/.test(p)) return sma;
+  return sma && ema`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

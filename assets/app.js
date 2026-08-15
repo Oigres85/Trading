@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "313";
+const BUILD_VERSION = "314";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2558,11 +2558,27 @@ function verificaReferto(referto, pacchetto) {
   const numeri = numeriDelTesto(referto);
   /* un numero e' "tracciato" se compare nel pacchetto in una qualunque delle sue forme:
      514.39 / 514,39 / 51439 — le tre che il sistema e gli LLM usano davvero. */
+  /* ⚠⚠ v314 — LE DUE NOTAZIONI VANNO NORMALIZZATE INSIEME, NON UNA ALLA VOLTA. Trovato sul
+     referto VERO di ChatGPT su MU: scriveva "1.011,77" — che e' esattamente la nostra
+     resistenza 1011.77 in notazione italiana — e il verificatore lo dava per scoperto. Le
+     trasformazioni erano applicate SEPARATAMENTE (togli i punti OPPURE cambia la virgola), mai
+     in sequenza, quindi il caso piu' comune in un testo italiano sfuggiva.
+     Un verificatore che segnala come sospetto un numero che gli abbiamo dato noi produce
+     rumore, e il rumore fa smettere di leggerlo — e' il modo in cui uno strumento di controllo
+     muore. */
   const forme = (v) => {
     const p = String(v);
-    const s = new Set([p, p.replace(",", "."), p.replace(".", ","),
-                       p.replace(/[.,]/g, ""), p.replace(/\.(?=\d{3}\b)/g, "")]);
-    return [...s];
+    const senzaMigliaia = p.replace(/\.(?=\d{3}(?:[^\d]|$))/g, "");
+    const s = new Set([
+      p,
+      p.replace(",", "."),
+      p.replace(".", ","),
+      p.replace(/[.,]/g, ""),
+      senzaMigliaia,                       // 1.011,77 → 1011,77
+      senzaMigliaia.replace(",", "."),     // 1.011,77 → 1011.77   ← il caso che sfuggiva
+      p.replace(/,(?=\d{3}(?:[^\d]|$))/g, ""),          // notazione inglese: 1,011.77 → 1011.77
+    ]);
+    return [...s].filter(Boolean);
   };
   /* ⚠⚠ CONFRONTO PER TOKEN INTERO, NON PER SOTTOSTRINGA. La prima stesura cercava "8.9" dentro
      il pacchetto e lo trovava dentro "158.9": dodici numeri su quattordici risultavano "dal
@@ -8705,8 +8721,27 @@ function datiNostriDelTitolo(tk) {
   if (t) {
     if (Number.isFinite(t.rsi)) L.push(`- RSI(14): ${t.rsi}`);
     if (Number.isFinite(t.atr)) L.push(`- ATR(14): ${t.atr}${Number.isFinite(t.atrPct) ? ` (${t.atrPct}% del prezzo — l'ampiezza tipica di una seduta)` : ""}`);
-    if (Number.isFinite(t.sma50)) L.push(`- Distanza dalla media a 50 sedute: ${t.sma50 > 0 ? "+" : ""}${t.sma50}%`);
-    if (Number.isFinite(t.sma200)) L.push(`- Distanza dalla media a 200 sedute: ${t.sma200 > 0 ? "+" : ""}${t.sma200}%`);
+  /* ═══ v314 — DUE CONVENZIONI OPPOSTE NELLO STESSO PACCHETTO, E UN LLM CI E' CASCATO ═════
+     Trovato nel referto reale su MU che il CEO ha portato: ChatGPT ha scritto "la SMA200 e'
+     circa il 75,9% sotto il riferimento". E' FALSO — se il prezzo sta +75,9% sopra la media,
+     la media sta il 43,1% sotto il prezzo, non il 75,9%.
+     ⚠⚠ MA LA COLPA E' NOSTRA. Nello stesso blocco convivevano due convenzioni opposte per la
+     stessa grandezza: le EMA scrivono "EMA 20 904.38 (-6.9% dal riferimento)", cioe' il LIVELLO
+     rispetto al prezzo; le SMA scrivevano "+75.9%", cioe' il PREZZO rispetto al livello. Due
+     basi diverse, nessuna delle due dichiarata, a due righe di distanza — la classe
+     "denominatori non dichiarati" che `coherence_check` insegue dentro il payload, qui sfuggita
+     perche' e' una questione di VERSO, non di valore.
+     Ora si scrive il livello E il verso in parole, come per le EMA. */
+  if (Number.isFinite(tec.sma50) || Number.isFinite(tec.sma200)) {
+    const rif = numero(f.prezzo);
+    const riga = (n, dist) => {
+      if (!Number.isFinite(dist)) return null;
+      const liv = Number.isFinite(rif) ? Math.round(rif / (1 + dist / 100) * 100) / 100 : null;
+      return `- Media a ${n} sedute${liv != null ? `: ${liv}` : ""} — il prezzo le sta `
+        + `${signTxt(dist)}, cioe' ${dist >= 0 ? "SOPRA" : "SOTTO"} la media`;
+    };
+    [riga(50, tec.sma50), riga(200, tec.sma200)].filter(Boolean).forEach(x => L.push(x));
+  }
     if (Number.isFinite(t.pe)) L.push(`- P/E (trailing): ${t.pe}×`);
     if (t.settore) L.push(`- Settore secondo la nostra classificazione: ${t.settore}`);
     if (t.trimestrale) L.push(`- Prossima trimestrale attesa: ${t.trimestrale}`);
