@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "294";
+const BUILD_VERSION = "295";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3001,7 +3001,7 @@ function indicatoriClassifica() {
   // lasciato SENZA CASA undici indicatori che prima erano visibili: carry, put/call, liquidità
   // in attesa, righello dollaro, Fed funds, curva-vs-recessione, disaccoppiamento, forward P/E,
   // FedWatch, streghe, scarto vs indice. NON erano duplicati di un grafico: erano informazione,
-  // e l'ho fatta sparire. Rientrano qui, sulla stessa scala 0-100 (100 = favorevole al libro):
+  // e l'ho fatta sparire. Rientrano qui, sulla stessa scala 0-100 (100 = favorevole al rischio):
   // non torna il riquadro, torna il DATO in forma confrontabile con tutti gli altri.
   const cl = (x) => Math.round(Math.max(0, Math.min(100, x)));
   const orf = [];
@@ -3412,7 +3412,7 @@ function tachimetro(v, opt = {}) {
    tale. Non sono soglie calcolate: il punteggio e' gia' normalizzato dal motore, e queste bande
    servono solo a dare un nome alla zona in cui cade la lancetta. */
 const ZONE_PUNTEGGIO = [
-  { da: 0, a: 35, nome: "sfavorevole al libro", colore: "var(--red)" },
+  { da: 0, a: 35, nome: "sfavorevole al rischio azionario", colore: "var(--red)" },
   { da: 35, a: 45, nome: "debole", colore: "var(--yellow)" },
   { da: 45, a: 55, nome: "neutro", colore: "var(--muted)" },
   { da: 55, a: 70, nome: "favorevole", colore: "var(--green)" },
@@ -4123,7 +4123,7 @@ function renderIndicatori() {
   /* v238 — le quattro tessere di testata (media, quanti sotto 40, i tre peggiori, quelli che
      tengono) sono state rimosse su richiesta del CEO: erano un riassunto della griglia che sta
      appena sotto, cioe' gli stessi fatti detti due volte. */
-  if (nota) nota.innerHTML = `Una scheda per indicatore, tutte sulla stessa scala: <b>100 = favorevole al libro, 0 = sfavorevole</b>, ordinate dalla peggiore.
+  if (nota) nota.innerHTML = `Una scheda per indicatore, tutte sulla stessa scala: <b>100 = favorevole al rischio azionario, 0 = sfavorevole</b>, ordinate dalla peggiore. È una convenzione di lettura del sistema, non una misura: dice da che parte tira ogni indicatore, non quanto pesa.
     Dove esiste una storia il grafico la mostra; dove il pannello di dettaglio portava un grafico o una tabella, quelli sono <b>qui dentro</b> invece che dietro un clic.
     <b>Clicca una scheda</b> per il resto del pannello e le news di quell'indicatore.`;
 }

@@ -1788,9 +1788,15 @@ def fetch_macro():
         ("unemp",    "UNRATE",                "diretta",      60),
         ("umich",    "PRIMARIA:umich",        "diretta",      60),   # v292 — vedi nota sotto
         ("philly",   "GACDFSA066MSFRBPHI",    "diretta",      60),
-        ("curve",    "T10Y2Y",                "diretta",     250),
+        # ⚠ v295 — `curve` e `t30` NON prendono lo storico qui, ed e' un difetto che ho
+        # introdotto io in v292: quelle due serie il file le aveva GIA'.
+        #   · 10A-2A → `macro.curve_history` (501 punti), che `serieIndicatore` legge da un
+        #     `case` dedicato: il mio storico non veniva nemmeno disegnato, era peso morto puro.
+        #   · 30 anni → `macro.tassi.storico.a30` (369 punti), messo li' da v289.
+        # Erano ~14KB spediti a ogni caricamento per niente, e — peggio del peso — due copie
+        # della stessa serie che possono divergere quando una delle due fonti cambia finestra.
+        # Prima di aggiungere una serie: cercare se il file ce l'ha gia'.
         ("curve3m",  "T10Y3M",                "diretta",     250),
-        ("t30",      "DGS30",                 "diretta",     250),
         ("real10",   "DFII10",                "diretta",     250),
         ("breakeven","T10YIE",                "diretta",     250),
     ]

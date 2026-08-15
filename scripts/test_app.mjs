@@ -2156,6 +2156,44 @@ check("v294 doppioni: cio' che esce dalla pagina resta nel pacchetto", suVeri(`
   }
   return true`));
 
+/* ══ v295 — DUE SERIE UGUALI IN DUE POSTI: IL DIFETTO CHE HO INTRODOTTO IO ═══════════════
+   Trovato nella revisione che il CEO ha chiesto ("cosa c'e' da aggiustare, eliminare"). In
+   v292 ho dato uno storico a tutti e 13 gli indicatori senza cercare se il file ce l'avesse
+   gia': per due ce l'aveva.
+   · 10A-2A → `macro.curve_history` (501 punti), che `serieIndicatore` legge da un `case`
+     dedicato. Il mio storico non veniva NEMMENO DISEGNATO: peso morto puro, spedito a ogni
+     caricamento.
+   · 30 anni → `macro.tassi.storico.a30` (369 punti), messo li' da v289 — cioe' da me, tre
+     versioni prima.
+   Erano ~27KB. Ma il peso e' il danno minore: due copie della stessa serie DIVERGONO appena
+   una delle due fonti cambia finestra o fornitore, e a quel punto la pagina mostra due valori
+   per la stessa grandezza — la classe che `coherence_check` insegue da sempre.
+   ⚠ REGOLA: prima di aggiungere una serie, cercare se il file ce l'ha gia'. */
+check("v295 dati: nessun indicatore duplica una serie che il file ha gia'", suVeri(`
+  const m = DATA.macro || {};
+  const coda = (a, n) => (a || []).slice(-n).map(p => (p && p.v != null) ? p.v : p);
+  const gia = [];
+  if ((m.curve_history || []).length) gia.push(["macro.curve_history", m.curve_history]);
+  for (const [k, v] of Object.entries((m.tassi && m.tassi.storico) || {})) gia.push(["macro.tassi.storico." + k, v]);
+  for (const i of (m.indicators || [])) {
+    const st = i && i.storico;
+    if (!st || st.length < 20) continue;
+    for (const [nome, altra] of gia) {
+      const n = Math.min(st.length, altra.length, 60);
+      if (n >= 20 && JSON.stringify(coda(st, n)) === JSON.stringify(coda(altra, n))) return false;
+    }
+  }
+  return true`));
+
+/* ⚠ e l'etichetta della scala non deve piu' parlare di un "libro": v256 ha tolto il
+   portafoglio, e nel file resta un BTP. "100 = favorevole al libro" rivendicava un confronto
+   con un portafoglio che non esiste — un'etichetta che afferma piu' di quanto il sistema
+   sappia, la classe v240 (una zona nominata e' un'affermazione). */
+check("v295 etichette: la scala non parla di un portafoglio che non c'e' piu'", (() => {
+  const senzaCommenti = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  return !/favorevole al libro|sfavorevole al libro/.test(senzaCommenti);
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
