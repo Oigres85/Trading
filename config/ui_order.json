@@ -8,7 +8,7 @@
   "classifica",
   "macro"
  ],
- "_savedAt": "2026-08-10T17:28:37.635Z",
+ "_savedAt": "2026-08-15T04:20:33.990Z",
  "schede": {
   "indicatori": [
    "corp_profit",
@@ -34,13 +34,13 @@
    "froth",
    "in:real10",
    "in:t30",
-   "in:curve3m",
-   "mk:^SOX",
    "systemic_risk",
-   "mk:HG=F",
-   "mk:CL=F",
-   "mk:GC=F",
-   "in:philly"
+   "in:curve3m",
+   "in:philly",
+   "mat:petrolio",
+   "mat:oro",
+   "mat:sox",
+   "mat:rame"
   ]
  },
  "rischio": [
