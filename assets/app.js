@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "292";
+const BUILD_VERSION = "293";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7301,7 +7301,13 @@ function fattiTitolo(tk) {
     tecnici: riga ? { rsi: numero(riga.rsi), atr: numero(riga.atr_14), atrPct: numero(riga.atr_pct),
                       sma50: numero(riga.sma50_dist_pct), sma200: numero(riga.sma200_dist_pct),
                       pe: numero(riga.pe), settore: riga.sector || null,
-                      trimestrale: riga.earnings_date || null } : null,
+                      trimestrale: riga.earnings_date || null,
+                      /* ⚠ v293 — barre e range servono a EMA e Fibonacci, che calcoliamo NOI
+                         (vedi datiNostriDelTitolo). Passano da qui perche' `fattiTitolo` e' la
+                         fonte unica dei fatti di un titolo (v274): leggere `sparks` da un altro
+                         punto vorrebbe dire due strade per lo stesso dato. */
+                      barreGiorno: (riga.sparks && Array.isArray(riga.sparks.m6)) ? riga.sparks.m6 : [],
+                      w52hi: numero(riga.w52_high), w52lo: numero(riga.w52_low) } : null,
   };
 }
 
@@ -7622,41 +7628,90 @@ function buildPromptTicker(tkGrezzo) {
 `3. IL PREZZO DI RIFERIMENTO E' UNO SOLO: valore, data e ora, borsa. Distanze dai livelli, capitalizzazione, rendimento da inizio anno e upside si calcolano su QUELLO e lo dichiarano ("−6% dal riferimento"). Citare $476 nella scheda, $482 nel commento e "chiusura del 31/07" nella tecnica significa descrivere tre giorni diversi come se fossero oggi — e' successo, ed e' il modo piu' facile di sbagliare un ingresso. A mercato chiuso il riferimento e' l'ultima chiusura, e lo scrivi.`,
 `4. NIENTE [VERIFICATO] DERIVATO: vale su cio' che hai LETTO in una fonte, mai su cio' che hai ricavato. "Capitalizzazione 780-790 mld, ricavabile da 807 mld di due settimane fa piu' il calo" e' una stima: si scrive [STIMA] col calcolo accanto, oppure "n.d.". Ogni numero esterno porta fonte e data.`,
 ``,
-`══ COSA DEVI CONSEGNARE ══`,
+/* ═══ v293 — LA CONSEGNA RISCRITTA SULLA RICHIESTA DEL CEO ═══════════════════════════════
+   Testuale: "mi fornisce un quadro troppo lungo. Vorrei: breve quadro macro sulla base solo
+   dei dati macro che estrapoliamo dal sistema, un quadro di cio' che fa l'azione con eventuali
+   competitor e quote di mercato, prossima trimestrale con info, sentiment analisti, dati
+   tecnici (supporti e resistenze, SMA, EMA, Fibonacci) e finanziari (bilanci, reddito, utili),
+   infine un'analisi in chiusura su eventuali ingressi analizzando anche il sentiment del
+   settore in prospettiva di breve, medio, lungo periodo".
+   ⚠ LA LUNGHEZZA E' UN VINCOLO, NON UN AUSPICIO, e la vecchia consegna non ne aveva nessuno:
+   sette blocchi con tabelle e prosa senza tetto producono tremila parole per costruzione. Un
+   budget scritto e' l'unica istruzione che un LLM rispetta davvero.
+   ⚠⚠ IL GIUDIZIO VA IN CIMA. Se la conclusione sta in fondo a una pagina e mezza, il CEO la
+   legge per ultima o non la legge: il documento serve a SOSTENERE il giudizio, non a
+   costruirlo davanti a chi legge.
+   ⚠ TRE COSE CHE MANCAVANO e che ora sono chieste per nome: la PROSSIMA trimestrale (c'era
+   solo l'ultima), i conti veri (bilancio/reddito/utili, prima sparsi), e i tre orizzonti col
+   sentiment di settore in chiusura.
+   ⚠ Le quattro regole difensive sopra (PASSO 0, gerarchia fonti, prezzo unico, niente
+   [VERIFICATO] derivato) NON si toccano: ognuna nasce da un fallimento vero — vedi CLAUDE.md,
+   "da non tagliare per quanto sembrino ovvie". */
+`══ COSA DEVI CONSEGNARE — E QUANTO LUNGO ══`,
 ``,
-`1) SCHEDA DI IDENTITA' — una tabella:`,
-`| Voce | Valore | Fonte + data |`,
-`con: nome completo, borsa e valuta, settore e sotto-settore, capitalizzazione, prezzo attuale, variazione da inizio anno, massimo e minimo a 52 settimane, volume medio, prossima trimestrale attesa.`,
+`BUDGET: 1.100-1.300 parole IN TUTTO. E' un vincolo, non un'indicazione. Un blocco che non ha`,
+`nulla da dire si chiude in una riga: meglio corto e vero che lungo e riempito. Tabelle solo`,
+`dove servono a confrontare; niente tabella per elencare tre numeri.`,
 ``,
-`2) DOVE OPERA E CONTRO CHI — una tabella dei concorrenti diretti:`,
-`| Concorrente | Ticker | Cap. mercato | Quota di mercato stimata | Cosa fa meglio / peggio di ${tk} |`,
-`Scrivi da dove viene la quota di mercato e a quale anno si riferisce. Se una quota non e' pubblica, dillo e usa un proxy dichiarato (ricavi del segmento sul totale del mercato indirizzabile). Chiudi con una riga su come il settore sta crescendo e chi sta guadagnando terreno.`,
+`0) IL GIUDIZIO — cinque righe, prima di tutto il resto.`,
+`Cosa sta facendo ${tk}, a quale prezzo diventa interessante, cosa lo romperebbe. Nessuna`,
+`tabella, nessuna premessa. Tutto quello che viene dopo serve a sostenere queste cinque righe.`,
 ``,
-`3) ULTIMA TRIMESTRALE — una scheda:`,
-`| Voce | Dato | Attesa consenso | Sorpresa | Trimestre precedente |`,
-`con ricavi, utile per azione, margine lordo e operativo, flusso di cassa, e le voci specifiche del business (per un semiconduttore i segmenti; per un software i ricavi ricorrenti; per un industriale il portafoglio ordini). Poi in prosa: cosa ha detto il management sulla guidance, cosa ha sorpreso, e come ha reagito il titolo nei giorni successivi.`,
+`1) QUADRO MACRO — massimo 8 righe, SOLO dai dati in coda a questo messaggio.`,
+`Non cercare online il quadro macro e non riassumere tutte le serie: prendi le DUE O TRE`,
+`grandezze che contano per ${tk} e di' attraverso quale canale arrivano al suo conto economico`,
+`— quale tasso, quale costo, quale domanda finale. Guarda anche dove gli indicatori NON sono`,
+`d'accordo fra loro e di' da quale lato di quel disaccordo sta questo titolo.`,
+`⚠ Il quadro macro in coda e' rilevato dal sistema il ${rilevazione}; il prossimo run del sistema`,
+`e' atteso il ${prossimoRun}. Ogni serie porta la propria data di rilevazione e il proprio prossimo`,
+`aggiornamento: un dato di due mesi non e' lo stato di oggi, e se lo usi dichiari quanto e' vecchio.`,
 ``,
-`4) TECNICA — dove sta il prezzo, dove sono i livelli:`,
-`| Livello | Prezzo | Perche' e' li' (volume, massimo precedente, media mobile) |`,
-`Supporti e resistenze VERI (zone dove ha scambiato volume, non numeri tondi), medie mobili 50/125/200, RSI, ATR, e la struttura: trend integro, laterale, o rotto. Dimmi cosa dovrebbe succedere perche' quel quadro cambi.`,
+`2) L'AZIENDA E CONTRO CHI GIOCA — cosa vende e a chi, poi una tabella dei concorrenti diretti:`,
+`| Concorrente | Ticker | Cap. mercato | Quota di mercato | Anno e fonte della quota | Dove batte ${tk} |`,
+`Se una quota non e' pubblica dillo e usa un proxy dichiarato (ricavi di segmento, unita'`,
+`spedite). Una quota senza anno non vale: i mercati si ribaltano in quattro trimestri.`,
 ``,
-`5) IL PONTE COL MACRO — la parte che nessun altro puo' scrivere al posto tuo:`,
-`Il quadro macro in coda e' rilevato dal sistema il ${rilevazione}, e ogni serie porta la propria data e il prossimo aggiornamento atteso. Il prossimo run del sistema e' previsto per il ${prossimoRun}.`,
-`Prendi le due o tre grandezze macro che contano davvero per ${tk} e dimmi ATTRAVERSO QUALE CANALE arrivano al suo conto economico: un tasso che muove il costo del debito o il multiplo, un cambio che muove i ricavi esteri, uno spread di credito che muove il rifinanziamento, un ciclo settoriale che muove i volumi, un prezzo di input che muove il margine lordo. Quantifica dove puoi ("un punto di dollaro forte vale circa X sui ricavi, perche' il Y% e' fuori dagli USA").`,
-`Poi guarda il blocco "DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO": dimmi da quale lato di quel disaccordo sta ${tk}.`,
+`3) TRIMESTRALI — l'ultima come contesto, la PROSSIMA come evento.`,
+`Dell'ultima: ricavi, utile per azione, margine lordo e operativo, e la voce che conta per il`,
+`suo business, ciascuno col confronto sul consenso. Della PROSSIMA: la data (confermata dalla`,
+`societa' o dichiarata stimata), cosa attende il consenso su ricavi ed EPS, quale numero`,
+`specifico deciderebbe la reazione, e cosa ha fatto il titolo dopo le ultime due uscite.`,
 ``,
-`6) SENTIMENT E POSIZIONAMENTO:`,
-`consenso degli analisti (quanti compra/mantieni/vendi, target medio e distanza dal prezzo), revisioni delle stime negli ultimi 90 giorni (in salita o in discesa), interesse short sul flottante, operazioni degli insider, e il tono delle notizie recenti. Distingui cio' che il prezzo ha gia' incorporato da cio' che non ha ancora visto.`,
+`4) I CONTI — bilancio, conto economico, generazione di cassa.`,
+`Debito netto e sua scadenza, liquidita', margini e loro direzione negli ultimi quattro`,
+`trimestri, flusso di cassa operativo e libero, diluizione da compensi in azioni. La domanda a`,
+`cui rispondere e' una: questa societa' finanzia la propria crescita o la prende a prestito?`,
 ``,
-`7) ENTRARE O USCIRE, E A CHE PREZZO — la conclusione operativa:`,
-`Non un voto: un ragionamento con dei numeri sopra. Dimmi a quale prezzo il rischio-rendimento diventa favorevole e perche' proprio li' (quale supporto, quale multiplo, quale evento), a quale prezzo la tesi e' smentita, e quale evento nei prossimi 90 giorni deciderebbe la questione. Se pensi che oggi non ci sia niente da fare, dillo: e' una conclusione anche quella.`,
+`5) TECNICA — i livelli, non le sensazioni.`,
+`Supporti e resistenze, medie semplici ed ESPONENZIALI, ritracciamenti di FIBONACCI, RSI, ATR`,
+`e i muri delle opzioni. ⚠ Molti di questi numeri sono gia' calcolati nel blocco "QUELLO CHE IL`,
+`SISTEMA SA GIA'" qui sotto, con il metodo dichiarato: usa QUELLI. Se ne trovi altri online che`,
+`non tornano, scrivi entrambi e di' quale usi e perche' — non sostituirli in silenzio.`,
+``,
+`6) SENTIMENT DEGLI ANALISTI — consenso (quanti compra/mantieni/vendi), target medio e distanza`,
+`dal prezzo, revisioni delle stime negli ultimi 90 giorni e direzione, posizionamento (short`,
+`interest, flussi). Le revisioni contano piu' del target: il target e' vecchio quanto l'ultimo`,
+`aggiornamento, la revisione dice cosa sta cambiando adesso.`,
+``,
+`7) LA CHIUSURA — ingressi e settore, su tre orizzonti.`,
+`Prima il SETTORE: come sta messo il comparto di ${tk} e se questo titolo e' il migliore o il`,
+`peggiore posto in cui esprimere quella scommessa. Poi gli INGRESSI, distinti per orizzonte:`,
+`· BREVE (settimane): a quale prezzo il rischio-rendimento gira, e quale livello lo invalida.`,
+`· MEDIO (3-12 mesi): quale trimestrale o quale dato macro decide la direzione.`,
+`· LUNGO (oltre l'anno): la tesi vale ancora se il ciclo del settore gira? Cosa la romperebbe?`,
+`Non un voto: un ragionamento con numeri sopra, e per ciascun orizzonte cosa ti smentirebbe.`,
 ``,
 `══ REGOLE ══`,
-`· Italiano, prosa densa, tabelle dove sono utili. Non riassumere il quadro macro: usalo.`,
+`· Sei un analista di Wall Street: scrivi come per un comitato di investimento, non per un blog.`,
+`  Italiano, prosa densa, zero frasi di cortesia, zero cappelli introduttivi, zero riassunti di`,
+`  cio' che hai gia' detto. Se una frase non porta un fatto o un giudizio, va tolta.`,
 `· Ogni dato esterno va [VERIFICATO] con fonte e data. Chiudi con "FONTI" — una riga per URL.`,
 `· Se due fonti danno numeri diversi sulla stessa grandezza, dillo e scegli motivando.`,
-`· Non conosco la tua posizione su ${tk} e tu non la chiedi: niente dimensionamenti, niente "quante quote", niente stop calcolati su un capitale che non ti ho detto. I livelli sono livelli del titolo, non ordini per me.`,
-`· Ignora prezzi e conclusioni di conversazioni precedenti: conta questo pacchetto e cio' che trovi ADESSO in rete.`,
+`· Non conosco la tua posizione su ${tk} e tu non la chiedi: niente dimensionamenti, niente`,
+`  "quante quote", niente stop in euro. I prezzi si', le quantita' no.`,
+`· Ignora prezzi e conclusioni di conversazioni precedenti: conta questo pacchetto e cio' che`,
+`  trovi ADESSO in rete.`,
+`· Niente domande in chiusura e niente offerte di approfondimento: quello che serve, dillo qui.`,
 ``,
 `──────────────────────────────────────────────────────────────────`,
 `QUADRO MACRO DI RIFERIMENTO (rilevato dal sistema, non da te)`,
@@ -7713,6 +7768,51 @@ function datiNostriDelTitolo(tk) {
   }
   /* i livelli arrivano gia' ordinati, col lato misurato e la provenienza dichiarata. */
   f.livelli.forEach(x => L.push(`- ${x.nome}: ${x.v}${dist(x.v)} — ${x.fonte}`));
+
+  /* ═══ v293 — FIBONACCI ED EMA LI CALCOLIAMO NOI ═════════════════════════════════════════
+     Richiesta del CEO: fra i dati tecnici vuole "supporti e resistenze, SMA, EMA, Fibonacci".
+     ⚠ E vanno calcolati QUI, non fatti cercare: e' testualmente la lezione v271 — il sistema
+     aveva i livelli e ne faceva cercare altri, l'LLM tornava con numeri diversi, e il CEO si
+     ritrovava la pagina che dice una cosa e l'analisi che ne dice un'altra sullo stesso titolo
+     senza sapere a quale credere. Un sistema che tiene un numero e ne fa cercare un altro sta
+     preparando quella contraddizione.
+     ⚠⚠ E SI CALCOLA SOLO CIO' CHE I DATI PERMETTONO. Misurato sulle serie vere: `sparks.m6` sono
+     126 barre GIORNALIERE (le ultime cinque coincidono con `w1`), mentre `sparks.all` — 500
+     punti che su AMD vanno da 17,56 a 514,39 — e' lo storico lungo, non giornaliero. Quindi EMA
+     20 e 50 si possono fare; l'EMA 200 NO: servirebbero 200 barre giornaliere e ne abbiamo 126.
+     Pubblicarla lo stesso sarebbe un numero che sembra piu' solido di quanto e'. */
+  const tec = f.tecnici || {};
+  const barre = Array.isArray(tec.barreGiorno) ? tec.barreGiorno : [];
+  const ema = (serie, n) => {
+    /* servono almeno 2n barre perche' il valore si sia staccato dal seme: sotto, l'EMA e'
+       ancora dominata dalla media semplice iniziale e non e' cio' che dichiara di essere. */
+    if (!Array.isArray(serie) || serie.length < 2 * n) return null;
+    const kk = 2 / (n + 1);
+    let e = serie.slice(0, n).reduce((s, v) => s + v, 0) / n;
+    for (let i = n; i < serie.length; i++) e = serie[i] * kk + e * (1 - kk);
+    return Math.round(e * 100) / 100;
+  };
+  const e20 = ema(barre, 20), e50 = ema(barre, 50);
+  if (e20 != null || e50 != null) {
+    const pezzi = [];
+    if (e20 != null) pezzi.push(`EMA 20 ${e20}${dist(e20)}`);
+    if (e50 != null) pezzi.push(`EMA 50 ${e50}${dist(e50)}`);
+    L.push(`- Medie esponenziali: ${pezzi.join(" · ")} — calcolate dal sistema su ${barre.length} `
+      + `barre giornaliere di chiusura. EMA 200 NON calcolata: servirebbero 200 barre giornaliere `
+      + `e ce ne sono ${barre.length}; per il lungo periodo c'e' la distanza dalla SMA 200 qui sopra.`);
+  }
+  /* ⚠ Fibonacci sul range a 52 settimane: aritmetica esatta su due numeri che abbiamo gia', non
+     una stima. I livelli si contano DAL MASSIMO verso il basso (ritracciamento di una salita) ed
+     e' scritto, perche' la stessa serie letta al contrario significa un'altra cosa. */
+  if (Number.isFinite(tec.w52hi) && Number.isFinite(tec.w52lo) && tec.w52hi > tec.w52lo) {
+    const R = tec.w52hi - tec.w52lo;
+    const liv = [0.236, 0.382, 0.5, 0.618, 0.786]
+      .map(q => ({ q, v: Math.round((tec.w52hi - q * R) * 100) / 100 }));
+    L.push(`- Ritracciamenti di Fibonacci sul range a 52 settimane (massimo ${tec.w52hi}, minimo ${tec.w52lo}): `
+      + liv.map(x => `${Math.round(x.q * 1000) / 10}% a ${x.v}${dist(x.v)}`).join(" · ")
+      + ` — calcolo esatto sui due estremi, contati DAL MASSIMO verso il basso. Non sono previsioni: `
+      + `sono le quote che quella convenzione indica.`);
+  }
   if (f.opzioni && f.opzioni.ratio != null) {
     L.push(`- Rapporto put/call di ${T} sulla scadenza ${f.opzioni.scadenza}: `
       + `${Math.round(f.opzioni.ratio * 100) / 100} (volumi scambiati oggi: put ${f.opzioni.put}, call ${f.opzioni.call})`

@@ -1047,11 +1047,21 @@ check("v257 analisi titolo: dice DOVE cercare, con fonti nominate e il ticker ne
   return /DOVE CERCARE/.test(t) && /finance\\.yahoo\\.com\\/quote\\/NVDA/.test(t)
       && /stockanalysis\\.com/.test(t) && /sec\\.gov/.test(t)`));
 
-check("v257 analisi titolo: chiede le sei consegne che il CEO ha elencato", suVeri(`
+/* ⚠⚠ v293 — RIAGGANCIATO AL FATTO, NON AL TITOLO DELLA SEZIONE. Cercava "SCHEDA DI
+   IDENTITA'", "ULTIMA TRIMESTRALE", "ENTRARE O USCIRE": stringhe letterali, rotte appena il
+   CEO ha chiesto una struttura diversa pur essendoci ancora tutto il contenuto. E' la SESTA
+   volta in questo progetto che un check ancorato a una parola si rompe su una riformulazione
+   senza che manchi nulla. Ora verifica che il pacchetto CHIEDA quelle cose, comunque siano
+   intitolate.
+   ⚠ La scheda di identita' non c'e' piu' ed e' voluto: il CEO ha chiesto meno lunghezza, e
+   nome/borsa/capitalizzazione stanno su qualunque pagina di quotazione — mentre prezzo, range
+   a 52 settimane e settore il pacchetto li porta gia' come FATTI nel blocco del sistema. */
+check("v257 analisi titolo: chiede le consegne che il CEO ha elencato", suVeri(`
   const t = buildPromptTicker("NVDA");
-  return /SCHEDA DI IDENTITA/.test(t) && /Concorrente/.test(t) && /[Qq]uota di mercato/.test(t)
-      && /ULTIMA TRIMESTRALE/.test(t) && /Supporti e resistenze/.test(t)
-      && /SENTIMENT/.test(t) && /ENTRARE O USCIRE/.test(t)`));
+  return /Concorrente/.test(t) && /[Qq]uota di mercato/.test(t)
+      && /[Tt]rimestral/.test(t) && /PROSSIMA/.test(t)
+      && /Supporti e resistenze/.test(t) && /SENTIMENT/.test(t)
+      && /[Ii]ngressi/.test(t) && /rischio-rendimento/.test(t)`));
 
 check("v257 analisi titolo: dichiara data del dato macro e prossimo aggiornamento", suVeri(`
   const t = buildPromptTicker("NVDA");
@@ -2045,6 +2055,57 @@ check("v292 macro: la serie osservata batte la scala convenzionale", (() => {
   const posForma = corpo.indexOf("const forma =");
   return posSerie > -1 && posForma > posSerie;
 })());
+
+/* ══ v293 — LA CONSEGNA CHIESTA DAL CEO, E IL SUO TETTO ══════════════════════════════════
+   "mi fornisce un quadro troppo lungo": la vecchia consegna aveva sette blocchi con tabelle e
+   prosa e NESSUN tetto — tremila parole per costruzione. Un budget scritto e' l'unica
+   istruzione sulla lunghezza che un LLM rispetti davvero. */
+check("v293 consegna: il pacchetto titolo porta un tetto di lunghezza", suVeri(`
+  const p = buildPromptTicker("AMD");
+  return /BUDGET: [\\d.\\-]+ parole IN TUTTO/.test(p) && /vincolo, non un'indicazione/.test(p)`));
+
+/* ⚠ gli otto blocchi che il CEO ha elencato, nel suo ordine. Se un domani qualcuno ne toglie
+   uno "per accorciare", qui si accende: la lunghezza si taglia col budget, non con i blocchi. */
+check("v293 consegna: gli otto blocchi richiesti ci sono tutti e in ordine", suVeri(`
+  const p = buildPromptTicker("AMD");
+  const ordine = ["0) IL GIUDIZIO", "1) QUADRO MACRO", "2) L'AZIENDA", "3) TRIMESTRALI",
+                  "4) I CONTI", "5) TECNICA", "6) SENTIMENT DEGLI ANALISTI", "7) LA CHIUSURA"];
+  let pos = -1;
+  for (const b of ordine) { const i = p.indexOf(b); if (i < 0 || i < pos) return false; pos = i; }
+  return /BREVE \\(settimane\\)/.test(p) && /MEDIO \\(3-12/.test(p) && /LUNGO \\(oltre/.test(p)
+      && /analista di Wall Street/.test(p)`));
+
+/* ══ v293 — EMA E FIBONACCI LI CALCOLIAMO NOI ════════════════════════════════════════════
+   Lezione v271: il sistema aveva i livelli e ne faceva cercare altri, l'LLM tornava con numeri
+   diversi e il CEO si ritrovava pagina e analisi in disaccordo sullo stesso titolo. */
+check("v293 tecnica: EMA e Fibonacci sono nel pacchetto, calcolati dal sistema", suVeri(`
+  const p = buildPromptTicker("AMD");
+  return /Medie esponenziali: EMA 20 [\\d.]+/.test(p)
+      && /calcolate dal sistema su \\d+ barre giornaliere/.test(p)
+      && /Ritracciamenti di Fibonacci sul range a 52 settimane/.test(p)
+      && /calcolo esatto sui due estremi/.test(p)`));
+
+/* ⚠⚠ E SI PUBBLICA SOLO CIO' CHE I DATI PERMETTONO. `sparks.m6` sono 126 barre giornaliere:
+   l'EMA 200 ne vorrebbe 200. Pubblicarla lo stesso sarebbe un numero che sembra piu' solido di
+   quanto e' — la classe di difetto peggiore di questo progetto. Il pacchetto deve DICHIARARE
+   perche' manca, non ometterla in silenzio. */
+check("v293 tecnica: l'EMA 200 non si pubblica, e si dice perche'", suVeri(`
+  const p = buildPromptTicker("AMD");
+  if (!/Medie esponenziali/.test(p)) return true;
+  return /EMA 200 NON calcolata/.test(p) && /servirebbero 200 barre giornaliere/.test(p)
+      && !/EMA 200 [\\d]/.test(p)`));
+
+/* ⚠ Fibonacci e' aritmetica esatta, non una stima: il livello 50% dev'essere esattamente il
+   punto medio fra massimo e minimo a 52 settimane. Se un domani qualcuno "arrotonda" o cambia
+   il verso del conteggio, il numero smette di essere quello che la convenzione indica. */
+check("v293 tecnica: i livelli di Fibonacci tornano col range dichiarato", suVeri(`
+  const p = buildPromptTicker("AMD");
+  const m = p.match(/Fibonacci sul range a 52 settimane \\(massimo ([\\d.]+), minimo ([\\d.]+)\\): ([^\\n]+)/);
+  if (!m) return true;
+  const hi = parseFloat(m[1]), lo = parseFloat(m[2]);
+  const meta = m[3].match(/50% a ([\\d.]+)/);
+  if (!meta) return false;
+  return Math.abs(parseFloat(meta[1]) - (hi - 0.5 * (hi - lo))) < 0.02`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
