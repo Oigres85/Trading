@@ -2236,14 +2236,33 @@ check("v299 pacchetto titolo: elenca cosa non ha e obbliga a dichiarare i buchi"
       && p.includes("NON VERIFICATO:")
       && p.includes("Un numero plausibile inventato e' peggio di un buco dichiarato")`));
 
-/* ══ v299 — «OGGI» ══════════════════════════════════════════════════════════════════════
-   ⚠⚠ "PIU' DEL SUO SOLITO" DEV'ESSERE UNA MISURA, NON UNA SOGLIA. Lo scarto si divide per la
-   deviazione tipica di QUELLA serie: una soglia fissa non sa se cinque punti siano tanti per
-   quell'indicatore, ed e' il registro che invecchia da solo (C10) piu' la lezione v230. */
-check("v299 oggi: il movimento notevole e' misurato in deviazioni, non con una soglia fissa", (() => {
+/* ⚠⚠ v300 — L'INVARIANTE SI RAFFORZA, DOPO CHE LA REVISIONE HA TROVATO UN MIO ERRORE. La
+   prima stesura misurava il movimento sui PUNTEGGI 0-100 di `metrics_history.macro_scores`:
+   cioe' esattamente i numeri che v200 ha tolto dal pacchetto dopo aver misurato un hit-rate
+   del 29%. Avevo costruito il rilevatore sui numeri che questo progetto ha deciso di non
+   credere, e parlava il 7% dei giorni (3 su 42 misurati sullo storico vero).
+   Ora misura sui VALORI PUBBLICATI degli indicatori, e non c'e' nessuna soglia: si ordina per
+   scarto normalizzato e si mostra quante volte il tipico vale ciascuno, perche' scegliere una
+   soglia sarebbe decidere io cosa merita attenzione. */
+check("v300 oggi: il movimento si misura sui valori pubblicati, non sui punteggi", (() => {
+  const nl = String.fromCharCode(10);
   const i = src.indexOf("function scartiNotevoli");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  return corpo.includes("Math.sqrt") && corpo.includes("sigma >= 2") && corpo.includes("sd < 0.4");
+  /* ⚠ SENZA COMMENTI: la nota che spiega l'errore corretto cita per forza `macro_scores`, e il
+     gate trovava se stesso — quinta volta in questo progetto (v213, v226, v238, v240). */
+  const corpo = src.slice(i, src.indexOf(nl + "function ", i + 10))
+    .replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  return corpo.includes("DATA.macro.indicators")
+      && corpo.includes("Math.sqrt")
+      && !corpo.includes("macro_scores")          // il difetto che questa riscrittura chiude
+      && !corpo.includes(">= 2");                 // nessuna soglia inventata: si ordina e si dichiara
+})());
+
+/* ⚠ e l'unita' di misura vive in UN SOLO POSTO: "+31,1%" su Philly Fed, che e' un indice, era
+   un'unita' sbagliata su un numero giusto — il modo piu' rapido di far diffidare di un
+   pannello corretto. Due copie della stessa tabella divergono (lezione v161/v207). */
+check("v300 oggi: le unita' degli indicatori stanno in una tabella sola", (() => {
+  const occorrenze = (src.match(/nfp: "K", curve: " pp"/g) || []).length;
+  return occorrenze === 1 && src.includes("const unitaDi =") && src.includes("unitaDi(m.key)");
 })());
 
 /* ⚠ e i percentili si calcolano sullo storico VERO dell'indicatore, non su una scala 0-100

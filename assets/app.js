@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "299";
+const BUILD_VERSION = "300";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2476,26 +2476,48 @@ function renderTassi() {
    3 pp. Se la storia non basta a stimare la deviazione, la riga TACE invece di inventarla.
    ⚠ E i percentili si calcolano sullo storico VERO dell'indicatore, non su una scala 0-100
    costruita da me: quelle sono state tolte dal pacchetto in v200 e non tornano dalla finestra. */
+/* ⚠ v300 — l'unita' di misura di ogni indicatore vive in UN SOLO POSTO. Prima era scritta
+   dentro `serieIndicatore`; ora la usano anche gli scarti di «Oggi», e due copie della stessa
+   tabella divergono appena qualcuno ne aggiorna una (lezione v161/v207, gia' pagata due volte).
+   ⚠ Il default e' "%" perche' la maggior parte sono percentuali, ma indici come Philly Fed e
+   UMich NON lo sono: "+31,1%" su un indice e' un'unita' sbagliata su un numero giusto, ed e' il
+   modo piu' rapido di far diffidare di un pannello corretto. */
+const UNITA_INDICATORE = { nfp: "K", curve: " pp", curve3m: " pp", umich: "", philly: "" };
+const unitaDi = (k) => (k in UNITA_INDICATORE) ? UNITA_INDICATORE[k] : "%";
+
 function scartiNotevoli(quanti = 3) {
-  const st = (DATA && DATA.metrics_history) || [];
-  if (st.length < 8) return [];                 // troppo poca storia per una deviazione onesta
-  const ieri = st[st.length - 2], oggi = st[st.length - 1];
-  if (!ieri || !oggi) return [];
-  const chiavi = Object.keys(oggi.macro_scores || {});
+  /* ⚠⚠ v300 — RISCRITTA. La prima stesura (v299) misurava il movimento sui PUNTEGGI 0-100 di
+     `metrics_history.macro_scores`: cioe' proprio i numeri che v200 ha tolto dal pacchetto dopo
+     aver misurato un hit-rate del 29%. Avevo costruito il rilevatore sui numeri che questo
+     progetto ha deciso di non credere — e parlava il 7% dei giorni (3 su 42 misurati).
+     Ora misura sui VALORI PUBBLICATI: l'ultimo scarto di ciascuna serie diviso per la
+     deviazione tipica dei suoi scarti. Sul dato vero il segnale c'e': PCE -0,41 = 1,4 volte il
+     suo movimento tipico, UMich +5,7 = 1,4 volte.
+     ⚠ NESSUNA SOGLIA. Si ordina per scarto normalizzato e si mostrano i primi, dichiarando
+     quante volte il tipico ciascuno vale: una soglia ("segnala sopra 2") sarebbe una mia
+     decisione su cosa merita attenzione, ed e' il genere di giudizio che questo sistema non da'
+     (v200: "ordinare e' gia' un giudizio" — qui si ordina per un FATTO misurato, e si scrive
+     qual e', cosi' chi legge puo' non essere d'accordo).
+     ⚠⚠ E NON E' "RISPETTO A IERI": una serie mensile non si muove ogni giorno. E' rispetto
+     all'ULTIMA RILEVAZIONE PRECEDENTE, e la data si scrive — altrimenti "il PCE si e' mosso"
+     letto di martedi' fa pensare che sia uscito lunedi'. */
+  const ind = ((DATA && DATA.macro && DATA.macro.indicators) || []);
   const out = [];
-  for (const k of chiavi) {
-    const serie = st.map(x => (x.macro_scores || {})[k]).filter(v => typeof v === "number");
-    if (serie.length < 8) continue;
+  for (const i of ind) {
+    const st = (i.storico || []).filter(p => p && typeof p.v === "number");
+    if (st.length < 12) continue;                 // troppo poca storia per una deviazione onesta
     const d = [];
-    for (let i = 1; i < serie.length; i++) d.push(serie[i] - serie[i - 1]);
+    for (let k = 1; k < st.length; k++) d.push(st[k].v - st[k - 1].v);
     const media = d.reduce((a, b) => a + b, 0) / d.length;
     const sd = Math.sqrt(d.reduce((a, b) => a + (b - media) ** 2, 0) / d.length);
-    const scarto = (oggi.macro_scores[k] ?? null) - (ieri.macro_scores[k] ?? null);
-    if (!Number.isFinite(scarto) || !Number.isFinite(sd) || sd < 0.4) continue;
-    const sigma = Math.abs(scarto - media) / sd;
-    if (sigma >= 2) out.push({ k, scarto: Math.round(scarto * 10) / 10, sigma: Math.round(sigma * 10) / 10 });
+    if (!Number.isFinite(sd) || sd === 0) continue;
+    const ultimo = d[d.length - 1];
+    out.push({ key: i.key, label: i.label, value: i.value,
+               scarto: Math.round(ultimo * 100) / 100,
+               volte: Math.round(Math.abs(ultimo - media) / sd * 10) / 10,
+               quando: st[st.length - 1].d });
   }
-  return out.sort((a, b) => b.sigma - a.sigma).slice(0, quanti);
+  return out.sort((a, b) => b.volte - a.volte).slice(0, quanti);
 }
 
 function estremiAnnuali(quanti = 3) {
@@ -2515,9 +2537,6 @@ function estremiAnnuali(quanti = 3) {
 function renderOggi() {
   const box = $("#oggi-righe");
   if (!box) return;
-  const nomi = (typeof MACRO_INFO === "object" && MACRO_INFO) || {};
-  const nome = (k) => (nomi["in:" + k] && nomi["in:" + k][0]) || (nomi[k] && nomi[k][0]) || k;
-
   const mossi = scartiNotevoli(3);
   /* ⚠ la STESSA finestra della sezione dedicata: due numeri diversi in due punti della
      pagina si contraddicono a vista (lezione v290, li' fra pagina e pacchetto). */
@@ -2527,9 +2546,10 @@ function renderOggi() {
   const righe = [];
   righe.push(mossi.length
     ? `<div class="oggi-riga"><span class="oggi-et">SI È MOSSO</span>`
-      + mossi.map(m => `<b>${esc(nome(m.k))}</b> ${signTxt(m.scarto)} <span class="muted">(${m.sigma}× il suo movimento tipico)</span>`).join(" · ")
+      + mossi.map(m => `<b>${esc(m.label)}</b> ${signTxt(m.scarto, unitaDi(m.key))} `
+          + `<span class="muted">(${fmtNum.format(m.volte)}× il suo tipico · rilevazione ${esc(m.quando)})</span>`).join(" · ")
       + `</div>`
-    : `<div class="oggi-riga"><span class="oggi-et">SI È MOSSO</span><span class="muted">niente oltre il movimento tipico di ciascuno rispetto a ieri</span></div>`);
+    : `<div class="oggi-riga"><span class="oggi-et">SI È MOSSO</span><span class="muted">nessuna serie ha abbastanza storia per misurare un movimento</span></div>`);
 
   righe.push(eventi.length
     ? `<div class="oggi-riga"><span class="oggi-et">IN USCITA</span>`
@@ -2547,8 +2567,8 @@ function renderOggi() {
   box.innerHTML = righe.join("");
   const nota = $("#oggi-nota");
   if (nota) {
-    nota.innerHTML = `<b>Come si legge.</b> "Si è mosso" confronta il valore di ieri con quello di oggi e lo divide per `
-      + `la deviazione tipica di QUELLA serie: due volte il suo movimento normale, non una soglia uguale per tutti. `
+    nota.innerHTML = `<b>Come si legge.</b> "Si è mosso" prende l'ultimo scarto pubblicato di ogni serie e lo divide per `
+      + `la deviazione tipica dei suoi scarti: "1,4× il suo tipico" vuol dire che quel movimento è più ampio del solito PER QUELLA serie. `+ `Non c'è una soglia: sono i primi tre in ordine, col loro numero accanto, così può non essere d'accordo. `+ `Una serie mensile non si muove ogni giorno: la data accanto dice QUANDO è uscito quel dato. `
       + `"Agli estremi" è il percentile sullo storico vero dell'indicatore. Le date in uscita sono <b>stime</b> `
       + `(v. sezione dedicata). Se una riga tace, tace perché non c'è niente da dire: non è un errore.`;
   }
@@ -4231,7 +4251,7 @@ function serieIndicatore(k) {
         const ind = ((m.indicators) || []).find(x => x && x.key === chiave);
         const st = (ind && ind.storico) || [];
         if (st.length > 2) {
-          const UNITA = { nfp: "K", curve: " pp", curve3m: " pp", umich: "", philly: "" };
+          const UNITA = UNITA_INDICATORE;
           /* ⚠ lo zero si segna SOLO dove e' un confine vero: curva invertita, occupazione che
              cala, vendite o PIL che si contraggono. Altrove sarebbe una soglia inventata, e
              questo progetto ne ha gia' tolte una volta (v240). */
