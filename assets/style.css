@@ -2097,3 +2097,12 @@ svg.g-serie { cursor: crosshair; }
 .tassi-dieci { display: flex; flex-direction: column; gap: 2px; margin: 4px 0 2px; }
 .tassi-dieci b { font-size: 26px; font-variant-numeric: tabular-nums; line-height: 1.1; }
 .tassi-dieci span { font-size: 11.5px; }
+
+/* v299 — «Oggi»: tre righe, un'etichetta a sinistra e i fatti a destra. Deve leggersi in
+   cinque secondi: se serve più tempo, questa sezione ha fallito il suo scopo. */
+.oggi-riga { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline;
+  padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; line-height: 1.45; }
+.oggi-riga:last-child { border-bottom: 0; }
+.oggi-et { flex: 0 0 92px; font-size: 10.5px; letter-spacing: .04em; color: var(--muted);
+  font-weight: 600; padding-top: 2px; }
+@media (max-width: 560px) { .oggi-et { flex-basis: 100%; } }

@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "298";
+const BUILD_VERSION = "299";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -791,6 +791,7 @@ function renderAll() {
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
   renderTassi();                // v289 — curva dei tassi, osservazioni FRED
+  renderOggi();                 // v299 — cosa si è mosso, cosa esce, cosa è a un estremo
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
@@ -2457,6 +2458,99 @@ function renderTassi() {
             + `quando si assottiglia smettono di prestare, e quello è il canale per cui una curva piatta arriva all'economia reale, `
             + `non una profezia statistica.</div>`
           : "");
+  }
+}
+
+/* ═══ v299 — «OGGI»: LA PRIMA COSA CHE SI GUARDA LA MATTINA ═══════════════════════════════
+   Dalla revisione a cinque teste: la pagina diceva benissimo COM'E' il mondo e non diceva
+   COSA SI E' MOSSO. Nove sezioni tutte dello stesso peso non dicono da dove cominciare, e
+   leggerle tutte ogni giorno e' un lavoro che nessuno fa davvero.
+   Tre domande, in tre righe, sopra tutto il resto:
+     1. cosa si e' mosso piu' del suo solito rispetto a ieri
+     2. cosa esce nei prossimi sette giorni
+     3. cosa e' a un estremo del proprio anno
+   ⚠⚠ "PIU' DEL SUO SOLITO" E' UNA MISURA, NON UNA SOGLIA INVENTATA: lo scarto di oggi viene
+   diviso per la deviazione standard degli scarti giornalieri di QUELLA serie. Una soglia fissa
+   ("segnala sopra 5 punti") non sa se cinque punti siano tanti per quell'indicatore — ed e' il
+   registro fisso che invecchia da solo (C10, red team I6), piu' la lezione v230 sulle soglie a
+   3 pp. Se la storia non basta a stimare la deviazione, la riga TACE invece di inventarla.
+   ⚠ E i percentili si calcolano sullo storico VERO dell'indicatore, non su una scala 0-100
+   costruita da me: quelle sono state tolte dal pacchetto in v200 e non tornano dalla finestra. */
+function scartiNotevoli(quanti = 3) {
+  const st = (DATA && DATA.metrics_history) || [];
+  if (st.length < 8) return [];                 // troppo poca storia per una deviazione onesta
+  const ieri = st[st.length - 2], oggi = st[st.length - 1];
+  if (!ieri || !oggi) return [];
+  const chiavi = Object.keys(oggi.macro_scores || {});
+  const out = [];
+  for (const k of chiavi) {
+    const serie = st.map(x => (x.macro_scores || {})[k]).filter(v => typeof v === "number");
+    if (serie.length < 8) continue;
+    const d = [];
+    for (let i = 1; i < serie.length; i++) d.push(serie[i] - serie[i - 1]);
+    const media = d.reduce((a, b) => a + b, 0) / d.length;
+    const sd = Math.sqrt(d.reduce((a, b) => a + (b - media) ** 2, 0) / d.length);
+    const scarto = (oggi.macro_scores[k] ?? null) - (ieri.macro_scores[k] ?? null);
+    if (!Number.isFinite(scarto) || !Number.isFinite(sd) || sd < 0.4) continue;
+    const sigma = Math.abs(scarto - media) / sd;
+    if (sigma >= 2) out.push({ k, scarto: Math.round(scarto * 10) / 10, sigma: Math.round(sigma * 10) / 10 });
+  }
+  return out.sort((a, b) => b.sigma - a.sigma).slice(0, quanti);
+}
+
+function estremiAnnuali(quanti = 3) {
+  const ind = ((DATA && DATA.macro && DATA.macro.indicators) || []);
+  const out = [];
+  for (const i of ind) {
+    const st = (i.storico || []).map(p => p && p.v).filter(v => typeof v === "number");
+    if (st.length < 24) continue;               // meno di due anni di mensili: percentile fragile
+    const v = st[st.length - 1];
+    const sotto = st.filter(x => x < v).length;
+    const pct = Math.round(sotto / st.length * 100);
+    if (pct >= 90 || pct <= 10) out.push({ label: i.label, value: i.value, pct, n: st.length });
+  }
+  return out.sort((a, b) => Math.abs(b.pct - 50) - Math.abs(a.pct - 50)).slice(0, quanti);
+}
+
+function renderOggi() {
+  const box = $("#oggi-righe");
+  if (!box) return;
+  const nomi = (typeof MACRO_INFO === "object" && MACRO_INFO) || {};
+  const nome = (k) => (nomi["in:" + k] && nomi["in:" + k][0]) || (nomi[k] && nomi[k][0]) || k;
+
+  const mossi = scartiNotevoli(3);
+  /* ⚠ la STESSA finestra della sezione dedicata: due numeri diversi in due punti della
+     pagina si contraddicono a vista (lezione v290, li' fra pagina e pacchetto). */
+  const eventi = (typeof prossimiEventi === "function") ? prossimiEventi(14).eventi : [];
+  const estremi = estremiAnnuali(3);
+
+  const righe = [];
+  righe.push(mossi.length
+    ? `<div class="oggi-riga"><span class="oggi-et">SI È MOSSO</span>`
+      + mossi.map(m => `<b>${esc(nome(m.k))}</b> ${signTxt(m.scarto)} <span class="muted">(${m.sigma}× il suo movimento tipico)</span>`).join(" · ")
+      + `</div>`
+    : `<div class="oggi-riga"><span class="oggi-et">SI È MOSSO</span><span class="muted">niente oltre il movimento tipico di ciascuno rispetto a ieri</span></div>`);
+
+  righe.push(eventi.length
+    ? `<div class="oggi-riga"><span class="oggi-et">IN USCITA</span>`
+      + eventi.slice(0, 4).map(e => `<b>${esc(e.nome)}</b> <span class="muted">${esc(e.giorno)}${e.stimata ? " (stimata)" : ""}</span>`).join(" · ")
+      + (eventi.length > 4 ? ` <span class="muted">e altri ${eventi.length - 4}</span>` : "")
+      + `</div>`
+    : `<div class="oggi-riga"><span class="oggi-et">IN USCITA</span><span class="muted">niente nelle prossime due settimane fra le serie e i titoli seguiti</span></div>`);
+
+  righe.push(estremi.length
+    ? `<div class="oggi-riga"><span class="oggi-et">AGLI ESTREMI</span>`
+      + estremi.map(e => `<b>${esc(e.label)}</b> ${esc(String(e.value))} <span class="muted">(${e.pct}° percentile su ${e.n} rilevazioni)</span>`).join(" · ")
+      + `</div>`
+    : `<div class="oggi-riga"><span class="oggi-et">AGLI ESTREMI</span><span class="muted">nessun indicatore nel primo o ultimo decile del proprio storico</span></div>`);
+
+  box.innerHTML = righe.join("");
+  const nota = $("#oggi-nota");
+  if (nota) {
+    nota.innerHTML = `<b>Come si legge.</b> "Si è mosso" confronta il valore di ieri con quello di oggi e lo divide per `
+      + `la deviazione tipica di QUELLA serie: due volte il suo movimento normale, non una soglia uguale per tutti. `
+      + `"Agli estremi" è il percentile sullo storico vero dell'indicatore. Le date in uscita sono <b>stime</b> `
+      + `(v. sezione dedicata). Se una riga tace, tace perché non c'è niente da dire: non è un errore.`;
   }
 }
 
@@ -6442,6 +6536,21 @@ function buildPrompt() {
      ⚠⚠ SONO TUTTE STIME E OGNI RIGA LO DEVE DIRE, come in pagina: le uscite macro le proietto
      dal ritardo tipico della fonte, le trimestrali le sposta l'emittente. Un appuntamento che
      sembra confermato senza esserlo e' la classe di difetto peggiore di questo progetto. */
+  /* ⚠ v299 — DOVE STA OGGI CIASCUN INDICATORE NEL PROPRIO STORICO. E' informazione NUOVA,
+     non una ripetizione: il payload dava il valore e la data, non se quel valore sia alto o
+     basso PER QUELLA SERIE. "Philly Fed +41,4" non dice niente; "+41,4, 97° percentile su 60
+     rilevazioni" dice che e' un estremo. ⚠ E' un percentile sullo storico VERO, non un
+     punteggio 0-100 costruito da me: quelli sono usciti in v200 e non rientrano. */
+  if (typeof estremiAnnuali === "function") {
+    const est = estremiAnnuali(6);
+    if (est.length) {
+      lines.push(`- AGLI ESTREMI DEL PROPRIO STORICO (percentile calcolato sulle osservazioni pubblicate della serie stessa, `
+        + `non su una scala costruita dal sistema): `
+        + est.map(e => `${e.label} ${e.value} = ${e.pct}° percentile su ${e.n} rilevazioni`).join(" · ")
+        + `. Un valore al 5° o al 95° percentile non e' un giudizio: e' dove sta quel numero nella sua stessa storia.`);
+    }
+  }
+
   if (typeof prossimiEventi === "function") {
     const pv = prossimiEventi(14);   // v290 — la stessa finestra della pagina: a 7 giorni era vuota
     if (pv && pv.eventi && pv.eventi.length) {
@@ -7212,6 +7321,21 @@ function fattiTitolo(tk) {
                          fonte unica dei fatti di un titolo (v274): leggere `sparks` da un altro
                          punto vorrebbe dire due strade per lo stesso dato. */
                       barreGiorno: (riga.sparks && Array.isArray(riga.sparks.m6)) ? riga.sparks.m6 : [],
+                      /* ⚠⚠ v299 — FONDAMENTALI CHE AVEVAMO E FACEVAMO CERCARE. Trovato nella revisione:
+                         il pacchetto diceva all'LLM "cerca online i fondamentali" mentre EPS, beta e
+                         forza relativa erano gia' in data.json. E' il difetto v271 (il sistema tiene un
+                         numero e ne fa cercare un altro) applicato ai conti invece che ai livelli.
+                         ⚠ L'EPS in particolare: v185 lo rimise nel payload perche' col solo P/E non si
+                         distingue una societa' cara da una in perdita — su AMD il pacchetto dava
+                         P/E 123,4x senza il 4,17 che lo spiega.
+                         ⚠ NON entrano `fin_health` e `health`: sono punteggi compositi 0-100, cioe'
+                         giudizi travestiti da dati, ed e' esattamente cio' che v200 ha tolto dal
+                         pacchetto misurando un hit-rate del 29%. I fatti si', i voti no. */
+                      eps: numero(riga.eps), beta: numero(riga.beta),
+                      oggiPct: numero(riga.change_pct), volRel: numero(riga.vol_ratio),
+                      rs1m: numero(riga.rs_1m), rsBench: riga.rs_bench || null,
+                      rsNdx: numero(riga.rs_ndx_1m), sortino: numero(riga.sortino_1y),
+                      rischioRendimento: riga.risk_reward || null,
                       w52hi: numero(riga.w52_high), w52lo: numero(riga.w52_low) } : null,
   };
 }
@@ -7748,6 +7872,30 @@ function datiNostriDelTitolo(tk) {
       + ` — calcolo esatto sui due estremi, contati DAL MASSIMO verso il basso. Non sono previsioni: `
       + `sono le quote che quella convenzione indica.`);
   }
+  /* ═══ v299 — I CONTI E IL RISCHIO, DA QUI E NON DALLA RETE ═════════════════════════════
+     Ogni riga porta l'unita' e cosa significa: un LLM che riceve "beta 2,49" senza sapere
+     contro quale indice non puo' usarlo, e uno che riceve "rs 1m -1,9" senza il benchmark
+     nemmeno. Il costo di scriverlo e' una manciata di caratteri; il costo di non scriverlo e'
+     un numero usato male o ignorato. */
+  {
+    const T2 = [];
+    if (Number.isFinite(tec.eps)) {
+      T2.push(`- Utile per azione (EPS, ultimi 12 mesi): ${tec.eps}`
+        + (Number.isFinite(tec.pe) ? ` — col P/E ${tec.pe}× qui sopra dice se il multiplo alto nasce da un utile piccolo o da un prezzo alto` : "")
+        + (tec.eps < 0 ? ". ⚠ E' NEGATIVO: la societa' e' in perdita, e un P/E assente non e' un dato mancante ma la conseguenza." : ""));
+    }
+    if (Number.isFinite(tec.beta)) T2.push(`- Beta: ${tec.beta} — quanto amplifica i movimenti del mercato (1 = come l'indice)`);
+    if (Number.isFinite(tec.oggiPct)) T2.push(`- Variazione di oggi: ${signTxt(tec.oggiPct)}`);
+    if (Number.isFinite(tec.volRel)) T2.push(`- Volume rispetto al suo tipico: ${tec.volRel}× (sotto 1 = seduta piu' fiacca del solito)`);
+    if (Number.isFinite(tec.rs1m)) {
+      T2.push(`- Forza relativa a 1 mese contro ${esc(String(tec.rsBench || "il suo indice").toUpperCase())}: ${signTxt(tec.rs1m, " pp")}`
+        + (Number.isFinite(tec.rsNdx) ? ` · contro il Nasdaq 100: ${signTxt(tec.rsNdx, " pp")}` : "")
+        + ` — quanto ha fatto MEGLIO o PEGGIO del suo settore, non quanto ha guadagnato`);
+    }
+    if (Number.isFinite(tec.sortino)) T2.push(`- Sortino a 1 anno: ${tec.sortino} — rendimento per unita' di rischio al RIBASSO (a differenza dello Sharpe non penalizza i rialzi)`);
+    if (tec.rischioRendimento) T2.push(`- Rapporto rischio/rendimento gia' calcolato dal sistema: ${esc(tec.rischioRendimento)} (guadagno fino alla resistenza contro due volte l'ATR di rischio) — non rifarlo`);
+    if (T2.length) L.push(...T2);
+  }
   if (f.opzioni && f.opzioni.ratio != null) {
     L.push(`- Rapporto put/call di ${T} sulla scadenza ${f.opzioni.scadenza}: `
       + `${Math.round(f.opzioni.ratio * 100) / 100} (volumi scambiati oggi: put ${f.opzioni.put}, call ${f.opzioni.call})`
@@ -7771,7 +7919,27 @@ function datiNostriDelTitolo(tk) {
     `Questi numeri sono calcolati sulle stesse barre che disegnano il grafico, e sono quelli che il CEO vede sulla pagina.`,
     `⚠ SUL RITARDO: i prezzi delle azioni americane arrivano da fonti gratuite e sono ritardati di circa 15 minuti — vale per questo pacchetto come per qualunque fonte gratuita, TradingView compresa. Cambi, indici di volatilita', cripto e materie prime sono in tempo reale. Se il titolo si sta muovendo forte adesso, dillo invece di trattare il prezzo come l'ultimo scambio.`,
     `USALI COME RIFERIMENTO. Se cio' che trovi in rete diverge in modo materiale (piu' del 2% su un livello di prezzo), NON scegliere in silenzio: riporta tutti e due, di' quale usi e perche'.`,
-    `Restano da cercare online le cose che qui NON ci sono: fondamentali di bilancio, trimestrale, concorrenti e quote di mercato, notizie, consenso analisti.`,
+    /* ═══ v299 — IL BLOCCO "COSA NON SO" ══════════════════════════════════════════════════════
+   Trovato nella revisione: dei nove blocchi che il prompt chiede, solo DUE si possono
+   rispondere coi dati del pacchetto (macro e tecnica). Concorrenti e quote, conti, consenso
+   analisti vengono INTERAMENTE dalla rete — cioe' circa il 70% della qualita' dell'output non
+   dipende da questo sistema ma dalla ricerca dell'LLM, che il sistema non controlla.
+   ⚠⚠ E fin qui e' un limite, non un difetto. Il DIFETTO era che un modello che non trova il
+   consenso analisti se lo inventa in silenzio, e nel referto non si distingue un numero
+   verificato da uno plausibile. Qui l'elenco e' esplicito e la dichiarazione di fallimento e'
+   OBBLIGATORIA: "non sono riuscito a verificare X" e' un'informazione, un numero inventato no.
+   ⚠ La riga di prima ("restano da cercare online...") elencava le stesse cose ma senza chiedere
+   conto del risultato: era una lista della spesa, non un vincolo. */
+`══ QUELLO CHE IL SISTEMA NON HA, E CHE DEVI PORTARE TU ══`,
+`Il pacchetto NON contiene queste cose. Cercale e portale con fonte e data:`,
+`· conti: ricavi, margine lordo e operativo, debito netto, cassa, flusso di cassa libero, diluizione`,
+`· ultima trimestrale nel dettaglio e la data CONFERMATA della prossima`,
+`· concorrenti diretti, quote di mercato e anno a cui si riferiscono`,
+`· consenso analisti: numero di giudizi, target medio, revisioni degli ultimi 90 giorni`,
+`· notizie e fatti societari delle ultime settimane`,
+`⚠ OBBLIGATORIO: chiudi con una riga "NON VERIFICATO:" che elenca quali di queste voci NON sei`,
+`riuscito a trovare o confermare. Se le hai trovate tutte, scrivi "NON VERIFICATO: nessuna".`,
+`Un numero plausibile inventato e' peggio di un buco dichiarato: il buco lo vedo, l'invenzione no.`,
     ...L,
   ].join("\n");
 }

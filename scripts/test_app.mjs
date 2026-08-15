@@ -2200,6 +2200,100 @@ check("v298 rotazione: senza partecipazioni il tooltip non compare", (() => {
   return corpo.includes(': ""') && barre.includes("x.suggerimento ?");
 })());
 
+/* ══ v299 — I QUATTRO PUNTI DELLA REVISIONE A CINQUE TESTE ═══════════════════════════════ */
+
+/* ⚠⚠ FONDAMENTALI CHE AVEVAMO E FACEVAMO CERCARE. Il pacchetto diceva "cerca online i
+   fondamentali" mentre EPS, beta e forza relativa erano gia' in data.json: e' il difetto v271
+   (il sistema tiene un numero e ne fa cercare un altro) applicato ai conti invece che ai
+   livelli. L'EPS in particolare — v185 lo rimise nel payload perche' col solo P/E non si
+   distingue una societa' cara da una in perdita, e su AMD davamo P/E 123,4x senza il 4,17. */
+check("v299 pacchetto titolo: porta i fondamentali che il sistema gia' possiede", suVeri(`
+  const p = buildPromptTicker("AMD");
+  const r = [...(DATA.portfolio||[]), ...(DATA.watchlist||[])].find(x => x.ticker === "AMD");
+  if (!r) return true;
+  const c = [];
+  if (r.eps != null) c.push("Utile per azione (EPS");
+  if (r.beta != null) c.push("Beta: " + r.beta);
+  if (r.rs_1m != null) c.push("Forza relativa a 1 mese");
+  if (r.risk_reward) c.push(r.risk_reward);
+  return c.every(x => p.includes(x))`));
+
+/* ⚠ ma NON i punteggi compositi: `fin_health` e `health` sono giudizi 0-100 travestiti da
+   dati, ed e' esattamente cio' che v200 ha tolto dal pacchetto misurando un hit-rate del 29%.
+   I fatti si', i voti no — anche quando sono comodi. */
+check("v299 pacchetto titolo: nessun punteggio composito rientra dalla finestra", suVeri(`
+  const p = buildPromptTicker("AMD");
+  return !p.includes("fin_health") && !p.includes("Financial Health")
+      && !p.includes("Salute finanziaria")`));
+
+/* ⚠⚠ IL BLOCCO "COSA NON SO". Dei nove blocchi che il prompt chiede, solo due si rispondono
+   coi dati del pacchetto: il resto viene dalla rete, e un modello che non trova il consenso
+   analisti se lo inventa in silenzio. La dichiarazione di fallimento e' OBBLIGATORIA perche'
+   un buco dichiarato si vede e un numero inventato no. */
+check("v299 pacchetto titolo: elenca cosa non ha e obbliga a dichiarare i buchi", suVeri(`
+  const p = buildPromptTicker("AMD");
+  return p.includes("QUELLO CHE IL SISTEMA NON HA")
+      && p.includes("NON VERIFICATO:")
+      && p.includes("Un numero plausibile inventato e' peggio di un buco dichiarato")`));
+
+/* ══ v299 — «OGGI» ══════════════════════════════════════════════════════════════════════
+   ⚠⚠ "PIU' DEL SUO SOLITO" DEV'ESSERE UNA MISURA, NON UNA SOGLIA. Lo scarto si divide per la
+   deviazione tipica di QUELLA serie: una soglia fissa non sa se cinque punti siano tanti per
+   quell'indicatore, ed e' il registro che invecchia da solo (C10) piu' la lezione v230. */
+check("v299 oggi: il movimento notevole e' misurato in deviazioni, non con una soglia fissa", (() => {
+  const i = src.indexOf("function scartiNotevoli");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("Math.sqrt") && corpo.includes("sigma >= 2") && corpo.includes("sd < 0.4");
+})());
+
+/* ⚠ e i percentili si calcolano sullo storico VERO dell'indicatore, non su una scala 0-100
+   costruita dal sistema: quelle sono uscite in v200 e non rientrano. */
+check("v299 oggi: gli estremi sono percentili sulla serie stessa", suVeri(`
+  const e = estremiAnnuali(6);
+  if (!e.length) return true;
+  const ind = (DATA.macro && DATA.macro.indicators) || [];
+  return e.every(x => {
+    const i = ind.find(y => y && y.label === x.label);
+    return i && (i.storico || []).length === x.n && x.pct >= 0 && x.pct <= 100;
+  })`));
+
+/* ⚠⚠ E LE TRE RIGHE NON RESTANO MAI VUOTE: una riga bianca si legge come "rotto", una che dice
+   "niente" si legge come "controllato". E' la differenza fra un buco e un'informazione, la
+   stessa ragione per cui la coda delle decisioni di v198 dichiarava "niente da decidere". */
+check("v299 oggi: ogni riga parla, anche quando non ha niente da dire", suVeri(`
+  const q = document.querySelector;
+  let reso = "";
+  try {
+    document.querySelector = (sel) => sel === "#oggi-righe"
+      ? { set innerHTML(v) { reso = v; }, get innerHTML() { return reso; } }
+      : q.call(document, sel);
+    renderOggi();
+  } finally { document.querySelector = q; }
+  return reso.includes("SI È MOSSO") && reso.includes("IN USCITA") && reso.includes("AGLI ESTREMI")`));
+
+/* ⚠ e la finestra dev'essere la STESSA della sezione dedicata: due numeri diversi in due punti
+   della pagina si contraddicono a vista (lezione v290, li' fra pagina e pacchetto). */
+check("v299 oggi: guarda la stessa finestra della sezione calendario", (() => {
+  const nl = String.fromCharCode(10);
+  const i = src.indexOf("function renderOggi");
+  const a = src.slice(i, src.indexOf(nl + "function ", i + 10));
+  const j = src.indexOf("function renderCalendario");
+  const b = src.slice(j, src.indexOf(nl + "function ", j + 10));
+  const nA = (a.match(/prossimiEventi\((\d+)\)/) || [])[1];
+  const cost = (src.match(/const GIORNI_CALENDARIO = (\d+)/) || [])[1];
+  return nA && cost && Number(nA) === Number(cost) && b.includes("GIORNI_CALENDARIO");
+})());
+
+/* ⚠ i percentili entrano anche nel PACCHETTO: e' informazione nuova (il payload dava il valore
+   e la data, non se quel valore sia alto o basso per quella serie), e cio' che si disegna in
+   pagina deve arrivare all'LLM — il difetto ripetuto due volte in v287 e v289. */
+check("v299 payload: i percentili arrivano anche all'LLM", suVeri(`
+  const est = estremiAnnuali(6);
+  if (!est.length) return true;
+  const p = buildPrompt();
+  return p.includes("AGLI ESTREMI DEL PROPRIO STORICO")
+      && est.every(e => p.includes(e.label))`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
