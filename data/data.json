@@ -1047,7 +1047,11 @@
    },
    "rs_1m": 9.3,
    "rs_bench": "sox",
-   "rs_ndx_1m": 10.4
+   "rs_ndx_1m": 10.4,
+   "qta": 70,
+   "pmc": 87.63,
+   "controvalore": 68016.2,
+   "gain_pct_pos": 1008.82
   },
   {
    "ticker": "AMD",
@@ -2027,7 +2031,11 @@
    },
    "rs_1m": -1.9,
    "rs_bench": "sox",
-   "rs_ndx_1m": -0.8
+   "rs_ndx_1m": -0.8,
+   "qta": 100,
+   "pmc": 153.916,
+   "controvalore": 51439.0,
+   "gain_pct_pos": 234.2
   },
   {
    "ticker": "NVDA",
@@ -2839,7 +2847,11 @@
    },
    "rs_1m": 3.9,
    "rs_bench": "sox",
-   "rs_ndx_1m": 5.0
+   "rs_ndx_1m": 5.0,
+   "qta": 270,
+   "pmc": 87.1667,
+   "controvalore": 60793.2,
+   "gain_pct_pos": 158.31
   },
   {
    "ticker": "GOOGL",
@@ -3581,7 +3593,11 @@
    },
    "rs_1m": -5.9,
    "rs_bench": "ndx",
-   "rs_ndx_1m": -5.9
+   "rs_ndx_1m": -5.9,
+   "qta": 50,
+   "pmc": 340.2,
+   "controvalore": 17295.0,
+   "gain_pct_pos": 1.68
   },
   {
    "ticker": "PLTR",
@@ -4133,7 +4149,11 @@
    },
    "rs_1m": 25.9,
    "rs_bench": "ndx",
-   "rs_ndx_1m": 25.9
+   "rs_ndx_1m": 25.9,
+   "qta": 100,
+   "pmc": 113.5,
+   "controvalore": 17404.0,
+   "gain_pct_pos": 53.34
   },
   {
    "ticker": "ORCL",
@@ -5099,7 +5119,11 @@
    },
    "rs_1m": 17.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 17.7
+   "rs_ndx_1m": 17.7,
+   "qta": 70,
+   "pmc": 143.0,
+   "controvalore": 10536.4,
+   "gain_pct_pos": 5.26
   },
   {
    "ticker": "WDC",
@@ -6154,7 +6178,11 @@
    },
    "rs_1m": 5.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 5.5
+   "rs_ndx_1m": 5.5,
+   "qta": 25,
+   "pmc": 458.0,
+   "controvalore": 12720.0,
+   "gain_pct_pos": 11.09
   },
   {
    "ticker": "MRVL",
@@ -6945,7 +6973,11 @@
    },
    "rs_1m": 13.3,
    "rs_bench": "sox",
-   "rs_ndx_1m": 14.4
+   "rs_ndx_1m": 14.4,
+   "qta": 42,
+   "pmc": 214.08,
+   "controvalore": 9324.84,
+   "gain_pct_pos": 3.71
   },
   {
    "ticker": "RGTI",
@@ -7490,7 +7522,11 @@
    },
    "rs_1m": 28.8,
    "rs_bench": "sox",
-   "rs_ndx_1m": 30.0
+   "rs_ndx_1m": 30.0,
+   "qta": 463,
+   "pmc": 26.5048,
+   "controvalore": 8713.66,
+   "gain_pct_pos": -28.99
   },
   {
    "ticker": "BE",
@@ -8064,7 +8100,11 @@
    },
    "rs_1m": 7.9,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 7.7
+   "rs_ndx_1m": 7.7,
+   "qta": 40,
+   "pmc": 214.0,
+   "controvalore": 9197.6,
+   "gain_pct_pos": 7.45
   },
   {
    "ticker": "SKHY",
@@ -8366,7 +8406,11 @@
    },
    "rs_1m": 5.9,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 5.7
+   "rs_ndx_1m": 5.7,
+   "qta": 45,
+   "pmc": 139.0,
+   "controvalore": 7484.85,
+   "gain_pct_pos": 19.66
   },
   {
    "ticker": "MSTR",
@@ -9181,7 +9225,11 @@
    },
    "rs_1m": -4.6,
    "rs_bench": "ndx",
-   "rs_ndx_1m": -4.6
+   "rs_ndx_1m": -4.6,
+   "qta": 173,
+   "pmc": 173.3045,
+   "controvalore": 16095.92,
+   "gain_pct_pos": -46.31
   },
   {
    "ticker": "BTC-USD",
@@ -34413,6 +34461,12 @@
     "MarketWatch"
    ],
    "filtro": "CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione"
+  },
+  "posizioni": {
+   "quante": 12,
+   "aggiornato": "2026-08-15",
+   "fonte": "estratto del broker del CEO, stampato il 15/08/2026 alle 12:35",
+   "non_seguite": []
   }
  },
  "broker": null,

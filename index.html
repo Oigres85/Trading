@@ -18,7 +18,7 @@
 <title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=306">
+<link rel="stylesheet" href="assets/style.css?v=307">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -150,13 +150,25 @@
      pannello "tassi" resterebbe vuoto — e quei tassi li abbiamo gia' da FRED, fonte primaria,
      con data e prossima uscita. Oro, petrolio e rame funzionerebbero ma li disegniamo gia' noi
      con un anno di storia: sarebbe il doppione che abbiamo tolto altrove. -->
+<!-- v307 — IL PORTAFOGLIO. Torna in pagina ora che le posizioni esistono (v256 l'aveva
+     tolto perche' non c'erano). Forma minima: una riga per titolo, ordinata per PESO e non per
+     guadagno — ordinare per guadagno mette in cima i vincitori, che e' la lettura che fa tenere
+     i perdenti. Clic su una riga = quel titolo nel grafico TradingView. -->
+<section class="card" data-sez="portafoglio">
+    <div class="card-head">
+      <h2>Portafoglio</h2>
+      <span class="muted">carichi dal suo estratto · clicca una riga per vederla nel grafico</span>
+    </div>
+    <div id="pf-righe"></div>
+    <div id="pf-nota" class="muted struct-note"></div>
+  </section>
+
 <section class="card" data-sez="calendario">
     <div class="card-head">
       <h2>Prossime due settimane</h2>
       <span class="muted">uscite macro e trimestrali · date stimate, non appuntamenti confermati</span>
     </div>
     <div id="cal-eventi" class="cal-eventi"></div>
-    <div id="cal-news"></div>
     <div id="cal-nota" class="muted"></div>
   </section>
 
@@ -305,6 +317,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=306"></script>
+<script src="assets/app.js?v=307"></script>
 </body>
 </html>

@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "306";
+const BUILD_VERSION = "307";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -790,6 +790,7 @@ function renderAll() {
      resta ferma su "non disponibili" anche dopo che i dati sono arrivati. Chi disegna al
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
+  renderPortafoglio();          // v307 — le posizioni, e il clic che apre il grafico
   montaSelettoreSettori();      // v305 — l'elenco dei settori, dai dati
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
@@ -2382,6 +2383,122 @@ function prossimiEventi(giorni = 7) {
 
 const UNITA_INDICATORE = { nfp: "K", curve: " pp", curve3m: " pp", umich: "", philly: "" };
 
+/* ═══ v307 — IL PORTAFOGLIO IN PAGINA, E IL GRAFICO CHE LO SEGUE ══════════════════════════
+   Il CEO: "ora che inserisci portafoglio se clicco su un ticker puoi richiamarlo nel grafico
+   tradingview?". La domanda presuppone una cosa che non c'era: il portafoglio VISIBILE. v256
+   l'aveva tolto, ora che le posizioni ci sono torna — ma in forma minima, una riga per titolo.
+   ⚠ NIENTE TOTALI IN EURO. Il progetto ha gia' pagato `eur_value` con un break di definizione,
+   e il gate valuta esiste per quello. Qui: controvalore nella valuta NATIVA e guadagno in
+   PERCENTUALE, che e' invariante al cambio. Il totale in euro lo da' il suo broker, che lo sa
+   fare meglio di noi perche' conosce i cambi di carico posizione per posizione.
+   ⚠⚠ ORDINE PER PESO, NON PER GUADAGNO: ordinare per guadagno metterebbe in cima i vincitori,
+   che e' esattamente la lettura che fa tenere i perdenti. Il peso dice quanto conta ciascuno
+   nelle decisioni di oggi — ed e' un fatto, non un giudizio. */
+function renderPortafoglio() {
+  const box = $("#pf-righe");
+  if (!box) return;
+  const nota = $("#pf-nota");
+  const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
+  if (!righe.length) {
+    box.innerHTML = '<div class="muted">Nessuna posizione: <code>config/posizioni.json</code> non è stato letto dalla pipeline.</div>';
+    if (nota) nota.innerHTML = "";
+    return;
+  }
+  /* ⚠⚠ v307 — DUE ERRORI CHE IL PRIMO DISEGNO HA RESO VISIBILI, ed erano entrambi silenziosi:
+     1. UN'OBBLIGAZIONE NON SI MOLTIPLICA COME UN'AZIONE. Il BTP quota in PERCENTUALE del
+        nominale: 40.000 di nominale a 102,86 valgono 41.144 euro, non 4.114.400. Moltiplicando
+        come un titolo azionario il BTP risultava il 93% del portafoglio e schiacciava tutto il
+        resto a 0-2%. Numero che non rompe niente e dice il falso — la classe v205.
+     2. NON SI SOMMANO VALUTE DIVERSE. Il totale metteva insieme dollari ed euro come se fossero
+        la stessa cosa: e' precisamente il difetto per cui esiste il gate valuta (v183), che
+        pero' guarda il PACCHETTO e non la pagina.
+     Il peso e' una percentuale, quindi adimensionale: si calcola convertendo tutto in euro col
+     cambio CORRENTE (non quello di carico, che e' un'altra cosa) e lo si dichiara. Gli importi
+     per riga restano nella valuta nativa, dove non c'e' niente da convertire. */
+  const fx = numero(DATA && DATA.eurusd);
+  const val = (r) => {
+    const p = numero(r.price ?? r.prezzo);
+    const q = numero(r.qta ?? r.qty);
+    if (!Number.isFinite(p) || !Number.isFinite(q)) return null;
+    return (String(r.ticker || "").startsWith("BTP") || r.currency === "EUR")
+      ? q * p / 100          // obbligazione: nominale x prezzo percentuale
+      : p * q;               // azione: quote x prezzo
+  };
+  /* per il PESO tutto in euro, altrimenti si sommano mele e pere */
+  const valEur = (r) => {
+    const v = val(r);
+    if (v == null) return null;
+    if (r.currency === "EUR" || String(r.ticker || "").startsWith("BTP")) return v;
+    return Number.isFinite(fx) && fx > 0 ? v / fx : null;
+  };
+  const tot = righe.reduce((a, r) => a + (valEur(r) || 0), 0);
+  righe.sort((a, b) => (valEur(b) || 0) - (valEur(a) || 0));
+
+  box.innerHTML = `<div class="pf-scroll"><table class="pf-tab"><thead><tr>
+    <th>Titolo</th><th class="num">Quote</th><th class="num">Carico</th><th class="num">Ultimo</th>
+    <th class="num">Guad.</th><th class="num">Controvalore</th><th class="num">Peso</th>
+    </tr></thead><tbody>${righe.map(r => {
+      const tk = String(r.ticker || "");
+      const q = numero(r.qta ?? r.qty), pmc = numero(r.pmc);
+      const p = numero(r.price ?? r.prezzo);
+      const g = Number.isFinite(r.gain_pct_pos) ? numero(r.gain_pct_pos)
+              : (Number.isFinite(p) && Number.isFinite(pmc) ? (p / pmc - 1) * 100 : null);
+      const v = val(r);
+      const cur = r.currency === "EUR" ? "€" : "$";
+      return `<tr class="pf-riga" data-pf-tk="${esc(tk)}" tabindex="0"
+                  title="Apri ${esc(tk)} nel grafico">
+        <td><b>${esc(tk)}</b> <span class="muted pf-nome">${esc(String(r.name || "").slice(0, 26))}</span></td>
+        <td class="num">${fmtNum.format(q)}</td>
+        <td class="num">${cur}${fmtNum.format(pmc)}</td>
+        <td class="num">${Number.isFinite(p) ? cur + fmtNum.format(p) : "—"}</td>
+        <td class="num ${g > 0 ? "pos" : g < 0 ? "neg" : "muted"}">${g != null ? signTxt(Math.round(g * 10) / 10) : "—"}</td>
+        <td class="num">${v != null ? cur + fmtNum.format(Math.round(v)) : "—"}</td>
+        <td class="num muted">${(() => { const e = valEur(r); return e != null && tot ? Math.round(e / tot * 100) + "%" : "—"; })()}</td>
+      </tr>`;
+    }).join("")}</tbody></table></div>`;
+
+  if (nota) {
+    const p = (DATA && DATA.macro && DATA.macro.posizioni) || {};
+    nota.innerHTML = `${righe.length} posizioni${p.aggiornato ? `, carichi aggiornati al ${esc(p.aggiornato)}` : ""}`
+      + `${p.fonte ? ` (${esc(p.fonte)})` : ""}. <b>Clicca una riga</b> per aprirla nel grafico qui sopra. `
+      + `<b>Come sono calcolati.</b> Gli importi per riga sono nella valuta nativa. Il <b>peso</b> converte `
+      + `tutto in euro al cambio corrente${Number.isFinite(fx) ? ` (EUR/USD ${fmtNum.format(fx)})` : ""}, `
+      + `perché sommare dollari ed euro darebbe una percentuale senza significato. `
+      + `⚠ Il BTP è un'obbligazione: il controvalore è <b>nominale × prezzo/100</b>, non quote × prezzo — `
+      + `moltiplicarlo come un'azione lo farebbe risultare il 93% del portafoglio. `
+      + `Non è il suo patrimonio: manca la liquidità e il cambio di carico posizione per posizione, `
+      + `che conosce il suo broker. I guadagni percentuali sono invarianti al cambio, gli importi no.`
+      + (p.non_seguite && p.non_seguite.length
+          ? ` ⚠ Posizioni su titoli non seguiti dalla pipeline, quindi senza prezzo: ${esc(p.non_seguite.join(", "))}.` : "");
+  }
+  /* ⚠ delega sul contenitore: le righe si ridisegnano a ogni render, e agganciare ognuna
+     lascerebbe handler morti — il difetto v193/v213 che ha gia' rotto il wiring piu' volte. */
+  box.addEventListener("click", (e) => {
+    const tr = e.target && e.target.closest ? e.target.closest("[data-pf-tk]") : null;
+    if (tr) apriNelGrafico(tr.dataset.pfTk);
+  });
+  box.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const tr = e.target && e.target.closest ? e.target.closest("[data-pf-tk]") : null;
+    if (tr) { e.preventDefault(); apriNelGrafico(tr.dataset.pfTk); }
+  });
+}
+
+/* ⚠ UNA SOLA STRADA per portare un simbolo nel grafico: la usano il clic sul portafoglio e il
+   selettore dei settori. Due percorsi separati divergerebbero — e' la lezione v225 sulle
+   frecce e il trascinamento, e quella v161/v207 sulle doppie derivazioni. */
+function apriNelGrafico(tk) {
+  const t = String(tk || "").trim().toUpperCase();
+  if (!t) return;
+  const campo = $("#tk-input");
+  if (campo) campo.value = t;
+  try { localStorage.setItem("ultimo_ticker", t); } catch { /* quota */ }
+  if (typeof montaGraficoTV === "function") montaGraficoTV(t);
+  const sez = document.querySelector('section[data-sez="grafico"]');
+  if (sez && typeof sez.scrollIntoView === "function") sez.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function renderCalendario() {
   const box = $("#cal-eventi");
   if (!box) return;
@@ -2426,63 +2543,15 @@ function renderCalendario() {
      di economia, gli altri due passano da un filtro per parole che e' imperfetto per
      costruzione. Un elenco che sembra curato quando e' automatico e' la classe di difetto
      peggiore di questo progetto — qui c'e' scritto com'e' fatto. */
-  const boxNews = $("#cal-news");
-  if (boxNews) {
-    const nw = (DATA && DATA.macro && DATA.macro.news) || null;
-    const voci = (nw && nw.voci) || [];
-    if (!voci.length) {
-      boxNews.innerHTML = "";
-    } else {
-      /* ═══ v306 — SOLO LE ULTIME SEI ORE, MA SENZA UNA SCATOLA VUOTA ══════════════════════
-         Il CEO: "inserisci solo news fresche di massimo 6 ore". Applicato — con una misura che
-         va detta: nel momento in cui l'ho scritto, dentro le 6 ore c'erano ZERO notizie macro,
-         e anche dentro le 12. La piu' fresca aveva 12,5 ore, perche' era sabato e la macro non
-         esce nel fine settimana.
-         ⚠⚠ Una finestra vuota si legge come "rotto", non come "non c'e' niente". Quindi: dentro
-         le 6 ore si mostra quello che c'e'; quando non c'e' niente si DICE, e si mostrano
-         comunque le piu' recenti marcate con la loro eta'. Il CEO chiedeva notizie fresche, non
-         una scatola che tace — e un dato vecchio DICHIARATO e' un'informazione (in questo caso:
-         "non e' uscito niente di macro da mezza giornata", che di sabato e' la risposta giusta). */
-      const ORE_FRESCHE = 6;
-      const ora = Date.now();
-      const oreDi = (iso) => {
-        const t = Date.parse(iso);
-        return Number.isFinite(t) ? (ora - t) / 3600000 : null;
-      };
-      const eta = (h) => h == null ? "" : h < 1 ? "adesso" : h < 24 ? `${Math.round(h)} ore fa` : `${Math.round(h / 24)} giorni fa`;
-      const conEta = voci.map(v => ({ ...v, ore: oreDi(v.quando) }))
-                         .filter(v => v.ore != null).sort((a, b) => a.ore - b.ore);
-      const fresche = conEta.filter(v => v.ore <= ORE_FRESCHE);
-      const mostrate = fresche.length ? fresche : conEta.slice(0, 6);
-      const piuFresca = conEta.length ? conEta[0].ore : null;
-
-      const riga = (v) => `<div class="cal-news-riga">
-        <span class="cal-news-quando${v.ore <= ORE_FRESCHE ? " cal-news-fresca" : ""}">${esc(eta(v.ore))}</span>
-        <span class="cal-news-testo">
-          ${v.url ? `<a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer">${esc(v.titolo)}</a>`
-                  : `<b>${esc(v.titolo)}</b>`}
-          ${v.riassunto ? `<span class="cal-news-rias">${esc(v.riassunto)}</span>` : ""}
-        </span>
-        <span class="cal-news-fonte">${esc(v.fonte)}</span>
-      </div>`;
-
-      boxNews.innerHTML = `<details class="cal-news">
-        <summary><b>Notizie macro</b> <span class="muted">${
-          fresche.length
-            ? `${fresche.length} nelle ultime ${ORE_FRESCHE} ore`
-            : `nessuna nelle ultime ${ORE_FRESCHE} ore — la più recente è di ${esc(eta(piuFresca))}`
-        } · ${esc((nw.fonti || []).join(", "))}</span></summary>
-        ${fresche.length ? "" : `<div class="cal-news-avviso">⚠ Nessuna notizia macro nelle ultime
-          ${ORE_FRESCHE} ore. <b>Non è un guasto</b>: la macro non esce di continuo, e nel fine
-          settimana non esce affatto. Qui sotto le più recenti, ciascuna con la sua età.</div>`}
-        <div class="cal-news-lista">${mostrate.map(riga).join("")}</div>
-        <div class="muted cal-news-nota">⚠ <b>Come è fatto questo elenco:</b> ${esc(nw.filtro || "")}.
-        Non è una selezione redazionale: è un filtro automatico, quindi può lasciar passare titoli
-        non macro e può scartarne di buoni. I riassunti sono quelli che la fonte pubblica nel feed,
-        non riscritti dal sistema. Il contenuto non è stato verificato.</div>
-      </details>`;
-    }
-  }
+  /* ⚠⚠ v307 — LA SEZIONE NOTIZIE ESCE DALLA PAGINA, richiesta del CEO, un'ora dopo averla
+     chiesta. Non e' un capriccio ed e' istruttivo: gliel'avevo consegnata con la finestra a sei
+     ore che lui stesso aveva fissato, e misurata quella finestra dava ZERO — la macro non esce
+     di continuo. Una scheda che nel fine settimana e in mezza giornata feriale non ha niente da
+     dire non merita spazio in una pagina che stiamo riducendo da nove sezioni a cinque.
+     ⚠ LE NOTIZIE RESTANO NEL PACCHETTO: e' la regola v208, si toglie dalla pagina cio' che il
+     payload porta gia'. La pipeline continua a scaricarle (tre richieste), il pacchetto le
+     porta all'LLM con la loro eta', e le istruzioni gli ordinano di cercarne di piu' sul titolo
+     e sul settore. Quello che sparisce e' il riquadro, non l'informazione. */
 
   if (nota) {
     nota.innerHTML = "⚠ <b>Tutte le date sono stime, non appuntamenti confermati.</b> "
@@ -2762,7 +2831,12 @@ function indicatoriClassifica() {
      dalla fonte primaria) e la stessa domanda — quanto le famiglie se la sentono di spendere —
      e' coperta piu' fresca dal Fear & Greed e dalle vendite al dettaglio. Resta nel PACCHETTO:
      e' la regola v208, si toglie dalla pagina cio' che il payload porta gia'. */
-  const FUORI = new Set(["in:umich",
+  /* ⚠ v307 — stagionalita' e EUR/USD tolti su richiesta del CEO. La stagionalita' era appena
+     rientrata (v303) fondendo "Leva e stagionalita'": non e' un ripensamento mio, e' che una
+     volta vista in mezzo alle altre non guadagnava il suo posto. EUR/USD resta nel PACCHETTO —
+     e' il cambio con cui si convertono i suoi conti — e resta nel blocco macro: esce la
+     tessera, non il fatto (regola v208). */
+  const FUORI = new Set(["seasonality", "mk:EURUSD=X", "in:umich",
                          "mat:petrolio", "mat:rame", "mat:oro",
                          "mk:EURJPY=X", "in:t30", "mk:^TNX", "in:curve3m",
                          "thermometer", "futures", "risk_sentiment", "smart_money",   // v303: stagionalità rientra
@@ -8097,6 +8171,14 @@ function montaSelettoreSettori() {
     sel.appendChild(o);
   }
 }
+
+/* ⚠ v307 — cambiare settore porta il suo ETF nel grafico. Il CEO: "se cambio analizza settore
+   macro, puoi modificare anche il ticker nel grafico di tradingview?". Passa dalla STESSA
+   funzione del clic sul portafoglio: due strade per la stessa azione divergono sempre. */
+$("#set-input")?.addEventListener("change", (e) => {
+  const v = e.target && e.target.value;
+  if (v) apriNelGrafico(v);
+});
 
 $("#set-copia")?.addEventListener("click", async () => {
   const sel = $("#set-input");

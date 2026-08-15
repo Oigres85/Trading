@@ -2128,9 +2128,12 @@ check("v299 pacchetto titolo: elenca cosa non ha e obbliga a dichiarare i buchi"
 
 /* ⚠ i tre termometri e la stagionalita' devono essere TESSERE, non essere spariti con la loro
    sezione: erano esclusi dalla classifica proprio perche' ne avevano una propria. */
-check("v303 fusione: termometri e stagionalità sono tessere della classifica", suVeri(`
+/* ⚠ v307 — la stagionalita' esce dall'elenco su richiesta del CEO, un commit dopo esserci
+   rientrata. L'invariante NON era "queste quattro chiavi": era che i tre TERMOMETRI, che
+   avevano una sezione propria, non sparissero fondendola. Quello resta. */
+check("v307 fusione: i tre termometri sono tessere della classifica", suVeri(`
   const k = indicatoriClassifica().map(x => x.k);
-  return ["in:curve", "credit", "vix", "seasonality"].every(x => k.includes(x))`));
+  return ["in:curve", "credit", "vix"].every(x => k.includes(x))`));
 
 /* ⚠ rotazione e tassi diventano due forme: devono esserci, disegnare qualcosa, e dichiarare
    come si leggono — la riga che il CEO ha chiesto per ogni scheda fin da v238. */
@@ -2226,22 +2229,24 @@ check("v306 news: il pacchetto parla in entrambi i rami, fresche o nessuna", suV
   return blocco.indexOf("SONO TITOLI, NON FATTI VERIFICATI") >= 0
       && blocco.indexOf("non ha data di rilevazione") >= 0`));
 
-/* ⚠ in pagina: espandibile e CHIUSA, altrimenti diciotto titoli seppelliscono il calendario —
-   il problema che il CEO ha appena risolto fondendo quattro sezioni. E deve dichiarare come e'
-   fatto l'elenco: un elenco che sembra curato quando e' automatico e' peggio di nessun elenco. */
-check("v304 news: espandibile, chiusa di default, e dichiara il proprio filtro", (() => {
-  const i = src.indexOf("function renderCalendario");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  return corpo.includes("<details class=\"cal-news\">")
-      && !corpo.includes("<details open")
-      && corpo.includes("Come è fatto questo elenco")
-      && corpo.includes("Il contenuto non è stato verificato")
-      /* ⚠ v306 — e lo stato vuoto deve PARLARE: una finestra vuota si legge come "rotto",
-         non come "non c'e' niente". Il CEO ha chiesto sei ore e sei ore spesso non danno
-         nulla — misurato: zero notizie macro dentro le 6 e dentro le 12, di sabato. */
-      && corpo.includes("Non è un guasto")
-      && corpo.includes("ciascuna con la sua età");
+/* ⚠⚠ v307 — LA SEZIONE NOTIZIE E' USCITA DALLA PAGINA su richiesta del CEO, un'ora dopo
+   averla chiesta: con la finestra a sei ore che aveva fissato, misurata, dava ZERO. Il check
+   che sorvegliava il riquadro non ha piu' un soggetto — ma l'invariante che conta e' l'altro,
+   e vale ancora: le notizie devono restare NEL PACCHETTO. E' la regola v208 (si toglie dalla
+   pagina cio' che il payload porta gia') e la classe v201-v204 (la pulizia che si porta via il
+   fatto), gia' pagata quattro volte qui. */
+check("v307 news: il riquadro e' uscito dalla pagina", (() => {
+  /* ⚠ `src` vive nello scope del file di test, non nella sandbox: la prima stesura lo cercava
+     dentro `suVeri` e il meta-check "vuole un BOOLEANO" l'ha preso. Ogni controllo va dove i
+     suoi dati esistono — errore gia' fatto in v300 con FAMIGLIA_INDICATORE. */
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  return src.indexOf("cal-news-lista") < 0 && html.indexOf('id="cal-news"') < 0;
 })());
+
+check("v307 news: ma restano nel pacchetto", suVeri(`
+  const nw = (DATA.macro && DATA.macro.news) || null;
+  if (!nw || !(nw.voci || []).length) return true;
+  return buildPrompt().indexOf("TITOLI MACRO DELLE ULTIME") >= 0`));
 
 /* ══ v305 — ANALISI DI UN SETTORE ═══════════════════════════════════════════════════════
    Richiesta del CEO dopo un'analisi esterna che ha portato. La struttura viene da quella —
@@ -2287,6 +2292,61 @@ check("v305 settore: il selettore si costruisce dai dati, non da un elenco a man
   const i = src.indexOf("function montaSelettoreSettori");
   const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
   return corpo.includes("DATA.macro.tilt") && !corpo.includes("XLK") && !corpo.includes("SMH");
+})());
+
+/* ══ v307 — IL PORTAFOGLIO IN PAGINA ═════════════════════════════════════════════════════
+   Il CEO ha dato il suo estratto e ha chiesto che cliccando un ticker si apra nel grafico. La
+   domanda presupponeva il portafoglio VISIBILE, che v256 aveva tolto perche' non c'erano
+   posizioni. Ora ci sono. */
+
+/* ⚠⚠ UN'OBBLIGAZIONE NON SI MOLTIPLICA COME UN'AZIONE, e il primo disegno lo dimostrava: il
+   BTP quota in PERCENTUALE del nominale, quindi 40.000 a 102,86 valgono 41.144 euro e non
+   4.114.400. Moltiplicato come un titolo azionario risultava il 93% del portafoglio e
+   schiacciava tutto il resto a 0-2%. Un numero che non rompe niente e dice il falso — classe
+   v205, e visibile solo perche' ho guardato il risultato invece del codice. */
+check("v307 portafoglio: il bond vale nominale x prezzo/100, non quote x prezzo", (() => {
+  const i = src.indexOf("function renderPortafoglio");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("q * p / 100") && corpo.includes("startsWith(\"BTP\")");
+})());
+
+/* ⚠⚠ E NON SI SOMMANO VALUTE DIVERSE: il totale metteva insieme dollari ed euro come se fossero
+   la stessa cosa — il difetto per cui esiste il gate valuta (v183), che pero' guarda il
+   pacchetto e non la pagina. Il peso e' adimensionale e si calcola in euro; gli importi per
+   riga restano nativi, dove non c'e' niente da convertire. */
+check("v307 portafoglio: il peso converte in euro, e lo dichiara", (() => {
+  const i = src.indexOf("function renderPortafoglio");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("valEur") && corpo.includes("DATA.eurusd")
+      && corpo.includes("sommare dollari ed euro");
+})());
+
+/* ⚠ UNA SOLA STRADA per portare un simbolo nel grafico: la usano il clic sul portafoglio e il
+   selettore dei settori. Due percorsi separati divergono sempre — lezione v225 (frecce e
+   trascinamento) e v161/v207 (doppie derivazioni della stessa grandezza). */
+check("v307 grafico: clic sul portafoglio e cambio settore passano dalla stessa funzione", (() => {
+  const usi = (src.match(/apriNelGrafico\(/g) || []).length;
+  return src.includes("function apriNelGrafico")
+      && src.includes('$("#set-input")?.addEventListener("change"')
+      && src.includes('closest("[data-pf-tk]")')
+      && usi >= 4;      // la definizione piu' i tre punti che la chiamano
+})());
+
+/* ⚠ le righe si ridisegnano a ogni render: gli handler stanno sul CONTENITORE, non sulle
+   righe, altrimenti restano handler morti — il difetto v193/v213 che ha gia' rotto il wiring
+   piu' volte in questo progetto. */
+check("v307 portafoglio: gli handler stanno sul contenitore, non sulle righe", (() => {
+  const i = src.indexOf("function renderPortafoglio");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("box.addEventListener");
+})());
+
+/* ⚠ e le posizioni su titoli che la pipeline NON segue non hanno prezzo: vanno dichiarate, non
+   omesse. Una posizione che sparisce dalla tabella si legge come "venduta". */
+check("v307 portafoglio: le posizioni non seguite vengono dichiarate", (() => {
+  const i = src.indexOf("function renderPortafoglio");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("non_seguite");
 })());
 
 /* ---------- report ----------

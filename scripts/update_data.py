@@ -3671,6 +3671,64 @@ def main():
     btp = fetch_btp()
     watchlist = fetch_watchlist()
     macro = fetch_macro()
+    # ═══ v307 — LE POSIZIONI DEL CEO, COME SOVRAPPOSIZIONE ═══════════════════════════════
+    # Il CEO ha dato il suo estratto e ha chiesto di inserirlo. NON si resuscita
+    # `holdings.json`: v274 lo cancello' di proposito perche' "un ripiego verso un file morto
+    # non e' una rete di sicurezza, e' una strada che riporta indietro" — quel file portava con
+    # se' 37 simboli e un universo diverso.
+    # ⚠ QUI E' UNA SOVRAPPOSIZIONE: `config/posizioni.json` non contiene simboli propri, dice
+    # solo quante quote e a che prezzo medio per titoli che la watchlist GIA' segue. Una
+    # posizione su un titolo non seguito viene IGNORATA e il fatto stampato: senza prezzo non
+    # se ne puo' dire niente, e inventarlo sarebbe peggio che ometterlo.
+    # ⚠⚠ NIENTE TOTALI IN EURO. Il progetto ha gia' pagato `eur_value` con un break di
+    # definizione, e il gate valuta esiste per quello. Qui si pubblicano il controvalore nella
+    # valuta NATIVA e il guadagno in PERCENTUALE, che e' invariante al cambio: cosi' non c'e'
+    # nessun importo in euro da tenere allineato.
+    # ⚠ STA QUI E NON PIU' SU, e la prima stesura era sbagliata: l'avevo messo dove `watchlist`
+    # non esiste ancora, quindi sarebbe fallito dentro il `try` senza dire niente. Un blocco che
+    # non gira e non protesta e' la classe di difetto peggiore.
+    try:
+        pos_file = ROOT / "config" / "posizioni.json"
+        if pos_file.exists():
+            pos_raw = json.loads(pos_file.read_text())
+            per_tk = {}
+            for p in (pos_raw.get("posizioni") or []):
+                tk = str(p.get("ticker") or "").strip().upper()
+                if tk and p.get("qta") and p.get("pmc"):
+                    per_tk[tk] = p
+            attaccate = 0
+            for r in watchlist:
+                p = per_tk.pop(str(r.get("ticker") or "").upper(), None)
+                if not p:
+                    continue
+                r["qta"] = p["qta"]
+                r["pmc"] = round(float(p["pmc"]), 4)
+                prezzo = r.get("price")
+                if prezzo:
+                    r["controvalore"] = round(float(prezzo) * float(p["qta"]), 2)
+                    r["gain_pct_pos"] = round((float(prezzo) / float(p["pmc"]) - 1) * 100, 2)
+                attaccate += 1
+            # ⚠ il BTP non e' nella watchlist (ha la sua funzione, fetch_btp): si aggancia li'
+            btp_pos = per_tk.pop("BTP-V28", None)
+            if btp_pos and isinstance(btp, dict):
+                btp["qta"] = btp_pos["qta"]
+                btp["pmc"] = round(float(btp_pos["pmc"]), 4)
+                pz = btp.get("price") or btp.get("prezzo")
+                if pz:
+                    btp["gain_pct_pos"] = round((float(pz) / float(btp_pos["pmc"]) - 1) * 100, 2)
+                attaccate += 1
+            orfane = sorted(per_tk.keys())
+            macro["posizioni"] = {
+                "quante": attaccate,
+                "aggiornato": pos_raw.get("aggiornato"),
+                "fonte": pos_raw.get("_fonte"),
+                "non_seguite": orfane,
+            }
+            print(f"   posizioni: {attaccate} attaccate"
+                  + (f", {len(orfane)} su titoli NON seguiti (ignorate): {orfane}" if orfane else ""))
+    except Exception as e:  # noqa: BLE001
+        print(f"!! posizioni: {e}", file=sys.stderr)
+
     # MACRO SHOCK ALERT v125: incrocia futures Nasdaq (macro) e KOSPI live (watchlist) → flag panico
     shock = compute_shock_alert(macro, watchlist)
     if shock:
