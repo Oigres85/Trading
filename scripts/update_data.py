@@ -1802,6 +1802,64 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! news macro: {e}", file=sys.stderr)
 
+    # ═══ v309 — STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE ═════════════════════════
+    # Il CEO: "reinserisci scheda macro per stagionalita' mensile nasdaq100 e se puoi aggiungi
+    # anche variabile in concomitanza di elezioni midterm (valuta tu come strutturarlo)".
+    # STRUTTURA SCELTA: due serie sullo stesso asse dei dodici mesi — la media di TUTTI gli
+    # anni e quella dei soli anni di MIDTERM — piu' la dispersione (peggiore e migliore) e la
+    # percentuale di mesi positivi. Il confronto e' il punto: da solo "ottobre +1,7%" non dice
+    # niente, "ottobre +1,7% su tutti gli anni ma +3,9% negli anni di midterm, 80% positivi"
+    # dice qualcosa di specifico su QUESTO anno.
+    #
+    # ⚠⚠ IL CAMPIONE E' DIECI ANNI E VA GRIDATO, NON SCRITTO IN NOTA. Dieci osservazioni per
+    # mese sono pochissime: la dispersione di ottobre va da -8,7% a +18,9%, cioe' la media
+    # +3,9% e' una media fra esiti opposti. Questo progetto ha gia' tolto un motore predittivo
+    # con SETTE segnali maturati (v200, hit-rate 29%): una statistica su dieci casi si pubblica
+    # con la sua incertezza accanto o non si pubblica.
+    # ⚠ L'ANNO IN CORSO E' ESCLUSO dal campione storico: usare il 2026 per descrivere il 2026
+    # sarebbe circolare. Il ciclo si conta cosi': anno 1 = post-elezione, anno 2 = MIDTERM,
+    # anno 3 = pre-elezione, anno 4 = elezione presidenziale. Il 2026 e' un anno 2.
+    try:
+        ndx = yf.Ticker("^NDX").history(period="max", interval="1mo", auto_adjust=True)["Close"].dropna()
+        if len(ndx) > 120:
+            rend = ndx.pct_change().dropna() * 100
+            anno_ora = datetime.now(timezone.utc).year
+            per_mese = {m: {"tutti": [], "midterm": []} for m in range(1, 13)}
+            for ts, v in rend.items():
+                if ts.year >= anno_ora:
+                    continue                      # l'anno in corso non descrive se stesso
+                per_mese[ts.month]["tutti"].append(float(v))
+                if ((ts.year - 1) % 4) + 1 == 2:  # anno di midterm
+                    per_mese[ts.month]["midterm"].append(float(v))
+            mesi = []
+            for m in range(1, 13):
+                t, mid = per_mese[m]["tutti"], per_mese[m]["midterm"]
+                if not t:
+                    continue
+                voce = {"mese": m, "media": round(sum(t) / len(t), 2), "n": len(t)}
+                if len(mid) >= 5:                 # sotto cinque osservazioni non si pubblica una media
+                    voce.update({
+                        "media_mid": round(sum(mid) / len(mid), 2),
+                        "n_mid": len(mid),
+                        "pos_mid": round(sum(1 for x in mid if x > 0) / len(mid) * 100),
+                        "peggio_mid": round(min(mid), 1),
+                        "meglio_mid": round(max(mid), 1),
+                    })
+                mesi.append(voce)
+            anni_mid = sorted({ts.year for ts in rend.index
+                               if ts.year < anno_ora and ((ts.year - 1) % 4) + 1 == 2})
+            macro["stagionalita_ndx"] = {
+                "mesi": mesi,
+                "dal": int(rend.index[0].year), "al": anno_ora - 1,
+                "anni_midterm": anni_mid,
+                "ciclo_ora": ((anno_ora - 1) % 4) + 1,
+                "mese_ora": datetime.now(timezone.utc).month,
+                "fonte": "^NDX, barre mensili (yfinance, auto_adjust)",
+            }
+            print(f"   stagionalita' NDX: {len(mesi)} mesi, {len(anni_mid)} anni di midterm nel campione")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! stagionalita' NDX: {e}", file=sys.stderr)
+
     # ═══ v292 — LO STORICO DEI 13 INDICATORI: LA TRAIETTORIA, NON SOLO IL PUNTO ═══════════
     # Il CEO: "possiamo ottenere i dati macro con la stessa logica del VIX nel box TradingView?".
     # Da TradingView no — misurato: i simboli ECONOMICS:* (USIRYY, USNFP, USUR, USGDPQQ, USCCI,

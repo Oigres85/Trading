@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "308";
+const BUILD_VERSION = "309";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2282,7 +2282,7 @@ function barreOrdinate(righe, opt = {}) {
        passaggio: compare subito, ha la grafica della pagina, e resta DENTRO il contenitore che
        scorre — un pannello in posizione assoluta verrebbe tagliato da `overflow`.
        ⚠ Il `title` resta come rete per il touch, dove il passaggio del mouse non esiste. */
-    return `<div class="obar-row${x.evidenzia ? " obar-on" : ""}"${x.tk ? ` data-obar-tk="${esc(x.tk)}"` : ""}${x.suggerimento ? ` title="${esc(x.suggerimento)}"` : ""}>
+    return `<div class="obar-row${x.evidenzia ? " obar-on" : ""}${x.tk ? " obar-click" : ""}"${x.tk ? ` data-obar-tk="${esc(x.tk)}" data-graf-tk="${esc(x.tk)}" role="button" tabindex="0"` : ""}${x.suggerimento ? ` title="${esc(x.suggerimento)}"` : ""}>
       <span class="obar-lab" title="${esc(x.nome)}">${esc(x.nome)}</span>
       <span class="obar-axis">${neg ? `<span class="obar-zero" style="left:${zero}%"></span>` : ""}
         <span class="obar-fill" style="left:${left.toFixed(1)}%;width:${Math.max(w, 0.6).toFixed(1)}%;background:${col}"></span>
@@ -2693,6 +2693,16 @@ function indicatoriClassifica() {
     out.push({ k: "rotazione", nome: "Rotazione — dove si muove il denaro",
                score: Math.round(su / m.tilt.length * 100),
                sub: `${su} settori su ${m.tilt.length} in positivo a 1 mese` });
+  }
+  if (m.stagionalita_ndx && (m.stagionalita_ndx.mesi || []).length) {
+    const so = m.stagionalita_ndx;
+    const q = (so.mesi || []).find(x => x && x.mese === so.mese_ora);
+    out.push({ k: "stagionalita_ndx", nome: "Stagionalità Nasdaq 100 e midterm",
+               score: 50,
+               sub: q && Number.isFinite(q.media_mid)
+                 ? `${["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"][so.mese_ora - 1]}: `
+                   + `${signTxt(q.media_mid)} negli anni di midterm (${q.n_mid} casi)`
+                 : `campione ${so.dal}–${so.al}` });
   }
   if (m.tassi && (m.tassi.scadenze || []).some(x => x.key === "a10")) {
     const d10 = m.tassi.scadenze.find(x => x.key === "a10");
@@ -3209,6 +3219,72 @@ function conTachimetro(comp, base, aria) {
 }
 
 const FORMA_INDICATORE = {
+  /* ═══ v309 — STAGIONALITA' DEL NASDAQ 100 E ANNI DI MIDTERM ═══════════════════════════
+     Il CEO ha chiesto la stagionalita' mensile dell'NDX e, se possibile, la variabile
+     "elezioni midterm", lasciando a me la struttura.
+     STRUTTURA: dodici colonne, una per mese. La BARRA e' la media degli anni di midterm, la
+     TACCA e' la media di tutti gli anni. Il confronto e' il messaggio: "ottobre +1,7%" da solo
+     non dice niente; "+1,7% su tutti gli anni ma +3,9% negli anni di midterm, 80% positivi"
+     dice qualcosa su QUESTO anno, che e' un anno di midterm.
+     ⚠⚠ IL CAMPIONE E' DIECI ANNI E LO SI DICE FORTE, non in nota. La dispersione di ottobre va
+     da -8,7% a +18,9%: la media +3,9% sta fra esiti opposti. Questo progetto ha tolto un motore
+     predittivo con SETTE segnali (v200, hit-rate 29%) — una statistica su dieci casi si
+     pubblica con la sua incertezza accanto, o non si pubblica.
+     ⚠ Il mese corrente e' acceso, e i prossimi tre portano il loro intervallo per esteso:
+     e' li' che la tentazione di leggere la media come previsione e' piu' forte. */
+  stagionalita_ndx: (m) => {
+    const st = m.stagionalita_ndx; if (!st || !(st.mesi || []).length) return null;
+    const MESI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+    const mesi = st.mesi.filter(x => x && Number.isFinite(x.media));
+    const vals = mesi.flatMap(x => [x.media, Number.isFinite(x.media_mid) ? x.media_mid : x.media]);
+    const lo = Math.min(0, ...vals), hi = Math.max(0, ...vals);
+    const W = 330, H = 150, L = 26, R = W - 8, T = 12, B = H - 22;
+    const X = (i) => L + (i + 0.5) / mesi.length * (R - L);
+    const Y = (v) => B - (v - lo) / ((hi - lo) || 1) * (B - T);
+    const larg = (R - L) / mesi.length * 0.56;
+    const zero = Y(0);
+    const barre = mesi.map((x, i) => {
+      const v = Number.isFinite(x.media_mid) ? x.media_mid : null;
+      if (v == null) return "";
+      const y = Math.min(Y(v), zero), h = Math.abs(Y(v) - zero);
+      const ora = x.mese === st.mese_ora;
+      return `<rect x="${(X(i) - larg / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${larg.toFixed(1)}"
+        height="${Math.max(h, 0.8).toFixed(1)}" fill="${v >= 0 ? "var(--green)" : "var(--red)"}"
+        opacity="${ora ? 1 : 0.55}"><title>${MESI[x.mese - 1]}: midterm ${fmtNum.format(v)}% su ${x.n_mid} anni · tutti ${fmtNum.format(x.media)}%</title></rect>`;
+    }).join("");
+    const tacche = mesi.map((x, i) =>
+      `<line x1="${(X(i) - larg / 2 - 1).toFixed(1)}" y1="${Y(x.media).toFixed(1)}"
+         x2="${(X(i) + larg / 2 + 1).toFixed(1)}" y2="${Y(x.media).toFixed(1)}"
+         stroke="var(--text)" stroke-width="1.6"/>`).join("");
+    const etich = mesi.map((x, i) =>
+      `<text x="${X(i).toFixed(1)}" y="${H - 8}" font-size="8.5" text-anchor="middle"
+        fill="${x.mese === st.mese_ora ? "var(--text)" : "var(--muted)"}"
+        font-weight="${x.mese === st.mese_ora ? "700" : "400"}">${MESI[x.mese - 1]}</text>`).join("");
+    const g = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
+        aria-label="stagionalità mensile del Nasdaq 100, anni di midterm contro tutti gli anni">
+      <line x1="${L}" y1="${zero.toFixed(1)}" x2="${R}" y2="${zero.toFixed(1)}" stroke="var(--border)" stroke-width="1"/>
+      <text x="4" y="${(zero + 3).toFixed(1)}" font-size="8.5" fill="var(--muted)">0%</text>
+      ${barre}${tacche}${etich}</svg>`;
+
+    /* i prossimi tre mesi, con l'intervallo per esteso: e' li' che una media diventa profezia */
+    const prossimi = [0, 1, 2].map(k => mesi.find(x => x.mese === ((st.mese_ora - 1 + k) % 12) + 1))
+      .filter(x => x && Number.isFinite(x.media_mid));
+    const testo = prossimi.map(x => `<b>${MESI[x.mese - 1]}</b> ${signTxt(x.media_mid)} `
+      + `<span class="muted">(${x.pos_mid}% positivi, da ${signTxt(x.peggio_mid)} a ${signTxt(x.meglio_mid)})</span>`).join(" · ");
+
+    return {
+      g,
+      n: `<b>Barra</b> = media dei soli anni di <b>midterm</b>; <b>tacca</b> = media di tutti gli anni. `
+        + `Campione ${st.dal}–${st.al}, <b>${(st.anni_midterm || []).length} anni di midterm</b>`
+        + (st.ciclo_ora === 2 ? ` — e il ${st.al + 1} è uno di quelli.` : ".")
+        + `<br>Prossimi tre mesi negli anni di midterm: ${testo || "n.d."}.`
+        + `<br>⚠⚠ <b>Dieci osservazioni per mese sono pochissime.</b> Guardi gli intervalli qui sopra: `
+        + `dove la media è +3,9% i singoli anni vanno da −8,7% a +18,9%. Non è una previsione, è `
+        + `il conto di cosa è successo — e cosa è successo dieci volte non dice cosa succederà l'undicesima. `
+        + `<b>Come si legge:</b> serve a sapere quando NON stupirsi, non a decidere quando comprare.`,
+    };
+  },
+
   /* ═══ v303 — ROTAZIONE E TASSI DIVENTANO TESSERE ═══════════════════════════════════════
      Il CEO: "sposta Rotazione, Leva e stagionalità e La curva dei tassi in Tutti gli
      indicatori, armonizzando la grafica e le dimensioni".
@@ -4058,15 +4134,54 @@ function ciambella(voci, opt = {}) {
    il comportamento GIUSTO: quel titolo puo' contenere nomi che arrivano dai dati, e
    l'escaping e' la garanzia che un nome non diventi markup. Quando serve del markup si
    aggiunge un campo, non si aggira la protezione. */
+/* ═══ v309 — QUALI TESSERE SI POSSONO APRIRE NEL GRAFICO ═══════════════════════════════════
+   Il CEO: "per ogni settore e per ogni informazione macro, per quelle che puoi, se ci clicco
+   sopra associa il relativo grafico in tradingview".
+   ⚠⚠ "PER QUELLE CHE PUOI" E' LA PARTE CHE CONTA, e la risposta l'ho gia' MISURATA in v290
+   caricando i simboli in un browser vero: il widget gratuito serve VIX, cambi, cripto, oro,
+   petrolio e rame; rifiuta TUTTI i rendimenti dei Treasury, il dollaro (DXY) e TUTTI gli
+   indici azionari con "Questo simbolo e' disponibile solo su TradingView".
+   Quindi la maggior parte delle tessere macro NON ha un grafico possibile, e un bottone che
+   apre un riquadro con un messaggio d'errore sarebbe peggio di nessun bottone.
+   ⚠ `mat:sox` usa SOXX, l'ETF: l'indice ^SOX e' fra i bloccati, il fondo che lo replica no.
+   ⚠ I SETTORI funzionano tutti: sono ETF quotati e il simbolo e' il loro ticker. */
+const TV_PER_TESSERA = {
+  vix: "VIX",
+  "mat:sox": "SOXX",
+  "mat:oro": "TVC:GOLD",
+  "mat:petrolio": "TVC:USOIL",
+  "mat:rame": "COPPER",
+  "mk:EURUSD=X": "FX:EURUSD",
+  "mk:EURJPY=X": "FX:EURJPY",
+  carry: "FX:USDJPY",
+  rotazione: "SMH",
+  stagionalita_ndx: "QQQ",   // ⚠ NON "NDX": gli indici sono bloccati, l'ETF no (stessa regola di ^SOX → SOXX)
+};
+
 function tessera({ t, v, cls, grafico, n, tk, id, tag }) {
   /* v241 — `id` e' la CHIAVE STABILE della scheda per il riordino: la chiave dell'indicatore
      (in:cpi, dollar, macroquant…), non il titolo e non la posizione. Una scheda rinominata non
      perde il posto che il CEO le ha dato, e una nuova finisce in coda invece di spostare tutto. */
   return `<div class="mg-card${tk ? " mg-click" : ""}"${id ? ` data-scheda="${esc(id)}"` : ""}${tk ? ` data-tess-tk="${esc(tk)}" role="button" tabindex="0"` : ""}>
-    <div class="mg-card-head"><span class="mg-t">${esc(t)}${tag ? `<span class="tag-proxy" title="${esc(tag)}">proxy</span>` : ""}</span><span class="mg-v ${cls || ""}">${v}</span></div>
+    <div class="mg-card-head"><span class="mg-t">${esc(t)}${tag ? `<span class="tag-proxy" title="${esc(tag)}">proxy</span>` : ""}</span><span class="mg-v ${cls || ""}">${v}</span>${
+      TV_PER_TESSERA[id] ? `<button type="button" class="mg-graf" data-graf-tk="${esc(TV_PER_TESSERA[id])}"
+        title="Apri ${esc(TV_PER_TESSERA[id])} nel grafico" aria-label="Apri ${esc(TV_PER_TESSERA[id])} nel grafico">📈</button>` : ""}</div>
     ${grafico || ""}${n ? `<div class="muted mg-n">${n}</div>` : ""}</div>`;
 }
 function agganciaTessere(box) {
+  /* ⚠ il bottone del grafico sta DENTRO una tessera che al clic apre il pannello: senza
+     stopPropagation si aprirebbero entrambe le cose. E l'handler sta sul CONTENITORE perche'
+     le tessere si ridisegnano a ogni render — difetto v193/v213, gia' pagato. */
+  if (box.dataset && box.dataset.grafAgganciato !== "1") {
+    box.dataset.grafAgganciato = "1";
+    box.addEventListener("click", (ev) => {
+      const b = ev.target && ev.target.closest ? ev.target.closest("[data-graf-tk]") : null;
+      if (!b) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      apriNelGrafico(b.dataset.grafTk);
+    });
+  }
   box.querySelectorAll("[data-tess-tk]").forEach(e => {
     const apri = () => openMacroInfo(e.dataset.tessTk);
     e.addEventListener("click", apri);

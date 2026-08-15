@@ -2370,6 +2370,64 @@ check("v307 portafoglio: le posizioni non seguite vengono dichiarate", (() => {
   return corpo.includes("non_seguite");
 })());
 
+/* ══ v309 — STAGIONALITA' NDX + MIDTERM, E I CLIC CHE PORTANO AL GRAFICO ═════════════════ */
+
+/* ⚠⚠ UNA STATISTICA SU DIECI CASI SI PUBBLICA CON LA SUA INCERTEZZA, O NON SI PUBBLICA. Questo
+   progetto ha tolto un motore predittivo con SETTE segnali maturati (v200, hit-rate 29%): una
+   media di dieci ottobre che va da -8,7% a +18,9% non e' una previsione, ed e' esattamente il
+   genere di numero che sembra una previsione se lo si scrive da solo. */
+check("v309 stagionalità: dichiara il campione e la dispersione, non solo la media", suVeri(`
+  const st = DATA.macro && DATA.macro.stagionalita_ndx;
+  if (!st || !(st.mesi || []).length) return true;
+  const f = FORMA_INDICATORE["stagionalita_ndx"](DATA.macro);
+  if (!f) return false;
+  return f.n.indexOf("anni di midterm") >= 0
+      && f.n.indexOf("osservazioni per mese sono pochissime") >= 0
+      && f.n.indexOf("Non è una previsione") >= 0
+      && (st.mesi || []).every(x => !Number.isFinite(x.media_mid) || (x.n_mid >= 5 && Number.isFinite(x.peggio_mid)))`));
+
+/* ⚠ e l'anno in corso NON entra nel campione che lo descrive: sarebbe circolare. */
+check("v309 stagionalità: l'anno in corso è escluso dallo storico", suVeri(`
+  const st = DATA.macro && DATA.macro.stagionalita_ndx;
+  if (!st) return true;
+  const anno = new Date().getUTCFullYear();
+  return st.al === anno - 1 && (st.anni_midterm || []).every(a => a < anno)`));
+
+/* ⚠⚠ "PER QUELLE CHE PUOI": il bottone del grafico compare SOLO dove un simbolo TradingView
+   funziona davvero. Misurato in v290 in un browser: il widget gratuito rifiuta i rendimenti
+   dei Treasury, il dollaro e TUTTI gli indici. Un bottone che apre un errore e' peggio di
+   nessun bottone — e la stessa regola vale per l'indice NDX, che va sostituito con QQQ come
+   ^SOX va sostituito con SOXX. */
+check("v309 grafico: nessuna tessera punta a un simbolo che il widget rifiuta", (() => {
+  const i = src.indexOf("const TV_PER_TESSERA");
+  /* ⚠ SENZA COMMENTI: la nota che spiega perche' NON usare "NDX" contiene "NDX", e il gate
+     trovava se stesso — SESTA volta in questo progetto (v213, v226, v238, v240, v300). */
+  const mappa = src.slice(i, src.indexOf("};", i))
+    .replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  const vietati = ["TVC:US10Y", "US02Y", "US30Y", "TVC:DXY", "TVC:SPX", "TVC:NDX", "TVC:RUT",
+                   '"NDX"', '"SPX"', '"RUT"', '"DXY"', "ECONOMICS:"];
+  return vietati.every(v => mappa.indexOf(v) < 0)
+      && mappa.indexOf('"SOXX"') >= 0 && mappa.indexOf('"QQQ"') >= 0;
+})());
+
+/* ⚠ il bottone sta dentro una tessera che al clic apre il pannello: senza stopPropagation si
+   aprirebbero entrambe le cose. E gli handler stanno sul contenitore, non sugli elementi che
+   si ridisegnano — difetto v193/v213. */
+check("v309 grafico: il clic sul bottone non apre anche il pannello", (() => {
+  const i = src.indexOf("function agganciaTessere");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("stopPropagation") && corpo.includes("box.addEventListener");
+})());
+
+/* ⚠ e ogni barra di settore porta al grafico del SUO ETF: era la richiesta "per ogni settore
+   se ci clicco sopra". */
+check("v309 grafico: ogni barra di settore ha il proprio simbolo", suVeri(`
+  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
+  if (!f) return true;
+  const n = (f.g.match(/data-graf-tk=/g) || []).length;
+  const barre = (f.g.match(/obar-row/g) || []).length;
+  return n === barre && n >= 6`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

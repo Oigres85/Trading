@@ -34467,6 +34467,147 @@
    "aggiornato": "2026-08-15",
    "fonte": "estratto del broker del CEO, stampato il 15/08/2026 alle 12:35",
    "non_seguite": []
+  },
+  "stagionalita_ndx": {
+   "mesi": [
+    {
+     "mese": 1,
+     "media": 2.52,
+     "n": 40,
+     "media_mid": -0.32,
+     "n_mid": 10,
+     "pos_mid": 50,
+     "peggio_mid": -9.8,
+     "meglio_mid": 8.7
+    },
+    {
+     "mese": 2,
+     "media": 0.59,
+     "n": 40,
+     "media_mid": 0.84,
+     "n_mid": 10,
+     "pos_mid": 50,
+     "peggio_mid": -12.3,
+     "meglio_mid": 11.5
+    },
+    {
+     "mese": 3,
+     "media": 0.93,
+     "n": 40,
+     "media_mid": 1.77,
+     "n_mid": 10,
+     "pos_mid": 70,
+     "peggio_mid": -7.1,
+     "meglio_mid": 7.7
+    },
+    {
+     "mese": 4,
+     "media": 1.53,
+     "n": 40,
+     "media_mid": -2.31,
+     "n_mid": 10,
+     "pos_mid": 40,
+     "peggio_mid": -13.4,
+     "meglio_mid": 4.1
+    },
+    {
+     "mese": 5,
+     "media": 2.19,
+     "n": 40,
+     "media_mid": 0.53,
+     "n_mid": 10,
+     "pos_mid": 50,
+     "peggio_mid": -7.4,
+     "meglio_mid": 14.7
+    },
+    {
+     "mese": 6,
+     "media": 0.81,
+     "n": 40,
+     "media_mid": -1.64,
+     "n_mid": 10,
+     "pos_mid": 40,
+     "peggio_mid": -13.0,
+     "meglio_mid": 12.2
+    },
+    {
+     "mese": 7,
+     "media": 1.72,
+     "n": 40,
+     "media_mid": -0.07,
+     "n_mid": 10,
+     "pos_mid": 60,
+     "peggio_mid": -11.0,
+     "meglio_mid": 12.6
+    },
+    {
+     "mese": 8,
+     "media": 0.52,
+     "n": 40,
+     "media_mid": -1.53,
+     "n_mid": 10,
+     "pos_mid": 50,
+     "peggio_mid": -17.2,
+     "meglio_mid": 7.5
+    },
+    {
+     "mese": 9,
+     "media": -0.53,
+     "n": 40,
+     "media_mid": -0.66,
+     "n_mid": 10,
+     "pos_mid": 30,
+     "peggio_mid": -11.7,
+     "meglio_mid": 18.0
+    },
+    {
+     "mese": 10,
+     "media": 1.7,
+     "n": 40,
+     "media_mid": 3.94,
+     "n_mid": 10,
+     "pos_mid": 80,
+     "peggio_mid": -8.7,
+     "meglio_mid": 18.9
+    },
+    {
+     "mese": 11,
+     "media": 2.54,
+     "n": 41,
+     "media_mid": 4.86,
+     "n_mid": 10,
+     "pos_mid": 70,
+     "peggio_mid": -2.0,
+     "meglio_mid": 12.8
+    },
+    {
+     "mese": 12,
+     "media": 1.69,
+     "n": 41,
+     "media_mid": -1.19,
+     "n_mid": 10,
+     "pos_mid": 30,
+     "peggio_mid": -11.8,
+     "meglio_mid": 17.8
+    }
+   ],
+   "dal": 1985,
+   "al": 2025,
+   "anni_midterm": [
+    1986,
+    1990,
+    1994,
+    1998,
+    2002,
+    2006,
+    2010,
+    2014,
+    2018,
+    2022
+   ],
+   "ciclo_ora": 2,
+   "mese_ora": 8,
+   "fonte": "^NDX, barre mensili (yfinance, auto_adjust)"
   }
  },
  "broker": null,

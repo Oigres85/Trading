@@ -2169,3 +2169,24 @@ svg.g-serie { cursor: crosshair; }
 .pf-riga:focus-visible { box-shadow: inset 2px 0 0 var(--blue); }
 .pf-nome { font-size: 11px; }
 @media (max-width: 620px) { .pf-nome { display: none; } }
+
+/* ═══ v309 — il bottone che porta una tessera nel grafico ═══════════════════════════════════
+   Solo dove un simbolo TradingView esiste davvero: misurato in v290, il widget gratuito
+   rifiuta i Treasury, il dollaro e gli indici. Un bottone che apre un errore è peggio di
+   nessun bottone. */
+.mg-graf { background: none; border: 0; cursor: pointer; font-size: 13px; line-height: 1;
+  padding: 2px 4px; border-radius: 6px; opacity: .55; margin-left: auto; }
+.mg-graf:hover, .mg-graf:focus-visible { opacity: 1; background: var(--hover); outline: none; }
+.mg-card-head { display: flex; align-items: baseline; gap: 6px; }
+
+/* v309 — rotazione più compatta in verticale: righe più basse e riga delle prime cinque che
+   non spinge il resto. Il CEO ha chiesto di ottimizzare l'altezza, e in una tessera ogni
+   pixel speso su una riga è un pixel tolto al grafico. */
+.obars-compatte .obar-row { padding: 0 4px; font-size: 10.5px; gap: 6px;
+  grid-template-columns: 84px minmax(0, 1fr) 60px; align-items: center; }
+.obars-compatte .obar-axis { height: 5px; }
+.obars-compatte .obar-lab, .obars-compatte .obar-val { font-size: 10.5px; line-height: 1.2; }
+.obar-click { cursor: pointer; }
+.obar-click:hover, .obar-click:focus-visible { background: var(--hover); outline: none; }
+.obars-compatte .obar-prime { font-size: 10px; }
+.obars-compatte .obar-row:hover .obar-prime { max-height: 26px; }
