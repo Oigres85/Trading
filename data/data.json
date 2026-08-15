@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-08-15T19:15:11Z",
+ "updated_at": "2026-08-15T20:21:16Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 0,
@@ -947,10 +947,10 @@
    "risk_reward": "1:1.9",
    "sector": "Technology",
    "stats": {
-    "market_cap": 1097386098688.0,
-    "shares": 1129393151.0,
+    "market_cap": null,
+    "shares": null,
     "float_shares": 1125474157.0,
-    "float_pct": 99.7,
+    "float_pct": null,
     "avg_volume_30d": 50030500.0,
     "pe_ttm": 21.9783,
     "forward_pe": 6.2732,
@@ -970,12 +970,12 @@
     "gross_margin": 0.7257,
     "enterprise_value": 1077740175360.0,
     "ev_ebitda": 15.798,
-    "peg": 0.13,
+    "peg": 0.14,
     "roa": 0.3487,
     "short_float": 0.0265,
-    "buyback_yield": -0.0,
-    "altman_z": 44.35,
-    "altman_missing": 0,
+    "buyback_yield": null,
+    "altman_z": 4.11,
+    "altman_missing": 1,
     "altman_model": "Z''"
    },
    "tech_by_range": {
@@ -1911,9 +1911,9 @@
    "earnings_date": "2026-11-03",
    "rating": {
     "key": "strong_buy",
-    "n": 46,
-    "target": 613.33,
-    "upside_pct": 19.2
+    "n": 47,
+    "target": 612.84,
+    "upside_pct": 19.1
    },
    "health": 72,
    "eps": 3.91,
@@ -1949,12 +1949,12 @@
     "debt_to_equity": 6.361,
     "dividend_yield": null,
     "price_to_book": 12.4879,
-    "target_mean": 613.3348,
+    "target_mean": 612.8383,
     "fcf": 8841499648.0,
     "gross_margin": 0.5572,
     "enterprise_value": 830893850624.0,
     "ev_ebitda": 86.895,
-    "peg": 1.01,
+    "peg": 1.1,
     "roa": 0.0513,
     "short_float": 0.0232,
     "buyback_yield": 0.0023,
@@ -2770,13 +2770,10 @@
     "gross_margin": 0.7414,
     "enterprise_value": 5408514113536.0,
     "ev_ebitda": 32.677,
-    "peg": 0.6,
+    "peg": 0.62,
     "roa": 0.5273,
     "short_float": 0.0126,
-    "buyback_yield": 0.0074,
-    "altman_z": 125.54,
-    "altman_missing": 0,
-    "altman_model": "Z''"
+    "buyback_yield": 0.0074
    },
    "tech_by_range": {
     "w1": {
@@ -3519,7 +3516,7 @@
     "gross_margin": 0.609,
     "enterprise_value": 4126697062400.0,
     "ev_ebitda": 23.831,
-    "peg": 0.93,
+    "peg": 0.97,
     "roa": 0.1296,
     "short_float": 0.012,
     "buyback_yield": 0.0108
@@ -4072,7 +4069,7 @@
     "gross_margin": 0.848,
     "enterprise_value": 409141280768.0,
     "ev_ebitda": 153.661,
-    "peg": 2.3,
+    "peg": 2.41,
     "roa": 0.1729,
     "short_float": 0.0317,
     "buyback_yield": 0.0002,
@@ -6078,8 +6075,8 @@
    "risk_reward": "1:1.8",
    "sector": "Technology",
    "stats": {
-    "market_cap": 175374270464.0,
-    "shares": 344682131.0,
+    "market_cap": null,
+    "shares": null,
     "float_shares": 347053000.0,
     "float_pct": null,
     "avg_volume_30d": 8539061.0,
@@ -6095,18 +6092,18 @@
     "roe": 1.3085,
     "debt_to_equity": 11.868,
     "dividend_yield": 0.0012,
-    "price_to_book": 24.327,
+    "price_to_book": null,
     "target_mean": 662.125,
     "fcf": 2318500096.0,
     "gross_margin": 0.4885,
     "enterprise_value": 177552998400.0,
     "ev_ebitda": 35.696,
-    "peg": 0.86,
+    "peg": 0.83,
     "roa": 0.2063,
     "short_float": 0.0805,
-    "buyback_yield": 0.0008,
-    "altman_z": 22.86,
-    "altman_missing": 0,
+    "buyback_yield": null,
+    "altman_z": 1.1,
+    "altman_missing": 1,
     "altman_model": "Z''"
    },
    "tech_by_range": {
@@ -6858,8 +6855,8 @@
    "rating": {
     "key": "strong_buy",
     "n": 40,
-    "target": 257.29,
-    "upside_pct": 15.9
+    "target": 256.91,
+    "upside_pct": 15.7
    },
    "health": 68,
    "eps": 2.91,
@@ -6895,12 +6892,12 @@
     "debt_to_equity": 28.97,
     "dividend_yield": 0.0011,
     "price_to_book": 10.672,
-    "target_mean": 257.2892,
+    "target_mean": 256.9142,
     "fcf": 2269700096.0,
     "gross_margin": 0.515,
     "enterprise_value": 195656695808.0,
     "ev_ebitda": 72.145,
-    "peg": 1.23,
+    "peg": 1.18,
     "roa": 0.0381,
     "short_float": 0.0479,
     "buyback_yield": 0.0102,
@@ -8027,7 +8024,7 @@
     "gross_margin": 0.3165,
     "enterprise_value": 67850452992.0,
     "ev_ebitda": 162.135,
-    "peg": 1.0,
+    "peg": 0.88,
     "roa": 0.056,
     "short_float": 0.0787,
     "buyback_yield": -0.0009,
@@ -8328,7 +8325,7 @@
     "gross_margin": 0.702,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 0.31,
+    "peg": 0.27,
     "roa": 0.3366,
     "short_float": null,
     "buyback_yield": -0.0551,
@@ -9238,10 +9235,10 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 63012.29,
+   "price": 63008.07,
    "price_asof": "2026-08-15",
    "price_live": false,
-   "change_pct": 0.06,
+   "change_pct": 0.05,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -50.1,
@@ -9255,7 +9252,7 @@
    "support": 62226.58,
    "resistance": 65658.34,
    "rsi": 43.0,
-   "volume": 11045020672,
+   "volume": 10824378368,
    "vol_ratio": 0.91,
    "atr_14": 1232.62,
    "atr_pct": 1.96,
@@ -9267,7 +9264,7 @@
      63402.43,
      63402.17,
      62975.59,
-     63012.29
+     63008.07
     ],
     "m6": [
      70753.41,
@@ -9395,7 +9392,7 @@
      63402.43,
      63402.17,
      62975.59,
-     63012.29
+     63008.07
     ],
     "all": [
      386.94,
@@ -9541,7 +9538,7 @@
      73579.69,
      58558.86,
      62813.75,
-     63012.29
+     63008.07
     ],
     "m1": [
      64311.81,
@@ -9565,7 +9562,7 @@
      63402.43,
      63402.17,
      62975.59,
-     63012.29
+     63008.07
     ],
     "m3": [
      63561.05,
@@ -9633,7 +9630,7 @@
      63402.43,
      63402.17,
      62975.59,
-     63012.29
+     63008.07
     ],
     "y1": [
      117398.35,
@@ -9709,18 +9706,18 @@
      62813.75,
      64597.5,
      63910.59,
-     63012.29
+     63008.07
     ],
     "d1": [
      62955.55,
-     62948.78,
+     62948.79,
      62959.09,
      62949.99,
      62950.86,
      62932.3,
      62939.43,
      62944.43,
-     62970.0,
+     62969.99,
      62970.51,
      62964.7,
      62958.74,
@@ -9729,26 +9726,26 @@
      63038.63,
      63060.85,
      63047.15,
-     63063.65,
+     63063.64,
      63068.33,
-     63076.33,
-     63040.94,
+     63083.7,
+     63040.95,
      63013.88,
      63000.01,
      63011.55,
      63010.1,
-     63037.77,
+     63036.61,
      63055.49,
      63060.03,
      63087.38,
      63053.98,
      63060.63,
-     63089.14,
+     63088.96,
      63060.83,
      63057.98,
      63009.39,
      63005.91,
-     63019.95,
+     63019.94,
      62971.91,
      62988.42,
      62996.05,
@@ -9768,46 +9765,46 @@
      62897.97,
      62852.67,
      62890.07,
-     62894.35,
+     62894.34,
      62918.07,
-     62951.99,
+     62951.98,
      62978.0,
      62930.88,
      62950.71,
      62948.05,
      62960.14,
-     62966.17,
+     62966.18,
      62960.72,
      62959.56,
-     62956.47,
+     62956.48,
      62963.58,
      62960.46,
      62980.0,
      62957.27,
      62927.86,
-     62917.49,
+     62916.18,
      62917.25,
      62916.22,
      62895.6,
      62886.76,
-     63001.81,
+     63001.82,
      63000.95,
      62970.31,
      62968.88,
      62957.44,
-     62979.11,
+     62978.83,
      62965.38,
-     62977.21,
-     62947.23,
-     62967.22,
+     62977.22,
+     62947.22,
+     62964.56,
      62965.85,
      62981.27,
      62970.15,
-     62965.01,
+     62965.0,
      62987.82,
      63026.3,
      63041.77,
-     63023.55,
+     63023.56,
      63016.48,
      63007.47,
      63033.51,
@@ -9818,16 +9815,23 @@
      63023.59,
      62990.4,
      62998.03,
-     62998.01,
-     62993.15,
+     62998.02,
+     62993.14,
      62988.69,
      63022.95,
-     62987.93,
+     62987.94,
      62977.5,
-     62972.73,
-     62983.83,
+     62972.72,
+     62983.82,
      62993.99,
-     63012.29
+     63009.33,
+     63047.98,
+     63026.78,
+     63034.52,
+     63050.93,
+     63038.65,
+     63010.05,
+     63008.07
     ]
    },
    "earnings_date": null,
@@ -9840,7 +9844,7 @@
    "sharpe_6m": -1.18,
    "sortino_6m": -1.54,
    "prepost": null,
-   "prezzo_limite_aggiustato": 63012.29,
+   "prezzo_limite_aggiustato": 63008.07,
    "risk_reward": "1:1.4",
    "sector": "Altro",
    "stats": null,
@@ -9848,22 +9852,22 @@
     "w1": {
      "support": 62487.7,
      "resistance": 64433.68,
-     "change_pct": -0.85
+     "change_pct": -0.86
     },
     "m1": {
      "support": 62226.58,
      "resistance": 65658.34,
-     "change_pct": -2.02
+     "change_pct": -2.03
     },
     "m3": {
      "support": 57747.77,
      "resistance": 67248.13,
-     "change_pct": -0.86
+     "change_pct": -0.87
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -30.3
+     "change_pct": -30.31
     }
    },
    "financials": [],
@@ -11372,7 +11376,7 @@
      30147.0,
      30133.5,
      30144.25,
-     30150.5,
+     30149.5,
      30161.75,
      30172.75,
      30174.0,
@@ -11381,7 +11385,7 @@
      30163.25,
      30154.5,
      30167.5,
-     30172.5,
+     30172.75,
      30190.75,
      30180.25,
      30177.0,
@@ -11412,7 +11416,7 @@
      30249.25,
      30263.25,
      30263.75,
-     30265.0,
+     30264.75,
      30235.0,
      30251.5,
      30264.0,
@@ -11420,51 +11424,51 @@
      30268.25,
      30265.25,
      30246.75,
-     30241.5,
-     30220.5,
+     30241.25,
+     30220.0,
      30238.0,
-     30228.25,
-     30233.75,
+     30227.25,
+     30233.0,
      30172.5,
      30160.25,
      30169.0,
      30150.25,
-     30123.0,
-     30106.5,
+     30123.5,
+     30106.0,
      30104.25,
-     30072.5,
+     30072.25,
      30042.25,
-     30037.75,
+     30038.0,
      30065.75,
-     30059.75,
+     30059.5,
      30081.75,
-     30101.0,
-     30081.75,
+     30101.25,
+     30081.5,
      30074.5,
      30059.0,
      30067.0,
      30068.75,
-     30059.25,
+     30059.0,
      30057.25,
      30058.0,
      30081.5,
      30088.5,
      30084.75,
-     30068.0,
+     30067.5,
      30076.25,
      30087.0,
-     30088.5,
+     30088.75,
      30092.25,
-     30088.25,
+     30088.0,
      30096.75,
      30105.75,
      30119.5,
-     30145.0,
-     30133.25,
+     30144.25,
+     30133.75,
      30131.5,
      30131.0,
      30137.0,
-     30141.5,
+     30141.25,
      30141.75
     ]
    },
@@ -11542,20 +11546,20 @@
    "pe": null,
    "ath": 9385.59,
    "ath_dist_pct": -25.7,
-   "sma200_dist_pct": 18.8,
-   "sma50_dist_pct": -5.8,
+   "sma200_dist_pct": 19.7,
+   "sma50_dist_pct": -7.3,
    "w52_high": 9385.59,
    "w52_low": 3079.27,
    "w52_dist_pct": -25.7,
    "day_high": 7010.86,
    "day_low": 6848.43,
    "support": 5262.77,
-   "resistance": 7166.0,
-   "rsi": 53.3,
+   "resistance": 7424.18,
+   "rsi": 52.5,
    "volume": 332900,
-   "vol_ratio": 0.84,
-   "atr_14": 405.62,
-   "atr_pct": 5.81,
+   "vol_ratio": 0.86,
+   "atr_14": 414.17,
+   "atr_pct": 5.94,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -11567,6 +11571,9 @@
      6977.94
     ],
     "m6": [
+     5371.1,
+     5163.57,
+     5089.14,
      5298.04,
      5301.69,
      5354.49,
@@ -11674,15 +11681,12 @@
      7284.41,
      6820.6,
      6516.27,
-     6747.95,
-     6797.7,
      7096.89,
      6690.62,
      6755.75,
      6023.66,
      5663.24,
      5593.56,
-     6595.45,
      6257.45,
      6358.95,
      6598.26,
@@ -12054,18 +12058,18 @@
      6977.94
     ],
     "m1": [
+     7475.94,
+     6806.93,
+     6856.83,
      7284.41,
      6820.6,
      6516.27,
-     6747.95,
-     6797.7,
      7096.89,
      6690.62,
      6755.75,
      6023.66,
      5663.24,
      5593.56,
-     6595.45,
      6257.45,
      6358.95,
      6598.26,
@@ -12078,6 +12082,9 @@
      6977.94
     ],
     "m3": [
+     7490.05,
+     7498.0,
+     7822.24,
      7643.15,
      7844.01,
      7981.41,
@@ -12125,15 +12132,12 @@
      7284.41,
      6820.6,
      6516.27,
-     6747.95,
-     6797.7,
      7096.89,
      6690.62,
      6755.75,
      6023.66,
      5663.24,
      5593.56,
-     6595.45,
      6257.45,
      6358.95,
      6598.26,
@@ -12191,10 +12195,10 @@
      8394.65,
      8051.33,
      6806.93,
-     6747.95,
-     6023.66,
-     6358.95,
-     6345.53
+     7096.89,
+     5593.56,
+     6258.77,
+     6977.94
     ],
     "d1": [
      6997.98,
@@ -12237,16 +12241,16 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 44,
+   "health": 40,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 1.44,
-   "sortino_1y": 2.01,
-   "sharpe_6m": 0.86,
-   "sortino_6m": 1.19,
+   "sharpe_1y": 1.48,
+   "sortino_1y": 2.04,
+   "sharpe_6m": 0.76,
+   "sortino_6m": 1.04,
    "prepost": null,
    "prezzo_limite_aggiustato": 6977.94,
-   "risk_reward": "1:2.3",
+   "risk_reward": "1:2.6",
    "sector": "Altro",
    "stats": null,
    "tech_by_range": {
@@ -12257,13 +12261,13 @@
     },
     "m1": {
      "support": 5262.77,
-     "resistance": 7424.18,
-     "change_pct": -4.21
+     "resistance": 7704.93,
+     "change_pct": -6.66
     },
     "m3": {
      "support": 5262.77,
      "resistance": 9385.59,
-     "change_pct": -8.7
+     "change_pct": -6.84
     },
     "y1": {
      "support": 3079.27,
@@ -12274,9 +12278,9 @@
    "financials": [],
    "fin_health": null,
    "smc": {
-    "bias": 86,
+    "bias": 68,
     "label": "Accumulazione",
-    "structure": "rialzista",
+    "structure": "laterale",
     "bos": "rialzista",
     "bull_fvg": 4,
     "bear_fvg": 2,
@@ -12285,17 +12289,17 @@
      "lo": 6668.43,
      "hi": 6848.43
     },
-    "liq_above": 7166.0,
-    "liq_below": 6448.86,
+    "liq_above": 7108.44,
+    "liq_below": 6472.8,
     "order_block": {
      "dir": "rialzista",
      "lo": 6299.66,
      "hi": 6306.33
     }
    },
-   "rs_1m": -7.6,
+   "rs_1m": -10.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -7.7
+   "rs_ndx_1m": -10.2
   },
   {
    "ticker": "^SOX",
@@ -12309,20 +12313,20 @@
    "pe": null,
    "ath": 14655.29,
    "ath_dist_pct": -15.3,
-   "sma200_dist_pct": 30.7,
-   "sma50_dist_pct": -1.5,
+   "sma200_dist_pct": 31.8,
+   "sma50_dist_pct": -2.2,
    "w52_high": 14655.29,
    "w52_low": 5480.05,
    "w52_dist_pct": -15.3,
    "day_high": 12495.15,
    "day_low": 12269.44,
    "support": 10445.44,
-   "resistance": 12704.38,
-   "rsi": 53.4,
+   "resistance": 12785.4,
+   "rsi": 52.6,
    "volume": 0,
    "vol_ratio": null,
-   "atr_14": 533.21,
-   "atr_pct": 4.29,
+   "atr_14": 550.45,
+   "atr_pct": 4.43,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -12334,6 +12338,9 @@
      12417.05
     ],
     "m6": [
+     8107.13,
+     8291.86,
+     8084.7,
      8137.86,
      8136.05,
      8214.35,
@@ -12441,15 +12448,12 @@
      11867.5,
      11673.89,
      11743.85,
-     12356.16,
-     12410.67,
      12343.84,
      11818.88,
      11554.88,
      11035.68,
      10447.49,
      11302.99,
-     11311.08,
      11430.35,
      12179.26,
      12008.88,
@@ -12852,18 +12856,18 @@
      12417.05
     ],
     "m1": [
+     12347.78,
+     12661.93,
+     12398.89,
      11867.5,
      11673.89,
      11743.85,
-     12356.16,
-     12410.67,
      12343.84,
      11818.88,
      11554.88,
      11035.68,
      10447.49,
      11302.99,
-     11311.08,
      11430.35,
      12179.26,
      12008.88,
@@ -12876,6 +12880,9 @@
      12417.05
     ],
     "m3": [
+     11160.99,
+     11775.5,
+     12081.04,
      11717.26,
      12017.98,
      12073.78,
@@ -12923,15 +12930,12 @@
      11867.5,
      11673.89,
      11743.85,
-     12356.16,
-     12410.67,
      12343.84,
      11818.88,
      11554.88,
      11035.68,
      10447.49,
      11302.99,
-     11311.08,
      11430.35,
      12179.26,
      12008.88,
@@ -12991,10 +12995,9 @@
      12626.22,
      12967.16,
      11673.89,
-     11818.88,
-     11311.08,
-     12356.79,
-     12417.05
+     11035.68,
+     12008.88,
+     12399.38
     ],
     "d1": [
      12381.72,
@@ -13040,13 +13043,13 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 59,
+   "health": 52,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 1.67,
-   "sortino_1y": 2.41,
-   "sharpe_6m": 1.56,
-   "sortino_6m": 2.23,
+   "sharpe_1y": 1.69,
+   "sortino_1y": 2.42,
+   "sharpe_6m": 1.51,
+   "sortino_6m": 2.17,
    "prepost": null,
    "prezzo_limite_aggiustato": 12417.05,
    "risk_reward": "1:2.1",
@@ -13060,13 +13063,13 @@
     },
     "m1": {
      "support": 10445.44,
-     "resistance": 12704.38,
-     "change_pct": 4.63
+     "resistance": 12846.29,
+     "change_pct": 0.56
     },
     "m3": {
      "support": 10445.44,
      "resistance": 14655.29,
-     "change_pct": 5.97
+     "change_pct": 11.25
     },
     "y1": {
      "support": 5480.05,
@@ -13081,14 +13084,14 @@
     "label": "Neutro",
     "structure": "laterale",
     "bos": null,
-    "bull_fvg": 2,
-    "bear_fvg": 2,
+    "bull_fvg": 3,
+    "bear_fvg": 3,
     "last_fvg": {
      "dir": "rialzista",
      "lo": 12204.46,
      "hi": 12398.82
     },
-    "liq_above": 12525.71,
+    "liq_above": 12480.88,
     "liq_below": 11960.84,
     "order_block": {
      "dir": "rialzista",
@@ -13096,9 +13099,9 @@
      "hi": 12141.69
     }
    },
-   "rs_1m": 1.3,
+   "rs_1m": -2.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 1.1
+   "rs_ndx_1m": -3.0
   },
   {
    "ticker": "^RUT",
@@ -17833,6 +17836,9 @@
    "value": 14.25,
    "change_pct": -2.6,
    "spark": [
+    16.45,
+    16.59,
+    16.15,
     15.57,
     16.13,
     16.9,
@@ -17844,15 +17850,12 @@
     16.73,
     18.77,
     18.65,
-    17.05,
-    16.64,
     18.7,
     18.58,
     18.67,
     18.21,
     20.66,
     17.09,
-    15.99,
     15.86,
     16.5,
     15.81,
@@ -31804,39 +31807,39 @@
     "group": "Tematici",
     "medie": {
      "ma20": {
-      "valore": 243.94,
-      "dist_pct": 3.8,
-      "pendenza_pct": 1.87
+      "valore": 243.81,
+      "dist_pct": 3.9,
+      "pendenza_pct": 1.65
      },
      "ma50": {
-      "valore": 239.75,
-      "dist_pct": 5.6,
-      "pendenza_pct": 3.32
+      "valore": 239.4,
+      "dist_pct": 5.8,
+      "pendenza_pct": 3.64
      },
      "ma100": {
-      "valore": 231.76,
-      "dist_pct": 9.3,
-      "pendenza_pct": 0.55
+      "valore": 231.49,
+      "dist_pct": 9.4,
+      "pendenza_pct": 0.33
      },
      "ma200": {
-      "valore": 227.46,
-      "dist_pct": 11.3,
-      "pendenza_pct": 1.54
+      "valore": 227.21,
+      "dist_pct": 11.4,
+      "pendenza_pct": 1.63
      }
     },
     "relativa": {
      "m6": {
-      "settore": 8.0,
+      "settore": 8.7,
       "spy": 14.5,
       "qqq": 21.7
      },
      "a1": {
-      "settore": 29.9,
+      "settore": 29.7,
       "spy": 21.7,
       "qqq": 26.7
      },
      "a2": {
-      "settore": 82.9,
+      "settore": 87.8,
       "spy": 49.0,
       "qqq": 63.7
      }
@@ -31845,8 +31848,8 @@
     "asof": "2026-08-14",
     "price": 253.22,
     "d1": 1.41,
-    "m1": 9.7,
-    "m3": 12.4,
+    "m1": 7.7,
+    "m3": 13.9,
     "prime": [
      {
       "tk": "GE",
@@ -31874,7 +31877,85 @@
       "peso": 4.8
      }
     ],
-    "score": 77
+    "score": 75
+   },
+   {
+    "ticker": "IBB",
+    "name": "Pharma/Bio",
+    "group": "Tematici",
+    "medie": {
+     "ma20": {
+      "valore": 192.32,
+      "dist_pct": 3.1,
+      "pendenza_pct": 3.86
+     },
+     "ma50": {
+      "valore": 185.04,
+      "dist_pct": 7.1,
+      "pendenza_pct": 5.4
+     },
+     "ma100": {
+      "valore": 177.17,
+      "dist_pct": 11.9,
+      "pendenza_pct": 2.55
+     },
+     "ma200": {
+      "valore": 173.08,
+      "dist_pct": 14.5,
+      "pendenza_pct": 2.67
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 15.3,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 50.9,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 44.2,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": null,
+    "asof": "2026-08-14",
+    "price": 198.26,
+    "d1": -0.34,
+    "m1": 4.6,
+    "m3": 16.6,
+    "prime": [
+     {
+      "tk": "AMGN",
+      "nome": "Amgen Inc",
+      "peso": 8.5
+     },
+     {
+      "tk": "VRTX",
+      "nome": "Vertex Pharmaceuticals Inc",
+      "peso": 7.9
+     },
+     {
+      "tk": "GILD",
+      "nome": "Gilead Sciences Inc",
+      "peso": 7.2
+     },
+     {
+      "tk": "REGN",
+      "nome": "Regeneron Pharmaceuticals Inc",
+      "peso": 6.1
+     },
+     {
+      "tk": "ARGX",
+      "nome": "argenx SE ADR",
+      "peso": 3.5
+     }
+    ],
+    "score": 73
    },
    {
     "ticker": "XBI",
@@ -31955,84 +32036,6 @@
     "score": 72
    },
    {
-    "ticker": "IBB",
-    "name": "Pharma/Bio",
-    "group": "Tematici",
-    "medie": {
-     "ma20": {
-      "valore": 192.0,
-      "dist_pct": 3.3,
-      "pendenza_pct": 2.2
-     },
-     "ma50": {
-      "valore": 186.28,
-      "dist_pct": 6.4,
-      "pendenza_pct": 5.36
-     },
-     "ma100": {
-      "valore": 177.91,
-      "dist_pct": 11.4,
-      "pendenza_pct": 2.71
-     },
-     "ma200": {
-      "valore": 173.56,
-      "dist_pct": 14.2,
-      "pendenza_pct": 2.51
-     }
-    },
-    "relativa": {
-     "m6": {
-      "settore": 15.0,
-      "spy": 14.5,
-      "qqq": 21.7
-     },
-     "a1": {
-      "settore": 44.8,
-      "spy": 21.7,
-      "qqq": 26.7
-     },
-     "a2": {
-      "settore": 40.8,
-      "spy": 49.0,
-      "qqq": 63.7
-     }
-    },
-    "azioni_in_circolazione": 69700000,
-    "asof": "2026-08-14",
-    "price": 198.26,
-    "d1": -0.34,
-    "m1": 4.6,
-    "m3": 15.1,
-    "prime": [
-     {
-      "tk": "AMGN",
-      "nome": "Amgen Inc",
-      "peso": 8.5
-     },
-     {
-      "tk": "VRTX",
-      "nome": "Vertex Pharmaceuticals Inc",
-      "peso": 7.9
-     },
-     {
-      "tk": "GILD",
-      "nome": "Gilead Sciences Inc",
-      "peso": 7.2
-     },
-     {
-      "tk": "REGN",
-      "nome": "Regeneron Pharmaceuticals Inc",
-      "peso": 6.1
-     },
-     {
-      "tk": "ARGX",
-      "nome": "argenx SE ADR",
-      "peso": 3.5
-     }
-    ],
-    "score": 72
-   },
-   {
     "ticker": "XLV",
     "name": "Salute",
     "group": "Settori",
@@ -32075,7 +32078,7 @@
       "qqq": 63.7
      }
     },
-    "azioni_in_circolazione": 197415008,
+    "azioni_in_circolazione": null,
     "asof": "2026-08-14",
     "price": 167.37,
     "d1": -0.6,
@@ -32309,7 +32312,7 @@
       "qqq": 63.7
      }
     },
-    "azioni_in_circolazione": 272056000,
+    "azioni_in_circolazione": null,
     "asof": "2026-08-14",
     "price": 190.01,
     "d1": -0.4,
@@ -32350,39 +32353,39 @@
     "group": "Settori",
     "medie": {
      "ma20": {
-      "valore": 182.76,
-      "dist_pct": 2.1,
-      "pendenza_pct": 0.62
+      "valore": 182.87,
+      "dist_pct": 2.0,
+      "pendenza_pct": 0.88
      },
      "ma50": {
-      "valore": 180.85,
-      "dist_pct": 3.1,
-      "pendenza_pct": 2.37
+      "valore": 180.49,
+      "dist_pct": 3.3,
+      "pendenza_pct": 2.44
      },
      "ma100": {
-      "valore": 175.51,
-      "dist_pct": 6.3,
-      "pendenza_pct": 1.58
+      "valore": 175.0,
+      "dist_pct": 6.6,
+      "pendenza_pct": 1.37
      },
      "ma200": {
-      "valore": 168.23,
-      "dist_pct": 10.9,
-      "pendenza_pct": 1.93
+      "valore": 167.85,
+      "dist_pct": 11.1,
+      "pendenza_pct": 1.97
      }
     },
     "relativa": {
      "m6": {
-      "settore": 7.7,
+      "settore": 7.8,
       "spy": 14.5,
       "qqq": 21.7
      },
      "a1": {
-      "settore": 25.0,
+      "settore": 25.7,
       "spy": 21.7,
       "qqq": 26.7
      },
      "a2": {
-      "settore": 55.0,
+      "settore": 57.8,
       "spy": 49.0,
       "qqq": 63.7
      }
@@ -32391,8 +32394,8 @@
     "asof": "2026-08-14",
     "price": 186.51,
     "d1": 0.39,
-    "m1": 3.5,
-    "m3": 7.2,
+    "m1": 3.4,
+    "m3": 7.5,
     "prime": [
      {
       "tk": "GE",
@@ -32421,84 +32424,6 @@
      }
     ],
     "score": 63
-   },
-   {
-    "ticker": "ARKK",
-    "name": "Innovazione",
-    "group": "Tematici",
-    "medie": {
-     "ma20": {
-      "valore": 76.09,
-      "dist_pct": 6.6,
-      "pendenza_pct": -4.32
-     },
-     "ma50": {
-      "valore": 77.52,
-      "dist_pct": 4.6,
-      "pendenza_pct": -1.02
-     },
-     "ma100": {
-      "valore": 76.24,
-      "dist_pct": 6.4,
-      "pendenza_pct": 1.02
-     },
-     "ma200": {
-      "valore": 76.82,
-      "dist_pct": 5.6,
-      "pendenza_pct": -1.66
-     }
-    },
-    "relativa": {
-     "m6": {
-      "settore": 15.4,
-      "spy": 14.5,
-      "qqq": 21.7
-     },
-     "a1": {
-      "settore": 5.3,
-      "spy": 21.7,
-      "qqq": 26.7
-     },
-     "a2": {
-      "settore": 98.2,
-      "spy": 49.0,
-      "qqq": 63.7
-     }
-    },
-    "azioni_in_circolazione": null,
-    "asof": "2026-08-14",
-    "price": 81.1,
-    "d1": -1.8,
-    "m1": 5.8,
-    "m3": 3.7,
-    "prime": [
-     {
-      "tk": "TSLA",
-      "nome": "Tesla Inc",
-      "peso": 9.4
-     },
-     {
-      "tk": "SPCX",
-      "nome": "Space Exploration Technologies Corp Cl",
-      "peso": 4.9
-     },
-     {
-      "tk": "TEM",
-      "nome": "Tempus AI Inc Class A common stock",
-      "peso": 4.8
-     },
-     {
-      "tk": "CRSP",
-      "nome": "CRISPR Therapeutics AG",
-      "peso": 4.7
-     },
-     {
-      "tk": "COIN",
-      "nome": "Coinbase Global Inc Ordinary Shares - ",
-      "peso": 4.5
-     }
-    ],
-    "score": 62
    },
    {
     "ticker": "SMH",
@@ -32543,7 +32468,7 @@
       "qqq": 63.7
      }
     },
-    "azioni_in_circolazione": 11670900,
+    "azioni_in_circolazione": null,
     "asof": "2026-08-14",
     "price": 587.82,
     "d1": -0.22,
@@ -32584,49 +32509,49 @@
     "group": "Tematici",
     "medie": {
      "ma20": {
-      "valore": 87.05,
-      "dist_pct": 0.4,
-      "pendenza_pct": 0.32
+      "valore": 87.32,
+      "dist_pct": 0.1,
+      "pendenza_pct": 0.99
      },
      "ma50": {
-      "valore": 86.66,
-      "dist_pct": 0.9,
-      "pendenza_pct": 2.86
+      "valore": 86.47,
+      "dist_pct": 1.1,
+      "pendenza_pct": 3.27
      },
      "ma100": {
-      "valore": 83.03,
-      "dist_pct": 5.3,
-      "pendenza_pct": 2.63
+      "valore": 82.62,
+      "dist_pct": 5.8,
+      "pendenza_pct": 2.39
      },
      "ma200": {
-      "valore": 79.27,
-      "dist_pct": 10.3,
-      "pendenza_pct": 2.2
+      "valore": 79.02,
+      "dist_pct": 10.7,
+      "pendenza_pct": 2.22
      }
     },
     "relativa": {
      "m6": {
-      "settore": 10.0,
+      "settore": 7.1,
       "spy": 14.5,
       "qqq": 21.7
      },
      "a1": {
-      "settore": 25.7,
+      "settore": 30.3,
       "spy": 21.7,
       "qqq": 26.7
      },
      "a2": {
-      "settore": 41.0,
+      "settore": 43.0,
       "spy": 49.0,
       "qqq": 63.7
      }
     },
-    "azioni_in_circolazione": 2800000,
+    "azioni_in_circolazione": null,
     "asof": "2026-08-14",
     "price": 87.44,
     "d1": -0.79,
-    "m1": -2.9,
-    "m3": 10.2,
+    "m1": -0.7,
+    "m3": 8.5,
     "prime": [
      {
       "tk": "UNP",
@@ -32654,7 +32579,7 @@
       "peso": 4.9
      }
     ],
-    "score": 56
+    "score": 57
    },
    {
     "ticker": "XLB",
@@ -32735,82 +32660,82 @@
     "score": 56
    },
    {
-    "ticker": "XLRE",
-    "name": "Immobiliare",
-    "group": "Settori",
+    "ticker": "ARKK",
+    "name": "Innovazione",
+    "group": "Tematici",
     "medie": {
      "ma20": {
-      "valore": 45.22,
-      "dist_pct": 0.1,
-      "pendenza_pct": 1.82
+      "valore": 76.05,
+      "dist_pct": 6.6,
+      "pendenza_pct": -4.51
      },
      "ma50": {
-      "valore": 44.73,
-      "dist_pct": 1.2,
-      "pendenza_pct": 1.36
+      "valore": 77.56,
+      "dist_pct": 4.6,
+      "pendenza_pct": -1.01
      },
      "ma100": {
-      "valore": 43.8,
-      "dist_pct": 3.4,
-      "pendenza_pct": 1.43
+      "valore": 76.19,
+      "dist_pct": 6.4,
+      "pendenza_pct": 1.03
      },
      "ma200": {
-      "valore": 42.27,
-      "dist_pct": 7.1,
-      "pendenza_pct": 1.12
+      "valore": 76.9,
+      "dist_pct": 5.5,
+      "pendenza_pct": -1.61
      }
     },
     "relativa": {
      "m6": {
-      "settore": 7.2,
+      "settore": 18.5,
       "spy": 14.5,
       "qqq": 21.7
      },
      "a1": {
-      "settore": 13.3,
+      "settore": 4.1,
       "spy": 21.7,
       "qqq": 26.7
      },
      "a2": {
-      "settore": 15.8,
+      "settore": 95.6,
       "spy": 49.0,
       "qqq": 63.7
      }
     },
     "azioni_in_circolazione": null,
     "asof": "2026-08-14",
-    "price": 45.27,
-    "d1": 0.33,
-    "m1": 1.6,
-    "m3": 2.5,
+    "price": 81.1,
+    "d1": -1.8,
+    "m1": 1.9,
+    "m3": 1.3,
     "prime": [
      {
-      "tk": "WELL",
-      "nome": "Welltower Inc",
-      "peso": 11.1
+      "tk": "TSLA",
+      "nome": "Tesla Inc",
+      "peso": 9.4
      },
      {
-      "tk": "PLD",
-      "nome": "Prologis Inc",
-      "peso": 9.0
+      "tk": "SPCX",
+      "nome": "Space Exploration Technologies Corp Cl",
+      "peso": 4.9
      },
      {
-      "tk": "EQIX",
-      "nome": "Equinix Inc",
-      "peso": 6.7
+      "tk": "TEM",
+      "nome": "Tempus AI Inc Class A common stock",
+      "peso": 4.8
      },
      {
-      "tk": "AMT",
-      "nome": "American Tower Corp",
-      "peso": 5.4
+      "tk": "CRSP",
+      "nome": "CRISPR Therapeutics AG",
+      "peso": 4.7
      },
      {
-      "tk": "SPG",
-      "nome": "Simon Property Group Inc",
-      "peso": 5.0
+      "tk": "COIN",
+      "nome": "Coinbase Global Inc Ordinary Shares - ",
+      "peso": 4.5
      }
     ],
-    "score": 55
+    "score": 54
    },
    {
     "ticker": "XLP",
@@ -32943,54 +32868,132 @@
     "score": 58
    },
    {
+    "ticker": "XLRE",
+    "name": "Immobiliare",
+    "group": "Settori",
+    "medie": {
+     "ma20": {
+      "valore": 45.16,
+      "dist_pct": 0.3,
+      "pendenza_pct": 1.58
+     },
+     "ma50": {
+      "valore": 44.75,
+      "dist_pct": 1.2,
+      "pendenza_pct": 1.32
+     },
+     "ma100": {
+      "valore": 43.84,
+      "dist_pct": 3.3,
+      "pendenza_pct": 1.46
+     },
+     "ma200": {
+      "valore": 42.28,
+      "dist_pct": 7.1,
+      "pendenza_pct": 1.1
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 5.7,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 14.1,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 16.5,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": null,
+    "asof": "2026-08-14",
+    "price": 45.27,
+    "d1": 0.33,
+    "m1": -0.4,
+    "m3": 2.4,
+    "prime": [
+     {
+      "tk": "WELL",
+      "nome": "Welltower Inc",
+      "peso": 11.1
+     },
+     {
+      "tk": "PLD",
+      "nome": "Prologis Inc",
+      "peso": 9.0
+     },
+     {
+      "tk": "EQIX",
+      "nome": "Equinix Inc",
+      "peso": 6.7
+     },
+     {
+      "tk": "AMT",
+      "nome": "American Tower Corp",
+      "peso": 5.4
+     },
+     {
+      "tk": "SPG",
+      "nome": "Simon Property Group Inc",
+      "peso": 5.0
+     }
+    ],
+    "score": 52
+   },
+   {
     "ticker": "XLY",
     "name": "Consumi discr.",
     "group": "Settori",
     "medie": {
      "ma20": {
-      "valore": 115.58,
-      "dist_pct": 2.3,
-      "pendenza_pct": -0.55
+      "valore": 115.71,
+      "dist_pct": 2.1,
+      "pendenza_pct": -0.53
      },
      "ma50": {
-      "valore": 115.92,
-      "dist_pct": 2.0,
-      "pendenza_pct": -1.04
+      "valore": 116.0,
+      "dist_pct": 1.9,
+      "pendenza_pct": -1.01
      },
      "ma100": {
-      "valore": 115.86,
-      "dist_pct": 2.0,
-      "pendenza_pct": 0.41
+      "valore": 115.73,
+      "dist_pct": 2.1,
+      "pendenza_pct": 0.31
      },
      "ma200": {
-      "valore": 116.75,
+      "valore": 116.79,
       "dist_pct": 1.2,
-      "pendenza_pct": -0.19
+      "pendenza_pct": -0.17
      }
     },
     "relativa": {
      "m6": {
-      "settore": 2.1,
+      "settore": 0.8,
       "spy": 14.5,
       "qqq": 21.7
      },
      "a1": {
-      "settore": 3.8,
+      "settore": 5.1,
       "spy": 21.7,
       "qqq": 26.7
      },
      "a2": {
-      "settore": 38.4,
+      "settore": 38.3,
       "spy": 49.0,
       "qqq": 63.7
      }
     },
-    "azioni_in_circolazione": 120253000,
+    "azioni_in_circolazione": null,
     "asof": "2026-08-14",
     "price": 118.2,
     "d1": -0.21,
-    "m1": 0.7,
-    "m3": 0.1,
+    "m1": 2.0,
+    "m3": -1.5,
     "prime": [
      {
       "tk": "AMZN",
@@ -33018,7 +33021,7 @@
       "peso": 4.1
      }
     ],
-    "score": 51
+    "score": 52
    },
    {
     "ticker": "XLC",
@@ -33026,22 +33029,22 @@
     "group": "Settori",
     "medie": {
      "ma20": {
-      "valore": 109.92,
-      "dist_pct": 2.8,
+      "valore": 109.95,
+      "dist_pct": 2.7,
       "pendenza_pct": 0.56
      },
      "ma50": {
-      "valore": 110.02,
+      "valore": 110.01,
       "dist_pct": 2.7,
-      "pendenza_pct": -2.16
+      "pendenza_pct": -2.11
      },
      "ma100": {
-      "valore": 112.37,
+      "valore": 112.35,
       "dist_pct": 0.5,
-      "pendenza_pct": -1.03
+      "pendenza_pct": -1.01
      },
      "ma200": {
-      "valore": 113.68,
+      "valore": 113.65,
       "dist_pct": -0.6,
       "pendenza_pct": -0.44
      }
@@ -33058,7 +33061,7 @@
       "qqq": 26.7
      },
      "a2": {
-      "settore": 35.7,
+      "settore": 36.7,
       "spy": 49.0,
       "qqq": 63.7
      }
@@ -33067,8 +33070,8 @@
     "asof": "2026-08-14",
     "price": 112.95,
     "d1": 0.36,
-    "m1": -0.4,
-    "m3": -2.0,
+    "m1": 0.3,
+    "m3": -2.3,
     "prime": [
      {
       "tk": "META",
@@ -33096,7 +33099,7 @@
       "peso": 4.8
      }
     ],
-    "score": 47
+    "score": 48
    },
    {
     "ticker": "XLU",
@@ -35960,7 +35963,7 @@
   },
   "dollar_ruler": {
    "value": 99.67,
-   "chg_3m_pct": 0.4,
+   "chg_3m_pct": 1.4,
    "flag": null,
    "src": "DXY"
   },
@@ -35973,8 +35976,8 @@
    },
    "ndx": {
     "price": 30046.14,
-    "sma125": 27562.26,
-    "dist_pct": 9.01,
+    "sma125": 27467.81,
+    "dist_pct": 9.39,
     "asof": "2026-08-14"
    }
   },
@@ -36009,8 +36012,8 @@
   },
   "breadth": {
    "spy_1m_pct": 3.41,
-   "rsp_1m_pct": 3.59,
-   "divergence_pp": -0.17,
+   "rsp_1m_pct": 4.37,
+   "divergence_pp": -0.95,
    "alert": false,
    "asof": "2026-08-14"
   },
@@ -36058,18 +36061,13 @@
   },
   {
    "question": "Will the price of Bitcoin be above $60,000 on August 16?",
-   "yes": 100,
+   "yes": 99,
    "link": "https://polymarket.com/event/bitcoin-above-60k-on-august-16-2026"
   },
   {
    "question": "Will the price of Bitcoin be above $62,000 on August 16?",
    "yes": 98,
    "link": "https://polymarket.com/event/bitcoin-above-62k-on-august-16-2026"
-  },
-  {
-   "question": "Will the Fed increase interest rates by 25 bps after the September 2026 meeting?",
-   "yes": 24,
-   "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
   }
  ],
  "options": {
@@ -38915,6 +38913,38 @@
      "date": "2026-08-28",
      "calls": [
       {
+       "strike": 170.0,
+       "bid": 59.4,
+       "ask": 62.75,
+       "iv": 102.2,
+       "vol": 3,
+       "oi": 51
+      },
+      {
+       "strike": 175.0,
+       "bid": 54.7,
+       "ask": 58.05,
+       "iv": 99.7,
+       "vol": 3,
+       "oi": 41
+      },
+      {
+       "strike": 180.0,
+       "bid": 50.0,
+       "ask": 53.6,
+       "iv": 97.9,
+       "vol": 8,
+       "oi": 244
+      },
+      {
+       "strike": 185.0,
+       "bid": 45.75,
+       "ask": 48.9,
+       "iv": 96.2,
+       "vol": 10,
+       "oi": 58
+      },
+      {
        "strike": 190.0,
        "bid": 41.8,
        "ask": 44.9,
@@ -38955,28 +38985,12 @@
        "oi": 133
       },
       {
-       "strike": 212.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 215.0,
        "bid": 23.25,
        "ask": 26.5,
        "iv": 94.1,
        "vol": 6,
        "oi": 194
-      },
-      {
-       "strike": 217.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 220.0,
@@ -38987,28 +39001,12 @@
        "oi": 117
       },
       {
-       "strike": 222.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 225.0,
        "bid": 17.8,
        "ask": 19.95,
        "iv": 91.8,
        "vol": 14,
        "oi": 161
-      },
-      {
-       "strike": 227.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 230.0,
@@ -39025,14 +39023,6 @@
        "iv": 94.3,
        "vol": 66,
        "oi": 171
-      },
-      {
-       "strike": 237.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 240.0,
@@ -39113,6 +39103,14 @@
        "iv": 97.7,
        "vol": 536,
        "oi": 1096
+      },
+      {
+       "strike": 290.0,
+       "bid": 2.05,
+       "ask": 3.15,
+       "iv": 96.7,
+       "vol": 43,
+       "oi": 254
       }
      ],
      "puts": [
@@ -43819,18 +43817,10 @@
        "oi": 2
       },
       {
-       "strike": 1115.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 1130.0,
-       "bid": null,
-       "ask": null,
-       "iv": null,
+       "strike": 1370.0,
+       "bid": 390.95,
+       "ask": 404.45,
+       "iv": 240.1,
        "vol": 0,
        "oi": 0
       }
@@ -45497,14 +45487,6 @@
        "oi": 33707
       },
       {
-       "strike": 237.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 240.0,
        "bid": 0.31,
        "ask": 0.32,
@@ -45529,14 +45511,6 @@
        "oi": 17922
       },
       {
-       "strike": 247.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 250.0,
        "bid": 0.09,
        "ask": 0.1,
@@ -45559,6 +45533,22 @@
        "iv": 44.5,
        "vol": 5368,
        "oi": 28688
+      },
+      {
+       "strike": 265.0,
+       "bid": 0.03,
+       "ask": 0.04,
+       "iv": 48.4,
+       "vol": 2119,
+       "oi": 7757
+      },
+      {
+       "strike": 270.0,
+       "bid": 0.02,
+       "ask": 0.03,
+       "iv": 50.4,
+       "vol": 879,
+       "oi": 20299
       }
      ],
      "puts": [
@@ -47401,7 +47391,7 @@
      ],
      "call_wall": 180.0,
      "put_wall": 125.0,
-     "opt_volume": 158497
+     "opt_volume": 158410
     },
     {
      "date": "2026-08-28",
@@ -47795,7 +47785,7 @@
      ],
      "call_wall": 200.0,
      "put_wall": 150.0,
-     "opt_volume": 21539
+     "opt_volume": 21623
     },
     {
      "date": "2026-09-04",
@@ -50657,28 +50647,12 @@
        "oi": 5661
       },
       {
-       "strike": 432.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
-      },
-      {
        "strike": 435.0,
        "bid": 3.7,
        "ask": 4.05,
        "iv": 32.0,
        "vol": 596,
        "oi": 1816
-      },
-      {
-       "strike": 437.5,
-       "bid": null,
-       "ask": null,
-       "iv": null,
-       "vol": 0,
-       "oi": 0
       },
       {
        "strike": 440.0,
@@ -50743,6 +50717,22 @@
        "iv": 38.2,
        "vol": 318,
        "oi": 6615
+      },
+      {
+       "strike": 480.0,
+       "bid": 0.07,
+       "ask": 0.15,
+       "iv": 40.2,
+       "vol": 188,
+       "oi": 14699
+      },
+      {
+       "strike": 490.0,
+       "bid": 0.01,
+       "ask": 0.06,
+       "iv": 41.0,
+       "vol": 289,
+       "oi": 3650
       }
      ],
      "puts": [
@@ -54984,6 +54974,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-08-15T19:15:11Z"
+  "generated_at": "2026-08-15T20:21:16Z"
  }
 }
