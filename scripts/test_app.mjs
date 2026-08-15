@@ -2194,6 +2194,35 @@ check("v295 etichette: la scala non parla di un portafoglio che non c'e' piu'", 
   return !/favorevole al libro|sfavorevole al libro/.test(senzaCommenti);
 })());
 
+/* ══ v296 — LA TESI CONTRARIA ════════════════════════════════════════════════════════════
+   Presa da TauricResearch/TradingAgents, che il CEO mi ha chiesto di analizzare: di quel
+   framework l'unica idea che vale e' il ricercatore rialzista contro quello ribassista prima
+   che qualcuno decida. Presa come STRUTTURA DI PROMPT, non come sistema: zero infrastruttura,
+   dentro il flusso a un incollaggio. Del resto — agenti autonomi, borsa simulata, sentiment
+   dai forum — non prendo niente, e i forum sono gia' vietati da questa testata dopo che un LLM
+   marco' [VERIFICATO] medie mobili con fonte Reddit. */
+check("v296 contraddittorio: il pacchetto chiede la tesi opposta, e la chiede per ultima", suVeri(`
+  const p = buildPromptTicker("AMD");
+  const i8 = p.indexOf("8) LA TESI CONTRARIA");
+  const i7 = p.indexOf("7) LA CHIUSURA");
+  const i0 = p.indexOf("0) IL GIUDIZIO");
+  /* dopo la conclusione, non dopo il giudizio: per attaccare una tesi bisogna averla prima
+     argomentata con le prove, altrimenti e' teatro. */
+  return i8 > i7 && i7 > i0 && /obbligatoria/.test(p)`));
+
+/* ⚠⚠ I TRE VINCOLI CHE LO RENDONO UN CONTRADDITTORIO INVECE DI UN PARAGRAFO DI CORTESIA. Senza
+   di questi un modello scrive "d'altra parte i rischi non mancano" e passa oltre: (a) i numeri
+   devono essere QUESTI, (b) deve scegliere, (c) deve nominare un fatto osservabile e datato che
+   deciderebbe la disputa. Il terzo si aggancia al calendario che il pacchetto porta da v290. */
+check("v296 contraddittorio: obbliga ai numeri del pacchetto, a scegliere, e a un fatto datato", suVeri(`
+  const p = buildPromptTicker("AMD");
+  const i = p.indexOf("8) LA TESI CONTRARIA");
+  const b = p.slice(i, p.indexOf("══ REGOLE ══", i));
+  return /NUMERI DI QUESTO PACCHETTO/.test(b)
+      && /non obiezioni generiche/.test(b)
+      && /QUALE FATTO OSSERVABILE E DATATO/.test(b)
+      && /Non ti e' consentito rispondere che entrambe le tesi hanno merito/.test(b)`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

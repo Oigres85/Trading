@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "295";
+const BUILD_VERSION = "296";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7759,7 +7759,7 @@ function buildPromptTicker(tkGrezzo) {
    "da non tagliare per quanto sembrino ovvie". */
 `══ COSA DEVI CONSEGNARE — E QUANTO LUNGO ══`,
 ``,
-`BUDGET: 1.100-1.300 parole IN TUTTO. E' un vincolo, non un'indicazione. Un blocco che non ha`,
+`BUDGET: 1.200-1.400 parole IN TUTTO. E' un vincolo, non un'indicazione. Un blocco che non ha`,
 `nulla da dire si chiude in una riga: meglio corto e vero che lungo e riempito. Tabelle solo`,
 `dove servono a confrontare; niente tabella per elencare tre numeri.`,
 ``,
@@ -7810,6 +7810,36 @@ function buildPromptTicker(tkGrezzo) {
 `· MEDIO (3-12 mesi): quale trimestrale o quale dato macro decide la direzione.`,
 `· LUNGO (oltre l'anno): la tesi vale ancora se il ciclo del settore gira? Cosa la romperebbe?`,
 `Non un voto: un ragionamento con numeri sopra, e per ciascun orizzonte cosa ti smentirebbe.`,
+``,
+/* ═══ v296 — LA TESI CONTRARIA, PRESA DA TradingAgents ═══════════════════════════════════
+   Il CEO mi ha chiesto di analizzare TauricResearch/TradingAgents. Di quel framework l'idea
+   che vale e' UNA: due ricercatori, uno rialzista e uno ribassista, che si contraddicono prima
+   che qualcuno decida. Il resto (agenti autonomi, borsa simulata, sentiment dai forum) non lo
+   prendo — e il sentiment dai forum e' gia' vietato da questa stessa testata, dopo che un LLM
+   marco' [VERIFICATO] medie mobili e target con fonte Reddit.
+   ⚠ E LA PRENDO COME STRUTTURA DI PROMPT, NON COME SISTEMA: zero infrastruttura nuova, resta
+   dentro il flusso a un incollaggio, ed e' verificabile con un cancello.
+   ⚠⚠ VA IN FONDO, NON DOPO IL GIUDIZIO. Per attaccare una tesi bisogna averla prima esposta
+   con le prove: messo dopo il blocco 0 sarebbe un'obiezione a qualcosa che non e' ancora stato
+   argomentato, cioe' teatro.
+   ⚠ TRE VINCOLI CHE LO RENDONO UN CONTRADDITTORIO VERO invece di un paragrafo di cortesia:
+   (a) deve usare i NUMERI DI QUESTO PACCHETTO, altrimenti produce obiezioni generiche che
+       valgono per qualsiasi titolo e non informano su nessuno;
+   (b) deve chiudere SCEGLIENDO: "entrambe le tesi hanno merito" e' il modo in cui un modello
+       evita di esporsi, ed e' esattamente cio' che il blocco deve impedire;
+   (c) deve nominare un fatto OSSERVABILE E DATATO che deciderebbe la disputa — e il pacchetto
+       ora porta il calendario delle prossime due settimane, quindi quel fatto spesso c'e' gia'. */
+`8) LA TESI CONTRARIA — massimo 10 righe, ed e' obbligatoria.`,
+`Hai appena scritto un giudizio. Ora scrivi il caso di chi la pensa all'opposto, e scrivilo`,
+`bene: se sei arrivato a "comprare", argomenta perche' ${tk} scendera'; se sei arrivato a`,
+`"stare fuori", argomenta perche' questo e' il momento di entrare.`,
+`⚠ Usa i NUMERI DI QUESTO PACCHETTO, non obiezioni generiche: un'obiezione che varrebbe per`,
+`qualsiasi titolo non dice niente su questo. Se la tesi contraria poggia su un dato che qui`,
+`non c'e', dillo — anche quello e' un'informazione sul tuo giudizio.`,
+`Poi chiudi in due righe: quale delle due regge meglio, e QUALE FATTO OSSERVABILE E DATATO`,
+`separerebbe le due letture (una trimestrale, un dato macro in uscita, un livello di prezzo`,
+`toccato). Non ti e' consentito rispondere che entrambe le tesi hanno merito: se le prove non`,
+`bastano a scegliere, il giudizio da dare e' "non abbastanza per agire", che e' una scelta.`,
 ``,
 `══ REGOLE ══`,
 `· Sei un analista di Wall Street: scrivi come per un comitato di investimento, non per un blog.`,
