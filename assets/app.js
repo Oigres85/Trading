@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "305";
+const BUILD_VERSION = "306";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2433,25 +2433,53 @@ function renderCalendario() {
     if (!voci.length) {
       boxNews.innerHTML = "";
     } else {
+      /* ═══ v306 — SOLO LE ULTIME SEI ORE, MA SENZA UNA SCATOLA VUOTA ══════════════════════
+         Il CEO: "inserisci solo news fresche di massimo 6 ore". Applicato — con una misura che
+         va detta: nel momento in cui l'ho scritto, dentro le 6 ore c'erano ZERO notizie macro,
+         e anche dentro le 12. La piu' fresca aveva 12,5 ore, perche' era sabato e la macro non
+         esce nel fine settimana.
+         ⚠⚠ Una finestra vuota si legge come "rotto", non come "non c'e' niente". Quindi: dentro
+         le 6 ore si mostra quello che c'e'; quando non c'e' niente si DICE, e si mostrano
+         comunque le piu' recenti marcate con la loro eta'. Il CEO chiedeva notizie fresche, non
+         una scatola che tace — e un dato vecchio DICHIARATO e' un'informazione (in questo caso:
+         "non e' uscito niente di macro da mezza giornata", che di sabato e' la risposta giusta). */
+      const ORE_FRESCHE = 6;
       const ora = Date.now();
-      const eta = (iso) => {
+      const oreDi = (iso) => {
         const t = Date.parse(iso);
-        if (!Number.isFinite(t)) return "";
-        const h = Math.round((ora - t) / 3600000);
-        return h < 1 ? "adesso" : h < 24 ? `${h} ore fa` : `${Math.round(h / 24)} giorni fa`;
+        return Number.isFinite(t) ? (ora - t) / 3600000 : null;
       };
-      boxNews.innerHTML = `<details class="cal-news">
-        <summary><b>Notizie macro</b> <span class="muted">${voci.length} titoli · ${esc((nw.fonti || []).join(", "))}</span></summary>
-        <div class="cal-news-lista">${voci.map(v => `<div class="cal-news-riga">
-          <span class="cal-news-quando">${esc(eta(v.quando))}</span>
+      const eta = (h) => h == null ? "" : h < 1 ? "adesso" : h < 24 ? `${Math.round(h)} ore fa` : `${Math.round(h / 24)} giorni fa`;
+      const conEta = voci.map(v => ({ ...v, ore: oreDi(v.quando) }))
+                         .filter(v => v.ore != null).sort((a, b) => a.ore - b.ore);
+      const fresche = conEta.filter(v => v.ore <= ORE_FRESCHE);
+      const mostrate = fresche.length ? fresche : conEta.slice(0, 6);
+      const piuFresca = conEta.length ? conEta[0].ore : null;
+
+      const riga = (v) => `<div class="cal-news-riga">
+        <span class="cal-news-quando${v.ore <= ORE_FRESCHE ? " cal-news-fresca" : ""}">${esc(eta(v.ore))}</span>
+        <span class="cal-news-testo">
           ${v.url ? `<a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer">${esc(v.titolo)}</a>`
-                  : `<span>${esc(v.titolo)}</span>`}
-          <span class="cal-news-fonte">${esc(v.fonte)}</span>
-        </div>`).join("")}</div>
+                  : `<b>${esc(v.titolo)}</b>`}
+          ${v.riassunto ? `<span class="cal-news-rias">${esc(v.riassunto)}</span>` : ""}
+        </span>
+        <span class="cal-news-fonte">${esc(v.fonte)}</span>
+      </div>`;
+
+      boxNews.innerHTML = `<details class="cal-news">
+        <summary><b>Notizie macro</b> <span class="muted">${
+          fresche.length
+            ? `${fresche.length} nelle ultime ${ORE_FRESCHE} ore`
+            : `nessuna nelle ultime ${ORE_FRESCHE} ore — la più recente è di ${esc(eta(piuFresca))}`
+        } · ${esc((nw.fonti || []).join(", "))}</span></summary>
+        ${fresche.length ? "" : `<div class="cal-news-avviso">⚠ Nessuna notizia macro nelle ultime
+          ${ORE_FRESCHE} ore. <b>Non è un guasto</b>: la macro non esce di continuo, e nel fine
+          settimana non esce affatto. Qui sotto le più recenti, ciascuna con la sua età.</div>`}
+        <div class="cal-news-lista">${mostrate.map(riga).join("")}</div>
         <div class="muted cal-news-nota">⚠ <b>Come è fatto questo elenco:</b> ${esc(nw.filtro || "")}.
-        Non è una selezione redazionale: è un filtro automatico, quindi può lasciar passare
-        titoli non macro e può scartarne di buoni. I titoli portano fonte e ora; il contenuto
-        non è stato verificato dal sistema.</div>
+        Non è una selezione redazionale: è un filtro automatico, quindi può lasciar passare titoli
+        non macro e può scartarne di buoni. I riassunti sono quelli che la fonte pubblica nel feed,
+        non riscritti dal sistema. Il contenuto non è stato verificato.</div>
       </details>`;
     }
   }
@@ -2558,6 +2586,29 @@ function vixComeIndicatore(m) {
            score: Math.round(Math.max(0, Math.min(100, 100 - v.value / 50 * 100))),
            sub: `${fmtNum.format(v.value)}${v.change_pct != null ? ` (${signTxt(v.change_pct)} oggi)` : ""}` };
 }
+/* ⚠ v306 — quanto si e' mosso un indicatore RISPETTO AL SUO SOLITO: l'ultimo scarto
+   pubblicato diviso per la deviazione tipica degli scarti di quella stessa serie. Non c'e' una
+   soglia — serve solo a ORDINARE, e il numero si scrive accanto cosi' chi legge puo' non essere
+   d'accordo. Torna `null` dove non c'e' abbastanza storia: null non e' zero. */
+function mossaRelativa(k) {
+  const m = (DATA && DATA.macro) || {};
+  let st = null;
+  if (String(k).startsWith("in:")) {
+    const i = (m.indicators || []).find(x => x && x.key === String(k).slice(3));
+    st = i && i.storico;
+  } else if (k === "in:curve" || k === "credit" || k === "vix") {
+    st = k === "credit" ? (m.credit && m.credit.history) : (m.curve_history || null);
+  }
+  const p = (st || []).filter(x => x && typeof x.v === "number");
+  if (p.length < 12) return null;
+  const d = [];
+  for (let i = 1; i < p.length; i++) d.push(p[i].v - p[i - 1].v);
+  const media = d.reduce((a, b) => a + b, 0) / d.length;
+  const sd = Math.sqrt(d.reduce((a, b) => a + (b - media) ** 2, 0) / d.length);
+  if (!Number.isFinite(sd) || sd === 0) return null;
+  return Math.round(Math.abs(d[d.length - 1] - media) / sd * 10) / 10;
+}
+
 function indicatoriClassifica() {
   const m = DATA?.macro || {}, out = [];
   { const vx = vixComeIndicatore(m); if (vx) out.push(vx); }   // v251
@@ -2706,7 +2757,13 @@ function indicatoriClassifica() {
      continua a pubblicarli in `macro.materie`), esce solo la tessera: e' la regola v208, si
      toglie dalla pagina cio' che il pacchetto porta gia'. Il SOX resta perche' non e' stato
      chiesto di toglierlo ed e' il benchmark del suo fattore principale. */
-  const FUORI = new Set(["mat:petrolio", "mat:rame", "mat:oro",
+  /* ⚠ v306 — UMICH fuori dalla PAGINA su mia proposta, accettata dal CEO. La fiducia dei
+     consumatori arriva con 1-2 mesi di ritardo di licenza da FRED (per questo la prendiamo
+     dalla fonte primaria) e la stessa domanda — quanto le famiglie se la sentono di spendere —
+     e' coperta piu' fresca dal Fear & Greed e dalle vendite al dettaglio. Resta nel PACCHETTO:
+     e' la regola v208, si toglie dalla pagina cio' che il payload porta gia'. */
+  const FUORI = new Set(["in:umich",
+                         "mat:petrolio", "mat:rame", "mat:oro",
                          "mk:EURJPY=X", "in:t30", "mk:^TNX", "in:curve3m",
                          "thermometer", "futures", "risk_sentiment", "smart_money",   // v303: stagionalità rientra
                          "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield",
@@ -2860,7 +2917,26 @@ function indicatoriClassifica() {
       const blocco = m[chiave] || m[x.k] || null;
       return { ...x, cadenza: rigaFreschezzaMercato(blocco) };
     })
-    .sort((a, b) => a.score - b.score);
+    /* ═══ v306 — SI ORDINA PER QUANTO SI E' MOSSO, NON PER IL PUNTEGGIO ═══════════════════
+       Il punteggio 0-100 e' lo stesso numero che v200 ha tolto dal pacchetto dopo aver misurato
+       7 segnali maturati, -10,8% medio e hit-rate 29%, e che v300 ha tolto dal rilevatore di
+       movimento. Ordinare 28 tessere con quel numero e' ancora un giudizio — "ordinare e' gia'
+       un giudizio" e' testualmente la frase di v200, e qui era sopravvissuta.
+       Ora l'ordine e' un FATTO: quanto l'ultimo scarto pubblicato di ogni serie vale rispetto
+       alla deviazione tipica dei suoi scarti. Chi si e' mosso piu' del proprio solito sta in
+       cima, e la tessera lo dichiara.
+       ⚠ Chi NON ha una serie non ha un movimento misurabile: va dopo, in ordine alfabetico, che
+       non esprime preferenze. Metterlo in mezzo con uno zero direbbe "fermo", che e' falso —
+       la differenza fra "non si e' mosso" e "non lo sappiamo" e' esattamente cio' che questo
+       sistema non deve confondere. */
+    .map(x => ({ ...x, mossa: mossaRelativa(x.k) }))
+    .sort((a, b) => {
+      const A = a.mossa, B = b.mossa;
+      if (A != null && B != null) return B - A;
+      if (A != null) return -1;
+      if (B != null) return 1;
+      return String(a.nome).localeCompare(String(b.nome));
+    });
 }
 /* ═══ v233 — QUELLO CHE IL POPUP AVEVA DENTRO, PORTATO FUORI ════════════════════════════════
    Richiesta CEO: "i grafici riportali all'originaria forma di mini tab e se il rispettivo pop up
@@ -6346,15 +6422,34 @@ function buildPrompt() {
      questo progetto — e qui il rischio e' concreto, perche' un titolo di giornale contiene
      numeri ("annual rate at 3.4%") che un LLM prenderebbe per buoni. */
   if (m.news && (m.news.voci || []).length) {
-    const v = m.news.voci.slice(0, 12);
-    lines.push(`- TITOLI MACRO RECENTI (${v.length}, da ${(m.news.fonti || []).join(", ")}) — `
-      + `SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i `
-      + `numeri che contengono, e la selezione e' automatica (${m.news.filtro || "filtro dichiarato in pagina"}). `
-      + `Nessuno di questi titoli e' stato verificato dal sistema: i numeri che contengono non sono `
-      + `passati da nessun controllo, a differenza delle serie di questo pacchetto, che portano tutte `
-      + `la propria data di rilevazione. Un titolo non ha data di rilevazione: ha solo la data di `
-      + `pubblicazione, che e' un'altra cosa.`
-      + v.map(x => `\n    · [${x.fonte}, ${String(x.quando).slice(0, 10)}] ${x.titolo}`).join(""));
+    /* ⚠⚠ v306 — SOLO LE ULTIME SEI ORE, come chiesto dal CEO, e quando non c'e' niente lo si
+       DICE. Misurato scrivendo questa riga: dentro le 6 ore c'erano zero notizie macro e anche
+       dentro le 12 — era sabato. "Non e' uscito niente di macro da mezza giornata" non e' un
+       buco del sistema: e' un fatto sul mondo, e di sabato e' la risposta giusta. Tacere
+       lascerebbe l'LLM a dedurre, e dedurrebbe male. */
+    const ORE = 6;
+    const adesso = Date.now();
+    const conEta = m.news.voci
+      .map(v => ({ ...v, ore: (adesso - Date.parse(v.quando)) / 3600000 }))
+      .filter(v => Number.isFinite(v.ore)).sort((a, b) => a.ore - b.ore);
+    const fresche = conEta.filter(v => v.ore <= ORE).slice(0, 12);
+    if (fresche.length) {
+      lines.push(`- TITOLI MACRO DELLE ULTIME ${ORE} ORE (${fresche.length}, da ${(m.news.fonti || []).join(", ")}) — `
+        + `SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri `
+        + `che contengono, e la selezione e' automatica (${m.news.filtro || ""}). I riassunti sono quelli `
+        + `pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: `
+        + `ha solo la data di pubblicazione, che e' un'altra cosa.`
+        + fresche.map(x => `\n    · [${x.fonte}, ${Math.round(x.ore)}h fa] ${x.titolo}`
+            + (x.riassunto ? `\n      ${x.riassunto}` : "")).join(""));
+    } else {
+      const p = conEta.length ? Math.round(conEta[0].ore) : null;
+      lines.push(`- TITOLI MACRO DELLE ULTIME ${ORE} ORE: NESSUNO. `
+        + (p != null ? `La notizia macro piu' recente fra le fonti seguite (${(m.news.fonti || []).join(", ")}) `
+            + `ha ${p} ore. ` : "")
+        + `E' un fatto sul mondo, non un buco del sistema: la macro non esce di continuo e nel fine settimana `
+        + `non esce affatto. Un'analisi scritta in una finestra senza notizie e' diversa da una scritta subito `
+        + `dopo un dato, e la differenza sta qui.`);
+    }
   }
 
   if (typeof prossimiEventi === "function") {
@@ -7544,6 +7639,9 @@ function buildPromptSettore(chiave) {
 `   quale fatto le separerebbe. Non ti e' consentito rispondere che entrambe hanno merito.`,
 ``,
 `══ REGOLE ══`,
+`· Cerca le notizie delle ULTIME 48 ORE su questo comparto e sui suoi titoli principali: il pacchetto`,
+`  porta i titoli macro recenti ma NON quelli di settore, quindi quella parte e' tua. Se non trovi`,
+`  nulla, dillo — l'assenza di notizie in un settore che si muove e' a sua volta un fatto.`,
 `· Italiano, prosa densa, niente frasi di cortesia. Ogni dato esterno va [VERIFICATO] con fonte e data.`,
 `· I numeri del blocco qui sotto sono calcolati dal sistema: usa quelli e non cercarne altri per le`,
 `  stesse grandezze. Se ne trovi di diversi, riporta entrambi e di' quale usi.`,
@@ -7891,7 +7989,10 @@ function datiNostriDelTitolo(tk) {
 `· ultima trimestrale nel dettaglio e la data CONFERMATA della prossima`,
 `· concorrenti diretti, quote di mercato e anno a cui si riferiscono`,
 `· consenso analisti: numero di giudizi, target medio, revisioni degli ultimi 90 giorni`,
-`· notizie e fatti societari delle ultime settimane`,
+`· notizie e fatti societari: prima le ULTIME 48 ORE, poi il contesto delle ultime settimane.`,
+`  Il pacchetto porta i titoli MACRO delle ultime 6 ore quando ce ne sono; su questa societa' e sul`,
+`  suo settore non porta niente, quindi quella parte e' interamente tua. Se non trovi nulla di`,
+`  recente, scrivilo: "nessuna notizia rilevante nelle ultime 48 ore" e' un'informazione.`,
 `⚠ OBBLIGATORIO: chiudi con una riga "NON VERIFICATO:" che elenca quali di queste voci NON sei`,
 `riuscito a trovare o confermare. Se le hai trovate tutte, scrivi "NON VERIFICATO: nessuna".`,
 `Un numero plausibile inventato e' peggio di un buco dichiarato: il buco lo vedo, l'invenzione no.`,

@@ -2205,14 +2205,26 @@ check("v304 news: entrano solo con una data, e i forum restano vietati", suVeri(
 /* ⚠ e nel PACCHETTO devono arrivare come TITOLI, non come fatti: il sistema non ha letto gli
    articoli ne' controllato i numeri che contengono, e un titolo cita numeri ("annual rate at
    3.4%") che un LLM prenderebbe per buoni. */
-check("v304 news: nel pacchetto sono marcate come titoli non verificati", suVeri(`
+/* ⚠⚠ v306 — DUE RAMI, ED ENTRAMBI DEVONO PARLARE. Il CEO ha chiesto solo notizie di massimo
+   sei ore. Misurato mentre lo scrivevo: dentro le 6 ore c'erano ZERO notizie macro, e anche
+   dentro le 12 — era sabato. Quindi il ramo "nessuna" non e' un caso limite raro: e' quello
+   che si vede ogni fine settimana e molte mattine. Deve DIRE che non c'e' niente e quanto e'
+   vecchia la piu' recente, perche' "non e' uscito niente di macro da mezza giornata" e' un
+   fatto sul mondo, non un buco del sistema — e tacere lascerebbe l'LLM a dedurre. */
+check("v306 news: il pacchetto parla in entrambi i rami, fresche o nessuna", suVeri(`
   const nw = (DATA.macro && DATA.macro.news) || null;
   if (!nw || !(nw.voci || []).length) return true;
   const p = buildPrompt();
-  return p.indexOf("SONO TITOLI, NON FATTI VERIFICATI") >= 0
-      && p.indexOf("non ha letto gli articoli") >= 0
-      && p.indexOf("non ha data di rilevazione") >= 0
-      && p.indexOf(nw.voci[0].titolo) >= 0`));
+  const i = p.indexOf("TITOLI MACRO DELLE ULTIME 6 ORE");
+  if (i < 0) return false;
+  const blocco = p.slice(i, i + 1200);
+  const nessuna = blocco.indexOf("NESSUNO") >= 0;
+  if (nessuna) {
+    /* il ramo vuoto deve dichiarare l'eta' della piu' recente e che non e' un guasto */
+    return blocco.indexOf("piu' recente") >= 0 && blocco.indexOf("non un buco del sistema") >= 0;
+  }
+  return blocco.indexOf("SONO TITOLI, NON FATTI VERIFICATI") >= 0
+      && blocco.indexOf("non ha data di rilevazione") >= 0`));
 
 /* ⚠ in pagina: espandibile e CHIUSA, altrimenti diciotto titoli seppelliscono il calendario —
    il problema che il CEO ha appena risolto fondendo quattro sezioni. E deve dichiarare come e'
@@ -2223,7 +2235,12 @@ check("v304 news: espandibile, chiusa di default, e dichiara il proprio filtro",
   return corpo.includes("<details class=\"cal-news\">")
       && !corpo.includes("<details open")
       && corpo.includes("Come è fatto questo elenco")
-      && corpo.includes("non è stato verificato dal sistema");
+      && corpo.includes("Il contenuto non è stato verificato")
+      /* ⚠ v306 — e lo stato vuoto deve PARLARE: una finestra vuota si legge come "rotto",
+         non come "non c'e' niente". Il CEO ha chiesto sei ore e sei ore spesso non danno
+         nulla — misurato: zero notizie macro dentro le 6 e dentro le 12, di sabato. */
+      && corpo.includes("Non è un guasto")
+      && corpo.includes("ciascuna con la sua età");
 })());
 
 /* ══ v305 — ANALISI DI UN SETTORE ═══════════════════════════════════════════════════════

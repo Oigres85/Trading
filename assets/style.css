@@ -2145,3 +2145,10 @@ svg.g-serie { cursor: crosshair; }
 .tk-riga-settore { margin-top: 8px; gap: 8px; }
 .tk-riga-settore select { flex: 1 1 240px; min-width: 0; background: var(--card); color: var(--text);
   border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+
+/* v306 — il riassunto sotto il titolo, e l'età in evidenza quando è dentro le sei ore. */
+.cal-news-testo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cal-news-rias { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+.cal-news-fresca { color: var(--green); font-weight: 600; }
+.cal-news-avviso { padding: 8px 10px; font-size: 11.5px; line-height: 1.5;
+  color: var(--muted); border-bottom: 1px solid var(--border); }

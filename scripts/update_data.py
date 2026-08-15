@@ -1528,10 +1528,17 @@ def fetch_macro():
         v12 = curve_m[-13][1] if len(curve_m) > 13 else None       # 12 mesi fa (media mensile)
         steepening = (cur_m is not None and v12 is not None and cur_m - v12 > 0.2)
         was_inverted = any(v < 0 for _, v in curve_m[-24:])         # invertita negli ultimi 2 anni
+        # ⚠⚠ v306 — TRE SERIE LUNGHE TOLTE: NESSUNO LE DISEGNAVA. Misurato nella revisione:
+        # `curve` (360 punti), `gdp_growth` (146) e `claims` (360) pesavano ~25KB in data.json
+        # e non venivano rese da nessuna parte — `serieIndicatore("yield_recession")` legge
+        # `macro.curve_history`, non queste. Peso spedito a ogni caricamento per niente, la
+        # stessa classe del difetto trovato in v295 (due serie duplicate).
+        # ⚠ GLI SCALARI RESTANO e sono nel pacchetto (curva attuale, PIL, richieste di
+        # sussidio, l'etichetta): quelli servono, e toglierli sarebbe la pulizia che si porta
+        # via il fatto — classe v201-v204, gia' pagata quattro volte qui.
+        # ⚠ `claims` era l'unica serie di richieste di sussidio che avessimo: se un domani si
+        # vuole disegnarla, si rimette QUESTA riga — non si reinventa la fonte.
         macro["yield_recession"] = {
-            "curve": [{"d": d, "v": round(v, 2)} for d, v in curve_m if v is not None],
-            "gdp_growth": gdp_growth,
-            "claims": [{"d": d, "v": round(v)} for d, v in claims_m if v is not None],
             "recessions": recessions,
             "current_curve": round(cur_v, 2) if cur_v is not None else None,
             "curve_12m_ago": round(v12, 2) if v12 is not None else None,
@@ -1747,6 +1754,11 @@ def fetch_macro():
                 testo = r.text
                 for pezzo in re.findall(r"<item>(.*?)</item>", testo, re.S)[:30]:
                     tm = re.search(r"<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</title>", pezzo, re.S)
+                    # ⚠ v306 — il RIASSUNTO: il CEO lo ha chiesto ("inserisci qualche riga
+                    # riassuntiva"). Sta nella <description> del feed e c'e' quasi sempre
+                    # (misurato: 92-329 caratteri). Dove manca, la riga resta il solo titolo:
+                    # meglio un titolo nudo che un riassunto inventato.
+                    de = re.search(r"<description>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</description>", pezzo, re.S)
                     lm = re.search(r"<link>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</link>", pezzo, re.S)
                     dm = re.search(r"<pubDate>(.*?)</pubDate>", pezzo, re.S)
                     if not tm or not dm:
@@ -1760,7 +1772,12 @@ def fetch_macro():
                         quando = _eu.parsedate_to_datetime(dm.group(1)).astimezone(timezone.utc)
                     except Exception:  # noqa: BLE001
                         continue
-                    news.append({"titolo": titolo[:180], "fonte": fonte,
+                    rias = ""
+                    if de:
+                        rias = re.sub(r"<[^>]+>", "", html.unescape(de.group(1))).strip()[:320]
+                        if rias.lower() == titolo.lower():
+                            rias = ""          # ripetere il titolo non e' un riassunto
+                    news.append({"titolo": titolo[:180], "riassunto": rias, "fonte": fonte,
                                  "quando": quando.strftime("%Y-%m-%dT%H:%M:%SZ"),
                                  "url": (lm.group(1).strip() if lm else "")[:400]})
             except Exception as e:  # noqa: BLE001
