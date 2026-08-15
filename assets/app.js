@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "309";
+const BUILD_VERSION = "310";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6584,6 +6584,35 @@ function buildPrompt() {
      ⚠ Sono fatti che contano per questo libro: il rame e' la domanda industriale (e i semi
      sono ciclici), il petrolio e' inflazione dal lato dei costi, l'oro e' il termometro della
      sfiducia. Una riga sola, col valore, la variazione e dove sta nel proprio anno. */
+  /* ═══ v310 — LA STAGIONALITA' ARRIVA ANCHE ALL'LLM ═══════════════════════════════════
+     TERZA VOLTA che disegno una cosa in pagina e la dimentico nel pacchetto: era gia' successo
+     col calendario (v287) e con la curva dei tassi (v289), e il CEO stesso me l'aveva fatto
+     notare ("abbiamo tenuto conto anche nella generazione del prompt?"). Trovata da una
+     scansione sistematica invece che a occhio, e la scansione e' diventata un cancello.
+     ⚠⚠ E LA CAUTELA VIAGGIA COL DATO. Dieci osservazioni per mese con una dispersione da
+     -8,7% a +18,9% non sono una previsione: se il payload desse la media senza l'intervallo,
+     un LLM la userebbe come tale — ed e' esattamente il genere di numero che questo progetto
+     ha gia' tolto una volta (v200, motore predittivo a hit-rate 29%). */
+  if (m.stagionalita_ndx && (m.stagionalita_ndx.mesi || []).length) {
+    const st = m.stagionalita_ndx;
+    const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+                  "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+    const prossimi = [0, 1, 2]
+      .map(k => (st.mesi || []).find(x => x && x.mese === ((st.mese_ora - 1 + k) % 12) + 1))
+      .filter(x => x && Number.isFinite(x.media_mid));
+    if (prossimi.length) {
+      lines.push(`- STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE (${st.fonte || "^NDX mensile"}, `
+        + `campione ${st.dal}-${st.al}, ${(st.anni_midterm || []).length} anni di midterm`
+        + (st.ciclo_ora === 2 ? `; il ${st.al + 1} e' un anno di midterm` : "") + `): `
+        + prossimi.map(x => `${MESI[x.mese - 1]} ${signTxt(x.media_mid)} negli anni di midterm `
+            + `contro ${signTxt(x.media)} su tutti gli anni, ${x.pos_mid}% di mesi positivi, `
+            + `esiti da ${signTxt(x.peggio_mid)} a ${signTxt(x.meglio_mid)}`).join(" · ")
+        + `. ⚠ Dieci osservazioni per mese: dove la media e' +3,9% i singoli anni vanno da -8,7% a `
+        + `+18,9%, cioe' la media sta fra esiti opposti. E' il conto di cosa e' successo, non una `
+        + `previsione — serve a sapere quando un movimento e' ordinario per il periodo, non a dedurne uno.`);
+    }
+  }
+
   if (m.materie && Object.keys(m.materie).length) {
     const pezzi = [];
     for (const [k, v] of Object.entries(m.materie)) {
@@ -7429,7 +7458,20 @@ function fattiTitolo(tk) {
                       w52hi: numero(riga.w52_high), w52lo: numero(riga.w52_low),
                       /* v308 — la posizione, quando c'e': il pacchetto non deve piu' negare di saperlo */
                       qta: numero(riga.qta), pmc: numero(riga.pmc),
-                      gainPos: numero(riga.gain_pct_pos) } : null,
+                      gainPos: numero(riga.gain_pct_pos),
+                      /* ⚠ v310 — il PESO nel libro si calcola qui e non in chi disegna: `fattiTitolo` e'
+                         la fonte unica dei fatti di un titolo (v274), e il gate lo verifica. La prima
+                         stesura leggeva `DATA.watchlist` dentro `datiNostriDelTitolo` — due strade per lo
+                         stesso fatto, che e' esattamente cio' che v274 ha chiuso. */
+                      pesoLibro: (() => {
+                        const tutte = ((DATA && DATA.watchlist) || [])
+                          .filter(x => x && numero(x.qta) > 0 && numero(x.price) > 0);
+                        if (!tutte.length) return null;
+                        const fx = numero(DATA && DATA.eurusd) || 1;
+                        const eur = (x) => (x.currency === 'EUR' ? 1 : 1 / fx) * numero(x.price) * numero(x.qta);
+                        const tot = tutte.reduce((a2, x) => a2 + eur(x), 0);
+                        return tot > 0 ? { pct: Math.round(eur(riga) / tot * 100), quante: tutte.length } : null;
+                      })() } : null,
   };
 }
 
@@ -7801,6 +7843,25 @@ function buildPromptSettore(chiave) {
         .some(p => p && String(p.tk).toUpperCase() === String(r.ticker).toUpperCase()));
       if (tot > 0) {
         const quota = dentro.reduce((acc, r) => acc + eur(r), 0);
+        /* ⚠⚠ v310 — IL DENOMINATORE VA DICHIARATO QUANDO CAMBIA. Provato togliendo il prezzo
+           di AMD: il peso scendeva da 62% a 54% SENZA dire che una posizione era uscita dal
+           conto. E' la classe "denominatori non dichiarati" che `coherence_check` insegue, e
+           qui produceva un numero piu' basso che sembrava una riduzione dell'esposizione.
+           ⚠ E quando non ha NIENTE in quel comparto, si dice cosi': "0 delle 12 ... valgono il
+           0%" e' vero e si legge male. */
+        const senzaPrezzo = ((DATA && DATA.watchlist) || [])
+          .filter(x => x && numero(x.qta) > 0 && !(numero(x.price) > 0))
+          .map(x => x.ticker);
+        const coda = senzaPrezzo.length
+          ? ` ⚠ ${senzaPrezzo.length} posizioni sono fuori da questo conto perche' il sistema non ne ha il prezzo `
+            + `(${senzaPrezzo.join(", ")}): il denominatore e' piu' piccolo del suo libro reale.`
+          : "";
+        if (!dentro.length) {
+          F.push(`- IL SUO LIBRO, DENTRO QUESTO COMPARTO: nessuna delle ${posiz.length} posizioni azionarie `
+            + `che il sistema conosce e' fra le prime posizioni di ${s.ticker}. `
+            + `Non significa che non abbia esposizione al comparto: significa che non ce l'ha attraverso `
+            + `i suoi titoli piu' grandi.` + coda);
+        } else {
         F.push(`- IL SUO LIBRO, DENTRO QUESTO COMPARTO: ${dentro.length} delle ${posiz.length} posizioni azionarie `
           + `sono fra le prime posizioni di ${s.ticker} e valgono il ${Math.round(quota / tot * 100)}% del `
           + `controvalore azionario`
@@ -7809,7 +7870,8 @@ function buildPromptSettore(chiave) {
               .join(" · ") : "")
           + `. ⚠ E' il peso sulle sole azioni: esclude il BTP e la liquidita', che il sistema non conosce. `
           + `Il prezzo di carico non cambia cosa fa il titolo — cambia cosa costa uscirne, ed e' un fatto `
-          + `diverso dal giudizio sul comparto.`);
+          + `diverso dal giudizio sul comparto.` + coda);
+        }
       }
     }
   }
@@ -8193,8 +8255,18 @@ function datiNostriDelTitolo(tk) {
   if (Number.isFinite(numero(tec.qta)) && numero(tec.qta) > 0 && Number.isFinite(numero(tec.pmc))) {
     const q = numero(tec.qta), pmc = numero(tec.pmc);
     const g = Number.isFinite(numero(tec.gainPos)) ? numero(tec.gainPos) : null;
+    /* ⚠⚠ v310 — E QUANTO PESA NEL LIBRO. Il pacchetto di SETTORE lo sapeva (AMD = 18% del
+       controvalore azionario) e quello del TITOLO no: chi analizza AMD da sola riceveva le
+       quote senza il peso, che e' il fatto che cambia la decisione piu' di qualunque livello
+       tecnico. Un'asimmetria fra due pacchetti dello stesso sistema sullo stesso titolo e' la
+       classe che `coherence_check` chiama "denominatori non dichiarati", qui fra artefatti. */
+    const pl = tec.pesoLibro || null;
+    const peso = pl ? pl.pct : null;
     L.push(`- ⚠ QUESTO TITOLO E' GIA' IN PORTAFOGLIO: ${fmtNum.format(q)} quote a un prezzo medio di carico `
-      + `di ${pmc}${g != null ? `, oggi ${signTxt(Math.round(g * 10) / 10)}` : ""}. `
+      + `di ${pmc}${g != null ? `, oggi ${signTxt(Math.round(g * 10) / 10)}` : ""}`
+      + (peso != null ? `, e vale il ${peso}% del controvalore azionario del libro `
+          + `(su ${pl.quante} posizioni; esclude il BTP e la liquidita', che il sistema non conosce)` : "")
+      + `. `
       + `Non e' una decisione di ingresso ma di mantenimento: il prezzo di carico non cambia cosa fa il `
       + `titolo, cambia cosa costa uscirne e quale plusvalenza si realizzerebbe. Il sistema NON conosce `
       + `la liquidita' disponibile, il resto del libro in dettaglio, ne' la sua situazione fiscale.`);

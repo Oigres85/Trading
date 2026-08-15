@@ -2428,6 +2428,85 @@ check("v309 grafico: ogni barra di settore ha il proprio simbolo", suVeri(`
   const barre = (f.g.match(/obar-row/g) || []).length;
   return n === barre && n >= 6`));
 
+/* ══ v310 — CIO' CHE SI DISEGNA DEVE ARRIVARE ALL'LLM: IL CANCELLO CHE CHIUDE LA CLASSE ══
+   ⚠⚠ E' LA TERZA VOLTA. Il calendario (v287) e la curva dei tassi (v289) erano stati costruiti,
+   disegnati e testati, e MAI messi nel pacchetto — il CEO se n'era accorto da solo ("abbiamo
+   tenuto conto anche nella generazione del prompt dei suggerimenti?"). In v290 ho corretto quei
+   due casi. Oggi e' successo di nuovo con la stagionalita' del Nasdaq.
+   Correggere il caso e non la causa significa rivederlo una quarta volta. Questo check non
+   sorveglia UNA tessera: le sorveglia TUTTE, e vale anche per quelle che non esistono ancora.
+   ⚠ COME FUNZIONA: per ogni tessera in classifica prende il suo blocco in `macro`, ne estrae
+   qualche valore scalare caratteristico (esclusi storici e serie, che nel payload non entrano
+   per intero) e verifica che ALMENO UNO compaia nel pacchetto. Se il blocco non ha scalari, la
+   tessera non e' giudicabile e viene saltata: meglio un check che tace su un caso ambiguo che
+   uno che grida al lupo.
+   ⚠ Chi e' escluso lo e' PER SCELTA, e la scelta va scritta qui: le tessere che disegnano una
+   cosa gia' presente in altra forma (rotazione = i 21 ETF, tassi10 = la curva) troverebbero
+   comunque un riscontro; quelle senza blocco proprio in `macro` non hanno niente da confrontare. */
+check("v310 nessuna tessera e' cieca al pacchetto: cio' che si disegna arriva all'LLM", suVeri(`
+  const m = DATA.macro || {};
+  const p = buildPrompt();
+  const scalari = (o, prof) => {
+    if (o == null || prof > 2) return [];
+    if (typeof o === "number") return [String(o)];
+    if (typeof o === "string") return (o.length > 2 && o.length < 40) ? [o] : [];
+    if (Array.isArray(o)) return [];
+    if (typeof o === "object") {
+      return Object.entries(o)
+        .filter(([k]) => !/histor|spark|serie|storico|components|items|voci|mesi|scadenze/i.test(k))
+        .flatMap(([, v]) => scalari(v, prof + 1)).slice(0, 8);
+    }
+    return [];
+  };
+  const cieche = [];
+  for (const r of indicatoriClassifica()) {
+    const chiave = String(r.k).replace(/^(in:|mk:|mat:|fg:)/, "");
+    const blocco = m[chiave];
+    if (!blocco || typeof blocco !== "object") continue;      // niente blocco: non giudicabile
+    const vals = scalari(blocco, 0).filter(x => x && String(x).length > 1);
+    if (!vals.length) continue;                               // nessuno scalare: non giudicabile
+    if (!vals.some(v => p.indexOf(String(v)) >= 0)) cieche.push(r.k);
+  }
+  return cieche.length === 0`));
+
+/* ══ v310 — I REPERTI DEL TERZO GIRO DEL LOOP ═══════════════════════════════════════════ */
+
+/* ⚠⚠ IL DENOMINATORE VA DICHIARATO QUANDO CAMBIA. Provato togliendo il prezzo di AMD: il peso
+   del comparto scendeva da 62% a 54% SENZA dire che una posizione era uscita dal conto. Un
+   numero piu' basso che sembra una riduzione dell'esposizione e invece e' un denominatore
+   diverso — la classe "denominatori non dichiarati" che `coherence_check` insegue. */
+check("v310 settore: se una posizione esce dal conto per mancanza di prezzo, lo dichiara", suVeri(`
+  const wl = DATA.watchlist || [];
+  const conPos = wl.filter(r => r && r.qta > 0);
+  if (conPos.length < 2) return true;
+  const salvo = conPos[0].price;
+  try {
+    delete conPos[0].price;
+    const p = buildPromptSettore("SMH");
+    return p.indexOf("fuori da questo conto") >= 0 && p.indexOf(conPos[0].ticker) >= 0;
+  } finally { conPos[0].price = salvo; }`));
+
+/* ⚠ e il peso del titolo nel libro dev'essere lo STESSO nei due pacchetti: un'asimmetria fra
+   due artefatti dello stesso sistema sullo stesso titolo e' peggio di un dato mancante,
+   perche' chi legge non sa quale credere. */
+check("v310 coerenza: il peso di un titolo e' identico nel pacchetto titolo e in quello di settore", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.qta > 0 && x.price > 0 && x.ticker === "AMD");
+  if (!r) return true;
+  const a = (buildPromptTicker("AMD").match(/vale il (\\d+)% del controvalore/) || [])[1];
+  const b = (buildPromptSettore("SMH").match(/AMD (\\d+)%/) || [])[1];
+  return a && b && Math.abs(Number(a) - Number(b)) <= 1`));
+
+/* ⚠ il peso si calcola in `fattiTitolo`, fonte unica dei fatti di un titolo (v274): la prima
+   stesura lo ricalcolava dentro chi disegna, e il gate v274 l'ha preso. */
+check("v310 fatti: il peso nel libro nasce in fattiTitolo, non in chi lo stampa", (() => {
+  const i = src.indexOf("function fattiTitolo");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  const j = src.indexOf("function datiNostriDelTitolo");
+  const disegna = src.slice(j, src.indexOf(String.fromCharCode(10) + "function ", j + 10));
+  return corpo.includes("pesoLibro") && disegna.includes("tec.pesoLibro")
+      && !disegna.includes("DATA.eurusd");
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
