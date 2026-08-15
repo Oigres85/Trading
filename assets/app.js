@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "303";
+const BUILD_VERSION = "304";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2413,6 +2413,47 @@ function renderCalendario() {
     return `<div class="cal-giorno${scarto === 0 ? " cal-oggi" : ""}">
       <div class="cal-data">${etichetta}</div>${righe}</div>`;
   }).join("");
+
+  /* ═══ v304 — LE NEWS MACRO, ESPANDIBILI ═══════════════════════════════════════════════
+     Il CEO: "in Prossime due settimane aggiungi news inerenti tutti i dati macro (questa
+     finestra deve essere espandibile)". Il calendario dice cosa ESCE; le news dicono cosa e'
+     GIA' uscito e come e' stato letto — sono le due meta' della stessa domanda.
+     ⚠ ESPANDIBILE E CHIUSA DI DEFAULT: diciotto titoli aperti sopra il calendario lo
+     seppellirebbero, ed e' il problema che il CEO ha appena risolto fondendo quattro sezioni.
+     Il numero sta nell'intestazione, cosi' una scatola chiusa non e' un buco.
+     ⚠⚠ E LA PROVENIENZA VA DICHIARATA: CNBC Economia entra per intero perche' e' gia' un feed
+     di economia, gli altri due passano da un filtro per parole che e' imperfetto per
+     costruzione. Un elenco che sembra curato quando e' automatico e' la classe di difetto
+     peggiore di questo progetto — qui c'e' scritto com'e' fatto. */
+  const boxNews = $("#cal-news");
+  if (boxNews) {
+    const nw = (DATA && DATA.macro && DATA.macro.news) || null;
+    const voci = (nw && nw.voci) || [];
+    if (!voci.length) {
+      boxNews.innerHTML = "";
+    } else {
+      const ora = Date.now();
+      const eta = (iso) => {
+        const t = Date.parse(iso);
+        if (!Number.isFinite(t)) return "";
+        const h = Math.round((ora - t) / 3600000);
+        return h < 1 ? "adesso" : h < 24 ? `${h} ore fa` : `${Math.round(h / 24)} giorni fa`;
+      };
+      boxNews.innerHTML = `<details class="cal-news">
+        <summary><b>Notizie macro</b> <span class="muted">${voci.length} titoli · ${esc((nw.fonti || []).join(", "))}</span></summary>
+        <div class="cal-news-lista">${voci.map(v => `<div class="cal-news-riga">
+          <span class="cal-news-quando">${esc(eta(v.quando))}</span>
+          ${v.url ? `<a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer">${esc(v.titolo)}</a>`
+                  : `<span>${esc(v.titolo)}</span>`}
+          <span class="cal-news-fonte">${esc(v.fonte)}</span>
+        </div>`).join("")}</div>
+        <div class="muted cal-news-nota">⚠ <b>Come è fatto questo elenco:</b> ${esc(nw.filtro || "")}.
+        Non è una selezione redazionale: è un filtro automatico, quindi può lasciar passare
+        titoli non macro e può scartarne di buoni. I titoli portano fonte e ora; il contenuto
+        non è stato verificato dal sistema.</div>
+      </details>`;
+    }
+  }
 
   if (nota) {
     nota.innerHTML = "⚠ <b>Tutte le date sono stime, non appuntamenti confermati.</b> "
@@ -6292,6 +6333,27 @@ function buildPrompt() {
         + `industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo `
         + `stesso numero — non sommarli in un giudizio unico.`);
     }
+  }
+
+  /* ═══ v304 — I TITOLI MACRO NEL PACCHETTO, COME TITOLI E NON COME FATTI ═══════════════
+     Il pacchetto dice all'LLM di cercare le notizie online (blocco "quello che il sistema non
+     ha"). Questi diciotto titoli non sostituiscono quella ricerca: le danno un punto di
+     partenza datato, e soprattutto dicono di COSA si sta parlando adesso.
+     ⚠⚠ SONO TITOLI, NON FATTI, e la differenza va scritta: il sistema non ha letto gli
+     articoli, non ha verificato i numeri che contengono, e il filtro che li seleziona e'
+     automatico. Presentarli come dati verificati sarebbe la classe di difetto peggiore di
+     questo progetto — e qui il rischio e' concreto, perche' un titolo di giornale contiene
+     numeri ("annual rate at 3.4%") che un LLM prenderebbe per buoni. */
+  if (m.news && (m.news.voci || []).length) {
+    const v = m.news.voci.slice(0, 12);
+    lines.push(`- TITOLI MACRO RECENTI (${v.length}, da ${(m.news.fonti || []).join(", ")}) — `
+      + `SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i `
+      + `numeri che contengono, e la selezione e' automatica (${m.news.filtro || "filtro dichiarato in pagina"}). `
+      + `Nessuno di questi titoli e' stato verificato dal sistema: i numeri che contengono non sono `
+      + `passati da nessun controllo, a differenza delle serie di questo pacchetto, che portano tutte `
+      + `la propria data di rilevazione. Un titolo non ha data di rilevazione: ha solo la data di `
+      + `pubblicazione, che e' un'altra cosa.`
+      + v.map(x => `\n    · [${x.fonte}, ${String(x.quando).slice(0, 10)}] ${x.titolo}`).join(""));
   }
 
   if (typeof prossimiEventi === "function") {

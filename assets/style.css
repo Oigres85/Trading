@@ -2118,3 +2118,25 @@ svg.g-serie { cursor: crosshair; }
 .obar-row:hover .obar-prime,
 .obar-row:focus-within .obar-prime { max-height: 34px; opacity: 1; padding: 2px 0 3px; }
 @media (hover: none) { .obar-prime { max-height: 34px; opacity: 1; padding: 2px 0 3px; } }
+
+/* ═══ v304 — le notizie macro dentro il calendario: chiuse di default ══════════════════════
+   Diciotto titoli aperti sopra il calendario lo seppellirebbero — è il problema che il CEO ha
+   appena risolto fondendo quattro sezioni. Il conteggio nell'intestazione fa sì che una
+   scatola chiusa si legga come una scatola, non come un buco. */
+.cal-news { border: 1px solid var(--border); border-radius: 8px; margin-top: 10px; }
+.cal-news > summary { cursor: pointer; padding: 8px 10px; font-size: 12.5px; list-style: none;
+  display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.cal-news > summary::-webkit-details-marker { display: none; }
+.cal-news > summary::before { content: "▸"; color: var(--muted); font-size: 11px; }
+.cal-news[open] > summary::before { content: "▾"; }
+.cal-news[open] > summary { border-bottom: 1px solid var(--border); }
+.cal-news-lista { padding: 6px 10px; }
+.cal-news-riga { display: grid; grid-template-columns: 74px minmax(0, 1fr) auto; gap: 4px 10px;
+  align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+.cal-news-riga:last-child { border-bottom: 0; }
+.cal-news-quando { font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+.cal-news-fonte { font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+.cal-news-riga a { color: var(--text); text-decoration: none; }
+.cal-news-riga a:hover { text-decoration: underline; }
+.cal-news-nota { padding: 6px 10px 8px; font-size: 11px; line-height: 1.45; }
+@media (max-width: 560px) { .cal-news-riga { grid-template-columns: 1fr; } }

@@ -1681,6 +1681,110 @@ def fetch_macro():
     # ⚠ I BUCHI RESTANO BUCHI. Le serie giornaliere di FRED non hanno osservazioni nei giorni di
     # chiusura, e riempirli con l'ultimo valore disegnerebbe un tratto piatto che nessun mercato
     # ha fatto — cioe' un dato presunto travestito da dato. Si pubblica solo cio' che esiste.
+    # ═══ v304 — NEWS MACRO: TRE FONTI, NON CINQUANTASETTE ═══════════════════════════════
+    # Il CEO: "in Prossime due settimane aggiungi news inerenti tutti i dati macro (questa
+    # finestra deve essere espandibile)". Le news c'erano e sono uscite in v269, ma il motivo
+    # NON era che fossero inutili: erano ~57 richieste RSS a ogni run — una ventina di feed
+    # fissi piu' uno per ogni titolo seguito — per riempire un blocco che nessuno apriva.
+    # Qui sono TRE richieste e solo macro. Il costo che aveva fatto togliere la funzione non
+    # si ripresenta.
+    #
+    # ⚠ SCELTE DI FONTE, MISURATE E NON PRESE DALL'ELENCO VECCHIO:
+    #   · i due feed "economia/indicatori" di Investing NON espongono <pubDate>, e servono
+    #     articoli vecchi (uno dava Bitcoin a 63.000). Una notizia senza data non si puo'
+    #     pesare: esclusi.
+    #   · Reddit e i forum restano VIETATI — la testata lo impone da quando un LLM marco'
+    #     [VERIFICATO] medie mobili e target con fonte Reddit.
+    #   · misurata la freschezza: Bloomberg 2h dall'ultima, CNBC finanza 5h, CNBC economia 19h
+    #     (la macro esce meno spesso, non e' un difetto del feed), MarketWatch 12h.
+    #
+    # ⚠⚠ IL FILTRO E' UN REGISTRO DI PAROLE, quindi e' fallibile e va DICHIARATO: ogni voce
+    # porta la fonte e l'ora, e la pagina scrive che sono titoli filtrati per parola chiave,
+    # non una selezione redazionale. Un elenco che sembra curato quando e' automatico e' la
+    # classe di difetto peggiore di questo progetto.
+    # ⚠⚠ IL FILTRO LO FA LA FONTE, NON L'ELENCO DI PAROLE. Provate tre tarature: stretta,
+    # scartava il PPI ("Wholesale prices were flat in July") e il deficit di bilancio; larga,
+    # faceva passare "Modi Maps India's Growth Push" (per "growth") e un pezzo sulle detrazioni
+    # fiscali (per "tax"). Un filtro a parole su un titolo di giornale non distingue la
+    # "growth" di un'economia da quella di una societa': e' il limite dello strumento, non
+    # della taratura. La strada giusta: CNBC Economia E' GIA' un feed di economia — la
+    # selezione l'ha fatta una redazione, e si prende tutto. Bloomberg e MarketWatch sono
+    # generalisti e passano dal filtro, che resta imperfetto e viene DICHIARATO in pagina.
+    NEWS_FONTI = [
+        ("CNBC Economia",  "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258", False),
+        ("Bloomberg",      "https://feeds.bloomberg.com/markets/news.rss", True),
+        ("MarketWatch",    "https://feeds.content.dowjones.io/public/rss/mw_topstories", True),
+    ]
+    # ⚠⚠ TERMINI INTERI, NON SOTTOSTRINGHE, E NIENTE `split()` SU FRASI. La prima stesura
+    # spezzava "bank of japan" in tre parole: "of" diventava un termine e, cercato come
+    # sottostringa, faceva passare "Hollywood Box OFfices Are Back" come notizia macro.
+    # Un filtro che accetta tutto non e' un filtro — ed e' peggio di nessun filtro, perche'
+    # l'elenco SEMBRA curato. Ora i termini sono frasi intere e si cercano con i confini di
+    # parola: "rate" non matcha "corporate", "fed" non matcha "federated".
+    NEWS_TERMINI = [
+        "inflation", "cpi", "pce", "ppi", "fed", "federal reserve", "rate", "rates", "yield",
+        "yields", "treasury", "treasuries", "bond", "bonds", "jobs", "payroll", "payrolls",
+        "unemployment", "gdp", "economy", "economic", "recession", "tariff", "tariffs",
+        "trade deficit", "ecb", "boj", "bank of japan", "powell", "fomc", "rate cut",
+        "rate hike", "consumer sentiment", "retail sales", "manufacturing", "ism", "pmi",
+        "housing", "dollar", "jobless", "labor market", "central bank", "monetary policy",
+        # ⚠ aggiunti dopo aver guardato COSA VENIVA SCARTATO: il filtro stretto buttava via
+        # "Wholesale prices were flat in July" (che e' il PPI) e "U.S. budget deficit surged"
+        # (che e' politica fiscale). Un filtro si tara sui falsi negativi, non solo sui falsi
+        # positivi — e i falsi negativi si vedono solo se si stampa cio' che si e' scartato.
+        "wholesale prices", "producer prices", "consumer prices", "budget deficit", "deficit",
+        "wages", "wage growth", "spending", "stimulus", "tax", "tariffs on", "growth",
+        "slowdown", "soft landing", "hard landing", "yield curve", "credit",
+        "inflazione", "tassi", "disoccupazione", "recessione", "dazi", "bce",
+    ]
+    NEWS_RE = re.compile(r"\b(" + "|".join(re.escape(x) for x in NEWS_TERMINI) + r")\b", re.I)
+    try:
+        import email.utils as _eu
+        news = []
+        for fonte, url, filtra in NEWS_FONTI:
+            try:
+                r = http_get(url, timeout=15)
+                testo = r.text
+                for pezzo in re.findall(r"<item>(.*?)</item>", testo, re.S)[:30]:
+                    tm = re.search(r"<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</title>", pezzo, re.S)
+                    lm = re.search(r"<link>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</link>", pezzo, re.S)
+                    dm = re.search(r"<pubDate>(.*?)</pubDate>", pezzo, re.S)
+                    if not tm or not dm:
+                        continue                      # senza data non entra: non si puo' pesare
+                    titolo = re.sub(r"<[^>]+>", "", html.unescape(tm.group(1))).strip()
+                    if not titolo or len(titolo) < 12:
+                        continue
+                    if filtra and not NEWS_RE.search(titolo):
+                        continue                      # filtro per parola: dichiarato in pagina
+                    try:
+                        quando = _eu.parsedate_to_datetime(dm.group(1)).astimezone(timezone.utc)
+                    except Exception:  # noqa: BLE001
+                        continue
+                    news.append({"titolo": titolo[:180], "fonte": fonte,
+                                 "quando": quando.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                 "url": (lm.group(1).strip() if lm else "")[:400]})
+            except Exception as e:  # noqa: BLE001
+                print(f"!! news {fonte}: {e}", file=sys.stderr)
+        # piu' recenti in cima, senza doppioni di titolo
+        visti, puliti = set(), []
+        for n in sorted(news, key=lambda x: x["quando"], reverse=True):
+            k = n["titolo"].lower()[:60]
+            if k in visti:
+                continue
+            visti.add(k)
+            puliti.append(n)
+        if puliti:
+            macro["news"] = {
+                "voci": puliti[:18],
+                "fonti": [f for f, _, _ in NEWS_FONTI],
+                "filtro": ("CNBC Economia entra per intero (e' gia' un feed di economia); "
+                           "Bloomberg e MarketWatch passano da un filtro per termine macro, "
+                           "imperfetto per costruzione"),
+            }
+            print(f"   news macro: {len(puliti[:18])} voci da {len(NEWS_FONTI)} fonti")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! news macro: {e}", file=sys.stderr)
+
     # ═══ v292 — LO STORICO DEI 13 INDICATORI: LA TRAIETTORIA, NON SOLO IL PUNTO ═══════════
     # Il CEO: "possiamo ottenere i dati macro con la stessa logica del VIX nel box TradingView?".
     # Da TradingView no — misurato: i simboli ECONOMICS:* (USIRYY, USNFP, USUR, USGDPQQ, USCCI,

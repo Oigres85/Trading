@@ -2187,6 +2187,45 @@ check("v303 rotazione: le prime cinque del comparto sopravvivono alla fusione", 
   const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
   return !!f && f.g.indexOf("obar-prime") >= 0 && f.g.indexOf("Prime ") >= 0`));
 
+/* ══ v304 — NEWS MACRO: TRE FONTI, NON CINQUANTASETTE ════════════════════════════════════
+   Il CEO le ha richieste nel calendario. Erano uscite in v269 e il motivo NON era che fossero
+   inutili: erano ~57 richieste RSS a ogni run per un blocco che nessuno apriva. Qui sono TRE.
+   ⚠⚠ IL FILTRO LO FA LA FONTE. Tre tarature provate: stretta, scartava il PPI e il deficit di
+   bilancio; larga, faceva passare "Modi Maps India's Growth Push" (per "growth"). Un filtro a
+   parole su un titolo non distingue la "growth" di un'economia da quella di una societa'.
+   CNBC Economia e' gia' un feed di economia e si prende per intero; i generalisti passano dal
+   filtro, che resta imperfetto e viene dichiarato. */
+check("v304 news: entrano solo con una data, e i forum restano vietati", suVeri(`
+  const nw = (DATA.macro && DATA.macro.news) || null;
+  if (!nw || !(nw.voci || []).length) return true;
+  const conData = nw.voci.every(v => /^\\d{4}-\\d{2}-\\d{2}/.test(String(v.quando || "")));
+  const fonti = (nw.fonti || []).join(" ").toLowerCase();
+  return conData && fonti.indexOf("reddit") < 0 && fonti.indexOf("forum") < 0`));
+
+/* ⚠ e nel PACCHETTO devono arrivare come TITOLI, non come fatti: il sistema non ha letto gli
+   articoli ne' controllato i numeri che contengono, e un titolo cita numeri ("annual rate at
+   3.4%") che un LLM prenderebbe per buoni. */
+check("v304 news: nel pacchetto sono marcate come titoli non verificati", suVeri(`
+  const nw = (DATA.macro && DATA.macro.news) || null;
+  if (!nw || !(nw.voci || []).length) return true;
+  const p = buildPrompt();
+  return p.indexOf("SONO TITOLI, NON FATTI VERIFICATI") >= 0
+      && p.indexOf("non ha letto gli articoli") >= 0
+      && p.indexOf("non ha data di rilevazione") >= 0
+      && p.indexOf(nw.voci[0].titolo) >= 0`));
+
+/* ⚠ in pagina: espandibile e CHIUSA, altrimenti diciotto titoli seppelliscono il calendario —
+   il problema che il CEO ha appena risolto fondendo quattro sezioni. E deve dichiarare come e'
+   fatto l'elenco: un elenco che sembra curato quando e' automatico e' peggio di nessun elenco. */
+check("v304 news: espandibile, chiusa di default, e dichiara il proprio filtro", (() => {
+  const i = src.indexOf("function renderCalendario");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("<details class=\"cal-news\">")
+      && !corpo.includes("<details open")
+      && corpo.includes("Come è fatto questo elenco")
+      && corpo.includes("non è stato verificato dal sistema");
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
