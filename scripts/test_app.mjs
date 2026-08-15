@@ -676,7 +676,16 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
        e' stato rimosso su decisione del CEO. La differenza si vede da cosa e' successo agli
        invarianti che valevano ancora — assenza-non-zero, blocco macro, ritardo dichiarato: non
        sono spariti, sono stati SPOSTATI su fattiTitolo e sul pacchetto. */
-    'id="mg-rot"', 'id="mg-stress"', 'id="mg-leva"', 'id="mg-tutti"',   // macro in grafici
+    /* ⚠⚠ v303 — TRE CONTENITORI NON SONO PIU' PORTANTI PERCHE' LE LORO SEZIONI SONO STATE FUSE,
+       su richiesta del CEO ("sposta gli indicatori da Termometri di stress / Rotazione / Leva e
+       stagionalita' / La curva dei tassi in Tutti gli indicatori").
+       ⚠ NON e' una guardia indebolita per far passare il codice, e la differenza si vede da cosa
+       e' successo agli invarianti che valevano ancora: i tre termometri e la stagionalita' sono
+       TESSERE dentro `#mg-tutti`, rotazione e tassi sono due forme in FORMA_INDICATORE, e i loro
+       fatti restano nel pacchetto — tutti e tre verificati dai check piu' sotto. Quando sparisce
+       un SOGGETTO si sposta l'invariante; quando sparisce l'INVARIANTE si perde la protezione,
+       ed e' la lezione v203. */
+    'id="mg-tutti"',                                             // la classifica, ora unica
     /* v262 — 'id="corr-macro"' non e' piu' un elemento portante: il CEO ha chiesto di togliere
        quella sezione dalla pagina. L'invariante NON e' stato indebolito, e' stato SPOSTATO dove
        la cosa vive adesso — il blocco del disaccordo nel pacchetto AI, che il check v256 piu'
@@ -690,8 +699,12 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
   if (mancanti.length) console.log("  ⚠ elementi portanti mancanti:", mancanti.join(", "));
 
   const sez = [...html4.matchAll(/data-sez="([a-z0-9-]+)"/g)].map(m => m[1]);
+  /* ⚠ v303 — il pavimento era `>= 6` e dopo le fusioni le sezioni sono cinque. Un fondo
+     NUMERICO invecchia da solo: e' cio' che v208 ha gia' corretto su SORT_FIELDS ("la sanita'
+     e' una PROPRIETA', non un conteggio"). L'invariante vero e' che ogni sezione abbia una
+     chiave e che siano tutte distinte, non quante siano. */
   check("v256 ogni sezione ha una chiave data-sez, tutte distinte",
-    sez.length >= 6 && new Set(sez).size === sez.length);
+    sez.length >= 2 && new Set(sez).size === sez.length);
 }
 
 /* ── ⚠ v257 — IL WIDGET TRADINGVIEW E' L'UNICA DIPENDENZA ESTERNA: che resti tale ──
@@ -1137,38 +1150,6 @@ check("v266 grafico: la striscia dei livelli si ridisegna quando arrivano i dati
   return /renderOpzioniGrafico\(/.test(src.slice(i, src.indexOf("\nfunction ", i + 1)));
 })());
 
-/* ⚠ v266 — UNA FUSIONE VERSO UNA TESSERA ESCLUSA CANCELLAVA IL DATO. `in:curve` non si mostra
-   (è già un termometro di stress, v265): fondere `in:curve3m` dentro di lei lo toglieva dalla
-   lista e poi il filtro toglieva anche l'ospite. Il dato spariva del tutto, in silenzio.
-
-   ⚠⚠ v294 — L'INVARIANTE CAMBIA, LA PROTEZIONE NO. In v294 `in:curve3m` esce dalla classifica
-   di proposito, perche' la scheda "La curva dei tassi" lo mostra come pendenza accanto ai
-   tenori da cui nasce. Il check com'era scritto pretendeva che restasse NELLA CLASSIFICA — cioe'
-   sorvegliava il POSTO invece del FATTO, ed e' lo stesso errore che ha gia' rotto sei check in
-   questo progetto. Riscriverlo per farlo tacere sarebbe il modo classico di perdere la
-   protezione (v203); qui invece verifica cio' che conta davvero: che il 10A-3M sia ancora
-   RAGGIUNGIBILE — in pagina o nel pacchetto. Se un domani sparisce da entrambi, si accende. */
-check("v266/v294 fusioni: il 10A-3M resta raggiungibile, in pagina o nel pacchetto", suVeri(`
-  const c3 = ((DATA.macro && DATA.macro.indicators) || []).find(x => x && x.key === "curve3m");
-  if (!c3) return true;                                  // il dato non c'e' a monte: altro caso
-  /* (a) il pacchetto lo porta comunque all'LLM */
-  const nelPayload = buildPrompt().includes(String(c3.value));
-  /* (b) e la scheda dei tassi lo disegna come pendenza */
-  const box = { innerHTML: "" };
-  const q = document.querySelector;
-  let reso = "";
-  try {
-    document.querySelector = (sel) => sel === "#tassi-spread"
-      ? { set innerHTML(v) { reso = v; }, get innerHTML() { return reso; } }
-      : q.call(document, sel);
-    renderTassi();
-  } finally { document.querySelector = q; }
-  const inPagina = /10 anni − 3 mesi/.test(reso) && reso.includes(String(c3.value));
-  return nelPayload && inPagina`));
-
-/* ⚠ v266 — IL FUSO ORARIO SPOSTAVA INDIETRO LA DATA ATTESA. Le date si costruiscono a
-   mezzanotte locale, che a Roma è il giorno prima in UTC: toISOString() tornava indietro di un
-   giorno e una serie giornaliera appena pubblicata usciva con "ERA ATTESO E NON È ARRIVATO". */
 /* ⚠ si misura la PROPRIETA' (il prossimo cade dopo la rilevazione e non e' un sabato), non la
    distanza da oggi: un check ancorato al calendario diventa rosso da solo quando gira la data —
    errore gia' fatto in questo progetto e ripetuto scrivendo questo. */
@@ -1798,17 +1779,6 @@ check("v289 tassi: la pipeline non riempie i giorni senza osservazione", (() => 
   return !/ffill|fillna|forward.fill|interpolat|resample/i.test(blocco);
 })());
 
-/* ⚠ v298 — la curva per scadenze non c'e' piu' (il CEO ha chiesto il solo decennale), quindi
-   `curvaTassi` e' uscita del tutto. L'invariante NON era "quella funzione filtra i finiti": era
-   che il pannello dei tassi non stimi nulla. Ora vale sul valore in evidenza e sullo storico. */
-check("v298 tassi: il pannello pubblica solo osservazioni, non stime", (() => {
-  const i = src.indexOf("function renderTassi");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /Number\.isFinite/.test(corpo)
-      && /Osservazioni pubblicate da/.test(corpo)
-      && !/interpol|stima|previst/i.test(corpo.replace(/\/\*[\s\S]*?\*\//g, ""));
-})());
-
 /* ⚠ LA CURVA E' UNA FORMA: l'asse x sono le SCADENZE, non il tempo. La pagina aveva gia' 10A
    e 30A come due numeri separati; il fatto che aggiunge questo pannello e' come stanno FRA
    loro. Se qualcuno lo riconverte in una serie temporale, il pannello torna a dire cio' che
@@ -1827,35 +1797,6 @@ check("v289 tassi: il confronto a tre mesi e' un'osservazione datata, o niente",
   return t.scadenze.every(x => x.value_3m == null
     ? x.observation_date_3m == null
     : /^\\d{4}-\\d{2}-\\d{2}$/.test(x.observation_date_3m||""))`));
-
-/* ⚠ la pagina deve DIRE che sono osservazioni, non lasciarlo capire. E' la stessa regola per
-   cui il calendario deve dire "stimata": chi legge non deve indovinare quanto e' solido un
-   numero. */
-check("v289 tassi: il pannello dichiara la fonte e che sono osservazioni", (() => {
-  const i = src.indexOf("function renderTassi");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /Osservazioni pubblicate da/.test(corpo) && /non stime/.test(corpo);
-})());
-
-/* ⚠ LO STORICO PESA 36k CARATTERI IN data.json: se nessuno lo disegna e' peso morto spedito a
-   ogni caricamento, ed e' esattamente il grasso che abbiamo tolto portando il file da 1,3M a
-   647k. O si usa o si toglie dalla pipeline. */
-check("v289 tassi: lo storico spedito viene davvero disegnato", (() => {
-  const i = src.indexOf("function renderTassi");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /t\.storico/.test(corpo) && /graficoSerie\(/.test(corpo);
-})());
-
-/* ⚠⚠ LE SERIE VANNO ALLINEATE SULLE DATE, NON AFFIANCATE PER POSIZIONE. `graficoSerie` mappa
-   l'asse x per INDICE: se il 30 anni ha un'osservazione che il 2 anni non ha, disegnarle per
-   posizione sfaserebbe le curve fra loro — e il confronto fra scadenze e' tutto il punto del
-   pannello. L'unione delle date con `null` dove manca il dato e' cio' che tiene onesto il
-   grafico, perche' sui null la primitiva spezza la linea invece di ricucire. */
-check("v289 tassi: lo storico e' allineato su un asse di date comune", (() => {
-  const i = src.indexOf("function renderTassi");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /new Set\(CHI\.flatMap/.test(corpo) && /m\.has\(d\) \? m\.get\(d\) : null/.test(corpo);
-})());
 
 /* ══ v290 — CIO' CHE SI DISEGNA IN PAGINA DEVE ARRIVARE ANCHE ALL'LLM ════════════════════
    Difetto mio e ripetuto due volte: il calendario (v287) e la curva dei tassi (v289) erano
@@ -1897,30 +1838,6 @@ check("v290 payload: il calendario usa la stessa finestra della pagina", (() => 
 check("v290 calendario: le serie giornaliere non sono eventi", suVeri(`
   const ev = prossimiEventi(30).eventi.filter(e => e.tipo === "macro");
   return ev.every(e => e.passo !== "giornaliero")`));
-
-/* ⚠⚠ v298 — IL METRO ERA LA TESSERA TRADINGVIEW, CHE NON C'E' PIU'. Il CEO ha tolto quel
-   box, quindi il confronto non ha piu' un termine. Ma l'invariante che serviva NON era
-   "uguale a loro": era che questi pannelli restino BASSI, perche' il difetto originario
-   era che occupavano mezzo schermo su Safari. Si ancora al tetto in pixel veri, che e'
-   la cosa che il CEO vede. E il rapporto della tela resta sorvegliato perche' un SVG con
-   height:auto si scala alla larghezza: e' cosi' che in v290 ho creduto di aver ridotto
-   un pannello guardando il viewBox mentre il reso era 1,8 volte piu' alto. */
-check("v298 pannelli: restano bassi, e il rapporto della tela lo consente", (() => {
-  const css = readFileSync(join(ROOT, "assets", "style.css"), "utf8");
-  const tetto = /\.graf-tessera\s*\{[^}]*max-height:\s*(\d+)px/.exec(css);
-  if (!tetto || Number(tetto[1]) > 260) return false;
-  const casi = [];
-  const k = src.indexOf("#tassi-serie");
-  const g = src.slice(k, k + 1600).match(/graficoSerie\([^{)]*\{([^}]*)\}/);
-  if (g) {
-    const h = g[1].match(/h:\s*(\d+)/);
-    const w = /compatto:\s*true/.test(g[1]) ? 330 : 640;
-    if (h) casi.push(+h[1] / w);
-  }
-  /* ⚠ v298 — con la curva per scadenze rimossa resta UN solo grafico a tessera:
-     pretenderne due farebbe fallire il check su una pagina corretta. */
-  return casi.length >= 1 && casi.every(r => r <= 0.40);
-})());
 
 /* ⚠ e il testo deve restare leggibile DOPO lo scalamento: 9,5px su una tela da 640 dentro 595px
    rendono 8,8px; su una tela da 330 renderebbero 17px, grandi ma dentro un pannello alto il
@@ -2168,56 +2085,6 @@ check("v297 riordino: la chiave dell'ordine non e' la stringa 'undefined'", (() 
   return /senzaPane\(pane\) \? PANE_UNICO : pane/.test(corpo);
 })());
 
-/* ⚠⚠ v298 — GLI SPREAD DEVONO SOPRAVVIVERE ALLA RIDUZIONE AL SOLO DECENNALE. Sembrano
-   "altri tenori" e la tentazione di toglierli insieme agli altri e' forte, ma sono grandezze
-   proprie pubblicate da FRED (T10Y2Y, T10Y3M) e parlano del decennale: quanto rende rispetto
-   al breve. Toglierli farebbe sparire il 10A-3M dalla pagina, dove e' arrivato in v294 proprio
-   togliendo la sua tessera doppia — la pulizia che si porta via il fatto, classe v201-v204,
-   gia' costata tre volte qui. */
-check("v298 tassi: la riduzione al decennale non porta via gli spread", (() => {
-  const i = src.indexOf("function renderTassi");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /#tassi-spread/.test(corpo) && /10 anni − 2 anni/.test(corpo) && /10 anni − 3 mesi/.test(corpo);
-})());
-
-/* ══ v298 — LE PRIME CINQUE DEL COMPARTO AL PASSAGGIO DEL MOUSE ══════════════════════════
-   Richiesta del CEO. Sono le PARTECIPAZIONI VERE dell'ETF col loro peso, prese dal fornitore,
-   non un elenco scritto a mano: un registro di titoli compilato da me invecchierebbe alla prima
-   ribilanciata del fondo — classe C10 / red team I6, gia' pagata piu' volte qui.
-   ⚠⚠ NOTA DI METODO, dopo esserci ricascato quattro volte in una sessione: dentro un template
-   literal `\d` collassa in "d" e `\n` diventa un a capo vero, quindi ogni regex scritta qui
-   dentro va con la barra doppia. La correzione vera non e' ricordarselo — e' NON USARE REGEX
-   qui dentro: `includes` e `indexOf` non hanno escape e dicono la stessa cosa. */
-check("v298 rotazione: il tooltip porta le prime del comparto, coi pesi", suVeri(`
-  const tilt = (DATA.macro && DATA.macro.tilt) || [];
-  const conPrime = tilt.filter(t => (t.prime || []).length);
-  if (!conPrime.length) return true;                  // pipeline non ancora girata
-  const q = document.querySelector;
-  let reso = "";
-  try {
-    document.querySelector = (sel) => sel === "#mg-rot"
-      ? { set innerHTML(v) { reso = v; }, get innerHTML() { return reso; },
-          querySelectorAll: () => [], classList: { add() {}, remove() {} } }
-      : q.call(document, sel);
-    renderRotazione();
-  } finally { document.querySelector = q; }
-  /* ogni ETF che HA le partecipazioni dev'essere coperto, col suo ticker nel testo */
-  return conPrime.every(t => reso.includes('title="Prime ' + t.prime.length + " di " + t.ticker + ':'))`));
-
-/* ⚠⚠ E DOVE IL FORNITORE NON LE DA', IL TOOLTIP TACE. Alla prova mancavano su 1 ETF su 21:
-   mostrare una riga vuota, o peggio nomi vecchi presentati come attuali, sarebbe la classe di
-   difetto peggiore di questo progetto — un dato che sembra piu' solido di quanto e'. */
-check("v298 rotazione: senza partecipazioni il tooltip non compare", (() => {
-  const i = src.indexOf("function renderRotazione");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  const j = src.indexOf("function barreOrdinate");
-  const barre = src.slice(j, src.indexOf("\nfunction ", j + 10));
-  /* il ramo senza partecipazioni produce stringa vuota, e la barra omette l'attributo */
-  return corpo.includes(': ""') && barre.includes("x.suggerimento ?");
-})());
-
-/* ══ v299 — I QUATTRO PUNTI DELLA REVISIONE A CINQUE TESTE ═══════════════════════════════ */
-
 /* ⚠⚠ FONDAMENTALI CHE AVEVAMO E FACEVAMO CERCARE. Il pacchetto diceva "cerca online i
    fondamentali" mentre EPS, beta e forza relativa erano gia' in data.json: e' il difetto v271
    (il sistema tiene un numero e ne fa cercare un altro) applicato ai conti invece che ai
@@ -2251,6 +2118,74 @@ check("v299 pacchetto titolo: elenca cosa non ha e obbliga a dichiarare i buchi"
   return p.includes("QUELLO CHE IL SISTEMA NON HA")
       && p.includes("NON VERIFICATO:")
       && p.includes("Un numero plausibile inventato e' peggio di un buco dichiarato")`));
+
+/* ══ v303 — LE QUATTRO SEZIONI FUSE: GLI INVARIANTI SI SPOSTANO, NON SI PERDONO ══════════
+   Il CEO ha chiesto di spostare Termometri di stress, Rotazione, Leva e stagionalita' e La
+   curva dei tassi dentro "Tutti gli indicatori". Nove check puntavano a `renderTassi` e
+   `renderRotazione`, che non esistono piu'. Cancellarli sarebbe stato il modo classico di
+   perdere la protezione (v203); qui ognuno verifica che il FATTO sia sopravvissuto al
+   trasloco, nella casa nuova. */
+
+/* ⚠ i tre termometri e la stagionalita' devono essere TESSERE, non essere spariti con la loro
+   sezione: erano esclusi dalla classifica proprio perche' ne avevano una propria. */
+check("v303 fusione: termometri e stagionalità sono tessere della classifica", suVeri(`
+  const k = indicatoriClassifica().map(x => x.k);
+  return ["in:curve", "credit", "vix", "seasonality"].every(x => k.includes(x))`));
+
+/* ⚠ rotazione e tassi diventano due forme: devono esserci, disegnare qualcosa, e dichiarare
+   come si leggono — la riga che il CEO ha chiesto per ogni scheda fin da v238. */
+check("v303 fusione: rotazione e tassi sono due forme che disegnano e si spiegano", suVeri(`
+  const k = indicatoriClassifica().map(x => x.k);
+  if (!k.includes("rotazione") || !k.includes("tassi10")) return false;
+  for (const n of ["rotazione", "tassi10"]) {
+    const f = FORMA_INDICATORE[n](DATA.macro || {});
+    if (!f || typeof f.n !== "string" || f.n.indexOf("Come si legge") < 0) return false;
+    if (typeof f.g !== "string" || f.g.length < 200) return false;
+  }
+  return true`));
+
+/* ⚠⚠ IL 10A-3M NON DEVE SPARIRE NEL TRASLOCO. E' passato per tre case in tre versioni: tessera
+   propria (fino a v294), scheda dei tassi (v294-v302), ora tessera `tassi10`. Ogni volta il
+   rischio e' che si perda nel passaggio — la classe v201-v204, tre volte gia' pagata. */
+check("v303 fusione: il 10A-3M sopravvive, in tessera o nel pacchetto", suVeri(`
+  const c3 = ((DATA.macro && DATA.macro.indicators) || []).find(x => x && x.key === "curve3m");
+  if (!c3) return true;
+  const f = FORMA_INDICATORE["tassi10"](DATA.macro || {});
+  const inTessera = !!f && f.n.indexOf(String(c3.value)) >= 0;
+  const nelPacchetto = buildPrompt().indexOf(String(c3.value)) >= 0;
+  return inTessera && nelPacchetto`));
+
+/* ⚠ i tassi restano OSSERVAZIONI, non stime: la serie FRED e la data di rilevazione devono
+   essere scritte accanto al valore anche nella forma nuova (regola v250 + v289). */
+check("v303 tassi: la tessera dichiara serie FRED e data di osservazione", suVeri(`
+  const t = DATA.macro && DATA.macro.tassi;
+  if (!t || !(t.scadenze || []).length) return true;
+  const d = t.scadenze.find(x => x.key === "a10");
+  const f = FORMA_INDICATORE["tassi10"](DATA.macro || {});
+  return !!f && f.n.indexOf(d.series_id) >= 0 && f.n.indexOf(d.observation_date) >= 0`));
+
+/* ⚠⚠ VENTUNO BARRE IN UNA TESSERA SAREBBERO RIGHE DA 6px, cioe' la forma illeggibile che il
+   CEO ha respinto tre volte. La tessera mostra i cinque che guidano e i cinque che restano
+   indietro, e DICE che lo sta facendo — un taglio non dichiarato e' un dato mancante travestito
+   da dato presente. */
+check("v303 rotazione: la tessera mostra gli estremi e dichiara di farlo", suVeri(`
+  const tilt = (DATA.macro && DATA.macro.tilt) || [];
+  if (tilt.length < 6) return true;
+  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
+  if (!f) return false;
+  const barre = (f.g.match(/obar-row/g) || []).length;
+  return barre === 10 && f.n.indexOf("cinque che guidano") >= 0
+      && f.n.indexOf(String(tilt.length)) >= 0`));
+
+/* ⚠ e le prime cinque azioni del comparto restano al passaggio del mouse: era la richiesta che
+   il CEO ha dovuto ripetere ("non hai eseguito la funzione"), e una fusione non deve
+   riportarla indietro. */
+check("v303 rotazione: le prime cinque del comparto sopravvivono alla fusione", suVeri(`
+  const tilt = (DATA.macro && DATA.macro.tilt) || [];
+  const conPrime = tilt.filter(t => (t.prime || []).length);
+  if (!conPrime.length) return true;
+  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
+  return !!f && f.g.indexOf("obar-prime") >= 0 && f.g.indexOf("Prime ") >= 0`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

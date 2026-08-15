@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "302";
+const BUILD_VERSION = "303";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -790,7 +790,6 @@ function renderAll() {
      resta ferma su "non disponibili" anche dopo che i dati sono arrivati. Chi disegna al
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
-  renderTassi();                // v289 — curva dei tassi, osservazioni FRED
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
@@ -2148,8 +2147,42 @@ function dataBreve(iso, lunga) {
      Senza soglie un livello non dice niente: "HY OAS 2,84" è un numero, "2,84 contro i 4,0
      dello stress" è un'informazione. È il motivo per cui questi grafici esistono.
    opt.bande: [{ da, a, colore }] — zone di sfondo (es. "zona di inversione" sotto lo zero). */
+/* ═══ v303 — RIDUZIONE ALLA RISOLUZIONE CHE LA TELA PUO' MOSTRARE ═════════════════════════
+   Difetto introdotto dalla fusione delle sezioni: portando in classifica le serie lunghe (la
+   curva ha 501 punti, il credito 260, i tassi 369) la scheda e' passata da 23.747 a 294.026
+   caratteri di markup — DODICI volte. Una tela da 330px non puo' mostrare 501 punti: sono
+   cinque punti per pixel, cioe' peso senza informazione.
+   ⚠⚠ NON SI PRENDE UN PUNTO OGNI N. Campionare cosi' fa sparire le punte — e una punta e'
+   esattamente cio' che si guarda in una serie di mercato. Si divide in secchi e di ogni secchio
+   si tengono il MINIMO e il MASSIMO, nell'ordine in cui compaiono: la forma resta, gli estremi
+   restano, spariscono solo i punti che cadrebbero sullo stesso pixel.
+   ⚠ I BUCHI RESTANO BUCHI: un `null` dentro un secchio lo attraversa intatto, altrimenti la
+   riduzione ricucirebbe una continuita' mai esistita (regola v289). */
+function riduciSerie(punti, max = 200) {
+  if (!Array.isArray(punti) || punti.length <= max) return punti;
+  const per = Math.ceil(punti.length / (max / 2));   // due punti per secchio: min e max
+  const out = [];
+  for (let i = 0; i < punti.length; i += per) {
+    const secchio = punti.slice(i, i + per);
+    const buchi = secchio.filter(p => !p || p.v == null);
+    const veri = secchio.filter(p => p && p.v != null);
+    if (buchi.length) out.push(buchi[0]);            // il buco sopravvive: non si ricuce
+    if (!veri.length) continue;
+    let lo = veri[0], hi = veri[0];
+    for (const p of veri) { if (p.v < lo.v) lo = p; if (p.v > hi.v) hi = p; }
+    const primo = veri.indexOf(lo) <= veri.indexOf(hi) ? lo : hi;
+    const secondo = primo === lo ? hi : lo;
+    out.push(primo);
+    if (secondo !== primo) out.push(secondo);
+  }
+  return out;
+}
+
 function graficoSerie(serie, opt = {}) {
-  const s = (serie || []).filter(x => (x.punti || []).some(p => p && p.v != null));
+  const s = (serie || []).filter(x => (x.punti || []).some(p => p && p.v != null))
+    /* ⚠ la riduzione avviene QUI, in un posto solo: ogni consumatore ne beneficia e nessuno
+       puo' dimenticarsene. Il tetto e' generoso (200) perche' la tela piu' larga e' 640px. */
+    .map(x => ({ ...x, punti: riduciSerie(x.punti, 200) }));
   if (!s.length) return '<div class="muted">Storico non disponibile.</div>';
   // ⚠ il viewBox NON è fisso: dentro una card da 300px un viewBox da 640 scala il testo al 47%
   // (9,5px → 4,5px, illeggibile). `compatto` porta la tela vicino alla larghezza reale, così
@@ -2346,149 +2379,6 @@ function prossimiEventi(giorni = 7) {
 }
 
 
-function renderTassi() {
-  const box = $("#tassi-curva");
-  if (!box) return;
-  const t = (DATA && DATA.macro && DATA.macro.tassi) || null;
-  const nota = $("#tassi-nota");
-  const storico = $("#tassi-storico");
-  if (!t || !(t.scadenze || []).length) {
-    box.innerHTML = '<div class="muted">Arriva col prossimo giro della pipeline.</div>';
-    if (nota) nota.innerHTML = "";
-    if (storico) storico.innerHTML = "";
-    return;
-  }
-  /* ═══ v298 — SOLO IL DECENNALE ═══════════════════════════════════════════════════════
-     Il CEO: "La curva dei tassi lascia solo dato a 10 anni". Con un tenore solo non c'e' una
-     curva da disegnare, quindi `curvaTassi` esce del tutto invece di restare a disegnare un
-     punto: un grafico con un punto e' la stessa forma vuota che v265 ha gia' tolto dalle
-     vendite al dettaglio ("la linea retta era il problema").
-     ⚠ GLI SPREAD RESTANO. Sembrano "altri tenori" ma non lo sono: sono grandezze proprie
-     pubblicate da FRED come serie a se' (T10Y2Y, T10Y3M) e parlano del DECENNALE — quanto rende
-     rispetto al breve. Toglierli farebbe sparire il 10A-3M dalla pagina, dove e' arrivato in
-     v294 proprio togliendo la sua tessera doppia: sarebbe la classe v201-v204, la pulizia che
-     si porta via il fatto. Un cancello lo verifica. */
-  const dieci = (t.scadenze || []).find(x => x.key === "a10");
-  box.innerHTML = dieci
-    ? `<div class="tassi-dieci"><b>${fmtNum.format(dieci.value)}%</b>`
-      + `<span class="muted">Treasury USA 10 anni · ${esc(dieci.series_id)} · osservazione del ${esc(dieci.observation_date)}</span>`
-      + (Number.isFinite(dieci.value_3m)
-         ? `<span class="muted">tre mesi fa ${fmtNum.format(dieci.value_3m)}% (${esc(dieci.observation_date_3m)}) — `
-           + `${signTxt(Math.round((dieci.value - dieci.value_3m) * 100) / 100, " pp")}</span>` : "")
-      + `</div>`
-    : '<div class="muted">Arriva col prossimo giro della pipeline.</div>';
-
-  const per = (k) => (t.scadenze || []).find(x => x.key === k);
-  const corto = per("m3") || per("a2"), lungo = per("a30") || per("a10");
-  const pendenza = (corto && lungo && Number.isFinite(lungo.value) && Number.isFinite(corto.value))
-    ? Math.round((lungo.value - corto.value) * 100) / 100 : null;
-  const pendenza3m = (corto && lungo && Number.isFinite(lungo.value_3m) && Number.isFinite(corto.value_3m))
-    ? Math.round((lungo.value_3m - corto.value_3m) * 100) / 100 : null;
-
-  /* le righe: valore, data VERA dell'osservazione, e lo scarto dalla stessa scadenza tre mesi
-     fa — anche quello un'osservazione, non una tendenza stimata. */
-  const righe = (t.scadenze || []).filter(x => x.key === "a10").map(x => {
-    const d = (Number.isFinite(x.value) && Number.isFinite(x.value_3m))
-      ? Math.round((x.value - x.value_3m) * 100) / 100 : null;
-    return `<tr><td>${esc(x.label)}</td>
-      <td class="num"><b>${fmtNum.format(x.value)}%</b></td>
-      <td class="num ${d > 0 ? "neg" : d < 0 ? "pos" : "muted"}">${d != null ? signTxt(d, " pp") : "—"}</td>
-      <td class="muted tassi-fonte">${esc(x.series_id)} · oss. ${esc(x.observation_date)}</td></tr>`;
-  }).join("");
-  if (storico) {
-    storico.innerHTML = `<div class="tassi-scroll"><table class="tassi-tab"><thead><tr>
-      <th>Scadenza</th><th class="num">Rendimento</th><th class="num">vs 3 mesi fa</th><th>Serie FRED · osservazione</th>
-      </tr></thead><tbody>${righe}</tbody></table></div>`;
-  }
-  /* ⚠ LA STORIA DELLE TRE SCADENZE, ALLINEATA SULLE DATE VERE. Le serie vanno unite su un
-     asse di date comune, non affiancate per posizione: se il 30 anni ha un'osservazione che il
-     2 anni non ha, disegnarle per indice sfaserebbe le curve fra loro e il confronto — che e'
-     tutto il punto — direbbe una cosa falsa. Dove una serie non ha il dato passa `null`, e
-     `graficoSerie` spezza la linea invece di ricucire due estremi lontani. */
-  const serie = $("#tassi-serie");
-  if (serie) {
-    const st = t.storico || {};
-    const CHI = [
-      { k: "a10", nome: "10 anni", colore: "var(--blue)" },   // v298 — solo il decennale
-    ].filter(x => (st[x.k] || []).length > 1);
-    if (!CHI.length) {
-      serie.innerHTML = "";
-    } else {
-      const date = [...new Set(CHI.flatMap(x => st[x.k].map(p => p.d)))].sort();
-      const dati = CHI.map(x => {
-        const m = new Map(st[x.k].map(p => [p.d, p.v]));
-        return { nome: x.nome, colore: x.colore,
-                 punti: date.map(d => ({ d, v: m.has(d) ? m.get(d) : null })) };
-      });
-      serie.innerHTML = graficoSerie(dati, { h: 225, unita: "%" })
-        + `<div class="tassi-leg">${CHI.map(x => `<span><i style="background:${x.colore}"></i>${esc(x.nome)}</span>`).join("")}`
-        + `<span class="muted">${date.length} giorni di rilevazione, dal ${esc(date[0])}</span></div>`;
-    }
-  }
-
-  /* ═══ v294 — GLI SPREAD ENTRANO QUI, DOVE SONO UNA PROPRIETA' DELLA CURVA ═══════════════
-     Il CEO: "vedi se ci sono doppioni, ovvero se più schede mostrano lo stesso dato". Ce n'erano:
-     "Treasury USA 10A" e "Treasury USA 30A" avevano una scheda ciascuno nella classifica mentre
-     questa card mostra gli stessi rendimenti CON lo storico, e "Curva 10A-3M" ne aveva una terza
-     per una grandezza che e' la distanza fra due punti gia' disegnati qui.
-     ⚠ GLI SPREAD SI PRENDONO DALLE SERIE UFFICIALI (T10Y2Y, T10Y3M via `macro.indicators`), NON
-     si ricalcolano sottraendo i nostri tenori: sarebbero due derivazioni della stessa grandezza,
-     coerenti solo per fortuna — la classe v161/v207, gia' pagata due volte in questo progetto.
-     FRED pubblica lo spread come serie propria, con la sua data: quella si usa. */
-  const spread = $("#tassi-spread");
-  if (spread) {
-    const ind = ((DATA && DATA.macro && DATA.macro.indicators) || []);
-    const q = (k) => ind.find(x => x && x.key === k);
-    const righe = [["curve", "10 anni − 2 anni"], ["curve3m", "10 anni − 3 mesi"]]
-      .map(([k, et]) => { const x = q(k); return x ? { et, v: x.value, d: x.date, key: k } : null; })
-      .filter(Boolean);
-    spread.innerHTML = righe.length
-      ? `<div class="tassi-spread">${righe.map(x =>
-          `<span><b>${esc(x.et)}: ${esc(String(x.v))}</b> <span class="muted">(serie FRED propria, oss. ${esc(x.d)})</span></span>`
-        ).join("")}</div>`
-        + `<div class="muted tassi-spread-nota">Sono la <b>pendenza</b> della curva qui sopra, presa dalle serie che `
-        + `la fonte pubblica come tali — non ricalcolata sottraendo i nostri tenori, che darebbe un secondo numero `
-        + `per la stessa grandezza. Sotto zero la curva è invertita: chi presta a dieci anni incassa meno di chi presta a tre mesi.</div>`
-      : "";
-  }
-
-  if (nota) {
-    const dataUlt = (t.scadenze || []).map(x => x.observation_date).filter(Boolean).sort().pop();
-    nota.innerHTML = `<b>Osservazioni pubblicate da ${esc(t.fonte || "FRED")}</b>, non stime: `
-      + `ogni punto è un valore che la fonte ha pubblicato in quella data. L'ultima è del ${esc(dataUlt || "n.d.")}. `
-      + `La linea tratteggiata è la stessa curva tre mesi fa — anche quella osservata, non ricostruita. `
-      + `L'asse del grafico storico conta i giorni in cui la fonte ha RILEVATO, non i giorni di calendario: un giorno di chiusura non diventa un valore piatto, e dove una serie non ha il dato la linea si spezza invece di ricucire due estremi lontani.`
-      + (pendenza != null
-          ? `<div class="tassi-pend">Fra ${esc(corto.label)} e ${esc(lungo.label)} ci sono <b>${signTxt(pendenza, " pp")}</b>`
-            + (pendenza3m != null ? `, erano ${signTxt(pendenza3m, " pp")} tre mesi fa` : "")
-            + `. <b>Come si legge:</b> è la differenza che le banche incassano prestando a lunga e finanziandosi a breve — `
-            + `quando si assottiglia smettono di prestare, e quello è il canale per cui una curva piatta arriva all'economia reale, `
-            + `non una profezia statistica.</div>`
-          : "");
-  }
-}
-
-/* ═══ v299 — «OGGI»: LA PRIMA COSA CHE SI GUARDA LA MATTINA ═══════════════════════════════
-   Dalla revisione a cinque teste: la pagina diceva benissimo COM'E' il mondo e non diceva
-   COSA SI E' MOSSO. Nove sezioni tutte dello stesso peso non dicono da dove cominciare, e
-   leggerle tutte ogni giorno e' un lavoro che nessuno fa davvero.
-   Tre domande, in tre righe, sopra tutto il resto:
-     1. cosa si e' mosso piu' del suo solito rispetto a ieri
-     2. cosa esce nei prossimi sette giorni
-     3. cosa e' a un estremo del proprio anno
-   ⚠⚠ "PIU' DEL SUO SOLITO" E' UNA MISURA, NON UNA SOGLIA INVENTATA: lo scarto di oggi viene
-   diviso per la deviazione standard degli scarti giornalieri di QUELLA serie. Una soglia fissa
-   ("segnala sopra 5 punti") non sa se cinque punti siano tanti per quell'indicatore — ed e' il
-   registro fisso che invecchia da solo (C10, red team I6), piu' la lezione v230 sulle soglie a
-   3 pp. Se la storia non basta a stimare la deviazione, la riga TACE invece di inventarla.
-   ⚠ E i percentili si calcolano sullo storico VERO dell'indicatore, non su una scala 0-100
-   costruita da me: quelle sono state tolte dal pacchetto in v200 e non tornano dalla finestra. */
-/* ⚠ v300 — l'unita' di misura di ogni indicatore vive in UN SOLO POSTO. Prima era scritta
-   dentro `serieIndicatore`; ora la usano anche gli scarti di «Oggi», e due copie della stessa
-   tabella divergono appena qualcuno ne aggiorna una (lezione v161/v207, gia' pagata due volte).
-   ⚠ Il default e' "%" perche' la maggior parte sono percentuali, ma indici come Philly Fed e
-   UMich NON lo sono: "+31,1%" su un indice e' un'unita' sbagliata su un numero giusto, ed e' il
-   modo piu' rapido di far diffidare di un pannello corretto. */
 const UNITA_INDICATORE = { nfp: "K", curve: " pp", curve3m: " pp", umich: "", philly: "" };
 
 function renderCalendario() {
@@ -2573,197 +2463,10 @@ const ETF_DI_SETTORE = { sox: "SMH", Technology: "XLK", "Communication Services"
   "Health Care": "XLV", Financials: "XLF", Industrials: "XLI", "Consumer Discretionary": "XLY" };
 
 
-let rotOrizzonte = "m1";
-/* v265 — `rotTutte` rimossa: si mostrano sempre tutti i settori, come chiesto dal CEO. */
-function renderRotazione() {
-  /* ⚠ v262 — TERZA VOLTA CHE IL CEO CHIEDE DI RIDURRE QUESTO RIQUADRO ("riduci le dimensioni
-     del box!!"). Le prime due volte ho stretto il CSS: prima il vincolo sbagliato (v259), poi
-     quello giusto ma non abbastanza. Quando una richiesta torna tre volte il problema non e' la
-     misura, e' la FORMA — la stessa lezione delle barre 0-100 respinte tre volte in v225-v228.
-     Ventuno barre, per quanto basse, restano ventuno righe da leggere.
-     Ora il riquadro mostra I DUE ESTREMI, che sono la risposta alla domanda "dove si muove il
-     denaro": i cinque settori che tirano e i cinque che perdono. Gli altri undici stanno in
-     mezzo e non dicono niente di piu'. Il resto della classifica e' a un clic, e il pacchetto
-     per l'LLM continua a portarli TUTTI e 21 — si accorcia la pagina, non l'informazione. */
-  const box = $("#mg-rot"); if (!box) return;
-  const tilt = DATA?.macro?.tilt || [];
-  const nota = $("#mg-rot-note"), head = $("#mg-rot-head");
-  if (!tilt.length) { box.innerHTML = '<div class="muted">Rotazione non disponibile.</div>'; return; }
-  const tutte = [...tilt].sort((a, b) => (b[rotOrizzonte] ?? -99) - (a[rotOrizzonte] ?? -99))
-    .map(t => {
-      /* ⚠⚠ v298 — LE PRIME CINQUE DEL COMPARTO, richiesta del CEO. Sono le partecipazioni VERE
-         dell'ETF col loro peso, prese dalla pipeline: un elenco scritto da me invecchierebbe
-         alla prima ribilanciata del fondo — il registro fisso (C10, red team I6) gia' pagato.
-         ⚠ Se il fornitore non le da' — su 21 ETF ne mancava uno alla prova — il tooltip TACE,
-         invece di mostrare nomi vecchi presentati come attuali. */
-      const p = (t.prime || []).filter(x => x && x.tk);
-      return { nome: t.name, valore: t[rotOrizzonte], tk: t.ticker,
-               testo: signTxt(t[rotOrizzonte]),
-               suggerimento: p.length
-                 ? `Prime ${p.length} di ${t.ticker}: `
-                   + p.map(x => `${x.tk}${x.peso != null ? ` ${fmtNum.format(x.peso)}%` : ""}`).join(" · ")
-                 : "" };
-    });
-  /* v265 — SEMPRE TUTTI I SETTORI, senza bottone. Il CEO ha chiesto di togliere "mostra solo
-     gli estremi": la riduzione la fa gia' il CSS compatto (righe da ~15px invece di ~26), e un
-     bottone che nasconde meta' dei dati e' un ostacolo, non una semplificazione. */
-  box.innerHTML = barreOrdinate(tutte).replace('<div class="obars">', '<div class="obars obars-compatte">');
-  if (head) head.innerHTML = "";
-  const primo = tutte[0], ultimo = tutte[tutte.length - 1];
-  const sopraZero = tutte.filter(r => (r.valore ?? 0) > 0).length;
-  if (nota) {
-    nota.innerHTML = `Rendimento a ${rotOrizzonte === "m1" ? "1 mese" : "3 mesi"}. ${sopraZero} su ${tutte.length} in positivo. `
-      + (primo && ultimo ? `L'arco va da ${esc(primo.nome)} ${signTxt(primo.valore)} a ${esc(ultimo.nome)} ${signTxt(ultimo.valore)}: `
-         + `piu' e' largo, piu' il mercato sta scegliendo invece di salire insieme.` : "");
-  }
-}
 
-/* I TRE TERMOMETRI DI STRESS, con le loro soglie disegnate.
-   Un livello senza soglia non dice niente: "HY OAS 2,84" è un numero, "2,84 contro i 4,0 della
-   tensione" è un'informazione. Le soglie sono le stesse che la pipeline già usa per gli score. */
-function renderStress() {
-  const m = DATA?.macro || {};
-  const box = $("#mg-stress"); if (!box) return;
-  const carte = [];
-
-  if ((m.curve_history || []).length > 2) {
-    const h = m.curve_history, ora = h[h.length - 1].v;
-    carte.push({
-      t: "Curva 10A-2A", v: `${ora > 0 ? "+" : ""}${fmtNum.format(ora)} pp`,
-      cls: ora < 0 ? "neg" : ora < 0.25 ? "warn" : "pos",
-      g: graficoSerie([{ nome: "curva", punti: h, colore: ora < 0 ? "var(--red)" : "var(--blue)" }],
-        { h: 120, compatto: true, soglie: [{ v: 0, testo: "inversione", colore: "var(--red)" }],
-          bande: [{ da: Math.min(...h.map(x => x.v)) - 0.05, a: 0, colore: "var(--red)" }],
-          unita: "", aria: "spread 10 anni meno 2 anni", etichetteDx: false }),
-      n: ora < 0 ? "Invertita: storicamente precede le recessioni."
-        : `Positiva da ${h.filter(x => x.v < 0).length ? "dopo l'ultima inversione" : "tutto il periodo"}. Sotto lo zero è il segnale che conta.`,
-    });
-  }
-  if ((m.credit?.history || []).length > 2) {
-    const h = m.credit.history, ora = h[h.length - 1].v;
-    carte.push({
-      t: "Credito HY (spread)", v: `${fmtNum.format(ora)}%`,
-      cls: ora >= 6 ? "neg" : ora >= 4 ? "warn" : "pos",
-      g: graficoSerie([{ nome: "hy", punti: h, colore: ora >= 4 ? "var(--yellow)" : "var(--green)" }],
-        { h: 120, compatto: true, soglie: [{ v: 4, testo: "tensione", colore: "var(--yellow)" }], unita: "%",
-          aria: "spread high yield", etichetteDx: false }),
-      n: `Quanto extra-rendimento chiede il mercato per prestare alle aziende fragili. Sopra 4% si tende, sopra 6% è stress. Ora ${fmtNum.format(ora)}%.`,
-    });
-  }
-  if ((m.vix?.spark || []).length > 2) {
-    const sp = m.vix.spark, ora = m.vix.value ?? sp[sp.length - 1];
-    carte.push({
-      t: "VIX — volatilità attesa", v: fmtNum.format(ora),
-      cls: ora >= 30 ? "neg" : ora >= 20 ? "warn" : "pos",
-      g: graficoSerie([{ nome: "vix", punti: sp.map(v => ({ d: null, v })), colore: ora >= 20 ? "var(--yellow)" : "var(--green)" }],
-        { h: 120, compatto: true, soglie: [{ v: 20, testo: "tensione", colore: "var(--yellow)" }],
-          assex: ["30 sedute fa", "oggi"], aria: "VIX ultime 30 sedute", etichetteDx: false }),
-      n: `Sotto 20 il mercato è calmo, sopra 30 ha paura. Questa serie di 30 sedute non era disegnata da nessuna parte.`,
-    });
-  }
-  box.innerHTML = carte.length ? carte.map(c => `<div class="mg-card">
-      <div class="mg-card-head"><span class="mg-t">${esc(c.t)}</span><span class="mg-v ${c.cls}">${esc(c.v)}</span></div>
-      ${c.g}<div class="muted mg-n">${c.n}</div></div>`).join("")
-    : '<div class="muted">Serie di stress non disponibili.</div>';
-}
-
-/* v229 — `annoCircolare()` RIMOSSA. Era la rosa dei 12 mesi: leggibile, ma da imparare — e il
-   CEO ha chiesto la stagionalita' "a barre". Dodici barre affiancate col mese corrente acceso si
-   leggono senza istruzioni, ed e' la forma che aveva prima della v225.
-   RICEVUTA DEL TAGLIO: 1 chiamante, convertito a barreOrdinate(); 0 riferimenti nei test; dentro
-   i confini del blocco non vive nessun'altra funzione. ⚠ La prima stesura di questo assert ha
-   MORSO: avevo assunto che il vicino a valle fosse renderLevaStagione(), mentre fra le due era
-   stato inserito l'intero modulo v226 (FAMIGLIE_MACRO, puntiSuAsse, agganciaMacroDinamico).
-   E' la terza volta in quattro versioni che la ricevuta scritta PRIMA di tagliare intercetta un
-   confine sbagliato — la classe v201-v204 non e' teorica. */
-/* ═══ v226 — RAGNATELA + PUNTI SU UN ASSE: il quadro, poi il dettaglio ══════════════════════
-   Storia di questa decisione, perche' e' costata tre tentativi: la barra 0-100 e' stata
-   respinta, il quadrante ad arco pure. La diagnosi giusta non era la FORMA del widget — era
-   che ce n'erano 30 IDENTICI in fila. Nessuna forma sopravvive a essere ripetuta 30 volte.
-   Il CEO ha poi chiesto GRAFICI, comprensibili e dinamici, scegliendo fra alternative rese sui
-   dati veri. Qui la lettura ha due livelli e nessun widget ripetuto:
-     1. la RAGNATELA: 30 indicatori in 6 famiglie, un poligono solo. Dove rientra verso il
-        centro, quella parte del quadro e' debole. Si legge senza numeri, da lontano.
-     2. i PUNTI SU UN ASSE: tutti sulla stessa scala 0-100, una riga per famiglia. Si vede dove
-        si addensano e, cosa che nessuna media dice, quanto sono in DISACCORDO fra loro.
-   Dinamici: si passa sopra un punto e compare il nome, si clicca e si apre il pannello, si
-   clicca una famiglia sulla ragnatela e l'asse isola quella. */
-
-/* v233 — RIMOSSA LA VISTA A PALLINI (FAMIGLIE_MACRO, famigliaDi, famiglieMacro, larghezzaTela,
-   puntiSuAsse, agganciaMacroDinamico). Il CEO ha chiesto di riportare "Tutti gli indicatori" alla
-   forma di MINI TAB: l'asse coi pallini non ha piu' chiamanti, e con lui il raggruppamento in
-   famiglie che serviva solo a disporre quei pallini.
-   RICEVUTA DEL TAGLIO, scritta prima di tagliare e verificata con assert: dentro i confini vivono
-   esattamente quelle 5 funzioni piu' la costante; il vicino a valle, renderLevaStagione(), e'
-   intatto; `larghezzaTela` era usata SOLO da radarFamiglie (v228, gia' rimossa) e da puntiSuAsse,
-   quindi esce con loro.
-   ⚠ E LE GUARDIE NON SI CANCELLANO CON LA FUNZIONALITA' (classe v203): i check v226 verificavano
-   che NESSUN indicatore andasse perso nel raggruppamento. Quell'invariante vale ancora — ogni
-   indicatore deve avere la SUA scheda — e infatti i check sono stati riscritti su quella, non
-   tolti: cambia il meccanismo, non la cosa da proteggere. */
-function renderLevaStagione() {
-  const m = DATA?.macro || {};
-  const box = $("#mg-leva"); if (!box) return;
-  const carte = [];
-
-  /* ═══ v265 — LA LEVA A CREDITO E' STATA TOLTA, e la ragione e' che non c'e' rimedio ══════
-     Il CEO: "con dati cosi' vecchi questo valore e' fuorviante, c'e' una soluzione? altrimenti
-     va tolta". La risposta onesta e' NO, non c'e'.
-     FINRA pubblica il margin debt del mese M nella terza settimana di M+1: il ritardo e'
-     STRUTTURALE, non un difetto della pipeline, e non esiste una fonte gratuita piu' fresca
-     dello stesso dato. Ho gia' provato le due mitigazioni possibili — scrivergli accanto la
-     data (v262) e riformulare la frase perche' parlasse al passato — e il CEO l'ha comunque
-     trovato fuorviante. Ha ragione: "leva al massimo storico" pesa nella lettura molto piu' di
-     quanto la sua nota a margine riesca a smorzare. E' lo stesso argomento con cui in v200 e'
-     stato tolto il punteggio del motore: l'ancoraggio non si batte con una nota, si batte
-     togliendo il numero.
-     Resta la stagionalita', che non ha questo problema. */
-  const se = m.seasonality;
-  if ((se?.sp500 || []).length === 12) {
-    const MESI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
-    const cur = se.current_month;
-    carte.push({
-      t: "Stagionalità S&P 500", v: `${MESI[(cur || 1) - 1]} · ${se.label || ""}`,
-      cls: (se.sp500[(cur || 1) - 1]?.avg ?? 0) < 0 ? "warn" : "pos",
-      /* v229 — TORNA A BARRE su richiesta del CEO. La rosa circolare era leggibile ma va
-         imparata; dodici barre affiancate, una per mese, con quello corrente acceso, si
-         leggono senza istruzioni. Divergono dallo zero perche' il segno E' l'informazione. */
-      g: barreOrdinate(se.sp500.map(x => ({
-        nome: MESI[x.m - 1], valore: x.avg, evidenzia: x.m === cur,
-        testo: `${signTxt(x.avg)} · ${Math.round(x.pos)}% anni positivi`,
-      })), {}),
-      n: `Rendimento medio di ogni mese su ~${se.sp500[0]?.n || 40} anni, con il mese corrente acceso. È contesto di probabilità, non una previsione.`,
-    });
-  }
-  /* v231 — MINI TAB da "Leva e stagionalità" in giù (richiesta CEO). `mg-wide` fa
-     grid-column: 1/-1, cioè trasformava queste schede in blocchi a tutta larghezza: tolto, la
-     griglia .mg-tris le rimette affiancate. I GRAFICI RESTANO DENTRO — margin debt tiene la sua
-     serie storica, la stagionalità le sue 12 barre: "se quelle all'interno portavano dei grafici
-     con le informazioni riporta direttamente quelle". Cambia il contenitore, non il contenuto. */
-  box.innerHTML = carte.length ? carte.map(c => `<div class="mg-card">
-      <div class="mg-card-head"><span class="mg-t">${esc(c.t)}</span><span class="mg-v ${c.cls}">${esc(c.v)}</span></div>
-      ${c.g}<div class="muted mg-n">${c.n}</div></div>`).join("")
-    : '<div class="muted">Dati non disponibili.</div>';
-}
-
-/* v238 — `renderScomposizione()` e la costante COMPOSITI RIMOSSE col loro riquadro.
-   RICEVUTA DEL TAGLIO, verificata con assert: dentro i confini vive UNA sola funzione piu' la
-   costante; il vicino a valle, renderSignposts(), e' intatto.
-   ⚠ IL CONTENUTO NON E' PERSO: le barre dei fattori di ogni composito sono ora dentro la scheda
-   del rispettivo indicatore (FORMA_INDICATORE → barreComposito). Prima quei nomi comparivano DUE
-   volte, una nella classifica e una qui: e' la classe v184, lo stesso dato presentato come due. */
-/* v243 — `renderSignposts()` RIMOSSA col suo riquadro (richiesta CEO).
-   RICEVUTA DEL TAGLIO: dentro i confini vive UNA sola dichiarazione di primo livello, verificata
-   contando function/const/let/var e non solo le function — la svista che in v238 ha portato via
-   `let allocGrafMode` e ucciso la pagina. Il vicino a valle, renderMacroGrafici(), e' intatto.
-   ⚠ IL DATO NON E' PERSO: macro.signposts resta in data.json e la riga "BofA Bear-Market
-   Signposts: N/10 attivi" resta nel payload. Si e' tolta la resa, non l'informazione. */
 function renderMacroGrafici() {
   if (!DATA) return;
   attivaHoverGrafici();
-  renderRotazione();
-  renderStress();
-  renderLevaStagione();
   renderIndicatori();   // v215 — le 27 scatole diventano una classifica sola
   // v235 — ORA le schede esistono: si misura e si impacca
   impaccaGriglia(document.querySelector(".shell-main"));
@@ -2820,6 +2523,22 @@ function indicatoriClassifica() {
     const v = m[k];
     if (v && v.score != null) out.push({ k, nome, score: Math.round(v.score), sub: v.label || v.status || v.rating || "" });
   });
+  /* v303 — le due sezioni promosse a tessera entrano qui, con un punteggio che NON e' un
+     giudizio: la rotazione usa quanti settori sono in positivo, i tassi il percentile del
+     decennale nel proprio anno. Servono solo a dare loro un posto nell'ordine. */
+  if ((m.tilt || []).length >= 6) {
+    const su = (m.tilt || []).filter(t => (t.m1 ?? 0) > 0).length;
+    out.push({ k: "rotazione", nome: "Rotazione — dove si muove il denaro",
+               score: Math.round(su / m.tilt.length * 100),
+               sub: `${su} settori su ${m.tilt.length} in positivo a 1 mese` });
+  }
+  if (m.tassi && (m.tassi.scadenze || []).some(x => x.key === "a10")) {
+    const d10 = m.tassi.scadenze.find(x => x.key === "a10");
+    const st = ((m.tassi.storico || {}).a10 || []).map(p => p && p.v).filter(v => typeof v === "number");
+    const pct = st.length > 20 ? Math.round(st.filter(v => v < d10.value).length / st.length * 100) : 50;
+    out.push({ k: "tassi10", nome: "Treasury USA 10 anni", score: 100 - pct,
+               sub: `${fmtNum.format(d10.value)}% · osservazione ${d10.observation_date}` });
+  }
   (m.indicators || []).forEach(i => {
     /* v250 — la card porta la CADENZA: quando è stato rilevato, quanti giorni ha, quando ne
        arriva uno nuovo. Richiesta del CEO dopo il dubbio sul margin debt — un dato vecchio con
@@ -2918,7 +2637,14 @@ function indicatoriClassifica() {
      = domanda industriale, cioe' due segni opposti sullo stesso 100. Metterle nella mediana
      del quadro d'insieme, o fra "i tre piu' favorevoli", direbbe una cosa che non significa
      niente — l'errore che il Philly Fed a punteggio pieno ha gia' fatto vedere (v274). */
-  const chiaviTermometri = new Set(["in:curve", "credit", "vix"]);
+  /* ⚠ v303 — I TERMOMETRI RIENTRANO IN CLASSIFICA. Il CEO: "sposta gli indicatori da
+     Termometri di stress in Tutti gli indicatori". Erano esclusi da qui perche' avevano una
+     sezione propria (v265); tolta quella, l'esclusione li cancellerebbe invece di spostarli.
+     ⚠ La grafica si armonizza DA SOLA e non per caso: `serieIndicatore` ha gia' i casi
+     `in:curve`, `credit` e `vix` con le loro soglie disegnate, e la classifica usa la stessa
+     `tessera()` che usava la sezione. Non c'era niente da riscrivere: c'era da smettere di
+     escluderli. */
+  const chiaviTermometri = new Set([]);
   /* ⚠ v294 — TRE DOPPIONI TOLTI, e la ragione va scritta perche' un domani sembrera' una
      dimenticanza. Il CEO: "vedi se ci sono doppioni, ovvero se piu' schede mostrano lo stesso
      dato". Questi tre portano numeri che la scheda "La curva dei tassi" mostra gia', e meglio,
@@ -2940,7 +2666,7 @@ function indicatoriClassifica() {
      chiesto di toglierlo ed e' il benchmark del suo fattore principale. */
   const FUORI = new Set(["mat:petrolio", "mat:rame", "mat:oro",
                          "mk:EURJPY=X", "in:t30", "mk:^TNX", "in:curve3m",
-                         "thermometer", "futures", "seasonality", "risk_sentiment", "smart_money",
+                         "thermometer", "futures", "risk_sentiment", "smart_money",   // v303: stagionalità rientra
                          "_alpha", "fg:momentum-s-p-500", "fg:domanda-bond-high-yield",
                          /* v265 — richieste esplicite del CEO: due componenti F&G che non vuole */
                          "fg:forza-dei-prezzi", "fg:domanda-beni-rifugio",
@@ -3291,6 +3017,60 @@ function conTachimetro(comp, base, aria) {
 }
 
 const FORMA_INDICATORE = {
+  /* ═══ v303 — ROTAZIONE E TASSI DIVENTANO TESSERE ═══════════════════════════════════════
+     Il CEO: "sposta Rotazione, Leva e stagionalità e La curva dei tassi in Tutti gli
+     indicatori, armonizzando la grafica e le dimensioni".
+     ⚠⚠ ARMONIZZARE LE DIMENSIONI COSTA UNA SCELTA, non e' un copia e incolla: la rotazione ha
+     VENTUNO barre, e ventuno barre dentro una tessera sarebbero righe da 6px, illeggibili — la
+     forma che il CEO ha gia' respinto tre volte. Nella tessera stanno i CINQUE che guidano e i
+     CINQUE che restano indietro, che e' la domanda a cui la sezione risponde ("dove si muove il
+     denaro"): i settori di mezzo non dicono niente e occupavano i due terzi dello spazio.
+     ⚠ Le prime cinque azioni del comparto restano al passaggio del mouse, come in v302. */
+  rotazione: (m) => {
+    const tilt = m.tilt || [];
+    if (tilt.length < 6) return null;
+    const ord = [...tilt].sort((a, b) => (b.m1 ?? -99) - (a.m1 ?? -99));
+    const scelti = [...ord.slice(0, 5), ...ord.slice(-5)];
+    const barre = scelti.map(t => ({
+      nome: t.name, valore: t.m1, tk: t.ticker, testo: signTxt(t.m1),
+      suggerimento: (t.prime || []).length
+        ? `Prime ${(t.prime || []).length} di ${t.ticker}: `
+          + t.prime.map(x => `${x.tk}${x.peso != null ? ` ${fmtNum.format(x.peso)}%` : ""}`).join(" · ")
+        : "",
+    }));
+    const sopraZero = tilt.filter(t => (t.m1 ?? 0) > 0).length;
+    return {
+      g: barreOrdinate(barre).replace('<div class="obars">', '<div class="obars obars-compatte">'),
+      n: `Rendimento a 1 mese dei 21 ETF settoriali: qui i <b>cinque che guidano e i cinque che restano indietro</b> — `
+        + `i settori di mezzo non cambiano la lettura. <b>${sopraZero} su ${tilt.length}</b> sono in positivo. `
+        + `<b>Come si legge:</b> passa sopra una barra per le prime cinque azioni di quel comparto. `
+        + `Il denaro che esce da un settore entra in un altro: guarda la distanza fra i due estremi, non il segno del primo.`,
+    };
+  },
+
+  /* ⚠ i tassi in tessera: il decennale col suo scarto a tre mesi e le due pendenze. La curva
+     per scadenze non c'e' piu' dalla v298 (richiesta del CEO), quindi qui non si perde niente
+     che la sezione avesse. */
+  tassi10: (m) => {
+    const t = m.tassi; if (!t || !(t.scadenze || []).length) return null;
+    const d = (t.scadenze || []).find(x => x.key === "a10"); if (!d) return null;
+    const ind = (m.indicators || []);
+    const sp = [["curve", "10A−2A"], ["curve3m", "10A−3M"]]
+      .map(([k, et]) => { const x = ind.find(y => y && y.key === k); return x ? `${et} ${x.value}` : null; })
+      .filter(Boolean);
+    const st = (t.storico && t.storico.a10) || [];
+    return {
+      g: st.length > 2
+        ? graficoSerie([{ nome: "10 anni", punti: st, colore: "var(--blue)" }], { h: 150, compatto: true, unita: "%" })
+        : "",
+      n: `<b>${fmtNum.format(d.value)}%</b> · ${esc(d.series_id)}, osservazione del ${esc(d.observation_date)}`
+        + (Number.isFinite(d.value_3m) ? ` · tre mesi fa ${fmtNum.format(d.value_3m)}% (${signTxt(Math.round((d.value - d.value_3m) * 100) / 100, " pp")})` : "")
+        + (sp.length ? `<br>Pendenze: ${sp.join(" · ")} <span class="muted">(serie FRED proprie)</span>` : "")
+        + `. <b>Come si legge:</b> il decennale e' il costo del denaro a lunga — quando sale comprime i multipli `
+        + `delle societa' che promettono utili lontani. Le pendenze sotto zero dicono che il mercato prezza un rallentamento.`,
+    };
+  },
+
   /* ═══ v265 — VENDITE AL DETTAGLIO: LA LINEA RETTA ERA IL PROBLEMA ══════════════════════════
      Il CEO: "anche questo valore sempre fuorviante soprattutto con un grafico che segna una
      linea retta". Aveva ragione due volte.
@@ -8370,16 +8150,6 @@ document.addEventListener("keydown", e => {
 
 // v214 — orizzonte del confronto col benchmark
 
-
-// v206 — orizzonte della rotazione settoriale
-document.querySelectorAll("#rot-toggle .chip").forEach(ch => {
-  ch.addEventListener("click", () => {
-    document.querySelectorAll("#rot-toggle .chip").forEach(c => c.classList.remove("chip-active"));
-    ch.classList.add("chip-active");
-    rotOrizzonte = ch.dataset.rot;
-    renderRotazione();
-  });
-});
 
 // v205 — interruttore settore/valuta della vista struttura
 document.querySelectorAll("#alloc-graf-toggle .chip").forEach(ch => {
