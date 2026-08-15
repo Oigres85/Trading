@@ -1278,6 +1278,50 @@ rimossa la contengono per forza. La scansione toglie i commenti (come v213).
 ⚠ E una guardia non mordeva perché `class="sc-fonte` matcha anche `sc-fonte-qualsiasi`: quando si
 ancora a una classe CSS, l'ancoraggio va chiuso.
 
+## 🚪 v315 — "la funzione esiste" e "la funzione è raggiungibile" sono due cose diverse
+
+Il CEO ha segnalato **due volte** di non riuscire a modificare il portafoglio. Verificato sulla
+pagina viva: la modalità **funzionava** — il clic produceva 14 righe modificabili, `pfInModifica`
+passava a `true`. Il bottone era **74×22 pixel, sfondo trasparente, 11px, in coda a ~400 caratteri
+di prosa** dentro una nota grigia.
+
+> **Un comando che nessuno trova non è un comando.** Nessun gate lo vedeva perché tutti
+> guardavano se la funzione *esiste*: è la stessa famiglia di `.abar-fill` senza `display:block`
+> (v205) e del `</div>` orfano (v225) — **difetti che non si rompono**. Il gate nuovo guarda
+> **dove sta** il bottone (dentro `.card-head`, non dentro `nota.innerHTML`), non se la funzione
+> è definita.
+
+Corollario: quando l'utente segnala due volte la stessa cosa e il codice sembra corretto, la
+domanda non è "funziona?" ma **"si trova?"**. Misurare il rettangolo, non rileggere l'handler.
+
+## 💶 v315 — il controvalore in euro, e il default che è un'affermazione
+
+- **La conversione è al cambio di OGGI, non il costo sostenuto.** Il cambio di carico è diverso
+  posizione per posizione e il sistema non lo conosce: sommare euro convertiti oggi con euro
+  spesi allora darebbe un patrimonio mai esistito. È la classe del gate valuta (v183), e la nota
+  lo dichiara invece di lasciarlo dedurre. Il BTP resta **nominale × prezzo/100** (valutarlo come
+  un'azione dava 4,1 milioni invece di 41 mila).
+- **Ordinare è già un giudizio** (v200), quindi anche il DEFAULT lo è. Resta il **peso**:
+  ordinare per guadagno mette in cima i vincitori, che è la lettura che fa tenere i perdenti.
+  Un gate sorveglia il default — non perché cambiarlo sia vietato, ma perché dev'essere una
+  decisione presa, non una svista.
+
+## 📚 v315 — il terzo pacchetto: il libro intero
+
+`buildPromptPortafoglio()` (~20k caratteri) sta accanto a `buildPromptTicker` e
+`buildPromptSettore` e porta **il fatto che nessuno dei due può vedere**: sui dati veri,
+Technology **78%** del libro e le prime tre posizioni al **54%**. Più posizioni nello stesso
+comparto sono **una** scommessa scritta più volte, e si vede solo guardando il libro insieme.
+
+⚠ **Dichiara in cima ciò che il sistema NON sa** — liquidità, altri conti, situazione fiscale —
+e **vieta di dimensionare**: senza quei tre dati qualunque quantità è un numero che sembra un
+consiglio. *I livelli di prezzo sì, le quantità no.* È l'unica cosa che tiene il pacchetto dalla
+parte dei fatti, che è la riga di condotta di tutto il sistema.
+
+⚠ Ripetute due sviste già scritte in questo file: **una regex dentro un template literal**
+(`\d` diventa `d`) e — **settima volta** — un check ancorato a una **stringa letterale**, qui
+una frase che nel testo **va a capo**. Riagganciato al fatto.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
