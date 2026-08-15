@@ -2140,3 +2140,8 @@ svg.g-serie { cursor: crosshair; }
 .cal-news-riga a:hover { text-decoration: underline; }
 .cal-news-nota { padding: 6px 10px 8px; font-size: 11px; line-height: 1.45; }
 @media (max-width: 560px) { .cal-news-riga { grid-template-columns: 1fr; } }
+
+/* v305 — la riga del settore: stessa forma della riga del ticker, sotto di lei. */
+.tk-riga-settore { margin-top: 8px; gap: 8px; }
+.tk-riga-settore select { flex: 1 1 240px; min-width: 0; background: var(--card); color: var(--text);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 13px; }

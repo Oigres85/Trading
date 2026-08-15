@@ -33384,7 +33384,47 @@
       "peso": 3.3
      }
     ],
-    "score": 100
+    "score": 100,
+    "medie": {
+     "ma20": {
+      "valore": 147.16,
+      "dist_pct": 12.4,
+      "pendenza_pct": 9.16
+     },
+     "ma50": {
+      "valore": 140.28,
+      "dist_pct": 17.9,
+      "pendenza_pct": 4.05
+     },
+     "ma100": {
+      "valore": 131.3,
+      "dist_pct": 25.9,
+      "pendenza_pct": 5.93
+     },
+     "ma200": {
+      "valore": 127.77,
+      "dist_pct": 29.4,
+      "pendenza_pct": 0.93
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 44.7,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 38.2,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 81.9,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": null
    },
    {
     "ticker": "IGV",
@@ -33422,7 +33462,47 @@
       "peso": 5.4
      }
     ],
-    "score": 83
+    "score": 83,
+    "medie": {
+     "ma20": {
+      "valore": 96.85,
+      "dist_pct": 7.5,
+      "pendenza_pct": 6.37
+     },
+     "ma50": {
+      "valore": 93.85,
+      "dist_pct": 10.9,
+      "pendenza_pct": 1.28
+     },
+     "ma100": {
+      "valore": 90.45,
+      "dist_pct": 15.1,
+      "pendenza_pct": 3.04
+     },
+     "ma200": {
+      "valore": 94.13,
+      "dist_pct": 10.6,
+      "pendenza_pct": -1.96
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 25.8,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": -3.9,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 27.0,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 12500000
    },
    {
     "ticker": "ITA",
@@ -33460,7 +33540,47 @@
       "peso": 4.8
      }
     ],
-    "score": 77
+    "score": 77,
+    "medie": {
+     "ma20": {
+      "valore": 243.94,
+      "dist_pct": 3.8,
+      "pendenza_pct": 1.87
+     },
+     "ma50": {
+      "valore": 239.75,
+      "dist_pct": 5.6,
+      "pendenza_pct": 3.32
+     },
+     "ma100": {
+      "valore": 231.76,
+      "dist_pct": 9.3,
+      "pendenza_pct": 0.55
+     },
+     "ma200": {
+      "valore": 227.46,
+      "dist_pct": 11.3,
+      "pendenza_pct": 1.54
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 8.0,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 29.9,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 82.9,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": null
    },
    {
     "ticker": "XBI",
@@ -33498,7 +33618,47 @@
       "peso": 1.4
      }
     ],
-    "score": 72
+    "score": 72,
+    "medie": {
+     "ma20": {
+      "valore": 153.04,
+      "dist_pct": 2.9,
+      "pendenza_pct": -1.04
+     },
+     "ma50": {
+      "valore": 149.92,
+      "dist_pct": 5.0,
+      "pendenza_pct": 6.01
+     },
+     "ma100": {
+      "valore": 140.69,
+      "dist_pct": 11.9,
+      "pendenza_pct": 4.42
+     },
+     "ma200": {
+      "valore": 131.21,
+      "dist_pct": 20.0,
+      "pendenza_pct": 3.98
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 28.2,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 76.5,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 65.1,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": null
    },
    {
     "ticker": "IBB",
@@ -33536,7 +33696,47 @@
       "peso": 3.5
      }
     ],
-    "score": 72
+    "score": 72,
+    "medie": {
+     "ma20": {
+      "valore": 192.0,
+      "dist_pct": 3.3,
+      "pendenza_pct": 2.2
+     },
+     "ma50": {
+      "valore": 186.28,
+      "dist_pct": 6.4,
+      "pendenza_pct": 5.36
+     },
+     "ma100": {
+      "valore": 177.91,
+      "dist_pct": 11.4,
+      "pendenza_pct": 2.71
+     },
+     "ma200": {
+      "valore": 173.56,
+      "dist_pct": 14.2,
+      "pendenza_pct": 2.51
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 15.0,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 44.8,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 40.8,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 69700000
    },
    {
     "ticker": "XLV",
@@ -33574,7 +33774,47 @@
       "peso": 5.5
      }
     ],
-    "score": 70
+    "score": 70,
+    "medie": {
+     "ma20": {
+      "valore": 164.26,
+      "dist_pct": 1.9,
+      "pendenza_pct": 3.81
+     },
+     "ma50": {
+      "valore": 159.67,
+      "dist_pct": 4.8,
+      "pendenza_pct": 4.94
+     },
+     "ma100": {
+      "valore": 152.76,
+      "dist_pct": 9.6,
+      "pendenza_pct": 1.71
+     },
+     "ma200": {
+      "valore": 152.54,
+      "dist_pct": 9.7,
+      "pendenza_pct": 1.57
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 7.1,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 27.1,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 15.9,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 197415008
    },
    {
     "ticker": "XLE",
@@ -33612,7 +33852,47 @@
       "peso": 4.9
      }
     ],
-    "score": 71
+    "score": 71,
+    "medie": {
+     "ma20": {
+      "valore": 59.16,
+      "dist_pct": 4.7,
+      "pendenza_pct": 8.46
+     },
+     "ma50": {
+      "valore": 56.88,
+      "dist_pct": 8.8,
+      "pendenza_pct": 1.04
+     },
+     "ma100": {
+      "valore": 57.36,
+      "dist_pct": 7.9,
+      "pendenza_pct": 1.07
+     },
+     "ma200": {
+      "valore": 52.88,
+      "dist_pct": 17.1,
+      "pendenza_pct": 3.31
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 15.5,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 49.2,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 46.8,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 186424000
    },
    {
     "ticker": "XLF",
@@ -33650,7 +33930,47 @@
       "peso": 5.0
      }
     ],
-    "score": 67
+    "score": 67,
+    "medie": {
+     "ma20": {
+      "valore": 57.2,
+      "dist_pct": 1.7,
+      "pendenza_pct": 4.26
+     },
+     "ma50": {
+      "valore": 55.42,
+      "dist_pct": 4.9,
+      "pendenza_pct": 4.67
+     },
+     "ma100": {
+      "valore": 53.19,
+      "dist_pct": 9.3,
+      "pendenza_pct": 2.96
+     },
+     "ma200": {
+      "valore": 52.78,
+      "dist_pct": 10.2,
+      "pendenza_pct": 0.94
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 13.6,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 11.4,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 42.1,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 883444992
    },
    {
     "ticker": "XLK",
@@ -33688,7 +34008,47 @@
       "peso": 4.2
      }
     ],
-    "score": 69
+    "score": 69,
+    "medie": {
+     "ma20": {
+      "valore": 181.02,
+      "dist_pct": 5.0,
+      "pendenza_pct": -1.71
+     },
+     "ma50": {
+      "valore": 182.77,
+      "dist_pct": 4.0,
+      "pendenza_pct": 0.14
+     },
+     "ma100": {
+      "valore": 171.79,
+      "dist_pct": 10.6,
+      "pendenza_pct": 5.43
+     },
+     "ma200": {
+      "valore": 157.26,
+      "dist_pct": 20.8,
+      "pendenza_pct": 2.61
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 36.5,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 42.7,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 85.5,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 272056000
    },
    {
     "ticker": "XLI",
@@ -33726,7 +34086,47 @@
       "peso": 3.1
      }
     ],
-    "score": 63
+    "score": 63,
+    "medie": {
+     "ma20": {
+      "valore": 182.76,
+      "dist_pct": 2.1,
+      "pendenza_pct": 0.62
+     },
+     "ma50": {
+      "valore": 180.85,
+      "dist_pct": 3.1,
+      "pendenza_pct": 2.37
+     },
+     "ma100": {
+      "valore": 175.51,
+      "dist_pct": 6.3,
+      "pendenza_pct": 1.58
+     },
+     "ma200": {
+      "valore": 168.23,
+      "dist_pct": 10.9,
+      "pendenza_pct": 1.93
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 7.7,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 25.0,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 55.0,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 136626000
    },
    {
     "ticker": "ARKK",
@@ -33764,7 +34164,47 @@
       "peso": 4.5
      }
     ],
-    "score": 62
+    "score": 62,
+    "medie": {
+     "ma20": {
+      "valore": 76.09,
+      "dist_pct": 6.6,
+      "pendenza_pct": -4.32
+     },
+     "ma50": {
+      "valore": 77.52,
+      "dist_pct": 4.6,
+      "pendenza_pct": -1.02
+     },
+     "ma100": {
+      "valore": 76.24,
+      "dist_pct": 6.4,
+      "pendenza_pct": 1.02
+     },
+     "ma200": {
+      "valore": 76.82,
+      "dist_pct": 5.6,
+      "pendenza_pct": -1.66
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 15.4,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 5.3,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 98.2,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": null
    },
    {
     "ticker": "SMH",
@@ -33802,7 +34242,47 @@
       "peso": 5.2
      }
     ],
-    "score": 60
+    "score": 60,
+    "medie": {
+     "ma20": {
+      "valore": 564.11,
+      "dist_pct": 4.2,
+      "pendenza_pct": -8.17
+     },
+     "ma50": {
+      "valore": 591.49,
+      "dist_pct": -0.6,
+      "pendenza_pct": -0.87
+     },
+     "ma100": {
+      "valore": 545.18,
+      "dist_pct": 7.8,
+      "pendenza_pct": 6.79
+     },
+     "ma200": {
+      "valore": 461.82,
+      "dist_pct": 27.3,
+      "pendenza_pct": 5.38
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 44.2,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 95.3,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 161.0,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 11670900
    },
    {
     "ticker": "IYT",
@@ -33840,7 +34320,47 @@
       "peso": 4.9
      }
     ],
-    "score": 56
+    "score": 56,
+    "medie": {
+     "ma20": {
+      "valore": 87.05,
+      "dist_pct": 0.4,
+      "pendenza_pct": 0.32
+     },
+     "ma50": {
+      "valore": 86.66,
+      "dist_pct": 0.9,
+      "pendenza_pct": 2.86
+     },
+     "ma100": {
+      "valore": 83.03,
+      "dist_pct": 5.3,
+      "pendenza_pct": 2.63
+     },
+     "ma200": {
+      "valore": 79.27,
+      "dist_pct": 10.3,
+      "pendenza_pct": 2.2
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 10.0,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 25.7,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 41.0,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 2800000
    },
    {
     "ticker": "XLB",
@@ -33878,7 +34398,47 @@
       "peso": 4.7
      }
     ],
-    "score": 56
+    "score": 56,
+    "medie": {
+     "ma20": {
+      "valore": 51.73,
+      "dist_pct": 1.6,
+      "pendenza_pct": 1.18
+     },
+     "ma50": {
+      "valore": 51.34,
+      "dist_pct": 2.3,
+      "pendenza_pct": 0.62
+     },
+     "ma100": {
+      "valore": 51.09,
+      "dist_pct": 2.8,
+      "pendenza_pct": 0.62
+     },
+     "ma200": {
+      "valore": 49.06,
+      "dist_pct": 7.1,
+      "pendenza_pct": 1.7
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": -0.6,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 18.8,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 23.7,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 71923696
    },
    {
     "ticker": "XLRE",
@@ -33916,7 +34476,47 @@
       "peso": 5.0
      }
     ],
-    "score": 55
+    "score": 55,
+    "medie": {
+     "ma20": {
+      "valore": 45.22,
+      "dist_pct": 0.1,
+      "pendenza_pct": 1.82
+     },
+     "ma50": {
+      "valore": 44.73,
+      "dist_pct": 1.2,
+      "pendenza_pct": 1.36
+     },
+     "ma100": {
+      "valore": 43.8,
+      "dist_pct": 3.4,
+      "pendenza_pct": 1.43
+     },
+     "ma200": {
+      "valore": 42.27,
+      "dist_pct": 7.1,
+      "pendenza_pct": 1.12
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 7.2,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 13.3,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 15.8,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": null
    },
    {
     "ticker": "XLP",
@@ -33954,7 +34554,47 @@
       "peso": 6.3
      }
     ],
-    "score": 53
+    "score": 53,
+    "medie": {
+     "ma20": {
+      "valore": 85.18,
+      "dist_pct": 1.1,
+      "pendenza_pct": 1.49
+     },
+     "ma50": {
+      "valore": 84.45,
+      "dist_pct": 1.9,
+      "pendenza_pct": 0.81
+     },
+     "ma100": {
+      "valore": 83.47,
+      "dist_pct": 3.1,
+      "pendenza_pct": 0.09
+     },
+     "ma200": {
+      "valore": 81.86,
+      "dist_pct": 5.2,
+      "pendenza_pct": 1.06
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": -2.6,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 8.0,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 15.2,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 210172000
    },
    {
     "ticker": "GLD",
@@ -33966,7 +34606,47 @@
     "m1": 10.0,
     "m3": -7.3,
     "prime": [],
-    "score": 58
+    "score": 58,
+    "medie": {
+     "ma20": {
+      "valore": 383.06,
+      "dist_pct": 4.8,
+      "pendenza_pct": 2.17
+     },
+     "ma50": {
+      "valore": 381.3,
+      "dist_pct": 5.3,
+      "pendenza_pct": -3.98
+     },
+     "ma100": {
+      "valore": 403.1,
+      "dist_pct": -0.4,
+      "pendenza_pct": -4.03
+     },
+     "ma200": {
+      "valore": 412.35,
+      "dist_pct": -2.6,
+      "pendenza_pct": 0.25
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": -13.2,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 30.7,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 75.8,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 260300000
    },
    {
     "ticker": "XLY",
@@ -34004,7 +34684,47 @@
       "peso": 4.1
      }
     ],
-    "score": 51
+    "score": 51,
+    "medie": {
+     "ma20": {
+      "valore": 115.58,
+      "dist_pct": 2.3,
+      "pendenza_pct": -0.55
+     },
+     "ma50": {
+      "valore": 115.92,
+      "dist_pct": 2.0,
+      "pendenza_pct": -1.04
+     },
+     "ma100": {
+      "valore": 115.86,
+      "dist_pct": 2.0,
+      "pendenza_pct": 0.41
+     },
+     "ma200": {
+      "valore": 116.75,
+      "dist_pct": 1.2,
+      "pendenza_pct": -0.19
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 2.1,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 3.8,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 38.4,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 120253000
    },
    {
     "ticker": "XLC",
@@ -34042,7 +34762,47 @@
       "peso": 4.8
      }
     ],
-    "score": 47
+    "score": 47,
+    "medie": {
+     "ma20": {
+      "valore": 109.92,
+      "dist_pct": 2.8,
+      "pendenza_pct": 0.56
+     },
+     "ma50": {
+      "valore": 110.02,
+      "dist_pct": 2.7,
+      "pendenza_pct": -2.16
+     },
+     "ma100": {
+      "valore": 112.37,
+      "dist_pct": 0.5,
+      "pendenza_pct": -1.03
+     },
+     "ma200": {
+      "valore": 113.68,
+      "dist_pct": -0.6,
+      "pendenza_pct": -0.44
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": -0.9,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 2.9,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 35.7,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": null
    },
    {
     "ticker": "XLU",
@@ -34080,7 +34840,47 @@
       "peso": 5.0
      }
     ],
-    "score": 45
+    "score": 45,
+    "medie": {
+     "ma20": {
+      "valore": 44.57,
+      "dist_pct": -0.6,
+      "pendenza_pct": -1.71
+     },
+     "ma50": {
+      "valore": 44.78,
+      "dist_pct": -1.1,
+      "pendenza_pct": 0.16
+     },
+     "ma100": {
+      "valore": 45.0,
+      "dist_pct": -1.5,
+      "pendenza_pct": -0.71
+     },
+     "ma200": {
+      "valore": 44.33,
+      "dist_pct": -0.0,
+      "pendenza_pct": 0.09
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": -3.4,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 6.1,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 27.2,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": 163274000
    },
    {
     "ticker": "TAN",
@@ -34118,7 +34918,47 @@
       "peso": 4.6
      }
     ],
-    "score": 28
+    "score": 28,
+    "medie": {
+     "ma20": {
+      "valore": 51.65,
+      "dist_pct": 0.6,
+      "pendenza_pct": -9.15
+     },
+     "ma50": {
+      "valore": 55.83,
+      "dist_pct": -6.9,
+      "pendenza_pct": -9.43
+     },
+     "ma100": {
+      "valore": 57.92,
+      "dist_pct": -10.3,
+      "pendenza_pct": -1.56
+     },
+     "ma200": {
+      "valore": 55.15,
+      "dist_pct": -5.8,
+      "pendenza_pct": 1.02
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": -10.3,
+      "spy": 14.5,
+      "qqq": 21.7
+     },
+     "a1": {
+      "settore": 41.9,
+      "spy": 21.7,
+      "qqq": 26.7
+     },
+     "a2": {
+      "settore": 33.0,
+      "spy": 49.0,
+      "qqq": 63.7
+     }
+    },
+    "azioni_in_circolazione": null
    }
   ],
   "witching": {

@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "304";
+const BUILD_VERSION = "305";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -790,6 +790,7 @@ function renderAll() {
      resta ferma su "non disponibili" anche dopo che i dati sono arrivati. Chi disegna al
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
+  montaSelettoreSettori();      // v305 — l'elenco dei settori, dai dati
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
@@ -7406,6 +7407,155 @@ function nomeSimbolo(T) {
 
 
 
+/* ═══ v305 — ANALISI DI UN SETTORE ════════════════════════════════════════════════════════
+   Richiesta del CEO dopo l'analisi che ha portato: "un'analisi di settori che gli indico
+   all'interno del Nasdaq/S&P, motivandole, sulla base anche dei dati macro che abbiamo o che
+   mancano integrandoli".
+   ⚠⚠ LA STRUTTURA VIENE DA QUELL'ANALISI, I NUMERI DA NOI. Il ragionamento e' che una corsa di
+   settore finisce quando si presentano DUE ingredienti insieme:
+     (a) le azioni passano da mani istituzionali a mani retail — piu' fragili e piu' a leva;
+     (b) il MOMENTUM si gira: le medie mobili smettono di salire e il prezzo va sotto.
+   Il caso che lo dimostra e' il Nasdaq 1998: scossone del 20%, medie ancora in salita, e poi
+   +300% fino al 2000. Chi vendette nel 1998 lesse (a) e ignoro' (b).
+   ⚠ (b) LO CALCOLIAMO ESATTAMENTE. (a) NO, e va detto: i flussi retail negli ETF non hanno una
+   fonte gratuita affidabile e i 13F sono trimestrali e in ritardo. Il pacchetto porta i PROXY
+   che abbiamo — schiuma sugli ETF a leva, put/call, ampiezza — e dichiara che sono proxy.
+   Un ingrediente mancante dichiarato e' un'analisi onesta; uno stimato in silenzio no. */
+function settorePerChiave(chiave) {
+  const t = String(chiave || "").trim().toUpperCase();
+  if (!t) return null;
+  const tilt = (DATA && DATA.macro && DATA.macro.tilt) || [];
+  return tilt.find(x => String(x.ticker || "").toUpperCase() === t)
+      || tilt.find(x => String(x.name || "").toUpperCase() === t)
+      || tilt.find(x => String(x.name || "").toUpperCase().includes(t))
+      || null;
+}
+
+function buildPromptSettore(chiave) {
+  const s = settorePerChiave(chiave);
+  if (!s) {
+    const nomi = ((DATA && DATA.macro && DATA.macro.tilt) || [])
+      .map(x => `${x.ticker} (${x.name})`).join(" · ");
+    return `Settore non riconosciuto: "${chiave}".\nQuelli che il sistema segue: ${nomi}`;
+  }
+  const macro = buildPrompt();
+  const header = promptHeaderText();
+  const soloDati = macro.startsWith(header) ? macro.slice(header.length).replace(/^\n+/, "") : macro;
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const oggi = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+  const m = (DATA && DATA.macro) || {};
+
+  const F = [];
+  F.push(`=== QUELLO CHE IL SISTEMA SA GIA' DEL SETTORE ${s.name.toUpperCase()} (${s.ticker}) ===`);
+  F.push(`Tutti i numeri qui sotto sono calcolati dal sistema sulle barre giornaliere di ${s.ticker}, `
+    + `l'ETF che rappresenta il comparto. Non sono da cercare altrove.`);
+  if (s.asof) F.push(`- Barra di riferimento: ${s.asof}${s.price != null ? ` · prezzo ${s.price}` : ""}`);
+
+  /* ── (b) IL MOMENTUM: dove sta il prezzo e cosa fanno le medie ── */
+  if (s.medie) {
+    F.push(`- ANATOMIA DEL MOMENTUM (il secondo ingrediente, quello misurabile):`);
+    for (const [k, v] of Object.entries(s.medie)) {
+      const n = k.replace("ma", "");
+      F.push(`    media a ${n} sedute: ${v.valore} — il prezzo le sta ${signTxt(v.dist_pct)} `
+        + `e la media stessa e' ${signTxt(v.pendenza_pct)} nell'ultimo mese `
+        + `(${v.pendenza_pct > 0 ? "sale" : v.pendenza_pct < 0 ? "scende" : "piatta"})`);
+    }
+    const su = Object.values(s.medie).filter(v => v.pendenza_pct > 0).length;
+    const sopra = Object.values(s.medie).filter(v => v.dist_pct > 0).length;
+    const tot = Object.keys(s.medie).length;
+    F.push(`    riepilogo: ${su} medie su ${tot} salgono, e il prezzo sta sopra ${sopra} su ${tot}. `
+      + `Sono due conteggi, non un giudizio: quale delle due conti di piu' e' la domanda dell'analisi.`);
+  }
+
+  /* ── la forza relativa: e' il confronto che rende visibile l'euforia ── */
+  if (s.relativa) {
+    const et = { m6: "6 mesi", a1: "1 anno", a2: "2 anni" };
+    F.push(`- FORZA RELATIVA (settore contro mercato e contro Nasdaq):`);
+    for (const [k, v] of Object.entries(s.relativa)) {
+      F.push(`    ${et[k] || k}: ${s.ticker} ${signTxt(v.settore)}`
+        + (v.spy != null ? ` · S&P 500 ${signTxt(v.spy)}` : "")
+        + (v.qqq != null ? ` · Nasdaq 100 ${signTxt(v.qqq)}` : "")
+        + (v.spy != null ? ` — scarto sul mercato ${signTxt(Math.round((v.settore - v.spy) * 10) / 10, " pp")}` : ""));
+    }
+  }
+  if (s.m1 != null || s.m3 != null) {
+    F.push(`- Momentum breve: 1 mese ${signTxt(s.m1)} · 3 mesi ${signTxt(s.m3)}`);
+  }
+
+  /* ── i titoli che pesano: la dispersione dice se il comparto si sta rompendo dentro ── */
+  const prime = (s.prime || []).filter(x => x && x.tk);
+  if (prime.length) {
+    F.push(`- LE PRIME ${prime.length} POSIZIONI DELL'ETF (dal fornitore del fondo, col peso):`);
+    const seguiti = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])];
+    for (const p of prime) {
+      const r = seguiti.find(x => String(x.ticker || "").toUpperCase() === p.tk.toUpperCase());
+      F.push(`    ${p.tk} ${p.peso != null ? fmtNum.format(p.peso) + "%" : ""} — ${p.nome}`
+        + (r && numero(r.w52_dist_pct) != null && Number.isFinite(numero(r.w52_dist_pct))
+            ? ` · oggi ${signTxt(numero(r.w52_dist_pct))} dal massimo di 52 settimane` : ""));
+    }
+    F.push(`    ⚠ Il sistema ha la distanza dal massimo solo per i titoli che segue: dove manca, `
+      + `il dato non e' stato calcolato, non e' zero.`);
+  }
+
+  /* ── (a) I PROXY DELL'EUFORIA, dichiarati per quello che sono ── */
+  F.push(`- SUL PRIMO INGREDIENTE (chi possiede le azioni) IL SISTEMA NON HA IL DATO. `
+    + `I flussi retail negli ETF e la ripartizione istituzionali/retail non hanno una fonte gratuita `
+    + `affidabile: i 13F sono trimestrali e in ritardo, e le azioni in circolazione di un ETF che `
+    + `yfinance espone sono incoerenti col patrimonio dichiarato (undici milioni di quote per un NAV `
+    + `di 584 dollari fanno 6,8 miliardi contro i 68 dichiarati). Quello che il sistema ha sono PROXY, `
+    + `e sono proxy dell'euforia generale del mercato, non di questo settore:`);
+  if (m.froth) F.push(`    schiuma sugli ETF a leva 3x: ${m.froth.label || ""} ${m.froth.score != null ? `(${m.froth.score}/100)` : ""}`);
+  if (m.putcall && m.putcall.ratio != null) F.push(`    rapporto put/call sull'S&P: ${m.putcall.ratio}`);
+  if (m.breadth) F.push(`    ampiezza del mercato (SPY contro RSP): ${m.breadth.label || m.breadth.divergence_pp + " pp"}`);
+  if (m.margin_debt) F.push(`    debito a margine: ${m.margin_debt.label || ""} — dato FINRA, ritardo strutturale di ~6 settimane`);
+
+  const istruzioni = [
+`ANALISI DEL SETTORE ${s.name.toUpperCase()} (${s.ticker}) — ${oggi}`,
+``,
+`Sei un analista di Wall Street. Devi dire a che punto del ciclo si trova questo comparto e cosa`,
+`ne consegue per chi guarda l'S&P 500 e il Nasdaq. BUDGET: 900-1.100 parole.`,
+``,
+`0) IL GIUDIZIO — cinque righe. A che punto del ciclo sta il settore, cosa lo farebbe cambiare.`,
+``,
+`1) I DUE INGREDIENTI. Una corsa di settore finisce quando si presentano INSIEME: (a) il passaggio`,
+`   delle azioni da mani istituzionali a mani retail, piu' fragili e a leva; (b) il momentum che si`,
+`   gira — le medie smettono di salire e il prezzo va sotto. Il caso di scuola e' il Nasdaq 1998:`,
+`   scossone del 20%, medie ancora in salita, poi +300% fino al 2000. Chi vendette lesse (a) e`,
+`   ignoro' (b). Di' quale dei due ingredienti c'e' OGGI e quale no, coi numeri qui sotto.`,
+`   ⚠ Sul primo il sistema NON ha il dato e te lo dichiara: se lo usi, dillo che usi un proxy.`,
+``,
+`2) IL MOMENTUM, LETTO SULLE MEDIE. Non basta dire "sale" o "scende": le medie corte e quelle`,
+`   lunghe possono dire cose opposte, ed e' proprio quella divergenza il segnale. Di' quale`,
+`   orizzonte si e' girato e quale no, e cosa servirebbe perche' si girassero anche gli altri.`,
+``,
+`3) DENTRO IL COMPARTO. Guarda le prime posizioni e le loro distanze dal massimo: un settore che`,
+`   scende tutto insieme e' una cosa, uno dove tre titoli tengono e due crollano e' un'altra.`,
+``,
+`4) IL PONTE COL MACRO — la parte che nessun altro puo' scrivere al posto tuo. Prendi dal quadro`,
+`   macro in coda le due o tre grandezze che arrivano davvero a QUESTO comparto e di' ATTRAVERSO`,
+`   QUALE CANALE: quale tasso, quale costo, quale domanda finale, quale vincolo di capacita'.`,
+``,
+`5) COSA GUARDARE ADESSO. Un fatto osservabile e datato che direbbe se l'ingrediente mancante sta`,
+`   arrivando. Non una previsione: un evento che si puo' controllare.`,
+``,
+`6) LA TESI CONTRARIA — massimo 8 righe, obbligatoria. Argomenta il contrario di quello che hai`,
+`   appena scritto usando i NUMERI DI QUESTO PACCHETTO, poi di' quale delle due regge meglio e`,
+`   quale fatto le separerebbe. Non ti e' consentito rispondere che entrambe hanno merito.`,
+``,
+`══ REGOLE ══`,
+`· Italiano, prosa densa, niente frasi di cortesia. Ogni dato esterno va [VERIFICATO] con fonte e data.`,
+`· I numeri del blocco qui sotto sono calcolati dal sistema: usa quelli e non cercarne altri per le`,
+`  stesse grandezze. Se ne trovi di diversi, riporta entrambi e di' quale usi.`,
+`· Non conosco la tua posizione e tu non la chiedi: niente dimensionamenti, niente quantita'.`,
+`· Chiudi con "NON VERIFICATO:" elencando cosa non sei riuscito a confermare.`,
+``,
+`──────────────────────────────────────────────────────────────────`,
+  ].join("\n");
+
+  return [istruzioni, F.join("\n"), testoCorrelazioniMacro(), soloDati].filter(Boolean).join("\n\n");
+}
+
 function buildPromptTicker(tkGrezzo) {
   /* ═══ v257 — RISCRITTO DOPO UN FALLIMENTO REALE ═══════════════════════════════════════════
      Il CEO ha incollato il pacchetto in Gemini e si e' sentito rispondere: "Tutti i dati tecnici
@@ -7828,6 +7978,39 @@ async function copyCIOText() {
 $("#btn-refresh")?.addEventListener("click", refreshAll);
 $("#btn-cio")?.addEventListener("click", copyCIOText);
 $("#tk-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") copyCIOText(); });
+
+/* ═══ v305 — IL SELETTORE DEI SETTORI ══════════════════════════════════════════════════════
+   ⚠ L'elenco si costruisce dai dati, non a mano: i 21 ETF sono gia' in `macro.tilt`, e un
+   secondo elenco scritto qui divergerebbe alla prima aggiunta — la classe C10/C12 gia' pagata
+   piu' volte in questo progetto. */
+function montaSelettoreSettori() {
+  const sel = $("#set-input");
+  if (!sel || sel.dataset.montato === "1") return;
+  const tilt = (DATA && DATA.macro && DATA.macro.tilt) || [];
+  if (!tilt.length) return;
+  sel.dataset.montato = "1";
+  for (const t of [...tilt].sort((a, b) => String(a.name).localeCompare(String(b.name)))) {
+    const o = document.createElement("option");
+    o.value = t.ticker;
+    o.textContent = `${t.name} (${t.ticker})`;
+    sel.appendChild(o);
+  }
+}
+
+$("#set-copia")?.addEventListener("click", async () => {
+  const sel = $("#set-input");
+  const esito = $("#set-esito");
+  const v = sel && sel.value;
+  if (!v) { if (esito) esito.textContent = "Scegli prima un settore dall'elenco."; return; }
+  try {
+    const testo = buildPromptSettore(v);
+    await navigator.clipboard.writeText(testo);
+    if (esito) esito.innerHTML = `Copiato: <b>${esc(sel.options[sel.selectedIndex].textContent)}</b> — `
+      + `${testo.length.toLocaleString("it")} caratteri. Incollalo in una chat NUOVA.`;
+  } catch (e) {
+    if (esito) esito.textContent = "Non sono riuscito a copiare negli appunti: " + (e && e.message ? e.message : e);
+  }
+});
 $("#modal-close")?.addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal")?.addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
 $("#btn-copy")?.addEventListener("click", async () => {

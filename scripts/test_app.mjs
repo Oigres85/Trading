@@ -2226,6 +2226,52 @@ check("v304 news: espandibile, chiusa di default, e dichiara il proprio filtro",
       && corpo.includes("non è stato verificato dal sistema");
 })());
 
+/* ══ v305 — ANALISI DI UN SETTORE ═══════════════════════════════════════════════════════
+   Richiesta del CEO dopo un'analisi esterna che ha portato. La struttura viene da quella —
+   una corsa di settore finisce quando arrivano INSIEME (a) il passaggio delle azioni da mani
+   istituzionali a retail e (b) il momentum che si gira — ma i numeri vengono da noi.
+   ⚠⚠ (b) SI CALCOLA, (a) NO, E VA DICHIARATO. I flussi retail negli ETF non hanno fonte
+   gratuita affidabile: `sharesOutstanding` di yfinance da' 11,7M quote per un NAV di 584$,
+   cioe' 6,8 miliardi contro i 68 di `totalAssets` — dieci volte di scarto. Un ingrediente
+   mancante DICHIARATO e' un'analisi onesta; uno stimato in silenzio non lo e'. */
+check("v305 settore: il pacchetto porta l'anatomia del momentum, media per media", suVeri(`
+  const p = buildPromptSettore("SMH");
+  if (p.indexOf("Settore non riconosciuto") === 0) return true;
+  return p.indexOf("ANATOMIA DEL MOMENTUM") >= 0
+      && p.indexOf("media a 200 sedute") >= 0
+      && p.indexOf("nell'ultimo mese") >= 0`));
+
+/* ⚠ e la forza relativa CONTRO il mercato: e' il confronto che rende visibile l'euforia — un
+   settore a +161% mentre l'indice fa +49% dice qualcosa che il +161% da solo non dice. */
+check("v305 settore: confronta il comparto col mercato e col Nasdaq", suVeri(`
+  const p = buildPromptSettore("SMH");
+  if (p.indexOf("Settore non riconosciuto") === 0) return true;
+  return p.indexOf("FORZA RELATIVA") >= 0 && p.indexOf("S&P 500") >= 0
+      && p.indexOf("Nasdaq 100") >= 0 && p.indexOf("scarto sul mercato") >= 0`));
+
+/* ⚠⚠ L'INGREDIENTE CHE NON ABBIAMO DEVE ESSERE DICHIARATO, coi numeri che lo dimostrano. Senza
+   questa riga il pacchetto sembrerebbe completo, e un LLM riempirebbe il buco stimando. */
+check("v305 settore: dichiara che i flussi retail non li abbiamo, e perche'", suVeri(`
+  const p = buildPromptSettore("SMH");
+  if (p.indexOf("Settore non riconosciuto") === 0) return true;
+  return p.indexOf("IL SISTEMA NON HA IL DATO") >= 0
+      && p.indexOf("13F sono trimestrali") >= 0
+      && p.indexOf("PROXY") >= 0`));
+
+/* ⚠ un settore che non esiste non deve produrre un pacchetto vuoto che sembra valido: deve
+   dire quali esistono. Un pacchetto muto e' peggio di un errore. */
+check("v305 settore: una chiave sconosciuta elenca i settori disponibili", suVeri(`
+  const p = buildPromptSettore("NONESISTE");
+  return p.indexOf("Settore non riconosciuto") === 0 && p.indexOf("SMH") >= 0`));
+
+/* ⚠ l'elenco del selettore si costruisce DAI DATI: un secondo elenco scritto a mano
+   divergerebbe alla prima aggiunta (classe C10/C12, gia' pagata piu' volte qui). */
+check("v305 settore: il selettore si costruisce dai dati, non da un elenco a mano", (() => {
+  const i = src.indexOf("function montaSelettoreSettori");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("DATA.macro.tilt") && !corpo.includes("XLK") && !corpo.includes("SMH");
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

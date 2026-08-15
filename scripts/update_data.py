@@ -3054,7 +3054,11 @@ def fetch_sector_tilt():
     I primi in classifica sono quelli su cui ruotare (overweight)."""
     rows = []
     try:
-        data = yf.download(list(SECTOR_ETF), period="6mo", interval="1d",
+        # ⚠ v305 — TRE ANNI, NON SEI MESI. Con 126 barre non si calcola una media a 200
+        # sedute ne' si misura un ciclo di settore: servono per l'"anatomia" — dove sta il
+        # prezzo rispetto alle sue medie e se quelle medie salgono o scendono. Sei mesi
+        # bastavano al momentum 1M/3M, non a dire se una corsa e' ancora viva.
+        data = yf.download(list(SECTOR_ETF) + ["SPY", "QQQ"], period="3y", interval="1d",
                            auto_adjust=True, progress=False)["Close"]
         for sym, (name, group) in SECTOR_ETF.items():
             try:
@@ -3081,7 +3085,59 @@ def fetch_sector_tilt():
                                           "peso": round(float(peso) * 100, 1) if peso is not None else None})
                 except Exception:  # noqa: BLE001
                     pass
+                # ═══ v305 — L'ANATOMIA DEL CICLO DI SETTORE ═══════════════════════════
+                # Dall'analisi che il CEO ha portato: per capire se una corsa di settore e'
+                # finita servono DUE ingredienti, e uno solo e' misurabile con dati gratuiti.
+                #   (a) chi possiede le azioni — istituzionali o retail. NON lo abbiamo: i
+                #       flussi retail negli ETF non hanno una fonte gratuita affidabile e i
+                #       13F sono trimestrali e in ritardo. Resta DICHIARATO come mancante.
+                #   (b) il MOMENTUM — dove sta il prezzo rispetto alle sue medie e se quelle
+                #       medie salgono. Questo si calcola esattamente, ed e' cio' che
+                #       distingue il 1998 (scossone del 20% con le medie ancora in salita,
+                #       poi +300%) dal 2000 (medie girate, e li' e' finita).
+                # ⚠ SI CALCOLA SOLO CIO' CHE LE BARRE PERMETTONO: con meno barre di quante
+                # ne chiede una media, la media NON si pubblica. Una MA200 su 150 barre e'
+                # un numero che sembra piu' solido di quanto e'.
+                medie = {}
+                for n_ma in (20, 50, 100, 200):
+                    if len(s) >= n_ma + 21:
+                        m_ora = float(s.iloc[-n_ma:].mean())
+                        m_prima = float(s.iloc[-n_ma - 21:-21].mean())   # ~un mese fa
+                        medie[f"ma{n_ma}"] = {
+                            "valore": round(m_ora, 2),
+                            "dist_pct": round((last / m_ora - 1) * 100, 1),
+                            # la PENDENZA e' il segnale del video: media che sale = musica che suona
+                            "pendenza_pct": round((m_ora / m_prima - 1) * 100, 2),
+                        }
+                # forza relativa contro il mercato e contro il Nasdaq, sugli orizzonti che
+                # contano per un ciclo di settore (il video confronta +200% contro +35%)
+                rel = {}
+                for et, n_g in (("m6", 126), ("a1", 252), ("a2", 504)):
+                    if len(s) > n_g:
+                        r_et = (last / float(s.iloc[-n_g]) - 1) * 100
+                        voci = {"settore": round(r_et, 1)}
+                        for bench, chiave in (("SPY", "spy"), ("QQQ", "qqq")):
+                            try:
+                                b = data[bench].dropna()
+                                if len(b) > n_g:
+                                    voci[chiave] = round((float(b.iloc[-1]) / float(b.iloc[-n_g]) - 1) * 100, 1)
+                            except Exception:  # noqa: BLE001
+                                pass
+                        rel[et] = voci
+                # ⚠ le azioni in circolazione di un ETF cambiano con creazioni e riscatti:
+                # la loro VARIAZIONE e' il flusso netto. Il livello assoluto qui NON e'
+                # affidabile (yfinance dava 11,7M azioni x 584 NAV = 6,8 mld contro
+                # `totalAssets` 68 mld: dieci volte di scarto), quindi si registra e basta.
+                # Diventera' un flusso quando ci sara' abbastanza storia per misurarlo — non
+                # si pubblica un numero prima di poterlo verificare.
+                azioni = None
+                try:
+                    azioni = (yf.Ticker(sym).get_info() or {}).get("sharesOutstanding")
+                except Exception:  # noqa: BLE001
+                    pass
                 rows.append({"ticker": sym, "name": name, "group": group,
+                             "medie": medie or None, "relativa": rel or None,
+                             "azioni_in_circolazione": azioni,
                              "asof": bar_asof(s),         # v261: la barra della rotazione
                              "price": round(last, 2), "d1": round(d1, 2),
                              "m1": round(m1, 1), "m3": round(m3, 1),
