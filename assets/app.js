@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "311";
+const BUILD_VERSION = "312";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2524,6 +2524,113 @@ function renderPortafoglio() {
     const tr = e.target && e.target.closest ? e.target.closest("[data-pf-tk]") : null;
     if (tr) { e.preventDefault(); apriNelGrafico(tr.dataset.pfTk); }
   });
+}
+
+/* ═══ v312 — IL VERIFICATORE DEL REFERTO ══════════════════════════════════════════════════
+   L'anello mancante, indicato nella revisione a cinque teste: il sistema e' rigorosissimo sui
+   dati che PRODUCE e non ha nessuna difesa su quelli che l'LLM porta DENTRO. Il pacchetto
+   impone di marcare [VERIFICATO] ogni dato esterno, ma nessuno controlla che l'abbia fatto —
+   e misurato: dei nove blocchi che il prompt chiede, cinque vengono interamente dalla rete.
+   Qui si incolla il referto e il sistema dice, numero per numero, quali vengono dal pacchetto,
+   quali sono dichiarati [VERIFICATO] e quali non hanno nessuna delle due cose.
+   ⚠⚠ E' UN'EURISTICA, NON UNA PROVA, e va detto forte: un numero che compare nel pacchetto
+   puo' essere stato usato male, e uno che non compare puo' essere corretto e verificato in un
+   modo che il sistema non riconosce. Serve a sapere DOVE guardare, non a promuovere o bocciare.
+   ⚠ Si escludono anni (1900-2099), numeri di una cifra e percentuali sotto il 10 senza
+   decimali: sono ovunque nella prosa e produrrebbero solo rumore — un rilevatore che segnala
+   tutto si smette di leggerlo, ed e' successo in questa stessa sessione con un mio detector. */
+function numeriDelTesto(t) {
+  const out = new Map();
+  const re = /(?:^|[^\w.,])(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d+)?|\d+[.,]\d+)/g;
+  let m;
+  while ((m = re.exec(String(t || ""))) !== null) {
+    const grezzo = m[1];
+    const n = Number(grezzo.replace(/\.(?=\d{3}\b)/g, "").replace(",", "."));
+    if (!Number.isFinite(n)) continue;
+    if (Number.isInteger(n) && n >= 1900 && n <= 2099) continue;   // anni
+    if (Number.isInteger(n) && Math.abs(n) < 10) continue;          // cifre singole
+    const ctx = String(t).slice(Math.max(0, m.index - 60), m.index + grezzo.length + 60);
+    if (!out.has(grezzo)) out.set(grezzo, ctx.replace(/\s+/g, " ").trim());
+  }
+  return [...out.entries()].map(([v, ctx]) => ({ v, ctx }));
+}
+
+function verificaReferto(referto, pacchetto) {
+  const numeri = numeriDelTesto(referto);
+  /* un numero e' "tracciato" se compare nel pacchetto in una qualunque delle sue forme:
+     514.39 / 514,39 / 51439 — le tre che il sistema e gli LLM usano davvero. */
+  const forme = (v) => {
+    const p = String(v);
+    const s = new Set([p, p.replace(",", "."), p.replace(".", ","),
+                       p.replace(/[.,]/g, ""), p.replace(/\.(?=\d{3}\b)/g, "")]);
+    return [...s];
+  };
+  /* ⚠⚠ CONFRONTO PER TOKEN INTERO, NON PER SOTTOSTRINGA. La prima stesura cercava "8.9" dentro
+     il pacchetto e lo trovava dentro "158.9": dodici numeri su quattordici risultavano "dal
+     pacchetto" in un referto che ne aveva inventati due. Un verificatore che assolve tutti e'
+     peggio di nessun verificatore, perche' da' una sicurezza che non c'e'. Il confine di parola
+     lo chiude: "8.9" non combacia piu' dentro un numero piu' lungo. */
+  const dentro = (v) => forme(v).some(f => {
+    if (f.length < 2) return false;
+    const q = f.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp("(?:^|[^\\d.,])" + q + "(?![\\d.,]*\\d)").test(String(pacchetto));
+  });
+  /* ⚠ "verificato" = il marcatore nella stessa frase. La testata chiede [VERIFICATO] CON fonte
+     e data, e i modelli scrivono "[VERIFICATO, MarketBeat, 14/08/2026]": pretendere la parentesi
+     chiusa subito dopo la parola faceva risultare scoperto un numero correttamente marcato —
+     trovato al primo test, ed e' il difetto che rende un controllo peggio che inutile. */
+  const marcato = (ctx) => /\[\s*VERIFICATO\b/i.test(ctx);
+  const righe = numeri.map(x => ({
+    v: x.v, ctx: x.ctx,
+    stato: dentro(x.v) ? "pacchetto" : marcato(x.ctx) ? "verificato" : "scoperto",
+  }));
+  const conta = (s) => righe.filter(r => r.stato === s).length;
+  return {
+    totale: righe.length,
+    pacchetto: conta("pacchetto"),
+    verificato: conta("verificato"),
+    scoperti: righe.filter(r => r.stato === "scoperto"),
+    nonVerificato: /NON VERIFICATO\s*:/i.test(referto),
+  };
+}
+
+function renderVerifica() {
+  const esito = $("#ver-esito");
+  const testo = $("#ver-testo");
+  if (!esito || !testo) return;
+  const referto = String(testo.value || "").trim();
+  if (referto.length < 200) {
+    esito.innerHTML = '<span class="muted">Incolla qui il referto dell\'LLM: te lo confronto col pacchetto, numero per numero.</span>';
+    return;
+  }
+  /* il pacchetto contro cui confrontare: quello del titolo se il campo ticker e' pieno, il
+     macro altrimenti. E' lo stesso che il CEO ha copiato, non una ricostruzione. */
+  const tk = String(($("#tk-input") || {}).value || "").trim().toUpperCase();
+  let pacchetto = "";
+  try { pacchetto = tk ? buildPromptTicker(tk) : buildPrompt(); } catch { pacchetto = ""; }
+  const r = verificaReferto(referto, pacchetto);
+  const pct = r.totale ? Math.round((r.pacchetto + r.verificato) / r.totale * 100) : 0;
+  esito.innerHTML = `<div class="ver-righe">
+      <div><b>${r.totale}</b> numeri nel referto</div>
+      <div><b class="pos">${r.pacchetto}</b> vengono dal pacchetto${tk ? ` di ${esc(tk)}` : " macro"}</div>
+      <div><b>${r.verificato}</b> dichiarati [VERIFICATO]</div>
+      <div><b class="${r.scoperti.length ? "neg" : "muted"}">${r.scoperti.length}</b> senza nessuna delle due cose</div>
+      <div class="muted">copertura ${pct}%</div>
+    </div>`
+    + (r.scoperti.length
+        ? `<div class="ver-lista"><b>I numeri scoperti, col loro contesto:</b>`
+          + r.scoperti.slice(0, 20).map(x => `<div class="ver-riga"><code>${esc(x.v)}</code> — ${esc(x.ctx)}</div>`).join("")
+          + (r.scoperti.length > 20 ? `<div class="muted">…e altri ${r.scoperti.length - 20}.</div>` : "")
+          + `</div>`
+        : `<div class="ver-ok">Nessun numero scoperto: tutto viene dal pacchetto o è dichiarato verificato.</div>`)
+    + `<div class="ver-nota muted">`
+    + (r.nonVerificato ? `Il referto chiude con la riga "NON VERIFICATO:", come il pacchetto impone. `
+                       : `⚠ <b>Manca la riga "NON VERIFICATO:"</b> che il pacchetto rende obbligatoria: `
+                         + `senza, non si sa cosa il modello NON è riuscito a confermare. `)
+    + `⚠⚠ <b>Questa è un'euristica, non una prova.</b> Un numero che compare nel pacchetto può essere `
+    + `stato usato male, e uno scoperto può essere corretto e verificato in un modo che non riconosco. `
+    + `Serve a sapere <b>dove guardare</b>, non a promuovere o bocciare un'analisi. `
+    + `Anni, cifre singole e numeri sotto 10 sono esclusi: nella prosa sono ovunque e farebbero solo rumore.</div>`;
 }
 
 /* ═══ v311 — IL PORTAFOGLIO SI MODIFICA DALLA PAGINA ══════════════════════════════════════
@@ -8602,6 +8709,7 @@ function montaSelettoreSettori() {
    volte in questo progetto. */
 document.addEventListener("click", (e) => {
   const t = e.target && e.target.closest ? e.target : null;
+  if (t && t.closest && t.closest("#ver-controlla")) { renderVerifica(); return; }
   if (!t || !t.closest) return;
   if (t.closest("#pf-modifica")) { pfInModifica = true; renderPortafoglio(); return; }
   if (t.closest("#pf-annulla")) { pfInModifica = false; renderPortafoglio(); return; }

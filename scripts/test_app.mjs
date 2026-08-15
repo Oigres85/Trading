@@ -2568,6 +2568,56 @@ check("v311 portafoglio: la forma parte dai dati veri, non da un elenco separato
   return corpo.includes("DATA.portfolio") && corpo.includes("DATA.watchlist");
 })());
 
+/* ══ v312 — IL VERIFICATORE DEL REFERTO ═════════════════════════════════════════════════
+   L'anello mancante indicato dalla revisione: il sistema e' rigorosissimo sui dati che PRODUCE
+   e non aveva nessuna difesa su quelli che l'LLM porta DENTRO — e misurato, cinque blocchi su
+   nove del pacchetto titolo vengono interamente dalla rete. */
+
+/* ⚠⚠ IL CONFRONTO E' PER TOKEN INTERO, NON PER SOTTOSTRINGA. La prima stesura cercava "8.9"
+   dentro il pacchetto e lo trovava dentro "158.9": DODICI numeri su quattordici risultavano
+   "dal pacchetto" in un referto che ne aveva inventati tre. Un verificatore che assolve tutti
+   e' peggio di nessun verificatore, perche' da' una sicurezza che non c'e'. */
+check("v312 verifica: un referto inventato non trova riscontri", suVeri(`
+  const pac = buildPromptTicker("AMD");
+  const falso = "Il titolo vale 999.11 dollari, i ricavi 77.31 miliardi e il margine 41.77 percento.";
+  const r = verificaReferto(falso, pac);
+  return r.totale === 3 && r.pacchetto === 0 && r.scoperti.length === 3`));
+
+/* ⚠ e uno che cita i numeri VERI li riconosce: un rilevatore che segnala tutto si smette di
+   leggerlo, ed e' successo in questa stessa sessione con un mio detector sulle contraddizioni. */
+check("v312 verifica: i numeri del pacchetto vengono riconosciuti", suVeri(`
+  const r0 = (DATA.watchlist || []).find(x => x && x.ticker === "AMD");
+  if (!r0 || !r0.price) return true;
+  const pac = buildPromptTicker("AMD");
+  const vero = "Il prezzo e " + r0.price + " e la resistenza sta a " + r0.resistance + ".";
+  const r = verificaReferto(vero, pac);
+  return r.pacchetto >= 2 && r.scoperti.length === 0`));
+
+/* ⚠⚠ IL MARCATORE HA LA FONTE DENTRO LA PARENTESI. La testata chiede [VERIFICATO] con fonte e
+   data, e i modelli scrivono "[VERIFICATO, MarketBeat, 14/08/2026]": pretendere la parentesi
+   chiusa subito dopo la parola faceva risultare SCOPERTO un numero correttamente marcato —
+   trovato al primo test, ed e' il difetto che rende un controllo peggio che inutile. */
+check("v312 verifica: riconosce [VERIFICATO] anche con fonte e data dentro", suVeri(`
+  const pac = buildPromptTicker("AMD");
+  const t = "Il target medio e 620.44 dollari [VERIFICATO, MarketBeat, 14/08/2026].";
+  const r = verificaReferto(t, pac);
+  /* ⚠ la DATA dentro il marcatore produce essa stessa un numero (il "14" di 14/08/2026): anche
+     quello cade nel contesto marcato, quindi verificato e' 2 e non 1. Un'asserzione su un
+     conteggio esatto si rompe su un dettaglio del testo — quella che conta e' che NULLA resti
+     scoperto quando il marcatore c'e'. */
+  return r.verificato >= 1 && r.scoperti.length === 0`));
+
+/* ⚠ e il risultato NON deve presentarsi come una prova: un numero che compare nel pacchetto
+   puo' essere stato usato male, e uno scoperto puo' essere corretto. Serve a sapere dove
+   guardare — dirlo e' parte dello strumento, non una postilla. */
+check("v312 verifica: si dichiara euristica, non prova", (() => {
+  const i = src.indexOf("function renderVerifica");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("un'euristica, non una prova")
+      && corpo.includes("dove guardare")
+      && corpo.includes("NON VERIFICATO");
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

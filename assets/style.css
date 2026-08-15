@@ -2205,3 +2205,19 @@ svg.g-serie { cursor: crosshair; }
 .pf-azioni { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .pf-esito { margin-top: 8px; font-size: 11.5px; line-height: 1.5; }
 .pf-mod { font-size: 11px; padding: 3px 8px; margin-left: 4px; vertical-align: baseline; }
+
+/* v312 — il verificatore del referto: deve leggersi come un elenco di cose da guardare,
+   non come una pagella. Per questo i numeri scoperti hanno il loro CONTESTO accanto. */
+#ver-testo { width: 100%; box-sizing: border-box; background: var(--bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12.5px;
+  font-family: var(--mono); line-height: 1.5; resize: vertical; }
+#ver-testo:focus { outline: none; border-color: var(--blue); }
+.ver-azioni { margin-top: 8px; }
+.ver-esito { margin-top: 10px; font-size: 12.5px; }
+.ver-righe { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: baseline; }
+.ver-lista { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
+.ver-riga { font-size: 11.5px; line-height: 1.5; padding: 3px 0; border-bottom: 1px solid var(--border); }
+.ver-riga:last-child { border-bottom: 0; }
+.ver-riga code { background: var(--hover); padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+.ver-ok { margin-top: 8px; color: var(--green); font-size: 12px; }
+.ver-nota { margin-top: 10px; font-size: 11px; line-height: 1.5; }
