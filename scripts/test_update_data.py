@@ -549,13 +549,17 @@ check("v316 stagionalita': sotto otto anni di storia non si pubblica una media f
 # nasceva da due formule indipendenti. La tabella e' la STESSA che sta in scripts/test_app.mjs:
 # se una delle due lingue deriva, una delle due suite si rompe.
 _BANDE_HY = ud.BANDE_HY_OAS
-_CONTRATTO_CREDITO = ((2.71, 88), (3.9, 95), (4.5, 40), (6.5, 25), (8, 6), (10, 10))
+_CONTRATTO_CREDITO = ((0.5, 93), (2.71, 80), (3.9, 73), (4.5, 40), (6.5, 29), (8, 26), (10, 23))
 check("v323 credito: il punteggio rispetta il contratto condiviso con la dashboard",
       all(round(ud._punteggio_da_bande(v, _BANDE_HY)) == atteso for v, atteso in _CONTRATTO_CREDITO))
 # ⚠ e il numero non puo' contraddire la didascalia: a 6,5% la legenda stampata accanto dice
 #   "stress", e il punteggio prima valeva 56, cioe' "favorevole" nella scala dei punteggi.
 check("v323 credito: a spread da 'stress' il punteggio sta nel rosso",
       round(ud._punteggio_da_bande(6.5, _BANDE_HY)) < 35 and round(ud._punteggio_da_bande(2.71, _BANDE_HY)) > 70)
+check("v326 credito: la scala e' monotona su tutto il dominio, non solo sui punti del contratto",
+      all(round(ud._punteggio_da_bande(v, _BANDE_HY)) <= round(ud._punteggio_da_bande(v - 0.1, _BANDE_HY))
+          for v in [x / 10 for x in range(3, 150)]))
+
 check("v323 credito: l'ancora inventata 2,5-11,5% non e' piu' nel codice",
       "(hy_val - 2.5) / 9" not in _src and "(hy_now - 2.5) / 9" not in _src)
 

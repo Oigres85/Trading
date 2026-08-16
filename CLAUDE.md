@@ -1390,6 +1390,49 @@ rispondeva *"Scegli prima un settore dall'elenco"*.
 scritto `gain_pct`, mentre la tabella legge **`gain_pct_pos`** — *il campo aggiornato non era quello
 letto*. Prezzo fresco accanto a guadagno vecchio, e la tabella nemmeno ridisegnata.
 
+## 🪤 v326 — tre difetti MIEI, trovati da uno sciame di agenti dopo che li avevo "corretti"
+
+Le prime quattro ondate della revisione hanno prodotto 39 reperti grezzi. Tre riguardavano
+codice scritto **in questa stessa sessione**, e tutti e tre erano nati da una correzione.
+
+### 1. Il beta diviso per cento
+`sensibilita_macro` riceveva log-rendimenti in **frazione** e convertiva il benchmark in
+**percentuale**: beta /100. MU contro il proprio settore dava **0,01 con correlazione 0,82**,
+impossibile. E il test di v316 non l'ha preso perché **passava le percentuali a mano**: provava
+una strada che la produzione non percorre.
+> **La classe v238 applicata alle unità di misura.** Ora la funzione prende le CHIUSURE e decide
+> lei l'unità, e il gate verifica l'INVARIANTE STATISTICO — beta = corr × (σ/σ), quindi con
+> correlazione alta il beta non può essere microscopico. Nessuna scelta di unità lo soddisfa per caso.
+
+### 2. Il punteggio a denti di sega
+v319 aveva chiuso l'inversione **grossa** (fra le bande) e ne aveva aperta una **fine**: dentro
+ogni banda il punteggio cresceva col valore, anche dove il valore alto è la cosa peggiore.
+HY OAS a 0,5% valeva **75**, a 3,9% valeva **95**; l'ampiezza a −8 pp (partecipazione massima)
+valeva 72 mentre a −1,1 pp valeva 96. E due bande rosse adiacenti facevano **ripartire** il
+numero: una crisi valeva più di uno stress grave.
+> **Un gate che pinna il comportamento sbagliato lo rende permanente**: la tabella del contratto
+> conteneva l'inversione (2,71→88 contro 3,9→95). Ora il verso si RICAVA dall'ordine delle zone,
+> le bande dello stesso colore si fondono, e il check nuovo non guarda valori attesi ma la
+> **proprietà**: la scala è monotona su 60 punti del dominio. Una funzione monotona non può avere
+> un punto in cui "peggio" vale di più.
+
+### 3. "sul trimestre" era il mese
+Il campo `margin_debt.qoq` contiene la variazione **mensile** — e il commento della pipeline lo
+dichiara testualmente. In v320 l'ho stampata come "sul trimestre" e ci ho fondato il verdetto
+"leva in ritiro". Il trimestre vero, ricalcolato dallo storico, è **+8,7%: segno opposto**.
+> **Il commento diceva la verità e non l'ho letto.** E il gate cercava la stringa "sul trimestre"
+> — confermava l'etichetta, non l'orizzonte. Ora i tre orizzonti hanno ciascuno il proprio nome,
+> il trimestre si calcola dallo storico, e il gate verifica che i due numeri siano DIVERSI e che
+> il trimestre coincida col ricalcolo. **Un'etichetta si controlla contro il calcolo, non contro
+> sé stessa.**
+
+### La lezione comune
+Tutte e tre le volte la correzione era giusta nella direzione e sbagliata nel dettaglio, e tutte
+e tre le volte **il mio test confermava la mia stessa assunzione** invece di misurare la proprietà.
+> Quando correggi un difetto di misura, il check non deve verificare il numero che ti aspetti:
+> deve verificare una **proprietà che il difetto viola per costruzione** — monotonia, invarianza
+> di scala, coerenza fra due lingue. I valori attesi si possono sbagliare insieme al codice.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

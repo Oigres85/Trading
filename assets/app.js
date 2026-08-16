@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "325";
+const BUILD_VERSION = "326";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3600,16 +3600,37 @@ const FASCIA_DA_COLORE = {
 function punteggioDaZone(v, zone) {
   const z = (zone || []).filter(x => x && x.a > x.da);
   if (v == null || isNaN(v) || !z.length) return null;
-  const dentro = z.find(x => v >= x.da && v <= x.a)
-    || (v < z[0].da ? z[0] : v > z[z.length - 1].a ? z[z.length - 1] : null);
-  if (!dentro) return null;
+  /* ⚠ DUE BANDE ADIACENTI DELLO STESSO COLORE SONO UNA BANDA SOLA. Il credito ha "stress"
+     (5-7%) e "crisi" (7-20%) entrambe rosse: trattandole separate il punteggio arrivava a 4 a
+     fine stress e RIPARTIVA da 32 all'inizio della crisi — cioe' una crisi conclamata valeva
+     piu' di uno stress grave. Si fondono prima di cercare, cosi' la funzione resta monotona
+     anche dove il colore non cambia. */
+    const fuse = [];
+    for (const x of z) {
+      const ult = fuse[fuse.length - 1];
+      if (ult && ult.colore === x.colore && Math.abs(ult.a - x.da) < 1e-9) ult.a = x.a;
+      else fuse.push({ ...x });
+    }
+    const dentro = fuse.find(x => v >= x.da && v <= x.a)
+      || (v < fuse[0].da ? fuse[0] : v > fuse[fuse.length - 1].a ? fuse[fuse.length - 1] : null);
+    if (!dentro) return null;
   const f = FASCIA_DA_COLORE[dentro.colore];
   if (!f) return null;
-  /* dentro la zona il punteggio si muove, cosi' 1,19 e 0,81 non danno lo stesso numero: ma non
-     esce MAI dalla fascia del proprio colore, che e' l'invariante che rende impossibile la
-     contraddizione fra il punteggio e la scheda che lo accompagna. */
+  /* ⚠⚠ v326 — DENTRO OGNI BANDA IL PUNTEGGIO ERA ROVESCIATO. La v319 aveva chiuso l'inversione
+     GROSSA (fra le bande) e ne aveva aperta una FINE: dentro la banda il punteggio cresceva
+     sempre col valore, anche dove il valore alto e' la cosa peggiore. Misurato: HY OAS a 0,5% —
+     credito rilassatissimo — valeva 75, a 3,9% — al confine dello stress — valeva 95. E
+     l'ampiezza a -8 pp, cioe' la partecipazione piu' larga possibile, valeva 72 mentre a -1,1 pp
+     valeva 96. Il punteggio era a DENTI DI SEGA: giusto fra le bande, rovesciato dentro.
+     ⚠ La direzione non si dichiara a mano zona per zona (un secondo registro da tenere allineato,
+     classe C10): si RICAVA dall'ordine delle zone. Se la prima e' favorevole e l'ultima
+     sfavorevole, il valore che cresce peggiora, e dentro ogni banda il punteggio scende. */
+  const primo = FASCIA_DA_COLORE[fuse[0].colore], ultimo = FASCIA_DA_COLORE[fuse[fuse.length - 1].colore];
+  const scende = primo && ultimo && (primo[0] + primo[1]) > (ultimo[0] + ultimo[1]);
   const q = Math.max(0, Math.min(1, (v - dentro.da) / ((dentro.a - dentro.da) || 1)));
-  return Math.round(f[0] + q * (f[1] - f[0]));
+  /* la fascia si percorre dal suo estremo MIGLIORE al peggiore, nel verso della scala: cosi'
+     l'intera funzione e' monotona e non puo' esistere un punto in cui "peggio" vale di piu'. */
+  return Math.round(scende ? f[1] + q * (f[0] - f[1]) : f[0] + q * (f[1] - f[0]));
 }
 
 /* le zone sono dichiarate UNA VOLTA e servono a due cose: colorare la scheda e generare il
@@ -6845,13 +6866,24 @@ function rigaLeva(m) {
   const st = (typeof marginDebtState === "function") ? marginDebtState() : null;
   const mld = (v) => fmtNum.format(Math.round(v / 1000));
   const cad = rigaCadenza("margin_debt", md.date);
+  /* il trimestre si ricava dallo storico mensile: tre rilevazioni indietro, non il campo `qoq` */
+  const st3 = (md.history || []).map(Number).filter(Number.isFinite);
+  const trim = st3.length >= 4 && st3[st3.length - 4]
+    ? Math.round((st3[st3.length - 1] / st3[st3.length - 4] - 1) * 1000) / 10 : null;
   const pil = md.pct_of_gdp, mediana = md.gdp_median_ref;
   const sopra = (pil != null && mediana != null) ? Math.round(pil / mediana * 10) / 10 : null;
   return `- LEVA DEGLI OPERATORI (debito a margine dei conti retail e istituzionali presso i broker): `
     + `${mld(md.value)} miliardi di dollari, il ${fmtNum.format(md.pct_of_peak)}% del massimo storico `
     + `(${mld(md.peak)} mld, toccato ${md.peak_date ? dataBreve(md.peak_date) : "n.d."})`
     + (md.yoy != null ? ` · ${signTxt(md.yoy)} sull'anno` : "")
-    + (md.qoq != null ? ` · ${signTxt(md.qoq)} sul trimestre` : "") + `. `
+    /* ⚠⚠ v326 — `qoq` CONTIENE LA VARIAZIONE MENSILE, non trimestrale: il commento della
+       pipeline lo dichiara ("la chiave si chiama qoq per ragioni storiche ma contiene il mom")
+       e in v320 l'ho stampata come "sul trimestre" fondandoci sopra il verdetto. Il trimestre
+       VERO, ricalcolato dallo storico, e' +8,7% — segno OPPOSTO. Ora i tre orizzonti hanno
+       ciascuno il proprio nome, e il trimestre si calcola invece di essere ereditato da una
+       chiave che mente. */
+    + (md.qoq != null ? ` · ${signTxt(md.qoq)} nell'ultimo mese` : "")
+    + (trim != null ? ` · ${signTxt(trim)} sul trimestre` : "") + `. `
     + (st ? `Stato: ${st.label}. ` : "")
     + (pil != null && mediana != null
         ? `⚠ IL PARAMETRO STORICO: vale il ${fmtNum.format(pil)}% del PIL contro una mediana storica `
@@ -6859,9 +6891,11 @@ function rigaLeva(m) {
           + `il "% del massimo", che in un mercato al rialzo sta sopra il 95% quasi sempre e quindi non `
           + `distingue niente. `
         : "")
-    + `⚠ LIVELLO E VERSO SONO DUE FATTI DIVERSI: la leva puo' essere altissima e in ritiro, ed e' `
-    + `il caso di oggi. Il livello dice quanto carburante c'e' per un deleveraging; il verso dice `
-    + `se e' gia' cominciato. `
+    + `⚠ LIVELLO E VERSO SONO DUE FATTI DIVERSI, E IL VERSO DIPENDE DALL'ORIZZONTE: qui la leva `
+    + `e' altissima, in ritiro sull'ULTIMO MESE e ancora in espansione sul trimestre e sull'anno. `
+    + `Il livello dice quanto carburante c'e' per un deleveraging; il mese dice che il massimo e' `
+    + `stato superato; il trimestre e l'anno dicono che la tendenza di fondo non e' ancora girata. `
+    + `Chi legge un orizzonte solo conclude il contrario di chi ne legge un altro. `
     + (cad ? `[${cad}]` : "");
 }
 

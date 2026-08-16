@@ -3053,7 +3053,7 @@ def _finra_scrape(url):
     return fs
 
 
-BANDE_HY_OAS = ((0, 4, 72, 96), (4, 5, 36, 44), (5, 7, 4, 32), (7, 20, 4, 32))
+BANDE_HY_OAS = ((0, 4, 96, 72), (4, 5, 44, 36), (5, 20, 32, 4))
 
 
 def _punteggio_da_bande(v, bande):

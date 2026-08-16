@@ -2994,7 +2994,16 @@ check("v320 leva: il pacchetto porta i NUMERI, non solo il verdetto", suVeri(`
   const md = (DATA.macro || {}).margin_debt || {};
   return r.includes(fmtNum.format(Math.round(md.value / 1000)))   // il valore in miliardi
       && r.includes(fmtNum.format(md.pct_of_peak))                // la distanza dal massimo
-      && r.includes("sul trimestre")                              // il VERSO, non solo il livello
+      && r.includes("nell'ultimo mese") && r.includes("sul trimestre")
+      && (() => {
+        const h = (md.history || []).map(Number).filter(Number.isFinite);
+        if (h.length < 4 || !h[h.length - 4]) return true;
+        const trim = Math.round((h[h.length - 1] / h[h.length - 4] - 1) * 1000) / 10;
+        /* i due orizzonti hanno numeri diversi e ognuno e' scritto col proprio nome */
+        return r.includes(signTxt(trim) + " sul trimestre")
+            && r.includes(signTxt(md.qoq) + " nell'ultimo mese")
+            && Math.abs(trim - md.qoq) > 0.5;
+      })()
       && r.includes("rilevazione") && r.includes("prossimo atteso")`));
 
 check("v320 leva: pubblica il parametro storico, e non è il '% del massimo'", suVeri(`
@@ -3151,7 +3160,7 @@ check("v322 testata: la ricerca di dati freschi e notizie e' obbligatoria e veri
    modo di eseguire Python da questa suite, quindi il contratto si fissa QUI e in
    scripts/test_update_data.py con la STESSA tabella: se una delle due deriva, una delle due
    suite si rompe. Una tabella condivisa e' l'unico modo onesto di legare due lingue. */
-const CONTRATTO_CREDITO = [[2.71, 88], [3.9, 95], [4.5, 40], [6.5, 25], [8, 6], [10, 10]];
+const CONTRATTO_CREDITO = [[0.5, 93], [2.71, 80], [3.9, 73], [4.5, 40], [6.5, 29], [8, 26], [10, 23]];
 
 check("v323 credito: il punteggio rispetta il contratto condiviso con la pipeline", (() => (
   CONTRATTO_CREDITO.every(([v, atteso]) =>
@@ -3161,6 +3170,33 @@ check("v323 credito: il punteggio rispetta il contratto condiviso con la pipelin
 /* ⚠ e il numero non puo' contraddire la didascalia che gli sta accanto: a 6,5% la legenda dice
    "stress", quindi il punteggio deve stare nella fascia sfavorevole. Prima valeva 56, cioe'
    "favorevole", ed era stampato sulla stessa riga della parola "stress". */
+/* ══ v326 — LA RETE PER TUTTA LA CLASSE: OGNI PUNTEGGIO A ZONE DEV'ESSERE MONOTONO ═════════
+   La v319 aveva chiuso l'inversione GROSSA (fra le bande) e ne aveva aperta una FINE: dentro
+   ogni banda il punteggio cresceva sempre col valore, anche dove il valore alto e' la cosa
+   peggiore. Misurato: HY OAS a 0,5% valeva 75 e a 3,9% valeva 95; l'ampiezza a -8 pp, la
+   partecipazione piu' larga possibile, valeva 72 mentre a -1,1 pp valeva 96. Un punteggio a
+   DENTI DI SEGA: giusto a grandi passi, rovesciato da vicino.
+   ⚠ Questo check non guarda dei valori attesi: guarda la PROPRIETA'. Una funzione monotona non
+   puo' avere un punto in cui "peggio" vale di piu', e nessuna riscrittura futura puo'
+   reintrodurre il difetto senza romperlo. */
+check("v326 punteggi: ogni scala a zone e' monotona sull'intero dominio", (() => {
+  const SCALE = [
+    { z: "ZONE_CREDITO", da: 0.2, a: 15, cresce: false },
+    { z: "ZONE_AMPIEZZA", da: -8, a: 11, cresce: false },
+    { z: "ZONE_PUTCALL", da: 0.5, a: 1.6, cresce: true },
+  ];
+  return SCALE.every(s2 => {
+    const passi = 60;
+    const vals = [];
+    for (let i = 0; i <= passi; i++) {
+      const v = s2.da + (s2.a - s2.da) * i / passi;
+      vals.push(Number(run(`return punteggioDaZone(${v}, ${s2.z})`)));
+    }
+    if (vals.some(x => !Number.isFinite(x))) return false;
+    return vals.every((x, i) => i === 0 || (s2.cresce ? x >= vals[i - 1] : x <= vals[i - 1]));
+  });
+})());
+
 check("v323 credito: a spread da 'stress' il punteggio sta nel rosso, non nel favorevole", (() => {
   const stress = Number(run("return punteggioDaZone(6.5, ZONE_CREDITO)"));
   const rilassato = Number(run("return punteggioDaZone(2.71, ZONE_CREDITO)"));
