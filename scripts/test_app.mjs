@@ -1146,21 +1146,32 @@ check("v266 grafico: la legenda non descrive piu' la barra laterale, in alto e i
   return !/Barra laterale|Barra in alto|In basso a destra/.test(leg);
 })());
 
-check("v266 grafico: candele, volume, SMA, EMA e RSI restano spiegati", (() => {
-  const i = src.indexOf('<details class="tv-piu">');
-  const leg = src.slice(i, src.indexOf("</details>", i));
-  return ["Candele", "Volume", "SMA blu", "EMA arancio", "RSI"].every(x => leg.includes(x));
+/* ⚠⚠ v317 — L'INVARIANTE E' CAMBIATO, NON E' STATO ZITTITO. Il CEO ha chiesto di togliere i
+   blocchi che spiegavano il funzionamento del grafico (i numeri in alto a sinistra, com'e' fatta
+   una candela, cos'e' il volume): erano istruzioni per l'uso, non analisi, e chi guarda il
+   grafico le ha gia' davanti. Cio' che deve restare vero e' piu' forte di prima: medie, RSI e
+   volume ci sono ancora, ma AGGANCIATI AI VALORI DI QUESTO TITOLO, non spiegati in astratto.
+   Riscrivere una guardia per farla tacere e' il modo classico di perdere la protezione (v203):
+   qui la guardia chiede di piu', non di meno. */
+check("v317 analisi tecnica: medie, RSI e volume sono agganciati ai valori del titolo", (() => {
+  const i = src.indexOf("v317 — DALLA LEGENDA GENERICA");
+  const sez = src.slice(i, src.indexOf("tv-piede", i));
+  return sez.includes("Analisi tecnica —")
+      && sez.includes("tec.medie_battute") && sez.includes("o.rsi14") && sez.includes("vol_ratio")
+      && sez.includes('rigaMedia("sma50"') && sez.includes('rigaMedia("sma200"')
+      && !sez.includes("I numeri in alto a sinistra") && !sez.includes("<b>Candele</b>");
 })());
 
 /* ⚠ v266 — la spiegazione deve dire cosa fare del numero, non solo cos'e'. Le trappole sono la
    parte che il CEO non poteva indovinare: l'RSI che non e' un segnale di vendita, la media a 9
    che e' corta, il volume che vale solo nel confronto. */
-check("v266 grafico: la legenda porta le trappole, non solo le definizioni", (() => {
-  const i = src.indexOf('<details class="tv-piu">');
-  const leg = src.slice(i, src.indexOf("</details>", i));
-  return /NON e' un segnale di acquisto o di vendita/.test(leg)
-      && /media <b>corta<\/b>/.test(leg)
-      && /CONFRONTO con le barre vicine/.test(leg);
+check("v317 analisi tecnica: porta le trappole, non solo i numeri", (() => {
+  const i = src.indexOf('class="tv-piu"');
+  const leg = src.slice(i - 4000, i + 500);
+  return leg.includes("Non e' un segnale di vendita")
+      && leg.includes("confronto con la media")
+      && leg.includes("le medie danno falsi segnali")
+      && leg.includes("il prezzo fa un nuovo massimo e l'RSI no");
 })());
 
 /* ⚠ v266 — chi disegna al montaggio deve ridisegnare all'arrivo dei dati: il montaggio precede
@@ -1926,8 +1937,12 @@ check("v297 macro: Fear & Greed e' reso come tachimetro, non come linea a quattr
   if (!fo) return true;
   const n = se && se.punti ? se.punti.length : 0;
   /* la serie del F&G e' cortissima per costruzione: deve perdere contro la forma */
-  return n < 20 && /viewBox="0 0 300 186"/.test(fo.g || "")
-      && /<title>paura estrema: da 0 a 25<\\/title>/.test(fo.g || "")`));
+  const g = fo.g || "";
+  return n < 20
+      && /<path d="M [\\d.]+ [\\d.]+ A 1[01]\\d /.test(g)
+      && /<circle cx="150"/.test(g)
+      && !/<polyline/.test(g)
+      && g.includes("<title>paura estrema: da 0 a 25<" + "/title>")`));
 
 /* ══ v293 — LA CONSEGNA CHIESTA DAL CEO, E IL SUO TETTO ══════════════════════════════════
    "mi fornisce un quadro troppo lungo": la vecchia consegna aveva sette blocchi con tabelle e

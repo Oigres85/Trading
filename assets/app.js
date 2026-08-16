@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "316";
+const BUILD_VERSION = "317";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3413,36 +3413,77 @@ function contenutoDalPannello(k, notaGia = "") {
    (dove comincia la recessione, dov'e' il target della Fed, dove i multipli si comprimono) e la
    lettura e' la POSIZIONE dentro una di esse. Il numero non e' il messaggio: lo e' la zona in
    cui cade, che ha un nome scritto sotto. */
-function scala(v, opt = {}) {
+/* ═══ v317 — DALLA BARRA AL TACHIMETRO ═══════════════════════════════════════════════════════
+   Il CEO: "i grafici a barre come per esempio Righello dollaro (DXY) modificali in tachimetro per
+   una piu' facile lettura. il rosso indica un valore negativo per mercato il verde positivo (i
+   colori sono sfumati dal verde al rosso con arancione nel mezzo)".
+   ⚠⚠ QUESTO NON E' IL RITORNO DELLA BARRA 0-100 RESPINTA TRE VOLTE. Quella chiedeva di stimare
+   una lunghezza contro un asse anonimo; qui la lancetta indica un VALORE VERO (99,67 di DXY, 5,21%
+   del trentennale) dentro ZONE NOMINATE che hanno un nome scritto sotto. La differenza e' fra un
+   punteggio normalizzato e uno strumento con le sue unita'.
+   ⚠ Una modifica sola invece di ventuno: `scala()` delega qui, quindi tutti i suoi punti di
+   chiamata diventano tachimetri conservando le loro zone, le loro soglie e la loro fonte. Due
+   implementazioni della stessa forma divergerebbero — lezione v161/v207. */
+const COLORE_ZONA = {
+  /* il CEO vuole la sfumatura verde -> arancione -> rosso: le zone intermedie erano grigie
+     (`--muted`), che non dice "in mezzo", dice "non classificato". */
+  "var(--muted)": "var(--orange, #f59e0b)",
+  "var(--yellow)": "var(--orange, #f59e0b)",
+};
+
+function tachimetroValore(v, opt = {}) {
   if (v == null || isNaN(v)) return "";
   const zone = (opt.zone || []).filter(z => z && z.a > z.da);
   if (!zone.length) return "";
   const min = opt.min != null ? opt.min : Math.min(...zone.map(z => z.da));
   const max = opt.max != null ? opt.max : Math.max(...zone.map(z => z.a));
   if (!(max > min)) return "";
-  const W = 320, H = 62, L = 6, R = W - 6, y = 26, alt = 13;
-  const X = (x) => L + (Math.max(min, Math.min(max, x)) - min) / (max - min) * (R - L);
-  const fasce = zone.map(z => `<rect x="${X(z.da).toFixed(1)}" y="${y}" width="${(X(z.a) - X(z.da)).toFixed(1)}"
-      height="${alt}" fill="${z.colore}" fill-opacity=".55"><title>${esc(z.nome)}</title></rect>`).join("");
-  const conf = (opt.soglie || []).filter(t => t && t.v > min && t.v < max).map(t =>
-    `<line x1="${X(t.v).toFixed(1)}" y1="${y - 4}" x2="${X(t.v).toFixed(1)}" y2="${y + alt + 4}"
-       stroke="var(--text)" stroke-width="1" stroke-dasharray="2 2" opacity=".7"/>
-     <text x="${X(t.v).toFixed(1)}" y="${y - 7}" text-anchor="middle" font-size="8.5" fill="var(--muted)">${esc(t.testo)}</text>`).join("");
-  const px = X(v);
-  const fmt = opt.fmt || ((x) => fmtNum.format(x));
-  // il valore si scrive dove sta il marcatore, ma senza uscire dalla tela
-  const tx = Math.max(L + 22, Math.min(R - 22, px));
-  const dentro = zone.find(z => v >= z.da && v <= z.a);
-  return `<div class="sc"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.aria || "scala")}: ${fmt(v)}">
-      ${fasce}${conf}
-      <polygon points="${px.toFixed(1)},${y - 2} ${(px - 4).toFixed(1)},${y - 9} ${(px + 4).toFixed(1)},${y - 9}" fill="var(--text)"/>
-      <line x1="${px.toFixed(1)}" y1="${y - 2}" x2="${px.toFixed(1)}" y2="${y + alt + 2}" stroke="var(--text)" stroke-width="1.8"/>
-      <text x="${tx.toFixed(1)}" y="${y + alt + 15}" text-anchor="middle" font-size="12" font-weight="700"
-        font-family="var(--mono)" fill="var(--text)">${esc(fmt(v))}${esc(opt.unita || "")}</text>
-      <text x="${L}" y="${y - 7}" font-size="8.5" fill="var(--muted)">${esc(fmt(min))}</text>
-      <text x="${R}" y="${y - 7}" text-anchor="end" font-size="8.5" fill="var(--muted)">${esc(fmt(max))}</text>
-    </svg>${dentro ? `<div class="sc-zona" style="color:${dentro.colore}">${esc(dentro.nome)}</div>` : ""}
-    <div class="sc-fonte muted">${esc(opt.fonte || "bande di lettura convenzionali, non soglie calcolate dai dati")}</div></div>`;
+  const val = Math.max(min, Math.min(max, v));
+  const fmt = opt.fmt || ((x) => fmtNum.format(Math.round(x * 100) / 100));
+
+  const W = 300, H = 190, cx = W / 2, cy = 142, R = 112, sp = 24;
+  const q = (x) => (Math.max(min, Math.min(max, x)) - min) / (max - min);   // 0..1
+  const ang = (x) => Math.PI * (1 - q(x));
+  const P = (r, a) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy - r * Math.sin(a)).toFixed(2)}`;
+
+  const arco = zone.map(z => {
+    const a0 = ang(z.da), a1 = ang(z.a);
+    const col = COLORE_ZONA[z.colore] || z.colore;
+    return `<path d="M ${P(R, a0)} A ${R} ${R} 0 ${(q(z.a) - q(z.da)) > 0.5 ? 1 : 0} 1 ${P(R, a1)}"
+      fill="none" stroke="${col}" stroke-width="${sp}" stroke-opacity=".85"
+      ><title>${esc(z.nome)}: da ${fmt(z.da)} a ${fmt(z.a)}</title></path>`;
+  }).join("");
+
+  /* le soglie dichiarate restano: sono affermazioni che il grafico deve continuare a fare (v240) */
+  const conf = (opt.soglie || []).filter(t => t && t.v > min && t.v < max).map(t => {
+    const a = ang(t.v), i = P(R - sp / 2 - 3, a).split(" "), o = P(R + sp / 2 + 3, a).split(" ");
+    const e = P(R + sp / 2 + 12, a).split(" ");
+    return `<line x1="${i[0]}" y1="${i[1]}" x2="${o[0]}" y2="${o[1]}" stroke="var(--text)"
+        stroke-width="1.4" stroke-dasharray="2 2" opacity=".85"/>
+      <text x="${e[0]}" y="${e[1]}" text-anchor="middle" font-size="8.5" fill="var(--muted)">${esc(t.testo)}</text>`;
+  }).join("");
+
+  const a = ang(val), punta = P(R - 18, a).split(" ");
+  const dentro = zone.find(z => v >= z.da && v <= z.a) || (v <= min ? zone[0] : zone[zone.length - 1]);
+  const col = dentro ? (COLORE_ZONA[dentro.colore] || dentro.colore) : "var(--text)";
+  const fuori = v < min || v > max;   // il valore esce dalla scala: si dichiara invece di fingerlo dentro
+  return `<div class="tk"><svg viewBox="0 0 ${W} ${H}" role="img"
+      aria-label="${esc(opt.aria || "misuratore")}: ${fmt(v)}${esc(opt.unita || "")}">
+      ${arco}${conf}
+      <line x1="${cx}" y1="${cy}" x2="${punta[0]}" y2="${punta[1]}" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="${cy}" r="7" fill="var(--text)"/><circle cx="${cx}" cy="${cy}" r="3" fill="var(--card-2)"/>
+      <text x="${cx}" y="${cy + 34}" text-anchor="middle" font-size="26" font-weight="700"
+        font-family="var(--mono)" fill="${col}">${esc(fmt(v))}${esc(opt.unita || "")}</text>
+      <text x="10" y="${cy + 14}" font-size="9.5" fill="var(--muted)">${esc(fmt(min))}${esc(opt.unita || "")}</text>
+      <text x="${W - 10}" y="${cy + 14}" text-anchor="end" font-size="9.5" fill="var(--muted)">${esc(fmt(max))}${esc(opt.unita || "")}</text>
+    </svg>${dentro ? `<div class="tk-zona" style="color:${col}">${esc(dentro.nome)}${fuori ? " — VALORE FUORI SCALA" : ""}</div>` : ""}
+    <div class="tk-fonte muted">${esc(opt.fonte || "bande di lettura convenzionali, non soglie calcolate dai dati")}</div></div>`;
+}
+
+function scala(v, opt = {}) {
+  /* v317 — la barra orizzontale non esiste piu': stessa firma, stessi argomenti, forma nuova.
+     Delegare invece di duplicare e' il motivo per cui la conversione ha toccato un punto solo. */
+  return tachimetroValore(v, opt);
 }
 
 /* conto alla rovescia per le date: un numero di giorni e' un fatto, la sequenza delle prossime
@@ -3465,39 +3506,10 @@ function contoAllaRovescia(giorni, date, opt = {}) {
    scritto sotto. La differenza fra i due casi e' quella fra un cruscotto e un muro di quadranti
    uguali. Come per la scala, ogni tachimetro DICHIARA da dove vengono le sue bande. */
 function tachimetro(v, opt = {}) {
-  if (v == null || isNaN(v)) return "";
-  const val = Math.max(0, Math.min(100, Math.round(v)));
-  const zone = (opt.zone || []).filter(z => z && z.a > z.da);
-  if (!zone.length) return "";
-  /* ⚠ il numero stava a cy-24, DENTRO l'arco: e' esattamente dove passa la lancetta, e a meta'
-     scala i due si sovrapponevano (misurato a colpo d'occhio su 53 e 55). L'arco e' aperto in
-     basso, quindi sotto il perno c'e' spazio libero: il numero va li'. */
-  const W = 300, H = 186, cx = W / 2, cy = 138, R = 112, sp = 22;
-  const ang = (p) => Math.PI * (1 - p / 100);
-  const P = (r, a) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy - r * Math.sin(a)).toFixed(2)}`;
-  const arco = zone.map(z => {
-    const a0 = ang(z.da), a1 = ang(z.a);
-    return `<path d="M ${P(R, a0)} A ${R} ${R} 0 ${(z.a - z.da) > 50 ? 1 : 0} 1 ${P(R, a1)}"
-      fill="none" stroke="${z.colore}" stroke-width="${sp}" stroke-opacity=".8"
-      ><title>${esc(z.nome)}: da ${z.da} a ${z.a}</title></path>`;
-  }).join("");
-  const tacche = [0, 25, 50, 75, 100].map(t => {
-    const a = ang(t), i = P(R - sp / 2 - 2, a).split(" "), o = P(R + sp / 2 + 2, a).split(" ");
-    return `<line x1="${i[0]}" y1="${i[1]}" x2="${o[0]}" y2="${o[1]}"
-       stroke="var(--bg)" stroke-width="${t === 50 ? 2.4 : 1.4}" opacity="${t === 50 ? .95 : .6}"/>`;
-  }).join("");
-  const a = ang(val), punta = P(R - 16, a).split(" ");
-  const dentro = zone.find(z => val >= z.da && val <= z.a);
-  const col = dentro ? dentro.colore : scoreColor(val);
-  return `<div class="tk"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opt.aria || "tachimetro")}: ${val} su 100">
-      ${arco}${tacche}
-      <line x1="${cx}" y1="${cy}" x2="${punta[0]}" y2="${punta[1]}" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="${cx}" cy="${cy}" r="7" fill="var(--text)"/><circle cx="${cx}" cy="${cy}" r="3" fill="var(--card-2)"/>
-      <text x="${cx}" y="${cy + 36}" text-anchor="middle" font-size="30" font-weight="700" font-family="var(--mono)" fill="${col}">${val}</text>
-      <text x="12" y="${cy + 15}" font-size="9.5" fill="var(--muted)">0</text>
-      <text x="${W - 12}" y="${cy + 15}" text-anchor="end" font-size="9.5" fill="var(--muted)">100</text>
-    </svg>${dentro ? `<div class="tk-zona" style="color:${dentro.colore}">${esc(dentro.nome)}</div>` : ""}
-    <div class="tk-fonte muted">${esc(opt.fonte || "bande di lettura convenzionali, non soglie calcolate dai dati")}</div></div>`;
+  /* v317 — il tachimetro a punteggio e' il caso particolare di quello a valore: scala 0-100,
+     nessuna unita'. Una sola geometria per tutti, cosi' non divergono. */
+  return tachimetroValore(v == null || isNaN(v) ? null : Math.round(v),
+    { min: 0, max: 100, fmt: (x) => String(Math.round(x)), ...opt });
 }
 
 /* ═══ v238 — OGNI INDICATORE HA LA SUA FORMA E LA SUA LETTURA ═══════════════════════════════
@@ -8026,14 +8038,74 @@ function montaGraficoTV(tk, intervallo) {
        con tasto per farle riapparire"). Il <details> nativo fa esattamente questo e non ha
        bisogno di stato da mantenere: si apre, si chiude, e il browser ricorda la posizione
        finche' la pagina vive. Chiuso di default — chi sa gia' cos'e' un RSI non deve scorrerlo. */
-    nota.innerHTML = `<details class="tv-piu"><summary>Come si legge il grafico — candele, volume, medie, RSI</summary><div class="tv-legenda">
-      <div><b>I numeri in alto a sinistra</b><span>Sono la candela su cui hai il mouse, non l'ultimo prezzo: <b>Aper.</b> a quanto ha aperto, <b>Max</b> e <b>Min</b> i due estremi della seduta, <b>Chius.</b> a quanto ha chiuso, e accanto quanto ha guadagnato o perso rispetto al giorno prima. Sposti il mouse e cambiano: e' cosi' che leggi una singola giornata senza aprire altro.</span></div>
-      <div><b>Candele</b><span>Ogni candela e' una seduta. Il <b>corpo</b> va da apertura a chiusura, i <b>fili</b> arrivano al massimo e al minimo toccati durante il giorno. <b class="tv-verde">Verde</b> = ha chiuso sopra l'apertura, <b class="tv-rosso">rossa</b> = sotto.<br>Cosa ti dice la FORMA: corpo lungo = una direzione ha comandato tutto il giorno. Corpo corto con fili lunghi da tutte e due le parti = compratori e venditori si sono equivalsi, giornata indecisa. Filo lungo solo sotto = hanno provato a spingerlo giu' e i compratori hanno ricomprato tutto: e' un rifiuto di quel livello, ed e' il pezzo di informazione piu' utile di una candela.</span></div>
-      <div><b>Volume</b><span>Le barre in basso: quante azioni sono passate di mano quel giorno. Da solo il numero non dice niente — conta il <b>CONFRONTO con le barre vicine</b>. Un rialzo con barre piu' alte della media e' stato fatto da molti e regge; lo stesso rialzo con barre basse e' fatto da pochi ed e' fragile. Il caso da conoscere: prezzo che sale mentre le barre si accorciano seduta dopo seduta = la spinta si sta esaurendo. Le barre sono verdi o rosse come la loro seduta.</span></div>
-      <div><b class="tv-blu">SMA blu</b><span>Media semplice: la media dei prezzi di chiusura delle ultime N sedute, dove ogni giorno pesa uguale. Il numero scritto accanto alla sigla e' <b>N</b>, e il valore che segue e' quanto vale la media adesso — con <code>SMA 9</code> stai guardando la media di NOVE sedute, cioe' due settimane scarse: e' una media <b>corta</b>, si muove quasi come il prezzo e cambia idea spesso. Le medie che il mercato guarda per la tendenza di fondo sono la 50 e la 200; se ti servono quelle, cambiale dal pannello indicatori.<br>Come si usa: prezzo sopra la linea = chi ha comprato di recente e' in guadagno, e la linea tende a fare da appoggio quando il prezzo ci torna sopra. Sotto = il contrario, e diventa un tetto.</span></div>
-      <div><b class="tv-arancio">EMA arancio</b><span>Stessa cosa, ma le sedute recenti pesano di piu' delle vecchie. Conseguenza pratica: <b>gira prima della SMA</b> quando il movimento cambia direzione.<br>Le due insieme ti dicono <b>a che punto e' il cambio</b>: ha girato solo l'arancio = e' appena cominciato, puo' ancora rientrare; hanno girato entrambe e l'arancio ha incrociato la blu = il cambio si e' consolidato. Quando sono appiattite e appiccicate, non c'e' tendenza: sono lo strumento sbagliato per quel momento, e leggerle li' produce solo falsi segnali.</span></div>
-      <div><b class="tv-viola">RSI</b><span>Nel riquadro sotto, scala fissa 0-100: misura quanto e' stata forte la spinta delle ultime 14 sedute, confrontando le giornate di rialzo con quelle di ribasso. I numeri accanto alla sigla sono <b>due</b>: il primo e' l'RSI di oggi, il secondo la sua media — quando l'RSI sta sopra la propria media la spinta sta accelerando, sotto sta rallentando.<br>Sopra 70 il titolo ha corso molto in poco tempo, sotto 30 e' stato venduto molto. <b>NON e' un segnale di acquisto o di vendita</b>: un titolo in tendenza forte resta sopra 70 per settimane, e chi vende a 70 vende all'inizio della corsa. Serve per una cosa sola e la fa bene: vedere quando <b>il prezzo fa un nuovo massimo e l'RSI no</b>. Vuol dire che il movimento continua ma con meno forza dietro — e' il primo posto dove si vede che una salita si sta stancando.</span></div>
-    </div></details>
+    /* ═══ v317 — DALLA LEGENDA GENERICA ALL'ANALISI TECNICA DEL TITOLO ═══════════════════════
+       Il CEO: "invece di darmi info generiche puoi darmi info correlate ai valori EMA RSI VOlume
+       e SMA correlate al titolo (con la stessa logica della sezione di sopra relativa ai livelli)?
+       se si crea un'unica sezione denominata analisi tecnica".
+       ⚠ Via i tre blocchi che spiegavano cose che il grafico mostra da solo (i numeri in alto a
+       sinistra, come e' fatta una candela, cos'e' il volume): erano istruzioni per l'uso, non
+       analisi, e chi guarda il grafico le ha gia' davanti. Restano SMA, EMA, RSI e volume, ma
+       agganciati ai NUMERI DI QUESTO TITOLO — la stessa logica dei livelli qui sopra.
+       ⚠ Le medie a 50 e 200 che il CEO ha chiesto ci sono, con i loro valori: lo studio SMA del
+       widget gratuito parte a 9 sedute e la sua lunghezza non e' pilotabile dall'incorporamento
+       (si cambia dal pannello indicatori del widget, e resta). Qui il numero e' nostro, calcolato
+       sulla barra giornaliera, quindi non dipende da quel pannello. */
+    const rTk = ((DATA && DATA.watchlist) || []).concat((DATA && DATA.portfolio) || [])
+      .find(x => x && String(x.ticker).toUpperCase() === String(tk).toUpperCase());
+    const tec = rTk && rTk.tv && rTk.tv.tecnica;
+    const rgV = (v, d = 2) => (Number.isFinite(v) ? fmtNum.format(Math.round(v * 10 ** d) / 10 ** d) : "n.d.");
+    const med = (k) => (tec && tec.medie && tec.medie[k]) || null;
+    const rigaMedia = (k, et) => {
+      const m = med(k); if (!m) return "";
+      return `<li><b>${et}</b>: <b>${rgV(m.liv)}</b> — il prezzo le sta <b class="${m.dist_pct >= 0 ? "tv-verde" : "tv-rosso"}">`
+        + `${signTxt(Math.round(m.dist_pct * 10) / 10)}</b>, cioe' ${m.dist_pct >= 0 ? "SOPRA" : "SOTTO"}</li>`;
+    };
+    const o = (tec && tec.oscillatori) || {};
+    const vr = numero(rTk && rTk.vol_ratio);
+    const analisi = !tec ? `<div class="tv-legenda"><div><b>Analisi tecnica</b><span>I valori di questo titolo
+        arrivano dalla pipeline e per <b>${esc(String(tk).toUpperCase())}</b> non ci sono ancora: compaiono al
+        prossimo giro. Non li stimo dal grafico — un numero plausibile inventato e' peggio di un buco dichiarato.</span></div></div>`
+      : `<div class="tv-legenda">
+      <div><b>Le medie, e dove sta il prezzo</b><span>Il livello di ogni media e la distanza del prezzo da lei.
+        Una convenzione sola: si scrive il <b>livello della media</b>, e poi dove sta il <b>prezzo</b> rispetto a lei.
+        <ul class="tv-lista">${rigaMedia("sma50", "Media semplice 50")}${rigaMedia("sma200", "Media semplice 200")}
+        ${rigaMedia("ema20", "Media esponenziale 20")}${rigaMedia("ema50", "Media esponenziale 50")}</ul>
+        Il prezzo sta sopra <b>${tec.medie_battute} delle ${tec.medie_totali}</b> medie calcolate (da 10 a 200 sedute,
+        semplici ed esponenziali). E' un <b>conteggio</b>, non un giudizio.<br>
+        La 50 e la 200 sono le due che il mercato guarda per la tendenza di fondo: il loro incrocio e' il segnale
+        che tutti vedono insieme, ed e' per questo che conta — non perche' preveda, ma perche' molti ci reagiscono.</span></div>
+      <div><b>RSI ${o.rsi14 != null ? `— oggi <b class="tv-viola">${rgV(o.rsi14, 1)}</b>` : ""}</b><span>
+        Misura quanto e' stata forte la spinta delle ultime 14 sedute confrontando le sedute di rialzo con quelle di ribasso.
+        ${o.rsi14 != null ? (o.rsi14 >= 70
+          ? `A <b>${rgV(o.rsi14, 1)}</b> il titolo ha corso molto in poco tempo. <b>Non e' un segnale di vendita</b>: un titolo in tendenza forte resta sopra 70 per settimane, e chi vende a 70 vende all'inizio della corsa.`
+          : o.rsi14 <= 30
+            ? `A <b>${rgV(o.rsi14, 1)}</b> e' stato venduto molto. Non e' un segnale di acquisto: puo' restare li' finche' la discesa non finisce.`
+            : `A <b>${rgV(o.rsi14, 1)}</b> sta in mezzo, e in mezzo l'RSI non dice quasi niente sul livello.`) : ""}
+        Serve bene per una cosa sola: vedere quando <b>il prezzo fa un nuovo massimo e l'RSI no</b> — il movimento
+        continua con meno forza dietro, ed e' il primo posto dove si vede che una salita si sta stancando.</span></div>
+      ${o.macd ? `<div><b>MACD — istogramma ${rgV(o.macd.istogramma)}</b><span>Differenza fra due medie esponenziali
+        (12 e 26 sedute) e la sua media a 9. L'istogramma e' quanto la prima sta sopra la seconda:
+        ${o.macd.istogramma >= 0 ? "positivo, cioe' la spinta breve e' sopra quella media" : "negativo, cioe' la spinta breve e' sotto quella media"}.
+        Il valore assoluto conta poco; conta il <b>verso in cui si sta muovendo</b>.</span></div>` : ""}
+      ${o.adx14 != null ? `<div><b>ADX — ${rgV(o.adx14, 1)}</b><span>Misura la <b>forza</b> del trend, non la sua direzione.
+        ${o.adx14 < 20 ? `A ${rgV(o.adx14, 1)} il trend e' <b>debole</b>: in questa condizione le medie danno falsi segnali, perche' il prezzo le attraversa in continuazione senza andare da nessuna parte.` : `A ${rgV(o.adx14, 1)} il trend ha forza: le medie e i livelli funzionano meglio che in fase laterale.`}
+        ${o.di_su != null ? `DI+ ${rgV(o.di_su, 1)} contro DI- ${rgV(o.di_giu, 1)}: e' li' che sta la direzione.` : ""}</span></div>` : ""}
+      <div><b>Volume${Number.isFinite(vr) ? ` — ${rgV(vr, 2)}× la media` : ""}</b><span>
+        Le barre in basso: quante azioni sono passate di mano. Il numero da solo non dice niente, conta il
+        <b>confronto con la media</b>.
+        ${Number.isFinite(vr) ? (vr >= 1.5
+          ? `Oggi il volume e' <b>${rgV(vr, 2)} volte</b> la media a 30 sedute: quello che e' successo oggi lo hanno fatto in molti.`
+          : vr <= 0.7
+            ? `Oggi il volume e' <b>${rgV(vr, 2)} volte</b> la media a 30 sedute: il movimento di oggi lo hanno fatto in pochi, e regge meno.`
+            : `Oggi il volume e' <b>${rgV(vr, 2)} volte</b> la media a 30 sedute, cioe' ordinario.`) : ""}
+        Il caso da conoscere: prezzo che sale mentre le barre si accorciano seduta dopo seduta = la spinta si sta esaurendo.</span></div>
+      ${Number.isFinite(numero(rTk.atr_pct)) ? `<div><b>Quanto si muove in un giorno normale — ATR ${rgV(numero(rTk.atr_pct), 2)}%</b><span>
+        E' l'escursione media di una seduta. Serve per non scambiare un movimento ordinario per un segnale:
+        su questo titolo una giornata da ${rgV(numero(rTk.atr_pct), 1)}% <b>non e' una notizia</b>, e uno stop piu' stretto di
+        quella cifra viene toccato dal rumore prima che dalla tesi.</span></div>` : ""}
+      ${tec._come ? `<div class="tv-metodo muted">${esc(tec._come)}. Aggiornati al giro della pipeline, non al tick.</div>` : ""}
+    </div>`;
+    nota.innerHTML = `<details class="tv-piu" open><summary>Analisi tecnica — ${esc(String(tk).toUpperCase())}</summary>${analisi}</details>
     ${String(tk).includes(".") ? `<div class="tv-piede">⚠ "${esc(tk)}" ha un suffisso di borsa alla Yahoo: TradingView usa una nomenclatura diversa e il simbolo potrebbe non agganciarsi — scrivilo come lo vedi su TradingView (per esempio <code>EURONEXT:ASML</code>).</div>` : ""}`;
   }
 
