@@ -2902,6 +2902,55 @@ check("v318 stagionalita': le due grandezze stanno sullo STESSO asse, o non sono
   const ys = g.split('y1="').slice(1).map(x => Number(x.split(String.fromCharCode(34))[0])).filter(Number.isFinite);
   return lim > 0 && ys.every(y => y >= 0 && y <= 138)`));
 
+/* ══ v319 — LA RETE: IL PUNTEGGIO NON PUO' CONTRADDIRE LA PROPRIA SCHEDA ═══════════════════
+   Il CEO: "controlla se effettivamente il rating che dai ad ogni scheda hanno una logica di
+   calcolo corretta". Due schede avevano il SEGNO INVERTITO e 224 check erano verdi.
+   ⚠⚠ QUESTO CHECK E' PIU' IMPORTANTE DELLE DUE CORREZIONI CHE LO ACCOMPAGNANO. Rattoppare due
+   segni lascia in piedi il meccanismo che li ha prodotti: due formule indipendenti per la stessa
+   domanda — una per il punteggio, una per il colore — che divergono in silenzio. Questa guardia
+   confronta le due e boccia da sola qualunque formula futura che rientri dalla finestra. */
+const FASCIA_ATTESA = (sc) => (sc < 35 ? "sfavorevole" : sc < 45 ? "debole" : sc <= 55 ? "neutro" : "favorevole");
+const COLORE_ATTESO = { "var(--red)": "sfavorevole", "var(--yellow)": "debole",
+  "var(--muted)": "neutro", "var(--orange, #f59e0b)": "neutro", "var(--green)": "favorevole" };
+
+check("v319 punteggi: il punteggio cade nella stessa fascia del colore della sua zona", (() => {
+  const casi = [
+    { z: "ZONE_AMPIEZZA", vs: [-6, -4, -0.5, 0, 2, 5, 6] },
+    { z: "ZONE_PUTCALL", vs: [0.6, 0.75, 0.9, 1.0, 1.19, 1.3, 1.5] },
+  ];
+  return casi.every(c => c.vs.every(v => {
+    const r = run(`
+      const z = ${c.z};
+      const dentro = z.find(x => ${v} >= x.da && ${v} <= x.a) || (${v} < z[0].da ? z[0] : z[z.length - 1]);
+      return JSON.stringify({ sc: punteggioDaZone(${v}, z), col: dentro.colore });`);
+    const o = JSON.parse(r);
+    return o.sc != null && FASCIA_ATTESA(o.sc) === COLORE_ATTESO[o.col];
+  }));
+})());
+
+/* ⚠ e il verso, verificato sui due estremi che hanno un significato opposto e certo: la
+   partecipazione piu' larga possibile non puo' valere meno del rally piu' stretto. */
+check("v319 ampiezza: la partecipazione larga vale PIU' del rally di sole megacap", (() => {
+  const larga = Number(run("return punteggioDaZone(-6, ZONE_AMPIEZZA)"));
+  const stretto = Number(run("return punteggioDaZone(6, ZONE_AMPIEZZA)"));
+  return larga > 55 && stretto < 35 && larga > stretto + 30;
+})());
+
+check("v319 put/call: la copertura pesante vale PIU' della compiacenza (lettura contrarian)", (() => {
+  const cop = Number(run("return punteggioDaZone(1.4, ZONE_PUTCALL)"));
+  const comp = Number(run("return punteggioDaZone(0.6, ZONE_PUTCALL)"));
+  return cop > 55 && comp < 35 && cop > comp + 30;
+})());
+
+/* ⚠ le zone sono dichiarate UNA volta e servono sia al colore sia al punteggio: un secondo
+   elenco tenuto allineato a mano e' la classe C10/C12, gia' pagata. */
+check("v319 punteggi: la scheda e il punteggio leggono lo STESSO elenco di zone", (() => (
+  src.indexOf("zone: ZONE_PUTCALL") >= 0
+  && src.indexOf("punteggioDaZone(m.putcall.ratio, ZONE_PUTCALL)") >= 0
+  && src.indexOf("punteggioDaZone(m.breadth.divergence_pp, ZONE_AMPIEZZA)") >= 0
+  && !/50 \+ m\.breadth\.divergence_pp \* 8/.test(src)
+))());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

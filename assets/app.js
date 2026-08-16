@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "318";
+const BUILD_VERSION = "319";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3066,7 +3066,9 @@ function indicatoriClassifica() {
     score: cl(50 + (m.carry.spread - 2) * 15),
     sub: `spread ${fmtNum.format(m.carry.spread)} pp${m.carry.usdjpy != null ? ` · USD/JPY ${fmtNum.format(m.carry.usdjpy)}` : ""}` });
   if (m.putcall?.ratio != null) orf.push({ k: "putcall", nome: "Put/Call ratio (SPY)",
-    score: cl(100 - (m.putcall.ratio - 0.7) / 0.008),
+    /* v319 — era DECRESCENTE nel rapporto: la copertura pesante, che la scheda colora di
+       verde e il pacchetto legge come contrarian rialzista, valeva 13/100. */
+    score: punteggioDaZone(m.putcall.ratio, ZONE_PUTCALL),
     sub: `${fmtNum.format(m.putcall.ratio)} — sopra 1 più copertura che scommessa` });
   if (m.liquidity_split?.retail_mmf_bln != null) orf.push({ k: "liquidity", nome: "Liquidità in attesa (dry powder)",
     score: cl(40 + (m.liquidity_split.retail_pctile_5y ?? 50) * 0.4),
@@ -3213,7 +3215,10 @@ function indicatoriClassifica() {
   // diverse (pp, %, un booleano) che nessuno poteva confrontare fra loro. Portati sulla stessa
   // scala 0-100 entrano nella classifica insieme a tutto il resto, e la mini-card sparisce.
   if (m.breadth?.divergence_pp != null) out.push({ k: "breadth", nome: "Ampiezza del mercato (SPY vs RSP)",
-    score: Math.round(clamp(50 + m.breadth.divergence_pp * 8)), sub: `${signTxt(m.breadth.divergence_pp, " pp")} a 1 mese` });
+    /* v319 — era `50 + divergence*8`, cioe' CRESCENTE nella divergenza: premiava il rally
+       piu' stretto. Ora esce dalle stesse zone che la scheda colora. */
+    score: punteggioDaZone(m.breadth.divergence_pp, ZONE_AMPIEZZA),
+    sub: `${signTxt(m.breadth.divergence_pp, " pp")} a 1 mese` });
   if (m.momentum?.sp500?.dist_pct != null) out.push({ k: "momentum", nome: "S&P vs media 125 sedute",
     score: Math.round(clamp(50 + m.momentum.sp500.dist_pct * 4)), sub: signTxt(m.momentum.sp500.dist_pct) });
   if (m.froth) out.push({ k: "froth", nome: "Schiuma sugli ETF a leva",
@@ -3528,6 +3533,57 @@ function tachimetro(v, opt = {}) {
 /* v243 — le bande dei punteggi 0-100 del sistema: una convenzione di LETTURA, dichiarata come
    tale. Non sono soglie calcolate: il punteggio e' gia' normalizzato dal motore, e queste bande
    servono solo a dare un nome alla zona in cui cade la lancetta. */
+/* ═══ v319 — IL PUNTEGGIO NASCE DALLE ZONE, NON DA UNA SECONDA FORMULA ═══════════════════════
+   Il CEO: "controlla se effettivamente il rating che dai ad ogni scheda hanno una logica di
+   calcolo corretta". La risposta e' no per almeno cinque schede, e due avevano il SEGNO INVERTITO.
+   ⚠⚠ MISURATO, NON DEDOTTO. Ampiezza del mercato: a -6 pp — l'azione media che batte l'indice di
+   sei punti, cioe' la partecipazione piu' larga possibile — il punteggio valeva 2/100 mentre la
+   scheda scriveva "PARTECIPAZIONE LARGA"; a +6 pp, il rally piu' fragile che esista, valeva
+   98/100 mentre la scheda scriveva "SOLO LE MEGACAP". Put/Call: 1,4 (copertura pesante, che la
+   scheda stessa colora di VERDE e il pacchetto legge come contrarian rialzista) valeva 13/100.
+   ⚠ LA CAUSA NON ERA IL SEGNO: erano DUE FORMULE INDIPENDENTI per la stessa domanda — una
+   calcolava il punteggio, l'altra decideva il colore della zona — e due formule indipendenti
+   divergono, e' la lezione v161/v207 applicata ai punteggi. Rattoppare i due segni avrebbe
+   lasciato in piedi il meccanismo che li ha prodotti.
+   Ora il punteggio si RICAVA dalla zona in cui il valore cade, e le fasce sono allineate a
+   ZONE_PUNTEGGIO: se la scheda colora di rosso, il punteggio sta nel rosso. Per costruzione. */
+const FASCIA_DA_COLORE = {
+  "var(--red)": [4, 32],
+  "var(--yellow)": [36, 44],
+  "var(--orange, #f59e0b)": [46, 54],
+  "var(--muted)": [46, 54],
+  "var(--green)": [72, 96],
+};
+
+function punteggioDaZone(v, zone) {
+  const z = (zone || []).filter(x => x && x.a > x.da);
+  if (v == null || isNaN(v) || !z.length) return null;
+  const dentro = z.find(x => v >= x.da && v <= x.a)
+    || (v < z[0].da ? z[0] : v > z[z.length - 1].a ? z[z.length - 1] : null);
+  if (!dentro) return null;
+  const f = FASCIA_DA_COLORE[dentro.colore];
+  if (!f) return null;
+  /* dentro la zona il punteggio si muove, cosi' 1,19 e 0,81 non danno lo stesso numero: ma non
+     esce MAI dalla fascia del proprio colore, che e' l'invariante che rende impossibile la
+     contraddizione fra il punteggio e la scheda che lo accompagna. */
+  const q = Math.max(0, Math.min(1, (v - dentro.da) / ((dentro.a - dentro.da) || 1)));
+  return Math.round(f[0] + q * (f[1] - f[0]));
+}
+
+/* le zone sono dichiarate UNA VOLTA e servono a due cose: colorare la scheda e generare il
+   punteggio. Un secondo elenco tenuto allineato a mano e' la classe C10/C12. */
+const ZONE_AMPIEZZA = [
+  { da: -8, a: -1, nome: "partecipazione larga: l'azione media batte l'indice", colore: "var(--green)" },
+  { da: -1, a: 1.5, nome: "rialzo condiviso", colore: "var(--muted)" },
+  { da: 1.5, a: 4, nome: "l'indice tira piu' dell'azione media", colore: "var(--yellow)" },
+  { da: 4, a: 12, nome: "solo le megacap: rally stretto", colore: "var(--red)" },
+];
+const ZONE_PUTCALL = [
+  { da: 0.5, a: 0.8, nome: "compiacenza", colore: "var(--red)" },
+  { da: 0.8, a: 1.2, nome: "equilibrio", colore: "var(--muted)" },
+  { da: 1.2, a: 1.6, nome: "copertura pesante", colore: "var(--green)" },
+];
+
 const ZONE_PUNTEGGIO = [
   { da: 0, a: 35, nome: "sfavorevole al rischio azionario", colore: "var(--red)" },
   { da: 35, a: 45, nome: "debole", colore: "var(--yellow)" },
@@ -3944,9 +4000,7 @@ const FORMA_INDICATORE = {
     ], { nota: "volumi sulle prime due scadenze" }) : "";
     return {
       g: scala(r, { min: 0.5, max: 1.6, unita: "", aria: "put/call",
-          zone: [{ da: 0.5, a: 0.8, nome: "compiacenza", colore: "var(--red)" },
-                 { da: 0.8, a: 1.2, nome: "equilibrio", colore: "var(--muted)" },
-                 { da: 1.2, a: 1.6, nome: "copertura pesante", colore: "var(--green)" }],
+          zone: ZONE_PUTCALL,
           fonte: "bande di lettura convenzionali sul rapporto put/call; il valore viene dai volumi reali" })
         + barre,
       n: `<b>${stato}.</b> Rapporto ${fmtNum.format(r)} sulle opzioni dell'ETF che replica l'S&P 500 — quindi parla del MERCATO, non di un titolo. `
