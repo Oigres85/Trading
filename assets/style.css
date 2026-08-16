@@ -2269,3 +2269,9 @@ svg.g-serie { cursor: crosshair; }
 /* v320 — la soglia storica della leva e la riga di cadenza sotto la scheda. */
 .leva-soglia { margin-top: 8px; padding: 7px 9px; background: var(--card-2); border-left: 3px solid var(--yellow); border-radius: 6px; font-size: 12.5px; }
 .leva-cad { font-size: 11px; margin-top: 6px; }
+
+/* v324 — una scheda macro puo' dichiararsi LARGA quando il suo contenuto ha bisogno di spazio
+   (la rotazione disegna 21 comparti: in una colonna stretta le etichette diventano illeggibili,
+   ed e' il difetto del viewBox gia' pagato in v206 e v226). */
+.mg-card.mg-larga { grid-column: 1 / -1; }
+.mg-card.mg-larga .rot-due { margin-bottom: 10px; }

@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "323";
+const BUILD_VERSION = "324";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3839,11 +3839,53 @@ const FORMA_INDICATORE = {
         ${p.length ? `<span class="rot-prime">${p.map(x => esc(x.tk)).join(" · ")}</span>` : ""}
       </div>`;
     };
+    /* ═══ v324 — LA ROTAZIONE SI VEDE SOLO SE SI VEDE IL MOVIMENTO ═══════════════════════════
+       Il CEO: "ingrandisci scheda inserendo anche grafico per rendere piu' facilmente visibile
+       la rotazione".
+       ⚠⚠ LA DOMANDA NON E' "CHI SALE", E' "CHI STA CAMBIANDO POSTO". I due elenchi dicono chi
+       sta davanti oggi; non dicono se ci e' appena arrivato o se ci sta da tre mesi, ed e'
+       esattamente la differenza fra una rotazione in corso e una gia' avvenuta. Il confronto
+       fra il ritmo a UN mese e quello a TRE mesi lo rende visibile senza chiedere di decodificare
+       niente: la barra e' il mese, la lineetta e' il ritmo trimestrale portato sullo stesso
+       passo mensile, e chi ha la barra sopra la lineetta sta accelerando.
+       ⚠ Non e' la barra 0-100 respinta tre volte: qui la lunghezza e' un RENDIMENTO in
+       percentuale, con lo zero al centro e il proprio numero scritto accanto. */
+    const conRitmo = ord.map(t2 => ({
+      ...t2,
+      /* il trimestre si porta al passo MENSILE, altrimenti si confrontano due orizzonti diversi
+         e la barra piu' lunga vince sempre per costruzione — il difetto v207 in miniatura. */
+      ritmo3: Number.isFinite(t2.m3) ? Math.round(t2.m3 / 3 * 10) / 10 : null,
+    }));
+    const lim = Math.max(...conRitmo.flatMap(x => [Math.abs(x.m1 || 0), Math.abs(x.ritmo3 || 0)])) || 1;
+    const W = 640, RH = 17, H = conRitmo.length * RH + 26, L = 132, C = L + (W - L - 56) / 2;
+    const X = (v) => C + (v / lim) * ((W - L - 56) / 2);
+    const barre = conRitmo.map((x, i) => {
+      const y = 20 + i * RH;
+      const x0 = Math.min(C, X(x.m1)), w = Math.abs(X(x.m1) - C);
+      const acc = x.ritmo3 != null && x.m1 != null ? x.m1 - x.ritmo3 : null;
+      return `<g><title>${esc(x.name)}: ${signTxt(x.m1)} nell'ultimo mese, ${signTxt(x.m3)} in tre mesi `
+        + `(ritmo mensile ${signTxt(x.ritmo3)})${acc != null ? ` — ${acc >= 0 ? "sta accelerando" : "sta rallentando"}` : ""}</title>
+        <text x="0" y="${y + 8}" font-size="10" fill="var(--muted)">${esc(x.name.slice(0, 20))}</text>
+        <rect x="${x0.toFixed(1)}" y="${y + 1}" width="${Math.max(w, 1).toFixed(1)}" height="10" rx="2"
+          fill="${x.m1 >= 0 ? "var(--green)" : "var(--red)"}" fill-opacity=".75"/>
+        ${x.ritmo3 != null ? `<line x1="${X(x.ritmo3).toFixed(1)}" y1="${y}" x2="${X(x.ritmo3).toFixed(1)}" y2="${y + 12}"
+          stroke="var(--text)" stroke-width="1.8" stroke-linecap="round"/>` : ""}
+        <text x="${W - 50}" y="${y + 9}" font-size="9.5" font-family="var(--mono)"
+          fill="${x.m1 >= 0 ? "var(--green)" : "var(--red)"}">${signTxt(x.m1)}</text></g>`;
+    }).join("");
+    const graf = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
+        aria-label="rendimento a un mese di ogni comparto, col ritmo trimestrale a confronto">
+      <line x1="${C}" y1="14" x2="${C}" y2="${H - 6}" stroke="var(--border)" stroke-width="1"/>
+      <text x="0" y="10" font-size="9" fill="var(--muted)">comparto</text>
+      <text x="${C + 4}" y="10" font-size="9" fill="var(--muted)">barra = ultimo mese · lineetta = ritmo dei tre mesi, al passo mensile</text>
+      ${barre}</svg>`;
+
     return {
       g: `<div class="rot-due">
         <div class="rot-col"><div class="rot-testa rot-su">SALE — dove il denaro sta entrando</div>${su.map(riga).join("")}</div>
         <div class="rot-col"><div class="rot-testa rot-giu">SCENDE — dove sta uscendo</div>${giu.map(riga).join("")}</div>
-      </div>`,
+      </div>${graf}`,
+      larga: true,
       n: `Rendimento a <b>1 mese</b> dei 21 ETF settoriali: qui i cinque che salgono di piu' e i cinque `
         + `che scendono di piu'. <b>${sopraZero} su ${tilt.length}</b> sono in positivo. `
         + `Sotto ogni comparto ci sono le sue <b>prime azioni per peso</b>, cioè i titoli che lo muovono. `
@@ -4506,6 +4548,10 @@ function renderIndicatori() {
     return tessera({ t: r.nome, tag: r.proxy || null,
       v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
       cls: clsScore(r.score), grafico: g,
+      /* v324 — la scheda dichiara da se' quanto spazio le serve: il contenuto lo sa, il
+         contenitore no. Il riordino per trascinamento non ne risente, perche' la chiave resta
+         `data-scheda` e non la posizione. */
+      larga: !!(forma && forma.larga),
       /* v250 — sotto ogni card macro, la riga di cadenza: rilevazione, età, prossimo atteso.
          Sta in FONDO e in piccolo: è contesto sul dato, non il dato. */
       /* ⚠ v265 — LA GUIDA DI LETTURA VA A SCOMPARSA. Il CEO: "tutte le info e le guide di
@@ -4708,11 +4754,11 @@ const TV_PER_TESSERA = {
   stagionalita_ndx: "QQQ",   // ⚠ NON "NDX": gli indici sono bloccati, l'ETF no (stessa regola di ^SOX → SOXX)
 };
 
-function tessera({ t, v, cls, grafico, n, tk, id, tag }) {
+function tessera({ t, v, cls, grafico, n, tk, id, tag, larga }) {
   /* v241 — `id` e' la CHIAVE STABILE della scheda per il riordino: la chiave dell'indicatore
      (in:cpi, dollar, macroquant…), non il titolo e non la posizione. Una scheda rinominata non
      perde il posto che il CEO le ha dato, e una nuova finisce in coda invece di spostare tutto. */
-  return `<div class="mg-card${tk ? " mg-click" : ""}"${id ? ` data-scheda="${esc(id)}"` : ""}${tk ? ` data-tess-tk="${esc(tk)}" role="button" tabindex="0"` : ""}>
+  return `<div class="mg-card${tk ? " mg-click" : ""}${larga ? " mg-larga" : ""}"${id ? ` data-scheda="${esc(id)}"` : ""}${tk ? ` data-tess-tk="${esc(tk)}" role="button" tabindex="0"` : ""}>
     <div class="mg-card-head"><span class="mg-t">${esc(t)}${tag ? `<span class="tag-proxy" title="${esc(tag)}">proxy</span>` : ""}</span><span class="mg-v ${cls || ""}">${v}</span>${
       TV_PER_TESSERA[id] ? `<button type="button" class="mg-graf" data-graf-tk="${esc(TV_PER_TESSERA[id])}"
         title="Apri ${esc(TV_PER_TESSERA[id])} nel grafico" aria-label="Apri ${esc(TV_PER_TESSERA[id])} nel grafico">📈</button>` : ""}</div>

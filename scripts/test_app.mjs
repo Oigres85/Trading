@@ -3154,6 +3154,43 @@ check("v323 credito: il pacchetto stampa il punteggio RICALCOLATO e dichiara le 
       && r.includes("calcolato dalle bande qui indicate")
       && r.includes("5-7% stress")`));
 
+/* ══ v324 — LA ROTAZIONE MOSTRA IL MOVIMENTO, NON SOLO LA CLASSIFICA ═══════════════════════
+   Il CEO: "ingrandisci scheda inserendo anche grafico per rendere piu' facilmente visibile la
+   rotazione". I due elenchi dicono chi sta davanti OGGI; non dicono se ci e' appena arrivato o
+   se ci sta da tre mesi — che e' la differenza fra una rotazione in corso e una gia' avvenuta.
+   ⚠⚠ IL TRIMESTRE VA PORTATO AL PASSO MENSILE prima di confrontarlo col mese: affiancare un
+   +27,7% a tre mesi e un +18,1% a un mese fa vincere sempre l'orizzonte piu' lungo, per
+   costruzione. E' il difetto v207 (due serie con finestre diverse messe sullo stesso asse) in
+   miniatura, e qui sarebbe passato inosservato perche' entrambi i numeri sono veri. */
+check("v324 rotazione: disegna tutti i comparti, col mese E col ritmo trimestrale", suVeri(`
+  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
+  if (!f) return true;
+  const tilt = (DATA.macro.tilt || []).filter(t => Number.isFinite(t.m1));
+  const barre = f.g.split("<rect ").length - 1;
+  const tacche = f.g.split('stroke-linecap="round"').length - 1;
+  return f.larga === true && barre === tilt.length && tacche === tilt.length`));
+
+check("v324 rotazione: il trimestre e' riportato al passo MENSILE, non confrontato grezzo", suVeri(`
+  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
+  if (!f) return true;
+  const t = (DATA.macro.tilt || []).find(x => x && Number.isFinite(x.m3) && Math.abs(x.m3) > 3);
+  if (!t) return true;
+  const atteso = Math.round(t.m3 / 3 * 10) / 10;
+  const svg = f.g.slice(f.g.indexOf("<svg"));
+  const i = svg.indexOf(t.name);
+  if (i < 0) return false;
+  /* il titolo del comparto deve citare il ritmo mensile, non il grezzo a tre mesi */
+  const tit = svg.slice(Math.max(0, i - 300), i + 300);
+  return tit.includes("ritmo mensile") && tit.includes(signTxt(atteso))`));
+
+/* ⚠ e la scheda larga deve restare riordinabile: la chiave e' `data-scheda`, non la posizione. */
+check("v324 rotazione: la scheda larga conserva la chiave stabile del riordino", (() => {
+  const i = src.indexOf("function tessera({");
+  const corpo = src.slice(i, i + 900);
+  return corpo.includes("mg-larga") && corpo.includes("data-scheda")
+      && readFileSync(join(ROOT, "assets", "style.css"), "utf8").includes(".mg-card.mg-larga");
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
