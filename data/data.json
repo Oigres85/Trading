@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-08-16T14:50:59Z",
+ "updated_at": "2026-08-16T15:14:10Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 0,
@@ -1157,7 +1157,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -12133,24 +12133,24 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 63032.06,
+   "price": 63037.88,
    "price_asof": "2026-08-16",
    "price_live": false,
-   "change_pct": 0.01,
+   "change_pct": 0.02,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -50.1,
+   "ath_dist_pct": -50.0,
    "sma200_dist_pct": -9.0,
-   "sma50_dist_pct": -0.9,
+   "sma50_dist_pct": -0.8,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -50.1,
+   "w52_dist_pct": -50.0,
    "day_high": 63085.9,
    "day_low": 62901.25,
    "support": 62226.58,
    "resistance": 65401.69,
    "rsi": 43.2,
-   "volume": 8339606016,
+   "volume": 8274183168,
    "vol_ratio": 0.46,
    "atr_14": 1160.27,
    "atr_pct": 1.84,
@@ -12162,7 +12162,7 @@
      63402.17,
      62975.59,
      63024.32,
-     63032.06
+     63037.88
     ],
     "m6": [
      74484.64,
@@ -12290,7 +12290,7 @@
      63402.17,
      62975.59,
      63024.32,
-     63032.06
+     63037.88
     ],
     "all": [
      386.94,
@@ -12436,7 +12436,7 @@
      73579.69,
      58558.86,
      62813.75,
-     63032.06
+     63037.88
     ],
     "m1": [
      65340.3,
@@ -12460,7 +12460,7 @@
      63402.17,
      62975.59,
      63024.32,
-     63032.06
+     63037.88
     ],
     "m3": [
      63543.2,
@@ -12528,7 +12528,7 @@
      63402.17,
      62975.59,
      63024.32,
-     63032.06
+     63037.88
     ],
     "y1": [
      117491.35,
@@ -12604,7 +12604,7 @@
      62763.32,
      64262.11,
      63551.88,
-     63032.06
+     63037.88
     ],
     "d1": [
      63010.43,
@@ -12696,7 +12696,9 @@
      63030.11,
      63021.0,
      63029.41,
-     63032.06
+     63034.22,
+     63043.0,
+     63037.88
     ]
    },
    "earnings_date": null,
@@ -12709,7 +12711,7 @@
    "sharpe_6m": -0.96,
    "sortino_6m": -1.27,
    "prepost": null,
-   "prezzo_limite_aggiustato": 63032.06,
+   "prezzo_limite_aggiustato": 63037.88,
    "risk_reward": "1:1.4",
    "sector": "Altro",
    "stats": null,
@@ -12717,12 +12719,12 @@
     "w1": {
      "support": 62487.7,
      "resistance": 64381.08,
-     "change_pct": -0.58
+     "change_pct": -0.57
     },
     "m1": {
      "support": 62226.58,
      "resistance": 65658.34,
-     "change_pct": -3.53
+     "change_pct": -3.52
     },
     "m3": {
      "support": 57747.77,
@@ -12732,7 +12734,7 @@
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -30.46
+     "change_pct": -30.45
     }
    },
    "financials": [],
@@ -12759,55 +12761,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 63032.06,
+     "prezzo": 63037.88,
      "medie": {
       "sma10": {
-       "liv": 63792.88,
-       "dist_pct": -1.19
+       "liv": 63793.46,
+       "dist_pct": -1.18
       },
       "ema10": {
-       "liv": 63509.41,
-       "dist_pct": -0.75
+       "liv": 63510.47,
+       "dist_pct": -0.74
       },
       "sma20": {
-       "liv": 63793.46,
-       "dist_pct": -1.19
+       "liv": 63793.75,
+       "dist_pct": -1.18
       },
       "ema20": {
-       "liv": 63752.19,
-       "dist_pct": -1.13
+       "liv": 63752.74,
+       "dist_pct": -1.12
       },
       "sma30": {
-       "liv": 64190.43,
+       "liv": 64190.62,
        "dist_pct": -1.8
       },
       "ema30": {
-       "liv": 63860.21,
-       "dist_pct": -1.3
+       "liv": 63860.58,
+       "dist_pct": -1.29
       },
       "sma50": {
-       "liv": 63572.77,
-       "dist_pct": -0.85
+       "liv": 63572.89,
+       "dist_pct": -0.84
       },
       "ema50": {
-       "liv": 64304.44,
-       "dist_pct": -1.98
+       "liv": 64304.67,
+       "dist_pct": -1.97
       },
       "sma100": {
-       "liv": 66699.47,
-       "dist_pct": -5.5
+       "liv": 66699.52,
+       "dist_pct": -5.49
       },
       "ema100": {
-       "liv": 66400.83,
-       "dist_pct": -5.07
+       "liv": 66400.94,
+       "dist_pct": -5.06
       },
       "sma200": {
-       "liv": 69240.43,
-       "dist_pct": -8.97
+       "liv": 69240.46,
+       "dist_pct": -8.96
       },
       "ema200": {
-       "liv": 72045.86,
-       "dist_pct": -12.51
+       "liv": 72045.92,
+       "dist_pct": -12.5
       }
      },
      "medie_battute": 0,
@@ -12815,31 +12817,31 @@
      "oscillatori": {
       "rsi14": 43.2,
       "macd": {
-       "linea": -232.29,
-       "segnale": -80.79,
-       "istogramma": -151.5
+       "linea": -231.83,
+       "segnale": -80.7,
+       "istogramma": -151.13
       },
-      "stoch_k": 25.4,
-      "stoch_d": 24.7,
-      "williams_r": -74.6,
-      "cci20": -86.7,
+      "stoch_k": 25.6,
+      "stoch_d": 24.8,
+      "williams_r": -74.4,
+      "cci20": -86.5,
       "adx14": 14.0,
       "di_su": 14.1,
       "di_giu": 22.5,
-      "momentum10": -1230.05
+      "momentum10": -1224.23
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "performance": {
-     "s1": -0.82,
-     "m1": -1.99,
-     "m3": -0.83,
-     "m6": -10.91,
-     "a1": -30.28,
+     "s1": -0.81,
+     "m1": -1.98,
+     "m3": -0.82,
+     "m6": -10.9,
+     "a1": -30.27,
      "ytd": -28.96,
-     "a3": 143.07,
-     "a5": 33.64,
-     "a10": 10853.11
+     "a3": 143.09,
+     "a5": 33.65,
+     "a10": 10854.12
     },
     "stagionalita": [
      {
@@ -40937,7 +40939,7 @@
   },
   {
    "question": "Will Bitcoin dip to $45,000 by December 31, 2026?",
-   "yes": 22,
+   "yes": 24,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-45000-by-december-31-2026-674-923-755-971-998-525-926-245-316-517-544-589-965-923-986-841-815-224-586-231-289-533-573"
   },
   {
@@ -59902,6 +59904,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-08-16T14:51:00Z"
+  "generated_at": "2026-08-16T15:14:10Z"
  }
 }
