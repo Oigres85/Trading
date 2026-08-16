@@ -3120,6 +3120,40 @@ check("v322 testata: la ricerca di dati freschi e notizie e' obbligatoria e veri
       && h.includes("NON HO ACCESSO ALLA RETE");      // la via d'uscita onesta se non puo' navigare
 })());
 
+/* ══ v323 — IL CONTRATTO FRA LE DUE LINGUE ═════════════════════════════════════════════════
+   Il punteggio del credito si calcola in DUE posti: nella pipeline Python (che scrive
+   data.json) e in assets/app.js (che ricalcola finche' il CI non ha rigenerato — v187/v205).
+   ⚠⚠ Scrivendo questa correzione ho ricreato il difetto che stavo chiudendo: le due
+   implementazioni interpolavano in modo diverso e per HY 2,71% davano 69 contro 88. Non c'e'
+   modo di eseguire Python da questa suite, quindi il contratto si fissa QUI e in
+   scripts/test_update_data.py con la STESSA tabella: se una delle due deriva, una delle due
+   suite si rompe. Una tabella condivisa e' l'unico modo onesto di legare due lingue. */
+const CONTRATTO_CREDITO = [[2.71, 88], [3.9, 95], [4.5, 40], [6.5, 25], [8, 6], [10, 10]];
+
+check("v323 credito: il punteggio rispetta il contratto condiviso con la pipeline", (() => (
+  CONTRATTO_CREDITO.every(([v, atteso]) =>
+    Number(run(`return punteggioDaZone(${v}, ZONE_CREDITO)`)) === atteso)
+))());
+
+/* ⚠ e il numero non puo' contraddire la didascalia che gli sta accanto: a 6,5% la legenda dice
+   "stress", quindi il punteggio deve stare nella fascia sfavorevole. Prima valeva 56, cioe'
+   "favorevole", ed era stampato sulla stessa riga della parola "stress". */
+check("v323 credito: a spread da 'stress' il punteggio sta nel rosso, non nel favorevole", (() => {
+  const stress = Number(run("return punteggioDaZone(6.5, ZONE_CREDITO)"));
+  const rilassato = Number(run("return punteggioDaZone(2.71, ZONE_CREDITO)"));
+  return stress < 35 && rilassato > 70;
+})());
+
+check("v323 credito: il pacchetto stampa il punteggio RICALCOLATO e dichiara le bande", suVeri(`
+  const p = buildPrompt();
+  const i = p.indexOf("Rischio Credito (HY OAS");
+  if (i < 0) return true;
+  const r = p.slice(i, i + 420);
+  const atteso = punteggioDaZone(numero(DATA.macro.credit.spread_hy), ZONE_CREDITO);
+  return r.includes("score " + atteso + "/100")
+      && r.includes("calcolato dalle bande qui indicate")
+      && r.includes("5-7% stress")`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

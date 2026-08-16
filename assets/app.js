@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "322";
+const BUILD_VERSION = "323";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3603,6 +3603,28 @@ function punteggioDaZone(v, zone) {
 
 /* le zone sono dichiarate UNA VOLTA e servono a due cose: colorare la scheda e generare il
    punteggio. Un secondo elenco tenuto allineato a mano e' la classe C10/C12. */
+/* ⚠⚠ v323 — L'ANCORA DEL CREDITO ERA INVENTATA. Il punteggio usciva da
+   `clamp(100 - (hy - 2,5)/9*100)`, cioe' una scala tarata su una crisi conclamata: a HY 6,5% —
+   che la LEGENDA STAMPATA SULLA STESSA RIGA chiama "5-7% stress" — dava 56/100, che nella scala
+   dei punteggi e' "favorevole". Il numero contraddiceva la sua stessa didascalia.
+   Ora le bande sono quelle DICHIARATE nel pacchetto, e il punteggio esce da li'. Una soglia
+   sola per indicatore, che e' la regola generale di v319. */
+const ZONE_CREDITO = [
+  { da: 0, a: 4, nome: "credito rilassato", colore: "var(--green)" },
+  { da: 4, a: 5, nome: "attenzione", colore: "var(--yellow)" },
+  { da: 5, a: 7, nome: "stress", colore: "var(--red)" },
+  { da: 7, a: 20, nome: "crisi", colore: "var(--red)" },
+];
+
+/* ⚠ e il P/E: la scheda mostrava "50/100 = neutro" con l'etichetta "Sopravvalutazione" accanto,
+   perche' punteggio ed etichetta uscivano da due formule indipendenti. Il punteggio esce dalle
+   zone della scheda, cosi' l'etichetta e il numero non possono piu' divergere. */
+const ZONE_PE = [
+  { da: 8, a: 18, nome: "valutazione contenuta", colore: "var(--green)" },
+  { da: 18, a: 25, nome: "valutazione piena", colore: "var(--yellow)" },
+  { da: 25, a: 60, nome: "valutazione tesa", colore: "var(--red)" },
+];
+
 const ZONE_AMPIEZZA = [
   { da: -8, a: -1, nome: "partecipazione larga: l'azione media batte l'indice", colore: "var(--green)" },
   { da: -1, a: 1.5, nome: "rialzo condiviso", colore: "var(--muted)" },
@@ -7349,7 +7371,15 @@ function buildPrompt() {
     if (rl) lines.push(rl);
   }
   if (m.credit) {
-    let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`;
+    /* ⚠ v323 — il punteggio si RICALCOLA dalle bande dichiarate qui accanto: quello della
+       pipeline usciva da un'ancora 2,5-11,5% inventata, e a 6,5% dava "favorevole" mentre la
+       legenda sulla stessa riga dice "stress". Il ricalcolo vive anche qui perche' il CI
+       rigenera su cron: senza, il pacchetto porterebbe il numero vecchio per ore (v187/v205). */
+    const scCred = punteggioDaZone(numero(m.credit.spread_hy), ZONE_CREDITO);
+    const zCred = ZONE_CREDITO.find(z => numero(m.credit.spread_hy) >= z.da && numero(m.credit.spread_hy) <= z.a);
+    let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${zCred ? zCred.nome : m.credit.label} `
+      + `(score ${scCred != null ? scCred : m.credit.score}/100, calcolato dalle bande qui indicate: `
+      + `sotto 4% rilassato, 4-5% attenzione, 5-7% stress, oltre 7% crisi)`;
     const ch = m.credit.history || [];
     if (ch.length > 20) { const d = ch[ch.length - 1].v - ch[ch.length - 21].v; crl += `; trend ~1 mese ${d > 0 ? "+" : ""}${fmtNum.format(Math.round(d * 100) / 100)} pp (${d > 0.15 ? "spread in allargamento = rischio in aumento" : d < -0.15 ? "spread in restringimento = rischio in calo" : "stabile"})`; }
     lines.push(crl);

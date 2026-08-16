@@ -2343,7 +2343,11 @@ def fetch_macro():
         hy = fred_series("BAMLH0A0HYM2", 260)   # ~1 anno giornaliero
         hy_val = hy[-1][1]
         # OAS HY: <4% = normale, 4-5% = attenzione, 5-7% = stress, >9% = crisi
-        hy_score = round(clamp(100 - (hy_val - 2.5) / 9 * 100))
+        # ⚠⚠ v323 — L'ANCORA ERA INVENTATA: 2,5-11,5% e' la scala di una crisi conclamata, e a
+        # HY 6,5% — che la legenda stampata accanto chiama "stress" — dava 56/100, cioe'
+        # "favorevole" nella scala dei punteggi. Il numero contraddiceva la sua didascalia.
+        # Ora si usano le BANDE DICHIARATE, le stesse che il payload stampa sulla riga.
+        hy_score = round(_punteggio_da_bande(hy_val, BANDE_HY_OAS))
         macro["credit"] = {
             "spread_hy": round(hy_val, 2),
             "score": hy_score,
@@ -2379,7 +2383,7 @@ def fetch_macro():
                   "Mercato del Credito Rilassato" if (easing or (hy_now and hy_now < 4)) else
                   "Mercato del Credito Stabile")
         # score 0-100 (100 = favorevole: spread bassi e in calo). Penalizza l'allargamento.
-        sc = clamp(100 - (hy_now - 2.5) / 9 * 100) if hy_now else 50
+        sc = _punteggio_da_bande(hy_now, BANDE_HY_OAS) if hy_now else 50
         if hy_chg:
             sc -= max(0, hy_chg) * 0.8
         if stl is not None:
@@ -3032,6 +3036,30 @@ def _finra_scrape(url):
             fs.append((f"20{yy}-{mnum:02d}-01", float(val.replace(",", ""))))
     fs.sort()
     return fs
+
+
+BANDE_HY_OAS = ((0, 4, 72, 96), (4, 5, 36, 44), (5, 7, 4, 32), (7, 20, 4, 32))
+
+
+def _punteggio_da_bande(v, bande):
+    """Punteggio 0-100 ricavato dalle BANDE DICHIARATE, non da un'ancora scelta a mano.
+    Ogni banda e' (da, a, punteggio_minimo, punteggio_massimo): dentro la banda il valore si
+    muove, ma non esce MAI dalla fascia che porta il suo nome — cosi' il numero non puo'
+    contraddire l'etichetta che gli sta accanto.
+    ⚠⚠ QUESTA FUNZIONE DEVE DARE LO STESSO NUMERO DI `punteggioDaZone` IN assets/app.js. La
+    prima stesura interpolava in modo diverso e per HY 2,71% dava 69 contro 88: due
+    implementazioni della stessa formula che divergono — cioe' il difetto che questa riscrittura
+    esiste per chiudere, ricreato nell'atto di chiuderlo. Un gate confronta i due su una griglia
+    di valori: se divergono, la CI si rompe."""
+    if v is None:
+        return 50
+    for da, a, s0, s1 in bande:
+        if da <= v <= a:
+            q = max(0.0, min(1.0, (v - da) / ((a - da) or 1)))
+            return clamp(s0 + q * (s1 - s0))
+    if v < bande[0][0]:
+        return clamp(bande[0][2])
+    return clamp(bande[-1][3])
 
 
 def fetch_margin_debt(prev_md=None):

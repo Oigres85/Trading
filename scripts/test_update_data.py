@@ -543,6 +543,22 @@ check("v316 stagionalita': un mese per riga, col proprio campione e i propri est
 check("v316 stagionalita': sotto otto anni di storia non si pubblica una media fra esiti opposti",
       ud.stagionalita_titolo(_mens.head(48)) is None)
 
+# ══ v323 — IL CONTRATTO FRA LE DUE LINGUE ═══════════════════════════════════════════════════
+# Il punteggio del credito si calcola qui e in assets/app.js. Le due implementazioni sono gia'
+# divergute una volta (HY 2,71% -> 69 contro 88) nell'atto stesso di correggere il difetto che
+# nasceva da due formule indipendenti. La tabella e' la STESSA che sta in scripts/test_app.mjs:
+# se una delle due lingue deriva, una delle due suite si rompe.
+_BANDE_HY = ud.BANDE_HY_OAS
+_CONTRATTO_CREDITO = ((2.71, 88), (3.9, 95), (4.5, 40), (6.5, 25), (8, 6), (10, 10))
+check("v323 credito: il punteggio rispetta il contratto condiviso con la dashboard",
+      all(round(ud._punteggio_da_bande(v, _BANDE_HY)) == atteso for v, atteso in _CONTRATTO_CREDITO))
+# ⚠ e il numero non puo' contraddire la didascalia: a 6,5% la legenda stampata accanto dice
+#   "stress", e il punteggio prima valeva 56, cioe' "favorevole" nella scala dei punteggi.
+check("v323 credito: a spread da 'stress' il punteggio sta nel rosso",
+      round(ud._punteggio_da_bande(6.5, _BANDE_HY)) < 35 and round(ud._punteggio_da_bande(2.71, _BANDE_HY)) > 70)
+check("v323 credito: l'ancora inventata 2,5-11,5% non e' piu' nel codice",
+      "(hy_val - 2.5) / 9" not in _src and "(hy_now - 2.5) / 9" not in _src)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)
