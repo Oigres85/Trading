@@ -498,6 +498,51 @@ check("v280 pipeline: le materie prime hanno il loro blocco con lo storico",
 check("v280 pipeline: nessun simbolo sta sia nei mercati sia nelle materie",
       not set(s for s in ('"HG=F"', '"GC=F"', '"CL=F"', '"^SOX"') if s in _righe_markets))
 
+# ═══ v316 — LA COLONNA DI TRADINGVIEW, CALCOLATA DA NOI ═══════════════════════════════════
+# Si provano su serie SINTETICHE con esito noto: una funzione che calcola un RSI si verifica
+# dandole una salita monotona (RSI deve saturare verso 100), non guardando se "sembra giusto".
+import pandas as _pd
+import numpy as _np
+
+_idx = _pd.date_range("2024-01-01", periods=260, freq="B")
+_su = _pd.DataFrame({"Open": _np.linspace(100, 200, 260), "High": _np.linspace(101, 202, 260),
+                     "Low": _np.linspace(99, 198, 260), "Close": _np.linspace(100, 200, 260),
+                     "Volume": [1e6] * 260}, index=_idx)
+_bt = ud.batteria_tecnica(_su)
+check("v316 tecnica: su una salita monotona l'RSI satura in alto e il prezzo batte ogni media",
+      _bt["oscillatori"]["rsi14"] > 95 and _bt["medie_battute"] == _bt["medie_totali"])
+check("v316 tecnica: la distanza dalla media e' il PREZZO rispetto al LIVELLO, non il contrario",
+      abs(_bt["medie"]["sma200"]["dist_pct"]
+          - (_bt["prezzo"] / _bt["medie"]["sma200"]["liv"] - 1) * 100) < 0.05)
+check("v316 tecnica: l'ADX misura la forza, e su un trend pulito e' alto",
+      _bt["oscillatori"].get("adx14", 0) > 40)
+check("v316 tecnica: sotto 30 barre non si pubblica niente invece di pubblicare rumore",
+      ud.batteria_tecnica(_su.head(20)) is None)
+
+# ⚠ IL BETA SENZA R² E' MEZZO NUMERO: due serie identiche danno beta 1 e R² 1; due indipendenti
+#   danno un R² vicino a zero, ed e' quello che deve arrivare al pacchetto.
+_r = _pd.Series(_np.random.RandomState(7).normal(0, 1, 260), index=_idx)
+_uguale = (1 + _r / 100).cumprod() * 100
+_altro = (1 + _pd.Series(_np.random.RandomState(99).normal(0, 1, 260), index=_idx) / 100).cumprod() * 100
+_sens = ud.sensibilita_macro(_r, {"stessa": ("X", "canale", _uguale), "altra": ("Y", "canale", _altro)})
+check("v316 sensibilita': serie identica -> beta ~1 e R² ~1",
+      abs(_sens["stessa"]["beta"] - 1) < 0.05 and _sens["stessa"]["r2"] > 0.99)
+check("v316 sensibilita': serie indipendente -> R² prossimo a zero, non un beta spacciato per segnale",
+      _sens["altra"]["r2"] < 0.05)
+check("v316 sensibilita': la finestra e' comune e dichiarata (date, non posizioni)",
+      _sens["stessa"]["campione"] >= 60 and _sens["stessa"]["da"] < _sens["stessa"]["a"])
+# ⚠ e su una sovrapposizione corta NON si pubblica: e' la lezione v207 (due serie senza giorni in comune)
+check("v316 sensibilita': sotto 60 sedute comuni non si pubblica un beta",
+      ud.sensibilita_macro(_r.head(40), {"x": ("X", "c", _uguale)}) is None)
+
+_mens = _pd.Series(_np.tile([1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 3.0, -3.0, 0.5, -0.5, 2.5, -2.5], 12).cumsum() + 100,
+                   index=_pd.date_range("2014-01-31", periods=144, freq="ME"))
+_st = ud.stagionalita_titolo(_mens)
+check("v316 stagionalita': un mese per riga, col proprio campione e i propri estremi",
+      _st and len(_st) == 12 and all(x["campione"] >= 8 and x["peggio"] <= x["meglio"] for x in _st))
+check("v316 stagionalita': sotto otto anni di storia non si pubblica una media fra esiti opposti",
+      ud.stagionalita_titolo(_mens.head(48)) is None)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)

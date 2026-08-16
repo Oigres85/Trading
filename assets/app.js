@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "315";
+const BUILD_VERSION = "316";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -733,14 +733,33 @@ async function livePrices() {
   const map = {}; let any = false;
   res.forEach(x => { if (x.status === "fulfilled" && x.value[1]) { map[x.value[0]] = x.value[1]; any = true; } });
   if (!any) return;
+  /* ═══ v316 — IL PORTAFOGLIO SEGUE IL MERCATO, NON LO SNAPSHOT ═══════════════════════════
+     Il CEO: "trova un modo per aggiornare i dati del portafoglio sulla base delle ultime
+     rilevazioni di mercato". Il prezzo si aggiornava gia' ogni 60 secondi — il GUADAGNO no, e
+     la tabella nemmeno.
+     ⚠⚠ DUE DIFETTI, E IL PRIMO E' UN NOME. La condizione era `r.currency === "USD" && r.qty`,
+     ma le posizioni del CEO arrivano da config/posizioni.json e portano `qta`, non `qty`:
+     il ramo non entrava MAI. E anche fosse entrato avrebbe scritto `gain_pct`, mentre la tabella
+     del portafoglio legge `gain_pct_pos` — cioe' il campo aggiornato non era quello letto.
+     Risultato: prezzo fresco accanto a un guadagno vecchio, due grandezze sullo stesso titolo a
+     due istanti diversi. E' la classe che questo progetto ha gia' pagato piu' volte (v229/v230):
+     quando due letture della stessa grandezza convivono, si decide sulla piu' allarmante.
+     ⚠ L'obbligazione NON si valuta come un'azione: quote x prezzo darebbe 4,1 milioni al posto
+     di 41 mila. Ma il GUADAGNO percentuale si', perche' carico e prezzo sono entrambi in
+     percentuale del nominale. */
   const upd = (r) => {
     const q = map[r.ticker]; if (!q) return;
     r.price = Math.round(q.price * 100) / 100;
     r.change_pct = Math.round((q.price / q.prev - 1) * 10000) / 100;
-    if (r.currency === "USD" && r.qty) {
-      r.value = r.price * r.qty;
-      r.gain = r.value - r.pmc * r.qty;
-      r.gain_pct = Math.round((r.value / (r.pmc * r.qty) - 1) * 10000) / 100;
+    r.price_asof = "live";                       // la riga sa di essere fresca, e la tabella lo dice
+    const qta = numero(r.qta ?? r.qty), pmc = numero(r.pmc);
+    if (Number.isFinite(qta) && qta > 0 && Number.isFinite(pmc) && pmc > 0) {
+      const obbl = String(r.ticker || "").startsWith("BTP") || r.currency === "EUR";
+      r.value = obbl ? qta * r.price / 100 : r.price * qta;
+      r.gain = r.value - (obbl ? qta * pmc / 100 : pmc * qta);
+      const g = Math.round((r.price / pmc - 1) * 10000) / 100;
+      r.gain_pct = g;
+      r.gain_pct_pos = g;                        // il campo che la tabella legge davvero
     }
   };
   DATA.portfolio.forEach(upd);
@@ -754,6 +773,9 @@ async function livePrices() {
      niente sull'esecuzione, e un gate copre solo la catena che gli hai dato. Trovata solo
      aprendo la pagina. Sotto, la guardia e' stata estesa a TUTTE le funzioni di primo livello. */
   renderShockAlert();
+  /* ⚠ senza questa riga i numeri nuovi restavano in memoria e la tabella continuava a mostrare
+     quelli dello snapshot: aggiornare il dato e non ridisegnarlo e' come non aggiornarlo. */
+  renderPortafoglio();
   const el = $("#live-badge");
   if (el) el.textContent = `Prezzi live: ${new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
 }
@@ -2525,7 +2547,7 @@ function renderPortafoglio() {
         <td><b>${esc(tk)}</b> <span class="muted pf-nome">${esc(String(r.name || "").slice(0, 24))}</span></td>
         <td class="num">${fmtNum.format(q)}</td>
         <td class="num">${cur}${fmtNum.format(pmc)}</td>
-        <td class="num">${Number.isFinite(p) ? cur + fmtNum.format(p) : "—"}</td>
+        <td class="num" title="${r.price_asof === "live" ? "prezzo del refresh live" : "prezzo dello snapshot della pipeline"}">${Number.isFinite(p) ? cur + fmtNum.format(p) : "—"}${r.price_asof === "live" ? '<span class="pf-live" aria-label="prezzo live">·</span>' : ""}</td>
         <td class="num ${g > 0 ? "pos" : g < 0 ? "neg" : "muted"}">${g != null ? signTxt(Math.round(g * 10) / 10) : "—"}</td>
         <td class="num">${v != null ? cur + fmtNum.format(Math.round(v)) : "—"}</td>
         <td class="num">${e != null ? "€" + fmtNum.format(Math.round(e)) : "—"}</td>
@@ -2564,142 +2586,6 @@ function renderPortafoglio() {
   });
 }
 
-/* ═══ v312 — IL VERIFICATORE DEL REFERTO ══════════════════════════════════════════════════
-   L'anello mancante, indicato nella revisione a cinque teste: il sistema e' rigorosissimo sui
-   dati che PRODUCE e non ha nessuna difesa su quelli che l'LLM porta DENTRO. Il pacchetto
-   impone di marcare [VERIFICATO] ogni dato esterno, ma nessuno controlla che l'abbia fatto —
-   e misurato: dei nove blocchi che il prompt chiede, cinque vengono interamente dalla rete.
-   Qui si incolla il referto e il sistema dice, numero per numero, quali vengono dal pacchetto,
-   quali sono dichiarati [VERIFICATO] e quali non hanno nessuna delle due cose.
-   ⚠⚠ E' UN'EURISTICA, NON UNA PROVA, e va detto forte: un numero che compare nel pacchetto
-   puo' essere stato usato male, e uno che non compare puo' essere corretto e verificato in un
-   modo che il sistema non riconosce. Serve a sapere DOVE guardare, non a promuovere o bocciare.
-   ⚠ Si escludono anni (1900-2099), numeri di una cifra e percentuali sotto il 10 senza
-   decimali: sono ovunque nella prosa e produrrebbero solo rumore — un rilevatore che segnala
-   tutto si smette di leggerlo, ed e' successo in questa stessa sessione con un mio detector. */
-function numeriDelTesto(t) {
-  const out = new Map();
-  const re = /(?:^|[^\w.,])(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d+)?|\d+[.,]\d+)/g;
-  let m;
-  while ((m = re.exec(String(t || ""))) !== null) {
-    const grezzo = m[1];
-    const n = Number(grezzo.replace(/\.(?=\d{3}\b)/g, "").replace(",", "."));
-    if (!Number.isFinite(n)) continue;
-    if (Number.isInteger(n) && n >= 1900 && n <= 2099) continue;   // anni
-    if (Number.isInteger(n) && Math.abs(n) < 10) continue;          // cifre singole
-    const ctx = String(t).slice(Math.max(0, m.index - 60), m.index + grezzo.length + 60);
-    if (!out.has(grezzo)) out.set(grezzo, ctx.replace(/\s+/g, " ").trim());
-  }
-  return [...out.entries()].map(([v, ctx]) => ({ v, ctx }));
-}
-
-function verificaReferto(referto, pacchetto) {
-  const numeri = numeriDelTesto(referto);
-  /* un numero e' "tracciato" se compare nel pacchetto in una qualunque delle sue forme:
-     514.39 / 514,39 / 51439 — le tre che il sistema e gli LLM usano davvero. */
-  /* ⚠⚠ v314 — LE DUE NOTAZIONI VANNO NORMALIZZATE INSIEME, NON UNA ALLA VOLTA. Trovato sul
-     referto VERO di ChatGPT su MU: scriveva "1.011,77" — che e' esattamente la nostra
-     resistenza 1011.77 in notazione italiana — e il verificatore lo dava per scoperto. Le
-     trasformazioni erano applicate SEPARATAMENTE (togli i punti OPPURE cambia la virgola), mai
-     in sequenza, quindi il caso piu' comune in un testo italiano sfuggiva.
-     Un verificatore che segnala come sospetto un numero che gli abbiamo dato noi produce
-     rumore, e il rumore fa smettere di leggerlo — e' il modo in cui uno strumento di controllo
-     muore. */
-  const forme = (v) => {
-    const p = String(v);
-    const senzaMigliaia = p.replace(/\.(?=\d{3}(?:[^\d]|$))/g, "");
-    const s = new Set([
-      p,
-      p.replace(",", "."),
-      p.replace(".", ","),
-      p.replace(/[.,]/g, ""),
-      senzaMigliaia,                       // 1.011,77 → 1011,77
-      senzaMigliaia.replace(",", "."),     // 1.011,77 → 1011.77   ← il caso che sfuggiva
-      p.replace(/,(?=\d{3}(?:[^\d]|$))/g, ""),          // notazione inglese: 1,011.77 → 1011.77
-    ]);
-    return [...s].filter(Boolean);
-  };
-  /* ⚠⚠ CONFRONTO PER TOKEN INTERO, NON PER SOTTOSTRINGA. La prima stesura cercava "8.9" dentro
-     il pacchetto e lo trovava dentro "158.9": dodici numeri su quattordici risultavano "dal
-     pacchetto" in un referto che ne aveva inventati due. Un verificatore che assolve tutti e'
-     peggio di nessun verificatore, perche' da' una sicurezza che non c'e'. Il confine di parola
-     lo chiude: "8.9" non combacia piu' dentro un numero piu' lungo. */
-  const dentro = (v) => forme(v).some(f => {
-    if (f.length < 2) return false;
-    const q = f.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    return new RegExp("(?:^|[^\\d.,])" + q + "(?![\\d.,]*\\d)").test(String(pacchetto));
-  });
-  /* ⚠ "verificato" = il marcatore nella stessa frase. La testata chiede [VERIFICATO] CON fonte
-     e data, e i modelli scrivono "[VERIFICATO, MarketBeat, 14/08/2026]": pretendere la parentesi
-     chiusa subito dopo la parola faceva risultare scoperto un numero correttamente marcato —
-     trovato al primo test, ed e' il difetto che rende un controllo peggio che inutile. */
-  const marcato = (ctx) => /\[\s*VERIFICATO\b/i.test(ctx);
-  const righe = numeri.map(x => ({
-    v: x.v, ctx: x.ctx,
-    stato: dentro(x.v) ? "pacchetto" : marcato(x.ctx) ? "verificato" : "scoperto",
-  }));
-  const conta = (s) => righe.filter(r => r.stato === s).length;
-  return {
-    totale: righe.length,
-    pacchetto: conta("pacchetto"),
-    verificato: conta("verificato"),
-    scoperti: righe.filter(r => r.stato === "scoperto"),
-    nonVerificato: /NON VERIFICATO\s*:/i.test(referto),
-  };
-}
-
-function renderVerifica() {
-  const esito = $("#ver-esito");
-  const testo = $("#ver-testo");
-  if (!esito || !testo) return;
-  const referto = String(testo.value || "").trim();
-  if (referto.length < 200) {
-    esito.innerHTML = '<span class="muted">Incolla qui il referto dell\'LLM: te lo confronto col pacchetto, numero per numero.</span>';
-    return;
-  }
-  /* il pacchetto contro cui confrontare: quello del titolo se il campo ticker e' pieno, il
-     macro altrimenti. E' lo stesso che il CEO ha copiato, non una ricostruzione. */
-  const tk = String(($("#tk-input") || {}).value || "").trim().toUpperCase();
-  let pacchetto = "";
-  try { pacchetto = tk ? buildPromptTicker(tk) : buildPrompt(); } catch { pacchetto = ""; }
-  const r = verificaReferto(referto, pacchetto);
-  const pct = r.totale ? Math.round((r.pacchetto + r.verificato) / r.totale * 100) : 0;
-  esito.innerHTML = `<div class="ver-righe">
-      <div><b>${r.totale}</b> numeri nel referto</div>
-      <div><b class="pos">${r.pacchetto}</b> vengono dal pacchetto${tk ? ` di ${esc(tk)}` : " macro"}</div>
-      <div><b>${r.verificato}</b> dichiarati [VERIFICATO]</div>
-      <div><b class="${r.scoperti.length ? "neg" : "muted"}">${r.scoperti.length}</b> senza nessuna delle due cose</div>
-      <div class="muted">copertura ${pct}%</div>
-    </div>`
-    + (r.scoperti.length
-        ? `<div class="ver-lista"><b>I numeri scoperti, col loro contesto:</b>`
-          + r.scoperti.slice(0, 20).map(x => `<div class="ver-riga"><code>${esc(x.v)}</code> — ${esc(x.ctx)}</div>`).join("")
-          + (r.scoperti.length > 20 ? `<div class="muted">…e altri ${r.scoperti.length - 20}.</div>` : "")
-          + `</div>`
-        : `<div class="ver-ok">Nessun numero scoperto: tutto viene dal pacchetto o è dichiarato verificato.</div>`)
-    + `<div class="ver-nota muted">`
-    + (r.nonVerificato ? `Il referto chiude con la riga "NON VERIFICATO:", come il pacchetto impone. `
-                       : `⚠ <b>Manca la riga "NON VERIFICATO:"</b> che il pacchetto rende obbligatoria: `
-                         + `senza, non si sa cosa il modello NON è riuscito a confermare. `)
-    + `⚠⚠ <b>Questa è un'euristica, non una prova.</b> Un numero che compare nel pacchetto può essere `
-    + `stato usato male, e uno scoperto può essere corretto e verificato in un modo che non riconosco. `
-    + `Serve a sapere <b>dove guardare</b>, non a promuovere o bocciare un'analisi. `
-    + `Anni, cifre singole e numeri sotto 10 sono esclusi: nella prosa sono ovunque e farebbero solo rumore.</div>`;
-}
-
-/* ═══ v311 — IL PORTAFOGLIO SI MODIFICA DALLA PAGINA ══════════════════════════════════════
-   Richiesta del CEO: cambiare i valori, aggiungere e togliere titoli. Si scrive
-   `config/posizioni.json` con la stessa macchina che questo progetto usa gia' per l'ordine
-   delle sezioni e la testata del prompt — la GitHub Contents API col token in localStorage,
-   che e' il "backend" di un sito statico.
-   ⚠⚠ SENZA TOKEN SI SALVA IN LOCALE E LO SI DICE. Un salvataggio che sembra riuscito e resta
-   su un browser solo e' il difetto gia' corretto sui parametri di rischio: il CEO aprirebbe
-   l'iPhone e troverebbe i vecchi numeri senza capire perche'.
-   ⚠⚠⚠ UN TICKER NUOVO NON BASTA METTERLO QUI. `posizioni.json` e' una SOVRAPPOSIZIONE e non e'
-   una fonte di simboli (v274: "un ripiego verso un file morto e' una strada che riporta
-   indietro"). Se il titolo non e' nella watchlist la pipeline non ne prende il prezzo, e la
-   riga resterebbe senza valore: allora si scrive ANCHE `config/ui_watchlist.json`, e lo si
-   dichiara invece di farlo di nascosto. */
 const POSIZIONI_PATH = "config/posizioni.json";
 const WATCHLIST_PATH = "config/ui_watchlist.json";
 let pfInModifica = false;
@@ -2818,17 +2704,9 @@ async function salvaPosizioni() {
    volte in questo progetto. */
 document.addEventListener("click", (e) => {
   const t = e.target && e.target.closest ? e.target : null;
-  if (t && t.closest && t.closest("#ver-controlla")) { renderVerifica(); return; }
   if (!t || !t.closest) return;
   if (t.closest("#pf-copia")) {
-    const esito = $("#pf-nota");
-    try {
-      const testo = buildPromptPortafoglio();
-      navigator.clipboard.writeText(testo).then(() => {
-        if (esito) esito.innerHTML = `<b>Analisi del portafoglio copiata</b> — ${testo.length.toLocaleString("it")} `
-          + `caratteri. Incollala in una chat NUOVA. ` + esito.innerHTML;
-      });
-    } catch (err) { if (esito) esito.textContent = "Non sono riuscito a copiare: " + err; }
+    consegnaPacchetto(buildPromptPortafoglio(), "Analisi del portafoglio", $("#pf-nota"));
     return;
   }
   if (t.closest("#pf-modifica")) { pfInModifica = !pfInModifica; renderPortafoglio(); return; }
@@ -2871,19 +2749,20 @@ $("#set-input")?.addEventListener("change", (e) => {
   if (v) apriNelGrafico(v);
 });
 
+/* ⚠⚠ v316 — QUESTO BOTTONE ERA ROTTO DALLA v313 E NESSUN GATE L'HA VISTO. Leggeva `#set-input`,
+   cioe' la barra di selezione che la v313 aveva RIMOSSO su richiesta del CEO: con il settore
+   correttamente scelto (settoreScelto = "SKYY", verificato in browser) rispondeva "Scegli prima
+   un settore dall'elenco". Il gate della v313 verificava che il bottone ESISTESSE e che
+   `scegliSettore` esistesse — non che i due fossero COLLEGATI. E' la stessa classe del bottone
+   di modifica del portafoglio: ho controllato l'esistenza, non la raggiungibilita'. */
 $("#set-copia")?.addEventListener("click", async () => {
-  const sel = $("#set-input");
   const esito = $("#set-esito");
-  const v = sel && sel.value;
-  if (!v) { if (esito) esito.textContent = "Scegli prima un settore dall'elenco."; return; }
-  try {
-    const testo = buildPromptSettore(v);
-    await navigator.clipboard.writeText(testo);
-    if (esito) esito.innerHTML = `Copiato: <b>${esc(sel.options[sel.selectedIndex].textContent)}</b> — `
-      + `${testo.length.toLocaleString("it")} caratteri. Incollalo in una chat NUOVA.`;
-  } catch (e) {
-    if (esito) esito.textContent = "Non sono riuscito a copiare negli appunti: " + (e && e.message ? e.message : e);
+  if (!settoreScelto) {
+    if (esito) esito.textContent = "Scegli prima un comparto: clicca una barra in \"Rotazione — dove si muove il denaro\".";
+    return;
   }
+  const nome = (settorePerChiave(settoreScelto) || {}).name || settoreScelto;
+  await consegnaPacchetto(buildPromptSettore(settoreScelto), `Analisi del comparto ${nome}`, esito);
 });
 $("#modal-close")?.addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal")?.addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
@@ -4543,10 +4422,6 @@ async function controllaVersione() {
         <span class="muted">Non è il sito: è la cache del browser (GitHub Pages tiene index.html per 10 minuti).</span></div>
       <button class="btn btn-primary btn-sm" id="ver-reload">Ricarica la versione ${esc(attesa)}</button>
     </div>`;
-    $("#ver-reload")?.addEventListener("click", () => {
-      // URL mai vista dalla cache: un reload normale ripescherebbe lo stesso file
-      location.replace(location.pathname + "?r=" + Date.now());
-    });
   } catch { /* offline o file:// — nessun avviso, meglio del falso allarme */ }
 }
 
@@ -7095,16 +6970,29 @@ function buildPrompt() {
     const pezzi = [];
     for (const [k, v] of Object.entries(m.materie)) {
       if (!v || v.value == null) continue;
+      /* ⚠ due grandezze DIVERSE, e prima erano una sola sotto il nome sbagliato: quanto si e'
+         mosso in un anno, e dove sta dentro l'intervallo di quell'anno. Un metallo puo' essere
+         +31% e stare a meta' del range, o -5% e stare al massimo: dirne una sola e chiamarla
+         come l'altra e' cio' che ha prodotto "116° percentile", che non esiste.
+         La posizione si ricalcola qui se la pipeline non l'ha ancora pubblicata (il CI rigenera
+         su cron: senza questo il pacchetto resterebbe monco per ore — ragione di v187/v205). */
+      const varAnno = v.var_1y != null ? v.var_1y : v.pct_1y;
+      const pos = v.pos_range_1y != null ? v.pos_range_1y
+        : (v.min_1y != null && v.max_1y != null && v.max_1y > v.min_1y
+            ? Math.round((v.value - v.min_1y) / (v.max_1y - v.min_1y) * 1000) / 10 : null);
       pezzi.push(`${v.label || k} ${v.value}${v.unita ? " " + v.unita : ""}`
         + (v.change_pct != null ? ` (${signTxt(v.change_pct)} oggi)` : "")
-        + (v.pct_1y != null ? ` — ${Math.round(v.pct_1y)}° percentile dell'anno`
-            + (v.min_1y != null && v.max_1y != null ? `, range ${v.min_1y}–${v.max_1y}` : "") : ""));
+        + (varAnno != null ? ` — ${signTxt(Math.round(varAnno * 10) / 10)} in un anno` : "")
+        + (pos != null && v.min_1y != null && v.max_1y != null
+            ? `, e sta al ${Math.round(pos)}% dell'intervallo annuale ${v.min_1y}–${v.max_1y}` : ""));
     }
     if (pezzi.length) {
       lines.push(`- MATERIE PRIME E SEMICONDUTTORI: ${pezzi.join(" · ")}. `
-        + `Il percentile dice DOVE sta il prezzo nel suo anno, non se sia caro: rame alto = domanda `
-        + `industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo `
-        + `stesso numero — non sommarli in un giudizio unico.`);
+        + `Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la `
+        + `posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso `
+        + `periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due `
+        + `dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione `
+        + `dal lato dei costi, e sono due segni opposti sullo stesso numero.`);
     }
   }
 
@@ -8573,6 +8461,108 @@ function buildPromptSettore(chiave) {
   return [istruzioni, F.join("\n"), testoCorrelazioniMacro(), soloDati].filter(Boolean).join("\n\n");
 }
 
+/* ═══ v316 — LA COLONNA DI TRADINGVIEW, DENTRO IL PACCHETTO ══════════════════════════════════
+   Richiesta del CEO: stagionalita', conto economico, performance e dettagli tecnici. La pipeline
+   li calcola sulla barra giornaliera vera (batteria_tecnica / conto_trimestrale / stagionalita_titolo
+   in scripts/update_data.py); qui si stampano soltanto.
+   ⚠ NON SI LEGGE IL WIDGET DI TERZI: si calcola. Le formule sono pubbliche e l'OHLCV lo scarichiamo
+   gia'. Cosi' il numero e' nostro e sappiamo cosa significa.
+   ⚠ Finche' il CI non ha rigenerato data.json questi campi non ci sono: il blocco allora non
+   esiste, e non si inventa un ripiego calcolato sulle `sparks` — che sono sotto-campionate e
+   senza date, quindi darebbero un RSI e un MACD sbagliati con l'aria di essere giusti. */
+function tvBlocchi(tk) {
+  const r = ((DATA && DATA.watchlist) || []).concat((DATA && DATA.portfolio) || [])
+    .find(x => x && String(x.ticker).toUpperCase() === String(tk).toUpperCase());
+  const tv = r && r.tv;
+  if (!tv) return [];
+  const F = [];
+  const pc = (v) => (v == null ? "n.d." : signTxt(Math.round(v * 10) / 10));
+
+  if (tv.performance) {
+    const et = { s1: "1 settimana", m1: "1 mese", m3: "3 mesi", m6: "6 mesi", ytd: "da inizio anno",
+                 a1: "1 anno", a3: "3 anni", a5: "5 anni", a10: "10 anni" };
+    F.push(``, `--- PERFORMANCE PER ORIZZONTE ---`);
+    F.push(Object.keys(et).filter(k => tv.performance[k] != null)
+      .map(k => `${et[k]} ${pc(tv.performance[k])}`).join(" \u00b7 "));
+    F.push(`Gli orizzonti oltre l'anno sono misurati sulla serie MENSILE, non su una finestra `
+      + `giornaliera corta: un ritorno di un anno con l'etichetta di tre sarebbe un numero fuori orizzonte.`);
+  }
+
+  if (tv.tecnica) {
+    const t = tv.tecnica;
+    F.push(``, `--- DETTAGLI TECNICI (calcolati dal sistema, non letti da terzi) ---`);
+    const ord = ["sma10", "sma20", "sma30", "sma50", "sma100", "sma200", "ema10", "ema20", "ema30", "ema50", "ema100", "ema200"];
+    ord.filter(k => t.medie && t.medie[k]).forEach(k => {
+      const m = t.medie[k];
+      const nome = k.startsWith("sma") ? `Media semplice ${k.slice(3)}` : `Media esponenziale ${k.slice(3)}`;
+      /* ⚠ UNA SOLA CONVENZIONE, e dichiarata: il LIVELLO della media, e dove sta il PREZZO
+         rispetto a lei. In v314 le due famiglie ne usavano due opposte e un LLM vero ha scritto
+         "la SMA200 e' il 75,9% sotto il riferimento" invertendo il verso. */
+      F.push(`${nome}: ${m.liv} — il prezzo le sta ${pc(m.dist_pct)}, cioe' ${m.dist_pct >= 0 ? "SOPRA" : "SOTTO"}`);
+    });
+    if (t.medie_totali) {
+      F.push(`Il prezzo sta sopra ${t.medie_battute} delle ${t.medie_totali} medie calcolate. `
+        + `E' un CONTEGGIO, non un giudizio: il sistema non pubblica piu' verdetti sintetici (v200), `
+        + `perche' un'etichetta compra/vendi ancora la lettura prima ancora che cominci.`);
+    }
+    const o = t.oscillatori || {};
+    const osc = [];
+    if (o.rsi14 != null) osc.push(`RSI 14: ${o.rsi14}`);
+    if (o.macd) osc.push(`MACD 12/26/9: linea ${o.macd.linea}, segnale ${o.macd.segnale}, istogramma ${o.macd.istogramma}`);
+    if (o.stoch_k != null) osc.push(`Stocastico 14/3: %K ${o.stoch_k}${o.stoch_d != null ? `, %D ${o.stoch_d}` : ""}`);
+    if (o.cci20 != null) osc.push(`CCI 20: ${o.cci20}`);
+    if (o.williams_r != null) osc.push(`Williams %R 14: ${o.williams_r}`);
+    if (o.adx14 != null) osc.push(`ADX 14: ${o.adx14} (DI+ ${o.di_su}, DI- ${o.di_giu}) — l'ADX misura la FORZA del trend, non la direzione: sotto 20 il trend e' debole a prescindere dal segno`);
+    if (o.momentum10 != null) osc.push(`Momentum 10 sedute: ${o.momentum10}`);
+    if (osc.length) F.push(`Oscillatori — ${osc.join(" \u00b7 ")}`);
+    if (t._come) F.push(`Metodo: ${t._come}.`);
+  }
+
+  if (tv.conto_trim && tv.conto_trim.length) {
+    F.push(``, `--- CONTO ECONOMICO TRIMESTRALE (ultimi ${tv.conto_trim.length} trimestri) ---`);
+    const mld = (v) => (v == null ? "n.d." : `${(v / 1e9).toFixed(2)} mld`);
+    tv.conto_trim.forEach(q => F.push(`- ${q.trim}: ricavi ${mld(q.ricavi)}`
+      + (q.operativo != null ? ` \u00b7 risultato operativo ${mld(q.operativo)}${q.margine_op != null ? ` (${q.margine_op}%)` : ""}` : "")
+      + (q.utile != null ? ` \u00b7 utile netto ${mld(q.utile)}${q.margine != null ? ` (margine ${q.margine}%)` : ""}` : "")));
+    F.push(`⚠ Il trimestre e' l'unita' in cui una societa' ciclica gira: la serie ANNUALE piu' `
+      + `sopra copre lo stesso periodo ma nasconde il punto di svolta dentro la media dei dodici mesi.`);
+  }
+
+  if (tv.stagionalita && tv.stagionalita.length) {
+    const MESI = ["", "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio",
+                  "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+    const ora = new Date().getMonth() + 1;
+    const vicini = tv.stagionalita.filter(x => [ora, ora % 12 + 1, (ora + 1) % 12 + 1].includes(x.mese));
+    F.push(``, `--- STAGIONALITA' DEL TITOLO (mese per mese, sul suo storico mensile) ---`);
+    (vicini.length ? vicini : tv.stagionalita).forEach(x =>
+      F.push(`- ${MESI[x.mese]}: media ${pc(x.media)}, mediana ${pc(x.mediana)}, `
+        + `${x.positivi_pct}% di mesi positivi su ${x.campione} osservazioni, esiti da ${pc(x.peggio)} a ${pc(x.meglio)}`));
+    F.push(`⚠ Dove media e mediana divergono, la media e' tirata da pochi mesi estremi. E' il conto `
+      + `di cosa e' successo, non una previsione: serve a sapere se un movimento e' ordinario per il periodo.`);
+  }
+
+  if (tv.sensibilita) {
+    F.push(``, `--- COME IL MACRO ARRIVA A ${String(tk).toUpperCase()}: SENSIBILITA' MISURATE ---`);
+    F.push(`Regressione dei rendimenti GIORNALIERI del titolo su quelli di uno strumento quotato che `
+      + `rappresenta il canale. Il beta dice di quanto si muove il titolo per ogni punto del canale; `
+      + `l'R² dice QUANTA della sua variabilita' quel canale spiega davvero.`);
+    Object.entries(tv.sensibilita).forEach(([nome, v]) => {
+      const forza = v.r2 >= 0.4 ? "canale DOMINANTE" : v.r2 >= 0.15 ? "canale presente"
+        : v.r2 >= 0.05 ? "canale debole" : "NESSUNA relazione misurabile su questa finestra";
+      F.push(`- ${nome} (${v.strumento}) — ${v.canale}: beta ${v.beta > 0 ? "+" : ""}${v.beta}, `
+        + `R² ${v.r2} → ${forza}. Campione ${v.campione} sedute comuni, dal ${v.da} al ${v.a}.`);
+    });
+    F.push(`⚠⚠ UN BETA SENZA IL SUO R² E' MEZZO NUMERO. Un beta di 1,8 sui tassi con R² 0,01 non `
+      + `significa "molto sensibile ai tassi": significa che su questa finestra i tassi non spiegano `
+      + `niente del movimento, e il beta e' rumore stimato con tre decimali. La finestra e' comune `
+      + `per costruzione — le due serie sono allineate per DATA, non per posizione.`);
+    F.push(`⚠ Sono relazioni STORICHE su circa un anno, non leggi: un canale puo' accendersi (una `
+      + `societa' che si indebita diventa sensibile ai tassi in un trimestre). Dicono da dove il `
+      + `movimento e' arrivato finora, non da dove arrivera'.`);
+  }
+  return F;
+}
+
 function buildPromptTicker(tkGrezzo) {
   /* ═══ v257 — RISCRITTO DOPO UN FALLIMENTO REALE ═══════════════════════════════════════════
      Il CEO ha incollato il pacchetto in Gemini e si e' sentito rispondere: "Tutti i dati tecnici
@@ -8658,7 +8648,14 @@ function buildPromptTicker(tkGrezzo) {
 `Cosa sta facendo ${tk}, a quale prezzo diventa interessante, cosa lo romperebbe. Nessuna`,
 `tabella, nessuna premessa. Tutto quello che viene dopo serve a sostenere queste cinque righe.`,
 ``,
-`1) QUADRO MACRO — massimo 8 righe, SOLO dai dati in coda a questo messaggio.`,
+`1) QUADRO MACRO — massimo 10 righe, SOLO dai dati in coda a questo messaggio.`,
+`⚠ PARTI DAL BLOCCO "SENSIBILITA' MISURATE" in coda, se c'e': dice quanto di ${tk} e' spiegato`,
+`DAVVERO da ciascun canale (mercato, comparto, tassi, dollaro) sulle sedute in comune. Un canale`,
+`con R² sotto 0,05 NON e' un canale su questa finestra: se vuoi sostenerlo lo stesso, di' perche'`,
+`ti aspetti che si accenda ora — un bilancio che cambia, una scadenza di debito, una quota di`,
+`ricavi esteri — e dichiara che stai andando CONTRO la misura. Raccontare il canale dei tassi su`,
+`un titolo il cui R² sui tassi e' 0,01 e' la forma di analisi che sembra piu' seria di quella`,
+`corretta, ed e' l'errore che quel blocco esiste per impedire.`,
 `Non cercare online il quadro macro e non riassumere tutte le serie: prendi le DUE O TRE`,
 `grandezze che contano per ${tk} e di' attraverso quale canale arrivano al suo conto economico`,
 `— quale tasso, quale costo, quale domanda finale. Guarda anche dove gli indicatori NON sono`,
@@ -8967,6 +8964,7 @@ function datiNostriDelTitolo(tk) {
 `riuscito a trovare o confermare. Se le hai trovate tutte, scrivi "NON VERIFICATO: nessuna".`,
 `Un numero plausibile inventato e' peggio di un buco dichiarato: il buco lo vedo, l'invenzione no.`,
     ...L,
+    ...tvBlocchi(tk),
   ].join("\n");
 }
 
@@ -8995,6 +8993,39 @@ function buildCIOText() {
 }
 
 /* ---------- azione unica: copia il pacchetto completo e mostralo nella modal ---------- */
+/* ═══ v316 — UNA SOLA STRADA PER CONSEGNARE UN PACCHETTO ═══════════════════════════════════
+   Il CEO: "pulsante relativo copia analisi del portafoglio non genera prompt". Il pacchetto
+   veniva generato benissimo — 20.013 caratteri — e poi buttato via: `navigator.clipboard
+   .writeText` viene RIFIUTATA dal browser (NotAllowedError: la clipboard richiede permesso e
+   attivazione, e non sempre ce l'ha), e la promise rifiutata non era gestita. Nessun errore in
+   console per lui, nessun testo, nessun messaggio. Il fallimento piu' silenzioso possibile.
+   ⚠⚠ MA IL DIFETTO VERO ERANO TRE STRADE DIVERSE PER LA STESSA COSA. copyCIOText apriva la
+   modale col testo (e quindi funzionava anche senza clipboard), #set-copia scriveva solo negli
+   appunti e in caso di rifiuto PERDEVA il pacchetto, #pf-copia non gestiva nemmeno il rifiuto.
+   Tre implementazioni della stessa operazione divergono — e' la lezione v161/v207 pagata di
+   nuovo. Ora la strada e' UNA: il testo finisce SEMPRE nel riquadro, che e' l'unico posto da cui
+   il CEO puo' comunque prenderlo; la clipboard e' un di piu' che riesce o dichiara di non essere
+   riuscito. Un pacchetto generato e non consegnato e' un pacchetto non generato. */
+async function consegnaPacchetto(testo, che, esito) {
+  if (!testo) { if (esito) esito.textContent = `${che}: non c'e' niente da consegnare.`; return false; }
+  const box = $("#prompt-text");
+  if (box) box.value = testo;
+  const modale = $("#modal");
+  if (modale) modale.hidden = false;
+  const quanti = `${testo.length.toLocaleString("it")} caratteri`;
+  try {
+    await navigator.clipboard.writeText(testo);
+    if (esito) esito.innerHTML = `<b>${esc(che)} negli appunti</b> — ${quanti}. Incollalo in una chat NUOVA.`;
+    toast(`${che} copiato \u2713`);
+    return true;
+  } catch {
+    /* il rifiuto della clipboard NON e' un fallimento della generazione: il testo e' li'. */
+    if (esito) esito.innerHTML = `<b>${esc(che)} pronto nel riquadro</b> — ${quanti}. `
+      + `Il browser non mi ha dato gli appunti: selezionalo e copialo da li'.`;
+    return false;
+  }
+}
+
 async function copyCIOText() {
   /* ⚠ v259 — UN SOLO BOTTONE. Ce n'erano due, "Copia analisi macro" in topbar e "Copia analisi
      per l'AI" nel box del titolo, e il CEO ha chiesto di unirli: "ci dovrebbe essere un unico
@@ -9022,17 +9053,7 @@ async function copyCIOText() {
     testo = buildCIOText();
     che = "Quadro macro";
   }
-  const box = $("#prompt-text");
-  if (box) box.value = testo;
-  const modale = $("#modal");
-  if (modale) modale.hidden = false;
-  try {
-    await navigator.clipboard.writeText(testo);
-    if (esito) esito.textContent = `${che} copiato (${(testo.length / 1000).toFixed(1)}k caratteri). Non e' stato salvato da nessuna parte.`;
-    toast(`${che} copiato \u2713`);
-  } catch {
-    if (esito) esito.textContent = `${che} pronto nel riquadro: copialo da li' (la clipboard non e' disponibile).`;
-  }
+  await consegnaPacchetto(testo, che, esito);
 }
 
 

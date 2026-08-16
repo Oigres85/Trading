@@ -2523,56 +2523,6 @@ check("v311 portafoglio: la forma parte dai dati veri, non da un elenco separato
   return corpo.includes("DATA.portfolio") && corpo.includes("DATA.watchlist");
 })());
 
-/* ══ v312 — IL VERIFICATORE DEL REFERTO ═════════════════════════════════════════════════
-   L'anello mancante indicato dalla revisione: il sistema e' rigorosissimo sui dati che PRODUCE
-   e non aveva nessuna difesa su quelli che l'LLM porta DENTRO — e misurato, cinque blocchi su
-   nove del pacchetto titolo vengono interamente dalla rete. */
-
-/* ⚠⚠ IL CONFRONTO E' PER TOKEN INTERO, NON PER SOTTOSTRINGA. La prima stesura cercava "8.9"
-   dentro il pacchetto e lo trovava dentro "158.9": DODICI numeri su quattordici risultavano
-   "dal pacchetto" in un referto che ne aveva inventati tre. Un verificatore che assolve tutti
-   e' peggio di nessun verificatore, perche' da' una sicurezza che non c'e'. */
-check("v312 verifica: un referto inventato non trova riscontri", suVeri(`
-  const pac = buildPromptTicker("AMD");
-  const falso = "Il titolo vale 999.11 dollari, i ricavi 77.31 miliardi e il margine 41.77 percento.";
-  const r = verificaReferto(falso, pac);
-  return r.totale === 3 && r.pacchetto === 0 && r.scoperti.length === 3`));
-
-/* ⚠ e uno che cita i numeri VERI li riconosce: un rilevatore che segnala tutto si smette di
-   leggerlo, ed e' successo in questa stessa sessione con un mio detector sulle contraddizioni. */
-check("v312 verifica: i numeri del pacchetto vengono riconosciuti", suVeri(`
-  const r0 = (DATA.watchlist || []).find(x => x && x.ticker === "AMD");
-  if (!r0 || !r0.price) return true;
-  const pac = buildPromptTicker("AMD");
-  const vero = "Il prezzo e " + r0.price + " e la resistenza sta a " + r0.resistance + ".";
-  const r = verificaReferto(vero, pac);
-  return r.pacchetto >= 2 && r.scoperti.length === 0`));
-
-/* ⚠⚠ IL MARCATORE HA LA FONTE DENTRO LA PARENTESI. La testata chiede [VERIFICATO] con fonte e
-   data, e i modelli scrivono "[VERIFICATO, MarketBeat, 14/08/2026]": pretendere la parentesi
-   chiusa subito dopo la parola faceva risultare SCOPERTO un numero correttamente marcato —
-   trovato al primo test, ed e' il difetto che rende un controllo peggio che inutile. */
-check("v312 verifica: riconosce [VERIFICATO] anche con fonte e data dentro", suVeri(`
-  const pac = buildPromptTicker("AMD");
-  const t = "Il target medio e 620.44 dollari [VERIFICATO, MarketBeat, 14/08/2026].";
-  const r = verificaReferto(t, pac);
-  /* ⚠ la DATA dentro il marcatore produce essa stessa un numero (il "14" di 14/08/2026): anche
-     quello cade nel contesto marcato, quindi verificato e' 2 e non 1. Un'asserzione su un
-     conteggio esatto si rompe su un dettaglio del testo — quella che conta e' che NULLA resti
-     scoperto quando il marcatore c'e'. */
-  return r.verificato >= 1 && r.scoperti.length === 0`));
-
-/* ⚠ e il risultato NON deve presentarsi come una prova: un numero che compare nel pacchetto
-   puo' essere stato usato male, e uno scoperto puo' essere corretto. Serve a sapere dove
-   guardare — dirlo e' parte dello strumento, non una postilla. */
-check("v312 verifica: si dichiara euristica, non prova", (() => {
-  const i = src.indexOf("function renderVerifica");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  return corpo.includes("un'euristica, non una prova")
-      && corpo.includes("dove guardare")
-      && corpo.includes("NON VERIFICATO");
-})());
-
 /* ══ v313 — LA ROTAZIONE CAMBIA FORMA, GLI INVARIANTI RESTANO ═══════════════════════════
    Il CEO: "poco intuitivo… la lettura non e' intuitiva e leggibile", e la forma che ha
    descritto lui — verde chi sale, rosso chi scende — era gia' quella giusta. Via le dieci
@@ -2750,6 +2700,138 @@ check("v315 pacchetto libro: senza posizioni lo dice invece di analizzare il vuo
   const _s = DATA;
   DATA = JSON.parse(JSON.stringify(REALE)); DATA.portfolio = []; DATA.watchlist = [];
   try { return /Nessuna posizione/.test(buildPromptPortafoglio()); } finally { DATA = _s; recomputeTotals(); }`));
+
+/* ══ v316 — UNA SOLA STRADA PER CONSEGNARE UN PACCHETTO ════════════════════════════════════
+   Il CEO: "pulsante relativo copia analisi del portafoglio non genera prompt". Il pacchetto si
+   generava e veniva buttato: la clipboard rifiutava e la promise rifiutata non era gestita.
+   ⚠⚠ Ma il difetto vero erano TRE strade diverse per la stessa operazione, e due erano rotte —
+   #set-copia leggeva `#set-input`, la barra che la v313 aveva RIMOSSO, quindi con il comparto
+   correttamente scelto rispondeva "Scegli prima un settore dall'elenco". Verificato in browser
+   sul sito pubblicato. Il gate della v313 controllava che il bottone ESISTESSE, non che fosse
+   COLLEGATO: e' la stessa classe del bottone di modifica: esistenza contro raggiungibilita'. */
+check("v316 consegna: tutti i pacchetti passano dalla stessa funzione", (() => {
+  const usi = (src.match(/consegnaPacchetto\(/g) || []).length;
+  return src.indexOf("async function consegnaPacchetto") >= 0
+      && usi >= 4                                       // la definizione + i tre bottoni
+      && !/writeText\([^)]*\)\.then/.test(src);         // nessuna promise di clipboard non gestita
+})());
+
+check("v316 consegna: il testo finisce SEMPRE nel riquadro, anche se la clipboard rifiuta", (() => {
+  const i = src.indexOf("async function consegnaPacchetto");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "async function", i + 10));
+  const box = corpo.indexOf("box.value = testo");
+  const cli = corpo.indexOf("await navigator.clipboard");
+  return box >= 0 && cli > box;    // prima si consegna, poi si prova la clipboard
+})());
+
+check("v316 settore: il bottone legge il comparto scelto, non la barra rimossa", (() => {
+  const i = src.indexOf('$("#set-copia")');
+  const corpo = src.slice(i, i + 900);
+  return corpo.includes("settoreScelto") && !corpo.includes("#set-input")
+      && readFileSync(join(ROOT, "index.html"), "utf8").indexOf('id="set-input"') < 0;
+})());
+
+/* ══ IL PERCENTILE CHE NON ESISTEVA ════════════════════════════════════════════════════════
+   Trovato leggendo il pacchetto che il CEO ha incollato: "Semiconduttori (SOX) — 116° percentile
+   dell'anno". Un percentile sopra 100 non esiste. Il campo `pct_1y` calcolava la VARIAZIONE a
+   un anno e la pagina la stampava come percentile: l'oro a +31,3% usciva come "31° percentile",
+   cioe' nel terzo BASSO del suo intervallo. La lettura si INVERTE. */
+check("v316 materie: variazione e posizione nell'intervallo, mai 'percentile'", suVeri(`
+  const p = buildPrompt();
+  const r = (p.split(String.fromCharCode(10)).find(x => x.includes("MATERIE PRIME")) || "");
+  if (!r) return true;
+  return !/percentile dell'anno/.test(r)
+      && /in un anno/.test(r) && /dell'intervallo annuale/.test(r)`));
+
+check("v316 materie: la posizione nell'intervallo sta fra 0 e 100", suVeri(`
+  const m = (DATA.macro && DATA.macro.materie) || {};
+  return Object.values(m).every(v => {
+    if (!v || v.min_1y == null || v.max_1y == null || v.value == null) return true;
+    const pos = (v.value - v.min_1y) / (v.max_1y - v.min_1y) * 100;
+    return pos >= -0.01 && pos <= 100.01;
+  })`));
+
+/* ══ LA COLONNA DI TRADINGVIEW, CALCOLATA DA NOI ═══════════════════════════════════════════ */
+const TV_FINTO = {
+  tecnica: { prezzo: 100, medie: { sma200: { liv: 50, dist_pct: 100 }, ema20: { liv: 95, dist_pct: 5.3 } },
+             medie_battute: 2, medie_totali: 2,
+             oscillatori: { rsi14: 56.3, macd: { linea: -4.78, segnale: -18.87, istogramma: 14.09 }, adx14: 15.6, di_su: 20, di_giu: 18 },
+             _come: "formule standard" },
+  performance: { s1: 10.7, m1: 7.5, a1: 717.8, a3: 1304.8 },
+  stagionalita: [{ mese: 8, media: 0.41, mediana: -0.26, positivi_pct: 43, campione: 42, peggio: -31.7, meglio: 26.6 }],
+  sensibilita: { settore: { strumento: "SOXX", canale: "il comparto", beta: 1.46, r2: 0.657, corr: 0.81, campione: 250, da: "2025-08-18", a: "2026-08-14" },
+                 tassi: { strumento: "TLT", canale: "i tassi a lunga", beta: 0.75, r2: 0.007, corr: 0.08, campione: 250, da: "2025-08-18", a: "2026-08-14" } },
+  conto_trim: [{ trim: "2026-05-31", ricavi: 41460000000, utile: 28243000000, operativo: 33318000000, margine: 68.1, margine_op: 80.4 }],
+};
+
+check("v316 titolo: la colonna di TradingView e' nel pacchetto, calcolata da noi", run(`
+  const _s = DATA;
+  DATA = JSON.parse(JSON.stringify(REALE));
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
+  if (!r) { DATA = _s; return true; }
+  r.tv = ${JSON.stringify(TV_FINTO)};
+  recomputeTotals();
+  try {
+    const p = buildPromptTicker("MU");
+    return /PERFORMANCE PER ORIZZONTE/.test(p)
+        && /DETTAGLI TECNICI \\(calcolati dal sistema, non letti da terzi\\)/.test(p)
+        && /CONTO ECONOMICO TRIMESTRALE/.test(p)
+        && /STAGIONALITA' DEL TITOLO/.test(p)
+        && /SENSIBILITA' MISURATE/.test(p);
+  } finally { DATA = _s; recomputeTotals(); }`));
+
+/* ⚠⚠ UN BETA SENZA IL SUO R² E' MEZZO NUMERO: con R² 0,007 il canale dei tassi NON esiste su
+   quella finestra, e un pacchetto che pubblicasse il solo beta inviterebbe a raccontarlo. E' il
+   difetto che il referto reale di ChatGPT ha commesso ("il canale negativo e' il costo del
+   capitale") su un titolo il cui R² sui tassi vale 0,007. */
+check("v316 sensibilita': ogni beta viaggia col suo R², col campione e con la finestra", run(`
+  const _s = DATA;
+  DATA = JSON.parse(JSON.stringify(REALE));
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
+  if (!r) { DATA = _s; return true; }
+  r.tv = ${JSON.stringify(TV_FINTO)};
+  recomputeTotals();
+  try {
+    const p = buildPromptTicker("MU");
+    const righe = p.split(String.fromCharCode(10)).filter(x => /^- (settore|tassi) \\(/.test(x));
+    return righe.length === 2
+        && righe.every(x => /beta [+-]?[\\d.]+/.test(x) && /R² [\\d.]+/.test(x) && /Campione \\d+ sedute comuni/.test(x))
+        && /NESSUNA relazione misurabile/.test(righe.find(x => x.startsWith("- tassi")))
+        && /canale DOMINANTE/.test(righe.find(x => x.startsWith("- settore")));
+  } finally { DATA = _s; recomputeTotals(); }`));
+
+check("v316 titolo: senza i dati della pipeline il blocco non esiste e non si inventa un ripiego", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
+  if (r) delete r.tv;
+  const p = buildPromptTicker("MU");
+  return !/DETTAGLI TECNICI/.test(p) && !/--- COME IL MACRO ARRIVA A/.test(p)
+      && !/PERFORMANCE PER ORIZZONTE/.test(p) && p.length > 5000`));
+
+/* ══ IL PORTAFOGLIO SEGUE IL MERCATO ═══════════════════════════════════════════════════════
+   La condizione era `r.qty`, ma le posizioni portano `qta`: il ramo non entrava mai, e scriveva
+   comunque `gain_pct` mentre la tabella legge `gain_pct_pos`. Prezzo fresco, guadagno vecchio. */
+check("v316 live: il refresh ricalcola il guadagno che la tabella legge davvero", (() => {
+  const i = src.indexOf("const upd = (r) => {");
+  const corpo = src.slice(i, i + 1200);
+  return corpo.includes("r.qta ?? r.qty")
+      && corpo.includes("gain_pct_pos")
+      && src.slice(src.indexOf("renderShockAlert();"), src.indexOf("renderShockAlert();") + 400).includes("renderPortafoglio()");
+})());
+
+check("v316 live: l'obbligazione non viene valutata come un'azione nel refresh", (() => {
+  const i = src.indexOf("const upd = (r) => {");
+  const corpo = src.slice(i, i + 1200);
+  return corpo.includes("qta * r.price / 100") && corpo.includes("startsWith(\"BTP\")");
+})());
+
+/* ⚠ la sezione "verifica del referto" e' stata RIMOSSA su richiesta del CEO: la ricevuta del
+   taglio ha verificato che dentro i confini ci fossero le tre funzioni e nient'altro. */
+check("v316 verifica: la sezione e' via, e non restano riferimenti orfani", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  return html.indexOf('data-sez="verifica"') < 0 && html.indexOf("ver-controlla") < 0
+      && src.indexOf("renderVerifica") < 0 && src.indexOf("verificaReferto") < 0
+      && html.indexOf('data-sez="portafoglio"') >= 0;     // il vicino e' rimasto
+})());
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

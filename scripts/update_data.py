@@ -511,6 +511,245 @@ def bar_asof(serie_o_df):
         return None
 
 
+# ═══ v316 — LA COLONNA DI TRADINGVIEW, CALCOLATA DA NOI ═══════════════════════════════════
+# Il CEO: "nel box tradingview a fianco c'e' una colonna con dati di tradingview per esempio
+# stagionalita', conto economico, performance e dettagli tecnici... possiamo farli tutti nostri
+# affinche' siano parte delle informazioni generate nell'analisi di un titolo?".
+# ⚠⚠ NON SI RAGLIA IL WIDGET, SI CALCOLA. Quei numeri stanno dentro un iframe di terzi: leggerli
+# sarebbe fragile, vietato dai loro termini, e soprattutto INUTILE — le formule sono pubbliche e
+# l'OHLCV ce l'abbiamo gia' scaricato qui. Quello che pubblichiamo lo calcoliamo, con la formula
+# dichiarata: cosi' il numero e' nostro e sappiamo cosa significa.
+# ⚠ E NON SI CALCOLA LATO PAGINA. Le `sparks` in data.json sono SOTTO-CAMPIONATE e SENZA DATE
+# (51 punti per un anno intero): un MACD o un ADX calcolati li' sopra darebbero numeri che
+# sembrano giusti e non lo sono. Qui c'e' la barra giornaliera vera, ed e' l'unico posto dove
+# questi conti si possono fare senza mentire.
+def _ema_serie(s, n):
+    return s.ewm(span=n, adjust=False).mean()
+
+
+def _rsi(c, n=14):
+    d = c.diff()
+    su = d.clip(lower=0).ewm(alpha=1 / n, adjust=False).mean()
+    giu = (-d.clip(upper=0)).ewm(alpha=1 / n, adjust=False).mean()
+    rs = su / giu.replace(0, float("nan"))
+    out = 100 - 100 / (1 + rs)
+    return out.mask(giu.eq(0) & su.gt(0), 100.0).mask(su.eq(0) & giu.gt(0), 0.0)
+
+
+def _adx(h, n=14):
+    """Average Directional Index (Wilder). Misura la FORZA del trend, non la direzione."""
+    import pandas as pd
+    alto, basso, chiu = h["High"], h["Low"], h["Close"]
+    su, giu = alto.diff(), -basso.diff()
+    dm_su = ((su > giu) & (su > 0)) * su
+    dm_giu = ((giu > su) & (giu > 0)) * giu
+    tr = pd.concat([alto - basso, (alto - chiu.shift()).abs(), (basso - chiu.shift()).abs()], axis=1).max(axis=1)
+    atr = tr.ewm(alpha=1 / n, adjust=False).mean()
+    di_su = 100 * dm_su.ewm(alpha=1 / n, adjust=False).mean() / atr.replace(0, float("nan"))
+    di_giu = 100 * dm_giu.ewm(alpha=1 / n, adjust=False).mean() / atr.replace(0, float("nan"))
+    dx = 100 * (di_su - di_giu).abs() / (di_su + di_giu).replace(0, float("nan"))
+    return dx.ewm(alpha=1 / n, adjust=False).mean(), di_su, di_giu
+
+
+def conto_trimestrale(t, quanti=6):
+    """Il CONTO ECONOMICO trimestrale: ricavi, utile netto, margine. La pipeline pubblicava solo
+    l'annuale (4 righe), e su una societa' ciclica l'anno nasconde esattamente cio' che conta —
+    il trimestre in cui la curva gira. ⚠ Yahoo cambia i nomi delle voci: si cercano per
+    ALIAS e se non si trova la voce si lascia il campo vuoto, non si stima."""
+    try:
+        q = t.quarterly_financials
+        if q is None or q.empty:
+            return None
+    except Exception:  # noqa: BLE001
+        return None
+
+    def voce(*nomi):
+        for n in nomi:
+            if n in q.index:
+                return q.loc[n]
+        return None
+
+    ric = voce("Total Revenue", "Operating Revenue", "Revenue")
+    uti = voce("Net Income", "Net Income Common Stockholders", "Net Income From Continuing Operation Net Minority Interest")
+    ope = voce("Operating Income", "Total Operating Income As Reported", "EBIT")
+    if ric is None:
+        return None
+    fuori = []
+    for col in list(q.columns)[:quanti]:
+        try:
+            r = float(ric.get(col)) if ric is not None and ric.get(col) == ric.get(col) else None
+        except Exception:  # noqa: BLE001
+            r = None
+        if r is None:
+            continue
+        def num(s):
+            try:
+                v = float(s.get(col)) if s is not None else None
+                return v if v == v else None
+            except Exception:  # noqa: BLE001
+                return None
+        u, o = num(uti), num(ope)
+        fuori.append({"trim": col.strftime("%Y-%m-%d"), "ricavi": round(r),
+                      "utile": round(u) if u is not None else None,
+                      "operativo": round(o) if o is not None else None,
+                      "margine": round(u / r * 100, 1) if u is not None and r else None,
+                      "margine_op": round(o / r * 100, 1) if o is not None and r else None})
+    return fuori or None
+
+
+def batteria_tecnica(hist):
+    """I 'dettagli tecnici': medie mobili e oscillatori, ognuno con la propria formula standard.
+    ⚠ Il CONTEGGIO delle medie battute e' la sintesi che TradingView chiama 'Moving Averages':
+    non e' un giudizio nostro, e' quante medie il prezzo sta sopra su quante ne esistono. Lo
+    pubblichiamo come conteggio proprio per questo — un'etichetta 'compra/vendi' sarebbe un
+    verdetto, e i verdetti sono stati tolti dal sistema in v200."""
+    if hist is None or len(hist) < 30:
+        return None
+    c, alto, basso = hist["Close"], hist["High"], hist["Low"]
+    p = float(c.iloc[-1])
+    medie = {}
+    for n in (10, 20, 30, 50, 100, 200):
+        if len(c) >= n:
+            sma = float(c.rolling(n).mean().iloc[-1])
+            ema = float(_ema_serie(c, n).iloc[-1])
+            medie[f"sma{n}"] = {"liv": round(sma, 2), "dist_pct": round((p / sma - 1) * 100, 2)}
+            medie[f"ema{n}"] = {"liv": round(ema, 2), "dist_pct": round((p / ema - 1) * 100, 2)}
+    sopra = sum(1 for v in medie.values() if v["dist_pct"] > 0)
+
+    osc = {}
+    rsi = _rsi(c)
+    if rsi.notna().any():
+        osc["rsi14"] = round(float(rsi.iloc[-1]), 1)
+    ml, ms = _ema_serie(c, 12), _ema_serie(c, 26)
+    macd = ml - ms
+    segnale = _ema_serie(macd, 9)
+    osc["macd"] = {"linea": round(float(macd.iloc[-1]), 2), "segnale": round(float(segnale.iloc[-1]), 2),
+                   "istogramma": round(float(macd.iloc[-1] - segnale.iloc[-1]), 2)}
+    if len(c) >= 14:
+        bb, aa = basso.rolling(14).min(), alto.rolling(14).max()
+        k = 100 * (c - bb) / (aa - bb).replace(0, float("nan"))
+        osc["stoch_k"] = round(float(k.iloc[-1]), 1) if k.notna().iloc[-1] else None
+        osc["stoch_d"] = round(float(k.rolling(3).mean().iloc[-1]), 1) if len(k.dropna()) >= 3 else None
+        osc["williams_r"] = round(float(-100 * (aa.iloc[-1] - p) / (aa.iloc[-1] - bb.iloc[-1])), 1) if aa.iloc[-1] != bb.iloc[-1] else None
+    if len(c) >= 20:
+        tp = (alto + basso + c) / 3
+        md = (tp - tp.rolling(20).mean()).abs().rolling(20).mean()
+        cci = (tp - tp.rolling(20).mean()) / (0.015 * md.replace(0, float("nan")))
+        osc["cci20"] = round(float(cci.iloc[-1]), 1) if cci.notna().iloc[-1] else None
+    if len(c) >= 30:
+        adx, dsu, dgiu = _adx(hist)
+        if adx.notna().iloc[-1]:
+            osc["adx14"] = round(float(adx.iloc[-1]), 1)
+            osc["di_su"] = round(float(dsu.iloc[-1]), 1)
+            osc["di_giu"] = round(float(dgiu.iloc[-1]), 1)
+    if len(c) >= 11:
+        osc["momentum10"] = round(float(p - c.iloc[-11]), 2)
+
+    return {"prezzo": round(p, 2), "medie": medie, "medie_battute": sopra, "medie_totali": len(medie),
+            "oscillatori": osc,
+            "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo "
+                     "(auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, "
+                     "stocastico 14/3, CCI 20, Williams %R 14"}
+
+
+def performance_orizzonti(hist, monthly=None):
+    """I ritorni per orizzonte. ⚠ Da qui in avanti l'orizzonte oltre l'anno esce dalla serie
+    MENSILE: chiedere 3 anni a una serie giornaliera di 252 barre darebbe il ritorno di un anno
+    con l'etichetta di tre — un numero fuori orizzonte, peggio di nessun numero (v199)."""
+    if hist is None or hist.empty:
+        return None
+    c = hist["Close"]
+    p = float(c.iloc[-1])
+    out, dispon = {}, len(c)
+    for k, n in (("s1", 5), ("m1", 22), ("m3", 66), ("m6", 126), ("a1", 252)):
+        if dispon > n:
+            out[k] = round((p / float(c.iloc[-(n + 1)]) - 1) * 100, 2)
+    try:  # da inizio anno: la prima seduta dell'anno solare, non 252 sedute fa
+        anno = c[c.index.year == c.index[-1].year]
+        if len(anno) >= 2:
+            out["ytd"] = round((p / float(anno.iloc[0]) - 1) * 100, 2)
+    except Exception:  # noqa: BLE001
+        pass
+    if monthly is not None and len(monthly) > 12:
+        for k, m in (("a1", 12), ("a3", 36), ("a5", 60), ("a10", 120)):
+            if k == "a1" and "a1" in out:
+                continue
+            if len(monthly) > m:
+                out[k] = round((p / float(monthly.iloc[-(m + 1)]) - 1) * 100, 2)
+    return out or None
+
+
+def stagionalita_titolo(monthly, min_anni=8):
+    """Stagionalita' del TITOLO, mese per mese, sul suo storico mensile.
+    ⚠ Sotto `min_anni` osservazioni per mese non si pubblica niente: una 'media' su tre anni fra
+    esiti opposti non e' una stagionalita', e' rumore con un'etichetta. Stessa disciplina gia'
+    applicata alla stagionalita' del Nasdaq."""
+    if monthly is None or len(monthly) < min_anni * 12:
+        return None
+    r = monthly.pct_change().dropna() * 100
+    fuori = []
+    for m in range(1, 13):
+        v = r[r.index.month == m]
+        if len(v) < min_anni:
+            continue
+        fuori.append({"mese": m, "media": round(float(v.mean()), 2), "mediana": round(float(v.median()), 2),
+                      "positivi_pct": round(float((v > 0).mean() * 100)), "campione": int(len(v)),
+                      "peggio": round(float(v.min()), 1), "meglio": round(float(v.max()), 1)})
+    return fuori or None
+
+
+def sensibilita_macro(ret, serie_bench):
+    """IL PONTE MACRO -> TITOLO, MISURATO. Il CEO ha chiesto una sezione su come i dati macro
+    incidono sul titolo. L'unica forma che non sia un oroscopo e' questa: la REGRESSIONE dei
+    rendimenti giornalieri del titolo su quelli di uno strumento che rappresenta il canale.
+    ⚠⚠ IL BETA SENZA R² E SENZA CAMPIONE E' UN NUMERO INVENTATO A META'. Un beta di 1,8 sui tassi
+    con R² 0,02 significa 'nessuna relazione misurabile', e senza l'R² accanto verrebbe letto come
+    'il titolo e' molto sensibile ai tassi'. Qui viaggiano sempre insieme, e la finestra e' comune
+    per costruzione (si allineano le DATE, non le posizioni — lezione v207)."""
+    import pandas as pd
+    if ret is None or len(ret) < 60:
+        return None
+    fuori = {}
+    for nome, (sym, canale, s) in serie_bench.items():
+        if s is None or len(s) < 60:
+            continue
+        rb = s.pct_change().dropna() * 100
+        a, b = ret.align(rb, join="inner")     # finestra COMUNE per date, mai per posizione
+        if len(a) < 60:
+            continue
+        var = float(b.var())
+        if not var:
+            continue
+        beta = float(a.cov(b) / var)
+        corr = float(a.corr(b))
+        fuori[nome] = {"strumento": sym, "canale": canale, "beta": round(beta, 2),
+                       "r2": round(corr * corr, 3), "corr": round(corr, 2),
+                       "campione": int(len(a)), "da": str(a.index[0].date()), "a": str(a.index[-1].date())}
+    return fuori or None
+
+
+# I canali si scaricano UNA VOLTA per run, non una volta per titolo: 23 titoli x 4 canali
+# sarebbero 92 chiamate per un dato che e' lo stesso per tutti.
+_CANALI = {}
+
+
+def canali_macro():
+    """Gli strumenti che rappresentano i canali di trasmissione. Sono ETF QUOTATI, non serie
+    statistiche: hanno la stessa barra giornaliera dei titoli, quindi la finestra comune esiste
+    per costruzione. Un canale 'tassi' preso da FRED avrebbe frequenza e calendario diversi — e
+    confrontare due serie senza giorni in comune e' il difetto che v207 ha gia' pagato."""
+    if _CANALI:
+        return _CANALI
+    for nome, sym, canale in (
+        ("mercato", "QQQ", "il mercato: quanta parte del movimento e' semplicemente indice"),
+        ("settore", "SOXX", "il comparto: quanto e' scommessa sul settore invece che sulla societa'"),
+        ("tassi", "TLT", "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale"),
+        ("dollaro", "UUP", "il dollaro: ricavi esteri e costi in valuta"),
+    ):
+        _CANALI[nome] = (sym, canale, bench_close(sym, period="1y"))
+    return _CANALI
+
+
 def drop_void_bars(hist):
     """Barre senza Close via. Yahoo può appendere la barra ODIERNA con Close=NaN e volume
     valorizzato (visto sul campo, lug 2026: ^KS11 dopo la chiusura coreana) → il prezzo
@@ -1000,6 +1239,14 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "financials": financials,
         "fin_health": fin_health,
         "smc": smc_analysis(hist),
+        # v316 — la colonna di TradingView, calcolata da noi (richiesta del CEO)
+        "tv": {k: v for k, v in (
+            ("tecnica", batteria_tecnica(hist)),
+            ("performance", performance_orizzonti(hist, monthly)),
+            ("stagionalita", stagionalita_titolo(monthly)),
+            ("sensibilita", sensibilita_macro(daily_ret, canali_macro()) if has_fundamentals(ticker, currency) else None),
+            ("conto_trim", conto_trimestrale(t) if has_fundamentals(ticker, currency) else None),
+        ) if v},
         # serie rendimenti giornalieri (uso interno per lo Sharpe di portafoglio; rimossa prima del dump)
         "_ret_series": [round(float(x), 6) for x in daily_ret.tail(252)],
         "_ret_dates": [d.strftime("%Y-%m-%d") for d in daily_ret.index[-252:]],
@@ -1656,8 +1903,15 @@ def fetch_macro():
                 "symbol": sym, "label": label, "unita": unita,
                 "value": round(ultimo, dec) if dec else round(ultimo),
                 "change_pct": round((ultimo / prec - 1) * 100, 2),
-                # posizione nel range dell'anno: e' la lettura che un livello da solo non da'
-                "pct_1y": round((ultimo / float(h.iloc[0]) - 1) * 100, 1),
+                # ⚠⚠ v316 — QUESTO CAMPO SI CHIAMAVA "pct_1y" E IL COMMENTO DICEVA "posizione nel
+                # range dell'anno", ma la formula calcola la VARIAZIONE a 1 anno. app.js la
+                # stampava come "N° percentile dell'anno": l'oro a +31,3% in un anno veniva
+                # pubblicato come "31° percentile", cioe' nel terzo BASSO del suo intervallo.
+                # La lettura si INVERTE — e il semiconduttori usciva a "116° percentile", che non
+                # esiste. Ora sono DUE campi con due nomi veri: la variazione e la posizione.
+                "var_1y": round((ultimo / float(h.iloc[0]) - 1) * 100, 1),
+                "pos_range_1y": (round((ultimo - anno_min) / (anno_max - anno_min) * 100, 1)
+                                 if anno_max > anno_min else None),
                 "min_1y": round(anno_min, dec) if dec else round(anno_min),
                 "max_1y": round(anno_max, dec) if dec else round(anno_max),
                 "history": storia,

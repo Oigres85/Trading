@@ -2254,3 +2254,6 @@ svg.g-serie { cursor: crosshair; }
 .pf-th:hover, .pf-th:focus-visible { color: var(--text); outline: none; }
 .pf-th-on { color: var(--text); }
 .pf-tab tfoot td { border-top: 1px solid var(--border); padding-top: 6px; font-size: 12.5px; }
+
+/* v316 — il puntino che dice "questo prezzo e' del refresh live, non dello snapshot". */
+.pf-live { color: var(--pos, #22c55e); margin-left: 3px; font-weight: 700; }
