@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-08-16T04:35:54Z",
+ "updated_at": "2026-08-16T05:06:04Z",
  "eurusd": 1.1573,
  "totals": {
   "usd_value": 0,
@@ -1047,6 +1047,285 @@
      "hi": 912.94
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 971.66,
+     "medie": {
+      "sma10": {
+       "liv": 893.67,
+       "dist_pct": 8.73
+      },
+      "ema10": {
+       "liv": 906.29,
+       "dist_pct": 7.21
+      },
+      "sma20": {
+       "liv": 890.05,
+       "dist_pct": 9.17
+      },
+      "ema20": {
+       "liv": 904.38,
+       "dist_pct": 7.44
+      },
+      "sma30": {
+       "liv": 905.68,
+       "dist_pct": 7.28
+      },
+      "ema30": {
+       "liv": 909.27,
+       "dist_pct": 6.86
+      },
+      "sma50": {
+       "liv": 960.65,
+       "dist_pct": 1.15
+      },
+      "ema50": {
+       "liv": 894.07,
+       "dist_pct": 8.68
+      },
+      "sma100": {
+       "liv": 778.13,
+       "dist_pct": 24.87
+      },
+      "ema100": {
+       "liv": 794.87,
+       "dist_pct": 22.24
+      },
+      "sma200": {
+       "liv": 552.44,
+       "dist_pct": 75.88
+      },
+      "ema200": {
+       "liv": 623.6,
+       "dist_pct": 55.81
+      }
+     },
+     "medie_battute": 12,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 56.3,
+      "macd": {
+       "linea": -4.78,
+       "segnale": -18.87,
+       "istogramma": 14.09
+      },
+      "stoch_k": 95.0,
+      "stoch_d": 86.3,
+      "williams_r": -5.0,
+      "cci20": 96.9,
+      "adx14": 15.6,
+      "di_su": 27.2,
+      "di_giu": 25.2,
+      "momentum10": 148.63
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 10.72,
+     "m1": 7.45,
+     "m3": 22.19,
+     "m6": 134.85,
+     "ytd": 208.23,
+     "a1": 717.76,
+     "a3": 1304.8,
+     "a5": 1252.01,
+     "a10": 5942.66
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 10.1,
+      "mediana": 9.99,
+      "positivi_pct": 68,
+      "campione": 41,
+      "peggio": -22.1,
+      "meglio": 54.3
+     },
+     {
+      "mese": 2,
+      "media": 5.72,
+      "mediana": 5.29,
+      "positivi_pct": 62,
+      "campione": 42,
+      "peggio": -51.6,
+      "meglio": 56.5
+     },
+     {
+      "mese": 3,
+      "media": 2.13,
+      "mediana": 1.07,
+      "positivi_pct": 52,
+      "campione": 42,
+      "peggio": -20.6,
+      "meglio": 31.2
+     },
+     {
+      "mese": 4,
+      "media": 2.36,
+      "mediana": 0.88,
+      "positivi_pct": 50,
+      "campione": 42,
+      "peggio": -28.0,
+      "meglio": 53.1
+     },
+     {
+      "mese": 5,
+      "media": 6.49,
+      "mediana": 6.08,
+      "positivi_pct": 67,
+      "campione": 42,
+      "peggio": -24.1,
+      "meglio": 87.8
+     },
+     {
+      "mese": 6,
+      "media": -0.84,
+      "mediana": 1.43,
+      "positivi_pct": 52,
+      "campione": 42,
+      "peggio": -32.5,
+      "meglio": 30.5
+     },
+     {
+      "mese": 7,
+      "media": 0.78,
+      "mediana": -1.67,
+      "positivi_pct": 43,
+      "campione": 42,
+      "peggio": -28.7,
+      "meglio": 52.2
+     },
+     {
+      "mese": 8,
+      "media": 0.41,
+      "mediana": -0.26,
+      "positivi_pct": 43,
+      "campione": 42,
+      "peggio": -31.7,
+      "meglio": 26.6
+     },
+     {
+      "mese": 9,
+      "media": -0.25,
+      "mediana": -2.73,
+      "positivi_pct": 49,
+      "campione": 41,
+      "peggio": -49.9,
+      "meglio": 40.6
+     },
+     {
+      "mese": 10,
+      "media": -0.56,
+      "mediana": -2.33,
+      "positivi_pct": 46,
+      "campione": 41,
+      "peggio": -36.1,
+      "meglio": 33.8
+     },
+     {
+      "mese": 11,
+      "media": 2.62,
+      "mediana": -0.08,
+      "positivi_pct": 49,
+      "campione": 41,
+      "peggio": -41.8,
+      "meglio": 97.2
+     },
+     {
+      "mese": 12,
+      "media": 3.7,
+      "mediana": 3.08,
+      "positivi_pct": 61,
+      "campione": 41,
+      "peggio": -38.4,
+      "meglio": 78.8
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.03,
+      "r2": 0.488,
+      "corr": 0.7,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.01,
+      "r2": 0.666,
+      "corr": 0.82,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.01,
+      "r2": 0.007,
+      "corr": 0.09,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.02,
+      "r2": 0.021,
+      "corr": -0.15,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-05-31",
+      "ricavi": 41456000000,
+      "utile": 28243000000,
+      "operativo": 33318000000,
+      "margine": 68.1,
+      "margine_op": 80.4
+     },
+     {
+      "trim": "2026-02-28",
+      "ricavi": 23860000000,
+      "utile": 13785000000,
+      "operativo": 16135000000,
+      "margine": 57.8,
+      "margine_op": 67.6
+     },
+     {
+      "trim": "2025-11-30",
+      "ricavi": 13643000000,
+      "utile": 5240000000,
+      "operativo": 6136000000,
+      "margine": 38.4,
+      "margine_op": 45.0
+     },
+     {
+      "trim": "2025-08-31",
+      "ricavi": 11315000000,
+      "utile": 3201000000,
+      "operativo": 3693000000,
+      "margine": 28.3,
+      "margine_op": 32.6
+     },
+     {
+      "trim": "2025-05-31",
+      "ricavi": 9301000000,
+      "utile": 1885000000,
+      "operativo": 2169000000,
+      "margine": 20.3,
+      "margine_op": 23.3
+     }
+    ]
+   },
    "rs_1m": 9.3,
    "rs_bench": "sox",
    "rs_ndx_1m": 10.4,
@@ -2031,6 +2310,285 @@
      "hi": 484.5
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 514.39,
+     "medie": {
+      "sma10": {
+       "liv": 488.21,
+       "dist_pct": 5.36
+      },
+      "ema10": {
+       "liv": 489.48,
+       "dist_pct": 5.09
+      },
+      "sma20": {
+       "liv": 494.24,
+       "dist_pct": 4.08
+      },
+      "ema20": {
+       "liv": 494.11,
+       "dist_pct": 4.11
+      },
+      "sma30": {
+       "liv": 506.11,
+       "dist_pct": 1.64
+      },
+      "ema30": {
+       "liv": 496.45,
+       "dist_pct": 3.61
+      },
+      "sma50": {
+       "liv": 510.4,
+       "dist_pct": 0.78
+      },
+      "ema50": {
+       "liv": 486.91,
+       "dist_pct": 5.64
+      },
+      "sma100": {
+       "liv": 428.92,
+       "dist_pct": 19.93
+      },
+      "ema100": {
+       "liv": 437.03,
+       "dist_pct": 17.7
+      },
+      "sma200": {
+       "liv": 324.33,
+       "dist_pct": 58.6
+      },
+      "ema200": {
+       "liv": 361.8,
+       "dist_pct": 42.18
+      }
+     },
+     "medie_battute": 12,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 53.7,
+      "macd": {
+       "linea": -6.12,
+       "segnale": -7.7,
+       "istogramma": 1.58
+      },
+      "stoch_k": 85.2,
+      "stoch_d": 62.6,
+      "williams_r": -14.8,
+      "cci20": 24.3,
+      "adx14": 10.0,
+      "di_su": 28.4,
+      "di_giu": 25.3,
+      "momentum10": 38.24
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 6.42,
+     "m1": -2.79,
+     "m3": 12.12,
+     "m6": 149.78,
+     "ytd": 130.18,
+     "a1": 216.29,
+     "a3": 386.56,
+     "a5": 364.59,
+     "a10": 6851.22
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 6.52,
+      "mediana": 2.49,
+      "positivi_pct": 59,
+      "campione": 41,
+      "peggio": -28.2,
+      "meglio": 78.1
+     },
+     {
+      "mese": 2,
+      "media": 3.44,
+      "mediana": 2.95,
+      "positivi_pct": 55,
+      "campione": 42,
+      "peggio": -22.1,
+      "meglio": 39.4
+     },
+     {
+      "mese": 3,
+      "media": 5.42,
+      "mediana": 2.65,
+      "positivi_pct": 60,
+      "campione": 42,
+      "peggio": -18.3,
+      "meglio": 49.4
+     },
+     {
+      "mese": 4,
+      "media": 4.71,
+      "mediana": 3.19,
+      "positivi_pct": 60,
+      "campione": 42,
+      "peggio": -24.0,
+      "meglio": 74.3
+     },
+     {
+      "mese": 5,
+      "media": 5.02,
+      "mediana": 2.01,
+      "positivi_pct": 55,
+      "campione": 42,
+      "peggio": -29.5,
+      "meglio": 45.6
+     },
+     {
+      "mese": 6,
+      "media": -4.59,
+      "mediana": -4.57,
+      "positivi_pct": 38,
+      "campione": 42,
+      "peggio": -44.4,
+      "meglio": 28.1
+     },
+     {
+      "mese": 7,
+      "media": -2.78,
+      "mediana": -4.96,
+      "positivi_pct": 40,
+      "campione": 42,
+      "peggio": -36.8,
+      "meglio": 47.2
+     },
+     {
+      "mese": 8,
+      "media": 4.83,
+      "mediana": 3.81,
+      "positivi_pct": 60,
+      "campione": 42,
+      "peggio": -25.8,
+      "meglio": 54.7
+     },
+     {
+      "mese": 9,
+      "media": -4.05,
+      "mediana": -4.65,
+      "positivi_pct": 32,
+      "campione": 41,
+      "peggio": -39.9,
+      "meglio": 42.8
+     },
+     {
+      "mese": 10,
+      "media": -1.22,
+      "mediana": -5.73,
+      "positivi_pct": 39,
+      "campione": 41,
+      "peggio": -47.7,
+      "meglio": 58.3
+     },
+     {
+      "mese": 11,
+      "media": 9.1,
+      "mediana": 11.32,
+      "positivi_pct": 61,
+      "campione": 41,
+      "peggio": -32.6,
+      "meglio": 52.4
+     },
+     {
+      "mese": 12,
+      "media": 1.24,
+      "mediana": 1.4,
+      "positivi_pct": 51,
+      "campione": 41,
+      "peggio": -28.2,
+      "meglio": 38.1
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.03,
+      "r2": 0.492,
+      "corr": 0.7,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.01,
+      "r2": 0.59,
+      "corr": 0.77,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.01,
+      "r2": 0.005,
+      "corr": 0.07,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.02,
+      "r2": 0.025,
+      "corr": -0.16,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-06-30",
+      "ricavi": 11536000000,
+      "utile": 2297000000,
+      "operativo": 1990000000,
+      "margine": 19.9,
+      "margine_op": 17.3
+     },
+     {
+      "trim": "2026-03-31",
+      "ricavi": 10253000000,
+      "utile": 1383000000,
+      "operativo": 1476000000,
+      "margine": 13.5,
+      "margine_op": 14.4
+     },
+     {
+      "trim": "2025-12-31",
+      "ricavi": 10270000000,
+      "utile": 1511000000,
+      "operativo": 1752000000,
+      "margine": 14.7,
+      "margine_op": 17.1
+     },
+     {
+      "trim": "2025-09-30",
+      "ricavi": 9246000000,
+      "utile": 1243000000,
+      "operativo": 1270000000,
+      "margine": 13.4,
+      "margine_op": 13.7
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 7685000000,
+      "utile": 872000000,
+      "operativo": -134000000,
+      "margine": 11.3,
+      "margine_op": -1.7
+     }
+    ]
+   },
    "rs_1m": -1.9,
    "rs_bench": "sox",
    "rs_ndx_1m": -0.8,
@@ -2847,6 +3405,285 @@
      "hi": 207.54
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 225.16,
+     "medie": {
+      "sma10": {
+       "liv": 219.04,
+       "dist_pct": 2.8
+      },
+      "ema10": {
+       "liv": 218.59,
+       "dist_pct": 3.01
+      },
+      "sma20": {
+       "liv": 210.39,
+       "dist_pct": 7.02
+      },
+      "ema20": {
+       "liv": 213.59,
+       "dist_pct": 5.42
+      },
+      "sma30": {
+       "liv": 208.54,
+       "dist_pct": 7.97
+      },
+      "ema30": {
+       "liv": 211.21,
+       "dist_pct": 6.61
+      },
+      "sma50": {
+       "liv": 206.52,
+       "dist_pct": 9.03
+      },
+      "ema50": {
+       "liv": 208.73,
+       "dist_pct": 7.87
+      },
+      "sma100": {
+       "liv": 204.17,
+       "dist_pct": 10.28
+      },
+      "ema100": {
+       "liv": 204.08,
+       "dist_pct": 10.33
+      },
+      "sma200": {
+       "liv": 194.75,
+       "dist_pct": 15.62
+      },
+      "ema200": {
+       "liv": 197.5,
+       "dist_pct": 14.0
+      }
+     },
+     "medie_battute": 12,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 63.0,
+      "macd": {
+       "linea": 5.28,
+       "segnale": 3.23,
+       "istogramma": 2.05
+      },
+      "stoch_k": 93.8,
+      "stoch_d": 95.2,
+      "williams_r": -6.2,
+      "cci20": 111.2,
+      "adx14": 20.3,
+      "di_su": 27.3,
+      "di_giu": 14.7,
+      "momentum10": 24.41
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 0.54,
+     "m1": 5.96,
+     "m3": 2.73,
+     "m6": 20.59,
+     "ytd": 19.37,
+     "a1": 29.44,
+     "a3": 357.09,
+     "a5": 909.15,
+     "a10": 14845.62
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 3.38,
+      "mediana": -1.49,
+      "positivi_pct": 41,
+      "campione": 27,
+      "peggio": -27.7,
+      "meglio": 57.6
+     },
+     {
+      "mese": 2,
+      "media": 7.42,
+      "mediana": 4.49,
+      "positivi_pct": 68,
+      "campione": 28,
+      "peggio": -22.4,
+      "meglio": 72.7
+     },
+     {
+      "mese": 3,
+      "media": 4.73,
+      "mediana": 1.5,
+      "positivi_pct": 54,
+      "campione": 28,
+      "peggio": -18.5,
+      "meglio": 45.3
+     },
+     {
+      "mese": 4,
+      "media": 0.4,
+      "mediana": 1.43,
+      "positivi_pct": 57,
+      "campione": 28,
+      "peggio": -32.0,
+      "meglio": 28.3
+     },
+     {
+      "mese": 5,
+      "media": 10.91,
+      "mediana": 5.71,
+      "positivi_pct": 75,
+      "campione": 28,
+      "peggio": -25.1,
+      "meglio": 82.6
+     },
+     {
+      "mese": 6,
+      "media": -1.07,
+      "mediana": -0.63,
+      "positivi_pct": 50,
+      "campione": 28,
+      "peggio": -48.7,
+      "meglio": 23.2
+     },
+     {
+      "mese": 7,
+      "media": -1.43,
+      "mediana": 0.8,
+      "positivi_pct": 54,
+      "campione": 28,
+      "peggio": -38.9,
+      "meglio": 21.5
+     },
+     {
+      "mese": 8,
+      "media": 7.86,
+      "mediana": 6.62,
+      "positivi_pct": 75,
+      "campione": 28,
+      "peggio": -19.2,
+      "meglio": 39.8
+     },
+     {
+      "mese": 9,
+      "media": -1.84,
+      "mediana": 1.65,
+      "positivi_pct": 59,
+      "campione": 27,
+      "peggio": -35.1,
+      "meglio": 25.2
+     },
+     {
+      "mese": 10,
+      "media": 5.54,
+      "mediana": 5.91,
+      "positivi_pct": 59,
+      "campione": 27,
+      "peggio": -25.0,
+      "meglio": 56.0
+     },
+     {
+      "mese": 11,
+      "media": 9.79,
+      "mediana": 7.77,
+      "positivi_pct": 78,
+      "campione": 27,
+      "peggio": -34.8,
+      "meglio": 56.5
+     },
+     {
+      "mese": 12,
+      "media": 3.32,
+      "mediana": 2.69,
+      "positivi_pct": 63,
+      "campione": 27,
+      "peggio": -32.8,
+      "meglio": 43.0
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.01,
+      "r2": 0.467,
+      "corr": 0.68,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.0,
+      "r2": 0.344,
+      "corr": 0.59,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.0,
+      "r2": 0.004,
+      "corr": 0.06,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.01,
+      "r2": 0.009,
+      "corr": -0.09,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-04-30",
+      "ricavi": 81615000000,
+      "utile": 58321000000,
+      "operativo": 53536000000,
+      "margine": 71.5,
+      "margine_op": 65.6
+     },
+     {
+      "trim": "2026-01-31",
+      "ricavi": 68127000000,
+      "utile": 42960000000,
+      "operativo": 44299000000,
+      "margine": 63.1,
+      "margine_op": 65.0
+     },
+     {
+      "trim": "2025-10-31",
+      "ricavi": 57006000000,
+      "utile": 31910000000,
+      "operativo": 36010000000,
+      "margine": 56.0,
+      "margine_op": 63.2
+     },
+     {
+      "trim": "2025-07-31",
+      "ricavi": 46743000000,
+      "utile": 26422000000,
+      "operativo": 28440000000,
+      "margine": 56.5,
+      "margine_op": 60.8
+     },
+     {
+      "trim": "2025-04-30",
+      "ricavi": 44062000000,
+      "utile": 18775000000,
+      "operativo": 21638000000,
+      "margine": 42.6,
+      "margine_op": 49.1
+     }
+    ]
+   },
    "rs_1m": 3.9,
    "rs_bench": "sox",
    "rs_ndx_1m": 5.0,
@@ -3593,6 +4430,285 @@
      "hi": 334.2
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 345.9,
+     "medie": {
+      "sma10": {
+       "liv": 356.28,
+       "dist_pct": -2.91
+      },
+      "ema10": {
+       "liv": 349.6,
+       "dist_pct": -1.06
+      },
+      "sma20": {
+       "liv": 346.41,
+       "dist_pct": -0.15
+      },
+      "ema20": {
+       "liv": 350.27,
+       "dist_pct": -1.25
+      },
+      "sma30": {
+       "liv": 350.79,
+       "dist_pct": -1.4
+      },
+      "ema30": {
+       "liv": 351.37,
+       "dist_pct": -1.56
+      },
+      "sma50": {
+       "liv": 353.89,
+       "dist_pct": -2.26
+      },
+      "ema50": {
+       "liv": 352.67,
+       "dist_pct": -1.92
+      },
+      "sma100": {
+       "liv": 352.5,
+       "dist_pct": -1.87
+      },
+      "ema100": {
+       "liv": 347.35,
+       "dist_pct": -0.42
+      },
+      "sma200": {
+       "liv": 331.1,
+       "dist_pct": 4.47
+      },
+      "ema200": {
+       "liv": 325.75,
+       "dist_pct": 6.19
+      }
+     },
+     "medie_battute": 2,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 47.0,
+      "macd": {
+       "linea": -1.13,
+       "segnale": -0.96,
+       "istogramma": -0.17
+      },
+      "stoch_k": 35.7,
+      "stoch_d": 37.1,
+      "williams_r": -64.3,
+      "cci20": 0.5,
+      "adx14": 12.4,
+      "di_su": 28.1,
+      "di_giu": 26.1,
+      "momentum10": -10.23
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": -2.37,
+     "m1": -6.75,
+     "m3": -10.94,
+     "m6": 12.09,
+     "ytd": 9.9,
+     "a1": 62.93,
+     "a3": 156.27,
+     "a5": 141.17,
+     "a10": 783.63
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 2.28,
+      "mediana": 4.28,
+      "positivi_pct": 77,
+      "campione": 22,
+      "peggio": -18.4,
+      "meglio": 12.2
+     },
+     {
+      "mese": 2,
+      "media": -2.96,
+      "mediana": -0.88,
+      "positivi_pct": 36,
+      "campione": 22,
+      "peggio": -16.5,
+      "meglio": 10.6
+     },
+     {
+      "mese": 3,
+      "media": 0.12,
+      "mediana": 1.14,
+      "positivi_pct": 55,
+      "campione": 22,
+      "peggio": -13.2,
+      "meglio": 15.2
+     },
+     {
+      "mese": 4,
+      "media": 5.29,
+      "mediana": 3.18,
+      "positivi_pct": 64,
+      "campione": 22,
+      "peggio": -17.9,
+      "meglio": 33.8
+     },
+     {
+      "mese": 5,
+      "media": 3.28,
+      "mediana": 5.5,
+      "positivi_pct": 64,
+      "campione": 22,
+      "peggio": -11.0,
+      "meglio": 26.0
+     },
+     {
+      "mese": 6,
+      "media": -0.4,
+      "mediana": -0.55,
+      "positivi_pct": 45,
+      "campione": 22,
+      "peggio": -10.1,
+      "meglio": 12.8
+     },
+     {
+      "mese": 7,
+      "media": 5.12,
+      "mediana": 5.92,
+      "positivi_pct": 68,
+      "campione": 22,
+      "peggio": -10.0,
+      "meglio": 21.8
+     },
+     {
+      "mese": 8,
+      "media": 0.01,
+      "mediana": -0.4,
+      "positivi_pct": 45,
+      "campione": 22,
+      "peggio": -10.4,
+      "meglio": 10.9
+     },
+     {
+      "mese": 9,
+      "media": 2.71,
+      "mediana": 1.87,
+      "positivi_pct": 64,
+      "campione": 22,
+      "peggio": -13.5,
+      "meglio": 26.6
+     },
+     {
+      "mese": 10,
+      "media": 8.69,
+      "mediana": 9.2,
+      "positivi_pct": 73,
+      "campione": 22,
+      "peggio": -10.3,
+      "meglio": 47.1
+     },
+     {
+      "mese": 11,
+      "media": 1.08,
+      "mediana": 1.76,
+      "positivi_pct": 64,
+      "campione": 22,
+      "peggio": -18.5,
+      "meglio": 13.9
+     },
+     {
+      "mese": 12,
+      "media": 1.83,
+      "mediana": 2.11,
+      "positivi_pct": 68,
+      "campione": 22,
+      "peggio": -12.6,
+      "meglio": 12.2
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.01,
+      "r2": 0.24,
+      "corr": 0.49,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.0,
+      "r2": 0.079,
+      "corr": 0.28,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.01,
+      "r2": 0.026,
+      "corr": 0.16,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.01,
+      "r2": 0.058,
+      "corr": -0.24,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-06-30",
+      "ricavi": 119796000000,
+      "utile": 112193000000,
+      "operativo": 40770000000,
+      "margine": 93.7,
+      "margine_op": 34.0
+     },
+     {
+      "trim": "2026-03-31",
+      "ricavi": 109896000000,
+      "utile": 62578000000,
+      "operativo": 39696000000,
+      "margine": 56.9,
+      "margine_op": 36.1
+     },
+     {
+      "trim": "2025-12-31",
+      "ricavi": 113829000000,
+      "utile": 34455000000,
+      "operativo": 35934000000,
+      "margine": 30.3,
+      "margine_op": 31.6
+     },
+     {
+      "trim": "2025-09-30",
+      "ricavi": 102346000000,
+      "utile": 34979000000,
+      "operativo": 31228000000,
+      "margine": 34.2,
+      "margine_op": 30.5
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 96428000000,
+      "utile": 28196000000,
+      "operativo": 31271000000,
+      "margine": 29.2,
+      "margine_op": 32.4
+     }
+    ]
+   },
    "rs_1m": -5.9,
    "rs_bench": "ndx",
    "rs_ndx_1m": -5.9,
@@ -4148,6 +5264,174 @@
      "lo": 171.04,
      "hi": 174.07
     }
+   },
+   "tv": {
+    "tecnica": {
+     "prezzo": 174.04,
+     "medie": {
+      "sma10": {
+       "liv": 164.89,
+       "dist_pct": 5.55
+      },
+      "ema10": {
+       "liv": 164.39,
+       "dist_pct": 5.87
+      },
+      "sma20": {
+       "liv": 145.53,
+       "dist_pct": 19.59
+      },
+      "ema20": {
+       "liv": 152.9,
+       "dist_pct": 13.83
+      },
+      "sma30": {
+       "liv": 141.0,
+       "dist_pct": 23.43
+      },
+      "ema30": {
+       "liv": 146.97,
+       "dist_pct": 18.42
+      },
+      "sma50": {
+       "liv": 134.99,
+       "dist_pct": 28.93
+      },
+      "ema50": {
+       "liv": 142.14,
+       "dist_pct": 22.44
+      },
+      "sma100": {
+       "liv": 138.27,
+       "dist_pct": 25.87
+      },
+      "ema100": {
+       "liv": 141.96,
+       "dist_pct": 22.6
+      },
+      "sma200": {
+       "liv": 152.09,
+       "dist_pct": 14.43
+      },
+      "ema200": {
+       "liv": 148.85,
+       "dist_pct": 16.92
+      }
+     },
+     "medie_battute": 12,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 68.1,
+      "macd": {
+       "linea": 12.56,
+       "segnale": 8.54,
+       "istogramma": 4.02
+      },
+      "stoch_k": 90.1,
+      "stoch_d": 91.6,
+      "williams_r": -9.9,
+      "cci20": 121.9,
+      "adx14": 28.4,
+      "di_su": 44.1,
+      "di_giu": 16.5,
+      "momentum10": 50.98
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 1.18,
+     "m1": 30.11,
+     "m3": 27.14,
+     "m6": 34.78,
+     "ytd": 3.68,
+     "a1": 11.06,
+     "a3": 1061.82,
+     "a5": 560.74
+    },
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.01,
+      "r2": 0.185,
+      "corr": 0.43,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.0,
+      "r2": 0.044,
+      "corr": 0.21,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.0,
+      "r2": 0.001,
+      "corr": 0.04,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.01,
+      "r2": 0.011,
+      "corr": -0.1,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-06-30",
+      "ricavi": 1935464000,
+      "utile": 1061890000,
+      "operativo": 912004000,
+      "margine": 54.9,
+      "margine_op": 47.1
+     },
+     {
+      "trim": "2026-03-31",
+      "ricavi": 1632583000,
+      "utile": 870527000,
+      "operativo": 753998000,
+      "margine": 53.3,
+      "margine_op": 46.2
+     },
+     {
+      "trim": "2025-12-31",
+      "ricavi": 1406802000,
+      "utile": 608676000,
+      "operativo": 575394000,
+      "margine": 43.3,
+      "margine_op": 40.9
+     },
+     {
+      "trim": "2025-09-30",
+      "ricavi": 1181092000,
+      "utile": 475599000,
+      "operativo": 393256000,
+      "margine": 40.3,
+      "margine_op": 33.3
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 1003697000,
+      "utile": 326727000,
+      "operativo": 269317000,
+      "margine": 32.6,
+      "margine_op": 26.8
+     }
+    ]
    },
    "rs_1m": 25.9,
    "rs_bench": "ndx",
@@ -5118,6 +6402,285 @@
      "lo": 144.39,
      "hi": 145.0
     }
+   },
+   "tv": {
+    "tecnica": {
+     "prezzo": 150.52,
+     "medie": {
+      "sma10": {
+       "liv": 147.9,
+       "dist_pct": 1.77
+      },
+      "ema10": {
+       "liv": 146.47,
+       "dist_pct": 2.77
+      },
+      "sma20": {
+       "liv": 135.17,
+       "dist_pct": 11.36
+      },
+      "ema20": {
+       "liv": 142.5,
+       "dist_pct": 5.63
+      },
+      "sma30": {
+       "liv": 135.16,
+       "dist_pct": 11.37
+      },
+      "ema30": {
+       "liv": 143.79,
+       "dist_pct": 4.68
+      },
+      "sma50": {
+       "liv": 152.08,
+       "dist_pct": -1.03
+      },
+      "ema50": {
+       "liv": 149.44,
+       "dist_pct": 0.72
+      },
+      "sma100": {
+       "liv": 163.87,
+       "dist_pct": -8.15
+      },
+      "ema100": {
+       "liv": 160.26,
+       "dist_pct": -6.08
+      },
+      "sma200": {
+       "liv": 175.09,
+       "dist_pct": -14.03
+      },
+      "ema200": {
+       "liv": 177.7,
+       "dist_pct": -15.29
+      }
+     },
+     "medie_battute": 7,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 56.1,
+      "macd": {
+       "linea": 2.13,
+       "segnale": -1.73,
+       "istogramma": 3.85
+      },
+      "stoch_k": 80.5,
+      "stoch_d": 89.9,
+      "williams_r": -19.5,
+      "cci20": 78.2,
+      "adx14": 24.6,
+      "di_su": 26.7,
+      "di_giu": 20.7,
+      "momentum10": 20.65
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 2.38,
+     "m1": 13.61,
+     "m3": -22.08,
+     "m6": -3.14,
+     "ytd": -22.35,
+     "a1": -32.68,
+     "a3": 29.52,
+     "a5": 80.65,
+     "a10": 323.96
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 4.52,
+      "mediana": 2.72,
+      "positivi_pct": 62,
+      "campione": 40,
+      "peggio": -15.3,
+      "meglio": 30.1
+     },
+     {
+      "mese": 2,
+      "media": 1.82,
+      "mediana": 0.84,
+      "positivi_pct": 52,
+      "campione": 40,
+      "peggio": -34.8,
+      "meglio": 48.6
+     },
+     {
+      "mese": 3,
+      "media": -0.25,
+      "mediana": 1.39,
+      "positivi_pct": 52,
+      "campione": 40,
+      "peggio": -32.5,
+      "meglio": 28.2
+     },
+     {
+      "mese": 4,
+      "media": 1.5,
+      "mediana": 2.4,
+      "positivi_pct": 73,
+      "campione": 41,
+      "peggio": -21.6,
+      "meglio": 20.5
+     },
+     {
+      "mese": 5,
+      "media": 2.87,
+      "mediana": 1.51,
+      "positivi_pct": 61,
+      "campione": 41,
+      "peggio": -21.1,
+      "meglio": 39.9
+     },
+     {
+      "mese": 6,
+      "media": 6.1,
+      "mediana": 3.97,
+      "positivi_pct": 68,
+      "campione": 41,
+      "peggio": -35.1,
+      "meglio": 49.6
+     },
+     {
+      "mese": 7,
+      "media": 0.8,
+      "mediana": 2.0,
+      "positivi_pct": 59,
+      "campione": 41,
+      "peggio": -36.4,
+      "meglio": 22.1
+     },
+     {
+      "mese": 8,
+      "media": -0.31,
+      "mediana": 0.8,
+      "positivi_pct": 54,
+      "campione": 41,
+      "peggio": -32.5,
+      "meglio": 23.3
+     },
+     {
+      "mese": 9,
+      "media": 3.73,
+      "mediana": 2.71,
+      "positivi_pct": 55,
+      "campione": 40,
+      "peggio": -44.1,
+      "meglio": 46.1
+     },
+     {
+      "mese": 10,
+      "media": 2.73,
+      "mediana": 1.88,
+      "positivi_pct": 57,
+      "campione": 40,
+      "peggio": -23.1,
+      "meglio": 29.6
+     },
+     {
+      "mese": 11,
+      "media": 3.05,
+      "mediana": 3.08,
+      "positivi_pct": 62,
+      "campione": 40,
+      "peggio": -23.1,
+      "meglio": 46.5
+     },
+     {
+      "mese": 12,
+      "media": 2.94,
+      "mediana": -1.56,
+      "positivi_pct": 45,
+      "campione": 40,
+      "peggio": -33.0,
+      "meglio": 65.3
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.01,
+      "r2": 0.179,
+      "corr": 0.42,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.0,
+      "r2": 0.109,
+      "corr": 0.33,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.01,
+      "r2": 0.013,
+      "corr": 0.11,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.02,
+      "r2": 0.019,
+      "corr": -0.14,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-05-31",
+      "ricavi": 19184000000,
+      "utile": 4304000000,
+      "operativo": 6955000000,
+      "margine": 22.4,
+      "margine_op": 36.3
+     },
+     {
+      "trim": "2026-02-28",
+      "ricavi": 17190000000,
+      "utile": 3721000000,
+      "operativo": 5637000000,
+      "margine": 21.6,
+      "margine_op": 32.8
+     },
+     {
+      "trim": "2025-11-30",
+      "ricavi": 16058000000,
+      "utile": 6135000000,
+      "operativo": 5158000000,
+      "margine": 38.2,
+      "margine_op": 32.1
+     },
+     {
+      "trim": "2025-08-31",
+      "ricavi": 14926000000,
+      "utile": 2927000000,
+      "operativo": 4692000000,
+      "margine": 19.6,
+      "margine_op": 31.4
+     },
+     {
+      "trim": "2025-05-31",
+      "ricavi": 15903000000,
+      "utile": 3427000000,
+      "operativo": 5191000000,
+      "margine": 21.5,
+      "margine_op": 32.6
+     }
+    ]
    },
    "rs_1m": 17.8,
    "rs_bench": "sp500",
@@ -6178,6 +7741,285 @@
      "hi": 457.07
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 508.8,
+     "medie": {
+      "sma10": {
+       "liv": 480.72,
+       "dist_pct": 5.84
+      },
+      "ema10": {
+       "liv": 481.72,
+       "dist_pct": 5.62
+      },
+      "sma20": {
+       "liv": 498.96,
+       "dist_pct": 1.97
+      },
+      "ema20": {
+       "liv": 497.15,
+       "dist_pct": 2.34
+      },
+      "sma30": {
+       "liv": 512.55,
+       "dist_pct": -0.73
+      },
+      "ema30": {
+       "liv": 508.92,
+       "dist_pct": -0.02
+      },
+      "sma50": {
+       "liv": 552.41,
+       "dist_pct": -7.89
+      },
+      "ema50": {
+       "liv": 512.68,
+       "dist_pct": -0.76
+      },
+      "sma100": {
+       "liv": 483.23,
+       "dist_pct": 5.29
+      },
+      "ema100": {
+       "liv": 472.63,
+       "dist_pct": 7.65
+      },
+      "sma200": {
+       "liv": 349.61,
+       "dist_pct": 45.54
+      },
+      "ema200": {
+       "liv": 381.85,
+       "dist_pct": 33.25
+      }
+     },
+     "medie_battute": 8,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 50.4,
+      "macd": {
+       "linea": -20.56,
+       "segnale": -21.58,
+       "istogramma": 1.02
+      },
+      "stoch_k": 58.7,
+      "stoch_d": 44.0,
+      "williams_r": -41.3,
+      "cci20": 8.4,
+      "adx14": 18.7,
+      "di_su": 27.6,
+      "di_giu": 32.4,
+      "momentum10": -36.04
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 17.15,
+     "m1": -0.98,
+     "m3": -1.34,
+     "m6": 79.22,
+     "ytd": 171.27,
+     "a1": 535.02,
+     "a3": 1402.72,
+     "a5": 969.98,
+     "a10": 1542.75
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 15.25,
+      "mediana": 9.79,
+      "positivi_pct": 73,
+      "campione": 48,
+      "peggio": -27.7,
+      "meglio": 116.6
+     },
+     {
+      "mese": 2,
+      "media": -0.78,
+      "mediana": -1.08,
+      "positivi_pct": 46,
+      "campione": 48,
+      "peggio": -30.3,
+      "meglio": 26.0
+     },
+     {
+      "mese": 3,
+      "media": 2.11,
+      "mediana": -1.68,
+      "positivi_pct": 48,
+      "campione": 48,
+      "peggio": -30.8,
+      "meglio": 65.3
+     },
+     {
+      "mese": 4,
+      "media": 4.18,
+      "mediana": 4.49,
+      "positivi_pct": 62,
+      "campione": 48,
+      "peggio": -28.0,
+      "meglio": 60.6
+     },
+     {
+      "mese": 5,
+      "media": 2.42,
+      "mediana": 3.47,
+      "positivi_pct": 56,
+      "campione": 48,
+      "peggio": -31.8,
+      "meglio": 34.2
+     },
+     {
+      "mese": 6,
+      "media": -3.75,
+      "mediana": -2.88,
+      "positivi_pct": 31,
+      "campione": 48,
+      "peggio": -30.8,
+      "meglio": 29.2
+     },
+     {
+      "mese": 7,
+      "media": -0.27,
+      "mediana": -3.61,
+      "positivi_pct": 44,
+      "campione": 48,
+      "peggio": -27.3,
+      "meglio": 38.2
+     },
+     {
+      "mese": 8,
+      "media": 4.31,
+      "mediana": 2.66,
+      "positivi_pct": 54,
+      "campione": 48,
+      "peggio": -27.0,
+      "meglio": 61.7
+     },
+     {
+      "mese": 9,
+      "media": -2.4,
+      "mediana": -2.37,
+      "positivi_pct": 38,
+      "campione": 47,
+      "peggio": -39.8,
+      "meglio": 49.6
+     },
+     {
+      "mese": 10,
+      "media": 0.93,
+      "mediana": -2.33,
+      "positivi_pct": 45,
+      "campione": 47,
+      "peggio": -30.2,
+      "meglio": 57.5
+     },
+     {
+      "mese": 11,
+      "media": 4.51,
+      "mediana": 6.76,
+      "positivi_pct": 67,
+      "campione": 48,
+      "peggio": -45.8,
+      "meglio": 40.6
+     },
+     {
+      "mese": 12,
+      "media": 4.18,
+      "mediana": 6.14,
+      "positivi_pct": 60,
+      "campione": 48,
+      "peggio": -25.0,
+      "meglio": 33.1
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.02,
+      "r2": 0.375,
+      "corr": 0.61,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.01,
+      "r2": 0.486,
+      "corr": 0.7,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.01,
+      "r2": 0.005,
+      "corr": 0.07,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.03,
+      "r2": 0.04,
+      "corr": -0.2,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-03-31",
+      "ricavi": 3337000000,
+      "utile": 3205000000,
+      "operativo": 1235000000,
+      "margine": 96.0,
+      "margine_op": 37.0
+     },
+     {
+      "trim": "2025-12-31",
+      "ricavi": 3017000000,
+      "utile": 1842000000,
+      "operativo": 963000000,
+      "margine": 61.1,
+      "margine_op": 31.9
+     },
+     {
+      "trim": "2025-09-30",
+      "ricavi": 2818000000,
+      "utile": 1182000000,
+      "operativo": 795000000,
+      "margine": 41.9,
+      "margine_op": 28.2
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 2605000000,
+      "utile": 257000000,
+      "operativo": 681000000,
+      "margine": 9.9,
+      "margine_op": 26.1
+     },
+     {
+      "trim": "2025-03-31",
+      "ricavi": 2294000000,
+      "utile": 524000000,
+      "operativo": 559000000,
+      "margine": 22.8,
+      "margine_op": 24.4
+     }
+    ]
+   },
    "rs_1m": 5.7,
    "rs_bench": "sp500",
    "rs_ndx_1m": 5.5,
@@ -6973,6 +8815,285 @@
     "liq_below": 201.74,
     "order_block": null
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 222.02,
+     "medie": {
+      "sma10": {
+       "liv": 213.48,
+       "dist_pct": 4.0
+      },
+      "ema10": {
+       "liv": 212.87,
+       "dist_pct": 4.3
+      },
+      "sma20": {
+       "liv": 202.51,
+       "dist_pct": 9.64
+      },
+      "ema20": {
+       "liv": 211.64,
+       "dist_pct": 4.9
+      },
+      "sma30": {
+       "liv": 208.8,
+       "dist_pct": 6.33
+      },
+      "ema30": {
+       "liv": 214.36,
+       "dist_pct": 3.57
+      },
+      "sma50": {
+       "liv": 238.07,
+       "dist_pct": -6.74
+      },
+      "ema50": {
+       "liv": 214.4,
+       "dist_pct": 3.56
+      },
+      "sma100": {
+       "liv": 197.79,
+       "dist_pct": 12.25
+      },
+      "ema100": {
+       "liv": 195.45,
+       "dist_pct": 13.59
+      },
+      "sma200": {
+       "liv": 141.38,
+       "dist_pct": 57.04
+      },
+      "ema200": {
+       "liv": 160.91,
+       "dist_pct": 37.98
+      }
+     },
+     "medie_battute": 11,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 53.7,
+      "macd": {
+       "linea": -1.56,
+       "segnale": -6.4,
+       "istogramma": 4.84
+      },
+      "stoch_k": 86.3,
+      "stoch_d": 84.5,
+      "williams_r": -13.7,
+      "cci20": 47.5,
+      "adx14": 17.0,
+      "di_su": 28.8,
+      "di_giu": 22.7,
+      "momentum10": 34.46
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 1.51,
+     "m1": 7.64,
+     "m3": 29.99,
+     "m6": 184.02,
+     "ytd": 148.74,
+     "a1": 253.89,
+     "a3": 284.7,
+     "a5": 269.64,
+     "a10": 1826.5
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 6.79,
+      "mediana": 7.02,
+      "positivi_pct": 69,
+      "campione": 26,
+      "peggio": -18.3,
+      "meglio": 80.1
+     },
+     {
+      "mese": 2,
+      "media": -1.05,
+      "mediana": 3.26,
+      "positivi_pct": 62,
+      "campione": 26,
+      "peggio": -49.7,
+      "meglio": 12.8
+     },
+     {
+      "mese": 3,
+      "media": -0.55,
+      "mediana": 0.57,
+      "positivi_pct": 50,
+      "campione": 26,
+      "peggio": -39.3,
+      "meglio": 42.7
+     },
+     {
+      "mese": 4,
+      "media": 6.26,
+      "mediana": -2.39,
+      "positivi_pct": 42,
+      "campione": 26,
+      "peggio": -18.9,
+      "meglio": 108.9
+     },
+     {
+      "mese": 5,
+      "media": 7.31,
+      "mediana": 3.61,
+      "positivi_pct": 65,
+      "campione": 26,
+      "peggio": -16.5,
+      "meglio": 48.2
+     },
+     {
+      "mese": 6,
+      "media": 1.31,
+      "mediana": 1.66,
+      "positivi_pct": 54,
+      "campione": 26,
+      "peggio": -36.8,
+      "meglio": 45.3
+     },
+     {
+      "mese": 7,
+      "media": 0.13,
+      "mediana": -0.18,
+      "positivi_pct": 48,
+      "campione": 27,
+      "peggio": -37.0,
+      "meglio": 28.1
+     },
+     {
+      "mese": 8,
+      "media": 1.33,
+      "mediana": -0.43,
+      "positivi_pct": 48,
+      "campione": 27,
+      "peggio": -21.8,
+      "meglio": 56.2
+     },
+     {
+      "mese": 9,
+      "media": -2.56,
+      "mediana": -1.86,
+      "positivi_pct": 38,
+      "campione": 26,
+      "peggio": -42.7,
+      "meglio": 33.7
+     },
+     {
+      "mese": 10,
+      "media": 0.7,
+      "mediana": -1.05,
+      "positivi_pct": 46,
+      "campione": 26,
+      "peggio": -27.7,
+      "meglio": 69.6
+     },
+     {
+      "mese": 11,
+      "media": 7.16,
+      "mediana": 9.09,
+      "positivi_pct": 73,
+      "campione": 26,
+      "peggio": -48.7,
+      "meglio": 39.7
+     },
+     {
+      "mese": 12,
+      "media": 0.95,
+      "mediana": 0.59,
+      "positivi_pct": 54,
+      "campione": 26,
+      "peggio": -23.4,
+      "meglio": 34.6
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.03,
+      "r2": 0.411,
+      "corr": 0.64,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.01,
+      "r2": 0.558,
+      "corr": 0.75,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.01,
+      "r2": 0.01,
+      "corr": 0.1,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.02,
+      "r2": 0.02,
+      "corr": -0.14,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-04-30",
+      "ricavi": 2417800000,
+      "utile": 34500000,
+      "operativo": 350100000,
+      "margine": 1.4,
+      "margine_op": 14.5
+     },
+     {
+      "trim": "2026-01-31",
+      "ricavi": 2218700000,
+      "utile": 396100000,
+      "operativo": 413900000,
+      "margine": 17.9,
+      "margine_op": 18.7
+     },
+     {
+      "trim": "2025-10-31",
+      "ricavi": 2074500000,
+      "utile": 1901300000,
+      "operativo": 367400000,
+      "margine": 91.7,
+      "margine_op": 17.7
+     },
+     {
+      "trim": "2025-07-31",
+      "ricavi": 2006100000,
+      "utile": 194800000,
+      "operativo": 298800000,
+      "margine": 9.7,
+      "margine_op": 14.9
+     },
+     {
+      "trim": "2025-04-30",
+      "ricavi": 1895300000,
+      "utile": 177900000,
+      "operativo": 258300000,
+      "margine": 9.4,
+      "margine_op": 13.6
+     }
+    ]
+   },
    "rs_1m": 13.3,
    "rs_bench": "sox",
    "rs_ndx_1m": 14.4,
@@ -7521,6 +9642,174 @@
      "lo": 18.42,
      "hi": 18.57
     }
+   },
+   "tv": {
+    "tecnica": {
+     "prezzo": 18.82,
+     "medie": {
+      "sma10": {
+       "liv": 17.63,
+       "dist_pct": 6.74
+      },
+      "ema10": {
+       "liv": 17.63,
+       "dist_pct": 6.77
+      },
+      "sma20": {
+       "liv": 16.16,
+       "dist_pct": 16.44
+      },
+      "ema20": {
+       "liv": 17.04,
+       "dist_pct": 10.45
+      },
+      "sma30": {
+       "liv": 16.11,
+       "dist_pct": 16.86
+      },
+      "ema30": {
+       "liv": 17.08,
+       "dist_pct": 10.19
+      },
+      "sma50": {
+       "liv": 17.8,
+       "dist_pct": 5.75
+      },
+      "ema50": {
+       "liv": 17.47,
+       "dist_pct": 7.76
+      },
+      "sma100": {
+       "liv": 18.04,
+       "dist_pct": 4.32
+      },
+      "ema100": {
+       "liv": 18.31,
+       "dist_pct": 2.81
+      },
+      "sma200": {
+       "liv": 20.62,
+       "dist_pct": -8.75
+      },
+      "ema200": {
+       "liv": 19.42,
+       "dist_pct": -3.1
+      }
+     },
+     "medie_battute": 10,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 60.0,
+      "macd": {
+       "linea": 0.4,
+       "segnale": -0.12,
+       "istogramma": 0.52
+      },
+      "stoch_k": 91.3,
+      "stoch_d": 91.6,
+      "williams_r": -8.7,
+      "cci20": 96.9,
+      "adx14": 20.3,
+      "di_su": 28.0,
+      "di_giu": 17.8,
+      "momentum10": 3.87
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 4.91,
+     "m1": 23.41,
+     "m3": -8.24,
+     "m6": 25.55,
+     "ytd": -20.25,
+     "a1": 15.96,
+     "a3": 945.56,
+     "a5": 94.32
+    },
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.03,
+      "r2": 0.251,
+      "corr": 0.5,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.01,
+      "r2": 0.217,
+      "corr": 0.47,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.0,
+      "r2": 0.002,
+      "corr": 0.04,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.02,
+      "r2": 0.011,
+      "corr": -0.1,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-06-30",
+      "ricavi": 5138000,
+      "utile": -52606000,
+      "operativo": -28062000,
+      "margine": -1023.9,
+      "margine_op": -546.2
+     },
+     {
+      "trim": "2026-03-31",
+      "ricavi": 4400000,
+      "utile": 33109000,
+      "operativo": -25951000,
+      "margine": 752.5,
+      "margine_op": -589.8
+     },
+     {
+      "trim": "2025-12-31",
+      "ricavi": 1868000,
+      "utile": -18207000,
+      "operativo": -22597000,
+      "margine": -974.7,
+      "margine_op": -1209.7
+     },
+     {
+      "trim": "2025-09-30",
+      "ricavi": 1947000,
+      "utile": -200968000,
+      "operativo": -20549000,
+      "margine": -10321.9,
+      "margine_op": -1055.4
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 1801000,
+      "utile": -39654000,
+      "operativo": -19882000,
+      "margine": -2201.8,
+      "margine_op": -1103.9
+     }
+    ]
    },
    "rs_1m": 28.8,
    "rs_bench": "sox",
@@ -8100,6 +10389,284 @@
     "liq_below": 216.04,
     "order_block": null
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 229.94,
+     "medie": {
+      "sma10": {
+       "liv": 225.42,
+       "dist_pct": 2.0
+      },
+      "ema10": {
+       "liv": 223.4,
+       "dist_pct": 2.93
+      },
+      "sma20": {
+       "liv": 211.48,
+       "dist_pct": 8.73
+      },
+      "ema20": {
+       "liv": 223.17,
+       "dist_pct": 3.03
+      },
+      "sma30": {
+       "liv": 222.94,
+       "dist_pct": 3.14
+      },
+      "ema30": {
+       "liv": 228.07,
+       "dist_pct": 0.82
+      },
+      "sma50": {
+       "liv": 247.24,
+       "dist_pct": -7.0
+      },
+      "ema50": {
+       "liv": 234.46,
+       "dist_pct": -1.93
+      },
+      "sma100": {
+       "liv": 239.51,
+       "dist_pct": -4.0
+      },
+      "ema100": {
+       "liv": 226.54,
+       "dist_pct": 1.5
+      },
+      "sma200": {
+       "liv": 184.56,
+       "dist_pct": 24.59
+      },
+      "ema200": {
+       "liv": 192.26,
+       "dist_pct": 19.6
+      }
+     },
+     "medie_battute": 9,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 51.1,
+      "macd": {
+       "linea": -3.6,
+       "segnale": -9.0,
+       "istogramma": 5.4
+      },
+      "stoch_k": 75.7,
+      "stoch_d": 81.3,
+      "williams_r": -24.3,
+      "cci20": 48.2,
+      "adx14": 17.4,
+      "di_su": 23.8,
+      "di_giu": 19.9,
+      "momentum10": 24.13
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 4.83,
+     "m1": -3.94,
+     "m3": -19.01,
+     "m6": 65.39,
+     "ytd": 132.99,
+     "a1": 334.34,
+     "a3": 1433.96,
+     "a5": 973.48
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 9.75,
+      "mediana": 5.83,
+      "positivi_pct": 62,
+      "campione": 8,
+      "peggio": -31.2,
+      "meglio": 74.2
+     },
+     {
+      "mese": 2,
+      "media": 8.29,
+      "mediana": 2.35,
+      "positivi_pct": 62,
+      "campione": 8,
+      "peggio": -22.5,
+      "meglio": 53.1
+     },
+     {
+      "mese": 3,
+      "media": -7.56,
+      "mediana": -9.41,
+      "positivi_pct": 25,
+      "campione": 8,
+      "peggio": -42.3,
+      "meglio": 28.2
+     },
+     {
+      "mese": 4,
+      "media": 13.73,
+      "mediana": -2.49,
+      "positivi_pct": 38,
+      "campione": 8,
+      "peggio": -23.1,
+      "meglio": 109.1
+     },
+     {
+      "mese": 5,
+      "media": 0.24,
+      "mediana": -2.51,
+      "positivi_pct": 50,
+      "campione": 8,
+      "peggio": -20.7,
+      "meglio": 46.6
+     },
+     {
+      "mese": 6,
+      "media": 10.54,
+      "mediana": 12.39,
+      "positivi_pct": 75,
+      "campione": 8,
+      "peggio": -25.0,
+      "meglio": 35.5
+     },
+     {
+      "mese": 7,
+      "media": 5.6,
+      "mediana": 9.93,
+      "positivi_pct": 62,
+      "campione": 8,
+      "peggio": -32.0,
+      "meglio": 56.3
+     },
+     {
+      "mese": 8,
+      "media": 5.63,
+      "mediana": 11.72,
+      "positivi_pct": 56,
+      "campione": 9,
+      "peggio": -57.1,
+      "meglio": 41.6
+     },
+     {
+      "mese": 9,
+      "media": 0.5,
+      "mediana": -11.44,
+      "positivi_pct": 38,
+      "campione": 8,
+      "peggio": -27.5,
+      "meglio": 59.7
+     },
+     {
+      "mese": 10,
+      "media": 2.55,
+      "mediana": -7.75,
+      "positivi_pct": 25,
+      "campione": 8,
+      "peggio": -30.3,
+      "meglio": 67.0
+     },
+     {
+      "mese": 11,
+      "media": 48.18,
+      "mediana": 26.32,
+      "positivi_pct": 62,
+      "campione": 8,
+      "peggio": -30.7,
+      "meglio": 185.9
+     },
+     {
+      "mese": 12,
+      "media": -9.42,
+      "mediana": -14.64,
+      "positivi_pct": 38,
+      "campione": 8,
+      "peggio": -39.3,
+      "meglio": 16.9
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.03,
+      "r2": 0.296,
+      "corr": 0.54,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.01,
+      "r2": 0.353,
+      "corr": 0.59,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.0,
+      "r2": 0.001,
+      "corr": 0.03,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.02,
+      "r2": 0.014,
+      "corr": -0.12,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-06-30",
+      "ricavi": 1065365000,
+      "utile": 196290000,
+      "operativo": 182237000,
+      "margine": 18.4,
+      "margine_op": 17.1
+     },
+     {
+      "trim": "2026-03-31",
+      "ricavi": 751054000,
+      "utile": 70653000,
+      "operativo": 72190000,
+      "margine": 9.4,
+      "margine_op": 9.6
+     },
+     {
+      "trim": "2025-12-31",
+      "ricavi": 777683000,
+      "utile": 1092000,
+      "operativo": 87529000,
+      "margine": 0.1,
+      "margine_op": 11.3
+     },
+     {
+      "trim": "2025-09-30",
+      "ricavi": 519048000,
+      "utile": -23093000,
+      "operativo": 7846000,
+      "margine": -4.4,
+      "margine_op": 1.5
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 401242000,
+      "utile": -42619000,
+      "operativo": -3503000,
+      "margine": -10.6,
+      "margine_op": -0.9
+     }
+    ]
+   },
    "rs_1m": 7.9,
    "rs_bench": "sp500",
    "rs_ndx_1m": 7.7,
@@ -8405,6 +10972,55 @@
      "lo": 126.79,
      "hi": 129.95
     }
+   },
+   "tv": {
+    "performance": {
+     "s1": 20.61,
+     "m1": -5.74,
+     "ytd": -1.0
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-03-31",
+      "ricavi": 52576287000000,
+      "utile": 40330176000000,
+      "operativo": 37610283000000,
+      "margine": 76.7,
+      "margine_op": 71.5
+     },
+     {
+      "trim": "2025-12-31",
+      "ricavi": 32826653000000,
+      "utile": 15219783000000,
+      "operativo": 19169574000000,
+      "margine": 46.4,
+      "margine_op": 58.4
+     },
+     {
+      "trim": "2025-09-30",
+      "ricavi": 24448929000000,
+      "utile": 12595195000000,
+      "operativo": 11383390000000,
+      "margine": 51.5,
+      "margine_op": 46.6
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 22231952000000,
+      "utile": 6997228000000,
+      "operativo": 9212851000000,
+      "margine": 31.5,
+      "margine_op": 41.4
+     },
+     {
+      "trim": "2025-03-31",
+      "ricavi": 17639141000000,
+      "utile": 8107081000000,
+      "operativo": 7440504000000,
+      "margine": 46.0,
+      "margine_op": 42.2
+     }
+    ]
    },
    "rs_1m": 5.9,
    "rs_bench": "sp500",
@@ -9225,6 +11841,285 @@
      "hi": 94.86
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 93.04,
+     "medie": {
+      "sma10": {
+       "liv": 96.61,
+       "dist_pct": -3.7
+      },
+      "ema10": {
+       "liv": 96.0,
+       "dist_pct": -3.08
+      },
+      "sma20": {
+       "liv": 96.52,
+       "dist_pct": -3.6
+      },
+      "ema20": {
+       "liv": 96.87,
+       "dist_pct": -3.95
+      },
+      "sma30": {
+       "liv": 96.23,
+       "dist_pct": -3.32
+      },
+      "ema30": {
+       "liv": 99.29,
+       "dist_pct": -6.29
+      },
+      "sma50": {
+       "liv": 101.45,
+       "dist_pct": -8.29
+      },
+      "ema50": {
+       "liv": 106.3,
+       "dist_pct": -12.47
+      },
+      "sma100": {
+       "liv": 128.62,
+       "dist_pct": -27.66
+      },
+      "ema100": {
+       "liv": 123.79,
+       "dist_pct": -24.84
+      },
+      "sma200": {
+       "liv": 148.07,
+       "dist_pct": -37.16
+      },
+      "ema200": {
+       "liv": 161.32,
+       "dist_pct": -42.33
+      }
+     },
+     "medie_battute": 0,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 43.3,
+      "macd": {
+       "linea": -2.04,
+       "segnale": -2.63,
+       "istogramma": 0.59
+      },
+      "stoch_k": 23.5,
+      "stoch_d": 35.5,
+      "williams_r": -76.5,
+      "cci20": -109.2,
+      "adx14": 9.7,
+      "di_su": 23.5,
+      "di_giu": 23.0,
+      "momentum10": -0.24
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": -6.97,
+     "m1": -4.54,
+     "m3": -52.52,
+     "m6": -24.36,
+     "ytd": -40.8,
+     "a1": -72.18,
+     "a3": 160.23,
+     "a5": 34.01,
+     "a10": 457.83
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 11.91,
+      "mediana": 6.26,
+      "positivi_pct": 68,
+      "campione": 28,
+      "peggio": -32.4,
+      "meglio": 77.8
+     },
+     {
+      "mese": 2,
+      "media": 0.51,
+      "mediana": -3.46,
+      "positivi_pct": 46,
+      "campione": 28,
+      "peggio": -46.7,
+      "meglio": 104.1
+     },
+     {
+      "mese": 3,
+      "media": -0.89,
+      "mediana": -0.27,
+      "positivi_pct": 50,
+      "campione": 28,
+      "peggio": -67.9,
+      "meglio": 66.6
+     },
+     {
+      "mese": 4,
+      "media": -1.85,
+      "mediana": -0.19,
+      "positivi_pct": 46,
+      "campione": 28,
+      "peggio": -70.3,
+      "meglio": 57.9
+     },
+     {
+      "mese": 5,
+      "media": -0.16,
+      "mediana": -2.19,
+      "positivi_pct": 43,
+      "campione": 28,
+      "peggio": -28.9,
+      "meglio": 44.9
+     },
+     {
+      "mese": 6,
+      "media": -0.84,
+      "mediana": -1.98,
+      "positivi_pct": 43,
+      "campione": 28,
+      "peggio": -59.3,
+      "meglio": 57.4
+     },
+     {
+      "mese": 7,
+      "media": 6.88,
+      "mediana": 1.88,
+      "positivi_pct": 55,
+      "campione": 29,
+      "peggio": -29.8,
+      "meglio": 74.1
+     },
+     {
+      "mese": 8,
+      "media": -0.25,
+      "mediana": -2.93,
+      "positivi_pct": 38,
+      "campione": 29,
+      "peggio": -23.8,
+      "meglio": 67.3
+     },
+     {
+      "mese": 9,
+      "media": 1.89,
+      "mediana": -0.31,
+      "positivi_pct": 50,
+      "campione": 28,
+      "peggio": -54.3,
+      "meglio": 41.0
+     },
+     {
+      "mese": 10,
+      "media": 16.6,
+      "mediana": 16.78,
+      "positivi_pct": 75,
+      "campione": 28,
+      "peggio": -35.0,
+      "meglio": 143.4
+     },
+     {
+      "mese": 11,
+      "media": 5.59,
+      "mediana": 0.82,
+      "positivi_pct": 57,
+      "campione": 28,
+      "peggio": -61.4,
+      "meglio": 105.2
+     },
+     {
+      "mese": 12,
+      "media": 1.37,
+      "mediana": -2.14,
+      "positivi_pct": 43,
+      "campione": 28,
+      "peggio": -28.5,
+      "meglio": 71.4
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.02,
+      "r2": 0.231,
+      "corr": 0.48,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.01,
+      "r2": 0.122,
+      "corr": 0.35,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.0,
+      "r2": 0.003,
+      "corr": 0.06,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.03,
+      "r2": 0.047,
+      "corr": -0.22,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-06-30",
+      "ricavi": 122368000,
+      "utile": -8219628000,
+      "operativo": -15585000,
+      "margine": -6717.1,
+      "margine_op": -12.7
+     },
+     {
+      "trim": "2026-03-31",
+      "ricavi": 124300000,
+      "utile": -12542670000,
+      "operativo": -14940000,
+      "margine": -10090.6,
+      "margine_op": -12.0
+     },
+     {
+      "trim": "2025-12-31",
+      "ricavi": 122988000,
+      "utile": -12436652000,
+      "operativo": -9973000,
+      "margine": -10112.1,
+      "margine_op": -8.1
+     },
+     {
+      "trim": "2025-09-30",
+      "ricavi": 128691000,
+      "utile": 2785024000,
+      "operativo": -5000,
+      "margine": 2164.1,
+      "margine_op": -0.0
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 114488000,
+      "utile": 10020846000,
+      "operativo": -15524000,
+      "margine": 8752.7,
+      "margine_op": -13.6
+     }
+    ]
+   },
    "rs_1m": -4.6,
    "rs_bench": "ndx",
    "rs_ndx_1m": -4.6,
@@ -9238,24 +12133,24 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 63053.36,
+   "price": 63023.92,
    "price_asof": "2026-08-16",
    "price_live": false,
-   "change_pct": 0.12,
+   "change_pct": 0.08,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -50.0,
+   "ath_dist_pct": -50.1,
    "sma200_dist_pct": -9.1,
-   "sma50_dist_pct": -0.7,
+   "sma50_dist_pct": -0.8,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -50.0,
+   "w52_dist_pct": -50.1,
    "day_high": 63085.9,
    "day_low": 62954.42,
    "support": 62226.58,
    "resistance": 65658.34,
-   "rsi": 43.4,
-   "volume": 9144737792,
+   "rsi": 43.1,
+   "volume": 9136265216,
    "vol_ratio": 0.91,
    "atr_14": 1225.55,
    "atr_pct": 1.94,
@@ -9267,7 +12162,7 @@
      63402.43,
      63402.17,
      62975.59,
-     63053.36
+     63023.92
     ],
     "m6": [
      70753.41,
@@ -9395,7 +12290,7 @@
      63402.43,
      63402.17,
      62975.59,
-     63053.36
+     63023.92
     ],
     "all": [
      386.94,
@@ -9541,7 +12436,7 @@
      73579.69,
      58558.86,
      62813.75,
-     63053.36
+     63023.92
     ],
     "m1": [
      64311.81,
@@ -9565,7 +12460,7 @@
      63402.43,
      63402.17,
      62975.59,
-     63053.36
+     63023.92
     ],
     "m3": [
      63561.05,
@@ -9633,7 +12528,7 @@
      63402.43,
      63402.17,
      62975.59,
-     63053.36
+     63023.92
     ],
     "y1": [
      117491.35,
@@ -9738,20 +12633,23 @@
      63059.43,
      63063.07,
      63080.57,
-     63053.36
+     63053.36,
+     63051.68,
+     63052.45,
+     63025.01
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 35,
+   "health": 34,
    "eps": null,
    "beta": null,
    "sharpe_1y": -1.3,
    "sortino_1y": -1.68,
-   "sharpe_6m": -1.17,
-   "sortino_6m": -1.53,
+   "sharpe_6m": -1.18,
+   "sortino_6m": -1.54,
    "prepost": null,
-   "prezzo_limite_aggiustato": 63053.36,
+   "prezzo_limite_aggiustato": 63023.92,
    "risk_reward": "1:1.4",
    "sector": "Altro",
    "stats": null,
@@ -9759,22 +12657,22 @@
     "w1": {
      "support": 62487.7,
      "resistance": 64433.68,
-     "change_pct": -0.78
+     "change_pct": -0.83
     },
     "m1": {
      "support": 62226.58,
      "resistance": 65658.34,
-     "change_pct": -1.96
+     "change_pct": -2.0
     },
     "m3": {
      "support": 57747.77,
      "resistance": 67248.13,
-     "change_pct": -0.8
+     "change_pct": -0.85
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -30.26
+     "change_pct": -30.29
     }
    },
    "financials": [],
@@ -9798,6 +12696,201 @@
      "lo": 64262.11,
      "hi": 64595.45
     }
+   },
+   "tv": {
+    "tecnica": {
+     "prezzo": 63023.92,
+     "medie": {
+      "sma10": {
+       "liv": 63915.85,
+       "dist_pct": -1.4
+      },
+      "ema10": {
+       "liv": 63615.41,
+       "dist_pct": -0.93
+      },
+      "sma20": {
+       "liv": 63828.08,
+       "dist_pct": -1.26
+      },
+      "ema20": {
+       "liv": 63827.95,
+       "dist_pct": -1.26
+      },
+      "sma30": {
+       "liv": 64219.33,
+       "dist_pct": -1.86
+      },
+      "ema30": {
+       "liv": 63917.29,
+       "dist_pct": -1.4
+      },
+      "sma50": {
+       "liv": 63510.93,
+       "dist_pct": -0.77
+      },
+      "ema50": {
+       "liv": 64356.36,
+       "dist_pct": -2.07
+      },
+      "sma100": {
+       "liv": 66871.01,
+       "dist_pct": -5.75
+      },
+      "ema100": {
+       "liv": 66468.88,
+       "dist_pct": -5.18
+      },
+      "sma200": {
+       "liv": 69371.19,
+       "dist_pct": -9.15
+      },
+      "ema200": {
+       "liv": 72136.45,
+       "dist_pct": -12.63
+      }
+     },
+     "medie_battute": 0,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 43.1,
+      "macd": {
+       "linea": -194.73,
+       "segnale": -42.93,
+       "istogramma": -151.8
+      },
+      "stoch_k": 25.1,
+      "stoch_d": 28.6,
+      "williams_r": -74.9,
+      "cci20": -98.8,
+      "adx14": 13.3,
+      "di_su": 14.3,
+      "di_giu": 23.0,
+      "momentum10": -1573.58
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": -1.39,
+     "m1": -1.68,
+     "m3": 2.56,
+     "m6": -13.73,
+     "a1": -29.4,
+     "ytd": -28.97,
+     "a3": 143.04,
+     "a5": 33.62,
+     "a10": 10851.69
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": -1.15,
+      "mediana": -3.46,
+      "positivi_pct": 50,
+      "campione": 12,
+      "peggio": -32.1,
+      "meglio": 39.8
+     },
+     {
+      "mese": 2,
+      "media": 10.19,
+      "mediana": 11.86,
+      "positivi_pct": 75,
+      "campione": 12,
+      "peggio": -17.6,
+      "meglio": 43.7
+     },
+     {
+      "mese": 3,
+      "media": 0.48,
+      "mediana": -0.16,
+      "positivi_pct": 50,
+      "campione": 12,
+      "peggio": -32.9,
+      "meglio": 30.5
+     },
+     {
+      "mese": 4,
+      "media": 10.16,
+      "mediana": 9.7,
+      "positivi_pct": 67,
+      "campione": 12,
+      "peggio": -17.2,
+      "meglio": 34.5
+     },
+     {
+      "mese": 5,
+      "media": 8.08,
+      "mediana": 3.37,
+      "positivi_pct": 50,
+      "campione": 12,
+      "peggio": -35.4,
+      "meglio": 69.6
+     },
+     {
+      "mese": 6,
+      "media": 0.05,
+      "mediana": -0.51,
+      "positivi_pct": 50,
+      "campione": 12,
+      "peggio": -37.8,
+      "meglio": 26.7
+     },
+     {
+      "mese": 7,
+      "media": 8.88,
+      "mediana": 8.13,
+      "positivi_pct": 75,
+      "campione": 12,
+      "peggio": -7.2,
+      "meglio": 23.9
+     },
+     {
+      "mese": 8,
+      "media": -0.11,
+      "mediana": -7.19,
+      "positivi_pct": 33,
+      "campione": 12,
+      "peggio": -19.2,
+      "meglio": 63.6
+     },
+     {
+      "mese": 9,
+      "media": -1.82,
+      "mediana": -3.08,
+      "positivi_pct": 45,
+      "campione": 11,
+      "peggio": -13.9,
+      "meglio": 7.4
+     },
+     {
+      "mese": 10,
+      "media": 16.63,
+      "mediana": 12.94,
+      "positivi_pct": 75,
+      "campione": 12,
+      "peggio": -12.6,
+      "meglio": 49.1
+     },
+     {
+      "mese": 11,
+      "media": 7.51,
+      "mediana": 7.58,
+      "positivi_pct": 58,
+      "campione": 12,
+      "peggio": -36.4,
+      "meglio": 58.2
+     },
+     {
+      "mese": 12,
+      "media": 7.14,
+      "mediana": -3.16,
+      "positivi_pct": 42,
+      "campione": 12,
+      "peggio": -18.8,
+      "meglio": 47.8
+     }
+    ]
    },
    "rs_1m": -5.3,
    "rs_bench": "sp500",
@@ -10693,6 +13786,201 @@
      "hi": 16.03
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 14.25,
+     "medie": {
+      "sma10": {
+       "liv": 15.24,
+       "dist_pct": -6.49
+      },
+      "ema10": {
+       "liv": 15.31,
+       "dist_pct": -6.9
+      },
+      "sma20": {
+       "liv": 16.63,
+       "dist_pct": -14.32
+      },
+      "ema20": {
+       "liv": 16.01,
+       "dist_pct": -10.97
+      },
+      "sma30": {
+       "liv": 16.56,
+       "dist_pct": -13.97
+      },
+      "ema30": {
+       "liv": 16.38,
+       "dist_pct": -13.01
+      },
+      "sma50": {
+       "liv": 17.18,
+       "dist_pct": -17.05
+      },
+      "ema50": {
+       "liv": 16.89,
+       "dist_pct": -15.63
+      },
+      "sma100": {
+       "liv": 18.25,
+       "dist_pct": -21.9
+      },
+      "ema100": {
+       "liv": 17.65,
+       "dist_pct": -19.27
+      },
+      "sma200": {
+       "liv": 18.53,
+       "dist_pct": -23.1
+      },
+      "ema200": {
+       "liv": 17.85,
+       "dist_pct": -20.15
+      }
+     },
+     "medie_battute": 0,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 40.1,
+      "macd": {
+       "linea": -0.76,
+       "segnale": -0.48,
+       "istogramma": -0.27
+      },
+      "stoch_k": 1.0,
+      "stoch_d": 2.4,
+      "williams_r": -99.0,
+      "cci20": -110.3,
+      "adx14": 29.1,
+      "di_su": 23.1,
+      "di_giu": 15.9,
+      "momentum10": -1.74
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": -4.36,
+     "m1": -9.06,
+     "m3": -20.79,
+     "m6": -30.83,
+     "a1": -3.91,
+     "ytd": -1.79,
+     "a3": 5.01,
+     "a5": -13.53,
+     "a10": 6.18
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 2.5,
+      "mediana": -0.56,
+      "positivi_pct": 50,
+      "campione": 36,
+      "peggio": -34.8,
+      "meglio": 45.5
+     },
+     {
+      "mese": 2,
+      "media": 6.17,
+      "mediana": 1.53,
+      "positivi_pct": 54,
+      "campione": 37,
+      "peggio": -36.4,
+      "meglio": 112.9
+     },
+     {
+      "mese": 3,
+      "media": -1.12,
+      "mediana": -3.32,
+      "positivi_pct": 38,
+      "campione": 37,
+      "peggio": -32.1,
+      "meglio": 37.5
+     },
+     {
+      "mese": 4,
+      "media": -2.83,
+      "mediana": -4.02,
+      "positivi_pct": 38,
+      "campione": 37,
+      "peggio": -36.2,
+      "meglio": 62.5
+     },
+     {
+      "mese": 5,
+      "media": -1.53,
+      "mediana": -8.23,
+      "positivi_pct": 32,
+      "campione": 37,
+      "peggio": -24.8,
+      "meglio": 45.4
+     },
+     {
+      "mese": 6,
+      "media": -0.44,
+      "mediana": -3.68,
+      "positivi_pct": 49,
+      "campione": 37,
+      "peggio": -29.0,
+      "meglio": 34.3
+     },
+     {
+      "mese": 7,
+      "media": 4.7,
+      "mediana": 0.29,
+      "positivi_pct": 51,
+      "campione": 37,
+      "peggio": -33.5,
+      "meglio": 52.8
+     },
+     {
+      "mese": 8,
+      "media": 7.46,
+      "mediana": 0.35,
+      "positivi_pct": 54,
+      "campione": 37,
+      "peggio": -28.7,
+      "meglio": 134.6
+     },
+     {
+      "mese": 9,
+      "media": 8.13,
+      "mediana": 1.89,
+      "positivi_pct": 50,
+      "campione": 36,
+      "peggio": -23.0,
+      "meglio": 90.8
+     },
+     {
+      "mese": 10,
+      "media": 4.47,
+      "mediana": 3.37,
+      "positivi_pct": 58,
+      "campione": 36,
+      "peggio": -38.5,
+      "meglio": 75.2
+     },
+     {
+      "mese": 11,
+      "media": -5.62,
+      "mediana": -7.24,
+      "positivi_pct": 31,
+      "campione": 36,
+      "peggio": -45.9,
+      "meglio": 67.2
+     },
+     {
+      "mese": 12,
+      "media": 1.19,
+      "mediana": 0.11,
+      "positivi_pct": 53,
+      "campione": 36,
+      "peggio": -36.7,
+      "meglio": 44.0
+     }
+    ]
+   },
    "rs_1m": -18.2,
    "rs_bench": "sp500",
    "rs_ndx_1m": -18.3
@@ -11332,6 +14620,201 @@
      "lo": 29626.0,
      "hi": 29764.5
     }
+   },
+   "tv": {
+    "tecnica": {
+     "prezzo": 30141.75,
+     "medie": {
+      "sma10": {
+       "liv": 29723.97,
+       "dist_pct": 1.41
+      },
+      "ema10": {
+       "liv": 29669.94,
+       "dist_pct": 1.59
+      },
+      "sma20": {
+       "liv": 29075.74,
+       "dist_pct": 3.67
+      },
+      "ema20": {
+       "liv": 29430.89,
+       "dist_pct": 2.42
+      },
+      "sma30": {
+       "liv": 29241.44,
+       "dist_pct": 3.08
+      },
+      "ema30": {
+       "liv": 29364.09,
+       "dist_pct": 2.65
+      },
+      "sma50": {
+       "liv": 29453.38,
+       "dist_pct": 2.34
+      },
+      "ema50": {
+       "liv": 29197.85,
+       "dist_pct": 3.23
+      },
+      "sma100": {
+       "liv": 28403.96,
+       "dist_pct": 6.12
+      },
+      "ema100": {
+       "liv": 28482.52,
+       "dist_pct": 5.83
+      },
+      "sma200": {
+       "liv": 26856.46,
+       "dist_pct": 12.23
+      },
+      "ema200": {
+       "liv": 27310.88,
+       "dist_pct": 10.37
+      }
+     },
+     "medie_battute": 12,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 59.0,
+      "macd": {
+       "linea": 206.37,
+       "segnale": 31.0,
+       "istogramma": 175.37
+      },
+      "stoch_k": 95.4,
+      "stoch_d": 95.0,
+      "williams_r": -4.6,
+      "cci20": 85.5,
+      "adx14": 16.8,
+      "di_su": 23.6,
+      "di_giu": 19.4,
+      "momentum10": 1737.5
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 1.03,
+     "m1": 1.51,
+     "m3": 2.44,
+     "m6": 21.7,
+     "ytd": 18.74,
+     "a1": 41.0,
+     "a3": 149.68,
+     "a5": 172.87,
+     "a10": 594.79
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": -0.45,
+      "mediana": 0.8,
+      "positivi_pct": 59,
+      "campione": 22,
+      "peggio": -12.2,
+      "meglio": 10.0
+     },
+     {
+      "mese": 2,
+      "media": -0.22,
+      "mediana": 0.24,
+      "positivi_pct": 50,
+      "campione": 22,
+      "peggio": -26.7,
+      "meglio": 15.3
+     },
+     {
+      "mese": 3,
+      "media": 1.11,
+      "mediana": 2.08,
+      "positivi_pct": 68,
+      "campione": 22,
+      "peggio": -17.0,
+      "meglio": 10.2
+     },
+     {
+      "mese": 4,
+      "media": 1.59,
+      "mediana": 2.32,
+      "positivi_pct": 64,
+      "campione": 22,
+      "peggio": -13.6,
+      "meglio": 18.2
+     },
+     {
+      "mese": 5,
+      "media": 2.86,
+      "mediana": 4.59,
+      "positivi_pct": 73,
+      "campione": 22,
+      "peggio": -8.5,
+      "meglio": 13.3
+     },
+     {
+      "mese": 6,
+      "media": 0.82,
+      "mediana": 1.51,
+      "positivi_pct": 68,
+      "campione": 22,
+      "peggio": -12.9,
+      "meglio": 7.9
+     },
+     {
+      "mese": 7,
+      "media": 2.53,
+      "mediana": 4.03,
+      "positivi_pct": 73,
+      "campione": 22,
+      "peggio": -8.9,
+      "meglio": 12.5
+     },
+     {
+      "mese": 8,
+      "media": 0.38,
+      "mediana": 0.99,
+      "positivi_pct": 61,
+      "campione": 23,
+      "peggio": -20.6,
+      "meglio": 11.2
+     },
+     {
+      "mese": 9,
+      "media": -1.53,
+      "mediana": -0.14,
+      "positivi_pct": 43,
+      "campione": 21,
+      "peggio": -20.2,
+      "meglio": 7.2
+     },
+     {
+      "mese": 10,
+      "media": 2.99,
+      "mediana": 4.76,
+      "positivi_pct": 68,
+      "campione": 22,
+      "peggio": -16.1,
+      "meglio": 16.5
+     },
+     {
+      "mese": 11,
+      "media": 1.5,
+      "mediana": 3.52,
+      "positivi_pct": 70,
+      "campione": 23,
+      "peggio": -30.1,
+      "meglio": 16.7
+     },
+     {
+      "mese": 12,
+      "media": 0.89,
+      "mediana": 0.2,
+      "positivi_pct": 50,
+      "campione": 22,
+      "peggio": -8.9,
+      "meglio": 16.7
+     }
+    ]
    },
    "rs_1m": -0.2,
    "rs_bench": "sp500",
@@ -12099,6 +15582,201 @@
      "lo": 6299.66,
      "hi": 6306.33
     }
+   },
+   "tv": {
+    "tecnica": {
+     "prezzo": 6977.94,
+     "medie": {
+      "sma10": {
+       "liv": 6478.53,
+       "dist_pct": 7.71
+      },
+      "ema10": {
+       "liv": 6567.24,
+       "dist_pct": 6.25
+      },
+      "sma20": {
+       "liv": 6463.32,
+       "dist_pct": 7.96
+      },
+      "ema20": {
+       "liv": 6644.22,
+       "dist_pct": 5.02
+      },
+      "sma30": {
+       "liv": 6761.53,
+       "dist_pct": 3.2
+      },
+      "ema30": {
+       "liv": 6807.63,
+       "dist_pct": 2.5
+      },
+      "sma50": {
+       "liv": 7408.26,
+       "dist_pct": -5.81
+      },
+      "ema50": {
+       "liv": 6988.87,
+       "dist_pct": -0.16
+      },
+      "sma100": {
+       "liv": 7065.17,
+       "dist_pct": -1.23
+      },
+      "ema100": {
+       "liv": 6825.97,
+       "dist_pct": 2.23
+      },
+      "sma200": {
+       "liv": 5873.23,
+       "dist_pct": 18.81
+      },
+      "ema200": {
+       "liv": 6088.55,
+       "dist_pct": 14.61
+      }
+     },
+     "medie_battute": 9,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 53.3,
+      "macd": {
+       "linea": -184.23,
+       "segnale": -309.52,
+       "istogramma": 125.29
+      },
+      "stoch_k": 98.1,
+      "stoch_d": 89.6,
+      "williams_r": -1.9,
+      "cci20": 51.9,
+      "adx14": 25.8,
+      "di_su": 25.6,
+      "di_giu": 29.3,
+      "momentum10": 382.49
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 11.49,
+     "m1": 1.77,
+     "m3": -10.79,
+     "m6": 37.11,
+     "ytd": 61.92,
+     "a1": 119.02,
+     "a3": 172.97,
+     "a5": 118.11,
+     "a10": 242.96
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 3.34,
+      "mediana": 1.89,
+      "positivi_pct": 63,
+      "campione": 30,
+      "peggio": -14.4,
+      "meglio": 50.8
+     },
+     {
+      "mese": 2,
+      "media": 0.31,
+      "mediana": 0.43,
+      "positivi_pct": 53,
+      "campione": 30,
+      "peggio": -12.2,
+      "meglio": 19.5
+     },
+     {
+      "mese": 3,
+      "media": 0.37,
+      "mediana": 0.52,
+      "positivi_pct": 57,
+      "campione": 30,
+      "peggio": -19.1,
+      "meglio": 19.0
+     },
+     {
+      "mese": 4,
+      "media": 3.18,
+      "mediana": 2.86,
+      "positivi_pct": 63,
+      "campione": 30,
+      "peggio": -15.7,
+      "meglio": 30.6
+     },
+     {
+      "mese": 5,
+      "media": 0.69,
+      "mediana": 1.17,
+      "positivi_pct": 53,
+      "campione": 30,
+      "peggio": -20.1,
+      "meglio": 28.4
+     },
+     {
+      "mese": 6,
+      "media": 0.59,
+      "mediana": -0.06,
+      "positivi_pct": 50,
+      "campione": 30,
+      "peggio": -13.2,
+      "meglio": 20.0
+     },
+     {
+      "mese": 7,
+      "media": 0.88,
+      "mediana": 1.53,
+      "positivi_pct": 60,
+      "campione": 30,
+      "peggio": -22.2,
+      "meglio": 15.3
+     },
+     {
+      "mese": 8,
+      "media": -0.79,
+      "mediana": -0.65,
+      "positivi_pct": 43,
+      "campione": 30,
+      "peggio": -11.9,
+      "meglio": 9.3
+     },
+     {
+      "mese": 9,
+      "media": -1.22,
+      "mediana": 0.07,
+      "positivi_pct": 55,
+      "campione": 29,
+      "peggio": -12.8,
+      "meglio": 12.7
+     },
+     {
+      "mese": 10,
+      "media": -0.43,
+      "mediana": -0.32,
+      "positivi_pct": 45,
+      "campione": 29,
+      "peggio": -27.2,
+      "meglio": 24.0
+     },
+     {
+      "mese": 11,
+      "media": 2.88,
+      "mediana": 0.83,
+      "positivi_pct": 59,
+      "campione": 29,
+      "peggio": -13.4,
+      "meglio": 19.7
+     },
+     {
+      "mese": 12,
+      "media": 2.05,
+      "mediana": 2.03,
+      "positivi_pct": 59,
+      "campione": 29,
+      "peggio": -13.4,
+      "meglio": 24.5
+     }
+    ]
    },
    "rs_1m": -7.6,
    "rs_bench": "sp500",
@@ -12902,6 +16580,201 @@
      "lo": 12008.88,
      "hi": 12141.69
     }
+   },
+   "tv": {
+    "tecnica": {
+     "prezzo": 12417.05,
+     "medie": {
+      "sma10": {
+       "liv": 12138.87,
+       "dist_pct": 2.29
+      },
+      "ema10": {
+       "liv": 12156.02,
+       "dist_pct": 2.15
+      },
+      "sma20": {
+       "liv": 11885.71,
+       "dist_pct": 4.47
+      },
+      "ema20": {
+       "liv": 12109.18,
+       "dist_pct": 2.54
+      },
+      "sma30": {
+       "liv": 12078.9,
+       "dist_pct": 2.8
+      },
+      "ema30": {
+       "liv": 12161.81,
+       "dist_pct": 2.1
+      },
+      "sma50": {
+       "liv": 12607.76,
+       "dist_pct": -1.51
+      },
+      "ema50": {
+       "liv": 12108.61,
+       "dist_pct": 2.55
+      },
+      "sma100": {
+       "liv": 11474.36,
+       "dist_pct": 8.22
+      },
+      "ema100": {
+       "liv": 11407.07,
+       "dist_pct": 8.85
+      },
+      "sma200": {
+       "liv": 9498.04,
+       "dist_pct": 30.73
+      },
+      "ema200": {
+       "liv": 10041.19,
+       "dist_pct": 23.66
+      }
+     },
+     "medie_battute": 11,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 53.4,
+      "macd": {
+       "linea": -19.87,
+       "segnale": -151.99,
+       "istogramma": 132.12
+      },
+      "stoch_k": 87.3,
+      "stoch_d": 90.0,
+      "williams_r": -12.7,
+      "cci20": 52.5,
+      "adx14": 17.7,
+      "di_su": 26.0,
+      "di_giu": 27.5,
+      "momentum10": 1105.97
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 0.49,
+     "m1": 0.15,
+     "m3": 2.78,
+     "m6": 53.59,
+     "ytd": 68.54,
+     "a1": 119.04,
+     "a3": 238.25,
+     "a5": 263.31,
+     "a10": 1449.27
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 3.61,
+      "mediana": 2.66,
+      "positivi_pct": 59,
+      "campione": 32,
+      "peggio": -12.2,
+      "meglio": 27.0
+     },
+     {
+      "mese": 2,
+      "media": 2.55,
+      "mediana": 2.02,
+      "positivi_pct": 62,
+      "campione": 32,
+      "peggio": -26.1,
+      "meglio": 50.4
+     },
+     {
+      "mese": 3,
+      "media": 0.91,
+      "mediana": 0.34,
+      "positivi_pct": 50,
+      "campione": 32,
+      "peggio": -11.4,
+      "meglio": 16.5
+     },
+     {
+      "mese": 4,
+      "media": 3.19,
+      "mediana": 0.82,
+      "positivi_pct": 50,
+      "campione": 32,
+      "peggio": -14.9,
+      "meglio": 38.4
+     },
+     {
+      "mese": 5,
+      "media": 2.98,
+      "mediana": 5.8,
+      "positivi_pct": 66,
+      "campione": 32,
+      "peggio": -17.9,
+      "meglio": 22.1
+     },
+     {
+      "mese": 6,
+      "media": 0.47,
+      "mediana": -1.1,
+      "positivi_pct": 42,
+      "campione": 33,
+      "peggio": -18.6,
+      "meglio": 24.8
+     },
+     {
+      "mese": 7,
+      "media": 0.96,
+      "mediana": 1.97,
+      "positivi_pct": 58,
+      "campione": 33,
+      "peggio": -20.6,
+      "meglio": 19.8
+     },
+     {
+      "mese": 8,
+      "media": 0.26,
+      "mediana": 1.47,
+      "positivi_pct": 55,
+      "campione": 33,
+      "peggio": -24.2,
+      "meglio": 17.0
+     },
+     {
+      "mese": 9,
+      "media": -2.12,
+      "mediana": -0.46,
+      "positivi_pct": 47,
+      "campione": 32,
+      "peggio": -33.6,
+      "meglio": 13.6
+     },
+     {
+      "mese": 10,
+      "media": 2.19,
+      "mediana": 2.03,
+      "positivi_pct": 59,
+      "campione": 32,
+      "peggio": -22.0,
+      "meglio": 23.9
+     },
+     {
+      "mese": 11,
+      "media": 4.41,
+      "mediana": 4.25,
+      "positivi_pct": 69,
+      "campione": 32,
+      "peggio": -27.6,
+      "meglio": 27.2
+     },
+     {
+      "mese": 12,
+      "media": 1.13,
+      "mediana": 1.04,
+      "positivi_pct": 62,
+      "campione": 32,
+      "peggio": -22.6,
+      "meglio": 16.1
+     }
+    ]
    },
    "rs_1m": 1.3,
    "rs_bench": "sp500",
@@ -13786,6 +17659,201 @@
      "hi": 3016.3
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 3068.42,
+     "medie": {
+      "sma10": {
+       "liv": 3028.54,
+       "dist_pct": 1.32
+      },
+      "ema10": {
+       "liv": 3026.46,
+       "dist_pct": 1.39
+      },
+      "sma20": {
+       "liv": 2986.55,
+       "dist_pct": 2.74
+      },
+      "ema20": {
+       "liv": 3003.73,
+       "dist_pct": 2.15
+      },
+      "sma30": {
+       "liv": 2982.69,
+       "dist_pct": 2.87
+      },
+      "ema30": {
+       "liv": 2988.85,
+       "dist_pct": 2.66
+      },
+      "sma50": {
+       "liv": 2970.05,
+       "dist_pct": 3.31
+      },
+      "ema50": {
+       "liv": 2957.5,
+       "dist_pct": 3.75
+      },
+      "sma100": {
+       "liv": 2857.23,
+       "dist_pct": 7.39
+      },
+      "ema100": {
+       "liv": 2873.58,
+       "dist_pct": 6.78
+      },
+      "sma200": {
+       "liv": 2703.47,
+       "dist_pct": 13.5
+      },
+      "ema200": {
+       "liv": 2742.63,
+       "dist_pct": 11.88
+      }
+     },
+     "medie_battute": 12,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 63.0,
+      "macd": {
+       "linea": 25.79,
+       "segnale": 17.14,
+       "istogramma": 8.65
+      },
+      "stoch_k": 99.2,
+      "stoch_d": 95.8,
+      "williams_r": -0.8,
+      "cci20": 117.5,
+      "adx14": 15.5,
+      "di_su": 24.8,
+      "di_giu": 14.9,
+      "momentum10": 137.08
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 1.12,
+     "m1": 3.1,
+     "m3": 6.89,
+     "m6": 17.3,
+     "ytd": 22.33,
+     "a1": 29.67,
+     "a3": 61.52,
+     "a5": 34.95,
+     "a10": 147.47
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 0.74,
+      "mediana": 1.25,
+      "positivi_pct": 54,
+      "campione": 39,
+      "peggio": -11.2,
+      "meglio": 11.2
+     },
+     {
+      "mese": 2,
+      "media": 1.01,
+      "mediana": 0.97,
+      "positivi_pct": 59,
+      "campione": 39,
+      "peggio": -12.3,
+      "meglio": 16.4
+     },
+     {
+      "mese": 3,
+      "media": 0.41,
+      "mediana": 1.12,
+      "positivi_pct": 67,
+      "campione": 39,
+      "peggio": -21.9,
+      "meglio": 8.7
+     },
+     {
+      "mese": 4,
+      "media": 1.24,
+      "mediana": 0.81,
+      "positivi_pct": 59,
+      "campione": 39,
+      "peggio": -10.0,
+      "meglio": 15.3
+     },
+     {
+      "mese": 5,
+      "media": 1.38,
+      "mediana": 2.12,
+      "positivi_pct": 67,
+      "campione": 39,
+      "peggio": -7.9,
+      "meglio": 11.0
+     },
+     {
+      "mese": 6,
+      "media": 0.8,
+      "mediana": 0.6,
+      "positivi_pct": 64,
+      "campione": 39,
+      "peggio": -8.4,
+      "meglio": 8.6
+     },
+     {
+      "mese": 7,
+      "media": 0.45,
+      "mediana": 1.33,
+      "positivi_pct": 56,
+      "campione": 39,
+      "peggio": -15.2,
+      "meglio": 10.4
+     },
+     {
+      "mese": 8,
+      "media": -0.23,
+      "mediana": 1.87,
+      "positivi_pct": 54,
+      "campione": 39,
+      "peggio": -19.5,
+      "meglio": 7.4
+     },
+     {
+      "mese": 9,
+      "media": -0.43,
+      "mediana": 0.57,
+      "positivi_pct": 58,
+      "campione": 38,
+      "peggio": -13.6,
+      "meglio": 12.3
+     },
+     {
+      "mese": 10,
+      "media": -0.54,
+      "mediana": 1.76,
+      "positivi_pct": 56,
+      "campione": 39,
+      "peggio": -30.8,
+      "meglio": 15.0
+     },
+     {
+      "mese": 11,
+      "media": 2.24,
+      "mediana": 3.01,
+      "positivi_pct": 69,
+      "campione": 39,
+      "peggio": -12.0,
+      "meglio": 18.3
+     },
+     {
+      "mese": 12,
+      "media": 2.38,
+      "mediana": 2.63,
+      "positivi_pct": 77,
+      "campione": 39,
+      "peggio": -12.0,
+      "meglio": 12.1
+     }
+    ]
+   },
    "rs_1m": -0.2,
    "rs_bench": "sp500",
    "rs_ndx_1m": -0.4
@@ -14571,6 +18639,201 @@
      "hi": 1.15
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 1.16,
+     "medie": {
+      "sma10": {
+       "liv": 1.15,
+       "dist_pct": 0.27
+      },
+      "ema10": {
+       "liv": 1.15,
+       "dist_pct": 0.36
+      },
+      "sma20": {
+       "liv": 1.15,
+       "dist_pct": 0.81
+      },
+      "ema20": {
+       "liv": 1.15,
+       "dist_pct": 0.61
+      },
+      "sma30": {
+       "liv": 1.15,
+       "dist_pct": 0.97
+      },
+      "ema30": {
+       "liv": 1.15,
+       "dist_pct": 0.7
+      },
+      "sma50": {
+       "liv": 1.15,
+       "dist_pct": 0.92
+      },
+      "ema50": {
+       "liv": 1.15,
+       "dist_pct": 0.62
+      },
+      "sma100": {
+       "liv": 1.16,
+       "dist_pct": 0.04
+      },
+      "ema100": {
+       "liv": 1.15,
+       "dist_pct": 0.24
+      },
+      "sma200": {
+       "liv": 1.16,
+       "dist_pct": -0.48
+      },
+      "ema200": {
+       "liv": 1.16,
+       "dist_pct": -0.22
+      }
+     },
+     "medie_battute": 10,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 61.4,
+      "macd": {
+       "linea": 0.0,
+       "segnale": 0.0,
+       "istogramma": 0.0
+      },
+      "stoch_k": 93.1,
+      "stoch_d": 85.1,
+      "williams_r": -6.9,
+      "cci20": 95.4,
+      "adx14": 27.8,
+      "di_su": 26.4,
+      "di_giu": 13.2,
+      "momentum10": 0.0
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 0.42,
+     "m1": 1.3,
+     "m3": -1.22,
+     "m6": -1.83,
+     "a1": -1.17,
+     "ytd": -1.51,
+     "a3": 5.86,
+     "a5": -1.9,
+     "a10": 3.76
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": -0.68,
+      "mediana": -0.99,
+      "positivi_pct": 43,
+      "campione": 23,
+      "peggio": -8.1,
+      "meglio": 3.4
+     },
+     {
+      "mese": 2,
+      "media": -0.17,
+      "mediana": -0.04,
+      "positivi_pct": 43,
+      "campione": 23,
+      "peggio": -3.1,
+      "meglio": 2.6
+     },
+     {
+      "mese": 3,
+      "media": 0.32,
+      "mediana": 0.0,
+      "positivi_pct": 52,
+      "campione": 23,
+      "peggio": -3.3,
+      "meglio": 4.5
+     },
+     {
+      "mese": 4,
+      "media": 0.71,
+      "mediana": 0.45,
+      "positivi_pct": 52,
+      "campione": 23,
+      "peggio": -5.5,
+      "meglio": 5.2
+     },
+     {
+      "mese": 5,
+      "media": -0.86,
+      "mediana": -0.41,
+      "positivi_pct": 35,
+      "campione": 23,
+      "peggio": -7.6,
+      "meglio": 6.7
+     },
+     {
+      "mese": 6,
+      "media": 0.28,
+      "mediana": 0.07,
+      "positivi_pct": 52,
+      "campione": 23,
+      "peggio": -3.0,
+      "meglio": 3.3
+     },
+     {
+      "mese": 7,
+      "media": 0.23,
+      "mediana": 0.02,
+      "positivi_pct": 52,
+      "campione": 23,
+      "peggio": -3.2,
+      "meglio": 6.6
+     },
+     {
+      "mese": 8,
+      "media": -0.02,
+      "mediana": 0.27,
+      "positivi_pct": 52,
+      "campione": 23,
+      "peggio": -5.8,
+      "meglio": 2.5
+     },
+     {
+      "mese": 9,
+      "media": -0.17,
+      "mediana": -0.49,
+      "positivi_pct": 45,
+      "campione": 22,
+      "peggio": -5.9,
+      "meglio": 7.6
+     },
+     {
+      "mese": 10,
+      "media": -0.29,
+      "mediana": -0.03,
+      "positivi_pct": 50,
+      "campione": 22,
+      "peggio": -9.9,
+      "meglio": 4.1
+     },
+     {
+      "mese": 11,
+      "media": -0.21,
+      "mediana": -0.06,
+      "positivi_pct": 50,
+      "campione": 22,
+      "peggio": -5.8,
+      "meglio": 3.8
+     },
+     {
+      "mese": 12,
+      "media": 0.89,
+      "mediana": 1.0,
+      "positivi_pct": 68,
+      "campione": 22,
+      "peggio": -4.7,
+      "meglio": 10.3
+     }
+    ]
+   },
    "rs_1m": -2.5,
    "rs_bench": "sp500",
    "rs_ndx_1m": -2.6
@@ -15212,6 +19475,201 @@
      "hi": 6.61
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 6.61,
+     "medie": {
+      "sma10": {
+       "liv": 6.61,
+       "dist_pct": 0.04
+      },
+      "ema10": {
+       "liv": 6.57,
+       "dist_pct": 0.59
+      },
+      "sma20": {
+       "liv": 6.49,
+       "dist_pct": 1.89
+      },
+      "ema20": {
+       "liv": 6.5,
+       "dist_pct": 1.69
+      },
+      "sma30": {
+       "liv": 6.4,
+       "dist_pct": 3.31
+      },
+      "ema30": {
+       "liv": 6.45,
+       "dist_pct": 2.51
+      },
+      "sma50": {
+       "liv": 6.35,
+       "dist_pct": 4.18
+      },
+      "ema50": {
+       "liv": 6.37,
+       "dist_pct": 3.74
+      },
+      "sma100": {
+       "liv": 6.19,
+       "dist_pct": 6.8
+      },
+      "ema100": {
+       "liv": 6.21,
+       "dist_pct": 6.57
+      },
+      "sma200": {
+       "liv": 5.87,
+       "dist_pct": 12.64
+      },
+      "ema200": {
+       "liv": 5.88,
+       "dist_pct": 12.45
+      }
+     },
+     "medie_battute": 12,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 60.2,
+      "macd": {
+       "linea": 0.09,
+       "segnale": 0.08,
+       "istogramma": 0.01
+      },
+      "stoch_k": 75.8,
+      "stoch_d": 73.2,
+      "williams_r": -24.2,
+      "cci20": 45.0,
+      "adx14": 15.7,
+      "di_su": 35.4,
+      "di_giu": 28.5,
+      "momentum10": 0.18
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 0.65,
+     "m1": 5.08,
+     "m3": 3.11,
+     "m6": 14.59,
+     "ytd": 17.25,
+     "a1": 42.14,
+     "a3": 61.39,
+     "a5": 117.28,
+     "a10": 131.22
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 0.75,
+      "mediana": 0.41,
+      "positivi_pct": 59,
+      "campione": 22,
+      "peggio": -10.9,
+      "meglio": 11.9
+     },
+     {
+      "mese": 2,
+      "media": 3.58,
+      "mediana": 2.73,
+      "positivi_pct": 73,
+      "campione": 22,
+      "peggio": -5.3,
+      "meglio": 17.1
+     },
+     {
+      "mese": 3,
+      "media": 2.35,
+      "mediana": 0.23,
+      "positivi_pct": 55,
+      "campione": 22,
+      "peggio": -8.1,
+      "meglio": 18.9
+     },
+     {
+      "mese": 4,
+      "media": 2.69,
+      "mediana": -0.95,
+      "positivi_pct": 41,
+      "campione": 22,
+      "peggio": -11.0,
+      "meglio": 40.4
+     },
+     {
+      "mese": 5,
+      "media": 0.98,
+      "mediana": 2.55,
+      "positivi_pct": 64,
+      "campione": 22,
+      "peggio": -12.1,
+      "meglio": 11.4
+     },
+     {
+      "mese": 6,
+      "media": -1.7,
+      "mediana": -3.06,
+      "positivi_pct": 45,
+      "campione": 22,
+      "peggio": -15.5,
+      "meglio": 11.8
+     },
+     {
+      "mese": 7,
+      "media": 2.57,
+      "mediana": 4.1,
+      "positivi_pct": 73,
+      "campione": 22,
+      "peggio": -11.7,
+      "meglio": 15.9
+     },
+     {
+      "mese": 8,
+      "media": -1.16,
+      "mediana": -1.25,
+      "positivi_pct": 35,
+      "campione": 23,
+      "peggio": -10.2,
+      "meglio": 7.3
+     },
+     {
+      "mese": 9,
+      "media": -0.22,
+      "mediana": 0.18,
+      "positivi_pct": 55,
+      "campione": 22,
+      "peggio": -24.9,
+      "meglio": 10.3
+     },
+     {
+      "mese": 10,
+      "media": 0.49,
+      "mediana": 2.0,
+      "positivi_pct": 59,
+      "campione": 22,
+      "peggio": -36.1,
+      "meglio": 15.4
+     },
+     {
+      "mese": 11,
+      "media": 1.13,
+      "mediana": 2.37,
+      "positivi_pct": 57,
+      "campione": 23,
+      "peggio": -12.0,
+      "meglio": 19.1
+     },
+     {
+      "mese": 12,
+      "media": 1.43,
+      "mediana": 1.0,
+      "positivi_pct": 59,
+      "campione": 22,
+      "peggio": -14.1,
+      "meglio": 16.1
+     }
+    ]
+   },
    "rs_1m": 1.6,
    "rs_bench": "sp500",
    "rs_ndx_1m": 1.4
@@ -15852,6 +20310,201 @@
      "lo": 79.26,
      "hi": 82.0
     }
+   },
+   "tv": {
+    "tecnica": {
+     "prezzo": 82.4,
+     "medie": {
+      "sma10": {
+       "liv": 79.9,
+       "dist_pct": 3.12
+      },
+      "ema10": {
+       "liv": 81.36,
+       "dist_pct": 1.28
+      },
+      "sma20": {
+       "liv": 82.51,
+       "dist_pct": -0.13
+      },
+      "ema20": {
+       "liv": 81.01,
+       "dist_pct": 1.71
+      },
+      "sma30": {
+       "liv": 80.15,
+       "dist_pct": 2.8
+      },
+      "ema30": {
+       "liv": 81.04,
+       "dist_pct": 1.68
+      },
+      "sma50": {
+       "liv": 79.55,
+       "dist_pct": 3.58
+      },
+      "ema50": {
+       "liv": 81.95,
+       "dist_pct": 0.55
+      },
+      "sma100": {
+       "liv": 88.7,
+       "dist_pct": -7.1
+      },
+      "ema100": {
+       "liv": 82.45,
+       "dist_pct": -0.05
+      },
+      "sma200": {
+       "liv": 76.84,
+       "dist_pct": 7.24
+      },
+      "ema200": {
+       "liv": 78.85,
+       "dist_pct": 4.5
+      }
+     },
+     "medie_battute": 9,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 52.5,
+      "macd": {
+       "linea": 0.32,
+       "segnale": 0.2,
+       "istogramma": 0.12
+      },
+      "stoch_k": 64.6,
+      "stoch_d": 56.2,
+      "williams_r": -35.4,
+      "cci20": -4.9,
+      "adx14": 16.2,
+      "di_su": 24.5,
+      "di_giu": 22.0,
+      "momentum10": -2.27
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 5.4,
+     "m1": 3.52,
+     "m3": -15.98,
+     "m6": 31.13,
+     "ytd": 43.75,
+     "a1": 35.55,
+     "a3": 6.94,
+     "a5": 130.23,
+     "a10": 24.57
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 3.73,
+      "mediana": 5.5,
+      "positivi_pct": 64,
+      "campione": 22,
+      "peggio": -9.4,
+      "meglio": 24.6
+     },
+     {
+      "mese": 2,
+      "media": 3.44,
+      "mediana": 5.21,
+      "positivi_pct": 73,
+      "campione": 22,
+      "peggio": -13.2,
+      "meglio": 17.8
+     },
+     {
+      "mese": 3,
+      "media": 3.32,
+      "mediana": 5.12,
+      "positivi_pct": 64,
+      "campione": 22,
+      "peggio": -15.2,
+      "meglio": 20.0
+     },
+     {
+      "mese": 4,
+      "media": 3.24,
+      "mediana": 4.22,
+      "positivi_pct": 64,
+      "campione": 22,
+      "peggio": -57.9,
+      "meglio": 61.1
+     },
+     {
+      "mese": 5,
+      "media": 3.64,
+      "mediana": 0.15,
+      "positivi_pct": 50,
+      "campione": 22,
+      "peggio": -16.9,
+      "meglio": 88.4
+     },
+     {
+      "mese": 6,
+      "media": 2.02,
+      "mediana": 4.38,
+      "positivi_pct": 68,
+      "campione": 22,
+      "peggio": -20.4,
+      "meglio": 13.6
+     },
+     {
+      "mese": 7,
+      "media": 2.44,
+      "mediana": 0.62,
+      "positivi_pct": 68,
+      "campione": 22,
+      "peggio": -20.8,
+      "meglio": 21.8
+     },
+     {
+      "mese": 8,
+      "media": 0.21,
+      "mediana": 0.73,
+      "positivi_pct": 52,
+      "campione": 23,
+      "peggio": -9.2,
+      "meglio": 13.8
+     },
+     {
+      "mese": 9,
+      "media": -2.06,
+      "mediana": -4.18,
+      "positivi_pct": 41,
+      "campione": 22,
+      "peggio": -13.9,
+      "meglio": 13.3
+     },
+     {
+      "mese": 10,
+      "media": -2.24,
+      "mediana": -2.54,
+      "positivi_pct": 36,
+      "campione": 22,
+      "peggio": -32.6,
+      "meglio": 17.7
+     },
+     {
+      "mese": 11,
+      "media": -3.96,
+      "mediana": -3.8,
+      "positivi_pct": 39,
+      "campione": 23,
+      "peggio": -22.0,
+      "meglio": 11.1
+     },
+     {
+      "mese": 12,
+      "media": -0.55,
+      "mediana": 0.85,
+      "positivi_pct": 50,
+      "campione": 22,
+      "peggio": -20.7,
+      "meglio": 35.6
+     }
+    ]
    },
    "rs_1m": 1.0,
    "rs_bench": "sp500",
@@ -16681,6 +21334,285 @@
      "hi": 419.32
     }
    },
+   "tv": {
+    "tecnica": {
+     "prezzo": 426.35,
+     "medie": {
+      "sma10": {
+       "liv": 420.2,
+       "dist_pct": 1.46
+      },
+      "ema10": {
+       "liv": 420.78,
+       "dist_pct": 1.32
+      },
+      "sma20": {
+       "liv": 412.14,
+       "dist_pct": 3.45
+      },
+      "ema20": {
+       "liv": 418.15,
+       "dist_pct": 1.96
+      },
+      "sma30": {
+       "liv": 416.82,
+       "dist_pct": 2.29
+      },
+      "ema30": {
+       "liv": 418.33,
+       "dist_pct": 1.92
+      },
+      "sma50": {
+       "liv": 425.06,
+       "dist_pct": 0.3
+      },
+      "ema50": {
+       "liv": 416.69,
+       "dist_pct": 2.32
+      },
+      "sma100": {
+       "liv": 404.9,
+       "dist_pct": 5.3
+      },
+      "ema100": {
+       "liv": 402.26,
+       "dist_pct": 5.99
+      },
+      "sma200": {
+       "liv": 362.32,
+       "dist_pct": 17.67
+      },
+      "ema200": {
+       "liv": 369.36,
+       "dist_pct": 15.43
+      }
+     },
+     "medie_battute": 12,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 54.3,
+      "macd": {
+       "linea": 1.43,
+       "segnale": -1.91,
+       "istogramma": 3.33
+      },
+      "stoch_k": 84.7,
+      "stoch_d": 89.7,
+      "williams_r": -15.3,
+      "cci20": 56.4,
+      "adx14": 12.4,
+      "di_su": 25.3,
+      "di_giu": 21.2,
+      "momentum10": 22.1
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": 1.5,
+     "m1": 1.64,
+     "m3": 5.64,
+     "m6": 16.42,
+     "ytd": 34.09,
+     "a1": 86.71,
+     "a3": 375.42,
+     "a5": 288.64,
+     "a10": 1765.95
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 7.24,
+      "mediana": 4.23,
+      "positivi_pct": 69,
+      "campione": 29,
+      "peggio": -11.2,
+      "meglio": 41.0
+     },
+     {
+      "mese": 2,
+      "media": 0.79,
+      "mediana": 1.81,
+      "positivi_pct": 55,
+      "campione": 29,
+      "peggio": -22.0,
+      "meglio": 20.8
+     },
+     {
+      "mese": 3,
+      "media": 2.22,
+      "mediana": 0.95,
+      "positivi_pct": 55,
+      "campione": 29,
+      "peggio": -10.4,
+      "meglio": 27.7
+     },
+     {
+      "mese": 4,
+      "media": 2.27,
+      "mediana": 0.95,
+      "positivi_pct": 66,
+      "campione": 29,
+      "peggio": -14.7,
+      "meglio": 24.3
+     },
+     {
+      "mese": 5,
+      "media": 0.31,
+      "mediana": 1.87,
+      "positivi_pct": 62,
+      "campione": 29,
+      "peggio": -23.2,
+      "meglio": 21.1
+     },
+     {
+      "mese": 6,
+      "media": 2.78,
+      "mediana": 2.78,
+      "positivi_pct": 62,
+      "campione": 29,
+      "peggio": -14.0,
+      "meglio": 29.8
+     },
+     {
+      "mese": 7,
+      "media": -0.13,
+      "mediana": -1.98,
+      "positivi_pct": 45,
+      "campione": 29,
+      "peggio": -29.8,
+      "meglio": 39.0
+     },
+     {
+      "mese": 8,
+      "media": 0.24,
+      "mediana": 2.03,
+      "positivi_pct": 55,
+      "campione": 29,
+      "peggio": -20.4,
+      "meglio": 17.8
+     },
+     {
+      "mese": 9,
+      "media": -1.92,
+      "mediana": 1.54,
+      "positivi_pct": 57,
+      "campione": 28,
+      "peggio": -41.6,
+      "meglio": 21.4
+     },
+     {
+      "mese": 10,
+      "media": 5.82,
+      "mediana": 5.93,
+      "positivi_pct": 79,
+      "campione": 28,
+      "peggio": -13.7,
+      "meglio": 36.0
+     },
+     {
+      "mese": 11,
+      "media": 4.12,
+      "mediana": 3.03,
+      "positivi_pct": 62,
+      "campione": 29,
+      "peggio": -25.9,
+      "meglio": 34.8
+     },
+     {
+      "mese": 12,
+      "media": 1.96,
+      "mediana": 1.67,
+      "positivi_pct": 59,
+      "campione": 29,
+      "peggio": -23.8,
+      "meglio": 25.7
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.02,
+      "r2": 0.578,
+      "corr": 0.76,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.01,
+      "r2": 0.625,
+      "corr": 0.79,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.01,
+      "r2": 0.028,
+      "corr": 0.17,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.01,
+      "r2": 0.039,
+      "corr": -0.2,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-06-30",
+      "ricavi": 1270381000000,
+      "utile": 706562000000,
+      "operativo": 766603000000,
+      "margine": 55.6,
+      "margine_op": 60.3
+     },
+     {
+      "trim": "2026-03-31",
+      "ricavi": 1134103440000,
+      "utile": 572479752000,
+      "operativo": 658948859000,
+      "margine": 50.5,
+      "margine_op": 58.1
+     },
+     {
+      "trim": "2025-12-31",
+      "ricavi": 1046090449000,
+      "utile": 485465363000,
+      "operativo": 564880854000,
+      "margine": 46.4,
+      "margine_op": 54.0
+     },
+     {
+      "trim": "2025-09-30",
+      "ricavi": 989918318000,
+      "utile": 452301407000,
+      "operativo": 500685080000,
+      "margine": 45.7,
+      "margine_op": 50.6
+     },
+     {
+      "trim": "2025-06-30",
+      "ricavi": 933792000000,
+      "utile": 398273000000,
+      "operativo": 463423000000,
+      "margine": 42.7,
+      "margine_op": 49.6
+     }
+    ]
+   },
    "rs_1m": 0.7,
    "rs_bench": "sp500",
    "rs_ndx_1m": 0.5
@@ -17365,6 +22297,285 @@
      "lo": 389.28,
      "hi": 394.83
     }
+   },
+   "tv": {
+    "tecnica": {
+     "prezzo": 392.99,
+     "medie": {
+      "sma10": {
+       "liv": 414.23,
+       "dist_pct": -5.13
+      },
+      "ema10": {
+       "liv": 408.84,
+       "dist_pct": -3.88
+      },
+      "sma20": {
+       "liv": 399.49,
+       "dist_pct": -1.63
+      },
+      "ema20": {
+       "liv": 403.07,
+       "dist_pct": -2.5
+      },
+      "sma30": {
+       "liv": 394.56,
+       "dist_pct": -0.4
+      },
+      "ema30": {
+       "liv": 399.81,
+       "dist_pct": -1.71
+      },
+      "sma50": {
+       "liv": 390.33,
+       "dist_pct": 0.68
+      },
+      "ema50": {
+       "liv": 396.52,
+       "dist_pct": -0.89
+      },
+      "sma100": {
+       "liv": 392.38,
+       "dist_pct": 0.16
+      },
+      "ema100": {
+       "liv": 387.8,
+       "dist_pct": 1.34
+      },
+      "sma200": {
+       "liv": 368.25,
+       "dist_pct": 6.72
+      },
+      "ema200": {
+       "liv": 371.23,
+       "dist_pct": 5.86
+      }
+     },
+     "medie_battute": 5,
+     "medie_totali": 12,
+     "oscillatori": {
+      "rsi14": 46.5,
+      "macd": {
+       "linea": 6.79,
+       "segnale": 6.23,
+       "istogramma": 0.57
+      },
+      "stoch_k": 37.1,
+      "stoch_d": 62.4,
+      "williams_r": -62.9,
+      "cci20": -7.2,
+      "adx14": 14.3,
+      "di_su": 19.6,
+      "di_giu": 26.9,
+      "momentum10": 3.71
+     },
+     "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
+    },
+    "performance": {
+     "s1": -8.13,
+     "m1": -0.33,
+     "m3": -8.13,
+     "m6": 19.1,
+     "ytd": 13.47,
+     "a1": 33.11,
+     "a3": 341.47,
+     "a5": 768.2,
+     "a10": 2805.87
+    },
+    "stagionalita": [
+     {
+      "mese": 1,
+      "media": 1.67,
+      "mediana": 2.28,
+      "positivi_pct": 59,
+      "campione": 17,
+      "peggio": -12.0,
+      "meglio": 17.6
+     },
+     {
+      "mese": 2,
+      "media": 3.91,
+      "mediana": 2.65,
+      "positivi_pct": 71,
+      "campione": 17,
+      "peggio": -10.7,
+      "meglio": 24.0
+     },
+     {
+      "mese": 3,
+      "media": 2.03,
+      "mediana": 3.98,
+      "positivi_pct": 59,
+      "campione": 17,
+      "peggio": -15.8,
+      "meglio": 15.7
+     },
+     {
+      "mese": 4,
+      "media": 1.2,
+      "mediana": -1.61,
+      "positivi_pct": 35,
+      "campione": 17,
+      "peggio": -12.0,
+      "meglio": 34.9
+     },
+     {
+      "mese": 5,
+      "media": 8.02,
+      "mediana": 7.03,
+      "positivi_pct": 88,
+      "campione": 17,
+      "peggio": -21.0,
+      "meglio": 29.0
+     },
+     {
+      "mese": 6,
+      "media": 3.01,
+      "mediana": 1.99,
+      "positivi_pct": 65,
+      "campione": 17,
+      "peggio": -15.6,
+      "meglio": 21.2
+     },
+     {
+      "mese": 7,
+      "media": 0.65,
+      "mediana": 1.8,
+      "positivi_pct": 71,
+      "campione": 17,
+      "peggio": -11.5,
+      "meglio": 10.2
+     },
+     {
+      "mese": 8,
+      "media": 1.94,
+      "mediana": 1.26,
+      "positivi_pct": 65,
+      "campione": 17,
+      "peggio": -7.4,
+      "meglio": 18.3
+     },
+     {
+      "mese": 9,
+      "media": 1.62,
+      "mediana": -0.73,
+      "positivi_pct": 41,
+      "campione": 17,
+      "peggio": -10.3,
+      "meglio": 13.5
+     },
+     {
+      "mese": 10,
+      "media": 1.52,
+      "mediana": 1.3,
+      "positivi_pct": 53,
+      "campione": 17,
+      "peggio": -12.1,
+      "meglio": 12.0
+     },
+     {
+      "mese": 11,
+      "media": 5.26,
+      "mediana": 5.94,
+      "positivi_pct": 82,
+      "campione": 17,
+      "peggio": -11.4,
+      "meglio": 17.2
+     },
+     {
+      "mese": 12,
+      "media": 8.28,
+      "mediana": 8.23,
+      "positivi_pct": 76,
+      "campione": 17,
+      "peggio": -13.9,
+      "meglio": 43.4
+     }
+    ],
+    "sensibilita": {
+     "mercato": {
+      "strumento": "QQQ",
+      "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
+      "beta": 0.02,
+      "r2": 0.431,
+      "corr": 0.66,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "settore": {
+      "strumento": "SOXX",
+      "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
+      "beta": 0.01,
+      "r2": 0.419,
+      "corr": 0.65,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "tassi": {
+      "strumento": "TLT",
+      "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
+      "beta": 0.01,
+      "r2": 0.048,
+      "corr": 0.22,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     },
+     "dollaro": {
+      "strumento": "UUP",
+      "canale": "il dollaro: ricavi esteri e costi in valuta",
+      "beta": -0.01,
+      "r2": 0.024,
+      "corr": -0.15,
+      "campione": 250,
+      "da": "2025-08-18",
+      "a": "2026-08-14"
+     }
+    },
+    "conto_trim": [
+     {
+      "trim": "2026-04-30",
+      "ricavi": 22187000000,
+      "utile": 9310000000,
+      "operativo": 10859000000,
+      "margine": 42.0,
+      "margine_op": 48.9
+     },
+     {
+      "trim": "2026-01-31",
+      "ricavi": 19311000000,
+      "utile": 7349000000,
+      "operativo": 8666000000,
+      "margine": 38.1,
+      "margine_op": 44.9
+     },
+     {
+      "trim": "2025-10-31",
+      "ricavi": 18015000000,
+      "utile": 8518000000,
+      "operativo": 7654000000,
+      "margine": 47.3,
+      "margine_op": 42.5
+     },
+     {
+      "trim": "2025-07-31",
+      "ricavi": 15952000000,
+      "utile": 4140000000,
+      "operativo": 6074000000,
+      "margine": 26.0,
+      "margine_op": 38.1
+     },
+     {
+      "trim": "2025-04-30",
+      "ricavi": 15004000000,
+      "utile": 4965000000,
+      "operativo": 5915000000,
+      "margine": 33.1,
+      "margine_op": 39.4
+     }
+    ]
    },
    "rs_1m": 0.3,
    "rs_bench": "sox",
@@ -24419,7 +29630,8 @@
     "unita": "",
     "value": 12417,
     "change_pct": -0.31,
-    "pct_1y": 115.8,
+    "var_1y": 115.8,
+    "pos_range_1y": 75.5,
     "min_1y": 5593,
     "max_1y": 14635,
     "history": [
@@ -24935,7 +30147,8 @@
     "unita": "$/lb",
     "value": 6.613,
     "change_pct": 0.31,
-    "pct_1y": 48.4,
+    "var_1y": 48.4,
+    "pos_range_1y": 96.1,
     "min_1y": 4.409,
     "max_1y": 6.703,
     "history": [
@@ -25451,7 +30664,8 @@
     "unita": "$",
     "value": 82.4,
     "change_pct": 1.42,
-    "pct_1y": 29.9,
+    "var_1y": 29.9,
+    "pos_range_1y": 47.0,
     "min_1y": 55.27,
     "max_1y": 112.95,
     "history": [
@@ -25967,7 +31181,8 @@
     "unita": "$/oz",
     "value": 4437,
     "change_pct": 1.69,
-    "pct_1y": 33.2,
+    "var_1y": 33.2,
+    "pos_range_1y": 56.1,
     "min_1y": 3313,
     "max_1y": 5318,
     "history": [
@@ -35652,18 +40867,18 @@
  "predictions": [
   {
    "question": "Will the price of Bitcoin be above $60,000 on August 16?",
-   "yes": 99,
+   "yes": 100,
    "link": "https://polymarket.com/event/bitcoin-above-60k-on-august-16-2026"
-  },
-  {
-   "question": "Will there be no change in Fed interest rates after the September 2026 meeting?",
-   "yes": 74,
-   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-september-2026-meeting-615"
   },
   {
    "question": "Will the price of Bitcoin be above $62,000 on August 16?",
    "yes": 98,
    "link": "https://polymarket.com/event/bitcoin-above-62k-on-august-16-2026"
+  },
+  {
+   "question": "Will there be no change in Fed interest rates after the September 2026 meeting?",
+   "yes": 74,
+   "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-september-2026-meeting-615"
   },
   {
    "question": "Will the price of Bitcoin be above $64,000 on August 16?",
@@ -54627,6 +59842,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-08-16T04:35:54Z"
+  "generated_at": "2026-08-16T05:06:05Z"
  }
 }
