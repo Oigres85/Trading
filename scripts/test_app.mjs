@@ -1166,8 +1166,8 @@ check("v317 analisi tecnica: medie, RSI e volume sono agganciati ai valori del t
    parte che il CEO non poteva indovinare: l'RSI che non e' un segnale di vendita, la media a 9
    che e' corta, il volume che vale solo nel confronto. */
 check("v317 analisi tecnica: porta le trappole, non solo i numeri", (() => {
-  const i = src.indexOf('class="tv-piu"');
-  const leg = src.slice(i - 4000, i + 500);
+  const i = src.indexOf("v317 — DALLA LEGENDA GENERICA");
+  const leg = src.slice(i, src.indexOf("tv-piede", i));
   return leg.includes("Non e' un segnale di vendita")
       && leg.includes("confronto con la media")
       && leg.includes("le medie danno falsi segnali")
@@ -3056,6 +3056,68 @@ check("v321 fusioni: la regola vale per COSTRUZIONE, non per il caso di oggi", (
   return corpo.includes("Math.min(A.score, B.score)")
       && corpo.includes("non concordano")
       && !/A\.score = A\.score/.test(corpo);
+})());
+
+/* ══ v322 — TRE PACCHETTI, TRE BOTTONI, TRE STANZE DIVERSE ═════════════════════════════════
+   Il CEO: "non vedo ancora i tre pulsanti prompt in alto a destra". I tre bottoni esistevano ma
+   stavano in tre posti diversi della pagina — due dentro le rispettive schede, uno in topbar.
+   ⚠ NON e' la classe v209/v259 ("due porte per la stessa stanza"): quelle erano DUE bottoni che
+   producevano lo STESSO pacchetto. Qui le tre porte danno su tre stanze diverse — macro/titolo,
+   comparto, portafoglio — e stare insieme e' cio' che rende evidente che sono tre cose diverse.
+   ⚠ E si SPOSTANO, non si duplicano: due elementi con lo stesso id fanno trovare a
+   `querySelector` solo il primo, e il secondo bottone sembrerebbe rotto a caso. */
+check("v322 prompt: i tre bottoni stanno insieme in topbar, e ogni id esiste una volta sola", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const topbar = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
+  return ["btn-cio", "set-copia", "pf-copia"].every(id =>
+    topbar.includes(`id="${id}"`) && html.split(`id="${id}"`).length === 2);
+})());
+
+/* ⚠ e ognuno deve produrre un pacchetto DIVERSO: tre bottoni che generano la stessa cosa
+   sarebbero la classe v259 con un nome nuovo. */
+check("v322 prompt: i tre bottoni producono tre pacchetti diversi", suVeri(`
+  settoreScelto = "SKYY";
+  const a = buildCIOText(), b = buildPromptSettore("SKYY"), c = buildPromptPortafoglio();
+  return a.length > 5000 && b.length > 5000 && c.length > 5000
+      && a !== b && b !== c && a !== c
+      && b.includes("SKYY") && c.includes("IL LIBRO, POSIZIONE PER POSIZIONE")`));
+
+/* ══ FIBONACCI: UN SOLO CALCOLO, DUE POSTI DOVE SI LEGGE ═══════════════════════════════════
+   Il CEO li ha chiesti sul grafico. Il sistema li calcolava gia' per il pacchetto (v293) sul
+   range a 52 settimane. Un SECONDO punto di calcolo darebbe due serie di livelli per lo stesso
+   titolo — la contraddizione che v271 ha gia' pagato: la pagina che dice una cosa e l'analisi
+   che ne dice un'altra, senza sapere a quale credere. */
+check("v322 fibonacci: la pagina e il pacchetto mostrano gli STESSI livelli", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU" && x.w52_high && x.w52_low);
+  if (!r) return true;
+  const R = r.w52_high - r.w52_low;
+  const attesi = [0.236, 0.382, 0.5, 0.618, 0.786].map(q => Math.round((r.w52_high - q * R) * 100) / 100);
+  const p = buildPromptTicker("MU");
+  /* nel pacchetto ci sono tutti, e sono quelli calcolati dagli estremi a 52 settimane */
+  return attesi.every(v => p.includes(String(v)));`));
+
+check("v322 fibonacci: i livelli si dichiarano contati DAL MASSIMO, e non come previsioni", (() => {
+  const i = src.indexOf("v322 — I RITRACCIAMENTI DI FIBONACCI");
+  if (i < 0) return false;
+  const blocco = src.slice(i, i + 2600);
+  return blocco.includes("dal massimo verso il basso")
+      && blocco.includes("Non sono previsioni")
+      && blocco.includes("w52_high");
+})());
+
+/* ══ LA TESTATA IMPONE LA RICERCA, PERCHE' UN REFERTO REALE NON L'HA FATTA ═════════════════
+   Il CEO ha portato la risposta di ChatGPT al pacchetto macro: chiudeva con "FONTI DA
+   CONTROLLARE: nessuna. Questa analisi utilizza esclusivamente il payload fornito". Formalmente
+   in regola — la vecchia A1 chiedeva di verificare solo cio' che POGGIA su fatti esterni, e il
+   modello non ne aveva usati — e sostanzialmente inutile: ha letto una fotografia con dati fino
+   a 140 giorni come se fosse il presente. */
+check("v322 testata: la ricerca di dati freschi e notizie e' obbligatoria e verificabile", (() => {
+  const h = readFileSync(join(ROOT, "config", "prompt_header_macro.txt"), "utf8");
+  return h.includes("A1bis")
+      && h.includes("ULTIME 24 ORE")
+      && h.includes("piu' vecchio di 30 giorni")
+      && h.includes("NON E' UNA RISPOSTA ACCETTABILE")
+      && h.includes("NON HO ACCESSO ALLA RETE");      // la via d'uscita onesta se non puo' navigare
 })());
 
 /* ---------- report ----------

@@ -18,7 +18,7 @@
 <title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=321">
+<link rel="stylesheet" href="assets/style.css?v=322">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -35,7 +35,9 @@
     </div>
   </div>
   <div class="actions">
-    <button class="btn btn-primary" id="btn-cio" aria-label="Crea il prompt per l'LLM" title="Crea il pacchetto da incollare in un LLM: se hai scritto un ticker nel box qui sotto l'analisi è su quel titolo (col quadro macro dentro), altrimenti è il solo quadro macro">📋 Crea il prompt</button>
+    <button class="btn btn-primary" id="btn-cio" aria-label="Crea il prompt per l'LLM" title="Crea il pacchetto da incollare in un LLM: se hai scritto un ticker nel box qui sotto l'analisi è su quel titolo (col quadro macro dentro), altrimenti è il solo quadro macro">📋 Macro / titolo</button>
+    <button class="btn btn-ghost" id="set-copia" type="button" title="Analisi del comparto scelto cliccando una barra in Rotazione">📋 Settore</button>
+    <button class="btn btn-ghost" id="pf-copia" type="button" title="Analisi del portafoglio intero: concentrazione, pesi, esposizione">📋 Portafoglio</button>
     <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: rigenerazione completa via pipeline (~2-3 min)">↻ Rigenera</button>
   </div>
 </header>
@@ -81,7 +83,6 @@
     <!-- v313 — via il selettore: il settore si sceglie cliccandolo in "Rotazione", con la
          stessa logica del portafoglio. Resta il bottone, che dice QUALE settore copierebbe. -->
     <div class="tk-riga tk-riga-settore">
-      <button id="set-copia" class="btn btn-ghost" type="button">📋 Copia analisi settore</button>
       <span id="set-scelto" class="muted"></span>
     </div>
     <div id="set-esito" class="muted"></div>
@@ -162,7 +163,6 @@
     <div class="card-head">
       <h2>Portafoglio</h2>
       <span class="muted">carichi dal suo estratto · clicca una riga per vederla nel grafico</span>
-      <button type="button" id="pf-copia" class="btn btn-ghost pf-mod-testa">📋 Copia analisi portafoglio</button>
       <button type="button" id="pf-modifica" class="btn btn-primary">✎ Modifica</button>
     </div>
     <div id="pf-righe"></div>
@@ -327,6 +327,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=321"></script>
+<script src="assets/app.js?v=322"></script>
 </body>
 </html>

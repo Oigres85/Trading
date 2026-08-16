@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "321";
+const BUILD_VERSION = "322";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8316,6 +8316,36 @@ function montaGraficoTV(tk, intervallo) {
             ? `Oggi il volume e' <b>${rgV(vr, 2)} volte</b> la media a 30 sedute: il movimento di oggi lo hanno fatto in pochi, e regge meno.`
             : `Oggi il volume e' <b>${rgV(vr, 2)} volte</b> la media a 30 sedute, cioe' ordinario.`) : ""}
         Il caso da conoscere: prezzo che sale mentre le barre si accorciano seduta dopo seduta = la spinta si sta esaurendo.</span></div>
+      ${(() => {
+        /* ⚠ v322 — I RITRACCIAMENTI DI FIBONACCI: il CEO li ha chiesti sul grafico. Il sistema
+           li calcola GIA' per il pacchetto (v293) sul range a 52 settimane, con aritmetica
+           esatta su due numeri che possediamo. Qui si riusa QUELLO STESSO calcolo: un secondo
+           punto di calcolo darebbe due serie di livelli per lo stesso titolo, ed e' esattamente
+           la contraddizione che v271 ha gia' pagato — la pagina che dice una cosa e l'analisi
+           che ne dice un'altra, senza sapere a quale credere.
+           ⚠ I livelli si contano DAL MASSIMO verso il basso (ritracciamento di una salita) e
+           sta scritto: la stessa coppia di numeri letta al contrario significa un'altra cosa. */
+        const hi = numero(rTk.w52_high), lo = numero(rTk.w52_low), px = numero(rTk.price);
+        if (!Number.isFinite(hi) || !Number.isFinite(lo) || !(hi > lo)) return "";
+        const R = hi - lo;
+        const liv = [0.236, 0.382, 0.5, 0.618, 0.786].map(q => {
+          const v = Math.round((hi - q * R) * 100) / 100;
+          const d = Number.isFinite(px) ? Math.round((px / v - 1) * 1000) / 10 : null;
+          return { et: `${Math.round(q * 1000) / 10}%`, v, d };
+        });
+        const vicino = Number.isFinite(px)
+          ? liv.reduce((a2, x) => (Math.abs(x.d) < Math.abs(a2.d) ? x : a2), liv[0]) : null;
+        return `<div><b>Ritracciamenti di Fibonacci — range a 52 settimane (${fmtNum.format(lo)}–${fmtNum.format(hi)})</b><span>
+          <ul class="tv-lista">${liv.map(x => `<li><b>${x.et}</b>: <b>${fmtNum.format(x.v)}</b>`
+            + (x.d != null ? ` — il prezzo le sta <b class="${x.d >= 0 ? "tv-verde" : "tv-rosso"}">${signTxt(x.d)}</b>` : "")
+            + `</li>`).join("")}</ul>
+          Contati <b>dal massimo verso il basso</b>, cioè come ritracciamento di una salita: la stessa
+          coppia di numeri letta al contrario indica quote diverse.
+          ${vicino ? `Il livello più vicino al prezzo di oggi è <b>${vicino.et} a ${fmtNum.format(vicino.v)}</b> (${signTxt(vicino.d)}).` : ""}
+          <b>Non sono previsioni</b>: sono le quote che quella convenzione indica, e valgono
+          quanto vale il fatto che molti le guardino. Sono gli stessi numeri che finiscono nel
+          pacchetto per l'LLM — un solo calcolo, così la pagina e l'analisi non possono divergere.</span></div>`;
+      })()}
       ${Number.isFinite(numero(rTk.atr_pct)) ? `<div><b>Quanto si muove in un giorno normale — ATR ${rgV(numero(rTk.atr_pct), 2)}%</b><span>
         E' l'escursione media di una seduta. Serve per non scambiare un movimento ordinario per un segnale:
         su questo titolo una giornata da ${rgV(numero(rTk.atr_pct), 1)}% <b>non e' una notizia</b>, e uno stop piu' stretto di
