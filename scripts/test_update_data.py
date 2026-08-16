@@ -524,7 +524,7 @@ check("v316 tecnica: sotto 30 barre non si pubblica niente invece di pubblicare 
 _r = _pd.Series(_np.random.RandomState(7).normal(0, 1, 260), index=_idx)
 _uguale = (1 + _r / 100).cumprod() * 100
 _altro = (1 + _pd.Series(_np.random.RandomState(99).normal(0, 1, 260), index=_idx) / 100).cumprod() * 100
-_sens = ud.sensibilita_macro(_r, {"stessa": ("X", "canale", _uguale), "altra": ("Y", "canale", _altro)})
+_sens = ud.sensibilita_macro(_uguale, {"stessa": ("X", "canale", _uguale), "altra": ("Y", "canale", _altro)})
 check("v316 sensibilita': serie identica -> beta ~1 e R² ~1",
       abs(_sens["stessa"]["beta"] - 1) < 0.05 and _sens["stessa"]["r2"] > 0.99)
 check("v316 sensibilita': serie indipendente -> R² prossimo a zero, non un beta spacciato per segnale",
@@ -533,7 +533,7 @@ check("v316 sensibilita': la finestra e' comune e dichiarata (date, non posizion
       _sens["stessa"]["campione"] >= 60 and _sens["stessa"]["da"] < _sens["stessa"]["a"])
 # ⚠ e su una sovrapposizione corta NON si pubblica: e' la lezione v207 (due serie senza giorni in comune)
 check("v316 sensibilita': sotto 60 sedute comuni non si pubblica un beta",
-      ud.sensibilita_macro(_r.head(40), {"x": ("X", "c", _uguale)}) is None)
+      ud.sensibilita_macro(_uguale.head(40), {"x": ("X", "c", _uguale)}) is None)
 
 _mens = _pd.Series(_np.tile([1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 3.0, -3.0, 0.5, -0.5, 2.5, -2.5], 12).cumsum() + 100,
                    index=_pd.date_range("2014-01-31", periods=144, freq="ME"))
@@ -558,6 +558,33 @@ check("v323 credito: a spread da 'stress' il punteggio sta nel rosso",
       round(ud._punteggio_da_bande(6.5, _BANDE_HY)) < 35 and round(ud._punteggio_da_bande(2.71, _BANDE_HY)) > 70)
 check("v323 credito: l'ancora inventata 2,5-11,5% non e' piu' nel codice",
       "(hy_val - 2.5) / 9" not in _src and "(hy_now - 2.5) / 9" not in _src)
+
+# ══ v325 — UN BETA DEVE ESSERE COMPATIBILE CON LA PROPRIA CORRELAZIONE ═══════════════════════
+# Il beta usciva diviso per CENTO: la pipeline passava log-rendimenti in frazione a una funzione
+# che convertiva il benchmark in percentuale. Su MU contro il proprio settore: beta 0,01 con
+# correlazione 0,82, che e' impossibile.
+# ⚠⚠ E il test di v316 non lo prese perche' PASSAVA LE PERCENTUALI A MANO: provava una strada che
+# la produzione non percorre. Ora la funzione prende le CHIUSURE e decide lei l'unita', e questo
+# check verifica l'INVARIANTE STATISTICO, che nessuna scelta di unita' puo' soddisfare per caso:
+# beta = corr x (sigma_titolo / sigma_benchmark), quindi con una correlazione alta il beta non
+# puo' essere microscopico — servirebbe un rapporto fra volatilita' di 1 a 100.
+import numpy as _np
+import pandas as _pd
+_idx2 = _pd.date_range("2024-01-01", periods=300, freq="B")
+_rng = _np.random.RandomState(11)
+_b = _pd.Series((1 + _rng.normal(0, 0.01, 300)).cumprod() * 100, index=_idx2)
+_t = _pd.Series((1 + (_b.pct_change().fillna(0) * 1.5 + _rng.normal(0, 0.002, 300))).cumprod() * 50, index=_idx2)
+_sens = ud.sensibilita_macro(_t, {"bench": ("B", "canale", _b)})
+check("v325 sensibilita': su un titolo costruito con beta 1,5 la funzione lo ritrova",
+      _sens and abs(_sens["bench"]["beta"] - 1.5) < 0.15 and _sens["bench"]["r2"] > 0.9)
+# ⚠ l'invariante che non si puo' soddisfare per caso: con correlazione alta, beta non microscopico
+check("v325 sensibilita': un beta microscopico con correlazione alta e' impossibile",
+      all(abs(v["beta"]) > 0.1 for v in (_sens or {}).values() if abs(v["corr"]) > 0.5))
+# ⚠ e la scala non deve dipendere dall'unita' in cui arrivano le chiusure: prezzi in centesimi
+#   devono dare lo STESSO beta, perche' il beta e' un rapporto fra rendimenti
+_sens100 = ud.sensibilita_macro(_t * 100, {"bench": ("B", "canale", _b)})
+check("v325 sensibilita': il beta non cambia se le chiusure arrivano in un'altra scala",
+      _sens100 and abs(_sens100["bench"]["beta"] - _sens["bench"]["beta"]) < 0.01)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

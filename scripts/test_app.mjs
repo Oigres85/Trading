@@ -2545,30 +2545,53 @@ check("v311 portafoglio: la forma parte dai dati veri, non da un elenco separato
   return corpo.includes("DATA.portfolio") && corpo.includes("DATA.watchlist");
 })());
 
-/* ══ v313 — LA ROTAZIONE CAMBIA FORMA, GLI INVARIANTI RESTANO ═══════════════════════════
-   Il CEO: "poco intuitivo… la lettura non e' intuitiva e leggibile", e la forma che ha
-   descritto lui — verde chi sale, rosso chi scende — era gia' quella giusta. Via le dieci
-   barre divergenti, due elenchi nominati. I check che sorvegliavano le barre non hanno piu' un
-   soggetto; quelli che seguono sorvegliano i FATTI, che non sono cambiati. */
-check("v313 rotazione: mostra i cinque che salgono e i cinque che scendono, e lo dichiara", suVeri(`
-  const tilt = (DATA.macro && DATA.macro.tilt) || [];
-  if (tilt.length < 6) return true;
+/* ══ v325 — LA ROTAZIONE CAMBIA FORMA, GLI INVARIANTI CAMBIANO CON LEI ═════════════════════
+   Il CEO: "elimina le azioni indicate in sale e scende e lascia solo le barre con i settori con
+   possibilita' di modificarle a 1 mese, 3 mesi un anno e 5 anni".
+   ⚠⚠ I check che sorvegliavano i due elenchi non sono stati ZITTITI: hanno cambiato soggetto, e
+   cio' che deve restare vero e' piu' forte di prima — ogni comparto disegnato, ognuno cliccabile
+   col proprio simbolo, e l'ordine che cambia DAVVERO quando cambia l'orizzonte. */
+check("v325 rotazione: disegna tutti i comparti, ognuno cliccabile col proprio simbolo", suVeri(`
   const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
-  if (!f) return false;
-  const righe = (f.g.match(/rot-riga/g) || []).length;
-  return righe === 10
-      && f.g.indexOf("SALE") >= 0 && f.g.indexOf("SCENDE") >= 0
-      && f.n.indexOf("cinque che salgono") >= 0
-      && f.n.indexOf(String(tilt.length)) >= 0`));
+  if (!f) return true;
+  const conM1 = (DATA.macro.tilt || []).filter(t => Number.isFinite(t.m1)).length;
+  const barre = f.g.split("data-rot-tk").length - 1;
+  const graf = f.g.split("data-graf-tk").length - 1;
+  return f.larga === true && barre === conM1 && graf === barre && barre >= 15`));
 
-/* ⚠ le prime azioni del comparto sono la richiesta che il CEO ha dovuto ripetere ("non hai
-   eseguito la funzione"): un cambio di forma non deve riportarla indietro. */
-check("v313 rotazione: le prime azioni del comparto sopravvivono al cambio di forma", suVeri(`
-  const tilt = (DATA.macro && DATA.macro.tilt) || [];
-  const conPrime = tilt.filter(t => (t.prime || []).length);
-  if (!conPrime.length) return true;
+check("v325 rotazione: gli orizzonti offerti sono SOLO quelli che esistono nei dati", suVeri(`
   const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
-  return !!f && f.g.indexOf("rot-prime") >= 0`));
+  if (!f) return true;
+  const offerti = f.g.split('data-rot-or="').slice(1).map(x => x.split('"')[0]);
+  const tilt = DATA.macro.tilt || [];
+  const esiste = (k) => k === "m1" ? tilt.filter(t => Number.isFinite(t.m1)).length >= 6
+    : k === "m3" ? tilt.filter(t => Number.isFinite(t.m3)).length >= 6
+    : tilt.filter(t => Number.isFinite((((t.relativa || {})[k]) || {}).settore)).length >= 6;
+  /* un bottone senza dati dietro e' un comando morto: peggio di un comando assente */
+  return offerti.length >= 2 && offerti.every(esiste)`));
+
+check("v325 rotazione: cambiare orizzonte cambia davvero l'ordine", suVeri(`
+  const primi = (k) => {
+    rotOrizzonte = k;
+    const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
+    return f.g.split('data-rot-tk="').slice(1).map(x => x.split('"')[0]).slice(0, 5).join(",");
+  };
+  const a = primi("m1"), b = primi("a2");
+  rotOrizzonte = "m1";
+  return a.length > 5 && b.length > 5 && a !== b`));
+
+/* ⚠ LA RICEVUTA DEL TAGLIO, scritta PRIMA: le prime azioni di ogni comparto escono dalla SCHEDA
+   ma restano nel PACCHETTO di settore — verificato sui dati veri, 5 su 5 per SKYY. E' la regola
+   v208: si toglie dalla pagina cio' che il payload porta gia'. Se un domani uscissero anche da
+   li', questo check lo dice subito. */
+check("v325 rotazione: le prime azioni restano nel pacchetto, e non piu' nella scheda", suVeri(`
+  const t = (DATA.macro.tilt || []).find(x => x && (x.prime || []).length >= 3);
+  if (!t) return true;
+  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
+  const p = buildPromptSettore(t.ticker);
+  const nomi = t.prime.slice(0, 3).map(x => x.tk);
+  return nomi.every(k => p.includes(k))
+      && !nomi.some(k => (f.g || "").includes(">" + k + "<"))`));
 
 /* ⚠⚠ IL SELETTORE NON C'E' PIU', ma la funzione che serviva si': scegliere un comparto per
    l'analisi. Ora la scelta e' UN CLIC nella rotazione, che fa due cose insieme — porta il
@@ -2583,13 +2606,13 @@ check("v313 settore: si sceglie cliccando la rotazione, e la copia resta", (() =
       && src.indexOf("settoreScelto") >= 0;
 })());
 
-/* ⚠ e ogni comparto porta al grafico del suo ETF: era "per ogni settore se ci clicco sopra". */
-check("v313 grafico: ogni riga di settore ha il proprio simbolo", suVeri(`
+/* ⚠ questo invariante non cambia con la forma: cliccare un comparto deve portarlo nel grafico. */
+check("v325 grafico: ogni comparto porta il proprio simbolo al grafico", suVeri(`
   const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
   if (!f) return true;
-  const n = (f.g.match(/data-graf-tk=/g) || []).length;
-  const righe = (f.g.match(/rot-riga/g) || []).length;
-  return n === righe && n >= 6`));
+  const tk = f.g.split('data-graf-tk="').slice(1).map(x => x.split('"')[0]);
+  const noti = new Set((DATA.macro.tilt || []).map(t => t.ticker));
+  return tk.length >= 15 && tk.every(x => noti.has(x))`));
 
 /* ══ v314 — DUE CONVENZIONI OPPOSTE, E UN LLM VERO CI E' CASCATO ═════════════════════════
    Il CEO ha portato il referto reale di ChatGPT su MU. Ottimo referto — ma contiene una frase
@@ -3154,34 +3177,7 @@ check("v323 credito: il pacchetto stampa il punteggio RICALCOLATO e dichiara le 
       && r.includes("calcolato dalle bande qui indicate")
       && r.includes("5-7% stress")`));
 
-/* ══ v324 — LA ROTAZIONE MOSTRA IL MOVIMENTO, NON SOLO LA CLASSIFICA ═══════════════════════
-   Il CEO: "ingrandisci scheda inserendo anche grafico per rendere piu' facilmente visibile la
-   rotazione". I due elenchi dicono chi sta davanti OGGI; non dicono se ci e' appena arrivato o
-   se ci sta da tre mesi — che e' la differenza fra una rotazione in corso e una gia' avvenuta.
-   ⚠⚠ IL TRIMESTRE VA PORTATO AL PASSO MENSILE prima di confrontarlo col mese: affiancare un
-   +27,7% a tre mesi e un +18,1% a un mese fa vincere sempre l'orizzonte piu' lungo, per
-   costruzione. E' il difetto v207 (due serie con finestre diverse messe sullo stesso asse) in
-   miniatura, e qui sarebbe passato inosservato perche' entrambi i numeri sono veri. */
-check("v324 rotazione: disegna tutti i comparti, col mese E col ritmo trimestrale", suVeri(`
-  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
-  if (!f) return true;
-  const tilt = (DATA.macro.tilt || []).filter(t => Number.isFinite(t.m1));
-  const barre = f.g.split("<rect ").length - 1;
-  const tacche = f.g.split('stroke-linecap="round"').length - 1;
-  return f.larga === true && barre === tilt.length && tacche === tilt.length`));
 
-check("v324 rotazione: il trimestre e' riportato al passo MENSILE, non confrontato grezzo", suVeri(`
-  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
-  if (!f) return true;
-  const t = (DATA.macro.tilt || []).find(x => x && Number.isFinite(x.m3) && Math.abs(x.m3) > 3);
-  if (!t) return true;
-  const atteso = Math.round(t.m3 / 3 * 10) / 10;
-  const svg = f.g.slice(f.g.indexOf("<svg"));
-  const i = svg.indexOf(t.name);
-  if (i < 0) return false;
-  /* il titolo del comparto deve citare il ritmo mensile, non il grezzo a tre mesi */
-  const tit = svg.slice(Math.max(0, i - 300), i + 300);
-  return tit.includes("ritmo mensile") && tit.includes(signTxt(atteso))`));
 
 /* ⚠ e la scheda larga deve restare riordinabile: la chiave e' `data-scheda`, non la posizione. */
 check("v324 rotazione: la scheda larga conserva la chiave stabile del riordino", (() => {

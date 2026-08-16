@@ -1688,7 +1688,7 @@ svg.g-serie { cursor: crosshair; }
 .card[data-sez] { position: relative; }
 .sez-cmd {
   position: absolute; top: 8px; right: 10px; z-index: 2;
-  display: flex; gap: 2px; opacity: 0; transition: opacity .15s ease;
+  display: flex; gap: 2px; opacity: .45; transition: opacity .15s ease;
 }
 .card[data-sez]:hover .sez-cmd, .sez-cmd:focus-within, .in-riordino .sez-cmd { opacity: 1; }
 @media (hover: none) { .sez-cmd { opacity: .55; } }   /* su touch non c'e' hover: sempre visibili */
@@ -1802,6 +1802,7 @@ svg.g-serie { cursor: crosshair; }
   touch-action: none;            /* il dito trascina, non scorre la pagina */
 }
 .mg-card[data-scheda]:hover .sk-grip, .sk-grip:focus-visible { opacity: 1; }
+.sk-grip { opacity: .45; }   /* v325 — sempre visibile: un comando nascosto e' un comando assente */
 @media (hover: none) { .sk-grip { opacity: .5; } }   /* su touch non c'e' hover */
 .sk-grip:hover { color: var(--text); border-color: var(--accent); }
 .sk-grip:active { cursor: grabbing; }
@@ -2275,3 +2276,10 @@ svg.g-serie { cursor: crosshair; }
    ed e' il difetto del viewBox gia' pagato in v206 e v226). */
 .mg-card.mg-larga { grid-column: 1 / -1; }
 .mg-card.mg-larga .rot-due { margin-bottom: 10px; }
+
+/* v325 — il selettore di orizzonte della rotazione, e le barre cliccabili. */
+.rot-tf { display: flex; gap: 4px; flex-wrap: wrap; margin: 2px 0 8px; }
+.rot-tf .chip { font-size: 11.5px; padding: 3px 9px; }
+.rot-b:hover rect:not([fill="transparent"]) { fill-opacity: 1; }
+.rot-b:hover text { fill: var(--text); }
+.rot-b:focus-visible { outline: 1px solid var(--accent); }

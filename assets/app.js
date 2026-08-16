@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "324";
+const BUILD_VERSION = "325";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2596,6 +2596,9 @@ let settoreScelto = null;
 /* v315 — l'ordinamento del portafoglio. Il DEFAULT resta il peso: ordinare per guadagno mette
    in cima i vincitori, che e' la lettura che fa tenere i perdenti. Ma ora e' una scelta del CEO. */
 let pfOrdine = { campo: "peso", verso: "giu" };
+/* v325 — l'orizzonte scelto per la rotazione. Vive qui e non dentro la scheda perche' la scheda
+   si ricostruisce a ogni render: uno stato dentro il render si azzererebbe da solo. */
+let rotOrizzonte = "m1";
 
 function posizioniCorrenti() {
   /* ⚠ si legge da cio' che il sistema HA disegnato, non da una copia parallela: due elenchi
@@ -2710,6 +2713,14 @@ document.addEventListener("click", (e) => {
     return;
   }
   if (t.closest("#pf-modifica")) { pfInModifica = !pfInModifica; renderPortafoglio(); return; }
+  const or = t.closest("[data-rot-or]");
+  if (or) {
+    /* v325 — cambia l'orizzonte e ridisegna: una strada sola, la stessa che usa il primo
+       disegno, cosi' non possono divergere. */
+    rotOrizzonte = or.dataset.rotOr;
+    renderIndicatori();
+    return;
+  }
   const th = t.closest("[data-pf-ord]");
   if (th) {
     /* stesso campo = si inverte il verso; campo nuovo = si parte dal piu' grande, che e' cio'
@@ -3813,91 +3824,74 @@ const FORMA_INDICATORE = {
   },
 
   rotazione: (m) => {
-    /* ═══ v313 — DUE ELENCHI NOMINATI, NON DIECI BARRE ═══════════════════════════════════════
-       Il CEO: "poco intuitivo… il comparto verde mi dira' le azioni di chi ha avuto un
-       andamento positivo mentre la parte rossa quelle di chi ha perso di piu'; in ogni caso la
-       lettura non e' intuitiva e leggibile".
-       ⚠⚠ LA DESCRIZIONE CHE LUI HA DATO E' GIA' LA FORMA GIUSTA: due gruppi, chi sale e chi
-       scende. Dieci barre che divergono da uno zero, dentro una tessera, chiedono di confrontare
-       lunghezze in due direzioni — ed e' la famiglia di forme che questo progetto ha gia'
-       respinto tre volte (barra 0-100 in v225, quadrante in v226, ragnatela in v228).
-       Ora sono due colonne con l'intestazione a parole, il numero accanto al nome e le prime
-       azioni del comparto sotto. Il clic porta il settore nel grafico E lo sceglie per la copia
-       dell'analisi di settore. */
+    /* ═══ v325 — SOLO LE BARRE, E L'ORIZZONTE SI SCEGLIE ═══════════════════════════════════════
+       Il CEO: "la rotazione non mi piace, ora e' troppo grande, inoltre elimina le azioni
+       indicate in sale e scende e lascia solo le barre con i settori con possibilita' di
+       modificarle a 1 mese, 3 mesi un anno e 5 anni e se clicco su un settore mi consente di
+       vederlo nel grafico tradingview ed associalo nel prompt analisi settore".
+       ⚠ Via i due elenchi e i nomi delle azioni: erano tre informazioni sovrapposte nello stesso
+       riquadro (chi sale, chi scende, chi compone il comparto) e la scheda era diventata un muro.
+       Resta UNA domanda: come sono ordinati i comparti sull'orizzonte che scegli tu.
+       ⚠⚠ CINQUE ANNI NON CI SONO NEI DATI, e non li invento: la pipeline pubblica 1 mese, 3 mesi,
+       6 mesi, 1 anno e 2 anni. L'orizzonte a 5 anni compare da solo appena la pipeline lo
+       produce (il selettore si costruisce da cio' che esiste, non da un elenco scritto a mano),
+       e finche' non c'e' la scheda lo dichiara invece di mostrare un bottone che non funziona. */
     const tilt = m.tilt || [];
     if (tilt.length < 6) return null;
-    const ord = [...tilt].filter(t => Number.isFinite(t.m1)).sort((a, b) => b.m1 - a.m1);
-    if (ord.length < 6) return null;
-    const su = ord.slice(0, 5), giu = ord.slice(-5).reverse();
-    const sopraZero = tilt.filter(t => (t.m1 ?? 0) > 0).length;
-    const riga = (t) => {
-      const p = (t.prime || []).filter(x => x && x.tk).slice(0, 5);
-      return `<div class="rot-riga" data-graf-tk="${esc(t.ticker)}" data-rot-tk="${esc(t.ticker)}"
-          role="button" tabindex="0" title="Apri ${esc(t.ticker)} nel grafico e scegli questo settore">
-        <span class="rot-nome">${esc(t.name)}</span>
-        <span class="rot-val ${t.m1 >= 0 ? "pos" : "neg"}">${signTxt(t.m1)}</span>
-        ${p.length ? `<span class="rot-prime">${p.map(x => esc(x.tk)).join(" · ")}</span>` : ""}
-      </div>`;
-    };
-    /* ═══ v324 — LA ROTAZIONE SI VEDE SOLO SE SI VEDE IL MOVIMENTO ═══════════════════════════
-       Il CEO: "ingrandisci scheda inserendo anche grafico per rendere piu' facilmente visibile
-       la rotazione".
-       ⚠⚠ LA DOMANDA NON E' "CHI SALE", E' "CHI STA CAMBIANDO POSTO". I due elenchi dicono chi
-       sta davanti oggi; non dicono se ci e' appena arrivato o se ci sta da tre mesi, ed e'
-       esattamente la differenza fra una rotazione in corso e una gia' avvenuta. Il confronto
-       fra il ritmo a UN mese e quello a TRE mesi lo rende visibile senza chiedere di decodificare
-       niente: la barra e' il mese, la lineetta e' il ritmo trimestrale portato sullo stesso
-       passo mensile, e chi ha la barra sopra la lineetta sta accelerando.
-       ⚠ Non e' la barra 0-100 respinta tre volte: qui la lunghezza e' un RENDIMENTO in
-       percentuale, con lo zero al centro e il proprio numero scritto accanto. */
-    const conRitmo = ord.map(t2 => ({
-      ...t2,
-      /* il trimestre si porta al passo MENSILE, altrimenti si confrontano due orizzonti diversi
-         e la barra piu' lunga vince sempre per costruzione — il difetto v207 in miniatura. */
-      ritmo3: Number.isFinite(t2.m3) ? Math.round(t2.m3 / 3 * 10) / 10 : null,
-    }));
-    const lim = Math.max(...conRitmo.flatMap(x => [Math.abs(x.m1 || 0), Math.abs(x.ritmo3 || 0)])) || 1;
-    const W = 640, RH = 17, H = conRitmo.length * RH + 26, L = 132, C = L + (W - L - 56) / 2;
-    const X = (v) => C + (v / lim) * ((W - L - 56) / 2);
-    const barre = conRitmo.map((x, i) => {
-      const y = 20 + i * RH;
-      const x0 = Math.min(C, X(x.m1)), w = Math.abs(X(x.m1) - C);
-      const acc = x.ritmo3 != null && x.m1 != null ? x.m1 - x.ritmo3 : null;
-      return `<g><title>${esc(x.name)}: ${signTxt(x.m1)} nell'ultimo mese, ${signTxt(x.m3)} in tre mesi `
-        + `(ritmo mensile ${signTxt(x.ritmo3)})${acc != null ? ` — ${acc >= 0 ? "sta accelerando" : "sta rallentando"}` : ""}</title>
-        <text x="0" y="${y + 8}" font-size="10" fill="var(--muted)">${esc(x.name.slice(0, 20))}</text>
-        <rect x="${x0.toFixed(1)}" y="${y + 1}" width="${Math.max(w, 1).toFixed(1)}" height="10" rx="2"
-          fill="${x.m1 >= 0 ? "var(--green)" : "var(--red)"}" fill-opacity=".75"/>
-        ${x.ritmo3 != null ? `<line x1="${X(x.ritmo3).toFixed(1)}" y1="${y}" x2="${X(x.ritmo3).toFixed(1)}" y2="${y + 12}"
-          stroke="var(--text)" stroke-width="1.8" stroke-linecap="round"/>` : ""}
-        <text x="${W - 50}" y="${y + 9}" font-size="9.5" font-family="var(--mono)"
-          fill="${x.m1 >= 0 ? "var(--green)" : "var(--red)"}">${signTxt(x.m1)}</text></g>`;
+    const ORIZZONTI = [
+      { k: "m1", et: "1 mese", v: (t2) => t2.m1 },
+      { k: "m3", et: "3 mesi", v: (t2) => t2.m3 },
+      { k: "m6", et: "6 mesi", v: (t2) => ((t2.relativa || {}).m6 || {}).settore },
+      { k: "a1", et: "1 anno", v: (t2) => ((t2.relativa || {}).a1 || {}).settore },
+      { k: "a2", et: "2 anni", v: (t2) => ((t2.relativa || {}).a2 || {}).settore },
+      { k: "a5", et: "5 anni", v: (t2) => ((t2.relativa || {}).a5 || {}).settore },
+    ].filter(o => tilt.filter(t2 => Number.isFinite(o.v(t2))).length >= 6);
+    if (!ORIZZONTI.length) return null;
+    const scelto = ORIZZONTI.find(o => o.k === rotOrizzonte) || ORIZZONTI[0];
+    const ord = tilt.filter(t2 => Number.isFinite(scelto.v(t2)))
+      .map(t2 => ({ ...t2, val: scelto.v(t2) }))
+      .sort((a, b) => b.val - a.val);
+    const sopraZero = ord.filter(t2 => t2.val > 0).length;
+
+    const W = 620, RH = 18, H = ord.length * RH + 14, L = 118, C = L + (W - L - 54) / 2;
+    const lim = Math.max(...ord.map(t2 => Math.abs(t2.val))) || 1;
+    const X = (v) => C + (v / lim) * ((W - L - 54) / 2);
+    const barre = ord.map((t2, i) => {
+      const y = 4 + i * RH;
+      const x0 = Math.min(C, X(t2.val)), w = Math.abs(X(t2.val) - C);
+      return `<g class="rot-b" data-graf-tk="${esc(t2.ticker)}" data-rot-tk="${esc(t2.ticker)}"
+          role="button" tabindex="0" style="cursor:pointer">
+        <title>${esc(t2.name)} (${esc(t2.ticker)}): ${signTxt(t2.val)} su ${scelto.et} — clicca per aprirlo nel grafico e sceglierlo per l'analisi di settore</title>
+        <rect x="0" y="${y}" width="${W}" height="${RH - 2}" fill="transparent"/>
+        <text x="0" y="${y + 11}" font-size="10.5" fill="var(--muted)">${esc(t2.name.slice(0, 19))}</text>
+        <rect x="${x0.toFixed(1)}" y="${y + 2}" width="${Math.max(w, 1).toFixed(1)}" height="11" rx="2"
+          fill="${t2.val >= 0 ? "var(--green)" : "var(--red)"}" fill-opacity=".8"/>
+        <text x="${W - 48}" y="${y + 11}" font-size="10" font-family="var(--mono)"
+          fill="${t2.val >= 0 ? "var(--green)" : "var(--red)"}">${signTxt(t2.val)}</text></g>`;
     }).join("");
-    const graf = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
-        aria-label="rendimento a un mese di ogni comparto, col ritmo trimestrale a confronto">
-      <line x1="${C}" y1="14" x2="${C}" y2="${H - 6}" stroke="var(--border)" stroke-width="1"/>
-      <text x="0" y="10" font-size="9" fill="var(--muted)">comparto</text>
-      <text x="${C + 4}" y="10" font-size="9" fill="var(--muted)">barra = ultimo mese · lineetta = ritmo dei tre mesi, al passo mensile</text>
-      ${barre}</svg>`;
+
+    const chip = ORIZZONTI.map(o => `<button type="button" class="chip${o.k === scelto.k ? " chip-active" : ""}"
+        data-rot-or="${o.k}">${o.et}</button>`).join("");
+    const mancanti = ["1 mese", "3 mesi", "6 mesi", "1 anno", "2 anni", "5 anni"]
+      .filter(et => !ORIZZONTI.some(o => o.et === et));
 
     return {
-      g: `<div class="rot-due">
-        <div class="rot-col"><div class="rot-testa rot-su">SALE — dove il denaro sta entrando</div>${su.map(riga).join("")}</div>
-        <div class="rot-col"><div class="rot-testa rot-giu">SCENDE — dove sta uscendo</div>${giu.map(riga).join("")}</div>
-      </div>${graf}`,
+      g: `<div class="rot-tf">${chip}</div>
+        <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
+          aria-label="rendimento dei comparti su ${scelto.et}, dal migliore al peggiore">
+          <line x1="${C}" y1="0" x2="${C}" y2="${H - 4}" stroke="var(--border)" stroke-width="1"/>
+          ${barre}</svg>`,
+      n: `Rendimento dei <b>${ord.length} comparti</b> su <b>${scelto.et}</b>, dal migliore al peggiore. `
+        + `<b>${sopraZero} su ${ord.length}</b> sono in positivo. `
+        + `<b>Clicca una barra</b> per aprire quel comparto nel grafico e sceglierlo per l'analisi di settore.`
+        + (mancanti.length ? ` <span class="muted">Orizzonti non ancora nei dati: ${mancanti.join(", ")} — compaiono da soli appena la pipeline li produce.</span>` : "")
+        + `<br><b>Come si legge:</b> l'ordine cambia con l'orizzonte, ed è quello il punto. Un comparto in `
+        + `cima a un mese e in fondo a un anno è denaro appena arrivato; uno in cima a tutti gli orizzonti `
+        + `è una tendenza. Il primo si può invertire in poche sedute, il secondo no.`,
       larga: true,
-      n: `Rendimento a <b>1 mese</b> dei 21 ETF settoriali: qui i cinque che salgono di piu' e i cinque `
-        + `che scendono di piu'. <b>${sopraZero} su ${tilt.length}</b> sono in positivo. `
-        + `Sotto ogni comparto ci sono le sue <b>prime azioni per peso</b>, cioè i titoli che lo muovono. `
-        + `<b>Clicca un comparto</b> per vederlo nel grafico qui sopra e sceglierlo per l'analisi di settore. `
-        + `<b>Come si legge:</b> il denaro che esce da un settore entra in un altro — conta la <b>distanza</b> `
-        + `fra le due colonne, non il segno della prima riga.`,
     };
   },
 
-  /* ⚠ i tassi in tessera: il decennale col suo scarto a tre mesi e le due pendenze. La curva
-     per scadenze non c'e' piu' dalla v298 (richiesta del CEO), quindi qui non si perde niente
-     che la sezione avesse. */
   tassi10: (m) => {
     const t = m.tassi; if (!t || !(t.scadenze || []).length) return null;
     const d = (t.scadenze || []).find(x => x.key === "a10"); if (!d) return null;
@@ -8409,24 +8403,20 @@ function montaGraficoTV(tk, intervallo) {
           const d = Number.isFinite(px) ? Math.round((px / v - 1) * 1000) / 10 : null;
           return { et: `${Math.round(q * 1000) / 10}%`, v, d };
         });
-        const vicino = Number.isFinite(px)
-          ? liv.reduce((a2, x) => (Math.abs(x.d) < Math.abs(a2.d) ? x : a2), liv[0]) : null;
+        const sotto = Number.isFinite(px) ? liv.filter(x => x.v < px).sort((a2, b2) => b2.v - a2.v)[0] : null;
+        const sopra = Number.isFinite(px) ? liv.filter(x => x.v > px).sort((a2, b2) => a2.v - b2.v)[0] : null;
         return `<div><b>Ritracciamenti di Fibonacci — range a 52 settimane (${fmtNum.format(lo)}–${fmtNum.format(hi)})</b><span>
           <ul class="tv-lista">${liv.map(x => `<li><b>${x.et}</b>: <b>${fmtNum.format(x.v)}</b>`
             + (x.d != null ? ` — il prezzo le sta <b class="${x.d >= 0 ? "tv-verde" : "tv-rosso"}">${signTxt(x.d)}</b>` : "")
             + `</li>`).join("")}</ul>
           Contati <b>dal massimo verso il basso</b>, cioè come ritracciamento di una salita: la stessa
           coppia di numeri letta al contrario indica quote diverse.
-          ${vicino ? `Il livello più vicino al prezzo di oggi è <b>${vicino.et} a ${fmtNum.format(vicino.v)}</b> (${signTxt(vicino.d)}).` : ""}
+          ${sotto ? `<b>Il primo appoggio sotto il prezzo</b> è ${sotto.et} a <b>${fmtNum.format(sotto.v)}</b> (${signTxt(sotto.d)} da qui): è la quota che molti guardano per rientrare, e dove un ribasso ordinario tende a fermarsi.` : ""}
+          ${sopra ? ` <b>Il primo ostacolo sopra</b> è ${sopra.et} a <b>${fmtNum.format(sopra.v)}</b> (${signTxt(sopra.d)}).` : ` <b>Il prezzo sta sopra tutti i ritracciamenti</b>: sopra di lui non c'è nessuna quota di Fibonacci, solo il massimo delle 52 settimane a ${fmtNum.format(hi)}.`}
           <b>Non sono previsioni</b>: sono le quote che quella convenzione indica, e valgono
           quanto vale il fatto che molti le guardino. Sono gli stessi numeri che finiscono nel
           pacchetto per l'LLM — un solo calcolo, così la pagina e l'analisi non possono divergere.</span></div>`;
       })()}
-      ${Number.isFinite(numero(rTk.atr_pct)) ? `<div><b>Quanto si muove in un giorno normale — ATR ${rgV(numero(rTk.atr_pct), 2)}%</b><span>
-        E' l'escursione media di una seduta. Serve per non scambiare un movimento ordinario per un segnale:
-        su questo titolo una giornata da ${rgV(numero(rTk.atr_pct), 1)}% <b>non e' una notizia</b>, e uno stop piu' stretto di
-        quella cifra viene toccato dal rumore prima che dalla tesi.</span></div>` : ""}
-      ${tec._come ? `<div class="tv-metodo muted">${esc(tec._come)}. Aggiornati al giro della pipeline, non al tick.</div>` : ""}
     </div>`;
     nota.innerHTML = `<details class="tv-piu" open><summary>Analisi tecnica — ${esc(String(tk).toUpperCase())}</summary>${analisi}</details>
     ${String(tk).includes(".") ? `<div class="tv-piede">⚠ "${esc(tk)}" ha un suffisso di borsa alla Yahoo: TradingView usa una nomenclatura diversa e il simbolo potrebbe non agganciarsi — scrivilo come lo vedi su TradingView (per esempio <code>EURONEXT:ASML</code>).</div>` : ""}`;

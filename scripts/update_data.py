@@ -698,7 +698,7 @@ def stagionalita_titolo(monthly, min_anni=8):
     return fuori or None
 
 
-def sensibilita_macro(ret, serie_bench):
+def sensibilita_macro(closes, serie_bench):
     """IL PONTE MACRO -> TITOLO, MISURATO. Il CEO ha chiesto una sezione su come i dati macro
     incidono sul titolo. L'unica forma che non sia un oroscopo e' questa: la REGRESSIONE dei
     rendimenti giornalieri del titolo su quelli di uno strumento che rappresenta il canale.
@@ -707,7 +707,21 @@ def sensibilita_macro(ret, serie_bench):
     'il titolo e' molto sensibile ai tassi'. Qui viaggiano sempre insieme, e la finestra e' comune
     per costruzione (si allineano le DATE, non le posizioni — lezione v207)."""
     import pandas as pd
-    if ret is None or len(ret) < 60:
+    # ⚠⚠ v325 — QUESTA FUNZIONE PRENDEVA I RENDIMENTI E LI PRENDEVA NELL'UNITA' SBAGLIATA.
+    # La pipeline le passava `daily_ret`, che sono log-rendimenti in FRAZIONE, mentre qui dentro
+    # il benchmark veniva convertito in PERCENTUALE: il beta usciva diviso per cento. Su MU
+    # contro il proprio settore dava 0,01 con correlazione 0,82 — un valore impossibile, perche'
+    # con quella correlazione e volatilita' simili il beta deve stare intorno a 1.
+    # ⚠ E l'ho scoperto solo dall'inventario di un agente: quando in v316 provai la funzione, le
+    # passai io le percentuali e ottenni 1,46, cioe' il valore giusto. AVEVO PROVATO UNA STRADA
+    # CHE LA PRODUZIONE NON PERCORRE — la stessa classe di v238 ("la sintassi valida non dice
+    # niente sull'esecuzione") applicata alle unita' di misura.
+    # Ora la funzione prende le CHIUSURE e si calcola i rendimenti da se': una convenzione sola,
+    # dentro, dove il chiamante non puo' sbagliarla.
+    if closes is None or len(closes) < 61:
+        return None
+    ret = closes.pct_change().dropna() * 100
+    if len(ret) < 60:
         return None
     fuori = {}
     for nome, (sym, canale, s) in serie_bench.items():
@@ -1244,7 +1258,8 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             ("tecnica", batteria_tecnica(hist)),
             ("performance", performance_orizzonti(hist, monthly)),
             ("stagionalita", stagionalita_titolo(monthly)),
-            ("sensibilita", sensibilita_macro(daily_ret, canali_macro()) if has_fundamentals(ticker, currency) else None),
+            # ⚠ si passano le CHIUSURE, non i rendimenti: l'unita' la decide la funzione (v325)
+            ("sensibilita", sensibilita_macro(closes, canali_macro()) if has_fundamentals(ticker, currency) else None),
             ("conto_trim", conto_trimestrale(t) if has_fundamentals(ticker, currency) else None),
         ) if v},
         # serie rendimenti giornalieri (uso interno per lo Sharpe di portafoglio; rimossa prima del dump)
@@ -3415,7 +3430,7 @@ def fetch_sector_tilt():
         # sedute ne' si misura un ciclo di settore: servono per l'"anatomia" — dove sta il
         # prezzo rispetto alle sue medie e se quelle medie salgono o scendono. Sei mesi
         # bastavano al momentum 1M/3M, non a dire se una corsa e' ancora viva.
-        data = yf.download(list(SECTOR_ETF) + ["SPY", "QQQ"], period="3y", interval="1d",
+        data = yf.download(list(SECTOR_ETF) + ["SPY", "QQQ"], period="6y", interval="1d",
                            auto_adjust=True, progress=False)["Close"]
         for sym, (name, group) in SECTOR_ETF.items():
             try:
@@ -3469,7 +3484,7 @@ def fetch_sector_tilt():
                 # forza relativa contro il mercato e contro il Nasdaq, sugli orizzonti che
                 # contano per un ciclo di settore (il video confronta +200% contro +35%)
                 rel = {}
-                for et, n_g in (("m6", 126), ("a1", 252), ("a2", 504)):
+                for et, n_g in (("m6", 126), ("a1", 252), ("a2", 504), ("a5", 1260)):
                     if len(s) > n_g:
                         r_et = (last / float(s.iloc[-n_g]) - 1) * 100
                         voci = {"settore": round(r_et, 1)}
