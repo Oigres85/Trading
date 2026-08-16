@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "320";
+const BUILD_VERSION = "321";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3079,9 +3079,17 @@ function indicatoriClassifica() {
   if (m.fed_market?.current_rate != null) orf.push({ k: "fed_market", nome: "Tasso Fed Funds",
     score: cl(100 - (m.fed_market.current_rate - 1) * 20),
     sub: `${fmtNum.format(m.fed_market.current_rate)}% — sopra il 4% comprime i multipli` });
-  if (m.yield_recession?.current != null) orf.push({ k: "yield_recession", nome: "Curva vs recessione",
-    score: cl(50 + m.yield_recession.current * 60),
-    sub: `spread ${signTxt(m.yield_recession.current, " pp")} · ${m.yield_recession.was_inverted_24m ? "invertita negli ultimi 24 mesi" : "nessuna inversione recente"}` });
+  /* ⚠⚠ v321 — QUESTA TESSERA NON E' MAI NATA. Leggeva `yield_recession.current`, ma il campo
+     che la pipeline pubblica si chiama `current_curve`: la condizione era sempre falsa, la
+     tessera non veniva creata, la fusione dichiarata non scattava, e `was_inverted_24m` — cioe'
+     l'unica informazione che la curva a +0,51 pp di OGGI non contiene, che due anni fa era
+     invertita — non compariva da nessuna parte, ne' in pagina ne' nel pacchetto.
+     Nessun errore, nessun gate rosso: un `?.` su un campo inesistente e' silenzioso. E' la
+     classe "difetti che non si rompono", e il gate nuovo controlla che ogni chiave letta da
+     m.<qualcosa> esista davvero nel data.json reale. */
+  if (m.yield_recession?.current_curve != null) orf.push({ k: "yield_recession", nome: "Curva vs recessione",
+    score: cl(50 + m.yield_recession.current_curve * 60),
+    sub: `spread ${signTxt(m.yield_recession.current_curve, " pp")} · ${m.yield_recession.was_inverted_24m ? "invertita negli ultimi 24 mesi" : "nessuna inversione recente"}` });
   if ((m.decouple?.sp500 || []).length && (m.decouple?.gdp || []).length) {
     const gapD = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
     orf.push({ k: "decouple", nome: "Borsa vs economia reale", score: cl(100 - gapD * 0.9),
@@ -3183,13 +3191,23 @@ function indicatoriClassifica() {
     { p: "in:unemp", s: "in:nfp", nome: "Mercato del lavoro",
       sub: (a2, b2) => `disoccupazione ${a2.sub.split(" ")[0]} · nuovi posti ${b2.sub.split(" ")[0]}` },
     { p: "in:curve", s: "yield_recession", nome: "Curva dei tassi 10A-2A",
-      sub: (a2) => `${a2.sub} — sotto zero e' il segnale che conta` },
+      /* ⚠ il fatto di B (l'inversione degli ultimi 24 mesi) va portato dentro, o la fusione
+         successiva con in:curve3m riscrive il sub e lo cancella un'altra volta. */
+      sub: (a2, b2) => `${a2.sub} — sotto zero e' il segnale che conta`
+        + (/invertita/.test(b2.sub || "") ? " · gia' invertita negli ultimi 24 mesi" : "") },
     /* ⚠ v266 — 10A-2A e 10A-3M SONO LA STESSA CURVA su due tratti. Affiancate sarebbero due
        tessere che dicono la stessa cosa, cioe' esattamente il doppione che il CEO ha gia'
        dovuto segnalare due volte. Si fondono, e la tessera porta tutti e due i numeri: quando
        i due tratti non concordano, quello e' il fatto interessante. */
     { p: "in:curve", s: "in:curve3m", nome: "Curva dei tassi (10A-2A e 10A-3M)",
-      sub: (a2, b2) => `10A-2A ${a2.sub.split(" ")[0]} · 10A-3M ${b2.sub.split(" ")[0]} — due tratti della STESSA curva, non due segnali` },
+      /* ⚠⚠ QUESTA FUSIONE RISCRIVE IL SUB DA ZERO, quindi cancellava il fatto che la fusione
+         precedente aveva appena portato dentro: che la curva e' GIA' STATA INVERTITA negli
+         ultimi 24 mesi. E' l'unica informazione che il +0,51 pp di oggi non contiene — una
+         curva normalizzata da tempo e una che non si e' mai invertita raccontano due storie
+         diverse — ed e' proprio quella che spariva. Una fusione che riscrive deve rileggere
+         cosa c'era, non ripartire da capo. */
+      sub: (a2, b2) => `10A-2A ${a2.sub.split(" ")[0]} · 10A-3M ${b2.sub.split(" ")[0]} — due tratti della STESSA curva, non due segnali`
+        + (/invertita/.test(a2.sub || "") ? " · gia' invertita negli ultimi 24 mesi" : "") },
     /* reale e attesa sono i due pezzi in cui si scompone il rendimento nominale: separati
        sembrano indipendenti, e non lo sono. */
     { p: "in:real10", s: "in:breakeven", nome: "Tasso reale e inflazione attesa (10A)",
@@ -3208,6 +3226,19 @@ function indicatoriClassifica() {
     const A = out[ip], B = out[is];
     A.nome = f.nome;
     try { A.sub = f.sub(A, B); } catch { /* sub assente: si tiene quello originale */ }
+    /* ⚠⚠ v321 — LA FUSIONE TENEVA IL PUNTEGGIO DI A E BUTTAVA QUELLO DI B. Misurato:
+       "Mercato del lavoro 76/100" — cioe' molto favorevole — nasceva dalla disoccupazione al
+       76 mentre i nuovi posti stavano a 19, con "-23K" stampato due centimetri sotto. Il
+       punteggio peggiore spariva dalla pagina insieme alla tessera che lo portava.
+       Una fusione puo' unire due VISTE della stessa cosa, non due giudizi opposti: quando i
+       due divergono, il numero onesto e' il peggiore, e lo SCARTO e' il fatto da mostrare —
+       e' la stessa regola per cui il blocco del disaccordo apre il pacchetto. */
+    if (Number.isFinite(A.score) && Number.isFinite(B.score)) {
+      const scarto = Math.abs(A.score - B.score);
+      const peggio = Math.min(A.score, B.score);
+      if (scarto > 20) A.sub = `${A.sub} · ⚠ i due componenti non concordano (${A.score} e ${B.score}): vale il peggiore`;
+      A.score = peggio;
+    }
     out.splice(is, 1);
   }
 
@@ -7167,11 +7198,17 @@ function buildPrompt() {
       const pos = v.pos_range_1y != null ? v.pos_range_1y
         : (v.min_1y != null && v.max_1y != null && v.max_1y > v.min_1y
             ? Math.round((v.value - v.min_1y) / (v.max_1y - v.min_1y) * 1000) / 10 : null);
-      pezzi.push(`${v.label || k} ${v.value}${v.unita ? " " + v.unita : ""}`
+      /* ⚠⚠ v321 — `${v.value}` INTERPOLAVA IL NUMERO GREZZO: il rame usciva "6.613 $/lb", e in
+         un pacchetto che trentanove righe piu' su scrive "30.046,14" quel punto e' il separatore
+         delle MIGLIAIA. Un lettore — umano o modello — legge 6613 invece di 6,613: sbaglia di
+         mille volte, e non si autodenuncia perche' anche l'intervallo "4.409–6.703" e'
+         internamente coerente con la lettura sbagliata. Una convenzione decimale sola in tutto
+         il pacchetto, ed e' quella italiana che il resto usa gia'. */
+      pezzi.push(`${v.label || k} ${fmtNum.format(v.value)}${v.unita ? " " + v.unita : ""}`
         + (v.change_pct != null ? ` (${signTxt(v.change_pct)} oggi)` : "")
         + (varAnno != null ? ` — ${signTxt(Math.round(varAnno * 10) / 10)} in un anno` : "")
         + (pos != null && v.min_1y != null && v.max_1y != null
-            ? `, e sta al ${Math.round(pos)}% dell'intervallo annuale ${v.min_1y}–${v.max_1y}` : ""));
+            ? `, e sta al ${Math.round(pos)}% dell'intervallo annuale ${fmtNum.format(v.min_1y)}–${fmtNum.format(v.max_1y)}` : ""));
     }
     if (pezzi.length) {
       lines.push(`- MATERIE PRIME E SEMICONDUTTORI: ${pezzi.join(" · ")}. `

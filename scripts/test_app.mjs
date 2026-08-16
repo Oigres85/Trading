@@ -1594,8 +1594,15 @@ check("v302 materie: tolte dalla pagina, restano nel pacchetto", suVeri(`
   const inPagina = indicatoriClassifica().map(x => x.k);
   const fuori = ["mat:petrolio", "mat:rame", "mat:oro"].every(k => !inPagina.includes(k));
   /* ...ma i loro valori sono ancora nel pacchetto */
-  const dentro = ["petrolio", "rame", "oro"].every(k => !mat[k] || p.includes(String(mat[k].value)));
-  return fuori && dentro`));
+  const dentro = ["petrolio", "rame", "oro"].every(k => !mat[k] || p.includes(fmtNum.format(mat[k].value)));
+  /* e la scrittura dev'essere quella italiana del resto del pacchetto: un valore col punto
+     decimale accanto a "30.046,14" si legge mille volte piu' grande di quello che e' */
+  const senzaAmbiguita = ["petrolio", "rame", "oro"].every(k => {
+    const v = mat[k] && mat[k].value;
+    if (v == null || Number.isInteger(v)) return true;
+    return !p.includes(" " + String(v) + " ");     // mai il numero grezzo con punto decimale
+  });
+  return fuori && dentro && senzaAmbiguita`));
 
 /* ⚠ IL PUNTEGGIO E' POSIZIONALE, NON UN GIUDIZIO: un petrolio al 90% del suo intervallo e'
    inflazione (male), un rame al 90% e' domanda industriale (bene) — stesso numero, segni
@@ -2997,6 +3004,59 @@ check("v320 leva: la scheda esiste, disegna la serie e dichiara che le date sono
   return f.g.includes("<svg") && f.n.includes("del PIL") && f.n.includes("mediana storica")
       && f.n.includes("RICOSTRUITE")                       // una ricostruzione si dichiara
       && f.score === (st ? st.score : null)`));            // stesso punteggio della fonte unica
+
+/* ══ v321 — LA TESSERA CHE NON NASCEVA, E LA RETE PER TUTTA LA CLASSE ══════════════════════
+   `m.yield_recession?.current` — ma il campo si chiama `current_curve`. La condizione era
+   sempre falsa: la tessera non veniva creata, la fusione dichiarata non scattava, e
+   `was_inverted_24m` (che la curva a +0,51 pp di OGGI non contiene: una curva normalizzata da
+   tempo e una che non si e' MAI invertita raccontano due storie diverse) non compariva da
+   nessuna parte. Nessun errore, nessun gate rosso: un `?.` su un campo inesistente e' silenzioso. */
+check("v321 curva: la tessera esiste e porta l'inversione degli ultimi 24 mesi", suVeri(`
+  const yr = (DATA.macro || {}).yield_recession;
+  if (!yr || yr.current_curve == null) return true;
+  const lista = indicatoriClassifica();
+  const t = lista.find(x => /Curva dei tassi/i.test(x.nome || ""));
+  if (!t) return false;
+  /* il fatto deve sopravvivere a ENTRAMBE le fusioni: la prima lo porta dentro, la seconda
+     riscrive il sub da zero e lo cancellava di nuovo */
+  return yr.was_inverted_24m ? (t.sub || "").includes("invertita negli ultimi 24 mesi") : true`));
+
+/* ⚠⚠ LA RETE DELLA CLASSE: ogni campo che il codice legge da `m.<x>` deve esistere davvero nel
+   data.json. Senza questa guardia un campo rinominato in pipeline fa sparire una tessera in
+   silenzio, e ci si accorge solo se qualcuno va a cercarla. Validata iniettando il difetto
+   originale (`current` al posto di `current_curve`): morde. */
+check("v321 dati: nessuna tessera legge un campo che in data.json non esiste", (() => {
+  const i = src.indexOf("function indicatoriClassifica");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  const letti = [...corpo.matchAll(/\bm\.([a-z_0-9]+)\?\.([a-z_0-9]+)\s*!=\s*null/gi)]
+    .map(x => [x[1], x[2]]);
+  if (letti.length < 5) return false;          // se l'estrazione non trova niente, e' rotta lei
+  const macro = reale.macro || {};
+  const mancanti = letti.filter(([a, b]) => macro[a] && !(b in macro[a]));
+  if (mancanti.length) console.log("   campi letti e assenti:", mancanti.map(x => x.join(".")).join(", "));
+  return mancanti.length === 0;
+})());
+
+/* ══ LE FUSIONI NON POSSONO TENERE IL PUNTEGGIO MIGLIORE ═══════════════════════════════════
+   "Mercato del lavoro 76/100" — molto favorevole — nasceva dalla disoccupazione al 76 mentre i
+   nuovi posti stavano a 19, con "-23K" stampato due centimetri sotto: il punteggio peggiore
+   spariva dalla pagina insieme alla tessera che lo portava. Una fusione puo' unire due VISTE
+   della stessa cosa, non due giudizi opposti. */
+check("v321 fusioni: il punteggio fuso e' il PEGGIORE dei due, e lo scarto resta visibile", suVeri(`
+  const u = (DATA.macro && DATA.macro.indicators || []).find(x => x && x.key === "unemp");
+  const n = (DATA.macro && DATA.macro.indicators || []).find(x => x && x.key === "nfp");
+  if (!u || !n) return true;
+  const t = indicatoriClassifica().find(x => /Mercato del lavoro/i.test(x.nome || ""));
+  if (!t) return true;
+  return t.score <= 40 && (t.sub || "").includes("non concordano")`));
+
+check("v321 fusioni: la regola vale per COSTRUZIONE, non per il caso di oggi", (() => {
+  const i = src.indexOf("for (const f of FUSIONI)");
+  const corpo = src.slice(i, i + 1600);
+  return corpo.includes("Math.min(A.score, B.score)")
+      && corpo.includes("non concordano")
+      && !/A\.score = A\.score/.test(corpo);
+})());
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
