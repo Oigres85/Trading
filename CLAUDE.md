@@ -1322,6 +1322,74 @@ parte dei fatti, che è la riga di condotta di tutto il sistema.
 (`\d` diventa `d`) e — **settima volta** — un check ancorato a una **stringa letterale**, qui
 una frase che nel testo **va a capo**. Riagganciato al fatto.
 
+## 📡 v316 — la colonna di TradingView si CALCOLA, non si legge
+
+Richiesta del CEO: stagionalità, conto economico, performance e dettagli tecnici della colonna
+laterale del widget. **Non si raschia l'iframe di terzi**: le formule sono pubbliche e l'OHLCV lo
+scarichiamo già. `batteria_tecnica`, `performance_orizzonti`, `stagionalita_titolo`,
+`conto_trimestrale` in `scripts/update_data.py`.
+
+⚠ **E non si calcolano lato pagina.** Le `sparks` in `data.json` sono **sotto-campionate e senza
+date** — 51 punti per un anno intero. Un MACD o un ADX calcolati lì darebbero numeri che
+*sembrano* giusti e non lo sono, e senza date non esiste finestra comune con nessuna serie macro
+(v207). Quando un calcolo ha bisogno della barra vera, si fa dove la barra vera c'è.
+
+⚠ **Un test sintetico ha trovato un difetto che i dati reali non contengono**: su una serie senza
+sedute negative la perdita media è zero, la divisione dava `NaN` e l'RSI **spariva** proprio nel
+caso più estremo. Per definizione lì vale 100. Su MU il valore è invariato (56,3) — ed è
+esattamente perché i test sintetici servono.
+
+## 🌉 v316 — il ponte macro→titolo: misurato, non raccontato
+
+Il CEO ha chiesto una sezione su come i dati macro incidano sul titolo. L'unica forma che non sia
+un oroscopo è la **regressione dei rendimenti giornalieri** del titolo su quelli di uno strumento
+**quotato** che rappresenta il canale (QQQ mercato, SOXX comparto, TLT tassi, UUP dollaro).
+Quotato perché ha la stessa barra giornaliera: la finestra comune esiste per costruzione, e le
+serie si allineano **per data, mai per posizione**.
+
+> ⚠⚠ **UN BETA SENZA IL SUO R² È MEZZO NUMERO.** Su MU il comparto spiega il 66% della varianza
+> (R² 0,657) e i tassi lo **0,7%**. Il referto reale di ChatGPT che il CEO ha allegato scrive *"il
+> canale negativo è il costo del capitale"* — su un titolo dove quel canale non è misurabile. Un
+> beta pubblicato da solo INVITA a quel racconto. Beta, R², campione e finestra viaggiano insieme,
+> e la testata vieta di sostenere un canale sotto R² 0,05 senza dichiarare che si va CONTRO la misura.
+
+## 🔢 v316 — il percentile che non esisteva
+
+Trovato leggendo il payload che il CEO ha incollato: *"Semiconduttori (SOX) — 116° percentile
+dell'anno"*. **Un percentile sopra 100 non esiste.** `pct_1y` calcolava la **variazione** a un anno
+e la pagina la stampava come **percentile**: l'oro a +31,3% usciva come "31° percentile", cioè nel
+terzo BASSO del suo intervallo. **La lettura si inverte.** Il rame era "47° percentile" e sta al
+**96%** del suo intervallo annuale.
+
+Il commento nella pipeline diceva *"posizione nel range dell'anno"* e la formula faceva un'altra
+cosa: **il commento dichiarava l'intenzione, il codice eseguiva altro, e nessuno dei due mentiva da
+solo.** Ora sono due campi con due nomi veri, `var_1y` e `pos_range_1y`.
+
+## 🚪 v316 — tre strade per consegnare un pacchetto, due rotte
+
+Il CEO: *"pulsante relativo copia analisi del portafoglio non genera prompt"*. Il pacchetto si
+generava (20.013 caratteri) e veniva buttato: `clipboard.writeText` **viene rifiutata** dal browser
+e la promise rifiutata non era gestita — nessun testo, nessun messaggio, nessun errore in console.
+
+⚠⚠ Ma il difetto vero erano **tre implementazioni della stessa operazione**: `copyCIOText` apriva
+la modale (e quindi reggeva anche senza clipboard), `#set-copia` scriveva solo negli appunti e in
+caso di rifiuto **perdeva il pacchetto**, `#pf-copia` non gestiva nemmeno il rifiuto. E `#set-copia`
+era **rotto dalla v313**: leggeva `#set-input`, la barra rimossa, quindi con il comparto scelto
+rispondeva *"Scegli prima un settore dall'elenco"*.
+
+> Il gate della v313 verificava che il bottone **esistesse** e che `scegliSettore` **esistesse** —
+> non che i due fossero **collegati**. È la stessa classe del bottone di modifica di v315: ho
+> controllato l'esistenza, non la raggiungibilità. **Un pacchetto generato e non consegnato è un
+> pacchetto non generato.** Ora la strada è una (`consegnaPacchetto`): il testo finisce SEMPRE nel
+> riquadro, la clipboard è un di più che riesce o dichiara di non essere riuscito.
+
+## 💹 v316 — il portafoglio segue il mercato, non lo snapshot
+
+`refreshLivePrices` ricalcolava il guadagno solo `if (r.qty)`, ma le posizioni arrivano da
+`config/posizioni.json` e portano **`qta`**: il ramo non entrava mai. E anche fosse entrato avrebbe
+scritto `gain_pct`, mentre la tabella legge **`gain_pct_pos`** — *il campo aggiornato non era quello
+letto*. Prezzo fresco accanto a guadagno vecchio, e la tabella nemmeno ridisegnata.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

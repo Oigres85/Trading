@@ -9015,12 +9015,12 @@ async function consegnaPacchetto(testo, che, esito) {
   const quanti = `${testo.length.toLocaleString("it")} caratteri`;
   try {
     await navigator.clipboard.writeText(testo);
-    if (esito) esito.innerHTML = `<b>${esc(che)} negli appunti</b> — ${quanti}. Incollalo in una chat NUOVA.`;
+    if (esito) esito.innerHTML = `<b>${esc(che)}</b> — ${quanti}, negli appunti. Incolla in una chat NUOVA.`;
     toast(`${che} copiato \u2713`);
     return true;
   } catch {
     /* il rifiuto della clipboard NON e' un fallimento della generazione: il testo e' li'. */
-    if (esito) esito.innerHTML = `<b>${esc(che)} pronto nel riquadro</b> — ${quanti}. `
+    if (esito) esito.innerHTML = `<b>${esc(che)}</b> — ${quanti}, nel riquadro qui sopra. `
       + `Il browser non mi ha dato gli appunti: selezionalo e copialo da li'.`;
     return false;
   }
