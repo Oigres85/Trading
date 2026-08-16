@@ -2848,6 +2848,35 @@ check("v316 verifica: la sezione e' via, e non restano riferimenti orfani", (() 
       && html.indexOf('data-sez="portafoglio"') >= 0;     // il vicino e' rimasto
 })());
 
+/* ══ v318 — STAGIONALITA': DUE GRANDEZZE, DUE SEGNI GRAFICI ════════════════════════════════
+   Il CEO: "devono essere distinti ovvero devi fornire stagionalita' e a parte con una linea es.
+   arancione sopra la barra il valore dello storico del midterm".
+   ⚠ La v313 mostrava la DIFFERENZA fra i due, una codifica sola — scelta fatta allora per
+   rispondere a "non comprendo il significato delle tacche". Ma cosi' il valore di midterm, che
+   e' il numero che il CEO vuole leggere, non era scritto da nessuna parte: si poteva solo
+   ricostruire sommando. Semplificare togliendo un dato non e' semplificare. */
+check("v318 stagionalita': la barra e' tutti gli anni, la lineetta arancione e' il midterm", suVeri(`
+  const f = FORMA_INDICATORE["stagionalita_ndx"](DATA.macro || {});
+  if (!f) return true;
+  const g = f.g || "";
+  const barre = g.split("<rect").length - 2;        // meno il quadratino della legenda
+  const linee = g.split('stroke="var(--orange').length - 2;
+  return barre >= 12 && linee === barre
+      && g.includes("in tutti gli anni") && g.includes("negli anni di midterm")
+      && g.includes(">tutti gli anni<") && g.includes(">anni di midterm<")`));
+
+check("v318 stagionalita': le due grandezze stanno sullo STESSO asse, o non sono confrontabili", suVeri(`
+  const st = (DATA.macro || {}).stagionalita_ndx;
+  if (!st || !(st.mesi || []).length) return true;
+  const f = FORMA_INDICATORE["stagionalita_ndx"](DATA.macro || {});
+  const g = f.g || "";
+  /* la scala si tara sul massimo delle DUE serie: se si tarasse solo sulle barre, una lineetta
+     di midterm piu' estrema uscirebbe dalla tela senza che nessuno se ne accorga */
+  const mesi = st.mesi.filter(x => x && Number.isFinite(x.media) && Number.isFinite(x.media_mid));
+  const lim = Math.max(...mesi.flatMap(x => [Math.abs(x.media), Math.abs(x.media_mid)]));
+  const ys = g.split('y1="').slice(1).map(x => Number(x.split(String.fromCharCode(34))[0])).filter(Number.isFinite);
+  return lim > 0 && ys.every(y => y >= 0 && y <= 138)`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

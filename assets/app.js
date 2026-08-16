@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "317";
+const BUILD_VERSION = "318";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3576,20 +3576,36 @@ const FORMA_INDICATORE = {
                   "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
     const mesi = (st.mesi || []).filter(x => x && Number.isFinite(x.media) && Number.isFinite(x.media_mid));
     if (mesi.length < 6) return null;
+    /* ═══ v317 — DUE GRANDEZZE DISTINTE, NON UNA DIFFERENZA ═════════════════════════════════
+       Il CEO: "devono essere distinti ovvero devi fornire stagionalita' e a parte con una linea
+       es. arancione sopra la barra il valore dello storico del midterm".
+       ⚠ La v313 aveva fatto l'opposto, e per una ragione che allora sembrava buona: mostrava la
+       DIFFERENZA fra midterm e tutti gli anni, una codifica sola. Ma cosi' il valore di midterm
+       — che e' il numero che il CEO vuole leggere — non era scritto da nessuna parte: si poteva
+       solo ricostruire sommando. Ora la barra e' la stagionalita' di TUTTI gli anni e la lineetta
+       arancione e' il valore degli anni di midterm: due grandezze, due segni grafici, nessuna
+       sottrazione da fare a mente. */
     const diff = mesi.map(x => ({ ...x, d: Math.round((x.media_mid - x.media) * 100) / 100 }));
-    const lim = Math.max(...diff.map(x => Math.abs(x.d))) || 1;
+    const lim = Math.max(...diff.flatMap(x => [Math.abs(x.media), Math.abs(x.media_mid)])) || 1;
     const W = 330, H = 138, L = 30, R = W - 8, T = 10, B = H - 22;
     const X = (i) => L + (i + 0.5) / diff.length * (R - L);
     const zero = (T + B) / 2;
     const Y = (v) => zero - (v / lim) * ((B - T) / 2);
     const larg = (R - L) / diff.length * 0.6;
     const barre = diff.map((x, i) => {
-      const y = Math.min(Y(x.d), zero), h = Math.abs(Y(x.d) - zero);
+      const y = Math.min(Y(x.media), zero), h = Math.abs(Y(x.media) - zero);
       const ora = x.mese === st.mese_ora;
       return `<rect x="${(X(i) - larg / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${larg.toFixed(1)}"
-        height="${Math.max(h, 1).toFixed(1)}" rx="1.5" fill="${x.d >= 0 ? "var(--green)" : "var(--red)"}"
-        opacity="${ora ? 1 : 0.5}"><title>${NOMI[x.mese - 1]}: negli anni di midterm ${fmtNum.format(x.media_mid)}%, in tutti gli anni ${fmtNum.format(x.media)}% — differenza ${fmtNum.format(x.d)} punti</title></rect>`;
+        height="${Math.max(h, 1).toFixed(1)}" rx="1.5" fill="${x.media >= 0 ? "var(--green)" : "var(--red)"}"
+        opacity="${ora ? 1 : 0.5}"><title>${NOMI[x.mese - 1]}: in tutti gli anni ${fmtNum.format(x.media)}%, negli anni di midterm ${fmtNum.format(x.media_mid)}% — differenza ${fmtNum.format(x.d)} punti</title></rect>`;
     }).join("");
+    /* la lineetta arancione: il valore degli anni di midterm, sullo STESSO asse delle barre —
+       se avesse un asse proprio i due numeri non sarebbero confrontabili a vista, ed e' tutto
+       il motivo per cui il CEO li vuole insieme. */
+    const midterm = diff.map((x, i) => `<line x1="${(X(i) - larg / 2 - 1.5).toFixed(1)}" y1="${Y(x.media_mid).toFixed(1)}"
+        x2="${(X(i) + larg / 2 + 1.5).toFixed(1)}" y2="${Y(x.media_mid).toFixed(1)}"
+        stroke="var(--orange, #f59e0b)" stroke-width="2.6" stroke-linecap="round"
+        opacity="${x.mese === st.mese_ora ? 1 : 0.8}"><title>${NOMI[x.mese - 1]}: negli anni di midterm ${fmtNum.format(x.media_mid)}%</title></line>`).join("");
     const etich = diff.map((x, i) =>
       `<text x="${X(i).toFixed(1)}" y="${H - 7}" font-size="8.5" text-anchor="middle"
         fill="${x.mese === st.mese_ora ? "var(--text)" : "var(--muted)"}"
@@ -3599,7 +3615,13 @@ const FORMA_INDICATORE = {
       <line x1="${L}" y1="${zero}" x2="${R}" y2="${zero}" stroke="var(--border)" stroke-width="1"/>
       <text x="2" y="${(T + 8).toFixed(1)}" font-size="8" fill="var(--muted)">meglio</text>
       <text x="2" y="${(B - 1).toFixed(1)}" font-size="8" fill="var(--muted)">peggio</text>
-      ${barre}${etich}</svg>`;
+      ${barre}${midterm}${etich}
+      <g transform="translate(${(L + 4)},${T})">
+        <rect x="0" y="0" width="9" height="6" rx="1" fill="var(--green)" opacity=".7"/>
+        <text x="13" y="6" font-size="8.5" fill="var(--muted)">tutti gli anni</text>
+        <line x1="74" y1="3" x2="88" y2="3" stroke="var(--orange, #f59e0b)" stroke-width="2.6" stroke-linecap="round"/>
+        <text x="92" y="6" font-size="8.5" fill="var(--muted)">anni di midterm</text>
+      </g></svg>`;
 
     const prossimi = [0, 1, 2].map(k => diff.find(x => x.mese === ((st.mese_ora - 1 + k) % 12) + 1)).filter(Boolean);
     const testo = prossimi.map(x =>
@@ -3609,8 +3631,11 @@ const FORMA_INDICATORE = {
 
     return {
       g,
-      n: `<b>Ogni barra dice una cosa sola:</b> quanto quel mese è andato <b>meglio (verde) o peggio (rosso)</b> `
-        + `negli anni di elezioni di midterm rispetto alla media di tutti gli anni. Il mese in corso è acceso.`
+      n: `<b>Due grandezze distinte, non una differenza.</b> La <b>barra</b> è la stagionalità di `
+        + `<b>tutti gli anni</b> (verde se quel mese è storicamente positivo, rossa se negativo); la `
+        + `<b class="stag-mid">lineetta arancione</b> sopra la barra è lo stesso mese ma <b>nei soli anni `
+        + `di elezioni di midterm</b>. Quanto distano fra loro è quanto il ciclo elettorale sposta quel mese. `
+        + `Il mese in corso è acceso.`
         + `<div class="stag-blocco">${testo}</div>`
         + `Campione ${st.dal}–${st.al}: <b>${(st.anni_midterm || []).length} anni di midterm</b>`
         + (st.ciclo_ora === 2 ? `, e il ${st.al + 1} è uno di quelli.` : ".")
