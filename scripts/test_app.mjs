@@ -2358,19 +2358,43 @@ check("v307 portafoglio: le posizioni non seguite vengono dichiarate", (() => {
 
 /* ══ v309 — STAGIONALITA' NDX + MIDTERM, E I CLIC CHE PORTANO AL GRAFICO ═════════════════ */
 
-/* ⚠⚠ UNA STATISTICA SU DIECI CASI SI PUBBLICA CON LA SUA INCERTEZZA, O NON SI PUBBLICA. Questo
-   progetto ha tolto un motore predittivo con SETTE segnali maturati (v200, hit-rate 29%): una
-   media di dieci ottobre che va da -8,7% a +18,9% non e' una previsione, ed e' esattamente il
-   genere di numero che sembra una previsione se lo si scrive da solo. */
-check("v309 stagionalità: dichiara il campione e la dispersione, non solo la media", suVeri(`
+/* ══ v327 — LA STAGIONALITA' AL NETTO DELLA DERIVA ═════════════════════════════════════════
+   Il CEO: "il grafico che mi dai mi da solo settembre con andamento negativo e questo non e'
+   possibile!!!". Aveva ragione, e la causa era nel METODO, non nei dati: il Nasdaq sale in media
+   dell'1,35% AL MESE sui 41 anni del campione, quindi sommando quella deriva a ogni mese undici
+   mesi su dodici risultano positivi. Un grafico tutto verde non distingue niente.
+   ⚠ RICEVUTA DEL TAGLIO: il ciclo di midterm esce dalla SCHEDA su richiesta del CEO (dieci
+   osservazioni per mese non reggevano il peso che gli si dava) ma resta nel PACCHETTO per l'LLM
+   — verificato: la riga c'e'. Regola v208, si toglie dalla pagina cio' che il payload porta gia'. */
+check("v327 stagionalita': la barra e' l'ECCESSO sul mese medio, e la deriva e' dichiarata", suVeri(`
   const st = DATA.macro && DATA.macro.stagionalita_ndx;
   if (!st || !(st.mesi || []).length) return true;
   const f = FORMA_INDICATORE["stagionalita_ndx"](DATA.macro);
   if (!f) return false;
-  return f.n.indexOf("anni di midterm") >= 0
-      && f.n.indexOf("osservazioni per mese sono pochissime") >= 0
-      && f.n.indexOf("Non è una previsione") >= 0
-      && (st.mesi || []).every(x => !Number.isFinite(x.media_mid) || (x.n_mid >= 5 && Number.isFinite(x.peggio_mid)))`));
+  const mesi = st.mesi.filter(x => x && Number.isFinite(x.media));
+  const deriva = mesi.reduce((a, x) => a + x.media, 0) / mesi.length;
+  /* la deriva dev'essere SCRITTA: e' l'unica cosa che spiega perche' i numeri non coincidono
+     con quelli assoluti che il lettore potrebbe cercare altrove */
+  return f.n.includes("mese MEDIO") && f.n.includes(signTxt(Math.round(deriva * 100) / 100))
+      && f.n.includes("osservazioni per mese")
+      && !/midterm/i.test(f.g + f.n)`));
+
+check("v327 stagionalita': al netto della deriva i mesi negativi sono piu' di uno", suVeri(`
+  const st = DATA.macro && DATA.macro.stagionalita_ndx;
+  if (!st || !(st.mesi || []).length) return true;
+  const mesi = st.mesi.filter(x => x && Number.isFinite(x.media));
+  const deriva = mesi.reduce((a, x) => a + x.media, 0) / mesi.length;
+  const neg = mesi.filter(x => x.media - deriva < 0).length;
+  const f = FORMA_INDICATORE["stagionalita_ndx"](DATA.macro);
+  const rosse = f.g.split("var(--red)").length - 1;
+  /* un grafico in cui un solo mese e' negativo non e' stagionalita', e' la deriva dell'indice */
+  return neg >= 3 && rosse === neg`));
+
+/* ⚠ e il midterm dev'essere ancora nel pacchetto: esce dalla scheda, non dal sistema. */
+check("v327 stagionalita': il ciclo di midterm resta nel pacchetto per l'LLM", suVeri(`
+  const st = DATA.macro && DATA.macro.stagionalita_ndx;
+  if (!st || !(st.mesi || []).some(x => Number.isFinite(x.media_mid))) return true;
+  return /midterm/i.test(buildPrompt())`));
 
 /* ⚠ e l'anno in corso NON entra nel campione che lo descrive: sarebbe circolare. */
 check("v309 stagionalità: l'anno in corso è escluso dallo storico", suVeri(`
@@ -2545,19 +2569,15 @@ check("v311 portafoglio: la forma parte dai dati veri, non da un elenco separato
   return corpo.includes("DATA.portfolio") && corpo.includes("DATA.watchlist");
 })());
 
-/* ══ v325 — LA ROTAZIONE CAMBIA FORMA, GLI INVARIANTI CAMBIANO CON LEI ═════════════════════
-   Il CEO: "elimina le azioni indicate in sale e scende e lascia solo le barre con i settori con
-   possibilita' di modificarle a 1 mese, 3 mesi un anno e 5 anni".
-   ⚠⚠ I check che sorvegliavano i due elenchi non sono stati ZITTITI: hanno cambiato soggetto, e
-   cio' che deve restare vero e' piu' forte di prima — ogni comparto disegnato, ognuno cliccabile
-   col proprio simbolo, e l'ordine che cambia DAVVERO quando cambia l'orizzonte. */
-check("v325 rotazione: disegna tutti i comparti, ognuno cliccabile col proprio simbolo", suVeri(`
+check("v327 rotazione: disegna tutti i comparti, ognuno cliccabile, in una scheda normale", suVeri(`
   const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
   if (!f) return true;
   const conM1 = (DATA.macro.tilt || []).filter(t => Number.isFinite(t.m1)).length;
   const barre = f.g.split("data-rot-tk").length - 1;
   const graf = f.g.split("data-graf-tk").length - 1;
-  return f.larga === true && barre === conM1 && graf === barre && barre >= 15`));
+  /* v327 — il CEO: "riduci dimensioni Rotazione quasi al pari delle altre tab macro": la scheda
+     non e' piu' a piena larghezza, ma deve continuare a disegnarli TUTTI. */
+  return !f.larga && barre === conM1 && graf === barre && barre >= 15`));
 
 check("v325 rotazione: gli orizzonti offerti sono SOLO quelli che esistono nei dati", suVeri(`
   const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
@@ -2878,47 +2898,7 @@ check("v316 verifica: la sezione e' via, e non restano riferimenti orfani", (() 
       && html.indexOf('data-sez="portafoglio"') >= 0;     // il vicino e' rimasto
 })());
 
-/* ══ v318 — STAGIONALITA': DUE GRANDEZZE, DUE SEGNI GRAFICI ════════════════════════════════
-   Il CEO: "devono essere distinti ovvero devi fornire stagionalita' e a parte con una linea es.
-   arancione sopra la barra il valore dello storico del midterm".
-   ⚠ La v313 mostrava la DIFFERENZA fra i due, una codifica sola — scelta fatta allora per
-   rispondere a "non comprendo il significato delle tacche". Ma cosi' il valore di midterm, che
-   e' il numero che il CEO vuole leggere, non era scritto da nessuna parte: si poteva solo
-   ricostruire sommando. Semplificare togliendo un dato non e' semplificare. */
-check("v318 stagionalita': la barra e' tutti gli anni, la lineetta arancione e' il midterm", suVeri(`
-  const f = FORMA_INDICATORE["stagionalita_ndx"](DATA.macro || {});
-  if (!f) return true;
-  const g = f.g || "";
-  const barre = g.split("<rect").length - 2;        // meno il quadratino della legenda
-  const linee = g.split('stroke="var(--orange').length - 2;
-  return barre >= 12 && linee === barre
-      && g.includes("in tutti gli anni") && g.includes("negli anni di midterm")
-      && g.includes(">tutti gli anni<") && g.includes(">anni di midterm<")`));
 
-check("v318 stagionalita': la lineetta sta al valore di midterm, non a quello delle barre", suVeri(`
-  const st = (DATA.macro || {}).stagionalita_ndx;
-  if (!st || !(st.mesi || []).length) return true;
-  const g = FORMA_INDICATORE["stagionalita_ndx"](DATA.macro || {}).g || "";
-  const mesi = st.mesi.filter(x => x && Number.isFinite(x.media) && Number.isFinite(x.media_mid));
-  /* i mesi in cui midterm e tutti-gli-anni divergono davvero: li' l'ordine verticale fra la
-     lineetta e il bordo della barra e' un fatto osservabile, e cambia se si disegna il valore
-     sbagliato. Sull'asse SVG y cresce verso il BASSO: valore piu' alto = y piu' piccola. */
-  const casi = mesi.filter(x => Math.abs(x.media_mid - x.media) > 0.3);
-  if (casi.length < 2) return true;
-  const ys = g.split("<line").slice(1).filter(p => p.includes("var(--orange"))
-    .map(p => Number((p.split('y1="')[1] || "").split(String.fromCharCode(34))[0]))
-    .filter(Number.isFinite);
-  if (ys.length < mesi.length) return false;
-  const lim = Math.max(...mesi.flatMap(x => [Math.abs(x.media), Math.abs(x.media_mid)]));
-  const zero = (10 + 116) / 2, semi = (116 - 10) / 2;
-  const atteso = (v) => zero - (v / lim) * semi;
-  /* si confronta col valore ATTESO di media_mid: se il codice disegnasse media, su questi mesi
-     lo scarto supererebbe di molto la tolleranza */
-  return casi.every(x => {
-    const i = mesi.indexOf(x);
-    return Math.abs(ys[i] - atteso(x.media_mid)) < 1.2
-        && Math.abs(ys[i] - atteso(x.media)) > 1.2;
-  })`));
 
 check("v318 stagionalita': le due grandezze stanno sullo STESSO asse, o non sono confrontabili", suVeri(`
   const st = (DATA.macro || {}).stagionalita_ndx;

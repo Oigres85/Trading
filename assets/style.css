@@ -112,7 +112,7 @@ td.bar-mid::after {
   background: var(--muted); opacity: .45; z-index: -1;
 }
 
-main { max-width: 1500px; margin: 0 auto; padding: 0 20px 40px; }
+main { max-width: min(1900px, 96vw); margin: 0 auto; padding: 0 20px 40px; }
 
 /* ---------- topbar ---------- */
 .topbar {
@@ -1659,7 +1659,7 @@ svg.g-serie { cursor: crosshair; }
 
 /* v223 — MISURATORE dentro la tessera: dove sta questo valore sulla sua scala */
 /* la griglia delle tessere si stringe: molte card piccole invece di poche grandi */
-.mg-tris { grid-template-columns: repeat(auto-fit, minmax(232px, 1fr)); gap: 11px; }
+.mg-tris { grid-template-columns: repeat(auto-fit, minmax(248px, 1fr)); gap: 11px; }
 .mg-card .mg-n { font-size: 11px; margin-top: 7px; }
 /* v223 — rotazione compattata: righe più fitte, il grafico occupa meno */
 #mg-rot .obar-row { grid-template-columns: 118px minmax(0, 1fr) 150px; padding: 0 4px; }
@@ -2283,3 +2283,13 @@ svg.g-serie { cursor: crosshair; }
 .rot-b:hover rect:not([fill="transparent"]) { fill-opacity: 1; }
 .rot-b:hover text { fill: var(--text); }
 .rot-b:focus-visible { outline: 1px solid var(--accent); }
+
+/* v327 — modalità scorrimento per le schede macro su schermi stretti: invece di comprimerle
+   sotto la larghezza leggibile (dove le etichette degli assi scendono sotto i 6px e il grafico
+   smette di dire qualcosa — la lezione del viewBox, v206 e v226), la griglia scorre. */
+@media (max-width: 700px) {
+  .mg-tris { grid-auto-flow: column; grid-auto-columns: minmax(268px, 1fr);
+             grid-template-columns: none; overflow-x: auto; scroll-snap-type: x proximity;
+             padding-bottom: 8px; }
+  .mg-tris > .mg-card { scroll-snap-align: start; }
+}

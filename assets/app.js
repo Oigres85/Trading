@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "326";
+const BUILD_VERSION = "327";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3755,92 +3755,66 @@ const FORMA_INDICATORE = {
   },
 
   stagionalita_ndx: (m) => {
-    /* ═══ v313 — UNA SOLA DOMANDA, UNA SOLA CODIFICA ═══════════════════════════════════════
-       Il CEO: "la parte inerente le midterm non mi e' chiara e non comprendo il significato
-       delle tacche". Aveva ragione, e la diagnosi e' la stessa gia' pagata tre volte: la prima
-       stesura metteva DUE codifiche nello stesso grafico — la barra per gli anni di midterm e
-       una tacca per la media di tutti gli anni — e obbligava a decodificare prima di leggere.
-       "Un grafico che va spiegato non e' un grafico leggibile" e' la frase di v228, quando fu
-       respinta la ragnatela.
-       Ora la barra risponde a UNA domanda sola: <b>quanto un anno di midterm cambia questo
-       mese rispetto al normale</b>. Sopra lo zero il mese e' andato meglio del solito negli
-       anni di midterm, sotto peggio. Le due medie restano, ma scritte in parole sotto i
-       prossimi tre mesi — dove si leggono, invece che dedotte da una tacca. */
+    /* ═══ v327 — LA STAGIONALITA' SI VEDE SOLO AL NETTO DELLA DERIVA ═══════════════════════════
+       Il CEO: "il grafico che mi dai mi da solo settembre con andamento negativo e questo non e'
+       possibile!!!". Aveva ragione, e la causa non era nei dati: era nel METODO.
+       ⚠⚠ IL NASDAQ SALE IN MEDIA DELL'1,35% AL MESE. Misurato sui 41 anni del campione: quella e'
+       la DERIVA dell'indice, non una proprieta' di nessun mese. Sommandola a ogni mese, undici
+       mesi su dodici risultano positivi — e un grafico in cui tutto e' verde non distingue
+       niente, che e' esattamente cio' che il CEO ha visto.
+       Ora la barra e' l'ECCESSO sul mese medio: quanto quel mese fa MEGLIO O PEGGIO di un mese
+       qualunque dello stesso indice. Al netto della deriva i mesi negativi diventano CINQUE su
+       dodici, ed e' la stagionalita' vera — la deriva e' un fatto dell'indice, non del calendario.
+       ⚠ Via ogni riferimento al ciclo di midterm, su richiesta del CEO: dieci osservazioni per
+       mese non reggevano il peso che la scheda gli dava. Il dato resta in data.json e nel
+       pacchetto per l'LLM, non si perde — esce dalla scheda, non dal sistema. */
     const st = m.stagionalita_ndx; if (!st || !(st.mesi || []).length) return null;
     const MESI = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
     const NOMI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
                   "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
-    const mesi = (st.mesi || []).filter(x => x && Number.isFinite(x.media) && Number.isFinite(x.media_mid));
+    const mesi = (st.mesi || []).filter(x => x && Number.isFinite(x.media));
     if (mesi.length < 6) return null;
-    /* ═══ v317 — DUE GRANDEZZE DISTINTE, NON UNA DIFFERENZA ═════════════════════════════════
-       Il CEO: "devono essere distinti ovvero devi fornire stagionalita' e a parte con una linea
-       es. arancione sopra la barra il valore dello storico del midterm".
-       ⚠ La v313 aveva fatto l'opposto, e per una ragione che allora sembrava buona: mostrava la
-       DIFFERENZA fra midterm e tutti gli anni, una codifica sola. Ma cosi' il valore di midterm
-       — che e' il numero che il CEO vuole leggere — non era scritto da nessuna parte: si poteva
-       solo ricostruire sommando. Ora la barra e' la stagionalita' di TUTTI gli anni e la lineetta
-       arancione e' il valore degli anni di midterm: due grandezze, due segni grafici, nessuna
-       sottrazione da fare a mente. */
-    const diff = mesi.map(x => ({ ...x, d: Math.round((x.media_mid - x.media) * 100) / 100 }));
-    const lim = Math.max(...diff.flatMap(x => [Math.abs(x.media), Math.abs(x.media_mid)])) || 1;
-    const W = 330, H = 138, L = 30, R = W - 8, T = 10, B = H - 22;
-    const X = (i) => L + (i + 0.5) / diff.length * (R - L);
+    const deriva = mesi.reduce((a, x) => a + x.media, 0) / mesi.length;
+    const ecc = mesi.map(x => ({ ...x, e: Math.round((x.media - deriva) * 100) / 100 }));
+    const lim = Math.max(...ecc.map(x => Math.abs(x.e))) || 1;
+    const W = 330, H = 132, L = 26, R = W - 8, T = 10, B = H - 22;
+    const X = (i) => L + (i + 0.5) / ecc.length * (R - L);
     const zero = (T + B) / 2;
     const Y = (v) => zero - (v / lim) * ((B - T) / 2);
-    const larg = (R - L) / diff.length * 0.6;
-    const barre = diff.map((x, i) => {
-      const y = Math.min(Y(x.media), zero), h = Math.abs(Y(x.media) - zero);
+    const larg = (R - L) / ecc.length * 0.62;
+    const barre = ecc.map((x, i) => {
+      const y = Math.min(Y(x.e), zero), h = Math.abs(Y(x.e) - zero);
       const ora = x.mese === st.mese_ora;
       return `<rect x="${(X(i) - larg / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${larg.toFixed(1)}"
-        height="${Math.max(h, 1).toFixed(1)}" rx="1.5" fill="${x.media >= 0 ? "var(--green)" : "var(--red)"}"
-        opacity="${ora ? 1 : 0.5}"><title>${NOMI[x.mese - 1]}: in tutti gli anni ${fmtNum.format(x.media)}%, negli anni di midterm ${fmtNum.format(x.media_mid)}% — differenza ${fmtNum.format(x.d)} punti</title></rect>`;
+        height="${Math.max(h, 1).toFixed(1)}" rx="1.5" fill="${x.e >= 0 ? "var(--green)" : "var(--red)"}"
+        opacity="${ora ? 1 : 0.55}"><title>${NOMI[x.mese - 1]}: ${signTxt(x.e)} rispetto al mese medio (il mese medio del Nasdaq vale ${signTxt(Math.round(deriva * 100) / 100)}; questo mese in assoluto ${signTxt(x.media)})</title></rect>`;
     }).join("");
-    /* la lineetta arancione: il valore degli anni di midterm, sullo STESSO asse delle barre —
-       se avesse un asse proprio i due numeri non sarebbero confrontabili a vista, ed e' tutto
-       il motivo per cui il CEO li vuole insieme. */
-    const midterm = diff.map((x, i) => `<line x1="${(X(i) - larg / 2 - 1.5).toFixed(1)}" y1="${Y(x.media_mid).toFixed(1)}"
-        x2="${(X(i) + larg / 2 + 1.5).toFixed(1)}" y2="${Y(x.media_mid).toFixed(1)}"
-        stroke="var(--orange, #f59e0b)" stroke-width="2.6" stroke-linecap="round"
-        opacity="${x.mese === st.mese_ora ? 1 : 0.8}"><title>${NOMI[x.mese - 1]}: negli anni di midterm ${fmtNum.format(x.media_mid)}%</title></line>`).join("");
-    const etich = diff.map((x, i) =>
+    const etich = ecc.map((x, i) =>
       `<text x="${X(i).toFixed(1)}" y="${H - 7}" font-size="8.5" text-anchor="middle"
         fill="${x.mese === st.mese_ora ? "var(--text)" : "var(--muted)"}"
         font-weight="${x.mese === st.mese_ora ? "700" : "400"}">${MESI[x.mese - 1]}</text>`).join("");
     const g = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
-        aria-label="quanto un anno di elezioni di midterm cambia ogni mese del Nasdaq 100 rispetto alla media di tutti gli anni">
+        aria-label="quanto ogni mese del Nasdaq 100 fa meglio o peggio di un mese medio dello stesso indice">
       <line x1="${L}" y1="${zero}" x2="${R}" y2="${zero}" stroke="var(--border)" stroke-width="1"/>
-      <text x="2" y="${(T + 8).toFixed(1)}" font-size="8" fill="var(--muted)">meglio</text>
-      <text x="2" y="${(B - 1).toFixed(1)}" font-size="8" fill="var(--muted)">peggio</text>
-      ${barre}${midterm}${etich}
-      <g transform="translate(${(L + 4)},${T})">
-        <rect x="0" y="0" width="9" height="6" rx="1" fill="var(--green)" opacity=".7"/>
-        <text x="13" y="6" font-size="8.5" fill="var(--muted)">tutti gli anni</text>
-        <line x1="74" y1="3" x2="88" y2="3" stroke="var(--orange, #f59e0b)" stroke-width="2.6" stroke-linecap="round"/>
-        <text x="92" y="6" font-size="8.5" fill="var(--muted)">anni di midterm</text>
-      </g></svg>`;
+      <text x="1" y="${(T + 8).toFixed(1)}" font-size="8" fill="var(--muted)">meglio</text>
+      <text x="1" y="${(B - 1).toFixed(1)}" font-size="8" fill="var(--muted)">peggio</text>
+      ${barre}${etich}</svg>`;
 
-    const prossimi = [0, 1, 2].map(k => diff.find(x => x.mese === ((st.mese_ora - 1 + k) % 12) + 1)).filter(Boolean);
-    const testo = prossimi.map(x =>
-      `<div class="stag-riga"><b>${NOMI[x.mese - 1]}</b>: negli anni di midterm <b>${signTxt(x.media_mid)}</b>, `
-      + `in tutti gli anni ${signTxt(x.media)} <span class="muted">(${x.pos_mid}% dei casi positivo; `
-      + `i singoli anni sono andati da ${signTxt(x.peggio_mid)} a ${signTxt(x.meglio_mid)})</span></div>`).join("");
-
+    const prossimi = [0, 1, 2].map(k => ecc.find(x => x.mese === ((st.mese_ora - 1 + k) % 12) + 1)).filter(Boolean);
+    const negativi = ecc.filter(x => x.e < 0).length;
     return {
       g,
-      n: `<b>Due grandezze distinte, non una differenza.</b> La <b>barra</b> è la stagionalità di `
-        + `<b>tutti gli anni</b> (verde se quel mese è storicamente positivo, rossa se negativo); la `
-        + `<b class="stag-mid">lineetta arancione</b> sopra la barra è lo stesso mese ma <b>nei soli anni `
-        + `di elezioni di midterm</b>. Quanto distano fra loro è quanto il ciclo elettorale sposta quel mese. `
-        + `Il mese in corso è acceso.`
-        + `<div class="stag-blocco">${testo}</div>`
-        + `Campione ${st.dal}–${st.al}: <b>${(st.anni_midterm || []).length} anni di midterm</b>`
-        + (st.ciclo_ora === 2 ? `, e il ${st.al + 1} è uno di quelli.` : ".")
-        + ` <b>Perché i midterm:</b> negli Stati Uniti si vota a metà mandato ogni quattro anni, e storicamente `
-        + `i mesi prima del voto sono più incerti e quelli dopo più forti — è la regolarità che questa scheda misura, `
-        + `non una causa dimostrata.`
-        + `<br>⚠⚠ <b>Dieci osservazioni per mese sono pochissime.</b> Guardi gli intervalli qui sopra: dove la media `
-        + `è +3,9% i singoli anni vanno da −8,7% a +18,9%. Non è una previsione: serve a sapere quando un movimento `
-        + `è ordinario per il periodo, non a dedurne uno.`,
+      n: `<b>Ogni barra dice quanto quel mese va meglio o peggio del mese MEDIO</b> dello stesso `
+        + `indice — non quanto sale in assoluto.`
+        + `<div class="stag-blocco">${prossimi.map(x =>
+            `<div class="stag-riga"><b>${NOMI[x.mese - 1]}</b>: <b class="${x.e >= 0 ? "pos" : "neg"}">${signTxt(x.e)}</b> `
+            + `rispetto al mese medio <span class="muted">(in assoluto ${signTxt(x.media)})</span></div>`).join("")}</div>`
+        + `⚠ <b>Perché al netto della deriva:</b> il Nasdaq sale in media di <b>${signTxt(Math.round(deriva * 100) / 100)} al mese</b> `
+        + `sui ${st.dal}–${st.al}. Sommando quella deriva a ogni mese, undici mesi su dodici risultano positivi `
+        + `e il grafico non distingue più niente: quella è la salita dell'indice, non una proprietà del calendario. `
+        + `Tolta la deriva, i mesi sotto la media diventano <b>${negativi} su ${ecc.length}</b>.`
+        + `<br><b>Come si legge:</b> serve a sapere se un movimento è ordinario per il periodo, non a prevederlo. `
+        + `Su ${(st.mesi[0] || {}).campione || 40} osservazioni per mese la dispersione resta ampia: la media sta fra esiti opposti.`,
     };
   },
 
@@ -3874,7 +3848,7 @@ const FORMA_INDICATORE = {
       .sort((a, b) => b.val - a.val);
     const sopraZero = ord.filter(t2 => t2.val > 0).length;
 
-    const W = 620, RH = 18, H = ord.length * RH + 14, L = 118, C = L + (W - L - 54) / 2;
+    const W = 330, RH = 13, H = ord.length * RH + 12, L = 86, C = L + (W - L - 40) / 2;
     const lim = Math.max(...ord.map(t2 => Math.abs(t2.val))) || 1;
     const X = (v) => C + (v / lim) * ((W - L - 54) / 2);
     const barre = ord.map((t2, i) => {
@@ -3909,7 +3883,6 @@ const FORMA_INDICATORE = {
         + `<br><b>Come si legge:</b> l'ordine cambia con l'orizzonte, ed è quello il punto. Un comparto in `
         + `cima a un mese e in fondo a un anno è denaro appena arrivato; uno in cima a tutti gli orizzonti `
         + `è una tendenza. Il primo si può invertire in poche sedute, il secondo no.`,
-      larga: true,
     };
   },
 
