@@ -1240,12 +1240,20 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         # pre/after (sessione estesa) usa QUEL prezzo; altrimenti l'ultima chiusura regolare.
         # Evita che l'AI calcoli male "chiusura + gap%" a mano.
         "prezzo_limite_aggiustato": round(float(prepost["price"]), 2) if prepost else round(price, 2),
-        # OFFLOADING R/R per la Tabella B dell'LLM: reward = resistenza − limite(supporto),
-        # risk = limite − stop(2×ATR) = 2×ATR. Formato "1:X.X"; degeneri/mancanti → None (n.d.).
+        # ⚠⚠ v328 — IL REWARD SI MISURA DAL PREZZO CHE PAGHERESTI, NON DAL SUPPORTO.
+        # Il limite era il MINIMO DELLE ULTIME 20 SEDUTE: il rapporto descriveva quindi
+        # l'operazione di chi ha comprato sul minimo, non di chi compra oggi — e la differenza
+        # non e' piccola. Misurato sui dati veri: MU usciva 1:1.9 mentre dal prezzo di
+        # riferimento vale 0,28 (sette volte), NVDA 1:2.7 contro 0,17 (sedici volte), e su 23
+        # righe su 23 lo scarto andava NELLA STESSA DIREZIONE: ottimista.
+        # Non era un errore di stima, era una definizione che lusinga. Ora il denominatore e' il
+        # prezzo che si pagherebbe davvero, e il campo accanto dichiara quale base e' stata usata
+        # — cosi' nessuna riga puo' piu' affermare una base diversa dalla propria.
         "risk_reward": _risk_reward_str(
-            float(hist["Low"].tail(20).min()),            # limite = supporto
-            float(hist["High"].tail(20).max()),           # target = resistenza
+            round(float(prepost["price"]), 2) if prepost else round(price, 2),   # il prezzo che pagheresti
+            float(hist["High"].tail(20).max()),           # target = resistenza a 20 sedute
             atr_14),
+        "risk_reward_base": "prezzo esteso" if prepost else "ultima chiusura",
         # MAI il quoteType come settore ("EQUITY" non è un settore: falsava la concentrazione)
         "sector": SECTOR_OVERRIDES.get(ticker) or info.get("sector") or "Altro",
         "stats": stats,

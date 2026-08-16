@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "327";
+const BUILD_VERSION = "328";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1106,7 +1106,7 @@ function sessionContextLine() {
   const guida = (s.phase === "weekend" && asiaViva)
     ? `WEEKEND a New York MA BORSA ASIATICA APERTA (Seoul sta scambiando ORA; apertura USA tra ~${hrs}h). ATTENZIONE ALLA FRESCHEZZA: la borsa coreana è aperta, ma il valore del KOSPI qui sopra viene dallo snapshot della pipeline e NON è aggiornato in tempo reale — è l'ultima chiusura, non la seduta in corso. Storicamente il primo mercato che vota sulle notizie del fine settimana è l'Asia, e i semiconduttori coreani sono i più correlati a questo book${nUnp ? `; le ${nUnp} notizie non ancora prezzate sono elencate sotto` : ""}`
     : s.phase === "weekend"
-    ? `WEEKEND, MERCATI CHIUSI (apertura tra ~${hrs}h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA.${nUnp ? ` Il segnale fresco di questo run sono le ${nUnp} NOTIZIE arrivate dopo la campana, che il prezzo non ha ancora votato:` : " Nessuna notizia nuova dopo la campana:"} gli ordini valgono per l'apertura di lunedì, a limite, mai a mercato`
+    ? `WEEKEND, MERCATI CHIUSI (apertura tra ~${hrs}h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA.${nUnp ? ` Il segnale fresco di questo run sono le ${nUnp} NOTIZIE arrivate dopo la campana, che il prezzo non ha ancora votato:` : " Nessuna notizia nuova dopo la campana:"} il prossimo prezzo che esiste e' quello dell'apertura di lunedi'`
     : beforeBell
     ? `SEI PRIMA DELLA CAMPANA (apertura tra ~${hrs}h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura`
     : s.phase === "regular"
@@ -3734,7 +3734,7 @@ const FORMA_INDICATORE = {
       score: st ? st.score : null,
       n: `<b>${mld(md.value / 1000)} miliardi di dollari</b> presi a prestito dagli operatori per comprare `
         + `azioni — il <b>${fmtNum.format(md.pct_of_peak)}%</b> del massimo storico`
-        + (md.qoq != null ? `, ma <b class="${md.qoq < 0 ? "neg" : "pos"}">${signTxt(md.qoq)}</b> sul trimestre` : "")
+        + (md.qoq != null ? `, ma <b class="${md.qoq < 0 ? "neg" : "pos"}">${signTxt(md.qoq)}</b> nell'ultimo mese` : "")
         + (md.yoy != null ? ` e ${signTxt(md.yoy)} sull'anno` : "") + `.`
         + (st ? ` <b style="color:${st.col}">${esc(st.labelShort)}</b>.` : "")
         + (rapp != null
@@ -6979,7 +6979,9 @@ function buildPrompt() {
       + (barra && etaBarra >= 1
           ? `⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL ${barra} — ${etaBarra} ${etaBarra === 1 ? "giorno" : "giorni"} fa. `
             + `Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.`
-          : `La barra giornaliera sotto quei numeri e' di oggi (${barra || "data non disponibile"}).`));
+          : barra
+              ? `La barra giornaliera sotto quei numeri e' del ${barra}.`
+              : `⚠ La data della barra giornaliera sotto quei numeri NON e' disponibile: non dare per scontato che sia di oggi.`));
     if (conCalendario.length) {
       lines.push(`· STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): `
         + `${conCalendario.join(" · ")}. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e `
@@ -8126,7 +8128,17 @@ function fattiTitolo(tk) {
                       oggiPct: numero(riga.change_pct), volRel: numero(riga.vol_ratio),
                       rs1m: numero(riga.rs_1m), rsBench: riga.rs_bench || null,
                       rsNdx: numero(riga.rs_ndx_1m), sortino: numero(riga.sortino_1y),
-                      rischioRendimento: riga.risk_reward || null,
+                      /* ⚠ v328 — il valore in data.json puo' essere ancora quello VECCHIO,
+                         misurato dal supporto e quindi gonfiato fino a sedici volte. Finche' il
+                         CI non ha rigenerato si ricalcola qui dal prezzo che si pagherebbe. */
+                      rischioRendimento: (() => {
+                        const p = numero(riga.prezzo_limite_aggiustato ?? riga.price);
+                        const res = numero(riga.resistance), atr = numero(riga.atr_14);
+                        if (![p, res, atr].every(Number.isFinite) || atr <= 0 || res <= p) return null;
+                        return `1:${Math.round((res - p) / (2 * atr) * 10) / 10}`;
+                      })(),
+                      rischioRendimentoBase: riga.risk_reward_base
+                        || (riga.prezzo_limite_aggiustato != null ? "prezzo esteso" : "ultima chiusura"),
                       w52hi: numero(riga.w52_high), w52lo: numero(riga.w52_low),
                       /* v308 — la posizione, quando c'e': il pacchetto non deve piu' negare di saperlo */
                       qta: numero(riga.qta), pmc: numero(riga.pmc),
@@ -8796,11 +8808,14 @@ function buildPromptSettore(chiave) {
   }
   if (m.breadth && m.breadth.divergence_pp != null) {
     F.push(`    ampiezza (SPY contro RSP a 1 mese): ${signTxt(m.breadth.divergence_pp, " pp")} `
-      + `— SPY ${signTxt(m.breadth.spy_1m_pct)}, RSP ${signTxt(m.breadth.rsp_1m_pct)}. Sotto zero: la salita e' dei grandi.`);
+      + `— SPY ${signTxt(m.breadth.spy_1m_pct)}, RSP ${signTxt(m.breadth.rsp_1m_pct)}. `
+      + (m.breadth.divergence_pp > 0
+          ? `Sopra zero: l'indice tira piu' dell'azione media, cioe' la salita e' concentrata nei grandi.`
+          : `Sotto zero: l'azione media batte l'indice, cioe' la partecipazione e' larga.`));
   }
   if (m.margin_debt && m.margin_debt.pct_of_peak != null) {
     F.push(`    debito a margine: ${m.margin_debt.pct_of_peak}% del massimo storico, `
-      + `${signTxt(m.margin_debt.yoy)} sull'anno e ${signTxt(m.margin_debt.qoq)} sul trimestre `
+      + `${signTxt(m.margin_debt.yoy)} sull'anno e ${signTxt(m.margin_debt.qoq)} nell'ultimo mese `
       + `— fonte FINRA, ritardo STRUTTURALE di ~6 settimane: descrive il mese scorso, non oggi.`);
   }
 
@@ -8844,7 +8859,13 @@ function buildPromptSettore(chiave) {
 `· Italiano, prosa densa, niente frasi di cortesia. Ogni dato esterno va [VERIFICATO] con fonte e data.`,
 `· I numeri del blocco qui sotto sono calcolati dal sistema: usa quelli e non cercarne altri per le`,
 `  stesse grandezze. Se ne trovi di diversi, riporta entrambi e di' quale usi.`,
-`· Non conosco la tua posizione e tu non la chiedi: niente dimensionamenti, niente quantita'.`,
+/* ⚠ v328 — DICEVA IL FALSO: il pacchetto di settore CONTIENE il blocco "IL SUO LIBRO, DENTRO
+   QUESTO COMPARTO" con pesi e prezzi di carico. Un'istruzione che nega un fatto presente nel
+   payload insegna al modello che le istruzioni non sono affidabili, ed e' peggio dell'assenza
+   di istruzione. Il divieto resta — cambia la ragione, che ora e' vera. */
+`· Il pacchetto ti dice quanto pesa questo comparto nel libro, ma NON quanta liquidita' c'e', ne'`,
+`  quali altri conti esistano, ne' la situazione fiscale: senza quelli qualunque quantita' e' un`,
+`  numero che sembra un consiglio. Livelli di prezzo si', dimensionamenti e quantita' no.`,
 `· Chiudi con "NON VERIFICATO:" elencando cosa non sei riuscito a confermare.`,
 ``,
 `──────────────────────────────────────────────────────────────────`,
@@ -9286,7 +9307,7 @@ function datiNostriDelTitolo(tk) {
         + ` — quanto ha fatto MEGLIO o PEGGIO del suo settore, non quanto ha guadagnato`);
     }
     if (Number.isFinite(tec.sortino)) T2.push(`- Sortino a 1 anno: ${tec.sortino} — rendimento per unita' di rischio al RIBASSO (a differenza dello Sharpe non penalizza i rialzi)`);
-    if (tec.rischioRendimento) T2.push(`- Rapporto rischio/rendimento gia' calcolato dal sistema: ${esc(tec.rischioRendimento)} (guadagno fino alla resistenza contro due volte l'ATR di rischio) — non rifarlo`);
+    if (tec.rischioRendimento) T2.push(`- Rapporto rischio/rendimento: ${esc(tec.rischioRendimento)} — guadagno dal riferimento (${esc(tec.rischioRendimentoBase || "ultima chiusura")}) fino alla resistenza, contro due volte l'ATR di rischio. ⚠ LA BASE E' IL PREZZO CHE PAGHERESTI, non il minimo delle ultime 20 sedute: misurato dal minimo il rapporto descriverebbe l'operazione di chi ha comprato sul fondo, e su questo titolo sarebbe stato fino a sedici volte piu' generoso. Non rifarlo`);
     if (T2.length) L.push(...T2);
   }
   if (f.opzioni && f.opzioni.ratio != null) {

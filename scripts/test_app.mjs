@@ -2141,8 +2141,14 @@ check("v299 pacchetto titolo: porta i fondamentali che il sistema gia' possiede"
   if (r.eps != null) c.push("Utile per azione (EPS");
   if (r.beta != null) c.push("Beta: " + r.beta);
   if (r.rs_1m != null) c.push("Forza relativa a 1 mese");
-  if (r.risk_reward) c.push(r.risk_reward);
-  return c.every(x => p.includes(x))`));
+  return c.every(x => p.includes(x)) && (() => {
+    const px = numero(r.prezzo_limite_aggiustato ?? r.price);
+    const res = numero(r.resistance), atr = numero(r.atr_14);
+    if (![px, res, atr].every(Number.isFinite) || atr <= 0 || res <= px) return true;
+    const atteso = "1:" + (Math.round((res - px) / (2 * atr) * 10) / 10);
+    return p.includes("Rapporto rischio/rendimento: " + atteso)
+        && p.includes("LA BASE E' IL PREZZO CHE PAGHERESTI");
+  })()`));
 
 /* ⚠ ma NON i punteggi compositi: `fin_health` e `health` sono giudizi 0-100 travestiti da
    dati, ed e' esattamente cio' che v200 ha tolto dal pacchetto misurando un hit-rate del 29%.
