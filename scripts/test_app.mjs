@@ -2865,6 +2865,31 @@ check("v318 stagionalita': la barra e' tutti gli anni, la lineetta arancione e' 
       && g.includes("in tutti gli anni") && g.includes("negli anni di midterm")
       && g.includes(">tutti gli anni<") && g.includes(">anni di midterm<")`));
 
+check("v318 stagionalita': la lineetta sta al valore di midterm, non a quello delle barre", suVeri(`
+  const st = (DATA.macro || {}).stagionalita_ndx;
+  if (!st || !(st.mesi || []).length) return true;
+  const g = FORMA_INDICATORE["stagionalita_ndx"](DATA.macro || {}).g || "";
+  const mesi = st.mesi.filter(x => x && Number.isFinite(x.media) && Number.isFinite(x.media_mid));
+  /* i mesi in cui midterm e tutti-gli-anni divergono davvero: li' l'ordine verticale fra la
+     lineetta e il bordo della barra e' un fatto osservabile, e cambia se si disegna il valore
+     sbagliato. Sull'asse SVG y cresce verso il BASSO: valore piu' alto = y piu' piccola. */
+  const casi = mesi.filter(x => Math.abs(x.media_mid - x.media) > 0.3);
+  if (casi.length < 2) return true;
+  const ys = g.split("<line").slice(1).filter(p => p.includes("var(--orange"))
+    .map(p => Number((p.split('y1="')[1] || "").split(String.fromCharCode(34))[0]))
+    .filter(Number.isFinite);
+  if (ys.length < mesi.length) return false;
+  const lim = Math.max(...mesi.flatMap(x => [Math.abs(x.media), Math.abs(x.media_mid)]));
+  const zero = (10 + 116) / 2, semi = (116 - 10) / 2;
+  const atteso = (v) => zero - (v / lim) * semi;
+  /* si confronta col valore ATTESO di media_mid: se il codice disegnasse media, su questi mesi
+     lo scarto supererebbe di molto la tolleranza */
+  return casi.every(x => {
+    const i = mesi.indexOf(x);
+    return Math.abs(ys[i] - atteso(x.media_mid)) < 1.2
+        && Math.abs(ys[i] - atteso(x.media)) > 1.2;
+  })`));
+
 check("v318 stagionalita': le due grandezze stanno sullo STESSO asse, o non sono confrontabili", suVeri(`
   const st = (DATA.macro || {}).stagionalita_ndx;
   if (!st || !(st.mesi || []).length) return true;
