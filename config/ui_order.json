@@ -8,17 +8,13 @@
   "classifica",
   "macro"
  ],
- "_savedAt": "2026-08-16T08:35:20.784Z",
+ "_savedAt": "2026-08-16T21:14:33.708Z",
  "schede": {
   "indicatori": [
    "corp_profit",
-   "in:umich",
-   "mk:^TNX",
    "dollar",
    "breadth",
    "fear_greed",
-   "mk:EURUSD=X",
-   "mk:EURJPY=X",
    "fed_market",
    "fedwatch",
    "carry",
@@ -26,21 +22,20 @@
    "in:gdp",
    "sp500_pe",
    "in:retail",
-   "witching",
    "momentum",
    "putcall",
    "liquidity",
    "in:unemp",
    "froth",
    "in:real10",
-   "in:t30",
-   "systemic_risk",
-   "in:curve3m",
    "in:philly",
-   "mat:petrolio",
-   "mat:oro",
    "mat:sox",
-   "mat:rame"
+   "vix",
+   "credit",
+   "in:curve",
+   "rotazione",
+   "stagionalita_ndx",
+   "tassi10"
   ]
  },
  "rischio": [
