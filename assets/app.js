@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "319";
+const BUILD_VERSION = "320";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3614,6 +3614,61 @@ const FORMA_INDICATORE = {
      pubblica con la sua incertezza accanto, o non si pubblica.
      ⚠ Il mese corrente e' acceso, e i prossimi tre portano il loro intervallo per esteso:
      e' li' che la tentazione di leggere la media come previsione e' piu' forte. */
+  /* ═══ v320 — IL GRAFICO DELLA LEVA ═══════════════════════════════════════════════════════
+     Il CEO: "manca grafico utilizzo leva da parte degli attori del mercato". Il dato c'era
+     (FINRA, debiti a margine, 13 rilevazioni mensili) e non era disegnato da nessuna parte.
+     ⚠ Due grandezze nello stesso riquadro, e sono diverse: la LINEA e' il livello assoluto, la
+     riga sotto porta il rapporto sul PIL contro la sua mediana storica — che e' il parametro che
+     dice "sopra o sotto soglia" e che il "% del massimo" non puo' dare, perche' in un mercato al
+     rialzo sta sopra il 95% quasi sempre.
+     ⚠ IL PUNTEGGIO VIENE DA marginDebtState(), la stessa funzione che alimenta il pacchetto:
+     due derivazioni della leva sono gia' esistite e una diceva il falso. */
+  leva: (m) => {
+    const md = m.margin_debt;
+    if (!md || md.value == null) return null;
+    const st = (typeof marginDebtState === "function") ? marginDebtState() : null;
+    const grezzi = (md.history || []).map(x => Number(x && x.v != null ? x.v : x)).filter(Number.isFinite);
+    const fine = md.date ? new Date(md.date + "T12:00:00") : null;
+    const punti = (fine && grezzi.length)
+      ? grezzi.map((v, i) => {
+          const dd = new Date(fine); dd.setMonth(dd.getMonth() - (grezzi.length - 1 - i));
+          return { d: `${dd.getFullYear()}-${String(dd.getMonth() + 1).padStart(2, "0")}-01`, v: v / 1000 };
+        })
+      : [];
+    const mld = (v) => fmtNum.format(Math.round(v));
+    const g = punti.length >= 3
+      ? graficoSerie([{ nome: "debito a margine", punti, colore: "var(--yellow)" }],
+          { h: 150, compatto: true, unita: " mld",
+            aria: "debito a margine presso i broker, in miliardi di dollari, ultimi mesi",
+            soglie: md.peak != null ? [{ v: md.peak / 1000, testo: "massimo storico", colore: "var(--red)" }] : [] })
+      : "";
+    const pil = md.pct_of_gdp, mediana = md.gdp_median_ref;
+    const rapp = (pil != null && mediana != null) ? Math.round(pil / mediana * 10) / 10 : null;
+    return {
+      g,
+      score: st ? st.score : null,
+      n: `<b>${mld(md.value / 1000)} miliardi di dollari</b> presi a prestito dagli operatori per comprare `
+        + `azioni — il <b>${fmtNum.format(md.pct_of_peak)}%</b> del massimo storico`
+        + (md.qoq != null ? `, ma <b class="${md.qoq < 0 ? "neg" : "pos"}">${signTxt(md.qoq)}</b> sul trimestre` : "")
+        + (md.yoy != null ? ` e ${signTxt(md.yoy)} sull'anno` : "") + `.`
+        + (st ? ` <b style="color:${st.col}">${esc(st.labelShort)}</b>.` : "")
+        + (rapp != null
+            ? `<div class="leva-soglia"><b>Sopra o sotto soglia:</b> vale il <b>${fmtNum.format(pil)}% del PIL</b> `
+              + `contro una <b>mediana storica del ${fmtNum.format(mediana)}%</b> — <b>${rapp}× la mediana</b>, `
+              + `quindi <b>sopra</b>. È questo il metro storico, non il "% del massimo": quello in un mercato `
+              + `al rialzo sta sopra il 95% quasi sempre, e un allarme sempre acceso non distingue niente.</div>`
+            : "")
+        + `<br><b>Come si legge:</b> è il carburante di un ribasso violento. Quando i prezzi scendono, chi ha `
+        + `comprato a debito riceve la chiamata a margine e deve vendere — e vende a prescindere da cosa pensa, `
+        + `il che trasforma una discesa ordinata in una di quelle rapide. <b>Livello e verso sono due fatti diversi:</b> `
+        + `il livello dice quanto carburante c'è, il verso dice se il deleveraging è già cominciato.`
+        + `<div class="muted leva-cad">${esc(rigaCadenza("margin_debt", md.date) || "")}`
+        + ` · le date dell'asse sono RICOSTRUITE dalla cadenza mensile dichiarata dalla fonte `
+        + `(l'ultima rilevazione è quella pubblicata, le precedenti un mese l'una dall'altra): `
+        + `la fonte pubblica i valori senza il loro calendario.</div>`,
+    };
+  },
+
   stagionalita_ndx: (m) => {
     /* ═══ v313 — UNA SOLA DOMANDA, UNA SOLA CODIFICA ═══════════════════════════════════════
        Il CEO: "la parte inerente le midterm non mi e' chiara e non comprendo il significato
@@ -6676,6 +6731,47 @@ async function loadPromptHeaderCloud() {
   } catch { /* offline: resta l'eventuale override locale */ }
 }
 
+/* ═══ v320 — LA LEVA: IL FATTO, NON SOLO L'AFFERMAZIONE ══════════════════════════════════════
+   Il CEO: "manca grafico utilizzo leva da parte degli attori del mercato... presta attenzione
+   sulla costante data di cui il dato e' aggiornato rispetto anche al prossimo aggiornamento...
+   inoltre definisci un parametro storico dell'utilizzo della leva al fine di farmi capire se ad
+   oggi quel valore e' sotto o sopra soglia mediana".
+   ⚠⚠ IL PACCHETTO AFFERMAVA "leva ai massimi" E NON CONTENEVA UN SOLO NUMERO SULLA LEVA — zero
+   occorrenze di "margin". Peggio: l'affermazione era FALSA. Il sistema calcola gia' lo stato
+   giusto in `marginDebtState()` (94,4% del picco ma -5,6% sul trimestre: leva in RITIRO dal
+   massimo di giugno, che quella funzione chiama "INVERSIONE DELLA LEVA dai massimi"), mentre il
+   pacchetto usava una derivazione PARALLELA — `pct_of_peak >= 90 && P/E > 20` — che guarda solo
+   il livello e ignora il verso. Due derivazioni della stessa domanda divergono: v161/v207 di
+   nuovo, e stavolta quella sbagliata era l'unica che arrivava all'LLM.
+   ⚠ IL PARAMETRO STORICO E' IL RAPPORTO SUL PIL, non il "% del picco": quest'ultimo e' SATURO
+   in un mercato al rialzo (13 mesi su 13 sopra il 95%), cioe' un allarme permanente, che e'
+   potere discriminante zero. Il rapporto sul PIL ha una mediana storica vera nel file. */
+function rigaLeva(m) {
+  const md = (m || {}).margin_debt;
+  if (!md || md.value == null) return null;
+  const st = (typeof marginDebtState === "function") ? marginDebtState() : null;
+  const mld = (v) => fmtNum.format(Math.round(v / 1000));
+  const cad = rigaCadenza("margin_debt", md.date);
+  const pil = md.pct_of_gdp, mediana = md.gdp_median_ref;
+  const sopra = (pil != null && mediana != null) ? Math.round(pil / mediana * 10) / 10 : null;
+  return `- LEVA DEGLI OPERATORI (debito a margine dei conti retail e istituzionali presso i broker): `
+    + `${mld(md.value)} miliardi di dollari, il ${fmtNum.format(md.pct_of_peak)}% del massimo storico `
+    + `(${mld(md.peak)} mld, toccato ${md.peak_date ? dataBreve(md.peak_date) : "n.d."})`
+    + (md.yoy != null ? ` · ${signTxt(md.yoy)} sull'anno` : "")
+    + (md.qoq != null ? ` · ${signTxt(md.qoq)} sul trimestre` : "") + `. `
+    + (st ? `Stato: ${st.label}. ` : "")
+    + (pil != null && mediana != null
+        ? `⚠ IL PARAMETRO STORICO: vale il ${fmtNum.format(pil)}% del PIL contro una mediana storica `
+          + `del ${fmtNum.format(mediana)}%, cioe' ${sopra}× la mediana — SOPRA soglia. Si usa questo e non `
+          + `il "% del massimo", che in un mercato al rialzo sta sopra il 95% quasi sempre e quindi non `
+          + `distingue niente. `
+        : "")
+    + `⚠ LIVELLO E VERSO SONO DUE FATTI DIVERSI: la leva puo' essere altissima e in ritiro, ed e' `
+    + `il caso di oggi. Il livello dice quanto carburante c'e' per un deleveraging; il verso dice `
+    + `se e' gia' cominciato. `
+    + (cad ? `[${cad}]` : "");
+}
+
 function buildPrompt() {
   const t = DATA.totals;
   const m = DATA.macro || {};
@@ -7201,14 +7297,19 @@ function buildPrompt() {
     const fpAgeDays = (() => { const d = fp.fetched_at || fp.date; if (!d) return null;
       const t = new Date(d); return isNaN(t) ? null : Math.round((Date.now() - t) / 86400000); })();
     const fpStale = !!fp.carried || (fpAgeDays != null && fpAgeDays > 21);
-    const sysDanger = (m.margin_debt?.pct_of_peak >= 90) && fp.value > 20;
+    const stLeva = (typeof marginDebtState === "function") ? marginDebtState() : null;
+    const sysDanger = (m.margin_debt?.pct_of_peak >= 90) && fp.value > 20 && !(stLeva && stLeva.rollover);
     const carriedTag = (o) => {
       if (!o || !o.carried) return "";
       const d = o.fetched_at || o.date;
       const age = d ? Math.round((Date.now() - new Date(d)) / 86400000) : null;
       return `, ⚠ CARRY-FORWARD dal run precedente${d ? ` (rilevato ${String(d).slice(0, 10)}${age != null ? `, ${age}g fa` : ""})` : ""} — la fonte era irraggiungibile: pesalo come dato DATATO, non odierno`;
     };
-    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: NON derivarne tassi di crescita impliciti]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? (fpStale ? `RISCHIO SISTEMICO da VERIFICARE: leva ai massimi e valutazioni tese porterebbero a un giudizio di vulnerabilità a un deleveraging violento, MA questo Forward P/E non è fresco${fpAgeDays != null ? ` (${fpAgeDays}g)` : ""} — il verdetto poggia su un input datato: confermalo via web prima di usarlo come premessa.` : "RISCHIO SISTEMICO ELEVATO: leva ai massimi + valutazioni tese → vulnerabilità a deleveraging violento.") : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva."}`);
+    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: NON derivarne tassi di crescita impliciti]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? (fpStale ? `RISCHIO SISTEMICO da VERIFICARE: leva ai massimi e valutazioni tese porterebbero a un giudizio di vulnerabilità a un deleveraging violento, MA questo Forward P/E non è fresco${fpAgeDays != null ? ` (${fpAgeDays}g)` : ""} — il verdetto poggia su un input datato: confermalo via web prima di usarlo come premessa.` : "RISCHIO SISTEMICO ELEVATO: leva in espansione sui massimi + valutazioni tese → vulnerabilità a deleveraging violento.") : (stLeva && stLeva.rollover
+        ? "Valutazioni tese, ma la leva si sta RITIRANDO dai massimi: il livello alto dice quanto carburante c'era, il verso negativo dice che il deleveraging e' gia' cominciato — vedi la riga LEVA DEGLI OPERATORI per i numeri."
+        : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva.")}`);
+    const rl = rigaLeva(m);
+    if (rl) lines.push(rl);
   }
   if (m.credit) {
     let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${m.credit.label} (score ${m.credit.score}/100; <4% normale, 5-7% stress, >9% crisi)`;

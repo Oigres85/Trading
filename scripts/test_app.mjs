@@ -2951,6 +2951,53 @@ check("v319 punteggi: la scheda e il punteggio leggono lo STESSO elenco di zone"
   && !/50 \+ m\.breadth\.divergence_pp \* 8/.test(src)
 ))());
 
+/* ══ v320 — LA LEVA: IL FATTO, NON SOLO L'AFFERMAZIONE ═════════════════════════════════════
+   Il pacchetto affermava "leva ai massimi" e non conteneva UN SOLO NUMERO sulla leva. Peggio:
+   l'affermazione era falsa — 94,4% del picco ma -5,6% sul trimestre, cioe' leva in RITIRO dal
+   massimo di giugno, stato che `marginDebtState()` calcolava gia' correttamente mentre il
+   pacchetto usava una derivazione PARALLELA che guarda solo il livello e ignora il verso. */
+check("v320 leva: il pacchetto porta i NUMERI, non solo il verdetto", suVeri(`
+  const p = buildPrompt();
+  const i = p.indexOf("LEVA DEGLI OPERATORI");
+  if (i < 0) return false;
+  const r = p.slice(i, i + 1400);
+  const md = (DATA.macro || {}).margin_debt || {};
+  return r.includes(fmtNum.format(Math.round(md.value / 1000)))   // il valore in miliardi
+      && r.includes(fmtNum.format(md.pct_of_peak))                // la distanza dal massimo
+      && r.includes("sul trimestre")                              // il VERSO, non solo il livello
+      && r.includes("rilevazione") && r.includes("prossimo atteso")`));
+
+check("v320 leva: pubblica il parametro storico, e non è il '% del massimo'", suVeri(`
+  const p = buildPrompt();
+  const i = p.indexOf("LEVA DEGLI OPERATORI");
+  const r = i < 0 ? "" : p.slice(i, i + 1400);
+  const md = (DATA.macro || {}).margin_debt || {};
+  if (md.pct_of_gdp == null || md.gdp_median_ref == null) return true;
+  return r.includes("del PIL") && r.includes("mediana storica")
+      && r.includes("la mediana") && (r.includes("SOPRA soglia") || r.includes("SOTTO soglia"))
+      && r.includes(fmtNum.format(md.pct_of_gdp)) && r.includes(fmtNum.format(md.gdp_median_ref))`));
+
+/* ⚠⚠ L'INVARIANTE CHE CONTA: il verdetto sistemico non puo' dire "leva ai massimi" mentre la
+   fonte unica dice che si sta ritirando. Due derivazioni della stessa domanda sono gia' esistite
+   qui, e quella sbagliata era l'unica che arrivava all'LLM. */
+check("v320 leva: il verdetto sistemico non contraddice marginDebtState", suVeri(`
+  const st = marginDebtState();
+  if (!st) return true;
+  const p = buildPrompt();
+  const massimi = p.includes("leva in espansione sui massimi");
+  const ritiro = p.includes("la leva si sta RITIRANDO dai massimi");
+  /* esattamente uno dei due, e quello giusto: se la fonte unica dice rollover, il pacchetto
+     deve dire ritiro e non massimi */
+  return (massimi !== ritiro) && (st.rollover ? ritiro : !ritiro)`));
+
+check("v320 leva: la scheda esiste, disegna la serie e dichiara che le date sono ricostruite", suVeri(`
+  const f = (FORMA_INDICATORE["leva"] || (() => null))(DATA.macro || {});
+  if (!f) return false;
+  const st = marginDebtState();
+  return f.g.includes("<svg") && f.n.includes("del PIL") && f.n.includes("mediana storica")
+      && f.n.includes("RICOSTRUITE")                       // una ricostruzione si dichiara
+      && f.score === (st ? st.score : null)`));            // stesso punteggio della fonte unica
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
