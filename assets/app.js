@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "334";
+const BUILD_VERSION = "335";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3215,7 +3215,8 @@ function indicatoriClassifica() {
          lasciarlo dedurre da due gap in punti percentuali. */
       sub: (a2, b2) => `${a2.sub} · e contro il PIL: ${b2.sub} — NON due prove, la stessa su due denominatori` },
     { p: "in:unemp", s: "in:nfp", nome: "Mercato del lavoro",
-      sub: (a2, b2) => `disoccupazione ${a2.sub.split(" ")[0]} · nuovi posti ${b2.sub.split(" ")[0]}` },
+      sub: (a2, b2) => `disoccupazione ${a2.sub.split(" ")[0]} · nuovi posti ${b2.sub.split(" ")[0]}` +
+        ` — lo ZERO sui nuovi posti e' il confine: sopra si assume, sotto si licenzia` },
     { p: "in:curve", s: "yield_recession", nome: "Curva dei tassi 10A-2A",
       /* ⚠ il fatto di B (l'inversione degli ultimi 24 mesi) va portato dentro, o la fusione
          successiva con in:curve3m riscrive il sub e lo cancella un'altra volta. */
@@ -8663,10 +8664,19 @@ function montaGraficoTV(tk, intervallo) {
             : `A <b>${rgV(o.rsi14, 1)}</b> sta in mezzo, e in mezzo l'RSI non dice quasi niente sul livello.`) : ""}
         Serve bene per una cosa sola: vedere quando <b>il prezzo fa un nuovo massimo e l'RSI no</b> — il movimento
         continua con meno forza dietro, ed e' il primo posto dove si vede che una salita si sta stancando.</span></div>
-      ${o.macd ? `<div><b>MACD — istogramma ${rgV(o.macd.istogramma)}</b><span>Differenza fra due medie esponenziali
-        (12 e 26 sedute) e la sua media a 9. L'istogramma e' quanto la prima sta sopra la seconda:
-        ${o.macd.istogramma >= 0 ? "positivo, cioe' la spinta breve e' sopra quella media" : "negativo, cioe' la spinta breve e' sotto quella media"}.
-        Il valore assoluto conta poco; conta il <b>verso in cui si sta muovendo</b>.</span></div>` : ""}
+      ${o.macd ? (() => {
+        const px = numero(rTk.price);
+        const inPct = Number.isFinite(px) && px > 0 ? o.macd.istogramma / px * 100 : null;
+        return `<div><b>MACD — le due spinte a confronto</b><span>
+        L'istogramma vale <b>${rgV(o.macd.istogramma)}</b>${inPct != null ? `, cioe' il <b>${rgV(Math.abs(inPct), 2)}%</b> del prezzo di ${esc(String(tk).toUpperCase())}` : ""}:
+        ⚠ il numero grezzo e' in DOLLARI, quindi su un titolo da 900 dollari e su uno da 90 lo stesso
+        valore significa cose diverse — rapportato al prezzo diventa confrontabile.
+        ${o.macd.istogramma >= 0
+          ? "E' POSITIVO: la spinta delle ultime settimane e' piu' forte di quella del mese e mezzo precedente."
+          : "E' NEGATIVO: la spinta recente si e' indebolita rispetto a quella del mese e mezzo precedente."}
+        Su questo titolo conta il VERSO in cui si muove, non il livello: un istogramma che si
+        accorcia mentre il prezzo sale e' il primo posto dove si vede una salita che si stanca.</span></div>`;
+      })() : ""}
       ${o.adx14 != null ? `<div><b>ADX — ${rgV(o.adx14, 1)}</b><span>${o.adx14 < 20 ? `A ${rgV(o.adx14, 1)} il trend e' <b>debole</b>: in questa condizione le medie danno falsi segnali, perche' il prezzo le attraversa in continuazione senza andare da nessuna parte.` : `A ${rgV(o.adx14, 1)} il trend ha forza: le medie e i livelli funzionano meglio che in fase laterale.`}
         ${o.di_su != null ? `DI+ ${rgV(o.di_su, 1)} contro DI- ${rgV(o.di_giu, 1)}: e' li' che sta la direzione.` : ""}</span></div>` : ""}
       <div><b>Volume${Number.isFinite(vr) ? ` — ${rgV(vr, 2)}× la media` : ""}</b><span>
@@ -8702,6 +8712,11 @@ function montaGraficoTV(tk, intervallo) {
             + `</li>`).join("")}</ul>
           Contati <b>dal massimo verso il basso</b>, cioè come ritracciamento di una salita: la stessa
           coppia di numeri letta al contrario indica quote diverse.
+          <b>Perché proprio queste quote:</b> sono le frazioni in cui una salita viene storicamente
+          restituita prima di riprendere — il 23,6% è un respiro, il 38,2% una correzione ordinaria,
+          il 61,8% il punto oltre il quale la salita precedente è in discussione. Non hanno un
+          meccanismo economico: valgono perché <b>moltissimi operatori guardano gli stessi numeri</b>
+          e mettono gli ordini lì, e questo li rende livelli veri anche senza una causa.
           ${sotto ? `<b>Il primo appoggio sotto il prezzo</b> è ${sotto.et} a <b>${fmtNum.format(sotto.v)}</b> (${signTxt(sotto.d)} da qui): è la quota che molti guardano per rientrare, e dove un ribasso ordinario tende a fermarsi.` : ""}
           ${sopra ? ` <b>Il primo ostacolo sopra</b> è ${sopra.et} a <b>${fmtNum.format(sopra.v)}</b> (${signTxt(sopra.d)}).` : ` <b>Il prezzo sta sopra tutti i ritracciamenti</b>: sopra di lui non c'è nessuna quota di Fibonacci, solo il massimo delle 52 settimane a ${fmtNum.format(hi)}.`}
           <b>Non sono previsioni</b>: sono le quote che quella convenzione indica, e valgono

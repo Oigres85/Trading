@@ -3137,7 +3137,7 @@ check("v322 fibonacci: la pagina e il pacchetto mostrano gli STESSI livelli", su
 check("v322 fibonacci: i livelli si dichiarano contati DAL MASSIMO, e non come previsioni", (() => {
   const i = src.indexOf("v322 — I RITRACCIAMENTI DI FIBONACCI");
   if (i < 0) return false;
-  const blocco = src.slice(i, i + 2600);
+  const blocco = src.slice(i, src.indexOf("})()}", i) + 5);
   return blocco.includes("dal massimo verso il basso")
       && blocco.includes("Non sono previsioni")
       && blocco.includes("w52_high");
