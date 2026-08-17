@@ -1056,7 +1056,9 @@ check("v337 nessun punteggio NOSTRO su 0-100 nei quattro pacchetti", suVeri(`
   /* Fear & Greed e Financial Health sono indici PUBBLICATI da terzi, nativamente su 0-100:
      quelli sono il dato. Il divieto riguarda i compositi che calcoliamo noi. */
   const ESTERNI = /Fear (&|&amp;) Greed|Financial Health|CNN/i;
-  const testi = [buildCIOText(), buildPromptTicker("MU"), buildPromptSettore("Technology"), buildPromptPortafoglio()];
+  const settore = buildPromptSettore("SMH");
+  if (settore.length < 5000) return false;   // non e' il pacchetto: e' il messaggio d'errore
+  const testi = [buildCIOText(), buildPromptTicker("MU"), settore, buildPromptPortafoglio()];
   for (const t of testi) {
     for (const riga of String(t).split(String.fromCharCode(10))) {
       /* ⚠ NIENTE REGEX QUI: dentro un template literal passato a vm gli escape si mangiano
@@ -3542,6 +3544,37 @@ check("v337 la consegna scarica il PDF e tiene il ripiego sulla casella", (() =>
       && iOk > 0
       && corpo.indexOf('modale.hidden = false') > iOk    // la modale SOLO nel ramo di fallimento
       && corpo.includes("il PDF non e' partito");
+})());
+
+/* ══ v338 — LA RICEVUTA DEL TAGLIO DELLA WATCHLIST ═══════════════════════════════════════
+   Il CEO: "la watchlist di tradingview non va bene, torna come prima". Un taglio in questo
+   progetto si porta via il vicino tre volte su quattro (CLAUDE.md, v201-v204 e v238), quindi
+   il check dice DUE cose insieme: cosa doveva sparire e cosa doveva restare in piedi.
+   ⚠ La seconda meta' e' quella che conta davvero: `extended_hours` e i bottoni Nasdaq/S&P
+   sono richieste del CEO della stessa versione (v332) che NON ha ritirato, e stavano a poche
+   righe dal codice rimosso. */
+check("v338 il widget non riceve piu' una watchlist, e la stella e' sparita con lei", (() => {
+  const i = src.indexOf('sc.src = "https://s3.tradingview.com/external-embedding');
+  const cfg = src.slice(i, src.indexOf("});", i));
+  const pagina = readFileSync(join(ROOT, "index.html"), "utf8");
+  return i > 0
+      && cfg.indexOf("watchlist") < 0
+      && src.indexOf("preferitiTradingView") < 0     // nessun residuo, nemmeno nei commenti
+      && src.indexOf("aggiornaStellaPreferiti") < 0
+      && pagina.indexOf('id="tv-pref"') < 0
+      /* ⚠ e la chiave duplicata che la v332 aveva lasciato: `details` due volte nello stesso
+         oggetto. Innocua col medesimo valore, ma e' la classe che self_check sorveglia. */
+      && (cfg.split("details:").length - 1) === 1;
+})());
+
+check("v338 sopravvivono l'overnight e i bottoni degli indici, che il CEO non ha ritirato", (() => {
+  const i = src.indexOf('sc.src = "https://s3.tradingview.com/external-embedding');
+  const cfg = src.slice(i, src.indexOf("});", i));
+  const pagina = readFileSync(join(ROOT, "index.html"), "utf8");
+  return cfg.includes("extended_hours: true")
+      && src.includes('$("#tv-idx")?.addEventListener')
+      && src.includes("function simboloTradingView")   // il montaggio del widget la usa
+      && pagina.includes('id="tv-idx"');
 })());
 
 /* ---------- report ----------

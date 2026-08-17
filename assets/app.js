@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "337";
+const BUILD_VERSION = "338";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8165,42 +8165,20 @@ let tvIntervallo = "D";
 
 /* TradingView vuole "BORSA:TICKER" ma accetta anche il ticker nudo, risolvendolo da solo.
    I suffissi di Yahoo (.AS, .KS, .MI) NON sono simboli TradingView: si passano nudi e si
-   lascia risolvere al widget, dichiarando che l'aggancio potrebbe non essere esatto. */
-/* ═══ v332 — I PREFERITI DENTRO IL GRAFICO ═══════════════════════════════════════════════════
-   Il CEO: "sarebbe utile avere la lista preferiti nel grafico tradingview composta da azioni in
-   watchlist e altri valori che potrei aggiungere o togliere".
-   ⚠ La base sono i titoli che il sistema GIA' segue: un secondo elenco scritto a mano
-   divergerebbe dal primo al primo titolo aggiunto (classe C10/C12). Sopra ci sono le aggiunte e
-   le rimozioni del CEO, che vivono in localStorage — e' una preferenza di lettura, non un dato:
-   perderla cambiando browser costa un clic, mentre scriverla nel repo a ogni tocco no.
-   ⚠⚠ GLI INDICI NON SI POSSONO METTERE: misurato in v292, i simboli di indice sono bloccati
-   nell'incorporamento gratuito. Nasdaq e S&P entrano come QQQ e SPY, che sono gli ETF che li
-   replicano e che il widget serve — e la differenza si dichiara invece di far sembrare che
-   siano gli indici. */
-const PREF_KEY = "tv_preferiti";
-const PREF_BASE = ["QQQ", "SPY", "SMH"];   // Nasdaq, S&P e semiconduttori via ETF: gli indici sono bloccati
-
-function preferitiTradingView() {
-  const dalSistema = [...new Set([...((DATA && DATA.watchlist) || []), ...((DATA && DATA.portfolio) || [])]
-    .map(r => r && r.ticker).filter(Boolean)
-    .filter(t => !/-(USD|USDT)$/i.test(t) && !/^\^/.test(t))     // cripto e indici fuori: il widget non li serve
-    .map(simboloTradingView))];
-  let agg = [], tolti = [];
-  try {
-    const p = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
-    agg = Array.isArray(p.aggiunti) ? p.aggiunti : [];
-    tolti = Array.isArray(p.tolti) ? p.tolti : [];
-  } catch { /* preferenza illeggibile: si parte da quella del sistema */ }
-  const fuori = new Set(tolti.map(x => String(x).toUpperCase()));
-  return [...new Set([...PREF_BASE, ...dalSistema, ...agg.map(simboloTradingView)])]
-    .filter(t => t && !fuori.has(t.toUpperCase()))
-    .slice(0, 40);          // oltre, la lista del widget diventa un elenco che nessuno scorre
-}
-
-function salvaPreferiti(agg, tolti) {
-  try { localStorage.setItem(PREF_KEY, JSON.stringify({ aggiunti: agg, tolti })); } catch { /* quota */ }
-}
-
+   lascia risolvere al widget, dichiarando che l'aggancio potrebbe non essere esatto. *//* ⚠⚠ v338 — LA WATCHLIST DENTRO IL GRAFICO E' STATA TOLTA. Decisione del CEO, testuale:
+   "la watchlist di tradingview non va bene, torna come prima" — e "come prima" e' lo stato
+   pre-v332, dove il widget non riceveva nessuna chiave `watchlist` e il grafico era il
+   grafico e basta. Verificato su 571c470^ prima di tagliare, non ricostruito a memoria.
+   ⚠ VIA ANCHE LA STELLA, e non e' un di piu': ☆ Preferito serviva SOLO a comporre quella
+   lista. Lasciato in pagina sarebbe stato un bottone che risponde al clic, salva una
+   preferenza e non produce nessun effetto visibile — il sintomo v193 (un handler vivo su
+   una funzione senza consumatori), che in questo progetto e' gia' stato pagato tre volte.
+   ⚠ RESTANO, perche' il CEO le ha chieste e non le ha ritirate: `extended_hours` (l'overnight
+   nel grafico, v332) e i bottoni Nasdaq / S&P 500 (#tv-idx), che passano da montaGraficoTV e
+   non hanno mai avuto niente a che vedere con la lista. Resta anche simboloTradingView(), che
+   e' la mappatura ticker->simbolo usata dal montaggio del widget.
+   ⚠ Il taglio non tocca il PACCHETTO: la watchlist del widget era una comodita' di lettura,
+   e nessun dato dell'LLM passava di li'. */
 function simboloTradingView(tk) {
   const T = String(tk || "").trim().toUpperCase();
   if (!T) return "";
@@ -8586,14 +8564,10 @@ function montaGraficoTV(tk, intervallo) {
        dentro non si disegna. ⚠ Sulle azioni americane l'incorporamento gratuito mostra il
        pre/after con lo stesso ritardo del resto (~15 minuti): e' visibile, non e' in tempo reale. */
     extended_hours: true,
-    /* la lista dei preferiti DENTRO il grafico: si sfoglia senza uscire dal widget */
-    watchlist: preferitiTradingView(),
-    details: true,
     studies: TV_STUDIES,
     support_host: "https://www.tradingview.com",
   });
   const nota = $("#tv-nota");
-  if (typeof aggiornaStellaPreferiti === "function") aggiornaStellaPreferiti();
   sc.onerror = () => {
     box.innerHTML = `<div class="muted tv-vuoto">TradingView non risponde (rete o blocco degli script di terze parti).
       Il resto della pagina funziona lo stesso.</div>`;
@@ -8735,46 +8709,15 @@ function montaGraficoTV(tk, intervallo) {
 
 }
 
-/* v332 — gli indici e la stella dei preferiti. Passano dalle STESSE funzioni del resto
-   (montaGraficoTV, preferitiTradingView): due strade separate divergerebbero. */
+/* v332 — i bottoni Nasdaq e S&P 500. Passano dalla STESSA funzione del resto
+   (montaGraficoTV): due strade separate divergerebbero.
+   ⚠ v338 — la stella dei preferiti e' uscita con la watchlist del widget; questo commento la
+   nominava ancora, e un commento che rimanda a codice inesistente manda la lettura a cercare
+   qualcosa che non c'e'. QQQ e SPY restano ETF, non indici: quelli il widget non li serve. */
 $("#tv-idx")?.addEventListener("click", (e) => {
   const b = e.target.closest("[data-tv-tk]");
   if (b) montaGraficoTV(b.dataset.tvTk);
 });
-$("#tv-pref")?.addEventListener("click", () => {
-  const tk = simboloTradingView(tvSimboloCorrente || ($("#tk-input")?.value || ""));
-  if (!tk) return;
-  let agg = [], tolti = [];
-  try {
-    const p = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
-    agg = Array.isArray(p.aggiunti) ? p.aggiunti : [];
-    tolti = Array.isArray(p.tolti) ? p.tolti : [];
-  } catch { /* si riparte da zero */ }
-  const dentro = preferitiTradingView().some(x => x.toUpperCase() === tk.toUpperCase());
-  if (dentro) {
-    /* togliere un titolo che viene dal sistema non basta cancellarlo dagli aggiunti: va messo
-       fra i TOLTI, o al render successivo tornerebbe da solo. */
-    tolti = [...new Set([...tolti, tk])];
-    agg = agg.filter(x => x.toUpperCase() !== tk.toUpperCase());
-  } else {
-    agg = [...new Set([...agg, tk])];
-    tolti = tolti.filter(x => x.toUpperCase() !== tk.toUpperCase());
-  }
-  salvaPreferiti(agg, tolti);
-  aggiornaStellaPreferiti();
-  montaGraficoTV(tvSimboloCorrente);      // il widget rilegge la lista solo al montaggio
-});
-
-function aggiornaStellaPreferiti() {
-  const b = $("#tv-pref"); if (!b) return;
-  const tk = simboloTradingView(tvSimboloCorrente || "");
-  const dentro = tk && preferitiTradingView().some(x => x.toUpperCase() === tk.toUpperCase());
-  b.textContent = dentro ? "★ Nei preferiti" : "☆ Preferito";
-  b.title = dentro
-    ? `${tk} è nella lista del grafico: clicca per toglierlo`
-    : `Aggiungi ${tk || "il simbolo"} alla lista del grafico`;
-}
-
 $("#tv-tf")?.addEventListener("click", (e) => {
   const b = e.target.closest("[data-tv-int]");
   if (!b) return;
