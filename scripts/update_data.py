@@ -597,6 +597,30 @@ def conto_trimestrale(t, quanti=6):
     return fuori or None
 
 
+def barre_ohlc(hist, quante=70):
+    """Le ultime barre giornaliere, per disegnare le candele nel PDF.
+    ⚠⚠ SENZA QUESTE IL PDF NON PUO' ESISTERE. Le `sparks` in data.json sono chiusure
+    SOTTO-CAMPIONATE e SENZA DATE: con quelle si disegnerebbe una linea che somiglia al prezzo,
+    non le candele — e una candela senza apertura, massimo e minimo non e' una candela.
+    ⚠ Settanta barre e non trecento: il peso in data.json cresce per ogni titolo seguito, e
+    settanta sedute sono il trimestre che si guarda su un grafico giornaliero. Chi vuole
+    l'orizzonte lungo ha le medie e la performance, che sono gia' pubblicate."""
+    if hist is None or hist.empty:
+        return None
+    h = hist.tail(quante)
+    fuori = []
+    for d, r in h.iterrows():
+        try:
+            o, hi, lo, c = float(r["Open"]), float(r["High"]), float(r["Low"]), float(r["Close"])
+        except Exception:  # noqa: BLE001
+            continue
+        if not all(x == x for x in (o, hi, lo, c)):
+            continue
+        fuori.append({"d": d.strftime("%Y-%m-%d"), "o": round(o, 2), "h": round(hi, 2),
+                      "l": round(lo, 2), "c": round(c, 2)})
+    return fuori or None
+
+
 def batteria_tecnica(hist):
     """I 'dettagli tecnici': medie mobili e oscillatori, ognuno con la propria formula standard.
     ⚠ Il CONTEGGIO delle medie battute e' la sintesi che TradingView chiama 'Moving Averages':
@@ -1264,6 +1288,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         # v316 — la colonna di TradingView, calcolata da noi (richiesta del CEO)
         "tv": {k: v for k, v in (
             ("tecnica", batteria_tecnica(hist)),
+            ("ohlc", barre_ohlc(hist)),
             ("performance", performance_orizzonti(hist, monthly)),
             ("stagionalita", stagionalita_titolo(monthly)),
             # ⚠ si passano le CHIUSURE, non i rendimenti: l'unita' la decide la funzione (v325)

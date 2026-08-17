@@ -2321,3 +2321,6 @@ svg.g-serie { cursor: crosshair; }
 
 /* v332 — i livelli sono ora parte dell'analisi tecnica: stessa cornice, nessun cassetto. */
 .tvo-testa { font-size: 12.5px; margin: 10px 0 6px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+/* v336 — la riga del PDF sotto il testo del pacchetto. */
+.prompt-pdf { margin-top: 8px; font-size: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }

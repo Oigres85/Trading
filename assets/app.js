@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "335";
+const BUILD_VERSION = "336";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -9761,12 +9761,192 @@ function buildCIOText() {
    nuovo. Ora la strada e' UNA: il testo finisce SEMPRE nel riquadro, che e' l'unico posto da cui
    il CEO puo' comunque prenderlo; la clipboard e' un di piu' che riesce o dichiara di non essere
    riuscito. Un pacchetto generato e non consegnato e' un pacchetto non generato. */
+/* ═══ v336 — IL PACCHETTO IN PDF, COL GRAFICO DISEGNATO DA NOI ══════════════════════════════
+   Il CEO: "per i tre prompt genera pdf che dovranno contenere screen grafico... HO LA CERTEZZA
+   DI AVERE DATI FRESCHI E GRAFICO BEN COSTRUITO PER LA LETTURA DELL'LLM".
+   ⚠⚠ LO SCREENSHOT DI TRADINGVIEW NON E' POSSIBILE, e l'ho verificato invece di dedurlo: il
+   widget vive su tradingview-widget.com, `contentDocument` e' bloccato e `drawImage` lancia
+   TypeError. Un "cattura schermo" fatto dalla pagina produrrebbe un rettangolo VUOTO 1151x520.
+   Il CEO ha scelto l'alternativa: il grafico lo disegniamo NOI sulle barre giornaliere che la
+   pipeline pubblica. Cosi' l'immagine e' vera, e' coerente al byte coi numeri del pacchetto
+   (stessa fonte, stesso istante) e non dipende da un permesso che nessuno puo' dare.
+   ⚠ Niente librerie: il CSP della pagina vieta gli script di terze parti, quindi il PDF si
+   scrive a mano. Non e' un ripiego — un PDF vettoriale disegnato con gli operatori nativi pesa
+   meno di un'immagine e resta nitido a qualunque ingrandimento, che per un modello che lo legge
+   e' cio' che conta. */
+const PDF_W = 595, PDF_H = 842;          // A4 in punti tipografici
+
+/* Helvetica standard usa WinAnsi: le lettere accentate italiane ci sono, ma vanno scritte come
+   byte singoli e le parentesi vanno protette o chiuderebbero la stringa PDF. */
+function pdfTesto(s) {
+  return String(s == null ? "" : s)
+    .replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"')
+    .replace(/[\u2013\u2014]/g, "-").replace(/\u2500/g, "-")
+    .replace(/[^\x20-\xFF]/g, "?")
+    .replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+}
+
+/* le candele: la parte che il CEO vuole vedere nel PDF */
+function pdfCandele(barre, opt = {}) {
+  const b = (barre || []).filter(x => x && [x.o, x.h, x.l, x.c].every(Number.isFinite));
+  if (b.length < 5) return "";
+  const X0 = 56, X1 = PDF_W - 40, Y0 = PDF_H - 300, Y1 = PDF_H - 96;
+  const lo = Math.min(...b.map(x => x.l)), hi = Math.max(...b.map(x => x.h));
+  const marg = (hi - lo) * 0.06 || 1;
+  const L = lo - marg, H = hi + marg;
+  const X = (i) => X0 + (i + 0.5) / b.length * (X1 - X0);
+  const Y = (v) => Y0 + (v - L) / ((H - L) || 1) * (Y1 - Y0);
+  const larg = Math.max(1.4, (X1 - X0) / b.length * 0.62);
+  let c = "q 0.5 w\n";
+  /* la griglia con i prezzi: senza riferimenti una candela e' un disegno, non un dato */
+  for (let k = 0; k <= 4; k++) {
+    const v = L + (H - L) * k / 4, y = Y(v);
+    c += `0.82 0.82 0.86 RG ${X0} ${y.toFixed(1)} m ${X1} ${y.toFixed(1)} l S\n`;
+    c += `BT /F1 7 Tf 0.35 0.35 0.4 rg ${(X0 - 50).toFixed(1)} ${(y - 2).toFixed(1)} Td (${pdfTesto(fmtNum.format(Math.round(v * 100) / 100))}) Tj ET\n`;
+  }
+  for (let i = 0; i < b.length; i++) {
+    const x = X(i), su = b[i].c >= b[i].o;
+    const col = su ? "0.13 0.63 0.35" : "0.80 0.24 0.24";
+    c += `${col} RG ${col} rg 0.8 w\n`;
+    c += `${x.toFixed(1)} ${Y(b[i].l).toFixed(1)} m ${x.toFixed(1)} ${Y(b[i].h).toFixed(1)} l S\n`;
+    const y0 = Y(Math.min(b[i].o, b[i].c)), y1 = Y(Math.max(b[i].o, b[i].c));
+    c += `${(x - larg / 2).toFixed(1)} ${y0.toFixed(1)} ${larg.toFixed(1)} ${Math.max(y1 - y0, 0.7).toFixed(1)} re f\n`;
+  }
+  /* i livelli del sistema, disegnati sul grafico: sono gli STESSI del testo, non altri */
+  for (const liv of (opt.livelli || [])) {
+    if (!Number.isFinite(liv.v) || liv.v < L || liv.v > H) continue;
+    const y = Y(liv.v);
+    c += `0.25 0.45 0.85 RG 0.7 w [3 2] 0 d ${X0} ${y.toFixed(1)} m ${X1} ${y.toFixed(1)} l S [] 0 d\n`;
+    c += `BT /F1 7 Tf 0.25 0.45 0.85 rg ${(X1 - 96).toFixed(1)} ${(y + 2).toFixed(1)} Td (${pdfTesto(liv.et)}) Tj ET\n`;
+  }
+  c += `0.2 0.2 0.25 RG 0.8 w ${X0} ${Y0} m ${X1} ${Y0} l S\n`;
+  c += `BT /F1 8 Tf 0.35 0.35 0.4 rg ${X0} ${(Y0 - 12).toFixed(1)} Td (${pdfTesto(b[0].d + "  ->  " + b[b.length - 1].d + "   (" + b.length + " sedute giornaliere)")}) Tj ET\n`;
+  return c + "Q\n";
+}
+
+function pdfPagina(righe, y0) {
+  let c = "BT /F1 8.2 Tf 0.1 0.1 0.12 rg\n", y = y0;
+  for (const r of righe) {
+    c += `1 0 0 1 40 ${y.toFixed(1)} Tm (${pdfTesto(r)}) Tj\n`;
+    y -= 10.2;
+  }
+  return c + "ET\n";
+}
+
+/* il testo si spezza a larghezza fissa: Helvetica 8,2pt entra in ~104 caratteri su A4 */
+function pdfSpezza(testo, larghezza = 104) {
+  const fuori = [];
+  for (const riga of String(testo || "").split("\n")) {
+    if (riga.length <= larghezza) { fuori.push(riga); continue; }
+    let resto = riga;
+    while (resto.length > larghezza) {
+      let t = resto.lastIndexOf(" ", larghezza);
+      if (t < larghezza * 0.5) t = larghezza;
+      fuori.push(resto.slice(0, t));
+      resto = resto.slice(t).replace(/^ /, "");
+    }
+    if (resto) fuori.push(resto);
+  }
+  return fuori;
+}
+
+function costruisciPdf(titolo, testo, barre, livelli) {
+  const righe = pdfSpezza(testo);
+  const PER_PAG = 72;
+  const pagine = [];
+  /* prima pagina: intestazione + grafico + l'inizio del testo */
+  const testa = `BT /F2 13 Tf 0.05 0.05 0.08 rg 40 ${PDF_H - 48} Td (${pdfTesto(titolo)}) Tj ET\n`
+    + `BT /F1 7.5 Tf 0.4 0.4 0.45 rg 40 ${PDF_H - 62} Td (${pdfTesto("Grafico disegnato dal sistema sulle stesse barre da cui vengono i numeri di questo documento: non e' una cattura di terzi.")}) Tj ET\n`;
+  const graf = pdfCandele(barre, { livelli });
+  pagine.push(testa + graf + pdfPagina(righe.slice(0, 22), PDF_H - 320));
+  for (let i = 22; i < righe.length; i += PER_PAG) {
+    pagine.push(pdfPagina(righe.slice(i, i + PER_PAG), PDF_H - 48));
+  }
+
+  /* il file: oggetti numerati, xref, trailer. Un PDF minimo ha bisogno di tutto questo e di
+     nient'altro — niente compressione, che richiederebbe una libreria. */
+  const oggetti = [];
+  const nPag = pagine.length;
+  const idKids = [];
+  for (let i = 0; i < nPag; i++) idKids.push(4 + i * 2);
+  oggetti[1] = "<< /Type /Catalog /Pages 2 0 R >>";
+  oggetti[2] = `<< /Type /Pages /Kids [${idKids.map(i => `${i} 0 R`).join(" ")}] /Count ${nPag} >>`;
+  oggetti[3] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>";
+  const idFontB = 3 + nPag * 2 + 1;
+  for (let i = 0; i < nPag; i++) {
+    oggetti[4 + i * 2] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PDF_W} ${PDF_H}] `
+      + `/Resources << /Font << /F1 3 0 R /F2 ${idFontB} 0 R >> >> /Contents ${5 + i * 2} 0 R >>`;
+    oggetti[5 + i * 2] = { stream: pagine[i] };
+  }
+  oggetti[idFontB] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>";
+
+  let out = "%PDF-1.4\n";
+  const off = [];
+  for (let i = 1; i < oggetti.length; i++) {
+    if (oggetti[i] == null) continue;
+    off[i] = out.length;
+    const o = oggetti[i];
+    out += typeof o === "string"
+      ? `${i} 0 obj\n${o}\nendobj\n`
+      : `${i} 0 obj\n<< /Length ${o.stream.length} >>\nstream\n${o.stream}endstream\nendobj\n`;
+  }
+  const xref = out.length;
+  const n = oggetti.length;
+  out += `xref\n0 ${n}\n0000000000 65535 f \n`;
+  for (let i = 1; i < n; i++) {
+    out += off[i] != null ? `${String(off[i]).padStart(10, "0")} 00000 n \n` : `0000000000 65535 f \n`;
+  }
+  out += `trailer\n<< /Size ${n} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return out;
+}
+
+/* prepara il PDF e lo appende alla modale: il grafico e' del titolo a grafico, o dell'indice
+   di riferimento quando il pacchetto non parla di un titolo solo. */
+function preparaPdf(testo, che) {
+  const host = $("#prompt-pdf");
+  if (!host) return;
+  const tk = String(tvSimboloCorrente || "").toUpperCase();
+  const r = ((DATA && DATA.watchlist) || []).concat((DATA && DATA.portfolio) || [])
+    .find(x => x && String(x.ticker).toUpperCase() === tk);
+  const barre = (r && r.tv && r.tv.ohlc) || null;
+  if (!barre) {
+    host.innerHTML = `<span class="muted">PDF col grafico: disponibile appena la pipeline pubblica le `
+      + `barre giornaliere di ${esc(tk || "questo simbolo")}. Non lo genero senza — un grafico `
+      + `disegnato su dati sotto-campionati somiglierebbe al prezzo senza esserlo.</span>`;
+    return;
+  }
+  const livelli = [];
+  const num = (x) => (Number.isFinite(numero(x)) ? numero(x) : null);
+  if (num(r.support) != null) livelli.push({ v: num(r.support), et: `supporto ${fmtNum.format(r.support)}` });
+  if (num(r.resistance) != null) livelli.push({ v: num(r.resistance), et: `resistenza ${fmtNum.format(r.resistance)}` });
+  const med = r.tv && r.tv.tecnica && r.tv.tecnica.medie;
+  if (med && med.sma50) livelli.push({ v: med.sma50.liv, et: `media 50 ${fmtNum.format(med.sma50.liv)}` });
+  if (med && med.sma200) livelli.push({ v: med.sma200.liv, et: `media 200 ${fmtNum.format(med.sma200.liv)}` });
+
+  host.innerHTML = `<button type="button" class="btn btn-ghost btn-sm" id="pdf-scarica">📄 Scarica in PDF (col grafico)</button>
+    <span class="muted"> — ${barre.length} sedute di ${esc(tk)}, disegnate dal sistema.</span>`;
+  $("#pdf-scarica")?.addEventListener("click", () => {
+    const pdf = costruisciPdf(`${che} — ${tk}`, testo, barre, livelli);
+    const bytes = new Uint8Array(pdf.length);
+    for (let i = 0; i < pdf.length; i++) bytes[i] = pdf.charCodeAt(i) & 0xFF;
+    const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = `${tk || "analisi"}-${new Date().toISOString().slice(0, 10)}.pdf`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  });
+}
+
 async function consegnaPacchetto(testo, che, esito) {
   if (!testo) { if (esito) esito.textContent = `${che}: non c'e' niente da consegnare.`; return false; }
   const box = $("#prompt-text");
   if (box) box.value = testo;
   const modale = $("#modal");
   if (modale) modale.hidden = false;
+  /* v336 — il bottone del PDF vive accanto al testo: la stessa consegna, due formati. Il PDF
+     porta il grafico che il testo non puo' portare; il testo resta perche' i numeri scritti
+     sono l'unica parte verificabile. */
+  preparaPdf(testo, che);
   const quanti = `${testo.length.toLocaleString("it")} caratteri`;
   try {
     await navigator.clipboard.writeText(testo);

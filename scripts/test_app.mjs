@@ -3370,6 +3370,46 @@ check("v334 carry: dichiara che le probabilita' BoJ non ci sono, invece di stima
   return nudo.includes("non esiste una fonte gratuita affidabile")
       && nudo.includes("stimarle sarebbe inventarle")`));
 
+/* ══ v336 — IL PACCHETTO IN PDF, COL GRAFICO DISEGNATO DA NOI ═════════════════════════════
+   Il CEO voleva lo screenshot del grafico TradingView. Non e' possibile, e l'ho VERIFICATO
+   invece di dedurlo: il widget vive su tradingview-widget.com, `contentDocument` e' bloccato e
+   `drawImage` lancia TypeError — una cattura fatta dalla pagina darebbe un rettangolo VUOTO
+   1151x520. Scelta l'alternativa: il grafico lo disegniamo noi sulle barre giornaliere che la
+   pipeline pubblica, cosi' l'immagine e' vera e coerente al byte coi numeri del pacchetto.
+   ⚠ Niente librerie (il CSP le vieta): il PDF si scrive a mano, con gli operatori nativi. */
+check("v336 pdf: costruisce un file valido, con l'intestazione e il trailer al posto giusto", (() => {
+  const pdf = run(`
+    const barre = [];
+    for (let i = 0; i < 40; i++) barre.push({ d: "2026-06-" + String((i % 28) + 1).padStart(2, "0"),
+      o: 100 + i, h: 104 + i, l: 97 + i, c: 101 + i });
+    return costruisciPdf("Prova", "riga uno", barre, [{ v: 110, et: "supporto" }]);`);
+  const attese = 40;
+  return typeof pdf === "string"
+      && pdf.startsWith("%PDF-")
+      && pdf.trimEnd().endsWith("%%EOF")
+      && pdf.includes("xref") && pdf.includes("trailer")
+      && (pdf.split(" re f").length - 1) === attese;   // una candela per barra, nessuna persa
+})());
+
+/* ⚠ IL GRAFICO NON SI DISEGNA SU DATI CHE NON LO PERMETTONO. Le `sparks` sono chiusure
+   sotto-campionate e senza date: con quelle si otterrebbe una linea che SOMIGLIA al prezzo
+   senza esserlo, ed e' peggio di nessun grafico — un modello che la legge non ha modo di
+   sapere che sta guardando un'approssimazione. */
+check("v336 pdf: senza le barre giornaliere il grafico non si disegna e lo dichiara", (() => {
+  const vuoto = run(`return pdfCandele([{ d: "2026-01-01", o: 1, h: 2, l: 0.5, c: 1.5 }])`);
+  return vuoto === "";     // sotto cinque barre non si disegna niente
+})());
+
+check("v336 pdf: i livelli disegnati sono gli STESSI che il testo pubblica", (() => {
+  const i = src.indexOf("function preparaPdf");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "async function", i));
+  /* devono venire dai campi del sistema, non da un secondo calcolo: due serie di livelli per lo
+     stesso titolo sono la contraddizione che v271 ha gia' pagato */
+  return corpo.includes("r.support") && corpo.includes("r.resistance")
+      && corpo.includes("med.sma50") && corpo.includes("med.sma200")
+      && !corpo.includes("Math.min(...") && !corpo.includes("Math.max(...");
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
