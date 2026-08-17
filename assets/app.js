@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "328";
+const BUILD_VERSION = "329";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1635,11 +1635,21 @@ function prossimoRunPipeline(adesso = new Date()) {
    Il ripiego onesto c'e' ed e' gia' nel file: le posizioni portano `price_asof`, cioe' la data
    dell'ultima barra che Yahoo ha pubblicato. E' la STESSA barra da cui nascono VIX, ampiezza e
    rotazione, perche' vengono tutti dallo stesso download giornaliero. */
+/* ⚠⚠ v329 — GLI STRUMENTI 24/7 DECIDEVANO LA FRESCHEZZA DI TUTTI GLI ALTRI. Misurato sui dati
+   veri di una domenica: 22 barre su 23 erano del venerdi' (14/08), UNA sola — BTC-USD — era del
+   giorno stesso, e siccome qui si prende la PIU' RECENTE quella sola alzava la dichiarazione per
+   tutto il pacchetto. VIX, put/call e ampiezza venivano consegnati come fotografia di adesso
+   quattro righe sotto un "WEEKEND, MERCATI CHIUSI".
+   Le cripto non hanno chiusura: la loro barra e' sempre di oggi, e per questo non puo' parlare
+   per le azioni. La freschezza di un mercato la dice il suo mercato. */
+const SEMPRE_APERTI = /-(USD|USDT|EUR)$/i;      // BTC-USD, ETH-USD… quotano anche a borse chiuse
+
 function ultimaBarraDisponibile() {
   const date = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .filter(r => r && !SEMPRE_APERTI.test(String(r.ticker || "")))
     .map(r => r && r.price_asof).filter(x => typeof x === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x));
   if (!date.length) return null;
-  return date.sort()[date.length - 1];          // la piu' recente fra quelle pubblicate
+  return date.sort()[date.length - 1];          // la piu' recente fra quelle dei mercati che chiudono
 }
 
 /* la data del dato di un blocco macro: prima quella dichiarata dalla pipeline, poi il ripiego */
@@ -4540,6 +4550,10 @@ function renderIndicatori() {
          contenitore no. Il riordino per trascinamento non ne risente, perche' la chiave resta
          `data-scheda` e non la posizione. */
       larga: !!(forma && forma.larga),
+      /* ⚠ v329 — la MOSSA stampata in ogni scheda: senza, l'ordine e' un fatto invisibile e
+         chi guarda deduce una gerarchia che non c'e'. Con essa, l'ordine si verifica a colpo
+         d'occhio — ed e' l'unico modo perche' una didascalia sull'ordine sia controllabile. */
+      mossa: Number.isFinite(r.mossa) ? r.mossa : null,
       /* v250 — sotto ogni card macro, la riga di cadenza: rilevazione, età, prossimo atteso.
          Sta in FONDO e in piccolo: è contesto sul dato, non il dato. */
       /* ⚠ v265 — LA GUIDA DI LETTURA VA A SCOMPARSA. Il CEO: "tutte le info e le guide di
@@ -4567,7 +4581,8 @@ function renderIndicatori() {
   /* v238 — le quattro tessere di testata (media, quanti sotto 40, i tre peggiori, quelli che
      tengono) sono state rimosse su richiesta del CEO: erano un riassunto della griglia che sta
      appena sotto, cioe' gli stessi fatti detti due volte. */
-  if (nota) nota.innerHTML = `Una scheda per indicatore, tutte sulla stessa scala: <b>100 = favorevole al rischio azionario, 0 = sfavorevole</b>, ordinate dalla peggiore. È una convenzione di lettura del sistema, non una misura: dice da che parte tira ogni indicatore, non quanto pesa.
+  if (nota) nota.innerHTML = `Una scheda per indicatore, tutte sulla stessa scala: <b>100 = favorevole al rischio azionario, 0 = sfavorevole</b>. È una convenzione di lettura del sistema, non una misura: dice da che parte tira ogni indicatore, non quanto pesa.
+    <b>L'ordine NON è per punteggio</b>: sono ordinate da <b>chi si è mosso di più rispetto al proprio solito</b>, perché quello che si muove è quello che ha una notizia dentro. Chi non ha una serie storica non ha un movimento misurabile e va in fondo, in ordine alfabetico — che non esprime preferenze.
     Dove esiste una storia il grafico la mostra; dove il pannello di dettaglio portava un grafico o una tabella, quelli sono <b>qui dentro</b> invece che dietro un clic.
     <b>Clicca una scheda</b> per il resto del pannello e le news di quell'indicatore.`;
 }
@@ -4742,7 +4757,7 @@ const TV_PER_TESSERA = {
   stagionalita_ndx: "QQQ",   // ⚠ NON "NDX": gli indici sono bloccati, l'ETF no (stessa regola di ^SOX → SOXX)
 };
 
-function tessera({ t, v, cls, grafico, n, tk, id, tag, larga }) {
+function tessera({ t, v, cls, grafico, n, tk, id, tag, larga, mossa }) {
   /* v241 — `id` e' la CHIAVE STABILE della scheda per il riordino: la chiave dell'indicatore
      (in:cpi, dollar, macroquant…), non il titolo e non la posizione. Una scheda rinominata non
      perde il posto che il CEO le ha dato, e una nuova finisce in coda invece di spostare tutto. */
@@ -4750,6 +4765,7 @@ function tessera({ t, v, cls, grafico, n, tk, id, tag, larga }) {
     <div class="mg-card-head"><span class="mg-t">${esc(t)}${tag ? `<span class="tag-proxy" title="${esc(tag)}">proxy</span>` : ""}</span><span class="mg-v ${cls || ""}">${v}</span>${
       TV_PER_TESSERA[id] ? `<button type="button" class="mg-graf" data-graf-tk="${esc(TV_PER_TESSERA[id])}"
         title="Apri ${esc(TV_PER_TESSERA[id])} nel grafico" aria-label="Apri ${esc(TV_PER_TESSERA[id])} nel grafico">📈</button>` : ""}</div>
+    ${mossa != null ? `<div class="mg-mossa muted" title="quanto questo indicatore si e' mosso rispetto al proprio solito: e' il criterio con cui le schede sono ordinate">si e' mosso ${fmtNum.format(Math.round(mossa * 10) / 10)}× il suo solito</div>` : ""}
     ${grafico || ""}${n ? `<div class="muted mg-n">${n}</div>` : ""}</div>`;
 }
 function agganciaTessere(box) {
@@ -6912,7 +6928,7 @@ function buildPrompt() {
     lines.push("");
   }
   const ageMin = Math.round((Date.now() - new Date(DATA.updated_at).getTime()) / 60000);
-  const lagNote = ageMin > 90 ? ` [ATTENZIONE: snapshot di ${ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min"} fa — i prezzi potrebbero essere disallineati dal mercato live; verifica online i livelli critici prima di ragionarci sopra]` : "";
+  const lagNote = ageMin > 90 ? ` [ATTENZIONE: snapshot di ${ageMin >= 120 ? Math.round(ageMin / 60) + " ore" : ageMin + " min"} fa — i prezzi potrebbero essere disallineati dal mercato live, e i livelli critici sono i primi a spostarsi]` : "";
   lines.push(`DATI AL ${new Date(DATA.updated_at).toLocaleString("it-IT")} (prezzi: snapshot pipeline + refresh live lato client ogni 60s)${lagNote}`);
   lines.push(sessionContextLine());   // v256: fase della seduta USA, calcolata ADESSO lato client
 
@@ -7147,9 +7163,9 @@ function buildPrompt() {
     : i.key === "curve3m" ? "serie GIORNALIERA FRED T10Y3M, ultima chiusura — è lo STESSO segnale della curva 10A-2A su un altro tratto, non un secondo segnale"
     : i.key === "t30" ? "serie GIORNALIERA FRED DGS30, ultima chiusura"
     : i.key === "real10" ? "serie GIORNALIERA FRED DFII10 (TIPS 10A): è il rendimento AL NETTO dell'inflazione attesa"
-    : i.key === "breakeven" ? "serie GIORNALIERA FRED T10YIE: nominale meno reale, cioè l'inflazione che il mercato PREZZA, non quella osservata — non sommarla al CPI come se fossero due misure della stessa cosa"
-    : i.key === "philly" ? "indagine mensile della Federal Reserve di Philadelphia (FRED GACDFSA066MSFRBPHI). NON è l'ISM: l'ISM è sotto licenza e non è ridistribuibile. Stessa specie di misura (diffusion index sulla manifattura, esce prima dell'ISM), ma copre un distretto, non il paese: usala come indicazione di direzione, non come il livello nazionale"
-    : i.key === "umich" ? "serie mensile via FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui — verificale prima di trarne conclusioni sul consumatore"
+    : i.key === "breakeven" ? "serie GIORNALIERA FRED T10YIE: nominale meno reale, cioè l'inflazione che il mercato PREZZA, non quella osservata: è una grandezza diversa dal CPI, non una seconda misura della stessa"
+    : i.key === "philly" ? "indagine mensile della Federal Reserve di Philadelphia (FRED GACDFSA066MSFRBPHI). NON è l'ISM: l'ISM è sotto licenza e non è ridistribuibile. Stessa specie di misura (diffusion index sulla manifattura, esce prima dell'ISM), ma copre un distretto, non il paese: è un'indicazione di direzione, non il livello nazionale"
+    : i.key === "umich" ? "serie mensile via FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui: questo valore non è l'ultimo pubblicato"
     : "serie mensile, normale ritardo di pubblicazione";
   /* ⚠ v266 — LA CADENZA NON DEVE MANGIARSI L'IDENTIFICAZIONE DELLA SERIE. Aggiungendo le
      cadenze giornaliere, `cad` ha cominciato a esistere anche per la curva e ha preso il posto
@@ -7358,9 +7374,27 @@ function buildPrompt() {
        le chiavi vanno lette da data.json, non dedotte dal nome (lezione v207). */
     const accesi = (m.signposts.items || []).filter(x => x && x.status === true)
       .map(x => x.name || x.label).filter(Boolean);
-    lines.push(`- BofA Bear-Market Signposts: ${m.signposts.active}/10 campanelli accesi `
-      + `(e' un CONTEGGIO, non una probabilita': cinque su dieci non significa 50% di probabilita' di ribasso)`
-      + (accesi.length ? ` — accesi: ${accesi.join(" · ")}` : ""));
+    /* ⚠⚠ v329 — "5/10 ACCESI" NON ERA UN CONTEGGIO, ERA UN PAVIMENTO. Solo quattro voci si
+       calcolano da una fonte; le altre sei sono costanti di baseline, di cui cinque accese. Il
+       numero non poteva scendere sotto cinque qualunque cosa facesse il mercato, e veniva
+       presentato come una misura. Ora la riga separa cio' che e' misurato da cio' che e' assunto. */
+    const nCalc = m.signposts.calcolabili, nOn = m.signposts.accesi_calcolabili;
+    const costanti = (m.signposts.items || []).filter(x => x && !x.calcolato && x.status === true)
+      .map(x => x.name).filter(Boolean);
+    lines.push(nCalc != null
+      ? `- BofA Bear-Market Signposts: ${nOn} accesi su ${nCalc} CALCOLABILI da una fonte`
+        + (accesi.length ? ` — accesi: ${accesi.join(" · ")}` : " — nessuno acceso")
+        + `. ⚠ Gli altri ${10 - nCalc} campanelli sono COSTANTI di riferimento, non misure: `
+        + (costanti.length ? `${costanti.length} di essi risultano accesi (${costanti.join(" · ")}) ma nessuna riga di codice puo' spegnerli. ` : "")
+        + `Il totale "${m.signposts.active}/10" che si legge altrove NON e' un conteggio: e' un `
+        + `pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero `
+        + `misurato da una fonte e' ${nOn} su ${nCalc}.`
+      : `- BofA Bear-Market Signposts: ${m.signposts.active}/10 accesi`
+        + (accesi.length ? ` — ${accesi.join(" · ")}` : "")
+        + `. ⚠ NON e' un conteggio di misure: una parte di queste voci non viene ricalcolata da `
+        + `nessuna fonte a ogni run, quindi il numero e' un LIMITE SUPERIORE che non puo' scendere `
+        + `sotto le voci fisse: una parte del numero e' un'assunzione, non una misura che si `
+        + `muove col mercato.`);
   }
 /* ═══ v246 — LA LEVA È UNA FOTOGRAFIA DI DUE MESI FA, E IL KOSPI LO DICE ═══════════════════
    Segnalato dal CEO: "il grafico porta ancora la leva al massimo ma sembra che ci sia stata una
@@ -7413,8 +7447,8 @@ function buildPrompt() {
       const age = d ? Math.round((Date.now() - new Date(d)) / 86400000) : null;
       return `, ⚠ CARRY-FORWARD dal run precedente${d ? ` (rilevato ${String(d).slice(0, 10)}${age != null ? `, ${age}g fa` : ""})` : ""} — la fonte era irraggiungibile: pesalo come dato DATATO, non odierno`;
     };
-    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: NON derivarne tassi di crescita impliciti]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? (fpStale ? `RISCHIO SISTEMICO da VERIFICARE: leva ai massimi e valutazioni tese porterebbero a un giudizio di vulnerabilità a un deleveraging violento, MA questo Forward P/E non è fresco${fpAgeDays != null ? ` (${fpAgeDays}g)` : ""} — il verdetto poggia su un input datato: confermalo via web prima di usarlo come premessa.` : "RISCHIO SISTEMICO ELEVATO: leva in espansione sui massimi + valutazioni tese → vulnerabilità a deleveraging violento.") : (stLeva && stLeva.rollover
-        ? "Valutazioni tese, ma la leva si sta RITIRANDO dai massimi: il livello alto dice quanto carburante c'era, il verso negativo dice che il deleveraging e' gia' cominciato — vedi la riga LEVA DEGLI OPERATORI per i numeri."
+    lines.push(`- Forward P/E S&P 500 [FORWARD, fonte: ${fp.source || "WSJ"}${carriedTag(fp)} — metodologia DIVERSA dal trailing: il rapporto fra i due non è un tasso di crescita implicito]: ${fp.value}× vs media storica ${fp.avg_hist}× (${fp.label}). ${sysDanger ? (fpStale ? `RISCHIO SISTEMICO da VERIFICARE: leva ai massimi e valutazioni tese porterebbero a un giudizio di vulnerabilità a un deleveraging violento, MA questo Forward P/E non è fresco${fpAgeDays != null ? ` (${fpAgeDays}g)` : ""} — il verdetto poggia su un input datato: confermalo via web prima di usarlo come premessa.` : "RISCHIO SISTEMICO ELEVATO: leva in espansione sui massimi + valutazioni tese → vulnerabilità a deleveraging violento.") : (stLeva && stLeva.rollover
+        ? "Valutazioni tese, ma la leva si sta RITIRANDO dai massimi: il livello alto dice quanto carburante c'era, il verso negativo dice che il deleveraging e' gia' cominciato — i numeri stanno nella riga LEVA DEGLI OPERATORI."
         : "Valutazioni " + (fp.value > 20 ? "tese ma" : "") + " da monitorare insieme alla leva.")}`);
     const rl = rigaLeva(m);
     if (rl) lines.push(rl);
@@ -7554,7 +7588,7 @@ function buildPrompt() {
       ? `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp`
       : `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): il gap dell'S&P NON è calcolabile in questo snapshot (la sua serie e quella dei profitti non condividono nessun periodo)`;
     if (m.corp_profit.ndx_gap != null) cpBp += `, NDX gap ${m.corp_profit.ndx_gap > 0 ? "+" : ""}${m.corp_profit.ndx_gap} pp`;
-    cpBp += ` — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). Contarli come due prove separate raddoppia un segnale solo.`;
+    cpBp += ` — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). sono lo stesso segnale contato due volte, non due prove separate.`;
     lines.push(cpBp);
   }
   if (m.fed_market) /* ⚠ v264 — DICEVA "Fed Funds Rate" PER LA SECONDA VOLTA, CON UN NUMERO DIVERSO. In QUADRO
@@ -9314,7 +9348,7 @@ function datiNostriDelTitolo(tk) {
     L.push(`- Rapporto put/call di ${T} sulla scadenza ${f.opzioni.scadenza}: `
       + `${Math.round(f.opzioni.ratio * 100) / 100} (volumi scambiati oggi: put ${f.opzioni.put}, call ${f.opzioni.call})`
       + (f.opzioni.nonLaPiuVicina
-          ? `. ⚠ NON e' la scadenza piu' vicina: e' quella con piu' CONTRATTI APERTI (${f.opzioni.oi} contro ${f.opzioni.oiPiuVicina} — grandezza diversa dai volumi qui sopra, non provare a farli tornare). I muri di una scadenza quasi esaurita si spostano da soli senza che il mercato si muova, quindi non sono livelli.`
+          ? `. ⚠ NON e' la scadenza piu' vicina: e' quella con piu' CONTRATTI APERTI (${f.opzioni.oi} contro ${f.opzioni.oiPiuVicina} — grandezza diversa dai volumi qui sopra,  a farli tornare). I muri di una scadenza quasi esaurita si spostano da soli senza che il mercato si muova, quindi non sono livelli.`
           : ""));
   }
   const t = f.tecnici;
@@ -9348,10 +9382,10 @@ function datiNostriDelTitolo(tk) {
   }
   if (!L.length) return "";
   return [
-    `=== QUELLO CHE IL SISTEMA SA GIA' DI ${T} (non cercarlo altrove: e' qui) ===`,
+    `=== QUELLO CHE IL SISTEMA SA GIA' DI ${T} (questi numeri sono qui, e sono quelli che il sistema pubblica) ===`,
     `Questi numeri sono calcolati sulle stesse barre che disegnano il grafico, e sono quelli che il CEO vede sulla pagina.`,
-    `⚠ SUL RITARDO: i prezzi delle azioni americane arrivano da fonti gratuite e sono ritardati di circa 15 minuti — vale per questo pacchetto come per qualunque fonte gratuita, TradingView compresa. Cambi, indici di volatilita', cripto e materie prime sono in tempo reale. Se il titolo si sta muovendo forte adesso, dillo invece di trattare il prezzo come l'ultimo scambio.`,
-    `USALI COME RIFERIMENTO. Se cio' che trovi in rete diverge in modo materiale (piu' del 2% su un livello di prezzo), NON scegliere in silenzio: riporta tutti e due, di' quale usi e perche'.`,
+    `⚠ SUL RITARDO: i prezzi delle azioni americane arrivano da fonti gratuite e sono ritardati di circa 15 minuti — vale per questo pacchetto come per qualunque fonte gratuita, TradingView compresa. Cambi, indici di volatilita', cripto e materie prime sono in tempo reale. Se il titolo si sta muovendo forte adesso, il prezzo qui sotto non e' l'ultimo scambio.`,
+    `Sono il riferimento del sistema. Uno scarto materiale rispetto a cio' che si trova in rete (oltre il 2% su un livello di prezzo) e' un fatto che va scritto insieme a entrambi i valori: una scelta fatta in silenzio fra i due non e' verificabile.`,
     /* ═══ v299 — IL BLOCCO "COSA NON SO" ══════════════════════════════════════════════════════
    Trovato nella revisione: dei nove blocchi che il prompt chiede, solo DUE si possono
    rispondere coi dati del pacchetto (macro e tecnica). Concorrenti e quote, conti, consenso
@@ -9373,7 +9407,7 @@ function datiNostriDelTitolo(tk) {
 `  Il pacchetto porta i titoli MACRO delle ultime 6 ore quando ce ne sono; su questa societa' e sul`,
 `  suo settore non porta niente, quindi quella parte e' interamente tua. Se non trovi nulla di`,
 `  recente, scrivilo: "nessuna notizia rilevante nelle ultime 48 ore" e' un'informazione.`,
-`⚠ OBBLIGATORIO: chiudi con una riga "NON VERIFICATO:" che elenca quali di queste voci NON sei`,
+`⚠ La riga "NON VERIFICATO:" in chiusura e' obbligatoria, e contiene le voci che non risultano`,
 `riuscito a trovare o confermare. Se le hai trovate tutte, scrivi "NON VERIFICATO: nessuna".`,
 `Un numero plausibile inventato e' peggio di un buco dichiarato: il buco lo vedo, l'invenzione no.`,
     ...L,

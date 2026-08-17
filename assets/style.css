@@ -2293,3 +2293,6 @@ svg.g-serie { cursor: crosshair; }
              padding-bottom: 8px; }
   .mg-tris > .mg-card { scroll-snap-align: start; }
 }
+
+/* v329 — la mossa relativa sotto il titolo della scheda: rende verificabile l'ordine. */
+.mg-mossa { font-size: 10.5px; margin: 2px 0 4px; }

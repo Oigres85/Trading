@@ -2278,15 +2278,30 @@ def fetch_macro():
                if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")][:4]
         # tasso BoJ (overnight call rate) via FRED
         boj_rate_val = None
+        boj_rate_date = None
         try:
+            # ⚠⚠ v329 — IL VALORE VENIVA PUBBLICATO SENZA LA SUA DATA, e `fred_series` la
+            # restituisce: `boj_r[-1][0]`. Senza quella, una serie che la fonte ha smesso di
+            # aggiornare continua a produrre un numero che sembra di oggi — e questa e' l'unica
+            # riga del pacchetto che parla di unwind del carry. Ora la data viaggia col valore,
+            # e oltre i 120 giorni il valore NON si pubblica: un tasso di politica monetaria
+            # vecchio di mesi non e' un dato vecchio, e' un dato sbagliato.
             boj_r = fred_series("IRSTCB01JPM156N", 1)
-            boj_rate_val = round(boj_r[-1][1], 2) if boj_r else None
+            if boj_r:
+                boj_rate_date = boj_r[-1][0]
+                eta_g = (datetime.now(timezone.utc).date()
+                         - datetime.strptime(boj_rate_date, "%Y-%m-%d").date()).days
+                if eta_g <= 120:
+                    boj_rate_val = round(boj_r[-1][1], 2)
+                else:
+                    print(f"!! tasso BoJ scartato: osservazione del {boj_rate_date}, {eta_g} giorni fa",
+                          file=sys.stderr)
         except Exception:
             pass
         macro["carry"] = {
             "us10": round(us10, 2), "jp10": round(float(jp10), 2), "spread": spread,
             "usdjpy": round(usdjpy, 2), "usdjpy_chg_1m": usdjpy_chg_1m,
-            "boj_rate": boj_rate_val,
+            "boj_rate": boj_rate_val, "boj_rate_date": boj_rate_date,
             "boj_meetings": boj,
             "note": ("Spread ampio e yen debole: carry trade USD/JPY favorevole (capitali verso il dollaro). "
                      "Un rialzo dei tassi BoJ o un rafforzamento dello yen può innescare l'unwind del carry, "
@@ -3575,9 +3590,11 @@ def fetch_signposts():
     items = [{"name": n, "category": c, "status": s, "desc": d, "source": src}
              for n, c, s, d, src in SIGNPOSTS_BASE]
     def setstatus(name, val):
+        """Marca la voce come CALCOLATA: e' l'unico modo per distinguerla da una costante."""
         for it in items:
             if it["name"] == name:
                 it["status"] = bool(val)
+                it["calcolato"] = True
     try:  # fiducia consumatori > 100
         setstatus("Fiducia consumatori > 100", fred_series("UMCSENT", 1)[-1][1] > 100)
     except Exception:  # noqa: BLE001
@@ -3597,9 +3614,18 @@ def fetch_signposts():
         setstatus("Inasprimento criteri di prestito", fred_series("DRTSCILM", 1)[-1][1] > 0)
     except Exception:  # noqa: BLE001
         pass
+    # ⚠⚠ v329 — "5/10 ACCESI" NON ERA UN CONTEGGIO, ERA UN PAVIMENTO. Solo QUATTRO voci si
+    # calcolano da FRED (fiducia, curva, stress credito, criteri di prestito) e oggi sono tutte
+    # e quattro SPENTE; le altre sei sono costanti di baseline, di cui cinque accese. Il numero
+    # pubblicato non poteva scendere sotto cinque qualunque cosa facesse il mercato, e veniva
+    # presentato come una misura. Ora ogni voce dichiara se e' calcolata, e il conteggio che
+    # conta e' quello sulle calcolabili.
+    calcolabili = sum(1 for it in items if it.get("calcolato"))
+    accesi_calc = sum(1 for it in items if it.get("calcolato") and it["status"])
     active = sum(1 for it in items if it["status"])
     return {"items": items, "active": active, "total": len(items),
-            "pct": round(active / len(items) * 100)}
+            "calcolabili": calcolabili, "accesi_calcolabili": accesi_calc,
+            "pct": round(accesi_calc / calcolabili * 100) if calcolabili else None}
 
 
 def translate_it(text):

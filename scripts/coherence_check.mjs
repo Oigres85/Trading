@@ -51,7 +51,13 @@ function generaPayload() {
   vm.runInContext(src, ctx, { filename: "app.js" });
   const d = JSON.parse(readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null"));
   vm.runInContext("DATA=" + JSON.stringify(d) + "; cashEur=30000; recomputeTotals();", ctx);
-  return { testo: vm.runInContext("buildCIOText()", ctx), ctx, data: d };
+  const tk = (d.watchlist || []).find(x => x && x.ticker && x.price != null);
+  const set = ((d.macro || {}).tilt || [])[0];
+  const altri = [];
+  if (tk) altri.push({ nome: `titolo ${tk.ticker}`, testo: vm.runInContext(`buildPromptTicker(${JSON.stringify(tk.ticker)})`, ctx) });
+  if (set) altri.push({ nome: `settore ${set.ticker}`, testo: vm.runInContext(`buildPromptSettore(${JSON.stringify(set.ticker)})`, ctx) });
+  try { altri.push({ nome: "portafoglio", testo: vm.runInContext("buildPromptPortafoglio()", ctx) }); } catch { /* senza posizioni non esiste */ }
+  return { testo: vm.runInContext("buildCIOText()", ctx), altri, ctx, data: d };
 }
 
 /* numero italiano ("1.234,5" / "-9,3") → Number */
@@ -245,12 +251,55 @@ function c8_denominatori(t) {
    l'intero PROMEMORIA FINALE duplicato 6 concetti su 6). Ogni volta era sopravvissuta perche' si
    guardava solo dove si era appena messo mano. Qui si cerca in modo sistematico: imperativi in
    seconda persona dentro la CODA (dopo la fine della testata), che sono il marcatore dell'istruzione. */
-function c9_istruzioniDuplicate(t) {
-  const header = (() => { try { return readFileSync(join(ROOT, "config", "prompt_header.txt"), "utf8"); } catch { return ""; } })();
-  const finTestata = header ? t.indexOf(header) + header.length : 0;
+/* ⚠ v329 — il confine testata/coda dipende dal PACCHETTO. Il macro usa il file della testata;
+   gli altri tre sono prompt autonomi che portano le proprie istruzioni in cima, separate dai
+   dati da una riga di trattini lunghi. Passare il confine esplicito e' l'unico modo di far
+   girare lo stesso detector su superfici diverse senza che chiami "violazione" la testata
+   legittima di ciascuna. */
+function c9_istruzioniDuplicate(t, confineEsplicito) {
+  const header = (() => {
+    for (const f of ["prompt_header_macro.txt", "prompt_header.txt"]) {
+      try {
+        const h = readFileSync(join(ROOT, "config", f), "utf8");
+        if (h && t.indexOf(h.trim().slice(0, 200)) >= 0) return h;
+      } catch { /* file assente: si prova il successivo */ }
+    }
+    return "";
+  })();
+  /* si taglia sull'ULTIMA riga della testata, non sul testo esatto: il pacchetto la inserisce
+     con ritocchi (a capo, spazi) e un confronto esatto fallisce in silenzio — che e' come il
+     difetto qui sopra e' sopravvissuto. */
+  const ultimaRiga = header ? (header.trim().split("\n").pop() || "").trim() : "";
+  const dove = ultimaRiga ? t.indexOf(ultimaRiga) : -1;
+  const finTestata = confineEsplicito != null ? confineEsplicito
+    : (dove >= 0 ? dove + ultimaRiga.length : 0);
   const coda = finTestata > 0 ? t.slice(finTestata) : t;
-  // imperativi rivolti al lettore: sono istruzioni, e le istruzioni vivono nella testata
-  const IMPERATIVI = /\b(usalo|usali|dichiaralo|dichiarali|non ripeterlo|non rifare|non ricalcolare|valutane|pesalo|pesane|trattal[oa]|non trattarl[oa]|leggilo|non leggerlo|non inseguire|incrocia|segnala l|chiedi conferma|deduci dal|scegli tu|alza gli standard|riduci il sizing)\b/gi;
+  /* ⚠⚠ v329 — ERA UN REGISTRO DI PAROLE, ED E' INVECCHIATO DA SOLO. La lista fissa non
+     intercettava cinque imperativi che nel frattempo erano finiti nella coda — "verificale",
+     "non sommarla al CPI", "usala come indicazione", "NON derivarne", "vedi la riga LEVA" — e
+     il gate restava verde mentre il difetto che esiste per impedire era presente. E' la stessa
+     classe di C10 e degli indici 16/17 del red team: un elenco scritto a mano invecchia in
+     silenzio, e il silenzio e' esattamente il modo in cui questi difetti sopravvivono.
+     Ora si cerca la FORMA, non le parole. In italiano un'istruzione al lettore ha marcatori
+     grammaticali inequivocabili:
+       · il PRONOME ENCLITICO attaccato al verbo (verificaLE, usaLA, sommarLA, derivarNE): un
+         verbo con l'oggetto incollato dietro e' rivolto a qualcuno, non descrive un fatto;
+       · NON + INFINITO ("non sommare", "non derivarne"), che e' l'imperativo negativo italiano;
+       · una manciata di imperativi nudi frequenti in questo dominio, elencati per esteso perche'
+         senza enclitico non hanno un marcatore morfologico.
+     ⚠ La regola EVITA i falsi positivi sulle terze persone — "la Fed guarda il PCE" e' un fatto,
+     non un ordine — perche' non basta lo stem: serve l'enclitico, la negazione con l'infinito,
+     o l'appartenenza alla lista corta. */
+  const IMPERATIVI = new RegExp([
+    /* imperativo NEGATIVO italiano: non + infinito (+ enclitico). Non ha altre letture. */
+    "\\bnon\\s+\\w{3,}(?:are|ere|ire)(?:l[oaie]|ne|ci|si)?\\b",
+    /* infinito + enclitico NON preceduto da preposizione o modale: "sommarla" e' un ordine,
+       "per calcolarla" e' una descrizione. E' la preposizione a fare la differenza. */
+    "(?<!\\b(?:per|di|da|a|nel|col|senza|puoi|puo'|deve|devi|possono|invece)\\s)\\b\\w{4,}(?:arl[oaie]|erl[oaie]|irl[oaie]|arne|erne|irne|arci|arsi)\\b",
+    /* imperativi nudi frequenti in questo dominio: senza enclitico non hanno marcatore
+       morfologico, quindi vanno elencati — ma in minuscolo, o "USA" il paese diventa un ordine. */
+    "\\b(?:vedi|verifica|verificale|verificalo|verificali|usala|usalo|usali|controlla|ricorda|considera|ignora|evita|dimmi|dillo|elenca|riporta|conta i|guardalo|guardala)\\b",
+  ].join("|"), "g");
   const colpiti = [];
   for (const linea of coda.split("\n")) {
     const m = linea.match(IMPERATIVI);
@@ -460,7 +509,7 @@ function c15_numeriNellaTestata(t, ctx) {
 }
 
 /* ---------------------------------- esecuzione ---------------------------------- */
-const { testo, ctx } = generaPayload();
+const { testo, altri, ctx } = generaPayload();
 c1_valoriRipetuti(testo);
 c2_freschezza(testo);
 c3_somme(testo);
@@ -477,10 +526,26 @@ c13_seduteMiste(testo, ctx);
 c14_codaAZero(testo);
 c15_numeriNellaTestata(testo, ctx);
 
+/* ⚠⚠ v329 — GLI ALTRI DUE PACCHETTI. Non tutti i detector hanno senso fuori dal macro (C12 e'
+   la ricevuta di un taglio che riguarda solo quello, C13 parla del book), ma quelli che
+   controllano la FORMA del testo — istruzioni nella coda, rimandi a sezioni inesistenti,
+   terminologia divergente — valgono per qualunque pacchetto si consegni a un modello.
+   Il prefisso nel messaggio dice QUALE pacchetto ha il problema: senza, un fallimento su tre
+   superfici e' un fallimento che non si sa dove riparare. */
+for (const p of (altri || [])) {
+  const prima = PROBLEMI.length;
+  /* il confine e' la riga di trattini che separa le istruzioni dai dati in ciascun pacchetto */
+  const sep = p.testo.indexOf("\u2500".repeat(20));
+  c9_istruzioniDuplicate(p.testo, sep >= 0 ? sep : 0);
+  c10_sezioniInesistenti(p.testo);
+  c6_terminologia(p.testo);
+  for (let i = prima; i < PROBLEMI.length; i++) PROBLEMI[i].msg = `[pacchetto ${p.nome}] ${PROBLEMI[i].msg}`;
+}
+
 if (VERBOSE) PASSATI.forEach(p => console.log(`  ok   ${p}`));
 if (PROBLEMI.length) {
   console.log(`\nINCOERENZE TROVATE: ${PROBLEMI.length}\n`);
   PROBLEMI.forEach((p, i) => console.log(`  ${i + 1}. [${p.classe}] ${p.msg}\n`));
   process.exit(1);
 }
-console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 15 classi — nessuna incoerenza interna`);
+console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 15 classi, su ${1 + (altri || []).length} pacchetti — nessuna incoerenza interna`);

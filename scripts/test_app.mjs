@@ -876,17 +876,35 @@ check("v264 il tasso effettivo si dichiara come tale e si riconcilia col target"
   const riga = buildPrompt().split(NL).find(l => l.indexOf("Tasso EFFETTIVO") >= 0);
   return !!riga && riga.indexOf("DENTRO il target") > 0`));
 
-check("v264 i campanelli sono un CONTEGGIO, non una probabilita' travestita", suVeri(`
+/* ══ v329 — "5/10 ACCESI" NON ERA UN CONTEGGIO, ERA UN PAVIMENTO ══════════════════════════
+   Solo QUATTRO delle dieci voci si calcolano da una fonte, e oggi sono tutte e quattro SPENTE;
+   le altre sei sono costanti di baseline, di cui cinque accese. Il numero pubblicato non poteva
+   scendere sotto cinque qualunque cosa facesse il mercato, e la riga lo chiamava "CONTEGGIO" —
+   cioe' dichiarava misura una cosa che per meta' e' un'assunzione. Il vecchio check pretendeva
+   proprio quella parola: chiedeva al sistema di continuare a dirlo.
+   ⚠ L'invariante nuovo e' piu' forte: la riga deve separare cio' che e' MISURATO da cio' che e'
+   ASSUNTO, e dove la pipeline non ha ancora marcato le voci deve DICHIARARE il limite invece di
+   presentare un conteggio. */
+check("v329 campanelli: la riga separa le voci misurate da quelle assunte", suVeri(`
   const NL = String.fromCharCode(10);
   const riga = buildPrompt().split(NL).find(l => l.indexOf("Signposts") >= 0);
   if (!riga) return true;
-  return riga.indexOf("CONTEGGIO") > 0 && riga.indexOf("rischio ribassista") < 0`));
+  const sp = DATA.macro.signposts || {};
+  if (sp.calcolabili != null) {
+    /* pipeline aggiornata: si pubblica il conteggio sulle CALCOLABILI e si nominano le costanti */
+    return riga.includes("su " + sp.calcolabili + " CALCOLABILI")
+        && riga.includes("COSTANTI di riferimento, non misure")
+        && riga.includes("non e' un conteggio");
+  }
+  /* pipeline non ancora aggiornata: il limite va DICHIARATO, non nascosto dietro la parola conteggio */
+  return riga.includes("NON e' un conteggio di misure")
+      && riga.includes("LIMITE SUPERIORE");`));
 
-check("v264 i campanelli accesi sono NOMINATI (cinque sul credito non sono cinque sparsi)", suVeri(`
+check("v329 campanelli: le voci accese restano NOMINATE", suVeri(`
   const NL = String.fromCharCode(10);
   const riga = buildPrompt().split(NL).find(l => l.indexOf("Signposts") >= 0);
   const attesi = ((DATA.macro.signposts || {}).items || []).filter(x => x && x.status === true).length;
-  return !riga || attesi === 0 || riga.indexOf("accesi:") > 0`));
+  return !riga || attesi === 0 || riga.indexOf("—") > 0`));
 
 /* ── ⚠ v265 — DUE CHIAVI UGUALI IN FORMA_INDICATORE: l'ultima vince IN SILENZIO ──
    Mi e' costato un giro due volte in due versioni (breadth in v262, froth in v265): scrivevo
@@ -1350,7 +1368,9 @@ check("v271 pacchetto titolo: porta i livelli che il sistema gia' conosce", run(
 check("v271 pacchetto titolo: dice cosa fare se il web diverge, invece di lasciar scegliere in silenzio", (() => {
   const i = src.indexOf("function datiNostriDelTitolo");
   const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
-  return /NON scegliere in silenzio/.test(corpo) && /riporta tutti e due/.test(corpo);
+  return corpo.includes("2%")                       // la soglia di materialita' e' dichiarata
+      && /entrambi i valori|tutti e due/.test(corpo)  // si scrivono tutti e due, non uno solo
+      && /silenzio/.test(corpo);                      // e la scelta silenziosa e' nominata come tale
 })());
 
 /* ⚠ per un titolo che la pipeline NON segue il blocco non deve esistere: inventare un
