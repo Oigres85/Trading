@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "330";
+const BUILD_VERSION = "331";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6811,6 +6811,14 @@ const DEFAULT_PROMPT_HEADER = `Sei un analista macro. Ricevi il quadro macro com
 
 [A] REGOLE SUI DATI
 A1 — PROVENIENZA E VERIFICA. Ogni numero che citi viene da questo payload, e lo scrivi come lo trovi. Quando un'affermazione poggia su un fatto ESTERNO al payload (una notizia, una dichiarazione di banca centrale, un dato uscito dopo lo snapshot), verificala online e marcala [VERIFICATO] con la fonte. Chiudi con un elenco "FONTI DA CONTROLLARE": una riga per ogni [VERIFICATO] su cui poggia una conclusione, col suo URL. Mai inventare valori: un dato che manca si dichiara "n.d.". Ignora prezzi e conclusioni di conversazioni precedenti — conta solo questo payload.
+
+A1bis — LA RICERCA NON E' FACOLTATIVA, ED E' LA PRIMA COSA CHE FAI. Questo pacchetto e' una FOTOGRAFIA: le statistiche ufficiali che contiene hanno da uno a centoquaranta giorni, e ogni riga dichiara la propria eta'. Prima di scrivere una sola conclusione, cerca online e riporta:
+  (a) le NOTIZIE MACRO DELLE ULTIME 24 ORE su Fed, inflazione, lavoro, credito e mercati;
+  (b) per OGNI dato del payload piu' vecchio di 30 giorni, se la fonte ne ha nel frattempo pubblicato uno piu' recente. Il payload ti dice quali sono e quando escono: quelle righe sono la tua lista della spesa, non un contorno;
+  (c) se un dato uscito DOPO lo snapshot ribalta una riga del pacchetto, dillo per primo e usa quello, dichiarando che stai sostituendo il valore del payload.
+Chiudi con l'elenco "FONTI DA CONTROLLARE": una riga per ogni [VERIFICATO] su cui poggia una conclusione, con URL, DATA DI PUBBLICAZIONE e un frammento TESTUALE del titolo. Le tre cose insieme: un URL da solo si costruisce a memoria dagli identificativi di serie che questo pacchetto contiene, una data e un titolo verbatim no.
+⚠ Gli ID delle serie (FRED, BLS, BEA) stampati nella coda NON sono una fonte consultata: sono il nome del dato. Ricostruirci sopra un indirizzo senza aver aperto la pagina e' esattamente cio' che questa regola vieta.
+⚠ Se NON puoi navigare, scrivilo in cima a lettere chiare — "NON HO ACCESSO ALLA RETE: quanto segue e' la lettura di uno snapshot del <data>, non del mercato di oggi" — e non produrre nessun URL. E' una risposta accettabile; un elenco di fonti mai aperte non lo e'.
 A2 — LA DATA DEL DATO E' PARTE DEL DATO. Ogni serie porta la propria rilevazione e il prossimo aggiornamento atteso. Un numero di 68 giorni non e' lo stato di oggi: se lo usi, dichiara quanto e' vecchio. Dove il payload dichiara un LIMITE (finestra comune assente, orizzonte del contratto superato) quel limite si riporta, non si aggira con una stima.
 A3 — I NUMERI GIA' CALCOLATI si usano come sono: percentili, ampiezze, mediane, distanze dalle soglie. Non rifarli.
 
@@ -6828,6 +6836,19 @@ function promptHeaderText() {
   const ov = localStorage.getItem("prompt_header");
   return (ov && ov.trim()) ? ov : DEFAULT_PROMPT_HEADER;
 }
+
+/* la PROVENIENZA della testata e' un FATTO, quindi sta legittimamente nella coda: senza, un
+   pacchetto partito col fallback e' indistinguibile da uno partito col file, e il CEO non puo'
+   sapere se l'LLM ha ricevuto l'ordine di cercare. */
+function provenienzaTestata() {
+  const ov = localStorage.getItem("prompt_header");
+  if (ov && ov.trim()) {
+    const q = localStorage.getItem("prompt_header_asof");
+    return `testata: ${PROMPT_HEADER_PATH}${q ? `, scaricata il ${q}` : ""}`;
+  }
+  return `testata: FALLBACK LOCALE (il file remoto non e' stato scaricato) — le regole sono `
+    + `quelle incluse in questa pagina, non quelle del repo`;
+}
 /* v141: savePromptHeader/pushPromptHeaderCloud rimosse con l'editor UI — la testata
    (Costituzione) si scrive via repo; il client la LEGGE soltanto (loadPromptHeaderCloud). */
 /* POST equivalente: sovrascrive config/prompt_header.txt via GitHub Contents API */
@@ -6837,6 +6858,8 @@ async function loadPromptHeaderCloud() {
     const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${PROMPT_HEADER_PATH}?t=${Date.now()}`, { cache: "no-store" });
     if (!r.ok) return;
     const txt = (await r.text()).trim();
+    /* la data dello scaricamento: e' cio' che la riga di provenienza pubblica */
+    try { localStorage.setItem("prompt_header_asof", new Date().toLocaleString("it-IT")); } catch { /* quota */ }
     if (txt && txt !== DEFAULT_PROMPT_HEADER.trim()) localStorage.setItem("prompt_header", txt);
     else localStorage.removeItem("prompt_header");   // server allineato al default -> nessun override
   } catch { /* offline: resta l'eventuale override locale */ }
@@ -7380,7 +7403,11 @@ function buildPrompt() {
   if (m.signposts) {
     /* ⚠ il campo e' `status`, non `active`: verificato sul file vero invece di indovinarlo —
        le chiavi vanno lette da data.json, non dedotte dal nome (lezione v207). */
-    const accesi = (m.signposts.items || []).filter(x => x && x.status === true)
+    const items = m.signposts.items || [];
+    const conMisura = items.some(x => x && x.calcolato);
+    /* i NOMI devono venire dalla stessa popolazione del CONTEGGIO: se si conta sulle
+       calcolabili, si nominano le calcolabili accese, non tutte. */
+    const accesi = items.filter(x => x && x.status === true && (!conMisura || x.calcolato))
       .map(x => x.name || x.label).filter(Boolean);
     /* ⚠⚠ v329 — "5/10 ACCESI" NON ERA UN CONTEGGIO, ERA UN PAVIMENTO. Solo quattro voci si
        calcolano da una fonte; le altre sei sono costanti di baseline, di cui cinque accese. Il
@@ -7461,6 +7488,8 @@ function buildPrompt() {
     const rl = rigaLeva(m);
     if (rl) lines.push(rl);
   }
+  /* v331 — quale testata sta viaggiando in QUESTO pacchetto */
+  if (typeof provenienzaTestata === "function") lines.push(`- PROVENIENZA DELLE REGOLE: ${provenienzaTestata()}.`);
   if (m.credit) {
     /* ⚠ v323 — il punteggio si RICALCOLA dalle bande dichiarate qui accanto: quello della
        pipeline usciva da un'ancora 2,5-11,5% inventata, e a 6,5% dava "favorevole" mentre la
@@ -8686,6 +8715,10 @@ function buildPromptPortafoglio() {
 `· Italiano, prosa densa, niente frasi di cortesia e niente riassunti di cio' che hai gia' detto.`,
 `· Ogni dato esterno va [VERIFICATO] con fonte e data. Chiudi con "NON VERIFICATO:" elencando`,
 `  cosa non sei riuscito a confermare.`,
+`⚠ SE NON PUOI NAVIGARE, scrivilo in cima a lettere chiare — "NON HO ACCESSO ALLA RETE: quanto`,
+`  segue e' la lettura di uno snapshot del ${oggi}, non del mercato di oggi" — e non produrre`,
+`  nessun URL. E' una risposta accettabile; un elenco di fonti mai aperte non lo e'. Gli ID delle`,
+`  serie stampati nella coda NON sono una fonte consultata: sono il nome del dato.`,
 `· Cerca le notizie delle ULTIME 48 ORE sui titoli piu' pesanti del libro: il pacchetto porta i`,
 `  titoli macro recenti ma non quelli societari.`,
 `· Niente domande in chiusura e niente offerte di approfondimento.`,
@@ -8907,6 +8940,10 @@ function buildPromptSettore(chiave) {
 `  quali altri conti esistano, ne' la situazione fiscale: senza quelli qualunque quantita' e' un`,
 `  numero che sembra un consiglio. Livelli di prezzo si', dimensionamenti e quantita' no.`,
 `· Chiudi con "NON VERIFICATO:" elencando cosa non sei riuscito a confermare.`,
+`⚠ SE NON PUOI NAVIGARE, scrivilo in cima a lettere chiare — "NON HO ACCESSO ALLA RETE: quanto`,
+`  segue e' la lettura di uno snapshot del ${oggi}, non del mercato di oggi" — e non produrre`,
+`  nessun URL. E' una risposta accettabile; un elenco di fonti mai aperte non lo e'. Gli ID delle`,
+`  serie stampati nella coda NON sono una fonte consultata: sono il nome del dato.`,
 ``,
 `──────────────────────────────────────────────────────────────────`,
   ].join("\n");
@@ -9416,6 +9453,10 @@ function datiNostriDelTitolo(tk) {
 `⚠ La riga "NON VERIFICATO:" in chiusura e' obbligatoria, e contiene le voci che non risultano`,
 `riuscito a trovare o confermare. Se le hai trovate tutte, scrivi "NON VERIFICATO: nessuna".`,
 `Un numero plausibile inventato e' peggio di un buco dichiarato: il buco lo vedo, l'invenzione no.`,
+`⚠ Gli ID delle serie e i nomi delle fonti stampati in coda NON sono fonti consultate: sono il`,
+`nome del dato. Ricostruirci sopra un indirizzo senza aver aperto la pagina e' un elenco di fonti`,
+`mai lette, che e' peggio di "non ho potuto verificare". Ogni [VERIFICATO] porta URL, DATA DI`,
+`PUBBLICAZIONE e un frammento TESTUALE del titolo: le tre cose insieme non si scrivono a memoria.`,
     ...L,
     ...tvBlocchi(tk),
   ].join("\n");

@@ -894,7 +894,7 @@ check("v329 campanelli: la riga separa le voci misurate da quelle assunte", suVe
     /* pipeline aggiornata: si pubblica il conteggio sulle CALCOLABILI e si nominano le costanti */
     return riga.includes("su " + sp.calcolabili + " CALCOLABILI")
         && riga.includes("COSTANTI di riferimento, non misure")
-        && riga.includes("non e' un conteggio");
+        && /non e' un conteggio/i.test(riga);
   }
   /* pipeline non ancora aggiornata: il limite va DICHIARATO, non nascosto dietro la parola conteggio */
   return riga.includes("NON e' un conteggio di misure")
@@ -3228,6 +3228,43 @@ check("v324 rotazione: la scheda larga conserva la chiave stabile del riordino",
   return corpo.includes("mg-larga") && corpo.includes("data-scheda")
       && readFileSync(join(ROOT, "assets", "style.css"), "utf8").includes(".mg-card.mg-larga");
 })());
+
+/* ══ v331 — L'OBBLIGO DI RICERCA VIVEVA SOLO NEL FILE REMOTO ═══════════════════════════════
+   Lo sciame ha risposto alla domanda del CEO ("i prompt fanno si che l'LLM trovi le news?") e la
+   risposta era NO, per tre ragioni indipendenti che ho verificato una per una:
+   1. A1bis — la regola che impone la ricerca — stava SOLO in config/prompt_header_macro.txt.
+      `promptHeaderText()` ripiega su DEFAULT_PROMPT_HEADER, che non la conteneva: i 1.348
+      caratteri di differenza fra fallback (2.891) e file (4.239) erano esattamente A1bis. Con
+      `loadPromptHeaderCloud` che esce in silenzio, un browser nuovo o una fetch lenta
+      producevano un pacchetto identico in tutto il resto e SENZA l'ordine di cercare.
+   2. Gli altri tre pacchetti affettano via la testata macro, quindi A1bis non li raggiungeva
+      MAI. Settore e portafoglio ordinavano di cercare senza prevedere la risposta onesta.
+   3. Un modello che non cerca produceva comunque una risposta conforme: la coda pubblica dieci
+      identificativi di serie FRED da cui si costruiscono URL veri senza aprire una pagina.
+   ⚠ Un obbligo che dipende da una fetch non gestita non e' un obbligo, e' una speranza. */
+check("v331 ricerca: la regola vive nel FALLBACK, non solo nel file remoto", (() => {
+  const m = src.match(/const DEFAULT_PROMPT_HEADER = `([\s\S]*?)`;/);
+  if (!m) return false;
+  const fb = m[1];
+  return fb.includes("A1bis") && fb.includes("NON HO ACCESSO ALLA RETE")
+      && /DATA DI PUBBLICAZIONE/.test(fb);
+})());
+
+check("v331 ricerca: tutti e quattro i pacchetti prevedono la risposta onesta di chi non ha rete", suVeri(`
+  settoreScelto = "SKYY";
+  const pacchetti = [buildCIOText(), buildPromptTicker("MU"), buildPromptSettore("SKYY"), buildPromptPortafoglio()];
+  /* senza il ramo offline il modello riceve l'ordine di citare fonti e nessun modo di dire che
+     non puo': e' la configurazione che produce URL a memoria */
+  return pacchetti.every(p => /NON HO ACCESSO ALLA RETE|non puoi navigare/i.test(p))
+      && pacchetti.every(p => /non sono (una )?font[ei] consultat[ae]|mai aperte/i.test(p))`));
+
+check("v331 ricerca: il pacchetto DICHIARA quale testata sta portando", suVeri(`
+  const p = buildPrompt();
+  const r = p.split(String.fromCharCode(10)).find(x => x.startsWith("- PROVENIENZA DELLE REGOLE"));
+  if (!r) return false;
+  /* o nomina il file remoto, o dichiara di essere partito col fallback: la terza possibilita' —
+     non dirlo — e' quella che rendeva invisibile il fallimento */
+  return /FALLBACK LOCALE/.test(r) || /prompt_header/.test(r);`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
