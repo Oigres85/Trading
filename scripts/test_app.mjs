@@ -3577,6 +3577,30 @@ check("v338 sopravvivono l'overnight e i bottoni degli indici, che il CEO non ha
       && pagina.includes('id="tv-idx"');
 })());
 
+/* ⚠ v339 — IL COLORE E' INFORMAZIONE, ANCHE QUANDO DICE "NEUTRO". Il CEO: "Attese sui tassi
+   (prossimo FOMC) la percentuale di neutro non si evidenzia". Il segmento "fermo" era dipinto
+   con var(--muted), cioe' lo STESSO colore delle etichette dell'asse: il numero c'era ma il
+   blocco si leggeva come scocca, non come dato — e "fermo" e' l'esito DOMINANTE quasi sempre.
+   Il check guarda una proprieta' verificabile nel sorgente: i tre esiti hanno tre colori
+   distinti, e nessuno dei tre e' il colore del testo secondario. */
+check("v339 FOMC: i tre esiti hanno colori distinti e nessuno e' quello dell'interfaccia", (() => {
+  const i = src.indexOf('const seg = [["taglio"');
+  if (i < 0) return false;
+  const riga = src.slice(i, src.indexOf(String.fromCharCode(10), i));
+  const col = [...riga.matchAll(/var\(--([a-z]+)\)/g)].map(m => m[1]);
+  return col.length === 3
+      && new Set(col).size === 3          // tre esiti, tre colori
+      && col.indexOf("muted") < 0;        // nessuno e' il grigio del testo secondario
+})());
+
+/* ⚠ e una probabilita' piccola ma NON nulla non deve sparire perche' il segmento e' stretto:
+   e' informazione mancante travestita da informazione presente, la classe C14 gia' pagata. */
+check("v339 FOMC: sotto la soglia la percentuale esce di lato invece di sparire", (() => {
+  const i = src.indexOf('const seg = [["taglio"');
+  const blocco = src.slice(i, i + 1800);
+  return blocco.includes("text-anchor=\"start\"") && blocco.includes("v[1] > 0");
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

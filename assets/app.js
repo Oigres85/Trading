@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "338";
+const BUILD_VERSION = "339";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4052,12 +4052,21 @@ const FORMA_INDICATORE = {
       const y = 12 + i * RH;
       const tot = Math.max(1, x.taglio + x.fermo + x.rialzo);
       let px = L;
-      const seg = [["taglio", x.taglio, "var(--green)"], ["fermo", x.fermo, "var(--muted)"], ["rialzo", x.rialzo, "var(--red)"]]
+      const seg = [["taglio", x.taglio, "var(--green)"], ["fermo", x.fermo, "var(--blue)"], ["rialzo", x.rialzo, "var(--red)"]]
         .map(v => {
           const w = v[1] / tot * (R - L);
           const el = `<g><title>${x.d}: ${v[0]} ${v[1]}%</title>`
             + `<rect x="${px.toFixed(1)}" y="${y}" width="${Math.max(w, 0).toFixed(1)}" height="14" fill="${v[2]}" fill-opacity=".85"/>`
-            + (w > 26 ? `<text x="${(px + w / 2).toFixed(1)}" y="${y + 11}" font-size="9.5" text-anchor="middle" font-family="var(--mono)" fill="var(--bg)">${v[1]}%</text>` : "")
+            /* ⚠ v339 — sotto i 26px il numero non ci sta DENTRO il segmento, e prima veniva
+               semplicemente buttato: una probabilita' piccola ma non nulla spariva dalla riga,
+               che e' informazione mancante travestita da informazione presente (classe C14).
+               Ora esce di lato, col colore del proprio segmento. A zero non si stampa niente,
+               perche' li' il segmento non esiste e un "0%" sospeso non appartiene a nessuno. */
+            + (w > 26
+                ? `<text x="${(px + w / 2).toFixed(1)}" y="${y + 11}" font-size="9.5" text-anchor="middle" font-family="var(--mono)" fill="var(--bg)" font-weight="600">${v[1]}%</text>`
+                : v[1] > 0
+                  ? `<text x="${(px + w + 3).toFixed(1)}" y="${y + 11}" font-size="9" text-anchor="start" font-family="var(--mono)" fill="${v[2]}">${v[1]}%</text>`
+                  : "")
             + `</g>`;
           px += w; return el;
         }).join("");
@@ -4068,7 +4077,7 @@ const FORMA_INDICATORE = {
       g: `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
         aria-label="probabilita di taglio, tasso fermo o rialzo per ogni riunione della Fed">
         <text x="${L}" y="7" font-size="8.5" fill="var(--green)">taglio</text>
-        <text x="${(L + R) / 2}" y="7" font-size="8.5" text-anchor="middle" fill="var(--muted)">fermo</text>
+        <text x="${(L + R) / 2}" y="7" font-size="8.5" text-anchor="middle" fill="var(--blue)">fermo</text>
         <text x="${R}" y="7" font-size="8.5" text-anchor="end" fill="var(--red)">rialzo</text>
         ${righe}</svg>`,
       score: punteggioDaZone(pr ? pr.rialzo : 50, [
