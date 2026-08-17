@@ -3327,6 +3327,49 @@ check("v333 liquidita': porta la data della RILEVAZIONE, non quella del payload"
   return f.n.includes(p[2] + "/" + p[1] + "/" + p[0]) && f.n.includes("MENSILE")
       && !f.n.includes("percentile a 5 anni e'");`));   // il percentile saturo non si pubblica piu'
 
+/* ══ v334 — LA TRATTEGGIATA NON SEGUIVA LA VIOLA, E NON ERA UN DIFETTO DI DISEGNO ══════════
+   Il CEO l'ha visto: le due linee di "Borsa vs economia reale" finivano in punti diversi. La
+   causa: il Nasdaq e' MENSILE e arriva a oggi, i profitti aziendali sono TRIMESTRALI e la fonte
+   li pubblica con mesi di ritardo — 60 punti fino al 2026-08 contro 20 fermi al 2026-01. La
+   tratteggiata si fermava prima perche' il DATO finisce prima, e il grafico sembrava rotto.
+   ⚠ E' la lezione v207 in una forma nuova: li' due serie non avevano giorni in comune, qui ne
+   hanno ma una finisce prima — e l'ultimo tratto, quello che si guarda per primo, confrontava
+   una linea viva con una ferma. */
+check("v334 borsa vs economia: le due linee coprono la stessa finestra", suVeri(`
+  for (const k of ["corp_profit", "decouple"]) {
+    const se = serieIndicatore(k);
+    if (!se || !se.doppia) continue;
+    const [a, b] = se.doppia;
+    if (!a.punti.length || !b.punti.length) return false;
+    /* devono FINIRE insieme: e' l'ultimo tratto quello che si guarda */
+    if (a.punti[a.punti.length - 1].d !== b.punti[b.punti.length - 1].d) return false;
+    if (!se.finestra || !se.finestra.inizio || !se.finestra.fine) return false;
+  }
+  return true`));
+
+check("v334 valutazione: trailing e forward hanno ciascuno il proprio riferimento", suVeri(`
+  const f = FORMA_INDICATORE["sp500_pe"](DATA.macro || {});
+  if (!f) return true;
+  let nudo = f.n.split("<").map((p, i) => i ? p.slice(p.indexOf(">") + 1) : p).join("")
+    .split(String.fromCharCode(10)).join(" ").toLowerCase();
+  while (nudo.indexOf("  ") >= 0) nudo = nudo.split("  ").join(" ");
+  /* la trappola da impedire: leggere la differenza fra i due come un tasso di crescita */
+  return nudo.includes("metodologie diverse") && nudo.includes("non e' un tasso di crescita")
+      && nudo.includes("proprio riferimento")`));
+
+/* ⚠ le probabilita' per riunione della BoJ NON esistono in forma gratuita affidabile: il CEO
+   aveva posto la condizione "solo se trovi fonte attendibile", e la risposta e' che non c'e'.
+   Il pacchetto lo DICHIARA invece di stimarle — un numero stimato qui sarebbe indistinguibile
+   da uno di mercato. */
+check("v334 carry: dichiara che le probabilita' BoJ non ci sono, invece di stimarle", suVeri(`
+  const f = FORMA_INDICATORE["carry"](DATA.macro || {});
+  if (!f) return true;
+  let nudo = f.n.split("<").map((p, i) => i ? p.slice(p.indexOf(">") + 1) : p).join("")
+    .split(String.fromCharCode(10)).join(" ").toLowerCase();
+  while (nudo.indexOf("  ") >= 0) nudo = nudo.split("  ").join(" ");
+  return nudo.includes("non esiste una fonte gratuita affidabile")
+      && nudo.includes("stimarle sarebbe inventarle")`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

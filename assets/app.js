@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "333";
+const BUILD_VERSION = "334";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3209,6 +3209,10 @@ function indicatoriClassifica() {
     { p: "sp500_pe", s: "forward_pe", nome: "Valutazione S&P (trailing e forward)",
       sub: (a2, b2) => `${a2.sub} · forward ${b2.sub}` },
     { p: "corp_profit", s: "decouple", nome: "Borsa vs economia reale",
+      /* ⚠ v334 — il CEO: "non ne capisco il significato di entrambi". Le due linee sono la
+         BORSA e l'ECONOMIA, entrambe partite da 100 nello stesso mese: quanto si allargano e'
+         quanto la borsa e' salita piu' di cio' che la sostiene. Lo dice la riga, invece di
+         lasciarlo dedurre da due gap in punti percentuali. */
       sub: (a2, b2) => `${a2.sub} · e contro il PIL: ${b2.sub} — NON due prove, la stessa su due denominatori` },
     { p: "in:unemp", s: "in:nfp", nome: "Mercato del lavoro",
       sub: (a2, b2) => `disoccupazione ${a2.sub.split(" ")[0]} · nuovi posti ${b2.sub.split(" ")[0]}` },
@@ -4261,14 +4265,36 @@ const FORMA_INDICATORE = {
   },
 
   carry: (m) => {
+    /* ⚠ v334 — il CEO: "aumenta dimensione di questa sezione affinche' sia tutto bene leggibile
+       ma non deve essere il doppio". Il tachimetro sul punteggio 0-100 nascondeva i tre numeri
+       che contano davvero: i due rendimenti e il cambio. Ora si vedono, e il punteggio resta
+       accanto al titolo dove sta per tutte le altre schede.
+       ⚠ Le probabilita' per riunione della Banca del Giappone NON ci sono, e non le invento:
+       l'equivalente gratuito di CME FedWatch per la BoJ non esiste — quelle curve si ricavano
+       dagli OIS, che sono a pagamento. Il CEO aveva posto la condizione "solo se trovi fonte
+       attendibile", e la risposta e' che non c'e'. */
     const c = m.carry; if (!c || c.spread == null) return null;
-    const p = punteggioDi("carry");
-    return { g: tachimetro(p, { aria: "carry USA-Giappone", zone: ZONE_PUNTEGGIO,
-        fonte: "bande di lettura convenzionali sul punteggio 0-100 del sistema" })
-        /* ⚠ la nota va PASSATA al filtro di ridondanza (v237), o le righe del pannello
-           ripetono gli stessi numeri che scrivo due righe sotto — il difetto gia' corretto. */
-        + contenutoDalPannello("carry", `${c.spread} ${c.usdjpy} ${c.usdjpy_chg_1m} ${c.boj_rate} ${c.us10} ${c.jp10}`),
-      n: `Spread 10A USA−Giappone ${fmtNum.format(c.spread)} pp · USD/JPY ${fmtNum.format(c.usdjpy)} (${signTxt(c.usdjpy_chg_1m)} in un mese) · tasso BoJ ${c.boj_rate}%. <b>Come si legge:</b> più lo spread è ampio e più lo yen è debole, più conviene finanziarsi in yen per comprare asset in dollari — è il carry trade che ha alimentato il tech. Lo spread in compressione o uno yen che si rafforza forzano la chiusura di quelle posizioni, e le vendite partono dai titoli più affollati.` };
+    const voci = [
+      { nome: "Treasury 10A", val: Number(c.us10), testo: `${fmtNum.format(c.us10)}%`, colore: "var(--blue)" },
+      { nome: "JGB 10A", val: Number(c.jp10), testo: `${fmtNum.format(c.jp10)}%`, colore: "var(--purple)" },
+    ].filter(x => Number.isFinite(x.val));
+    const prossima = (c.boj_meetings || [])[0];
+    return {
+      g: voci.length >= 2 ? dueBarre(voci, { soloPositivi: true, minScala: 5,
+            aria: "rendimento a dieci anni negli Stati Uniti e in Giappone" }) : "",
+      score: punteggioDi("carry"),
+      larga: false,
+      n: `Differenziale <b>${fmtNum.format(c.spread)} pp</b> · USD/JPY <b>${fmtNum.format(c.usdjpy)}</b>`
+        + (c.usdjpy_chg_1m != null ? ` (${signTxt(c.usdjpy_chg_1m)} in un mese)` : "")
+        + (c.boj_rate != null ? ` · tasso BoJ ${fmtNum.format(c.boj_rate)}%${c.boj_rate_date ? ` <span class="muted">(rilevazione ${esc(c.boj_rate_date)})</span>` : ""}` : "")
+        + (prossima ? ` · prossima riunione BoJ ${esc(prossima)}` : "") + `.`
+        + `<br><b>Come si legge:</b> finche' rendersi in dollari rende molto piu' che in yen, il denaro
+        prende a prestito in yen e compra attivi americani. Il differenziale e' il guadagno di quel
+        giro; il cambio e' il rischio. Quando lo yen si rafforza in fretta, quel giro si chiude di
+        colpo e la vendita arriva sugli attivi comprati con quei soldi — Nasdaq compreso.
+        ⚠ Le probabilita' per riunione della BoJ non sono qui: non esiste una fonte gratuita
+        affidabile che le pubblichi, e stimarle sarebbe inventarle.`,
+    };
   },
   "mk:EURJPY=X": (m) => {
     const q = (m.markets || []).find(x => x.key === "EURJPY=X"); if (!q) return null;
@@ -4456,21 +4482,36 @@ const FORMA_INDICATORE = {
      in un oggetto non danno errore, l'ultima sovrascrive la prima in silenzio — e per un giro
      ho creduto che la mia versione non funzionasse. */
   sp500_pe: (m) => {
-    const p2 = m.sp500_pe, f = m.forward_pe; if (!p2 || p2.current == null) return null;
-    return { g: scala(p2.current, { min: 10, max: 40, unita: "×", aria: "P/E S&P 500",
-        zone: [{ da: 10, a: 18, nome: "valutazione contenuta", colore: "var(--green)" },
-               /* ⚠ v240 — si chiamava "sopra la media storica": anche il NOME di una zona e'
-                  un'affermazione, e quella media nel file non c'e' (sp500_pe.avg_10y e' null).
-                  Il nome ora descrive il livello senza rivendicare un confronto che non ho. */
-               { da: 18, a: 25, nome: "valutazione piena", colore: "var(--yellow)" },
-               { da: 25, a: 40, nome: "valutazione tesa", colore: "var(--red)" }],
-        /* ⚠ v240 — la tacca "media storica 16,5" era la media del FORWARD (forward_pe.avg_hist)
-           disegnata su una scala del TRAILING: due metodologie diverse confrontate come se
-           fossero la stessa, che e' proprio cio' che il payload avverte di non fare. E
-           sp500_pe.avg_10y nel file e' null, quindi una media storica del trailing NON esiste:
-           non si disegna. Il forward e il suo riferimento restano scritti nella nota. */
-        fonte: "bande di sola lettura: nel file non c'e' una media storica del P/E trailing" }),
-      n: `Trailing ${fmtNum.format(p2.current)}×${p2.nasdaq_pe ? ` · Nasdaq 100 ${fmtNum.format(p2.nasdaq_pe)}×` : ""}${f && f.value != null ? ` · forward ${fmtNum.format(f.value)}×` : ""}. <b>Come si legge:</b> il trailing guarda gli utili già fatti, il forward quelli attesi — e la differenza fra i due dice quanta crescita il mercato sta già prezzando. Un multiplo alto non è di per sé un segnale di vendita: diventa fragile quando i tassi salgono, perché è proprio il multiplo a comprimersi per primo.` };
+    /* ⚠ v334 — il CEO: "deve essere strutturato meglio perche' cosi' non e' intuitivo". Il
+       problema era che due multipli DIVERSI stavano su una scala sola: il trailing guarda gli
+       utili gia' fatti, il forward quelli attesi, e sono metodologie diverse — affiancarli su
+       un asse unico invita a sottrarli, che e' esattamente cio' che non si deve fare.
+       Ora sono due barre con i LORO riferimenti accanto, e la distanza dal proprio riferimento
+       e' la cosa che si legge — non il confronto fra i due. */
+    const p2 = m.sp500_pe, f = m.forward_pe;
+    if (!p2 || p2.current == null) return null;
+    const voci = [{ nome: "Trailing", val: Number(p2.current), testo: `${fmtNum.format(p2.current)}×`,
+                    colore: p2.current > 25 ? "var(--red)" : p2.current > 18 ? "var(--yellow)" : "var(--green)" }];
+    if (f && f.value != null) voci.push({ nome: "Forward", val: Number(f.value), testo: `${fmtNum.format(f.value)}×`,
+                    colore: f.value > 22 ? "var(--red)" : f.value > 17 ? "var(--yellow)" : "var(--green)" });
+    const rifF = f && f.avg_hist != null ? Number(f.avg_hist) : null;
+    return {
+      g: voci.length >= 2
+        ? dueBarre(voci, { soloPositivi: true, minScala: 34, soglia: rifF,
+                           soglieTesto: rifF != null ? `media forward ${fmtNum.format(rifF)}×` : "",
+                           aria: "P/E trailing e forward dell'S&P 500" })
+        : scala(p2.current, { min: 10, max: 40, unita: "×", aria: "P/E S&P 500", zone: ZONE_PE,
+                              fonte: "bande di lettura sul multiplo, non una media storica calcolata" }),
+      score: punteggioDaZone(Number(p2.current), ZONE_PE),
+      n: `<b>${fmtNum.format(p2.current)}×</b> sugli utili GIA' REALIZZATI`
+        + (f && f.value != null ? ` · <b>${fmtNum.format(f.value)}×</b> su quelli ATTESI a dodici mesi` : "")
+        + (rifF != null ? ` <span class="muted">(media storica del forward ${fmtNum.format(rifF)}×)</span>` : "") + `.`
+        + `<br><b>Come si legge:</b> sono due misure con metodologie DIVERSE — una guarda indietro,
+        l'altra guarda le stime degli analisti — e la loro differenza NON e' un tasso di crescita:
+        e' anche l'effetto di come i due indici trattano voci straordinarie e societa' in perdita.
+        Ognuna va confrontata col PROPRIO riferimento, non con l'altra. Un trailing alto con un
+        forward molto piu' basso dice che il mercato sta pagando utili che devono ancora arrivare.`,
+    };
   },
   "in:unemp": (m) => {
     const u = (m.indicators || []).find(x => x.key === "unemp"); if (!u) return null;
@@ -4924,18 +4965,40 @@ function serieIndicatore(k) {
       return (m.fed_market?.fedfunds || []).length > 2
         ? { punti: m.fed_market.fedfunds, soglie: [{ v: 4, testo: "comprime i multipli", colore: "var(--yellow)" }], unita: "%" } : null;
     case "decouple": {
+      /* stessa cura del caso qui sopra: la finestra e' quella COMUNE, e si dichiara. */
       const dc = m.decouple || {};
-      return (dc.sp500 || []).length > 2 && (dc.gdp || []).length > 2
-        ? { doppia: [{ nome: "S&P 500", punti: dc.sp500, colore: "var(--blue)" },
-                     { nome: "PIL reale", punti: dc.gdp, colore: "var(--muted)", tratteggio: true }],
-            soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }] } : null;
+      const a2 = dc.sp500 || [], b2 = dc.gdp || [];
+      if (a2.length < 3 || b2.length < 3) return null;
+      const fine = [a2[a2.length - 1].d, b2[b2.length - 1].d].sort()[0];
+      const inizio = [a2[0].d, b2[0].d].sort()[1];
+      const taglia = (arr) => arr.filter(x => x && x.d >= inizio && x.d <= fine);
+      const A = taglia(a2), B = taglia(b2);
+      if (A.length < 3 || B.length < 3) return null;
+      return { doppia: [{ nome: "S&P 500", punti: A, colore: "var(--blue)" },
+                        { nome: "PIL reale", punti: B, colore: "var(--muted)", tratteggio: true }],
+               soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }],
+               finestra: { inizio, fine } };
     }
     case "corp_profit": {
+      /* ⚠⚠ v334 — il CEO: "la linea tratteggiata non segue quella viola". Non era un difetto di
+         disegno: le due serie FINISCONO IN DATE DIVERSE. Il Nasdaq e' mensile e arriva a oggi
+         (60 punti, fino al 2026-08); i profitti aziendali sono TRIMESTRALI e la fonte li
+         pubblica con mesi di ritardo (20 punti, fermi al 2026-01). La tratteggiata si fermava
+         prima perche' il dato finisce prima, e sembrava che il grafico fosse rotto.
+         Ora si disegna la FINESTRA COMUNE e la si dichiara: due linee che finiscono in momenti
+         diversi non sono confrontabili sull'ultimo tratto, ed e' la lezione v207. */
       const cp = m.corp_profit || {};
-      return (cp.ndx || []).length > 2 && (cp.profits || []).length > 2
-        ? { doppia: [{ nome: "Nasdaq 100", punti: cp.ndx, colore: "var(--purple)" },
-                     { nome: "Profitti reali", punti: cp.profits, colore: "var(--muted)", tratteggio: true }],
-            soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }] } : null;
+      const a2 = cp.ndx || [], b2 = cp.profits || [];
+      if (a2.length < 3 || b2.length < 3) return null;
+      const fine = [a2[a2.length - 1].d, b2[b2.length - 1].d].sort()[0];
+      const inizio = [a2[0].d, b2[0].d].sort()[1];
+      const taglia = (arr) => arr.filter(x => x && x.d >= inizio && x.d <= fine);
+      const A = taglia(a2), B = taglia(b2);
+      if (A.length < 3 || B.length < 3) return null;
+      return { doppia: [{ nome: "Nasdaq 100", punti: A, colore: "var(--purple)" },
+                        { nome: "Profitti reali", punti: B, colore: "var(--muted)", tratteggio: true }],
+               soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }],
+               finestra: { inizio, fine } };
     }
     default: {
       /* ═══ v292 — LA TRAIETTORIA DEGLI INDICATORI MACRO ══════════════════════════════════
@@ -6671,6 +6734,19 @@ function openMacroInfo(key) {
       </div>`;
   } else if (key === "corp_profit" && m.corp_profit) {
     const cp = m.corp_profit;
+    /* ⚠ v334 — la spiegazione che mancava, in cima e in parole: due linee, stessa partenza. */
+    const se = (typeof serieIndicatore === "function") ? serieIndicatore("corp_profit") : null;
+    const fin = se && se.finestra
+      ? `<div class="info-line muted" style="font-size:11px">Le due linee coprono la FINESTRA COMUNE `
+        + `${se.finestra.inizio} → ${se.finestra.fine}: i profitti aziendali sono TRIMESTRALI e la fonte `
+        + `li pubblica con mesi di ritardo, quindi la serie finisce prima di quella di borsa. `
+        + `Disegnarle fino a date diverse farebbe sembrare che una delle due si sia fermata.</div>`
+      : "";
+    extra = `<div class="info-line"><b>Come si leggono le due linee:</b> partono ENTRAMBE da 100 nello
+        stesso mese. Quella colorata e' la BORSA, la tratteggiata e' cio' che la sostiene — i profitti
+        aziendali reali (o il PIL reale nell'altra coppia). Se si allargano, la borsa e' salita piu' di
+        quello che le sta sotto: e' un fatto di VALUTAZIONE, non un segnale di uscita, perche' quel
+        divario puo' restare aperto per anni.</div>${fin}` + extra;
     const gapCol = cp.gap > 40 ? "var(--red)" : cp.gap > 20 ? "var(--yellow)" : "var(--green)";
     const ndxGapCol = cp.ndx_gap != null ? (cp.ndx_gap > 40 ? "var(--red)" : cp.ndx_gap > 20 ? "var(--yellow)" : "var(--green)") : "var(--muted)";
     extra = `<div class="info-line"><b>Gap S&amp;P 500 vs Profitti Reali:</b> <span style="color:${gapCol}">${cp.gap > 0 ? "+" : ""}${cp.gap} pp — ${cp.label}</span></div>
