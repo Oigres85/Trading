@@ -1187,9 +1187,9 @@ check("v317 analisi tecnica: porta le trappole, non solo i numeri", (() => {
   const i = src.indexOf("v317 — DALLA LEGENDA GENERICA");
   const leg = src.slice(i, src.indexOf("tv-piede", i));
   return leg.includes("Non e' un segnale di vendita")
-      && leg.includes("confronto con la media")
-      && leg.includes("le medie danno falsi segnali")
-      && leg.includes("il prezzo fa un nuovo massimo e l'RSI no");
+      && leg.includes("il prezzo fa un nuovo massimo e l'RSI no")
+      /* e i VALORI devono restare tutti, anche dove la prosa e' stata tolta */
+      && leg.includes("vol_ratio") && leg.includes("o.adx14");
 })());
 
 /* ⚠ v266 — chi disegna al montaggio deve ridisegnare all'arrivo dei dati: il montaggio precede

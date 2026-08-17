@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "329";
+const BUILD_VERSION = "330";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3192,6 +3192,7 @@ function indicatoriClassifica() {
   /* ⚠ v313 — "Prossima scadenza tecnica" (witching) fuori su richiesta del CEO. Resta nel
      PACCHETTO, dove una scadenza tecnica in arrivo e' un fatto che spiega volumi anomali. */
   const FUORI = new Set(["witching", "seasonality", "mk:EURUSD=X", "in:umich",
+                         "dollar", "in:gdp", "in:retail",   // v330 — fuori dalla pagina, restano nel pacchetto
                          "mat:petrolio", "mat:rame", "mat:oro",
                          "mk:EURJPY=X", "in:t30", "mk:^TNX", "in:curve3m",
                          "thermometer", "futures", "risk_sentiment", "smart_money",   // v303: stagionalità rientra
@@ -3819,12 +3820,12 @@ const FORMA_INDICATORE = {
         + `<div class="stag-blocco">${prossimi.map(x =>
             `<div class="stag-riga"><b>${NOMI[x.mese - 1]}</b>: <b class="${x.e >= 0 ? "pos" : "neg"}">${signTxt(x.e)}</b> `
             + `rispetto al mese medio <span class="muted">(in assoluto ${signTxt(x.media)})</span></div>`).join("")}</div>`
-        + `⚠ <b>Perché al netto della deriva:</b> il Nasdaq sale in media di <b>${signTxt(Math.round(deriva * 100) / 100)} al mese</b> `
-        + `sui ${st.dal}–${st.al}. Sommando quella deriva a ogni mese, undici mesi su dodici risultano positivi `
-        + `e il grafico non distingue più niente: quella è la salita dell'indice, non una proprietà del calendario. `
-        + `Tolta la deriva, i mesi sotto la media diventano <b>${negativi} su ${ecc.length}</b>.`
-        + `<br><b>Come si legge:</b> serve a sapere se un movimento è ordinario per il periodo, non a prevederlo. `
-        + `Su ${(st.mesi[0] || {}).campione || 40} osservazioni per mese la dispersione resta ampia: la media sta fra esiti opposti.`,
+        + `<b>Come si legge:</b> il Nasdaq sale in media di ${signTxt(Math.round(deriva * 100) / 100)} al mese `
+        + `sui ${st.dal}–${st.al}, e quella deriva è la salita dell'indice, non una proprietà del calendario: `
+        + `sommandola a ogni mese undici mesi su dodici risulterebbero positivi e il grafico non distinguerebbe `
+        + `più niente. Tolta la deriva i mesi sotto la media sono ${negativi} su ${ecc.length}. `
+        + `Serve a sapere se un movimento è ordinario per il periodo, non a prevederlo: su `
+        + `${(st.mesi[0] || {}).campione || 40} osservazioni per mese la media sta fra esiti opposti.`,
     };
   },
 
@@ -4465,7 +4466,8 @@ function notaConDettaglio(nota, cadenza) {
   const sopra = testo.slice(0, i).trim();
   const sotto = testo.slice(i).trim();
   return sopra
-    + `<details class="mg-piu"><summary>Come si legge</summary><div>${sotto.replace(/^(<b>)?Come si legge:?(<\/b>)?\s*/i, "")}</div></details>`
+    + `<details class="mg-guida"><summary title="come si legge questo dato" aria-label="come si legge questo dato">?</summary>`
+    + `<div class="mg-guida-box">${sotto.replace(/^(<b>)?Come si legge:?(<\/b>)?\s*/i, "")}</div></details>`
     + cad;
 }
 
@@ -4868,9 +4870,15 @@ function serieIndicatore(k) {
              questo progetto ne ha gia' tolte una volta (v240). */
           const CONFINE = { curve: "inversione", curve3m: "inversione", nfp: "posti persi",
                             retail: "vendite in calo", gdp: "contrazione" };
+          /* il 2% e' il target DICHIARATO della Federal Reserve, non una convenzione nostra:
+             e' l'unico riferimento rispetto al quale un'inflazione a/a si legge. */
+          const TARGET_FED = { cpi: true, pce: true };
+          const soglie = TARGET_FED[chiave]
+            ? [{ v: 2, testo: "target Fed", colore: "var(--green)" }]
+            : (CONFINE[chiave] ? [{ v: 0, testo: CONFINE[chiave], colore: "var(--red)" }] : []);
           return { punti: st,
                    unita: (chiave in UNITA) ? UNITA[chiave] : "%",
-                   soglie: CONFINE[chiave] ? [{ v: 0, testo: CONFINE[chiave], colore: "var(--red)" }] : [],
+                   soglie,
                    fonteSerie: ind.storico_serie || "" };
         }
       }
@@ -8427,18 +8435,16 @@ function montaGraficoTV(tk, intervallo) {
         (12 e 26 sedute) e la sua media a 9. L'istogramma e' quanto la prima sta sopra la seconda:
         ${o.macd.istogramma >= 0 ? "positivo, cioe' la spinta breve e' sopra quella media" : "negativo, cioe' la spinta breve e' sotto quella media"}.
         Il valore assoluto conta poco; conta il <b>verso in cui si sta muovendo</b>.</span></div>` : ""}
-      ${o.adx14 != null ? `<div><b>ADX — ${rgV(o.adx14, 1)}</b><span>Misura la <b>forza</b> del trend, non la sua direzione.
-        ${o.adx14 < 20 ? `A ${rgV(o.adx14, 1)} il trend e' <b>debole</b>: in questa condizione le medie danno falsi segnali, perche' il prezzo le attraversa in continuazione senza andare da nessuna parte.` : `A ${rgV(o.adx14, 1)} il trend ha forza: le medie e i livelli funzionano meglio che in fase laterale.`}
+      ${o.adx14 != null ? `<div><b>ADX — ${rgV(o.adx14, 1)}</b><span>${o.adx14 < 20 ? `A ${rgV(o.adx14, 1)} il trend e' <b>debole</b>: in questa condizione le medie danno falsi segnali, perche' il prezzo le attraversa in continuazione senza andare da nessuna parte.` : `A ${rgV(o.adx14, 1)} il trend ha forza: le medie e i livelli funzionano meglio che in fase laterale.`}
         ${o.di_su != null ? `DI+ ${rgV(o.di_su, 1)} contro DI- ${rgV(o.di_giu, 1)}: e' li' che sta la direzione.` : ""}</span></div>` : ""}
       <div><b>Volume${Number.isFinite(vr) ? ` — ${rgV(vr, 2)}× la media` : ""}</b><span>
-        Le barre in basso: quante azioni sono passate di mano. Il numero da solo non dice niente, conta il
-        <b>confronto con la media</b>.
+
         ${Number.isFinite(vr) ? (vr >= 1.5
           ? `Oggi il volume e' <b>${rgV(vr, 2)} volte</b> la media a 30 sedute: quello che e' successo oggi lo hanno fatto in molti.`
           : vr <= 0.7
             ? `Oggi il volume e' <b>${rgV(vr, 2)} volte</b> la media a 30 sedute: il movimento di oggi lo hanno fatto in pochi, e regge meno.`
             : `Oggi il volume e' <b>${rgV(vr, 2)} volte</b> la media a 30 sedute, cioe' ordinario.`) : ""}
-        Il caso da conoscere: prezzo che sale mentre le barre si accorciano seduta dopo seduta = la spinta si sta esaurendo.</span></div>
+</span></div>
       ${(() => {
         /* ⚠ v322 — I RITRACCIAMENTI DI FIBONACCI: il CEO li ha chiesti sul grafico. Il sistema
            li calcola GIA' per il pacchetto (v293) sul range a 52 settimane, con aritmetica
