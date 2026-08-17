@@ -2323,4 +2323,10 @@ svg.g-serie { cursor: crosshair; }
 .tvo-testa { font-size: 12.5px; margin: 10px 0 6px; padding-top: 10px; border-top: 1px solid var(--border); }
 
 /* v336 — la riga del PDF sotto il testo del pacchetto. */
-.prompt-pdf { margin-top: 8px; font-size: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+/* v337 — il portafoglio si contrae: il CEO lo legge da TradingView e la sezione gli serve
+   solo per modificarlo prima di generare un pacchetto. Il triangolo e' un bottone vero, non
+   un <details>: la testata contiene gia' ✎ Modifica, e un <summary> se lo sarebbe mangiato. */
+.pf-toggle { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 15px;
+  line-height: 1; padding: 2px 6px; border-radius: 6px; transition: transform .15s ease, color .15s ease; }
+.pf-toggle:hover { color: var(--fg); background: var(--hover); }
+.pf-toggle[aria-expanded="true"] { transform: rotate(90deg); }

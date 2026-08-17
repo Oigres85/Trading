@@ -1041,18 +1041,33 @@ check("v256 pacchetto macro: NESSUNA traccia di portafoglio, posizioni o watchli
   const dati = t.slice(t.indexOf(header) + header.length);   // la testata parla di se stessa
   return !/PORTAFOGLIO —|SITUAZIONE PATRIMONIALE|WATCHLIST —|MATRICE DI RISCHIO|DIARIO DELLE AZIONI|ULTIME NEWS/.test(dati)`));
 
-check("v256 pacchetto macro: il blocco del disaccordo c'è ed è SUBITO dopo la testata", suVeri(`
-  const t = buildCIOText();
-  const i = t.indexOf("DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO");
-  return i > 0 && i < t.length * 0.45`));
+/* ⚠⚠ v337 — QUESTI DUE CHECK HANNO CAMBIATO INVARIANTE, non sono stati tolti.
+   Fino alla v336 sorvegliavano che il blocco "DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO"
+   FOSSE nel pacchetto. Il CEO l'ha tolto insieme alla scala 0-100 su cui era costruito
+   ("Via da tutto, schede e prompt"), quindi il vecchio invariante e' diventato falso per
+   decisione, non per difetto — e riscriverlo per farlo tacere sarebbe stato il modo classico
+   di perdere la protezione (v203). Ora sorvegliano il fatto NUOVO: che il punteggio non torni.
+   ⚠ Serve davvero: in v200 il verdetto del motore fu tolto e l'ORDINAMENTO per punteggio
+   sopravvisse fino alla v228, cioe' 28 versioni. Un giudizio rimosso rientra dai bordi. */
+check("v337 il pacchetto macro non porta piu' il blocco del disaccordo", suVeri(`
+  return !/DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO/.test(buildCIOText())`));
 
-check("v256 correlazione macro: misura la dispersione DENTRO i compositi, non una correlazione inventata", suVeri(`
-  const c = correlazioniMacro();
-  if (!c.compositi.length) return false;
-  const ok = c.compositi.every(x => x.spread === x.max - x.min && x.n >= 3
-                                    && x.peggiore.score <= x.migliore.score);
-  const testo = testoCorrelazioniMacro();
-  return ok && /Nessuna correlazione storica/.test(testo)`));
+check("v337 nessun punteggio NOSTRO su 0-100 nei quattro pacchetti", suVeri(`
+  /* Fear & Greed e Financial Health sono indici PUBBLICATI da terzi, nativamente su 0-100:
+     quelli sono il dato. Il divieto riguarda i compositi che calcoliamo noi. */
+  const ESTERNI = /Fear (&|&amp;) Greed|Financial Health|CNN/i;
+  const testi = [buildCIOText(), buildPromptTicker("MU"), buildPromptSettore("Technology"), buildPromptPortafoglio()];
+  for (const t of testi) {
+    for (const riga of String(t).split(String.fromCharCode(10))) {
+      /* ⚠ NIENTE REGEX QUI: dentro un template literal passato a vm gli escape si mangiano
+         un livello — \s diventa s — ed e' la SESTA volta in questo progetto. Si conta a mano. */
+      const j = riga.indexOf("/100");
+      if (j < 1 || !"0123456789".includes(riga[j - 1])) continue;
+      if (ESTERNI.test(riga)) continue;
+      return false;
+    }
+  }
+  return true`));
 
 /* ── analisi spot del titolo ── */
 /* ⚠ v257 — INVARIANTI RISCRITTI DOPO UN FALLIMENTO REALE. Il CEO ha incollato il pacchetto in
@@ -1099,10 +1114,12 @@ check("v257 analisi titolo: dichiara data del dato macro e prossimo aggiornament
   return /Snapshot del /.test(t) && /prossimo aggiornamento atteso/.test(t)
       && /prossimo run del sistema/.test(t)`));
 
-check("v257 analisi titolo: porta il quadro macro e il blocco del disaccordo", suVeri(`
+/* v337 — il terzo requisito (il blocco del disaccordo) e' caduto col punteggio 0-100. I due
+   che restano sono quelli che dicono la cosa vera: il pacchetto del titolo PORTA DENTRO il
+   quadro macro, che e' la ragione per cui non esistono due bottoni separati (v259). */
+check("v257 analisi titolo: porta dentro di se' il quadro macro", suVeri(`
   const t = buildPromptTicker("NVDA");
-  return /ANALISI DI NVDA/.test(t) && /QUADRO MACRO/.test(t)
-      && /DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO/.test(t)`));
+  return /ANALISI DI NVDA/.test(t) && /QUADRO MACRO/.test(t)`));
 
 /* ⚠⚠ v308 — L'INVARIANTE E' IL DIVIETO, NON LA FRASE. Il check cercava le parole "niente
    dimensionamenti", che nascevano da "non conosco la tua posizione". Dalla v307 il sistema LA
@@ -1631,15 +1648,21 @@ check("v302 materie: tolte dalla pagina, restano nel pacchetto", suVeri(`
 /* ⚠ `suVeri` e non `run`: sulla fixture non c'e' macro.indicators, quindi `quadro` e' null e
    il check moriva su `null.n` — misurando i dati di prova invece del codice. E' la stessa
    trappola gia' documentata in CLAUDE.md e ripetuta oggi per la terza volta. */
-check("v280 materie: i punteggi posizionali NON votano nel quadro d'insieme", suVeri(`
-  const saved = DATA.macro.materie;
-  const st = (b) => Array.from({length: 40}, (_, i) => ({ d: "2026-01-01", v: b }));
-  const prima = correlazioniMacro().quadro.n;
-  DATA.macro.materie = { rame: { label: "Rame", value: 6.6, change_pct: 0, pct_1y: 0,
-    min_1y: 4, max_1y: 7, history: st(6) } };
-  const dopo = correlazioniMacro().quadro.n;
-  DATA.macro.materie = saved;
-  return prima === dopo`));
+/* ⚠⚠ v337 — L'INVARIANTE CAMBIA PERCHE' L'OGGETTO E' SPARITO, non perche' desse fastidio.
+   Il check sorvegliava che il punteggio POSIZIONALE delle materie (dove lo stesso 90 significa
+   "inflazione" sul petrolio e "domanda industriale" sul rame) non entrasse nel conteggio del
+   quadro d'insieme. Quel conteggio non esiste piu': il CEO ha tolto la scala 0-100 da schede e
+   pacchetto, e con lei correlazioniMacro(). Un check su un aggregato inesistente e' un ramo
+   irraggiungibile — la classe v234, "un commento che sembra codice".
+   Al suo posto la RICEVUTA del taglio, che e' la cosa che puo' ancora rompersi: i valori delle
+   materie devono continuare ad arrivare nel pacchetto. Il rischio vero non e' piu' che
+   inquinino una media, e' che spariscano insieme a lei. */
+check("v280 materie: i valori arrivano nel pacchetto anche senza il quadro d'insieme", suVeri(`
+  const p = buildPrompt();
+  const m = (DATA.macro && DATA.macro.materie) || {};
+  const nomi = Object.keys(m).filter(k => m[k] && m[k].label);
+  if (!nomi.length) return true;
+  return nomi.every(k => p.indexOf(m[k].label) >= 0)`));
 
 /* ══ v280 — IL PUT/CALL NON MOSTRA PIU' IL VECCHIO PORTAFOGLIO ═══════════════════════════
    ⚠ TERZA VOLTA che il CEO deve segnalare questa stessa cosa. In v265 avevo corretto la SCHEDA
@@ -1764,9 +1787,21 @@ check("v287 pacchetto: nessun verdetto aggregato sul quadro macro", suVeri(`
    verdetto avrebbe buttato via l'informazione per tenere solo il rumore. */
 /* ⚠ il blocco del disaccordo NON sta in buildPrompt: e' un pezzo a se' che buildPromptTicker
    e buildCIOText innestano (v156). Cercarlo nel posto sbagliato dava un rosso su codice sano. */
-check("v287 pacchetto: la dispersione dentro i compositi sopravvive", suVeri(`
-  const t = testoCorrelazioniMacro() || "";
-  return t.indexOf("come sintesi, ma i suoi") >= 0 && t.indexOf("componenti vanno da") >= 0`));
+/* ⚠ v337 — la dispersione viveva nel blocco del disaccordo, uscito con la scala 0-100.
+   L'INFORMAZIONE pero' non doveva uscire con lui: "chi tira giu' e chi tiene su un composito"
+   e' un fatto sul dato, e sopravvive nelle SCHEDE come barre ordinate. Il check si sposta li'.
+   ⚠ E verifica anche che le barre NON stampino piu' il punteggio accanto: e' esattamente il
+   posto da cui il numero poteva rientrare senza che nessuno se ne accorgesse. */
+check("v287 schede: i componenti di un composito restano confrontabili, senza punteggio", (() => {
+  const r = run(`
+    const c = { components: [ { label: "Alfa", score: 20 }, { label: "Beta", score: 80 },
+                              { label: "Gamma", score: 55 } ] };
+    return barreComposito(c, "prova", "");`);
+  if (!r || !r.g || !r.n) return false;
+  const nomiPresenti = r.n.indexOf("Alfa") >= 0 && r.n.indexOf("Beta") >= 0;
+  const senzaPunteggio = r.n.indexOf("/100") < 0 && r.g.indexOf("/100") < 0;
+  return nomiPresenti && senzaPunteggio;
+})());
 
 /* ══ v287 — CALENDARIO: COSA ARRIVA, NON SOLO COSA E' USCITO ═════════════════════════════
    Il quadro macro diceva benissimo cosa e' gia' uscito e taceva su cosa sta per uscire.
@@ -2722,7 +2757,7 @@ check("v315 portafoglio: si ordina di default per peso, non per guadagno", (() =
 
 check("v315 portafoglio: ogni colonna ordina davvero, e il verso si inverte", suVeri(`
   const q = document.querySelector, presi = {};
-  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "", classList: { add(){}, remove(){}, toggle(){}, contains: () => false }, style: {}, dataset: {}, querySelectorAll: () => [], addEventListener(){} });
+  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "", hidden: false, classList: { add(){}, remove(){}, toggle(){}, contains: () => false }, style: {}, dataset: {}, querySelectorAll: () => [], addEventListener(){}, setAttribute(){}, getAttribute: () => null });
   document.querySelector = (s) => finto(s);
   const leggi = (campo, verso) => {
     pfOrdine = { campo, verso }; renderPortafoglio();
@@ -2745,7 +2780,7 @@ check("v315 portafoglio: ogni colonna ordina davvero, e il verso si inverte", su
    41 mila) e che il totale sia la somma dichiarata, non una normalizzazione su se stessa. */
 check("v315 portafoglio: la colonna in euro converte e il BTP resta nominale x prezzo", suVeri(`
   const q = document.querySelector, presi = {};
-  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "", classList: { add(){}, remove(){}, toggle(){}, contains: () => false }, style: {}, dataset: {}, querySelectorAll: () => [], addEventListener(){} });
+  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "", hidden: false, classList: { add(){}, remove(){}, toggle(){}, contains: () => false }, style: {}, dataset: {}, querySelectorAll: () => [], addEventListener(){}, setAttribute(){}, getAttribute: () => null });
   document.querySelector = (s) => finto(s);
   try {
     renderPortafoglio();
@@ -3209,15 +3244,24 @@ check("v323 credito: a spread da 'stress' il punteggio sta nel rosso, non nel fa
   return stress < 35 && rilassato > 70;
 })());
 
-check("v323 credito: il pacchetto stampa il punteggio RICALCOLATO e dichiara le bande", suVeri(`
+/* ⚠⚠ v337 — IL PUNTEGGIO ESCE, LA ZONA RESTA, ED E' UN MIGLIORAMENTO non un cedimento.
+   Il difetto originale della v323 era che il numero CONTRADDICEVA la legenda sulla stessa riga
+   (56/100 "favorevole" accanto alla parola "stress"). Tolto il numero, la contraddizione non
+   puo' piu' nascere per costruzione — ma resta l'invariante che conta davvero: il NOME DELLA
+   ZONA stampato dev'essere quello che le bande dichiarate implicano per quel valore.
+   ⚠ Questa e' la parte SOSTENUTA (v240): le bande sono una convenzione di lettura scritta
+   accanto al numero, non una formula nostra travestita da misura. */
+check("v323 credito: la zona stampata e' quella che le bande dichiarate implicano", suVeri(`
   const p = buildPrompt();
   const i = p.indexOf("Rischio Credito (HY OAS");
   if (i < 0) return true;
   const r = p.slice(i, i + 420);
-  const atteso = punteggioDaZone(numero(DATA.macro.credit.spread_hy), ZONE_CREDITO);
-  return r.includes("score " + atteso + "/100")
-      && r.includes("calcolato dalle bande qui indicate")
-      && r.includes("5-7% stress")`));
+  const v = numero(DATA.macro.credit.spread_hy);
+  const z = ZONE_CREDITO.find(x => v >= x.da && v <= x.a);
+  return r.indexOf("/100") < 0
+      && r.includes("bande di lettura")
+      && r.includes("5-7% stress")
+      && (!z || r.includes(z.nome))`));
 
 
 
@@ -3383,12 +3427,34 @@ check("v336 pdf: costruisce un file valido, con l'intestazione e il trailer al p
     for (let i = 0; i < 40; i++) barre.push({ d: "2026-06-" + String((i % 28) + 1).padStart(2, "0"),
       o: 100 + i, h: 104 + i, l: 97 + i, c: 101 + i });
     return costruisciPdf("Prova", "riga uno", barre, [{ v: 110, et: "supporto" }]);`);
-  const attese = 40;
+  /* ⚠ v337 — il conteggio diventa ESPLICITO invece di allentarsi. Da questa versione ogni
+     etichetta di livello ha un rettangolo di fondo (serviva: sul PDF vero due etichette
+     finivano sopra le candele e non si leggevano), quindi i "re f" sono candele + etichette.
+     Scriverlo come somma dichiarata tiene l'invariante che conta — nessuna candela persa — e
+     rende rumoroso anche un rettangolo di troppo. Abbassarlo a ">= 40" avrebbe spento il check. */
+  const CANDELE = 40, ETICHETTE = 1;
   return typeof pdf === "string"
       && pdf.startsWith("%PDF-")
       && pdf.trimEnd().endsWith("%%EOF")
       && pdf.includes("xref") && pdf.includes("trailer")
-      && (pdf.split(" re f").length - 1) === attese;   // una candela per barra, nessuna persa
+      && (pdf.split(" re f").length - 1) === CANDELE + ETICHETTE
+      && (pdf.split(" l S").length - 1) >= CANDELE;   // uno stoppino per barra, nessuna persa
+})());
+
+/* ⚠ v337 — I CARATTERI CHE WinAnsi NON HA VANNO TRADOTTI, NON BUTTATI. Visto sul PDF vero:
+   "trimestrale ? comunicato IR" e "concorrenti e quote ? ultimo 10-K" — la freccia porta il
+   senso della riga (dove cercare, in che ordine) e diventava un punto interrogativo, cioe'
+   l'opposto di un'indicazione. Il testo era li' e non significava piu' niente. */
+check("v337 pdf: freccia, soglie e box-drawing diventano ASCII invece di punti interrogativi", (() => {
+  const t = run(`return pdfTesto("cerca " + String.fromCharCode(0x2192) + " leggi "
+    + String.fromCharCode(0x2550) + String.fromCharCode(0x2550) + " REGOLE "
+    + String.fromCharCode(0x2264) + "3 " + String.fromCharCode(0x26a0) + " nota");`);
+  const g = run(`return pdfTesto(String.fromCharCode(0x394) + "1M "
+    + String.fromCharCode(0x3c3) + " " + String.fromCharCode(0x2248) + "6 mesi");`);
+  return t.indexOf("?") < 0
+      && t.includes("->") && t.includes("==") && t.includes("<=3") && t.includes("!")
+      /* ⚠ le greche: un delta che diventa "?" toglie alla riga la grandezza che misura */
+      && g.indexOf("?") < 0 && g.includes("delta") && g.includes("sigma") && g.includes("~6 mesi");
 })());
 
 /* ⚠ IL GRAFICO NON SI DISEGNA SU DATI CHE NON LO PERMETTONO. Le `sparks` sono chiusure
@@ -3401,13 +3467,81 @@ check("v336 pdf: senza le barre giornaliere il grafico non si disegna e lo dichi
 })());
 
 check("v336 pdf: i livelli disegnati sono gli STESSI che il testo pubblica", (() => {
-  const i = src.indexOf("function preparaPdf");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "async function", i));
+  /* v337 — preparaPdf e' diventata barrePerPdf (il bottone scarica invece di appendersi a una
+     modale). L'invariante non cambia di una virgola: i livelli vengono dai campi del sistema. */
+  const i = src.indexOf("function barrePerPdf");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function scaricaPdf", i));
   /* devono venire dai campi del sistema, non da un secondo calcolo: due serie di livelli per lo
      stesso titolo sono la contraddizione che v271 ha gia' pagato */
   return corpo.includes("r.support") && corpo.includes("r.resistance")
       && corpo.includes("med.sma50") && corpo.includes("med.sma200")
       && !corpo.includes("Math.min(...") && !corpo.includes("Math.max(...");
+})());
+
+/* ══ v337 — LE TRE COSE NUOVE, CIASCUNA CON LA SUA GUARDIA ════════════════════════════════
+   Costruire un comportamento e non sorvegliarlo e' il modo documentato di perderlo alla
+   modifica successiva (v203, v238). Queste tre nascono insieme al codice che descrivono. */
+
+/* ⚠ IL CONFINE GIA' STABILITO IN v188: nascondere qualcosa nella pagina non deve togliere un
+   dato al pacchetto. Allora erano le colonne, oggi e' la sezione intera. Il confine regge da
+   solo perche' buildPromptPortafoglio() legge DATA e non tocca il DOM — ma "regge per
+   costruzione" e' esattamente cio' che smette di essere vero senza che nessuno se ne accorga. */
+check("v337 portafoglio contratto: il pacchetto e' identico al byte", suVeri(`
+  const chiuso = buildPromptPortafoglio();
+  apriPortafoglio(true, false);
+  const aperto = buildPromptPortafoglio();
+  apriPortafoglio(false, false);
+  return chiuso.length > 500 && chiuso === aperto`));
+
+/* ⚠ LA LEZIONE v315, APPLICATA ALLA CONTRAZIONE: il CEO ha segnalato DUE VOLTE di non riuscire
+   a modificare il portafoglio, e la causa era un bottone che c'era e non si trovava. Ora la
+   sezione parte CHIUSA e l'unico motivo per cui gli serve e' modificarla: se ✎ Modifica
+   finisse dentro il corpo contraibile, avrei ricostruito lo stesso difetto in forma peggiore.
+   Il check guarda DOVE STA il bottone nel markup, non se la funzione esiste. */
+check("v337 il bottone ✎ Modifica resta FUORI dalla parte contraibile", (() => {
+  const pagina = readFileSync(join(ROOT, "index.html"), "utf8");
+  const i = pagina.indexOf('data-sez="portafoglio"');
+  const sez = pagina.slice(i, pagina.indexOf("</section>", i));
+  const corpo = sez.indexOf('id="pf-corpo"');
+  const mod = sez.indexOf('id="pf-modifica"');
+  const togg = sez.indexOf('id="pf-toggle"');
+  return corpo > 0 && mod > 0 && togg > 0 && mod < corpo && togg < corpo;
+})());
+
+/* ⚠ E l'esito dei pacchetti non puo' finire dentro cio' che e' nascosto: #pf-nota vive dentro
+   #pf-corpo, quindi il bottone del portafoglio deve scrivere altrove. Un messaggio consegnato
+   in un elemento invisibile e' la classe v316 (pacchetto generato e non consegnato). */
+check("v337 l'esito del pacchetto portafoglio non finisce nella parte nascosta", (() => {
+  const i = src.indexOf('t.closest("#pf-copia")');
+  const corpo = src.slice(i, i + 900);
+  const iChiama = corpo.indexOf("consegnaPacchetto(");
+  const chiamata = corpo.slice(iChiama, corpo.indexOf(");", iChiama));
+  return chiamata.includes("#tk-esito");
+})());
+
+/* ⚠ IL PDF SENZA GRAFICO. Due pacchetti su tre non parlano di un titolo solo: il costruttore
+   deve reggere barre assenti, e soprattutto NON deve stampare la riga che dichiara un grafico
+   che non c'e' — un'affermazione che il documento non sostiene e' la classe v240. */
+check("v337 pdf senza barre: file valido, e non dichiara un grafico che non ha", (() => {
+  const pdf = run(`return costruisciPdf("Solo testo", "riga uno" + String.fromCharCode(10) + "riga due", null, []);`);
+  return typeof pdf === "string"
+      && pdf.startsWith("%PDF-")
+      && pdf.trimEnd().endsWith("%%EOF")
+      && pdf.indexOf("non e' una cattura di terzi") < 0
+      && pdf.indexOf("selezionabile e copiabile") > 0;
+})());
+
+/* ⚠ E la consegna dev'essere il PDF, non la modale: e' la direttiva del CEO ("Il bottone genera
+   direttamente il PDF"). Il check guarda che il ripiego esista comunque — se il download non
+   parte, la casella si apre. Una strada sola che fallisce in silenzio e' il difetto v316. */
+check("v337 la consegna scarica il PDF e tiene il ripiego sulla casella", (() => {
+  const i = src.indexOf("async function consegnaPacchetto");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "async function", i + 10));
+  const iOk = corpo.indexOf("if (r.ok)");
+  return corpo.includes("scaricaPdf(testo, che)")
+      && iOk > 0
+      && corpo.indexOf('modale.hidden = false') > iOk    // la modale SOLO nel ramo di fallimento
+      && corpo.includes("il PDF non e' partito");
 })());
 
 /* ---------- report ----------

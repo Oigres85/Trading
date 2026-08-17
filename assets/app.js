@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "336";
+const BUILD_VERSION = "337";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -815,9 +815,9 @@ function renderAll() {
   renderPortafoglio();          // v307 — le posizioni, e il clic che apre il grafico
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
-  /* v262 — renderCorrMacro() fuori dalla catena: la sua sezione e' stata rimossa dalla
-     pagina. La funzione RESTA perche' testoCorrelazioniMacro() usa lo stesso calcolo per il
-     pacchetto AI, dove il blocco e' il primo dopo la testata. */
+  /* v337 — qui stava un rimando a renderCorrMacro()/testoCorrelazioniMacro(): entrambe
+     rimosse col punteggio 0-100. Un commento che nomina funzioni inesistenti manda la lettura
+     a cercare codice che non c'e' — e self_check lo prende, giustamente. */
   refreshShockClient();
   renderShockAlert();
   renderDataQualityAlert();
@@ -1946,10 +1946,10 @@ function openMacroQuantModal() {
     : mq.score >= 40
     ? "Ciclo neutro: segnali misti. Attenzione a dati macro in uscita."
     : "Rischio di recessione: PIL debole, occupazione in calo o credito sotto stress. Preferire difensivi e ridurre rischio.";
-  openInfoModal(`MacroQuant — Ciclo economico: ${mq.score}%`,
+  openInfoModal(`MacroQuant — Ciclo economico: ${mq.label}`,
     `<div class="info-line" style="margin-bottom:8px">${cycleDesc}</div>
-     <div class="info-line"><b>Punteggio composito:</b> <b style="color:${scoreColor(mq.score)}">${mq.score}/100</b> — <span class="muted">100 = ciclo perfetto di crescita, 0 = recessione in atto</span></div>
-     <h4 style="margin:10px 0 4px">Cosa compone il punteggio</h4>
+     <div class="info-line muted" style="font-size:11px">Questa non e' una misura pubblicata: e' la media di fattori macro pubblici, ricomposta qui. Per questo non porta un punteggio — il valore sta nei fattori sotto, non nel numero che ne esce.</div>
+     <h4 style="margin:10px 0 4px">I fattori che la compongono</h4>
      <table class="info-table"><thead><tr><th>Indicatore</th><th>Score</th><th>Interpretazione</th></tr></thead><tbody>${rows}</tbody></table>
      <div class="info-line muted" style="font-size:11px;margin-top:8px">Ispirato alla metodologia BCA Research. Verde = indicatore positivo per l'economia, rosso = segnale di debolezza. Aggiornato a ogni refresh dei dati.</div>`);
 }
@@ -2464,6 +2464,42 @@ function formaPosizioni() {
   }
 }
 
+/* ⚠⚠ v337 — IL PORTAFOGLIO SI CONTRAE. Direttiva del CEO, testuale: "portafoglio contraibile
+   perche' lo vedro' da tradingview e quindi mi servira' solo per modificarlo ai fini della
+   costruzione del prompt". Chiuso di partenza, con una preferenza che si ricorda.
+   ⚠ CHIUSO NON VUOL DIRE VUOTO. La testata porta comunque quante posizioni ci sono e quanto
+   valgono: se la sezione contratta non dicesse niente, il CEO perderebbe dallo sguardo il fatto
+   che un portafoglio esiste — e la contrazione avrebbe tolto informazione invece che spazio.
+   ⚠ IL PACCHETTO NON SE NE ACCORGE. buildPromptPortafoglio() legge DATA, non il DOM: nascondere
+   righe non toglie un dato all'LLM. E' il confine gia' stabilito in v188 con le colonne
+   nascondibili, e un gate lo verifica generando il pacchetto aperto e chiuso. */
+const PF_APERTO_KEY = "pf_aperto";
+function portafoglioAperto() {
+  try { return localStorage.getItem(PF_APERTO_KEY) === "1"; } catch { return false; }
+}
+function apriPortafoglio(aperto, persisti) {
+  const corpo = $("#pf-corpo"), bot = $("#pf-toggle");
+  if (corpo) corpo.hidden = !aperto;
+  if (bot) { bot.setAttribute("aria-expanded", aperto ? "true" : "false"); bot.textContent = "▸"; }
+  /* ⚠ l'apertura AUTOMATICA (quella che scatta entrando in modifica) non salva niente: una
+     scelta dell'utente non va sovrascritta da un effetto collaterale. E' la regola gia' scritta
+     in v198 per la vista compatta — "il default non si applica mai se l'utente ha gia' una
+     preferenza" — applicata al verso opposto. */
+  if (persisti) { try { localStorage.setItem(PF_APERTO_KEY, aperto ? "1" : "0"); } catch { /* modalita' privata */ } }
+}
+/* la riga che sopravvive alla chiusura: quante posizioni e quanto valgono, in euro veri
+   (il controvalore lo calcola gia' valorePosizioni(), che sa del BTP e del cambio). */
+function aggiornaSommarioPortafoglio() {
+  const el = $("#pf-sommario");
+  if (!el) return;
+  const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
+  if (!righe.length) { el.textContent = "nessuna posizione letta dalla pipeline"; return; }
+  const aperto = $("#pf-corpo") && !$("#pf-corpo").hidden;
+  const coda = aperto ? "clicca una riga per vederla nel grafico" : "clicca ▸ per aprirlo";
+  el.textContent = `${righe.length} posizioni · ${coda}`;
+}
+
 function renderPortafoglio() {
   const box = $("#pf-righe");
   if (!box) return;
@@ -2472,6 +2508,12 @@ function renderPortafoglio() {
      non e' riuscito a usarlo, e la diagnosi e' la stessa del tooltip di v302. */
   const bMod = $("#pf-modifica");
   if (bMod) bMod.textContent = pfInModifica ? "✕ Chiudi modifica" : "✎ Modifica";
+  /* ⚠ v337 — ENTRARE IN MODIFICA APRE LA SEZIONE. Senza questo, da chiuso il clic su ✎ Modifica
+     non produrrebbe NIENTE di visibile: e' esattamente il difetto v315 in una forma nuova — il
+     comando esiste, si trova, e non si manifesta. Chi chiede di modificare vuole vedere. */
+  if (pfInModifica) apriPortafoglio(true, false);
+  else apriPortafoglio(portafoglioAperto(), false);
+  aggiornaSommarioPortafoglio();
   if (pfInModifica) { formaPosizioni(); return; }
   const nota = $("#pf-nota");
   const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
@@ -2719,7 +2761,20 @@ document.addEventListener("click", (e) => {
   const t = e.target && e.target.closest ? e.target : null;
   if (!t || !t.closest) return;
   if (t.closest("#pf-copia")) {
-    consegnaPacchetto(buildPromptPortafoglio(), "Analisi del portafoglio", $("#pf-nota"));
+    /* ⚠ v337 — L'ESITO VA IN #tk-esito, NON IN #pf-nota. Da quando il portafoglio si contrae,
+       #pf-nota vive DENTRO la parte nascosta: con la sezione chiusa — cioe' il caso normale,
+       visto che parte chiusa — il messaggio "PDF scaricato" sarebbe stato scritto in un
+       elemento invisibile. Un esito consegnato dove nessuno lo vede e' un esito non
+       consegnato: la stessa lezione del v316, in una forma nuova.
+       E c'e' una coerenza in piu': i tre bottoni stanno tutti in topbar, e ora rispondono
+       tutti e tre nello stesso punto. */
+    consegnaPacchetto(buildPromptPortafoglio(), "Analisi del portafoglio", $("#tk-esito") || $("#pf-nota"));
+    return;
+  }
+  if (t.closest("#pf-toggle")) {
+    const chiuso = !$("#pf-corpo") || $("#pf-corpo").hidden;
+    apriPortafoglio(chiuso, true);
+    aggiornaSommarioPortafoglio();
     return;
   }
   if (t.closest("#pf-modifica")) { pfInModifica = !pfInModifica; renderPortafoglio(); return; }
@@ -3205,7 +3260,7 @@ function indicatoriClassifica() {
     { p: "in:cpi", s: "in:pce", nome: "Inflazione (CPI e PCE)",
       sub: (a2, b2) => `CPI ${a2.sub.split(" ")[0]} · PCE ${b2.sub.split(" ")[0]} — due misure della stessa cosa, la Fed guarda il PCE` },
     { p: "credit", s: "systemic_risk", nome: "Stress del credito",
-      sub: (a2, b2) => `${a2.sub} · stress sistemico ${b2.score}/100 — stessa famiglia, spread HY e IG` },
+      sub: (a2, b2) => `${a2.sub} · ${esc(String(b2.sub || "").split(" ")[0])} sistemico — stessa famiglia, spread HY e IG` },
     { p: "sp500_pe", s: "forward_pe", nome: "Valutazione S&P (trailing e forward)",
       sub: (a2, b2) => `${a2.sub} · forward ${b2.sub}` },
     { p: "corp_profit", s: "decouple", nome: "Borsa vs economia reale",
@@ -4542,10 +4597,13 @@ function barreComposito(c, nome, comeSiLegge) {
   const comp = ((c || {}).components || []).filter(x => x && x.score != null);
   if (comp.length < 2) return null;
   const righe = [...comp].sort((a, b) => a.score - b.score)
-    .map(x => ({ nome: x.label, valore: Math.round(x.score) - 50, colore: scoreColor(x.score), testo: `${Math.round(x.score)}/100` }));
+    /* v337 — la BARRA resta (confronta i componenti fra loro: e' la cosa che risponde a
+       "chi tira giu'"), il NUMERO no. Erano due informazioni diverse infilate nello stesso
+       oggetto: il confronto e' misurato, il punteggio assoluto era una formula nostra. */
+    .map(x => ({ nome: x.label, valore: Math.round(x.score) - 50, colore: scoreColor(x.score), testo: "" }));
   const peggio = righe[0], meglio = righe[righe.length - 1];
   return { g: barreOrdinate(righe, {}),
-    n: `${comeSiLegge}${comeSiLegge ? " " : ""}Oggi tira giù <b>${esc(peggio.nome)}</b> (${peggio.testo}) e tiene su <b>${esc(meglio.nome)}</b> (${meglio.testo}).` };
+    n: `${comeSiLegge}${comeSiLegge ? " " : ""}Oggi tira giù <b>${esc(peggio.nome)}</b> e tiene su <b>${esc(meglio.nome)}</b>.` };
 }
 
 /* ═══ v235 — IMPACCAMENTO A MASONRY DELLA GRIGLIA ══════════════════════════════════════════
@@ -4680,7 +4738,14 @@ function renderIndicatori() {
       : "";
     const g = (!se && forma) ? forma.g : linea + (se ? dal.replace(/<svg[\s\S]*?<\/svg>/g, "") : dal);
     return tessera({ t: r.nome, tag: r.proxy || null,
-      v: `${r.score}<span class="muted" style="font-size:12px">/100</span>`,
+      /* ⚠ v337 — QUI NON VA NIENTE, ed e' una scelta misurata non una omissione. Il CEO:
+         "elimina dalle schede macro i parametri in alto a destra es. 56/100; il dato deve
+         essere asettico da quel parametro". La prima stesura ci metteva il valore al posto del
+         punteggio; misurato in browser, 12 schede su 22 non hanno UN valore solo (CPI e PCE,
+         i tre rami del FOMC, tasso reale e attesa), quindi la casella si riempiva su dieci e
+         restava vuota su dodici — e sulle dodici avrei stampato UNO dei valori come se fosse
+         IL valore. Il dato sta nel sottotitolo, intero e senza dover scegliere per lui. */
+      v: "",
       cls: clsScore(r.score), grafico: g,
       /* v324 — la scheda dichiara da se' quanto spazio le serve: il contenuto lo sa, il
          contenitore no. Il riordino per trascinamento non ne risente, perche' la chiave resta
@@ -6656,7 +6721,7 @@ function openMacroInfo(key) {
         <div class="dual-idx-block">
           ${compactSemiGauge(sm.score, ["Bullish (Long)", "Bearish (Short)"])}
           <div class="dual-idx-label">Istituzionali (SMC)</div>
-          <div class="dual-idx-val" style="color:${smCol}">${sm.score}/100 &middot; ${sm.label}</div>
+          <div class="dual-idx-val" style="color:${smCol}">${sm.label}</div>
         </div>
         ${fgScore != null ? `<div class="dual-idx-block">
           ${compactSemiGauge(fgScore, ["Paura", "Avidità"])}
@@ -6664,7 +6729,7 @@ function openMacroInfo(key) {
           <div class="dual-idx-val" style="color:${scoreColor(fgScore)}">${fgScore}/100${fgLabel ? ` &middot; ${fgLabel}` : ""}</div>
         </div>` : ""}
       </div>
-      <div class="info-line"><b>Posizionamento istituzionale:</b> <span style="color:${smCol}">${sm.score}/100 — ${sm.label}</span></div>
+      <div class="info-line"><b>Posizionamento istituzionale:</b> <span style="color:${smCol}">${sm.label}</span> <span class="muted" style="font-size:11px">— composito nostro da VIX, HY/IG e put/call</span></div>
       ${thermoBar(sm.score, ["Bullish (Long)", "Bearish (Short)"])}`;
     const arrow = d => d === "rialzista" ? '<span class="pos">▲ rialzista</span>' : d === "ribassista" ? '<span class="neg">▼ ribassista</span>' : '<span class="muted">laterale</span>';
     const smcIdx = sm.smc_indices || {};
@@ -6672,7 +6737,7 @@ function openMacroInfo(key) {
       if (!s) return "";
       const c = scoreColor(s.bias);
       return `<div class="smc-card">
-        <div class="smc-head"><b>${esc(s.label_idx || "")}</b> <span style="color:${c}">${s.bias}/100 · ${s.label}</span></div>
+        <div class="smc-head"><b>${esc(s.label_idx || "")}</b> <span style="color:${c}">${s.label}</span></div>
         <div class="smc-line">Struttura: ${arrow(s.structure)} &nbsp;·&nbsp; BOS: ${s.bos ? arrow(s.bos) : "—"}</div>
         <div class="smc-line">FVG aperti: <span class="pos">${s.bull_fvg} ↑</span> / <span class="neg">${s.bear_fvg} ↓</span>${s.last_fvg ? ` · ultimo ${s.last_fvg.dir} ${fmtNum.format(s.last_fvg.lo)}–${fmtNum.format(s.last_fvg.hi)}` : ""}</div>
         <div class="smc-line">Liquidità: sopra <b>${s.liq_above != null ? fmtNum.format(s.liq_above) : "—"}</b> · sotto <b>${s.liq_below != null ? fmtNum.format(s.liq_below) : "—"}</b>${s.order_block ? ` · Order block ${s.order_block.dir} ${fmtNum.format(s.order_block.lo)}–${fmtNum.format(s.order_block.hi)}` : ""}</div>
@@ -6993,7 +7058,7 @@ A3 — I NUMERI GIA' CALCOLATI si usano come sono: percentili, ampiezze, mediane
 
 [B] COME VOGLIO CHE RAGIONI
 B1 — IL MECCANISMO, NON LA CORRELAZIONE. Non basta dire che due cose si muovono insieme: dimmi attraverso quale canale una arriva all'altra — quale tasso, quale flusso, quale voce di costo, quale vincolo regolatorio. Se il meccanismo non lo conosci, dillo invece di inventarlo.
-B2 — IL DISACCORDO E' IL SEGNALE. Il blocco "DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO" e' il punto di partenza, non un'appendice: un composito a 58/100 con i componenti che vanno da 19 a 98 non descrive un'economia neutra, descrive un'economia che tira in due direzioni. Dimmi quale delle due sta vincendo e da cosa lo deduci.
+B2 — IL DISACCORDO E' IL SEGNALE, E DEVI TROVARLO TU. Il pacchetto NON classifica piu' gli indicatori macro su una scala 0-100: ti consegna i valori grezzi con le loro soglie dichiarate, e niente altro. Il punteggio e' stato tolto apposta, perche' era calcolato da noi con formule nostre e ti avrebbe ancorato a un giudizio travestito da misura. Quindi il primo passo dell'analisi e' tuo: metti i valori uno accanto all'altro e di' DOVE NON SI ACCORDANO — credito tranquillo mentre l'occupazione cede, inflazione ferma mentre la curva si disinverte, indici ai massimi mentre i profitti reali non seguono. Nomina gli indicatori esatti che divergono, di' quale lato sta vincendo e quale fatto osservabile te lo fa dire. Se invece tutto punta davvero nella stessa direzione, dillo esplicitamente e spiega perche' e' credibile: e' raro, e vale come segnale a sua volta. Non partire da una media, e non chiedermi un punteggio che non c'e' piu'.
 B3 — CONTA I SEGNALI UNA VOLTA SOLA. Due misure della stessa grandezza (CPI e PCE, curva e recessione, Fear & Greed e sentiment globale) sono un segnale, non due. Il payload lo dichiara dove succede: rispettalo.
 B4 — DOVE TI ASPETTERESTI DI SBAGLIARE. Chiudi indicando quale dato, se uscisse diverso dalle attese al prossimo aggiornamento, ribalterebbe la lettura che hai appena dato. Un'analisi che non sa cosa la smentirebbe non e' un'analisi.
 
@@ -7228,7 +7293,10 @@ function buildPrompt() {
     /* ⚠ la frase NON nomina i pezzi dell'indice: una guardia (v263) vieta di elencarli su
        questa riga, ed e' nata da un difetto vero — pagina e pacchetto che dicevano cose
        diverse sugli stessi indicatori. Il rimando si puo' fare senza riaprire quella porta. */
-    fgl += " — lo stesso indice torna piu' sopra nel blocco del disaccordo, visto dal lato della sua dispersione interna: e' UNA misura guardata da due lati, non due segnali.";
+    /* v337 — il rimando e' caduto col blocco che nominava: un rinvio a una sezione che non
+       esiste piu' e' esattamente la classe C10, e insegna al modello che i riferimenti del
+       payload non sono affidabili. Resta la parte VERA della frase, che non rimanda a niente. */
+    fgl += " — livello e dispersione interna dello stesso indice sono UNA misura guardata da due lati, non due segnali.";
     lines.push(fgl);
   }
   // sanity finale sul payload: un valore impossibile diventa "n.d." e NON entra nell'analisi
@@ -7561,7 +7629,12 @@ function buildPrompt() {
     }
   }
 
-  if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, stile BCA): ${m.macroquant.label} (${m.macroquant.score}/100)`);
+  /* ⚠ v337 — il numero e' uscito, l'etichetta resta. MacroQuant NON e' un dato di mercato:
+     e' la MEDIA di punteggi che calcolo io (pipeline riga ~2760, "Riproduzione trasparente
+     stile BCA"). Pubblicarlo su 0-100 accanto a valori veri lo faceva sembrare una misura.
+     L'etichetta ("Espansione"/"Rallentamento"/"Contrazione") e' una classificazione dichiarata
+     ed e' cio' che resta leggibile senza fingere una precisione a due cifre. */
+  if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, riproduzione stile BCA dai fattori macro pubblici): ${m.macroquant.label}`);
   /* ⚠ v264 — "5/10 attivi (50% RISCHIO RIBASSISTA)" ERA UN CONTEGGIO TRAVESTITO DA PROBABILITA'.
      Cinque campanelli su dieci non fanno il 50% di probabilita' di un mercato orso: fanno cinque
      campanelli su dieci. Chiamare percentuale il rapporto fra acceso e totale gli da' l'autorita'
@@ -7667,8 +7740,7 @@ function buildPrompt() {
     const scCred = punteggioDaZone(numero(m.credit.spread_hy), ZONE_CREDITO);
     const zCred = ZONE_CREDITO.find(z => numero(m.credit.spread_hy) >= z.da && numero(m.credit.spread_hy) <= z.a);
     let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${zCred ? zCred.nome : m.credit.label} `
-      + `(score ${scCred != null ? scCred : m.credit.score}/100, calcolato dalle bande qui indicate: `
-      + `sotto 4% rilassato, 4-5% attenzione, 5-7% stress, oltre 7% crisi)`;
+      + `(bande di lettura: sotto 4% rilassato, 4-5% attenzione, 5-7% stress, oltre 7% crisi)`;
     const ch = m.credit.history || [];
     if (ch.length > 20) { const d = ch[ch.length - 1].v - ch[ch.length - 21].v; crl += `; trend ~1 mese ${d > 0 ? "+" : ""}${fmtNum.format(Math.round(d * 100) / 100)} pp (${d > 0.15 ? "spread in allargamento = rischio in aumento" : d < -0.15 ? "spread in restringimento = rischio in calo" : "stabile"})`; }
     lines.push(crl);
@@ -7794,7 +7866,7 @@ function buildPrompt() {
       ? `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp`
       : `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): il gap dell'S&P NON è calcolabile in questo snapshot (la sua serie e quella dei profitti non condividono nessun periodo)`;
     if (m.corp_profit.ndx_gap != null) cpBp += `, NDX gap ${m.corp_profit.ndx_gap > 0 ? "+" : ""}${m.corp_profit.ndx_gap} pp`;
-    cpBp += ` — ${m.corp_profit.label} (score ${m.corp_profit.score}/100; gap>40 = Asset Inflation da fiat debasement, non crescita utili reali). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). sono lo stesso segnale contato due volte, non due prove separate.`;
+    cpBp += ` — ${m.corp_profit.label} (soglia di lettura: gap>40 pp = Asset Inflation da fiat debasement, non crescita utili reali). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). sono lo stesso segnale contato due volte, non due prove separate.`;
     lines.push(cpBp);
   }
   if (m.fed_market) /* ⚠ v264 — DICEVA "Fed Funds Rate" PER LA SECONDA VOLTA, CON UN NUMERO DIVERSO. In QUADRO
@@ -7938,10 +8010,12 @@ function buildHistoricalDigests() {
    e tutte e sei le sue famiglie di divergenza (relapse, MCR, tema, accelerazione, stop, meta)
    erano per-titolo. La seconda era il brief sul delta del NAV. Senza portafoglio e senza news
    nessuna delle due ha più un ingresso.
-   ⚠ IL CEO HA CHIESTO DI TENERE "la relativa correlazione". Non poteva essere questa: si regge
-   sulle posizioni che ha appena tolto. La correlazione che sopravvive è quella FRA GLI
-   INDICATORI MACRO — dove famiglie che di solito si muovono insieme oggi dicono cose opposte —
-   ed è ciò che costruisce correlazioniMacro() qui sotto. Assunzione dichiarata, non nascosta. */
+   ⚠ IL CEO HA CHIESTO DI TENERE "la relativa correlazione". Non poteva essere quella per-titolo:
+   si regge sulle posizioni che aveva appena tolto. Per undici versioni la correlazione superstite
+   e' stata quella FRA GLI INDICATORI MACRO, misurata come dispersione dei punteggi 0-100.
+   ⚠ v337 — anche quella e' uscita, insieme alla scala su cui poggiava. La domanda resta, ma ora
+   e' un'ISTRUZIONE nella testata (B2) invece di un calcolo nel payload: chiedere all'LLM di
+   trovare il disaccordo fra i valori grezzi non richiede che sia io a punteggiarli prima. */
 
 
 /* ---------- testo per l'analisi AI: executive brief + prompt esistente + digest storici ---------- */
@@ -8037,94 +8111,21 @@ let LAST_DIV_SIGNALS = [];
      0-100 dove 100 è favorevole, per la fotografia d'insieme.
    ⚠ NON si dichiara nessuna correlazione STORICA fra indicatori: nel file non ci sono serie
    appaiate per calcolarla, e affermarla sarebbe la classe v240 (una soglia disegnata è
-   un'affermazione, e va sostenuta). Qui si misura solo il disaccordo di OGGI. */
-function correlazioniMacro() {
-  const m = (typeof DATA !== "undefined" && DATA && DATA.macro) || {};
-  const mediana = (a) => { const x = [...a].sort((p, q) => p - q); const n = x.length;
-    return n ? (n % 2 ? x[(n - 1) / 2] : (x[n / 2 - 1] + x[n / 2]) / 2) : null; };
-  /* ⚠ v259 — restano DUE compositi, non quattro. Il CEO ha chiesto di togliere "Sentiment
-     globale" e "Istituzionali vs retail" perche' aggregano cose gia' visibili altrove: toglierli
-     dalle schede e lasciarli qui sarebbe stato rimetterli dalla porta di servizio.
-     Restano il ciclo economico (13 componenti macro, che schede proprie NON hanno) e Fear &
-     Greed, che il CEO ha esplicitamente voluto tenere chiedendo di estrarne i componenti. */
-  const NOMI = { macroquant: "Ciclo economico", fear_greed: "Fear & Greed" };
-  const compositi = [];
-  for (const k of Object.keys(NOMI)) {
-    const v = m[k];
-    if (!v || !Array.isArray(v.components) || v.components.length < 3) continue;
-    const parti = v.components
-      .map(c => ({ nome: String(c.label || "").trim(), score: Number(c.score) }))
-      .filter(c => c.nome && Number.isFinite(c.score));
-    if (parti.length < 3) continue;
-    const punti = parti.map(c => c.score);
-    const min = Math.min(...punti), max = Math.max(...punti);
-    parti.sort((a, b) => a.score - b.score);
-    compositi.push({
-      key: k, nome: NOMI[k], score: Number(v.score),
-      n: parti.length, min, max, spread: max - min, mediana: mediana(punti),
-      peggiore: parti[0], migliore: parti[parti.length - 1], parti,
-    });
-  }
-  compositi.sort((a, b) => b.spread - a.spread);
-
-  /* ⚠ v280 — FUORI I PUNTEGGI POSIZIONALI. Le materie prime portano "dove sta il prezzo nel
-     range dell'anno", non un giudizio favorevole/sfavorevole: un petrolio al 90% del suo
-     intervallo e' inflazione (male) mentre un rame al 90% e' domanda industriale (bene), e
-     sono lo stesso numero. Nella mediana del quadro d'insieme, o fra "i tre piu' favorevoli",
-     direbbero una cosa priva di senso — lo stesso errore che il Philly Fed a punteggio pieno
-     ha reso visibile in v274. Restano schede con la loro serie, e non votano. */
-  const tutti = (typeof indicatoriClassifica === "function" ? indicatoriClassifica() : [])
-    .filter(x => Number.isFinite(x.score) && !x.posizionale);
-  const punteggi = tutti.map(x => x.score);
-  const quadro = punteggi.length ? {
-    n: punteggi.length,
-    mediana: mediana(punteggi),
-    sotto50: punteggi.filter(x => x < 50).length,
-    sopra50: punteggi.filter(x => x > 50).length,
-    peggiori: tutti.slice(0, 3).map(x => ({ nome: x.nome, score: x.score })),
-    migliori: tutti.slice(-3).reverse().map(x => ({ nome: x.nome, score: x.score })),
-  } : null;
-  return { compositi, quadro };
-}
-
-/* il blocco per il pacchetto AI. FATTI, non istruzioni (regola C9). */
-function testoCorrelazioniMacro() {
-  const { compositi, quadro } = correlazioniMacro();
-  if (!compositi.length && !quadro) return "";
-  const L = [];
-  L.push("=== DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO ===");
-  L.push("(scala unica 0-100, 100 = favorevole agli attivi rischiosi. Il disaccordo e' misurato "
-       + "DENTRO ciascun composito, fra i componenti che la pipeline pubblica: e' l'informazione "
-       + "che la media cancella. Nessuna correlazione storica fra indicatori e' dichiarata: nel "
-       + "file non ci sono serie appaiate per calcolarla.)");
-  /* ⚠⚠ v287 — IL VERDETTO AGGREGATO E' USCITO DAL PACCHETTO, ED E' LA CORREZIONE PIU'
-     IMPORTANTE DI QUESTO GIRO.
-     Diceva: "Quadro d'insieme: 26 indicatori · mediana 51,5/100 · 10 sotto 50 e 13 sopra · i
-     tre piu' sfavorevoli … i tre piu' favorevoli …". Sembra un fatto e non lo e': quei
-     punteggi 0-100 li calcolo IO, con formule mie — `clamp(100 - abs(v - 2) * 30)`
-     sull'inflazione, `clamp(50 + v * 40)` sulla curva, e via cosi' per tredici indicatori.
-     Contarli, mediarli e classificarli produce un GIUDIZIO SUL QUADRO MACRO travestito da
-     misura, e lo mette in cima al pacchetto dove ancora tutto e' da leggere.
-     Tre prove che la scala era arbitraria, tutte pagate in questa sessione:
-       · il Philly Fed saturava a 100 e ho dovuto cambiare la pendenza da 1,2 a 0,9 (v271);
-       · le materie prime hanno un punteggio POSIZIONALE che con lo stesso 90 significa
-         "inflazione" sul petrolio e "domanda industriale" sul rame (v280);
-       · il conteggio non chiudeva, e la toppa e' stata dichiarare i pareggi (v286).
-     Quando una scala va ritarata tre volte per farla sembrare sensata, il problema non e' la
-     taratura. E' che questo sistema ha gia' rimosso una volta un motore di punteggio, in
-     v200, per la stessa ragione: "ordinare e' gia' un giudizio".
-     ⚠ COSA RESTA, e perche' non e' la stessa cosa: la DISPERSIONE dentro i compositi (sotto)
-     sopravvive quando i componenti portano punteggi ALTRUI — quelli di Fear & Greed vengono
-     da CNN. Li' "i sette componenti vanno da 32 a 99" e' un fatto sul dato, non una mia
-     opinione travestita. E ogni indicatore continua ad avere valore, data e fonte: e' quello
-     che serve all'LLM per giudicare da se'. */
-  for (const c of compositi) {
-    L.push(`- ${c.nome}: ${fmtNum.format(c.score)}/100 come sintesi, ma i suoi ${c.n} componenti `
-         + `vanno da ${c.min} a ${c.max} (ampiezza ${c.spread} punti, mediana ${fmtNum.format(c.mediana)}). `
-         + `Lo tira giu' "${c.peggiore.nome}" a ${c.peggiore.score}; lo tiene su "${c.migliore.nome}" a ${c.migliore.score}.`);
-  }
-  return L.join("\n");
-}
+   un'affermazione, e va sostenuta). Qui si misura solo il disaccordo di OGGI. *//* ⚠⚠ v337 — IL BLOCCO DEL DISACCORDO E' USCITO, con `correlazioniMacro` e
+   `testoCorrelazioniMacro` che lo costruivano. Decisione del CEO, testuale: "elimina dalle
+   schede macro (e se ci sono riferimenti nel prompt) i parametri in alto a destra es. 56/100;
+   il dato deve essere asettico da quel parametro" — e alla domanda se il taglio dovesse
+   arrivare fino al pacchetto: "Via da tutto, schede e prompt".
+   Non e' un taglio estetico. Quel blocco era interamente costruito sulla scala 0-100 che
+   calcolo IO: dichiarava "scala unica 0-100, 100 = favorevole agli attivi rischiosi" e
+   misurava la dispersione FRA quei punteggi. Tolta la scala, il blocco non misura piu' niente
+   — la dispersione fra numeri che non esistono non e' un fatto.
+   ⚠ E' la seconda volta che questo progetto toglie un numero 0-100 dal pacchetto: v200 tolse
+   il verdetto del motore perche' "un punteggio ancora comunque, e l'ancoraggio non si batte
+   con una nota a pie' di pagina, si batte togliendo il numero". Stessa ragione, altra scala.
+   La domanda che il blocco poneva NON e' persa: e' passata alla testata (regola B2 riscritta),
+   dove chiedere di cercare il disaccordo e' un'ISTRUZIONE — che e' il posto giusto, regola C9.
+   I VALORI restano tutti nel payload: quello che sparisce e' il giudizio, non il dato. */
 
 /* la scheda in pagina: le stesse barre gia' usate per la macro, una riga per componente,
    divergenti da 50 perche' su una scala 0-100 il neutro e' il centro (v209). */
@@ -8987,7 +8988,7 @@ function buildPromptPortafoglio() {
 `──────────────────────────────────────────────────────────────────`,
   ].join("\n");
 
-  return [istruzioni, F.join("\n"), testoCorrelazioniMacro(), soloDati].filter(Boolean).join("\n\n");
+  return [istruzioni, F.join("\n"), soloDati].filter(Boolean).join("\n\n");
 }
 
 function buildPromptSettore(chiave) {
@@ -9209,7 +9210,7 @@ function buildPromptSettore(chiave) {
 `──────────────────────────────────────────────────────────────────`,
   ].join("\n");
 
-  return [istruzioni, F.join("\n"), testoCorrelazioniMacro(), soloDati].filter(Boolean).join("\n\n");
+  return [istruzioni, F.join("\n"), soloDati].filter(Boolean).join("\n\n");
 }
 
 /* ═══ v316 — LA COLONNA DI TRADINGVIEW, DENTRO IL PACCHETTO ══════════════════════════════════
@@ -9339,7 +9340,6 @@ function buildPromptTicker(tkGrezzo) {
   const macro = buildPrompt();
   const header = promptHeaderText();
   const soloDati = macro.startsWith(header) ? macro.slice(header.length).replace(/^\n+/, "") : macro;
-  const disaccordo = testoCorrelazioniMacro();
   const storico = historicalDigestText();
   const now = new Date();
   const pad = (n) => String(n).padStart(2, "0");
@@ -9502,7 +9502,7 @@ function buildPromptTicker(tkGrezzo) {
 `──────────────────────────────────────────────────────────────────`,
 ].join("\n");
 
-  return [istruzioni, datiNostriDelTitolo(tk), disaccordo, soloDati, storico].filter(Boolean).join("\n\n");
+  return [istruzioni, datiNostriDelTitolo(tk), soloDati, storico].filter(Boolean).join("\n\n");
 }
 
 /* ═══ v271 — QUELLO CHE SAPPIAMO GIA' DEL TITOLO, INVECE DI FARLO CERCARE ═════════════════
@@ -9732,15 +9732,9 @@ function buildCIOText() {
      ultimo, cioè quando la conclusione è già stata scritta. */
   const full = buildPrompt();
   const historical = historicalDigestText();
-  const disaccordo = testoCorrelazioniMacro();
-  const header = promptHeaderText();
-  let body = full;
-  if (full.startsWith(header)) {
-    const rest = full.slice(header.length).replace(/^\n+/, "");
-    body = header + (disaccordo ? "\n\n" + disaccordo : "") + "\n\n" + rest;
-  } else if (disaccordo) {
-    body = full + "\n\n" + disaccordo;   // confine non combaciante: fallback alla coda
-  }
+  /* v337 — non c'e' piu' niente da issare in cima: il blocco che si issava (il disaccordo)
+     e' uscito col punteggio 0-100 su cui era costruito. Il corpo e' il pacchetto cosi' com'e'. */
+  const body = full;
   const now = new Date();
   const pad = (n) => String(n).padStart(2, "0");
   const stamp = `\u27e6 BUILD v${BUILD_VERSION} \u00b7 generato ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())} \u27e7`;
@@ -9781,7 +9775,19 @@ const PDF_W = 595, PDF_H = 842;          // A4 in punti tipografici
 function pdfTesto(s) {
   return String(s == null ? "" : s)
     .replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"')
-    .replace(/[\u2013\u2014]/g, "-").replace(/\u2500/g, "-")
+    .replace(/[\u2013\u2014]/g, "-").replace(/[\u2500-\u254F\u256A-\u257F]/g, "-")
+    /* v337 — questi arrivano DAVVERO nel testo dei pacchetti e senza traduzione uscivano "?",
+       cancellando il senso della riga (una freccia che diventa "?" nega l'indicazione). */
+    .replace(/[\u2192\u21D2]/g, "->").replace(/[\u2190\u21D0]/g, "<-")
+    .replace(/[\u2191\u2b06]/g, "su").replace(/[\u2193\u2b07]/g, "giu")
+    .replace(/[\u2550-\u2569]/g, "=").replace(/[\u25A0-\u25FF\u2b1b-\u2b1c]/g, "*")
+    .replace(/[\u26a0\u26A1\u2757\u203C]/g, "!").replace(/\u2713|\u2714/g, "ok")
+    .replace(/[\u2264]/g, "<=").replace(/[\u2265]/g, ">=").replace(/\u00d7/g, "x")
+    .replace(/[\u2022\u25CF]/g, "-").replace(/\u2026/g, "...")
+    .replace(/\u0394/g, "delta ").replace(/\u03c3/g, "sigma").replace(/\u03bc/g, "mu")
+    .replace(/\u03b1/g, "alpha").replace(/\u03b2/g, "beta").replace(/\u03c0/g, "pi")
+    .replace(/[\u2248\u223c]/g, "~").replace(/\u221e/g, "inf")
+    .replace(/[\uD800-\uDFFF]./g, "")          /* emoji: via del tutto, non "?" a coppie */
     .replace(/[^\x20-\xFF]/g, "?")
     .replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
 }
@@ -9816,8 +9822,12 @@ function pdfCandele(barre, opt = {}) {
   for (const liv of (opt.livelli || [])) {
     if (!Number.isFinite(liv.v) || liv.v < L || liv.v > H) continue;
     const y = Y(liv.v);
-    c += `0.25 0.45 0.85 RG 0.7 w [3 2] 0 d ${X0} ${y.toFixed(1)} m ${X1} ${y.toFixed(1)} l S [] 0 d\n`;
-    c += `BT /F1 7 Tf 0.25 0.45 0.85 rg ${(X1 - 96).toFixed(1)} ${(y + 2).toFixed(1)} Td (${pdfTesto(liv.et)}) Tj ET\n`;
+    const et = pdfTesto(liv.et);
+    const wEt = et.length * 3.55 + 5;
+    const xEt = X1 - wEt - 2;
+    c += `0.25 0.45 0.85 RG 0.7 w [3 2] 0 d ${X0} ${y.toFixed(1)} m ${(xEt - 3).toFixed(1)} ${y.toFixed(1)} l S [] 0 d\n`;
+    c += `1 1 1 rg ${xEt.toFixed(1)} ${(y - 1.5).toFixed(1)} ${wEt.toFixed(1)} 9 re f\n`;
+    c += `BT /F1 7 Tf 0.25 0.45 0.85 rg ${(xEt + 2).toFixed(1)} ${(y + 1).toFixed(1)} Td (${et}) Tj ET\n`;
   }
   c += `0.2 0.2 0.25 RG 0.8 w ${X0} ${Y0} m ${X1} ${Y0} l S\n`;
   c += `BT /F1 8 Tf 0.35 0.35 0.4 rg ${X0} ${(Y0 - 12).toFixed(1)} Td (${pdfTesto(b[0].d + "  ->  " + b[b.length - 1].d + "   (" + b.length + " sedute giornaliere)")}) Tj ET\n`;
@@ -9855,11 +9865,16 @@ function costruisciPdf(titolo, testo, barre, livelli) {
   const PER_PAG = 72;
   const pagine = [];
   /* prima pagina: intestazione + grafico + l'inizio del testo */
+  const conGrafico = Array.isArray(barre) && barre.length > 1;
+  const sotto = conGrafico
+    ? "Grafico disegnato dal sistema sulle stesse barre da cui vengono i numeri di questo documento: non e' una cattura di terzi."
+    : "Pacchetto completo, cosi' come lo legge il modello. Il testo di questo PDF e' selezionabile e copiabile.";
   const testa = `BT /F2 13 Tf 0.05 0.05 0.08 rg 40 ${PDF_H - 48} Td (${pdfTesto(titolo)}) Tj ET\n`
-    + `BT /F1 7.5 Tf 0.4 0.4 0.45 rg 40 ${PDF_H - 62} Td (${pdfTesto("Grafico disegnato dal sistema sulle stesse barre da cui vengono i numeri di questo documento: non e' una cattura di terzi.")}) Tj ET\n`;
-  const graf = pdfCandele(barre, { livelli });
-  pagine.push(testa + graf + pdfPagina(righe.slice(0, 22), PDF_H - 320));
-  for (let i = 22; i < righe.length; i += PER_PAG) {
+    + `BT /F1 7.5 Tf 0.4 0.4 0.45 rg 40 ${PDF_H - 62} Td (${pdfTesto(sotto)}) Tj ET\n`;
+  const graf = conGrafico ? pdfCandele(barre, { livelli }) : "";
+  const PRIME = conGrafico ? 22 : 60;
+  pagine.push(testa + graf + pdfPagina(righe.slice(0, PRIME), conGrafico ? PDF_H - 320 : PDF_H - 84));
+  for (let i = PRIME; i < righe.length; i += PER_PAG) {
     pagine.push(pdfPagina(righe.slice(i, i + PER_PAG), PDF_H - 48));
   }
 
@@ -9900,21 +9915,23 @@ function costruisciPdf(titolo, testo, barre, livelli) {
   return out;
 }
 
-/* prepara il PDF e lo appende alla modale: il grafico e' del titolo a grafico, o dell'indice
-   di riferimento quando il pacchetto non parla di un titolo solo. */
-function preparaPdf(testo, che) {
-  const host = $("#prompt-pdf");
-  if (!host) return;
+/* ⚠⚠ v337 — LA CONSEGNA E' IL PDF. Direttiva del CEO: "prompt macro/titolo e settore e
+   portafoglio non generano pdf ma ancora prompt", e alla domanda su cosa dovesse fare il
+   bottone: "Il bottone genera direttamente il PDF".
+   ⚠ Il testo NON si perde, ed e' la ragione per cui questa scelta non toglie niente: il
+   pacchetto completo E' dentro il PDF, nelle pagine dopo il grafico, come testo vero
+   (Helvetica /WinAnsiEncoding, non un'immagine) — selezionabile e copiabile da qualunque
+   lettore. Il PDF porta in piu' il grafico, che il testo non puo' portare.
+   ⚠ E il ripiego resta: se il download non parte — sandbox, permessi, popup bloccato — si
+   riapre la casella col testo. La lezione v316 vale ancora: un pacchetto generato e non
+   consegnato e' un pacchetto non generato, e la strada di consegna non puo' essere una sola
+   che fallisce in silenzio. */
+function barrePerPdf() {
   const tk = String(tvSimboloCorrente || "").toUpperCase();
   const r = ((DATA && DATA.watchlist) || []).concat((DATA && DATA.portfolio) || [])
     .find(x => x && String(x.ticker).toUpperCase() === tk);
   const barre = (r && r.tv && r.tv.ohlc) || null;
-  if (!barre) {
-    host.innerHTML = `<span class="muted">PDF col grafico: disponibile appena la pipeline pubblica le `
-      + `barre giornaliere di ${esc(tk || "questo simbolo")}. Non lo genero senza — un grafico `
-      + `disegnato su dati sotto-campionati somiglierebbe al prezzo senza esserlo.</span>`;
-    return;
-  }
+  if (!barre || !r) return { tk, barre: null, livelli: [] };
   const livelli = [];
   const num = (x) => (Number.isFinite(numero(x)) ? numero(x) : null);
   if (num(r.support) != null) livelli.push({ v: num(r.support), et: `supporto ${fmtNum.format(r.support)}` });
@@ -9922,43 +9939,59 @@ function preparaPdf(testo, che) {
   const med = r.tv && r.tv.tecnica && r.tv.tecnica.medie;
   if (med && med.sma50) livelli.push({ v: med.sma50.liv, et: `media 50 ${fmtNum.format(med.sma50.liv)}` });
   if (med && med.sma200) livelli.push({ v: med.sma200.liv, et: `media 200 ${fmtNum.format(med.sma200.liv)}` });
+  return { tk, barre, livelli };
+}
 
-  host.innerHTML = `<button type="button" class="btn btn-ghost btn-sm" id="pdf-scarica">📄 Scarica in PDF (col grafico)</button>
-    <span class="muted"> — ${barre.length} sedute di ${esc(tk)}, disegnate dal sistema.</span>`;
-  $("#pdf-scarica")?.addEventListener("click", () => {
-    const pdf = costruisciPdf(`${che} — ${tk}`, testo, barre, livelli);
+/* scarica il pacchetto come PDF. Ritorna cosa e' successo: chi chiama deve poter dire al CEO
+   se il grafico c'era, e ripiegare sul testo se il download non e' partito. */
+function scaricaPdf(testo, che) {
+  const { tk, barre, livelli } = barrePerPdf();
+  const titolo = barre ? `${che} — ${tk}` : che;
+  try {
+    const pdf = costruisciPdf(titolo, testo, barre, livelli);
     const bytes = new Uint8Array(pdf.length);
     for (let i = 0; i < pdf.length; i++) bytes[i] = pdf.charCodeAt(i) & 0xFF;
     const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+    const nome = `${(barre ? tk : che).replace(/[^A-Za-z0-9]+/g, "-").toLowerCase()}-${new Date().toISOString().slice(0, 10)}.pdf`;
     const a = document.createElement("a");
-    a.href = url; a.download = `${tk || "analisi"}-${new Date().toISOString().slice(0, 10)}.pdf`;
+    a.href = url; a.download = nome;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
-  });
+    return { ok: true, nome, barre: barre ? barre.length : 0, kb: Math.round(pdf.length / 1024) };
+  } catch (e) {
+    return { ok: false, errore: String((e && e.message) || e) };
+  }
 }
 
 async function consegnaPacchetto(testo, che, esito) {
   if (!testo) { if (esito) esito.textContent = `${che}: non c'e' niente da consegnare.`; return false; }
+  /* il testo finisce SEMPRE nel riquadro, anche quando la casella resta chiusa: se il download
+     non parte, il ripiego qui sotto la apre e il pacchetto e' gia' dentro. */
   const box = $("#prompt-text");
   if (box) box.value = testo;
+  const quanti = `${testo.length.toLocaleString("it")} caratteri`;
+
+  const r = scaricaPdf(testo, che);
+  if (r.ok) {
+    const conGraf = r.barre > 1 ? ` col grafico a ${r.barre} sedute` : "";
+    if (esito) esito.innerHTML = `<b>${esc(che)}</b> — PDF scaricato${conGraf}: `
+      + `<code>${esc(r.nome)}</code> (${r.kb} KB, ${quanti}). Caricalo in una chat NUOVA; `
+      + `il testo dentro il PDF e' selezionabile se preferisci incollarlo.`;
+    toast(`${che}: PDF scaricato \u2713`);
+    return true;
+  }
+
+  /* ⚠ ripiego: il download non e' partito. NON si perde il pacchetto — si apre la casella col
+     testo dentro e si dice cosa e' successo. Un fallimento silenzioso qui sarebbe esattamente
+     il difetto v316, dove tre strade di consegna su tre buttavano il pacchetto senza dirlo. */
   const modale = $("#modal");
   if (modale) modale.hidden = false;
-  /* v336 — il bottone del PDF vive accanto al testo: la stessa consegna, due formati. Il PDF
-     porta il grafico che il testo non puo' portare; il testo resta perche' i numeri scritti
-     sono l'unica parte verificabile. */
-  preparaPdf(testo, che);
-  const quanti = `${testo.length.toLocaleString("it")} caratteri`;
-  try {
-    await navigator.clipboard.writeText(testo);
-    if (esito) esito.innerHTML = `<b>${esc(che)}</b> — ${quanti}, negli appunti. Incolla in una chat NUOVA.`;
-    toast(`${che} copiato \u2713`);
-    return true;
-  } catch {
-    /* il rifiuto della clipboard NON e' un fallimento della generazione: il testo e' li'. */
-    if (esito) esito.innerHTML = `<b>${esc(che)}</b> — ${quanti}, nel riquadro qui sopra. `
-      + `Il browser non mi ha dato gli appunti: selezionalo e copialo da li'.`;
-    return false;
-  }
+  let inAppunti = false;
+  try { await navigator.clipboard.writeText(testo); inAppunti = true; } catch { /* rifiutata */ }
+  if (esito) esito.innerHTML = `<b>${esc(che)}</b> — <b>il PDF non e' partito</b> `
+    + `(${esc(r.errore || "download bloccato dal browser")}). Il pacchetto e' ${quanti} nel `
+    + `riquadro qui sopra${inAppunti ? " e negli appunti" : ", da selezionare e copiare a mano"}.`;
+  return false;
 }
 
 async function copyCIOText() {

@@ -410,13 +410,32 @@ function c12_fattiSopravvissuti(t) {
     /* v256 — la ricevuta del taglio NUOVO: il pacchetto macro ha perso portafoglio, watchlist
        e news, e questi sono i fatti che DOVEVANO sopravvivere a quel taglio. */
     { che: "rotazione settoriale", re: /ROTAZIONE SETTORIALE/,                     era: "pagina portafoglio",     ora: "ROTAZIONE" },
-    { che: "disaccordo macro",     re: /DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO/, era: "CORRELAZIONI news↔book", ora: "blocco proprio" },
+    /* ⚠ v337 — la voce "disaccordo macro" e' USCITA da questa ricevuta perche' il blocco e'
+       stato rimosso su decisione del CEO insieme alla scala 0-100. Non e' un fatto perso in un
+       taglio: e' un GIUDIZIO tolto di proposito, che e' l'opposto. I VALORI che il blocco
+       usava restano tutti — sono le voci "CPI e PCE", "curva 10A-2A", "tasso Fed" qui sopra.
+       Al suo posto la voce che sorveglia il DIVIETO nuovo, poco piu' sotto (C12bis). */
     { che: "serie storiche macro", re: /ANALISI STORICA DELLE SERIE MACRO/,        era: "digest per titolo",      ora: "digest macro" },
     { che: "fase della seduta",    re: /CONTESTO DI SESSIONE|SESSIONE USA/i,       era: "blocco portafoglio",     ora: "sopra il quadro macro" },
   ];
   const persi = ATTESI.filter(a => !a.re.test(t));
   if (persi.length) flag("C12 fatto perso in un taglio", persi.map(a =>
     `"${a.che}" non è più nel payload: stava in ${a.era}, doveva restare in ${a.ora}`).join(" · "));
+
+  /* ⚠ C12bis (v337) — LA RICEVUTA ROVESCIATA: non "questo fatto deve restare" ma "questo
+     giudizio non deve tornare". Il CEO ha tolto la scala 0-100 dal pacchetto e dalle schede
+     ("il dato deve essere asettico da quel parametro"). Un divieto senza guardia dura finche'
+     qualcuno non aggiunge una riga: in v200 il punteggio del motore fu rimosso e l'ORDINAMENTO
+     per punteggio sopravvisse 28 versioni.
+     ⚠ L'ECCEZIONE E' PARTE DELLA REGOLA: Fear & Greed (CNN) e Financial Health sono indici
+     PUBBLICATI da terzi, nativamente espressi su 0-100. Quelli sono il DATO, non un nostro
+     giudizio, e vietarli sarebbe togliere informazione vera per rispettare la forma. */
+  const ESTERNI = /Fear (&|&amp;) Greed|Financial Health|CNN|F&G/i;
+  const punteggi = t.split(String.fromCharCode(10))
+    .filter(r => /[0-9]{1,3}\s*\/\s*100/.test(r) && !ESTERNI.test(r));
+  if (punteggi.length) flag("C12bis punteggio 0-100 nostro tornato nel payload",
+    punteggi.slice(0, 3).map(r => r.trim().slice(0, 110)).join(" · ")
+    + (punteggi.length > 3 ? ` · (+${punteggi.length - 3} righe)` : ""));
 }
 
 /* ═══════════ C13 — AGGREGATI SU UN BOOK PREZZATO A SEDUTE DIVERSE ═══════════════════
