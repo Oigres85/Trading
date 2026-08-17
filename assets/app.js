@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "331";
+const BUILD_VERSION = "332";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7996,6 +7996,41 @@ let tvIntervallo = "D";
 /* TradingView vuole "BORSA:TICKER" ma accetta anche il ticker nudo, risolvendolo da solo.
    I suffissi di Yahoo (.AS, .KS, .MI) NON sono simboli TradingView: si passano nudi e si
    lascia risolvere al widget, dichiarando che l'aggancio potrebbe non essere esatto. */
+/* ═══ v332 — I PREFERITI DENTRO IL GRAFICO ═══════════════════════════════════════════════════
+   Il CEO: "sarebbe utile avere la lista preferiti nel grafico tradingview composta da azioni in
+   watchlist e altri valori che potrei aggiungere o togliere".
+   ⚠ La base sono i titoli che il sistema GIA' segue: un secondo elenco scritto a mano
+   divergerebbe dal primo al primo titolo aggiunto (classe C10/C12). Sopra ci sono le aggiunte e
+   le rimozioni del CEO, che vivono in localStorage — e' una preferenza di lettura, non un dato:
+   perderla cambiando browser costa un clic, mentre scriverla nel repo a ogni tocco no.
+   ⚠⚠ GLI INDICI NON SI POSSONO METTERE: misurato in v292, i simboli di indice sono bloccati
+   nell'incorporamento gratuito. Nasdaq e S&P entrano come QQQ e SPY, che sono gli ETF che li
+   replicano e che il widget serve — e la differenza si dichiara invece di far sembrare che
+   siano gli indici. */
+const PREF_KEY = "tv_preferiti";
+const PREF_BASE = ["QQQ", "SPY", "SMH"];   // Nasdaq, S&P e semiconduttori via ETF: gli indici sono bloccati
+
+function preferitiTradingView() {
+  const dalSistema = [...new Set([...((DATA && DATA.watchlist) || []), ...((DATA && DATA.portfolio) || [])]
+    .map(r => r && r.ticker).filter(Boolean)
+    .filter(t => !/-(USD|USDT)$/i.test(t) && !/^\^/.test(t))     // cripto e indici fuori: il widget non li serve
+    .map(simboloTradingView))];
+  let agg = [], tolti = [];
+  try {
+    const p = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+    agg = Array.isArray(p.aggiunti) ? p.aggiunti : [];
+    tolti = Array.isArray(p.tolti) ? p.tolti : [];
+  } catch { /* preferenza illeggibile: si parte da quella del sistema */ }
+  const fuori = new Set(tolti.map(x => String(x).toUpperCase()));
+  return [...new Set([...PREF_BASE, ...dalSistema, ...agg.map(simboloTradingView)])]
+    .filter(t => t && !fuori.has(t.toUpperCase()))
+    .slice(0, 40);          // oltre, la lista del widget diventa un elenco che nessuno scorre
+}
+
+function salvaPreferiti(agg, tolti) {
+  try { localStorage.setItem(PREF_KEY, JSON.stringify({ aggiunti: agg, tolti })); } catch { /* quota */ }
+}
+
 function simboloTradingView(tk) {
   const T = String(tk || "").trim().toUpperCase();
   if (!T) return "";
@@ -8278,18 +8313,8 @@ async function renderOpzioniGrafico(tk) {
 
   /* la corsia: dove sta il prezzo fra il pavimento e il tetto piu' vicini. E' la sola domanda
      che si fa guardando un grafico — quanto spazio ho prima di sbattere, da una parte e dall'altra. */
-  const t = S.tetto, p = S.pavimento;
-  let corsia = "";
-  if (t && p && t.v > p.v) {
-    const q = (S.spot - p.v) / (t.v - p.v) * 100;
-    corsia = `<div class="tvo-corsia">
-      <div class="tvo-corsia-barra"><div class="tvo-corsia-ora" style="left:${q.toFixed(1)}%"></div></div>
-      <div class="tvo-corsia-et"><span>${fmtNum.format(p.v)} · ${esc(p.nome.toLowerCase())}</span>
-        <b>ora ${fmtNum.format(S.spot)}</b>
-        <span>${fmtNum.format(t.v)} · ${esc(t.nome.toLowerCase())}</span></div>
-      <div class="muted tvo-corsia-nota">Ha <b>${fmtNum.format(Math.abs(Math.round((S.spot / p.v - 1) * 1000) / 10))}%</b> di spazio sotto prima ${esc(p.breve)}, <b>${fmtNum.format(Math.round((t.v / S.spot - 1) * 1000) / 10)}%</b> sopra prima ${esc(t.breve)}.</div>
-    </div>`;
-  }
+  const corsia = "";   // v332 — rimossa su richiesta del CEO: ripeteva la tabella qui sotto
+
 
   /* la scala: tutti i livelli in ordine di prezzo, col prezzo di adesso al suo posto dentro
      l'elenco — non in un riquadro a parte, che e' il modo per non far capire dov'e'. */
@@ -8330,7 +8355,7 @@ async function renderOpzioniGrafico(tk) {
   /* il titolo promette solo quello che c'e' dentro: per i titoli fuori dai 30 seguiti le
      opzioni non ci sono, e annunciarle sarebbe una promessa non mantenuta. */
   const conOpz = !!(o && o.ratio != null);
-  box.innerHTML = `<details class="tvo-piu"><summary>Livelli di <b>${esc(S.tk)}</b> — supporti, resistenze${conOpz ? " e opzioni" : ""}</summary>
+  box.innerHTML = `<div class="tvo-testa"><b>Livelli di ${esc(S.tk)}</b> <span class="muted">— supporti, resistenze${conOpz ? " e muri delle opzioni" : ""}</span></div>
     <div class="tvo">
       ${corsia}
       <div class="tvo-scroll"><table class="tvo-tab"><thead><tr>
@@ -8341,7 +8366,7 @@ async function renderOpzioniGrafico(tk) {
       <div class="muted tvo-fine">I livelli non sono previsioni: dicono dove il prezzo ha gia' incontrato
         qualcosa, non dove andra'. Quelli delle opzioni valgono per la loro scadenza e si spostano quando
         cambia; supporto e resistenza guardano venti sedute e si aggiornano ogni giorno.</div>
-    </div></details>`;
+    </div>`;
 }
 
 function montaGraficoTV(tk, intervallo) {
@@ -8385,10 +8410,20 @@ function montaGraficoTV(tk, intervallo) {
     allow_symbol_change: true,
     withdateranges: true,
     details: true,
+    /* ⚠ v332 — il CEO: "su grafico tradingview aggiungi sezione overnight visibile".
+       `extended_hours` accende le sedute fuori orario NEL grafico: e' l'unico posto dove
+       l'overnight si puo' vedere, perche' il widget e' un iframe di un altro dominio e da qui
+       dentro non si disegna. ⚠ Sulle azioni americane l'incorporamento gratuito mostra il
+       pre/after con lo stesso ritardo del resto (~15 minuti): e' visibile, non e' in tempo reale. */
+    extended_hours: true,
+    /* la lista dei preferiti DENTRO il grafico: si sfoglia senza uscire dal widget */
+    watchlist: preferitiTradingView(),
+    details: true,
     studies: TV_STUDIES,
     support_host: "https://www.tradingview.com",
   });
   const nota = $("#tv-nota");
+  if (typeof aggiornaStellaPreferiti === "function") aggiornaStellaPreferiti();
   sc.onerror = () => {
     box.innerHTML = `<div class="muted tv-vuoto">TradingView non risponde (rete o blocco degli script di terze parti).
       Il resto della pagina funziona lo stesso.</div>`;
@@ -8506,11 +8541,54 @@ function montaGraficoTV(tk, intervallo) {
           pacchetto per l'LLM — un solo calcolo, così la pagina e l'analisi non possono divergere.</span></div>`;
       })()}
     </div>`;
-    nota.innerHTML = `<details class="tv-piu" open><summary>Analisi tecnica — ${esc(String(tk).toUpperCase())}</summary>${analisi}</details>
+    /* ⚠ v332 — un titolo solo per analisi tecnica E livelli: il CEO li ha chiesti accorpati.
+       Il <details> resta APERTO e non si richiude, perche' questo blocco si ridisegna solo al
+       cambio di simbolo — non a ogni refresh dei prezzi, che e' cio' che chiudeva l'altro. */
+    nota.innerHTML = `<details class="tv-piu" open><summary>Analisi tecnica e livelli — ${esc(String(tk).toUpperCase())}</summary>${analisi}</details>
     ${String(tk).includes(".") ? `<div class="tv-piede">⚠ "${esc(tk)}" ha un suffisso di borsa alla Yahoo: TradingView usa una nomenclatura diversa e il simbolo potrebbe non agganciarsi — scrivilo come lo vedi su TradingView (per esempio <code>EURONEXT:ASML</code>).</div>` : ""}`;
   }
 
 
+}
+
+/* v332 — gli indici e la stella dei preferiti. Passano dalle STESSE funzioni del resto
+   (montaGraficoTV, preferitiTradingView): due strade separate divergerebbero. */
+$("#tv-idx")?.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-tv-tk]");
+  if (b) montaGraficoTV(b.dataset.tvTk);
+});
+$("#tv-pref")?.addEventListener("click", () => {
+  const tk = simboloTradingView(tvSimboloCorrente || ($("#tk-input")?.value || ""));
+  if (!tk) return;
+  let agg = [], tolti = [];
+  try {
+    const p = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+    agg = Array.isArray(p.aggiunti) ? p.aggiunti : [];
+    tolti = Array.isArray(p.tolti) ? p.tolti : [];
+  } catch { /* si riparte da zero */ }
+  const dentro = preferitiTradingView().some(x => x.toUpperCase() === tk.toUpperCase());
+  if (dentro) {
+    /* togliere un titolo che viene dal sistema non basta cancellarlo dagli aggiunti: va messo
+       fra i TOLTI, o al render successivo tornerebbe da solo. */
+    tolti = [...new Set([...tolti, tk])];
+    agg = agg.filter(x => x.toUpperCase() !== tk.toUpperCase());
+  } else {
+    agg = [...new Set([...agg, tk])];
+    tolti = tolti.filter(x => x.toUpperCase() !== tk.toUpperCase());
+  }
+  salvaPreferiti(agg, tolti);
+  aggiornaStellaPreferiti();
+  montaGraficoTV(tvSimboloCorrente);      // il widget rilegge la lista solo al montaggio
+});
+
+function aggiornaStellaPreferiti() {
+  const b = $("#tv-pref"); if (!b) return;
+  const tk = simboloTradingView(tvSimboloCorrente || "");
+  const dentro = tk && preferitiTradingView().some(x => x.toUpperCase() === tk.toUpperCase());
+  b.textContent = dentro ? "★ Nei preferiti" : "☆ Preferito";
+  b.title = dentro
+    ? `${tk} è nella lista del grafico: clicca per toglierlo`
+    : `Aggiungi ${tk || "il simbolo"} alla lista del grafico`;
 }
 
 $("#tv-tf")?.addEventListener("click", (e) => {

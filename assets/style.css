@@ -1856,7 +1856,7 @@ svg.g-serie { cursor: crosshair; }
 #corr-macro-note { margin-top: 10px; font-size: 12.5px; }
 
 /* ═══ v257 — GRAFICO TRADINGVIEW, WATCHLIST, ROTAZIONE COMPATTA ═════════════════════════ */
-.tv-chart { height: 520px; min-height: 320px; border-radius: 8px; overflow: hidden; }
+.tv-chart { height: clamp(420px, 62vh, 760px); min-height: 320px; border-radius: 8px; overflow: hidden; }
 .tv-chart .tradingview-widget-container,
 .tv-chart .tradingview-widget-container__widget { height: 100%; }
 .tv-wl { min-height: 120px; margin-top: 8px; }
@@ -2318,3 +2318,6 @@ svg.g-serie { cursor: crosshair; }
 }
 /* vicino al bordo destro il pannello si ancora a destra, o uscirebbe dalla scheda */
 .mg-card:nth-child(4n) .mg-guida-box, .mg-card:last-child .mg-guida-box { left: auto; right: 0; }
+
+/* v332 — i livelli sono ora parte dell'analisi tecnica: stessa cornice, nessun cassetto. */
+.tvo-testa { font-size: 12.5px; margin: 10px 0 6px; padding-top: 10px; border-top: 1px solid var(--border); }

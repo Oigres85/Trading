@@ -1174,7 +1174,7 @@ check("v266 grafico: la legenda non descrive piu' la barra laterale, in alto e i
 check("v317 analisi tecnica: medie, RSI e volume sono agganciati ai valori del titolo", (() => {
   const i = src.indexOf("v317 — DALLA LEGENDA GENERICA");
   const sez = src.slice(i, src.indexOf("tv-piede", i));
-  return sez.includes("Analisi tecnica —")
+  return /Analisi tecnica( e livelli)? —/.test(sez)
       && sez.includes("tec.medie_battute") && sez.includes("o.rsi14") && sez.includes("vol_ratio")
       && sez.includes('rigaMedia("sma50"') && sez.includes('rigaMedia("sma200"')
       && !sez.includes("I numeri in alto a sinistra") && !sez.includes("<b>Candele</b>");
