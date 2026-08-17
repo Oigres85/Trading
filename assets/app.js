@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "332";
+const BUILD_VERSION = "333";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3652,6 +3652,43 @@ function punteggioDaZone(v, zone) {
    dei punteggi e' "favorevole". Il numero contraddiceva la sua stessa didascalia.
    Ora le bande sono quelle DICHIARATE nel pacchetto, e il punteggio esce da li'. Una soglia
    sola per indicatore, che e' la regola generale di v319. */
+/* ═══ v333 — DUE BARRE A CONFRONTO: la forma piu' leggibile che esista ═══════════════════════
+   Il CEO ha respinto la barra 0-100, il quadrante, la ragnatela e — sull'ampiezza — anche il
+   tachimetro. Il denominatore comune di tutte e quattro: chiedono di decodificare una scala.
+   Due barre affiancate no: si vede quale e' piu' lunga, e quella E' la risposta.
+   ⚠ La scala e' CONDIVISA fra le voci, o il confronto — l'unico motivo per cui la forma esiste —
+   sparisce (lezione v206). E la soglia, quando c'e', e' disegnata: un livello senza il suo
+   riferimento non dice niente (v238). */
+function dueBarre(voci, opt = {}) {
+  const v = (voci || []).filter(x => x && Number.isFinite(x.val));
+  if (v.length < 2) return "";
+  const lim = Math.max(...v.map(x => Math.abs(x.val)), opt.minScala || 0) || 1;
+  const W = 300, RH = 30, H = v.length * RH + (opt.soglia != null ? 18 : 8), L = 92, R = W - 46;
+  const zero = opt.soloPositivi ? L : (L + R) / 2;
+  const amp = opt.soloPositivi ? (R - L) : (R - L) / 2;
+  const X = (x) => zero + (x / lim) * amp;
+  const barre = v.map((x, i) => {
+    const y = 4 + i * RH;
+    const x0 = Math.min(zero, X(x.val)), w = Math.abs(X(x.val) - zero);
+    const col = x.colore || (x.val >= 0 ? "var(--green)" : "var(--red)");
+    return `<g><title>${esc(x.nome)}: ${esc(x.testo || fmtNum.format(x.val))}</title>
+      <text x="0" y="${y + 14}" font-size="10.5" fill="var(--muted)">${esc(String(x.nome).slice(0, 16))}</text>
+      <rect x="${x0.toFixed(1)}" y="${y + 4}" width="${Math.max(w, 1).toFixed(1)}" height="13" rx="2"
+        fill="${col}" fill-opacity=".82"/>
+      <text x="${W - 42}" y="${y + 15}" font-size="11" font-family="var(--mono)" font-weight="700"
+        fill="${col}">${esc(x.testo || fmtNum.format(x.val))}</text></g>`;
+  }).join("");
+  const sog = (opt.soglia != null && Math.abs(opt.soglia) <= lim)
+    ? `<line x1="${X(opt.soglia).toFixed(1)}" y1="2" x2="${X(opt.soglia).toFixed(1)}" y2="${H - 16}"
+         stroke="var(--red)" stroke-width="1.4" stroke-dasharray="3 2"/>
+       <text x="${X(opt.soglia).toFixed(1)}" y="${H - 4}" font-size="8.5" text-anchor="middle"
+         fill="var(--muted)">${esc(opt.soglieTesto || "soglia")}</text>` : "";
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
+      aria-label="${esc(opt.aria || "confronto fra due grandezze")}">
+    ${opt.soloPositivi ? "" : `<line x1="${zero}" y1="2" x2="${zero}" y2="${H - 16}" stroke="var(--border)"/>`}
+    ${sog}${barre}</svg>`;
+}
+
 const ZONE_CREDITO = [
   { da: 0, a: 4, nome: "credito rilassato", colore: "var(--green)" },
   { da: 4, a: 5, nome: "attenzione", colore: "var(--yellow)" },
@@ -3939,25 +3976,48 @@ const FORMA_INDICATORE = {
      probabilita' su tre riunioni. Le barre le mostrano tutte e tre insieme, che e' il punto:
      il mercato non prezza "un rialzo", prezza una traiettoria. */
   fedwatch: (m) => {
+    /* ⚠ v333 — il CEO: "grafico a barre con percentuali di taglio, neutro o rialzo per ogni
+       riunione fed (non inserire testo guida)". Una barra impilata per riunione: i tre esiti
+       sono ESAUSTIVI e sommano a 100, quindi la barra intera e' la riunione e i segmenti sono
+       le probabilita'. E' l'unico caso in cui una barra impilata e' la forma giusta — parti di
+       un tutto, nessuna negativa. Nessun testo guida, come chiesto. */
     const f = m.fedwatch; if (!f || !Array.isArray(f.meetings) || !f.meetings.length) return null;
-    const it = (d) => { const [a, me, g] = String(d).split("-"); return `${g}/${me}`; };
-    const barre = barreOrdinate(f.meetings.slice(0, 3).map(x => ({
-      nome: `Rialzo entro il ${it(x.date)}`,
-      valore: Math.round(Number(x.hike_prob) || 0),
-      testo: `${Math.round(Number(x.hike_prob) || 0)}%`,
-      colore: (Number(x.hike_prob) || 0) >= 60 ? "var(--red)" : (Number(x.hike_prob) || 0) >= 35 ? "var(--yellow)" : "var(--muted)",
-    })), { nota: "probabilita' implicite, riunione per riunione" });
-    if (!barre) return null;
-    const p1 = Math.round(Number(f.meetings[0].hike_prob) || 0);
-    const stato = p1 >= 60 ? "il mercato SI ASPETTA un rialzo alla prossima riunione"
-      : p1 >= 35 ? "il mercato e' diviso sulla prossima riunione"
-      : "il mercato non si aspetta un rialzo alla prossima riunione";
+    const it = (d) => { const p = String(d).split("-"); return `${p[2]}/${p[1]}`; };
+    const rr = f.meetings.slice(0, 4).map(x => ({ d: it(x.date),
+      taglio: Math.round(Number(x.cut_prob) || 0),
+      fermo: Math.round(Number(x.hold_prob) || 0),
+      rialzo: Math.round(Number(x.hike_prob) || 0) }));
+    const W = 320, RH = 30, H = rr.length * RH + 18, L = 44, R = W - 8;
+    const righe = rr.map((x, i) => {
+      const y = 12 + i * RH;
+      const tot = Math.max(1, x.taglio + x.fermo + x.rialzo);
+      let px = L;
+      const seg = [["taglio", x.taglio, "var(--green)"], ["fermo", x.fermo, "var(--muted)"], ["rialzo", x.rialzo, "var(--red)"]]
+        .map(v => {
+          const w = v[1] / tot * (R - L);
+          const el = `<g><title>${x.d}: ${v[0]} ${v[1]}%</title>`
+            + `<rect x="${px.toFixed(1)}" y="${y}" width="${Math.max(w, 0).toFixed(1)}" height="14" fill="${v[2]}" fill-opacity=".85"/>`
+            + (w > 26 ? `<text x="${(px + w / 2).toFixed(1)}" y="${y + 11}" font-size="9.5" text-anchor="middle" font-family="var(--mono)" fill="var(--bg)">${v[1]}%</text>` : "")
+            + `</g>`;
+          px += w; return el;
+        }).join("");
+      return `<text x="0" y="${y + 11}" font-size="10" fill="var(--muted)">${x.d}</text>${seg}`;
+    }).join("");
+    const pr = rr[0];
     return {
-      g: barre,
-      n: `<b>${stato}</b> (${p1}%). Range attuale ${esc(f.target_range || "n.d.")}, tasso implicito ${f.implied_rate}%. `
-        + `Come si legge: la riga che conta non e' la prima ma la DIFFERENZA fra le tre — se la probabilita' cresce di riunione in riunione, `
-        + `il mercato non sta prezzando "se" ma "quando", e quello sposta la curva dei tassi molto prima che la Fed faccia qualcosa. `
-        + `Sono prezzi di mercato, non previsioni: dicono cosa costa coprirsi, non cosa succedera'.`,
+      g: `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img"
+        aria-label="probabilita di taglio, tasso fermo o rialzo per ogni riunione della Fed">
+        <text x="${L}" y="7" font-size="8.5" fill="var(--green)">taglio</text>
+        <text x="${(L + R) / 2}" y="7" font-size="8.5" text-anchor="middle" fill="var(--muted)">fermo</text>
+        <text x="${R}" y="7" font-size="8.5" text-anchor="end" fill="var(--red)">rialzo</text>
+        ${righe}</svg>`,
+      score: punteggioDaZone(pr ? pr.rialzo : 50, [
+        { da: 0, a: 25, nome: "nessun rialzo prezzato", colore: "var(--green)" },
+        { da: 25, a: 50, nome: "rialzo possibile", colore: "var(--muted)" },
+        { da: 50, a: 100, nome: "rialzo prezzato", colore: "var(--red)" }]),
+      n: `Prossima riunione ${pr ? pr.d : "n.d."}: <b>${pr ? pr.rialzo : "n.d."}%</b> rialzo · `
+        + `<b>${pr ? pr.fermo : "n.d."}%</b> fermo · <b>${pr ? pr.taglio : "n.d."}%</b> taglio. `
+        + `<span class="muted">Dai futures sui Fed Funds a 30 giorni.</span>`,
     };
   },
 
@@ -4098,25 +4158,27 @@ const FORMA_INDICATORE = {
      Ora la scala e' centrata su 1 (volume = media) con la zona di allarme a 2,5, che e' la
      soglia che la pipeline usa davvero per accendere `froth.alert`. */
   froth: (m) => {
+    /* ⚠ v333 — il CEO: "grafico poco intuitivo". Il numero e' un RAPPORTO col volume tipico:
+       1 = normale. Senza quel riferimento disegnato "0,64" non dice niente; con l'1 e la soglia
+       d'allarme a 2,5 si legge in un istante quanto si e' lontani da entrambi. */
     const f = m.froth; if (!f) return null;
-    const voci = [["soxl", "SOXL — semiconduttori 3x"], ["tqqq", "TQQQ — Nasdaq 3x"]]
-      .map(([k, nome]) => ({ nome, d: f[k] })).filter(x => x.d && x.d.rvol != null);
+    const voci = [["soxl", "SOXL semi 3x"], ["tqqq", "TQQQ Nasdaq 3x"]]
+      .map(([k, nome]) => ({ nome, d: f[k] })).filter(x => x.d && x.d.rvol != null)
+      .map(x => ({ nome: x.nome, val: Number(x.d.rvol), testo: `${fmtNum.format(x.d.rvol)}×`,
+                   colore: Number(x.d.rvol) >= 2.5 ? "var(--red)" : Number(x.d.rvol) >= 1 ? "var(--yellow)" : "var(--green)" }));
     if (!voci.length) return null;
-    const max = Math.max(...voci.map(x => Number(x.d.rvol)));
-    const stato = f.alert ? "EUFORIA: volumi anomali sugli ETF a leva, il retail sta rincorrendo"
-      : max < 1 ? "CALMA: sugli ETF a leva si scambia MENO della media"
-      : "NORMALE: volumi in linea con la media";
+    const max = Math.max(...voci.map(x => x.val));
+    const stato = f.alert ? "EUFORIA: volumi anomali sugli ETF a leva"
+      : max < 1 ? "CALMA: si scambia MENO del solito" : "NELLA NORMA";
     return {
-      g: scala(max, { min: 0, max: 3, unita: "×", aria: "schiuma ETF leva",
-          zone: [{ da: 0, a: 1, nome: "sotto la media", colore: "var(--green)" },
-                 { da: 1, a: 2.5, nome: "sopra la media", colore: "var(--yellow)" },
-                 { da: 2.5, a: 3, nome: "euforia", colore: "var(--red)" }],
-          soglie: [{ v: 1, testo: "volume = media" }],
-          fonte: "la soglia 2,5× e' quella con cui la pipeline stessa accende l'allarme; l'1× e' il volume medio a 30 sedute" }),
-      n: `<b>${stato}.</b> ` + voci.map(x =>
-            `${x.nome}: volume ${fmtNum.format(x.d.rvol)}× la media${x.d.chg_5d_pct != null ? `, prezzo ${signTxt(x.d.chg_5d_pct)} in 5 sedute` : ""}`).join(" · ")
-        + `. Come si legge: sono ETF che moltiplicano per tre il movimento giornaliero — li compra chi vuole scommettere in fretta, quindi il loro volume misura quanta fretta c'e' in giro. `
-        + `Il numero e' un RAPPORTO: 1 significa "come sempre", 2,5 significa "due volte e mezza il normale". Quello che conta e' volume alto INSIEME a prezzo in salita: e' la firma della rincorsa.`,
+      g: dueBarre(voci, { soloPositivi: true, minScala: 2.8, soglia: 2.5,
+                          soglieTesto: "allarme", aria: "volume rispetto al tipico sugli ETF a leva 3x" }),
+      score: f.alert ? 18 : max < 1 ? 78 : 55,
+      n: `<b>${stato}.</b> Il numero e' quante volte il volume di oggi supera quello tipico di quell'ETF: `
+        + `<b>1× e' il normale</b>, e la linea tratteggiata a 2,5× e' la soglia oltre la quale il sistema segnala euforia.`
+        + `<br><b>Come si legge:</b> sono ETF a leva tripla, cioe' lo strumento che il denaro emotivo usa `
+        + `quando rincorre. Volumi molto sopra il tipico MENTRE il prezzo sale sono la firma di una corsa `
+        + `fatta da chi arriva tardi; sotto 1 vuol dire che nessuno sta rincorrendo.`,
     };
   },
 
@@ -4172,22 +4234,29 @@ const FORMA_INDICATORE = {
      il proprio alert (`spread > 4` in fetch_market_breadth), quindi viene dal sistema, non da
      me. Le altre due bande sono dichiarate come convenzione di lettura (regola v240). */
   breadth: (m) => {
+    /* ⚠ v333 — il CEO: "come tachimetro non e' intuitivo, trova grafico piu' esaustivo". La
+       domanda dell'ampiezza e' UNA: chi dei due sta salendo di piu'. Due barre affiancate la
+       rispondono senza scala da decodificare — si vede quale e' piu' lunga, e quella E' la
+       risposta. E' il denominatore comune delle quattro forme che il CEO ha respinto: tutte
+       chiedevano di decodificare una scala. */
     const b = m.breadth; if (!b || b.divergence_pp == null) return null;
     const d = Number(b.divergence_pp);
+    const spy = Number(b.spy_1m_pct), rsp = Number(b.rsp_1m_pct);
     const conclusione = d > 4
       ? "SOLO LE MEGACAP: l'indice sale, l'azione media resta indietro"
       : d < -2 ? "PARTECIPAZIONE LARGA: l'azione media fa meglio dell'indice"
       : "RIALZO CONDIVISO: indice e azione media si muovono insieme";
     return {
-      g: scala(d, { min: -6, max: 8, unita: " pp", zone: [
-            { da: -6, a: -2, nome: "azione media avanti", colore: "var(--green)" },
-            { da: -2, a: 4, nome: "insieme", colore: "var(--yellow)" },
-            { da: 4, a: 8, nome: "solo megacap", colore: "var(--red)" },
-          ],
-          fonte: "la soglia dei 4 pp e' quella con cui la pipeline stessa alza l'allarme; le altre due bande sono convenzioni di lettura" }),
-      n: `<b>${conclusione}.</b> Confronta l'S&P pesato per capitalizzazione (SPY, dove le prime dieci societa' contano per un terzo) con lo stesso indice a pesi uguali (RSP, dove ogni azione vale come le altre). `
-        + `A un mese: SPY ${signTxt(b.spy_1m_pct)}, RSP ${signTxt(b.rsp_1m_pct)}, differenza ${signTxt(d, " pp")}. `
-        + `Come si legge: se la differenza cresce, il rialzo si sta stringendo su poche societa' e diventa piu' fragile — basta che una di quelle inciampi.`,
+      g: dueBarre([
+        { nome: "SPY (i grandi)", val: spy, testo: signTxt(spy), colore: "var(--blue)" },
+        { nome: "RSP (media)", val: rsp, testo: signTxt(rsp), colore: "var(--purple)" },
+      ], { aria: "rendimento a un mese dell'indice contro l'azione media" }),
+      score: punteggioDaZone(d, ZONE_AMPIEZZA),
+      n: `<b>${conclusione}.</b> A un mese l'indice pesato per capitalizzazione fa ${signTxt(spy)}, `
+        + `quello dove ogni azione pesa uguale fa ${signTxt(rsp)}: <b>${signTxt(d, " pp")}</b> di scarto.`
+        + `<br><b>Come si legge:</b> se la barra di SPY e' molto piu' lunga il rialzo lo stanno facendo `
+        + `poche societa' enormi, e un rialzo cosi' si rompe quando quelle poche inciampano. Se e' piu' `
+        + `lunga RSP, sta salendo il mercato e non cinque titoli.`,
     };
   },
 
@@ -4339,25 +4408,48 @@ const FORMA_INDICATORE = {
       n: `${q.value} (${signTxt(q.change_pct)} pp nella seduta). <b>Come si legge:</b> è il tasso privo di rischio con cui si scontano gli utili futuri. Più sale, meno vale oggi un utile lontano nel tempo — ed è per questo che colpisce il growth più del value: i suoi utili stanno più avanti.` };
   },
   momentum: (m) => {
-    const s = (m.momentum || {}).sp500; if (!s || s.dist_pct == null) return null;
+    /* ⚠ v333 — il CEO: "aggiungi un tachimetro anche per nasdaq 100 e mettili vicino". Due barre
+       sullo stesso asse invece di due tachimetri: il confronto FRA i due indici e' cio' che si
+       vuole vedere, e due lancette separate lo rendono piu' difficile — bisognerebbe confrontare
+       due angoli invece di due lunghezze. */
+    const s2 = (m.momentum || {}).sp500; if (!s2 || s2.dist_pct == null) return null;
     const n2 = (m.momentum || {}).ndx;
-    return { g: scala(s.dist_pct, { min: -15, max: 15, unita: "%", aria: "distanza dalla media 125",
-        zone: [{ da: -15, a: -3, nome: "sotto la media: trend primario deteriorato", colore: "var(--red)" },
-               { da: -3, a: 3, nome: "sulla media", colore: "var(--muted)" },
-               { da: 3, a: 15, nome: "sopra la media: trend primario integro", colore: "var(--green)" }],
-        soglie: [{ v: 0, testo: "media 125" }],
-        fonte: "lo zero è la media a 125 sedute calcolata dalla pipeline" }),
-      n: `S&P 500 a ${fmtNum.format(s.price)} contro una media a 125 sedute di ${fmtNum.format(s.sma125)}${n2 ? ` · Nasdaq 100 ${signTxt(n2.dist_pct)}` : ""}. <b>Come si legge:</b> 125 sedute sono circa sei mesi: è la linea che separa un ribasso dentro un rialzo da un cambio di regime. Finché il prezzo sta sopra, le discese sono correzioni; sotto, vanno trattate diversamente.` };
+    const voci = [{ nome: "S&P 500", val: Number(s2.dist_pct), testo: signTxt(s2.dist_pct), colore: "var(--blue)" }];
+    if (n2 && n2.dist_pct != null) voci.push({ nome: "Nasdaq 100", val: Number(n2.dist_pct), testo: signTxt(n2.dist_pct), colore: "var(--purple)" });
+    return {
+      g: dueBarre(voci, { aria: "distanza dei due indici dalla media a 125 sedute", minScala: 10 }),
+      n: `S&P 500 <b>${signTxt(s2.dist_pct)}</b> dalla media a 125 sedute`
+        + (n2 && n2.dist_pct != null ? ` · Nasdaq 100 <b>${signTxt(n2.dist_pct)}</b>` : "") + `.`
+        + `<br><b>Come si legge:</b> 125 sedute sono circa sei mesi, cioe' la tendenza di fondo. Sopra `
+        + `la media il trend primario e' integro, sotto il deterioramento e' cominciato. Quando i due `
+        + `indici divergono, quello sotto sta gia' girando mentre l'altro tiene.`,
+    };
   },
   liquidity: (m) => {
-    const l = m.liquidity_split; if (!l || l.retail_pctile_5y == null) return null;
-    return { g: scala(l.retail_pctile_5y, { min: 0, max: 100, unita: "° pct", aria: "liquidità retail",
-        zone: [{ da: 0, a: 40, nome: "poca benzina a bordo campo", colore: "var(--yellow)" },
-               { da: 40, a: 75, nome: "liquidità nella norma", colore: "var(--muted)" },
-               { da: 75, a: 100, nome: "molta liquidità ferma", colore: "var(--green)" }],
-        soglie: [{ v: 50, testo: "mediana 5A" }],
-        fonte: "il percentile e la sua mediana vengono dal dato (5 anni di fondi monetari)" }),
-      n: `Fondi monetari retail ${fmtNum.format(l.retail_mmf_bln)} mld (${signTxt(l.retail_yoy_pct)} in un anno, ${l.retail_pctile_5y}° percentile su 5 anni) · istituzionali ${l.inst_cash_pct}% in liquidità. <b>Come si legge:</b> ha due letture opposte e vanno tenute insieme. Molta liquidità ferma è benzina potenziale per i rialzi; ma se sta AUMENTANDO significa che qualcuno sta uscendo dal rischio adesso. Guarda il livello e la direzione, non uno solo dei due. Sono proxy dichiarati, non i flussi veri.` };
+    /* ⚠⚠ v333 — IL PERCENTILE ERA SATURO: 95-98 in ogni mese degli ultimi tre anni, cioe' potere
+       discriminante zero — la stessa classe del "% del massimo" della leva, gia' corretta in
+       v320. Cio' che si muove e' il LIVELLO e la sua variazione.
+       ⚠ Il CEO: "inserisci data relativa alla rilevazione (non data aggiornamento payload)". La
+       serie dei fondi monetari e' MENSILE e arriva con settimane di ritardo: senza la sua data
+       si legge come se fosse di oggi. */
+    const l = m.liquidity_split; if (!l || l.retail_mmf_bln == null) return null;
+    const voci = [];
+    if (l.retail_yoy_pct != null) voci.push({ nome: "sull'anno", val: Number(l.retail_yoy_pct),
+      testo: signTxt(l.retail_yoy_pct), colore: Number(l.retail_yoy_pct) >= 0 ? "var(--green)" : "var(--red)" });
+    if (l.inst_cash_pct != null) voci.push({ nome: "cassa istituz.", val: Number(l.inst_cash_pct),
+      testo: `${fmtNum.format(l.inst_cash_pct)}%`, colore: "var(--blue)" });
+    const it = (d) => { const p = String(d || "").split("-"); return p[2] ? `${p[2]}/${p[1]}/${p[0]}` : ""; };
+    return {
+      g: voci.length >= 2 ? dueBarre(voci, { soloPositivi: true, aria: "liquidita ferma: variazione annua e quota istituzionale" }) : "",
+      n: `<b>${fmtNum.format(l.retail_mmf_bln)} miliardi</b> fermi nei fondi monetari retail`
+        + (l.retail_yoy_pct != null ? `, <b>${signTxt(l.retail_yoy_pct)}</b> sull'anno` : "") + `.`
+        + (l.retail_date ? ` <span class="muted">Rilevazione del ${it(l.retail_date)} — serie MENSILE, non e' il dato di oggi.</span>` : "")
+        + `<br><b>Come si legge:</b> e' il denaro parcheggiato che potrebbe entrare in borsa. Il LIVELLO `
+        + `da solo dice poco perche' cresce quasi sempre; conta la DIREZIONE: in aumento vuol dire che `
+        + `qualcuno sta uscendo dal rischio, in calo che sta rientrando. ⚠ Il percentile a 5 anni non e' `
+        + `pubblicato qui perche' e' saturo: sta fra 95 e 98 in ogni mese degli ultimi tre anni, quindi `
+        + `non distingue niente.`,
+    };
   },
   /* v262 — la vecchia `breadth` e' stata sostituita da quella nella forma dei termometri,
      piu' in alto. ⚠ Stava DOPO nell'oggetto letterale, quindi vinceva lei: due chiavi uguali

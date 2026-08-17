@@ -3266,6 +3266,67 @@ check("v331 ricerca: il pacchetto DICHIARA quale testata sta portando", suVeri(`
      non dirlo — e' quella che rendeva invisibile il fallimento */
   return /FALLBACK LOCALE/.test(r) || /prompt_header/.test(r);`));
 
+/* ══ v333 — CINQUE SCHEDE RIFATTE, E LA RICEVUTA CHE MI HA FERMATO ════════════════════════
+   Il CEO ha respinto la barra 0-100, il quadrante, la ragnatela e — sull'ampiezza — anche il
+   tachimetro. Il denominatore comune di tutte e quattro: chiedono di decodificare una scala.
+   Due barre affiancate no: si vede quale e' piu' lunga, e quella E' la risposta.
+   ⚠⚠ IL PRIMO TENTATIVO HA PORTATO VIA I VICINI. La mia funzione di taglio cercava "la prossima
+   riga che somiglia a una chiave" e si e' mangiata QUATTRO voci (in:t30, in:real10, in:curve3m,
+   in:philly) piu' l'intero blocco MATERIE — e `modifica_sicura` ha accettato, perche' il JS
+   restava valido. E' la classe v201-v204 per la QUINTA volta, e l'unica ragione per cui l'ho
+   vista sono stati due check che sorvegliavano proprio quelle voci.
+   La riscrittura conta le GRAFFE e asserisce, prima di tagliare, che dentro i confini ci sia
+   UNA sola voce e nessuno dei vicini noti. */
+check("v333 forme: le cinque schede rifatte disegnano barre a confronto, non scale da decodificare", suVeri(`
+  const attese = ["breadth", "momentum", "froth", "fedwatch", "liquidity"];
+  return attese.every(k => {
+    const f = (FORMA_INDICATORE[k] || (() => null))(DATA.macro || {});
+    if (!f) return true;
+    return typeof f.g === "string" && f.g.includes("<svg") && !f.g.includes("tk-zona");
+  })`));
+
+/* ⚠ LA RICEVUTA DEL TAGLIO, resa eseguibile: le voci vicine a quelle riscritte devono esserci
+   ancora. Senza questo check il taglio sbagliato sarebbe passato — l'ho scoperto solo perche'
+   due guardie preesistenti nominavano quelle chiavi. */
+check("v333 forme: la riscrittura non ha portato via le schede vicine", (() => {
+  const i = src.indexOf("const FORMA_INDICATORE");
+  const blocco = src.slice(i, src.indexOf(String.fromCharCode(10) + "};", i));
+  return ["in:t30", "in:real10", "in:curve3m", "in:philly", "stagionalita_ndx", "rotazione"]
+      .every(k => blocco.includes(k))
+    && src.includes("const MATERIE = {");
+})());
+
+/* ⚠ le barre condividono la scala, o il confronto — l'unico motivo per cui la forma esiste —
+   sparisce. E la soglia, dove c'e', dev'essere disegnata: un livello senza riferimento non dice
+   niente (v238). */
+check("v333 dueBarre: scala condivisa e soglia disegnata dove esiste", suVeri(`
+  const f = FORMA_INDICATORE["froth"](DATA.macro || {});
+  if (!f) return true;
+  /* la schiuma ha una soglia d'allarme dichiarata a 2,5x: deve comparire nel disegno */
+  return f.g.includes("stroke-dasharray") && f.g.includes("allarme")
+      && (f.g.split("<rect ").length - 1) >= 2`));
+
+check("v333 fedwatch: una barra per riunione, coi tre esiti che sommano a 100", suVeri(`
+  const f = (DATA.macro || {}).fedwatch;
+  if (!f || !(f.meetings || []).length) return true;
+  const forma = FORMA_INDICATORE["fedwatch"](DATA.macro || {});
+  const r = f.meetings[0];
+  const tot = (Number(r.cut_prob) || 0) + (Number(r.hold_prob) || 0) + (Number(r.hike_prob) || 0);
+  /* i tre esiti sono esaustivi: se non sommano a 100 la barra impilata mentirebbe sulla larghezza */
+  const nudo = forma.n.replace(/<[^>]*>/g, "");
+  return Math.abs(tot - 100) <= 2
+      && nudo.includes(Math.round(Number(r.hike_prob) || 0) + "% rialzo")
+      && nudo.includes(Math.round(Number(r.hold_prob) || 0) + "% fermo")
+      && !/Come si legge/.test(forma.n)`));   // il CEO: "non inserire testo guida"
+
+check("v333 liquidita': porta la data della RILEVAZIONE, non quella del payload", suVeri(`
+  const l = (DATA.macro || {}).liquidity_split;
+  if (!l || !l.retail_date) return true;
+  const f = FORMA_INDICATORE["liquidity"](DATA.macro || {});
+  const p = String(l.retail_date).split("-");
+  return f.n.includes(p[2] + "/" + p[1] + "/" + p[0]) && f.n.includes("MENSILE")
+      && !f.n.includes("percentile a 5 anni e'");`));   // il percentile saturo non si pubblica piu'
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
