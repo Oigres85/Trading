@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "339";
+const BUILD_VERSION = "340";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1932,25 +1932,41 @@ const MQ_LABELS = {
 function openMacroQuantModal() {
   const mq = (DATA.macro || {}).macroquant;
   if (!mq) return;
-  const rows = (mq.components || []).map(c => {
-    const friendlyLab = MQ_LABELS[c.key] || MQ_LABELS[c.label?.toLowerCase()] || c.label;
-    const interp = c.score >= 70 ? "Positivo per l'economia" : c.score >= 45 ? "Neutro" : "Segnale di debolezza";
-    return `<tr>
-      <td>${esc(friendlyLab)}</td>
-      <td style="min-width:120px">${meterBar(c.score, scoreColor(c.score), String(c.score))}</td>
-      <td class="muted" style="font-size:11px">${interp}</td>
-    </tr>`;
-  }).join("");
-  const cycleDesc = mq.score >= 60
+  /* ⚠⚠ v340 — QUESTA SCHEDA ERA IL TAGLIO DELLA v337 LASCIATO A META', ed e' la scheda che
+     il CEO ha indicato per nome ("elimina dalle schede macro i parametri in alto a destra es.
+     56/100"). Il badge era uscito e qui dentro restavano DICIANNOVE punteggi 0-100 sotto una
+     colonna intitolata letteralmente "Score" — piu' il fatto peggiore: il numero rimosso
+     GUIDAVA ANCORA LA PROSA (cycleDesc sceglieva su mq.score >= 60 / >= 40).
+     E produceva una contraddizione dentro la stessa scheda: il titolo diceva "Rallentamento"
+     (mq.label) mentre il corpo diceva "Ciclo neutro" (da mq.score = 56). Due verdetti opposti
+     nella stessa card — la classe "due derivazioni della stessa domanda, coerenti solo per
+     fortuna" (v161/v207/v228), qui incoerenti per davvero.
+     Ora: la prosa si sceglie sull'ETICHETTA, che e' l'unica cosa che la scheda dichiara, e le
+     barre restano perche' CONFRONTANO i fattori fra loro (chi tira giu', chi tiene su) — e'
+     il confronto a essere misurato, non il punteggio assoluto. Stesso trattamento che
+     barreComposito() ha ricevuto in v337: la barra resta, il numero no. */
+  const rows = [...(mq.components || [])]
+    .sort((p, q) => (p.score ?? 50) - (q.score ?? 50))
+    .map(c => {
+      const friendlyLab = MQ_LABELS[c.key] || MQ_LABELS[c.label?.toLowerCase()] || c.label;
+      const interp = c.score >= 70 ? "Positivo per l'economia" : c.score >= 45 ? "Neutro" : "Segnale di debolezza";
+      return `<tr>
+        <td>${esc(friendlyLab)}</td>
+        <td style="min-width:120px">${meterBar(c.score, scoreColor(c.score), "")}</td>
+        <td class="muted" style="font-size:11px">${interp}</td>
+      </tr>`;
+    }).join("");
+  const et = String(mq.label || "").toLowerCase();
+  const cycleDesc = et.indexOf("espansione") >= 0
     ? "Ciclo espansivo: PIL cresce, occupazione solida, condizioni di credito normali. Favorevole per asset rischiosi (azioni, tech)."
-    : mq.score >= 40
-    ? "Ciclo neutro: segnali misti. Attenzione a dati macro in uscita."
-    : "Rischio di recessione: PIL debole, occupazione in calo o credito sotto stress. Preferire difensivi e ridurre rischio.";
+    : et.indexOf("contrazione") >= 0
+    ? "Rischio di recessione: PIL debole, occupazione in calo o credito sotto stress. Preferire difensivi e ridurre rischio."
+    : "Rallentamento: segnali misti, i fattori qui sotto tirano in direzioni opposte. Attenzione ai dati macro in uscita.";
   openInfoModal(`MacroQuant — Ciclo economico: ${mq.label}`,
     `<div class="info-line" style="margin-bottom:8px">${cycleDesc}</div>
-     <div class="info-line muted" style="font-size:11px">Questa non e' una misura pubblicata: e' la media di fattori macro pubblici, ricomposta qui. Per questo non porta un punteggio — il valore sta nei fattori sotto, non nel numero che ne esce.</div>
+     <div class="info-line muted" style="font-size:11px">Questa non e' una misura pubblicata: e' la media di fattori macro pubblici, ricomposta qui. Per questo non porta un punteggio — e nemmeno i fattori ne portano uno: le barre servono a confrontarli <b>fra loro</b>, dal piu' debole al piu' forte, che e' l'unica cosa che il calcolo misura davvero.</div>
      <h4 style="margin:10px 0 4px">I fattori che la compongono</h4>
-     <table class="info-table"><thead><tr><th>Indicatore</th><th>Score</th><th>Interpretazione</th></tr></thead><tbody>${rows}</tbody></table>
+     <table class="info-table"><thead><tr><th>Indicatore</th><th>Dove sta, rispetto agli altri</th><th>Lettura</th></tr></thead><tbody>${rows}</tbody></table>
      <div class="info-line muted" style="font-size:11px;margin-top:8px">Ispirato alla metodologia BCA Research. Verde = indicatore positivo per l'economia, rosso = segnale di debolezza. Aggiornato a ogni refresh dei dati.</div>`);
 }
 
@@ -8370,6 +8386,16 @@ function fattiTitolo(tk) {
     opzioni: opz,
     tecnici: riga ? { rsi: numero(riga.rsi), atr: numero(riga.atr_14), atrPct: numero(riga.atr_pct),
                       sma50: numero(riga.sma50_dist_pct), sma200: numero(riga.sma200_dist_pct),
+                      /* ⚠⚠ v340 — IL LIVELLO VERO DELLA MEDIA, non piu' ricavato all'indietro.
+                         `sma50`/`sma200` qui sopra sono DISTANZE percentuali calcolate dalla
+                         pipeline contro la CHIUSURA. La v314 stampava il livello derivandolo
+                         (`prezzo / (1 + dist/100)`) usando pero' il prezzo VIVO — due
+                         riferimenti diversi — e il risultato non era la media di nessuna
+                         finestra: su MU dava 557,27 mentre la media vera e' 556,46, e il
+                         pacchetto pubblicava i due numeri a trenta righe di distanza.
+                         La pipeline il livello ce l'ha gia'. Si legge, non si ricostruisce. */
+                      sma50Liv: numero((((riga.tv || {}).tecnica || {}).medie || {}).sma50?.liv),
+                      sma200Liv: numero((((riga.tv || {}).tecnica || {}).medie || {}).sma200?.liv),
                       pe: numero(riga.pe), settore: riga.sector || null,
                       trimestrale: riga.earnings_date || null,
                       /* ⚠ v293 — barre e range servono a EMA e Fibonacci, che calcoliamo NOI
@@ -9623,14 +9649,23 @@ function datiNostriDelTitolo(tk) {
      perche' e' una questione di VERSO, non di valore.
      Ora si scrive il livello E il verso in parole, come per le EMA. */
   if (Number.isFinite(tec.sma50) || Number.isFinite(tec.sma200)) {
-    const rif = numero(f.prezzo);
-    const riga = (n, dist) => {
+    /* ⚠⚠ v340 — SI LEGGE IL LIVELLO, NON SI DERIVA. Fino alla v339 questa riga faceva
+       `prezzo / (1 + dist/100)`: il prezzo era quello VIVO e la distanza era calcolata dalla
+       pipeline contro la CHIUSURA, quindi il numero che ne usciva non era la media di nessuna
+       finestra — era il rapporto fra due grandezze misurate su riferimenti diversi.
+       Su MU: 557,27 qui contro 556,46 trenta righe sotto (`Media semplice 200`), stessa
+       grandezza, due valori, stesso pacchetto. Piccolo abbastanza da far pensare a due
+       finestre di calcolo, mai abbastanza da far sospettare un difetto — cioe' la forma
+       peggiore. Ora il livello e' quello della pipeline, che e' l'unico che esiste davvero.
+       ⚠ E QUANDO NON C'E' NON SI INVENTA: se la pipeline non ha pubblicato la media, si
+       stampa la sola distanza. Un livello ricostruito e' peggio di un livello assente. */
+    const riga = (n, dist, liv) => {
       if (!Number.isFinite(dist)) return null;
-      const liv = Number.isFinite(rif) ? Math.round(rif / (1 + dist / 100) * 100) / 100 : null;
-      return `- Media a ${n} sedute${liv != null ? `: ${liv}` : ""} — il prezzo le sta `
+      return `- Media a ${n} sedute${Number.isFinite(liv) ? `: ${liv}` : ""} — il prezzo le sta `
         + `${signTxt(dist)}, cioe' ${dist >= 0 ? "SOPRA" : "SOTTO"} la media`;
     };
-    [riga(50, tec.sma50), riga(200, tec.sma200)].filter(Boolean).forEach(x => L.push(x));
+    [riga(50, tec.sma50, f.sma50Liv ?? tec.sma50Liv),
+     riga(200, tec.sma200, f.sma200Liv ?? tec.sma200Liv)].filter(Boolean).forEach(x => L.push(x));
   }
     if (Number.isFinite(t.pe)) L.push(`- P/E (trailing): ${t.pe}×`);
     if (t.settore) L.push(`- Settore secondo la nostra classificazione: ${t.settore}`);
@@ -9739,6 +9774,19 @@ function pdfTesto(s) {
     .replace(/\u0394/g, "delta ").replace(/\u03c3/g, "sigma").replace(/\u03bc/g, "mu")
     .replace(/\u03b1/g, "alpha").replace(/\u03b2/g, "beta").replace(/\u03c0/g, "pi")
     .replace(/[\u2248\u223c]/g, "~").replace(/\u221e/g, "inf")
+    /* ⚠⚠ v340 — L'EURO SPARIVA DA OGNI RIGA DEL PDF DEL PORTAFOGLIO. U+20AC sta fuori da
+       Latin-1, quindi cadeva nella rete finale e diventava "?": quindici importi su quindici
+       piu' il totale del libro perdevano la valuta. Ma il PDF dichiara WinAnsiEncoding
+       (oggetto /Font piu' sotto), e WinAnsi l'euro CE L'HA, alla posizione 0x80 — che in
+       Latin-1 e' un carattere di controllo e infatti nessun altro la occupa. Bastava mapparlo.
+       ⚠ Su un progetto che ha un gate intero (fx_check) nato perche' un LLM aveva usato un
+       dollaro etichettato €, un documento in cui la valuta sparisce e' la stessa famiglia di
+       danno: un importo senza valuta non e' un importo. */
+    .replace(/\u20ac/g, "\u0080")
+    /* ⚠ e il MENO tipografico U+2212, che non e' il trattino ASCII: portava il SEGNO in righe
+       come "(-6% dal riferimento)" e "alert se SPY+ con RSP-", e diventava "?" — cioe' la
+       riga perdeva la direzione, non un ornamento. */
+    .replace(/\u2212/g, "-").replace(/\u27e6/g, "[").replace(/\u27e7/g, "]")
     .replace(/[\uD800-\uDFFF]./g, "")          /* emoji: via del tutto, non "?" a coppie */
     .replace(/[^\x20-\xFF]/g, "?")
     .replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");

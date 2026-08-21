@@ -2712,11 +2712,19 @@ check("v314 medie: il verso e' scritto in parole, non lasciato dedurre", suVeri(
   const p = buildPromptTicker("MU");
   const m = p.match(/Media a 200 sedute: ([\\d.]+) — il prezzo le sta ([+-][\\d,]+%), cioe' (SOPRA|SOTTO)/);
   if (!m) return false;
-  /* il livello dev'essere coerente col prezzo e con la distanza: se il prezzo sta +75,9%
-     sopra, la media vale prezzo/1,759 — un controllo aritmetico, non testuale */
+  /* ⚠⚠ v340 — L'INVARIANTE E' L'IDENTITA', NON LA VICINANZA. La vecchia stesura confrontava
+     il livello stampato con la sua stessa ri-derivazione: confermava l'assunzione invece di
+     misurare una proprieta' (la lezione comune dei tre difetti di v326). E la tolleranza a
+     0,5 era un pavimento numerico che invecchiava col prezzo — su MU a 552 lo scarto ci
+     stava sotto, a 1027 vale 0,76 e il check e' esploso da solo, per il motivo giusto e per
+     caso. Ora: la stessa media stampata due volte nello stesso pacchetto deve portare lo
+     STESSO numero, e quel numero dev'essere quello che la pipeline pubblica. Nessuna soglia. */
   const liv = Number(m[1]);
-  const atteso = r.price / (1 + r.sma200_dist_pct / 100);
-  return Math.abs(liv - atteso) < 0.5 && m[3] === (r.sma200_dist_pct >= 0 ? "SOPRA" : "SOTTO")`));
+  const med = ((((r.tv || {}).tecnica || {}).medie || {}).sma200 || {});
+  if (Number.isFinite(med.liv) && liv !== med.liv) return false;
+  const m2 = p.match(/Media semplice 200: ([\d.]+) —/);
+  if (m2 && Number(m2[1]) !== liv) return false;
+  return m[3] === (r.sma200_dist_pct >= 0 ? "SOPRA" : "SOTTO")`));
 
 /* ⚠ e le due famiglie di medie devono usare la STESSA base: se una dice il livello e l'altra
    il prezzo, chi legge inverte — ed e' successo davvero. */
@@ -3600,6 +3608,73 @@ check("v339 FOMC: sotto la soglia la percentuale esce di lato invece di sparire"
   const blocco = src.slice(i, i + 1800);
   return blocco.includes("text-anchor=\"start\"") && blocco.includes("v[1] > 0");
 })());
+
+/* ⚠⚠ v340 — IL CHECK DELL'ENCODING GIRA SUI PACCHETTI VERI, NON SU CINQUE CARATTERI SCELTI
+   A MANO. La stesura di v337 provava una manciata di caratteri decisi da me: e' il "registro
+   fisso che invecchia da solo" gia' pagato con C10 e con gli indici 16/17 del red team, e
+   infatti mancava proprio i due che contavano — l'EURO (spariva da ogni importo del PDF del
+   portafoglio) e il MENO tipografico U+2212 (spariva il segno da "(-6% dal riferimento)").
+   Ora si applica pdfTesto ai QUATTRO pacchetti reali e si conta se compaiono "?" che nel
+   testo di partenza non c'erano. Nessun elenco da tenere aggiornato: se un domani il payload
+   comincia a usare un carattere nuovo, il check lo trova da solo. */
+check("v340 pdf: nessun carattere del payload vero si perde in un punto interrogativo", suVeri(`
+  const testi = [buildCIOText(), buildPromptTicker("MU"), buildPromptSettore("SMH"), buildPromptPortafoglio()];
+  for (const t of testi) {
+    if (!t || t.length < 5000) return false;         // non e' un pacchetto: check a vuoto
+    for (const riga of String(t).split(String.fromCharCode(10))) {
+      const prima = (riga.split("?").length - 1);
+      const dopo = (pdfTesto(riga).split("?").length - 1);
+      if (dopo > prima) return false;                 // un "?" NUOVO = un carattere perso
+    }
+  }
+  return true`));
+
+/* ⚠ e l'euro in particolare: WinAnsiEncoding — che il PDF dichiara — lo ha a 0x80, quindi
+   NON deve degradare a "EUR" ne' sparire. Un importo senza valuta non e' un importo. */
+check("v340 pdf: il simbolo dell'euro sopravvive alla codifica", (() => {
+  const t = run(`return pdfTesto("61.947 " + String.fromCharCode(0x20AC) + " pari al 21%");`);
+  return t.indexOf("?") < 0 && t.indexOf(String.fromCharCode(0x80)) >= 0;
+})());
+
+/* ══ v340 — IL DIVIETO SUI PUNTEGGI VALE ANCHE PER LE SCHEDE, E NESSUN GATE LO GUARDAVA ═══
+   ⚠⚠ Il check v337 e C12bis sorvegliano i quattro PACCHETTI. Le SCHEDE no — e infatti la
+   scheda MacroQuant ha continuato a stampare DICIANNOVE punteggi 0-100 sotto una colonna
+   intitolata "Score" per tre versioni dopo il taglio, cioe' esattamente nel posto che il CEO
+   aveva indicato per nome. Peggio: `mq.score` sceglieva ancora la prosa, e produceva una
+   contraddizione con l'etichetta nel titolo della stessa card.
+   ⚠ Il check ESEGUE la funzione vera e legge l'HTML che produce davvero — non rilegge il
+   sorgente. E' la lezione v226: un test che non passa dal codice reale certifica una strada
+   immaginaria, e li' mi era gia' costato uno spicchio fantasma spedito in produzione. */
+check("v340 schede: la scheda MacroQuant non stampa piu' punteggi, e non li usa per la prosa", suVeri(`
+  /* ⚠ SU DATI VERI, non sulla fixture: la fixture non ha macro.macroquant, quindi la scheda
+     uscirebbe subito e il check sarebbe verde (o rosso) per ASSENZA DEL FENOMENO, non per
+     assenza di difetti. E' la trappola che questo file documenta quattro volte — e scrivendo
+     questo stesso check ci sono cascato una quinta, prima di agganciarlo a suVeri. */
+  const mq = (DATA.macro || {}).macroquant;
+  if (!mq) return true;
+  let html = "", titolo = "";
+  const vero = openInfoModal;
+  openInfoModal = (t, b) => { titolo = t; html = b; };
+  try { openMacroQuantModal(); } finally { openInfoModal = vero; }
+  if (!html) return false;
+  const nudo = html.split("<").map((p, i) => i ? p.slice(p.indexOf(">") + 1) : p).join(" ").toLowerCase();
+  /* (a) nessuna colonna intitolata "Score" */
+  if (html.indexOf(">Score<") >= 0) return false;
+  /* (b) il punteggio composito non compare nel corpo */
+  if (mq.score != null && nudo.indexOf(String(mq.score) + "/100") >= 0) return false;
+  /* ⚠⚠ (b-bis) E NEMMENO I PUNTEGGI DEI COMPONENTI, IN NESSUNA FORMA. La prima stesura di
+     questo check cercava solo ">Score<" e "56/100" e NON MORDEVA: il difetto stampa i numeri
+     NUDI ("55", "26", "19") come etichetta della barra. Verificato iniettandolo — passava.
+     Ora si contano i punteggi che compaiono come token isolato nel testo: uno puo' coincidere
+     per caso con un altro numero della scheda, due no. */
+  const numeri = nudo.split(/[^0-9]+/).filter(Boolean);
+  const punteggi = (mq.components || []).map(c => c.score).filter(x => x != null).map(String);
+  const trovati = punteggi.filter(x => numeri.indexOf(x) >= 0).length;
+  if (trovati >= 2) return false;
+  /* (c) e la prosa dev'essere coerente con l'ETICHETTA del titolo: prima il corpo diceva
+         "Ciclo neutro" (da score 56) mentre il titolo diceva "Rallentamento" (da label) */
+  if (mq.label && nudo.indexOf(String(mq.label).toLowerCase()) < 0) return false;
+  return titolo.indexOf(String(mq.label)) >= 0`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
