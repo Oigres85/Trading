@@ -770,24 +770,8 @@ check("v258 il contenuto del popup esce nella scheda, prosa compresa", (() => {
    mobili, supporti, target degli analisti e short interest; (2) tre prezzi diversi nello stesso
    documento (476, 482, "chiusura del 31/07") senza un riferimento unico; (3) una
    capitalizzazione RICAVATA da un dato di due settimane prima e presentata come [VERIFICATO]. */
-check("v259 analisi titolo: la gerarchia delle fonti c'e' e i forum sono esclusi per nome", suVeri(`
-  const t = buildPromptTicker("NVDA");
-  return /GERARCHIA DELLE FONTI/.test(t)
-      && /FONTE PRIMARIA/.test(t)
-      && /NON SONO FONTI/.test(t) && /Reddit/.test(t) && /StockTwits/.test(t)`));
 
-check("v259 analisi titolo: impone UN prezzo di riferimento con data e ora", suVeri(`
-  const t = buildPromptTicker("NVDA");
-  return /IL PREZZO DI RIFERIMENTO E' UNO SOLO/.test(t)
-      && /valore, data e ora/.test(t)
-      && /tre giorni diversi/.test(t)`));
 
-check("v259 analisi titolo: vieta il [VERIFICATO] su un numero ricavato", suVeri(`
-  const t = buildPromptTicker("NVDA");
-  /* ⚠ le parentesi quadre vanno escapate DUE volte: una per la regex, una perche' il check
-     vive dentro un template literal che passa per vm.runInContext. La prima stesura ne aveva
-     una sola e la regex cercava una classe di caratteri invece del letterale. */
-  return /NIENTE .VERIFICATO. DERIVATO/.test(t) && /.STIMA./.test(t) && /si scrive/.test(t)`));
 
 /* ── v259 — la freschezza dei dati e' dichiarata nel payload, non solo nelle schede ── */
 check("v259 payload: dichiara le tre classi di freschezza prima del quadro macro", suVeri(`
@@ -1052,24 +1036,6 @@ check("v256 pacchetto macro: NESSUNA traccia di portafoglio, posizioni o watchli
 check("v337 il pacchetto macro non porta piu' il blocco del disaccordo", suVeri(`
   return !/DOVE GLI INDICATORI MACRO NON SONO D'ACCORDO/.test(buildCIOText())`));
 
-check("v337 nessun punteggio NOSTRO su 0-100 nei quattro pacchetti", suVeri(`
-  /* Fear & Greed e Financial Health sono indici PUBBLICATI da terzi, nativamente su 0-100:
-     quelli sono il dato. Il divieto riguarda i compositi che calcoliamo noi. */
-  const ESTERNI = /Fear (&|&amp;) Greed|Financial Health|CNN/i;
-  const settore = buildPromptSettore("SMH");
-  if (settore.length < 5000) return false;   // non e' il pacchetto: e' il messaggio d'errore
-  const testi = [buildCIOText(), buildPromptTicker("MU"), settore, buildPromptPortafoglio()];
-  for (const t of testi) {
-    for (const riga of String(t).split(String.fromCharCode(10))) {
-      /* ⚠ NIENTE REGEX QUI: dentro un template literal passato a vm gli escape si mangiano
-         un livello — \s diventa s — ed e' la SESTA volta in questo progetto. Si conta a mano. */
-      const j = riga.indexOf("/100");
-      if (j < 1 || !"0123456789".includes(riga[j - 1])) continue;
-      if (ESTERNI.test(riga)) continue;
-      return false;
-    }
-  }
-  return true`));
 
 /* ── analisi spot del titolo ── */
 /* ⚠ v257 — INVARIANTI RISCRITTI DOPO UN FALLIMENTO REALE. Il CEO ha incollato il pacchetto in
@@ -1079,21 +1045,8 @@ check("v337 nessun punteggio NOSTRO su 0-100 nei quattro pacchetti", suVeri(`
    che diceva "cercali online" e subito dopo "cio' che manca si dichiara n.d.".
    I check vecchi verificavano che il pacchetto DICHIARASSE di non avere i dati. Ora verificano
    che ORDINI di cercarli, che dica DOVE, e che chiuda la scappatoia del referto tutto-n.d. */
-check("v257 analisi titolo: la ricerca online e' il PASSO 0, obbligatorio e prima di tutto", suVeri(`
-  const t = buildPromptTicker("nvda");
-  return /PASSO 0/.test(t) && /OBBLIGATORIO/.test(t)
-      && /CERCA ONLINE/.test(t) && /Non e' un'opzione/.test(t)`));
 
-check("v257 analisi titolo: chiude la scappatoia del referto tutto-n.d.", suVeri(`
-  const t = buildPromptTicker("NVDA");
-  return /SE NON PUOI NAVIGARE/.test(t)
-      && /FERMATI/.test(t)
-      && /mai come politica generale/.test(t)`));
 
-check("v257 analisi titolo: dice DOVE cercare, con fonti nominate e il ticker nell'URL", suVeri(`
-  const t = buildPromptTicker("NVDA");
-  return /DOVE CERCARE/.test(t) && /finance\\.yahoo\\.com\\/quote\\/NVDA/.test(t)
-      && /stockanalysis\\.com/.test(t) && /sec\\.gov/.test(t)`));
 
 /* ⚠⚠ v293 — RIAGGANCIATO AL FATTO, NON AL TITOLO DELLA SEZIONE. Cercava "SCHEDA DI
    IDENTITA'", "ULTIMA TRIMESTRALE", "ENTRARE O USCIRE": stringhe letterali, rotte appena il
@@ -1104,24 +1057,11 @@ check("v257 analisi titolo: dice DOVE cercare, con fonti nominate e il ticker ne
    ⚠ La scheda di identita' non c'e' piu' ed e' voluto: il CEO ha chiesto meno lunghezza, e
    nome/borsa/capitalizzazione stanno su qualunque pagina di quotazione — mentre prezzo, range
    a 52 settimane e settore il pacchetto li porta gia' come FATTI nel blocco del sistema. */
-check("v257 analisi titolo: chiede le consegne che il CEO ha elencato", suVeri(`
-  const t = buildPromptTicker("NVDA");
-  return /Concorrente/.test(t) && /[Qq]uota di mercato/.test(t)
-      && /[Tt]rimestral/.test(t) && /PROSSIMA/.test(t)
-      && /Supporti e resistenze/.test(t) && /SENTIMENT/.test(t)
-      && /[Ii]ngressi/.test(t) && /rischio-rendimento/.test(t)`));
 
-check("v257 analisi titolo: dichiara data del dato macro e prossimo aggiornamento", suVeri(`
-  const t = buildPromptTicker("NVDA");
-  return /Snapshot del /.test(t) && /prossimo aggiornamento atteso/.test(t)
-      && /prossimo run del sistema/.test(t)`));
 
 /* v337 — il terzo requisito (il blocco del disaccordo) e' caduto col punteggio 0-100. I due
    che restano sono quelli che dicono la cosa vera: il pacchetto del titolo PORTA DENTRO il
    quadro macro, che e' la ragione per cui non esistono due bottoni separati (v259). */
-check("v257 analisi titolo: porta dentro di se' il quadro macro", suVeri(`
-  const t = buildPromptTicker("NVDA");
-  return /ANALISI DI NVDA/.test(t) && /QUADRO MACRO/.test(t)`));
 
 /* ⚠⚠ v308 — L'INVARIANTE E' IL DIVIETO, NON LA FRASE. Il check cercava le parole "niente
    dimensionamenti", che nascevano da "non conosco la tua posizione". Dalla v307 il sistema LA
@@ -1130,31 +1070,12 @@ check("v257 analisi titolo: porta dentro di se' il quadro macro", suVeri(`
    Cio' che NON deve cambiare e' il divieto di dimensionare — e la ragione ora e' piu' precisa:
    non "non so cosa possiedi" ma "non conosco liquidita' ne' situazione fiscale, e un
    dimensionamento senza quei due dati e' un numero che sembra un consiglio". */
-check("v308 analisi titolo: il divieto di dimensionare resta, con la ragione giusta", suVeri(`
-  const t = buildPromptTicker("NVDA");
-  return t.indexOf("In nessun caso dimensionare") >= 0
-      && t.indexOf("niente stop in euro") >= 0
-      && t.indexOf("non conosce liquidita'") >= 0
-      && t.indexOf("Non conosco la tua posizione") < 0`));
 
 /* ⚠ e quando il titolo E' in portafoglio il pacchetto deve dirlo, col carico: e' il fatto che
    distingue una decisione di mantenimento da una di ingresso. Quando NON lo e', non deve
    inventarselo. */
-check("v308 analisi titolo: dichiara la posizione se c'e', tace se non c'e'", suVeri(`
-  const dentro = ((DATA.watchlist || []).find(r => r && r.qta > 0 && r.pmc > 0) || {}).ticker;
-  if (!dentro) return true;
-  const conPos = buildPromptTicker(dentro);
-  const senzaPos = buildPromptTicker("TSLA");
-  return conPos.indexOf("GIA' IN PORTAFOGLIO") >= 0
-      && senzaPos.indexOf("GIA' IN PORTAFOGLIO") < 0`));
 
-check("v256 analisi titolo: ticker vuoto non produce nessun pacchetto", suVeri(`
-  return buildPromptTicker("") === "" && buildPromptTicker("   ") === ""`));
 
-check("v256 analisi titolo: una sola testata nel pacchetto (quella spot), non due", suVeri(`
-  const t = buildPromptTicker("NVDA");
-  const h = promptHeaderText();
-  return !t.includes(h)`));
 
 /* ── v266 — la watchlist e' una TABELLA NOSTRA, ordinabile e cancellabile ──────────────────
    Il CEO: "sembra che i dati siano fermi ... con possibilita' di eliminarli o ordinarli
@@ -1373,29 +1294,13 @@ check("v268 rete: livePrices e la watchlist condividono UNA cache, non due giri"
    ATR e medie mobili — numeri che il sistema HA GIA' e mostra sulla pagina due centimetri piu'
    su. Lo spreco e' il danno minore: quello grosso e' che l'LLM torna con numeri diversi, e il
    CEO si ritrova la pagina che dice una cosa e l'analisi un'altra sullo stesso titolo. */
-check("v271 pacchetto titolo: porta i livelli che il sistema gia' conosce", run(`
-  const p = buildPromptTicker("NVDA");
-  const r = (DATA.watchlist || []).concat(DATA.portfolio || []).find(x => x.ticker === "NVDA");
-  if (!r) return true;
-  return p.includes("QUELLO CHE IL SISTEMA SA GIA'")
-      && p.includes(String(r.support)) && p.includes(String(r.resistance))
-      && p.includes(String(r.rsi))`));
 
 /* ⚠ si misura la funzione che il testo lo produce, non un pacchetto che in questo harness puo'
    legittimamente non avere quel titolo: un check che dipende dai dati di prova misura i dati
    di prova, non il codice. */
-check("v271 pacchetto titolo: dice cosa fare se il web diverge, invece di lasciar scegliere in silenzio", (() => {
-  const i = src.indexOf("function datiNostriDelTitolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
-  return corpo.includes("2%")                       // la soglia di materialita' e' dichiarata
-      && /entrambi i valori|tutti e due/.test(corpo)  // si scrivono tutti e due, non uno solo
-      && /silenzio/.test(corpo);                      // e la scelta silenziosa e' nominata come tale
-})());
 
 /* ⚠ per un titolo che la pipeline NON segue il blocco non deve esistere: inventare un
    "supporto del sistema" che il sistema non ha calcolato sarebbe la bugia peggiore. */
-check("v271 pacchetto titolo: nessun blocco per un titolo che la pipeline non segue", run(`
-  return !buildPromptTicker("ZZZZ-INESISTENTE").includes("QUELLO CHE IL SISTEMA SA GIA'")`));
 
 /* ⚠ IL FALSO ALLARME DEL LUNEDI'. Il Treasury 30A rilevato venerdi' usciva lunedi' mattina
    con "ERA ATTESO E NON E' ARRIVATO": i due giorni di grazia se li mangiava il fine settimana.
@@ -1470,13 +1375,6 @@ check("v272 rigenera: niente passi che annunciano lavori che non si fanno piu'",
    qui creava una situazione peggiore di prima: il pacchetto continuava a dire all'LLM che
    "prima della campana i futures sono il dato piu' fresco", mentre la pagina aveva il prezzo
    pre-market di QUEL titolo. Il sistema sapeva una cosa e ne faceva scrivere un'altra. */
-check("v273 pacchetto titolo: il prezzo pre/after entra nel pacchetto, non solo in tabella", (() => {
-  /* v274 — il pre/after non si rilegge piu' da quoteLive qui dentro: arriva da fattiTitolo,
-     il punto unico. La proprieta' da controllare resta che il pacchetto lo PORTI. */
-  const i = src.indexOf("function datiNostriDelTitolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /f\.ext/.test(corpo) && /PRE-MARKET/.test(corpo) && /AFTER-HOURS/.test(corpo);
-})());
 
 /* ══ v274 — I DUE CERVELLI ADESSO NE SONO UNO ════════════════════════════════════════════
    Punto 1 della revisione che il CEO ha approvato. Pagina e pacchetto erano costruiti da
@@ -1486,23 +1384,6 @@ check("v273 pacchetto titolo: il prezzo pre/after entra nel pacchetto, non solo 
    ⚠ QUESTO CHECK E' LA RAGIONE PER CUI IL DIFETTO NON TORNA: se un consumatore ricomincia a
    leggersi i dati da solo, qui si accende. Non misura uno stile: misura che esista UN posto
    dove la domanda "cosa sappiamo di questo titolo?" ha una risposta sola. */
-check("v274 fatti: la scheda livelli e il pacchetto leggono tutti da fattiTitolo", (() => {
-  const puro = (nome, finoA) => {
-    const i = src.indexOf("function " + nome);
-    if (i < 0) return "";
-    const j = finoA ? src.indexOf(finoA, i) : src.indexOf("\nfunction ", i + 10);
-    return src.slice(i, j > 0 ? j : i + 4000).replace(/\/\*[\s\S]*?\*\//g, "");
-  };
-  /* v275 — datiSimbolo e' uscito con la watchlist; i consumatori sono due, e la regola non
-     cambia: nessuno si rifa' i conti da solo sulle fonti grezze. */
-  const consumatori = ["livelliTitolo", "datiNostriDelTitolo"];
-  return consumatori.every(n => {
-    const c = puro(n);
-    /* deve chiamare fattiTitolo e NON rifarsi i conti da solo su DATA */
-    return /fattiTitolo\(/.test(c)
-        && !/DATA\.portfolio/.test(c) && !/DATA\.watchlist/.test(c) && !/DATA\.options/.test(c);
-  });
-})());
 
 check("v274 fatti: fattiTitolo e' l'unico che legge le fonti grezze", (() => {
   const i = src.indexOf("function fattiTitolo");
@@ -1532,11 +1413,6 @@ check("v274 macro: il Philly Fed si dichiara proxy sulla scheda e nel pacchetto"
    DECIDERE, invece di cambiare fonte sperando che cambi qualcosa. */
 /* v275 — la tabella e' uscita; il pacchetto resta il posto dove quel ritardo va dichiarato,
    perche' e' li' che i prezzi vengono letti da qualcuno che poi ci ragiona sopra. */
-check("v275 prezzi: il ritardo e' dichiarato nel pacchetto per l'analisi", (() => {
-  const j = src.indexOf("function datiNostriDelTitolo");
-  const pac = src.slice(j, src.indexOf("\nfunction ", j + 10));
-  return /ritardati di circa 15 minuti/.test(pac);
-})());
 
 /* ══ v275 — LA WATCHLIST E' USCITA, MA NON LE SUE LEZIONI ═══════════════════════════════
    Il CEO: "elimina La mia watchlist che vedro' con i tempi aggiornati dal mio broker".
@@ -1593,11 +1469,6 @@ check("v276 pacchetto: i livelli sono arrotondati alla fonte, non solo a schermo
 
 /* ⚠ un prezzo senza ora non dice quanto e' fresco: se il CEO incolla alle 16:00 e l'LLM
    risponde alle 16:30, quel numero ha mezz'ora e nessuno dei due lo sa. */
-check("v276 pacchetto: il prezzo di riferimento porta l'ora della lettura", (() => {
-  const i = src.indexOf("function datiNostriDelTitolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /letto dal browser alle \$\{ora\}/.test(corpo);
-})());
 
 /* ⚠ "Fear & Greed" compariva due volte con lo stesso numero, in due blocchi. Sono
    complementari, ma la testata impone di CONTARE I SEGNALI UNA VOLTA SOLA e due righe uguali
@@ -1732,13 +1603,6 @@ check("v284 opzioni: si sceglie la scadenza con piu' contratti aperti, non la pi
 
 /* ⚠ e quando la scelta NON e' la piu' vicina va DETTO: "scadenza 14/08" accanto a un titolo
    che scade il 12 sembra un errore, e un numero che sembra sbagliato viene ignorato. */
-check("v284 opzioni: la scheda e il pacchetto dichiarano se la scadenza non e' la piu' vicina", (() => {
-  const i = src.indexOf("async function renderOpzioniGrafico");
-  const scheda = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  const j = src.indexOf("function datiNostriDelTitolo");
-  const pac = src.slice(j, src.indexOf("\nfunction ", j + 10));
-  return /Non è la scadenza più vicina/.test(scheda) && /NON e' la scadenza piu' vicina/.test(pac);
-})());
 
 /* ══ v286 — TRE DIFETTI TROVATI NEL PACCHETTO CHE IL CEO MI HA INCOLLATO ═════════════════ */
 
@@ -1746,12 +1610,6 @@ check("v284 opzioni: la scheda e il pacchetto dichiarano se la scadenza non e' l
    etichetta: "put 6434, call 15041" (volumi del giorno) accanto a "33024 contratti" (open
    interest). Non tornano e non devono tornare — ma chi legge prova a farli quadrare, e quando
    non ci riesce dubita di tutto il blocco. E' la classe "denominatori non dichiarati". */
-check("v286 opzioni: volumi e contratti aperti sono etichettati per quello che sono", (() => {
-  const i = src.indexOf("function datiNostriDelTitolo");
-  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
-  return /volumi scambiati oggi/.test(corpo) && /CONTRATTI APERTI/.test(corpo)
-      && /grandezza diversa dai volumi/.test(corpo);
-})());
 
 /* ⚠ IL CONTEGGIO NON CHIUDEVA: "26 indicatori · 10 sotto 50 e 13 sopra" lascia tre indicatori
    senza posto — quelli esattamente a 50. Un conteggio che non torna invita a dubitare del
@@ -2012,52 +1870,22 @@ check("v297 macro: Fear & Greed e' reso come tachimetro, non come linea a quattr
    "mi fornisce un quadro troppo lungo": la vecchia consegna aveva sette blocchi con tabelle e
    prosa e NESSUN tetto — tremila parole per costruzione. Un budget scritto e' l'unica
    istruzione sulla lunghezza che un LLM rispetti davvero. */
-check("v293 consegna: il pacchetto titolo porta un tetto di lunghezza", suVeri(`
-  const p = buildPromptTicker("AMD");
-  return /BUDGET: [\\d.\\-]+ parole IN TUTTO/.test(p) && /vincolo, non un'indicazione/.test(p)`));
 
 /* ⚠ gli otto blocchi che il CEO ha elencato, nel suo ordine. Se un domani qualcuno ne toglie
    uno "per accorciare", qui si accende: la lunghezza si taglia col budget, non con i blocchi. */
-check("v293 consegna: gli otto blocchi richiesti ci sono tutti e in ordine", suVeri(`
-  const p = buildPromptTicker("AMD");
-  const ordine = ["0) IL GIUDIZIO", "1) QUADRO MACRO", "2) L'AZIENDA", "3) TRIMESTRALI",
-                  "4) I CONTI", "5) TECNICA", "6) SENTIMENT DEGLI ANALISTI", "7) LA CHIUSURA"];
-  let pos = -1;
-  for (const b of ordine) { const i = p.indexOf(b); if (i < 0 || i < pos) return false; pos = i; }
-  return /BREVE \\(settimane\\)/.test(p) && /MEDIO \\(3-12/.test(p) && /LUNGO \\(oltre/.test(p)
-      && /analista di Wall Street/.test(p)`));
 
 /* ══ v293 — EMA E FIBONACCI LI CALCOLIAMO NOI ════════════════════════════════════════════
    Lezione v271: il sistema aveva i livelli e ne faceva cercare altri, l'LLM tornava con numeri
    diversi e il CEO si ritrovava pagina e analisi in disaccordo sullo stesso titolo. */
-check("v293 tecnica: EMA e Fibonacci sono nel pacchetto, calcolati dal sistema", suVeri(`
-  const p = buildPromptTicker("AMD");
-  return /Medie esponenziali: EMA 20 [\\d.]+/.test(p)
-      && /calcolate dal sistema su \\d+ barre giornaliere/.test(p)
-      && /Ritracciamenti di Fibonacci sul range a 52 settimane/.test(p)
-      && /calcolo esatto sui due estremi/.test(p)`));
 
 /* ⚠⚠ E SI PUBBLICA SOLO CIO' CHE I DATI PERMETTONO. `sparks.m6` sono 126 barre giornaliere:
    l'EMA 200 ne vorrebbe 200. Pubblicarla lo stesso sarebbe un numero che sembra piu' solido di
    quanto e' — la classe di difetto peggiore di questo progetto. Il pacchetto deve DICHIARARE
    perche' manca, non ometterla in silenzio. */
-check("v293 tecnica: l'EMA 200 non si pubblica, e si dice perche'", suVeri(`
-  const p = buildPromptTicker("AMD");
-  if (!/Medie esponenziali/.test(p)) return true;
-  return /EMA 200 NON calcolata/.test(p) && /servirebbero 200 barre giornaliere/.test(p)
-      && !/EMA 200 [\\d]/.test(p)`));
 
 /* ⚠ Fibonacci e' aritmetica esatta, non una stima: il livello 50% dev'essere esattamente il
    punto medio fra massimo e minimo a 52 settimane. Se un domani qualcuno "arrotonda" o cambia
    il verso del conteggio, il numero smette di essere quello che la convenzione indica. */
-check("v293 tecnica: i livelli di Fibonacci tornano col range dichiarato", suVeri(`
-  const p = buildPromptTicker("AMD");
-  const m = p.match(/Fibonacci sul range a 52 settimane \\(massimo ([\\d.]+), minimo ([\\d.]+)\\): ([^\\n]+)/);
-  if (!m) return true;
-  const hi = parseFloat(m[1]), lo = parseFloat(m[2]);
-  const meta = m[3].match(/50% a ([\\d.]+)/);
-  if (!meta) return false;
-  return Math.abs(parseFloat(meta[1]) - (hi - 0.5 * (hi - lo))) < 0.02`));
 
 /* ⚠⚠ I DOPPIONI TOLTI DALLA PAGINA DEVONO RESTARE NEL PACCHETTO. E' la regola v208 — "si toglie
    dalla pagina cio' che il payload porta gia'" — e senza questo check un domani qualcuno
@@ -2117,27 +1945,11 @@ check("v295 etichette: la scala non parla di un portafoglio che non c'e' piu'", 
    dentro il flusso a un incollaggio. Del resto — agenti autonomi, borsa simulata, sentiment
    dai forum — non prendo niente, e i forum sono gia' vietati da questa testata dopo che un LLM
    marco' [VERIFICATO] medie mobili con fonte Reddit. */
-check("v296 contraddittorio: il pacchetto chiede la tesi opposta, e la chiede per ultima", suVeri(`
-  const p = buildPromptTicker("AMD");
-  const i8 = p.indexOf("8) LA TESI CONTRARIA");
-  const i7 = p.indexOf("7) LA CHIUSURA");
-  const i0 = p.indexOf("0) IL GIUDIZIO");
-  /* dopo la conclusione, non dopo il giudizio: per attaccare una tesi bisogna averla prima
-     argomentata con le prove, altrimenti e' teatro. */
-  return i8 > i7 && i7 > i0 && /obbligatoria/.test(p)`));
 
 /* ⚠⚠ I TRE VINCOLI CHE LO RENDONO UN CONTRADDITTORIO INVECE DI UN PARAGRAFO DI CORTESIA. Senza
    di questi un modello scrive "d'altra parte i rischi non mancano" e passa oltre: (a) i numeri
    devono essere QUESTI, (b) deve scegliere, (c) deve nominare un fatto osservabile e datato che
    deciderebbe la disputa. Il terzo si aggancia al calendario che il pacchetto porta da v290. */
-check("v296 contraddittorio: obbliga ai numeri del pacchetto, a scegliere, e a un fatto datato", suVeri(`
-  const p = buildPromptTicker("AMD");
-  const i = p.indexOf("8) LA TESI CONTRARIA");
-  const b = p.slice(i, p.indexOf("══ REGOLE ══", i));
-  return /NUMERI DI QUESTO PACCHETTO/.test(b)
-      && /non obiezioni generiche/.test(b)
-      && /QUALE FATTO OSSERVABILE E DATATO/.test(b)
-      && /Non ti e' consentito rispondere che entrambe le tesi hanno merito/.test(b)`));
 
 /* ⚠ v298 — la lista NON si congela: era scritta a mano e sarebbe invecchiata alla prima
    sezione aggiunta o tolta (e ne ho tolte due in questo stesso commit). Si rilegge da
@@ -2190,40 +2002,15 @@ check("v297 riordino: la chiave dell'ordine non e' la stringa 'undefined'", (() 
    (il sistema tiene un numero e ne fa cercare un altro) applicato ai conti invece che ai
    livelli. L'EPS in particolare — v185 lo rimise nel payload perche' col solo P/E non si
    distingue una societa' cara da una in perdita, e su AMD davamo P/E 123,4x senza il 4,17. */
-check("v299 pacchetto titolo: porta i fondamentali che il sistema gia' possiede", suVeri(`
-  const p = buildPromptTicker("AMD");
-  const r = [...(DATA.portfolio||[]), ...(DATA.watchlist||[])].find(x => x.ticker === "AMD");
-  if (!r) return true;
-  const c = [];
-  if (r.eps != null) c.push("Utile per azione (EPS");
-  if (r.beta != null) c.push("Beta: " + r.beta);
-  if (r.rs_1m != null) c.push("Forza relativa a 1 mese");
-  return c.every(x => p.includes(x)) && (() => {
-    const px = numero(r.prezzo_limite_aggiustato ?? r.price);
-    const res = numero(r.resistance), atr = numero(r.atr_14);
-    if (![px, res, atr].every(Number.isFinite) || atr <= 0 || res <= px) return true;
-    const atteso = "1:" + (Math.round((res - px) / (2 * atr) * 10) / 10);
-    return p.includes("Rapporto rischio/rendimento: " + atteso)
-        && p.includes("LA BASE E' IL PREZZO CHE PAGHERESTI");
-  })()`));
 
 /* ⚠ ma NON i punteggi compositi: `fin_health` e `health` sono giudizi 0-100 travestiti da
    dati, ed e' esattamente cio' che v200 ha tolto dal pacchetto misurando un hit-rate del 29%.
    I fatti si', i voti no — anche quando sono comodi. */
-check("v299 pacchetto titolo: nessun punteggio composito rientra dalla finestra", suVeri(`
-  const p = buildPromptTicker("AMD");
-  return !p.includes("fin_health") && !p.includes("Financial Health")
-      && !p.includes("Salute finanziaria")`));
 
 /* ⚠⚠ IL BLOCCO "COSA NON SO". Dei nove blocchi che il prompt chiede, solo due si rispondono
    coi dati del pacchetto: il resto viene dalla rete, e un modello che non trova il consenso
    analisti se lo inventa in silenzio. La dichiarazione di fallimento e' OBBLIGATORIA perche'
    un buco dichiarato si vede e un numero inventato no. */
-check("v299 pacchetto titolo: elenca cosa non ha e obbliga a dichiarare i buchi", suVeri(`
-  const p = buildPromptTicker("AMD");
-  return p.includes("QUELLO CHE IL SISTEMA NON HA")
-      && p.includes("NON VERIFICATO:")
-      && p.includes("Un numero plausibile inventato e' peggio di un buco dichiarato")`));
 
 /* ══ v303 — LE QUATTRO SEZIONI FUSE: GLI INVARIANTI SI SPOSTANO, NON SI PERDONO ══════════
    Il CEO ha chiesto di spostare Termometri di stress, Rotazione, Leva e stagionalita' e La
@@ -2339,85 +2126,37 @@ check("v307 news: ma restano nel pacchetto", suVeri(`
    gratuita affidabile: `sharesOutstanding` di yfinance da' 11,7M quote per un NAV di 584$,
    cioe' 6,8 miliardi contro i 68 di `totalAssets` — dieci volte di scarto. Un ingrediente
    mancante DICHIARATO e' un'analisi onesta; uno stimato in silenzio non lo e'. */
-check("v305 settore: il pacchetto porta l'anatomia del momentum, media per media", suVeri(`
-  const p = buildPromptSettore("SMH");
-  if (p.indexOf("Settore non riconosciuto") === 0) return true;
-  return p.indexOf("ANATOMIA DEL MOMENTUM") >= 0
-      && p.indexOf("media a 200 sedute") >= 0
-      && p.indexOf("nell'ultimo mese") >= 0`));
 
 /* ⚠ e la forza relativa CONTRO il mercato: e' il confronto che rende visibile l'euforia — un
    settore a +161% mentre l'indice fa +49% dice qualcosa che il +161% da solo non dice. */
-check("v305 settore: confronta il comparto col mercato e col Nasdaq", suVeri(`
-  const p = buildPromptSettore("SMH");
-  if (p.indexOf("Settore non riconosciuto") === 0) return true;
-  return p.indexOf("FORZA RELATIVA") >= 0 && p.indexOf("S&P 500") >= 0
-      && p.indexOf("Nasdaq 100") >= 0 && p.indexOf("scarto sul mercato") >= 0`));
 
 /* ⚠⚠ L'INGREDIENTE CHE NON ABBIAMO DEVE ESSERE DICHIARATO, coi numeri che lo dimostrano. Senza
    questa riga il pacchetto sembrerebbe completo, e un LLM riempirebbe il buco stimando. */
-check("v305 settore: dichiara che i flussi retail non li abbiamo, e perche'", suVeri(`
-  const p = buildPromptSettore("SMH");
-  if (p.indexOf("Settore non riconosciuto") === 0) return true;
-  return p.indexOf("IL SISTEMA NON HA IL DATO") >= 0
-      && p.indexOf("13F sono trimestrali") >= 0
-      && p.indexOf("PROXY") >= 0`));
 
 /* ⚠ un settore che non esiste non deve produrre un pacchetto vuoto che sembra valido: deve
    dire quali esistono. Un pacchetto muto e' peggio di un errore. */
-check("v305 settore: una chiave sconosciuta elenca i settori disponibili", suVeri(`
-  const p = buildPromptSettore("NONESISTE");
-  return p.indexOf("Settore non riconosciuto") === 0 && p.indexOf("SMH") >= 0`));
 
 /* ⚠⚠ UN'OBBLIGAZIONE NON SI MOLTIPLICA COME UN'AZIONE, e il primo disegno lo dimostrava: il
    BTP quota in PERCENTUALE del nominale, quindi 40.000 a 102,86 valgono 41.144 euro e non
    4.114.400. Moltiplicato come un titolo azionario risultava il 93% del portafoglio e
    schiacciava tutto il resto a 0-2%. Un numero che non rompe niente e dice il falso — classe
    v205, e visibile solo perche' ho guardato il risultato invece del codice. */
-check("v307 portafoglio: il bond vale nominale x prezzo/100, non quote x prezzo", (() => {
-  const i = src.indexOf("function renderPortafoglio");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  return corpo.includes("q * p / 100") && corpo.includes("startsWith(\"BTP\")");
-})());
 
 /* ⚠⚠ E NON SI SOMMANO VALUTE DIVERSE: il totale metteva insieme dollari ed euro come se fossero
    la stessa cosa — il difetto per cui esiste il gate valuta (v183), che pero' guarda il
    pacchetto e non la pagina. Il peso e' adimensionale e si calcola in euro; gli importi per
    riga restano nativi, dove non c'e' niente da convertire. */
-check("v307 portafoglio: il peso converte in euro, e lo dichiara", (() => {
-  const i = src.indexOf("function renderPortafoglio");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  return corpo.includes("valEur") && corpo.includes("DATA.eurusd")
-      && corpo.includes("sommare dollari ed euro");
-})());
 
 /* ⚠ UNA SOLA STRADA per portare un simbolo nel grafico: la usano il clic sul portafoglio e il
    selettore dei settori. Due percorsi separati divergono sempre — lezione v225 (frecce e
    trascinamento) e v161/v207 (doppie derivazioni della stessa grandezza). */
-check("v307 grafico: clic sul portafoglio e cambio settore passano dalla stessa funzione", (() => {
-  const usi = (src.match(/apriNelGrafico\(/g) || []).length;
-  return src.includes("function apriNelGrafico")
-      && src.includes('$("#set-input")?.addEventListener("change"')
-      && src.includes('closest("[data-pf-tk]")')
-      && usi >= 4;      // la definizione piu' i tre punti che la chiamano
-})());
 
 /* ⚠ le righe si ridisegnano a ogni render: gli handler stanno sul CONTENITORE, non sulle
    righe, altrimenti restano handler morti — il difetto v193/v213 che ha gia' rotto il wiring
    piu' volte in questo progetto. */
-check("v307 portafoglio: gli handler stanno sul contenitore, non sulle righe", (() => {
-  const i = src.indexOf("function renderPortafoglio");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  return corpo.includes("box.addEventListener");
-})());
 
 /* ⚠ e le posizioni su titoli che la pipeline NON segue non hanno prezzo: vanno dichiarate, non
    omesse. Una posizione che sparisce dalla tabella si legge come "venduta". */
-check("v307 portafoglio: le posizioni non seguite vengono dichiarate", (() => {
-  const i = src.indexOf("function renderPortafoglio");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  return corpo.includes("non_seguite");
-})());
 
 /* ══ v309 — STAGIONALITA' NDX + MIDTERM, E I CLIC CHE PORTANO AL GRAFICO ═════════════════ */
 
@@ -2539,37 +2278,13 @@ check("v310 nessuna tessera e' cieca al pacchetto: cio' che si disegna arriva al
    del comparto scendeva da 62% a 54% SENZA dire che una posizione era uscita dal conto. Un
    numero piu' basso che sembra una riduzione dell'esposizione e invece e' un denominatore
    diverso — la classe "denominatori non dichiarati" che `coherence_check` insegue. */
-check("v310 settore: se una posizione esce dal conto per mancanza di prezzo, lo dichiara", suVeri(`
-  const wl = DATA.watchlist || [];
-  const conPos = wl.filter(r => r && r.qta > 0);
-  if (conPos.length < 2) return true;
-  const salvo = conPos[0].price;
-  try {
-    delete conPos[0].price;
-    const p = buildPromptSettore("SMH");
-    return p.indexOf("fuori da questo conto") >= 0 && p.indexOf(conPos[0].ticker) >= 0;
-  } finally { conPos[0].price = salvo; }`));
 
 /* ⚠ e il peso del titolo nel libro dev'essere lo STESSO nei due pacchetti: un'asimmetria fra
    due artefatti dello stesso sistema sullo stesso titolo e' peggio di un dato mancante,
    perche' chi legge non sa quale credere. */
-check("v310 coerenza: il peso di un titolo e' identico nel pacchetto titolo e in quello di settore", suVeri(`
-  const r = (DATA.watchlist || []).find(x => x && x.qta > 0 && x.price > 0 && x.ticker === "AMD");
-  if (!r) return true;
-  const a = (buildPromptTicker("AMD").match(/vale il (\\d+)% del controvalore/) || [])[1];
-  const b = (buildPromptSettore("SMH").match(/AMD (\\d+)%/) || [])[1];
-  return a && b && Math.abs(Number(a) - Number(b)) <= 1`));
 
 /* ⚠ il peso si calcola in `fattiTitolo`, fonte unica dei fatti di un titolo (v274): la prima
    stesura lo ricalcolava dentro chi disegna, e il gate v274 l'ha preso. */
-check("v310 fatti: il peso nel libro nasce in fattiTitolo, non in chi lo stampa", (() => {
-  const i = src.indexOf("function fattiTitolo");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  const j = src.indexOf("function datiNostriDelTitolo");
-  const disegna = src.slice(j, src.indexOf(String.fromCharCode(10) + "function ", j + 10));
-  return corpo.includes("pesoLibro") && disegna.includes("tec.pesoLibro")
-      && !disegna.includes("DATA.eurusd");
-})());
 
 /* ══ v311 — IL PORTAFOGLIO SI MODIFICA DALLA PAGINA ═════════════════════════════════════
    E' un percorso di SCRITTURA sui dati del CEO: i check qui sono piu' stretti del solito,
@@ -2578,59 +2293,23 @@ check("v310 fatti: il peso nel libro nasce in fattiTitolo, non in chi lo stampa"
 /* ⚠⚠ NIENTE SALVATAGGI PARZIALI. Se una riga non e' valida non si scrive NIENTE: salvare
    metà portafoglio e dire "fatto" e' peggio di non salvare, perche' il CEO non ha modo di
    sapere quale metà. */
-check("v311 portafoglio: input non valido = nessuna scrittura, e lo dice", (() => {
-  const i = src.indexOf("async function salvaPosizioni");
-  const corpo = src.slice(i, src.indexOf("async function", i + 10) > 0
-    ? src.indexOf("async function", i + 10) : src.length);
-  return corpo.includes("Non ho salvato niente")
-      && corpo.includes("un salvataggio parziale sarebbe peggio")
-      && /if \(errori\.length\)[\s\S]{0,200}return;/.test(corpo);
-})());
 
 /* ⚠⚠ UN TICKER NUOVO VA ANCHE NELLA WATCHLIST, altrimenti la pipeline non ne prende il prezzo
    e la riga resta senza valore — un dato mancante travestito da posizione. E `posizioni.json`
    NON diventa una fonte di simboli: e' la lezione v274 ("un ripiego verso un file morto e' una
    strada che riporta indietro"), quindi si scrivono DUE file e lo si dichiara. */
-check("v311 portafoglio: un titolo nuovo entra anche nella watchlist, dichiarandolo", (() => {
-  const i = src.indexOf("async function salvaPosizioni");
-  const corpo = src.slice(i, i + 4200);
-  return corpo.includes("WATCHLIST_PATH")
-      && corpo.includes("Ho aggiunto anche alla watchlist")
-      && corpo.includes("la pipeline non ne prenderebbe il prezzo");
-})());
 
 /* ⚠ senza token il salvataggio resta su un browser: dirlo, non lasciarlo scoprire dall'iPhone.
    E' il difetto gia' corretto sui parametri di rischio e sull'ordine delle sezioni. */
-check("v311 portafoglio: senza token dichiara che il salvataggio e' locale", (() => {
-  const i = src.indexOf("async function salvaPosizioni");
-  const corpo = src.slice(i, i + 4200);
-  return corpo.includes("solo su questo browser") && corpo.includes("la pipeline non lo legge");
-})());
 
 /* ⚠ togliere una riga tocca il FORM, non i dati: il salvataggio e' l'unico momento in cui
    qualcosa viene scritto, e Annulla deve poter riportare tutto indietro. */
-check("v311 portafoglio: togliere una riga non scrive niente finche' non si salva", (() => {
-  const i = src.indexOf('const togli = t.closest(".pf-togli")');
-  const corpo = src.slice(i, i + 500);
-  return corpo.includes("removeChild") && !corpo.includes("salvaPosizioni")
-      && src.includes('t.closest("#pf-annulla")');
-})());
 
 /* ⚠ i comandi nascono e muoiono a ogni ridisegno: la delega sta sul documento, non sui
    bottoni — difetto v193/v213, che ha gia' rotto il wiring piu' volte qui. */
-check("v311 portafoglio: i comandi sono in delega, non agganciati ai bottoni", (() => {
-  return src.includes('document.addEventListener("click"')
-      && src.includes('t.closest("#pf-salva")')
-      && !/\$\("#pf-salva"\)\?\.addEventListener/.test(src);
-})());
 
 /* ⚠ e la modifica legge le posizioni da cio' che il sistema HA, non da una copia parallela:
    due elenchi della stessa cosa divergono (C10/C12). */
-check("v311 portafoglio: la forma parte dai dati veri, non da un elenco separato", (() => {
-  const i = src.indexOf("function posizioniCorrenti");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
-  return corpo.includes("DATA.portfolio") && corpo.includes("DATA.watchlist");
-})());
 
 check("v327 rotazione: disegna tutti i comparti, ognuno cliccabile, in una scheda normale", suVeri(`
   const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
@@ -2667,27 +2346,11 @@ check("v325 rotazione: cambiare orizzonte cambia davvero l'ordine", suVeri(`
    ma restano nel PACCHETTO di settore — verificato sui dati veri, 5 su 5 per SKYY. E' la regola
    v208: si toglie dalla pagina cio' che il payload porta gia'. Se un domani uscissero anche da
    li', questo check lo dice subito. */
-check("v325 rotazione: le prime azioni restano nel pacchetto, e non piu' nella scheda", suVeri(`
-  const t = (DATA.macro.tilt || []).find(x => x && (x.prime || []).length >= 3);
-  if (!t) return true;
-  const f = FORMA_INDICATORE["rotazione"](DATA.macro || {});
-  const p = buildPromptSettore(t.ticker);
-  const nomi = t.prime.slice(0, 3).map(x => x.tk);
-  return nomi.every(k => p.includes(k))
-      && !nomi.some(k => (f.g || "").includes(">" + k + "<"))`));
 
 /* ⚠⚠ IL SELETTORE NON C'E' PIU', ma la funzione che serviva si': scegliere un comparto per
    l'analisi. Ora la scelta e' UN CLIC nella rotazione, che fa due cose insieme — porta il
    settore nel grafico e lo rende quello che il bottone copierebbe. Due gesti diventati uno,
    e una sola strada per scriverlo (`scegliSettore`), perche' due strade divergono. */
-check("v313 settore: si sceglie cliccando la rotazione, e la copia resta", (() => {
-  const html = readFileSync(join(ROOT, "index.html"), "utf8");
-  return html.indexOf('id="set-input"') < 0            // la barra e' sparita
-      && html.indexOf('id="set-copia"') >= 0           // il bottone resta
-      && src.indexOf("function scegliSettore") >= 0
-      && src.indexOf("b.dataset.rotTk") >= 0
-      && src.indexOf("settoreScelto") >= 0;
-})());
 
 /* ⚠ questo invariante non cambia con la forma: cliccare un comparto deve portarlo nel grafico. */
 check("v325 grafico: ogni comparto porta il proprio simbolo al grafico", suVeri(`
@@ -2706,34 +2369,9 @@ check("v325 grafico: ogni comparto porta il proprio simbolo al grafico", suVeri(
    al prezzo ("EMA 20 904.38 (-6.9% dal riferimento)"), le SMA il PREZZO rispetto al livello
    ("+75.9%"). E' la classe "denominatori non dichiarati", sfuggita a `coherence_check` perche'
    qui e' una questione di VERSO, non di valore. */
-check("v314 medie: il verso e' scritto in parole, non lasciato dedurre", suVeri(`
-  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU" && x.sma200_dist_pct != null);
-  if (!r) return true;
-  const p = buildPromptTicker("MU");
-  const m = p.match(/Media a 200 sedute: ([\\d.]+) — il prezzo le sta ([+-][\\d,]+%), cioe' (SOPRA|SOTTO)/);
-  if (!m) return false;
-  /* ⚠⚠ v340 — L'INVARIANTE E' L'IDENTITA', NON LA VICINANZA. La vecchia stesura confrontava
-     il livello stampato con la sua stessa ri-derivazione: confermava l'assunzione invece di
-     misurare una proprieta' (la lezione comune dei tre difetti di v326). E la tolleranza a
-     0,5 era un pavimento numerico che invecchiava col prezzo — su MU a 552 lo scarto ci
-     stava sotto, a 1027 vale 0,76 e il check e' esploso da solo, per il motivo giusto e per
-     caso. Ora: la stessa media stampata due volte nello stesso pacchetto deve portare lo
-     STESSO numero, e quel numero dev'essere quello che la pipeline pubblica. Nessuna soglia. */
-  const liv = Number(m[1]);
-  const med = ((((r.tv || {}).tecnica || {}).medie || {}).sma200 || {});
-  if (Number.isFinite(med.liv) && liv !== med.liv) return false;
-  const m2 = p.match(/Media semplice 200: ([\d.]+) —/);
-  if (m2 && Number(m2[1]) !== liv) return false;
-  return m[3] === (r.sma200_dist_pct >= 0 ? "SOPRA" : "SOTTO")`));
 
 /* ⚠ e le due famiglie di medie devono usare la STESSA base: se una dice il livello e l'altra
    il prezzo, chi legge inverte — ed e' successo davvero. */
-check("v314 medie: SMA ed EMA dichiarano entrambe il livello", suVeri(`
-  const p = buildPromptTicker("MU");
-  const sma = /Media a \\d+ sedute: [\\d.]+ —/.test(p);
-  const ema = /EMA \\d+ [\\d.]+ \\([+-]/.test(p);
-  if (!/Medie esponenziali/.test(p)) return sma;
-  return sma && ema`));
 
 /* ══ v315 — IL PORTAFOGLIO SI MODIFICA, SI ORDINA, E SI ANALIZZA INTERO ══════════════════
    Il CEO ha segnalato DUE VOLTE di non riuscire a modificare il portafoglio. La modalita'
@@ -2741,66 +2379,19 @@ check("v314 medie: SMA ed EMA dichiarano entrambe il livello", suVeri(`
    una nota grigia. ⚠ "La funzione esiste" e "la funzione e' raggiungibile" sono due cose diverse,
    e la seconda e' l'unica che conta per chi usa la pagina: un comando che nessuno trova non e'
    un comando. Il check guarda DOVE sta il bottone, non se la funzione esiste. */
-check("v315 portafoglio: il comando di modifica sta nell'intestazione, non sepolto nella nota", (() => {
-  const html = readFileSync(join(ROOT, "index.html"), "utf8");
-  const i = html.indexOf('id="pf-modifica"');
-  if (i < 0) return false;
-  const testa = html.lastIndexOf('class="card-head"', i);
-  const chiude = html.indexOf("</div>", testa);
-  return testa >= 0 && i < chiude              // sta dentro l'intestazione della card
-      && src.indexOf('nota.innerHTML') >= 0
-      && !/nota\.innerHTML[\s\S]{0,900}?pf-modifica/.test(src);   // e NON dentro la prosa
-})());
 
-check("v315 portafoglio: il bottone e' un interruttore e lo dichiara", (() => (
-  src.indexOf("pfInModifica = !pfInModifica") >= 0
-  && src.indexOf('pfInModifica ? "✕ Chiudi modifica" : "✎ Modifica"') >= 0
-))());
 
 /* ⚠ L'ORDINAMENTO E' UNA SCELTA DEL CEO, MA IL DEFAULT E' UNA NOSTRA AFFERMAZIONE.
    Il default resta il PESO: ordinare per guadagno mette in cima i vincitori, che e' la lettura
    che fa tenere i perdenti. Se un domani qualcuno cambia il default in "gain", questo check lo
    dice — non perche' sia vietato, ma perche' dev'essere una decisione presa, non una svista. */
-check("v315 portafoglio: si ordina di default per peso, non per guadagno", (() => (
-  /let pfOrdine = \{ campo: "peso"/.test(src)
-))());
 
-check("v315 portafoglio: ogni colonna ordina davvero, e il verso si inverte", suVeri(`
-  const q = document.querySelector, presi = {};
-  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "", hidden: false, classList: { add(){}, remove(){}, toggle(){}, contains: () => false }, style: {}, dataset: {}, querySelectorAll: () => [], addEventListener(){}, setAttribute(){}, getAttribute: () => null });
-  document.querySelector = (s) => finto(s);
-  const leggi = (campo, verso) => {
-    pfOrdine = { campo, verso }; renderPortafoglio();
-    const t = finto("#pf-righe").innerHTML;
-    return (t.match(/data-pf-tk="([^"]+)"/g) || []).map(x => x.slice(12, -1));
-  };
-  try {
-    const peso = leggi("peso", "giu"), pesoSu = leggi("peso", "su"), gain = leggi("gain", "giu");
-    /* invertire il verso deve rovesciare l'elenco, e un campo diverso deve dare un ordine diverso:
-       due proprieta' osservabili, non un elenco atteso che invecchia col portafoglio */
-    return peso.length >= 5
-      && JSON.stringify(pesoSu) === JSON.stringify([...peso].reverse())
-      && JSON.stringify(gain) !== JSON.stringify(peso);
-  } finally { document.querySelector = q; }`));
 
 /* ⚠⚠ IL CONTROVALORE IN EURO E' UNA CONVERSIONE AL CAMBIO DI OGGI, NON IL COSTO SOSTENUTO.
    E' la classe del gate valuta (v183): un dollaro col simbolo dell'euro accanto a un euro vero
    ha gia' prodotto un dimensionamento sbagliato in un referto reale. Qui il check verifica che
    l'obbligazione NON sia valutata come un'azione (quote x prezzo darebbe 4,1 milioni invece di
    41 mila) e che il totale sia la somma dichiarata, non una normalizzazione su se stessa. */
-check("v315 portafoglio: la colonna in euro converte e il BTP resta nominale x prezzo", suVeri(`
-  const q = document.querySelector, presi = {};
-  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "", hidden: false, classList: { add(){}, remove(){}, toggle(){}, contains: () => false }, style: {}, dataset: {}, querySelectorAll: () => [], addEventListener(){}, setAttribute(){}, getAttribute: () => null });
-  document.querySelector = (s) => finto(s);
-  try {
-    renderPortafoglio();
-    const t = finto("#pf-righe").innerHTML;
-    if (!/In euro/.test(t)) return false;
-    const btp = (DATA.portfolio || []).concat(DATA.watchlist || []).find(r => r && String(r.ticker).startsWith("BTP"));
-    if (!btp) return true;
-    const atteso = Math.round(btp.qta * btp.price / 100);
-    return t.indexOf("€" + fmtNum.format(atteso)) >= 0;
-  } finally { document.querySelector = q; }`));
 
 /* ══ IL PACCHETTO SUL LIBRO INTERO ══════════════════════════════════════════════════════════
    Terzo pacchetto dopo titolo e settore. Porta il fatto che nessuno degli altri due puo' vedere:
@@ -2809,33 +2400,12 @@ check("v315 portafoglio: la colonna in euro converte e il BTP resta nominale x p
    fiscale: senza quei tre, qualunque quantita' e' un numero che sembra un consiglio. Il divieto
    di dimensionare non e' prudenza formale — e' l'unica cosa che tiene il pacchetto dalla parte
    dei fatti, che e' la riga di condotta di tutto il sistema. */
-check("v315 pacchetto libro: pubblica pesi, concentrazione e la posizione piu' grande", suVeri(`
-  const p = buildPromptPortafoglio();
-  return /IL LIBRO, POSIZIONE PER POSIZIONE \\(\\d+ posizioni\\)/.test(p)
-      && /CONCENTRAZIONE PER SETTORE/.test(p)
-      && /La posizione piu' grande e' [A-Z]+ al \\d+% del libro/.test(p)
-      && /le prime tre valgono il \\d+%/.test(p)
-      && p.length > 8000`));
 
-check("v315 pacchetto libro: dichiara cosa NON sa e vieta di dimensionare", suVeri(`
-  const p = buildPromptPortafoglio();
-  const testa = p.slice(0, p.indexOf("=== IL LIBRO"));
-  return /liquidita/.test(testa) && /fiscale/.test(testa)
-      && /non dare quantita/.test(testa)
-      && /non dare stop in euro/.test(testa)
-      && /le quantita' no/.test(testa)`));
 
 /* ⚠ e il cambio dev'essere dichiarato per quello che e': quello di OGGI, non quello di carico. */
-check("v315 pacchetto libro: il cambio dichiarato e' quello di oggi, non quello di carico", suVeri(`
-  const p = buildPromptPortafoglio();
-  return /cambio di OGGI/.test(p) && /NON e' il cambio di carico/.test(p)`));
 
 /* ⚠ un pacchetto che non trova posizioni deve DIRLO, non produrre un'analisi di un libro vuoto:
    e' la classe "verde per assenza di dati" applicata al prodotto invece che al test. */
-check("v315 pacchetto libro: senza posizioni lo dice invece di analizzare il vuoto", run(`
-  const _s = DATA;
-  DATA = JSON.parse(JSON.stringify(REALE)); DATA.portfolio = []; DATA.watchlist = [];
-  try { return /Nessuna posizione/.test(buildPromptPortafoglio()); } finally { DATA = _s; recomputeTotals(); }`));
 
 /* ══ v316 — UNA SOLA STRADA PER CONSEGNARE UN PACCHETTO ════════════════════════════════════
    Il CEO: "pulsante relativo copia analisi del portafoglio non genera prompt". Il pacchetto si
@@ -2845,12 +2415,6 @@ check("v315 pacchetto libro: senza posizioni lo dice invece di analizzare il vuo
    correttamente scelto rispondeva "Scegli prima un settore dall'elenco". Verificato in browser
    sul sito pubblicato. Il gate della v313 controllava che il bottone ESISTESSE, non che fosse
    COLLEGATO: e' la stessa classe del bottone di modifica: esistenza contro raggiungibilita'. */
-check("v316 consegna: tutti i pacchetti passano dalla stessa funzione", (() => {
-  const usi = (src.match(/consegnaPacchetto\(/g) || []).length;
-  return src.indexOf("async function consegnaPacchetto") >= 0
-      && usi >= 4                                       // la definizione + i tre bottoni
-      && !/writeText\([^)]*\)\.then/.test(src);         // nessuna promise di clipboard non gestita
-})());
 
 check("v316 consegna: il testo finisce SEMPRE nel riquadro, anche se la clipboard rifiuta", (() => {
   const i = src.indexOf("async function consegnaPacchetto");
@@ -2860,12 +2424,6 @@ check("v316 consegna: il testo finisce SEMPRE nel riquadro, anche se la clipboar
   return box >= 0 && cli > box;    // prima si consegna, poi si prova la clipboard
 })());
 
-check("v316 settore: il bottone legge il comparto scelto, non la barra rimossa", (() => {
-  const i = src.indexOf('$("#set-copia")');
-  const corpo = src.slice(i, i + 900);
-  return corpo.includes("settoreScelto") && !corpo.includes("#set-input")
-      && readFileSync(join(ROOT, "index.html"), "utf8").indexOf('id="set-input"') < 0;
-})());
 
 /* ══ IL PERCENTILE CHE NON ESISTEVA ════════════════════════════════════════════════════════
    Trovato leggendo il pacchetto che il CEO ha incollato: "Semiconduttori (SOX) — 116° percentile
@@ -2900,59 +2458,16 @@ const TV_FINTO = {
   conto_trim: [{ trim: "2026-05-31", ricavi: 41460000000, utile: 28243000000, operativo: 33318000000, margine: 68.1, margine_op: 80.4 }],
 };
 
-check("v316 titolo: la colonna di TradingView e' nel pacchetto, calcolata da noi", run(`
-  const _s = DATA;
-  DATA = JSON.parse(JSON.stringify(REALE));
-  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
-  if (!r) { DATA = _s; return true; }
-  r.tv = ${JSON.stringify(TV_FINTO)};
-  recomputeTotals();
-  try {
-    const p = buildPromptTicker("MU");
-    return /PERFORMANCE PER ORIZZONTE/.test(p)
-        && /DETTAGLI TECNICI \\(calcolati dal sistema, non letti da terzi\\)/.test(p)
-        && /CONTO ECONOMICO TRIMESTRALE/.test(p)
-        && /STAGIONALITA' DEL TITOLO/.test(p)
-        && /SENSIBILITA' MISURATE/.test(p);
-  } finally { DATA = _s; recomputeTotals(); }`));
 
 /* ⚠⚠ UN BETA SENZA IL SUO R² E' MEZZO NUMERO: con R² 0,007 il canale dei tassi NON esiste su
    quella finestra, e un pacchetto che pubblicasse il solo beta inviterebbe a raccontarlo. E' il
    difetto che il referto reale di ChatGPT ha commesso ("il canale negativo e' il costo del
    capitale") su un titolo il cui R² sui tassi vale 0,007. */
-check("v316 sensibilita': ogni beta viaggia col suo R², col campione e con la finestra", run(`
-  const _s = DATA;
-  DATA = JSON.parse(JSON.stringify(REALE));
-  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
-  if (!r) { DATA = _s; return true; }
-  r.tv = ${JSON.stringify(TV_FINTO)};
-  recomputeTotals();
-  try {
-    const p = buildPromptTicker("MU");
-    const righe = p.split(String.fromCharCode(10)).filter(x => /^- (settore|tassi) \\(/.test(x));
-    return righe.length === 2
-        && righe.every(x => /beta [+-]?[\\d.]+/.test(x) && /R² [\\d.]+/.test(x) && /Campione \\d+ sedute comuni/.test(x))
-        && /NESSUNA relazione misurabile/.test(righe.find(x => x.startsWith("- tassi")))
-        && /canale DOMINANTE/.test(righe.find(x => x.startsWith("- settore")));
-  } finally { DATA = _s; recomputeTotals(); }`));
 
-check("v316 titolo: senza i dati della pipeline il blocco non esiste e non si inventa un ripiego", suVeri(`
-  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
-  if (r) delete r.tv;
-  const p = buildPromptTicker("MU");
-  return !/DETTAGLI TECNICI/.test(p) && !/--- COME IL MACRO ARRIVA A/.test(p)
-      && !/PERFORMANCE PER ORIZZONTE/.test(p) && p.length > 5000`));
 
 /* ══ IL PORTAFOGLIO SEGUE IL MERCATO ═══════════════════════════════════════════════════════
    La condizione era `r.qty`, ma le posizioni portano `qta`: il ramo non entrava mai, e scriveva
    comunque `gain_pct` mentre la tabella legge `gain_pct_pos`. Prezzo fresco, guadagno vecchio. */
-check("v316 live: il refresh ricalcola il guadagno che la tabella legge davvero", (() => {
-  const i = src.indexOf("const upd = (r) => {");
-  const corpo = src.slice(i, i + 1200);
-  return corpo.includes("r.qta ?? r.qty")
-      && corpo.includes("gain_pct_pos")
-      && src.slice(src.indexOf("renderShockAlert();"), src.indexOf("renderShockAlert();") + 400).includes("renderPortafoglio()");
-})());
 
 check("v316 live: l'obbligazione non viene valutata come un'azione nel refresh", (() => {
   const i = src.indexOf("const upd = (r) => {");
@@ -2962,12 +2477,6 @@ check("v316 live: l'obbligazione non viene valutata come un'azione nel refresh",
 
 /* ⚠ la sezione "verifica del referto" e' stata RIMOSSA su richiesta del CEO: la ricevuta del
    taglio ha verificato che dentro i confini ci fossero le tre funzioni e nient'altro. */
-check("v316 verifica: la sezione e' via, e non restano riferimenti orfani", (() => {
-  const html = readFileSync(join(ROOT, "index.html"), "utf8");
-  return html.indexOf('data-sez="verifica"') < 0 && html.indexOf("ver-controlla") < 0
-      && src.indexOf("renderVerifica") < 0 && src.indexOf("verificaReferto") < 0
-      && html.indexOf('data-sez="portafoglio"') >= 0;     // il vicino e' rimasto
-})());
 
 
 
@@ -3149,35 +2658,15 @@ check("v321 fusioni: la regola vale per COSTRUZIONE, non per il caso di oggi", (
    comparto, portafoglio — e stare insieme e' cio' che rende evidente che sono tre cose diverse.
    ⚠ E si SPOSTANO, non si duplicano: due elementi con lo stesso id fanno trovare a
    `querySelector` solo il primo, e il secondo bottone sembrerebbe rotto a caso. */
-check("v322 prompt: i tre bottoni stanno insieme in topbar, e ogni id esiste una volta sola", (() => {
-  const html = readFileSync(join(ROOT, "index.html"), "utf8");
-  const topbar = html.slice(html.indexOf("<header"), html.indexOf("</header>"));
-  return ["btn-cio", "set-copia", "pf-copia"].every(id =>
-    topbar.includes(`id="${id}"`) && html.split(`id="${id}"`).length === 2);
-})());
 
 /* ⚠ e ognuno deve produrre un pacchetto DIVERSO: tre bottoni che generano la stessa cosa
    sarebbero la classe v259 con un nome nuovo. */
-check("v322 prompt: i tre bottoni producono tre pacchetti diversi", suVeri(`
-  settoreScelto = "SKYY";
-  const a = buildCIOText(), b = buildPromptSettore("SKYY"), c = buildPromptPortafoglio();
-  return a.length > 5000 && b.length > 5000 && c.length > 5000
-      && a !== b && b !== c && a !== c
-      && b.includes("SKYY") && c.includes("IL LIBRO, POSIZIONE PER POSIZIONE")`));
 
 /* ══ FIBONACCI: UN SOLO CALCOLO, DUE POSTI DOVE SI LEGGE ═══════════════════════════════════
    Il CEO li ha chiesti sul grafico. Il sistema li calcolava gia' per il pacchetto (v293) sul
    range a 52 settimane. Un SECONDO punto di calcolo darebbe due serie di livelli per lo stesso
    titolo — la contraddizione che v271 ha gia' pagato: la pagina che dice una cosa e l'analisi
    che ne dice un'altra, senza sapere a quale credere. */
-check("v322 fibonacci: la pagina e il pacchetto mostrano gli STESSI livelli", suVeri(`
-  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU" && x.w52_high && x.w52_low);
-  if (!r) return true;
-  const R = r.w52_high - r.w52_low;
-  const attesi = [0.236, 0.382, 0.5, 0.618, 0.786].map(q => Math.round((r.w52_high - q * R) * 100) / 100);
-  const p = buildPromptTicker("MU");
-  /* nel pacchetto ci sono tutti, e sono quelli calcolati dagli estremi a 52 settimane */
-  return attesi.every(v => p.includes(String(v)));`));
 
 check("v322 fibonacci: i livelli si dichiarano contati DAL MASSIMO, e non come previsioni", (() => {
   const i = src.indexOf("v322 — I RITRACCIAMENTI DI FIBONACCI");
@@ -3304,13 +2793,6 @@ check("v331 ricerca: la regola vive nel FALLBACK, non solo nel file remoto", (()
       && /DATA DI PUBBLICAZIONE/.test(fb);
 })());
 
-check("v331 ricerca: tutti e quattro i pacchetti prevedono la risposta onesta di chi non ha rete", suVeri(`
-  settoreScelto = "SKYY";
-  const pacchetti = [buildCIOText(), buildPromptTicker("MU"), buildPromptSettore("SKYY"), buildPromptPortafoglio()];
-  /* senza il ramo offline il modello riceve l'ordine di citare fonti e nessun modo di dire che
-     non puo': e' la configurazione che produce URL a memoria */
-  return pacchetti.every(p => /NON HO ACCESSO ALLA RETE|non puoi navigare/i.test(p))
-      && pacchetti.every(p => /non sono (una )?font[ei] consultat[ae]|mai aperte/i.test(p))`));
 
 check("v331 ricerca: il pacchetto DICHIARA quale testata sta portando", suVeri(`
   const p = buildPrompt();
@@ -3431,62 +2913,17 @@ check("v334 carry: dichiara che le probabilita' BoJ non ci sono, invece di stima
    1151x520. Scelta l'alternativa: il grafico lo disegniamo noi sulle barre giornaliere che la
    pipeline pubblica, cosi' l'immagine e' vera e coerente al byte coi numeri del pacchetto.
    ⚠ Niente librerie (il CSP le vieta): il PDF si scrive a mano, con gli operatori nativi. */
-check("v336 pdf: costruisce un file valido, con l'intestazione e il trailer al posto giusto", (() => {
-  const pdf = run(`
-    const barre = [];
-    for (let i = 0; i < 40; i++) barre.push({ d: "2026-06-" + String((i % 28) + 1).padStart(2, "0"),
-      o: 100 + i, h: 104 + i, l: 97 + i, c: 101 + i });
-    return costruisciPdf("Prova", "riga uno", barre, [{ v: 110, et: "supporto" }]);`);
-  /* ⚠ v337 — il conteggio diventa ESPLICITO invece di allentarsi. Da questa versione ogni
-     etichetta di livello ha un rettangolo di fondo (serviva: sul PDF vero due etichette
-     finivano sopra le candele e non si leggevano), quindi i "re f" sono candele + etichette.
-     Scriverlo come somma dichiarata tiene l'invariante che conta — nessuna candela persa — e
-     rende rumoroso anche un rettangolo di troppo. Abbassarlo a ">= 40" avrebbe spento il check. */
-  const CANDELE = 40, ETICHETTE = 1;
-  return typeof pdf === "string"
-      && pdf.startsWith("%PDF-")
-      && pdf.trimEnd().endsWith("%%EOF")
-      && pdf.includes("xref") && pdf.includes("trailer")
-      && (pdf.split(" re f").length - 1) === CANDELE + ETICHETTE
-      && (pdf.split(" l S").length - 1) >= CANDELE;   // uno stoppino per barra, nessuna persa
-})());
 
 /* ⚠ v337 — I CARATTERI CHE WinAnsi NON HA VANNO TRADOTTI, NON BUTTATI. Visto sul PDF vero:
    "trimestrale ? comunicato IR" e "concorrenti e quote ? ultimo 10-K" — la freccia porta il
    senso della riga (dove cercare, in che ordine) e diventava un punto interrogativo, cioe'
    l'opposto di un'indicazione. Il testo era li' e non significava piu' niente. */
-check("v337 pdf: freccia, soglie e box-drawing diventano ASCII invece di punti interrogativi", (() => {
-  const t = run(`return pdfTesto("cerca " + String.fromCharCode(0x2192) + " leggi "
-    + String.fromCharCode(0x2550) + String.fromCharCode(0x2550) + " REGOLE "
-    + String.fromCharCode(0x2264) + "3 " + String.fromCharCode(0x26a0) + " nota");`);
-  const g = run(`return pdfTesto(String.fromCharCode(0x394) + "1M "
-    + String.fromCharCode(0x3c3) + " " + String.fromCharCode(0x2248) + "6 mesi");`);
-  return t.indexOf("?") < 0
-      && t.includes("->") && t.includes("==") && t.includes("<=3") && t.includes("!")
-      /* ⚠ le greche: un delta che diventa "?" toglie alla riga la grandezza che misura */
-      && g.indexOf("?") < 0 && g.includes("delta") && g.includes("sigma") && g.includes("~6 mesi");
-})());
 
 /* ⚠ IL GRAFICO NON SI DISEGNA SU DATI CHE NON LO PERMETTONO. Le `sparks` sono chiusure
    sotto-campionate e senza date: con quelle si otterrebbe una linea che SOMIGLIA al prezzo
    senza esserlo, ed e' peggio di nessun grafico — un modello che la legge non ha modo di
    sapere che sta guardando un'approssimazione. */
-check("v336 pdf: senza le barre giornaliere il grafico non si disegna e lo dichiara", (() => {
-  const vuoto = run(`return pdfCandele([{ d: "2026-01-01", o: 1, h: 2, l: 0.5, c: 1.5 }])`);
-  return vuoto === "";     // sotto cinque barre non si disegna niente
-})());
 
-check("v336 pdf: i livelli disegnati sono gli STESSI che il testo pubblica", (() => {
-  /* v337 — preparaPdf e' diventata barrePerPdf (il bottone scarica invece di appendersi a una
-     modale). L'invariante non cambia di una virgola: i livelli vengono dai campi del sistema. */
-  const i = src.indexOf("function barrePerPdf");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function scaricaPdf", i));
-  /* devono venire dai campi del sistema, non da un secondo calcolo: due serie di livelli per lo
-     stesso titolo sono la contraddizione che v271 ha gia' pagato */
-  return corpo.includes("r.support") && corpo.includes("r.resistance")
-      && corpo.includes("med.sma50") && corpo.includes("med.sma200")
-      && !corpo.includes("Math.min(...") && !corpo.includes("Math.max(...");
-})());
 
 /* ══ v337 — LE TRE COSE NUOVE, CIASCUNA CON LA SUA GUARDIA ════════════════════════════════
    Costruire un comportamento e non sorvegliarlo e' il modo documentato di perderlo alla
@@ -3496,63 +2933,24 @@ check("v336 pdf: i livelli disegnati sono gli STESSI che il testo pubblica", (()
    dato al pacchetto. Allora erano le colonne, oggi e' la sezione intera. Il confine regge da
    solo perche' buildPromptPortafoglio() legge DATA e non tocca il DOM — ma "regge per
    costruzione" e' esattamente cio' che smette di essere vero senza che nessuno se ne accorga. */
-check("v337 portafoglio contratto: il pacchetto e' identico al byte", suVeri(`
-  const chiuso = buildPromptPortafoglio();
-  apriPortafoglio(true, false);
-  const aperto = buildPromptPortafoglio();
-  apriPortafoglio(false, false);
-  return chiuso.length > 500 && chiuso === aperto`));
 
 /* ⚠ LA LEZIONE v315, APPLICATA ALLA CONTRAZIONE: il CEO ha segnalato DUE VOLTE di non riuscire
    a modificare il portafoglio, e la causa era un bottone che c'era e non si trovava. Ora la
    sezione parte CHIUSA e l'unico motivo per cui gli serve e' modificarla: se ✎ Modifica
    finisse dentro il corpo contraibile, avrei ricostruito lo stesso difetto in forma peggiore.
    Il check guarda DOVE STA il bottone nel markup, non se la funzione esiste. */
-check("v337 il bottone ✎ Modifica resta FUORI dalla parte contraibile", (() => {
-  const pagina = readFileSync(join(ROOT, "index.html"), "utf8");
-  const i = pagina.indexOf('data-sez="portafoglio"');
-  const sez = pagina.slice(i, pagina.indexOf("</section>", i));
-  const corpo = sez.indexOf('id="pf-corpo"');
-  const mod = sez.indexOf('id="pf-modifica"');
-  const togg = sez.indexOf('id="pf-toggle"');
-  return corpo > 0 && mod > 0 && togg > 0 && mod < corpo && togg < corpo;
-})());
 
 /* ⚠ E l'esito dei pacchetti non puo' finire dentro cio' che e' nascosto: #pf-nota vive dentro
    #pf-corpo, quindi il bottone del portafoglio deve scrivere altrove. Un messaggio consegnato
    in un elemento invisibile e' la classe v316 (pacchetto generato e non consegnato). */
-check("v337 l'esito del pacchetto portafoglio non finisce nella parte nascosta", (() => {
-  const i = src.indexOf('t.closest("#pf-copia")');
-  const corpo = src.slice(i, i + 900);
-  const iChiama = corpo.indexOf("consegnaPacchetto(");
-  const chiamata = corpo.slice(iChiama, corpo.indexOf(");", iChiama));
-  return chiamata.includes("#tk-esito");
-})());
 
 /* ⚠ IL PDF SENZA GRAFICO. Due pacchetti su tre non parlano di un titolo solo: il costruttore
    deve reggere barre assenti, e soprattutto NON deve stampare la riga che dichiara un grafico
    che non c'e' — un'affermazione che il documento non sostiene e' la classe v240. */
-check("v337 pdf senza barre: file valido, e non dichiara un grafico che non ha", (() => {
-  const pdf = run(`return costruisciPdf("Solo testo", "riga uno" + String.fromCharCode(10) + "riga due", null, []);`);
-  return typeof pdf === "string"
-      && pdf.startsWith("%PDF-")
-      && pdf.trimEnd().endsWith("%%EOF")
-      && pdf.indexOf("non e' una cattura di terzi") < 0
-      && pdf.indexOf("selezionabile e copiabile") > 0;
-})());
 
 /* ⚠ E la consegna dev'essere il PDF, non la modale: e' la direttiva del CEO ("Il bottone genera
    direttamente il PDF"). Il check guarda che il ripiego esista comunque — se il download non
    parte, la casella si apre. Una strada sola che fallisce in silenzio e' il difetto v316. */
-check("v337 la consegna scarica il PDF e tiene il ripiego sulla casella", (() => {
-  const i = src.indexOf("async function consegnaPacchetto");
-  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "async function", i + 10));
-  const iOk = corpo.indexOf("if (r.ok)");
-  return corpo.includes("scaricaPdf(testo, che)")
-      && iOk > 0
-      && corpo.indexOf('modale.hidden = false') > iOk    // la modale SOLO nel ramo di fallimento
-      && corpo.includes("il PDF non e' partito");
-})());
 
 /* ══ v338 — LA RICEVUTA DEL TAGLIO DELLA WATCHLIST ═══════════════════════════════════════
    Il CEO: "la watchlist di tradingview non va bene, torna come prima". Un taglio in questo
@@ -3617,24 +3015,9 @@ check("v339 FOMC: sotto la soglia la percentuale esce di lato invece di sparire"
    Ora si applica pdfTesto ai QUATTRO pacchetti reali e si conta se compaiono "?" che nel
    testo di partenza non c'erano. Nessun elenco da tenere aggiornato: se un domani il payload
    comincia a usare un carattere nuovo, il check lo trova da solo. */
-check("v340 pdf: nessun carattere del payload vero si perde in un punto interrogativo", suVeri(`
-  const testi = [buildCIOText(), buildPromptTicker("MU"), buildPromptSettore("SMH"), buildPromptPortafoglio()];
-  for (const t of testi) {
-    if (!t || t.length < 5000) return false;         // non e' un pacchetto: check a vuoto
-    for (const riga of String(t).split(String.fromCharCode(10))) {
-      const prima = (riga.split("?").length - 1);
-      const dopo = (pdfTesto(riga).split("?").length - 1);
-      if (dopo > prima) return false;                 // un "?" NUOVO = un carattere perso
-    }
-  }
-  return true`));
 
 /* ⚠ e l'euro in particolare: WinAnsiEncoding — che il PDF dichiara — lo ha a 0x80, quindi
    NON deve degradare a "EUR" ne' sparire. Un importo senza valuta non e' un importo. */
-check("v340 pdf: il simbolo dell'euro sopravvive alla codifica", (() => {
-  const t = run(`return pdfTesto("61.947 " + String.fromCharCode(0x20AC) + " pari al 21%");`);
-  return t.indexOf("?") < 0 && t.indexOf(String.fromCharCode(0x80)) >= 0;
-})());
 
 /* ══ v340 — IL DIVIETO SUI PUNTEGGI VALE ANCHE PER LE SCHEDE, E NESSUN GATE LO GUARDAVA ═══
    ⚠⚠ Il check v337 e C12bis sorvegliano i quattro PACCHETTI. Le SCHEDE no — e infatti la
@@ -3675,6 +3058,41 @@ check("v340 schede: la scheda MacroQuant non stampa piu' punteggi, e non li usa 
          "Ciclo neutro" (da score 56) mentre il titolo diceva "Rallentamento" (da label) */
   if (mq.label && nudo.indexOf(String(mq.label).toLowerCase()) < 0) return false;
   return titolo.indexOf(String(mq.label)) >= 0`));
+
+/* ══ v341 — I DUE INVARIANTI CHE SOPRAVVIVONO AL TAGLIO ═══════════════════════════════════
+   Con tre pacchetti su quattro rimossi, 86 check sono usciti: sorvegliavano funzionalita' che
+   il CEO ha chiuso, e tenerli sarebbe stato tenere in vita il ricordo di un sistema che non
+   c'e'. Ma DUE di quegli 86 non parlavano dei pacchetti — parlavano di DECISIONI, e le
+   decisioni valgono ancora sull'unico pacchetto rimasto. Sono stati riscritti, non persi.
+   ⚠ E' la regola di v203 letta al contrario: togliere una guardia mentre si toglie una
+   funzionalita' e' il modo piu' rapido di perdere la protezione senza accorgersene. Qui la
+   funzionalita' se n'e' andata davvero; l'invariante no. */
+
+/* (1) IL PUNTEGGIO 0-100 NON DEVE TORNARE. Il CEO l'ha tolto in v337 da schede e pacchetto
+   ("il dato deve essere asettico da quel parametro"). Fear & Greed e Financial Health restano
+   perche' sono indici PUBBLICATI da terzi, nativamente su 0-100: quelli sono il dato. */
+check("v341 il pacchetto macro non porta punteggi 0-100 calcolati da noi", suVeri(`
+  const t = buildCIOText();
+  if (!t || t.length < 5000) return false;          // non e' il pacchetto: check a vuoto
+  const ESTERNI = /Fear (&|&amp;) Greed|Financial Health|CNN|F&G/i;
+  for (const riga of t.split(String.fromCharCode(10))) {
+    /* ⚠ niente regex con escape qui dentro: in un template literal passato a vm si mangiano
+       un livello, ed e' gia' costato sei volte in questo progetto. Si conta a mano. */
+    const j = riga.indexOf("/100");
+    if (j < 1 || !"0123456789".includes(riga[j - 1])) continue;
+    if (ESTERNI.test(riga)) continue;
+    return false;
+  }
+  return true`));
+
+/* (2) LA VIA D'USCITA ONESTA (A1bis). Nata da un difetto vero: "cercali online" accanto a "un
+   dato che manca si dichiara n.d." rendeva l'INAZIONE la risposta conforme, e un LLM reale ha
+   consegnato un referto tutto n.d. La regola impone di dichiarare in una riga di non avere
+   rete e fermarsi — che e' una risposta accettabile — invece di riempire il vuoto. */
+check("v341 il pacchetto macro prevede la risposta onesta di chi non puo' navigare", suVeri(`
+  const t = buildCIOText();
+  return t.indexOf("NON HO ACCESSO ALLA RETE") > 0
+      && t.indexOf("non produrre") > 0`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

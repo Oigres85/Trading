@@ -138,7 +138,7 @@ if (conChiaviDoppie.length) console.log("  ⚠ oggetto con chiavi doppie:", conC
    zero: un allarme su codice sano, cioe' il modo piu' rapido per far spegnere il controllo.
    Per loro il pavimento e' la RIGA DI RAPPORTO: se non la stampano non hanno lavorato. */
 const SUITE = [
-  { file: "test_app.mjs",        cmd: "node",    minimo: 100, firma: /\d+\/\d+ check superati/ },
+  { file: "test_app.mjs",        cmd: "node",    minimo: 185, firma: /\d+\/\d+ check superati/ },
   { file: "test_update_data.py", cmd: "python3", minimo:  80, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   { file: "coherence_check.mjs", cmd: "node",    minimo: null, firma: /COERENZA PAYLOAD: \d+ controlli/ },

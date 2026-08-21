@@ -18,7 +18,7 @@
 <title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=340">
+<link rel="stylesheet" href="assets/style.css?v=341">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -35,9 +35,10 @@
     </div>
   </div>
   <div class="actions">
-    <button class="btn btn-primary" id="btn-cio" aria-label="Crea il prompt per l'LLM" title="Crea il pacchetto da incollare in un LLM: se hai scritto un ticker nel box qui sotto l'analisi è su quel titolo (col quadro macro dentro), altrimenti è il solo quadro macro">📋 Macro / titolo</button>
-    <button class="btn btn-ghost" id="set-copia" type="button" title="Analisi del comparto scelto cliccando una barra in Rotazione">📋 Settore</button>
-    <button class="btn btn-ghost" id="pf-copia" type="button" title="Analisi del portafoglio intero: concentrazione, pesi, esposizione">📋 Portafoglio</button>
+    <!-- v341 — UN BOTTONE SOLO. Il CEO: "elimina portafoglio ed elimina le analisi settore e
+         portafoglio. modifica analisi macro/titolo in analisi macro e fai ritornare analisi
+         macro solo testuale." Da quattro pacchetti a uno, e la consegna torna al testo. -->
+    <button class="btn btn-primary" id="btn-cio" aria-label="Crea il pacchetto macro per l'LLM" title="Genera il quadro macro completo da incollare in una chat NUOVA di un LLM">📋 Analisi macro</button>
     <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: rigenerazione completa via pipeline (~2-3 min)">↻ Rigenera</button>
   </div>
 </header>
@@ -80,12 +81,6 @@
          comparto del Nasdaq/S&P letto come ciclo — a che punto sta, cosa lo farebbe girare, e
          attraverso quale canale il macro ci arriva. Stessa scatola dell'analisi di un titolo:
          si sceglie e si copia, niente da salvare. -->
-    <!-- v313 — via il selettore: il settore si sceglie cliccandolo in "Rotazione", con la
-         stessa logica del portafoglio. Resta il bottone, che dice QUALE settore copierebbe. -->
-    <div class="tk-riga tk-riga-settore">
-      <span id="set-scelto" class="muted"></span>
-    </div>
-    <div id="set-esito" class="muted"></div>
   </section>
 
   <!-- ═══ v257 — GRAFICO TRADINGVIEW, PILOTATO DAL BOX DEL TICKER ═══════════════════════════
@@ -158,26 +153,7 @@
      pannello "tassi" resterebbe vuoto — e quei tassi li abbiamo gia' da FRED, fonte primaria,
      con data e prossima uscita. Oro, petrolio e rame funzionerebbero ma li disegniamo gia' noi
      con un anno di storia: sarebbe il doppione che abbiamo tolto altrove. -->
-<!-- v307 — IL PORTAFOGLIO. Torna in pagina ora che le posizioni esistono (v256 l'aveva
-     tolto perche' non c'erano). Forma minima: una riga per titolo, ordinata per PESO e non per
-     guadagno — ordinare per guadagno mette in cima i vincitori, che e' la lettura che fa tenere
-     i perdenti. Clic su una riga = quel titolo nel grafico TradingView. -->
-<section class="card" data-sez="portafoglio">
-    <!-- v315 — IL COMANDO STA NELLA TESTATA, non in fondo a un paragrafo. Il bottone era
-         74x22px, trasparente, dopo 400 caratteri di spiegazione: il CEO non e' riuscito a
-         usarlo e aveva ragione — "una funzione che c'e' e non si manifesta, per chi la usa,
-         non c'e'" e' la frase che avevo scritto io in v302 per il tooltip della rotazione. -->
-    <div class="card-head">
-      <button type="button" id="pf-toggle" class="pf-toggle" aria-expanded="false" aria-controls="pf-corpo" title="Mostra o nascondi le righe del portafoglio">▸</button>
-      <h2>Portafoglio</h2>
-      <span class="muted" id="pf-sommario">carichi dal suo estratto · clicca una riga per vederla nel grafico</span>
-      <button type="button" id="pf-modifica" class="btn btn-primary">✎ Modifica</button>
-    </div>
-    <div id="pf-corpo" hidden>
-      <div id="pf-righe"></div>
-      <div id="pf-nota" class="muted struct-note"></div>
-    </div>
-  </section>
+
 
 <section class="card" data-sez="calendario">
     <div class="card-head">
@@ -337,6 +313,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=340"></script>
+<script src="assets/app.js?v=341"></script>
 </body>
 </html>

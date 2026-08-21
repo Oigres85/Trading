@@ -51,12 +51,11 @@ function generaPayload() {
   vm.runInContext(src, ctx, { filename: "app.js" });
   const d = JSON.parse(readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null"));
   vm.runInContext("DATA=" + JSON.stringify(d) + "; cashEur=30000; recomputeTotals();", ctx);
-  const tk = (d.watchlist || []).find(x => x && x.ticker && x.price != null);
-  const set = ((d.macro || {}).tilt || [])[0];
+  /* ⚠ v341 — RESTA UN PACCHETTO SOLO. Il CEO ha chiuso analisi del titolo, di settore e di
+     portafoglio ("elimina le analisi settore e portafoglio... modifica analisi macro/titolo in
+     analisi macro"). `altri` resta come struttura perche' i detector la attraversano: se un
+     domani torna un secondo pacchetto, si rimette qui e tutte le classi lo coprono da sole. */
   const altri = [];
-  if (tk) altri.push({ nome: `titolo ${tk.ticker}`, testo: vm.runInContext(`buildPromptTicker(${JSON.stringify(tk.ticker)})`, ctx) });
-  if (set) altri.push({ nome: `settore ${set.ticker}`, testo: vm.runInContext(`buildPromptSettore(${JSON.stringify(set.ticker)})`, ctx) });
-  try { altri.push({ nome: "portafoglio", testo: vm.runInContext("buildPromptPortafoglio()", ctx) }); } catch { /* senza posizioni non esiste */ }
   return { testo: vm.runInContext("buildCIOText()", ctx), altri, ctx, data: d };
 }
 

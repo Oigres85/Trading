@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "340";
+const BUILD_VERSION = "341";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -773,9 +773,6 @@ async function livePrices() {
      niente sull'esecuzione, e un gate copre solo la catena che gli hai dato. Trovata solo
      aprendo la pagina. Sotto, la guardia e' stata estesa a TUTTE le funzioni di primo livello. */
   renderShockAlert();
-  /* ⚠ senza questa riga i numeri nuovi restavano in memoria e la tabella continuava a mostrare
-     quelli dello snapshot: aggiornare il dato e non ridisegnarlo e' come non aggiornarlo. */
-  renderPortafoglio();
   const el = $("#live-badge");
   if (el) el.textContent = `Prezzi live: ${new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
 }
@@ -812,7 +809,6 @@ function renderAll() {
      resta ferma su "non disponibili" anche dopo che i dati sono arrivati. Chi disegna al
      montaggio deve stare anche qui, perche' il montaggio precede sempre i dati. */
   if (typeof tvSimboloCorrente === "string" && tvSimboloCorrente) renderOpzioniGrafico(tvSimboloCorrente);
-  renderPortafoglio();          // v307 — le posizioni, e il clic che apre il grafico
   renderCalendario();           // v287 — cosa esce nei prossimi 7 giorni
   renderMacroGrafici();         // rotazione, stress, leva e stagionalità
   /* v337 — qui stava un rimando a renderCorrMacro()/testoCorrelazioniMacro(): entrambe
@@ -2444,41 +2440,19 @@ const UNITA_INDICATORE = { nfp: "K", curve: " pp", curve3m: " pp", umich: "", ph
 /* ⚠ v311 — la modalita' MODIFICA e' un secondo disegno della stessa tabella, non una seconda
    tabella: le colonne e l'ordine restano quelli, cambiano solo le celle in campi. Due tabelle
    separate divergerebbero al primo cambio di colonna (C10/C12). */
-function formaPosizioni() {
-  const box = $("#pf-righe");
-  if (!box) return;
-  const righe = posizioniCorrenti();
-  const riga = (p) => `<tr data-pf-edit="${esc(p ? p.ticker : "")}">
-    <td>${p ? `<b>${esc(p.ticker)}</b><input type="hidden" class="pf-in-tk" value="${esc(p.ticker)}">`
-            : `<input class="pf-in-tk" type="text" placeholder="TICKER" inputmode="latin"
-                 autocapitalize="characters" spellcheck="false" aria-label="Ticker">`}</td>
-    <td class="num"><input class="pf-in-q" type="text" inputmode="decimal" value="${p ? p.qta : ""}"
-        placeholder="quote" aria-label="Quantità"></td>
-    <td class="num"><input class="pf-in-p" type="text" inputmode="decimal" value="${p ? p.pmc : ""}"
-        placeholder="carico" aria-label="Prezzo medio di carico"></td>
-    <td class="num"><button type="button" class="pf-togli" title="Togli questa riga"
-        aria-label="Togli ${esc(p ? p.ticker : "questa riga")}">✕</button></td>
-  </tr>`;
-  box.innerHTML = `<div class="pf-scroll"><table class="pf-tab pf-tab-edit"><thead><tr>
-      <th>Titolo</th><th class="num">Quote</th><th class="num">Carico</th><th class="num"></th>
-    </tr></thead><tbody>${righe.map(riga).join("")}${riga(null)}</tbody></table></div>
-    <div class="pf-azioni">
-      <button type="button" id="pf-aggiungi" class="btn btn-ghost">+ Riga</button>
-      <button type="button" id="pf-salva" class="btn btn-primary">Salva</button>
-      <button type="button" id="pf-annulla" class="btn btn-ghost">Annulla</button>
-    </div>
-    <div id="pf-esito" class="muted pf-esito"></div>`;
+/* ⚠⚠ v341 — VIA LA MACCHINA DEL PDF E QUELLA DEL PORTAFOGLIO.
+   Il CEO: "elimina portafoglio ... e fai ritornare analisi macro solo testuale."
+   Il PDF esisteva per UNA ragione: portare il GRAFICO A CANDELE, che il testo non puo'
+   portare. Quel grafico aveva senso su un pacchetto che parla di UN titolo — e il pacchetto
+   del titolo non c'e' piu'. Un PDF di solo testo sarebbe un contenitore piu' scomodo del
+   testo, quindi la consegna torna al testo, che e' la forma che si incolla in una chat.
+   Rimosse: costruisciPdf, pdfCandele, pdfTesto, pdfPagina, pdfSpezza, barrePerPdf, scaricaPdf,
+   renderPortafoglio, formaPosizioni, portafoglioAperto, apriPortafoglio,
+   aggiornaSommarioPortafoglio.
+   ⚠ Tenerle in piedi senza chiamanti sarebbe stato peggio che toglierle: e' la classe v193
+   (una funzione morta accanto a un bottone inerte e' un sintomo, non un surplus), e
+   self_check la denuncia. Stanno in git: tornano con un revert. */
 
-  const nota = $("#pf-nota");
-  if (nota) {
-    nota.innerHTML = `<b>Il carico è il prezzo medio di acquisto</b>, nella valuta del titolo `
-      + `(dollari per le azioni americane; per il BTP è la percentuale del nominale, quindi 100 = alla pari). `
-      + `⚠ Un titolo aggiunto qui viene messo <b>anche nella watchlist</b>: senza, la pipeline non ne prende `
-      + `il prezzo e la riga resterebbe senza valore. `
-      + `⚠ Senza token GitHub il salvataggio resta <b>su questo browser</b> e la pipeline non lo legge — `
-      + `lo dico invece di lasciarglielo scoprire dall'iPhone.`;
-  }
-}
 
 /* ⚠⚠ v337 — IL PORTAFOGLIO SI CONTRAE. Direttiva del CEO, testuale: "portafoglio contraibile
    perche' lo vedro' da tradingview e quindi mi servira' solo per modificarlo ai fini della
@@ -2489,274 +2463,26 @@ function formaPosizioni() {
    ⚠ IL PACCHETTO NON SE NE ACCORGE. buildPromptPortafoglio() legge DATA, non il DOM: nascondere
    righe non toglie un dato all'LLM. E' il confine gia' stabilito in v188 con le colonne
    nascondibili, e un gate lo verifica generando il pacchetto aperto e chiuso. */
-const PF_APERTO_KEY = "pf_aperto";
-function portafoglioAperto() {
-  try { return localStorage.getItem(PF_APERTO_KEY) === "1"; } catch { return false; }
-}
-function apriPortafoglio(aperto, persisti) {
-  const corpo = $("#pf-corpo"), bot = $("#pf-toggle");
-  if (corpo) corpo.hidden = !aperto;
-  if (bot) { bot.setAttribute("aria-expanded", aperto ? "true" : "false"); bot.textContent = "▸"; }
-  /* ⚠ l'apertura AUTOMATICA (quella che scatta entrando in modifica) non salva niente: una
-     scelta dell'utente non va sovrascritta da un effetto collaterale. E' la regola gia' scritta
-     in v198 per la vista compatta — "il default non si applica mai se l'utente ha gia' una
-     preferenza" — applicata al verso opposto. */
-  if (persisti) { try { localStorage.setItem(PF_APERTO_KEY, aperto ? "1" : "0"); } catch { /* modalita' privata */ } }
-}
 /* la riga che sopravvive alla chiusura: quante posizioni e quanto valgono, in euro veri
    (il controvalore lo calcola gia' valorePosizioni(), che sa del BTP e del cambio). */
-function aggiornaSommarioPortafoglio() {
-  const el = $("#pf-sommario");
-  if (!el) return;
-  const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
-    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
-  if (!righe.length) { el.textContent = "nessuna posizione letta dalla pipeline"; return; }
-  const aperto = $("#pf-corpo") && !$("#pf-corpo").hidden;
-  const coda = aperto ? "clicca una riga per vederla nel grafico" : "clicca ▸ per aprirlo";
-  el.textContent = `${righe.length} posizioni · ${coda}`;
-}
 
-function renderPortafoglio() {
-  const box = $("#pf-righe");
-  if (!box) return;
-  /* ⚠ v315 — il bottone vive nel markup e cambia etichetta: un comando che dice cosa fara'
-     e' un comando che si trova. Prima era in fondo alla nota, 74x22px e trasparente: il CEO
-     non e' riuscito a usarlo, e la diagnosi e' la stessa del tooltip di v302. */
-  const bMod = $("#pf-modifica");
-  if (bMod) bMod.textContent = pfInModifica ? "✕ Chiudi modifica" : "✎ Modifica";
-  /* ⚠ v337 — ENTRARE IN MODIFICA APRE LA SEZIONE. Senza questo, da chiuso il clic su ✎ Modifica
-     non produrrebbe NIENTE di visibile: e' esattamente il difetto v315 in una forma nuova — il
-     comando esiste, si trova, e non si manifesta. Chi chiede di modificare vuole vedere. */
-  if (pfInModifica) apriPortafoglio(true, false);
-  else apriPortafoglio(portafoglioAperto(), false);
-  aggiornaSommarioPortafoglio();
-  if (pfInModifica) { formaPosizioni(); return; }
-  const nota = $("#pf-nota");
-  const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
-    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
-  if (!righe.length) {
-    box.innerHTML = '<div class="muted">Nessuna posizione: <code>config/posizioni.json</code> non è stato letto dalla pipeline.</div>';
-    if (nota) nota.innerHTML = "";
-    return;
-  }
-  /* ⚠⚠ v307 — DUE ERRORI CHE IL PRIMO DISEGNO HA RESO VISIBILI, ed erano entrambi silenziosi:
-     1. UN'OBBLIGAZIONE NON SI MOLTIPLICA COME UN'AZIONE. Il BTP quota in PERCENTUALE del
-        nominale: 40.000 di nominale a 102,86 valgono 41.144 euro, non 4.114.400. Moltiplicando
-        come un titolo azionario il BTP risultava il 93% del portafoglio e schiacciava tutto il
-        resto a 0-2%. Numero che non rompe niente e dice il falso — la classe v205.
-     2. NON SI SOMMANO VALUTE DIVERSE. Il totale metteva insieme dollari ed euro come se fossero
-        la stessa cosa: e' precisamente il difetto per cui esiste il gate valuta (v183), che
-        pero' guarda il PACCHETTO e non la pagina.
-     Il peso e' una percentuale, quindi adimensionale: si calcola convertendo tutto in euro col
-     cambio CORRENTE (non quello di carico, che e' un'altra cosa) e lo si dichiara. Gli importi
-     per riga restano nella valuta nativa, dove non c'e' niente da convertire. */
-  const fx = numero(DATA && DATA.eurusd);
-  const val = (r) => {
-    const p = numero(r.price ?? r.prezzo);
-    const q = numero(r.qta ?? r.qty);
-    if (!Number.isFinite(p) || !Number.isFinite(q)) return null;
-    return (String(r.ticker || "").startsWith("BTP") || r.currency === "EUR")
-      ? q * p / 100          // obbligazione: nominale x prezzo percentuale
-      : p * q;               // azione: quote x prezzo
-  };
-  /* per il PESO tutto in euro, altrimenti si sommano mele e pere */
-  const valEur = (r) => {
-    const v = val(r);
-    if (v == null) return null;
-    if (r.currency === "EUR" || String(r.ticker || "").startsWith("BTP")) return v;
-    return Number.isFinite(fx) && fx > 0 ? v / fx : null;
-  };
-  const tot = righe.reduce((a, r) => a + (valEur(r) || 0), 0);
-  righe.sort((a, b) => (valEur(b) || 0) - (valEur(a) || 0));
-
-  /* ═══ v315 — COLONNE ORDINABILI E CONTROVALORE IN EURO ═══════════════════════════════
-     Il CEO: "consenti di ordinare in portafoglio sulla base dei valori (es. peso, controvalore
-     etc.) inserisci anche controvalore euro".
-     ⚠ L'ordine di DEFAULT resta il peso: ordinare per guadagno mette in cima i vincitori, che
-     e' la lettura che fa tenere i perdenti. Ma ora e' una scelta sua, non mia — cliccare
-     un'intestazione ordina, e il verso si inverte al secondo clic.
-     ⚠⚠ IL CONTROVALORE IN EURO E' UNA CONVERSIONE AL CAMBIO DI OGGI, NON IL SUO COSTO. Il cambio
-     di carico e' diverso posizione per posizione e il sistema non lo conosce: sono due
-     grandezze diverse e la nota lo dice. Sommare euro convertiti oggi con euro spesi allora
-     darebbe un patrimonio che non e' mai esistito — la classe del gate valuta (v183). */
-  const col = [
-    { k: "ticker", et: "Titolo",        num: false, v: (r) => String(r.ticker || "") },
-    { k: "qta",    et: "Quote",         num: true,  v: (r) => numero(r.qta ?? r.qty) },
-    { k: "pmc",    et: "Carico",        num: true,  v: (r) => numero(r.pmc) },
-    { k: "prezzo", et: "Ultimo",        num: true,  v: (r) => numero(r.price ?? r.prezzo) },
-    { k: "gain",   et: "Guad.",         num: true,  v: (r) => Number.isFinite(numero(r.gain_pct_pos)) ? numero(r.gain_pct_pos) : null },
-    { k: "val",    et: "Controvalore",  num: true,  v: (r) => val(r) },
-    { k: "eur",    et: "In euro",       num: true,  v: (r) => valEur(r) },
-    { k: "peso",   et: "Peso",          num: true,  v: (r) => valEur(r) },
-  ];
-  const attivo = col.find(c => c.k === pfOrdine.campo) || col.find(c => c.k === "peso");
-  righe.sort((a, b) => {
-    const x = attivo.v(a), y = attivo.v(b);
-    if (x == null && y == null) return 0;
-    if (x == null) return 1;
-    if (y == null) return -1;
-    const d = attivo.num ? (y - x) : String(x).localeCompare(String(y));
-    return pfOrdine.verso === "su" ? -d : d;
-  });
-
-  box.innerHTML = `<div class="pf-scroll"><table class="pf-tab"><thead><tr>${
-    col.map(c => `<th class="${c.num ? "num " : ""}pf-th${attivo.k === c.k ? " pf-th-on" : ""}"
-        data-pf-ord="${c.k}" role="button" tabindex="0"
-        title="Ordina per ${esc(c.et)}">${esc(c.et)}${attivo.k === c.k ? (pfOrdine.verso === "su" ? " ▲" : " ▼") : ""}</th>`).join("")
-    }</tr></thead><tbody>${righe.map(r => {
-      const tk = String(r.ticker || "");
-      const q = numero(r.qta ?? r.qty), pmc = numero(r.pmc);
-      const p = numero(r.price ?? r.prezzo);
-      const g = Number.isFinite(numero(r.gain_pct_pos)) ? numero(r.gain_pct_pos)
-              : (Number.isFinite(p) && Number.isFinite(pmc) ? (p / pmc - 1) * 100 : null);
-      const v = val(r), e = valEur(r);
-      const cur = r.currency === "EUR" ? "€" : "$";
-      return `<tr class="pf-riga" data-pf-tk="${esc(tk)}" tabindex="0" title="Apri ${esc(tk)} nel grafico">
-        <td><b>${esc(tk)}</b> <span class="muted pf-nome">${esc(String(r.name || "").slice(0, 24))}</span></td>
-        <td class="num">${fmtNum.format(q)}</td>
-        <td class="num">${cur}${fmtNum.format(pmc)}</td>
-        <td class="num" title="${r.price_asof === "live" ? "prezzo del refresh live" : "prezzo dello snapshot della pipeline"}">${Number.isFinite(p) ? cur + fmtNum.format(p) : "—"}${r.price_asof === "live" ? '<span class="pf-live" aria-label="prezzo live">·</span>' : ""}</td>
-        <td class="num ${g > 0 ? "pos" : g < 0 ? "neg" : "muted"}">${g != null ? signTxt(Math.round(g * 10) / 10) : "—"}</td>
-        <td class="num">${v != null ? cur + fmtNum.format(Math.round(v)) : "—"}</td>
-        <td class="num">${e != null ? "€" + fmtNum.format(Math.round(e)) : "—"}</td>
-        <td class="num muted">${e != null && tot ? Math.round(e / tot * 100) + "%" : "—"}</td>
-      </tr>`;
-    }).join("")}</tbody>
-    <tfoot><tr><td><b>Totale</b></td><td colspan="5"></td>
-      <td class="num"><b>€${fmtNum.format(Math.round(tot))}</b></td>
-      <td class="num muted">100%</td></tr></tfoot>
-    </table></div>`;
-
-  if (nota) {
-    const p = (DATA && DATA.macro && DATA.macro.posizioni) || {};
-    nota.innerHTML = `${righe.length} posizioni${p.aggiornato ? `, carichi aggiornati al ${esc(p.aggiornato)}` : ""}`
-      + `${p.fonte ? ` (${esc(p.fonte)})` : ""}. <b>Clicca una riga</b> per aprirla nel grafico qui sopra. `
-      + `<b>Come sono calcolati.</b> Gli importi per riga sono nella valuta nativa. Il <b>peso</b> converte `
-      + `tutto in euro al cambio corrente${Number.isFinite(fx) ? ` (EUR/USD ${fmtNum.format(fx)})` : ""}, `
-      + `perché sommare dollari ed euro darebbe una percentuale senza significato. `
-      + `⚠ Il BTP è un'obbligazione: il controvalore è <b>nominale × prezzo/100</b>, non quote × prezzo — `
-      + `moltiplicarlo come un'azione lo farebbe risultare il 93% del portafoglio. `
-      + `Non è il suo patrimonio: manca la liquidità e il cambio di carico posizione per posizione, `
-      + `che conosce il suo broker. I guadagni percentuali sono invarianti al cambio, gli importi no.`
-      + (p.non_seguite && p.non_seguite.length
-          ? ` ⚠ Posizioni su titoli non seguiti dalla pipeline, quindi senza prezzo: ${esc(p.non_seguite.join(", "))}.` : "");
-  }
-  /* ⚠ delega sul contenitore: le righe si ridisegnano a ogni render, e agganciare ognuna
-     lascerebbe handler morti — il difetto v193/v213 che ha gia' rotto il wiring piu' volte. */
-  box.addEventListener("click", (e) => {
-    const tr = e.target && e.target.closest ? e.target.closest("[data-pf-tk]") : null;
-    if (tr) apriNelGrafico(tr.dataset.pfTk);
-  });
-  box.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    const tr = e.target && e.target.closest ? e.target.closest("[data-pf-tk]") : null;
-    if (tr) { e.preventDefault(); apriNelGrafico(tr.dataset.pfTk); }
-  });
-}
 
 const POSIZIONI_PATH = "config/posizioni.json";
 const WATCHLIST_PATH = "config/ui_watchlist.json";
-let pfInModifica = false;
 /* ⚠ v313 — il settore scelto per l'analisi. Il CEO ha tolto il selettore: si sceglie cliccando
    un comparto in "Rotazione", con la stessa logica del portafoglio. Una variabile sola, scritta
    da un punto solo (`scegliSettore`), perche' due strade per la stessa scelta divergono. */
-let settoreScelto = null;
 /* v315 — l'ordinamento del portafoglio. Il DEFAULT resta il peso: ordinare per guadagno mette
    in cima i vincitori, che e' la lettura che fa tenere i perdenti. Ma ora e' una scelta del CEO. */
-let pfOrdine = { campo: "peso", verso: "giu" };
 /* v325 — l'orizzonte scelto per la rotazione. Vive qui e non dentro la scheda perche' la scheda
    si ricostruisce a ogni render: uno stato dentro il render si azzererebbe da solo. */
 let rotOrizzonte = "m1";
 
-function posizioniCorrenti() {
-  /* ⚠ si legge da cio' che il sistema HA disegnato, non da una copia parallela: due elenchi
-     della stessa cosa divergono (C10/C12, gia' pagata piu' volte qui). */
-  return [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
-    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0)
-    .map(r => ({ ticker: String(r.ticker || "").toUpperCase(),
-                 qta: numero(r.qta ?? r.qty), pmc: numero(r.pmc),
-                 valuta: r.currency === "EUR" ? "EUR" : "USD" }));
-}
+/* v341 — qui stavano posizioniCorrenti() e leggiFormPosizioni(): leggevano la tabella del
+   portafoglio e il suo form di modifica, che non esistono piu'. Rimosse insieme a loro. */
 
-function leggiFormPosizioni() {
-  const righe = [...document.querySelectorAll("[data-pf-edit]")];
-  const out = [], errori = [];
-  for (const tr of righe) {
-    const tk = String((tr.querySelector(".pf-in-tk") || {}).value || tr.dataset.pfEdit || "").trim().toUpperCase();
-    const q = Number(String((tr.querySelector(".pf-in-q") || {}).value || "").replace(",", "."));
-    const p = Number(String((tr.querySelector(".pf-in-p") || {}).value || "").replace(",", "."));
-    if (!tk) continue;                       // riga vuota: si ignora, non e' un errore
-    if (!Number.isFinite(q) || q <= 0) { errori.push(`${tk}: quantità non valida`); continue; }
-    if (!Number.isFinite(p) || p <= 0) { errori.push(`${tk}: prezzo di carico non valido`); continue; }
-    if (out.some(x => x.ticker === tk)) { errori.push(`${tk}: compare due volte`); continue; }
-    out.push({ ticker: tk, qta: q, pmc: Math.round(p * 10000) / 10000,
-               valuta: tk.startsWith("BTP") ? "EUR" : "USD" });
-  }
-  return { posizioni: out, errori };
-}
 
-async function salvaPosizioni() {
-  const { posizioni, errori } = leggiFormPosizioni();
-  const esito = $("#pf-esito");
-  if (errori.length) {
-    if (esito) esito.innerHTML = `⚠ Non ho salvato niente: ${esc(errori.join(" · "))}. `
-      + `Correggi e riprova — un salvataggio parziale sarebbe peggio di nessun salvataggio.`;
-    return;
-  }
-  if (!posizioni.length) {
-    if (esito) esito.textContent = "⚠ Non ho salvato: la lista è vuota. Per svuotare davvero il portafoglio, dimmelo esplicitamente.";
-    return;
-  }
-  /* ⚠ i simboli che la pipeline non segue non avrebbero prezzo: si aggiungono alla watchlist */
-  const seguiti = new Set([...((DATA && DATA.watchlist) || []), ...((DATA && DATA.portfolio) || [])]
-    .map(r => String(r.ticker || "").toUpperCase()));
-  const nuovi = posizioni.map(p => p.ticker).filter(t => !seguiti.has(t));
 
-  const file = {
-    _nota: "Posizioni del CEO. NON e' la lista dei simboli da seguire: quella resta config/ui_watchlist.json. Questo file e' una SOVRAPPOSIZIONE.",
-    _fonte: "modificato dalla dashboard",
-    aggiornato: new Date().toISOString().slice(0, 10),
-    posizioni,
-  };
-  const token = localStorage.getItem("gh_token");
-  if (!token) {
-    try { localStorage.setItem("posizioni_locali", JSON.stringify(file)); } catch { /* quota */ }
-    if (esito) esito.innerHTML = `Salvato <b>solo su questo browser</b>: senza token GitHub non arriva `
-      + `su iPhone e la pipeline non lo legge. I numeri qui sopra restano quelli del run precedente `
-      + `finché il file non è sul repository.`;
-    return;
-  }
-  const scrivi = async (path, contenuto, messaggio) => {
-    let sha;
-    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,
-      { headers: ghHeaders(token), cache: "no-store" });
-    if (g.ok) sha = (await g.json()).sha;
-    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-      method: "PUT", headers: ghHeaders(token),
-      body: JSON.stringify({ message: messaggio, sha,
-        content: btoa(unescape(encodeURIComponent(JSON.stringify(contenuto, null, 1) + "\n"))) }),
-    });
-    return r.ok;
-  };
-  try {
-    const ok1 = await scrivi(POSIZIONI_PATH, file, "Posizioni aggiornate dalla dashboard");
-    let ok2 = true;
-    if (nuovi.length) {
-      const wl = [...seguiti, ...nuovi];
-      ok2 = await scrivi(WATCHLIST_PATH, wl, `Watchlist: aggiunti ${nuovi.join(", ")} (posizioni nuove)`);
-    }
-    if (esito) {
-      esito.innerHTML = (ok1 && ok2)
-        ? `Salvato: <b>${posizioni.length} posizioni</b>.`
-          + (nuovi.length ? ` Ho aggiunto anche alla watchlist <b>${esc(nuovi.join(", "))}</b>, `
-              + `altrimenti la pipeline non ne prenderebbe il prezzo e la riga resterebbe senza valore.` : "")
-          + ` I prezzi e i guadagni si aggiornano al prossimo giro della pipeline.`
-        : `⚠ GitHub ha rifiutato la scrittura. Controlla che il token abbia il permesso di scrivere sul repository.`;
-    }
-  } catch (e) {
-    if (esito) esito.textContent = "Non sono riuscito a scrivere su GitHub: " + (e && e.message ? e.message : e);
-  }
-}
 
 /* ⚠ UNA SOLA STRADA per portare un simbolo nel grafico: la usano il clic sul portafoglio e il
    selettore dei settori. Due percorsi separati divergerebbero — e' la lezione v225 sulle
@@ -2776,24 +2502,9 @@ async function salvaPosizioni() {
 document.addEventListener("click", (e) => {
   const t = e.target && e.target.closest ? e.target : null;
   if (!t || !t.closest) return;
-  if (t.closest("#pf-copia")) {
-    /* ⚠ v337 — L'ESITO VA IN #tk-esito, NON IN #pf-nota. Da quando il portafoglio si contrae,
-       #pf-nota vive DENTRO la parte nascosta: con la sezione chiusa — cioe' il caso normale,
-       visto che parte chiusa — il messaggio "PDF scaricato" sarebbe stato scritto in un
-       elemento invisibile. Un esito consegnato dove nessuno lo vede e' un esito non
-       consegnato: la stessa lezione del v316, in una forma nuova.
-       E c'e' una coerenza in piu': i tre bottoni stanno tutti in topbar, e ora rispondono
-       tutti e tre nello stesso punto. */
-    consegnaPacchetto(buildPromptPortafoglio(), "Analisi del portafoglio", $("#tk-esito") || $("#pf-nota"));
-    return;
-  }
-  if (t.closest("#pf-toggle")) {
-    const chiuso = !$("#pf-corpo") || $("#pf-corpo").hidden;
-    apriPortafoglio(chiuso, true);
-    aggiornaSommarioPortafoglio();
-    return;
-  }
-  if (t.closest("#pf-modifica")) { pfInModifica = !pfInModifica; renderPortafoglio(); return; }
+  /* v341 — i rami #pf-copia / #pf-toggle / #pf-modifica sono usciti con la sezione
+     portafoglio. Il ramo della ROTAZIONE qui sotto RESTA: e' la navigazione (clic su una barra
+     → quell'ETF nel grafico), non l'analisi di settore. */
   const or = t.closest("[data-rot-or]");
   if (or) {
     /* v325 — cambia l'orizzonte e ridisegna: una strada sola, la stessa che usa il primo
@@ -2802,60 +2513,8 @@ document.addEventListener("click", (e) => {
     renderIndicatori();
     return;
   }
-  const th = t.closest("[data-pf-ord]");
-  if (th) {
-    /* stesso campo = si inverte il verso; campo nuovo = si parte dal piu' grande, che e' cio'
-       che si vuole vedere per primo su quantita' e controvalori. */
-    const k = th.dataset.pfOrd;
-    pfOrdine = (pfOrdine.campo === k)
-      ? { campo: k, verso: pfOrdine.verso === "giu" ? "su" : "giu" }
-      : { campo: k, verso: "giu" };
-    renderPortafoglio();
-    return;
-  }
-  if (t.closest("#pf-annulla")) { pfInModifica = false; renderPortafoglio(); return; }
-  if (t.closest("#pf-salva")) { salvaPosizioni(); return; }
-  if (t.closest("#pf-aggiungi")) {
-    const corpo = document.querySelector(".pf-tab-edit tbody");
-    if (corpo && corpo.lastElementChild) {
-      corpo.appendChild(corpo.lastElementChild.cloneNode(true));
-      const nuova = corpo.lastElementChild;
-      nuova.querySelectorAll("input").forEach(i => { i.value = ""; });
-      nuova.setAttribute("data-pf-edit", "");
-      const primo = nuova.querySelector(".pf-in-tk");
-      if (primo && typeof primo.focus === "function") primo.focus();
-    }
-    return;
-  }
-  const togli = t.closest(".pf-togli");
-  if (togli) {
-    /* ⚠ la riga sparisce dal FORM, non dai dati: il salvataggio e' l'unico momento in cui
-       qualcosa viene scritto. Annulla deve poter riportare tutto indietro. */
-    const tr = togli.closest("[data-pf-edit]");
-    if (tr && tr.parentNode) tr.parentNode.removeChild(tr);
-  }
 });
 
-$("#set-input")?.addEventListener("change", (e) => {
-  const v = e.target && e.target.value;
-  if (v) apriNelGrafico(v);
-});
-
-/* ⚠⚠ v316 — QUESTO BOTTONE ERA ROTTO DALLA v313 E NESSUN GATE L'HA VISTO. Leggeva `#set-input`,
-   cioe' la barra di selezione che la v313 aveva RIMOSSO su richiesta del CEO: con il settore
-   correttamente scelto (settoreScelto = "SKYY", verificato in browser) rispondeva "Scegli prima
-   un settore dall'elenco". Il gate della v313 verificava che il bottone ESISTESSE e che
-   `scegliSettore` esistesse — non che i due fossero COLLEGATI. E' la stessa classe del bottone
-   di modifica del portafoglio: ho controllato l'esistenza, non la raggiungibilita'. */
-$("#set-copia")?.addEventListener("click", async () => {
-  const esito = $("#set-esito");
-  if (!settoreScelto) {
-    if (esito) esito.textContent = "Scegli prima un comparto: clicca una barra in \"Rotazione — dove si muove il denaro\".";
-    return;
-  }
-  const nome = (settorePerChiave(settoreScelto) || {}).name || settoreScelto;
-  await consegnaPacchetto(buildPromptSettore(settoreScelto), `Analisi del comparto ${nome}`, esito);
-});
 $("#modal-close")?.addEventListener("click", () => { $("#modal").hidden = true; });
 $("#modal")?.addEventListener("click", (e) => { if (e.target.id === "modal") $("#modal").hidden = true; });
 $("#btn-copy")?.addEventListener("click", async () => {
@@ -2880,15 +2539,13 @@ const SELL_KEY = "vendite_manuali";
 
 /* ⚠ scegliere un settore fa DUE cose: lo porta nel grafico e lo rende quello che il bottone
    copierebbe. Erano due gesti separati (selettore + grafico), ora e' un clic solo. */
+/* ⚠ v341 — RESTA SOLO LA NAVIGAZIONE. Scegliere un settore faceva due cose: portarlo nel
+   grafico e renderlo quello che il bottone "Settore" avrebbe copiato. Il bottone non c'e'
+   piu', quindi resta la prima — che e' quella che il CEO usa cliccando le barre di Rotazione,
+   e che non ha chiesto di togliere. */
 function scegliSettore(tk) {
   const t = String(tk || "").trim().toUpperCase();
   if (!t) return;
-  settoreScelto = t;
-  const et = $("#set-scelto");
-  if (et) {
-    const s2 = settorePerChiave(t);
-    et.innerHTML = s2 ? `settore scelto: <b>${esc(s2.name)}</b> (${esc(s2.ticker)})` : "";
-  }
   apriNelGrafico(t);
 }
 
@@ -8829,15 +8486,21 @@ function nomeSimbolo(T) {
    fonte gratuita affidabile e i 13F sono trimestrali e in ritardo. Il pacchetto porta i PROXY
    che abbiamo — schiuma sugli ETF a leva, put/call, ampiezza — e dichiara che sono proxy.
    Un ingrediente mancante dichiarato e' un'analisi onesta; uno stimato in silenzio no. */
-function settorePerChiave(chiave) {
-  const t = String(chiave || "").trim().toUpperCase();
-  if (!t) return null;
-  const tilt = (DATA && DATA.macro && DATA.macro.tilt) || [];
-  return tilt.find(x => String(x.ticker || "").toUpperCase() === t)
-      || tilt.find(x => String(x.name || "").toUpperCase() === t)
-      || tilt.find(x => String(x.name || "").toUpperCase().includes(t))
-      || null;
-}
+/* ⚠⚠ v341 — TRE PACCHETTI SU QUATTRO SONO USCITI. Decisione del CEO, testuale: "elimina
+   portafoglio ed elimina le analisi settore e portafoglio. modifica analisi macro/titolo in
+   analisi macro e fai ritornare analisi macro solo testuale."
+   Via: buildPromptTicker + datiNostriDelTitolo (la sua meta' di dati), buildPromptSettore,
+   buildPromptPortafoglio, settorePerChiave (aveva un solo consumatore, il pacchetto settore).
+   Resta buildPrompt/buildCIOText: il quadro macro, consegnato come TESTO.
+   ⚠ SONO RIMASTE IN PIEDI, e vanno lasciate stare: fattiTitolo() e livelliTitolo() non
+   servivano al pacchetto del titolo — alimentano il pannello dei livelli sotto il grafico
+   (renderOpzioniGrafico), che il CEO usa e non ha chiesto di togliere. Verificato risalendo
+   la catena dei chiamanti prima di tagliare, non a memoria: e' la classe v201-v204, tre tagli
+   su quattro in questo progetto si sono portati via il vicino.
+   ⚠ E' un taglio REVERSIBILE: il codice sta in git, l'analisi di un titolo torna con un
+   revert. Quello che non torna da solo e' il fatto che il sistema, da qui in avanti, sui
+   singoli titoli non dice piu' niente. */
+
 
 /* ═══ v315 — ANALISI DEL PORTAFOGLIO INTERO ═══════════════════════════════════════════════
    Richiesta del CEO. E' il terzo pacchetto dopo titolo e settore, e risponde a una domanda che
@@ -8850,346 +8513,7 @@ function settorePerChiave(chiave) {
    non conosce altri conti, non conosce la situazione fiscale. Senza quei tre dati qualunque
    dimensionamento e' un numero che sembra un consiglio — ed e' la ragione per cui il pacchetto
    li chiede a chi legge invece di stimarli. */
-function buildPromptPortafoglio() {
-  const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
-    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
-  if (!righe.length) {
-    return "Nessuna posizione: config/posizioni.json non e' stato letto dalla pipeline, "
-      + "oppure il portafoglio e' vuoto. Non c'e' niente da analizzare.";
-  }
-  const fx = numero(DATA && DATA.eurusd) || 1;
-  const obbl = (r) => String(r.ticker || "").startsWith("BTP") || r.currency === "EUR";
-  const val = (r) => {
-    const p = numero(r.price ?? r.prezzo), q = numero(r.qta ?? r.qty);
-    if (!Number.isFinite(p) || !Number.isFinite(q)) return null;
-    return obbl(r) ? q * p / 100 : p * q;      // obbligazione: nominale x prezzo percentuale
-  };
-  const eur = (r) => { const v = val(r); return v == null ? null : (obbl(r) ? v : v / fx); };
-  const tot = righe.reduce((a, r) => a + (eur(r) || 0), 0);
-  const senzaPrezzo = righe.filter(r => eur(r) == null).map(r => r.ticker);
 
-  const macro = buildPrompt();
-  const header = promptHeaderText();
-  const soloDati = macro.startsWith(header) ? macro.slice(header.length).replace(/^\n+/, "") : macro;
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  const oggi = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
-
-  const F = [];
-  F.push(`=== IL LIBRO, POSIZIONE PER POSIZIONE (${righe.length} posizioni) ===`);
-  F.push(`Quote e prezzi medi di carico vengono dall'estratto del broker; i prezzi correnti dalla `
-    + `pipeline. Il peso converte tutto in euro al cambio di OGGI (EUR/USD ${fmtNum.format(fx)}): `
-    + `NON e' il cambio di carico, che e' diverso posizione per posizione e che il sistema non conosce.`);
-  [...righe].sort((a, b) => (eur(b) || 0) - (eur(a) || 0)).forEach(r => {
-    const q = numero(r.qta ?? r.qty), p = numero(r.price ?? r.prezzo);
-    const g = numero(r.gain_pct_pos);
-    const e = eur(r);
-    F.push(`- ${r.ticker}${r.name ? ` (${r.name})` : ""}: ${fmtNum.format(q)} `
-      + `${obbl(r) ? "di nominale" : "quote"} a carico ${r.pmc}, oggi ${Number.isFinite(p) ? p : "n.d."}`
-      + (Number.isFinite(g) ? `, ${signTxt(Math.round(g * 10) / 10)}` : "")
-      + (e != null ? ` — ${Math.round(e).toLocaleString("it-IT")} € pari al ${Math.round(e / tot * 100)}% del libro` : " — senza prezzo, escluso dai pesi")
-      + (r.sector ? ` · settore ${r.sector}` : "") + (r.rs_bench ? ` · benchmark ${String(r.rs_bench).toUpperCase()}` : ""));
-  });
-  F.push(`- Totale del libro conosciuto dal sistema: ${Math.round(tot).toLocaleString("it-IT")} €.`
-    + (senzaPrezzo.length ? ` ⚠ ${senzaPrezzo.join(", ")} non hanno prezzo e sono fuori dal totale.` : ""));
-
-  /* ── la concentrazione: il fatto che nessuna analisi di singolo titolo puo' vedere ── */
-  const perSettore = new Map();
-  for (const r of righe) {
-    const e = eur(r); if (e == null) continue;
-    const k = obbl(r) ? "Obbligazionario" : (r.sector || "Non classificato");
-    perSettore.set(k, (perSettore.get(k) || 0) + e);
-  }
-  const ord = [...perSettore.entries()].sort((a, b) => b[1] - a[1]);
-  F.push(`- CONCENTRAZIONE PER SETTORE: ` + ord.map(([k, v]) => `${k} ${Math.round(v / tot * 100)}%`).join(" · ")
-    + `. ⚠ E' il fatto che nessuna analisi di un singolo titolo puo' vedere: piu' posizioni nello `
-    + `stesso comparto sono UNA scommessa scritta piu' volte, e si muovono insieme quando conta.`);
-  const primo = [...righe].filter(r => eur(r) != null).sort((a, b) => eur(b) - eur(a))[0];
-  if (primo) {
-    F.push(`- La posizione piu' grande e' ${primo.ticker} al ${Math.round(eur(primo) / tot * 100)}% del libro; `
-      + `le prime tre valgono il ${Math.round([...righe].filter(r => eur(r) != null)
-          .sort((a, b) => eur(b) - eur(a)).slice(0, 3).reduce((a, r) => a + eur(r), 0) / tot * 100)}%.`);
-  }
-  const vinc = righe.filter(r => numero(r.gain_pct_pos) > 0).length;
-  F.push(`- ${vinc} posizioni su ${righe.length} sono in guadagno. `
-    + `⚠ Il prezzo di carico non cambia cosa fara' un titolo: cambia cosa costa uscirne e quale `
-    + `plusvalenza si realizzerebbe. Sono due domande diverse e vanno tenute separate.`);
-
-  const istruzioni = [
-`ANALISI DEL PORTAFOGLIO — ${oggi}`,
-``,
-`Sei un analista di Wall Street. Devi dire cosa questo libro E' — non cosa fa ogni singolo`,
-`titolo, che si vede altrove — e cosa lo romperebbe. BUDGET: 900-1.100 parole.`,
-``,
-`⚠ QUELLO CHE IL SISTEMA NON SA, e che quindi non devi assumere: la liquidita' disponibile, la`,
-`presenza di altri conti o strumenti, la situazione fiscale, l'orizzonte e gli obblighi di spesa`,
-`di chi lo detiene. Senza questi, qualunque dimensionamento e' un numero che sembra un consiglio:`,
-`non dare quantita', non dare percentuali di ribilanciamento, non dare stop in euro. I livelli`,
-`di prezzo si', le quantita' no. Se una conclusione dipende da uno di quei dati, dillo e fermati li'.`,
-``,
-`0) COS'E' QUESTO LIBRO — cinque righe. Se dovessi descriverlo a un collega in una frase, che`,
-`   scommessa e'? Poi: qual e' il rischio che chi lo detiene probabilmente NON sta vedendo.`,
-``,
-`1) LA CONCENTRAZIONE. Guarda i pesi e i settori qui sotto. Quante scommesse DISTINTE ci sono`,
-`   davvero, contro quante posizioni? Due titoli dello stesso comparto che si muovono insieme`,
-`   sono una posizione sola con due nomi. Dillo con i numeri.`,
-``,
-`2) COSA TIENE IN PIEDI IL LIBRO E COSA LO ZAVORRA. Non l'elenco dei guadagni: quali posizioni`,
-`   contano davvero per il risultato, e quali sono troppo piccole per spostarlo in un senso o`,
-`   nell'altro qualunque cosa facciano.`,
-``,
-`3) IL PONTE COL MACRO — la parte che nessun altro puo' scrivere. Prendi dal quadro in coda le`,
-`   due o tre grandezze che arrivano a QUESTO libro e di' attraverso quale canale: quale tasso,`,
-`   quale costo, quale domanda finale. Un libro concentrato in un settore ha un canale dominante:`,
-`   nominalo.`,
-``,
-`4) COSA LO ROMPEREBBE. Un evento osservabile e datato — non "se il mercato scende". Quale dato,`,
-`   quale trimestrale, quale livello: e quanto del libro ne verrebbe colpito insieme.`,
-``,
-`5) LA TESI CONTRARIA — massimo 8 righe, obbligatoria. Argomenta che questo libro va bene com'e',`,
-`   se hai concluso il contrario, o il contrario se hai concluso che va bene. Usa i NUMERI di`,
-`   questo pacchetto. Poi di' quale delle due regge meglio e quale fatto osservabile le separa.`,
-`   Non ti e' consentito rispondere che entrambe hanno merito.`,
-``,
-`══ REGOLE ══`,
-`· Italiano, prosa densa, niente frasi di cortesia e niente riassunti di cio' che hai gia' detto.`,
-`· Ogni dato esterno va [VERIFICATO] con fonte e data. Chiudi con "NON VERIFICATO:" elencando`,
-`  cosa non sei riuscito a confermare.`,
-`⚠ SE NON PUOI NAVIGARE, scrivilo in cima a lettere chiare — "NON HO ACCESSO ALLA RETE: quanto`,
-`  segue e' la lettura di uno snapshot del ${oggi}, non del mercato di oggi" — e non produrre`,
-`  nessun URL. E' una risposta accettabile; un elenco di fonti mai aperte non lo e'. Gli ID delle`,
-`  serie stampati nella coda NON sono una fonte consultata: sono il nome del dato.`,
-`· Cerca le notizie delle ULTIME 48 ORE sui titoli piu' pesanti del libro: il pacchetto porta i`,
-`  titoli macro recenti ma non quelli societari.`,
-`· Niente domande in chiusura e niente offerte di approfondimento.`,
-``,
-`──────────────────────────────────────────────────────────────────`,
-  ].join("\n");
-
-  return [istruzioni, F.join("\n"), soloDati].filter(Boolean).join("\n\n");
-}
-
-function buildPromptSettore(chiave) {
-  const s = settorePerChiave(chiave);
-  if (!s) {
-    const nomi = ((DATA && DATA.macro && DATA.macro.tilt) || [])
-      .map(x => `${x.ticker} (${x.name})`).join(" · ");
-    return `Settore non riconosciuto: "${chiave}".\nQuelli che il sistema segue: ${nomi}`;
-  }
-  const macro = buildPrompt();
-  const header = promptHeaderText();
-  const soloDati = macro.startsWith(header) ? macro.slice(header.length).replace(/^\n+/, "") : macro;
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  const oggi = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
-  const m = (DATA && DATA.macro) || {};
-
-  const F = [];
-  F.push(`=== QUELLO CHE IL SISTEMA SA GIA' DEL SETTORE ${s.name.toUpperCase()} (${s.ticker}) ===`);
-  F.push(`Tutti i numeri qui sotto sono calcolati dal sistema sulle barre giornaliere di ${s.ticker}, `
-    + `l'ETF che rappresenta il comparto. Non sono da cercare altrove.`);
-  if (s.asof) F.push(`- Barra di riferimento: ${s.asof}${s.price != null ? ` · prezzo ${s.price}` : ""}`);
-
-  /* ── (b) IL MOMENTUM: dove sta il prezzo e cosa fanno le medie ── */
-  if (s.medie) {
-    F.push(`- ANATOMIA DEL MOMENTUM (il secondo ingrediente, quello misurabile):`);
-    for (const [k, v] of Object.entries(s.medie)) {
-      const n = k.replace("ma", "");
-      F.push(`    media a ${n} sedute: ${v.valore} — il prezzo le sta ${signTxt(v.dist_pct)} `
-        + `e la media stessa e' ${signTxt(v.pendenza_pct)} nell'ultimo mese `
-        + `(${v.pendenza_pct > 0 ? "sale" : v.pendenza_pct < 0 ? "scende" : "piatta"})`);
-    }
-    const su = Object.values(s.medie).filter(v => v.pendenza_pct > 0).length;
-    const sopra = Object.values(s.medie).filter(v => v.dist_pct > 0).length;
-    const tot = Object.keys(s.medie).length;
-    F.push(`    riepilogo: ${su} medie su ${tot} salgono, e il prezzo sta sopra ${sopra} su ${tot}. `
-      + `Sono due conteggi, non un giudizio: quale delle due conti di piu' e' la domanda dell'analisi.`);
-  }
-
-  /* ── la forza relativa: e' il confronto che rende visibile l'euforia ── */
-  if (s.relativa) {
-    const et = { m6: "6 mesi", a1: "1 anno", a2: "2 anni" };
-    F.push(`- FORZA RELATIVA (settore contro mercato e contro Nasdaq):`);
-    for (const [k, v] of Object.entries(s.relativa)) {
-      F.push(`    ${et[k] || k}: ${s.ticker} ${signTxt(v.settore)}`
-        + (v.spy != null ? ` · S&P 500 ${signTxt(v.spy)}` : "")
-        + (v.qqq != null ? ` · Nasdaq 100 ${signTxt(v.qqq)}` : "")
-        + (v.spy != null ? ` — scarto sul mercato ${signTxt(Math.round((v.settore - v.spy) * 10) / 10, " pp")}` : ""));
-    }
-  }
-  if (s.m1 != null || s.m3 != null) {
-    F.push(`- Momentum breve: 1 mese ${signTxt(s.m1)} · 3 mesi ${signTxt(s.m3)}`);
-  }
-
-  /* ── i titoli che pesano: la dispersione dice se il comparto si sta rompendo dentro ── */
-  const prime = (s.prime || []).filter(x => x && x.tk);
-  if (prime.length) {
-    F.push(`- LE PRIME ${prime.length} POSIZIONI DELL'ETF (dal fornitore del fondo, col peso):`);
-    const seguiti = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])];
-    for (const p of prime) {
-      const r = seguiti.find(x => String(x.ticker || "").toUpperCase() === p.tk.toUpperCase());
-      F.push(`    ${p.tk} ${p.peso != null ? fmtNum.format(p.peso) + "%" : ""} — ${p.nome}`
-        + (r && numero(r.w52_dist_pct) != null && Number.isFinite(numero(r.w52_dist_pct))
-            ? ` · oggi ${signTxt(numero(r.w52_dist_pct))} dal massimo di 52 settimane` : ""));
-    }
-    F.push(`    ⚠ Il sistema ha la distanza dal massimo solo per i titoli che segue: dove manca, `
-      + `il dato non e' stato calcolato, non e' zero.`);
-  }
-
-  /* ── (a) I PROXY DELL'EUFORIA, dichiarati per quello che sono ── */
-  /* ═══ v308 — QUANTO PESA QUESTO COMPARTO NEL SUO LIBRO ═══════════════════════════════
-     Trovato rileggendo il pacchetto come lo leggerebbe un analista: il sistema conosce le
-     posizioni dalla v307, e un'analisi di settore per chi ci ha dentro tre quarti del
-     portafoglio NON e' la stessa che per chi non ce l'ha. Il pacchetto lo taceva.
-     ⚠ E' un FATTO (peso misurato), non un ordine: cosa farne lo decide chi legge. */
-  {
-    const posiz = ((DATA && DATA.watchlist) || []).filter(r => r && numero(r.qta) > 0 && numero(r.price) > 0);
-    if (posiz.length) {
-      const fx = numero(DATA && DATA.eurusd) || 1;
-      const eur = (r) => (r.currency === "EUR" ? 1 : 1 / fx) * numero(r.price) * numero(r.qta);
-      const tot = posiz.reduce((acc, r) => acc + eur(r), 0);
-      const dentro = posiz.filter(r => (s.prime || [])
-        .some(p => p && String(p.tk).toUpperCase() === String(r.ticker).toUpperCase()));
-      if (tot > 0) {
-        const quota = dentro.reduce((acc, r) => acc + eur(r), 0);
-        /* ⚠⚠ v310 — IL DENOMINATORE VA DICHIARATO QUANDO CAMBIA. Provato togliendo il prezzo
-           di AMD: il peso scendeva da 62% a 54% SENZA dire che una posizione era uscita dal
-           conto. E' la classe "denominatori non dichiarati" che `coherence_check` insegue, e
-           qui produceva un numero piu' basso che sembrava una riduzione dell'esposizione.
-           ⚠ E quando non ha NIENTE in quel comparto, si dice cosi': "0 delle 12 ... valgono il
-           0%" e' vero e si legge male. */
-        const senzaPrezzo = ((DATA && DATA.watchlist) || [])
-          .filter(x => x && numero(x.qta) > 0 && !(numero(x.price) > 0))
-          .map(x => x.ticker);
-        const coda = senzaPrezzo.length
-          ? ` ⚠ ${senzaPrezzo.length} posizioni sono fuori da questo conto perche' il sistema non ne ha il prezzo `
-            + `(${senzaPrezzo.join(", ")}): il denominatore e' piu' piccolo del suo libro reale.`
-          : "";
-        if (!dentro.length) {
-          F.push(`- IL SUO LIBRO, DENTRO QUESTO COMPARTO: nessuna delle ${posiz.length} posizioni azionarie `
-            + `che il sistema conosce e' fra le prime posizioni di ${s.ticker}. `
-            + `Non significa che non abbia esposizione al comparto: significa che non ce l'ha attraverso `
-            + `i suoi titoli piu' grandi.` + coda);
-        } else {
-        F.push(`- IL SUO LIBRO, DENTRO QUESTO COMPARTO: ${dentro.length} delle ${posiz.length} posizioni azionarie `
-          + `sono fra le prime posizioni di ${s.ticker} e valgono il ${Math.round(quota / tot * 100)}% del `
-          + `controvalore azionario`
-          + (dentro.length ? `: ` + dentro.sort((x, y) => eur(y) - eur(x))
-              .map(r => `${r.ticker} ${Math.round(eur(r) / tot * 100)}% (carico ${r.pmc}, oggi ${signTxt(numero(r.gain_pct_pos))})`)
-              .join(" · ") : "")
-          + `. ⚠ E' il peso sulle sole azioni: esclude il BTP e la liquidita', che il sistema non conosce. `
-          + `Il prezzo di carico non cambia cosa fa il titolo — cambia cosa costa uscirne, ed e' un fatto `
-          + `diverso dal giudizio sul comparto.` + coda);
-        }
-      }
-    }
-  }
-
-  F.push(`- SUL PRIMO INGREDIENTE (chi possiede le azioni) IL SISTEMA NON HA IL DATO. `
-    + `I flussi retail negli ETF e la ripartizione istituzionali/retail non hanno una fonte gratuita `
-    + `affidabile: i 13F sono trimestrali e in ritardo, e le azioni in circolazione di un ETF che `
-    + `yfinance espone sono incoerenti col patrimonio dichiarato (undici milioni di quote per un NAV `
-    + `di 584 dollari fanno 6,8 miliardi contro i 68 dichiarati). Quello che il sistema ha sono PROXY, `
-    + `e vanno letti per quello che sono: il put/call e l'ampiezza parlano del MERCATO, mentre `
-    + `l'ETF a leva 3x sul comparto e il debito a margine sono i piu' vicini al primo ingrediente `
-    + `che i dati gratuiti consentano:`);
-  /* ⚠⚠ v308 — LE CHIAVI VANNO LETTE DA data.json, NON DEDOTTE DAL NOME. La prima stesura
-     cercava `m.froth.label`, `m.froth.score` e `m.margin_debt.label`: campi che NON ESISTONO.
-     Il risultato era una riga con l'etichetta e niente dopo — "schiuma sugli ETF a leva 3x:"
-     seguito dal vuoto. E' testualmente la lezione v207, e ci sono ricascato.
-     ⚠⚠⚠ E LEGGENDO I CAMPI VERI SI SCOPRE UNA COSA CHE CAMBIA L'ANALISI: `froth.soxl` e' SOXL,
-     l'ETF a leva 3x SUI SEMICONDUTTORI. Avevo scritto che questi sono "proxy dell'euforia
-     generale del mercato, non di questo settore" — per i semiconduttori e' FALSO: SOXL e'
-     esattamente il proxy di settore, ed e' il piu' vicino che i dati gratuiti consentano
-     all'ingrediente (a), quello che dichiaravo di non avere. Il volume relativo di un ETF a
-     leva 3x su un comparto E' la misura di quanto denaro emotivo ci sta dentro. */
-  if (m.froth) {
-    const lev = Object.entries(m.froth).filter(([, v]) => v && v.symbol && v.rvol != null);
-    if (lev.length) {
-      const suoi = lev.filter(([, v]) => /SOX/i.test(String(v.symbol)));
-      F.push(`    ETF A LEVA 3x — volume rispetto al loro tipico: `
-        + lev.map(([, v]) => `${v.symbol} ${fmtNum.format(v.rvol)}×`
-            + (v.chg_5d_pct != null ? ` (${signTxt(v.chg_5d_pct)} in 5 sedute)` : "")).join(" · ")
-        + (m.froth.alert ? ` ⚠ il sistema segnala schiuma.` : ` Nessun allarme dal sistema.`)
-        + (suoi.length ? ` ⚠ ${suoi.map(([, v]) => v.symbol).join(", ")} e' a leva 3x SU QUESTO COMPARTO: `
-            + `non e' un proxy del mercato, e' il piu' vicino che i dati gratuiti consentano al primo `
-            + `ingrediente — quanto denaro emotivo e a leva sta dentro questo settore.` : ""));
-    }
-  }
-  if (m.putcall && m.putcall.ratio != null) {
-    F.push(`    rapporto put/call sull'S&P: ${m.putcall.ratio} (put ${m.putcall.puts}, call ${m.putcall.calls}) — mercato, non settore`);
-  }
-  if (m.breadth && m.breadth.divergence_pp != null) {
-    F.push(`    ampiezza (SPY contro RSP a 1 mese): ${signTxt(m.breadth.divergence_pp, " pp")} `
-      + `— SPY ${signTxt(m.breadth.spy_1m_pct)}, RSP ${signTxt(m.breadth.rsp_1m_pct)}. `
-      + (m.breadth.divergence_pp > 0
-          ? `Sopra zero: l'indice tira piu' dell'azione media, cioe' la salita e' concentrata nei grandi.`
-          : `Sotto zero: l'azione media batte l'indice, cioe' la partecipazione e' larga.`));
-  }
-  if (m.margin_debt && m.margin_debt.pct_of_peak != null) {
-    F.push(`    debito a margine: ${m.margin_debt.pct_of_peak}% del massimo storico, `
-      + `${signTxt(m.margin_debt.yoy)} sull'anno e ${signTxt(m.margin_debt.qoq)} nell'ultimo mese `
-      + `— fonte FINRA, ritardo STRUTTURALE di ~6 settimane: descrive il mese scorso, non oggi.`);
-  }
-
-  const istruzioni = [
-`ANALISI DEL SETTORE ${s.name.toUpperCase()} (${s.ticker}) — ${oggi}`,
-``,
-`Sei un analista di Wall Street. Devi dire a che punto del ciclo si trova questo comparto e cosa`,
-`ne consegue per chi guarda l'S&P 500 e il Nasdaq. BUDGET: 900-1.100 parole.`,
-``,
-`0) IL GIUDIZIO — cinque righe. A che punto del ciclo sta il settore, cosa lo farebbe cambiare.`,
-``,
-`1) I DUE INGREDIENTI. Una corsa di settore finisce quando si presentano INSIEME: (a) il passaggio`,
-`   delle azioni da mani istituzionali a mani retail, piu' fragili e a leva; (b) il momentum che si`,
-`   gira — le medie smettono di salire e il prezzo va sotto. Il caso di scuola e' il Nasdaq 1998:`,
-`   scossone del 20%, medie ancora in salita, poi +300% fino al 2000. Chi vendette lesse (a) e`,
-`   ignoro' (b). Di' quale dei due ingredienti c'e' OGGI e quale no, coi numeri qui sotto.`,
-`   ⚠ Sul primo il sistema NON ha il dato e te lo dichiara: se lo usi, dillo che usi un proxy.`,
-``,
-`2) IL MOMENTUM, LETTO SULLE MEDIE. Non basta dire "sale" o "scende": le medie corte e quelle`,
-`   lunghe possono dire cose opposte, ed e' proprio quella divergenza il segnale. Di' quale`,
-`   orizzonte si e' girato e quale no, e cosa servirebbe perche' si girassero anche gli altri.`,
-``,
-`3) DENTRO IL COMPARTO. Guarda le prime posizioni e le loro distanze dal massimo: un settore che`,
-`   scende tutto insieme e' una cosa, uno dove tre titoli tengono e due crollano e' un'altra.`,
-``,
-`4) IL PONTE COL MACRO — la parte che nessun altro puo' scrivere al posto tuo. Prendi dal quadro`,
-`   macro in coda le due o tre grandezze che arrivano davvero a QUESTO comparto e di' ATTRAVERSO`,
-`   QUALE CANALE: quale tasso, quale costo, quale domanda finale, quale vincolo di capacita'.`,
-``,
-`5) COSA GUARDARE ADESSO. Un fatto osservabile e datato che direbbe se l'ingrediente mancante sta`,
-`   arrivando. Non una previsione: un evento che si puo' controllare.`,
-``,
-`6) LA TESI CONTRARIA — massimo 8 righe, obbligatoria. Argomenta il contrario di quello che hai`,
-`   appena scritto usando i NUMERI DI QUESTO PACCHETTO, poi di' quale delle due regge meglio e`,
-`   quale fatto le separerebbe. Non ti e' consentito rispondere che entrambe hanno merito.`,
-``,
-`══ REGOLE ══`,
-`· Cerca le notizie delle ULTIME 48 ORE su questo comparto e sui suoi titoli principali: il pacchetto`,
-`  porta i titoli macro recenti ma NON quelli di settore, quindi quella parte e' tua. Se non trovi`,
-`  nulla, dillo — l'assenza di notizie in un settore che si muove e' a sua volta un fatto.`,
-`· Italiano, prosa densa, niente frasi di cortesia. Ogni dato esterno va [VERIFICATO] con fonte e data.`,
-`· I numeri del blocco qui sotto sono calcolati dal sistema: usa quelli e non cercarne altri per le`,
-`  stesse grandezze. Se ne trovi di diversi, riporta entrambi e di' quale usi.`,
-/* ⚠ v328 — DICEVA IL FALSO: il pacchetto di settore CONTIENE il blocco "IL SUO LIBRO, DENTRO
-   QUESTO COMPARTO" con pesi e prezzi di carico. Un'istruzione che nega un fatto presente nel
-   payload insegna al modello che le istruzioni non sono affidabili, ed e' peggio dell'assenza
-   di istruzione. Il divieto resta — cambia la ragione, che ora e' vera. */
-`· Il pacchetto ti dice quanto pesa questo comparto nel libro, ma NON quanta liquidita' c'e', ne'`,
-`  quali altri conti esistano, ne' la situazione fiscale: senza quelli qualunque quantita' e' un`,
-`  numero che sembra un consiglio. Livelli di prezzo si', dimensionamenti e quantita' no.`,
-`· Chiudi con "NON VERIFICATO:" elencando cosa non sei riuscito a confermare.`,
-`⚠ SE NON PUOI NAVIGARE, scrivilo in cima a lettere chiare — "NON HO ACCESSO ALLA RETE: quanto`,
-`  segue e' la lettura di uno snapshot del ${oggi}, non del mercato di oggi" — e non produrre`,
-`  nessun URL. E' una risposta accettabile; un elenco di fonti mai aperte non lo e'. Gli ID delle`,
-`  serie stampati nella coda NON sono una fonte consultata: sono il nome del dato.`,
-``,
-`──────────────────────────────────────────────────────────────────`,
-  ].join("\n");
-
-  return [istruzioni, F.join("\n"), soloDati].filter(Boolean).join("\n\n");
-}
 
 /* ═══ v316 — LA COLONNA DI TRADINGVIEW, DENTRO IL PACCHETTO ══════════════════════════════════
    Richiesta del CEO: stagionalita', conto economico, performance e dettagli tecnici. La pipeline
@@ -9200,288 +8524,7 @@ function buildPromptSettore(chiave) {
    ⚠ Finche' il CI non ha rigenerato data.json questi campi non ci sono: il blocco allora non
    esiste, e non si inventa un ripiego calcolato sulle `sparks` — che sono sotto-campionate e
    senza date, quindi darebbero un RSI e un MACD sbagliati con l'aria di essere giusti. */
-function tvBlocchi(tk) {
-  const r = ((DATA && DATA.watchlist) || []).concat((DATA && DATA.portfolio) || [])
-    .find(x => x && String(x.ticker).toUpperCase() === String(tk).toUpperCase());
-  const tv = r && r.tv;
-  if (!tv) return [];
-  const F = [];
-  const pc = (v) => (v == null ? "n.d." : signTxt(Math.round(v * 10) / 10));
 
-  if (tv.performance) {
-    const et = { s1: "1 settimana", m1: "1 mese", m3: "3 mesi", m6: "6 mesi", ytd: "da inizio anno",
-                 a1: "1 anno", a3: "3 anni", a5: "5 anni", a10: "10 anni" };
-    F.push(``, `--- PERFORMANCE PER ORIZZONTE ---`);
-    F.push(Object.keys(et).filter(k => tv.performance[k] != null)
-      .map(k => `${et[k]} ${pc(tv.performance[k])}`).join(" \u00b7 "));
-    F.push(`Gli orizzonti oltre l'anno sono misurati sulla serie MENSILE, non su una finestra `
-      + `giornaliera corta: un ritorno di un anno con l'etichetta di tre sarebbe un numero fuori orizzonte.`);
-  }
-
-  if (tv.tecnica) {
-    const t = tv.tecnica;
-    F.push(``, `--- DETTAGLI TECNICI (calcolati dal sistema, non letti da terzi) ---`);
-    const ord = ["sma10", "sma20", "sma30", "sma50", "sma100", "sma200", "ema10", "ema20", "ema30", "ema50", "ema100", "ema200"];
-    ord.filter(k => t.medie && t.medie[k]).forEach(k => {
-      const m = t.medie[k];
-      const nome = k.startsWith("sma") ? `Media semplice ${k.slice(3)}` : `Media esponenziale ${k.slice(3)}`;
-      /* ⚠ UNA SOLA CONVENZIONE, e dichiarata: il LIVELLO della media, e dove sta il PREZZO
-         rispetto a lei. In v314 le due famiglie ne usavano due opposte e un LLM vero ha scritto
-         "la SMA200 e' il 75,9% sotto il riferimento" invertendo il verso. */
-      F.push(`${nome}: ${m.liv} — il prezzo le sta ${pc(m.dist_pct)}, cioe' ${m.dist_pct >= 0 ? "SOPRA" : "SOTTO"}`);
-    });
-    if (t.medie_totali) {
-      F.push(`Il prezzo sta sopra ${t.medie_battute} delle ${t.medie_totali} medie calcolate. `
-        + `E' un CONTEGGIO, non un giudizio: il sistema non pubblica piu' verdetti sintetici (v200), `
-        + `perche' un'etichetta compra/vendi ancora la lettura prima ancora che cominci.`);
-    }
-    const o = t.oscillatori || {};
-    const osc = [];
-    if (o.rsi14 != null) osc.push(`RSI 14: ${o.rsi14}`);
-    if (o.macd) osc.push(`MACD 12/26/9: linea ${o.macd.linea}, segnale ${o.macd.segnale}, istogramma ${o.macd.istogramma}`);
-    if (o.stoch_k != null) osc.push(`Stocastico 14/3: %K ${o.stoch_k}${o.stoch_d != null ? `, %D ${o.stoch_d}` : ""}`);
-    if (o.cci20 != null) osc.push(`CCI 20: ${o.cci20}`);
-    if (o.williams_r != null) osc.push(`Williams %R 14: ${o.williams_r}`);
-    if (o.adx14 != null) osc.push(`ADX 14: ${o.adx14} (DI+ ${o.di_su}, DI- ${o.di_giu}) — l'ADX misura la FORZA del trend, non la direzione: sotto 20 il trend e' debole a prescindere dal segno`);
-    if (o.momentum10 != null) osc.push(`Momentum 10 sedute: ${o.momentum10}`);
-    if (osc.length) F.push(`Oscillatori — ${osc.join(" \u00b7 ")}`);
-    if (t._come) F.push(`Metodo: ${t._come}.`);
-  }
-
-  if (tv.conto_trim && tv.conto_trim.length) {
-    F.push(``, `--- CONTO ECONOMICO TRIMESTRALE (ultimi ${tv.conto_trim.length} trimestri) ---`);
-    const mld = (v) => (v == null ? "n.d." : `${(v / 1e9).toFixed(2)} mld`);
-    tv.conto_trim.forEach(q => F.push(`- ${q.trim}: ricavi ${mld(q.ricavi)}`
-      + (q.operativo != null ? ` \u00b7 risultato operativo ${mld(q.operativo)}${q.margine_op != null ? ` (${q.margine_op}%)` : ""}` : "")
-      + (q.utile != null ? ` \u00b7 utile netto ${mld(q.utile)}${q.margine != null ? ` (margine ${q.margine}%)` : ""}` : "")));
-    F.push(`⚠ Il trimestre e' l'unita' in cui una societa' ciclica gira: la serie ANNUALE piu' `
-      + `sopra copre lo stesso periodo ma nasconde il punto di svolta dentro la media dei dodici mesi.`);
-  }
-
-  if (tv.stagionalita && tv.stagionalita.length) {
-    const MESI = ["", "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio",
-                  "agosto", "settembre", "ottobre", "novembre", "dicembre"];
-    const ora = new Date().getMonth() + 1;
-    const vicini = tv.stagionalita.filter(x => [ora, ora % 12 + 1, (ora + 1) % 12 + 1].includes(x.mese));
-    F.push(``, `--- STAGIONALITA' DEL TITOLO (mese per mese, sul suo storico mensile) ---`);
-    (vicini.length ? vicini : tv.stagionalita).forEach(x =>
-      F.push(`- ${MESI[x.mese]}: media ${pc(x.media)}, mediana ${pc(x.mediana)}, `
-        + `${x.positivi_pct}% di mesi positivi su ${x.campione} osservazioni, esiti da ${pc(x.peggio)} a ${pc(x.meglio)}`));
-    F.push(`⚠ Dove media e mediana divergono, la media e' tirata da pochi mesi estremi. E' il conto `
-      + `di cosa e' successo, non una previsione: serve a sapere se un movimento e' ordinario per il periodo.`);
-  }
-
-  if (tv.sensibilita) {
-    F.push(``, `--- COME IL MACRO ARRIVA A ${String(tk).toUpperCase()}: SENSIBILITA' MISURATE ---`);
-    F.push(`Regressione dei rendimenti GIORNALIERI del titolo su quelli di uno strumento quotato che `
-      + `rappresenta il canale. Il beta dice di quanto si muove il titolo per ogni punto del canale; `
-      + `l'R² dice QUANTA della sua variabilita' quel canale spiega davvero.`);
-    Object.entries(tv.sensibilita).forEach(([nome, v]) => {
-      const forza = v.r2 >= 0.4 ? "canale DOMINANTE" : v.r2 >= 0.15 ? "canale presente"
-        : v.r2 >= 0.05 ? "canale debole" : "NESSUNA relazione misurabile su questa finestra";
-      F.push(`- ${nome} (${v.strumento}) — ${v.canale}: beta ${v.beta > 0 ? "+" : ""}${v.beta}, `
-        + `R² ${v.r2} → ${forza}. Campione ${v.campione} sedute comuni, dal ${v.da} al ${v.a}.`);
-    });
-    F.push(`⚠⚠ UN BETA SENZA IL SUO R² E' MEZZO NUMERO. Un beta di 1,8 sui tassi con R² 0,01 non `
-      + `significa "molto sensibile ai tassi": significa che su questa finestra i tassi non spiegano `
-      + `niente del movimento, e il beta e' rumore stimato con tre decimali. La finestra e' comune `
-      + `per costruzione — le due serie sono allineate per DATA, non per posizione.`);
-    F.push(`⚠ Sono relazioni STORICHE su circa un anno, non leggi: un canale puo' accendersi (una `
-      + `societa' che si indebita diventa sensibile ai tassi in un trimestre). Dicono da dove il `
-      + `movimento e' arrivato finora, non da dove arrivera'.`);
-  }
-  return F;
-}
-
-function buildPromptTicker(tkGrezzo) {
-  /* ═══ v257 — RISCRITTO DOPO UN FALLIMENTO REALE ═══════════════════════════════════════════
-     Il CEO ha incollato il pacchetto in Gemini e si e' sentito rispondere: "Tutti i dati tecnici
-     e fondamentali specifici su MRVL, cosi' come le notizie, sono stati classificati e registrati
-     come n.d. in ottemperanza ai limiti imposti sull'impossibilita' di stima in assenza di
-     accesso a feed live". Cioe': il modello ha usato la MIA regola anti-invenzione come permesso
-     per non fare niente.
-     La causa e' mia. Dicevo "cercali online" e subito dopo "un dato che manca si dichiara n.d.":
-     due istruzioni che, lette insieme da un modello prudente, rendono l'inazione la risposta
-     conforme. La regola anti-invenzione serve a impedire i NUMERI FALSI, non a giustificare un
-     referto vuoto — e non lo diceva.
-     Tre correzioni, tutte necessarie insieme:
-     1. la ricerca e' il PRIMO passo obbligatorio, non un'opzione, e il pacchetto elenca DOVE
-        guardare con gli URL — un modello che sa dove andare non si arrende alla prima difficolta';
-     2. se il modello NON PUO' navigare deve DIRLO IN UNA RIGA E FERMARSI, non riempire di "n.d.":
-        un referto tutto n.d. e' peggio di un rifiuto, perche' sembra un'analisi;
-     3. "n.d." e' ammesso per il singolo campo introvabile DOPO aver cercato, mai come politica.
-     ⚠ IL VINCOLO NON E' CAMBIATO: questa pagina e' statica, la pipeline conosce solo i suoi
-     ticker e il CORS chiude Yahoo dal browser. I dati del titolo li deve prendere l'LLM. Quello
-     che e' cambiato e' che ora glielo si chiede in modo che non possa scambiarlo per un divieto. */
-  const tk = String(tkGrezzo || "").trim().toUpperCase();
-  if (!tk) return "";
-  const macro = buildPrompt();
-  const header = promptHeaderText();
-  const soloDati = macro.startsWith(header) ? macro.slice(header.length).replace(/^\n+/, "") : macro;
-  const storico = historicalDigestText();
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  const oggi = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
-  const rilevazione = DATA && DATA.updated_at
-    ? new Date(DATA.updated_at).toLocaleString("it-IT") : "n.d.";
-  const prossimoRun = (typeof prossimoRunPipeline === "function" && prossimoRunPipeline())
-    ? prossimoRunPipeline().toLocaleString("it-IT") : "n.d.";
-
-  const istruzioni = [
-`ANALISI DI ${tk} — ${oggi}`,
-``,
-`Sei un analista azionario senior. Devi produrre un'analisi operativa su ${tk}: tecnica, fondamentale, notizie, e il collegamento col quadro macro che trovi in coda.`,
-``,
-/* ═══ v274 — QUATTRO BLOCCHI DIFENSIVI IN UNO ═════════════════════════════════════════════
-   Punto 2 della revisione. Erano PASSO 0, GERARCHIA DELLE FONTI, IL PREZZO E' UNO SOLO e
-   NIENTE [VERIFICATO] DERIVATO: 3.532 caratteri che dicevano quattro volte "attenzione ai
-   numeri" con quattro intestazioni diverse. Ogni regola nasce da un fallimento vero e nessuna
-   si perde — cambia che stanno insieme, perche' insieme e' come vanno applicate.
-   ⚠ Da non tagliare, per quanto sembrino ovvie: il "se non puoi navigare fermati" nasce da
-   Gemini che rispose tutto "n.d."; il bando ai forum da un LLM che marco' [VERIFICATO] con
-   fonte Reddit medie mobili e target; il prezzo unico da un'analisi che citava tre giorni
-   diversi come se fossero oggi. */
-`══ REGOLE SUI NUMERI — le quattro che decidono se l'analisi vale ══`,
-`1. PASSO 0 — OBBLIGATORIO: CERCA ONLINE prima di scrivere qualsiasi cosa. Non e' un'opzione. SE NON PUOI NAVIGARE: scrivi una riga — "Non ho accesso al web: non posso produrre questa analisi" — e FERMATI. Non compilare il referto con "n.d." dappertutto: ha la forma di un lavoro fatto e non ne ha la sostanza. "n.d." vale per il singolo dato non trovato DOPO averlo cercato, mai come politica generale.`,
-`   DOVE CERCARE: prezzi e tecnici → finance.yahoo.com/quote/${tk} · stockanalysis.com/stocks/${tk} · investing.com — fondamentali → stockanalysis.com/stocks/${tk}/financials · macrotrends · sito IR — trimestrale → comunicato IR · SEC EDGAR (sec.gov/cgi-bin/browse-edgar) — concorrenti e quote → ultimo 10-K (Competition) — notizie → Reuters, Bloomberg, CNBC, Barron's — consenso → stockanalysis/forecast · marketbeat · tipranks.`,
-`2. GERARCHIA DELLE FONTI: vince il rango piu' alto. (1) FONTE PRIMARIA — societa' e filing SEC, l'unica valida per bilancio e guidance · (2) dati di mercato: Yahoo, stockanalysis, investing · (3) stampa finanziaria: Reuters, Bloomberg, WSJ, CNBC, FT · (4) aggregatori di consenso, dichiarando SEMPRE quanti analisti e a che data. NON SONO FONTI e non si marcano [VERIFICATO]: Reddit, X, StockTwits, forum, blog anonimi, video, e ogni pagina che riporta un numero senza dire da dove viene — se un numero lo trovi solo li', e' un dato che non hai. Se il rango 2-4 contraddice il rango 1, vince l'1 e lo dici.`,
-`3. IL PREZZO DI RIFERIMENTO E' UNO SOLO: valore, data e ora, borsa. Distanze dai livelli, capitalizzazione, rendimento da inizio anno e upside si calcolano su QUELLO e lo dichiarano ("−6% dal riferimento"). Citare $476 nella scheda, $482 nel commento e "chiusura del 31/07" nella tecnica significa descrivere tre giorni diversi come se fossero oggi — e' successo, ed e' il modo piu' facile di sbagliare un ingresso. A mercato chiuso il riferimento e' l'ultima chiusura, e lo scrivi.`,
-`4. NIENTE [VERIFICATO] DERIVATO: vale su cio' che hai LETTO in una fonte, mai su cio' che hai ricavato. "Capitalizzazione 780-790 mld, ricavabile da 807 mld di due settimane fa piu' il calo" e' una stima: si scrive [STIMA] col calcolo accanto, oppure "n.d.". Ogni numero esterno porta fonte e data.`,
-``,
-/* ═══ v293 — LA CONSEGNA RISCRITTA SULLA RICHIESTA DEL CEO ═══════════════════════════════
-   Testuale: "mi fornisce un quadro troppo lungo. Vorrei: breve quadro macro sulla base solo
-   dei dati macro che estrapoliamo dal sistema, un quadro di cio' che fa l'azione con eventuali
-   competitor e quote di mercato, prossima trimestrale con info, sentiment analisti, dati
-   tecnici (supporti e resistenze, SMA, EMA, Fibonacci) e finanziari (bilanci, reddito, utili),
-   infine un'analisi in chiusura su eventuali ingressi analizzando anche il sentiment del
-   settore in prospettiva di breve, medio, lungo periodo".
-   ⚠ LA LUNGHEZZA E' UN VINCOLO, NON UN AUSPICIO, e la vecchia consegna non ne aveva nessuno:
-   sette blocchi con tabelle e prosa senza tetto producono tremila parole per costruzione. Un
-   budget scritto e' l'unica istruzione che un LLM rispetta davvero.
-   ⚠⚠ IL GIUDIZIO VA IN CIMA. Se la conclusione sta in fondo a una pagina e mezza, il CEO la
-   legge per ultima o non la legge: il documento serve a SOSTENERE il giudizio, non a
-   costruirlo davanti a chi legge.
-   ⚠ TRE COSE CHE MANCAVANO e che ora sono chieste per nome: la PROSSIMA trimestrale (c'era
-   solo l'ultima), i conti veri (bilancio/reddito/utili, prima sparsi), e i tre orizzonti col
-   sentiment di settore in chiusura.
-   ⚠ Le quattro regole difensive sopra (PASSO 0, gerarchia fonti, prezzo unico, niente
-   [VERIFICATO] derivato) NON si toccano: ognuna nasce da un fallimento vero — vedi CLAUDE.md,
-   "da non tagliare per quanto sembrino ovvie". */
-`══ COSA DEVI CONSEGNARE — E QUANTO LUNGO ══`,
-``,
-`BUDGET: 1.200-1.400 parole IN TUTTO. E' un vincolo, non un'indicazione. Un blocco che non ha`,
-`nulla da dire si chiude in una riga: meglio corto e vero che lungo e riempito. Tabelle solo`,
-`dove servono a confrontare; niente tabella per elencare tre numeri.`,
-``,
-`0) IL GIUDIZIO — cinque righe, prima di tutto il resto.`,
-`Cosa sta facendo ${tk}, a quale prezzo diventa interessante, cosa lo romperebbe. Nessuna`,
-`tabella, nessuna premessa. Tutto quello che viene dopo serve a sostenere queste cinque righe.`,
-``,
-`1) QUADRO MACRO — massimo 10 righe, SOLO dai dati in coda a questo messaggio.`,
-`⚠ PARTI DAL BLOCCO "SENSIBILITA' MISURATE" in coda, se c'e': dice quanto di ${tk} e' spiegato`,
-`DAVVERO da ciascun canale (mercato, comparto, tassi, dollaro) sulle sedute in comune. Un canale`,
-`con R² sotto 0,05 NON e' un canale su questa finestra: se vuoi sostenerlo lo stesso, di' perche'`,
-`ti aspetti che si accenda ora — un bilancio che cambia, una scadenza di debito, una quota di`,
-`ricavi esteri — e dichiara che stai andando CONTRO la misura. Raccontare il canale dei tassi su`,
-`un titolo il cui R² sui tassi e' 0,01 e' la forma di analisi che sembra piu' seria di quella`,
-`corretta, ed e' l'errore che quel blocco esiste per impedire.`,
-`Non cercare online il quadro macro e non riassumere tutte le serie: prendi le DUE O TRE`,
-`grandezze che contano per ${tk} e di' attraverso quale canale arrivano al suo conto economico`,
-`— quale tasso, quale costo, quale domanda finale. Guarda anche dove gli indicatori NON sono`,
-`d'accordo fra loro e di' da quale lato di quel disaccordo sta questo titolo.`,
-`⚠ Il quadro macro in coda e' rilevato dal sistema il ${rilevazione}; il prossimo run del sistema`,
-`e' atteso il ${prossimoRun}. Ogni serie porta la propria data di rilevazione e il proprio prossimo`,
-`aggiornamento: un dato di due mesi non e' lo stato di oggi, e se lo usi dichiari quanto e' vecchio.`,
-``,
-`2) L'AZIENDA E CONTRO CHI GIOCA — cosa vende e a chi, poi una tabella dei concorrenti diretti:`,
-`| Concorrente | Ticker | Cap. mercato | Quota di mercato | Anno e fonte della quota | Dove batte ${tk} |`,
-`Se una quota non e' pubblica dillo e usa un proxy dichiarato (ricavi di segmento, unita'`,
-`spedite). Una quota senza anno non vale: i mercati si ribaltano in quattro trimestri.`,
-``,
-`3) TRIMESTRALI — l'ultima come contesto, la PROSSIMA come evento.`,
-`Dell'ultima: ricavi, utile per azione, margine lordo e operativo, e la voce che conta per il`,
-`suo business, ciascuno col confronto sul consenso. Della PROSSIMA: la data (confermata dalla`,
-`societa' o dichiarata stimata), cosa attende il consenso su ricavi ed EPS, quale numero`,
-`specifico deciderebbe la reazione, e cosa ha fatto il titolo dopo le ultime due uscite.`,
-``,
-`4) I CONTI — bilancio, conto economico, generazione di cassa.`,
-`Debito netto e sua scadenza, liquidita', margini e loro direzione negli ultimi quattro`,
-`trimestri, flusso di cassa operativo e libero, diluizione da compensi in azioni. La domanda a`,
-`cui rispondere e' una: questa societa' finanzia la propria crescita o la prende a prestito?`,
-``,
-`5) TECNICA — i livelli, non le sensazioni.`,
-`Supporti e resistenze, medie semplici ed ESPONENZIALI, ritracciamenti di FIBONACCI, RSI, ATR`,
-`e i muri delle opzioni. ⚠ Molti di questi numeri sono gia' calcolati nel blocco "QUELLO CHE IL`,
-`SISTEMA SA GIA'" qui sotto, con il metodo dichiarato: usa QUELLI. Se ne trovi altri online che`,
-`non tornano, scrivi entrambi e di' quale usi e perche' — non sostituirli in silenzio.`,
-``,
-`6) SENTIMENT DEGLI ANALISTI — consenso (quanti compra/mantieni/vendi), target medio e distanza`,
-`dal prezzo, revisioni delle stime negli ultimi 90 giorni e direzione, posizionamento (short`,
-`interest, flussi). Le revisioni contano piu' del target: il target e' vecchio quanto l'ultimo`,
-`aggiornamento, la revisione dice cosa sta cambiando adesso.`,
-``,
-`7) LA CHIUSURA — ingressi e settore, su tre orizzonti.`,
-`Prima il SETTORE: come sta messo il comparto di ${tk} e se questo titolo e' il migliore o il`,
-`peggiore posto in cui esprimere quella scommessa. Poi gli INGRESSI, distinti per orizzonte:`,
-`· BREVE (settimane): a quale prezzo il rischio-rendimento gira, e quale livello lo invalida.`,
-`· MEDIO (3-12 mesi): quale trimestrale o quale dato macro decide la direzione.`,
-`· LUNGO (oltre l'anno): la tesi vale ancora se il ciclo del settore gira? Cosa la romperebbe?`,
-`Non un voto: un ragionamento con numeri sopra, e per ciascun orizzonte cosa ti smentirebbe.`,
-``,
-/* ═══ v296 — LA TESI CONTRARIA, PRESA DA TradingAgents ═══════════════════════════════════
-   Il CEO mi ha chiesto di analizzare TauricResearch/TradingAgents. Di quel framework l'idea
-   che vale e' UNA: due ricercatori, uno rialzista e uno ribassista, che si contraddicono prima
-   che qualcuno decida. Il resto (agenti autonomi, borsa simulata, sentiment dai forum) non lo
-   prendo — e il sentiment dai forum e' gia' vietato da questa stessa testata, dopo che un LLM
-   marco' [VERIFICATO] medie mobili e target con fonte Reddit.
-   ⚠ E LA PRENDO COME STRUTTURA DI PROMPT, NON COME SISTEMA: zero infrastruttura nuova, resta
-   dentro il flusso a un incollaggio, ed e' verificabile con un cancello.
-   ⚠⚠ VA IN FONDO, NON DOPO IL GIUDIZIO. Per attaccare una tesi bisogna averla prima esposta
-   con le prove: messo dopo il blocco 0 sarebbe un'obiezione a qualcosa che non e' ancora stato
-   argomentato, cioe' teatro.
-   ⚠ TRE VINCOLI CHE LO RENDONO UN CONTRADDITTORIO VERO invece di un paragrafo di cortesia:
-   (a) deve usare i NUMERI DI QUESTO PACCHETTO, altrimenti produce obiezioni generiche che
-       valgono per qualsiasi titolo e non informano su nessuno;
-   (b) deve chiudere SCEGLIENDO: "entrambe le tesi hanno merito" e' il modo in cui un modello
-       evita di esporsi, ed e' esattamente cio' che il blocco deve impedire;
-   (c) deve nominare un fatto OSSERVABILE E DATATO che deciderebbe la disputa — e il pacchetto
-       ora porta il calendario delle prossime due settimane, quindi quel fatto spesso c'e' gia'. */
-`8) LA TESI CONTRARIA — massimo 10 righe, ed e' obbligatoria.`,
-`Hai appena scritto un giudizio. Ora scrivi il caso di chi la pensa all'opposto, e scrivilo`,
-`bene: se sei arrivato a "comprare", argomenta perche' ${tk} scendera'; se sei arrivato a`,
-`"stare fuori", argomenta perche' questo e' il momento di entrare.`,
-`⚠ Usa i NUMERI DI QUESTO PACCHETTO, non obiezioni generiche: un'obiezione che varrebbe per`,
-`qualsiasi titolo non dice niente su questo. Se la tesi contraria poggia su un dato che qui`,
-`non c'e', dillo — anche quello e' un'informazione sul tuo giudizio.`,
-`Poi chiudi in due righe: quale delle due regge meglio, e QUALE FATTO OSSERVABILE E DATATO`,
-`separerebbe le due letture (una trimestrale, un dato macro in uscita, un livello di prezzo`,
-`toccato). Non ti e' consentito rispondere che entrambe le tesi hanno merito: se le prove non`,
-`bastano a scegliere, il giudizio da dare e' "non abbastanza per agire", che e' una scelta.`,
-``,
-`══ REGOLE ══`,
-`· Sei un analista di Wall Street: scrivi come per un comitato di investimento, non per un blog.`,
-`  Italiano, prosa densa, zero frasi di cortesia, zero cappelli introduttivi, zero riassunti di`,
-`  cio' che hai gia' detto. Se una frase non porta un fatto o un giudizio, va tolta.`,
-`· Ogni dato esterno va [VERIFICATO] con fonte e data. Chiudi con "FONTI" — una riga per URL.`,
-`· Se due fonti danno numeri diversi sulla stessa grandezza, dillo e scegli motivando.`,
-`· Se il pacchetto dichiara che il titolo e' gia' in portafoglio, tienine conto: e' una decisione`,
-`  di MANTENIMENTO, non di ingresso, e va detto a quale prezzo la tesi si romperebbe. Se non lo`,
-`  dichiara, il sistema non ha quella posizione e tu non la chiedi.`,
-`· In nessun caso dimensionare: niente "quante quote comprare", niente stop in euro, niente`,
-`  percentuali di portafoglio. Il sistema non conosce liquidita' ne' situazione fiscale, e un`,
-`  dimensionamento senza quei due dati e' un numero che sembra un consiglio.`,
-`· Ignora prezzi e conclusioni di conversazioni precedenti: conta questo pacchetto e cio' che`,
-`  trovi ADESSO in rete.`,
-`· Niente domande in chiusura e niente offerte di approfondimento: quello che serve, dillo qui.`,
-``,
-`──────────────────────────────────────────────────────────────────`,
-`QUADRO MACRO DI RIFERIMENTO (rilevato dal sistema, non da te)`,
-`Snapshot del ${rilevazione} · prossimo aggiornamento atteso ${prossimoRun}`,
-`──────────────────────────────────────────────────────────────────`,
-].join("\n");
-
-  return [istruzioni, datiNostriDelTitolo(tk), soloDati, storico].filter(Boolean).join("\n\n");
-}
 
 /* ═══ v271 — QUELLO CHE SAPPIAMO GIA' DEL TITOLO, INVECE DI FARLO CERCARE ═════════════════
    Trovato rileggendo il pacchetto di NVDA come lo leggerebbe un analista: la scheda TECNICA
@@ -9496,219 +8539,6 @@ function buildPromptTicker(tkGrezzo) {
    contraddizione.
    ⚠ Restano FATTI, non istruzioni (regola C9): qui si dichiara cosa sappiamo, con la data e
    con il metodo di calcolo, e si dice all'LLM cosa fare se cio' che trova fuori non torna. */
-function datiNostriDelTitolo(tk) {
-  /* v274 — SCRITTO SUI FATTI, non ricavato di nuovo. Prima questa funzione rileggeva
-     DATA.portfolio, DATA.watchlist, DATA.options e quoteLive per conto suo, e ogni volta che
-     aggiungevo un dato alla pagina mi dimenticavo di aggiungerlo qui: i muri delle opzioni,
-     poi il pre-market. Adesso legge lo stesso oggetto che disegna la scheda, quindi non c'e'
-     piu' un "qui" e un "li'" da tenere allineati a mano. */
-  const f = fattiTitolo(tk);
-  if (!f || !f.seguito) return "";
-  const T = f.tk, L = [];
-  const dist = (v) => (Number.isFinite(f.prezzo) && Number.isFinite(v))
-    ? ` (${v > f.prezzo ? "+" : ""}${Math.round((v / f.prezzo - 1) * 1000) / 10}% dal riferimento)` : "";
-
-  if (Number.isFinite(f.prezzo)) {
-    /* ⚠ v276 — L'ORA DELLA LETTURA. "Ultima quotazione letta dal browser" non dice QUANDO: se
-       il CEO incolla il pacchetto alle 16:00 e l'LLM risponde alle 16:30, quel prezzo ha
-       mezz'ora e nessuno dei due lo sa. E' la stessa regola che ho gia' applicato al
-       pre-market e alle cadenze macro — un numero senza ora non dice quanto e' fresco. */
-    const ora = new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
-    L.push(`- Prezzo di riferimento del sistema: ${f.prezzo}`
-      + (f.fonte === "live" ? ` (letto dal browser alle ${ora}, ora italiana)`
-         : f.barraDel ? ` (barra del ${f.barraDel})` : ""));
-  }
-  /* il prezzo fuori orario, quando c'e', batte i futures sull'indice: parla di QUESTO titolo. */
-  if (f.ext && Number.isFinite(f.ext.prezzo)) {
-    const d = Number.isFinite(f.prezzo) && f.prezzo
-      ? Math.round((f.ext.prezzo / f.prezzo - 1) * 1000) / 10 : null;
-    L.push(`- Prezzo ${f.ext.fase === "pre" ? "PRE-MARKET" : "AFTER-HOURS"} adesso: ${Math.round(f.ext.prezzo * 100) / 100}`
-      + (d != null ? ` (${d > 0 ? "+" : ""}${d}% rispetto alla chiusura)` : "")
-      + ` — rilevato alle ${f.ext.quando.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}, ora italiana.`
-      + ` E' piu' fresco della chiusura e riguarda QUESTO titolo: pesalo piu' dei futures sull'indice, che parlano del mercato e non di lui.`);
-  }
-  /* i livelli arrivano gia' ordinati, col lato misurato e la provenienza dichiarata. */
-  f.livelli.forEach(x => L.push(`- ${x.nome}: ${x.v}${dist(x.v)} — ${x.fonte}`));
-
-  /* ═══ v293 — FIBONACCI ED EMA LI CALCOLIAMO NOI ═════════════════════════════════════════
-     Richiesta del CEO: fra i dati tecnici vuole "supporti e resistenze, SMA, EMA, Fibonacci".
-     ⚠ E vanno calcolati QUI, non fatti cercare: e' testualmente la lezione v271 — il sistema
-     aveva i livelli e ne faceva cercare altri, l'LLM tornava con numeri diversi, e il CEO si
-     ritrovava la pagina che dice una cosa e l'analisi che ne dice un'altra sullo stesso titolo
-     senza sapere a quale credere. Un sistema che tiene un numero e ne fa cercare un altro sta
-     preparando quella contraddizione.
-     ⚠⚠ E SI CALCOLA SOLO CIO' CHE I DATI PERMETTONO. Misurato sulle serie vere: `sparks.m6` sono
-     126 barre GIORNALIERE (le ultime cinque coincidono con `w1`), mentre `sparks.all` — 500
-     punti che su AMD vanno da 17,56 a 514,39 — e' lo storico lungo, non giornaliero. Quindi EMA
-     20 e 50 si possono fare; l'EMA 200 NO: servirebbero 200 barre giornaliere e ne abbiamo 126.
-     Pubblicarla lo stesso sarebbe un numero che sembra piu' solido di quanto e'. */
-  const tec = f.tecnici || {};
-  const barre = Array.isArray(tec.barreGiorno) ? tec.barreGiorno : [];
-  const ema = (serie, n) => {
-    /* servono almeno 2n barre perche' il valore si sia staccato dal seme: sotto, l'EMA e'
-       ancora dominata dalla media semplice iniziale e non e' cio' che dichiara di essere. */
-    if (!Array.isArray(serie) || serie.length < 2 * n) return null;
-    const kk = 2 / (n + 1);
-    let e = serie.slice(0, n).reduce((s, v) => s + v, 0) / n;
-    for (let i = n; i < serie.length; i++) e = serie[i] * kk + e * (1 - kk);
-    return Math.round(e * 100) / 100;
-  };
-  const e20 = ema(barre, 20), e50 = ema(barre, 50);
-  if (e20 != null || e50 != null) {
-    const pezzi = [];
-    if (e20 != null) pezzi.push(`EMA 20 ${e20}${dist(e20)}`);
-    if (e50 != null) pezzi.push(`EMA 50 ${e50}${dist(e50)}`);
-    L.push(`- Medie esponenziali: ${pezzi.join(" · ")} — calcolate dal sistema su ${barre.length} `
-      + `barre giornaliere di chiusura. EMA 200 NON calcolata: servirebbero 200 barre giornaliere `
-      + `e ce ne sono ${barre.length}; per il lungo periodo c'e' la distanza dalla SMA 200 qui sopra.`);
-  }
-  /* ⚠ Fibonacci sul range a 52 settimane: aritmetica esatta su due numeri che abbiamo gia', non
-     una stima. I livelli si contano DAL MASSIMO verso il basso (ritracciamento di una salita) ed
-     e' scritto, perche' la stessa serie letta al contrario significa un'altra cosa. */
-  if (Number.isFinite(tec.w52hi) && Number.isFinite(tec.w52lo) && tec.w52hi > tec.w52lo) {
-    const R = tec.w52hi - tec.w52lo;
-    const liv = [0.236, 0.382, 0.5, 0.618, 0.786]
-      .map(q => ({ q, v: Math.round((tec.w52hi - q * R) * 100) / 100 }));
-    L.push(`- Ritracciamenti di Fibonacci sul range a 52 settimane (massimo ${tec.w52hi}, minimo ${tec.w52lo}): `
-      + liv.map(x => `${Math.round(x.q * 1000) / 10}% a ${x.v}${dist(x.v)}`).join(" · ")
-      + ` — calcolo esatto sui due estremi, contati DAL MASSIMO verso il basso. Non sono previsioni: `
-      + `sono le quote che quella convenzione indica.`);
-  }
-  /* ═══ v308 — SE IL TITOLO E' IN PORTAFOGLIO, IL PACCHETTO LO DICE ═══════════════════════
-     Trovato rileggendo il pacchetto come lo leggerebbe un analista: dalla v307 il sistema
-     CONOSCE le posizioni, e il pacchetto continuava a dichiarare "non conosco la tua posizione".
-     Su AMD significava proporre un ingresso a 514 dollari a chi ha carico 153,92 e un +234%
-     aperto: due decisioni diverse, e la seconda ha dentro una domanda fiscale che la prima non
-     ha. Un pacchetto che nega di sapere cio' che sa e' la peggiore forma di incoerenza.
-     ⚠ E' un FATTO, non un ordine: quante quote, a che prezzo, quanto vale oggi. Cosa farne lo
-     decide chi legge — e l'istruzione corrispondente sta nella testata, dove vanno gli ordini. */
-  if (Number.isFinite(numero(tec.qta)) && numero(tec.qta) > 0 && Number.isFinite(numero(tec.pmc))) {
-    const q = numero(tec.qta), pmc = numero(tec.pmc);
-    const g = Number.isFinite(numero(tec.gainPos)) ? numero(tec.gainPos) : null;
-    /* ⚠⚠ v310 — E QUANTO PESA NEL LIBRO. Il pacchetto di SETTORE lo sapeva (AMD = 18% del
-       controvalore azionario) e quello del TITOLO no: chi analizza AMD da sola riceveva le
-       quote senza il peso, che e' il fatto che cambia la decisione piu' di qualunque livello
-       tecnico. Un'asimmetria fra due pacchetti dello stesso sistema sullo stesso titolo e' la
-       classe che `coherence_check` chiama "denominatori non dichiarati", qui fra artefatti. */
-    const pl = tec.pesoLibro || null;
-    const peso = pl ? pl.pct : null;
-    L.push(`- ⚠ QUESTO TITOLO E' GIA' IN PORTAFOGLIO: ${fmtNum.format(q)} quote a un prezzo medio di carico `
-      + `di ${pmc}${g != null ? `, oggi ${signTxt(Math.round(g * 10) / 10)}` : ""}`
-      + (peso != null ? `, e vale il ${peso}% del controvalore azionario del libro `
-          + `(su ${pl.quante} posizioni; esclude il BTP e la liquidita', che il sistema non conosce)` : "")
-      + `. `
-      + `Non e' una decisione di ingresso ma di mantenimento: il prezzo di carico non cambia cosa fa il `
-      + `titolo, cambia cosa costa uscirne e quale plusvalenza si realizzerebbe. Il sistema NON conosce `
-      + `la liquidita' disponibile, il resto del libro in dettaglio, ne' la sua situazione fiscale.`);
-  }
-
-  /* ═══ v299 — I CONTI E IL RISCHIO, DA QUI E NON DALLA RETE ═════════════════════════════
-     Ogni riga porta l'unita' e cosa significa: un LLM che riceve "beta 2,49" senza sapere
-     contro quale indice non puo' usarlo, e uno che riceve "rs 1m -1,9" senza il benchmark
-     nemmeno. Il costo di scriverlo e' una manciata di caratteri; il costo di non scriverlo e'
-     un numero usato male o ignorato. */
-  {
-    const T2 = [];
-    if (Number.isFinite(tec.eps)) {
-      T2.push(`- Utile per azione (EPS, ultimi 12 mesi): ${tec.eps}`
-        + (Number.isFinite(tec.pe) ? ` — col P/E ${tec.pe}× qui sopra dice se il multiplo alto nasce da un utile piccolo o da un prezzo alto` : "")
-        + (tec.eps < 0 ? ". ⚠ E' NEGATIVO: la societa' e' in perdita, e un P/E assente non e' un dato mancante ma la conseguenza." : ""));
-    }
-    if (Number.isFinite(tec.beta)) T2.push(`- Beta: ${tec.beta} — quanto amplifica i movimenti del mercato (1 = come l'indice)`);
-    if (Number.isFinite(tec.oggiPct)) T2.push(`- Variazione di oggi: ${signTxt(tec.oggiPct)}`);
-    if (Number.isFinite(tec.volRel)) T2.push(`- Volume rispetto al suo tipico: ${tec.volRel}× (sotto 1 = seduta piu' fiacca del solito)`);
-    if (Number.isFinite(tec.rs1m)) {
-      T2.push(`- Forza relativa a 1 mese contro ${esc(String(tec.rsBench || "il suo indice").toUpperCase())}: ${signTxt(tec.rs1m, " pp")}`
-        + (Number.isFinite(tec.rsNdx) ? ` · contro il Nasdaq 100: ${signTxt(tec.rsNdx, " pp")}` : "")
-        + ` — quanto ha fatto MEGLIO o PEGGIO del suo settore, non quanto ha guadagnato`);
-    }
-    if (Number.isFinite(tec.sortino)) T2.push(`- Sortino a 1 anno: ${tec.sortino} — rendimento per unita' di rischio al RIBASSO (a differenza dello Sharpe non penalizza i rialzi)`);
-    if (tec.rischioRendimento) T2.push(`- Rapporto rischio/rendimento: ${esc(tec.rischioRendimento)} — guadagno dal riferimento (${esc(tec.rischioRendimentoBase || "ultima chiusura")}) fino alla resistenza, contro due volte l'ATR di rischio. ⚠ LA BASE E' IL PREZZO CHE PAGHERESTI, non il minimo delle ultime 20 sedute: misurato dal minimo il rapporto descriverebbe l'operazione di chi ha comprato sul fondo, e su questo titolo sarebbe stato fino a sedici volte piu' generoso. Non rifarlo`);
-    if (T2.length) L.push(...T2);
-  }
-  if (f.opzioni && f.opzioni.ratio != null) {
-    L.push(`- Rapporto put/call di ${T} sulla scadenza ${f.opzioni.scadenza}: `
-      + `${Math.round(f.opzioni.ratio * 100) / 100} (volumi scambiati oggi: put ${f.opzioni.put}, call ${f.opzioni.call})`
-      + (f.opzioni.nonLaPiuVicina
-          ? `. ⚠ NON e' la scadenza piu' vicina: e' quella con piu' CONTRATTI APERTI (${f.opzioni.oi} contro ${f.opzioni.oiPiuVicina} — grandezza diversa dai volumi qui sopra,  a farli tornare). I muri di una scadenza quasi esaurita si spostano da soli senza che il mercato si muova, quindi non sono livelli.`
-          : ""));
-  }
-  const t = f.tecnici;
-  if (t) {
-    if (Number.isFinite(t.rsi)) L.push(`- RSI(14): ${t.rsi}`);
-    if (Number.isFinite(t.atr)) L.push(`- ATR(14): ${t.atr}${Number.isFinite(t.atrPct) ? ` (${t.atrPct}% del prezzo — l'ampiezza tipica di una seduta)` : ""}`);
-  /* ═══ v314 — DUE CONVENZIONI OPPOSTE NELLO STESSO PACCHETTO, E UN LLM CI E' CASCATO ═════
-     Trovato nel referto reale su MU che il CEO ha portato: ChatGPT ha scritto "la SMA200 e'
-     circa il 75,9% sotto il riferimento". E' FALSO — se il prezzo sta +75,9% sopra la media,
-     la media sta il 43,1% sotto il prezzo, non il 75,9%.
-     ⚠⚠ MA LA COLPA E' NOSTRA. Nello stesso blocco convivevano due convenzioni opposte per la
-     stessa grandezza: le EMA scrivono "EMA 20 904.38 (-6.9% dal riferimento)", cioe' il LIVELLO
-     rispetto al prezzo; le SMA scrivevano "+75.9%", cioe' il PREZZO rispetto al livello. Due
-     basi diverse, nessuna delle due dichiarata, a due righe di distanza — la classe
-     "denominatori non dichiarati" che `coherence_check` insegue dentro il payload, qui sfuggita
-     perche' e' una questione di VERSO, non di valore.
-     Ora si scrive il livello E il verso in parole, come per le EMA. */
-  if (Number.isFinite(tec.sma50) || Number.isFinite(tec.sma200)) {
-    /* ⚠⚠ v340 — SI LEGGE IL LIVELLO, NON SI DERIVA. Fino alla v339 questa riga faceva
-       `prezzo / (1 + dist/100)`: il prezzo era quello VIVO e la distanza era calcolata dalla
-       pipeline contro la CHIUSURA, quindi il numero che ne usciva non era la media di nessuna
-       finestra — era il rapporto fra due grandezze misurate su riferimenti diversi.
-       Su MU: 557,27 qui contro 556,46 trenta righe sotto (`Media semplice 200`), stessa
-       grandezza, due valori, stesso pacchetto. Piccolo abbastanza da far pensare a due
-       finestre di calcolo, mai abbastanza da far sospettare un difetto — cioe' la forma
-       peggiore. Ora il livello e' quello della pipeline, che e' l'unico che esiste davvero.
-       ⚠ E QUANDO NON C'E' NON SI INVENTA: se la pipeline non ha pubblicato la media, si
-       stampa la sola distanza. Un livello ricostruito e' peggio di un livello assente. */
-    const riga = (n, dist, liv) => {
-      if (!Number.isFinite(dist)) return null;
-      return `- Media a ${n} sedute${Number.isFinite(liv) ? `: ${liv}` : ""} — il prezzo le sta `
-        + `${signTxt(dist)}, cioe' ${dist >= 0 ? "SOPRA" : "SOTTO"} la media`;
-    };
-    [riga(50, tec.sma50, f.sma50Liv ?? tec.sma50Liv),
-     riga(200, tec.sma200, f.sma200Liv ?? tec.sma200Liv)].filter(Boolean).forEach(x => L.push(x));
-  }
-    if (Number.isFinite(t.pe)) L.push(`- P/E (trailing): ${t.pe}×`);
-    if (t.settore) L.push(`- Settore secondo la nostra classificazione: ${t.settore}`);
-    if (t.trimestrale) L.push(`- Prossima trimestrale attesa: ${t.trimestrale}`);
-  }
-  if (!L.length) return "";
-  return [
-    `=== QUELLO CHE IL SISTEMA SA GIA' DI ${T} (questi numeri sono qui, e sono quelli che il sistema pubblica) ===`,
-    `Questi numeri sono calcolati sulle stesse barre che disegnano il grafico, e sono quelli che il CEO vede sulla pagina.`,
-    `⚠ SUL RITARDO: i prezzi delle azioni americane arrivano da fonti gratuite e sono ritardati di circa 15 minuti — vale per questo pacchetto come per qualunque fonte gratuita, TradingView compresa. Cambi, indici di volatilita', cripto e materie prime sono in tempo reale. Se il titolo si sta muovendo forte adesso, il prezzo qui sotto non e' l'ultimo scambio.`,
-    `Sono il riferimento del sistema. Uno scarto materiale rispetto a cio' che si trova in rete (oltre il 2% su un livello di prezzo) e' un fatto che va scritto insieme a entrambi i valori: una scelta fatta in silenzio fra i due non e' verificabile.`,
-    /* ═══ v299 — IL BLOCCO "COSA NON SO" ══════════════════════════════════════════════════════
-   Trovato nella revisione: dei nove blocchi che il prompt chiede, solo DUE si possono
-   rispondere coi dati del pacchetto (macro e tecnica). Concorrenti e quote, conti, consenso
-   analisti vengono INTERAMENTE dalla rete — cioe' circa il 70% della qualita' dell'output non
-   dipende da questo sistema ma dalla ricerca dell'LLM, che il sistema non controlla.
-   ⚠⚠ E fin qui e' un limite, non un difetto. Il DIFETTO era che un modello che non trova il
-   consenso analisti se lo inventa in silenzio, e nel referto non si distingue un numero
-   verificato da uno plausibile. Qui l'elenco e' esplicito e la dichiarazione di fallimento e'
-   OBBLIGATORIA: "non sono riuscito a verificare X" e' un'informazione, un numero inventato no.
-   ⚠ La riga di prima ("restano da cercare online...") elencava le stesse cose ma senza chiedere
-   conto del risultato: era una lista della spesa, non un vincolo. */
-`══ QUELLO CHE IL SISTEMA NON HA, E CHE DEVI PORTARE TU ══`,
-`Il pacchetto NON contiene queste cose. Cercale e portale con fonte e data:`,
-`· conti: ricavi, margine lordo e operativo, debito netto, cassa, flusso di cassa libero, diluizione`,
-`· ultima trimestrale nel dettaglio e la data CONFERMATA della prossima`,
-`· concorrenti diretti, quote di mercato e anno a cui si riferiscono`,
-`· consenso analisti: numero di giudizi, target medio, revisioni degli ultimi 90 giorni`,
-`· notizie e fatti societari: prima le ULTIME 48 ORE, poi il contesto delle ultime settimane.`,
-`  Il pacchetto porta i titoli MACRO delle ultime 6 ore quando ce ne sono; su questa societa' e sul`,
-`  suo settore non porta niente, quindi quella parte e' interamente tua. Se non trovi nulla di`,
-`  recente, scrivilo: "nessuna notizia rilevante nelle ultime 48 ore" e' un'informazione.`,
-`⚠ La riga "NON VERIFICATO:" in chiusura e' obbligatoria, e contiene le voci che non risultano`,
-`riuscito a trovare o confermare. Se le hai trovate tutte, scrivi "NON VERIFICATO: nessuna".`,
-`Un numero plausibile inventato e' peggio di un buco dichiarato: il buco lo vedo, l'invenzione no.`,
-`⚠ Gli ID delle serie e i nomi delle fonti stampati in coda NON sono fonti consultate: sono il`,
-`nome del dato. Ricostruirci sopra un indirizzo senza aver aperto la pagina e' un elenco di fonti`,
-`mai lette, che e' peggio di "non ho potuto verificare". Ogni [VERIFICATO] porta URL, DATA DI`,
-`PUBBLICAZIONE e un frammento TESTUALE del titolo: le tre cose insieme non si scrivono a memoria.`,
-    ...L,
-    ...tvBlocchi(tk),
-  ].join("\n");
-}
 
 function buildCIOText() {
   /* v256 — IL PACCHETTO È MACRO. Prima era: timbro + brief sul NAV + testata + correlazioni
@@ -9742,226 +8572,13 @@ function buildCIOText() {
    nuovo. Ora la strada e' UNA: il testo finisce SEMPRE nel riquadro, che e' l'unico posto da cui
    il CEO puo' comunque prenderlo; la clipboard e' un di piu' che riesce o dichiara di non essere
    riuscito. Un pacchetto generato e non consegnato e' un pacchetto non generato. */
-/* ═══ v336 — IL PACCHETTO IN PDF, COL GRAFICO DISEGNATO DA NOI ══════════════════════════════
-   Il CEO: "per i tre prompt genera pdf che dovranno contenere screen grafico... HO LA CERTEZZA
-   DI AVERE DATI FRESCHI E GRAFICO BEN COSTRUITO PER LA LETTURA DELL'LLM".
-   ⚠⚠ LO SCREENSHOT DI TRADINGVIEW NON E' POSSIBILE, e l'ho verificato invece di dedurlo: il
-   widget vive su tradingview-widget.com, `contentDocument` e' bloccato e `drawImage` lancia
-   TypeError. Un "cattura schermo" fatto dalla pagina produrrebbe un rettangolo VUOTO 1151x520.
-   Il CEO ha scelto l'alternativa: il grafico lo disegniamo NOI sulle barre giornaliere che la
-   pipeline pubblica. Cosi' l'immagine e' vera, e' coerente al byte coi numeri del pacchetto
-   (stessa fonte, stesso istante) e non dipende da un permesso che nessuno puo' dare.
-   ⚠ Niente librerie: il CSP della pagina vieta gli script di terze parti, quindi il PDF si
-   scrive a mano. Non e' un ripiego — un PDF vettoriale disegnato con gli operatori nativi pesa
-   meno di un'immagine e resta nitido a qualunque ingrandimento, che per un modello che lo legge
-   e' cio' che conta. */
-const PDF_W = 595, PDF_H = 842;          // A4 in punti tipografici
-
-/* Helvetica standard usa WinAnsi: le lettere accentate italiane ci sono, ma vanno scritte come
-   byte singoli e le parentesi vanno protette o chiuderebbero la stringa PDF. */
-function pdfTesto(s) {
-  return String(s == null ? "" : s)
-    .replace(/[\u2018\u2019]/g, "'").replace(/[\u201c\u201d]/g, '"')
-    .replace(/[\u2013\u2014]/g, "-").replace(/[\u2500-\u254F\u256A-\u257F]/g, "-")
-    /* v337 — questi arrivano DAVVERO nel testo dei pacchetti e senza traduzione uscivano "?",
-       cancellando il senso della riga (una freccia che diventa "?" nega l'indicazione). */
-    .replace(/[\u2192\u21D2]/g, "->").replace(/[\u2190\u21D0]/g, "<-")
-    .replace(/[\u2191\u2b06]/g, "su").replace(/[\u2193\u2b07]/g, "giu")
-    .replace(/[\u2550-\u2569]/g, "=").replace(/[\u25A0-\u25FF\u2b1b-\u2b1c]/g, "*")
-    .replace(/[\u26a0\u26A1\u2757\u203C]/g, "!").replace(/\u2713|\u2714/g, "ok")
-    .replace(/[\u2264]/g, "<=").replace(/[\u2265]/g, ">=").replace(/\u00d7/g, "x")
-    .replace(/[\u2022\u25CF]/g, "-").replace(/\u2026/g, "...")
-    .replace(/\u0394/g, "delta ").replace(/\u03c3/g, "sigma").replace(/\u03bc/g, "mu")
-    .replace(/\u03b1/g, "alpha").replace(/\u03b2/g, "beta").replace(/\u03c0/g, "pi")
-    .replace(/[\u2248\u223c]/g, "~").replace(/\u221e/g, "inf")
-    /* ⚠⚠ v340 — L'EURO SPARIVA DA OGNI RIGA DEL PDF DEL PORTAFOGLIO. U+20AC sta fuori da
-       Latin-1, quindi cadeva nella rete finale e diventava "?": quindici importi su quindici
-       piu' il totale del libro perdevano la valuta. Ma il PDF dichiara WinAnsiEncoding
-       (oggetto /Font piu' sotto), e WinAnsi l'euro CE L'HA, alla posizione 0x80 — che in
-       Latin-1 e' un carattere di controllo e infatti nessun altro la occupa. Bastava mapparlo.
-       ⚠ Su un progetto che ha un gate intero (fx_check) nato perche' un LLM aveva usato un
-       dollaro etichettato €, un documento in cui la valuta sparisce e' la stessa famiglia di
-       danno: un importo senza valuta non e' un importo. */
-    .replace(/\u20ac/g, "\u0080")
-    /* ⚠ e il MENO tipografico U+2212, che non e' il trattino ASCII: portava il SEGNO in righe
-       come "(-6% dal riferimento)" e "alert se SPY+ con RSP-", e diventava "?" — cioe' la
-       riga perdeva la direzione, non un ornamento. */
-    .replace(/\u2212/g, "-").replace(/\u27e6/g, "[").replace(/\u27e7/g, "]")
-    .replace(/[\uD800-\uDFFF]./g, "")          /* emoji: via del tutto, non "?" a coppie */
-    .replace(/[^\x20-\xFF]/g, "?")
-    .replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
-}
-
-/* le candele: la parte che il CEO vuole vedere nel PDF */
-function pdfCandele(barre, opt = {}) {
-  const b = (barre || []).filter(x => x && [x.o, x.h, x.l, x.c].every(Number.isFinite));
-  if (b.length < 5) return "";
-  const X0 = 56, X1 = PDF_W - 40, Y0 = PDF_H - 300, Y1 = PDF_H - 96;
-  const lo = Math.min(...b.map(x => x.l)), hi = Math.max(...b.map(x => x.h));
-  const marg = (hi - lo) * 0.06 || 1;
-  const L = lo - marg, H = hi + marg;
-  const X = (i) => X0 + (i + 0.5) / b.length * (X1 - X0);
-  const Y = (v) => Y0 + (v - L) / ((H - L) || 1) * (Y1 - Y0);
-  const larg = Math.max(1.4, (X1 - X0) / b.length * 0.62);
-  let c = "q 0.5 w\n";
-  /* la griglia con i prezzi: senza riferimenti una candela e' un disegno, non un dato */
-  for (let k = 0; k <= 4; k++) {
-    const v = L + (H - L) * k / 4, y = Y(v);
-    c += `0.82 0.82 0.86 RG ${X0} ${y.toFixed(1)} m ${X1} ${y.toFixed(1)} l S\n`;
-    c += `BT /F1 7 Tf 0.35 0.35 0.4 rg ${(X0 - 50).toFixed(1)} ${(y - 2).toFixed(1)} Td (${pdfTesto(fmtNum.format(Math.round(v * 100) / 100))}) Tj ET\n`;
-  }
-  for (let i = 0; i < b.length; i++) {
-    const x = X(i), su = b[i].c >= b[i].o;
-    const col = su ? "0.13 0.63 0.35" : "0.80 0.24 0.24";
-    c += `${col} RG ${col} rg 0.8 w\n`;
-    c += `${x.toFixed(1)} ${Y(b[i].l).toFixed(1)} m ${x.toFixed(1)} ${Y(b[i].h).toFixed(1)} l S\n`;
-    const y0 = Y(Math.min(b[i].o, b[i].c)), y1 = Y(Math.max(b[i].o, b[i].c));
-    c += `${(x - larg / 2).toFixed(1)} ${y0.toFixed(1)} ${larg.toFixed(1)} ${Math.max(y1 - y0, 0.7).toFixed(1)} re f\n`;
-  }
-  /* i livelli del sistema, disegnati sul grafico: sono gli STESSI del testo, non altri */
-  for (const liv of (opt.livelli || [])) {
-    if (!Number.isFinite(liv.v) || liv.v < L || liv.v > H) continue;
-    const y = Y(liv.v);
-    const et = pdfTesto(liv.et);
-    const wEt = et.length * 3.55 + 5;
-    const xEt = X1 - wEt - 2;
-    c += `0.25 0.45 0.85 RG 0.7 w [3 2] 0 d ${X0} ${y.toFixed(1)} m ${(xEt - 3).toFixed(1)} ${y.toFixed(1)} l S [] 0 d\n`;
-    c += `1 1 1 rg ${xEt.toFixed(1)} ${(y - 1.5).toFixed(1)} ${wEt.toFixed(1)} 9 re f\n`;
-    c += `BT /F1 7 Tf 0.25 0.45 0.85 rg ${(xEt + 2).toFixed(1)} ${(y + 1).toFixed(1)} Td (${et}) Tj ET\n`;
-  }
-  c += `0.2 0.2 0.25 RG 0.8 w ${X0} ${Y0} m ${X1} ${Y0} l S\n`;
-  c += `BT /F1 8 Tf 0.35 0.35 0.4 rg ${X0} ${(Y0 - 12).toFixed(1)} Td (${pdfTesto(b[0].d + "  ->  " + b[b.length - 1].d + "   (" + b.length + " sedute giornaliere)")}) Tj ET\n`;
-  return c + "Q\n";
-}
-
-function pdfPagina(righe, y0) {
-  let c = "BT /F1 8.2 Tf 0.1 0.1 0.12 rg\n", y = y0;
-  for (const r of righe) {
-    c += `1 0 0 1 40 ${y.toFixed(1)} Tm (${pdfTesto(r)}) Tj\n`;
-    y -= 10.2;
-  }
-  return c + "ET\n";
-}
-
-/* il testo si spezza a larghezza fissa: Helvetica 8,2pt entra in ~104 caratteri su A4 */
-function pdfSpezza(testo, larghezza = 104) {
-  const fuori = [];
-  for (const riga of String(testo || "").split("\n")) {
-    if (riga.length <= larghezza) { fuori.push(riga); continue; }
-    let resto = riga;
-    while (resto.length > larghezza) {
-      let t = resto.lastIndexOf(" ", larghezza);
-      if (t < larghezza * 0.5) t = larghezza;
-      fuori.push(resto.slice(0, t));
-      resto = resto.slice(t).replace(/^ /, "");
-    }
-    if (resto) fuori.push(resto);
-  }
-  return fuori;
-}
-
-function costruisciPdf(titolo, testo, barre, livelli) {
-  const righe = pdfSpezza(testo);
-  const PER_PAG = 72;
-  const pagine = [];
-  /* prima pagina: intestazione + grafico + l'inizio del testo */
-  const conGrafico = Array.isArray(barre) && barre.length > 1;
-  const sotto = conGrafico
-    ? "Grafico disegnato dal sistema sulle stesse barre da cui vengono i numeri di questo documento: non e' una cattura di terzi."
-    : "Pacchetto completo, cosi' come lo legge il modello. Il testo di questo PDF e' selezionabile e copiabile.";
-  const testa = `BT /F2 13 Tf 0.05 0.05 0.08 rg 40 ${PDF_H - 48} Td (${pdfTesto(titolo)}) Tj ET\n`
-    + `BT /F1 7.5 Tf 0.4 0.4 0.45 rg 40 ${PDF_H - 62} Td (${pdfTesto(sotto)}) Tj ET\n`;
-  const graf = conGrafico ? pdfCandele(barre, { livelli }) : "";
-  const PRIME = conGrafico ? 22 : 60;
-  pagine.push(testa + graf + pdfPagina(righe.slice(0, PRIME), conGrafico ? PDF_H - 320 : PDF_H - 84));
-  for (let i = PRIME; i < righe.length; i += PER_PAG) {
-    pagine.push(pdfPagina(righe.slice(i, i + PER_PAG), PDF_H - 48));
-  }
-
-  /* il file: oggetti numerati, xref, trailer. Un PDF minimo ha bisogno di tutto questo e di
-     nient'altro — niente compressione, che richiederebbe una libreria. */
-  const oggetti = [];
-  const nPag = pagine.length;
-  const idKids = [];
-  for (let i = 0; i < nPag; i++) idKids.push(4 + i * 2);
-  oggetti[1] = "<< /Type /Catalog /Pages 2 0 R >>";
-  oggetti[2] = `<< /Type /Pages /Kids [${idKids.map(i => `${i} 0 R`).join(" ")}] /Count ${nPag} >>`;
-  oggetti[3] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>";
-  const idFontB = 3 + nPag * 2 + 1;
-  for (let i = 0; i < nPag; i++) {
-    oggetti[4 + i * 2] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PDF_W} ${PDF_H}] `
-      + `/Resources << /Font << /F1 3 0 R /F2 ${idFontB} 0 R >> >> /Contents ${5 + i * 2} 0 R >>`;
-    oggetti[5 + i * 2] = { stream: pagine[i] };
-  }
-  oggetti[idFontB] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>";
-
-  let out = "%PDF-1.4\n";
-  const off = [];
-  for (let i = 1; i < oggetti.length; i++) {
-    if (oggetti[i] == null) continue;
-    off[i] = out.length;
-    const o = oggetti[i];
-    out += typeof o === "string"
-      ? `${i} 0 obj\n${o}\nendobj\n`
-      : `${i} 0 obj\n<< /Length ${o.stream.length} >>\nstream\n${o.stream}endstream\nendobj\n`;
-  }
-  const xref = out.length;
-  const n = oggetti.length;
-  out += `xref\n0 ${n}\n0000000000 65535 f \n`;
-  for (let i = 1; i < n; i++) {
-    out += off[i] != null ? `${String(off[i]).padStart(10, "0")} 00000 n \n` : `0000000000 65535 f \n`;
-  }
-  out += `trailer\n<< /Size ${n} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
-  return out;
-}
-
-/* ⚠⚠ v337 — LA CONSEGNA E' IL PDF. Direttiva del CEO: "prompt macro/titolo e settore e
-   portafoglio non generano pdf ma ancora prompt", e alla domanda su cosa dovesse fare il
-   bottone: "Il bottone genera direttamente il PDF".
-   ⚠ Il testo NON si perde, ed e' la ragione per cui questa scelta non toglie niente: il
-   pacchetto completo E' dentro il PDF, nelle pagine dopo il grafico, come testo vero
-   (Helvetica /WinAnsiEncoding, non un'immagine) — selezionabile e copiabile da qualunque
-   lettore. Il PDF porta in piu' il grafico, che il testo non puo' portare.
-   ⚠ E il ripiego resta: se il download non parte — sandbox, permessi, popup bloccato — si
-   riapre la casella col testo. La lezione v316 vale ancora: un pacchetto generato e non
-   consegnato e' un pacchetto non generato, e la strada di consegna non puo' essere una sola
-   che fallisce in silenzio. */
-function barrePerPdf() {
-  const tk = String(tvSimboloCorrente || "").toUpperCase();
-  const r = ((DATA && DATA.watchlist) || []).concat((DATA && DATA.portfolio) || [])
-    .find(x => x && String(x.ticker).toUpperCase() === tk);
-  const barre = (r && r.tv && r.tv.ohlc) || null;
-  if (!barre || !r) return { tk, barre: null, livelli: [] };
-  const livelli = [];
-  const num = (x) => (Number.isFinite(numero(x)) ? numero(x) : null);
-  if (num(r.support) != null) livelli.push({ v: num(r.support), et: `supporto ${fmtNum.format(r.support)}` });
-  if (num(r.resistance) != null) livelli.push({ v: num(r.resistance), et: `resistenza ${fmtNum.format(r.resistance)}` });
-  const med = r.tv && r.tv.tecnica && r.tv.tecnica.medie;
-  if (med && med.sma50) livelli.push({ v: med.sma50.liv, et: `media 50 ${fmtNum.format(med.sma50.liv)}` });
-  if (med && med.sma200) livelli.push({ v: med.sma200.liv, et: `media 200 ${fmtNum.format(med.sma200.liv)}` });
-  return { tk, barre, livelli };
-}
-
-/* scarica il pacchetto come PDF. Ritorna cosa e' successo: chi chiama deve poter dire al CEO
-   se il grafico c'era, e ripiegare sul testo se il download non e' partito. */
-function scaricaPdf(testo, che) {
-  const { tk, barre, livelli } = barrePerPdf();
-  const titolo = barre ? `${che} — ${tk}` : che;
-  try {
-    const pdf = costruisciPdf(titolo, testo, barre, livelli);
-    const bytes = new Uint8Array(pdf.length);
-    for (let i = 0; i < pdf.length; i++) bytes[i] = pdf.charCodeAt(i) & 0xFF;
-    const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
-    const nome = `${(barre ? tk : che).replace(/[^A-Za-z0-9]+/g, "-").toLowerCase()}-${new Date().toISOString().slice(0, 10)}.pdf`;
-    const a = document.createElement("a");
-    a.href = url; a.download = nome;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 4000);
-    return { ok: true, nome, barre: barre ? barre.length : 0, kb: Math.round(pdf.length / 1024) };
-  } catch (e) {
-    return { ok: false, errore: String((e && e.message) || e) };
-  }
-}
+/* ⚠⚠ v341 — IL PDF E' USCITO, E LA CONSEGNA E' TORNATA AL TESTO. Il CEO: "fai ritornare
+   analisi macro solo testuale". Il PDF esisteva per portare il GRAFICO A CANDELE — la sola
+   cosa che il testo non puo' portare — e quel grafico aveva senso su un pacchetto che parla
+   di UN titolo. Senza il pacchetto del titolo, un PDF di solo testo sarebbe un contenitore
+   piu' scomodo del testo: si incolla peggio in una chat e non aggiunge niente.
+   Restano in git costruisciPdf, pdfCandele e il resto: se un domani torna l'analisi di un
+   titolo, tornano con un revert. */
 
 async function consegnaPacchetto(testo, che, esito) {
   if (!testo) { if (esito) esito.textContent = `${che}: non c'e' niente da consegnare.`; return false; }
@@ -9971,27 +8588,21 @@ async function consegnaPacchetto(testo, che, esito) {
   if (box) box.value = testo;
   const quanti = `${testo.length.toLocaleString("it")} caratteri`;
 
-  const r = scaricaPdf(testo, che);
-  if (r.ok) {
-    const conGraf = r.barre > 1 ? ` col grafico a ${r.barre} sedute` : "";
-    if (esito) esito.innerHTML = `<b>${esc(che)}</b> — PDF scaricato${conGraf}: `
-      + `<code>${esc(r.nome)}</code> (${r.kb} KB, ${quanti}). Caricalo in una chat NUOVA; `
-      + `il testo dentro il PDF e' selezionabile se preferisci incollarlo.`;
-    toast(`${che}: PDF scaricato \u2713`);
-    return true;
-  }
-
-  /* ⚠ ripiego: il download non e' partito. NON si perde il pacchetto — si apre la casella col
-     testo dentro e si dice cosa e' successo. Un fallimento silenzioso qui sarebbe esattamente
-     il difetto v316, dove tre strade di consegna su tre buttavano il pacchetto senza dirlo. */
+  /* v341 — una strada sola, ed e' il testo: nel riquadro sempre, negli appunti se il browser
+     li concede. La regola v316 non cambia — un pacchetto generato e non consegnato e' un
+     pacchetto non generato — cambia il formato, non il principio. */
   const modale = $("#modal");
   if (modale) modale.hidden = false;
-  let inAppunti = false;
-  try { await navigator.clipboard.writeText(testo); inAppunti = true; } catch { /* rifiutata */ }
-  if (esito) esito.innerHTML = `<b>${esc(che)}</b> — <b>il PDF non e' partito</b> `
-    + `(${esc(r.errore || "download bloccato dal browser")}). Il pacchetto e' ${quanti} nel `
-    + `riquadro qui sopra${inAppunti ? " e negli appunti" : ", da selezionare e copiare a mano"}.`;
-  return false;
+  try {
+    await navigator.clipboard.writeText(testo);
+    if (esito) esito.innerHTML = `<b>${esc(che)}</b> — ${quanti}, negli appunti e nel riquadro. Incolla in una chat NUOVA.`;
+    toast(`${che} copiato \u2713`);
+    return true;
+  } catch {
+    /* il rifiuto della clipboard NON e' un fallimento della generazione: il testo e' li'. */
+    if (esito) esito.innerHTML = `<b>${esc(che)}</b> — ${quanti}, nel riquadro qui sopra. Il browser non mi ha dato gli appunti: selezionalo e copialo da li'.`;
+    return false;
+  }
 }
 
 async function copyCIOText() {
@@ -10005,23 +8616,15 @@ async function copyCIOText() {
      Ora la scelta la fa il contenuto del box: ticker scritto → analisi di quel titolo; box vuoto
      → solo quadro macro. E lo dice, invece di lasciarlo indovinare. */
   if (!DATA) { toast("Dati non ancora caricati, riprova tra un attimo"); return; }
-  const tk = String($("#tk-input")?.value || "").trim().toUpperCase();
+  /* ⚠ v341 — UN PACCHETTO SOLO. Il bottone produceva l'analisi del TITOLO quando il box
+     conteneva un ticker e il quadro macro quando era vuoto: due esiti da un comando solo, che
+     era gia' una stranezza e che il CEO ha chiuso ("modifica analisi macro/titolo in analisi
+     macro"). Ora fa una cosa sola e il suo nome la dice.
+     ⚠ IL BOX DEL TICKER RESTA, e non e' un residuo: pilota il grafico TradingView e il
+     pannello dei livelli sotto di esso. Quello che non fa piu' e' cambiare cosa produce
+     questo bottone. */
   const esito = $("#tk-esito");
-  let testo, che;
-  if (tk) {
-    if (!/^[A-Z0-9][A-Z0-9.\-=^:]{0,15}$/.test(tk)) {
-      if (esito) esito.textContent = `"${tk}" non sembra un ticker. Svuota il campo per il solo quadro macro, o scrivilo come lo vedi sul mercato.`;
-      $("#tk-input")?.focus();
-      return;
-    }
-    montaGraficoTV(tk);
-    testo = buildPromptTicker(tk);
-    che = `Analisi di ${tk}`;
-  } else {
-    testo = buildCIOText();
-    che = "Quadro macro";
-  }
-  await consegnaPacchetto(testo, che, esito);
+  await consegnaPacchetto(buildCIOText(), "Quadro macro", esito);
 }
 
 
