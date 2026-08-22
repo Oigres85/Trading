@@ -57,6 +57,17 @@ jobs:
       # incoerenti) bloccano il commit dei dati; i degradi di mercato sono solo warning
       - run: python scripts/audit_data.py data/data.json
 
+      # ⚠ v342 — IL PACCHETTO MACRO COME FILE PUBBLICO. Il CEO lavora con un assistente che
+      # non puo' aprire la pagina: se il quadro macro esiste come file nel repo pubblico, se
+      # lo scarica da solo a ogni conversazione e resta fresco perche' questa pipeline gira
+      # su cron. Nessun copia-incolla.
+      # ⚠ NON blocca il commit dei dati (continue-on-error): se il pacchetto non si genera,
+      # i prezzi devono comunque arrivare. Un file macro vecchio si riconosce dalla data che
+      # porta in testa; dati di mercato mancanti no.
+      - name: Genera il pacchetto macro (data/macro_pack.txt)
+        run: node scripts/emit_macro_pack.mjs
+        continue-on-error: true
+
       # registro verdetti→esiti (v113): logga i candidati del motore e inietta il track
       # record in data.json. BEST-EFFORT: exit 0 sempre + continue-on-error, non deve
       # MAI bloccare il commit dei dati.

@@ -3,7 +3,7 @@
    app.js è pensato per il browser: qui gira in un contesto Node (vm) con un DOM-stub
    minimale — niente rendering, si testano SOLO calcoli e generazione del prompt.
    Uso: node scripts/test_app.mjs  (exit 1 se un check fallisce) */
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import vm from "node:vm";
@@ -3093,6 +3093,37 @@ check("v341 il pacchetto macro prevede la risposta onesta di chi non puo' naviga
   const t = buildCIOText();
   return t.indexOf("NON HO ACCESSO ALLA RETE") > 0
       && t.indexOf("non produrre") > 0`));
+
+/* ══ v342 — IL PACCHETTO MACRO PUBBLICATO COME FILE ══════════════════════════════════════
+   Il CEO lavora con un assistente che non puo' aprire la dashboard: il quadro macro viene
+   scritto in data/macro_pack.txt dalla pipeline, e siccome il repo e' PUBBLICO l'assistente
+   se lo scarica da solo. Nessun copia-incolla, e il file si rinfresca da se'.
+   ⚠⚠ L'INVARIANTE CHE CONTA E' DI RISERVATEZZA, NON DI FORMA: quel file finisce su internet.
+   Se un domani tornasse un pacchetto che contiene il portafoglio e qualcuno lo scrivesse
+   li' dentro, le posizioni del CEO sarebbero pubbliche. Il check lo impedisce sul file vero,
+   non sull'intenzione. */
+check("v342 il pacchetto macro pubblico non contiene NESSUN dato di portafoglio", (() => {
+  const p = join(ROOT, "data", "macro_pack.txt");
+  if (!existsSync(p)) return true;                 // non ancora generato dalla CI
+  const t = readFileSync(p, "utf8");
+  if (t.length < 8000) return false;               // troncato = peggio che assente
+  const SPIE = ["SITUAZIONE PATRIMONIALE", "IL SUO LIBRO", "quote a carico", "PMC ",
+                "Prz Medio", "controvalore della posizione"];
+  return !SPIE.some(s => t.includes(s));
+})());
+
+/* ⚠ e l'emettitore non deve RISCRIVERE il pacchetto: deve ESEGUIRE buildCIOText() dentro una
+   vm. Una seconda implementazione diverge dalla prima al primo ritocco — classe v161/v207. */
+check("v342 l'emettitore esegue il codice vero, non una copia della logica", (() => {
+  const p = join(ROOT, "scripts", "emit_macro_pack.mjs");
+  if (!existsSync(p)) return false;
+  const s = readFileSync(p, "utf8");
+  const ci = readFileSync(join(ROOT, ".github", "workflows", "update-data.yml"), "utf8");
+  return s.includes("buildCIOText()")
+      && s.includes("vm.runInContext")
+      && s.includes("prompt_header_macro.txt")     // la testata vera, non il fallback
+      && ci.includes("emit_macro_pack.mjs");       // ed e' davvero cablato nella pipeline
+})());
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
