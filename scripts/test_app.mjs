@@ -3180,6 +3180,28 @@ check("v343 cadenza: l'eta' di una serie non supera mai il suo intervallo di pub
   }
   return true`));
 
+/* ══ v344 — IL PACCHETTO DICHIARA IL PROPRIO PERIMETRO ════════════════════════════════════
+   Un LLM che legge 22.000 caratteri intitolati "quadro macro" lo tratta come completo. Il
+   22/08 e' costato caro: il pacchetto NON sapeva che dal 22/05/2026 la Fed ha un presidente
+   nuovo (zero occorrenze in tutto il file) ne' che Jackson Hole cadeva quella settimana. Il
+   modello se n'e' accorto solo perche' ha cercato di sua iniziativa.
+   ⚠ La correzione NON e' mettere quei fatti nel pacchetto: cambiano di rado e in modo
+   imprevedibile, quindi invecchierebbero in silenzio — che e' precisamente il difetto che si
+   vuole evitare. La correzione e' che il pacchetto dica DOVE FINISCE e mandi a cercare il
+   resto. Un perimetro dichiarato non invecchia; un fatto sul presidente della Fed si'. */
+check("v344 il pacchetto dichiara cosa NON sa, prima dei numeri", suVeri(`
+  const t = buildCIOText();
+  const i = t.indexOf("PERIMETRO DI QUESTO PACCHETTO");
+  const q = t.indexOf("QUADRO MACRO:");
+  if (i < 0 || q < 0) return false;
+  if (i > q) return false;                          // deve stare PRIMA dei numeri
+  const blocco = t.slice(i, q);
+  /* le quattro cecita' che il caso reale ha esposto, piu' l'istruzione di andare a cercare */
+  return blocco.indexOf("presidenza della Fed") > 0
+      && blocco.indexOf("EVENTI NON STATISTICI") > 0
+      && blocco.indexOf("NOTIZIE SOCIETARIE") > 0
+      && blocco.indexOf("cerca online") > 0`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

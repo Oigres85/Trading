@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "343";
+const BUILD_VERSION = "344";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -6977,6 +6977,21 @@ function buildPrompt() {
     lines.push(`· SERIE STORICHE E PERCENTILI (curva, HY OAS, VIX): calcolati su finestre che finiscono `
       + `all'ultima rilevazione disponibile della serie, non a oggi.`);
   }
+  /* v344 — la mappa dei propri limiti, PRIMA dei numeri. Un pacchetto che non dichiara il
+     proprio perimetro viene letto come se non ne avesse uno. */
+  lines.push("⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.");
+  lines.push("MISURA: il valore corrente di ciascuna serie, la sua posizione nel proprio intervallo storico "
+    + "(percentili, inversioni, pendenze), le soglie di lettura con la loro provenienza, e la rotazione "
+    + "settoriale su 21 ETF. Questa parte NON e' reperibile cercando online: richiede le serie storiche.");
+  lines.push("NON SA, e va cercato altrove ogni volta: (a) CHI GUIDA le istituzioni e cosa hanno "
+    + "dichiarato — presidenza della Fed, composizione del FOMC, ultimo dot plot, verbali; (b) gli EVENTI "
+    + "NON STATISTICI — simposi, audizioni, vertici, discorsi programmati: qui trovi solo le uscite di "
+    + "dati con calendario proprio; (c) le NOTIZIE SOCIETARIE e qualunque cosa riguardi un singolo titolo; "
+    + "(d) tutto cio' che e' successo dopo la generazione dichiarata in testa.");
+  lines.push("Quindi: usa questo pacchetto per la STORIA MISURATA, e cerca online il REGIME e gli EVENTI. "
+    + "Se una tua conclusione poggia su chi presiede la Fed o su cosa succede questa settimana, quel pezzo "
+    + "NON viene da qui e va verificato con fonte e data.");
+  lines.push("");
   lines.push("QUADRO MACRO:");
   /* v259 — "Sentiment globale" fuori dal payload: media di componenti gia' pubblicati uno per uno. */
   /* v256 — "Termometro tecnico del portafoglio" tolto: era un punteggio calcolato sui

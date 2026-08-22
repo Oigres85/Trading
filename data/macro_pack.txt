@@ -1,4 +1,4 @@
-⟦ BUILD v343 · generato 22/08/2026 19:16 ⟧
+⟦ BUILD v344 · generato 22/08/2026 21:17 ⟧
 
 Sei un analista macro. Ricevi il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno. Non hai davanti nessun portafoglio: questo pacchetto contiene SOLO dati macro e la loro tensione interna. Non proporre operazioni su titoli, non dimensionare posizioni, non dare consigli di acquisto o vendita.
 
@@ -27,12 +27,17 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 22/08/2026, 19:16:09 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 15:16, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,88% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,09% · Fut S&P +0,29% · BTC -1,28% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~42.2h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 22/08/2026, 21:16:09 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 15:17, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,88% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,09% · Fut S&P +0,29% · BTC -1,28% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~42.2h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 22/08/2026, 19:16:09, prossimo run 22/08/2026, 20:00:00. ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-08-21 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 22/08/2026, 21:16:09, prossimo run 22/08/2026, 22:00:00. ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-08-21 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-06-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-07-01) · Curva 10A-2A (2026-08-21) · Curva 10A-3M (2026-08-21) · Treasury USA 30A (2026-08-20) · Tasso reale 10A (TIPS) (2026-08-20) · Inflazione attesa 10A (breakeven) (2026-08-21) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (curva, HY OAS, VIX): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi.
+⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
+MISURA: il valore corrente di ciascuna serie, la sua posizione nel proprio intervallo storico (percentili, inversioni, pendenze), le soglie di lettura con la loro provenienza, e la rotazione settoriale su 21 ETF. Questa parte NON e' reperibile cercando online: richiede le serie storiche.
+NON SA, e va cercato altrove ogni volta: (a) CHI GUIDA le istituzioni e cosa hanno dichiarato — presidenza della Fed, composizione del FOMC, ultimo dot plot, verbali; (b) gli EVENTI NON STATISTICI — simposi, audizioni, vertici, discorsi programmati: qui trovi solo le uscite di dati con calendario proprio; (c) le NOTIZIE SOCIETARIE e qualunque cosa riguardi un singolo titolo; (d) tutto cio' che e' successo dopo la generazione dichiarata in testa.
+Quindi: usa questo pacchetto per la STORIA MISURATA, e cerca online il REGIME e gli EVENTI. Se una tua conclusione poggia su chi presiede la Fed o su cosa succede questa settimana, quel pezzo NON viene da qui e va verificato con fonte e data.
+
 QUADRO MACRO:
 - Fear & Greed: 55 (Avidità), 1 settimana fa 64, 1 mese fa 43, 1 anno fa 53 — livello e dispersione interna dello stesso indice sono UNA misura guardata da due lati, non due segnali.
 - VIX: 15.13 (-5,5% nell'ultima seduta [chiusura del 21/08] — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario)
