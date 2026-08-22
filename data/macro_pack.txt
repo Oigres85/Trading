@@ -1,4 +1,4 @@
-⟦ BUILD v344 · generato 22/08/2026 21:17 ⟧
+⟦ BUILD v345 · generato 22/08/2026 21:31 ⟧
 
 Sei un analista macro. Ricevi il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno. Non hai davanti nessun portafoglio: questo pacchetto contiene SOLO dati macro e la loro tensione interna. Non proporre operazioni su titoli, non dimensionare posizioni, non dare consigli di acquisto o vendita.
 
@@ -28,7 +28,7 @@ C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invec
 
 
 DATI AL 22/08/2026, 21:16:09 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 15:17, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,88% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,09% · Fut S&P +0,29% · BTC -1,28% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~42.2h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+CONTESTO DI SESSIONE (ora ET 15:31, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,88% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,09% · Fut S&P +0,29% · BTC -1,28% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~42h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
 · DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 22/08/2026, 21:16:09, prossimo run 22/08/2026, 22:00:00. ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-08-21 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-06-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-07-01) · Curva 10A-2A (2026-08-21) · Curva 10A-3M (2026-08-21) · Treasury USA 30A (2026-08-20) · Tasso reale 10A (TIPS) (2026-08-20) · Inflazione attesa 10A (breakeven) (2026-08-21) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
@@ -78,6 +78,7 @@ QUADRO MACRO:
 - Curva 10A-2A: +0.5 pp (rilevazione 2026-08-21, serie GIORNALIERA FRED T10Y2Y, ultima chiusura) — positiva da tempo — l'ultima inversione risale a 489 sedute fa, quindi NON è una dis-inversione in corso ma una curva normalizzata da tempo
 - Curva vs Recessione (modello storico FRED, stessa curva della riga qui sopra): 12m fa +0.51 pp (media mensile del modello), Curva normale. PIL reale YoY 2.1%, sussidi disocc. 206000. NB: la curva NON si sta irripidendo (oggi 0.5 contro 0.51 di 12 mesi fa): la regola "irripidimento post-inversione → recessione entro ~12 mesi" NON è attiva adesso, e va citata solo se e quando lo diventa.
 - FedWatch prossima riunione 2026-09-16 (fra 24 giorni) (dai futures sui Fed Funds a 30 giorni: tasso implicito 3.63% vs punto medio del range attuale): RIALZO 2% · invariato 98% · taglio 0% · POLYMARKET sulla stessa riunione: sull'INVARIATO Polymarket quota 68% contro il 98% dei futures (30 punti di divergenza)
+- STRUTTURA A TERMINE DELLE ATTESE FED (dai futures, riunioni successive): 28/10 invariato 86% · rialzo 14% · taglio 0% | 09/12 invariato 74% · rialzo 26% · taglio 0%. La FORMA conta piu' del primo punto: se la probabilita' di rialzo cresce con l'orizzonte, il mercato non sta dicendo "Fed ferma", sta dicendo "ferma per ora".
 
 ROTAZIONE SETTORIALE/TEMATICA USA (ETF, performance 1M e 3M):
 - Cloud (SKYY): 1M +24,3%, 3M +25,9%
@@ -118,4 +119,8 @@ MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment
 · HY OAS (spread high yield, serie 1A): 2,75% · Δ1M +2,61% · range 1A [2,63–3,46] · percentile 14° (compressione estrema: il credito non prezza rischio)
 · Curva 10A–2A (serie ~2A): 0,5pp · Δ1M 0,16pp · Δ3M 0,01pp · ultima inversione 489 sedute fa
 · VIX (finestra spark ~3M): 15,1 · oggi -5,5% · percentile finestra 14° · term VIX/VIX3M 0,82 (contango: calma)
+· Treasury 10A (serie ~18M): 4,74% · Δ1M +0,43% · range [3,97–4,75] su 369 rilevazioni · percentile 99° (costo del capitale ai massimi del periodo: e' il canale che comprime i multipli lunghi)
+· Treasury 30A (serie ~18M): 5,23% · Δ1M +1,55% · range [4,41–5,31] su 369 rilevazioni · percentile 91° (parte lunga ai massimi: il mercato chiede premio a termine)
+· Rame (serie ~6M): 6,58 $/lb · Δ1M +7,15% · range [4,45–6,7] su 126 rilevazioni · percentile 95° (input industriale ai massimi: entra nel deflatore e nel costo di costruzione dei data center)
+· Petrolio WTI (serie ~6M): 87,06 $ · Δ1M +18,92% · range [55,27–112,41] su 126 rilevazioni · percentile 56°
 USO METODOLOGICO: sulle serie macro sia i valori ESTREMI (HY OAS ai minimi del range, VIX ai minimi della sua distribuzione) sia le INVERSIONI DI TENDENZA (spread in allargamento, curva in dis-inversione) sono i due modi in cui questi indicatori hanno storicamente anticipato i punti di svolta.

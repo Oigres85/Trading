@@ -3202,6 +3202,37 @@ check("v344 il pacchetto dichiara cosa NON sa, prima dei numeri", suVeri(`
       && blocco.indexOf("NOTIZIE SOCIETARIE") > 0
       && blocco.indexOf("cerca online") > 0`));
 
+/* ══ v345 — DUE COSE CHE IL SISTEMA AVEVA E NON PUBBLICAVA ════════════════════════════════
+   Misurato: la parte del pacchetto irreperibile online pesava 775 caratteri su 22.832 — il
+   3,4%. Tutto il resto si trova cercando. Allargare quel 3,4% e' l'unico modo di rendere il
+   pacchetto piu' utile senza allungarlo inutilmente, e le serie c'erano gia' in data.json:
+   369 punti sul Treasury 10A e 30A, 126 su rame e petrolio, mai interrogati.
+   ⚠ Un livello non dice niente da solo: "10 anni al 4,74%" e' un numero, "al 99° percentile
+   del suo intervallo di 18 mesi" e' un'informazione — e su un libro lungo di duration per tre
+   quarti e' LA notizia. */
+check("v345 il digest storico misura anche tassi e input industriali, non solo credito e VIX", suVeri(`
+  const d = buildHistoricalDigests();
+  const et = d.map(x => x.label).join(" | ");
+  const conPercentile = d.filter(x => /percentile/.test(x.text || "")).length;
+  return /Treasury 10A/.test(et) && /Treasury 30A/.test(et)
+      && /Rame/.test(et) && /Petrolio/.test(et)
+      && conPercentile >= 5`));
+
+/* ⚠ E LA CURVA DELLE ATTESE FED, non solo il primo punto. `fedwatch.meetings` portava TRE
+   riunioni con le loro probabilita' e il pacchetto ne pubblicava una: sulla piu' vicina la Fed
+   sembra ferma, tre riunioni piu' in la' il rialzo e' quotato molto di piu'. E' la PENDENZA a
+   dire cosa prezza il mercato — pubblicare solo il primo punto fa sembrare fermo un mercato
+   che sta dicendo "ferma per ora". Classe v199 rovesciata: li' il contratto non prezzava quella
+   riunione, qui prezzava anche le successive e non lo dicevamo. */
+check("v345 il pacchetto pubblica la struttura a termine delle attese Fed, non solo la prossima", suVeri(`
+  const riunioni = ((DATA.macro || {}).fedwatch || {}).meetings || [];
+  if (riunioni.length < 2) return true;          // con una sola riunione non c'e' curva da dire
+  const p = buildPrompt();
+  if (p.indexOf("STRUTTURA A TERMINE DELLE ATTESE FED") < 0) return false;
+  /* la seconda riunione dev'essere nominata: e' il punto che il pacchetto prima taceva */
+  const d2 = String(riunioni[1].date || "");
+  return d2.length >= 10 && p.indexOf(d2.slice(8, 10) + "/" + d2.slice(5, 7)) > 0`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

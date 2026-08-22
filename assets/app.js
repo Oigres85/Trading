@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "344";
+const BUILD_VERSION = "345";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7560,6 +7560,17 @@ function buildPrompt() {
     }
     const conf = pezzi.length ? ` · POLYMARKET sulla stessa riunione: ${pezzi.join(" · ")}` : "";
     const pmPct = pmHike;
+    /* ⚠ v345 — LA CURVA DELLE ATTESE, non solo il primo punto. `meetings` porta le riunioni
+       successive con le loro probabilita': e' la FORMA a dire cosa prezza il mercato. Sulla
+       prossima riunione la Fed sembra ferma; tre riunioni piu' in la' il rialzo e' quotato
+       molto di piu', e quella pendenza e' l'informazione. */
+    const succ = ((m.fedwatch || {}).meetings || []).slice(1, 4)
+      .filter(x => x && x.date)
+      .map(x => `${x.date.slice(8, 10)}/${x.date.slice(5, 7)} invariato ${x.hold_prob ?? 0}% · rialzo ${x.hike_prob ?? 0}% · taglio ${x.cut_prob ?? 0}%`);
+    const curva = succ.length
+      ? `\n- STRUTTURA A TERMINE DELLE ATTESE FED (dai futures, riunioni successive): ${succ.join(" | ")}`
+        + `. La FORMA conta piu' del primo punto: se la probabilita' di rialzo cresce con l'orizzonte, il mercato non sta dicendo "Fed ferma", sta dicendo "ferma per ora".`
+      : "";
     // ═══ v199 — IL CONTRATTO NON PREZZA QUELLA RIUNIONE. ZQ=F e' il future Fed Funds a 30
     // giorni sul MESE CORRENTE: prezza la media del mese in corso, non una riunione fra sei
     // settimane. Il 31/07 il payload ne ricavava "RIALZO 2%" per la riunione del 16/09 mentre
@@ -7577,7 +7588,7 @@ function buildPrompt() {
       lines.push(`- FedWatch — NON CALCOLABILE per la riunione del ${mt.date} (fra ${giorniAllaRiunione} giorni): il tasso implicito ${m.fedwatch.implied_rate}% viene dal future Fed Funds a 30 giorni, che prezza il MESE IN CORSO e non una riunione così lontana. Le probabilità derivate da quel contratto non riguarderebbero quella data.`
         + (pmPct != null ? ` La fonte che quota proprio quella riunione è il mercato di previsione: rialzo ${pmPct}%.` : " Nessun mercato di previsione disponibile su quella riunione in questo payload."));
     } else {
-      lines.push(`- FedWatch prossima riunione ${mt.date}${giorniAllaRiunione != null ? ` (fra ${giorniAllaRiunione} giorni)` : ""} (dai futures sui Fed Funds a 30 giorni: tasso implicito ${m.fedwatch.implied_rate}% vs punto medio del range attuale): ${rami.join(" · ")}${conf}`);
+      lines.push(`- FedWatch prossima riunione ${mt.date}${giorniAllaRiunione != null ? ` (fra ${giorniAllaRiunione} giorni)` : ""} (dai futures sui Fed Funds a 30 giorni: tasso implicito ${m.fedwatch.implied_rate}% vs punto medio del range attuale): ${rami.join(" · ")}${conf}${curva}`);
     }
   }
   if ((m.tilt || []).length) {
@@ -7720,6 +7731,39 @@ function buildHistoricalDigests() {
   out.push({ label: "VIX (finestra spark ~3M)", text: dgFin(vx.value) != null
     ? `${dgTxt(vx.value, "", 1)} · oggi ${signTxt(dgFin(vx.change_pct))} · percentile finestra ${dgTxt(vxPct, "°", 0)} · term VIX/VIX3M ${dgTxt((m.smart_money || {}).vix_term_ratio, "", 2)}${dgFin((m.smart_money || {}).vix_term_ratio) != null ? ((m.smart_money || {}).vix_term_ratio >= 1 ? " (BACKWARDATION: stress)" : " (contango: calma)") : ""}`
     : "—" });
+
+  /* ══ v345 — QUATTRO SERIE CHE IL SISTEMA AVEVA E NON LEGGEVA ═══════════════════════════
+     Misurato: la parte del pacchetto che una ricerca online NON puo' produrre pesava 775
+     caratteri su 22.832, cioe' il 3,4%. Tutto il resto e' reperibile — a costo di trenta
+     ricerche. Allargare quel 3,4% e' l'unico modo di rendere il pacchetto piu' utile senza
+     renderlo piu' lungo in modo inutile.
+     Le serie c'erano gia' in data.json e nessuno le interrogava: `tassi.storico.a10` e `.a30`
+     con 369 punti, `materie.rame.history` e `.petrolio.history` con 126. Sono i due canali che
+     contano su un libro lungo di duration e di infrastruttura: il costo del capitale (che
+     riprezza il multiplo) e il costo degli input (che entra nel deflatore e nel costo di
+     costruzione di un data center).
+     ⚠ Un livello non dice niente da solo. "10 anni al 4,74%" e' un numero; "4,74%, all'87°
+     percentile del suo intervallo di 18 mesi" e' un'informazione — ed e' precisamente cio' che
+     nessuna ricerca web restituisce, perche' richiede la serie. */
+  const serieStorica = (arr, valore, nome, unita, decimali, altoBasso) => {
+    const h = Array.isArray(arr) ? arr.map(x => dgFin(x && x.v)).filter(x => x != null) : [];
+    const v = dgFin(valore) != null ? dgFin(valore) : (h.length ? h[h.length - 1] : null);
+    if (h.length < 30 || v == null) return;
+    const pct = dgPercentile(h, v);
+    let nota = "";
+    if (pct != null && altoBasso) nota = pct >= 80 ? ` (${altoBasso[0]})` : pct <= 20 ? ` (${altoBasso[1]})` : "";
+    out.push({ label: nome, text:
+      `${dgTxt(v, unita, decimali)} · Δ1M ${signTxt(dgDelta(h, 21), "%")} · range [${dgTxt(Math.min(...h), "", decimali)}–${dgTxt(Math.max(...h), "", decimali)}] su ${h.length} rilevazioni · percentile ${dgTxt(pct, "°", 0)}${nota}` });
+  };
+  const tassi = m.tassi || {}, st = tassi.storico || {}, mat = m.materie || {};
+  serieStorica(st.a10, (tassi.a10 != null ? tassi.a10 : (m.carry || {}).us10), "Treasury 10A (serie ~18M)", "%", 2,
+    ["costo del capitale ai massimi del periodo: e' il canale che comprime i multipli lunghi", "costo del capitale ai minimi: vento a favore sulla duration"]);
+  serieStorica(st.a30, null, "Treasury 30A (serie ~18M)", "%", 2,
+    ["parte lunga ai massimi: il mercato chiede premio a termine", "parte lunga ai minimi"]);
+  serieStorica((mat.rame || {}).history, (mat.rame || {}).value, "Rame (serie ~6M)", " $/lb", 2,
+    ["input industriale ai massimi: entra nel deflatore e nel costo di costruzione dei data center", "input industriale ai minimi: domanda debole o offerta abbondante"]);
+  serieStorica((mat.petrolio || {}).history, (mat.petrolio || {}).value, "Petrolio WTI (serie ~6M)", " $", 2,
+    ["energia ai massimi: pressione sul deflatore e sul costo di esercizio", "energia ai minimi"]);
 
   /* v257 — CONTROVALORE E SHARPE DEL FONDO tolti dai digest: erano l'ultima traccia del
      portafoglio nel pacchetto, ed e' il CEO che l'ha vista incollandomi il prompt. */
