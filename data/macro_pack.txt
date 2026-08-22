@@ -1,4 +1,4 @@
-⟦ BUILD v345 · generato 22/08/2026 21:31 ⟧
+⟦ BUILD v346 · generato 22/08/2026 21:38 ⟧
 
 Sei un analista macro. Ricevi il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno. Non hai davanti nessun portafoglio: questo pacchetto contiene SOLO dati macro e la loro tensione interna. Non proporre operazioni su titoli, non dimensionare posizioni, non dare consigli di acquisto o vendita.
 
@@ -28,7 +28,7 @@ C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invec
 
 
 DATI AL 22/08/2026, 21:16:09 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 15:31, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,88% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,09% · Fut S&P +0,29% · BTC -1,28% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~42h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+CONTESTO DI SESSIONE (ora ET 15:38, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,88% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,09% · Fut S&P +0,29% · BTC -1,28% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~41.9h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
 · DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 22/08/2026, 21:16:09, prossimo run 22/08/2026, 22:00:00. ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-08-21 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-06-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-07-01) · Curva 10A-2A (2026-08-21) · Curva 10A-3M (2026-08-21) · Treasury USA 30A (2026-08-20) · Tasso reale 10A (TIPS) (2026-08-20) · Inflazione attesa 10A (breakeven) (2026-08-21) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
@@ -102,6 +102,13 @@ ROTAZIONE SETTORIALE/TEMATICA USA (ETF, performance 1M e 3M):
 - Semiconduttori (SMH): 1M -3,4%, 3M +3%
 - Solare (TAN): 1M -6,7%, 3M -19,1%
 - Utilities (XLU): 1M -7,4%, 3M -2,9%
+STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in cui "correzione o rottura?" e' una domanda aperta; dove concordano la risposta e' gia' nel segno). In ordine di DIVERGENZA fra la pendenza a 20 giorni e quella a 200: piu' in alto, piu' la domanda e' aperta:
+- Semiconduttori (SMH): vs 20g: prezzo -0,4% (media in calo -5,85%) · vs 50g: prezzo -4,9% (media in calo -1,6%) · vs 100g: prezzo +1,1% (media in salita +6,97%) · vs 200g: prezzo +20% (media in salita +5,1%)
+- Software (IGV): vs 20g: prezzo +3,4% (media in salita +8,96%) · vs 50g: prezzo +9,3% (media in salita +1,95%) · vs 100g: prezzo +12,8% (media in salita +3,74%) · vs 200g: prezzo +10,2% (media in calo -1,67%)
+- Solare (TAN): vs 20g: prezzo -3,2% (media in calo -7,96%) · vs 50g: prezzo -9,4% (media in calo -10,53%) · vs 100g: prezzo -14,5% (media in calo -1,55%) · vs 200g: prezzo -10,6% (media in salita +0,7%)
+- Biotech (XBI): vs 20g: prezzo +6,3% (media in calo -0,5%) · vs 50g: prezzo +8,1% (media in salita +7,02%) · vs 100g: prezzo +16% (media in salita +5,02%) · vs 200g: prezzo +25,1% (media in salita +3,95%)
+- Trasporti (IYT): vs 20g: prezzo +0,4% (media in calo -1,31%) · vs 50g: prezzo +0,2% (media in salita +2,14%) · vs 100g: prezzo +4% (media in salita +2,96%) · vs 200g: prezzo +9,3% (media in salita +2,14%)
+- Comunicazioni (XLC): vs 20g: prezzo +0,7% (media in salita +0,81%) · vs 50g: prezzo +1,3% (media in calo -1,53%) · vs 100g: prezzo -0,9% (media in calo -0,63%) · vs 200g: prezzo -1,9% (media in calo -0,36%)
 - P/E Ratio S&P 500 [TRAILING, fonte: multpl]: 29.6× (Sopravvalutazione) · Nasdaq 100 (QQQ) P/E: 30.5× (tech solitamente a premio; >35× = valutazioni tese)
 - S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap +34.9 pp, NDX gap +40.1 pp — Asset Inflation (driver: NDX) (soglia di lettura: gap>40 pp = Asset Inflation da fiat debasement, non crescita utili reali). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). sono lo stesso segnale contato due volte, non due prove separate.
 - Tasso EFFETTIVO (EFFR) 3.63% (rilevazione 2026-07-01) — e' dove le banche si prestano DENTRO il target 3,50-3,75% dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria. Sopra il 4% storicamente comprime i multipli P/E in 12-18 mesi.

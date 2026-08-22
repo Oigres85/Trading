@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "345";
+const BUILD_VERSION = "346";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7596,6 +7596,44 @@ function buildPrompt() {
     lines.push("ROTAZIONE SETTORIALE/TEMATICA USA (ETF, performance 1M e 3M):");
     [...m.tilt].sort((a, b) => b.m1 - a.m1).forEach(s =>
       lines.push(`- ${s.name} (${s.ticker}): 1M ${signTxt(s.m1)}, 3M ${signTxt(s.m3)}`));
+
+    /* ══ v346 — CORREZIONE O ROTTURA DEL TREND? Il pacchetto dava 1 mese e 3 mesi, e con quei
+       due soli numeri un comparto a -3,4% e' indistinguibile fra "correzione dentro un rialzo
+       intatto" e "tendenza che si e' girata". E' la differenza fra tenere e non tenere, cioe'
+       la domanda piu' importante che si possa fare su una posizione lunga.
+       La risposta era gia' nei dati e nessuno la leggeva: ogni ETF porta `medie` con la
+       DISTANZA del prezzo da ma20/50/100/200 e la PENDENZA di ciascuna media. Se le brevi
+       scendono mentre le lunghe salgono e il prezzo sta molto sopra la 200, e' una correzione;
+       se anche le lunghe hanno girato, e' un'altra cosa.
+       ⚠ NON si pubblicano tutti e 21: sarebbero settanta righe di rumore. Si pubblicano SOLO
+       quelli in cui la lettura e' AMBIGUA — dove la pendenza breve e quella lunga hanno segno
+       opposto — che e' esattamente l'insieme dei casi in cui la domanda e' viva. Il criterio
+       si auto-seleziona e non invecchia: nessun elenco di ticker scritto a mano (classe C10). */
+    const ambigui = [...m.tilt].filter(s => {
+      const md = s.medie || {};
+      const breve = (md.ma20 || {}).pendenza_pct, lunga = (md.ma200 || {}).pendenza_pct;
+      return Number.isFinite(breve) && Number.isFinite(lunga) && (breve < 0) !== (lunga < 0);
+    });
+    /* ⚠ ordinare e' un giudizio (v200): qui il giudizio e' dichiarato nell'intestazione.
+       Prima l'ordine era quello per performance a un mese, ereditato dalla lista sopra — e con
+       un tetto di sei righe tagliava a caso. */
+    ambigui.sort((x, y) => {
+      const div = (t) => Math.abs((((t.medie || {}).ma20 || {}).pendenza_pct || 0) - (((t.medie || {}).ma200 || {}).pendenza_pct || 0));
+      return div(y) - div(x);
+    });
+    if (ambigui.length) {
+      lines.push("STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in cui "
+        + "\"correzione o rottura?\" e' una domanda aperta; dove concordano la risposta e' gia' nel segno). In ordine di DIVERGENZA fra la pendenza a 20 giorni e quella a 200: piu' in alto, piu' la domanda e' aperta:");
+      ambigui.slice(0, 6).forEach(s => {
+        const md = s.medie || {};
+        const pezzo = (n, e) => (e && Number.isFinite(e.dist_pct))
+          ? `${n} prezzo ${signTxt(e.dist_pct)}${Number.isFinite(e.pendenza_pct) ? ` (media ${e.pendenza_pct < 0 ? "in calo" : "in salita"} ${signTxt(e.pendenza_pct)})` : ""}`
+          : null;
+        const parti = [pezzo("vs 20g:", md.ma20), pezzo("vs 50g:", md.ma50),
+                       pezzo("vs 100g:", md.ma100), pezzo("vs 200g:", md.ma200)].filter(Boolean);
+        if (parti.length) lines.push(`- ${s.name} (${s.ticker}): ${parti.join(" · ")}`);
+      });
+    }
   }
   if (m.sp500_pe) {
     const cf = m.sp500_pe.carried ? `, ⚠ CARRY-FORWARD dal run precedente${m.sp500_pe.fetched_at || m.sp500_pe.date ? ` (rilevato ${String(m.sp500_pe.fetched_at || m.sp500_pe.date).slice(0, 10)})` : ""} — fonte irraggiungibile: dato DATATO` : "";

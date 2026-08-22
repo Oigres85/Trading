@@ -3233,6 +3233,65 @@ check("v345 il pacchetto pubblica la struttura a termine delle attese Fed, non s
   const d2 = String(riunioni[1].date || "");
   return d2.length >= 10 && p.indexOf(d2.slice(8, 10) + "/" + d2.slice(5, 7)) > 0`));
 
+/* ══ v346 — "CORREZIONE O ROTTURA?" ERA INDECIDIBILE COL PACCHETTO ════════════════════════
+   La rotazione dava 1 mese e 3 mesi. Con quei due soli numeri un comparto a -3,4% e'
+   indistinguibile fra "correzione dentro un rialzo intatto" e "tendenza che si e' girata" —
+   che e' la differenza fra tenere e non tenere, cioe' la domanda piu' importante che si possa
+   fare su una posizione lunga.
+   La risposta era gia' nei dati: ogni ETF porta `medie` con la DISTANZA del prezzo da
+   ma20/50/100/200 e la PENDENZA di ciascuna. Sui semiconduttori oggi: brevi in calo, lunghe in
+   salita, prezzo il 20% sopra la 200 — correzione, non rottura.
+   ⚠ NON si pubblicano tutti e 21 (sarebbero settanta righe di rumore) e NON si sceglie con un
+   elenco di ticker scritto a mano, che invecchierebbe da solo (classe C10). Si pubblicano solo
+   quelli in cui la lettura e' AMBIGUA — pendenza breve e lunga di segno opposto — che e'
+   esattamente l'insieme dei casi in cui la domanda e' viva. Il criterio si auto-seleziona. */
+check("v346 la struttura delle medie esce solo dove breve e lungo NON concordano", suVeri(`
+  const t = (DATA.macro || {}).tilt || [];
+  if (!t.length) return true;
+  const pend = (s, k) => (((s.medie || {})[k] || {}).pendenza_pct);
+  const attesi = t.filter(s => {
+    const b = pend(s, "ma20"), l = pend(s, "ma200");
+    return Number.isFinite(b) && Number.isFinite(l) && (b < 0) !== (l < 0);
+  });
+  const p = buildPrompt();
+  if (!attesi.length) return p.indexOf("STRUTTURA DELLE MEDIE") < 0;
+  if (p.indexOf("STRUTTURA DELLE MEDIE") < 0) return false;
+  const blocco = p.slice(p.indexOf("STRUTTURA DELLE MEDIE"));
+  const fine = blocco.indexOf(String.fromCharCode(10) + "- P/E");
+  const testo = fine > 0 ? blocco.slice(0, fine) : blocco;
+  /* nessun settore CONCORDE deve comparire: sarebbe rumore travestito da segnale */
+  for (const s of t) {
+    const b = pend(s, "ma20"), l = pend(s, "ma200");
+    const concorde = Number.isFinite(b) && Number.isFinite(l) && (b < 0) === (l < 0);
+    if (concorde && testo.indexOf("(" + s.ticker + ")") >= 0) return false;
+  }
+  return true`));
+
+/* ⚠ e l'ORDINE e' un giudizio (v200): qui e' dichiarato — per divergenza fra la pendenza a 20
+   giorni e quella a 200, cioe' per quanto la domanda e' aperta. Prima era l'ordine per
+   performance a un mese, ereditato dalla lista sopra, e col tetto di sei righe tagliava a caso
+   proprio il comparto su cui la domanda contava di piu'. */
+check("v346 i settori ambigui sono ordinati per divergenza, e l'ordine e' dichiarato", suVeri(`
+  const t = (DATA.macro || {}).tilt || [];
+  const pend = (s, k) => (((s.medie || {})[k] || {}).pendenza_pct);
+  const amb = t.filter(s => {
+    const b = pend(s, "ma20"), l = pend(s, "ma200");
+    return Number.isFinite(b) && Number.isFinite(l) && (b < 0) !== (l < 0);
+  }).sort((x, y) => Math.abs(pend(y,"ma20") - pend(y,"ma200")) - Math.abs(pend(x,"ma20") - pend(x,"ma200")));
+  if (amb.length < 2) return true;
+  const p = buildPrompt();
+  if (p.indexOf("In ordine di DIVERGENZA") < 0) return false;   // l'ordine va dichiarato
+  /* ⚠ SI CERCA DENTRO IL BLOCCO, non in tutto il pacchetto: l'elenco della rotazione qui sopra
+     contiene gli stessi ticker in ordine di performance, e cercare li' misura l'ordine di
+     un'altra lista. La prima stesura di questa sonda ci e' cascata. */
+  const inizio = p.indexOf("STRUTTURA DELLE MEDIE");
+  if (inizio < 0) return false;
+  const resto = p.slice(inizio);
+  const fine = resto.indexOf(String.fromCharCode(10) + "- P/E");
+  const blocco = fine > 0 ? resto.slice(0, fine) : resto;
+  const i0 = blocco.indexOf("(" + amb[0].ticker + ")"), i1 = blocco.indexOf("(" + amb[1].ticker + ")");
+  return i0 > 0 && i1 > 0 && i0 < i1`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
