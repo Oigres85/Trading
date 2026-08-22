@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-08-22T14:50:05Z",
+ "updated_at": "2026-08-22T15:14:06Z",
  "eurusd": 1.1678,
  "totals": {
   "usd_value": 0,
@@ -928,8 +928,8 @@
    "rating": {
     "key": "strong_buy",
     "n": 44,
-    "target": 1521.62,
-    "upside_pct": 57.4
+    "target": 1515.11,
+    "upside_pct": 56.7
    },
    "health": 64,
    "eps": 44.23,
@@ -966,7 +966,7 @@
     "debt_to_equity": 6.33,
     "dividend_yield": 0.0005,
     "price_to_book": 10.8365,
-    "target_mean": 1521.6232,
+    "target_mean": 1515.1136,
     "fcf": 7639499776.0,
     "gross_margin": 0.7257,
     "enterprise_value": 1072228728832.0,
@@ -2683,9 +2683,9 @@
    "earnings_date": "2026-11-03",
    "rating": {
     "key": "strong_buy",
-    "n": 47,
-    "target": 614.43,
-    "upside_pct": 29.8
+    "n": 48,
+    "target": 613.09,
+    "upside_pct": 29.5
    },
    "health": 32,
    "eps": 3.93,
@@ -2722,12 +2722,12 @@
     "debt_to_equity": 6.361,
     "dividend_yield": null,
     "price_to_book": 11.4892,
-    "target_mean": 614.434,
+    "target_mean": 613.0917,
     "fcf": 8841499648.0,
     "gross_margin": 0.5572,
     "enterprise_value": 763733803008.0,
     "ev_ebitda": 79.872,
-    "peg": 1.0,
+    "peg": 1.01,
     "roa": 0.0513,
     "short_float": 0.0232,
     "buyback_yield": 0.0025,
@@ -4271,9 +4271,9 @@
    "earnings_date": "2026-08-26",
    "rating": {
     "key": "strong_buy",
-    "n": 58,
-    "target": 304.12,
-    "upside_pct": 41.6
+    "n": 59,
+    "target": 304.73,
+    "upside_pct": 41.9
    },
    "health": 72,
    "eps": 6.53,
@@ -4310,12 +4310,12 @@
     "debt_to_equity": 6.555,
     "dividend_yield": 0.0047,
     "price_to_book": 26.6072,
-    "target_mean": 304.1207,
+    "target_mean": 304.7288,
     "fcf": 46335873024.0,
     "gross_margin": 0.7414,
     "enterprise_value": 5155866017792.0,
     "ev_ebitda": 31.151,
-    "peg": 0.6,
+    "peg": 0.59,
     "roa": 0.5273,
     "short_float": 0.0126,
     "buyback_yield": 0.0077
@@ -17837,15 +17837,15 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 76957.71,
+   "price": 76946.83,
    "price_asof": "2026-08-22",
    "price_live": false,
-   "change_pct": -1.76,
+   "change_pct": -1.77,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -39.0,
-   "sma200_dist_pct": 11.6,
-   "sma50_dist_pct": 18.7,
+   "sma200_dist_pct": 11.5,
+   "sma50_dist_pct": 18.6,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
    "w52_dist_pct": -39.0,
@@ -17853,8 +17853,8 @@
    "day_low": 76628.17,
    "support": 62226.58,
    "resistance": 79463.71,
-   "rsi": 79.7,
-   "volume": 53482004480,
+   "rsi": 79.6,
+   "volume": 52960346112,
    "vol_ratio": 3.3,
    "atr_14": 2105.57,
    "atr_pct": 2.74,
@@ -17866,7 +17866,7 @@
      69266.19,
      73032.76,
      78335.19,
-     76957.71
+     76946.83
     ],
     "m6": [
      73856.35,
@@ -17994,7 +17994,7 @@
      69266.19,
      73032.76,
      78335.19,
-     76957.71
+     76946.83
     ],
     "all": [
      386.94,
@@ -18140,7 +18140,7 @@
      73579.69,
      58558.86,
      62813.75,
-     76957.71
+     76946.83
     ],
     "m1": [
      62763.32,
@@ -18164,7 +18164,7 @@
      69266.19,
      73032.76,
      78335.19,
-     76957.71
+     76946.83
     ],
     "m3": [
      62896.47,
@@ -18232,7 +18232,7 @@
      69266.19,
      73032.76,
      78335.19,
-     76957.71
+     76946.83
     ],
     "y1": [
      116874.09,
@@ -18308,7 +18308,7 @@
      64880.19,
      63402.43,
      64506.25,
-     76957.71
+     76946.83
     ],
     "d1": [
      78179.07,
@@ -18399,7 +18399,10 @@
      77018.99,
      77011.61,
      77133.43,
-     76947.72
+     76947.72,
+     76935.08,
+     77007.19,
+     76946.83
     ]
    },
    "earnings_date": null,
@@ -18412,7 +18415,7 @@
    "sharpe_6m": -0.01,
    "sortino_6m": -0.02,
    "prepost": null,
-   "prezzo_limite_aggiustato": 76957.71,
+   "prezzo_limite_aggiustato": 76946.83,
    "risk_reward": "1:0.6",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -18421,22 +18424,22 @@
     "w1": {
      "support": 63980.32,
      "resistance": 79463.71,
-     "change_pct": 18.98
+     "change_pct": 18.96
     },
     "m1": {
      "support": 62226.58,
      "resistance": 79463.71,
-     "change_pct": 22.62
+     "change_pct": 22.6
     },
     "m3": {
      "support": 57747.77,
      "resistance": 79463.71,
-     "change_pct": 22.36
+     "change_pct": 22.34
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -12.72
+     "change_pct": -12.73
     }
    },
    "financials": [],
@@ -18463,74 +18466,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 76957.71,
+     "prezzo": 76946.83,
      "medie": {
       "sma10": {
-       "liv": 67899.95,
-       "dist_pct": 13.34
+       "liv": 67898.87,
+       "dist_pct": 13.33
       },
       "ema10": {
-       "liv": 70042.68,
-       "dist_pct": 9.87
+       "liv": 70040.71,
+       "dist_pct": 9.86
       },
       "sma20": {
-       "liv": 66043.53,
-       "dist_pct": 16.53
+       "liv": 66042.99,
+       "dist_pct": 16.51
       },
       "ema20": {
-       "liv": 67470.55,
-       "dist_pct": 14.06
+       "liv": 67469.52,
+       "dist_pct": 14.05
       },
       "sma30": {
-       "liv": 65330.34,
-       "dist_pct": 17.8
+       "liv": 65329.97,
+       "dist_pct": 17.78
       },
       "ema30": {
-       "liv": 66443.41,
-       "dist_pct": 15.82
+       "liv": 66442.71,
+       "dist_pct": 15.81
       },
       "sma50": {
-       "liv": 64858.83,
-       "dist_pct": 18.65
+       "liv": 64858.61,
+       "dist_pct": 18.64
       },
       "ema50": {
-       "liv": 65830.31,
-       "dist_pct": 16.9
+       "liv": 65829.88,
+       "dist_pct": 16.89
       },
       "sma100": {
-       "liv": 66111.75,
-       "dist_pct": 16.41
+       "liv": 66111.64,
+       "dist_pct": 16.39
       },
       "ema100": {
-       "liv": 66951.77,
-       "dist_pct": 14.95
+       "liv": 66951.55,
+       "dist_pct": 14.93
       },
       "sma200": {
-       "liv": 68980.21,
-       "dist_pct": 11.56
+       "liv": 68980.16,
+       "dist_pct": 11.55
       },
       "ema200": {
-       "liv": 71983.42,
-       "dist_pct": 6.91
+       "liv": 71983.31,
+       "dist_pct": 6.9
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 79.7,
+      "rsi14": 79.6,
       "macd": {
-       "linea": 2505.0,
-       "segnale": 938.55,
-       "istogramma": 1566.44
+       "linea": 2504.13,
+       "segnale": 938.38,
+       "istogramma": 1565.75
       },
       "stoch_k": 85.2,
       "stoch_d": 91.8,
       "williams_r": -14.8,
-      "cci20": 361.2,
+      "cci20": 361.1,
       "adx14": 25.6,
       "di_su": 51.6,
       "di_giu": 8.4,
-      "momentum10": 13555.28
+      "momentum10": 13544.39
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -19023,19 +19026,19 @@
       "o": 78326.97,
       "h": 78767.34,
       "l": 76628.17,
-      "c": 76957.71
+      "c": 76946.83
      }
     ],
     "performance": {
-     "s1": 19.3,
-     "m1": 22.52,
-     "m3": 19.47,
-     "m6": 1.63,
-     "a1": -14.77,
-     "ytd": -13.27,
-     "a3": 196.77,
-     "a5": 63.16,
-     "a10": 13272.97
+     "s1": 19.29,
+     "m1": 22.5,
+     "m3": 19.45,
+     "m6": 1.61,
+     "a1": -14.79,
+     "ytd": -13.28,
+     "a3": 196.73,
+     "a5": 63.14,
+     "a10": 13271.08
     },
     "stagionalita": [
      {
@@ -19103,7 +19106,7 @@
      },
      {
       "mese": 8,
-      "media": 1.74,
+      "media": 1.73,
       "mediana": -7.19,
       "positivi_pct": 33,
       "campione": 12,
@@ -52482,7 +52485,7 @@
   },
   {
    "question": "Bitcoin Up or Down on August 22?",
-   "yes": 19,
+   "yes": 15,
    "link": "https://polymarket.com/event/bitcoin-up-or-down-on-august-22-2026"
   },
   {
@@ -52497,12 +52500,12 @@
   },
   {
    "question": "Will Bitcoin reach $80,000 in August?",
-   "yes": 59,
+   "yes": 58,
    "link": "https://polymarket.com/event/will-bitcoin-reach-80k-in-august-2026"
   },
   {
    "question": "Ethereum Up or Down on August 22?",
-   "yes": 83,
+   "yes": 82,
    "link": "https://polymarket.com/event/ethereum-up-or-down-on-august-22-2026"
   }
  ],
@@ -71648,6 +71651,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-08-22T14:50:06Z"
+  "generated_at": "2026-08-22T15:14:06Z"
  }
 }
