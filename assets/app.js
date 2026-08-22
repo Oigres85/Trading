@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "342";
+const BUILD_VERSION = "343";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1509,8 +1509,12 @@ const CADENZA_FONTE = {
   t30:       { nome: "FRED", giorniLag: 1, passo: "giornaliero", nota: "rendimento del Treasury a 30 anni" },
   real10:    { nome: "FRED", giorniLag: 1, passo: "giornaliero", nota: "rendimento TIPS 10A, cioe' al netto dell'inflazione" },
   breakeven: { nome: "FRED", giorniLag: 1, passo: "giornaliero", nota: "differenza fra nominale e reale a 10 anni" },
-  philly:    { nome: "Philadelphia Fed", giorniLag: 18, passo: "mensile",
-               nota: "l'ISM e' sotto licenza e non e' ridistribuibile: questa e' la stessa specie di indagine, dichiarata" },
+  /* ⚠ `mesiRitardo` = quanti mesi dopo il periodo misurato esce il dato. Vale 1 per quasi
+     tutte le serie americane (il CPI di luglio esce a meta' agosto) e per questo e' il valore
+     predefinito — ma NON per il Philly Fed, che pubblica l'indagine del mese dentro quel mese.
+     Senza questo campo la serie annunciava "prossimo atteso" con due mesi di ritardo. */
+  philly:    { nome: "Philadelphia Fed", giorniLag: 18, passo: "mensile", mesiRitardo: 0,
+               nota: "l'ISM e' sotto licenza e non e' ridistribuibile: questa e' la stessa specie di indagine, dichiarata. Esce il terzo giovedi' del mese che misura, non il mese dopo" },
 };
 
 /* Restituisce { rilevato, eta, prossimo, passo, fonte, nota } o null se non si può dire nulla.
@@ -1532,7 +1536,24 @@ function cadenzaDato(chiave, dataRilevazione) {
   const d = new Date(String(dataRilevazione).slice(0, 10) + "T00:00:00");
   if (isNaN(d)) return null;
   const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
-  const eta = Math.round((oggi - d) / 86400000);
+  /* ⚠⚠ v343 — L'ETA' SI CONTA DALL'USCITA, NON DAL PERIODO MISURATO. Per i mensili FRED data
+     l'osservazione al PRIMO del mese di riferimento: e' il periodo, non il giorno in cui il
+     numero e' arrivato. Contare da li' gonfia l'eta' di tutto il ritardo di pubblicazione —
+     sul Philly Fed un dato di due giorni usciva come "21 giorni fa", cioe' vecchio quando era
+     appena nato. Si stima invece quando quell'osservazione e' stata PUBBLICATA. */
+  const usciloIl = new Date(d);
+  if (c.passo === "mensile") {
+    usciloIl.setMonth(usciloIl.getMonth() + (c.mesiRitardo ?? 1));
+    usciloIl.setDate(Math.min(c.giorniLag || 15, 28));
+  } else if (c.passo === "trimestrale") {
+    usciloIl.setMonth(usciloIl.getMonth() + 3);
+    usciloIl.setDate(Math.min(c.giorniLag || 15, 28));
+  } else {
+    usciloIl.setDate(usciloIl.getDate() + (c.giorniLag || 1));
+  }
+  /* se la stima cade nel futuro il dato e' appena uscito: l'eta' non puo' essere negativa */
+  const rif = usciloIl > oggi ? d : usciloIl;
+  const eta = Math.max(0, Math.round((oggi - rif) / 86400000));
   /* il prossimo dato copre il periodo SUCCESSIVO a quello rilevato, e arriva `giorniLag`
      dopo la fine di quel periodo: si somma un passo alla rilevazione e poi il ritardo. */
   const p = new Date(d);
@@ -1544,7 +1565,10 @@ function cadenzaDato(chiave, dataRilevazione) {
     p.setMonth(p.getMonth() + 6);
     p.setDate(Math.min(c.giorniLag || 15, 28));
   } else {
-    p.setMonth(p.getMonth() + 2);
+    /* ⚠ v343 — un passo per il periodo successivo, PIU' il ritardo di pubblicazione di quella
+       serie. Prima erano due mesi fissi: giusto sulle serie che escono in M+1, sbagliato di
+       un mese intero su quelle che escono dentro il proprio mese. */
+    p.setMonth(p.getMonth() + 1 + (c.mesiRitardo ?? 1));
     p.setDate(Math.min(c.giorniLag || 15, 28));
   }
   /* ⚠ v266 — LA DATA SI COMPONE DAI PEZZI LOCALI, NON DA toISOString(). Le date qui sono
@@ -7501,15 +7525,26 @@ function buildPrompt() {
       `taglio ${mt.cut_prob ?? 0}%`,
     ];
     // stessa riunione quotata su Polymarket? (i mercati di previsione sono già nel payload)
-    const pm = (DATA.predictions || []).find(x => /\bfed\b/i.test(x.question || "") && /increase|hike|raise/i.test(x.question || ""));
+    const cerca = (re) => (DATA.predictions || []).find(x => /\bfed\b/i.test(x.question || "") && re.test(x.question || ""));
     // il campo di Polymarket in data.json si chiama `yes` ed e' gia' in percentuale (17 = 17%);
     // si accettano anche le forme 0-1 e `probability` per non dipendere da un solo formato.
-    const pmRaw = pm ? (pm.yes ?? pm.probability) : null;
-    const pmPct = pmRaw != null ? Math.round(pmRaw > 1 ? pmRaw : pmRaw * 100) : null;
-    const scarto = (pmPct != null && mt.hike_prob) ? Math.abs(pmPct - mt.hike_prob) : null;
-    const conf = scarto != null
-      ? ` · lo stesso esito su Polymarket è quotato ${pmPct}%${scarto >= 10 ? ` — le due fonti divergono di ${scarto} punti sulla stessa riunione` : ""}`
-      : "";
+    const quota = (x) => { const r = x ? (x.yes ?? x.probability) : null;
+      return r != null ? Math.round(r > 1 ? r : r * 100) : null; };
+    const pmHike = quota(cerca(/increase|hike|raise/i));
+    const pmHold = quota(cerca(/no change|unchanged|hold/i));
+    const pezzi = [];
+    // ⚠ OGNI CONFRONTO NOMINA IL PROPRIO ESITO: "lo stesso esito" senza dire quale si aggancia
+    //   alla voce piu' vicina di chi legge, e produce una lettura falsa (v343).
+    if (pmHold != null && mt.hold_prob != null) {
+      const d = Math.abs(pmHold - mt.hold_prob);
+      pezzi.push(`sull'INVARIATO Polymarket quota ${pmHold}% contro il ${mt.hold_prob}% dei futures${d >= 10 ? ` (${d} punti di divergenza)` : ""}`);
+    }
+    if (pmHike != null && mt.hike_prob != null) {
+      const d = Math.abs(pmHike - mt.hike_prob);
+      pezzi.push(`sul RIALZO quota ${pmHike}% contro il ${mt.hike_prob}%${d >= 10 ? ` (${d} punti)` : ""}`);
+    }
+    const conf = pezzi.length ? ` · POLYMARKET sulla stessa riunione: ${pezzi.join(" · ")}` : "";
+    const pmPct = pmHike;
     // ═══ v199 — IL CONTRATTO NON PREZZA QUELLA RIUNIONE. ZQ=F e' il future Fed Funds a 30
     // giorni sul MESE CORRENTE: prezza la media del mese in corso, non una riunione fra sei
     // settimane. Il 31/07 il payload ne ricavava "RIALZO 2%" per la riunione del 16/09 mentre

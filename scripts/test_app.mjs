@@ -3125,6 +3125,61 @@ check("v342 l'emettitore esegue il codice vero, non una copia della logica", (()
       && ci.includes("emit_macro_pack.mjs");       // ed e' davvero cablato nella pipeline
 })());
 
+/* ══ v343 — LA DISTANZA FRA DUE USCITE DEVE VALERE UN PASSO, NON DUE ═══════════════════════
+   Il difetto trovato: la logica mensile sommava SEMPRE due mesi alla data di rilevazione (un
+   passo per il periodo successivo, uno per il ritardo di pubblicazione). Vero per CPI, PCE,
+   NFP e vendite al dettaglio, che escono in M+1. Falso per il Philly Fed, che pubblica
+   l'indagine del mese DENTRO quel mese: il pacchetto annunciava "prossimo atteso 18/10" su un
+   dato uscito il 20/08, cioe' due mesi di silenzio su una serie che parla ogni tre settimane.
+   Un LLM che legge quella riga smette di aspettarsi il dato di settembre.
+   ⚠ Il check NON verifica le date attese una per una — sarebbe un registro fisso che invecchia
+   da solo, la classe C10. Verifica la PROPRIETA': per una serie mensile la prossima uscita
+   dista dall'ultima circa un mese, mai due. Vale per qualunque serie si aggiunga domani. */
+check("v343 cadenza: per ogni serie la prossima uscita dista UN passo, non due", suVeri(`
+  const GIORNO = 86400000;
+  const LIMITI = { giornaliero: [1, 4], mensile: [24, 40], trimestrale: [80, 100] };
+  for (const k of Object.keys(CADENZA_FONTE)) {
+    const c = CADENZA_FONTE[k];
+    /* si parte da una rilevazione fittizia ma realistica: il primo del mese scorso */
+    const oggi = new Date();
+    const rif = new Date(oggi.getFullYear(), oggi.getMonth() - 1, 1);
+    const iso = rif.getFullYear() + "-" + String(rif.getMonth() + 1).padStart(2, "0") + "-01";
+    const r = cadenzaDato(k, iso);
+    if (!r || !r.prossimo) continue;
+    /* ⚠ la base del confronto cambia col passo, e confonderle da' un risultato senza senso:
+       per una serie GIORNALIERA il passo si misura dall'osservazione (il giorno lavorativo
+       dopo); per mensili e trimestrali dalla PUBBLICAZIONE stimata, perche' e' quella la
+       cadenza con cui il dato arriva a chi legge. */
+    let base = new Date(iso + "T00:00:00");
+    if (c.passo === "mensile") { base.setMonth(base.getMonth() + (c.mesiRitardo == null ? 1 : c.mesiRitardo)); base.setDate(Math.min(c.giorniLag || 15, 28)); }
+    else if (c.passo === "trimestrale") { base.setMonth(base.getMonth() + 3); base.setDate(Math.min(c.giorniLag || 15, 28)); }
+    const d = Math.round((new Date(r.prossimo + "T00:00:00") - base) / GIORNO);
+    const lim = LIMITI[c.passo];
+    if (!lim) continue;
+    if (d < lim[0] || d > lim[1]) return false;
+  }
+  return true`));
+
+/* ⚠ e l'ETA' non si conta dal periodo MISURATO ma dall'uscita: FRED data i mensili al primo
+   del mese di riferimento, quindi contare da li' gonfia l'eta' di tutto il ritardo di
+   pubblicazione. Sul Philly Fed un dato di due giorni usciva come "21 giorni fa". */
+check("v343 cadenza: l'eta' di una serie non supera mai il suo intervallo di pubblicazione", suVeri(`
+  const oggi = new Date();
+  for (const k of Object.keys(CADENZA_FONTE)) {
+    const c = CADENZA_FONTE[k];
+    if (c.passo !== "mensile") continue;
+    /* rilevazione del mese scorso: appena pubblicata o quasi, l'eta' non puo' essere di mesi */
+    const rif = new Date(oggi.getFullYear(), oggi.getMonth() - 1, 1);
+    const iso = rif.getFullYear() + "-" + String(rif.getMonth() + 1).padStart(2, "0") + "-01";
+    const r = cadenzaDato(k, iso);
+    if (!r) continue;
+    /* tolleranza larga per le serie con ritardo di licenza dichiarato (UMich via FRED) */
+    const tetto = 40 + (c.giorniLag || 0);
+    if (r.eta > tetto) return false;
+    if (r.eta < 0) return false;
+  }
+  return true`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
