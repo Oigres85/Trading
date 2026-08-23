@@ -9688,10 +9688,19 @@ function datiNostriDelTitolo(tk) {
   if (f.ext && Number.isFinite(f.ext.prezzo)) {
     const d = Number.isFinite(f.prezzo) && f.prezzo
       ? Math.round((f.ext.prezzo / f.prezzo - 1) * 1000) / 10 : null;
-    L.push(`- Prezzo ${f.ext.fase === "pre" ? "PRE-MARKET" : "AFTER-HOURS"} adesso: ${Math.round(f.ext.prezzo * 100) / 100}`
+    const oraExt = f.ext.quando, adesso = new Date();
+    const stessoGiorno = oraExt.getFullYear() === adesso.getFullYear()
+      && oraExt.getMonth() === adesso.getMonth() && oraExt.getDate() === adesso.getDate();
+    const oreFa = Math.round((adesso.getTime() - oraExt.getTime()) / 3600000);
+    const hhmm = oraExt.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    L.push(`- Prezzo ${f.ext.fase === "pre" ? "PRE-MARKET" : "AFTER-HOURS"}${stessoGiorno ? " adesso" : ""}: ${Math.round(f.ext.prezzo * 100) / 100}`
       + (d != null ? ` (${d > 0 ? "+" : ""}${d}% rispetto alla chiusura)` : "")
-      + ` — rilevato alle ${f.ext.quando.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}, ora italiana.`
-      + ` E' piu' fresco della chiusura e riguarda QUESTO titolo: pesalo piu' dei futures sull'indice, che parlano del mercato e non di lui.`);
+      + (stessoGiorno
+          ? ` — rilevato alle ${hhmm}, ora italiana. E' piu' fresco della chiusura e riguarda QUESTO titolo: `
+            + `pesalo piu' dei futures sull'indice, che parlano del mercato e non di lui.`
+          : ` — rilevato il ${oraExt.toLocaleDateString("it-IT")} alle ${hhmm}, ora italiana, cioe' ${oreFa} ore fa: `
+            + `NON e' un prezzo di adesso, e' l'ultimo scambio fuori orario prima della pausa. Riguarda QUESTO titolo `
+            + `e non l'indice, ma e' vecchio quanto la sessione che l'ha prodotto: non aggiunge niente all'ultima chiusura.`));
   }
   /* i livelli arrivano gia' ordinati, col lato misurato e la provenienza dichiarata. */
   f.livelli.forEach(x => L.push(`- ${x.nome}: ${x.v}${dist(x.v)} — ${x.fonte}`));

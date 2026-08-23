@@ -4042,6 +4042,19 @@ check("v350 cadenza: il periodo rilevato e la data di pubblicazione sono NOMINAT
   return righe.every(l => /riferito a \\d{2}\\/\\d{2}\\/\\d{4} · pubblicato ~\\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l)
                        || /rilevazione \\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l));`));
 
+
+check("v350 pre/after: un prezzo di ieri non si chiama 'adesso'", (() => {
+  /* nel pacchetto di NVDA di domenica sera: "Prezzo AFTER-HOURS adesso: 215.38 — rilevato alle
+     01:59", che era l'ultima barra di venerdi'. E la riga successiva diceva di pesarlo PIU' dei
+     futures: un prezzo vecchio due giorni con quell'istruzione accanto e' peggio di nessuno. */
+  const i = src.indexOf('f.ext && Number.isFinite(f.ext.prezzo)');
+  const corpo = src.slice(i, i + 2000);
+  return corpo.includes("stessoGiorno")
+      && corpo.includes("toLocaleDateString")
+      && corpo.includes("NON e' un prezzo di adesso")
+      && corpo.includes('${stessoGiorno ? " adesso" : ""}');
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
