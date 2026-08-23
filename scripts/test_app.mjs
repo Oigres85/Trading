@@ -4055,6 +4055,44 @@ check("v350 pre/after: un prezzo di ieri non si chiama 'adesso'", (() => {
       && corpo.includes('${stessoGiorno ? " adesso" : ""}');
 })());
 
+
+check("v351 tassi: i due decennali si dichiarano come due fonti, non si contraddicono", suVeri(`
+  const m = DATA.macro || {};
+  const tnx = (m.markets || []).find(x => String(x.key || "").toUpperCase() === "^TNX");
+  const dgs = ((m.tassi || {}).scadenze || []).find(x => x && x.key === "a10");
+  if (!tnx || !dgs) return true;
+  const t = buildCIOText();
+  const i = t.indexOf("Treasury USA 10A:");
+  if (i < 0) return false;
+  const riga = t.slice(i, i + 700);
+  /* 4,74% da yfinance e 4,69% da FRED convivevano senza etichetta: la sezione SEGNALAZIONI
+     chiede all'LLM di riportare i numeri calcolati in due punti con due valori diversi, e
+     gliene stavamo dando uno da correggere a ogni analisi */
+  return riga.includes("^TNX") && riga.includes("FRED DGS10")
+      && riga.includes("NON e' una contraddizione");`));
+
+
+/* ══ v351 — DUE COSE TROVATE ESEGUENDO IL PACCHETTO SU DI ME, con la ricerca online che la
+   testata impone al PASSO 0. Nessuna delle due e' un errore di calcolo: sono due convenzioni
+   taciute, e una taciuta vale come un numero sbagliato per chi la confronta con una fonte. */
+
+check("v351 valutazione: il forward P/E dichiara la convenzione e come confrontarlo", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA" && (x.stats || {}).forward_pe);
+  if (!r) return true;
+  const p = buildPromptTicker("NVDA");
+  /* misurato: qui 16,5× (yfinance forwardEps = PROSSIMO esercizio fiscale), su
+     stockanalysis.com 21,4× sullo stesso prezzo — due anni diversi, 30% di scarto sul numero
+     con cui si decide se un titolo e' caro */
+  return /PROSSIMO ESERCIZIO FISCALE/.test(p) && /a che esercizio si riferisce/i.test(p)
+      && /pubblicali entrambi/.test(p);`));
+
+check("v351 livelli: il range a 52 settimane dichiara chiusure e rettifica", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  if (!/Massimo 52 settimane/.test(p)) return true;
+  /* 163,85–236,26 qui contro 164,07–236,54 su Yahoo: 0,12% su entrambi gli estremi, che e'
+     esattamente il dividendo di NVIDIA. Su questi due numeri si calcolano i Fibonacci. */
+  return /CHIUSURE giornaliere RETTIFICATE/.test(p) && /INTRADAY e NON rettificato/.test(p);`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

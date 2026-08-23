@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "350";
+const BUILD_VERSION = "351";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7752,7 +7752,18 @@ function buildPrompt() {
   }
   // EUR/JPY escluso dal payload (v138): ridondante — il rischio yen è già nel blocco Carry
   // USA-Giappone (USD/JPY + tasso BoJ), e il rischio cambio del fondo è EUR/USD.
-  (m.markets || []).filter(x => !/EUR\/JPY/i.test(x.label || "")).forEach(x => lines.push(`- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`));
+  const dgs10 = (((m.tassi || {}).scadenze || []).find(x => x && x.key === "a10") || {});
+  (m.markets || []).filter(x => !/EUR\/JPY/i.test(x.label || "")).forEach(x => {
+    let riga = `- ${x.label}: ${x.value} (${signTxt(x.change_pct, x.suffix || "%")} oggi)`;
+    if (String(x.key || "").toUpperCase() === "^TNX" && dgs10.value != null) {
+      riga += ` [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI `
+        + `porta lo stesso decennale a ${fmtNum.format(dgs10.value)}% (FRED DGS10, osservazione del `
+        + `${dgs10.observation_date}): NON e' una contraddizione, sono due fonti e due momenti — `
+        + `la quotazione di mercato e l'osservazione ufficiale, che esce con qualche giorno di ritardo. `
+        + `Per confronti con le altre scadenze usa quella della curva, che e' omogenea con loro.]`;
+    }
+    lines.push(riga);
+  });
   // ogni indicatore economico con la sua data di pubblicazione ESPLICITA: la latenza del dato
   // deve essere palese all'AI (CPI/NFP = mensili con ~1 mese di ritardo; PIL = trimestrale)
   /* ═══ v229 — ACCORPAMENTO NEL PAYLOAD (era già stato fatto in dashboard in v225) ══════════
@@ -8957,10 +8968,13 @@ function fattiTitolo(tk) {
     agg("Supporto", "del supporto", daVivo ? storia.sup20 : riga.support,
         "minimo delle ultime 20 sedute" + et,
         "il punto dove nell'ultimo mese hanno ricomprato; rotto al ribasso smette di essere un supporto");
+    const conv = " (CHIUSURE giornaliere RETTIFICATE per dividendi e frazionamenti: i siti di "
+      + "mercato mostrano di solito il range INTRADAY e NON rettificato, quindi qualche decimo di "
+      + "punto di scarto e' atteso e non e' un errore di nessuno dei due)";
     agg("Massimo 52 settimane", "del massimo dell'anno", daVivo ? storia.max52 : riga.w52_high,
-        "un anno di barre" + et, "il punto piu' alto degli ultimi dodici mesi");
+        "un anno di barre" + et + conv, "il punto piu' alto degli ultimi dodici mesi");
     agg("Minimo 52 settimane", "del minimo dell'anno", daVivo ? storia.min52 : riga.w52_low,
-        "un anno di barre" + et, "il punto piu' basso degli ultimi dodici mesi");
+        "un anno di barre" + et + conv, "il punto piu' basso degli ultimi dodici mesi");
   }
   /* ⚠ SOPRA O SOTTO SI MISURA, NON SI PRESUME (v266): il muro delle call di AMD stava sotto il
      prezzo e veniva dipinto come un tetto. */
@@ -9850,8 +9864,13 @@ function datiNostriDelTitolo(tk) {
     if (Number.isFinite(t.peFwd) || Number.isFinite(t.epsFwd)) {
       L.push(`- P/E PROSPETTICO: ${Number.isFinite(t.peFwd) ? t.peFwd.toFixed(1) + "×" : "n.d."}`
         + `${Number.isFinite(t.epsFwd) ? ` (utile per azione atteso ${fmtNum.format(t.epsFwd)})` : ""}`
-        + ` — e' il CONSENSO DEGLI ANALISTI sull'esercizio prossimo, non una guidance della societa'`
+        + ` — e' il CONSENSO DEGLI ANALISTI sul PROSSIMO ESERCIZIO FISCALE (convenzione di yfinance \`forwardEps\`), non una guidance della societa'`
         + `${Number.isFinite(t.pe) && Number.isFinite(t.peFwd) && t.pe > 0 ? ` e non un tasso di crescita: ${(t.pe / t.peFwd).toFixed(1)}× di scarto fra i due multipli misura quanto utile in piu' il consenso si aspetta, non quanto il titolo sia caro` : ""}.`
+        + ` ⚠⚠ PRIMA DI CONFRONTARLO CON UN FORWARD P/E TROVATO ONLINE, GUARDA A CHE ESERCIZIO SI RIFERISCE: per una societa' `
+        + `con anno fiscale sfasato "il prossimo esercizio" puo' essere un anno piu' avanti di quello che quotano i siti di `
+        + `mercato, e i due multipli non sono confrontabili. Misurato su NVDA il 23/08/2026: qui 16,5×, su stockanalysis.com `
+        + `21,4× — stesso prezzo, due anni diversi. Se lo scarto con la fonte che consulti supera il 10%, pubblicali entrambi `
+        + `e di' a quale esercizio si riferisce ciascuno.`
         + ` ⚠ SU UN TITOLO CICLICO i due multipli raccontano storie opposte e vanno letti insieme: il trailing dice cosa l'azienda HA guadagnato, il forward incorpora l'ipotesi che il ciclo continui — che di solito e' proprio l'ipotesi in discussione.`);
     }
     if (t.settore) L.push(`- Settore secondo la nostra classificazione: ${t.settore}`);
