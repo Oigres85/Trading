@@ -2549,9 +2549,11 @@ check("v319 punteggi: la scheda e il punteggio leggono lo STESSO elenco di zone"
    pacchetto usava una derivazione PARALLELA che guarda solo il livello e ignora il verso. */
 check("v320 leva: il pacchetto porta i NUMERI, non solo il verdetto", suVeri(`
   const p = buildPrompt();
-  const i = p.indexOf("LEVA DEGLI OPERATORI");
+  const i = p.indexOf("LEVA DEGLI OPERATORI (debito a margine");
   if (i < 0) return false;
-  const r = p.slice(i, i + 1400);
+  const aCapo = String.fromCharCode(10);
+  const dopo = p.indexOf(aCapo + "- ", i + 10);
+  const r = p.slice(i, dopo < 0 ? p.length : dopo);
   const md = (DATA.macro || {}).margin_debt || {};
   return r.includes(fmtNum.format(Math.round(md.value / 1000)))   // il valore in miliardi
       && r.includes(fmtNum.format(md.pct_of_peak))                // la distanza dal massimo
@@ -2565,11 +2567,12 @@ check("v320 leva: il pacchetto porta i NUMERI, non solo il verdetto", suVeri(`
             && r.includes(signTxt(md.qoq) + " nell'ultimo mese")
             && Math.abs(trim - md.qoq) > 0.5;
       })()
-      && r.includes("rilevazione") && r.includes("prossimo atteso")`));
+      && (r.includes("rilevazione") || r.includes("riferito a "))
+      && r.includes("prossimo atteso")`));
 
 check("v320 leva: pubblica il parametro storico, e non è il '% del massimo'", suVeri(`
   const p = buildPrompt();
-  const i = p.indexOf("LEVA DEGLI OPERATORI");
+  const i = p.indexOf("LEVA DEGLI OPERATORI (debito a margine");
   const r = i < 0 ? "" : p.slice(i, i + 1400);
   const md = (DATA.macro || {}).margin_debt || {};
   if (md.pct_of_gdp == null || md.gdp_median_ref == null) return true;
@@ -4016,6 +4019,28 @@ check("v350 grafico: le due linee partono davvero dalla soglia 'partenza'", suVe
      misurava una distanza iniziale che non esisteva */
   return primi.every(p => p.v === 100) && primi[0].d === primi[1].d
       && (se.soglie || []).some(s => s.v === 100 && String(s.testo).includes(primi[0].d));`));
+
+
+check("v350 fibonacci: i livelli usano lo STESSO range stampato sopra di loro", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  const hi = (p.match(/Massimo 52 settimane: ([\\d.]+)/) || [])[1];
+  const lo = (p.match(/Minimo 52 settimane: ([\\d.]+)/) || [])[1];
+  const fib = p.match(/Fibonacci sul range a 52 settimane \\(massimo ([\\d.]+), minimo ([\\d.]+)\\)/);
+  if (!hi || !lo || !fib) return true;
+  /* misurato su NVDA: 236.54/164.07 nell'elenco, 236.26/163.85 nei Fibonacci — due range nello
+     stesso blocco, e i cinque livelli erano quelli del range vecchio */
+  return fib[1] === hi && fib[2] === lo;`));
+
+
+check("v350 cadenza: il periodo rilevato e la data di pubblicazione sono NOMINATI", suVeri(`
+  const t = buildCIOText();
+  /* la stessa data 01/07/2026 usciva come "3 giorni fa", "8 giorni fa" e "18 giorni fa" in tre
+     righe diverse: ciascuna corretta (i ritardi delle fonti differiscono) ma la forma accostava
+     il periodo RILEVATO all'eta' della PUBBLICAZIONE senza dire quale fosse quale */
+  const righe = t.split("\\n").filter(l => /giorni fa\\)/.test(l) && /rilevazione |riferito a /.test(l));
+  if (!righe.length) return true;
+  return righe.every(l => /riferito a \\d{2}\\/\\d{2}\\/\\d{4} · pubblicato ~\\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l)
+                       || /rilevazione \\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l));`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

@@ -1758,6 +1758,17 @@ function cadenzaDato(chiave, dataRilevazione) {
   const iso = (d2) => `${d2.getFullYear()}-${String(d2.getMonth() + 1).padStart(2, "0")}-${String(d2.getDate()).padStart(2, "0")}`;
   return {
     rilevato: String(dataRilevazione).slice(0, 10), eta,
+    /* ⚠ v350 — LA DATA DI PUBBLICAZIONE STIMATA ESCE DALLA FUNZIONE, e non e' un dettaglio.
+       `eta` conta i giorni dall'USCITA (scelta v343, corretta: un PIL trimestrale rilevato il
+       01/04 e pubblicato a fine luglio non e' "vecchio di 144 giorni"). Ma la riga stampava
+       "rilevazione 01/07/2026 (3 giorni fa)" accostando il periodo RILEVATO all'eta' della
+       PUBBLICAZIONE, che sono due cose diverse. Conseguenza misurata nel pacchetto di NVDA:
+       la stessa data 01/07/2026 compariva come "3 giorni fa" sulla leva, "8 giorni fa" sulle
+       vendite al dettaglio e "18 giorni fa" sui payroll. Tre eta' per una data sola: chi legge
+       conclude che il sistema e' rotto, e da li' in poi non si fida piu' di nessun'altra riga.
+       Ciascuna e' corretta — i ritardi di pubblicazione delle tre fonti sono diversi — ma la
+       forma non lo diceva. Ora le due date si nominano e l'eta' sta attaccata alla sua. */
+    pubblicato: iso(rif),
     prossimo: iso(p),
     /* ⚠ v266 — LE SERIE GIORNALIERE HANNO DUE GIORNI DI GRAZIA. Il Treasury non pubblica nei
        giorni di festa americana, e senza tolleranza ogni 4 luglio o Thanksgiving avrebbe acceso
@@ -1779,7 +1790,11 @@ function rigaCadenza(chiave, dataRilevazione) {
   const c = cadenzaDato(chiave, dataRilevazione);
   if (!c) return "";
   const it = (s) => { const [a, m, g] = [s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)]; return `${g}/${m}/${a}`; };
-  return `rilevazione ${it(c.rilevato)} (${c.eta} giorni fa) · prossimo atteso ${it(c.prossimo)}` +
+  const stessoGiorno = c.pubblicato === c.rilevato;
+  return (stessoGiorno
+      ? `rilevazione ${it(c.rilevato)} (${c.eta} giorni fa)`
+      : `riferito a ${it(c.rilevato)} · pubblicato ~${it(c.pubblicato)} (${c.eta} giorni fa)`)
+    + ` · prossimo atteso ${it(c.prossimo)}` +
          (c.scaduto ? " ⚠ ERA ATTESO E NON È ARRIVATO" : "") + ` · ${c.fonte}, ${c.passo}`;
 }
 
@@ -9044,7 +9059,8 @@ function fattiTitolo(tk) {
                       })(),
                       rischioRendimentoBase: riga.risk_reward_base
                         || (riga.prezzo_limite_aggiustato != null ? "prezzo esteso" : "ultima chiusura"),
-                      w52hi: numero(riga.w52_high), w52lo: numero(riga.w52_low),
+                      w52hi: numero(daVivo ? storia.max52 : riga.w52_high),
+                      w52lo: numero(daVivo ? storia.min52 : riga.w52_low),
                       /* v308 — la posizione, quando c'e': il pacchetto non deve piu' negare di saperlo */
                       qta: numero(riga.qta), pmc: numero(riga.pmc),
                       gainPos: numero(riga.gain_pct_pos),
