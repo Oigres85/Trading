@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "351";
+const BUILD_VERSION = "352";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -9949,6 +9949,19 @@ function buildPromptTicker(tkGrezzo) {
   const prossimoRun = (typeof prossimoRunPipeline === "function" && prossimoRunPipeline())
     ? prossimoRunPipeline().toLocaleString("it-IT") : "n.d.";
 
+  const rigaLibro = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .find(r => r && String(r.ticker || "").toUpperCase() === tk
+            && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
+  const giaDentro = !!rigaLibro;
+  /* ⚠ un evento datato DENTRO l'orizzonte cambia l'oggetto della domanda: un prezzo "a
+     settimane" scritto tre giorni prima di una trimestrale non e' lo stesso prezzo. Il
+     pacchetto lo dice, ma nel calendario macro, a trenta righe da chi deve usarlo. */
+  const giorniTrim = (() => {
+    const d = rigaLibro && rigaLibro.earnings_date;
+    if (!d) return null;
+    const q = Math.round((new Date(d) - Date.now()) / 86400000);
+    return Number.isFinite(q) && q >= 0 && q <= 60 ? { g: q, quando: String(d).slice(0, 10) } : null;
+  })();
   const istruzioni = [
 `ANALISI DI ${tk} — ${oggi}`,
 ``,
@@ -9996,8 +10009,14 @@ function buildPromptTicker(tkGrezzo) {
 `dove servono a confrontare; niente tabella per elencare tre numeri.`,
 ``,
 `0) IL GIUDIZIO — cinque righe, prima di tutto il resto.`,
-`Cosa sta facendo ${tk}, a quale prezzo diventa interessante, cosa lo romperebbe. Nessuna`,
-`tabella, nessuna premessa. Tutto quello che viene dopo serve a sostenere queste cinque righe.`,
+(giaDentro
+  ? `Cosa sta facendo ${tk}, cosa romperebbe la tesi di chi lo tiene, e a quale prezzo tenerlo smette`
+  : `Cosa sta facendo ${tk}, a quale prezzo diventa interessante, cosa lo romperebbe. Nessuna`),
+(giaDentro
+  ? `di avere senso. ⚠ LA POSIZIONE E' GIA' APERTA e la coda lo dichiara: la domanda non e' "a che`
+  : `tabella, nessuna premessa. Tutto quello che viene dopo serve a sostenere queste cinque righe.`),
+(giaDentro ? `prezzo entrare" ma "cosa farne adesso". Nessuna tabella, nessuna premessa: tutto quello che` : ``),
+(giaDentro ? `viene dopo serve a sostenere queste cinque righe.` : ``),
 ``,
 `1) QUADRO MACRO — massimo 10 righe, SOLO dai dati in coda a questo messaggio.`,
 `⚠ PARTI DAL BLOCCO "SENSIBILITA' MISURATE" in coda, se c'e': dice quanto di ${tk} e' spiegato`,
@@ -10048,13 +10067,23 @@ function buildPromptTicker(tkGrezzo) {
 `RETAIL, non verificato]. Serve a sapere da che parte sta il piccolo investitore, non a`,
 `stabilire un fatto: euforia su un titolo gia' corso e' un dato di posizionamento, non una tesi.`,
 ``,
-`7) LA CHIUSURA — ingressi e settore, su tre orizzonti.`,
+(giaDentro ? `7) LA CHIUSURA — la posizione aperta e il settore, su tre orizzonti.` : `7) LA CHIUSURA — ingressi e settore, su tre orizzonti.`),
 `Prima il SETTORE: come sta messo il comparto di ${tk} e se questo titolo e' il migliore o il`,
-`peggiore posto in cui esprimere quella scommessa. Poi gli INGRESSI, distinti per orizzonte:`,
-`· BREVE (settimane): a quale prezzo il rischio-rendimento gira, e quale livello lo invalida.`,
+(giaDentro
+  ? `peggiore posto in cui esprimere quella scommessa. Poi le DECISIONI SULLA POSIZIONE APERTA,`
+  : `peggiore posto in cui esprimere quella scommessa. Poi gli INGRESSI, distinti per orizzonte:`),
+(giaDentro ? `distinte per orizzonte — tenere, alleggerire o aggiungere; MAI di quanto:` : ``),
+(giaDentro
+  ? `· BREVE (settimane): a quale prezzo il rischio-rendimento gira per chi la posizione ce l'ha gia', e quale livello invalida la tesi.`
+  : `· BREVE (settimane): a quale prezzo il rischio-rendimento gira, e quale livello lo invalida.`),
 `· MEDIO (3-12 mesi): quale trimestrale o quale dato macro decide la direzione.`,
 `· LUNGO (oltre l'anno): la tesi vale ancora se il ciclo del settore gira? Cosa la romperebbe?`,
 `Non un voto: un ragionamento con numeri sopra, e per ciascun orizzonte cosa ti smentirebbe.`,
+(giorniTrim
+  ? `⚠ C'E' UN EVENTO DENTRO L'ORIZZONTE BREVE: la trimestrale esce il ${giorniTrim.quando}, fra ${giorniTrim.g} giorni. `
+    + `Una lettura del breve scritta prima di quella data e' un'altra cosa da una scritta dopo: di' esplicitamente se `
+    + `quello che scrivi vale FINO alla trimestrale o OLTRE, perche' le due risposte sono diverse.`
+  : ``),
 ``,
 /* ═══ v296 — LA TESI CONTRARIA, PRESA DA TradingAgents ═══════════════════════════════════
    Il CEO mi ha chiesto di analizzare TauricResearch/TradingAgents. Di quel framework l'idea
@@ -10076,8 +10105,12 @@ function buildPromptTicker(tkGrezzo) {
        ora porta il calendario delle prossime due settimane, quindi quel fatto spesso c'e' gia'. */
 `8) LA TESI CONTRARIA — massimo 10 righe, ed e' obbligatoria.`,
 `Hai appena scritto un giudizio. Ora scrivi il caso di chi la pensa all'opposto, e scrivilo`,
-`bene: se sei arrivato a "comprare", argomenta perche' ${tk} scendera'; se sei arrivato a`,
-`"stare fuori", argomenta perche' questo e' il momento di entrare.`,
+(giaDentro
+  ? `bene: se sei arrivato a "tenere" o "aggiungere", argomenta perche' ${tk} scendera' e perche'`
+  : `bene: se sei arrivato a "comprare", argomenta perche' ${tk} scendera'; se sei arrivato a`),
+(giaDentro
+  ? `alleggerire adesso sarebbe la mossa giusta; se sei arrivato ad "alleggerire", argomenta perche' chi vende oggi se ne pentira'.`
+  : `"stare fuori", argomenta perche' questo e' il momento di entrare.`),
 `⚠ Usa i NUMERI DI QUESTO PACCHETTO, non obiezioni generiche: un'obiezione che varrebbe per`,
 `qualsiasi titolo non dice niente su questo. Se la tesi contraria poggia su un dato che qui`,
 `non c'e', dillo — anche quello e' un'informazione sul tuo giudizio.`,

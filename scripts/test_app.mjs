@@ -3350,7 +3350,8 @@ check("v257 analisi titolo: chiede le consegne che il CEO ha elencato", suVeri(`
   return /Concorrente/.test(t) && /[Qq]uota di mercato/.test(t)
       && /[Tt]rimestral/.test(t) && /PROSSIMA/.test(t)
       && /Supporti e resistenze/.test(t) && /SENTIMENT/.test(t)
-      && /[Ii]ngressi/.test(t) && /rischio-rendimento/.test(t)`));
+      && /[Ii]ngressi|DECISIONI SULLA POSIZIONE APERTA/.test(t)
+      && /rischio-rendimento/.test(t)`));
 
 check("v257 analisi titolo: dichiara data del dato macro e prossimo aggiornamento", suVeri(`
   const t = buildPromptTicker("NVDA");
@@ -4092,6 +4093,57 @@ check("v351 livelli: il range a 52 settimane dichiara chiusure e rettifica", suV
   /* 163,85–236,26 qui contro 164,07–236,54 su Yahoo: 0,12% su entrambi gli estremi, che e'
      esattamente il dividendo di NVIDIA. Su questi due numeri si calcolano i Fibonacci. */
   return /CHIUSURE giornaliere RETTIFICATE/.test(p) && /INTRADAY e NON rettificato/.test(p);`));
+
+
+/* ══ v352 — LE ISTRUZIONI CHIEDEVANO UN INGRESSO SU UNA POSIZIONE GIA' APERTA ═══════════════
+   La coda del pacchetto dichiara "⚠ QUESTO TITOLO E' GIA' IN PORTAFOGLIO ... Non e' una
+   decisione di ingresso ma di mantenimento", e i blocchi 0, 7 e 8 chiedevano lo stesso "a quale
+   prezzo diventa interessante", "gli INGRESSI" e "se sei arrivato a comprare". Un prezzo
+   d'ingresso su 270 quote gia' in carico non e' una risposta sbagliata: e' la risposta a
+   un'ALTRA domanda, e occupa il posto di quella che serve. Regola C10 applicata alle
+   istruzioni invece che ai dati. */
+
+check("v352 istruzioni: su una posizione aperta si chiede cosa farne, non a che prezzo entrare", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA" && numero(x.qta) > 0);
+  if (!r) return true;
+  const p = buildPromptTicker("NVDA");
+  const b0 = p.slice(p.indexOf("0) IL GIUDIZIO"), p.indexOf("1) QUADRO MACRO"));
+  const b7 = p.slice(p.indexOf("7) LA CHIUSURA"), p.indexOf("8) LA TESI"));
+  return /LA POSIZIONE E' GIA' APERTA/.test(b0)
+      && !/a quale prezzo diventa interessante/.test(b0)
+      && /DECISIONI SULLA POSIZIONE APERTA/.test(b7)
+      && /tenere, alleggerire o aggiungere/.test(b7)
+      && !/Poi gli INGRESSI/.test(b7);`));
+
+check("v352 istruzioni: su un titolo NON in portafoglio restano gli ingressi", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "TSM");
+  if (!r || numero(r.qta) > 0) return true;
+  const p = buildPromptTicker("TSM");
+  /* la correzione non deve rovesciare il caso opposto: su un titolo mai comprato la domanda
+     giusta e' proprio "a che prezzo entrare" */
+  return /a quale prezzo diventa interessante/.test(p) && /Poi gli INGRESSI/.test(p)
+      && !/LA POSIZIONE E' GIA' APERTA/.test(p);`));
+
+check("v352 istruzioni: la contraria si oppone alla conclusione vera, non a un voto", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA" && numero(x.qta) > 0);
+  if (!r) return true;
+  const p = buildPromptTicker("NVDA");
+  const b8 = p.slice(p.indexOf("8) LA TESI CONTRARIA"));
+  /* il blocco 7 vieta il voto ("Non un voto") e il blocco 8 presupponeva "se sei arrivato a
+     comprare": su una posizione aperta l'alternativa non e' comprare/stare fuori */
+  return /se sei arrivato a "tenere" o "aggiungere"/.test(b8)
+      && !/se sei arrivato a "comprare"/.test(b8);`));
+
+check("v352 orizzonti: un evento datato dentro il breve viene dichiarato dove serve", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
+  if (!r || !r.earnings_date) return true;
+  const g = Math.round((new Date(r.earnings_date) - Date.now()) / 86400000);
+  const p = buildPromptTicker("NVDA");
+  const b7 = p.slice(p.indexOf("7) LA CHIUSURA"), p.indexOf("8) LA TESI"));
+  /* il pacchetto lo diceva nel calendario macro, a trenta righe da chi deve usarlo: un prezzo
+     "a settimane" scritto due giorni prima di una trimestrale e' un altro oggetto */
+  if (g < 0 || g > 60) return !/EVENTO DENTRO L'ORIZZONTE BREVE/.test(b7);
+  return /EVENTO DENTRO L'ORIZZONTE BREVE/.test(b7) && b7.includes(String(r.earnings_date).slice(0, 10));`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
