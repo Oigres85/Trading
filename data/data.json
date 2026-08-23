@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-08-23T16:25:00Z",
+ "updated_at": "2026-08-23T19:55:39Z",
  "eurusd": 1.1678,
  "totals": {
   "usd_value": 0,
@@ -948,10 +948,10 @@
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
-    "market_cap": null,
-    "shares": null,
+    "market_cap": 1091874717696.0,
+    "shares": 1129393151.0,
     "float_shares": 1125575802.0,
-    "float_pct": null,
+    "float_pct": 99.7,
     "avg_volume_30d": 48346220.0,
     "pe_ttm": 21.8333,
     "forward_pe": 6.2363,
@@ -974,9 +974,9 @@
     "peg": 0.14,
     "roa": 0.3487,
     "short_float": 0.0265,
-    "buyback_yield": null,
-    "altman_z": 4.11,
-    "altman_missing": 1,
+    "buyback_yield": -0.0,
+    "altman_z": 44.15,
+    "altman_missing": 0,
     "altman_model": "Z''"
    },
    "tech_by_range": {
@@ -4318,7 +4318,10 @@
     "peg": 0.59,
     "roa": 0.5273,
     "short_float": 0.0126,
-    "buyback_yield": 0.0077
+    "buyback_yield": 0.0077,
+    "altman_z": 120.18,
+    "altman_missing": 0,
+    "altman_model": "Z''"
    },
    "tech_by_range": {
     "w1": {
@@ -10610,7 +10613,7 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0013,
-    "price_to_book": null,
+    "price_to_book": 21.967,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
@@ -18982,34 +18985,38 @@
    },
    "rs_1m": 4.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 5.3
+   "rs_ndx_1m": 5.3,
+   "qta": 105,
+   "pmc": 97.199,
+   "controvalore": 9224.25,
+   "gain_pct_pos": -9.62
   },
   {
    "ticker": "BTC-USD",
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 77261.6,
+   "price": 77377.84,
    "price_asof": "2026-08-23",
    "price_live": false,
-   "change_pct": 0.23,
+   "change_pct": 0.38,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.8,
-   "sma200_dist_pct": 12.0,
-   "sma50_dist_pct": 18.6,
+   "ath_dist_pct": -38.7,
+   "sma200_dist_pct": 12.1,
+   "sma50_dist_pct": 18.8,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -38.8,
+   "w52_dist_pct": -38.7,
    "day_high": 77673.51,
    "day_low": 75884.68,
    "support": 62487.7,
    "resistance": 79463.71,
-   "rsi": 80.4,
-   "volume": 29819736064,
+   "rsi": 80.5,
+   "volume": 30139312128,
    "vol_ratio": 1.75,
    "atr_14": 2091.91,
-   "atr_pct": 2.71,
+   "atr_pct": 2.7,
    "signal": "Ipercomprato",
    "signal_class": "warn",
    "sparks": {
@@ -19018,7 +19025,7 @@
      73032.76,
      78335.19,
      77083.41,
-     77261.6
+     77377.84
     ],
     "m6": [
      75872.52,
@@ -19146,7 +19153,7 @@
      73032.76,
      78335.19,
      77083.41,
-     77261.6
+     77377.84
     ],
     "all": [
      386.94,
@@ -19292,7 +19299,7 @@
      73579.69,
      58558.86,
      62813.75,
-     77261.6
+     77377.84
     ],
     "m1": [
      63482.0,
@@ -19316,7 +19323,7 @@
      73032.76,
      78335.19,
      77083.41,
-     77261.6
+     77377.84
     ],
     "m3": [
      63540.84,
@@ -19384,7 +19391,7 @@
      73032.76,
      78335.19,
      77083.41,
-     77261.6
+     77377.84
     ],
     "y1": [
      115374.33,
@@ -19460,51 +19467,51 @@
      64904.69,
      63402.17,
      64680.71,
-     77261.6
+     77377.84
     ],
     "d1": [
-     77124.64,
+     77124.65,
      77079.49,
-     77189.99,
+     77188.64,
      77261.04,
      77267.15,
      77318.6,
      77172.9,
-     77390.99,
-     77296.94,
-     77201.15,
+     77397.37,
+     77295.63,
+     77202.2,
      77238.64,
-     77245.85,
+     77245.86,
      77125.52,
-     77043.18,
+     77043.17,
      77053.66,
      77195.68,
-     77164.22,
-     77062.25,
-     77061.02,
-     77074.02,
+     77169.25,
+     77062.26,
+     77061.01,
+     77074.01,
      77005.83,
-     76929.23,
-     76839.31,
+     76938.62,
+     76844.17,
      76945.46,
      76835.71,
-     76992.84,
-     76894.49,
-     76858.6,
+     76989.46,
+     76893.98,
+     76858.65,
      76811.99,
-     76688.38,
-     76571.91,
-     75865.2,
-     76269.23,
-     76236.37,
+     76678.87,
+     76579.54,
+     75908.33,
+     76278.25,
+     76238.68,
      76155.62,
-     76138.33,
-     76109.68,
-     76071.77,
+     76133.79,
+     76084.43,
+     76067.67,
      76261.4,
      76323.61,
      76246.51,
-     76136.74,
+     76136.43,
      76109.33,
      76289.07,
      76220.45,
@@ -19514,67 +19521,88 @@
      76024.5,
      76190.99,
      76227.04,
-     76289.89,
+     76289.88,
      76506.49,
-     76499.32,
+     76492.91,
      76583.83,
      76568.14,
      76479.33,
-     76482.01,
+     76482.0,
      76559.59,
      76588.1,
-     76610.1,
-     76642.35,
-     76787.49,
+     76601.28,
+     76642.34,
+     76793.46,
      76876.56,
      76841.45,
      76805.05,
-     76729.58,
-     76862.22,
+     76729.57,
+     76862.23,
      77269.34,
-     77183.76,
-     77257.1,
+     77193.22,
+     77263.33,
      77343.14,
      77176.45,
-     77068.41,
+     77073.01,
      77095.25,
      77072.02,
      77228.94,
-     77151.88,
-     77194.7,
+     77151.87,
+     77204.76,
      77318.36,
-     77623.8,
+     77628.22,
      77376.46,
      77510.29,
-     77480.27,
+     77484.89,
      77546.01,
      77541.88,
      77414.86,
-     77412.75,
-     77004.29,
-     77255.32,
+     77412.74,
+     76992.1,
+     77259.51,
      77251.86,
      77144.91,
      77206.02,
-     77151.46,
+     77148.73,
      77255.64,
      77166.87,
-     77248.05,
-     77259.48,
-     77261.6
+     77259.5,
+     77261.9,
+     77251.06,
+     77397.02,
+     77370.29,
+     77381.0,
+     77198.5,
+     77266.18,
+     77280.87,
+     77245.26,
+     77229.01,
+     77224.73,
+     77166.97,
+     77337.12,
+     77310.72,
+     77286.83,
+     77333.61,
+     77283.63,
+     77334.47,
+     77316.02,
+     77349.31,
+     77338.36,
+     77429.06,
+     77377.84
     ]
    },
    "earnings_date": null,
    "rating": null,
-   "health": 83,
+   "health": 84,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.85,
+   "sharpe_1y": -0.84,
    "sortino_1y": -1.13,
-   "sharpe_6m": 0.18,
-   "sortino_6m": 0.26,
+   "sharpe_6m": 0.19,
+   "sortino_6m": 0.28,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77261.6,
+   "prezzo_limite_aggiustato": 77377.84,
    "risk_reward": "1:0.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19583,22 +19611,22 @@
     "w1": {
      "support": 64111.07,
      "resistance": 79463.71,
-     "change_pct": 11.54
+     "change_pct": 11.71
     },
     "m1": {
      "support": 62226.58,
      "resistance": 79463.71,
-     "change_pct": 21.71
+     "change_pct": 21.89
     },
     "m3": {
      "support": 57747.77,
      "resistance": 79463.71,
-     "change_pct": 21.59
+     "change_pct": 21.78
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.6
+     "change_pct": -10.46
     }
    },
    "financials": [],
@@ -19625,74 +19653,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77261.6,
+     "prezzo": 77377.84,
      "medie": {
       "sma10": {
-       "liv": 69298.47,
-       "dist_pct": 11.49
+       "liv": 69310.09,
+       "dist_pct": 11.64
       },
       "ema10": {
-       "liv": 71373.91,
-       "dist_pct": 8.25
+       "liv": 71395.05,
+       "dist_pct": 8.38
       },
       "sma20": {
-       "liv": 66739.85,
-       "dist_pct": 15.77
+       "liv": 66745.67,
+       "dist_pct": 15.93
       },
       "ema20": {
-       "liv": 68413.87,
-       "dist_pct": 12.93
+       "liv": 68424.94,
+       "dist_pct": 13.08
       },
       "sma30": {
-       "liv": 65773.3,
-       "dist_pct": 17.47
+       "liv": 65777.17,
+       "dist_pct": 17.64
       },
       "ema30": {
-       "liv": 67148.95,
-       "dist_pct": 15.06
+       "liv": 67156.45,
+       "dist_pct": 15.22
       },
       "sma50": {
-       "liv": 65144.81,
-       "dist_pct": 18.6
+       "liv": 65147.13,
+       "dist_pct": 18.77
       },
       "ema50": {
-       "liv": 66283.33,
-       "dist_pct": 16.56
+       "liv": 66287.89,
+       "dist_pct": 16.73
       },
       "sma100": {
-       "liv": 66094.96,
-       "dist_pct": 16.89
+       "liv": 66096.12,
+       "dist_pct": 17.07
       },
       "ema100": {
-       "liv": 67157.37,
-       "dist_pct": 15.05
+       "liv": 67159.67,
+       "dist_pct": 15.21
       },
       "sma200": {
-       "liv": 69002.05,
-       "dist_pct": 11.97
+       "liv": 69002.63,
+       "dist_pct": 12.14
       },
       "ema200": {
-       "liv": 71998.59,
-       "dist_pct": 7.31
+       "liv": 71999.74,
+       "dist_pct": 7.47
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 80.4,
+      "rsi14": 80.5,
       "macd": {
-       "linea": 2964.85,
-       "segnale": 1345.42,
-       "istogramma": 1619.43
+       "linea": 2974.12,
+       "segnale": 1347.27,
+       "istogramma": 1626.85
       },
-      "stoch_k": 87.0,
-      "stoch_d": 88.8,
-      "williams_r": -13.0,
-      "cci20": 266.0,
+      "stoch_k": 87.7,
+      "stoch_d": 89.0,
+      "williams_r": -12.3,
+      "cci20": 266.8,
       "adx14": 28.5,
       "di_su": 48.3,
       "di_giu": 10.0,
-      "momentum10": 13859.43
+      "momentum10": 13975.67
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -20185,19 +20213,19 @@
       "o": 77076.06,
       "h": 77673.51,
       "l": 75884.68,
-      "c": 77261.6
+      "c": 77377.84
      }
     ],
     "performance": {
-     "s1": 19.45,
-     "m1": 23.1,
-     "m3": 22.84,
-     "m6": 4.61,
-     "a1": -12.38,
-     "ytd": -12.93,
-     "a3": 197.95,
-     "a5": 63.81,
-     "a10": 13325.78
+     "s1": 19.63,
+     "m1": 23.29,
+     "m3": 23.02,
+     "m6": 4.77,
+     "a1": -12.25,
+     "ytd": -12.8,
+     "a3": 198.39,
+     "a5": 64.05,
+     "a10": 13345.98
     },
     "stagionalita": [
      {
@@ -20265,7 +20293,7 @@
      },
      {
       "mese": 8,
-      "media": 1.78,
+      "media": 1.79,
       "mediana": -7.19,
       "positivi_pct": 33,
       "campione": 12,
@@ -20310,9 +20338,9 @@
      }
     ]
    },
-   "rs_1m": 18.1,
+   "rs_1m": 18.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 18.7
+   "rs_ndx_1m": 18.9
   },
   {
    "ticker": "^VIX",
@@ -21914,13 +21942,13 @@
    "w52_low": 22961.5,
    "w52_dist_pct": -5.1,
    "day_high": 29539.0,
-   "day_low": 29220.75,
+   "day_low": 29220.0,
    "support": 27201.5,
    "resistance": 30343.0,
    "rsi": 49.4,
    "volume": 483725,
    "vol_ratio": 0.89,
-   "atr_14": 533.74,
+   "atr_14": 533.79,
    "atr_pct": 1.82,
    "signal": "Neutrale",
    "signal_class": "neutral",
@@ -23094,7 +23122,7 @@
       "d": "2026-08-21",
       "o": 29327.0,
       "h": 29539.0,
-      "l": 29220.75,
+      "l": 29220.0,
       "c": 29387.75
      }
     ],
@@ -30549,38 +30577,37 @@
    "currency": "PTS",
    "price_src": "yahoo",
    "price": 87.06,
-   "price_asof": null,
-   "price_live": true,
+   "price_asof": "2026-08-21",
+   "price_live": false,
    "change_pct": -0.88,
    "pe": null,
    "ath": 147.27,
    "ath_dist_pct": -40.9,
-   "sma200_dist_pct": 12.6,
-   "sma50_dist_pct": 10.0,
+   "sma200_dist_pct": 12.4,
+   "sma50_dist_pct": 10.1,
    "w52_high": 119.48,
    "w52_low": 54.98,
    "w52_dist_pct": -27.1,
-   "day_high": 89.0,
-   "day_low": 85.6,
+   "day_high": 87.51,
+   "day_low": 85.8,
    "support": 74.24,
-   "resistance": 92.83,
-   "rsi": 60.8,
-   "volume": 262550,
-   "vol_ratio": 1.01,
-   "atr_14": 3.72,
-   "atr_pct": 4.28,
+   "resistance": 89.0,
+   "rsi": 59.1,
+   "volume": 209116,
+   "vol_ratio": 0.8,
+   "atr_14": 3.6,
+   "atr_pct": 4.14,
    "signal": "Trend rialzista",
    "signal_class": "good",
    "sparks": {
     "w1": [
-     82.4,
      84.5,
      84.94,
      85.83,
-     87.83
+     87.83,
+     87.06
     ],
     "m6": [
-     66.39,
      66.31,
      65.63,
      65.42,
@@ -30705,7 +30732,8 @@
      84.5,
      84.94,
      85.83,
-     87.83
+     87.83,
+     87.06
     ],
     "all": [
      33.1,
@@ -30977,7 +31005,6 @@
      87.06
     ],
     "m1": [
-     86.83,
      92.19,
      89.31,
      82.61,
@@ -30998,10 +31025,10 @@
      84.5,
      84.94,
      85.83,
-     87.83
+     87.83,
+     87.06
     ],
     "m3": [
-     108.66,
      107.77,
      98.26,
      96.35,
@@ -31066,7 +31093,8 @@
      84.5,
      84.94,
      85.83,
-     87.83
+     87.83,
+     87.06
     ],
     "y1": [
      64.8,
@@ -31124,39 +31152,39 @@
    },
    "earnings_date": null,
    "rating": null,
-   "health": 72,
+   "health": 60,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.5,
-   "sortino_1y": 0.67,
-   "sharpe_6m": 0.73,
-   "sortino_6m": 0.99,
+   "sharpe_1y": 0.48,
+   "sortino_1y": 0.65,
+   "sharpe_6m": 0.71,
+   "sortino_6m": 0.96,
    "prepost": null,
    "prezzo_limite_aggiustato": 87.06,
-   "risk_reward": "1:0.8",
+   "risk_reward": "1:0.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
    "tech_by_range": {
     "w1": {
-     "support": 80.71,
+     "support": 81.5,
      "resistance": 89.0,
-     "change_pct": 6.59
+     "change_pct": 3.03
     },
     "m1": {
      "support": 74.24,
      "resistance": 93.5,
-     "change_pct": 1.15
+     "change_pct": -5.56
     },
     "m3": {
      "support": 67.04,
-     "resistance": 109.47,
-     "change_pct": -19.17
+     "resistance": 109.24,
+     "change_pct": -19.22
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 35.54
+     "change_pct": 34.35
     }
    },
    "financials": [],
@@ -31183,85 +31211,78 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 87.83,
+     "prezzo": 87.06,
      "medie": {
       "sma10": {
-       "liv": 83.35,
-       "dist_pct": 5.37
+       "liv": 84.24,
+       "dist_pct": 3.35
       },
       "ema10": {
-       "liv": 83.95,
-       "dist_pct": 4.62
+       "liv": 84.52,
+       "dist_pct": 3.01
       },
       "sma20": {
-       "liv": 82.3,
-       "dist_pct": 6.72
+       "liv": 82.19,
+       "dist_pct": 5.93
       },
       "ema20": {
-       "liv": 82.63,
-       "dist_pct": 6.29
+       "liv": 83.05,
+       "dist_pct": 4.83
       },
       "sma30": {
-       "liv": 82.1,
-       "dist_pct": 6.97
+       "liv": 82.63,
+       "dist_pct": 5.37
       },
       "ema30": {
-       "liv": 82.17,
-       "dist_pct": 6.89
+       "liv": 82.48,
+       "dist_pct": 5.55
       },
       "sma50": {
-       "liv": 79.15,
-       "dist_pct": 10.96
+       "liv": 79.09,
+       "dist_pct": 10.07
       },
       "ema50": {
-       "liv": 82.52,
-       "dist_pct": 6.43
+       "liv": 82.7,
+       "dist_pct": 5.27
       },
       "sma100": {
-       "liv": 88.36,
-       "dist_pct": -0.6
+       "liv": 88.21,
+       "dist_pct": -1.3
       },
       "ema100": {
-       "liv": 82.71,
-       "dist_pct": 6.19
+       "liv": 82.8,
+       "dist_pct": 5.15
       },
       "sma200": {
-       "liv": 77.34,
-       "dist_pct": 13.56
+       "liv": 77.47,
+       "dist_pct": 12.38
       },
       "ema200": {
-       "liv": 79.24,
-       "dist_pct": 10.85
+       "liv": 79.31,
+       "dist_pct": 9.77
       }
      },
      "medie_battute": 11,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 60.8,
+      "rsi14": 59.1,
       "macd": {
-       "linea": 1.32,
-       "segnale": 0.66,
-       "istogramma": 0.66
+       "linea": 1.5,
+       "segnale": 0.83,
+       "istogramma": 0.67
       },
-      "stoch_k": 92.1,
-      "stoch_d": 88.8,
-      "williams_r": -7.9,
-      "cci20": 99.5,
-      "adx14": 16.9,
-      "di_su": 30.1,
-      "di_giu": 17.7,
-      "momentum10": 10.54
+      "stoch_k": 86.9,
+      "stoch_d": 89.5,
+      "williams_r": -13.1,
+      "cci20": 101.8,
+      "adx14": 17.5,
+      "di_su": 28.9,
+      "di_giu": 17.0,
+      "momentum10": 8.88
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
-     {
-      "d": "2026-05-12",
-      "o": 98.39,
-      "h": 102.72,
-      "l": 98.0,
-      "c": 102.18
-     },
      {
       "d": "2026-05-13",
       "o": 102.16,
@@ -31744,18 +31765,25 @@
       "h": 89.0,
       "l": 85.6,
       "c": 87.83
+     },
+     {
+      "d": "2026-08-21",
+      "o": 86.27,
+      "h": 87.51,
+      "l": 85.8,
+      "c": 87.06
      }
     ],
     "performance": {
-     "s1": 8.1,
-     "m1": 3.44,
-     "m3": -16.69,
-     "m6": 32.21,
-     "ytd": 53.23,
-     "a1": 44.48,
-     "a3": 13.99,
-     "a5": 145.4,
-     "a10": 32.77
+     "s1": 5.66,
+     "m1": 0.26,
+     "m3": -19.88,
+     "m6": 31.13,
+     "ytd": 51.88,
+     "a1": 43.21,
+     "a3": 12.99,
+     "a5": 143.25,
+     "a10": 31.61
     },
     "stagionalita": [
      {
@@ -31868,9 +31896,9 @@
      }
     ]
    },
-   "rs_1m": -2.4,
+   "rs_1m": -9.2,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -1.8
+   "rs_ndx_1m": -8.6
   },
   {
    "ticker": "TSM",
@@ -41966,8 +41994,8 @@
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "185.36",
-    "change_pct": -0.18,
+    "value": "185.48",
+    "change_pct": -0.12,
     "suffix": "%"
    }
   ],
@@ -48677,8 +48705,8 @@
    "us10": 4.74,
    "jp10": 2.85,
    "spread": 1.88,
-   "usdjpy": 158.94,
-   "usdjpy_chg_1m": -2.18,
+   "usdjpy": 158.99,
+   "usdjpy_chg_1m": -2.15,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -48692,12 +48720,12 @@
   "putcall": {
    "symbol": "SPY",
    "name": "S&P 500 ETF",
-   "ratio": 1.21,
-   "puts": 710550,
-   "calls": 585815
+   "ratio": 1.19,
+   "puts": 712131,
+   "calls": 596486
   },
   "risk_sentiment": {
-   "score": 54,
+   "score": 55,
    "label": "Neutrale",
    "components": [
     {
@@ -48710,11 +48738,11 @@
     },
     {
      "label": "Put/Call",
-     "score": 15
+     "score": 18
     },
     {
      "label": "Bitcoin",
-     "score": 52
+     "score": 54
     },
     {
      "label": "Treasury 10A",
@@ -48942,7 +48970,7 @@
       "qqq": 99.2
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 69700000,
     "asof": "2026-08-21",
     "price": 213.56,
     "d1": 1.29,
@@ -49274,7 +49302,7 @@
       "qqq": 99.2
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 197415008,
     "asof": "2026-08-21",
     "price": 174.62,
     "d1": 1.29,
@@ -49663,7 +49691,7 @@
       "qqq": 99.2
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 120253000,
     "asof": "2026-08-21",
     "price": 118.02,
     "d1": 1.15,
@@ -49746,7 +49774,7 @@
       "qqq": 99.2
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 272056000,
     "asof": "2026-08-21",
     "price": 183.31,
     "d1": 0.11,
@@ -49912,7 +49940,7 @@
       "qqq": 99.2
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 2800000,
     "asof": "2026-08-21",
     "price": 87.03,
     "d1": 0.88,
@@ -50327,7 +50355,7 @@
       "qqq": 99.2
      }
     },
-    "azioni_in_circolazione": null,
+    "azioni_in_circolazione": 11670900,
     "asof": "2026-08-21",
     "price": 560.42,
     "d1": -0.4,
@@ -52370,10 +52398,10 @@
     }
    ],
    "gap": 34.9,
-   "ndx_gap": 40.1,
-   "worst_gap": 40.1,
-   "score": 50,
-   "label": "Asset Inflation (driver: NDX)"
+   "ndx_gap": 27.3,
+   "worst_gap": 34.9,
+   "score": 58,
+   "label": "Tensione moderata"
   },
   "fed_market": {
    "fedfunds": [
@@ -52889,7 +52917,7 @@
    "fetched_at": "2026-08-23"
   },
   "smart_money": {
-   "score": 64,
+   "score": 65,
    "label": "Ottimista",
    "smc_indices": {
     "sp500": {
@@ -52940,7 +52968,7 @@
    "vix_term_ratio": 0.818,
    "ig_spread": 1.0,
    "hy_ig_ratio": 2.75,
-   "divergence": -9,
+   "divergence": -10,
    "divergence_label": "Allineati",
    "components": [
     {
@@ -52957,7 +52985,7 @@
     },
     {
      "label": "Copertura PUT (P/C ratio)",
-     "score": 49
+     "score": 51
     }
    ]
   },
@@ -53039,7 +53067,7 @@
     },
     {
      "label": "Smart Money (VIX+HY/IG+P/C)",
-     "score": 64
+     "score": 65
     }
    ],
    "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici (il MacroQuant ufficiale di BCA Research è proprietario e a pagamento)."
@@ -53317,10 +53345,11 @@
    "fetched_at": "2026-08-23"
   },
   "posizioni": {
-   "quante": 13,
+   "quante": 14,
    "aggiornato": "2026-08-23",
    "fonte": "modificato dalla dashboard",
-   "non_seguite": []
+   "non_seguite": [],
+   "senza_prezzo": []
   }
  },
  "broker": null,
@@ -53346,14 +53375,14 @@
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-45000-by-december-31-2026-674-923-755-971-998-525-926-245-316-517-544-589-965-923-986-841-815-224-586-231-289-533-573"
   },
   {
-   "question": "Will Bitcoin reach $80,000 in August?",
-   "yes": 60,
-   "link": "https://polymarket.com/event/will-bitcoin-reach-80k-in-august-2026"
+   "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
+   "yes": 11,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
   },
   {
-   "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
-   "yes": 12,
-   "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
+   "question": "Will the price of Bitcoin be above $68,000 on August 24?",
+   "yes": 100,
+   "link": "https://polymarket.com/event/bitcoin-above-68k-on-august-24-2026"
   }
  ],
  "options": {
@@ -53365,36 +53394,12 @@
      "date": "2026-08-24",
      "calls": [
       {
-       "strike": 430.0,
-       "bid": 42.0,
-       "ask": 44.8,
-       "iv": 62.7,
-       "vol": 30,
-       "oi": 9
-      },
-      {
-       "strike": 432.5,
-       "bid": 38.45,
-       "ask": 42.3,
-       "iv": 95.7,
-       "vol": 2,
-       "oi": 8
-      },
-      {
-       "strike": 435.0,
-       "bid": 37.4,
-       "ask": 39.8,
-       "iv": 64.9,
-       "vol": 4,
-       "oi": 16
-      },
-      {
-       "strike": 440.0,
-       "bid": 32.55,
-       "ask": 34.8,
-       "iv": 59.9,
-       "vol": 26,
-       "oi": 15
+       "strike": 442.5,
+       "bid": 30.15,
+       "ask": 32.35,
+       "iv": 58.1,
+       "vol": 0,
+       "oi": 14
       },
       {
        "strike": 445.0,
@@ -53405,6 +53410,14 @@
        "oi": 33
       },
       {
+       "strike": 447.5,
+       "bid": 25.25,
+       "ask": 27.45,
+       "iv": 52.5,
+       "vol": 15,
+       "oi": 18
+      },
+      {
        "strike": 450.0,
        "bid": 22.9,
        "ask": 25.05,
@@ -53413,12 +53426,28 @@
        "oi": 62
       },
       {
+       "strike": 452.5,
+       "bid": 20.55,
+       "ask": 24.15,
+       "iv": 59.0,
+       "vol": 11,
+       "oi": 44
+      },
+      {
        "strike": 455.0,
        "bid": 18.05,
        "ask": 20.35,
        "iv": 59.7,
        "vol": 27,
        "oi": 114
+      },
+      {
+       "strike": 457.5,
+       "bid": 16.1,
+       "ask": 18.9,
+       "iv": 50.7,
+       "vol": 39,
+       "oi": 46
       },
       {
        "strike": 460.0,
@@ -53769,42 +53798,18 @@
      ],
      "call_wall": 525.0,
      "put_wall": 490.0,
-     "opt_volume": 47411
+     "opt_volume": 47725
     },
     {
      "date": "2026-08-26",
      "calls": [
       {
-       "strike": 370.0,
-       "bid": 102.0,
-       "ask": 105.25,
-       "iv": 114.8,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 375.0,
-       "bid": 96.55,
-       "ask": 100.35,
-       "iv": 99.8,
-       "vol": 1,
-       "oi": 5
-      },
-      {
-       "strike": 415.0,
-       "bid": 57.4,
-       "ask": 60.45,
-       "iv": 74.9,
-       "vol": 1,
-       "oi": 3
-      },
-      {
-       "strike": 440.0,
-       "bid": 33.4,
-       "ask": 35.95,
-       "iv": 56.6,
-       "vol": 4,
-       "oi": 1
+       "strike": 442.5,
+       "bid": 31.4,
+       "ask": 33.5,
+       "iv": 56.2,
+       "vol": 2,
+       "oi": 0
       },
       {
        "strike": 445.0,
@@ -53839,6 +53844,14 @@
        "oi": 8
       },
       {
+       "strike": 455.0,
+       "bid": 21.2,
+       "ask": 22.85,
+       "iv": 54.0,
+       "vol": 1,
+       "oi": 1
+      },
+      {
        "strike": 457.5,
        "bid": 19.65,
        "ask": 21.0,
@@ -53855,12 +53868,28 @@
        "oi": 28
       },
       {
+       "strike": 462.5,
+       "bid": 16.05,
+       "ask": 17.4,
+       "iv": 53.7,
+       "vol": 47,
+       "oi": 174
+      },
+      {
        "strike": 465.0,
        "bid": 14.8,
        "ask": 15.35,
        "iv": 53.3,
        "vol": 139,
        "oi": 143
+      },
+      {
+       "strike": 467.5,
+       "bid": 12.95,
+       "ask": 14.25,
+       "iv": 53.3,
+       "vol": 103,
+       "oi": 61
       },
       {
        "strike": 470.0,
@@ -54179,19 +54208,11 @@
      ],
      "call_wall": 515.0,
      "put_wall": 400.0,
-     "opt_volume": 10646
+     "opt_volume": 11160
     },
     {
      "date": "2026-08-28",
      "calls": [
-      {
-       "strike": 435.0,
-       "bid": 40.1,
-       "ask": 42.05,
-       "iv": 63.1,
-       "vol": 12,
-       "oi": 122
-      },
       {
        "strike": 440.0,
        "bid": 35.75,
@@ -54199,6 +54220,14 @@
        "iv": 61.5,
        "vol": 9,
        "oi": 108
+      },
+      {
+       "strike": 442.5,
+       "bid": 33.35,
+       "ask": 35.5,
+       "iv": 59.8,
+       "vol": 3,
+       "oi": 0
       },
       {
        "strike": 445.0,
@@ -54377,30 +54406,22 @@
        "oi": 3477
       },
       {
-       "strike": 505.0,
-       "bid": 3.55,
-       "ask": 4.0,
+       "strike": 502.5,
+       "bid": 4.0,
+       "ask": 4.5,
        "iv": 57.7,
-       "vol": 476,
-       "oi": 1111
+       "vol": 171,
+       "oi": 20
       }
      ],
      "puts": [
       {
-       "strike": 435.0,
-       "bid": 2.18,
-       "ask": 2.3,
-       "iv": 58.6,
-       "vol": 443,
-       "oi": 1210
-      },
-      {
-       "strike": 440.0,
-       "bid": 2.72,
-       "ask": 3.1,
-       "iv": 57.8,
-       "vol": 1685,
-       "oi": 1499
+       "strike": 442.5,
+       "bid": 3.2,
+       "ask": 3.4,
+       "iv": 57.4,
+       "vol": 154,
+       "oi": 105
       },
       {
        "strike": 445.0,
@@ -54409,6 +54430,14 @@
        "iv": 57.1,
        "vol": 1020,
        "oi": 579
+      },
+      {
+       "strike": 447.5,
+       "bid": 4.15,
+       "ask": 4.55,
+       "iv": 57.3,
+       "vol": 70,
+       "oi": 5
       },
       {
        "strike": 450.0,
@@ -54579,17 +54608,17 @@
        "oi": 900
       },
       {
-       "strike": 505.0,
-       "bid": 33.95,
-       "ask": 36.1,
-       "iv": 54.7,
+       "strike": 502.5,
+       "bid": 32.0,
+       "ask": 34.05,
+       "iv": 55.0,
        "vol": 6,
-       "oi": 125
+       "oi": 26
       }
      ],
      "call_wall": 600.0,
      "put_wall": 420.0,
-     "opt_volume": 68234
+     "opt_volume": 75727
     }
    ]
   },
@@ -54601,12 +54630,60 @@
      "date": "2026-08-24",
      "calls": [
       {
+       "strike": 337.5,
+       "bid": 29.35,
+       "ask": 32.35,
+       "iv": 97.9,
+       "vol": 150,
+       "oi": 0
+      },
+      {
        "strike": 340.0,
        "bid": 26.85,
        "ask": 29.8,
        "iv": 90.9,
        "vol": 2,
        "oi": 6
+      },
+      {
+       "strike": 342.5,
+       "bid": 24.4,
+       "ask": 26.35,
+       "iv": 62.5,
+       "vol": 2,
+       "oi": 0
+      },
+      {
+       "strike": 345.0,
+       "bid": 21.9,
+       "ask": 24.7,
+       "iv": 77.0,
+       "vol": 8,
+       "oi": 1
+      },
+      {
+       "strike": 347.5,
+       "bid": 19.4,
+       "ask": 22.5,
+       "iv": 76.0,
+       "vol": 6,
+       "oi": 0
+      },
+      {
+       "strike": 350.0,
+       "bid": 16.95,
+       "ask": 19.9,
+       "iv": 68.0,
+       "vol": 7,
+       "oi": 11
+      },
+      {
+       "strike": 352.5,
+       "bid": 14.5,
+       "ask": 17.55,
+       "iv": 63.9,
+       "vol": 0,
+       "oi": 2
       },
       {
        "strike": 355.0,
@@ -54633,6 +54710,30 @@
        "oi": 115
       },
       {
+       "strike": 362.5,
+       "bid": 6.95,
+       "ask": 7.8,
+       "iv": 38.6,
+       "vol": 59,
+       "oi": 100
+      },
+      {
+       "strike": 365.0,
+       "bid": 5.25,
+       "ask": 5.8,
+       "iv": 35.4,
+       "vol": 468,
+       "oi": 211
+      },
+      {
+       "strike": 367.5,
+       "bid": 3.75,
+       "ask": 4.25,
+       "iv": 34.6,
+       "vol": 1419,
+       "oi": 169
+      },
+      {
        "strike": 370.0,
        "bid": 2.47,
        "ask": 2.76,
@@ -54647,6 +54748,22 @@
        "iv": 33.9,
        "vol": 1354,
        "oi": 143
+      },
+      {
+       "strike": 375.0,
+       "bid": 1.0,
+       "ask": 1.18,
+       "iv": 32.2,
+       "vol": 2855,
+       "oi": 426
+      },
+      {
+       "strike": 377.5,
+       "bid": 0.64,
+       "ask": 0.73,
+       "iv": 32.4,
+       "vol": 1187,
+       "oi": 178
       },
       {
        "strike": 380.0,
@@ -54711,56 +54828,16 @@
        "iv": 44.9,
        "vol": 33,
        "oi": 113
-      },
-      {
-       "strike": 400.0,
-       "bid": 0.03,
-       "ask": 0.05,
-       "iv": 48.2,
-       "vol": 382,
-       "oi": 304
-      },
-      {
-       "strike": 402.5,
-       "bid": 0.0,
-       "ask": 0.22,
-       "iv": 57.2,
-       "vol": 5,
-       "oi": 398
-      },
-      {
-       "strike": 405.0,
-       "bid": 0.01,
-       "ask": 0.1,
-       "iv": 55.1,
-       "vol": 45,
-       "oi": 134
       }
      ],
      "puts": [
       {
-       "strike": 325.0,
-       "bid": 0.0,
-       "ask": 0.01,
-       "iv": 56.3,
-       "vol": 7,
-       "oi": 37
-      },
-      {
-       "strike": 330.0,
+       "strike": 337.5,
        "bid": 0.01,
-       "ask": 0.22,
-       "iv": 70.6,
-       "vol": 74,
-       "oi": 52
-      },
-      {
-       "strike": 335.0,
-       "bid": 0.01,
-       "ask": 0.11,
-       "iv": 56.8,
-       "vol": 1232,
-       "oi": 64
+       "ask": 0.24,
+       "iv": 58.8,
+       "vol": 9,
+       "oi": 8
       },
       {
        "strike": 340.0,
@@ -54771,12 +54848,28 @@
        "oi": 48
       },
       {
+       "strike": 342.5,
+       "bid": 0.01,
+       "ask": 0.25,
+       "iv": 50.7,
+       "vol": 4,
+       "oi": 4
+      },
+      {
        "strike": 345.0,
        "bid": 0.03,
        "ask": 0.09,
        "iv": 43.8,
        "vol": 40,
        "oi": 914
+      },
+      {
+       "strike": 347.5,
+       "bid": 0.01,
+       "ask": 0.29,
+       "iv": 48.9,
+       "vol": 125,
+       "oi": 71
       },
       {
        "strike": 350.0,
@@ -54941,11 +55034,35 @@
      ],
      "call_wall": 380.0,
      "put_wall": 345.0,
-     "opt_volume": 24244
+     "opt_volume": 30879
     },
     {
      "date": "2026-08-26",
      "calls": [
+      {
+       "strike": 325.0,
+       "bid": 42.0,
+       "ask": 44.35,
+       "iv": 81.0,
+       "vol": 2,
+       "oi": 0
+      },
+      {
+       "strike": 327.5,
+       "bid": 39.5,
+       "ask": 42.4,
+       "iv": 86.9,
+       "vol": 2,
+       "oi": 0
+      },
+      {
+       "strike": 330.0,
+       "bid": 37.05,
+       "ask": 39.9,
+       "iv": 82.6,
+       "vol": 1,
+       "oi": 1
+      },
       {
        "strike": 340.0,
        "bid": 27.2,
@@ -54955,12 +55072,116 @@
        "oi": 2
       },
       {
+       "strike": 345.0,
+       "bid": 22.45,
+       "ask": 25.45,
+       "iv": 63.3,
+       "vol": 0,
+       "oi": 4
+      },
+      {
+       "strike": 350.0,
+       "bid": 18.45,
+       "ask": 20.35,
+       "iv": 52.9,
+       "vol": 10,
+       "oi": 35
+      },
+      {
+       "strike": 355.0,
+       "bid": 13.95,
+       "ask": 17.15,
+       "iv": 58.6,
+       "vol": 4,
+       "oi": 3
+      },
+      {
+       "strike": 357.5,
+       "bid": 12.95,
+       "ask": 13.85,
+       "iv": 46.6,
+       "vol": 2,
+       "oi": 0
+      },
+      {
+       "strike": 360.0,
+       "bid": 11.15,
+       "ask": 12.65,
+       "iv": 50.6,
+       "vol": 28,
+       "oi": 138
+      },
+      {
+       "strike": 362.5,
+       "bid": 9.35,
+       "ask": 10.9,
+       "iv": 49.5,
+       "vol": 8,
+       "oi": 18
+      },
+      {
+       "strike": 365.0,
+       "bid": 7.8,
+       "ask": 9.1,
+       "iv": 47.3,
+       "vol": 162,
+       "oi": 140
+      },
+      {
+       "strike": 367.5,
+       "bid": 6.4,
+       "ask": 7.2,
+       "iv": 43.7,
+       "vol": 51,
+       "oi": 21
+      },
+      {
+       "strike": 370.0,
+       "bid": 5.45,
+       "ask": 5.6,
+       "iv": 41.2,
+       "vol": 388,
+       "oi": 204
+      },
+      {
+       "strike": 372.5,
+       "bid": 4.3,
+       "ask": 4.8,
+       "iv": 42.8,
+       "vol": 89,
+       "oi": 73
+      },
+      {
+       "strike": 375.0,
+       "bid": 3.4,
+       "ask": 3.9,
+       "iv": 43.0,
+       "vol": 372,
+       "oi": 258
+      },
+      {
+       "strike": 377.5,
+       "bid": 2.74,
+       "ask": 3.1,
+       "iv": 42.8,
+       "vol": 56,
+       "oi": 113
+      },
+      {
        "strike": 380.0,
        "bid": 2.14,
        "ask": 2.68,
        "iv": 44.7,
        "vol": 919,
        "oi": 376
+      },
+      {
+       "strike": 382.5,
+       "bid": 1.43,
+       "ask": 2.02,
+       "iv": 43.9,
+       "vol": 116,
+       "oi": 137
       },
       {
        "strike": 385.0,
@@ -55009,104 +55230,16 @@
        "iv": 45.9,
        "vol": 118,
        "oi": 47
-      },
-      {
-       "strike": 400.0,
-       "bid": 0.21,
-       "ask": 0.31,
-       "iv": 45.4,
-       "vol": 271,
-       "oi": 261
-      },
-      {
-       "strike": 402.5,
-       "bid": 0.11,
-       "ask": 0.27,
-       "iv": 46.9,
-       "vol": 7,
-       "oi": 33
-      },
-      {
-       "strike": 405.0,
-       "bid": 0.16,
-       "ask": 0.33,
-       "iv": 51.4,
-       "vol": 17,
-       "oi": 97
-      },
-      {
-       "strike": 407.5,
-       "bid": 0.02,
-       "ask": 0.21,
-       "iv": 50.0,
-       "vol": 3,
-       "oi": 11
-      },
-      {
-       "strike": 410.0,
-       "bid": 0.1,
-       "ask": 0.13,
-       "iv": 48.7,
-       "vol": 29,
-       "oi": 134
-      },
-      {
-       "strike": 412.5,
-       "bid": 0.03,
-       "ask": 0.27,
-       "iv": 52.1,
-       "vol": 2,
-       "oi": 44
       }
      ],
      "puts": [
       {
-       "strike": 230.0,
-       "bid": null,
-       "ask": 1.9,
-       "iv": 279.0,
-       "vol": 8,
-       "oi": 5
-      },
-      {
-       "strike": 290.0,
-       "bid": 0.0,
-       "ask": 0.55,
-       "iv": 111.1,
-       "vol": 8,
-       "oi": 4
-      },
-      {
-       "strike": 310.0,
+       "strike": 337.5,
        "bid": 0.01,
-       "ask": 0.25,
-       "iv": 75.0,
+       "ask": 0.8,
+       "iv": 51.3,
        "vol": 3,
-       "oi": 12
-      },
-      {
-       "strike": 315.0,
-       "bid": 0.01,
-       "ask": 0.06,
-       "iv": 58.6,
-       "vol": 4,
-       "oi": 8
-      },
-      {
-       "strike": 320.0,
-       "bid": 0.03,
-       "ask": 0.07,
-       "iv": 55.5,
-       "vol": 55,
-       "oi": 92
-      },
-      {
-       "strike": 335.0,
-       "bid": 0.14,
-       "ask": 0.44,
-       "iv": 51.4,
-       "vol": 43,
-       "oi": 41
+       "oi": 2
       },
       {
        "strike": 340.0,
@@ -55117,12 +55250,28 @@
        "oi": 160
       },
       {
+       "strike": 342.5,
+       "bid": 0.35,
+       "ask": 0.5,
+       "iv": 46.4,
+       "vol": 4,
+       "oi": 5
+      },
+      {
        "strike": 345.0,
        "bid": 0.48,
        "ask": 0.65,
        "iv": 45.5,
        "vol": 54,
        "oi": 66
+      },
+      {
+       "strike": 347.5,
+       "bid": 0.11,
+       "ask": 1.49,
+       "iv": 53.0,
+       "vol": 14,
+       "oi": 0
       },
       {
        "strike": 350.0,
@@ -55133,12 +55282,28 @@
        "oi": 67
       },
       {
+       "strike": 352.5,
+       "bid": 1.18,
+       "ask": 1.43,
+       "iv": 43.4,
+       "vol": 40,
+       "oi": 5
+      },
+      {
        "strike": 355.0,
        "bid": 1.58,
        "ask": 1.83,
        "iv": 42.7,
        "vol": 131,
        "oi": 165
+      },
+      {
+       "strike": 357.5,
+       "bid": 2.04,
+       "ask": 2.53,
+       "iv": 43.6,
+       "vol": 30,
+       "oi": 42
       },
       {
        "strike": 360.0,
@@ -55149,12 +55314,28 @@
        "oi": 176
       },
       {
+       "strike": 362.5,
+       "bid": 3.35,
+       "ask": 4.35,
+       "iv": 45.4,
+       "vol": 57,
+       "oi": 43
+      },
+      {
        "strike": 365.0,
        "bid": 4.3,
        "ask": 4.95,
        "iv": 42.6,
        "vol": 136,
        "oi": 343
+      },
+      {
+       "strike": 367.5,
+       "bid": 5.4,
+       "ask": 6.05,
+       "iv": 42.4,
+       "vol": 97,
+       "oi": 45
       },
       {
        "strike": 370.0,
@@ -55165,12 +55346,28 @@
        "oi": 224
       },
       {
+       "strike": 372.5,
+       "bid": 7.95,
+       "ask": 8.8,
+       "iv": 42.5,
+       "vol": 25,
+       "oi": 0
+      },
+      {
        "strike": 375.0,
        "bid": 9.5,
        "ask": 10.4,
        "iv": 42.6,
        "vol": 37,
        "oi": 146
+      },
+      {
+       "strike": 377.5,
+       "bid": 11.2,
+       "ask": 13.05,
+       "iv": 49.4,
+       "vol": 8,
+       "oi": 0
       },
       {
        "strike": 380.0,
@@ -55235,79 +55432,15 @@
        "iv": 50.8,
        "vol": 15,
        "oi": 21
-      },
-      {
-       "strike": 400.0,
-       "bid": 30.55,
-       "ask": 33.4,
-       "iv": 70.0,
-       "vol": 3,
-       "oi": 315
-      },
-      {
-       "strike": 402.5,
-       "bid": 32.85,
-       "ask": 35.85,
-       "iv": 73.0,
-       "vol": 47,
-       "oi": 41
-      },
-      {
-       "strike": 405.0,
-       "bid": 36.1,
-       "ask": 38.3,
-       "iv": 59.0,
-       "vol": 5,
-       "oi": 19
       }
      ],
      "call_wall": 380.0,
      "put_wall": 365.0,
-     "opt_volume": 4571
+     "opt_volume": 6168
     },
     {
      "date": "2026-08-28",
      "calls": [
-      {
-       "strike": 295.0,
-       "bid": 72.1,
-       "ask": 75.15,
-       "iv": 79.6,
-       "vol": 1,
-       "oi": 1
-      },
-      {
-       "strike": 300.0,
-       "bid": 67.1,
-       "ask": 70.1,
-       "iv": 72.7,
-       "vol": 12,
-       "oi": 12
-      },
-      {
-       "strike": 320.0,
-       "bid": 47.25,
-       "ask": 50.3,
-       "iv": 59.3,
-       "vol": 2,
-       "oi": 14
-      },
-      {
-       "strike": 325.0,
-       "bid": 42.3,
-       "ask": 45.35,
-       "iv": 55.2,
-       "vol": 16,
-       "oi": 20
-      },
-      {
-       "strike": 330.0,
-       "bid": 37.45,
-       "ask": 40.4,
-       "iv": 52.0,
-       "vol": 42,
-       "oi": 40
-      },
       {
        "strike": 335.0,
        "bid": 32.6,
@@ -55315,6 +55448,14 @@
        "iv": 50.3,
        "vol": 4,
        "oi": 4
+      },
+      {
+       "strike": 337.5,
+       "bid": 30.25,
+       "ask": 33.2,
+       "iv": 65.4,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 340.0,
@@ -55333,12 +55474,28 @@
        "oi": 50
       },
       {
+       "strike": 347.5,
+       "bid": 21.2,
+       "ask": 24.0,
+       "iv": 56.3,
+       "vol": 2,
+       "oi": 5
+      },
+      {
        "strike": 350.0,
        "bid": 20.2,
        "ask": 21.85,
        "iv": 54.7,
        "vol": 197,
        "oi": 224
+      },
+      {
+       "strike": 352.5,
+       "bid": 18.05,
+       "ask": 19.8,
+       "iv": 53.4,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 355.0,
@@ -55349,12 +55506,28 @@
        "oi": 139
       },
       {
+       "strike": 357.5,
+       "bid": 14.25,
+       "ask": 15.9,
+       "iv": 50.8,
+       "vol": 11,
+       "oi": 3
+      },
+      {
        "strike": 360.0,
        "bid": 12.95,
        "ask": 14.0,
        "iv": 49.2,
        "vol": 580,
        "oi": 1512
+      },
+      {
+       "strike": 362.5,
+       "bid": 11.35,
+       "ask": 12.55,
+       "iv": 49.6,
+       "vol": 16,
+       "oi": 14
       },
       {
        "strike": 365.0,
@@ -55365,12 +55538,28 @@
        "oi": 810
       },
       {
+       "strike": 367.5,
+       "bid": 8.75,
+       "ask": 9.35,
+       "iv": 47.1,
+       "vol": 561,
+       "oi": 58
+      },
+      {
        "strike": 370.0,
        "bid": 7.55,
        "ask": 7.95,
        "iv": 46.1,
        "vol": 2317,
        "oi": 3088
+      },
+      {
+       "strike": 372.5,
+       "bid": 6.3,
+       "ask": 7.0,
+       "iv": 46.9,
+       "vol": 402,
+       "oi": 602
       },
       {
        "strike": 375.0,
@@ -55381,12 +55570,28 @@
        "oi": 954
       },
       {
+       "strike": 377.5,
+       "bid": 4.65,
+       "ask": 5.0,
+       "iv": 46.1,
+       "vol": 219,
+       "oi": 108
+      },
+      {
        "strike": 380.0,
        "bid": 3.9,
        "ask": 4.2,
        "iv": 46.0,
        "vol": 1255,
        "oi": 3246
+      },
+      {
+       "strike": 382.5,
+       "bid": 2.86,
+       "ask": 3.55,
+       "iv": 46.1,
+       "vol": 427,
+       "oi": 336
       },
       {
        "strike": 385.0,
@@ -55397,12 +55602,28 @@
        "oi": 1206
       },
       {
+       "strike": 387.5,
+       "bid": 2.07,
+       "ask": 2.4,
+       "iv": 45.8,
+       "vol": 272,
+       "oi": 333
+      },
+      {
        "strike": 390.0,
        "bid": 1.76,
        "ask": 2.0,
        "iv": 46.0,
        "vol": 1438,
        "oi": 1494
+      },
+      {
+       "strike": 392.5,
+       "bid": 1.45,
+       "ask": 1.71,
+       "iv": 46.8,
+       "vol": 583,
+       "oi": 116
       },
       {
        "strike": 395.0,
@@ -55419,104 +55640,16 @@
        "iv": 47.1,
        "vol": 578,
        "oi": 338
-      },
-      {
-       "strike": 400.0,
-       "bid": 0.82,
-       "ask": 0.93,
-       "iv": 47.1,
-       "vol": 3185,
-       "oi": 3221
-      },
-      {
-       "strike": 402.5,
-       "bid": 0.68,
-       "ask": 0.81,
-       "iv": 48.1,
-       "vol": 113,
-       "oi": 565
-      },
-      {
-       "strike": 405.0,
-       "bid": 0.58,
-       "ask": 0.68,
-       "iv": 48.6,
-       "vol": 185,
-       "oi": 618
-      },
-      {
-       "strike": 407.5,
-       "bid": 0.42,
-       "ask": 0.56,
-       "iv": 49.0,
-       "vol": 47,
-       "oi": 320
-      },
-      {
-       "strike": 410.0,
-       "bid": 0.4,
-       "ask": 0.45,
-       "iv": 49.1,
-       "vol": 748,
-       "oi": 1888
-      },
-      {
-       "strike": 412.5,
-       "bid": 0.28,
-       "ask": 0.4,
-       "iv": 50.2,
-       "vol": 102,
-       "oi": 135
       }
      ],
      "puts": [
       {
-       "strike": 310.0,
-       "bid": 0.03,
-       "ask": 0.15,
-       "iv": 58.4,
-       "vol": 147,
-       "oi": 853
-      },
-      {
-       "strike": 315.0,
-       "bid": 0.06,
-       "ask": 0.14,
-       "iv": 54.3,
-       "vol": 131,
-       "oi": 252
-      },
-      {
-       "strike": 320.0,
-       "bid": 0.06,
-       "ask": 0.2,
-       "iv": 51.4,
-       "vol": 143,
-       "oi": 1350
-      },
-      {
-       "strike": 325.0,
-       "bid": 0.21,
-       "ask": 0.33,
-       "iv": 52.1,
-       "vol": 78,
-       "oi": 415
-      },
-      {
-       "strike": 330.0,
-       "bid": 0.33,
-       "ask": 0.39,
-       "iv": 50.0,
-       "vol": 102,
-       "oi": 1189
-      },
-      {
-       "strike": 335.0,
-       "bid": 0.5,
-       "ask": 0.66,
-       "iv": 49.6,
-       "vol": 304,
-       "oi": 664
+       "strike": 337.5,
+       "bid": 0.61,
+       "ask": 0.8,
+       "iv": 48.7,
+       "vol": 114,
+       "oi": 13
       },
       {
        "strike": 340.0,
@@ -55527,12 +55660,28 @@
        "oi": 3472
       },
       {
+       "strike": 342.5,
+       "bid": 1.0,
+       "ask": 1.2,
+       "iv": 47.3,
+       "vol": 71,
+       "oi": 627
+      },
+      {
        "strike": 345.0,
        "bid": 1.26,
        "ask": 1.5,
        "iv": 47.0,
        "vol": 477,
        "oi": 1296
+      },
+      {
+       "strike": 347.5,
+       "bid": 1.58,
+       "ask": 2.05,
+       "iv": 48.3,
+       "vol": 214,
+       "oi": 40
       },
       {
        "strike": 350.0,
@@ -55543,12 +55692,28 @@
        "oi": 1621
       },
       {
+       "strike": 352.5,
+       "bid": 2.43,
+       "ask": 2.73,
+       "iv": 45.6,
+       "vol": 163,
+       "oi": 144
+      },
+      {
        "strike": 355.0,
        "bid": 3.0,
        "ask": 3.3,
        "iv": 45.2,
        "vol": 376,
        "oi": 1897
+      },
+      {
+       "strike": 357.5,
+       "bid": 3.65,
+       "ask": 4.1,
+       "iv": 45.7,
+       "vol": 191,
+       "oi": 128
       },
       {
        "strike": 360.0,
@@ -55559,12 +55724,28 @@
        "oi": 3052
       },
       {
+       "strike": 362.5,
+       "bid": 5.25,
+       "ask": 6.25,
+       "iv": 47.7,
+       "vol": 272,
+       "oi": 70
+      },
+      {
        "strike": 365.0,
        "bid": 6.25,
        "ask": 6.8,
        "iv": 44.9,
        "vol": 377,
        "oi": 1245
+      },
+      {
+       "strike": 367.5,
+       "bid": 7.05,
+       "ask": 8.05,
+       "iv": 45.3,
+       "vol": 231,
+       "oi": 24
       },
       {
        "strike": 370.0,
@@ -55575,12 +55756,28 @@
        "oi": 2337
       },
       {
+       "strike": 372.5,
+       "bid": 9.9,
+       "ask": 10.8,
+       "iv": 45.5,
+       "vol": 66,
+       "oi": 82
+      },
+      {
        "strike": 375.0,
        "bid": 11.45,
        "ask": 12.8,
        "iv": 48.2,
        "vol": 204,
        "oi": 1417
+      },
+      {
+       "strike": 377.5,
+       "bid": 12.7,
+       "ask": 14.15,
+       "iv": 46.7,
+       "vol": 44,
+       "oi": 138
       },
       {
        "strike": 380.0,
@@ -55591,6 +55788,14 @@
        "oi": 2085
       },
       {
+       "strike": 382.5,
+       "bid": 16.2,
+       "ask": 17.9,
+       "iv": 48.0,
+       "vol": 47,
+       "oi": 68
+      },
+      {
        "strike": 385.0,
        "bid": 18.05,
        "ask": 19.95,
@@ -55599,12 +55804,28 @@
        "oi": 779
       },
       {
+       "strike": 387.5,
+       "bid": 20.45,
+       "ask": 22.85,
+       "iv": 55.6,
+       "vol": 15,
+       "oi": 39
+      },
+      {
        "strike": 390.0,
        "bid": 22.35,
        "ask": 24.45,
        "iv": 53.0,
        "vol": 168,
        "oi": 1218
+      },
+      {
+       "strike": 392.5,
+       "bid": 24.65,
+       "ask": 27.1,
+       "iv": 57.6,
+       "vol": 3,
+       "oi": 46
       },
       {
        "strike": 395.0,
@@ -55621,59 +55842,11 @@
        "iv": 55.1,
        "vol": 1,
        "oi": 96
-      },
-      {
-       "strike": 400.0,
-       "bid": 31.85,
-       "ask": 33.95,
-       "iv": 52.1,
-       "vol": 87,
-       "oi": 896
-      },
-      {
-       "strike": 402.5,
-       "bid": 33.35,
-       "ask": 36.25,
-       "iv": 63.4,
-       "vol": 5,
-       "oi": 91
-      },
-      {
-       "strike": 405.0,
-       "bid": 36.1,
-       "ask": 38.7,
-       "iv": 51.2,
-       "vol": 9,
-       "oi": 480
-      },
-      {
-       "strike": 407.5,
-       "bid": 38.2,
-       "ask": 41.05,
-       "iv": 67.3,
-       "vol": 2,
-       "oi": 41
-      },
-      {
-       "strike": 410.0,
-       "bid": 40.65,
-       "ask": 43.5,
-       "iv": 50.6,
-       "vol": 43,
-       "oi": 689
-      },
-      {
-       "strike": 412.5,
-       "bid": 42.5,
-       "ask": 45.9,
-       "iv": 71.2,
-       "vol": 3,
-       "oi": 30
       }
      ],
      "call_wall": 380.0,
      "put_wall": 340.0,
-     "opt_volume": 30547
+     "opt_volume": 34739
     }
    ]
   },
@@ -55685,52 +55858,12 @@
      "date": "2026-08-28",
      "calls": [
       {
-       "strike": 145.0,
-       "bid": 54.6,
-       "ask": 57.4,
-       "iv": 165.7,
-       "vol": 2,
-       "oi": 21
-      },
-      {
-       "strike": 150.0,
-       "bid": 49.65,
-       "ask": 52.45,
-       "iv": 153.4,
+       "strike": 172.5,
+       "bid": 27.85,
+       "ask": 30.8,
+       "iv": 73.9,
        "vol": 1,
-       "oi": 74
-      },
-      {
-       "strike": 155.0,
-       "bid": 44.7,
-       "ask": 47.5,
-       "iv": 141.1,
-       "vol": 2,
-       "oi": 11
-      },
-      {
-       "strike": 160.0,
-       "bid": 39.75,
-       "ask": 42.65,
-       "iv": 131.7,
-       "vol": 2,
-       "oi": 25
-      },
-      {
-       "strike": 165.0,
-       "bid": 34.9,
-       "ask": 37.8,
-       "iv": 121.7,
-       "vol": 100,
-       "oi": 79
-      },
-      {
-       "strike": 170.0,
-       "bid": 30.2,
-       "ask": 33.35,
-       "iv": 77.3,
-       "vol": 4,
-       "oi": 52
+       "oi": 0
       },
       {
        "strike": 175.0,
@@ -55741,6 +55874,14 @@
        "oi": 42
       },
       {
+       "strike": 177.5,
+       "bid": 24.1,
+       "ask": 26.2,
+       "iv": 84.0,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 180.0,
        "bid": 22.25,
        "ask": 24.35,
@@ -55749,12 +55890,28 @@
        "oi": 246
       },
       {
+       "strike": 182.5,
+       "bid": 20.9,
+       "ask": 21.4,
+       "iv": 87.0,
+       "vol": 6,
+       "oi": 0
+      },
+      {
        "strike": 185.0,
        "bid": 18.25,
        "ask": 19.9,
        "iv": 85.2,
        "vol": 10,
        "oi": 58
+      },
+      {
+       "strike": 187.5,
+       "bid": 16.55,
+       "ask": 18.4,
+       "iv": 88.5,
+       "vol": 29,
+       "oi": 0
       },
       {
        "strike": 190.0,
@@ -55781,12 +55938,28 @@
        "oi": 43
       },
       {
+       "strike": 197.5,
+       "bid": 10.75,
+       "ask": 11.0,
+       "iv": 85.9,
+       "vol": 218,
+       "oi": 16
+      },
+      {
        "strike": 200.0,
        "bid": 8.8,
        "ask": 9.65,
        "iv": 82.6,
        "vol": 741,
        "oi": 1121
+      },
+      {
+       "strike": 202.5,
+       "bid": 8.3,
+       "ask": 8.45,
+       "iv": 86.1,
+       "vol": 131,
+       "oi": 37
       },
       {
        "strike": 205.0,
@@ -55887,36 +56060,12 @@
      ],
      "puts": [
       {
-       "strike": 155.0,
-       "bid": 0.1,
-       "ask": 0.2,
-       "iv": 98.0,
-       "vol": 300,
-       "oi": 593
-      },
-      {
-       "strike": 160.0,
-       "bid": 0.11,
-       "ask": 0.26,
-       "iv": 90.6,
-       "vol": 397,
-       "oi": 804
-      },
-      {
-       "strike": 165.0,
-       "bid": 0.33,
-       "ask": 0.43,
-       "iv": 91.1,
-       "vol": 241,
-       "oi": 870
-      },
-      {
-       "strike": 170.0,
-       "bid": 0.62,
-       "ask": 0.63,
-       "iv": 88.7,
-       "vol": 417,
-       "oi": 1256
+       "strike": 172.5,
+       "bid": 0.81,
+       "ask": 0.93,
+       "iv": 89.5,
+       "vol": 99,
+       "oi": 50
       },
       {
        "strike": 175.0,
@@ -55927,6 +56076,14 @@
        "oi": 1523
       },
       {
+       "strike": 177.5,
+       "bid": 1.34,
+       "ask": 1.39,
+       "iv": 87.3,
+       "vol": 162,
+       "oi": 52
+      },
+      {
        "strike": 180.0,
        "bid": 1.71,
        "ask": 1.75,
@@ -55935,12 +56092,28 @@
        "oi": 4250
       },
       {
+       "strike": 182.5,
+       "bid": 2.15,
+       "ask": 2.22,
+       "iv": 86.7,
+       "vol": 138,
+       "oi": 24
+      },
+      {
        "strike": 185.0,
        "bid": 2.65,
        "ask": 2.75,
        "iv": 86.2,
        "vol": 478,
        "oi": 1387
+      },
+      {
+       "strike": 187.5,
+       "bid": 3.25,
+       "ask": 3.35,
+       "iv": 85.7,
+       "vol": 86,
+       "oi": 56
       },
       {
        "strike": 190.0,
@@ -56089,43 +56262,11 @@
      ],
      "call_wall": 250.0,
      "put_wall": 180.0,
-     "opt_volume": 20521
+     "opt_volume": 21948
     },
     {
      "date": "2026-09-04",
      "calls": [
-      {
-       "strike": 140.0,
-       "bid": 59.95,
-       "ask": 62.8,
-       "iv": 132.4,
-       "vol": 2,
-       "oi": 1
-      },
-      {
-       "strike": 145.0,
-       "bid": 55.1,
-       "ask": 57.95,
-       "iv": 74.0,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 150.0,
-       "bid": 50.3,
-       "ask": 53.15,
-       "iv": 81.2,
-       "vol": 1,
-       "oi": 10
-      },
-      {
-       "strike": 155.0,
-       "bid": 45.55,
-       "ask": 48.45,
-       "iv": 83.3,
-       "vol": 4,
-       "oi": 7
-      },
       {
        "strike": 160.0,
        "bid": 40.9,
@@ -56175,12 +56316,28 @@
        "oi": 26
       },
       {
+       "strike": 187.5,
+       "bid": 19.15,
+       "ask": 21.85,
+       "iv": 84.0,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 190.0,
        "bid": 18.1,
        "ask": 20.35,
        "iv": 86.2,
        "vol": 1,
        "oi": 30
+      },
+      {
+       "strike": 192.5,
+       "bid": 16.9,
+       "ask": 19.05,
+       "iv": 87.9,
+       "vol": 5,
+       "oi": 0
       },
       {
        "strike": 195.0,
@@ -56191,12 +56348,28 @@
        "oi": 60
       },
       {
+       "strike": 197.5,
+       "bid": 14.5,
+       "ask": 16.2,
+       "iv": 88.5,
+       "vol": 22,
+       "oi": 0
+      },
+      {
        "strike": 200.0,
        "bid": 13.4,
        "ask": 14.85,
        "iv": 88.7,
        "vol": 51,
        "oi": 301
+      },
+      {
+       "strike": 202.5,
+       "bid": 12.45,
+       "ask": 13.8,
+       "iv": 89.8,
+       "vol": 27,
+       "oi": 2
       },
       {
        "strike": 205.0,
@@ -56207,12 +56380,28 @@
        "oi": 109
       },
       {
+       "strike": 207.5,
+       "bid": 9.3,
+       "ask": 11.55,
+       "iv": 86.0,
+       "vol": 31,
+       "oi": 0
+      },
+      {
        "strike": 210.0,
        "bid": 9.35,
        "ask": 10.55,
        "iv": 89.2,
        "vol": 72,
        "oi": 289
+      },
+      {
+       "strike": 212.5,
+       "bid": 8.2,
+       "ask": 9.75,
+       "iv": 88.7,
+       "vol": 27,
+       "oi": 41
       },
       {
        "strike": 215.0,
@@ -56223,12 +56412,28 @@
        "oi": 181
       },
       {
+       "strike": 217.5,
+       "bid": 6.95,
+       "ask": 8.25,
+       "iv": 90.2,
+       "vol": 9,
+       "oi": 8
+      },
+      {
        "strike": 220.0,
        "bid": 6.35,
        "ask": 7.5,
        "iv": 90.5,
        "vol": 104,
        "oi": 180
+      },
+      {
+       "strike": 222.5,
+       "bid": 5.4,
+       "ask": 6.75,
+       "iv": 89.1,
+       "vol": 6,
+       "oi": 53
       },
       {
        "strike": 225.0,
@@ -56239,6 +56444,14 @@
        "oi": 462
       },
       {
+       "strike": 227.5,
+       "bid": 4.85,
+       "ask": 5.45,
+       "iv": 90.8,
+       "vol": 2,
+       "oi": 15
+      },
+      {
        "strike": 230.0,
        "bid": 4.25,
        "ask": 5.1,
@@ -56247,110 +56460,22 @@
        "oi": 177
       },
       {
-       "strike": 235.0,
-       "bid": 3.25,
-       "ask": 4.0,
-       "iv": 89.7,
-       "vol": 156,
-       "oi": 1053
-      },
-      {
-       "strike": 240.0,
-       "bid": 2.85,
-       "ask": 4.25,
-       "iv": 96.2,
-       "vol": 105,
-       "oi": 536
-      },
-      {
-       "strike": 245.0,
-       "bid": 2.2,
-       "ask": 2.9,
-       "iv": 92.6,
-       "vol": 81,
-       "oi": 181
-      },
-      {
-       "strike": 250.0,
-       "bid": 1.7,
-       "ask": 2.42,
-       "iv": 92.9,
-       "vol": 104,
-       "oi": 510
-      },
-      {
-       "strike": 255.0,
-       "bid": 1.46,
-       "ask": 2.1,
-       "iv": 94.9,
-       "vol": 8,
-       "oi": 154
-      },
-      {
-       "strike": 260.0,
-       "bid": 1.17,
-       "ask": 1.56,
-       "iv": 94.0,
-       "vol": 44,
-       "oi": 251
+       "strike": 232.5,
+       "bid": 3.6,
+       "ask": 4.55,
+       "iv": 90.0,
+       "vol": 4,
+       "oi": 44
       }
      ],
      "puts": [
       {
-       "strike": 140.0,
-       "bid": 0.24,
-       "ask": 0.45,
-       "iv": 101.1,
-       "vol": 67,
-       "oi": 833
-      },
-      {
-       "strike": 145.0,
-       "bid": 0.41,
-       "ask": 0.47,
-       "iv": 96.6,
-       "vol": 27,
-       "oi": 219
-      },
-      {
-       "strike": 150.0,
-       "bid": 0.55,
-       "ask": 0.64,
-       "iv": 93.4,
-       "vol": 49,
-       "oi": 1843
-      },
-      {
-       "strike": 155.0,
-       "bid": 0.8,
-       "ask": 0.92,
-       "iv": 91.6,
-       "vol": 93,
-       "oi": 257
-      },
-      {
-       "strike": 160.0,
-       "bid": 1.12,
-       "ask": 1.28,
-       "iv": 89.5,
-       "vol": 830,
-       "oi": 1141
-      },
-      {
-       "strike": 165.0,
-       "bid": 1.45,
-       "ask": 2.18,
-       "iv": 89.9,
-       "vol": 48,
-       "oi": 514
-      },
-      {
-       "strike": 170.0,
-       "bid": 2.21,
-       "ask": 2.88,
-       "iv": 89.2,
-       "vol": 361,
-       "oi": 881
+       "strike": 172.5,
+       "bid": 2.49,
+       "ask": 3.35,
+       "iv": 88.1,
+       "vol": 59,
+       "oi": 2
       },
       {
        "strike": 175.0,
@@ -56361,12 +56486,28 @@
        "oi": 317
       },
       {
+       "strike": 177.5,
+       "bid": 3.7,
+       "ask": 4.5,
+       "iv": 88.7,
+       "vol": 11,
+       "oi": 3
+      },
+      {
        "strike": 180.0,
        "bid": 4.5,
        "ask": 5.0,
        "iv": 88.6,
        "vol": 194,
        "oi": 1816
+      },
+      {
+       "strike": 182.5,
+       "bid": 4.4,
+       "ask": 5.9,
+       "iv": 85.9,
+       "vol": 108,
+       "oi": 32
       },
       {
        "strike": 185.0,
@@ -56377,12 +56518,28 @@
        "oi": 599
       },
       {
+       "strike": 187.5,
+       "bid": 6.65,
+       "ask": 7.75,
+       "iv": 88.9,
+       "vol": 3,
+       "oi": 0
+      },
+      {
        "strike": 190.0,
        "bid": 7.75,
        "ask": 8.75,
        "iv": 89.7,
        "vol": 246,
        "oi": 665
+      },
+      {
+       "strike": 192.5,
+       "bid": 8.65,
+       "ask": 10.2,
+       "iv": 90.7,
+       "vol": 10,
+       "oi": 1
       },
       {
        "strike": 195.0,
@@ -56393,12 +56550,28 @@
        "oi": 265
       },
       {
+       "strike": 197.5,
+       "bid": 10.95,
+       "ask": 13.4,
+       "iv": 93.8,
+       "vol": 13,
+       "oi": 4
+      },
+      {
        "strike": 200.0,
        "bid": 12.15,
        "ask": 13.35,
        "iv": 89.2,
        "vol": 110,
        "oi": 672
+      },
+      {
+       "strike": 202.5,
+       "bid": 13.4,
+       "ask": 15.0,
+       "iv": 90.0,
+       "vol": 6,
+       "oi": 3
       },
       {
        "strike": 205.0,
@@ -56409,12 +56582,28 @@
        "oi": 242
       },
       {
+       "strike": 207.5,
+       "bid": 16.25,
+       "ask": 17.25,
+       "iv": 87.9,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 210.0,
        "bid": 17.75,
        "ask": 19.05,
        "iv": 88.6,
        "vol": 26,
        "oi": 313
+      },
+      {
+       "strike": 212.5,
+       "bid": 19.4,
+       "ask": 20.6,
+       "iv": 88.5,
+       "vol": 3,
+       "oi": 28
       },
       {
        "strike": 215.0,
@@ -56425,12 +56614,28 @@
        "oi": 142
       },
       {
+       "strike": 217.5,
+       "bid": 22.85,
+       "ask": 25.5,
+       "iv": 93.9,
+       "vol": 3,
+       "oi": 29
+      },
+      {
        "strike": 220.0,
        "bid": 24.65,
        "ask": 27.15,
        "iv": 93.6,
        "vol": 13,
        "oi": 265
+      },
+      {
+       "strike": 222.5,
+       "bid": 26.2,
+       "ask": 29.05,
+       "iv": 92.8,
+       "vol": 2,
+       "oi": 8
       },
       {
        "strike": 225.0,
@@ -56441,6 +56646,14 @@
        "oi": 159
       },
       {
+       "strike": 227.5,
+       "bid": 30.25,
+       "ask": 33.3,
+       "iv": 95.4,
+       "vol": 4,
+       "oi": 4
+      },
+      {
        "strike": 230.0,
        "bid": 32.3,
        "ask": 34.8,
@@ -56449,69 +56662,21 @@
        "oi": 256
       },
       {
-       "strike": 235.0,
-       "bid": 36.1,
-       "ask": 39.45,
-       "iv": 95.1,
-       "vol": 2,
-       "oi": 418
-      },
-      {
-       "strike": 240.0,
-       "bid": 40.6,
-       "ask": 42.6,
-       "iv": 91.3,
-       "vol": 3,
-       "oi": 229
-      },
-      {
-       "strike": 245.0,
-       "bid": 44.9,
-       "ask": 47.45,
-       "iv": 93.4,
-       "vol": 1,
-       "oi": 93
-      },
-      {
-       "strike": 250.0,
-       "bid": 49.4,
-       "ask": 52.55,
-       "iv": 97.3,
-       "vol": 22,
-       "oi": 79
-      },
-      {
-       "strike": 255.0,
-       "bid": 54.05,
-       "ask": 57.15,
-       "iv": 98.6,
-       "vol": 1,
-       "oi": 24
-      },
-      {
-       "strike": 260.0,
-       "bid": 58.85,
-       "ask": 61.75,
-       "iv": 100.0,
-       "vol": 6,
-       "oi": 31
+       "strike": 232.5,
+       "bid": 33.95,
+       "ask": 37.3,
+       "iv": 94.3,
+       "vol": 0,
+       "oi": 11
       }
      ],
      "call_wall": 235.0,
      "put_wall": 150.0,
-     "opt_volume": 4648
+     "opt_volume": 5309
     },
     {
      "date": "2026-09-11",
      "calls": [
-      {
-       "strike": 130.0,
-       "bid": 70.05,
-       "ask": 73.7,
-       "iv": 99.0,
-       "vol": 1,
-       "oi": 1
-      },
       {
        "strike": 140.0,
        "bid": 60.4,
@@ -56535,6 +56700,14 @@
        "iv": 84.5,
        "vol": 2,
        "oi": 8
+      },
+      {
+       "strike": 155.0,
+       "bid": 46.5,
+       "ask": 49.45,
+       "iv": 84.8,
+       "vol": 0,
+       "oi": 0
       },
       {
        "strike": 160.0,
@@ -57325,7 +57498,7 @@
      ],
      "call_wall": 100.0,
      "put_wall": 91.0,
-     "opt_volume": 44549
+     "opt_volume": 44550
     },
     {
      "date": "2026-09-04",
@@ -57735,7 +57908,7 @@
      ],
      "call_wall": 120.0,
      "put_wall": 56.0,
-     "opt_volume": 8508
+     "opt_volume": 8509
     },
     {
      "date": "2026-09-11",
@@ -58157,30 +58330,6 @@
      "date": "2026-08-24",
      "calls": [
       {
-       "strike": 290.0,
-       "bid": 52.5,
-       "ask": 57.5,
-       "iv": 112.5,
-       "vol": 1,
-       "oi": 1
-      },
-      {
-       "strike": 300.0,
-       "bid": 42.5,
-       "ask": 47.5,
-       "iv": 93.2,
-       "vol": 1,
-       "oi": 54
-      },
-      {
-       "strike": 305.0,
-       "bid": 37.5,
-       "ask": 42.5,
-       "iv": 83.7,
-       "vol": 1,
-       "oi": 33
-      },
-      {
        "strike": 310.0,
        "bid": 32.5,
        "ask": 37.5,
@@ -58205,6 +58354,14 @@
        "oi": 22
       },
       {
+       "strike": 322.5,
+       "bid": 20.0,
+       "ask": 24.9,
+       "iv": 101.8,
+       "vol": 0,
+       "oi": 3
+      },
+      {
        "strike": 325.0,
        "bid": 17.5,
        "ask": 22.2,
@@ -58213,12 +58370,28 @@
        "oi": 23
       },
       {
+       "strike": 327.5,
+       "bid": 15.0,
+       "ask": 20.0,
+       "iv": 88.1,
+       "vol": 0,
+       "oi": 4
+      },
+      {
        "strike": 330.0,
        "bid": 12.75,
        "ask": 17.15,
        "iv": 75.6,
        "vol": 187,
        "oi": 62
+      },
+      {
+       "strike": 332.5,
+       "bid": 10.3,
+       "ask": 14.3,
+       "iv": 63.2,
+       "vol": 135,
+       "oi": 1
       },
       {
        "strike": 335.0,
@@ -58359,44 +58532,20 @@
      ],
      "puts": [
       {
-       "strike": 295.0,
-       "bid": 0.0,
-       "ask": 2.13,
-       "iv": 143.6,
-       "vol": 3,
-       "oi": 347
-      },
-      {
-       "strike": 300.0,
-       "bid": 0.0,
-       "ask": 0.02,
-       "iv": 65.6,
-       "vol": 1,
-       "oi": 39
-      },
-      {
-       "strike": 305.0,
-       "bid": 0.0,
-       "ask": 0.01,
-       "iv": 54.7,
-       "vol": 120,
-       "oi": 56
-      },
-      {
-       "strike": 310.0,
-       "bid": 0.0,
-       "ask": 0.52,
-       "iv": 79.0,
-       "vol": 113,
-       "oi": 133
-      },
-      {
        "strike": 315.0,
        "bid": 0.01,
        "ask": 2.14,
        "iv": 94.7,
        "vol": 32,
        "oi": 54
+      },
+      {
+       "strike": 317.5,
+       "bid": 0.0,
+       "ask": 0.35,
+       "iv": 59.7,
+       "vol": 10,
+       "oi": 8
       },
       {
        "strike": 320.0,
@@ -58407,6 +58556,14 @@
        "oi": 219
       },
       {
+       "strike": 322.5,
+       "bid": 0.0,
+       "ask": 0.14,
+       "iv": 48.2,
+       "vol": 61,
+       "oi": 6
+      },
+      {
        "strike": 325.0,
        "bid": 0.0,
        "ask": 0.05,
@@ -58415,12 +58572,28 @@
        "oi": 253
       },
       {
+       "strike": 327.5,
+       "bid": 0.04,
+       "ask": 0.07,
+       "iv": 34.6,
+       "vol": 779,
+       "oi": 127
+      },
+      {
        "strike": 330.0,
        "bid": 0.01,
        "ask": 0.35,
        "iv": 41.4,
        "vol": 494,
        "oi": 291
+      },
+      {
+       "strike": 332.5,
+       "bid": 0.08,
+       "ask": 0.12,
+       "iv": 28.4,
+       "vol": 675,
+       "oi": 104
       },
       {
        "strike": 335.0,
@@ -58511,11 +58684,27 @@
        "oi": 1
       },
       {
+       "strike": 362.5,
+       "bid": 15.25,
+       "ask": 20.0,
+       "iv": 79.9,
+       "vol": 0,
+       "oi": 0
+      },
+      {
        "strike": 365.0,
        "bid": 17.75,
        "ask": 22.5,
        "iv": 86.4,
        "vol": 12,
+       "oi": 0
+      },
+      {
+       "strike": 367.5,
+       "bid": 20.15,
+       "ask": 25.0,
+       "iv": 92.6,
+       "vol": 0,
        "oi": 0
       },
       {
@@ -58535,61 +58724,21 @@
        "oi": 0
       },
       {
-       "strike": 385.0,
-       "bid": 37.75,
-       "ask": 42.5,
-       "iv": 132.2,
-       "vol": 2,
-       "oi": 0
-      },
-      {
-       "strike": 390.0,
-       "bid": 42.75,
-       "ask": 47.5,
-       "iv": 142.5,
-       "vol": 0,
+       "strike": 380.0,
+       "bid": 32.85,
+       "ask": 37.5,
+       "iv": 121.5,
+       "vol": 4,
        "oi": 0
       }
      ],
      "call_wall": 347.5,
      "put_wall": 335.0,
-     "opt_volume": 31399
+     "opt_volume": 40432
     },
     {
      "date": "2026-08-26",
      "calls": [
-      {
-       "strike": 290.0,
-       "bid": 52.5,
-       "ask": 57.5,
-       "iv": 79.5,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 295.0,
-       "bid": 47.5,
-       "ask": 52.3,
-       "iv": 64.8,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 300.0,
-       "bid": 42.5,
-       "ask": 46.95,
-       "iv": 111.4,
-       "vol": 1,
-       "oi": 46
-      },
-      {
-       "strike": 305.0,
-       "bid": 37.5,
-       "ask": 42.45,
-       "iv": 57.8,
-       "vol": 0,
-       "oi": 46
-      },
       {
        "strike": 310.0,
        "bid": 32.5,
@@ -58607,12 +58756,52 @@
        "oi": 35
       },
       {
+       "strike": 317.5,
+       "bid": 25.0,
+       "ask": 30.0,
+       "iv": 83.6,
+       "vol": 0,
+       "oi": 15
+      },
+      {
+       "strike": 320.0,
+       "bid": 22.55,
+       "ask": 27.5,
+       "iv": 78.3,
+       "vol": 0,
+       "oi": 14
+      },
+      {
+       "strike": 322.5,
+       "bid": 20.0,
+       "ask": 24.95,
+       "iv": 72.5,
+       "vol": 70,
+       "oi": 16
+      },
+      {
+       "strike": 325.0,
+       "bid": 17.95,
+       "ask": 22.0,
+       "iv": 62.5,
+       "vol": 72,
+       "oi": 8
+      },
+      {
        "strike": 330.0,
        "bid": 13.0,
        "ask": 17.2,
        "iv": 53.9,
        "vol": 34,
        "oi": 5
+      },
+      {
+       "strike": 332.5,
+       "bid": 10.9,
+       "ask": 13.6,
+       "iv": 37.6,
+       "vol": 2,
+       "oi": 0
       },
       {
        "strike": 335.0,
@@ -58753,44 +58942,20 @@
      ],
      "puts": [
       {
-       "strike": 295.0,
-       "bid": 0.0,
-       "ask": 2.15,
-       "iv": 101.7,
-       "vol": 23,
-       "oi": 19
-      },
-      {
-       "strike": 300.0,
-       "bid": 0.0,
-       "ask": 2.16,
-       "iv": 93.2,
-       "vol": 8,
-       "oi": 20
-      },
-      {
-       "strike": 305.0,
-       "bid": 0.0,
-       "ask": 0.99,
-       "iv": 71.0,
-       "vol": 4,
-       "oi": 17
-      },
-      {
-       "strike": 310.0,
-       "bid": 0.0,
-       "ask": 0.88,
-       "iv": 61.8,
-       "vol": 61,
-       "oi": 228
-      },
-      {
        "strike": 315.0,
        "bid": 0.0,
        "ask": 2.2,
        "iv": 67.4,
        "vol": 92,
        "oi": 28
+      },
+      {
+       "strike": 317.5,
+       "bid": 0.0,
+       "ask": 0.09,
+       "iv": 37.9,
+       "vol": 39,
+       "oi": 168
       },
       {
        "strike": 320.0,
@@ -58801,6 +58966,14 @@
        "oi": 45
       },
       {
+       "strike": 322.5,
+       "bid": 0.0,
+       "ask": 0.5,
+       "iv": 44.0,
+       "vol": 5,
+       "oi": 6
+      },
+      {
        "strike": 325.0,
        "bid": 0.16,
        "ask": 0.36,
@@ -58809,12 +58982,28 @@
        "oi": 115
       },
       {
+       "strike": 327.5,
+       "bid": 0.0,
+       "ask": 0.93,
+       "iv": 42.7,
+       "vol": 24,
+       "oi": 28
+      },
+      {
        "strike": 330.0,
        "bid": 0.05,
        "ask": 0.71,
        "iv": 35.2,
        "vol": 419,
        "oi": 211
+      },
+      {
+       "strike": 332.5,
+       "bid": 0.17,
+       "ask": 1.3,
+       "iv": 37.8,
+       "vol": 57,
+       "oi": 61
       },
       {
        "strike": 335.0,
@@ -58905,6 +59094,14 @@
        "oi": 9
       },
       {
+       "strike": 362.5,
+       "bid": 15.55,
+       "ask": 20.5,
+       "iv": 61.2,
+       "vol": 176,
+       "oi": 0
+      },
+      {
        "strike": 365.0,
        "bid": 18.0,
        "ask": 22.95,
@@ -58943,19 +59140,11 @@
        "iv": 78.0,
        "vol": 1,
        "oi": 0
-      },
-      {
-       "strike": 380.0,
-       "bid": 32.8,
-       "ask": 37.5,
-       "iv": 85.9,
-       "vol": 1,
-       "oi": 0
       }
      ],
      "call_wall": 350.0,
      "put_wall": 335.0,
-     "opt_volume": 7370
+     "opt_volume": 7948
     },
     {
      "date": "2026-08-28",
@@ -59365,7 +59554,7 @@
      ],
      "call_wall": 345.0,
      "put_wall": 285.0,
-     "opt_volume": 83600
+     "opt_volume": 83643
     }
    ]
   },
@@ -59505,12 +59694,28 @@
        "oi": 2009
       },
       {
+       "strike": 247.5,
+       "bid": 9.1,
+       "ask": 9.5,
+       "iv": 112.4,
+       "vol": 228,
+       "oi": 154
+      },
+      {
        "strike": 250.0,
        "bid": 8.35,
        "ask": 8.6,
        "iv": 112.6,
        "vol": 4003,
        "oi": 4503
+      },
+      {
+       "strike": 252.5,
+       "bid": 7.5,
+       "ask": 8.0,
+       "iv": 113.2,
+       "vol": 204,
+       "oi": 37
       },
       {
        "strike": 255.0,
@@ -59521,12 +59726,28 @@
        "oi": 4194
       },
       {
+       "strike": 257.5,
+       "bid": 6.15,
+       "ask": 6.55,
+       "iv": 113.3,
+       "vol": 243,
+       "oi": 41
+      },
+      {
        "strike": 260.0,
        "bid": 5.6,
        "ask": 5.9,
        "iv": 113.6,
        "vol": 1711,
        "oi": 2252
+      },
+      {
+       "strike": 262.5,
+       "bid": 5.05,
+       "ask": 5.4,
+       "iv": 114.1,
+       "vol": 181,
+       "oi": 215
       },
       {
        "strike": 265.0,
@@ -59537,55 +59758,15 @@
        "oi": 4220
       },
       {
-       "strike": 270.0,
-       "bid": 3.7,
-       "ask": 3.95,
-       "iv": 114.6,
-       "vol": 1691,
-       "oi": 1075
-      },
-      {
-       "strike": 275.0,
-       "bid": 3.0,
-       "ask": 3.25,
-       "iv": 115.5,
-       "vol": 734,
-       "oi": 1699
-      },
-      {
-       "strike": 280.0,
-       "bid": 2.45,
-       "ask": 2.75,
-       "iv": 117.1,
-       "vol": 1164,
-       "oi": 2097
-      },
-      {
-       "strike": 285.0,
-       "bid": 1.97,
-       "ask": 2.12,
-       "iv": 116.8,
-       "vol": 481,
-       "oi": 417
-      },
-      {
-       "strike": 290.0,
-       "bid": 1.59,
-       "ask": 1.74,
-       "iv": 117.7,
-       "vol": 766,
-       "oi": 856
+       "strike": 267.5,
+       "bid": 4.0,
+       "ask": 4.45,
+       "iv": 114.2,
+       "vol": 53,
+       "oi": 17
       }
      ],
      "puts": [
-      {
-       "strike": 205.0,
-       "bid": 2.28,
-       "ask": 2.42,
-       "iv": 108.6,
-       "vol": 620,
-       "oi": 443
-      },
       {
        "strike": 207.5,
        "bid": 2.55,
@@ -59683,12 +59864,28 @@
        "oi": 315
       },
       {
+       "strike": 237.5,
+       "bid": 13.2,
+       "ask": 13.75,
+       "iv": 109.2,
+       "vol": 457,
+       "oi": 136
+      },
+      {
        "strike": 240.0,
        "bid": 14.55,
        "ask": 15.1,
        "iv": 109.0,
        "vol": 2569,
        "oi": 2419
+      },
+      {
+       "strike": 242.5,
+       "bid": 16.0,
+       "ask": 16.65,
+       "iv": 109.5,
+       "vol": 147,
+       "oi": 92
       },
       {
        "strike": 245.0,
@@ -59699,12 +59896,28 @@
        "oi": 213
       },
       {
+       "strike": 247.5,
+       "bid": 19.1,
+       "ask": 19.8,
+       "iv": 109.7,
+       "vol": 45,
+       "oi": 33
+      },
+      {
        "strike": 250.0,
        "bid": 20.65,
        "ask": 21.45,
        "iv": 109.3,
        "vol": 107,
        "oi": 482
+      },
+      {
+       "strike": 252.5,
+       "bid": 22.4,
+       "ask": 23.3,
+       "iv": 110.0,
+       "vol": 3,
+       "oi": 4
       },
       {
        "strike": 255.0,
@@ -59721,6 +59934,14 @@
        "iv": 110.8,
        "vol": 541,
        "oi": 563
+      },
+      {
+       "strike": 262.5,
+       "bid": 29.15,
+       "ask": 31.45,
+       "iv": 110.2,
+       "vol": 0,
+       "oi": 4
       },
       {
        "strike": 265.0,
@@ -59745,102 +59966,22 @@
        "iv": 112.5,
        "vol": 16,
        "oi": 79
-      },
-      {
-       "strike": 280.0,
-       "bid": 44.1,
-       "ask": 46.75,
-       "iv": 115.2,
-       "vol": 1,
-       "oi": 17
-      },
-      {
-       "strike": 285.0,
-       "bid": 48.7,
-       "ask": 51.3,
-       "iv": 116.7,
-       "vol": 1,
-       "oi": 15
-      },
-      {
-       "strike": 290.0,
-       "bid": 53.85,
-       "ask": 55.6,
-       "iv": 119.5,
-       "vol": 3,
-       "oi": 13
-      },
-      {
-       "strike": 295.0,
-       "bid": 58.0,
-       "ask": 60.6,
-       "iv": 118.4,
-       "vol": 1,
-       "oi": 7
       }
      ],
      "call_wall": 240.0,
      "put_wall": 140.0,
-     "opt_volume": 57633
+     "opt_volume": 61320
     },
     {
      "date": "2026-09-04",
      "calls": [
       {
-       "strike": 175.0,
-       "bid": 61.4,
-       "ask": 64.7,
-       "iv": 103.1,
-       "vol": 8,
-       "oi": 40
-      },
-      {
-       "strike": 180.0,
-       "bid": 57.05,
-       "ask": 59.7,
-       "iv": 101.5,
-       "vol": 11,
-       "oi": 317
-      },
-      {
-       "strike": 185.0,
-       "bid": 52.05,
-       "ask": 55.3,
-       "iv": 98.3,
-       "vol": 9,
-       "oi": 21
-      },
-      {
-       "strike": 190.0,
-       "bid": 47.5,
-       "ask": 50.8,
-       "iv": 96.7,
-       "vol": 24,
-       "oi": 66
-      },
-      {
-       "strike": 195.0,
-       "bid": 43.05,
-       "ask": 46.45,
-       "iv": 95.1,
+       "strike": 207.5,
+       "bid": 33.1,
+       "ask": 35.7,
+       "iv": 91.7,
        "vol": 1,
-       "oi": 63
-      },
-      {
-       "strike": 200.0,
-       "bid": 40.0,
-       "ask": 42.0,
-       "iv": 98.6,
-       "vol": 35,
-       "oi": 111
-      },
-      {
-       "strike": 205.0,
-       "bid": 35.0,
-       "ask": 38.25,
-       "iv": 94.4,
-       "vol": 1,
-       "oi": 33
+       "oi": 10
       },
       {
        "strike": 210.0,
@@ -59851,12 +59992,28 @@
        "oi": 162
       },
       {
+       "strike": 212.5,
+       "bid": 29.8,
+       "ask": 32.5,
+       "iv": 94.6,
+       "vol": 0,
+       "oi": 11
+      },
+      {
        "strike": 215.0,
        "bid": 28.35,
        "ask": 30.25,
        "iv": 93.7,
        "vol": 14,
        "oi": 1260
+      },
+      {
+       "strike": 217.5,
+       "bid": 26.45,
+       "ask": 28.8,
+       "iv": 93.6,
+       "vol": 3,
+       "oi": 47
       },
       {
        "strike": 220.0,
@@ -59867,12 +60024,28 @@
        "oi": 531
       },
       {
+       "strike": 222.5,
+       "bid": 23.95,
+       "ask": 25.0,
+       "iv": 93.7,
+       "vol": 2,
+       "oi": 32
+      },
+      {
        "strike": 225.0,
        "bid": 21.75,
        "ask": 23.75,
        "iv": 92.2,
        "vol": 19,
        "oi": 544
+      },
+      {
+       "strike": 227.5,
+       "bid": 21.0,
+       "ask": 22.05,
+       "iv": 93.4,
+       "vol": 6,
+       "oi": 42
       },
       {
        "strike": 230.0,
@@ -59883,12 +60056,28 @@
        "oi": 395
       },
       {
+       "strike": 232.5,
+       "bid": 18.3,
+       "ask": 19.5,
+       "iv": 93.6,
+       "vol": 37,
+       "oi": 61
+      },
+      {
        "strike": 235.0,
        "bid": 17.2,
        "ask": 18.15,
        "iv": 93.7,
        "vol": 202,
        "oi": 345
+      },
+      {
+       "strike": 237.5,
+       "bid": 16.1,
+       "ask": 16.85,
+       "iv": 93.6,
+       "vol": 171,
+       "oi": 77
       },
       {
        "strike": 240.0,
@@ -59899,12 +60088,28 @@
        "oi": 721
       },
       {
+       "strike": 242.5,
+       "bid": 14.0,
+       "ask": 15.0,
+       "iv": 94.8,
+       "vol": 107,
+       "oi": 1585
+      },
+      {
        "strike": 245.0,
        "bid": 13.0,
        "ask": 13.8,
        "iv": 94.3,
        "vol": 454,
        "oi": 1019
+      },
+      {
+       "strike": 247.5,
+       "bid": 11.9,
+       "ask": 12.85,
+       "iv": 93.9,
+       "vol": 83,
+       "oi": 57
       },
       {
        "strike": 250.0,
@@ -59915,12 +60120,28 @@
        "oi": 8039
       },
       {
+       "strike": 252.5,
+       "bid": 10.15,
+       "ask": 11.4,
+       "iv": 94.7,
+       "vol": 51,
+       "oi": 221
+      },
+      {
        "strike": 255.0,
        "bid": 9.55,
        "ask": 10.35,
        "iv": 94.5,
        "vol": 57,
        "oi": 456
+      },
+      {
+       "strike": 257.5,
+       "bid": 8.65,
+       "ask": 10.0,
+       "iv": 95.3,
+       "vol": 10,
+       "oi": 303
       },
       {
        "strike": 260.0,
@@ -59931,6 +60152,14 @@
        "oi": 947
       },
       {
+       "strike": 262.5,
+       "bid": 7.4,
+       "ask": 8.65,
+       "iv": 95.7,
+       "vol": 37,
+       "oi": 13
+      },
+      {
        "strike": 265.0,
        "bid": 7.2,
        "ask": 7.7,
@@ -59939,110 +60168,22 @@
        "oi": 299
       },
       {
-       "strike": 270.0,
-       "bid": 6.0,
-       "ask": 6.95,
-       "iv": 97.0,
-       "vol": 166,
-       "oi": 257
-      },
-      {
-       "strike": 275.0,
-       "bid": 4.95,
-       "ask": 6.0,
-       "iv": 96.9,
-       "vol": 614,
-       "oi": 1627
-      },
-      {
-       "strike": 280.0,
-       "bid": 4.45,
-       "ask": 4.95,
-       "iv": 97.5,
-       "vol": 1326,
-       "oi": 2451
-      },
-      {
-       "strike": 285.0,
-       "bid": 3.5,
-       "ask": 4.4,
-       "iv": 97.4,
-       "vol": 144,
-       "oi": 233
-      },
-      {
-       "strike": 290.0,
-       "bid": 3.15,
-       "ask": 3.8,
-       "iv": 98.9,
-       "vol": 95,
-       "oi": 180
-      },
-      {
-       "strike": 295.0,
-       "bid": 2.64,
-       "ask": 3.25,
-       "iv": 99.1,
-       "vol": 45,
-       "oi": 937
+       "strike": 267.5,
+       "bid": 6.3,
+       "ask": 7.5,
+       "iv": 96.2,
+       "vol": 7,
+       "oi": 31
       }
      ],
      "puts": [
       {
-       "strike": 175.0,
-       "bid": 0.67,
-       "ask": 1.0,
-       "iv": 99.1,
-       "vol": 31,
-       "oi": 707
-      },
-      {
-       "strike": 180.0,
-       "bid": 0.93,
-       "ask": 1.14,
-       "iv": 95.8,
-       "vol": 118,
-       "oi": 257
-      },
-      {
-       "strike": 185.0,
-       "bid": 1.27,
-       "ask": 1.4,
-       "iv": 93.5,
-       "vol": 66,
-       "oi": 260
-      },
-      {
-       "strike": 190.0,
-       "bid": 1.74,
-       "ask": 1.97,
-       "iv": 93.2,
-       "vol": 143,
-       "oi": 355
-      },
-      {
-       "strike": 195.0,
-       "bid": 2.34,
-       "ask": 2.61,
-       "iv": 92.5,
-       "vol": 47,
-       "oi": 151
-      },
-      {
-       "strike": 200.0,
-       "bid": 3.1,
-       "ask": 3.35,
-       "iv": 91.5,
-       "vol": 181,
-       "oi": 2319
-      },
-      {
-       "strike": 205.0,
-       "bid": 4.05,
-       "ask": 4.3,
-       "iv": 90.9,
-       "vol": 60,
-       "oi": 162
+       "strike": 207.5,
+       "bid": 4.3,
+       "ask": 5.2,
+       "iv": 90.8,
+       "vol": 5,
+       "oi": 13
       },
       {
        "strike": 210.0,
@@ -60053,12 +60194,28 @@
        "oi": 234
       },
       {
+       "strike": 212.5,
+       "bid": 5.9,
+       "ask": 6.65,
+       "iv": 92.2,
+       "vol": 9,
+       "oi": 26
+      },
+      {
        "strike": 215.0,
        "bid": 6.65,
        "ask": 7.2,
        "iv": 91.4,
        "vol": 156,
        "oi": 251
+      },
+      {
+       "strike": 217.5,
+       "bid": 7.5,
+       "ask": 8.3,
+       "iv": 92.4,
+       "vol": 46,
+       "oi": 30
       },
       {
        "strike": 220.0,
@@ -60069,12 +60226,28 @@
        "oi": 323
       },
       {
+       "strike": 222.5,
+       "bid": 9.3,
+       "ask": 10.15,
+       "iv": 92.4,
+       "vol": 33,
+       "oi": 26
+      },
+      {
        "strike": 225.0,
        "bid": 10.3,
        "ask": 10.75,
        "iv": 91.1,
        "vol": 76,
        "oi": 95
+      },
+      {
+       "strike": 227.5,
+       "bid": 11.3,
+       "ask": 12.25,
+       "iv": 92.2,
+       "vol": 19,
+       "oi": 13
       },
       {
        "strike": 230.0,
@@ -60085,12 +60258,28 @@
        "oi": 353
       },
       {
+       "strike": 232.5,
+       "bid": 13.6,
+       "ask": 14.7,
+       "iv": 92.5,
+       "vol": 14,
+       "oi": 88
+      },
+      {
        "strike": 235.0,
        "bid": 14.9,
        "ask": 15.55,
        "iv": 91.4,
        "vol": 110,
        "oi": 289
+      },
+      {
+       "strike": 237.5,
+       "bid": 15.4,
+       "ask": 17.1,
+       "iv": 89.8,
+       "vol": 93,
+       "oi": 19
       },
       {
        "strike": 240.0,
@@ -60101,12 +60290,28 @@
        "oi": 207
       },
       {
+       "strike": 242.5,
+       "bid": 19.0,
+       "ask": 20.15,
+       "iv": 92.7,
+       "vol": 11,
+       "oi": 53
+      },
+      {
        "strike": 245.0,
        "bid": 19.7,
        "ask": 21.4,
        "iv": 89.7,
        "vol": 54,
        "oi": 136
+      },
+      {
+       "strike": 247.5,
+       "bid": 22.3,
+       "ask": 23.05,
+       "iv": 93.0,
+       "vol": 24,
+       "oi": 53
       },
       {
        "strike": 250.0,
@@ -60117,6 +60322,14 @@
        "oi": 59
       },
       {
+       "strike": 252.5,
+       "bid": 24.7,
+       "ask": 26.45,
+       "iv": 90.9,
+       "vol": 1,
+       "oi": 8
+      },
+      {
        "strike": 255.0,
        "bid": 26.45,
        "ask": 28.2,
@@ -60125,12 +60338,28 @@
        "oi": 15
       },
       {
+       "strike": 257.5,
+       "bid": 28.85,
+       "ask": 30.0,
+       "iv": 93.1,
+       "vol": 0,
+       "oi": 1
+      },
+      {
        "strike": 260.0,
        "bid": 30.6,
        "ask": 31.8,
        "iv": 93.0,
        "vol": 1,
        "oi": 7
+      },
+      {
+       "strike": 262.5,
+       "bid": 31.55,
+       "ask": 33.7,
+       "iv": 90.3,
+       "vol": 20,
+       "oi": 0
       },
       {
        "strike": 265.0,
@@ -60147,51 +60376,11 @@
        "iv": 93.0,
        "vol": 503,
        "oi": 7
-      },
-      {
-       "strike": 275.0,
-       "bid": 41.5,
-       "ask": 44.6,
-       "iv": 94.1,
-       "vol": 3,
-       "oi": 9
-      },
-      {
-       "strike": 280.0,
-       "bid": 45.6,
-       "ask": 48.85,
-       "iv": 94.0,
-       "vol": 16,
-       "oi": 30
-      },
-      {
-       "strike": 285.0,
-       "bid": 50.4,
-       "ask": 53.2,
-       "iv": 96.5,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 290.0,
-       "bid": 55.2,
-       "ask": 57.65,
-       "iv": 98.8,
-       "vol": 2,
-       "oi": 3
-      },
-      {
-       "strike": 295.0,
-       "bid": 59.6,
-       "ask": 62.15,
-       "iv": 98.8,
-       "vol": 0,
-       "oi": 1
       }
      ],
      "call_wall": 250.0,
      "put_wall": 140.0,
-     "opt_volume": 9219
+     "opt_volume": 10419
     },
     {
      "date": "2026-09-11",
@@ -60567,6 +60756,14 @@
        "oi": 113
       },
       {
+       "strike": 280.0,
+       "bid": 47.45,
+       "ask": 49.65,
+       "iv": 84.0,
+       "vol": 0,
+       "oi": 1
+      },
+      {
        "strike": 295.0,
        "bid": 59.85,
        "ask": 63.25,
@@ -60581,11 +60778,19 @@
        "iv": 88.4,
        "vol": 1,
        "oi": 2
+      },
+      {
+       "strike": 305.0,
+       "bid": 69.25,
+       "ask": 72.25,
+       "iv": 86.7,
+       "vol": 0,
+       "oi": 3
       }
      ],
      "call_wall": 240.0,
      "put_wall": 215.0,
-     "opt_volume": 2089
+     "opt_volume": 2513
     }
    ]
   },
@@ -60596,14 +60801,6 @@
     {
      "date": "2026-08-28",
      "calls": [
-      {
-       "strike": 106.0,
-       "bid": 14.0,
-       "ask": 14.4,
-       "iv": 87.4,
-       "vol": 149,
-       "oi": 1739
-      },
       {
        "strike": 107.0,
        "bid": 13.1,
@@ -60693,12 +60890,60 @@
        "oi": 20428
       },
       {
+       "strike": 118.0,
+       "bid": 5.85,
+       "ask": 6.05,
+       "iv": 87.4,
+       "vol": 1423,
+       "oi": 258
+      },
+      {
+       "strike": 119.0,
+       "bid": 5.4,
+       "ask": 5.7,
+       "iv": 89.1,
+       "vol": 1369,
+       "oi": 352
+      },
+      {
        "strike": 120.0,
        "bid": 5.05,
        "ask": 5.1,
        "iv": 89.0,
        "vol": 21378,
        "oi": 17092
+      },
+      {
+       "strike": 121.0,
+       "bid": 4.6,
+       "ask": 4.75,
+       "iv": 89.6,
+       "vol": 9038,
+       "oi": 10677
+      },
+      {
+       "strike": 122.0,
+       "bid": 4.2,
+       "ask": 4.4,
+       "iv": 90.3,
+       "vol": 17069,
+       "oi": 9941
+      },
+      {
+       "strike": 123.0,
+       "bid": 3.9,
+       "ask": 4.05,
+       "iv": 91.3,
+       "vol": 5225,
+       "oi": 20120
+      },
+      {
+       "strike": 124.0,
+       "bid": 3.55,
+       "ask": 3.75,
+       "iv": 91.9,
+       "vol": 15358,
+       "oi": 97
       },
       {
        "strike": 125.0,
@@ -60709,6 +60954,38 @@
        "oi": 2458
       },
       {
+       "strike": 126.0,
+       "bid": 3.0,
+       "ask": 3.2,
+       "iv": 93.6,
+       "vol": 1683,
+       "oi": 89
+      },
+      {
+       "strike": 127.0,
+       "bid": 2.69,
+       "ask": 2.93,
+       "iv": 93.7,
+       "vol": 3197,
+       "oi": 82
+      },
+      {
+       "strike": 128.0,
+       "bid": 2.54,
+       "ask": 2.7,
+       "iv": 95.1,
+       "vol": 19116,
+       "oi": 61
+      },
+      {
+       "strike": 129.0,
+       "bid": 2.34,
+       "ask": 2.49,
+       "iv": 96.0,
+       "vol": 8050,
+       "oi": 61
+      },
+      {
        "strike": 130.0,
        "bid": 2.19,
        "ask": 2.25,
@@ -60717,95 +60994,15 @@
        "oi": 9671
       },
       {
-       "strike": 135.0,
-       "bid": 1.43,
-       "ask": 1.53,
-       "iv": 101.0,
-       "vol": 2647,
-       "oi": 1028
-      },
-      {
-       "strike": 140.0,
-       "bid": 0.96,
-       "ask": 1.03,
-       "iv": 105.1,
-       "vol": 4625,
-       "oi": 2413
-      },
-      {
-       "strike": 145.0,
-       "bid": 0.68,
-       "ask": 0.72,
-       "iv": 110.0,
-       "vol": 3562,
-       "oi": 594
-      },
-      {
-       "strike": 150.0,
-       "bid": 0.49,
-       "ask": 0.51,
-       "iv": 114.6,
-       "vol": 8012,
-       "oi": 2708
-      },
-      {
-       "strike": 155.0,
-       "bid": 0.36,
-       "ask": 0.39,
-       "iv": 119.8,
-       "vol": 2828,
-       "oi": 1237
-      },
-      {
-       "strike": 160.0,
-       "bid": 0.28,
-       "ask": 0.29,
-       "iv": 124.6,
-       "vol": 2776,
-       "oi": 442
-      },
-      {
-       "strike": 165.0,
-       "bid": 0.2,
-       "ask": 0.25,
-       "iv": 129.9,
-       "vol": 865,
-       "oi": 275
-      },
-      {
-       "strike": 170.0,
-       "bid": 0.16,
-       "ask": 0.19,
-       "iv": 134.0,
-       "vol": 3495,
-       "oi": 187
-      },
-      {
-       "strike": 175.0,
-       "bid": 0.15,
-       "ask": 0.24,
-       "iv": 145.3,
-       "vol": 669,
-       "oi": 40
-      },
-      {
-       "strike": 180.0,
-       "bid": 0.1,
-       "ask": 0.14,
-       "iv": 143.8,
-       "vol": 726,
-       "oi": 300
+       "strike": 131.0,
+       "bid": 2.0,
+       "ask": 2.12,
+       "iv": 97.9,
+       "vol": 528,
+       "oi": 179
       }
      ],
      "puts": [
-      {
-       "strike": 106.0,
-       "bid": 0.82,
-       "ask": 0.93,
-       "iv": 85.1,
-       "vol": 1919,
-       "oi": 2077
-      },
       {
        "strike": 107.0,
        "bid": 1.01,
@@ -60895,12 +61092,60 @@
        "oi": 3
       },
       {
+       "strike": 118.0,
+       "bid": 4.45,
+       "ask": 4.75,
+       "iv": 85.8,
+       "vol": 970,
+       "oi": 7
+      },
+      {
+       "strike": 119.0,
+       "bid": 5.1,
+       "ask": 5.3,
+       "iv": 87.4,
+       "vol": 1274,
+       "oi": 13
+      },
+      {
        "strike": 120.0,
        "bid": 5.7,
        "ask": 5.8,
        "iv": 87.7,
        "vol": 1839,
        "oi": 438
+      },
+      {
+       "strike": 121.0,
+       "bid": 6.1,
+       "ask": 6.5,
+       "iv": 87.6,
+       "vol": 1824,
+       "oi": 2
+      },
+      {
+       "strike": 122.0,
+       "bid": 6.75,
+       "ask": 7.15,
+       "iv": 88.6,
+       "vol": 192,
+       "oi": 1
+      },
+      {
+       "strike": 123.0,
+       "bid": 7.4,
+       "ask": 7.85,
+       "iv": 89.6,
+       "vol": 53,
+       "oi": 0
+      },
+      {
+       "strike": 124.0,
+       "bid": 8.0,
+       "ask": 8.55,
+       "iv": 89.8,
+       "vol": 54,
+       "oi": 0
       },
       {
        "strike": 125.0,
@@ -60911,6 +61156,38 @@
        "oi": 174
       },
       {
+       "strike": 126.0,
+       "bid": 9.6,
+       "ask": 9.9,
+       "iv": 91.8,
+       "vol": 143,
+       "oi": 2
+      },
+      {
+       "strike": 127.0,
+       "bid": 10.2,
+       "ask": 10.7,
+       "iv": 91.6,
+       "vol": 601,
+       "oi": 0
+      },
+      {
+       "strike": 128.0,
+       "bid": 11.0,
+       "ask": 11.45,
+       "iv": 92.4,
+       "vol": 1,
+       "oi": 1
+      },
+      {
+       "strike": 129.0,
+       "bid": 11.85,
+       "ask": 12.25,
+       "iv": 93.8,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 130.0,
        "bid": 12.65,
        "ask": 13.05,
@@ -60919,117 +61196,21 @@
        "oi": 106
       },
       {
-       "strike": 135.0,
-       "bid": 16.75,
-       "ask": 17.35,
-       "iv": 96.5,
-       "vol": 9,
-       "oi": 8
-      },
-      {
-       "strike": 140.0,
-       "bid": 21.2,
-       "ask": 22.0,
-       "iv": 100.5,
-       "vol": 20,
-       "oi": 26
-      },
-      {
-       "strike": 145.0,
-       "bid": 25.9,
-       "ask": 26.7,
-       "iv": 103.8,
-       "vol": 51,
-       "oi": 3
-      },
-      {
-       "strike": 150.0,
-       "bid": 30.7,
-       "ask": 31.5,
-       "iv": 106.5,
-       "vol": 6,
-       "oi": 0
-      },
-      {
-       "strike": 155.0,
-       "bid": 35.6,
-       "ask": 36.35,
-       "iv": 109.2,
-       "vol": 1,
-       "oi": 1
-      },
-      {
-       "strike": 160.0,
-       "bid": 40.5,
-       "ask": 41.25,
-       "iv": 109.2,
-       "vol": 5,
-       "oi": 0
-      },
-      {
-       "strike": 165.0,
-       "bid": 45.45,
-       "ask": 46.2,
-       "iv": 110.5,
-       "vol": 1,
-       "oi": 0
-      },
-      {
-       "strike": 170.0,
-       "bid": 50.4,
-       "ask": 51.15,
-       "iv": 104.7,
-       "vol": 1,
-       "oi": 0
-      },
-      {
-       "strike": 180.0,
-       "bid": 60.35,
-       "ask": 61.1,
-       "iv": 169.1,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 185.0,
-       "bid": 65.35,
-       "ask": 66.3,
-       "iv": 143.0,
-       "vol": 0,
+       "strike": 131.0,
+       "bid": 13.4,
+       "ask": 13.9,
+       "iv": 94.5,
+       "vol": 128,
        "oi": 0
       }
      ],
      "call_wall": 115.0,
      "put_wall": 65.0,
-     "opt_volume": 234455
+     "opt_volume": 331094
     },
     {
      "date": "2026-09-04",
      "calls": [
-      {
-       "strike": 104.0,
-       "bid": 16.8,
-       "ask": 17.6,
-       "iv": 85.0,
-       "vol": 82,
-       "oi": 312
-      },
-      {
-       "strike": 105.0,
-       "bid": 16.0,
-       "ask": 16.75,
-       "iv": 84.1,
-       "vol": 221,
-       "oi": 876
-      },
-      {
-       "strike": 106.0,
-       "bid": 15.25,
-       "ask": 15.7,
-       "iv": 81.8,
-       "vol": 104,
-       "oi": 346
-      },
       {
        "strike": 107.0,
        "bid": 14.45,
@@ -61103,12 +61284,76 @@
        "oi": 2019
       },
       {
+       "strike": 116.0,
+       "bid": 8.8,
+       "ask": 9.5,
+       "iv": 83.8,
+       "vol": 92,
+       "oi": 258
+      },
+      {
+       "strike": 117.0,
+       "bid": 8.3,
+       "ask": 8.95,
+       "iv": 83.8,
+       "vol": 141,
+       "oi": 164
+      },
+      {
+       "strike": 118.0,
+       "bid": 7.8,
+       "ask": 8.5,
+       "iv": 84.2,
+       "vol": 517,
+       "oi": 65
+      },
+      {
+       "strike": 119.0,
+       "bid": 7.35,
+       "ask": 8.05,
+       "iv": 84.5,
+       "vol": 671,
+       "oi": 53
+      },
+      {
        "strike": 120.0,
        "bid": 7.05,
        "ask": 7.3,
        "iv": 83.8,
        "vol": 2452,
        "oi": 2673
+      },
+      {
+       "strike": 121.0,
+       "bid": 6.55,
+       "ask": 7.2,
+       "iv": 85.4,
+       "vol": 427,
+       "oi": 29
+      },
+      {
+       "strike": 122.0,
+       "bid": 6.25,
+       "ask": 6.6,
+       "iv": 85.1,
+       "vol": 768,
+       "oi": 24
+      },
+      {
+       "strike": 123.0,
+       "bid": 5.9,
+       "ask": 6.4,
+       "iv": 86.5,
+       "vol": 163,
+       "oi": 17
+      },
+      {
+       "strike": 124.0,
+       "bid": 5.5,
+       "ask": 5.95,
+       "iv": 86.1,
+       "vol": 104,
+       "oi": 13
       },
       {
        "strike": 125.0,
@@ -61119,6 +61364,38 @@
        "oi": 940
       },
       {
+       "strike": 126.0,
+       "bid": 4.95,
+       "ask": 5.35,
+       "iv": 87.6,
+       "vol": 175,
+       "oi": 18
+      },
+      {
+       "strike": 127.0,
+       "bid": 4.65,
+       "ask": 5.05,
+       "iv": 88.0,
+       "vol": 192,
+       "oi": 11
+      },
+      {
+       "strike": 128.0,
+       "bid": 4.1,
+       "ask": 4.85,
+       "iv": 87.3,
+       "vol": 257,
+       "oi": 234
+      },
+      {
+       "strike": 129.0,
+       "bid": 4.0,
+       "ask": 4.6,
+       "iv": 88.7,
+       "vol": 159,
+       "oi": 234
+      },
+      {
        "strike": 130.0,
        "bid": 3.95,
        "ask": 4.05,
@@ -61127,111 +61404,15 @@
        "oi": 1963
       },
       {
-       "strike": 135.0,
-       "bid": 2.87,
-       "ask": 3.15,
-       "iv": 91.3,
-       "vol": 244,
-       "oi": 467
-      },
-      {
-       "strike": 140.0,
-       "bid": 2.24,
-       "ask": 2.36,
-       "iv": 94.3,
-       "vol": 1294,
-       "oi": 529
-      },
-      {
-       "strike": 145.0,
-       "bid": 1.7,
-       "ask": 1.88,
-       "iv": 97.7,
-       "vol": 307,
-       "oi": 414
-      },
-      {
-       "strike": 150.0,
-       "bid": 1.28,
-       "ask": 1.42,
-       "iv": 99.7,
-       "vol": 3074,
-       "oi": 448
-      },
-      {
-       "strike": 155.0,
-       "bid": 0.93,
-       "ask": 1.12,
-       "iv": 101.7,
-       "vol": 166,
-       "oi": 236
-      },
-      {
-       "strike": 160.0,
-       "bid": 0.75,
-       "ask": 0.9,
-       "iv": 104.8,
-       "vol": 1270,
-       "oi": 174
-      },
-      {
-       "strike": 165.0,
-       "bid": 0.57,
-       "ask": 0.79,
-       "iv": 108.3,
-       "vol": 37,
-       "oi": 21
-      },
-      {
-       "strike": 170.0,
-       "bid": 0.52,
-       "ask": 0.63,
-       "iv": 111.8,
-       "vol": 2141,
-       "oi": 149
-      },
-      {
-       "strike": 175.0,
-       "bid": 0.35,
-       "ask": 0.53,
-       "iv": 113.0,
-       "vol": 55,
-       "oi": 95
-      },
-      {
-       "strike": 180.0,
-       "bid": 0.31,
-       "ask": 0.44,
-       "iv": 116.2,
-       "vol": 554,
-       "oi": 178
+       "strike": 131.0,
+       "bid": 3.65,
+       "ask": 4.05,
+       "iv": 90.0,
+       "vol": 60,
+       "oi": 3
       }
      ],
      "puts": [
-      {
-       "strike": 104.0,
-       "bid": 1.59,
-       "ask": 1.82,
-       "iv": 80.7,
-       "vol": 104,
-       "oi": 780
-      },
-      {
-       "strike": 105.0,
-       "bid": 1.78,
-       "ask": 2.0,
-       "iv": 80.2,
-       "vol": 254,
-       "oi": 526
-      },
-      {
-       "strike": 106.0,
-       "bid": 2.01,
-       "ask": 2.25,
-       "iv": 80.3,
-       "vol": 16,
-       "oi": 121
-      },
       {
        "strike": 107.0,
        "bid": 2.27,
@@ -61305,12 +61486,76 @@
        "oi": 521
       },
       {
+       "strike": 116.0,
+       "bid": 5.3,
+       "ask": 5.9,
+       "iv": 80.3,
+       "vol": 14,
+       "oi": 4
+      },
+      {
+       "strike": 117.0,
+       "bid": 5.8,
+       "ask": 6.4,
+       "iv": 80.7,
+       "vol": 23,
+       "oi": 3
+      },
+      {
+       "strike": 118.0,
+       "bid": 6.3,
+       "ask": 6.95,
+       "iv": 81.1,
+       "vol": 111,
+       "oi": 8
+      },
+      {
+       "strike": 119.0,
+       "bid": 6.85,
+       "ask": 7.45,
+       "iv": 81.2,
+       "vol": 29,
+       "oi": 16
+      },
+      {
        "strike": 120.0,
        "bid": 7.45,
        "ask": 8.0,
        "iv": 81.6,
        "vol": 518,
        "oi": 572
+      },
+      {
+       "strike": 121.0,
+       "bid": 8.0,
+       "ask": 8.6,
+       "iv": 81.8,
+       "vol": 105,
+       "oi": 1
+      },
+      {
+       "strike": 122.0,
+       "bid": 8.55,
+       "ask": 9.35,
+       "iv": 82.6,
+       "vol": 12,
+       "oi": 1
+      },
+      {
+       "strike": 123.0,
+       "bid": 9.25,
+       "ask": 9.95,
+       "iv": 83.2,
+       "vol": 3,
+       "oi": 0
+      },
+      {
+       "strike": 124.0,
+       "bid": 9.9,
+       "ask": 10.6,
+       "iv": 83.5,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 125.0,
@@ -61321,6 +61566,22 @@
        "oi": 392
       },
       {
+       "strike": 127.0,
+       "bid": 11.95,
+       "ask": 12.7,
+       "iv": 84.8,
+       "vol": 3,
+       "oi": 0
+      },
+      {
+       "strike": 129.0,
+       "bid": 13.35,
+       "ask": 14.15,
+       "iv": 85.1,
+       "vol": 3,
+       "oi": 0
+      },
+      {
        "strike": 130.0,
        "bid": 14.2,
        "ask": 14.9,
@@ -61329,93 +61590,37 @@
        "oi": 765
       },
       {
-       "strike": 135.0,
-       "bid": 18.0,
-       "ask": 18.95,
-       "iv": 87.3,
-       "vol": 8,
-       "oi": 70
-      },
-      {
-       "strike": 140.0,
-       "bid": 22.25,
-       "ask": 23.25,
-       "iv": 89.6,
-       "vol": 3,
-       "oi": 203
-      },
-      {
-       "strike": 145.0,
-       "bid": 26.75,
-       "ask": 27.7,
-       "iv": 91.8,
-       "vol": 2,
-       "oi": 116
-      },
-      {
-       "strike": 150.0,
-       "bid": 31.35,
-       "ask": 32.35,
-       "iv": 94.2,
-       "vol": 2,
-       "oi": 51
-      },
-      {
-       "strike": 155.0,
-       "bid": 36.05,
-       "ask": 37.05,
-       "iv": 95.7,
-       "vol": 30,
-       "oi": 0
-      },
-      {
-       "strike": 160.0,
-       "bid": 40.85,
-       "ask": 41.85,
-       "iv": 97.8,
-       "vol": 4,
-       "oi": 0
-      },
-      {
-       "strike": 165.0,
-       "bid": 45.7,
-       "ask": 46.7,
-       "iv": 99.7,
+       "strike": 131.0,
+       "bid": 14.9,
+       "ask": 15.7,
+       "iv": 86.2,
        "vol": 1,
        "oi": 0
       },
       {
-       "strike": 180.0,
-       "bid": 60.45,
-       "ask": 61.4,
-       "iv": 103.1,
-       "vol": 0,
+       "strike": 133.0,
+       "bid": 16.4,
+       "ask": 17.3,
+       "iv": 86.6,
+       "vol": 22,
+       "oi": 0
+      },
+      {
+       "strike": 134.0,
+       "bid": 17.2,
+       "ask": 18.1,
+       "iv": 86.9,
+       "vol": 8,
        "oi": 0
       }
      ],
      "call_wall": 120.0,
      "put_wall": 60.0,
-     "opt_volume": 37726
+     "opt_volume": 42258
     },
     {
      "date": "2026-09-11",
      "calls": [
-      {
-       "strike": 104.0,
-       "bid": 17.75,
-       "ask": 18.6,
-       "iv": 81.3,
-       "vol": 46,
-       "oi": 130
-      },
-      {
-       "strike": 105.0,
-       "bid": 16.95,
-       "ask": 17.8,
-       "iv": 80.4,
-       "vol": 95,
-       "oi": 533
-      },
       {
        "strike": 106.0,
        "bid": 16.15,
@@ -61495,6 +61700,22 @@
        "iv": 80.0,
        "vol": 282,
        "oi": 1189
+      },
+      {
+       "strike": 116.0,
+       "bid": 10.05,
+       "ask": 10.9,
+       "iv": 79.8,
+       "vol": 117,
+       "oi": 29
+      },
+      {
+       "strike": 117.0,
+       "bid": 9.65,
+       "ask": 10.3,
+       "iv": 79.9,
+       "vol": 211,
+       "oi": 142
       },
       {
        "strike": 120.0,
@@ -61603,30 +61824,6 @@
      ],
      "puts": [
       {
-       "strike": 103.0,
-       "bid": 2.14,
-       "ask": 2.5,
-       "iv": 76.7,
-       "vol": 20,
-       "oi": 42
-      },
-      {
-       "strike": 104.0,
-       "bid": 2.38,
-       "ask": 2.71,
-       "iv": 76.5,
-       "vol": 27,
-       "oi": 69
-      },
-      {
-       "strike": 105.0,
-       "bid": 2.65,
-       "ask": 2.98,
-       "iv": 76.6,
-       "vol": 50,
-       "oi": 260
-      },
-      {
        "strike": 106.0,
        "bid": 2.84,
        "ask": 3.35,
@@ -61667,6 +61864,14 @@
        "oi": 330
       },
       {
+       "strike": 111.0,
+       "bid": 4.4,
+       "ask": 5.05,
+       "iv": 76.4,
+       "vol": 80,
+       "oi": 44
+      },
+      {
        "strike": 112.0,
        "bid": 4.8,
        "ask": 5.45,
@@ -61697,6 +61902,22 @@
        "iv": 76.2,
        "vol": 127,
        "oi": 372
+      },
+      {
+       "strike": 116.0,
+       "bid": 6.5,
+       "ask": 7.25,
+       "iv": 76.6,
+       "vol": 14,
+       "oi": 0
+      },
+      {
+       "strike": 117.0,
+       "bid": 6.95,
+       "ask": 7.75,
+       "iv": 76.5,
+       "vol": 28,
+       "oi": 1
       },
       {
        "strike": 120.0,
@@ -61789,7 +62010,7 @@
      ],
      "call_wall": 115.0,
      "put_wall": 60.0,
-     "opt_volume": 13732
+     "opt_volume": 14190
     }
    ]
   },
@@ -62131,12 +62352,28 @@
        "oi": 51
       },
       {
+       "strike": 985.0,
+       "bid": 23.55,
+       "ask": 26.2,
+       "iv": 53.5,
+       "vol": 352,
+       "oi": 26
+      },
+      {
        "strike": 990.0,
        "bid": 27.2,
        "ask": 29.6,
        "iv": 52.8,
        "vol": 322,
        "oi": 61
+      },
+      {
+       "strike": 995.0,
+       "bid": 31.05,
+       "ask": 34.3,
+       "iv": 56.9,
+       "vol": 34,
+       "oi": 30
       },
       {
        "strike": 1000.0,
@@ -62155,6 +62392,22 @@
        "oi": 33
       },
       {
+       "strike": 1010.0,
+       "bid": 44.15,
+       "ask": 47.3,
+       "iv": 52.5,
+       "vol": 351,
+       "oi": 45
+      },
+      {
+       "strike": 1015.0,
+       "bid": 48.2,
+       "ask": 52.55,
+       "iv": 54.1,
+       "vol": 723,
+       "oi": 615
+      },
+      {
        "strike": 1020.0,
        "bid": 50.95,
        "ask": 58.2,
@@ -62169,43 +62422,11 @@
        "iv": 50.1,
        "vol": 9,
        "oi": 25
-      },
-      {
-       "strike": 1030.0,
-       "bid": 60.2,
-       "ask": 69.9,
-       "iv": 62.7,
-       "vol": 15,
-       "oi": 18
-      },
-      {
-       "strike": 1040.0,
-       "bid": 69.5,
-       "ask": 79.5,
-       "iv": 64.2,
-       "vol": 1,
-       "oi": 4
-      },
-      {
-       "strike": 1050.0,
-       "bid": 79.5,
-       "ask": 89.2,
-       "iv": 68.8,
-       "vol": 33,
-       "oi": 17
-      },
-      {
-       "strike": 1060.0,
-       "bid": 89.3,
-       "ask": 99.25,
-       "iv": 73.9,
-       "vol": 6,
-       "oi": 20
       }
      ],
      "call_wall": 1000.0,
      "put_wall": 900.0,
-     "opt_volume": 93303
+     "opt_volume": 98498
     },
     {
      "date": "2026-08-26",
@@ -62541,12 +62762,28 @@
        "oi": 29
       },
       {
+       "strike": 985.0,
+       "bid": 33.25,
+       "ask": 36.1,
+       "iv": 60.1,
+       "vol": 363,
+       "oi": 19
+      },
+      {
        "strike": 990.0,
        "bid": 37.0,
        "ask": 39.45,
        "iv": 61.0,
        "vol": 2359,
        "oi": 41
+      },
+      {
+       "strike": 995.0,
+       "bid": 39.75,
+       "ask": 42.95,
+       "iv": 60.4,
+       "vol": 5,
+       "oi": 5
       },
       {
        "strike": 1000.0,
@@ -62557,41 +62794,49 @@
        "oi": 34
       },
       {
-       "strike": 1040.0,
-       "bid": 75.0,
-       "ask": 80.8,
-       "iv": 63.9,
-       "vol": 3,
-       "oi": 6
-      },
-      {
-       "strike": 1075.0,
-       "bid": 103.1,
-       "ask": 117.9,
-       "iv": 68.8,
+       "strike": 1005.0,
+       "bid": 47.6,
+       "ask": 50.3,
+       "iv": 61.7,
        "vol": 4,
-       "oi": 29
+       "oi": 15
       },
       {
-       "strike": 1085.0,
-       "bid": 113.75,
-       "ask": 127.55,
-       "iv": 74.4,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 1180.0,
-       "bid": 206.0,
-       "ask": 221.65,
-       "iv": 89.6,
+       "strike": 1010.0,
+       "bid": 51.3,
+       "ask": 53.85,
+       "iv": 61.3,
        "vol": 1,
-       "oi": 0
+       "oi": 12
+      },
+      {
+       "strike": 1015.0,
+       "bid": 55.4,
+       "ask": 58.15,
+       "iv": 62.4,
+       "vol": 36,
+       "oi": 12
+      },
+      {
+       "strike": 1020.0,
+       "bid": 58.65,
+       "ask": 62.3,
+       "iv": 61.5,
+       "vol": 4,
+       "oi": 26
+      },
+      {
+       "strike": 1025.0,
+       "bid": 62.15,
+       "ask": 67.55,
+       "iv": 62.6,
+       "vol": 6,
+       "oi": 2
       }
      ],
      "call_wall": 1000.0,
      "put_wall": 950.0,
-     "opt_volume": 25569
+     "opt_volume": 26691
     },
     {
      "date": "2026-08-28",
@@ -63001,7 +63246,7 @@
      ],
      "call_wall": 1000.0,
      "put_wall": 800.0,
-     "opt_volume": 142396
+     "opt_volume": 142628
     }
    ]
   },
@@ -63417,35 +63662,11 @@
      ],
      "call_wall": 225.0,
      "put_wall": 215.0,
-     "opt_volume": 492324
+     "opt_volume": 492740
     },
     {
      "date": "2026-08-28",
      "calls": [
-      {
-       "strike": 170.0,
-       "bid": 43.3,
-       "ask": 46.4,
-       "iv": 85.9,
-       "vol": 9,
-       "oi": 328
-      },
-      {
-       "strike": 175.0,
-       "bid": 36.85,
-       "ask": 43.75,
-       "iv": 99.9,
-       "vol": 147,
-       "oi": 579
-      },
-      {
-       "strike": 180.0,
-       "bid": 34.75,
-       "ask": 35.7,
-       "iv": 86.0,
-       "vol": 249,
-       "oi": 587
-      },
       {
        "strike": 185.0,
        "bid": 29.7,
@@ -63453,6 +63674,14 @@
        "iv": 86.2,
        "vol": 151,
        "oi": 651
+      },
+      {
+       "strike": 187.5,
+       "bid": 24.1,
+       "ask": 29.55,
+       "iv": 106.8,
+       "vol": 71,
+       "oi": 41
       },
       {
        "strike": 190.0,
@@ -63463,12 +63692,28 @@
        "oi": 1901
       },
       {
+       "strike": 192.5,
+       "bid": 22.6,
+       "ask": 23.4,
+       "iv": 65.6,
+       "vol": 515,
+       "oi": 13
+      },
+      {
        "strike": 195.0,
        "bid": 20.45,
        "ask": 20.8,
        "iv": 62.3,
        "vol": 308,
        "oi": 3918
+      },
+      {
+       "strike": 197.5,
+       "bid": 18.2,
+       "ask": 18.75,
+       "iv": 62.3,
+       "vol": 888,
+       "oi": 26
       },
       {
        "strike": 200.0,
@@ -63625,36 +63870,20 @@
      ],
      "puts": [
       {
-       "strike": 170.0,
-       "bid": 0.09,
-       "ask": 0.11,
-       "iv": 82.8,
-       "vol": 4501,
-       "oi": 6313
-      },
-      {
-       "strike": 175.0,
-       "bid": 0.12,
-       "ask": 0.13,
-       "iv": 76.2,
-       "vol": 6797,
-       "oi": 3658
-      },
-      {
-       "strike": 180.0,
-       "bid": 0.16,
-       "ask": 0.17,
-       "iv": 70.1,
-       "vol": 3697,
-       "oi": 7440
-      },
-      {
        "strike": 185.0,
        "bid": 0.24,
        "ask": 0.26,
        "iv": 65.2,
        "vol": 13522,
        "oi": 3347
+      },
+      {
+       "strike": 187.5,
+       "bid": 0.3,
+       "ask": 0.32,
+       "iv": 62.9,
+       "vol": 1753,
+       "oi": 1205
       },
       {
        "strike": 190.0,
@@ -63665,12 +63894,28 @@
        "oi": 9435
       },
       {
+       "strike": 192.5,
+       "bid": 0.54,
+       "ask": 0.56,
+       "iv": 60.1,
+       "vol": 1615,
+       "oi": 149
+      },
+      {
        "strike": 195.0,
        "bid": 0.74,
        "ask": 0.77,
        "iv": 59.2,
        "vol": 5178,
        "oi": 7611
+      },
+      {
+       "strike": 197.5,
+       "bid": 1.03,
+       "ask": 1.06,
+       "iv": 58.8,
+       "vol": 2245,
+       "oi": 444
       },
       {
        "strike": 200.0,
@@ -63827,417 +64072,417 @@
      ],
      "call_wall": 240.0,
      "put_wall": 115.0,
-     "opt_volume": 416288
+     "opt_volume": 427040
     },
     {
-     "date": "2026-09-04",
+     "date": "2026-08-31",
      "calls": [
       {
-       "strike": 155.0,
-       "bid": 57.5,
-       "ask": 63.6,
-       "iv": 107.1,
-       "vol": 79,
-       "oi": 90
-      },
-      {
-       "strike": 160.0,
-       "bid": 51.25,
-       "ask": 59.05,
-       "iv": 86.5,
-       "vol": 18,
-       "oi": 40
-      },
-      {
-       "strike": 165.0,
-       "bid": 46.3,
-       "ask": 54.05,
-       "iv": 79.7,
-       "vol": 24,
-       "oi": 34
-      },
-      {
-       "strike": 170.0,
-       "bid": 44.35,
-       "ask": 47.85,
-       "iv": 92.2,
-       "vol": 23,
-       "oi": 10106
-      },
-      {
-       "strike": 175.0,
-       "bid": 36.8,
-       "ask": 43.0,
-       "iv": 54.8,
-       "vol": 92,
-       "oi": 136
-      },
-      {
-       "strike": 180.0,
-       "bid": 34.95,
-       "ask": 35.9,
-       "iv": 62.9,
-       "vol": 128,
-       "oi": 5159
-      },
-      {
        "strike": 185.0,
-       "bid": 30.3,
-       "ask": 31.1,
-       "iv": 59.8,
-       "vol": 37,
-       "oi": 291
+       "bid": 26.75,
+       "ask": 32.15,
+       "iv": 94.3,
+       "vol": 146,
+       "oi": 28
+      },
+      {
+       "strike": 187.5,
+       "bid": 27.45,
+       "ask": 28.3,
+       "iv": 60.4,
+       "vol": 144,
+       "oi": 28
       },
       {
        "strike": 190.0,
-       "bid": 25.4,
-       "ask": 26.2,
-       "iv": 53.0,
-       "vol": 71,
-       "oi": 952
+       "bid": 25.1,
+       "ask": 25.9,
+       "iv": 58.3,
+       "vol": 42,
+       "oi": 145
+      },
+      {
+       "strike": 192.5,
+       "bid": 22.8,
+       "ask": 23.55,
+       "iv": 56.6,
+       "vol": 1,
+       "oi": 6
       },
       {
        "strike": 195.0,
-       "bid": 21.2,
-       "ask": 21.85,
-       "iv": 52.8,
-       "vol": 38,
-       "oi": 791
+       "bid": 20.5,
+       "ask": 21.45,
+       "iv": 56.1,
+       "vol": 14,
+       "oi": 12
+      },
+      {
+       "strike": 197.5,
+       "bid": 18.35,
+       "ask": 19.1,
+       "iv": 54.2,
+       "vol": 4,
+       "oi": 17
       },
       {
        "strike": 200.0,
-       "bid": 17.05,
-       "ask": 17.55,
-       "iv": 50.2,
-       "vol": 213,
-       "oi": 1789
+       "bid": 16.4,
+       "ask": 16.8,
+       "iv": 53.0,
+       "vol": 153,
+       "oi": 193
+      },
+      {
+       "strike": 202.5,
+       "bid": 14.35,
+       "ask": 14.95,
+       "iv": 52.7,
+       "vol": 40,
+       "oi": 7
       },
       {
        "strike": 205.0,
-       "bid": 13.6,
-       "ask": 13.85,
-       "iv": 50.2,
-       "vol": 52,
-       "oi": 1246
+       "bid": 12.5,
+       "ask": 13.1,
+       "iv": 52.3,
+       "vol": 162,
+       "oi": 62
+      },
+      {
+       "strike": 207.5,
+       "bid": 11.0,
+       "ask": 11.15,
+       "iv": 52.0,
+       "vol": 34,
+       "oi": 12
       },
       {
        "strike": 210.0,
-       "bid": 10.4,
-       "ask": 10.55,
-       "iv": 49.9,
-       "vol": 2094,
-       "oi": 2835
+       "bid": 9.5,
+       "ask": 9.6,
+       "iv": 52.1,
+       "vol": 2500,
+       "oi": 2216
+      },
+      {
+       "strike": 212.5,
+       "bid": 8.0,
+       "ask": 8.2,
+       "iv": 51.8,
+       "vol": 303,
+       "oi": 66
       },
       {
        "strike": 215.0,
-       "bid": 7.75,
-       "ask": 7.85,
-       "iv": 49.4,
-       "vol": 5878,
-       "oi": 8639
+       "bid": 6.75,
+       "ask": 6.9,
+       "iv": 51.8,
+       "vol": 1723,
+       "oi": 711
+      },
+      {
+       "strike": 217.5,
+       "bid": 5.65,
+       "ask": 5.8,
+       "iv": 51.9,
+       "vol": 1434,
+       "oi": 721
       },
       {
        "strike": 220.0,
-       "bid": 5.6,
-       "ask": 5.7,
-       "iv": 49.3,
-       "vol": 5120,
-       "oi": 7062
+       "bid": 4.7,
+       "ask": 4.8,
+       "iv": 52.0,
+       "vol": 9005,
+       "oi": 7672
+      },
+      {
+       "strike": 222.5,
+       "bid": 3.8,
+       "ask": 3.95,
+       "iv": 51.8,
+       "vol": 652,
+       "oi": 310
       },
       {
        "strike": 225.0,
-       "bid": 3.9,
-       "ask": 4.0,
-       "iv": 49.1,
-       "vol": 1948,
-       "oi": 7812
+       "bid": 3.1,
+       "ask": 3.25,
+       "iv": 52.1,
+       "vol": 1796,
+       "oi": 2613
+      },
+      {
+       "strike": 227.5,
+       "bid": 2.51,
+       "ask": 2.6,
+       "iv": 52.1,
+       "vol": 1534,
+       "oi": 678
       },
       {
        "strike": 230.0,
-       "bid": 2.67,
-       "ask": 2.73,
-       "iv": 49.0,
-       "vol": 2558,
-       "oi": 15850
+       "bid": 2.01,
+       "ask": 2.08,
+       "iv": 52.2,
+       "vol": 1943,
+       "oi": 3181
+      },
+      {
+       "strike": 232.5,
+       "bid": 1.59,
+       "ask": 1.66,
+       "iv": 52.3,
+       "vol": 1010,
+       "oi": 145
       },
       {
        "strike": 235.0,
-       "bid": 1.78,
-       "ask": 1.83,
-       "iv": 49.2,
-       "vol": 1707,
-       "oi": 6406
+       "bid": 1.25,
+       "ask": 1.31,
+       "iv": 52.5,
+       "vol": 3968,
+       "oi": 2511
+      },
+      {
+       "strike": 237.5,
+       "bid": 0.98,
+       "ask": 1.04,
+       "iv": 52.7,
+       "vol": 159,
+       "oi": 165
       },
       {
        "strike": 240.0,
-       "bid": 1.18,
-       "ask": 1.22,
-       "iv": 49.6,
-       "vol": 1840,
-       "oi": 15264
+       "bid": 0.77,
+       "ask": 0.82,
+       "iv": 53.0,
+       "vol": 1126,
+       "oi": 766
+      },
+      {
+       "strike": 242.5,
+       "bid": 0.61,
+       "ask": 0.65,
+       "iv": 53.5,
+       "vol": 164,
+       "oi": 186
       },
       {
        "strike": 245.0,
-       "bid": 0.79,
-       "ask": 0.82,
-       "iv": 50.1,
-       "vol": 723,
-       "oi": 6357
-      },
-      {
-       "strike": 250.0,
-       "bid": 0.55,
-       "ask": 0.57,
-       "iv": 51.4,
-       "vol": 1511,
-       "oi": 5578
-      },
-      {
-       "strike": 255.0,
-       "bid": 0.39,
-       "ask": 0.41,
-       "iv": 52.8,
-       "vol": 121,
-       "oi": 1789
-      },
-      {
-       "strike": 260.0,
-       "bid": 0.29,
-       "ask": 0.31,
-       "iv": 54.6,
-       "vol": 355,
-       "oi": 3986
-      },
-      {
-       "strike": 265.0,
-       "bid": 0.22,
-       "ask": 0.24,
-       "iv": 56.4,
-       "vol": 286,
-       "oi": 3387
-      },
-      {
-       "strike": 270.0,
-       "bid": 0.18,
-       "ask": 0.19,
-       "iv": 58.6,
-       "vol": 206,
-       "oi": 5460
-      },
-      {
-       "strike": 275.0,
-       "bid": 0.14,
-       "ask": 0.16,
-       "iv": 60.5,
-       "vol": 33,
-       "oi": 993
+       "bid": 0.5,
+       "ask": 0.53,
+       "iv": 54.3,
+       "vol": 864,
+       "oi": 7881
       }
      ],
      "puts": [
       {
-       "strike": 155.0,
-       "bid": 0.12,
-       "ask": 0.14,
-       "iv": 78.3,
-       "vol": 92,
-       "oi": 1231
-      },
-      {
-       "strike": 160.0,
-       "bid": 0.15,
-       "ask": 0.17,
-       "iv": 73.7,
-       "vol": 134,
-       "oi": 1775
-      },
-      {
-       "strike": 165.0,
-       "bid": 0.18,
-       "ask": 0.2,
-       "iv": 68.8,
-       "vol": 31,
-       "oi": 1020
-      },
-      {
-       "strike": 170.0,
-       "bid": 0.22,
-       "ask": 0.24,
-       "iv": 63.9,
-       "vol": 101,
-       "oi": 14418
-      },
-      {
-       "strike": 175.0,
-       "bid": 0.28,
-       "ask": 0.3,
-       "iv": 59.4,
-       "vol": 487,
-       "oi": 3163
-      },
-      {
-       "strike": 180.0,
-       "bid": 0.39,
-       "ask": 0.41,
-       "iv": 55.8,
-       "vol": 1848,
-       "oi": 3505
-      },
-      {
        "strike": 185.0,
-       "bid": 0.56,
-       "ask": 0.59,
-       "iv": 52.5,
-       "vol": 455,
-       "oi": 2968
+       "bid": 0.31,
+       "ask": 0.35,
+       "iv": 56.2,
+       "vol": 80,
+       "oi": 58
+      },
+      {
+       "strike": 187.5,
+       "bid": 0.39,
+       "ask": 0.43,
+       "iv": 54.4,
+       "vol": 37,
+       "oi": 24
       },
       {
        "strike": 190.0,
-       "bid": 0.88,
-       "ask": 0.91,
-       "iv": 50.3,
-       "vol": 737,
-       "oi": 67116
+       "bid": 0.52,
+       "ask": 0.55,
+       "iv": 53.2,
+       "vol": 1511,
+       "oi": 139
+      },
+      {
+       "strike": 192.5,
+       "bid": 0.67,
+       "ask": 0.73,
+       "iv": 52.1,
+       "vol": 43,
+       "oi": 50
       },
       {
        "strike": 195.0,
-       "bid": 1.41,
-       "ask": 1.47,
-       "iv": 49.2,
-       "vol": 544,
-       "oi": 2841
+       "bid": 0.9,
+       "ask": 0.96,
+       "iv": 51.3,
+       "vol": 258,
+       "oi": 189
+      },
+      {
+       "strike": 197.5,
+       "bid": 1.21,
+       "ask": 1.28,
+       "iv": 50.8,
+       "vol": 90,
+       "oi": 89
       },
       {
        "strike": 200.0,
-       "bid": 2.28,
-       "ask": 2.35,
-       "iv": 48.3,
-       "vol": 945,
-       "oi": 7498
+       "bid": 1.62,
+       "ask": 1.7,
+       "iv": 50.5,
+       "vol": 455,
+       "oi": 328
+      },
+      {
+       "strike": 202.5,
+       "bid": 2.15,
+       "ask": 2.23,
+       "iv": 50.3,
+       "vol": 422,
+       "oi": 431
       },
       {
        "strike": 205.0,
-       "bid": 3.55,
-       "ask": 3.65,
-       "iv": 47.7,
-       "vol": 475,
-       "oi": 2596
+       "bid": 2.81,
+       "ask": 2.9,
+       "iv": 50.3,
+       "vol": 234,
+       "oi": 555
+      },
+      {
+       "strike": 207.5,
+       "bid": 3.6,
+       "ask": 3.7,
+       "iv": 50.3,
+       "vol": 733,
+       "oi": 92
       },
       {
        "strike": 210.0,
-       "bid": 5.35,
-       "ask": 5.45,
-       "iv": 47.4,
-       "vol": 733,
-       "oi": 4039
+       "bid": 4.5,
+       "ask": 4.65,
+       "iv": 50.2,
+       "vol": 386,
+       "oi": 873
+      },
+      {
+       "strike": 212.5,
+       "bid": 5.6,
+       "ask": 5.75,
+       "iv": 50.3,
+       "vol": 333,
+       "oi": 174
       },
       {
        "strike": 215.0,
-       "bid": 7.65,
-       "ask": 7.8,
-       "iv": 47.4,
-       "vol": 1071,
-       "oi": 1864
+       "bid": 6.8,
+       "ask": 7.0,
+       "iv": 50.2,
+       "vol": 572,
+       "oi": 884
+      },
+      {
+       "strike": 217.5,
+       "bid": 8.2,
+       "ask": 8.4,
+       "iv": 50.4,
+       "vol": 422,
+       "oi": 303
       },
       {
        "strike": 220.0,
-       "bid": 10.5,
-       "ask": 10.65,
-       "iv": 47.2,
-       "vol": 429,
-       "oi": 12630
+       "bid": 8.75,
+       "ask": 10.05,
+       "iv": 52.2,
+       "vol": 602,
+       "oi": 667
+      },
+      {
+       "strike": 222.5,
+       "bid": 11.15,
+       "ask": 11.7,
+       "iv": 52.2,
+       "vol": 82,
+       "oi": 76
       },
       {
        "strike": 225.0,
-       "bid": 13.7,
-       "ask": 14.05,
-       "iv": 47.5,
-       "vol": 706,
-       "oi": 2216
+       "bid": 12.85,
+       "ask": 13.55,
+       "iv": 52.9,
+       "vol": 77,
+       "oi": 2144
+      },
+      {
+       "strike": 227.5,
+       "bid": 14.7,
+       "ask": 15.4,
+       "iv": 52.7,
+       "vol": 5,
+       "oi": 12
       },
       {
        "strike": 230.0,
-       "bid": 17.15,
-       "ask": 18.1,
-       "iv": 49.8,
-       "vol": 108,
-       "oi": 556
+       "bid": 16.2,
+       "ask": 17.5,
+       "iv": 54.0,
+       "vol": 6,
+       "oi": 75
+      },
+      {
+       "strike": 232.5,
+       "bid": 18.7,
+       "ask": 19.5,
+       "iv": 53.4,
+       "vol": 36,
+       "oi": 47
       },
       {
        "strike": 235.0,
-       "bid": 21.25,
-       "ask": 22.25,
-       "iv": 50.5,
-       "vol": 105,
-       "oi": 152
+       "bid": 20.85,
+       "ask": 21.8,
+       "iv": 55.5,
+       "vol": 29,
+       "oi": 28
       },
       {
        "strike": 240.0,
-       "bid": 25.6,
-       "ask": 26.75,
-       "iv": 52.5,
-       "vol": 27,
-       "oi": 59
+       "bid": 25.35,
+       "ask": 26.35,
+       "iv": 57.4,
+       "vol": 0,
+       "oi": 9
+      },
+      {
+       "strike": 242.5,
+       "bid": 27.7,
+       "ask": 28.7,
+       "iv": 58.8,
+       "vol": 294,
+       "oi": 0
       },
       {
        "strike": 245.0,
-       "bid": 30.25,
-       "ask": 31.35,
-       "iv": 53.9,
-       "vol": 26,
-       "oi": 155
+       "bid": 30.1,
+       "ask": 31.1,
+       "iv": 60.5,
+       "vol": 294,
+       "oi": 11
       },
       {
-       "strike": 250.0,
-       "bid": 35.0,
-       "ask": 36.15,
-       "iv": 56.8,
-       "vol": 3,
-       "oi": 29
-      },
-      {
-       "strike": 255.0,
-       "bid": 39.85,
-       "ask": 41.0,
-       "iv": 59.6,
-       "vol": 10,
-       "oi": 238
-      },
-      {
-       "strike": 260.0,
-       "bid": 43.4,
-       "ask": 47.55,
-       "iv": 50.9,
-       "vol": 16,
-       "oi": 226
-      },
-      {
-       "strike": 265.0,
-       "bid": 47.9,
-       "ask": 52.75,
-       "iv": 94.4,
-       "vol": 1,
-       "oi": 8
-      },
-      {
-       "strike": 270.0,
-       "bid": 53.05,
-       "ask": 57.5,
-       "iv": 97.0,
-       "vol": 3,
-       "oi": 32
-      },
-      {
-       "strike": 275.0,
-       "bid": 57.75,
-       "ask": 62.7,
-       "iv": 104.8,
-       "vol": 10,
-       "oi": 0
+       "strike": 247.5,
+       "bid": 32.45,
+       "ask": 33.5,
+       "iv": 62.0,
+       "vol": 221,
+       "oi": 22
       }
      ],
-     "call_wall": 230.0,
-     "put_wall": 190.0,
-     "opt_volume": 51188
+     "call_wall": 245.0,
+     "put_wall": 225.0,
+     "opt_volume": 39271
     }
    ]
   },
@@ -64653,7 +64898,7 @@
      ],
      "call_wall": 170.0,
      "put_wall": 95.0,
-     "opt_volume": 65675
+     "opt_volume": 65743
     },
     {
      "date": "2026-09-04",
@@ -65045,25 +65290,25 @@
        "oi": 428
       },
       {
+       "strike": 167.5,
+       "bid": 20.25,
+       "ask": 22.65,
+       "iv": 69.3,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 170.0,
        "bid": 22.5,
        "ask": 25.15,
        "iv": 74.1,
        "vol": 2,
        "oi": 34
-      },
-      {
-       "strike": 172.5,
-       "bid": 24.5,
-       "ask": 27.75,
-       "iv": 80.3,
-       "vol": 2,
-       "oi": 12
       }
      ],
      "call_wall": 145.0,
      "put_wall": 125.0,
-     "opt_volume": 27800
+     "opt_volume": 27801
     },
     {
      "date": "2026-09-11",
@@ -65473,7 +65718,7 @@
      ],
      "call_wall": 190.0,
      "put_wall": 85.0,
-     "opt_volume": 6116
+     "opt_volume": 6136
     }
    ]
   },
@@ -65637,6 +65882,14 @@
        "oi": 1941
       },
       {
+       "strike": 197.5,
+       "bid": 0.49,
+       "ask": 0.51,
+       "iv": 53.0,
+       "vol": 2055,
+       "oi": 215
+      },
+      {
        "strike": 200.0,
        "bid": 0.35,
        "ask": 0.36,
@@ -65675,14 +65928,6 @@
        "iv": 68.4,
        "vol": 696,
        "oi": 877
-      },
-      {
-       "strike": 225.0,
-       "bid": 0.03,
-       "ask": 0.06,
-       "iv": 71.5,
-       "vol": 193,
-       "oi": 797
       }
      ],
      "puts": [
@@ -65839,6 +66084,14 @@
        "oi": 33
       },
       {
+       "strike": 197.5,
+       "bid": 16.95,
+       "ask": 18.9,
+       "iv": 70.5,
+       "vol": 18,
+       "oi": 0
+      },
+      {
        "strike": 200.0,
        "bid": 20.0,
        "ask": 21.15,
@@ -65877,19 +66130,11 @@
        "iv": 136.8,
        "vol": 0,
        "oi": 0
-      },
-      {
-       "strike": 255.0,
-       "bid": 73.15,
-       "ask": 76.75,
-       "iv": 187.8,
-       "vol": 0,
-       "oi": 0
       }
      ],
      "call_wall": 180.0,
      "put_wall": 170.0,
-     "opt_volume": 253964
+     "opt_volume": 255953
     },
     {
      "date": "2026-09-04",
@@ -66047,12 +66292,28 @@
        "oi": 919
       },
       {
+       "strike": 197.5,
+       "bid": 1.41,
+       "ask": 1.51,
+       "iv": 49.9,
+       "vol": 337,
+       "oi": 265
+      },
+      {
        "strike": 200.0,
        "bid": 1.12,
        "ask": 1.23,
        "iv": 50.7,
        "vol": 2384,
        "oi": 2683
+      },
+      {
+       "strike": 202.5,
+       "bid": 0.88,
+       "ask": 1.01,
+       "iv": 50.6,
+       "vol": 189,
+       "oi": 11
       },
       {
        "strike": 205.0,
@@ -66063,36 +66324,20 @@
        "oi": 662
       },
       {
+       "strike": 207.5,
+       "bid": 0.56,
+       "ask": 0.66,
+       "iv": 51.8,
+       "vol": 729,
+       "oi": 0
+      },
+      {
        "strike": 210.0,
        "bid": 0.46,
        "ask": 0.53,
        "iv": 52.6,
        "vol": 491,
        "oi": 4197
-      },
-      {
-       "strike": 215.0,
-       "bid": 0.27,
-       "ask": 0.4,
-       "iv": 54.2,
-       "vol": 77,
-       "oi": 219
-      },
-      {
-       "strike": 220.0,
-       "bid": 0.21,
-       "ask": 0.28,
-       "iv": 56.5,
-       "vol": 879,
-       "oi": 723
-      },
-      {
-       "strike": 225.0,
-       "bid": 0.11,
-       "ask": 0.25,
-       "iv": 58.7,
-       "vol": 42,
-       "oi": 296
       }
      ],
      "puts": [
@@ -66233,12 +66478,28 @@
        "oi": 27
       },
       {
+       "strike": 192.5,
+       "bid": 14.15,
+       "ask": 15.25,
+       "iv": 52.2,
+       "vol": 34,
+       "oi": 0
+      },
+      {
        "strike": 195.0,
        "bid": 16.5,
        "ask": 16.9,
        "iv": 49.0,
        "vol": 69,
        "oi": 9
+      },
+      {
+       "strike": 197.5,
+       "bid": 18.1,
+       "ask": 19.9,
+       "iv": 58.8,
+       "vol": 0,
+       "oi": 2
       },
       {
        "strike": 200.0,
@@ -66257,6 +66518,14 @@
        "oi": 8
       },
       {
+       "strike": 207.5,
+       "bid": 26.7,
+       "ask": 29.15,
+       "iv": 67.0,
+       "vol": 30,
+       "oi": 0
+      },
+      {
        "strike": 210.0,
        "bid": 29.1,
        "ask": 31.55,
@@ -66271,27 +66540,11 @@
        "iv": 51.1,
        "vol": 1,
        "oi": 0
-      },
-      {
-       "strike": 245.0,
-       "bid": 63.15,
-       "ask": 66.75,
-       "iv": 116.8,
-       "vol": 0,
-       "oi": 0
-      },
-      {
-       "strike": 320.0,
-       "bid": 138.15,
-       "ask": 141.75,
-       "iv": 184.5,
-       "vol": 2,
-       "oi": 0
       }
      ],
      "call_wall": 180.0,
      "put_wall": 150.0,
-     "opt_volume": 31699
+     "opt_volume": 33246
     },
     {
      "date": "2026-09-11",
@@ -66449,6 +66702,14 @@
        "oi": 867
       },
       {
+       "strike": 197.5,
+       "bid": 2.2,
+       "ask": 2.43,
+       "iv": 48.1,
+       "vol": 78,
+       "oi": 8
+      },
+      {
        "strike": 200.0,
        "bid": 1.88,
        "ask": 1.97,
@@ -66487,14 +66748,6 @@
        "iv": 51.7,
        "vol": 204,
        "oi": 105
-      },
-      {
-       "strike": 225.0,
-       "bid": 0.29,
-       "ask": 0.43,
-       "iv": 53.1,
-       "vol": 43,
-       "oi": 102
       }
      ],
      "puts": [
@@ -66619,6 +66872,14 @@
        "oi": 12
       },
       {
+       "strike": 187.5,
+       "bid": 11.9,
+       "ask": 12.25,
+       "iv": 46.1,
+       "vol": 16,
+       "oi": 0
+      },
+      {
        "strike": 190.0,
        "bid": 13.5,
        "ask": 14.0,
@@ -66689,19 +66950,11 @@
        "iv": 65.2,
        "vol": 0,
        "oi": 0
-      },
-      {
-       "strike": 290.0,
-       "bid": 108.1,
-       "ask": 112.0,
-       "iv": 133.4,
-       "vol": 1,
-       "oi": 0
       }
      ],
      "call_wall": 210.0,
      "put_wall": 100.0,
-     "opt_volume": 14240
+     "opt_volume": 14338
     }
    ]
   },
@@ -66713,20 +66966,20 @@
      "date": "2026-08-28",
      "calls": [
       {
-       "strike": 11.0,
-       "bid": 4.9,
-       "ask": 8.3,
-       "iv": 550.8,
-       "vol": 7,
-       "oi": 7
-      },
-      {
        "strike": 12.0,
        "bid": 4.6,
        "ask": 7.15,
        "iv": 458.4,
        "vol": 3,
        "oi": 29
+      },
+      {
+       "strike": 12.5,
+       "bid": 3.85,
+       "ask": 6.65,
+       "iv": 428.1,
+       "vol": 4,
+       "oi": 0
       },
       {
        "strike": 13.0,
@@ -67117,19 +67370,11 @@
      ],
      "call_wall": 23.0,
      "put_wall": 15.0,
-     "opt_volume": 27664
+     "opt_volume": 27682
     },
     {
      "date": "2026-09-04",
      "calls": [
-      {
-       "strike": 9.0,
-       "bid": 7.55,
-       "ask": 10.05,
-       "iv": 439.5,
-       "vol": 0,
-       "oi": 1
-      },
       {
        "strike": 10.0,
        "bid": 7.55,
@@ -67145,6 +67390,14 @@
        "iv": 329.1,
        "vol": 5,
        "oi": 6
+      },
+      {
+       "strike": 12.5,
+       "bid": 3.65,
+       "ask": 6.5,
+       "iv": 273.6,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 13.5,
@@ -67275,12 +67528,28 @@
        "oi": 286
       },
       {
+       "strike": 21.5,
+       "bid": 0.17,
+       "ask": 0.22,
+       "iv": 84.4,
+       "vol": 27,
+       "oi": 1
+      },
+      {
        "strike": 22.0,
        "bid": 0.14,
        "ask": 0.19,
        "iv": 87.1,
        "vol": 26,
        "oi": 334
+      },
+      {
+       "strike": 22.5,
+       "bid": 0.0,
+       "ask": 0.25,
+       "iv": 87.3,
+       "vol": 7,
+       "oi": 12
       },
       {
        "strike": 23.0,
@@ -67305,14 +67574,6 @@
        "iv": 90.6,
        "vol": 32,
        "oi": 257
-      },
-      {
-       "strike": 30.0,
-       "bid": 0.0,
-       "ask": 0.2,
-       "iv": 153.5,
-       "vol": 4,
-       "oi": 69
       }
      ],
      "puts": [
@@ -67499,22 +67760,30 @@
        "iv": 141.6,
        "vol": 1,
        "oi": 0
+      },
+      {
+       "strike": 30.0,
+       "bid": 11.05,
+       "ask": 14.15,
+       "iv": 222.9,
+       "vol": 1,
+       "oi": 0
       }
      ],
      "call_wall": 17.5,
      "put_wall": 12.0,
-     "opt_volume": 4127
+     "opt_volume": 4162
     },
     {
      "date": "2026-09-11",
      "calls": [
       {
-       "strike": 10.5,
-       "bid": 6.2,
-       "ask": 8.35,
-       "iv": 270.7,
-       "vol": 2,
-       "oi": 51
+       "strike": 11.5,
+       "bid": 4.45,
+       "ask": 8.4,
+       "iv": 87.5,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 12.5,
@@ -67831,6 +68100,14 @@
        "oi": 54
       },
       {
+       "strike": 19.5,
+       "bid": 1.49,
+       "ask": 2.83,
+       "iv": 68.9,
+       "vol": 0,
+       "oi": 3
+      },
+      {
        "strike": 20.0,
        "bid": 2.35,
        "ask": 3.0,
@@ -67871,12 +68148,28 @@
        "oi": 3
       },
       {
+       "strike": 24.0,
+       "bid": 5.35,
+       "ask": 7.5,
+       "iv": 109.6,
+       "vol": 0,
+       "oi": 1
+      },
+      {
        "strike": 25.0,
        "bid": 6.2,
        "ask": 8.45,
        "iv": 108.2,
        "vol": 0,
        "oi": 17
+      },
+      {
+       "strike": 26.0,
+       "bid": 6.9,
+       "ask": 9.45,
+       "iv": 93.4,
+       "vol": 0,
+       "oi": 1
       }
      ],
      "call_wall": 20.5,
@@ -68263,6 +68556,14 @@
        "oi": 10
       },
       {
+       "strike": 185.0,
+       "bid": 18.7,
+       "ask": 26.5,
+       "iv": 80.7,
+       "vol": 20,
+       "oi": 16
+      },
+      {
        "strike": 190.0,
        "bid": 23.7,
        "ask": 28.2,
@@ -68285,19 +68586,11 @@
        "iv": 121.4,
        "vol": 0,
        "oi": 1
-      },
-      {
-       "strike": 200.0,
-       "bid": 32.1,
-       "ask": 41.0,
-       "iv": 180.7,
-       "vol": 4,
-       "oi": 4
       }
      ],
      "call_wall": 200.0,
      "put_wall": 110.0,
-     "opt_volume": 30281
+     "opt_volume": 30301
     },
     {
      "date": "2026-09-04",
@@ -68649,6 +68942,14 @@
        "oi": 44
       },
       {
+       "strike": 177.5,
+       "bid": 17.4,
+       "ask": 18.7,
+       "iv": 73.1,
+       "vol": 0,
+       "oi": 2
+      },
+      {
        "strike": 180.0,
        "bid": 19.3,
        "ask": 20.7,
@@ -68663,6 +68964,22 @@
        "iv": 73.7,
        "vol": 3,
        "oi": 6
+      },
+      {
+       "strike": 190.0,
+       "bid": 24.1,
+       "ask": 32.2,
+       "iv": 71.3,
+       "vol": 0,
+       "oi": 10
+      },
+      {
+       "strike": 197.5,
+       "bid": 30.4,
+       "ask": 39.9,
+       "iv": 75.0,
+       "vol": 0,
+       "oi": 10
       },
       {
        "strike": 200.0,
@@ -68683,7 +69000,7 @@
      ],
      "call_wall": 165.0,
      "put_wall": 90.0,
-     "opt_volume": 8852
+     "opt_volume": 8857
     },
     {
      "date": "2026-09-11",
@@ -68849,6 +69166,14 @@
        "oi": 408
       },
       {
+       "strike": 182.5,
+       "bid": 4.3,
+       "ask": 5.0,
+       "iv": 73.4,
+       "vol": 2,
+       "oi": 0
+      },
+      {
        "strike": 185.0,
        "bid": 3.8,
        "ask": 4.4,
@@ -68879,14 +69204,6 @@
        "iv": 76.0,
        "vol": 783,
        "oi": 372
-      },
-      {
-       "strike": 205.0,
-       "bid": 1.35,
-       "ask": 1.85,
-       "iv": 76.5,
-       "vol": 1,
-       "oi": 35
       }
      ],
      "puts": [
@@ -69035,17 +69352,33 @@
        "oi": 21
       },
       {
+       "strike": 177.5,
+       "bid": 19.0,
+       "ask": 20.3,
+       "iv": 70.7,
+       "vol": 0,
+       "oi": 3
+      },
+      {
        "strike": 180.0,
        "bid": 20.9,
        "ask": 22.3,
        "iv": 71.5,
        "vol": 9,
        "oi": 13
+      },
+      {
+       "strike": 185.0,
+       "bid": 24.3,
+       "ask": 26.2,
+       "iv": 69.8,
+       "vol": 0,
+       "oi": 2
       }
      ],
      "call_wall": 170.0,
      "put_wall": 105.0,
-     "opt_volume": 5419
+     "opt_volume": 5424
     }
    ]
   },
@@ -69056,22 +69389,6 @@
     {
      "date": "2026-08-28",
      "calls": [
-      {
-       "strike": 380.0,
-       "bid": 38.6,
-       "ask": 39.8,
-       "iv": 52.1,
-       "vol": 1,
-       "oi": 183
-      },
-      {
-       "strike": 385.0,
-       "bid": 33.7,
-       "ask": 35.3,
-       "iv": 52.5,
-       "vol": 101,
-       "oi": 55
-      },
       {
        "strike": 390.0,
        "bid": 28.95,
@@ -69095,6 +69412,14 @@
        "iv": 45.2,
        "vol": 15,
        "oi": 43
+      },
+      {
+       "strike": 397.5,
+       "bid": 22.1,
+       "ask": 23.15,
+       "iv": 40.3,
+       "vol": 0,
+       "oi": 31
       },
       {
        "strike": 400.0,
@@ -69135,6 +69460,14 @@
        "iv": 38.7,
        "vol": 65,
        "oi": 554
+      },
+      {
+       "strike": 412.5,
+       "bid": 10.7,
+       "ask": 11.65,
+       "iv": 37.7,
+       "vol": 54,
+       "oi": 176
       },
       {
        "strike": 415.0,
@@ -69427,11 +69760,27 @@
        "oi": 1157
       },
       {
+       "strike": 442.5,
+       "bid": 23.8,
+       "ask": 25.45,
+       "iv": 42.2,
+       "vol": 15,
+       "oi": 98
+      },
+      {
        "strike": 445.0,
        "bid": 26.0,
        "ask": 27.75,
        "iv": 43.4,
        "vol": 3,
+       "oi": 15
+      },
+      {
+       "strike": 447.5,
+       "bid": 28.2,
+       "ask": 30.1,
+       "iv": 44.8,
+       "vol": 0,
        "oi": 15
       },
       {
@@ -69441,63 +69790,15 @@
        "iv": 46.0,
        "vol": 20,
        "oi": 345
-      },
-      {
-       "strike": 455.0,
-       "bid": 35.95,
-       "ask": 37.3,
-       "iv": 49.4,
-       "vol": 20,
-       "oi": 38
-      },
-      {
-       "strike": 460.0,
-       "bid": 40.25,
-       "ask": 42.2,
-       "iv": 53.0,
-       "vol": 1,
-       "oi": 21
       }
      ],
      "call_wall": 417.5,
      "put_wall": 400.0,
-     "opt_volume": 21756
+     "opt_volume": 22065
     },
     {
      "date": "2026-09-04",
      "calls": [
-      {
-       "strike": 360.0,
-       "bid": 58.95,
-       "ask": 60.8,
-       "iv": 51.1,
-       "vol": 1,
-       "oi": 44
-      },
-      {
-       "strike": 365.0,
-       "bid": 54.05,
-       "ask": 55.6,
-       "iv": 54.2,
-       "vol": 0,
-       "oi": 14
-      },
-      {
-       "strike": 370.0,
-       "bid": 49.2,
-       "ask": 51.15,
-       "iv": 54.3,
-       "vol": 1,
-       "oi": 5151
-      },
-      {
-       "strike": 375.0,
-       "bid": 44.4,
-       "ask": 46.05,
-       "iv": 49.3,
-       "vol": 11,
-       "oi": 13
-      },
       {
        "strike": 380.0,
        "bid": 39.7,
@@ -69531,6 +69832,14 @@
        "oi": 38
       },
       {
+       "strike": 397.5,
+       "bid": 24.4,
+       "ask": 25.8,
+       "iv": 39.7,
+       "vol": 5,
+       "oi": 0
+      },
+      {
        "strike": 400.0,
        "bid": 22.45,
        "ask": 23.6,
@@ -69547,12 +69856,28 @@
        "oi": 136
       },
       {
+       "strike": 407.5,
+       "bid": 17.05,
+       "ask": 18.35,
+       "iv": 37.8,
+       "vol": 2,
+       "oi": 11
+      },
+      {
        "strike": 410.0,
        "bid": 15.45,
        "ask": 16.35,
        "iv": 36.3,
        "vol": 10,
        "oi": 125
+      },
+      {
+       "strike": 412.5,
+       "bid": 13.95,
+       "ask": 14.9,
+       "iv": 36.4,
+       "vol": 27,
+       "oi": 45
       },
       {
        "strike": 415.0,
@@ -69563,12 +69888,28 @@
        "oi": 285
       },
       {
+       "strike": 417.5,
+       "bid": 11.2,
+       "ask": 12.05,
+       "iv": 35.9,
+       "vol": 84,
+       "oi": 19
+      },
+      {
        "strike": 420.0,
        "bid": 9.95,
        "ask": 10.65,
        "iv": 35.4,
        "vol": 271,
        "oi": 457
+      },
+      {
+       "strike": 422.5,
+       "bid": 8.8,
+       "ask": 9.5,
+       "iv": 35.3,
+       "vol": 8,
+       "oi": 14
       },
       {
        "strike": 425.0,
@@ -69579,12 +69920,28 @@
        "oi": 13242
       },
       {
+       "strike": 427.5,
+       "bid": 6.8,
+       "ask": 7.4,
+       "iv": 35.0,
+       "vol": 46,
+       "oi": 84
+      },
+      {
        "strike": 430.0,
        "bid": 5.9,
        "ask": 6.6,
        "iv": 35.3,
        "vol": 63,
        "oi": 601
+      },
+      {
+       "strike": 432.5,
+       "bid": 5.15,
+       "ask": 5.8,
+       "iv": 35.3,
+       "vol": 101,
+       "oi": 61
       },
       {
        "strike": 435.0,
@@ -69595,12 +69952,28 @@
        "oi": 163
       },
       {
+       "strike": 437.5,
+       "bid": 3.8,
+       "ask": 4.4,
+       "iv": 35.2,
+       "vol": 11,
+       "oi": 19
+      },
+      {
        "strike": 440.0,
        "bid": 3.3,
        "ask": 3.75,
        "iv": 34.9,
        "vol": 88,
        "oi": 802
+      },
+      {
+       "strike": 442.5,
+       "bid": 2.87,
+       "ask": 3.25,
+       "iv": 35.0,
+       "vol": 49,
+       "oi": 34
       },
       {
        "strike": 445.0,
@@ -69611,111 +69984,23 @@
        "oi": 246
       },
       {
+       "strike": 447.5,
+       "bid": 2.03,
+       "ask": 2.46,
+       "iv": 35.3,
+       "vol": 2,
+       "oi": 21
+      },
+      {
        "strike": 450.0,
        "bid": 1.77,
        "ask": 2.03,
        "iv": 35.0,
        "vol": 139,
        "oi": 338
-      },
-      {
-       "strike": 455.0,
-       "bid": 1.22,
-       "ask": 1.59,
-       "iv": 35.9,
-       "vol": 11,
-       "oi": 318
-      },
-      {
-       "strike": 460.0,
-       "bid": 0.91,
-       "ask": 1.06,
-       "iv": 35.3,
-       "vol": 99,
-       "oi": 548
-      },
-      {
-       "strike": 465.0,
-       "bid": 0.59,
-       "ask": 0.78,
-       "iv": 35.7,
-       "vol": 34,
-       "oi": 178
-      },
-      {
-       "strike": 470.0,
-       "bid": 0.41,
-       "ask": 0.58,
-       "iv": 36.2,
-       "vol": 3,
-       "oi": 509
-      },
-      {
-       "strike": 475.0,
-       "bid": 0.24,
-       "ask": 0.43,
-       "iv": 36.7,
-       "vol": 4,
-       "oi": 265
-      },
-      {
-       "strike": 480.0,
-       "bid": 0.25,
-       "ask": 0.34,
-       "iv": 37.7,
-       "vol": 5,
-       "oi": 255
       }
      ],
      "puts": [
-      {
-       "strike": 360.0,
-       "bid": 0.34,
-       "ask": 0.48,
-       "iv": 44.9,
-       "vol": 94,
-       "oi": 685
-      },
-      {
-       "strike": 365.0,
-       "bid": 0.41,
-       "ask": 0.63,
-       "iv": 43.7,
-       "vol": 17,
-       "oi": 397
-      },
-      {
-       "strike": 370.0,
-       "bid": 0.5,
-       "ask": 0.7,
-       "iv": 41.0,
-       "vol": 22,
-       "oi": 449
-      },
-      {
-       "strike": 375.0,
-       "bid": 0.65,
-       "ask": 0.92,
-       "iv": 39.8,
-       "vol": 29,
-       "oi": 442
-      },
-      {
-       "strike": 380.0,
-       "bid": 0.9,
-       "ask": 1.2,
-       "iv": 38.5,
-       "vol": 51,
-       "oi": 721
-      },
-      {
-       "strike": 385.0,
-       "bid": 1.25,
-       "ask": 1.65,
-       "iv": 37.7,
-       "vol": 66,
-       "oi": 1001
-      },
       {
        "strike": 390.0,
        "bid": 1.79,
@@ -69723,6 +70008,14 @@
        "iv": 36.0,
        "vol": 127,
        "oi": 601
+      },
+      {
+       "strike": 392.5,
+       "bid": 2.11,
+       "ask": 2.53,
+       "iv": 36.3,
+       "vol": 15,
+       "oi": 0
       },
       {
        "strike": 395.0,
@@ -69733,12 +70026,28 @@
        "oi": 1298
       },
       {
+       "strike": 397.5,
+       "bid": 2.92,
+       "ask": 3.4,
+       "iv": 35.6,
+       "vol": 20,
+       "oi": 0
+      },
+      {
        "strike": 400.0,
        "bid": 3.3,
        "ask": 3.9,
        "iv": 35.2,
        "vol": 79,
        "oi": 1617
+      },
+      {
+       "strike": 402.5,
+       "bid": 3.9,
+       "ask": 4.6,
+       "iv": 35.3,
+       "vol": 24,
+       "oi": 48
       },
       {
        "strike": 405.0,
@@ -69749,12 +70058,28 @@
        "oi": 731
       },
       {
+       "strike": 407.5,
+       "bid": 5.3,
+       "ask": 6.0,
+       "iv": 34.6,
+       "vol": 13,
+       "oi": 59
+      },
+      {
        "strike": 410.0,
        "bid": 6.2,
        "ask": 6.9,
        "iv": 34.6,
        "vol": 98,
        "oi": 480
+      },
+      {
+       "strike": 412.5,
+       "bid": 7.1,
+       "ask": 7.85,
+       "iv": 34.4,
+       "vol": 24,
+       "oi": 34
       },
       {
        "strike": 415.0,
@@ -69765,12 +70090,28 @@
        "oi": 247
       },
       {
+       "strike": 417.5,
+       "bid": 9.1,
+       "ask": 10.05,
+       "iv": 34.2,
+       "vol": 90,
+       "oi": 75
+      },
+      {
        "strike": 420.0,
        "bid": 10.3,
        "ask": 11.05,
        "iv": 33.3,
        "vol": 408,
        "oi": 1201
+      },
+      {
+       "strike": 422.5,
+       "bid": 11.6,
+       "ask": 12.7,
+       "iv": 34.2,
+       "vol": 34,
+       "oi": 10
       },
       {
        "strike": 425.0,
@@ -69781,12 +70122,28 @@
        "oi": 127
       },
       {
+       "strike": 427.5,
+       "bid": 14.5,
+       "ask": 15.75,
+       "iv": 34.4,
+       "vol": 7,
+       "oi": 9
+      },
+      {
        "strike": 430.0,
        "bid": 16.2,
        "ask": 17.45,
        "iv": 34.6,
        "vol": 462,
        "oi": 139
+      },
+      {
+       "strike": 432.5,
+       "bid": 18.05,
+       "ask": 19.25,
+       "iv": 34.9,
+       "vol": 0,
+       "oi": 1
       },
       {
        "strike": 435.0,
@@ -69803,6 +70160,14 @@
        "iv": 35.9,
        "vol": 5,
        "oi": 52
+      },
+      {
+       "strike": 442.5,
+       "bid": 25.35,
+       "ask": 27.1,
+       "iv": 36.3,
+       "vol": 10,
+       "oi": 0
       },
       {
        "strike": 445.0,
@@ -69835,55 +70200,15 @@
        "iv": 40.5,
        "vol": 1,
        "oi": 3
-      },
-      {
-       "strike": 465.0,
-       "bid": 45.9,
-       "ask": 47.6,
-       "iv": 42.1,
-       "vol": 20,
-       "oi": 22
-      },
-      {
-       "strike": 470.0,
-       "bid": 50.45,
-       "ask": 52.45,
-       "iv": 44.0,
-       "vol": 105,
-       "oi": 23
-      },
-      {
-       "strike": 475.0,
-       "bid": 55.25,
-       "ask": 57.3,
-       "iv": 45.8,
-       "vol": 0,
-       "oi": 1
-      },
-      {
-       "strike": 480.0,
-       "bid": 60.15,
-       "ask": 62.2,
-       "iv": 47.7,
-       "vol": 3,
-       "oi": 33
       }
      ],
      "call_wall": 485.0,
      "put_wall": 260.0,
-     "opt_volume": 5521
+     "opt_volume": 6240
     },
     {
      "date": "2026-09-11",
      "calls": [
-      {
-       "strike": 340.0,
-       "bid": 79.05,
-       "ask": 81.85,
-       "iv": 59.1,
-       "vol": 2,
-       "oi": 1
-      },
       {
        "strike": 345.0,
        "bid": 74.15,
@@ -69923,6 +70248,14 @@
        "iv": 42.8,
        "vol": 2,
        "oi": 3
+      },
+      {
+       "strike": 385.0,
+       "bid": 36.45,
+       "ask": 38.3,
+       "iv": 42.3,
+       "vol": 0,
+       "oi": 26
       },
       {
        "strike": 390.0,
@@ -70239,6 +70572,14 @@
        "oi": 2
       },
       {
+       "strike": 460.0,
+       "bid": 41.8,
+       "ask": 43.7,
+       "iv": 36.7,
+       "vol": 0,
+       "oi": 1
+      },
+      {
        "strike": 470.0,
        "bid": 50.45,
        "ask": 52.95,
@@ -70269,14 +70610,6 @@
        "iv": 56.4,
        "vol": 1,
        "oi": 0
-      },
-      {
-       "strike": 510.0,
-       "bid": 89.3,
-       "ask": 93.25,
-       "iv": 58.9,
-       "vol": 0,
-       "oi": 0
       }
      ],
      "call_wall": 440.0,
@@ -70293,28 +70626,20 @@
      "date": "2026-08-28",
      "calls": [
       {
-       "strike": 425.0,
-       "bid": 38.1,
-       "ask": 45.0,
-       "iv": 87.3,
-       "vol": 74,
-       "oi": 40
-      },
-      {
-       "strike": 427.5,
-       "bid": 35.95,
-       "ask": 43.0,
-       "iv": 86.0,
-       "vol": 15,
-       "oi": 16
-      },
-      {
        "strike": 430.0,
        "bid": 33.65,
        "ask": 41.0,
        "iv": 84.1,
        "vol": 20,
        "oi": 48
+      },
+      {
+       "strike": 432.5,
+       "bid": 31.5,
+       "ask": 39.0,
+       "iv": 82.4,
+       "vol": 0,
+       "oi": 20
       },
       {
        "strike": 435.0,
@@ -70389,12 +70714,28 @@
        "oi": 82
       },
       {
+       "strike": 457.5,
+       "bid": 15.5,
+       "ask": 19.6,
+       "iv": 70.6,
+       "vol": 12,
+       "oi": 0
+      },
+      {
        "strike": 460.0,
        "bid": 17.0,
        "ask": 18.2,
        "iv": 76.1,
        "vol": 40,
        "oi": 139
+      },
+      {
+       "strike": 462.5,
+       "bid": 13.4,
+       "ask": 19.5,
+       "iv": 76.1,
+       "vol": 36,
+       "oi": 17
       },
       {
        "strike": 465.0,
@@ -70469,28 +70810,20 @@
        "oi": 57
       },
       {
+       "strike": 487.5,
+       "bid": 5.5,
+       "ask": 10.1,
+       "iv": 76.7,
+       "vol": 3,
+       "oi": 5
+      },
+      {
        "strike": 490.0,
        "bid": 6.3,
        "ask": 7.4,
        "iv": 75.0,
        "vol": 39,
        "oi": 275
-      },
-      {
-       "strike": 495.0,
-       "bid": 4.35,
-       "ask": 7.9,
-       "iv": 77.1,
-       "vol": 37,
-       "oi": 155
-      },
-      {
-       "strike": 500.0,
-       "bid": 4.05,
-       "ask": 5.35,
-       "iv": 74.4,
-       "vol": 356,
-       "oi": 784
       }
      ],
      "puts": [
@@ -70679,45 +71012,29 @@
        "oi": 233
       },
       {
+       "strike": 487.5,
+       "bid": 30.0,
+       "ask": 39.0,
+       "iv": 69.8,
+       "vol": 49,
+       "oi": 38
+      },
+      {
        "strike": 490.0,
        "bid": 32.05,
        "ask": 41.0,
        "iv": 70.3,
        "vol": 26,
        "oi": 211
-      },
-      {
-       "strike": 495.0,
-       "bid": 36.0,
-       "ask": 44.3,
-       "iv": 68.4,
-       "vol": 32,
-       "oi": 81
       }
      ],
      "call_wall": 770.0,
      "put_wall": 360.0,
-     "opt_volume": 9370
+     "opt_volume": 10429
     },
     {
      "date": "2026-09-04",
      "calls": [
-      {
-       "strike": 400.0,
-       "bid": 63.15,
-       "ask": 70.0,
-       "iv": 84.0,
-       "vol": 1,
-       "oi": 5
-      },
-      {
-       "strike": 405.0,
-       "bid": 59.15,
-       "ask": 66.0,
-       "iv": 83.4,
-       "vol": 2,
-       "oi": 9
-      },
       {
        "strike": 410.0,
        "bid": 55.7,
@@ -70791,12 +71108,28 @@
        "oi": 38
       },
       {
+       "strike": 452.5,
+       "bid": 27.15,
+       "ask": 29.55,
+       "iv": 72.1,
+       "vol": 10,
+       "oi": 0
+      },
+      {
        "strike": 455.0,
        "bid": 24.9,
        "ask": 28.2,
        "iv": 70.5,
        "vol": 1,
        "oi": 34
+      },
+      {
+       "strike": 457.5,
+       "bid": 25.25,
+       "ask": 28.25,
+       "iv": 74.7,
+       "vol": 0,
+       "oi": 3
       },
       {
        "strike": 460.0,
@@ -70807,12 +71140,28 @@
        "oi": 39
       },
       {
+       "strike": 462.5,
+       "bid": 22.45,
+       "ask": 24.05,
+       "iv": 71.4,
+       "vol": 1,
+       "oi": 0
+      },
+      {
        "strike": 465.0,
        "bid": 21.6,
        "ask": 23.2,
        "iv": 72.1,
        "vol": 10,
        "oi": 33
+      },
+      {
+       "strike": 467.5,
+       "bid": 20.45,
+       "ask": 23.4,
+       "iv": 73.9,
+       "vol": 8,
+       "oi": 0
       },
       {
        "strike": 470.0,
@@ -70823,12 +71172,28 @@
        "oi": 34
       },
       {
+       "strike": 472.5,
+       "bid": 18.35,
+       "ask": 20.2,
+       "iv": 72.1,
+       "vol": 1,
+       "oi": 6
+      },
+      {
        "strike": 475.0,
        "bid": 17.35,
        "ask": 19.15,
        "iv": 71.9,
        "vol": 5,
        "oi": 65
+      },
+      {
+       "strike": 477.5,
+       "bid": 16.45,
+       "ask": 18.15,
+       "iv": 71.8,
+       "vol": 5,
+       "oi": 6
       },
       {
        "strike": 480.0,
@@ -70839,6 +71204,14 @@
        "oi": 59
       },
       {
+       "strike": 482.5,
+       "bid": 14.8,
+       "ask": 17.4,
+       "iv": 73.5,
+       "vol": 1,
+       "oi": 1
+      },
+      {
        "strike": 485.0,
        "bid": 14.65,
        "ask": 16.5,
@@ -70847,103 +71220,23 @@
        "oi": 76
       },
       {
+       "strike": 487.5,
+       "bid": 13.35,
+       "ask": 15.8,
+       "iv": 73.7,
+       "vol": 2,
+       "oi": 3
+      },
+      {
        "strike": 490.0,
        "bid": 12.65,
        "ask": 18.2,
        "iv": 78.7,
        "vol": 2,
        "oi": 49
-      },
-      {
-       "strike": 495.0,
-       "bid": 11.4,
-       "ask": 13.6,
-       "iv": 74.1,
-       "vol": 1,
-       "oi": 16
-      },
-      {
-       "strike": 500.0,
-       "bid": 10.4,
-       "ask": 12.35,
-       "iv": 74.7,
-       "vol": 32,
-       "oi": 200
-      },
-      {
-       "strike": 505.0,
-       "bid": 9.3,
-       "ask": 11.45,
-       "iv": 75.4,
-       "vol": 1,
-       "oi": 128
-      },
-      {
-       "strike": 510.0,
-       "bid": 5.55,
-       "ask": 10.1,
-       "iv": 70.1,
-       "vol": 24,
-       "oi": 137
-      },
-      {
-       "strike": 515.0,
-       "bid": 7.2,
-       "ask": 9.15,
-       "iv": 75.0,
-       "vol": 14,
-       "oi": 111
-      },
-      {
-       "strike": 520.0,
-       "bid": 3.75,
-       "ask": 11.4,
-       "iv": 76.2,
-       "vol": 13,
-       "oi": 42
       }
      ],
      "puts": [
-      {
-       "strike": 400.0,
-       "bid": 4.5,
-       "ask": 5.45,
-       "iv": 73.6,
-       "vol": 26,
-       "oi": 211
-      },
-      {
-       "strike": 405.0,
-       "bid": 5.2,
-       "ask": 6.65,
-       "iv": 73.6,
-       "vol": 19,
-       "oi": 41
-      },
-      {
-       "strike": 410.0,
-       "bid": 3.35,
-       "ask": 7.0,
-       "iv": 65.5,
-       "vol": 9,
-       "oi": 998
-      },
-      {
-       "strike": 415.0,
-       "bid": 3.8,
-       "ask": 9.95,
-       "iv": 68.2,
-       "vol": 20,
-       "oi": 389
-      },
-      {
-       "strike": 420.0,
-       "bid": 6.1,
-       "ask": 11.55,
-       "iv": 71.0,
-       "vol": 33,
-       "oi": 223
-      },
       {
        "strike": 425.0,
        "bid": 6.8,
@@ -70951,6 +71244,14 @@
        "iv": 70.6,
        "vol": 25,
        "oi": 72
+      },
+      {
+       "strike": 427.5,
+       "bid": 6.45,
+       "ask": 14.4,
+       "iv": 68.8,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 430.0,
@@ -70969,12 +71270,28 @@
        "oi": 133
       },
       {
+       "strike": 437.5,
+       "bid": 10.35,
+       "ask": 17.8,
+       "iv": 69.5,
+       "vol": 4,
+       "oi": 0
+      },
+      {
        "strike": 440.0,
        "bid": 14.35,
        "ask": 18.8,
        "iv": 74.2,
        "vol": 2,
        "oi": 198
+      },
+      {
+       "strike": 442.5,
+       "bid": 15.25,
+       "ask": 19.8,
+       "iv": 74.0,
+       "vol": 2,
+       "oi": 0
       },
       {
        "strike": 445.0,
@@ -70993,12 +71310,28 @@
        "oi": 332
       },
       {
+       "strike": 452.5,
+       "bid": 19.5,
+       "ask": 21.25,
+       "iv": 69.0,
+       "vol": 1,
+       "oi": 1
+      },
+      {
        "strike": 455.0,
        "bid": 20.8,
        "ask": 22.55,
        "iv": 69.3,
        "vol": 8,
        "oi": 143
+      },
+      {
+       "strike": 457.5,
+       "bid": 21.9,
+       "ask": 23.8,
+       "iv": 69.0,
+       "vol": 2,
+       "oi": 1
       },
       {
        "strike": 460.0,
@@ -71009,12 +71342,28 @@
        "oi": 180
       },
       {
+       "strike": 462.5,
+       "bid": 24.4,
+       "ask": 26.75,
+       "iv": 69.2,
+       "vol": 3,
+       "oi": 1
+      },
+      {
        "strike": 465.0,
        "bid": 25.9,
        "ask": 28.35,
        "iv": 69.7,
        "vol": 9,
        "oi": 64
+      },
+      {
+       "strike": 467.5,
+       "bid": 27.4,
+       "ask": 29.25,
+       "iv": 69.1,
+       "vol": 1,
+       "oi": 0
       },
       {
        "strike": 470.0,
@@ -71025,12 +71374,28 @@
        "oi": 113
       },
       {
+       "strike": 472.5,
+       "bid": 29.7,
+       "ask": 32.45,
+       "iv": 68.4,
+       "vol": 0,
+       "oi": 10
+      },
+      {
        "strike": 475.0,
        "bid": 31.65,
        "ask": 35.55,
        "iv": 71.3,
        "vol": 1,
        "oi": 79
+      },
+      {
+       "strike": 477.5,
+       "bid": 33.35,
+       "ask": 37.0,
+       "iv": 71.3,
+       "vol": 2,
+       "oi": 22
       },
       {
        "strike": 480.0,
@@ -71041,6 +71406,14 @@
        "oi": 85
       },
       {
+       "strike": 482.5,
+       "bid": 36.7,
+       "ask": 38.85,
+       "iv": 69.3,
+       "vol": 0,
+       "oi": 77
+      },
+      {
        "strike": 485.0,
        "bid": 38.35,
        "ask": 40.9,
@@ -71049,65 +71422,25 @@
        "oi": 128
       },
       {
+       "strike": 487.5,
+       "bid": 40.0,
+       "ask": 42.7,
+       "iv": 69.8,
+       "vol": 2,
+       "oi": 7
+      },
+      {
        "strike": 490.0,
        "bid": 41.65,
        "ask": 44.65,
        "iv": 69.9,
        "vol": 120,
        "oi": 157
-      },
-      {
-       "strike": 495.0,
-       "bid": 45.45,
-       "ask": 48.25,
-       "iv": 70.2,
-       "vol": 6,
-       "oi": 58
-      },
-      {
-       "strike": 500.0,
-       "bid": 46.75,
-       "ask": 52.7,
-       "iv": 67.2,
-       "vol": 121,
-       "oi": 206
-      },
-      {
-       "strike": 505.0,
-       "bid": 50.25,
-       "ask": 57.8,
-       "iv": 68.7,
-       "vol": 2,
-       "oi": 105
-      },
-      {
-       "strike": 510.0,
-       "bid": 54.0,
-       "ask": 61.7,
-       "iv": 68.0,
-       "vol": 1,
-       "oi": 102
-      },
-      {
-       "strike": 515.0,
-       "bid": 58.0,
-       "ask": 66.75,
-       "iv": 69.8,
-       "vol": 3,
-       "oi": 390
-      },
-      {
-       "strike": 520.0,
-       "bid": 62.0,
-       "ask": 70.65,
-       "iv": 68.8,
-       "vol": 1,
-       "oi": 294
       }
      ],
      "call_wall": 560.0,
      "put_wall": 410.0,
-     "opt_volume": 2855
+     "opt_volume": 3109
     },
     {
      "date": "2026-09-11",
@@ -71517,7 +71850,7 @@
      ],
      "call_wall": 465.0,
      "put_wall": 430.0,
-     "opt_volume": 1016
+     "opt_volume": 1026
     }
    ]
   }
@@ -73642,12 +73975,12 @@
    "titles": {},
    "macro_scores": {
     "fear_greed": 55,
-    "risk_sentiment": 54,
+    "risk_sentiment": 55,
     "credit": 80,
     "systemic_risk": 78,
-    "corp_profit": 50,
+    "corp_profit": 58,
     "sp500_pe": 51,
-    "smart_money": 64,
+    "smart_money": 65,
     "macroquant": 55,
     "seasonality": 58,
     "in:cpi": 55,
@@ -73768,6 +74101,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-08-23T16:25:01Z"
+  "generated_at": "2026-08-23T19:55:40Z"
  }
 }
