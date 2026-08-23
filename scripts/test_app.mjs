@@ -3292,6 +3292,446 @@ check("v346 i settori ambigui sono ordinati per divergenza, e l'ordine e' dichia
   const i0 = blocco.indexOf("(" + amb[0].ticker + ")"), i1 = blocco.indexOf("(" + amb[1].ticker + ")");
   return i0 > 0 && i1 > 0 && i0 < i1`));
 
+/* ══ v347 — I CHECK TORNANO CON IL CODICE CHE SORVEGLIAVANO ══════════════════════════════
+   La v341 ne aveva tolti 86 perche' il pacchetto del titolo e quello del portafoglio non
+   esistevano piu': un check su codice assente e' un ramo irraggiungibile (classe v234).
+   Ora il codice torna e con lui i suoi invarianti. Ne rientrano 53 e non 86: gli altri
+   sorvegliavano il pacchetto di SETTORE, quello di PORTAFOGLIO e il PDF, che restano fuori
+   perche' il CEO non li ha chiesti. Ripristinare anche quelli sarebbe la classe v201-v204 nel
+   verso opposto: riportare indietro il vicino di cio' che serviva.
+   ⚠⚠ L'ESTRAZIONE E' STATA SBAGLIATA TRE VOLTE, e ogni volta il guardiano ha rifiutato la
+   scrittura invece di lasciare il file rotto: (1) risalendo il commento sopra un check si
+   catturava la CODA di un commento senza la sua apertura; (2) la coda del segmento portava con
+   se' il commento del check successivo; (3) portava anche una DICHIARAZIONE CONDIVISA del file
+   (SEZIONI_DI_INDEX), che reinserita si duplicava. Un blocco estratto da una versione vecchia
+   non e' "il testo fra due righe": e' un'unita' sintattica, e va verificata come tale. */
+
+check("v259 analisi titolo: la gerarchia delle fonti c'e' e i forum sono esclusi per nome", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /GERARCHIA DELLE FONTI/.test(t)
+      && /FONTE PRIMARIA/.test(t)
+      && /NON SONO FONTI/.test(t) && /Reddit/.test(t) && /StockTwits/.test(t)`));
+
+check("v259 analisi titolo: impone UN prezzo di riferimento con data e ora", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /IL PREZZO DI RIFERIMENTO E' UNO SOLO/.test(t)
+      && /valore, data e ora/.test(t)
+      && /tre giorni diversi/.test(t)`));
+
+check("v259 analisi titolo: vieta il [VERIFICATO] su un numero ricavato", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  /* ⚠ le parentesi quadre vanno escapate DUE volte: una per la regex, una perche' il check
+     vive dentro un template literal che passa per vm.runInContext. La prima stesura ne aveva
+     una sola e la regex cercava una classe di caratteri invece del letterale. */
+  return /NIENTE .VERIFICATO. DERIVATO/.test(t) && /.STIMA./.test(t) && /si scrive/.test(t)`));
+
+check("v257 analisi titolo: la ricerca online e' il PASSO 0, obbligatorio e prima di tutto", suVeri(`
+  const t = buildPromptTicker("nvda");
+  return /PASSO 0/.test(t) && /OBBLIGATORIO/.test(t)
+      && /CERCA ONLINE/.test(t) && /Non e' un'opzione/.test(t)`));
+
+check("v257 analisi titolo: chiude la scappatoia del referto tutto-n.d.", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /SE NON PUOI NAVIGARE/.test(t)
+      && /FERMATI/.test(t)
+      && /mai come politica generale/.test(t)`));
+
+check("v257 analisi titolo: dice DOVE cercare, con fonti nominate e il ticker nell'URL", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /DOVE CERCARE/.test(t) && /finance\\.yahoo\\.com\\/quote\\/NVDA/.test(t)
+      && /stockanalysis\\.com/.test(t) && /sec\\.gov/.test(t)`));
+
+check("v257 analisi titolo: chiede le consegne che il CEO ha elencato", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /Concorrente/.test(t) && /[Qq]uota di mercato/.test(t)
+      && /[Tt]rimestral/.test(t) && /PROSSIMA/.test(t)
+      && /Supporti e resistenze/.test(t) && /SENTIMENT/.test(t)
+      && /[Ii]ngressi/.test(t) && /rischio-rendimento/.test(t)`));
+
+check("v257 analisi titolo: dichiara data del dato macro e prossimo aggiornamento", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /Snapshot del /.test(t) && /prossimo aggiornamento atteso/.test(t)
+      && /prossimo run del sistema/.test(t)`));
+
+check("v257 analisi titolo: porta dentro di se' il quadro macro", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return /ANALISI DI NVDA/.test(t) && /QUADRO MACRO/.test(t)`));
+
+check("v308 analisi titolo: il divieto di dimensionare resta, con la ragione giusta", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  return t.indexOf("In nessun caso dimensionare") >= 0
+      && t.indexOf("niente stop in euro") >= 0
+      && t.indexOf("non conosce liquidita'") >= 0
+      && t.indexOf("Non conosco la tua posizione") < 0`));
+
+check("v308 analisi titolo: dichiara la posizione se c'e', tace se non c'e'", suVeri(`
+  const dentro = ((DATA.watchlist || []).find(r => r && r.qta > 0 && r.pmc > 0) || {}).ticker;
+  if (!dentro) return true;
+  const conPos = buildPromptTicker(dentro);
+  const senzaPos = buildPromptTicker("TSLA");
+  return conPos.indexOf("GIA' IN PORTAFOGLIO") >= 0
+      && senzaPos.indexOf("GIA' IN PORTAFOGLIO") < 0`));
+
+check("v256 analisi titolo: ticker vuoto non produce nessun pacchetto", suVeri(`
+  return buildPromptTicker("") === "" && buildPromptTicker("   ") === ""`));
+
+check("v256 analisi titolo: una sola testata nel pacchetto (quella spot), non due", suVeri(`
+  const t = buildPromptTicker("NVDA");
+  const h = promptHeaderText();
+  return !t.includes(h)`));
+
+check("v271 pacchetto titolo: porta i livelli che il sistema gia' conosce", run(`
+  const p = buildPromptTicker("NVDA");
+  const r = (DATA.watchlist || []).concat(DATA.portfolio || []).find(x => x.ticker === "NVDA");
+  if (!r) return true;
+  return p.includes("QUELLO CHE IL SISTEMA SA GIA'")
+      && p.includes(String(r.support)) && p.includes(String(r.resistance))
+      && p.includes(String(r.rsi))`));
+
+check("v271 pacchetto titolo: dice cosa fare se il web diverge, invece di lasciar scegliere in silenzio", (() => {
+  const i = src.indexOf("function datiNostriDelTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 1));
+  return corpo.includes("2%")                       // la soglia di materialita' e' dichiarata
+      && /entrambi i valori|tutti e due/.test(corpo)  // si scrivono tutti e due, non uno solo
+      && /silenzio/.test(corpo);                      // e la scelta silenziosa e' nominata come tale
+})());
+
+check("v271 pacchetto titolo: nessun blocco per un titolo che la pipeline non segue", run(`
+  return !buildPromptTicker("ZZZZ-INESISTENTE").includes("QUELLO CHE IL SISTEMA SA GIA'")`));
+
+check("v273 pacchetto titolo: il prezzo pre/after entra nel pacchetto, non solo in tabella", (() => {
+  /* v274 — il pre/after non si rilegge piu' da quoteLive qui dentro: arriva da fattiTitolo,
+     il punto unico. La proprieta' da controllare resta che il pacchetto lo PORTI. */
+  const i = src.indexOf("function datiNostriDelTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /f\.ext/.test(corpo) && /PRE-MARKET/.test(corpo) && /AFTER-HOURS/.test(corpo);
+})());
+
+check("v274 fatti: la scheda livelli e il pacchetto leggono tutti da fattiTitolo", (() => {
+  const puro = (nome, finoA) => {
+    const i = src.indexOf("function " + nome);
+    if (i < 0) return "";
+    const j = finoA ? src.indexOf(finoA, i) : src.indexOf("\nfunction ", i + 10);
+    return src.slice(i, j > 0 ? j : i + 4000).replace(/\/\*[\s\S]*?\*\//g, "");
+  };
+  /* v275 — datiSimbolo e' uscito con la watchlist; i consumatori sono due, e la regola non
+     cambia: nessuno si rifa' i conti da solo sulle fonti grezze. */
+  const consumatori = ["livelliTitolo", "datiNostriDelTitolo"];
+  return consumatori.every(n => {
+    const c = puro(n);
+    /* deve chiamare fattiTitolo e NON rifarsi i conti da solo su DATA */
+    return /fattiTitolo\(/.test(c)
+        && !/DATA\.portfolio/.test(c) && !/DATA\.watchlist/.test(c) && !/DATA\.options/.test(c);
+  });
+})());
+
+check("v275 prezzi: il ritardo e' dichiarato nel pacchetto per l'analisi", (() => {
+  const j = src.indexOf("function datiNostriDelTitolo");
+  const pac = src.slice(j, src.indexOf("\nfunction ", j + 10));
+  return /ritardati di circa 15 minuti/.test(pac);
+})());
+
+check("v276 pacchetto: il prezzo di riferimento porta l'ora della lettura", (() => {
+  const i = src.indexOf("function datiNostriDelTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /letto dal browser alle \$\{ora\}/.test(corpo);
+})());
+
+check("v284 opzioni: la scheda e il pacchetto dichiarano se la scadenza non e' la piu' vicina", (() => {
+  const i = src.indexOf("async function renderOpzioniGrafico");
+  const scheda = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  const j = src.indexOf("function datiNostriDelTitolo");
+  const pac = src.slice(j, src.indexOf("\nfunction ", j + 10));
+  return /Non è la scadenza più vicina/.test(scheda) && /NON e' la scadenza piu' vicina/.test(pac);
+})());
+
+check("v286 opzioni: volumi e contratti aperti sono etichettati per quello che sono", (() => {
+  const i = src.indexOf("function datiNostriDelTitolo");
+  const corpo = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  return /volumi scambiati oggi/.test(corpo) && /CONTRATTI APERTI/.test(corpo)
+      && /grandezza diversa dai volumi/.test(corpo);
+})());
+
+check("v293 consegna: il pacchetto titolo porta un tetto di lunghezza", suVeri(`
+  const p = buildPromptTicker("AMD");
+  return /BUDGET: [\\d.\\-]+ parole IN TUTTO/.test(p) && /vincolo, non un'indicazione/.test(p)`));
+
+check("v293 consegna: gli otto blocchi richiesti ci sono tutti e in ordine", suVeri(`
+  const p = buildPromptTicker("AMD");
+  const ordine = ["0) IL GIUDIZIO", "1) QUADRO MACRO", "2) L'AZIENDA", "3) TRIMESTRALI",
+                  "4) I CONTI", "5) TECNICA", "6) SENTIMENT DEGLI ANALISTI", "7) LA CHIUSURA"];
+  let pos = -1;
+  for (const b of ordine) { const i = p.indexOf(b); if (i < 0 || i < pos) return false; pos = i; }
+  return /BREVE \\(settimane\\)/.test(p) && /MEDIO \\(3-12/.test(p) && /LUNGO \\(oltre/.test(p)
+      && /analista di Wall Street/.test(p)`));
+
+check("v293 tecnica: EMA e Fibonacci sono nel pacchetto, calcolati dal sistema", suVeri(`
+  const p = buildPromptTicker("AMD");
+  return /Medie esponenziali: EMA 20 [\\d.]+/.test(p)
+      && /calcolate dal sistema su \\d+ barre giornaliere/.test(p)
+      && /Ritracciamenti di Fibonacci sul range a 52 settimane/.test(p)
+      && /calcolo esatto sui due estremi/.test(p)`));
+
+check("v293 tecnica: l'EMA 200 non si pubblica, e si dice perche'", suVeri(`
+  const p = buildPromptTicker("AMD");
+  if (!/Medie esponenziali/.test(p)) return true;
+  return /EMA 200 NON calcolata/.test(p) && /servirebbero 200 barre giornaliere/.test(p)
+      && !/EMA 200 [\\d]/.test(p)`));
+
+check("v293 tecnica: i livelli di Fibonacci tornano col range dichiarato", suVeri(`
+  const p = buildPromptTicker("AMD");
+  const m = p.match(/Fibonacci sul range a 52 settimane \\(massimo ([\\d.]+), minimo ([\\d.]+)\\): ([^\\n]+)/);
+  if (!m) return true;
+  const hi = parseFloat(m[1]), lo = parseFloat(m[2]);
+  const meta = m[3].match(/50% a ([\\d.]+)/);
+  if (!meta) return false;
+  return Math.abs(parseFloat(meta[1]) - (hi - 0.5 * (hi - lo))) < 0.02`));
+
+check("v296 contraddittorio: il pacchetto chiede la tesi opposta, e la chiede per ultima", suVeri(`
+  const p = buildPromptTicker("AMD");
+  const i8 = p.indexOf("8) LA TESI CONTRARIA");
+  const i7 = p.indexOf("7) LA CHIUSURA");
+  const i0 = p.indexOf("0) IL GIUDIZIO");
+  /* dopo la conclusione, non dopo il giudizio: per attaccare una tesi bisogna averla prima
+     argomentata con le prove, altrimenti e' teatro. */
+  return i8 > i7 && i7 > i0 && /obbligatoria/.test(p)`));
+
+check("v296 contraddittorio: obbliga ai numeri del pacchetto, a scegliere, e a un fatto datato", suVeri(`
+  const p = buildPromptTicker("AMD");
+  const i = p.indexOf("8) LA TESI CONTRARIA");
+  const b = p.slice(i, p.indexOf("══ REGOLE ══", i));
+  return /NUMERI DI QUESTO PACCHETTO/.test(b)
+      && /non obiezioni generiche/.test(b)
+      && /QUALE FATTO OSSERVABILE E DATATO/.test(b)
+      && /Non ti e' consentito rispondere che entrambe le tesi hanno merito/.test(b)`));
+
+/* ⚠ v298 — la lista NON si congela: era scritta a mano e sarebbe invecchiata alla prima
+   sezione aggiunta o tolta (e ne ho tolte due in questo stesso commit). Si rilegge da
+   index.html a ogni esecuzione: il registro fisso che invecchia da solo e' la classe
+   C10 / red team I6, gia' pagata piu' volte qui. */
+
+check("v299 pacchetto titolo: porta i fondamentali che il sistema gia' possiede", suVeri(`
+  const p = buildPromptTicker("AMD");
+  const r = [...(DATA.portfolio||[]), ...(DATA.watchlist||[])].find(x => x.ticker === "AMD");
+  if (!r) return true;
+  const c = [];
+  if (r.eps != null) c.push("Utile per azione (EPS");
+  if (r.beta != null) c.push("Beta: " + r.beta);
+  if (r.rs_1m != null) c.push("Forza relativa a 1 mese");
+  return c.every(x => p.includes(x)) && (() => {
+    const px = numero(r.prezzo_limite_aggiustato ?? r.price);
+    const res = numero(r.resistance), atr = numero(r.atr_14);
+    if (![px, res, atr].every(Number.isFinite) || atr <= 0 || res <= px) return true;
+    const atteso = "1:" + (Math.round((res - px) / (2 * atr) * 10) / 10);
+    return p.includes("Rapporto rischio/rendimento: " + atteso)
+        && p.includes("LA BASE E' IL PREZZO CHE PAGHERESTI");
+  })()`));
+
+check("v299 pacchetto titolo: nessun punteggio composito rientra dalla finestra", suVeri(`
+  const p = buildPromptTicker("AMD");
+  return !p.includes("fin_health") && !p.includes("Financial Health")
+      && !p.includes("Salute finanziaria")`));
+
+check("v299 pacchetto titolo: elenca cosa non ha e obbliga a dichiarare i buchi", suVeri(`
+  const p = buildPromptTicker("AMD");
+  return p.includes("QUELLO CHE IL SISTEMA NON HA")
+      && p.includes("NON VERIFICATO:")
+      && p.includes("Un numero plausibile inventato e' peggio di un buco dichiarato")`));
+
+check("v307 portafoglio: il bond vale nominale x prezzo/100, non quote x prezzo", (() => {
+  const i = src.indexOf("function renderPortafoglio");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("q * p / 100") && corpo.includes("startsWith(\"BTP\")");
+})());
+
+check("v307 portafoglio: il peso converte in euro, e lo dichiara", (() => {
+  const i = src.indexOf("function renderPortafoglio");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("valEur") && corpo.includes("DATA.eurusd")
+      && corpo.includes("sommare dollari ed euro");
+})());
+
+check("v307 portafoglio: gli handler stanno sul contenitore, non sulle righe", (() => {
+  const i = src.indexOf("function renderPortafoglio");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("box.addEventListener");
+})());
+
+check("v307 portafoglio: le posizioni non seguite vengono dichiarate", (() => {
+  const i = src.indexOf("function renderPortafoglio");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("non_seguite");
+})());
+
+check("v310 fatti: il peso nel libro nasce in fattiTitolo, non in chi lo stampa", (() => {
+  const i = src.indexOf("function fattiTitolo");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  const j = src.indexOf("function datiNostriDelTitolo");
+  const disegna = src.slice(j, src.indexOf(String.fromCharCode(10) + "function ", j + 10));
+  return corpo.includes("pesoLibro") && disegna.includes("tec.pesoLibro")
+      && !disegna.includes("DATA.eurusd");
+})());
+
+check("v311 portafoglio: input non valido = nessuna scrittura, e lo dice", (() => {
+  const i = src.indexOf("async function salvaPosizioni");
+  const corpo = src.slice(i, src.indexOf("async function", i + 10) > 0
+    ? src.indexOf("async function", i + 10) : src.length);
+  return corpo.includes("Non ho salvato niente")
+      && corpo.includes("un salvataggio parziale sarebbe peggio")
+      && /if \(errori\.length\)[\s\S]{0,200}return;/.test(corpo);
+})());
+
+check("v311 portafoglio: un titolo nuovo entra anche nella watchlist, dichiarandolo", (() => {
+  const i = src.indexOf("async function salvaPosizioni");
+  const corpo = src.slice(i, i + 4200);
+  return corpo.includes("WATCHLIST_PATH")
+      && corpo.includes("Ho aggiunto anche alla watchlist")
+      && corpo.includes("la pipeline non ne prenderebbe il prezzo");
+})());
+
+check("v311 portafoglio: senza token dichiara che il salvataggio e' locale", (() => {
+  const i = src.indexOf("async function salvaPosizioni");
+  const corpo = src.slice(i, i + 4200);
+  return corpo.includes("solo su questo browser") && corpo.includes("la pipeline non lo legge");
+})());
+
+check("v311 portafoglio: togliere una riga non scrive niente finche' non si salva", (() => {
+  const i = src.indexOf('const togli = t.closest(".pf-togli")');
+  const corpo = src.slice(i, i + 500);
+  return corpo.includes("removeChild") && !corpo.includes("salvaPosizioni")
+      && src.includes('t.closest("#pf-annulla")');
+})());
+
+check("v311 portafoglio: la forma parte dai dati veri, non da un elenco separato", (() => {
+  const i = src.indexOf("function posizioniCorrenti");
+  const corpo = src.slice(i, src.indexOf(String.fromCharCode(10) + "function ", i + 10));
+  return corpo.includes("DATA.portfolio") && corpo.includes("DATA.watchlist");
+})());
+
+check("v314 medie: il verso e' scritto in parole, non lasciato dedurre", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU" && x.sma200_dist_pct != null);
+  if (!r) return true;
+  const p = buildPromptTicker("MU");
+  const m = p.match(/Media a 200 sedute: ([\\d.]+) — il prezzo le sta ([+-][\\d,]+%), cioe' (SOPRA|SOTTO)/);
+  if (!m) return false;
+  /* ⚠⚠ v340 — L'INVARIANTE E' L'IDENTITA', NON LA VICINANZA. La vecchia stesura confrontava
+     il livello stampato con la sua stessa ri-derivazione: confermava l'assunzione invece di
+     misurare una proprieta' (la lezione comune dei tre difetti di v326). E la tolleranza a
+     0,5 era un pavimento numerico che invecchiava col prezzo — su MU a 552 lo scarto ci
+     stava sotto, a 1027 vale 0,76 e il check e' esploso da solo, per il motivo giusto e per
+     caso. Ora: la stessa media stampata due volte nello stesso pacchetto deve portare lo
+     STESSO numero, e quel numero dev'essere quello che la pipeline pubblica. Nessuna soglia. */
+  const liv = Number(m[1]);
+  const med = ((((r.tv || {}).tecnica || {}).medie || {}).sma200 || {});
+  if (Number.isFinite(med.liv) && liv !== med.liv) return false;
+  const m2 = p.match(/Media semplice 200: ([\d.]+) —/);
+  if (m2 && Number(m2[1]) !== liv) return false;
+  return m[3] === (r.sma200_dist_pct >= 0 ? "SOPRA" : "SOTTO")`));
+
+check("v314 medie: SMA ed EMA dichiarano entrambe il livello", suVeri(`
+  const p = buildPromptTicker("MU");
+  const sma = /Media a \\d+ sedute: [\\d.]+ —/.test(p);
+  const ema = /EMA \\d+ [\\d.]+ \\([+-]/.test(p);
+  if (!/Medie esponenziali/.test(p)) return sma;
+  return sma && ema`));
+
+check("v315 portafoglio: il bottone e' un interruttore e lo dichiara", (() => (
+  src.indexOf("pfInModifica = !pfInModifica") >= 0
+  && src.indexOf('pfInModifica ? "✕ Chiudi modifica" : "✎ Modifica"') >= 0
+))());
+
+check("v315 portafoglio: si ordina di default per peso, non per guadagno", (() => (
+  /let pfOrdine = \{ campo: "peso"/.test(src)
+))());
+
+check("v315 portafoglio: ogni colonna ordina davvero, e il verso si inverte", suVeri(`
+  const q = document.querySelector, presi = {};
+  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "", hidden: false, classList: { add(){}, remove(){}, toggle(){}, contains: () => false }, style: {}, dataset: {}, querySelectorAll: () => [], addEventListener(){}, setAttribute(){}, getAttribute: () => null });
+  document.querySelector = (s) => finto(s);
+  const leggi = (campo, verso) => {
+    pfOrdine = { campo, verso }; renderPortafoglio();
+    const t = finto("#pf-righe").innerHTML;
+    return (t.match(/data-pf-tk="([^"]+)"/g) || []).map(x => x.slice(12, -1));
+  };
+  try {
+    const peso = leggi("peso", "giu"), pesoSu = leggi("peso", "su"), gain = leggi("gain", "giu");
+    /* invertire il verso deve rovesciare l'elenco, e un campo diverso deve dare un ordine diverso:
+       due proprieta' osservabili, non un elenco atteso che invecchia col portafoglio */
+    return peso.length >= 5
+      && JSON.stringify(pesoSu) === JSON.stringify([...peso].reverse())
+      && JSON.stringify(gain) !== JSON.stringify(peso);
+  } finally { document.querySelector = q; }`));
+
+check("v315 portafoglio: la colonna in euro converte e il BTP resta nominale x prezzo", suVeri(`
+  const q = document.querySelector, presi = {};
+  const finto = (s) => presi[s] || (presi[s] = { innerHTML: "", textContent: "", hidden: false, classList: { add(){}, remove(){}, toggle(){}, contains: () => false }, style: {}, dataset: {}, querySelectorAll: () => [], addEventListener(){}, setAttribute(){}, getAttribute: () => null });
+  document.querySelector = (s) => finto(s);
+  try {
+    renderPortafoglio();
+    const t = finto("#pf-righe").innerHTML;
+    if (!/In euro/.test(t)) return false;
+    const btp = (DATA.portfolio || []).concat(DATA.watchlist || []).find(r => r && String(r.ticker).startsWith("BTP"));
+    if (!btp) return true;
+    const atteso = Math.round(btp.qta * btp.price / 100);
+    return t.indexOf("€" + fmtNum.format(atteso)) >= 0;
+  } finally { document.querySelector = q; }`));
+
+check("v316 titolo: la colonna di TradingView e' nel pacchetto, calcolata da noi", run(`
+  const _s = DATA;
+  DATA = JSON.parse(JSON.stringify(REALE));
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
+  if (!r) { DATA = _s; return true; }
+  r.tv = ${JSON.stringify(TV_FINTO)};
+  recomputeTotals();
+  try {
+    const p = buildPromptTicker("MU");
+    return /PERFORMANCE PER ORIZZONTE/.test(p)
+        && /DETTAGLI TECNICI \\(calcolati dal sistema, non letti da terzi\\)/.test(p)
+        && /CONTO ECONOMICO TRIMESTRALE/.test(p)
+        && /STAGIONALITA' DEL TITOLO/.test(p)
+        && /SENSIBILITA' MISURATE/.test(p);
+  } finally { DATA = _s; recomputeTotals(); }`));
+
+check("v316 sensibilita': ogni beta viaggia col suo R², col campione e con la finestra", run(`
+  const _s = DATA;
+  DATA = JSON.parse(JSON.stringify(REALE));
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
+  if (!r) { DATA = _s; return true; }
+  r.tv = ${JSON.stringify(TV_FINTO)};
+  recomputeTotals();
+  try {
+    const p = buildPromptTicker("MU");
+    const righe = p.split(String.fromCharCode(10)).filter(x => /^- (settore|tassi) \\(/.test(x));
+    return righe.length === 2
+        && righe.every(x => /beta [+-]?[\\d.]+/.test(x) && /R² [\\d.]+/.test(x) && /Campione \\d+ sedute comuni/.test(x))
+        && /NESSUNA relazione misurabile/.test(righe.find(x => x.startsWith("- tassi")))
+        && /canale DOMINANTE/.test(righe.find(x => x.startsWith("- settore")));
+  } finally { DATA = _s; recomputeTotals(); }`));
+
+check("v316 titolo: senza i dati della pipeline il blocco non esiste e non si inventa un ripiego", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
+  if (r) delete r.tv;
+  const p = buildPromptTicker("MU");
+  return !/DETTAGLI TECNICI/.test(p) && !/--- COME IL MACRO ARRIVA A/.test(p)
+      && !/PERFORMANCE PER ORIZZONTE/.test(p) && p.length > 5000`));
+
+check("v316 live: il refresh ricalcola il guadagno che la tabella legge davvero", (() => {
+  const i = src.indexOf("const upd = (r) => {");
+  const corpo = src.slice(i, i + 1200);
+  return corpo.includes("r.qta ?? r.qty")
+      && corpo.includes("gain_pct_pos")
+      && src.slice(src.indexOf("renderShockAlert();"), src.indexOf("renderShockAlert();") + 400).includes("renderPortafoglio()");
+})());
+
+check("v322 fibonacci: la pagina e il pacchetto mostrano gli STESSI livelli", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU" && x.w52_high && x.w52_low);
+  if (!r) return true;
+  const R = r.w52_high - r.w52_low;
+  const attesi = [0.236, 0.382, 0.5, 0.618, 0.786].map(q => Math.round((r.w52_high - q * R) * 100) / 100);
+  const p = buildPromptTicker("MU");
+  /* nel pacchetto ci sono tutti, e sono quelli calcolati dagli estremi a 52 settimane */
+  return attesi.every(v => p.includes(String(v)));`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

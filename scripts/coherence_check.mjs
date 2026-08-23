@@ -51,11 +51,12 @@ function generaPayload() {
   vm.runInContext(src, ctx, { filename: "app.js" });
   const d = JSON.parse(readFileSync(join(ROOT, "data", "data.json"), "utf8").replace(/\bNaN\b/g, "null"));
   vm.runInContext("DATA=" + JSON.stringify(d) + "; cashEur=30000; recomputeTotals();", ctx);
-  /* ⚠ v341 — RESTA UN PACCHETTO SOLO. Il CEO ha chiuso analisi del titolo, di settore e di
-     portafoglio ("elimina le analisi settore e portafoglio... modifica analisi macro/titolo in
-     analisi macro"). `altri` resta come struttura perche' i detector la attraversano: se un
-     domani torna un secondo pacchetto, si rimette qui e tutte le classi lo coprono da sole. */
+  /* v347 — il pacchetto del TITOLO e' tornato (il CEO l'ha richiesto) e con lui la sua
+     copertura: tutte le classi di coerenza lo attraversano di nuovo. Settore e portafoglio
+     restano fuori perche' quelli non sono tornati. */
+  const tk = (d.watchlist || []).find(x => x && x.ticker && x.price != null);
   const altri = [];
+  if (tk) altri.push({ nome: `titolo ${tk.ticker}`, testo: vm.runInContext(`buildPromptTicker(${JSON.stringify(tk.ticker)})`, ctx) });
   return { testo: vm.runInContext("buildCIOText()", ctx), altri, ctx, data: d };
 }
 
