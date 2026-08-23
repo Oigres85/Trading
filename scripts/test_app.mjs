@@ -3958,6 +3958,65 @@ check("v349 premessa: l'elenco delle serie storiche coincide con quelle consegna
   /* la premessa ne elencava tre e il blocco ne consegnava sette: chi legge conta e non torna */
   return promesse.length === consegnate.length && promesse.every((p, i) => p === consegnate[i]);`));
 
+
+/* ══ v350 — DUE MODI DI SPARIRE IN SILENZIO, TROVATI SU CoreWeave ═════════════════════════
+   Il CEO ha salvato la posizione scrivendo "CRVW" invece di "CRWV". La dashboard ha aggiunto
+   CRVW alla watchlist, quindi il titolo risultava SEGUITO; Yahoo non quota quel simbolo,
+   quindi la riga restava senza prezzo; senza prezzo niente controvalore, e la posizione
+   spariva da pagina e pacchetto. Il sistema intanto dichiarava "13 attaccate, 0 non seguite".
+   E il diario, alla stessa ora, scriveva in locale e falliva la push senza dirlo. */
+
+check("v350 posizioni: una posizione senza prezzo viene DICHIARATA, non contata come a posto", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  const i = py.indexOf('p = per_tk.pop(');
+  const corpo = py.slice(i, i + 1200);
+  /* non basta che il campo esista: l'incremento non deve avvenire senza prezzo */
+  return corpo.includes("senza_prezzo.append") && corpo.includes("if not prezzo:")
+      && py.includes('"senza_prezzo": sorted(senza_prezzo)');
+})());
+
+check("v350 posizioni: la pagina nomina le posizioni che non riesce a mostrare", (() => {
+  const i = src.indexOf("p.senza_prezzo");
+  if (i < 0) return false;
+  const corpo = src.slice(i, i + 700);
+  return corpo.includes("POSIZIONI CHE NON COMPAIONO QUI SOPRA") && corpo.includes("CRWV");
+})());
+
+check("v350 pacchetto: i pesi dichiarano se il denominatore e' incompleto", suVeri(`
+  const salva = ((DATA.macro || {}).posizioni || {}).senza_prezzo;
+  DATA.macro = DATA.macro || {}; DATA.macro.posizioni = DATA.macro.posizioni || {};
+  DATA.macro.posizioni.senza_prezzo = ["XXXX"];
+  const p = buildPromptTicker("MU");
+  DATA.macro.posizioni.senza_prezzo = salva;
+  return /FUORI DA QUESTO ELENCO, E QUINDI DAI PESI: XXXX/.test(p)
+      && /percentuali di un azionario che NON comprende/.test(p);`));
+
+check("v350 diario: la scrittura riporta l'esito invece di fallire in silenzio", (() => {
+  const i = src.indexOf("async function pushDiarioCloud");
+  const corpo = src.slice(i, src.indexOf("\n}\n", i));
+  /* prima: `if (!token) return;` e un catch vuoto. Una scrittura che fallisce senza dirlo e'
+     peggio di una che rifiuta: la seconda la vedi, la prima la scopri quando ti serve il dato. */
+  return corpo.includes("return { ok: true }") && corpo.includes("perche:")
+      && corpo.includes("r.status === 409")
+      && src.includes('riga.innerHTML = `⚠ <b>Salvata solo su questo browser</b>');
+})());
+
+check("v350 diario: setDiary restituisce l'esito a chi lo chiama", (() => {
+  const i = src.indexOf("function setDiary");
+  const corpo = src.slice(i, src.indexOf("\n}\n", i));
+  return corpo.includes("return pushDiarioCloud");
+})());
+
+
+check("v350 grafico: le due linee partono davvero dalla soglia 'partenza'", suVeri(`
+  const se = serieIndicatore("corp_profit");
+  if (!se || !se.doppia) return true;
+  const primi = se.doppia.map(x => x.punti[0]);
+  /* la soglia era a 100 mentre dentro la finestra le linee partivano da 107,9 e 98,9: l'occhio
+     misurava una distanza iniziale che non esisteva */
+  return primi.every(p => p.v === 100) && primi[0].d === primi[1].d
+      && (se.soglie || []).some(s => s.v === 100 && String(s.testo).includes(primi[0].d));`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

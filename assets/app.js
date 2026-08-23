@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "349";
+const BUILD_VERSION = "350";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1305,20 +1305,30 @@ function ordinaDiario(arr) {
 function setDiary(arr) {
   DIARIO_VOCI = ordinaDiario(arr).slice(0, 100);
   localStorage.setItem("action_diary", JSON.stringify(DIARIO_VOCI));
-  pushDiarioCloud(DIARIO_VOCI);
+  return pushDiarioCloud(DIARIO_VOCI);   // il chiamante deve poter dire com'e' andata
 }
 async function pushDiarioCloud(arr) {
   const token = localStorage.getItem("gh_token");
-  if (!token) return;   // senza token resta locale: il diario non si perde, semplicemente non viaggia
-  try {
-    let sha;
+  if (!token) return { ok: false, perche: "senza token GitHub il diario resta SOLO su questo browser: non arriva su iPhone e il pacchetto lo legge solo da qui" };
+  const corpo = (sha) => JSON.stringify({ message: "Aggiorna diario operazioni",
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(arr, null, 1)))), sha });
+  const shaCorrente = async () => {
     const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${DIARY_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
-    if (g.ok) sha = (await g.json()).sha;
-    await fetch(`https://api.github.com/repos/${REPO}/contents/${DIARY_PATH}`, {
-      method: "PUT", headers: ghHeaders(token),
-      body: JSON.stringify({ message: "Aggiorna diario operazioni", content: btoa(unescape(encodeURIComponent(JSON.stringify(arr, null, 1)))), sha }),
-    });
-  } catch { /* offline: resta in locale */ }
+    return g.ok ? (await g.json()).sha : undefined;
+  };
+  try {
+    let r = await fetch(`https://api.github.com/repos/${REPO}/contents/${DIARY_PATH}`,
+      { method: "PUT", headers: ghHeaders(token), body: corpo(await shaCorrente()) });
+    /* 409: la pipeline ha scritto in mezzo. Si rilegge lo sha e si riprova una volta. */
+    if (r.status === 409) r = await fetch(`https://api.github.com/repos/${REPO}/contents/${DIARY_PATH}`,
+      { method: "PUT", headers: ghHeaders(token), body: corpo(await shaCorrente()) });
+    if (r.ok) return { ok: true };
+    let dett = "";
+    try { dett = (await r.json()).message || ""; } catch { /* risposta non JSON */ }
+    return { ok: false, perche: `GitHub ha risposto ${r.status}${dett ? ` (${dett})` : ""}: la voce e' salvata QUI ma non sul repository` };
+  } catch (e) {
+    return { ok: false, perche: `rete non raggiungibile: la voce e' salvata QUI ma non sul repository (${e && e.message ? e.message : e})` };
+  }
 }
 
 /* ── riconoscere l'operazione dentro una frase scritta a mano ──────────────────────────────
@@ -1385,7 +1395,10 @@ function renderDiario() {
     ? DIARIO_VOCI.map(diarioRigaHtml).join("")
     : `<div class="muted" style="font-size:12px">Nessuna operazione annotata.</div>`;
   lista.querySelectorAll(".diary-del").forEach(b => b.addEventListener("click", () => {
-    setDiary(DIARIO_VOCI.filter(x => x.date !== b.dataset.iso));
+    Promise.resolve(setDiary(DIARIO_VOCI.filter(x => x.date !== b.dataset.iso))).then((e) => {
+      const riga = document.querySelector("#diary-esito");
+      if (riga) riga.innerHTML = (e && e.ok) ? "" : `⚠ <b>Cancellata solo su questo browser</b>: ${esc((e && e.perche) || "motivo sconosciuto")}.`;
+    });
     renderDiario();
   }));
 }
@@ -1396,6 +1409,7 @@ function apriDiario() {
        <input id="diary-input" type="text" placeholder="es. Acquisto 40 quote BE a 214 il 07/08/2026" />
        <button class="btn btn-primary btn-sm" id="diary-save">Registra</button>
      </div>
+     <div class="muted" id="diary-esito" style="font-size:11px;margin-bottom:6px"></div>
      <div class="diary-list" id="diary-list"></div>`);
   renderDiario();
   const salva = () => {
@@ -1404,10 +1418,25 @@ function apriDiario() {
     if (!testo) return;
     const iso = new Date().toISOString();
     const op = parseDiaryText(testo, iso);
-    setDiary([{ date: iso, text: testo, op }, ...DIARIO_VOCI]);
+    const esito = setDiary([{ date: iso, text: testo, op }, ...DIARIO_VOCI]);
     if (inp) inp.value = "";
     renderDiario();
-    toast(op ? `Annotata: ${op.tipo} ${op.ticker} — le posizioni NON sono state toccate` : "Annotata come testo: nessuna operazione riconosciuta");
+    const cosa = op ? `${op.tipo} ${op.ticker}` : "voce di testo";
+    /* ⚠ v350 — l'esito della scrittura sul repository ARRIVA DOPO: il toast ottimista qui
+       sopra diceva "annotata" mentre la push poteva ancora fallire. Si annuncia il salvataggio
+       locale (che e' gia' avvenuto) e poi si corregge il tiro quando la risposta arriva. */
+    toast(`${cosa}: salvata su questo browser…`);
+    Promise.resolve(esito).then((e) => {
+      const riga = document.querySelector("#diary-esito");
+      if (e && e.ok) {
+        toast(`${cosa} salvata anche sul repository — le posizioni NON sono state toccate`);
+        if (riga) riga.innerHTML = "";
+      } else {
+        const perche = (e && e.perche) || "motivo sconosciuto";
+        toast(`⚠ ${cosa}: NON salvata sul repository`);
+        if (riga) riga.innerHTML = `⚠ <b>Salvata solo su questo browser</b>: ${esc(perche)}.`;
+      }
+    });
   };
   document.querySelector("#diary-save")?.addEventListener("click", salva);
   document.querySelector("#diary-input")?.addEventListener("keydown", (ev) => { if (ev.key === "Enter") salva(); });
@@ -2886,7 +2915,11 @@ function renderPortafoglio() {
       + `Non è il suo patrimonio: manca la liquidità e il cambio di carico posizione per posizione, `
       + `che conosce il suo broker. I guadagni percentuali sono invarianti al cambio, gli importi no.`
       + (p.non_seguite && p.non_seguite.length
-          ? ` ⚠ Posizioni su titoli non seguiti dalla pipeline, quindi senza prezzo: ${esc(p.non_seguite.join(", "))}.` : "");
+          ? ` ⚠ Posizioni su titoli non seguiti dalla pipeline, quindi senza prezzo: ${esc(p.non_seguite.join(", "))}.` : "")
+      + (p.senza_prezzo && p.senza_prezzo.length
+          ? ` <b>⚠ POSIZIONI CHE NON COMPAIONO QUI SOPRA</b>: ${esc(p.senza_prezzo.join(", "))} — il titolo è nella `
+            + `watchlist ma la fonte non lo quota, quindi il sistema non ha nè prezzo nè controvalore e la riga `
+            + `non esiste. Nove volte su dieci è un simbolo scritto male: CoreWeave è <b>CRWV</b>, non CRVW.` : "");
   }
   /* ⚠ delega sul contenitore: le righe si ridisegnano a ogni render, e agganciare ognuna
      lascerebbe handler morti — il difetto v193/v213 che ha gia' rotto il wiring piu' volte. */
@@ -5323,12 +5356,18 @@ function serieIndicatore(k) {
       const fine = [a2[a2.length - 1].d, b2[b2.length - 1].d].sort()[0];
       const inizio = [a2[0].d, b2[0].d].sort()[1];
       const taglia = (arr) => arr.filter(x => x && x.d >= inizio && x.d <= fine);
-      const A = taglia(a2), B = taglia(b2);
+      let A = taglia(a2), B = taglia(b2);
       if (A.length < 3 || B.length < 3) return null;
-      return { doppia: [{ nome: "Nasdaq 100", punti: A, colore: "var(--purple)" },
-                        { nome: "Profitti reali", punti: B, colore: "var(--muted)", tratteggio: true }],
-               soglie: [{ v: 100, testo: "partenza", colore: "var(--border)" }],
-               finestra: { inizio, fine } };
+      /* le due serie hanno frequenze diverse: la prima data DENTRO la finestra puo' non
+         coincidere, e ribasare su due date diverse e' esattamente il difetto v349 */
+      const inizio2 = [A[0].d, B[0].d].sort()[1];
+      A = A.filter(x => x.d >= inizio2); B = B.filter(x => x.d >= inizio2);
+      if (A.length < 3 || B.length < 3) return null;
+      const base = (arr) => { const b0 = arr[0].v; return b0 ? arr.map(x => ({ d: x.d, v: Math.round(x.v / b0 * 1000) / 10 })) : arr; };
+      return { doppia: [{ nome: "Nasdaq 100", punti: base(A), colore: "var(--purple)" },
+                        { nome: "Profitti reali", punti: base(B), colore: "var(--muted)", tratteggio: true }],
+               soglie: [{ v: 100, testo: `partenza (${inizio2})`, colore: "var(--border)" }],
+               finestra: { inizio: inizio2, fine } };
     }
     default: {
       /* ═══ v292 — LA TRAIETTORIA DEGLI INDICATORI MACRO ══════════════════════════════════
@@ -8530,6 +8569,12 @@ function contestoPortafoglio(tkCorrente) {
     + `. ⚠ Titoli che condividono lo stesso fattore sono UNA scommessa scritta piu' volte, non `
     + `posizioni indipendenti: l'esposizione del libro a quel fattore e' la loro somma, `
     + `non il peso del singolo nome.`);
+  const muti = ((((DATA || {}).macro || {}).posizioni || {}).senza_prezzo) || [];
+  if (muti.length) {
+    L.push(`⚠ FUORI DA QUESTO ELENCO, E QUINDI DAI PESI: ${muti.join(", ")} — il sistema ha la posizione `
+      + `ma non il prezzo (la fonte non quota quel simbolo), quindi non puo' calcolarne il controvalore. `
+      + `I pesi qui sopra sono percentuali di un azionario che NON comprende ${muti.length === 1 ? "questa posizione" : "queste posizioni"}.`);
+  }
   return L.join("\n");
 }
 

@@ -4132,6 +4132,7 @@ def main():
                 if tk and p.get("qta") and p.get("pmc"):
                     per_tk[tk] = p
             attaccate = 0
+            senza_prezzo = []
             for r in watchlist:
                 p = per_tk.pop(str(r.get("ticker") or "").upper(), None)
                 if not p:
@@ -4139,9 +4140,12 @@ def main():
                 r["qta"] = p["qta"]
                 r["pmc"] = round(float(p["pmc"]), 4)
                 prezzo = r.get("price")
-                if prezzo:
-                    r["controvalore"] = round(float(prezzo) * float(p["qta"]), 2)
-                    r["gain_pct_pos"] = round((float(prezzo) / float(p["pmc"]) - 1) * 100, 2)
+                if not prezzo:
+                    # seguita ma non quotabile: quasi sempre un simbolo inesistente (refuso)
+                    senza_prezzo.append(str(r.get("ticker") or ""))
+                    continue
+                r["controvalore"] = round(float(prezzo) * float(p["qta"]), 2)
+                r["gain_pct_pos"] = round((float(prezzo) / float(p["pmc"]) - 1) * 100, 2)
                 attaccate += 1
             # ⚠ il BTP non e' nella watchlist (ha la sua funzione, fetch_btp): si aggancia li'
             btp_pos = per_tk.pop("BTP-V28", None)
@@ -4158,9 +4162,14 @@ def main():
                 "aggiornato": pos_raw.get("aggiornato"),
                 "fonte": pos_raw.get("_fonte"),
                 "non_seguite": orfane,
+                # ⚠ v350 — seguite ma senza prezzo: il caso del simbolo inesistente. Vanno
+                # dichiarate a valle o la posizione sparisce senza che nulla protesti.
+                "senza_prezzo": sorted(senza_prezzo),
             }
             print(f"   posizioni: {attaccate} attaccate"
-                  + (f", {len(orfane)} su titoli NON seguiti (ignorate): {orfane}" if orfane else ""))
+                  + (f", {len(orfane)} su titoli NON seguiti (ignorate): {orfane}" if orfane else "")
+                  + (f", {len(senza_prezzo)} SEGUITE MA SENZA PREZZO (simbolo inesistente?): "
+                     f"{sorted(senza_prezzo)}" if senza_prezzo else ""))
     except Exception as e:  # noqa: BLE001
         print(f"!! posizioni: {e}", file=sys.stderr)
 
