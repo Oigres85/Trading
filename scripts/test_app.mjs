@@ -3459,7 +3459,7 @@ check("v293 consegna: il pacchetto titolo porta un tetto di lunghezza", suVeri(`
 check("v293 consegna: gli otto blocchi richiesti ci sono tutti e in ordine", suVeri(`
   const p = buildPromptTicker("AMD");
   const ordine = ["0) IL GIUDIZIO", "1) QUADRO MACRO", "2) L'AZIENDA", "3) TRIMESTRALI",
-                  "4) I CONTI", "5) TECNICA", "6) SENTIMENT DEGLI ANALISTI", "7) LA CHIUSURA"];
+                  "4) I CONTI", "5) TECNICA", "6) SENTIMENT", "7) LA CHIUSURA"];
   let pos = -1;
   for (const b of ordine) { const i = p.indexOf(b); if (i < 0 || i < pos) return false; pos = i; }
   return /BREVE \\(settimane\\)/.test(p) && /MEDIO \\(3-12/.test(p) && /LUNGO \\(oltre/.test(p)
@@ -3731,6 +3731,98 @@ check("v322 fibonacci: la pagina e il pacchetto mostrano gli STESSI livelli", su
   const p = buildPromptTicker("MU");
   /* nel pacchetto ci sono tutti, e sono quelli calcolati dagli estremi a 52 settimane */
   return attesi.every(v => p.includes(String(v)));`));
+
+
+/* ══ v348 — IL DIARIO NEL PACCHETTO ═════════════════════════════════════════════════════════
+   Il diario e' l'unica parte del pacchetto che dice cosa il CEO ha GIA' fatto. Sbagliarlo non
+   produce un buco ma una bugia: un'operazione attribuita al titolo sbagliato e' peggio di
+   nessuna operazione. Questi check nascono tutti da errori veri fatti scrivendolo. */
+const DIARIO_FIXTURE = JSON.stringify([
+  { date: "2026-08-07", text: "Acquisto 40 quote BE a 214 il 07/08/2026",
+    op: { tipo: "ACQUISTO", qty: 40, ticker: "BE", prezzo: 214, quando: "07/08/2026" } },
+  { date: "2026-07-15", text: "vendita Cerebras quantita' 30 prezzo 190,10 il 15 luglio 2026" },
+  { date: "2026-06-29", text: "Alleggerito micron 20 azioni e amd  25 e venduto Intel e tesla tutto il 24 giugno 2026" },
+]);
+const conDiario = (code) => suVeri(`
+  const _d = DIARIO_VOCI;
+  DIARIO_VOCI = ${DIARIO_FIXTURE};
+  try { ${code} } finally { DIARIO_VOCI = _d; }`);
+
+check("v348 diario: le operazioni del CEO arrivano nel pacchetto del titolo", conDiario(`
+  const p = buildPromptTicker("MU");
+  return /IL DIARIO DELLE OPERAZIONI DEL CEO/.test(p) && /ACQUISTO 40 BE a 214/.test(p)`));
+
+check("v348 diario: una voce che cita il titolo esce in testa, anche se e' prosa", conDiario(`
+  const p = buildPromptTicker("AMD");
+  const i = p.indexOf("SU QUESTO TITOLO (AMD)");
+  if (i < 0) return false;
+  /* la riga del 29/06 nomina micron PRIMA di amd: se il filtro guardasse solo il ticker
+     strutturato, nel pacchetto di AMD quella vendita non esisterebbe */
+  return p.slice(i, i + 400).includes("Alleggerito micron 20 azioni e amd");`));
+
+check("v348 diario: una riga con piu' operazioni si pubblica INTEGRA, non riassunta", conDiario(`
+  const p = buildPromptTicker("MU");
+  /* strutturarla darebbe "VENDITA 20 MU" e le altre tre (AMD, Intel, Tesla) sparirebbero */
+  return /Alleggerito micron 20 azioni e amd 25 e venduto Intel e tesla tutto/.test(p)
+      && !/VENDITA 20 MU/.test(p)`));
+
+check("v348 diario: nessun alias inventato — Cerebras NON diventa SK hynix", conDiario(`
+  const p = buildPromptTicker("SKHY");
+  /* il primo giro aveva cerebras:"SKHY" in tabella: il pacchetto pubblicava una vendita di
+     SK hynix mai avvenuta. Un nome fuori dal libro resta prosa. */
+  return !/VENDITA 30 SKHY/.test(p) && /vendita Cerebras/.test(p)`));
+
+check("v348 diario: quantita' o prezzo mancanti non diventano 'null'", conDiario(`
+  DIARIO_VOCI = [{ date: "2026-05-02", text: "Alleggerito micron 20 azioni" }];
+  const p = buildPromptTicker("MU");
+  return /prezzo non annotato/.test(p) && !/ a null/.test(p)`));
+
+check("v348 diario: senza voci il blocco non esiste e non si inventa un ripiego", conDiario(`
+  DIARIO_VOCI = [];
+  return !/IL DIARIO DELLE OPERAZIONI/.test(buildPromptTicker("MU"))`));
+
+check("v348 diario: il pacchetto macro PUBBLICO non porta il diario", conDiario(`
+  return !/IL DIARIO DELLE OPERAZIONI/.test(buildCIOText())`));
+
+check("v348 diario: il bottone in pagina apre davvero il diario", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  /* v315: un bottone che esiste nel markup ma non ha handler e' un bottone che non c'e'. */
+  return html.includes('id="btn-diary"') && src.includes('$("#btn-diary")?.addEventListener("click", apriDiario)');
+})());
+
+/* ══ v348 — IL PORTAFOGLIO DENTRO IL PACCHETTO DEL TITOLO ═══════════════════════════════════ */
+check("v348 contesto: il pacchetto del titolo porta i PESI, mai gli importi", suVeri(`
+  const p = buildPromptTicker("MU");
+  const i = p.indexOf("CONCENTRAZIONE");
+  if (i < 0) return false;
+  const blocco = p.slice(Math.max(0, i - 1500), i + 400);
+  /* i pesi si pubblicano, il patrimonio no: nessun importo in euro o dollari nel blocco */
+  return /%/.test(blocco) && !/€|EUR |\\$[\\d]/.test(blocco);`));
+
+check("v348 contesto: la concentrazione per fattore e' una somma dichiarata, non un giudizio", suVeri(`
+  const p = buildPromptTicker("MU");
+  return /le prime tre posizioni valgono il \\d+%/.test(p)
+      && /l'esposizione del libro a quel fattore e' la loro somma/.test(p)`));
+
+/* ══ v348 — IL P/E FORWARD, CHE IL SISTEMA AVEVA E NON PUBBLICAVA ══════════════════════════ */
+check("v348 valutazione: se c'e' il P/E forward si pubblica, etichettato", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU" && (x.stats || {}).forward_pe);
+  if (!r) return true;
+  const p = buildPromptTicker("MU");
+  return /P\\/E PROSPETTICO: [\\d.]+×/.test(p) && /trailing/i.test(p);`));
+
+/* ══ v348 — LE SEGNALAZIONI AL SISTEMA ═════════════════════════════════════════════════════
+   Il CEO: "una conferma, tramite ricerca online, dei dati che possono sembrare incongrui e
+   segnalameli". Senza una sezione OBBLIGATORIA in uscita, la verifica resta un auspicio: chi
+   legge la fa e poi non ha dove scriverla. */
+check("v348 segnalazioni: il pacchetto chiede una sezione di ritorno sui dati incongrui", suVeri(`
+  const p = buildPromptTicker("MU");
+  return /SEGNALAZIONI AL SISTEMA/.test(p) && /VERIFICALO ONLINE su una fonte primaria/.test(p)
+      && /nessuna incongruenza rilevata/.test(p)`));
+
+check("v348 sentiment: Reddit e' ammesso come posizionamento retail, dichiarato tale", suVeri(`
+  const p = buildPromptTicker("MU");
+  return /Reddit/.test(p) && /SENTIMENT RETAIL, non verificato/.test(p)`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

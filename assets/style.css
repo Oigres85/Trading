@@ -1039,6 +1039,20 @@ tr.val-ok td { background: rgba(34,197,94,.07); }
 .diary-date { font-family: var(--mono); font-size: 10px; color: var(--muted); flex: 0 0 64px; }
 .diary-text { flex: 1; }
 .diary-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 11px; }
+
+/* v348 — il diario torna in pagina: mancavano le regole per la riga strutturata.
+   .diary-add/.diary-list/.diary-item erano rimaste dalla versione precedente. */
+.diary-form { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+.diary-form input { flex: 1; background: var(--card-2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 6px 8px; font-size: 12px; }
+.diary-form input:focus { border-color: var(--blue); outline: none; }
+.diary-body { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.diary-op { font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: .02em; }
+.diary-op.buy { color: var(--green); }
+.diary-op.sell { color: var(--red); }
+.diary-op.nota { color: var(--muted); font-weight: 400; }
+.diary-multi { font-size: 10px; color: var(--amber, var(--muted)); }
+.diary-text { flex: 1; line-height: 1.4; }
+
 .diary-del:hover { color: var(--red); }
 
 /* ---------- v69: Strumenti (PMC/vendite) come pulsanti ---------- */

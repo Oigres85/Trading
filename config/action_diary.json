@@ -1,5 +1,19 @@
 [
  {
+  "date": "2026-08-22T00:00:00.000Z",
+  "text": "Acquisto 105 quote CRWV a 97,199 — ⚠ DATA DA CONFERMARE: il prezzo di carico viene dall'estratto del broker, la data dell'operazione non è nota al sistema. Presente già nell'estratto del 21/08/2026, quindi eseguita prima di quel giorno.",
+  "op": {
+   "tipo": "ACQUISTO",
+   "qty": 105,
+   "ticker": "CRWV",
+   "prezzo": 97.199,
+   "quando": "DA CONFERMARE",
+   "multi": false
+  },
+  "applicata": true,
+  "_nota": "voce ricostruita dall'estratto, non registrata al momento dell'operazione"
+ },
+ {
   "date": "2026-08-07T20:30:16.214Z",
   "text": "Acquisto 40 quote BE a 214 il 07/08/2026",
   "op": {

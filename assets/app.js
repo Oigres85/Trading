@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "347";
+const BUILD_VERSION = "348";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1267,6 +1267,151 @@ function renderDataQualityAlert() {
 /* ---------------- mini-card: direzione mercato + BofA signposts ---------------- */
 // aggregatore: raccoglie TUTTI i segnali del sistema con etichetta e punteggio 0-100
 const DIARY_PATH = "config/action_diary.json";
+let DIARIO_VOCI = [];
+/* Carica il diario dal repository. E' un file PUBBLICO che contiene le operazioni del CEO:
+   non ci finiscono importi in euro ne' la sua liquidita', solo quantita' e prezzi di carico,
+   che sono gia' nel pacchetto per le posizioni aperte. */
+async function loadDiarioCloud() {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${DIARY_PATH}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return;
+    const v = await r.json();
+    if (!Array.isArray(v)) return;
+    /* Fusione col locale per data: le voci scritte su questo dispositivo e non ancora spinte
+       nel repo non devono sparire quando arriva la copia remota. */
+    const perData = {};
+    [...v, ...loadDiary()].forEach(e => { if (e && e.date) perData[e.date] = e; });
+    DIARIO_VOCI = ordinaDiario(Object.values(perData)).slice(0, 100);
+    localStorage.setItem("action_diary", JSON.stringify(DIARIO_VOCI));
+    renderDiario();
+  } catch { /* senza rete il diario resta vuoto e il pacchetto lo omette, senza rumore */ }
+}
+
+/* ══ v348 — IL DIARIO TORNA IN PAGINA ═══════════════════════════════════════════════════════
+   Il CEO: "inserisci nuovamente diario come lo avevamo un tempo e recupera i dati che inserii
+   in passato". I dati non erano da recuperare: erano fermi in config/action_diary.json da
+   quando la v256 ha portato via la UI. Tredici operazioni vere, dal 29/06 al 22/08.
+   ⚠ COSA NON TORNA CON LUI: la v193 faceva applicare le operazioni del diario al portafoglio,
+   e la v245 ha dovuto aggiungere un controllo di divergenza perche' quel meccanismo scriveva
+   quantita' sbagliate. Il portafoglio oggi viene da config/posizioni.json, che e' il libro
+   vero. Il diario ANNOTA, non muove: e' la versione che non puo' rompere le posizioni. */
+function loadDiary() {
+  try { const v = JSON.parse(localStorage.getItem("action_diary") || "[]"); return Array.isArray(v) ? v : []; }
+  catch { return []; }
+}
+function ordinaDiario(arr) {
+  return arr.slice().sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+}
+function setDiary(arr) {
+  DIARIO_VOCI = ordinaDiario(arr).slice(0, 100);
+  localStorage.setItem("action_diary", JSON.stringify(DIARIO_VOCI));
+  pushDiarioCloud(DIARIO_VOCI);
+}
+async function pushDiarioCloud(arr) {
+  const token = localStorage.getItem("gh_token");
+  if (!token) return;   // senza token resta locale: il diario non si perde, semplicemente non viaggia
+  try {
+    let sha;
+    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${DIARY_PATH}`, { headers: ghHeaders(token), cache: "no-store" });
+    if (g.ok) sha = (await g.json()).sha;
+    await fetch(`https://api.github.com/repos/${REPO}/contents/${DIARY_PATH}`, {
+      method: "PUT", headers: ghHeaders(token),
+      body: JSON.stringify({ message: "Aggiorna diario operazioni", content: btoa(unescape(encodeURIComponent(JSON.stringify(arr, null, 1)))), sha }),
+    });
+  } catch { /* offline: resta in locale */ }
+}
+
+/* ── riconoscere l'operazione dentro una frase scritta a mano ──────────────────────────────
+   Le quattro voci piu' vecchie sono prosa: "Alleggerito micron 20 azioni e amd 25". Il parser
+   ne ricava tipo/quantita'/ticker quando ci riesce e RESTITUISCE NULL quando non ci riesce:
+   una voce non capita resta testo, e si legge come l'ha scritta lui. Inventare una struttura
+   sbagliata sarebbe peggio del testo libero, perche' finirebbe nel pacchetto come un fatto. */
+const DIARY_BUY = /(acquist|comprat|compra|incrementat|accumulat|aggiunt)/i;
+const DIARY_SELL = /(vendit|vendut|vendo|alleggerit|ridott|chius|liquidat)/i;
+/* nomi commerciali che i dati non possono mappare da soli */
+/* ⚠ NIENTE ALIAS INVENTATI. Il primo giro aveva `cerebras: "SKHY"`, e SKHY nel libro e'
+   SK hynix: il diario avrebbe pubblicato una vendita di SK hynix mai avvenuta. Un nome
+   che non e' nel libro resta NON mappato, e la voce si legge come prosa. */
+const DIARY_ALIAS = { micron: "MU", oracle: "ORCL", intel: "INTC", tesla: "TSLA", nvidia: "NVDA", meta: "META", broadcom: "AVGO", marvell: "MRVL" };
+function diaryTickerMap() {
+  const m = Object.assign({}, DIARY_ALIAS);
+  [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])].forEach(r => {
+    if (!r) return;
+    const t = String(r.ticker || "").toUpperCase();
+    if (t) m[t.toLowerCase()] = t;
+    const n = String(r.name || "").toLowerCase().split(/[ ,.]/)[0];
+    if (n && n.length > 2 && !m[n]) m[n] = t;
+  });
+  return m;
+}
+function parseDiaryText(text, fallbackIso) {
+  const t = String(text || "");
+  const tipo = DIARY_SELL.test(t) ? "VENDITA" : DIARY_BUY.test(t) ? "ACQUISTO" : null;
+  if (!tipo) return null;
+  const map = diaryTickerMap();
+  let ticker = null;
+  for (const parola of t.toLowerCase().match(/[a-z]{2,}/g) || []) {
+    if (map[parola]) { ticker = map[parola]; break; }
+  }
+  if (!ticker) { const m = t.match(/\b([A-Z]{2,5})\b/); if (m && map[m[1].toLowerCase()]) ticker = m[1]; }
+  if (!ticker) return null;
+  const qm = t.match(/(\d+(?:[.,]\d+)?)\s*(?:quote|azioni|pezzi)/i) || t.match(/(?:quantit[àa]|qta)\s*(\d+(?:[.,]\d+)?)/i);
+  const pm = t.match(/(?:a|prezzo|@)\s*(\d+(?:[.,]\d+)?)/i);
+  const num = (s) => s ? Number(String(s).replace(",", ".")) : null;
+  /* piu' verbi d'operazione nella stessa riga: se ne struttura UNA e lo si dichiara */
+  const multi = (t.match(new RegExp(DIARY_BUY.source + "|" + DIARY_SELL.source, "gi")) || []).length > 1;
+  return { tipo, ticker, qty: num(qm && qm[1]), prezzo: num(pm && pm[1]), quando: String(fallbackIso || "").slice(0, 10), multi };
+}
+function diaryOp(e) { return (e && e.op) ? e.op : parseDiaryText(e && e.text, e && e.date); }
+
+function diarioRigaHtml(e) {
+  const o = diaryOp(e);
+  const d = String(e.date || "").slice(0, 10);
+  const data = d ? new Date(d).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "2-digit" }) : "—";
+  const cap = o
+    ? `<span class="diary-op ${o.tipo === "VENDITA" ? "sell" : "buy"}">${o.tipo} ${o.qty != null ? o.qty : "?"} ${o.ticker}${o.prezzo != null ? " a " + o.prezzo : ""}</span>`
+    : `<span class="diary-op nota">solo testo</span>`;
+  const avviso = (o && o.multi) ? `<span class="diary-multi">⚠ la riga contiene piu' operazioni: strutturata la prima, il testo integrale resta sotto</span>` : "";
+  return `<div class="diary-item" data-iso="${e.date}">
+      <span class="diary-date">${data}</span>
+      <span class="diary-body">${cap}${avviso}<span class="diary-text">${esc(e.text || "")}</span></span>
+      <button class="diary-del" data-iso="${e.date}" title="Elimina questa voce">✕</button>
+    </div>`;
+}
+function renderDiario() {
+  const lista = document.querySelector("#diary-list");
+  if (!lista) return;   // il modale non e' aperto: niente da ridisegnare
+  lista.innerHTML = DIARIO_VOCI.length
+    ? DIARIO_VOCI.map(diarioRigaHtml).join("")
+    : `<div class="muted" style="font-size:12px">Nessuna operazione annotata.</div>`;
+  lista.querySelectorAll(".diary-del").forEach(b => b.addEventListener("click", () => {
+    setDiary(DIARIO_VOCI.filter(x => x.date !== b.dataset.iso));
+    renderDiario();
+  }));
+}
+function apriDiario() {
+  openInfoModal("📔 Diario delle operazioni",
+    `<div class="info-line muted" style="font-size:11px;margin-bottom:8px">Qui vanno SOLO le operazioni che hai ESEGUITO davvero. Il diario finisce nel pacchetto per l'LLM: serve a far sapere a chi analizza un titolo se ci hai gia' messo mano e quando. <b>Non muove il portafoglio</b> — le posizioni restano quelle del libro (config/posizioni.json).</div>
+     <div class="diary-form">
+       <input id="diary-input" type="text" placeholder="es. Acquisto 40 quote BE a 214 il 07/08/2026" />
+       <button class="btn btn-primary btn-sm" id="diary-save">Registra</button>
+     </div>
+     <div class="diary-list" id="diary-list"></div>`);
+  renderDiario();
+  const salva = () => {
+    const inp = document.querySelector("#diary-input");
+    const testo = (inp && inp.value || "").trim();
+    if (!testo) return;
+    const iso = new Date().toISOString();
+    const op = parseDiaryText(testo, iso);
+    setDiary([{ date: iso, text: testo, op }, ...DIARIO_VOCI]);
+    if (inp) inp.value = "";
+    renderDiario();
+    toast(op ? `Annotata: ${op.tipo} ${op.ticker} — le posizioni NON sono state toccate` : "Annotata come testo: nessuna operazione riconosciuta");
+  };
+  document.querySelector("#diary-save")?.addEventListener("click", salva);
+  document.querySelector("#diary-input")?.addEventListener("keydown", (ev) => { if (ev.key === "Enter") salva(); });
+}
 /* salva il diario su GitHub (config/action_diary.json) — solo se c'è già un token salvato (no prompt) */
 /* carica il diario dal cloud all'avvio e lo fonde col locale (per date univoche) */
 
@@ -8170,6 +8315,122 @@ function buildHistoricalDigests() {
 
 
 /* ---------- testo per l'analisi AI: executive brief + prompt esistente + digest storici ---------- */
+/* ══ v348 — IL LIBRO INTERO, ACCANTO AL SINGOLO TITOLO ═══════════════════════════════════
+   Il CEO: "aggiungi anche una sezione ai dati del mio portafoglio così da dare un quadro più
+   ampio". La ragione e' misurata: la posizione piu' grande vale il 24% dell'azionario e i sei
+   semiconduttori il 69%, quindi un giudizio su MU che ignora il resto del libro sta valutando
+   il 24% come se fosse il 100%.
+   ⚠ NON E' IL PACCHETTO DI PORTAFOGLIO DELLA v315, che e' stato tolto e resta tolto: quello
+   chiedeva un'analisi del libro. Questo e' CONTESTO — pesi e concentrazione — perche' chi
+   giudica un titolo sappia in che compagnia sta.
+   ⚠ E NON DA' NUMERI PER DIMENSIONARE: niente liquidita', niente controvalori assoluti, solo
+   pesi relativi. Il divieto di dimensionare resta quello di sempre, e senza gli importi non
+   c'e' nemmeno la tentazione. */
+function contestoPortafoglio(tkCorrente) {
+  const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
+  if (righe.length < 2) return "";
+  const val = (r) => {
+    const q = numero(r.qta ?? r.qty), p = numero(r.price), pmc = numero(r.pmc);
+    if (!Number.isFinite(q)) return null;
+    /* ⚠ un'obbligazione quota in PERCENTUALE del nominale: moltiplicarla come un'azione la
+       fa risultare il 93% del libro (v307). Se il prezzo manca si usa il carico. */
+    const prezzo = Number.isFinite(p) ? p : pmc;
+    return /^BTP|^BOT|^CCT|^IT000/i.test(String(r.ticker)) ? q * prezzo / 100 : q * prezzo;
+  };
+  const conVal = righe.map(r => ({ r, v: val(r) })).filter(x => Number.isFinite(x.v) && x.v > 0);
+  if (!conVal.length) return "";
+  const azionarie = conVal.filter(x => !/^BTP|^BOT|^CCT|^IT000/i.test(String(x.r.ticker)));
+  const totAz = azionarie.reduce((s, x) => s + x.v, 0);
+  if (!totAz) return "";
+  const L = [];
+  L.push("=== IL LIBRO IN CUI QUESTA POSIZIONE VIVE (contesto, non richiesta di analisi del portafoglio) ===");
+  L.push("Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato "
+    + "e la liquidita' restano fuori perche' il sistema non li conosce entrambi. Nessun importo "
+    + "assoluto: servirebbe a dimensionare, e dimensionare e' vietato.");
+  const ord = [...azionarie].sort((a, b) => b.v - a.v);
+  ord.forEach(x => {
+    const pct = x.v / totAz * 100;
+    const g = numero(x.r.gain_pct_pos ?? x.r.gain_pct);
+    const qui = String(x.r.ticker).toUpperCase() === String(tkCorrente || "").toUpperCase() ? "  ← IL TITOLO DI QUESTA ANALISI" : "";
+    L.push(`- ${x.r.ticker}: ${pct.toFixed(1)}% dell'azionario${Number.isFinite(g) ? ` · ${signTxt(g)} dal carico` : ""}${qui}`);
+  });
+  /* la concentrazione per BENCHMARK, non per settore: e' il fattore che muove insieme */
+  const semi = azionarie.filter(x => x.r.rs_bench === "sox" || /semiconduc|semicondut/i.test(String(x.r.sector || "")));
+  const pesoSemi = semi.reduce((s, x) => s + x.v, 0) / totAz * 100;
+  const primeTre = ord.slice(0, 3).reduce((s, x) => s + x.v, 0) / totAz * 100;
+  L.push(`CONCENTRAZIONE: le prime tre posizioni valgono il ${primeTre.toFixed(0)}% dell'azionario`
+    + `${semi.length >= 2 ? ` · i ${semi.length} titoli che seguono il SOX ne valgono il ${pesoSemi.toFixed(0)}% (${semi.map(x => x.r.ticker).join(", ")})` : ""}`
+    + `. ⚠ Titoli che condividono lo stesso fattore sono UNA scommessa scritta piu' volte, non `
+    + `posizioni indipendenti: l'esposizione del libro a quel fattore e' la loro somma, `
+    + `non il peso del singolo nome.`);
+  return L.join("\n");
+}
+
+/* ══ v348 — IL DIARIO DELLE OPERAZIONI NEL PACCHETTO ═════════════════════════════════════
+   Il CEO: "inserisci nuovamente diario come lo avevamo un tempo e recupera i dati che inserii
+   in passato". I dati non erano persi: `config/action_diary.json` e' rimasto nel repository
+   con TREDICI operazioni vere dal 29/06 al 22/08, mentre in v256 usciva di scena solo la UI
+   che le mostrava.
+   ⚠ PERCHE' STA NEL PACCHETTO E NON SOLO IN PAGINA: chi giudica un titolo deve sapere se il
+   CEO ci ha gia' messo mano e quando. "MU +1003%" e "MU +1003%, alleggerito di 20 azioni il
+   24/06" sono due situazioni diverse, e la seconda dice che una decisione e' gia' stata presa.
+   ⚠ IL DIARIO E' UN FATTO, NON UN'ISTRUZIONE (regola C9): si pubblica cosa e' successo, non
+   cosa farne. */
+/* Il tetto serve a non far esplodere il pacchetto quando il diario avra' centinaia di
+   voci. A 12 tagliava la riga del 29/06 — quattro operazioni in una — che e' fra le
+   piu' informative che ci siano. */
+const DIARIO_MAX = 20;
+function diarioOperazioni(tkCorrente) {
+  const v = (typeof DIARIO_VOCI !== "undefined" && Array.isArray(DIARIO_VOCI)) ? DIARIO_VOCI : [];
+  if (!v.length) return "";
+  const tk = String(tkCorrente || "").toUpperCase();
+  const riga = (x) => {
+    const o = diaryOp(x);
+    const d = String(x.date || "").slice(0, 10);
+    const testo = String(x.text || "").replace(/\s+/g, " ").trim();
+    /* ⚠ UNA RIGA CHE CONTIENE PIU' OPERAZIONI NON SI RIASSUME. "Alleggerito micron 20
+       azioni e amd 25 e venduto Intel e tesla tutto" strutturata diventa "VENDITA 20 MU"
+       e le altre tre sparirebbero: nel pacchetto di AMD quella vendita non esisterebbe.
+       Prosa e voci multiple si pubblicano INTEGRE, e chi legge le interpreta con tutto
+       il testo davanti invece che con un riassunto che ha perso i tre quarti. */
+    if (!o || o.multi) return `- ${d}: ${testo}`;
+    const mio = tk && String(o.ticker).toUpperCase() === tk ? "  ← QUESTO TITOLO" : "";
+    const quando = o.quando && o.quando !== "DA CONFERMARE" ? o.quando : `${d} ⚠ data dell'annotazione, non dell'ordine`;
+    const q = o.qty != null ? fmtNum.format(o.qty) : "quantita' non annotata";
+    const p = o.prezzo != null ? ` a ${o.prezzo}` : " (prezzo non annotato)";
+    return `- ${o.tipo} ${q} ${o.ticker}${p} (${quando})${mio}`;
+  };
+  /* Una voce riguarda questo titolo se lo CITA, non solo se il parser l'ha messo in testa:
+     nella riga del 29/06 il primo nome e' "micron", ma la stessa riga parla anche di AMD. */
+  const cita = (x) => {
+    const mappa = diaryTickerMap();
+    const trovati = new Set();
+    const o = diaryOp(x);
+    if (o) trovati.add(String(o.ticker).toUpperCase());
+    (String(x.text || "").toLowerCase().match(/[a-z]{2,}/g) || []).forEach(w => { if (mappa[w]) trovati.add(mappa[w]); });
+    return trovati.has(tk);
+  };
+  const suo = tk ? v.filter(cita) : [];
+  const L = [];
+  L.push("=== IL DIARIO DELLE OPERAZIONI DEL CEO (cosa ha gia' fatto, e quando) ===");
+  L.push("Sono le sue annotazioni, non ricostruzioni del sistema. Una posizione su cui ha gia' "
+    + "agito non e' la stessa cosa di una posizione mai toccata: se ha alleggerito o incrementato "
+    + "di recente, su quel nome una decisione e' gia' stata presa.");
+  if (suo.length) {
+    L.push(`SU QUESTO TITOLO (${tk}): ${suo.length} ${suo.length > 1 ? "operazioni annotate" : "operazione annotata"}.`);
+    suo.forEach(x => L.push(riga(x)));
+    L.push("");
+  }
+  L.push(v.length > DIARIO_MAX
+    ? `ULTIME OPERAZIONI SUL LIBRO (le piu' recenti ${DIARIO_MAX} su ${v.length}):`
+    : `TUTTE LE OPERAZIONI ANNOTATE (${v.length}):`);
+  v.slice(0, DIARIO_MAX).forEach(x => L.push(riga(x)));
+  L.push("⚠ Le voci piu' vecchie sono testo libero scritto a mano: contengono piu' operazioni in "
+    + "una riga e date interne al testo. Leggile come sono, non normalizzarle.");
+  return L.join("\n");
+}
+
 function historicalDigestText() {
   /* v256 — DIGEST SOLO MACRO. Cadono con il portafoglio: CINEMATICA & TREND PER TITOLO (32
      righe di ticker), REGIME DI VARIANZA (MCR Top-3), NEWS VERTICALE PER TITOLO ATTIVO,
@@ -8522,7 +8783,11 @@ function fattiTitolo(tk) {
                          La pipeline il livello ce l'ha gia'. Si legge, non si ricostruisce. */
                       sma50Liv: numero((((riga.tv || {}).tecnica || {}).medie || {}).sma50?.liv),
                       sma200Liv: numero((((riga.tv || {}).tecnica || {}).medie || {}).sma200?.liv),
-                      pe: numero(riga.pe), settore: riga.sector || null,
+                      pe: numero(riga.pe),
+                      /* v348 — il prospettico era in data.json e non usciva dal pacchetto */
+                      peFwd: numero((riga.stats || {}).forward_pe),
+                      epsFwd: numero((riga.stats || {}).eps_forward),
+                      settore: riga.sector || null,
                       trimestrale: riga.earnings_date || null,
                       /* ⚠ v293 — barre e range servono a EMA e Fibonacci, che calcoliamo NOI
                          (vedi datiNostriDelTitolo). Passano da qui perche' `fattiTitolo` e' la
@@ -9327,7 +9592,14 @@ function datiNostriDelTitolo(tk) {
     [riga(50, tec.sma50, f.sma50Liv ?? tec.sma50Liv),
      riga(200, tec.sma200, f.sma200Liv ?? tec.sma200Liv)].filter(Boolean).forEach(x => L.push(x));
   }
-    if (Number.isFinite(t.pe)) L.push(`- P/E (trailing): ${t.pe}×`);
+    if (Number.isFinite(t.pe)) L.push(`- P/E (trailing): ${t.pe}× — sugli utili GIA' riportati negli ultimi 12 mesi`);
+    if (Number.isFinite(t.peFwd) || Number.isFinite(t.epsFwd)) {
+      L.push(`- P/E PROSPETTICO: ${Number.isFinite(t.peFwd) ? t.peFwd.toFixed(1) + "×" : "n.d."}`
+        + `${Number.isFinite(t.epsFwd) ? ` (utile per azione atteso ${fmtNum.format(t.epsFwd)})` : ""}`
+        + ` — e' il CONSENSO DEGLI ANALISTI sull'esercizio prossimo, non una guidance della societa'`
+        + `${Number.isFinite(t.pe) && Number.isFinite(t.peFwd) && t.pe > 0 ? ` e non un tasso di crescita: ${(t.pe / t.peFwd).toFixed(1)}× di scarto fra i due multipli misura quanto utile in piu' il consenso si aspetta, non quanto il titolo sia caro` : ""}.`
+        + ` ⚠ SU UN TITOLO CICLICO i due multipli raccontano storie opposte e vanno letti insieme: il trailing dice cosa l'azienda HA guadagnato, il forward incorpora l'ipotesi che il ciclo continui — che di solito e' proprio l'ipotesi in discussione.`);
+    }
     if (t.settore) L.push(`- Settore secondo la nostra classificazione: ${t.settore}`);
     if (t.trimestrale) L.push(`- Prossima trimestrale attesa: ${t.trimestrale}`);
   }
@@ -9421,7 +9693,7 @@ function buildPromptTicker(tkGrezzo) {
 `══ REGOLE SUI NUMERI — le quattro che decidono se l'analisi vale ══`,
 `1. PASSO 0 — OBBLIGATORIO: CERCA ONLINE prima di scrivere qualsiasi cosa. Non e' un'opzione. SE NON PUOI NAVIGARE: scrivi una riga — "Non ho accesso al web: non posso produrre questa analisi" — e FERMATI. Non compilare il referto con "n.d." dappertutto: ha la forma di un lavoro fatto e non ne ha la sostanza. "n.d." vale per il singolo dato non trovato DOPO averlo cercato, mai come politica generale.`,
 `   DOVE CERCARE: prezzi e tecnici → finance.yahoo.com/quote/${tk} · stockanalysis.com/stocks/${tk} · investing.com — fondamentali → stockanalysis.com/stocks/${tk}/financials · macrotrends · sito IR — trimestrale → comunicato IR · SEC EDGAR (sec.gov/cgi-bin/browse-edgar) — concorrenti e quote → ultimo 10-K (Competition) — notizie → Reuters, Bloomberg, CNBC, Barron's — consenso → stockanalysis/forecast · marketbeat · tipranks.`,
-`2. GERARCHIA DELLE FONTI: vince il rango piu' alto. (1) FONTE PRIMARIA — societa' e filing SEC, l'unica valida per bilancio e guidance · (2) dati di mercato: Yahoo, stockanalysis, investing · (3) stampa finanziaria: Reuters, Bloomberg, WSJ, CNBC, FT · (4) aggregatori di consenso, dichiarando SEMPRE quanti analisti e a che data. NON SONO FONTI e non si marcano [VERIFICATO]: Reddit, X, StockTwits, forum, blog anonimi, video, e ogni pagina che riporta un numero senza dire da dove viene — se un numero lo trovi solo li', e' un dato che non hai. Se il rango 2-4 contraddice il rango 1, vince l'1 e lo dici.`,
+`2. GERARCHIA DELLE FONTI: vince il rango piu' alto. (1) FONTE PRIMARIA — societa' e filing SEC, l'unica valida per bilancio e guidance · (2) dati di mercato: Yahoo, stockanalysis, investing · (3) stampa finanziaria: Reuters, Bloomberg, WSJ, CNBC, FT · (4) aggregatori di consenso, dichiarando SEMPRE quanti analisti e a che data. NON SONO FONTI PER UN NUMERO e non si marcano [VERIFICATO]: Reddit, X, StockTwits, forum, blog anonimi, video, e ogni pagina che riporta una cifra senza dire da dove viene — se un numero lo trovi solo li', e' un dato che non hai. ⚠ ECCEZIONE UNICA E DICHIARATA: Reddit (r/wallstreetbets, r/stocks, r/investing) vale come SEGNALE DI POSIZIONAMENTO RETAIL — cosa il piccolo investitore sta guardando e da che parte sta — mai come fonte di un bilancio, di una guidance o di un prezzo. Va sempre etichettato [SENTIMENT RETAIL, non verificato] e non puo' sostenere da solo nessuna conclusione. Se il rango 2-4 contraddice il rango 1, vince l'1 e lo dici.`,
 `3. IL PREZZO DI RIFERIMENTO E' UNO SOLO: valore, data e ora, borsa. Distanze dai livelli, capitalizzazione, rendimento da inizio anno e upside si calcolano su QUELLO e lo dichiarano ("−6% dal riferimento"). Citare $476 nella scheda, $482 nel commento e "chiusura del 31/07" nella tecnica significa descrivere tre giorni diversi come se fossero oggi — e' successo, ed e' il modo piu' facile di sbagliare un ingresso. A mercato chiuso il riferimento e' l'ultima chiusura, e lo scrivi.`,
 `4. NIENTE [VERIFICATO] DERIVATO: vale su cio' che hai LETTO in una fonte, mai su cio' che hai ricavato. "Capitalizzazione 780-790 mld, ricavabile da 807 mld di due settimane fa piu' il calo" e' una stima: si scrive [STIMA] col calcolo accanto, oppure "n.d.". Ogni numero esterno porta fonte e data.`,
 ``,
@@ -9446,7 +9718,7 @@ function buildPromptTicker(tkGrezzo) {
    "da non tagliare per quanto sembrino ovvie". */
 `══ COSA DEVI CONSEGNARE — E QUANTO LUNGO ══`,
 ``,
-`BUDGET: 1.200-1.400 parole IN TUTTO. E' un vincolo, non un'indicazione. Un blocco che non ha`,
+`BUDGET: 1.600-1.800 parole IN TUTTO. E' un vincolo, non un'indicazione. Un blocco che non ha`,
 `nulla da dire si chiude in una riga: meglio corto e vero che lungo e riempito. Tabelle solo`,
 `dove servono a confrontare; niente tabella per elencare tre numeri.`,
 ``,
@@ -9492,10 +9764,16 @@ function buildPromptTicker(tkGrezzo) {
 `SISTEMA SA GIA'" qui sotto, con il metodo dichiarato: usa QUELLI. Se ne trovi altri online che`,
 `non tornano, scrivi entrambi e di' quale usi e perche' — non sostituirli in silenzio.`,
 ``,
-`6) SENTIMENT DEGLI ANALISTI — consenso (quanti compra/mantieni/vendi), target medio e distanza`,
-`dal prezzo, revisioni delle stime negli ultimi 90 giorni e direzione, posizionamento (short`,
-`interest, flussi). Le revisioni contano piu' del target: il target e' vecchio quanto l'ultimo`,
-`aggiornamento, la revisione dice cosa sta cambiando adesso.`,
+`6) SENTIMENT — degli analisti E del retail, tenuti separati.`,
+`ANALISTI: consenso (quanti compra/mantieni/vendi), target medio e distanza dal prezzo, e la`,
+`DISPERSIONE fra target minimo e massimo — una forbice larga su un consenso unanime dice che`,
+`non stanno valutando la stessa azienda, ed e' un'informazione piu' utile della media. Poi le`,
+`revisioni degli ultimi 90 giorni e la direzione, e il posizionamento (short interest, flussi).`,
+`Le revisioni contano piu' del target: il target e' vecchio quanto l'ultimo aggiornamento, la`,
+`revisione dice cosa sta cambiando adesso.`,
+`RETAIL: cosa si dice di questo titolo su Reddit in questi giorni, etichettato [SENTIMENT`,
+`RETAIL, non verificato]. Serve a sapere da che parte sta il piccolo investitore, non a`,
+`stabilire un fatto: euforia su un titolo gia' corso e' un dato di posizionamento, non una tesi.`,
 ``,
 `7) LA CHIUSURA — ingressi e settore, su tre orizzonti.`,
 `Prima il SETTORE: come sta messo il comparto di ${tk} e se questo titolo e' il migliore o il`,
@@ -9551,13 +9829,35 @@ function buildPromptTicker(tkGrezzo) {
 `  trovi ADESSO in rete.`,
 `· Niente domande in chiusura e niente offerte di approfondimento: quello che serve, dillo qui.`,
 ``,
+`══ CONTROLLO DEL PACCHETTO — sezione obbligatoria, in fondo, intitolata "SEGNALAZIONI AL SISTEMA" ══`,
+`Mentre lavori, tratta i numeri di questo pacchetto come DA VERIFICARE, non come veri per`,
+`definizione. Il sistema che li produce ha gia' pubblicato, in passato: un percentile sopra 100,`,
+`un beta diviso per cento, una variazione mensile etichettata come trimestrale con il segno`,
+`opposto a quello vero, una prossima uscita annunciata con due mesi di ritardo, e un confronto`,
+`fra due esiti diversi presentato come divergenza fra fonti. Ogni volta il numero sembrava`,
+`plausibile: e' cosi' che questi difetti sopravvivono.`,
+`QUANDO un dato ti sembra incongruo — fuori scala, in contraddizione con un altro dato dello`,
+`stesso pacchetto, incompatibile con quello che sai del mercato, o semplicemente strano —`,
+`VERIFICALO ONLINE su una fonte primaria prima di usarlo, e poi elencalo qui sotto con:`,
+`  · il dato come lo scrive il pacchetto, testuale`,
+`  · il valore che hai trovato alla fonte, con URL e data`,
+`  · quale dei due hai usato nell'analisi e perche'`,
+`  · se e' un difetto del sistema o solo un dato che sorprende (sono cose diverse: il primo va`,
+`    corretto nel codice, il secondo e' informazione di mercato)`,
+`Rientrano in questa sezione anche: dati che il pacchetto DICE di avere e che non ci sono, rimandi`,
+`a sezioni assenti, unita' di misura ambigue, e numeri che il sistema calcola in due punti con due`,
+`valori diversi.`,
+`Se non hai trovato nulla, scrivi "SEGNALAZIONI AL SISTEMA: nessuna incongruenza rilevata" — e`,
+`dillo solo se hai davvero controllato. Questa sezione non e' un adempimento: e' il modo in cui`,
+`chi mantiene il sistema scopre cosa correggere, e una riga taciuta qui e' un difetto che resta.`,
+``,
 `──────────────────────────────────────────────────────────────────`,
 `QUADRO MACRO DI RIFERIMENTO (rilevato dal sistema, non da te)`,
 `Snapshot del ${rilevazione} · prossimo aggiornamento atteso ${prossimoRun}`,
 `──────────────────────────────────────────────────────────────────`,
 ].join("\n");
 
-  return [istruzioni, datiNostriDelTitolo(tk), soloDati, storico].filter(Boolean).join("\n\n");
+  return [istruzioni, datiNostriDelTitolo(tk), contestoPortafoglio(tk), diarioOperazioni(tk), soloDati, storico].filter(Boolean).join("\n\n");
 }
 
 async function consegnaPacchetto(testo, che, esito) {
@@ -9630,6 +9930,7 @@ async function copyCIOText() {
 /* ---------------- eventi ---------------- */
 $("#btn-refresh")?.addEventListener("click", refreshAll);
 $("#btn-cio")?.addEventListener("click", copyCIOText);
+$("#btn-diary")?.addEventListener("click", apriDiario);   // v348 — il diario torna raggiungibile
 $("#tk-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") copyCIOText(); });
 
 function sellManuali() {
@@ -10061,7 +10362,9 @@ document.addEventListener("click", (e) => {
 
 controllaVersione();   // v216 — avvisa se il browser sta servendo una pagina vecchia
 loadData();
-/* v256 — il diario delle azioni esce col portafoglio: non c'e' piu' niente da annotare. */
+/* v348 — il diario rientra col portafoglio: c'e' di nuovo qualcosa da annotare, e serve al
+   pacchetto per sapere su quali titoli il CEO ha gia' agito. */
+loadDiarioCloud();
 loadPromptHeaderCloud();   // testata del pacchetto macro (config/prompt_header_macro.txt)
 /* v257 — la watchlist e il grafico all'avvio: prima la copia locale (subito, senza rete), poi
    quella del repo quando arriva. Stessa logica dell'ordine delle sezioni: l'attesa della rete
