@@ -391,8 +391,12 @@ check("fedwatch: rami mutuamente esclusivi su tutto il range",
 # sbagliato era il TITOLO, con la soglia "Asset Inflation" fissata a 40.
 # ⚠ Il commento nel codice dichiarava quel ramo "corretto" dal v207: lo era sulla FREQUENZA, non
 #    sulla FINESTRA. Una dichiarazione di correttezza non è una verifica.
-_prof248 = [("2021-04-01", 100.0), ("2021-07-01", 105.0), ("2025-10-01", 127.0), ("2026-01-01", 132.4)]
-_ndx248 = [("2021-09-01", 100.0), ("2022-01-01", 110.0), ("2026-01-01", 180.0), ("2026-08-01", 220.0)]
+_prof248 = ([(f"{a}-{m}-01", 100.0 + i * 1.7) for i, (a, m) in enumerate(
+    [(y, mm) for y in range(2021, 2027) for mm in ("01", "04", "07", "10")])
+    if f"{a}-{m}-01" >= "2021-04-01" and f"{a}-{m}-01" <= "2026-01-01"])
+_ndx248 = ([(f"{y}-{mm:02d}-01", 100.0 + i * 2.6) for i, (y, mm) in enumerate(
+    [(y, mm) for y in range(2021, 2027) for mm in range(1, 13)])
+    if f"{y}-{mm:02d}-01" >= "2021-09-01" and f"{y}-{mm:02d}-01" <= "2026-08-01"])
 _al248 = _finestra_comune(_ndx248, _prof248)
 
 check("v248 NDX: esiste una finestra comune fra Nasdaq e profitti", _al248 is not None)
@@ -403,6 +407,25 @@ check("v248 NDX: il punto senza controparte (2026-08) resta FUORI dal confronto"
 check("v248 NDX: allineare RIDUCE il gap gonfiato dai mesi scoperti", bool(_al248) and
       round(_al248[0][-1][1] / _al248[0][0][1] * 100 - _al248[1][-1][1] / _al248[1][0][1] * 100, 1)
       < round(220.0 - 132.4, 1))
+
+# ═══ v349 — LA FINESTRA ERA ALLINEATA, LA PARTENZA NO ═══════════════════════════════════
+# I check v248 qui sopra verificano che le due serie FINISCANO insieme, e passavano: la loro
+# stessa fixture ha le partenze disallineate (2021-09 contro 2021-04) e nessuno se n'era
+# accorto. Sui dati veri del 23/08/2026 il ramo NDX ribasava il Nasdaq sul 2021-09-01 e i
+# profitti sul 2021-10-01 — un mese di borsa in piu' senza controparte — e pubblicava
+# ndx_gap 40,1 pp invece di 27,3. Sopra la soglia dichiarata di 40, quindi worst_gap prendeva
+# l'NDX e l'etichetta diventava "Asset Inflation (driver: NDX)" al posto di "Tensione
+# moderata". Il difetto stava nella riga che il commento v248 dichiarava sanata.
+check("v349 finestra: le due serie PARTONO dalla stessa data, non solo dallo stesso intervallo",
+      bool(_al248) and _al248[0][0][0] == _al248[1][0][0])
+_mens = [("2021-09-01", 100.0), ("2021-10-01", 107.9), ("2022-01-01", 110.0), ("2026-01-01", 173.9)]
+_trim = [("2021-10-01", 98.9), ("2022-01-01", 100.0), ("2026-01-01", 132.4)]
+_alMix = _finestra_comune(_mens, _trim)
+check("v349 finestra: due frequenze diverse partono comunque insieme",
+      bool(_alMix) and _alMix[0][0][0] == _alMix[1][0][0] == "2021-10-01")
+check("v349 finestra: il punto scoperto in testa resta FUORI dal ribasamento",
+      bool(_alMix) and all(d != "2021-09-01" for d, _ in _alMix[0]))
+
 # ═══ v254 — UNA POSIZIONE SENZA `name` NON DEVE FERMARE L'ACQUISIZIONE ═══════════════════
 # `pos["name"]` sollevava KeyError e uccideva l'INTERO run prima di scaricare un solo prezzo:
 # quattro posizioni scritte dal diario senza quel campo hanno tenuto data.json fermo a 9

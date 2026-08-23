@@ -1431,6 +1431,27 @@ def _finestra_comune(a, b):
     tb = [(d, v) for d, v in b if da <= d <= fino]
     if len(ta) < 2 or len(tb) < 2:
         return None
+    # ⚠⚠ v349 — LO STESSO INTERVALLO NON E' LA STESSA PARTENZA, e il docstring qui sopra
+    # descrive esattamente il difetto che restava vivo. Ritagliare su [da, fino] allinea la
+    # FINESTRA; con due frequenze diverse le due serie hanno pero' la loro PRIMA osservazione
+    # dentro quella finestra in due date diverse, e il chiamante ribasa ciascuna sul proprio
+    # primo punto — cioe' di nuovo su due partenze diverse.
+    # Misurato sui dati veri del 23/08/2026, ramo NDX di corp_profit:
+    #   ndx_al partiva da 2021-09-01, cp_al da 2021-10-01 (l'NDX e' mensile, i profitti
+    #   trimestrali) — un mese di Nasdaq in piu' che i profitti non avevano.
+    #   ndx_gap pubblicato 40,1 pp · ricalcolato su base comune 27,3 pp.
+    # Non era un decimale: 40,1 supera la soglia dichiarata di 40 pp, quindi worst_gap
+    # prendeva l'NDX invece dell'S&P e il sistema pubblicava "Asset Inflation (driver: NDX)"
+    # dove il dato allineato dice "Tensione moderata". Il numero sbagliato era quello stampato
+    # in cima, con la sua etichetta.
+    # Si avanza `da` alla prima data in cui ENTRAMBE hanno un'osservazione e si ritaglia di
+    # nuovo: cosi' il ribasamento del chiamante parte dallo stesso mese per tutte e due.
+    da2 = max(ta[0][0], tb[0][0])
+    if da2 != da:
+        ta = [(d, v) for d, v in ta if d >= da2]
+        tb = [(d, v) for d, v in tb if d >= da2]
+        if len(ta) < 2 or len(tb) < 2:
+            return None
     return ta, tb
 
 

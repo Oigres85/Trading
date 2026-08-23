@@ -358,7 +358,8 @@ check("CIO v128: digest HY OAS — percentile nel range e allarme compressione",
   DATA.macro.credit = { spread_hy: 2.7, history: Array.from({length: 250}, (_, i) => ({ d: "x", v: 2.7 + (i % 50) / 50 })) };
   const d = buildHistoricalDigests().find(x => x.label.startsWith("HY OAS"));
   DATA.macro.credit = saved;
-  return d.text.includes("percentile 0°") && d.text.includes("compressione estrema")`));
+  const p = Number((d.text.match(/percentile (\\d+)°/) || [])[1]);
+  return Number.isFinite(p) && p <= 5 && d.text.includes("compressione estrema")`));
 
 
 check("shock v141→v176: il KOSPI entra solo se Seoul è DAVVERO in sessione; 'live' fuori orario è un fantasma", run(`
@@ -3467,10 +3468,23 @@ check("v293 consegna: gli otto blocchi richiesti ci sono tutti e in ordine", suV
 
 check("v293 tecnica: EMA e Fibonacci sono nel pacchetto, calcolati dal sistema", suVeri(`
   const p = buildPromptTicker("AMD");
-  return /Medie esponenziali: EMA 20 [\\d.]+/.test(p)
-      && /calcolate dal sistema su \\d+ barre giornaliere/.test(p)
+  const daPagina = /Medie esponenziali: EMA 20 [\\d.]+/.test(p);
+  const daPipeline = /Media esponenziale 50: [\\d.]+/.test(p);
+  return (daPagina || daPipeline)
+      && (daPagina ? /calcolate dal sistema su \\d+ barre giornaliere/.test(p) : true)
       && /Ritracciamenti di Fibonacci sul range a 52 settimane/.test(p)
       && /calcolo esatto sui due estremi/.test(p)`));
+
+check("v349 tecnica: la stessa media non esce due volte con due valori", suVeri(`
+  for (const tk of ["MU", "AMD", "NVDA"]) {
+    const p = buildPromptTicker(tk);
+    /* misurato su MU: "EMA 50 906.65" lato pagina e "Media esponenziale 50: 907.06" lato
+       pipeline, nello stesso pacchetto, a trentotto righe di distanza */
+    if (/Medie esponenziali: EMA/.test(p) && /Media esponenziale 50:/.test(p)) return false;
+    /* e il pacchetto non puo' dichiarare impossibile un calcolo che poi pubblica */
+    if (/EMA 200 NON calcolata/.test(p) && /Media esponenziale 200: [\\d.]+/.test(p)) return false;
+  }
+  return true;`));
 
 check("v293 tecnica: l'EMA 200 non si pubblica, e si dice perche'", suVeri(`
   const p = buildPromptTicker("AMD");
@@ -3583,7 +3597,7 @@ check("v311 portafoglio: input non valido = nessuna scrittura, e lo dice", (() =
 
 check("v311 portafoglio: un titolo nuovo entra anche nella watchlist, dichiarandolo", (() => {
   const i = src.indexOf("async function salvaPosizioni");
-  const corpo = src.slice(i, i + 4200);
+  const corpo = src.slice(i, src.indexOf("\n}\n", i) + 3);
   return corpo.includes("WATCHLIST_PATH")
       && corpo.includes("Ho aggiunto anche alla watchlist")
       && corpo.includes("la pipeline non ne prenderebbe il prezzo");
@@ -3591,7 +3605,7 @@ check("v311 portafoglio: un titolo nuovo entra anche nella watchlist, dichiarand
 
 check("v311 portafoglio: senza token dichiara che il salvataggio e' locale", (() => {
   const i = src.indexOf("async function salvaPosizioni");
-  const corpo = src.slice(i, i + 4200);
+  const corpo = src.slice(i, src.indexOf("\n}\n", i) + 3);
   return corpo.includes("solo su questo browser") && corpo.includes("la pipeline non lo legge");
 })());
 
@@ -3823,6 +3837,116 @@ check("v348 segnalazioni: il pacchetto chiede una sezione di ritorno sui dati in
 check("v348 sentiment: Reddit e' ammesso come posizionamento retail, dichiarato tale", suVeri(`
   const p = buildPromptTicker("MU");
   return /Reddit/.test(p) && /SENTIMENT RETAIL, non verificato/.test(p)`));
+
+
+/* ══ v349 — TRE DIFETTI TROVATI CONTROLLANDO "TUTTI GLI INDICATORI, UNA CLASSIFICA SOLA" ═════
+   Nessuno dei tre rompeva niente: uno stampava "—", uno un colore neutro, uno uno zero. Sono
+   la classe piu' costosa — il sistema che mente restando in piedi — e i gate qui sotto la
+   sorvegliano al punto in cui e' misurabile. */
+
+check("v349 schede: una serie di PUNTEGGI non batte mai la forma che mostra il dato", (() => {
+  /* La scheda "Valutazione S&P" aveva l'asse a 50·51·52 — il punteggio accumulato in
+     metrics_history — mentre i due multipli veri (29,6× e 21×) non comparivano. Il pavimento
+     v297 contava i PUNTI e non guardava la NATURA della serie. */
+  const riga = src.split("\n").find(l => l.includes("const se = (forma &&"));
+  return !!riga && riga.includes("seGrezza.accumulata") && riga.includes("quanti < SERIE_MINIMA");
+})());
+
+check("v349 materie: la variazione a 12 mesi si legge dal campo che la pipeline scrive", suVeri(`
+  const m = DATA.macro || {};
+  const s = (m.materie || {}).sox;
+  if (!s || s.var_1y == null) return true;
+  const r = indicatoriClassifica().find(x => x.k === "mat:sox");
+  /* il SOX faceva +104% e la scheda stampava "—": app.js leggeva pct_1y, rinominato in v316 */
+  return !!r && r.sub.includes(String(s.var_1y)) && !/—\\s*in 12 mesi/.test(r.sub);`));
+
+check("v349 materie: nessun lettore usa pct_1y senza il ripiego su var_1y", (() => {
+  /* un campo rinominato senza seguire i suoi lettori non rompe: mente in silenzio */
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const nude = codice.split("\n").filter(l => l.includes(".pct_1y") && !l.includes("var_1y"));
+  return nude.length === 0;
+})());
+
+check("v349 mossa: ogni indicatore misura il MOVIMENTO DELLA PROPRIA serie", suVeri(`
+  const m = DATA.macro || {};
+  if (!((m.vix || {}).spark || []).length || !(m.curve_history || []).length) return true;
+  const calc = (p) => {
+    const d = []; for (let i = 1; i < p.length; i++) d.push(p[i].v - p[i - 1].v);
+    const me = d.reduce((a, b) => a + b, 0) / d.length;
+    const sd = Math.sqrt(d.reduce((a, b) => a + (b - me) ** 2, 0) / d.length);
+    return sd ? Math.round(Math.abs(d[d.length - 1] - me) / sd * 10) / 10 : null;
+  };
+  const atteso = calc(m.vix.spark.map(v => ({ v })));
+  /* prima il VIX riceveva la mossa della CURVA DEI TASSI: una catena if/else in cui il ramo
+     "in:curve || credit || vix" era irraggiungibile perche' "in:" lo prendeva il ramo sopra */
+  return mossaRelativa("vix") === atteso && mossaRelativa("vix") !== calc(m.curve_history);`));
+
+check("v349 mossa: la curva riceve la sua serie vera, non un ramo morto", suVeri(`
+  const m = DATA.macro || {};
+  if ((m.curve_history || []).length < 12) return true;
+  /* indicators["curve"].storico e' vuoto: la serie sta in m.curve_history, 369 punti */
+  return mossaRelativa("in:curve") !== null;`));
+
+
+/* ══ v349 — QUATTRO DIFETTI DEI DIGEST STORICI, TUTTI DELLA STESSA FAMIGLIA ═══════════════
+   Un numero che dichiara una cosa e ne misura un'altra. Nessuno di questi rompeva niente. */
+
+check("v349 digest: Δ1M si misura sul CALENDARIO e dichiara le due date", suVeri(`
+  const t = historicalDigestText();
+  /* "Δ1M" contava 21 PUNTI: sulle materie prime, diradate dalla pipeline, erano 58 giorni.
+     Il petrolio usciva a +23,77% "in un mese" quando il mese vero faceva +2,53%. */
+  const righe = t.split("\\n").filter(l => /Δ1M/.test(l));
+  if (!righe.length) return true;
+  return righe.every(l => /Δ1M [^·]*\\(\\d{4}-\\d{2}-\\d{2}→\\d{4}-\\d{2}-\\d{2}\\)/.test(l)
+                       || /la serie non porta le date/.test(l));`));
+
+check("v349 digest: la finestra dichiarata e' quella davvero coperta", suVeri(`
+  const m = DATA.macro || {};
+  const h = ((m.materie || {}).petrolio || {}).history || [];
+  if (h.length < 30) return true;
+  const gg = Math.round((new Date(h[h.length - 1].d) - new Date(h[0].d)) / 86400000);
+  const t = historicalDigestText();
+  const riga = t.split("\\n").find(l => l.startsWith("Petrolio WTI"));
+  if (!riga) return true;
+  /* 361 giorni etichettati "serie ~6M": l'etichetta era scritta a mano e non seguiva i dati */
+  const dichiarati = Number((riga.match(/serie ~(\\d+)([MA])/) || [])[1]);
+  const unita = (riga.match(/serie ~\\d+([MA])/) || [])[1];
+  const gDich = unita === "A" ? dichiarati * 365 : dichiarati * 30;
+  return Math.abs(gDich - gg) <= Math.max(45, gg * 0.2);`));
+
+check("v349 digest: 'percentile' e' un rango vero, non la posizione nel range", (() => {
+  /* min-max e rango sono due misure diverse: sull'HY OAS il primo diceva 14° e il secondo 23°,
+     e la soglia <=20 accendeva un allarme che al rango vero non si accende. */
+  const i = src.indexOf("const dgPercentile");
+  const corpo = src.slice(i, src.indexOf("};", i));
+  return corpo.includes("filter(y => y < x)") && !corpo.includes("(x - lo) / (hi - lo)");
+})());
+
+check("v349 digest: il valore collocato viene dalla stessa fonte della serie", suVeri(`
+  const m = DATA.macro || {};
+  const sc = ((m.tassi || {}).scadenze || []).find(x => x && x.key === "a10");
+  if (!sc) return true;
+  const t = historicalDigestText();
+  const riga = t.split("\\n").find(l => l.startsWith("Treasury 10A"));
+  if (!riga) return true;
+  /* prima ci finiva ^TNX da yfinance (4,74) dentro la distribuzione FRED DGS10: risultato 100°,
+     cioe' "mai stato cosi' alto", perche' era un valore estraneo alla serie */
+  return riga.includes(String(sc.value).replace(".", ","))
+      && !riga.includes(String(((m.carry || {}).us10 ?? "")).replace(".", ","));`));
+
+check("v349 liquidita': il dato mensile porta la sua data anche nel pacchetto", suVeri(`
+  const L = (DATA.macro || {}).liquidity_split || {};
+  if (L.retail_mmf_bln == null || !L.retail_date) return true;
+  const t = buildCIOText();
+  /* la scheda in pagina lo dichiarava "non e' il dato di oggi", il pacchetto no: 84 giorni
+     presentati come scaricati al run di stamattina */
+  return t.includes("rilevazione " + L.retail_date) && /NON e' il dato di oggi/.test(t);`));
+
+check("v349 opzioni: nessuna frase mutilata arriva all'LLM", suVeri(`
+  const p = buildPromptTicker("MU");
+  /* "grandezza diversa dai volumi qui sopra,  a farli tornare" — verbo perso in una modifica,
+     doppio spazio a fare da cicatrice, consegnato cosi' */
+  return !/,\\s\\sa farli tornare/.test(p) && !/\\s\\s+[a-z]+ tornare/.test(p);`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

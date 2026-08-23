@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "348";
+const BUILD_VERSION = "349";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -2932,32 +2932,64 @@ async function salvaPosizioni() {
       + `finché il file non è sul repository.`;
     return;
   }
+  /* ══ v349 — PERCHE' GITHUB HA DETTO NO ════════════════════════════════════════════════
+     Il CEO ha visto "Controlla che il token abbia il permesso di scrivere sul repository"
+     mentre il token funzionava benissimo: nella stessa ora tre sue scritture erano andate a
+     buon fine. Questa funzione restituiva `r.ok` e buttava via il codice di stato, quindi
+     OGNI fallimento diventava "colpa del token" — e la diagnosi mandava a cercare il guasto
+     dove non c'era.
+     ⚠ LA CAUSA VERA E' STRUTTURALE, NON UN CASO: la scrittura legge lo `sha` del file e poi
+     lo rimanda indietro. Fra le due chiamate la pipeline commissiona il suo run (ogni 30-70
+     minuti) e lo `sha` invecchia: GitHub risponde 409 Conflict. Non e' un errore del CEO ne'
+     del token, e' una collisione prevedibile — quindi si RIPROVA una volta con lo sha fresco
+     invece di annunciare un guasto. */
   const scrivi = async (path, contenuto, messaggio) => {
-    let sha;
-    const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,
-      { headers: ghHeaders(token), cache: "no-store" });
-    if (g.ok) sha = (await g.json()).sha;
-    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-      method: "PUT", headers: ghHeaders(token),
-      body: JSON.stringify({ message: messaggio, sha,
-        content: btoa(unescape(encodeURIComponent(JSON.stringify(contenuto, null, 1) + "\n"))) }),
-    });
-    return r.ok;
+    const corpo = (sha) => JSON.stringify({ message: messaggio, sha,
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(contenuto, null, 1) + "\n"))) });
+    const shaCorrente = async () => {
+      const g = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,
+        { headers: ghHeaders(token), cache: "no-store" });
+      return g.ok ? (await g.json()).sha : undefined;
+    };
+    let r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,
+      { method: "PUT", headers: ghHeaders(token), body: corpo(await shaCorrente()) });
+    if (r.status === 409) {
+      /* qualcuno ha scritto in mezzo: si rilegge lo sha e si riprova UNA volta sola */
+      r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`,
+        { method: "PUT", headers: ghHeaders(token), body: corpo(await shaCorrente()) });
+    }
+    if (r.ok) return { ok: true };
+    let dettaglio = "";
+    try { dettaglio = (await r.json()).message || ""; } catch { /* risposta non JSON */ }
+    return { ok: false, stato: r.status, dettaglio };
+  };
+  /* la diagnosi segue il codice di stato: ognuno ha una causa e un rimedio diversi */
+  const perche = (e) => {
+    if (e.stato === 401) return "il token non è più valido (scaduto o revocato): va rigenerato su GitHub";
+    if (e.stato === 403) return "il token è valido ma non ha il permesso di scrivere su questo repository (serve lo scope <code>repo</code>, o <code>contents: write</code> se è un fine-grained)";
+    if (e.stato === 404) return "GitHub non trova il file o il repository con questo token — di solito è un fine-grained token che non ha questo repository fra quelli selezionati";
+    if (e.stato === 409) return "un'altra scrittura è arrivata in mezzo due volte di fila (di solito la pipeline): riprova fra qualche secondo, non è un problema del token";
+    if (e.stato === 422) return "GitHub ha rifiutato il contenuto del file, non il permesso";
+    return "GitHub ha risposto " + (e.stato || "senza codice");
   };
   try {
-    const ok1 = await scrivi(POSIZIONI_PATH, file, "Posizioni aggiornate dalla dashboard");
-    let ok2 = true;
+    const e1 = await scrivi(POSIZIONI_PATH, file, "Posizioni aggiornate dalla dashboard");
+    let e2 = { ok: true };
     if (nuovi.length) {
       const wl = [...seguiti, ...nuovi];
-      ok2 = await scrivi(WATCHLIST_PATH, wl, `Watchlist: aggiunti ${nuovi.join(", ")} (posizioni nuove)`);
+      e2 = await scrivi(WATCHLIST_PATH, wl, `Watchlist: aggiunti ${nuovi.join(", ")} (posizioni nuove)`);
     }
+    const ok1 = e1.ok, ok2 = e2.ok;
+    const fallita = !e1.ok ? e1 : (!e2.ok ? e2 : null);
     if (esito) {
       esito.innerHTML = (ok1 && ok2)
         ? `Salvato: <b>${posizioni.length} posizioni</b>.`
           + (nuovi.length ? ` Ho aggiunto anche alla watchlist <b>${esc(nuovi.join(", "))}</b>, `
               + `altrimenti la pipeline non ne prenderebbe il prezzo e la riga resterebbe senza valore.` : "")
           + ` I prezzi e i guadagni si aggiornano al prossimo giro della pipeline.`
-        : `⚠ GitHub ha rifiutato la scrittura. Controlla che il token abbia il permesso di scrivere sul repository.`;
+        : `⚠ GitHub ha rifiutato la scrittura (codice ${fallita.stato}): ${perche(fallita)}.`
+          + (fallita.dettaglio ? ` <span class="muted">Risposta di GitHub: ${esc(fallita.dettaglio)}</span>` : "")
+          + ` Le posizioni non sono andate perse: restano scritte qui sopra finché non ricarichi la pagina.`;
     }
   } catch (e) {
     if (esito) esito.textContent = "Non sono riuscito a scrivere su GitHub: " + (e && e.message ? e.message : e);
@@ -3229,11 +3261,27 @@ function vixComeIndicatore(m) {
 function mossaRelativa(k) {
   const m = (DATA && DATA.macro) || {};
   let st = null;
-  if (String(k).startsWith("in:")) {
+  /* ⚠⚠ v349 — UN RAMO MORTO CHE FACEVA DUE DANNI, misurato in browser sui dati veri.
+     La catena era: `if (k.startsWith("in:")) ... else if (k === "in:curve" || "credit" || "vix")`.
+     `in:curve` comincia per "in:", quindi il PRIMO ramo lo prendeva sempre e la condizione nel
+     secondo non poteva essere vera nemmeno una volta. Conseguenze, entrambe verificate:
+     · dentro il ramo morto, `k === "credit" ? credit.history : curve_history` mandava il VIX
+       sul ramo `else`, cioe' sulla storia della CURVA DEI TASSI. La scheda del VIX pubblicava
+       "si e' mosso 0× il suo solito" perche' era la CURVA a non essersi mossa (ultimo scatto
+       0,00); sulla sua serie vera il VIX segnava 0,7×. E siccome la classifica si ORDINA per
+       questo numero, la posizione del VIX in pagina la decideva la curva.
+     · la curva, dal canto suo, restava senza: `indicators[curve].storico` e' vuoto (0 punti),
+       mentre `m.curve_history` ne ha 369. Il ramo che gliela avrebbe data non veniva eseguito.
+     Le chiavi specifiche vanno PRIMA del prefisso, o il prefisso se le mangia. */
+  if (k === "vix") {
+    st = ((m.vix && m.vix.spark) || []).map(v => ({ v }));
+  } else if (k === "credit" || k === "systemic_risk") {
+    st = m.credit && m.credit.history;
+  } else if (k === "in:curve" || k === "yield_recession") {
+    st = m.curve_history || null;
+  } else if (String(k).startsWith("in:")) {
     const i = (m.indicators || []).find(x => x && x.key === String(k).slice(3));
     st = i && i.storico;
-  } else if (k === "in:curve" || k === "credit" || k === "vix") {
-    st = k === "credit" ? (m.credit && m.credit.history) : (m.curve_history || null);
   }
   const p = (st || []).filter(x => x && typeof x.v === "number");
   if (p.length < 12) return null;
@@ -3301,7 +3349,7 @@ function indicatoriClassifica() {
     const dentro = (Number.isFinite(d.max_1y) && Number.isFinite(d.min_1y) && d.max_1y > d.min_1y)
       ? Math.round((d.value - d.min_1y) / (d.max_1y - d.min_1y) * 100) : 50;
     out.push({ k: "mat:" + chiave, nome: d.label || chiave, score: Math.round(clamp(dentro)),
-      sub: `${fmtNum.format(d.value)}${d.unita ? " " + d.unita : ""} · ${signTxt(d.pct_1y, "%")} in 12 mesi`,
+      sub: `${fmtNum.format(d.value)}${d.unita ? " " + d.unita : ""} · ${signTxt(d.var_1y != null ? d.var_1y : d.pct_1y, "%")} in 12 mesi`,
       posizionale: true });
   });
 
@@ -4292,7 +4340,21 @@ const FORMA_INDICATORE = {
       forme["mat:" + chiave] = (m) => {
         const d = (m.materie || {})[chiave];
         if (!d || !(d.history || []).length) return null;
-        const g = graficoSerie([{ nome: cfg.titolo, punti: d.history, colore: scoreColor(clamp(50 + (d.pct_1y || 0))) }],
+        /* ⚠⚠ v349 — TRE LETTORI RIMASTI INDIETRO DI UNA RINOMINA (v316).
+           La v316 ha rinominato nella pipeline `pct_1y` → `var_1y`, con ragione: il vecchio
+           nome diceva "percentile" mentre la formula calcolava la VARIAZIONE a un anno, e il
+           SOX usciva a "116° percentile", che non esiste. In app.js pero' e' stato aggiornato
+           UN punto solo (la riga del pacchetto, con il ripiego): gli altri tre continuavano a
+           leggere un campo che la pipeline non scrive piu'. Misurato oggi sui dati veri:
+           · scheda e classifica stampavano "— in dodici mesi" al posto di +104% sul SOX,
+             +47,5% sul rame, +34,4% sul petrolio, +38,7% sull'oro: il numero piu' grosso
+             della scheda, sparito;
+           · il COLORE della serie usava `d.pct_1y || 0`, quindi tutte e quattro le linee erano
+             colorate come se la variazione annua fosse ZERO — neutre da sette versioni.
+           Nessun gate se n'era accorto: "—" e' una stringa valida e un colore neutro e' un
+           colore. Un campo rinominato senza seguire i suoi lettori non rompe, mente in silenzio. */
+        const varAnno1 = d.var_1y != null ? d.var_1y : d.pct_1y;
+        const g = graficoSerie([{ nome: cfg.titolo, punti: d.history, colore: scoreColor(clamp(50 + (varAnno1 || 0))) }],
           { h: 104, compatto: true, etichetteDx: false, aria: cfg.titolo,
             fmtY: (v) => fmtNum.format(Math.round(v * 100) / 100) });
         if (!g) return null;
@@ -4301,7 +4363,7 @@ const FORMA_INDICATORE = {
         return {
           g,
           n: `<b>${fmtNum.format(d.value)}${d.unita ? " " + esc(d.unita) : ""}</b> `
-            + `(${signTxt(d.change_pct, "%")} nella seduta) · <b>${signTxt(d.pct_1y, "%")}</b> in dodici mesi`
+            + `(${signTxt(d.change_pct, "%")} nella seduta) · <b>${signTxt(varAnno1, "%")}</b> in dodici mesi`
             + (dentro != null ? ` — oggi sta al <b>${dentro}%</b> del suo intervallo dell'anno (${fmtNum.format(d.min_1y)}–${fmtNum.format(d.max_1y)})` : "")
             + `. Come si legge: ${cfg.come}`,
         };
@@ -4904,7 +4966,21 @@ function renderIndicatori() {
          : seGrezza.doppia ? Math.min(...seGrezza.doppia.map(x => (x.punti || []).length)) : 0)
       : 0;
     const forma = (() => { try { return FORMA_INDICATORE[r.k]?.(DATA.macro || {}) || null; } catch { return null; } })();
-    const se = (forma && quanti < SERIE_MINIMA) ? null : seGrezza;
+    /* ⚠⚠ v349 — IL SECONDO PAVIMENTO, MISURATO SULLA SCHEDA DELLA VALUTAZIONE S&P.
+       La v297 ha messo il pavimento sul NUMERO di punti (una serie di quattro non e' una
+       traiettoria). Mancava il pavimento sulla NATURA: `serieIndicatore` ha un ramo di ripiego
+       che pesca da `metrics_history` la serie del PUNTEGGIO 0-100 accumulato giorno per giorno,
+       e la marca `accumulata: true`. Con 21 punti superava la soglia e vinceva sulla forma.
+       Misurato in browser sulla scheda "Valutazione S&P (trailing e forward)": il grafico
+       aveva l'asse a 50 · 50,5 · 51 · 51,5 · 52 — il punteggio — mentre i due multipli veri,
+       29,6× trailing e 21× forward, non comparivano da nessuna parte nella scheda.
+       Due ragioni per cui non e' un dettaglio:
+       · in v337 il CEO ha fatto togliere il punteggio 0-100 dalle schede ("il dato deve essere
+         asettico da quel parametro"), e qui rientrava dalla finestra come grafico;
+       · su una scheda di VALUTAZIONE, un asse che segna 51 dove il lettore si aspetta un
+         multiplo e' peggio di un grafico assente.
+       Una serie di punteggi non batte mai una forma che mostra il dato vero. */
+    const se = (forma && (quanti < SERIE_MINIMA || (seGrezza && seGrezza.accumulata))) ? null : seGrezza;
     /* ⚠ v262 — LA SCHEDA DI FEAR & GREED NON RIPETE I SUOI COMPONENTI. Il CEO l'ha segnalato
        due volte: "ha ancora al suo interno altri valori come vix etc". Da v258 tutti e sette i
        componenti hanno una scheda propria (quattro nuove, tre — VIX, Put/Call, Ampiezza — che
@@ -7541,7 +7617,16 @@ function buildPrompt() {
     const L = m.liquidity_split;
     const bits = [];
     if (L.inst_cash_pct != null) bits.push(`Istituzionali Cash: ${fmtNum.format(L.inst_cash_pct)}% (proxy ${L.inst_note || "AUM BIL+SHV vs SPY"})`);
-    if (L.retail_mmf_bln != null) bits.push(`Retail Cash: fondi monetari retail $${fmtNum.format(L.retail_mmf_bln)} mld (FRED RMFNS${L.retail_yoy_pct != null ? `, YoY ${signTxt(L.retail_yoy_pct)}` : ""}${L.retail_pctile_5y != null ? `, ${L.retail_pctile_5y}° percentile 5A` : ""})`);
+    /* ⚠ v349 — LA DATA C'ERA IN PAGINA E NON NEL PACCHETTO. La scheda dichiara "Rilevazione
+       del 01/06/2026 — serie MENSILE, non e' il dato di oggi"; qui il numero usciva nudo, e
+       siccome non compare nell'elenco delle STATISTICHE UFFICIALI della premessa finiva nella
+       classe "scaricato al run di oggi". Ottantatre giorni presentati come freschi. La testata
+       ordina all'LLM di verificare online ogni dato piu' vecchio di trenta giorni dicendogli
+       quali sono: su questo non glielo diceva. */
+    if (L.retail_mmf_bln != null) {
+      const eta = L.retail_date ? Math.round((Date.now() - new Date(L.retail_date)) / 86400000) : null;
+      bits.push(`Retail Cash: fondi monetari retail $${fmtNum.format(L.retail_mmf_bln)} mld (FRED RMFNS${L.retail_yoy_pct != null ? `, YoY ${signTxt(L.retail_yoy_pct)}` : ""}${L.retail_pctile_5y != null ? `, ${L.retail_pctile_5y}° percentile 5A` : ""}${L.retail_date ? `, rilevazione ${L.retail_date}${eta != null ? ` — ${eta} giorni fa, serie MENSILE: NON e' il dato di oggi` : ""}` : ""})`);
+    }
     if (bits.length) lines.push(`- Liquidità in attesa (dry powder di mercato, PROXY dichiarati): ${bits.join(" · ")} — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.`);
   }
   if (m.dollar_ruler) {
@@ -7945,7 +8030,8 @@ function buildPrompt() {
     let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${zCred ? zCred.nome : m.credit.label} `
       + `(bande di lettura: sotto 4% rilassato, 4-5% attenzione, 5-7% stress, oltre 7% crisi)`;
     const ch = m.credit.history || [];
-    if (ch.length > 20) { const d = ch[ch.length - 1].v - ch[ch.length - 21].v; crl += `; trend ~1 mese ${d > 0 ? "+" : ""}${fmtNum.format(Math.round(d * 100) / 100)} pp (${d > 0.15 ? "spread in allargamento = rischio in aumento" : d < -0.15 ? "spread in restringimento = rischio in calo" : "stabile"})`; }
+    const chM = dg1M(ch);
+    if (chM) { const d = chM.pct * numero(m.credit.spread_hy) / (100 + chM.pct); crl += `; trend ~1 mese ${d > 0 ? "+" : ""}${fmtNum.format(Math.round(d * 100) / 100)} pp (${d > 0.15 ? "spread in allargamento = rischio in aumento" : d < -0.15 ? "spread in restringimento = rischio in calo" : "stabile"}, ${chM.da}→${chM.a})`; }
     lines.push(crl);
   }
   if (m.systemic_risk) {
@@ -8207,16 +8293,45 @@ const dgDelta = (arr, n) => {   // variazione % ultimo vs n passi indietro (seri
    i delta di eur_value sono inquinati (a) dal break di definizione cassa-inclusa→esclusa di
    metà luglio 2026 e (b), sempre, da versamenti/prelievi di liquidità. Lookback per DATA (per
    allinearsi alle finestre degli indici); fallback per conteggio rilevazioni se le date mancano. */
-const dgPercentile = (arr, v) => {   // posizione % di v nel range della serie
+/* ⚠⚠ v349 — SI CHIAMAVA PERCENTILE E NON LO ERA. Questa funzione calcolava la POSIZIONE nel
+   range (v−min)/(max−min), che e' un'altra cosa: dice dove cade il valore fra i due estremi,
+   non quante volte la serie e' stata piu' bassa. Il commento lo diceva onestamente, l'etichetta
+   pubblicata no — e la testata ordina all'LLM di usare i percentili come sono, senza rifarli.
+   Misurato sui dati del 23/08/2026:
+     HY OAS   pubblicato 14°  · rango vero 23°
+     WTI      pubblicato 55°  · rango vero 71°
+     T30A     pubblicato 91°  · rango vero 98°
+   Sull'HY OAS cambiava anche il giudizio: sotto 20 si accende "(compressione estrema: il
+   credito non prezza rischio)", che al rango vero non si accenderebbe. Il range min–max resta
+   pubblicato a fianco, quindi non si perde niente: si smette solo di chiamarlo percentile. */
+const dgPercentile = (arr, v) => {   // vero RANGO percentile: quante osservazioni stanno sotto
   const xs = (arr || []).map(dgFin).filter(x => x != null);
   const x = dgFin(v);
   if (x == null || xs.length < 5) return null;
-  const lo = Math.min(...xs), hi = Math.max(...xs);
-  return hi > lo ? Math.round((x - lo) / (hi - lo) * 100) : null;
+  const sotto = xs.filter(y => y < x).length;
+  const pari = xs.filter(y => y === x).length;
+  /* convenzione "midrank": i valori uguali contano per meta', cosi' il minimo non e' 0° e il
+     massimo non e' 100° quando ci sono ripetizioni */
+  return Math.round((sotto + pari / 2) / xs.length * 100);
 };
 
 /* ---------- fondamentale PROFONDO: CAGR pluriennale dai bilanci già in pipeline ---------- */
 
+/* ⚠ v349 — LA VARIAZIONE A UN MESE SI MISURA SUL CALENDARIO, per tutte le serie.
+   `dgDelta(arr, 21)` conta VENTUNO PUNTI: giusto su una serie giornaliera fitta, sbagliato su
+   una diradata (le materie prime davano 58 giorni). Peggio, con lookback per conteggio bastava
+   un passo di differenza — 20 punti invece di 21 — per far cambiare SEGNO al trend a un mese
+   dell'HY OAS, e nello stesso pacchetto comparivano tre "variazioni a un mese" diverse dello
+   stesso spread. Contate per data, sono una sola cosa e si possono confrontare. */
+const dgData = (x) => (typeof x === "string" && /^\d{4}-\d{2}-\d{2}/.test(x)) ? x.slice(0, 10) : null;
+function dg1M(punti) {
+  const p = (punti || []).map(x => ({ d: dgData(x && x.d), v: dgFin(x && x.v) })).filter(x => x.v != null);
+  if (p.length < 2 || !p.every(x => x.d)) return null;
+  const ultimo = p[p.length - 1];
+  const limite = new Date(new Date(ultimo.d).getTime() - 30 * 86400000).toISOString().slice(0, 10);
+  const prima = [...p].reverse().find(x => x.d <= limite);
+  return (prima && prima.v) ? { pct: (ultimo.v / prima.v - 1) * 100, da: prima.d, a: ultimo.d } : null;
+}
 /* ---------- DIGEST STORICI: le serie che i popup disegnano, tradotte in numeri ----------
    Un analista guarda le TRAIETTORIE (pendenza, percentile nel range, inversioni), non i livelli:
    questi digest danno all'AI esattamente ciò che l'occhio estrae dai grafici. Ogni voce è
@@ -8234,15 +8349,19 @@ function buildHistoricalDigests() {
   const cr = m.credit || {};
   const crh = Array.isArray(cr.history) ? cr.history.map(x => dgFin(x && x.v)).filter(x => x != null) : [];
   const crPct = dgPercentile(crh, cr.spread_hy);
+  const crM = dg1M(cr.history);
   out.push({ label: "HY OAS (spread high yield, serie 1A)", text: crh.length >= 5
-    ? `${dgTxt(cr.spread_hy, "%", 2)} · Δ1M ${signTxt(dgDelta(crh, 21), "%")} · range 1A [${dgTxt(Math.min(...crh), "", 2)}–${dgTxt(Math.max(...crh), "", 2)}] · percentile ${dgTxt(crPct, "°", 0)}${crPct != null && crPct <= 20 ? " (compressione estrema: il credito non prezza rischio)" : crPct != null && crPct >= 80 ? " (stress creditizio in costruzione)" : ""}`
+    ? `${dgTxt(cr.spread_hy, "%", 2)} · Δ1M ${crM ? `${signTxt(crM.pct, "%")} (${crM.da}→${crM.a})` : signTxt(dgDelta(crh, 21), "%")} · range 1A [${dgTxt(Math.min(...crh), "", 2)}–${dgTxt(Math.max(...crh), "", 2)}] · percentile ${dgTxt(crPct, "°", 0)}${crPct != null && crPct <= 20 ? " (compressione estrema: il credito non prezza rischio)" : crPct != null && crPct >= 80 ? " (stress creditizio in costruzione)" : ""}`
     : "—" });
 
   const cvh = Array.isArray(m.curve_history) ? m.curve_history.map(x => dgFin(x && x.v)).filter(x => x != null) : [];
+  /* la curva e' in punti percentuali: la variazione utile e' la DIFFERENZA, non il rapporto */
+  const cv1 = dg1M(m.curve_history);
+  const cvM = cv1 ? { assoluto: cvh[cvh.length - 1] * cv1.pct / (100 + cv1.pct), da: cv1.da, a: cv1.a } : null;
   let inv = null;
   for (let i = cvh.length - 1; i >= 0; i--) { if (cvh[i] < 0) { inv = cvh.length - 1 - i; break; } }
   out.push({ label: "Curva 10A–2A (serie ~2A)", text: cvh.length >= 5
-    ? `${dgTxt(cvh[cvh.length - 1], "pp", 2)} · Δ1M ${cvh.length >= 22 ? dgTxt(cvh[cvh.length - 1] - cvh[cvh.length - 22], "pp", 2) : "—"} · Δ3M ${cvh.length >= 64 ? dgTxt(cvh[cvh.length - 1] - cvh[cvh.length - 64], "pp", 2) : "—"} · ${inv == null ? "nessuna inversione nella serie" : inv === 0 ? "INVERTITA ORA" : `ultima inversione ${inv} sedute fa${inv <= 252 ? " (il rischio recessivo storicamente matura DOPO la dis-inversione)" : ""}`}`
+    ? `${dgTxt(cvh[cvh.length - 1], "pp", 2)} · Δ1M ${cvM ? `${dgTxt(cvM.assoluto, "pp", 2)} (${cvM.da}→${cvM.a})` : (cvh.length >= 22 ? dgTxt(cvh[cvh.length - 1] - cvh[cvh.length - 22], "pp", 2) + " (22 rilevazioni indietro: la serie non porta le date)" : "—")} · Δ3M ${cvh.length >= 64 ? dgTxt(cvh[cvh.length - 1] - cvh[cvh.length - 64], "pp", 2) : "—"} · ${inv == null ? "nessuna inversione nella serie" : inv === 0 ? "INVERTITA ORA" : `ultima inversione ${inv} sedute fa${inv <= 252 ? " (il rischio recessivo storicamente matura DOPO la dis-inversione)" : ""}`}`
     : "—" });
 
   const vx = m.vix || {};
@@ -8265,24 +8384,67 @@ function buildHistoricalDigests() {
      ⚠ Un livello non dice niente da solo. "10 anni al 4,74%" e' un numero; "4,74%, all'87°
      percentile del suo intervallo di 18 mesi" e' un'informazione — ed e' precisamente cio' che
      nessuna ricerca web restituisce, perche' richiede la serie. */
+  /* ⚠⚠ v349 — "Δ1M" MISURAVA CINQUANTOTTO GIORNI, e su una serie sola sarebbe un dettaglio.
+     `dgDelta(h, 21)` conta VENTUNO PUNTI, non ventuno sedute. Sulle serie fitte (HY OAS, curva)
+     le due cose coincidono e il numero era giusto; le materie prime invece la pipeline le dirada
+     (`passo = len(h) // 120`), quindi 126 punti coprono 361 giorni e ventuno punti sono
+     cinquantotto giorni. Misurato sui dati del 23/08/2026:
+       rame     "Δ1M +10,84%"  → un mese vero: +1,17%
+       petrolio "Δ1M +23,77%"  → un mese vero: +2,53%
+     Un petrolio a +23,8% in un mese e' uno shock da costi che entra nel deflatore; a +2,5% non
+     succede niente. E lo stesso blocco etichettava "serie ~6M" una serie di 361 giorni.
+     Ora la finestra si misura sulle DATE e l'etichetta si scrive dal periodo vero: se la densita'
+     di una serie cambia, il numero resta quello che dichiara di essere. */
   const serieStorica = (arr, valore, nome, unita, decimali, altoBasso) => {
-    const h = Array.isArray(arr) ? arr.map(x => dgFin(x && x.v)).filter(x => x != null) : [];
+    const punti = Array.isArray(arr)
+      ? arr.map(x => ({ d: x && x.d, v: dgFin(x && x.v) })).filter(x => x.v != null) : [];
+    const h = punti.map(x => x.v);
     const v = dgFin(valore) != null ? dgFin(valore) : (h.length ? h[h.length - 1] : null);
     if (h.length < 30 || v == null) return;
     const pct = dgPercentile(h, v);
     let nota = "";
     if (pct != null && altoBasso) nota = pct >= 80 ? ` (${altoBasso[0]})` : pct <= 20 ? ` (${altoBasso[1]})` : "";
-    out.push({ label: nome, text:
-      `${dgTxt(v, unita, decimali)} · Δ1M ${signTxt(dgDelta(h, 21), "%")} · range [${dgTxt(Math.min(...h), "", decimali)}–${dgTxt(Math.max(...h), "", decimali)}] su ${h.length} rilevazioni · percentile ${dgTxt(pct, "°", 0)}${nota}` });
+    /* variazione a un mese contata sul CALENDARIO: l'ultima osservazione con almeno 30 giorni
+       di distanza da quella finale. Senza date si ripiega sul conteggio dei punti, e lo dichiara. */
+    const dUlt = punti.length ? dgData(punti[punti.length - 1].d) : null;
+    let delta = null, comeDelta = "";
+    if (dUlt && punti.every(x => dgData(x.d))) {
+      const limite = new Date(new Date(dUlt).getTime() - 30 * 86400000).toISOString().slice(0, 10);
+      const prima = [...punti].reverse().find(x => x.d <= limite);
+      if (prima && prima.v) {
+        delta = (h[h.length - 1] / prima.v - 1) * 100;
+        comeDelta = ` (${prima.d}→${dUlt})`;
+      }
+    } else {
+      delta = dgDelta(h, 21);
+      comeDelta = " (21 rilevazioni indietro: la serie non porta le date)";
+    }
+    /* l'etichetta della finestra si scrive dal periodo COPERTO, non a mano */
+    let finestra = "";
+    if (dUlt && dgData(punti[0].d)) {
+      const gg = Math.round((new Date(dUlt) - new Date(punti[0].d)) / 86400000);
+      finestra = gg >= 640 ? ` (serie ~${Math.round(gg / 365)}A)` : ` (serie ~${Math.round(gg / 30)}M)`;
+    }
+    out.push({ label: nome + finestra, text:
+      `${dgTxt(v, unita, decimali)} · Δ1M ${signTxt(delta, "%")}${comeDelta} · range [${dgTxt(Math.min(...h), "", decimali)}–${dgTxt(Math.max(...h), "", decimali)}] su ${h.length} rilevazioni · percentile ${dgTxt(pct, "°", 0)}${nota}` });
   };
   const tassi = m.tassi || {}, st = tassi.storico || {}, mat = m.materie || {};
-  serieStorica(st.a10, (tassi.a10 != null ? tassi.a10 : (m.carry || {}).us10), "Treasury 10A (serie ~18M)", "%", 2,
+  /* ⚠⚠ v349 — IL VALORE VENIVA DA UN'ALTRA FONTE DELLA SERIE CHE LO DOVEVA COLLOCARE.
+     `tassi.a10` non esiste (il valore sta in `tassi.scadenze[key=a10].value`), quindi il ramo
+     attivo e' sempre stato il ripiego `carry.us10`, che e' ^TNX da yfinance — mentre la serie
+     e' FRED DGS10. Misurato: 4,74% (yfinance, 21/08) collocato nella distribuzione DGS10 dava
+     100°, cioe' "mai stato cosi' alto", perche' era un valore estraneo alla serie; il valore
+     della serie stessa (4,69%, 20/08) sta al 98°. E lo stesso pacchetto stampava due Treasury
+     10 anni diversi senza dire che erano due fonti. Un valore si colloca nella distribuzione
+     da cui viene, o non lo si colloca. */
+  const a10Serie = ((tassi.scadenze || []).find(x => x && x.key === "a10") || {}).value;
+  serieStorica(st.a10, a10Serie, "Treasury 10A", "%", 2,
     ["costo del capitale ai massimi del periodo: e' il canale che comprime i multipli lunghi", "costo del capitale ai minimi: vento a favore sulla duration"]);
-  serieStorica(st.a30, null, "Treasury 30A (serie ~18M)", "%", 2,
+  serieStorica(st.a30, null, "Treasury 30A", "%", 2,
     ["parte lunga ai massimi: il mercato chiede premio a termine", "parte lunga ai minimi"]);
-  serieStorica((mat.rame || {}).history, (mat.rame || {}).value, "Rame (serie ~6M)", " $/lb", 2,
+  serieStorica((mat.rame || {}).history, (mat.rame || {}).value, "Rame", " $/lb", 2,
     ["input industriale ai massimi: entra nel deflatore e nel costo di costruzione dei data center", "input industriale ai minimi: domanda debole o offerta abbondante"]);
-  serieStorica((mat.petrolio || {}).history, (mat.petrolio || {}).value, "Petrolio WTI (serie ~6M)", " $", 2,
+  serieStorica((mat.petrolio || {}).history, (mat.petrolio || {}).value, "Petrolio WTI", " $", 2,
     ["energia ai massimi: pressione sul deflatore e sul costo di esercizio", "energia ai minimi"]);
 
   /* v257 — CONTROVALORE E SHARPE DEL FONDO tolti dai digest: erano l'ultima traccia del
@@ -8782,6 +8944,20 @@ function fattiTitolo(tk) {
                          pacchetto pubblicava i due numeri a trenta righe di distanza.
                          La pipeline il livello ce l'ha gia'. Si legge, non si ricostruisce. */
                       sma50Liv: numero((((riga.tv || {}).tecnica || {}).medie || {}).sma50?.liv),
+                      /* ⚠⚠ v349 — LA STESSA CLASSE DELLA v340, SOPRAVVISSUTA SULLE EMA.
+                         Misurato su MU nel pacchetto di oggi: la riga v293 pubblicava
+                         "EMA 50 906.65 — calcolate su 126 barre" e trentotto righe piu'
+                         sotto il blocco della pipeline pubblicava "Media esponenziale
+                         50: 907.06". Due EMA 50 dello stesso titolo nello stesso testo.
+                         Peggio: la riga v293 dichiarava "EMA 200 NON calcolata,
+                         servirebbero 200 barre e ce ne sono 126" e piu' sotto l'EMA 200
+                         c'era, a 640.05 — il pacchetto smentiva se stesso a distanza di
+                         mezza pagina. Non e' un arrotondamento: sono due calcoli su due
+                         storici diversi (126 barre lato pagina, la serie intera lato
+                         pipeline), ed e' la pipeline ad avere quello buono.
+                         Questo flag dice al blocco v293 di tacere quando il calcolo
+                         completo c'e' gia'. */
+                      emaDallaPipeline: !!((((riga.tv || {}).tecnica || {}).medie || {}).ema50),
                       sma200Liv: numero((((riga.tv || {}).tecnica || {}).medie || {}).sma200?.liv),
                       pe: numero(riga.pe),
                       /* v348 — il prospettico era in data.json e non usciva dal pacchetto */
@@ -9479,7 +9655,11 @@ function datiNostriDelTitolo(tk) {
     return Math.round(e * 100) / 100;
   };
   const e20 = ema(barre, 20), e50 = ema(barre, 50);
-  if (e20 != null || e50 != null) {
+  /* ⚠ v349 — se la pipeline ha gia' calcolato la batteria completa sullo storico intero,
+     questa riga non deve pubblicare la SUA versione: sarebbe un secondo valore della
+     stessa media, piu' debole, nello stesso testo. Il blocco DETTAGLI TECNICI piu' sotto
+     porta le stesse medie (e anche l'EMA 200, che qui non si puo' fare). */
+  if ((e20 != null || e50 != null) && !tec.emaDallaPipeline) {
     const pezzi = [];
     if (e20 != null) pezzi.push(`EMA 20 ${e20}${dist(e20)}`);
     if (e50 != null) pezzi.push(`EMA 50 ${e50}${dist(e50)}`);
@@ -9555,7 +9735,7 @@ function datiNostriDelTitolo(tk) {
     L.push(`- Rapporto put/call di ${T} sulla scadenza ${f.opzioni.scadenza}: `
       + `${Math.round(f.opzioni.ratio * 100) / 100} (volumi scambiati oggi: put ${f.opzioni.put}, call ${f.opzioni.call})`
       + (f.opzioni.nonLaPiuVicina
-          ? `. ⚠ NON e' la scadenza piu' vicina: e' quella con piu' CONTRATTI APERTI (${f.opzioni.oi} contro ${f.opzioni.oiPiuVicina} — grandezza diversa dai volumi qui sopra,  a farli tornare). I muri di una scadenza quasi esaurita si spostano da soli senza che il mercato si muova, quindi non sono livelli.`
+          ? `. ⚠ NON e' la scadenza piu' vicina: e' quella con piu' CONTRATTI APERTI (${f.opzioni.oi} contro ${f.opzioni.oiPiuVicina} — grandezza diversa dai volumi qui sopra: i contratti aperti sono posizioni ancora in essere, i volumi sono gli scambi della giornata, e non si sommano ne' si confrontano). I muri di una scadenza quasi esaurita si spostano da soli senza che il mercato si muova, quindi non sono livelli.`
           : ""));
   }
   const t = f.tecnici;
