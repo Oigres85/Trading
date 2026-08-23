@@ -1,4 +1,4 @@
-⟦ BUILD v346 · generato 23/08/2026 04:37 ⟧
+⟦ BUILD v346 · generato 23/08/2026 05:18 ⟧
 
 Sei un analista macro. Ricevi il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno. Non hai davanti nessun portafoglio: questo pacchetto contiene SOLO dati macro e la loro tensione interna. Non proporre operazioni su titoli, non dimensionare posizioni, non dare consigli di acquisto o vendita.
 
@@ -27,10 +27,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 23/08/2026, 04:37:05 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 00:37, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,88% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,09% · Fut S&P +0,29% · BTC -1,92% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~32.9h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
+DATI AL 23/08/2026, 05:18:29 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 01:18, fase: WEEKEND — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,88% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +0,09% · Fut S&P +0,29% · BTC -3,41% [24/7] · WEEKEND, MERCATI CHIUSI (apertura tra ~32.2h): l'unico dato che si muove ancora è il BTC (24/7) — KOSPI e futures sono fermi alla chiusura di venerdì e NON anticipano nulla di nuovo, sono già dentro l'ultima chiusura USA. Nessuna notizia nuova dopo la campana: il prossimo prezzo che esiste e' quello dell'apertura di lunedi'.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 23/08/2026, 04:37:05, prossimo run 23/08/2026, 05:00:00. ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-08-21 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 23/08/2026, 05:18:29, prossimo run 23/08/2026, 08:00:00. ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-08-21 — 2 giorni fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-06-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-07-01) · Curva 10A-2A (2026-08-21) · Curva 10A-3M (2026-08-21) · Treasury USA 30A (2026-08-20) · Tasso reale 10A (TIPS) (2026-08-20) · Inflazione attesa 10A (breakeven) (2026-08-21) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (curva, HY OAS, VIX): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -115,12 +115,12 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 - Prossime "4 streghe" (quadruple witching): 18/09/2026 (tra 25 gg — volumi record e prezzo "attratto" dai muri di opzioni: prudenza sugli ordini a ridosso)
 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
-- Will the Fed decrease interest rates by 25 bps after the September 2026 meeting?: 2% [Δ7g —]
 - Will Ethereum dip to $1,000 by December 31, 2026?: 7% [Δ7g —]
 - Will Ethereum dip to $800 by December 31, 2026?: 5% [Δ7g —]
 - Will there be no change in Fed interest rates after the September 2026 meeting?: 68% [Δ7g —]
-- Will Bitcoin reach $90,000 in August?: 6% [Δ7g —]
-- Will Bitcoin reach $80,000 in August?: 55% [Δ7g —]
+- Will Bitcoin reach $90,000 in August?: 4% [Δ7g —]
+- Will Bitcoin dip to $45,000 by December 31, 2026?: 10% [Δ7g —]
+- Bitcoin Up or Down on August 23?: 12% [Δ7g —]
 
 === ANALISI STORICA DELLE SERIE MACRO (traiettorie: pendenze, percentili nel range, inversioni) ===
 · HY OAS (spread high yield, serie 1A): 2,75% · Δ1M +2,61% · range 1A [2,63–3,46] · percentile 14° (compressione estrema: il credito non prezza rischio)
