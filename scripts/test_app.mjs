@@ -3948,6 +3948,16 @@ check("v349 opzioni: nessuna frase mutilata arriva all'LLM", suVeri(`
      doppio spazio a fare da cicatrice, consegnato cosi' */
   return !/,\\s\\sa farli tornare/.test(p) && !/\\s\\s+[a-z]+ tornare/.test(p);`));
 
+
+check("v349 premessa: l'elenco delle serie storiche coincide con quelle consegnate", suVeri(`
+  const t = buildCIOText();
+  const riga = (t.match(/· SERIE STORICHE E PERCENTILI \\(([^)]*)\\)/) || [])[1];
+  if (!riga) return false;
+  const promesse = riga.split(",").map(x => x.trim()).filter(Boolean);
+  const consegnate = buildHistoricalDigests().map(x => String(x.label).replace(/\\s*\\(.*$/, ""));
+  /* la premessa ne elencava tre e il blocco ne consegnava sette: chi legge conta e non torna */
+  return promesse.length === consegnate.length && promesse.every((p, i) => p === consegnate[i]);`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

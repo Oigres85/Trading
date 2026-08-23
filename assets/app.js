@@ -7532,8 +7532,12 @@ function buildPrompt() {
         + `${conCalendario.join(" · ")}. Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e `
         + `il prossimo dato atteso.`);
     }
-    lines.push(`· SERIE STORICHE E PERCENTILI (curva, HY OAS, VIX): calcolati su finestre che finiscono `
-      + `all'ultima rilevazione disponibile della serie, non a oggi.`);
+    const nomiSerie = (typeof buildHistoricalDigests === "function"
+      ? buildHistoricalDigests().map(x => String(x.label).replace(/\s*\(.*$/, "")).filter(Boolean)
+      : []);
+    lines.push(`· SERIE STORICHE E PERCENTILI${nomiSerie.length ? ` (${nomiSerie.join(", ")})` : ""}: `
+      + `calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. `
+      + `Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.`);
   }
   /* v344 — la mappa dei propri limiti, PRIMA dei numeri. Un pacchetto che non dichiara il
      proprio perimetro viene letto come se non ne avesse uno. */
@@ -8367,7 +8371,7 @@ function buildHistoricalDigests() {
   const vx = m.vix || {};
   const vxs = Array.isArray(vx.spark) ? vx.spark.map(dgFin).filter(x => x != null) : [];
   const vxPct = dgPercentile(vxs, vx.value);
-  out.push({ label: "VIX (finestra spark ~3M)", text: dgFin(vx.value) != null
+  out.push({ label: "VIX (spark 30 sedute)", text: dgFin(vx.value) != null
     ? `${dgTxt(vx.value, "", 1)} · oggi ${signTxt(dgFin(vx.change_pct))} · percentile finestra ${dgTxt(vxPct, "°", 0)} · term VIX/VIX3M ${dgTxt((m.smart_money || {}).vix_term_ratio, "", 2)}${dgFin((m.smart_money || {}).vix_term_ratio) != null ? ((m.smart_money || {}).vix_term_ratio >= 1 ? " (BACKWARDATION: stress)" : " (contango: calma)") : ""}`
     : "—" });
 
