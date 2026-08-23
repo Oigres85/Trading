@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "352";
+const BUILD_VERSION = "353";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8316,7 +8316,14 @@ function buildPrompt() {
     lines.push("");
     recordPolymarket();   // registra lo snapshot di oggi (dedup giornaliero) per la derivata Δ7g
     lines.push("MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):");
-    DATA.predictions.forEach(p => { const d = pmDelta7(p.question, p.yes); lines.push(`- ${p.question}: ${p.yes}% [Δ7g ${d == null ? "—" : (d > 0 ? "+" : "") + d + "pp"}]`); });
+    const informativi = DATA.predictions.filter(p => {
+      const y = Number(p && p.yes);
+      return Number.isFinite(y) && y > 2 && y < 98;
+    });
+    const scartati = DATA.predictions.length - informativi.length;
+    informativi.forEach(p => { const d = pmDelta7(p.question, p.yes); lines.push(`- ${p.question}: ${p.yes}% [Δ7g ${d == null ? "—" : (d > 0 ? "+" : "") + d + "pp"}]`); });
+    if (scartati) lines.push(`⚠ ${scartati} ${scartati === 1 ? "mercato escluso" : "mercati esclusi"} perche' quota${scartati === 1 ? "" : "no"} sopra il 98% o sotto il 2%: `
+      + `una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.`);
   }
   /* v256 — ULTIME NEWS fuori dal payload: le news escono dal sistema con il portafoglio.
      La lettura delle notizie su un singolo nome torna, quando serve, dall'analisi spot del
@@ -8953,10 +8960,32 @@ function fattiTitolo(tk) {
     if (Number.isFinite(n) && n > 0) L.push({ nome, breve, v: n, fonte, spiega });
   };
   if (opz) {
-    agg("Muro delle CALL", "del muro delle call", opz.callWall, `opzioni, scadenza ${opz.scadenza}`,
-        "lo strike con piu' contratti call aperti: chi le ha vendute si copre qui, e il prezzo tende a rallentare");
-    agg("Muro delle PUT", "del muro delle put", opz.putWall, `opzioni, scadenza ${opz.scadenza}`,
-        "lo strike con piu' contratti put aperti: stessa meccanica al contrario, tende a fare da pavimento");
+    /* quanto puo' muoversi il titolo da qui alla scadenza, in ATR: sotto quella distanza un
+       muro e' un livello, oltre e' solo una concentrazione di contratti aperti */
+    const distPct = (v) => (Number.isFinite(numero(v)) && Number.isFinite(prezzo) && prezzo)
+      ? Math.abs(numero(v) / prezzo - 1) * 100 : null;
+    const LONTANO = 25;   // punti percentuali dallo spot
+    const spiegaMuro = (v, base) => {
+      const d = distPct(v);
+      return (d != null && d > LONTANO)
+        ? `⚠ NON E' UN LIVELLO: sta al ${Math.round(d)}% dal riferimento, cioe' fuori da quanto il titolo puo' `
+          + `percorrere entro la scadenza. E' dove si concentra l'open interest, e la meccanica che frena il `
+          + `prezzo vicino a un muro non arriva fin li'. Si pubblica come fatto sulla catena, non come quota operativa`
+        : base;
+    };
+    const fonteMuro = (v) => {
+      const d = distPct(v);
+      return `opzioni, scadenza ${opz.scadenza}`
+        + ((d != null && d > LONTANO)
+            ? `. ⚠ NON E' UN LIVELLO: sta al ${Math.round(d)}% dal riferimento, fuori da quanto il titolo puo' percorrere `
+              + `entro la scadenza. E' dove si concentra l'open interest; la meccanica che frena il prezzo vicino a un muro `
+              + `non arriva fin li'`
+            : "");
+    };
+    agg("Muro delle CALL", "del muro delle call", opz.callWall, fonteMuro(opz.callWall),
+        spiegaMuro(opz.callWall, "lo strike con piu' contratti call aperti: chi le ha vendute si copre qui, e il prezzo tende a rallentare"));
+    agg("Muro delle PUT", "del muro delle put", opz.putWall, fonteMuro(opz.putWall),
+        spiegaMuro(opz.putWall, "lo strike con piu' contratti put aperti: stessa meccanica al contrario, tende a fare da pavimento"));
   }
   const daVivo = storia && Number.isFinite(storia.res20);
   const src = daVivo ? storia : riga;

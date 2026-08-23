@@ -4145,6 +4145,42 @@ check("v352 orizzonti: un evento datato dentro il breve viene dichiarato dove se
   if (g < 0 || g > 60) return !/EVENTO DENTRO L'ORIZZONTE BREVE/.test(b7);
   return /EVENTO DENTRO L'ORIZZONTE BREVE/.test(b7) && b7.includes(String(r.earnings_date).slice(0, 10));`));
 
+
+/* ══ v353 — DUE NUMERI CHE NON PORTAVANO INFORMAZIONE E OCCUPAVANO IL POSTO DI QUELLI CHE SI ══ */
+
+check("v353 previsioni: un mercato gia' risolto non si pubblica come attesa", suVeri(`
+  const salva = DATA.predictions;
+  DATA.predictions = [
+    { question: "Fed ferma a settembre?", yes: 68 },
+    { question: "BTC sopra 68k domani?", yes: 100 },
+    { question: "ETH sotto 800?", yes: 1 },
+  ];
+  const t = buildCIOText();
+  DATA.predictions = salva;
+  /* "Will the price of Bitcoin be above $68,000 on August 24?: 100%" usciva in mezzo alle
+     attese sulla Fed: una probabilita' a 100 non e' un'attesa, e' un esito gia' noto */
+  return /Fed ferma a settembre/.test(t)
+      && !/BTC sopra 68k domani/.test(t) && !/ETH sotto 800/.test(t)
+      && /2 mercati esclusi/.test(t);`));
+
+check("v353 previsioni: il taglio si dichiara, non si fa in silenzio", (() => {
+  const i = src.indexOf("const informativi = DATA.predictions.filter");
+  const corpo = src.slice(i, i + 900);
+  /* un taglio silenzioso si legge come "questo e' tutto" */
+  return corpo.includes("scartati") && corpo.includes("esito gia' noto");
+})());
+
+check("v353 opzioni: un muro troppo lontano dichiara di non essere un livello", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  const m = p.match(/Muro delle PUT: ([\\d.]+) \\(([-+][\\d.]+)%/);
+  if (!m) return true;
+  const lontano = Math.abs(parseFloat(m[2])) > 25;
+  /* su NVDA: put wall a 115, cioe' -46% dallo spot, spiegato come "tende a fare da pavimento".
+     La banda di plausibilita' esisteva (0,5-2x lo spot) e 115/214,72 = 0,536: passava per
+     mezzo punto percentuale. */
+  return lontano ? /Muro delle PUT[^\\n]*NON E' UN LIVELLO/.test(p)
+                 : !/Muro delle PUT[^\\n]*NON E' UN LIVELLO/.test(p);`));
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo
