@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-08-23T15:14:42Z",
+ "updated_at": "2026-08-23T16:25:00Z",
  "eurusd": 1.1678,
  "totals": {
   "usd_value": 0,
@@ -1650,7 +1650,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -4959,7 +4959,7 @@
      "a1": 23.44,
      "a3": 335.9,
      "a5": 862.36,
-     "a10": 14152.64
+     "a10": 14152.63
     },
     "stagionalita": [
      {
@@ -18989,15 +18989,15 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 77219.83,
+   "price": 77261.6,
    "price_asof": "2026-08-23",
    "price_live": false,
-   "change_pct": 0.18,
+   "change_pct": 0.23,
    "pe": null,
    "ath": 126198.07,
    "ath_dist_pct": -38.8,
-   "sma200_dist_pct": 11.9,
-   "sma50_dist_pct": 18.5,
+   "sma200_dist_pct": 12.0,
+   "sma50_dist_pct": 18.6,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
    "w52_dist_pct": -38.8,
@@ -19006,7 +19006,7 @@
    "support": 62487.7,
    "resistance": 79463.71,
    "rsi": 80.4,
-   "volume": 29988806656,
+   "volume": 29819736064,
    "vol_ratio": 1.75,
    "atr_14": 2091.91,
    "atr_pct": 2.71,
@@ -19018,7 +19018,7 @@
      73032.76,
      78335.19,
      77083.41,
-     77219.83
+     77261.6
     ],
     "m6": [
      75872.52,
@@ -19146,7 +19146,7 @@
      73032.76,
      78335.19,
      77083.41,
-     77219.83
+     77261.6
     ],
     "all": [
      386.94,
@@ -19292,7 +19292,7 @@
      73579.69,
      58558.86,
      62813.75,
-     77219.83
+     77261.6
     ],
     "m1": [
      63482.0,
@@ -19316,7 +19316,7 @@
      73032.76,
      78335.19,
      77083.41,
-     77219.83
+     77261.6
     ],
     "m3": [
      63540.84,
@@ -19384,7 +19384,7 @@
      73032.76,
      78335.19,
      77083.41,
-     77219.83
+     77261.6
     ],
     "y1": [
      115374.33,
@@ -19460,7 +19460,7 @@
      64904.69,
      63402.17,
      64680.71,
-     77219.83
+     77261.6
     ],
     "d1": [
      77124.64,
@@ -19554,7 +19554,14 @@
      77004.29,
      77255.32,
      77251.86,
-     77219.83
+     77144.91,
+     77206.02,
+     77151.46,
+     77255.64,
+     77166.87,
+     77248.05,
+     77259.48,
+     77261.6
     ]
    },
    "earnings_date": null,
@@ -19564,10 +19571,10 @@
    "beta": null,
    "sharpe_1y": -0.85,
    "sortino_1y": -1.13,
-   "sharpe_6m": 0.17,
+   "sharpe_6m": 0.18,
    "sortino_6m": 0.26,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77219.83,
+   "prezzo_limite_aggiustato": 77261.6,
    "risk_reward": "1:0.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -19576,22 +19583,22 @@
     "w1": {
      "support": 64111.07,
      "resistance": 79463.71,
-     "change_pct": 11.48
+     "change_pct": 11.54
     },
     "m1": {
      "support": 62226.58,
      "resistance": 79463.71,
-     "change_pct": 21.64
+     "change_pct": 21.71
     },
     "m3": {
      "support": 57747.77,
      "resistance": 79463.71,
-     "change_pct": 21.53
+     "change_pct": 21.59
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -10.65
+     "change_pct": -10.6
     }
    },
    "financials": [],
@@ -19618,55 +19625,55 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77219.83,
+     "prezzo": 77261.6,
      "medie": {
       "sma10": {
-       "liv": 69294.29,
-       "dist_pct": 11.44
+       "liv": 69298.47,
+       "dist_pct": 11.49
       },
       "ema10": {
-       "liv": 71366.32,
-       "dist_pct": 8.2
+       "liv": 71373.91,
+       "dist_pct": 8.25
       },
       "sma20": {
-       "liv": 66737.77,
-       "dist_pct": 15.71
+       "liv": 66739.85,
+       "dist_pct": 15.77
       },
       "ema20": {
-       "liv": 68409.89,
-       "dist_pct": 12.88
+       "liv": 68413.87,
+       "dist_pct": 12.93
       },
       "sma30": {
-       "liv": 65771.9,
-       "dist_pct": 17.41
+       "liv": 65773.3,
+       "dist_pct": 17.47
       },
       "ema30": {
-       "liv": 67146.25,
-       "dist_pct": 15.0
+       "liv": 67148.95,
+       "dist_pct": 15.06
       },
       "sma50": {
-       "liv": 65143.97,
-       "dist_pct": 18.54
+       "liv": 65144.81,
+       "dist_pct": 18.6
       },
       "ema50": {
-       "liv": 66281.69,
-       "dist_pct": 16.5
+       "liv": 66283.33,
+       "dist_pct": 16.56
       },
       "sma100": {
-       "liv": 66094.54,
-       "dist_pct": 16.83
+       "liv": 66094.96,
+       "dist_pct": 16.89
       },
       "ema100": {
-       "liv": 67156.54,
-       "dist_pct": 14.98
+       "liv": 67157.37,
+       "dist_pct": 15.05
       },
       "sma200": {
-       "liv": 69001.84,
-       "dist_pct": 11.91
+       "liv": 69002.05,
+       "dist_pct": 11.97
       },
       "ema200": {
-       "liv": 71998.17,
-       "dist_pct": 7.25
+       "liv": 71998.59,
+       "dist_pct": 7.31
       }
      },
      "medie_battute": 12,
@@ -19674,18 +19681,18 @@
      "oscillatori": {
       "rsi14": 80.4,
       "macd": {
-       "linea": 2961.51,
-       "segnale": 1344.75,
-       "istogramma": 1616.76
+       "linea": 2964.85,
+       "segnale": 1345.42,
+       "istogramma": 1619.43
       },
-      "stoch_k": 86.8,
-      "stoch_d": 88.7,
-      "williams_r": -13.2,
-      "cci20": 265.8,
+      "stoch_k": 87.0,
+      "stoch_d": 88.8,
+      "williams_r": -13.0,
+      "cci20": 266.0,
       "adx14": 28.5,
       "di_su": 48.3,
       "di_giu": 10.0,
-      "momentum10": 13817.66
+      "momentum10": 13859.43
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -20178,19 +20185,19 @@
       "o": 77076.06,
       "h": 77673.51,
       "l": 75884.68,
-      "c": 77219.83
+      "c": 77261.6
      }
     ],
     "performance": {
-     "s1": 19.39,
-     "m1": 23.03,
-     "m3": 22.77,
-     "m6": 4.55,
-     "a1": -12.42,
-     "ytd": -12.97,
-     "a3": 197.78,
-     "a5": 63.72,
-     "a10": 13318.52
+     "s1": 19.45,
+     "m1": 23.1,
+     "m3": 22.84,
+     "m6": 4.61,
+     "a1": -12.38,
+     "ytd": -12.93,
+     "a3": 197.95,
+     "a5": 63.81,
+     "a10": 13325.78
     },
     "stagionalita": [
      {
@@ -20258,7 +20265,7 @@
      },
      {
       "mese": 8,
-      "media": 1.77,
+      "media": 1.78,
       "mediana": -7.19,
       "positivi_pct": 33,
       "campione": 12,
@@ -20303,9 +20310,9 @@
      }
     ]
    },
-   "rs_1m": 18.0,
+   "rs_1m": 18.1,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 18.6
+   "rs_ndx_1m": 18.7
   },
   {
    "ticker": "^VIX",
@@ -53329,24 +53336,24 @@
    "link": "https://polymarket.com/event/will-ethereum-dip-to-800-by-december-31-2026-568"
   },
   {
-   "question": "Bitcoin Up or Down on August 23?",
-   "yes": 82,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-august-23-2026"
-  },
-  {
    "question": "Will there be no change in Fed interest rates after the September 2026 meeting?",
    "yes": 68,
    "link": "https://polymarket.com/event/will-there-be-no-change-in-fed-interest-rates-after-the-september-2026-meeting-615"
   },
   {
-   "question": "Will the price of Bitcoin be above $72,000 on August 23?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-72k-on-august-23-2026"
+   "question": "Will Bitcoin dip to $45,000 by December 31, 2026?",
+   "yes": 8,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-45000-by-december-31-2026-674-923-755-971-998-525-926-245-316-517-544-589-965-923-986-841-815-224-586-231-289-533-573"
   },
   {
-   "question": "Will the price of Bitcoin be above $74,000 on August 23?",
-   "yes": 100,
-   "link": "https://polymarket.com/event/bitcoin-above-74k-on-august-23-2026"
+   "question": "Will Bitcoin reach $80,000 in August?",
+   "yes": 60,
+   "link": "https://polymarket.com/event/will-bitcoin-reach-80k-in-august-2026"
+  },
+  {
+   "question": "Will Bitcoin dip to $50,000 by December 31, 2026?",
+   "yes": 12,
+   "link": "https://polymarket.com/event/will-bitcoin-dip-to-50000-by-december-31-2026-454-325-222-878-949-487-451-853-523-111"
   }
  ],
  "options": {
@@ -73761,6 +73768,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-08-23T15:14:43Z"
+  "generated_at": "2026-08-23T16:25:01Z"
  }
 }
