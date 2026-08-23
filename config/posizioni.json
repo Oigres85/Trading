@@ -1,107 +1,85 @@
 {
-  "_nota": "Posizioni del CEO. NON e' la lista dei simboli da seguire: quella resta config/ui_watchlist.json, fonte unica. Questo file e' una SOVRAPPOSIZIONE — dice quante quote e a che prezzo medio, per i soli titoli che la watchlist gia' segue. v274 aveva cancellato holdings.json di proposito ('un ripiego verso un file morto e' una strada che riporta indietro'): questo file non lo resuscita, non contiene simboli propri e non puo' reintrodurre un universo diverso.",
-  "_fonte": "estratto del broker del CEO, stampato il 15/08/2026 alle 12:35",
-  "_verifica": "i 12 prezzi azionari dell'estratto combaciano con quelli della pipeline entro ±1,6% (scarto massimo ORCL +1,62%, mediana 0,22%)",
-  "aggiornato": "2026-08-22",
-  "posizioni": [
-    {
-      "ticker": "AMD",
-      "qta": 100,
-      "pmc": 153.916,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    },
-    {
-      "ticker": "BE",
-      "qta": 40,
-      "pmc": 214.0,
-      "valuta": "USD",
-      "mercato": "NYSE"
-    },
-    {
-      "ticker": "BTP-V28",
-      "qta": 40000,
-      "pmc": 100.0,
-      "valuta": "EUR",
-      "mercato": "MOT",
-      "isin": "IT0005565392"
-    },
-    {
-      "ticker": "CRWV",
-      "qta": 105,
-      "pmc": 97.199,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    },
-    {
-      "ticker": "GOOGL",
-      "qta": 50,
-      "pmc": 340.2,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    },
-    {
-      "ticker": "MRVL",
-      "qta": 42,
-      "pmc": 214.08,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    },
-    {
-      "ticker": "MSTR",
-      "qta": 173,
-      "pmc": 173.3045,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    },
-    {
-      "ticker": "MU",
-      "qta": 70,
-      "pmc": 87.63,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    },
-    {
-      "ticker": "NVDA",
-      "qta": 270,
-      "pmc": 87.1667,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    },
-    {
-      "ticker": "ORCL",
-      "qta": 70,
-      "pmc": 143.0,
-      "valuta": "USD",
-      "mercato": "NYSE"
-    },
-    {
-      "ticker": "PLTR",
-      "qta": 100,
-      "pmc": 113.5,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    },
-    {
-      "ticker": "RGTI",
-      "qta": 463,
-      "pmc": 26.5048,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    },
-    {
-      "ticker": "SKHY",
-      "qta": 45,
-      "pmc": 139.0,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    },
-    {
-      "ticker": "WDC",
-      "qta": 25,
-      "pmc": 458.0,
-      "valuta": "USD",
-      "mercato": "NASDAQ"
-    }
-  ]
+ "_nota": "Posizioni del CEO. NON e' la lista dei simboli da seguire: quella resta config/ui_watchlist.json. Questo file e' una SOVRAPPOSIZIONE.",
+ "_fonte": "modificato dalla dashboard",
+ "aggiornato": "2026-08-23",
+ "posizioni": [
+  {
+   "ticker": "BTP-V28",
+   "qta": 40000,
+   "pmc": 100,
+   "valuta": "EUR"
+  },
+  {
+   "ticker": "MU",
+   "qta": 70,
+   "pmc": 87.63,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "AMD",
+   "qta": 100,
+   "pmc": 153.916,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "NVDA",
+   "qta": 270,
+   "pmc": 87.1667,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "GOOGL",
+   "qta": 50,
+   "pmc": 340.2,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "PLTR",
+   "qta": 100,
+   "pmc": 113.5,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "ORCL",
+   "qta": 70,
+   "pmc": 143,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "WDC",
+   "qta": 25,
+   "pmc": 458,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "MRVL",
+   "qta": 42,
+   "pmc": 214.08,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "RGTI",
+   "qta": 463,
+   "pmc": 26.5048,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "BE",
+   "qta": 40,
+   "pmc": 214,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "SKHY",
+   "qta": 45,
+   "pmc": 139,
+   "valuta": "USD"
+  },
+  {
+   "ticker": "MSTR",
+   "qta": 173,
+   "pmc": 173.3045,
+   "valuta": "USD"
+  }
+ ]
 }
