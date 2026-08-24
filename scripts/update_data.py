@@ -1176,17 +1176,32 @@ def fetch_symbol(ticker, name=None, currency="USD"):
                 pass
             if ta_ and ta_ > 0 and tl_ and tl_ > 0:
                 wc = (ca_ - cl_) if (ca_ is not None and cl_ is not None) else None
+                # ⚠ X4 dello Z'' e' PATRIMONIO NETTO CONTABILE / passivita' totali (coeff. 1,05).
+                # Con `market_cap` al numeratore — che appartiene allo Z-score ORIGINALE, dove
+                # pero' il coefficiente e' 0,6 — il quarto termine domina e il punteggio misura
+                # quanto il mercato ama il titolo invece della solidita' del bilancio:
+                # misurato PLTR 326,52 · NVDA 120,18 contro uno Z'' plausibile fra -5 e +10.
+                book = ta_ - tl_
                 comp = [
                     (6.56, wc / ta_ if wc is not None else None),
                     (3.26, re_ / ta_ if re_ is not None else None),
                     (6.72, ebit / ta_ if ebit is not None else None),
-                    (1.05, stats["market_cap"] / tl_ if stats.get("market_cap") else None),
+                    (1.05, book / tl_),
                 ]
                 missing = sum(1 for _, x in comp if x is None)
                 if missing <= 1:
-                    stats["altman_z"] = round(sum(w_ * (x or 0.0) for w_, x in comp), 2)
-                    stats["altman_missing"] = missing
-                    stats["altman_model"] = "Z''"
+                    z_ = round(sum(w_ * (x or 0.0) for w_, x in comp), 2)
+                    # lo Z'' vive fra circa -10 e +15: i cutoff sono 1,1 e 2,6. Fuori da questa
+                    # banda il numero non e' "molto solido", e' un calcolo sbagliato — e non
+                    # deve arrivare in pagina con un flag di rischio attaccato.
+                    if -15 <= z_ <= 20:
+                        stats["altman_z"] = z_
+                        stats["altman_missing"] = missing
+                        stats["altman_model"] = "Z''"
+                    else:
+                        stats["altman_fuori_scala"] = z_
+                        print(f"!! altman {ticker}: Z''={z_} fuori dalla banda plausibile, non pubblicato",
+                              file=sys.stderr)
         except Exception as e:  # noqa: BLE001
             print(f"!! altman {ticker}: {e}", file=sys.stderr)
 

@@ -426,6 +426,32 @@ check("v349 finestra: due frequenze diverse partono comunque insieme",
 check("v349 finestra: il punto scoperto in testa resta FUORI dal ribasamento",
       bool(_alMix) and all(d != "2021-09-01" for d, _ in _alMix[0]))
 
+
+# ═══ v358 — LO Z'' USAVA LA CAPITALIZZAZIONE DOVE VUOLE IL PATRIMONIO NETTO ═══════════════
+# Il modello Z'' per non-manifatturieri e' 6,56·X1 + 3,26·X2 + 6,72·X3 + 1,05·X4, dove X4 e'
+# PATRIMONIO NETTO CONTABILE / passivita' totali. Il codice usava `market_cap` al numeratore —
+# che appartiene allo Z-score ORIGINALE, dove pero' il coefficiente e' 0,6 e non 1,05.
+# Misurato sui dati veri: PLTR 326,52 · NVDA 120,18 · AMD 60,40, contro uno Z'' che vive fra
+# circa -10 e +15 e ha i cutoff a 1,1 e 2,6. Su una societa' molto capitalizzata e poco
+# indebitata il quarto termine schiacciava gli altri tre, e il punteggio misurava quanto il
+# mercato ama il titolo invece della solidita' del bilancio.
+# ⚠ E il campo NON era inerte: la pagina lo stampa col flag [RISCHIO DEFAULT] sotto 1,81.
+_SRC_Z = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+
+def _z2(wc_ta, re_ta, ebit_ta, book_tl):
+    return round(6.56 * wc_ta + 3.26 * re_ta + 6.72 * ebit_ta + 1.05 * book_tl, 2)
+
+# societa' solida e poco indebitata: con la formula giusta resta dentro la banda
+check("v358 Altman: il quarto termine usa il PATRIMONIO NETTO, non la capitalizzazione",
+      _z2(0.30, 0.25, 0.12, 2.0) < 15)
+# lo stesso caso col numeratore sbagliato (capitalizzazione 40x le passivita') esplode
+check("v358 Altman: col numeratore sbagliato il punteggio esce dalla scala dei suoi cutoff",
+      _z2(0.30, 0.25, 0.12, 40.0) > 20)
+check("v358 Altman: il codice legge book = attivo - passivo",
+      "book = ta_ - tl_" in _SRC_Z and "(1.05, book / tl_)" in _SRC_Z)
+check("v358 Altman: fuori dalla banda plausibile non si pubblica e si dichiara",
+      "altman_fuori_scala" in _SRC_Z and "-15 <= z_ <= 20" in _SRC_Z)
+
 # ═══ v254 — UNA POSIZIONE SENZA `name` NON DEVE FERMARE L'ACQUISIZIONE ═══════════════════
 # `pos["name"]` sollevava KeyError e uccideva l'INTERO run prima di scaricare un solo prezzo:
 # quattro posizioni scritte dal diario senza quel campo hanno tenuto data.json fermo a 9
