@@ -528,14 +528,25 @@ check("v144 screener: assente/vuoto → nessun blocco (niente sezione vuota)", r
    SE IL PORTAFOGLIO TORNASSE: il rendimento si calcola da gain_pct, mai dai delta di un
    controvalore che contiene la liquidita'. */
 
-check("v145→v156 shock: EVIDENZA con workflow di verifica INLINE + conferma futures, NON più 'DIRETTIVA: SOSPENDI' né riferimento 'A4' pendente", run(`
+/* ⚠ v355 — L'INVARIANTE SI SPOSTA DI UN PASSO, nella stessa direzione in cui si muove da tre
+   versioni. La v145 ha tolto la "DIRETTIVA: SOSPENDI" lasciando un WORKFLOW DI VERIFICA
+   numerato; il gate di coerenza C9 ha poi mostrato che anche quel workflow e' un'ISTRUZIONE
+   nella coda — "verifica prima di agire · 1) conferma · 2) escludi · 3)…" — cioe' la cosa che
+   la regola vieta. Non si era mai vista perche' l'allarme non era mai scattato durante un
+   controllo di coerenza: e' emersa quando un nuovo giro di pipeline l'ha acceso.
+   La sostanza resta INTERA (i livelli del pacchetto sono calcolati su prezzi pre-shock, e il
+   sistema non sa se il dato sia confermato); cambia la forma: si dichiara il fatto e cosa non
+   e' piu' valido, invece di dettare un procedimento. */
+check("v145→v156→v355 shock: EVIDENZA e conferma futures, senza direttive ne' procedimenti nella coda", run(`
   const saved = DATA.macro.shock_alert, savedF = DATA.macro.futures;
   DATA.macro.shock_alert = { active: true, threshold: 2, sources: [{ src: "KOSPI", chg: -4.3 }] };
   DATA.macro.futures = { nasdaq: { label: "Fut NDX", change_pct: 0.4 }, sp500: { label: "Fut S&P", change_pct: 0.1 } };
   const p = buildPrompt();
   DATA.macro.shock_alert = saved; DATA.macro.futures = savedF;
-  return p.includes("SEGNALE DI SHOCK") && p.includes("NON è un ordine") && p.includes("WORKFLOW DI VERIFICA")
-      && !/\\bA4\\b/.test(p) && p.includes("ALLARME FANTASMA") && /Fut NDX \\+0,4/.test(p) && !p.includes("DIRETTIVA OPERATIVA: SOSPENDI")`));
+  return p.includes("SEGNALE DI SHOCK") && p.includes("indizio, non verdetto")
+      && p.includes("prezzi PRE-shock") && p.includes("COSA IL SISTEMA NON SA")
+      && !/\\bA4\\b/.test(p) && p.includes("ALLARME FANTASMA") && /Fut NDX \\+0,4/.test(p)
+      && !p.includes("DIRETTIVA OPERATIVA: SOSPENDI") && !p.includes("WORKFLOW DI VERIFICA")`));
 
 /* ⚠ v247 — INVARIANTE ROVESCIATO. Sorvegliava che la riga "posizione più pesante" citasse il
    cap REALE e non un 10% scritto a mano: era la protezione giusta finché il cap veniva
@@ -4245,7 +4256,8 @@ check("v354 concentrazione: il gruppo si MISURA, e chi resta fuori viene nominat
   const p = buildPromptTicker("NVDA");
   const i = p.indexOf("CONCENTRAZIONE:");
   if (i < 0) return true;
-  const blocco = p.slice(i, i + 1400);
+  const fineSez = p.indexOf("=== ", i);
+  const blocco = p.slice(i, fineSez < 0 ? p.length : fineSez);
   /* il cluster veniva da SECTOR_BENCH, un dizionario ticker→benchmark compilato a mano: CRWV
      (correlazione +0,52 con NVDA su 125 sedute) restava FUORI mentre MRVL e RGTI (+0,37 e
      +0,35) restavano dentro. Una lista a mano non descrive il fattore: descrive chi si e'
@@ -4258,11 +4270,108 @@ check("v354 concentrazione: chi non ha abbastanza storia non sparisce in silenzi
   const p = buildPromptTicker("NVDA");
   const i = p.indexOf("CONCENTRAZIONE:");
   if (i < 0) return true;
-  const blocco = p.slice(i, i + 1400);
+  const fineSez = p.indexOf("=== ", i);
+  const blocco = p.slice(i, fineSez < 0 ? p.length : fineSez);
   if (!/NON MISURABILI/.test(blocco)) return true;
   /* un nome escluso per mancanza di dati e uno escluso perche' misurato sotto soglia sono due
      cose diverse: letto come "non correlato", il primo diventa una rassicurazione falsa */
   return /non perche' indipendenti/.test(blocco) && /NON e' incluso/.test(blocco);`));
+
+
+/* ══ v355 — I TRE INTERVENTI: EVENTO, RISCHIO DEL LIBRO, TRAIETTORIA DELLA CRESCITA ═════════
+   Tre cose che il sistema aveva nei dati e non pubblicava. Non erano errori: erano assenze —
+   la categoria che nessun gate sorvegliava, perche' un gate verifica cio' che c'e'. */
+
+check("v355 evento: il movimento implicito arriva dalla catena, con lo straddle e la IV", suVeri(`
+  const o = (DATA.options || {}).NVDA;
+  if (!o || !(o.expiries || []).length) return true;
+  const p = buildPromptTicker("NVDA");
+  /* il sistema aveva bid/ask e IV per strike su tre scadenze e ne ricavava due muri: mancava
+     l'unica misura che dice quanto il mercato si aspetta che il titolo si muova */
+  return /MOVIMENTO IMPLICITO DALLE OPZIONI/.test(p)
+      && /straddle [\\d.]+ allo strike [\\d.]+/.test(p)
+      && /E' UNA DEVIAZIONE STANDARD/.test(p);`));
+
+check("v355 evento: il salto di IV fra due scadenze isola il premio dell'evento", suVeri(`
+  const o = (DATA.options || {}).NVDA;
+  const sc = (o && o.expiries) || [];
+  if (sc.length < 2) return true;
+  const p = buildPromptTicker("NVDA");
+  /* misurato su NVDA due giorni prima dei conti: IV 28 sulla scadenza pre-evento contro 60,6
+     sulla post-evento. Quel salto e' il prezzo che il mercato da' alla trimestrale. */
+  if (!/IL PREZZO DELL'EVENTO/.test(p)) return true;
+  return /la volatilita' implicita passa da [\\d.]+ sulla scadenza/.test(p)
+      && /rivende dopo a prezzo crollato/.test(p);`));
+
+check("v355 evento: i livelli si rileggono in sigma implicite", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  if (!/MOVIMENTO IMPLICITO/.test(p)) return true;
+  /* la resistenza a +6,1% sta a UNA sigma implicita esatta: senza questa riga si legge come un
+     livello lontano, con questa si legge come un testa-o-croce entro la scadenza */
+  return /I LIVELLI IN SIGMA IMPLICITE/.test(p) && /resistenza [\\d.]+σ/.test(p);`));
+
+check("v355 rischio: il contributo al rischio e' pubblicato accanto al peso", suVeri(`
+  const conMcr = (DATA.watchlist || []).filter(x => x && numero(x.qta) > 0 && Number.isFinite(numero(x.risk_contrib_pct)));
+  if (conMcr.length < 3) return true;
+  const p = buildPromptTicker("NVDA");
+  /* peso e rischio sono due ordinamenti diversi: MU pesa il 23,1% e contribuisce il 35,0% del
+     rischio, NVDA pesa il 19,8% e ne contribuisce l'11,1% */
+  return /CONTRIBUTO AL RISCHIO/.test(p) && /peso [\\d.]+% → rischio [\\d.]+%/.test(p)
+      && /ordinamento DIVERSO dal peso/.test(p);`));
+
+check("v355 rischio: VaR ed ES del libro arrivano nel pacchetto quando esistono", suVeri(`
+  const t = DATA.totals || {};
+  if (!Number.isFinite(numero(t.var95_hist_pct))) return true;
+  const p = buildPromptTicker("NVDA");
+  return /RISCHIO DEL LIBRO NEL SUO INSIEME/.test(p)
+      && p.includes(String(numero(t.var95_hist_pct)))
+      && /non quanto puo' scendere il libro in un ciclo/.test(p);`));
+
+check("v355 drawdown: profondita' e durata, che nessuno misurava", suVeri(`
+  const conSerie = (DATA.watchlist || []).filter(x => x && numero(x.qta) > 0 && ((x.sparks || {}).m6 || []).length >= 30);
+  if (conSerie.length < 3) return true;
+  const p = buildPromptTicker("NVDA");
+  /* in un libro di crescita il rischio non e' la volatilita': e' quanto profondo si scende e
+     per quante sedute si resta sotto il picco */
+  return /DRAWDOWN MASSIMO delle singole posizioni/.test(p)
+      && /-\\d+% \\(\\d+ sedute\\)/.test(p)
+      && /e' il calo gia' AVVENUTO/i.test(p);`));
+
+check("v355 crescita: i ricavi portano la variazione, non solo il livello", suVeri(`
+  const ct = (((DATA.watchlist || []).find(x => x && x.ticker === "NVDA") || {}).tv || {}).conto_trim || [];
+  if (ct.length < 3) return true;
+  const p = buildPromptTicker("NVDA");
+  /* si pubblicavano cinque ricavi assoluti e si lasciavano quattro divisioni al lettore */
+  return /ricavi [\\d.]+ mld \\([-+][\\d.]+% t\\/t\\)/.test(p)
+      && /TRAIETTORIA DELLA CRESCITA/.test(p)
+      && /SECONDA derivata dei ricavi/.test(p);`));
+
+check("v355 crescita: crescita a/a, utili e PEG escono dai dati che c'erano gia'", suVeri(`
+  const st = (((DATA.watchlist || []).find(x => x && x.ticker === "NVDA") || {}).stats) || {};
+  if (st.revenue_growth == null && st.peg == null) return true;
+  const p = buildPromptTicker("NVDA");
+  const ok = [];
+  if (st.revenue_growth != null) ok.push(/crescita ricavi a\\/a [\\d.]+%/.test(p));
+  if (st.earnings_growth != null) ok.push(/crescita utili a\\/a [\\d.]+%/.test(p));
+  if (st.peg != null) ok.push(/PEG [\\d,]+/.test(p));
+  return ok.length > 0 && ok.every(Boolean);`));
+
+check("v355 pipeline: il rischio si calcola su CHI HA UNA POSIZIONE, non sull'array PORTFOLIO", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  /* `compute_risk_metrics(equities, watchlist)` riceveva equities da fetch_equities(), che
+     itera su PORTFOLIO: dopo la migrazione delle azioni in watchlist quell'array ha il solo
+     BTP, e il motore usciva con return None — tutti i campi di rischio a null. */
+  return py.includes("con_posizione = [r for r in (equities + watchlist)")
+      && py.includes("compute_risk_metrics(con_posizione, senza_posizione)")
+      && py.includes('r.get("value") if r.get("value") is not None else r.get("controvalore")');
+})());
+
+check("v355 pipeline: un importo in valuta senza base esce null, non zero", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  /* uno 0 accanto a "VaR 95%" si legge come "nessun rischio" invece che "non so convertirlo" */
+  return py.includes('if (risk.get("var95_1d_pct") and usd_value) else None')
+      && py.includes('if (risk.get("es95_hist_pct") and usd_value) else None');
+})());
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

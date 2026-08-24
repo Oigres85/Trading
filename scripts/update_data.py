@@ -3881,7 +3881,8 @@ def compute_risk_metrics(rows, watch_rows=None):
     Ritorna {"sharpe", "portfolio_beta_ndx", "avg_pairwise_corr"} e annota le row in place."""
     series, weights = {}, {}
     for r in rows:
-        rs, ds, val = r.get("_ret_series"), r.get("_ret_dates"), r.get("value")
+        rs, ds = r.get("_ret_series"), r.get("_ret_dates")
+        val = r.get("value") if r.get("value") is not None else r.get("controvalore")
         if rs and ds and val and len(rs) == len(ds) and len(rs) >= 60:
             series[r["ticker"]] = pd.Series(rs, index=pd.to_datetime(ds))
             weights[r["ticker"]] = float(val)
@@ -4180,7 +4181,15 @@ def main():
         print(f"!! [MACRO SHOCK ALERT] {shock['worst_chg']}% — {[s['src'] for s in shock['sources']]}", file=sys.stderr)
 
     # Metriche di rischio (Sharpe, beta NDX, correlazioni, MCR) PRIMA di rimuovere le serie interne
-    risk = compute_risk_metrics(equities, watchlist) or {}
+    # ⚠ v355 — il portafoglio ai fini del rischio e' CHI HA UNA POSIZIONE, non chi sta
+    # nell'array PORTFOLIO: dopo la migrazione delle azioni in watchlist quell'array ha il solo
+    # BTP, e il motore restituiva None (tutti i campi di rischio a null in data.json).
+    con_posizione = [r for r in (equities + watchlist)
+                     if (r.get("qta") or r.get("qty")) and (r.get("value") or r.get("controvalore"))]
+    senza_posizione = [r for r in watchlist if r not in con_posizione]
+    print(f"   rischio di portafoglio: {len(con_posizione)} posizioni nel calcolo, "
+          f"{len(senza_posizione)} titoli seguiti fuori", file=sys.stderr)
+    risk = compute_risk_metrics(con_posizione, senza_posizione) or {}
     portfolio_sharpe = risk.get("sharpe")
     strip_private(equities)
     strip_private(watchlist)
@@ -4291,13 +4300,13 @@ def main():
             # % del controvalore azionario + conversione in € ai pesi MTM correnti
             "var95_1d_pct": risk.get("var95_1d_pct"),
             "es95_1d_pct": risk.get("es95_1d_pct"),
-            "var95_1d_eur": round(usd_value / eurusd * risk["var95_1d_pct"] / 100) if risk.get("var95_1d_pct") else None,
-            "es95_1d_eur": round(usd_value / eurusd * risk["es95_1d_pct"] / 100) if risk.get("es95_1d_pct") else None,
+            "var95_1d_eur": round(usd_value / eurusd * risk["var95_1d_pct"] / 100) if (risk.get("var95_1d_pct") and usd_value) else None,
+            "es95_1d_eur": round(usd_value / eurusd * risk["es95_1d_pct"] / 100) if (risk.get("es95_1d_pct") and usd_value) else None,
             # variante STORICA (percentili empirici — primaria: onesta sulle code grasse)
             "var95_hist_pct": risk.get("var95_hist_pct"),
             "es95_hist_pct": risk.get("es95_hist_pct"),
-            "var95_hist_eur": round(usd_value / eurusd * risk["var95_hist_pct"] / 100) if risk.get("var95_hist_pct") else None,
-            "es95_hist_eur": round(usd_value / eurusd * risk["es95_hist_pct"] / 100) if risk.get("es95_hist_pct") else None,
+            "var95_hist_eur": round(usd_value / eurusd * risk["var95_hist_pct"] / 100) if (risk.get("var95_hist_pct") and usd_value) else None,
+            "es95_hist_eur": round(usd_value / eurusd * risk["es95_hist_pct"] / 100) if (risk.get("es95_hist_pct") and usd_value) else None,
         },
         "portfolio": equities + [btp],
         "watchlist": watchlist,

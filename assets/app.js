@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "354";
+const BUILD_VERSION = "355";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7504,7 +7504,7 @@ function buildPrompt() {
          solo non letto). Ora la riga AFFERMA il fatto: le istruzioni vivono nella testata. */
       ? `Conferma incrociata USA (dato più fresco, ha PRIORITÀ sull'Asia): ${futBits}. Futures USA verdi o piatti mentre l'Asia crolla = ALLARME FANTASMA localizzato all'Asia, cioè una caduta che il mercato di riferimento di questo libro non ha confermato.`
       : `Conferma incrociata USA: i futures non sono nel payload, quindi la caduta asiatica resta senza controprova sul mercato che conta per questo libro.`;
-    lines.push(`🚨 [SEGNALE DI SHOCK — verifica prima di agire, NON è un ordine]: ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} (oltre ${shock.threshold}% con Wall Street chiusa). È un INDIZIO da validare, non un verdetto. WORKFLOW DI VERIFICA in ordine: 1) conferma il dato (Tabella B/web) · 2) escludi cache/feed rotto · 3) ${futLine} · 4) cosa cambia se il regime è confermato: i livelli d'ingresso e i target di questo payload sono calcolati su prezzi PRE-shock, e gli stop 2×ATR sono misurati su una volatilità che non contiene il gap atteso — due numeri costruiti su un mercato che potrebbe non esistere più all'apertura. Questo blocco è un INDIZIO, non una sospensione automatica.`);
+    lines.push(`🚨 [SEGNALE DI SHOCK — indizio, non verdetto]: ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} (oltre ${shock.threshold}% con Wall Street chiusa). ${futLine} ⚠ COSA SIGNIFICA PER I NUMERI DI QUESTO PACCHETTO: i livelli, i target e l'ATR qui dentro sono calcolati su prezzi PRE-shock, e la volatilità che li sostiene non contiene il gap atteso all'apertura — sono numeri costruiti su un mercato che all'apertura potrebbe non esistere più. ⚠ COSA IL SISTEMA NON SA: se il dato sia confermato o sia un feed rotto, e se il movimento regga fino alla campana. Un singolo indice fuori sessione è la fonte più fragile che questo pacchetto contenga.`);
     lines.push("");
   }
   // ORDINE WEB-SEARCH IN CIMA: se ci sono dati mancanti/inaffidabili, l'imperativo va visto
@@ -8630,6 +8630,47 @@ function contestoPortafoglio(tkCorrente) {
     + `. ⚠ Titoli che condividono lo stesso fattore sono UNA scommessa scritta piu' volte, non `
     + `posizioni indipendenti: l'esposizione del libro a quel fattore e' la loro somma, `
     + `non il peso del singolo nome.`);
+  /* il contributo al rischio, che e' un ordinamento DIVERSO dal peso */
+  const conMcr = azionarie.filter(x => Number.isFinite(numero(x.r.risk_contrib_pct)))
+    .map(x => ({ tk: x.r.ticker, peso: x.v / totAz * 100, mcr: numero(x.r.risk_contrib_pct) }))
+    .sort((a, b) => b.mcr - a.mcr);
+  if (conMcr.length >= 3) {
+    L.push(`CONTRIBUTO AL RISCHIO (quota della varianza del libro attribuibile a ciascuna posizione, `
+      + `dalle correlazioni misurate — e' un ordinamento DIVERSO dal peso): `
+      + conMcr.slice(0, 6).map(x => `${x.tk} peso ${x.peso.toFixed(1)}% → rischio ${x.mcr}%`).join(" · ")
+      + `. ⚠ Dove rischio e peso divergono, la posizione porta piu' (o meno) varianza di quanto il suo peso suggerisca: `
+      + `e' l'effetto delle correlazioni, non della dimensione.`);
+  }
+  const tot0 = (DATA && DATA.totals) || {};
+  const bit = [];
+  if (Number.isFinite(numero(tot0.var95_hist_pct))) bit.push(`VaR 95% a 1 giorno ${numero(tot0.var95_hist_pct)}% (percentili storici)`);
+  if (Number.isFinite(numero(tot0.es95_hist_pct))) bit.push(`Expected Shortfall 95% ${numero(tot0.es95_hist_pct)}% (perdita MEDIA nel 5% dei giorni peggiori)`);
+  if (Number.isFinite(numero(tot0.portfolio_beta_ndx))) bit.push(`beta del libro vs Nasdaq 100 ${numero(tot0.portfolio_beta_ndx)}`);
+  if (Number.isFinite(numero(tot0.avg_pairwise_corr))) bit.push(`correlazione media fra le posizioni ${numero(tot0.avg_pairwise_corr)}`);
+  if (bit.length) L.push(`RISCHIO DEL LIBRO NEL SUO INSIEME: ${bit.join(" · ")}. `
+    + `⚠ Sono misure a UN GIORNO su distribuzione storica: dicono quanto e' ampia una giornata brutta ordinaria, `
+    + `non quanto puo' scendere il libro in un ciclo. Per quello serve il drawdown qui sotto.`);
+  /* il drawdown: in un libro di crescita il rischio non e' la volatilita', e' quanto profondo
+     si scende e quanto ci si mette a tornare. I dati c'erano e nessuno li guardava. */
+  const dd = (serie) => {
+    if (!Array.isArray(serie) || serie.length < 30) return null;
+    let picco = serie[0], peggio = 0, dur = 0, cur = 0;
+    for (const v of serie) {
+      if (v > picco) { picco = v; cur = 0; }
+      else { cur++; const d = v / picco - 1; if (d < peggio) { peggio = d; dur = cur; } }
+    }
+    return { pct: peggio * 100, sedute: dur };
+  };
+  const dds = azionarie.map(x => ({ tk: x.r.ticker, d: dd((x.r.sparks || {}).m6) }))
+    .filter(x => x.d).sort((a, b) => a.d.pct - b.d.pct);
+  if (dds.length >= 3) {
+    L.push(`DRAWDOWN MASSIMO delle singole posizioni sulle ultime ~125 sedute (quanto e' scesa dal proprio picco, `
+      + `e per quante sedute e' rimasta sotto): `
+      + dds.slice(0, 6).map(x => `${x.tk} ${x.d.pct.toFixed(0)}% (${x.d.sedute} sedute)`).join(" · ")
+      + `${dds.length > 6 ? ` · il meno profondo del libro: ${dds[dds.length - 1].tk} ${dds[dds.length - 1].d.pct.toFixed(0)}%` : ""}`
+      + `. ⚠ E' il calo gia' AVVENUTO, non una previsione: serve a sapere quanto e' ordinario per questi titoli, `
+      + `perche' una discesa dentro quel range non e' una rottura della tesi e una fuori lo e'.`);
+  }
   if (misurato) {
     const nonMisurati = azionarie.filter(x => corrCon.get(x.r.ticker) == null).map(x => x.r.ticker);
     const sottoSoglia = azionarie.filter(x => { const c = corrCon.get(x.r.ticker); return c != null && c < SOGLIA_FATTORE; })
@@ -8915,7 +8956,48 @@ function statoOpzioni(tk) {
            /* vero quando la scadenza scelta NON e' la piu' vicina: la scheda lo dice, perche'
               altrimenti "scadenza 14/08" accanto a un titolo che scade il 12 sembra un errore. */
            nonLaPiuVicina: e.date !== o.expiries[0].date,
-           oiPiuVicina: oiPrima };
+           oiPiuVicina: oiPrima,
+           evento: movimentoImplicito(o) };
+}
+
+/* Il movimento implicito dallo straddle at-the-money: (call + put) allo strike piu' vicino allo
+   spot, in percentuale del prezzo. E' la deviazione standard che il mercato prezza fino alla
+   scadenza — non una previsione di direzione, una misura di ampiezza attesa.
+   ⚠ SI USA IL PUNTO MEDIO BID/ASK, non l'ultimo scambio: su strike poco liquidi l'ultimo prezzo
+   puo' essere di ore prima e produce uno straddle che non esiste piu'. Se manca un lato del
+   book, quella scadenza si salta invece di stimarla. */
+function movimentoImplicito(o) {
+  const spot = Number(o && o.spot);
+  if (!Number.isFinite(spot) || spot <= 0 || !Array.isArray(o.expiries)) return null;
+  const mid = (x) => (x && Number(x.bid) > 0 && Number(x.ask) > 0) ? (Number(x.bid) + Number(x.ask)) / 2 : null;
+  const perScadenza = [];
+  for (const e of o.expiries) {
+    const call = new Map((e.calls || []).map(c => [Number(c.strike), c]));
+    const put = new Map((e.puts || []).map(p => [Number(p.strike), p]));
+    const comuni = [...call.keys()].filter(k => put.has(k)).sort((a, b) => Math.abs(a - spot) - Math.abs(b - spot));
+    if (!comuni.length) continue;
+    const K = comuni[0];
+    const c = mid(call.get(K)), p = mid(put.get(K));
+    if (c == null || p == null) continue;
+    const strad = c + p;
+    const pct = strad / spot * 100;
+    /* il massimo open interest DENTRO il movimento implicito: quello e' il livello che il
+       mercato puo' davvero raggiungere entro la scadenza, non lo strike con piu' contratti in
+       assoluto (che su NVDA stava al -46% dallo spot) */
+    const dentro = (m) => [...m.entries()].filter(([k]) => Math.abs(k / spot - 1) * 100 <= pct)
+      .sort((a, b) => (Number(b[1].oi) || 0) - (Number(a[1].oi) || 0))[0];
+    const muroPutVicino = dentro(put), muroCallVicino = dentro(call);
+    perScadenza.push({
+      data: e.date, strike: K, straddle: Math.round(strad * 100) / 100,
+      pct: Math.round(pct * 100) / 100,
+      ivCall: Number(call.get(K).iv) || null, ivPut: Number(put.get(K).iv) || null,
+      putVicino: muroPutVicino ? { strike: muroPutVicino[0], oi: Number(muroPutVicino[1].oi) || 0 } : null,
+      callVicino: muroCallVicino ? { strike: muroCallVicino[0], oi: Number(muroCallVicino[1].oi) || 0 } : null,
+    });
+  }
+  if (!perScadenza.length) return null;
+  perScadenza.sort((a, b) => String(a.data).localeCompare(String(b.data)));
+  return { spot, scadenze: perScadenza };
 }
 
 /* ═══ v266 — I LIVELLI DEL TITOLO SU UNA SCALA SOLA ════════════════════════════════════════
@@ -9103,7 +9185,15 @@ function fattiTitolo(tk) {
                       emaDallaPipeline: !!((((riga.tv || {}).tecnica || {}).medie || {}).ema50),
                       /* v354 — c'erano in data.json e non uscivano da qui, quindi il pacchetto
                          li dichiarava assenti mentre la pagina li stampava */
+                      /* v355 — l'evento e i due livelli servono al blocco del movimento
+                         implicito, che li riesprime in sigma */
+                      evento: (opz && opz.evento) || null,
+                      opzioniPresenti: !!opz,
+                      resistenza: numero(riga.resistance), supporto: numero(riga.support),
                       rating: riga.rating || null,
+                      crescitaRicavi: numero((riga.stats || {}).revenue_growth),
+                      crescitaUtili: numero((riga.stats || {}).earnings_growth),
+                      peg: numero((riga.stats || {}).peg),
                       grossMargin: numero((riga.stats || {}).gross_margin),
                       fcf: numero((riga.stats || {}).fcf),
                       ricaviFy: numero((riga.stats || {}).revenue_fy),
@@ -9721,9 +9811,27 @@ function tvBlocchi(tk) {
   if (tv.conto_trim && tv.conto_trim.length) {
     F.push(``, `--- CONTO ECONOMICO TRIMESTRALE (ultimi ${tv.conto_trim.length} trimestri) ---`);
     const mld = (v) => (v == null ? "n.d." : `${(v / 1e9).toFixed(2)} mld`);
-    tv.conto_trim.forEach(q => F.push(`- ${q.trim}: ricavi ${mld(q.ricavi)}`
+    /* la traiettoria, non solo i livelli: t/t per ogni trimestre e la sua variazione */
+    const cres = tv.conto_trim.map((q, i) => {
+      const prec = tv.conto_trim[i + 1];
+      return (prec && prec.ricavi) ? Math.round((q.ricavi / prec.ricavi - 1) * 1000) / 10 : null;
+    });
+    tv.conto_trim.forEach((q, i) => F.push(`- ${q.trim}: ricavi ${mld(q.ricavi)}`
+      + (cres[i] != null ? ` (${cres[i] > 0 ? "+" : ""}${cres[i]}% t/t)` : "")
       + (q.operativo != null ? ` \u00b7 risultato operativo ${mld(q.operativo)}${q.margine_op != null ? ` (${q.margine_op}%)` : ""}` : "")
       + (q.utile != null ? ` \u00b7 utile netto ${mld(q.utile)}${q.margine != null ? ` (margine ${q.margine}%)` : ""}` : "")));
+    /* la SECONDA derivata: se la crescita accelera o rallenta. In growth e' il segnale. */
+    const validi = cres.filter(x => x != null);
+    if (validi.length >= 2) {
+      const ora = validi[0], prima = validi[1];
+      const verso = ora > prima + 0.5 ? "ACCELERA" : ora < prima - 0.5 ? "RALLENTA" : "stabile";
+      F.push(`TRAIETTORIA DELLA CRESCITA (trimestre su trimestre, dal piu' recente): `
+        + `${validi.map(x => `${x > 0 ? "+" : ""}${x}%`).join(" ← ")} — l'ultimo trimestre ${verso} `
+        + `rispetto al precedente (${ora > 0 ? "+" : ""}${ora}% contro ${prima > 0 ? "+" : ""}${prima}%). `
+        + `⚠ E' la SECONDA derivata dei ricavi: in un titolo di crescita il mercato paga la traiettoria, `
+        + `non il livello — una societa' che cresce del 20% accelerando e una che cresce del 20% rallentando `
+        + `hanno lo stesso numero e due prezzi diversi.`);
+    }
     F.push(annuali.length
       ? `⚠ Il trimestre e' l'unita' in cui una societa' ciclica gira: la serie ANNUALE qui sopra copre `
         + `lo stesso periodo ma nasconde il punto di svolta dentro la media dei dodici mesi.`
@@ -9918,6 +10026,50 @@ function datiNostriDelTitolo(tk) {
   }
   const t = f.tecnici;
   if (t) {
+    /* ⚠⚠ v355 — COSA PREZZA IL MERCATO PER L'EVENTO. Il sistema aveva la catena completa e
+       pubblicava tre numeri (due muri e un rapporto put/call): mancava l'unico che dice quanto
+       il mercato si aspetta che il titolo si muova. Su una trimestrale e' LA misura, perche' e'
+       la sola che colloca i livelli tecnici gia' pubblicati: una resistenza a una sigma
+       implicita e una a tre sigma non sono lo stesso oggetto. */
+    if (!t.evento && t.opzioniPresenti) {
+      L.push(`- ⚡ MOVIMENTO IMPLICITO: NON CALCOLABILE ADESSO. La catena opzioni c'e' ma il book e' vuoto `
+        + `(denaro e lettera a zero su tutti gli strike vicini): succede a mercato chiuso, e da un book vuoto `
+        + `non si ricava uno straddle. ⚠ NON significa che il mercato non prezzi l'evento: significa che questo `
+        + `pacchetto e' stato generato quando i prezzi delle opzioni non erano quotati. A mercato aperto la riga c'e'.`);
+    }
+    if (t.evento && t.evento.scadenze && t.evento.scadenze.length) {
+      const sc = t.evento.scadenze;
+      const rif = sc.find(x => x.pct >= 3) || sc[sc.length - 1];
+      L.push(`- ⚡ MOVIMENTO IMPLICITO DALLE OPZIONI (quanto il mercato si aspetta che si muova, non in che direzione):`
+        + sc.map(x => ` scadenza ${x.data}: ±${x.pct}% (straddle ${x.straddle} allo strike ${x.strike}, IV ${x.ivCall ?? "n.d."})`).join(" ·")
+        + `. E' UNA DEVIAZIONE STANDARD: fuori da quella banda il mercato prezza circa un caso su tre.`);
+      /* il salto di IV fra una scadenza e la successiva ISOLA il premio dell'evento */
+      if (sc.length >= 2 && Number.isFinite(sc[0].ivCall) && Number.isFinite(sc[1].ivCall) && sc[1].ivCall > sc[0].ivCall * 1.3) {
+        L.push(`- ⚡ IL PREZZO DELL'EVENTO: la volatilita' implicita passa da ${sc[0].ivCall} sulla scadenza ${sc[0].data} `
+          + `a ${sc[1].ivCall} sulla ${sc[1].data}. Quel salto e' il premio che il mercato paga per l'incertezza `
+          + `dell'uscita in mezzo, e il movimento atteso passa da ±${sc[0].pct}% a ±${sc[1].pct}%. `
+          + `⚠ Chi compra volatilita' prima dell'uscita la paga a quel prezzo e la rivende dopo a prezzo crollato, `
+          + `a prescindere da come vanno i conti: e' il motivo per cui "avevo ragione sulla trimestrale" e "ci ho guadagnato" sono due cose diverse.`);
+      }
+      /* i livelli gia' pubblicati, riespressi nell'unita' che conta a questo orizzonte */
+      const sigma = rif.pct;
+      const inSigma = (v, nome) => Number.isFinite(numero(v)) && Number.isFinite(f.prezzo) && sigma
+        ? `${nome} ${(Math.abs(numero(v) / f.prezzo - 1) * 100 / sigma).toFixed(1)}σ` : null;
+      const inS = [inSigma(t.resistenza, "resistenza"), inSigma(t.supporto, "supporto"),
+                   inSigma(t.w52hi, "massimo 52s"), inSigma(t.w52lo, "minimo 52s")].filter(Boolean);
+      if (inS.length) L.push(`- I LIVELLI IN SIGMA IMPLICITE (distanza dal riferimento divisa per il movimento atteso ±${sigma}% sulla scadenza ${rif.data}): `
+        + `${inS.join(" · ")}. ⚠ Sotto 1σ il livello cade dentro l'intervallo che la distribuzione implicita `
+        + `assegna a circa due casi su tre entro quella data; sopra 2σ cade in una coda da meno di un caso su venti. `
+        + `La distanza in percentuale da sola non distingue i due casi.`);
+      if (rif.putVicino || rif.callVicino) {
+        const b3 = [];
+        if (rif.callVicino) b3.push(`call ${rif.callVicino.strike} (${((rif.callVicino.strike / f.prezzo - 1) * 100).toFixed(1)}%, ${fmtNum.format(rif.callVicino.oi)} contratti)`);
+        if (rif.putVicino) b3.push(`put ${rif.putVicino.strike} (${((rif.putVicino.strike / f.prezzo - 1) * 100).toFixed(1)}%, ${fmtNum.format(rif.putVicino.oi)} contratti)`);
+        L.push(`- MASSIMO OPEN INTEREST DENTRO IL MOVIMENTO IMPLICITO (scadenza ${rif.data}): ${b3.join(" · ")}. `
+          + `Sono gli strike raggiungibili entro la scadenza con piu' posizioni aperte — a differenza dei "muri" assoluti, `
+          + `che possono stare a distanze che il titolo non percorre.`);
+      }
+    }
     if (Number.isFinite(t.rsi)) L.push(`- RSI(14): ${t.rsi}`);
     if (Number.isFinite(t.atr)) L.push(`- ATR(14): ${t.atr}${Number.isFinite(t.atrPct) ? ` (${t.atrPct}% del prezzo — l'ampiezza tipica di una seduta)` : ""}`);
   /* ═══ v314 — DUE CONVENZIONI OPPOSTE NELLO STESSO PACCHETTO, E UN LLM CI E' CASCATO ═════
@@ -9972,6 +10124,11 @@ function datiNostriDelTitolo(tk) {
     const perc = (v) => Number.isFinite(numero(v)) ? `${(numero(v) * 100).toFixed(1)}%` : null;
     const mld = (v) => Number.isFinite(numero(v)) ? `${fmtNum.format(Math.round(numero(v) / 1e9))} mld` : null;
     const fond = [
+      /* v355 — le tre misure di crescita che il sistema aveva e taceva: sono il cuore di un
+         mandato growth, ed erano in `stats` da sempre */
+      perc(t.crescitaRicavi) ? `crescita ricavi a/a ${perc(t.crescitaRicavi)}` : null,
+      perc(t.crescitaUtili) ? `crescita utili a/a ${perc(t.crescitaUtili)}` : null,
+      Number.isFinite(numero(t.peg)) ? `PEG ${fmtNum.format(numero(t.peg))} (P/E diviso la crescita attesa: sotto 1 il mercato paga meno di quanto la societa' cresce)` : null,
       perc(t.grossMargin) ? `margine lordo ${perc(t.grossMargin)}` : null,
       mld(t.fcf) ? `flusso di cassa libero ${mld(t.fcf)}` : null,
       mld(t.ricaviFy) ? `ricavi esercizio ${mld(t.ricaviFy)}` : null,
