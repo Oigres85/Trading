@@ -4341,7 +4341,8 @@ check("v355 drawdown: profondita' e durata, che nessuno misurava", suVeri(`
   /* in un libro di crescita il rischio non e' la volatilita': e' quanto profondo si scende e
      per quante sedute si resta sotto il picco */
   return /DRAWDOWN MASSIMO delle singole posizioni/.test(p)
-      && /-\\d+% \\(\\d+ sedute\\)/.test(p)
+      && /-\\d+% \\(\\d+ sedute sott'acqua/.test(p)
+      && /dal picco al ritorno su quel livello/.test(p)
       && /e' il calo gia' AVVENUTO/i.test(p);`));
 
 check("v355 crescita: i ricavi portano la variazione, non solo il livello", suVeri(`
@@ -4379,6 +4380,63 @@ check("v355 pipeline: un importo in valuta senza base esce null, non zero", (() 
   return py.includes('if (risk.get("var95_1d_pct") and usd_value) else None')
       && py.includes('if (risk.get("es95_hist_pct") and usd_value) else None');
 })());
+
+
+/* ══ v356 — L'ASIMMETRIA DEL SILENZIO, e cinque numeri che dicevano un'altra cosa ══════════
+   Trovati da un PM growth che ha provato a usare il sistema. Il piu' grave l'avevo introdotto
+   io stesso poche ore prima: avevo costruito la dichiarazione "non calcolabile" per un blocco
+   solo. La disciplina vale se e' simmetrica, altrimenti insegna che il silenzio e' ammesso. */
+
+check("v356 simmetria: se il motore di rischio non produce, il pacchetto LO DICE", suVeri(`
+  const salva = DATA.totals;
+  DATA.totals = Object.assign({}, DATA.totals, { var95_hist_pct: null, var95_1d_pct: null, portfolio_beta_ndx: null });
+  const p = buildPromptTicker("NVDA");
+  DATA.totals = salva;
+  /* le righe stavano dentro un if(isFinite) e con i campi a null sparivano: si incollava un
+     pacchetto senza VaR credendo di avere quello con il VaR */
+  return /RISCHIO DEL LIBRO NEL SUO INSIEME: NON CALCOLABILE IN QUESTO RUN/.test(p)
+      && /NON significa che il rischio sia basso o assente/.test(p);`));
+
+check("v356 evento: il premio si isola solo fra una scadenza PRIMA e una DOPO", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
+  const o = (DATA.options || {}).NVDA;
+  if (!r || !r.earnings_date || !o) return true;
+  const p = buildPromptTicker("NVDA");
+  const date = (o.expiries || []).map(e => e.date);
+  const evento = String(r.earnings_date).slice(0, 10);
+  const haPrima = date.some(d => d < evento), haDopo = date.some(d => d >= evento);
+  /* confrontavo le prime due scadenze chiunque fossero: con tutte e tre posteriori all'evento
+     avrei chiamato "prezzo dell'evento" la differenza fra due scadenze che l'evento ce l'hanno
+     gia' entrambe dentro */
+  if (haPrima && haDopo) return true;
+  return /IL PREMIO DELL'EVENTO NON E' ISOLABILE/.test(p) || !/MOVIMENTO IMPLICITO DALLE OPZIONI/.test(p);`));
+
+check("v356 etichette: il TTM non si chiama esercizio", suVeri(`
+  const st = (((DATA.watchlist || []).find(x => x && x.ticker === "NVDA") || {}).stats) || {};
+  if (st.revenue_fy == null) return true;
+  const p = buildPromptTicker("NVDA");
+  /* revenue_fy coincide al centesimo con la somma dei quattro trimestri (253,49), mentre il
+     conto annuale nello stesso pacchetto dice esercizio 2026 = 215,9: due numeri, un nome */
+  return /ricavi ultimi 12 mesi/.test(p) && !/ricavi esercizio \\d/.test(p)
+      && /NON l'esercizio fiscale/.test(p);`));
+
+check("v356 PEG: non si pubblica senza la crescita che lo genera", suVeri(`
+  const st = (((DATA.watchlist || []).find(x => x && x.ticker === "NVDA") || {}).stats) || {};
+  if (st.peg == null) return true;
+  const p = buildPromptTicker("NVDA");
+  /* 32,9 / 0,59 implica ~56% di crescita attesa: un TERZO tasso, diverso dall'85,2% dei ricavi
+     e dal 214,5% degli utili stampati due righe sopra */
+  return /PEG [\\d,]+ — implica una crescita attesa del \\d+%/.test(p)
+      && /TERZA grandezza/.test(p);`));
+
+check("v356 correlazioni: si dichiara che l'indipendenza e' rispetto all'ancora", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  if (!/Sotto soglia/.test(p)) return true;
+  /* "indipendenti" significava indipendenti da NVDA, non fra loro: due nomi possono formare un
+     secondo grappolo e il sistema non ha modo di vederlo, perche' misura contro una sola ancora */
+  return /indipendenti dall'ancora/.test(p)
+      && /fra loro possono muoversi insieme/.test(p)
+      && /arrotondati a due decimali/.test(p);`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

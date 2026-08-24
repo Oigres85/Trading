@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "355";
+const BUILD_VERSION = "356";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8642,6 +8642,16 @@ function contestoPortafoglio(tkCorrente) {
       + `e' l'effetto delle correlazioni, non della dimensione.`);
   }
   const tot0 = (DATA && DATA.totals) || {};
+  const motoreVuoto = !Number.isFinite(numero(tot0.var95_hist_pct))
+    && !Number.isFinite(numero(tot0.var95_1d_pct))
+    && !Number.isFinite(numero(tot0.portfolio_beta_ndx));
+  if (motoreVuoto && azionarie.length >= 3) {
+    L.push(`RISCHIO DEL LIBRO NEL SUO INSIEME: NON CALCOLABILE IN QUESTO RUN. Il motore che produce `
+      + `VaR, Expected Shortfall, beta di portafoglio e contributo marginale al rischio non ha restituito `
+      + `output — di solito perche' le serie di rendimenti non erano disponibili quando la pipeline e' girata. `
+      + `⚠ NON significa che il rischio sia basso o assente: significa che questo pacchetto non lo misura. `
+      + `I pesi e le correlazioni qui sopra restano validi; la quota di varianza per posizione no.`);
+  }
   const bit = [];
   if (Number.isFinite(numero(tot0.var95_hist_pct))) bit.push(`VaR 95% a 1 giorno ${numero(tot0.var95_hist_pct)}% (percentili storici)`);
   if (Number.isFinite(numero(tot0.es95_hist_pct))) bit.push(`Expected Shortfall 95% ${numero(tot0.es95_hist_pct)}% (perdita MEDIA nel 5% dei giorni peggiori)`);
@@ -8654,19 +8664,26 @@ function contestoPortafoglio(tkCorrente) {
      si scende e quanto ci si mette a tornare. I dati c'erano e nessuno li guardava. */
   const dd = (serie) => {
     if (!Array.isArray(serie) || serie.length < 30) return null;
-    let picco = serie[0], peggio = 0, dur = 0, cur = 0;
-    for (const v of serie) {
-      if (v > picco) { picco = v; cur = 0; }
-      else { cur++; const d = v / picco - 1; if (d < peggio) { peggio = d; dur = cur; } }
+    let picco = serie[0], peggio = 0, iMin = 0, iPicco = 0, iPiccoDelPeggio = 0;
+    for (let i = 0; i < serie.length; i++) {
+      const v = serie[i];
+      if (v > picco) { picco = v; iPicco = i; }
+      else { const d = v / picco - 1; if (d < peggio) { peggio = d; iMin = i; iPiccoDelPeggio = iPicco; } }
     }
-    return { pct: peggio * 100, sedute: dur };
+    /* sedute SOTT'ACQUA: dal picco fino al primo ritorno a quel livello. Se non c'e' ritorno,
+       il conto arriva a oggi e si dichiara che il recupero non e' avvenuto. */
+    const livelloPicco = serie[iPiccoDelPeggio];
+    let recupero = -1;
+    for (let i = iMin; i < serie.length; i++) { if (serie[i] >= livelloPicco) { recupero = i; break; } }
+    const sotto = (recupero >= 0 ? recupero : serie.length - 1) - iPiccoDelPeggio;
+    return { pct: peggio * 100, sedute: sotto, recuperato: recupero >= 0 };
   };
   const dds = azionarie.map(x => ({ tk: x.r.ticker, d: dd((x.r.sparks || {}).m6) }))
     .filter(x => x.d).sort((a, b) => a.d.pct - b.d.pct);
   if (dds.length >= 3) {
     L.push(`DRAWDOWN MASSIMO delle singole posizioni sulle ultime ~125 sedute (quanto e' scesa dal proprio picco, `
-      + `e per quante sedute e' rimasta sotto): `
-      + dds.slice(0, 6).map(x => `${x.tk} ${x.d.pct.toFixed(0)}% (${x.d.sedute} sedute)`).join(" · ")
+      + `e quante sedute sono passate dal picco al ritorno su quel livello): `
+      + dds.slice(0, 6).map(x => `${x.tk} ${x.d.pct.toFixed(0)}% (${x.d.sedute} sedute sott'acqua${x.d.recuperato ? "" : ", NON ancora recuperato"})`).join(" · ")
       + `${dds.length > 6 ? ` · il meno profondo del libro: ${dds[dds.length - 1].tk} ${dds[dds.length - 1].d.pct.toFixed(0)}%` : ""}`
       + `. ⚠ E' il calo gia' AVVENUTO, non una previsione: serve a sapere quanto e' ordinario per questi titoli, `
       + `perche' una discesa dentro quel range non e' una rottura della tesi e una fuori lo e'.`);
@@ -8675,7 +8692,10 @@ function contestoPortafoglio(tkCorrente) {
     const nonMisurati = azionarie.filter(x => corrCon.get(x.r.ticker) == null).map(x => x.r.ticker);
     const sottoSoglia = azionarie.filter(x => { const c = corrCon.get(x.r.ticker); return c != null && c < SOGLIA_FATTORE; })
       .map(x => `${x.r.ticker} ${corrCon.get(x.r.ticker).toFixed(2)}`);
-    if (sottoSoglia.length) L.push(`  Sotto soglia, cioe' misurati e indipendenti: ${sottoSoglia.join(", ")}.`);
+    if (sottoSoglia.length) L.push(`  Sotto soglia, cioe' misurati e indipendenti dall'ancora: ${sottoSoglia.join(", ")}`
+      + `. ⚠ I valori sono arrotondati a due decimali: un nome che appare qui a ${SOGLIA_FATTORE.toFixed(2)} sta sotto la soglia di pochi millesimi, `
+      + `non e' un'incoerenza. ⚠ E "indipendenti" vale RISPETTO A ${ancora}: fra loro possono muoversi insieme, `
+      + `perche' il sistema misura contro una sola ancora e non pubblica la matrice completa.`);
     if (nonMisurati.length) L.push(`  ⚠ NON MISURABILI, quindi fuori dal conto per mancanza di dati e non perche' indipendenti: `
       + `${nonMisurati.join(", ")} — meno di 60 sedute in comune con ${ancora}. Il loro peso NON e' incluso nel ${pesoSemi.toFixed(0)}%.`);
   }
@@ -9189,6 +9209,7 @@ function fattiTitolo(tk) {
                          implicito, che li riesprime in sigma */
                       evento: (opz && opz.evento) || null,
                       opzioniPresenti: !!opz,
+                      prossimaTrimestrale: riga.earnings_date || null,
                       resistenza: numero(riga.resistance), supporto: numero(riga.support),
                       rating: riga.rating || null,
                       crescitaRicavi: numero((riga.stats || {}).revenue_growth),
@@ -10044,10 +10065,21 @@ function datiNostriDelTitolo(tk) {
         + sc.map(x => ` scadenza ${x.data}: ±${x.pct}% (straddle ${x.straddle} allo strike ${x.strike}, IV ${x.ivCall ?? "n.d."})`).join(" ·")
         + `. E' UNA DEVIAZIONE STANDARD: fuori da quella banda il mercato prezza circa un caso su tre.`);
       /* il salto di IV fra una scadenza e la successiva ISOLA il premio dell'evento */
-      if (sc.length >= 2 && Number.isFinite(sc[0].ivCall) && Number.isFinite(sc[1].ivCall) && sc[1].ivCall > sc[0].ivCall * 1.3) {
-        L.push(`- ⚡ IL PREZZO DELL'EVENTO: la volatilita' implicita passa da ${sc[0].ivCall} sulla scadenza ${sc[0].data} `
-          + `a ${sc[1].ivCall} sulla ${sc[1].data}. Quel salto e' il premio che il mercato paga per l'incertezza `
-          + `dell'uscita in mezzo, e il movimento atteso passa da ±${sc[0].pct}% a ±${sc[1].pct}%. `
+      const dataEvento = t.prossimaTrimestrale ? String(t.prossimaTrimestrale).slice(0, 10) : null;
+      const prima = dataEvento ? sc.filter(x => x.data < dataEvento) : [];
+      const dopo = dataEvento ? sc.filter(x => x.data >= dataEvento) : [];
+      if (dataEvento && (!prima.length || !dopo.length)) {
+        L.push(`- ⚠ IL PREMIO DELL'EVENTO NON E' ISOLABILE: la trimestrale e' il ${dataEvento} e le scadenze `
+          + `disponibili (${sc.map(x => x.data).join(", ")}) stanno ${prima.length ? "tutte PRIMA" : "tutte DOPO"} di essa. `
+          + `Il salto di volatilita' implicita misura il premio dell'evento solo confrontando una scadenza che lo `
+          + `precede con una che lo segue: qui manca il lato ${prima.length ? "successivo" : "precedente"}, e confrontare `
+          + `due scadenze dallo stesso lato darebbe un numero che sembra una misura e non lo e'.`);
+      }
+      const pre = prima[prima.length - 1], post = dopo[0];
+      if (pre && post && Number.isFinite(pre.ivCall) && Number.isFinite(post.ivCall) && post.ivCall > pre.ivCall * 1.3) {
+        L.push(`- ⚡ IL PREZZO DELL'EVENTO: la volatilita' implicita passa da ${pre.ivCall} sulla scadenza ${pre.data} `
+          + `(PRIMA della trimestrale del ${dataEvento}) a ${post.ivCall} sulla ${post.data} (DOPO). Quel salto e' il premio `
+          + `che il mercato paga per l'incertezza dell'uscita in mezzo, e il movimento atteso passa da ±${pre.pct}% a ±${post.pct}%. `
           + `⚠ Chi compra volatilita' prima dell'uscita la paga a quel prezzo e la rivende dopo a prezzo crollato, `
           + `a prescindere da come vanno i conti: e' il motivo per cui "avevo ragione sulla trimestrale" e "ci ho guadagnato" sono due cose diverse.`);
       }
@@ -10128,10 +10160,10 @@ function datiNostriDelTitolo(tk) {
          mandato growth, ed erano in `stats` da sempre */
       perc(t.crescitaRicavi) ? `crescita ricavi a/a ${perc(t.crescitaRicavi)}` : null,
       perc(t.crescitaUtili) ? `crescita utili a/a ${perc(t.crescitaUtili)}` : null,
-      Number.isFinite(numero(t.peg)) ? `PEG ${fmtNum.format(numero(t.peg))} (P/E diviso la crescita attesa: sotto 1 il mercato paga meno di quanto la societa' cresce)` : null,
+      Number.isFinite(numero(t.peg)) ? `PEG ${fmtNum.format(numero(t.peg))}${Number.isFinite(t.pe) && numero(t.peg) > 0 ? ` — implica una crescita attesa del ${(t.pe / numero(t.peg)).toFixed(0)}%, che e' una TERZA grandezza: non coincide con la crescita dei ricavi ne' con quella degli utili qui accanto, perche' l'aggregatore la calcola sulle stime a 5 anni` : ""} (P/E diviso la crescita attesa: sotto 1 il mercato paga meno di quanto la societa' cresce)` : null,
       perc(t.grossMargin) ? `margine lordo ${perc(t.grossMargin)}` : null,
       mld(t.fcf) ? `flusso di cassa libero ${mld(t.fcf)}` : null,
-      mld(t.ricaviFy) ? `ricavi esercizio ${mld(t.ricaviFy)}` : null,
+      mld(t.ricaviFy) ? `ricavi ultimi 12 mesi ${mld(t.ricaviFy)} (somma dei quattro trimestri, NON l'esercizio fiscale: il conto annuale piu' sotto e' un'altra grandezza)` : null,
       Number.isFinite(numero(t.evEbitda)) ? `EV/EBITDA ${fmtNum.format(numero(t.evEbitda))}×` : null,
       Number.isFinite(numero(t.debtEquity)) ? `debito/mezzi propri ${fmtNum.format(numero(t.debtEquity))}` : null,
       perc(t.shortFloat) ? `short float ${perc(t.shortFloat)}` : null,
