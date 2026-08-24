@@ -3954,7 +3954,7 @@ check("v349 materie: la variazione a 12 mesi si legge dal campo che la pipeline 
   if (!s || s.var_1y == null) return true;
   const r = indicatoriClassifica().find(x => x.k === "mat:sox");
   /* il SOX faceva +104% e la scheda stampava "—": app.js leggeva pct_1y, rinominato in v316 */
-  return !!r && r.sub.includes(String(s.var_1y)) && !/—\\s*in 12 mesi/.test(r.sub);`));
+  return !!r && r.sub.includes(fmtNum.format(s.var_1y)) && !/—\\s*in 12 mesi/.test(r.sub);`));
 
 check("v349 materie: nessun lettore usa pct_1y senza il ripiego su var_1y", (() => {
   /* un campo rinominato senza seguire i suoi lettori non rompe: mente in silenzio */
