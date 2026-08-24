@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "353";
+const BUILD_VERSION = "354";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -699,9 +699,12 @@ function recomputeTotals() {
     eur_gain: eurGain, eur_gain_pct: costEur ? eurGain / costEur * 100 : 0,
     eur_stock_gain: stockGainEur, eur_btp_gain: btpGainEur,
     tax_est: tax, eur_gain_net: eurGain - tax,
-    // OFFLOADING per l'LLM: budget realmente spendibile = cassa − Expected Shortfall 95%
-    // (la quota pari all'ES è tail-risk INVIOLABILE). Mai sotto zero. ES storico se disponibile.
-    budget_operativo_spendibile: Math.max(0, cashEur - (DATA.totals?.es95_hist_eur ?? DATA.totals?.es95_1d_eur ?? 0)),
+    /* v354 — `budget_operativo_spendibile` RIMOSSO. Era cassa − ES95, per un LLM che dalla
+       v247 non riceve piu' nessuna capienza di spesa: unico riferimento in tutto il file, mai
+       letto. E l'ES95 e' `null` da quando le azioni stanno in `watchlist` e il motore di
+       rischio gira a vuoto, quindi il `?? 0` faceva coincidere quel "budget" con la cassa
+       intera: la riserva di coda spariva in silenzio. Un campo che nessuno legge e che, letto,
+       direbbe il falso. */
   });
   DATA.allocation = DATA.portfolio.map(r => ({
     ticker: r.ticker, name: r.name, sector: r.sector || "Altro", value_eur: r.val_eur,
@@ -7734,7 +7737,7 @@ function buildPrompt() {
     const fbit = (k, lab) => fr[k] ? `${lab} RVol ${fmtNum.format(fr[k].rvol)}×${fr[k].chg_5d_pct != null ? ` (${signTxt(fr[k].chg_5d_pct)} 5g)` : ""}` : null;
     const fbits = [fbit("soxl", "SOXL 3x semi"), fbit("tqqq", "TQQQ 3x NDX")].filter(Boolean);
     if (fr.alert) {
-      lines.push(`- ⚠ [SPECULATIVE FROTH ALERT] Schiuma speculativa sugli ETF a leva: ${fbits.join(" · ")}. ${fr.note || ""} DIRETTIVA: è in corso una speculazione estrema sui prodotti a leva tech — NON impegnare il budget operativo in NUOVI acquisti tech/semi finché il volume non si normalizza; le posizioni esistenti restano protette SOLO dagli Stop Ratchet 2×ATR (non alzarli, non anticiparli). La riserva ES95 resta inviolabile.`);
+      lines.push(`- ⚠ [SPECULATIVE FROTH ALERT] Schiuma speculativa sugli ETF a leva: ${fbits.join(" · ")}. ${fr.note || ""} ⚠ COSA MISURA: il volume sugli ETF a leva 3× e' un proxy dell'euforia retail, e a questi livelli e' un'anomalia di posizionamento, non un segnale direzionale: dice che c'e' molta leva dalla stessa parte, non da quale parte andra' il prezzo. Storicamente e' uno stato che precede movimenti ampi in ENTRAMBE le direzioni.`);
     } else if (fbits.length) {
       lines.push(`- Schiuma speculativa ETF leva 3x (proxy euforia retail): ${fbits.join(" · ")} — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).`);
     }
@@ -8593,15 +8596,48 @@ function contestoPortafoglio(tkCorrente) {
     const qui = String(x.r.ticker).toUpperCase() === String(tkCorrente || "").toUpperCase() ? "  ← IL TITOLO DI QUESTA ANALISI" : "";
     L.push(`- ${x.r.ticker}: ${pct.toFixed(1)}% dell'azionario${Number.isFinite(g) ? ` · ${signTxt(g)} dal carico` : ""}${qui}`);
   });
-  /* la concentrazione per BENCHMARK, non per settore: e' il fattore che muove insieme */
-  const semi = azionarie.filter(x => x.r.rs_bench === "sox" || /semiconduc|semicondut/i.test(String(x.r.sector || "")));
+  /* la concentrazione per FATTORE MISURATO, non per etichetta: e' cio' che si muove insieme */
+  const rendGiorn = (t) => {
+    const sp = (((azionarie.find(x => x.r.ticker === t) || {}).r || {}).sparks || {}).m6 || [];
+    return sp.length > 2 ? sp.slice(1).map((v, i) => (sp[i] ? v / sp[i] - 1 : 0)) : [];
+  };
+  const correla = (a2, b2) => {
+    const n = Math.min(a2.length, b2.length);
+    if (n < 60) return null;   // sotto due mesi comuni una correlazione non e' confrontabile
+    const x = a2.slice(-n), y = b2.slice(-n);
+    const mx = x.reduce((s2, v) => s2 + v, 0) / n, my = y.reduce((s2, v) => s2 + v, 0) / n;
+    let c = 0, vx = 0, vy = 0;
+    for (let i = 0; i < n; i++) { c += (x[i] - mx) * (y[i] - my); vx += (x[i] - mx) ** 2; vy += (y[i] - my) ** 2; }
+    return (vx && vy) ? c / Math.sqrt(vx * vy) : null;
+  };
+  const SOGLIA_FATTORE = 0.35;
+  const ancora = rendGiorn("NVDA").length ? "NVDA" : (azionarie[0] || {}).r?.ticker;
+  const rAnc = ancora ? rendGiorn(ancora) : [];
+  const corrCon = new Map();
+  if (rAnc.length >= 60) azionarie.forEach(x => corrCon.set(x.r.ticker, correla(rAnc, rendGiorn(x.r.ticker))));
+  const misurato = rAnc.length >= 60;
+  const semi = misurato
+    ? azionarie.filter(x => { const c = corrCon.get(x.r.ticker); return c != null && c >= SOGLIA_FATTORE; })
+    : azionarie.filter(x => x.r.rs_bench === "sox" || /semiconduc|semicondut/i.test(String(x.r.sector || "")));
   const pesoSemi = semi.reduce((s, x) => s + x.v, 0) / totAz * 100;
   const primeTre = ord.slice(0, 3).reduce((s, x) => s + x.v, 0) / totAz * 100;
   L.push(`CONCENTRAZIONE: le prime tre posizioni valgono il ${primeTre.toFixed(0)}% dell'azionario`
-    + `${semi.length >= 2 ? ` · i ${semi.length} titoli che seguono il SOX ne valgono il ${pesoSemi.toFixed(0)}% (${semi.map(x => x.r.ticker).join(", ")})` : ""}`
+    + `${semi.length >= 2 ? ` · ${semi.length} posizioni si muovono INSIEME e valgono il ${pesoSemi.toFixed(0)}% dell'azionario: `
+        + semi.map(x => `${x.r.ticker}${misurato && corrCon.get(x.r.ticker) != null ? ` ${corrCon.get(x.r.ticker).toFixed(2)}` : ""}`).join(", ")
+        + (misurato
+            ? ` — il gruppo NON e' una lista di settore: e' chi ha correlazione dei rendimenti giornalieri ≥ ${SOGLIA_FATTORE} con ${ancora} sulle sedute in comune (numero accanto a ogni nome)`
+            : ` — gruppo per etichetta di settore, la serie per misurarlo non c'e'`) : ""}`
     + `. ⚠ Titoli che condividono lo stesso fattore sono UNA scommessa scritta piu' volte, non `
     + `posizioni indipendenti: l'esposizione del libro a quel fattore e' la loro somma, `
     + `non il peso del singolo nome.`);
+  if (misurato) {
+    const nonMisurati = azionarie.filter(x => corrCon.get(x.r.ticker) == null).map(x => x.r.ticker);
+    const sottoSoglia = azionarie.filter(x => { const c = corrCon.get(x.r.ticker); return c != null && c < SOGLIA_FATTORE; })
+      .map(x => `${x.r.ticker} ${corrCon.get(x.r.ticker).toFixed(2)}`);
+    if (sottoSoglia.length) L.push(`  Sotto soglia, cioe' misurati e indipendenti: ${sottoSoglia.join(", ")}.`);
+    if (nonMisurati.length) L.push(`  ⚠ NON MISURABILI, quindi fuori dal conto per mancanza di dati e non perche' indipendenti: `
+      + `${nonMisurati.join(", ")} — meno di 60 sedute in comune con ${ancora}. Il loro peso NON e' incluso nel ${pesoSemi.toFixed(0)}%.`);
+  }
   const muti = ((((DATA || {}).macro || {}).posizioni || {}).senza_prezzo) || [];
   if (muti.length) {
     L.push(`⚠ FUORI DA QUESTO ELENCO, E QUINDI DAI PESI: ${muti.join(", ")} — il sistema ha la posizione `
@@ -9065,6 +9101,16 @@ function fattiTitolo(tk) {
                          Questo flag dice al blocco v293 di tacere quando il calcolo
                          completo c'e' gia'. */
                       emaDallaPipeline: !!((((riga.tv || {}).tecnica || {}).medie || {}).ema50),
+                      /* v354 — c'erano in data.json e non uscivano da qui, quindi il pacchetto
+                         li dichiarava assenti mentre la pagina li stampava */
+                      rating: riga.rating || null,
+                      grossMargin: numero((riga.stats || {}).gross_margin),
+                      fcf: numero((riga.stats || {}).fcf),
+                      ricaviFy: numero((riga.stats || {}).revenue_fy),
+                      evEbitda: numero((riga.stats || {}).ev_ebitda),
+                      debtEquity: numero((riga.stats || {}).debt_to_equity),
+                      shortFloat: numero((riga.stats || {}).short_float),
+                      capMercato: numero((riga.stats || {}).market_cap),
                       sma200Liv: numero((((riga.tv || {}).tecnica || {}).medie || {}).sma200?.liv),
                       pe: numero(riga.pe),
                       /* v348 — il prospettico era in data.json e non usciva dal pacchetto */
@@ -9660,14 +9706,29 @@ function tvBlocchi(tk) {
     if (t._come) F.push(`Metodo: ${t._come}.`);
   }
 
+  const annuali = (r && Array.isArray(r.financials)) ? r.financials.filter(x => x && x.revenue) : [];
+  if (annuali.length) {
+    F.push(``, `--- CONTO ECONOMICO ANNUALE (ultimi ${annuali.length} esercizi) ---`);
+    const mldA = (v) => (v == null ? "n.d." : `${(v / 1e9).toFixed(1)} mld`);
+    annuali.forEach(a2 => F.push(`- esercizio ${a2.year}: ricavi ${mldA(a2.revenue)}`
+      + (a2.net_income != null ? ` \u00b7 utile netto ${mldA(a2.net_income)}` : "")
+      + (a2.margin != null ? ` (margine ${a2.margin}%)` : "")));
+    F.push(`⚠ L'etichetta dell'esercizio e' quella della fonte, e per molte societa' l'anno fiscale `
+      + `NON chiude a dicembre: accostare questi anni ai trimestri qui sotto senza sapere dove chiude `
+      + `l'esercizio accosta periodi diversi.`);
+  }
+
   if (tv.conto_trim && tv.conto_trim.length) {
     F.push(``, `--- CONTO ECONOMICO TRIMESTRALE (ultimi ${tv.conto_trim.length} trimestri) ---`);
     const mld = (v) => (v == null ? "n.d." : `${(v / 1e9).toFixed(2)} mld`);
     tv.conto_trim.forEach(q => F.push(`- ${q.trim}: ricavi ${mld(q.ricavi)}`
       + (q.operativo != null ? ` \u00b7 risultato operativo ${mld(q.operativo)}${q.margine_op != null ? ` (${q.margine_op}%)` : ""}` : "")
       + (q.utile != null ? ` \u00b7 utile netto ${mld(q.utile)}${q.margine != null ? ` (margine ${q.margine}%)` : ""}` : "")));
-    F.push(`⚠ Il trimestre e' l'unita' in cui una societa' ciclica gira: la serie ANNUALE piu' `
-      + `sopra copre lo stesso periodo ma nasconde il punto di svolta dentro la media dei dodici mesi.`);
+    F.push(annuali.length
+      ? `⚠ Il trimestre e' l'unita' in cui una societa' ciclica gira: la serie ANNUALE qui sopra copre `
+        + `lo stesso periodo ma nasconde il punto di svolta dentro la media dei dodici mesi.`
+      : `⚠ Il trimestre e' l'unita' in cui una societa' ciclica gira. Il sistema NON ha la serie annuale `
+        + `di questa societa': se ti serve il confronto con l'esercizio, va cercato.`);
   }
 
   if (tv.stagionalita && tv.stagionalita.length) {
@@ -9889,6 +9950,38 @@ function datiNostriDelTitolo(tk) {
     [riga(50, tec.sma50, f.sma50Liv ?? tec.sma50Liv),
      riga(200, tec.sma200, f.sma200Liv ?? tec.sma200Liv)].filter(Boolean).forEach(x => L.push(x));
   }
+    /* ⚠⚠ v354 — IL SISTEMA DICHIARAVA DI NON AVERE COSE CHE HA, e la dashboard le mostra.
+       Il blocco "QUELLO CHE IL SISTEMA NON HA" elencava fra le cose da cercare online il
+       consenso degli analisti, il margine lordo, il flusso di cassa libero e lo short float —
+       tutti presenti in data.json e tutti stampati in pagina (app.js:7202 mostra "Target medio
+       analisti $304,73 · 59 analisti"). E' la classe v271 che questo progetto ha gia' pagato:
+       la pagina dice una cosa e l'analisi ne dice un'altra, e il CEO non sa a quale credere.
+       ⚠ E FA UN DANNO IN PIU' DI UN DATO MANCANTE: la testata impone di dichiarare la
+       divergenza quando una fonte esterna scosta di oltre il 2%. Chi legge non puo' dichiarare
+       una divergenza contro un numero di cui gli e' stato detto che non esiste — quindi il
+       pacchetto disattivava il proprio controllo di coerenza mentendo sul proprio inventario. */
+    if (t.rating && Number.isFinite(numero(t.rating.target))) {
+      const tg = numero(t.rating.target), up = numero(t.rating.upside_pct);
+      L.push(`- CONSENSO DEGLI ANALISTI (dal sistema, non da cercare): target medio ${fmtNum.format(tg)}`
+        + `${Number.isFinite(up) ? ` (${signTxt(up)} dal riferimento)` : ""}`
+        + `${Number.isFinite(numero(t.rating.n)) ? ` · ${numero(t.rating.n)} giudizi` : ""}`
+        + `${t.rating.key ? ` · giudizio prevalente ${String(t.rating.key).replace(/_/g, " ")}` : ""}`
+        + `. ⚠ E' una MEDIA e porta la data del suo ultimo aggiornamento, che il sistema non conosce: `
+        + `la DISPERSIONE fra target minimo e massimo e le revisioni recenti NON sono qui e vanno cercate.`);
+    }
+    const perc = (v) => Number.isFinite(numero(v)) ? `${(numero(v) * 100).toFixed(1)}%` : null;
+    const mld = (v) => Number.isFinite(numero(v)) ? `${fmtNum.format(Math.round(numero(v) / 1e9))} mld` : null;
+    const fond = [
+      perc(t.grossMargin) ? `margine lordo ${perc(t.grossMargin)}` : null,
+      mld(t.fcf) ? `flusso di cassa libero ${mld(t.fcf)}` : null,
+      mld(t.ricaviFy) ? `ricavi esercizio ${mld(t.ricaviFy)}` : null,
+      Number.isFinite(numero(t.evEbitda)) ? `EV/EBITDA ${fmtNum.format(numero(t.evEbitda))}×` : null,
+      Number.isFinite(numero(t.debtEquity)) ? `debito/mezzi propri ${fmtNum.format(numero(t.debtEquity))}` : null,
+      perc(t.shortFloat) ? `short float ${perc(t.shortFloat)}` : null,
+      mld(t.capMercato) ? `capitalizzazione ${mld(t.capMercato)}` : null,
+    ].filter(Boolean);
+    if (fond.length) L.push(`- FONDAMENTALI GIA' NEL SISTEMA (stessa fonte dei prezzi, gia' pubblicati qui): ${fond.join(" · ")}.`
+      + ` ⚠ Sono di fonte secondaria (aggregatore), non del filing: per bilancio e guidance vale il comunicato della societa', e se scosta lo scrivi.`);
     if (Number.isFinite(t.pe)) L.push(`- P/E (trailing): ${t.pe}× — sugli utili GIA' riportati negli ultimi 12 mesi`);
     if (Number.isFinite(t.peFwd) || Number.isFinite(t.epsFwd)) {
       L.push(`- P/E PROSPETTICO: ${Number.isFinite(t.peFwd) ? t.peFwd.toFixed(1) + "×" : "n.d."}`
@@ -9924,10 +10017,12 @@ function datiNostriDelTitolo(tk) {
    conto del risultato: era una lista della spesa, non un vincolo. */
 `══ QUELLO CHE IL SISTEMA NON HA, E CHE DEVI PORTARE TU ══`,
 `Il pacchetto NON contiene queste cose. Cercale e portale con fonte e data:`,
-`· conti: ricavi, margine lordo e operativo, debito netto, cassa, flusso di cassa libero, diluizione`,
+`· conti: debito netto e sua scadenza, cassa, diluizione da compensi in azioni, e la conferma`,
+`  dal filing dei fondamentali che trovi gia' pubblicati qui sotto (sono di aggregatore, non del filing)`,
 `· ultima trimestrale nel dettaglio e la data CONFERMATA della prossima`,
 `· concorrenti diretti, quote di mercato e anno a cui si riferiscono`,
-`· consenso analisti: numero di giudizi, target medio, revisioni degli ultimi 90 giorni`,
+`· del consenso analisti: la DISPERSIONE fra target minimo e massimo e le revisioni degli ultimi`,
+`  90 giorni — il target medio e il numero di giudizi il sistema li pubblica gia' qui sotto`,
 `· notizie e fatti societari: prima le ULTIME 48 ORE, poi il contesto delle ultime settimane.`,
 `  Il pacchetto porta i titoli MACRO delle ultime 6 ore quando ce ne sono; su questa societa' e sul`,
 `  suo settore non porta niente, quindi quella parte e' interamente tua. Se non trovi nulla di`,

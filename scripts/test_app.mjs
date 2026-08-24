@@ -326,13 +326,34 @@ check("v263 Fear & Greed: il payload non elenca i componenti (hanno una scheda c
   return !!riga && riga.indexOf("componenti") < 0`));
 
 
-check("v126 froth: alert schiuma speculativa nel prompt con direttiva (no acquisti tech, solo ratchet, ES95 salva)", run(`
+/* ⚠ v354 — L'INVARIANTE SI ROVESCIA, e va detto perche'. Fino a ieri questo check ESIGEVA
+   che l'allarme schiuma portasse una direttiva operativa ("non impegnare il budget", "solo
+   Stop Ratchet", "la riserva ES95 resta inviolabile"). Erano tre riferimenti morti: il budget
+   operativo e' uscito dal pacchetto in v247, gli Stop Ratchet non esistono piu', e l'ES95 e'
+   `null` da quando le azioni stanno in `watchlist`. Il check proteggeva una prescrizione
+   ancorata a numeri che non ci sono — e violava la regola C9, che vuole i FATTI nella coda e
+   le ISTRUZIONI nella testata. Ora esige il contrario: il fatto, senza la prescrizione. */
+check("v126 froth: l'allarme schiuma porta il FATTO, non una direttiva su numeri che non esistono", run(`
   DATA.macro.froth = { soxl: { symbol: "SOXL", rvol: 3.1, chg_5d_pct: 12.4 }, tqqq: { symbol: "TQQQ", rvol: 1.2, chg_5d_pct: 4 },
     alert: true, note: "Volume estremo in acquisto sugli ETF a leva 3x (SOXL RVol 3.1× / +12.4% 5g)." };
   const p = buildPrompt();
   delete DATA.macro.froth;
   const l = p.split("\\n").find(x => x.includes("[SPECULATIVE FROTH ALERT]"));
-  return l && l.includes("SOXL") && l.includes("NON impegnare il budget") && l.includes("Stop Ratchet") && l.includes("ES95")`));
+  return !!l && l.includes("SOXL") && l.includes("proxy dell'euforia retail")
+      && l.includes("non da quale parte andra' il prezzo")
+      && !l.includes("DIRETTIVA") && !l.includes("budget operativo")
+      && !l.includes("Stop Ratchet") && !l.includes("ES95")`));
+
+check("v354 nessun riferimento a grandezze rimosse sopravvive nel pacchetto", suVeri(`
+  const p = buildCIOText() + buildPromptTicker("MU");
+  /* budget operativo (tolto in v247), Stop Ratchet (non esistono piu') ed ES95 (null da quando
+     il motore di rischio gira a vuoto): tre nomi che il pacchetto non deve piu' pronunciare */
+  return !/budget operativo|Stop Ratchet|riserva ES95/.test(p);`));
+
+check("v354 il campo budget_operativo_spendibile non esiste piu'", (() => {
+  /* nessuno lo leggeva, e con ES95 null valeva la cassa INTERA: la riserva di coda spariva */
+  return !src.includes("budget_operativo_spendibile:");
+})());
 check("v126 breadth: divergenza SPY/RSP nel prompt con direttiva prudenza; forma neutra senza alert", run(`
   DATA.macro.breadth = { spy_1m_pct: 2.6, rsp_1m_pct: -0.8, divergence_pp: 3.4, alert: true, note: "Rally retto dalle megacap." };
   const p1 = buildPrompt();
@@ -4180,6 +4201,68 @@ check("v353 opzioni: un muro troppo lontano dichiara di non essere un livello", 
      mezzo punto percentuale. */
   return lontano ? /Muro delle PUT[^\\n]*NON E' UN LIVELLO/.test(p)
                  : !/Muro delle PUT[^\\n]*NON E' UN LIVELLO/.test(p);`));
+
+
+/* ══ v354 — L'INVENTARIO. Il sistema dichiarava di non avere cose che ha, e la pagina le
+   mostrava: e' la classe v271 ("la pagina dice una cosa e l'analisi un'altra") applicata non a
+   un numero ma all'elenco di cio' che il sistema possiede. Fa un danno in piu' di un dato
+   mancante: la testata impone di dichiarare la divergenza quando una fonte esterna scosta di
+   oltre il 2%, e non si puo' dichiarare una divergenza contro un numero di cui ti hanno detto
+   che non esiste. Il pacchetto disattivava il proprio controllo di coerenza. */
+
+check("v354 inventario: cio' che data.json ha NON sta fra le cose da cercare online", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
+  if (!r) return true;
+  const p = buildPromptTicker("NVDA");
+  const daCercare = p.slice(p.indexOf("QUELLO CHE IL SISTEMA NON HA"), p.indexOf("Prezzo di riferimento"));
+  const ok = [];
+  if ((r.rating || {}).target != null) ok.push(p.includes(fmtNum.format(r.rating.target)) && !/target medio, revisioni/.test(daCercare));
+  if ((r.stats || {}).gross_margin != null) ok.push(/margine lordo [\\d.]+%/.test(p));
+  if ((r.stats || {}).short_float != null) ok.push(/short float/.test(p));
+  if ((r.stats || {}).fcf != null) ok.push(/flusso di cassa libero \\d/.test(p));
+  return ok.length > 0 && ok.every(Boolean);`));
+
+check("v354 inventario: il consenso dichiara cosa NON ha (dispersione e revisioni)", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA" && (x.rating || {}).target != null);
+  if (!r) return true;
+  const p = buildPromptTicker("NVDA");
+  /* target medio e numero di giudizi il sistema li ha; dispersione e revisioni no, e questa e'
+     la differenza che rende utile l'uno e obbligatorio cercare l'altro */
+  return /CONSENSO DEGLI ANALISTI \\(dal sistema, non da cercare\\)/.test(p)
+      && /DISPERSIONE fra target minimo e massimo/.test(p);`));
+
+check("v354 C10: il rimando alla serie annuale trova la serie annuale", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  if (!/CONTO ECONOMICO TRIMESTRALE/.test(p)) return true;
+  /* la riga di chiusura diceva "la serie ANNUALE piu' sopra" e non c'era nessuna serie annuale:
+     la sezione SEGNALAZIONI chiede all'LLM di riportare i rimandi a sezioni assenti, quindi il
+     sistema chiedeva di trovare un difetto che il sistema stesso produceva */
+  const rimanda = /serie ANNUALE qui sopra/.test(p);
+  const esiste = /CONTO ECONOMICO ANNUALE/.test(p);
+  return rimanda === esiste;`));
+
+check("v354 concentrazione: il gruppo si MISURA, e chi resta fuori viene nominato", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  const i = p.indexOf("CONCENTRAZIONE:");
+  if (i < 0) return true;
+  const blocco = p.slice(i, i + 1400);
+  /* il cluster veniva da SECTOR_BENCH, un dizionario ticker→benchmark compilato a mano: CRWV
+     (correlazione +0,52 con NVDA su 125 sedute) restava FUORI mentre MRVL e RGTI (+0,37 e
+     +0,35) restavano dentro. Una lista a mano non descrive il fattore: descrive chi si e'
+     ricordato di aggiungerla. */
+  return /si muovono INSIEME/.test(blocco)
+      && /correlazione dei rendimenti giornalieri ≥/.test(blocco)
+      && (/Sotto soglia/.test(blocco) || /NON MISURABILI/.test(blocco));`));
+
+check("v354 concentrazione: chi non ha abbastanza storia non sparisce in silenzio", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  const i = p.indexOf("CONCENTRAZIONE:");
+  if (i < 0) return true;
+  const blocco = p.slice(i, i + 1400);
+  if (!/NON MISURABILI/.test(blocco)) return true;
+  /* un nome escluso per mancanza di dati e uno escluso perche' misurato sotto soglia sono due
+     cose diverse: letto come "non correlato", il primo diventa una rassicurazione falsa */
+  return /non perche' indipendenti/.test(blocco) && /NON e' incluso/.test(blocco);`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
