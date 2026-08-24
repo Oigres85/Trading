@@ -4282,9 +4282,14 @@ check("v354 concentrazione: chi non ha abbastanza storia non sparisce in silenzi
    Tre cose che il sistema aveva nei dati e non pubblicava. Non erano errori: erano assenze —
    la categoria che nessun gate sorvegliava, perche' un gate verifica cio' che c'e'. */
 
-check("v355 evento: il movimento implicito arriva dalla catena, con lo straddle e la IV", suVeri(`
+check("v355 evento: col book quotato esce il movimento implicito, col book vuoto lo dichiara", suVeri(`
   const o = (DATA.options || {}).NVDA;
   if (!o || !(o.expiries || []).length) return true;
+  const quotato = (o.expiries || []).some(e => (e.calls || []).some(c => Number(c.bid) > 0 && Number(c.ask) > 0));
+  if (!quotato) {
+    const p2 = buildPromptTicker("NVDA");
+    return /MOVIMENTO IMPLICITO: NON CALCOLABILE ADESSO/.test(p2) && /il book e' vuoto/.test(p2);
+  }
   const p = buildPromptTicker("NVDA");
   /* il sistema aveva bid/ask e IV per strike su tre scadenze e ne ricavava due muri: mancava
      l'unica misura che dice quanto il mercato si aspetta che il titolo si muova */
@@ -4305,7 +4310,9 @@ check("v355 evento: il salto di IV fra due scadenze isola il premio dell'evento"
 
 check("v355 evento: i livelli si rileggono in sigma implicite", suVeri(`
   const p = buildPromptTicker("NVDA");
-  if (!/MOVIMENTO IMPLICITO/.test(p)) return true;
+  /* solo quando il movimento implicito e' stato davvero calcolato: a mercato chiuso il book e'
+     vuoto e il pacchetto lo dichiara invece di stampare una sigma inventata */
+  if (!/MOVIMENTO IMPLICITO DALLE OPZIONI/.test(p)) return true;
   /* la resistenza a +6,1% sta a UNA sigma implicita esatta: senza questa riga si legge come un
      livello lontano, con questa si legge come un testa-o-croce entro la scadenza */
   return /I LIVELLI IN SIGMA IMPLICITE/.test(p) && /resistenza [\\d.]+σ/.test(p);`));
