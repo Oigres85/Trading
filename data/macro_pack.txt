@@ -1,4 +1,4 @@
-⟦ BUILD v361 · generato 24/08/2026 21:19 ⟧
+⟦ BUILD v361 · generato 24/08/2026 21:29 ⟧
 
 Sei un analista macro. Ricevi il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno. Non hai davanti nessun portafoglio: questo pacchetto contiene SOLO dati macro e la loro tensione interna. Non proporre operazioni su titoli, non dimensionare posizioni, non dare consigli di acquisto o vendita.
 
@@ -27,10 +27,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 24/08/2026, 21:19:01 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 17:19, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -3,12% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,48% · Fut S&P -0,11% · BTC +1,49% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~16.2h); il "→ agg." incorpora già il gap after.
+DATI AL 24/08/2026, 21:29:15 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 17:29, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -3,12% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,48% · Fut S&P -0,11% · BTC +1,46% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~16h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 24/08/2026, 21:19:01, prossimo run 24/08/2026, 22:00:00. La barra giornaliera sotto quei numeri e' del 2026-08-24.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 24/08/2026, 21:29:15, prossimo run 24/08/2026, 22:00:00. La barra giornaliera sotto quei numeri e' del 2026-08-24.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-06-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-07-01) · Curva 10A-2A (2026-08-24) · Curva 10A-3M (2026-08-24) · Treasury USA 30A (2026-08-21) · Tasso reale 10A (TIPS) (2026-08-21) · Inflazione attesa 10A (breakeven) (2026-08-24) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -42,16 +42,16 @@ QUADRO MACRO:
 - Fear & Greed: 55 (Avidità), 1 settimana fa 58, 1 mese fa 41, 1 anno fa 56 — livello e dispersione interna dello stesso indice sono UNA misura guardata da due lati, non due segnali.
 - VIX: 15.85 (+4,76% nell'ultima seduta [chiusura del 24/08] — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario)
 - Fed Funds Rate: range ATTUALE 3.50–3.75% · tasso implicito futures 3.74% · PROSSIMA RIUNIONE FOMC: 16/09/2026 (il tasso resta valido fino alla prossima decisione FOMC)
-- Carry USA-Giappone: spread tassi 10A 1,82 pp (US10A 4.7%, JGB10A 2.88%), USD/JPY 159.02 (-2,94% 1 mese); prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
+- Carry USA-Giappone: spread tassi 10A 1,82 pp (US10A 4.7%, JGB10A 2.88%), USD/JPY 159.04 (-2,93% 1 mese); prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
 - Put/Call SPY (S&P 500 ETF): 1.27 — prevalgono put = copertura/pessimismo (estremi = contrarian rialzista) (put 4604957, call 3616845)
 - Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 7,9% (proxy AUM BIL+SHV $68B vs SPY $795B) · Retail Cash: fondi monetari retail $3021,6 mld (FRED RMFNS, YoY +7,2%, 97° percentile 5A, rilevazione 2026-06-01 — 85 giorni fa, serie MENSILE: NON e' il dato di oggi) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
-- Righello Dollaro (DXY): 99 · 3 mesi -0,17% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
+- Righello Dollaro (DXY): 98.98 · 3 mesi -0,19% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
 - Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7652,86 vs SMA125 7247,8 (+5,59%) · Nasdaq 100 29.023,18 vs SMA125 27.781,15 (+4,47%) — sopra = trend primario integro, sotto = deterioramento.
 - Futures USA LIVE (anticipo direzione pre-apertura Wall Street): Nasdaq 100 (NQ) 29.131,25 (-0,48%) · S&P 500 (ES) 7674,25 (-0,11%) — in calo oltre il rumore: apertura USA attesa in gap-down.
 - Schiuma speculativa ETF leva 3x (proxy euforia retail): SOXL 3x semi RVol 0,94× (-26,64% 5g) · TQQQ 3x NDX RVol 0,75× (-9,67% 5g) — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).
 - Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): SPY (cap-pesato) +3,32% vs RSP (equi-pesato) +3,91% a 1M · spread -0,59pp — rally con partecipazione ampia (alert se SPY+ con RSP− o spread >4pp).
 - Treasury USA 10A: 4.70% (-0,03 pp oggi) [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI porta lo stesso decennale a 4,74% (FRED DGS10, osservazione del 2026-08-21): NON e' una contraddizione, sono due fonti e due momenti — la quotazione di mercato e l'osservazione ufficiale, che esce con qualche giorno di ritardo. Per confronti con le altre scadenze usa quella della curva, che e' omogenea con loro.]
-- EUR/USD: 1.1670 (-0,15% oggi)
+- EUR/USD: 1.1667 (-0,18% oggi)
 - PIL USA (t/t ann.): 1.5% (riferito a 01/04/2026 · pubblicato ~28/07/2026 (27 giorni fa) · prossimo atteso 28/10/2026 · BEA, trimestrale · serie TRIMESTRALE, il dato più recente disponibile)
 - Vendite al dettaglio (m/m): -0.6% (riferito a 01/07/2026 · pubblicato ~15/08/2026 (9 giorni fa) · prossimo atteso 15/09/2026 · Census, mensile)
 - Non-Farm Payrolls: -23K (riferito a 01/07/2026 · pubblicato ~05/08/2026 (19 giorni fa) · prossimo atteso 05/09/2026 · BLS, mensile)
