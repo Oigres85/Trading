@@ -545,7 +545,8 @@ check("v145→v156→v355 shock: EVIDENZA e conferma futures, senza direttive ne
   DATA.macro.shock_alert = saved; DATA.macro.futures = savedF;
   return p.includes("SEGNALE DI SHOCK") && p.includes("indizio, non verdetto")
       && p.includes("prezzi PRE-shock") && p.includes("COSA IL SISTEMA NON SA")
-      && !/\\bA4\\b/.test(p) && p.includes("ALLARME FANTASMA") && /Fut NDX \\+0,4/.test(p)
+      && /I futures USA sono (in calo|in rialzo|piatti)/.test(p)
+      && !/\\bA4\\b/.test(p) && /allarme localizzato all'Asia/.test(p) && /Fut NDX \\+0,4/.test(p)
       && !p.includes("DIRETTIVA OPERATIVA: SOSPENDI") && !p.includes("WORKFLOW DI VERIFICA")`));
 
 /* ⚠ v247 — INVARIANTE ROVESCIATO. Sorvegliava che la riga "posizione più pesante" citasse il
@@ -4417,8 +4418,14 @@ check("v356 etichette: il TTM non si chiama esercizio", suVeri(`
   const p = buildPromptTicker("NVDA");
   /* revenue_fy coincide al centesimo con la somma dei quattro trimestri (253,49), mentre il
      conto annuale nello stesso pacchetto dice esercizio 2026 = 215,9: due numeri, un nome */
-  return /ricavi ultimi 12 mesi/.test(p) && !/ricavi esercizio \\d/.test(p)
-      && /NON l'esercizio fiscale/.test(p);`));
+  const q = ((((DATA.watchlist || []).find(x => x && x.ticker === "NVDA") || {}).tv || {}).conto_trim || []).slice(0, 4);
+  const somma = q.length === 4 ? q.reduce((a2, x) => a2 + (x.ricavi || 0), 0) : null;
+  const scarto = somma ? Math.abs(st.revenue_fy / somma - 1) * 100 : null;
+  if (scarto == null) return true;
+  return !/ricavi esercizio \\d/.test(p)
+      && (scarto <= 2
+            ? /ricavi ultimi 12 mesi [^(]*\\(verificato: coincide con la somma/.test(p)
+            : /NON QUADRA CON I TRIMESTRI DI QUESTO PACCHETTO/.test(p));`));
 
 check("v356 PEG: non si pubblica senza la crescita che lo genera", suVeri(`
   const st = (((DATA.watchlist || []).find(x => x && x.ticker === "NVDA") || {}).stats) || {};
@@ -4437,6 +4444,96 @@ check("v356 correlazioni: si dichiara che l'indipendenza e' rispetto all'ancora"
   return /indipendenti dall'ancora/.test(p)
       && /fra loro possono muoversi insieme/.test(p)
       && /arrotondati a due decimali/.test(p);`));
+
+
+/* ══ v357 — IL CASO CHE NESSUN CHECK AVEVA MAI GUARDATO ═══════════════════════════════════
+   Tutti i controlli di generazione del pacchetto giravano su NVDA, MU e AMD: tre societa'
+   mature e profittevoli. CRWV — quattro esercizi in perdita, EPS negativo, prezzo sul minimo
+   dell'anno — ha esercitato per la prima volta i rami anomali, e ne ha rotti sei.
+   La lezione non e' nei sei difetti: e' che cio' che non e' mai stato misurato su un caso non
+   e' stato verificato, e' stato assunto. */
+
+check("v357 multipli: su utile negativo non si pubblica un rapporto che migliora peggiorando", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "CRWV");
+  if (!r || !((r.stats || {}).eps_forward < 0)) return true;
+  const p = buildPromptTicker("CRWV");
+  /* -47,1× su utile atteso -1,87: se la perdita raddoppia il multiplo diventa -23,5×, cioe'
+     apparentemente piu' economico. Un LLM che ordina per multiplo mette in cima chi perde di piu'. */
+  return /IL P\\/E PROSPETTICO NON ESISTE E NON VIENE PUBBLICATO/.test(p)
+      && /MIGLIORA quando i conti peggiorano/.test(p)
+      && !/P\\/E PROSPETTICO: -/.test(p);`));
+
+check("v357 multipli: su un titolo con utili il P/E prospettico resta", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
+  if (!r || !((r.stats || {}).eps_forward > 0)) return true;
+  /* la correzione non deve rovesciare il caso normale */
+  return /P\\/E PROSPETTICO: [\\d.]+×/.test(buildPromptTicker("NVDA"));`));
+
+check("v357 futures: un solo verdetto, e legge il segno", (() => {
+  const i = src.indexOf("function statoFutures");
+  if (i < 0) return false;
+  const corpo = src.slice(i, src.indexOf("\n}\n", i));
+  /* due template indipendenti dicevano "verdi o piatti" e "negativi marcati" sugli STESSI due
+     numeri, a ventidue righe di distanza, senza che nessuno dei due leggesse change_pct */
+  return corpo.includes("confermano") && corpo.includes("contraddicono") && corpo.includes("non decidono")
+      && src.includes("statoFutures(m.futures)")
+      && !src.includes("negativi marcati = apertura USA in gap-down attesa");
+})());
+
+check("v357 TTM: il rapporto coi trimestri si VERIFICA, non si afferma", suVeri(`
+  for (const tk of ["NVDA", "CRWV", "MU"]) {
+    const r = (DATA.watchlist || []).find(x => x && x.ticker === tk);
+    if (!r || (r.stats || {}).revenue_fy == null) continue;
+    const q = (((r.tv || {}).conto_trim) || []).slice(0, 4);
+    if (q.length < 4) continue;
+    const somma = q.reduce((a, x) => a + (x.ricavi || 0), 0);
+    const scarto = Math.abs(r.stats.revenue_fy / somma - 1) * 100;
+    const p = buildPromptTicker(tk);
+    /* su NVDA coincide allo 0,0%, su CRWV scarta del 21,9%: l'etichetta era stata verificata
+       su un titolo e promossa a definizione universale */
+    const ok = scarto <= 2 ? /verificato: coincide con la somma/.test(p)
+                           : /NON QUADRA CON I TRIMESTRI DI QUESTO PACCHETTO/.test(p);
+    if (!ok) return false;
+  }
+  return true;`));
+
+check("v357 trimestri: una tabella ferma non permette di affermare il verso della crescita", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "CRWV");
+  const ct = ((r || {}).tv || {}).conto_trim || [];
+  if (!r || !r.earnings_date || !ct.length) return true;
+  const mesi = Math.round((new Date(String(r.earnings_date).slice(0, 10)) - new Date(String(ct[0].trim).slice(0, 10))) / 86400000 / 30.4);
+  const p = buildPromptTicker("CRWV");
+  /* ultimo trimestre 2026-03-31, prossima uscita 2026-11-11: sette mesi. "ACCELERA" era
+     affermato in maiuscolo su una serie che poteva non contenere l'ultimo trimestre */
+  if (mesi <= 5) return true;
+  return /LA TABELLA DEI TRIMESTRI POTREBBE NON ESSERE AGGIORNATA/.test(p)
+      && /NON AFFERMABILE/.test(p) && !/l'ultimo trimestre ACCELERA/.test(p);`));
+
+check("v357 crescita: il margine incrementale dice quanto costa, non solo quanto e' veloce", suVeri(`
+  const ct = ((((DATA.watchlist || []).find(x => x && x.ticker === "CRWV") || {}).tv) || {}).conto_trim || [];
+  if (ct.length < 3) return true;
+  const p = buildPromptTicker("CRWV");
+  /* su CRWV i due trimestri in cui la crescita accelera sono i due col margine incrementale
+     NEGATIVO: ogni euro di ricavo in piu' e' costato piu' di quanto ha reso */
+  return /MARGINE INCREMENTALE/.test(p) && /[-+][\\d.]+%/.test(p)
+      && /distingue una crescita che si paga da sola da una comprata/.test(p);`));
+
+check("v357 stampa: nessun float grezzo esce nel pacchetto", suVeri(`
+  for (const tk of ["NVDA", "CRWV", "MU", "AMD"]) {
+    const p = buildPromptTicker(tk);
+    /* "(massimo 153.1999969482422, minimo 60.54999923706055)": il ramo dal VIVO leggeva
+       Math.max su barre float32, quello dalla pipeline numeri gia' arrotondati da Python */
+    if (/\\d+\\.\\d{5,}/.test(p)) return false;
+  }
+  return true;`));
+
+check("v357 etichette: la glossa non chiama 'settore' un benchmark che non lo e'", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  if (!/Forza relativa/.test(p)) return true;
+  /* la glossa era costante ("del suo settore") mentre il benchmark e' variabile: su CRWV il
+     sistema ripiega sull'S&P 500, che non e' il settore di nessuno */
+  return /dei due riferimenti NOMINATI qui sopra/.test(p)
+      && !/MEGLIO o PEGGIO del suo settore/.test(p);`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).

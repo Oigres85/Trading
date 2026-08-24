@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "356";
+const BUILD_VERSION = "357";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7502,7 +7502,16 @@ function buildPrompt() {
          C9 lo prendeva ogni volta che il ramo shock si attivava — cioè raramente, quindi era
          rimasto a lungo invisibile (la classe v190: un difetto in un ramo raro non è raro, è
          solo non letto). Ora la riga AFFERMA il fatto: le istruzioni vivono nella testata. */
-      ? `Conferma incrociata USA (dato più fresco, ha PRIORITÀ sull'Asia): ${futBits}. Futures USA verdi o piatti mentre l'Asia crolla = ALLARME FANTASMA localizzato all'Asia, cioè una caduta che il mercato di riferimento di questo libro non ha confermato.`
+      ? (() => {
+          const sf = statoFutures(m.futures);
+          const spiega = !sf ? ""
+            : sf.stato === "contraddicono"
+              ? ` I futures USA sono ${sf.testo}: la caduta asiatica NON e' confermata dal mercato di riferimento di questo libro — allarme localizzato all'Asia.`
+              : sf.stato === "confermano"
+                ? ` I futures USA sono ${sf.testo}: la caduta asiatica E' confermata anche sul mercato che conta per questo libro.`
+                : ` I futures USA sono ${sf.testo}: NON confermano ne' smentiscono. Un movimento asiatico di questa ampiezza senza controprova sul mercato di riferimento resta un indizio a fonte singola.`;
+          return `Conferma incrociata USA (dato più fresco, ha PRIORITÀ sull'Asia): ${futBits}.${spiega}`;
+        })()
       : `Conferma incrociata USA: i futures non sono nel payload, quindi la caduta asiatica resta senza controprova sul mercato che conta per questo libro.`;
     lines.push(`🚨 [SEGNALE DI SHOCK — indizio, non verdetto]: ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} (oltre ${shock.threshold}% con Wall Street chiusa). ${futLine} ⚠ COSA SIGNIFICA PER I NUMERI DI QUESTO PACCHETTO: i livelli, i target e l'ATR qui dentro sono calcolati su prezzi PRE-shock, e la volatilità che li sostiene non contiene il gap atteso all'apertura — sono numeri costruiti su un mercato che all'apertura potrebbe essere un altro. ⚠ COSA IL SISTEMA NON SA: se il dato sia confermato o sia un feed rotto, e se il movimento regga fino alla campana. Un singolo indice fuori sessione è la fonte più fragile che questo pacchetto contenga.`);
     lines.push("");
@@ -7727,7 +7736,14 @@ function buildPrompt() {
            aperto" non esisteva proprio: c'erano solo weekend e pre-apertura. */
         : (fase && fase.phase === "regular"
             ? `- Futures USA LIVE: ${fs.join(" · ")} — la sessione e' GIA' APERTA, quindi non anticipano niente: servono a vedere se il movimento in corso e' coerente col resto o se il cash si sta staccando dai future.`
-            : `- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): ${fs.join(" · ")} — negativi marcati = apertura USA in gap-down attesa.`));
+            : (() => {
+                const sf = statoFutures(m.futures);
+                const coda = !sf ? ""
+                  : sf.stato === "confermano" ? " — in calo oltre il rumore: apertura USA attesa in gap-down."
+                  : sf.stato === "contraddicono" ? " — in rialzo oltre il rumore: apertura USA attesa in gap-up."
+                  : ` — ${sf.testo}: non anticipano una direzione, perche' la variazione sta dentro l'ampiezza ordinaria del rumore fuori sessione.`;
+                return `- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): ${fs.join(" · ")}${coda}`;
+              })()));
     }
   }
   // RADAR SCHIUMA SPECULATIVA v126 (ETF a leva 3x): l'euforia retail terminale sul tech/semi
@@ -8411,6 +8427,21 @@ function dg1M(punti) {
   const prima = [...p].reverse().find(x => x.d <= limite);
   return (prima && prima.v) ? { pct: (ultimo.v / prima.v - 1) * 100, da: prima.d, a: ultimo.d } : null;
 }
+/* ⚠ v357 — UN SOLO VERDETTO SUI FUTURES, calcolato una volta e letto da tutti. Vedi il
+   commento esteso ai due punti d'uso: due template indipendenti divergono alla prima modifica
+   di uno dei due, ed e' esattamente quello che era successo. */
+const FUT_SOGLIA = 0.25;   // punti percentuali: sotto, i futures sono rumore e non un segnale
+function statoFutures(fut) {
+  const n = numero((fut || {}).nasdaq && fut.nasdaq.change_pct);
+  const p = numero((fut || {}).sp500 && fut.sp500.change_pct);
+  const vals = [n, p].filter(Number.isFinite);
+  if (!vals.length) return null;
+  const peggio = Math.min(...vals), meglio = Math.max(...vals);
+  if (peggio <= -FUT_SOGLIA) return { stato: "confermano", testo: "in calo oltre il rumore" };
+  if (meglio >= FUT_SOGLIA) return { stato: "contraddicono", testo: "in rialzo oltre il rumore" };
+  return { stato: "non decidono", testo: `piatti dentro il rumore (meno di ${FUT_SOGLIA} punti in valore assoluto)` };
+}
+
 /* ---------- DIGEST STORICI: le serie che i popup disegnano, tradotte in numeri ----------
    Un analista guarda le TRAIETTORIE (pendenza, percentile nel range, inversioni), non i livelli:
    questi digest danno all'AI esattamente ciò che l'occhio estrae dai grafici. Ogni voce è
@@ -9218,6 +9249,13 @@ function fattiTitolo(tk) {
                       grossMargin: numero((riga.stats || {}).gross_margin),
                       fcf: numero((riga.stats || {}).fcf),
                       ricaviFy: numero((riga.stats || {}).revenue_fy),
+                      /* la somma dei trimestri PUBBLICATI, per poter verificare l'etichetta
+                         invece di affermarla: e' il controllo che mancava */
+                      sommaTrim: (() => {
+                        const q = (((riga.tv || {}).conto_trim) || []).slice(0, 4)
+                          .map(x => numero(x && x.ricavi)).filter(Number.isFinite);
+                        return q.length === 4 ? q.reduce((a3, b3) => a3 + b3, 0) : null;
+                      })(),
                       evEbitda: numero((riga.stats || {}).ev_ebitda),
                       debtEquity: numero((riga.stats || {}).debt_to_equity),
                       shortFloat: numero((riga.stats || {}).short_float),
@@ -9843,12 +9881,45 @@ function tvBlocchi(tk) {
       + (q.utile != null ? ` \u00b7 utile netto ${mld(q.utile)}${q.margine != null ? ` (margine ${q.margine}%)` : ""}` : "")));
     /* la SECONDA derivata: se la crescita accelera o rallenta. In growth e' il segnale. */
     const validi = cres.filter(x => x != null);
+    /* la serie e' aggiornata? due controlli indipendenti, entrambi sui dati gia' presenti */
+    const ultimoTrim = tv.conto_trim[0] && String(tv.conto_trim[0].trim || "").slice(0, 10);
+    const prossima = r && r.earnings_date ? String(r.earnings_date).slice(0, 10) : null;
+    const mesiVuoti = (ultimoTrim && prossima)
+      ? Math.round((new Date(prossima) - new Date(ultimoTrim)) / 86400000 / 30.4) : null;
+    const serieFerma = Number.isFinite(mesiVuoti) && mesiVuoti > 5;
+    if (serieFerma) {
+      F.push(`⚠⚠ LA TABELLA DEI TRIMESTRI POTREBBE NON ESSERE AGGIORNATA: l'ultimo trimestre qui sopra e' `
+        + `${ultimoTrim} e la prossima uscita e' attesa il ${prossima}, cioe' ${mesiVuoti} mesi dopo — piu' di un `
+        + `trimestre di distanza. O la societa' ha saltato una pubblicazione, o manca un trimestre gia' uscito. `
+        + `⚠ Finche' non e' chiarito, la direzione della crescita qui sotto NON e' affermabile: potrebbe essere `
+        + `calcolata senza il dato piu' recente, che e' proprio quello che conta.`);
+    }
     if (validi.length >= 2) {
       const ora = validi[0], prima = validi[1];
-      const verso = ora > prima + 0.5 ? "ACCELERA" : ora < prima - 0.5 ? "RALLENTA" : "stabile";
+      const verso = serieFerma ? "NON AFFERMABILE (vedi l'avviso qui sopra)"
+        : ora > prima + 0.5 ? "ACCELERA" : ora < prima - 0.5 ? "RALLENTA" : "stabile";
+      /* ⚠ v357 — QUANTO COSTA LA CRESCITA, non solo quanto e' veloce. Richiesta di un PM
+         growth, e i dati erano gia' tutti stampati: Δoperativo / Δricavi trimestre su
+         trimestre. Su CRWV la lettura si ribalta — i due trimestri in cui la crescita
+         accelera sono i due in cui il margine incrementale e' NEGATIVO: ogni euro di ricavo
+         in piu' e' arrivato con piu' costo di quanto abbia portato. "+32,2%" da solo e' un
+         titolo di giornale; "+32,2% con margine incrementale -10,8%" e' una decisione. */
+      const inc = tv.conto_trim.map((q, i) => {
+        const p2 = tv.conto_trim[i + 1];
+        if (!p2 || q.ricavi == null || p2.ricavi == null || q.operativo == null || p2.operativo == null) return null;
+        const dR = q.ricavi - p2.ricavi;
+        return (dR > 0) ? { trim: q.trim, v: Math.round((q.operativo - p2.operativo) / dR * 1000) / 10 } : null;
+      }).filter(Boolean);
+      if (inc.length >= 2) {
+        F.push(`MARGINE INCREMENTALE (quanto di ogni euro di ricavo IN PIU' e' arrivato al risultato operativo, `
+          + `trimestre su trimestre): ${inc.slice(0, 4).map(x => `${x.trim}: ${x.v > 0 ? "+" : ""}${x.v}%`).join(" · ")}. `
+          + `⚠ Negativo significa che la crescita e' costata piu' di quanto ha reso in quel trimestre. `
+          + `E' la misura che distingue una crescita che si paga da sola da una comprata: la velocita' dei ricavi `
+          + `da sola non lo dice.`);
+      }
       F.push(`TRAIETTORIA DELLA CRESCITA (trimestre su trimestre, dal piu' recente): `
-        + `${validi.map(x => `${x > 0 ? "+" : ""}${x}%`).join(" ← ")} — l'ultimo trimestre ${verso} `
-        + `rispetto al precedente (${ora > 0 ? "+" : ""}${ora}% contro ${prima > 0 ? "+" : ""}${prima}%). `
+        + `${validi.map(x => `${x > 0 ? "+" : ""}${x}%`).join(" ← ")} — l'ultimo trimestre ${verso}`
+        + `${serieFerma ? ". " : ` rispetto al precedente (${ora > 0 ? "+" : ""}${ora}% contro ${prima > 0 ? "+" : ""}${prima}%). `}`
         + `⚠ E' la SECONDA derivata dei ricavi: in un titolo di crescita il mercato paga la traiettoria, `
         + `non il livello — una societa' che cresce del 20% accelerando e una che cresce del 20% rallentando `
         + `hanno lo stesso numero e due prezzi diversi.`);
@@ -9981,7 +10052,7 @@ function datiNostriDelTitolo(tk) {
     const R = tec.w52hi - tec.w52lo;
     const liv = [0.236, 0.382, 0.5, 0.618, 0.786]
       .map(q => ({ q, v: Math.round((tec.w52hi - q * R) * 100) / 100 }));
-    L.push(`- Ritracciamenti di Fibonacci sul range a 52 settimane (massimo ${tec.w52hi}, minimo ${tec.w52lo}): `
+    L.push(`- Ritracciamenti di Fibonacci sul range a 52 settimane (massimo ${fmtNum.format(Math.round(tec.w52hi * 100) / 100)}, minimo ${fmtNum.format(Math.round(tec.w52lo * 100) / 100)}): `
       + liv.map(x => `${Math.round(x.q * 1000) / 10}% a ${x.v}${dist(x.v)}`).join(" · ")
       + ` — calcolo esatto sui due estremi, contati DAL MASSIMO verso il basso. Non sono previsioni: `
       + `sono le quote che quella convenzione indica.`);
@@ -10032,7 +10103,7 @@ function datiNostriDelTitolo(tk) {
     if (Number.isFinite(tec.rs1m)) {
       T2.push(`- Forza relativa a 1 mese contro ${esc(String(tec.rsBench || "il suo indice").toUpperCase())}: ${signTxt(tec.rs1m, " pp")}`
         + (Number.isFinite(tec.rsNdx) ? ` · contro il Nasdaq 100: ${signTxt(tec.rsNdx, " pp")}` : "")
-        + ` — quanto ha fatto MEGLIO o PEGGIO del suo settore, non quanto ha guadagnato`);
+        + ` — quanto ha fatto MEGLIO o PEGGIO dei due riferimenti NOMINATI qui sopra, non quanto ha guadagnato. ⚠ Il primo riferimento cambia col titolo (il settore quando il sistema lo riconosce, l'indice generale quando ripiega): guarda quale e' scritto, non darlo per settoriale`);
     }
     if (Number.isFinite(tec.sortino)) T2.push(`- Sortino a 1 anno: ${tec.sortino} — rendimento per unita' di rischio al RIBASSO (a differenza dello Sharpe non penalizza i rialzi)`);
     if (tec.rischioRendimento) T2.push(`- Rapporto rischio/rendimento: ${esc(tec.rischioRendimento)} — guadagno dal riferimento (${esc(tec.rischioRendimentoBase || "ultima chiusura")}) fino alla resistenza, contro due volte l'ATR di rischio. ⚠ LA BASE E' IL PREZZO CHE PAGHERESTI, non il minimo delle ultime 20 sedute: misurato dal minimo il rapporto descriverebbe l'operazione di chi ha comprato sul fondo, e su questo titolo sarebbe stato fino a sedici volte piu' generoso. Non rifarlo`);
@@ -10160,11 +10231,21 @@ function datiNostriDelTitolo(tk) {
          mandato growth, ed erano in `stats` da sempre */
       perc(t.crescitaRicavi) ? `crescita ricavi a/a ${perc(t.crescitaRicavi)}` : null,
       perc(t.crescitaUtili) ? `crescita utili a/a ${perc(t.crescitaUtili)}` : null,
-      Number.isFinite(numero(t.peg)) ? `PEG ${fmtNum.format(numero(t.peg))}${Number.isFinite(t.pe) && numero(t.peg) > 0 ? ` — implica una crescita attesa del ${(t.pe / numero(t.peg)).toFixed(0)}%, che e' una TERZA grandezza: non coincide con la crescita dei ricavi ne' con quella degli utili qui accanto, perche' l'aggregatore la calcola sulle stime a 5 anni` : ""} (P/E diviso la crescita attesa: sotto 1 il mercato paga meno di quanto la societa' cresce)` : null,
+      (Number.isFinite(numero(t.peg)) && numero(t.peg) > 0 && Number.isFinite(t.pe) && t.pe > 0) ? `PEG ${fmtNum.format(numero(t.peg))}${Number.isFinite(t.pe) && numero(t.peg) > 0 ? ` — implica una crescita attesa del ${(t.pe / numero(t.peg)).toFixed(0)}%, che e' una TERZA grandezza: non coincide con la crescita dei ricavi ne' con quella degli utili qui accanto, perche' l'aggregatore la calcola sulle stime a 5 anni` : ""} (P/E diviso la crescita attesa: sotto 1 il mercato paga meno di quanto la societa' cresce)` : null,
       perc(t.grossMargin) ? `margine lordo ${perc(t.grossMargin)}` : null,
       mld(t.fcf) ? `flusso di cassa libero ${mld(t.fcf)}` : null,
-      mld(t.ricaviFy) ? `ricavi ultimi 12 mesi ${mld(t.ricaviFy)} (somma dei quattro trimestri, NON l'esercizio fiscale: il conto annuale piu' sotto e' un'altra grandezza)` : null,
-      Number.isFinite(numero(t.evEbitda)) ? `EV/EBITDA ${fmtNum.format(numero(t.evEbitda))}×` : null,
+      mld(t.ricaviFy) ? (() => {
+        const somma = t.sommaTrim;
+        const scarto = (Number.isFinite(somma) && somma > 0) ? Math.abs(t.ricaviFy / somma - 1) * 100 : null;
+        if (scarto == null) return `ricavi su dodici mesi ${mld(t.ricaviFy)} (dall'aggregatore; il sistema non ha i trimestri per verificarlo)`;
+        if (scarto <= 2) return `ricavi ultimi 12 mesi ${mld(t.ricaviFy)} (verificato: coincide con la somma dei quattro trimestri qui sotto entro il ${scarto.toFixed(1)}%; NON e' l'esercizio fiscale, che e' un'altra grandezza)`;
+        return `ricavi su dodici mesi ${mld(t.ricaviFy)} — ⚠⚠ NON QUADRA CON I TRIMESTRI DI QUESTO PACCHETTO: `
+          + `i quattro trimestri stampati piu' sotto sommano ${mld(somma)}, cioe' ${scarto.toFixed(1)}% in meno. `
+          + `Il residuo di ${mld(t.ricaviFy - somma)} non e' spiegato dai dati qui presenti: o la tabella dei `
+          + `trimestri e' incompleta, o l'aggregatore misura un periodo diverso. NON usare i due numeri insieme `
+          + `senza aver verificato quale copre cosa`;
+      })() : null,
+      Number.isFinite(numero(t.evEbitda)) ? (numero(t.evEbitda) > 0 ? `EV/EBITDA ${fmtNum.format(numero(t.evEbitda))}×` : `EV/EBITDA NON SIGNIFICATIVO (${fmtNum.format(numero(t.evEbitda))}×): l'EBITDA e' negativo, e il rapporto cambia segno invece di misurare quanto e' cara la societa'`) : null,
       Number.isFinite(numero(t.debtEquity)) ? `debito/mezzi propri ${fmtNum.format(numero(t.debtEquity))}` : null,
       perc(t.shortFloat) ? `short float ${perc(t.shortFloat)}` : null,
       mld(t.capMercato) ? `capitalizzazione ${mld(t.capMercato)}` : null,
@@ -10172,7 +10253,16 @@ function datiNostriDelTitolo(tk) {
     if (fond.length) L.push(`- FONDAMENTALI GIA' NEL SISTEMA (stessa fonte dei prezzi, gia' pubblicati qui): ${fond.join(" · ")}.`
       + ` ⚠ Sono di fonte secondaria (aggregatore), non del filing: per bilancio e guidance vale il comunicato della societa', e se scosta lo scrivi.`);
     if (Number.isFinite(t.pe)) L.push(`- P/E (trailing): ${t.pe}× — sugli utili GIA' riportati negli ultimi 12 mesi`);
-    if (Number.isFinite(t.peFwd) || Number.isFinite(t.epsFwd)) {
+    /* utile atteso NEGATIVO: non esiste un multiplo, esiste una perdita attesa */
+    if (Number.isFinite(t.epsFwd) && t.epsFwd <= 0) {
+      L.push(`- UTILE PER AZIONE ATTESO: ${fmtNum.format(t.epsFwd)} — il consenso degli analisti si aspetta una `
+        + `PERDITA sul prossimo esercizio fiscale. ⚠ IL P/E PROSPETTICO NON ESISTE E NON VIENE PUBBLICATO: `
+        + `prezzo diviso un utile negativo da' un numero che MIGLIORA quando i conti peggiorano `
+        + `(a ${fmtNum.format(t.epsFwd)} sarebbe ${(f.prezzo / t.epsFwd).toFixed(1)}×, a `
+        + `${fmtNum.format(t.epsFwd * 2)} diventerebbe ${(f.prezzo / (t.epsFwd * 2)).toFixed(1)}×, cioe' `
+        + `apparentemente piu' economico). Su una societa' in perdita il multiplo utile e' un altro: `
+        + `prezzo su ricavi, o valore d'impresa su ricavi, che il sistema non calcola.`);
+    } else if (Number.isFinite(t.peFwd) || Number.isFinite(t.epsFwd)) {
       L.push(`- P/E PROSPETTICO: ${Number.isFinite(t.peFwd) ? t.peFwd.toFixed(1) + "×" : "n.d."}`
         + `${Number.isFinite(t.epsFwd) ? ` (utile per azione atteso ${fmtNum.format(t.epsFwd)})` : ""}`
         + ` — e' il CONSENSO DEGLI ANALISTI sul PROSSIMO ESERCIZIO FISCALE (convenzione di yfinance \`forwardEps\`), non una guidance della societa'`
