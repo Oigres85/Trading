@@ -3599,7 +3599,7 @@ check("v293 tecnica: i livelli di Fibonacci tornano col range dichiarato", suVer
 
 check("v296 contraddittorio: il pacchetto chiede la tesi opposta, e la chiede per ultima", suVeri(`
   const p = buildPromptTicker("AMD");
-  const i8 = p.indexOf("8) LA TESI CONTRARIA");
+  const i8 = p.indexOf("LA TESI CONTRARIA");
   const i7 = p.indexOf("7) LA CHIUSURA");
   const i0 = p.indexOf("0) IL GIUDIZIO");
   /* dopo la conclusione, non dopo il giudizio: per attaccare una tesi bisogna averla prima
@@ -3608,7 +3608,7 @@ check("v296 contraddittorio: il pacchetto chiede la tesi opposta, e la chiede pe
 
 check("v296 contraddittorio: obbliga ai numeri del pacchetto, a scegliere, e a un fatto datato", suVeri(`
   const p = buildPromptTicker("AMD");
-  const i = p.indexOf("8) LA TESI CONTRARIA");
+  const i = p.indexOf("LA TESI CONTRARIA");
   const b = p.slice(i, p.indexOf("══ REGOLE ══", i));
   return /NUMERI DI QUESTO PACCHETTO/.test(b)
       && /non obiezioni generiche/.test(b)
@@ -4220,7 +4220,7 @@ check("v352 istruzioni: la contraria si oppone alla conclusione vera, non a un v
   const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA" && numero(x.qta) > 0);
   if (!r) return true;
   const p = buildPromptTicker("NVDA");
-  const b8 = p.slice(p.indexOf("8) LA TESI CONTRARIA"));
+  const b8 = p.slice(p.indexOf("LA TESI CONTRARIA"));
   /* il blocco 7 vieta il voto ("Non un voto") e il blocco 8 presupponeva "se sei arrivato a
      comprare": su una posizione aperta l'alternativa non e' comprare/stare fuori */
   return /se sei arrivato a "tenere" o "aggiungere"/.test(b8)
@@ -4639,6 +4639,62 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
       + sospetti.slice(0, 2).join(" · "));
   }
   return sospetti.length === 0;
+})());
+
+
+/* ══ v360 — LA SEZIONE DEL RISCHIO: misura e confronta, non simula e non prescrive ══════════
+   Scelta esplicita del CEO fra quattro opzioni: "misura e basta" piu' "confronta con un profilo
+   di riferimento". NON la simulazione di una regola, NON gli allarmi di soglia.
+   ⚠ E il riferimento non puo' essere un numero di settore asserito senza fonte: sono versioni
+   alternative dello STESSO libro, misurate sulle stesse sedute. */
+
+check("v360 rischio: il confronto ha almeno tre profili e sono misurati sulle stesse sedute", suVeri(`
+  const pr = profiliRischio();
+  if (!pr) return true;
+  /* ogni colonna nasce dagli stessi dati: la differenza fra due righe e' l'effetto di UNA scelta */
+  return pr.profili.length >= 3 && pr.sedute >= 100
+      && pr.profili[0].nome === "Il tuo libro"
+      && pr.profili.every(x => Number.isFinite(x.vol) && Number.isFinite(x.dd) && Number.isFinite(x.sotto));`));
+
+check("v360 rischio: le scommesse effettive non superano il numero dei nomi", suVeri(`
+  const pr = profiliRischio();
+  if (!pr) return true;
+  /* 1/(1/k + (k-1)/k*rho) e' <= k per costruzione: se esce di piu', la correlazione media e'
+     negativa o il conto e' sbagliato — ed e' il numero che rende leggibile una concentrazione */
+  return pr.profili.filter(x => x.eff != null && !x.indice).every(x => x.eff <= x.n + 0.01 && x.eff >= 1);`));
+
+check("v360 rischio: il pacchetto pubblica il confronto e dichiara che non e' un obiettivo", suVeri(`
+  const pr = profiliRischio();
+  if (!pr || pr.profili.length < 3) return true;
+  const p = buildPromptTicker("NVDA");
+  return /IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA/.test(p)
+      && /scommesse effettive/.test(p)
+      && /non sono un obiettivo/.test(p)
+      && /nessun numero viene da fuori/.test(p);`));
+
+check("v360 rischio: il blocco del prompt chiede le quattro domande e vieta il dimensionamento", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  const b = p.slice(p.indexOf("8) IL RISCHIO"), p.indexOf("LA TESI CONTRARIA"));
+  /* le quattro scelte del CEO, piu' il confine: misurare e collegare, mai dimensionare */
+  return /LA TESI REGGE IL RISCHIO CHE PORTA/.test(b)
+      && /QUALE FATTO ROMPEREBBE PIU' POSIZIONI INSIEME/.test(b)
+      && /LA DISCESA IN CORSO E' ORDINARIA O E' UNA ROTTURA/.test(b)
+      && /CHE COSA MANCA PER GIUDICARE IL RISCHIO/.test(b)
+      && /MISURA E COLLEGA, NON DIMENSIONARE/.test(b);`));
+
+check("v360 rischio: la tesi contraria resta l'ULTIMO blocco anche dopo l'inserimento", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  const iR = p.indexOf("IL RISCHIO, dal lato del libro");
+  const iC = p.indexOf("LA TESI CONTRARIA");
+  /* il rischio entra come blocco 8 e la contraria diventa 9: l'invariante non e' il numero,
+     e' che la contraria venga per ULTIMA — dopo aver scritto un giudizio */
+  return iR > 0 && iC > iR && !/\\n\\d\\) /.test(p.slice(iC + 20));`));
+
+check("v360 rischio: la pagina ha la sezione e il suo contenitore", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  /* v315: un contenitore nel markup senza chi lo riempie e' un blocco che non c'e' */
+  return html.includes('data-sez="rischio"') && html.includes('id="rischio-tabella"')
+      && src.includes("function renderRischio()") && src.includes("renderRischio();");
 })());
 
 /* ---------- report ----------

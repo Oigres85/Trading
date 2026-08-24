@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "359";
+const BUILD_VERSION = "360";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3257,6 +3257,7 @@ function renderMacroGrafici() {
   if (!DATA) return;
   attivaHoverGrafici();
   renderIndicatori();   // v215 — le 27 scatole diventano una classifica sola
+  renderRischio();      // v360 — il rischio del libro e il suo confronto
   // v235 — ORA le schede esistono: si misura e si impacca
   impaccaGriglia(document.querySelector(".shell-main"));
 }
@@ -4964,6 +4965,74 @@ function notaConDettaglio(nota, cadenza) {
     + cad;
 }
 
+
+
+/* ══ v360 — LA SEZIONE DEL RISCHIO IN PAGINA ═══════════════════════════════════════════════
+   Il CEO ha scelto il CONFRONTO AFFIANCATO come forma primaria, e la mappa peso-contro-rischio
+   come seconda. Nessuna barra 0-100: le ha respinte tre volte, e qui non servirebbero — queste
+   grandezze hanno unita' vere (percentuali, sedute, conteggi) e si leggono meglio nude.
+   ⚠ La colonna "Il tuo libro" e' evidenziata: fra sei righe di numeri simili, sapere quale sia
+   la propria richiede un colpo d'occhio, non una lettura. */
+function renderRischio() {
+  const box = $("#rischio-tabella"); if (!box) return;
+  const pr = profiliRischio();
+  if (!pr || pr.profili.length < 3) {
+    box.innerHTML = `<div class="muted">Confronto non calcolabile: servono almeno quattro posizioni con `
+      + `120 sedute di storia in comune. ⚠ Non significa che il rischio sia basso: significa che questo `
+      + `calcolo non ha i dati per misurarlo.</div>`;
+    return;
+  }
+  const pct = (v) => `${v > 0 ? "+" : ""}${fmtNum.format(Math.round(v * 10) / 10)}%`;
+  box.innerHTML = `<table class="tab-rischio"><thead><tr>
+      <th>profilo</th><th>volatilit&agrave; annua</th><th>drawdown massimo</th>
+      <th>sedute sott'acqua</th><th>scommesse effettive</th><th class="muted">cosa isola</th>
+    </tr></thead><tbody>`
+    + pr.profili.map((x, i) => `<tr class="${i === 0 ? "mio" : ""}${x.indice ? " idx" : ""}">
+        <td><b>${esc(x.nome)}</b></td>
+        <td>${fmtNum.format(Math.round(x.vol * 10) / 10)}%</td>
+        <td class="${x.dd < -30 ? "neg" : ""}">${pct(x.dd)}</td>
+        <td>${x.sotto}${x.recuperato ? "" : " <span class='neg'>non recuperato</span>"}</td>
+        <td>${x.eff != null && !x.indice ? `${fmtNum.format(Math.round(x.eff * 10) / 10)} <span class="muted">su ${x.n}</span>` : "—"}</td>
+        <td class="muted">${esc(x.nota)}</td></tr>`).join("")
+    + `</tbody></table>`;
+
+  /* la mappa: peso sull'orizzontale, contributo al rischio sul verticale. Sopra la diagonale
+     la posizione porta piu' varianza del suo peso — ed e' l'unica cosa che questa forma dice
+     meglio di una tabella, perche' la diagonale si vede e una colonna di numeri no. */
+  const conMcr = [...((DATA && DATA.watchlist) || [])]
+    .filter(r => r && numero(r.qta) > 0 && numero(r.controvalore) > 0 && Number.isFinite(numero(r.risk_contrib_pct)));
+  const mappa = $("#rischio-mappa");
+  if (mappa) {
+    if (conMcr.length < 3) {
+      mappa.innerHTML = `<div class="muted" style="margin-top:10px">Mappa peso/rischio non disponibile: `
+        + `il contributo marginale al rischio non e' stato calcolato in questo run della pipeline.</div>`;
+    } else {
+      const tot = conMcr.reduce((a, r) => a + numero(r.controvalore), 0);
+      const pt = conMcr.map(r => ({ tk: r.ticker, peso: numero(r.controvalore) / tot * 100, mcr: numero(r.risk_contrib_pct) }));
+      const max = Math.max(...pt.map(p => Math.max(p.peso, p.mcr))) * 1.1;
+      const W = 420, H = 300, m = 34;
+      const x = (v) => m + v / max * (W - m - 12), y = (v) => H - m - v / max * (H - m - 12);
+      mappa.innerHTML = `<div style="margin-top:14px"><b>Peso contro contributo al rischio</b>
+        <span class="muted">— sopra la diagonale la posizione porta pi&ugrave; varianza del suo peso</span></div>
+        <svg viewBox="0 0 ${W} ${H}" class="mappa-rischio" role="img" aria-label="peso contro contributo al rischio">
+        <line x1="${m}" y1="${H - m}" x2="${W - 12}" y2="${H - m}" class="ax"/>
+        <line x1="${m}" y1="12" x2="${m}" y2="${H - m}" class="ax"/>
+        <line x1="${x(0)}" y1="${y(0)}" x2="${x(max)}" y2="${y(max)}" class="diag"/>
+        <text x="${W - 14}" y="${H - 12}" class="lbl" text-anchor="end">peso %</text>
+        <text x="6" y="18" class="lbl">rischio %</text>
+        ${pt.map(p => `<circle cx="${x(p.peso).toFixed(1)}" cy="${y(p.mcr).toFixed(1)}" r="4"
+            class="${p.mcr > p.peso * 1.15 ? "sopra" : p.mcr < p.peso * 0.85 ? "sotto" : ""}"/>
+          <text x="${(x(p.peso) + 7).toFixed(1)}" y="${(y(p.mcr) + 4).toFixed(1)}" class="tk">${esc(p.tk)}</text>`).join("")}
+        </svg>`;
+    }
+  }
+  const nota = $("#rischio-note");
+  if (nota) nota.innerHTML = `Misurato su <b>${pr.sedute} sedute</b> comuni. Le <b>scommesse effettive</b> `
+    + `sono 1/(1/k + (k&minus;1)/k&middot;correlazione media): dicono quante decisioni indipendenti ci sono `
+    + `davvero dentro k posizioni. &#9888; Sono misure su una finestra passata, non previsioni, e non sono `
+    + `un obiettivo: un libro di crescita concentrato ha per costruzione volatilit&agrave; e drawdown `
+    + `superiori all'indice &mdash; il punto &egrave; sapere di quanto, non ridurli.`;
+}
 
 function renderIndicatori() {
   const box = $("#mg-tutti"); if (!box) return;
@@ -8598,6 +8667,93 @@ function buildHistoricalDigests() {
    ⚠ E NON DA' NUMERI PER DIMENSIONARE: niente liquidita', niente controvalori assoluti, solo
    pesi relativi. Il divieto di dimensionare resta quello di sempre, e senza gli importi non
    c'e' nemmeno la tentazione. */
+
+/* ══ v360 — IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA ═══════════════════════════════
+   Richiesta del CEO: una sezione di risk management che MISURI e CONFRONTI, esplicitamente non
+   che simuli una regola ne' che prescriva.
+   ⚠ IL «PROFILO DI RIFERIMENTO» NON PUO' ESSERE UN NUMERO DI SETTORE ASSERITO SENZA FONTE.
+   Un "fondo growth tipico ha volatilita' X" e' esattamente il genere di numero plausibile e
+   non verificabile che questo sistema esiste per non pubblicare. Il riferimento sono quindi
+   VERSIONI ALTERNATIVE DELLO STESSO LIBRO, calcolate sulle stesse sedute e dagli stessi dati:
+   · i pesi veri            → cosa e' successo davvero
+   · gli stessi nomi equipesati → isola l'effetto delle SCELTE DI PESO
+   · senza le prime tre     → isola l'effetto della CONCENTRAZIONE
+   · il solo indice         → isola l'effetto della SELEZIONE dei nomi
+   Ogni colonna e' misurata sulle stesse 125 sedute: la differenza fra due colonne e' l'effetto
+   di quella singola scelta, e nessun numero viene da fuori. */
+function profiliRischio() {
+  const righe = [...((DATA && DATA.watchlist) || []), ...((DATA && DATA.portfolio) || [])]
+    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.controvalore) > 0
+              && (((r.sparks || {}).m6) || []).length >= 120);
+  if (righe.length < 4) return null;
+  const n = Math.min(...righe.map(r => r.sparks.m6.length));
+  const rend = (s) => { const t = s.slice(-n); return t.slice(1).map((v, i) => (t[i] ? v / t[i] - 1 : 0)); };
+  const serie = (pesi) => {
+    const tot = [...pesi.values()].reduce((a, b) => a + b, 0);
+    const out = new Array(n - 1).fill(0);
+    for (const [tk, w] of pesi) {
+      const r = righe.find(x => x.ticker === tk);
+      if (!r) continue;
+      rend(r.sparks.m6).forEach((v, i) => { out[i] += w / tot * v; });
+    }
+    return out;
+  };
+  /* volatilita' annualizzata, drawdown massimo e sedute sott'acqua fino al ritorno sul picco */
+  const misura = (x) => {
+    const m = x.reduce((a, b) => a + b, 0) / x.length;
+    const vol = Math.sqrt(x.reduce((a, v) => a + (v - m) ** 2, 0) / x.length) * Math.sqrt(252) * 100;
+    const cum = [1]; x.forEach(v => cum.push(cum[cum.length - 1] * (1 + v)));
+    let picco = cum[0], peggio = 0, iPicco = 0, iMin = 0, iPiccoDelPeggio = 0;
+    cum.forEach((v, i) => {
+      if (v > picco) { picco = v; iPicco = i; }
+      else { const dd = v / picco - 1; if (dd < peggio) { peggio = dd; iMin = i; iPiccoDelPeggio = iPicco; } }
+    });
+    let rec = -1;
+    for (let i = iMin; i < cum.length; i++) if (cum[i] >= cum[iPiccoDelPeggio]) { rec = i; break; }
+    return { vol, dd: peggio * 100, sotto: (rec >= 0 ? rec : cum.length - 1) - iPiccoDelPeggio, recuperato: rec >= 0 };
+  };
+  /* SCOMMESSE EFFETTIVE: 1/(1/k + (k-1)/k·rho). Dodici nomi con correlazione media 0,43 non
+     sono dodici decisioni: sono due e mezzo. E' il numero che rende leggibile una
+     concentrazione, e non compare in nessun terminale. */
+  const correlaMedia = (tks) => {
+    const rs = new Map(tks.map(t => [t, rend(righe.find(x => x.ticker === t).sparks.m6)]));
+    const cs = [];
+    for (let i = 0; i < tks.length; i++) for (let j = i + 1; j < tks.length; j++) {
+      const a = rs.get(tks[i]), b = rs.get(tks[j]);
+      const ma = a.reduce((s, v) => s + v, 0) / a.length, mb = b.reduce((s, v) => s + v, 0) / b.length;
+      let c = 0, va = 0, vb = 0;
+      for (let k = 0; k < a.length; k++) { c += (a[k] - ma) * (b[k] - mb); va += (a[k] - ma) ** 2; vb += (b[k] - mb) ** 2; }
+      if (va && vb) cs.push(c / Math.sqrt(va * vb));
+    }
+    return cs.length ? cs.reduce((a, b) => a + b, 0) / cs.length : null;
+  };
+  const effettive = (tks) => {
+    const rho = correlaMedia(tks), k = tks.length;
+    return (rho == null || 1 / k + (k - 1) / k * rho <= 0) ? null : 1 / (1 / k + (k - 1) / k * rho);
+  };
+  const pesiVeri = new Map(righe.map(r => [r.ticker, numero(r.controvalore)]));
+  const ord = [...pesiVeri.entries()].sort((a, b) => b[1] - a[1]);
+  const primeTre = ord.slice(0, 3).map(x => x[0]);
+  const tutti = righe.map(r => r.ticker);
+  const senzaTre = tutti.filter(t => !primeTre.includes(t));
+  const out = [
+    { nome: "Il tuo libro", nota: "pesi reali", ...misura(serie(pesiVeri)), eff: effettive(tutti), n: tutti.length },
+    { nome: "Stessi nomi, pesi uguali", nota: "isola l'effetto delle scelte di peso",
+      ...misura(serie(new Map(tutti.map(t => [t, 1])))), eff: effettive(tutti), n: tutti.length },
+  ];
+  if (senzaTre.length >= 3) out.push({ nome: `Senza le prime tre (${primeTre.join(", ")})`,
+    nota: "isola l'effetto della concentrazione",
+    ...misura(serie(new Map(senzaTre.map(t => [t, pesiVeri.get(t)])))), eff: effettive(senzaTre), n: senzaTre.length });
+  /* gli indici: isolano l'effetto della SELEZIONE. Non sono un obiettivo, sono un metro. */
+  for (const [tk, et] of [["NQ=F", "Solo Nasdaq 100"], ["^SOX", "Solo semiconduttori (SOX)"]]) {
+    const r = ((DATA && DATA.watchlist) || []).find(x => x && x.ticker === tk);
+    const s = ((r || {}).sparks || {}).m6 || [];
+    if (s.length >= 120) out.push({ nome: et, nota: "isola l'effetto della selezione dei nomi",
+      ...misura(rend(s)), eff: 1, n: 1, indice: true });
+  }
+  return { sedute: n - 1, profili: out };
+}
+
 function contestoPortafoglio(tkCorrente) {
   const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
     .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
@@ -8729,6 +8885,26 @@ function contestoPortafoglio(tkCorrente) {
       + `perche' il sistema misura contro una sola ancora e non pubblica la matrice completa.`);
     if (nonMisurati.length) L.push(`  ⚠ NON MISURABILI, quindi fuori dal conto per mancanza di dati e non perche' indipendenti: `
       + `${nonMisurati.join(", ")} — meno di 60 sedute in comune con ${ancora}. Il loro peso NON e' incluso nel ${pesoSemi.toFixed(0)}%.`);
+  }
+  /* ⚠ v360 — IL CONFRONTO, che e' la sola forma in cui una misura di rischio si legge.
+     "Volatilita' 51,5%" da solo non dice niente; "51,5% contro il 52,6% degli stessi nomi
+     equipesati e il 22,1% del Nasdaq" dice tre cose insieme: quanto pesano le scelte di peso,
+     quanto pesa la selezione dei nomi, e di quanto il libro amplifica l'indice. */
+  const pr = profiliRischio();
+  if (pr && pr.profili.length >= 3) {
+    L.push(`IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sulle STESSE `
+      + `${pr.sedute} sedute e dagli stessi dati — nessun numero viene da fuori):`);
+    pr.profili.forEach(x => L.push(`- ${x.nome}: volatilita' annua ${x.vol.toFixed(1)}% · drawdown massimo `
+      + `${x.dd.toFixed(1)}% (${x.sotto} sedute sott'acqua${x.recuperato ? ", recuperato" : ", NON recuperato"})`
+      + `${x.eff != null && !x.indice ? ` · scommesse effettive ${x.eff.toFixed(1)} su ${x.n} nomi` : ""}`
+      + ` — ${x.nota}`));
+    L.push(`⚠ COME SI LEGGONO. La differenza fra due righe e' l'effetto di UNA scelta: "pesi uguali" `
+      + `contro "pesi reali" isola quanto hanno reso le scelte di peso; "senza le prime tre" isola la `
+      + `concentrazione; l'indice isola la selezione dei nomi. Le SCOMMESSE EFFETTIVE sono `
+      + `1/(1/k + (k-1)/k·correlazione media): dicono quante decisioni indipendenti ci sono davvero `
+      + `dentro k posizioni. ⚠ Sono misure su una finestra passata, non previsioni, e non sono un `
+      + `obiettivo: un libro di crescita concentrato ha per costruzione volatilita' e drawdown `
+      + `superiori all'indice — il punto e' sapere di quanto, non ridurli.`);
   }
   const muti = ((((DATA || {}).macro || {}).posizioni || {}).senza_prezzo) || [];
   if (muti.length) {
@@ -10521,7 +10697,26 @@ function buildPromptTicker(tkGrezzo) {
        evita di esporsi, ed e' esattamente cio' che il blocco deve impedire;
    (c) deve nominare un fatto OSSERVABILE E DATATO che deciderebbe la disputa — e il pacchetto
        ora porta il calendario delle prossime due settimane, quindi quel fatto spesso c'e' gia'. */
-`8) LA TESI CONTRARIA — massimo 10 righe, ed e' obbligatoria.`,
+`8) IL RISCHIO, dal lato del libro e non del titolo — massimo 12 righe.`,
+`Il pacchetto porta in coda le misure di rischio del libro e il confronto con versioni`,
+`alternative dello stesso libro. Usale per rispondere a queste quattro domande, in quest'ordine:`,
+`· LA TESI REGGE IL RISCHIO CHE PORTA? Questa posizione aggiunge una scommessa NUOVA al libro,`,
+`  oppure riscrive una che il libro ha gia'? Guarda le scommesse effettive e la correlazione col`,
+`  gruppo: se sono due decisioni scritte otto volte, il rischio del singolo nome non e' il rischio.`,
+`· QUALE FATTO ROMPEREBBE PIU' POSIZIONI INSIEME? Nomina UN evento datato e osservabile che`,
+`  colpirebbe contemporaneamente i nomi correlati, e di' quali. Un rischio che colpisce un nome`,
+`  solo si diversifica; uno che colpisce il fattore si moltiplica per il peso del gruppo.`,
+`· LA DISCESA IN CORSO E' ORDINARIA O E' UNA ROTTURA? Confronta il drawdown attuale del titolo`,
+`  con quello massimo gia' avvenuto e con le sedute che ci sono volute per recuperarlo. Dentro`,
+`  quel range e' rumore ordinario per questo nome; fuori, la tesi va riesaminata.`,
+`· CHE COSA MANCA PER GIUDICARE IL RISCHIO? Elenca i dati di rischio che il pacchetto NON ha e`,
+`  che cambierebbero la tua conclusione: liquidita' disponibile, situazione fiscale, scadenze del`,
+`  debito, backlog. Dire quali mancano e' informazione quanto i numeri che ci sono.`,
+`⚠ MISURA E COLLEGA, NON DIMENSIONARE: nessuna quota, nessuna percentuale di portafoglio,`,
+`nessuno stop in euro. Il divieto delle REGOLE vale qui piu' che altrove, perche' e' il blocco`,
+`in cui e' piu' facile scivolare da "questo e' il rischio" a "quindi riduci".`,
+``,
+`9) LA TESI CONTRARIA — massimo 10 righe, ed e' obbligatoria.`,
 `Hai appena scritto un giudizio. Ora scrivi il caso di chi la pensa all'opposto, e scrivilo`,
 (giaDentro
   ? `bene: se sei arrivato a "tenere" o "aggiungere", argomenta perche' ${tk} scendera' e perche'`
