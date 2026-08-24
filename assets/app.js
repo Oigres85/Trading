@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "358";
+const BUILD_VERSION = "359";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -9911,11 +9911,26 @@ function tvBlocchi(tk) {
         return (dR > 0) ? { trim: q.trim, v: Math.round((q.operativo - p2.operativo) / dR * 1000) / 10 } : null;
       }).filter(Boolean);
       if (inc.length >= 2) {
+        const negativi = inc.slice(0, 4).filter(x => x.v < 0);
+        const oltreCento = inc.slice(0, 4).filter(x => x.v > 100);
         F.push(`MARGINE INCREMENTALE (quanto di ogni euro di ricavo IN PIU' e' arrivato al risultato operativo, `
           + `trimestre su trimestre): ${inc.slice(0, 4).map(x => `${x.trim}: ${x.v > 0 ? "+" : ""}${x.v}%`).join(" · ")}. `
-          + `⚠ Negativo significa che la crescita e' costata piu' di quanto ha reso in quel trimestre. `
           + `E' la misura che distingue una crescita che si paga da sola da una comprata: la velocita' dei ricavi `
-          + `da sola non lo dice.`);
+          + `da sola non lo dice.`
+          + (negativi.length
+              ? ` ⚠ ${negativi.length === 1 ? "Un trimestre e' NEGATIVO" : `${negativi.length} trimestri sono NEGATIVI`}`
+                + ` (${negativi.map(x => x.trim).join(", ")}): li' la crescita e' costata piu' di quanto ha reso.`
+              : ` Tutti i trimestri qui sopra sono positivi: ogni euro di ricavo in piu' ha portato margine.`)
+          + (oltreCento.length
+              ? ` ⚠ Sopra il 100% il risultato operativo e' cresciuto PIU' dei ricavi: e' leva operativa,`
+                + ` e su una base piccola il rapporto si gonfia — guarda gli importi assoluti prima di leggerlo come tendenza.`
+              : "")
+          /* ⚠ il caveat sulla tabella ferma vale ANCHE qui: questo numero nasce dallo stesso
+             trimestre di cui non si sa se sia l'ultimo */
+          + (serieFerma
+              ? ` ⚠⚠ IL VALORE PIU' RECENTE (${inc[0].trim}) E' CALCOLATO SULLO STESSO TRIMESTRE `
+                + `dell'avviso qui sopra: se la tabella non e' aggiornata, non e' il margine incrementale piu' recente.`
+              : ""));
       }
       F.push(`TRAIETTORIA DELLA CRESCITA (trimestre su trimestre, dal piu' recente): `
         + `${validi.map(x => `${x > 0 ? "+" : ""}${x}%`).join(" ← ")} — l'ultimo trimestre ${verso}`

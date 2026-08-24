@@ -122,6 +122,61 @@ vm.runInContext("REALE = " + REALE_JSON + ";", ctx, { filename: "reale.js" });
 const reale = JSON.parse(REALE_JSON);      // stessi dati lato Node, per i check che li ispezionano
 /* copia PROFONDA a ogni uso: alcuni check MUTANO il portafoglio per provare un ramo, e con
    l'assegnazione per riferimento la mutazione restava addosso ai check successivi (v205). */
+
+/* ═══ v359 — LA SUITE CHE CONTROLLA SE' STESSA ═══════════════════════════════════════════
+   In un solo giorno due classi di errore hanno colpito quattro e otto volte, e condividono la
+   proprieta' peggiore che un gate possa avere: SI GUASTANO SENZA MORDERE.
+   · `src.slice(i, i + 1400)` — quel numero non e' stato scelto, e' stato TARATO sul corpo di
+     allora. Quando la funzione ispezionata cresce, la stringa cercata esce dalla finestra e il
+     check diventa VERDE senza che nulla sia stato corretto.
+   · un backslash SINGOLO dentro un template passato al vm: `\d` diventa `d`, la regex compila
+     senza errore e non matcha mai. Il gate diventa ROSSO e accusa il prodotto mentre e' rotto
+     il test — chi indaga corregge la cosa sbagliata.
+   ⚠ LA MIGRAZIONE AUTOMATICA E' STATA PROVATA E RIFIUTATA, due volte: la prima graffa dopo
+   l'ancora NON e' sempre il blocco voluto (su `DATA.predictions.filter(...)` e' il corpo della
+   callback, che finisce molto prima del testo cercato), e cinque check sono diventati rossi.
+   Quindi: l'helper si usa dove l'ancora e' una FUNZIONE — caso non ambiguo — e i meta-gate in
+   fondo al file impediscono che il numero di finestre fisse RISALGA. Il debito residuo e'
+   dichiarato e monotono: puo' solo scendere. */
+
+/* prende il BLOCCO SINTATTICO dall'ancora, bilanciando le graffe e ignorando quelle dentro
+   stringhe, template, regex e commenti. Nessun parametro da tarare: il commento-saggio dentro
+   la funzione puo' crescere quanto vuole senza spostare il confine.
+   ⚠ Se l'ancora TESTUALE non c'e' LANCIA: un check che asserisce su una stringa vuota e' verde
+   per la ragione sbagliata. Un indice numerico negativo invece torna vuoto, perche' li' la
+   guardia ce l'ha gia' il chiamante. */
+const bloccoDa = (testo, ancora, { max = 40000 } = {}) => {
+  const i = typeof ancora === "number" ? ancora : testo.indexOf(ancora);
+  if (typeof ancora === "number" && i < 0) return "";
+  if (i < 0) throw new Error(`ANCORA ASSENTE nel sorgente: ${ancora}`);
+  /* ⚠ una firma come `function tessera({ t, v, cls })` ha una graffa DENTRO i parametri:
+     bilanciando quella si otterrebbe la sola firma. Si chiude prima la tonda. */
+  let dopoFirma = i;
+  const tonda = testo.indexOf("(", i);
+  if (tonda >= 0 && tonda - i < 200) {
+    let p = 0;
+    for (let k = tonda; k < testo.length && k - tonda < 4000; k++) {
+      if (testo[k] === "(") p++;
+      else if (testo[k] === ")" && --p === 0) { dopoFirma = k; break; }
+    }
+  }
+  const apre = testo.indexOf("{", dopoFirma);
+  if (apre < 0 || apre - dopoFirma > 400) return testo.slice(i, i + max);
+  let d = 0, str = null, esc = false;
+  for (let k = apre; k < testo.length; k++) {
+    const c = testo[k];
+    if (esc) { esc = false; continue; }
+    if (c === "\\") { esc = true; continue; }
+    if (str) { if (c === str) str = null; continue; }
+    if (c === '"' || c === "'" || c === "`") { str = c; continue; }
+    if (c === "/" && testo[k + 1] === "/") { const n = testo.indexOf("\n", k); if (n < 0) break; k = n; continue; }
+    if (c === "/" && testo[k + 1] === "*") { const n = testo.indexOf("*/", k); if (n < 0) break; k = n + 1; continue; }
+    if (c === "{") d++;
+    else if (c === "}" && --d === 0) return testo.slice(i, k + 1);
+  }
+  return testo.slice(i, i + max);
+};
+
 const suVeri = (code, cash = 28500) => run(`
   const _salva = DATA, _cash = cashEur;
   DATA = JSON.parse(JSON.stringify(REALE)); cashEur = ${cash}; recomputeTotals();
@@ -1297,7 +1352,7 @@ check("v268 rete: un proxy che risponde 429 va in castigo, non si richiama subit
 
 check("v268 rete: livePrices e la watchlist condividono UNA cache, non due giri", (() => {
   const i = src.indexOf("async function livePrices");
-  const corpo = src.slice(i, i + 1800);
+  const corpo = bloccoDa(src, i);
   return /quotaLive\(/.test(corpo) && !/fetchQuote\(/.test(corpo);
 })());
 
@@ -1652,10 +1707,14 @@ check("v286 quadro d'insieme: il conteggio degli indicatori chiude", suVeri(`
   const NL = String.fromCharCode(10);
   const riga = buildPrompt().split(NL).find(l => l.indexOf("Quadro d") >= 0);
   if (!riga) return true;
-  const n = riga.match(/(\d+) indicatori/);
-  const giu = riga.match(/(\d+) sotto 50/);
-  const su = riga.match(/(\d+) sopra/);
-  const pari = riga.match(/(\d+) esattamente a 50/);
+  /* backslash RADDOPPIATI: dentro un template la sequenza barra-d arriva al vm come la sola
+     lettera d, e la regex non matcha mai. Erano singoli, e non si era mai visto perche' questo
+     check e' DORMIENTE: la riga "Quadro d'insieme" non e' piu' nel pacchetto e la guardia qui
+     sopra esce prima di eseguire il corpo. Trovato dal meta-gate v359, che esiste per questo. */
+  const n = riga.match(/(\\d+) indicatori/);
+  const giu = riga.match(/(\\d+) sotto 50/);
+  const su = riga.match(/(\\d+) sopra/);
+  const pari = riga.match(/(\\d+) esattamente a 50/);
   if (!n || !giu || !su) return false;
   return +n[1] === +giu[1] + +su[1] + (pari ? +pari[1] : 0)`));
 
@@ -1674,7 +1733,7 @@ check("v287 pacchetto: nessun verdetto aggregato sul quadro macro", suVeri(`
   return !/Quadro d'insieme/.test(p)
       && !/I tre piu' favorevoli/.test(p)
       && !/I tre piu' sfavorevoli/.test(p)
-      && !/sotto 50 e \d+ sopra/.test(p)`));
+      && !/sotto 50 e \\d+ sopra/.test(p)`));
 
 /* ⚠ ma la DISPERSIONE dentro un composito resta, e non e' la stessa cosa: dice che una media
    nasconde componenti che vanno da 32 a 99, ed e' un fatto sul dato. Toglierla insieme al
@@ -2804,7 +2863,7 @@ check("v323 credito: la zona stampata e' quella che le bande dichiarate implican
 /* ⚠ e la scheda larga deve restare riordinabile: la chiave e' `data-scheda`, non la posizione. */
 check("v324 rotazione: la scheda larga conserva la chiave stabile del riordino", (() => {
   const i = src.indexOf("function tessera({");
-  const corpo = src.slice(i, i + 900);
+  const corpo = bloccoDa(src, i);
   return corpo.includes("mg-larga") && corpo.includes("data-scheda")
       && readFileSync(join(ROOT, "assets", "style.css"), "utf8").includes(".mg-card.mg-larga");
 })());
@@ -3675,7 +3734,7 @@ check("v314 medie: il verso e' scritto in parole, non lasciato dedurre", suVeri(
   const liv = Number(m[1]);
   const med = ((((r.tv || {}).tecnica || {}).medie || {}).sma200 || {});
   if (Number.isFinite(med.liv) && liv !== med.liv) return false;
-  const m2 = p.match(/Media semplice 200: ([\d.]+) —/);
+  const m2 = p.match(/Media semplice 200: ([\\d.]+) —/);
   if (m2 && Number(m2[1]) !== liv) return false;
   return m[3] === (r.sma200_dist_pct >= 0 ? "SOPRA" : "SOTTO")`));
 
@@ -4534,6 +4593,53 @@ check("v357 etichette: la glossa non chiama 'settore' un benchmark che non lo e'
      sistema ripiega sull'S&P 500, che non e' il settore di nessuno */
   return /dei due riferimenti NOMINATI qui sopra/.test(p)
       && !/MEGLIO o PEGGIO del suo settore/.test(p);`));
+
+const TETTO_FINESTRE = 20;   // v359: debito dichiarato, monotono in discesa
+
+/* ══ v359 — I META-GATE: la suite misura SE' STESSA ═══════════════════════════════════════
+   Ogni difetto trovato oggi e' stato trovato perche' qualcuno ha GUARDATO: il P/E su utile
+   negativo, il float a ventidue decimali, la glossa "del suo settore", l'Altman con la
+   capitalizzazione. Nessuno e' stato trovato da un gate. E i gate esistenti si guastano nella
+   direzione silenziosa — le finestre fisse diventano verdi, i backslash singoli diventano rossi
+   accusando il prodotto. Il costo di guardare cresce con la superficie; la capacita' di
+   guardare no. Questi due controlli non guardano il prodotto: guardano la suite. */
+
+check("meta: le finestre a caratteri fissi non aumentano (tetto TETTO_FINESTRE, solo in discesa)", (() => {
+  const mio = readFileSync(fileURLToPath(import.meta.url), "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const fisse = [...mio.matchAll(/\.slice\(\s*\w+\s*,\s*\w+\s*\+\s*\d{2,}\s*\)/g)].map(m => m[0]);
+  /* ⚠ IL TETTO E' UN DEBITO DICHIARATO, NON UN PERMESSO. La migrazione automatica e' stata
+     provata due volte e rifiutata: la prima graffa dopo l'ancora non e' sempre il blocco voluto
+     (su una callback e' il corpo della callback), e cinque check sono diventati rossi. Le
+     restanti vanno migrate a mano, una alla volta, quando si tocca il check che le contiene.
+     Questo gate garantisce solo che il numero non RISALGA. */
+  if (fisse.length > TETTO_FINESTRE) {
+    console.log(`  ⛔ ${fisse.length} finestre fisse contro un tetto di ${TETTO_FINESTRE}: usa bloccoDa(). `
+      + fisse.slice(0, 3).join(" · "));
+  }
+  return fisse.length <= TETTO_FINESTRE;
+})());
+
+check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => {
+  const mio = readFileSync(fileURLToPath(import.meta.url), "utf8");
+  const sospetti = [];
+  /* dentro un template il backslash e' un escape DEL TEMPLATE: `\d` arriva al vm come `d`, la
+     regex compila e non matcha mai. Si cercano i template che contengono una regex e dentro di
+     essi i backslash non raddoppiati davanti alle classi che contano. */
+  const soloCodice = mio.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|conDiario)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+    const t = m[0];
+    if (!/\.test\(|\.match\(|new RegExp/.test(t)) continue;
+    for (const b of t.matchAll(/(?<!\\)\\[dwsbDWSB]/g)) {
+      sospetti.push(t.slice(Math.max(0, b.index - 28), b.index + 10).replace(/\n/g, "⏎"));
+    }
+  }
+  if (sospetti.length) {
+    console.log(`  ⛔ ${sospetti.length} backslash singoli in template → il vm li mangia: raddoppiali. `
+      + sospetti.slice(0, 2).join(" · "));
+  }
+  return sospetti.length === 0;
+})());
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
