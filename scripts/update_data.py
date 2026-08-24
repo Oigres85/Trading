@@ -1015,6 +1015,69 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             "upside_pct": round((float(tgt) / price - 1) * 100, 1) if tgt else None,
         }
 
+    # ⚠⚠ v361 — TRE COSE DICHIARATE "TETTO STRUTTURALE" CHE ERANO GRATIS.
+    # Tre revisori indipendenti hanno indicato revisioni degli utili, dispersione del consenso e
+    # dispersione dei target come i buchi che piu' pesano su un mandato di crescita, e io avevo
+    # risposto al CEO che erano un tetto strutturale: "richiedono una fonte dati che il sistema
+    # non ha". Era falso. yfinance 1.3.0 — la libreria che questa pipeline usa gia' per tutto il
+    # resto — le espone tutte e tre, dallo stesso endpoint, senza chiave e senza costo.
+    # Non le ho cercate: le ho dichiarate impossibili.
+    # ⚠ LA LEZIONE E' QUELLA DI TUTTA LA GIORNATA: "il sistema non ce l'ha" e' un'affermazione
+    # che va VERIFICATA come qualsiasi numero. L'inventario dichiarato falso costa quanto un
+    # dato sbagliato — e stavolta l'ho scritto io.
+    # PERCHE' CONTANO, in ordine:
+    # · le REVISIONI battono il target: il target e' vecchio quanto il suo ultimo aggiornamento,
+    #   la revisione dice cosa sta cambiando adesso. Su NVDA la stima FY+1 e' passata da 12,59 a
+    #   13,04 in novanta giorni, con 4 analisti al rialzo e 0 al ribasso.
+    # · la DISPERSIONE dice se stanno valutando la stessa azienda: consenso 13,04 con forbice
+    #   9,65-16,97 non e' un consenso, e' una media fra due tesi opposte.
+    # · il MINIMO dei target su NVDA e' 180 contro un prezzo di 209: la media di 304 lo nasconde,
+    #   ed e' il numero che dice quanto e' distante chi la pensa peggio.
+    analisti = None
+    try:
+        def _riga(df, per):
+            if df is None or getattr(df, "empty", True) or per not in df.index:
+                return None
+            return df.loc[per]
+
+        def _n(x):
+            try:
+                v = float(x)
+                return None if v != v else v
+            except (TypeError, ValueError):
+                return None
+
+        tr = _riga(t.eps_trend, "+1y")
+        rv = _riga(t.eps_revisions, "+1y")
+        es = _riga(t.earnings_estimate, "+1y")
+        pt = t.analyst_price_targets or {}
+        ora = _n(tr["current"]) if tr is not None else None
+        g90 = _n(tr["90daysAgo"]) if tr is not None else None
+        g7 = _n(tr["7daysAgo"]) if tr is not None else None
+        analisti = {
+            # la TRAIETTORIA della stima sull'esercizio prossimo: e' la revisione
+            "eps_ora": round(ora, 4) if ora else None,
+            "eps_90g_fa": round(g90, 4) if g90 else None,
+            "revisione_90g_pct": round((ora / g90 - 1) * 100, 2) if (ora and g90) else None,
+            "revisione_7g_pct": round((ora / g7 - 1) * 100, 2) if (ora and g7) else None,
+            # AMPIEZZA: quanti hanno alzato e quanti abbassato. Il verso conta piu' del numero.
+            "su_30g": int(rv["upLast30days"]) if (rv is not None and _n(rv["upLast30days"]) is not None) else None,
+            "giu_30g": int(rv["downLast30days"]) if (rv is not None and _n(rv["downLast30days"]) is not None) else None,
+            # DISPERSIONE degli utili attesi: forbice larga su consenso unanime = non stanno
+            # valutando la stessa azienda
+            "eps_min": round(_n(es["low"]), 4) if (es is not None and _n(es["low"])) else None,
+            "eps_max": round(_n(es["high"]), 4) if (es is not None and _n(es["high"])) else None,
+            "eps_n": int(es["numberOfAnalysts"]) if (es is not None and _n(es["numberOfAnalysts"]) is not None) else None,
+            # DISPERSIONE dei target: il minimo puo' stare SOTTO il prezzo, e la media lo nasconde
+            "target_min": round(_n(pt.get("low")), 2) if _n(pt.get("low")) else None,
+            "target_max": round(_n(pt.get("high")), 2) if _n(pt.get("high")) else None,
+            "target_mediana": round(_n(pt.get("median")), 2) if _n(pt.get("median")) else None,
+        }
+        if not any(v is not None for v in analisti.values()):
+            analisti = None
+    except Exception as e:  # noqa: BLE001
+        print(f"!! analisti {ticker}: {e}", file=sys.stderr)
+
     # quotazione pre/after market (se la sessione la espone)
     prepost = None
     for pk, lab in (("preMarketPrice", "pre"), ("postMarketPrice", "after")):
@@ -1267,6 +1330,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "sparks": sparks,
         "earnings_date": earnings_date,
         "rating": rating,
+        "analisti": analisti,   # v361 — revisioni, dispersione degli utili e dei target
         "health": health,
         "eps": round(float(eps), 2) if eps is not None else None,
         "beta": round(float(beta), 2) if beta is not None else None,

@@ -4697,6 +4697,64 @@ check("v360 rischio: la pagina ha la sezione e il suo contenitore", (() => {
       && src.includes("function renderRischio()") && src.includes("renderRischio();");
 })());
 
+
+/* ══ v361 — TRE COSE CHE AVEVO DICHIARATO IMPOSSIBILI ED ERANO GRATIS ══════════════════════
+   Revisioni degli utili, dispersione del consenso e dispersione dei target: tre revisori le
+   avevano indicate come i buchi che piu' pesano su un mandato di crescita, e io avevo risposto
+   al CEO che erano un tetto STRUTTURALE. yfinance — gia' usato dalla pipeline per tutto il
+   resto — le espone tutte e tre senza chiave e senza costo. Non le avevo cercate. */
+
+check("v361 revisioni: la traiettoria della stima e l'ampiezza arrivano nel pacchetto", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
+  const salva = r ? r.analisti : undefined;
+  if (r) r.analisti = { eps_ora: 13.04, eps_90g_fa: 12.59, revisione_90g_pct: 3.59,
+    revisione_7g_pct: 1.72, su_30g: 4, giu_30g: 0, eps_min: 9.65, eps_max: 16.97, eps_n: 51,
+    target_min: 180, target_max: 500, target_mediana: 300 };
+  const p = buildPromptTicker("NVDA");
+  if (r) r.analisti = salva;
+  /* la testata dice da sempre che le revisioni battono il target; ora il sistema le fornisce */
+  return /REVISIONI DEGLI UTILI/.test(p)
+      && /passata da [\\d,.-]+ a [\\d,.-]+ in 90 giorni/.test(p)
+      && /4 analisti hanno ALZATO la stima e 0 l'hanno ABBASSATA/.test(p);`));
+
+check("v361 revisioni: quando traiettoria e ampiezza divergono, la divergenza E' il fatto", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "CRWV");
+  if (!r) return true;
+  const salva = r.analisti;
+  /* misurato su CRWV: +23,8% a novanta giorni ma 3 al rialzo contro 6 al ribasso negli ultimi
+     trenta. La traiettoria dice da dove viene, l'ampiezza dove sta andando adesso. */
+  r.analisti = { eps_ora: -4.24, eps_90g_fa: -5.56, revisione_90g_pct: 23.83, su_30g: 3, giu_30g: 6 };
+  const p = buildPromptTicker("CRWV");
+  r.analisti = salva;
+  return /TRAIETTORIA E AMPIEZZA DIVERGONO/.test(p) && /prevalgono i TAGLI/.test(p);`));
+
+check("v361 dispersione: il minimo dei target sotto il prezzo viene DICHIARATO", suVeri(`
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "NVDA");
+  if (!r) return true;
+  const salva = r.analisti;
+  r.analisti = { target_min: 1, target_max: 500, target_mediana: 300 };
+  const p1 = buildPromptTicker("NVDA");
+  r.analisti = { target_min: 999999, target_max: 1000000, target_mediana: 999999 };
+  const p2 = buildPromptTicker("NVDA");
+  r.analisti = salva;
+  /* la media di 304 nasconde che c'e' chi vede il titolo sotto il prezzo di adesso */
+  return /IL MINIMO STA SOTTO IL PREZZO DI RIFERIMENTO/.test(p1)
+      && /Il minimo sta sopra il prezzo di riferimento/.test(p2);`));
+
+check("v361 inventario: revisioni e dispersione non stanno piu' fra le cose da cercare", suVeri(`
+  const p = buildPromptTicker("NVDA");
+  const daCercare = p.slice(p.indexOf("QUELLO CHE IL SISTEMA NON HA"), p.indexOf("Prezzo di riferimento"));
+  /* l'inventario si aggiorna quando il sistema acquisisce qualcosa, o torna a mentire */
+  return /revisioni dei RICAVI/.test(daCercare)
+      && !/la DISPERSIONE fra target minimo e massimo e le revisioni/.test(daCercare);`));
+
+check("v361 pipeline: i campi vengono da yfinance e il fallimento e' dichiarato", (() => {
+  const py = readFileSync(join(ROOT, "scripts", "update_data.py"), "utf8");
+  return py.includes("t.eps_trend") && py.includes("t.eps_revisions")
+      && py.includes("t.earnings_estimate") && py.includes("t.analyst_price_targets")
+      && py.includes('"analisti": analisti,') && py.includes('print(f"!! analisti {ticker}');
+})());
+
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
    Conseguenza misurata: quei check finivano in T e venivano CONTATI nel totale, ma il ciclo

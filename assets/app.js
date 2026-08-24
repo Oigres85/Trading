@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "360";
+const BUILD_VERSION = "361";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -9419,6 +9419,7 @@ function fattiTitolo(tk) {
                       prossimaTrimestrale: riga.earnings_date || null,
                       resistenza: numero(riga.resistance), supporto: numero(riga.support),
                       rating: riga.rating || null,
+                      analisti: riga.analisti || null,   /* v361 — revisioni e dispersione */
                       crescitaRicavi: numero((riga.stats || {}).revenue_growth),
                       crescitaUtili: numero((riga.stats || {}).earnings_growth),
                       peg: numero((riga.stats || {}).peg),
@@ -10415,6 +10416,45 @@ function datiNostriDelTitolo(tk) {
         + `. ⚠ E' una MEDIA e porta la data del suo ultimo aggiornamento, che il sistema non conosce: `
         + `la DISPERSIONE fra target minimo e massimo e le revisioni recenti NON sono qui e vanno cercate.`);
     }
+    if (t.analisti) {
+      const an = t.analisti, bit = [];
+      const nn = (x) => Number.isFinite(numero(x)) ? numero(x) : null;
+      if (nn(an.revisione_90g_pct) != null) {
+        bit.push(`la stima di utile sul prossimo esercizio e' passata da ${fmtNum.format(nn(an.eps_90g_fa))} a `
+          + `${fmtNum.format(nn(an.eps_ora))} in 90 giorni (${signTxt(nn(an.revisione_90g_pct))})`
+          + (nn(an.revisione_7g_pct) != null ? `, di cui ${signTxt(nn(an.revisione_7g_pct))} nell'ultima settimana` : ""));
+      }
+      if (nn(an.su_30g) != null && nn(an.giu_30g) != null) {
+        const su = nn(an.su_30g), giu = nn(an.giu_30g);
+        bit.push(`negli ultimi 30 giorni ${su} analisti hanno ALZATO la stima e ${giu} l'hanno ABBASSATA`
+          + (su + giu === 0 ? " — nessuno l'ha toccata" : su > 0 && giu > 0 ? " — il consenso non e' unanime sul verso" : ""));
+      }
+      if (bit.length) L.push(`- ⚡ REVISIONI DEGLI UTILI (contano piu' del target: il target e' vecchio quanto il suo `
+        + `ultimo aggiornamento, la revisione dice cosa sta cambiando adesso): ${bit.join(" · ")}.`
+        + (nn(an.revisione_90g_pct) != null && nn(an.giu_30g) > nn(an.su_30g)
+            ? ` ⚠⚠ TRAIETTORIA E AMPIEZZA DIVERGONO: la stima a 90 giorni sale ma negli ultimi 30 prevalgono i `
+              + `TAGLI. La prima dice da dove viene, la seconda dove sta andando adesso — quando non concordano, `
+              + `il fatto e' la divergenza.` : ""));
+      if (nn(an.eps_min) != null && nn(an.eps_max) != null && nn(an.eps_ora) != null) {
+        const amp = Math.abs((nn(an.eps_max) - nn(an.eps_min)) / nn(an.eps_ora)) * 100;
+        L.push(`- DISPERSIONE DEL CONSENSO SUGLI UTILI: stima media ${fmtNum.format(nn(an.eps_ora))}, forbice da `
+          + `${fmtNum.format(nn(an.eps_min))} a ${fmtNum.format(nn(an.eps_max))}${nn(an.eps_n) ? ` su ${nn(an.eps_n)} analisti` : ""} `
+          + `— un'ampiezza pari al ${amp.toFixed(0)}% della stima media. ⚠ L'ampiezza misura quanto sono `
+          + `distanti fra loro gli analisti, non quanto sono sicuri: una forbice larga dice che NON stanno `
+          + `valutando la stessa azienda, ed e' informazione piu' utile della media.`);
+      }
+      if (nn(an.target_min) != null && nn(an.target_max) != null) {
+        const sottoPrezzo = Number.isFinite(f.prezzo) && nn(an.target_min) < f.prezzo;
+        L.push(`- DISPERSIONE DEI TARGET: da ${fmtNum.format(nn(an.target_min))} a ${fmtNum.format(nn(an.target_max))}`
+          + `${nn(an.target_mediana) != null ? `, mediana ${fmtNum.format(nn(an.target_mediana))}` : ""}. `
+          + (sottoPrezzo
+              ? `⚠ IL MINIMO STA SOTTO IL PREZZO DI RIFERIMENTO (${fmtNum.format(f.prezzo)}): c'e' chi vede il titolo `
+                + `piu' in basso di adesso, e la media da sola lo nasconde.`
+              : `Il minimo sta sopra il prezzo di riferimento.`)
+          + (nn(an.target_mediana) != null && nn(an.target_mediana) < numero((t.rating || {}).target || 0)
+              ? ` ⚠ La MEDIANA e' sotto la MEDIA: pochi target molto alti stanno tirando su l'aritmetica.` : ""));
+      }
+    }
     const perc = (v) => Number.isFinite(numero(v)) ? `${(numero(v) * 100).toFixed(1)}%` : null;
     const mld = (v) => Number.isFinite(numero(v)) ? `${fmtNum.format(Math.round(numero(v) / 1e9))} mld` : null;
     const fond = [
@@ -10491,8 +10531,9 @@ function datiNostriDelTitolo(tk) {
 `  dal filing dei fondamentali che trovi gia' pubblicati qui sotto (sono di aggregatore, non del filing)`,
 `· ultima trimestrale nel dettaglio e la data CONFERMATA della prossima`,
 `· concorrenti diretti, quote di mercato e anno a cui si riferiscono`,
-`· del consenso analisti: la DISPERSIONE fra target minimo e massimo e le revisioni degli ultimi`,
-`  90 giorni — il target medio e il numero di giudizi il sistema li pubblica gia' qui sotto`,
+`· del consenso analisti: le revisioni dei RICAVI e il dettaglio per singolo broker — le`,
+`  revisioni degli UTILI a 90 giorni, la loro ampiezza e la dispersione di utili e target il`,
+`  sistema li pubblica gia' qui sotto`,
 `· notizie e fatti societari: prima le ULTIME 48 ORE, poi il contesto delle ultime settimane.`,
 `  Il pacchetto porta i titoli MACRO delle ultime 6 ore quando ce ne sono; su questa societa' e sul`,
 `  suo settore non porta niente, quindi quella parte e' interamente tua. Se non trovi nulla di`,
