@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "367";
+const BUILD_VERSION = "368";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10612,7 +10612,21 @@ function datiNostriDelTitolo(tk) {
       perc(t.crescitaUtili) ? `crescita utili a/a ${perc(t.crescitaUtili)}` : null,
       (Number.isFinite(numero(t.peg)) && numero(t.peg) > 0 && Number.isFinite(t.pe) && t.pe > 0) ? `PEG ${fmtNum.format(numero(t.peg))}${Number.isFinite(t.pe) && numero(t.peg) > 0 ? ` — implica una crescita attesa del ${(t.pe / numero(t.peg)).toFixed(0)}%, che e' una TERZA grandezza: non coincide con la crescita dei ricavi ne' con quella degli utili qui accanto, perche' l'aggregatore la calcola sulle stime a 5 anni` : ""} (P/E diviso la crescita attesa: sotto 1 il mercato paga meno di quanto la societa' cresce)` : null,
       perc(t.grossMargin) ? `margine lordo ${perc(t.grossMargin)}` : null,
-      mld(t.fcf) ? `flusso di cassa libero ${mld(t.fcf)}` : null,
+      mld(t.fcf) ? (() => {
+        const q = t.comb && t.comb.fcf_ttm;
+        if (q == null || !Number.isFinite(numero(t.fcf)) || numero(t.fcf) === 0)
+          return `flusso di cassa libero ${mld(t.fcf)}`;
+        const scarto = Math.abs(q / numero(t.fcf) - 1) * 100;
+        if (scarto <= 10)
+          return `flusso di cassa libero ${mld(t.fcf)} (verificato: coincide entro il ${scarto.toFixed(1)}% `
+            + `con la somma dei quattro trimestri nel blocco COMBUSTIONE DI CASSA)`;
+        const comeLa = `${fmtNum.format(Math.round(q / 1e8) / 10)} mld`;
+        return `flusso di cassa libero ${mld(t.fcf)} secondo l'aggregatore — ⚠⚠ IL BLOCCO COMBUSTIONE DI `
+          + `CASSA PIU' SOTTO NE CALCOLA UN ALTRO: ${comeLa}, sommando i quattro trimestri del rendiconto `
+          + `finanziario, cioe' ${scarto.toFixed(1)}% di scarto. Non e' un errore di arrotondamento: i due `
+          + `coprono periodi diversi, o l'aggregatore include voci che il rendiconto tiene fuori. NON usare `
+          + `i due numeri insieme senza aver verificato quale copre cosa`;
+      })() : null,
       mld(t.ricaviFy) ? (() => {
         const somma = t.sommaTrim;
         const scarto = (Number.isFinite(somma) && somma > 0) ? Math.abs(t.ricaviFy / somma - 1) * 100 : null;
@@ -10888,12 +10902,13 @@ function buildPromptTicker(tkGrezzo) {
    Gemini che rispose tutto "n.d."; il bando ai forum da un LLM che marco' [VERIFICATO] con
    fonte Reddit medie mobili e target; il prezzo unico da un'analisi che citava tre giorni
    diversi come se fossero oggi. */
-`══ REGOLE SUI NUMERI — le quattro che decidono se l'analisi vale ══`,
+`══ REGOLE SUI NUMERI — le cinque che decidono se l'analisi vale ══`,
 `1. PASSO 0 — OBBLIGATORIO: CERCA ONLINE prima di scrivere qualsiasi cosa. Non e' un'opzione. SE NON PUOI NAVIGARE: scrivi una riga — "Non ho accesso al web: non posso produrre questa analisi" — e FERMATI. Non compilare il referto con "n.d." dappertutto: ha la forma di un lavoro fatto e non ne ha la sostanza. "n.d." vale per il singolo dato non trovato DOPO averlo cercato, mai come politica generale.`,
 `   DOVE CERCARE: prezzi e tecnici → finance.yahoo.com/quote/${tk} · stockanalysis.com/stocks/${tk} · investing.com — fondamentali → stockanalysis.com/stocks/${tk}/financials · macrotrends · sito IR — trimestrale → comunicato IR · SEC EDGAR (sec.gov/cgi-bin/browse-edgar) — concorrenti e quote → ultimo 10-K (Competition) — notizie → Reuters, Bloomberg, CNBC, Barron's — consenso → stockanalysis/forecast · marketbeat · tipranks.`,
 `2. GERARCHIA DELLE FONTI: vince il rango piu' alto. (1) FONTE PRIMARIA — societa' e filing SEC, l'unica valida per bilancio e guidance · (2) dati di mercato: Yahoo, stockanalysis, investing · (3) stampa finanziaria: Reuters, Bloomberg, WSJ, CNBC, FT · (4) aggregatori di consenso, dichiarando SEMPRE quanti analisti e a che data. NON SONO FONTI PER UN NUMERO e non si marcano [VERIFICATO]: Reddit, X, StockTwits, forum, blog anonimi, video, e ogni pagina che riporta una cifra senza dire da dove viene — se un numero lo trovi solo li', e' un dato che non hai. ⚠ ECCEZIONE UNICA E DICHIARATA: Reddit (r/wallstreetbets, r/stocks, r/investing) vale come SEGNALE DI POSIZIONAMENTO RETAIL — cosa il piccolo investitore sta guardando e da che parte sta — mai come fonte di un bilancio, di una guidance o di un prezzo. Va sempre etichettato [SENTIMENT RETAIL, non verificato] e non puo' sostenere da solo nessuna conclusione. Se il rango 2-4 contraddice il rango 1, vince l'1 e lo dici.`,
 `3. IL PREZZO DI RIFERIMENTO E' UNO SOLO: valore, data e ora, borsa. Distanze dai livelli, capitalizzazione, rendimento da inizio anno e upside si calcolano su QUELLO e lo dichiarano ("−6% dal riferimento"). Citare $476 nella scheda, $482 nel commento e "chiusura del 31/07" nella tecnica significa descrivere tre giorni diversi come se fossero oggi — e' successo, ed e' il modo piu' facile di sbagliare un ingresso. A mercato chiuso il riferimento e' l'ultima chiusura, e lo scrivi.`,
 `4. NIENTE [VERIFICATO] DERIVATO: vale su cio' che hai LETTO in una fonte, mai su cio' che hai ricavato. "Capitalizzazione 780-790 mld, ricavabile da 807 mld di due settimane fa piu' il calo" e' una stima: si scrive [STIMA] col calcolo accanto, oppure "n.d.". Ogni numero esterno porta fonte e data.`,
+`5. I NUMERI GIA' CALCOLATI QUI SI USANO COME SONO. Percentili, drawdown, correlazioni, scommesse effettive, VaR ed Expected Shortfall, copertura degli interessi, movimento implicito, distanze dai livelli e somme su dodici mesi sono gia' calcolati da questo sistema, sulle finestre che ogni riga dichiara. Non rifarli: da dati parziali otterresti numeri diversi dai nostri e li leggeresti come una contraddizione del pacchetto, che non c'e'. Se un calcolo ti sembra sbagliato, dillo indicando la riga e il perche' — non sostituirlo in silenzio con il tuo.`,
 ``,
 /* ═══ v293 — LA CONSEGNA RISCRITTA SULLA RICHIESTA DEL CEO ═══════════════════════════════
    Testuale: "mi fornisce un quadro troppo lungo. Vorrei: breve quadro macro sulla base solo

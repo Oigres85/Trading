@@ -4642,7 +4642,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      regex compila e non matcha mai. Si cercano i template che contengono una regex e dentro di
      essi i backslash non raddoppiati davanti alle classi che contano. */
   const soloCodice = mio.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|conDiario)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|conDiario|conComb|conCombEsito)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     if (!/\.test\(|\.match\(|new RegExp/.test(t)) continue;
     for (const b of t.matchAll(/(?<!\\)\\[dwsbDWSB]/g)) {
@@ -5064,6 +5064,92 @@ check("v367 · -100% e' un buco della fonte, non un calo del costo del debito", 
   const b = bloccoDa(src, "function renderCredito", { max: 9000 });
   if (!/r\.var4 <= -100 \? "—"/.test(b))
     return no("un -100% (voce sparita dal trimestre recente) viene ancora stampato come se fosse una variazione");
+  return true;
+})());
+
+/* ---------- v368: lo stesso pacchetto non dice due volte la stessa grandezza ----------
+   ⚠⚠ Trovato leggendo il pacchetto vero, il giorno DOPO aver chiuso la stessa classe (C16)
+   sulle serie macro: il flusso di cassa libero usciva -9,1 mld nei FONDAMENTALI (TTM
+   dell'aggregatore) e -10,6 mld nel blocco COMBUSTIONE (somma dei quattro trimestri di
+   rendiconto, che ho aggiunto io in v365). Stessa grandezza, stessa societa', due numeri.
+   Il trattamento giusto era gia' in casa — quello dei RICAVI: non si sceglie in silenzio, si
+   dichiara lo scarto e si dice di non usarli insieme.
+   ⚠ E la correzione ha subito reintrodotto v362: l'avvertenza citava "-11 mld" mentre il blocco
+   citato scrive "-10,6 mld", perche' i due usano formattatori diversi. Un rimando che cita un
+   terzo numero e' peggio del difetto che ripara. */
+check("v368 · due valori per il flusso di cassa libero: dichiarati, non scelti in silenzio",
+  conCombEsito({ cassa: 2.2e9, ocf_ttm: 6e9, capex_ttm: -16.6e9, fcf_ttm: -10.6e9, trimestri: 4 },
+    { fcf: -9.09e9 }, `
+    if (!/IL BLOCCO COMBUSTIONE DI CASSA PIU' SOTTO NE CALCOLA UN ALTRO/.test(out))
+      return "due FCF diversi e nessuna dichiarazione: e' la classe C16 dentro il pacchetto titolo";
+    if (!/NON usare i due numeri insieme/.test(out)) return "non dice di non usarli insieme";
+    /* ⚠ il numero citato deve essere SCRITTO COME nel blocco a cui rimanda */
+    const cit = out.match(/NE CALCOLA UN ALTRO: (-?[\\d.,]+) mld/);
+    const blocco = out.match(/COMBUSTIONE DI CASSA[^\\n]*?flusso di cassa libero (-?[\\d.,]+) mld/);
+    if (!cit || !blocco) return "non trovo i due numeri da confrontare: il check non sta misurando";
+    if (cit[1] !== blocco[1])
+      return "il rimando cita " + cit[1] + " ma il blocco citato scrive " + blocco[1] + ": stesso numero, due forme (v362)";
+    return true;`));
+
+check("v368 · quando i due FCF coincidono lo dice, invece di tacere",
+  conCombEsito({ cassa: 2.2e9, ocf_ttm: 6e9, capex_ttm: -15.1e9, fcf_ttm: -9.1e9, trimestri: 4 },
+    { fcf: -9.09e9 }, `
+    if (/NE CALCOLA UN ALTRO/.test(out)) return "grida uno scarto che non c'e' (0,1%)";
+    if (!/coincide entro/.test(out)) return "non dichiara la verifica riuscita: un controllo silenzioso non si distingue da un controllo assente";
+    return true;`));
+
+/* ⚠⚠ v368 — L'ELENCO DEGLI HELPER SORVEGLIATI NON DEVE INVECCHIARE.
+   Il rilevatore dei backslash singoli (classe ricorrente numero uno di questo progetto:
+   dentro un template literal "\d" diventa "d" e "\n" diventa un a capo, quindi la regex nel vm
+   non e' quella che hai scritto) guardava solo run/suVeri/conDiario. conCombEsito e' nato in
+   v365 e il difetto ci e' passato dentro subito. Un elenco scritto a mano invecchia col codice:
+   questo check confronta l'elenco con TUTTI gli helper che passano un template al vm. */
+check("meta: il rilevatore dei backslash copre ogni helper che passa un template al vm", (() => {
+  const mio = readFileSync(new URL(import.meta.url), "utf8");
+  const scanner = mio.match(/matchAll\(\/\(\?:([a-zA-Z|]+)\)\\\(`/);
+  if (!scanner) return no("non trovo piu' l'elenco degli helper nel rilevatore: e' cieco");
+  const coperti = new Set(scanner[1].split("|"));
+  /* gli helper sono quelli definiti come `const X = (...) => run(` / `=> suVeri(` */
+  const definiti = [...mio.matchAll(/^const (\w+) = \([^)]*\) =>\s*(?:run|suVeri|suReale)\(/gm)].map((m) => m[1]);
+  const scoperti = definiti.filter((n) => !coperti.has(n));
+  if (scoperti.length)
+    return no(`helper non sorvegliati dal rilevatore dei backslash: ${scoperti.join(", ")} — `
+      + "un \\d scritto li' dentro diventa d e la regex nel vm non e' quella che credi");
+  if (definiti.length < 2) return no(`visti solo ${definiti.length} helper: il check non sta misurando`);
+  return true;
+})());
+
+/* ---------- v368: le DUE testate non devono divergere in silenzio ----------
+   ⚠⚠ Il sistema ha due set di regole indipendenti: config/prompt_header_macro.txt per il
+   pacchetto macro, e le istruzioni generate in buildPromptTicker per il pacchetto titolo.
+   Nessuno teneva il conto di cosa c'e' nell'una e non nell'altra, e infatti A3 ("i numeri gia'
+   calcolati si usano come sono, non rifarli") mancava proprio dal pacchetto TITOLO — che e'
+   quello che ne consegna di piu': percentili, drawdown, correlazioni, VaR, coperture.
+   Un LLM che li ricalcola da dati parziali ottiene numeri diversi dai nostri e segnala una
+   contraddizione inesistente, trasformando la regola C3 in una fabbrica di falsi allarmi.
+   ⚠ LISTA ESPLICITA, nessuna euristica sul linguaggio: e' la lezione di C9 (7 falsi positivi
+   su 9 frasi) e di C17. Se nasce un tema nuovo va aggiunto qui a mano, ed e' voluto. */
+check("v368 · ogni regola della testata macro ha il suo corrispettivo nel pacchetto titolo", (() => {
+  const hdr = readFileSync(join(ROOT, "config", "prompt_header_macro.txt"), "utf8");
+  const tk = suVeri(`return buildPromptTicker((DATA.watchlist.find(r => r && r.ticker && !String(r.ticker).startsWith("^")) || {}).ticker || "");`);
+  if (typeof tk !== "string" || tk.length < 500) return no("non riesco a generare un pacchetto titolo: il confronto non e' possibile");
+  /* tema · come si riconosce nella testata macro · come si riconosce nel pacchetto titolo */
+  const TEMI = [
+    ["ricerca online obbligatoria", /RICERCA NON E' FACOLTATIVA/, /PASSO 0 — OBBLIGATORIO/],
+    ["cosa fare se non puoi navigare", /NON HO ACCESSO ALLA RETE/, /Non ho accesso al web/],
+    ["mai inventare, n\.d\. se manca", /Mai inventare valori/, /"n\.d\." vale per il singolo dato/],
+    ["numeri gia' calcolati: non rifarli", /I NUMERI GIA' CALCOLATI/, /I NUMERI GIA' CALCOLATI QUI SI USANO COME SONO/],
+    ["l'eta' del dato fa parte del dato", /LA DATA DEL DATO E' PARTE DEL DATO/, /giorni fa|eta'|snapshot/],
+    ["contare i segnali una volta sola", /CONTA I SEGNALI UNA VOLTA SOLA/, /una volta sola|non due|stesso segnale/],
+    ["dire cosa smentirebbe l'analisi", /DOVE TI ASPETTERESTI DI SBAGLIARE/, /romperebbe la tesi|smentirebbe|ribalterebbe/],
+    ["segnalare le contraddizioni", /si contraddicono/, /contraddi/],
+  ];
+  const buchi = [];
+  for (const [nome, reMacro, reTicker] of TEMI) {
+    if (!reMacro.test(hdr)) { buchi.push(`"${nome}" e' sparito dalla TESTATA MACRO`); continue; }
+    if (!reTicker.test(tk)) buchi.push(`"${nome}" c'e' nella testata macro e MANCA nel pacchetto titolo`);
+  }
+  if (buchi.length) return no(`le due testate divergono: ${buchi.join(" · ")}`);
   return true;
 })());
 
