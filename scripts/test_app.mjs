@@ -4818,5 +4818,37 @@ for (const [name, ok] of T) {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}`);
 }
 
+/* ---------- v363: la sezione del rischio deve DIRE cosa ha trovato, non solo mostrarlo ----------
+   ⚠ Il CEO: "sezione non comprensibile". Era una tabella di cinque righe con intestazioni
+   tecniche ("cosa isola", "scommesse effettive") e nessuna frase che dicesse l'esito del
+   confronto. Rifatta: prima le conclusioni CALCOLATE, poi la tabella come prova.
+   Questi due check sorvegliano i due modi in cui puo' tornare com'era. */
+check("v363 · il rischio apre con le frasi, non con la tabella", () => {
+  const b = bloccoDa(src, "function renderRischio", { max: 6000 });
+  const iFrasi = b.indexOf("rischio-frasi"), iTab = b.indexOf("<table");
+  if (iFrasi < 0) return "le frasi calcolate sono sparite: resta la tabella nuda";
+  if (iTab < 0) return "la tabella-prova e' sparita: restano affermazioni senza righe";
+  if (iFrasi > iTab) return "la tabella viene prima delle frasi: e' l'ordine che il CEO ha respinto";
+  /* le intestazioni gergali non devono tornare */
+  for (const gergo of ["cosa isola", ">scommesse effettive<"])
+    if (b.includes(gergo)) return `intestazione gergale rientrata: "${gergo}"`;
+  return true;
+});
+
+/* Un rapporto vicino a 1 arrotondato a una cifra diventa "1 volte tanto": grammatica rotta E
+   informazione nulla. Quando due cose oscillano uguale la notizia e' proprio quella, e va
+   scritta a parole. Il check verifica che il ramo "quanto" esista e che la soglia lo copra. */
+check("v363 · nessun \"1 volte\": il rapporto ~1 si dice a parole", () => {
+  const b = bloccoDa(src, "function renderRischio", { max: 6000 });
+  if (!/Oscilla quanto \$\{nome\}/.test(b)) return "sparito il ramo che dice 'oscilla quanto X'";
+  const m = b.match(/Math\.abs\(r - 1\) < ([\d.]+)/);
+  if (!m) return "sparita la soglia che separa 'quanto' da 'N volte'";
+  const soglia = parseFloat(m[1]);
+  /* con una cifra decimale, un rapporto entro 0.05 da 1 stampa "1 volte": la soglia deve coprirlo */
+  if (soglia < 0.05) return `soglia ${soglia} troppo stretta: fra ${soglia} e 0.05 stampa ancora "1 volte"`;
+  if (soglia > 0.3) return `soglia ${soglia} troppo larga: chiama "uguali" cose che differiscono del 30%`;
+  return true;
+});
+
 console.log(`\n${T.length - fail}/${T.length} check superati`);
 process.exit(fail ? 1 : 0);

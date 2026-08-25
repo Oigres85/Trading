@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "362";
+const BUILD_VERSION = "363";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -4983,17 +4983,61 @@ function renderRischio() {
     return;
   }
   const pct = (v) => `${v > 0 ? "+" : ""}${fmtNum.format(Math.round(v * 10) / 10)}%`;
-  box.innerHTML = `<table class="tab-rischio"><thead><tr>
-      <th>profilo</th><th>volatilit&agrave; annua</th><th>drawdown massimo</th>
-      <th>sedute sott'acqua</th><th>scommesse effettive</th><th class="muted">cosa isola</th>
+  const n1 = (v) => fmtNum.format(Math.round(v * 10) / 10);
+  const P = Object.fromEntries(pr.profili.map(x => [x.nome, x]));
+  const mio = pr.profili[0];
+  const eq = pr.profili.find(x => x.nome.startsWith("Stessi nomi"));
+  const senza = pr.profili.find(x => x.nome.startsWith("Senza le prime tre"));
+  const idx = pr.profili.filter(x => x.indice);
+  /* le frasi: ognuna e' il confronto fra DUE righe, cioe' l'effetto di UNA scelta */
+  const frasi = [];
+  if (eq) {
+    const meglio = mio.dd > eq.dd;
+    frasi.push(`<b>Le tue scelte di peso ${meglio ? "hanno ridotto" : "hanno aumentato"} la discesa peggiore.</b> `
+      + `Con gli stessi nomi a peso uguale il libro sarebbe sceso del ${n1(Math.abs(eq.dd))}% invece del `
+      + `${n1(Math.abs(mio.dd))}%${meglio ? " — concentrare sui nomi che hanno tenuto ha aiutato, su questa finestra" : ""}.`);
+  }
+  if (senza) {
+    const meglio = senza.dd > mio.dd;
+    frasi.push(`<b>Togliere le tre posizioni maggiori ${meglio ? "avrebbe attenuato" : "non avrebbe attenuato"} la discesa.</b> `
+      + `Senza ${esc(senza.nome.replace(/^Senza le prime tre \(|\)$/g, ""))} il drawdown sarebbe stato del `
+      + `${n1(Math.abs(senza.dd))}% contro il ${n1(Math.abs(mio.dd))}% vero.`
+      + (Number.isFinite(senza.eff) && Number.isFinite(mio.eff) && senza.eff >= mio.eff - 0.15
+        ? ` E le decisioni indipendenti resterebbero ${n1(senza.eff)}, come adesso: la concentrazione `
+          + `non sta in quelle tre posizioni, sta nel fatto che le dodici fanno lo stesso mestiere.`
+        : ""));
+  }
+  for (const b2 of idx) {
+    const nome = esc(b2.nome.replace(/^Solo /, ""));
+    const r = mio.vol / b2.vol;
+    const quanto = Math.abs(r - 1) < 0.12
+      ? `<b>Oscilla quanto ${nome}.</b>`
+      : `<b>Oscilla ${n1(r)} volte ${nome}.</b>`;
+    const dd = Math.abs(mio.dd) - Math.abs(b2.dd);
+    frasi.push(`${quanto} Volatilit&agrave; ${n1(mio.vol)}% contro ${n1(b2.vol)}%; nella discesa peggiore ha perso `
+      + `${Math.abs(dd) < 1 ? "quanto lui" : `${n1(Math.abs(dd))} punti ${dd > 0 ? "in pi&ugrave;" : "in meno"}`} `
+      + `(${n1(Math.abs(mio.dd))}% contro ${n1(Math.abs(b2.dd))}%).`);
+  }
+  if (Number.isFinite(mio.eff)) {
+    frasi.push(`<b>${mio.n} nomi, ma ${n1(mio.eff)} decisioni indipendenti.</b> Le posizioni si muovono `
+      + `abbastanza insieme da valere, per il rischio, poco pi&ugrave; di ${Math.round(mio.eff)} scommesse: `
+      + `il resto &egrave; la stessa scommessa scritta pi&ugrave; volte.`);
+  }
+  box.innerHTML = `<div class="rischio-frasi">${frasi.map(x => `<div>${x}</div>`).join("")}</div>`
+    + `<div class="muted" style="margin:12px 0 6px">Le righe da cui vengono, tutte misurate sulle stesse `
+    + `${pr.sedute} sedute:</div>`
+    + `<table class="tab-rischio"><thead><tr>
+      <th>se il libro fosse&hellip;</th><th>quanto oscilla<br><span class="muted">volatilit&agrave; annua</span></th>
+      <th>quanto &egrave; sceso<br><span class="muted">dal proprio massimo</span></th>
+      <th>per quante sedute<br><span class="muted">prima di recuperare</span></th>
+      <th>decisioni vere<br><span class="muted">su quante posizioni</span></th>
     </tr></thead><tbody>`
     + pr.profili.map((x, i) => `<tr class="${i === 0 ? "mio" : ""}${x.indice ? " idx" : ""}">
-        <td><b>${esc(x.nome)}</b></td>
+        <td>${i === 0 ? "<b>&egrave; (quello vero)</b>" : esc(x.nome.replace(/^Solo /, "solo ").replace(/^Stessi nomi, pesi uguali$/, "avesse gli stessi nomi a peso uguale").replace(/^Senza le prime tre/, "non avesse le prime tre"))}</td>
         <td>${fmtNum.format(Math.round(x.vol * 10) / 10)}%</td>
-        <td class="${x.dd < -30 ? "neg" : ""}">${pct(x.dd)}</td>
-        <td>${x.sotto}${x.recuperato ? "" : " <span class='neg'>non recuperato</span>"}</td>
-        <td>${x.eff != null && !x.indice ? `${fmtNum.format(Math.round(x.eff * 10) / 10)} <span class="muted">su ${x.n}</span>` : "—"}</td>
-        <td class="muted">${esc(x.nota)}</td></tr>`).join("")
+        <td class="${x.dd < mio.dd ? "neg" : ""}">${pct(x.dd)}</td>
+        <td>${x.recuperato ? `${x.sotto}` : `<span class="neg">${x.sotto}, non ancora recuperato</span>`}</td>
+        <td>${x.eff != null && !x.indice ? `${fmtNum.format(Math.round(x.eff * 10) / 10)} <span class="muted">su ${x.n}</span>` : "<span class=\"muted\">1 (&egrave; un indice)</span>"}</td></tr>`).join("")
     + `</tbody></table>`;
 
   /* la mappa: peso sull'orizzontale, contributo al rischio sul verticale. Sopra la diagonale

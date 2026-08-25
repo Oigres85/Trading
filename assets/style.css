@@ -1057,9 +1057,12 @@ tr.val-ok td { background: rgba(34,197,94,.07); }
    Nessuna barra 0-100 (respinte tre volte dal CEO): queste grandezze hanno unita' vere. */
 .tab-rischio { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 .tab-rischio th { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--muted); font-weight: 600; font-size: 11px; }
-.tab-rischio th:first-child, .tab-rischio th:last-child { text-align: left; }
+.tab-rischio th:first-child { text-align: left; }
+.tab-rischio th .muted { font-weight: 400; display: block; margin-top: 1px; }
+.rischio-frasi > div { padding: 9px 12px; margin-bottom: 6px; border-left: 3px solid var(--accent);
+  background: var(--bg-soft, rgba(127,127,127,.06)); border-radius: 0 6px 6px 0; line-height: 1.5; }
 .tab-rischio td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--border); font-family: var(--mono); }
-.tab-rischio td:first-child, .tab-rischio td:last-child { text-align: left; font-family: inherit; }
+.tab-rischio td:first-child { text-align: left; font-family: inherit; }
 .tab-rischio tr.mio td { background: color-mix(in srgb, var(--blue) 12%, transparent); }
 .tab-rischio tr.idx td { color: var(--muted); }
 .tab-rischio tr.idx td:first-child { color: var(--text); }
