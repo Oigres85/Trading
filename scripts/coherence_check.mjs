@@ -545,6 +545,7 @@ c13_seduteMiste(testo, ctx);
 c14_codaAZero(testo);
 c15_numeriNellaTestata(testo, ctx);
 c16_stessoIntervalloDueVolte(testo);
+c17_verdettiSenzaRegola(testo);
 
 /* ---------- C16: la STESSA grandezza scritta con due valori diversi ----------
    ⚠⚠ Classe trovata sul campo, non teorizzata: il CEO incolla un pacchetto e dentro c'e' il
@@ -623,6 +624,59 @@ function c16_stessoIntervalloDueVolte(t) {
   ok(`C16 · ${confronti} serie con l'intervallo scritto in due blocchi, tutte concordi`);
 }
 
+/* ---------- C17: un giudizio nostro senza il metro accanto ----------
+   ⚠⚠ La testata B2 promette all'LLM che il pacchetto non gli consegna giudizi calcolati da noi.
+   Non era vero: il payload portava MacroQuant "Rallentamento", che e' la MEDIA di sette
+   punteggi 0-100 nostri — cioe' esattamente la cosa che B2 dichiara rimossa, nella riga che si
+   chiude con "Non partire da una media". In v337 avevo tolto il numero e tenuto l'etichetta
+   credendola innocua: sbagliato di grado, perche' l'etichetta e' la stessa media arrotondata in
+   tre caselle e per giunta NASCONDE di venirne.
+   Altri due giudizi ("Sopravvalutazione" su 29,5×, "Mercato del Credito Rilassato") uscivano
+   nudi: la banda che li produce stava nel codice o su un'altra riga.
+
+   ⚠ QUESTO DETECTOR E' DELIBERATAMENTE STRETTO. La lezione di C9 e' costata cara — 7 falsi
+   positivi su 9 frasi fattuali — e un detector che grida su cose giuste si impara a ignorare.
+   Quindi niente euristiche sul linguaggio: una LISTA ESPLICITA di etichette che sono nostre,
+   costruita guardando il pacchetto vero, e una lista altrettanto esplicita di marcatori che
+   contano come regola. Se nasce un'etichetta nuova va aggiunta qui a mano, ed e' voluto. */
+function c17_verdettiSenzaRegola(t) {
+  /* etichette che CALCOLIAMO NOI e stampiamo come giudizio */
+  const NOSTRE = ["Sopravvalutazione", "Valutazione elevata", "Valutazione normale",
+    "Mercato del Credito Rilassato", "Mercato del Credito Attenzione",
+    "Mercato del Credito Stress", "Mercato del Credito Crisi",
+    "(Elevato)", "Tensione moderata", "Tensione elevata"];
+  /* cio' che vale come metro scritto accanto */
+  const METRO = ["etichetta nostra", "bande di lettura", "soglia di lettura", "soglia",
+    "media storica", "confine a"];
+  /* il composito non deve rientrare: e' un giudizio che nessuna banda puo' rendere onesto,
+     perche' la sua "regola" e' la media di altri sette giudizi nostri */
+  for (const vietata of ["MacroQuant", "Espansione", "Rallentamento", "Contrazione"]) {
+    const riga = t.split("\n").find((x) => x.includes(vietata));
+    if (riga && !/NON e' (piu' )?nel pacchetto/.test(riga))
+      flag("C17", `il composito e' rientrato nel payload ("${vietata}"): e' la media di sette `
+        + `punteggi 0-100 nostri, cioe' proprio cio' che B2 dichiara rimosso nella riga che si `
+        + `chiude con "Non partire da una media". Riga: ${riga.slice(0, 120)}`);
+  }
+  let visti = 0;
+  for (const riga of t.split("\n")) {
+    for (const et of NOSTRE) {
+      if (!riga.includes(et)) continue;
+      visti++;
+      if (!METRO.some((m) => riga.includes(m)))
+        flag("C17", `"${et}" e' un giudizio nostro consegnato senza la banda che lo produce. `
+          + `B2 promette all'LLM che ogni etichetta porta il proprio metro NELLA STESSA RIGA, e `
+          + `gli chiede di segnalare i giudizi nudi: questo lo troverebbe lui. Riga: ${riga.slice(0, 120)}`);
+    }
+  }
+  if (visti < 3) {
+    flag("C17", `viste solo ${visti} etichette nostre nel payload: il detector non sta misurando. `
+      + `O sono cambiate le stringhe, o il pacchetto non porta piu' quelle righe. Un detector muto `
+      + `si legge come una conferma.`);
+    return;
+  }
+  ok(`C17 · ${visti} giudizi nostri nel payload, tutti con la propria banda accanto; nessun composito`);
+}
+
 /* ⚠⚠ v329 — GLI ALTRI DUE PACCHETTI. Non tutti i detector hanno senso fuori dal macro (C12 e'
    la ricevuta di un taglio che riguarda solo quello, C13 parla del book), ma quelli che
    controllano la FORMA del testo — istruzioni nella coda, rimandi a sezioni inesistenti,
@@ -645,4 +699,4 @@ if (PROBLEMI.length) {
   PROBLEMI.forEach((p, i) => console.log(`  ${i + 1}. [${p.classe}] ${p.msg}\n`));
   process.exit(1);
 }
-console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 16 classi, su ${1 + (altri || []).length} pacchetti — nessuna incoerenza interna`);
+console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 17 classi, su ${1 + (altri || []).length} pacchetti — nessuna incoerenza interna`);

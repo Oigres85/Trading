@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "363";
+const BUILD_VERSION = "364";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8129,7 +8129,7 @@ function buildPrompt() {
      stile BCA"). Pubblicarlo su 0-100 accanto a valori veri lo faceva sembrare una misura.
      L'etichetta ("Espansione"/"Rallentamento"/"Contrazione") e' una classificazione dichiarata
      ed e' cio' che resta leggibile senza fingere una precisione a due cifre. */
-  if (m.macroquant) lines.push(`- MacroQuant (ciclo economico, riproduzione stile BCA dai fattori macro pubblici): ${m.macroquant.label}`);
+  /* v364: nessuna riga MacroQuant nel payload — vedi la nota qui sopra. Sulla dashboard resta. */
   /* ⚠ v264 — "5/10 attivi (50% RISCHIO RIBASSISTA)" ERA UN CONTEGGIO TRAVESTITO DA PROBABILITA'.
      Cinque campanelli su dieci non fanno il 50% di probabilita' di un mercato orso: fanno cinque
      campanelli su dieci. Chiamare percentuale il rapporto fra acceso e totale gli da' l'autorita'
@@ -8243,7 +8243,7 @@ function buildPrompt() {
   }
   if (m.systemic_risk) {
     const sr = m.systemic_risk;
-    lines.push(`- Rischio Sistemico & Credito (proxy CDS): HY OAS ${sr.hy_oas}% (${signTxt(sr.hy_chg_1m)} 1m), IG OAS ${sr.ig_oas ?? "—"}% (ICE BofA US Corporate, indice IG AMPIO · ${sr.ig_chg_1m != null ? signTxt(sr.ig_chg_1m) : "—"} 1m), HY/IG ${sr.hy_ig ?? "—"}×${sr.stlfsi != null ? `, stress finanziario St.Louis ${signTxt(sr.stlfsi)}` : ""} — ${sr.status}`);
+    lines.push(`- Rischio Sistemico & Credito (proxy CDS): HY OAS ${sr.hy_oas}% (${signTxt(sr.hy_chg_1m)} 1m), IG OAS ${sr.ig_oas ?? "—"}% (ICE BofA US Corporate, indice IG AMPIO · ${sr.ig_chg_1m != null ? signTxt(sr.ig_chg_1m) : "—"} 1m), HY/IG ${sr.hy_ig ?? "—"}×${sr.stlfsi != null ? `, stress finanziario St.Louis ${signTxt(sr.stlfsi)}` : ""} — ${sr.status} [etichetta nostra, dalle bande sull'HY OAS: sotto 4% rilassato, 4-5% attenzione, 5-7% stress, oltre 7% crisi.]`);
   }
   /* v259 — "Istituzionali VS Retail" fuori dal payload: stessa ragione del sentiment
      globale — e' una media di SMC indici, VIX term, HY/IG e put/call, tutti gia' pubblicati. */
@@ -8412,7 +8412,7 @@ function buildPrompt() {
   }
   if (m.sp500_pe) {
     const cf = m.sp500_pe.carried ? `, ⚠ CARRY-FORWARD dal run precedente${m.sp500_pe.fetched_at || m.sp500_pe.date ? ` (rilevato ${String(m.sp500_pe.fetched_at || m.sp500_pe.date).slice(0, 10)})` : ""} — fonte irraggiungibile: dato DATATO` : "";
-    let peLine = `- P/E Ratio S&P 500 [TRAILING, fonte: ${m.sp500_pe.source || "FRED/multpl"}${cf}]: ${m.sp500_pe.current}× (${m.sp500_pe.label})${m.sp500_pe.avg_10y != null ? ` · media 10A ${m.sp500_pe.avg_10y}×` : ""}${m.sp500_pe.pct_rank != null ? ` · percentile storico ${m.sp500_pe.pct_rank}°` : ""}`;
+    let peLine = `- P/E Ratio S&P 500 [TRAILING, fonte: ${m.sp500_pe.source || "FRED/multpl"}${cf}]: ${m.sp500_pe.current}× (${m.sp500_pe.label} — etichetta nostra, confine a 25× per "sopravvalutazione" e 20× per "elevata")${m.sp500_pe.avg_10y != null ? ` · media 10A ${m.sp500_pe.avg_10y}×` : ""}${m.sp500_pe.pct_rank != null ? ` · percentile storico ${m.sp500_pe.pct_rank}°` : ""}`;
     if (m.sp500_pe.nasdaq_pe) peLine += ` · Nasdaq 100 (QQQ) P/E: ${m.sp500_pe.nasdaq_pe}× (tech solitamente a premio; >35× = valutazioni tese)`;
     lines.push(peLine);
   }
