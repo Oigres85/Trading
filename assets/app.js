@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "366";
+const BUILD_VERSION = "367";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3264,6 +3264,7 @@ function renderMacroGrafici() {
   attivaHoverGrafici();
   renderIndicatori();   // v215 — le 27 scatole diventano una classifica sola
   renderRischio();      // v360 — il rischio del libro e il suo confronto
+  renderCredito();      // v367 — il debito del libro, al posto del CDS
   // v235 — ORA le schede esistono: si misura e si impacca
   impaccaGriglia(document.querySelector(".shell-main"));
 }
@@ -4979,6 +4980,91 @@ function notaConDettaglio(nota, cadenza) {
    grandezze hanno unita' vere (percentuali, sedute, conteggi) e si leggono meglio nude.
    ⚠ La colonna "Il tuo libro" e' evidenziata: fra sei righe di numeri simili, sapere quale sia
    la propria richiede un colpo d'occhio, non una lettura. */
+/* ═══ v367 — IL DEBITO DEL LIBRO ═══════════════════════════════════════════════════════════
+   Il CEO ha chiesto i CDS sul debito che le societa' accendono per investire. I CDS single-name
+   sono a pagamento (TRACE risponde 401 senza credenziali) e un proxy travestito da quotazione
+   sarebbe peggio di non averlo. Qui ci sono le righe di bilancio che quello spread misura.
+   ⚠ Forma di v363, che il CEO aveva respinto nella prima stesura: PRIMA le conclusioni
+   calcolate, POI la tabella come prova. Una tabella nuda e' materiale grezzo, non informazione. */
+function renderCredito() {
+  const box = $("#credito-tabella"); if (!box) return;
+  const nota = $("#credito-note");
+  const righe = [...((DATA && DATA.watchlist) || [])]
+    .filter((r) => r && r.ticker && r.credito && numero(r.controvalore) > 0)
+    .map((r) => ({
+      tk: r.ticker, nome: r.name || r.ticker, peso: numero(r.controvalore) || 0,
+      cop: r.credito.copertura, oneri: r.credito.oneri_ttm,
+      var4: r.credito.oneri_var_4trim_pct,
+      corrente: r.credito.debito_corrente,
+      cassa: (r.combustione || {}).cassa,
+      /* ⚠ v367 — LA VALUTA DEI BILANCI, non quella della quotazione. SK hynix riporta in won
+         e quota come ADR in dollari: senza questa etichetta la tabella metteva "833,1 mld" di
+         oneri accanto a "1,5 mld" invitando a confrontarli. Sono la stessa classe di guaio che
+         scrub_cross_currency_stats ferma sulle stats dal 2024. */
+      val: r.credito.valuta || null,
+      /* materialita': un costo del debito che raddoppia non e' una notizia se il debito e'
+         irrilevante per l'azienda. GOOGL apriva la frase con +793,7% avendo copertura 134×. */
+      conta: r.credito.copertura == null || Math.abs(r.credito.copertura) < 10,
+    }))
+    .filter((r) => r.cop != null || r.oneri);
+  if (!righe.length) {
+    box.innerHTML = `<div class="muted">Nessun dato di credito ancora: il blocco arriva col prossimo `
+      + `aggiornamento della pipeline. Finche' non c'e', questa sezione tace invece di stimare.</div>`;
+    if (nota) nota.textContent = "";
+    return;
+  }
+  const n1 = (v) => fmtNum.format(Math.round(v * 10) / 10);
+  const M = (v) => v == null ? "—"
+    : Math.abs(v) >= 1e9 ? `${n1(v / 1e9)} mld` : `${fmtNum.format(Math.round(v / 1e6))} mln`;
+  const scoperti = righe.filter((r) => r.cop != null && r.cop < 1);
+  const inSecca = righe.filter((r) => r.corrente != null && r.cassa != null && r.cassa < r.corrente);
+  const acceleranti = righe.filter((r) => r.var4 != null && r.var4 >= 25 && r.var4 < 1000 && r.conta)
+    .sort((a, b) => b.var4 - a.var4);
+  const frasi = [];
+  frasi.push(scoperti.length
+    ? `<b>${scoperti.length} ${scoperti.length === 1 ? "nome non copre" : "nomi non coprono"} gli interessi con la gestione operativa:</b> `
+      + `${scoperti.map((r) => `${esc(r.tk)} (${r.cop < 0 ? "EBIT negativo" : `${n1(r.cop)}×`})`).join(", ")}. `
+      + `Gli oneri li pagano con cassa, debito nuovo o nuove azioni — non con quello che guadagnano.`
+    : `<b>Tutti i nomi del libro coprono gli interessi con la gestione operativa.</b> `
+      + `La copertura piu' bassa e' ${n1(Math.min(...righe.filter((r) => r.cop != null).map((r) => r.cop)))}×.`);
+  if (inSecca.length)
+    frasi.push(`<b>${inSecca.length} ${inSecca.length === 1 ? "nome ha" : "nomi hanno"} meno cassa del debito che scade entro l'anno:</b> `
+      + `${inSecca.map((r) => `${esc(r.tk)} (${M(r.cassa)} contro ${M(r.corrente)})`).join(", ")}. `
+      + `Il rifinanziamento non e' un'ipotesi, e' un passaggio obbligato.`);
+  if (acceleranti.length)
+    frasi.push(`<b>Il costo del debito accelera su ${acceleranti.length} ${acceleranti.length === 1 ? "nome" : "nomi"}:</b> `
+      + `${acceleranti.slice(0, 3).map((r) => `${esc(r.tk)} ${signTxt(r.var4)} in quattro trimestri`).join(", ")}. `
+      + `Il livello e il verso sono due fatti diversi: qui conta il secondo.`);
+  righe.sort((a, b) => (a.cop == null ? 1 : b.cop == null ? -1 : a.cop - b.cop));
+  box.innerHTML = `<div class="rischio-frasi">${frasi.map((x) => `<div>${x}</div>`).join("")}</div>`
+    + `<div class="muted" style="margin:12px 0 6px">Le righe da cui vengono:</div>`
+    + `<table class="tab-rischio"><thead><tr>
+        <th>titolo</th>
+        <th>quante volte l'EBIT<br><span class="muted">copre gli interessi</span></th>
+        <th>oneri finanziari<br><span class="muted">ultimi 12 mesi</span></th>
+        <th>come sta cambiando<br><span class="muted">in 4 trimestri</span></th>
+        <th>debito entro 12 mesi<br><span class="muted">contro la cassa</span></th>
+      </tr></thead><tbody>`
+    + righe.map((r) => `<tr>
+        <td><b>${esc(r.tk)}</b> <span class="muted">${esc(r.nome.slice(0, 22))}</span></td>
+        <td class="${r.cop != null && r.cop < 1 ? "neg" : ""}">${r.cop == null ? "—" : r.cop < 0 ? "non copre" : `${n1(r.cop)}×`}</td>
+        <td>${M(r.oneri)}${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
+        <td class="${r.var4 != null && r.var4 >= 25 && r.conta ? "neg" : ""}">${r.var4 == null || r.var4 <= -100 ? "—" : signTxt(r.var4)}</td>
+        <td class="${r.corrente != null && r.cassa != null && r.cassa < r.corrente ? "neg" : ""}">${M(r.corrente)}<span class="muted"> vs ${M(r.cassa)}</span>${r.val && r.val !== "USD" ? ` <span class="neg">${esc(r.val)}</span>` : ""}</td>
+      </tr>`).join("")
+    + `</tbody></table>`;
+  const altreValute = [...new Set(righe.filter((r) => r.val && r.val !== "USD").map((r) => r.val))];
+  if (nota) nota.innerHTML = (altreValute.length
+      ? `<b>&#9888; Importi in valuta del bilancio, non del prezzo:</b> ${altreValute.map(esc).join(", ")} `
+        + `su ${righe.filter((r) => r.val && r.val !== "USD").map((r) => esc(r.tk)).join(", ")} — `
+        + `le cifre assolute di quelle righe NON si confrontano con le altre. I rapporti (copertura, `
+        + `variazione) si confrontano, perche' numeratore e denominatore stanno nella stessa valuta.<br>`
+      : "") + `Voci di conto economico e stato patrimoniale trimestrali, di fonte aggregatore: `
+    + `per il bilancio che conta vale il deposito della societa'. <b>Non e' un CDS</b> — lo spread su singolo `
+    + `nome e' un dato a pagamento. La copertura e' EBIT diviso oneri finanziari: sotto 1 la gestione non basta, `
+    + `sotto 0 non copre nulla. &#9888; Sono fatti sul passato: non dicono se il rifinanziamento avverra' e a che prezzo.`;
+}
+
 function renderRischio() {
   const box = $("#rischio-tabella"); if (!box) return;
   const pr = profiliRischio();
@@ -9493,6 +9579,9 @@ function fattiTitolo(tk) {
                       ps: numero((riga.stats || {}).ps),
                       evS: numero((riga.stats || {}).ev_s),
                       comb: riga.combustione || null,
+                      cred: riga.credito || null,
+                      fuoriMercato: riga.fuori_mercato || null,
+                      shortFlusso: riga.short_flusso || null,
                       debtEquity: numero((riga.stats || {}).debt_to_equity),
                       shortFloat: numero((riga.stats || {}).short_float),
                       capMercato: numero((riga.stats || {}).market_cap),
@@ -10588,6 +10677,88 @@ function datiNostriDelTitolo(tk) {
         + `${c.cashflow_al ? ` fino al ${c.cashflow_al}` : ""}]: ${pezzi.join(" · ")}`
         + `${flussi.length ? `. Su dodici mesi: ${flussi.join(" · ")}` : ""}.${origine}${quanto}${dil}`
         + ` ⚠ Voci di bilancio dall'aggregatore, non dal filing: per il bilancio che conta vale il deposito della societa'.`);
+    }
+
+    /* ⚠⚠ v367 — AL POSTO DEL CDS, I FATTI CHE IL CDS PREZZA.
+       Il CEO ha chiesto i CDS sul debito acceso per investire. Verificato: i single-name sono
+       Markit/ICE a pagamento, e TRACE risponde 401 senza credenziali. Non c'e' un CDS gratuito,
+       e un proxy travestito da quotazione sarebbe peggio di non averlo — il pacchetto lo dice.
+       Quello che si puo' dare sono le righe di bilancio che quello spread misura, e su un nome
+       che costruisce a debito parlano da sole: su CRWV oneri finanziari passati da 267 a 536
+       milioni per trimestre in un anno, 1,5 miliardi su dodici mesi, contro un EBIT di -101. */
+    if (t.cred && (t.cred.oneri_ttm != null || t.cred.copertura != null)) {
+      const c = t.cred;
+      const M = (v) => v == null ? null
+        : Math.abs(v) >= 1e9 ? `${fmtNum.format(Math.round(v / 1e8) / 10)} mld`
+        : `${fmtNum.format(Math.round(v / 1e6))} milioni`;
+      const pezzi = [];
+      if (c.oneri_ttm != null) pezzi.push(`oneri finanziari ${M(c.oneri_ttm)} su ${c.trimestri || "?"} trimestri`);
+      if (c.ebit_ttm != null) pezzi.push(`EBIT ${M(c.ebit_ttm)}`);
+      let cop = "";
+      if (c.copertura != null) {
+        cop = c.copertura < 0
+          ? ` COPERTURA DEGLI INTERESSI NEGATIVA (${fmtNum.format(c.copertura)}×): la gestione operativa `
+            + `non copre nessuna parte degli oneri, che vengono pagati con cassa, debito nuovo o nuove azioni.`
+          : c.copertura < 1.5
+            ? ` Copertura degli interessi ${fmtNum.format(c.copertura)}×: l'EBIT copre gli oneri di poco o non del tutto.`
+            : ` Copertura degli interessi ${fmtNum.format(c.copertura >= 10 ? Math.round(c.copertura) : c.copertura)}×.`;
+      }
+      let verso = "";
+      if (c.oneri_var_4trim_pct != null && Array.isArray(c.oneri_trim) && c.oneri_trim.length >= 2) {
+        const t4 = c.oneri_trim.map((x) => `${fmtNum.format(Math.round(x / 1e6))}`).join(" → ");
+        verso = ` Il COSTO del debito per trimestre: ${t4} milioni (${signTxt(c.oneri_var_4trim_pct)} in quattro trimestri) `
+          + `— il livello e il verso sono due fatti diversi.`;
+      }
+      let scad = "";
+      if (c.debito_corrente != null || c.debito_lungo != null) {
+        scad = ` Scadenze: ${c.debito_corrente != null ? `entro 12 mesi ${M(c.debito_corrente)}` : "quota corrente n.d."}`
+          + `${c.debito_lungo != null ? `, oltre ${M(c.debito_lungo)}` : ""}`;
+        const cassa = t.comb && t.comb.cassa;
+        if (c.debito_corrente != null && cassa != null)
+          scad += cassa < c.debito_corrente
+            ? `. La cassa (${M(cassa)}) e' INFERIORE al debito in scadenza entro l'anno.`
+            : `. La cassa (${M(cassa)}) copre il debito in scadenza entro l'anno.`;
+        else scad += ".";
+      }
+      L.push(`- CREDITO [conto economico al ${c.conto_al || "n.d."}]: ${pezzi.join(" · ")}.${cop}${verso}${scad}`
+        + ` ⚠ NON e' un CDS: lo spread CDS su singolo nome e' un dato a pagamento e non e' in questo`
+        + ` sistema. Queste sono le righe di bilancio che quello spread misura, di fonte aggregatore.`);
+    }
+
+    /* ⚠⚠ v367 — FLUSSO FUORI DAI MERCATI REGOLAMENTATI (FINRA), chiesto come "dark pool".
+       ⚠ ATS e OTC non-ATS sono DUE COSE DIVERSE e confonderle e' l'errore classico su questo
+       dato: gli ATS sono i dark pool veri, l'OTC non-ATS sono internalizzatori e wholesaler,
+       cioe' dove finisce gran parte del flusso AL DETTAGLIO. Una quota alta NON e' accumulazione
+       istituzionale — spesso e' il contrario. Restano separate, e il pacchetto lo dichiara. */
+    if (t.fuoriMercato && Array.isArray(t.fuoriMercato.settimane) && t.fuoriMercato.settimane.length) {
+      const fm = t.fuoriMercato;
+      const piene = fm.settimane.filter((x) => !x.incompleta);
+      const Mi = (v) => `${fmtNum.format(Math.round(v / 1e5) / 10)}M`;
+      const righe = piene.slice(-4).map((x) => `${x.w}: ATS ${Mi(x.ats)}, fuori borsa non-ATS ${Mi(x.otc)}`);
+      let quota = "";
+      if (piene.length >= 2) {
+        const a2 = piene[piene.length - 1], b2 = piene[0];
+        const qa = a2.ats / (a2.ats + a2.otc) * 100, qb = b2.ats / (b2.ats + b2.otc) * 100;
+        quota = ` Quota ATS sul totale fuori borsa: ${fmtNum.format(Math.round(qa * 10) / 10)}% nell'ultima settimana `
+          + `contro ${fmtNum.format(Math.round(qb * 10) / 10)}% di ${piene.length - 1} settimane prima.`;
+      }
+      L.push(`- FLUSSO FUORI DAI MERCATI REGOLAMENTATI (FINRA, settimanale): ${righe.join(" · ")}.${quota}`
+        + `${fm.incomplete ? ` ⚠ ${fm.incomplete} settimana/e scartata/e perche' FINRA ne ha pubblicato solo meta' (una`
+          + ` delle due voci a zero mentre l'altra e' piena non e' una misura, e' una riga mancante).` : ""}`
+        + ` ⚠ DUE COSE DIVERSE: gli ATS sono i dark pool registrati; il "fuori borsa non-ATS" sono`
+        + ` internalizzatori e wholesaler, dove finisce gran parte del flusso AL DETTAGLIO — una quota`
+        + ` alta li' non e' accumulazione istituzionale. ⚠ FINRA pubblica con circa tre settimane di`
+        + ` ritardo: questi numeri non descrivono la settimana in corso.`);
+    }
+
+    if (t.shortFlusso && Array.isArray(t.shortFlusso.serie) && t.shortFlusso.serie.length) {
+      const sf = t.shortFlusso;
+      const u = sf.serie[sf.serie.length - 1];
+      L.push(`- VOLUME VENDUTO ALLO SCOPERTO (FINRA, giornaliero): ${fmtNum.format(u.pct)}% del volume del `
+        + `${u.d}, media ${fmtNum.format(sf.media_pct)}% sulle ultime ${sf.serie.length} sedute. `
+        + `⚠ NON e' lo short interest: quello e' la posizione aperta, questo e' il FLUSSO di una giornata e `
+        + `comprende il market making. Sui titoli liquidi una quota intorno alla meta' del volume e' ordinaria, `
+        + `quindi conta lo scostamento dalla propria media, non il livello.`);
     }
 
     /* utile atteso NEGATIVO: non esiste un multiplo, esiste una perdita attesa */

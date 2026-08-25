@@ -4954,6 +4954,119 @@ check("v365 · senza dati di bilancio il blocco tace, non stampa un riquadro vuo
     if (out.includes("COMBUSTIONE DI CASSA")) return no("stampa il riquadro senza avere i dati");
     return true;`));
 
+/* ---------- v367: credito (al posto del CDS) e flusso fuori mercato ----------
+   Il CEO ha chiesto i CDS sul debito acceso per investire e i movimenti nei dark pool.
+   Verificato con le fonti: i CDS single-name sono a pagamento e TRACE risponde 401, quindi il
+   pacchetto NON finge di averli e dichiara cosa sta dando al loro posto. FINRA invece pubblica
+   ATS e OTC non-ATS gratis, e il volume short giornaliero.
+   Questi check presidiano i due modi in cui questi blocchi possono mentire. */
+
+check("v367 · il credito non si spaccia per un CDS, e dichiara il verso oltre al livello",
+  conCombEsito(null, {}, `
+    const r2 = DATA.watchlist.find(x => x.ticker === "CRWV") || DATA.watchlist[0];
+    r2.credito = { oneri_ttm: 1.5e9, ebit_ttm: -1.01e8, trimestri: 4, conto_al: "2026-03-31",
+      copertura: -0.07, oneri_var_4trim_pct: 100.8, oneri_trim: [267e6, 311e6, 388e6, 536e6],
+      debito_corrente: 7.5e9, debito_lungo: 17.3e9 };
+    r2.combustione = { cassa: 2.2e9 };
+    const o2 = buildPromptTicker(r2.ticker);
+    if (!o2.includes("- CREDITO")) return "il blocco credito non compare";
+    if (!/NON e' un CDS/.test(o2)) return "non dichiara che non e' un CDS: chi legge puo' crederlo uno spread";
+    if (!/COPERTURA DEGLI INTERESSI NEGATIVA/.test(o2)) return "copertura negativa non segnalata come tale";
+    if (!/267 → 311 → 388 → 536/.test(o2)) return "manca il VERSO degli oneri: il livello da solo non dice che accelera";
+    if (!/INFERIORE al debito in scadenza/.test(o2)) return "cassa sotto il debito corrente non dichiarata";
+    return true;`));
+
+/* ⚠ L'ERRORE CLASSICO SU QUESTO DATO, e il motivo per cui il blocco esiste in questa forma:
+   ATS (dark pool registrati) e OTC non-ATS (internalizzatori, wholesaler) NON sono la stessa
+   cosa. Gran parte del flusso al DETTAGLIO stampa fuori borsa non-ATS: leggere una quota alta
+   come "accumulazione istituzionale" e' esattamente l'allucinazione che il pacchetto deve
+   impedire, non alimentare. */
+check("v367 · dark pool: ATS e non-ATS restano separati, col ritardo dichiarato",
+  conCombEsito(null, {}, `
+    const r2 = DATA.watchlist.find(x => x.ticker === "CRWV") || DATA.watchlist[0];
+    r2.fuori_mercato = { settimane: [
+      { w: "2026-07-13", ats: 25.7e6, otc: 42.3e6 }, { w: "2026-07-20", ats: 23.7e6, otc: 36.1e6 },
+      { w: "2026-07-27", ats: 32e6, otc: 42.7e6 }, { w: "2026-08-03", ats: 29e6, otc: 34.7e6 }],
+      ultima: "2026-08-03", incomplete: 0 };
+    const o2 = buildPromptTicker(r2.ticker);
+    if (!o2.includes("FLUSSO FUORI DAI MERCATI REGOLAMENTATI")) return "il blocco non compare";
+    if (!/DUE COSE DIVERSE/.test(o2)) return "non distingue ATS da non-ATS: e' l'errore classico su questo dato";
+    if (!/non e' accumulazione istituzionale/.test(o2)) return "non smentisce la lettura sbagliata piu' comune";
+    if (!/tre settimane di ritardo/.test(o2)) return "non dichiara il ritardo di pubblicazione: sembra il flusso di oggi";
+    return true;`));
+
+/* ⚠ UNO ZERO NON E' UNA MISURA. Misurato su NVDA: la settimana del 2026-07-06 esce con ATS
+   pieno e OTC a zero — una riga che FINRA non ha pubblicato, non un flusso retail sparito.
+   Lasciata passare, quella settimana diventa una storia inventata da un buco. */
+check("v367 · una settimana pubblicata a meta' viene scartata e dichiarata, non usata",
+  conCombEsito(null, {}, `
+    const r2 = DATA.watchlist.find(x => x.ticker === "CRWV") || DATA.watchlist[0];
+    r2.fuori_mercato = { settimane: [
+      { w: "2026-07-13", ats: 25.7e6, otc: 42.3e6 },
+      { w: "2026-07-20", ats: 23.7e6, otc: 0, incompleta: true },
+      { w: "2026-08-03", ats: 29e6, otc: 34.7e6 }], ultima: "2026-08-03", incomplete: 1 };
+    const o2 = buildPromptTicker(r2.ticker);
+    if (/2026-07-20/.test(o2)) return "la settimana incompleta compare fra i numeri usabili";
+    if (!/pubblicato solo meta'/.test(o2)) return "lo scarto non e' dichiarato: sparisce una settimana senza dirlo";
+    return true;`));
+
+check("v367 · lo short di flusso non viene spacciato per short interest",
+  conCombEsito(null, {}, `
+    const r2 = DATA.watchlist.find(x => x.ticker === "CRWV") || DATA.watchlist[0];
+    r2.short_flusso = { serie: [{ d: "2026-08-21", pct: 52.6 }, { d: "2026-08-24", pct: 57 }],
+      ultimo_pct: 57, media_pct: 54.8 };
+    const o2 = buildPromptTicker(r2.ticker);
+    if (!o2.includes("VOLUME VENDUTO ALLO SCOPERTO")) return "il blocco non compare";
+    if (!/NON e' lo short interest/.test(o2)) return "non distingue il flusso dalla posizione aperta";
+    if (!/e' ordinaria/.test(o2)) return "non dice che meta' del volume e' normale sui titoli liquidi: il livello da solo allarma a vuoto";
+    return true;`));
+
+check("v367 · senza i dati FINRA i tre blocchi tacciono",
+  conCombEsito(null, {}, `
+    const r2 = DATA.watchlist.find(x => x.ticker === "CRWV") || DATA.watchlist[0];
+    r2.credito = null; r2.fuori_mercato = null; r2.short_flusso = null;
+    const o2 = buildPromptTicker(r2.ticker);
+    for (const b of ["- CREDITO", "FLUSSO FUORI DAI MERCATI", "VOLUME VENDUTO ALLO SCOPERTO"])
+      if (o2.includes(b)) return "stampa il blocco " + b + " senza avere i dati";
+    return true;`));
+
+/* ---------- v367: la sezione del credito non confronta valute diverse, ne' grida su cose
+   che non contano ----------
+   Trovati rendendo la sezione con i dati veri, non ragionandoci sopra:
+   · SK hynix riporta in KRW e quota come ADR in USD: la tabella metteva "833,1 mld" di oneri
+     accanto a "1,5 mld" invitando a confrontarli — la classe che scrub_cross_currency_stats
+     ferma sulle stats dal 2024, ricomparsa da una porta nuova;
+   · la frase sull'accelerazione del costo del debito apriva con GOOGL +793,7%, che ha copertura
+     134×: vera e materialmente fuorviante, perche' ordinare per variazione percentuale mette
+     davanti il nome a cui il debito non interessa;
+   · MU usciva con -100%, che non e' un calo: e' la voce sparita dal trimestre recente. */
+check("v367 · il credito etichetta le valute non-USD invece di lasciarle confrontare", (() => {
+  const b = bloccoDa(src, "function renderCredito", { max: 9000 });
+  if (!/val: r\.credito\.valuta/.test(b)) return no("la valuta del bilancio non entra piu' nella riga");
+  if (!/r\.val !== "USD"/.test(b)) return no("sparito il confronto con USD: le cifre in valuta locale tornano nude");
+  if (!/NON si confrontano con le altre/.test(b)) return no("la nota non avverte piu' che le cifre assolute non sono confrontabili");
+  return true;
+})());
+
+check("v367 · la frase sull'accelerazione esclude i nomi a cui il debito non interessa", (() => {
+  const b = bloccoDa(src, "function renderCredito", { max: 9000 });
+  const m = b.match(/const acceleranti = [^;]+;/);
+  if (!m) return no("sparita la selezione dei nomi con costo del debito in accelerazione");
+  if (!/r\.conta/.test(m[0])) return no("l'accelerazione non filtra piu' per materialita': GOOGL a 134× di copertura tornerebbe in testa");
+  if (!/r\.var4 < 1000/.test(m[0])) return no("nessun tetto sulla variazione: una voce comparsa dal nulla diventa la notizia principale");
+  const c = b.match(/conta: [^,]+,/);
+  if (!c || !/Math\.abs\(r\.credito\.copertura\) < 10/.test(c[0]))
+    return no("la soglia di materialita' non e' piu' la copertura: senza, 'conta' non misura niente");
+  return true;
+})());
+
+check("v367 · -100% e' un buco della fonte, non un calo del costo del debito", (() => {
+  const b = bloccoDa(src, "function renderCredito", { max: 9000 });
+  if (!/r\.var4 <= -100 \? "—"/.test(b))
+    return no("un -100% (voce sparita dal trimestre recente) viene ancora stampato come se fosse una variazione");
+  return true;
+})());
+
 /* ---------- meta v365: nessun check DOPO il conteggio ----------
    ⚠⚠ LA CLASSE PEGGIORE TROVATA FINORA, e l'ho prodotta io due volte in un giorno.
    La suite conta cosi':

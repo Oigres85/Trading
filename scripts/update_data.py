@@ -856,6 +856,165 @@ def _live_is_informative(lp, last_close):
     return lp is not None and last_close and abs(lp / last_close - 1) >= 1e-6
 
 
+# ═══ v367 — CREDITO E FLUSSO FUORI MERCATO ═══════════════════════════════════════════════
+# Il CEO ha chiesto i CDS sul debito che le societa' accendono per investire, e i movimenti nei
+# dark pool. Verificato con le fonti in mano, non a opinione:
+#   · CDS single-name: Markit/ICE, A PAGAMENTO. TRACE (obbligazioni societarie) risponde 401
+#     senza credenziali. Non c'e' modo gratuito di avere uno spread CDS, e inventarne un proxy
+#     travestito da quotazione sarebbe peggio di non averlo.
+#     Quello che si puo' avere sono i FATTI CHE IL CDS PREZZA, e sono tutti in bilancio.
+#   · Dark pool: FINRA pubblica ATS e OTC non-ATS per simbolo, settimanali, GRATIS e senza
+#     autenticazione. Piu' il volume short giornaliero, sempre gratis.
+
+_SHORT_CACHE = {}          # {data: {ticker: (short, totale)}} — scaricato una volta per run
+
+
+def _finra_short_giorno(giorno):
+    """Volume short di TUTTI i titoli per una giornata. Il file FINRA e' unico per data:
+    scaricarlo una volta e filtrarlo costa una richiesta invece di una per titolo."""
+    if giorno in _SHORT_CACHE:
+        return _SHORT_CACHE[giorno]
+    url = f"https://cdn.finra.org/equity/regsho/daily/CNMSshvol{giorno}.txt"
+    fuori = {}
+    try:
+        r = requests.get(url, timeout=20)
+        if r.status_code == 200 and "Symbol" in r.text[:200]:
+            for riga in r.text.splitlines()[1:]:
+                p = riga.split("|")
+                if len(p) < 5:
+                    continue
+                try:
+                    fuori[p[1]] = (float(p[2]), float(p[4]))
+                except ValueError:
+                    continue
+    except Exception:
+        pass
+    _SHORT_CACHE[giorno] = fuori
+    return fuori
+
+
+def short_volume(ticker, giorni=8):
+    """Quota di volume venduta allo scoperto negli ultimi giorni di contrattazione.
+    ⚠ NON e' lo short interest: quello e' la posizione aperta, questo e' il FLUSSO di una
+    giornata, e comprende il market making. Una quota alta non vuol dire "molti ribassisti"."""
+    oggi = datetime.now(timezone.utc).date()
+    serie = []
+    for d in range(1, giorni + 3):
+        g = oggi - timedelta(days=d)
+        if g.weekday() >= 5:
+            continue
+        dati = _finra_short_giorno(g.strftime("%Y%m%d")).get(ticker)
+        if dati and dati[1] > 0:
+            serie.append({"d": g.isoformat(), "pct": round(dati[0] / dati[1] * 100, 1)})
+        if len(serie) >= giorni:
+            break
+    if not serie:
+        return None
+    serie.reverse()
+    return {"serie": serie, "ultimo_pct": serie[-1]["pct"],
+            "media_pct": round(sum(x["pct"] for x in serie) / len(serie), 1)}
+
+
+def fuori_mercato(ticker, settimane=6):
+    """Azioni scambiate FUORI dai mercati regolamentati, da FINRA, per settimana.
+    ⚠⚠ DUE COSE DIVERSE, e confonderle e' l'errore classico su questo dato:
+      · ATS = i dark pool veri (sedi alternative registrate);
+      · OTC non-ATS = internalizzatori e wholesaler, cioe' dove finisce gran parte del flusso
+        AL DETTAGLIO. Una quota alta qui NON e' accumulazione istituzionale: spesso e' il
+        contrario. Vanno tenute separate, e il pacchetto lo dice."""
+    fine = datetime.now(timezone.utc).date()
+    inizio = fine - timedelta(weeks=settimane + 4)   # la pubblicazione ha ~3 settimane di ritardo
+    corpo = {"limit": 400,
+             "compareFilters": [{"fieldName": "issueSymbolIdentifier", "fieldValue": ticker, "compareType": "equal"}],
+             "dateRangeFilters": [{"fieldName": "weekStartDate",
+                                   "startDate": inizio.isoformat(), "endDate": fine.isoformat()}]}
+    try:
+        r = requests.post("https://api.finra.org/data/group/otcMarket/name/weeklySummary",
+                          json=corpo, timeout=25)
+        if r.status_code != 200 or not r.text.strip():
+            return None
+        righe = list(csv.DictReader(io.StringIO(r.text)))
+    except Exception:
+        return None
+    # i totali per simbolo sono le righe _SMBL; le _SMBL_FIRM sono lo stesso totale spezzato per sede
+    agg = {}
+    for x in righe:
+        tipo = x.get("summaryTypeCode") or ""
+        if not tipo.endswith("_SMBL"):
+            continue
+        sett = x.get("weekStartDate")
+        try:
+            q = float(x.get("totalWeeklyShareQuantity") or 0)
+        except ValueError:
+            continue
+        d = agg.setdefault(sett, {"ats": 0.0, "otc": 0.0})
+        if tipo.startswith("ATS"):
+            d["ats"] += q
+        elif tipo.startswith("OTC"):
+            d["otc"] += q
+    if not agg:
+        return None
+    sett = sorted(agg)[-settimane:]
+    fuori = []
+    for w in sett:
+        ats, otc = round(agg[w]["ats"]), round(agg[w]["otc"])
+        riga = {"w": w, "ats": ats, "otc": otc}
+        if (ats > 0) != (otc > 0):
+            riga["incompleta"] = True     # una delle due meta' non e' stata pubblicata
+        fuori.append(riga)
+    piene = [x for x in fuori if not x.get("incompleta")]
+    return {"settimane": fuori, "ultima": (piene[-1]["w"] if piene else sett[-1]),
+            "incomplete": sum(1 for x in fuori if x.get("incompleta"))}
+
+
+def credito(t):
+    """⚠⚠ AL POSTO DEL CDS, I FATTI CHE IL CDS PREZZA.
+    Su CoreWeave questi numeri dicono piu' di qualunque spread: oneri finanziari per trimestre
+    267 -> 311 -> 388 -> 536 milioni, cioe' RADDOPPIATI in un anno e 1,5 miliardi su dodici mesi,
+    contro un EBIT di -101 milioni. La gestione operativa non copre NESSUNA parte degli interessi,
+    e il costo del debito accelera mentre il debito serve a costruire.
+    Nessun modello: sono righe di conto economico e di stato patrimoniale."""
+    out = {}
+    try:
+        inc = t.quarterly_income_stmt
+    except Exception:
+        inc = None
+    try:
+        bs = t.quarterly_balance_sheet
+    except Exception:
+        bs = None
+    oneri, n_on, data_ce = _somma_trimestri(inc, "Interest Expense")
+    ebit, n_eb, _ = _somma_trimestri(inc, "EBIT")
+    if ebit is None:
+        ebit, n_eb, _ = _somma_trimestri(inc, "Operating Income")
+    if oneri is None and ebit is None:
+        return None
+    out["oneri_ttm"] = oneri
+    out["ebit_ttm"] = ebit
+    out["trimestri"] = min(n_on, n_eb) if (n_on and n_eb) else (n_on or n_eb)
+    out["conto_al"] = data_ce
+    if oneri and oneri > 0 and ebit is not None:
+        out["copertura"] = round(ebit / oneri, 2)     # <1 = non copre, <0 = non copre nulla
+    # il VERSO degli oneri: un costo del debito che accelera e' un fatto diverso dal suo livello
+    if inc is not None and getattr(inc, "empty", True) is False and "Interest Expense" in inc.index:
+        try:
+            s = inc.loc["Interest Expense"].dropna()
+            if len(s) >= 4:
+                rec, vec = float(s.iloc[0]), float(s.iloc[3])
+                if vec > 0:
+                    out["oneri_var_4trim_pct"] = round((rec / vec - 1) * 100, 1)
+                out["oneri_trim"] = [round(float(x)) for x in s.iloc[:4]][::-1]
+        except Exception:
+            pass
+    corr, _ = _riga_bilancio(bs, "Current Debt")
+    lungo, _ = _riga_bilancio(bs, "Long Term Debt")
+    if corr is not None:
+        out["debito_corrente"] = corr
+    if lungo is not None:
+        out["debito_lungo"] = lungo
+    return {k: v for k, v in out.items() if v is not None}
+
+
 def _riga_bilancio(df, *voci):
     """Prima voce presente nel DataFrame, colonna piu' recente. None se manca o e' NaN."""
     if df is None or getattr(df, "empty", True):
@@ -1284,20 +1443,44 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         # grandezza che non esiste, cioe' la classe che la regola C10 vieta. Il P/E su chi perde
         # non e' solo inutile, e' monotono nella direzione sbagliata (misurato: -47 -> -22 -> -11
         # mentre le perdite peggiorano), quindi il sostituto non e' un lusso.
+        # ⚠ v365 — il riquadro della combustione (vedi combustione() piu' sopra)
+        try:
+            _comb = combustione(t, stats.get("market_cap"), stats.get("buyback_yield"))
+            if _comb:
+                _comb["valuta"] = g("financialCurrency") or g("currency")
+        except Exception as _e:
+            log(f"  combustione {ticker}: {type(_e).__name__} {_e}")
+            _comb = None
+
+        # ⚠ v367 — credito (al posto del CDS) e flusso fuori mercato. Ogni fonte in un try
+        # suo: FINRA e' un servizio esterno, e un suo disservizio non deve far cadere il run.
+        try:
+            _cred = credito(t)
+            if _cred:
+                _cred["valuta"] = g("financialCurrency") or g("currency")
+        except Exception as _e:
+            log(f"  credito {ticker}: {type(_e).__name__} {_e}")
+            _cred = None
+        _fuori = _short = None
+        if not (ticker.startswith("^") or ticker.endswith("=F")):
+            try:
+                _fuori = fuori_mercato(ticker)
+            except Exception as _e:
+                log(f"  fuori mercato {ticker}: {type(_e).__name__} {_e}")
+            try:
+                _short = short_volume(ticker)
+            except Exception as _e:
+                log(f"  short volume {ticker}: {type(_e).__name__} {_e}")
+
+        # ADR con bilanci in valuta locale → via i rapporti prezzo-vs-bilancio (unità miste)
+        stats = scrub_cross_currency_stats(stats, g("financialCurrency"), g("currency"))
+        # ⚠ v367 — P/S ed EV/S DOPO la ripulitura cross-currency: se i bilanci sono in valuta
+        # locale e il prezzo in un'altra, revenue_fy e' gia' None e questi restano n.d. da soli.
         _mc, _rev = stats.get("market_cap"), stats.get("revenue_fy")
         _ev = stats.get("enterprise_value")
         stats["ps"] = round(_mc / _rev, 2) if (_mc and _rev and _rev > 0) else None
         stats["ev_s"] = round(_ev / _rev, 2) if (_ev and _rev and _rev > 0) else None
 
-        # ⚠ v365 — il riquadro della combustione (vedi combustione() piu' sopra)
-        try:
-            _comb = combustione(t, stats.get("market_cap"), stats.get("buyback_yield"))
-        except Exception as _e:
-            log(f"  combustione {ticker}: {type(_e).__name__} {_e}")
-            _comb = None
-
-        # ADR con bilanci in valuta locale → via i rapporti prezzo-vs-bilancio (unità miste)
-        stats = scrub_cross_currency_stats(stats, g("financialCurrency"), g("currency"))
         # sanity: un PEG negativo (utili o crescita attesa negativi) non è usabile nei modelli → n.d.
         if stats.get("peg") is not None and stats["peg"] <= 0:
             stats["peg"] = None
@@ -1467,6 +1650,9 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "sector": SECTOR_OVERRIDES.get(ticker) or info.get("sector") or "Altro",
         "stats": stats,
         "combustione": _comb,   # v365 — cassa, debito, flusso operativo, capex. None se la fonte non li da'.
+        "credito": _cred,       # v367 — al posto del CDS: oneri finanziari, copertura, scadenze.
+        "fuori_mercato": _fuori,# v367 — ATS (dark pool) e OTC non-ATS per settimana, FINRA.
+        "short_flusso": _short, # v367 — quota di volume venduta allo scoperto, FINRA, giornaliera.
         "tech_by_range": tech_by_range,
         "financials": financials,
         "fin_health": fin_health,

@@ -639,6 +639,25 @@ _sens100 = ud.sensibilita_macro(_t * 100, {"bench": ("B", "canale", _b)})
 check("v325 sensibilita': il beta non cambia se le chiusure arrivano in un'altra scala",
       _sens100 and abs(_sens100["bench"]["beta"] - _sens["bench"]["beta"]) < 0.01)
 
+# ⚠⚠ v367 — IL P/S DEVE ESSERE CALCOLATO DOPO LA RIPULITURA CROSS-CURRENCY.
+# Introdotto in v365 e gia' pubblicato con il difetto: lo calcolavo PRIMA, e su SK hynix
+# (bilanci in KRW, ADR quotato in USD) usciva capitalizzazione in dollari diviso ricavi in won.
+# E' la stessa classe che scrub_cross_currency_stats ferma sulle stats dal 2024, rientrata da
+# una porta nuova — e' per questo che il controllo e' sull'ORDINE e non su una lista di campi:
+# una lista da tenere allineata a mano si disallinea, l'ordine no.
+_SRC_UD = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+_i_scrub = _SRC_UD.find("stats = scrub_cross_currency_stats(")
+_i_ps = _SRC_UD.find('stats["ps"] =')
+check("v367 P/S ed EV/S calcolati DOPO la ripulitura cross-currency (SK hynix: KRW vs USD)",
+      _i_scrub > 0 and _i_ps > 0 and _i_ps > _i_scrub)
+# e la valuta dei bilanci deve finire nei blocchi nuovi, altrimenti la pagina confronta won e dollari
+check("v367 credito e combustione portano la valuta del BILANCIO, non quella del prezzo",
+      '_cred["valuta"] = g("financialCurrency")' in _SRC_UD
+      and '_comb["valuta"] = g("financialCurrency")' in _SRC_UD)
+# ⚠ uno zero mentre l'altra meta' e' piena non e' una misura: e' una riga che FINRA non ha pubblicato
+check("v367 le settimane FINRA pubblicate a meta' sono marcate incomplete, non usate",
+      '(ats > 0) != (otc > 0)' in _SRC_UD and '"incompleta"' in _SRC_UD)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)
