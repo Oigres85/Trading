@@ -1784,6 +1784,7 @@ function cadenzaDato(chiave, dataRilevazione) {
        suona di lunedi' su ogni serie giornaliera insegna a ignorarlo, e allora non serve piu'
        il giorno che serve davvero. */
     scaduto: c.passo === "giornaliero" ? sommaGiorniLavorativi(p, 2) < oggi : p < oggi,
+    passata: p < oggi,
     passo: c.passo, fonte: c.nome, nota: c.nota,
   };
 }
@@ -1797,8 +1798,13 @@ function rigaCadenza(chiave, dataRilevazione) {
   return (stessoGiorno
       ? `rilevazione ${it(c.rilevato)} (${c.eta} giorni fa)`
       : `riferito a ${it(c.rilevato)} · pubblicato ~${it(c.pubblicato)} (${c.eta} giorni fa)`)
-    + ` · prossimo atteso ${it(c.prossimo)}` +
-         (c.scaduto ? " ⚠ ERA ATTESO E NON È ARRIVATO" : "") + ` · ${c.fonte}, ${c.passo}`;
+    + (c.scaduto
+        ? ` · prossimo atteso ${it(c.prossimo)} ⚠ ERA ATTESO E NON È ARRIVATO`
+        : c.passata
+          ? ` · era atteso il ${it(c.prossimo)} e non è ancora arrivato, ma è dentro la tolleranza `
+            + `di ${c.passo === "giornaliero" ? "due giorni lavorativi" : "un giorno"}: nessun allarme`
+          : ` · prossimo atteso ${it(c.prossimo)}`)
+    + ` · ${c.fonte}, ${c.passo}`;
 }
 
 /* ═══ v253 — LE CARD DI MERCATO NON DICEVANO QUANDO SONO STATE RILEVATE ═══════════════
@@ -8618,13 +8624,15 @@ function buildHistoricalDigests() {
      succede niente. E lo stesso blocco etichettava "serie ~6M" una serie di 361 giorni.
      Ora la finestra si misura sulle DATE e l'etichetta si scrive dal periodo vero: se la densita'
      di una serie cambia, il numero resta quello che dichiara di essere. */
-  const serieStorica = (arr, valore, nome, unita, decimali, altoBasso) => {
+  const serieStorica = (arr, valore, nome, unita, decimali, altoBasso, rangeVero) => {
     const punti = Array.isArray(arr)
       ? arr.map(x => ({ d: x && x.d, v: dgFin(x && x.v) })).filter(x => x.v != null) : [];
     const h = punti.map(x => x.v);
     const v = dgFin(valore) != null ? dgFin(valore) : (h.length ? h[h.length - 1] : null);
     if (h.length < 30 || v == null) return;
     const pct = dgPercentile(h, v);
+    const rgGiu = rangeVero ? dgFin(rangeVero[0]) : null;
+    const rgSu = rangeVero ? dgFin(rangeVero[1]) : null;
     let nota = "";
     if (pct != null && altoBasso) nota = pct >= 80 ? ` (${altoBasso[0]})` : pct <= 20 ? ` (${altoBasso[1]})` : "";
     /* variazione a un mese contata sul CALENDARIO: l'ultima osservazione con almeno 30 giorni
@@ -8649,7 +8657,9 @@ function buildHistoricalDigests() {
       finestra = gg >= 640 ? ` (serie ~${Math.round(gg / 365)}A)` : ` (serie ~${Math.round(gg / 30)}M)`;
     }
     out.push({ label: nome + finestra, text:
-      `${dgTxt(v, unita, decimali)} · Δ1M ${signTxt(delta, "%")}${comeDelta} · range [${dgTxt(Math.min(...h), "", decimali)}–${dgTxt(Math.max(...h), "", decimali)}] su ${h.length} rilevazioni · percentile ${dgTxt(pct, "°", 0)}${nota}` });
+      `${dgTxt(v, unita, decimali)} · Δ1M ${signTxt(delta, "%")}${comeDelta} · ${rgGiu != null && rgSu != null
+        ? `range [${dgTxt(rgGiu, "", decimali)}–${dgTxt(rgSu, "", decimali)}] (serie giornaliera completa) · percentile ${dgTxt(pct, "°", 0)} sulle ${h.length} rilevazioni campionate qui`
+        : `range [${dgTxt(Math.min(...h), "", decimali)}–${dgTxt(Math.max(...h), "", decimali)}] su ${h.length} rilevazioni · percentile ${dgTxt(pct, "°", 0)}`}${nota}` });
   };
   const tassi = m.tassi || {}, st = tassi.storico || {}, mat = m.materie || {};
   /* ⚠⚠ v349 — IL VALORE VENIVA DA UN'ALTRA FONTE DELLA SERIE CHE LO DOVEVA COLLOCARE.
@@ -8666,9 +8676,11 @@ function buildHistoricalDigests() {
   serieStorica(st.a30, null, "Treasury 30A", "%", 2,
     ["parte lunga ai massimi: il mercato chiede premio a termine", "parte lunga ai minimi"]);
   serieStorica((mat.rame || {}).history, (mat.rame || {}).value, "Rame", " $/lb", 2,
-    ["input industriale ai massimi: entra nel deflatore e nel costo di costruzione dei data center", "input industriale ai minimi: domanda debole o offerta abbondante"]);
+    ["input industriale ai massimi: entra nel deflatore e nel costo di costruzione dei data center", "input industriale ai minimi: domanda debole o offerta abbondante"],
+    [(mat.rame || {}).min_1y, (mat.rame || {}).max_1y]);
   serieStorica((mat.petrolio || {}).history, (mat.petrolio || {}).value, "Petrolio WTI", " $", 2,
-    ["energia ai massimi: pressione sul deflatore e sul costo di esercizio", "energia ai minimi"]);
+    ["energia ai massimi: pressione sul deflatore e sul costo di esercizio", "energia ai minimi"],
+    [(mat.petrolio || {}).min_1y, (mat.petrolio || {}).max_1y]);
 
   /* v257 — CONTROVALORE E SHARPE DEL FONDO tolti dai digest: erano l'ultima traccia del
      portafoglio nel pacchetto, ed e' il CEO che l'ha vista incollandomi il prompt. */

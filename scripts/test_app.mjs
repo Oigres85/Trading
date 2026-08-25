@@ -4850,5 +4850,42 @@ check("v363 · nessun \"1 volte\": il rapporto ~1 si dice a parole", () => {
   return true;
 });
 
+/* ---------- v363: "prossimo" non si dice di una data passata ----------
+   ⚠ Trovato leggendo il pacchetto del CEO: due serie giornaliere annunciavano "prossimo atteso
+   24/08/2026" dentro un pacchetto datato 25/08. L'allarme non era rotto — la grazia di due
+   giorni lavorativi (v266/v271) stava facendo il suo mestiere — ma il testo prometteva un
+   futuro riferito a ieri. E' il danno di v350 ripetuto: chi trova una data storta smette di
+   fidarsi anche delle righe giuste. Ora lo stato intermedio si dice, e questo check impedisce
+   che "prossimo atteso" torni a coprire una data gia' passata. */
+check("v363 · nessun \"prossimo atteso\" riferito a una data gia' passata", suVeri(`
+  const p = buildPrompt();
+  const mData = p.match(/DATI AL (\\d{2})\\/(\\d{2})\\/(\\d{4})/);
+  if (!mData) return "il pacchetto non dichiara piu' la propria data: il confronto non e' possibile";
+  const oggi = new Date(mData[3] + "-" + mData[2] + "-" + mData[1]);
+  const passate = [];
+  for (const m of p.matchAll(/prossimo atteso (\\d{2})\\/(\\d{2})\\/(\\d{4})/g)) {
+    const d = new Date(m[3] + "-" + m[2] + "-" + m[1]);
+    if (d < oggi) passate.push(m[0] + " (" + Math.round((oggi - d) / 86400000) + " giorni fa)");
+  }
+  if (passate.length) return "\\"prossimo\\" detto di date passate: " + [...new Set(passate)].join(", ");
+  /* il detector deve aver visto qualcosa, altrimenti e' muto e si legge come una conferma */
+  const quante = [...p.matchAll(/prossimo atteso \\d{2}\\/\\d{2}\\/\\d{4}/g)].length;
+  if (quante < 3) return "solo " + quante + " righe con 'prossimo atteso': il check non sta misurando";
+  return true;`));
+
+/* Lo stato intermedio deve ESISTERE nel codice: senza, una data appena passata torna a
+   uscire come "prossimo", oppure — peggio — accende l'allarme dei dati mancanti su una
+   fonte puntuale, che e' l'errore che v266 e v271 hanno gia' pagato due volte. */
+check("v363 · esiste lo stato 'atteso, non ancora arrivato, entro la tolleranza'", () => {
+  const b = bloccoDa(src, "function rigaCadenza", { max: 2500 });
+  if (!/c\.passata/.test(b)) return "sparito il ramo dello stato intermedio";
+  if (!/ERA ATTESO E NON È ARRIVATO/.test(b)) return "sparito l'allarme dei dati davvero mancanti";
+  const iAll = b.indexOf("ERA ATTESO"), iMedio = b.indexOf("c.passata");
+  if (iMedio < iAll) return "lo stato intermedio viene prima dell'allarme: coprirebbe i ritardi veri";
+  if (!/passata: p < oggi/.test(bloccoDa(src, "function cadenzaDato", { max: 6000 })))
+    return "cadenzaDato non espone piu' 'passata': il ramo intermedio non puo' accendersi";
+  return true;
+});
+
 console.log(`\n${T.length - fail}/${T.length} check superati`);
 process.exit(fail ? 1 : 0);

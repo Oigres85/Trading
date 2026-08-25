@@ -544,6 +544,84 @@ c12_fattiSopravvissuti(testo);
 c13_seduteMiste(testo, ctx);
 c14_codaAZero(testo);
 c15_numeriNellaTestata(testo, ctx);
+c16_stessoIntervalloDueVolte(testo);
+
+/* ---------- C16: la STESSA grandezza scritta con due valori diversi ----------
+   ⚠⚠ Classe trovata sul campo, non teorizzata: il CEO incolla un pacchetto e dentro c'e' il
+   minimo annuale del WTI scritto DUE VOLTE con due valori — 55,27 nel blocco materie, 55,94
+   nell'analisi storica. Non era arrotondamento: un blocco leggeva min_1y calcolato a monte
+   sulla serie giornaliera completa, l'altro lo ricalcolava sulle ~127 rilevazioni campionate
+   in data.json, che il minimo vero non lo contengono.
+   E' esattamente cio' che la regola C3 della testata chiede all'LLM di segnalare ("se due parti
+   del payload si contraddicono, dillo"): gliela stavamo dando da fare noi.
+
+   ⚠ NIENTE REGEX MONOLITICHE. Il primo tentativo usava due regex lunghe e non agganciava
+   NIENTE — nella riga materie c'e' un "—" fra il nome e l'intervallo, e la forma storica
+   inciampa su "(spread high yield, serie 1A)". Un detector che non misura e' peggio di uno
+   assente, perche' si legge come una conferma. Qui si lavora per frammenti, e se i confronti
+   sono zero il check FALLISCE invece di passare. */
+function c16_stessoIntervalloDueVolte(t) {
+  const num = (x) => {
+    const v = parseFloat(String(x).replace(/\./g, "").replace(",", "."));
+    return Number.isFinite(v) ? v : null;
+  };
+  /* decimali da come il numero e' SCRITTO: dice quanto scarto e' solo arrotondamento */
+  const dec = (x) => { const m = String(x).match(/,(\d+)$/); return m ? m[1].length : 0; };
+  const trovati = new Map();
+  const aggiungi = (nome, lo, hi, dove) => {
+    if (!nome || lo == null || hi == null) return;
+    if (!trovati.has(nome)) trovati.set(nome, []);
+    trovati.get(nome).push({ lo, hi, dove });
+  };
+
+  for (const riga of t.split("\n")) {
+    /* forma A — blocco materie: "… · Petrolio WTI 85,05 $ (…) — … dell'intervallo annuale 55,27–112,95 · …" */
+    if (riga.includes("intervallo annuale")) {
+      for (const pezzo of riga.split(" · ")) {
+        const r = pezzo.match(/intervallo annuale ([\d.,]+)[–-]([\d.,]+)/);
+        if (!r) continue;
+        /* il nome e' quel che precede il primo numero, ripulito dall'etichetta di sezione */
+        const testa = pezzo.slice(0, pezzo.search(/[\d]/)).replace(/^.*?:\s*/, "").trim();
+        aggiungi(testa, r[1], r[2], "blocco materie");
+      }
+      continue;
+    }
+    /* forma B — analisi storica: "· Petrolio WTI (serie ~12M): … · range [55,27–112,95] …" */
+    if (/^·\s/.test(riga) && /\brange\b/.test(riga)) {
+      const r = riga.match(/\brange(?: 1A)? \[([\d.,]+)[–-]([\d.,]+)\]/);
+      if (!r) continue;
+      const testa = riga.slice(2, riga.indexOf(" (")).trim();
+      aggiungi(testa, r[1], r[2], "analisi storica");
+    }
+  }
+
+  let confronti = 0;
+  for (const [nome, righe] of trovati) {
+    if (righe.length < 2) continue;
+    for (let i = 1; i < righe.length; i++) {
+      confronti++;
+      const a = righe[0], b = righe[i];
+      for (const [campo, etichetta] of [["lo", "minimo"], ["hi", "massimo"]]) {
+        const va = num(a[campo]), vb = num(b[campo]);
+        if (va == null || vb == null) continue;
+        /* tolleranza = mezza unita' dell'ultima cifra della scrittura PIU' GROSSOLANA:
+           6,7 e 6,69 sono lo stesso numero scritto con due precisioni; 55,27 e 55,94 no */
+        const tol = 0.5 * Math.pow(10, -Math.min(dec(a[campo]), dec(b[campo])));
+        if (Math.abs(va - vb) > tol)
+          flag("C16", `"${nome}": il ${etichetta} dell'intervallo e' scritto ${a[campo]} in ${a.dove} `
+            + `e ${b[campo]} in ${b.dove}. Stessa grandezza, due valori: e' la contraddizione `
+            + `interna che la regola C3 chiede all'LLM di trovare, e gliela stiamo dando noi.`);
+      }
+    }
+  }
+  if (!confronti) {
+    flag("C16", "nessuna serie porta il proprio intervallo in due blocchi: il detector non ha "
+      + "misurato NIENTE. O le forme del testo sono cambiate, o uno dei due blocchi non c'e' "
+      + "piu'. Un detector muto non e' una conferma.");
+    return;
+  }
+  ok(`C16 · ${confronti} serie con l'intervallo scritto in due blocchi, tutte concordi`);
+}
 
 /* ⚠⚠ v329 — GLI ALTRI DUE PACCHETTI. Non tutti i detector hanno senso fuori dal macro (C12 e'
    la ricevuta di un taglio che riguarda solo quello, C13 parla del book), ma quelli che
@@ -567,4 +645,4 @@ if (PROBLEMI.length) {
   PROBLEMI.forEach((p, i) => console.log(`  ${i + 1}. [${p.classe}] ${p.msg}\n`));
   process.exit(1);
 }
-console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 15 classi, su ${1 + (altri || []).length} pacchetti — nessuna incoerenza interna`);
+console.log(`COERENZA PAYLOAD: ${PASSATI.length} controlli superati su 16 classi, su ${1 + (altri || []).length} pacchetti — nessuna incoerenza interna`);
