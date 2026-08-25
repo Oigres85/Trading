@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "361";
+const BUILD_VERSION = "362";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10244,7 +10244,7 @@ function datiNostriDelTitolo(tk) {
     const R = tec.w52hi - tec.w52lo;
     const liv = [0.236, 0.382, 0.5, 0.618, 0.786]
       .map(q => ({ q, v: Math.round((tec.w52hi - q * R) * 100) / 100 }));
-    L.push(`- Ritracciamenti di Fibonacci sul range a 52 settimane (massimo ${fmtNum.format(Math.round(tec.w52hi * 100) / 100)}, minimo ${fmtNum.format(Math.round(tec.w52lo * 100) / 100)}): `
+    L.push(`- Ritracciamenti di Fibonacci sul range a 52 settimane (massimo ${Math.round(tec.w52hi * 100) / 100}, minimo ${Math.round(tec.w52lo * 100) / 100}): `
       + liv.map(x => `${Math.round(x.q * 1000) / 10}% a ${x.v}${dist(x.v)}`).join(" · ")
       + ` — calcolo esatto sui due estremi, contati DAL MASSIMO verso il basso. Non sono previsioni: `
       + `sono le quote che quella convenzione indica.`);

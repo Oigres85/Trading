@@ -3,7 +3,8 @@
    app.js è pensato per il browser: qui gira in un contesto Node (vm) con un DOM-stub
    minimale — niente rendering, si testano SOLO calcoli e generazione del prompt.
    Uso: node scripts/test_app.mjs  (exit 1 se un check fallisce) */
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, writeFileSync, unlinkSync } from "node:fs";
+import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import vm from "node:vm";
@@ -3477,7 +3478,7 @@ check("v256 analisi titolo: una sola testata nel pacchetto (quella spot), non du
   const h = promptHeaderText();
   return !t.includes(h)`));
 
-check("v271 pacchetto titolo: porta i livelli che il sistema gia' conosce", run(`
+check("v271 pacchetto titolo: porta i livelli che il sistema gia' conosce", suVeri(`
   const p = buildPromptTicker("NVDA");
   const r = (DATA.watchlist || []).concat(DATA.portfolio || []).find(x => x.ticker === "NVDA");
   if (!r) return true;
@@ -4002,7 +4003,9 @@ check("v349 digest: la finestra dichiarata e' quella davvero coperta", suVeri(`
   if (h.length < 30) return true;
   const gg = Math.round((new Date(h[h.length - 1].d) - new Date(h[0].d)) / 86400000);
   const t = historicalDigestText();
-  const riga = t.split("\\n").find(l => l.startsWith("Petrolio WTI"));
+  /* ⚠ le righe del digest sono precedute da "· ": startsWith non ha mai trovato niente,
+     e il check e' rimasto DORMIENTE dal giorno in cui l'ho scritto. */
+  const riga = t.split("\\n").find(l => l.includes("Petrolio WTI"));
   if (!riga) return true;
   /* 361 giorni etichettati "serie ~6M": l'etichetta era scritta a mano e non seguiva i dati */
   const dichiarati = Number((riga.match(/serie ~(\\d+)([MA])/) || [])[1]);
@@ -4023,12 +4026,17 @@ check("v349 digest: il valore collocato viene dalla stessa fonte della serie", s
   const sc = ((m.tassi || {}).scadenze || []).find(x => x && x.key === "a10");
   if (!sc) return true;
   const t = historicalDigestText();
-  const riga = t.split("\\n").find(l => l.startsWith("Treasury 10A"));
+  const riga = t.split("\\n").find(l => l.includes("Treasury 10A"));
   if (!riga) return true;
   /* prima ci finiva ^TNX da yfinance (4,74) dentro la distribuzione FRED DGS10: risultato 100°,
      cioe' "mai stato cosi' alto", perche' era un valore estraneo alla serie */
-  return riga.includes(String(sc.value).replace(".", ","))
-      && !riga.includes(String(((m.carry || {}).us10 ?? "")).replace(".", ","));`));
+  const primo = (riga.match(/Treasury 10A[^:]*:\\s*([\\d,.]+)%/) || [])[1];
+  if (!primo) return false;
+  const atteso = String(sc.value).replace(".", ",");
+  const estraneo = String(((m.carry || {}).us10 ?? "")).replace(".", ",");
+  /* il valore collocato deve essere quello della SERIE (FRED DGS10), non la quotazione di
+     mercato (^TNX) che veniva da un'altra fonte: 100° percentile era il sintomo */
+  return primo === atteso && primo !== estraneo;`));
 
 check("v349 liquidita': il dato mensile porta la sua data anche nel pacchetto", suVeri(`
   const L = (DATA.macro || {}).liquidity_split || {};
@@ -4753,6 +4761,47 @@ check("v361 pipeline: i campi vengono da yfinance e il fallimento e' dichiarato"
   return py.includes("t.eps_trend") && py.includes("t.eps_revisions")
       && py.includes("t.earnings_estimate") && py.includes("t.analyst_price_targets")
       && py.includes('"analisti": analisti,') && py.includes('print(f"!! analisti {ticker}');
+})());
+
+
+/* ══ v362 — I CHECK DORMIENTI: verdi, e senza misurare niente ═══════════════════════════════
+   Un check che esce con `if (!soggetto) return true` e' verde anche quando il soggetto non
+   esiste piu'. E' la stessa proprieta' delle finestre a caratteri fissi — si guasta senza
+   mordere — ma piu' difficile da vedere, perche' non c'e' un numero da guardare.
+   Misurati oggi strumentando le uscite: erano OTTO. Cinque erano difetti veri e sono stati
+   corretti (due regex che non matchavano piu' dopo una modifica al formato, due che cercavano
+   righe precedute da "· " con startsWith, uno che girava contro il fixture dove NVDA non
+   esiste). I TRE che restano sono FOSSILI: sorvegliano righe rimosse deliberatamente in v256
+   col portafoglio e col motore delle decisioni — "primo settore:", "Livelli calcolati dal
+   motore", "Quadro d'insieme".
+   ⚠ NON li cancello: se quelle righe tornassero, l'invariante servirebbe. E non li riscrivo
+   alla cieca: sono check con corpi annidati, e un tentativo automatico ha gia' rotto la
+   sintassi (modifica_sicura l'ha rifiutato). Restano, e il loro numero e' DICHIARATO e
+   MONOTONO IN DISCESA come per le finestre: cosi' il debito e' visibile e non puo' crescere. */
+const TETTO_DORMIENTI = 3;
+
+check("meta: i check dormienti non aumentano (tetto TETTO_DORMIENTI, solo in discesa)", (() => {
+  /* si strumentano le uscite anticipate e si esegue la suite in un processo separato: ogni
+     check che prende l'uscita restituisce una stringa, e check() la rifiuta come malformata */
+  const mio = readFileSync(fileURLToPath(import.meta.url), "utf8");
+  const strumentato = mio
+    .replace(/if\s*\(([^)]{1,160})\)\s*return true;/g, 'if ($1) return "__DORMIENTE__";')
+    /* il meta-gate non deve strumentare se' stesso, o si conta da solo */
+    .replace(/check\("meta: i check dormienti[\s\S]*?\}\)\(\)\);/, "");
+  const tmp = join(ROOT, "scripts", ".dormienti.tmp.mjs");
+  let n = 0;
+  try {
+    writeFileSync(tmp, strumentato);
+    const out = execSync(`node ${JSON.stringify(tmp)} 2>&1 || true`, { encoding: "utf8", maxBuffer: 20e6 });
+    n = (out.match(/CHECK MALFORMATO/g) || []).length;
+    if (n > TETTO_DORMIENTI) {
+      console.log(`  ⛔ ${n} check dormienti contro un tetto di ${TETTO_DORMIENTI}:`);
+      out.split("\n").filter(l => l.includes("CHECK MALFORMATO"))
+        .forEach(l => console.log(`     ${l.replace(/\s+⛔.*/, "").replace(/^FAIL\s+/, "").slice(0, 90)}`));
+    }
+  } catch { return true; }   /* se la strumentazione non gira, non si blocca la CI su un meta */
+  finally { try { unlinkSync(tmp); } catch { /* gia' rimosso */ } }
+  return n <= TETTO_DORMIENTI;
 })());
 
 /* ---------- report ----------
