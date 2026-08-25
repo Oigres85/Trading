@@ -97,6 +97,33 @@ const scenarios = {
     });
     return d;
   },
+  /* ⚠⚠ v365 — LA SOCIETA' IN PERDITA. Il red team girava su quattro scenari e NESSUNO aveva
+     utili negativi: e' cosi' che sono sopravvissuti due difetti veri, trovati leggendo un
+     pacchetto a mano invece che da un test —
+       · il forward P/E su una perdita e' MONOTONO NELLA DIREZIONE SBAGLIATA (-47 -> -22 -> -11
+         mentre le perdite peggiorano: sembra che migliori);
+       · l'Altman Z'' usava la capitalizzazione dove il modello vuole il patrimonio contabile.
+     I rami che toccano valutazione e solidita' sono quelli che toccano il capitale, ed erano
+     gli unici mai esercitati. Qui l'universo diventa in perdita: utili, EBITDA, flusso libero
+     e patrimonio negativi, ricavi positivi (altrimenti non e' un'azienda, e' un buco). */
+  "S5-in-perdita": (d) => {
+    equities(d).forEach((r, i) => {
+      r.eps = -3.48 - i;
+      r.pe = null;
+      r.stats = Object.assign({}, r.stats || {}, {
+        pe_ttm: null, eps_ttm: -3.48 - i, eps_forward: -1.95 - i, forward_pe: -44.26 + i * 5,
+        net_income_fy: -1.9e9, revenue_fy: 7.6e9, profit_margin: -0.254,
+        ev_ebitda: -12.3, fcf: -9.1e9, roe: -0.436, roa: -0.0024,
+        price_to_book: 9.46, debt_to_equity: 1027.3,
+        ps: 6.27, ev_s: 12.34, altman_z: -1.29,
+      });
+      /* combustione con la gestione IN PERDITA: il ramo che dice "viene dal mestiere" */
+      r.combustione = { cassa: 1e9, debito: 35e9, debito_netto: 34e9, bilancio_al: "2026-03-31",
+        ocf_ttm: -2e9, capex_ttm: -0.2e9, fcf_ttm: -2.2e9, trimestri: 4,
+        cashflow_al: "2026-03-31", mesi_operativi: 6, emissione_netta_pct: 3.13 };
+    });
+    return d;
+  },
   // run avvelenato: valori impossibili che le cinture client devono neutralizzare
   "S4-avvelenato": (d) => {
     const rows = equities(d);
@@ -181,6 +208,7 @@ function checkCampaign(name, ctx) {
     }
   }
   auditTables(name, p);   // I7–I11: audit semantico delle tabelle (ogni bug passato → guardia)
+  checkTitoli(name, ctx);  // I13–I16: il pacchetto del singolo titolo, mai coperto prima di v365
 }
 
 /* AUDITOR SEMANTICO DELLE TABELLE (v120) — la risposta al "ogni report scopre nuovi bug":
@@ -214,6 +242,56 @@ function tablesOf(p) {
   }
   return tables;
 }
+/* ⚠⚠ v365 — IL PACCHETTO DEL SINGOLO TITOLO NON ERA MAI STATO GENERATO DAL RED TEAM.
+   Cercando "buildPromptTicker" in questo file: zero occorrenze. Trentadue campagne, tutte sul
+   pacchetto macro. Il pacchetto che il CEO usa quando guarda UN nome — quello con valutazione,
+   solidita', analisti, opzioni — aveva copertura zero, ed e' esattamente la superficie dove i
+   difetti trovati a mano si erano annidati.
+   I13-I16 valgono su OGNI scenario, ma e' su S5 (societa' in perdita) che mordono. */
+function checkTitoli(name, ctx) {
+  const tickers = vm.runInContext(
+    "(DATA.watchlist || []).filter(r => r && r.ticker && !String(r.ticker).startsWith('^')).slice(0, 3).map(r => r.ticker)", ctx);
+  if (!tickers.length) { fail(name, "I13 nessun titolo su cui generare il pacchetto: il controllo e' cieco"); return; }
+  for (const tk of tickers) {
+    let p;
+    try { p = vm.runInContext(`buildPromptTicker(${JSON.stringify(tk)})`, ctx); }
+    catch (e) { fail(name, `I13 ${tk}: il pacchetto titolo esplode — ${e.message}`); continue; }
+    if (!p || p.length < 200) { fail(name, `I13 ${tk}: pacchetto vuoto o troncato (${(p || "").length} caratteri)`); continue; }
+
+    const eps = vm.runInContext(`((DATA.watchlist.find(r => r.ticker === ${JSON.stringify(tk)}) || {}).stats || {}).eps_ttm`, ctx);
+    const inPerdita = typeof eps === "number" && eps < 0;
+
+    /* I14 — su utili negativi NON esiste un P/E, e il forward non lo sostituisce: cresce
+       mentre la perdita peggiora. Se il pacchetto stampa un multiplo di utili senza dirlo,
+       chi legge lo usa. */
+    if (inPerdita) {
+      if (/- P\/E \(trailing\): -/.test(p)) fail(name, `I14 ${tk}: P/E trailing NEGATIVO stampato come multiplo`);
+      if (/forward P\/E|P\/E atteso/i.test(p) && !/non lo sostituisce|non e' un multiplo|perdita attesa/i.test(p))
+        fail(name, `I14 ${tk}: nomina un P/E prospettico su utili negativi senza dichiarare che non misura`);
+      /* I15 — tolto il P/E, il multiplo deve esserci lo stesso: nominarlo e non darlo e' C10.
+         ⚠ la prima stesura aveva la scappatoia `&& !/n\.d\./.test(p)`: quasi ogni pacchetto
+         contiene "n.d." da qualche parte, quindi non poteva scattare mai — verificato rompendo
+         il codice apposta. La precondizione vera sono i RICAVI, non l'assenza di "n.d.". */
+      const ricavi = vm.runInContext(`((DATA.watchlist.find(r => r.ticker === ${JSON.stringify(tk)}) || {}).stats || {}).revenue_fy`, ctx);
+      if (typeof ricavi === "number" && ricavi > 0 && !/P\/S \d/.test(p))
+        fail(name, `I15 ${tk}: nessun P/E, ricavi presenti (${Math.round(ricavi / 1e9)} mld) e nessun P/S — il pacchetto resta senza alcun multiplo`);
+    }
+    /* I16 — la combustione non deve contraddirsi: se la gestione assorbe cassa, il blocco non
+       puo' dire che non c'e' combustione ne' chiamarla costruzione. */
+    if (/COMBUSTIONE DI CASSA/.test(p)) {
+      const ocf = vm.runInContext(`((DATA.watchlist.find(r => r.ticker === ${JSON.stringify(tk)}) || {}).combustione || {}).ocf_ttm`, ctx);
+      if (typeof ocf === "number" && ocf < 0) {
+        if (/non c'e' combustione/.test(p)) fail(name, `I16 ${tk}: flusso operativo negativo ma dichiara "non c'e' combustione"`);
+        if (/combustione e' costruzione/.test(p)) fail(name, `I16 ${tk}: chiama costruzione una perdita operativa`);
+      }
+      if (typeof ocf === "number" && ocf > 0 && /La gestione ASSORBE cassa/.test(p))
+        fail(name, `I16 ${tk}: flusso operativo positivo ma dichiara che la gestione assorbe cassa`);
+    }
+    /* I11 vale anche qui: i placeholder non devono passare dalla porta di servizio */
+    if (/\bundefined\b|\[object Object\]|\bNaN\b/.test(p)) fail(name, `I11 ${tk}: placeholder nel pacchetto titolo`);
+  }
+}
+
 function auditTables(name, p) {
   // I11 leak di placeholder oltre a undefined/NaN/Infinity (già I3): null nudo, [object Object]
   if (/\|\s*null\s*\||\[object Object\]|\$\s*null|undefined%/.test(p)) fail(name, "I11 leak placeholder (null/[object Object]) nel prompt");
@@ -295,4 +373,4 @@ if (violations.length) {
   if (violations.length > 40) console.error(`  … e altre ${violations.length - 40}`);
   process.exit(1);
 }
-console.log(`RED TEAM: ${campaigns} campagne (4 scenari dati × stati UI), 12 invarianti — nessuna violazione`);
+console.log(`RED TEAM: ${campaigns} campagne (5 scenari dati × stati UI), 16 invarianti — nessuna violazione`);
