@@ -202,6 +202,13 @@ const check = (name, expr) => {
   }
   T.push([name, expr]);
 };
+/* ⚠⚠ v365 — `no("ragione")` STAMPA LA RAGIONE E TORNA false.
+   check() accetta SOLO booleani, ed e' giusto cosi': e' quel rigore che regge il meta-gate dei
+   dormienti (che riconosce un check muto proprio perche' torna una stringa invece di true).
+   Ma scrivere `return "manca X"` sembrava funzionare e invece produceva "CHECK MALFORMATO" con
+   la ragione buttata via. Questo helper tiene la diagnosi E la convenzione. */
+const no = (msg) => { console.log(`      ↳ ${msg}`); return false; };
+
 // ogni assert in una IIFE: i const/let top-level resterebbero nel lexical env globale del vm
 /* ⚠ v256 — `run` CATTURA L'ECCEZIONE invece di far esplodere l'intero file. Con la riscrittura
    a pagina-macro decine di check asserivano su blocchi che non esistono piu': il primo che
@@ -4812,43 +4819,40 @@ check("meta: i check dormienti non aumentano (tetto TETTO_DORMIENTI, solo in dis
    annunciava "174/174 superati" ed exit 0. La guardia anti-taglio v204, cioè proprio quella
    nata perché "l'attenzione non basta", era spenta in silenzio.
    Il report va per ultimo: ogni check aggiunto in fondo al file deve poter rompere la CI. */
-let fail = 0;
-for (const [name, ok] of T) {
-  if (!ok) fail++;
-  console.log(`${ok ? "PASS" : "FAIL"}  ${name}`);
-}
-
 /* ---------- v363: la sezione del rischio deve DIRE cosa ha trovato, non solo mostrarlo ----------
    ⚠ Il CEO: "sezione non comprensibile". Era una tabella di cinque righe con intestazioni
    tecniche ("cosa isola", "scommesse effettive") e nessuna frase che dicesse l'esito del
    confronto. Rifatta: prima le conclusioni CALCOLATE, poi la tabella come prova.
    Questi due check sorvegliano i due modi in cui puo' tornare com'era. */
-check("v363 · il rischio apre con le frasi, non con la tabella", () => {
+check("v363 · il rischio apre con le frasi, non con la tabella", (() => {
   const b = bloccoDa(src, "function renderRischio", { max: 6000 });
   const iFrasi = b.indexOf("rischio-frasi"), iTab = b.indexOf("<table");
-  if (iFrasi < 0) return "le frasi calcolate sono sparite: resta la tabella nuda";
-  if (iTab < 0) return "la tabella-prova e' sparita: restano affermazioni senza righe";
-  if (iFrasi > iTab) return "la tabella viene prima delle frasi: e' l'ordine che il CEO ha respinto";
-  /* le intestazioni gergali non devono tornare */
-  for (const gergo of ["cosa isola", ">scommesse effettive<"])
-    if (b.includes(gergo)) return `intestazione gergale rientrata: "${gergo}"`;
+  if (iFrasi < 0) return no("le frasi calcolate sono sparite: resta la tabella nuda");
+  if (iTab < 0) return no("la tabella-prova e' sparita: restano affermazioni senza righe");
+  if (iFrasi > iTab) return no("la tabella viene prima delle frasi: e' l'ordine che il CEO ha respinto");
+  /* le intestazioni gergali non devono tornare — solo nelle celle di TESTATA:
+     nella nota il termine e' SPIEGATO, ed e' quel che rende leggibile la sezione */
+  const testata = b.slice(b.indexOf("<thead"), b.indexOf("</thead>") + 8);
+  if (testata.length < 20) return no("non trovo la testata della tabella: il divieto non e' misurabile");
+  for (const gergo of ["cosa isola", "scommesse effettive"])
+    if (testata.includes(gergo)) return no(`intestazione gergale rientrata: "${gergo}"`);
   return true;
-});
+})());
 
 /* Un rapporto vicino a 1 arrotondato a una cifra diventa "1 volte tanto": grammatica rotta E
    informazione nulla. Quando due cose oscillano uguale la notizia e' proprio quella, e va
    scritta a parole. Il check verifica che il ramo "quanto" esista e che la soglia lo copra. */
-check("v363 · nessun \"1 volte\": il rapporto ~1 si dice a parole", () => {
+check("v363 · nessun \"1 volte\": il rapporto ~1 si dice a parole", (() => {
   const b = bloccoDa(src, "function renderRischio", { max: 6000 });
-  if (!/Oscilla quanto \$\{nome\}/.test(b)) return "sparito il ramo che dice 'oscilla quanto X'";
+  if (!/Oscilla quanto \$\{nome\}/.test(b)) return no("sparito il ramo che dice 'oscilla quanto X'");
   const m = b.match(/Math\.abs\(r - 1\) < ([\d.]+)/);
-  if (!m) return "sparita la soglia che separa 'quanto' da 'N volte'";
+  if (!m) return no("sparita la soglia che separa 'quanto' da 'N volte'");
   const soglia = parseFloat(m[1]);
   /* con una cifra decimale, un rapporto entro 0.05 da 1 stampa "1 volte": la soglia deve coprirlo */
-  if (soglia < 0.05) return `soglia ${soglia} troppo stretta: fra ${soglia} e 0.05 stampa ancora "1 volte"`;
-  if (soglia > 0.3) return `soglia ${soglia} troppo larga: chiama "uguali" cose che differiscono del 30%`;
+  if (soglia < 0.05) return no(`soglia ${soglia} troppo stretta: fra ${soglia} e 0.05 stampa ancora "1 volte"`);
+  if (soglia > 0.3) return no(`soglia ${soglia} troppo larga: chiama "uguali" cose che differiscono del 30%`);
   return true;
-});
+})());
 
 /* ---------- v363: "prossimo" non si dice di una data passata ----------
    ⚠ Trovato leggendo il pacchetto del CEO: due serie giornaliere annunciavano "prossimo atteso
@@ -4860,7 +4864,7 @@ check("v363 · nessun \"1 volte\": il rapporto ~1 si dice a parole", () => {
 check("v363 · nessun \"prossimo atteso\" riferito a una data gia' passata", suVeri(`
   const p = buildPrompt();
   const mData = p.match(/DATI AL (\\d{2})\\/(\\d{2})\\/(\\d{4})/);
-  if (!mData) return "il pacchetto non dichiara piu' la propria data: il confronto non e' possibile";
+  if (!mData) return no("il pacchetto non dichiara piu' la propria data: il confronto non e' possibile");
   const oggi = new Date(mData[3] + "-" + mData[2] + "-" + mData[1]);
   const passate = [];
   for (const m of p.matchAll(/prossimo atteso (\\d{2})\\/(\\d{2})\\/(\\d{4})/g)) {
@@ -4876,16 +4880,117 @@ check("v363 · nessun \"prossimo atteso\" riferito a una data gia' passata", suV
 /* Lo stato intermedio deve ESISTERE nel codice: senza, una data appena passata torna a
    uscire come "prossimo", oppure — peggio — accende l'allarme dei dati mancanti su una
    fonte puntuale, che e' l'errore che v266 e v271 hanno gia' pagato due volte. */
-check("v363 · esiste lo stato 'atteso, non ancora arrivato, entro la tolleranza'", () => {
+check("v363 · esiste lo stato 'atteso, non ancora arrivato, entro la tolleranza'", (() => {
   const b = bloccoDa(src, "function rigaCadenza", { max: 2500 });
-  if (!/c\.passata/.test(b)) return "sparito il ramo dello stato intermedio";
-  if (!/ERA ATTESO E NON È ARRIVATO/.test(b)) return "sparito l'allarme dei dati davvero mancanti";
+  if (!/c\.passata/.test(b)) return no("sparito il ramo dello stato intermedio");
+  if (!/ERA ATTESO E NON È ARRIVATO/.test(b)) return no("sparito l'allarme dei dati davvero mancanti");
   const iAll = b.indexOf("ERA ATTESO"), iMedio = b.indexOf("c.passata");
-  if (iMedio < iAll) return "lo stato intermedio viene prima dell'allarme: coprirebbe i ritardi veri";
+  if (iMedio < iAll) return no("lo stato intermedio viene prima dell'allarme: coprirebbe i ritardi veri");
   if (!/passata: p < oggi/.test(bloccoDa(src, "function cadenzaDato", { max: 6000 })))
-    return "cadenzaDato non espone piu' 'passata': il ramo intermedio non puo' accendersi";
+    return no("cadenzaDato non espone piu' 'passata': il ramo intermedio non puo' accendersi");
   return true;
-});
+})());
 
+/* ---------- v365: P/S e il riquadro della combustione ----------
+   Punti 2 e 3 dei cinque aperti. Il pacchetto NOMINAVA il price-to-sales come il multiplo
+   giusto per una societa' in perdita e poi non lo forniva (regola C10: rimando a una grandezza
+   inesistente); e non diceva niente sulla cassa, che per un libro growth su nomi in perdita
+   conta piu' del P/E. Questi check provano il COMPORTAMENTO su scenari costruiti, non la forma
+   del sorgente: i tre rami della combustione portano conclusioni opposte, ed e' li' che si
+   sbaglia. */
+/* ⚠⚠ COSTRUITO SU suVeri, NON SU run. Il primo tentativo cercava "TST1" in DATA.watchlist:
+   sbagliato due volte insieme — TST1 sta in DATA.portfolio, e a questo punto del file
+   DATA.watchlist e' gia' stato SOVRASCRITTO da un check precedente (^KS11). Un check in coda
+   eredita lo stato che gli altri hanno lasciato. suVeri riparte dai dati veri ogni volta. */
+const conComb = (comb, patch, code) => suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "CRWV") || DATA.watchlist[0];
+  if (!r) return "nessun titolo su cui provare: i dati veri non hanno watchlist";
+  r.stats = Object.assign({}, r.stats || {}, ${JSON.stringify(patch)});
+  r.combustione = ${JSON.stringify(comb)};
+  const out = buildPromptTicker(r.ticker);
+  ${code}`);
+const conCombEsito = (...a) => { const r = conComb(...a); return r === true ? true : no(String(r)); };
+
+check("v365 · combustione da INVESTIMENTI: la dice costruzione, e conta i mesi di capex",
+  conCombEsito({ cassa: 2.2e9, debito: 35e9, debito_netto: 32.9e9, bilancio_al: "2026-03-31",
+            ocf_ttm: 6e9, capex_ttm: -16.6e9, fcf_ttm: -10.6e9, trimestri: 4, mesi_capex: 1.6 }, {}, `
+    if (!out.includes("COMBUSTIONE DI CASSA")) return no("il blocco non compare");
+    if (!out.includes("combustione e' costruzione, non perdita operativa"))
+      return no("flusso operativo positivo e FCF negativo, ma non dice che la combustione e' investimento");
+    if (!out.includes("mesi di investimenti al ritmo attuale"))
+      return no("manca l'autonomia sul capex, che qui e' la domanda vera");
+    return true;`));
+
+check("v365 · combustione dalla GESTIONE: non la chiama costruzione",
+  conCombEsito({ cassa: 1e9, ocf_ttm: -2e9, capex_ttm: -0.2e9, fcf_ttm: -2.2e9, trimestri: 4,
+            mesi_operativi: 6 }, {}, `
+    if (!out.includes("La gestione ASSORBE cassa")) return no("flusso operativo negativo non riconosciuto");
+    if (out.includes("combustione e' costruzione")) return no("chiama costruzione una perdita operativa");
+    if (!out.includes("mesi di PERDITA OPERATIVA")) return no("manca l'autonomia sulla perdita, che qui e' la domanda vera");
+    return true;`));
+
+/* ⚠ IL RAMO CHE MI HA FREGATO. Su NVDA il blocco stampava "non c'e' combustione" e subito dopo
+   "il resto della costruzione e' finanziato da debito o da nuove azioni" — falso su chi genera
+   119 mld di flusso libero, e in contraddizione con la frase precedente DENTRO LO STESSO BLOCCO.
+   E' la classe "glossa costante su ramo variabile", gia' pagata tre volte. */
+check("v365 · nessuna combustione: non inventa un fabbisogno che non c'e'",
+  conCombEsito({ cassa: 13.2e9, debito: 12.3e9, debito_netto: -0.9e9, ocf_ttm: 125.6e9,
+            capex_ttm: -6.6e9, fcf_ttm: 119.1e9, trimestri: 4, mesi_capex: 24.2 }, {}, `
+    if (!out.includes("non c'e' combustione")) return no("flussi entrambi positivi non riconosciuti");
+    if (out.includes("finanziato da debito o da nuove azioni"))
+      return no("dice che serve finanziamento esterno a chi genera flusso libero positivo, e si contraddice due righe sopra");
+    if (!out.includes("debito netto NEGATIVO")) return no("cassa netta non dichiarata come tale");
+    return true;`));
+
+check("v365 · senza P/E, il pacchetto fornisce il P/S invece di limitarsi a nominarlo",
+  conCombEsito(null, { pe_ttm: null, eps_ttm: -3.48, ps: 6.27, ev_s: 12.34 }, `
+    if (!out.includes("NESSUN P/E")) return no("non dichiara l'assenza del P/E su utili negativi");
+    if (!out.includes("P/S 6,27×")) return no("nomina il P/S e non lo fornisce: e' la violazione C10 che il blocco esiste per chiudere");
+    if (!out.includes("EV/ricavi 12,34×")) return no("manca l'EV/ricavi, che su una societa' indebitata diverge dal P/S");
+    return true;`));
+
+check("v365 · senza dati di bilancio il blocco tace, non stampa un riquadro vuoto",
+  conCombEsito(null, {}, `
+    if (out.includes("COMBUSTIONE DI CASSA")) return no("stampa il riquadro senza avere i dati");
+    return true;`));
+
+/* ---------- meta v365: nessun check DOPO il conteggio ----------
+   ⚠⚠ LA CLASSE PEGGIORE TROVATA FINORA, e l'ho prodotta io due volte in un giorno.
+   La suite conta cosi':
+       let fail = 0;
+       for (const [name, ok] of T) { if (!ok) fail++; ... }     <- fail e' FISSATO qui
+       console.log(`${T.length - fail}/${T.length} check superati`);
+   Un check registrato DOPO quel ciclo entra in T — quindi T.length cresce — ma non passa mai
+   sotto il conteggio: fail resta fermo. Risultato: "354/354 superati" mentre NOVE check
+   fallivano, fra cui otto miei appena scritti.
+   Stamattina avevo gia' pagato meta' di questo errore e l'avevo riparato a meta': avevo
+   spostato i check prima dell'ULTIMA RIGA, non prima del CICLO. Il sintomo era identico e la
+   diagnosi sembrava fatta.
+   Non e' un caso di dormienza — quei check giravano — ed e' per questo che il meta-gate dei
+   dormienti non poteva vederli: la sentinella non booleana viene comunque ignorata se nessuno
+   la conta. Serve un controllo sulla STRUTTURA DEL FILE, ed e' questo. */
+check("meta: nessun check registrato dopo il ciclo che conta i fallimenti", (() => {
+  const mio = readFileSync(new URL(import.meta.url), "utf8");
+  const iConteggio = mio.indexOf("\nlet fail = 0;");
+  if (iConteggio < 0) return no("non trovo piu' il ciclo di conteggio: questo controllo e' cieco");
+  const coda = mio.slice(iConteggio);
+  /* i check veri iniziano a inizio riga: cosi' non conto le occorrenze dentro i commenti */
+  const dopo = [...coda.matchAll(/^check\("([^"]{0,80})/gm)].map((m) => m[1]);
+  if (dopo.length)
+    return no(`${dopo.length} check stanno DOPO il conteggio e non possono far fallire la CI: `
+      + dopo.slice(0, 3).map((x) => `"${x}…"`).join(", ") + (dopo.length > 3 ? ", …" : "")
+      + ". Vanno spostati prima di `let fail = 0;`.");
+  /* e il controllo deve poter vedere qualcosa: se il file finisse subito dopo il ciclo,
+     l'assenza di check non proverebbe niente */
+  const prima = [...mio.slice(0, iConteggio).matchAll(/^check\(/gm)].length;
+  if (prima < 300) return no(`visti solo ${prima} check prima del conteggio: la struttura non e' quella che credo`);
+  return true;
+})());
+
+let fail = 0;
+for (const [name, ok] of T) {
+  if (!ok) fail++;
+  console.log(`${ok ? "PASS" : "FAIL"}  ${name}`);
+}
 console.log(`\n${T.length - fail}/${T.length} check superati`);
 process.exit(fail ? 1 : 0);

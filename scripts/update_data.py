@@ -856,6 +856,95 @@ def _live_is_informative(lp, last_close):
     return lp is not None and last_close and abs(lp / last_close - 1) >= 1e-6
 
 
+def _riga_bilancio(df, *voci):
+    """Prima voce presente nel DataFrame, colonna piu' recente. None se manca o e' NaN."""
+    if df is None or getattr(df, "empty", True):
+        return None, None
+    for v in voci:
+        if v in df.index:
+            try:
+                x = df.loc[v].iloc[0]
+            except Exception:
+                continue
+            if x is None or x != x:      # NaN
+                continue
+            return float(x), str(df.columns[0])[:10]
+    return None, None
+
+
+def _somma_trimestri(df, voce, n=4):
+    """Somma degli ultimi n trimestri di una voce. Torna anche QUANTI ne ha davvero sommati:
+    un TTM costruito su tre trimestri non e' un TTM, e chi legge deve saperlo."""
+    if df is None or getattr(df, "empty", True) or voce not in df.index:
+        return None, 0, None
+    try:
+        serie = df.loc[voce].dropna()
+    except Exception:
+        return None, 0, None
+    if len(serie) == 0:
+        return None, 0, None
+    usati = serie.iloc[:n]
+    return float(usati.sum()), len(usati), str(df.columns[0])[:10]
+
+
+def combustione(t, mcap, buyback):
+    """⚠⚠ IL RIQUADRO DELLA COMBUSTIONE — chiesto per un libro growth con nomi in perdita, dove
+    conta piu' del P/E. Cassa, debito, flusso operativo, capex: da yfinance, GRATIS.
+
+    ⚠ E' nato perche' stavo per derivare la cassa da una catena di rapporti — enterprise_value
+    meno market_cap, debito da debtToEquity x patrimonio, patrimonio da market_cap/priceToBook.
+    Su CRWV quella catena dava cassa 5,6 mld e debito 51,7 mld. Il bilancio vero dice 2,24 e
+    35,1: sbagliata di 2,5 volte sulla cassa. Tre rapporti moltiplicati moltiplicano l'errore,
+    e il bilancio diretto costa una chiamata in piu'. Non si deriva cio' che si puo' leggere.
+
+    ⚠ E ribalta la lettura: su CRWV il flusso OPERATIVO e' positivo (~6 mld TTM) e l'FCF
+    negativo e' TUTTO capex. "Quanto sopravvive" e' la domanda sbagliata per chi costruisce:
+    quella giusta e' come finanzia la costruzione e cosa succede se il mercato dei capitali
+    chiude. Per questo il blocco porta i pezzi separati, e non un solo numero di "autonomia"."""
+    out = {}
+    try:
+        bs = t.quarterly_balance_sheet
+    except Exception:
+        bs = None
+    try:
+        cf = t.quarterly_cashflow
+    except Exception:
+        cf = None
+
+    cassa, d1 = _riga_bilancio(bs, "Cash And Cash Equivalents",
+                               "Cash Cash Equivalents And Short Term Investments")
+    debito, _ = _riga_bilancio(bs, "Total Debt")
+    patrim, _ = _riga_bilancio(bs, "Stockholders Equity")
+    ocf, n_ocf, d2 = _somma_trimestri(cf, "Operating Cash Flow")
+    capex, n_cap, _ = _somma_trimestri(cf, "Capital Expenditure")
+
+    if cassa is None and ocf is None:
+        return None                      # niente da dire: meglio assente che vuoto
+
+    out["cassa"] = cassa
+    out["debito"] = debito
+    out["patrimonio"] = patrim
+    out["bilancio_al"] = d1
+    out["ocf_ttm"] = ocf
+    out["capex_ttm"] = capex
+    out["trimestri"] = min(n_ocf, n_cap) if (n_ocf and n_cap) else (n_ocf or n_cap)
+    out["cashflow_al"] = d2
+    if ocf is not None and capex is not None:
+        out["fcf_ttm"] = ocf + capex     # capex e' gia' negativo in yfinance
+    # quanti mesi di COSTRUZIONE copre la cassa da sola, al ritmo attuale
+    if cassa is not None and capex is not None and capex < 0:
+        out["mesi_capex"] = round(cassa / (abs(capex) / 12.0), 1)
+    # quanti mesi di PERDITA di cassa copre, se il flusso operativo e' negativo
+    if cassa is not None and ocf is not None and ocf < 0:
+        out["mesi_operativi"] = round(cassa / (abs(ocf) / 12.0), 1)
+    # emissione netta di azioni: buyback_yield negativo = diluizione
+    if buyback is not None and buyback < 0:
+        out["emissione_netta_pct"] = round(abs(buyback) * 100, 2)
+    if debito is not None and cassa is not None:
+        out["debito_netto"] = debito - cassa
+    return {k: v for k, v in out.items() if v is not None}
+
+
 def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
     ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
@@ -1190,6 +1279,23 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             "buyback_yield": buyback_yield_frac(_bb_repurchase, _bb_issuance, num("marketCap")),
         }
         stats = {k: (round(v, 4) if v is not None else None) for k, v in stats.items()}
+        # ⚠ v365 — P/S ed EV/S. Il pacchetto diceva all'LLM che per una societa' in perdita
+        # il multiplo giusto e' il price-to-sales, e poi non glielo forniva: un rimando a una
+        # grandezza che non esiste, cioe' la classe che la regola C10 vieta. Il P/E su chi perde
+        # non e' solo inutile, e' monotono nella direzione sbagliata (misurato: -47 -> -22 -> -11
+        # mentre le perdite peggiorano), quindi il sostituto non e' un lusso.
+        _mc, _rev = stats.get("market_cap"), stats.get("revenue_fy")
+        _ev = stats.get("enterprise_value")
+        stats["ps"] = round(_mc / _rev, 2) if (_mc and _rev and _rev > 0) else None
+        stats["ev_s"] = round(_ev / _rev, 2) if (_ev and _rev and _rev > 0) else None
+
+        # ⚠ v365 — il riquadro della combustione (vedi combustione() piu' sopra)
+        try:
+            _comb = combustione(t, stats.get("market_cap"), stats.get("buyback_yield"))
+        except Exception as _e:
+            log(f"  combustione {ticker}: {type(_e).__name__} {_e}")
+            _comb = None
+
         # ADR con bilanci in valuta locale → via i rapporti prezzo-vs-bilancio (unità miste)
         stats = scrub_cross_currency_stats(stats, g("financialCurrency"), g("currency"))
         # sanity: un PEG negativo (utili o crescita attesa negativi) non è usabile nei modelli → n.d.
@@ -1360,6 +1466,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         # MAI il quoteType come settore ("EQUITY" non è un settore: falsava la concentrazione)
         "sector": SECTOR_OVERRIDES.get(ticker) or info.get("sector") or "Altro",
         "stats": stats,
+        "combustione": _comb,   # v365 — cassa, debito, flusso operativo, capex. None se la fonte non li da'.
         "tech_by_range": tech_by_range,
         "financials": financials,
         "fin_health": fin_health,

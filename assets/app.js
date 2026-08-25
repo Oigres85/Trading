@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "364";
+const BUILD_VERSION = "365";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -9490,6 +9490,9 @@ function fattiTitolo(tk) {
                         return q.length === 4 ? q.reduce((a3, b3) => a3 + b3, 0) : null;
                       })(),
                       evEbitda: numero((riga.stats || {}).ev_ebitda),
+                      ps: numero((riga.stats || {}).ps),
+                      evS: numero((riga.stats || {}).ev_s),
+                      comb: riga.combustione || null,
                       debtEquity: numero((riga.stats || {}).debt_to_equity),
                       shortFloat: numero((riga.stats || {}).short_float),
                       capMercato: numero((riga.stats || {}).market_cap),
@@ -10533,6 +10536,8 @@ function datiNostriDelTitolo(tk) {
           + `senza aver verificato quale copre cosa`;
       })() : null,
       Number.isFinite(numero(t.evEbitda)) ? (numero(t.evEbitda) > 0 ? `EV/EBITDA ${fmtNum.format(numero(t.evEbitda))}×` : `EV/EBITDA NON SIGNIFICATIVO (${fmtNum.format(numero(t.evEbitda))}×): l'EBITDA e' negativo, e il rapporto cambia segno invece di misurare quanto e' cara la societa'`) : null,
+      Number.isFinite(t.ps) ? `P/S ${fmtNum.format(t.ps)}×` : null,
+      Number.isFinite(t.evS) ? `EV/ricavi ${fmtNum.format(t.evS)}×` : null,
       Number.isFinite(numero(t.debtEquity)) ? `debito/mezzi propri ${fmtNum.format(numero(t.debtEquity))}` : null,
       perc(t.shortFloat) ? `short float ${perc(t.shortFloat)}` : null,
       mld(t.capMercato) ? `capitalizzazione ${mld(t.capMercato)}` : null,
@@ -10540,6 +10545,51 @@ function datiNostriDelTitolo(tk) {
     if (fond.length) L.push(`- FONDAMENTALI GIA' NEL SISTEMA (stessa fonte dei prezzi, gia' pubblicati qui): ${fond.join(" · ")}.`
       + ` ⚠ Sono di fonte secondaria (aggregatore), non del filing: per bilancio e guidance vale il comunicato della societa', e se scosta lo scrivi.`);
     if (Number.isFinite(t.pe)) L.push(`- P/E (trailing): ${t.pe}× — sugli utili GIA' riportati negli ultimi 12 mesi`);
+    else if (Number.isFinite(t.ps)) L.push(`- NESSUN P/E: gli utili degli ultimi 12 mesi sono negativi, quindi il rapporto non esiste`
+      + ` (e il FORWARD P/E su una perdita cresce mentre la perdita peggiora, quindi non lo sostituisce).`
+      + ` Il multiplo disponibile e' sui RICAVI: P/S ${fmtNum.format(t.ps)}×`
+      + `${Number.isFinite(t.evS) ? `, EV/ricavi ${fmtNum.format(t.evS)}× — che include il debito, e su una societa' indebitata i due numeri divergono` : ""}.`);
+    if (t.comb && (t.comb.cassa != null || t.comb.ocf_ttm != null)) {
+      const c = t.comb;
+      const M = (v) => v == null ? null : `${fmtNum.format(Math.round(v / 1e8) / 10)} mld`;
+      const pezzi = [];
+      if (c.cassa != null) pezzi.push(`cassa ${M(c.cassa)}`);
+      if (c.debito != null) pezzi.push(`debito lordo ${M(c.debito)}`);
+      if (c.debito_netto != null) pezzi.push(c.debito_netto < 0
+        ? `debito netto NEGATIVO (${M(-c.debito_netto)} di cassa netta)`
+        : `debito netto ${M(c.debito_netto)}`);
+      const flussi = [];
+      if (c.ocf_ttm != null) flussi.push(`flusso di cassa OPERATIVO ${M(c.ocf_ttm)}`);
+      if (c.capex_ttm != null) flussi.push(`investimenti (capex) ${M(c.capex_ttm)}`);
+      if (c.fcf_ttm != null) flussi.push(`flusso di cassa libero ${M(c.fcf_ttm)}`);
+      /* la frase che cambia la lettura: da dove viene la combustione */
+      let origine = "";
+      if (c.ocf_ttm != null && c.fcf_ttm != null) {
+        origine = c.ocf_ttm > 0 && c.fcf_ttm < 0
+          ? ` La gestione GENERA cassa (${M(c.ocf_ttm)}) e il flusso libero e' negativo solo per gli investimenti: `
+            + `qui la combustione e' costruzione, non perdita operativa.`
+          : c.ocf_ttm <= 0
+            ? ` La gestione ASSORBE cassa (${M(c.ocf_ttm)}): la combustione viene dal mestiere, non dagli investimenti.`
+            : ` Gestione e flusso libero sono entrambi positivi: non c'e' combustione.`;
+      }
+      let quanto = "";
+      if (c.mesi_operativi != null)
+        quanto = ` Al ritmo attuale la cassa da sola copre ${fmtNum.format(c.mesi_operativi)} mesi di PERDITA OPERATIVA.`;
+      else if (c.mesi_capex != null && c.fcf_ttm != null && c.fcf_ttm < 0)
+        quanto = ` La cassa da sola copre ${fmtNum.format(c.mesi_capex)} mesi di investimenti al ritmo attuale: `
+          + `il resto della costruzione e' finanziato da debito o da nuove azioni, non dalla cassa presente.`;
+      else if (c.fcf_ttm != null && c.fcf_ttm > 0)
+        quanto = ` Gli investimenti sono coperti dalla gestione, quindi la cassa non deve finanziarli: `
+          + `l'autonomia non e' una domanda che si pone qui.`;
+      const dil = c.emissione_netta_pct != null
+        ? ` Emissione netta di azioni ${fmtNum.format(c.emissione_netta_pct)}% del capitale in un anno (diluizione, non riacquisti).`
+        : "";
+      L.push(`- COMBUSTIONE DI CASSA [bilancio al ${c.bilancio_al || "n.d."}, flussi su ${c.trimestri || "?"} trimestri`
+        + `${c.cashflow_al ? ` fino al ${c.cashflow_al}` : ""}]: ${pezzi.join(" · ")}`
+        + `${flussi.length ? `. Su dodici mesi: ${flussi.join(" · ")}` : ""}.${origine}${quanto}${dil}`
+        + ` ⚠ Voci di bilancio dall'aggregatore, non dal filing: per il bilancio che conta vale il deposito della societa'.`);
+    }
+
     /* utile atteso NEGATIVO: non esiste un multiplo, esiste una perdita attesa */
     if (Number.isFinite(t.epsFwd) && t.epsFwd <= 0) {
       L.push(`- UTILE PER AZIONE ATTESO: ${fmtNum.format(t.epsFwd)} — il consenso degli analisti si aspetta una `
