@@ -1,4 +1,4 @@
-⟦ BUILD v373 · generato 28/08/2026 22:47 ⟧
+⟦ BUILD v373 · generato 28/08/2026 23:09 ⟧
 
 Sei un analista macro. Ricevi il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno. Non hai davanti nessun portafoglio: questo pacchetto contiene SOLO dati macro e la loro tensione interna. Non proporre operazioni su titoli, non dimensionare posizioni, non dare consigli di acquisto o vendita.
 
@@ -27,10 +27,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 28/08/2026, 22:47:29 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 18:47, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -1,79% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,55% · Fut S&P -0,22% · BTC -3,12% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~62.7h); il "→ agg." incorpora già il gap after.
+DATI AL 28/08/2026, 23:09:03 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 19:09, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI -1,79% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,55% · Fut S&P -0,22% · BTC -3,21% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~62.4h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 28/08/2026, 22:47:29, prossimo run 29/08/2026, 04:00:00. La barra giornaliera sotto quei numeri e' del 2026-08-28.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 28/08/2026, 23:09:03, prossimo run 29/08/2026, 04:00:00. La barra giornaliera sotto quei numeri e' del 2026-08-28.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-08-28) · Curva 10A-3M (2026-08-28) · Treasury USA 30A (2026-08-27) · Tasso reale 10A (TIPS) (2026-08-27) · Inflazione attesa 10A (breakeven) (2026-08-28) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -117,8 +117,8 @@ MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment
 - Will there be no change in Fed interest rates after the September 2026 meeting?: 48% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the September 2026 meeting?: 50% [Δ7g —]
 - Will Bitcoin reach $82,500 in August?: 6% [Δ7g —]
-- Will Bitcoin dip to $75,000 in August?: 26% [Δ7g —]
-- Will Bitcoin dip to $72,500 in August?: 8% [Δ7g —]
+- Will Bitcoin dip to $75,000 in August?: 25% [Δ7g —]
+- Will Bitcoin dip to $72,500 in August?: 6% [Δ7g —]
 ⚠ 1 mercato escluso perche' quota sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === ANALISI STORICA DELLE SERIE MACRO (traiettorie: pendenze, percentili nel range, inversioni) ===
