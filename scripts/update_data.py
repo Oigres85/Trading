@@ -1393,7 +1393,11 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             print(f"!! cashflow {ticker}: {e}", file=sys.stderr)
 
     # statistiche chiave (come scheda "Più dati finanziari") + stime
+    # ⚠ TUTTE INIZIALIZZATE QUI, PRIMA DEL RAMO: sono usate nel record finale, che viene
+    # costruito anche per i simboli senza fondamentali (indici, futures, ETF). Vedi il gate
+    # "v369 nessuna variabile del record assegnata solo dentro un ramo" in test_update_data.py.
     stats = None
+    _comb = _cred = _fuori = _short = None
     if has_fundamentals(ticker, currency):
         g = info.get
         def num(*keys):
@@ -1461,7 +1465,6 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         except Exception as _e:
             log(f"  credito {ticker}: {type(_e).__name__} {_e}")
             _cred = None
-        _fuori = _short = None
         if not (ticker.startswith("^") or ticker.endswith("=F")):
             try:
                 _fuori = fuori_mercato(ticker)

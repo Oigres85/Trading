@@ -4861,7 +4861,8 @@ check("v363 · nessun \"1 volte\": il rapporto ~1 si dice a parole", (() => {
    futuro riferito a ieri. E' il danno di v350 ripetuto: chi trova una data storta smette di
    fidarsi anche delle righe giuste. Ora lo stato intermedio si dice, e questo check impedisce
    che "prossimo atteso" torni a coprire una data gia' passata. */
-check("v363 · nessun \"prossimo atteso\" riferito a una data gia' passata", suVeri(`
+const _esitoV363 = (r) => r === true ? true : no(String(r));
+check("v363 · nessun \"prossimo atteso\" riferito a una data gia' passata", _esitoV363( suVeri(`
   const p = buildPrompt();
   const mData = p.match(/DATI AL (\\d{2})\\/(\\d{2})\\/(\\d{4})/);
   if (!mData) return no("il pacchetto non dichiara piu' la propria data: il confronto non e' possibile");
@@ -4875,7 +4876,7 @@ check("v363 · nessun \"prossimo atteso\" riferito a una data gia' passata", suV
   /* il detector deve aver visto qualcosa, altrimenti e' muto e si legge come una conferma */
   const quante = [...p.matchAll(/prossimo atteso \\d{2}\\/\\d{2}\\/\\d{4}/g)].length;
   if (quante < 3) return "solo " + quante + " righe con 'prossimo atteso': il check non sta misurando";
-  return true;`));
+  return true;`)));
 
 /* Lo stato intermedio deve ESISTERE nel codice: senza, una data appena passata torna a
    uscire come "prossimo", oppure — peggio — accende l'allarme dei dati mancanti su una
@@ -4883,8 +4884,10 @@ check("v363 · nessun \"prossimo atteso\" riferito a una data gia' passata", suV
 check("v363 · esiste lo stato 'atteso, non ancora arrivato, entro la tolleranza'", (() => {
   const b = bloccoDa(src, "function rigaCadenza", { max: 2500 });
   if (!/c\.passata/.test(b)) return no("sparito il ramo dello stato intermedio");
-  if (!/ERA ATTESO E NON È ARRIVATO/.test(b)) return no("sparito l'allarme dei dati davvero mancanti");
-  const iAll = b.indexOf("ERA ATTESO"), iMedio = b.indexOf("c.passata");
+  if (!/NON È ARRIVATO/.test(b)) return no("sparito l'allarme dei dati davvero mancanti");
+  if (/prossimo atteso \$\{it\(c\.prossimo\)\} ⚠/.test(b))
+    return no("l'allarme torna a dire \"prossimo atteso\" davanti a una data gia' passata");
+  const iAll = b.indexOf("NON È ARRIVATO"), iMedio = b.indexOf("c.passata");
   if (iMedio < iAll) return no("lo stato intermedio viene prima dell'allarme: coprirebbe i ritardi veri");
   if (!/passata: p < oggi/.test(bloccoDa(src, "function cadenzaDato", { max: 6000 })))
     return no("cadenzaDato non espone piu' 'passata': il ramo intermedio non puo' accendersi");

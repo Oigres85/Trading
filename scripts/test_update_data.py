@@ -639,6 +639,91 @@ _sens100 = ud.sensibilita_macro(_t * 100, {"bench": ("B", "canale", _b)})
 check("v325 sensibilita': il beta non cambia se le chiusure arrivano in un'altra scala",
       _sens100 and abs(_sens100["bench"]["beta"] - _sens["bench"]["beta"]) < 0.01)
 
+# ⚠⚠ v369 — NESSUNA VARIABILE DEL RECORD PUO' ESSERE ASSEGNATA SOLO DENTRO UN RAMO.
+# La pipeline e' rimasta rotta da v365 a v369 per questo: _comb, _cred, _fuori e _short erano
+# assegnati dentro `if has_fundamentals(ticker, currency):` e usati nel record COSTRUITO ANCHE
+# per i simboli senza fondamentali — indici (^GSPC), futures (CL=F), ETF. NameError, run morto.
+# ⚠ ast.parse e node --check passano: la sintassi e' valida, lo scope no. Terza volta che questa
+# classe morde (la prima fu `prezzo` in datiNostriDelTitolo). Un controllo a occhio non regge
+# tre volte: qui e' meccanico, sull'albero sintattico.
+#
+# ⚠⚠ E LA PRIMA STESURA DI QUESTO GATE ERA RUMOROSA: segnalava anche ath, c0, c1, h, price_asof
+# e v. Verificati a mano, erano SEI FALSI POSITIVI su sei — c0/c1/h/v vivono solo dentro scope
+# annidati (il rilevatore confondeva DUE return-dict diversi dentro la stessa funzione), e
+# ath/price_asof sono assegnati sia nel try sia nell'except, quindi esistono sempre.
+# Un gate che grida su codice giusto si impara a ignorare: e' la lezione di C9, gia' pagata.
+# Ora l'analisi e' quella vera: il record e' il return-dict piu' esterno, si contano solo i Name
+# letti DIRETTAMENTE (non dentro lambda/comprehension/def), e "assegnata sempre" segue i rami —
+# if/else conta solo se entrambi assegnano, try/except solo se assegnano corpo E tutti i gestori.
+import ast as _ast
+
+_UD_SRC = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+_FN = next(n for n in _ast.walk(_ast.parse(_UD_SRC))
+           if isinstance(n, _ast.FunctionDef) and n.name == "fetch_symbol")
+_SCOPE_ANNIDATI = (_ast.Lambda, _ast.ListComp, _ast.SetComp, _ast.DictComp,
+                   _ast.GeneratorExp, _ast.FunctionDef, _ast.AsyncFunctionDef)
+
+
+def _sicure(corpo):
+    """Variabili assegnate SU OGNI CAMMINO che attraversa questa lista di istruzioni."""
+    out = set()
+    for st in corpo:
+        if isinstance(st, (_ast.Assign, _ast.AnnAssign, _ast.AugAssign)):
+            tgt = st.targets if isinstance(st, _ast.Assign) else [st.target]
+            for t_ in tgt:
+                out |= {n.id for n in _ast.walk(t_) if isinstance(n, _ast.Name)}
+        elif isinstance(st, _ast.If):
+            # conta solo se ENTRAMBI i rami assegnano: un if senza else non garantisce niente
+            if st.orelse:
+                out |= _sicure(st.body) & _sicure(st.orelse)
+        elif isinstance(st, _ast.Try):
+            # il try puo' fallire a meta': garantito solo cio' che assegnano corpo E ogni gestore
+            if st.handlers:
+                g = _sicure(st.body)
+                for h in st.handlers:
+                    g &= _sicure(h.body)
+                out |= g
+            out |= _sicure(st.finalbody)
+        # for/while non garantiscono: possono iterare zero volte
+    return out
+
+
+def _letti_dal_record(fn):
+    """I Name letti DIRETTAMENTE nel return-dict piu' grande (il record), scope annidati esclusi."""
+    dicts = [st.value for st in _ast.walk(fn)
+             if isinstance(st, _ast.Return) and isinstance(st.value, _ast.Dict)]
+    if not dicts:
+        return set()
+    record = max(dicts, key=lambda d: len(d.keys))
+    letti = set()
+
+    def visita(n, annidato):
+        for c in _ast.iter_child_nodes(n):
+            if isinstance(c, _SCOPE_ANNIDATI):
+                visita(c, True)
+            else:
+                if not annidato and isinstance(c, _ast.Name) and isinstance(c.ctx, _ast.Load):
+                    letti.add(c.id)
+                visita(c, annidato)
+
+    visita(record, False)
+    return letti
+
+
+_ASSEGNATE_OVUNQUE = {n.id for x in _ast.walk(_FN) if isinstance(x, (_ast.Assign, _ast.For))
+                      for t_ in (x.targets if isinstance(x, _ast.Assign) else [x.target])
+                      for n in _ast.walk(t_) if isinstance(n, _ast.Name)}
+_ARG = {a.arg for a in _FN.args.args} | {a.arg for a in _FN.args.kwonlyargs}
+_RECORD = _letti_dal_record(_FN)
+_A_RISCHIO = sorted((_RECORD & _ASSEGNATE_OVUNQUE) - _sicure(_FN.body) - _ARG)
+check("v369 nessuna variabile del record assegnata solo dentro un ramo (NameError su indici/futures/ETF)",
+      not _A_RISCHIO)
+if _A_RISCHIO:
+    print(f"      ↳ a rischio NameError nel record: {', '.join(_A_RISCHIO)}")
+# ⚠ e il controllo deve VEDERE qualcosa: un'analisi che non legge il record passa sempre
+check("v369 l'analisi dello scope sta davvero leggendo il record di fetch_symbol",
+      len(_RECORD) >= 15 and "stats" in _RECORD)
+
 # ⚠⚠ v367 — IL P/S DEVE ESSERE CALCOLATO DOPO LA RIPULITURA CROSS-CURRENCY.
 # Introdotto in v365 e gia' pubblicato con il difetto: lo calcolavo PRIMA, e su SK hynix
 # (bilanci in KRW, ADR quotato in USD) usciva capitalizzazione in dollari diviso ricavi in won.

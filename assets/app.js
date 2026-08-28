@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "368";
+const BUILD_VERSION = "369";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1799,7 +1799,7 @@ function rigaCadenza(chiave, dataRilevazione) {
       ? `rilevazione ${it(c.rilevato)} (${c.eta} giorni fa)`
       : `riferito a ${it(c.rilevato)} · pubblicato ~${it(c.pubblicato)} (${c.eta} giorni fa)`)
     + (c.scaduto
-        ? ` · prossimo atteso ${it(c.prossimo)} ⚠ ERA ATTESO E NON È ARRIVATO`
+        ? ` · era atteso il ${it(c.prossimo)} e NON È ARRIVATO ⚠`
         : c.passata
           ? ` · era atteso il ${it(c.prossimo)} e non è ancora arrivato, ma è dentro la tolleranza `
             + `di ${c.passo === "giornaliero" ? "due giorni lavorativi" : "un giorno"}: nessun allarme`
