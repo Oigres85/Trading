@@ -5230,6 +5230,36 @@ check("v370 · il peso della posizione e' scritto una volta sola, in una forma s
     if (a[1] !== b2[1]) return "il peso di " + tk + " e' scritto " + a[1] + "% in un punto e " + b2[1] + "% in un altro";
     return true;`));
 
+/* ---------- v371: il denominatore vero ----------
+   ⚠⚠ Il pacchetto ripeteva QUATTRO VOLTE "il sistema non conosce la liquidita' ne' il BTP", ed
+   era FALSO: config/portfolio_state.json li contiene entrambi, e STATO_PTF_PATH era una costante
+   DICHIARATA E MAI USATA — nessuno leggeva quel file.
+   Conseguenza: ogni misura di rischio (volatilita' 51,5%, drawdown -24,4%, VaR 4,95%) descriveva
+   un capitale che non e' quello dell'investitore. Con l'azionario all'85% del totale, la
+   volatilita' vera del patrimonio e' ~44%, non 51,5%.
+   Non era un dato mancante: era un file non letto. */
+check("v371 · il pacchetto dichiara quanto pesa l'azionario sul patrimonio, non solo su se stesso",
+  suVeriEsito(`
+    STATO_PTF = { cash: { v: 10000, at: "2026-08-08" }, btp: { v: { qty: 40000, pmc: 100 } } };
+    const tk = (DATA.watchlist.find(r => r && Number(r.qta) > 0 && !String(r.ticker).startsWith("^")) || {}).ticker;
+    const p = buildPromptTicker(tk);
+    if (/non li conosce entrambi|esclude il BTP e la liquidita'/.test(p))
+      return "il pacchetto dichiara ancora di non conoscere liquidita' e BTP, che invece ha";
+    if (!/MA NON E' IL PATRIMONIO/.test(p)) return "non dichiara che l'azionario non e' il patrimonio";
+    if (!/va moltiplicata per/.test(p)) return "non da' il fattore con cui riportare le misure sul patrimonio";
+    return true;`));
+
+/* ⚠ e senza il file il pacchetto deve DIRLO, non fingere un totale: un denominatore inventato
+   e' peggio di un denominatore dichiarato mancante. */
+check("v371 · senza lo stato patrimoniale il pacchetto lo dichiara invece di inventare un totale",
+  suVeriEsito(`
+    STATO_PTF = null;
+    const tk = (DATA.watchlist.find(r => r && Number(r.qta) > 0 && !String(r.ticker).startsWith("^")) || {}).ticker;
+    const p = buildPromptTicker(tk);
+    if (/MA NON E' IL PATRIMONIO/.test(p)) return "senza dati dichiara comunque una quota del patrimonio";
+    if (!/non sono disponibili in questo run/.test(p)) return "non dichiara che il denominatore manca";
+    return true;`));
+
 /* ---------- meta v365: nessun check DOPO il conteggio ----------
    ⚠⚠ LA CLASSE PEGGIORE TROVATA FINORA, e l'ho prodotta io due volte in un giorno.
    La suite conta cosi':

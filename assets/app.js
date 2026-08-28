@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "370";
+const BUILD_VERSION = "371";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -463,6 +463,23 @@ const editMode = { portfolio: false, watchlist: false };
    e le posizioni su iPhone, si tengono ENTRAMBE. Con un timestamp unico per tutto il blocco, la
    modifica più vecchia sparirebbe in silenzio — e una perdita silenziosa è peggio di un conflitto. */
 const STATO_PTF_PATH = "config/portfolio_state.json";
+
+/* ⚠ v371 — lo stato patrimoniale NON azionario, letto davvero. Serve come DENOMINATORE: senza,
+   ogni misura di rischio parla di un capitale che non e' quello dell'investitore.
+   Difensivo per costruzione: se il file manca o e' vuoto si torna al comportamento di prima
+   (rischio sul solo azionario) e il pacchetto lo DICHIARA, invece di fingere un totale. */
+let STATO_PTF = null;
+function fuoriAzionarioEur() {
+  const st = STATO_PTF;
+  if (!st) return null;
+  const cassa = numero((st.cash || {}).v);
+  const btp = st.btp && st.btp.v ? numero(st.btp.v.qty) * numero(st.btp.v.pmc) / 100 : null;
+  const voci = [];
+  if (Number.isFinite(cassa) && cassa > 0) voci.push({ che: "liquidita'", eur: cassa, al: (st.cash || {}).at || null });
+  if (Number.isFinite(btp) && btp > 0) voci.push({ che: "titoli di Stato", eur: btp, al: (st.btp || {}).at || null });
+  if (!voci.length) return null;
+  return { voci, totale: voci.reduce((a2, x) => a2 + x.eur, 0) };
+}
 
 
 /* segna QUALE campo è cambiato e quando, poi salva e spedisce */
@@ -1274,6 +1291,17 @@ let DIARIO_VOCI = [];
 /* Carica il diario dal repository. E' un file PUBBLICO che contiene le operazioni del CEO:
    non ci finiscono importi in euro ne' la sua liquidita', solo quantita' e prezzi di carico,
    che sono gia' nel pacchetto per le posizioni aperte. */
+/* ⚠ v371 — carica lo stato patrimoniale NON azionario. Stesso modello del diario: se la rete
+   manca o il file non c'e', STATO_PTF resta null e il pacchetto lo dichiara invece di fingere. */
+async function loadStatoPtfCloud() {
+  try {
+    const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${STATO_PTF_PATH}?t=${Date.now()}`, { cache: "no-store" });
+    if (!r.ok) return;
+    const v = await r.json();
+    if (v && typeof v === "object") STATO_PTF = v;
+  } catch { /* offline: si resta senza denominatore, e si dice */ }
+}
+
 async function loadDiarioCloud() {
   try {
     const r = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${DIARY_PATH}?t=${Date.now()}`, { cache: "no-store" });
@@ -8926,9 +8954,23 @@ function contestoPortafoglio(tkCorrente) {
   if (!totAz) return "";
   const L = [];
   L.push("=== IL LIBRO IN CUI QUESTA POSIZIONE VIVE (contesto, non richiesta di analisi del portafoglio) ===");
-  L.push("Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato "
-    + "e la liquidita' restano fuori perche' il sistema non li conosce entrambi. Nessun importo "
-    + "assoluto: servirebbe a dimensionare, e dimensionare e' vietato.");
+  const fuori = fuoriAzionarioEur();
+  if (fuori) {
+    const tot = totAz + fuori.totale;
+    const quota = tot > 0 ? totAz / tot * 100 : null;
+    L.push("Pesi sul solo comparto AZIONARIO, che e' il denominatore con cui le posizioni si "
+      + "confrontano fra loro. ⚠ MA NON E' IL PATRIMONIO: l'azionario vale "
+      + `${/^(8|11)/.test(String(Math.round(quota))) ? "l'" : "il "}${fmtNum.format(Math.round(quota * 10) / 10)}% del totale, accanto a `
+      + fuori.voci.map(x => `${x.che}${x.al ? ` (al ${String(x.al).slice(0, 10)})` : ""}`).join(" e ")
+      + ". Ogni misura di rischio piu' sotto e' calcolata sull'azionario: sul patrimonio intero "
+      + `va moltiplicata per ${fmtNum.format(Math.round(quota) / 100)}. `
+      + "Nessun importo assoluto: servirebbe a dimensionare, e dimensionare e' vietato.");
+  } else {
+    L.push("Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo di Stato "
+      + "e la liquidita' non sono disponibili in questo run, quindi le misure di rischio piu' sotto "
+      + "descrivono l'azionario e NON il patrimonio. Nessun importo assoluto: servirebbe a "
+      + "dimensionare, e dimensionare e' vietato.");
+  }
   const ord = [...azionarie].sort((a, b) => b.v - a.v);
   ord.forEach(x => {
     const pct = x.v / totAz * 100;
@@ -10429,7 +10471,7 @@ function datiNostriDelTitolo(tk) {
     L.push(`- ⚠ QUESTO TITOLO E' GIA' IN PORTAFOGLIO: ${fmtNum.format(q)} quote a un prezzo medio di carico `
       + `di ${pmc}${g != null ? `, oggi ${signTxt(Math.round(g * 10) / 10)}` : ""}`
       + (peso != null ? `, e vale il ${peso}% del controvalore azionario del libro `
-          + `(su ${pl.quante} posizioni; esclude il BTP e la liquidita', che il sistema non conosce)` : "")
+          + `(su ${pl.quante} posizioni, sul solo comparto azionario)` : "")
       + `. `
       + `Non e' una decisione di ingresso ma di mantenimento: il prezzo di carico non cambia cosa fa il `
       + `titolo, cambia cosa costa uscirne e quale plusvalenza si realizzerebbe. Il sistema NON conosce `
@@ -11652,6 +11694,7 @@ loadData();
 /* v348 — il diario rientra col portafoglio: c'e' di nuovo qualcosa da annotare, e serve al
    pacchetto per sapere su quali titoli il CEO ha gia' agito. */
 loadDiarioCloud();
+loadStatoPtfCloud();   // v371 — il denominatore vero: liquidita' e titoli di Stato
 loadPromptHeaderCloud();   // testata del pacchetto macro (config/prompt_header_macro.txt)
 /* v257 — la watchlist e il grafico all'avvio: prima la copia locale (subito, senza rete), poi
    quella del repo quando arriva. Stessa logica dell'ordine delle sezioni: l'attesa della rete
