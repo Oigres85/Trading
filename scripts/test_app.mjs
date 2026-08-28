@@ -182,6 +182,7 @@ const suVeri = (code, cash = 28500) => run(`
   const _salva = DATA, _cash = cashEur;
   DATA = JSON.parse(JSON.stringify(REALE)); cashEur = ${cash}; recomputeTotals();
   try { ${code} } finally { DATA = _salva; cashEur = _cash; recomputeTotals(); }`);
+const suVeriEsito = (code) => { const r = suVeri(code); return r === true ? true : no(String(r)); };
 const suReale = suVeri;          // nome storico, stessa funzione
 
 /* ---------- checks ---------- */
@@ -4642,7 +4643,7 @@ check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => 
      regex compila e non matcha mai. Si cercano i template che contengono una regex e dentro di
      essi i backslash non raddoppiati davanti alle classi che contano. */
   const soloCodice = mio.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|conDiario|conComb|conCombEsito)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
+  for (const m of soloCodice.matchAll(/(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito)\(`(?:[^`\\]|\\[\s\S])*`/g)) {
     const t = m[0];
     if (!/\.test\(|\.match\(|new RegExp/.test(t)) continue;
     for (const b of t.matchAll(/(?<!\\)\\[dwsbDWSB]/g)) {
@@ -5113,7 +5114,7 @@ check("meta: il rilevatore dei backslash copre ogni helper che passa un template
   if (!scanner) return no("non trovo piu' l'elenco degli helper nel rilevatore: e' cieco");
   const coperti = new Set(scanner[1].split("|"));
   /* gli helper sono quelli definiti come `const X = (...) => run(` / `=> suVeri(` */
-  const definiti = [...mio.matchAll(/^const (\w+) = \([^)]*\) =>\s*(?:run|suVeri|suReale)\(/gm)].map((m) => m[1]);
+  const definiti = [...mio.matchAll(/^const (\w+) = \([^)]*\) =>\s*(?:\{[^\n]*?)?(?:run|suVeri|suReale)\(/gm)].map((m) => m[1]);
   const scoperti = definiti.filter((n) => !coperti.has(n));
   if (scoperti.length)
     return no(`helper non sorvegliati dal rilevatore dei backslash: ${scoperti.join(", ")} — `
@@ -5139,7 +5140,8 @@ check("v368 · ogni regola della testata macro ha il suo corrispettivo nel pacch
   /* tema · come si riconosce nella testata macro · come si riconosce nel pacchetto titolo */
   const TEMI = [
     ["ricerca online obbligatoria", /RICERCA NON E' FACOLTATIVA/, /PASSO 0 — OBBLIGATORIO/],
-    ["cosa fare se non puoi navigare", /NON HO ACCESSO ALLA RETE/, /Non ho accesso al web/],
+    /* niente da confrontare qui: la politica sul "non puoi navigare" e' DELIBERATAMENTE
+       diversa fra i due pacchetti, e sta nella tabella DIVERGENZE_VOLUTE qui sotto */
     ["mai inventare, n\.d\. se manca", /Mai inventare valori/, /"n\.d\." vale per il singolo dato/],
     ["numeri gia' calcolati: non rifarli", /I NUMERI GIA' CALCOLATI/, /I NUMERI GIA' CALCOLATI QUI SI USANO COME SONO/],
     ["l'eta' del dato fa parte del dato", /LA DATA DEL DATO E' PARTE DEL DATO/, /giorni fa|eta'|snapshot/],
@@ -5147,7 +5149,25 @@ check("v368 · ogni regola della testata macro ha il suo corrispettivo nel pacch
     ["dire cosa smentirebbe l'analisi", /DOVE TI ASPETTERESTI DI SBAGLIARE/, /romperebbe la tesi|smentirebbe|ribalterebbe/],
     ["segnalare le contraddizioni", /si contraddicono/, /contraddi/],
   ];
+  /* ⚠⚠ LE DIVERGENZE VOLUTE, con la loro ragione. Un tema elencato qui NON deve coincidere fra
+     i due pacchetti — deve divergere ESATTAMENTE COSI'. Se una delle due parti cambia lato, il
+     check fallisce: e' il contrario di un'eccezione, e' un vincolo piu' stretto.
+     Senza questa tabella il gate confrontava la PRESENZA del tema e passava su due politiche
+     opposte, certificandole allineate. */
+  const DIVERGENZE_VOLUTE = [
+    { tema: "senza rete: proseguire o fermarsi",
+      perche: "nel macro i dati SONO l'analisi (storia misurata) e senza rete restano utili; "
+        + "nel titolo meta' del valore e' ricerca viva, quindi senza rete non e' producibile",
+      macro: /quanto segue e' la lettura di uno snapshot/, macroNo: /e FERMATI/,
+      ticker: /e FERMATI/, tickerNo: /quanto segue e' la lettura di uno snapshot/ },
+  ];
   const buchi = [];
+  for (const d of DIVERGENZE_VOLUTE) {
+    if (!d.macro.test(hdr)) buchi.push(`"${d.tema}": la testata macro non prescrive piu' il suo lato (${d.perche})`);
+    if (d.macroNo.test(hdr)) buchi.push(`"${d.tema}": la testata macro ha preso il lato del pacchetto titolo`);
+    if (!d.ticker.test(tk)) buchi.push(`"${d.tema}": il pacchetto titolo non prescrive piu' il suo lato (${d.perche})`);
+    if (d.tickerNo.test(tk)) buchi.push(`"${d.tema}": il pacchetto titolo ha preso il lato della testata macro`);
+  }
   for (const [nome, reMacro, reTicker] of TEMI) {
     if (!reMacro.test(hdr)) { buchi.push(`"${nome}" e' sparito dalla TESTATA MACRO`); continue; }
     if (!reTicker.test(tk)) buchi.push(`"${nome}" c'e' nella testata macro e MANCA nel pacchetto titolo`);
@@ -5155,6 +5175,60 @@ check("v368 · ogni regola della testata macro ha il suo corrispettivo nel pacch
   if (buchi.length) return no(`le due testate divergono: ${buchi.join(" · ")}`);
   return true;
 })());
+
+/* ---------- v370: tre difetti trovati da un'analisi esterna del pacchetto, verificati ----------
+   Un analista senior ha letto il pacchetto vero e ha trovato tre cose. Le ho verificate tutte e
+   tre nel codice prima di correggerle: erano vere. */
+
+/* ⚠⚠ 1. LE SCOMMESSE EFFETTIVE ERANO CIECHE AI PESI, e la colonna stava nella riga il cui
+   mestiere dichiarato e' proprio isolare l'effetto dei pesi: "pesi reali" e "pesi uguali"
+   chiamavano effettive(tutti) con lo STESSO argomento e stampavano lo stesso numero per
+   costruzione. La formula 1/(1/k + (k-1)/k·rho) E' il caso equipesato (w = 1/k); la generale
+   e' 1/((1-rho)·somma(w²) + rho). Sul libro vero: 2,3 con i pesi reali contro 2,5 equipesato. */
+check("v370 · le scommesse effettive vedono i pesi, altrimenti la colonna non isola niente", (() => {
+  const b = bloccoDa(src, "function profiliRischio", { max: 9000 });
+  if (!/effettive = \(tks, pesi\)/.test(b)) return no("effettive() non accetta piu' i pesi");
+  if (!/effettive\(tutti, pesiVeri\)/.test(b)) return no("la riga 'pesi reali' non passa i pesi veri: torna a stampare l'equipeso");
+  if (!/somma dei quadrati dei pesi|Herfindahl/.test(b)) return no("sparito il termine dei pesi dalla formula");
+  const r = suVeri(`
+    const pr = profiliRischio();
+    if (!pr || !pr.profili || pr.profili.length < 2) return "nessun profilo da confrontare";
+    const mio = pr.profili[0], eq = pr.profili.find(x => x.nome.startsWith("Stessi nomi"));
+    if (!eq) return "sparita la riga equipesata: il confronto non esiste piu'";
+    if (!Number.isFinite(mio.eff) || !Number.isFinite(eq.eff)) return "scommesse effettive non calcolate";
+    if (Math.abs(mio.eff - eq.eff) < 1e-9)
+      return "pesi reali ed equipesato danno lo STESSO numero: la colonna non isola l'effetto dei pesi";
+    return true;`);
+  return r === true ? true : no(String(r));
+})());
+
+/* ⚠⚠ 2. `debtToEquity` di yfinance e' una PERCENTUALE. Stampato nudo, MRVL a 28,97 si legge
+   "29 volte i mezzi propri" — una societa' sull'orlo del baratro — invece di 0,29×, che e' un
+   bilancio solido. L'unita' mancante cambia il segno del giudizio, non la forma. */
+check("v370 · il debito sui mezzi propri porta la sua unita'", (() => {
+  const m = src.match(/debito\/mezzi propri[\s\S]{0,320}/);
+  if (!m) return no("sparita la riga del debito sui mezzi propri");
+  if (!/la fonte lo pubblica in percentuale/.test(m[0]))
+    return no("il rapporto torna nudo: senza unita' 28,97 si legge 29× invece di 0,29×");
+  if (!/\/ 100/.test(m[0])) return no("il valore non viene piu' convertito da percentuale a multiplo");
+  return true;
+})());
+
+/* ⚠⚠ 3. QUARTA VOLTA che lo stesso numero esce in due forme nello stesso pacchetto: il peso
+   della posizione era "3%" nella riga del portafoglio e "3.4%" nella lista del libro. */
+check("v370 · il peso della posizione e' scritto una volta sola, in una forma sola",
+  suVeriEsito(`
+    const conQta = (DATA.watchlist || []).filter(r => r && Number(r.qta) > 0 && Number(r.controvalore) > 0
+      && !String(r.ticker).startsWith("^"));
+    if (!conQta.length) return "nessuna posizione con quantita' e controvalore: il check non puo' misurare";
+    const tk = conQta[0].ticker;
+    const p = buildPromptTicker(tk);
+    const a = p.match(/vale il ([\\d.,]+)% del controvalore/);
+    const iRiga = p.indexOf(tk + ": ", p.indexOf("IL LIBRO IN CUI QUESTA POSIZIONE VIVE"));
+    const b2 = iRiga < 0 ? null : p.slice(iRiga, iRiga + tk.length + 40).match(/([\\d.,]+)% dell/);
+    if (!a || !b2) return "non trovo i due punti in cui il peso e' scritto: il check non misura";
+    if (a[1] !== b2[1]) return "il peso di " + tk + " e' scritto " + a[1] + "% in un punto e " + b2[1] + "% in un altro";
+    return true;`));
 
 /* ---------- meta v365: nessun check DOPO il conteggio ----------
    ⚠⚠ LA CLASSE PEGGIORE TROVATA FINORA, e l'ho prodotta io due volte in un giorno.

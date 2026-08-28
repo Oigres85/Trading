@@ -124,3 +124,33 @@ jobs:
             sleep 3
           done
           echo "push fallito dopo i tentativi" && exit 1
+
+      # ⚠⚠ v370 — L'ALLARME STAVA DOPO IL FUSIBILE, quindi non e' mai scattato.
+      # La pipeline e' rimasta rotta TRE GIORNI (12 run consecutivi falliti) e il CEO l'ha
+      # scoperto da uno screenshot di GitHub, non dal sistema: `notify_alerts.py` gira agli step
+      # 11 e 12, mentre a rompersi e' lo step 5 (`update_data.py`). Quando quello cade, tutti
+      # gli step successivi sono `skipped` — cioe' il canale di allarme e' spento proprio nel
+      # momento in cui esiste qualcosa da segnalare.
+      # Questo step gira SOLO in caso di fallimento, e apre una Issue: `issues: write` c'e' gia'.
+      - name: Allarme se la pipeline e' caduta
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          titolo="Pipeline caduta — run #${GITHUB_RUN_NUMBER}"
+          # una sola Issue aperta per volta: un allarme che si ripete dieci volte si ignora
+          aperta=$(gh issue list --state open --label pipeline --limit 1 --json number --jq '.[0].number')
+          corpo="Il workflow \`${GITHUB_WORKFLOW}\` e' fallito.
+
+          Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
+          Commit: ${GITHUB_SHA}
+
+          I dati sulla dashboard restano fermi all'ultimo run riuscito finche' questo non e' risolto.
+          Per il log dello step caduto: \`gh run view ${GITHUB_RUN_ID} --log-failed\`"
+          if [ -n "$aperta" ]; then
+            gh issue comment "$aperta" --body "$corpo"
+          else
+            gh issue create --title "$titolo" --label pipeline --body "$corpo"
+          fi
+          exit 0

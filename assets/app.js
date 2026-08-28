@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "369";
+const BUILD_VERSION = "370";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8869,9 +8869,19 @@ function profiliRischio() {
     }
     return cs.length ? cs.reduce((a, b) => a + b, 0) / cs.length : null;
   };
-  const effettive = (tks) => {
+  /* ⚠ v370 — CONSAPEVOLE DEI PESI. `pesi` e' una mappa ticker→peso (non normalizzata);
+     omessa, si ricade sull'equipeso, che e' il caso particolare w = 1/k. */
+  const effettive = (tks, pesi) => {
     const rho = correlaMedia(tks), k = tks.length;
-    return (rho == null || 1 / k + (k - 1) / k * rho <= 0) ? null : 1 / (1 / k + (k - 1) / k * rho);
+    if (rho == null || !k) return null;
+    let hh = 1 / k;                       // somma dei quadrati dei pesi (Herfindahl)
+    if (pesi) {
+      const w = tks.map(t => Math.max(0, numero(pesi.get(t)) || 0));
+      const tot = w.reduce((a, b) => a + b, 0);
+      if (tot > 0) hh = w.reduce((a, x) => a + (x / tot) ** 2, 0);
+    }
+    const den = (1 - rho) * hh + rho;
+    return den > 0 ? 1 / den : null;
   };
   const pesiVeri = new Map(righe.map(r => [r.ticker, numero(r.controvalore)]));
   const ord = [...pesiVeri.entries()].sort((a, b) => b[1] - a[1]);
@@ -8879,13 +8889,14 @@ function profiliRischio() {
   const tutti = righe.map(r => r.ticker);
   const senzaTre = tutti.filter(t => !primeTre.includes(t));
   const out = [
-    { nome: "Il tuo libro", nota: "pesi reali", ...misura(serie(pesiVeri)), eff: effettive(tutti), n: tutti.length },
+    { nome: "Il tuo libro", nota: "pesi reali", ...misura(serie(pesiVeri)), eff: effettive(tutti, pesiVeri), n: tutti.length },
     { nome: "Stessi nomi, pesi uguali", nota: "isola l'effetto delle scelte di peso",
       ...misura(serie(new Map(tutti.map(t => [t, 1])))), eff: effettive(tutti), n: tutti.length },
   ];
   if (senzaTre.length >= 3) out.push({ nome: `Senza le prime tre (${primeTre.join(", ")})`,
     nota: "isola l'effetto della concentrazione",
-    ...misura(serie(new Map(senzaTre.map(t => [t, pesiVeri.get(t)])))), eff: effettive(senzaTre), n: senzaTre.length });
+    ...misura(serie(new Map(senzaTre.map(t => [t, pesiVeri.get(t)])))),
+    eff: effettive(senzaTre, pesiVeri), n: senzaTre.length });
   /* gli indici: isolano l'effetto della SELEZIONE. Non sono un obiettivo, sono un metro. */
   for (const [tk, et] of [["NQ=F", "Solo Nasdaq 100"], ["^SOX", "Solo semiconduttori (SOX)"]]) {
     const r = ((DATA && DATA.watchlist) || []).find(x => x && x.ticker === tk);
@@ -9638,7 +9649,7 @@ function fattiTitolo(tk) {
                         const fx = numero(DATA && DATA.eurusd) || 1;
                         const eur = (x) => (x.currency === 'EUR' ? 1 : 1 / fx) * numero(x.price) * numero(x.qta);
                         const tot = tutte.reduce((a2, x) => a2 + eur(x), 0);
-                        return tot > 0 ? { pct: Math.round(eur(riga) / tot * 100), quante: tutte.length } : null;
+                        return tot > 0 ? { pct: Math.round(eur(riga) / tot * 1000) / 10, quante: tutte.length } : null;
                       })() } : null,
   };
 }
@@ -10641,7 +10652,10 @@ function datiNostriDelTitolo(tk) {
       Number.isFinite(numero(t.evEbitda)) ? (numero(t.evEbitda) > 0 ? `EV/EBITDA ${fmtNum.format(numero(t.evEbitda))}×` : `EV/EBITDA NON SIGNIFICATIVO (${fmtNum.format(numero(t.evEbitda))}×): l'EBITDA e' negativo, e il rapporto cambia segno invece di misurare quanto e' cara la societa'`) : null,
       Number.isFinite(t.ps) ? `P/S ${fmtNum.format(t.ps)}×` : null,
       Number.isFinite(t.evS) ? `EV/ricavi ${fmtNum.format(t.evS)}×` : null,
-      Number.isFinite(numero(t.debtEquity)) ? `debito/mezzi propri ${fmtNum.format(numero(t.debtEquity))}` : null,
+      Number.isFinite(numero(t.debtEquity))
+        ? `debito/mezzi propri ${fmtNum.format(Math.round(numero(t.debtEquity)) / 100)}× `
+          + `(${fmtNum.format(Math.round(numero(t.debtEquity) * 10) / 10)}% dei mezzi propri — la fonte lo pubblica in percentuale)`
+        : null,
       perc(t.shortFloat) ? `short float ${perc(t.shortFloat)}` : null,
       mld(t.capMercato) ? `capitalizzazione ${mld(t.capMercato)}` : null,
     ].filter(Boolean);
@@ -10797,13 +10811,34 @@ function datiNostriDelTitolo(tk) {
         + ` ⚠ SU UN TITOLO CICLICO i due multipli raccontano storie opposte e vanno letti insieme: il trailing dice cosa l'azienda HA guadagnato, il forward incorpora l'ipotesi che il ciclo continui — che di solito e' proprio l'ipotesi in discussione.`);
     }
     if (t.settore) L.push(`- Settore secondo la nostra classificazione: ${t.settore}`);
-    if (t.trimestrale) L.push(`- Prossima trimestrale attesa: ${t.trimestrale}`);
+    if (t.trimestrale) {
+      const dTrim = new Date(String(t.trimestrale).slice(0, 10));
+      const giorni = isNaN(dTrim) ? null : Math.round((Date.now() - dTrim.getTime()) / 86400000);
+      L.push(giorni != null && giorni > 0
+        ? `- ⚠ TRIMESTRALE GIA' USCITA: era attesa il ${t.trimestrale}, ${giorni} ${giorni === 1 ? "giorno" : "giorni"} fa. `
+          + `Questo pacchetto e' stato generato DOPO: i risultati non sono qui e vanno cercati, e l'analisi `
+          + `che scrivi e' un'analisi post-trimestrale, non l'attesa di un evento.`
+        : `- Prossima trimestrale attesa: ${t.trimestrale}${giorni != null ? ` (fra ${-giorni} ${giorni === -1 ? "giorno" : "giorni"})` : ""}`);
+    }
   }
   if (!L.length) return "";
   return [
     `=== QUELLO CHE IL SISTEMA SA GIA' DI ${T} (questi numeri sono qui, e sono quelli che il sistema pubblica) ===`,
     `Questi numeri sono calcolati sulle stesse barre che disegnano il grafico, e sono quelli che il CEO vede sulla pagina.`,
-    `⚠ SUL RITARDO: i prezzi delle azioni americane arrivano da fonti gratuite e sono ritardati di circa 15 minuti — vale per questo pacchetto come per qualunque fonte gratuita, TradingView compresa. Cambi, indici di volatilita', cripto e materie prime sono in tempo reale. Se il titolo si sta muovendo forte adesso, il prezzo qui sotto non e' l'ultimo scambio.`,
+    (() => {
+      const q = DATA && DATA.updated_at ? new Date(DATA.updated_at) : null;
+      const ore = q && !isNaN(q) ? Math.max(0, Math.round((Date.now() - q.getTime()) / 3600000)) : null;
+      const vecchio = ore != null && ore >= 6;
+      return `⚠ SUL RITARDO: ` + (vecchio
+        ? `QUESTI PREZZI HANNO ${ore} ORE. Non e' il ritardo ordinario di una fonte gratuita (~15 minuti): `
+          + `e' uno snapshot vecchio, e su un titolo con questa ampiezza giornaliera i livelli si sono `
+          + `spostati. Uno scarto fra questi livelli e una fonte viva NON e' un difetto di misura del `
+          + `sistema: e' l'eta' del dato, perche' l'aggiornamento non e' passato.`
+        : `i prezzi delle azioni americane arrivano da fonti gratuite e sono ritardati di circa 15 minuti `
+          + `— vale per questo pacchetto come per qualunque fonte gratuita, TradingView compresa. Cambi, `
+          + `indici di volatilita', cripto e materie prime sono in tempo reale. Se il titolo si sta `
+          + `muovendo forte adesso, il prezzo qui sotto non e' l'ultimo scambio.`);
+    })(),
     `Sono il riferimento del sistema. Uno scarto materiale rispetto a cio' che si trova in rete (oltre il 2% su un livello di prezzo) e' un fatto che va scritto insieme a entrambi i valori: una scelta fatta in silenzio fra i due non e' verificabile.`,
     /* ═══ v299 — IL BLOCCO "COSA NON SO" ══════════════════════════════════════════════════════
    Trovato nella revisione: dei nove blocchi che il prompt chiede, solo DUE si possono
