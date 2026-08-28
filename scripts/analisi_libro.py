@@ -21,7 +21,8 @@ uso:  python3 scripts/analisi_libro.py            → il libro
       python3 scripts/analisi_libro.py MRVL       → il libro + la scheda di un titolo
       python3 scripts/analisi_libro.py --json     → uscita strutturata
 """
-import json, math, sys
+import json, math, sys, time
+from datetime import datetime, timezone
 from pathlib import Path
 
 MIN_SEDUTE = 60          # sotto questa soglia un nome non entra nella matrice, e si dichiara
@@ -86,8 +87,17 @@ def analizza():
     import yfinance as yf
     az, _ = carica_posizioni()
     tutti = [r["ticker"] for r in az]
-    px = yf.download(tutti, period=FINESTRA, interval="1d", auto_adjust=True,
-                     progress=False, group_by="column")["Close"]
+    px = None
+    for tentativo in range(3):
+        px = yf.download(tutti, period=FINESTRA, interval="1d", auto_adjust=True,
+                         progress=False, group_by="column")["Close"]
+        vuote = [t for t in tutti if t not in px.columns or px[t].notna().sum() == 0]
+        if not vuote:
+            break
+        if tentativo < 2:
+            print(f"⚠ tentativo {tentativo + 1}: colonne vuote {', '.join(vuote)} — ritento",
+                  file=sys.stderr)
+            time.sleep(2)
     corti = [t for t in tutti if px[t].notna().sum() < MIN_SEDUTE]
     tk = [t for t in tutti if t not in corti]
     if len(tk) < 3:
@@ -98,16 +108,34 @@ def analizza():
     except Exception:
         pass
     ultimi = px.ffill().iloc[-1]
-    val = {r["ticker"]: float(ultimi[r["ticker"]]) * float(r["qta"])
-           / (1 if r.get("valuta") == "EUR" else fx) for r in az}
+    val, senza_prezzo = {}, []
+    for r in az:
+        t = r["ticker"]
+        p_ = float(ultimi[t]) if t in ultimi.index else float("nan")
+        if not (p_ == p_) or p_ <= 0:          # NaN o non positivo
+            senza_prezzo.append(t)
+            continue
+        val[t] = p_ * float(r["qta"]) / (1 if r.get("valuta") == "EUR" else fx)
+    if senza_prezzo:
+        print(f"⚠ senza prezzo utilizzabile, esclusi dal totale: {', '.join(senza_prezzo)}",
+              file=sys.stderr)
+    tk = [t for t in tk if t in val]
+    if len(tk) < 3:
+        raise SystemExit("meno di tre titoli con prezzo e storia: niente da misurare")
     tot_az = sum(val.values())
-    pesi = {t: val[t] / sum(val[x] for x in tk) for t in tk}
+    base = sum(val[x] for x in tk)
+    pesi = {t: val[t] / base for t in tk}
     m = misura(tk, px, pesi)
     sp = stato_patrimoniale() or {}
     fuori_az = (sp.get("cassa") or 0) + (sp.get("btp") or 0)
     patr = tot_az + fuori_az
-    return {"al": m["al"], "sedute": m["sedute"], "fx": fx,
-            "esclusi": {t: val[t] / tot_az for t in corti},
+    if not (tot_az == tot_az) or tot_az <= 0:
+        raise SystemExit("controvalore azionario non calcolabile: nessun prezzo valido")
+    return {"al": m["al"], "sedute": m["sedute"], "fx": fx, "senza_prezzo": senza_prezzo,
+            "esclusi": {t: (val[t] / tot_az if t in val else None)
+                        for t in dict.fromkeys(list(corti) + list(senza_prezzo))},
+            "perche_esclusi": {**{t: "storia corta" for t in corti},
+                               **{t: "prezzo non disponibile" for t in senza_prezzo}},
             "tot_az": tot_az, "cassa": sp.get("cassa"), "btp": sp.get("btp"), "patrimonio": patr,
             "quota_az": tot_az / patr if patr else None, "pesi": pesi, "val": val, "m": m,
             "carico": {r["ticker"]: r.get("pmc") for r in az},
@@ -119,8 +147,8 @@ def stampa(a, tk=None):
     q = a["quota_az"]
     print(f"LIBRO al {a['al']} · {a['sedute']} sedute · EUR/USD {a['fx']:.4f}")
     if a["esclusi"]:
-        print("⚠ ESCLUSI per storia corta (<%d sedute): %s" % (MIN_SEDUTE, ", ".join(
-            f"{t} ({p*100:.1f}% dell'azionario)" for t, p in a["esclusi"].items())))
+        print("⚠ ESCLUSI dalla matrice: %s" % (", ".join(
+            f"{t} ({p*100:.1f}% dell'azionario)" if p else f"{t} (peso n.d.)" for t, p in a["esclusi"].items())))
     print(f"\nPATRIMONIO  azionario {a['tot_az']:,.0f}€"
           + (f" ({q*100:.1f}%)" if q else " (quota sul totale: n.d.)")
           + (f" · liquidita' {a['cassa']:,.0f}€" if a["cassa"] else " · liquidita' n.d.")
@@ -151,10 +179,44 @@ def stampa(a, tk=None):
         print("   piu' correlati nel libro: " + ", ".join(f"{u} {c:.2f}" for u, c in vic))
 
 
+def _n(x, cifre=4):
+    """⚠ mai un NaN in un file pubblicato: sembra un numero e non lo e'. None si vede."""
+    try:
+        return round(float(x), cifre) if x == x and x is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def compatto(a):
+    """Le sole MISURE, senza importi assoluti: e' il file che la pipeline pubblica e che una
+    chat qualunque puo' scaricare e leggere. Deve restare piccolo per essere utile."""
+    m = a["m"]
+    return {
+        "al": m["al"], "sedute": m["sedute"], "generato": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "quota_azionaria": _n(a["quota_az"]) if a["quota_az"] else None,
+        "esclusi": {t: _n(p) for t, p in a["esclusi"].items()},
+        "perche_esclusi": a.get("perche_esclusi") or {},
+        "volatilita": _n(m["vol"]), "drawdown_max": _n(m["dd_max"]),
+        "drawdown_oggi": _n(m["dd_oggi"]),
+        "scommesse_effettive": _n(m["eff"], 2), "correlazione_media": _n(m["rho"], 3),
+        "scommesse_effettive_ribassi": _n(m["eff_giu"], 2),
+        "correlazione_ribassi": _n(m["rho_giu"], 3),
+        "sedute_ribassi": m["sedute_giu"],
+        "pesi": {t: _n(w) for t, w in a["pesi"].items()},
+        "contributo_rischio": {t: _n(c) for t, c in m["contrib"].items()},
+        "volatilita_nome": {t: _n(v, 3) for t, v in m["vol_nome"].items()},
+        "correlazioni": {t: {u: _n(c, 2) for u, c in r.items()} for t, r in m["corr"].items()},
+        "prezzi": {t: _n(p, 2) for t, p in a["prezzi"].items()},
+        "carico": a["carico"],
+    }
+
+
 if __name__ == "__main__":
     arg = [x for x in sys.argv[1:] if not x.startswith("--")]
     a = analizza()
-    if "--json" in sys.argv:
+    if "--compatto" in sys.argv:
+        print(json.dumps(compatto(a), default=float, ensure_ascii=False, indent=1))
+    elif "--json" in sys.argv:
         print(json.dumps(a, default=float, ensure_ascii=False, indent=1))
     else:
         stampa(a, arg[0].upper() if arg else None)

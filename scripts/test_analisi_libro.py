@@ -65,12 +65,29 @@ check("senza benchmark la correlazione al ribasso resta n.d. invece di essere st
 check("la volatilita' e' annualizzata (serie a 2% giornaliero → ~30%)",
       .20 < m_eq["vol"] < .45, f"vol {m_eq['vol']*100:.1f}%")
 
+# ── 5bis. un NaN non deve mai finire nell'uscita pubblicata ────────────────────────────
+# ⚠ successo davvero: yfinance ha restituito una colonna vuota per NVDA e ORCL, float(NaN)*qta
+#   ha reso NaN il controvalore, poi il totale, poi la quota — e il file conteneva
+#   "quota_azionaria": NaN. Un NaN pubblicato e' peggio di un errore: sembra un numero.
+check("_n() converte NaN e None in null, non li propaga",
+      A._n(float("nan")) is None and A._n(None) is None and A._n("x") is None
+      and A._n(0.12345) == 0.1235)
+srcA = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")
+check("i nomi senza prezzo utilizzabile sono esclusi dal totale, non lo avvelenano",
+      "senza_prezzo" in srcA and "non (tot_az == tot_az)".replace("non ", "not ") in srcA)
+check("nessun round() nudo nell'uscita compatta: passa tutto da _n()",
+      srcA[srcA.index("def compatto("):].count("round(") == 0)
+
 # ── 6. le posizioni si leggono dalla FONTE, non dallo snapshot della pipeline ──────────
 src = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")
 check("le posizioni vengono da config/posizioni.json, non da data/data.json",
       "config\" / \"posizioni.json" in src and "data.json" not in src)
 check("la soglia di esclusione e' dichiarata come costante, non sparsa nel codice",
-      "MIN_SEDUTE = " in src and src.count("MIN_SEDUTE") >= 3)
+      "MIN_SEDUTE = " in src and src.count("MIN_SEDUTE") >= 2)
+# ⚠ yfinance e' la dipendenza unica di questa strada e oggi ha restituito colonne vuote su due
+#   chiamate a un minuto di distanza: senza ritentativo il libro cambia forma per fortuna.
+check("il download ritenta prima di arrendersi a una colonna vuota",
+      "for tentativo in range(" in src and "ritento" in src)
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")

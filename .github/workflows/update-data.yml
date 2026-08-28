@@ -105,6 +105,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
+      - name: Misure del libro (data/libro.json) — anche se la pipeline e' caduta
+        if: always()
+        run: |
+          set +e
+          python scripts/analisi_libro.py --compatto > /tmp/libro.json 2>/tmp/libro.err
+          if [ -s /tmp/libro.json ] && python -c "import json,sys; json.load(open('/tmp/libro.json'))"; then
+            mv /tmp/libro.json data/libro.json
+            echo "libro.json aggiornato ($(wc -c < data/libro.json) byte)"
+          else
+            echo "misure del libro non calcolabili in questo run — il file precedente resta"
+            cat /tmp/libro.err | tail -5
+          fi
+          exit 0
+
       - name: Commit dati aggiornati
         run: |
           git config user.name "github-actions[bot]"

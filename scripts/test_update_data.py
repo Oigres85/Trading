@@ -639,6 +639,55 @@ _sens100 = ud.sensibilita_macro(_t * 100, {"bench": ("B", "canale", _b)})
 check("v325 sensibilita': il beta non cambia se le chiusure arrivano in un'altra scala",
       _sens100 and abs(_sens100["bench"]["beta"] - _sens["bench"]["beta"]) < 0.01)
 
+# ⚠⚠ v373 — NESSUNA CHIAMATA A UNA FUNZIONE CHE NON ESISTE.
+# La pipeline e' morta per giorni per questo: i quattro `except` scritti in v365 e v367
+# chiamavano log(), che in questo file NON ESISTE. Sul percorso normale non si vede — i gestori
+# non girano mai — ma appena FINRA o yfinance sollevano qualcosa (da un runner GitHub succede:
+# limiti di frequenza, IP di datacenter bloccati) il GESTORE solleva NameError, che nessuno
+# cattura, e il run muore.
+# E' il difetto piu' insidioso della famiglia: il codice scritto per impedire i crash li causa.
+# ast.parse passa, i test passano, il percorso felice passa. Solo il percorso infelice muore —
+# ed e' quello che esiste apposta per non morire.
+import builtins as _bi
+import ast as _ast
+
+_UD_SRC = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+_NOTI = set(dir(_bi))
+for _n in _ast.walk(_ast.parse(_UD_SRC)):
+    if isinstance(_n, (_ast.FunctionDef, _ast.AsyncFunctionDef, _ast.ClassDef)):
+        _NOTI.add(_n.name)
+    elif isinstance(_n, _ast.Import):
+        _NOTI.update((a.asname or a.name).split(".")[0] for a in _n.names)
+    elif isinstance(_n, _ast.ImportFrom):
+        _NOTI.update((a.asname or a.name) for a in _n.names)
+    elif isinstance(_n, _ast.Assign):
+        for _t in _n.targets:
+            _NOTI.update(x.id for x in _ast.walk(_t) if isinstance(x, _ast.Name))
+    elif isinstance(_n, (_ast.For, _ast.comprehension)):
+        _tg = _n.target
+        _NOTI.update(x.id for x in _ast.walk(_tg) if isinstance(x, _ast.Name))
+    elif isinstance(_n, _ast.arguments):
+        _NOTI.update(a.arg for a in list(_n.args) + list(_n.kwonlyargs) + list(_n.posonlyargs))
+        for _a in (_n.vararg, _n.kwarg):
+            if _a: _NOTI.add(_a.arg)
+    elif isinstance(_n, _ast.ExceptHandler) and _n.name:
+        _NOTI.add(_n.name)
+    elif isinstance(_n, _ast.withitem) and _n.optional_vars is not None:
+        _NOTI.update(x.id for x in _ast.walk(_n.optional_vars) if isinstance(x, _ast.Name))
+
+# ⚠ solo le chiamate a un NOME NUDO (f(...)), mai quelle a un attributo (x.f(...)): il nome
+#   nudo deve esistere in questo file, l'attributo appartiene a un oggetto e non e' verificabile.
+_FANTASMI = sorted({c.func.id for c in _ast.walk(_ast.parse(_UD_SRC))
+                    if isinstance(c, _ast.Call) and isinstance(c.func, _ast.Name)
+                    and c.func.id not in _NOTI})
+check("v373 nessuna chiamata a una funzione inesistente (il gestore d'errore che esplode)",
+      not _FANTASMI)
+if _FANTASMI:
+    print(f"      ↳ chiamate a nomi che non esistono: {', '.join(_FANTASMI)} — "
+          f"se stanno dentro un except, il run muore proprio quando doveva essere salvato")
+# e il controllo deve aver visto qualcosa, altrimenti passa a vuoto
+check("v373 l'analisi delle chiamate sta davvero leggendo la pipeline", len(_NOTI) > 200)
+
 # ⚠⚠ v369 — NESSUNA VARIABILE DEL RECORD PUO' ESSERE ASSEGNATA SOLO DENTRO UN RAMO.
 # La pipeline e' rimasta rotta da v365 a v369 per questo: _comb, _cred, _fuori e _short erano
 # assegnati dentro `if has_fundamentals(ticker, currency):` e usati nel record COSTRUITO ANCHE

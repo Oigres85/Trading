@@ -1453,7 +1453,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             if _comb:
                 _comb["valuta"] = g("financialCurrency") or g("currency")
         except Exception as _e:
-            log(f"  combustione {ticker}: {type(_e).__name__} {_e}")
+            print(f"!! combustione {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
             _comb = None
 
         # ⚠ v367 — credito (al posto del CDS) e flusso fuori mercato. Ogni fonte in un try
@@ -1463,17 +1463,17 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             if _cred:
                 _cred["valuta"] = g("financialCurrency") or g("currency")
         except Exception as _e:
-            log(f"  credito {ticker}: {type(_e).__name__} {_e}")
+            print(f"!! credito {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
             _cred = None
         if not (ticker.startswith("^") or ticker.endswith("=F")):
             try:
                 _fuori = fuori_mercato(ticker)
             except Exception as _e:
-                log(f"  fuori mercato {ticker}: {type(_e).__name__} {_e}")
+                print(f"!! fuori mercato {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
             try:
                 _short = short_volume(ticker)
             except Exception as _e:
-                log(f"  short volume {ticker}: {type(_e).__name__} {_e}")
+                print(f"!! short volume {ticker}: {type(_e).__name__} {_e}", file=sys.stderr)
 
         # ADR con bilanci in valuta locale → via i rapporti prezzo-vs-bilancio (unità miste)
         stats = scrub_cross_currency_stats(stats, g("financialCurrency"), g("currency"))

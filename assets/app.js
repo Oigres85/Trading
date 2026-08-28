@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "372";
+const BUILD_VERSION = "373";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -817,7 +817,13 @@ function renderAll() {
       upd.classList.toggle("stale", ageH > 8);
       at.title = ageH > 8 ? `Dati di ${Math.round(ageH)} ore fa` : "";
       upd.querySelector(".stale-tag")?.remove();
-      if (ageH > 8) { const sp = document.createElement("span"); sp.className = "stale-tag"; sp.textContent = " (vecchi)"; upd.appendChild(sp); }
+      if (ageH > 8) {
+        const sp = document.createElement("span"); sp.className = "stale-tag";
+        sp.textContent = ageH >= 24
+          ? ` — ⚠ ${Math.round(ageH / 24)} ${Math.round(ageH / 24) === 1 ? "giorno" : "giorni"} fa: la pipeline non sta aggiornando`
+          : ` — ⚠ ${Math.round(ageH)} ore fa`;
+        upd.appendChild(sp);
+      }
     }
   }
   recomputeTotals();
