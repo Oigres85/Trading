@@ -150,6 +150,66 @@ check("la soglia di esclusione e' dichiarata come costante, non sparsa nel codic
 check("il download ritenta prima di arrendersi a una colonna vuota",
       "for tentativo in range(" in src and "ritento" in src)
 
+# ── 7. il prezzo piu' fresco vince, e l'altro si dichiara (v382) ───────────────────────
+# ⚠ Nato dal 29/08/2026: libro.json fermo al 27/08 (dropna listwise: 12 nomi senza barra il 28)
+#   mentre data.json, gia' aperto dal rapporto per i fondamentali, portava il 28. MRVL era sceso
+#   del 10,3% in mezzo. I check sono sulle PROPRIETA' delle due funzioni pure, non su stringhe
+#   del sorgente: un check ancorato al testo si e' rotto sette volte in questo progetto.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import rapporto as RP
+
+check("lo snapshot piu' recente della seduta di libro.json viene riconosciuto",
+      RP.snapshot_piu_fresco("2026-08-29T03:06:41Z", "2026-08-27") is True)
+check("uno snapshot della STESSA seduta non spodesta libro.json",
+      RP.snapshot_piu_fresco("2026-08-27T22:10:00Z", "2026-08-27") is False)
+check("uno snapshot PIU' VECCHIO non spodesta libro.json",
+      RP.snapshot_piu_fresco("2026-08-26T03:06:41Z", "2026-08-27") is False)
+# ⚠ una data illeggibile non deve far scegliere una fonte: nel dubbio resta quella dichiarata
+check("una data assente o illeggibile non promuove lo snapshot",
+      RP.snapshot_piu_fresco(None, "2026-08-27") is False
+      and RP.snapshot_piu_fresco("2026-08-29T03:06:41Z", None) is False
+      and RP.snapshot_piu_fresco("boh", "2026-08-27") is False)
+
+# il caso reale: MRVL 241.45 (gio) → 216.62 (ven)
+p, sc = RP.prezzo_da_usare(241.45, 216.62, True)
+check("col preferisci_snap attivo vince il prezzo dello snapshot", p == 216.62)
+check("lo scarto dichiarato e' quello vero fra le due fonti",
+      sc is not None and abs(sc - (216.62 / 241.45 - 1) * 100) < 1e-9, f"scarto {sc}")
+check("uno scarto oltre soglia su un caso reale viene segnalato",
+      abs(sc) > RP.SCARTO_PREZZO, f"{sc:.2f}% contro soglia {RP.SCARTO_PREZZO}")
+p2, sc2 = RP.prezzo_da_usare(241.45, 216.62, False)
+check("senza preferisci_snap il prezzo resta quello di libro.json e non si dichiara nulla",
+      p2 == 241.45 and sc2 is None)
+p3, sc3 = RP.prezzo_da_usare(241.45, None, True)
+check("se lo snapshot non ha il prezzo si ricade su libro.json senza inventare uno scarto",
+      p3 == 241.45 and sc3 is None)
+# ⚠ MU si e' mosso dello 0,27%: sotto soglia, e la riga NON deve sporcare il rapporto
+_, sc4 = RP.prezzo_da_usare(935.39, 932.86, True)
+check("uno scarto sotto soglia resta calcolato ma non supera la soglia di segnalazione",
+      sc4 is not None and abs(sc4) < RP.SCARTO_PREZZO, f"{sc4:.2f}%")
+check("la soglia di dichiarazione e' una costante, non sparsa nel codice",
+      isinstance(RP.SCARTO_PREZZO, (int, float)) and srcR.count("SCARTO_PREZZO") >= 3)
+
+# ── 8. gli scenari non fingono un ripiego che non esiste (v382) ────────────────────────
+srcS = (Path(__file__).resolve().parent / "scenari.py").read_text(encoding="utf-8")
+import scenari as SC
+check("scenari.py non muore piu' con un traceback quando la rete manca",
+      "except (Exception, SystemExit)" in srcS and "non_si_puo" in srcS)
+# ⚠ la PROPRIETA' che conta: spiega senza produrre numeri di scenario inventati
+import io, contextlib
+buf = io.StringIO()
+with contextlib.redirect_stdout(buf):
+    SC.non_si_puo(RuntimeError("meno di tre titoli con storia sufficiente"))
+uscita = buf.getvalue()
+check("quando non puo', scenari.py dichiara la causa e cosa servirebbe",
+      "NON CALCOLABILI" in uscita and "RuntimeError" in uscita and "rendimenti giornalieri" in uscita)
+check("e dichiara ESPLICITAMENTE che un ripiego su libro.json non esiste",
+      "NON c'e' un ripiego" in uscita and "libro.json" in uscita)
+check("non stampa nessuna riga di scenario quando non ha i dati per calcolarla",
+      "sull'azionario" not in uscita and "beta" not in uscita.lower().replace("i beta verso", ""))
+check("il codice d'uscita dice la verita': non esce 0 senza aver prodotto scenari",
+      "sys.exit(main() or 0)" in srcS and "return 1" in srcS)
+
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
 sys.exit(1 if FALLITI else 0)

@@ -43,10 +43,41 @@ def beta_r2(y, x):
     return b, r * r, len(d)
 
 
+def non_si_puo(e):
+    """Perche' NON esiste un fallback su libro.json per gli scenari, e fingerlo sarebbe peggio.
+
+    ⚠⚠ rapporto.py degrada su data/libro.json perche' quello che stampa — misure e prezzi — sta
+    dentro quel file. Qui no: libro.json pubblica PESI, CORRELAZIONI FRA I NOMI DEL LIBRO e
+    volatilita', non i RENDIMENTI GIORNALIERI, e senza quelli un beta non si stima. Le
+    correlazioni che contiene sono interne al libro, non verso SOXX/QQQ/TLT: non c'e' niente da
+    cui ricavare questi scenari. Stampare comunque dei numeri sarebbe la classe di difetto che
+    questo progetto rifiuta da sempre — un numero nostro travestito da misura.
+    Quello che si puo' fare, e che prima non si faceva, e' non morire con un traceback: dire
+    quale fonte e' mancata, cosa servirebbe, e che cosa resta disponibile al suo posto."""
+    print("SCENARI A FATTORE — NON CALCOLABILI IN QUESTO RUN")
+    print(f"   causa: {type(e).__name__}: {str(e)[:120]}")
+    print("   servono i rendimenti giornalieri dei titoli E dei fattori (SOXX/QQQ/TLT…) sulla")
+    print("   stessa finestra: si scaricano al momento, e la rete non ha risposto.")
+    print("   ⚠ NON c'e' un ripiego su data/libro.json: quel file porta misure gia' calcolate")
+    print("     (pesi, volatilita', correlazioni FRA I NOMI DEL LIBRO), non le serie da cui si")
+    print("     stimano i beta verso un fattore esterno. Inventarli sarebbe peggio del guasto.")
+    try:
+        c = json.loads((ROOT / "data" / "libro.json").read_text(encoding="utf-8"))
+        print(f"   resta disponibile libro.json (seduta {c.get('al')}, generato "
+              f"{str(c.get('generato'))[:16]}): pesi, contributo al rischio, correlazioni,")
+        print("   volatilita' per nome — cioe' DOVE sta il rischio, non COSA SUCCEDE SE.")
+    except Exception:
+        print("   ⚠ e data/libro.json non e' leggibile: non resta nessuna misura del libro.")
+
+
 def main():
     import yfinance as yf
     import analisi_libro as A
-    a = A.analizza()
+    try:
+        a = A.analizza()
+    except (Exception, SystemExit) as e:
+        non_si_puo(e)
+        return 1
     pesi = a["pesi"]
     tk = list(pesi)
     arg = [x for x in sys.argv[1:] if not x.startswith("-") or x.lstrip("-").replace(".", "").isdigit()]
@@ -94,4 +125,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # ⚠ il codice d'uscita deve dire la verita': 1 quando gli scenari non sono stati prodotti.
+    #   Un'uscita 0 senza scenari e' la classe "verde per assenza", gia' pagata su test_app.mjs.
+    sys.exit(main() or 0)

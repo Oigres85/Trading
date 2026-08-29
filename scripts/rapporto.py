@@ -33,6 +33,42 @@ def eta_ore(iso):
         return None
 
 
+SCARTO_PREZZO = 2.0      # oltre questo scarto le due fonti si dichiarano ENTRAMBE
+
+
+def snapshot_piu_fresco(updated_at, libro_al):
+    """Lo snapshot della pipeline ha visto una seduta PIU' RECENTE di quella di libro.json?
+
+    ⚠ NASCE DA UN CASO REALE (29/08/2026). libro.json scarta una seduta INTERA se un solo nome
+    non ha ancora la barra (dropna listwise, trappola n.1 di analisi_libro.py); la pipeline no.
+    Quel giorno libro.json si fermava al 27/08 mentre data.json — che questo stesso rapporto
+    apre gia' per i fondamentali — portava il 28/08. In mezzo MRVL aveva perso il 10,3% sulla
+    trimestrale: la scheda dava +12,8% dal carico dove il libro aveva +1,2%, e il target di
+    consenso era calcolato sul prezzo sbagliato. Il rapporto aveva il dato giusto aperto in
+    memoria e stampava quello vecchio.
+    Si confrontano le DATE, non le ore: `updated_at` e' quando la pipeline ha girato, `al` e'
+    l'ultima seduta completa. Se la pipeline gira a mercato aperto il suo prezzo e' un
+    infragiornaliero, non una chiusura — e' comunque il piu' recente, e l'etichetta dice da
+    quale snapshot viene senza rivendicare una seduta."""
+    try:
+        s = datetime.fromisoformat(str(updated_at).replace("Z", "+00:00")).date()
+        return s > datetime.fromisoformat(str(libro_al)[:10]).date()
+    except (TypeError, ValueError):
+        return False
+
+
+def prezzo_da_usare(px_libro, px_snap, preferisci_snap):
+    """(prezzo, scarto%) — lo scarto e' None quando non c'e' una seconda lettura da dichiarare.
+
+    ⚠ Non si sceglie la fonte "migliore" in astratto: si prende la piu' RECENTE e si dichiara
+    l'altra quando divergono. Due valori per la stessa grandezza, uno solo dei quali stampato,
+    e' la classe di difetto che in questo progetto ha gia' fatto dimensionare una compensazione
+    fiscale sul numero sbagliato (v183, gate valuta)."""
+    if preferisci_snap and px_snap:
+        return px_snap, ((px_snap / px_libro - 1) * 100 if px_libro else None)
+    return px_libro, None
+
+
 def tecnica(h):
     c = h["Close"].dropna()
     if len(c) < 60:
@@ -73,6 +109,7 @@ def main():
     print("═" * 78)
     print("RAPPORTO DEL PORTAFOGLIO")
     print("═" * 78)
+    preferisci_snap = (not vivo) and snapshot_piu_fresco(d.get("updated_at"), a.get("al"))
     print(f"prezzi e tecnica: {'scaricati adesso' if vivo else 'DA data/libro.json, non ricalcolati'}"
           f" · ultima seduta usata {a['al']}")
     print(f"fondamentali:     dallo snapshot della pipeline"
@@ -83,6 +120,13 @@ def main():
           + (f", {g} giorni fa" if g is not None else "")
           + (" ⚠⚠ se hai operato dopo, questi numeri sono esatti su un libro che non hai piu'"
              if (g or 0) > 7 else ""))
+    if preferisci_snap:
+        print(f"⚠ PREZZI PRESI DALLO SNAPSHOT del {str(d.get('updated_at'))[:10]}, piu' recente "
+              f"della seduta {a['al']} di libro.json: prezzo, distanza dal carico e distanza dal "
+              f"target vengono da li'.")
+        print(f"  PESO, VARIANZA E CORRELAZIONI restano invece alla seduta {a['al']} — si "
+              f"ricalcolano solo con la rete. Le divergenze oltre il {SCARTO_PREZZO:.0f}% sono "
+              f"scritte per esteso sotto ogni posizione.")
     for gg, mancanti in (m.get("sedute_scartate") or {}).items():
         n = mancanti if isinstance(mancanti, int) else len(mancanti)
         print(f"⚠ seduta del {gg} non usata: {n} nomi senza barra")
@@ -119,14 +163,21 @@ def main():
         r = perTk.get(t, {})
         st = r.get("stats") or {}
         pmc = (a.get("carico") or {}).get(t)
-        px = a["prezzi"].get(t)
+        px_libro = a["prezzi"].get(t)
+        px, scarto = prezzo_da_usare(px_libro, r.get("price"), preferisci_snap)
         tc = tecnica(hist[t]) if hist.get(t) is not None and not hist[t].empty else None
         print(f"\n▸ {t}  {r.get('name', '')[:34]}")
         riga = f"   peso {a['pesi'][t]*100:5.1f}%  →  varianza {m['contrib'][t]*100:5.1f}%   " \
                f"vol {m['vol_nome'][t]*100:.0f}%"
         print(riga)
         if px:
-            print(f"   prezzo {px:.2f}" + (f" · carico {pmc} ({(px/pmc-1)*100:+.1f}%)" if pmc else ""))
+            print(f"   prezzo {px:.2f}" + (f" · carico {pmc} ({(px/pmc-1)*100:+.1f}%)" if pmc else "")
+                  + (f" · seduta {r['change_pct']:+.2f}%"
+                     if preferisci_snap and r.get("change_pct") is not None else ""))
+            if scarto is not None and abs(scarto) > SCARTO_PREZZO:
+                print(f"      ⚠ {scarto:+.1f}% rispetto alla seduta {a['al']} ({px_libro:.2f}"
+                      + (f", {(px_libro/pmc-1)*100:+.1f}% dal carico" if pmc else "")
+                      + "), che e' quella su cui poggiano peso, varianza e correlazioni")
         if tc:
             sopra = [f"SMA{g}" for g in (20, 50, 200) if tc.get(f"sma{g}") and tc["p"] > tc[f"sma{g}"]]
             print(f"   TECNICA  RSI {tc['rsi']:.0f} · ATR {tc['atr_pct']:.1f}% · dal proprio massimo {tc['dd']:+.1f}%"
