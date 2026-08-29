@@ -74,11 +74,18 @@ def blocco_libro(a, tk):
 
 
 def main():
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 3:
         raise SystemExit(__doc__)
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import analisi_libro as A
     tk = sys.argv[1].upper()
-    a = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
-    analisi = Path(sys.argv[3]).read_text(encoding="utf-8").strip()
+    analisi = Path(sys.argv[2]).read_text(encoding="utf-8").strip()
+    try:
+        a = A.analizza()
+    except Exception as e:
+        print(f"⚠ calcolo dal vivo non possibile ({type(e).__name__}) — uso i valori pubblicati",
+              file=sys.stderr)
+        a = A.da_pubblicato()
     oggi = datetime.now(timezone.utc).astimezone().strftime("%d/%m/%Y %H:%M")
     print(f"RICHIESTA DI GIUDIZIO SU {tk} — {oggi}\n")
     print(TESTATA)

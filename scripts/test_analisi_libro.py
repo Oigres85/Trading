@@ -95,6 +95,21 @@ check("uno scenario in cui quasi nessun nome ha un legame misurabile si dichiara
 check("i nomi con R² basso restano NEL conto, dichiarati: toglierli fingerebbe che non si muovano",
       "il contributo e' comunque incluso" in srcS)
 
+# ── 5quinquies. la seduta incompleta si dichiara, non sparisce ─────────────────────────
+# ⚠ trovato da una sessione su telefono: "venerdi' manca anche se il CI ha girato". Il dropna()
+#   scarta l'ultima riga se UN SOLO nome non ha ancora la barra, e l'analisi finiva un giorno
+#   prima senza dirlo. E' la trappola n.1 applicata alle DATE invece che ai titoli.
+check("la seduta scartata perche' incompleta viene dichiarata",
+      "sedute_scartate" in srcA and "NON USATA" in srcA)
+check("le righe incomplete NON vengono tenute (mischierebbero giorni diversi)",
+      "mischierebbe giorni diversi" in srcA and ".dropna()" in srcA)
+
+# ── 5sexies. senza rete si degrada sui valori pubblicati, dichiarandolo ────────────────
+check("esiste il degrado su data/libro.json invece della traccia di errore",
+      "def da_pubblicato(" in srcA and "NON CALCOLATO ORA" in srcA)
+check("il degrado NON ricalcola: rimette i valori pubblicati nella forma di stampa()",
+      "Non ricalcola nulla" in srcA)
+
 # ── 6. le posizioni si leggono dalla FONTE, non dallo snapshot della pipeline ──────────
 src = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")
 check("le posizioni vengono da config/posizioni.json, non da data/data.json",

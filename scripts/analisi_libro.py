@@ -55,8 +55,19 @@ def stato_patrimoniale():
 
 def misura(tickers, prezzi, pesi, bench="^NDX"):
     import yfinance as yf
-    R = prezzi[tickers].pct_change().dropna()
+    grezzo = prezzi[tickers]
+    R = grezzo.pct_change().dropna()
     k = len(tickers)
+    # ⚠⚠ IL dropna() SCARTA ANCHE L'ULTIMA SEDUTA se un solo nome non ha ancora pubblicato la
+    #   barra — e succede spesso a mercato appena chiuso o nel fine settimana. L'analisi finiva
+    #   su un giorno prima SENZA DIRLO: trovato da una sessione su telefono che ha notato
+    #   "venerdi' manca anche se il CI ha girato". E' la trappola n.1 di questo file applicata
+    #   alle DATE invece che ai titoli. Non si tengono le righe incomplete — mischierebbero
+    #   giorni diversi — si dichiara quale seduta e' stata lasciata fuori e perche'.
+    scartate = [d for d in grezzo.index if d > R.index[-1]]
+    senza = {}
+    for d in scartate:
+        senza[str(d.date())] = [t for t in tickers if grezzo.loc[d, t] != grezzo.loc[d, t]]
     sd = {t: R[t].std() * math.sqrt(252) for t in tickers}
     C = R.corr()
     var = sum(pesi[a] * pesi[b] * sd[a] * sd[b] * C.loc[a, b] for a in tickers for b in tickers)
@@ -80,7 +91,7 @@ def misura(tickers, prezzi, pesi, bench="^NDX"):
             fuori = {"eff_giu": 1 / ((1 - rg) * hh + rg), "rho_giu": rg, "sedute_giu": len(g)}
     except Exception:
         pass
-    return {"sedute": len(R), "al": str(R.index[-1].date()), "vol": math.sqrt(var),
+    return {"sedute": len(R), "al": str(R.index[-1].date()), "sedute_scartate": senza, "vol": math.sqrt(var),
             "dd_max": float(dd.min()), "dd_oggi": float(dd.iloc[-1]), "rho": rho,
             "eff": eff, "contrib": contrib, "vol_nome": sd,
             "corr": {t: {u: float(C.loc[t, u]) for u in tickers} for t in tickers}, **fuori}
@@ -156,7 +167,18 @@ def analizza():
 def stampa(a, tk=None):
     m = a["m"]
     q = a["quota_az"]
-    print(f"LIBRO al {a['al']} · {a['sedute']} sedute · EUR/USD {a['fx']:.4f}")
+    if a.get("da_pubblicato"):
+        print(f"⚠⚠ NON CALCOLATO ORA: valori letti da data/libro.json, generato "
+              f"{a['da_pubblicato']}. La rete non era disponibile. Nessun numero e' stato "
+              f"ricalcolato — sono quelli pubblicati, con l'eta' che hanno.")
+    print(f"LIBRO al {a['al']} · {a['sedute']} sedute"
+          + (f" · EUR/USD {a['fx']:.4f}" if a["fx"] == a["fx"] else ""))
+    sc = a["m"].get("sedute_scartate") or {}
+    for giorno, mancanti in sc.items():
+        print(f"⚠ SEDUTA DEL {giorno} NON USATA: {len(mancanti)} nomi non hanno ancora la barra"
+              + (f" ({', '.join(mancanti[:4])}{'…' if len(mancanti) > 4 else ''})" if mancanti else "")
+              + ". L'analisi finisce alla seduta precedente — tenere una riga incompleta "
+                "mischierebbe giorni diversi.")
     g = a.get("posizioni_giorni")
     if g is None:
         print("⚠ le POSIZIONI non dichiarano una data: non si sa se sono aggiornate")
@@ -169,7 +191,11 @@ def stampa(a, tk=None):
     if a["esclusi"]:
         print("⚠ ESCLUSI dalla matrice: %s" % (", ".join(
             f"{t} ({p*100:.1f}% dell'azionario)" if p else f"{t} (peso n.d.)" for t, p in a["esclusi"].items())))
-    print(f"\nPATRIMONIO  azionario {a['tot_az']:,.0f}€"
+    if a["tot_az"] is None:
+        print("\nPATRIMONIO  non ricalcolabile senza prezzi vivi"
+              + (f" · l'azionario era il {q*100:.1f}% del totale" if q else ""))
+    else:
+        print(f"\nPATRIMONIO  azionario {a['tot_az']:,.0f}€"
           + (f" ({q*100:.1f}%)" if q else " (quota sul totale: n.d.)")
           + (f" · liquidita' {a['cassa']:,.0f}€" if a["cassa"] else " · liquidita' n.d.")
           + (f" · titoli di Stato {a['btp']:,.0f}€" if a["btp"] else "")
@@ -215,6 +241,7 @@ def compatto(a):
         "al": m["al"], "sedute": m["sedute"], "generato": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "quota_azionaria": _n(a["quota_az"]) if a["quota_az"] else None,
         "posizioni_al": a.get("posizioni_al"), "posizioni_giorni": a.get("posizioni_giorni"),
+        "sedute_scartate": {g: len(v) for g, v in (m.get("sedute_scartate") or {}).items()},
         "esclusi": {t: _n(p) for t, p in a["esclusi"].items()},
         "perche_esclusi": a.get("perche_esclusi") or {},
         "volatilita": _n(m["vol"]), "drawdown_max": _n(m["dd_max"]),
@@ -232,9 +259,35 @@ def compatto(a):
     }
 
 
+def da_pubblicato():
+    """Ricostruisce la scheda da data/libro.json quando la rete non c'e'. Non ricalcola nulla:
+    rimette i valori pubblicati nella forma che stampa() si aspetta, e li marca come tali."""
+    c = json.loads((ROOT / "data" / "libro.json").read_text(encoding="utf-8"))
+    m = {"al": c["al"], "sedute": c["sedute"], "vol": c["volatilita"],
+         "dd_max": c["drawdown_max"], "dd_oggi": c["drawdown_oggi"], "rho": c["correlazione_media"],
+         "eff": c["scommesse_effettive"], "eff_giu": c.get("scommesse_effettive_ribassi"),
+         "rho_giu": c.get("correlazione_ribassi"), "sedute_giu": c.get("sedute_ribassi", 0),
+         "contrib": c["contributo_rischio"], "vol_nome": c["volatilita_nome"],
+         "corr": c["correlazioni"], "sedute_scartate": {}}
+    return {"al": c["al"], "sedute": c["sedute"], "fx": float("nan"), "senza_prezzo": [],
+            "posizioni_al": c.get("posizioni_al"), "posizioni_giorni": c.get("posizioni_giorni"),
+            "esclusi": c.get("esclusi", {}), "perche_esclusi": c.get("perche_esclusi", {}),
+            "tot_az": None, "cassa": None, "btp": None, "patrimonio": None,
+            "quota_az": c.get("quota_azionaria"), "pesi": c["pesi"], "val": {},
+            "m": m, "carico": c.get("carico", {}), "prezzi": c["prezzi"],
+            "da_pubblicato": c.get("generato")}
+
+
 if __name__ == "__main__":
     arg = [x for x in sys.argv[1:] if not x.startswith("--")]
-    a = analizza()
+    try:
+        a = analizza()
+    except Exception as e:
+        if "--no-fallback" in sys.argv:
+            raise
+        print(f"⚠ calcolo dal vivo non possibile ({type(e).__name__}: {str(e)[:90]})",
+              file=sys.stderr)
+        a = da_pubblicato()
     if "--compatto" in sys.argv:
         print(json.dumps(compatto(a), default=float, ensure_ascii=False, indent=1))
     elif "--json" in sys.argv:
