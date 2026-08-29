@@ -110,6 +110,23 @@ check("esiste il degrado su data/libro.json invece della traccia di errore",
 check("il degrado NON ricalcola: rimette i valori pubblicati nella forma di stampa()",
       "Non ricalcola nulla" in srcA)
 
+# ── 5septies. soglie.py: arriva fino al confine e non lo attraversa ────────────────────
+srcT = (Path(__file__).resolve().parent / "soglie.py").read_text(encoding="utf-8")
+check("le barre vuote si tolgono prima di calcolare i livelli",
+      srcT.count('dropna()') >= 3 and "il NaN\n    si propaga" in srcT.replace("\r", ""))
+check("ogni livello dichiara da dove viene",
+      "convenzione di Fibonacci, non una previsione" in srcT and "resistenza recente" in srcT)
+check("esiste la soglia di anomalia, calcolata dalla storia del titolo stesso",
+      "SOGLIA DI ANOMALIA" in srcT and "dd_p10" in srcT)
+# ⚠ il confine: misure si', imperativi no. Se una di queste parole entra, il file ha cambiato natura.
+_VIETATE = ["consiglio di vendere", "ti consiglio", "dovresti vendere", "dovresti comprare",
+            "raccomando", "conviene vendere", "conviene comprare", "esci a ", "entra a "]
+check("nessun imperativo operativo nel testo prodotto da soglie.py",
+      not [v for v in _VIETATE if v in srcT.lower()],
+      ", ".join(v for v in _VIETATE if v in srcT.lower()))
+check("il file dichiara esplicitamente cosa non fa",
+      "NON FA:" in srcT and "non propone quantita'" in srcT)
+
 # ── 6. le posizioni si leggono dalla FONTE, non dallo snapshot della pipeline ──────────
 src = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")
 check("le posizioni vengono da config/posizioni.json, non da data/data.json",
