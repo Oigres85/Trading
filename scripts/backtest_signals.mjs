@@ -47,8 +47,35 @@ function serie(tk) {
   const s = a.map(Number).filter(x => Number.isFinite(x));
   return s.length >= 40 ? s : null;
 }
-const BENCH = serie("^IXIC") || serie("QQQ");   // stessa chiave e stessa lunghezza dei titoli
-if (!BENCH) { console.log("Nessuna serie di benchmark (^IXIC/QQQ): backtest impossibile."); process.exit(0); }
+/* ⚠⚠ IL BENCHMARK VA CERCATO FRA QUELLI CHE ESISTONO DAVVERO (v386). Fino a qui la lista era
+   ^IXIC || QQQ e NESSUNO DEI DUE E' MAI STATO nella watchlist (23 simboli, verificato su
+   config/ui_watchlist.json): il backtest usciva alla riga dopo con process.exit(0), cioe'
+   ANNUNCIAVA SUCCESSO SENZA AVER MISURATO NIENTE. E' la classe "verde per assenza" per cui
+   esiste self_check.mjs (v277: una suite che usciva 0 senza stampare nulla) — ma questo non e'
+   un gate, quindi nessuno lo sorvegliava. L'unico strumento che risponde a "i nostri segnali
+   predicono davvero qualcosa?" e' stato muto per tutto il tempo.
+   I candidati ora sono in ordine di preferenza e comprendono cio' che la pipeline pubblica:
+   NQ=F e' il Nasdaq 100 (il paragone naturale per un libro growth), ^SOX il comparto — che per
+   un libro per tre quarti in semiconduttori e' il confronto piu' severo e piu' onesto. */
+const CANDIDATI = ["^IXIC", "QQQ", "NQ=F", "^SOX", "^RUT"];
+/* ⚠ IL BENCHMARK E' UN'ASSUNZIONE, NON UN DATO: cambia l'asticella contro cui ogni detector
+   viene giudicato. Un libro per tre quarti in semiconduttori confrontato col Nasdaq sembra
+   piu' bravo di quanto sia; confrontato col SOX, meno. Poterlo cambiare da riga di comando
+   serve a vedere se una conclusione REGGE al cambio di riferimento o dipende da esso —
+   `--bench ^SOX`. Una conclusione che si ribalta cambiando benchmark non e' una conclusione. */
+const _iB = process.argv.indexOf("--bench");
+const SCELTO = _iB > 0 ? process.argv[_iB + 1] : null;
+const BENCH_TK = SCELTO ? (serie(SCELTO) ? SCELTO : null) : CANDIDATI.find((t) => serie(t));
+const BENCH = BENCH_TK ? serie(BENCH_TK) : null;
+if (!BENCH) {
+  /* ⚠ esce 1, non 0: un backtest che non puo' misurare NON e' andato bene. E dice cosa ha
+     cercato e cosa c'era, perche' il difetto sopra e' sopravvissuto proprio non dicendolo. */
+  console.error("BACKTEST IMPOSSIBILE: nessun benchmark utilizzabile.");
+  console.error(`  cercati (in ordine): ${CANDIDATI.join(", ")}`);
+  console.error(`  presenti nell'universo: ${[...universo.keys()].join(", ")}`);
+  console.error(`  serve una serie sparks.${SERIE_KEY} di almeno 40 barre.`);
+  process.exit(1);
+}
 
 /* giorni di BORSA fra due date (approssimazione: esclude sabati e domeniche, ignora le festività —
    su finestre di 2-4 settimane lo scarto è al massimo di una barra ed è identico per titolo e indice) */
@@ -117,7 +144,7 @@ for (const [tk, arr] of perTicker) {
 
 /* ---------------------------------- rapporto ---------------------------------- */
 const med = (a) => a.reduce((s, v) => s + v, 0) / a.length;
-console.log(`\nBACKTEST DEI SEGNALI — orizzonte ${ORIZZONTE} giorni di borsa, extra-rendimento vs ${universo.has("^IXIC") ? "Nasdaq Composite" : "QQQ"}`);
+console.log(`\nBACKTEST DEI SEGNALI — orizzonte ${ORIZZONTE} giorni di borsa, extra-rendimento vs ${BENCH_TK}`);
 console.log(`Storico per-titolo: ${storia.length} giornate (${storia[0]?.date} → ${storia[storia.length - 1]?.date}) · osservazioni mature: ${tutti.length}`);
 if (tutti.length) {
   console.log(`Riferimento — TUTTE le osservazioni: media ${med(tutti.map(x => x.rel)).toFixed(2)}pp · quota positive ${Math.round(tutti.filter(x => x.rel > 0).length / tutti.length * 100)}%`);
