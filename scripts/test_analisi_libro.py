@@ -174,35 +174,92 @@ check("il download ritenta prima di arrendersi a una colonna vuota",
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import rapporto as RP
 
-check("lo snapshot piu' recente della seduta di libro.json viene riconosciuto",
-      RP.snapshot_piu_fresco("2026-08-29T03:06:41Z", "2026-08-27") is True)
-check("uno snapshot della STESSA seduta non spodesta libro.json",
-      RP.snapshot_piu_fresco("2026-08-27T22:10:00Z", "2026-08-27") is False)
-check("uno snapshot PIU' VECCHIO non spodesta libro.json",
-      RP.snapshot_piu_fresco("2026-08-26T03:06:41Z", "2026-08-27") is False)
-# ⚠ una data illeggibile non deve far scegliere una fonte: nel dubbio resta quella dichiarata
-check("una data assente o illeggibile non promuove lo snapshot",
-      RP.snapshot_piu_fresco(None, "2026-08-27") is False
-      and RP.snapshot_piu_fresco("2026-08-29T03:06:41Z", None) is False
-      and RP.snapshot_piu_fresco("boh", "2026-08-27") is False)
+# ⚠⚠ v383 — SI CONFRONTANO LE SEDUTE, NON GLI OROLOGI. La prima stesura confrontava
+#   `updated_at` (quando la pipeline ha girato) con la seduta di libro.json, ed era sbagliata:
+#   il 29/08/2026 due run hanno ripubblicato il 27 dopo che quattro avevano il 28, quindi uno
+#   snapshot con l'orologio piu' avanti portava una seduta piu' INDIETRO.
+VEN = {"price": 216.62, "price_asof": "2026-08-28"}     # MRVL venerdi', dopo la trimestrale
+GIO = {"price": 241.45, "price_asof": "2026-08-27"}     # MRVL giovedi'
 
-# il caso reale: MRVL 241.45 (gio) → 216.62 (ven)
-p, sc = RP.prezzo_da_usare(241.45, 216.62, True)
-check("col preferisci_snap attivo vince il prezzo dello snapshot", p == 216.62)
+p, sed, sc, arr = RP.prezzo_da_usare(241.45, VEN, "2026-08-27")
+check("una seduta piu' recente nello snapshot vince, e la sua data viene dichiarata",
+      p == 216.62 and sed == "2026-08-28" and arr is False)
 check("lo scarto dichiarato e' quello vero fra le due fonti",
       sc is not None and abs(sc - (216.62 / 241.45 - 1) * 100) < 1e-9, f"scarto {sc}")
 check("uno scarto oltre soglia su un caso reale viene segnalato",
       abs(sc) > RP.SCARTO_PREZZO, f"{sc:.2f}% contro soglia {RP.SCARTO_PREZZO}")
-p2, sc2 = RP.prezzo_da_usare(241.45, 216.62, False)
-check("senza preferisci_snap il prezzo resta quello di libro.json e non si dichiara nulla",
-      p2 == 241.45 and sc2 is None)
-p3, sc3 = RP.prezzo_da_usare(241.45, None, True)
-check("se lo snapshot non ha il prezzo si ricade su libro.json senza inventare uno scarto",
-      p3 == 241.45 and sc3 is None)
-# ⚠ MU si e' mosso dello 0,27%: sotto soglia, e la riga NON deve sporcare il rapporto
-_, sc4 = RP.prezzo_da_usare(935.39, 932.86, True)
+
+# ⚠ IL CASO CHE L'OROLOGIO SBAGLIAVA: snapshot generato DOPO ma su una seduta PRECEDENTE
+p2, sed2, sc2, arr2 = RP.prezzo_da_usare(216.62, GIO, "2026-08-28")
+check("uno snapshot ARRETRATO non spodesta libro.json e viene segnalato come tale",
+      p2 == 216.62 and sed2 == "2026-08-28" and sc2 is None and arr2 is True)
+
+p3, _, sc3, arr3 = RP.prezzo_da_usare(241.45, GIO, "2026-08-27")
+check("sulla STESSA seduta non si cambia fonte e non si dichiara nessuno scarto",
+      p3 == 241.45 and sc3 is None and arr3 is False)
+
+# ⚠ price_asof e' None sui LIVE override (cripto, futures, indici esteri): senza data non si
+#   confronta niente, e si resta sulla fonte dichiarata invece di indovinare.
+for descr, riga in (("senza price_asof", {"price": 216.62}),
+                    ("con price_asof nullo", {"price": 216.62, "price_asof": None}),
+                    ("senza prezzo", {"price_asof": "2026-08-28"})):
+    p4, _, sc4, arr4 = RP.prezzo_da_usare(241.45, riga, "2026-08-27")
+    check(f"una riga {descr} non spodesta libro.json ne' inventa uno scarto",
+          p4 == 241.45 and sc4 is None and arr4 is False)
+check("senza la seduta di libro.json non si sceglie e non si segnala",
+      RP.prezzo_da_usare(241.45, VEN, None) == (241.45, None, None, False))
+
+# ⚠ MU si e' mosso dello 0,27%: sotto soglia, la riga NON deve sporcare il rapporto
+_, _, sc5, _ = RP.prezzo_da_usare(935.39, {"price": 932.86, "price_asof": "2026-08-28"}, "2026-08-27")
 check("uno scarto sotto soglia resta calcolato ma non supera la soglia di segnalazione",
-      sc4 is not None and abs(sc4) < RP.SCARTO_PREZZO, f"{sc4:.2f}%")
+      sc5 is not None and abs(sc5) < RP.SCARTO_PREZZO, f"{sc5:.2f}%")
+
+# ⚠ OTTAVA volta in questo progetto che un check ancorato a una STRINGA del sorgente si rompe:
+#   la prima stesura pretendeva che "updated_at" non comparisse dopo prezzo_da_usare, ma quel
+#   campo serve legittimamente altrove (l'eta' dei fondamentali). La proprieta' vera e' che un
+#   OROLOGIO nella riga non cambia la scelta: solo la seduta conta.
+check("la seduta viene letta da price_asof, e un orologio nella riga non cambia la scelta",
+      RP.seduta_snapshot(VEN) == "2026-08-28" and RP.seduta_snapshot({}) is None
+      and RP.prezzo_da_usare(241.45, {**VEN, "updated_at": "2099-01-01T00:00:00Z"}, "2026-08-27")
+          == RP.prezzo_da_usare(241.45, VEN, "2026-08-27")
+      and RP.prezzo_da_usare(216.62, {**GIO, "updated_at": "2099-01-01T00:00:00Z"}, "2026-08-28")
+          == RP.prezzo_da_usare(216.62, GIO, "2026-08-28"))
+
+# ── 9. la pipeline dichiara quando ripubblica una seduta piu' vecchia (v383) ───────────
+srcU = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+import update_data as UD
+UD.PREV_DATA = {"watchlist": [{"ticker": "MRVL", "price_asof": "2026-08-28"}]}
+check("una seduta ARRETRATA rispetto al run precedente viene riconosciuta e datata",
+      UD.seduta_arretrata("MRVL", "2026-08-27") == "2026-08-28")
+check("una seduta uguale o piu' avanti non viene segnalata",
+      UD.seduta_arretrata("MRVL", "2026-08-28") is None
+      and UD.seduta_arretrata("MRVL", "2026-08-29") is None)
+check("un titolo mai visto prima non produce un falso allarme",
+      UD.seduta_arretrata("PIPPO", "2026-08-27") is None)
+check("senza price_asof (live override) non si segnala niente",
+      UD.seduta_arretrata("MRVL", None) is None)
+# ⚠ un titolo puo' passare da watchlist a portafoglio fra due run: il confronto non deve
+#   perdersi proprio quando la posizione viene aperta
+UD.PREV_DATA = {"portfolio": [{"ticker": "MRVL", "price_asof": "2026-08-28"}]}
+check("il confronto trova il titolo anche se ha cambiato lista fra i due run",
+      UD.seduta_arretrata("MRVL", "2026-08-27") == "2026-08-28")
+UD.PREV_DATA = {}
+check("senza snapshot precedente non si segnala niente",
+      UD.seduta_arretrata("MRVL", "2026-08-27") is None)
+# ⚠⚠ L'ALLARME DEVE RESTARE ACCESO. Al secondo run arretrato di fila, price_asof del run
+#   precedente porta gia' la data vecchia: senza memoria del flag l'allarme tacerebbe proprio
+#   mentre il sistema e' ancora indietro. Il 29/08/2026 la regressione e' durata quattro run.
+UD.PREV_DATA = {"watchlist": [{"ticker": "MRVL", "price_asof": "2026-08-27",
+                               "price_asof_arretrata_da": "2026-08-28"}]}
+check("al secondo run arretrato di fila l'allarme resta acceso, non tace",
+      UD.seduta_arretrata("MRVL", "2026-08-27") == "2026-08-28")
+check("e si spegne da solo quando la seduta persa viene recuperata",
+      UD.seduta_arretrata("MRVL", "2026-08-28") is None
+      and UD.seduta_arretrata("MRVL", "2026-08-31") is None)
+# ⚠ la pipeline DICHIARA, non rattoppa: splicciare un prezzo piu' recente su tecnica calcolata
+#   senza quella barra darebbe una riga a due eta' (la classe che coherence_check sorveglia)
+check("la pipeline dichiara la regressione invece di riscrivere il prezzo",
+      "price_asof_arretrata_da" in srcU and "NON SI RATTOPPA IL PREZZO" in srcU)
 check("la soglia di dichiarazione e' una costante, non sparsa nel codice",
       isinstance(RP.SCARTO_PREZZO, (int, float)) and srcR.count("SCARTO_PREZZO") >= 3)
 

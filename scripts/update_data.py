@@ -1104,6 +1104,48 @@ def combustione(t, mcap, buyback):
     return {k: v for k, v in out.items() if v is not None}
 
 
+def riga_precedente(ticker):
+    """La riga dello STESSO titolo nello snapshot del run precedente, ovunque stia.
+    Cerca in entrambe le liste perche' un titolo puo' passare da watchlist a portafoglio fra
+    due run: agganciarsi alla lista invece che al ticker perderebbe il confronto proprio
+    quando la posizione viene aperta."""
+    for lista in ("portfolio", "watchlist"):
+        for r in (PREV_DATA.get(lista) or []):
+            if r.get("ticker") == ticker:
+                return r
+    return None
+
+
+def seduta_arretrata(ticker, price_asof):
+    """La seduta pubblicata ORA e' PIU' VECCHIA di quella gia' a disco? Ritorna quella vecchia.
+
+    ⚠⚠ SUCCESSO DAVVERO, ED E' PASSATO INOSSERVATO PER ORE. Il 29/08/2026 i run delle 10:51 e
+    11:24 hanno ripubblicato la seduta del 27 dopo che quattro run consecutivi avevano il 28:
+    Yahoo ha servito la barra di venerdi' senza Close e `drop_void_bars` l'ha scartata — cioe'
+    la pipeline ha fatto la cosa GIUSTA, ma il risultato e' che 22 strumenti su 24 sono tornati
+    indietro di una seduta. MRVL da 216,62 (-10,3% sulla trimestrale) e' risalito a 241,45, il
+    SOX ha recuperato il 3,6% mai avvenuto, e `macro.momentum.sp500.asof` e' passato da
+    2026-08-28 a 2026-08-27. Dashboard e rapporto mostravano giovedi' credendolo l'ultimo dato.
+
+    ⚠ QUI NON SI RATTOPPA IL PREZZO, e la scelta e' deliberata. Riportare avanti la chiusura di
+    venerdi' su una riga la cui tecnica (ATR, medie, RSI, sparkline) e' calcolata SENZA quella
+    barra produrrebbe una riga a due eta': esattamente la classe di incoerenza per cui esiste
+    coherence_check, e il difetto che il gate valuta ha gia' pagato in v183. Il dato fetchato e'
+    internamente coerente — e' solo VECCHIO. Si dichiara, e chi legge decide.
+
+    ⚠ L'ALLARME DEVE RESTARE ACCESO, non suonare una volta sola. Se guardasse solo il
+    `price_asof` del run precedente, al secondo run consecutivo arretrato quel campo porterebbe
+    gia' la data vecchia e il confronto tornerebbe silenzioso — proprio mentre il sistema e'
+    ancora indietro. Il 29/08/2026 la regressione e' durata almeno QUATTRO run (10:51, 11:24,
+    13:40, 14:06): un allarme che suona sulla sola transizione non l'avrebbe raccontata.
+    Percio' si guarda la seduta piu' RECENTE mai pubblicata per questo titolo, tenendo memoria
+    anche del flag precedente."""
+    prec = riga_precedente(ticker) or {}
+    viste = [str(x) for x in (prec.get("price_asof"), prec.get("price_asof_arretrata_da")) if x]
+    massima = max(viste) if viste else None
+    return massima if (price_asof and massima and massima > str(price_asof)) else None
+
+
 def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
     ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
@@ -1147,6 +1189,14 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             price = lp
             price_asof = None   # non è una chiusura: è live
             price_live = True
+
+    # ⚠⚠ Guardia di REGRESSIONE DI SEDUTA (v383) — vedi seduta_arretrata(). Sta QUI, dopo il
+    #   live override: prima, price_asof puo' ancora essere azzerato e il confronto sarebbe
+    #   fatto su una data che poi non viene pubblicata.
+    arretrata_da = seduta_arretrata(ticker, price_asof)
+    if arretrata_da:
+        print(f"·· {ticker}: SEDUTA ARRETRATA — pubblico {price_asof}, il run precedente aveva "
+              f"{arretrata_da} (barra piu' recente assente o senza chiusura)", file=sys.stderr)
 
     monthly = None
     try:
@@ -1592,6 +1642,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "price_src": price_src,          # "yahoo" | "stooq" (fallback prezzi etichettato)
         "price": round(price, 2),
         "price_asof": price_asof,        # data dell'ultima chiusura valida (staleness dichiarabile)
+        "price_asof_arretrata_da": arretrata_da,   # v383: seduta PIU' RECENTE che un run precedente aveva gia' pubblicato
         "price_live": price_live,        # True = ultimo scambio LIVE (KOSPI/BTC/futures fuori orario USA)
         "change_pct": chg,
         "pe": round(float(pe), 1) if pe and pe > 0 else None,
