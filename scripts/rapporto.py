@@ -15,7 +15,7 @@ trimestrali e il perche' di un movimento non stanno qui — quelli si cercano in
 
 uso:  python3 scripts/rapporto.py
 """
-import json, math, sys
+import json, logging, math, sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -194,16 +194,92 @@ def extra(t, r, px):
                 for x in pr) + "  ⚠ conto di cosa e' successo, non previsione")
 
 
+class RaccoltaYF(logging.Handler):
+    """Le lamentele di yfinance non si buttano: si CONTANO e si riassumono per CAUSA.
+
+    ⚠ Non e' un silenziatore. Con 13 titoli e 3 tentativi yfinance scrive ~200 righe su
+      stderr, e quelle righe dicono "possibly delisted" di societa' vive: il muro seppelliva
+      l'unica riga che conta davvero — la nostra, che dichiara il ripiego sui valori
+      pubblicati. E' la classe v315 (una dichiarazione che c'e' e non si trova non e' una
+      dichiarazione) applicata all'output di un comando.
+      La regola "i fallback devono essere RUMOROSI" resta e viene RAFFORZATA: la nostra
+      dichiarazione sale in cima e porta la causa, invece di stare in fondo a un muro.
+    ⚠ E la causa e' l'informazione vera: "CONNECT 403" dice che la rete blocca Yahoo,
+      "possibly delisted" ripetuto 13 volte dice il contrario di quello che sembra.
+    """
+
+    CAUSE = (
+        ("403", "il proxy di rete rifiuta la connessione a Yahoo (CONNECT 403)"),
+        ("possibly delisted", "nessuna barra restituita (conseguenza del blocco, non un delisting)"),
+        ("crumb", "Yahoo non rilascia il cookie/crumb di sessione"),
+        ("Rate limit", "Yahoo sta limitando le richieste"),
+    )
+
+    def __init__(self):
+        super().__init__()
+        self.righe = []
+
+    def emit(self, record):
+        try:
+            self.righe.append(record.getMessage())
+        except Exception:
+            pass
+
+    def riassunto(self):
+        """Una riga per CAUSA distinta, col numero di messaggi che la portano."""
+        fuori = []
+        residuo = list(self.righe)
+        for ago, spiega in self.CAUSE:
+            n = sum(1 for r in residuo if ago in r)
+            if n:
+                fuori.append(f"{n} messaggi: {spiega}")
+                residuo = [r for r in residuo if ago not in r]
+        if residuo:
+            fuori.append(f"{len(residuo)} messaggi non classificati, il primo: "
+                         f"{residuo[0][:120]}")
+        return fuori
+
+
+def zittisci_yfinance():
+    """Dirotta il logger di yfinance su una RaccoltaYF. Ritorna (raccolta, ripristina)."""
+    racc = RaccoltaYF()
+    lg = logging.getLogger("yfinance")
+    prima_h, prima_p, prima_l = list(lg.handlers), lg.propagate, lg.level
+    lg.handlers = [racc]
+    lg.propagate = False
+    # ⚠ IL LIVELLO VA IMPOSTATO QUI, e non e' un dettaglio: scripts/update_data.py alza lo
+    #   stesso logger a CRITICAL al momento dell'import. Chi importa prima decide cosa
+    #   l'altro riesce a vedere — e senza questa riga la cattura funzionava solo perche'
+    #   rapporto.py non importa la pipeline, cioe' per fortuna e non per costruzione.
+    #   Trovato da un check che e' andato rosso proprio perche' la suite importa entrambi.
+    lg.setLevel(logging.WARNING)
+
+    def ripristina():
+        lg.handlers, lg.propagate, lg.level = prima_h, prima_p, prima_l
+
+    return racc, ripristina
+
+
+
 def main():
     import yfinance as yf
     import analisi_libro as A
+    racc, ripristina = zittisci_yfinance()
     try:
         a = A.analizza()
         vivo = True
     except (Exception, SystemExit) as e:
         print(f"⚠ misure non calcolabili dal vivo ({type(e).__name__}) — valori pubblicati",
               file=sys.stderr)
+        for r in racc.riassunto():
+            print(f"  causa: {r}", file=sys.stderr)
         a, vivo = A.da_pubblicato(), False
+    finally:
+        ripristina()
+    if vivo and racc.righe:
+        # sceso dal vivo lo stesso, ma non senza attriti: dirlo, senza il muro.
+        print(f"⚠ prezzi scaricati, ma yfinance ha protestato {len(racc.righe)} volte "
+              f"({'; '.join(racc.riassunto())})", file=sys.stderr)
     d = json.loads((ROOT / "data" / "data.json").read_text(encoding="utf-8"))
     perTk = {r["ticker"]: r for r in d.get("watchlist", [])}
     m, q = a["m"], a.get("quota_az")

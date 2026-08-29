@@ -29,10 +29,19 @@ python3 scripts/scenari.py                 # "se SOXX -20%, il libro quanto fa"
 python3 scripts/scenari.py QQQ -15 SOXX -25   # scenari su misura
 python3 scripts/rapporto.py                # TUTTO il libro: tecnica, fondamentali, cassa,
                                            # debito, dark pool, consenso, macro
-node scripts/grafici.mjs                  # pagina HTML da pubblicare come artefatto:
+node scripts/grafici.mjs                   # pagina HTML da pubblicare come artefatto:
                                            # RACCOGLIE i grafici della dashboard, non li ridisegna
+node scripts/emit_macro_pack.mjs           # data/macro_pack.txt: il quadro macro della
+                                           # dashboard (rotazione 21 ETF, medie, Polymarket)
+node scripts/backtest_signals.mjs          # i detector hanno avuto contenuto predittivo?
+node scripts/backtest_diary.mjs            # le operazioni VERE del CEO vs oggi e vs l'indice
 python3 scripts/pacchetto_verdetto.py TICKER analisi.md   # pacchetto corto, se serve
 ```
+
+⚠ I due backtest sono l'unica forma di "previsione" che questo sistema ammette: non un numero
+sul futuro, ma il **curriculum misurato** di chi lo direbbe. Vanno letti col loro campione REALE
+(titoli distinti, non le osservazioni giornaliere che si sovrappongono) e riportati anche quando
+l'esito e' scomodo — oggi lo e'.
 
 Tutti leggono le posizioni da `config/posizioni.json` e i prezzi da yfinance: **non dipendono
 dalla pipeline**. Se la rete manca, `analisi_libro.py` degrada su `data/libro.json` dichiarando

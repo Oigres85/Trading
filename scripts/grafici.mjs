@@ -109,6 +109,25 @@ for (const f of RENDER) {
   catch (e) { falliti.push(`${f}: ${String(e.message).slice(0, 80)}`); }
 }
 
+
+/* ── come si chiama un blocco: lo dice il MARKUP, non un elenco scritto a mano ─────────── */
+/* ⚠ Il nome NON viene da una mappa selettore→titolo tenuta qui dentro: una mappa del genere
+   invecchia da sola e in silenzio appena qualcuno rinomina una sezione — e' la classe C10 e
+   quella del registro di indici fissi del red team, pagata piu' volte in questo progetto.
+   Si legge invece l'<h2> che in index.html precede l'elemento: se la dashboard cambia nome
+   a una sezione, questa pagina cambia con lei. Quando l'h2 non c'e', si scrive il selettore
+   e si dice che il titolo manca — mai inventarne uno. */
+const MARKUP = readFileSync(join(ROOT, "index.html"), "utf8");
+function titoloDi(sel) {
+  const id = String(sel || "").replace(/^#/, "");
+  const dove = MARKUP.indexOf(`id="${id}"`);
+  if (dove < 0) return null;
+  const prima = MARKUP.slice(0, dove);
+  const h = [...prima.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)].pop();
+  const testo = h && h[1].replace(/<[^>]*>/g, "").trim();
+  return testo || null;
+}
+
 /* ── raccolta: si tiene cio' che ha DAVVERO prodotto un grafico ───────────────────────── */
 const blocchi = [];
 for (const [sel, n] of nodi) {
@@ -120,7 +139,7 @@ for (const [sel, n] of nodi) {
   const svg = (html.match(/<svg/g) || []).length;
   const tab = (html.match(/<table/g) || []).length;
   if (!svg && !tab) continue;
-  blocchi.push({ sel, html, svg, tab });
+  blocchi.push({ sel, html, svg, tab, titolo: titoloDi(sel) });
 }
 blocchi.sort((a, b) => (b.svg + b.tab) - (a.svg + a.tab) || a.sel.localeCompare(b.sel));
 
@@ -195,7 +214,9 @@ const pagina = `<title>Il libro dalla dashboard</title>
 <h1>Il libro dalla dashboard</h1>
 <div class="capo">${capo}${avvisi.map((a) => `<div class="av">${a}</div>`).join("")}</div>
 ${blocchi.length
-    ? blocchi.map((b) => `<div class="blocco" data-da="${esc(b.sel)}">${b.html}</div>`).join("\n")
+    ? blocchi.map((b) => `<h3>${b.titolo ? esc(b.titolo)
+        : `${esc(b.sel)} <span class="n">(senza intestazione nella dashboard)</span>`}</h3>
+<div class="blocco" data-da="${esc(b.sel)}">${b.html}</div>`).join("\n")
     : `<div class="vuoto">La dashboard non ha prodotto nessun grafico in questo run.
        Non ne viene disegnato uno di ripiego: un grafico che la dashboard non ha sarebbe
        un'invenzione, non una misura.</div>`}

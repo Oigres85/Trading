@@ -1433,6 +1433,78 @@ e tre le volte **il mio test confermava la mia stessa assunzione** invece di mis
 > deve verificare una **proprietà che il difetto viola per costruzione** — monotonia, invarianza
 > di scala, coerenza fra due lingue. I valori attesi si possono sbagliare insieme al codice.
 
+
+## 🧾 v387 — un comando resta indietro in silenzio, ed è così che smette di servire
+
+Il CEO ha chiesto di aggiungere a `/aggiorna` "altro che il sistema offre e tu non fornisci
+ancora". L'inventario ha dato la risposta e non era gradevole: **il comando citava 5 script su
+22**. `backtest_signals.mjs`, `backtest_diary.mjs` ed `emit_macro_pack.mjs` esistevano, giravano,
+e nessuno li eseguiva mai — fra questi il **quadro macro della dashboard** (rotazione sui 21 ETF,
+struttura delle medie, mercati di previsione), cioè proprio quello che il CEO aveva chiesto due
+messaggi prima.
+
+> **Un comando non si rompe: resta indietro.** Nessun test falliva, nessun errore compariva, e la
+> differenza fra ciò che il sistema sa e ciò che il comando consegna cresceva da sola.
+
+Ora un gate verifica l'invariante nei DUE versi: ogni script del repo è **o eseguito da
+`/aggiorna` o dichiarato fuori con la sua ragione**, e nessuno script citato è un fantasma.
+Validato per iniezione tre volte (uno strumento nuovo non censito, uno script citato e
+inesistente, `update_data.py` rimesso fra i passi): morde tutte e tre.
+
+⚠ **Il divieto del CEO è ora strutturale, non una buona intenzione**: niente aggiornamenti
+automatici, niente trigger, niente `update_data.py`, `notify_alerts.py` o `log_verdict.mjs` —
+questi tre scrivono (dati, Issue, `data.json`). Il gate verifica che compaiano **solo** nella
+sezione dei divieti. `test_update_data.py` resta invece fra i passi: è l'unico modo di sapere
+OGGI che la pipeline di domani è rotta, invece di scoprirlo dall'età il giorno dopo (v369).
+
+### Il muro di yfinance seppelliva l'unica riga che contava
+`rapporto.py` dichiarava correttamente il ripiego sui valori pubblicati — in fondo a **~200
+righe** che yfinance scrive su stderr, e quelle righe dicono `possibly delisted` di tredici
+società vive. È la classe **v315** (una dichiarazione che c'è e non si trova non è una
+dichiarazione) applicata all'output di un comando.
+
+Ora le proteste si **raccolgono e si riassumono per CAUSA**: 200 righe → 7, stdout **identico al
+byte**, e si legge *"40 messaggi: il proxy di rete rifiuta la connessione a Yahoo (CONNECT 403)"*
+seguito da *"40 messaggi: nessuna barra restituita (conseguenza del blocco, non un delisting)"*.
+Non è un silenziatore: la regola "i fallback devono essere RUMOROSI" viene **rafforzata**, perché
+la nostra riga sale in cima e porta la causa invece di stare sotto il muro.
+
+⚠⚠ **E il check è andato rosso avendo ragione.** `scripts/update_data.py:41` alza lo stesso
+logger a `CRITICAL` quando viene importato: la mia cattura funzionava solo perché `rapporto.py`
+non importa la pipeline — **per l'ordine degli import, non per costruzione**. Ora
+`zittisci_yfinance()` imposta il livello da sé e il check **riproduce apposta la condizione
+ostile** invece di aggirarla.
+> Quando due moduli configurano lo stesso logger globale, chi importa prima decide cosa l'altro
+> riesce a vedere. Un test che gira su un solo ordine di import non lo scopre mai.
+
+**Da decidere, e non fatto qui**: quel `setLevel(CRITICAL)` fa sì che la **pipeline** butti via
+le proteste di Yahoo senza contarle. Quando il CI viene bloccato, `update_data.py` non lascia
+traccia — la stessa classe della seduta persa (v383/v384). Non l'ho toccato: è il file della
+Regola Suprema e non posso osservarne l'esecuzione da qui, che è esattamente la trappola v203
+("logica provata, fetch mai provata").
+
+### I grafici raccolti non dicevano come si chiamano
+Cinque riquadri, 23 grafici e 3 tabelle, e **nessuna intestazione**: il CEO non poteva sapere
+quale fosse quale. Il titolo però esisteva già — è l'`<h2>` che in `index.html` precede ciascun
+elemento — quindi si **ricava dal markup**, non da una mappa selettore→titolo scritta dentro
+`grafici.mjs`: quella invecchierebbe da sola al primo rinomino (C10, red team I6,
+`MACRO_CARD_BY_PANEL` che copriva 7 pannelli su 37). Il check lo prova **rinominando davvero**
+una sezione in `index.html` e verificando che la pagina la segua; iniettando la mappa a mano,
+morde.
+
+⚠ **La trappola dell'ancoraggio aperto, ripetuta appena scritta**: il check "update_data.py solo
+fra i divieti" andava rosso perché `test_update_data.py` **contiene** `update_data.py` come
+sottostringa. È già scritta due volte in questo file (`mg-card` che matcha `mg-card-head`,
+`sc-fonte` che matcha `sc-fonte-qualsiasi`) e l'ho rifatta lo stesso. L'ancoraggio va chiuso.
+
+### L'unica forma di previsione che questo sistema ammette
+`/aggiorna` esegue ora i due backtest e ne riporta l'esito **anche quando è scomodo** — e oggi lo
+è: due detector su quattro hanno il **segno opposto** a quello che dichiarano (RS debole e RS
+molto debole sovraperformano invece di sottoperformare), e le operazioni annotate nel diario sono
+a valore positivo su **2 su 8**. Non è una profezia: è il curriculum misurato di chi la
+pronuncerebbe. **Un track record negativo taciuto è la peggiore forma di ancoraggio**, perché
+lascia intatta la fiducia togliendo le prove che la sosterrebbero.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

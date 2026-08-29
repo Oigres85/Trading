@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test di analisi_libro.py. Nessuna rete: dati sintetici costruiti per far scattare
 esattamente le trappole gia' pagate sul campo."""
-import math, sys
+import math, re, sys
 from pathlib import Path
 import numpy as np, pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -186,6 +186,32 @@ check("senza grafici raccolti lo script esce 1 invece di fingere un successo",
 check("il raccoglitore non disegna: nessun SVG scritto a mano nel sorgente",
       "<svg viewBox" not in srcG)
 _out.unlink(missing_ok=True)
+
+# ── 5c. ogni blocco raccolto dice come si chiama (v387) ────────────────────────────────
+# ⚠ Cinque riquadri senza intestazione: il CEO vedeva i grafici della dashboard e non poteva
+#   sapere quale fosse quale. Un blocco senza nome non e' meno grave di un titolo che mente —
+#   e' la stessa classe, l'etichetta che non fa il suo lavoro.
+check("ogni blocco raccolto porta un'intestazione", _pag.count("<h3>") >= _pag.count('data-da="#'))
+# ⚠⚠ LA PROPRIETA' CHE CONTA, e si prova cambiando index.html: il titolo si RICAVA dal markup.
+#   Con una mappa selettore→titolo scritta dentro grafici.mjs questo check passerebbe lo stesso
+#   ma la pagina mentirebbe al primo rinomino — la classe C10 (il registro che invecchia da
+#   solo). Qui la sezione viene rinominata davvero e si verifica che la pagina la segua.
+_idx = Path(__file__).resolve().parent.parent / "index.html"
+_orig_idx = _idx.read_text(encoding="utf-8")
+_MARCA = "Il rischio del libro, e con che cosa si confronta"
+assert _MARCA in _orig_idx, "iniezione a vuoto: intestazione di riferimento non in index.html"
+try:
+    _idx.write_text(_orig_idx.replace(_MARCA, "TITOLO CAMBIATO PER PROVA"), encoding="utf-8")
+    _r2 = subprocess.run(["node", str(Path(__file__).resolve().parent / "grafici.mjs"), str(_out)],
+                         capture_output=True, text=True,
+                         cwd=str(Path(__file__).resolve().parent.parent))
+    _pag2 = _out.read_text(encoding="utf-8") if _out.exists() else ""
+finally:
+    _idx.write_text(_orig_idx, encoding="utf-8")
+check("rinominando la sezione in index.html il titolo del blocco cambia con lei",
+      "TITOLO CAMBIATO PER PROVA" in _pag2 and _MARCA not in _pag2, f"exit {_r2.returncode}")
+check("nessuna mappa selettore→titolo scritta a mano dentro il raccoglitore",
+      "titoloDi" in srcG and "MARKUP.indexOf" in srcG and _MARCA not in srcG)
 
 # ── 6. le posizioni si leggono dalla FONTE, non dallo snapshot della pipeline ──────────
 src = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")
@@ -377,7 +403,7 @@ import scenari as SC
 check("scenari.py non muore piu' con un traceback quando la rete manca",
       "except (Exception, SystemExit)" in srcS and "non_si_puo" in srcS)
 # ⚠ la PROPRIETA' che conta: spiega senza produrre numeri di scenario inventati
-import io, contextlib
+import io, contextlib, logging
 buf = io.StringIO()
 with contextlib.redirect_stdout(buf):
     SC.non_si_puo(RuntimeError("meno di tre titoli con storia sufficiente"))
@@ -390,6 +416,101 @@ check("non stampa nessuna riga di scenario quando non ha i dati per calcolarla",
       "sull'azionario" not in uscita and "beta" not in uscita.lower().replace("i beta verso", ""))
 check("il codice d'uscita dice la verita': non esce 0 senza aver prodotto scenari",
       "sys.exit(main() or 0)" in srcS and "return 1" in srcS)
+
+# ── 9. il muro di yfinance: riassunto per CAUSA, non silenzio (v387) ───────────────────
+# ⚠ La dichiarazione del ripiego ESISTEVA gia' ed era corretta — stava pero' in fondo a ~200
+#   righe che yfinance scrive su stderr, e quelle righe dicono "possibly delisted" di societa'
+#   vive. E' la classe v315 (una dichiarazione che c'e' e non si trova non e' una dichiarazione)
+#   applicata all'output di un comando. Qui NON si prova che il rumore sparisce: si prova che
+#   la CAUSA sopravvive, che e' l'unica cosa che il muro faceva perdere.
+_racc = RP.RaccoltaYF()
+_racc.righe = (["Failed to perform, curl: (7) CONNECT tunnel failed, response 403"] * 3
+               + ["$MU: possibly delisted; no price data found"] * 5
+               + ["Cookie/crumb fetch failed (ConnectionError), continuing without crumb"] * 2
+               + ["qualcosa che non abbiamo mai visto"])
+_r = _racc.riassunto()
+check("il riassunto NON perde messaggi: le classi coprono tutto cio' che e' arrivato",
+      sum(int(x.split()[0]) for x in _r) == len(_racc.righe))
+# ⚠ LA PROPRIETA' CHE IL DIFETTO VIOLAVA: col muro, l'ultima cosa letta erano 13 "delisted".
+#   La causa vera (la rete) deve venire PRIMA, e il delisting essere dichiarato conseguenza.
+check("la causa di rete viene prima del delisting, che e' dichiarato una conseguenza",
+      "403" in _r[0] and any("delisting" in x and "conseguenza" in x for x in _r))
+check("un messaggio mai visto non viene inghiottito: viene contato e citato",
+      any("non classificati" in x and "mai visto" in x for x in _r))
+check("senza proteste il riassunto e' vuoto — non inventa una causa",
+      RP.RaccoltaYF().riassunto() == [])
+
+# ⚠ COMPORTAMENTALE: si prova sul logger VERO, non rileggendo il sorgente. Un messaggio
+#   emesso mentre la cattura e' attiva deve finire nella raccolta e NON su stderr; e dopo
+#   il ripristino deve tornare a propagare, altrimenti zittiremmo yfinance per sempre.
+_lg = logging.getLogger("yfinance")
+# ⚠ QUESTO CHECK E' ANDATO ROSSO E AVEVA RAGIONE. scripts/update_data.py alza lo stesso
+#   logger a CRITICAL quando viene importato, e questa suite lo importa: il messaggio spariva
+#   PRIMA di arrivare a qualunque handler. In produzione la cattura funzionava solo perche'
+#   rapporto.py non importa la pipeline — cioe' per l'ordine degli import, non per costruzione.
+#   Qui la condizione ostile si RIPRODUCE apposta, invece di essere aggirata.
+_lg.setLevel(logging.CRITICAL)
+_prima_p = _lg.propagate
+_err = io.StringIO()
+_racc2, _ripristina = RP.zittisci_yfinance()
+with contextlib.redirect_stderr(_err):
+    _lg.error("possibly delisted; no price data found")
+_ripristina()
+check("mentre la cattura e' attiva il messaggio va nella raccolta, non su stderr",
+      _racc2.righe == ["possibly delisted; no price data found"] and _err.getvalue() == "")
+check("dopo il ripristino il logger torna com'era: livello compreso",
+      _lg.handlers == [] and _lg.propagate == _prima_p and _lg.level == logging.CRITICAL)
+_lg.setLevel(logging.NOTSET)
+check("il ripristino avviene anche quando analizza() esplode: e' in un finally",
+      "finally:" in srcR and "ripristina()" in srcR)
+
+# ── 10. il comando /aggiorna non resta indietro rispetto al sistema (v387) ─────────────
+# ⚠⚠ Il modo in cui un comando smette di essere utile non e' rompersi: e' RESTARE INDIETRO.
+#   Prima di questa versione /aggiorna citava 5 script su 22 — backtest_signals, backtest_diary
+#   ed emit_macro_pack esistevano, funzionavano, e nessuno li eseguiva mai. Un comando che cita
+#   uno script rimosso, o che ignora uno strumento nuovo, degrada in silenzio: e' la classe del
+#   registro fisso (C10, red team I6, MACRO_CARD_BY_PANEL) applicata a un comando.
+_CMD = Path(__file__).resolve().parent.parent / ".claude" / "commands" / "aggiorna.md"
+_cmd = _CMD.read_text(encoding="utf-8")
+_scripts = sorted(p.name for p in (Path(__file__).resolve().parent).glob("*.py"))
+_scripts += sorted(p.name for p in (Path(__file__).resolve().parent).glob("*.mjs"))
+# ⚠ L'ANCORAGGIO VA CHIUSO: `update_data.py` e' sottostringa di `test_update_data.py`, quindi
+#   un `in` semplice dichiarava citato uno script mai nominato e vietato uno consentito. E' la
+#   trappola gia' scritta due volte in CLAUDE.md (`mg-card` che matcha `mg-card-head`,
+#   `sc-fonte` che matcha `sc-fonte-qualsiasi`), e il check l'ha ripetuta appena scritto.
+def _nominato(nome, testo):
+    return re.search(r"(?<![\w-])" + re.escape(nome), testo) is not None
+_ignoti = [s for s in _scripts if not _nominato(s, _cmd)]
+check("ogni script del repo e' o eseguito da /aggiorna o dichiarato fuori, con la sua ragione",
+      not _ignoti, f"mai nominati: {', '.join(_ignoti)}")
+# ⚠ e il verso opposto: un comando che cita uno script inesistente promette un passo che non
+#   avviene. Verde per assenza di esecuzione, la trappola gia' pagata in v205 e v226.
+_citati = sorted(set(re.findall(r"scripts/([A-Za-z0-9_]+\.(?:py|mjs))", _cmd)))
+_fantasmi = [s for s in _citati if not (Path(__file__).resolve().parent / s).exists()]
+check("nessuno script citato dal comando e' un fantasma", not _fantasmi, f"assenti: {_fantasmi}")
+# ⚠ IL DIVIETO E' STRUTTURALE, non una buona intenzione: il CEO ha chiesto che nessun
+#   aggiornamento parta da solo. Se un domani qualcuno mette update_data.py fra i passi da
+#   eseguire, questo check lo trova — la riga deve stare SOLO nella sezione dei divieti.
+_divieto = _cmd.split("## Cosa questo comando NON fa")[-1]
+_passi = _cmd.split("## Cosa questo comando NON fa")[0]
+check("update_data.py compare solo fra i divieti, mai fra i passi da eseguire",
+      _nominato("update_data.py", _divieto) and not _nominato("update_data.py", _passi))
+check("anche notify_alerts e log_verdict stanno solo fra i divieti: scrivono fuori",
+      all(_nominato(x, _divieto) and not _nominato(x, _passi)
+          for x in ("notify_alerts.py", "log_verdict.mjs")))
+# ⚠ e il gate della pipeline deve restare fra i PASSI: e' l'unico modo di sapere OGGI che la
+#   pipeline di domani e' rotta, invece di scoprirlo dall'eta' il giorno dopo (v369).
+check("test_update_data.py resta invece fra i passi: sorveglia la pipeline senza eseguirla",
+      _nominato("test_update_data.py", _passi))
+check("il divieto di armare trigger e schedulazioni e' scritto, non sottinteso",
+      "trigger" in _divieto.lower() and "schedulazion" in _divieto.lower())
+# ⚠ il backtest e' l'unica forma di "previsione" che questo sistema ammette, e va letto come
+#   curriculum misurato, non come profezia: il comando deve chiedere il campione REALE.
+check("il comando chiede il campione REALE dei backtest, non le osservazioni sovrapposte",
+      "campione REALE" in _cmd and "5 titoli distinti" in _cmd)
+check("il comando impone R² accanto al beta: un canale sotto 0,05 non si racconta",
+      "R²" in _cmd and "0,05" in _cmd)
+
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
