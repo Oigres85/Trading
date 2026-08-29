@@ -91,6 +91,99 @@ def tecnica(h):
     return out
 
 
+def mld(v, cifre=1):
+    if v is None:
+        return None
+    return f"{v/1e9:+.{cifre}f} mld" if abs(v) >= 1e9 else f"{v/1e6:+.0f} mln"
+
+
+def extra(t, r, px):
+    """Tutto il resto che il sistema ha e che il rapporto taceva. Ogni blocco e' condizionato al
+    proprio dato: se manca, tace. Un blocco vuoto stampato e' peggio di un blocco assente."""
+    an = r.get("analisti") or {}
+    if an.get("eps_min") is not None and an.get("eps_max") is not None:
+        med = an.get("eps_ora")
+        amp = (an["eps_max"] - an["eps_min"]) / med * 100 if med else None
+        print(f"   CONSENSO+ stime utili da {an['eps_min']} a {an['eps_max']}"
+              + (f" su {an['eps_n']} analisti" if an.get("eps_n") else "")
+              + (f" — forbice pari al {amp:.0f}% della media" if amp else "")
+              + (f" · {an['su_30g']}↑ {an['giu_30g']}↓ in 30 giorni"
+                 if an.get("su_30g") is not None else ""))
+    if an.get("target_min") is not None:
+        sotto = px and an["target_min"] < px
+        print(f"   TARGET   da {an['target_min']} a {an['target_max']}"
+              + (f", mediana {an['target_mediana']}" if an.get("target_mediana") else "")
+              + ("  ⚠ il minimo sta SOTTO il prezzo" if sotto else ""))
+    cb = r.get("combustione") or {}
+    if cb.get("ocf_ttm") is not None or cb.get("cassa") is not None:
+        pezzi = [x for x in (
+            f"cassa {mld(cb.get('cassa'))}" if cb.get("cassa") else None,
+            f"debito netto {mld(cb.get('debito_netto'))}" if cb.get("debito_netto") is not None else None,
+            f"flusso operativo {mld(cb.get('ocf_ttm'))}" if cb.get("ocf_ttm") is not None else None,
+            f"investimenti {mld(cb.get('capex_ttm'))}" if cb.get("capex_ttm") is not None else None,
+            f"flusso libero {mld(cb.get('fcf_ttm'))}" if cb.get("fcf_ttm") is not None else None) if x]
+        origine = ""
+        if cb.get("ocf_ttm") is not None and cb.get("fcf_ttm") is not None:
+            origine = ("  → la gestione genera cassa, il flusso libero e' negativo per gli INVESTIMENTI"
+                       if cb["ocf_ttm"] > 0 and cb["fcf_ttm"] < 0 else
+                       "  → la gestione ASSORBE cassa" if cb["ocf_ttm"] <= 0 else "")
+        print("   CASSA    " + " · ".join(pezzi) + origine)
+        if cb.get("emissione_netta_pct"):
+            print(f"            emissione netta di azioni {cb['emissione_netta_pct']:+.2f}% in un anno (diluizione)")
+    cr = r.get("credito") or {}
+    if cr.get("oneri_ttm") is not None:
+        v = [f"oneri finanziari {mld(cr['oneri_ttm'])}"]
+        if cr.get("oneri_var_4trim_pct") is not None:
+            v.append(f"{cr['oneri_var_4trim_pct']:+.0f}% in 4 trimestri")
+        if cr.get("debito_corrente") is not None:
+            cassa = cb.get("cassa")
+            v.append(f"in scadenza entro 12 mesi {mld(cr['debito_corrente'])}"
+                     + ("  ⚠ SOPRA la cassa" if cassa and cassa < cr["debito_corrente"] else ""))
+        print("   DEBITO   " + " · ".join(v))
+    fin = r.get("financials") or []
+    if len(fin) >= 2:
+        ult = fin[-4:]
+        print("   CONTO    " + " · ".join(
+            f"{x['year']}: ricavi {x['revenue']/1e9:.1f} mld, margine {x['margin']:+.0f}%" for x in ult))
+    fm = r.get("fuori_mercato") or {}
+    piene = [x for x in (fm.get("settimane") or []) if not x.get("incompleta")]
+    if len(piene) >= 2:
+        u = piene[-1]
+        quota = u["ats"] / (u["ats"] + u["otc"]) * 100 if (u["ats"] + u["otc"]) else None
+        print(f"   FLUSSO   settimana {u['w']}: dark pool (ATS) {u['ats']/1e6:.1f}M azioni, "
+              f"fuori borsa non-ATS {u['otc']/1e6:.1f}M"
+              + (f" — quota ATS {quota:.0f}%" if quota else "")
+              + "  ⚠ non-ATS = internalizzatori, molto flusso al dettaglio")
+    sf = r.get("short_flusso") or {}
+    if sf.get("ultimo_pct") is not None:
+        print(f"   SHORT    {sf['ultimo_pct']:.0f}% del volume venduto allo scoperto"
+              + (f" (media {sf['media_pct']:.0f}% su {len(sf.get('serie') or [])} sedute)" if sf.get("media_pct") else "")
+              + "  ⚠ e' flusso di giornata, non short interest")
+    sens = ((r.get("tv") or {}).get("sensibilita")) or {}
+    if isinstance(sens, dict) and sens:
+        vv = []
+        for k, d2 in sens.items():
+            if isinstance(d2, dict) and d2.get("r2") is not None:
+                forte = d2["r2"] >= 0.05
+                vv.append(f"{k} beta {d2.get('beta', '?'):+.2f} R² {d2['r2']:.2f}"
+                          + ("" if forte else " (canale assente)"))
+        if vv:
+            print("   CANALI   " + " · ".join(vv))
+    stg = ((r.get("tv") or {}).get("stagionalita")) or []
+    if isinstance(stg, list) and stg:
+        import datetime as _dt
+        m0 = _dt.date.today().month
+        prossimi = [n if n <= 12 else n - 12 for n in (m0, m0 + 1, m0 + 2)]
+        NOMI = ["", "gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
+        pr = [x for x in stg if isinstance(x, dict) and x.get("mese") in prossimi]
+        pr.sort(key=lambda x: prossimi.index(x["mese"]))
+        if pr:
+            print("   STAGION. " + " · ".join(
+                f"{NOMI[x['mese']]}: mediana {x.get('mediana', 0):+.1f}%, "
+                f"{x.get('positivi_pct', 0):.0f}% positivi su {x.get('campione', 0)} anni"
+                for x in pr) + "  ⚠ conto di cosa e' successo, non previsione")
+
+
 def main():
     import yfinance as yf
     import analisi_libro as A
@@ -215,6 +308,7 @@ def main():
         if r.get("earnings_date"): print(f"   trimestrale attesa {r['earnings_date']}")
         vic = sorted(((u, c) for u, c in m["corr"][t].items() if u != t), key=lambda x: -x[1])[:3]
         print("   si muove con: " + ", ".join(f"{u} {c:.2f}" for u, c in vic))
+        extra(t, r, px)
 
     print("\n" + "─" * 78)
     print("QUADRO MACRO (dallo snapshot della pipeline)")

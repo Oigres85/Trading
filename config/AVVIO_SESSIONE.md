@@ -27,6 +27,9 @@ python3 scripts/analisi_libro.py TICKER    # misure del libro + scheda del titol
 python3 scripts/soglie.py TICKER           # livelli, soglia di anomalia, costo negli scenari
 python3 scripts/scenari.py                 # "se SOXX -20%, il libro quanto fa"
 python3 scripts/scenari.py QQQ -15 SOXX -25   # scenari su misura
+python3 scripts/rapporto.py                # TUTTO il libro: tecnica, fondamentali, cassa,
+                                           # debito, dark pool, consenso, macro
+python3 scripts/grafici.py                 # pagina HTML da pubblicare come artefatto
 python3 scripts/pacchetto_verdetto.py TICKER analisi.md   # pacchetto corto, se serve
 ```
 

@@ -139,6 +139,22 @@ check("se legge meno di 4 voci macro lo dichiara, invece di stampare quel che tr
 check("il rapporto dice che notizie e trimestrali NON sono dentro",
       "si cercano in rete" in srcR)
 
+# ── 5novies. il rapporto arricchito e i grafici ────────────────────────────────────────
+srcR2 = (Path(__file__).resolve().parent / "rapporto.py").read_text(encoding="utf-8")
+for et in ("CASSA", "DEBITO", "CONTO", "FLUSSO", "SHORT", "CANALI", "STAGION.", "TARGET", "CONSENSO+"):
+    check(f"il rapporto pubblica il blocco {et}", et in srcR2)
+# ⚠ la chiave era `positivi_pct`, non `pos_pct`: il .get() con default 0 stampava "0% positivi"
+#   su medie positive. Un default silenzioso su una chiave sbagliata e' peggio di un KeyError.
+check("la stagionalita' usa la chiave vera (positivi_pct), non un default silenzioso",
+      "positivi_pct" in srcR2 and "pos_pct" not in srcR2)
+srcG = (Path(__file__).resolve().parent / "grafici.py").read_text(encoding="utf-8")
+check("i grafici non dipendono da risorse esterne (SVG scritto a mano)",
+      "http" not in srcG.split('"""')[2] and "<svg" in srcG)
+check("la pagina dei grafici funziona in tema chiaro e scuro",
+      "prefers-color-scheme: dark" in srcG and "data-theme=dark" in srcG)
+check("ogni pagina di grafici porta data e avvisi",
+      "seduta {a['al']}" in srcG and "posizioni di {g} giorni fa" in srcG)
+
 # ── 6. le posizioni si leggono dalla FONTE, non dallo snapshot della pipeline ──────────
 src = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")
 check("le posizioni vengono da config/posizioni.json, non da data/data.json",
