@@ -115,7 +115,7 @@ def analizza():
     corti = [t for t in tutti if px[t].notna().sum() < MIN_SEDUTE]
     tk = [t for t in tutti if t not in corti]
     if len(tk) < 3:
-        raise SystemExit("meno di tre titoli con storia sufficiente: niente da misurare")
+        raise RuntimeError("meno di tre titoli con storia sufficiente: niente da misurare")
     fx = 1.0
     try:
         fx = float(yf.download("EURUSD=X", period="5d", progress=False)["Close"].squeeze().iloc[-1])
@@ -135,7 +135,7 @@ def analizza():
               file=sys.stderr)
     tk = [t for t in tk if t in val]
     if len(tk) < 3:
-        raise SystemExit("meno di tre titoli con prezzo e storia: niente da misurare")
+        raise RuntimeError("meno di tre titoli con prezzo e storia: niente da misurare")
     tot_az = sum(val.values())
     base = sum(val[x] for x in tk)
     pesi = {t: val[t] / base for t in tk}
@@ -144,7 +144,7 @@ def analizza():
     fuori_az = (sp.get("cassa") or 0) + (sp.get("btp") or 0)
     patr = tot_az + fuori_az
     if not (tot_az == tot_az) or tot_az <= 0:
-        raise SystemExit("controvalore azionario non calcolabile: nessun prezzo valido")
+        raise RuntimeError("controvalore azionario non calcolabile: nessun prezzo valido")
     giorni_pos = None
     if pos_al:
         try:
@@ -282,7 +282,7 @@ if __name__ == "__main__":
     arg = [x for x in sys.argv[1:] if not x.startswith("--")]
     try:
         a = analizza()
-    except Exception as e:
+    except (Exception, SystemExit) as e:
         if "--no-fallback" in sys.argv:
             raise
         print(f"⚠ calcolo dal vivo non possibile ({type(e).__name__}: {str(e)[:90]})",

@@ -66,7 +66,12 @@ def main():
     if len(sys.argv) < 2:
         raise SystemExit(__doc__)
     tk = sys.argv[1].upper()
-    a = A.analizza()
+    try:
+        a = A.analizza()
+    except (Exception, SystemExit) as e:
+        print(f"⚠ misure del libro non calcolabili dal vivo ({type(e).__name__}) — "
+              f"uso i valori pubblicati in data/libro.json", file=sys.stderr)
+        a = A.da_pubblicato()
     if tk not in a["pesi"]:
         print(f"⚠ {tk} non e' fra i nomi misurati del libro: le soglie di portafoglio non si applicano")
     h = yf.Ticker(tk).history(period=FINESTRA, auto_adjust=True)
