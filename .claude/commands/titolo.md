@@ -7,10 +7,13 @@ Analizza **$1** come posizione dentro il libro del CEO (mandato growth, 13 nomi 
 
 1. `git pull`
 2. Leggi `config/AVVIO_SESSIONE.md` e seguilo.
-3. Esegui `python3 scripts/analisi_libro.py $1` e `python3 scripts/soglie.py $1`.
-4. Cerca in rete: ultima trimestrale (risultati contro consenso e guidance), notizie delle
+3. Prima di analizzare, controlla e riporta in due righe l'età di `data/data.json` (sopra 24
+   ore la pipeline è ferma) e di `config/posizioni.json` (sopra 7 giorni le posizioni potrebbero
+   non essere più quelle). Se qualcosa è vecchio, dillo in cima e continua dichiarandolo.
+4. Esegui `python3 scripts/analisi_libro.py $1` e `python3 scripts/soglie.py $1`.
+5. Cerca in rete: ultima trimestrale (risultati contro consenso e guidance), notizie delle
    ultime 48 ore, revisioni recenti. Fonte, data e URL.
-5. Scrivi l'analisi: il fatto che spiega il movimento, se è ordinario o una rottura **per questo
+6. Scrivi l'analisi: il fatto che spiega il movimento, se è ordinario o una rottura **per questo
    nome** (usa la soglia di anomalia che `soglie.py` calcola), il posto della posizione nel
    rischio del libro e con chi si muove insieme, cosa romperebbe la tesi.
 
