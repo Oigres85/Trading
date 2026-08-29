@@ -260,6 +260,82 @@ check("e si spegne da solo quando la seduta persa viene recuperata",
 #   senza quella barra darebbe una riga a due eta' (la classe che coherence_check sorveglia)
 check("la pipeline dichiara la regressione invece di riscrivere il prezzo",
       "price_asof_arretrata_da" in srcU and "NON SI RATTOPPA IL PREZZO" in srcU)
+
+# ── 10. la fonte di riserva scatta anche quando manca UNA SOLA seduta (v384) ───────────
+# ⚠⚠ backup_daily (Stooq → Tiingo) esisteva da sempre ma era agganciata al solo `hist.empty`,
+#   cioe' Yahoo che non risponde affatto. Il caso reale del 29/08/2026 era l'opposto: Yahoo
+#   risponde con un anno di barre e ne manca UNA, l'ultima. Il piano B non poteva scattare.
+#   Qui si prova senza rete, sostituendo backup_daily: cosi' il ramo si esercita davvero
+#   invece di essere solo letto (la lezione v234: un ramo mai raggiunto non e' una protezione).
+def _storico(fine, barre):
+    idx = pd.bdate_range(end=fine, periods=barre)
+    return pd.DataFrame({"Open": 100.0, "High": 101.0, "Low": 99.0,
+                         "Close": 100.0, "Volume": 1000.0}, index=idx)
+
+YAHOO_GIO = _storico("2026-08-27", 250)      # Yahoo si ferma a giovedi'
+RISERVA_VEN = _storico("2026-08-28", 250)    # la riserva ha venerdi'
+RISERVA_CORTA = _storico("2026-08-28", 40)   # ha venerdi' ma quasi nessuna storia
+
+def _con_riserva(ritorno):
+    """Sostituisce backup_daily e ritorna (hist, price_src) di recupera_seduta_persa."""
+    orig = UD.backup_daily
+    UD.backup_daily = lambda tk: ritorno
+    try:
+        return UD.recupera_seduta_persa("MRVL", YAHOO_GIO, "yahoo")
+    finally:
+        UD.backup_daily = orig
+
+UD.PREV_DATA = {"watchlist": [{"ticker": "MRVL", "price_asof": "2026-08-28"}]}
+h, src = _con_riserva((RISERVA_VEN, "stooq"))
+check("quando manca UNA seduta la riserva viene provata e la seduta si recupera",
+      UD.ultima_seduta(h) == "2026-08-28" and src == "stooq")
+check("si sostituisce TUTTO lo storico, non il solo prezzo (niente riga a due eta')",
+      len(h) == len(RISERVA_VEN) and h is not YAHOO_GIO)
+
+# ⚠ non si baratta la storia per una seduta: SMA200 e i massimi a 52 settimane valgono di piu'
+h2, src2 = _con_riserva((RISERVA_CORTA, "stooq"))
+check("una riserva troppo corta NON sostituisce Yahoo: non si perde SMA200 per un giorno",
+      UD.ultima_seduta(h2) == "2026-08-27" and src2 == "yahoo")
+check("la soglia di storia minima e' una costante dichiarata, non un numero sparso",
+      isinstance(UD.MIN_STORIA_RISERVA, int) and UD.MIN_STORIA_RISERVA >= 200)
+
+# ⚠ una riserva che si ferma dove si ferma Yahoo non e' un recupero: non va spacciata per tale
+h3, src3 = _con_riserva((_storico("2026-08-27", 250), "stooq"))
+check("una riserva ferma alla stessa seduta non viene spacciata per un recupero",
+      UD.ultima_seduta(h3) == "2026-08-27" and src3 == "yahoo")
+h4, src4 = _con_riserva(None)
+check("se la riserva non risponde si tiene Yahoo e la regressione resta dichiarata",
+      UD.ultima_seduta(h4) == "2026-08-27" and src4 == "yahoo")
+
+# ⚠ nessuna seduta persa = nessuna chiamata alla riserva. Un fetch inutile per titolo per run
+#   e' un costo vero su una fonte gratuita e rate-limited.
+UD.PREV_DATA = {"watchlist": [{"ticker": "MRVL", "price_asof": "2026-08-27"}]}
+_chiamate = []
+_orig = UD.backup_daily
+UD.backup_daily = lambda tk: _chiamate.append(tk) or (RISERVA_VEN, "stooq")
+try:
+    h5, src5 = UD.recupera_seduta_persa("MRVL", YAHOO_GIO, "yahoo")
+finally:
+    UD.backup_daily = _orig
+check("senza seduta persa la riserva non viene nemmeno interrogata",
+      _chiamate == [] and src5 == "yahoo" and h5 is YAHOO_GIO)
+
+# ⚠ il recupero e' AGGANCIATO alla guardia: le due cose devono leggere la stessa memoria,
+#   altrimenti divergono (due implementazioni della stessa domanda — gia' successo tre volte)
+# ⚠ NONA rottura di un check ancorato a una stringa del sorgente: la prima stesura cercava
+#   "seduta_gia_pubblicata" nei primi 400 caratteri dopo `def seduta_arretrata`, e la docstring
+#   e' piu' lunga di cosi'. La proprieta' vera si prova SENZA leggere il sorgente: si mette la
+#   seduta buona SOLO nel flag, e si verifica che la vedano entrambe. Se una delle due leggesse
+#   solo `price_asof` (qui il 25, piu' VECCHIO di Yahoo) non scatterebbe ne' l'allarme ne' il
+#   recupero — cioe' il difetto si manifesterebbe, invece di nascondersi in una stringa.
+UD.PREV_DATA = {"watchlist": [{"ticker": "MRVL", "price_asof": "2026-08-25",
+                               "price_asof_arretrata_da": "2026-08-28"}]}
+check("guardia e recupero leggono la STESSA memoria, flag di arretramento compreso",
+      UD.seduta_gia_pubblicata("MRVL") == "2026-08-28"
+      and UD.seduta_arretrata("MRVL", "2026-08-27") == "2026-08-28"
+      and UD.ultima_seduta(_con_riserva((RISERVA_VEN, "stooq"))[0]) == "2026-08-28")
+check("la riserva NON viene usata su indici, futures e cripto (simbologia diversa su Stooq)",
+      "riserva_possibile = currency ==" in srcU and "elif riserva_possibile:" in srcU)
 check("la soglia di dichiarazione e' una costante, non sparsa nel codice",
       isinstance(RP.SCARTO_PREZZO, (int, float)) and srcR.count("SCARTO_PREZZO") >= 3)
 

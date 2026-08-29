@@ -1116,6 +1116,74 @@ def riga_precedente(ticker):
     return None
 
 
+MIN_STORIA_RISERVA = 200   # sotto questo, la riserva costerebbe SMA200 e i massimi a 52 settimane
+
+
+def ultima_seduta(hist):
+    """La data dell'ultima barra di uno storico, o None se l'indice non e' di date."""
+    try:
+        return str(hist.index[-1].date())
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def seduta_gia_pubblicata(ticker):
+    """La seduta piu' RECENTE gia' pubblicata per questo titolo dai run precedenti.
+
+    ⚠ Tiene memoria anche del flag di arretramento: guardando solo `price_asof` del run
+    precedente, al secondo run arretrato di fila il riferimento sarebbe gia' la data vecchia e
+    il confronto tornerebbe muto proprio mentre il sistema e' ancora indietro. Il 29/08/2026 la
+    regressione e' durata almeno quattro run."""
+    prec = riga_precedente(ticker) or {}
+    viste = [str(x) for x in (prec.get("price_asof"), prec.get("price_asof_arretrata_da")) if x]
+    return max(viste) if viste else None
+
+
+def recupera_seduta_persa(ticker, hist, price_src):
+    """Yahoo ha lo storico ma NON l'ultima seduta gia' pubblicata: prova la fonte di riserva.
+
+    ⚠⚠ NASCE DAL 29/08/2026, ed e' il seguito di v383. Yahoo ha servito la barra di venerdi'
+    senza Close, drop_void_bars l'ha scartata (correttamente) e il prezzo e' ricaduto su
+    giovedi': 22 strumenti su 24 tornati indietro di una seduta, per almeno quattro run.
+    La ridondanza sui prezzi ESISTEVA GIA' — backup_daily, catena Stooq → Tiingo — ma era
+    agganciata al solo caso `hist.empty`, cioe' Yahoo che non risponde affatto. Il caso reale
+    non e' quello: Yahoo risponde, con un anno di barre, e ne manca UNA — l'ultima, che e'
+    l'unica che conta per il prezzo. Il piano B c'era e non poteva scattare.
+
+    ⚠ SI SOSTITUISCE TUTTO LO STORICO, non il solo prezzo. Innestare la chiusura di venerdi' su
+    tecnica, ATR, medie e sparkline calcolate SENZA quella barra darebbe una riga a DUE ETA':
+    la classe di incoerenza per cui esiste coherence_check, e la ragione per cui v383 aveva
+    scelto di dichiarare invece di rattoppare. O la riga viene da una fonte sola, o non si tocca.
+
+    ⚠ E NON SI BARATTA LA STORIA PER UNA SEDUTA: sotto MIN_STORIA_RISERVA barre si terrebbe un
+    giorno in piu' perdendo SMA200, massimo a 52 settimane e drawdown. In quel caso si tiene
+    Yahoo e la regressione resta DICHIARATA da v383 — che e' il comportamento peggiore
+    accettabile, non un fallimento silenzioso."""
+    attesa = seduta_gia_pubblicata(ticker)
+    adesso = ultima_seduta(hist)
+    if not (attesa and adesso and attesa > adesso):
+        return hist, price_src                       # niente da recuperare: la strada normale
+    bk = backup_daily(ticker)
+    if bk is None:
+        print(f"·· {ticker}: seduta {attesa} persa da Yahoo, la fonte di riserva non risponde",
+              file=sys.stderr)
+        return hist, price_src
+    alt = drop_void_bars(bk[0])
+    alt_seduta = ultima_seduta(alt)
+    if len(alt) < MIN_STORIA_RISERVA:
+        print(f"·· {ticker}: {bk[1]} avrebbe la seduta ma solo {len(alt)} barre "
+              f"(<{MIN_STORIA_RISERVA}): tengo Yahoo, non baratto SMA200 per un giorno",
+              file=sys.stderr)
+        return hist, price_src
+    if not (alt_seduta and alt_seduta > adesso):
+        print(f"·· {ticker}: anche {bk[1]} si ferma a {alt_seduta}: la seduta {attesa} non e' "
+              f"recuperabile in questo run", file=sys.stderr)
+        return hist, price_src
+    print(f"·· {ticker}: Yahoo fermo a {adesso} contro {attesa} gia' pubblicata → SEDUTA "
+          f"RECUPERATA da {bk[1]} ({alt_seduta}, {len(alt)} barre)", file=sys.stderr)
+    return alt, bk[1]
+
+
 def seduta_arretrata(ticker, price_asof):
     """La seduta pubblicata ORA e' PIU' VECCHIA di quella gia' a disco? Ritorna quella vecchia.
 
@@ -1140,9 +1208,7 @@ def seduta_arretrata(ticker, price_asof):
     13:40, 14:06): un allarme che suona sulla sola transizione non l'avrebbe raccontata.
     Percio' si guarda la seduta piu' RECENTE mai pubblicata per questo titolo, tenendo memoria
     anche del flag precedente."""
-    prec = riga_precedente(ticker) or {}
-    viste = [str(x) for x in (prec.get("price_asof"), prec.get("price_asof_arretrata_da")) if x]
-    massima = max(viste) if viste else None
+    massima = seduta_gia_pubblicata(ticker)
     return massima if (price_asof and massima and massima > str(price_asof)) else None
 
 
@@ -1152,11 +1218,18 @@ def fetch_symbol(ticker, name=None, currency="USD"):
     t = yf.Ticker(ticker)
     price_src = "yahoo"
     hist = drop_void_bars(t.history(period="1y", interval="1d", auto_adjust=True))
-    if hist.empty and currency == "USD" and not re.search(r"[\^=]|-", ticker):
+    # ⚠ la riserva vale solo per le azioni USD: indici, futures e cripto hanno una simbologia
+    #   diversa su Stooq e chiederli li' produrrebbe il titolo sbagliato, non un buco.
+    riserva_possibile = currency == "USD" and not re.search(r"[\^=]|-", ticker)
+    if hist.empty and riserva_possibile:
         bk = backup_daily(ticker)
         if bk is not None and len(bk[0]) >= 30:
             hist, price_src = drop_void_bars(bk[0]), bk[1]
             print(f"·· prezzi {ticker} da {price_src} (fallback: Yahoo senza storico)", file=sys.stderr)
+    elif riserva_possibile:
+        # ⚠⚠ IL CASO CHE MANCAVA (v384): Yahoo risponde, con un anno di barre, e ne manca UNA —
+        #    l'ultima. Per un anno il piano B e' esistito senza poter scattare proprio qui.
+        hist, price_src = recupera_seduta_persa(ticker, hist, price_src)
     if hist.empty:
         print(f"!! nessuno storico per {ticker}", file=sys.stderr)
         return None
