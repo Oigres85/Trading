@@ -26,4 +26,6 @@ yarn-error.log*
 .vercel
 __pycache__/
 .DS_Store
-.claude/
+.claude/*
+!.claude/commands/
+!.claude/launch.json
