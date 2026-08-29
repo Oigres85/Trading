@@ -127,6 +127,18 @@ check("nessun imperativo operativo nel testo prodotto da soglie.py",
 check("il file dichiara esplicitamente cosa non fa",
       "NON FA:" in srcT and "non propone quantita'" in srcT)
 
+# ── 5octies. rapporto.py: un comando per tutto il libro ────────────────────────────────
+srcR = (Path(__file__).resolve().parent / "rapporto.py").read_text(encoding="utf-8")
+check("il rapporto dichiara TRE eta' separate: prezzi, fondamentali, posizioni",
+      "prezzi e tecnica:" in srcR and "fondamentali:" in srcR and "posizioni:" in srcR)
+check("il rapporto degrada sui valori pubblicati invece di fallire",
+      "da_pubblicato()" in srcR and "(Exception, SystemExit)" in srcR)
+# ⚠ la prima stesura indovinava i nomi delle chiavi macro e ne stampava tre su otto, in silenzio
+check("se legge meno di 4 voci macro lo dichiara, invece di stampare quel che trova",
+      "stampate < 4" in srcR and "le chiavi potrebbero essere" in srcR)
+check("il rapporto dice che notizie e trimestrali NON sono dentro",
+      "si cercano in rete" in srcR)
+
 # ── 6. le posizioni si leggono dalla FONTE, non dallo snapshot della pipeline ──────────
 src = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")
 check("le posizioni vengono da config/posizioni.json, non da data/data.json",
