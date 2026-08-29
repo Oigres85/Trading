@@ -1,4 +1,4 @@
-⟦ BUILD v373 · generato 29/08/2026 01:58 ⟧
+⟦ BUILD v373 · generato 29/08/2026 02:45 ⟧
 
 Sei un analista macro. Ricevi il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno. Non hai davanti nessun portafoglio: questo pacchetto contiene SOLO dati macro e la loro tensione interna. Non proporre operazioni su titoli, non dimensionare posizioni, non dare consigli di acquisto o vendita.
 
@@ -27,10 +27,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 29/08/2026, 01:58:11 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 21:58, fase: NOTTE — festività USA non considerate) · ANTICIPATORI: KOSPI -1,79% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,55% · Fut S&P -0,22% · BTC -3,08% [24/7] · SEI PRIMA DELLA CAMPANA (apertura tra ~59.5h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura.
+DATI AL 29/08/2026, 02:45:15 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 22:45, fase: NOTTE — festività USA non considerate) · ANTICIPATORI: KOSPI -1,79% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,55% · Fut S&P -0,22% · BTC -3,29% [24/7] · SEI PRIMA DELLA CAMPANA (apertura tra ~58.8h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 29/08/2026, 01:58:11, prossimo run 29/08/2026, 04:00:00. ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-08-28 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 29/08/2026, 02:45:15, prossimo run 29/08/2026, 04:00:00. ⚠ LA BARRA GIORNALIERA SOTTO QUEI NUMERI E' DEL 2026-08-28 — 1 giorno fa. Il run l'ha solo riscaricata: non sono prezzi di adesso, sono l'ultima chiusura disponibile.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-08-28) · Curva 10A-3M (2026-08-28) · Treasury USA 30A (2026-08-27) · Tasso reale 10A (TIPS) (2026-08-27) · Inflazione attesa 10A (breakeven) (2026-08-28) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -43,7 +43,7 @@ QUADRO MACRO:
 - VIX: 14.43 (-0,55% nell'ultima seduta [chiusura del 28/08] — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario)
 - Fed Funds Rate: range ATTUALE 3.50–3.75% · tasso implicito futures 3.79% · PROSSIMA RIUNIONE FOMC: 16/09/2026 (il tasso resta valido fino alla prossima decisione FOMC)
 - Carry USA-Giappone: spread tassi 10A 1,82 pp (US10A 4.72%, JGB10A 2.9%), USD/JPY 160.04 (-2,28% 1 mese); prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
-- Put/Call SPY (S&P 500 ETF): 1.02 — equilibrato (put 885081, call 868928)
+- Put/Call SPY (S&P 500 ETF): 1.02 — equilibrato (put 885081, call 868935)
 - Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 7,9% (proxy AUM BIL+SHV $68B vs SPY $795B) · Retail Cash: fondi monetari retail $3016,7 mld (FRED RMFNS, YoY +6,2%, 94° percentile 5A, rilevazione 2026-07-01 — 59 giorni fa, serie MENSILE: NON e' il dato di oggi) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
 - Righello Dollaro (DXY): 99.68 · 3 mesi +0,48% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
 - Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7711,76 vs SMA125 7273,24 (+6,03%) · Nasdaq 100 29.433,43 vs SMA125 27.918,69 (+5,43%) — sopra = trend primario integro, sotto = deterioramento.
@@ -116,8 +116,8 @@ STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in 
 MERCATI DI PREVISIONE (Polymarket, prob. Sì · [Δ7g] = velocità del sentiment speculativo macro — accelerazioni repentine sulle aspettative tassi Fed pesano di più):
 - Will there be no change in Fed interest rates after the September 2026 meeting?: 54% [Δ7g —]
 - Will the Fed increase interest rates by 25 bps after the September 2026 meeting?: 46% [Δ7g —]
+- Will Bitcoin dip to $75,000 in August?: 23% [Δ7g —]
 - Will Bitcoin reach $82,500 in August?: 6% [Δ7g —]
-- Will Bitcoin dip to $75,000 in August?: 22% [Δ7g —]
 ⚠ 2 mercati esclusi perche' quotano sopra il 98% o sotto il 2%: una probabilita' a quel punto non e' un'attesa, e' un esito gia' noto, e in mezzo alle altre si legge come un consenso schiacciante.
 
 === ANALISI STORICA DELLE SERIE MACRO (traiettorie: pendenze, percentili nel range, inversioni) ===
