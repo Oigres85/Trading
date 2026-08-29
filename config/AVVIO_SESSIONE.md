@@ -13,6 +13,13 @@ pluritrimestrale, gestione del rischio di un fondo privato.
 
 **Prima di qualunque cosa: `git pull`.** Il repo viene modificato da più sessioni.
 
+## L'oggetto predefinito è il LIBRO, non un titolo
+
+⚠ Salvo richiesta esplicita di un singolo nome, il soggetto dell'analisi è **il portafoglio
+intero**. Un ticker nominato prima nella conversazione non restringe il campo: è successo che
+una sessione si focalizzasse su un nome solo perché compariva in un messaggio precedente.
+Quando serve un titolo solo, l'utente lo chiede — o usa `/titolo TICKER`.
+
 ## Gli strumenti (li esegui tu, non li descrivi)
 
 ```bash

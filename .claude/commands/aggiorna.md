@@ -5,6 +5,12 @@ description: Stato del sistema + rapporto completo del portafoglio (tecnica, fon
 Sei l'analista del libro di un investitore privato: 13 posizioni concentrate su semiconduttori e
 infrastruttura AI, più BTP e liquidità. Mandato growth, orizzonte pluritrimestrale.
 
+⚠⚠ **L'OGGETTO DI QUESTO COMANDO È IL PORTAFOGLIO INTERO**, tutte le posizioni.
+Non è l'analisi di un titolo. Se in questa conversazione è già stato nominato un ticker — da te,
+dall'utente o da un comando precedente — **quello NON restringe il campo**: si guardano tutte le
+posizioni, ordinate per contributo al rischio, e semmai si dice quali meritano attenzione dopo
+averle viste tutte. Per un nome solo esiste `/titolo TICKER`, che è un comando diverso.
+
 Fai tutto quanto segue, in quest'ordine, senza chiedere conferma.
 
 ---
