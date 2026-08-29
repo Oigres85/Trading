@@ -29,7 +29,8 @@ python3 scripts/scenari.py                 # "se SOXX -20%, il libro quanto fa"
 python3 scripts/scenari.py QQQ -15 SOXX -25   # scenari su misura
 python3 scripts/rapporto.py                # TUTTO il libro: tecnica, fondamentali, cassa,
                                            # debito, dark pool, consenso, macro
-python3 scripts/grafici.py                 # pagina HTML da pubblicare come artefatto
+node scripts/grafici.mjs                  # pagina HTML da pubblicare come artefatto:
+                                           # RACCOGLIE i grafici della dashboard, non li ridisegna
 python3 scripts/pacchetto_verdetto.py TICKER analisi.md   # pacchetto corto, se serve
 ```
 

@@ -147,13 +147,45 @@ for et in ("CASSA", "DEBITO", "CONTO", "FLUSSO", "SHORT", "CANALI", "STAGION.", 
 #   su medie positive. Un default silenzioso su una chiave sbagliata e' peggio di un KeyError.
 check("la stagionalita' usa la chiave vera (positivi_pct), non un default silenzioso",
       "positivi_pct" in srcR2 and "pos_pct" not in srcR2)
-srcG = (Path(__file__).resolve().parent / "grafici.py").read_text(encoding="utf-8")
-check("i grafici non dipendono da risorse esterne (SVG scritto a mano)",
-      "http" not in srcG.split('"""')[2] and "<svg" in srcG)
+# ── 5b. i grafici vengono RACCOLTI dalla dashboard, non ridisegnati (v385) ─────────────
+# ⚠⚠ grafici.py disegnava a mano tre SVG in Python mentre la dashboard ha gia' il proprio
+#   sistema di grafici in app.js: DUE IMPLEMENTAZIONI DELLA STESSA DOMANDA, la classe che in
+#   questo progetto ha gia' fatto divergere usRegularSessionOpen (v161), i rami FedWatch (v207)
+#   e la consegna del pacchetto (v316). Ora si raccoglie l'HTML vero della dashboard.
+#   I check ESEGUONO lo script sui dati veri invece di leggerne il sorgente: un check ancorato
+#   al testo si e' rotto NOVE volte qui dentro.
+import subprocess, tempfile
+srcG = (Path(__file__).resolve().parent / "grafici.mjs").read_text(encoding="utf-8")
+_out = Path(tempfile.gettempdir()) / "test_grafici_raccolti.html"
+_r = subprocess.run(["node", str(Path(__file__).resolve().parent / "grafici.mjs"), str(_out)],
+                    capture_output=True, text=True, cwd=str(Path(__file__).resolve().parent.parent))
+_pag = _out.read_text(encoding="utf-8") if _out.exists() else ""
+check("il raccoglitore gira sui dati veri e produce una pagina", _r.returncode == 0 and len(_pag) > 5000,
+      f"exit {_r.returncode}, {len(_pag)} byte · {_r.stderr[:120]}")
+check("la pagina porta grafici VERI presi dalla dashboard, non segnaposto",
+      _pag.count("<svg") >= 3 and 'data-da="#' in _pag, f"{_pag.count(chr(60)+'svg')} svg")
+# ⚠ v233: si estraggono <svg> E <table> — le tabelle sono l'analisi finanziaria e di rischio
+check("si raccolgono anche le tabelle, non solo i grafici", _pag.count("<table") >= 1)
 check("la pagina dei grafici funziona in tema chiaro e scuro",
       "prefers-color-scheme: dark" in srcG and "data-theme=dark" in srcG)
-check("ogni pagina di grafici porta data e avvisi",
-      "seduta {a['al']}" in srcG and "posizioni di {g} giorni fa" in srcG)
+check("ogni pagina di grafici porta la propria data e i propri avvisi",
+      "snapshot pipeline" in _pag and "matrice al" in _pag and "posizioni al" in _pag)
+check("la pagina dichiara che i grafici sono RACCOLTI e non ridisegnati",
+      "RACCOLTI dalla dashboard" in _pag)
+# ⚠ NIENTE REGISTRO DI ID SCRITTO A MANO: un elenco fisso di bersagli invecchia da solo e in
+#   silenzio (C10, red team I6, MACRO_CARD_BY_PANEL che copriva 7 pannelli su 37).
+check("le funzioni da eseguire si RICAVANO dal sorgente, non sono elencate a mano",
+      "src.matchAll" in srcG and "function\\s+(render" in srcG)
+# ⚠ un allarme sempre acceso e' un allarme che nessuno legge: cripto e cambi hanno
+#   legittimamente una seduta diversa dalle azioni ogni fine settimana (classe C14)
+check("l'avviso sulle sedute diverse esclude cripto e cambi, che hanno un altro calendario",
+      "calendarioUSA" in srcG and "-USD$|=X$" in srcG)
+# ⚠ una pagina senza grafici NON e' un successo: uscire 0 sarebbe "verde per assenza"
+check("senza grafici raccolti lo script esce 1 invece di fingere un successo",
+      "if (!blocchi.length) process.exit(1)" in srcG)
+check("il raccoglitore non disegna: nessun SVG scritto a mano nel sorgente",
+      "<svg viewBox" not in srcG)
+_out.unlink(missing_ok=True)
 
 # ── 6. le posizioni si leggono dalla FONTE, non dallo snapshot della pipeline ──────────
 src = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")

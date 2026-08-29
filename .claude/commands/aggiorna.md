@@ -37,8 +37,10 @@ leggerla, non dopo.
 ## PARTE 2 — Il rapporto
 
 5. `python3 scripts/rapporto.py` e `python3 scripts/scenari.py`.
-   Poi `python3 scripts/grafici.py` e **pubblica il file come artefatto**, così il CEO vede il
-   libro invece di leggerlo: peso contro rischio, volatilità per nome, mappa delle correlazioni.
+   Poi `node scripts/grafici.mjs` e **pubblica il file come artefatto**, così il CEO vede il
+   libro invece di leggerlo. ⚠ Quello script NON disegna: RACCOGLIE i grafici e le tabelle che
+   la dashboard produce davvero (`assets/app.js`), eseguendola sui dati veri. Se un grafico
+   manca, manca nella dashboard — non si inventa un ripiego.
    Se un artefatto per questo libro esiste già da una sessione precedente, aggiornalo passando
    il suo URL invece di crearne uno nuovo — altrimenti se ne accumulano.
 6. **Cerca in rete** ciò che gli script non hanno: trimestrali uscite o imminenti, notizie delle
