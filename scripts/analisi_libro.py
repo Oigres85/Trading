@@ -31,12 +31,15 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def carica_posizioni():
-    """Dalla FONTE, non dallo snapshot: posizioni.json e' cio' che scrive la dashboard."""
+    """Dalla FONTE, non dallo snapshot: posizioni.json e' cio' che scrive la dashboard.
+    ⚠⚠ Nessuno lo aggiorna automaticamente: se la dashboard non viene usata, invecchia e questa
+    analisi descrive con precisione un libro che non esiste piu' — peggio che non averla,
+    perche' i numeri sono giusti e il portafoglio e' sbagliato. L'eta' si dichiara sempre."""
     p = json.loads((ROOT / "config" / "posizioni.json").read_text(encoding="utf-8"))
     az, altro = [], []
     for r in p.get("posizioni", []):
         (altro if str(r.get("ticker", "")).startswith(("BTP", "BOT", "CCT")) else az).append(r)
-    return az, altro
+    return az, altro, p.get("aggiornato")
 
 
 def stato_patrimoniale():
@@ -85,7 +88,7 @@ def misura(tickers, prezzi, pesi, bench="^NDX"):
 
 def analizza():
     import yfinance as yf
-    az, _ = carica_posizioni()
+    az, _, pos_al = carica_posizioni()
     tutti = [r["ticker"] for r in az]
     px = None
     for tentativo in range(3):
@@ -131,7 +134,15 @@ def analizza():
     patr = tot_az + fuori_az
     if not (tot_az == tot_az) or tot_az <= 0:
         raise SystemExit("controvalore azionario non calcolabile: nessun prezzo valido")
+    giorni_pos = None
+    if pos_al:
+        try:
+            giorni_pos = (datetime.now(timezone.utc).date()
+                          - datetime.fromisoformat(str(pos_al)[:10]).date()).days
+        except ValueError:
+            pass
     return {"al": m["al"], "sedute": m["sedute"], "fx": fx, "senza_prezzo": senza_prezzo,
+            "posizioni_al": pos_al, "posizioni_giorni": giorni_pos,
             "esclusi": {t: (val[t] / tot_az if t in val else None)
                         for t in dict.fromkeys(list(corti) + list(senza_prezzo))},
             "perche_esclusi": {**{t: "storia corta" for t in corti},
@@ -146,6 +157,15 @@ def stampa(a, tk=None):
     m = a["m"]
     q = a["quota_az"]
     print(f"LIBRO al {a['al']} · {a['sedute']} sedute · EUR/USD {a['fx']:.4f}")
+    g = a.get("posizioni_giorni")
+    if g is None:
+        print("⚠ le POSIZIONI non dichiarano una data: non si sa se sono aggiornate")
+    elif g > 7:
+        print(f"⚠⚠ LE POSIZIONI HANNO {g} GIORNI (config/posizioni.json al {a['posizioni_al']}). "
+              f"Nessuno le aggiorna da solo: le scrive la dashboard. Se hai comprato o venduto dopo "
+              f"quella data, questi numeri sono esatti su un libro che non hai piu'.")
+    else:
+        print(f"posizioni al {a['posizioni_al']} ({g} giorni fa)")
     if a["esclusi"]:
         print("⚠ ESCLUSI dalla matrice: %s" % (", ".join(
             f"{t} ({p*100:.1f}% dell'azionario)" if p else f"{t} (peso n.d.)" for t, p in a["esclusi"].items())))
@@ -194,6 +214,7 @@ def compatto(a):
     return {
         "al": m["al"], "sedute": m["sedute"], "generato": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "quota_azionaria": _n(a["quota_az"]) if a["quota_az"] else None,
+        "posizioni_al": a.get("posizioni_al"), "posizioni_giorni": a.get("posizioni_giorni"),
         "esclusi": {t: _n(p) for t, p in a["esclusi"].items()},
         "perche_esclusi": a.get("perche_esclusi") or {},
         "volatilita": _n(m["vol"]), "drawdown_max": _n(m["dd_max"]),

@@ -78,6 +78,23 @@ check("i nomi senza prezzo utilizzabile sono esclusi dal totale, non lo avvelena
 check("nessun round() nudo nell'uscita compatta: passa tutto da _n()",
       srcA[srcA.index("def compatto("):].count("round(") == 0)
 
+# ── 5ter. l'eta' delle posizioni si dichiara: e' l'unico punto in cui la dashboard resta
+#          indispensabile, e un file vecchio produce numeri esatti su un libro che non esiste
+check("l'eta' del file delle posizioni entra nell'analisi e nell'uscita compatta",
+      "posizioni_giorni" in srcA and "posizioni_al" in srcA
+      and srcA.count("posizioni_giorni") >= 3)
+check("sopra i 7 giorni la stampa avverte, non si limita a mostrare la data",
+      "g > 7" in srcA and "un libro che non hai piu'" in srcA)
+
+# ── 5quater. gli scenari a fattore: un beta senza R² e' mezzo numero ───────────────────
+srcS = (Path(__file__).resolve().parent / "scenari.py").read_text(encoding="utf-8")
+check("ogni riga di scenario porta il proprio R², non solo il beta",
+      'R² {r2:.3f}' in srcS and "R2_MIN" in srcS)
+check("uno scenario in cui quasi nessun nome ha un legame misurabile si dichiara inaffidabile",
+      "SCENARIO NON AFFIDABILE" in srcS and "peso_buono" in srcS)
+check("i nomi con R² basso restano NEL conto, dichiarati: toglierli fingerebbe che non si muovano",
+      "il contributo e' comunque incluso" in srcS)
+
 # ── 6. le posizioni si leggono dalla FONTE, non dallo snapshot della pipeline ──────────
 src = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")
 check("le posizioni vengono da config/posizioni.json, non da data/data.json",
