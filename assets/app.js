@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "379";
+const BUILD_VERSION = "380";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1747,8 +1747,22 @@ const CADENZA_FONTE = {
   nfp:    { nome: "BLS", giorniLag: 5,  passo: "mensile", nota: "primo venerdì del mese successivo" },
   unemp:  { nome: "BLS", giorniLag: 5,  passo: "mensile", nota: "esce col dato sugli occupati" },
   retail: { nome: "Census", giorniLag: 15, passo: "mensile", nota: "vendite del mese M a metà M+1" },
-  umich:  { nome: "UMich via FRED", giorniLag: 45, passo: "mensile",
-            nota: "FRED sconta 1-2 mesi di ritardo di LICENZA: alla fonte esistono letture più recenti" },
+  /* ⚠⚠ v393 — QUESTA VOCE DESCRIVEVA LA FONTE SBAGLIATA, E QUINDI SBAGLIAVA TUTTO IL RESTO.
+     La pipeline legge UMich dalla FONTE PRIMARIA (sca.isr.umich.edu) e ripiega su FRED solo
+     se quella cade — ma qui c'era scritto "UMich via FRED" con 45 giorni di ritardo e un mese
+     di sfasamento, cioè il calendario del ripiego applicato al dato buono. Conseguenze
+     misurate sul pacchetto del 30/08/2026, tutte e tre false:
+       · "rilevazione 01/08/2026 (29 giorni fa)" — il definitivo di agosto era uscito il 28,
+         cioè DUE giorni prima, e per di più nella forma a GIORNO che v392 ha tolto altrove;
+       · "prossimo atteso 28/10/2026" — su una serie MENSILE, cioè un mese di troppo;
+       · "questo valore non è l'ultimo pubblicato" — l'esatto contrario del vero.
+     La primaria pubblica il preliminare a metà mese e il DEFINITIVO negli ultimi giorni dello
+     STESSO mese che misura: `mesiRitardo: 0`, come il Philly Fed. La voce del ripiego resta
+     accanto, e `rigaCadenza` sceglie in base a chi ha davvero servito il dato. */
+  umich:  { nome: "UMich (fonte primaria)", giorniLag: 28, passo: "mensile", mesiRitardo: 0,
+            nota: "il definitivo del mese esce negli ultimi giorni dello stesso mese che misura" },
+  umich_fred: { nome: "UMich via FRED (ripiego)", giorniLag: 45, passo: "mensile",
+                nota: "FRED sconta 1-2 mesi di ritardo di LICENZA: alla fonte esistono letture più recenti" },
   gdp:    { nome: "BEA", giorniLag: 30, passo: "trimestrale", nota: "stima avanzata ~1 mese dopo il trimestre" },
   /* ⚠ v266 — LE SERIE GIORNALIERE NON AVEVANO CADENZA, NEMMENO LA CURVA CHE C'ERA GIA'. Senza
      una voce qui rigaCadenza() restituisce stringa vuota e la card esce muta sulla propria eta':
@@ -2667,13 +2681,20 @@ function barreOrdinate(righe, opt = {}) {
        passaggio: compare subito, ha la grafica della pagina, e resta DENTRO il contenitore che
        scorre — un pannello in posizione assoluta verrebbe tagliato da `overflow`.
        ⚠ Il `title` resta come rete per il touch, dove il passaggio del mouse non esiste. */
+    /* ⚠⚠ v393 — `obar-prime` E' `grid-column: 1 / -1`, cioe' una RIGA INTERA: se sta nel DOM
+       PRIMA di `obar-val`, l'auto-placement della griglia manda il valore a capo, in colonna
+       uno della riga successiva. Misurato in browser sul primo grafico che ha usato davvero
+       `suggerimento`: "+33,7 pp" finiva sotto la barra invece che in fondo a essa.
+       ⚠ Il parametro esisteva dalla v302 e NESSUN chiamante lo passava: la resa non era mai
+       stata vista da nessuno. E' la classe v193 — codice vivo che non puo' manifestarsi — e si
+       trova solo guardando la pagina, non rileggendo la funzione. */
     return `<div class="obar-row${x.evidenzia ? " obar-on" : ""}${x.tk ? " obar-click" : ""}"${x.tk ? ` data-obar-tk="${esc(x.tk)}" data-graf-tk="${esc(x.tk)}" role="button" tabindex="0"` : ""}${x.suggerimento ? ` title="${esc(x.suggerimento)}"` : ""}>
       <span class="obar-lab" title="${esc(x.nome)}">${esc(x.nome)}</span>
       <span class="obar-axis">${neg ? `<span class="obar-zero" style="left:${zero}%"></span>` : ""}
         <span class="obar-fill" style="left:${left.toFixed(1)}%;width:${Math.max(w, 0.6).toFixed(1)}%;background:${col}"></span>
       </span>
-      ${x.suggerimento ? `<span class="obar-prime">${esc(x.suggerimento)}</span>` : ""}
       <span class="obar-val">${x.testo != null ? esc(x.testo) : signTxt(x.valore)}</span>
+      ${x.suggerimento ? `<span class="obar-prime">${esc(x.suggerimento)}</span>` : ""}
     </div>`;
   }).join("")}</div>${opt.nota ? `<div class="muted struct-note">${opt.nota}</div>` : ""}`;
 }
@@ -5260,6 +5281,114 @@ function renderCredito() {
    forme che chiedono di decodificare una geometria; qui ogni riga e' una frase con dentro due
    numeri e un'etichetta di stato. Lo stato e' colorato, ed e' l'unica cosa che si legge a colpo
    d'occhio: il resto si legge leggendo. */
+/* ═══ v393 — I TRE GRAFICI DELLA DISCIPLINA DI RISCHIO ═════════════════════════════════════
+   Richiesta del CEO: "inserisci anche dei grafici tendenzialmente istogrammi torte anche per
+   la sezione in chiusura sul risk management".
+
+   ⚠ LE FORME SONO QUELLE CHE IL CEO GIA' LEGGE SENZA ISTRUZIONI. Questo progetto ha respinto
+   cinque forme grafiche in fila — barra 0-100, quadrante, ragnatela, scatter con diagonale,
+   barre divergenti — e la regola che ne e' uscita e' scritta in CLAUDE.md: un grafico che va
+   spiegato non e' un grafico leggibile. Quindi qui non nasce nessuna primitiva nuova: si
+   riusano `barreOrdinate` (la rotazione settoriale, che legge senza istruzioni) e `ciambella`.
+
+   ⚠⚠ E I DATI VENGONO DA `disciplinaRischio()`, non da un calcolo locale: il grafico e la riga
+   che gli sta sotto devono essere lo stesso numero. Due derivazioni della stessa grandezza
+   divergono, ed e' gia' costato in v161, v207, v316 e v391.
+
+   Perche' proprio tre, e non uno per regola:
+     1. SCOSTAMENTO — risponde alla domanda che la sezione stessa dichiara essere la sua
+        ("quello che conta e' di QUANTO"), e la risponde in punti percentuali, cioe' nell'unica
+        unita' in cui quelle cinque regole sono confrontabili;
+     2. FATTORE — e' la riga che la sezione chiama "la piu' importante", e in una torta a due
+        fette non c'e' niente da decodificare: la fetta grande E' la risposta;
+     3. CALENDARIO — e' l'unica regola con un asse temporale naturale, e un istogramma per mese
+        mostra una cosa che la riga di testo non puo' mostrare: DOVE si addensa il rischio.
+   Le altre quattro regole NON prendono un grafico. Non e' una dimenticanza: parlano unita'
+   diverse (un conteggio, delle sedute, una percentuale con un altro denominatore) e affiancarle
+   sarebbe la classe "denominatori non dichiarati". Inventare una forma per riempire un riquadro
+   vuoto e' l'errore gia' respinto in v233. */
+function graficiDisciplina(d) {
+  const g = (d && d.graf) || {};
+  const n1 = (v) => fmtNum.format(Math.round(v * 10) / 10);
+  const parti = [];
+
+  /* ── 1. di quanto ogni disciplina supera la propria soglia, in punti percentuali ────── */
+  if ((g.scostamenti || []).length >= 2) {
+    const righe = [...g.scostamenti].sort((a, b) => b.oltre - a.oltre).map(s => ({
+      nome: s.nome.replace(/ \(.*\)$/, ""),
+      valore: Math.round(s.oltre * 10) / 10,
+      testo: `${s.oltre > 0 ? "+" : ""}${n1(s.oltre)} pp`,
+      suggerimento: `${n1(s.misura)}% nel libro contro una soglia del ${n1(s.soglia)}%`,
+      colore: s.oltre > 0 ? "var(--red)" : "var(--green)",
+    }));
+    parti.push(`<div class="disc-graf">
+      <div class="disc-graf-tit">Di quanto ciascuna disciplina supera la propria soglia</div>
+      ${barreOrdinate(righe, { nota: "Punti percentuali di scarto fra la misura del libro e la soglia "
+        + "convenzionale. A destra dello zero il libro sta oltre, a sinistra dentro. ⚠ Compaiono solo le "
+        + "cinque regole misurate in <b>percentuale dell'azionario</b>, che e' l'unica unita' in cui sono "
+        + "confrontabili: scommesse indipendenti (un conteggio), drawdown (percentuale del valore nel "
+        + "tempo, altro denominatore), liquidita' (sedute) e leva (non misurabile) restano solo nelle "
+        + "righe qui sotto." })}
+    </div>`);
+  }
+
+  /* ── 2. la torta del fattore: quanta parte del libro e' UNA scommessa sola ──────────── */
+  if (g.fattore && g.fattore.dentro > 0) {
+    const f = g.fattore;
+    parti.push(`<div class="disc-graf">
+      <div class="disc-graf-tit">Quanta parte del libro e' una scommessa sola</div>
+      ${ciambella([
+        { nome: `Si muovono insieme (${f.nomi.length} nomi)`, val: f.dentro, colore: "var(--red)",
+          extra: f.nomi.join(", ") },
+        { nome: "Indipendenti dall'ancora", val: f.fuori, colore: "var(--green)" },
+      ], { aria: "concentrazione di fattore",
+           centro: { sopra: "si muove insieme", grande: `${n1(f.dentro)}%`, sotto: "dell'azionario" } })}
+      <div class="muted struct-note">Non e' un raggruppamento per etichetta di settore: e' chi ha
+        correlazione dei rendimenti giornalieri sopra la soglia con l'ancora, sulle sedute in comune.
+        ⚠ "Indipendenti" vale <b>rispetto all'ancora</b>: fra loro quei nomi possono muoversi insieme,
+        perche' il sistema misura contro una sola e non pubblica la matrice completa.</div>
+    </div>`);
+  }
+
+  /* ── 3. il calendario: quando riprezza il libro ────────────────────────────────────── */
+  if ((g.eventi || []).length >= 2) {
+    const MESI = ["gen", "feb", "mar", "apr", "mag", "giu",
+                  "lug", "ago", "set", "ott", "nov", "dic"];
+    const soglia = 40;
+    const righe = g.eventi.map(e => {
+      const [a, m] = e.mese.split("-").map(Number);
+      return {
+        nome: `${MESI[m - 1]} ${a}`,
+        valore: Math.round(e.pct * 10) / 10,
+        testo: e.pct > 0 ? `${n1(e.pct)}%` : "—",
+        evidenzia: e.pct > soglia,
+        colore: e.pct > soglia ? "var(--red)" : "var(--blue)",
+        suggerimento: e.tk.length ? e.tk.join(", ") : "nessuna trimestrale attesa",
+      };
+    });
+    const picco = righe.reduce((a, b) => (b.valore > a.valore ? b : a));
+    parti.push(`<div class="disc-graf">
+      <div class="disc-graf-tit">Quando riprezza il libro: percentuale dell'azionario che riporta, per mese</div>
+      ${barreOrdinate(righe, { nota: `Il mese piu' carico e' <b>${esc(picco.nome)}</b> con il `
+        + `${n1(picco.valore)}% dell'azionario. `
+        /* ⚠⚠ DUE FINESTRE DIVERSE SULLA STESSA DOMANDA, E VANNO DICHIARATE. La regola qui sotto
+           misura la finestra MOBILE di 21 giorni piu' densa, che puo' stare a cavallo di due
+           mesi; questo grafico raggruppa per MESE DI CALENDARIO. I due numeri divergono per
+           costruzione, non per errore — ma affiancarli senza dirlo e' esattamente cio' che
+           `coherence_check` chiama "stessa grandezza con valori diversi", ed e' il modo piu'
+           rapido di far dubitare chi legge di tutte e due. */
+        + `⚠ <b>Questo grafico e la regola qui sotto non danno lo stesso numero, e non e' un `
+        + `errore</b>: qui il raggruppamento e' il <b>mese di calendario</b>, li' e' la finestra `
+        + `<b>mobile di tre settimane</b> piu' densa, che puo' stare a cavallo di due mesi. `
+        + `⚠ I mesi <b>vuoti</b> restano nell'asse: un buco fra due `
+        + `addensamenti e' informazione quanto un picco. ⚠ Le date sono <b>stime</b> — la piu' vicina fra `
+        + `quella di yfinance e la cadenza dei depositi 8-K su SEC EDGAR — e l'emittente le sposta.` })}
+    </div>`);
+  }
+
+  return parti.length ? `<div class="disc-grafici">${parti.join("")}</div>` : "";
+}
+
 function renderDisciplinaRischio() {
   const box = $("#disc-corpo"); if (!box) return;
   const nota = $("#disc-note");
@@ -5280,6 +5409,7 @@ function renderDisciplinaRischio() {
     + `fuori da quasi tutte queste soglie per costruzione — e' la sua tesi, non un difetto. Il valore `
     + `di questa sezione e' sapere <b>di quanto</b>, e quali deviazioni sono state decise e quali sono `
     + `successe da sole mentre i prezzi si muovevano.</div>`
+    + graficiDisciplina(d)
     + d.regole.map(r => `<div class="disc-regola ${CLASSE[r.stato] || ""}">
         <div class="disc-testa">
           <span class="disc-nome">${esc(r.nome)}</span>
@@ -8223,7 +8353,16 @@ function buildPrompt() {
   else if (m.vix) lines.push("- VIX: n.d. (valore scartato dal sanity check)");
   if (m.fedwatch) lines.push(`- Fed Funds Rate: range ATTUALE ${m.fedwatch.target_range} · tasso implicito futures ${m.fedwatch.implied_rate}%${m.fedwatch.next_fomc ? ` · PROSSIMA RIUNIONE FOMC: ${new Date(m.fedwatch.next_fomc + "T00:00:00").toLocaleDateString("it-IT")}` : ""} (il tasso resta valido fino alla prossima decisione FOMC)`);
   if (m.carry) {
-    let cl = `- Carry USA-Giappone: spread tassi 10A ${fmtNum.format(m.carry.spread)} pp (US10A ${m.carry.us10}%, JGB10A ${m.carry.jp10}%), USD/JPY ${m.carry.usdjpy} (${signTxt(m.carry.usdjpy_chg_1m)} 1 mese)${m.carry.boj_rate != null ? `, tasso BoJ ${m.carry.boj_rate}%` : ""}`;
+    let cl = `- Carry USA-Giappone: spread tassi 10A ${fmtNum.format(m.carry.spread)} pp (US10A ${m.carry.us10}%, JGB10A ${m.carry.jp10}%), USD/JPY ${m.carry.usdjpy} (${signTxt(m.carry.usdjpy_chg_1m)} 1 mese)${m.carry.boj_rate != null
+        ? `, tasso BoJ ${m.carry.boj_rate}%`
+        /* ⚠ v393 — IL LIVELLO DA CUI LA BoJ ALZEREBBE NON C'E', E PRIMA SPARIVA IN SILENZIO.
+           La pipeline scarta l'osservazione FRED quando e' troppo vecchia (misurata oggi: 2023-12-01,
+           milletre giorni fa) — ed e' la scelta giusta. Ma la riga chiudeva comunque con "rischio
+           unwind se BoJ alza" senza dire da QUALE livello, cioe' un rischio senza la sua ancora.
+           "Nessuna riga sull'argomento" e "dato mancante" si leggono uguali e sono due cose diverse
+           (v389): il buco si dichiara, non si tace. */
+        : `, tasso di POLITICA BoJ NON DISPONIBILE (la serie FRED e' ferma a un'osservazione troppo `
+          + `vecchia ed e' stata scartata): il livello da cui un rialzo partirebbe va cercato online`}`;
     if ((m.carry.boj_meetings || []).length) cl += `; prossima riunione BoJ ${new Date(m.carry.boj_meetings[0] + "T00:00:00").toLocaleDateString("it-IT")} (rischio unwind se BoJ alza o lo yen si rafforza)`;
     lines.push(cl);
   }
@@ -8365,7 +8504,9 @@ function buildPrompt() {
     : i.key === "real10" ? "serie GIORNALIERA FRED DFII10 (TIPS 10A): è il rendimento AL NETTO dell'inflazione attesa"
     : i.key === "breakeven" ? "serie GIORNALIERA FRED T10YIE: nominale meno reale, cioè l'inflazione che il mercato PREZZA, non quella osservata: è una grandezza diversa dal CPI, non una seconda misura della stessa"
     : i.key === "philly" ? "indagine mensile della Federal Reserve di Philadelphia (FRED GACDFSA066MSFRBPHI). NON è l'ISM: l'ISM è sotto licenza e non è ridistribuibile. Stessa specie di misura (diffusion index sulla manifattura, esce prima dell'ISM), ma copre un distretto, non il paese: è un'indicazione di direzione, non il livello nazionale"
-    : i.key === "umich" ? "serie mensile via FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui: questo valore non è l'ultimo pubblicato"
+    : i.key === "umich" ? (i.fonte === "ripiego"
+        ? "serie mensile via FRED UMCSENT (RIPIEGO: la fonte primaria non ha risposto in questo run), che sconta 1-2 mesi di ritardo di LICENZA: alla fonte UMich esistono già letture più recenti NON presenti qui, quindi questo valore NON è l'ultimo pubblicato"
+        : "indagine mensile dell'Università del Michigan, presa dalla FONTE PRIMARIA (sca.isr.umich.edu) e non da FRED, che la ridistribuisce con 1-2 mesi di ritardo di licenza: questo è il dato definitivo del mese indicato")
     : "serie mensile, normale ritardo di pubblicazione";
   /* ⚠ v266 — LA CADENZA NON DEVE MANGIARSI L'IDENTIFICAZIONE DELLA SERIE. Aggiungendo le
      cadenze giornaliere, `cad` ha cominciato a esistere anche per la curva e ha preso il posto
@@ -8378,7 +8519,10 @@ function buildPrompt() {
     /* v250 — dove esiste un calendario dichiarato dalla fonte si scrive QUANDO è stato rilevato,
        quanti giorni ha e QUANDO ne arriva uno nuovo. Altrove resta la nota generica: meglio una
        nota vaga che una data inventata. */
-    const cad = rigaCadenza(i.key, i.date);
+    /* v393 — la cadenza segue la FONTE che ha davvero servito il dato, non il nome della
+       serie: la primaria e il ripiego hanno calendari diversi, e applicare l'uno all'altro
+       e' come pubblicare la data di un dato al posto di quella di un altro. */
+    const cad = rigaCadenza(i.key === "umich" && i.fonte === "ripiego" ? "umich_fred" : i.key, i.date);
     const testa = cad
       ? (NOTA_INSOSTITUIBILE.has(i.key) ? `${cad} · ${noteSerie(i)}` : cad)
       : `rilevazione ${i.date} — ${noteSerie(i)}`;
@@ -8555,8 +8699,14 @@ function buildPrompt() {
        l'ultima campana NON e' ancora dentro il prezzo, e questa e' l'unica distinzione che
        rende utile un titolo di giornale dentro un pacchetto di prezzi. */
     const chiusura = (typeof lastUsEquityCloseUTC === "function") ? lastUsEquityCloseUTC() : null;
+    /* ⚠ v393 — UN NOME, UN SIGNIFICATO. Questa era una CONTEGGIO e la mia prima stesura del
+       fix ne dichiarava una seconda, un ARRAY, con lo stesso nome dentro il ramo `else`: la
+       riga che stampa "N pubblicate DOPO l'ultima chiusura" avrebbe interpolato degli oggetti.
+       Due variabili omonime con tipi diversi sono la stessa classe delle due derivazioni della
+       stessa grandezza (v161, v207, v316), in versione locale. Ora l'elenco e' uno solo e il
+       conteggio si ricava da lui. */
     const nonPrezzate = chiusura
-      ? conEta.filter(v => Date.parse(v.quando) > chiusura.at.getTime()).length : null;
+      ? conEta.filter(v => Date.parse(v.quando) > chiusura.at.getTime()) : null;
     if (!conEta.length) {
       lines.push(`- TITOLI MACRO DELLE ULTIME ${ORE} ORE: IL SISTEMA NON NE HA. ⚠ Questo NON `
         + `significa "non e' uscita nessuna notizia": significa che in questo run la raccolta dei feed `
@@ -8566,13 +8716,30 @@ function buildPrompt() {
         + `riportata nelle SEGNALAZIONI AL SISTEMA.`);
     } else {
       const dentro = conEta.filter(v => v.ore <= ORE);
-      const mostra = (dentro.length ? dentro : conEta).slice(0, 12);
+      /* ⚠⚠ v393 — IL PACCHETTO CONTAVA LE NOTIZIE POST-CHIUSURA E POI LE NASCONDEVA.
+         La v389 aveva chiuso il caso "zero dentro la finestra" (si pubblicano comunque le piu'
+         recenti con la loro eta') e lasciato aperto quello opposto: con anche UNA voce dentro
+         le 8 ore, `mostra` conteneva solo quelle e tutto il resto spariva — comprese le voci
+         uscite DOPO l'ultima campana, che l'intestazione continuava a contare due righe piu'
+         su. Misurato sul run del 30/08/2026: intestazione "3 pubblicate DOPO l'ultima chiusura
+         USA", corpo con UNA voce sola. Le due taciute erano "K, C or E? Why economists can't
+         agree on the shape of today's economy" e — peggio — "Guggenheim Ties Weigh on Acrisure
+         Debt, DRAGGING HIGH-YIELD CREDIT MARKETS", su un pacchetto la cui lettura del credito
+         e' "HY OAS 2,63%, credito rilassato, percentile 0". Cioe' il pacchetto teneva in tasca
+         il titolo che contraddiceva la propria riga sul credito.
+         ⚠ Dichiarare un numero e non mostrarne gli elementi e' peggio che tacere entrambi:
+         chi legge sa che esistono, non puo' vederli, e non ha modo di chiederli.
+         Le voci NON ancora prezzate entrano sempre, dentro o fuori finestra: e' l'unica classe
+         che cambia una decisione, perche' il prezzo non le ha ancora votate (v158). */
+      const base = dentro.length ? dentro : conEta;
+      const mostra = [...new Set([...base, ...(nonPrezzate || [])])]
+        .sort((a, b) => a.ore - b.ore).slice(0, 12);
       const riga = (x) => `\n    · [${x.fonte}, ${Math.round(x.ore)}h fa${chiusura && Date.parse(x.quando) > chiusura.at.getTime() ? ", DOPO l'ultima chiusura: il prezzo non l'ha ancora votata" : ""}] ${x.titolo}`
         + (x.riassunto ? `\n      ${x.riassunto}` : "");
       lines.push(`- TITOLI MACRO — ${dentro.length} dentro le ultime ${ORE} ORE`
         + (dentro.length ? "" : `, quindi NESSUNA nella finestra chiesta: qui sotto ci sono le ${mostra.length} piu' recenti che il sistema ha, con la loro eta', perche' una notizia fuori finestra si PESA diversamente, non si nasconde. La piu' fresca ha ${Math.round(conEta[0].ore)} ore`)
         + ` (fonti: ${fonti})`
-        + (nonPrezzate != null ? ` · ${nonPrezzate} pubblicate DOPO l'ultima chiusura USA del ${chiusura.asof}, cioe' non ancora dentro il prezzo` : "")
+        + (nonPrezzate != null ? ` · ${nonPrezzate.length} pubblicate DOPO l'ultima chiusura USA del ${chiusura.asof}, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto` : "")
         + `. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i `
         + `numeri che contengono, e la selezione e' automatica (${(m.news && m.news.filtro) || ""}). I riassunti `
         + `sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di `
@@ -9431,6 +9598,7 @@ function disciplinaRischio() {
       + "rivedendo la posizione quando la deriva la porta oltre un quinto del libro. Non e' un dato del file.",
     misura: `${primo.r.ticker} al ${n1(peso(primo))}% dell'azionario`,
     valore: peso(primo),
+    unita: "pct_azionario", sogliaPct: 15,   // v393 — vedi `graf.scostamenti`
     stato: peso(primo) > 20 ? "OLTRE" : peso(primo) > 15 ? "AL LIMITE" : "DENTRO",
     spiega: `La domanda che la soglia pone non e' "e' troppo?" ma "se questo nome perdesse meta' del suo valore in `
       + `una seduta, il libro reggerebbe?": ${n1(peso(primo) / 2)} punti di patrimonio azionario in un giorno. `
@@ -9447,6 +9615,7 @@ function disciplinaRischio() {
       + "diventa tre scommesse con un contorno. Nessuna autorita' la fissa; serve a rendere confrontabile il livello.",
     misura: `${ord.slice(0, 3).map(x => x.r.ticker).join(" + ")} = ${n1(tre)}%`,
     valore: tre,
+    unita: "pct_azionario", sogliaPct: 40,
     stato: tre > 50 ? "OLTRE" : tre > 40 ? "AL LIMITE" : "DENTRO",
     spiega: `Le altre ${azionarie.length - 3} posizioni si dividono il ${n1(100 - tre)}%: sul rischio del `
       + `libro pesano poco, quindi il loro contributo alla varianza e' marginale rispetto alle prime tre.`,
@@ -9462,6 +9631,7 @@ function disciplinaRischio() {
         + "diversificazione si conta sui FATTORI, non sui nomi. Il file non contiene nessuna soglia; la misura si'.",
       misura: `${gf.semi.length} posizioni = ${n1(gf.pesoSemi)}% dell'azionario (${gf.semi.map(x => x.r.ticker).join(", ")})`,
       valore: gf.pesoSemi,
+      unita: "pct_azionario", sogliaPct: 40,
       stato: gf.pesoSemi > 55 ? "OLTRE" : gf.pesoSemi > 40 ? "AL LIMITE" : "DENTRO",
       spiega: gf.misurato
         ? `Non e' un raggruppamento per etichetta di settore: e' chi ha correlazione dei rendimenti giornalieri `
@@ -9485,6 +9655,7 @@ function disciplinaRischio() {
         + "standard; la soglia di 5 e' una convenzione di lettura.",
       misura: `${n1(mio.eff)} su ${mio.n} nomi`,
       valore: mio.eff,
+      unita: "conteggio",
       stato: mio.eff < 3 ? "OLTRE" : mio.eff < 5 ? "AL LIMITE" : "DENTRO",
       spiega: `Aggiungere un nome correlato agli altri non aggiunge una decisione: allarga la stessa. Il numero dice `
         + `che il libro contiene circa ${n0(mio.eff)} idee, non ${mio.n}. ⚠ Conseguenza operativa: il tempo speso ad `
@@ -9504,6 +9675,7 @@ function disciplinaRischio() {
       misura: `${n1(dd)}% sulle ultime ${pr.sedute} sedute, ${mio.sotto} sedute sott'acqua`
         + `${mio.recuperato ? ", recuperato" : ", NON ancora recuperato"}`,
       valore: dd,
+      unita: "pct_valore_nel_tempo",   // altro denominatore: NON e' una frazione del libro
       stato: dd > 30 ? "OLTRE" : dd > 20 ? "AL LIMITE" : "DENTRO",
       spiega: `⚠ E' il calo GIA' AVVENUTO, non una previsione: serve a sapere cosa e' ordinario per QUESTO libro. `
         + `Una discesa dentro quel range non rompe niente; una fuori merita di essere spiegata. ⚠ E la finestra e' `
@@ -9570,6 +9742,7 @@ function disciplinaRischio() {
       misura: `${best.dentro.length} posizioni = ${n1(best.p)}% dell'azionario fra il ${gg(best.da)} e il ${gg(best.a)} `
         + `(${best.dentro.map(y => y.x.r.ticker).join(", ")})`,
       valore: best.p,
+      unita: "pct_azionario", sogliaPct: 40,
       stato: best.p > 60 ? "OLTRE" : best.p > 40 ? "AL LIMITE" : "DENTRO",
       spiega: `Le trimestrali sono l'unico evento datato che il sistema conosce in anticipo. ⚠ SU UN LIBRO CORRELATO `
         + `si sommano al fattore: se i nomi si muovono insieme E riportano insieme, la settimana peggiore non e' `
@@ -9611,6 +9784,7 @@ function disciplinaRischio() {
         ? `la posizione meno liquida (${peggiore.tk}) si chiuderebbe in meno di un decimo di seduta`
         : `${peggiore.tk}: ${n1(peggiore.gg)} sedute`,
       valore: peggiore.gg,
+      unita: "sedute",
       stato: peggiore.gg > 3 ? "OLTRE" : peggiore.gg > 1 ? "AL LIMITE" : "NON VINCOLA",
       spiega: peggiore.gg < 1
         ? `⚠ QUESTA REGOLA NON MORDE: il libro e' piccolo rispetto agli scambi dei nomi che contiene, quindi `
@@ -9646,6 +9820,7 @@ function disciplinaRischio() {
         + fragili.map(o => `${o.tk} (${Number.isFinite(o.cop) && o.cop < 1 ? (o.cop < 0 ? "EBIT negativo" : `copertura ${n1(o.cop)}×`) : "FCF negativo"}`
             + `${autonomia(o.mesi)})`).join(", "),
       valore: pesoFragili,
+      unita: "pct_azionario", sogliaPct: 10,
       stato: pesoFragili > 20 ? "OLTRE" : pesoFragili > 10 ? "AL LIMITE" : "DENTRO",
       spiega: `Queste posizioni dipendono dal mercato dei capitali per continuare: un irrigidimento del credito le `
         + `colpisce PRIMA e PIU' delle altre, a parita' di tesi industriale. ⚠ E' il canale che lega questa riga al `
@@ -9661,6 +9836,7 @@ function disciplinaRischio() {
     provenienza: "CONVENZIONE: e' la prima riga di qualunque scheda di rischio di un fondo. Qui non e' misurabile.",
     misura: "NON MISURABILE: il sistema conosce solo le posizioni lunghe che il CEO ha inserito",
     valore: null,
+    unita: null,
     stato: "NON MISURABILE",
     spiega: `Il sistema non sa se ci sia margine, se esistano posizioni corte, opzioni di copertura, altri conti o `
       + `altri strumenti. ⚠ TUTTE le misure di questa sezione descrivono quindi il LIBRO CHE IL SISTEMA VEDE, e se `
@@ -9668,7 +9844,71 @@ function disciplinaRischio() {
       + `non colmato da nessuna assunzione: e' l'unica forma in cui chi legge sa di cosa non si e' tenuto conto.`,
   });
 
-  return { regole: R, sedute: pr ? pr.sedute : null, nomi: azionarie.length, totAz };
+  /* ═══ v393 — I DATI PER I GRAFICI ESCONO DA QUI, NON DA UN SECONDO CALCOLO ═════════════
+     Richiesta del CEO: istogrammi e torte anche nella sezione di chiusura sul risk management.
+     ⚠ La tentazione era ricalcolare pesi e date dentro il renderer. Sarebbe stata la seconda
+     implementazione della stessa domanda — la classe che questo progetto ha gia' pagato in
+     v161, v207 e v316, e che qui farebbe divergere il GRAFICO dalla RIGA che gli sta sotto.
+     Quindi i tre grafici leggono esattamente le stesse grandezze delle nove regole.
+
+     ⚠⚠ E NON TUTTE LE REGOLE SONO DISEGNABILI INSIEME. `valore` cambia UNITA' da riga a riga:
+     percentuali dell'azionario (peso, prime tre, fattore, evento, autofinanziamento), un
+     CONTEGGIO (scommesse effettive: 2,3), delle SEDUTE (liquidita'), e una percentuale con un
+     denominatore diverso (il drawdown e' sul valore del libro nel tempo, non sulla sua
+     composizione). Metterle sullo stesso asse sarebbe la classe "denominatori non dichiarati"
+     che `coherence_check` sorveglia da sempre. Nel grafico entrano SOLO le cinque che parlano
+     la stessa lingua, e il renderer dichiara quali sono rimaste fuori e perche'.
+     Non si inventa una forma per riempire il riquadro delle altre (v233). */
+  /* ⚠⚠ IL FILTRO GUARDA L'UNITA', NON LA PRESENZA DI UNA SOGLIA. La prima stesura selezionava
+     "le regole che hanno una sogliaPct", e il gate che la sorvegliava era CIRCOLARE: verificava
+     che nel grafico ci fosse cio' che porta una soglia, cosa vera per costruzione. Iniettando
+     una soglia sul drawdown — che ha un denominatore diverso — il grafico se lo prendeva e
+     nessun check mordeva. Ora l'unita' e' un FATTO DICHIARATO da ogni regola, e mescolarne due
+     diventa una bugia visibile invece di un effetto collaterale. */
+  const scostamenti = R
+    .filter(r => r.unita === "pct_azionario" && Number.isFinite(r.sogliaPct)
+                 && Number.isFinite(r.valore))
+    .map(r => ({ nome: r.nome, misura: r.valore, soglia: r.sogliaPct,
+                 oltre: r.valore - r.sogliaPct, stato: r.stato }));
+
+  /* la torta del fattore: la riga piu' importante della sezione, in una forma che non chiede
+     di decodificare niente — due fette, e la piu' grande E' la risposta. */
+  const fattore = gf.semi.length >= 2
+    ? { nomi: gf.semi.map(s => s.r.ticker),
+        pesi: gf.semi.map(s => ({ tk: s.r.ticker, pct: s.v / totAz * 100 }))
+                     .sort((a, b) => b.pct - a.pct),
+        dentro: gf.pesoSemi, fuori: Math.max(0, 100 - gf.pesoSemi) }
+    : null;
+
+  /* l'istogramma del calendario: quanta parte del libro riprezza in ciascun mese. E' l'unica
+     regola con un asse temporale naturale, e il mese e' il raggruppamento che si legge senza
+     spiegazioni. I mesi VUOTI restano nell'asse: un buco fra due addensamenti e' informazione. */
+  let eventi = null;
+  if (conEarn.length >= 3) {
+    const chiave = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const per = new Map();
+    for (const o of conEarn) {
+      const k = chiave(o.d);
+      const c = per.get(k) || { pct: 0, tk: [] };
+      c.pct += o.x.v / totAz * 100;
+      c.tk.push(o.x.r.ticker);
+      per.set(k, c);
+    }
+    const ks = [...per.keys()].sort();
+    const mesiVuoti = [];
+    if (ks.length) {
+      const [a0, m0] = ks[0].split("-").map(Number);
+      const [a1, m1] = ks[ks.length - 1].split("-").map(Number);
+      for (let t = a0 * 12 + m0 - 1; t <= a1 * 12 + m1 - 1; t++) {
+        mesiVuoti.push(`${Math.floor(t / 12)}-${String(t % 12 + 1).padStart(2, "0")}`);
+      }
+    }
+    eventi = mesiVuoti.map(k => ({ mese: k, pct: (per.get(k) || {}).pct || 0,
+                                   tk: (per.get(k) || {}).tk || [] }));
+  }
+
+  return { regole: R, sedute: pr ? pr.sedute : null, nomi: azionarie.length, totAz,
+           graf: { scostamenti, fattore, eventi } };
 }
 
 /* ═══ v389 — LA DISCIPLINA DI RISCHIO DENTRO IL PACCHETTO ══════════════════════════════════

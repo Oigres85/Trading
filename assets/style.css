@@ -2370,6 +2370,25 @@ svg.g-serie { cursor: crosshair; }
    Qui il colore fa una cosa sola — dire lo STATO — e tutto il resto e' testo che si legge. */
 .disc-sommario { font-size: 13px; line-height: 1.55; padding: 10px 12px; margin-bottom: 12px;
   background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; }
+/* v393 — i tre grafici della disciplina di rischio.
+   ⚠ `min-width: 0` sulle celle della griglia: senza, una cella non scende sotto la larghezza
+   del proprio contenuto (min-width vale `auto` per costruzione) e una legenda lunga allarga
+   TUTTA LA PAGINA. E' esattamente il difetto della card "Parametri di Rischio" misurato in
+   v192, dove il documento usciva a 598px su uno schermo da 375 e trascinava fuori posto ogni
+   overlay `position: fixed`. */
+.disc-grafici { display: grid; gap: 14px; margin-bottom: 14px; }
+@media (min-width: 861px) {
+  .disc-grafici { grid-template-columns: 1fr 1fr; }
+  .disc-grafici > .disc-graf:first-child { grid-column: 1 / -1; }
+}
+.disc-graf { min-width: 0; border: 1px solid var(--border); border-radius: 8px;
+  padding: 11px 12px 9px; background: var(--card-2); }
+.disc-graf-tit { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 9px;
+  line-height: 1.35; }
+.disc-graf .struct-note { margin-top: 8px; font-size: 11px; line-height: 1.45; }
+.disc-graf .ciam-wrap { margin: 0; }
+.disc-graf .ciam-extra { display: block; font-size: 10.5px; line-height: 1.35; margin-top: 2px; }
+
 .disc-regola { border: 1px solid var(--border); border-left: 3px solid var(--muted);
   border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; background: var(--card-2); }
 .disc-oltre  { border-left-color: var(--red); }

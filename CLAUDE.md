@@ -1788,6 +1788,142 @@ consegna già in coda. E ha sostituito le date stimate delle uscite con quelle c
 fonte: è il lavoro che la v390 fa con SEC EDGAR. Due conferme indipendenti che quelle due
 correzioni servivano.
 
+## 🧮 v393 — L'INFLAZIONE PUBBLICATA ERA UN 13 MESI CHIAMATO "a/a"
+
+Il difetto più grave trovato in questa sessione, e stava nel numero che apre il quadro macro.
+
+`yoy(series)` faceva `series[-1] / series[-13]`: conta **tredici POSIZIONI** indietro e dà per
+scontato che siano dodici mesi. Lo sono solo se la serie non ha buchi — e **CPIAUCSL ha un buco a
+ottobre 2025**, il mese che il BLS non ha pubblicato.
+
+| | base usata | risultato |
+|---|---|---|
+| per POSIZIONE (il codice) | giugno 2025 | 332,813 / 321,435 = **3,54% → "CPI 3,5%"** |
+| per DATA (l'anno su anno vero) | luglio 2025 | 332,813 / 322,169 = **3,30%** |
+
+Non un punto solo: **nove punti consecutivi** dello storico, tutti gonfiati, da novembre 2025 in
+poi. E `UNRATE` ha lo stesso buco (lì il valore è `diretta`, quindi non ne soffre — ma ne
+soffrirebbe al primo calcolo di variazione).
+
+> **È la classe v207 — l'allineamento per POSIZIONE invece che per data — già pagata sui grafici
+> macro e di nuovo in v391 sulle barre OHLC filtrate indipendentemente. Qui stava nell'inflazione.**
+
+⚠ **Un LLM reale l'ha intercettato dall'ESITO e non dalla causa**: obiettava «il BLS titola 3,4%,
+voi 3,5%». Aveva ragione sul numero e non poteva vedere il perché.
+
+**Seconda causa, indipendente dalla prima**: il BLS titola l'anno su anno *on an unadjusted basis*,
+cioè sulla serie **grezza**. Noi usavamo la destagionalizzata. `CPIAUCNS` dà 3,36% → **3,4%**,
+esattamente il numero pubblicato. Le due correzioni insieme: 3,5% → **3,4%**.
+
+⚠ **Quando la base esatta manca non si tace e non si finge**: si prende la precedente più vicina e
+si restituisce la **distanza vera**, così chi stampa può scrivere "su 13 mesi" invece di "a/a".
+Far sparire l'inflazione per un mese sarebbe peggio del difetto. Nello **storico** invece il punto
+non si disegna: un buco non è uno zero, e nemmeno un valore approssimato (v205).
+
+## 📰 v393 — IL PACCHETTO CONTAVA LE NOTIZIE POST-CHIUSURA E POI LE NASCONDEVA
+
+La v389 aveva chiuso il caso "zero dentro la finestra" e lasciato aperto quello opposto: con anche
+UNA voce dentro le 8 ore, `mostra` conteneva solo quelle. Misurato sul run del 30/08: intestazione
+**«3 pubblicate DOPO l'ultima chiusura USA»**, corpo con **una voce sola**.
+
+Delle due taciute, una era *«Guggenheim Ties Weigh on Acrisure Debt, **Dragging High-Yield Credit
+Markets**»* — su un pacchetto la cui riga sul credito dice "HY OAS 2,63%, rilassato, percentile 0".
+**Il pacchetto teneva in tasca il titolo che contraddiceva la propria lettura del credito.**
+
+> **Dichiarare un numero e non mostrarne gli elementi è peggio che tacere entrambi**: chi legge sa
+> che esistono, non può vederli, e non ha modo di chiederli.
+
+⚠ Correggendolo ho dichiarato una seconda `nonPrezzate` — un ARRAY con lo stesso nome di un
+CONTEGGIO — dentro il ramo `else`. La riga di intestazione avrebbe interpolato degli oggetti. **Due
+variabili omonime con tipi diversi sono la classe v161/v207 in versione locale**: ora l'elenco è
+uno solo e il conteggio si ricava da lui.
+
+## 🇺🇸 v393 — UMICH: LA RIGA AFFERMAVA TRE COSE E DUE ERANO FALSE
+
+La pipeline legge UMich dalla **fonte primaria** (`sca.isr.umich.edu`) e ripiega su FRED solo se
+quella cade. Ma `CADENZA_FONTE` descriveva **sempre** il ripiego:
+
+- «rilevazione 01/08/2026 (29 giorni fa)» → il definitivo di agosto era uscito il **28**, due
+  giorni prima. E per di più nella forma a GIORNO che v392 aveva tolto altrove — perché il ramo
+  `stessoGiorno` di `rigaCadenza` **salta la resa a periodo**, ed è il buco della mia v392;
+- «prossimo atteso 28/10/2026» → su una serie **mensile**, un mese di troppo (`mesiRitardo`
+  mancante, come già per il Philly Fed);
+- «questo valore non è l'ultimo pubblicato» → **l'esatto contrario del vero**.
+
+> **Un pacchetto che diffama un proprio dato fresco è peggio di uno che lo tace**: manda chi legge
+> a cercare online una cosa che ha già in mano, e a diffidare del resto.
+
+`series_fallback` ora **registra chi ha servito**, l'indicatore lo porta, e la cadenza si sceglie
+da lì. È la regola già applicata allo storico ("lo storico esce dalla stessa fonte del valore")
+estesa all'etichetta e al calendario, che dalla fonte dipendono entrambi.
+
+## 📊 v393 — I TRE GRAFICI DELLA DISCIPLINA DI RISCHIO
+
+Richiesta del CEO: istogrammi e torte anche nella sezione di chiusura. **Nessuna primitiva nuova**:
+si riusano `barreOrdinate` e `ciambella`, le due famiglie che il progetto ha già misurato come
+leggibili senza istruzioni dopo cinque forme respinte.
+
+1. **Scostamento dalle soglie** — risponde alla domanda che la sezione stessa dichiara essere la
+   sua ("conta di QUANTO"), in punti percentuali;
+2. **Torta del fattore** — due fette, e la grande È la risposta (73,7% si muove insieme);
+3. **Calendario per mese** — l'unica regola con un asse temporale naturale.
+
+⚠⚠ **NON TUTTE LE REGOLE SONO DISEGNABILI INSIEME.** `valore` cambia unità da riga a riga:
+percentuali dell'azionario, un CONTEGGIO (2,3 scommesse), delle SEDUTE (liquidità), una percentuale
+con **un altro denominatore** (il drawdown è sul valore nel tempo). Nel grafico entrano solo le
+cinque che parlano la stessa lingua, e il renderer **dichiara quali sono rimaste fuori e perché**.
+Le altre non prendono un riempitivo (v233).
+
+⚠⚠ **E IL MIO PRIMO GATE ERA CIRCOLARE**: verificava che nel grafico ci fosse ciò che porta una
+`sogliaPct` — vero per costruzione. Iniettando una soglia sul drawdown il grafico se lo prendeva e
+**nessun check mordeva**. Ora ogni regola **dichiara la propria `unita`** e il filtro guarda quella:
+mescolare due denominatori diventa una bugia visibile invece di un effetto collaterale.
+> Quando un check non morde, la prima cosa da guardare non è il codice: è se la proprietà che
+> stai verificando può essere falsa.
+
+⚠ **Il grafico e la regola non danno lo stesso numero, e va DICHIARATO**: qui il raggruppamento è
+il mese di calendario, lì la finestra mobile di tre settimane più densa, che può stare a cavallo di
+due mesi. Affiancarli senza dirlo è "stessa grandezza con valori diversi".
+
+### `obar-prime` mandava il valore a capo, e nessuno l'aveva mai visto
+`.obar-prime` è `grid-column: 1 / -1`, cioè una riga intera: stando nel DOM **prima** di
+`obar-val`, l'auto-placement spingeva il valore in colonna uno della riga dopo. Il parametro
+`suggerimento` esisteva **dalla v302 e nessun chiamante lo passava**: la resa non era mai stata
+vista. È la classe v193 — codice vivo che non può manifestarsi — e si trova **guardando la pagina**,
+non rileggendo la funzione.
+
+## 🧪 v393 — TRE ERRORI DI METODO, TUTTI PRESI DAI META-GATE
+
+1. **`return true` anticipati** nel check delle notizie ("se lo snapshot non ha voci, passa"):
+   **verde per assenza di dati**, la trappola già pagata quattro volte. Il meta-gate dei check
+   dormienti l'ha presa subito. Ora le notizie si **iniettano**: il fenomeno c'è per costruzione.
+2. **Un'iniezione che non mordeva perché il caso non esisteva nei dati**: il check sui mesi vuoti
+   asseriva la contiguità, ma le trimestrali vere cadono in tre mesi consecutivi — comprimere o no
+   dava lo stesso risultato. Ora il gate **crea il buco** che deve rilevare (v234).
+3. **Quarta volta che un gate trova sé stesso**: il check "nessun accesso posizionale" falliva sul
+   commento che *spiega* l'accesso posizionale rimosso. Ora esiste `_SRC_UD_CODICE`, senza commenti:
+   **chi cerca l'ASSENZA di una costruzione guarda il codice, chi ne cerca la PRESENZA la prosa
+   va bene**.
+
+## 🔍 v393 — COSA HA TROVATO IL CONTROLLO DELLA PIPELINE, E COSA NO
+
+Verificata leggendo il log del run vero di "Rigenera" (`workflow_dispatch`), non simulandolo.
+
+**Funziona**: 17 fonti su 17 arrivano, `data_quality` le sorveglia tutte e 17 con **zero allarmi**,
+audit 0 violazioni, 36→18 voci di news da 3 fonti, SEC EDGAR 13 titoli, SLOOS/NFCI/BCE presenti.
+
+**Falsi allarmi da riconoscere a vista, per non riaprirli**:
+- `storico indicatori: 11/13 con serie` — **è voluto**: `curve` e `t30` prendono la serie da
+  `curve_history` e `tassi.storico.a30`, e duplicarla sarebbe la classe v295 (due copie della
+  stessa serie che divergono). Il messaggio invita a una diagnosi sbagliata: è un conteggio, non
+  un esito.
+- `audit: 0 ptf / 24 wl` — le posizioni vivono in `config/posizioni.json`, non nell'array
+  `portfolio` di `data.json`, che contiene solo il BTP.
+
+**Buco vero e chiuso**: `!! tasso BoJ scartato: osservazione del 2023-12-01` — lo scarto è giusto
+(mille giorni), ma la riga chiudeva con "rischio unwind se BoJ alza" **senza dire da quale
+livello**. Un rischio senza la sua ancora. Ora il buco si dichiara.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
