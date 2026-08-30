@@ -727,8 +727,15 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
   const src4 = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
   const m = src4.match(/const DEFAULT_PROMPT_HEADER = `([\s\S]*?)`;/);
   const testo = m ? m[1] : "";
+  /* ⚠ v389 — RIAGGANCIATO AL FATTO: cercava la stringa "analista macro", e la testata l'ha
+     persa quando e' diventata quella di un team di risk management di un fondo growth. E' la
+     NONA volta in questo progetto che un check ancorato a una stringa letterale si rompe su
+     una riformulazione senza che manchi niente (CLAUDE.md ne conta otto).
+     L'invariante vero e' triplo e nessuna delle tre parti e' una parola: la testata esiste ed
+     e' sostanziosa, dichiara di ricevere il QUADRO MACRO, e NON chiede di dimensionare. */
   check("v256 FALLBACK TESTATA: esiste, non è vuoto ed è scritto per un pacchetto MACRO",
-    testo.length > 400 && /analista macro/i.test(testo)
+    testo.length > 400 && /quadro macro/i.test(testo)
+    && /non dimension|niente quantita|non proporre operazioni/i.test(testo)
     && !/portafoglio del fondo|ordini a limite|stop dichiarato/i.test(testo));
   if (!(testo.length > 400)) console.log("  ⚠ fallback testata mancante o degenere");
 
@@ -4703,8 +4710,20 @@ check("v360 rischio: la tesi contraria resta l'ULTIMO blocco anche dopo l'inseri
   const iR = p.indexOf("IL RISCHIO, dal lato del libro");
   const iC = p.indexOf("LA TESI CONTRARIA");
   /* il rischio entra come blocco 8 e la contraria diventa 9: l'invariante non e' il numero,
-     e' che la contraria venga per ULTIMA — dopo aver scritto un giudizio */
-  return iR > 0 && iC > iR && !/\\n\\d\\) /.test(p.slice(iC + 20));`));
+     e' che la contraria venga per ULTIMA — dopo aver scritto un giudizio.
+     ⚠ v389 — LA RICERCA SI FERMA ALLA FINE DELLE ISTRUZIONI. Prima scorreva fino in fondo al
+     pacchetto, quindi qualunque riga di DATI che cominci con "N) " la faceva fallire — ed e'
+     successo appena la disciplina di rischio ha pubblicato le sue regole numerate. I blocchi
+     da consegnare vivono nelle ISTRUZIONI: cercarli nel payload e' misurare la regione
+     sbagliata, la stessa classe del registro di posizioni fisse del red team (I6). */
+  const fine = p.indexOf("QUADRO MACRO DI RIFERIMENTO");
+  const istruzioni = fine > iC ? p.slice(iC + 20, fine) : p.slice(iC + 20);
+  /* ⚠ v389 — la classe di cifre copriva UNA cifra sola: un decimo blocco ("10) ") non faceva
+     scattare il gate, e l'ho scoperto provando a iniettare proprio quello. Ora una o piu' cifre.
+     Un gate si valida iniettando il difetto, e l'iniezione va scelta fra i casi che il gate DEVE
+     prendere, non fra quelli comodi: la prima che avevo scritto passava per una ragione che non
+     c'entrava col difetto, e avrebbe certificato una protezione che non c'era. */
+  return iR > 0 && iC > iR && !/\\n\\d+\\) /.test(istruzioni);`));
 
 check("v360 rischio: la pagina ha la sezione e il suo contenitore", (() => {
   const html = readFileSync(join(ROOT, "index.html"), "utf8");
@@ -5292,6 +5311,192 @@ check("meta: nessun check registrato dopo il ciclo che conta i fallimenti", (() 
   if (prima < 300) return no(`visti solo ${prima} check prima del conteggio: la struttura non e' quella che credo`);
   return true;
 })());
+
+/* ══ v389 — LA DISCIPLINA DI RISCHIO, LE NEWS E IL GRAFICO PESO/RISCHIO ═══════════════════
+   ⚠ Tutti questi check girano sui dati VERI (suVeri), non sulla fixture: la fixture non ha
+   macro.indicators, non ha posizioni e non ha news, quindi NON CONTIENE il fenomeno da
+   misurare — e' l'errore fatto quattro volte in questo progetto, verde per assenza di dati. */
+
+check("v389 disciplina: ogni regola separa la MISURA dalla SOGLIA e dichiara la provenienza", suVeri(`
+  const d = disciplinaRischio();
+  if (!d || d.regole.length < 5) return false;
+  /* l'invariante non e' il numero di regole: e' che nessuna riga possa essere letta come un
+     dato del sistema quando invece e' una convenzione del mestiere */
+  return d.regole.every(r => r.nome && r.misura && r.soglia && r.provenienza && r.stato
+    && /CONVENZIONE/i.test(r.provenienza));`));
+
+check("v389 disciplina: nessuna regola dimensiona, e il divieto sta nella TESTATA non nella coda", suVeri(`
+  const t = disciplinaTesto();
+  if (!t) return false;
+  /* ⚠ v389 — RIAGGANCIATO DOPO CHE C9 HA AVUTO RAGIONE. La prima stesura pretendeva il divieto
+     DENTRO disciplinaTesto(), cioe' nel payload: ma il divieto e' un ORDINE, e gli ordini vivono
+     nella testata (v156/v179/v180). Un check che pretende un'istruzione nella coda mette in
+     conflitto due gate e vince quello scritto per ultimo.
+     L'invariante giusto e' doppio: la coda non propone quantita', e il PACCHETTO INTERO — che
+     comprende la testata — porta il divieto. */
+  const propone = /(vendi|compra|riduci|porta)\\s+(il\\s+)?\\d+([.,]\\d+)?\\s*(%|azioni|quote|€)/i.test(t);
+  const codaPulita = !propone && !/non dimensionare/i.test(t);
+  const macro = buildCIOText(), titolo = buildPromptTicker("NVDA");
+  const vietaMacro = /NON DIMENSIONATE|non dimensionare/i.test(macro);
+  const vietaTitolo = /In nessun caso dimensionare|non dimensionare/i.test(titolo);
+  /* e il fatto che rende sensato il divieto resta nella coda: i tre dati mancanti */
+  const treDati = /liquidita' disponibile[\\s\\S]{0,120}?situazione fiscale/i.test(t);
+  return codaPulita && vietaMacro && vietaTitolo && treDati;`));
+
+check("v389 disciplina: una soglia superata NON viene presentata come un errore del libro", suVeri(`
+  const t = disciplinaTesto();
+  /* e' la riga che impedisce l'analisi facile: un fondo growth concentrato sta fuori dalle
+     soglie per costruzione, e il pacchetto deve dirlo dove lo stato viene pubblicato */
+  return !!t && /NON SIGNIFICA CHE IL LIBRO SIA SBAGLIATO/.test(t)
+      && /PER\\s+COSTRUZIONE/i.test(t);`));
+
+check("v389 disciplina: pagina e pacchetto leggono LA STESSA misura, non due calcoli", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  /* due implementazioni della stessa domanda divergono (v161/v207/v316): entrambe le superfici
+     devono chiamare disciplinaRischio(), e la misura deve esistere in un posto solo */
+  const definizioni = (src.match(/^function disciplinaRischio\(/gm) || []).length;
+  const rende = /function renderDisciplinaRischio\([\s\S]{0,600}?disciplinaRischio\(\)/.test(src);
+  const testo = /function disciplinaTesto\([\s\S]{0,600}?disciplinaRischio\(\)/.test(src);
+  return definizioni === 1 && rende && testo;
+})());
+
+check("v389 disciplina: il gruppo di fattore si calcola in un posto solo", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  /* estratto da contestoPortafoglio in v389 proprio per non averne due copie */
+  return (src.match(/^function gruppoFattore\(/gm) || []).length === 1
+      && /contestoPortafoglio[\s\S]{0,4000}?gruppoFattore\(azionarie, totAz\)/.test(src);
+})());
+
+check("v389 disciplina: la sezione esiste in pagina e qualcuno la riempie", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  /* v315: un contenitore nel markup senza chi lo riempie e' un blocco che non c'e' */
+  return /id="disc-corpo"/.test(html) && /data-sez="disciplina"/.test(html)
+      && /\$\("#disc-corpo"\)/.test(src)
+      /* ⚠ v389 — la prima stesura trovava anche una chiamata COMMENTATA: iniettando
+         "// renderDisciplinaRischio();" il gate restava verde mentre la sezione non veniva
+         piu' disegnata. E' la trappola del gate che trova se stesso, gia' pagata in v213 e
+         v240: la scansione deve togliere i commenti prima di leggere. */
+      && /^\s*renderDisciplinaRischio\(\);/m.test(src.slice(src.indexOf("renderCredito();")));
+})());
+
+check("v389 pacchetto macro: porta il libro, e non dichiara piu' di non averlo", suVeri(`
+  const p = buildCIOText();
+  /* la testata diceva "Non hai davanti nessun portafoglio" mentre le posizioni esistono dal
+     v307: un pacchetto che nega di avere una cosa che ha e' peggio di uno che tace */
+  return /IL LIBRO IN CUI QUESTA POSIZIONE VIVE|LA DISCIPLINA DI RISCHIO/.test(p)
+      && !/Non hai davanti nessun portafoglio/i.test(p);`));
+
+check("v389 news: la finestra e' di 8 ore, come chiesto", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  return /const ORE = 8;/.test(src);
+})());
+
+check("v389 news: senza feed il pacchetto DICHIARA il buco invece di tacere", suVeri(`
+  /* il difetto vero: macro.news assente -> il blocco spariva del tutto, e "nessuna riga
+     sull'argomento" e "nessuna notizia" sono due cose che l'LLM non puo' distinguere */
+  const salvato = DATA.macro.news;
+  delete DATA.macro.news;
+  const p = buildPrompt();
+  DATA.macro.news = salvato;
+  return /TITOLI MACRO DELLE ULTIME 8 ORE: IL SISTEMA NON NE HA/.test(p)
+      && /dato MANCANTE, non come un dato negativo/.test(p);`));
+
+check("v389 news: fuori finestra pubblica comunque le piu' recenti, con la loro eta'", suVeri(`
+  /* la v306 rispondeva "NESSUNA" e si teneva in tasca una dichiarazione del presidente della
+     Fed di 17 ore: la finestra serve a PESARE una notizia, non a nasconderla */
+  const salvato = DATA.macro.news;
+  const ora = Date.now();
+  const iso = (h) => new Date(ora - h * 3600000).toISOString().slice(0, 19) + "Z";
+  DATA.macro.news = { fonti: ["Fonte X"], filtro: "prova", voci: [
+    { titolo: "Titolo vecchio ma rilevante sulla Fed", riassunto: "", fonte: "Fonte X", quando: iso(17) },
+    { titolo: "Titolo ancora piu' vecchio sul lavoro", riassunto: "", fonte: "Fonte X", quando: iso(30) },
+  ] };
+  const p = buildPrompt();
+  DATA.macro.news = salvato;
+  return /0 dentro le ultime 8 ORE/.test(p)
+      && /Titolo vecchio ma rilevante sulla Fed/.test(p)
+      && /17h fa/.test(p);`));
+
+check("v389 news: dentro la finestra le pubblica e le conta", suVeri(`
+  const salvato = DATA.macro.news;
+  const ora = Date.now();
+  const iso = (h) => new Date(ora - h * 3600000).toISOString().slice(0, 19) + "Z";
+  DATA.macro.news = { fonti: ["Fonte X"], filtro: "prova", voci: [
+    { titolo: "Notizia macro appena uscita sui tassi", riassunto: "riassunto della fonte", fonte: "Fonte X", quando: iso(2) },
+    { titolo: "Altra notizia macro recente sul lavoro", riassunto: "", fonte: "Fonte X", quando: iso(5) },
+    { titolo: "Notizia fuori finestra sul credito", riassunto: "", fonte: "Fonte X", quando: iso(40) },
+  ] };
+  const p = buildPrompt();
+  DATA.macro.news = salvato;
+  return /2 dentro le ultime 8 ORE/.test(p)
+      && /Notizia macro appena uscita sui tassi/.test(p)
+      && /SONO TITOLI, NON FATTI VERIFICATI/.test(p);`));
+
+check("v389 peso/rischio: la diagonale e' sparita e resta la differenza gia' calcolata", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const css = readFileSync(join(ROOT, "assets", "style.css"), "utf8");
+  /* il CEO non leggeva lo scatter: l'invariante non e' "non c'e' piu' l'SVG", e' che la
+     grandezza mostrata sia gia' la differenza e che il denominatore sia dichiarato */
+  return !/class="mappa-rischio"/.test(src) && !/class="diag"/.test(src)
+      && /gap: mcr - peso/.test(src)
+      && /barreOrdinate\(pt\.map/.test(src)
+      && !/\.mappa-rischio/.test(css);
+})());
+
+check("v389 peso/rischio: le posizioni fuori dal calcolo vengono NOMINATE, non tolte in silenzio", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  /* SKHY non ha abbastanza sedute in comune: il suo peso non e' dentro i 100%, e va detto */
+  return /non e' nel calcolo|non sono nel calcolo/.test(src)
+      && /due frazioni dello stesso insieme/.test(src);
+})());
+
+check("v389 collaudo: ENTRAMBI i pacchetti chiedono freschezza, congruita' e affidabilita'", suVeri(`
+  /* richiesta esplicita del CEO: le tre verifiche devono essere chieste a chi legge, non
+     assunte. E devono valere per tutti e due i percorsi, non solo per quello del titolo. */
+  const macro = buildCIOText(), titolo = buildPromptTicker("NVDA");
+  const chiede = (p) => /FRESCHEZZA/.test(p) && /CONGRUITA'/.test(p) && /AFFIDABILITA'/.test(p)
+                     && /COLLAUDO DEI DATI/i.test(p);
+  return chiede(macro) && chiede(titolo);`));
+
+check("v389 collaudo: l'esito va SCRITTO, non solo eseguito", suVeri(`
+  /* un collaudo che non lascia traccia non e' distinguibile da un collaudo non fatto: la
+     regola vale solo se il pacchetto chiede di riportarne l'esito */
+  const macro = buildCIOText(), titolo = buildPromptTicker("NVDA");
+  const traccia = (p) => /non e' distinguibile da un collaudo non fatto/.test(p);
+  return traccia(macro) && traccia(titolo);`));
+
+check("v389 libro: ogni posizione porta tecnica E fondamentali, non solo peso e guadagno", suVeri(`
+  const p = buildPromptTicker("MU");
+  const b = p.slice(p.indexOf("TECNICA E FONDAMENTALI DI OGNI POSIZIONE"));
+  if (!b) return false;
+  /* il difetto che questo blocco chiude: senza questi numeri l'unica misura disponibile sulle
+     altre posizioni era il guadagno dal carico, che e' quella che fa tenere i perdenti */
+  return /RSI /.test(b) && /dal massimo 52s/.test(b) && /forza relativa 1M/.test(b)
+      && /medie: /.test(b) && /ricavi /.test(b)
+      && /P\\/E prospettico|utile atteso NEGATIVO/.test(b);`));
+
+check("v389 libro: un multiplo prospettico negativo non si stampa come multiplo basso", suVeri(`
+  const p = buildPromptTicker("MU");
+  const b = p.slice(p.indexOf("TECNICA E FONDAMENTALI DI OGNI POSIZIONE"));
+  /* RGTI e CRWV hanno forward_pe negativo: "-75,7×" si leggerebbe come "costa pochissimo" */
+  return /utile atteso NEGATIVO/.test(b) && !/P\\/E prospettico -/.test(b);`));
+
+check("v389 libro: la forza relativa porta i PUNTI PERCENTUALI, non due unita'", suVeri(`
+  const p = buildPromptTicker("MU");
+  /* signTxt aggiunge gia' "%": "+5,2% pp" sarebbe due unita' sulla stessa cifra */
+  return / pp vs /.test(p) && !/% pp vs /.test(p);`));
+
+check("v389 disciplina: dichiara di riusare le misure del libro, per non farle contare due volte", suVeri(`
+  const p = buildPromptTicker("MU");
+  /* le stesse misure compaiono nel blocco del libro e nella disciplina: senza la dichiarazione
+     un lettore le conta come prove indipendenti. E' la regola B3 del pacchetto (contare i
+     segnali una volta sola) applicata al libro invece che alla macro. */
+  const iLibro = p.indexOf("IL LIBRO IN CUI QUESTA POSIZIONE VIVE");
+  const iDisc = p.indexOf("LA DISCIPLINA DI RISCHIO DI UN FONDO GROWTH");
+  return iLibro > 0 && iDisc > iLibro
+      && /SONO LE STESSE DEL BLOCCO DEL LIBRO/.test(p)
+      && /Contale UNA VOLTA SOLA/.test(p);`));
 
 let fail = 0;
 for (const [name, ok] of T) {

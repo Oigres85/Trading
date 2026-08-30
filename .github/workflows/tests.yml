@@ -1,7 +1,20 @@
 # Test del motore (JS + Python) a ogni push che tocca codice — NON blocca gli
 # aggiornamenti dati (quello è update-data.yml col suo audit_data.py).
+#
+# ⚠⚠ v389 — I TEST NON GIRAVANO SULLE PULL REQUEST, E NESSUNO POTEVA SAPERLO.
+# Il trigger era `push` sul solo `main`: una PR poteva restare aperta per giorni con ZERO check
+# (verificato sulla PR #85: `total_count: 0`), e i gate scattavano solo DOPO il merge — cioè
+# dopo che il codice era già su main e la pagina già servita al CEO.
+# Undici gate scritti con cura, e il momento in cui servono di più — prima del merge — era
+# l'unico in cui non giravano. È la classe già scritta in questo progetto per il gate spento
+# della v205: *un test che non può rompere la CI non è un test, è un commento*; qui non era
+# spento, era solo puntato dopo il fatto.
+# `pull_request` copre le PR verso main; `push` su main resta per i commit diretti.
 name: tests
 on:
+  pull_request:
+    branches: [main]
+    paths: ["assets/**", "scripts/**", "index.html", ".github/workflows/tests.yml"]
   push:
     branches: [main]
     paths: ["assets/**", "scripts/**", "index.html", ".github/workflows/tests.yml"]
