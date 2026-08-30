@@ -5498,6 +5498,91 @@ check("v389 disciplina: dichiara di riusare le misure del libro, per non farle c
       && /SONO LE STESSE DEL BLOCCO DEL LIBRO/.test(p)
       && /Contale UNA VOLTA SOLA/.test(p);`));
 
+/* ══ v390 — LE FONTI NUOVE, E IL RAMO CHE NESSUN GATE AVEVA MAI PERCORSO ═══════════════ */
+
+check("v390 EDGAR: il deposito passato e' un FATTO, la data futura resta una stima", suVeri(`
+  const salvato = DATA.macro.sec_calendario;
+  DATA.macro.sec_calendario = { per_titolo: { MU: {
+    ultimo_deposito: "2026-06-24", n_depositi: 36, cadenza_gg: 91, attesa_da_cadenza: "2026-09-23" } },
+    senza_8k: [], senza_cik: [], fonte: "SEC EDGAR" };
+  const p = buildPromptTicker("MU");
+  DATA.macro.sec_calendario = salvato;
+  /* la distinzione che il blocco esiste per fare: il deposito e' accaduto, l'attesa no */
+  return /ULTIMO DEPOSITO DEI RISULTATI[^\\n]*e' un FATTO, non una stima[^\\n]*2026-06-24/.test(p)
+      && /SECONDA stima della prossima uscita: 2026-09-23/.test(p)
+      && /STIMA di yfinance, non una data confermata/.test(p);`));
+
+check("v390 EDGAR: una cadenza irregolare NON produce una data", suVeri(`
+  const salvato = DATA.macro.sec_calendario;
+  /* misurato su MSTR: deposita 8-K/2.02 anche fuori dal ciclo, la mediana crolla a 67 giorni
+     e l'attesa che ne uscirebbe sbaglia di 24. Un numero che sembra una misura e non lo e'
+     e' peggio di nessun numero (v199). */
+  DATA.macro.sec_calendario = { per_titolo: { MU: {
+    ultimo_deposito: "2026-07-30", n_depositi: 20, cadenza_irregolare_gg: 67 } },
+    senza_8k: [], senza_cik: [], fonte: "SEC EDGAR" };
+  const p = buildPromptTicker("MU");
+  DATA.macro.sec_calendario = salvato;
+  return /cadenza dei suoi depositi e' IRREGOLARE \\(67 giorni/.test(p)
+      && !/SECONDA stima della prossima uscita/.test(p);`));
+
+check("v390 EDGAR: un emittente estero viene DICHIARATO, non lasciato vuoto", suVeri(`
+  const salvato = DATA.macro.sec_calendario;
+  DATA.macro.sec_calendario = { per_titolo: {}, senza_8k: ["MU"], senza_cik: [], fonte: "SEC EDGAR" };
+  const p = buildPromptTicker("MU");
+  DATA.macro.sec_calendario = salvato;
+  /* "nessuna data da EDGAR" e "nessuna trimestrale" si leggono uguali e sono cose diverse */
+  return /EMITTENTE ESTERO/.test(p) && /NON significa che non pubblichi trimestrali/.test(p);`));
+
+check("v390 SLOOS: il segno viene dichiarato, in entrambe le direzioni", suVeri(`
+  const salvato = DATA.macro.credito_banche;
+  const prova = (v) => {
+    DATA.macro.credito_banche = { sloos: { valore: v, data: "2026-07-01", precedente: 8.1, serie: "DRTSCILM" } };
+    return buildPrompt();
+  };
+  /* il segno di SLOOS non e' intuitivo: negativo = banche che ALLENTANO, cioe' la lettura
+     favorevole. Pubblicarlo senza dirlo e' la classe del percentile invertito (v316). */
+  const stretta = prova(12.5), allentamento = prova(-8.3);
+  DATA.macro.credito_banche = salvato;
+  return /le banche stringono/i.test(stretta) && /IL SEGNO/.test(stretta)
+      && /stanno allentando/i.test(allentamento);`));
+
+check("v390 SLOOS/NFCI: dichiarano di NON essere una seconda conferma dello spread", suVeri(`
+  const salvato = DATA.macro.credito_banche;
+  DATA.macro.credito_banche = { sloos: { valore: 0, data: "2026-07-01", serie: "DRTSCILM" },
+                                nfci: { valore: -0.57, data: "2026-08-21", serie: "NFCI" } };
+  const p = buildPrompt();
+  DATA.macro.credito_banche = salvato;
+  /* lo spread e' un PREZZO, SLOOS e' la DISPONIBILITA': contarli come due prove dello stesso
+     segnale e' la regola B3 violata */
+  return /NON sono una seconda conferma dello stesso segnale/.test(p)
+      && /l'altro lato del canale/.test(p);`));
+
+check("v390 BCE: il tasso euro c'e' e non si spaccia per un dato sui tassi USA", suVeri(`
+  const salvato = DATA.macro.bce;
+  DATA.macro.bce = { tasso_rifinanziamento: 2.4, data: "2026-08-30", fonte: "BCE Data Portal" };
+  const p = buildPrompt();
+  DATA.macro.bce = salvato;
+  return /BCE — tasso sulle operazioni di rifinanziamento/.test(p)
+      && /non il rendimento del BTP/.test(p)
+      && /non un secondo dato sui tassi americani/.test(p);`));
+
+check("v390 il ramo degli ALLARMI non contiene ordini — ramo mai percorso prima", suVeri(`
+  /* ⚠⚠ QUESTO CHECK NASCE DA UN DIFETTO SOPRAVVISSUTO PER INVISIBILITA'. I due blocchi che
+     escono quando data_quality ha un alert dicevano "usa OBBLIGATORIAMENTE la ricerca web",
+     cioe' istruzioni nel payload — e nessun gate li aveva mai visti, perche' data_quality non
+     aveva MAI avuto un alert e quindi quel ramo non si percorreva.
+     > Un difetto in un ramo raro non e' raro, e' solo invisibile (v190). */
+  const salvato = DATA.data_quality;
+  DATA.data_quality = { checks: [{ key: "margin_debt", date: null, age_days: null,
+    max_age: 90, status: "missing", note: "fonte ko" }], alerts: ["margin_debt: missing"] };
+  const p = buildPrompt();
+  DATA.data_quality = salvato;
+  const acceso = /DATI MANCANTI O INAFFIDABILI IN QUESTO PAYLOAD/.test(p);
+  const senzaOrdini = !/ORDINE OPERATIVO/.test(p) && !/usa OBBLIGATORIAMENTE/i.test(p);
+  /* e la lista non si pubblica due volte con due formulazioni diverse */
+  const unaVolta = (p.match(/margin_debt/g) || []).length <= 3;
+  return acceso && senzaOrdini && unaVolta;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

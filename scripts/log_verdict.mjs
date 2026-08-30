@@ -1,5 +1,23 @@
 #!/usr/bin/env node
-/* REGISTRO VERDETTI → ESITI (v113) — il motore si misura da solo.
+/* ⚠⚠ v390 — SCRIPT DORMIENTE, NON PIU' ESEGUITO DAL CI. LEGGERE PRIMA DI RIACCENDERLO.
+   Dipende da `decisionVerdict()` e `marketLinkText()`, rimosse col motore predittivo in v200
+   — tolto non per opinione ma perche' MISURATO: 7 segnali maturati, ritorno medio -10,8%,
+   hit-rate 29%, sette punti peggio del Nasdaq.
+   Da allora questo file falliva a OGNI run del CI con "decisionVerdict is not defined", e il
+   `continue-on-error: true` del workflow rendeva quel fallimento invisibile. Un errore coperto
+   da una rete di sicurezza sopravvive quanto la rete: e' la stessa classe dell'import mancante
+   che ha tenuto morte le news per tutta la loro vita (v389).
+   Il campo che produceva, `verdict_track`, non e' letto da NESSUNO nel repository.
+   ⚠ COSA NON E' STATO TOCCATO: `config/verdict_history.jsonl` — 30 giorni di storia vera, che
+   `backtest_diary.mjs` legge per affiancare a ogni operazione del CEO cio' che il sistema
+   diceva quel giorno. Cancellarlo distruggerebbe delle prove.
+   ⚠ PER RIACCENDERLO servirebbe prima decidere COSA loggare: il sistema oggi non emette piu'
+   un verdetto, e reintrodurne uno solo per poterlo misurare rimetterebbe in piedi l'ancoraggio
+   che v200 ha tolto. La misura contro gli esiti la fanno gia' `backtest_diary.mjs` (operazioni
+   reali) e `backtest_signals.mjs` (contenuto predittivo dei segnali).
+
+   ─── documentazione originale, conservata ───────────────────────────────────────────────
+   REGISTRO VERDETTI → ESITI (v113) — il motore si misura da solo.
    Gira nel CI dopo update_data.py:
    1. calcola il verdetto del motore (decisionVerdict di app.js, stesso harness vm dei test)
       e appende i candidati ACCUMULA di oggi a config/verdict_history.jsonl (1 riga/giorno);

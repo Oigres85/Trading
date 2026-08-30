@@ -2510,6 +2510,88 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! news macro: {e}", file=sys.stderr)
 
+    # ═══ v390 — LE DATE DELLE TRIMESTRALI, DAL DEPOSITO E NON DA UNA STIMA ═══════════════
+    # Il pacchetto pubblica `earnings_date` di yfinance dichiarandolo — correttamente — una
+    # STIMA. Ma su quella stima si regge la regola piu' operativa della disciplina di rischio:
+    # "quanta parte del libro riprezza nella stessa finestra di tre settimane". Una regola
+    # costruita su date stimate e' una regola che si sposta da sola.
+    #
+    # SEC EDGAR pubblica il FATTO: l'8-K con item 2.02 ("Results of Operations and Financial
+    # Condition") e' il deposito con cui la societa' comunica i risultati, e ha una data vera.
+    # Gratis, senza chiave, con il solo obbligo di dichiarare uno User-Agent identificabile.
+    #
+    # ⚠ COSA SI PUBBLICA E COSA NO. Il deposito passato e' un fatto e si pubblica sempre. La
+    # data FUTURA non esiste in EDGAR: si ricava dalla cadenza dei depositi precedenti, ed e'
+    # una SECONDA STIMA, indipendente da quella di yfinance. Averne due che concordano vale
+    # piu' di una sola; averne due che divergono e' informazione a sua volta.
+    # ⚠⚠ E LA CADENZA SI PUBBLICA SOLO SE E' PLAUSIBILMENTE TRIMESTRALE (80-100 giorni).
+    # Misurato su MSTR: deposita 8-K con item 2.02 anche FUORI dal ciclo trimestrale
+    # (2025-10-06, 2025-07-07), e la mediana degli scarti crolla a 67 giorni producendo
+    # un'attesa sbagliata di 24 giorni. Un numero che sembra una misura e non lo e' e' peggio
+    # di nessun numero (v199): fuori banda si pubblica il deposito e si tace sull'attesa.
+    # ⚠ GLI EMITTENTI ESTERI NON HANNO 8-K: SK hynix e TSMC depositano 6-K e 20-F, che non
+    # hanno gli "items". Per loro EDGAR non risponde alla domanda, e va DICHIARATO invece di
+    # lasciare una riga vuota che si legge come "nessuna trimestrale".
+    try:
+        import statistics as _st
+        SEC_UA = {"User-Agent": "Trading-Dashboard/1.0 (biagio.garofalo@siigep.tech)"}
+        _r = requests.get("https://www.sec.gov/files/company_tickers.json",
+                          headers=SEC_UA, timeout=25)
+        _r.raise_for_status()
+        _mappa = {v["ticker"].upper(): v["cik_str"] for v in _r.json().values()}
+        sec_cal, senza_cik, esteri = {}, [], []
+        # la lista viene dalla stessa fonte della pipeline (config/ui_watchlist.json), non
+        # da un elenco scritto a mano che invecchierebbe da solo: un titolo nuovo entra qui
+        # senza che nessuno se ne ricordi. Indici, cambi e future non sono societa' e finiscono
+        # in `senza_cik`, che e' un esito dichiarato e non un buco.
+        _, _wl_sec, _ = load_holdings()
+        _seguiti = {str(x.get("ticker", "")).upper() for x in _wl_sec}
+        _seguiti = {t for t in _seguiti
+                    if t and not t.startswith("^") and not t.endswith(("=F", "=X", "-USD"))}
+        for _tk in sorted(_seguiti):
+            _cik = _mappa.get(_tk)
+            if not _cik:
+                senza_cik.append(_tk)
+                continue
+            try:
+                _s = requests.get(f"https://data.sec.gov/submissions/CIK{_cik:010d}.json",
+                                  headers=SEC_UA, timeout=25)
+                _s.raise_for_status()
+                _rec = _s.json().get("filings", {}).get("recent", {})
+                _forme = _rec.get("form", [])
+                _items = _rec.get("items", [""] * len(_forme))
+                _dep = [d for f, d, it in zip(_forme, _rec.get("filingDate", []), _items)
+                        if f == "8-K" and "2.02" in (it or "")]
+                if not _dep:
+                    esteri.append(_tk)
+                    continue
+                voce = {"ultimo_deposito": _dep[0], "n_depositi": len(_dep)}
+                if len(_dep) >= 4:
+                    _ds = [datetime.strptime(x, "%Y-%m-%d").date() for x in _dep[:8]]
+                    _gap = [(_ds[i] - _ds[i + 1]).days for i in range(len(_ds) - 1)]
+                    _cad = int(_st.median(_gap))
+                    # solo una cadenza plausibilmente trimestrale autorizza una previsione
+                    if 80 <= _cad <= 100:
+                        voce["cadenza_gg"] = _cad
+                        voce["attesa_da_cadenza"] = (_ds[0] + timedelta(days=_cad)).isoformat()
+                    else:
+                        voce["cadenza_irregolare_gg"] = _cad
+                sec_cal[_tk] = voce
+            except Exception as e:  # noqa: BLE001
+                print(f"!! SEC EDGAR {_tk}: {e}", file=sys.stderr)
+            time.sleep(0.12)          # SEC chiede meno di 10 richieste al secondo
+        if sec_cal or esteri:
+            macro["sec_calendario"] = {
+                "per_titolo": sec_cal,
+                "senza_8k": esteri,          # emittenti esteri: 6-K/20-F, nessun item 2.02
+                "senza_cik": senza_cik,      # indici, cambi, materie prime: non sono societa'
+                "fonte": "SEC EDGAR, 8-K con item 2.02 (Results of Operations)",
+            }
+            print(f"   SEC EDGAR: {len(sec_cal)} titoli con deposito trimestrale, "
+                  f"{len(esteri)} emittenti senza 8-K")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! SEC EDGAR: {e}", file=sys.stderr)
+
     # ═══ v309 — STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE ═════════════════════════
     # Il CEO: "reinserisci scheda macro per stagionalita' mensile nasdaq100 e se puoi aggiungi
     # anche variabile in concomitanza di elezioni midterm (valuta tu come strutturarlo)".
@@ -2827,6 +2909,68 @@ def fetch_macro():
         }
     except Exception as e:  # noqa: BLE001
         print(f"!! credit: {e}", file=sys.stderr)
+
+    # ═══ v390 — CHI PRESTA, NON SOLO QUANTO COSTA ══════════════════════════════════════
+    # Il canale credito e' quello che colpisce PRIMA le partecipate che non si autofinanziano,
+    # e fino a qui il sistema lo misurava con il solo spread high yield. Uno spread e' un
+    # PREZZO: dice quanto il mercato chiede per prestare, non se le banche stiano prestando.
+    # Sono due domande diverse, e nel 2008 e nel 2023 hanno risposto in tempi diversi.
+    #
+    # DRTSCILM (SLOOS, Senior Loan Officer Opinion Survey): la percentuale NETTA di banche che
+    # ha IRRIGIDITO gli standard sui prestiti alle grandi imprese. Trimestrale, dalla Fed.
+    # Sopra zero = piu' banche stringono che allentano.
+    # NFCI (Chicago Fed National Financial Conditions Index): condizioni finanziarie
+    # complessive, settimanale. Zero = media storica; sopra zero = piu' rigide della media.
+    #
+    # ⚠ Sono INDAGINI e INDICI COMPOSITI, non prezzi: escono con ritardo (SLOOS anche di due
+    # mesi) e la riga porta la propria data, come tutte le statistiche ufficiali.
+    # ⚠ Il segno di SLOOS non e' intuitivo e va scritto: un valore NEGATIVO significa che le
+    # banche stanno ALLENTANDO, cioe' e' la lettura favorevole. Pubblicare "-8,3" senza dirlo
+    # e' la classe di difetto del percentile invertito (v316).
+    try:
+        _sl = fred_series("DRTSCILM", 20)
+        _nf = fred_series("NFCI", 60)
+        if _sl or _nf:
+            macro["credito_banche"] = {}
+            if _sl:
+                macro["credito_banche"]["sloos"] = {
+                    "valore": round(_sl[-1][1], 1), "data": _sl[-1][0],
+                    "precedente": round(_sl[-2][1], 1) if len(_sl) > 1 else None,
+                    "serie": "DRTSCILM",
+                    "storia": [{"d": d, "v": round(v, 1)} for d, v in _sl],
+                }
+            if _nf:
+                macro["credito_banche"]["nfci"] = {
+                    "valore": round(_nf[-1][1], 2), "data": _nf[-1][0],
+                    "mese_fa": round(_nf[-5][1], 2) if len(_nf) > 5 else None,
+                    "serie": "NFCI",
+                    "storia": [{"d": d, "v": round(v, 2)} for d, v in _nf],
+                }
+            print(f"   credito banche: SLOOS {'ok' if _sl else 'ko'}, NFCI {'ok' if _nf else 'ko'}")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! credito banche (SLOOS/NFCI): {e}", file=sys.stderr)
+
+    # ═══ v390 — I TASSI IN EURO, CHE IL SISTEMA NON HA MAI AVUTO ═══════════════════════
+    # Il quadro macro e' interamente americano, ma il CEO tiene un BTP da 40.000 euro nominali
+    # e vive in euro: il costo del denaro che lo riguarda per quella posizione — e il cambio con
+    # cui ogni utile in dollari torna a casa — non erano nel sistema.
+    # Fonte: BCE Data Portal (data-api.ecb.europa.eu), pubblica e senza chiave.
+    # ⚠ Il tasso sulle operazioni di rifinanziamento principali (MRR_FR) e' il tasso di
+    # POLITICA, non il rendimento del BTP: sono due cose diverse e la riga lo dice. Il
+    # rendimento del BTP il sistema lo ha gia' dal prezzo di Borsa Italiana.
+    try:
+        _r = http_get("https://data-api.ecb.europa.eu/service/data/FM/"
+                      "D.U2.EUR.4F.KR.MRR_FR.LEV?lastNObservations=1&format=csvdata")
+        _righe = [l for l in _r.text.strip().splitlines() if l]
+        _intest = _righe[0].split(",")
+        _iT, _iV = _intest.index("TIME_PERIOD"), _intest.index("OBS_VALUE")
+        _c = _righe[-1].split(",")
+        macro["bce"] = {"tasso_rifinanziamento": float(_c[_iV]), "data": _c[_iT],
+                        "fonte": "BCE Data Portal, serie FM.D.U2.EUR.4F.KR.MRR_FR.LEV"}
+        print(f"   BCE: tasso rifinanziamento {macro['bce']['tasso_rifinanziamento']}% "
+              f"al {macro['bce']['data']}")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! BCE: {e}", file=sys.stderr)
 
     # Rischio Sistemico & Stress del Credito (CDS proxy): HY OAS + IG OAS + variazione 1 mese +
     # indice di stress finanziario St. Louis Fed. Il credito anticipa l'azionario → allarme preventivo.
@@ -3744,6 +3888,38 @@ def validate_macro(macro):
                 "ok" if piu_recente <= 48 else "stale",
                 f"{len(voci)} voci, la piu' recente di {piu_recente:.0f} ore"
                 + ("" if piu_recente <= 48 else " — oltre due giorni: sospetta una fonte caduta"))
+
+    # --- fonti v390: ognuna nasce sorvegliata, non dopo il primo guasto -----------------
+    # ⚠ La lezione delle news e' costata la vita intera della funzionalita': una fonte che
+    # nessun check guarda puo' morire il giorno in cui nasce e nessuno se ne accorge. Queste
+    # tre entrano nel gate insieme al codice che le scarica, non dopo.
+    sc = macro.get("sec_calendario") or {}
+    if not sc.get("per_titolo"):
+        add("sec_calendario", None, 7, "missing",
+            "EDGAR non ha risposto: le date delle trimestrali restano solo stime di yfinance")
+    else:
+        add("sec_calendario", str(today), 7, "ok",
+            f"{len(sc['per_titolo'])} titoli con deposito reale"
+            + (f", {len(sc.get('senza_8k') or [])} emittenti esteri senza 8-K" if sc.get("senza_8k") else ""))
+
+    cb = macro.get("credito_banche") or {}
+    for _k, _max in (("sloos", 200), ("nfci", 30)):   # SLOOS e' trimestrale, NFCI settimanale
+        _v = cb.get(_k)
+        if not _v:
+            add(f"credito_{_k}", None, _max, "missing", "serie non disponibile in questo run")
+        else:
+            _a = age_of(_v.get("data"))
+            add(f"credito_{_k}", _v.get("data"), _max,
+                "ok" if (_a is not None and _a <= _max) else "stale")
+
+    bce = macro.get("bce") or {}
+    if not bce.get("tasso_rifinanziamento"):
+        add("bce", None, 10, "missing", "BCE non raggiungibile: nessun tasso in euro in questo run")
+    else:
+        _a = age_of(bce.get("data"))
+        # ⚠ il tasso BCE cambia solo alle riunioni, ma la serie e' GIORNALIERA: se smette di
+        # aggiornarsi il valore resta plausibile e non si nota. L'eta' e' l'unico segnale.
+        add("bce", bce.get("data"), 10, "ok" if (_a is not None and _a <= 10) else "stale")
 
     return {"checks": checks, "alerts": alerts,
             "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
