@@ -1944,14 +1944,89 @@ def umich_series(n=2):
     return out[-n:] if n else out
 
 
+def _distanza_mesi(a: str, b: str) -> int:
+    """quanti mesi separano due osservazioni ISO (b - a)."""
+    return (int(b[:4]) - int(a[:4])) * 12 + (int(b[5:7]) - int(a[5:7]))
+
+
+def _mese_meno(iso: str, n: int) -> str:
+    """la data ISO di n mesi prima. Le osservazioni mensili FRED stanno sempre al giorno 01."""
+    tot = int(iso[:4]) * 12 + (int(iso[5:7]) - 1) - n
+    return f"{tot // 12:04d}-{tot % 12 + 1:02d}-{iso[8:10]}"
+
+
+def _var_per_data(serie, mesi: int):
+    """Variazione percentuale su `mesi`, agganciata alla DATA e non alla POSIZIONE.
+
+    ═══ v393 — L'INFLAZIONE PUBBLICATA ERA UN 13 MESI CHIAMATO "a/a" ═══════════════════════
+    `yoy` faceva `series[-1] / series[-13]`: conta tredici POSIZIONI indietro e da' per
+    scontato che siano dodici mesi. Lo sono solo se la serie non ha buchi.
+
+    ⚠⚠ CPIAUCSL HA UN BUCO A OTTOBRE 2025 (il BLS non ha pubblicato quel mese), e UNRATE lo
+    ha con lui. Misurato sui dati veri il 30/08/2026: la posizione -13 cadeva su GIUGNO 2025
+    invece che su luglio, quindi il pacchetto pubblicava 332,813/321,435 = 3,54% -> "CPI 3,5%"
+    dove l'anno su anno vero e' 332,813/322,169 = 3,30%. Sovrastima di 0,24 pp sul numero
+    macro piu' letto del pacchetto, e NON su un punto solo: nove punti consecutivi dello
+    storico, tutti gonfiati, da novembre 2025 in poi.
+    Un LLM reale l'ha intercettato dall'esito (obiettava 3,4% del BLS contro il nostro 3,5%)
+    senza poter vedere la causa, e la causa non era ne' la fonte ne' l'arrotondamento.
+
+    E' la classe v207 — *l'allineamento per POSIZIONE invece che per data* — gia' pagata sui
+    grafici macro e di nuovo in v391 sulle barre OHLC filtrate indipendentemente. Qui stava
+    nel numero che apre il quadro macro.
+
+    ⚠ QUANDO LA BASE ESATTA NON C'E' non si tace e non si finge: si prende l'osservazione
+    precedente piu' vicina e si RESTITUISCE LA DISTANZA VERA, cosi' chi stampa puo' dichiarare
+    "su 13 mesi" invece di scrivere "a/a" su una cosa che non lo e'. Far sparire l'inflazione
+    per un mese intero sarebbe peggio del difetto (v199: un numero fuori orizzonte e' peggio
+    di nessun numero, ma un buco dichiarato non e' un numero fuori orizzonte).
+
+    Ritorna (valore, data_ultima_osservazione, mesi_effettivi).
+    """
+    if not serie or len(serie) < 2:
+        raise ValueError("serie troppo corta per una variazione")
+    ultima, valore = serie[-1]
+    atteso = _mese_meno(ultima, mesi)
+    per_data = {d: v for d, v in serie}
+    base = per_data.get(atteso)
+    effettivi = mesi
+    if base is None:
+        precedenti = [(d, v) for d, v in serie if d < atteso]
+        if not precedenti:
+            raise ValueError(f"nessuna osservazione a {mesi} mesi da {ultima}")
+        d0, base = precedenti[-1]
+        effettivi = _distanza_mesi(d0, ultima)
+        print(f"!! {atteso} assente nella serie: base a {d0}, distanza reale {effettivi} mesi",
+              file=sys.stderr)
+    if not base:
+        raise ValueError(f"base nulla a {atteso}")
+    return round((valore / base - 1) * 100, 1), ultima, effettivi
+
+
+# ⚠⚠ v393 — CHI HA SERVITO IL DATO E' PARTE DEL DATO, e finora non usciva dalla funzione.
+# UMich ha una fonte primaria (sca.isr.umich.edu, che pubblica il definitivo a FINE mese) e un
+# ripiego su FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA. Il pacchetto scriveva
+# SEMPRE la seconda versione — "via FRED ... questo valore non e' l'ultimo pubblicato" — anche
+# quando a servire era stata la primaria, cioe' DIFFAMAVA UN DATO FRESCO dicendo che era vecchio.
+# Misurato il 30/08/2026: valore 51,7 di agosto dalla primaria, dichiarato come lettura di FRED
+# vecchia di 29 giorni e non aggiornata. Un LLM reale l'ha corretto, giustamente.
+# E' la stessa regola gia' applicata allo STORICO ("lo storico esce dalla stessa fonte del
+# valore"): qui vale per l'etichetta e per il calendario, che dalla fonte dipendono entrambi.
+FONTE_SERVITA: dict = {}
+
+
 def series_fallback(label, primary, fallback=None):
     try:
-        return primary()
+        s = primary()
+        FONTE_SERVITA[label] = "primaria"
+        return s
     except Exception as e:  # noqa: BLE001
         print(f"!! {label}: fonte primaria ko ({e}), provo fallback", file=sys.stderr)
         if fallback is None:
             raise
-        return fallback()
+        s = fallback()
+        FONTE_SERVITA[label] = "ripiego"
+        return s
 
 
 def fetch_macro():
@@ -2070,25 +2145,40 @@ def fetch_macro():
 
     # Serie FRED
     def yoy(series):
-        return round((series[-1][1] / series[-13][1] - 1) * 100, 1), series[-1][0]
+        return _var_per_data(series, 12)
 
     def mom(series):
-        return round((series[-1][1] / series[-2][1] - 1) * 100, 1), series[-1][0]
+        return _var_per_data(series, 1)
 
     # impact: 0 = molto negativo per i mercati, 100 = molto positivo
     indicators = []
     try:
-        v, d = yoy(series_fallback("cpi", lambda: fred_series("CPIAUCSL"),
-                                   lambda: bls_series("CUSR0000SA0")))
-        indicators.append({"key": "cpi", "label": "Inflazione CPI (a/a)", "value": f"{v}%", "date": d,
-                           "impact": round(clamp(100 - abs(v - 2) * 30))})
+        # ⚠ v393 — L'ANNO SU ANNO DEL CPI SI CALCOLA SULLA SERIE GREZZA, NON SU QUELLA
+        # DESTAGIONALIZZATA. Il BLS titola "prices rose X percent over the last 12 months"
+        # esplicitamente *on an unadjusted basis*, ed e' il numero che stampa la stampa e che
+        # un LLM trova cercando online. Misurato su luglio 2026: CPIAUCNS da' 3,36% -> "3,4%",
+        # CPIAUCSL 3,30% -> "3,3%". La destagionalizzazione serve al mese su mese, dove toglie
+        # il rumore stagionale; sull'anno su anno quel rumore si cancella da solo e resta solo
+        # la revisione annuale dei fattori, che fa divergere il nostro numero da quello
+        # pubblicato senza che nessuno dei due sia sbagliato. Ma "CPI a/a" ha UN significato
+        # solo per chi legge, e va prodotto quello.
+        v, d, mesi = yoy(series_fallback("cpi", lambda: fred_series("CPIAUCNS"),
+                                         lambda: bls_series("CUUR0000SA0")))
+        ind = {"key": "cpi", "label": "Inflazione CPI (a/a)", "value": f"{v}%", "date": d,
+               "impact": round(clamp(100 - abs(v - 2) * 30))}
+        if mesi != 12:
+            ind["span_mesi"] = mesi
+        indicators.append(ind)
     except Exception as e:  # noqa: BLE001
         print(f"!! cpi: {e}", file=sys.stderr)
     try:
-        v, d = yoy(series_fallback("pce", lambda: fred_series("PCEPI"),
-                                   lambda: dbnomics_series("BEA/NIPA-T20804/DPCERG-M")))
-        indicators.append({"key": "pce", "label": "Inflazione PCE (a/a)", "value": f"{v}%", "date": d,
-                           "impact": round(clamp(100 - abs(v - 2) * 30))})
+        v, d, mesi = yoy(series_fallback("pce", lambda: fred_series("PCEPI"),
+                                         lambda: dbnomics_series("BEA/NIPA-T20804/DPCERG-M")))
+        ind = {"key": "pce", "label": "Inflazione PCE (a/a)", "value": f"{v}%", "date": d,
+               "impact": round(clamp(100 - abs(v - 2) * 30))}
+        if mesi != 12:
+            ind["span_mesi"] = mesi
+        indicators.append(ind)
     except Exception as e:  # noqa: BLE001
         print(f"!! pce: {e}", file=sys.stderr)
     try:
@@ -2100,9 +2190,12 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! gdp: {e}", file=sys.stderr)
     try:
-        v, d = mom(fred_series("RSAFS"))
-        indicators.append({"key": "retail", "label": "Vendite al dettaglio (m/m)", "value": f"{v}%", "date": d,
-                           "impact": round(clamp(50 + v * 40))})
+        v, d, mesi = mom(fred_series("RSAFS"))
+        ind = {"key": "retail", "label": "Vendite al dettaglio (m/m)", "value": f"{v}%", "date": d,
+               "impact": round(clamp(50 + v * 40))}
+        if mesi != 1:
+            ind["span_mesi"] = mesi
+        indicators.append(ind)
     except Exception as e:  # noqa: BLE001
         print(f"!! retail: {e}", file=sys.stderr)
     try:
@@ -2126,6 +2219,8 @@ def fetch_macro():
         v = s[-1][1]
         indicators.append({"key": "umich", "label": "Fiducia consumatori (UMich)",
                            "value": f"{v}", "date": s[-1][0],
+                           # v393 — chi ha servito decide etichetta E calendario lato pagina
+                           "fonte": FONTE_SERVITA.get("umich", "primaria"),
                            "impact": round(clamp((v - 40) * 1.7))})
     except Exception as e:  # noqa: BLE001
         print(f"!! umcsent: {e}", file=sys.stderr)
@@ -2668,7 +2763,7 @@ def fetch_macro():
     # niente interpolazioni. Dove la fonte non ha pubblicato, non c'e' punto.
     STORICO_IND = [
         # chiave     serie FRED               trasformazione  quanti punti
-        ("cpi",      "CPIAUCSL",              "yoy",          60),
+        ("cpi",      "CPIAUCNS",              "yoy",          60),   # grezza: lo storico segue il valore
         ("pce",      "PCEPI",                 "yoy",          60),
         ("gdp",      "A191RL1Q225SBEA",       "diretta",      24),
         ("retail",   "RSAFS",                 "mom",          60),
@@ -2714,22 +2809,26 @@ def fetch_macro():
             punti = []
             if modo == "diretta":
                 punti = [{"d": d, "v": round(float(v), 2)} for d, v in s]
-            elif modo == "yoy":
-                for i in range(12, len(s)):
-                    prima = float(s[i - 12][1])
-                    if prima:
-                        punti.append({"d": s[i][0],
-                                      "v": round((float(s[i][1]) / prima - 1) * 100, 2)})
-            elif modo == "mom":
-                for i in range(1, len(s)):
-                    prima = float(s[i - 1][1])
-                    if prima:
-                        punti.append({"d": s[i][0],
-                                      "v": round((float(s[i][1]) / prima - 1) * 100, 2)})
-            elif modo == "delta_k":
-                # PAYEMS e' in migliaia di occupati: la variazione mensile E' il dato che si cita
-                for i in range(1, len(s)):
-                    punti.append({"d": s[i][0], "v": round(float(s[i][1]) - float(s[i - 1][1]))})
+            # ⚠⚠ v393 — ANCHE QUI L'AGGANCIO E' PER DATA, NON PER POSIZIONE. Lo storico
+            # soffriva dello stesso difetto del valore in evidenza (vedi `_var_per_data`): con
+            # ottobre 2025 assente da CPIAUCSL, `s[i - 12]` cadeva un mese troppo indietro e
+            # NOVE punti consecutivi da novembre 2025 uscivano gonfiati — il grafico sotto la
+            # scheda dell'inflazione raccontava una storia che i dati non contengono.
+            # ⚠ Dove la base esatta manca il punto NON si disegna: un buco non e' uno zero e
+            # non e' nemmeno un valore approssimato (v205). Meglio una linea interrotta di una
+            # linea continua che passa per un punto mai osservato.
+            elif modo in ("yoy", "mom", "delta_k"):
+                indietro = 12 if modo == "yoy" else 1
+                per_data = {d: float(v) for d, v in s}
+                for d, v in s:
+                    prima = per_data.get(_mese_meno(d, indietro))
+                    if prima is None:
+                        continue
+                    if modo == "delta_k":
+                        # PAYEMS e' in migliaia di occupati: la variazione mensile E' il dato citato
+                        punti.append({"d": d, "v": round(float(v) - prima)})
+                    elif prima:
+                        punti.append({"d": d, "v": round((float(v) / prima - 1) * 100, 2)})
             if len(punti) >= 3:
                 ind["storico"] = punti[-quanti:]
                 ind["storico_serie"] = ("sca.isr.umich.edu (fonte primaria)"

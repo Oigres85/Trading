@@ -2193,20 +2193,31 @@ check("v304 news: entrano solo con una data, e i forum restano vietati", suVeri(
    che si vede ogni fine settimana e molte mattine. Deve DIRE che non c'e' niente e quanto e'
    vecchia la piu' recente, perche' "non e' uscito niente di macro da mezza giornata" e' un
    fatto sul mondo, non un buco del sistema — e tacere lascerebbe l'LLM a dedurre. */
+/* ⚠⚠ v393 — QUESTO CHECK ERA UN FOSSILE VERDE PER DUE RAGIONI INSIEME, e le ho scoperte solo
+   quando il `data.json` sotto di lui e' tornato ad avere notizie:
+     1. cercava la stringa letterale "TITOLI MACRO DELLE ULTIME 6 ORE", che non esiste dalla
+        v389 (la finestra e' passata a otto ore e l'intestazione ha cambiato forma). E' la
+        TREDICESIMA volta che un check ancorato a una stringa si rompe in questo progetto;
+     2. usciva con `return true` quando `macro.news` mancava — e mancava SEMPRE, perche' le news
+        erano morte dalla nascita per l'`import html` assente. Cioe' il check che doveva
+        sorvegliare le notizie era verde proprio PERCHE' le notizie non funzionavano.
+   Ora e' agganciato al FATTO — entrambi i rami esistono e ciascuno dichiara cio' che deve — e i
+   due rami si ESERCITANO iniettando i dati, invece di sperare che lo snapshot li contenga. */
 check("v306 news: il pacchetto parla in entrambi i rami, fresche o nessuna", suVeri(`
-  const nw = (DATA.macro && DATA.macro.news) || null;
-  if (!nw || !(nw.voci || []).length) return true;
-  const p = buildPrompt();
-  const i = p.indexOf("TITOLI MACRO DELLE ULTIME 6 ORE");
-  if (i < 0) return false;
-  const blocco = p.slice(i, i + 1200);
-  const nessuna = blocco.indexOf("NESSUNO") >= 0;
-  if (nessuna) {
-    /* il ramo vuoto deve dichiarare l'eta' della piu' recente e che non e' un guasto */
-    return blocco.indexOf("piu' recente") >= 0 && blocco.indexOf("non un buco del sistema") >= 0;
-  }
-  return blocco.indexOf("SONO TITOLI, NON FATTI VERIFICATI") >= 0
-      && blocco.indexOf("non ha data di rilevazione") >= 0`));
+  const riga = (p) => p.split(String.fromCharCode(10)).find(x => x.indexOf("TITOLI MACRO") >= 0) || "";
+  DATA.macro = DATA.macro || {};
+  /* ramo PIENO: la riga deve dichiarare che sono titoli e non fatti verificati */
+  DATA.macro.news = { fonti: ["Prova"], filtro: "sintetico", voci: [
+    { titolo: "UNA-QUALSIASI", riassunto: "", fonte: "Prova",
+      quando: new Date(Date.now() - 36e5).toISOString() }] };
+  const pieno = riga(buildPrompt());
+  /* ramo VUOTO: deve dire che e' un dato MANCANTE, non un dato negativo */
+  DATA.macro.news = { fonti: ["Prova"], filtro: "sintetico", voci: [] };
+  const vuoto = riga(buildPrompt());
+  return pieno.indexOf("SONO TITOLI, NON FATTI VERIFICATI") >= 0
+      && pieno.indexOf("non ha data di rilevazione") >= 0
+      && vuoto.indexOf("MANCANTE") >= 0
+      && vuoto.indexOf("non come") >= 0`));
 
 /* ⚠⚠ v307 — LA SEZIONE NOTIZIE E' USCITA DALLA PAGINA su richiesta del CEO, un'ora dopo
    averla chiesta: con la finestra a sei ore che aveva fissato, misurata, dava ZERO. Il check
@@ -2222,10 +2233,15 @@ check("v307 news: il riquadro e' uscito dalla pagina", (() => {
   return src.indexOf("cal-news-lista") < 0 && html.indexOf('id="cal-news"') < 0;
 })());
 
+/* ⚠ stessa coppia di difetti del check qui sopra: stringa letterale piu' uscita anticipata.
+   Il fatto da sorvegliare e' che il pacchetto NOMINI le notizie, comunque sia formulato. */
 check("v307 news: ma restano nel pacchetto", suVeri(`
-  const nw = (DATA.macro && DATA.macro.news) || null;
-  if (!nw || !(nw.voci || []).length) return true;
-  return buildPrompt().indexOf("TITOLI MACRO DELLE ULTIME") >= 0`));
+  DATA.macro = DATA.macro || {};
+  DATA.macro.news = { fonti: ["Prova"], filtro: "sintetico", voci: [
+    { titolo: "RESTA-NEL-PACCHETTO", riassunto: "", fonte: "Prova",
+      quando: new Date(Date.now() - 36e5).toISOString() }] };
+  const p = buildPrompt();
+  return p.indexOf("TITOLI MACRO") >= 0 && p.indexOf("RESTA-NEL-PACCHETTO") >= 0`));
 
 /* ══ v305 — ANALISI DI UN SETTORE ═══════════════════════════════════════════════════════
    Richiesta del CEO dopo un'analisi esterna che ha portato. La struttura viene da quella —
@@ -4838,6 +4854,119 @@ check("meta: i check dormienti non aumentano (tetto TETTO_DORMIENTI, solo in dis
   finally { try { unlinkSync(tmp); } catch { /* gia' rimosso */ } }
   return n <= TETTO_DORMIENTI;
 })());
+
+/* ═══ v393 — I GRAFICI DELLA DISCIPLINA DI RISCHIO ═══════════════════════════════════════
+   ⚠ I check leggono l'HTML DAVVERO PRODOTTO, non il sorgente: in v226 un check che chiamava la
+   funzione pura direttamente era verde mentre la pagina disegnava uno spicchio fantasma. */
+check("v393 la disciplina di rischio disegna i tre grafici chiesti dal CEO", suVeri(`
+  const g = graficiDisciplina(disciplinaRischio());
+  const titoli = (g.match(/disc-graf-tit/g) || []).length;
+  const barre  = (g.match(/obar-row/g) || []).length;
+  const archi  = (g.match(/ciam-arco/g) || []).length;
+  return titoli === 3 && barre >= 5 && archi >= 2;`));
+
+/* ⚠⚠ LA PROPRIETA' CHE IL DIFETTO VIOLEREBBE PER COSTRUZIONE: nell'istogramma degli
+   scostamenti possono entrare SOLO regole misurate in percentuale dell'azionario. Mettere sullo
+   stesso asse le scommesse effettive (un conteggio), il drawdown (altro denominatore) o la
+   liquidita' (sedute) e' la classe "denominatori non dichiarati". Il check non conta le barre:
+   verifica che ogni riga disegnata abbia una soglia percentuale dichiarata dalla regola. */
+check("v393 nell'istogramma entrano solo le regole con lo STESSO denominatore", suVeri(`
+  const d = disciplinaRischio();
+  const per = (u) => d.regole.filter(r => r.unita === u).map(r => r.nome);
+  const disegnate = new Set(d.graf.scostamenti.map(s => s.nome));
+  /* tutte e sole le regole in percentuale dell'azionario stanno sull'asse */
+  const soloQuelle = d.graf.scostamenti.every(s => per("pct_azionario").includes(s.nome));
+  /* e nessuna delle altre unita' ci finisce: sono i denominatori che non si mescolano */
+  const altre = ["conteggio", "pct_valore_nel_tempo", "sedute"].flatMap(per);
+  const nessunaAltra = altre.length >= 3 && altre.every(n => !disegnate.has(n));
+  return soloQuelle && nessunaAltra && d.graf.scostamenti.length >= 2;`));
+
+/* i grafici e le righe devono essere LO STESSO numero: due derivazioni divergono (v161/v207) */
+check("v393 il grafico e la riga sotto di lui portano la stessa misura", suVeri(`
+  const d = disciplinaRischio();
+  return d.graf.scostamenti.every(s => {
+    const r = d.regole.find(x => x.nome === s.nome);
+    return r && Math.abs(r.valore - s.misura) < 1e-9
+             && Math.abs((r.valore - r.sogliaPct) - s.oltre) < 1e-9;
+  });`));
+
+check("v393 la torta del fattore nomina i titoli e somma a cento", suVeri(`
+  const f = disciplinaRischio().graf.fattore;
+  if (!f) return false;
+  return f.nomi.length >= 2 && f.nomi.every(n => typeof n === "string")
+      && Math.abs(f.dentro + f.fuori - 100) < 1e-6;`));
+
+/* ⚠ un mese senza trimestrali resta nell'asse: un buco fra due addensamenti e' informazione
+   quanto un picco, e toglierlo farebbe sembrare contigui due mesi che non lo sono. */
+/* ⚠⚠ IL GATE DEVE ESERCITARE IL RAMO, NON SPERARE CHE I DATI LO CONTENGANO. La prima stesura
+   asseriva la contiguita' sui dati veri — dove le trimestrali cadono in tre mesi CONSECUTIVI,
+   quindi comprimere o non comprimere dava lo stesso risultato e l'iniezione non mordeva: verde
+   per una ragione che non c'entrava col difetto. Qui il buco si CREA: due trimestrali a tre
+   mesi di distanza, e in mezzo devono comparire i mesi a zero. E' la lezione v234 — un ramo che
+   nessun test percorre non e' una protezione. */
+check("v393 il calendario tiene i mesi vuoti nell'asse invece di comprimerli", suVeri(`
+  const oggi = new Date();
+  const fra = (m) => new Date(oggi.getFullYear(), oggi.getMonth() + m, 15).toISOString().slice(0, 10);
+  DATA.macro = DATA.macro || {};
+  DATA.macro.sec_calendario = { per_titolo: {} };     // niente seconda derivazione a interferire
+  const az = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+    .filter(r => r && Number(r.qta ?? r.qty) > 0 && Number(r.pmc) > 0
+                 && !/^BTP|^BOT|^CCT|^IT000/i.test(String(r.ticker)));
+  az.forEach((r, i) => { r.earnings_date = fra(i === 0 ? 1 : 4); });   // mese +1 e mese +4
+  const e = disciplinaRischio().graf.eventi;
+  if (!e) return false;
+  const t = e.map(x => Number(x.mese.slice(0, 4)) * 12 + Number(x.mese.slice(5, 7)));
+  const contigui = t.every((v, i) => i === 0 || v === t[i - 1] + 1);
+  const conBuco = e.filter(x => x.pct === 0).length >= 2;   // i due mesi in mezzo, a zero
+  return e.length === 4 && contigui && conBuco;`));
+
+check("v393 i grafici sono agganciati al renderer, non solo definiti", (() => {
+  /* ⚠ la scansione TOGLIE I COMMENTI: iniettando "// graficiDisciplina(d)" un check ancorato
+     al sorgente grezzo resterebbe verde mentre i grafici spariscono dalla pagina (v389). */
+  const codice = src.split(String.fromCharCode(10))
+    .map(r => r.replace(/^\s*\/\/.*$/, "")).join(String.fromCharCode(10));
+  return /\+\s*graficiDisciplina\(d\)/.test(codice);
+})());
+
+/* ═══ v393 — LE NOTIZIE NON ANCORA PREZZATE NON SI CONTANO PER POI NASCONDERLE ════════════
+   Il pacchetto dichiarava "3 pubblicate DOPO l'ultima chiusura" e ne mostrava UNA: le altre due
+   sparivano perche' fuori dalle 8 ore. Una di quelle taciute parlava di high yield in tensione,
+   cioe' contraddiceva la riga sul credito dello stesso pacchetto. */
+/* ⚠ IL FENOMENO CI DEVE ESSERE PER COSTRUZIONE. La prima stesura usciva con `return true`
+   quando lo snapshot non aveva voci post-chiusura: verde per ASSENZA DI DATI, non di difetti —
+   la trappola gia' pagata quattro volte in questo progetto, e il meta-gate dei check dormienti
+   l'ha intercettata subito. Qui le notizie si INIETTANO: una dentro la finestra e due appena
+   dopo l'ultima campana. Sotto il codice vecchio le due sparivano; sotto quello nuovo ci sono. */
+check("v393 ogni notizia non ancora prezzata compare nell'elenco, dentro o fuori finestra", suVeri(`
+  const ch = lastUsEquityCloseUTC();
+  const t = (ms) => new Date(ms).toISOString();
+  DATA.macro = DATA.macro || {};
+  DATA.macro.news = { fonti: ["Prova"], filtro: "sintetico", voci: [
+    { titolo: "DENTRO-LA-FINESTRA-8H", riassunto: "", fonte: "Prova", quando: t(Date.now() - 36e5) },
+    { titolo: "POST-CHIUSURA-UNO",     riassunto: "", fonte: "Prova", quando: t(ch.at.getTime() + 1000) },
+    { titolo: "POST-CHIUSURA-DUE",     riassunto: "", fonte: "Prova", quando: t(ch.at.getTime() + 2000) },
+  ] };
+  const p = buildPrompt();
+  return p.includes("DENTRO-LA-FINESTRA-8H")
+      && p.includes("POST-CHIUSURA-UNO")
+      && p.includes("POST-CHIUSURA-DUE");`));
+
+check("v393 UMich dichiara la fonte che ha SERVITO il dato, non una fissa", (() => {
+  const codice = src.split(String.fromCharCode(10))
+    .map(r => r.replace(/^\s*\/\/.*$/, "")).join(String.fromCharCode(10));
+  /* la voce del ripiego esiste, e la scelta passa dal campo `fonte` dell'indicatore */
+  return codice.includes("umich_fred:")
+      && /i\.fonte === "ripiego" \? "umich_fred" : i\.key/.test(codice)
+      && codice.includes("FONTE PRIMARIA (sca.isr.umich.edu)");
+})());
+
+check("v393 il calendario di UMich e' quello della primaria: stesso mese, non il mese dopo", suVeri(`
+  /* la primaria pubblica il definitivo negli ultimi giorni dello STESSO mese che misura.
+     Col vecchio mesiRitardo la riga annunciava il prossimo dato con un mese di ritardo. */
+  const r = rigaCadenza("umich", "2026-08-01");
+  return r.includes("riferito a agosto 2026")
+      && r.includes("prossimo atteso 28/09/2026")
+      && !r.includes("via FRED");`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
