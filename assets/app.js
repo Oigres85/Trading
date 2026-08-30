@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "378";
+const BUILD_VERSION = "379";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1858,15 +1858,62 @@ function cadenzaDato(chiave, dataRilevazione) {
   };
 }
 
+/* ⚠ v392 — "rilevazione 2026-07-01" su una serie MENSILE si legge come una data puntuale, e
+   un LLM reale l'ha letta come data di PUBBLICAZIONE, obiettando che il pacchetto sbagliava
+   l'eta'. Non sbagliava: 2026-07-01 e' il mese di LUGLIO, e la pubblicazione e' un'altra cosa.
+   Stessa famiglia della riga trimestrale del PIL, e stesso rimedio: si scrive il periodo. */
+function meseEsteso(s) {
+  const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+                "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+  const t = String(s).slice(0, 10), m = Number(t.slice(5, 7));
+  return (m >= 1 && m <= 12) ? `${MESI[m - 1]} ${t.slice(0, 4)}` : t;
+}
+
 /* la riga da mostrare sotto una card macro e da mettere nel payload */
 function rigaCadenza(chiave, dataRilevazione) {
   const c = cadenzaDato(chiave, dataRilevazione);
   if (!c) return "";
   const it = (s) => { const [a, m, g] = [s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)]; return `${g}/${m}/${a}`; };
+  /* ═══ v392 — IL PERIODO DI RIFERIMENTO SI SCRIVE COME PERIODO, NON COME GIORNO ═══════
+     Il CEO ha incollato il referto di un LLM reale sul pacchetto: su TRE "correzioni" che
+     quel modello dichiarava di fare al sistema, DUE erano false e nascevano tutte e due da
+     questa riga.
+     · Sul PIL leggeva "riferito a 01/04/2026" e annunciava: "non e' piu' un dato riferito al
+       1 aprile, il BEA ha pubblicato la seconda stima del Q2 2026". Ma 01/04/2026 E' il Q2
+       2026 — e' la convenzione FRED/BEA per cui una serie trimestrale porta la data del
+       PRIMO GIORNO del trimestre. Il modello ha corretto una cosa giusta, e ha speso una
+       ricerca web per farlo.
+     · Sui fondi monetari leggeva "rilevazione 2026-07-01 — 61 giorni fa" e obiettava che il
+       dato "e' stato pubblicato il 25 agosto, quindi l'eta' dichiarata e' sbagliata".
+       Confondeva il PERIODO DESCRITTO con la DATA DI PUBBLICAZIONE — che il pacchetto
+       riporta gia', separatamente, due campi piu' in la'.
+     ⚠ Un dato mensile o trimestrale NON descrive un giorno: descrive un mese o un trimestre.
+     Scriverlo come "01/04/2026" e' formalmente esatto e comunicativamente falso — invita a
+     leggere una data puntuale dove c'e' un periodo, ed e' la stessa famiglia del percentile
+     scambiato per variazione (v316): la forma del numero suggerisce la grandezza sbagliata.
+     Ora il periodo si scrive per esteso, e la parola "pubblicato" resta solo dove significa
+     davvero "uscito". */
+  const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+                "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+  const periodo = (s) => {
+    const a = s.slice(0, 4), m = Number(s.slice(5, 7));
+    if (c.passo === "trimestrale") {
+      const q = Math.floor((m - 1) / 3) + 1;
+      const da = MESI[(q - 1) * 3], a2 = MESI[(q - 1) * 3 + 2];
+      return `al ${q}° trimestre ${a} (${da}-${a2})`;
+    }
+    if (c.passo === "mensile") return `a ${MESI[m - 1]} ${a}`;
+    return `al ${it(s)}`;      // giornaliero: il giorno E' il periodo
+  };
   const stessoGiorno = c.pubblicato === c.rilevato;
   return (stessoGiorno
       ? `rilevazione ${it(c.rilevato)} (${c.eta} giorni fa)`
-      : `riferito a ${it(c.rilevato)} · pubblicato ~${it(c.pubblicato)} (${c.eta} giorni fa)`)
+      /* ⚠ l'eta' conta i giorni dall'USCITA (scelta v343) ed e' scritta attaccata a
+         "pubblicato", che e' la data a cui si riferisce. La prima stesura di v392 ci aveva
+         appeso una parentesi che diceva il CONTRARIO — "non dalla pubblicazione" — cioe'
+         avevo aggiunto un'affermazione falsa mentre correggevo un'ambiguita'. Trovata
+         verificando da dove `eta` e' calcolata invece di assumerlo. */
+      : `riferito ${periodo(c.rilevato)} · pubblicato ~${it(c.pubblicato)} (${c.eta} giorni fa)`)
     + (c.scaduto
         ? ` · era atteso il ${it(c.prossimo)} e NON È ARRIVATO ⚠`
         : c.passata
@@ -8196,8 +8243,15 @@ function buildPrompt() {
        ordina all'LLM di verificare online ogni dato piu' vecchio di trenta giorni dicendogli
        quali sono: su questo non glielo diceva. */
     if (L.retail_mmf_bln != null) {
-      const eta = L.retail_date ? Math.round((Date.now() - new Date(L.retail_date)) / 86400000) : null;
-      bits.push(`Retail Cash: fondi monetari retail $${fmtNum.format(L.retail_mmf_bln)} mld (FRED RMFNS${L.retail_yoy_pct != null ? `, YoY ${signTxt(L.retail_yoy_pct)}` : ""}${L.retail_pctile_5y != null ? `, ${L.retail_pctile_5y}° percentile 5A` : ""}${L.retail_date ? `, rilevazione ${L.retail_date}${eta != null ? ` — ${eta} giorni fa, serie MENSILE: NON e' il dato di oggi` : ""}` : ""})`);
+      /* ⚠⚠ v392 — IL CONTEGGIO IN GIORNI E' USCITO, E MI HA PRESO DUE VOLTE NELLA STESSA
+         MODIFICA. `eta` misurava i giorni dal 2026-07-01, cioe' dall'INIZIO del mese descritto:
+         scriverlo come "il periodo e' finito N giorni fa" e' falso (luglio finisce il 31), e
+         scriverlo come "rilevazione N giorni fa" e' l'ambiguita' che un LLM reale ha scambiato
+         per la data di pubblicazione. Il nome del mese porta l'eta' senza ambiguita' e senza
+         un punto di riferimento da scegliere: "luglio 2026" letto il 30 agosto si data da se'.
+         Un numero che ha bisogno di una didascalia per non essere frainteso vale meno della
+         parola che lo rende inutile. */
+      bits.push(`Retail Cash: fondi monetari retail $${fmtNum.format(L.retail_mmf_bln)} mld (FRED RMFNS${L.retail_yoy_pct != null ? `, YoY ${signTxt(L.retail_yoy_pct)}` : ""}${L.retail_pctile_5y != null ? `, ${L.retail_pctile_5y}° percentile 5A` : ""}${L.retail_date ? `, riferito a ${meseEsteso(L.retail_date)}, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva` : ""})`);
     }
     if (bits.length) lines.push(`- Liquidità in attesa (dry powder di mercato, PROXY dichiarati): ${bits.join(" · ")} — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.`);
   }

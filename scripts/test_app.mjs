@@ -4155,8 +4155,16 @@ check("v350 cadenza: il periodo rilevato e la data di pubblicazione sono NOMINAT
      il periodo RILEVATO all'eta' della PUBBLICAZIONE senza dire quale fosse quale */
   const righe = t.split("\\n").filter(l => /giorni fa\\)/.test(l) && /rilevazione |riferito a /.test(l));
   if (!righe.length) return true;
-  return righe.every(l => /riferito a \\d{2}\\/\\d{2}\\/\\d{4} · pubblicato ~\\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l)
-                       || /rilevazione \\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l));`));
+  /* ⚠ v392 — RIAGGANCIATO AL FATTO. La prima stesura pretendeva "riferito a GG/MM/AAAA",
+     cioe' una FORMA: quando il periodo di riferimento e' diventato un periodo per esteso
+     ("riferito al 2° trimestre 2026", "riferito a luglio 2026") il check e' fallito su codice
+     piu' chiaro di prima. Dodicesima volta in questo progetto.
+     L'invariante che v350 esiste per difendere e' scritto nel commento qui sopra: le due date
+     devono essere NOMINATE e distinguibili, cosi' che l'eta' si attacchi a quella giusta.
+     Il periodo per esteso lo soddisfa MEGLIO di una data puntuale, non peggio. */
+  return righe.every(l =>
+       (/riferito (a|al) /.test(l) && /pubblicato ~\\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l))
+    || /rilevazione \\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l));`));
 
 
 check("v350 pre/after: un prezzo di ieri non si chiama 'adesso'", (() => {
@@ -5728,6 +5736,58 @@ check("v391 modifica: la frase in cima non poggia su una riga mezza vecchia", su
   try { renderRischio(); } finally { document.querySelector = vero; }
   const frase = (html.split("rischio-frasi")[1] || "").slice(0, 600);
   return !/MU pesa/.test(frase);`));
+
+/* ══ v392 — IL PERIODO DI RIFERIMENTO, DOPO CHE UN LLM REALE L'HA FRAINTESO DUE VOLTE ══ */
+
+check("v392 una serie mensile o trimestrale dichiara il PERIODO, non un giorno", suVeri(`
+  const p = buildPrompt();
+  /* il CEO ha incollato il referto di un LLM reale: su tre "correzioni" al sistema, DUE erano
+     false e nascevano tutte e due da "riferito a 01/04/2026" letto come una data puntuale.
+     01/04/2026 su una serie trimestrale E' il secondo trimestre — la convenzione FRED/BEA. */
+  const pil = p.split(String.fromCharCode(10)).find(x => x.startsWith("- PIL USA"));
+  const nfp = p.split(String.fromCharCode(10)).find(x => x.startsWith("- Non-Farm Payrolls"));
+  if (!pil || !nfp) return false;
+  /* ⚠ i backslash vanno RADDOPPIATI: dentro un template literal "\\d" diventa "d" e la regex
+     smette di essere quella che credi. E' la trappola che il meta-gate sorveglia, e mi ha
+     preso di nuovo qui. */
+  return /riferito al \\d° trimestre \\d{4} \\([a-z]+-[a-z]+\\)/.test(pil)
+      && !/riferito a \\d{2}\\/\\d{2}\\/\\d{4}/.test(pil)
+      && /riferito a [a-z]+ \\d{4}/.test(nfp)
+      && !/riferito a \\d{2}\\/\\d{2}\\/\\d{4}/.test(nfp);`));
+
+check("v392 il trimestre dichiarato e' quello GIUSTO per ogni mese d'inizio", (() => {
+  /* la convenzione: la data e' il PRIMO giorno del trimestre. Gennaio->1°, aprile->2°,
+     luglio->3°, ottobre->4°. Un errore qui sposterebbe un dato di tre mesi. */
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("const periodo = (s) => {");
+  const b = src.slice(i, src.indexOf("const stessoGiorno", i));
+  const q = (m) => Math.floor((m - 1) / 3) + 1;
+  return /Math\.floor\(\(m - 1\) \/ 3\) \+ 1/.test(b)
+      && q(1) === 1 && q(4) === 2 && q(7) === 3 && q(10) === 4
+      && q(3) === 1 && q(6) === 2 && q(9) === 3 && q(12) === 4;
+})());
+
+check("v392 l'eta' in giorni resta attaccata alla PUBBLICAZIONE, che e' cio' che misura", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("function rigaCadenza(");
+  const b = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  /* ⚠ la prima stesura di v392 aveva appeso all'eta' la frase "NON dalla pubblicazione",
+     che e' esattamente il contrario del vero (v343: eta = giorni dall'uscita). Correggendo
+     un'ambiguita' avevo introdotto un'affermazione falsa. */
+  const senzaCommenti = b.replace(/\/\*[\s\S]*?\*\//g, "");
+  return /pubblicato ~\$\{it\(c\.pubblicato\)\} \(\$\{c\.eta\} giorni fa\)/.test(senzaCommenti)
+      && !/NON dalla pubblicazione/.test(senzaCommenti);
+})());
+
+check("v392 i fondi monetari non dichiarano piu' un'eta' con un riferimento ambiguo", suVeri(`
+  const p = buildPrompt();
+  const r = p.split(String.fromCharCode(10)).find(x => x.indexOf("Retail Cash") >= 0);
+  if (!r) return true;
+  /* il mese per esteso si data da solo; un conteggio in giorni avrebbe bisogno di dire da
+     quale estremo del mese parte, e la prima stesura sbagliava proprio quello */
+  return /riferito a [a-z]+ \\d{4}/.test(r)
+      && !/rilevazione \\d{4}-\\d{2}-\\d{2}/.test(r)
+      && /NON e' la data in cui FRED lo ha pubblicato/.test(r);`));
 
 let fail = 0;
 for (const [name, ok] of T) {
