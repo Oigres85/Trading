@@ -1736,6 +1736,58 @@ collegamento, che toglie i commenti prima di leggere.
 salvataggio **riuscito**. Un messaggio che descrive il fallimento sbagliato manda a rifare
 un'operazione già fatta.
 
+## 📅 v392 — DUE FALSE CORREZIONI SU TRE, E VENIVANO DALLA STESSA RIGA
+
+Il CEO ha incollato il referto di un LLM reale sul pacchetto v375. Quel modello dichiarava **tre
+correzioni al sistema**: due erano **false**, e nascevano tutte e due dalla stessa forma.
+
+1. **PIL.** Leggeva `riferito a 01/04/2026` e annunciava: *"non è più un dato riferito al 1°
+   aprile: il BEA ha pubblicato la seconda stima del Q2 2026"*. Ma 01/04/2026 **è** il Q2 2026 —
+   è la convenzione FRED/BEA per cui una serie trimestrale porta la data del **primo giorno del
+   trimestre**. Ha corretto una cosa giusta, e ci ha speso una ricerca web.
+2. **Fondi monetari.** Leggeva `rilevazione 2026-07-01 — 61 giorni fa` e obiettava che *"il dato
+   è stato pubblicato il 25 agosto, quindi l'età dichiarata è sbagliata"*. Confondeva il
+   **periodo descritto** con la **data di pubblicazione** — che il pacchetto riporta già,
+   separatamente, in un altro campo.
+
+> **Un dato mensile o trimestrale non descrive un giorno: descrive un mese o un trimestre.**
+> Scriverlo come "01/04/2026" è formalmente esatto e **comunicativamente falso** — invita a
+> leggere una data puntuale dove c'è un periodo. È la famiglia del percentile scambiato per
+> variazione (v316): la forma del numero suggerisce la grandezza sbagliata.
+
+Ora il periodo si scrive per esteso: *"riferito al 2° trimestre 2026 (aprile-giugno)"*,
+*"riferito a luglio 2026"*. Il giorno resta solo dove il giorno **è** il periodo (serie
+giornaliere).
+
+### ⚠⚠ E correggendo l'ambiguità ho introdotto due volte una falsità precisa
+
+Vale più della correzione stessa, perché è la stessa classe che stavo chiudendo:
+
+- **Prima stesura**: ho appeso all'età la parentesi *"N giorni fa dalla fine del periodo
+  descritto, NON dalla pubblicazione"*. È **esattamente il contrario del vero**: `eta` conta i
+  giorni dall'USCITA, ed è una scelta deliberata annotata in v343. Trovata solo andando a
+  **leggere da dove `eta` è calcolata**, invece di assumerlo.
+- **Seconda stesura**, sui fondi monetari: *"il periodo descritto è finito 61 giorni fa"*. Falso:
+  quei 61 giorni partono dal **1° luglio**, cioè dall'INIZIO del mese. Luglio era finito da 30.
+
+Il rimedio non è stato scrivere una didascalia migliore: è stato **togliere il numero**. Il nome
+del mese si data da sé, e non ha un estremo da scegliere.
+
+> **Un numero che ha bisogno di una didascalia per non essere frainteso vale meno della parola
+> che lo rende inutile.**
+
+⚠ Il gate v350 pretendeva `riferito a GG/MM/AAAA` — una FORMA — ed è fallito su codice **più
+chiaro di prima** (dodicesima volta). Riagganciato all'invariante scritto nel suo stesso
+commento: le due date devono essere nominate e distinguibili, non avere un formato preciso.
+⚠ E il meta-gate dei backslash mi ha ripreso: `\d` dentro un template literal diventa `d`.
+
+### Cosa il referto ha CONFERMATO, oltre a quello che ha sbagliato
+Il modello ha dovuto cercarsi da solo la notizia macro dominante (il discorso del presidente
+della Fed sull'inflazione) — cioè esattamente uno dei titoli che il feed riparato in v389
+consegna già in coda. E ha sostituito le date stimate delle uscite con quelle confermate dalla
+fonte: è il lavoro che la v390 fa con SEC EDGAR. Due conferme indipendenti che quelle due
+correzioni servivano.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
