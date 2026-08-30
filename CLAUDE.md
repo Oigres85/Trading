@@ -1664,6 +1664,78 @@ il repository. Il passo è stato ritirato; lo script resta dormiente con la sua 
 `backtest_diary.mjs` legge per affiancare a ogni operazione del CEO ciò che il sistema diceva quel
 giorno. Cancellarlo distruggerebbe delle prove — ed è la ricevuta del taglio scritta *prima*.
 
+## 📊 v391 — QUINTA FORMA, E IL RAPPORTO RISCHIO/RENDIMENTO OVUNQUE
+
+Barra 0-100 → quadrante → ragnatela → scatter con diagonale → barre divergenti → **due barre
+affiancate**. Il CEO ha chiesto di cambiare ancora, e questa è l'unica famiglia che il progetto
+ha già misurato come leggibile senza istruzioni (v333): *due barre affiancate non chiedono di
+decodificare una scala — si vede quale è più lunga, e quella È la risposta*.
+
+⚠ Il CSS delle barre gemelle (`.cbars`, `.f-peso`, `.f-mcr`) era **rimasto orfano** da quando
+entrò lo scatter: la forma buona era già in casa, dismessa.
+
+⚠ Il **rapporto rischio/rendimento** sta in fondo a ogni riga e NON è un terzo asse: misura
+un'altra cosa, e disegnarlo accanto a peso e rischio suggerirebbe che siano commensurabili.
+
+## 🔄 v391 — IL GRAFICO SEGUIVA IL PORTAFOGLIO SOLO A METÀ
+
+`salvaPosizioni()` scriveva su GitHub e diceva *"si aggiornano al prossimo giro della
+pipeline"*: per due-quattro ore la sezione del rischio mostrava il portafoglio **vecchio**
+mentre il CEO ne guardava uno nuovo.
+
+Ora i pesi si ricalcolano subito. Ma il pezzo che conta è quello che **non** si può ricalcolare:
+
+> ⚠⚠ Il **contributo al rischio** richiede la matrice di covarianza sulle serie complete.
+> Ricalcolarlo dalle `sparks` darebbe un numero **plausibile e divergente** da quello pubblicato
+> (v316). Meglio un dato dichiarato in ritardo che uno inventato in tempo.
+
+Quindi dopo una modifica le due barre descrivono due libri leggermente diversi, e la sezione **lo
+dichiara** invece di lasciarlo dedurre.
+
+⚠⚠ **E LA FRASE IN CIMA NON PUÒ POGGIARE SU UNA RIGA MEZZA VECCHIA.** Misurato: portando MU da
+70 a 20 quote, il peso scende dal 23% al 6,9% mentre il rischio resta il 34% della pipeline, e
+la frase annunciava *"+27,1 pp di rischio in più di quanto il suo peso lasci pensare"* — un
+numero che non misura niente, **nella riga più letta della sezione**. La nota sotto lo
+dichiarava, ma la nota non è la frase che si legge. Ora gli estremi si scelgono fra le righe
+coerenti, e se non ne restano abbastanza la frase dice che non c'è niente da dire.
+
+## 📐 v391 — IL R/R NON ESISTEVA SU UN TITOLO NUOVO, E MESCOLAVA DUE FONTI SU UNO SEGUITO
+
+L'**intero blocco tecnico** era condizionato alla riga della pipeline: per un titolo non seguito
+spariva tutto, rapporto rischio/rendimento compreso — ed è proprio ciò che il CEO chiede di
+vedere quando analizza un'azione nuova. E su un titolo seguito era peggio che assente:
+resistenza e supporto venivano **dal vivo**, prezzo e ATR **dallo snapshot** — due basi dentro
+lo stesso rapporto (classe v230).
+
+Ora `daVivo` decide per tutti e tre gli ingressi, e l'ATR si calcola dalle barre vive.
+
+> ⚠⚠ **NON si usano `hi`, `lo` e `chiusure`**: sono filtrati **indipendentemente** con `ok()`,
+> quindi una barra a cui manca il solo minimo accorcia `lo` e disallinea tutti gli indici — il
+> massimo di martedì finirebbe accanto al minimo di mercoledì. Misurato: 120 contro 119. È
+> l'allineamento per POSIZIONE invece che per data, la classe della v207. Si costruiscono terne
+> allineate e si scartano le barre incomplete.
+
+⚠ Si pubblica **solo ciò che le barre vive sostengono**: RSI, medie, forza relativa e
+fondamentali restano assenti su un titolo nuovo. Ricostruirli da 260 barre darebbe numeri che
+sembrano giusti e non lo sono (v316).
+
+## 🧪 v391 — TRE GATE MIEI ANCORATI ALLA FORMA, E UN'INIEZIONE CHE NON MORDEVA
+
+Le guardie della v389 pretendevano `barreOrdinate(pt.map` e una frase letterale: alla forma
+successiva sono fallite **su codice corretto** (decima e undicesima volta). Riagganciate al
+fatto: che lo scatter non torni, e che le posizioni escluse siano nominate — quest'ultima ora
+legge **l'HTML davvero prodotto**, non il sorgente.
+
+⚠⚠ E un'iniezione **non mordeva**: togliendo la chiamata da `salvaPosizioni` tutti i check
+restavano verdi, perché la invocavano *direttamente*. Il grafico sarebbe tornato a restare
+indietro — cioè il difetto segnalato dal CEO — con la suite verde. Aggiunto il check sul
+collegamento, che toglie i commenti prima di leggere.
+
+⚠ Un errore di render dentro `applicaPosizioniInLocale` risaliva fino al `catch` di
+`salvaPosizioni`, che avrebbe annunciato *"non sono riuscito a scrivere su GitHub"* su un
+salvataggio **riuscito**. Un messaggio che descrive il fallimento sbagliato manda a rifare
+un'operazione già fatta.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

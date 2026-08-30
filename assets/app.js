@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "377";
+const BUILD_VERSION = "378";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -673,6 +673,41 @@ async function quotaLive(symbol, range = "1d") {
          calcolano SOLO sulle barre giornaliere. */
       sup20: !intraday && hi.length >= 20 ? Math.min(...lo.slice(-20)) : NaN,
       res20: !intraday && hi.length >= 20 ? Math.max(...hi.slice(-20)) : NaN,
+      /* ═══ v391 — ATR DAL VIVO, per il rapporto rischio/rendimento di un titolo NUOVO ═════
+         Il rapporto R/R e' (resistenza - prezzo) / (2 x ATR), e fino a qui l'ATR arrivava solo
+         da `data.json`: per un titolo che la pipeline non segue non esisteva, quindi il R/R
+         non compariva affatto. E per un titolo seguito era peggio che assente — i livelli
+         accanto venivano dal vivo e l'ATR dallo snapshot, cioe' due basi diverse dentro lo
+         stesso rapporto.
+         ⚠⚠ NON SI USANO `hi`, `lo` E `chiusure`: sono filtrati INDIPENDENTEMENTE l'uno
+         dall'altro con ok(), quindi una barra a cui manca il solo minimo accorcia `lo` e
+         disallinea tutti gli indici successivi — il massimo di martedi' finirebbe accanto al
+         minimo di mercoledi'. E' l'allineamento per POSIZIONE invece che per data, la classe
+         gia' pagata in v207 sui grafici macro. Qui si costruiscono TERNE allineate e si
+         scartano le barre incomplete.
+         ⚠ Il metodo e' quello di Wilder, lo stesso della pipeline: media esponenziale con
+         alfa 1/14 sul true range, non media semplice. Con una media semplice il numero sarebbe
+         plausibile e diverso da quello che il sistema pubblica per gli altri titoli. */
+      atr14: (() => {
+        if (intraday) return NaN;      // con barre da 5 minuti sarebbe un'altra grandezza
+        const H = b.high || [], L = b.low || [], C = b.close || [];
+        const barre = [];
+        for (let i = 0; i < H.length; i++) {
+          if (Number.isFinite(H[i]) && Number.isFinite(L[i]) && Number.isFinite(C[i])) {
+            barre.push({ h: H[i], l: L[i], c: C[i] });
+          }
+        }
+        if (barre.length < 15) return NaN;
+        const tr = [];
+        for (let i = 1; i < barre.length; i++) {
+          const p = barre[i - 1].c, x = barre[i];
+          tr.push(Math.max(x.h - x.l, Math.abs(x.h - p), Math.abs(x.l - p)));
+        }
+        if (tr.length < 14) return NaN;
+        let a = tr.slice(0, 14).reduce((s, v2) => s + v2, 0) / 14;   // primo valore: media semplice
+        for (let i = 14; i < tr.length; i++) a = (a * 13 + tr[i]) / 14;   // poi Wilder
+        return Number.isFinite(a) && a > 0 ? a : NaN;
+      })(),
       max52: !intraday && hi.length >= 200 ? Math.max(...hi) : NaN,
       min52: !intraday && lo.length >= 200 ? Math.min(...lo) : NaN,
       barre: hi.length,
@@ -2728,6 +2763,19 @@ const UNITA_INDICATORE = { nfp: "K", curve: " pp", curve3m: " pp", umich: "", ph
 
 
 const POSIZIONI_PATH = "config/posizioni.json";
+/* ═══ v391 — LE POSIZIONI TOCCATE DOPO L'ULTIMO GIRO DELLA PIPELINE ═══════════════════════
+   Il CEO: "un portafoglio il quale si modifica va ad aggiornare anche il grafico". Vero, ma
+   solo a meta', e la meta' che manca e' quella che conta: dopo una modifica i PESI si
+   ricalcolano subito (quantita' x prezzo), il CONTRIBUTO AL RISCHIO no — richiede la matrice
+   di covarianza sulle serie complete, che calcola la pipeline.
+   ⚠⚠ Ricalcolarlo qui dalle `sparks` darebbe un numero PLAUSIBILE E DIVERSO da quello
+   pubblicato: e' il divieto scritto in v316, dove un MACD calcolato lato pagina su serie
+   sotto-campionate produceva valori che sembravano giusti. Meglio un dato dichiarato in
+   ritardo che uno inventato in tempo.
+   Questo insieme tiene i nomi toccati, cosi' il grafico puo' MARCARLI invece di far credere
+   che le due barre parlino dello stesso libro. Non si persiste: vale per la sessione, che e'
+   esattamente la finestra fra la modifica e il giro successivo della pipeline. */
+let POSIZIONI_LOCALI_MODIFICATE = [];
 const WATCHLIST_PATH = "config/ui_watchlist.json";
 /* ⚠ v313 — il settore scelto per l'analisi. Il CEO ha tolto il selettore: si sceglie cliccando
    un comparto in "Rotazione", con la stessa logica del portafoglio. Una variabile sola, scritta
@@ -3077,13 +3125,70 @@ async function salvaPosizioni() {
         ? `Salvato: <b>${posizioni.length} posizioni</b>.`
           + (nuovi.length ? ` Ho aggiunto anche alla watchlist <b>${esc(nuovi.join(", "))}</b>, `
               + `altrimenti la pipeline non ne prenderebbe il prezzo e la riga resterebbe senza valore.` : "")
-          + ` I prezzi e i guadagni si aggiornano al prossimo giro della pipeline.`
+          + ` Pesi e grafici sono gia' aggiornati qui; il contributo al rischio e i prezzi si `
+          + `ricalcolano al prossimo giro della pipeline.`
         : `⚠ GitHub ha rifiutato la scrittura (codice ${fallita.stato}): ${perche(fallita)}.`
           + (fallita.dettaglio ? ` <span class="muted">Risposta di GitHub: ${esc(fallita.dettaglio)}</span>` : "")
           + ` Le posizioni non sono andate perse: restano scritte qui sopra finché non ricarichi la pagina.`;
     }
+    /* ⚠ v391 — IL GRAFICO SI AGGIORNA SUBITO, non al prossimo giro della pipeline.
+       Prima il salvataggio scriveva su GitHub e diceva "si aggiorna dopo": per due-quattro ore
+       la sezione del rischio mostrava il portafoglio VECCHIO mentre il CEO ne guardava uno
+       nuovo. Ora le quantita' entrano in DATA e la catena di render gira. */
+    if (ok1) applicaPosizioniInLocale(posizioni);
   } catch (e) {
     if (esito) esito.textContent = "Non sono riuscito a scrivere su GitHub: " + (e && e.message ? e.message : e);
+  }
+}
+
+/* Porta le posizioni appena salvate dentro DATA e ridisegna. Aggiorna SOLO cio' che si puo'
+   calcolare senza la pipeline: quantita', prezzo medio di carico, controvalore e guadagno.
+   ⚠ NON tocca `risk_contrib_pct`: quello resta il valore della pipeline, e i nomi toccati
+   finiscono in POSIZIONI_LOCALI_MODIFICATE perche' il grafico possa dichiararlo. */
+function applicaPosizioniInLocale(posizioni) {
+  if (!DATA || !Array.isArray(DATA.watchlist)) return;
+  const perTk = new Map(posizioni.map(p => [String(p.ticker).toUpperCase(), p]));
+  const toccati = [];
+  for (const r of DATA.watchlist) {
+    const tk = String(r.ticker || "").toUpperCase();
+    const p = perTk.get(tk);
+    const qPrima = numero(r.qta) || 0, pmcPrima = numero(r.pmc) || 0;
+    const qDopo = p ? numero(p.qta) || 0 : 0, pmcDopo = p ? numero(p.pmc) || 0 : 0;
+    if (qPrima === qDopo && pmcPrima === pmcDopo) continue;
+    toccati.push(tk);
+    r.qta = qDopo || null;
+    r.pmc = pmcDopo || null;
+    const px = numero(r.price);
+    /* il controvalore e' in EURO come lo pubblica la pipeline: le azioni in dollari vanno
+       convertite, altrimenti il peso di una posizione USD risulterebbe gonfiato del cambio. */
+    const fx = numero(DATA.eurusd) || 1;
+    if (qDopo > 0 && Number.isFinite(px)) {
+      r.controvalore = (r.currency === "EUR" ? 1 : 1 / fx) * px * qDopo;
+      r.gain_pct_pos = pmcDopo > 0 ? (px / pmcDopo - 1) * 100 : null;
+    } else {
+      r.controvalore = null; r.gain_pct_pos = null;
+    }
+  }
+  /* una posizione NUOVA non e' in DATA.watchlist: la pipeline non l'ha mai vista, quindi non
+     ha prezzo. Si registra il nome perche' il grafico dica che manca, invece di ignorarla. */
+  for (const p of posizioni) {
+    const tk = String(p.ticker).toUpperCase();
+    if (!DATA.watchlist.some(r => String(r.ticker || "").toUpperCase() === tk)) toccati.push(tk);
+  }
+  POSIZIONI_LOCALI_MODIFICATE = [...new Set([...POSIZIONI_LOCALI_MODIFICATE, ...toccati])];
+  if (typeof recomputeTotals === "function") recomputeTotals();
+  /* ⚠ v391 — IL RIDISEGNO E' ISOLATO DALLA SCRITTURA, e non e' pedanteria: questa funzione
+     viene chiamata DOPO che il salvataggio su GitHub e' riuscito. Se il render sollevasse
+     un'eccezione, questa risalirebbe fino al `catch` di `salvaPosizioni`, che direbbe "non sono
+     riuscito a scrivere su GitHub" — cioe' annuncerebbe la perdita di un salvataggio che INVECE
+     E' ANDATO A BUON FINE. Un messaggio d'errore che descrive il fallimento sbagliato e' peggio
+     di nessun messaggio: manda a rifare un'operazione gia' fatta.
+     ⚠ Il catch NON e' silenzioso: i dati locali sono comunque aggiornati, e l'errore va in
+     console perche' chi apre gli strumenti lo trovi. */
+  try {
+    if (typeof renderAll === "function") renderAll();
+  } catch (e) {
+    console.error("posizioni aggiornate in locale, ma il ridisegno e' fallito:", e);
   }
 }
 
@@ -5215,31 +5320,28 @@ function renderRischio() {
         <td>${x.eff != null && !x.indice ? `${fmtNum.format(Math.round(x.eff * 10) / 10)} <span class="muted">su ${x.n}</span>` : "<span class=\"muted\">1 (&egrave; un indice)</span>"}</td></tr>`).join("")
     + `</tbody></table>`;
 
-  /* ═══ v389 — LA DIAGONALE E' USCITA: IL CEO NON LA CAPIVA, E AVEVA RAGIONE ═════════════
-     "Peso contro contributo al rischio — sopra la diagonale la posizione porta piu' varianza
-     del suo peso": era uno scatter con una diagonale tratteggiata, e per leggerlo bisognava
-     sapere che cosa vuol dire "sopra la diagonale". Cioe' bisognava sapere che i due assi hanno
-     la stessa unita', che la bisettrice e' il luogo peso==rischio, e che la distanza da quella
-     retta e' il messaggio. Tre nozioni prima di poter guardare.
+  /* ═══ v391 — BARRE GEMELLE, E IL RAPPORTO RISCHIO/RENDIMENTO ACCANTO ══════════════════
+     Quinta forma per la stessa domanda: barra 0-100 → quadrante → ragnatela → scatter con
+     diagonale → barre divergenti da zero → DUE BARRE AFFIANCATE. Il CEO ha chiesto di cambiare
+     ancora tipologia, e questa e' l'unica famiglia che il progetto ha misurato come leggibile
+     senza istruzioni (v333): *due barre affiancate non chiedono di decodificare una scala — si
+     vede quale e' piu' lunga, e quella E' la risposta*.
+     Rispetto alle barre divergenti cambia cosa si guarda: li' si leggeva la DIFFERENZA e i due
+     valori di partenza stavano nel suggerimento; qui si vedono i due valori, e la differenza e'
+     scritta a destra. Per una riga sola e' equivalente; per tredici righe insieme, due barre
+     allineate sullo stesso asse si confrontano fra loro, una differenza no.
 
-     ⚠⚠ E' LA STESSA REGOLA GIA' PAGATA TRE VOLTE IN QUESTO PROGETTO (barra → quadrante →
-     ragnatela, v225-v228): *un grafico che va spiegato non e' un grafico leggibile, per
-     elegante che sia*. E la correzione non e' rifinire la forma — assi piu' chiari, etichette
-     piu' grandi — ma CAMBIARE FAMIGLIA. Uno scatter rifinito resta uno scatter.
+     ⚠ Il CEO ha chiesto anche il RAPPORTO RISCHIO/RENDIMENTO di ogni posizione. Sta in fondo
+     a ogni riga e NON e' un terzo asse: e' un numero, perche' misura un'altra cosa (quanto puoi
+     guadagnare fino alla resistenza contro due volte l'ATR di rischio) e disegnarlo accanto a
+     peso e rischio suggerirebbe che siano commensurabili. Non lo sono.
 
-     Quello che c'e' ora e' la stessa famiglia della rotazione settoriale, che il CEO legge
-     senza istruzioni: barre che divergono da zero, ordinate. La grandezza disegnata NON e' piu'
-     una coppia di coordinate da confrontare a mente — e' gia' la differenza, in punti
-     percentuali: `rischio% - peso%`. Sopra lo zero la posizione porta piu' varianza del suo
-     peso, sotto ne porta meno, e non c'e' niente da decodificare perche' il numero E' la
-     risposta. I due valori di partenza restano accanto a ogni riga, cosi' non si perde nulla.
-
-     ⚠ IL DENOMINATORE VA DICHIARATO (regola v205, "denominatori non dichiarati"): peso e
-     rischio stanno ENTRAMBI sul solo comparto azionario e sulle sole posizioni che la pipeline
-     ha potuto misurare — chi non ha abbastanza sedute in comune non e' nel calcolo, e il suo
-     nome viene scritto invece di sparire. Sommano tutti e due a 100% sullo STESSO insieme:
-     senza quello, "23% del capitale contro 34% del rischio" sarebbero due frazioni con basi
-     diverse. */
+     ⚠⚠ IL RISCHIO E' DELLA PIPELINE, IL PESO PUO' ESSERE DI ADESSO. Quando il CEO modifica il
+     portafoglio, i pesi si ricalcolano subito ma il contributo al rischio no: richiede la
+     matrice di covarianza, che la pipeline calcola sulle serie complete. Ricalcolarlo dalle
+     `sparks` darebbe un numero che SEMBRA giusto e diverge da quello pubblicato (v316). Quindi
+     dopo una modifica le due barre descrivono due libri leggermente diversi, e la sezione LO
+     DICHIARA invece di lasciarlo dedurre — e' la classe dei denominatori non dichiarati (v205). */
   const conMcr = [...((DATA && DATA.watchlist) || [])]
     .filter(r => r && numero(r.qta) > 0 && numero(r.controvalore) > 0 && Number.isFinite(numero(r.risk_contrib_pct)));
   const mappa = $("#rischio-mappa");
@@ -5252,29 +5354,39 @@ function renderRischio() {
       const tot = conMcr.reduce((a, r) => a + numero(r.controvalore), 0);
       const pt = conMcr.map(r => {
         const peso = numero(r.controvalore) / tot * 100, mcr = numero(r.risk_contrib_pct);
-        return { tk: r.ticker, peso, mcr, gap: mcr - peso };
+        return { tk: r.ticker, peso, mcr, gap: mcr - peso, rr: r.risk_reward || null };
       }).sort((a, b) => b.gap - a.gap);
-      /* le posizioni che il calcolo NON copre: si nominano, non si tolgono in silenzio */
       const fuori = [...((DATA && DATA.watchlist) || [])]
         .filter(r => r && numero(r.qta) > 0 && numero(r.controvalore) > 0
                   && !Number.isFinite(numero(r.risk_contrib_pct)))
         .map(r => r.ticker);
-      const peggio = pt[0], meglio = pt[pt.length - 1];
+      /* le posizioni toccate dopo l'ultimo giro della pipeline: il loro peso e' aggiornato,
+         il loro contributo al rischio no, e la riga va marcata */
+      const stale = new Set(POSIZIONI_LOCALI_MODIFICATE || []);
+      const max = Math.max(...pt.map(p => Math.max(p.peso, p.mcr))) || 1;
+      /* ⚠⚠ v391 — LA FRASE IN CIMA NON PUO' POGGIARE SU UNA RIGA MEZZA VECCHIA.
+         Misurato simulando una modifica: portando MU da 70 a 20 quote il peso scende dal 23%
+         al 6,9% mentre il contributo al rischio resta il 34% della pipeline, e la frase
+         annunciava "+27,1 pp di rischio in piu' di quanto il suo peso lasci pensare" — un
+         numero che non misura niente, perche' confronta il libro nuovo col rischio del
+         vecchio. La nota sotto lo dichiarava, ma la frase in cima e' quella che si legge, ed
+         era la piu' sbagliata della sezione.
+         Gli estremi si scelgono quindi fra le righe COERENTI; se non ne restano abbastanza, la
+         frase dice che non c'e' niente da dire finche' la pipeline non ha rigenerato. */
+      const coerenti = pt.filter(p => !stale.has(p.tk));
+      const peggio = coerenti[0], meglio = coerenti[coerenti.length - 1];
       const p1 = (v) => `${fmtNum.format(Math.round(v * 10) / 10)}%`;
-      /* ⚠ "il 11,8%" invece di "l'11,8%": la stessa svista gia' pagata in v372 ("il 83,4%").
-         In italiano l'articolo si elide davanti a numero che si LEGGE con vocale iniziale —
-         uno, otto, undici, diciotto, ottanta... — e la cifra iniziale non basta a saperlo:
-         1 e' "uno" (elide) ma 12 e' "dodici" (no). Si guarda quindi il numero letto, non il
-         primo carattere. */
-      const ilPct = (v) => {
-        const n = Math.abs(Math.round(v * 10) / 10);
-        const intero = Math.floor(n);
-        const elide = intero === 1 || intero === 8 || intero === 11 || intero === 18
-          || (intero >= 80 && intero <= 89);
-        return `${elide ? "l'" : "il "}${p1(v)}`;
-      };
       const pp = (v) => `${v > 0 ? "+" : ""}${fmtNum.format(Math.round(v * 10) / 10)} pp`;
-      const frase = peggio && peggio.gap > 0.5
+      const ilPct = (v) => {
+        const i = Math.floor(Math.abs(Math.round(v * 10) / 10));
+        return `${(i === 1 || i === 8 || i === 11 || i === 18 || (i >= 80 && i <= 89)) ? "l'" : "il "}${p1(v)}`;
+      };
+      const frase = coerenti.length < 2
+        ? `<b>Il confronto fra peso e rischio non e' leggibile in questo momento.</b> Hai appena `
+          + `modificato ${stale.size === 1 ? "una posizione" : `${stale.size} posizioni`} e il contributo al `
+          + `rischio e' ancora quello calcolato sui pesi di prima: mettere i due numeri accanto `
+          + `descriverebbe un libro che non esiste. Torna leggibile al prossimo giro della pipeline.`
+        : peggio && peggio.gap > 0.5
         ? `<b>${esc(peggio.tk)} pesa ${ilPct(peggio.peso)} del tuo capitale azionario e ne porta `
           + `${ilPct(peggio.mcr)} delle oscillazioni.</b> Sono ${pp(peggio.gap)} di rischio in piu' di quanto `
           + `il suo peso lasci pensare: non perche' sia grande, ma perche' si muove insieme agli altri.`
@@ -5285,28 +5397,40 @@ function renderRischio() {
           + `il contributo al rischio segue la dimensione: e' il caso in cui ridurre un nome riduce il `
           + `rischio in proporzione, che non e' sempre vero.`;
       mappa.innerHTML = `<div class="rischio-frasi" style="margin-top:14px"><div>${frase}</div></div>`
-        + `<div class="muted" style="margin:10px 0 6px"><b>Quanto rischio porta ogni posizione in piu' `
-        + `(o in meno) del suo peso</b> — barra a destra dello zero: porta piu' oscillazioni di quanto `
-        + `pesa; a sinistra: meno. Passa sopra una riga per i due numeri di partenza.</div>`
-        + barreOrdinate(pt.map(p => ({
-            nome: p.tk,
-            valore: Math.round(p.gap * 10) / 10,
-            testo: pp(p.gap),
-            colore: p.gap >= 0 ? "var(--red)" : "var(--green)",
-            suggerimento: `pesa ${p1(p.peso)} del capitale azionario, porta ${p1(p.mcr)} del rischio`,
-          })), {
-            nota: `Peso e rischio sono <b>due frazioni dello stesso insieme</b>: le ${pt.length} posizioni `
-              + `azionarie che la pipeline ha potuto misurare, e sommano entrambe a 100%. `
-              + (fuori.length
-                ? `⚠ <b>${fuori.map(esc).join(", ")}</b> ${fuori.length === 1 ? "non e' nel calcolo" : "non sono nel calcolo"} `
-                  + `— storia troppo corta in comune con le altre — quindi ${fuori.length === 1 ? "il suo peso non e'" : "il loro peso non e'"} `
-                  + `dentro questi 100%. Non e' un giudizio sul ${fuori.length === 1 ? "titolo" : "titoli"}: e' un dato mancante. `
-                : "")
-              + `Il rischio non e' la perdita attesa: e' la quota di oscillazione del libro attribuibile a `
-              + `ciascun nome, dalle correlazioni misurate. Un nome puo' portare piu' rischio del suo peso `
-              + `perche' e' piu' volatile, oppure perche' si muove insieme a chi gli sta accanto — ed e' il `
-              + `secondo caso quello che non si vede guardando le posizioni una per una.`,
-          });
+        + (stale.size
+          ? `<div class="muted struct-note" style="margin:10px 0 0"><b>&#9888; ${[...stale].map(esc).join(", ")}: `
+            + `peso aggiornato adesso, rischio ancora quello della pipeline.</b> Il contributo al rischio `
+            + `richiede la matrice di covarianza sulle serie complete e si ricalcola solo al prossimo giro `
+            + `(~2-4 ore). Fino ad allora, su ${stale.size === 1 ? "questa riga" : "queste righe"} le due barre `
+            + `descrivono due libri leggermente diversi — non e' un errore di calcolo, e' un dato che deve `
+            + `ancora arrivare.</div>` : "")
+        + `<div class="chart-legend" style="margin-top:12px">`
+        + `<span><span class="lg-dot" style="background:var(--blue)"></span>quanto pesa (capitale)</span>`
+        + `<span><span class="lg-dot" style="background:var(--purple)"></span>quanto rischio porta</span>`
+        + `<span>a destra: differenza e rapporto rischio/rendimento</span></div>`
+        + `<div class="cbars">` + pt.map(p => `<div class="cbar-row">
+            <span class="cbar-tk" data-graf-tk="${esc(p.tk)}" title="Mostra ${esc(p.tk)} nel grafico">${esc(p.tk)}${stale.has(p.tk) ? " &#9888;" : ""}</span>
+            <span class="cbar-track">
+              <span class="cbar-line"><span class="cbar-bar"><span class="cbar-fill f-peso" style="width:${(p.peso / max * 100).toFixed(1)}%"></span></span><span class="cbar-num">${p1(p.peso)}</span></span>
+              <span class="cbar-line"><span class="cbar-bar"><span class="cbar-fill f-mcr" style="width:${(p.mcr / max * 100).toFixed(1)}%"></span></span><span class="cbar-num">${p1(p.mcr)}</span></span>
+            </span>
+            <span class="cbar-gap ${p.gap > 2 ? "g-bad" : p.gap > 0.5 ? "g-warn" : "g-ok"}">${pp(p.gap)}<br>
+              <span class="cbar-num">${p.rr ? `R/R ${esc(p.rr)}` : "R/R n.d."}</span></span>
+          </div>`).join("") + `</div>`
+        + `<div class="muted struct-note">Le due barre stanno sulla <b>stessa scala</b> e sullo stesso `
+        + `insieme — le ${pt.length} posizioni azionarie che la pipeline ha potuto misurare — e sommano `
+        + `entrambe a 100%. `
+        + (fuori.length
+          ? `⚠ <b>${fuori.map(esc).join(", ")}</b> ${fuori.length === 1 ? "non e' nel calcolo" : "non sono nel calcolo"} `
+            + `(storia troppo corta in comune), quindi ${fuori.length === 1 ? "il suo peso non e'" : "il loro peso non e'"} `
+            + `dentro questi 100%: e' un dato mancante, non un giudizio. ` : "")
+        + `Il <b>rapporto rischio/rendimento</b> e' un'altra grandezza e per questo non ha una barra: `
+        + `misura quanto c'e' da guadagnare fino alla resistenza contro due volte l'ATR di rischio, `
+        + `posizione per posizione. "1:2" vuol dire due di guadagno potenziale per uno di rischio. `
+        + `⚠ E' calcolato sul prezzo di adesso, quindi cambia col prezzo: non e' una proprieta' del titolo. `
+        + `⚠ Un nome puo' portare piu' rischio del suo peso perche' e' piu' volatile, oppure perche' si `
+        + `muove insieme a chi gli sta accanto — ed e' il secondo caso quello che non si vede guardando `
+        + `le posizioni una per una.</div>`;
     }
   }
   const nota = $("#rischio-note");
@@ -10325,14 +10449,32 @@ function fattiTitolo(tk) {
                       /* ⚠ v328 — il valore in data.json puo' essere ancora quello VECCHIO,
                          misurato dal supporto e quindi gonfiato fino a sedici volte. Finche' il
                          CI non ha rigenerato si ricalcola qui dal prezzo che si pagherebbe. */
+                      /* ⚠⚠ v391 — IL RAPPORTO SEGUE LA STESSA FONTE DEI LIVELLI CHE STANNO
+                         ACCANTO. Prima leggeva SOLO da `riga`, cioe' dallo snapshot della
+                         pipeline, e questo produceva due difetti:
+                         · su un titolo NUOVO (che la pipeline non segue) `riga` e' null, quindi
+                           il rapporto non compariva affatto — ed e' esattamente cio' che il CEO
+                           ha chiesto di vedere quando analizza un'azione nuova;
+                         · su un titolo seguito, con i dati dal vivo disponibili, resistenza e
+                           supporto venivano dal VIVO mentre prezzo e ATR dallo SNAPSHOT: due
+                           basi diverse dentro lo stesso rapporto, che e' la classe v230 —
+                           "quando esistono due letture della stessa grandezza a freschezze
+                           diverse, la difesa va agganciata a quella su cui si decide".
+                         Ora la fonte e' UNA: `daVivo` decide per tutto il rapporto, come gia'
+                         decide per i livelli. */
                       rischioRendimento: (() => {
-                        const p = numero(riga.prezzo_limite_aggiustato ?? riga.price);
-                        const res = numero(riga.resistance), atr = numero(riga.atr_14);
+                        const p = daVivo
+                          ? numero(vivo && (vivo.ext && vivo.ext.price) != null ? vivo.ext.price : storia.price)
+                          : numero(riga && (riga.prezzo_limite_aggiustato ?? riga.price));
+                        const res = daVivo ? numero(storia.res20) : numero(riga && riga.resistance);
+                        const atr = daVivo ? numero(storia.atr14) : numero(riga && riga.atr_14);
                         if (![p, res, atr].every(Number.isFinite) || atr <= 0 || res <= p) return null;
                         return `1:${Math.round((res - p) / (2 * atr) * 10) / 10}`;
                       })(),
-                      rischioRendimentoBase: riga.risk_reward_base
-                        || (riga.prezzo_limite_aggiustato != null ? "prezzo esteso" : "ultima chiusura"),
+                      rischioRendimentoBase: daVivo
+                        ? "prezzo e livelli dal vivo (Yahoo), ATR(14) di Wilder sulle stesse barre"
+                        : ((riga && riga.risk_reward_base)
+                           || (riga && riga.prezzo_limite_aggiustato != null ? "prezzo esteso" : "ultima chiusura")),
                       w52hi: numero(daVivo ? storia.max52 : riga.w52_high),
                       w52lo: numero(daVivo ? storia.min52 : riga.w52_low),
                       /* v308 — la posizione, quando c'e': il pacchetto non deve piu' negare di saperlo */
@@ -10350,7 +10492,31 @@ function fattiTitolo(tk) {
                         const eur = (x) => (x.currency === 'EUR' ? 1 : 1 / fx) * numero(x.price) * numero(x.qta);
                         const tot = tutte.reduce((a2, x) => a2 + eur(x), 0);
                         return tot > 0 ? { pct: Math.round(eur(riga) / tot * 1000) / 10, quante: tutte.length } : null;
-                      })() } : null,
+                      })() }
+      /* ═══ v391 — UN TITOLO NUOVO NON E' PIU' UN BLOCCO VUOTO ══════════════════════════
+         Qui c'era `: null`, quindi per un titolo che la pipeline NON segue l'intero blocco
+         tecnico spariva — e con lui il rapporto rischio/rendimento, che e' proprio cio' che il
+         CEO ha chiesto di vedere quando analizza un'azione nuova.
+         ⚠⚠ SI PUBBLICA SOLO CIO' CHE LE BARRE VIVE SOSTENGONO, e nient'altro. RSI, medie,
+         forza relativa, Sortino, fondamentali e peso nel libro restano ASSENTI: sono calcoli
+         della pipeline su serie complete, e ricostruirli qui da 260 barre darebbe numeri che
+         SEMBRANO giusti e non lo sono — e' il divieto scritto in v316, e vale ancora.
+         Quello che le barre vive sostengono davvero e' il rapporto rischio/rendimento:
+         resistenza a 20 sedute, prezzo e ATR(14) di Wilder vengono tutti dalle STESSE barre,
+         quindi il rapporto e' omogeneo per costruzione. */
+      : (daVivo ? {
+          rischioRendimento: (() => {
+            const p = numero(storia.price), res = numero(storia.res20), atr = numero(storia.atr14);
+            if (![p, res, atr].every(Number.isFinite) || atr <= 0 || res <= p) return null;
+            return `1:${Math.round((res - p) / (2 * atr) * 10) / 10}`;
+          })(),
+          rischioRendimentoBase: "prezzo, resistenza a 20 sedute e ATR(14) di Wilder, tutti dalle "
+            + "stesse barre giornaliere Yahoo scaricate ora",
+          atr: numero(storia.atr14),
+          atrPct: Number.isFinite(numero(storia.atr14)) && numero(storia.price) > 0
+            ? Math.round(numero(storia.atr14) / numero(storia.price) * 1000) / 10 : null,
+          soloDalVivo: true,
+        } : null),
   };
 }
 

@@ -5433,23 +5433,37 @@ check("v389 news: dentro la finestra le pubblica e le conta", suVeri(`
       && /Notizia macro appena uscita sui tassi/.test(p)
       && /SONO TITOLI, NON FATTI VERIFICATI/.test(p);`));
 
-check("v389 peso/rischio: la diagonale e' sparita e resta la differenza gia' calcolata", (() => {
+check("v389 peso/rischio: la diagonale non torna e la differenza resta gia' calcolata", (() => {
   const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
   const css = readFileSync(join(ROOT, "assets", "style.css"), "utf8");
-  /* il CEO non leggeva lo scatter: l'invariante non e' "non c'e' piu' l'SVG", e' che la
-     grandezza mostrata sia gia' la differenza e che il denominatore sia dichiarato */
+  /* ⚠ v391 — RIAGGANCIATO. La prima stesura pretendeva `barreOrdinate(pt.map`, cioe' UNA
+     implementazione: alla forma successiva (barre gemelle, chiesta dal CEO) e' fallita su
+     codice corretto. E' la decima volta in questo progetto che un check ancorato alla forma
+     invece che al fatto si rompe su una riformulazione.
+     L'invariante vero non e' "quale grafico": e' che lo scatter con la diagonale — la forma che
+     il CEO non riusciva a leggere — non torni, e che la DIFFERENZA fra peso e rischio sia
+     calcolata dal sistema invece di essere lasciata da stimare a occhio. */
   return !/class="mappa-rischio"/.test(src) && !/class="diag"/.test(src)
-      && /gap: mcr - peso/.test(src)
-      && /barreOrdinate\(pt\.map/.test(src)
-      && !/\.mappa-rischio/.test(css);
+      && !/\.mappa-rischio/.test(css)
+      && /gap: mcr - peso/.test(src);
 })());
 
-check("v389 peso/rischio: le posizioni fuori dal calcolo vengono NOMINATE, non tolte in silenzio", (() => {
-  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
-  /* SKHY non ha abbastanza sedute in comune: il suo peso non e' dentro i 100%, e va detto */
-  return /non e' nel calcolo|non sono nel calcolo/.test(src)
-      && /due frazioni dello stesso insieme/.test(src);
-})());
+check("v389 peso/rischio: le posizioni fuori dal calcolo vengono NOMINATE, non tolte in silenzio", suVeri(`
+  /* ⚠ v391 — girava sul SORGENTE cercando una frase, e la frase e' cambiata con la forma del
+     grafico. Ora gira sull'HTML DAVVERO PRODOTTO da renderRischio sui dati veri: SKHY non ha
+     abbastanza sedute in comune, quindi il suo peso non e' dentro i 100% e il nome deve
+     comparire. Un check che legge il sorgente certifica cio' che c'e' scritto; uno che legge
+     l'uscita certifica cio' che l'utente vede. */
+  let html = "";
+  const vero = document.querySelector;
+  document.querySelector = (sel) => String(sel) === "#rischio-mappa"
+    ? { set innerHTML(v) { html = v; }, get innerHTML() { return html; } }
+    : vero(sel);
+  try { renderRischio(); } finally { document.querySelector = vero; }
+  const senzaMcr = (DATA.watchlist || []).filter(r => r && r.qta > 0 && r.controvalore > 0
+    && !Number.isFinite(Number(r.risk_contrib_pct))).map(r => r.ticker);
+  if (!senzaMcr.length) return true;   /* niente esclusi: niente da dichiarare */
+  return senzaMcr.every(t => html.includes(t)) && /non e' nel calcolo|non sono nel calcolo/.test(html);`));
 
 check("v389 collaudo: ENTRAMBI i pacchetti chiedono freschezza, congruita' e affidabilita'", suVeri(`
   /* richiesta esplicita del CEO: le tre verifiche devono essere chieste a chi legge, non
@@ -5582,6 +5596,138 @@ check("v390 il ramo degli ALLARMI non contiene ordini — ramo mai percorso prim
   /* e la lista non si pubblica due volte con due formulazioni diverse */
   const unaVolta = (p.match(/margin_debt/g) || []).length <= 3;
   return acceso && senzaOrdini && unaVolta;`));
+
+/* ══ v391 — RAPPORTO RISCHIO/RENDIMENTO OVUNQUE, E IL GRAFICO CHE SEGUE IL PORTAFOGLIO ══ */
+
+check("v391 R/R: emerge anche su un titolo che la pipeline NON segue", suVeri(`
+  /* il CEO: "lo stesso rapporto rischio/rendimento deve emergere anche quando analizzo
+     un'azione nuova". Prima l'INTERO blocco tecnico era condizionato alla riga della
+     pipeline, quindi per un titolo non seguito non compariva nulla. */
+  const T = "ZZTEST";
+  const H = [], L = [], C = [];
+  let p = 100;
+  for (let i = 0; i < 260; i++) { p = p * (1 + Math.sin(i / 11) * 0.008 + 0.0004); H.push(p * 1.012); L.push(p * 0.988); C.push(p); }
+  const tr = [];
+  for (let i = 1; i < H.length; i++) tr.push(Math.max(H[i] - L[i], Math.abs(H[i] - C[i - 1]), Math.abs(L[i] - C[i - 1])));
+  let a = tr.slice(0, 14).reduce((s, v) => s + v, 0) / 14;
+  for (let i = 14; i < tr.length; i++) a = (a * 13 + tr[i]) / 14;
+  quoteLive.set(T, { price: C[C.length - 1], chgPct: 0.4, ext: null, valuta: "USD" });
+  quoteLive.set(T + "|1y", { price: C[C.length - 1], sup20: Math.min(...L.slice(-20)),
+    res20: Math.max(...H.slice(-20)), max52: Math.max(...H), min52: Math.min(...L),
+    barre: 260, valuta: "USD", ext: null, atr14: a });
+  const f = fattiTitolo(T);
+  quoteLive.delete(T); quoteLive.delete(T + "|1y");
+  if (!f.tecnici || !f.tecnici.rischioRendimento) return false;
+  /* il valore deve essere quello vero, non un placeholder */
+  const atteso = Math.round((Math.max(...H.slice(-20)) - C[C.length - 1]) / (2 * a) * 10) / 10;
+  return f.tecnici.rischioRendimento === "1:" + atteso && f.tecnici.soloDalVivo === true;`));
+
+check("v391 R/R su titolo nuovo: NON inventa gli altri tecnici della pipeline", suVeri(`
+  /* ⚠ le barre vive sostengono il R/R, non RSI/medie/forza relativa/fondamentali: quelli sono
+     calcoli della pipeline su serie complete, e ricostruirli da 260 barre darebbe numeri che
+     sembrano giusti e non lo sono (v316). */
+  const T = "ZZTEST2";
+  quoteLive.set(T, { price: 100, chgPct: 0, ext: null, valuta: "USD" });
+  quoteLive.set(T + "|1y", { price: 100, sup20: 90, res20: 120, max52: 130, min52: 80,
+    barre: 260, valuta: "USD", ext: null, atr14: 5 });
+  const f = fattiTitolo(T);
+  quoteLive.delete(T); quoteLive.delete(T + "|1y");
+  const t = f.tecnici || {};
+  return t.rischioRendimento === "1:2"
+      && t.rsi === undefined && t.sma50 === undefined && t.rs1m === undefined
+      && t.eps === undefined && t.pesoLibro === undefined;`));
+
+check("v391 ATR dal vivo: terne allineate, non tre array filtrati a parte", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("      atr14: (() => {");
+  const b = src.slice(i, src.indexOf("      })(),", i));
+  /* ⚠⚠ hi/lo/chiusure sono filtrati INDIPENDENTEMENTE con ok(): usarli per l'ATR accosterebbe
+     il massimo di un giorno al minimo di un altro. Misurato: con una sola barra incompleta le
+     lunghezze diventano 120 e 119. E' l'allineamento per posizione invece che per data (v207). */
+  return /b\.high \|\| \[\]/.test(b) && /b\.low \|\| \[\]/.test(b) && /b\.close \|\| \[\]/.test(b)
+      && /Number\.isFinite\(H\[i\]\) && Number\.isFinite\(L\[i\]\) && Number\.isFinite\(C\[i\]\)/.test(b)
+      && !/\bok\(/.test(b)
+      && /a \* 13 \+ tr\[i\]\) \/ 14/.test(b);          // Wilder, non media semplice
+})());
+
+check("v391 R/R: una sola fonte per prezzo, resistenza e ATR", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("rischioRendimento: (() => {");
+  const b = src.slice(i, src.indexOf("})(),", i));
+  /* la classe v230: due letture della stessa grandezza a freschezze diverse dentro un
+     rapporto. Il ramo dal vivo deve usare valori VIVI per tutti e tre gli ingressi.
+     ⚠ v391 — la prima stesura contava "daVivo ?" e falliva perche' il primo va a capo prima
+     del punto interrogativo: contava la FORMA, non il fatto. Undicesima volta in questo
+     progetto. L'invariante e' che i tre ingressi vengano dalla stessa fonte viva. */
+  return /storia\.price/.test(b) && /storia\.res20/.test(b) && /storia\.atr14/.test(b)
+      && /riga && riga\.resistance/.test(b) && /riga && riga\.atr_14/.test(b);
+})());
+
+check("v391 grafico: due barre affiancate e il R/R di ogni posizione", suVeri(`
+  let html = "";
+  const vero = document.querySelector;
+  document.querySelector = (sel) => String(sel) === "#rischio-mappa"
+    ? { set innerHTML(v) { html = v; }, get innerHTML() { return html; } } : vero(sel);
+  try { renderRischio(); } finally { document.querySelector = vero; }
+  const righe = (html.match(/class="cbar-row"/g) || []).length;
+  const rr = (html.match(/R\\/R /g) || []).length;
+  /* una riga per posizione, e ognuna porta il proprio rapporto rischio/rendimento */
+  return righe >= 3 && rr === righe
+      && /f-peso/.test(html) && /f-mcr/.test(html)
+      && !/<svg/.test(html);`));
+
+check("v391 modifica: il SALVATAGGIO chiama l'aggiornamento locale, non solo la funzione esiste", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("async function salvaPosizioni()");
+  const b = src.slice(i, src.indexOf("\nfunction applicaPosizioniInLocale", i));
+  /* ⚠ v391 — questo check nasce da un'iniezione che NON mordeva: gli altri chiamano
+     applicaPosizioniInLocale direttamente, quindi togliere la chiamata da salvaPosizioni li
+     lasciava tutti verdi mentre il grafico tornava a restare indietro fino al giro successivo
+     della pipeline — cioe' esattamente il difetto che il CEO ha segnalato.
+     ⚠ E la scansione toglie i commenti: una chiamata commentata non e' una chiamata (v213,
+     v240, v389 — terza volta che questa trappola si ripresenta). */
+  const senzaCommenti = b.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  return /^\s*if \(ok1\) applicaPosizioniInLocale\(posizioni\);/m.test(senzaCommenti);
+})());
+
+check("v391 modifica del portafoglio: i pesi si aggiornano subito", suVeri(`
+  const prima = DATA.watchlist.find(r => r.ticker === "MU").controvalore;
+  const pos = DATA.watchlist.filter(r => r && r.qta > 0)
+    .map(r => ({ ticker: r.ticker, qta: r.ticker === "MU" ? 20 : r.qta, pmc: r.pmc }));
+  applicaPosizioniInLocale(pos);
+  const dopo = DATA.watchlist.find(r => r.ticker === "MU").controvalore;
+  return Number.isFinite(dopo) && dopo < prima * 0.5;`));
+
+check("v391 modifica: il rischio NON viene ricalcolato a mano, e lo si dichiara", suVeri(`
+  const mcrPrima = DATA.watchlist.find(r => r.ticker === "MU").risk_contrib_pct;
+  const pos = DATA.watchlist.filter(r => r && r.qta > 0)
+    .map(r => ({ ticker: r.ticker, qta: r.ticker === "MU" ? 20 : r.qta, pmc: r.pmc }));
+  applicaPosizioniInLocale(pos);
+  const mcrDopo = DATA.watchlist.find(r => r.ticker === "MU").risk_contrib_pct;
+  let html = "";
+  const vero = document.querySelector;
+  document.querySelector = (sel) => String(sel) === "#rischio-mappa"
+    ? { set innerHTML(v) { html = v; }, get innerHTML() { return html; } } : vero(sel);
+  try { renderRischio(); } finally { document.querySelector = vero; }
+  /* il contributo al rischio resta quello della pipeline (ricalcolarlo dalle sparks darebbe
+     un numero plausibile e divergente, v316) e la riga toccata viene NOMINATA */
+  return mcrDopo === mcrPrima && /MU/.test(html)
+      && /peso aggiornato adesso, rischio ancora quello della pipeline/.test(html);`));
+
+check("v391 modifica: la frase in cima non poggia su una riga mezza vecchia", suVeri(`
+  /* il difetto misurato: portando MU da 70 a 20 quote la frase annunciava "+27,1 pp di rischio
+     in piu'", che confronta il peso NUOVO col rischio VECCHIO — un numero che non misura
+     niente, nella riga piu' letta della sezione. */
+  const pos = DATA.watchlist.filter(r => r && r.qta > 0)
+    .map(r => ({ ticker: r.ticker, qta: r.ticker === "MU" ? 20 : r.qta, pmc: r.pmc }));
+  applicaPosizioniInLocale(pos);
+  let html = "";
+  const vero = document.querySelector;
+  document.querySelector = (sel) => String(sel) === "#rischio-mappa"
+    ? { set innerHTML(v) { html = v; }, get innerHTML() { return html; } } : vero(sel);
+  try { renderRischio(); } finally { document.querySelector = vero; }
+  const frase = (html.split("rischio-frasi")[1] || "").slice(0, 600);
+  return !/MU pesa/.test(frase);`));
 
 let fail = 0;
 for (const [name, ok] of T) {
