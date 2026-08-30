@@ -36,9 +36,16 @@ import pandas as pd
 import requests
 import yfinance as yf
 
+from rumore_yf import zittisci_yfinance   # fonte UNICA, condivisa col rapporto
+
 # yfinance logga internamente ("$TICKER: possibly delisted", 404 quoteSummary) su indici/ticker
-# flaky: catturiamo già le eccezioni a valle, qui zittiamo il logger per non inquinare stderr.
-logging.getLogger("yfinance").setLevel(logging.CRITICAL)
+# flaky: catturiamo già le eccezioni a valle, quindi il muro per titolo non deve inquinare stderr.
+# ⚠⚠ MA NON SI BUTTANO: prima qui c'era setLevel(CRITICAL), che le SCARTAVA. Conseguenza vera,
+#    non teorica: quando Yahoo blocca il CI la pipeline non lasciava NESSUNA traccia del perché —
+#    la stessa classe della seduta persa (v383/v384), una degradazione che non si vede. Ora si
+#    raccolgono e si riassumono per causa alla fine del run: 200 righe diventano 3, e quelle 3
+#    dicono se a fermarci è stata la rete, il rate limit o davvero un titolo.
+_RUMORE_YF, _ = zittisci_yfinance()
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "data.json"
@@ -4838,6 +4845,13 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     # NaN/Infinity non sono JSON validi per il browser → li converto in null prima di scrivere
     OUT.write_text(json.dumps(clean_nan(data), ensure_ascii=False, indent=1))
+    # ⚠ IL RIASSUNTO VA IN FONDO, dove il log del CI lo mostra senza scorrere, e va stampato
+    #   ANCHE quando il run è riuscito: un run che scrive data.json dopo 200 rifiuti di Yahoo
+    #   è riuscito a metà, e prima non c'era modo di saperlo.
+    if _RUMORE_YF.righe:
+        print(f"⚠ yfinance ha protestato {len(_RUMORE_YF.righe)} volte in questo run:")
+        for _r in _RUMORE_YF.riassunto():
+            print(f"   causa: {_r}")
     print(f"OK -> {OUT} ({OUT.stat().st_size // 1024} KB)")
 
 

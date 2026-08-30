@@ -1477,11 +1477,28 @@ ostile** invece di aggirarla.
 > Quando due moduli configurano lo stesso logger globale, chi importa prima decide cosa l'altro
 > riesce a vedere. Un test che gira su un solo ordine di import non lo scopre mai.
 
-**Da decidere, e non fatto qui**: quel `setLevel(CRITICAL)` fa sì che la **pipeline** butti via
-le proteste di Yahoo senza contarle. Quando il CI viene bloccato, `update_data.py` non lascia
-traccia — la stessa classe della seduta persa (v383/v384). Non l'ho toccato: è il file della
-Regola Suprema e non posso osservarne l'esecuzione da qui, che è esattamente la trappola v203
-("logica provata, fetch mai provata").
+**E poi è stato fatto** (stessa sessione): quel `setLevel(CRITICAL)` faceva sì che la
+**pipeline** buttasse via le proteste di Yahoo **senza contarle**. Quando il CI veniva bloccato,
+`update_data.py` non lasciava traccia del perché — un run degradato che si presenta come riuscito,
+la stessa classe della seduta persa (v383/v384). Ora la pipeline usa la stessa raccolta e stampa
+il riassunto **in fondo al run**, dove il log del CI lo mostra, **anche quando il run riesce**:
+un run che scrive `data.json` dopo 200 rifiuti di Yahoo è riuscito a metà.
+
+⚠ Il cambiamento è di sola diagnostica: non tocca il flusso, e la trappola v203 ("logica provata,
+fetch mai provata") non si applica perché ciò che si prova qui è il **logging**, non la fetch — il
+check emette sul logger vero e guarda dove finisce il messaggio. Ciò che resta non osservabile da
+qui è il run in CI, e infatti non se ne afferma nulla.
+
+⚠⚠ **La raccolta vive in `scripts/rumore_yf.py`, e una copia sola.** Serve al rapporto E alla
+pipeline: duplicarla sarebbe stata la classe v161/v207 al primo ritocco. Un check in ENTRAMBE le
+suite verifica che nessuno dei due la reimplementi in casa — validato iniettando la copia, e
+morde in tutte e due.
+
+⚠ **La ricevuta del taglio ha morso mentre spostavo la raccolta fuori da `rapporto.py`**: la
+prima stesura contava solo `^class|^def` a colonna zero e falliva sui metodi annidati. Riscritta
+per contare **tutte** le dichiarazioni di primo livello, che è la lezione v238-v239 — la pagina
+è andata morta in produzione proprio perché un `assert` contava le `function` e a essere portato
+via era stato un `let`.
 
 ### I grafici raccolti non dicevano come si chiamano
 Cinque riquadri, 23 grafici e 3 tabelle, e **nessuna intestazione**: il CEO non poteva sapere

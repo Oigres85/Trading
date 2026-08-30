@@ -423,7 +423,8 @@ check("il codice d'uscita dice la verita': non esce 0 senza aver prodotto scenar
 #   vive. E' la classe v315 (una dichiarazione che c'e' e non si trova non e' una dichiarazione)
 #   applicata all'output di un comando. Qui NON si prova che il rumore sparisce: si prova che
 #   la CAUSA sopravvive, che e' l'unica cosa che il muro faceva perdere.
-_racc = RP.RaccoltaYF()
+import rumore_yf as RY
+_racc = RY.RaccoltaYF()
 _racc.righe = (["Failed to perform, curl: (7) CONNECT tunnel failed, response 403"] * 3
                + ["$MU: possibly delisted; no price data found"] * 5
                + ["Cookie/crumb fetch failed (ConnectionError), continuing without crumb"] * 2
@@ -438,7 +439,7 @@ check("la causa di rete viene prima del delisting, che e' dichiarato una consegu
 check("un messaggio mai visto non viene inghiottito: viene contato e citato",
       any("non classificati" in x and "mai visto" in x for x in _r))
 check("senza proteste il riassunto e' vuoto — non inventa una causa",
-      RP.RaccoltaYF().riassunto() == [])
+      RY.RaccoltaYF().riassunto() == [])
 
 # ⚠ COMPORTAMENTALE: si prova sul logger VERO, non rileggendo il sorgente. Un messaggio
 #   emesso mentre la cattura e' attiva deve finire nella raccolta e NON su stderr; e dopo
@@ -450,19 +451,31 @@ _lg = logging.getLogger("yfinance")
 #   rapporto.py non importa la pipeline — cioe' per l'ordine degli import, non per costruzione.
 #   Qui la condizione ostile si RIPRODUCE apposta, invece di essere aggirata.
 _lg.setLevel(logging.CRITICAL)
+# ⚠ LA PROPRIETA' E' "torna ESATTAMENTE com'era", non "torna vuoto". La prima stesura asseriva
+#   handlers == [], e si e' rotta appena la pipeline ha cominciato a tenere la propria raccolta
+#   attiva: l'assunzione era sul valore, non sull'invariante. Si fotografa lo stato e si verifica
+#   che il ripristino lo rimetta, chiunque altro abbia toccato il logger prima.
+_stato_prima = (list(_lg.handlers), _lg.propagate, _lg.level)
 _prima_p = _lg.propagate
 _err = io.StringIO()
-_racc2, _ripristina = RP.zittisci_yfinance()
+_racc2, _ripristina = RY.zittisci_yfinance()
 with contextlib.redirect_stderr(_err):
     _lg.error("possibly delisted; no price data found")
 _ripristina()
 check("mentre la cattura e' attiva il messaggio va nella raccolta, non su stderr",
       _racc2.righe == ["possibly delisted; no price data found"] and _err.getvalue() == "")
-check("dopo il ripristino il logger torna com'era: livello compreso",
-      _lg.handlers == [] and _lg.propagate == _prima_p and _lg.level == logging.CRITICAL)
+check("dopo il ripristino il logger torna ESATTAMENTE com'era: handler, propagate, livello",
+      (list(_lg.handlers), _lg.propagate, _lg.level) == _stato_prima)
 _lg.setLevel(logging.NOTSET)
 check("il ripristino avviene anche quando analizza() esplode: e' in un finally",
       "finally:" in srcR and "ripristina()" in srcR)
+# ⚠ UNA COPIA SOLA. La raccolta serve al rapporto E alla pipeline: due implementazioni della
+#   stessa domanda divergono al primo ritocco (classe v161/v207, pagata piu' volte). Il check
+#   verifica che nessuno dei due la reimplementi in casa.
+_srcU_txt = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+check("la raccolta ha UNA fonte sola, importata sia dal rapporto sia dalla pipeline",
+      "from rumore_yf import" in srcR and "from rumore_yf import" in _srcU_txt
+      and "class RaccoltaYF" not in srcR and "class RaccoltaYF" not in _srcU_txt)
 
 # ── 10. il comando /aggiorna non resta indietro rispetto al sistema (v387) ─────────────
 # ⚠⚠ Il modo in cui un comando smette di essere utile non e' rompersi: e' RESTARE INDIETRO.

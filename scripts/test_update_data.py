@@ -792,6 +792,37 @@ check("v367 credito e combustione portano la valuta del BILANCIO, non quella del
 check("v367 le settimane FINRA pubblicate a meta' sono marcate incomplete, non usate",
       '(ats > 0) != (otc > 0)' in _SRC_UD and '"incompleta"' in _SRC_UD)
 
+# ── v387: la pipeline CONTA le proteste di Yahoo, non le butta ─────────────────────────
+# ⚠⚠ Prima nel sorgente c'era `logging.getLogger("yfinance").setLevel(logging.CRITICAL)`, che
+#   le SCARTAVA. Conseguenza vera e non teorica: quando Yahoo blocca il CI la pipeline non
+#   lasciava nessuna traccia del perche' — un run degradato che si presenta come riuscito,
+#   la stessa classe della seduta persa (v383/v384).
+import io as _io, contextlib as _cl, logging as _lo
+_srcU = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+check("il silenziamento a CRITICAL non c'e' piu': le proteste si raccolgono",
+      "setLevel(logging.CRITICAL)" not in _srcU and "_RUMORE_YF" in _srcU)
+check("la raccolta viene dalla fonte unica, non reimplementata nella pipeline",
+      "from rumore_yf import" in _srcU and "class RaccoltaYF" not in _srcU)
+# ⚠ COMPORTAMENTALE: si emette sul logger vero e si guarda dove finisce, invece di rileggere
+#   il sorgente. La sintassi valida non dice niente sull'esecuzione (v238).
+_lg_yf = _lo.getLogger("yfinance")
+_err_yf = _io.StringIO()
+_n_prima = len(ud._RUMORE_YF.righe)
+with _cl.redirect_stderr(_err_yf):
+    _lg_yf.error("$MU: possibly delisted; no price data found")
+    _lg_yf.error("curl: (7) CONNECT tunnel failed, response 403")
+check("un messaggio di yfinance finisce nella raccolta della pipeline, non su stderr",
+      len(ud._RUMORE_YF.righe) == _n_prima + 2 and _err_yf.getvalue() == "")
+_riass = ud._RUMORE_YF.riassunto()
+check("e la pipeline sa dire la CAUSA: il blocco di rete, e il delisting come conseguenza",
+      any("403" in x for x in _riass) and any("conseguenza del blocco" in x for x in _riass))
+# ⚠ il riassunto va stampato ANCHE quando il run riesce: un run che scrive data.json dopo 200
+#   rifiuti di Yahoo e' riuscito a meta', e prima non c'era modo di saperlo.
+_coda = _srcU[_srcU.rindex("OUT.write_text"):]
+check("il riassunto si stampa in fondo al run, non solo in caso di fallimento",
+      "_RUMORE_YF.righe" in _coda and "_RUMORE_YF.riassunto()" in _coda)
+
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)

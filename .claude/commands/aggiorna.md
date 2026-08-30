@@ -151,7 +151,9 @@ aggiorna"*. In concreto:
 Gli strumenti per un nome solo — `soglie.py TICKER`, `analisi_libro.py TICKER`,
 `pacchetto_verdetto.py TICKER` — restano fuori per costruzione: qui l'oggetto è il libro.
 `scripts/modifica_sicura.py` non è un passo di questo comando: è la libreria che ogni modifica ai
-sorgenti deve usare, e la verifica che gira nel `pre-commit`.
+sorgenti deve usare, e la verifica che gira nel `pre-commit`. `scripts/rumore_yf.py` è la libreria
+che raccoglie e riassume per causa le proteste di yfinance: la usano il rapporto e la pipeline, ed
+è una sola perché due copie divergerebbero al primo ritocco.
 
 ⚠ Un gate verifica che questo elenco sia COMPLETO: ogni script del repo deve essere o eseguito
 qui, o dichiarato fuori qui, con la sua ragione. Se domani nasce uno strumento nuovo e nessuno
