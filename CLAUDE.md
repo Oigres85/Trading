@@ -1584,6 +1584,86 @@ che il libro è concentrato "per sei misure indipendenti", mentre sono le stesse
 Stessa classe delle cinque variabili della v206, rimasta aperta su un alias. Il giallo di avviso
 del progetto è già `--yellow`: l'alias ci punta, non introduce un secondo tono.
 
+## 🏛️ v390 — TRE FONTI NUOVE, E OGNUNA NASCE SORVEGLIATA
+
+La lezione della v389 è costata la vita intera di una funzionalità: **una fonte che nessun check
+guarda può morire il giorno in cui nasce**. Le tre nuove entrano nel gate di qualità *insieme* al
+codice che le scarica, non dopo il primo guasto.
+
+### SEC EDGAR — la data della trimestrale smette di essere solo una stima
+La regola più operativa della disciplina di rischio — *quanta parte del libro riprezza nella
+stessa finestra di tre settimane* — poggiava interamente su `earnings_date` di yfinance, che il
+pacchetto stesso dichiara una STIMA. **Una regola costruita su date stimate si sposta da sola.**
+
+L'8-K con **item 2.02** ("Results of Operations") è il deposito con cui la società comunica i
+risultati, e ha una data vera. Gratis, senza chiave. Ora ci sono **due derivazioni indipendenti**
+della prossima uscita — la stima di yfinance e la cadenza dei depositi veri — e dove esistono
+entrambe si prende **la più vicina**: una finestra di eventi si sottostima allontanando le date,
+mai avvicinandole. Dove divergono di più di una settimana, il pacchetto lo scrive.
+
+Misurato sul libro: **MRVL non aveva alcuna data** e EDGAR la fornisce; su GOOGL e NVDA le due
+derivazioni divergono di 8 giorni, e la finestra di rischio d'evento passa da 70,9% a 64,9%
+proprio perché una data si è spostata.
+
+> ⚠⚠ **LA CADENZA SI PUBBLICA SOLO SE È PLAUSIBILMENTE TRIMESTRALE (80-100 giorni).** Misurato su
+> MSTR: deposita 8-K/2.02 anche **fuori** dal ciclo (2025-10-06, 2025-07-07), la mediana crolla a
+> 67 giorni e l'attesa che ne uscirebbe sbaglia di **24 giorni**. Fuori banda si pubblica il
+> deposito e si tace sull'attesa — *un numero che sembra una misura e non lo è è peggio di nessun
+> numero* (v199).
+
+⚠ **Gli emittenti esteri non hanno l'8-K**: SK hynix e TSMC depositano 6-K e 20-F. Per loro EDGAR
+non risponde alla domanda, e va **dichiarato**: "nessuna data da EDGAR" e "nessuna trimestrale" si
+leggono uguali e sono cose diverse.
+
+### SLOOS e NFCI — chi presta, non solo quanto costa
+Il canale credito è quello che colpisce **prima** le partecipate che non si autofinanziano, e il
+sistema lo misurava con il solo spread high yield. **Uno spread è un PREZZO**: dice quanto il
+mercato chiede per prestare, non se le banche stiano prestando. Sono due domande diverse che
+possono rispondere in tempi diversi, e il pacchetto dichiara che **non sono una seconda conferma
+dello stesso segnale** ma l'altro lato del canale.
+
+> ⚠ **IL SEGNO DI SLOOS NON È INTUITIVO e va scritto ogni volta**: un valore NEGATIVO significa
+> che le banche stanno ALLENTANDO, cioè è la lettura favorevole. Pubblicare "-8,3" senza dirlo è
+> la classe del percentile invertito (v316), dove la lettura si ribaltava in silenzio.
+
+### BCE — il quadro macro era interamente americano
+Il CEO tiene un BTP da 40.000 euro nominali e vive in euro: il costo del denaro della sua valuta
+non era nel sistema. ⚠ È il tasso di **politica monetaria**, non il rendimento del BTP e non un
+secondo dato sui tassi americani — serve a leggere il differenziale con la Fed, che è il motore
+del cambio con cui ogni utile in dollari torna a casa.
+
+## 🕳️ v390 — UN RAMO CHE NESSUN GATE AVEVA MAI PERCORSO
+
+Aggiungendo il check sulle news, `data_quality` ha prodotto **il primo alert della storia del
+file**. E con quell'alert è comparso un blocco del payload che nessuno aveva mai visto: diceva
+*"PRIMO ORDINE OPERATIVO: usa OBBLIGATORIAMENTE la ricerca web…"* — cioè **istruzioni nella coda**,
+la violazione C9 che questo progetto ha già pagato tre volte. Il gate di coerenza non l'aveva mai
+trovata perché gira sul payload di un `data.json` **senza allarmi**.
+
+> **Un difetto in un ramo raro non è raro, è solo invisibile** (v190), e qui il ramo era
+> irraggiungibile *per i dati*, non per l'orologio.
+
+E i due blocchi erano anche **duplicati fra loro**: pubblicavano la stessa lista di chiavi
+mancanti con due formulazioni diverse. Ora la lista è una, e c'è un check che percorre il ramo
+degli allarmi apposta.
+
+## ⚰️ v390 — `log_verdict.mjs` FALLIVA A OGNI RUN DA v200, DIETRO UN `continue-on-error`
+
+Chiamava `decisionVerdict()` e `marketLinkText()`, rimosse col motore predittivo — tolto **sui
+numeri**: hit-rate 29%, sette punti peggio del Nasdaq. Da allora il passo del CI moriva a ogni
+esecuzione con `decisionVerdict is not defined`, e `continue-on-error: true` rendeva quel
+fallimento invisibile: **un job verde con un passo morto dentro**.
+
+> **Un errore coperto da una rete di sicurezza sopravvive quanto la rete.** È la stessa classe
+> dell'`import html` mancante, dove a coprire era un `try/except` per-fonte.
+
+Il campo che produceva (`verdict_track`) **non lo legge nessuno** — verificato con grep su tutto
+il repository. Il passo è stato ritirato; lo script resta dormiente con la sua lapide in testa.
+
+⚠ **`config/verdict_history.jsonl` NON è stato toccato**: 30 giorni di storia vera, che
+`backtest_diary.mjs` legge per affiancare a ogni operazione del CEO ciò che il sistema diceva quel
+giorno. Cancellarlo distruggerebbe delle prove — ed è la ricevuta del taglio scritta *prima*.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

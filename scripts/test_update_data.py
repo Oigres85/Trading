@@ -355,7 +355,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 
 # v254 — la soglia minima resta come rete anti-regressione (se qualcuno cancella meta' suite
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
-N_CHECKS_MINIMO = 75
+N_CHECKS_MINIMO = 84   # v390: +9 sulle fonti nuove (il pavimento sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -791,6 +791,48 @@ check("v367 credito e combustione portano la valuta del BILANCIO, non quella del
 # ⚠ uno zero mentre l'altra meta' e' piena non e' una misura: e' una riga che FINRA non ha pubblicato
 check("v367 le settimane FINRA pubblicate a meta' sono marcate incomplete, non usate",
       '(ats > 0) != (otc > 0)' in _SRC_UD and '"incompleta"' in _SRC_UD)
+
+# ══ v390 — LE TRE FONTI NUOVE, E IL GATE CHE LE SORVEGLIA ═══════════════════════════════
+# ⚠ La lezione delle news di v389 e' costata la vita intera della funzionalita': una fonte che
+# nessun check guarda puo' morire il giorno in cui nasce. Questi check nascono insieme al codice.
+
+# l'import mancante che ha tenuto morte le news: non deve poter tornare
+check("v390 ogni modulo usato da update_data.py e' importato",
+      all(f"\nimport {m}\n" in _SRC_UD or f"\nfrom {m} " in _SRC_UD
+          for m in ("html", "csv", "json", "re", "sys", "time")))
+
+check("v390 SEC EDGAR: si cercano gli 8-K con item 2.02, non un form qualsiasi",
+      '"2.02" in (it or "")' in _SRC_UD and 'f == "8-K"' in _SRC_UD)
+
+# ⚠ misurato su MSTR: deposita 8-K/2.02 fuori dal ciclo e la mediana crolla a 67 giorni,
+# producendo un'attesa sbagliata di 24. Fuori banda non si pubblica nulla.
+check("v390 SEC EDGAR: la cadenza si pubblica solo se e' plausibilmente trimestrale",
+      "if 80 <= _cad <= 100:" in _SRC_UD
+      and '"cadenza_irregolare_gg"' in _SRC_UD)
+
+check("v390 SEC EDGAR: gli emittenti esteri finiscono in un elenco dichiarato, non nel nulla",
+      '"senza_8k": esteri' in _SRC_UD and "esteri.append(_tk)" in _SRC_UD)
+
+# SEC chiede uno User-Agent identificabile e meno di 10 richieste al secondo
+check("v390 SEC EDGAR: User-Agent identificabile e passo rispettato",
+      "SEC_UA" in _SRC_UD and "time.sleep(0.12)" in _SRC_UD)
+
+# ⚠ la prima stesura tagliava su "SEC EDGAR", che compare gia' nel commento di testa: la
+# finestra finiva prima del codice e il check falliva su codice corretto. Si ancora al CODICE.
+check("v390 la lista dei titoli per EDGAR viene da load_holdings, non da un elenco scritto a mano",
+      "_, _wl_sec, _ = load_holdings()" in _SRC_UD
+      and "for _tk in sorted(_seguiti):" in _SRC_UD)
+
+check("v390 credito banche: SLOOS e NFCI arrivano con la loro data e la loro serie",
+      '"serie": "DRTSCILM"' in _SRC_UD and '"serie": "NFCI"' in _SRC_UD
+      and 'macro["credito_banche"]' in _SRC_UD)
+
+check("v390 BCE: la serie e' dichiarata nel campo fonte, non solo nel codice",
+      "MRR_FR" in _SRC_UD and '"fonte": "BCE Data Portal' in _SRC_UD)
+
+# ⚠ le tre fonti entrano nel gate di qualita' INSIEME al codice che le scarica
+check("v390 le tre fonti nuove sono sorvegliate da validate_macro",
+      all(k in _SRC_UD for k in ('add("sec_calendario"', 'add(f"credito_{_k}"', 'add("bce"')))
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

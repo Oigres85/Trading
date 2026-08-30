@@ -68,12 +68,20 @@ jobs:
         run: node scripts/emit_macro_pack.mjs
         continue-on-error: true
 
-      # registro verdetti→esiti (v113): logga i candidati del motore e inietta il track
-      # record in data.json. BEST-EFFORT: exit 0 sempre + continue-on-error, non deve
-      # MAI bloccare il commit dei dati.
-      - name: Log verdetti e track record
-        run: node scripts/log_verdict.mjs
-        continue-on-error: true
+      # ⚠ v390 — IL PASSO "Log verdetti e track record" E' STATO RITIRATO.
+      # `log_verdict.mjs` chiamava `decisionVerdict()` e `marketLinkText()`, rimosse con il
+      # motore predittivo (v200, tolto perche' MISURATO: hit-rate 29%, sette punti peggio del
+      # Nasdaq). Da allora falliva a OGNI run — "decisionVerdict is not defined" — e nessuno se
+      # ne accorgeva: era `continue-on-error: true`, quindi un job verde con un passo morto
+      # dentro. E' la stessa classe delle news di v389: un errore reso invisibile da una rete
+      # di sicurezza sopravvive quanto la rete.
+      # Il campo che produceva (`verdict_track`) non lo legge PIU' NESSUNO — verificato con
+      # grep su tutto il repository. Rigenerarlo non serviva a nulla e riportarlo in vita
+      # significherebbe reintrodurre il punteggio che il CEO ha tolto sui numeri.
+      # ⚠ `config/verdict_history.jsonl` RESTA: sono 30 giorni di storia vera e `backtest_diary.mjs`
+      # li legge per mostrare cosa diceva il sistema il giorno di ogni operazione del CEO.
+      # Lo script resta nel repository, dormiente e con la sua lapide in testa: la misura del
+      # sistema contro gli esiti la fanno `backtest_diary.mjs` e `backtest_signals.mjs`.
 
       # RED TEAM sui DATI FRESCHI (v116): gli invarianti finanziari del motore vengono
       # verificati su tutte le combinazioni di stato UI PRIMA del commit. Un fallimento

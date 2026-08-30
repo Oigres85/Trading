@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "376";
+const BUILD_VERSION = "377";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -7875,10 +7875,24 @@ function buildPrompt() {
     lines.push(`🚨 [SEGNALE DI SHOCK — indizio, non verdetto]: ${shock.sources.map(s => `${s.src} ${signTxt(s.chg)}`).join(" · ")} (oltre ${shock.threshold}% con Wall Street chiusa). ${futLine} ⚠ COSA SIGNIFICA PER I NUMERI DI QUESTO PACCHETTO: i livelli, i target e l'ATR qui dentro sono calcolati su prezzi PRE-shock, e la volatilità che li sostiene non contiene il gap atteso all'apertura — sono numeri costruiti su un mercato che all'apertura potrebbe essere un altro. ⚠ COSA IL SISTEMA NON SA: se il dato sia confermato o sia un feed rotto, e se il movimento regga fino alla campana. Un singolo indice fuori sessione è la fonte più fragile che questo pacchetto contenga.`);
     lines.push("");
   }
-  // ORDINE WEB-SEARCH IN CIMA: se ci sono dati mancanti/inaffidabili, l'imperativo va visto
-  // PRIMA di tutto il resto (l'LLM tende a "dimenticarlo" se sepolto in fondo al payload)
+  /* ⚠ v390 — QUESTO BLOCCO ERA UN ORDINE, ED E' TORNATO A ESSERE UN FATTO.
+     Diceva "PRIMO ORDINE OPERATIVO: usa OBBLIGATORIAMENTE la ricerca web…", cioe' un'istruzione
+     nel payload: le istruzioni vivono nella testata, che infatti impone gia' la ricerca (A1bis)
+     e vieta di trattare un dato mancante come zero. Ripeterlo qui e' la duplicazione
+     testata/coda gia' pagata in v156, v179, v180.
+     ⚠⚠ E NESSUNO SE N'ERA ACCORTO perche' il blocco esce SOLO quando `data_quality` ha almeno
+     un alert, e finora non ne aveva mai: il gate di coerenza gira sul payload di un data.json
+     senza allarmi, quindi non ha mai visto questa riga. L'ha trovata la v390, che con il check
+     sulle news ha prodotto il primo alert della storia del file.
+     > Un difetto in un ramo raro non e' raro, e' solo invisibile (v190).
+     Resta la POSIZIONE — in cima, dove si legge prima di tutto il resto — perche' quella non e'
+     un'istruzione, e' impaginazione. */
   if ((dqV.bad || []).length) {
-    lines.push(`⚠⚠ PRIMO ORDINE OPERATIVO (esegui PRIMA di scrivere l'analisi): questi dati macro sono MANCANTI o INAFFIDABILI nel payload → [${dqV.bad.map(b => b.key).join(", ")}]. Usa OBBLIGATORIAMENTE la ricerca web per reperirne il valore reale corrente (cita valore, fonte e data per ciascuno) e usali per la lettura di leva finanziaria e valutazioni. Se la ricerca non li recupera, lasciali mancanti ma dichiaralo e tienine conto — non trattarli come zero.`);
+    lines.push(`⚠⚠ DATI MANCANTI O INAFFIDABILI IN QUESTO PAYLOAD: [${dqV.bad.map(b => b.key).join(", ")}]. `
+      + `Sono le voci che le assertions automatiche del sistema hanno marcato come non utilizzabili in `
+      + `questo run. ⚠ NON sono zeri e non sono valori bassi: sono buchi, e le grandezze che ne dipendono `
+      + `— in particolare leva finanziaria e valutazioni di mercato — in questo pacchetto non hanno una `
+      + `base. Il dettaglio di ciascuna, con lo stato e la causa, e' nel DATA QUALITY REPORT piu' sotto.`);
     lines.push("");
   }
   const ageMin = Math.round((Date.now() - new Date(DATA.updated_at).getTime()) / 60000);
@@ -7901,11 +7915,16 @@ function buildPrompt() {
   // DATA QUALITY REPORT: i dati flaggati dalle assertions vengono dichiarati PRIMA del quadro
   // macro, con l'ordine esplicito di fare double-check web su ciò che è datato/inaffidabile
   if (!dqV.ok) {
-    lines.push(`⚠ DATA QUALITY REPORT (assertions automatiche del sistema): ${[...dqV.bad.map(b => `${b.key} INAFFIDABILE (${b.status}${b.note ? ": " + b.note : ""})`), ...dqV.stale.map(s => `${s.key} DATATO oltre la cadenza attesa`)].join(" · ")}. Per ogni dato marcato qui sotto con [!!! DATATO / UNRELIABLE !!!] o [LAG TEMPORALE RILEVATO]: NON usarlo così com'è — fai double-check con la ricerca web e cita il valore aggiornato con fonte e data.`);
-    const missingKeys = dqV.bad.map(b => b.key);
-    if (missingKeys.length) {
-      lines.push(`ATTENZIONE — ORDINE OPERATIVO: i seguenti dati sono mancanti o inaffidabili nel payload: [${missingKeys.join(", ")}]. PRIMA di generare la tua analisi, usa OBBLIGATORIAMENTE il tuo strumento di ricerca web per reperire questi valori in tempo reale (cita valore, fonte e data per ciascuno) e usali al posto di quelli assenti — in particolare per valutare leva finanziaria e valutazioni di mercato.`);
-    }
+    /* ⚠ v390 — anche qui l'ordine e' uscito e resta il fatto. E la riga che lo ripeteva subito
+       dopo — "ATTENZIONE — ORDINE OPERATIVO: i seguenti dati sono mancanti…" — e' stata TOLTA:
+       elencava le STESSE chiavi del blocco in cima, cioe' pubblicava due volte la stessa lista
+       con due formulazioni diverse. Un dato che compare due volte si conta due volte. */
+    lines.push(`⚠ DATA QUALITY REPORT (assertions automatiche del sistema): `
+      + `${[...dqV.bad.map(b => `${b.key} INAFFIDABILE (${b.status}${b.note ? ": " + b.note : ""})`),
+           ...dqV.stale.map(s => `${s.key} DATATO oltre la cadenza attesa`)].join(" · ")}. `
+      + `E' lo stesso elenco gia' nominato in cima al pacchetto, qui con lo stato e la causa di `
+      + `ciascuna voce: una sola lista guardata due volte, non due segnali. I dati marcati piu' sotto `
+      + `con [!!! DATATO / UNRELIABLE !!!] o [LAG TEMPORALE RILEVATO] sono questi.`);
   }
   if ((dqV.overrides || []).length) {
     lines.push(`OVERRIDE MANUALI ATTIVI (valori inseriti dall'utente perché la fonte era ko — trattali come dati validi ma verifica se puoi): ${dqV.overrides.map(o => `${o.key} [MANUAL_OVERRIDE del ${o.date || "n.d."}]`).join(" · ")}.`);
@@ -8515,6 +8534,55 @@ function buildPrompt() {
     const chM = dg1M(ch);
     if (chM) { const d = chM.pct * numero(m.credit.spread_hy) / (100 + chM.pct); crl += `; trend ~1 mese ${d > 0 ? "+" : ""}${fmtNum.format(Math.round(d * 100) / 100)} pp (${d > 0.15 ? "spread in allargamento = rischio in aumento" : d < -0.15 ? "spread in restringimento = rischio in calo" : "stabile"}, ${chM.da}→${chM.a})`; }
     lines.push(crl);
+  }
+  /* ═══ v390 — CHI PRESTA, NON SOLO QUANTO COSTA ═══════════════════════════════════════
+     Lo spread HY e' un PREZZO: dice quanto il mercato chiede per prestare. SLOOS dice se le
+     BANCHE stanno prestando, e sono due domande diverse che possono rispondere in tempi
+     diversi. Sta subito dopo il credito perche' e' lo stesso canale visto dall'altro lato.
+     ⚠ IL SEGNO DI SLOOS NON E' INTUITIVO e va scritto ogni volta: NEGATIVO = le banche
+     ALLENTANO, cioe' e' la lettura favorevole. Pubblicare "-8,3" senza dirlo e' la classe del
+     percentile invertito (v316), dove la lettura si ribaltava in silenzio. */
+  if (m.credito_banche && (m.credito_banche.sloos || m.credito_banche.nfci)) {
+    const cb = m.credito_banche;
+    const pezzi = [];
+    if (cb.sloos) {
+      const v = numero(cb.sloos.valore), p = numero(cb.sloos.precedente);
+      pezzi.push(`STANDARD DI CREDITO DELLE BANCHE (SLOOS, indagine trimestrale della Fed, serie `
+        + `${cb.sloos.serie}, rilevazione ${cb.sloos.data}): ${fmtNum.format(v)}% netto di banche che ha `
+        + `IRRIGIDITO gli standard sui prestiti alle grandi imprese`
+        + (Number.isFinite(p) ? `, da ${fmtNum.format(p)}% del trimestre prima` : "")
+        + `. ⚠ IL SEGNO: sopra zero piu' banche stringono che allentano; SOTTO ZERO stanno `
+        + `allentando, ed e' la lettura favorevole. `
+        + (v > 0 ? "Qui il valore e' positivo: le banche stringono."
+           : v < 0 ? "Qui il valore e' negativo: le banche stanno allentando."
+           : "Qui il valore e' esattamente zero: tante banche stringono quante allentano."));
+    }
+    if (cb.nfci) {
+      const v = numero(cb.nfci.valore), p = numero(cb.nfci.mese_fa);
+      pezzi.push(`CONDIZIONI FINANZIARIE COMPLESSIVE (NFCI, Chicago Fed, settimanale, serie `
+        + `${cb.nfci.serie}, rilevazione ${cb.nfci.data}): ${fmtNum.format(v)}`
+        + (Number.isFinite(p) ? ` contro ${fmtNum.format(p)} di un mese fa` : "")
+        + `. ⚠ Lo zero e' la MEDIA STORICA, non un confine di allarme: sopra zero le condizioni `
+        + `sono piu' rigide della media, sotto piu' larghe. `
+        + (v < 0 ? "Qui sono piu' larghe della media." : "Qui sono piu' rigide della media."));
+    }
+    lines.push(`- ${pezzi.join(" · ")}`);
+    lines.push(`  ⚠ COME SI LEGGONO INSIEME ALLO SPREAD HY QUI SOPRA: NON sono una seconda conferma `
+      + `dello stesso segnale, sono l'altro lato del canale. Lo spread e' il PREZZO che il mercato `
+      + `chiede; SLOOS e NFCI dicono se il credito e' DISPONIBILE. Storicamente possono divergere, e `
+      + `la divergenza e' il segnale: uno spread compresso mentre le banche stringono significa che il `
+      + `mercato obbligazionario e il canale bancario stanno prezzando due mondi diversi. ⚠ SLOOS e' `
+      + `un'INDAGINE trimestrale e puo' avere due mesi di ritardo: la sua data e' scritta accanto.`);
+  }
+  /* v390 — il tasso in euro. Il quadro macro e' interamente americano, ma il CEO tiene un BTP
+     e vive in euro: il costo del denaro della sua valuta non era nel sistema. */
+  if (m.bce && numero(m.bce.tasso_rifinanziamento) != null) {
+    lines.push(`- BCE — tasso sulle operazioni di rifinanziamento principali: `
+      + `${fmtNum.format(numero(m.bce.tasso_rifinanziamento))}% (rilevazione ${m.bce.data}, `
+      + `${m.bce.fonte}). ⚠ E' il tasso di POLITICA MONETARIA dell'area euro, non il rendimento `
+      + `del BTP in portafoglio e non un secondo dato sui tassi americani: serve a leggere il `
+      + `differenziale con la Fed, che e' il motore del cambio con cui ogni utile in dollari `
+      + `torna a casa in euro.`);
   }
   if (m.systemic_risk) {
     const sr = m.systemic_risk;
@@ -9267,9 +9335,44 @@ function disciplinaRischio() {
 
   /* ── 6. il rischio d'evento: quanta parte del libro riprezza nella stessa finestra ─── */
   const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+  /* ═══ v390 — LA DATA VIENE DAL DEPOSITO, NON SOLO DA UNA STIMA ═══════════════════════
+     Questa regola e' la piu' operativa della sezione, e fino a qui poggiava interamente su
+     `earnings_date` di yfinance, che il pacchetto stesso dichiara una STIMA. Una regola
+     costruita su date stimate si sposta da sola.
+     Ora ci sono DUE derivazioni indipendenti: la stima di yfinance e quella ricavata dalla
+     CADENZA DEI DEPOSITI VERI su SEC EDGAR (8-K con item 2.02). Non si sceglie in silenzio:
+     · dove esiste solo una delle due, si usa quella e si dichiara quale;
+     · dove esistono entrambe si usa la piu' PRUDENTE per il rischio, cioe' la piu' VICINA —
+       una finestra di eventi si sottostima allontanando le date, mai avvicinandole;
+     · dove divergono di piu' di una settimana lo si scrive, perche' e' informazione a sua volta.
+     ⚠ EDGAR non pubblica date FUTURE: quella da cadenza resta una stima, e la riga lo dice.
+     Misurato: su MRVL yfinance non aveva nessuna data e EDGAR la fornisce; su MSTR la cadenza
+     e' irregolare (deposita 8-K/2.02 anche fuori dal ciclo) e la pipeline non la pubblica
+     affatto, quindi resta la sola stima di yfinance. */
+  const secCal = (((DATA || {}).macro || {}).sec_calendario || {}).per_titolo || {};
+  const dataDa = (s) => { const d = s ? new Date(String(s).slice(0, 10) + "T12:00:00") : null;
+                          return (d && !isNaN(d)) ? d : null; };
+  /* gli emittenti esteri (6-K/20-F) non hanno l'8-K: si nominano, perche' "nessuna data da
+     EDGAR" e "nessuna trimestrale" si leggono uguali e sono cose diverse. */
+  const senza8k = new Set((((DATA || {}).macro || {}).sec_calendario || {}).senza_8k || []);
+  const fuoriEdgar = azionarie.map(x => String(x.r.ticker).toUpperCase()).filter(t => senza8k.has(t));
+  const divergenti = [];
   const conEarn = azionarie
-    .map(x => ({ x, d: x.r.earnings_date ? new Date(String(x.r.earnings_date).slice(0, 10) + "T12:00:00") : null }))
-    .filter(o => o.d && !isNaN(o.d) && o.d >= oggi)
+    .map(x => {
+      const stima = dataDa(x.r.earnings_date);
+      const sec = secCal[String(x.r.ticker).toUpperCase()] || {};
+      const daCad = dataDa(sec.attesa_da_cadenza);
+      let d = null, fonte = null;
+      if (stima && daCad) {
+        const gg = Math.round(Math.abs(stima - daCad) / 86400000);
+        if (gg > 7) divergenti.push(`${x.r.ticker} (stima ${String(x.r.earnings_date).slice(0, 10)} contro ${sec.attesa_da_cadenza} dalla cadenza dei depositi, ${gg} giorni)`);
+        d = stima < daCad ? stima : daCad;   // la piu' vicina: non si sottostima una finestra di eventi
+        fonte = "due stime concordi";
+      } else if (stima) { d = stima; fonte = "stima yfinance"; }
+      else if (daCad) { d = daCad; fonte = "cadenza dei depositi SEC"; }
+      return { x, d, fonte, ultimo: sec.ultimo_deposito || null };
+    })
+    .filter(o => o.d && o.d >= oggi)
     .sort((a, b) => a.d - b.d);
   if (conEarn.length >= 3) {
     /* la finestra di 21 giorni piu' densa: si cercano tutte, non si assume che sia la prima */
@@ -9292,7 +9395,20 @@ function disciplinaRischio() {
       stato: best.p > 60 ? "OLTRE" : best.p > 40 ? "AL LIMITE" : "DENTRO",
       spiega: `Le trimestrali sono l'unico evento datato che il sistema conosce in anticipo. ⚠ SU UN LIBRO CORRELATO `
         + `si sommano al fattore: se i nomi si muovono insieme E riportano insieme, la settimana peggiore non e' `
-        + `una coincidenza, e' una struttura. ⚠ Le date oltre il trimestre in corso sono STIME dell'emittente e si spostano.`,
+        + `una coincidenza, e' una struttura. `
+        + `⚠ LE DATE VENGONO DA DUE DERIVAZIONI INDIPENDENTI: la stima di yfinance e la cadenza dei DEPOSITI `
+        + `VERI su SEC EDGAR (8-K con item 2.02). Dove esistono entrambe si prende la piu' vicina — una `
+        + `finestra di eventi si sottostima allontanando le date, mai avvicinandole. Restano STIME: EDGAR `
+        + `pubblica i depositi passati, non gli appuntamenti futuri.`
+        + (divergenti.length
+          ? ` ⚠ LE DUE DERIVAZIONI DIVERGONO DI PIU' DI UNA SETTIMANA SU ${divergenti.length} `
+            + `${divergenti.length === 1 ? "NOME" : "NOMI"}: ${divergenti.join(", ")}. Su questi la data e' meno solida delle altre.`
+          : " Sui nomi con entrambe le derivazioni lo scarto sta dentro la settimana.")
+        + (fuoriEdgar.length
+          ? ` ⚠ ${fuoriEdgar.join(", ")}: ${fuoriEdgar.length === 1 ? "emittente estero, deposita" : "emittenti esteri, depositano"} `
+            + `6-K e 20-F invece dell'8-K, quindi EDGAR non ha una data di risultati per ${fuoriEdgar.length === 1 ? "lui" : "loro"} `
+            + `e resta la sola stima. Non e' un dato mancante del titolo: e' una forma di deposito diversa.`
+          : ""),
     });
   }
 
@@ -11411,7 +11527,44 @@ function datiNostriDelTitolo(tk) {
         ? `- ⚠ TRIMESTRALE GIA' USCITA: era attesa il ${t.trimestrale}, ${giorni} ${giorni === 1 ? "giorno" : "giorni"} fa. `
           + `Questo pacchetto e' stato generato DOPO: i risultati non sono qui e vanno cercati, e l'analisi `
           + `che scrivi e' un'analisi post-trimestrale, non l'attesa di un evento.`
-        : `- Prossima trimestrale attesa: ${t.trimestrale}${giorni != null ? ` (fra ${-giorni} ${giorni === -1 ? "giorno" : "giorni"})` : ""}`);
+        : `- Prossima trimestrale attesa: ${t.trimestrale}${giorni != null ? ` (fra ${-giorni} ${giorni === -1 ? "giorno" : "giorni"})` : ""} [STIMA di yfinance, non una data confermata dalla societa']`);
+    }
+    /* ═══ v390 — L'ULTIMO DEPOSITO E' UN FATTO, LA PROSSIMA DATA NO ════════════════════
+       EDGAR pubblica quando la societa' ha DAVVERO comunicato i risultati (8-K con item 2.02).
+       E' l'unico dato certo di questo blocco, e serve a due cose: dire da quanto tempo i conti
+       che stai leggendo sono pubblici, e dare una seconda derivazione della prossima uscita,
+       indipendente dalla stima di yfinance. Dove le due divergono, si dice. */
+    const _sec = ((((DATA || {}).macro || {}).sec_calendario || {}).per_titolo || {})[String(tk).toUpperCase()];
+    const _senza8k = ((((DATA || {}).macro || {}).sec_calendario || {}).senza_8k) || [];
+    if (_sec && _sec.ultimo_deposito) {
+      const _dd = new Date(String(_sec.ultimo_deposito) + "T12:00:00");
+      const _gg = isNaN(_dd) ? null : Math.round((Date.now() - _dd.getTime()) / 86400000);
+      let r = `- ULTIMO DEPOSITO DEI RISULTATI (SEC EDGAR, 8-K item 2.02 — e' un FATTO, non una stima): `
+        + `${_sec.ultimo_deposito}${_gg != null ? `, ${_gg} giorni fa` : ""}. `
+        + `I conti che leggi qui sopra sono quelli comunicati allora.`;
+      if (_sec.attesa_da_cadenza) {
+        r += ` La cadenza dei suoi ultimi ${_sec.n_depositi} depositi e' di ${_sec.cadenza_gg} giorni, `
+          + `da cui una SECONDA stima della prossima uscita: ${_sec.attesa_da_cadenza}.`;
+        if (t.trimestrale) {
+          const a = new Date(String(_sec.attesa_da_cadenza) + "T12:00:00");
+          const b = new Date(String(t.trimestrale).slice(0, 10) + "T12:00:00");
+          const sc = (isNaN(a) || isNaN(b)) ? null : Math.round(Math.abs(a - b) / 86400000);
+          r += sc == null ? ""
+            : sc > 7 ? ` ⚠ LE DUE STIME DIVERGONO DI ${sc} GIORNI: la data non e' solida, e se la tua `
+                       + `analisi dipende da quando esce il trimestre, verificala sul sito investor relations.`
+            : ` Le due stime concordano entro ${sc} ${sc === 1 ? "giorno" : "giorni"}: la data e' solida.`;
+        }
+      } else if (_sec.cadenza_irregolare_gg) {
+        r += ` ⚠ La cadenza dei suoi depositi e' IRREGOLARE (${_sec.cadenza_irregolare_gg} giorni di mediana): `
+          + `deposita 8-K con risultati anche fuori dal ciclo trimestrale, quindi il sistema NON ricava una `
+          + `seconda stima da essa. Resta la sola stima di yfinance.`;
+      }
+      L.push(r);
+    } else if (_senza8k.includes(String(tk).toUpperCase())) {
+      L.push(`- ULTIMO DEPOSITO DEI RISULTATI: non disponibile su SEC EDGAR perche' ${esc(tk)} e' un EMITTENTE `
+        + `ESTERO: deposita 6-K e 20-F, che non hanno l'item 2.02 con cui si riconosce la comunicazione dei `
+        + `risultati. ⚠ NON significa che non pubblichi trimestrali: significa che questa fonte non le data. `
+        + `La data di cui sopra resta la sola stima disponibile, e va verificata alla fonte societaria.`);
     }
   }
   if (!L.length) return "";
