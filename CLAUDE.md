@@ -1433,6 +1433,157 @@ e tre le volte **il mio test confermava la mia stessa assunzione** invece di mis
 > deve verificare una **proprietà che il difetto viola per costruzione** — monotonia, invarianza
 > di scala, coerenza fra due lingue. I valori attesi si possono sbagliare insieme al codice.
 
+## 📰 v389 — LE NEWS ERANO MORTE DALLA NASCITA, E NESSUNO POTEVA ACCORGERSENE
+
+`import html` **non c'era** in `scripts/update_data.py`. Tutte e tre le fonti RSS morivano con
+`NameError: name 'html' is not defined` dentro il loro `try/except` per-fonte, `macro["news"]`
+non veniva **mai** scritto, e il blocco del pacchetto che pubblica i titoli — condizionato
+all'esistenza di quella chiave — **spariva in silenzio**.
+
+Il CI lo stampava a **ogni run**, tre righe identiche, dal giorno in cui la funzionalità è nata
+(v304). Nessuno le leggeva, perché la pipeline **usciva 0**: un `except` per-fonte trasforma un
+import mancante in un avviso su `stderr`, e un avviso su stderr in un job verde è invisibile.
+
+> **Un `try/except` per-fonte non protegge la funzionalità: la spegne in silenzio.** E i dodici
+> check di `validate_macro` guardavano tutti altrove — dodici sorveglianti e una fonte scoperta.
+
+Tre correzioni, e la terza è quella che conta:
+1. l'import (una riga);
+2. la finestra passa da 6 a **8 ore**, come chiesto dal CEO;
+3. **il ramo `else` che non esisteva**: senza `macro.news` il pacchetto non nominava affatto le
+   notizie. *"Nessuna riga sull'argomento" e "nessuna notizia" sono due cose diverse, e l'LLM non
+   può distinguerle.* Ora dichiara il buco e lo chiama **dato MANCANTE, non dato negativo**.
+4. `news_macro` entra in `validate_macro` → alert → warning nel CI. ⚠ La soglia è a **48 ore**,
+   non alle 8 della finestra: zero notizie in 8 ore di domenica è un fatto sul mondo, zero in due
+   giorni è quasi sempre la fonte. Provato su quattro scenari (feed caduto, vivo, fermo da 5
+   giorni, date illeggibili).
+
+**Fuori finestra non si tace, si dichiara l'età.** La v306 rispondeva "NESSUNA" e si teneva in
+tasca una dichiarazione del presidente della Fed sull'inflazione di 17 ore. La finestra serve a
+**pesare** una notizia, non a nasconderla.
+
+## 📊 v389 — LA DIAGONALE È USCITA: la quarta forma respinta, e stavolta si sapeva già
+
+Il CEO: *"Peso contro contributo al rischio — sopra la diagonale la posizione porta più varianza
+del suo peso · cambia grafico così non lo capisco"*. Per leggere quello scatter bisognava sapere
+che i due assi hanno la stessa unità, che la bisettrice è il luogo peso==rischio, e che la
+distanza da quella retta è il messaggio: **tre nozioni prima di poter guardare**.
+
+Barra → quadrante → ragnatela → **scatter con diagonale**. La regola era già scritta in questo
+file e l'ho pagata lo stesso: *un grafico che va spiegato non è un grafico leggibile*.
+
+La forma nuova non è uno scatter rifinito: la grandezza disegnata **è già la differenza**
+(`rischio% − peso%`), in punti percentuali, in barre che divergono da zero — la stessa famiglia
+della rotazione settoriale, che il CEO legge senza istruzioni. Non c'è niente da decodificare
+perché **il numero È la risposta**.
+
+⚠ E il taglio ha **dichiarato un denominatore che prima spariva**: SKHY non ha abbastanza sedute
+in comune, quindi il suo peso non è dentro quei 100%. Prima veniva escluso in silenzio.
+⚠ Il gate nuovo ha trovato **8 righe di CSS morto** (`.mappa-rischio`) che avevo lasciato dietro.
+
+## 🏦 v389 — LA DISCIPLINA DI RISCHIO: nove regole, e ognuna dichiara di essere una convenzione
+
+Richiesta del CEO: *"ampia sezione in chiusura di risk management con regole di hedge fund privato
+growth"*. Vive in `disciplinaRischio()`, **una funzione sola** che alimenta sia la sezione di
+pagina sia il blocco del pacchetto: due implementazioni della stessa domanda divergono, ed è già
+costato tre volte (v161, v207, v316).
+
+> ⚠⚠ **OGNI SOGLIA È UN'AFFERMAZIONE, NON UN DATO.** Nel file non esiste nessun limite di
+> concentrazione, nessun tetto di drawdown, nessuna soglia di liquidità. È la lezione v240 — le
+> tacche inventate su un asse — applicata a un intero framework. Ogni riga separa in modo
+> esplicito la **MISURA** (dal libro), la **SOGLIA** (dal mestiere, con la provenienza scritta) e
+> lo **STATO** (solo il confronto fra le due).
+
+⚠ **"OLTRE" non vuol dire "sbagliato"**, e il pacchetto lo dice dove pubblica lo stato: un fondo
+growth concentrato sta fuori da quasi tutte queste soglie **per costruzione**. Senza quella riga
+l'LLM scrive l'analisi facile — "il libro è troppo concentrato, riduci" — che è un ordine
+costruito su tre dati che il sistema non ha.
+
+**La regola che NON morde vale quanto le altre.** La liquidità di uscita: la posizione meno
+liquida si chiude in meno di un decimo di seduta. Dirlo — e dire che è stata *misurata*, non
+assunta — vale più che applicare a forza una disciplina che qui non vincola.
+
+⚠ **Un'autonomia di "1022,6 mesi" è aritmeticamente giusta e comunicativamente falsa**: oltre i
+cinque anni il numero non porta più informazione e fa dubitare di tutto il blocco.
+
+### Il gate di coerenza ha avuto ragione due volte, e la seconda era architetturale
+C9 ha trovato **6 imperativi** che avevo scritto nella coda. Quattro erano prosa da riscrivere.
+Il quinto era il **divieto di dimensionare**, ed è il caso interessante: è un *ordine*, e gli
+ordini vivono nella testata — ripeterlo nel payload è la duplicazione testata/coda già pagata in
+v156, v179, v180. Nella coda resta il **fatto** che rende sensato il divieto: i tre dati che il
+sistema non ha. E il mio check che *pretendeva* il divieto nella coda è stato riagganciato: un
+check che chiede un'istruzione nel payload mette in conflitto due gate e vince quello scritto per
+ultimo.
+
+## 🧪 v389 — TRE GATE RIAGGANCIATI, E UNO AVEVA UN BUCO CHE NON SAPEVO
+
+- **`/analista macro/`** — nona volta che un check ancorato a una **stringa letterale** si rompe
+  su una riformulazione senza che manchi niente. Riagganciato a tre proprietà.
+- **La tesi contraria "ultima"** — il check scorreva fino in fondo al pacchetto, quindi qualunque
+  riga di *dati* che cominci con `N) ` lo faceva fallire. I blocchi da consegnare vivono nelle
+  **istruzioni**: cercarli nel payload è misurare la regione sbagliata.
+- ⚠⚠ **E lì ho trovato un buco vero**: la classe `\d` copriva **una cifra sola**, quindi un
+  decimo blocco (`10) `) non faceva scattare il gate. L'ho scoperto perché la mia prima iniezione
+  usava proprio `10)` ed era **verde per una ragione che non c'entrava col difetto**.
+  > **L'iniezione va scelta fra i casi che il gate DEVE prendere, non fra quelli comodi.** Una
+  > validazione che passa per il motivo sbagliato certifica una protezione che non esiste.
+- **E un gate trovava una chiamata COMMENTATA**: iniettando `// renderDisciplinaRischio();`
+  restava verde mentre la sezione non veniva più disegnata. La scansione deve togliere i commenti
+  (v213, v240) — terza incarnazione della stessa trappola.
+
+⚠ Ripetuta anche la svista dei **backtick dentro un template literal**: `modifica_sicura` ha
+rifiutato la scrittura e il file è rimasto intatto. Lo strumento ha fatto esattamente il lavoro
+per cui esiste.
+
+## 📦 v389 — IL PACCHETTO MACRO NEGAVA DI AVERE IL LIBRO
+
+La testata diceva testualmente *"Non hai davanti nessun portafoglio"*. Era vero nella v256, quando
+le posizioni non esistevano nel sistema; è diventato **falso nella v307** e nessuno ha riallineato
+il testo per ottantadue versioni.
+
+> **Un pacchetto che dichiara di non avere una cosa che ha è peggio di uno che tace**: manda l'LLM
+> a rifiutare *esplicitamente* il collegamento fra macro e libro, che è l'unico collegamento per
+> cui quel pacchetto viene letto.
+
+Ora entrambi i percorsi portano il libro. E il blocco del libro pubblica **tecnica e fondamentali
+di ogni posizione**, non solo peso e guadagno: senza medie, RSI, distanza dal massimo e forza
+relativa, l'unica misura disponibile sulle altre dodici posizioni era il **guadagno dal carico**,
+cioè la misura che fa tenere i perdenti e vendere i vincitori.
+
+⚠ **Un multiplo prospettico negativo non è un multiplo basso**: `-75,7×` si legge come "costa
+pochissimo". RGTI e CRWV ora dichiarano *utile atteso NEGATIVO*.
+⚠ E `signTxt` aggiunge già `%`: la forza relativa usciva `+5,2% pp`, due unità sulla stessa cifra.
+
+## 🔬 v389 — IL COLLAUDO DEI DATI, CHIESTO A CHI LEGGE
+
+Il CEO ha chiesto che congruità, affidabilità e **freschezza** siano verificate dall'LLM. Non è
+diffidenza verso il sistema: è che il pacchetto contiene dati **da uno a centoquaranta giorni** e
+usarli come se fossero tutti di oggi è il modo più comune di produrre un'analisi sbagliata con
+numeri giusti. Le tre verifiche hanno **protocolli diversi per classe di dato**, e l'esito va
+scritto in tre righe — *un collaudo che non lascia traccia non è distinguibile da un collaudo non
+fatto*.
+
+⚠⚠ **E DEVE STARE ANCHE NEL FALLBACK.** Precedente diretto in v331: `loadPromptHeaderCloud()` può
+fallire in silenzio, e allora vale `DEFAULT_PROMPT_HEADER`. *Un obbligo che dipende da una fetch
+non gestita non è un obbligo, è una speranza.* Il check l'ha preso subito.
+
+## ♻️ v389 — LA STESSA MISURA IN DUE BLOCCHI: dichiararla, non tagliarla
+
+Il libro e la disciplina pubblicano gli stessi numeri (peso del primo nome, gruppo correlato,
+scommesse effettive, drawdown): là sono il **fatto**, qui sono il **confronto con una soglia**.
+Tagliare avrebbe reso illeggibili le righe della disciplina, che senza la misura accanto alla
+soglia non dicono nulla.
+
+Si applica invece la regola che il pacchetto usa già per CPI/PCE e per il disaccoppiamento contro
+i profitti reali: **dichiarare che è lo stesso segnale**. Senza quella riga un lettore conclude
+che il libro è concentrato "per sei misure indipendenti", mentre sono le stesse guardate due volte.
+
+## 🎨 v389 — `--amber` era usato e mai definito
+
+`.diary-multi` rendeva **grigia** invece che ambra, per il fallback `var(--amber, var(--muted))`.
+Stessa classe delle cinque variabili della v206, rimasta aperta su un alias. Il giallo di avviso
+del progetto è già `--yellow`: l'alias ci punta, non introduce un secondo tono.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

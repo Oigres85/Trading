@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "375";
+const BUILD_VERSION = "376";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -3299,6 +3299,7 @@ function renderMacroGrafici() {
   renderIndicatori();   // v215 — le 27 scatole diventano una classifica sola
   renderRischio();      // v360 — il rischio del libro e il suo confronto
   renderCredito();      // v367 — il debito del libro, al posto del CDS
+  renderDisciplinaRischio();   // v389 — le regole di un fondo growth, applicate a questo libro
   // v235 — ORA le schede esistono: si misura e si impacca
   impaccaGriglia(document.querySelector(".shell-main"));
 }
@@ -5099,6 +5100,54 @@ function renderCredito() {
     + `sotto 0 non copre nulla. &#9888; Sono fatti sul passato: non dicono se il rifinanziamento avverra' e a che prezzo.`;
 }
 
+/* ═══ v389 — LA DISCIPLINA DI RISCHIO IN PAGINA ════════════════════════════════════════════
+   La misura NON e' qui: viene da `disciplinaRischio()`, la stessa che alimenta il pacchetto per
+   l'LLM. Qui c'e' solo l'impaginazione. Un secondo calcolo per la pagina divergerebbe dal primo
+   e il CEO leggerebbe due numeri per la stessa cosa — e' la classe v161/v207/v316.
+   ⚠ LA FORMA: niente barre, niente quadranti, niente ragnatele. Il CEO ha respinto tre volte le
+   forme che chiedono di decodificare una geometria; qui ogni riga e' una frase con dentro due
+   numeri e un'etichetta di stato. Lo stato e' colorato, ed e' l'unica cosa che si legge a colpo
+   d'occhio: il resto si legge leggendo. */
+function renderDisciplinaRischio() {
+  const box = $("#disc-corpo"); if (!box) return;
+  const nota = $("#disc-note");
+  const d = (typeof disciplinaRischio === "function") ? disciplinaRischio() : null;
+  if (!d || !d.regole.length) {
+    box.innerHTML = `<div class="muted">Disciplina di rischio non calcolabile: servono almeno tre `
+      + `posizioni azionarie con quantita' e prezzo di carico. ⚠ Non significa che il rischio sia `
+      + `basso: significa che qui non e' misurato.</div>`;
+    if (nota) nota.innerHTML = "";
+    return;
+  }
+  const CLASSE = { "OLTRE": "disc-oltre", "AL LIMITE": "disc-limite", "DENTRO": "disc-dentro",
+                   "NON VINCOLA": "disc-ok", "NON MISURABILE": "disc-nd" };
+  const oltre = d.regole.filter(r => r.stato === "OLTRE").length;
+  box.innerHTML = `<div class="disc-sommario">`
+    + `<b>${oltre} ${oltre === 1 ? "disciplina" : "discipline"} su ${d.regole.length} ${oltre === 1 ? "e'" : "sono"} oltre la propria soglia.</b> `
+    + `⚠ E questo <b>non vuol dire che il libro sia sbagliato</b>: un fondo growth concentrato sta `
+    + `fuori da quasi tutte queste soglie per costruzione — e' la sua tesi, non un difetto. Il valore `
+    + `di questa sezione e' sapere <b>di quanto</b>, e quali deviazioni sono state decise e quali sono `
+    + `successe da sole mentre i prezzi si muovevano.</div>`
+    + d.regole.map(r => `<div class="disc-regola ${CLASSE[r.stato] || ""}">
+        <div class="disc-testa">
+          <span class="disc-nome">${esc(r.nome)}</span>
+          <span class="disc-stato">${esc(r.stato)}</span>
+        </div>
+        <div class="disc-riga"><span class="disc-et">nel tuo libro</span><span class="disc-mis">${esc(r.misura)}</span></div>
+        <div class="disc-riga"><span class="disc-et">soglia del mestiere</span><span class="disc-sog">${esc(r.soglia)}</span></div>
+        <div class="disc-prov">${esc(r.provenienza)}</div>
+        <div class="disc-spiega">${esc(r.spiega)}</div>
+      </div>`).join("");
+  if (nota) nota.innerHTML = `Misure sul comparto <b>azionario</b> (${d.nomi} posizioni`
+    + (d.sedute ? `, finestra di ${d.sedute} sedute` : "") + `). `
+    + `⚠⚠ <b>Le soglie sono CONVENZIONI, non dati.</b> Nel file non esiste nessun limite di `
+    + `concentrazione, nessun tetto di drawdown, nessuna soglia di liquidita': quelle cifre vengono `
+    + `dal mestiere e ognuna dichiara da dove. Quello che viene dal file e' la colonna "nel tuo libro". `
+    + `⚠ <b>Nessuna riga dimensiona</b>: il sistema non conosce la liquidita' disponibile, gli altri `
+    + `conti ne' la situazione fiscale — e senza quei tre dati qualunque quantita' sarebbe un numero `
+    + `che sembra un consiglio. Ogni regola dice dove sta il libro, e si ferma li'.`;
+}
+
 function renderRischio() {
   const box = $("#rischio-tabella"); if (!box) return;
   const pr = profiliRischio();
@@ -5166,34 +5215,98 @@ function renderRischio() {
         <td>${x.eff != null && !x.indice ? `${fmtNum.format(Math.round(x.eff * 10) / 10)} <span class="muted">su ${x.n}</span>` : "<span class=\"muted\">1 (&egrave; un indice)</span>"}</td></tr>`).join("")
     + `</tbody></table>`;
 
-  /* la mappa: peso sull'orizzontale, contributo al rischio sul verticale. Sopra la diagonale
-     la posizione porta piu' varianza del suo peso — ed e' l'unica cosa che questa forma dice
-     meglio di una tabella, perche' la diagonale si vede e una colonna di numeri no. */
+  /* ═══ v389 — LA DIAGONALE E' USCITA: IL CEO NON LA CAPIVA, E AVEVA RAGIONE ═════════════
+     "Peso contro contributo al rischio — sopra la diagonale la posizione porta piu' varianza
+     del suo peso": era uno scatter con una diagonale tratteggiata, e per leggerlo bisognava
+     sapere che cosa vuol dire "sopra la diagonale". Cioe' bisognava sapere che i due assi hanno
+     la stessa unita', che la bisettrice e' il luogo peso==rischio, e che la distanza da quella
+     retta e' il messaggio. Tre nozioni prima di poter guardare.
+
+     ⚠⚠ E' LA STESSA REGOLA GIA' PAGATA TRE VOLTE IN QUESTO PROGETTO (barra → quadrante →
+     ragnatela, v225-v228): *un grafico che va spiegato non e' un grafico leggibile, per
+     elegante che sia*. E la correzione non e' rifinire la forma — assi piu' chiari, etichette
+     piu' grandi — ma CAMBIARE FAMIGLIA. Uno scatter rifinito resta uno scatter.
+
+     Quello che c'e' ora e' la stessa famiglia della rotazione settoriale, che il CEO legge
+     senza istruzioni: barre che divergono da zero, ordinate. La grandezza disegnata NON e' piu'
+     una coppia di coordinate da confrontare a mente — e' gia' la differenza, in punti
+     percentuali: `rischio% - peso%`. Sopra lo zero la posizione porta piu' varianza del suo
+     peso, sotto ne porta meno, e non c'e' niente da decodificare perche' il numero E' la
+     risposta. I due valori di partenza restano accanto a ogni riga, cosi' non si perde nulla.
+
+     ⚠ IL DENOMINATORE VA DICHIARATO (regola v205, "denominatori non dichiarati"): peso e
+     rischio stanno ENTRAMBI sul solo comparto azionario e sulle sole posizioni che la pipeline
+     ha potuto misurare — chi non ha abbastanza sedute in comune non e' nel calcolo, e il suo
+     nome viene scritto invece di sparire. Sommano tutti e due a 100% sullo STESSO insieme:
+     senza quello, "23% del capitale contro 34% del rischio" sarebbero due frazioni con basi
+     diverse. */
   const conMcr = [...((DATA && DATA.watchlist) || [])]
     .filter(r => r && numero(r.qta) > 0 && numero(r.controvalore) > 0 && Number.isFinite(numero(r.risk_contrib_pct)));
   const mappa = $("#rischio-mappa");
   if (mappa) {
     if (conMcr.length < 3) {
-      mappa.innerHTML = `<div class="muted" style="margin-top:10px">Mappa peso/rischio non disponibile: `
-        + `il contributo marginale al rischio non e' stato calcolato in questo run della pipeline.</div>`;
+      mappa.innerHTML = `<div class="muted" style="margin-top:10px">Confronto peso/rischio non disponibile: `
+        + `il contributo al rischio non e' stato calcolato in questo run della pipeline. ⚠ Non significa `
+        + `che i pesi e il rischio coincidano: significa che questa misura non c'e'.</div>`;
     } else {
       const tot = conMcr.reduce((a, r) => a + numero(r.controvalore), 0);
-      const pt = conMcr.map(r => ({ tk: r.ticker, peso: numero(r.controvalore) / tot * 100, mcr: numero(r.risk_contrib_pct) }));
-      const max = Math.max(...pt.map(p => Math.max(p.peso, p.mcr))) * 1.1;
-      const W = 420, H = 300, m = 34;
-      const x = (v) => m + v / max * (W - m - 12), y = (v) => H - m - v / max * (H - m - 12);
-      mappa.innerHTML = `<div style="margin-top:14px"><b>Peso contro contributo al rischio</b>
-        <span class="muted">— sopra la diagonale la posizione porta pi&ugrave; varianza del suo peso</span></div>
-        <svg viewBox="0 0 ${W} ${H}" class="mappa-rischio" role="img" aria-label="peso contro contributo al rischio">
-        <line x1="${m}" y1="${H - m}" x2="${W - 12}" y2="${H - m}" class="ax"/>
-        <line x1="${m}" y1="12" x2="${m}" y2="${H - m}" class="ax"/>
-        <line x1="${x(0)}" y1="${y(0)}" x2="${x(max)}" y2="${y(max)}" class="diag"/>
-        <text x="${W - 14}" y="${H - 12}" class="lbl" text-anchor="end">peso %</text>
-        <text x="6" y="18" class="lbl">rischio %</text>
-        ${pt.map(p => `<circle cx="${x(p.peso).toFixed(1)}" cy="${y(p.mcr).toFixed(1)}" r="4"
-            class="${p.mcr > p.peso * 1.15 ? "sopra" : p.mcr < p.peso * 0.85 ? "sotto" : ""}"/>
-          <text x="${(x(p.peso) + 7).toFixed(1)}" y="${(y(p.mcr) + 4).toFixed(1)}" class="tk">${esc(p.tk)}</text>`).join("")}
-        </svg>`;
+      const pt = conMcr.map(r => {
+        const peso = numero(r.controvalore) / tot * 100, mcr = numero(r.risk_contrib_pct);
+        return { tk: r.ticker, peso, mcr, gap: mcr - peso };
+      }).sort((a, b) => b.gap - a.gap);
+      /* le posizioni che il calcolo NON copre: si nominano, non si tolgono in silenzio */
+      const fuori = [...((DATA && DATA.watchlist) || [])]
+        .filter(r => r && numero(r.qta) > 0 && numero(r.controvalore) > 0
+                  && !Number.isFinite(numero(r.risk_contrib_pct)))
+        .map(r => r.ticker);
+      const peggio = pt[0], meglio = pt[pt.length - 1];
+      const p1 = (v) => `${fmtNum.format(Math.round(v * 10) / 10)}%`;
+      /* ⚠ "il 11,8%" invece di "l'11,8%": la stessa svista gia' pagata in v372 ("il 83,4%").
+         In italiano l'articolo si elide davanti a numero che si LEGGE con vocale iniziale —
+         uno, otto, undici, diciotto, ottanta... — e la cifra iniziale non basta a saperlo:
+         1 e' "uno" (elide) ma 12 e' "dodici" (no). Si guarda quindi il numero letto, non il
+         primo carattere. */
+      const ilPct = (v) => {
+        const n = Math.abs(Math.round(v * 10) / 10);
+        const intero = Math.floor(n);
+        const elide = intero === 1 || intero === 8 || intero === 11 || intero === 18
+          || (intero >= 80 && intero <= 89);
+        return `${elide ? "l'" : "il "}${p1(v)}`;
+      };
+      const pp = (v) => `${v > 0 ? "+" : ""}${fmtNum.format(Math.round(v * 10) / 10)} pp`;
+      const frase = peggio && peggio.gap > 0.5
+        ? `<b>${esc(peggio.tk)} pesa ${ilPct(peggio.peso)} del tuo capitale azionario e ne porta `
+          + `${ilPct(peggio.mcr)} delle oscillazioni.</b> Sono ${pp(peggio.gap)} di rischio in piu' di quanto `
+          + `il suo peso lasci pensare: non perche' sia grande, ma perche' si muove insieme agli altri.`
+          + (meglio && meglio.gap < -0.5
+            ? ` All'estremo opposto ${esc(meglio.tk)}, che pesa ${ilPct(meglio.peso)} e ne porta `
+              + `${ilPct(meglio.mcr)}: ${pp(meglio.gap)}, cioe' e' la posizione che diversifica di piu'.` : "")
+        : `<b>Nessuna posizione porta un rischio molto diverso dal proprio peso.</b> Su questa finestra `
+          + `il contributo al rischio segue la dimensione: e' il caso in cui ridurre un nome riduce il `
+          + `rischio in proporzione, che non e' sempre vero.`;
+      mappa.innerHTML = `<div class="rischio-frasi" style="margin-top:14px"><div>${frase}</div></div>`
+        + `<div class="muted" style="margin:10px 0 6px"><b>Quanto rischio porta ogni posizione in piu' `
+        + `(o in meno) del suo peso</b> — barra a destra dello zero: porta piu' oscillazioni di quanto `
+        + `pesa; a sinistra: meno. Passa sopra una riga per i due numeri di partenza.</div>`
+        + barreOrdinate(pt.map(p => ({
+            nome: p.tk,
+            valore: Math.round(p.gap * 10) / 10,
+            testo: pp(p.gap),
+            colore: p.gap >= 0 ? "var(--red)" : "var(--green)",
+            suggerimento: `pesa ${p1(p.peso)} del capitale azionario, porta ${p1(p.mcr)} del rischio`,
+          })), {
+            nota: `Peso e rischio sono <b>due frazioni dello stesso insieme</b>: le ${pt.length} posizioni `
+              + `azionarie che la pipeline ha potuto misurare, e sommano entrambe a 100%. `
+              + (fuori.length
+                ? `⚠ <b>${fuori.map(esc).join(", ")}</b> ${fuori.length === 1 ? "non e' nel calcolo" : "non sono nel calcolo"} `
+                  + `— storia troppo corta in comune con le altre — quindi ${fuori.length === 1 ? "il suo peso non e'" : "il loro peso non e'"} `
+                  + `dentro questi 100%. Non e' un giudizio sul ${fuori.length === 1 ? "titolo" : "titoli"}: e' un dato mancante. `
+                : "")
+              + `Il rischio non e' la perdita attesa: e' la quota di oscillazione del libro attribuibile a `
+              + `ciascun nome, dalle correlazioni misurate. Un nome puo' portare piu' rischio del suo peso `
+              + `perche' e' piu' volatile, oppure perche' si muove insieme a chi gli sta accanto — ed e' il `
+              + `secondo caso quello che non si vede guardando le posizioni una per una.`,
+          });
     }
   }
   const nota = $("#rischio-note");
@@ -7601,7 +7714,7 @@ const PROMPT_HEADER_PATH = "config/prompt_header_macro.txt";
    fondo (ruolo di Comitato Investimenti, ordini, stop): senza portafoglio nel payload
    sarebbe stata una testata che chiede cose che i dati non permettono. Il file vero e'
    config/prompt_header_macro.txt; questo serve solo al primo caricamento senza rete. */
-const DEFAULT_PROMPT_HEADER = `Sei un analista macro. Ricevi il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno. Non hai davanti nessun portafoglio: questo pacchetto contiene SOLO dati macro e la loro tensione interna. Non proporre operazioni su titoli, non dimensionare posizioni, non dare consigli di acquisto o vendita.
+const DEFAULT_PROMPT_HEADER = `Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra. La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. ⚠ NON DIMENSIONATE: niente quantita', niente percentuali obiettivo, niente stop in euro — il sistema non conosce liquidita', altri conti ne' fiscalita'.
 
 [A] REGOLE SUI DATI
 A1 — PROVENIENZA E VERIFICA. Ogni numero che citi viene da questo payload, e lo scrivi come lo trovi. Quando un'affermazione poggia su un fatto ESTERNO al payload (una notizia, una dichiarazione di banca centrale, un dato uscito dopo lo snapshot), verificala online e marcala [VERIFICATO] con la fonte. Chiudi con un elenco "FONTI DA CONTROLLARE": una riga per ogni [VERIFICATO] su cui poggia una conclusione, col suo URL. Mai inventare valori: un dato che manca si dichiara "n.d.". Ignora prezzi e conclusioni di conversazioni precedenti — conta solo questo payload.
@@ -7621,6 +7734,13 @@ B1 — IL MECCANISMO, NON LA CORRELAZIONE. Non basta dire che due cose si muovon
 B2 — IL DISACCORDO E' IL SEGNALE, E DEVI TROVARLO TU. Il pacchetto NON classifica piu' gli indicatori macro su una scala 0-100: ti consegna i valori grezzi con le loro soglie dichiarate, e niente altro. Il punteggio e' stato tolto apposta, perche' era calcolato da noi con formule nostre e ti avrebbe ancorato a un giudizio travestito da misura. Quindi il primo passo dell'analisi e' tuo: metti i valori uno accanto all'altro e di' DOVE NON SI ACCORDANO — credito tranquillo mentre l'occupazione cede, inflazione ferma mentre la curva si disinverte, indici ai massimi mentre i profitti reali non seguono. Nomina gli indicatori esatti che divergono, di' quale lato sta vincendo e quale fatto osservabile te lo fa dire. Se invece tutto punta davvero nella stessa direzione, dillo esplicitamente e spiega perche' e' credibile: e' raro, e vale come segnale a sua volta. Non partire da una media, e non chiedermi un punteggio che non c'e' piu'.
 B3 — CONTA I SEGNALI UNA VOLTA SOLA. Due misure della stessa grandezza (CPI e PCE, curva e recessione, Fear & Greed e sentiment globale) sono un segnale, non due. Il payload lo dichiara dove succede: rispettalo.
 B4 — DOVE TI ASPETTERESTI DI SBAGLIARE. Chiudi indicando quale dato, se uscisse diverso dalle attese al prossimo aggiornamento, ribalterebbe la lettura che hai appena dato. Un'analisi che non sa cosa la smentirebbe non e' un'analisi.
+
+[B5] IL COLLAUDO DEI DATI, PRIMA DI USARLI — e l'esito si scrive.
+Congruita', affidabilita' e freschezza vanno VERIFICATE, non date per buone: questo pacchetto contiene dati di eta' diverse, da un giorno a centoquaranta, e usarli come se fossero tutti di oggi e' il modo piu' comune di produrre un'analisi sbagliata con numeri giusti. Le classi non si collaudano allo stesso modo. FRESCHEZZA: i dati di mercato stanno sulla barra dichiarata in cima (a mercati chiusi e' l'ultima chiusura, non "adesso"); le statistiche ufficiali portano rilevazione, eta' e prossima uscita, e sopra i 30 giorni si cerca online se ne esiste una piu' recente; sulle notizie il pacchetto dichiara quante cadono nelle ultime 8 ore, e se dichiara di NON AVERNE quello e' un dato MANCANTE, non l'assenza di notizie. CONGRUITA': dove una grandezza compare in due punti il pacchetto lo dichiara — due valori SENZA quella dichiarazione sono un difetto; e due percentuali si confrontano solo se hanno lo stesso denominatore. AFFIDABILITA': le etichette qualitative ("rilassato", "elevato", "OLTRE") sono classificazioni NOSTRE con la banda scritta accanto, cioe' convenzioni dichiarate e non misure; se il quadro le contraddice la conclusione e' tua.
+⚠ Chiudi con TRE RIGHE di esito — "FRESCHEZZA: ...", "CONGRUITA': ...", "AFFIDABILITA': ..." — obbligatorie anche quando va tutto bene. Un collaudo che non lascia traccia non e' distinguibile da un collaudo non fatto.
+
+[B6] IL LIBRO E' IN CODA, E L'ANALISI DEVE ARRIVARCI.
+Il pacchetto porta le posizioni del fondo, la loro concentrazione, il contributo al rischio di ciascuna e la disciplina di rischio misurata riga per riga. Ogni conclusione macro va portata fino a li': quale canale, quali posizioni, quale segno. Le SOGLIE della disciplina sono CONVENZIONI del mestiere, dichiarate riga per riga, non regole del sistema: citandole, dillo. E una soglia superata NON e' un errore del libro — un fondo growth concentrato sta fuori da quasi tutte per costruzione: conta di quanto, e quali deviazioni sono state decise e quali sono successe da sole.
 
 [C] FORMA
 C1 — Scrivi in italiano, in prosa, senza scalette rigide e senza ripetere il payload. Non ho bisogno che tu mi riassuma i numeri: li ho gia'. Ho bisogno di sapere cosa vogliono dire insieme.
@@ -8199,34 +8319,69 @@ function buildPrompt() {
      automatico. Presentarli come dati verificati sarebbe la classe di difetto peggiore di
      questo progetto — e qui il rischio e' concreto, perche' un titolo di giornale contiene
      numeri ("annual rate at 3.4%") che un LLM prenderebbe per buoni. */
-  if (m.news && (m.news.voci || []).length) {
-    /* ⚠⚠ v306 — SOLO LE ULTIME SEI ORE, come chiesto dal CEO, e quando non c'e' niente lo si
-       DICE. Misurato scrivendo questa riga: dentro le 6 ore c'erano zero notizie macro e anche
-       dentro le 12 — era sabato. "Non e' uscito niente di macro da mezza giornata" non e' un
-       buco del sistema: e' un fatto sul mondo, e di sabato e' la risposta giusta. Tacere
-       lascerebbe l'LLM a dedurre, e dedurrebbe male. */
-    const ORE = 6;
+  /* ═══ v389 — LA FINESTRA E' OTTO ORE, E IL SILENZIO NON E' PIU' UN'OPZIONE ══════════
+     Tre cose cambiano rispetto alla v306, e la terza e' la ragione per cui questo blocco e'
+     stato riscritto invece che ritoccato.
+
+     1. LA FINESTRA PASSA DA 6 A 8 ORE, come chiesto dal CEO.
+
+     2. FUORI FINESTRA NON SI TACE, SI DICHIARA L'ETA'. La v306 rispondeva "NESSUNA" e si
+        fermava. Misurato oggi sui feed veri: dentro le 8 ore zero notizie (e' domenica) e
+        subito fuori c'era una dichiarazione del presidente della Fed sull'inflazione di 17
+        ore. Rispondere "nessuna notizia" e tenersi quella in tasca e' vero e inutile: la
+        finestra serve a PESARE una notizia, non a nasconderla. Ora le voci recenti si
+        pubblicano comunque, ciascuna con la propria eta', e la riga dice quante cadono
+        dentro le 8 ore — che e' l'informazione che il CEO ha chiesto.
+
+     3. ⚠⚠ QUANDO IL FEED NON HA PRODOTTO NIENTE, IL PACCHETTO LO DEVE DIRE. Il ramo `else`
+        di questo `if` non esisteva: senza `m.news` il pacchetto non nominava affatto le
+        notizie, e "nessuna riga sull'argomento" e "nessuna notizia" sono due cose diverse che
+        l'LLM non puo' distinguere. Non e' teorico — e' successo per tutta la vita di questa
+        funzionalita': `import html` mancava in `update_data.py`, tutte e tre le fonti RSS
+        morivano con `NameError` dentro il loro try/except, `macro["news"]` non veniva mai
+        scritto, e questo blocco spariva in silenzio. Il CI lo stampava a ogni run e nessuno
+        lo leggeva, perche' la pipeline usciva 0.
+        E' la regola gia' scritta in CLAUDE.md — i fallback devono essere RUMOROSI — applicata
+        alla FONTE invece che al dato.
+
+     ⚠⚠ SONO TITOLI, NON FATTI (v304): il sistema non ha letto gli articoli, non ha verificato
+     i numeri che contengono, e il filtro che li seleziona e' automatico. */
+  {
+    const ORE = 8;
+    const fonti = (m.news && m.news.fonti || []).join(", ");
+    const voci = (m.news && m.news.voci) || [];
     const adesso = Date.now();
-    const conEta = m.news.voci
+    const conEta = voci
       .map(v => ({ ...v, ore: (adesso - Date.parse(v.quando)) / 3600000 }))
-      .filter(v => Number.isFinite(v.ore)).sort((a, b) => a.ore - b.ore);
-    const fresche = conEta.filter(v => v.ore <= ORE).slice(0, 12);
-    if (fresche.length) {
-      lines.push(`- TITOLI MACRO DELLE ULTIME ${ORE} ORE (${fresche.length}, da ${(m.news.fonti || []).join(", ")}) — `
-        + `SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri `
-        + `che contengono, e la selezione e' automatica (${m.news.filtro || ""}). I riassunti sono quelli `
-        + `pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: `
-        + `ha solo la data di pubblicazione, che e' un'altra cosa.`
-        + fresche.map(x => `\n    · [${x.fonte}, ${Math.round(x.ore)}h fa] ${x.titolo}`
-            + (x.riassunto ? `\n      ${x.riassunto}` : "")).join(""));
+      .filter(v => Number.isFinite(v.ore) && v.ore >= 0).sort((a, b) => a.ore - b.ore);
+    /* l'orologio delle notizie contro quello del prezzo (v158): una notizia pubblicata dopo
+       l'ultima campana NON e' ancora dentro il prezzo, e questa e' l'unica distinzione che
+       rende utile un titolo di giornale dentro un pacchetto di prezzi. */
+    const chiusura = (typeof lastUsEquityCloseUTC === "function") ? lastUsEquityCloseUTC() : null;
+    const nonPrezzate = chiusura
+      ? conEta.filter(v => Date.parse(v.quando) > chiusura.at.getTime()).length : null;
+    if (!conEta.length) {
+      lines.push(`- TITOLI MACRO DELLE ULTIME ${ORE} ORE: IL SISTEMA NON NE HA. ⚠ Questo NON `
+        + `significa "non e' uscita nessuna notizia": significa che in questo run la raccolta dei feed `
+        + `non ha prodotto voci${fonti ? ` (fonti previste: ${fonti})` : ""}, e il sistema non sa dire se `
+        + `il mondo fosse silenzioso o la fonte irraggiungibile. Trattalo come un dato MANCANTE, non come `
+        + `un dato negativo: le notizie macro delle ultime ore vanno cercate online, e questa assenza va `
+        + `riportata nelle SEGNALAZIONI AL SISTEMA.`);
     } else {
-      const p = conEta.length ? Math.round(conEta[0].ore) : null;
-      lines.push(`- TITOLI MACRO DELLE ULTIME ${ORE} ORE: NESSUNO. `
-        + (p != null ? `La notizia macro piu' recente fra le fonti seguite (${(m.news.fonti || []).join(", ")}) `
-            + `ha ${p} ore. ` : "")
-        + `E' un fatto sul mondo, non un buco del sistema: la macro non esce di continuo e nel fine settimana `
-        + `non esce affatto. Un'analisi scritta in una finestra senza notizie e' diversa da una scritta subito `
-        + `dopo un dato, e la differenza sta qui.`);
+      const dentro = conEta.filter(v => v.ore <= ORE);
+      const mostra = (dentro.length ? dentro : conEta).slice(0, 12);
+      const riga = (x) => `\n    · [${x.fonte}, ${Math.round(x.ore)}h fa${chiusura && Date.parse(x.quando) > chiusura.at.getTime() ? ", DOPO l'ultima chiusura: il prezzo non l'ha ancora votata" : ""}] ${x.titolo}`
+        + (x.riassunto ? `\n      ${x.riassunto}` : "");
+      lines.push(`- TITOLI MACRO — ${dentro.length} dentro le ultime ${ORE} ORE`
+        + (dentro.length ? "" : `, quindi NESSUNA nella finestra chiesta: qui sotto ci sono le ${mostra.length} piu' recenti che il sistema ha, con la loro eta', perche' una notizia fuori finestra si PESA diversamente, non si nasconde. La piu' fresca ha ${Math.round(conEta[0].ore)} ore`)
+        + ` (fonti: ${fonti})`
+        + (nonPrezzate != null ? ` · ${nonPrezzate} pubblicate DOPO l'ultima chiusura USA del ${chiusura.asof}, cioe' non ancora dentro il prezzo` : "")
+        + `. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i `
+        + `numeri che contengono, e la selezione e' automatica (${(m.news && m.news.filtro) || ""}). I riassunti `
+        + `sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di `
+        + `rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta `
+        + `parlando adesso e da dove partire a cercare, non a sostituire la ricerca.`
+        + mostra.map(riga).join(""));
     }
   }
 
@@ -8941,6 +9096,346 @@ function profiliRischio() {
   return { sedute: n - 1, profili: out };
 }
 
+/* ══ v389 — IL GRUPPO DI FATTORE, IN UN POSTO SOLO ═════════════════════════════════════════
+   Estratto da `contestoPortafoglio` senza cambiarne una riga di logica, perche' ora lo legge
+   anche `disciplinaRischio()`. Riceve le posizioni azionarie gia' valorizzate ({r, v}) e il
+   totale azionario, e ritorna chi si muove INSIEME.
+   ⚠ Il gruppo NON e' una lista di settore: e' chi ha correlazione dei rendimenti giornalieri
+   sopra soglia con l'ancora, misurata sulle sedute in comune. Un'etichetta di settore direbbe
+   che MSTR (bitcoin) e NVDA sono due scommesse diverse; la correlazione dice se lo sono. */
+function gruppoFattore(azionarie, totAz) {
+  const rendGiorn = (t) => {
+    const sp = (((azionarie.find(x => x.r.ticker === t) || {}).r || {}).sparks || {}).m6 || [];
+    return sp.length > 2 ? sp.slice(1).map((v, i) => (sp[i] ? v / sp[i] - 1 : 0)) : [];
+  };
+  const correla = (a2, b2) => {
+    const n = Math.min(a2.length, b2.length);
+    if (n < 60) return null;   // sotto due mesi comuni una correlazione non e' confrontabile
+    const x = a2.slice(-n), y = b2.slice(-n);
+    const mx = x.reduce((s2, v) => s2 + v, 0) / n, my = y.reduce((s2, v) => s2 + v, 0) / n;
+    let c = 0, vx = 0, vy = 0;
+    for (let i = 0; i < n; i++) { c += (x[i] - mx) * (y[i] - my); vx += (x[i] - mx) ** 2; vy += (y[i] - my) ** 2; }
+    return (vx && vy) ? c / Math.sqrt(vx * vy) : null;
+  };
+  const SOGLIA_FATTORE = 0.35;
+  const ancora = rendGiorn("NVDA").length ? "NVDA" : (azionarie[0] || {}).r?.ticker;
+  const rAnc = ancora ? rendGiorn(ancora) : [];
+  const corrCon = new Map();
+  if (rAnc.length >= 60) azionarie.forEach(x => corrCon.set(x.r.ticker, correla(rAnc, rendGiorn(x.r.ticker))));
+  const misurato = rAnc.length >= 60;
+  const semi = misurato
+    ? azionarie.filter(x => { const c = corrCon.get(x.r.ticker); return c != null && c >= SOGLIA_FATTORE; })
+    : azionarie.filter(x => x.r.rs_bench === "sox" || /semiconduc|semicondut/i.test(String(x.r.sector || "")));
+  const pesoSemi = semi.reduce((s, x) => s + x.v, 0) / totAz * 100;
+  return { SOGLIA_FATTORE, ancora, corrCon, misurato, semi, pesoSemi };
+}
+
+/* ═══ v389 — LA DISCIPLINA DI RISCHIO DI UN FONDO GROWTH PRIVATO ═══════════════════════════
+   Richiesta del CEO: "ampia sezione in chiusura di risk management con regole di hedge fund
+   privato growth". Serve sia alla pagina (sezione in fondo) sia al pacchetto per l'LLM, e per
+   questo la misura vive QUI, in un posto solo: due implementazioni della stessa domanda
+   divergono, ed e' gia' costato tre volte in questo progetto.
+
+   ⚠⚠ LA REGOLA PIU' IMPORTANTE DI QUESTO BLOCCO, E VA LETTA PRIMA DEL CODICE.
+   Ogni soglia scritta qui sotto e' un'AFFERMAZIONE, non un dato: nel file non esiste nessun
+   limite di concentrazione, nessun tetto di drawdown, nessuna soglia di liquidita'. Sono
+   CONVENZIONI DI LETTURA del mestiere, e ognuna porta scritto (a) da dove viene e (b) che e'
+   una convenzione. E' esattamente la lezione della v240, dove quattro tacche disegnate su un
+   asse — la "zona di intervento" su EUR/JPY, la "media storica" dell'UMich, la soglia di Sahm
+   letta come livello — erano state inventate o applicate alla serie sbagliata, e sembravano
+   dati perche' stavano su un grafico.
+   Qui la separazione e' esplicita in ogni riga: la MISURA viene dal libro, la SOGLIA viene dal
+   mestiere, e lo STATO e' solo il confronto fra le due.
+
+   ⚠ E NON DIMENSIONA. Il sistema non conosce la liquidita' disponibile, gli altri conti ne' la
+   situazione fiscale del CEO: una regola che dicesse "porta MU al 15%" sarebbe un ordine
+   costruito su tre dati mancanti. Ogni regola dice DOVE STA il libro rispetto a una disciplina
+   dichiarata, e si ferma li'. La decisione resta al CEO, che e' l'unico che ha i tre dati.
+
+   ⚠ "FUORI" NON VUOL DIRE "SBAGLIATO". Un fondo growth concentrato sta fuori da quasi tutte
+   queste soglie per COSTRUZIONE — e' la sua tesi, non un difetto. Il valore della sezione e'
+   sapere di quanto, e quale delle deviazioni e' deliberata e quale e' successa da sola. */
+function disciplinaRischio() {
+  const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+    .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
+  if (righe.length < 3) return null;
+  const obbl = (t) => /^BTP|^BOT|^CCT|^IT000/i.test(String(t));
+  const val = (r) => {
+    const q = numero(r.qta ?? r.qty), p = numero(r.price), pmc = numero(r.pmc);
+    if (!Number.isFinite(q)) return null;
+    const prezzo = Number.isFinite(p) ? p : pmc;
+    return obbl(r.ticker) ? q * prezzo / 100 : q * prezzo;
+  };
+  const conVal = righe.map(r => ({ r, v: val(r) })).filter(x => Number.isFinite(x.v) && x.v > 0);
+  const azionarie = conVal.filter(x => !obbl(x.r.ticker));
+  const totAz = azionarie.reduce((s, x) => s + x.v, 0);
+  if (!totAz || azionarie.length < 3) return null;
+  const ord = [...azionarie].sort((a, b) => b.v - a.v);
+  const peso = (x) => x.v / totAz * 100;
+  const R = [];
+  const n1 = (v) => fmtNum.format(Math.round(v * 10) / 10);
+  const n0 = (v) => fmtNum.format(Math.round(v));
+
+  /* ── 1. quanto pesa il nome piu' grande ────────────────────────────────────────────── */
+  const primo = ord[0];
+  R.push({
+    nome: "Peso del singolo nome",
+    soglia: "15% del capitale azionario, con tolleranza fino al 20-25% quando la posizione e' cresciuta da sola",
+    provenienza: "CONVENZIONE del mestiere: un fondo growth concentrato entra fra il 5% e il 10% e lascia correre i vincitori, "
+      + "rivedendo la posizione quando la deriva la porta oltre un quinto del libro. Non e' un dato del file.",
+    misura: `${primo.r.ticker} al ${n1(peso(primo))}% dell'azionario`,
+    valore: peso(primo),
+    stato: peso(primo) > 20 ? "OLTRE" : peso(primo) > 15 ? "AL LIMITE" : "DENTRO",
+    spiega: `La domanda che la soglia pone non e' "e' troppo?" ma "se questo nome perdesse meta' del suo valore in `
+      + `una seduta, il libro reggerebbe?": ${n1(peso(primo) / 2)} punti di patrimonio azionario in un giorno. `
+      + `Il peso e' cresciuto col prezzo, quindi non e' una scelta di ingresso — e' una scelta di NON aver ridotto, `
+      + `che e' comunque una scelta.`,
+  });
+
+  /* ── 2. le prime tre ───────────────────────────────────────────────────────────────── */
+  const tre = ord.slice(0, 3).reduce((s, x) => s + x.v, 0) / totAz * 100;
+  R.push({
+    nome: "Peso delle prime tre posizioni",
+    soglia: "40% del capitale azionario",
+    provenienza: "CONVENZIONE: e' il confine oltre il quale un libro smette di essere un portafoglio concentrato e "
+      + "diventa tre scommesse con un contorno. Nessuna autorita' la fissa; serve a rendere confrontabile il livello.",
+    misura: `${ord.slice(0, 3).map(x => x.r.ticker).join(" + ")} = ${n1(tre)}%`,
+    valore: tre,
+    stato: tre > 50 ? "OLTRE" : tre > 40 ? "AL LIMITE" : "DENTRO",
+    spiega: `Le altre ${azionarie.length - 3} posizioni si dividono il ${n1(100 - tre)}%: sul rischio del `
+      + `libro pesano poco, quindi il loro contributo alla varianza e' marginale rispetto alle prime tre.`,
+  });
+
+  /* ── 3. la concentrazione che conta: il FATTORE, non il nome ───────────────────────── */
+  const gf = gruppoFattore(azionarie, totAz);
+  if (gf.semi.length >= 2) {
+    R.push({
+      nome: "Concentrazione di FATTORE (la scommessa vera)",
+      soglia: "40% del capitale azionario su un solo fattore",
+      provenienza: "CONVENZIONE, ed e' la regola che i fondi growth violano piu' spesso senza accorgersene: la "
+        + "diversificazione si conta sui FATTORI, non sui nomi. Il file non contiene nessuna soglia; la misura si'.",
+      misura: `${gf.semi.length} posizioni = ${n1(gf.pesoSemi)}% dell'azionario (${gf.semi.map(x => x.r.ticker).join(", ")})`,
+      valore: gf.pesoSemi,
+      stato: gf.pesoSemi > 55 ? "OLTRE" : gf.pesoSemi > 40 ? "AL LIMITE" : "DENTRO",
+      spiega: gf.misurato
+        ? `Non e' un raggruppamento per etichetta di settore: e' chi ha correlazione dei rendimenti giornalieri `
+          + `≥ ${gf.SOGLIA_FATTORE} con ${gf.ancora} sulle sedute in comune. ⚠ E' LA RIGA PIU' IMPORTANTE DELLA SEZIONE: `
+          + `${n1(gf.pesoSemi)}% del capitale si muove insieme, quindi il libro ha UNA posizione da ${n1(gf.pesoSemi)}% `
+          + `scritta ${gf.semi.length} volte. Un evento che colpisce il fattore non colpisce un nome: li colpisce tutti.`
+        : `⚠ Gruppo per ETICHETTA di settore: le serie per misurare le correlazioni non c'erano in questo run, quindi `
+          + `questa riga e' meno solida delle altre e va letta come indicazione.`,
+    });
+  }
+
+  /* ── 4. quante decisioni indipendenti ci sono davvero ──────────────────────────────── */
+  const pr = (typeof profiliRischio === "function") ? profiliRischio() : null;
+  const mio = pr && pr.profili && pr.profili[0];
+  if (mio && Number.isFinite(mio.eff)) {
+    R.push({
+      nome: "Scommesse davvero indipendenti",
+      soglia: "almeno 5 decisioni indipendenti",
+      provenienza: "CONVENZIONE: sotto le cinque, la diversificazione non riduce piu' il rischio in modo apprezzabile "
+        + "e il libro si comporta come un paniere di poche idee. La formula (1/(1/k + (k-1)/k·correlazione media)) e' "
+        + "standard; la soglia di 5 e' una convenzione di lettura.",
+      misura: `${n1(mio.eff)} su ${mio.n} nomi`,
+      valore: mio.eff,
+      stato: mio.eff < 3 ? "OLTRE" : mio.eff < 5 ? "AL LIMITE" : "DENTRO",
+      spiega: `Aggiungere un nome correlato agli altri non aggiunge una decisione: allarga la stessa. Il numero dice `
+        + `che il libro contiene circa ${n0(mio.eff)} idee, non ${mio.n}. ⚠ Conseguenza operativa: il tempo speso ad `
+        + `analizzare la tredicesima posizione rende meno del tempo speso a chiedersi se la prima idea vale ancora.`,
+    });
+  }
+
+  /* ── 5. il drawdown gia' avvenuto, come metro di quello che verra' ─────────────────── */
+  if (mio && Number.isFinite(mio.dd)) {
+    const dd = Math.abs(mio.dd);
+    R.push({
+      nome: "Discesa dal massimo (drawdown)",
+      soglia: "-20% rivedere la tesi, -30% ridurre il rischio lordo",
+      provenienza: "CONVENZIONE di governance: molti fondi scrivono nel proprio regolamento due soglie, una di "
+        + "revisione e una di azione, fissate in anticipo proprio perche' nel mezzo di una discesa il giudizio e' "
+        + "peggiore. Il file non le contiene.",
+      misura: `${n1(dd)}% sulle ultime ${pr.sedute} sedute, ${mio.sotto} sedute sott'acqua`
+        + `${mio.recuperato ? ", recuperato" : ", NON ancora recuperato"}`,
+      valore: dd,
+      stato: dd > 30 ? "OLTRE" : dd > 20 ? "AL LIMITE" : "DENTRO",
+      spiega: `⚠ E' il calo GIA' AVVENUTO, non una previsione: serve a sapere cosa e' ordinario per QUESTO libro. `
+        + `Una discesa dentro quel range non rompe niente; una fuori merita di essere spiegata. ⚠ E la finestra e' `
+        + `${pr.sedute} sedute: non contiene un mercato ribassista intero, quindi il peggio misurato NON e' il peggio possibile.`,
+    });
+  }
+
+  /* ── 6. il rischio d'evento: quanta parte del libro riprezza nella stessa finestra ─── */
+  const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+  const conEarn = azionarie
+    .map(x => ({ x, d: x.r.earnings_date ? new Date(String(x.r.earnings_date).slice(0, 10) + "T12:00:00") : null }))
+    .filter(o => o.d && !isNaN(o.d) && o.d >= oggi)
+    .sort((a, b) => a.d - b.d);
+  if (conEarn.length >= 3) {
+    /* la finestra di 21 giorni piu' densa: si cercano tutte, non si assume che sia la prima */
+    let best = null;
+    for (const o of conEarn) {
+      const fine = new Date(o.d.getTime() + 21 * 86400000);
+      const dentro = conEarn.filter(y => y.d >= o.d && y.d <= fine);
+      const p = dentro.reduce((s, y) => s + y.x.v, 0) / totAz * 100;
+      if (!best || p > best.p) best = { da: o.d, a: fine, dentro, p };
+    }
+    const gg = (d) => `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+    R.push({
+      nome: "Rischio d'evento concentrato (trimestrali)",
+      soglia: "40% del capitale che riprezza nella stessa finestra di tre settimane",
+      provenienza: "CONVENZIONE: tre settimane e' la finestra tipica in cui si addensa una stagione di trimestrali. "
+        + "La soglia serve a rendere visibile un rischio che il calendario nasconde perche' e' distribuito su piu' righe.",
+      misura: `${best.dentro.length} posizioni = ${n1(best.p)}% dell'azionario fra il ${gg(best.da)} e il ${gg(best.a)} `
+        + `(${best.dentro.map(y => y.x.r.ticker).join(", ")})`,
+      valore: best.p,
+      stato: best.p > 60 ? "OLTRE" : best.p > 40 ? "AL LIMITE" : "DENTRO",
+      spiega: `Le trimestrali sono l'unico evento datato che il sistema conosce in anticipo. ⚠ SU UN LIBRO CORRELATO `
+        + `si sommano al fattore: se i nomi si muovono insieme E riportano insieme, la settimana peggiore non e' `
+        + `una coincidenza, e' una struttura. ⚠ Le date oltre il trimestre in corso sono STIME dell'emittente e si spostano.`,
+    });
+  }
+
+  /* ── 7. la liquidita' di uscita: la regola che qui NON vincola, ed e' un fatto utile ─ */
+  const conAdv = azionarie.map(x => {
+    const s = x.r.stats || {};
+    const adv = numero(s.avg_volume_30d) || numero(x.r.volume);
+    const prezzo = numero(x.r.price);
+    if (!Number.isFinite(adv) || !Number.isFinite(prezzo) || adv <= 0) return null;
+    const eur = numero(DATA && DATA.eurusd) || 1.16;
+    /* controvalore in dollari contro il 20% del volume medio in dollari */
+    return { tk: x.r.ticker, gg: (x.v * eur) / (adv * prezzo * 0.20) };
+  }).filter(Boolean);
+  if (conAdv.length >= 3) {
+    const peggiore = conAdv.reduce((a, b) => (b.gg > a.gg ? b : a));
+    R.push({
+      nome: "Liquidita' di uscita",
+      soglia: "3 sedute per liquidare una posizione, prendendo il 20% del volume medio giornaliero",
+      provenienza: "CONVENZIONE: il 20% dell'ADV e' il tetto oltre il quale l'ordine muove il prezzo contro chi lo "
+        + "esegue; le tre sedute sono il confine convenzionale fra una posizione liquida e una illiquida.",
+      misura: peggiore.gg < 0.05
+        ? `la posizione meno liquida (${peggiore.tk}) si chiuderebbe in meno di un decimo di seduta`
+        : `${peggiore.tk}: ${n1(peggiore.gg)} sedute`,
+      valore: peggiore.gg,
+      stato: peggiore.gg > 3 ? "OLTRE" : peggiore.gg > 1 ? "AL LIMITE" : "NON VINCOLA",
+      spiega: peggiore.gg < 1
+        ? `⚠ QUESTA REGOLA NON MORDE: il libro e' piccolo rispetto agli scambi dei nomi che contiene, quindi `
+          + `l'uscita non e' un vincolo e la liquidita' non entra fra i motivi che condizionano una vendita. `
+          + `E' una delle poche discipline di un fondo che qui risulta gia' soddisfatta, e lo risulta perche' `
+          + `e' stata misurata, non assunta.`
+        : `Su questa posizione l'uscita richiede piu' di una seduta senza muovere il prezzo: la decisione di vendere `
+          + `e l'esecuzione non coincidono, e la differenza va messa in conto.`,
+    });
+  }
+
+  /* ── 8. il bilancio: chi non si finanzia da solo ───────────────────────────────────── */
+  const fragili = azionarie.map(x => {
+    const c = x.r.credito || {}, b = x.r.combustione || {};
+    return { tk: x.r.ticker, peso: peso(x), cop: numero(c.copertura),
+             fcf: numero(b.fcf_ttm), mesi: numero(b.mesi_operativi) };
+  }).filter(o => (Number.isFinite(o.cop) && o.cop < 1) || (Number.isFinite(o.fcf) && o.fcf < 0));
+  if (fragili.length) {
+    const pesoFragili = fragili.reduce((s, o) => s + o.peso, 0);
+    /* ⚠ un'autonomia di "1022,6 mesi" e' aritmeticamente giusta e comunicativamente falsa: nasce
+       da una combustione operativa quasi nulla al denominatore, e stampata cosi' fa dubitare di
+       tutto il blocco invece che di quella riga. Oltre i cinque anni il numero non porta piu'
+       informazione — dice solo "non e' un problema di cassa" — e si scrive cosi'. */
+    const autonomia = (m) => !Number.isFinite(m) ? ""
+      : m > 60 ? ", cassa per oltre 5 anni ai ritmi attuali"
+      : `, ${n1(m)} mesi di autonomia`;
+    R.push({
+      nome: "Autofinanziamento delle partecipate",
+      soglia: "nessuna posizione con flusso di cassa libero negativo E interessi non coperti dalla gestione",
+      provenienza: "CONVENZIONE, ed e' quella che distingue un fondo growth da un fondo speculativo: si accetta di "
+        + "pagare la crescita, non di finanziarla col debito altrui. Le righe di bilancio sono nel file; la regola no.",
+      misura: `${fragili.length} ${fragili.length === 1 ? "posizione" : "posizioni"} = ${n1(pesoFragili)}% dell'azionario: `
+        + fragili.map(o => `${o.tk} (${Number.isFinite(o.cop) && o.cop < 1 ? (o.cop < 0 ? "EBIT negativo" : `copertura ${n1(o.cop)}×`) : "FCF negativo"}`
+            + `${autonomia(o.mesi)})`).join(", "),
+      valore: pesoFragili,
+      stato: pesoFragili > 20 ? "OLTRE" : pesoFragili > 10 ? "AL LIMITE" : "DENTRO",
+      spiega: `Queste posizioni dipendono dal mercato dei capitali per continuare: un irrigidimento del credito le `
+        + `colpisce PRIMA e PIU' delle altre, a parita' di tesi industriale. ⚠ E' il canale che lega questa riga al `
+        + `quadro macro: lo spread high yield in coda al pacchetto e' la variabile che decide il costo di quel `
+        + `rifinanziamento. ⚠ Voci di fonte aggregatore, non del deposito ufficiale.`,
+    });
+  }
+
+  /* ── 9. cio' che il sistema NON sa, e che nessuna riga puo' sostituire ─────────────── */
+  R.push({
+    nome: "Leva, esposizione lorda e copertura",
+    soglia: "esposizione lorda dichiarata, leva dichiarata, coperture dichiarate",
+    provenienza: "CONVENZIONE: e' la prima riga di qualunque scheda di rischio di un fondo. Qui non e' misurabile.",
+    misura: "NON MISURABILE: il sistema conosce solo le posizioni lunghe che il CEO ha inserito",
+    valore: null,
+    stato: "NON MISURABILE",
+    spiega: `Il sistema non sa se ci sia margine, se esistano posizioni corte, opzioni di copertura, altri conti o `
+      + `altri strumenti. ⚠ TUTTE le misure di questa sezione descrivono quindi il LIBRO CHE IL SISTEMA VEDE, e se `
+      + `il vero patrimonio e' piu' grande ogni percentuale qui sopra e' sovrastimata. Il buco resta dichiarato e `
+      + `non colmato da nessuna assunzione: e' l'unica forma in cui chi legge sa di cosa non si e' tenuto conto.`,
+  });
+
+  return { regole: R, sedute: pr ? pr.sedute : null, nomi: azionarie.length, totAz };
+}
+
+/* ═══ v389 — LA DISCIPLINA DI RISCHIO DENTRO IL PACCHETTO ══════════════════════════════════
+   Stessa misura della pagina, stessa funzione: `disciplinaRischio()`. Qui cambia solo la forma.
+   ⚠ PERCHE' NEL PACCHETTO E NON SOLO IN PAGINA: il CEO ha chiesto che l'analisi sia fatta "come
+   team di analisti senior di Wall Street con ottica di risk management e di hedge fund privato
+   growth". Una richiesta del genere, scritta nelle sole istruzioni, produce il TONO di quel
+   mestiere senza i suoi numeri — cioe' esattamente il registro che invita ad allucinare. Qui
+   l'LLM riceve le soglie del mestiere GIA' CONFRONTATE col libro vero: non deve ricordarsi
+   quanto pesa MU ne' immaginare quale sia un limite ragionevole.
+   ⚠⚠ E LE SOGLIE SONO DICHIARATE CONVENZIONI, riga per riga. Se non lo fossero, l'LLM le
+   citerebbe come regole del sistema — e una convenzione ripetuta con l'autorita' di un dato e'
+   il modo piu' rapido di trasformare una lettura in un obbligo. */
+function disciplinaTesto() {
+  const d = (typeof disciplinaRischio === "function") ? disciplinaRischio() : null;
+  if (!d || !d.regole.length) return "";
+  const oltre = d.regole.filter(r => r.stato === "OLTRE");
+  const L = [];
+  L.push("=== LA DISCIPLINA DI RISCHIO DI UN FONDO GROWTH, APPLICATA A QUESTO LIBRO ===");
+  L.push("Ogni riga ha TRE parti che vanno tenute distinte, e il pacchetto le separa apposta: la "
+    + "MISURA viene dal libro del CEO, la SOGLIA e' una convenzione del mestiere (nel file non "
+    + "esiste nessun limite di concentrazione, di drawdown o di liquidita'), e lo STATO e' solo il "
+    + "confronto fra le due. ⚠ Citando una soglia, dichiarala per quello che e': se la riporti come "
+    + "una regola del sistema, chi legge la prende per un obbligo che nessuno ha scritto.");
+  /* ⚠⚠ ANTI-DOPPIO CONTEGGIO. Le misure di questa sezione sono LE STESSE del blocco del libro
+     qui sopra — peso del primo nome, prime tre, gruppo correlato, scommesse effettive, drawdown
+     — viste contro una soglia invece che da sole. Senza questa riga un lettore le conta come
+     prove separate e conclude che il libro e' concentrato "per sei misure indipendenti", mentre
+     le misure sono le stesse guardate due volte. E' la regola che il pacchetto applica gia' a
+     CPI/PCE e al disaccoppiamento contro i profitti reali, qui applicata al libro. */
+  L.push("⚠ QUESTE MISURE SONO LE STESSE DEL BLOCCO DEL LIBRO QUI SOPRA, non misure nuove: la "
+    + "differenza e' che qui stanno accanto a una soglia. Contale UNA VOLTA SOLA. La concentrazione "
+    + "per nome, quella per fattore, le scommesse effettive e il drawdown compaiono in entrambi i "
+    + "blocchi perche' li' sono il fatto e qui sono il confronto — non perche' siano prove separate.");
+  L.push(`STATO COMPLESSIVO: ${oltre.length} discipline su ${d.regole.length} sono oltre la propria soglia`
+    + (oltre.length ? ` (${oltre.map(r => r.nome).join(" · ")})` : "") + ". "
+    + "⚠ NON SIGNIFICA CHE IL LIBRO SIA SBAGLIATO, e questa e' la riga che ti impedisce di scrivere "
+    + "l'analisi facile: un fondo growth concentrato sta fuori da quasi tutte queste soglie PER "
+    + "COSTRUZIONE — e' la sua tesi, non un difetto. Quello che conta e' di QUANTO, e soprattutto "
+    + "quali deviazioni sono state decise e quali sono successe da sole mentre i prezzi si muovevano. "
+    + "Una posizione cresciuta dal 10% al 22% col prezzo non e' la stessa cosa di una comprata al 22%.");
+  d.regole.forEach((r, i) => {
+    L.push(`${i + 1}) ${r.nome} — ${r.stato}`);
+    L.push(`   nel libro: ${r.misura}`);
+    L.push(`   soglia (convenzione): ${r.soglia}`);
+    L.push(`   da dove viene la soglia: ${r.provenienza}`);
+    L.push(`   ${r.spiega}`);
+  });
+  /* ⚠ IL DIVIETO DI DIMENSIONARE NON STA QUI, E NON E' UNA DIMENTICANZA. Era scritto in questo
+     punto e il gate di coerenza (C9) l'ha tolto avendo ragione: e' un ORDINE, e gli ordini vivono
+     nella testata — config/prompt_header_macro.txt per il pacchetto macro, il blocco REGOLE per
+     quello del titolo, e tutti e due lo portano. Ripeterlo qui e' la duplicazione testata/coda
+     che in questo progetto e' gia' costata tre volte (v156, v179, v180).
+     Quello che resta nel payload e' il FATTO che rende il divieto sensato: i tre dati che il
+     sistema non ha. Sta nella regola "Leva, esposizione lorda e copertura" qui sopra. */
+  L.push("I tre dati che questa sezione NON contiene, e senza i quali una quantita' non e' "
+    + "calcolabile: la liquidita' disponibile del CEO, gli altri conti, la sua situazione fiscale. "
+    + "Nessuno dei tre e' nel sistema.");
+  return L.join("\n");
+}
+
 function contestoPortafoglio(tkCorrente) {
   const righe = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
     .filter(r => r && numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
@@ -8984,30 +9479,71 @@ function contestoPortafoglio(tkCorrente) {
     const qui = String(x.r.ticker).toUpperCase() === String(tkCorrente || "").toUpperCase() ? "  ← IL TITOLO DI QUESTA ANALISI" : "";
     L.push(`- ${x.r.ticker}: ${pct.toFixed(1)}% dell'azionario${Number.isFinite(g) ? ` · ${signTxt(g)} dal carico` : ""}${qui}`);
   });
-  /* la concentrazione per FATTORE MISURATO, non per etichetta: e' cio' che si muove insieme */
-  const rendGiorn = (t) => {
-    const sp = (((azionarie.find(x => x.r.ticker === t) || {}).r || {}).sparks || {}).m6 || [];
-    return sp.length > 2 ? sp.slice(1).map((v, i) => (sp[i] ? v / sp[i] - 1 : 0)) : [];
-  };
-  const correla = (a2, b2) => {
-    const n = Math.min(a2.length, b2.length);
-    if (n < 60) return null;   // sotto due mesi comuni una correlazione non e' confrontabile
-    const x = a2.slice(-n), y = b2.slice(-n);
-    const mx = x.reduce((s2, v) => s2 + v, 0) / n, my = y.reduce((s2, v) => s2 + v, 0) / n;
-    let c = 0, vx = 0, vy = 0;
-    for (let i = 0; i < n; i++) { c += (x[i] - mx) * (y[i] - my); vx += (x[i] - mx) ** 2; vy += (y[i] - my) ** 2; }
-    return (vx && vy) ? c / Math.sqrt(vx * vy) : null;
-  };
-  const SOGLIA_FATTORE = 0.35;
-  const ancora = rendGiorn("NVDA").length ? "NVDA" : (azionarie[0] || {}).r?.ticker;
-  const rAnc = ancora ? rendGiorn(ancora) : [];
-  const corrCon = new Map();
-  if (rAnc.length >= 60) azionarie.forEach(x => corrCon.set(x.r.ticker, correla(rAnc, rendGiorn(x.r.ticker))));
-  const misurato = rAnc.length >= 60;
-  const semi = misurato
-    ? azionarie.filter(x => { const c = corrCon.get(x.r.ticker); return c != null && c >= SOGLIA_FATTORE; })
-    : azionarie.filter(x => x.r.rs_bench === "sox" || /semiconduc|semicondut/i.test(String(x.r.sector || "")));
-  const pesoSemi = semi.reduce((s, x) => s + x.v, 0) / totAz * 100;
+
+  /* ═══ v389 — TECNICA E FONDAMENTALI DI TUTTE LE POSIZIONI, NON SOLO DI QUELLA ANALIZZATA ═══
+     Richiesta del CEO: "che le informazioni tecniche/fondamentali dei titoli in portafoglio
+     siano acquisite". Fino a qui il blocco del libro pubblicava DUE numeri per posizione — peso
+     e guadagno dal carico — mentre `data.json` porta per ognuna medie, RSI, forza relativa,
+     distanza dai massimi, multiplo prospettico, crescita dei ricavi e data della trimestrale.
+     ⚠ PERCHE' CONTA, e non e' completezza per completezza: senza questi numeri l'unico modo di
+     giudicare le altre dodici posizioni e' il GUADAGNO DAL CARICO, che e' la misura che fa
+     tenere i perdenti e vendere i vincitori. Un team di risk management che vede "-41% dal
+     carico" e basta non puo' distinguere una tesi rotta da una discesa ordinaria; con la
+     distanza dal massimo, la posizione rispetto alle medie e la forza relativa, si'.
+     ⚠ Sono i numeri GIA' CALCOLATI dal sistema sulle stesse barre del grafico: l'LLM non deve
+     ricalcolarli ne' cercarli, e la riga dei metodi lo dice. */
+  const nRid = (v, d = 1) => Number.isFinite(v) ? fmtNum.format(Math.round(v * 10 ** d) / 10 ** d) : null;
+  const righeTec = ord.map(x => {
+    const r = x.r, s = r.stats || {};
+    const p = [];
+    const s50 = numero(r.sma50_dist_pct), s200 = numero(r.sma200_dist_pct);
+    if (Number.isFinite(s50) || Number.isFinite(s200)) {
+      p.push("medie: " + [Number.isFinite(s50) ? `${signTxt(s50)} dalla 50` : null,
+                          Number.isFinite(s200) ? `${signTxt(s200)} dalla 200` : null].filter(Boolean).join(", "));
+    }
+    const rsi = numero(r.rsi);
+    if (Number.isFinite(rsi)) p.push(`RSI ${nRid(rsi)}`);
+    const w52 = numero(r.w52_dist_pct);
+    if (Number.isFinite(w52)) p.push(`${signTxt(w52)} dal massimo 52s`);
+    const rs = numero(r.rs_1m);
+    /* ⚠ signTxt aggiunge gia' "%": la forza relativa e' una DIFFERENZA fra due rendimenti,
+       quindi si misura in punti percentuali e "+5,2% pp" sarebbe due unita' sulla stessa cifra. */
+    if (Number.isFinite(rs)) p.push(`forza relativa 1M ${signTxt(rs, " pp")} vs ${String(r.rs_bench || "indice").toUpperCase()}`);
+    const atr = numero(r.atr_pct);
+    if (Number.isFinite(atr)) p.push(`ampiezza tipica di seduta ${nRid(atr)}%`);
+    /* ⚠ un multiplo prospettico NEGATIVO non e' un multiplo basso: e' un utile atteso negativo,
+       e stampato come "-75,7×" verrebbe letto come "costa pochissimo". Si scrive per quello che e'. */
+    const fpe = numero(s.forward_pe);
+    if (Number.isFinite(fpe)) p.push(fpe < 0 ? "utile atteso NEGATIVO (nessun multiplo prospettico)"
+                                             : `P/E prospettico ${nRid(fpe)}×`);
+    const rg = numero(s.revenue_growth);
+    if (Number.isFinite(rg)) p.push(`ricavi ${signTxt(rg * 100)} a/a`);
+    const gg = (typeof giorniAllaTrimestrale === "function") ? giorniAllaTrimestrale(r.earnings_date) : null;
+    if (Number.isFinite(gg)) p.push(gg === 0 ? "trimestrale OGGI" : `trimestrale fra ${gg} giorni`);
+    return p.length ? `- ${r.ticker}: ${p.join(" · ")}` : null;
+  }).filter(Boolean);
+  if (righeTec.length) {
+    L.push("TECNICA E FONDAMENTALI DI OGNI POSIZIONE (gia' calcolati dal sistema sulle barre "
+      + "giornaliere Yahoo con auto_adjust, le stesse che disegnano il grafico — non vanno "
+      + "ricalcolati ne' cercati online):");
+    righeTec.forEach(r => L.push(r));
+    L.push("⚠ COME SI LEGGE QUESTO ELENCO. La distanza dal massimo a 52 settimane e la posizione "
+      + "rispetto alle medie dicono cose diverse: la prima misura quanto e' gia' sceso il titolo, "
+      + "la seconda se il trend regge adesso. Un nome molto sotto il massimo ma sopra le medie sta "
+      + "risalendo; uno sotto entrambe no. ⚠ La forza relativa e' contro il riferimento NOMINATO "
+      + "in ciascuna riga, che cambia col titolo (il settore dove il sistema lo riconosce, "
+      + "l'indice generale dove ripiega): il confronto fra due righe con riferimenti diversi non "
+      + "e' omogeneo. ⚠ I fondamentali sono di fonte aggregatore, non del deposito ufficiale.");
+  }
+  /* la concentrazione per FATTORE MISURATO, non per etichetta: e' cio' che si muove insieme.
+     ⚠ v389 — IL CALCOLO E' USCITO DA QUI ed e' diventato `gruppoFattore()`, perche' ora serve
+     anche alla DISCIPLINA DI RISCHIO (sezione di pagina e blocco del pacchetto). Due
+     implementazioni della stessa domanda divergono — e' costato tre volte in questo progetto
+     (v161, v207, v316) — quindi il gruppo si calcola in un posto solo.
+     La logica NON e' cambiata: verificato generando i pacchetti prima e dopo sullo stesso
+     data.json e confrontandoli byte a byte. */
+  const gf = gruppoFattore(azionarie, totAz);
+  const { SOGLIA_FATTORE, ancora, corrCon, misurato, semi, pesoSemi } = gf;
   const primeTre = ord.slice(0, 3).reduce((s, x) => s + x.v, 0) / totAz * 100;
   L.push(`CONCENTRAZIONE: le prime tre posizioni valgono il ${primeTre.toFixed(0)}% dell'azionario`
     + `${semi.length >= 2 ? ` · ${semi.length} posizioni si muovono INSIEME e valgono il ${pesoSemi.toFixed(0)}% dell'azionario: `
@@ -10148,7 +10684,16 @@ function buildCIOText() {
   const historical = historicalDigestText();
   /* v337 — non c'e' piu' niente da issare in cima: il blocco che si issava (il disaccordo)
      e' uscito col punteggio 0-100 su cui era costruito. Il corpo e' il pacchetto cosi' com'e'. */
-  const body = full;
+  /* ⚠⚠ v389 — IL PACCHETTO MACRO PORTA IL LIBRO. Fino a qui non ne conteneva una riga, e la
+     testata diceva perfino "Non hai davanti nessun portafoglio": era vero nella v256, quando le
+     posizioni non esistevano nel sistema, ed e' diventato FALSO nella v307 senza che nessuno
+     riallineasse il testo. Un pacchetto che dichiara di non avere una cosa che ha e' peggio di
+     uno che tace: manda l'LLM a rifiutare esplicitamente il collegamento fra macro e libro, che
+     e' l'unico collegamento per cui il CEO legge la macro.
+     Il CEO ha chiesto che l'analisi abbia SEMPRE contenuti relativi al portafoglio: qui il
+     contesto del libro e la disciplina di rischio entrano anche nel percorso macro. */
+  const libro = [contestoPortafoglio(null), disciplinaTesto()].filter(Boolean).join("\n\n");
+  const body = libro ? full + "\n\n" + libro : full;
   const now = new Date();
   const pad = (n) => String(n).padStart(2, "0");
   const stamp = `\u27e6 BUILD v${BUILD_VERSION} \u00b7 generato ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())} \u27e7`;
@@ -10909,9 +11454,15 @@ function datiNostriDelTitolo(tk) {
 `  revisioni degli UTILI a 90 giorni, la loro ampiezza e la dispersione di utili e target il`,
 `  sistema li pubblica gia' qui sotto`,
 `· notizie e fatti societari: prima le ULTIME 48 ORE, poi il contesto delle ultime settimane.`,
-`  Il pacchetto porta i titoli MACRO delle ultime 6 ore quando ce ne sono; su questa societa' e sul`,
-`  suo settore non porta niente, quindi quella parte e' interamente tua. Se non trovi nulla di`,
-`  recente, scrivilo: "nessuna notizia rilevante nelle ultime 48 ore" e' un'informazione.`,
+`  Il pacchetto porta i titoli MACRO e dichiara quanti cadono nelle ultime 8 ore; su QUESTA`,
+`  SOCIETA' e sul suo settore non porta niente, quindi quella parte e' interamente tua. Se non`,
+`  trovi nulla di recente, scrivilo: "nessuna notizia rilevante nelle ultime 48 ore" e' un'informazione.`,
+`  ⚠ E INCROCIALE COL LIBRO, non solo col titolo analizzato: una notizia che colpisce il fattore`,
+`  condiviso — il gruppo di posizioni correlate che trovi nel blocco del libro — vale per tutte`,
+`  quelle posizioni insieme, non per una. E' la differenza fra una notizia su un nome e una`,
+`  notizia sulla scommessa che il libro ha scritto piu' volte.`,
+`  ⚠ Se il pacchetto dichiara di NON AVERE titoli macro, quello e' un dato MANCANTE e non`,
+`  l'assenza di notizie: il sistema non sa distinguere un mondo silenzioso da una fonte caduta.`,
 `⚠ La riga "NON VERIFICATO:" in chiusura e' obbligatoria, e contiene le voci che non risultano`,
 `riuscito a trovare o confermare. Se le hai trovate tutte, scrivi "NON VERIFICATO: nessuna".`,
 `Un numero plausibile inventato e' peggio di un buco dichiarato: il buco lo vedo, l'invenzione no.`,
@@ -11164,6 +11715,47 @@ function buildPromptTicker(tkGrezzo) {
 `  trovi ADESSO in rete.`,
 `· Niente domande in chiusura e niente offerte di approfondimento: quello che serve, dillo qui.`,
 ``,
+`══ IL COLLAUDO DEI DATI, PRIMA DI USARLI — tre domande per ogni classe, e si scrive l'esito ══`,
+`Richiesta esplicita del CEO: congruita', affidabilita' e freschezza vanno VERIFICATE da chi legge,`,
+`non date per buone. Non e' diffidenza verso il sistema: e' che un pacchetto di 70.000 caratteri`,
+`contiene dati di eta' diverse da uno a centoquaranta giorni, e usarli come se fossero tutti di`,
+`oggi e' il modo piu' comune di produrre un'analisi sbagliata con numeri giusti.`,
+`Prima di scrivere il giudizio, esegui questo collaudo e riportane l'esito in TRE RIGHE dentro`,
+`"SEGNALAZIONI AL SISTEMA". Le classi di dato NON si collaudano allo stesso modo:`,
+``,
+`  (1) FRESCHEZZA — quanto e' vecchio, e conta che lo sia?`,
+`      · PREZZI E TECNICA: la barra dichiarata in cima. A mercato aperto e' vecchia di minuti o`,
+`        ore; oltre le 24 ore in giorno di borsa aperta e' un fatto da dichiarare, non da ignorare.`,
+`      · STATISTICHE UFFICIALI: ognuna porta rilevazione, eta' in giorni e prossima uscita. Sopra`,
+`        i 30 giorni CERCA se la fonte ha gia' pubblicato un dato piu' recente — quelle righe sono`,
+`        la lista della spesa, non un contorno.`,
+`      · NOTIZIE: il pacchetto porta i titoli macro e dichiara quanti cadono nelle ultime 8 ore.`,
+`        Se dichiara di non averne, e' un dato MANCANTE e non l'assenza di notizie: cercale.`,
+`      · FONDAMENTALI E BILANCI: la data del conto e' scritta accanto. Un bilancio di quattro mesi`,
+`        fa e' normale; usarlo senza dire a che trimestre si riferisce no.`,
+``,
+`  (2) CONGRUITA' — i numeri del pacchetto si contraddicono fra loro?`,
+`      Il pacchetto calcola alcune grandezze in due punti (il decennale come quotazione e come`,
+`      osservazione FRED, il flusso di cassa libero dall'aggregatore e dal rendiconto): dove lo fa,`,
+`      lo dichiara. Se trovi DUE VALORI per la stessa grandezza SENZA quella dichiarazione, e' un`,
+`      difetto e va in SEGNALAZIONI. Controlla anche che i denominatori siano gli stessi prima di`,
+`      confrontare due percentuali: "23% del capitale" e "34% del rischio" sono confrontabili solo`,
+`      perche' il pacchetto dichiara che stanno sullo stesso insieme.`,
+``,
+`  (3) AFFIDABILITA' — di che RANGO e' la fonte, e regge il peso che le stai dando?`,
+`      Fonte primaria (deposito societario) > dati di mercato > stampa finanziaria > aggregatori.`,
+`      Il pacchetto dichiara la propria fonte riga per riga, e per i fondamentali e' un AGGREGATORE:`,
+`      se una conclusione importante poggia su un numero di aggregatore, verificalo alla fonte`,
+`      primaria o dichiara che non l'hai fatto. Le etichette qualitative del sistema ("rilassato",`,
+`      "elevato", "OLTRE") sono classificazioni NOSTRE con la banda scritta accanto: sono`,
+`      convenzioni dichiarate, non misure, e se il quadro le contraddice la conclusione e' tua.`,
+``,
+`⚠ LE TRE RIGHE DI ESITO SONO OBBLIGATORIE e vanno scritte anche quando va tutto bene — nella`,
+`forma "FRESCHEZZA: il dato piu' vecchio su cui poggia una conclusione e' <quale>, di <N> giorni;`,
+`ho verificato online <cosa>", "CONGRUITA': nessuna contraddizione / trovata <quale>",`,
+`"AFFIDABILITA': la conclusione piu' importante poggia su <fonte di rango N>".`,
+`Un collaudo che non lascia traccia non e' distinguibile da un collaudo non fatto.`,
+``,
 `══ CONTROLLO DEL PACCHETTO — sezione obbligatoria, in fondo, intitolata "SEGNALAZIONI AL SISTEMA" ══`,
 `Mentre lavori, tratta i numeri di questo pacchetto come DA VERIFICARE, non come veri per`,
 `definizione. Il sistema che li produce ha gia' pubblicato, in passato: un percentile sopra 100,`,
@@ -11192,7 +11784,11 @@ function buildPromptTicker(tkGrezzo) {
 `──────────────────────────────────────────────────────────────────`,
 ].join("\n");
 
-  return [istruzioni, datiNostriDelTitolo(tk), contestoPortafoglio(tk), diarioOperazioni(tk), soloDati, storico].filter(Boolean).join("\n\n");
+  /* v389 — la disciplina di rischio sta SUBITO DOPO il contesto del libro e PRIMA dei dati
+     macro: e' il blocco che dice con quale metro leggere tutto il resto, e un metro consegnato
+     in coda arriva quando il giudizio e' gia' scritto (stessa ragione della v156). */
+  return [istruzioni, datiNostriDelTitolo(tk), contestoPortafoglio(tk), disciplinaTesto(),
+          diarioOperazioni(tk), soloDati, storico].filter(Boolean).join("\n\n");
 }
 
 async function consegnaPacchetto(testo, che, esito) {

@@ -14,6 +14,16 @@ Fonti (tutte gratuite):
   Investing.com, Google News
 """
 import csv
+# ⚠ v389 — `html` MANCAVA, e le news erano morte da quando sono nate (v304).
+# Ogni run del CI stampava tre righe identiche — `!! news CNBC Economia: name 'html' is not
+# defined` — e nessuno le leggeva, perche' la pipeline usciva 0: l'except le trasformava in
+# un avviso su stderr. Conseguenza: `macro["news"]` non veniva MAI scritto, e il blocco del
+# pacchetto che pubblica i titoli e' condizionato alla sua esistenza, quindi il pacchetto
+# TACEVA. Non "nessuna notizia": proprio nessuna riga sull'argomento.
+# E' la classe gia' scritta in CLAUDE.md — i fallback devono essere RUMOROSI — applicata alla
+# fonte invece che al dato: un import mancante dentro un try/except per-fonte non rompe niente
+# e spegne una funzionalita' intera.
+import html
 import io
 import json
 import logging
@@ -3699,6 +3709,41 @@ def validate_macro(macro):
         _asof = (obj or {}).get("fetched_at") or (obj or {}).get("date") or today.isoformat()
         add(k, str(_asof)[:10], 40, "ok" if val is not None else "missing",
             "" if val is not None else "fonte ko in questo run: conferma leva/valutazioni impossibile")
+
+    # --- news macro: LA FONTE CHE NESSUNO SORVEGLIAVA ---------------------------------
+    # ⚠⚠ v389 — QUESTO CHECK NASCE DA UN GUASTO DURATO QUANTO LA FUNZIONALITA'. `import html`
+    # mancava in questo file: tutte e tre le fonti RSS morivano con NameError dentro il loro
+    # try/except per-fonte, `macro["news"]` non veniva MAI scritto, e il pacchetto per l'LLM —
+    # che pubblica quel blocco solo se la chiave esiste — TACEVA. Non "nessuna notizia":
+    # proprio nessuna riga sull'argomento.
+    # Il CI lo stampava a ogni run ("!! news CNBC Economia: name 'html' is not defined") e
+    # nessuno lo leggeva, perche' la pipeline usciva 0 e i dodici check di qualita' guardavano
+    # tutti altrove. Dodici sorveglianti e una fonte scoperta: il guasto e' durato li'.
+    # ⚠ La soglia e' sulle 48 ORE e non sulle 8 della finestra del pacchetto, ed e' deliberato:
+    # la macro non esce di continuo e nel fine settimana non esce affatto, quindi zero notizie
+    # in 8 ore e' un FATTO SUL MONDO. Zero in due giorni, invece, e' quasi sempre la fonte.
+    nw = macro.get("news") or {}
+    voci = nw.get("voci") or []
+    if not voci:
+        add("news_macro", None, 2, "missing",
+            "nessuna voce raccolta in questo run: il pacchetto non potra' pubblicare titoli macro")
+    else:
+        piu_recente = None
+        for v in voci:
+            try:
+                q = datetime.fromisoformat(str(v.get("quando")).replace("Z", "+00:00"))
+                ore = (datetime.now(timezone.utc) - q).total_seconds() / 3600
+                if piu_recente is None or ore < piu_recente:
+                    piu_recente = ore
+            except Exception:  # noqa: BLE001
+                continue
+        if piu_recente is None:
+            add("news_macro", None, 2, "implausible", "nessuna voce con data leggibile")
+        else:
+            add("news_macro", str(today), 2,
+                "ok" if piu_recente <= 48 else "stale",
+                f"{len(voci)} voci, la piu' recente di {piu_recente:.0f} ore"
+                + ("" if piu_recente <= 48 else " — oltre due giorni: sospetta una fonte caduta"))
 
     return {"checks": checks, "alerts": alerts,
             "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
