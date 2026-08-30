@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-08-30T14:08:20Z",
+ "updated_at": "2026-08-30T16:22:14Z",
  "eurusd": 1.1587,
  "totals": {
   "usd_value": 0,
@@ -1766,7 +1766,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.3
+      "meglio": 31.2
      },
      {
       "mese": 4,
@@ -3835,7 +3835,7 @@
    "price_asof": "2026-08-28",
    "price_live": false,
    "change_pct": -4.57,
-   "pe": 27.5,
+   "pe": 28.8,
    "ath": 236.26,
    "ath_dist_pct": -7.9,
    "sma200_dist_pct": 11.2,
@@ -4533,7 +4533,7 @@
     "target_mediana": 315.0
    },
    "health": 84,
-   "eps": 7.92,
+   "eps": 7.55,
    "beta": 2.21,
    "sharpe_1y": 0.5,
    "sortino_1y": 0.73,
@@ -4551,12 +4551,12 @@
    "stats": {
     "market_cap": 5253179637760.0,
     "shares": 24147000000.0,
-    "float_shares": 23127324000.0,
+    "float_shares": 23130216000.0,
     "float_pct": 95.8,
     "avg_volume_30d": 140227025.0,
-    "pe_ttm": 27.4684,
+    "pe_ttm": 28.8146,
     "forward_pe": 14.2134,
-    "eps_ttm": 7.92,
+    "eps_ttm": 7.55,
     "eps_forward": 15.306,
     "revenue_fy": 302970011648.0,
     "net_income_fy": 192880001024.0,
@@ -12321,7 +12321,7 @@
    "price_asof": "2026-08-28",
    "price_live": false,
    "change_pct": -10.28,
-   "pe": 72.0,
+   "pe": 79.9,
    "ath": 329.8,
    "ath_dist_pct": -34.3,
    "sma200_dist_pct": 45.8,
@@ -13002,7 +13002,7 @@
     "target_mediana": 275.0
    },
    "health": 66,
-   "eps": 3.01,
+   "eps": 2.71,
    "beta": null,
    "sharpe_1y": 1.58,
    "sortino_1y": 2.51,
@@ -13023,9 +13023,9 @@
     "float_shares": 894411658.0,
     "float_pct": null,
     "avg_volume_30d": 40253158.0,
-    "pe_ttm": 71.9668,
+    "pe_ttm": 79.9336,
     "forward_pe": 32.6021,
-    "eps_ttm": 3.01,
+    "eps_ttm": 2.71,
     "eps_forward": 6.6444,
     "revenue_fy": 9450300416.0,
     "net_income_fy": 2639899904.0,
@@ -18290,7 +18290,7 @@
     "target_mediana": 193.0
    },
    "health": 78,
-   "eps": -99.16,
+   "eps": -91.88,
    "beta": 3.56,
    "sharpe_1y": -1.31,
    "sortino_1y": -1.81,
@@ -18313,7 +18313,7 @@
     "avg_volume_30d": 23441238.0,
     "pe_ttm": null,
     "forward_pe": 2.5724,
-    "eps_ttm": -99.16,
+    "eps_ttm": -91.88,
     "eps_forward": 49.49,
     "revenue_fy": 498347008.0,
     "net_income_fy": -31367133184.0,
@@ -20583,26 +20583,26 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 78846.36,
+   "price": 79077.42,
    "price_asof": "2026-08-30",
    "price_live": false,
-   "change_pct": 1.31,
+   "change_pct": 1.6,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -37.5,
-   "sma200_dist_pct": 13.8,
-   "sma50_dist_pct": 17.7,
+   "ath_dist_pct": -37.3,
+   "sma200_dist_pct": 14.1,
+   "sma50_dist_pct": 18.0,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -37.5,
-   "day_high": 78940.3,
+   "w52_dist_pct": -37.3,
+   "day_high": 79069.41,
    "day_low": 77972.53,
    "support": 62487.7,
    "resistance": 81346.95,
-   "rsi": 72.6,
-   "volume": 13520501760,
+   "rsi": 73.0,
+   "volume": 14042188800,
    "vol_ratio": 1.42,
-   "atr_14": 2311.63,
+   "atr_14": 2320.85,
    "atr_pct": 2.93,
    "signal": "Ipercomprato",
    "signal_class": "warn",
@@ -20612,7 +20612,7 @@
      79027.42,
      80257.54,
      77830.29,
-     78846.36
+     79077.42
     ],
     "m6": [
      78657.54,
@@ -20740,7 +20740,7 @@
      79027.42,
      80257.54,
      77830.29,
-     78846.36
+     79077.42
     ],
     "all": [
      386.94,
@@ -20886,7 +20886,7 @@
      73579.69,
      58558.86,
      62813.75,
-     78846.36
+     79077.42
     ],
     "m1": [
      64904.69,
@@ -20910,7 +20910,7 @@
      79027.42,
      80257.54,
      77830.29,
-     78846.36
+     79077.42
     ],
     "m3": [
      59721.68,
@@ -20978,7 +20978,7 @@
      79027.42,
      80257.54,
      77830.29,
-     78846.36
+     79077.42
     ],
     "y1": [
      108808.07,
@@ -21140,7 +21140,21 @@
      78700.47,
      78791.69,
      78892.65,
-     78885.11
+     78885.11,
+     78916.54,
+     78836.57,
+     78825.14,
+     78748.58,
+     78806.85,
+     78677.0,
+     78660.53,
+     78764.79,
+     78796.16,
+     78859.61,
+     78796.32,
+     78963.88,
+     79115.2,
+     79077.42
     ]
    },
    "earnings_date": null,
@@ -21151,10 +21165,10 @@
    "beta": null,
    "sharpe_1y": -0.7,
    "sortino_1y": -0.94,
-   "sharpe_6m": -0.01,
-   "sortino_6m": -0.02,
+   "sharpe_6m": 0.01,
+   "sortino_6m": 0.01,
    "prepost": null,
-   "prezzo_limite_aggiustato": 78846.36,
+   "prezzo_limite_aggiustato": 79077.42,
    "risk_reward": "1:0.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -21167,22 +21181,22 @@
     "w1": {
      "support": 76909.35,
      "resistance": 81346.95,
-     "change_pct": 0.36
+     "change_pct": 0.65
     },
     "m1": {
      "support": 62487.7,
      "resistance": 81346.95,
-     "change_pct": 21.48
+     "change_pct": 21.84
     },
     "m3": {
      "support": 57747.77,
      "resistance": 81346.95,
-     "change_pct": 32.02
+     "change_pct": 32.41
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -11.03
+     "change_pct": -10.77
     }
    },
    "financials": [],
@@ -21209,74 +21223,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 78846.36,
+     "prezzo": 79077.42,
      "medie": {
       "sma10": {
-       "liv": 77969.77,
-       "dist_pct": 1.12
+       "liv": 77992.88,
+       "dist_pct": 1.39
       },
       "ema10": {
-       "liv": 76655.25,
-       "dist_pct": 2.86
+       "liv": 76697.27,
+       "dist_pct": 3.1
       },
       "sma20": {
-       "liv": 71061.82,
-       "dist_pct": 10.95
+       "liv": 71073.38,
+       "dist_pct": 11.26
       },
       "ema20": {
-       "liv": 73173.64,
-       "dist_pct": 7.75
+       "liv": 73195.65,
+       "dist_pct": 8.04
       },
       "sma30": {
-       "liv": 68710.06,
-       "dist_pct": 14.75
+       "liv": 68717.76,
+       "dist_pct": 15.08
       },
       "ema30": {
-       "liv": 71047.33,
-       "dist_pct": 10.98
+       "liv": 71062.24,
+       "dist_pct": 11.28
       },
       "sma50": {
-       "liv": 67016.14,
-       "dist_pct": 17.65
+       "liv": 67020.76,
+       "dist_pct": 17.99
       },
       "ema50": {
-       "liv": 68992.96,
-       "dist_pct": 14.28
+       "liv": 69002.02,
+       "dist_pct": 14.6
       },
       "sma100": {
-       "liv": 66192.18,
-       "dist_pct": 19.12
+       "liv": 66194.49,
+       "dist_pct": 19.46
       },
       "ema100": {
-       "liv": 68491.23,
-       "dist_pct": 15.12
+       "liv": 68495.8,
+       "dist_pct": 15.45
       },
       "sma200": {
-       "liv": 69313.38,
-       "dist_pct": 13.75
+       "liv": 69314.54,
+       "dist_pct": 14.08
       },
       "ema200": {
-       "liv": 72241.52,
-       "dist_pct": 9.14
+       "liv": 72243.82,
+       "dist_pct": 9.46
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 72.6,
+      "rsi14": 73.0,
       "macd": {
-       "linea": 4070.28,
-       "segnale": 3290.45,
-       "istogramma": 779.83
+       "linea": 4088.71,
+       "segnale": 3294.13,
+       "istogramma": 794.58
       },
-      "stoch_k": 86.6,
-      "stoch_d": 87.5,
-      "williams_r": -13.4,
-      "cci20": 94.4,
+      "stoch_k": 87.9,
+      "stoch_d": 87.9,
+      "williams_r": -12.1,
+      "cci20": 95.7,
       "adx14": 40.7,
-      "di_su": 39.2,
+      "di_su": 39.0,
       "di_giu": 11.7,
-      "momentum10": 9580.17
+      "momentum10": 9811.23
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -21767,21 +21781,21 @@
      {
       "d": "2026-08-30",
       "o": 78234.75,
-      "h": 78940.3,
+      "h": 79069.41,
       "l": 77972.53,
-      "c": 78846.36
+      "c": 79077.42
      }
     ],
     "performance": {
-     "s1": -0.15,
-     "m1": 21.53,
-     "m3": 29.27,
-     "m6": 1.59,
-     "a1": -10.75,
-     "ytd": -11.14,
-     "a3": 204.06,
-     "a5": 67.17,
-     "a10": 13601.16
+     "s1": 0.14,
+     "m1": 21.88,
+     "m3": 29.65,
+     "m6": 1.89,
+     "a1": -10.49,
+     "ytd": -10.88,
+     "a3": 204.95,
+     "a5": 67.66,
+     "a10": 13641.32
     },
     "stagionalita": [
      {
@@ -21849,7 +21863,7 @@
      },
      {
       "mese": 8,
-      "media": 1.99,
+      "media": 2.02,
       "mediana": -7.19,
       "positivi_pct": 33,
       "campione": 12,
@@ -21894,9 +21908,9 @@
      }
     ]
    },
-   "rs_1m": 17.8,
+   "rs_1m": 18.2,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 16.8,
+   "rs_ndx_1m": 17.1,
    "beta_ndx": 0.78,
    "avg_corr": 0.29,
    "max_corr": 0.78,
@@ -33537,7 +33551,7 @@
    "price_asof": "2026-08-28",
    "price_live": false,
    "change_pct": -2.29,
-   "pe": 31.1,
+   "pe": 31.8,
    "ath": 479.0,
    "ath_dist_pct": -12.8,
    "sma200_dist_pct": 13.3,
@@ -34245,7 +34259,7 @@
     "target_mediana": 538.5
    },
    "health": 56,
-   "eps": 13.44,
+   "eps": 13.11,
    "beta": 1.26,
    "sharpe_1y": 1.42,
    "sortino_1y": 2.14,
@@ -34266,9 +34280,9 @@
     "float_shares": 37842588894.0,
     "float_pct": null,
     "avg_volume_30d": 13426336.0,
-    "pe_ttm": 31.0655,
+    "pe_ttm": 31.8474,
     "forward_pe": 19.1688,
-    "eps_ttm": 13.44,
+    "eps_ttm": 13.11,
     "eps_forward": 21.7813,
     "revenue_fy": null,
     "net_income_fy": null,
@@ -45941,6 +45955,229 @@
     ]
    }
   },
+  "news": {
+   "voci": [
+    {
+     "titolo": "Dollar Debasement Backs Bull Case for Emerging Bonds, Funds Say",
+     "riassunto": "A stellar year for emerging-market bonds is set to get even better as the return of the “dollar debasement trade” amplifies inflows into the asset class, fund managers say.",
+     "fonte": "Bloomberg",
+     "quando": "2026-08-30T12:30:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-08-30/dollar-debasement-backs-bull-case-for-emerging-bonds-funds-say"
+    },
+    {
+     "titolo": "K, C or E? Why economists can’t agree on the shape of today’s economy",
+     "riassunto": "Economists have long viewed the post-pandemic economy as \"K\"-shaped. That consensus has now evaporated.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-29T20:22:12Z",
+     "url": "https://www.cnbc.com/2026/08/29/k-shaped-economy-c-shaped-e-shape.html"
+    },
+    {
+     "titolo": "Guggenheim Ties Weigh on Acrisure Debt, Dragging High-Yield Credit Markets",
+     "riassunto": "It had already been a tough 2026 for Acrisure. Part fintech, part insurance broker, the firm said in late May it would cut 11% of its workforce, or some 2,250 people, as part of a sweeping overhaul to modernize operations. Some of its bonds and loans had fallen, but still remained above levels typically deemed distress",
+     "fonte": "Bloomberg",
+     "quando": "2026-08-29T19:00:00Z",
+     "url": "https://www.bloomberg.com/news/articles/2026-08-29/guggenheim-stain-piles-onto-biggest-junk-laggard-credit-weekly"
+    },
+    {
+     "titolo": "Fed Chairman Warsh expresses concern about inflation, advocates for 'quieter' central bank",
+     "riassunto": "He used the speech to outline his philosophy on policymaking while carefully sidestepping any signals",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-28T16:11:51Z",
+     "url": "https://www.cnbc.com/2026/08/28/kevin-warsh-jackson-hole-federal-reserve-inflation.html"
+    },
+    {
+     "titolo": "Fed's Hammack says 'now is the time to act' on raising interest rates",
+     "riassunto": "She still thinks the Fed needs to take action against inflation that is straining household budgets.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-27T17:31:09Z",
+     "url": "https://www.cnbc.com/2026/08/27/feds-hammack-says-now-is-the-time-to-act-on-raising-interest-rates.html"
+    },
+    {
+     "titolo": "Fed’s preferred inflation gauge shows core prices rose 3.3% annually in July",
+     "riassunto": "The personal consumption expenditures price index was expected to rise 0.1% monthly and 3.6% on a 12-month basis, according to economists surveyed by Dow Jones.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-26T13:35:50Z",
+     "url": "https://www.cnbc.com/2026/08/26/feds-preferred-inflation-gauge-shows-core-prices-rose-3point3percent-annually-in-july.html"
+    },
+    {
+     "titolo": "Stanley Druckenmiller leads doubters who think Bessent's bond ploys will fail",
+     "riassunto": "The bond market interventions have generated a modest decline in yields along with a growing chorus of derision.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-25T17:15:50Z",
+     "url": "https://www.cnbc.com/2026/08/25/stanley-druckenmiller-leads-doubters-who-think-bessents-bond-ploys-will-fail.html"
+    },
+    {
+     "titolo": "China needs U.S. dollars but is building a hedge against Washington’s sanctions",
+     "riassunto": "The U.S. can pressure Chinese banks over Iran through access to its financial system, while Beijing is building alternatives such as CIPS.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-25T16:00:40Z",
+     "url": "https://www.cnbc.com/2026/08/25/china-iran-us-sanctions-banks-cips.html"
+    },
+    {
+     "titolo": "'They asked too much': Canadian dollar slides as Ottawa and Washington head for all-out trade war",
+     "riassunto": "\"As a smaller, more open economy, Canada has more to lose from this,\" ING strategists said Monday.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-24T13:35:08Z",
+     "url": "https://www.cnbc.com/2026/08/24/canada-us-trade-war-deal.html"
+    },
+    {
+     "titolo": "Bessent could tap near $1 trillion Treasury General Account to fund bond buybacks, sources said",
+     "riassunto": "Using the TGA would provide the Treasury with considerable firepower to influence long-term bond yields.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-24T13:17:35Z",
+     "url": "https://www.cnbc.com/2026/08/24/bessent-1-trillion-treasury-general-account-bond-buybacks.html"
+    },
+    {
+     "titolo": "Singapore inflation hits highest in nearly two years, but undershoots expectations",
+     "riassunto": "Consumer prices rose 2.2% last month, compared with the 2.3% expected by economists polled by Reuters",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-24T05:24:43Z",
+     "url": "https://www.cnbc.com/2026/08/24/singapore-inflation-budget-iran-war.html"
+    },
+    {
+     "titolo": "Bessent's bond gambit aimed at calming markets is instead stirring inflation worries",
+     "riassunto": "The so-called breakeven rate hit its highest levels in more than two months.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-21T17:51:10Z",
+     "url": "https://www.cnbc.com/2026/08/21/bessents-bond-gambit-aimed-at-calming-markets-is-instead-stirring-inflation-worries-.html"
+    },
+    {
+     "titolo": "Bessent says there's a 'very good chance' U.S. budget deficit under Trump has peaked",
+     "riassunto": "Treasury Secretary Scott Bessent said Thursday that there's a \"very good chance\" of the U.S. has seen its budget deficit peak under President Donald Trump.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-21T13:11:41Z",
+     "url": "https://www.cnbc.com/2026/08/20/bessent-budget-deficit-trump.html"
+    },
+    {
+     "titolo": "Bessent's efforts in the Treasury market so far haven't worked. Here's what else he can try",
+     "riassunto": "Market experts showed skepticism at whether the push would succeed against a bevy of factors working against Treasurys.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-21T12:43:04Z",
+     "url": "https://www.cnbc.com/2026/08/20/bessents-efforts-in-the-treasury-market-so-far-havent-worked-heres-what-else-he-can-try.html"
+    },
+    {
+     "titolo": "Here are three key takeaways from the disappointing July jobs report",
+     "riassunto": "Nonfarm payrolls in the U.S. unexpectedly declined in July, but so did the unemployment rate, leaving investors with mixed signals.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-21T08:36:07Z",
+     "url": "https://www.cnbc.com/2026/08/07/here-are-three-key-takeaways-from-the-disappointing-july-jobs-report.html"
+    },
+    {
+     "titolo": "Bessent says Treasury buyback operation could be more than $4 billion",
+     "riassunto": "Bessent said his department is going \"make a market\" in the longer-dated securities where yields have been surging lately.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-20T15:35:33Z",
+     "url": "https://www.cnbc.com/2026/08/20/bessent-says-treasury-buyback-operation-could-be-more-than-4-billion.html"
+    },
+    {
+     "titolo": "U.S. government debt passes $40 trillion, more than doubling in a decade",
+     "riassunto": "",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-19T22:34:33Z",
+     "url": "https://www.cnbc.com/2026/08/19/us-government-debt-passes-40-trillion-mark-for-the-first-time.html"
+    },
+    {
+     "titolo": "Trump bemoans Fed interest rate policy, says U.S. should be paying much less",
+     "riassunto": "As he has done in the past, Trump accused Fed officials of having political motives.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-19T21:29:38Z",
+     "url": "https://www.cnbc.com/2026/08/19/trump-bemoans-fed-interest-rate-policy-says-us-should-be-paying-much-less.html"
+    }
+   ],
+   "fonti": [
+    "CNBC Economia",
+    "Bloomberg",
+    "MarketWatch"
+   ],
+   "filtro": "CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione"
+  },
+  "sec_calendario": {
+   "per_titolo": {
+    "AMD": {
+     "ultimo_deposito": "2026-08-04",
+     "n_depositi": 37,
+     "cadenza_gg": 91,
+     "attesa_da_cadenza": "2026-11-03"
+    },
+    "AVGO": {
+     "ultimo_deposito": "2026-06-03",
+     "n_depositi": 33,
+     "cadenza_gg": 91,
+     "attesa_da_cadenza": "2026-09-02"
+    },
+    "BE": {
+     "ultimo_deposito": "2026-07-28",
+     "n_depositi": 33,
+     "cadenza_gg": 91,
+     "attesa_da_cadenza": "2026-10-27"
+    },
+    "CRWV": {
+     "ultimo_deposito": "2026-08-11",
+     "n_depositi": 5,
+     "cadenza_gg": 93,
+     "attesa_da_cadenza": "2026-11-12"
+    },
+    "GOOGL": {
+     "ultimo_deposito": "2026-07-22",
+     "n_depositi": 13,
+     "cadenza_gg": 90,
+     "attesa_da_cadenza": "2026-10-20"
+    },
+    "MRVL": {
+     "ultimo_deposito": "2026-08-27",
+     "n_depositi": 24,
+     "cadenza_gg": 91,
+     "attesa_da_cadenza": "2026-11-26"
+    },
+    "MSTR": {
+     "ultimo_deposito": "2026-07-30",
+     "n_depositi": 17,
+     "cadenza_irregolare_gg": 67
+    },
+    "MU": {
+     "ultimo_deposito": "2026-06-24",
+     "n_depositi": 36,
+     "cadenza_gg": 91,
+     "attesa_da_cadenza": "2026-09-23"
+    },
+    "NVDA": {
+     "ultimo_deposito": "2026-08-26",
+     "n_depositi": 26,
+     "cadenza_gg": 91,
+     "attesa_da_cadenza": "2026-11-25"
+    },
+    "ORCL": {
+     "ultimo_deposito": "2026-06-10",
+     "n_depositi": 43,
+     "cadenza_gg": 91,
+     "attesa_da_cadenza": "2026-09-09"
+    },
+    "PLTR": {
+     "ultimo_deposito": "2026-08-03",
+     "n_depositi": 24,
+     "cadenza_gg": 91,
+     "attesa_da_cadenza": "2026-11-02"
+    },
+    "RGTI": {
+     "ultimo_deposito": "2026-08-06",
+     "n_depositi": 21,
+     "cadenza_gg": 90,
+     "attesa_da_cadenza": "2026-11-04"
+    },
+    "WDC": {
+     "ultimo_deposito": "2026-08-05",
+     "n_depositi": 32,
+     "cadenza_gg": 91,
+     "attesa_da_cadenza": "2026-11-04"
+    }
+   },
+   "senza_8k": [
+    "SKHY",
+    "TSM"
+   ],
+   "senza_cik": [],
+   "fonte": "SEC EDGAR, 8-K con item 2.02 (Results of Operations)"
+  },
   "stagionalita_ndx": {
    "mesi": [
     {
@@ -50614,7 +50851,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 63
+     "score": 66
     },
     {
      "label": "Treasury 10A",
@@ -53493,6 +53730,349 @@
     }
    ]
   },
+  "credito_banche": {
+   "sloos": {
+    "valore": 0.0,
+    "data": "2026-07-01",
+    "precedente": 8.1,
+    "serie": "DRTSCILM",
+    "storia": [
+     {
+      "d": "2021-10-01",
+      "v": -18.2
+     },
+     {
+      "d": "2022-01-01",
+      "v": -14.5
+     },
+     {
+      "d": "2022-04-01",
+      "v": -1.5
+     },
+     {
+      "d": "2022-07-01",
+      "v": 24.2
+     },
+     {
+      "d": "2022-10-01",
+      "v": 39.1
+     },
+     {
+      "d": "2023-01-01",
+      "v": 44.8
+     },
+     {
+      "d": "2023-04-01",
+      "v": 46.0
+     },
+     {
+      "d": "2023-07-01",
+      "v": 50.8
+     },
+     {
+      "d": "2023-10-01",
+      "v": 33.9
+     },
+     {
+      "d": "2024-01-01",
+      "v": 14.5
+     },
+     {
+      "d": "2024-04-01",
+      "v": 15.6
+     },
+     {
+      "d": "2024-07-01",
+      "v": 7.9
+     },
+     {
+      "d": "2024-10-01",
+      "v": 0.0
+     },
+     {
+      "d": "2025-01-01",
+      "v": 6.2
+     },
+     {
+      "d": "2025-04-01",
+      "v": 18.5
+     },
+     {
+      "d": "2025-07-01",
+      "v": 9.5
+     },
+     {
+      "d": "2025-10-01",
+      "v": 6.5
+     },
+     {
+      "d": "2026-01-01",
+      "v": 5.3
+     },
+     {
+      "d": "2026-04-01",
+      "v": 8.1
+     },
+     {
+      "d": "2026-07-01",
+      "v": 0.0
+     }
+    ]
+   },
+   "nfci": {
+    "valore": -0.57,
+    "data": "2026-08-21",
+    "mese_fa": -0.54,
+    "serie": "NFCI",
+    "storia": [
+     {
+      "d": "2025-07-04",
+      "v": -0.5
+     },
+     {
+      "d": "2025-07-11",
+      "v": -0.51
+     },
+     {
+      "d": "2025-07-18",
+      "v": -0.51
+     },
+     {
+      "d": "2025-07-25",
+      "v": -0.52
+     },
+     {
+      "d": "2025-08-01",
+      "v": -0.52
+     },
+     {
+      "d": "2025-08-08",
+      "v": -0.52
+     },
+     {
+      "d": "2025-08-15",
+      "v": -0.52
+     },
+     {
+      "d": "2025-08-22",
+      "v": -0.53
+     },
+     {
+      "d": "2025-08-29",
+      "v": -0.53
+     },
+     {
+      "d": "2025-09-05",
+      "v": -0.53
+     },
+     {
+      "d": "2025-09-12",
+      "v": -0.53
+     },
+     {
+      "d": "2025-09-19",
+      "v": -0.53
+     },
+     {
+      "d": "2025-09-26",
+      "v": -0.52
+     },
+     {
+      "d": "2025-10-03",
+      "v": -0.52
+     },
+     {
+      "d": "2025-10-10",
+      "v": -0.52
+     },
+     {
+      "d": "2025-10-17",
+      "v": -0.52
+     },
+     {
+      "d": "2025-10-24",
+      "v": -0.52
+     },
+     {
+      "d": "2025-10-31",
+      "v": -0.51
+     },
+     {
+      "d": "2025-11-07",
+      "v": -0.51
+     },
+     {
+      "d": "2025-11-14",
+      "v": -0.51
+     },
+     {
+      "d": "2025-11-21",
+      "v": -0.51
+     },
+     {
+      "d": "2025-11-28",
+      "v": -0.51
+     },
+     {
+      "d": "2025-12-05",
+      "v": -0.51
+     },
+     {
+      "d": "2025-12-12",
+      "v": -0.52
+     },
+     {
+      "d": "2025-12-19",
+      "v": -0.52
+     },
+     {
+      "d": "2025-12-26",
+      "v": -0.54
+     },
+     {
+      "d": "2026-01-02",
+      "v": -0.55
+     },
+     {
+      "d": "2026-01-09",
+      "v": -0.56
+     },
+     {
+      "d": "2026-01-16",
+      "v": -0.56
+     },
+     {
+      "d": "2026-01-23",
+      "v": -0.57
+     },
+     {
+      "d": "2026-01-30",
+      "v": -0.56
+     },
+     {
+      "d": "2026-02-06",
+      "v": -0.55
+     },
+     {
+      "d": "2026-02-13",
+      "v": -0.54
+     },
+     {
+      "d": "2026-02-20",
+      "v": -0.53
+     },
+     {
+      "d": "2026-02-27",
+      "v": -0.51
+     },
+     {
+      "d": "2026-03-06",
+      "v": -0.49
+     },
+     {
+      "d": "2026-03-13",
+      "v": -0.47
+     },
+     {
+      "d": "2026-03-20",
+      "v": -0.46
+     },
+     {
+      "d": "2026-03-27",
+      "v": -0.46
+     },
+     {
+      "d": "2026-04-03",
+      "v": -0.46
+     },
+     {
+      "d": "2026-04-10",
+      "v": -0.47
+     },
+     {
+      "d": "2026-04-17",
+      "v": -0.48
+     },
+     {
+      "d": "2026-04-24",
+      "v": -0.49
+     },
+     {
+      "d": "2026-05-01",
+      "v": -0.5
+     },
+     {
+      "d": "2026-05-08",
+      "v": -0.51
+     },
+     {
+      "d": "2026-05-15",
+      "v": -0.51
+     },
+     {
+      "d": "2026-05-22",
+      "v": -0.51
+     },
+     {
+      "d": "2026-05-29",
+      "v": -0.51
+     },
+     {
+      "d": "2026-06-05",
+      "v": -0.5
+     },
+     {
+      "d": "2026-06-12",
+      "v": -0.5
+     },
+     {
+      "d": "2026-06-19",
+      "v": -0.51
+     },
+     {
+      "d": "2026-06-26",
+      "v": -0.51
+     },
+     {
+      "d": "2026-07-03",
+      "v": -0.52
+     },
+     {
+      "d": "2026-07-10",
+      "v": -0.52
+     },
+     {
+      "d": "2026-07-17",
+      "v": -0.53
+     },
+     {
+      "d": "2026-07-24",
+      "v": -0.54
+     },
+     {
+      "d": "2026-07-31",
+      "v": -0.55
+     },
+     {
+      "d": "2026-08-07",
+      "v": -0.56
+     },
+     {
+      "d": "2026-08-14",
+      "v": -0.56
+     },
+     {
+      "d": "2026-08-21",
+      "v": -0.57
+     }
+    ]
+   }
+  },
+  "bce": {
+   "tasso_rifinanziamento": 2.4,
+   "data": "2026-08-30",
+   "fonte": "BCE Data Portal, serie FM.D.U2.EUR.4F.KR.MRR_FR.LEV"
+  },
   "systemic_risk": {
    "hy_oas": 2.63,
    "hy_chg_1m": -3.7,
@@ -55217,28 +55797,23 @@
   },
   {
    "question": "Will the Fed increase interest rates by 25 bps after the September 2026 meeting?",
-   "yes": 47,
+   "yes": 46,
    "link": "https://polymarket.com/event/will-the-fed-increase-interest-rates-by-25-bps-after-the-september-2026-meeting-649"
   },
   {
-   "question": "Will Ethereum dip to $2,400 in August?",
-   "yes": 15,
-   "link": "https://polymarket.com/event/will-ethereum-dip-to-2400-in-august-2026-from-august-23"
-  },
-  {
-   "question": "Bitcoin Up or Down on August 30?",
-   "yes": 99,
-   "link": "https://polymarket.com/event/bitcoin-up-or-down-on-august-30-2026"
-  },
-  {
    "question": "Will Bitcoin dip to $45,000 by December 31, 2026?",
-   "yes": 9,
+   "yes": 8,
    "link": "https://polymarket.com/event/will-bitcoin-dip-to-45000-by-december-31-2026-674-923-755-971-998-525-926-245-316-517-544-589-965-923-986-841-815-224-586-231-289-533-573"
   },
   {
-   "question": "Will the price of Bitcoin be above $80,000 on August 30?",
+   "question": "Will Bitcoin reach $85,000 in August?",
    "yes": 2,
-   "link": "https://polymarket.com/event/bitcoin-above-80k-on-august-30-2026"
+   "link": "https://polymarket.com/event/will-bitcoin-reach-85k-in-august-2026"
+  },
+  {
+   "question": "Will Bitcoin reach $82,500 in August?",
+   "yes": 9,
+   "link": "https://polymarket.com/event/will-bitcoin-reach-82pt5k-in-august-2026"
   }
  ],
  "options": {
@@ -75692,9 +76267,49 @@
     "max_age": 40,
     "status": "ok",
     "note": ""
+   },
+   {
+    "key": "news_macro",
+    "date": "2026-08-30",
+    "age_days": 0,
+    "max_age": 2,
+    "status": "ok",
+    "note": "18 voci, la piu' recente di 4 ore"
+   },
+   {
+    "key": "sec_calendario",
+    "date": "2026-08-30",
+    "age_days": 0,
+    "max_age": 7,
+    "status": "ok",
+    "note": "13 titoli con deposito reale, 2 emittenti esteri senza 8-K"
+   },
+   {
+    "key": "credito_sloos",
+    "date": "2026-07-01",
+    "age_days": 60,
+    "max_age": 200,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "credito_nfci",
+    "date": "2026-08-21",
+    "age_days": 9,
+    "max_age": 30,
+    "status": "ok",
+    "note": ""
+   },
+   {
+    "key": "bce",
+    "date": "2026-08-30",
+    "age_days": 0,
+    "max_age": 10,
+    "status": "ok",
+    "note": ""
    }
   ],
   "alerts": [],
-  "generated_at": "2026-08-30T14:08:21Z"
+  "generated_at": "2026-08-30T16:22:15Z"
  }
 }
