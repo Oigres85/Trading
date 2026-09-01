@@ -1,4 +1,4 @@
-⟦ BUILD v379 · generato 01/09/2026 22:54 ⟧
+⟦ BUILD v379 · generato 01/09/2026 23:05 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -41,10 +41,10 @@ C2 — Niente domande in chiusura e niente offerte di approfondimento: quello ch
 C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invece di scegliere in silenzio quella che ti fa comodo.
 
 
-DATI AL 01/09/2026, 22:54:33 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 18:54, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,23% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,24% · Fut S&P -0,69% · BTC -1,61% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~14.6h); il "→ agg." incorpora già il gap after.
+DATI AL 01/09/2026, 23:05:42 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
+CONTESTO DI SESSIONE (ora ET 19:05, fase: AFTER-HOURS — festività USA non considerate) · FERMI — non anticipano nulla di nuovo: sono gia' dentro l'ultima chiusura USA: KOSPI +0,23% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -1,19% · Fut S&P -0,66% · BTC -1,73% [24/7] · USA in AFTER-HOURS: gli ordini valgono per la prossima apertura (~14.4h); il "→ agg." incorpora già il gap after.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
-· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 01/09/2026, 22:54:33, prossimo run 02/09/2026, 04:00:00. La barra giornaliera sotto quei numeri e' del 2026-09-01.
+· DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 01/09/2026, 23:05:42, prossimo run 02/09/2026, 04:00:00. La barra giornaliera sotto quei numeri e' del 2026-09-02.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-01) · Curva 10A-3M (2026-09-01) · Treasury USA 30A (2026-08-31) · Tasso reale 10A (TIPS) (2026-08-31) · Inflazione attesa 10A (breakeven) (2026-09-01) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
 · SERIE STORICHE E PERCENTILI (HY OAS, Curva 10A–2A, VIX, Treasury 10A, Treasury 30A, Rame, Petrolio WTI): calcolati su finestre che finiscono all'ultima rilevazione disponibile della serie, non a oggi. Ogni voce dichiara accanto al proprio numero la finestra che ha misurato.
 ⚠ PERIMETRO DI QUESTO PACCHETTO — leggilo prima dei numeri.
@@ -56,16 +56,16 @@ QUADRO MACRO:
 - Fear & Greed: 45 (Paura), 1 settimana fa 57, 1 mese fa 45, 1 anno fa 62 — livello e dispersione interna dello stesso indice sono UNA misura guardata da due lati, non due segnali.
 - VIX: 16.34 (+9,52% nell'ultima seduta [chiusura del 01/09] — seduta ordinaria CHIUSA: il VIX non ha quotazione fuori orario)
 - Fed Funds Rate: range ATTUALE 3.50–3.75% · tasso implicito futures 3.81% · PROSSIMA RIUNIONE FOMC: 16/09/2026 (il tasso resta valido fino alla prossima decisione FOMC)
-- Carry USA-Giappone: spread tassi 10A 1,85 pp (US10A 4.8%, JGB10A 2.94%), USD/JPY 160.2 (+1,66% 1 mese); prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
+- Carry USA-Giappone: spread tassi 10A 1,85 pp (US10A 4.8%, JGB10A 2.94%), USD/JPY 160.21 (+1,67% 1 mese); prossima riunione BoJ 18/09/2026 (rischio unwind se BoJ alza o lo yen si rafforza)
 - Put/Call SPY (S&P 500 ETF): 1.11 — prevalgono put = copertura/pessimismo (estremi = contrarian rialzista) (put 5230781, call 4698361)
 - Liquidità in attesa (dry powder di mercato, PROXY dichiarati): Istituzionali Cash: 7,9% (proxy AUM BIL+SHV $68B vs SPY $795B) · Retail Cash: fondi monetari retail $3016,7 mld (FRED RMFNS, YoY +6,2%, 94° percentile 5A, riferito a luglio 2026, serie MENSILE: NON e' il dato di oggi e NON e' la data in cui FRED lo ha pubblicato, che e' successiva) — cash alto = benzina potenziale per i rialzi, cash in aumento = de-risking in corso.
-- Righello Dollaro (DXY): 99.65 · 3 mesi +0,12% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
-- Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7631,47 vs SMA125 7286,3 (+4,74%) · Nasdaq 100 29.077,22 vs SMA125 27.988,45 (+3,89%) — sopra = trend primario integro, sotto = deterioramento.
-- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): Nasdaq 100 (NQ) 29.117,75 (-1,24%) · S&P 500 (ES) 7643,75 (-0,69%) — in calo oltre il rumore: apertura USA attesa in gap-down.
+- Righello Dollaro (DXY): 99.65 · 3 mesi +0,44% (variazione trimestrale entro ±5%: impatto valutario neutro sugli utili)
+- Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7631,47 vs SMA125 7279,56 (+4,83%) · Nasdaq 100 29.077,22 vs SMA125 27.988,45 (+3,89%) — sopra = trend primario integro, sotto = deterioramento.
+- Futures USA LIVE (anticipo direzione pre-apertura Wall Street): Nasdaq 100 (NQ) 29.133 (-1,19%) · S&P 500 (ES) 7645,75 (-0,66%) — in calo oltre il rumore: apertura USA attesa in gap-down.
 - Schiuma speculativa ETF leva 3x (proxy euforia retail): SOXL 3x semi RVol 0,94× (-8,44% 5g) · TQQQ 3x NDX RVol 1× (-1,59% 5g) — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).
-- Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): SPY (cap-pesato) +0,54% vs RSP (equi-pesato) +0,22% a 1M · spread +0,32pp — rally con partecipazione ampia (alert se SPY+ con RSP− o spread >4pp).
+- Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): SPY (cap-pesato) +0,54% vs RSP (equi-pesato) +1,2% a 1M · spread -0,66pp — rally con partecipazione ampia (alert se SPY+ con RSP− o spread >4pp).
 - Treasury USA 10A: 4.80% (+0,04 pp oggi) [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI porta lo stesso decennale a 4,75% (FRED DGS10, osservazione del 2026-08-31): NON e' una contraddizione, sono due fonti e due momenti — la quotazione di mercato e l'osservazione ufficiale, che esce con qualche giorno di ritardo. Per confronti con le altre scadenze usa quella della curva, che e' omogenea con loro.]
-- EUR/USD: 1.1596 (+0,06% oggi)
+- EUR/USD: 1.1596 (-0,19% oggi)
 - PIL USA (t/t ann.): 1.5% (riferito al 2° trimestre 2026 (aprile-giugno) · pubblicato ~28/07/2026 (35 giorni fa) · prossimo atteso 28/10/2026 · BEA, trimestrale · serie TRIMESTRALE, il dato più recente disponibile)
 - Vendite al dettaglio (m/m): -0.6% (riferito a luglio 2026 · pubblicato ~15/08/2026 (17 giorni fa) · prossimo atteso 15/09/2026 · Census, mensile)
 - Non-Farm Payrolls: -23K (riferito a luglio 2026 · pubblicato ~05/08/2026 (27 giorni fa) · prossimo atteso 05/09/2026 · BLS, mensile)
@@ -79,7 +79,7 @@ QUADRO MACRO:
 - Inflazione (a/a): CPI 3.5% · PCE 3.7% — due misure della STESSA grandezza, non due segnali: la Fed guarda il PCE. Rilevazioni: CPI riferito a luglio 2026 · pubblicato ~13/08/2026 (19 giorni fa) · prossimo atteso 13/09/2026 · BLS, mensile · PCE riferito a luglio 2026 · pubblicato ~28/08/2026 (4 giorni fa) · prossimo atteso 28/09/2026 · BEA, mensile.
 - CURVA DEI TASSI USA (FRED (Federal Reserve Bank of St. Louis), OSSERVAZIONI PUBBLICATE — non stime, ultima del 2026-08-31, quindi NON di oggi: la fonte pubblica con qualche giorno di ritardo): 3 mesi 3,91% [+0,14 vs 3,77% del 2026-06-02] · 2 anni 4,34% [+0,29 vs 4,05% del 2026-06-02] · 5 anni 4,49% [+0,32 vs 4,17% del 2026-06-02] · 10 anni 4,75% [+0,29 vs 4,46% del 2026-06-02] · 30 anni 5,25% [+0,28 vs 4,97% del 2026-06-02]. Pendenza 3 mesi→30 anni: +1,34 pp, era +1,2 pp tre mesi fa. Fra parentesi quadre lo scarto dalla stessa scadenza tre mesi fa: e' un confronto fra due osservazioni datate, non una tendenza ricostruita.
 - STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE (^NDX, barre mensili (yfinance, auto_adjust), campione 1985-2025, 10 anni di midterm; il 2026 e' un anno di midterm): settembre -0,66% negli anni di midterm contro -0,53% su tutti gli anni, 30% di mesi positivi, esiti da -11,7% a +18% · ottobre +3,94% negli anni di midterm contro +1,7% su tutti gli anni, 80% di mesi positivi, esiti da -8,7% a +18,9% · novembre +4,86% negli anni di midterm contro +2,54% su tutti gli anni, 70% di mesi positivi, esiti da -2% a +12,8%. ⚠ Dieci osservazioni per mese: dove la media e' +3,9% i singoli anni vanno da -8,7% a +18,9%, cioe' la media sta fra esiti opposti. E' il conto di cosa e' successo, non una previsione — serve a sapere quando un movimento e' ordinario per il periodo, non a dedurne uno.
-- MATERIE PRIME E SEMICONDUTTORI: Semiconduttori (SOX) 11.289 (-2,14% oggi) — +101,4% in un anno, e sta al 63% dell'intervallo annuale 5593–14.635 · Rame 6,53 $/lb (-0,9% oggi) — +43% in un anno, e sta al 92% dell'intervallo annuale 4,48–6,71 · Petrolio WTI 90,84 $ (+5,92% oggi) — +38,5% in un anno, e sta al 62% dell'intervallo annuale 55,27–112,95 · Oro 4374 $/oz (-1,28% oggi) — +23,2% in un anno, e sta al 47% dell'intervallo annuale 3549–5318. Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo stesso numero.
+- MATERIE PRIME E SEMICONDUTTORI: Semiconduttori (SOX) 11.289 (-2,14% oggi) — +101,4% in un anno, e sta al 63% dell'intervallo annuale 5593–14.635 · Rame 6,54 $/lb (-0,83% oggi) — +43,1% in un anno, e sta al 92% dell'intervallo annuale 4,48–6,71 · Petrolio WTI 90,79 $ (+5,87% oggi) — +38,4% in un anno, e sta al 62% dell'intervallo annuale 55,27–112,95 · Oro 4375 $/oz (-1,26% oggi) — +23,3% in un anno, e sta al 47% dell'intervallo annuale 3549–5318. Sono due grandezze diverse: la variazione dice quanto si e' mosso in dodici mesi, la posizione nell'intervallo dice dove sta oggi fra il minimo e il massimo dello stesso periodo — un metallo puo' essere salito molto e stare a meta' strada. Nessuna delle due dice se il prezzo sia caro: rame alto = domanda industriale, petrolio alto = inflazione dal lato dei costi, e sono due segni opposti sullo stesso numero.
 - TITOLI MACRO — 5 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 4 pubblicate DOPO l'ultima chiusura USA del 2026-09-01, cioe' non ancora dentro il prezzo. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
     · [Bloomberg, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Bessent’s Bond Gains Wiped Out as Treasury Yields Jump Again
       The yields on the longest-dated US government bonds shot back to levels seen just before Treasury Secretary Scott Bessent shocked markets last month by expanding a buyback program in an effort to halt the rise.
@@ -89,7 +89,7 @@ QUADRO MACRO:
       First Eagle Investments' Idanna Appio discusses the ongoing rise in bond yields and the broad selloff across global fixed income markets. Appio says the move is not just a US story, but a global one driven by several factors. She speaks with David Ingles and Yvonne Man on August 1, 2026. (Source: Bloomberg)
     · [MarketWatch, 2h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] This could be the 10-year Treasury’s tipping point into the danger zone
       An unrelenting rout has global bond yields touching their highest levels since 2008, driving up borrowing costs for households, businesses and world governments.
-    · [Bloomberg, 3h fa] Bond Traders Snap Up Protection Against Soaring Treasury Yields
+    · [Bloomberg, 4h fa] Bond Traders Snap Up Protection Against Soaring Treasury Yields
       Traders are scrambling to shield their portfolios against further losses in Treasuries, as worries over the budget deficit and inflation push yields toward multiyear highs.
 - IN USCITA NELLE PROSSIME 2 SETTIMANE — TUTTE DATE STIMATE, non appuntamenti confermati (le macro proiettate dal ritardo tipico della fonte, le trimestrali le sposta l'emittente): dati macro: 2026-09-05 Non-Farm Payrolls (precedente -23K) · 2026-09-05 Disoccupazione (precedente 4.1%) · 2026-09-13 Inflazione CPI (a/a) (precedente 3.5%) · 2026-09-15 Vendite al dettaglio (m/m) (precedente -0.6%). trimestrali dei titoli seguiti: 2026-09-02 AVGO · 2026-09-10 ORCL. Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.
 - BofA Bear-Market Signposts: 0 accesi su 4 CALCOLABILI da una fonte — nessuno acceso. ⚠ Gli altri 6 campanelli sono COSTANTI di riferimento, non misure: 5 di essi risultano accesi (Aspettative sui prezzi azionari · Aspettative crescita utili LT · Volume operazioni M&A · Regola del 20 (P/E + CPI) · Divario titoli costosi/economici) ma nessuna riga di codice puo' spegnerli. Il totale "5/10" che si legge altrove NON e' un conteggio: e' un pavimento, perche' non puo' scendere sotto il numero delle costanti accese. Il numero misurato da una fonte e' 0 su 4.
@@ -108,34 +108,34 @@ QUADRO MACRO:
 - STRUTTURA A TERMINE DELLE ATTESE FED (dai futures, riunioni successive): 28/10 invariato 14% · rialzo 86% · taglio 0% | 09/12 invariato 2% · rialzo 98% · taglio 0%. La FORMA conta piu' del primo punto: se la probabilita' di rialzo cresce con l'orizzonte, il mercato non sta dicendo "Fed ferma", sta dicendo "ferma per ora".
 
 ROTAZIONE SETTORIALE/TEMATICA USA (ETF, performance 1M e 3M):
+- Innovazione (ARKK): 1M +16,6%, 3M +2,6%
 - Pharma/Bio (IBB): 1M +13,4%, 3M +22,5%
-- Innovazione (ARKK): 1M +13%, 3M +1,4%
+- Cloud (SKYY): 1M +12,4%, 3M +19%
 - Biotech (XBI): 1M +10,9%, 3M +19,7%
 - Energia (XLE): 1M +10,2%, 3M +15,9%
 - Software (IGV): 1M +9%, 3M +4,5%
-- Cloud (SKYY): 1M +8,6%, 3M +11,2%
 - Oro (GLD): 1M +6,7%, 3M -4,9%
 - Salute (XLV): 1M +5,8%, 3M +15,4%
-- Tecnologia (XLK): 1M +3,1%, 3M -3,7%
-- Materiali (XLB): 1M +2,1%, 3M +2,2%
+- Tecnologia (XLK): 1M +4,7%, 3M -1,6%
+- Materiali (XLB): 1M +3,3%, 3M +1,8%
+- Semiconduttori (SMH): 1M +0,9%, 3M -9,1%
 - Consumi difens. (XLP): 1M +0,5%, 3M +3,5%
-- Semiconduttori (SMH): 1M -0%, 3M -9%
 - Finanziari (XLF): 1M -0,3%, 3M +11,3%
 - Comunicazioni (XLC): 1M -0,4%, 3M -3,9%
+- Consumi discr. (XLY): 1M -1,3%, 3M -5,9%
 - Immobiliare (XLRE): 1M -2,5%, 3M +1%
-- Consumi discr. (XLY): 1M -3,1%, 3M -5%
 - Trasporti (IYT): 1M -3,4%, 3M -0,9%
+- Industriali (XLI): 1M -4%, 3M -0,4%
 - Utilities (XLU): 1M -4,1%, 3M -3,6%
-- Industriali (XLI): 1M -5,7%, 3M 0%
+- Solare (TAN): 1M -5%, 3M -34,9%
 - Difesa/Aerospazio (ITA): 1M -8,4%, 3M -4,2%
-- Solare (TAN): 1M -8,5%, 3M -36,6%
 STRUTTURA DELLE MEDIE dove il breve e il lungo NON concordano (l'unico posto in cui "correzione o rottura?" e' una domanda aperta; dove concordano la risposta e' gia' nel segno). In ordine di DIVERGENZA fra la pendenza a 20 giorni e quella a 200: piu' in alto, piu' la domanda e' aperta:
 - Software (IGV): vs 20g: prezzo +2,1% (media in salita +12,52%) · vs 50g: prezzo +9,7% (media in salita +4,13%) · vs 100g: prezzo +13,6% (media in salita +5,27%) · vs 200g: prezzo +13,4% (media in calo -1,05%)
-- Innovazione (ARKK): vs 20g: prezzo +0,8% (media in salita +8,41%) · vs 50g: prezzo +4,9% (media in salita +2,29%) · vs 100g: prezzo +6,3% (media in salita +3,54%) · vs 200g: prezzo +8,2% (media in calo -0,56%)
-- Semiconduttori (SMH): vs 20g: prezzo -4% (media in calo -0,1%) · vs 50g: prezzo -5,7% (media in calo -2,96%) · vs 100g: prezzo -3,5% (media in salita +6,96%) · vs 200g: prezzo +15% (media in salita +5,03%)
-- Solare (TAN): vs 20g: prezzo -6,8% (media in calo -4,59%) · vs 50g: prezzo -11% (media in calo -10,79%) · vs 100g: prezzo -18,1% (media in calo -1,8%) · vs 200g: prezzo -15% (media in salita +0,31%)
+- Innovazione (ARKK): vs 20g: prezzo +1,3% (media in salita +7,18%) · vs 50g: prezzo +5% (media in salita +2,07%) · vs 100g: prezzo +6,5% (media in salita +3,34%) · vs 200g: prezzo +8,2% (media in calo -0,67%)
+- Semiconduttori (SMH): vs 20g: prezzo -4,2% (media in calo -0,42%) · vs 50g: prezzo -6,1% (media in calo -2,64%) · vs 100g: prezzo -3,3% (media in salita +7,03%) · vs 200g: prezzo +15,3% (media in salita +5,06%)
+- Solare (TAN): vs 20g: prezzo -7,2% (media in calo -4,71%) · vs 50g: prezzo -11,4% (media in calo -10,73%) · vs 100g: prezzo -18,2% (media in calo -1,75%) · vs 200g: prezzo -15% (media in salita +0,37%)
 - Trasporti (IYT): vs 20g: prezzo -4,3% (media in calo -0,96%) · vs 50g: prezzo -4,7% (media in salita +1,21%) · vs 100g: prezzo -1,8% (media in salita +3,16%) · vs 200g: prezzo +3,4% (media in salita +2,09%)
-- Consumi discr. (XLY): vs 20g: prezzo -2,6% (media in salita +2,72%) · vs 50g: prezzo -1,4% (media in salita +0,14%) · vs 100g: prezzo -1,9% (media in salita +1,48%) · vs 200g: prezzo -1,8% (media in calo -0,04%)
+- Consumi discr. (XLY): vs 20g: prezzo -2,7% (media in salita +2,78%) · vs 50g: prezzo -1,3% (media in salita +0,11%) · vs 100g: prezzo -1,9% (media in salita +1,48%) · vs 200g: prezzo -1,8% (media in calo -0,03%)
 - P/E Ratio S&P 500 [TRAILING, fonte: multpl]: 29.4× (Sopravvalutazione — etichetta nostra, confine a 25× per "sopravvalutazione" e 20× per "elevata") · Nasdaq 100 (QQQ) P/E: 30.3× (tech solitamente a premio; >35× = valutazioni tese)
 - S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap +14.7 pp, NDX gap +27.4 pp — Tensione moderata (driver: NDX) (soglia di lettura: gap>40 pp = Asset Inflation da fiat debasement, non crescita utili reali). ⚠ NON è una seconda conferma indipendente del Disaccoppiamento qui sopra: entrambi misurano "l'azionario è salito più dell'economia reale" su una finestra pluriennale, con denominatori diversi (PIL contro profitti). sono lo stesso segnale contato due volte, non due prove separate.
 - Tasso EFFETTIVO (EFFR) 3.63% (rilevazione 2026-08-01) — e' dove le banche si prestano DENTRO il target 3,50-3,75% dichiarato in QUADRO MACRO, non un secondo tasso di politica monetaria. Sopra il 4% storicamente comprime i multipli P/E in 12-18 mesi.
@@ -165,32 +165,32 @@ Pesi sul solo comparto AZIONARIO, che e' il denominatore dichiarato: il titolo d
 - SKHY: 2.5% dell'azionario · +15,67% dal carico
 - RGTI: 2.4% dell'azionario · -43,44% dal carico
 TECNICA E FONDAMENTALI DI OGNI POSIZIONE (gia' calcolati dal sistema sulle barre giornaliere Yahoo con auto_adjust, le stesse che disegnano il grafico — non vanno ricalcolati ne' cercati online):
-- MU: medie: -1,3% dalla 50, +56,8% dalla 200 · RSI 50,4 · -25,6% dal massimo 52s · forza relativa 1M +13,8 pp vs SOX · ampiezza tipica di seduta 6,2% · P/E prospettico 6× · ricavi +345,7% a/a · trimestrale fra 29 giorni
-- NVDA: medie: +4,1% dalla 50, +11% dalla 200 · RSI 51,9 · -8% dal massimo 52s · forza relativa 1M +6,5 pp vs SOX · ampiezza tipica di seduta 3,4% · P/E prospettico 14,1× · ricavi +105,9% a/a · trimestrale fra 77 giorni
-- AMD: medie: -8,6% dalla 50, +36,1% dalla 200 · RSI 43,6 · -21,4% dal massimo 52s · forza relativa 1M -3,9 pp vs SOX · ampiezza tipica di seduta 5,2% · P/E prospettico 29,7× · ricavi +50,1% a/a · trimestrale fra 63 giorni
-- MSTR: medie: +23,7% dalla 50, -10,8% dalla 200 · RSI 59 · -65,8% dal massimo 52s · forza relativa 1M +30,6 pp vs NDX · ampiezza tipica di seduta 6,5% · P/E prospettico 2,5× · ricavi +6,9% a/a · trimestrale fra 58 giorni
-- PLTR: medie: +23,1% dalla 50, +18,9% dalla 200 · RSI 61,9 · -13,3% dal massimo 52s · forza relativa 1M +42,1 pp vs NDX · ampiezza tipica di seduta 4,1% · P/E prospettico 77,7× · ricavi +92,8% a/a · trimestrale fra 62 giorni
-- GOOGL: medie: -4% dalla 50, +0,1% dalla 200 · RSI 41,3 · -18% dal massimo 52s · forza relativa 1M -11,3 pp vs NDX · ampiezza tipica di seduta 2,5% · P/E prospettico 22,6× · ricavi +24,2% a/a · trimestrale fra 57 giorni
-- WDC: medie: -13,3% dalla 50, +22,3% dalla 200 · RSI 43,7 · -43,7% dal massimo 52s · forza relativa 1M -15 pp vs SP500 · ampiezza tipica di seduta 7,9% · P/E prospettico 14,2× · ricavi +43,8% a/a · trimestrale fra 65 giorni
-- ORCL: medie: +0,9% dalla 50, -16,3% dalla 200 · RSI 46,4 · -58,7% dal massimo 52s · forza relativa 1M -0,8 pp vs SP500 · ampiezza tipica di seduta 4,6% · P/E prospettico 12,9× · ricavi +20,6% a/a · trimestrale fra 9 giorni
-- MRVL: medie: -6,3% dalla 50, +40,4% dalla 200 · RSI 45,2 · -36,2% dal massimo 52s · forza relativa 1M +9,8 pp vs SOX · ampiezza tipica di seduta 8% · P/E prospettico 31,4× · ricavi +36,5% a/a · trimestrale fra 91 giorni
-- CRWV: medie: -5,5% dalla 50, -10,4% dalla 200 · RSI 42,6 · -46,6% dal massimo 52s · forza relativa 1M -5 pp vs SP500 · ampiezza tipica di seduta 7,9% · utile atteso NEGATIVO (nessun multiplo prospettico) · ricavi +112,5% a/a · trimestrale fra 71 giorni
-- BE: medie: -7,7% dalla 50, +12,8% dalla 200 · RSI 48,1 · -39,2% dal massimo 52s · forza relativa 1M -2,6 pp vs SP500 · ampiezza tipica di seduta 9% · P/E prospettico 43,4× · ricavi +165,5% a/a · trimestrale fra 56 giorni
-- SKHY: RSI 43,8 · -17,5% dal massimo 52s · forza relativa 1M +12,2 pp vs SP500 · ampiezza tipica di seduta 6% · P/E prospettico 4,8× · ricavi +256,8% a/a · trimestrale fra 56 giorni
-- RGTI: medie: -10,3% dalla 50, -22,9% dalla 200 · RSI 41,4 · -74,2% dal massimo 52s · forza relativa 1M -5,2 pp vs SOX · ampiezza tipica di seduta 7,4% · utile atteso NEGATIVO (nessun multiplo prospettico) · ricavi +185,3% a/a · trimestrale fra 70 giorni
+- MU: medie: -1,3% dalla 50, +56,8% dalla 200 · RSI 50,4 · -25,6% dal massimo 52s · forza relativa 1M +12,7 pp vs SOX · ampiezza tipica di seduta 6,2% · P/E prospettico 6× · ricavi +345,7% a/a · trimestrale fra 29 giorni
+- NVDA: medie: +4,1% dalla 50, +11% dalla 200 · RSI 51,9 · -8% dal massimo 52s · forza relativa 1M +5,4 pp vs SOX · ampiezza tipica di seduta 3,4% · P/E prospettico 14,2× · ricavi +105,9% a/a · trimestrale fra 77 giorni
+- AMD: medie: -8,6% dalla 50, +36,1% dalla 200 · RSI 43,6 · -21,4% dal massimo 52s · forza relativa 1M -5 pp vs SOX · ampiezza tipica di seduta 5,2% · P/E prospettico 29,7× · ricavi +50,1% a/a · trimestrale fra 63 giorni
+- MSTR: medie: +23,7% dalla 50, -10,8% dalla 200 · RSI 59 · -65,8% dal massimo 52s · forza relativa 1M +28,8 pp vs NDX · ampiezza tipica di seduta 6,5% · P/E prospettico 2,5× · ricavi +6,9% a/a · trimestrale fra 58 giorni
+- PLTR: medie: +23,1% dalla 50, +18,9% dalla 200 · RSI 61,9 · -13,3% dal massimo 52s · forza relativa 1M +40,4 pp vs NDX · ampiezza tipica di seduta 4,1% · P/E prospettico 77,7× · ricavi +92,8% a/a · trimestrale fra 62 giorni
+- GOOGL: medie: -4% dalla 50, +0,1% dalla 200 · RSI 41,3 · -18% dal massimo 52s · forza relativa 1M -13,1 pp vs NDX · ampiezza tipica di seduta 2,5% · P/E prospettico 22,6× · ricavi +24,2% a/a · trimestrale fra 57 giorni
+- WDC: medie: -14,2% dalla 50, +22,8% dalla 200 · RSI 43,8 · -43,7% dal massimo 52s · forza relativa 1M -19,2 pp vs SP500 · ampiezza tipica di seduta 8,2% · P/E prospettico 14,2× · ricavi +43,8% a/a · trimestrale fra 65 giorni
+- ORCL: medie: +0,9% dalla 50, -16,3% dalla 200 · RSI 46,4 · -58,7% dal massimo 52s · forza relativa 1M -2,3 pp vs SP500 · ampiezza tipica di seduta 4,6% · P/E prospettico 12,9× · ricavi +20,6% a/a · trimestrale fra 9 giorni
+- MRVL: medie: -6,3% dalla 50, +40,4% dalla 200 · RSI 45,2 · -36,2% dal massimo 52s · forza relativa 1M +8,8 pp vs SOX · ampiezza tipica di seduta 8% · P/E prospettico 31,4× · ricavi +36,5% a/a · trimestrale fra 91 giorni
+- CRWV: medie: -5,5% dalla 50, -10,4% dalla 200 · RSI 42,6 · -46,6% dal massimo 52s · forza relativa 1M -6,5 pp vs SP500 · ampiezza tipica di seduta 7,9% · utile atteso NEGATIVO (nessun multiplo prospettico) · ricavi +112,5% a/a · trimestrale fra 71 giorni
+- BE: medie: -7,7% dalla 50, +12,8% dalla 200 · RSI 48,1 · -39,2% dal massimo 52s · forza relativa 1M -4 pp vs SP500 · ampiezza tipica di seduta 9% · P/E prospettico 43,4× · ricavi +165,5% a/a · trimestrale fra 56 giorni
+- SKHY: RSI 43,8 · -17,5% dal massimo 52s · forza relativa 1M +10,8 pp vs SP500 · ampiezza tipica di seduta 6% · P/E prospettico 4,7× · ricavi +256,8% a/a · trimestrale fra 56 giorni
+- RGTI: medie: -10,3% dalla 50, -22,9% dalla 200 · RSI 41,4 · -74,2% dal massimo 52s · forza relativa 1M -6,2 pp vs SOX · ampiezza tipica di seduta 7,4% · utile atteso NEGATIVO (nessun multiplo prospettico) · ricavi +185,3% a/a · trimestrale fra 70 giorni
 ⚠ COME SI LEGGE QUESTO ELENCO. La distanza dal massimo a 52 settimane e la posizione rispetto alle medie dicono cose diverse: la prima misura quanto e' gia' sceso il titolo, la seconda se il trend regge adesso. Un nome molto sotto il massimo ma sopra le medie sta risalendo; uno sotto entrambe no. ⚠ La forza relativa e' contro il riferimento NOMINATO in ciascuna riga, che cambia col titolo (il settore dove il sistema lo riconosce, l'indice generale dove ripiega): il confronto fra due righe con riferimenti diversi non e' omogeneo. ⚠ I fondamentali sono di fonte aggregatore, non del deposito ufficiale.
 CONCENTRAZIONE: le prime tre posizioni valgono il 59% dell'azionario · 8 posizioni si muovono INSIEME e valgono il 74% dell'azionario: MU 0.42, AMD 0.47, NVDA 1.00, ORCL 0.40, MRVL 0.37, RGTI 0.37, BE 0.37, CRWV 0.48 — il gruppo NON e' una lista di settore: e' chi ha correlazione dei rendimenti giornalieri ≥ 0.35 con NVDA sulle sedute in comune (numero accanto a ogni nome). ⚠ Titoli che condividono lo stesso fattore sono UNA scommessa scritta piu' volte, non posizioni indipendenti: l'esposizione del libro a quel fattore e' la loro somma, non il peso del singolo nome.
-CONTRIBUTO AL RISCHIO (quota della varianza del libro attribuibile a ciascuna posizione, dalle correlazioni misurate — e' un ordinamento DIVERSO dal peso): MU peso 22.7% → rischio 34.5% · AMD peso 16.0% → rischio 19.7% · NVDA peso 20.4% → rischio 11.9% · MSTR peso 7.5% → rischio 6.5% · WDC peso 3.9% → rischio 4.9% · BE peso 3.0% → rischio 4.9%. ⚠ Dove rischio e peso divergono, la posizione porta piu' (o meno) varianza di quanto il suo peso suggerisca: e' l'effetto delle correlazioni, non della dimensione.
+CONTRIBUTO AL RISCHIO (quota della varianza del libro attribuibile a ciascuna posizione, dalle correlazioni misurate — e' un ordinamento DIVERSO dal peso): MU peso 22.7% → rischio 34.6% · AMD peso 16.0% → rischio 19.8% · NVDA peso 20.4% → rischio 11.8% · MSTR peso 7.5% → rischio 6.5% · WDC peso 3.9% → rischio 4.9% · BE peso 3.0% → rischio 4.9%. ⚠ Dove rischio e peso divergono, la posizione porta piu' (o meno) varianza di quanto il suo peso suggerisca: e' l'effetto delle correlazioni, non della dimensione.
 RISCHIO DEL LIBRO NEL SUO INSIEME: VaR 95% a 1 giorno 4.93% (percentili storici) · Expected Shortfall 95% 6.16% (perdita MEDIA nel 5% dei giorni peggiori) · beta del libro vs Nasdaq 100 2.09 · correlazione media fra le posizioni 0.35. ⚠ Sono misure a UN GIORNO su distribuzione storica: dicono quanto e' ampia una giornata brutta ordinaria, non quanto puo' scendere il libro in un ciclo. Per quello serve il drawdown qui sotto.
 DRAWDOWN MASSIMO delle singole posizioni sulle ultime ~125 sedute (quanto e' scesa dal proprio picco, e quante sedute sono passate dal picco al ritorno su quel livello): MSTR -58% (78 sedute sott'acqua, NON ancora recuperato) · CRWV -56% (81 sedute sott'acqua, NON ancora recuperato) · ORCL -53% (64 sedute sott'acqua, NON ancora recuperato) · BE -53% (50 sedute sott'acqua, NON ancora recuperato) · RGTI -51% (66 sedute sott'acqua, NON ancora recuperato) · MRVL -48% (61 sedute sott'acqua, NON ancora recuperato) · il meno profondo del libro: NVDA -19%. ⚠ E' il calo gia' AVVENUTO, non una previsione: serve a sapere quanto e' ordinario per questi titoli, perche' una discesa dentro quel range non e' una rottura della tesi e una fuori lo e'.
-  Sotto soglia, cioe' misurati e indipendenti dall'ancora: GOOGL 0.24, PLTR 0.20, WDC 0.34, MSTR 0.34. ⚠ I valori sono arrotondati a due decimali: un nome che appare qui a 0.35 sta sotto la soglia di pochi millesimi, non e' un'incoerenza. ⚠ E "indipendenti" vale RISPETTO A NVDA: fra loro possono muoversi insieme, perche' il sistema misura contro una sola ancora e non pubblica la matrice completa.
+  Sotto soglia, cioe' misurati e indipendenti dall'ancora: GOOGL 0.24, PLTR 0.20, WDC 0.10, MSTR 0.34. ⚠ I valori sono arrotondati a due decimali: un nome che appare qui a 0.35 sta sotto la soglia di pochi millesimi, non e' un'incoerenza. ⚠ E "indipendenti" vale RISPETTO A NVDA: fra loro possono muoversi insieme, perche' il sistema misura contro una sola ancora e non pubblica la matrice completa.
   ⚠ NON MISURABILI, quindi fuori dal conto per mancanza di dati e non perche' indipendenti: SKHY — meno di 60 sedute in comune con NVDA. Il loro peso NON e' incluso nel 74%.
 IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sulle STESSE 125 sedute e dagli stessi dati — nessun numero viene da fuori):
-- Il tuo libro: volatilita' annua 50.9% · drawdown massimo -24.2% (63 sedute sott'acqua, NON recuperato) · scommesse effettive 2.3 su 12 nomi — pesi reali
-- Stessi nomi, pesi uguali: volatilita' annua 52.0% · drawdown massimo -31.2% (63 sedute sott'acqua, NON recuperato) · scommesse effettive 2.5 su 12 nomi — isola l'effetto delle scelte di peso
-- Senza le prime tre (MU, NVDA, AMD): volatilita' annua 47.9% · drawdown massimo -30.5% (63 sedute sott'acqua, NON recuperato) · scommesse effettive 2.5 su 9 nomi — isola l'effetto della concentrazione
+- Il tuo libro: volatilita' annua 48.5% · drawdown massimo -24.0% (50 sedute sott'acqua, NON recuperato) · scommesse effettive 2.6 su 12 nomi — pesi reali
+- Stessi nomi, pesi uguali: volatilita' annua 47.2% · drawdown massimo -30.6% (63 sedute sott'acqua, NON recuperato) · scommesse effettive 3.0 su 12 nomi — isola l'effetto delle scelte di peso
+- Senza le prime tre (MU, NVDA, AMD): volatilita' annua 42.6% · drawdown massimo -29.9% (63 sedute sott'acqua, NON recuperato) · scommesse effettive 3.0 su 9 nomi — isola l'effetto della concentrazione
 - Solo Nasdaq 100: volatilita' annua 22.0% · drawdown massimo -11.0% (63 sedute sott'acqua, NON recuperato) — isola l'effetto della selezione dei nomi
-- Solo semiconduttori (SOX): volatilita' annua 53.2% · drawdown massimo -28.6% (50 sedute sott'acqua, NON recuperato) — isola l'effetto della selezione dei nomi
+- Solo semiconduttori (SOX): volatilita' annua 53.2% · drawdown massimo -28.6% (49 sedute sott'acqua, NON recuperato) — isola l'effetto della selezione dei nomi
 ⚠ COME SI LEGGONO. La differenza fra due righe e' l'effetto di UNA scelta: "pesi uguali" contro "pesi reali" isola quanto hanno reso le scelte di peso; "senza le prime tre" isola la concentrazione; l'indice isola la selezione dei nomi. Le SCOMMESSE EFFETTIVE sono 1/(1/k + (k-1)/k·correlazione media): dicono quante decisioni indipendenti ci sono davvero dentro k posizioni. ⚠ Sono misure su una finestra passata, non previsioni, e non sono un obiettivo: un libro di crescita concentrato ha per costruzione volatilita' e drawdown superiori all'indice — il punto e' sapere di quanto, non ridurli.
 
 === LA DISCIPLINA DI RISCHIO DI UN FONDO GROWTH, APPLICATA A QUESTO LIBRO ===
@@ -213,12 +213,12 @@ STATO COMPLESSIVO: 5 discipline su 9 sono oltre la propria soglia (Peso del sing
    da dove viene la soglia: CONVENZIONE, ed e' la regola che i fondi growth violano piu' spesso senza accorgersene: la diversificazione si conta sui FATTORI, non sui nomi. Il file non contiene nessuna soglia; la misura si'.
    Non e' un raggruppamento per etichetta di settore: e' chi ha correlazione dei rendimenti giornalieri ≥ 0.35 con NVDA sulle sedute in comune. ⚠ E' LA RIGA PIU' IMPORTANTE DELLA SEZIONE: 74% del capitale si muove insieme, quindi il libro ha UNA posizione da 74% scritta 8 volte. Un evento che colpisce il fattore non colpisce un nome: li colpisce tutti.
 4) Scommesse davvero indipendenti — OLTRE
-   nel libro: 2,3 su 12 nomi
+   nel libro: 2,6 su 12 nomi
    soglia (convenzione): almeno 5 decisioni indipendenti
    da dove viene la soglia: CONVENZIONE: sotto le cinque, la diversificazione non riduce piu' il rischio in modo apprezzabile e il libro si comporta come un paniere di poche idee. La formula (1/(1/k + (k-1)/k·correlazione media)) e' standard; la soglia di 5 e' una convenzione di lettura.
-   Aggiungere un nome correlato agli altri non aggiunge una decisione: allarga la stessa. Il numero dice che il libro contiene circa 2 idee, non 12. ⚠ Conseguenza operativa: il tempo speso ad analizzare la tredicesima posizione rende meno del tempo speso a chiedersi se la prima idea vale ancora.
+   Aggiungere un nome correlato agli altri non aggiunge una decisione: allarga la stessa. Il numero dice che il libro contiene circa 3 idee, non 12. ⚠ Conseguenza operativa: il tempo speso ad analizzare la tredicesima posizione rende meno del tempo speso a chiedersi se la prima idea vale ancora.
 5) Discesa dal massimo (drawdown) — AL LIMITE
-   nel libro: 24,2% sulle ultime 125 sedute, 63 sedute sott'acqua, NON ancora recuperato
+   nel libro: 24% sulle ultime 125 sedute, 50 sedute sott'acqua, NON ancora recuperato
    soglia (convenzione): -20% rivedere la tesi, -30% ridurre il rischio lordo
    da dove viene la soglia: CONVENZIONE di governance: molti fondi scrivono nel proprio regolamento due soglie, una di revisione e una di azione, fissate in anticipo proprio perche' nel mezzo di una discesa il giudizio e' peggiore. Il file non le contiene.
    ⚠ E' il calo GIA' AVVENUTO, non una previsione: serve a sapere cosa e' ordinario per QUESTO libro. Una discesa dentro quel range non rompe niente; una fuori merita di essere spiegata. ⚠ E la finestra e' 125 sedute: non contiene un mercato ribassista intero, quindi il peggio misurato NON e' il peggio possibile.
@@ -247,9 +247,9 @@ I tre dati che questa sezione NON contiene, e senza i quali una quantita' non e'
 === ANALISI STORICA DELLE SERIE MACRO (traiettorie: pendenze, percentili nel range, inversioni) ===
 · HY OAS (spread high yield, serie 1A): 2,63% · Δ1M -7,72% (2026-07-31→2026-08-31) · range 1A [2,6–3,46] · percentile 1° (compressione estrema: il credito non prezza rischio)
 · Curva 10A–2A (serie ~2A): 0,4pp · Δ1M -0,07pp (2026-07-31→2026-09-01) · Δ3M -0,01pp · ultima inversione 496 sedute fa
-· VIX (spark 30 sedute): 16,3 · oggi +9,52% · percentile finestra 72° · term VIX/VIX3M 0,89 (contango: calma)
+· VIX (spark 30 sedute): 16,3 · oggi +9,52% · percentile finestra 68° · term VIX/VIX3M 0,89 (contango: calma)
 · Treasury 10A (serie ~18M): 4,75% · Δ1M 0% (2026-07-31→2026-08-31) · range [3,97–4,75] su 369 rilevazioni · percentile 100° (costo del capitale ai massimi del periodo: e' il canale che comprime i multipli lunghi)
 · Treasury 30A (serie ~18M): 5,25% · Δ1M -0,38% (2026-07-31→2026-08-31) · range [4,41–5,31] su 369 rilevazioni · percentile 99° (parte lunga ai massimi: il mercato chiede premio a termine)
-· Rame (serie ~12M): 6,53 $/lb · Δ1M +1,4% (2026-07-30→2026-09-01) · range [4,48–6,71] (serie giornaliera completa) · percentile 91° sulle 127 rilevazioni campionate qui (input industriale ai massimi: entra nel deflatore e nel costo di costruzione dei data center)
-· Petrolio WTI (serie ~12M): 90,84 $ · Δ1M +8,67% (2026-07-30→2026-09-01) · range [55,27–112,95] (serie giornaliera completa) · percentile 77° sulle 127 rilevazioni campionate qui
+· Rame (serie ~12M): 6,54 $/lb · Δ1M +1,46% (2026-07-30→2026-09-01) · range [4,48–6,71] (serie giornaliera completa) · percentile 91° sulle 127 rilevazioni campionate qui (input industriale ai massimi: entra nel deflatore e nel costo di costruzione dei data center)
+· Petrolio WTI (serie ~12M): 90,79 $ · Δ1M +8,61% (2026-07-30→2026-09-01) · range [55,27–112,95] (serie giornaliera completa) · percentile 77° sulle 127 rilevazioni campionate qui
 USO METODOLOGICO: sulle serie macro sia i valori ESTREMI (HY OAS ai minimi del range, VIX ai minimi della sua distribuzione) sia le INVERSIONI DI TENDENZA (spread in allargamento, curva in dis-inversione) sono i due modi in cui questi indicatori hanno storicamente anticipato i punti di svolta.
