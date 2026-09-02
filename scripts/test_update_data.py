@@ -1213,6 +1213,45 @@ _corta = ud.sensibilita_macro(_c.iloc[-80:], {"tassi": ("TLT", "i tassi", _b.ilo
 check("v401 sensibilita': sotto 90 osservazioni la finestra corta NON si pubblica",
       _corta is not None and _corta["tassi"].get("breve") is None)
 
+# ═══ v403 — LA SENSIBILITA' NELLE SEDUTE DI FORTE ESCURSIONE ═══════════════════════════════
+# Serie costruita perche' il fenomeno ci sia: la relazione col canale vale SOLO nelle sedute in
+# cui il canale si muove molto. E' il caso che il libro teme (il giorno che i tassi saltano) e
+# che una regressione sulla giornata media descrive male.
+_idxE = pd.bdate_range("2025-01-01", periods=260)
+_rngE = np.random.default_rng(5)
+_rbE = _rngE.normal(0, 0.01, 260)
+_bE = pd.Series(100 * np.cumprod(1 + _rbE), index=_idxE)
+_grandi = np.abs(_rbE) >= np.quantile(np.abs(_rbE), 0.8)
+_rtE = _rngE.normal(0, 0.02, 260)
+_rtE[_grandi] = 2.5 * _rbE[_grandi] + _rngE.normal(0, 0.004, int(_grandi.sum()))
+_cE = pd.Series(100 * np.cumprod(1 + _rtE), index=_idxE)
+_sE = ud.sensibilita_macro(_cE, {"tassi": ("TLT", "i tassi", _bE)})["tassi"]
+
+check("v403 il terzo sguardo esiste e porta il proprio campione e la propria soglia",
+      _sE.get("evento") is not None
+      and _sE["evento"]["campione"] >= 32
+      and _sE["evento"]["r2_soglia"] > _sE["r2_soglia"])
+
+# ⚠ IL PUNTO DELLA MISURA, e la sua affermazione onesta: NON scopre un canale invisibile — una
+# relazione di coda porta gran parte della varianza e si vede anche nella regressione piena.
+# Quello che aggiunge e' il BETA delle giornate che contano, che la media sottostima.
+check("v403 il beta delle sedute forti e' piu' ampio di quello pieno, che lo sottostima",
+      abs(_sE["evento"]["beta"]) > abs(_sE["beta"]) * 1.2)
+
+check("v403 il campione condizionato e' circa un quinto delle sedute, non un decimo",
+      0.15 * _sE["campione"] <= _sE["evento"]["campione"] <= 0.25 * _sE["campione"])
+
+# ⚠ la selezione e' sulla |escursione| del CANALE: la soglia pubblicata deve essere quella, e
+# deve essere positiva — se fosse zero la selezione non selezionerebbe niente.
+check("v403 la soglia di escursione e' pubblicata ed e' positiva",
+      _sE["evento"].get("escursione_min") is not None and _sE["evento"]["escursione_min"] > 0)
+
+# ⚠ sotto le 32 osservazioni selezionate non si pubblica: il pavimento del rumore non esiste
+# sotto df 30, e un pavimento inventato sarebbe peggio del silenzio.
+_corto = ud.sensibilita_macro(_cE.iloc[-100:], {"tassi": ("TLT", "i tassi", _bE.iloc[-100:])})["tassi"]
+check("v403 su un campione troppo piccolo il terzo sguardo tace invece di inventare un pavimento",
+      _corto.get("evento") is None)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)

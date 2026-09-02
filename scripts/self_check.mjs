@@ -145,8 +145,8 @@ const SUITE = [
      da uno script). Alzati con margine su una crescita ordinaria, non incollati al numero
      di oggi — un pavimento uguale al conteggio va rosso al primo check tolto per una ragione
      legittima. Si alzano quando la suite cresce, mai si abbassano per far passare qualcosa. */
-  { file: "test_app.mjs",        cmd: "node",    minimo: 430, firma: /\d+\/\d+ check superati/ },
-  { file: "test_update_data.py", cmd: "python3", minimo: 160, firma: /CHECK OK|CHECK FALLITI/ },
+  { file: "test_app.mjs",        cmd: "node",    minimo: 440, firma: /\d+\/\d+ check superati/ },
+  { file: "test_update_data.py", cmd: "python3", minimo: 165, firma: /CHECK OK|CHECK FALLITI/ },
   { file: "redteam.mjs",         cmd: "node",    minimo: null, firma: /RED TEAM: \d+ campagne/ },
   /* v372 — il percorso diretto ha i suoi test come tutto il resto: se lo strato che misura il
      libro non e' sorvegliato, torna a essere codice di cui fidarsi a occhio. */

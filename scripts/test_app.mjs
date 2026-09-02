@@ -2631,7 +2631,10 @@ const TV_FINTO = {
   sensibilita: { settore: { strumento: "SOXX", canale: "il comparto", beta: 1.46, r2: 0.657, corr: 0.81, campione: 250, da: "2025-08-18", a: "2026-08-14", r2_soglia: 0.015, acceso: true,
                             breve: { beta: 1.5, r2: 0.62, corr: 0.79, campione: 60, da: "2026-05-20", a: "2026-08-14", r2_soglia: 0.065, acceso: true } },
                  tassi: { strumento: "TLT", canale: "i tassi a lunga", beta: 0.75, r2: 0.007, corr: 0.08, campione: 250, da: "2025-08-18", a: "2026-08-14", r2_soglia: 0.015, acceso: false,
-                          breve: { beta: 1.9, r2: 0.18, corr: 0.42, campione: 60, da: "2026-05-20", a: "2026-08-14", r2_soglia: 0.065, acceso: true } } },
+                          breve: { beta: 1.9, r2: 0.18, corr: 0.42, campione: 60, da: "2026-05-20", a: "2026-08-14", r2_soglia: 0.065, acceso: true },
+                          /* v403 — nelle sedute di forte escursione il beta e' molto piu' ampio della
+                             media: e' il numero che serve a un libro a leva, e non si ricava dagli altri due. */
+                          evento: { beta: 2.4, r2: 0.55, corr: 0.74, campione: 50, da: "2025-08-20", a: "2026-08-13", r2_soglia: 0.077, acceso: true, escursione_min: 1.2 } } },
   conto_trim: [{ trim: "2026-05-31", ricavi: 41460000000, utile: 28243000000, operativo: 33318000000, margine: 68.1, margine_op: 80.4 }],
 };
 
@@ -6563,6 +6566,63 @@ check("v402 le notizie post-chiusura si contano anche a sessione aperta", suVeri
   return ch.at.getTime() <= Date.now()
       && p.indexOf("POST-CHIUSURA-UNO") >= 0
       && p.indexOf("POST-CHIUSURA-DUE") >= 0;`));
+
+/* ═══ v403 — LA SENSIBILITA' AGLI EVENTI, E IL DENOMINATORE CHE NON SI CONFRONTA ═══════════
+   Le due finestre della v401 hanno risposto NO sul canale tassi di CRWV, e avevano ragione: il
+   01/09 e' stato un evento, non un regime. Ma la domanda che un libro a leva pone e' "il giorno
+   che i tassi saltano, quanto perdo", e una regressione sulla giornata MEDIA non la risponde.
+   ⚠ Il rischio della misura e' che il suo R² venga letto accanto agli altri due: e' calcolato
+   su un sottoinsieme scelto, quindi ha un denominatore diverso. Il gate pretende che la riga lo
+   DICHIARI — e' la regola dei denominatori non dichiarati applicata a una misura nostra. */
+check("v403 la sensibilita' nelle sedute di forte escursione viene pubblicata col suo campione", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "MU");
+  if (!r) return false;
+  r.tv = JSON.parse(JSON.stringify(${JSON.stringify(TV_FINTO)}));
+  const p = buildPromptTicker("MU");
+  /* ⚠ indexOf e non regex: un backslash dentro un template literal sparisce, e il meta-gate mi
+     ha ripreso di nuovo scrivendo questo check. Una stringa non ha niente da sfuggire. */
+  return p.indexOf("quando il canale si muove FORTE") >= 0
+      && p.indexOf("beta +2.4, R² 0.55 contro un pavimento del rumore di 0.077") >= 0
+      && p.indexOf("50 sedute, dal 2025-08-20 al 2026-08-13") >= 0
+      && p.indexOf("oltre 1.2% in valore assoluto") >= 0;`));
+
+check("v403 il R² condizionato dichiara di NON essere confrontabile con gli altri due", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "MU");
+  if (!r) return false;
+  r.tv = JSON.parse(JSON.stringify(${JSON.stringify(TV_FINTO)}));
+  const p = buildPromptTicker("MU");
+  return p.indexOf("QUESTO R² NON SI CONFRONTA") >= 0
+      && p.indexOf("DENOMINATORE diverso") >= 0
+      && p.indexOf("Quello che si confronta e' il BETA") >= 0;`));
+
+/* ⚠ il confronto fra i due beta e' il messaggio: 2,4 contro 0,75 e' il triplo, e la riga deve
+   dirlo in cifre invece di lasciarlo calcolare a chi legge. */
+check("v403 il beta delle sedute forti si confronta in cifre con quello della finestra lunga", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "MU");
+  if (!r) return false;
+  r.tv = JSON.parse(JSON.stringify(${JSON.stringify(TV_FINTO)}));
+  const p = buildPromptTicker("MU");
+  return p.indexOf("220% PIU' AMPIO") >= 0;`));
+
+/* ⚠ e la riga deve dire PERCHE' la selezione non falsa il beta: si sceglie sulla causa, non
+   sull'effetto. Senza quella frase la misura invita al sospetto giusto sulla cosa sbagliata. */
+check("v403 la riga dichiara che la selezione e' sul canale, non sul titolo", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "MU");
+  if (!r) return false;
+  r.tv = JSON.parse(JSON.stringify(${JSON.stringify(TV_FINTO)}));
+  const p = buildPromptTicker("MU");
+  return p.indexOf("si sceglie sulla causa, non sull'effetto") >= 0
+      && p.indexOf("selezionarle sul movimento del") >= 0;`));
+
+check("v403 senza il terzo sguardo nei dati la riga non compare e non si inventa", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "MU");
+  if (!r) return false;
+  const tv = JSON.parse(JSON.stringify(${JSON.stringify(TV_FINTO)}));
+  Object.values(tv.sensibilita).forEach(v => { delete v.evento; });
+  r.tv = tv;
+  const p = buildPromptTicker("MU");
+  return p.indexOf("quando il canale si muove FORTE") < 0
+      && p.indexOf("QUESTO R² NON SI CONFRONTA") < 0;`));
 
 let fail = 0;
 for (const [name, ok] of T) {

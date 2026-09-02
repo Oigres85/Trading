@@ -743,6 +743,9 @@ def stagionalita_titolo(monthly, min_anni=8):
 # 60 sedute: un trimestre di borsa. E' la finestra piu' corta su cui una regressione semplice
 # dica ancora qualcosa, ed e' quella su cui un canale che si accende diventa visibile.
 _FINESTRA_BREVE = 60
+# v403 — la quota di sedute in cui il canale si muove di piu': un quinto, non un decimo, perche'
+# il decimo su un anno lascia ~25 osservazioni e sotto df 30 non esiste un pavimento affidabile.
+_QUOTA_EVENTO = 0.20
 
 
 def r2_rumore(n):
@@ -839,7 +842,28 @@ def sensibilita_macro(closes, serie_bench):
         if len(a) >= 90:
             ab, bb = a.iloc[-_FINESTRA_BREVE:], b.iloc[-_FINESTRA_BREVE:]
             breve = _misura(ab, bb)
-        fuori[nome] = {"strumento": sym, "canale": canale, **lungo, "breve": breve}
+        # ═══ v403 — LA CO-MOVIMENTAZIONE NON E' LA SENSIBILITA' AGLI EVENTI ══════════════════
+        # Le due finestre della v401 hanno risposto, e hanno risposto NO: sul canale tassi di
+        # CRWV il beta e' salito da +0,18 a +1,35 fra l'anno e il trimestre, ma l'R2 e' rimasto
+        # sotto il pavimento del rumore. La lettura giusta e' che il 01/09 e' stato un EVENTO,
+        # non un regime — e una regressione lineare sui rendimenti giornalieri e' CIECA per
+        # costruzione a una relazione di coda: una giornata violenta non produce R2 su sessanta
+        # sedute. Qui si guarda alla domanda che il libro pone davvero: "quando questo canale si
+        # muove FORTE, quanto si muove il titolo, e quanto di quel movimento e' spiegato".
+        # ⚠⚠ SELEZIONARE SUL REGRESSORE NON DISTORCE IL BETA — si sceglie sulla |x|, non sulla y,
+        # ed e' l'equivalente di un esperimento con piu' escursione. Ma l'R2 SI': il denominatore
+        # cambia, quindi NON e' confrontabile con quello delle altre due finestre e chi lo stampa
+        # deve dirlo. E' la regola dei denominatori non dichiarati, applicata a una misura nostra.
+        # ⚠ Il quinto delle sedute (non il decimo) perche' su ~251 osservazioni il decile ne
+        # lascia ~25, cioe' df 23: sotto la soglia in cui r2_rumore restituisce un pavimento
+        # affidabile, e un pavimento inventato sarebbe peggio del silenzio.
+        evento = None
+        soglia_mov = float(b.abs().quantile(1 - _QUOTA_EVENTO))
+        forti = b.abs() >= soglia_mov
+        if int(forti.sum()) >= 32:
+            evento = _misura(a[forti], b[forti])
+            evento["escursione_min"] = round(soglia_mov, 2)
+        fuori[nome] = {"strumento": sym, "canale": canale, **lungo, "breve": breve, "evento": evento}
     return fuori or None
 
 
