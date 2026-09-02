@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "384";
+const BUILD_VERSION = "385";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10172,6 +10172,61 @@ function contestoPortafoglio(tkCorrente) {
       + `ma non il prezzo (la fonte non quota quel simbolo), quindi non puo' calcolarne il controvalore. `
       + `I pesi qui sopra sono percentuali di un azionario che NON comprende ${muti.length === 1 ? "questa posizione" : "queste posizioni"}.`);
   }
+
+  /* ═══ v398 — LE NOTIZIE, E L'UNICA COSA CHE L'LLM DA SOLO NON PUO' FARE ═══════════════
+     Il pacchetto ordina gia' di cercare online le notizie sul titolo, e quella ricerca e' piu'
+     fresca del nostro cron. Quello che chi legge NON puo' fare e' incrociarle col LIBRO: una
+     notizia su un ALTRO nome del gruppo correlato riguarda anche questa posizione, perche' i
+     due si muovono insieme — e il gruppo lo conosce solo chi ha il libro. Per questo il blocco
+     vive qui, dentro il contesto di portafoglio, e non fra i dati del titolo.
+     ⚠ I tre esiti restano distinti (con voci / senza voci / non letti): "nessuna notizia" e
+     "la fonte non ha risposto" si leggono uguali e significano l'opposto (v389). */
+  const nt = (DATA && DATA.news_titoli) || {};
+  const perTk = nt.per_titolo || {};
+  const TK = String(tkCorrente || "").toUpperCase();
+  const gfN = gruppoFattore(azionarie, totAz);
+  const gruppo = new Set((gfN.semi || []).map(x => String(x.r.ticker).toUpperCase()));
+  const eta = (q) => {
+    const d = new Date(String(q));
+    return isNaN(d) ? null : Math.max(0, Math.round((Date.now() - d.getTime()) / 3600000));
+  };
+  const riga = (v) => {
+    const h = eta(v.quando);
+    return `\n    · [${h != null ? h + "h fa" : "data illeggibile"}] ${v.titolo}`
+      + (v.riassunto ? `\n      ${v.riassunto}` : "");
+  };
+  const mie = perTk[TK] || [];
+  const altre = Object.entries(perTk)
+    .filter(([t]) => t !== TK && gruppo.has(t))
+    .flatMap(([t, vv]) => (vv || []).slice(0, 2).map(v => ({ t, v })));
+  if (mie.length || altre.length || (nt.non_letti || []).length) {
+    L.push("");
+    L.push(`--- NOTIZIE SUI TITOLI DEL LIBRO (${nt.fonte || "Yahoo Finance RSS per ticker"}, `
+      + `finestra ${nt.finestra_giorni || 14} giorni) ---`);
+    L.push(`⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui `
+      + `per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che il `
+      + `PASSO 0 ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.`);
+    if (mie.length) {
+      L.push(`Su ${TK} (${mie.length} ${mie.length === 1 ? "voce" : "voci"}):` + mie.map(riga).join(""));
+    } else if ((nt.senza_notizie || []).map(String).includes(TK)) {
+      L.push(`Su ${TK}: nessuna voce nella finestra. E' un FATTO sulla fonte, non una garanzia `
+        + `che non sia successo niente: cercale comunque.`);
+    }
+    if (altre.length) {
+      /* ⚠ QUESTA E' LA RIGA PER CUI IL BLOCCO ESISTE. */
+      L.push(`⚠⚠ E QUESTE RIGUARDANO IL FATTORE, NON UN ALTRO TITOLO: i nomi qui sotto stanno nel `
+        + `gruppo correlato di ${TK} (${gfN.misurato ? "correlazione misurata sopra " + gfN.SOGLIA_FATTORE
+            : "classificazione di settore, correlazione non misurabile in questo run"}), cioe' si `
+        + `muovono insieme. Una notizia su di loro e' una notizia su questa posizione, e vale per `
+        + `il PESO DEL GRUPPO (${Math.round(gfN.pesoSemi)}% dell'azionario), non per un nome solo.`
+        + altre.map(({ t, v }) => `\n  [${t}]` + riga(v).replace(/^\n {4}/, " ")).join(""));
+    }
+    if ((nt.non_letti || []).length) {
+      L.push(`⚠ NON LETTI in questo run (la fonte ha strozzato le richieste, HTTP 429): `
+        + `${nt.non_letti.join(", ")}. Per questi titoli l'assenza di notizie qui NON e' `
+        + `un'informazione: e' un buco della raccolta.`);
+    }
+  }
   return L.join("\n");
 }
 
@@ -12109,9 +12164,13 @@ function datiNostriDelTitolo(tk) {
 `  revisioni degli UTILI a 90 giorni, la loro ampiezza e la dispersione di utili e target il`,
 `  sistema li pubblica gia' qui sotto`,
 `· notizie e fatti societari: prima le ULTIME 48 ORE, poi il contesto delle ultime settimane.`,
-`  Il pacchetto porta i titoli MACRO e dichiara quanti cadono nelle ultime 8 ore; su QUESTA`,
-`  SOCIETA' e sul suo settore non porta niente, quindi quella parte e' interamente tua. Se non`,
-`  trovi nulla di recente, scrivilo: "nessuna notizia rilevante nelle ultime 48 ore" e' un'informazione.`,
+`  Il pacchetto porta i titoli MACRO, e da ora anche i titoli sui NOMI CHE IL CEO POSSIEDE (feed`,
+`  Yahoo per ticker, finestra 14 giorni) — compreso l'incrocio col FATTORE, che tu da solo non`,
+`  puoi fare perche' non conosci il libro. ⚠ NON TI ESONERANO DALLA RICERCA: arrivano col giro`,
+`  della pipeline e la tua e' piu' fresca, non coprono i titoli soltanto seguiti, e sono TITOLI`,
+`  non articoli letti. Se non trovi nulla di recente, scrivilo: "nessuna notizia rilevante nelle`,
+`  ultime 48 ore" e' un'informazione. ⚠ E se il blocco dichiara dei titoli NON LETTI (la fonte ha`,
+`  strozzato le richieste), per quelli l'assenza qui non e' un dato: e' un buco della raccolta.`,
 `  ⚠ E INCROCIALE COL LIBRO, non solo col titolo analizzato: una notizia che colpisce il fattore`,
 `  condiviso — il gruppo di posizioni correlate che trovi nel blocco del libro — vale per tutte`,
 `  quelle posizioni insieme, non per una. E' la differenza fra una notizia su un nome e una`,
@@ -12226,9 +12285,25 @@ function buildPromptTicker(tkGrezzo) {
    "da non tagliare per quanto sembrino ovvie". */
 `══ COSA DEVI CONSEGNARE — E QUANTO LUNGO ══`,
 ``,
-`BUDGET: 1.600-1.800 parole IN TUTTO. E' un vincolo, non un'indicazione. Un blocco che non ha`,
-`nulla da dire si chiude in una riga: meglio corto e vero che lungo e riempito. Tabelle solo`,
-`dove servono a confrontare; niente tabella per elencare tre numeri.`,
+/* ⚠⚠ v398 — IL TETTO E' STATO RICALIBRATO, E LA COSA CHE CONTA NON E' IL NUMERO. Misurato sul
+   pacchetto vero: i quattro blocchi con tetto esplicito (0, 1, 8, 9) valgono gia' ~520 parole,
+   e ne restavano ~1.200 per gli altri sei PIU' la tabella dei concorrenti, il collaudo in tre
+   righe, le segnalazioni e le fonti. I blocchi che pagavano la compressione erano gli ULTIMI —
+   rischio di libro e tesi contraria — cioe' proprio quelli in cui un modello a corto di spazio
+   sostituisce le prove con affermazioni. Il rischio di allucinazione non nasce dall'avere piu'
+   spazio: nasce dall'essere COSTRETTI a riempirlo e dall'essere costretti a comprimere le prove.
+   Per questo il minimo e' SPARITO — un intervallo con un pavimento e' un invito a riempire — e
+   al suo posto c'e' la clausola che chiude il varco vero: non si allunga mai un blocco con
+   affermazioni che non si possono sostenere. */
+`BUDGET: al massimo 2.300 parole IN TUTTO. E' un TETTO, non un bersaglio: non esiste una`,
+`lunghezza minima e un referto di 1.400 parole tutte sostenute vale piu' di uno di 2.300 con`,
+`duecento parole di riempimento. Un blocco che non ha nulla da dire si chiude in una riga.`,
+`⚠⚠ E LA REGOLA CHE CONTA: non allungare MAI un blocco aggiungendo affermazioni che non puoi`,
+`sostenere con un numero di questo pacchetto o con una fonte che hai aperto. Se ti accorgi di`,
+`star scrivendo per arrivare a una lunghezza, fermati: quello e' il punto esatto in cui un`,
+`referto comincia a inventare. Scrivere "su questo non ho abbastanza per concludere" e' una`,
+`risposta legittima e conta come contenuto.`,
+`Tabelle solo dove servono a confrontare; niente tabella per elencare tre numeri.`,
 ``,
 `0) IL GIUDIZIO — cinque righe, prima di tutto il resto.`,
 (giaDentro

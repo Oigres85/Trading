@@ -355,7 +355,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 
 # v254 — la soglia minima resta come rete anti-regressione (se qualcuno cancella meta' suite
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
-N_CHECKS_MINIMO = 104  # +8 col calendario ufficiale v395 (sale, mai scende)
+N_CHECKS_MINIMO = 112  # +8 con le news per titolo v398 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -1031,6 +1031,112 @@ finally:
         os.environ.pop("FRED_API_KEY", None)
     else:
         os.environ["FRED_API_KEY"] = _vecchia_chiave
+
+# ══ v398 — LE NOTIZIE PER TITOLO ══════════════════════════════════════════════════════════
+from email.utils import format_datetime as _eu_fmt   # RFC 2822: il formato dei feed
+# ⚠ La fetch verso Yahoo non e' esercitabile in modo affidabile da qui (la quota per IP si
+# esaurisce: misurato, dopo ~15 richieste risponde 429 anche a 1,5 secondi di distanza). Come
+# per il calendario FRED: la LOGICA si prova tutta con una risposta finta, la fetch vera si
+# esercita nel run del CI leggendone il log. Cio' che non e' osservabile da qui non si afferma.
+_RSS_FINTO = (
+    "<rss><channel>"
+    "<item><title>Titolo recente sulla societa'</title>"
+    "<description>Un riassunto che non ripete il titolo.</description>"
+    "<link>http://x/1</link><pubDate>{recente}</pubDate></item>"
+    "<item><title>Titolo vecchio fuori finestra</title><description></description>"
+    "<link>http://x/2</link><pubDate>{vecchio}</pubDate></item>"
+    "<item><title>Senza data non deve entrare</title><link>http://x/3</link></item>"
+    "<item><title>corto</title><pubDate>{recente}</pubDate></item>"
+    "</channel></rss>"
+).format(recente=_eu_fmt(datetime.now(timezone.utc) - timedelta(hours=3)),
+         vecchio=_eu_fmt(datetime.now(timezone.utc) - timedelta(days=40)))
+
+_voci = ud.voci_rss(_RSS_FINTO, "prova")
+check("v398 il parser RSS scarta cio' che non si puo' pesare o e' spazzatura",
+      len(_voci) == 2                                   # senza data e titolo corto: fuori
+      and _voci[0]["titolo"] == "Titolo recente sulla societa'"
+      and _voci[0]["riassunto"].startswith("Un riassunto")
+      and _voci[0]["fonte"] == "prova")
+
+check("v398 un riassunto uguale al titolo non e' un riassunto",
+      ud.voci_rss("<item><title>Uguale uguale uguale</title>"
+                  "<description>uguale uguale uguale</description>"
+                  f"<pubDate>{_eu_fmt(datetime.now(timezone.utc))}</pubDate></item>",
+                  "p")[0]["riassunto"] == "")
+
+# ⚠ IL PARSER DEVE ESSERE UNO SOLO: due copie divergono al primo ritocco (v161, v207, v316).
+check("v398 il parser RSS non e' reimplementato una seconda volta nella pipeline",
+      _SRC_UD_CODICE.count("def voci_rss") == 1
+      and _SRC_UD_CODICE.count('re.findall(r"<item>(.*?)</item>"') == 1
+      and "voci_rss(testo, fonte, NEWS_RE if filtra else None" in _SRC_UD_CODICE)
+
+class _RispNews:
+    def __init__(self, code, testo=""):
+        self.status_code = code
+        self.text = testo
+
+
+_CHIAMATE_NEWS = []
+
+
+def _fake_news(url, headers=None, timeout=None):
+    _CHIAMATE_NEWS.append(url)
+    tk = url.split("s=")[1].split("&")[0]
+    if tk == "STROZZATO":
+        return _RispNews(429)
+    if tk == "MUTO":
+        return _RispNews(200, "<rss></rss>")
+    return _RispNews(200, _RSS_FINTO)
+
+
+_vero_req = ud.requests.get
+_vero_sl = ud.time.sleep
+try:
+    ud.requests.get = _fake_news
+    ud.time.sleep = lambda *_a, **_k: None
+    _CHIAMATE_NEWS.clear()
+    _out = ud.news_titoli(["BUONO", "MUTO", "STROZZATO"])
+
+    check("v398 i tre esiti restano DISTINTI: con voci, senza voci, non letto",
+          list(_out["per_titolo"]) == ["BUONO"]
+          and _out["senza_notizie"] == ["MUTO"]
+          and _out["non_letti"] == ["STROZZATO"])
+
+    # ⚠ un 429 NON e' un guasto da ritentare: e' la fonte che dice "rallenta". Ritentare tre
+    # volte, come fa http_get, significa martellare proprio quando non si deve.
+    check("v398 un 429 costa UNA chiamata, non tre: non si martella la fonte",
+          len([u for u in _CHIAMATE_NEWS if "STROZZATO" in u]) == 1
+          and "http_get(" not in _SRC_UD_CODICE.split("def news_titoli")[1].split("def ")[0])
+
+    check("v398 fuori dalla finestra non entra: una notizia di 40 giorni non e' una notizia",
+          len(_out["per_titolo"]["BUONO"]) == 1)
+finally:
+    ud.requests.get = _vero_req
+    ud.time.sleep = _vero_sl
+
+# la fonte nasce sorvegliata: e' l'unica difesa contro il guasto silenzioso (v389)
+_dqn = ud.validate_macro({"_news_titoli": {"per_titolo": {}, "senza_notizie": [],
+                                           "non_letti": ["A", "B"], "letto_il": "2026-09-02"}})
+check("v398 se la fonte strozza meta' dei titoli, il gate lo dice",
+      any(a.startswith("news_titoli: stale") for a in _dqn["alerts"]))
+_dqn2 = ud.validate_macro({"_news_titoli": {"per_titolo": {"A": [1]}, "senza_notizie": [],
+                                            "non_letti": [], "letto_il": "2026-09-02"}})
+check("v398 con la raccolta riuscita il gate non suona",
+      not any(a.startswith("news_titoli") for a in _dqn2["alerts"]))
+
+# ⚠⚠ E IL COLLEGAMENTO, non solo il controllo. I due check qui sopra chiamano validate_macro
+# con un dizionario costruito a mano: provano che il CHECK funziona, non che la fonte gli
+# arrivi davvero. Togliendo la riga che l'aggancia restavano tutti verdi — cioe' la fonte
+# poteva smettere di essere sorvegliata senza che nulla mordesse, che e' letteralmente il
+# guasto per cui le news macro sono morte un anno (v389). Trovato iniettando, non rileggendo.
+# ⚠ `validate_macro(macro)` compare DUE volte nel file e find() prendeva la prima, che sta
+# molto piu' su: il check era rosso sul codice giusto. Conta quella dell'ASSEMBLAGGIO, cioe'
+# l'ultima. Un indice preso dal posto sbagliato e' un check che misura un'altra cosa.
+_i_agg = _SRC_UD_CODICE.find('macro["_news_titoli"]')
+_i_val = _SRC_UD_CODICE.rfind("validate_macro(macro)")
+check("v398 la raccolta e' AGGANCIATA al gate, e prima che il gate giri",
+      _i_agg > 0 and _i_val > 0 and _i_agg < _i_val
+      and "news_titoli(_tk_pos)" in _SRC_UD_CODICE)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

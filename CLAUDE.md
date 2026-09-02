@@ -150,6 +150,65 @@ Il gate v395 sul raggruppamento per comunicato costruiva gli id finti con `abs(h
 far fallire il check senza che nulla fosse rotto. Terza incarnazione della classe v233/v349 —
 *un check che dipende dal caso invece che dalla proprietà va rosso da solo*. Ora è deterministico.
 
+## 📰 v398 — LE NOTIZIE PER TITOLO TORNANO, E IL COSTO È STATO MISURATO PRIMA
+
+Decisione del CEO dopo l'analisi del pacchetto CRWV. Erano state tolte in v269 per una ragione
+**misurata, non estetica**: ~57 richieste RSS a ogni run (venti feed fissi più uno per ogni
+titolo seguito) per riempire un blocco che nessuno apriva.
+
+Quel costo non si ripresenta, ed è stato **misurato prima di scrivere il codice**: una richiesta
+per ciascun titolo IN POSIZIONE — tredici — che rispondono in **6,8 secondi** su un run che ne
+dura novanta. E il blocco non è più "un blocco che nessuno apre": finisce nel pacchetto del
+titolo, che è quello che il CEO incolla.
+
+> ⚠⚠ **PERCHÉ NON BASTA LA RICERCA WEB DELL'LLM**, che il pacchetto già ordina e che è più
+> fresca della nostra: l'LLM cerca sul titolo che analizza e **non conosce il libro**. Una
+> notizia su un altro nome del gruppo correlato riguarda anche la posizione in esame, e quel
+> collegamento lo può fare solo chi ha il libro. È l'unica ragione per cui il blocco vale il suo
+> costo, e per questo ha un gate tutto suo: se cadesse quella riga, resterebbero tredici
+> richieste per niente.
+
+⚠ **L'attribuzione viene dalla FONTE, non da noi.** Yahoo espone anche un feed multi-ticker che
+costerebbe UNA richiesta sola, ma restituisce le voci senza dire a quale ticker appartengono:
+per attribuirle dovremmo cercare il nome nel titolo, cioè indovinare. Sei secondi in più tolgono
+di mezzo un'euristica.
+
+⚠⚠ **E IL LIMITE DI FREQUENZA È REALE, quindi si dichiara invece di tacere.** Misurato: dopo una
+quindicina di richieste Yahoo mette l'IP in castigo e risponde **429 anche a 1,5 secondi di
+distanza** — non è una frequenza massima, è una quota. In CI la pipeline la consuma già coi
+prezzi. Quindi `news_titoli` **non usa `http_get`** (che ritenta tre volte, cioè martella proprio
+quando la fonte dice di rallentare), tiene **tre esiti distinti** — con voci, senza voci, NON
+letto — e il blocco sta **in fondo al run, dopo i prezzi**, perché un blocco accessorio non deve
+poter danneggiare quello portante.
+
+> *"Nessuna notizia" e "la fonte non ha risposto" si leggono uguali e significano l'opposto.* È
+> la lezione della v389 applicata prima del guasto invece che dopo.
+
+### 📏 Il tetto di lunghezza: il minimo è SPARITO
+Misurato sul pacchetto vero: i quattro blocchi con tetto esplicito valgono già ~520 parole, e ne
+restavano ~1.200 per gli altri sei più la tabella dei concorrenti, il collaudo, le segnalazioni
+e le fonti. A pagare la compressione erano gli **ultimi** blocchi — rischio di libro e tesi
+contraria — cioè proprio quelli in cui un modello a corto di spazio sostituisce le prove con
+affermazioni.
+
+> **Il rischio di allucinazione non nasce dall'avere più spazio: nasce dall'essere COSTRETTI a
+> riempirlo.** Per questo il pavimento è sparito — un intervallo con un minimo è un invito a
+> riempire — e al suo posto c'è la clausola che chiude il varco vero: *non allungare mai un
+> blocco con affermazioni che non puoi sostenere*, e *"su questo non ho abbastanza per
+> concludere" conta come contenuto*.
+
+⚠ **Diciottesima rottura di un check ancorato a una stringa letterale**: v293 pretendeva
+`BUDGET: N-M parole IN TUTTO`. Riagganciato al fatto — un tetto c'è ed è dichiarato tale.
+
+### 🔌 Il check provava il CONTROLLO, non il COLLEGAMENTO
+I gate sul nuovo `validate_macro` chiamavano la funzione con un dizionario costruito a mano:
+togliendo la riga che aggancia la fonte al gate **restavano tutti verdi**. La fonte poteva
+smettere di essere sorvegliata senza che nulla mordesse — letteralmente il guasto per cui le
+news macro sono morte un anno. Trovato **iniettando**, non rileggendo.
+⚠ E il check nuovo era rosso sul codice giusto perché `validate_macro(macro)` compare **due
+volte** nel file e `find()` prendeva la prima: un indice preso dal posto sbagliato è un check
+che misura un'altra cosa.
+
 ## 🚦 FLUSSO DI CONSEGNA — si lavora su `main`, e la PR si unisce sempre
 
 Istruzione permanente del CEO (02/09/2026), testuale: *"Unisci sempre la pr e lavora

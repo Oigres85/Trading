@@ -3636,9 +3636,16 @@ check("v286 opzioni: volumi e contratti aperti sono etichettati per quello che s
       && /grandezza diversa dai volumi/.test(corpo);
 })());
 
+/* ⚠ v398 — DICIOTTESIMA rottura di un check ancorato a una stringa letterale: pretendeva
+   "BUDGET: N-M parole IN TUTTO" e "vincolo, non un'indicazione", cioe' la FORMA vecchia, ed e'
+   andato rosso quando il tetto e' stato ricalibrato togliendo il pavimento. L'invariante e'
+   che un tetto ci sia e sia dichiarato come tale, non con quali parole. */
 check("v293 consegna: il pacchetto titolo porta un tetto di lunghezza", suVeri(`
   const p = buildPromptTicker("AMD");
-  return /BUDGET: [\\d.\\-]+ parole IN TUTTO/.test(p) && /vincolo, non un'indicazione/.test(p)`));
+  const m = p.match(/BUDGET: al massimo ([0-9.]+) parole/);
+  if (!m) return false;
+  const tetto = Number(String(m[1]).replace(".", ""));
+  return tetto >= 800 && tetto <= 4000 && /TETTO, non un bersaglio/.test(p);`));
 
 check("v293 consegna: gli otto blocchi richiesti ci sono tutti e in ordine", suVeri(`
   const p = buildPromptTicker("AMD");
@@ -6185,6 +6192,67 @@ check("v397 la tabella dei trimestri vecchia si diagnostica dal DEPOSITO, non da
   return q.indexOf("E' UN FATTO, NON UN SOSPETTO") < 0
       && q.indexOf("POTREBBE NON ESSERE AGGIORNATA") >= 0
       && q.indexOf("poggia su una data ATTESA") >= 0;`));
+
+/* ═══ v398 — LE NOTIZIE PER TITOLO, E LA RAGIONE PER CUI ESISTONO ═════════════════════════
+   ⚠ IL FENOMENO NON C'E' NEI DATI E VA INIETTATO: `data.json` non porta ancora news_titoli (lo
+   scrive la pipeline al primo run col codice nuovo), quindi un check che leggesse i dati veri
+   sarebbe verde per assenza — la trappola gia' pagata cinque volte in questo progetto. */
+const _INIETTA_NEWS = `
+  const _ora = (h) => new Date(Date.now() - h * 3600000).toISOString().slice(0, 19) + "Z";
+  const _grp = disciplinaRischio();
+  DATA.news_titoli = { fonte: "Yahoo Finance RSS per ticker", finestra_giorni: 14,
+    senza_notizie: ["BE"], non_letti: ["SKHY"], letto_il: _ora(0),
+    per_titolo: {
+      CRWV: [{ titolo: "Titolo di prova su CoreWeave", riassunto: "riassunto", quando: _ora(6), fonte: "Yahoo Finance", url: "u" }],
+      NVDA: [{ titolo: "Titolo di prova su Nvidia", riassunto: "", quando: _ora(9), fonte: "Yahoo Finance", url: "u" }],
+    } };
+`;
+
+check("v398 il pacchetto porta i titoli sul nome analizzato, con la loro eta'", suVeri(_INIETTA_NEWS + `
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("NOTIZIE SUI TITOLI DEL LIBRO") >= 0
+      && p.indexOf("Titolo di prova su CoreWeave") >= 0
+      && /\\[6h fa\\]/.test(p);`));
+
+/* ⚠⚠ QUESTA E' LA RAGIONE PER CUI IL BLOCCO ESISTE, e va sorvegliata a parte: la ricerca web
+   dell'LLM e' piu' fresca della nostra, quindi il valore aggiunto NON e' la notizia sul titolo
+   — e' la notizia su un ALTRO nome del gruppo correlato, collegamento che si puo' fare solo
+   avendo il libro. Se cadesse questa riga, il blocco costerebbe tredici richieste per niente. */
+check("v398 le notizie sugli altri nomi del gruppo sono marcate come notizie sul FATTORE", suVeri(_INIETTA_NEWS + `
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("RIGUARDANO IL FATTORE") >= 0
+      && p.indexOf("[NVDA]") >= 0
+      && p.indexOf("Titolo di prova su Nvidia") >= 0
+      && /PESO DEL GRUPPO \\(\\d+% dell'azionario\\)/.test(p);`));
+
+check("v398 un titolo NON LETTO non si legge come 'nessuna notizia'", suVeri(_INIETTA_NEWS + `
+  const p = buildPromptTicker("CRWV");
+  /* i tre esiti hanno significati opposti: se si confondono, un buco della raccolta diventa
+     un fatto sul mondo (la classe che ha ucciso le news macro per un anno, v389). */
+  return p.indexOf("NON LETTI in questo run") >= 0
+      && p.indexOf("SKHY") >= 0
+      && p.indexOf("NON e' un'informazione: e' un buco della raccolta") >= 0;`));
+
+check("v398 senza raccolta il blocco sparisce, non mente", suVeri(`
+  delete DATA.news_titoli;
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("NOTIZIE SUI TITOLI DEL LIBRO") < 0
+      && p.indexOf("RIGUARDANO IL FATTORE") < 0;`));
+
+/* ⚠ il tetto di lunghezza: il minimo e' stato TOLTO perche' un pavimento e' un invito a
+   riempire, ed e' il riempimento — non lo spazio — a produrre affermazioni non sostenute. */
+check("v398 il budget e' un TETTO senza pavimento, con la clausola anti-riempimento", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return /BUDGET: al massimo [0-9.]+ parole/.test(p)
+      && p.indexOf("non esiste una") >= 0
+      && p.indexOf("non allungare MAI un blocco") >= 0
+      && p.indexOf("1.600-1.800") < 0;`));
+
+check("v398 la testata non dichiara piu' di non avere notizie sulla societa'", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("non porta niente, quindi quella parte e' interamente tua") < 0
+      && p.indexOf("i titoli sui NOMI CHE IL CEO POSSIEDE") >= 0
+      && p.indexOf("NON TI ESONERANO DALLA RICERCA") >= 0;`));
 
 let fail = 0;
 for (const [name, ok] of T) {

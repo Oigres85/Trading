@@ -2087,6 +2087,120 @@ def calendario_uscite_fred(voci, quante=3):
     return out
 
 
+# ═══ v398 — LE NOTIZIE SUL SINGOLO TITOLO, E PERCHE' TORNANO ══════════════════════════════
+# Erano state tolte in v269 e la ragione era MISURATA, non estetica: ~57 richieste RSS a ogni
+# run (una ventina di feed fissi piu' una per ogni titolo seguito) per riempire un blocco che
+# nessuno apriva. Quel costo qui non si ripresenta, ed e' stato misurato prima di scrivere il
+# codice: UNA richiesta per ogni titolo IN POSIZIONE — tredici — che rispondono in 6,8 secondi
+# su un run che ne dura novanta. E il blocco non e' piu' "un blocco che nessuno apre": finisce
+# nel pacchetto del titolo, che e' quello che il CEO incolla.
+#
+# ⚠⚠ PERCHE' NON BASTA LA RICERCA WEB DELL'LLM, che il pacchetto gia' ordina. Perche' l'LLM
+# cerca sul titolo che sta analizzando e NON CONOSCE IL LIBRO: una notizia su un altro nome del
+# gruppo correlato — gli otto titoli che si muovono insieme — riguarda anche la posizione in
+# esame, e quel collegamento lo puo' fare solo chi ha il libro. E' l'unica ragione per cui
+# questo blocco vale il suo costo.
+#
+# ⚠ L'ATTRIBUZIONE VIENE DALLA FONTE, non da noi. Yahoo espone anche un feed multi-ticker che
+# costerebbe UNA richiesta sola, ma restituisce le voci senza dire a quale ticker appartengono:
+# per attribuirle dovremmo cercare il nome nel titolo, cioe' indovinare. Una richiesta per
+# titolo costa sei secondi in piu' e toglie di mezzo un'euristica. Provato: 13/13 feed
+# rispondono, 242 voci.
+def news_titoli(tickers, per_titolo=6, giorni=14):
+    """Titoli di notizia per ciascun ticker, dal feed Yahoo di QUEL ticker.
+
+    Ritorna {"per_titolo": {TICKER: [voce, ...]}, "senza_notizie": [...], "non_letti": [...]}.
+    Un feed che non risponde non ferma gli altri: e' un guasto per titolo, non della funzione,
+    e i tre esiti restano distinti perche' significano cose diverse.
+    """
+    fuori, muti, strozzati = {}, [], []
+    limite = datetime.now(timezone.utc) - timedelta(days=giorni)
+    for tk in tickers:
+        try:
+            # ⚠⚠ NON si usa http_get: quello ritenta TRE volte con attesa crescente, cioe'
+            # martella proprio quando la fonte sta dicendo "rallenta". Misurato da qui: dopo
+            # una quindicina di richieste Yahoo mette l'IP in castigo e risponde 429 anche a
+            # 1,5 secondi di distanza — non e' una frequenza massima, e' una quota. Un 429
+            # NON e' un guasto da ritentare: e' un "non adesso" da dichiarare.
+            r = requests.get("https://feeds.finance.yahoo.com/rss/2.0/headline"
+                             f"?s={urllib.parse.quote(tk)}&region=US&lang=en-US",
+                             headers=UA, timeout=15)
+            if r.status_code == 429:
+                strozzati.append(tk)
+                time.sleep(1.0)
+                continue
+            if r.status_code != 200:
+                raise RuntimeError(f"HTTP {r.status_code}")
+            voci = voci_rss(r.text, "Yahoo Finance", None, 25)
+            recenti = [v for v in voci
+                       if datetime.strptime(v["quando"], "%Y-%m-%dT%H:%M:%SZ")
+                          .replace(tzinfo=timezone.utc) >= limite]
+            recenti.sort(key=lambda v: v["quando"], reverse=True)
+            if recenti:
+                fuori[tk] = recenti[:per_titolo]
+            else:
+                muti.append(tk)
+            time.sleep(0.1)
+        except Exception as e:  # noqa: BLE001
+            print(f"!! news di {tk}: {e}", file=sys.stderr)
+            muti.append(tk)
+    # ⚠⚠ I TRE ESITI SONO DIVERSI E VANNO TENUTI DIVERSI: con voci, senza voci, non leggibile.
+    # "nessuna notizia su questo titolo" e "la fonte non mi ha risposto" si leggono uguali e
+    # significano l'opposto — e' la lezione delle news macro (v389), dove un ramo `else`
+    # mancante faceva sparire in silenzio un'intera funzionalita'.
+    if muti or strozzati:
+        print(f"   news per titolo: {len(fuori)} con voci"
+              + (f", {len(muti)} senza notizie recenti ({', '.join(muti)})" if muti else "")
+              + (f", {len(strozzati)} NON LETTI perche' Yahoo ha strozzato le richieste "
+                 f"({', '.join(strozzati)}): non e' assenza di notizie" if strozzati else ""))
+    return {"per_titolo": fuori, "senza_notizie": muti, "non_letti": strozzati,
+            "fonte": "Yahoo Finance RSS per ticker", "finestra_giorni": giorni,
+            "letto_il": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+
+
+# ═══ v398 — UN SOLO PARSER RSS, NON DUE ═══════════════════════════════════════════════════
+# Le notizie per TITOLO (chieste dal CEO) leggono lo stesso formato delle notizie macro. Due
+# copie dello stesso parser sono la classe che questo progetto ha gia' pagato tre volte
+# (v161 usRegularSessionOpen, v207 miniDualChart, v316 la consegna del pacchetto): divergono
+# al primo ritocco, e la divergenza non rompe niente — produce solo due letture diverse dello
+# stesso feed. Il parser sta qui, e chi legge RSS passa da qui.
+#
+# ⚠ Le regole dure sono quelle gia' misurate sulle news macro e restano invariate:
+#   · senza <pubDate> la voce NON entra — una notizia che non si puo' datare non si puo' pesare;
+#   · un titolo sotto i 12 caratteri e' spazzatura del feed;
+#   · una <description> uguale al titolo non e' un riassunto, e si scarta.
+def voci_rss(testo, fonte, filtro_re=None, limite=30):
+    """Estrae le voci da un feed RSS. Ritorna [] su feed vuoto: non alza, e' il chiamante
+    che decide se l'assenza e' un guasto o un fatto."""
+    import email.utils as _eu
+    fuori = []
+    for pezzo in re.findall(r"<item>(.*?)</item>", testo, re.S)[:limite]:
+        tm = re.search(r"<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</title>", pezzo, re.S)
+        de = re.search(r"<description>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</description>", pezzo, re.S)
+        lm = re.search(r"<link>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</link>", pezzo, re.S)
+        dm = re.search(r"<pubDate>(.*?)</pubDate>", pezzo, re.S)
+        if not tm or not dm:
+            continue                      # senza data non entra: non si puo' pesare
+        titolo = re.sub(r"<[^>]+>", "", html.unescape(tm.group(1))).strip()
+        if not titolo or len(titolo) < 12:
+            continue
+        if filtro_re is not None and not filtro_re.search(titolo):
+            continue                      # filtro per parola: dichiarato in pagina
+        try:
+            quando = _eu.parsedate_to_datetime(dm.group(1)).astimezone(timezone.utc)
+        except Exception:  # noqa: BLE001
+            continue
+        rias = ""
+        if de:
+            rias = re.sub(r"<[^>]+>", "", html.unescape(de.group(1))).strip()[:320]
+            if rias.lower() == titolo.lower():
+                rias = ""          # ripetere il titolo non e' un riassunto
+        fuori.append({"titolo": titolo[:180], "riassunto": rias, "fonte": fonte,
+                      "quando": quando.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                      "url": (lm.group(1).strip() if lm else "")[:400]})
+    return fuori
+
+
 def bls_series(series_id, n=14):
     """Fallback per le serie BLS (CPI, NFP, disoccupazione) — API pubblica v1, senza chiave."""
     r = http_get(f"https://api.bls.gov/publicAPI/v1/timeseries/data/{series_id}")
@@ -2806,34 +2920,7 @@ def fetch_macro():
             try:
                 r = http_get(url, timeout=15)
                 testo = r.text
-                for pezzo in re.findall(r"<item>(.*?)</item>", testo, re.S)[:30]:
-                    tm = re.search(r"<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</title>", pezzo, re.S)
-                    # ⚠ v306 — il RIASSUNTO: il CEO lo ha chiesto ("inserisci qualche riga
-                    # riassuntiva"). Sta nella <description> del feed e c'e' quasi sempre
-                    # (misurato: 92-329 caratteri). Dove manca, la riga resta il solo titolo:
-                    # meglio un titolo nudo che un riassunto inventato.
-                    de = re.search(r"<description>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</description>", pezzo, re.S)
-                    lm = re.search(r"<link>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</link>", pezzo, re.S)
-                    dm = re.search(r"<pubDate>(.*?)</pubDate>", pezzo, re.S)
-                    if not tm or not dm:
-                        continue                      # senza data non entra: non si puo' pesare
-                    titolo = re.sub(r"<[^>]+>", "", html.unescape(tm.group(1))).strip()
-                    if not titolo or len(titolo) < 12:
-                        continue
-                    if filtra and not NEWS_RE.search(titolo):
-                        continue                      # filtro per parola: dichiarato in pagina
-                    try:
-                        quando = _eu.parsedate_to_datetime(dm.group(1)).astimezone(timezone.utc)
-                    except Exception:  # noqa: BLE001
-                        continue
-                    rias = ""
-                    if de:
-                        rias = re.sub(r"<[^>]+>", "", html.unescape(de.group(1))).strip()[:320]
-                        if rias.lower() == titolo.lower():
-                            rias = ""          # ripetere il titolo non e' un riassunto
-                    news.append({"titolo": titolo[:180], "riassunto": rias, "fonte": fonte,
-                                 "quando": quando.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                                 "url": (lm.group(1).strip() if lm else "")[:400]})
+                news.extend(voci_rss(testo, fonte, NEWS_RE if filtra else None, 30))
             except Exception as e:  # noqa: BLE001
                 print(f"!! news {fonte}: {e}", file=sys.stderr)
         # piu' recenti in cima, senza doppioni di titolo
@@ -4294,6 +4381,29 @@ def validate_macro(macro):
             f"{len(_pc)} indicatori con data confermata, {len(_fut)} con la prossima ancora futura"
             + ("" if _fut else " — nessuna data futura: calendario fermo o finestra esaurita"))
 
+    # --- v398: le notizie per titolo, sorvegliate dal giorno in cui nascono -------------
+    # ⚠ Questa fonte si guasta in modo SILENZIOSO e prevedibile: Yahoo assegna una quota per IP
+    # e in CI la pipeline la consuma gia' coi prezzi. Se le richieste vengono strozzate, il
+    # pacchetto non mostra notizie — che si legge come "non e' successo niente". E' esattamente
+    # la forma di guasto che ha ucciso le news macro per un anno intero (v389), e qui va
+    # guardata l'ASSENZA, non la presenza.
+    ntt = macro.get("_news_titoli") if isinstance(macro.get("_news_titoli"), dict) else None
+    if ntt is not None:
+        _con = len(ntt.get("per_titolo") or {})
+        _stroz = len(ntt.get("non_letti") or [])
+        _tot = _con + len(ntt.get("senza_notizie") or []) + _stroz
+        if not _tot:
+            add("news_titoli", None, 1, "missing",
+                "nessun titolo interrogato: la raccolta non e' partita")
+        elif _stroz and _stroz >= _tot / 2:
+            add("news_titoli", ntt.get("letto_il"), 1, "stale",
+                f"{_stroz} titoli su {_tot} NON letti (HTTP 429): per loro l'assenza di notizie "
+                "nel pacchetto non e' un'informazione")
+        else:
+            add("news_titoli", ntt.get("letto_il"), 1, "ok",
+                f"{_con} titoli con voci su {_tot}"
+                + (f", {_stroz} strozzati" if _stroz else ""))
+
     return {"checks": checks, "alerts": alerts,
             "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
 
@@ -5232,6 +5342,27 @@ def main():
         # rilevazioni la linea compare da sola, senza toccare la UI.
         "macro_scores": _macro_scores(macro),
     }
+    # ═══ v398 — LE NOTIZIE DEI TITOLI CHE IL CEO POSSIEDE ═════════════════════════════════
+    # Solo le POSIZIONI, non tutta la watchlist: e' li' che il collegamento col fattore ha un
+    # senso, ed e' il motivo per cui questo blocco esiste (l'LLM cerca sul titolo, non sul
+    # libro). Sui titoli soltanto seguiti il pacchetto continua a dire che le notizie sono
+    # compito di chi legge, come ha sempre fatto.
+    # ⚠ STA IN FONDO AL RUN, DOPO I PREZZI, ed e' deliberato: Yahoo assegna una quota per IP e
+    # se la esaurisce questo blocco, a rimetterci sarebbero i prezzi — che sono il dato per cui
+    # la pipeline esiste. Un blocco accessorio non deve poter danneggiare quello portante.
+    news_tit = {"per_titolo": {}, "senza_notizie": [], "non_letti": [], "fonte": None}
+    try:
+        _tk_pos = sorted({str(r.get("ticker") or "").upper() for r in watchlist
+                          if r.get("qta") and str(r.get("ticker") or "").upper()})
+        if _tk_pos:
+            news_tit = news_titoli(_tk_pos)
+            # ⚠ si appende a `macro` con un nome interno perche' validate_macro riceve SOLO
+            # quello: una fonte che il gate non puo' vedere e' una fonte non sorvegliata, ed e'
+            # la condizione in cui le news macro sono morte per un anno.
+            macro["_news_titoli"] = news_tit
+    except Exception as e:  # noqa: BLE001
+        print(f"!! news per titolo: {e}", file=sys.stderr)
+
     metrics_history = [p for p in prev_hist if p.get("date") != today]
     metrics_history.append(point)
     metrics_history = metrics_history[-180:]   # ~6 mesi di storico giornaliero
@@ -5297,6 +5428,7 @@ def main():
         # richieste RSS a ogni run, per riempire un blocco che nessuno apriva.
         # `predictions` RESTA: e' Polymarket, e le sue righe finiscono davvero nel pacchetto
         # macro (buildPrompt legge DATA.predictions per le probabilita' sulla Fed).
+        "news_titoli": news_tit,
         "predictions": fetch_predictions(),
         "options": options,
         "metrics_history": metrics_history,
