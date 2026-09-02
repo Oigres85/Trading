@@ -2389,6 +2389,20 @@ svg.g-serie { cursor: crosshair; }
 .disc-graf .ciam-wrap { margin: 0; }
 .disc-graf .ciam-extra { display: block; font-size: 10.5px; line-height: 1.35; margin-top: 2px; }
 
+/* v394 — ⚠ IL NOME TRONCATO E' IL MESSAGGIO PERSO. `.obar-lab` e `.ciam-nome` stanno a riga
+   singola con ellissi perche' altrove vivono in colonne strette e molto ripetute. Qui pero' i
+   nomi SONO le regole della disciplina ("Autofinanziamento delle partecipate", 219px) dentro
+   una colonna da 132: misurato in browser, QUATTRO etichette su cinque uscivano tagliate a
+   1440px e la legenda della torta a 375px. Un grafico che dice "di quanto" e non fa leggere
+   "di che cosa" ha perso meta' della propria risposta — la stessa famiglia di `.abar-fill`
+   senza `display:block` (v205): un difetto che non si rompe, nessun errore in console.
+   Si va a capo invece di allargare la colonna: una larghezza fissa nuova e' la classe gia'
+   pagata due volte (v192, v209), mentre col ritorno a capo la cella non scende comunque sotto
+   la parola piu' lunga (~110px), che nella colonna esistente ci sta. */
+.disc-graf .obar-lab, .disc-graf .ciam-nome {
+  white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3;
+}
+
 .disc-regola { border: 1px solid var(--border); border-left: 3px solid var(--muted);
   border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; background: var(--card-2); }
 .disc-oltre  { border-left-color: var(--red); }
