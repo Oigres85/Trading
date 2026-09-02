@@ -1446,6 +1446,10 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             # la TRAIETTORIA della stima sull'esercizio prossimo: e' la revisione
             "eps_ora": round(ora, 4) if ora else None,
             "eps_90g_fa": round(g90, 4) if g90 else None,
+            # v400 — il FATTO accanto al rapporto: su un utile NEGATIVO il rapporto inverte il
+            # senso (-4,37 / -3,42 = +28% mentre il conto peggiora), quindi chi stampa deve
+            # poter guardare la differenza fra due stime e non solo la loro divisione.
+            "eps_7g_fa": round(g7, 4) if g7 else None,
             "revisione_90g_pct": round((ora / g90 - 1) * 100, 2) if (ora and g90) else None,
             "revisione_7g_pct": round((ora / g7 - 1) * 100, 2) if (ora and g7) else None,
             # AMPIEZZA: quanti hanno alzato e quanti abbassato. Il verso conta piu' del numero.

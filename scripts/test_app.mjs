@@ -4470,8 +4470,16 @@ check("v355 evento: col book quotato esce il movimento implicito, col book vuoto
   if (!o || !(o.expiries || []).length) return true;
   const quotato = (o.expiries || []).some(e => (e.calls || []).some(c => Number(c.bid) > 0 && Number(c.ask) > 0));
   if (!quotato) {
+    /* ⚠ v400 — DICIANNOVESIMA ROTTURA DI UN CHECK ANCORATO A UNA STRINGA LETTERALE. Pretendeva
+       "NON CALCOLABILE ADESSO" ed e' andato rosso su una riga piu' CORRETTA di prima: "adesso"
+       affermava uno stato di mercato che il pacchetto non conosce (il book era vuoto allo
+       SNAPSHOT, non necessariamente ora). Riagganciato al FATTO che il gate difende: che il
+       movimento implicito sia dichiarato non calcolabile, che sia detto perche', e che la
+       ragione non pretenda di sapere se il mercato sia aperto adesso. */
     const p2 = buildPromptTicker("NVDA");
-    return /MOVIMENTO IMPLICITO: NON CALCOLABILE ADESSO/.test(p2) && /il book e' vuoto/.test(p2);
+    return /MOVIMENTO IMPLICITO: NON CALCOLABILE/.test(p2)
+        && p2.indexOf("il book e' vuoto") >= 0
+        && p2.indexOf("succede a mercato chiuso") < 0;
   }
   const p = buildPromptTicker("NVDA");
   /* il sistema aveva bid/ask e IV per strike su tre scadenze e ne ricavava due muri: mancava
@@ -6256,6 +6264,99 @@ check("v398 la testata non dichiara piu' di non avere notizie sulla societa'", s
   return p.indexOf("non porta niente, quindi quella parte e' interamente tua") < 0
       && p.indexOf("i titoli sui NOMI CHE IL CEO POSSIEDE") >= 0
       && p.indexOf("NON TI ESONERANO DALLA RICERCA") >= 0;`));
+
+/* ═══ v400 — IL SEGNO DELLA REVISIONE SU UN UTILE NEGATIVO ═════════════════════════════════
+   Il pacchetto stampava "+27,77%" su una stima passata da -3,42 a -4,37 e poi, nella riga
+   marcata ⚠⚠, "la stima a 90 giorni SALE": l'opposto del vero, nella riga che si dichiara la
+   piu' importante. Il check non guarda il numero atteso — quello si puo' sbagliare insieme al
+   codice (v326) — ma la PROPRIETA' che il difetto viola per costruzione: su due stime negative
+   in cui la seconda e' piu' bassa, la parola stampata deve dire che il conto PEGGIORA. */
+check("v400 su un EPS negativo la revisione dichiara che la perdita si AMPLIA, non che sale", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "CRWV");
+  r.analisti = { eps_ora: -4.37, eps_90g_fa: -3.42, revisione_90g_pct: 27.77, su_30g: 3, giu_30g: 6 };
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("la perdita attesa si e' AMPLIATA") >= 0
+      && p.indexOf("la stima a 90 giorni sale") < 0;`));
+
+check("v400 la stessa revisione su utili POSITIVI resta descritta come stima che scende", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "CRWV");
+  r.analisti = { eps_ora: 3.42, eps_90g_fa: 4.37, revisione_90g_pct: -21.74, su_30g: 3, giu_30g: 6 };
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("la stima e' SCESA del") >= 0
+      && p.indexOf("la perdita attesa") < 0;`));
+
+/* ⚠ LA DIVERGENZA ERA FABBRICATA: scattava ogni volta che i tagli a 30 giorni prevalevano,
+   qualunque cosa facesse la traiettoria a 90. Il check esercita ENTRAMBI i rami — concordi e
+   discordi — perche' un gate che prova un ramo solo non distingue una condizione giusta da una
+   costante. */
+check("v400 due misure concordi NON vengono annunciate come divergenza", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "CRWV");
+  r.analisti = { eps_ora: -4.37, eps_90g_fa: -3.42, revisione_90g_pct: 27.77, su_30g: 3, giu_30g: 6 };
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("TRAIETTORIA E AMPIEZZA CONCORDANO") >= 0
+      && p.indexOf("TRAIETTORIA E AMPIEZZA DIVERGONO") < 0;`));
+
+check("v400 due misure davvero opposte SONO annunciate come divergenza", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "CRWV");
+  r.analisti = { eps_ora: -3.42, eps_90g_fa: -4.37, revisione_90g_pct: -21.74, su_30g: 3, giu_30g: 6 };
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("TRAIETTORIA E AMPIEZZA DIVERGONO") >= 0
+      && p.indexOf("TRAIETTORIA E AMPIEZZA CONCORDANO") < 0;`));
+
+/* ═══ v400 — IL PACCHETTO NON PRESENTA PIU' COME MISTERO CIO' CHE SA ═══════════════════════
+   Lo scarto fra i ricavi su dodici mesi dell'aggregatore e la somma dei quattro trimestri E'
+   il trimestre che la tabella non ha, e il deposito EDGAR lo dice nello stesso pacchetto. */
+check("v400 il residuo dei ricavi 12 mesi e' spiegato dal deposito, non dichiarato ignoto", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  if (p.indexOf("NON QUADRA CON I TRIMESTRI") < 0) return false;   // il fenomeno c'e'
+  return p.indexOf("E' SPIEGATO: la tabella dei trimestri e' ferma") >= 0
+      && p.indexOf("non e' spiegato dai dati qui presenti") < 0;`));
+
+check("v400 senza deposito EDGAR il residuo torna a dichiararsi non spiegato", suVeri(`
+  delete DATA.macro.sec_calendario;
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("non e' spiegato dai dati qui presenti") >= 0
+      && p.indexOf("E' SPIEGATO: la tabella dei trimestri e' ferma") < 0;`));
+
+/* ═══ v400 — BILANCIO E CREDITO DICHIARANO DI NON ESSERE L'ULTIMO ══════════════════════════
+   Erano i due blocchi su cui si regge l'analisi di una societa' che costruisce a debito, ed
+   erano gli unici due senza l'avviso costruito sul deposito EDGAR: cassa 2,2 mld al 31/03
+   contro 5,524 del 10-Q depositato l'11/08, con due conclusioni al presente costruite sopra. */
+check("v400 COMBUSTIONE DI CASSA dichiara che il bilancio non e' l'ultimo depositato", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  if (p.indexOf("COMBUSTIONE DI CASSA [bilancio al") < 0) return false;
+  return p.indexOf("E QUESTO BILANCIO NON E' L'ULTIMO") >= 0;`));
+
+check("v400 CREDITO dichiara che il conto economico non e' l'ultimo depositato", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  if (p.indexOf("- CREDITO [conto economico al") < 0) return false;
+  return p.indexOf("E QUESTO CONTO ECONOMICO NON E' L'ULTIMO") >= 0;`));
+
+check("v400 senza deposito EDGAR i due avvisi tacciono invece di affermare a vuoto", suVeri(`
+  delete DATA.macro.sec_calendario;
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("E QUESTO BILANCIO NON E' L'ULTIMO") < 0
+      && p.indexOf("E QUESTO CONTO ECONOMICO NON E' L'ULTIMO") < 0;`));
+
+/* ⚠ v400 — UNA SOLA RISPOSTA ALLA DOMANDA "la tabella e' ferma?": tre blocchi la fanno e la
+   funzione e' una. Il check verifica il COLLEGAMENTO, non l'esistenza: e' la lezione v399 —
+   togliendo la riga che aggancia la fonte al gate, tutto restava verde. */
+check("v400 i tre blocchi passano dallo stesso depositoOltreLaTabella", (() => {
+  const senzaCommenti = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const n = (senzaCommenti.match(/depositoOltreLaTabella\(/g) || []).length;
+  return n >= 4 && /function depositoOltreLaTabella\(/.test(senzaCommenti);   // 1 def + 3 usi
+})());
+
+/* ⚠ v400 — DUE OROLOGI: il book vuoto e' un fatto dello SNAPSHOT, la fase di sessione e'
+   calcolata adesso. La riga affermava "succede a mercato chiuso" accanto a "SESSIONE USA
+   APERTA", e il collaudo di congruita' impone a chi legge di segnalarlo. */
+check("v400 il movimento implicito non afferma piu' uno stato di mercato che non conosce", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "CRWV");
+  if (r.tv && r.tv.evento) delete r.tv.evento;
+  const p = buildPromptTicker("CRWV");
+  if (p.indexOf("MOVIMENTO IMPLICITO: NON CALCOLABILE") < 0) return false;
+  return p.indexOf("succede a mercato chiuso") < 0
+      && p.indexOf("sono due orologi") >= 0;`));
 
 let fail = 0;
 for (const [name, ok] of T) {

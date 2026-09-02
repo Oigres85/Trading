@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "386";
+const BUILD_VERSION = "387";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10771,6 +10771,12 @@ function fattiTitolo(tk) {
                           .map(x => numero(x && x.ricavi)).filter(Number.isFinite);
                         return q.length === 4 ? q.reduce((a3, b3) => a3 + b3, 0) : null;
                       })(),
+                      /* v400 — la data dell'ultimo trimestre IN TABELLA: serve a chi stampa i
+                         ricavi su dodici mesi e il bilancio per sapere se quella tabella e'
+                         ferma, invece di dichiarare "non spiegato" uno scarto di cui il
+                         pacchetto conosce gia' la causa (il deposito su SEC EDGAR). */
+                      ultimoTrim: (((riga.tv || {}).conto_trim) || [])[0]
+                        ? String((((riga.tv || {}).conto_trim) || [])[0].trim || "").slice(0, 10) || null : null,
                       evEbitda: numero((riga.stats || {}).ev_ebitda),
                       ps: numero((riga.stats || {}).ps),
                       evS: numero((riga.stats || {}).ev_s),
@@ -11379,6 +11385,26 @@ function buildCIOText() {
    chiesti, e un ripristino che riporta indietro anche cio' che nessuno ha chiesto e' come un
    taglio che si porta via il vicino — stessa classe, verso opposto. */
 
+/* ═══ v400 — UNA SOLA RISPOSTA ALLA DOMANDA "LA TABELLA E' FERMA?" ═══════════════════════
+   La v397 ha insegnato al pacchetto a diagnosticare la tabella dei trimestri dal FATTO (il
+   deposito 8-K item 2.02 su SEC EDGAR) invece che dalla data attesa. Ma quella diagnosi viveva
+   dentro tvBlocchi, e altri due blocchi che dipendono dallo stesso fatto non la vedevano: la
+   riga dei ricavi su dodici mesi, che dichiarava "non spiegato" uno scarto di cui il pacchetto
+   conosce la causa, e i blocchi COMBUSTIONE DI CASSA e CREDITO, che pubblicano un bilancio e
+   una copertura degli interessi calcolati sullo stesso trimestre vecchio.
+   ⚠ Riscriverla nei tre punti sarebbe la classe v161/v207: due implementazioni della stessa
+   domanda divergono al primo ritocco. Sta qui, e la chiamano tutti e tre. */
+function depositoOltreLaTabella(tk, ultimoTrim, giorni = 60) {
+  if (!tk || !ultimoTrim) return null;
+  const per = ((((DATA || {}).macro || {}).sec_calendario || {}).per_titolo || {})[String(tk).toUpperCase()];
+  const dep = per && per.ultimo_deposito ? String(per.ultimo_deposito).slice(0, 10) : null;
+  if (!dep) return null;
+  /* un deposito arriva settimane DOPO la fine del trimestre che riporta: oltre la soglia, quel
+     deposito parla di un trimestre SUCCESSIVO all'ultimo che la tabella contiene. */
+  const gg = Math.round((new Date(dep) - new Date(String(ultimoTrim).slice(0, 10))) / 86400000);
+  return gg > giorni ? { dep, gg } : null;
+}
+
 function tvBlocchi(tk) {
   const r = ((DATA && DATA.watchlist) || []).concat((DATA && DATA.portfolio) || [])
     .find(x => x && String(x.ticker).toUpperCase() === String(tk).toUpperCase());
@@ -11464,13 +11490,9 @@ function tvBlocchi(tk) {
        debole dei due. Dopo v396 la gerarchia e' esplicita — prima il fatto, la stima solo se il
        fatto non c'e' — e qui il fatto rende la diagnosi certa invece che probabile: non "manca
        forse un trimestre", ma "ne e' stato depositato uno che qui non compare". */
-    const _secTk = ((((DATA || {}).macro || {}).sec_calendario || {}).per_titolo || {})[String(tk).toUpperCase()];
-    const _dep = _secTk && _secTk.ultimo_deposito ? String(_secTk.ultimo_deposito).slice(0, 10) : null;
-    const _gg = (a, b) => Math.round((new Date(a) - new Date(b)) / 86400000);
-    /* un deposito arriva settimane DOPO la fine del trimestre che riporta: oltre i 60 giorni di
-       distanza dall'ultimo trimestre in tabella, il deposito parla di un trimestre successivo. */
-    const daDeposito = (ultimoTrim && _dep && _gg(_dep, ultimoTrim) > 60)
-      ? { gg: _gg(_dep, ultimoTrim), dep: _dep } : null;
+    /* v400 — la domanda ha una risposta sola, e sta in depositoOltreLaTabella(): la usano anche
+       la riga dei ricavi su dodici mesi e i blocchi COMBUSTIONE DI CASSA e CREDITO. */
+    const daDeposito = depositoOltreLaTabella(tk, ultimoTrim);
     const prossima = r && r.earnings_date ? String(r.earnings_date).slice(0, 10) : null;
     const mesiVuoti = (ultimoTrim && prossima)
       ? Math.round((new Date(prossima) - new Date(ultimoTrim)) / 86400000 / 30.4) : null;
@@ -11749,10 +11771,20 @@ function datiNostriDelTitolo(tk) {
        la sola che colloca i livelli tecnici gia' pubblicati: una resistenza a una sigma
        implicita e una a tre sigma non sono lo stesso oggetto. */
     if (!t.evento && t.opzioniPresenti) {
-      L.push(`- ⚡ MOVIMENTO IMPLICITO: NON CALCOLABILE ADESSO. La catena opzioni c'e' ma il book e' vuoto `
-        + `(denaro e lettera a zero su tutti gli strike vicini): succede a mercato chiuso, e da un book vuoto `
-        + `non si ricava uno straddle. ⚠ NON significa che il mercato non prezzi l'evento: significa che questo `
-        + `pacchetto e' stato generato quando i prezzi delle opzioni non erano quotati. A mercato aperto la riga c'e'.`);
+      /* ⚠ v400 — DUE OROLOGI, E LA RIGA NE AFFERMAVA UNO PER L'ALTRO. Diceva "succede a mercato
+         chiuso" mentre il CONTESTO DI SESSIONE, poche righe piu' in la', dichiarava la sessione
+         USA APERTA: le due frasi si leggono come una contraddizione e il collaudo di congruita'
+         impone a chi legge di segnalarla. Non lo era — il book era vuoto allo SNAPSHOT, che la
+         pipeline prende su cron, mentre la fase di sessione e' calcolata al momento in cui il
+         pacchetto viene generato — ma il pacchetto non lo diceva. E' la classe v193/v234: stato
+         del mercato e freschezza del dato sono due cose diverse, qui dentro la stessa riga. */
+      L.push(`- ⚡ MOVIMENTO IMPLICITO: NON CALCOLABILE DA QUESTO SNAPSHOT. La catena opzioni c'e' ma il book `
+        + `e' vuoto (denaro e lettera a zero su tutti gli strike vicini), e da un book vuoto non si ricava uno `
+        + `straddle. ⚠ Succede quando lo SNAPSHOT e' stato preso fuori dalla sessione regolare — pre-mercato, `
+        + `dopo la chiusura o a borsa ferma: e' l'orario dello snapshot in cima al pacchetto che conta qui, NON `
+        + `la fase di sessione dichiarata piu' sotto, che e' calcolata adesso. Se le due non coincidono non e' `
+        + `una contraddizione, sono due orologi. ⚠ NON significa che il mercato non prezzi l'evento: significa `
+        + `che quando la pipeline ha guardato, le opzioni non erano quotate.`);
     }
     if (t.evento && t.evento.scadenze && t.evento.scadenze.length) {
       const sc = t.evento.scadenze;
@@ -11852,10 +11884,48 @@ function datiNostriDelTitolo(tk) {
     if (t.analisti) {
       const an = t.analisti, bit = [];
       const nn = (x) => Number.isFinite(numero(x)) ? numero(x) : null;
-      if (nn(an.revisione_90g_pct) != null) {
+      /* ═══ v400 — IL SEGNO DELLA REVISIONE SU UN UTILE NEGATIVO ══════════════════════════
+         La pipeline calcola la revisione come RAPPORTO (ora/prima - 1). Su una societa' in
+         perdita quel rapporto INVERTE il senso: CRWV e' passata da -3,42 a -4,37, cioe' la
+         perdita attesa si e' AMPLIATA, e il pacchetto stampava "+27,77%" e poi, nella riga
+         marcata ⚠⚠, "la stima a 90 giorni SALE". Diceva l'opposto del vero nella riga che
+         dichiarava di essere la piu' importante, e ci costruiva sopra una DIVERGENZA che non
+         esiste: a 90 giorni le stime scendono e negli ultimi 30 prevalgono i tagli — le due
+         misure CONCORDANO. E' la classe v316 (il percentile che era una variazione) e v389
+         (il multiplo prospettico negativo che si leggeva come basso): la formula calcola una
+         cosa, l'etichetta ne dichiara un'altra, e nessuna delle due mente da sola.
+         ⚠ La direzione si prende dalla DIFFERENZA, che non ha segni da interpretare; la
+         percentuale resta solo dove non e' ambigua, cioe' quando entrambe le stime sono
+         positive. Su una perdita si scrive di quanto si e' AMPLIATA o RIDOTTA. */
+      const _rev = (ora, prima) => {
+        if (!Number.isFinite(ora) || !Number.isFinite(prima) || prima === 0) return null;
+        const peggiora = ora < prima;                       // sull'utile atteso, meno e' peggio
+        const pct = Math.abs((ora - prima) / prima) * 100;
+        const perdita = ora < 0 || prima < 0;
+        return { peggiora, pct, perdita };
+      };
+      const _revTxt = (r) => r == null ? ""
+        : r.perdita
+          ? `la perdita attesa si e' ${r.peggiora ? "AMPLIATA" : "RIDOTTA"} del ${fmtNum.format(Math.round(r.pct * 10) / 10)}%`
+          : `la stima e' ${r.peggiora ? "SCESA" : "SALITA"} del ${fmtNum.format(Math.round(r.pct * 10) / 10)}%`;
+      const rev90 = _rev(nn(an.eps_ora), nn(an.eps_90g_fa));
+      if (rev90 != null) {
+        /* ⚠ il campo eps_7g_fa e' nato con questa versione: finche' il CI non ha rigenerato
+           data.json si ricava dal rapporto gia' presente, invece di far sparire la riga —
+           stessa ragione del ripiego FedWatch di v187. Togliere in silenzio una riga che il
+           pacchetto pubblicava e' peggio del difetto che si sta correggendo. */
+        const _e7 = nn(an.eps_7g_fa) != null ? nn(an.eps_7g_fa)
+          : (nn(an.revisione_7g_pct) != null && nn(an.eps_ora) != null
+              ? nn(an.eps_ora) / (1 + nn(an.revisione_7g_pct) / 100) : null);
+        const r7 = _rev(nn(an.eps_ora), _e7);
         bit.push(`la stima di utile sul prossimo esercizio e' passata da ${fmtNum.format(nn(an.eps_90g_fa))} a `
-          + `${fmtNum.format(nn(an.eps_ora))} in 90 giorni (${signTxt(nn(an.revisione_90g_pct))})`
-          + (nn(an.revisione_7g_pct) != null ? `, di cui ${signTxt(nn(an.revisione_7g_pct))} nell'ultima settimana` : ""));
+          + `${fmtNum.format(nn(an.eps_ora))} in 90 giorni: ${_revTxt(rev90)}`
+          + (r7 == null ? ""
+              : r7.peggiora === rev90.peggiora
+                ? `, di cui ${fmtNum.format(Math.round(r7.pct * 10) / 10)}% nell'ultima settimana`
+                : `, ma nell'ultima settimana ${_revTxt(r7)}`)
+          + (rev90.perdita ? ` ⚠ SU UNA PERDITA il rapporto fra due stime inverte il senso `
+              + `(-4,37 diviso -3,42 da' +28%, ma il conto peggiora): qui il verso e' quello scritto a parole` : ""));
       }
       if (nn(an.su_30g) != null && nn(an.giu_30g) != null) {
         const su = nn(an.su_30g), giu = nn(an.giu_30g);
@@ -11864,10 +11934,29 @@ function datiNostriDelTitolo(tk) {
       }
       if (bit.length) L.push(`- ⚡ REVISIONI DEGLI UTILI (contano piu' del target: il target e' vecchio quanto il suo `
         + `ultimo aggiornamento, la revisione dice cosa sta cambiando adesso): ${bit.join(" · ")}.`
-        + (nn(an.revisione_90g_pct) != null && nn(an.giu_30g) > nn(an.su_30g)
-            ? ` ⚠⚠ TRAIETTORIA E AMPIEZZA DIVERGONO: la stima a 90 giorni sale ma negli ultimi 30 prevalgono i `
-              + `TAGLI. La prima dice da dove viene, la seconda dove sta andando adesso — quando non concordano, `
-              + `il fatto e' la divergenza.` : ""));
+        /* ⚠⚠ v400 — LA DIVERGENZA ERA FABBRICATA DAL SEGNO SBAGLIATO. La condizione era
+           "esiste una revisione a 90 giorni E negli ultimi 30 prevalgono i tagli", e su CRWV
+           scattava annunciando che "la stima a 90 giorni sale" mentre scendeva: le due misure
+           CONCORDANO entrambe al ribasso, e il pacchetto inventava un disaccordo. Ora la
+           divergenza si misura dove sta — fra il VERSO a 90 giorni e il saldo a 30 — e la riga
+           esce solo quando i due versi sono davvero opposti. Quando concordano lo si dice: due
+           misure indipendenti che puntano nella stessa direzione sono un fatto piu' forte di
+           una sola, e tacerlo lascerebbe il lettore a dedurlo. */
+        + (() => {
+            if (rev90 == null || nn(an.su_30g) == null || nn(an.giu_30g) == null) return "";
+            const su = nn(an.su_30g), giu = nn(an.giu_30g);
+            if (su === giu) return "";
+            const peggiora30 = giu > su;
+            return peggiora30 === rev90.peggiora
+              ? ` ⚠ TRAIETTORIA E AMPIEZZA CONCORDANO: la revisione a 90 giorni e il saldo degli ultimi 30 `
+                + `puntano nello stesso verso (${rev90.peggiora ? "al ribasso" : "al rialzo"}). Sono due `
+                + `misure diverse della stessa cosa, non due prove indipendenti: contano come un segnale solo, `
+                + `ma senza il disaccordo che renderebbe incerto il verso.`
+              : ` ⚠⚠ TRAIETTORIA E AMPIEZZA DIVERGONO: a 90 giorni la stima va `
+                + `${rev90.peggiora ? "al ribasso" : "al rialzo"} ma negli ultimi 30 prevalgono `
+                + `${peggiora30 ? "i TAGLI" : "i RIALZI"}. La prima dice da dove viene, la seconda dove sta `
+                + `andando adesso — quando non concordano, il fatto e' la divergenza.`;
+          })());
       if (nn(an.eps_min) != null && nn(an.eps_max) != null && nn(an.eps_ora) != null) {
         const amp = Math.abs((nn(an.eps_max) - nn(an.eps_min)) / nn(an.eps_ora)) * 100;
         L.push(`- DISPERSIONE DEL CONSENSO SUGLI UTILI: stima media ${fmtNum.format(nn(an.eps_ora))}, forbice da `
@@ -11917,11 +12006,26 @@ function datiNostriDelTitolo(tk) {
         const scarto = (Number.isFinite(somma) && somma > 0) ? Math.abs(t.ricaviFy / somma - 1) * 100 : null;
         if (scarto == null) return `ricavi su dodici mesi ${mld(t.ricaviFy)} (dall'aggregatore; il sistema non ha i trimestri per verificarlo)`;
         if (scarto <= 2) return `ricavi ultimi 12 mesi ${mld(t.ricaviFy)} (verificato: coincide con la somma dei quattro trimestri qui sotto entro il ${scarto.toFixed(1)}%; NON e' l'esercizio fiscale, che e' un'altra grandezza)`;
+        /* ⚠⚠ v400 — IL PACCHETTO CONOSCEVA LA CAUSA E LA PRESENTAVA COME MISTERO. Misurato su
+           CRWV: i dodici mesi dell'aggregatore valgono 8 mld, i quattro trimestri stampati ne
+           sommano 6,2, e quaranta righe piu' sotto lo stesso pacchetto dichiara — dal deposito
+           8-K su SEC EDGAR, un fatto — che la tabella si ferma a un trimestre gia' superato.
+           Il residuo E' quel trimestre. Scrivere "non e' spiegato dai dati qui presenti" mentre
+           il dato che lo spiega e' nello stesso pacchetto manda chi legge a cercare un difetto
+           che non c'e'. E' la gerarchia della v396 applicata alle DIAGNOSI: prima il fatto, la
+           congettura solo se il fatto non c'e'. */
+        const ferma = depositoOltreLaTabella(tk, t.ultimoTrim);
         return `ricavi su dodici mesi ${mld(t.ricaviFy)} — ⚠⚠ NON QUADRA CON I TRIMESTRI DI QUESTO PACCHETTO: `
           + `i quattro trimestri stampati piu' sotto sommano ${mld(somma)}, cioe' ${scarto.toFixed(1)}% in meno. `
-          + `Il residuo di ${mld(t.ricaviFy - somma)} non e' spiegato dai dati qui presenti: o la tabella dei `
-          + `trimestri e' incompleta, o l'aggregatore misura un periodo diverso. NON usare i due numeri insieme `
-          + `senza aver verificato quale copre cosa`;
+          + (ferma
+              ? `Il residuo di ${mld(t.ricaviFy - somma)} E' SPIEGATO: la tabella dei trimestri e' ferma al `
+                + `${t.ultimoTrim} e la societa' ha depositato risultati piu' recenti il ${ferma.dep} (SEC EDGAR, `
+                + `8-K item 2.02), quindi i dodici mesi dell'aggregatore comprendono un trimestre che qui non `
+                + `c'e'. ⚠ Usa il numero dell'aggregatore come piu' AGGIORNATO, non come discordante — ma `
+                + `verificalo alla fonte, perche' il trimestre mancante non e' in questo pacchetto`
+              : `Il residuo di ${mld(t.ricaviFy - somma)} non e' spiegato dai dati qui presenti: o la tabella dei `
+                + `trimestri e' incompleta, o l'aggregatore misura un periodo diverso. NON usare i due numeri `
+                + `insieme senza aver verificato quale copre cosa`);
       })() : null,
       Number.isFinite(numero(t.evEbitda)) ? (numero(t.evEbitda) > 0 ? `EV/EBITDA ${fmtNum.format(numero(t.evEbitda))}×` : `EV/EBITDA NON SIGNIFICATIVO (${fmtNum.format(numero(t.evEbitda))}×): l'EBITDA e' negativo, e il rapporto cambia segno invece di misurare quanto e' cara la societa'`) : null,
       Number.isFinite(t.ps) ? `P/S ${fmtNum.format(t.ps)}×` : null,
@@ -11975,10 +12079,30 @@ function datiNostriDelTitolo(tk) {
       const dil = c.emissione_netta_pct != null
         ? ` Emissione netta di azioni ${fmtNum.format(c.emissione_netta_pct)}% del capitale in un anno (diluizione, non riacquisti).`
         : "";
+      /* ═══ v400 — IL BILANCIO VECCHIO NON DICHIARAVA DI ESSERLO ═══════════════════════════
+         La v397 ha dato alla TABELLA DEI TRIMESTRI un avviso costruito sul deposito EDGAR. I
+         blocchi COMBUSTIONE DI CASSA e CREDITO poggiano sullo STESSO trimestre e non l'hanno
+         mai avuto — e sono i due su cui si regge l'analisi di una societa' che costruisce a
+         debito. Misurato su CRWV il 02/09/2026: il pacchetto pubblicava "cassa 2,2 mld" al
+         2026-03-31 e ci costruiva sopra due conclusioni al presente ("la cassa copre 1,6 mesi
+         di investimenti", "la cassa e' INFERIORE al debito in scadenza entro l'anno"), mentre
+         il 10-Q depositato l'11/08 riporta 5,524 mld: 2,5 volte tanto. La data c'era; le frasi
+         DERIVATE da quella data no, e sono quelle che si leggono.
+         ⚠ Non si tocca il numero — e' quello che l'aggregatore ha — e non si toglie la frase:
+         si dichiara su quale trimestre e' calcolata e che ne esiste uno piu' recente. */
+      const _fermaBil = depositoOltreLaTabella(tk, c.bilancio_al);
       L.push(`- COMBUSTIONE DI CASSA [bilancio al ${c.bilancio_al || "n.d."}, flussi su ${c.trimestri || "?"} trimestri`
         + `${c.cashflow_al ? ` fino al ${c.cashflow_al}` : ""}]: ${pezzi.join(" · ")}`
         + `${flussi.length ? `. Su dodici mesi: ${flussi.join(" · ")}` : ""}.${origine}${quanto}${dil}`
-        + ` ⚠ Voci di bilancio dall'aggregatore, non dal filing: per il bilancio che conta vale il deposito della societa'.`);
+        + ` ⚠ Voci di bilancio dall'aggregatore, non dal filing: per il bilancio che conta vale il deposito della societa'.`
+        + (_fermaBil
+            ? ` ⚠⚠ E QUESTO BILANCIO NON E' L'ULTIMO — E' UN FATTO, NON UN SOSPETTO: e' al `
+              + `${c.bilancio_al}, ma la societa' ha depositato risultati il ${_fermaBil.dep} (SEC EDGAR, 8-K `
+              + `item 2.02), ${_fermaBil.gg} giorni dopo. Cassa, debito e autonomia qui sopra descrivono quel `
+              + `trimestre, non oggi, e su una societa' che costruisce a debito sono le voci che si muovono di `
+              + `piu' fra un trimestre e l'altro: le conclusioni sull'autonomia NON sono affermabili senza il `
+              + `deposito piu' recente. Cercalo alla fonte prima di usarle.`
+            : ""));
     }
 
     /* ⚠⚠ v367 — AL POSTO DEL CDS, I FATTI CHE IL CDS PREZZA.
@@ -12022,9 +12146,20 @@ function datiNostriDelTitolo(tk) {
             : `. La cassa (${M(cassa)}) copre il debito in scadenza entro l'anno.`;
         else scad += ".";
       }
+      /* v400 — stesso avviso della COMBUSTIONE: la copertura degli interessi e le scadenze sono
+         calcolate sul conto economico di quel trimestre, e su questa classe di societa' gli
+         oneri finanziari raddoppiano in quattro trimestri (misurato su CRWV: 267 → 536 milioni).
+         Un rapporto di copertura vecchio di un trimestre non e' un dettaglio: e' la grandezza. */
+      const _fermaCred = depositoOltreLaTabella(tk, c.conto_al);
       L.push(`- CREDITO [conto economico al ${c.conto_al || "n.d."}]: ${pezzi.join(" · ")}.${cop}${verso}${scad}`
         + ` ⚠ NON e' un CDS: lo spread CDS su singolo nome e' un dato a pagamento e non e' in questo`
-        + ` sistema. Queste sono le righe di bilancio che quello spread misura, di fonte aggregatore.`);
+        + ` sistema. Queste sono le righe di bilancio che quello spread misura, di fonte aggregatore.`
+        + (_fermaCred
+            ? ` ⚠⚠ E QUESTO CONTO ECONOMICO NON E' L'ULTIMO — E' UN FATTO: e' al ${c.conto_al}, e la societa'`
+              + ` ha depositato risultati il ${_fermaCred.dep} (SEC EDGAR, 8-K item 2.02), ${_fermaCred.gg} giorni`
+              + ` dopo. Oneri finanziari e copertura qui sopra sono di quel trimestre: su un bilancio che cresce a`
+              + ` debito sono proprio le voci che cambiano piu' in fretta. Prendile dal deposito piu' recente.`
+            : ""));
     }
 
     /* ⚠⚠ v367 — FLUSSO FUORI DAI MERCATI REGOLAMENTATI (FINRA), chiesto come "dark pool".

@@ -2347,6 +2347,99 @@ ramo invece di leggerlo.
 ⚠ E ho rifatto l'**ancoraggio aperto** già scritto tre volte in questo file: la guardia
 `"calendario_uscite" not in s` matcha anche `calendario_uscite_fred`.
 
+## 🔢 v400 — LA REVISIONE DICEVA CHE LA STIMA SALE MENTRE LA PERDITA SI AMPLIAVA
+
+Trovato eseguendo il pacchetto CRWV su me stesso, come il modello che lo riceve. È il difetto
+più grave di questa sessione, e stava nella riga che il pacchetto stesso dichiara **più
+importante del target**.
+
+`revisione_90g_pct` è un RAPPORTO: `(ora / prima − 1) × 100`. Su una società in perdita quel
+rapporto **inverte il senso**. CRWV è passata da **−3,42 a −4,37**, cioè la perdita attesa si è
+ampliata, e il pacchetto stampava **`+27,77%`** e poi, nella riga marcata ⚠⚠:
+
+> *"TRAIETTORIA E AMPIEZZA DIVERGONO: la stima a 90 giorni **sale** ma negli ultimi 30
+> prevalgono i TAGLI"*
+
+**Due affermazioni, entrambe false.** La stima non sale: scende. E non c'è nessuna divergenza —
+a 90 giorni le stime peggiorano e negli ultimi 30 prevalgono i tagli, cioè le due misure
+**concordano**. Il pacchetto fabbricava un disaccordo dal proprio errore di segno, e poi
+istruiva chi legge che *"il fatto è la divergenza"*.
+
+> È la classe **v316** (il percentile che era una variazione) e **v389** (il multiplo
+> prospettico negativo che si legge come basso): **la formula calcola una cosa, l'etichetta ne
+> dichiara un'altra, e nessuna delle due mente da sola.**
+
+⚠ La direzione ora si prende dalla **differenza**, che non ha segni da interpretare; la
+percentuale resta solo dove non è ambigua. Su una perdita si scrive *"la perdita attesa si è
+AMPLIATA del 27,8%"*. E la condizione della divergenza confronta i **versi**, non l'esistenza di
+un dato: quando concordano lo dice, perché due misure che puntano nella stessa direzione sono un
+fatto — ma **un segnale solo, non due prove**.
+
+⚠ La pipeline pubblica ora anche `eps_7g_fa`: il FATTO accanto al rapporto. Finché il CI non ha
+rigenerato, `app.js` lo ricava dal rapporto invece di far sparire la riga — ripiego della classe
+v187, *togliere in silenzio una riga che il pacchetto pubblicava è peggio del difetto*.
+
+## 🧾 v400 — IL BILANCIO VECCHIO NON DICHIARAVA DI ESSERLO, E LE CONCLUSIONI SÌ
+
+La v397 ha dato alla **tabella dei trimestri** un avviso costruito sul deposito EDGAR. I due
+blocchi che poggiano sullo **stesso trimestre** non l'hanno mai avuto — e sono esattamente i due
+su cui si regge l'analisi di una società che costruisce a debito.
+
+| il pacchetto pubblicava | il 10-Q depositato l'11/08 |
+|---|---|
+| cassa **2,2 mld** (al 31/03) | **5,524 mld** — 2,5 volte tanto |
+| *"la cassa copre 1,6 mesi di investimenti"* | calcolata su quella cassa |
+| *"la cassa è INFERIORE al debito in scadenza entro l'anno"* | non più vero con 5,5 mld |
+| oneri finanziari 1,5 mld su 4 trimestri, copertura −0,07× | **640 mln nel solo Q2** |
+
+**La data c'era. Le frasi DERIVATE da quella data no** — e sono quelle che si leggono. Ora
+COMBUSTIONE DI CASSA e CREDITO portano lo stesso avviso della tabella dei trimestri, e dichiarano
+che le conclusioni sull'autonomia **non sono affermabili** senza il deposito più recente.
+
+⚠ **La domanda "la tabella è ferma?" ha ora UNA risposta sola** (`depositoOltreLaTabella`), usata
+da tre blocchi. Riscriverla nei tre punti era la classe v161/v207, e un check verifica il
+**collegamento**, non l'esistenza — lezione v399, dove togliendo la riga che agganciava la fonte
+al gate restava tutto verde.
+
+## 🧩 v400 — IL PACCHETTO PRESENTAVA COME MISTERO UNA COSA CHE SAPEVA
+
+*"ricavi su dodici mesi 8 mld — NON QUADRA: i quattro trimestri sommano 6 mld. **Il residuo di 1
+mld non è spiegato dai dati qui presenti**"* — e quaranta righe più sotto lo stesso pacchetto
+dichiara, **dal deposito 8-K su SEC EDGAR**, che la tabella si ferma a un trimestre già superato.
+Il residuo **È** quel trimestre.
+
+> Mandare chi legge a cercare un difetto che non c'è costa quanto tacere un difetto che c'è. È la
+> gerarchia della **v396 applicata alle diagnosi**: prima il fatto, la congettura solo se il
+> fatto non c'è.
+
+## 🕐 v400 — DUE OROLOGI, E LA RIGA NE AFFERMAVA UNO PER L'ALTRO
+
+*"il book è vuoto: **succede a mercato chiuso**"* accanto a *"CONTESTO DI SESSIONE … fase:
+REGULAR · SESSIONE USA APERTA"*. Non era una contraddizione — il book era vuoto allo **snapshot**,
+che la pipeline prende su cron, mentre la fase di sessione è calcolata **adesso** — ma il
+pacchetto non lo diceva, e il collaudo di congruità **impone a chi legge di segnalarla**. Un
+pacchetto che genera falsi positivi nel proprio controllo di qualità lo logora.
+
+Classe **v193/v234**: *stato del mercato e freschezza del dato sono due cose diverse*, qui dentro
+la stessa riga.
+
+### 🦴 Il pavimento delle suite era fermo a metà
+Misurato: `test_app.mjs` contiene **452** chiamate a `check()` contro un pavimento di **185**;
+`test_update_data.py` 161 contro 80; `test_analisi_libro.py` 97 contro 50. **Un pavimento a metà
+non è un pavimento**: metà suite poteva sparire restando verde, che è precisamente il guasto per
+cui il pavimento esiste (v277, la suite mangiata a metà da uno script). Alzati a 420/150/90 — con
+margine, perché un pavimento incollato al conteggio di oggi va rosso al primo check tolto per una
+ragione legittima.
+
+⚠ **Diciannovesima rottura di un check ancorato a una stringa letterale**: v355 pretendeva
+`NON CALCOLABILE ADESSO` ed è andato rosso su una riga **più corretta di prima**. Riagganciato al
+fatto: il movimento implicito è dichiarato non calcolabile, si dice perché, e la ragione non
+pretende di sapere se il mercato sia aperto adesso.
+
+⚠ E il **meta-gate dei backslash** mi ha ripreso di nuovo: `\s` dentro un template literal
+diventa `s`, quindi la regex del check nuovo non poteva funzionare. Sostituita con un `indexOf`,
+che non ha niente da sfuggire.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
