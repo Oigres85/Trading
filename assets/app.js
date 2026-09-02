@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "387";
+const BUILD_VERSION = "388";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -12472,9 +12472,17 @@ function buildPromptTicker(tkGrezzo) {
 `aggiornamento: un dato di due mesi non e' lo stato di oggi, e se lo usi dichiari quanto e' vecchio.`,
 ``,
 `2) L'AZIENDA E CONTRO CHI GIOCA — cosa vende e a chi, poi una tabella dei concorrenti diretti:`,
-`| Concorrente | Ticker | Cap. mercato | Quota di mercato | Anno e fonte della quota | Dove batte ${tk} |`,
+`| Concorrente | Ticker | Cap. mercato | Quota | DI QUALE MERCATO | Anno e fonte | Dove batte ${tk} |`,
+`⚠⚠ LA COLONNA "DI QUALE MERCATO" E' OBBLIGATORIA E NON E' UNA FORMALITA': due quote si possono`,
+`mettere in colonna solo se hanno lo stesso DENOMINATORE. E' l'errore che un modello reale ha`,
+`commesso su questo stesso pacchetto — ha messo in tabella le quote del cloud generale (44%, 30%,`,
+`19%) accanto a un 5% del titolo analizzato, che sta su un mercato molto piu' piccolo: sommate`,
+`fanno un mondo che non esiste, e la riga del titolo sembra dieci volte piu' grande di quello che`,
+`e'. Se le quote che trovi stanno su mercati diversi, NON incolonnarle: dillo e tienile separate.`,
 `Se una quota non e' pubblica dillo e usa un proxy dichiarato (ricavi di segmento, unita'`,
-`spedite). Una quota senza anno non vale: i mercati si ribaltano in quattro trimestri.`,
+`spedite, capacita' contrattata). Una quota senza anno non vale: i mercati si ribaltano in`,
+`quattro trimestri. ⚠ La capitalizzazione dei concorrenti serve a dare la scala, non a decidere:`,
+`se verificarla ti costa piu' di quanto renda, scrivi "n.d." e spendi la ricerca altrove.`,
 ``,
 `3) TRIMESTRALI — l'ultima come contesto, la PROSSIMA come evento.`,
 `Dell'ultima: ricavi, utile per azione, margine lordo e operativo, e la voce che conta per il`,

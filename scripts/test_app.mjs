@@ -3526,7 +3526,11 @@ check("v257 analisi titolo: dice DOVE cercare, con fonti nominate e il ticker ne
 
 check("v257 analisi titolo: chiede le consegne che il CEO ha elencato", suVeri(`
   const t = buildPromptTicker("NVDA");
-  return /Concorrente/.test(t) && /[Qq]uota di mercato/.test(t)
+  /* ⚠ v400 — VENTESIMA ROTTURA DI UN CHECK ANCORATO A UNA STRINGA LETTERALE: pretendeva
+     "quota di mercato" ed e' andato rosso quando la colonna e' diventata piu' precisa
+     ("Quota" + "DI QUALE MERCATO"). L'invariante non e' il nome della colonna: e' che la
+     tabella chieda un concorrente, la sua quota e l'anno a cui quella quota si riferisce. */
+  return /Concorrente/.test(t) && /[Qq]uota/.test(t) && /Anno e fonte/.test(t)
       && /[Tt]rimestral/.test(t) && /PROSSIMA/.test(t)
       && /Supporti e resistenze/.test(t) && /SENTIMENT/.test(t)
       && /[Ii]ngressi|DECISIONI SULLA POSIZIONE APERTA/.test(t)
@@ -6357,6 +6361,17 @@ check("v400 il movimento implicito non afferma piu' uno stato di mercato che non
   if (p.indexOf("MOVIMENTO IMPLICITO: NON CALCOLABILE") < 0) return false;
   return p.indexOf("succede a mercato chiuso") < 0
       && p.indexOf("sono due orologi") >= 0;`));
+
+/* ═══ v400 — LA TABELLA DEI CONCORRENTI CHIEDEVA UNA QUOTA SENZA CHIEDERE DI QUALE MERCATO ══
+   Dimostrato da un referto reale su questo stesso pacchetto: il modello ha incolonnato le quote
+   del cloud GENERALE (44%, 30%, 19%) accanto a un 5% del titolo, che sta su un mercato molto
+   piu' piccolo. Denominatori diversi nella stessa colonna — la classe che coherence_check
+   chiama "denominatori non dichiarati", qui prodotta dalla richiesta stessa. */
+check("v400 la tabella dei concorrenti pretende il denominatore della quota", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("DI QUALE MERCATO") >= 0
+      && p.indexOf("stesso DENOMINATORE") >= 0
+      && p.indexOf("NON incolonnarle") >= 0;`));
 
 let fail = 0;
 for (const [name, ok] of T) {
