@@ -2591,6 +2591,53 @@ calcolato sul campione (0,015 su 251 sedute, 0,065 su 60) e l'istruzione diceva 
 di congruità ordina a chi legge di segnalare, prodotto dal pacchetto stesso. L'istruzione ora
 rimanda al numero che ogni riga porta con sé, invece di ripeterne uno proprio.
 
+## 🎯 v403 — LA CO-MOVIMENTAZIONE NON È LA SENSIBILITÀ AGLI EVENTI
+
+Le due finestre della v401 hanno risposto, e **hanno risposto NO**: sul canale tassi di CRWV il
+beta è salito da **+0,18 a +1,35** fra l'anno e il trimestre, ma l'R² è rimasto **0,016 contro un
+pavimento di 0,065**. La misura non mi ha dato ragione, ed è la risposta giusta — il 01/09 è
+stato un **evento**, non un regime: una giornata violenta non produce R² su sessanta sedute.
+
+> **Un gate che rifiuta di confermare chi l'ha scritto sta facendo il suo lavoro.** Se avessi
+> tarato la finestra finché diceva quello che volevo, avrei costruito il check che conferma la
+> propria assunzione — l'errore v326.
+
+Ma la domanda che un libro a leva pone non è "quanto si muovono insieme in una giornata
+qualunque": è **"il giorno che i tassi saltano, quanto perdo"**. Ora ogni canale porta un terzo
+sguardo — la regressione sul **quinto di sedute in cui il canale ha l'escursione maggiore**.
+
+⚠⚠ **E L'AFFERMAZIONE VA TENUTA ONESTA.** Costruendo il caso di prova ho scoperto che una
+relazione di coda **non è invisibile** alla regressione piena: quelle sedute portano gran parte
+della varianza, quindi si vede anche lì. Quello che il terzo sguardo aggiunge non è "un canale
+nascosto" ma il **beta delle giornate che contano**, che la media sottostima — misurato sui dati
+sintetici: **+2,48 contro +1,63**, cioè la regressione piena sottostima del 35% la sensibilità
+del giorno peggiore.
+
+⚠⚠ **IL SUO R² NON SI CONFRONTA CON GLI ALTRI DUE**: è calcolato su un sottoinsieme scelto,
+quindi ha un **denominatore diverso**. La riga lo dichiara invece di lasciarlo dedurre — è la
+regola dei denominatori non dichiarati applicata a una misura nostra. Quello che si confronta è
+il **beta**, e la riga stampa di quanto è più ampio.
+
+⚠ **Selezionare sulla |escursione| del CANALE non distorce il beta** — si sceglie sulla causa,
+non sull'effetto, ed è l'equivalente di un esperimento con più escursione. Selezionare sul
+movimento del TITOLO lo distorcerebbe, e la riga dice esplicitamente che non è ciò che il sistema
+fa: senza quella frase la misura invita al sospetto giusto sulla cosa sbagliata.
+
+⚠ **Il quinto e non il decimo**: su ~251 osservazioni il decile ne lascia ~25, cioè df 23 —
+sotto la soglia in cui `r2_rumore` restituisce un pavimento affidabile. Sotto le 32 osservazioni
+selezionate il blocco **tace**, invece di pubblicare un pavimento inventato.
+
+### 🔴 E main è stato ROSSO per quattro ore e mezza senza che nessuno lo vedesse
+Il merge della v401-402 (17:26) è andato **rosso in CI**; la v402 (21:58) l'ha riportato verde.
+La causa non è il codice: i due check caduti erano **dipendenti dai dati**, e il run del CI usa
+un `data.json` **più fresco di quello locale**. La corsa dei gate prima del push era verde sul
+mio, rossa sul loro.
+
+> **Con la regola "si unisce sempre", la CI gira DOPO la pubblicazione: la corsa locale dei gate
+> è l'unica protezione, e non gira sugli stessi dati.** Quindi un check che dipende dai dati del
+> giorno non è solo fragile — è un buco nella sola rete rimasta. Entrambi sono stati riscritti
+> perché **costruiscono lo stato** che misurano invece di trovarlo.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

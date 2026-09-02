@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "390";
+const BUILD_VERSION = "391";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -11661,6 +11661,30 @@ function tvBlocchi(tk) {
       } else {
         F.push(`  · finestra corta — non ancora presente in questo run dei dati (il campo e' nato con questa `
           + `versione e lo scrive la pipeline): finche' non c'e', il canale si legge solo sull'anno.`);
+      }
+      /* ═══ v403 — QUANDO IL CANALE SI MUOVE FORTE ═══════════════════════════════════════════
+         Le due finestre rispondono "quanto si muovono insieme in una giornata qualunque". La
+         domanda che un libro a leva pone e' un'altra: "il giorno che i tassi saltano, quanto
+         perdo". Sono due misure diverse, e la seconda non si ricava dalla prima — sui dati
+         sintetici la beta piena sottostima del 35% quella delle sedute di forte escursione.
+         ⚠⚠ E NON E' UN R² MIGLIORE: il denominatore e' un altro (solo le sedute selezionate),
+         quindi confrontarlo con quello delle altre due righe e' un confronto fra due basi. La
+         riga lo dichiara, invece di lasciarlo dedurre. */
+      if (v.evento) {
+        const e = v.evento;
+        F.push(`  · quando il canale si muove FORTE (il quinto di sedute con l'escursione maggiore`
+          + `${Number.isFinite(numero(e.escursione_min)) ? `, oltre ${e.escursione_min}% in valore assoluto` : ""}) — `
+          + `beta ${e.beta > 0 ? "+" : ""}${e.beta}, R² ${e.r2} contro un pavimento del rumore di ${e.r2_soglia}. `
+          + `${e.campione} sedute, dal ${e.da} al ${e.a}.`);
+        const scarto = (Number.isFinite(numero(e.beta)) && Number.isFinite(numero(v.beta)) && Math.abs(numero(v.beta)) > 0.05)
+          ? Math.round((Math.abs(numero(e.beta)) / Math.abs(numero(v.beta)) - 1) * 100) : null;
+        F.push(`  ⚠ QUESTO R² NON SI CONFRONTA con quello delle due righe qui sopra: e' calcolato su un `
+          + `sottoinsieme scelto, quindi ha un DENOMINATORE diverso. Quello che si confronta e' il BETA`
+          + `${scarto != null ? `, ed e' ${scarto > 0 ? `${scarto}% PIU' AMPIO` : `${-scarto}% piu' contenuto`} `
+              + `di quello della finestra lunga` : ""}: dice come si comporta il canale nelle giornate che `
+          + `contano, che non sono la giornata media. ⚠ Selezionare le sedute sull'escursione del CANALE non `
+          + `distorce il beta (si sceglie sulla causa, non sull'effetto); selezionarle sul movimento del `
+          + `TITOLO lo distorcerebbe, e non e' quello che il sistema fa.`);
       }
     });
     F.push(`⚠⚠ UN BETA SENZA IL SUO R² E' MEZZO NUMERO. Un beta di 1,8 sui tassi con R² 0,01 non `
