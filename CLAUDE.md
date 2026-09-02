@@ -2553,6 +2553,44 @@ anti-riempimento resta ed è la protezione vera.
 - **C9 ha preso un mio imperativo nella coda** (*"e leggerli come uno solo è l'errore facile"*) —
   quarta volta (v156, v179, v180, v389). Riscritto come fatto.
 
+## 🕰️ v402 — L'ULTIMA CHIUSURA ERA NEL FUTURO, E IL CONTEGGIO ERA ZERO PER COSTRUZIONE
+
+Trovato da **un check andato rosso da solo** quando il CI ha prodotto il primo run *a mercato
+aperto*. `price_asof` diventa OGGI appena la barra odierna comincia, e `lastUsEquityCloseUTC()`
+costruiva le **16:00 ET di quel giorno** — sei ore avanti. Conseguenza misurata il 02/09/2026
+alle 13:31 ET, nel pacchetto vero:
+
+> *"0 pubblicate DOPO l'ultima chiusura USA del **2026-09-02**"*
+
+**Zero per costruzione**: niente può essere posteriore a un istante che non è arrivato. E uno
+zero lì si legge come *"niente di non prezzato"*, cioè l'opposto — il blocco che esiste per dire
+*"questo il prezzo non l'ha ancora votato"* **taceva esattamente durante la sessione**.
+
+Classe **v193/v234**: stato del mercato e freschezza del dato sono due cose diverse. Il rimedio
+non è spostare la soglia ma tornare all'ultima chiusura **davvero avvenuta** — a sessione aperta
+è quella di ieri, ed è la risposta giusta: una notizia uscita stanotte non è nel prezzo di
+chiusura di ieri, che è precisamente ciò che il blocco vuole segnalare.
+
+⚠ `now` è ora un **parametro**: un ramo temporale che nessun test può esercitare non è una
+protezione (v190, v234), e un check che dipende dall'ora in cui gira va rosso da solo. I tre
+gate lo percorrono a orologio fermo — sessione aperta, sessione chiusa, e il salto che scavalca
+il fine settimana.
+
+### ⚠⚠ E la mia iniezione della v400 NON MORDEVA
+Il check sul movimento implicito cancellava `r.tv.evento`, ma quel dato **non viene da lì**: lo
+costruisce `movimentoImplicito(DATA.options[tk])`. Passava solo perché allo snapshot di quel
+momento il book era vuoto — appena è arrivato un run con le opzioni quotate è andato rosso.
+Due lezioni già scritte in questo file, sommate: *un check che misura i dati del giorno invece
+della proprietà* (v233) e *un'iniezione senza morso è un no-op silenzioso*. Ora lo stato si
+**costruisce**: la catena resta e denaro/lettera vanno a zero su ogni strike.
+
+### 🔢 La testata citava una soglia che i dati non usano più
+Rigenerando il pacchetto dopo la v401 e leggendolo: la coda pubblica il **pavimento del rumore**
+calcolato sul campione (0,015 su 251 sedute, 0,065 su 60) e l'istruzione diceva ancora *"sotto
+0,05 non è un canale"*. **Due valori per la stessa grandezza** — esattamente ciò che il collaudo
+di congruità ordina a chi legge di segnalare, prodotto dal pacchetto stesso. L'istruzione ora
+rimanda al numero che ogni riga porta con sé, invece di ripeterne uno proprio.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
