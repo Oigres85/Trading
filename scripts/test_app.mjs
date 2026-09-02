@@ -1789,9 +1789,23 @@ check("v287 calendario: unisce uscite macro e trimestrali in una finestra", suVe
    una MIA proiezione dal ritardo tipico della fonte; le date delle trimestrali le cambia
    l'emittente di continuo. Presentarle come appuntamenti confermati sarebbe la classe di
    difetto peggiore di questo progetto: un dato che sembra piu' solido di quanto sia. */
-check("v287 calendario: ogni evento e' marcato come stimato", suVeri(`
+/* ⚠ v395 — A QUESTO CHECK E' CAMBIATO L'INVARIANTE, NON E' STATO ZITTITO. Pretendeva che
+   OGNI evento fosse marcato stimato: era vero finche' tutte le uscite macro erano proiettate
+   dal ritardo tipico della fonte, ed e' diventato falso da quando la pipeline legge il
+   calendario ufficiale. Riscriverlo per farlo tacere sarebbe il modo classico di perdere la
+   protezione (v203); l'invariante che conta e' piu' forte di prima: ogni evento DICHIARA la
+   propria provenienza con un booleano vero — mai `undefined`, che si leggerebbe come "non
+   stimato" — e "confermato" e' vero solo se il calendario ha davvero quella chiave. */
+check("v287 calendario: ogni evento dichiara la propria provenienza, e non mente", suVeri(`
+  const cal = ((DATA.macro.calendario_uscite || {}).per_chiave) || {};
+  const perNome = {};
+  for (const i of DATA.macro.indicators || []) perNome[i.label] = i.key;
   const r = prossimiEventi(30);
-  return r.eventi.length === 0 || r.eventi.every(e => e.stimata === true)`));
+  if (!r.eventi.length) return false;                 // muto = non sta misurando
+  return r.eventi.every(e => typeof e.stimata === "boolean")
+      && r.eventi.filter(e => e.tipo === "utili").every(e => e.stimata === true)
+      && r.eventi.filter(e => e.tipo === "macro" && !e.stimata)
+                 .every(e => !!cal[perNome[e.nome]]);`));
 
 check("v287 calendario: la nota dichiara che non sono appuntamenti confermati", (() => {
   const i = src.indexOf("function renderCalendario");
@@ -3263,7 +3277,13 @@ check("v342 l'emettitore esegue il codice vero, non una copia della logica", (()
    ⚠ Il check NON verifica le date attese una per una — sarebbe un registro fisso che invecchia
    da solo, la classe C10. Verifica la PROPRIETA': per una serie mensile la prossima uscita
    dista dall'ultima circa un mese, mai due. Vale per qualunque serie si aggiunga domani. */
+/* ⚠ v395 — QUESTO CHECK MISURA L'ARITMETICA DELLA PROIEZIONE, e da quando esiste il
+   calendario ufficiale `cadenzaDato` per molte chiavi non la usa piu': confrontava quindi una
+   data DICHIARATA DALL'ENTE con una base costruita da una rilevazione fittizia, e falliva su
+   codice giusto. Il calendario si toglie prima di misurare — e' il ramo che questo check
+   sorveglia — e la proprieta' del ramo confermato si verifica accanto, invece di perderla. */
 check("v343 cadenza: per ogni serie la prossima uscita dista UN passo, non due", suVeri(`
+  delete DATA.macro.calendario_uscite;
   const GIORNO = 86400000;
   const LIMITI = { giornaliero: [1, 4], mensile: [24, 40], trimestrale: [80, 100] };
   for (const k of Object.keys(CADENZA_FONTE)) {
@@ -4006,8 +4026,19 @@ check("v349 mossa: ogni indicatore misura il MOVIMENTO DELLA PROPRIA serie", suV
   };
   const atteso = calc(m.vix.spark.map(v => ({ v })));
   /* prima il VIX riceveva la mossa della CURVA DEI TASSI: una catena if/else in cui il ramo
-     "in:curve || credit || vix" era irraggiungibile perche' "in:" lo prendeva il ramo sopra */
-  return mossaRelativa("vix") === atteso && mossaRelativa("vix") !== calc(m.curve_history);`));
+     "in:curve || credit || vix" era irraggiungibile perche' "in:" lo prendeva il ramo sopra.
+     ⚠⚠ v395 — LA SECONDA META' CONFRONTAVA con la mossa della curva, cioe' provava il
+     collegamento per DISUGUAGLIANZA DI VALORE, e il 02/09/2026 i due numeri sono venuti
+     uguali per caso (0,3 e 0,3): check rosso senza che nulla fosse rotto. E' la classe gia'
+     annotata in v233 — un check che misura i dati del giorno invece della proprieta' va rosso
+     da solo. Ora si PERTURBA la serie della curva: se il VIX leggesse quella, il suo numero
+     cambierebbe. Due serie possono coincidere per caso; non possono muoversi insieme. */
+  const prima = mossaRelativa("vix");
+  const salva = m.curve_history;
+  m.curve_history = salva.map((p, i) => ({ ...p, v: p.v + (i % 2 ? 7 : -7) }));
+  const dopo = mossaRelativa("vix");
+  m.curve_history = salva;
+  return prima === atteso && dopo === prima;`));
 
 check("v349 mossa: la curva riceve la sua serie vera, non un ramo morto", suVeri(`
   const m = DATA.macro || {};
@@ -5024,15 +5055,21 @@ check("v363 · nessun \"prossimo atteso\" riferito a una data gia' passata", _es
   const mData = p.match(/DATI AL (\\d{2})\\/(\\d{2})\\/(\\d{4})/);
   if (!mData) return no("il pacchetto non dichiara piu' la propria data: il confronto non e' possibile");
   const oggi = new Date(mData[3] + "-" + mData[2] + "-" + mData[1]);
+  /* ⚠ v395 — IL RILEVATORE GUARDAVA UNA FORMA SOLA e il pavimento di 3 occorrenze ha smesso
+     di essere raggiunto appena la maggioranza delle uscite e' passata al calendario ufficiale:
+     il check si e' dichiarato MUTO, correttamente. L'invariante non riguarda la parola
+     "atteso" ma la PRETESA: nessuna riga puo' annunciare come futura una data gia' passata,
+     che sia una stima o un appuntamento confermato. Ora copre entrambe le forme. */
+  const FORME = /(?:prossimo atteso|prossima uscita CONFERMATA il) (\\d{2})\\/(\\d{2})\\/(\\d{4})/g;
   const passate = [];
-  for (const m of p.matchAll(/prossimo atteso (\\d{2})\\/(\\d{2})\\/(\\d{4})/g)) {
+  for (const m of p.matchAll(FORME)) {
     const d = new Date(m[3] + "-" + m[2] + "-" + m[1]);
     if (d < oggi) passate.push(m[0] + " (" + Math.round((oggi - d) / 86400000) + " giorni fa)");
   }
   if (passate.length) return "\\"prossimo\\" detto di date passate: " + [...new Set(passate)].join(", ");
   /* il detector deve aver visto qualcosa, altrimenti e' muto e si legge come una conferma */
-  const quante = [...p.matchAll(/prossimo atteso \\d{2}\\/\\d{2}\\/\\d{4}/g)].length;
-  if (quante < 3) return "solo " + quante + " righe con 'prossimo atteso': il check non sta misurando";
+  const quante = [...p.matchAll(FORME)].length;
+  if (quante < 3) return "solo " + quante + " righe sulla prossima uscita: il check non sta misurando";
   return true;`)));
 
 /* Lo stato intermedio deve ESISTERE nel codice: senza, una data appena passata torna a

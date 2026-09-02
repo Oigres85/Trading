@@ -2108,6 +2108,36 @@ delle date passate, salto delle serie non-FRED, rifiuto senza chiave) e la fetch
 spacchettava due — `ValueError` a ogni run, cioè il blocco sarebbe morto in CI. Trovato dalla
 `http_get` finta, non rileggendo il codice.
 
+### 🦴 Quattro gate FOSSILI si sono svegliati quando il fenomeno è arrivato nei dati
+Il primo run col codice nuovo ha portato le date confermate, e **quattro check scritti quando
+tutto era stimato sono andati rossi**. Nessuno è stato zittito; a tre è cambiato l'invariante e
+uno era un difetto latente che non c'entrava col calendario:
+
+- **v287** pretendeva che *ogni* evento fosse marcato stimato. Ora l'invariante è **più forte**:
+  ogni evento dichiara la provenienza con un booleano vero — mai `undefined`, che si leggerebbe
+  come "non stimato" — e "confermato" è vero **solo se il calendario ha davvero quella chiave**.
+- **v343** misura l'aritmetica della **proiezione**, che per molte chiavi non viene più usata:
+  confrontava una data dichiarata dall'ente con una base costruita da una rilevazione fittizia.
+  Ora toglie il calendario prima di misurare — è il ramo che sorveglia — e verifica accanto che
+  le date confermate siano future.
+- **v363** guardava una forma sola (`prossimo atteso`) e il suo pavimento di tre occorrenze ha
+  smesso di essere raggiunto: **si è dichiarato muto, correttamente**. L'invariante non riguarda
+  la parola ma la **pretesa**: nessuna riga annuncia come futura una data già passata, stima o
+  appuntamento che sia. Ora copre entrambe le forme.
+- ⚠⚠ **v349 non c'entrava col calendario**: provava che il VIX legge la propria serie
+  confrontandola **per disuguaglianza di valore** con quella della curva, e il 02/09/2026 i due
+  numeri sono venuti **uguali per caso** (0,3 e 0,3). È la classe già annotata in v233 — *un
+  check che misura i dati del giorno invece della proprietà va rosso da solo*. Ora **perturba**
+  la serie della curva: due serie possono coincidere per caso, non possono muoversi insieme.
+
+> **Un gate che si sveglia quando il mondo cambia sta facendo il suo lavoro.** La domanda giusta
+> davanti a un check rosso non è come farlo tacere ma quale invariante volesse davvero difendere.
+
+⚠ E ho rifatto la trappola **numero uno** di questo file, scritta qui da versioni: un **backtick
+dentro un template literal lo chiude**. Il commento che spiegava la correzione di v349 citava il
+codice vecchio fra backtick e ha ucciso la suite — che infatti è morta **rumorosamente**, senza
+stampare nulla, invece di passare a vuoto.
+
 ### 🛑 Il gate positivo era CIRCOLARE, e me l'ha detto quello negativo
 Cercavo `[CONFERMATA]` dentro tutta la riga — ma **la legenda che spiega il marcatore lo contiene
 per forza**. Quindi il check positivo era verde anche con **zero** date confermate, e quello
