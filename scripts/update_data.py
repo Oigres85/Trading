@@ -14,6 +14,16 @@ Fonti (tutte gratuite):
   Investing.com, Google News
 """
 import csv
+# ⚠ v389 — `html` MANCAVA, e le news erano morte da quando sono nate (v304).
+# Ogni run del CI stampava tre righe identiche — `!! news CNBC Economia: name 'html' is not
+# defined` — e nessuno le leggeva, perche' la pipeline usciva 0: l'except le trasformava in
+# un avviso su stderr. Conseguenza: `macro["news"]` non veniva MAI scritto, e il blocco del
+# pacchetto che pubblica i titoli e' condizionato alla sua esistenza, quindi il pacchetto
+# TACEVA. Non "nessuna notizia": proprio nessuna riga sull'argomento.
+# E' la classe gia' scritta in CLAUDE.md — i fallback devono essere RUMOROSI — applicata alla
+# fonte invece che al dato: un import mancante dentro un try/except per-fonte non rompe niente
+# e spegne una funzionalita' intera.
+import html
 import io
 import json
 import logging
@@ -2065,14 +2075,89 @@ def umich_series(n=2):
     return out[-n:] if n else out
 
 
+def _distanza_mesi(a: str, b: str) -> int:
+    """quanti mesi separano due osservazioni ISO (b - a)."""
+    return (int(b[:4]) - int(a[:4])) * 12 + (int(b[5:7]) - int(a[5:7]))
+
+
+def _mese_meno(iso: str, n: int) -> str:
+    """la data ISO di n mesi prima. Le osservazioni mensili FRED stanno sempre al giorno 01."""
+    tot = int(iso[:4]) * 12 + (int(iso[5:7]) - 1) - n
+    return f"{tot // 12:04d}-{tot % 12 + 1:02d}-{iso[8:10]}"
+
+
+def _var_per_data(serie, mesi: int):
+    """Variazione percentuale su `mesi`, agganciata alla DATA e non alla POSIZIONE.
+
+    ═══ v393 — L'INFLAZIONE PUBBLICATA ERA UN 13 MESI CHIAMATO "a/a" ═══════════════════════
+    `yoy` faceva `series[-1] / series[-13]`: conta tredici POSIZIONI indietro e da' per
+    scontato che siano dodici mesi. Lo sono solo se la serie non ha buchi.
+
+    ⚠⚠ CPIAUCSL HA UN BUCO A OTTOBRE 2025 (il BLS non ha pubblicato quel mese), e UNRATE lo
+    ha con lui. Misurato sui dati veri il 30/08/2026: la posizione -13 cadeva su GIUGNO 2025
+    invece che su luglio, quindi il pacchetto pubblicava 332,813/321,435 = 3,54% -> "CPI 3,5%"
+    dove l'anno su anno vero e' 332,813/322,169 = 3,30%. Sovrastima di 0,24 pp sul numero
+    macro piu' letto del pacchetto, e NON su un punto solo: nove punti consecutivi dello
+    storico, tutti gonfiati, da novembre 2025 in poi.
+    Un LLM reale l'ha intercettato dall'esito (obiettava 3,4% del BLS contro il nostro 3,5%)
+    senza poter vedere la causa, e la causa non era ne' la fonte ne' l'arrotondamento.
+
+    E' la classe v207 — *l'allineamento per POSIZIONE invece che per data* — gia' pagata sui
+    grafici macro e di nuovo in v391 sulle barre OHLC filtrate indipendentemente. Qui stava
+    nel numero che apre il quadro macro.
+
+    ⚠ QUANDO LA BASE ESATTA NON C'E' non si tace e non si finge: si prende l'osservazione
+    precedente piu' vicina e si RESTITUISCE LA DISTANZA VERA, cosi' chi stampa puo' dichiarare
+    "su 13 mesi" invece di scrivere "a/a" su una cosa che non lo e'. Far sparire l'inflazione
+    per un mese intero sarebbe peggio del difetto (v199: un numero fuori orizzonte e' peggio
+    di nessun numero, ma un buco dichiarato non e' un numero fuori orizzonte).
+
+    Ritorna (valore, data_ultima_osservazione, mesi_effettivi).
+    """
+    if not serie or len(serie) < 2:
+        raise ValueError("serie troppo corta per una variazione")
+    ultima, valore = serie[-1]
+    atteso = _mese_meno(ultima, mesi)
+    per_data = {d: v for d, v in serie}
+    base = per_data.get(atteso)
+    effettivi = mesi
+    if base is None:
+        precedenti = [(d, v) for d, v in serie if d < atteso]
+        if not precedenti:
+            raise ValueError(f"nessuna osservazione a {mesi} mesi da {ultima}")
+        d0, base = precedenti[-1]
+        effettivi = _distanza_mesi(d0, ultima)
+        print(f"!! {atteso} assente nella serie: base a {d0}, distanza reale {effettivi} mesi",
+              file=sys.stderr)
+    if not base:
+        raise ValueError(f"base nulla a {atteso}")
+    return round((valore / base - 1) * 100, 1), ultima, effettivi
+
+
+# ⚠⚠ v393 — CHI HA SERVITO IL DATO E' PARTE DEL DATO, e finora non usciva dalla funzione.
+# UMich ha una fonte primaria (sca.isr.umich.edu, che pubblica il definitivo a FINE mese) e un
+# ripiego su FRED UMCSENT, che sconta 1-2 mesi di ritardo di LICENZA. Il pacchetto scriveva
+# SEMPRE la seconda versione — "via FRED ... questo valore non e' l'ultimo pubblicato" — anche
+# quando a servire era stata la primaria, cioe' DIFFAMAVA UN DATO FRESCO dicendo che era vecchio.
+# Misurato il 30/08/2026: valore 51,7 di agosto dalla primaria, dichiarato come lettura di FRED
+# vecchia di 29 giorni e non aggiornata. Un LLM reale l'ha corretto, giustamente.
+# E' la stessa regola gia' applicata allo STORICO ("lo storico esce dalla stessa fonte del
+# valore"): qui vale per l'etichetta e per il calendario, che dalla fonte dipendono entrambi.
+FONTE_SERVITA: dict = {}
+
+
 def series_fallback(label, primary, fallback=None):
     try:
-        return primary()
+        s = primary()
+        FONTE_SERVITA[label] = "primaria"
+        return s
     except Exception as e:  # noqa: BLE001
         print(f"!! {label}: fonte primaria ko ({e}), provo fallback", file=sys.stderr)
         if fallback is None:
             raise
-        return fallback()
+        s = fallback()
+        FONTE_SERVITA[label] = "ripiego"
+        return s
 
 
 def fetch_macro():
@@ -2191,25 +2276,40 @@ def fetch_macro():
 
     # Serie FRED
     def yoy(series):
-        return round((series[-1][1] / series[-13][1] - 1) * 100, 1), series[-1][0]
+        return _var_per_data(series, 12)
 
     def mom(series):
-        return round((series[-1][1] / series[-2][1] - 1) * 100, 1), series[-1][0]
+        return _var_per_data(series, 1)
 
     # impact: 0 = molto negativo per i mercati, 100 = molto positivo
     indicators = []
     try:
-        v, d = yoy(series_fallback("cpi", lambda: fred_series("CPIAUCSL"),
-                                   lambda: bls_series("CUSR0000SA0")))
-        indicators.append({"key": "cpi", "label": "Inflazione CPI (a/a)", "value": f"{v}%", "date": d,
-                           "impact": round(clamp(100 - abs(v - 2) * 30))})
+        # ⚠ v393 — L'ANNO SU ANNO DEL CPI SI CALCOLA SULLA SERIE GREZZA, NON SU QUELLA
+        # DESTAGIONALIZZATA. Il BLS titola "prices rose X percent over the last 12 months"
+        # esplicitamente *on an unadjusted basis*, ed e' il numero che stampa la stampa e che
+        # un LLM trova cercando online. Misurato su luglio 2026: CPIAUCNS da' 3,36% -> "3,4%",
+        # CPIAUCSL 3,30% -> "3,3%". La destagionalizzazione serve al mese su mese, dove toglie
+        # il rumore stagionale; sull'anno su anno quel rumore si cancella da solo e resta solo
+        # la revisione annuale dei fattori, che fa divergere il nostro numero da quello
+        # pubblicato senza che nessuno dei due sia sbagliato. Ma "CPI a/a" ha UN significato
+        # solo per chi legge, e va prodotto quello.
+        v, d, mesi = yoy(series_fallback("cpi", lambda: fred_series("CPIAUCNS"),
+                                         lambda: bls_series("CUUR0000SA0")))
+        ind = {"key": "cpi", "label": "Inflazione CPI (a/a)", "value": f"{v}%", "date": d,
+               "impact": round(clamp(100 - abs(v - 2) * 30))}
+        if mesi != 12:
+            ind["span_mesi"] = mesi
+        indicators.append(ind)
     except Exception as e:  # noqa: BLE001
         print(f"!! cpi: {e}", file=sys.stderr)
     try:
-        v, d = yoy(series_fallback("pce", lambda: fred_series("PCEPI"),
-                                   lambda: dbnomics_series("BEA/NIPA-T20804/DPCERG-M")))
-        indicators.append({"key": "pce", "label": "Inflazione PCE (a/a)", "value": f"{v}%", "date": d,
-                           "impact": round(clamp(100 - abs(v - 2) * 30))})
+        v, d, mesi = yoy(series_fallback("pce", lambda: fred_series("PCEPI"),
+                                         lambda: dbnomics_series("BEA/NIPA-T20804/DPCERG-M")))
+        ind = {"key": "pce", "label": "Inflazione PCE (a/a)", "value": f"{v}%", "date": d,
+               "impact": round(clamp(100 - abs(v - 2) * 30))}
+        if mesi != 12:
+            ind["span_mesi"] = mesi
+        indicators.append(ind)
     except Exception as e:  # noqa: BLE001
         print(f"!! pce: {e}", file=sys.stderr)
     try:
@@ -2221,9 +2321,12 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! gdp: {e}", file=sys.stderr)
     try:
-        v, d = mom(fred_series("RSAFS"))
-        indicators.append({"key": "retail", "label": "Vendite al dettaglio (m/m)", "value": f"{v}%", "date": d,
-                           "impact": round(clamp(50 + v * 40))})
+        v, d, mesi = mom(fred_series("RSAFS"))
+        ind = {"key": "retail", "label": "Vendite al dettaglio (m/m)", "value": f"{v}%", "date": d,
+               "impact": round(clamp(50 + v * 40))}
+        if mesi != 1:
+            ind["span_mesi"] = mesi
+        indicators.append(ind)
     except Exception as e:  # noqa: BLE001
         print(f"!! retail: {e}", file=sys.stderr)
     try:
@@ -2247,6 +2350,8 @@ def fetch_macro():
         v = s[-1][1]
         indicators.append({"key": "umich", "label": "Fiducia consumatori (UMich)",
                            "value": f"{v}", "date": s[-1][0],
+                           # v393 — chi ha servito decide etichetta E calendario lato pagina
+                           "fonte": FONTE_SERVITA.get("umich", "primaria"),
                            "impact": round(clamp((v - 40) * 1.7))})
     except Exception as e:  # noqa: BLE001
         print(f"!! umcsent: {e}", file=sys.stderr)
@@ -2631,6 +2736,88 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! news macro: {e}", file=sys.stderr)
 
+    # ═══ v390 — LE DATE DELLE TRIMESTRALI, DAL DEPOSITO E NON DA UNA STIMA ═══════════════
+    # Il pacchetto pubblica `earnings_date` di yfinance dichiarandolo — correttamente — una
+    # STIMA. Ma su quella stima si regge la regola piu' operativa della disciplina di rischio:
+    # "quanta parte del libro riprezza nella stessa finestra di tre settimane". Una regola
+    # costruita su date stimate e' una regola che si sposta da sola.
+    #
+    # SEC EDGAR pubblica il FATTO: l'8-K con item 2.02 ("Results of Operations and Financial
+    # Condition") e' il deposito con cui la societa' comunica i risultati, e ha una data vera.
+    # Gratis, senza chiave, con il solo obbligo di dichiarare uno User-Agent identificabile.
+    #
+    # ⚠ COSA SI PUBBLICA E COSA NO. Il deposito passato e' un fatto e si pubblica sempre. La
+    # data FUTURA non esiste in EDGAR: si ricava dalla cadenza dei depositi precedenti, ed e'
+    # una SECONDA STIMA, indipendente da quella di yfinance. Averne due che concordano vale
+    # piu' di una sola; averne due che divergono e' informazione a sua volta.
+    # ⚠⚠ E LA CADENZA SI PUBBLICA SOLO SE E' PLAUSIBILMENTE TRIMESTRALE (80-100 giorni).
+    # Misurato su MSTR: deposita 8-K con item 2.02 anche FUORI dal ciclo trimestrale
+    # (2025-10-06, 2025-07-07), e la mediana degli scarti crolla a 67 giorni producendo
+    # un'attesa sbagliata di 24 giorni. Un numero che sembra una misura e non lo e' e' peggio
+    # di nessun numero (v199): fuori banda si pubblica il deposito e si tace sull'attesa.
+    # ⚠ GLI EMITTENTI ESTERI NON HANNO 8-K: SK hynix e TSMC depositano 6-K e 20-F, che non
+    # hanno gli "items". Per loro EDGAR non risponde alla domanda, e va DICHIARATO invece di
+    # lasciare una riga vuota che si legge come "nessuna trimestrale".
+    try:
+        import statistics as _st
+        SEC_UA = {"User-Agent": "Trading-Dashboard/1.0 (biagio.garofalo@siigep.tech)"}
+        _r = requests.get("https://www.sec.gov/files/company_tickers.json",
+                          headers=SEC_UA, timeout=25)
+        _r.raise_for_status()
+        _mappa = {v["ticker"].upper(): v["cik_str"] for v in _r.json().values()}
+        sec_cal, senza_cik, esteri = {}, [], []
+        # la lista viene dalla stessa fonte della pipeline (config/ui_watchlist.json), non
+        # da un elenco scritto a mano che invecchierebbe da solo: un titolo nuovo entra qui
+        # senza che nessuno se ne ricordi. Indici, cambi e future non sono societa' e finiscono
+        # in `senza_cik`, che e' un esito dichiarato e non un buco.
+        _, _wl_sec, _ = load_holdings()
+        _seguiti = {str(x.get("ticker", "")).upper() for x in _wl_sec}
+        _seguiti = {t for t in _seguiti
+                    if t and not t.startswith("^") and not t.endswith(("=F", "=X", "-USD"))}
+        for _tk in sorted(_seguiti):
+            _cik = _mappa.get(_tk)
+            if not _cik:
+                senza_cik.append(_tk)
+                continue
+            try:
+                _s = requests.get(f"https://data.sec.gov/submissions/CIK{_cik:010d}.json",
+                                  headers=SEC_UA, timeout=25)
+                _s.raise_for_status()
+                _rec = _s.json().get("filings", {}).get("recent", {})
+                _forme = _rec.get("form", [])
+                _items = _rec.get("items", [""] * len(_forme))
+                _dep = [d for f, d, it in zip(_forme, _rec.get("filingDate", []), _items)
+                        if f == "8-K" and "2.02" in (it or "")]
+                if not _dep:
+                    esteri.append(_tk)
+                    continue
+                voce = {"ultimo_deposito": _dep[0], "n_depositi": len(_dep)}
+                if len(_dep) >= 4:
+                    _ds = [datetime.strptime(x, "%Y-%m-%d").date() for x in _dep[:8]]
+                    _gap = [(_ds[i] - _ds[i + 1]).days for i in range(len(_ds) - 1)]
+                    _cad = int(_st.median(_gap))
+                    # solo una cadenza plausibilmente trimestrale autorizza una previsione
+                    if 80 <= _cad <= 100:
+                        voce["cadenza_gg"] = _cad
+                        voce["attesa_da_cadenza"] = (_ds[0] + timedelta(days=_cad)).isoformat()
+                    else:
+                        voce["cadenza_irregolare_gg"] = _cad
+                sec_cal[_tk] = voce
+            except Exception as e:  # noqa: BLE001
+                print(f"!! SEC EDGAR {_tk}: {e}", file=sys.stderr)
+            time.sleep(0.12)          # SEC chiede meno di 10 richieste al secondo
+        if sec_cal or esteri:
+            macro["sec_calendario"] = {
+                "per_titolo": sec_cal,
+                "senza_8k": esteri,          # emittenti esteri: 6-K/20-F, nessun item 2.02
+                "senza_cik": senza_cik,      # indici, cambi, materie prime: non sono societa'
+                "fonte": "SEC EDGAR, 8-K con item 2.02 (Results of Operations)",
+            }
+            print(f"   SEC EDGAR: {len(sec_cal)} titoli con deposito trimestrale, "
+                  f"{len(esteri)} emittenti senza 8-K")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! SEC EDGAR: {e}", file=sys.stderr)
+
     # ═══ v309 — STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE ═════════════════════════
     # Il CEO: "reinserisci scheda macro per stagionalita' mensile nasdaq100 e se puoi aggiungi
     # anche variabile in concomitanza di elezioni midterm (valuta tu come strutturarlo)".
@@ -2707,7 +2894,7 @@ def fetch_macro():
     # niente interpolazioni. Dove la fonte non ha pubblicato, non c'e' punto.
     STORICO_IND = [
         # chiave     serie FRED               trasformazione  quanti punti
-        ("cpi",      "CPIAUCSL",              "yoy",          60),
+        ("cpi",      "CPIAUCNS",              "yoy",          60),   # grezza: lo storico segue il valore
         ("pce",      "PCEPI",                 "yoy",          60),
         ("gdp",      "A191RL1Q225SBEA",       "diretta",      24),
         ("retail",   "RSAFS",                 "mom",          60),
@@ -2753,22 +2940,26 @@ def fetch_macro():
             punti = []
             if modo == "diretta":
                 punti = [{"d": d, "v": round(float(v), 2)} for d, v in s]
-            elif modo == "yoy":
-                for i in range(12, len(s)):
-                    prima = float(s[i - 12][1])
-                    if prima:
-                        punti.append({"d": s[i][0],
-                                      "v": round((float(s[i][1]) / prima - 1) * 100, 2)})
-            elif modo == "mom":
-                for i in range(1, len(s)):
-                    prima = float(s[i - 1][1])
-                    if prima:
-                        punti.append({"d": s[i][0],
-                                      "v": round((float(s[i][1]) / prima - 1) * 100, 2)})
-            elif modo == "delta_k":
-                # PAYEMS e' in migliaia di occupati: la variazione mensile E' il dato che si cita
-                for i in range(1, len(s)):
-                    punti.append({"d": s[i][0], "v": round(float(s[i][1]) - float(s[i - 1][1]))})
+            # ⚠⚠ v393 — ANCHE QUI L'AGGANCIO E' PER DATA, NON PER POSIZIONE. Lo storico
+            # soffriva dello stesso difetto del valore in evidenza (vedi `_var_per_data`): con
+            # ottobre 2025 assente da CPIAUCSL, `s[i - 12]` cadeva un mese troppo indietro e
+            # NOVE punti consecutivi da novembre 2025 uscivano gonfiati — il grafico sotto la
+            # scheda dell'inflazione raccontava una storia che i dati non contengono.
+            # ⚠ Dove la base esatta manca il punto NON si disegna: un buco non e' uno zero e
+            # non e' nemmeno un valore approssimato (v205). Meglio una linea interrotta di una
+            # linea continua che passa per un punto mai osservato.
+            elif modo in ("yoy", "mom", "delta_k"):
+                indietro = 12 if modo == "yoy" else 1
+                per_data = {d: float(v) for d, v in s}
+                for d, v in s:
+                    prima = per_data.get(_mese_meno(d, indietro))
+                    if prima is None:
+                        continue
+                    if modo == "delta_k":
+                        # PAYEMS e' in migliaia di occupati: la variazione mensile E' il dato citato
+                        punti.append({"d": d, "v": round(float(v) - prima)})
+                    elif prima:
+                        punti.append({"d": d, "v": round((float(v) / prima - 1) * 100, 2)})
             if len(punti) >= 3:
                 ind["storico"] = punti[-quanti:]
                 ind["storico_serie"] = ("sca.isr.umich.edu (fonte primaria)"
@@ -2948,6 +3139,68 @@ def fetch_macro():
         }
     except Exception as e:  # noqa: BLE001
         print(f"!! credit: {e}", file=sys.stderr)
+
+    # ═══ v390 — CHI PRESTA, NON SOLO QUANTO COSTA ══════════════════════════════════════
+    # Il canale credito e' quello che colpisce PRIMA le partecipate che non si autofinanziano,
+    # e fino a qui il sistema lo misurava con il solo spread high yield. Uno spread e' un
+    # PREZZO: dice quanto il mercato chiede per prestare, non se le banche stiano prestando.
+    # Sono due domande diverse, e nel 2008 e nel 2023 hanno risposto in tempi diversi.
+    #
+    # DRTSCILM (SLOOS, Senior Loan Officer Opinion Survey): la percentuale NETTA di banche che
+    # ha IRRIGIDITO gli standard sui prestiti alle grandi imprese. Trimestrale, dalla Fed.
+    # Sopra zero = piu' banche stringono che allentano.
+    # NFCI (Chicago Fed National Financial Conditions Index): condizioni finanziarie
+    # complessive, settimanale. Zero = media storica; sopra zero = piu' rigide della media.
+    #
+    # ⚠ Sono INDAGINI e INDICI COMPOSITI, non prezzi: escono con ritardo (SLOOS anche di due
+    # mesi) e la riga porta la propria data, come tutte le statistiche ufficiali.
+    # ⚠ Il segno di SLOOS non e' intuitivo e va scritto: un valore NEGATIVO significa che le
+    # banche stanno ALLENTANDO, cioe' e' la lettura favorevole. Pubblicare "-8,3" senza dirlo
+    # e' la classe di difetto del percentile invertito (v316).
+    try:
+        _sl = fred_series("DRTSCILM", 20)
+        _nf = fred_series("NFCI", 60)
+        if _sl or _nf:
+            macro["credito_banche"] = {}
+            if _sl:
+                macro["credito_banche"]["sloos"] = {
+                    "valore": round(_sl[-1][1], 1), "data": _sl[-1][0],
+                    "precedente": round(_sl[-2][1], 1) if len(_sl) > 1 else None,
+                    "serie": "DRTSCILM",
+                    "storia": [{"d": d, "v": round(v, 1)} for d, v in _sl],
+                }
+            if _nf:
+                macro["credito_banche"]["nfci"] = {
+                    "valore": round(_nf[-1][1], 2), "data": _nf[-1][0],
+                    "mese_fa": round(_nf[-5][1], 2) if len(_nf) > 5 else None,
+                    "serie": "NFCI",
+                    "storia": [{"d": d, "v": round(v, 2)} for d, v in _nf],
+                }
+            print(f"   credito banche: SLOOS {'ok' if _sl else 'ko'}, NFCI {'ok' if _nf else 'ko'}")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! credito banche (SLOOS/NFCI): {e}", file=sys.stderr)
+
+    # ═══ v390 — I TASSI IN EURO, CHE IL SISTEMA NON HA MAI AVUTO ═══════════════════════
+    # Il quadro macro e' interamente americano, ma il CEO tiene un BTP da 40.000 euro nominali
+    # e vive in euro: il costo del denaro che lo riguarda per quella posizione — e il cambio con
+    # cui ogni utile in dollari torna a casa — non erano nel sistema.
+    # Fonte: BCE Data Portal (data-api.ecb.europa.eu), pubblica e senza chiave.
+    # ⚠ Il tasso sulle operazioni di rifinanziamento principali (MRR_FR) e' il tasso di
+    # POLITICA, non il rendimento del BTP: sono due cose diverse e la riga lo dice. Il
+    # rendimento del BTP il sistema lo ha gia' dal prezzo di Borsa Italiana.
+    try:
+        _r = http_get("https://data-api.ecb.europa.eu/service/data/FM/"
+                      "D.U2.EUR.4F.KR.MRR_FR.LEV?lastNObservations=1&format=csvdata")
+        _righe = [l for l in _r.text.strip().splitlines() if l]
+        _intest = _righe[0].split(",")
+        _iT, _iV = _intest.index("TIME_PERIOD"), _intest.index("OBS_VALUE")
+        _c = _righe[-1].split(",")
+        macro["bce"] = {"tasso_rifinanziamento": float(_c[_iV]), "data": _c[_iT],
+                        "fonte": "BCE Data Portal, serie FM.D.U2.EUR.4F.KR.MRR_FR.LEV"}
+        print(f"   BCE: tasso rifinanziamento {macro['bce']['tasso_rifinanziamento']}% "
+              f"al {macro['bce']['data']}")
+    except Exception as e:  # noqa: BLE001
+        print(f"!! BCE: {e}", file=sys.stderr)
 
     # Rischio Sistemico & Stress del Credito (CDS proxy): HY OAS + IG OAS + variazione 1 mese +
     # indice di stress finanziario St. Louis Fed. Il credito anticipa l'azionario → allarme preventivo.
@@ -3830,6 +4083,73 @@ def validate_macro(macro):
         _asof = (obj or {}).get("fetched_at") or (obj or {}).get("date") or today.isoformat()
         add(k, str(_asof)[:10], 40, "ok" if val is not None else "missing",
             "" if val is not None else "fonte ko in questo run: conferma leva/valutazioni impossibile")
+
+    # --- news macro: LA FONTE CHE NESSUNO SORVEGLIAVA ---------------------------------
+    # ⚠⚠ v389 — QUESTO CHECK NASCE DA UN GUASTO DURATO QUANTO LA FUNZIONALITA'. `import html`
+    # mancava in questo file: tutte e tre le fonti RSS morivano con NameError dentro il loro
+    # try/except per-fonte, `macro["news"]` non veniva MAI scritto, e il pacchetto per l'LLM —
+    # che pubblica quel blocco solo se la chiave esiste — TACEVA. Non "nessuna notizia":
+    # proprio nessuna riga sull'argomento.
+    # Il CI lo stampava a ogni run ("!! news CNBC Economia: name 'html' is not defined") e
+    # nessuno lo leggeva, perche' la pipeline usciva 0 e i dodici check di qualita' guardavano
+    # tutti altrove. Dodici sorveglianti e una fonte scoperta: il guasto e' durato li'.
+    # ⚠ La soglia e' sulle 48 ORE e non sulle 8 della finestra del pacchetto, ed e' deliberato:
+    # la macro non esce di continuo e nel fine settimana non esce affatto, quindi zero notizie
+    # in 8 ore e' un FATTO SUL MONDO. Zero in due giorni, invece, e' quasi sempre la fonte.
+    nw = macro.get("news") or {}
+    voci = nw.get("voci") or []
+    if not voci:
+        add("news_macro", None, 2, "missing",
+            "nessuna voce raccolta in questo run: il pacchetto non potra' pubblicare titoli macro")
+    else:
+        piu_recente = None
+        for v in voci:
+            try:
+                q = datetime.fromisoformat(str(v.get("quando")).replace("Z", "+00:00"))
+                ore = (datetime.now(timezone.utc) - q).total_seconds() / 3600
+                if piu_recente is None or ore < piu_recente:
+                    piu_recente = ore
+            except Exception:  # noqa: BLE001
+                continue
+        if piu_recente is None:
+            add("news_macro", None, 2, "implausible", "nessuna voce con data leggibile")
+        else:
+            add("news_macro", str(today), 2,
+                "ok" if piu_recente <= 48 else "stale",
+                f"{len(voci)} voci, la piu' recente di {piu_recente:.0f} ore"
+                + ("" if piu_recente <= 48 else " — oltre due giorni: sospetta una fonte caduta"))
+
+    # --- fonti v390: ognuna nasce sorvegliata, non dopo il primo guasto -----------------
+    # ⚠ La lezione delle news e' costata la vita intera della funzionalita': una fonte che
+    # nessun check guarda puo' morire il giorno in cui nasce e nessuno se ne accorge. Queste
+    # tre entrano nel gate insieme al codice che le scarica, non dopo.
+    sc = macro.get("sec_calendario") or {}
+    if not sc.get("per_titolo"):
+        add("sec_calendario", None, 7, "missing",
+            "EDGAR non ha risposto: le date delle trimestrali restano solo stime di yfinance")
+    else:
+        add("sec_calendario", str(today), 7, "ok",
+            f"{len(sc['per_titolo'])} titoli con deposito reale"
+            + (f", {len(sc.get('senza_8k') or [])} emittenti esteri senza 8-K" if sc.get("senza_8k") else ""))
+
+    cb = macro.get("credito_banche") or {}
+    for _k, _max in (("sloos", 200), ("nfci", 30)):   # SLOOS e' trimestrale, NFCI settimanale
+        _v = cb.get(_k)
+        if not _v:
+            add(f"credito_{_k}", None, _max, "missing", "serie non disponibile in questo run")
+        else:
+            _a = age_of(_v.get("data"))
+            add(f"credito_{_k}", _v.get("data"), _max,
+                "ok" if (_a is not None and _a <= _max) else "stale")
+
+    bce = macro.get("bce") or {}
+    if not bce.get("tasso_rifinanziamento"):
+        add("bce", None, 10, "missing", "BCE non raggiungibile: nessun tasso in euro in questo run")
+    else:
+        _a = age_of(bce.get("data"))
+        # ⚠ il tasso BCE cambia solo alle riunioni, ma la serie e' GIORNALIERA: se smette di
+        # aggiornarsi il valore resta plausibile e non si nota. L'eta' e' l'unico segnale.
+        add("bce", bce.get("data"), 10, "ok" if (_a is not None and _a <= 10) else "stale")
 
     return {"checks": checks, "alerts": alerts,
             "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}

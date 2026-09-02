@@ -18,6 +18,11 @@
      misurati: trascinando una colonna non si vedeva dove sarebbe caduta (--accent su
      th.col-over), il focus del diario diventava grigio invece che blu, tre sfondi restavano
      trasparenti. Una variabile inesistente non dà errore: rende la dichiarazione invalida. */
+  /* ⚠ v389 — `--amber` era usato in due punti con un fallback e mai definito: la riga
+     `.diary-multi` rendeva GRIGIA (ripiego su --muted) invece che ambra. Stessa classe
+     della nota v206 qui sotto, rimasta aperta su un alias. Il giallo di avviso del
+     progetto e' gia' --yellow: l'alias ci punta, non introduce un secondo tono. */
+  --amber: var(--yellow);
   --accent: var(--blue);
   --fg: var(--text);
   --hover: #1b2130;
@@ -1066,14 +1071,6 @@ tr.val-ok td { background: rgba(34,197,94,.07); }
 .tab-rischio tr.mio td { background: color-mix(in srgb, var(--blue) 12%, transparent); }
 .tab-rischio tr.idx td { color: var(--muted); }
 .tab-rischio tr.idx td:first-child { color: var(--text); }
-.mappa-rischio { width: 100%; max-width: 460px; height: auto; margin-top: 8px; }
-.mappa-rischio .ax { stroke: var(--border); stroke-width: 1; }
-.mappa-rischio .diag { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; opacity: .6; }
-.mappa-rischio circle { fill: var(--blue); }
-.mappa-rischio circle.sopra { fill: var(--red); }
-.mappa-rischio circle.sotto { fill: var(--green); }
-.mappa-rischio .tk { fill: var(--text); font-size: 9px; font-family: var(--mono); }
-.mappa-rischio .lbl { fill: var(--muted); font-size: 9px; }
 
 
 .diary-del:hover { color: var(--red); }
@@ -2367,3 +2364,72 @@ svg.g-serie { cursor: crosshair; }
   line-height: 1; padding: 2px 6px; border-radius: 6px; transition: transform .15s ease, color .15s ease; }
 .pf-toggle:hover { color: var(--fg); background: var(--hover); }
 .pf-toggle[aria-expanded="true"] { transform: rotate(90deg); }
+
+/* ═══ v389 — LA DISCIPLINA DI RISCHIO ═══════════════════════════════════════════════════════
+   Nessun grafico: il CEO ha respinto tre forme che chiedevano di decodificare una geometria.
+   Qui il colore fa una cosa sola — dire lo STATO — e tutto il resto e' testo che si legge. */
+.disc-sommario { font-size: 13px; line-height: 1.55; padding: 10px 12px; margin-bottom: 12px;
+  background: var(--card-2); border: 1px solid var(--border); border-radius: 8px; }
+/* v393 — i tre grafici della disciplina di rischio.
+   ⚠ `min-width: 0` sulle celle della griglia: senza, una cella non scende sotto la larghezza
+   del proprio contenuto (min-width vale `auto` per costruzione) e una legenda lunga allarga
+   TUTTA LA PAGINA. E' esattamente il difetto della card "Parametri di Rischio" misurato in
+   v192, dove il documento usciva a 598px su uno schermo da 375 e trascinava fuori posto ogni
+   overlay `position: fixed`. */
+.disc-grafici { display: grid; gap: 14px; margin-bottom: 14px; }
+@media (min-width: 861px) {
+  .disc-grafici { grid-template-columns: 1fr 1fr; }
+  .disc-grafici > .disc-graf:first-child { grid-column: 1 / -1; }
+}
+.disc-graf { min-width: 0; border: 1px solid var(--border); border-radius: 8px;
+  padding: 11px 12px 9px; background: var(--card-2); }
+.disc-graf-tit { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 9px;
+  line-height: 1.35; }
+.disc-graf .struct-note { margin-top: 8px; font-size: 11px; line-height: 1.45; }
+.disc-graf .ciam-wrap { margin: 0; }
+.disc-graf .ciam-extra { display: block; font-size: 10.5px; line-height: 1.35; margin-top: 2px; }
+
+/* v394 — ⚠ IL NOME TRONCATO E' IL MESSAGGIO PERSO. `.obar-lab` e `.ciam-nome` stanno a riga
+   singola con ellissi perche' altrove vivono in colonne strette e molto ripetute. Qui pero' i
+   nomi SONO le regole della disciplina ("Autofinanziamento delle partecipate", 219px) dentro
+   una colonna da 132: misurato in browser, QUATTRO etichette su cinque uscivano tagliate a
+   1440px e la legenda della torta a 375px. Un grafico che dice "di quanto" e non fa leggere
+   "di che cosa" ha perso meta' della propria risposta — la stessa famiglia di `.abar-fill`
+   senza `display:block` (v205): un difetto che non si rompe, nessun errore in console.
+   Si va a capo invece di allargare la colonna: una larghezza fissa nuova e' la classe gia'
+   pagata due volte (v192, v209), mentre col ritorno a capo la cella non scende comunque sotto
+   la parola piu' lunga (~110px), che nella colonna esistente ci sta. */
+.disc-graf .obar-lab, .disc-graf .ciam-nome {
+  white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3;
+}
+
+.disc-regola { border: 1px solid var(--border); border-left: 3px solid var(--muted);
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; background: var(--card-2); }
+.disc-oltre  { border-left-color: var(--red); }
+.disc-limite { border-left-color: var(--yellow); }
+.disc-dentro,
+.disc-ok     { border-left-color: var(--green); }
+.disc-nd     { border-left-color: var(--muted); }
+.disc-testa { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.disc-nome { font-weight: 700; font-size: 13.5px; }
+.disc-stato { font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 7px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+.disc-oltre  .disc-stato { color: var(--red);   border-color: color-mix(in srgb, var(--red) 45%, transparent); }
+.disc-limite .disc-stato { color: var(--yellow); border-color: color-mix(in srgb, var(--yellow) 45%, transparent); }
+.disc-dentro .disc-stato,
+.disc-ok     .disc-stato { color: var(--green); border-color: color-mix(in srgb, var(--green) 45%, transparent); }
+/* ⚠ min-width:0 sulla cella di destra: senza, un testo lungo allarga la griglia e con lei il
+   documento — la causa vera del popup fuori schermo su iPhone in v192. */
+.disc-riga { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 10px;
+  font-size: 12.5px; line-height: 1.5; padding: 2px 0; }
+.disc-et { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .03em;
+  padding-top: 2px; }
+.disc-mis { font-family: var(--mono); font-size: 12px; min-width: 0; }
+.disc-sog { min-width: 0; }
+.disc-prov { font-size: 11.5px; color: var(--muted); line-height: 1.5; margin-top: 6px;
+  padding-top: 6px; border-top: 1px dashed var(--border); }
+.disc-spiega { font-size: 12.5px; line-height: 1.55; margin-top: 6px; }
+@media (max-width: 560px) {
+  .disc-riga { grid-template-columns: 1fr; gap: 1px; }
+  .disc-et { padding-top: 4px; }
+}

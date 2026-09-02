@@ -355,7 +355,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 
 # v254 — la soglia minima resta come rete anti-regressione (se qualcuno cancella meta' suite
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
-N_CHECKS_MINIMO = 75
+N_CHECKS_MINIMO = 96   # +5 al merge di v383-v388 (il pavimento sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -780,6 +780,13 @@ check("v369 l'analisi dello scope sta davvero leggendo il record di fetch_symbol
 # una porta nuova — e' per questo che il controllo e' sull'ORDINE e non su una lista di campi:
 # una lista da tenere allineata a mano si disallinea, l'ordine no.
 _SRC_UD = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+
+# QUARTA VOLTA CHE UN GATE TROVA SE STESSO (v213, v240, v389, e ora qui). Il check
+# "nessun accesso posizionale nello storico" e' fallito su codice CORRETTO, perche' il
+# commento che spiega il difetto rimosso contiene per forza la costruzione rimossa.
+# Regola: chi cerca l'ASSENZA di una costruzione deve guardare il CODICE, non la prosa
+# che lo circonda. Chi ne cerca la PRESENZA puo' continuare a usare _SRC_UD.
+_SRC_UD_CODICE = "\n".join(r.split("#")[0] for r in _SRC_UD.splitlines())
 _i_scrub = _SRC_UD.find("stats = scrub_cross_currency_stats(")
 _i_ps = _SRC_UD.find('stats["ps"] =')
 check("v367 P/S ed EV/S calcolati DOPO la ripulitura cross-currency (SK hynix: KRW vs USD)",
@@ -822,6 +829,94 @@ _coda = _srcU[_srcU.rindex("OUT.write_text"):]
 check("il riassunto si stampa in fondo al run, non solo in caso di fallimento",
       "_RUMORE_YF.righe" in _coda and "_RUMORE_YF.riassunto()" in _coda)
 
+# ══ v390 — LE TRE FONTI NUOVE, E IL GATE CHE LE SORVEGLIA ═══════════════════════════════
+# ⚠ La lezione delle news di v389 e' costata la vita intera della funzionalita': una fonte che
+# nessun check guarda puo' morire il giorno in cui nasce. Questi check nascono insieme al codice.
+
+# l'import mancante che ha tenuto morte le news: non deve poter tornare
+check("v390 ogni modulo usato da update_data.py e' importato",
+      all(f"\nimport {m}\n" in _SRC_UD or f"\nfrom {m} " in _SRC_UD
+          for m in ("html", "csv", "json", "re", "sys", "time")))
+
+check("v390 SEC EDGAR: si cercano gli 8-K con item 2.02, non un form qualsiasi",
+      '"2.02" in (it or "")' in _SRC_UD and 'f == "8-K"' in _SRC_UD)
+
+# ⚠ misurato su MSTR: deposita 8-K/2.02 fuori dal ciclo e la mediana crolla a 67 giorni,
+# producendo un'attesa sbagliata di 24. Fuori banda non si pubblica nulla.
+check("v390 SEC EDGAR: la cadenza si pubblica solo se e' plausibilmente trimestrale",
+      "if 80 <= _cad <= 100:" in _SRC_UD
+      and '"cadenza_irregolare_gg"' in _SRC_UD)
+
+check("v390 SEC EDGAR: gli emittenti esteri finiscono in un elenco dichiarato, non nel nulla",
+      '"senza_8k": esteri' in _SRC_UD and "esteri.append(_tk)" in _SRC_UD)
+
+# SEC chiede uno User-Agent identificabile e meno di 10 richieste al secondo
+check("v390 SEC EDGAR: User-Agent identificabile e passo rispettato",
+      "SEC_UA" in _SRC_UD and "time.sleep(0.12)" in _SRC_UD)
+
+# ⚠ la prima stesura tagliava su "SEC EDGAR", che compare gia' nel commento di testa: la
+# finestra finiva prima del codice e il check falliva su codice corretto. Si ancora al CODICE.
+check("v390 la lista dei titoli per EDGAR viene da load_holdings, non da un elenco scritto a mano",
+      "_, _wl_sec, _ = load_holdings()" in _SRC_UD
+      and "for _tk in sorted(_seguiti):" in _SRC_UD)
+
+check("v390 credito banche: SLOOS e NFCI arrivano con la loro data e la loro serie",
+      '"serie": "DRTSCILM"' in _SRC_UD and '"serie": "NFCI"' in _SRC_UD
+      and 'macro["credito_banche"]' in _SRC_UD)
+
+check("v390 BCE: la serie e' dichiarata nel campo fonte, non solo nel codice",
+      "MRR_FR" in _SRC_UD and '"fonte": "BCE Data Portal' in _SRC_UD)
+
+# ⚠ le tre fonti entrano nel gate di qualita' INSIEME al codice che le scarica
+check("v390 le tre fonti nuove sono sorvegliate da validate_macro",
+      all(k in _SRC_UD for k in ('add("sec_calendario"', 'add(f"credito_{_k}"', 'add("bce"')))
+
+# ═══ v393 — L'ANNO SU ANNO SI AGGANCIA ALLA DATA, NON ALLA POSIZIONE ═══════════════════
+# Il difetto vero: `series[-1] / series[-13]` conta TREDICI POSIZIONI e le chiama dodici mesi.
+# CPIAUCSL ha un buco a ottobre 2025 (il BLS non ha pubblicato quel mese), quindi la base
+# cadeva su giugno 2025 invece che su luglio e il pacchetto stampava "CPI 3,5%" dove l'anno su
+# anno vero e' 3,3%. Nove punti consecutivi dello storico, tutti gonfiati.
+#
+# ⚠ IL CHECK NON VERIFICA UN NUMERO ATTESO, VERIFICA UNA PROPRIETA' CHE IL DIFETTO VIOLA PER
+# COSTRUZIONE: su una serie con un buco, il risultato deve coincidere col rapporto fra le due
+# osservazioni giuste PER DATA. Nessuna implementazione posizionale la soddisfa per caso.
+# (E' la lezione v326: i valori attesi si possono sbagliare insieme al codice.)
+_SERIE_CON_BUCO = ([(f"2025-{m:02d}-01", 100.0 + m) for m in range(1, 10)]      # gen-set 2025
+                   + [(f"2025-{m:02d}-01", 100.0 + m) for m in (11, 12)]        # ottobre MANCA
+                   + [(f"2026-{m:02d}-01", 120.0 + m) for m in range(1, 8)])    # gen-lug 2026
+_ATTESO = round((127.0 / 107.0 - 1) * 100, 1)      # lug 2026 su lug 2025, per DATA
+
+check("v393 l'a/a su una serie BUCATA usa la base giusta per data (non la 13a posizione)",
+      ud._var_per_data(_SERIE_CON_BUCO, 12)[0] == _ATTESO)
+
+check("v393 e dichiara che sono dodici mesi veri quando la base esatta c'e'",
+      ud._var_per_data(_SERIE_CON_BUCO, 12)[2] == 12)
+
+# ⚠ il caso in cui la base esatta NON esiste: non si tace e non si approssima in silenzio,
+# si dichiara la distanza vera cosi' chi stampa puo' scrivere "su 13 mesi" invece di "a/a".
+_SENZA_BASE = [(d, v) for d, v in _SERIE_CON_BUCO if d != "2025-07-01"]
+check("v393 base assente: ritorna la distanza REALE invece di spacciarla per un anno",
+      ud._var_per_data(_SENZA_BASE, 12)[2] == 13)
+
+# una serie senza buchi deve dare esattamente quello che dava prima: la correzione non
+# muove i numeri gia' giusti (verificato sui dati veri: PCE resta 3,7%).
+_SERIE_PIENA = [(f"{a}-{m:02d}-01", 100.0 + (a - 2025) * 12 + m)
+                for a in (2025, 2026) for m in range(1, 13)][:19]
+check("v393 su una serie SENZA buchi il risultato non cambia",
+      ud._var_per_data(_SERIE_PIENA, 12)[0]
+      == round((_SERIE_PIENA[-1][1] / _SERIE_PIENA[-13][1] - 1) * 100, 1))
+
+check("v393 anche lo STORICO si aggancia alla data, non all'indice",
+      "per_data.get(_mese_meno(d, indietro))" in _SRC_UD
+      and "s[i - 12]" not in _SRC_UD_CODICE)
+
+# ⚠ seconda causa, indipendente dalla prima: il BLS titola l'a/a sulla serie GREZZA.
+check("v393 il CPI a/a esce dalla serie NON destagionalizzata, come il titolo del BLS",
+      'fred_series("CPIAUCNS")' in _SRC_UD and 'bls_series("CUUR0000SA0")' in _SRC_UD
+      and 'fred_series("CPIAUCSL")' not in _SRC_UD)
+
+check("v393 lo storico del CPI segue la stessa serie del valore",
+      '("cpi",      "CPIAUCNS",' in _SRC_UD)
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

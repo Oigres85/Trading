@@ -53,6 +53,33 @@
 > non sono ovvie dal codice e che, se ignorate, rompono il sistema. Aggiornalo quando prendi
 > una decisione strutturale nuova.
 
+## 🚦 FLUSSO DI CONSEGNA — si lavora su `main`, e la PR si unisce sempre
+
+Istruzione permanente del CEO (02/09/2026), testuale: *"Unisci sempre la pr e lavora
+direttamente sul ramo principale affinché le modifiche siano sempre committate e subito
+online"*. Nasce da un guasto concreto: il lavoro dalla v375 alla v379 era committato su un ramo
+di lavoro e **la pagina viva restava indietro**, perché GitHub Pages serve `main` e nessun altro
+ramo. *Un commit che non è su `main` non è online, per quanti gate abbia passato.*
+
+Quindi: si sviluppa e si committa **su `main`**, si pusha subito, e se per qualunque ragione
+nasce una PR **la si unisce** invece di lasciarla aperta.
+
+> ⚠⚠ **E QUINDI NON C'È PIÙ UN PUNTO DI CONTROLLO DOPO LA SCRITTURA.** Con la PR, la CI girava
+> *fra* il push e la pubblicazione. Su `main` il push **è** la pubblicazione: la CI trova gli
+> errori quando il CEO può già aver aperto la pagina. La rete che è caduta va ricostruita
+> **prima** del push, ed è tutta la lista di "✅ Prima di ogni commit" più il gate di render —
+> non un sottoinsieme scelto a occhio, perché la classe di difetto che uccide la pagina
+> (`allocGrafMode is not defined`, v238) passa `node --check` e 219 check su 220.
+>
+> È la stessa lezione del `.githooks/pre-commit`, che esiste proprio per chiudere la finestra
+> fra la modifica e il push: ora quella finestra dà **direttamente sulla produzione**.
+> Attivarlo, una volta per macchina: `git config core.hooksPath .githooks`
+
+⚠ `main` riceve anche i commit del CI (`Aggiornamento dati …`, ~ogni 30 minuti): **prima di
+ogni push** serve `git pull --rebase origin main`. Sui conflitti in `data/data.json` vince la
+versione remota fresca — i calcoli si rifanno al run successivo.
+
+
 ## 🔁 Esercizio ricorrente: "check del prompt AI applicato a te stesso"
 
 L'utente chiede periodicamente di generare il prompt reale e di ESEGUIRLO su di sé (simulare
@@ -1521,6 +1548,514 @@ molto debole sovraperformano invece di sottoperformare), e le operazioni annotat
 a valore positivo su **2 su 8**. Non è una profezia: è il curriculum misurato di chi la
 pronuncerebbe. **Un track record negativo taciuto è la peggiore forma di ancoraggio**, perché
 lascia intatta la fiducia togliendo le prove che la sosterrebbero.
+## 📰 v389 — LE NEWS ERANO MORTE DALLA NASCITA, E NESSUNO POTEVA ACCORGERSENE
+
+`import html` **non c'era** in `scripts/update_data.py`. Tutte e tre le fonti RSS morivano con
+`NameError: name 'html' is not defined` dentro il loro `try/except` per-fonte, `macro["news"]`
+non veniva **mai** scritto, e il blocco del pacchetto che pubblica i titoli — condizionato
+all'esistenza di quella chiave — **spariva in silenzio**.
+
+Il CI lo stampava a **ogni run**, tre righe identiche, dal giorno in cui la funzionalità è nata
+(v304). Nessuno le leggeva, perché la pipeline **usciva 0**: un `except` per-fonte trasforma un
+import mancante in un avviso su `stderr`, e un avviso su stderr in un job verde è invisibile.
+
+> **Un `try/except` per-fonte non protegge la funzionalità: la spegne in silenzio.** E i dodici
+> check di `validate_macro` guardavano tutti altrove — dodici sorveglianti e una fonte scoperta.
+
+Tre correzioni, e la terza è quella che conta:
+1. l'import (una riga);
+2. la finestra passa da 6 a **8 ore**, come chiesto dal CEO;
+3. **il ramo `else` che non esisteva**: senza `macro.news` il pacchetto non nominava affatto le
+   notizie. *"Nessuna riga sull'argomento" e "nessuna notizia" sono due cose diverse, e l'LLM non
+   può distinguerle.* Ora dichiara il buco e lo chiama **dato MANCANTE, non dato negativo**.
+4. `news_macro` entra in `validate_macro` → alert → warning nel CI. ⚠ La soglia è a **48 ore**,
+   non alle 8 della finestra: zero notizie in 8 ore di domenica è un fatto sul mondo, zero in due
+   giorni è quasi sempre la fonte. Provato su quattro scenari (feed caduto, vivo, fermo da 5
+   giorni, date illeggibili).
+
+**Fuori finestra non si tace, si dichiara l'età.** La v306 rispondeva "NESSUNA" e si teneva in
+tasca una dichiarazione del presidente della Fed sull'inflazione di 17 ore. La finestra serve a
+**pesare** una notizia, non a nasconderla.
+
+## 📊 v389 — LA DIAGONALE È USCITA: la quarta forma respinta, e stavolta si sapeva già
+
+Il CEO: *"Peso contro contributo al rischio — sopra la diagonale la posizione porta più varianza
+del suo peso · cambia grafico così non lo capisco"*. Per leggere quello scatter bisognava sapere
+che i due assi hanno la stessa unità, che la bisettrice è il luogo peso==rischio, e che la
+distanza da quella retta è il messaggio: **tre nozioni prima di poter guardare**.
+
+Barra → quadrante → ragnatela → **scatter con diagonale**. La regola era già scritta in questo
+file e l'ho pagata lo stesso: *un grafico che va spiegato non è un grafico leggibile*.
+
+La forma nuova non è uno scatter rifinito: la grandezza disegnata **è già la differenza**
+(`rischio% − peso%`), in punti percentuali, in barre che divergono da zero — la stessa famiglia
+della rotazione settoriale, che il CEO legge senza istruzioni. Non c'è niente da decodificare
+perché **il numero È la risposta**.
+
+⚠ E il taglio ha **dichiarato un denominatore che prima spariva**: SKHY non ha abbastanza sedute
+in comune, quindi il suo peso non è dentro quei 100%. Prima veniva escluso in silenzio.
+⚠ Il gate nuovo ha trovato **8 righe di CSS morto** (`.mappa-rischio`) che avevo lasciato dietro.
+
+## 🏦 v389 — LA DISCIPLINA DI RISCHIO: nove regole, e ognuna dichiara di essere una convenzione
+
+Richiesta del CEO: *"ampia sezione in chiusura di risk management con regole di hedge fund privato
+growth"*. Vive in `disciplinaRischio()`, **una funzione sola** che alimenta sia la sezione di
+pagina sia il blocco del pacchetto: due implementazioni della stessa domanda divergono, ed è già
+costato tre volte (v161, v207, v316).
+
+> ⚠⚠ **OGNI SOGLIA È UN'AFFERMAZIONE, NON UN DATO.** Nel file non esiste nessun limite di
+> concentrazione, nessun tetto di drawdown, nessuna soglia di liquidità. È la lezione v240 — le
+> tacche inventate su un asse — applicata a un intero framework. Ogni riga separa in modo
+> esplicito la **MISURA** (dal libro), la **SOGLIA** (dal mestiere, con la provenienza scritta) e
+> lo **STATO** (solo il confronto fra le due).
+
+⚠ **"OLTRE" non vuol dire "sbagliato"**, e il pacchetto lo dice dove pubblica lo stato: un fondo
+growth concentrato sta fuori da quasi tutte queste soglie **per costruzione**. Senza quella riga
+l'LLM scrive l'analisi facile — "il libro è troppo concentrato, riduci" — che è un ordine
+costruito su tre dati che il sistema non ha.
+
+**La regola che NON morde vale quanto le altre.** La liquidità di uscita: la posizione meno
+liquida si chiude in meno di un decimo di seduta. Dirlo — e dire che è stata *misurata*, non
+assunta — vale più che applicare a forza una disciplina che qui non vincola.
+
+⚠ **Un'autonomia di "1022,6 mesi" è aritmeticamente giusta e comunicativamente falsa**: oltre i
+cinque anni il numero non porta più informazione e fa dubitare di tutto il blocco.
+
+### Il gate di coerenza ha avuto ragione due volte, e la seconda era architetturale
+C9 ha trovato **6 imperativi** che avevo scritto nella coda. Quattro erano prosa da riscrivere.
+Il quinto era il **divieto di dimensionare**, ed è il caso interessante: è un *ordine*, e gli
+ordini vivono nella testata — ripeterlo nel payload è la duplicazione testata/coda già pagata in
+v156, v179, v180. Nella coda resta il **fatto** che rende sensato il divieto: i tre dati che il
+sistema non ha. E il mio check che *pretendeva* il divieto nella coda è stato riagganciato: un
+check che chiede un'istruzione nel payload mette in conflitto due gate e vince quello scritto per
+ultimo.
+
+## 🧪 v389 — TRE GATE RIAGGANCIATI, E UNO AVEVA UN BUCO CHE NON SAPEVO
+
+- **`/analista macro/`** — nona volta che un check ancorato a una **stringa letterale** si rompe
+  su una riformulazione senza che manchi niente. Riagganciato a tre proprietà.
+- **La tesi contraria "ultima"** — il check scorreva fino in fondo al pacchetto, quindi qualunque
+  riga di *dati* che cominci con `N) ` lo faceva fallire. I blocchi da consegnare vivono nelle
+  **istruzioni**: cercarli nel payload è misurare la regione sbagliata.
+- ⚠⚠ **E lì ho trovato un buco vero**: la classe `\d` copriva **una cifra sola**, quindi un
+  decimo blocco (`10) `) non faceva scattare il gate. L'ho scoperto perché la mia prima iniezione
+  usava proprio `10)` ed era **verde per una ragione che non c'entrava col difetto**.
+  > **L'iniezione va scelta fra i casi che il gate DEVE prendere, non fra quelli comodi.** Una
+  > validazione che passa per il motivo sbagliato certifica una protezione che non esiste.
+- **E un gate trovava una chiamata COMMENTATA**: iniettando `// renderDisciplinaRischio();`
+  restava verde mentre la sezione non veniva più disegnata. La scansione deve togliere i commenti
+  (v213, v240) — terza incarnazione della stessa trappola.
+
+⚠ Ripetuta anche la svista dei **backtick dentro un template literal**: `modifica_sicura` ha
+rifiutato la scrittura e il file è rimasto intatto. Lo strumento ha fatto esattamente il lavoro
+per cui esiste.
+
+## 📦 v389 — IL PACCHETTO MACRO NEGAVA DI AVERE IL LIBRO
+
+La testata diceva testualmente *"Non hai davanti nessun portafoglio"*. Era vero nella v256, quando
+le posizioni non esistevano nel sistema; è diventato **falso nella v307** e nessuno ha riallineato
+il testo per ottantadue versioni.
+
+> **Un pacchetto che dichiara di non avere una cosa che ha è peggio di uno che tace**: manda l'LLM
+> a rifiutare *esplicitamente* il collegamento fra macro e libro, che è l'unico collegamento per
+> cui quel pacchetto viene letto.
+
+Ora entrambi i percorsi portano il libro. E il blocco del libro pubblica **tecnica e fondamentali
+di ogni posizione**, non solo peso e guadagno: senza medie, RSI, distanza dal massimo e forza
+relativa, l'unica misura disponibile sulle altre dodici posizioni era il **guadagno dal carico**,
+cioè la misura che fa tenere i perdenti e vendere i vincitori.
+
+⚠ **Un multiplo prospettico negativo non è un multiplo basso**: `-75,7×` si legge come "costa
+pochissimo". RGTI e CRWV ora dichiarano *utile atteso NEGATIVO*.
+⚠ E `signTxt` aggiunge già `%`: la forza relativa usciva `+5,2% pp`, due unità sulla stessa cifra.
+
+## 🔬 v389 — IL COLLAUDO DEI DATI, CHIESTO A CHI LEGGE
+
+Il CEO ha chiesto che congruità, affidabilità e **freschezza** siano verificate dall'LLM. Non è
+diffidenza verso il sistema: è che il pacchetto contiene dati **da uno a centoquaranta giorni** e
+usarli come se fossero tutti di oggi è il modo più comune di produrre un'analisi sbagliata con
+numeri giusti. Le tre verifiche hanno **protocolli diversi per classe di dato**, e l'esito va
+scritto in tre righe — *un collaudo che non lascia traccia non è distinguibile da un collaudo non
+fatto*.
+
+⚠⚠ **E DEVE STARE ANCHE NEL FALLBACK.** Precedente diretto in v331: `loadPromptHeaderCloud()` può
+fallire in silenzio, e allora vale `DEFAULT_PROMPT_HEADER`. *Un obbligo che dipende da una fetch
+non gestita non è un obbligo, è una speranza.* Il check l'ha preso subito.
+
+## ♻️ v389 — LA STESSA MISURA IN DUE BLOCCHI: dichiararla, non tagliarla
+
+Il libro e la disciplina pubblicano gli stessi numeri (peso del primo nome, gruppo correlato,
+scommesse effettive, drawdown): là sono il **fatto**, qui sono il **confronto con una soglia**.
+Tagliare avrebbe reso illeggibili le righe della disciplina, che senza la misura accanto alla
+soglia non dicono nulla.
+
+Si applica invece la regola che il pacchetto usa già per CPI/PCE e per il disaccoppiamento contro
+i profitti reali: **dichiarare che è lo stesso segnale**. Senza quella riga un lettore conclude
+che il libro è concentrato "per sei misure indipendenti", mentre sono le stesse guardate due volte.
+
+## 🎨 v389 — `--amber` era usato e mai definito
+
+`.diary-multi` rendeva **grigia** invece che ambra, per il fallback `var(--amber, var(--muted))`.
+Stessa classe delle cinque variabili della v206, rimasta aperta su un alias. Il giallo di avviso
+del progetto è già `--yellow`: l'alias ci punta, non introduce un secondo tono.
+
+## 🏛️ v390 — TRE FONTI NUOVE, E OGNUNA NASCE SORVEGLIATA
+
+La lezione della v389 è costata la vita intera di una funzionalità: **una fonte che nessun check
+guarda può morire il giorno in cui nasce**. Le tre nuove entrano nel gate di qualità *insieme* al
+codice che le scarica, non dopo il primo guasto.
+
+### SEC EDGAR — la data della trimestrale smette di essere solo una stima
+La regola più operativa della disciplina di rischio — *quanta parte del libro riprezza nella
+stessa finestra di tre settimane* — poggiava interamente su `earnings_date` di yfinance, che il
+pacchetto stesso dichiara una STIMA. **Una regola costruita su date stimate si sposta da sola.**
+
+L'8-K con **item 2.02** ("Results of Operations") è il deposito con cui la società comunica i
+risultati, e ha una data vera. Gratis, senza chiave. Ora ci sono **due derivazioni indipendenti**
+della prossima uscita — la stima di yfinance e la cadenza dei depositi veri — e dove esistono
+entrambe si prende **la più vicina**: una finestra di eventi si sottostima allontanando le date,
+mai avvicinandole. Dove divergono di più di una settimana, il pacchetto lo scrive.
+
+Misurato sul libro: **MRVL non aveva alcuna data** e EDGAR la fornisce; su GOOGL e NVDA le due
+derivazioni divergono di 8 giorni, e la finestra di rischio d'evento passa da 70,9% a 64,9%
+proprio perché una data si è spostata.
+
+> ⚠⚠ **LA CADENZA SI PUBBLICA SOLO SE È PLAUSIBILMENTE TRIMESTRALE (80-100 giorni).** Misurato su
+> MSTR: deposita 8-K/2.02 anche **fuori** dal ciclo (2025-10-06, 2025-07-07), la mediana crolla a
+> 67 giorni e l'attesa che ne uscirebbe sbaglia di **24 giorni**. Fuori banda si pubblica il
+> deposito e si tace sull'attesa — *un numero che sembra una misura e non lo è è peggio di nessun
+> numero* (v199).
+
+⚠ **Gli emittenti esteri non hanno l'8-K**: SK hynix e TSMC depositano 6-K e 20-F. Per loro EDGAR
+non risponde alla domanda, e va **dichiarato**: "nessuna data da EDGAR" e "nessuna trimestrale" si
+leggono uguali e sono cose diverse.
+
+### SLOOS e NFCI — chi presta, non solo quanto costa
+Il canale credito è quello che colpisce **prima** le partecipate che non si autofinanziano, e il
+sistema lo misurava con il solo spread high yield. **Uno spread è un PREZZO**: dice quanto il
+mercato chiede per prestare, non se le banche stiano prestando. Sono due domande diverse che
+possono rispondere in tempi diversi, e il pacchetto dichiara che **non sono una seconda conferma
+dello stesso segnale** ma l'altro lato del canale.
+
+> ⚠ **IL SEGNO DI SLOOS NON È INTUITIVO e va scritto ogni volta**: un valore NEGATIVO significa
+> che le banche stanno ALLENTANDO, cioè è la lettura favorevole. Pubblicare "-8,3" senza dirlo è
+> la classe del percentile invertito (v316), dove la lettura si ribaltava in silenzio.
+
+### BCE — il quadro macro era interamente americano
+Il CEO tiene un BTP da 40.000 euro nominali e vive in euro: il costo del denaro della sua valuta
+non era nel sistema. ⚠ È il tasso di **politica monetaria**, non il rendimento del BTP e non un
+secondo dato sui tassi americani — serve a leggere il differenziale con la Fed, che è il motore
+del cambio con cui ogni utile in dollari torna a casa.
+
+## 🕳️ v390 — UN RAMO CHE NESSUN GATE AVEVA MAI PERCORSO
+
+Aggiungendo il check sulle news, `data_quality` ha prodotto **il primo alert della storia del
+file**. E con quell'alert è comparso un blocco del payload che nessuno aveva mai visto: diceva
+*"PRIMO ORDINE OPERATIVO: usa OBBLIGATORIAMENTE la ricerca web…"* — cioè **istruzioni nella coda**,
+la violazione C9 che questo progetto ha già pagato tre volte. Il gate di coerenza non l'aveva mai
+trovata perché gira sul payload di un `data.json` **senza allarmi**.
+
+> **Un difetto in un ramo raro non è raro, è solo invisibile** (v190), e qui il ramo era
+> irraggiungibile *per i dati*, non per l'orologio.
+
+E i due blocchi erano anche **duplicati fra loro**: pubblicavano la stessa lista di chiavi
+mancanti con due formulazioni diverse. Ora la lista è una, e c'è un check che percorre il ramo
+degli allarmi apposta.
+
+## ⚰️ v390 — `log_verdict.mjs` FALLIVA A OGNI RUN DA v200, DIETRO UN `continue-on-error`
+
+Chiamava `decisionVerdict()` e `marketLinkText()`, rimosse col motore predittivo — tolto **sui
+numeri**: hit-rate 29%, sette punti peggio del Nasdaq. Da allora il passo del CI moriva a ogni
+esecuzione con `decisionVerdict is not defined`, e `continue-on-error: true` rendeva quel
+fallimento invisibile: **un job verde con un passo morto dentro**.
+
+> **Un errore coperto da una rete di sicurezza sopravvive quanto la rete.** È la stessa classe
+> dell'`import html` mancante, dove a coprire era un `try/except` per-fonte.
+
+Il campo che produceva (`verdict_track`) **non lo legge nessuno** — verificato con grep su tutto
+il repository. Il passo è stato ritirato; lo script resta dormiente con la sua lapide in testa.
+
+⚠ **`config/verdict_history.jsonl` NON è stato toccato**: 30 giorni di storia vera, che
+`backtest_diary.mjs` legge per affiancare a ogni operazione del CEO ciò che il sistema diceva quel
+giorno. Cancellarlo distruggerebbe delle prove — ed è la ricevuta del taglio scritta *prima*.
+
+## 📊 v391 — QUINTA FORMA, E IL RAPPORTO RISCHIO/RENDIMENTO OVUNQUE
+
+Barra 0-100 → quadrante → ragnatela → scatter con diagonale → barre divergenti → **due barre
+affiancate**. Il CEO ha chiesto di cambiare ancora, e questa è l'unica famiglia che il progetto
+ha già misurato come leggibile senza istruzioni (v333): *due barre affiancate non chiedono di
+decodificare una scala — si vede quale è più lunga, e quella È la risposta*.
+
+⚠ Il CSS delle barre gemelle (`.cbars`, `.f-peso`, `.f-mcr`) era **rimasto orfano** da quando
+entrò lo scatter: la forma buona era già in casa, dismessa.
+
+⚠ Il **rapporto rischio/rendimento** sta in fondo a ogni riga e NON è un terzo asse: misura
+un'altra cosa, e disegnarlo accanto a peso e rischio suggerirebbe che siano commensurabili.
+
+## 🔄 v391 — IL GRAFICO SEGUIVA IL PORTAFOGLIO SOLO A METÀ
+
+`salvaPosizioni()` scriveva su GitHub e diceva *"si aggiornano al prossimo giro della
+pipeline"*: per due-quattro ore la sezione del rischio mostrava il portafoglio **vecchio**
+mentre il CEO ne guardava uno nuovo.
+
+Ora i pesi si ricalcolano subito. Ma il pezzo che conta è quello che **non** si può ricalcolare:
+
+> ⚠⚠ Il **contributo al rischio** richiede la matrice di covarianza sulle serie complete.
+> Ricalcolarlo dalle `sparks` darebbe un numero **plausibile e divergente** da quello pubblicato
+> (v316). Meglio un dato dichiarato in ritardo che uno inventato in tempo.
+
+Quindi dopo una modifica le due barre descrivono due libri leggermente diversi, e la sezione **lo
+dichiara** invece di lasciarlo dedurre.
+
+⚠⚠ **E LA FRASE IN CIMA NON PUÒ POGGIARE SU UNA RIGA MEZZA VECCHIA.** Misurato: portando MU da
+70 a 20 quote, il peso scende dal 23% al 6,9% mentre il rischio resta il 34% della pipeline, e
+la frase annunciava *"+27,1 pp di rischio in più di quanto il suo peso lasci pensare"* — un
+numero che non misura niente, **nella riga più letta della sezione**. La nota sotto lo
+dichiarava, ma la nota non è la frase che si legge. Ora gli estremi si scelgono fra le righe
+coerenti, e se non ne restano abbastanza la frase dice che non c'è niente da dire.
+
+## 📐 v391 — IL R/R NON ESISTEVA SU UN TITOLO NUOVO, E MESCOLAVA DUE FONTI SU UNO SEGUITO
+
+L'**intero blocco tecnico** era condizionato alla riga della pipeline: per un titolo non seguito
+spariva tutto, rapporto rischio/rendimento compreso — ed è proprio ciò che il CEO chiede di
+vedere quando analizza un'azione nuova. E su un titolo seguito era peggio che assente:
+resistenza e supporto venivano **dal vivo**, prezzo e ATR **dallo snapshot** — due basi dentro
+lo stesso rapporto (classe v230).
+
+Ora `daVivo` decide per tutti e tre gli ingressi, e l'ATR si calcola dalle barre vive.
+
+> ⚠⚠ **NON si usano `hi`, `lo` e `chiusure`**: sono filtrati **indipendentemente** con `ok()`,
+> quindi una barra a cui manca il solo minimo accorcia `lo` e disallinea tutti gli indici — il
+> massimo di martedì finirebbe accanto al minimo di mercoledì. Misurato: 120 contro 119. È
+> l'allineamento per POSIZIONE invece che per data, la classe della v207. Si costruiscono terne
+> allineate e si scartano le barre incomplete.
+
+⚠ Si pubblica **solo ciò che le barre vive sostengono**: RSI, medie, forza relativa e
+fondamentali restano assenti su un titolo nuovo. Ricostruirli da 260 barre darebbe numeri che
+sembrano giusti e non lo sono (v316).
+
+## 🧪 v391 — TRE GATE MIEI ANCORATI ALLA FORMA, E UN'INIEZIONE CHE NON MORDEVA
+
+Le guardie della v389 pretendevano `barreOrdinate(pt.map` e una frase letterale: alla forma
+successiva sono fallite **su codice corretto** (decima e undicesima volta). Riagganciate al
+fatto: che lo scatter non torni, e che le posizioni escluse siano nominate — quest'ultima ora
+legge **l'HTML davvero prodotto**, non il sorgente.
+
+⚠⚠ E un'iniezione **non mordeva**: togliendo la chiamata da `salvaPosizioni` tutti i check
+restavano verdi, perché la invocavano *direttamente*. Il grafico sarebbe tornato a restare
+indietro — cioè il difetto segnalato dal CEO — con la suite verde. Aggiunto il check sul
+collegamento, che toglie i commenti prima di leggere.
+
+⚠ Un errore di render dentro `applicaPosizioniInLocale` risaliva fino al `catch` di
+`salvaPosizioni`, che avrebbe annunciato *"non sono riuscito a scrivere su GitHub"* su un
+salvataggio **riuscito**. Un messaggio che descrive il fallimento sbagliato manda a rifare
+un'operazione già fatta.
+
+## 📅 v392 — DUE FALSE CORREZIONI SU TRE, E VENIVANO DALLA STESSA RIGA
+
+Il CEO ha incollato il referto di un LLM reale sul pacchetto v375. Quel modello dichiarava **tre
+correzioni al sistema**: due erano **false**, e nascevano tutte e due dalla stessa forma.
+
+1. **PIL.** Leggeva `riferito a 01/04/2026` e annunciava: *"non è più un dato riferito al 1°
+   aprile: il BEA ha pubblicato la seconda stima del Q2 2026"*. Ma 01/04/2026 **è** il Q2 2026 —
+   è la convenzione FRED/BEA per cui una serie trimestrale porta la data del **primo giorno del
+   trimestre**. Ha corretto una cosa giusta, e ci ha speso una ricerca web.
+2. **Fondi monetari.** Leggeva `rilevazione 2026-07-01 — 61 giorni fa` e obiettava che *"il dato
+   è stato pubblicato il 25 agosto, quindi l'età dichiarata è sbagliata"*. Confondeva il
+   **periodo descritto** con la **data di pubblicazione** — che il pacchetto riporta già,
+   separatamente, in un altro campo.
+
+> **Un dato mensile o trimestrale non descrive un giorno: descrive un mese o un trimestre.**
+> Scriverlo come "01/04/2026" è formalmente esatto e **comunicativamente falso** — invita a
+> leggere una data puntuale dove c'è un periodo. È la famiglia del percentile scambiato per
+> variazione (v316): la forma del numero suggerisce la grandezza sbagliata.
+
+Ora il periodo si scrive per esteso: *"riferito al 2° trimestre 2026 (aprile-giugno)"*,
+*"riferito a luglio 2026"*. Il giorno resta solo dove il giorno **è** il periodo (serie
+giornaliere).
+
+### ⚠⚠ E correggendo l'ambiguità ho introdotto due volte una falsità precisa
+
+Vale più della correzione stessa, perché è la stessa classe che stavo chiudendo:
+
+- **Prima stesura**: ho appeso all'età la parentesi *"N giorni fa dalla fine del periodo
+  descritto, NON dalla pubblicazione"*. È **esattamente il contrario del vero**: `eta` conta i
+  giorni dall'USCITA, ed è una scelta deliberata annotata in v343. Trovata solo andando a
+  **leggere da dove `eta` è calcolata**, invece di assumerlo.
+- **Seconda stesura**, sui fondi monetari: *"il periodo descritto è finito 61 giorni fa"*. Falso:
+  quei 61 giorni partono dal **1° luglio**, cioè dall'INIZIO del mese. Luglio era finito da 30.
+
+Il rimedio non è stato scrivere una didascalia migliore: è stato **togliere il numero**. Il nome
+del mese si data da sé, e non ha un estremo da scegliere.
+
+> **Un numero che ha bisogno di una didascalia per non essere frainteso vale meno della parola
+> che lo rende inutile.**
+
+⚠ Il gate v350 pretendeva `riferito a GG/MM/AAAA` — una FORMA — ed è fallito su codice **più
+chiaro di prima** (dodicesima volta). Riagganciato all'invariante scritto nel suo stesso
+commento: le due date devono essere nominate e distinguibili, non avere un formato preciso.
+⚠ E il meta-gate dei backslash mi ha ripreso: `\d` dentro un template literal diventa `d`.
+
+### Cosa il referto ha CONFERMATO, oltre a quello che ha sbagliato
+Il modello ha dovuto cercarsi da solo la notizia macro dominante (il discorso del presidente
+della Fed sull'inflazione) — cioè esattamente uno dei titoli che il feed riparato in v389
+consegna già in coda. E ha sostituito le date stimate delle uscite con quelle confermate dalla
+fonte: è il lavoro che la v390 fa con SEC EDGAR. Due conferme indipendenti che quelle due
+correzioni servivano.
+
+## 🧮 v393 — L'INFLAZIONE PUBBLICATA ERA UN 13 MESI CHIAMATO "a/a"
+
+Il difetto più grave trovato in questa sessione, e stava nel numero che apre il quadro macro.
+
+`yoy(series)` faceva `series[-1] / series[-13]`: conta **tredici POSIZIONI** indietro e dà per
+scontato che siano dodici mesi. Lo sono solo se la serie non ha buchi — e **CPIAUCSL ha un buco a
+ottobre 2025**, il mese che il BLS non ha pubblicato.
+
+| | base usata | risultato |
+|---|---|---|
+| per POSIZIONE (il codice) | giugno 2025 | 332,813 / 321,435 = **3,54% → "CPI 3,5%"** |
+| per DATA (l'anno su anno vero) | luglio 2025 | 332,813 / 322,169 = **3,30%** |
+
+Non un punto solo: **nove punti consecutivi** dello storico, tutti gonfiati, da novembre 2025 in
+poi. E `UNRATE` ha lo stesso buco (lì il valore è `diretta`, quindi non ne soffre — ma ne
+soffrirebbe al primo calcolo di variazione).
+
+> **È la classe v207 — l'allineamento per POSIZIONE invece che per data — già pagata sui grafici
+> macro e di nuovo in v391 sulle barre OHLC filtrate indipendentemente. Qui stava nell'inflazione.**
+
+⚠ **Un LLM reale l'ha intercettato dall'ESITO e non dalla causa**: obiettava «il BLS titola 3,4%,
+voi 3,5%». Aveva ragione sul numero e non poteva vedere il perché.
+
+**Seconda causa, indipendente dalla prima**: il BLS titola l'anno su anno *on an unadjusted basis*,
+cioè sulla serie **grezza**. Noi usavamo la destagionalizzata. `CPIAUCNS` dà 3,36% → **3,4%**,
+esattamente il numero pubblicato. Le due correzioni insieme: 3,5% → **3,4%**.
+
+⚠ **Quando la base esatta manca non si tace e non si finge**: si prende la precedente più vicina e
+si restituisce la **distanza vera**, così chi stampa può scrivere "su 13 mesi" invece di "a/a".
+Far sparire l'inflazione per un mese sarebbe peggio del difetto. Nello **storico** invece il punto
+non si disegna: un buco non è uno zero, e nemmeno un valore approssimato (v205).
+
+## 📰 v393 — IL PACCHETTO CONTAVA LE NOTIZIE POST-CHIUSURA E POI LE NASCONDEVA
+
+La v389 aveva chiuso il caso "zero dentro la finestra" e lasciato aperto quello opposto: con anche
+UNA voce dentro le 8 ore, `mostra` conteneva solo quelle. Misurato sul run del 30/08: intestazione
+**«3 pubblicate DOPO l'ultima chiusura USA»**, corpo con **una voce sola**.
+
+Delle due taciute, una era *«Guggenheim Ties Weigh on Acrisure Debt, **Dragging High-Yield Credit
+Markets**»* — su un pacchetto la cui riga sul credito dice "HY OAS 2,63%, rilassato, percentile 0".
+**Il pacchetto teneva in tasca il titolo che contraddiceva la propria lettura del credito.**
+
+> **Dichiarare un numero e non mostrarne gli elementi è peggio che tacere entrambi**: chi legge sa
+> che esistono, non può vederli, e non ha modo di chiederli.
+
+⚠ Correggendolo ho dichiarato una seconda `nonPrezzate` — un ARRAY con lo stesso nome di un
+CONTEGGIO — dentro il ramo `else`. La riga di intestazione avrebbe interpolato degli oggetti. **Due
+variabili omonime con tipi diversi sono la classe v161/v207 in versione locale**: ora l'elenco è
+uno solo e il conteggio si ricava da lui.
+
+## 🇺🇸 v393 — UMICH: LA RIGA AFFERMAVA TRE COSE E DUE ERANO FALSE
+
+La pipeline legge UMich dalla **fonte primaria** (`sca.isr.umich.edu`) e ripiega su FRED solo se
+quella cade. Ma `CADENZA_FONTE` descriveva **sempre** il ripiego:
+
+- «rilevazione 01/08/2026 (29 giorni fa)» → il definitivo di agosto era uscito il **28**, due
+  giorni prima. E per di più nella forma a GIORNO che v392 aveva tolto altrove — perché il ramo
+  `stessoGiorno` di `rigaCadenza` **salta la resa a periodo**, ed è il buco della mia v392;
+- «prossimo atteso 28/10/2026» → su una serie **mensile**, un mese di troppo (`mesiRitardo`
+  mancante, come già per il Philly Fed);
+- «questo valore non è l'ultimo pubblicato» → **l'esatto contrario del vero**.
+
+> **Un pacchetto che diffama un proprio dato fresco è peggio di uno che lo tace**: manda chi legge
+> a cercare online una cosa che ha già in mano, e a diffidare del resto.
+
+`series_fallback` ora **registra chi ha servito**, l'indicatore lo porta, e la cadenza si sceglie
+da lì. È la regola già applicata allo storico ("lo storico esce dalla stessa fonte del valore")
+estesa all'etichetta e al calendario, che dalla fonte dipendono entrambi.
+
+## 📊 v393 — I TRE GRAFICI DELLA DISCIPLINA DI RISCHIO
+
+Richiesta del CEO: istogrammi e torte anche nella sezione di chiusura. **Nessuna primitiva nuova**:
+si riusano `barreOrdinate` e `ciambella`, le due famiglie che il progetto ha già misurato come
+leggibili senza istruzioni dopo cinque forme respinte.
+
+1. **Scostamento dalle soglie** — risponde alla domanda che la sezione stessa dichiara essere la
+   sua ("conta di QUANTO"), in punti percentuali;
+2. **Torta del fattore** — due fette, e la grande È la risposta (73,7% si muove insieme);
+3. **Calendario per mese** — l'unica regola con un asse temporale naturale.
+
+⚠⚠ **NON TUTTE LE REGOLE SONO DISEGNABILI INSIEME.** `valore` cambia unità da riga a riga:
+percentuali dell'azionario, un CONTEGGIO (2,3 scommesse), delle SEDUTE (liquidità), una percentuale
+con **un altro denominatore** (il drawdown è sul valore nel tempo). Nel grafico entrano solo le
+cinque che parlano la stessa lingua, e il renderer **dichiara quali sono rimaste fuori e perché**.
+Le altre non prendono un riempitivo (v233).
+
+⚠⚠ **E IL MIO PRIMO GATE ERA CIRCOLARE**: verificava che nel grafico ci fosse ciò che porta una
+`sogliaPct` — vero per costruzione. Iniettando una soglia sul drawdown il grafico se lo prendeva e
+**nessun check mordeva**. Ora ogni regola **dichiara la propria `unita`** e il filtro guarda quella:
+mescolare due denominatori diventa una bugia visibile invece di un effetto collaterale.
+> Quando un check non morde, la prima cosa da guardare non è il codice: è se la proprietà che
+> stai verificando può essere falsa.
+
+⚠ **Il grafico e la regola non danno lo stesso numero, e va DICHIARATO**: qui il raggruppamento è
+il mese di calendario, lì la finestra mobile di tre settimane più densa, che può stare a cavallo di
+due mesi. Affiancarli senza dirlo è "stessa grandezza con valori diversi".
+
+### `obar-prime` mandava il valore a capo, e nessuno l'aveva mai visto
+`.obar-prime` è `grid-column: 1 / -1`, cioè una riga intera: stando nel DOM **prima** di
+`obar-val`, l'auto-placement spingeva il valore in colonna uno della riga dopo. Il parametro
+`suggerimento` esisteva **dalla v302 e nessun chiamante lo passava**: la resa non era mai stata
+vista. È la classe v193 — codice vivo che non può manifestarsi — e si trova **guardando la pagina**,
+non rileggendo la funzione.
+
+## 🧪 v393 — TRE ERRORI DI METODO, TUTTI PRESI DAI META-GATE
+
+1. **`return true` anticipati** nel check delle notizie ("se lo snapshot non ha voci, passa"):
+   **verde per assenza di dati**, la trappola già pagata quattro volte. Il meta-gate dei check
+   dormienti l'ha presa subito. Ora le notizie si **iniettano**: il fenomeno c'è per costruzione.
+2. **Un'iniezione che non mordeva perché il caso non esisteva nei dati**: il check sui mesi vuoti
+   asseriva la contiguità, ma le trimestrali vere cadono in tre mesi consecutivi — comprimere o no
+   dava lo stesso risultato. Ora il gate **crea il buco** che deve rilevare (v234).
+3. **Quarta volta che un gate trova sé stesso**: il check "nessun accesso posizionale" falliva sul
+   commento che *spiega* l'accesso posizionale rimosso. Ora esiste `_SRC_UD_CODICE`, senza commenti:
+   **chi cerca l'ASSENZA di una costruzione guarda il codice, chi ne cerca la PRESENZA la prosa
+   va bene**.
+
+## 🔍 v393 — COSA HA TROVATO IL CONTROLLO DELLA PIPELINE, E COSA NO
+
+Verificata leggendo il log del run vero di "Rigenera" (`workflow_dispatch`), non simulandolo.
+
+**Funziona**: 17 fonti su 17 arrivano, `data_quality` le sorveglia tutte e 17 con **zero allarmi**,
+audit 0 violazioni, 36→18 voci di news da 3 fonti, SEC EDGAR 13 titoli, SLOOS/NFCI/BCE presenti.
+
+**Falsi allarmi da riconoscere a vista, per non riaprirli**:
+- `storico indicatori: 11/13 con serie` — **è voluto**: `curve` e `t30` prendono la serie da
+  `curve_history` e `tassi.storico.a30`, e duplicarla sarebbe la classe v295 (due copie della
+  stessa serie che divergono). Il messaggio invita a una diagnosi sbagliata: è un conteggio, non
+  un esito.
+- `audit: 0 ptf / 24 wl` — le posizioni vivono in `config/posizioni.json`, non nell'array
+  `portfolio` di `data.json`, che contiene solo il BTP.
+
+**Buco vero e chiuso**: `!! tasso BoJ scartato: osservazione del 2023-12-01` — lo scarto è giusto
+(mille giorni), ma la riga chiudeva con "rischio unwind se BoJ alza" **senza dire da quale
+livello**. Un rischio senza la sua ancora. Ora il buco si dichiara.
+
+## ✂️ v394 — IL NOME TRONCATO È IL MESSAGGIO PERSO
+
+I tre grafici della v393 erano verdi su tutti i gate e **quattro etichette su cinque uscivano
+tagliate a 1440px**: `Autofinanziamento delle partecipate` chiede 219px in una colonna da 132.
+A 375px era tagliato anche il nome della fetta grande della torta, che è *la risposta* del
+grafico. Nessun errore in console, nessun check rosso.
+
+`.obar-lab` e `.ciam-nome` troncano con l'ellissi perché altrove vivono in colonne strette e
+molto ripetute, dove troncare è giusto. Qui i nomi **sono le regole**: un grafico che dice *di
+quanto* e non fa leggere *di che cosa* ha perso metà della propria risposta. È la famiglia di
+`.abar-fill` senza `display:block` (v205) e del `</div>` orfano (v225) — **difetti che non si
+rompono**, e si trovano solo misurando `scrollWidth` contro `clientWidth` in un browser vero.
+
+⚠ **Si va a capo, non si allarga la colonna.** Una larghezza fissa nuova è la classe già pagata
+due volte: v192 (chip da 298px → documento a 598 su uno schermo da 375) e v209 (96px sulla
+colonna del valore → 44px di scorrimento orizzontale su tutta la pagina). Col ritorno a capo la
+cella non scende comunque sotto la parola più lunga, che nella colonna esistente ci sta.
 
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 

@@ -727,8 +727,15 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
   const src4 = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
   const m = src4.match(/const DEFAULT_PROMPT_HEADER = `([\s\S]*?)`;/);
   const testo = m ? m[1] : "";
+  /* ⚠ v389 — RIAGGANCIATO AL FATTO: cercava la stringa "analista macro", e la testata l'ha
+     persa quando e' diventata quella di un team di risk management di un fondo growth. E' la
+     NONA volta in questo progetto che un check ancorato a una stringa letterale si rompe su
+     una riformulazione senza che manchi niente (CLAUDE.md ne conta otto).
+     L'invariante vero e' triplo e nessuna delle tre parti e' una parola: la testata esiste ed
+     e' sostanziosa, dichiara di ricevere il QUADRO MACRO, e NON chiede di dimensionare. */
   check("v256 FALLBACK TESTATA: esiste, non è vuoto ed è scritto per un pacchetto MACRO",
-    testo.length > 400 && /analista macro/i.test(testo)
+    testo.length > 400 && /quadro macro/i.test(testo)
+    && /non dimension|niente quantita|non proporre operazioni/i.test(testo)
     && !/portafoglio del fondo|ordini a limite|stop dichiarato/i.test(testo));
   if (!(testo.length > 400)) console.log("  ⚠ fallback testata mancante o degenere");
 
@@ -2186,20 +2193,31 @@ check("v304 news: entrano solo con una data, e i forum restano vietati", suVeri(
    che si vede ogni fine settimana e molte mattine. Deve DIRE che non c'e' niente e quanto e'
    vecchia la piu' recente, perche' "non e' uscito niente di macro da mezza giornata" e' un
    fatto sul mondo, non un buco del sistema — e tacere lascerebbe l'LLM a dedurre. */
+/* ⚠⚠ v393 — QUESTO CHECK ERA UN FOSSILE VERDE PER DUE RAGIONI INSIEME, e le ho scoperte solo
+   quando il `data.json` sotto di lui e' tornato ad avere notizie:
+     1. cercava la stringa letterale "TITOLI MACRO DELLE ULTIME 6 ORE", che non esiste dalla
+        v389 (la finestra e' passata a otto ore e l'intestazione ha cambiato forma). E' la
+        TREDICESIMA volta che un check ancorato a una stringa si rompe in questo progetto;
+     2. usciva con `return true` quando `macro.news` mancava — e mancava SEMPRE, perche' le news
+        erano morte dalla nascita per l'`import html` assente. Cioe' il check che doveva
+        sorvegliare le notizie era verde proprio PERCHE' le notizie non funzionavano.
+   Ora e' agganciato al FATTO — entrambi i rami esistono e ciascuno dichiara cio' che deve — e i
+   due rami si ESERCITANO iniettando i dati, invece di sperare che lo snapshot li contenga. */
 check("v306 news: il pacchetto parla in entrambi i rami, fresche o nessuna", suVeri(`
-  const nw = (DATA.macro && DATA.macro.news) || null;
-  if (!nw || !(nw.voci || []).length) return true;
-  const p = buildPrompt();
-  const i = p.indexOf("TITOLI MACRO DELLE ULTIME 6 ORE");
-  if (i < 0) return false;
-  const blocco = p.slice(i, i + 1200);
-  const nessuna = blocco.indexOf("NESSUNO") >= 0;
-  if (nessuna) {
-    /* il ramo vuoto deve dichiarare l'eta' della piu' recente e che non e' un guasto */
-    return blocco.indexOf("piu' recente") >= 0 && blocco.indexOf("non un buco del sistema") >= 0;
-  }
-  return blocco.indexOf("SONO TITOLI, NON FATTI VERIFICATI") >= 0
-      && blocco.indexOf("non ha data di rilevazione") >= 0`));
+  const riga = (p) => p.split(String.fromCharCode(10)).find(x => x.indexOf("TITOLI MACRO") >= 0) || "";
+  DATA.macro = DATA.macro || {};
+  /* ramo PIENO: la riga deve dichiarare che sono titoli e non fatti verificati */
+  DATA.macro.news = { fonti: ["Prova"], filtro: "sintetico", voci: [
+    { titolo: "UNA-QUALSIASI", riassunto: "", fonte: "Prova",
+      quando: new Date(Date.now() - 36e5).toISOString() }] };
+  const pieno = riga(buildPrompt());
+  /* ramo VUOTO: deve dire che e' un dato MANCANTE, non un dato negativo */
+  DATA.macro.news = { fonti: ["Prova"], filtro: "sintetico", voci: [] };
+  const vuoto = riga(buildPrompt());
+  return pieno.indexOf("SONO TITOLI, NON FATTI VERIFICATI") >= 0
+      && pieno.indexOf("non ha data di rilevazione") >= 0
+      && vuoto.indexOf("MANCANTE") >= 0
+      && vuoto.indexOf("non come") >= 0`));
 
 /* ⚠⚠ v307 — LA SEZIONE NOTIZIE E' USCITA DALLA PAGINA su richiesta del CEO, un'ora dopo
    averla chiesta: con la finestra a sei ore che aveva fissato, misurata, dava ZERO. Il check
@@ -2215,10 +2233,15 @@ check("v307 news: il riquadro e' uscito dalla pagina", (() => {
   return src.indexOf("cal-news-lista") < 0 && html.indexOf('id="cal-news"') < 0;
 })());
 
+/* ⚠ stessa coppia di difetti del check qui sopra: stringa letterale piu' uscita anticipata.
+   Il fatto da sorvegliare e' che il pacchetto NOMINI le notizie, comunque sia formulato. */
 check("v307 news: ma restano nel pacchetto", suVeri(`
-  const nw = (DATA.macro && DATA.macro.news) || null;
-  if (!nw || !(nw.voci || []).length) return true;
-  return buildPrompt().indexOf("TITOLI MACRO DELLE ULTIME") >= 0`));
+  DATA.macro = DATA.macro || {};
+  DATA.macro.news = { fonti: ["Prova"], filtro: "sintetico", voci: [
+    { titolo: "RESTA-NEL-PACCHETTO", riassunto: "", fonte: "Prova",
+      quando: new Date(Date.now() - 36e5).toISOString() }] };
+  const p = buildPrompt();
+  return p.indexOf("TITOLI MACRO") >= 0 && p.indexOf("RESTA-NEL-PACCHETTO") >= 0`));
 
 /* ══ v305 — ANALISI DI UN SETTORE ═══════════════════════════════════════════════════════
    Richiesta del CEO dopo un'analisi esterna che ha portato. La struttura viene da quella —
@@ -4148,8 +4171,16 @@ check("v350 cadenza: il periodo rilevato e la data di pubblicazione sono NOMINAT
      il periodo RILEVATO all'eta' della PUBBLICAZIONE senza dire quale fosse quale */
   const righe = t.split("\\n").filter(l => /giorni fa\\)/.test(l) && /rilevazione |riferito a /.test(l));
   if (!righe.length) return true;
-  return righe.every(l => /riferito a \\d{2}\\/\\d{2}\\/\\d{4} · pubblicato ~\\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l)
-                       || /rilevazione \\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l));`));
+  /* ⚠ v392 — RIAGGANCIATO AL FATTO. La prima stesura pretendeva "riferito a GG/MM/AAAA",
+     cioe' una FORMA: quando il periodo di riferimento e' diventato un periodo per esteso
+     ("riferito al 2° trimestre 2026", "riferito a luglio 2026") il check e' fallito su codice
+     piu' chiaro di prima. Dodicesima volta in questo progetto.
+     L'invariante che v350 esiste per difendere e' scritto nel commento qui sopra: le due date
+     devono essere NOMINATE e distinguibili, cosi' che l'eta' si attacchi a quella giusta.
+     Il periodo per esteso lo soddisfa MEGLIO di una data puntuale, non peggio. */
+  return righe.every(l =>
+       (/riferito (a|al) /.test(l) && /pubblicato ~\\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l))
+    || /rilevazione \\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l));`));
 
 
 check("v350 pre/after: un prezzo di ieri non si chiama 'adesso'", (() => {
@@ -4703,8 +4734,20 @@ check("v360 rischio: la tesi contraria resta l'ULTIMO blocco anche dopo l'inseri
   const iR = p.indexOf("IL RISCHIO, dal lato del libro");
   const iC = p.indexOf("LA TESI CONTRARIA");
   /* il rischio entra come blocco 8 e la contraria diventa 9: l'invariante non e' il numero,
-     e' che la contraria venga per ULTIMA — dopo aver scritto un giudizio */
-  return iR > 0 && iC > iR && !/\\n\\d\\) /.test(p.slice(iC + 20));`));
+     e' che la contraria venga per ULTIMA — dopo aver scritto un giudizio.
+     ⚠ v389 — LA RICERCA SI FERMA ALLA FINE DELLE ISTRUZIONI. Prima scorreva fino in fondo al
+     pacchetto, quindi qualunque riga di DATI che cominci con "N) " la faceva fallire — ed e'
+     successo appena la disciplina di rischio ha pubblicato le sue regole numerate. I blocchi
+     da consegnare vivono nelle ISTRUZIONI: cercarli nel payload e' misurare la regione
+     sbagliata, la stessa classe del registro di posizioni fisse del red team (I6). */
+  const fine = p.indexOf("QUADRO MACRO DI RIFERIMENTO");
+  const istruzioni = fine > iC ? p.slice(iC + 20, fine) : p.slice(iC + 20);
+  /* ⚠ v389 — la classe di cifre copriva UNA cifra sola: un decimo blocco ("10) ") non faceva
+     scattare il gate, e l'ho scoperto provando a iniettare proprio quello. Ora una o piu' cifre.
+     Un gate si valida iniettando il difetto, e l'iniezione va scelta fra i casi che il gate DEVE
+     prendere, non fra quelli comodi: la prima che avevo scritto passava per una ragione che non
+     c'entrava col difetto, e avrebbe certificato una protezione che non c'era. */
+  return iR > 0 && iC > iR && !/\\n\\d+\\) /.test(istruzioni);`));
 
 check("v360 rischio: la pagina ha la sezione e il suo contenitore", (() => {
   const html = readFileSync(join(ROOT, "index.html"), "utf8");
@@ -4811,6 +4854,119 @@ check("meta: i check dormienti non aumentano (tetto TETTO_DORMIENTI, solo in dis
   finally { try { unlinkSync(tmp); } catch { /* gia' rimosso */ } }
   return n <= TETTO_DORMIENTI;
 })());
+
+/* ═══ v393 — I GRAFICI DELLA DISCIPLINA DI RISCHIO ═══════════════════════════════════════
+   ⚠ I check leggono l'HTML DAVVERO PRODOTTO, non il sorgente: in v226 un check che chiamava la
+   funzione pura direttamente era verde mentre la pagina disegnava uno spicchio fantasma. */
+check("v393 la disciplina di rischio disegna i tre grafici chiesti dal CEO", suVeri(`
+  const g = graficiDisciplina(disciplinaRischio());
+  const titoli = (g.match(/disc-graf-tit/g) || []).length;
+  const barre  = (g.match(/obar-row/g) || []).length;
+  const archi  = (g.match(/ciam-arco/g) || []).length;
+  return titoli === 3 && barre >= 5 && archi >= 2;`));
+
+/* ⚠⚠ LA PROPRIETA' CHE IL DIFETTO VIOLEREBBE PER COSTRUZIONE: nell'istogramma degli
+   scostamenti possono entrare SOLO regole misurate in percentuale dell'azionario. Mettere sullo
+   stesso asse le scommesse effettive (un conteggio), il drawdown (altro denominatore) o la
+   liquidita' (sedute) e' la classe "denominatori non dichiarati". Il check non conta le barre:
+   verifica che ogni riga disegnata abbia una soglia percentuale dichiarata dalla regola. */
+check("v393 nell'istogramma entrano solo le regole con lo STESSO denominatore", suVeri(`
+  const d = disciplinaRischio();
+  const per = (u) => d.regole.filter(r => r.unita === u).map(r => r.nome);
+  const disegnate = new Set(d.graf.scostamenti.map(s => s.nome));
+  /* tutte e sole le regole in percentuale dell'azionario stanno sull'asse */
+  const soloQuelle = d.graf.scostamenti.every(s => per("pct_azionario").includes(s.nome));
+  /* e nessuna delle altre unita' ci finisce: sono i denominatori che non si mescolano */
+  const altre = ["conteggio", "pct_valore_nel_tempo", "sedute"].flatMap(per);
+  const nessunaAltra = altre.length >= 3 && altre.every(n => !disegnate.has(n));
+  return soloQuelle && nessunaAltra && d.graf.scostamenti.length >= 2;`));
+
+/* i grafici e le righe devono essere LO STESSO numero: due derivazioni divergono (v161/v207) */
+check("v393 il grafico e la riga sotto di lui portano la stessa misura", suVeri(`
+  const d = disciplinaRischio();
+  return d.graf.scostamenti.every(s => {
+    const r = d.regole.find(x => x.nome === s.nome);
+    return r && Math.abs(r.valore - s.misura) < 1e-9
+             && Math.abs((r.valore - r.sogliaPct) - s.oltre) < 1e-9;
+  });`));
+
+check("v393 la torta del fattore nomina i titoli e somma a cento", suVeri(`
+  const f = disciplinaRischio().graf.fattore;
+  if (!f) return false;
+  return f.nomi.length >= 2 && f.nomi.every(n => typeof n === "string")
+      && Math.abs(f.dentro + f.fuori - 100) < 1e-6;`));
+
+/* ⚠ un mese senza trimestrali resta nell'asse: un buco fra due addensamenti e' informazione
+   quanto un picco, e toglierlo farebbe sembrare contigui due mesi che non lo sono. */
+/* ⚠⚠ IL GATE DEVE ESERCITARE IL RAMO, NON SPERARE CHE I DATI LO CONTENGANO. La prima stesura
+   asseriva la contiguita' sui dati veri — dove le trimestrali cadono in tre mesi CONSECUTIVI,
+   quindi comprimere o non comprimere dava lo stesso risultato e l'iniezione non mordeva: verde
+   per una ragione che non c'entrava col difetto. Qui il buco si CREA: due trimestrali a tre
+   mesi di distanza, e in mezzo devono comparire i mesi a zero. E' la lezione v234 — un ramo che
+   nessun test percorre non e' una protezione. */
+check("v393 il calendario tiene i mesi vuoti nell'asse invece di comprimerli", suVeri(`
+  const oggi = new Date();
+  const fra = (m) => new Date(oggi.getFullYear(), oggi.getMonth() + m, 15).toISOString().slice(0, 10);
+  DATA.macro = DATA.macro || {};
+  DATA.macro.sec_calendario = { per_titolo: {} };     // niente seconda derivazione a interferire
+  const az = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
+    .filter(r => r && Number(r.qta ?? r.qty) > 0 && Number(r.pmc) > 0
+                 && !/^BTP|^BOT|^CCT|^IT000/i.test(String(r.ticker)));
+  az.forEach((r, i) => { r.earnings_date = fra(i === 0 ? 1 : 4); });   // mese +1 e mese +4
+  const e = disciplinaRischio().graf.eventi;
+  if (!e) return false;
+  const t = e.map(x => Number(x.mese.slice(0, 4)) * 12 + Number(x.mese.slice(5, 7)));
+  const contigui = t.every((v, i) => i === 0 || v === t[i - 1] + 1);
+  const conBuco = e.filter(x => x.pct === 0).length >= 2;   // i due mesi in mezzo, a zero
+  return e.length === 4 && contigui && conBuco;`));
+
+check("v393 i grafici sono agganciati al renderer, non solo definiti", (() => {
+  /* ⚠ la scansione TOGLIE I COMMENTI: iniettando "// graficiDisciplina(d)" un check ancorato
+     al sorgente grezzo resterebbe verde mentre i grafici spariscono dalla pagina (v389). */
+  const codice = src.split(String.fromCharCode(10))
+    .map(r => r.replace(/^\s*\/\/.*$/, "")).join(String.fromCharCode(10));
+  return /\+\s*graficiDisciplina\(d\)/.test(codice);
+})());
+
+/* ═══ v393 — LE NOTIZIE NON ANCORA PREZZATE NON SI CONTANO PER POI NASCONDERLE ════════════
+   Il pacchetto dichiarava "3 pubblicate DOPO l'ultima chiusura" e ne mostrava UNA: le altre due
+   sparivano perche' fuori dalle 8 ore. Una di quelle taciute parlava di high yield in tensione,
+   cioe' contraddiceva la riga sul credito dello stesso pacchetto. */
+/* ⚠ IL FENOMENO CI DEVE ESSERE PER COSTRUZIONE. La prima stesura usciva con `return true`
+   quando lo snapshot non aveva voci post-chiusura: verde per ASSENZA DI DATI, non di difetti —
+   la trappola gia' pagata quattro volte in questo progetto, e il meta-gate dei check dormienti
+   l'ha intercettata subito. Qui le notizie si INIETTANO: una dentro la finestra e due appena
+   dopo l'ultima campana. Sotto il codice vecchio le due sparivano; sotto quello nuovo ci sono. */
+check("v393 ogni notizia non ancora prezzata compare nell'elenco, dentro o fuori finestra", suVeri(`
+  const ch = lastUsEquityCloseUTC();
+  const t = (ms) => new Date(ms).toISOString();
+  DATA.macro = DATA.macro || {};
+  DATA.macro.news = { fonti: ["Prova"], filtro: "sintetico", voci: [
+    { titolo: "DENTRO-LA-FINESTRA-8H", riassunto: "", fonte: "Prova", quando: t(Date.now() - 36e5) },
+    { titolo: "POST-CHIUSURA-UNO",     riassunto: "", fonte: "Prova", quando: t(ch.at.getTime() + 1000) },
+    { titolo: "POST-CHIUSURA-DUE",     riassunto: "", fonte: "Prova", quando: t(ch.at.getTime() + 2000) },
+  ] };
+  const p = buildPrompt();
+  return p.includes("DENTRO-LA-FINESTRA-8H")
+      && p.includes("POST-CHIUSURA-UNO")
+      && p.includes("POST-CHIUSURA-DUE");`));
+
+check("v393 UMich dichiara la fonte che ha SERVITO il dato, non una fissa", (() => {
+  const codice = src.split(String.fromCharCode(10))
+    .map(r => r.replace(/^\s*\/\/.*$/, "")).join(String.fromCharCode(10));
+  /* la voce del ripiego esiste, e la scelta passa dal campo `fonte` dell'indicatore */
+  return codice.includes("umich_fred:")
+      && /i\.fonte === "ripiego" \? "umich_fred" : i\.key/.test(codice)
+      && codice.includes("FONTE PRIMARIA (sca.isr.umich.edu)");
+})());
+
+check("v393 il calendario di UMich e' quello della primaria: stesso mese, non il mese dopo", suVeri(`
+  /* la primaria pubblica il definitivo negli ultimi giorni dello STESSO mese che misura.
+     Col vecchio mesiRitardo la riga annunciava il prossimo dato con un mese di ritardo. */
+  const r = rigaCadenza("umich", "2026-08-01");
+  return r.includes("riferito a agosto 2026")
+      && r.includes("prossimo atteso 28/09/2026")
+      && !r.includes("via FRED");`));
 
 /* ---------- report ----------
    ⚠ v205: questo blocco stava PRIMA degli ultimi tre gruppi di check (v196, v205, v204).
@@ -5292,6 +5448,475 @@ check("meta: nessun check registrato dopo il ciclo che conta i fallimenti", (() 
   if (prima < 300) return no(`visti solo ${prima} check prima del conteggio: la struttura non e' quella che credo`);
   return true;
 })());
+
+/* ══ v389 — LA DISCIPLINA DI RISCHIO, LE NEWS E IL GRAFICO PESO/RISCHIO ═══════════════════
+   ⚠ Tutti questi check girano sui dati VERI (suVeri), non sulla fixture: la fixture non ha
+   macro.indicators, non ha posizioni e non ha news, quindi NON CONTIENE il fenomeno da
+   misurare — e' l'errore fatto quattro volte in questo progetto, verde per assenza di dati. */
+
+check("v389 disciplina: ogni regola separa la MISURA dalla SOGLIA e dichiara la provenienza", suVeri(`
+  const d = disciplinaRischio();
+  if (!d || d.regole.length < 5) return false;
+  /* l'invariante non e' il numero di regole: e' che nessuna riga possa essere letta come un
+     dato del sistema quando invece e' una convenzione del mestiere */
+  return d.regole.every(r => r.nome && r.misura && r.soglia && r.provenienza && r.stato
+    && /CONVENZIONE/i.test(r.provenienza));`));
+
+check("v389 disciplina: nessuna regola dimensiona, e il divieto sta nella TESTATA non nella coda", suVeri(`
+  const t = disciplinaTesto();
+  if (!t) return false;
+  /* ⚠ v389 — RIAGGANCIATO DOPO CHE C9 HA AVUTO RAGIONE. La prima stesura pretendeva il divieto
+     DENTRO disciplinaTesto(), cioe' nel payload: ma il divieto e' un ORDINE, e gli ordini vivono
+     nella testata (v156/v179/v180). Un check che pretende un'istruzione nella coda mette in
+     conflitto due gate e vince quello scritto per ultimo.
+     L'invariante giusto e' doppio: la coda non propone quantita', e il PACCHETTO INTERO — che
+     comprende la testata — porta il divieto. */
+  const propone = /(vendi|compra|riduci|porta)\\s+(il\\s+)?\\d+([.,]\\d+)?\\s*(%|azioni|quote|€)/i.test(t);
+  const codaPulita = !propone && !/non dimensionare/i.test(t);
+  const macro = buildCIOText(), titolo = buildPromptTicker("NVDA");
+  const vietaMacro = /NON DIMENSIONATE|non dimensionare/i.test(macro);
+  const vietaTitolo = /In nessun caso dimensionare|non dimensionare/i.test(titolo);
+  /* e il fatto che rende sensato il divieto resta nella coda: i tre dati mancanti */
+  const treDati = /liquidita' disponibile[\\s\\S]{0,120}?situazione fiscale/i.test(t);
+  return codaPulita && vietaMacro && vietaTitolo && treDati;`));
+
+check("v389 disciplina: una soglia superata NON viene presentata come un errore del libro", suVeri(`
+  const t = disciplinaTesto();
+  /* e' la riga che impedisce l'analisi facile: un fondo growth concentrato sta fuori dalle
+     soglie per costruzione, e il pacchetto deve dirlo dove lo stato viene pubblicato */
+  return !!t && /NON SIGNIFICA CHE IL LIBRO SIA SBAGLIATO/.test(t)
+      && /PER\\s+COSTRUZIONE/i.test(t);`));
+
+check("v389 disciplina: pagina e pacchetto leggono LA STESSA misura, non due calcoli", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  /* due implementazioni della stessa domanda divergono (v161/v207/v316): entrambe le superfici
+     devono chiamare disciplinaRischio(), e la misura deve esistere in un posto solo */
+  const definizioni = (src.match(/^function disciplinaRischio\(/gm) || []).length;
+  const rende = /function renderDisciplinaRischio\([\s\S]{0,600}?disciplinaRischio\(\)/.test(src);
+  const testo = /function disciplinaTesto\([\s\S]{0,600}?disciplinaRischio\(\)/.test(src);
+  return definizioni === 1 && rende && testo;
+})());
+
+check("v389 disciplina: il gruppo di fattore si calcola in un posto solo", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  /* estratto da contestoPortafoglio in v389 proprio per non averne due copie */
+  return (src.match(/^function gruppoFattore\(/gm) || []).length === 1
+      && /contestoPortafoglio[\s\S]{0,4000}?gruppoFattore\(azionarie, totAz\)/.test(src);
+})());
+
+check("v389 disciplina: la sezione esiste in pagina e qualcuno la riempie", (() => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  /* v315: un contenitore nel markup senza chi lo riempie e' un blocco che non c'e' */
+  return /id="disc-corpo"/.test(html) && /data-sez="disciplina"/.test(html)
+      && /\$\("#disc-corpo"\)/.test(src)
+      /* ⚠ v389 — la prima stesura trovava anche una chiamata COMMENTATA: iniettando
+         "// renderDisciplinaRischio();" il gate restava verde mentre la sezione non veniva
+         piu' disegnata. E' la trappola del gate che trova se stesso, gia' pagata in v213 e
+         v240: la scansione deve togliere i commenti prima di leggere. */
+      && /^\s*renderDisciplinaRischio\(\);/m.test(src.slice(src.indexOf("renderCredito();")));
+})());
+
+check("v389 pacchetto macro: porta il libro, e non dichiara piu' di non averlo", suVeri(`
+  const p = buildCIOText();
+  /* la testata diceva "Non hai davanti nessun portafoglio" mentre le posizioni esistono dal
+     v307: un pacchetto che nega di avere una cosa che ha e' peggio di uno che tace */
+  return /IL LIBRO IN CUI QUESTA POSIZIONE VIVE|LA DISCIPLINA DI RISCHIO/.test(p)
+      && !/Non hai davanti nessun portafoglio/i.test(p);`));
+
+check("v389 news: la finestra e' di 8 ore, come chiesto", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  return /const ORE = 8;/.test(src);
+})());
+
+check("v389 news: senza feed il pacchetto DICHIARA il buco invece di tacere", suVeri(`
+  /* il difetto vero: macro.news assente -> il blocco spariva del tutto, e "nessuna riga
+     sull'argomento" e "nessuna notizia" sono due cose che l'LLM non puo' distinguere */
+  const salvato = DATA.macro.news;
+  delete DATA.macro.news;
+  const p = buildPrompt();
+  DATA.macro.news = salvato;
+  return /TITOLI MACRO DELLE ULTIME 8 ORE: IL SISTEMA NON NE HA/.test(p)
+      && /dato MANCANTE, non come un dato negativo/.test(p);`));
+
+check("v389 news: fuori finestra pubblica comunque le piu' recenti, con la loro eta'", suVeri(`
+  /* la v306 rispondeva "NESSUNA" e si teneva in tasca una dichiarazione del presidente della
+     Fed di 17 ore: la finestra serve a PESARE una notizia, non a nasconderla */
+  const salvato = DATA.macro.news;
+  const ora = Date.now();
+  const iso = (h) => new Date(ora - h * 3600000).toISOString().slice(0, 19) + "Z";
+  DATA.macro.news = { fonti: ["Fonte X"], filtro: "prova", voci: [
+    { titolo: "Titolo vecchio ma rilevante sulla Fed", riassunto: "", fonte: "Fonte X", quando: iso(17) },
+    { titolo: "Titolo ancora piu' vecchio sul lavoro", riassunto: "", fonte: "Fonte X", quando: iso(30) },
+  ] };
+  const p = buildPrompt();
+  DATA.macro.news = salvato;
+  return /0 dentro le ultime 8 ORE/.test(p)
+      && /Titolo vecchio ma rilevante sulla Fed/.test(p)
+      && /17h fa/.test(p);`));
+
+check("v389 news: dentro la finestra le pubblica e le conta", suVeri(`
+  const salvato = DATA.macro.news;
+  const ora = Date.now();
+  const iso = (h) => new Date(ora - h * 3600000).toISOString().slice(0, 19) + "Z";
+  DATA.macro.news = { fonti: ["Fonte X"], filtro: "prova", voci: [
+    { titolo: "Notizia macro appena uscita sui tassi", riassunto: "riassunto della fonte", fonte: "Fonte X", quando: iso(2) },
+    { titolo: "Altra notizia macro recente sul lavoro", riassunto: "", fonte: "Fonte X", quando: iso(5) },
+    { titolo: "Notizia fuori finestra sul credito", riassunto: "", fonte: "Fonte X", quando: iso(40) },
+  ] };
+  const p = buildPrompt();
+  DATA.macro.news = salvato;
+  return /2 dentro le ultime 8 ORE/.test(p)
+      && /Notizia macro appena uscita sui tassi/.test(p)
+      && /SONO TITOLI, NON FATTI VERIFICATI/.test(p);`));
+
+check("v389 peso/rischio: la diagonale non torna e la differenza resta gia' calcolata", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const css = readFileSync(join(ROOT, "assets", "style.css"), "utf8");
+  /* ⚠ v391 — RIAGGANCIATO. La prima stesura pretendeva `barreOrdinate(pt.map`, cioe' UNA
+     implementazione: alla forma successiva (barre gemelle, chiesta dal CEO) e' fallita su
+     codice corretto. E' la decima volta in questo progetto che un check ancorato alla forma
+     invece che al fatto si rompe su una riformulazione.
+     L'invariante vero non e' "quale grafico": e' che lo scatter con la diagonale — la forma che
+     il CEO non riusciva a leggere — non torni, e che la DIFFERENZA fra peso e rischio sia
+     calcolata dal sistema invece di essere lasciata da stimare a occhio. */
+  return !/class="mappa-rischio"/.test(src) && !/class="diag"/.test(src)
+      && !/\.mappa-rischio/.test(css)
+      && /gap: mcr - peso/.test(src);
+})());
+
+check("v389 peso/rischio: le posizioni fuori dal calcolo vengono NOMINATE, non tolte in silenzio", suVeri(`
+  /* ⚠ v391 — girava sul SORGENTE cercando una frase, e la frase e' cambiata con la forma del
+     grafico. Ora gira sull'HTML DAVVERO PRODOTTO da renderRischio sui dati veri: SKHY non ha
+     abbastanza sedute in comune, quindi il suo peso non e' dentro i 100% e il nome deve
+     comparire. Un check che legge il sorgente certifica cio' che c'e' scritto; uno che legge
+     l'uscita certifica cio' che l'utente vede. */
+  let html = "";
+  const vero = document.querySelector;
+  document.querySelector = (sel) => String(sel) === "#rischio-mappa"
+    ? { set innerHTML(v) { html = v; }, get innerHTML() { return html; } }
+    : vero(sel);
+  try { renderRischio(); } finally { document.querySelector = vero; }
+  const senzaMcr = (DATA.watchlist || []).filter(r => r && r.qta > 0 && r.controvalore > 0
+    && !Number.isFinite(Number(r.risk_contrib_pct))).map(r => r.ticker);
+  if (!senzaMcr.length) return true;   /* niente esclusi: niente da dichiarare */
+  return senzaMcr.every(t => html.includes(t)) && /non e' nel calcolo|non sono nel calcolo/.test(html);`));
+
+check("v389 collaudo: ENTRAMBI i pacchetti chiedono freschezza, congruita' e affidabilita'", suVeri(`
+  /* richiesta esplicita del CEO: le tre verifiche devono essere chieste a chi legge, non
+     assunte. E devono valere per tutti e due i percorsi, non solo per quello del titolo. */
+  const macro = buildCIOText(), titolo = buildPromptTicker("NVDA");
+  const chiede = (p) => /FRESCHEZZA/.test(p) && /CONGRUITA'/.test(p) && /AFFIDABILITA'/.test(p)
+                     && /COLLAUDO DEI DATI/i.test(p);
+  return chiede(macro) && chiede(titolo);`));
+
+check("v389 collaudo: l'esito va SCRITTO, non solo eseguito", suVeri(`
+  /* un collaudo che non lascia traccia non e' distinguibile da un collaudo non fatto: la
+     regola vale solo se il pacchetto chiede di riportarne l'esito */
+  const macro = buildCIOText(), titolo = buildPromptTicker("NVDA");
+  const traccia = (p) => /non e' distinguibile da un collaudo non fatto/.test(p);
+  return traccia(macro) && traccia(titolo);`));
+
+check("v389 libro: ogni posizione porta tecnica E fondamentali, non solo peso e guadagno", suVeri(`
+  const p = buildPromptTicker("MU");
+  const b = p.slice(p.indexOf("TECNICA E FONDAMENTALI DI OGNI POSIZIONE"));
+  if (!b) return false;
+  /* il difetto che questo blocco chiude: senza questi numeri l'unica misura disponibile sulle
+     altre posizioni era il guadagno dal carico, che e' quella che fa tenere i perdenti */
+  return /RSI /.test(b) && /dal massimo 52s/.test(b) && /forza relativa 1M/.test(b)
+      && /medie: /.test(b) && /ricavi /.test(b)
+      && /P\\/E prospettico|utile atteso NEGATIVO/.test(b);`));
+
+check("v389 libro: un multiplo prospettico negativo non si stampa come multiplo basso", suVeri(`
+  const p = buildPromptTicker("MU");
+  const b = p.slice(p.indexOf("TECNICA E FONDAMENTALI DI OGNI POSIZIONE"));
+  /* RGTI e CRWV hanno forward_pe negativo: "-75,7×" si leggerebbe come "costa pochissimo" */
+  return /utile atteso NEGATIVO/.test(b) && !/P\\/E prospettico -/.test(b);`));
+
+check("v389 libro: la forza relativa porta i PUNTI PERCENTUALI, non due unita'", suVeri(`
+  const p = buildPromptTicker("MU");
+  /* signTxt aggiunge gia' "%": "+5,2% pp" sarebbe due unita' sulla stessa cifra */
+  return / pp vs /.test(p) && !/% pp vs /.test(p);`));
+
+check("v389 disciplina: dichiara di riusare le misure del libro, per non farle contare due volte", suVeri(`
+  const p = buildPromptTicker("MU");
+  /* le stesse misure compaiono nel blocco del libro e nella disciplina: senza la dichiarazione
+     un lettore le conta come prove indipendenti. E' la regola B3 del pacchetto (contare i
+     segnali una volta sola) applicata al libro invece che alla macro. */
+  const iLibro = p.indexOf("IL LIBRO IN CUI QUESTA POSIZIONE VIVE");
+  const iDisc = p.indexOf("LA DISCIPLINA DI RISCHIO DI UN FONDO GROWTH");
+  return iLibro > 0 && iDisc > iLibro
+      && /SONO LE STESSE DEL BLOCCO DEL LIBRO/.test(p)
+      && /Contale UNA VOLTA SOLA/.test(p);`));
+
+/* ══ v390 — LE FONTI NUOVE, E IL RAMO CHE NESSUN GATE AVEVA MAI PERCORSO ═══════════════ */
+
+check("v390 EDGAR: il deposito passato e' un FATTO, la data futura resta una stima", suVeri(`
+  const salvato = DATA.macro.sec_calendario;
+  DATA.macro.sec_calendario = { per_titolo: { MU: {
+    ultimo_deposito: "2026-06-24", n_depositi: 36, cadenza_gg: 91, attesa_da_cadenza: "2026-09-23" } },
+    senza_8k: [], senza_cik: [], fonte: "SEC EDGAR" };
+  const p = buildPromptTicker("MU");
+  DATA.macro.sec_calendario = salvato;
+  /* la distinzione che il blocco esiste per fare: il deposito e' accaduto, l'attesa no */
+  return /ULTIMO DEPOSITO DEI RISULTATI[^\\n]*e' un FATTO, non una stima[^\\n]*2026-06-24/.test(p)
+      && /SECONDA stima della prossima uscita: 2026-09-23/.test(p)
+      && /STIMA di yfinance, non una data confermata/.test(p);`));
+
+check("v390 EDGAR: una cadenza irregolare NON produce una data", suVeri(`
+  const salvato = DATA.macro.sec_calendario;
+  /* misurato su MSTR: deposita 8-K/2.02 anche fuori dal ciclo, la mediana crolla a 67 giorni
+     e l'attesa che ne uscirebbe sbaglia di 24. Un numero che sembra una misura e non lo e'
+     e' peggio di nessun numero (v199). */
+  DATA.macro.sec_calendario = { per_titolo: { MU: {
+    ultimo_deposito: "2026-07-30", n_depositi: 20, cadenza_irregolare_gg: 67 } },
+    senza_8k: [], senza_cik: [], fonte: "SEC EDGAR" };
+  const p = buildPromptTicker("MU");
+  DATA.macro.sec_calendario = salvato;
+  return /cadenza dei suoi depositi e' IRREGOLARE \\(67 giorni/.test(p)
+      && !/SECONDA stima della prossima uscita/.test(p);`));
+
+check("v390 EDGAR: un emittente estero viene DICHIARATO, non lasciato vuoto", suVeri(`
+  const salvato = DATA.macro.sec_calendario;
+  DATA.macro.sec_calendario = { per_titolo: {}, senza_8k: ["MU"], senza_cik: [], fonte: "SEC EDGAR" };
+  const p = buildPromptTicker("MU");
+  DATA.macro.sec_calendario = salvato;
+  /* "nessuna data da EDGAR" e "nessuna trimestrale" si leggono uguali e sono cose diverse */
+  return /EMITTENTE ESTERO/.test(p) && /NON significa che non pubblichi trimestrali/.test(p);`));
+
+check("v390 SLOOS: il segno viene dichiarato, in entrambe le direzioni", suVeri(`
+  const salvato = DATA.macro.credito_banche;
+  const prova = (v) => {
+    DATA.macro.credito_banche = { sloos: { valore: v, data: "2026-07-01", precedente: 8.1, serie: "DRTSCILM" } };
+    return buildPrompt();
+  };
+  /* il segno di SLOOS non e' intuitivo: negativo = banche che ALLENTANO, cioe' la lettura
+     favorevole. Pubblicarlo senza dirlo e' la classe del percentile invertito (v316). */
+  const stretta = prova(12.5), allentamento = prova(-8.3);
+  DATA.macro.credito_banche = salvato;
+  return /le banche stringono/i.test(stretta) && /IL SEGNO/.test(stretta)
+      && /stanno allentando/i.test(allentamento);`));
+
+check("v390 SLOOS/NFCI: dichiarano di NON essere una seconda conferma dello spread", suVeri(`
+  const salvato = DATA.macro.credito_banche;
+  DATA.macro.credito_banche = { sloos: { valore: 0, data: "2026-07-01", serie: "DRTSCILM" },
+                                nfci: { valore: -0.57, data: "2026-08-21", serie: "NFCI" } };
+  const p = buildPrompt();
+  DATA.macro.credito_banche = salvato;
+  /* lo spread e' un PREZZO, SLOOS e' la DISPONIBILITA': contarli come due prove dello stesso
+     segnale e' la regola B3 violata */
+  return /NON sono una seconda conferma dello stesso segnale/.test(p)
+      && /l'altro lato del canale/.test(p);`));
+
+check("v390 BCE: il tasso euro c'e' e non si spaccia per un dato sui tassi USA", suVeri(`
+  const salvato = DATA.macro.bce;
+  DATA.macro.bce = { tasso_rifinanziamento: 2.4, data: "2026-08-30", fonte: "BCE Data Portal" };
+  const p = buildPrompt();
+  DATA.macro.bce = salvato;
+  return /BCE — tasso sulle operazioni di rifinanziamento/.test(p)
+      && /non il rendimento del BTP/.test(p)
+      && /non un secondo dato sui tassi americani/.test(p);`));
+
+check("v390 il ramo degli ALLARMI non contiene ordini — ramo mai percorso prima", suVeri(`
+  /* ⚠⚠ QUESTO CHECK NASCE DA UN DIFETTO SOPRAVVISSUTO PER INVISIBILITA'. I due blocchi che
+     escono quando data_quality ha un alert dicevano "usa OBBLIGATORIAMENTE la ricerca web",
+     cioe' istruzioni nel payload — e nessun gate li aveva mai visti, perche' data_quality non
+     aveva MAI avuto un alert e quindi quel ramo non si percorreva.
+     > Un difetto in un ramo raro non e' raro, e' solo invisibile (v190). */
+  const salvato = DATA.data_quality;
+  DATA.data_quality = { checks: [{ key: "margin_debt", date: null, age_days: null,
+    max_age: 90, status: "missing", note: "fonte ko" }], alerts: ["margin_debt: missing"] };
+  const p = buildPrompt();
+  DATA.data_quality = salvato;
+  const acceso = /DATI MANCANTI O INAFFIDABILI IN QUESTO PAYLOAD/.test(p);
+  const senzaOrdini = !/ORDINE OPERATIVO/.test(p) && !/usa OBBLIGATORIAMENTE/i.test(p);
+  /* e la lista non si pubblica due volte con due formulazioni diverse */
+  const unaVolta = (p.match(/margin_debt/g) || []).length <= 3;
+  return acceso && senzaOrdini && unaVolta;`));
+
+/* ══ v391 — RAPPORTO RISCHIO/RENDIMENTO OVUNQUE, E IL GRAFICO CHE SEGUE IL PORTAFOGLIO ══ */
+
+check("v391 R/R: emerge anche su un titolo che la pipeline NON segue", suVeri(`
+  /* il CEO: "lo stesso rapporto rischio/rendimento deve emergere anche quando analizzo
+     un'azione nuova". Prima l'INTERO blocco tecnico era condizionato alla riga della
+     pipeline, quindi per un titolo non seguito non compariva nulla. */
+  const T = "ZZTEST";
+  const H = [], L = [], C = [];
+  let p = 100;
+  for (let i = 0; i < 260; i++) { p = p * (1 + Math.sin(i / 11) * 0.008 + 0.0004); H.push(p * 1.012); L.push(p * 0.988); C.push(p); }
+  const tr = [];
+  for (let i = 1; i < H.length; i++) tr.push(Math.max(H[i] - L[i], Math.abs(H[i] - C[i - 1]), Math.abs(L[i] - C[i - 1])));
+  let a = tr.slice(0, 14).reduce((s, v) => s + v, 0) / 14;
+  for (let i = 14; i < tr.length; i++) a = (a * 13 + tr[i]) / 14;
+  quoteLive.set(T, { price: C[C.length - 1], chgPct: 0.4, ext: null, valuta: "USD" });
+  quoteLive.set(T + "|1y", { price: C[C.length - 1], sup20: Math.min(...L.slice(-20)),
+    res20: Math.max(...H.slice(-20)), max52: Math.max(...H), min52: Math.min(...L),
+    barre: 260, valuta: "USD", ext: null, atr14: a });
+  const f = fattiTitolo(T);
+  quoteLive.delete(T); quoteLive.delete(T + "|1y");
+  if (!f.tecnici || !f.tecnici.rischioRendimento) return false;
+  /* il valore deve essere quello vero, non un placeholder */
+  const atteso = Math.round((Math.max(...H.slice(-20)) - C[C.length - 1]) / (2 * a) * 10) / 10;
+  return f.tecnici.rischioRendimento === "1:" + atteso && f.tecnici.soloDalVivo === true;`));
+
+check("v391 R/R su titolo nuovo: NON inventa gli altri tecnici della pipeline", suVeri(`
+  /* ⚠ le barre vive sostengono il R/R, non RSI/medie/forza relativa/fondamentali: quelli sono
+     calcoli della pipeline su serie complete, e ricostruirli da 260 barre darebbe numeri che
+     sembrano giusti e non lo sono (v316). */
+  const T = "ZZTEST2";
+  quoteLive.set(T, { price: 100, chgPct: 0, ext: null, valuta: "USD" });
+  quoteLive.set(T + "|1y", { price: 100, sup20: 90, res20: 120, max52: 130, min52: 80,
+    barre: 260, valuta: "USD", ext: null, atr14: 5 });
+  const f = fattiTitolo(T);
+  quoteLive.delete(T); quoteLive.delete(T + "|1y");
+  const t = f.tecnici || {};
+  return t.rischioRendimento === "1:2"
+      && t.rsi === undefined && t.sma50 === undefined && t.rs1m === undefined
+      && t.eps === undefined && t.pesoLibro === undefined;`));
+
+check("v391 ATR dal vivo: terne allineate, non tre array filtrati a parte", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("      atr14: (() => {");
+  const b = src.slice(i, src.indexOf("      })(),", i));
+  /* ⚠⚠ hi/lo/chiusure sono filtrati INDIPENDENTEMENTE con ok(): usarli per l'ATR accosterebbe
+     il massimo di un giorno al minimo di un altro. Misurato: con una sola barra incompleta le
+     lunghezze diventano 120 e 119. E' l'allineamento per posizione invece che per data (v207). */
+  return /b\.high \|\| \[\]/.test(b) && /b\.low \|\| \[\]/.test(b) && /b\.close \|\| \[\]/.test(b)
+      && /Number\.isFinite\(H\[i\]\) && Number\.isFinite\(L\[i\]\) && Number\.isFinite\(C\[i\]\)/.test(b)
+      && !/\bok\(/.test(b)
+      && /a \* 13 \+ tr\[i\]\) \/ 14/.test(b);          // Wilder, non media semplice
+})());
+
+check("v391 R/R: una sola fonte per prezzo, resistenza e ATR", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("rischioRendimento: (() => {");
+  const b = src.slice(i, src.indexOf("})(),", i));
+  /* la classe v230: due letture della stessa grandezza a freschezze diverse dentro un
+     rapporto. Il ramo dal vivo deve usare valori VIVI per tutti e tre gli ingressi.
+     ⚠ v391 — la prima stesura contava "daVivo ?" e falliva perche' il primo va a capo prima
+     del punto interrogativo: contava la FORMA, non il fatto. Undicesima volta in questo
+     progetto. L'invariante e' che i tre ingressi vengano dalla stessa fonte viva. */
+  return /storia\.price/.test(b) && /storia\.res20/.test(b) && /storia\.atr14/.test(b)
+      && /riga && riga\.resistance/.test(b) && /riga && riga\.atr_14/.test(b);
+})());
+
+check("v391 grafico: due barre affiancate e il R/R di ogni posizione", suVeri(`
+  let html = "";
+  const vero = document.querySelector;
+  document.querySelector = (sel) => String(sel) === "#rischio-mappa"
+    ? { set innerHTML(v) { html = v; }, get innerHTML() { return html; } } : vero(sel);
+  try { renderRischio(); } finally { document.querySelector = vero; }
+  const righe = (html.match(/class="cbar-row"/g) || []).length;
+  const rr = (html.match(/R\\/R /g) || []).length;
+  /* una riga per posizione, e ognuna porta il proprio rapporto rischio/rendimento */
+  return righe >= 3 && rr === righe
+      && /f-peso/.test(html) && /f-mcr/.test(html)
+      && !/<svg/.test(html);`));
+
+check("v391 modifica: il SALVATAGGIO chiama l'aggiornamento locale, non solo la funzione esiste", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("async function salvaPosizioni()");
+  const b = src.slice(i, src.indexOf("\nfunction applicaPosizioniInLocale", i));
+  /* ⚠ v391 — questo check nasce da un'iniezione che NON mordeva: gli altri chiamano
+     applicaPosizioniInLocale direttamente, quindi togliere la chiamata da salvaPosizioni li
+     lasciava tutti verdi mentre il grafico tornava a restare indietro fino al giro successivo
+     della pipeline — cioe' esattamente il difetto che il CEO ha segnalato.
+     ⚠ E la scansione toglie i commenti: una chiamata commentata non e' una chiamata (v213,
+     v240, v389 — terza volta che questa trappola si ripresenta). */
+  const senzaCommenti = b.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  return /^\s*if \(ok1\) applicaPosizioniInLocale\(posizioni\);/m.test(senzaCommenti);
+})());
+
+check("v391 modifica del portafoglio: i pesi si aggiornano subito", suVeri(`
+  const prima = DATA.watchlist.find(r => r.ticker === "MU").controvalore;
+  const pos = DATA.watchlist.filter(r => r && r.qta > 0)
+    .map(r => ({ ticker: r.ticker, qta: r.ticker === "MU" ? 20 : r.qta, pmc: r.pmc }));
+  applicaPosizioniInLocale(pos);
+  const dopo = DATA.watchlist.find(r => r.ticker === "MU").controvalore;
+  return Number.isFinite(dopo) && dopo < prima * 0.5;`));
+
+check("v391 modifica: il rischio NON viene ricalcolato a mano, e lo si dichiara", suVeri(`
+  const mcrPrima = DATA.watchlist.find(r => r.ticker === "MU").risk_contrib_pct;
+  const pos = DATA.watchlist.filter(r => r && r.qta > 0)
+    .map(r => ({ ticker: r.ticker, qta: r.ticker === "MU" ? 20 : r.qta, pmc: r.pmc }));
+  applicaPosizioniInLocale(pos);
+  const mcrDopo = DATA.watchlist.find(r => r.ticker === "MU").risk_contrib_pct;
+  let html = "";
+  const vero = document.querySelector;
+  document.querySelector = (sel) => String(sel) === "#rischio-mappa"
+    ? { set innerHTML(v) { html = v; }, get innerHTML() { return html; } } : vero(sel);
+  try { renderRischio(); } finally { document.querySelector = vero; }
+  /* il contributo al rischio resta quello della pipeline (ricalcolarlo dalle sparks darebbe
+     un numero plausibile e divergente, v316) e la riga toccata viene NOMINATA */
+  return mcrDopo === mcrPrima && /MU/.test(html)
+      && /peso aggiornato adesso, rischio ancora quello della pipeline/.test(html);`));
+
+check("v391 modifica: la frase in cima non poggia su una riga mezza vecchia", suVeri(`
+  /* il difetto misurato: portando MU da 70 a 20 quote la frase annunciava "+27,1 pp di rischio
+     in piu'", che confronta il peso NUOVO col rischio VECCHIO — un numero che non misura
+     niente, nella riga piu' letta della sezione. */
+  const pos = DATA.watchlist.filter(r => r && r.qta > 0)
+    .map(r => ({ ticker: r.ticker, qta: r.ticker === "MU" ? 20 : r.qta, pmc: r.pmc }));
+  applicaPosizioniInLocale(pos);
+  let html = "";
+  const vero = document.querySelector;
+  document.querySelector = (sel) => String(sel) === "#rischio-mappa"
+    ? { set innerHTML(v) { html = v; }, get innerHTML() { return html; } } : vero(sel);
+  try { renderRischio(); } finally { document.querySelector = vero; }
+  const frase = (html.split("rischio-frasi")[1] || "").slice(0, 600);
+  return !/MU pesa/.test(frase);`));
+
+/* ══ v392 — IL PERIODO DI RIFERIMENTO, DOPO CHE UN LLM REALE L'HA FRAINTESO DUE VOLTE ══ */
+
+check("v392 una serie mensile o trimestrale dichiara il PERIODO, non un giorno", suVeri(`
+  const p = buildPrompt();
+  /* il CEO ha incollato il referto di un LLM reale: su tre "correzioni" al sistema, DUE erano
+     false e nascevano tutte e due da "riferito a 01/04/2026" letto come una data puntuale.
+     01/04/2026 su una serie trimestrale E' il secondo trimestre — la convenzione FRED/BEA. */
+  const pil = p.split(String.fromCharCode(10)).find(x => x.startsWith("- PIL USA"));
+  const nfp = p.split(String.fromCharCode(10)).find(x => x.startsWith("- Non-Farm Payrolls"));
+  if (!pil || !nfp) return false;
+  /* ⚠ i backslash vanno RADDOPPIATI: dentro un template literal "\\d" diventa "d" e la regex
+     smette di essere quella che credi. E' la trappola che il meta-gate sorveglia, e mi ha
+     preso di nuovo qui. */
+  return /riferito al \\d° trimestre \\d{4} \\([a-z]+-[a-z]+\\)/.test(pil)
+      && !/riferito a \\d{2}\\/\\d{2}\\/\\d{4}/.test(pil)
+      && /riferito a [a-z]+ \\d{4}/.test(nfp)
+      && !/riferito a \\d{2}\\/\\d{2}\\/\\d{4}/.test(nfp);`));
+
+check("v392 il trimestre dichiarato e' quello GIUSTO per ogni mese d'inizio", (() => {
+  /* la convenzione: la data e' il PRIMO giorno del trimestre. Gennaio->1°, aprile->2°,
+     luglio->3°, ottobre->4°. Un errore qui sposterebbe un dato di tre mesi. */
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("const periodo = (s) => {");
+  const b = src.slice(i, src.indexOf("const stessoGiorno", i));
+  const q = (m) => Math.floor((m - 1) / 3) + 1;
+  return /Math\.floor\(\(m - 1\) \/ 3\) \+ 1/.test(b)
+      && q(1) === 1 && q(4) === 2 && q(7) === 3 && q(10) === 4
+      && q(3) === 1 && q(6) === 2 && q(9) === 3 && q(12) === 4;
+})());
+
+check("v392 l'eta' in giorni resta attaccata alla PUBBLICAZIONE, che e' cio' che misura", (() => {
+  const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
+  const i = src.indexOf("function rigaCadenza(");
+  const b = src.slice(i, src.indexOf("\nfunction ", i + 10));
+  /* ⚠ la prima stesura di v392 aveva appeso all'eta' la frase "NON dalla pubblicazione",
+     che e' esattamente il contrario del vero (v343: eta = giorni dall'uscita). Correggendo
+     un'ambiguita' avevo introdotto un'affermazione falsa. */
+  const senzaCommenti = b.replace(/\/\*[\s\S]*?\*\//g, "");
+  return /pubblicato ~\$\{it\(c\.pubblicato\)\} \(\$\{c\.eta\} giorni fa\)/.test(senzaCommenti)
+      && !/NON dalla pubblicazione/.test(senzaCommenti);
+})());
+
+check("v392 i fondi monetari non dichiarano piu' un'eta' con un riferimento ambiguo", suVeri(`
+  const p = buildPrompt();
+  const r = p.split(String.fromCharCode(10)).find(x => x.indexOf("Retail Cash") >= 0);
+  if (!r) return true;
+  /* il mese per esteso si data da solo; un conteggio in giorni avrebbe bisogno di dire da
+     quale estremo del mese parte, e la prima stesura sbagliava proprio quello */
+  return /riferito a [a-z]+ \\d{4}/.test(r)
+      && !/rilevazione \\d{4}-\\d{2}-\\d{2}/.test(r)
+      && /NON e' la data in cui FRED lo ha pubblicato/.test(r);`));
 
 let fail = 0;
 for (const [name, ok] of T) {
