@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "389";
+const BUILD_VERSION = "390";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1230,14 +1230,43 @@ function etUtcOffsetHours(d) {   // ore da sottrarre a UTC per avere l'ora di Ne
 }
 /* istante UTC dell'ultima chiusura USA (16:00 ET del giorno di price_asof delle EQUITY:
    crypto/futures/indici esteri quotano 24/7 e falserebbero il confine) */
-function lastUsEquityCloseUTC() {
+/* ═══ v402 — RESTITUIVA UNA CHIUSURA CHE NON ERA ANCORA AVVENUTA ═══════════════════════════
+   `price_asof` diventa OGGI appena la barra odierna comincia, quindi a mercato APERTO questa
+   funzione costruiva le 16:00 ET DI OGGI — un istante nel futuro. Conseguenza in produzione,
+   misurata il 02/09/2026 alle 13:31 ET: il pacchetto scriveva "0 pubblicate DOPO l'ultima
+   chiusura USA del 2026-09-02", cioe' contava contro una chiusura mancante di sei ore. Nessuna
+   notizia puo' essere posteriore a un momento che non e' arrivato: il conteggio era ZERO PER
+   COSTRUZIONE, e uno zero si legge come "niente di non prezzato" invece che come "la domanda
+   non ha senso adesso". E' la classe v193/v234 — stato del mercato e freschezza del dato sono
+   due cose diverse — e il difetto stava proprio nel blocco che esiste per dire "questo il
+   prezzo non l'ha ancora votato".
+   ⚠ Il rimedio non e' spostare la soglia: e' tornare all'ultima chiusura DAVVERO avvenuta. A
+   sessione aperta e' quella di ieri, ed e' la risposta giusta — una notizia uscita stanotte non
+   e' nel prezzo di chiusura di ieri, ed e' esattamente cio' che il blocco vuole segnalare.
+   ⚠ `now` e' un parametro perche' un ramo temporale che nessun test puo' esercitare non e' una
+   protezione (v190, v234): il gate lo percorre a orologio fermo invece di sperare nell'ora in
+   cui gira. */
+function lastUsEquityCloseUTC(now = new Date()) {
   const eq = [...(DATA.portfolio || []), ...(DATA.watchlist || [])]
     .filter(r => r && r.currency === "USD" && !/-USD$|^\^|=F$/.test(r.ticker || "") && r.price_asof);
   const asof = eq.map(r => String(r.price_asof).slice(0, 10)).sort().pop();
   if (!asof) return null;
-  const off = etUtcOffsetHours(new Date(asof + "T18:00:00Z"));
-  const t = new Date(`${asof}T${String(16 + off).padStart(2, "0")}:00:00Z`);
-  return isNaN(t) ? null : { at: t, asof };
+  const chiusuraDi = (giorno) => {
+    const off = etUtcOffsetHours(new Date(giorno + "T18:00:00Z"));
+    return new Date(`${giorno}T${String(16 + off).padStart(2, "0")}:00:00Z`);
+  };
+  let giorno = asof, t = chiusuraDi(giorno);
+  if (isNaN(t)) return null;
+  /* si torna indietro finche' la chiusura e' avvenuta davvero, saltando sabato e domenica.
+     Cinque passi bastano per il ponte piu' lungo; oltre, si dichiara di non sapere. */
+  for (let i = 0; i < 5 && t.getTime() > now.getTime(); i++) {
+    const d = new Date(giorno + "T12:00:00Z");
+    do { d.setUTCDate(d.getUTCDate() - 1); } while (d.getUTCDay() === 0 || d.getUTCDay() === 6);
+    giorno = d.toISOString().slice(0, 10);
+    t = chiusuraDi(giorno);
+    if (isNaN(t)) return null;
+  }
+  return t.getTime() > now.getTime() ? null : { at: t, asof: giorno };
 }
 /* news pubblicate DOPO l'ultima chiusura = non ancora nel prezzo.
    Esclude le voci sintetiche Polymarket (sono snapshot di probabilità, non notizie). */
@@ -12517,12 +12546,27 @@ function buildPromptTicker(tkGrezzo) {
 ``,
 `1) QUADRO MACRO — massimo 10 righe, SOLO dai dati in coda a questo messaggio.`,
 `⚠ PARTI DAL BLOCCO "SENSIBILITA' MISURATE" in coda, se c'e': dice quanto di ${tk} e' spiegato`,
-`DAVVERO da ciascun canale (mercato, comparto, tassi, dollaro) sulle sedute in comune. Un canale`,
-`con R² sotto 0,05 NON e' un canale su questa finestra: se vuoi sostenerlo lo stesso, di' perche'`,
-`ti aspetti che si accenda ora — un bilancio che cambia, una scadenza di debito, una quota di`,
-`ricavi esteri — e dichiara che stai andando CONTRO la misura. Raccontare il canale dei tassi su`,
-`un titolo il cui R² sui tassi e' 0,01 e' la forma di analisi che sembra piu' seria di quella`,
-`corretta, ed e' l'errore che quel blocco esiste per impedire.`,
+/* ⚠⚠ v402 — LA TESTATA CITAVA ANCORA LA SOGLIA FISSA CHE I DATI NON USANO PIU'. Trovato
+   rigenerando il pacchetto e leggendolo: la coda pubblica il PAVIMENTO DEL RUMORE calcolato sul
+   campione (0,015 su 251 sedute, 0,065 su 60) e l'istruzione diceva "sotto 0,05 non e' un
+   canale". Due valori per la stessa grandezza — esattamente cio' che il collaudo di congruita'
+   ordina a chi legge di segnalare, prodotto dal pacchetto stesso. L'istruzione ora rimanda al
+   numero che la riga porta con se', invece di ripeterne uno proprio. */
+`DAVVERO da ciascun canale (mercato, comparto, tassi, dollaro) sulle sedute in comune. Ogni`,
+`misura porta accanto il PAVIMENTO DEL RUMORE del proprio campione — l'R² che il puro caso supera`,
+`nel 5% dei casi a quella numerosita' — e sotto quel pavimento NON c'e' un canale su quella`,
+`finestra. Il pavimento cambia con la finestra e non e' una convenzione: e' piu' alto su una`,
+`finestra corta, dove il caso spiega di piu'.`,
+`⚠⚠ E LE FINESTRE SONO DUE: quella lunga dice da dove viene il movimento, quella corta (un`,
+`trimestre) dice se il canale si e' ACCESO o SPENTO di recente. Quando divergono, la divergenza`,
+`e' il fatto: un canale spento sull'anno e acceso sull'ultimo trimestre e' precisamente il caso`,
+`in cui il numero annuale, letto da solo, fa scrivere "nessuna relazione" su cio' che sta`,
+`muovendo il titolo adesso.`,
+`Se vuoi sostenere un canale che entrambe le finestre danno sotto il pavimento, di' perche' ti`,
+`aspetti che si accenda ora — un bilancio che cambia, una scadenza di debito, una quota di ricavi`,
+`esteri — e dichiara che stai andando CONTRO la misura. Raccontare il canale dei tassi su un`,
+`titolo il cui R² sui tassi sta sotto il pavimento su entrambe le finestre e' la forma di analisi`,
+`che sembra piu' seria di quella corretta, ed e' l'errore che quel blocco esiste per impedire.`,
 `Non cercare online il quadro macro e non riassumere tutte le serie: prendi le DUE O TRE`,
 `grandezze che contano per ${tk} e di' attraverso quale canale arrivano al suo conto economico`,
 `— quale tasso, quale costo, quale domanda finale. Guarda anche dove gli indicatori NON sono`,

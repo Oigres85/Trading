@@ -6372,9 +6372,20 @@ check("v400 i tre blocchi passano dallo stesso depositoOltreLaTabella", (() => {
 /* ⚠ v400 — DUE OROLOGI: il book vuoto e' un fatto dello SNAPSHOT, la fase di sessione e'
    calcolata adesso. La riga affermava "succede a mercato chiuso" accanto a "SESSIONE USA
    APERTA", e il collaudo di congruita' impone a chi legge di segnalarlo. */
+/* ⚠⚠ v402 — LA MIA INIEZIONE NON MORDEVA, E IL CHECK ERA VERDE PER LO STATO DEL GIORNO.
+   Cancellava `r.tv.evento`, ma il movimento implicito NON viene da li': lo costruisce
+   `movimentoImplicito(DATA.options[tk])`. Il check passava solo perche' allo snapshot di quel
+   momento il book era vuoto — appena il CI ha prodotto un run a mercato aperto, con le opzioni
+   quotate, e' andato rosso. E' la classe v233 (un check che misura i dati del giorno invece
+   della proprieta') sommata a quella dell'iniezione senza morso: due volte la stessa lezione,
+   scritta in questo file, ripetuta lo stesso.
+   Ora lo STATO si COSTRUISCE: la catena resta (quindi `opzioniPresenti` e' vero) ma denaro e
+   lettera vanno a zero su ogni strike, che e' esattamente il book vuoto da cui non si ricava
+   uno straddle. Il fenomeno c'e' per costruzione, non per fortuna. */
 check("v400 il movimento implicito non afferma piu' uno stato di mercato che non conosce", suVeri(`
-  const r = DATA.watchlist.find(x => x.ticker === "CRWV");
-  if (r.tv && r.tv.evento) delete r.tv.evento;
+  const o = (DATA.options || {}).CRWV;
+  if (!o || !(o.expiries || []).length) return false;   // senza catena il ramo non esiste
+  o.expiries.forEach(e => [...(e.calls || []), ...(e.puts || [])].forEach(x => { x.bid = 0; x.ask = 0; }));
   const p = buildPromptTicker("CRWV");
   if (p.indexOf("MOVIMENTO IMPLICITO: NON CALCOLABILE") < 0) return false;
   return p.indexOf("succede a mercato chiuso") < 0
@@ -6493,6 +6504,65 @@ check("v401 il conteggio degli analisti dichiara che cosa conta", suVeri(`
          codice giusto — quinta incarnazione dell'ancoraggio aperto in questo progetto. Quello
          che non deve tornare e' il CONTEGGIO NUDO accanto al target. */
       && !/\\d+ giudizi/.test(p);`));
+
+/* ⚠⚠ v402 — UNA SOLA SOGLIA NEL PACCHETTO. La testata citava 0,05 mentre la coda pubblica il
+   pavimento misurato: due valori per la stessa grandezza, cioe' la classe che il collaudo di
+   congruita' ordina a chi legge di segnalare — prodotta dal pacchetto stesso. Il check cerca
+   il numero fisso nelle ISTRUZIONI, dove non deve piu' comparire. */
+check("v402 la testata non ripete una soglia di R² propria: rimanda al pavimento misurato", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  const testa = p.slice(0, p.indexOf("QUADRO MACRO DI RIFERIMENTO"));
+  return testa.indexOf("PAVIMENTO DEL RUMORE") >= 0
+      && testa.indexOf("E LE FINESTRE SONO DUE") >= 0
+      && !/R² sotto 0,05/.test(testa)
+      && !/R² sui tassi e' 0,01/.test(testa);`));
+
+/* ═══ v402 — L'ULTIMA CHIUSURA NON PUO' ESSERE NEL FUTURO ══════════════════════════════════
+   Trovato da un check andato rosso da solo quando il CI ha prodotto un run A MERCATO APERTO:
+   `price_asof` diventa oggi appena la barra odierna comincia, e la funzione costruiva le 16:00
+   ET DI OGGI — sei ore avanti. Il pacchetto scriveva "0 pubblicate DOPO l'ultima chiusura USA
+   del 2026-09-02": zero PER COSTRUZIONE, perche' niente puo' essere posteriore a un istante non
+   ancora arrivato. E uno zero li' si legge come "niente di non prezzato", che e' l'opposto.
+   ⚠ Il ramo si esercita a OROLOGIO FERMO: un ramo temporale che nessun test puo' percorrere non
+   e' una protezione, e un check che dipende dall'ora in cui gira va rosso da solo (v190, v234). */
+check("v402 a mercato aperto l'ultima chiusura e' quella di IERI, non una di oggi non avvenuta", suVeri(`
+  const r = DATA.watchlist.find(x => x.ticker === "CRWV");
+  if (!r) return false;
+  DATA.watchlist.forEach(x => { if (x.currency === "USD") x.price_asof = "2026-09-02"; });
+  // mercoledi' 02/09/2026, 13:30 a New York: la sessione e' in corso
+  const c = lastUsEquityCloseUTC(new Date("2026-09-02T17:30:00Z"));
+  return c !== null && c.asof === "2026-09-01"
+      && c.at.getTime() < new Date("2026-09-02T17:30:00Z").getTime();`));
+
+check("v402 a mercato chiuso l'ultima chiusura resta quella del giorno stesso", suVeri(`
+  DATA.watchlist.forEach(x => { if (x.currency === "USD") x.price_asof = "2026-09-02"; });
+  // stessa giornata, ma alle 23:00 UTC: le 16:00 ET sono passate
+  const c = lastUsEquityCloseUTC(new Date("2026-09-02T23:00:00Z"));
+  return c !== null && c.asof === "2026-09-02";`));
+
+/* ⚠ il salto all'indietro deve scavalcare il fine settimana, altrimenti restituirebbe una
+   "chiusura" di domenica, che non esiste. */
+check("v402 tornando indietro si saltano sabato e domenica", suVeri(`
+  DATA.watchlist.forEach(x => { if (x.currency === "USD") x.price_asof = "2026-09-07"; });
+  // lunedi' 07/09/2026 a mercato ancora aperto: la chiusura precedente e' venerdi' 04
+  const c = lastUsEquityCloseUTC(new Date("2026-09-07T17:30:00Z"));
+  return c !== null && c.asof === "2026-09-04";`));
+
+/* ⚠ e la conseguenza che conta, sul pacchetto vero: il conteggio delle notizie non prezzate
+   non e' piu' zero per costruzione. Il check INIETTA le voci, cosi' il fenomeno c'e'. */
+check("v402 le notizie post-chiusura si contano anche a sessione aperta", suVeri(`
+  const ch = lastUsEquityCloseUTC();
+  if (!ch) return false;
+  const t = (ms) => new Date(ms).toISOString();
+  DATA.macro = DATA.macro || {};
+  DATA.macro.news = { fonti: ["Prova"], filtro: "sintetico", voci: [
+    { titolo: "POST-CHIUSURA-UNO", riassunto: "", fonte: "Prova", quando: t(ch.at.getTime() + 1000) },
+    { titolo: "POST-CHIUSURA-DUE", riassunto: "", fonte: "Prova", quando: t(ch.at.getTime() + 2000) },
+  ] };
+  const p = buildPrompt();
+  return ch.at.getTime() <= Date.now()
+      && p.indexOf("POST-CHIUSURA-UNO") >= 0
+      && p.indexOf("POST-CHIUSURA-DUE") >= 0;`));
 
 let fail = 0;
 for (const [name, ok] of T) {
