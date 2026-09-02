@@ -2106,55 +2106,88 @@ def calendario_uscite_fred(voci, quante=3):
 # per attribuirle dovremmo cercare il nome nel titolo, cioe' indovinare. Una richiesta per
 # titolo costa sei secondi in piu' e toglie di mezzo un'euristica. Provato: 13/13 feed
 # rispondono, 242 voci.
+# ═══ v399 — LA FONTE E' CAMBIATA DOPO AVERLA PROVATA IN CI, NON PRIMA ═════════════════════
+# La v398 usava il feed Yahoo per ticker. Provato nel run vero del CI: **tutti e tredici** i
+# titoli sono tornati 429 — Yahoo assegna una quota per IP e quella dei runner di GitHub e'
+# gia' consumata dai prezzi. Il sistema lo ha DICHIARATO ("13 su 13 NON letti") invece di
+# mostrare un silenzio che si legge come "non e' successo niente", quindi la rete ha retto: ma
+# una funzionalita' che dichiara sempre di non aver potuto leggere non serve a nessuno.
+#
+# ⚠⚠ E' la trappola v203 presa in tempo: la fetch NON era esercitabile da qui, l'ho scritto
+# prima di pubblicare, e la verifica in CI ha detto che la fonte era sbagliata. Il costo e'
+# stato un run; il costo di non averlo fatto sarebbe stato un blocco vuoto per sempre.
+#
+# Misurate quattro alternative da un IP di datacenter, che e' la condizione del CI:
+#   · Nasdaq  `feed/rssoutbound?symbol=TK` → 200, 15 voci, TUTTE datate, SPECIFICHE del ticker
+#   · Seeking Alpha → 200, 30 voci, ma sono analisi e opinioni piu' che notizie
+#   · Google News → 200 e molte voci, ma si interroga con una STRINGA DI RICERCA: l'attribuzione
+#     al titolo la dovremmo indovinare noi, ed e' precisamente cio' che non vogliamo fare
+#   · Yahoo → 429, sempre
+# Vince Nasdaq: l'attribuzione viene dalla FONTE, non da un'euristica nostra.
+#
+# ⚠ NASDAQ E' LENTO (3,1 s a titolo, misurati): tredici in fila sono 40 secondi su un run che
+# ne dura novanta, cioe' +32 minuti di CI al giorno su 48 run. Quattro richieste in parallelo
+# li portano a 10 secondi con lo stesso esito (13/13). Il parallelismo e' basso di proposito:
+# la fonte e' gratuita e non va martellata — e' la stessa ragione per cui un 429 non si ritenta.
 def news_titoli(tickers, per_titolo=6, giorni=14):
-    """Titoli di notizia per ciascun ticker, dal feed Yahoo di QUEL ticker.
+    """Titoli di notizia per ciascun ticker. Nasdaq primario, Yahoo di riserva.
 
-    Ritorna {"per_titolo": {TICKER: [voce, ...]}, "senza_notizie": [...], "non_letti": [...]}.
-    Un feed che non risponde non ferma gli altri: e' un guasto per titolo, non della funzione,
-    e i tre esiti restano distinti perche' significano cose diverse.
+    Ritorna {"per_titolo": {...}, "senza_notizie": [...], "non_letti": [...], "fonti": {...}}.
+    I tre esiti restano DISTINTI perche' significano cose diverse: "nessuna notizia su questo
+    titolo" e "la fonte non mi ha risposto" si leggono uguali e sono l'opposto (v389).
+    ⚠ `fonti` dice CHI HA SERVITO ciascun titolo: la lezione di v393, dove la riga di UMich
+    affermava tre cose false perche' descriveva il ripiego invece della fonte vera.
     """
-    fuori, muti, strozzati = {}, [], []
+    from concurrent.futures import ThreadPoolExecutor
     limite = datetime.now(timezone.utc) - timedelta(days=giorni)
-    for tk in tickers:
-        try:
-            # ⚠⚠ NON si usa http_get: quello ritenta TRE volte con attesa crescente, cioe'
-            # martella proprio quando la fonte sta dicendo "rallenta". Misurato da qui: dopo
-            # una quindicina di richieste Yahoo mette l'IP in castigo e risponde 429 anche a
-            # 1,5 secondi di distanza — non e' una frequenza massima, e' una quota. Un 429
-            # NON e' un guasto da ritentare: e' un "non adesso" da dichiarare.
-            r = requests.get("https://feeds.finance.yahoo.com/rss/2.0/headline"
-                             f"?s={urllib.parse.quote(tk)}&region=US&lang=en-US",
-                             headers=UA, timeout=15)
-            if r.status_code == 429:
-                strozzati.append(tk)
-                time.sleep(1.0)
-                continue
-            if r.status_code != 200:
-                raise RuntimeError(f"HTTP {r.status_code}")
-            voci = voci_rss(r.text, "Yahoo Finance", None, 25)
-            recenti = [v for v in voci
-                       if datetime.strptime(v["quando"], "%Y-%m-%dT%H:%M:%SZ")
-                          .replace(tzinfo=timezone.utc) >= limite]
-            recenti.sort(key=lambda v: v["quando"], reverse=True)
-            if recenti:
-                fuori[tk] = recenti[:per_titolo]
+    CANALI = (("Nasdaq", "https://www.nasdaq.com/feed/rssoutbound?symbol={tk}"),
+              ("Yahoo Finance", "https://feeds.finance.yahoo.com/rss/2.0/headline"
+                                "?s={tk}&region=US&lang=en-US"))
+
+    def prendi(tk):
+        """Ritorna (tk, voci, fonte_che_ha_servito, motivo_se_vuoto)."""
+        ultimo = None
+        for nome, modello in CANALI:
+            try:
+                # ⚠⚠ NON si usa http_get: quello ritenta TRE volte con attesa crescente, cioe'
+                # martella proprio quando la fonte sta dicendo "rallenta". Un 429 non e' un
+                # guasto da ritentare: e' un "non adesso" da dichiarare e da passare oltre.
+                r = requests.get(modello.format(tk=urllib.parse.quote(tk)),
+                                 headers=UA, timeout=20)
+                if r.status_code == 429:
+                    ultimo = "429"
+                    continue
+                if r.status_code != 200:
+                    ultimo = f"HTTP {r.status_code}"
+                    continue
+                voci = [v for v in voci_rss(r.text, nome, None, 25)
+                        if datetime.strptime(v["quando"], "%Y-%m-%dT%H:%M:%SZ")
+                           .replace(tzinfo=timezone.utc) >= limite]
+                if voci:
+                    voci.sort(key=lambda v: v["quando"], reverse=True)
+                    return tk, voci[:per_titolo], nome, None
+                ultimo = "nessuna voce nella finestra"
+            except Exception as e:  # noqa: BLE001
+                ultimo = type(e).__name__
+        return tk, [], None, ultimo
+
+    fuori, muti, non_letti, fonti = {}, [], [], {}
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        for tk, voci, fonte, motivo in pool.map(prendi, list(tickers)):
+            if voci:
+                fuori[tk] = voci
+                fonti[tk] = fonte
+            elif motivo == "nessuna voce nella finestra":
+                muti.append(tk)          # la fonte ha risposto: e' un fatto sul mondo
             else:
-                muti.append(tk)
-            time.sleep(0.1)
-        except Exception as e:  # noqa: BLE001
-            print(f"!! news di {tk}: {e}", file=sys.stderr)
-            muti.append(tk)
-    # ⚠⚠ I TRE ESITI SONO DIVERSI E VANNO TENUTI DIVERSI: con voci, senza voci, non leggibile.
-    # "nessuna notizia su questo titolo" e "la fonte non mi ha risposto" si leggono uguali e
-    # significano l'opposto — e' la lezione delle news macro (v389), dove un ramo `else`
-    # mancante faceva sparire in silenzio un'intera funzionalita'.
-    if muti or strozzati:
+                non_letti.append(tk)     # la fonte NON ha risposto: e' un buco nostro
+    if muti or non_letti:
         print(f"   news per titolo: {len(fuori)} con voci"
-              + (f", {len(muti)} senza notizie recenti ({', '.join(muti)})" if muti else "")
-              + (f", {len(strozzati)} NON LETTI perche' Yahoo ha strozzato le richieste "
-                 f"({', '.join(strozzati)}): non e' assenza di notizie" if strozzati else ""))
-    return {"per_titolo": fuori, "senza_notizie": muti, "non_letti": strozzati,
-            "fonte": "Yahoo Finance RSS per ticker", "finestra_giorni": giorni,
+              + (f", {len(muti)} senza notizie recenti ({', '.join(sorted(muti))})" if muti else "")
+              + (f", {len(non_letti)} NON LETTI, nessun canale ha risposto "
+                 f"({', '.join(sorted(non_letti))}): non e' assenza di notizie" if non_letti else ""))
+    return {"per_titolo": fuori, "senza_notizie": sorted(muti), "non_letti": sorted(non_letti),
+            "fonti": fonti, "canali": [c[0] for c in CANALI], "finestra_giorni": giorni,
             "letto_il": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
 
 

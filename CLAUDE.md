@@ -184,6 +184,40 @@ poter danneggiare quello portante.
 > *"Nessuna notizia" e "la fonte non ha risposto" si leggono uguali e significano l'opposto.* È
 > la lezione della v389 applicata prima del guasto invece che dopo.
 
+### 🔁 v399 — LA FONTE ERA SBAGLIATA, E L'HA DETTO IL CI
+Il primo run col codice nuovo ha risposto **429 su tutti e tredici i titoli**: Yahoo assegna una
+quota per IP e quella dei runner di GitHub è già consumata dai prezzi. Il sistema lo ha
+**dichiarato** ("13 su 13 NON letti") invece di mostrare un silenzio che si legge come "non è
+successo niente" — la rete ha retto — ma una funzionalità che dichiara sempre di non aver potuto
+leggere non serve a nessuno.
+
+> È la trappola **v203 presa in tempo**: la fetch non era esercitabile dall'ambiente di sviluppo,
+> l'ho scritto prima di pubblicare, e la verifica in CI ha detto che la fonte era sbagliata. Il
+> costo è stato un run; il costo di non farla sarebbe stato un blocco vuoto per sempre.
+
+Misurate quattro alternative **da un IP di datacenter**, che è la condizione del CI:
+
+| fonte | esito |
+|---|---|
+| **Nasdaq** `feed/rssoutbound?symbol=TK` | 200, 15 voci, tutte datate, **specifiche del ticker** |
+| Seeking Alpha | 200, 30 voci, ma sono analisi e opinioni più che notizie |
+| Google News | 200 e molte voci, ma si interroga con una **stringa di ricerca**: l'attribuzione al titolo la dovremmo indovinare noi |
+| Yahoo | **429, sempre** |
+
+Vince Nasdaq: l'attribuzione viene dalla FONTE, non da un'euristica nostra. Yahoo resta come
+**riserva**, e `fonti` registra chi ha servito ciascun titolo — la lezione v393, dove la riga di
+UMich affermava tre cose false perché descriveva il ripiego.
+
+⚠ **Nasdaq è lento**: 3,1 s a titolo misurati, cioè 40 secondi in fila su un run che ne dura
+novanta — **+32 minuti di CI al giorno** su 48 run. Quattro richieste in parallelo li portano a
+**10 secondi** con lo stesso esito (13/13). Il parallelismo è basso di proposito: la fonte è
+gratuita e non va martellata, che è la stessa ragione per cui un 429 non si ritenta.
+
+⚠ E i miei due check sono andati rossi **avendo ragione**: col secondo canale un 429 sul
+primario non è un fallimento ma il segnale di passare alla riserva, quindi le chiamate diventano
+due. L'invariante non è "una chiamata" ma **"nessun canale ritentato"**, ed è stato riscritto
+così invece di essere allentato.
+
 ### 📏 Il tetto di lunghezza: il minimo è SPARITO
 Misurato sul pacchetto vero: i quattro blocchi con tetto esplicito valgono già ~520 parole, e ne
 restavano ~1.200 per gli altri sei più la tabella dei concorrenti, il collaudo, le segnalazioni

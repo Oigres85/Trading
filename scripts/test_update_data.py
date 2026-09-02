@@ -1081,7 +1081,11 @@ _CHIAMATE_NEWS = []
 
 def _fake_news(url, headers=None, timeout=None):
     _CHIAMATE_NEWS.append(url)
-    tk = url.split("s=")[1].split("&")[0]
+    # ⚠ i due canali hanno parametri diversi: Nasdaq usa `symbol=`, Yahoo `s=`. Leggere sempre
+    # `s=` faceva estrarre il ticker sbagliato dall'URL di Nasdaq — un check che misura un'altra
+    # cosa perche' l'indice e' preso dal posto sbagliato (stessa svista del find/rfind di v398).
+    tk = (url.split("symbol=")[1].split("&")[0] if "symbol=" in url
+          else url.split("s=")[1].split("&")[0])
     if tk == "STROZZATO":
         return _RispNews(429)
     if tk == "MUTO":
@@ -1104,9 +1108,17 @@ try:
 
     # ⚠ un 429 NON e' un guasto da ritentare: e' la fonte che dice "rallenta". Ritentare tre
     # volte, come fa http_get, significa martellare proprio quando non si deve.
-    check("v398 un 429 costa UNA chiamata, non tre: non si martella la fonte",
-          len([u for u in _CHIAMATE_NEWS if "STROZZATO" in u]) == 1
-          and "http_get(" not in _SRC_UD_CODICE.split("def news_titoli")[1].split("def ")[0])
+    # ⚠ v399 — L'INVARIANTE E' CAMBIATO COL CONTRATTO, non e' stato indebolito. Con DUE canali
+    # un 429 sul primario non e' un fallimento: e' il segnale di passare alla riserva, quindi
+    # per quel titolo le chiamate sono due, una per canale. Cio' che non deve MAI accadere e'
+    # ritentare LO STESSO canale, cioe' martellare una fonte che sta dicendo "rallenta".
+    _per_canale = {}
+    for _u in _CHIAMATE_NEWS:
+        if "STROZZATO" in _u:
+            _per_canale.setdefault("nasdaq" if "nasdaq" in _u else "yahoo", []).append(_u)
+    check("v399 nessun canale viene ritentato: un 429 passa alla riserva, non si martella",
+          bool(_per_canale) and all(len(v) == 1 for v in _per_canale.values())
+          and "http_get(" not in _SRC_UD_CODICE.split("def news_titoli")[1].split(chr(10) + "def ")[0])
 
     check("v398 fuori dalla finestra non entra: una notizia di 40 giorni non e' una notizia",
           len(_out["per_titolo"]["BUONO"]) == 1)

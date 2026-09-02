@@ -6212,7 +6212,10 @@ check("v398 il pacchetto porta i titoli sul nome analizzato, con la loro eta'", 
   const p = buildPromptTicker("CRWV");
   return p.indexOf("NOTIZIE SUI TITOLI DEL LIBRO") >= 0
       && p.indexOf("Titolo di prova su CoreWeave") >= 0
-      && /\\[6h fa\\]/.test(p);`));
+      /* la riga porta la fonte CHE HA SERVITO accanto all'eta': i canali sono due, e dire
+         quale ha risposto e' la lezione v393 — un'etichetta fissa descrive il ripiego come se
+         fosse la primaria. */
+      && /\\[[^\\]]+, 6h fa\\]/.test(p);`));
 
 /* ⚠⚠ QUESTA E' LA RAGIONE PER CUI IL BLOCCO ESISTE, e va sorvegliata a parte: la ricerca web
    dell'LLM e' piu' fresca della nostra, quindi il valore aggiunto NON e' la notizia sul titolo

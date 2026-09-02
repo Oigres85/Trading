@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "385";
+const BUILD_VERSION = "386";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10192,7 +10192,7 @@ function contestoPortafoglio(tkCorrente) {
   };
   const riga = (v) => {
     const h = eta(v.quando);
-    return `\n    · [${h != null ? h + "h fa" : "data illeggibile"}] ${v.titolo}`
+    return `\n    · [${v.fonte || "fonte non dichiarata"}, ${h != null ? h + "h fa" : "data illeggibile"}] ${v.titolo}`
       + (v.riassunto ? `\n      ${v.riassunto}` : "");
   };
   const mie = perTk[TK] || [];
@@ -10201,8 +10201,13 @@ function contestoPortafoglio(tkCorrente) {
     .flatMap(([t, vv]) => (vv || []).slice(0, 2).map(v => ({ t, v })));
   if (mie.length || altre.length || (nt.non_letti || []).length) {
     L.push("");
-    L.push(`--- NOTIZIE SUI TITOLI DEL LIBRO (${nt.fonte || "Yahoo Finance RSS per ticker"}, `
-      + `finestra ${nt.finestra_giorni || 14} giorni) ---`);
+    /* ⚠ v399 — LA FONTE SI NOMINA PER QUELLA CHE HA SERVITO, non con un'etichetta fissa.
+       I canali sono due (Nasdaq primario, Yahoo di riserva) e la riga diceva sempre il nome di
+       uno solo: e' il difetto di v393, dove UMich dichiarava il calendario del RIPIEGO sotto un
+       dato preso dalla primaria. Ogni voce porta gia' la propria fonte; qui si dice quali
+       canali il sistema ha interrogato. */
+    const canali = (nt.canali || []).join(" con riserva su ") || "RSS per ticker";
+    L.push(`--- NOTIZIE SUI TITOLI DEL LIBRO (${canali}, finestra ${nt.finestra_giorni || 14} giorni) ---`);
     L.push(`⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli. Sono qui `
       + `per dirti di cosa si sta parlando e da dove partire, NON per sostituire la ricerca che il `
       + `PASSO 0 ti impone — la tua e' piu' fresca di questa, che arriva col giro della pipeline.`);
@@ -10222,7 +10227,7 @@ function contestoPortafoglio(tkCorrente) {
         + altre.map(({ t, v }) => `\n  [${t}]` + riga(v).replace(/^\n {4}/, " ")).join(""));
     }
     if ((nt.non_letti || []).length) {
-      L.push(`⚠ NON LETTI in questo run (la fonte ha strozzato le richieste, HTTP 429): `
+      L.push(`⚠ NON LETTI in questo run (nessuno dei canali ha risposto): `
         + `${nt.non_letti.join(", ")}. Per questi titoli l'assenza di notizie qui NON e' `
         + `un'informazione: e' un buco della raccolta.`);
     }
