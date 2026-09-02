@@ -2440,6 +2440,25 @@ pretende di sapere se il mercato sia aperto adesso.
 diventa `s`, quindi la regex del check nuovo non poteva funzionare. Sostituita con un `indexOf`,
 che non ha niente da sfuggire.
 
+## 📊 v400 — LA TABELLA CHIEDEVA UNA QUOTA SENZA CHIEDERE DI QUALE MERCATO
+
+Dimostrato da un **referto reale** su questo stesso pacchetto: il modello ha incolonnato le quote
+del **cloud generale** (AWS 44%, Azure 30%, GCP 19%) accanto a un **5%** del titolo analizzato,
+che sta su un mercato di due ordini di grandezza più piccolo. Sommate fanno un mondo che non
+esiste, e la riga del titolo sembra dieci volte più grande di quello che è.
+
+Non è un errore del modello: è la **richiesta** che lo produce. La colonna si chiamava "Quota di
+mercato" e nessuna riga chiedeva **quale** mercato. È la classe che `coherence_check` chiama
+*denominatori non dichiarati* — sorvegliata dentro il payload da anni e **assente dalle
+istruzioni che il payload stesso impartisce**.
+
+⚠ Aggiunta anche la clausola sul costo: *"la capitalizzazione dei concorrenti serve a dare la
+scala, non a decidere: se verificarla ti costa più di quanto renda, scrivi n.d."*. Ogni cella di
+quella tabella è una ricerca web, e il budget di ricerca è finito quanto quello di parole.
+
+⚠ **Ventesima rottura di un check ancorato a una stringa letterale**: v257 pretendeva
+`quota di mercato` ed è andato rosso quando la colonna è diventata più precisa.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
