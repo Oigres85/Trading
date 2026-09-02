@@ -1951,6 +1951,24 @@ audit 0 violazioni, 36→18 voci di news da 3 fonti, SEC EDGAR 13 titoli, SLOOS/
 (mille giorni), ma la riga chiudeva con "rischio unwind se BoJ alza" **senza dire da quale
 livello**. Un rischio senza la sua ancora. Ora il buco si dichiara.
 
+## ✂️ v394 — IL NOME TRONCATO È IL MESSAGGIO PERSO
+
+I tre grafici della v393 erano verdi su tutti i gate e **quattro etichette su cinque uscivano
+tagliate a 1440px**: `Autofinanziamento delle partecipate` chiede 219px in una colonna da 132.
+A 375px era tagliato anche il nome della fetta grande della torta, che è *la risposta* del
+grafico. Nessun errore in console, nessun check rosso.
+
+`.obar-lab` e `.ciam-nome` troncano con l'ellissi perché altrove vivono in colonne strette e
+molto ripetute, dove troncare è giusto. Qui i nomi **sono le regole**: un grafico che dice *di
+quanto* e non fa leggere *di che cosa* ha perso metà della propria risposta. È la famiglia di
+`.abar-fill` senza `display:block` (v205) e del `</div>` orfano (v225) — **difetti che non si
+rompono**, e si trovano solo misurando `scrollWidth` contro `clientWidth` in un browser vero.
+
+⚠ **Si va a capo, non si allarga la colonna.** Una larghezza fissa nuova è la classe già pagata
+due volte: v192 (chip da 298px → documento a 598 su uno schermo da 375) e v209 (96px sulla
+colonna del valore → 44px di scorrimento orizzontale su tutta la pagina). Col ritorno a capo la
+cella non scende comunque sotto la parola più lunga, che nella colonna esistente ci sta.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
