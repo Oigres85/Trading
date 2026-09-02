@@ -46,9 +46,16 @@ import pandas as pd
 import requests
 import yfinance as yf
 
+from rumore_yf import zittisci_yfinance   # fonte UNICA, condivisa col rapporto
+
 # yfinance logga internamente ("$TICKER: possibly delisted", 404 quoteSummary) su indici/ticker
-# flaky: catturiamo già le eccezioni a valle, qui zittiamo il logger per non inquinare stderr.
-logging.getLogger("yfinance").setLevel(logging.CRITICAL)
+# flaky: catturiamo già le eccezioni a valle, quindi il muro per titolo non deve inquinare stderr.
+# ⚠⚠ MA NON SI BUTTANO: prima qui c'era setLevel(CRITICAL), che le SCARTAVA. Conseguenza vera,
+#    non teorica: quando Yahoo blocca il CI la pipeline non lasciava NESSUNA traccia del perché —
+#    la stessa classe della seduta persa (v383/v384), una degradazione che non si vede. Ora si
+#    raccolgono e si riassumono per causa alla fine del run: 200 righe diventano 3, e quelle 3
+#    dicono se a fermarci è stata la rete, il rate limit o davvero un titolo.
+_RUMORE_YF, _ = zittisci_yfinance()
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "data.json"
@@ -1114,17 +1121,132 @@ def combustione(t, mcap, buyback):
     return {k: v for k, v in out.items() if v is not None}
 
 
+def riga_precedente(ticker):
+    """La riga dello STESSO titolo nello snapshot del run precedente, ovunque stia.
+    Cerca in entrambe le liste perche' un titolo puo' passare da watchlist a portafoglio fra
+    due run: agganciarsi alla lista invece che al ticker perderebbe il confronto proprio
+    quando la posizione viene aperta."""
+    for lista in ("portfolio", "watchlist"):
+        for r in (PREV_DATA.get(lista) or []):
+            if r.get("ticker") == ticker:
+                return r
+    return None
+
+
+MIN_STORIA_RISERVA = 200   # sotto questo, la riserva costerebbe SMA200 e i massimi a 52 settimane
+
+
+def ultima_seduta(hist):
+    """La data dell'ultima barra di uno storico, o None se l'indice non e' di date."""
+    try:
+        return str(hist.index[-1].date())
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def seduta_gia_pubblicata(ticker):
+    """La seduta piu' RECENTE gia' pubblicata per questo titolo dai run precedenti.
+
+    ⚠ Tiene memoria anche del flag di arretramento: guardando solo `price_asof` del run
+    precedente, al secondo run arretrato di fila il riferimento sarebbe gia' la data vecchia e
+    il confronto tornerebbe muto proprio mentre il sistema e' ancora indietro. Il 29/08/2026 la
+    regressione e' durata almeno quattro run."""
+    prec = riga_precedente(ticker) or {}
+    viste = [str(x) for x in (prec.get("price_asof"), prec.get("price_asof_arretrata_da")) if x]
+    return max(viste) if viste else None
+
+
+def recupera_seduta_persa(ticker, hist, price_src):
+    """Yahoo ha lo storico ma NON l'ultima seduta gia' pubblicata: prova la fonte di riserva.
+
+    ⚠⚠ NASCE DAL 29/08/2026, ed e' il seguito di v383. Yahoo ha servito la barra di venerdi'
+    senza Close, drop_void_bars l'ha scartata (correttamente) e il prezzo e' ricaduto su
+    giovedi': 22 strumenti su 24 tornati indietro di una seduta, per almeno quattro run.
+    La ridondanza sui prezzi ESISTEVA GIA' — backup_daily, catena Stooq → Tiingo — ma era
+    agganciata al solo caso `hist.empty`, cioe' Yahoo che non risponde affatto. Il caso reale
+    non e' quello: Yahoo risponde, con un anno di barre, e ne manca UNA — l'ultima, che e'
+    l'unica che conta per il prezzo. Il piano B c'era e non poteva scattare.
+
+    ⚠ SI SOSTITUISCE TUTTO LO STORICO, non il solo prezzo. Innestare la chiusura di venerdi' su
+    tecnica, ATR, medie e sparkline calcolate SENZA quella barra darebbe una riga a DUE ETA':
+    la classe di incoerenza per cui esiste coherence_check, e la ragione per cui v383 aveva
+    scelto di dichiarare invece di rattoppare. O la riga viene da una fonte sola, o non si tocca.
+
+    ⚠ E NON SI BARATTA LA STORIA PER UNA SEDUTA: sotto MIN_STORIA_RISERVA barre si terrebbe un
+    giorno in piu' perdendo SMA200, massimo a 52 settimane e drawdown. In quel caso si tiene
+    Yahoo e la regressione resta DICHIARATA da v383 — che e' il comportamento peggiore
+    accettabile, non un fallimento silenzioso."""
+    attesa = seduta_gia_pubblicata(ticker)
+    adesso = ultima_seduta(hist)
+    if not (attesa and adesso and attesa > adesso):
+        return hist, price_src                       # niente da recuperare: la strada normale
+    bk = backup_daily(ticker)
+    if bk is None:
+        print(f"·· {ticker}: seduta {attesa} persa da Yahoo, la fonte di riserva non risponde",
+              file=sys.stderr)
+        return hist, price_src
+    alt = drop_void_bars(bk[0])
+    alt_seduta = ultima_seduta(alt)
+    if len(alt) < MIN_STORIA_RISERVA:
+        print(f"·· {ticker}: {bk[1]} avrebbe la seduta ma solo {len(alt)} barre "
+              f"(<{MIN_STORIA_RISERVA}): tengo Yahoo, non baratto SMA200 per un giorno",
+              file=sys.stderr)
+        return hist, price_src
+    if not (alt_seduta and alt_seduta > adesso):
+        print(f"·· {ticker}: anche {bk[1]} si ferma a {alt_seduta}: la seduta {attesa} non e' "
+              f"recuperabile in questo run", file=sys.stderr)
+        return hist, price_src
+    print(f"·· {ticker}: Yahoo fermo a {adesso} contro {attesa} gia' pubblicata → SEDUTA "
+          f"RECUPERATA da {bk[1]} ({alt_seduta}, {len(alt)} barre)", file=sys.stderr)
+    return alt, bk[1]
+
+
+def seduta_arretrata(ticker, price_asof):
+    """La seduta pubblicata ORA e' PIU' VECCHIA di quella gia' a disco? Ritorna quella vecchia.
+
+    ⚠⚠ SUCCESSO DAVVERO, ED E' PASSATO INOSSERVATO PER ORE. Il 29/08/2026 i run delle 10:51 e
+    11:24 hanno ripubblicato la seduta del 27 dopo che quattro run consecutivi avevano il 28:
+    Yahoo ha servito la barra di venerdi' senza Close e `drop_void_bars` l'ha scartata — cioe'
+    la pipeline ha fatto la cosa GIUSTA, ma il risultato e' che 22 strumenti su 24 sono tornati
+    indietro di una seduta. MRVL da 216,62 (-10,3% sulla trimestrale) e' risalito a 241,45, il
+    SOX ha recuperato il 3,6% mai avvenuto, e `macro.momentum.sp500.asof` e' passato da
+    2026-08-28 a 2026-08-27. Dashboard e rapporto mostravano giovedi' credendolo l'ultimo dato.
+
+    ⚠ QUI NON SI RATTOPPA IL PREZZO, e la scelta e' deliberata. Riportare avanti la chiusura di
+    venerdi' su una riga la cui tecnica (ATR, medie, RSI, sparkline) e' calcolata SENZA quella
+    barra produrrebbe una riga a due eta': esattamente la classe di incoerenza per cui esiste
+    coherence_check, e il difetto che il gate valuta ha gia' pagato in v183. Il dato fetchato e'
+    internamente coerente — e' solo VECCHIO. Si dichiara, e chi legge decide.
+
+    ⚠ L'ALLARME DEVE RESTARE ACCESO, non suonare una volta sola. Se guardasse solo il
+    `price_asof` del run precedente, al secondo run consecutivo arretrato quel campo porterebbe
+    gia' la data vecchia e il confronto tornerebbe silenzioso — proprio mentre il sistema e'
+    ancora indietro. Il 29/08/2026 la regressione e' durata almeno QUATTRO run (10:51, 11:24,
+    13:40, 14:06): un allarme che suona sulla sola transizione non l'avrebbe raccontata.
+    Percio' si guarda la seduta piu' RECENTE mai pubblicata per questo titolo, tenendo memoria
+    anche del flag precedente."""
+    massima = seduta_gia_pubblicata(ticker)
+    return massima if (price_asof and massima and massima > str(price_asof)) else None
+
+
 def fetch_symbol(ticker, name=None, currency="USD"):
     """Quote + dati tecnici + rating + trimestrale + sparkline per un titolo."""
     ticker = TICKER_ALIAS.get(ticker.strip().upper(), ticker.strip())
     t = yf.Ticker(ticker)
     price_src = "yahoo"
     hist = drop_void_bars(t.history(period="1y", interval="1d", auto_adjust=True))
-    if hist.empty and currency == "USD" and not re.search(r"[\^=]|-", ticker):
+    # ⚠ la riserva vale solo per le azioni USD: indici, futures e cripto hanno una simbologia
+    #   diversa su Stooq e chiederli li' produrrebbe il titolo sbagliato, non un buco.
+    riserva_possibile = currency == "USD" and not re.search(r"[\^=]|-", ticker)
+    if hist.empty and riserva_possibile:
         bk = backup_daily(ticker)
         if bk is not None and len(bk[0]) >= 30:
             hist, price_src = drop_void_bars(bk[0]), bk[1]
             print(f"·· prezzi {ticker} da {price_src} (fallback: Yahoo senza storico)", file=sys.stderr)
+    elif riserva_possibile:
+        # ⚠⚠ IL CASO CHE MANCAVA (v384): Yahoo risponde, con un anno di barre, e ne manca UNA —
+        #    l'ultima. Per un anno il piano B e' esistito senza poter scattare proprio qui.
+        hist, price_src = recupera_seduta_persa(ticker, hist, price_src)
     if hist.empty:
         print(f"!! nessuno storico per {ticker}", file=sys.stderr)
         return None
@@ -1157,6 +1279,14 @@ def fetch_symbol(ticker, name=None, currency="USD"):
             price = lp
             price_asof = None   # non è una chiusura: è live
             price_live = True
+
+    # ⚠⚠ Guardia di REGRESSIONE DI SEDUTA (v383) — vedi seduta_arretrata(). Sta QUI, dopo il
+    #   live override: prima, price_asof puo' ancora essere azzerato e il confronto sarebbe
+    #   fatto su una data che poi non viene pubblicata.
+    arretrata_da = seduta_arretrata(ticker, price_asof)
+    if arretrata_da:
+        print(f"·· {ticker}: SEDUTA ARRETRATA — pubblico {price_asof}, il run precedente aveva "
+              f"{arretrata_da} (barra piu' recente assente o senza chiusura)", file=sys.stderr)
 
     monthly = None
     try:
@@ -1602,6 +1732,7 @@ def fetch_symbol(ticker, name=None, currency="USD"):
         "price_src": price_src,          # "yahoo" | "stooq" (fallback prezzi etichettato)
         "price": round(price, 2),
         "price_asof": price_asof,        # data dell'ultima chiusura valida (staleness dichiarabile)
+        "price_asof_arretrata_da": arretrata_da,   # v383: seduta PIU' RECENTE che un run precedente aveva gia' pubblicato
         "price_live": price_live,        # True = ultimo scambio LIVE (KOSPI/BTC/futures fuori orario USA)
         "change_pct": chg,
         "pe": round(float(pe), 1) if pe and pe > 0 else None,
@@ -5034,6 +5165,13 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     # NaN/Infinity non sono JSON validi per il browser → li converto in null prima di scrivere
     OUT.write_text(json.dumps(clean_nan(data), ensure_ascii=False, indent=1))
+    # ⚠ IL RIASSUNTO VA IN FONDO, dove il log del CI lo mostra senza scorrere, e va stampato
+    #   ANCHE quando il run è riuscito: un run che scrive data.json dopo 200 rifiuti di Yahoo
+    #   è riuscito a metà, e prima non c'era modo di saperlo.
+    if _RUMORE_YF.righe:
+        print(f"⚠ yfinance ha protestato {len(_RUMORE_YF.righe)} volte in questo run:")
+        for _r in _RUMORE_YF.riassunto():
+            print(f"   causa: {_r}")
     print(f"OK -> {OUT} ({OUT.stat().st_size // 1024} KB)")
 
 

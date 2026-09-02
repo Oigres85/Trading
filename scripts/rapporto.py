@@ -15,7 +15,7 @@ trimestrali e il perche' di un movimento non stanno qui — quelli si cercano in
 
 uso:  python3 scripts/rapporto.py
 """
-import json, math, sys
+import json, logging, math, sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -36,37 +36,47 @@ def eta_ore(iso):
 SCARTO_PREZZO = 2.0      # oltre questo scarto le due fonti si dichiarano ENTRAMBE
 
 
-def snapshot_piu_fresco(updated_at, libro_al):
-    """Lo snapshot della pipeline ha visto una seduta PIU' RECENTE di quella di libro.json?
+def seduta_snapshot(riga):
+    """La SEDUTA del prezzo di questa riga, come la dichiara la pipeline in `price_asof`.
 
-    ⚠ NASCE DA UN CASO REALE (29/08/2026). libro.json scarta una seduta INTERA se un solo nome
-    non ha ancora la barra (dropna listwise, trappola n.1 di analisi_libro.py); la pipeline no.
-    Quel giorno libro.json si fermava al 27/08 mentre data.json — che questo stesso rapporto
-    apre gia' per i fondamentali — portava il 28/08. In mezzo MRVL aveva perso il 10,3% sulla
-    trimestrale: la scheda dava +12,8% dal carico dove il libro aveva +1,2%, e il target di
-    consenso era calcolato sul prezzo sbagliato. Il rapporto aveva il dato giusto aperto in
-    memoria e stampava quello vecchio.
-    Si confrontano le DATE, non le ore: `updated_at` e' quando la pipeline ha girato, `al` e'
-    l'ultima seduta completa. Se la pipeline gira a mercato aperto il suo prezzo e' un
-    infragiornaliero, non una chiusura — e' comunque il piu' recente, e l'etichetta dice da
-    quale snapshot viene senza rivendicare una seduta."""
-    try:
-        s = datetime.fromisoformat(str(updated_at).replace("Z", "+00:00")).date()
-        return s > datetime.fromisoformat(str(libro_al)[:10]).date()
-    except (TypeError, ValueError):
-        return False
+    ⚠ E' None quando il prezzo e' un LIVE override (cripto, futures, indici esteri): li' non
+    esiste una chiusura, e la pipeline lo dichiara azzerando price_asof. Senza data non si
+    confronta niente e si resta su libro.json — meglio la fonte dichiarata che una data
+    inventata."""
+    a = (riga or {}).get("price_asof")
+    return str(a)[:10] if a else None
 
 
-def prezzo_da_usare(px_libro, px_snap, preferisci_snap):
-    """(prezzo, scarto%) — lo scarto e' None quando non c'e' una seconda lettura da dichiarare.
+def prezzo_da_usare(px_libro, riga_snap, libro_al):
+    """(prezzo, seduta, scarto%, snapshot_arretrato) — quale prezzo pubblicare, e di che seduta.
 
-    ⚠ Non si sceglie la fonte "migliore" in astratto: si prende la piu' RECENTE e si dichiara
-    l'altra quando divergono. Due valori per la stessa grandezza, uno solo dei quali stampato,
-    e' la classe di difetto che in questo progetto ha gia' fatto dimensionare una compensazione
-    fiscale sul numero sbagliato (v183, gate valuta)."""
-    if preferisci_snap and px_snap:
-        return px_snap, ((px_snap / px_libro - 1) * 100 if px_libro else None)
-    return px_libro, None
+    ⚠⚠ SI CONFRONTANO LE SEDUTE, NON GLI OROLOGI — e la prima stesura sbagliava proprio qui.
+    Confrontava `updated_at` (quando la pipeline ha GIRATO) con la seduta di libro.json: due
+    grandezze diverse messe sullo stesso piano. Il 29/08/2026 i run delle 10:51 e 11:24 hanno
+    ripubblicato la seduta del 27 dopo che quattro run avevano il 28 — Yahoo ha servito la
+    barra di venerdi' senza Close e drop_void_bars l'ha (correttamente) scartata. Con il
+    confronto sugli orologi quello snapshot risultava "piu' fresco" mentre era INDIETRO di una
+    seduta: se libro.json avesse avuto il 28, avrei preferito il prezzo piu' vecchio credendolo
+    piu' nuovo. `price_asof` e' la seduta vera, per titolo, e la pipeline la timbra gia'.
+
+    ⚠ LIMITE DICHIARATO: libro.json non pubblica una data per prezzo, solo `al`, che e'
+    l'ultima seduta COMPLETA della matrice. I suoi prezzi vengono da `ffill().iloc[-1]` e
+    possono quindi essere piu' recenti di `al` per i nomi che hanno la barra. `al` e' percio'
+    un limite INFERIORE alla freschezza di libro.json, non la sua data esatta: il confronto
+    e' conservativo: nel dubbio preferisce lo snapshot, che la sua data ce l'ha.
+
+    Il quarto valore dice che lo snapshot e' ARRETRATO rispetto a libro.json. Non e' un
+    dettaglio tecnico: e' il sintomo che il sistema ha perso una seduta e nessuno l'ha detto."""
+    px_snap = (riga_snap or {}).get("price")
+    seduta = seduta_snapshot(riga_snap)
+    base = str(libro_al)[:10] if libro_al else None
+    if not px_snap or not seduta or not base:
+        return px_libro, base, None, False
+    if seduta > base:
+        return px_snap, seduta, ((px_snap / px_libro - 1) * 100 if px_libro else None), False
+    if seduta < base:
+        return px_libro, base, None, True
+    return px_libro, base, None, False
 
 
 def tecnica(h):
@@ -187,13 +197,23 @@ def extra(t, r, px):
 def main():
     import yfinance as yf
     import analisi_libro as A
+    from rumore_yf import zittisci_yfinance   # fonte UNICA, condivisa con la pipeline
+    racc, ripristina = zittisci_yfinance()
     try:
         a = A.analizza()
         vivo = True
     except (Exception, SystemExit) as e:
         print(f"⚠ misure non calcolabili dal vivo ({type(e).__name__}) — valori pubblicati",
               file=sys.stderr)
+        for r in racc.riassunto():
+            print(f"  causa: {r}", file=sys.stderr)
         a, vivo = A.da_pubblicato(), False
+    finally:
+        ripristina()
+    if vivo and racc.righe:
+        # sceso dal vivo lo stesso, ma non senza attriti: dirlo, senza il muro.
+        print(f"⚠ prezzi scaricati, ma yfinance ha protestato {len(racc.righe)} volte "
+              f"({'; '.join(racc.riassunto())})", file=sys.stderr)
     d = json.loads((ROOT / "data" / "data.json").read_text(encoding="utf-8"))
     perTk = {r["ticker"]: r for r in d.get("watchlist", [])}
     m, q = a["m"], a.get("quota_az")
@@ -202,7 +222,15 @@ def main():
     print("═" * 78)
     print("RAPPORTO DEL PORTAFOGLIO")
     print("═" * 78)
-    preferisci_snap = (not vivo) and snapshot_piu_fresco(d.get("updated_at"), a.get("al"))
+    # ⚠ la fonte del prezzo si sceglie per TITOLO e PRIMA dell'intestazione: solo cosi'
+    #   l'intestazione puo' dire da quali sedute vengono davvero i prezzi che stampera'.
+    scelte = {}
+    for t in a["pesi"]:
+        pl = a["prezzi"].get(t)
+        scelte[t] = ((pl, a.get("al"), None, False) if vivo
+                     else prezzo_da_usare(pl, perTk.get(t), a.get("al")))
+    da_snapshot = sorted({s for _, s, sc, _ in scelte.values() if sc is not None})
+    arretrati = sorted(t for t, v in scelte.items() if v[3])
     print(f"prezzi e tecnica: {'scaricati adesso' if vivo else 'DA data/libro.json, non ricalcolati'}"
           f" · ultima seduta usata {a['al']}")
     print(f"fondamentali:     dallo snapshot della pipeline"
@@ -213,13 +241,22 @@ def main():
           + (f", {g} giorni fa" if g is not None else "")
           + (" ⚠⚠ se hai operato dopo, questi numeri sono esatti su un libro che non hai piu'"
              if (g or 0) > 7 else ""))
-    if preferisci_snap:
-        print(f"⚠ PREZZI PRESI DALLO SNAPSHOT del {str(d.get('updated_at'))[:10]}, piu' recente "
-              f"della seduta {a['al']} di libro.json: prezzo, distanza dal carico e distanza dal "
+    if da_snapshot:
+        print(f"⚠ PREZZI DALLO SNAPSHOT, seduta {', '.join(da_snapshot)} — piu' recente della "
+              f"seduta {a['al']} di libro.json: prezzo, distanza dal carico e distanza dal "
               f"target vengono da li'.")
         print(f"  PESO, VARIANZA E CORRELAZIONI restano invece alla seduta {a['al']} — si "
               f"ricalcolano solo con la rete. Le divergenze oltre il {SCARTO_PREZZO:.0f}% sono "
               f"scritte per esteso sotto ogni posizione.")
+    if arretrati:
+        # ⚠⚠ IL SISTEMA HA PERSO UNA SEDUTA. Non e' un dettaglio della pipeline: e' successo
+        #    il 29/08/2026 su 22 strumenti su 24 e per ore NIENTE l'ha detto — dashboard e
+        #    rapporto mostravano giovedi' credendolo l'ultimo dato disponibile.
+        print(f"⚠⚠ LO SNAPSHOT E' ARRETRATO su {len(arretrati)} titoli ({', '.join(arretrati)}): "
+              f"la pipeline pubblica una seduta PIU' VECCHIA della {a['al']} di libro.json.")
+        print("   Qui si usano i prezzi di libro.json. Il run della pipeline ha ripreso una "
+              "barra piu' vecchia (tipicamente Yahoo che serve la barra senza chiusura, che "
+              "drop_void_bars scarta): non e' un errore di calcolo, e' una seduta persa.")
     for gg, mancanti in (m.get("sedute_scartate") or {}).items():
         n = mancanti if isinstance(mancanti, int) else len(mancanti)
         print(f"⚠ seduta del {gg} non usata: {n} nomi senza barra")
@@ -257,7 +294,7 @@ def main():
         st = r.get("stats") or {}
         pmc = (a.get("carico") or {}).get(t)
         px_libro = a["prezzi"].get(t)
-        px, scarto = prezzo_da_usare(px_libro, r.get("price"), preferisci_snap)
+        px, seduta_px, scarto, _arretrato = scelte[t]
         tc = tecnica(hist[t]) if hist.get(t) is not None and not hist[t].empty else None
         print(f"\n▸ {t}  {r.get('name', '')[:34]}")
         riga = f"   peso {a['pesi'][t]*100:5.1f}%  →  varianza {m['contrib'][t]*100:5.1f}%   " \
@@ -265,8 +302,9 @@ def main():
         print(riga)
         if px:
             print(f"   prezzo {px:.2f}" + (f" · carico {pmc} ({(px/pmc-1)*100:+.1f}%)" if pmc else "")
-                  + (f" · seduta {r['change_pct']:+.2f}%"
-                     if preferisci_snap and r.get("change_pct") is not None else ""))
+                  + (f" · seduta del {seduta_px}" if seduta_px else "")
+                  + (f", var. {r['change_pct']:+.2f}%"
+                     if scarto is not None and r.get("change_pct") is not None else ""))
             if scarto is not None and abs(scarto) > SCARTO_PREZZO:
                 print(f"      ⚠ {scarto:+.1f}% rispetto alla seduta {a['al']} ({px_libro:.2f}"
                       + (f", {(px_libro/pmc-1)*100:+.1f}% dal carico" if pmc else "")

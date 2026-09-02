@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test di analisi_libro.py. Nessuna rete: dati sintetici costruiti per far scattare
 esattamente le trappole gia' pagate sul campo."""
-import math, sys
+import math, re, sys
 from pathlib import Path
 import numpy as np, pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -147,13 +147,71 @@ for et in ("CASSA", "DEBITO", "CONTO", "FLUSSO", "SHORT", "CANALI", "STAGION.", 
 #   su medie positive. Un default silenzioso su una chiave sbagliata e' peggio di un KeyError.
 check("la stagionalita' usa la chiave vera (positivi_pct), non un default silenzioso",
       "positivi_pct" in srcR2 and "pos_pct" not in srcR2)
-srcG = (Path(__file__).resolve().parent / "grafici.py").read_text(encoding="utf-8")
-check("i grafici non dipendono da risorse esterne (SVG scritto a mano)",
-      "http" not in srcG.split('"""')[2] and "<svg" in srcG)
+# ── 5b. i grafici vengono RACCOLTI dalla dashboard, non ridisegnati (v385) ─────────────
+# ⚠⚠ grafici.py disegnava a mano tre SVG in Python mentre la dashboard ha gia' il proprio
+#   sistema di grafici in app.js: DUE IMPLEMENTAZIONI DELLA STESSA DOMANDA, la classe che in
+#   questo progetto ha gia' fatto divergere usRegularSessionOpen (v161), i rami FedWatch (v207)
+#   e la consegna del pacchetto (v316). Ora si raccoglie l'HTML vero della dashboard.
+#   I check ESEGUONO lo script sui dati veri invece di leggerne il sorgente: un check ancorato
+#   al testo si e' rotto NOVE volte qui dentro.
+import subprocess, tempfile
+srcG = (Path(__file__).resolve().parent / "grafici.mjs").read_text(encoding="utf-8")
+_out = Path(tempfile.gettempdir()) / "test_grafici_raccolti.html"
+_r = subprocess.run(["node", str(Path(__file__).resolve().parent / "grafici.mjs"), str(_out)],
+                    capture_output=True, text=True, cwd=str(Path(__file__).resolve().parent.parent))
+_pag = _out.read_text(encoding="utf-8") if _out.exists() else ""
+check("il raccoglitore gira sui dati veri e produce una pagina", _r.returncode == 0 and len(_pag) > 5000,
+      f"exit {_r.returncode}, {len(_pag)} byte · {_r.stderr[:120]}")
+check("la pagina porta grafici VERI presi dalla dashboard, non segnaposto",
+      _pag.count("<svg") >= 3 and 'data-da="#' in _pag, f"{_pag.count(chr(60)+'svg')} svg")
+# ⚠ v233: si estraggono <svg> E <table> — le tabelle sono l'analisi finanziaria e di rischio
+check("si raccolgono anche le tabelle, non solo i grafici", _pag.count("<table") >= 1)
 check("la pagina dei grafici funziona in tema chiaro e scuro",
       "prefers-color-scheme: dark" in srcG and "data-theme=dark" in srcG)
-check("ogni pagina di grafici porta data e avvisi",
-      "seduta {a['al']}" in srcG and "posizioni di {g} giorni fa" in srcG)
+check("ogni pagina di grafici porta la propria data e i propri avvisi",
+      "snapshot pipeline" in _pag and "matrice al" in _pag and "posizioni al" in _pag)
+check("la pagina dichiara che i grafici sono RACCOLTI e non ridisegnati",
+      "RACCOLTI dalla dashboard" in _pag)
+# ⚠ NIENTE REGISTRO DI ID SCRITTO A MANO: un elenco fisso di bersagli invecchia da solo e in
+#   silenzio (C10, red team I6, MACRO_CARD_BY_PANEL che copriva 7 pannelli su 37).
+check("le funzioni da eseguire si RICAVANO dal sorgente, non sono elencate a mano",
+      "src.matchAll" in srcG and "function\\s+(render" in srcG)
+# ⚠ un allarme sempre acceso e' un allarme che nessuno legge: cripto e cambi hanno
+#   legittimamente una seduta diversa dalle azioni ogni fine settimana (classe C14)
+check("l'avviso sulle sedute diverse esclude cripto e cambi, che hanno un altro calendario",
+      "calendarioUSA" in srcG and "-USD$|=X$" in srcG)
+# ⚠ una pagina senza grafici NON e' un successo: uscire 0 sarebbe "verde per assenza"
+check("senza grafici raccolti lo script esce 1 invece di fingere un successo",
+      "if (!blocchi.length) process.exit(1)" in srcG)
+check("il raccoglitore non disegna: nessun SVG scritto a mano nel sorgente",
+      "<svg viewBox" not in srcG)
+_out.unlink(missing_ok=True)
+
+# ── 5c. ogni blocco raccolto dice come si chiama (v387) ────────────────────────────────
+# ⚠ Cinque riquadri senza intestazione: il CEO vedeva i grafici della dashboard e non poteva
+#   sapere quale fosse quale. Un blocco senza nome non e' meno grave di un titolo che mente —
+#   e' la stessa classe, l'etichetta che non fa il suo lavoro.
+check("ogni blocco raccolto porta un'intestazione", _pag.count("<h3>") >= _pag.count('data-da="#'))
+# ⚠⚠ LA PROPRIETA' CHE CONTA, e si prova cambiando index.html: il titolo si RICAVA dal markup.
+#   Con una mappa selettore→titolo scritta dentro grafici.mjs questo check passerebbe lo stesso
+#   ma la pagina mentirebbe al primo rinomino — la classe C10 (il registro che invecchia da
+#   solo). Qui la sezione viene rinominata davvero e si verifica che la pagina la segua.
+_idx = Path(__file__).resolve().parent.parent / "index.html"
+_orig_idx = _idx.read_text(encoding="utf-8")
+_MARCA = "Il rischio del libro, e con che cosa si confronta"
+assert _MARCA in _orig_idx, "iniezione a vuoto: intestazione di riferimento non in index.html"
+try:
+    _idx.write_text(_orig_idx.replace(_MARCA, "TITOLO CAMBIATO PER PROVA"), encoding="utf-8")
+    _r2 = subprocess.run(["node", str(Path(__file__).resolve().parent / "grafici.mjs"), str(_out)],
+                         capture_output=True, text=True,
+                         cwd=str(Path(__file__).resolve().parent.parent))
+    _pag2 = _out.read_text(encoding="utf-8") if _out.exists() else ""
+finally:
+    _idx.write_text(_orig_idx, encoding="utf-8")
+check("rinominando la sezione in index.html il titolo del blocco cambia con lei",
+      "TITOLO CAMBIATO PER PROVA" in _pag2 and _MARCA not in _pag2, f"exit {_r2.returncode}")
+check("nessuna mappa selettore→titolo scritta a mano dentro il raccoglitore",
+      "titoloDi" in srcG and "MARKUP.indexOf" in srcG and _MARCA not in srcG)
 
 # ── 6. le posizioni si leggono dalla FONTE, non dallo snapshot della pipeline ──────────
 src = (Path(__file__).resolve().parent / "analisi_libro.py").read_text(encoding="utf-8")
@@ -174,35 +232,168 @@ check("il download ritenta prima di arrendersi a una colonna vuota",
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import rapporto as RP
 
-check("lo snapshot piu' recente della seduta di libro.json viene riconosciuto",
-      RP.snapshot_piu_fresco("2026-08-29T03:06:41Z", "2026-08-27") is True)
-check("uno snapshot della STESSA seduta non spodesta libro.json",
-      RP.snapshot_piu_fresco("2026-08-27T22:10:00Z", "2026-08-27") is False)
-check("uno snapshot PIU' VECCHIO non spodesta libro.json",
-      RP.snapshot_piu_fresco("2026-08-26T03:06:41Z", "2026-08-27") is False)
-# ⚠ una data illeggibile non deve far scegliere una fonte: nel dubbio resta quella dichiarata
-check("una data assente o illeggibile non promuove lo snapshot",
-      RP.snapshot_piu_fresco(None, "2026-08-27") is False
-      and RP.snapshot_piu_fresco("2026-08-29T03:06:41Z", None) is False
-      and RP.snapshot_piu_fresco("boh", "2026-08-27") is False)
+# ⚠⚠ v383 — SI CONFRONTANO LE SEDUTE, NON GLI OROLOGI. La prima stesura confrontava
+#   `updated_at` (quando la pipeline ha girato) con la seduta di libro.json, ed era sbagliata:
+#   il 29/08/2026 due run hanno ripubblicato il 27 dopo che quattro avevano il 28, quindi uno
+#   snapshot con l'orologio piu' avanti portava una seduta piu' INDIETRO.
+VEN = {"price": 216.62, "price_asof": "2026-08-28"}     # MRVL venerdi', dopo la trimestrale
+GIO = {"price": 241.45, "price_asof": "2026-08-27"}     # MRVL giovedi'
 
-# il caso reale: MRVL 241.45 (gio) → 216.62 (ven)
-p, sc = RP.prezzo_da_usare(241.45, 216.62, True)
-check("col preferisci_snap attivo vince il prezzo dello snapshot", p == 216.62)
+p, sed, sc, arr = RP.prezzo_da_usare(241.45, VEN, "2026-08-27")
+check("una seduta piu' recente nello snapshot vince, e la sua data viene dichiarata",
+      p == 216.62 and sed == "2026-08-28" and arr is False)
 check("lo scarto dichiarato e' quello vero fra le due fonti",
       sc is not None and abs(sc - (216.62 / 241.45 - 1) * 100) < 1e-9, f"scarto {sc}")
 check("uno scarto oltre soglia su un caso reale viene segnalato",
       abs(sc) > RP.SCARTO_PREZZO, f"{sc:.2f}% contro soglia {RP.SCARTO_PREZZO}")
-p2, sc2 = RP.prezzo_da_usare(241.45, 216.62, False)
-check("senza preferisci_snap il prezzo resta quello di libro.json e non si dichiara nulla",
-      p2 == 241.45 and sc2 is None)
-p3, sc3 = RP.prezzo_da_usare(241.45, None, True)
-check("se lo snapshot non ha il prezzo si ricade su libro.json senza inventare uno scarto",
-      p3 == 241.45 and sc3 is None)
-# ⚠ MU si e' mosso dello 0,27%: sotto soglia, e la riga NON deve sporcare il rapporto
-_, sc4 = RP.prezzo_da_usare(935.39, 932.86, True)
+
+# ⚠ IL CASO CHE L'OROLOGIO SBAGLIAVA: snapshot generato DOPO ma su una seduta PRECEDENTE
+p2, sed2, sc2, arr2 = RP.prezzo_da_usare(216.62, GIO, "2026-08-28")
+check("uno snapshot ARRETRATO non spodesta libro.json e viene segnalato come tale",
+      p2 == 216.62 and sed2 == "2026-08-28" and sc2 is None and arr2 is True)
+
+p3, _, sc3, arr3 = RP.prezzo_da_usare(241.45, GIO, "2026-08-27")
+check("sulla STESSA seduta non si cambia fonte e non si dichiara nessuno scarto",
+      p3 == 241.45 and sc3 is None and arr3 is False)
+
+# ⚠ price_asof e' None sui LIVE override (cripto, futures, indici esteri): senza data non si
+#   confronta niente, e si resta sulla fonte dichiarata invece di indovinare.
+for descr, riga in (("senza price_asof", {"price": 216.62}),
+                    ("con price_asof nullo", {"price": 216.62, "price_asof": None}),
+                    ("senza prezzo", {"price_asof": "2026-08-28"})):
+    p4, _, sc4, arr4 = RP.prezzo_da_usare(241.45, riga, "2026-08-27")
+    check(f"una riga {descr} non spodesta libro.json ne' inventa uno scarto",
+          p4 == 241.45 and sc4 is None and arr4 is False)
+check("senza la seduta di libro.json non si sceglie e non si segnala",
+      RP.prezzo_da_usare(241.45, VEN, None) == (241.45, None, None, False))
+
+# ⚠ MU si e' mosso dello 0,27%: sotto soglia, la riga NON deve sporcare il rapporto
+_, _, sc5, _ = RP.prezzo_da_usare(935.39, {"price": 932.86, "price_asof": "2026-08-28"}, "2026-08-27")
 check("uno scarto sotto soglia resta calcolato ma non supera la soglia di segnalazione",
-      sc4 is not None and abs(sc4) < RP.SCARTO_PREZZO, f"{sc4:.2f}%")
+      sc5 is not None and abs(sc5) < RP.SCARTO_PREZZO, f"{sc5:.2f}%")
+
+# ⚠ OTTAVA volta in questo progetto che un check ancorato a una STRINGA del sorgente si rompe:
+#   la prima stesura pretendeva che "updated_at" non comparisse dopo prezzo_da_usare, ma quel
+#   campo serve legittimamente altrove (l'eta' dei fondamentali). La proprieta' vera e' che un
+#   OROLOGIO nella riga non cambia la scelta: solo la seduta conta.
+check("la seduta viene letta da price_asof, e un orologio nella riga non cambia la scelta",
+      RP.seduta_snapshot(VEN) == "2026-08-28" and RP.seduta_snapshot({}) is None
+      and RP.prezzo_da_usare(241.45, {**VEN, "updated_at": "2099-01-01T00:00:00Z"}, "2026-08-27")
+          == RP.prezzo_da_usare(241.45, VEN, "2026-08-27")
+      and RP.prezzo_da_usare(216.62, {**GIO, "updated_at": "2099-01-01T00:00:00Z"}, "2026-08-28")
+          == RP.prezzo_da_usare(216.62, GIO, "2026-08-28"))
+
+# ── 9. la pipeline dichiara quando ripubblica una seduta piu' vecchia (v383) ───────────
+srcU = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+import update_data as UD
+UD.PREV_DATA = {"watchlist": [{"ticker": "MRVL", "price_asof": "2026-08-28"}]}
+check("una seduta ARRETRATA rispetto al run precedente viene riconosciuta e datata",
+      UD.seduta_arretrata("MRVL", "2026-08-27") == "2026-08-28")
+check("una seduta uguale o piu' avanti non viene segnalata",
+      UD.seduta_arretrata("MRVL", "2026-08-28") is None
+      and UD.seduta_arretrata("MRVL", "2026-08-29") is None)
+check("un titolo mai visto prima non produce un falso allarme",
+      UD.seduta_arretrata("PIPPO", "2026-08-27") is None)
+check("senza price_asof (live override) non si segnala niente",
+      UD.seduta_arretrata("MRVL", None) is None)
+# ⚠ un titolo puo' passare da watchlist a portafoglio fra due run: il confronto non deve
+#   perdersi proprio quando la posizione viene aperta
+UD.PREV_DATA = {"portfolio": [{"ticker": "MRVL", "price_asof": "2026-08-28"}]}
+check("il confronto trova il titolo anche se ha cambiato lista fra i due run",
+      UD.seduta_arretrata("MRVL", "2026-08-27") == "2026-08-28")
+UD.PREV_DATA = {}
+check("senza snapshot precedente non si segnala niente",
+      UD.seduta_arretrata("MRVL", "2026-08-27") is None)
+# ⚠⚠ L'ALLARME DEVE RESTARE ACCESO. Al secondo run arretrato di fila, price_asof del run
+#   precedente porta gia' la data vecchia: senza memoria del flag l'allarme tacerebbe proprio
+#   mentre il sistema e' ancora indietro. Il 29/08/2026 la regressione e' durata quattro run.
+UD.PREV_DATA = {"watchlist": [{"ticker": "MRVL", "price_asof": "2026-08-27",
+                               "price_asof_arretrata_da": "2026-08-28"}]}
+check("al secondo run arretrato di fila l'allarme resta acceso, non tace",
+      UD.seduta_arretrata("MRVL", "2026-08-27") == "2026-08-28")
+check("e si spegne da solo quando la seduta persa viene recuperata",
+      UD.seduta_arretrata("MRVL", "2026-08-28") is None
+      and UD.seduta_arretrata("MRVL", "2026-08-31") is None)
+# ⚠ la pipeline DICHIARA, non rattoppa: splicciare un prezzo piu' recente su tecnica calcolata
+#   senza quella barra darebbe una riga a due eta' (la classe che coherence_check sorveglia)
+check("la pipeline dichiara la regressione invece di riscrivere il prezzo",
+      "price_asof_arretrata_da" in srcU and "NON SI RATTOPPA IL PREZZO" in srcU)
+
+# ── 10. la fonte di riserva scatta anche quando manca UNA SOLA seduta (v384) ───────────
+# ⚠⚠ backup_daily (Stooq → Tiingo) esisteva da sempre ma era agganciata al solo `hist.empty`,
+#   cioe' Yahoo che non risponde affatto. Il caso reale del 29/08/2026 era l'opposto: Yahoo
+#   risponde con un anno di barre e ne manca UNA, l'ultima. Il piano B non poteva scattare.
+#   Qui si prova senza rete, sostituendo backup_daily: cosi' il ramo si esercita davvero
+#   invece di essere solo letto (la lezione v234: un ramo mai raggiunto non e' una protezione).
+def _storico(fine, barre):
+    idx = pd.bdate_range(end=fine, periods=barre)
+    return pd.DataFrame({"Open": 100.0, "High": 101.0, "Low": 99.0,
+                         "Close": 100.0, "Volume": 1000.0}, index=idx)
+
+YAHOO_GIO = _storico("2026-08-27", 250)      # Yahoo si ferma a giovedi'
+RISERVA_VEN = _storico("2026-08-28", 250)    # la riserva ha venerdi'
+RISERVA_CORTA = _storico("2026-08-28", 40)   # ha venerdi' ma quasi nessuna storia
+
+def _con_riserva(ritorno):
+    """Sostituisce backup_daily e ritorna (hist, price_src) di recupera_seduta_persa."""
+    orig = UD.backup_daily
+    UD.backup_daily = lambda tk: ritorno
+    try:
+        return UD.recupera_seduta_persa("MRVL", YAHOO_GIO, "yahoo")
+    finally:
+        UD.backup_daily = orig
+
+UD.PREV_DATA = {"watchlist": [{"ticker": "MRVL", "price_asof": "2026-08-28"}]}
+h, src = _con_riserva((RISERVA_VEN, "stooq"))
+check("quando manca UNA seduta la riserva viene provata e la seduta si recupera",
+      UD.ultima_seduta(h) == "2026-08-28" and src == "stooq")
+check("si sostituisce TUTTO lo storico, non il solo prezzo (niente riga a due eta')",
+      len(h) == len(RISERVA_VEN) and h is not YAHOO_GIO)
+
+# ⚠ non si baratta la storia per una seduta: SMA200 e i massimi a 52 settimane valgono di piu'
+h2, src2 = _con_riserva((RISERVA_CORTA, "stooq"))
+check("una riserva troppo corta NON sostituisce Yahoo: non si perde SMA200 per un giorno",
+      UD.ultima_seduta(h2) == "2026-08-27" and src2 == "yahoo")
+check("la soglia di storia minima e' una costante dichiarata, non un numero sparso",
+      isinstance(UD.MIN_STORIA_RISERVA, int) and UD.MIN_STORIA_RISERVA >= 200)
+
+# ⚠ una riserva che si ferma dove si ferma Yahoo non e' un recupero: non va spacciata per tale
+h3, src3 = _con_riserva((_storico("2026-08-27", 250), "stooq"))
+check("una riserva ferma alla stessa seduta non viene spacciata per un recupero",
+      UD.ultima_seduta(h3) == "2026-08-27" and src3 == "yahoo")
+h4, src4 = _con_riserva(None)
+check("se la riserva non risponde si tiene Yahoo e la regressione resta dichiarata",
+      UD.ultima_seduta(h4) == "2026-08-27" and src4 == "yahoo")
+
+# ⚠ nessuna seduta persa = nessuna chiamata alla riserva. Un fetch inutile per titolo per run
+#   e' un costo vero su una fonte gratuita e rate-limited.
+UD.PREV_DATA = {"watchlist": [{"ticker": "MRVL", "price_asof": "2026-08-27"}]}
+_chiamate = []
+_orig = UD.backup_daily
+UD.backup_daily = lambda tk: _chiamate.append(tk) or (RISERVA_VEN, "stooq")
+try:
+    h5, src5 = UD.recupera_seduta_persa("MRVL", YAHOO_GIO, "yahoo")
+finally:
+    UD.backup_daily = _orig
+check("senza seduta persa la riserva non viene nemmeno interrogata",
+      _chiamate == [] and src5 == "yahoo" and h5 is YAHOO_GIO)
+
+# ⚠ il recupero e' AGGANCIATO alla guardia: le due cose devono leggere la stessa memoria,
+#   altrimenti divergono (due implementazioni della stessa domanda — gia' successo tre volte)
+# ⚠ NONA rottura di un check ancorato a una stringa del sorgente: la prima stesura cercava
+#   "seduta_gia_pubblicata" nei primi 400 caratteri dopo `def seduta_arretrata`, e la docstring
+#   e' piu' lunga di cosi'. La proprieta' vera si prova SENZA leggere il sorgente: si mette la
+#   seduta buona SOLO nel flag, e si verifica che la vedano entrambe. Se una delle due leggesse
+#   solo `price_asof` (qui il 25, piu' VECCHIO di Yahoo) non scatterebbe ne' l'allarme ne' il
+#   recupero — cioe' il difetto si manifesterebbe, invece di nascondersi in una stringa.
+UD.PREV_DATA = {"watchlist": [{"ticker": "MRVL", "price_asof": "2026-08-25",
+                               "price_asof_arretrata_da": "2026-08-28"}]}
+check("guardia e recupero leggono la STESSA memoria, flag di arretramento compreso",
+      UD.seduta_gia_pubblicata("MRVL") == "2026-08-28"
+      and UD.seduta_arretrata("MRVL", "2026-08-27") == "2026-08-28"
+      and UD.ultima_seduta(_con_riserva((RISERVA_VEN, "stooq"))[0]) == "2026-08-28")
+check("la riserva NON viene usata su indici, futures e cripto (simbologia diversa su Stooq)",
+      "riserva_possibile = currency ==" in srcU and "elif riserva_possibile:" in srcU)
 check("la soglia di dichiarazione e' una costante, non sparsa nel codice",
       isinstance(RP.SCARTO_PREZZO, (int, float)) and srcR.count("SCARTO_PREZZO") >= 3)
 
@@ -212,7 +403,7 @@ import scenari as SC
 check("scenari.py non muore piu' con un traceback quando la rete manca",
       "except (Exception, SystemExit)" in srcS and "non_si_puo" in srcS)
 # ⚠ la PROPRIETA' che conta: spiega senza produrre numeri di scenario inventati
-import io, contextlib
+import io, contextlib, logging
 buf = io.StringIO()
 with contextlib.redirect_stdout(buf):
     SC.non_si_puo(RuntimeError("meno di tre titoli con storia sufficiente"))
@@ -225,6 +416,114 @@ check("non stampa nessuna riga di scenario quando non ha i dati per calcolarla",
       "sull'azionario" not in uscita and "beta" not in uscita.lower().replace("i beta verso", ""))
 check("il codice d'uscita dice la verita': non esce 0 senza aver prodotto scenari",
       "sys.exit(main() or 0)" in srcS and "return 1" in srcS)
+
+# ── 9. il muro di yfinance: riassunto per CAUSA, non silenzio (v387) ───────────────────
+# ⚠ La dichiarazione del ripiego ESISTEVA gia' ed era corretta — stava pero' in fondo a ~200
+#   righe che yfinance scrive su stderr, e quelle righe dicono "possibly delisted" di societa'
+#   vive. E' la classe v315 (una dichiarazione che c'e' e non si trova non e' una dichiarazione)
+#   applicata all'output di un comando. Qui NON si prova che il rumore sparisce: si prova che
+#   la CAUSA sopravvive, che e' l'unica cosa che il muro faceva perdere.
+import rumore_yf as RY
+_racc = RY.RaccoltaYF()
+_racc.righe = (["Failed to perform, curl: (7) CONNECT tunnel failed, response 403"] * 3
+               + ["$MU: possibly delisted; no price data found"] * 5
+               + ["Cookie/crumb fetch failed (ConnectionError), continuing without crumb"] * 2
+               + ["qualcosa che non abbiamo mai visto"])
+_r = _racc.riassunto()
+check("il riassunto NON perde messaggi: le classi coprono tutto cio' che e' arrivato",
+      sum(int(x.split()[0]) for x in _r) == len(_racc.righe))
+# ⚠ LA PROPRIETA' CHE IL DIFETTO VIOLAVA: col muro, l'ultima cosa letta erano 13 "delisted".
+#   La causa vera (la rete) deve venire PRIMA, e il delisting essere dichiarato conseguenza.
+check("la causa di rete viene prima del delisting, che e' dichiarato una conseguenza",
+      "403" in _r[0] and any("delisting" in x and "conseguenza" in x for x in _r))
+check("un messaggio mai visto non viene inghiottito: viene contato e citato",
+      any("non classificati" in x and "mai visto" in x for x in _r))
+check("senza proteste il riassunto e' vuoto — non inventa una causa",
+      RY.RaccoltaYF().riassunto() == [])
+
+# ⚠ COMPORTAMENTALE: si prova sul logger VERO, non rileggendo il sorgente. Un messaggio
+#   emesso mentre la cattura e' attiva deve finire nella raccolta e NON su stderr; e dopo
+#   il ripristino deve tornare a propagare, altrimenti zittiremmo yfinance per sempre.
+_lg = logging.getLogger("yfinance")
+# ⚠ QUESTO CHECK E' ANDATO ROSSO E AVEVA RAGIONE. scripts/update_data.py alza lo stesso
+#   logger a CRITICAL quando viene importato, e questa suite lo importa: il messaggio spariva
+#   PRIMA di arrivare a qualunque handler. In produzione la cattura funzionava solo perche'
+#   rapporto.py non importa la pipeline — cioe' per l'ordine degli import, non per costruzione.
+#   Qui la condizione ostile si RIPRODUCE apposta, invece di essere aggirata.
+_lg.setLevel(logging.CRITICAL)
+# ⚠ LA PROPRIETA' E' "torna ESATTAMENTE com'era", non "torna vuoto". La prima stesura asseriva
+#   handlers == [], e si e' rotta appena la pipeline ha cominciato a tenere la propria raccolta
+#   attiva: l'assunzione era sul valore, non sull'invariante. Si fotografa lo stato e si verifica
+#   che il ripristino lo rimetta, chiunque altro abbia toccato il logger prima.
+_stato_prima = (list(_lg.handlers), _lg.propagate, _lg.level)
+_prima_p = _lg.propagate
+_err = io.StringIO()
+_racc2, _ripristina = RY.zittisci_yfinance()
+with contextlib.redirect_stderr(_err):
+    _lg.error("possibly delisted; no price data found")
+_ripristina()
+check("mentre la cattura e' attiva il messaggio va nella raccolta, non su stderr",
+      _racc2.righe == ["possibly delisted; no price data found"] and _err.getvalue() == "")
+check("dopo il ripristino il logger torna ESATTAMENTE com'era: handler, propagate, livello",
+      (list(_lg.handlers), _lg.propagate, _lg.level) == _stato_prima)
+_lg.setLevel(logging.NOTSET)
+check("il ripristino avviene anche quando analizza() esplode: e' in un finally",
+      "finally:" in srcR and "ripristina()" in srcR)
+# ⚠ UNA COPIA SOLA. La raccolta serve al rapporto E alla pipeline: due implementazioni della
+#   stessa domanda divergono al primo ritocco (classe v161/v207, pagata piu' volte). Il check
+#   verifica che nessuno dei due la reimplementi in casa.
+_srcU_txt = (Path(__file__).resolve().parent / "update_data.py").read_text(encoding="utf-8")
+check("la raccolta ha UNA fonte sola, importata sia dal rapporto sia dalla pipeline",
+      "from rumore_yf import" in srcR and "from rumore_yf import" in _srcU_txt
+      and "class RaccoltaYF" not in srcR and "class RaccoltaYF" not in _srcU_txt)
+
+# ── 10. il comando /aggiorna non resta indietro rispetto al sistema (v387) ─────────────
+# ⚠⚠ Il modo in cui un comando smette di essere utile non e' rompersi: e' RESTARE INDIETRO.
+#   Prima di questa versione /aggiorna citava 5 script su 22 — backtest_signals, backtest_diary
+#   ed emit_macro_pack esistevano, funzionavano, e nessuno li eseguiva mai. Un comando che cita
+#   uno script rimosso, o che ignora uno strumento nuovo, degrada in silenzio: e' la classe del
+#   registro fisso (C10, red team I6, MACRO_CARD_BY_PANEL) applicata a un comando.
+_CMD = Path(__file__).resolve().parent.parent / ".claude" / "commands" / "aggiorna.md"
+_cmd = _CMD.read_text(encoding="utf-8")
+_scripts = sorted(p.name for p in (Path(__file__).resolve().parent).glob("*.py"))
+_scripts += sorted(p.name for p in (Path(__file__).resolve().parent).glob("*.mjs"))
+# ⚠ L'ANCORAGGIO VA CHIUSO: `update_data.py` e' sottostringa di `test_update_data.py`, quindi
+#   un `in` semplice dichiarava citato uno script mai nominato e vietato uno consentito. E' la
+#   trappola gia' scritta due volte in CLAUDE.md (`mg-card` che matcha `mg-card-head`,
+#   `sc-fonte` che matcha `sc-fonte-qualsiasi`), e il check l'ha ripetuta appena scritto.
+def _nominato(nome, testo):
+    return re.search(r"(?<![\w-])" + re.escape(nome), testo) is not None
+_ignoti = [s for s in _scripts if not _nominato(s, _cmd)]
+check("ogni script del repo e' o eseguito da /aggiorna o dichiarato fuori, con la sua ragione",
+      not _ignoti, f"mai nominati: {', '.join(_ignoti)}")
+# ⚠ e il verso opposto: un comando che cita uno script inesistente promette un passo che non
+#   avviene. Verde per assenza di esecuzione, la trappola gia' pagata in v205 e v226.
+_citati = sorted(set(re.findall(r"scripts/([A-Za-z0-9_]+\.(?:py|mjs))", _cmd)))
+_fantasmi = [s for s in _citati if not (Path(__file__).resolve().parent / s).exists()]
+check("nessuno script citato dal comando e' un fantasma", not _fantasmi, f"assenti: {_fantasmi}")
+# ⚠ IL DIVIETO E' STRUTTURALE, non una buona intenzione: il CEO ha chiesto che nessun
+#   aggiornamento parta da solo. Se un domani qualcuno mette update_data.py fra i passi da
+#   eseguire, questo check lo trova — la riga deve stare SOLO nella sezione dei divieti.
+_divieto = _cmd.split("## Cosa questo comando NON fa")[-1]
+_passi = _cmd.split("## Cosa questo comando NON fa")[0]
+check("update_data.py compare solo fra i divieti, mai fra i passi da eseguire",
+      _nominato("update_data.py", _divieto) and not _nominato("update_data.py", _passi))
+check("anche notify_alerts e log_verdict stanno solo fra i divieti: scrivono fuori",
+      all(_nominato(x, _divieto) and not _nominato(x, _passi)
+          for x in ("notify_alerts.py", "log_verdict.mjs")))
+# ⚠ e il gate della pipeline deve restare fra i PASSI: e' l'unico modo di sapere OGGI che la
+#   pipeline di domani e' rotta, invece di scoprirlo dall'eta' il giorno dopo (v369).
+check("test_update_data.py resta invece fra i passi: sorveglia la pipeline senza eseguirla",
+      _nominato("test_update_data.py", _passi))
+check("il divieto di armare trigger e schedulazioni e' scritto, non sottinteso",
+      "trigger" in _divieto.lower() and "schedulazion" in _divieto.lower())
+# ⚠ il backtest e' l'unica forma di "previsione" che questo sistema ammette, e va letto come
+#   curriculum misurato, non come profezia: il comando deve chiedere il campione REALE.
+check("il comando chiede il campione REALE dei backtest, non le osservazioni sovrapposte",
+      "campione REALE" in _cmd and "5 titoli distinti" in _cmd)
+check("il comando impone R² accanto al beta: un canale sotto 0,05 non si racconta",
+      "R²" in _cmd and "0,05" in _cmd)
+
 
 _T = len(ESEGUITI)
 print(f"\n{'TUTTI I ' + str(_T - len(FALLITI)) + f'/{_T} CHECK OK' if not FALLITI else str(len(FALLITI)) + f'/{_T} FALLITI: ' + ', '.join(FALLITI)}")
