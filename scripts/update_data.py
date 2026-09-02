@@ -2031,7 +2031,15 @@ def calendario_uscite_fred(voci, quante=3):
     if not key:
         raise RuntimeError("FRED_API_KEY assente: il calendario ufficiale passa dall'API, "
                            "il csv pubblico non lo espone")
-    oggi = datetime.now(timezone.utc).date().isoformat()
+    oggi_d = datetime.now(timezone.utc).date()
+    oggi = oggi_d.isoformat()
+    # ⚠ v396 — SI GUARDA ANCHE ALL'INDIETRO, e non e' un dettaglio. Il CEO ha vietato le
+    # proiezioni: "solo ultimo dato ufficiale con data acquisizione e la data del prossimo
+    # aggiornamento". La data in cui il dato corrente e' stato PUBBLICATO era finora una
+    # nostra stima ("pubblicato ~15/08"), costruita dal ritardo tipico della fonte. Il
+    # calendario la contiene davvero: e' l'ultima uscita gia' avvenuta. Chiedendo la finestra
+    # all'indietro si sostituisce una stima con un fatto, invece di limitarsi a toglierla.
+    da = (oggi_d - timedelta(days=200)).isoformat()
     date_per_release, nome_release, out = {}, {}, {}
     # ⚠ le righe di STORICO_IND hanno QUATTRO campi (chiave, serie, trasformazione, punti):
     # qui servono i primi due. Spacchettarne due su una riga da quattro alza ValueError e
@@ -2055,16 +2063,24 @@ def calendario_uscite_fred(voci, quante=3):
                 d = http_get("https://api.stlouisfed.org/fred/release/dates"
                              f"?release_id={rid}&api_key={key}&file_type=json"
                              "&include_release_dates_with_no_data=true"
-                             f"&realtime_start={oggi}&sort_order=asc&limit={max(quante, 1) * 4}")
-                # ⚠ il filtro >= oggi si rifa' anche lato nostro: `realtime_start` e' il periodo
-                # di realtime dell'API, che NON e' la stessa cosa della data di uscita. Fidarsi
+                             f"&realtime_start={da}&sort_order=asc&limit=400")
+                # ⚠ il taglio si rifa' anche lato nostro: `realtime_start` e' il periodo di
+                # realtime dell'API, che NON e' la stessa cosa della data di uscita. Fidarsi
                 # del nome di un parametro e' come fidarsi di un commento invece del calcolo.
-                date_per_release[rid] = [x["date"] for x in d.json().get("release_dates", [])
-                                         if str(x.get("date", "")) >= oggi][:quante]
+                tutte = sorted({str(x.get("date", ""))[:10]
+                                for x in d.json().get("release_dates", [])
+                                if len(str(x.get("date", ""))) >= 10})
+                # una serie giornaliera (H.15) ha ~140 uscite in 200 giorni: si tengono le due
+                # ultime avvenute e le prossime, non tutta la storia.
+                date_per_release[rid] = {
+                    "passate": [x for x in tutte if x <= oggi][-2:],
+                    "prossime": [x for x in tutte if x > oggi][:quante],
+                }
                 time.sleep(0.1)
-            if date_per_release[rid]:
-                out[chiave] = {"prossime": date_per_release[rid], "release": nome_release[rid],
-                               "release_id": rid, "serie": serie}
+            _d = date_per_release[rid]
+            if _d["passate"] or _d["prossime"]:
+                out[chiave] = {"prossime": _d["prossime"], "passate": _d["passate"],
+                               "release": nome_release[rid], "release_id": rid, "serie": serie}
             time.sleep(0.1)
         except Exception as e:  # noqa: BLE001
             print(f"!! calendario FRED per {chiave} ({serie}): {e}", file=sys.stderr)
@@ -2901,9 +2917,14 @@ def fetch_macro():
                     _gap = [(_ds[i] - _ds[i + 1]).days for i in range(len(_ds) - 1)]
                     _cad = int(_st.median(_gap))
                     # solo una cadenza plausibilmente trimestrale autorizza una previsione
+                    # ⚠ v396 — LA DATA ATTESA E' STATA TOLTA. Era `ultimo deposito + cadenza
+                    # mediana`, cioe' una PROIEZIONE NOSTRA su dati che acquisiamo: il CEO l'ha
+                    # vietata ("meglio non avere dati che avere dati non corretti"). Restano i
+                    # FATTI, che sono la parte che vale: quando la societa' ha depositato davvero
+                    # e ogni quanti giorni lo fa. Da quelli chi legge sa cosa aspettarsi senza
+                    # che il sistema gli metta in mano una data che nessuno ha fissato.
                     if 80 <= _cad <= 100:
                         voce["cadenza_gg"] = _cad
-                        voce["attesa_da_cadenza"] = (_ds[0] + timedelta(days=_cad)).isoformat()
                     else:
                         voce["cadenza_irregolare_gg"] = _cad
                 sec_cal[_tk] = voce
@@ -3114,9 +3135,11 @@ def fetch_macro():
         spread = round(us10 - float(jp10), 2)
         # prossime riunioni Bank of Japan (calendario ufficiale 2026; date = 2° giorno = annuncio decisione)
         boj = [d for d in ("2026-01-23", "2026-03-19", "2026-04-28", "2026-06-16",
-                           "2026-07-31", "2026-09-18", "2026-10-29", "2026-12-18",
-                           # 2027 (stimate sul calendario tipico BoJ, da confermare)
-                           "2027-01-22", "2027-03-18", "2027-04-28", "2027-06-17")
+                           "2026-07-31", "2026-09-18", "2026-10-29", "2026-12-18")
+                           # ⚠ v396 — le quattro date 2027 erano "stimate sul calendario tipico
+                           # BoJ, da confermare": una proiezione nostra, e il CEO le ha vietate.
+                           # Quando il 2026 sara' esaurito la lista si svuota e la pagina lo
+                           # dice, invece di mostrare riunioni che nessuno ha convocato.
                if d >= datetime.now(timezone.utc).strftime("%Y-%m-%d")][:4]
         # tasso BoJ (overnight call rate) via FRED
         boj_rate_val = None

@@ -53,6 +53,75 @@
 > non sono ovvie dal codice e che, se ignorate, rompono il sistema. Aggiornalo quando prendi
 > una decisione strutturale nuova.
 
+## 🚫 v396 — IL SISTEMA NON PROIETTA PIÙ NESSUNA DATA. FATTI, O "DATO NON DISPONIBILE"
+
+Istruzione permanente del CEO (02/09/2026), testuale: *"non inserire mai proiezioni di dati che
+acquisiamo (es. calendario FRED) ma solo ultimo dato ufficiale con data acquisizione e la data
+del prossimo aggiornamento, se non abbiamo queste informazioni dici dato non disponibile …
+**meglio non avere dati che avere dati non corretti**"*. Vale nel sistema E nel pacchetto.
+
+**La ricevuta, scritta prima di tagliare.** Le proiezioni erano CINQUE, e nessuna si annunciava
+come tale al di fuori di un'etichetta:
+
+| dove | cosa inventava |
+|---|---|
+| `cadenzaDato` → `prossimo` | rilevazione + un passo + il ritardo TIPICO della fonte |
+| `cadenzaDato` → `pubblicato` | la data d'uscita stimata (`pubblicato ~15/08`), **e su di essa l'età in giorni** |
+| `cadenzaDato` → `scaduto`/`passata` | l'allarme *"era atteso il X e NON È ARRIVATO"*, confrontato con una data nostra |
+| `nextReleaseDate()` | un calendario USA **scritto a mano** ("primo venerdì", "il 12", "il 28") |
+| pipeline → `attesa_da_cadenza` | ultimo deposito SEC + cadenza mediana |
+| pipeline → BoJ 2027 | quattro riunioni *"stimate sul calendario tipico"* |
+
+**Quanto sbagliavano, misurato**: confrontate col calendario ufficiale arrivato lo stesso
+giorno, le quattro uscite macro delle due settimane successive erano **tutte e quattro
+sbagliate** — NFP e disoccupazione di 1 giorno, vendite al dettaglio di 1, **CPI di 2**. Un CPI
+spostato di due giorni fa scrivere un'analisi *"prima del dato"* il giorno dopo che è uscito.
+
+**E il taglio ha portato un guadagno, non solo una perdita.** Chiedendo al calendario FRED anche
+la finestra ALL'INDIETRO, l'ultima uscita già avvenuta **è** la data di pubblicazione: una stima
+è stata sostituita da un fatto, invece di essere semplicemente rimossa.
+
+⚠ **L'allarme "dato non arrivato" NON è perso, si è spostato dove è misurato meglio**:
+`validate_macro` confronta l'ETÀ della rilevazione con la cadenza massima ammessa per la serie —
+una soglia misurata invece di una data immaginata. La vecchia versione poteva suonare su un dato
+regolarissimo (è successo due volte: feste americane in v266, fine settimana in v271) e tacere su
+uno davvero in ritardo.
+
+⚠ **Gli esclusi si NOMINANO.** Tolte le date proiettate, tre indicatori restano senza prossimo
+aggiornamento: il pacchetto li conta e li elenca. *Togliere righe in silenzio è peggio del
+difetto che si sta correggendo* — chi legge non distingue "nessuna uscita prevista" da "il
+sistema non sa quando esce". È la classe delle notizie contate e poi nascoste (v393).
+
+⚠ **Le trimestrali restano stime, e la differenza è dichiarata**: le pubblica l'EMITTENTE come
+propria attesa. Non sono una proiezione nostra — noi non ne calcoliamo più nessuna.
+
+### 🦴 Dodici gate hanno accusato il colpo, e nessuno è stato zittito
+v266 (×2), v271 (×2), v320, v350, v363 (×2), v390, v392, v393, v395 (×4). Tutti sorvegliavano
+l'aritmetica della proiezione. A ciascuno è cambiato l'invariante, e quelli nati per difendere
+qualcosa che non esiste più sono diventati la **ricevuta della rimozione**: verificano che ciò
+che è stato tolto non rientri e che al suo posto ci sia la dichiarazione onesta.
+
+⚠ Fra questi, **v320 è la sedicesima rottura di un check ancorato a una stringa letterale**
+(`"prossimo atteso"`), e **v350 era diventato DORMIENTE**: il suo filtro non trovava più righe e
+usciva verde per assenza del fenomeno. L'ha preso il meta-gate dei dormienti, non io.
+
+### 🛠️ Il backtick dentro un template: tre volte in una sessione, chiuso con uno strumento
+`` ` `` dentro un template literal **lo chiude**. È scritto in questo file da versioni e oggi ci
+sono cascato **tre volte** — sempre in un commento che CITAVA del codice, che è precisamente
+quando viene naturale usare gli apici inversi. Ogni volta `modifica_sicura` ha rifiutato la
+scrittura, ma il rifiuto arriva dopo aver scritto lo script.
+
+> **Un difetto di metodo ripetuto non si corregge con l'attenzione: si corregge cambiando lo
+> strumento perché non lo accetti più.**
+
+Ora c'è `meta: nessun backtick dentro un template passato al vm`, fratello del rilevatore dei
+backslash. **Validato sul caso che `node --check` NON vede**: un template spezzato che resta
+sintatticamente valido (`` suVeri(`x` + `…`) ``) — lì il compilatore tace e il check muore a
+metà.
+⚠ E scrivendolo ho fatto per la **sesta volta** il gate che trova sé stesso: i meta-gate
+contengono la sequenza di apertura come DATO. Si tolgono i commenti e si esclude il proprio
+blocco (v213, v240, v393).
+
 ## 🚦 FLUSSO DI CONSEGNA — si lavora su `main`, e la PR si unisce sempre
 
 Istruzione permanente del CEO (02/09/2026), testuale: *"Unisci sempre la pr e lavora

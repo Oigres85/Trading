@@ -1248,17 +1248,41 @@ check("v266 grafico: la striscia dei livelli si ridisegna quando arrivano i dati
 /* ⚠ si misura la PROPRIETA' (il prossimo cade dopo la rilevazione e non e' un sabato), non la
    distanza da oggi: un check ancorato al calendario diventa rosso da solo quando gira la data —
    errore gia' fatto in questo progetto e ripetuto scrivendo questo. */
-check("v266 cadenza: il prossimo atteso di una serie giornaliera cade DOPO la rilevazione", run(`
-  const c = cadenzaDato("t30", "2026-08-06");
-  if (!c || !(c.prossimo > "2026-08-06")) return false;
-  const g = new Date(c.prossimo + "T12:00:00").getDay();
-  return g !== 0 && g !== 6`));
+/* ⚠ v396 — INVARIANTE CAMBIATO, NON ZITTITO. Questo check verificava l'aritmetica della
+   PROIEZIONE (il giorno lavorativo dopo la rilevazione). Da quando il CEO ha vietato le date
+   proiettate, `cadenzaDato` non ne calcola piu': o c'e' l'appuntamento del calendario
+   ufficiale, o non c'e' niente. L'invariante che resta e' piu' semplice e piu' forte: la data
+   pubblicata come "prossima" viene SEMPRE dal calendario e cade SEMPRE nel futuro. */
+check("v266 cadenza: la prossima uscita, quando c'e', viene dal calendario e sta nel futuro", suVeri(`
+  const oggi = new Date(); oggi.setHours(0, 0, 0, 0);
+  const cal = ((DATA.macro.calendario_uscite || {}).per_chiave) || {};
+  let viste = 0;
+  for (const i of DATA.macro.indicators || []) {
+    const c = cadenzaDato(i.key, i.date);
+    if (!c) continue;
+    if (c.prossimo) {
+      viste++;
+      if (!cal[i.key]) return false;                                  // inventata
+      if (new Date(c.prossimo + "T00:00:00") <= oggi) return false;   // gia' passata
+      if (c.confermato !== true) return false;
+    } else if (c.confermato !== false) return false;
+  }
+  return viste >= 1;`));
 
-check("v266 cadenza: un giorno di festa non accende l'allarme dato mancante", run(`
-  const ieri = new Date(); ieri.setDate(ieri.getDate() - 2);
-  const iso = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-  const c = cadenzaDato("t30", iso(ieri));
-  return !!c && !c.scaduto`));
+/* ⚠⚠ v396 — L'ALLARME "ERA ATTESO E NON E' ARRIVATO" E' STATO RIMOSSO, e questo check ne e'
+   la ricevuta. Confrontava OGGI con una data che ci eravamo dati da soli: poteva suonare su un
+   dato regolarissimo (era il difetto di v266 e v271, pagato due volte con le feste americane e
+   col fine settimana) e tacere su uno davvero in ritardo. Il segnale non e' perso: vive in
+   `validate_macro` lato pipeline, che confronta l'ETA' della rilevazione con la cadenza massima
+   ammessa per quella serie — una soglia misurata invece di una data immaginata.
+   Qui si verifica che l'allarme non torni per la porta di servizio. */
+check("v396 nessun allarme di dato mancante costruito su una data che ci siamo dati noi", suVeri(`
+  const c = cadenzaDato("t30", "2026-08-06");
+  if (!c) return false;
+  if ("scaduto" in c || "passata" in c) return false;   // i campi della vecchia proiezione
+  const p = buildPrompt();
+  return p.indexOf("NON E' ARRIVATO") < 0 && p.indexOf("NON È ARRIVATO") < 0
+      && p.indexOf("dentro la tolleranza") < 0;`));
 
 check("v266 cadenza: le serie giornaliere hanno un calendario, non solo le mensili", (() => {
   const i = src.indexOf("const CADENZA_FONTE");
@@ -1419,24 +1443,32 @@ check("v268 rete: livePrices e la watchlist condividono UNA cache, non due giri"
    quando gira la data — errore gia' fatto in questo progetto e ripetuto scrivendo questo".
    L'ho scritto e l'ho rifatto nella stessa riga. Ora la data si costruisce ALL'INDIETRO da
    oggi: l'ultimo giorno lavorativo, che e' il caso che la proprieta' descrive. */
-check("v271 cadenza: l'ultimo dato lavorativo non risulta 'mancante'", run(`
-  const iso = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")
-                   + "-" + String(d.getDate()).padStart(2, "0");
-  const indietroLavorativi = (n) => {
-    const d = new Date(); d.setHours(0, 0, 0, 0);
-    while (n > 0) { d.setDate(d.getDate() - 1); if (d.getDay() !== 0 && d.getDay() !== 6) n--; }
-    return d;
-  };
-  const uno = cadenzaDato("t30", iso(indietroLavorativi(1)));
-  const due = cadenzaDato("t30", iso(indietroLavorativi(2)));
-  /* uno e due giorni LAVORATIVI fa sono dentro la grazia; cinque no, e il check verifica
-     anche quello — altrimenti passerebbe pure una grazia infinita. */
-  const cinque = cadenzaDato("t30", iso(indietroLavorativi(5)));
-  return uno && due && cinque && !uno.scaduto && !due.scaduto && cinque.scaduto`));
+/* ⚠ v396 — la grazia in giorni lavorativi serviva a non far suonare l'allarme costruito sulla
+   proiezione. Tolto l'allarme, la grazia non ha piu' oggetto. Al suo posto l'invariante che
+   conta oggi: la riga di cadenza NON scrive mai una data che non venga da una fonte, e quando
+   non ce l'ha lo DICE — "dato non disponibile" e' un'informazione, un trattino no. */
+check("v396 dove non c'e' la data, la riga lo dichiara invece di tacere o indovinare", suVeri(`
+  const salva = DATA.macro.calendario_uscite;
+  delete DATA.macro.calendario_uscite;
+  const r = rigaCadenza("t30", "2026-08-06");
+  DATA.macro.calendario_uscite = salva;
+  return r.indexOf("prossimo aggiornamento dato non disponibile") >= 0
+      && r.indexOf("ultima uscita dato non disponibile") >= 0
+      && /[0-9]{2}\\/[0-9]{2}\\/[0-9]{4}/.test(r) === true;`));
 
-check("v271 cadenza: la grazia si conta in giorni lavorativi", (() => {
-  const i = src.indexOf("function sommaGiorniLavorativi");
-  return i > 0 && /getDay\(\) !== 0 && x\.getDay\(\) !== 6/.test(src.slice(i, i + 400));
+/* ⚠ v396 — LA GRAZIA IN GIORNI LAVORATIVI E' STATA RIMOSSA insieme all'allarme che serviva
+   ad ammorbidire: quell'allarme confrontava OGGI con una data proiettata da noi, e le date
+   proiettate non esistono piu'. Questo check e' la RICEVUTA della rimozione: verifica che ne'
+   la funzione ne' il concetto rientrino di soppiatto, e che il posto sia occupato dalla
+   dichiarazione onesta invece che da un buco. */
+check("v396 la grazia sulla data proiettata non rientra dalla porta di servizio", (() => {
+  const soloCodice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  if (/sommaGiorniLavorativi/.test(soloCodice)) return no("la funzione della grazia e' tornata");
+  const c = bloccoDa(src, "function cadenzaDato", { max: 7000 }).replace(/\/\*[\s\S]*?\*\//g, "");
+  if (/scaduto|passata|tolleranza/.test(c)) return no("i campi dell'allarme proiettato sono tornati");
+  if (!/dato non disponibile|ND/.test(bloccoDa(src, "function rigaCadenza", { max: 3000 })))
+    return no("tolto l'allarme, la riga tace invece di dichiarare che non sa");
+  return true;
 })());
 
 /* ══ v272 — RICHIESTE DEL CEO: pre/after market, tab macro senza grafico, punti morti ═════ */
@@ -2706,7 +2738,10 @@ check("v320 leva: il pacchetto porta i NUMERI, non solo il verdetto", suVeri(`
             && Math.abs(trim - md.qoq) > 0.5;
       })()
       && (r.includes("rilevazione") || r.includes("riferito a "))
-      && r.includes("prossimo atteso")`));
+      /* ⚠ v396 — qui c'era un includes sulla stringa "prossimo atteso": SEDICESIMA rottura di un check
+         ancorato a una stringa letterale, andato rosso su codice piu' corretto di prima.
+         L'invariante e' che la riga dica quando arriva il prossimo dato, non con quali parole. */
+      && r.includes("prossimo aggiornamento")`));
 
 check("v320 leva: pubblica il parametro storico, e non è il '% del massimo'", suVeri(`
   const p = buildPrompt();
@@ -4195,23 +4230,26 @@ check("v350 fibonacci: i livelli usano lo STESSO range stampato sopra di loro", 
   return fib[1] === hi && fib[2] === lo;`));
 
 
-check("v350 cadenza: il periodo rilevato e la data di pubblicazione sono NOMINATI", suVeri(`
+check("v396 cadenza: periodo, acquisizione e prossimo aggiornamento sono TRE campi distinti",
+      suVeri(`
   const t = buildCIOText();
-  /* la stessa data 01/07/2026 usciva come "3 giorni fa", "8 giorni fa" e "18 giorni fa" in tre
-     righe diverse: ciascuna corretta (i ritardi delle fonti differiscono) ma la forma accostava
-     il periodo RILEVATO all'eta' della PUBBLICAZIONE senza dire quale fosse quale */
-  const righe = t.split("\\n").filter(l => /giorni fa\\)/.test(l) && /rilevazione |riferito a /.test(l));
-  if (!righe.length) return true;
-  /* ⚠ v392 — RIAGGANCIATO AL FATTO. La prima stesura pretendeva "riferito a GG/MM/AAAA",
-     cioe' una FORMA: quando il periodo di riferimento e' diventato un periodo per esteso
-     ("riferito al 2° trimestre 2026", "riferito a luglio 2026") il check e' fallito su codice
-     piu' chiaro di prima. Dodicesima volta in questo progetto.
-     L'invariante che v350 esiste per difendere e' scritto nel commento qui sopra: le due date
-     devono essere NOMINATE e distinguibili, cosi' che l'eta' si attacchi a quella giusta.
-     Il periodo per esteso lo soddisfa MEGLIO di una data puntuale, non peggio. */
+  /* ⚠⚠ v396 — QUESTO CHECK ERA DIVENTATO DORMIENTE, e il meta-gate l'ha preso subito. Cercava
+     righe con "(N giorni fa)" accanto a "rilevazione|riferito a": la mia stessa modifica ha
+     tolto l'eta' stimata dalla riga, quindi il filtro trovava zero righe e il check usciva
+     un return anticipato: VERDE PER ASSENZA DEL FENOMENO, trappola gia' pagata cinque volte.
+     L'invariante che v350 difendeva resta e si rafforza: le date che la riga nomina devono
+     essere DISTINGUIBILI, cosi' che nessuno attacchi un'eta' alla data sbagliata (era il caso
+     reale: la stessa 01/07/2026 letta come "3", "8" e "18 giorni fa" in tre righe diverse).
+     Ora i campi sono tre e ciascuno ha il proprio nome. */
+  const righe = t.split("\\n").filter(l => /riferito (a|al) /.test(l) && /acquisito /.test(l));
+  if (righe.length < 3) return false;          // muto = non sta misurando
   return righe.every(l =>
-       (/riferito (a|al) /.test(l) && /pubblicato ~\\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l))
-    || /rilevazione \\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/.test(l));`));
+       /riferito (a|al) /.test(l)
+    && /acquisito (il \\d{2}\\/\\d{2}\\/\\d{4}|dato non disponibile)/.test(l)
+    && /ultima uscita (\\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)|dato non disponibile)/.test(l)
+    && /prossimo aggiornamento (\\d{2}\\/\\d{2}\\/\\d{4}|dato non disponibile)/.test(l)
+    /* nessuna riga puo' portare un'eta' senza la data a cui si riferisce */
+    && !/\\(\\d+ giorni fa\\)/.test(l.replace(/ultima uscita \\d{2}\\/\\d{2}\\/\\d{4} \\(\\d+ giorni fa\\)/g, "")));`));
 
 
 check("v350 pre/after: un prezzo di ieri non si chiama 'adesso'", (() => {
@@ -4698,6 +4736,55 @@ check("meta: le finestre a caratteri fissi non aumentano (tetto TETTO_FINESTRE, 
   return fisse.length <= TETTO_FINESTRE;
 })());
 
+/* ⚠⚠ v396 — IL BACKTICK DENTRO UN TEMPLATE LO CHIUDE, e in una sola sessione ci sono cascato
+   TRE volte: una nel commento che spiegava la correzione di v349, una nel commento che citava
+   la stringa rimossa da v320, una nel commento che spiegava la trappola dei check dormienti.
+   Tutte e tre le volte il commento CITAVA del codice, che e' la ragione per cui viene naturale
+   racchiuderlo fra apici inversi. E tutte e tre le volte `modifica_sicura` ha rifiutato la
+   scrittura, che e' esattamente il lavoro per cui esiste — ma il rifiuto arriva DOPO aver
+   scritto lo script, e la regola di questo progetto e' che un difetto di metodo ripetuto non si
+   corregge con l'attenzione, si corregge cambiando lo strumento perche' non lo accetti piu'.
+   Fratello del rilevatore dei backslash qui sotto: stessa causa, stesso posto, stessa forma. */
+check("meta: nessun backtick dentro un template passato al vm", (() => {
+  /* ⚠ SESTA VOLTA CHE UN GATE TROVA SE' STESSO, e mi e' successo scrivendo il gate che doveva
+     chiudere un'ALTRA trappola ricorrente. I meta-gate contengono la sequenza di apertura come
+     DATO — nel commento che la spiega e dentro la propria regex — quindi lo scanner la leggeva
+     come una vera chiamata e denunciava due guasti inesistenti. Rimedio gia' scritto in
+     CLAUDE.md per v213, v240 e v393: si tolgono i commenti e si esclude il blocco dei meta. */
+  const mio = readFileSync(fileURLToPath(import.meta.url), "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/^\s*\/\/.*$/gm, "")
+    .replace(/check\("meta: nessun back(?:slash|tick)[\s\S]*?\}\)\(\)\);/g, "")
+    .replace(/check\("meta: il rilevatore dei backslash[\s\S]*?\}\)\(\)\);/g, "");
+  /* si isola ogni template passato a un helper del vm e si guarda se, PRIMA della chiusura,
+     compare un backtick non escapato: se c'e', il template finisce li' e il resto del check
+     diventa sintassi arbitraria — che e' come si e' rotta la suite tre volte oggi. */
+  const APERTURE = /(?:run|suVeri|suReale|suVeriEsito|conDiario|conComb|conCombEsito)\(`/g;
+  const guasti = [];
+  for (const m of mio.matchAll(APERTURE)) {
+    const da = m.index + m[0].length;
+    let k = da, chiuso = -1;
+    while (k < mio.length) {
+      const ch = mio[k];
+      if (ch === "\\") { k += 2; continue; }
+      if (ch === "`") { chiuso = k; break; }
+      k++;
+    }
+    if (chiuso < 0) { guasti.push("template mai chiuso a " + da); continue; }
+    /* il template chiude dove deve? se subito dopo non c'e' una chiusura di chiamata
+       plausibile, il backtick trovato era dentro il corpo e ha spezzato tutto. */
+    const coda = mio.slice(chiuso + 1, chiuso + 6);
+    if (!/^\s*\)/.test(coda))
+      guasti.push(mio.slice(Math.max(da, chiuso - 46), chiuso + 4).replace(/\n/g, "\u23ce"));
+  }
+  if (guasti.length) {
+    console.log("  \u26d4 " + guasti.length + " backtick dentro un template del vm: lo chiudono. "
+      + guasti.slice(0, 2).join(" \u00b7 "));
+  }
+  return guasti.length === 0;
+})());
+
+
 check("meta: nessun backslash SINGOLO dentro un template passato al vm", (() => {
   const mio = readFileSync(fileURLToPath(import.meta.url), "utf8");
   const sospetti = [];
@@ -4994,9 +5081,15 @@ check("v393 UMich dichiara la fonte che ha SERVITO il dato, non una fissa", (() 
 check("v393 il calendario di UMich e' quello della primaria: stesso mese, non il mese dopo", suVeri(`
   /* la primaria pubblica il definitivo negli ultimi giorni dello STESSO mese che misura.
      Col vecchio mesiRitardo la riga annunciava il prossimo dato con un mese di ritardo. */
+  /* ⚠ v396 — la data attesa era una PROIEZIONE (fine mese + 28 giorni) e non si pubblica piu'.
+     Resta il fatto che questo check esiste per difendere: UMich viene dalla fonte PRIMARIA, e
+     il calendario FRED — che descriverebbe la ridistribuzione, con 1-2 mesi di ritardo di
+     licenza — non deve toccarlo. Quindi la riga nomina la primaria e per la prossima uscita
+     dichiara che il dato non c'e', invece di prendere quella sbagliata. */
   const r = rigaCadenza("umich", "2026-08-01");
   return r.includes("riferito a agosto 2026")
-      && r.includes("prossimo atteso 28/09/2026")
+      && r.includes("prossimo aggiornamento dato non disponibile")
+      && r.includes("UMich (fonte primaria)")
       && !r.includes("via FRED");`));
 
 /* ---------- report ----------
@@ -5050,57 +5143,39 @@ check("v363 · nessun \"1 volte\": il rapporto ~1 si dice a parole", (() => {
    fidarsi anche delle righe giuste. Ora lo stato intermedio si dice, e questo check impedisce
    che "prossimo atteso" torni a coprire una data gia' passata. */
 const _esitoV363 = (r) => r === true ? true : no(String(r));
-check("v363 · nessun \"prossimo atteso\" riferito a una data gia' passata", _esitoV363( suVeri(`
+/* ⚠⚠ v396 — QUESTI DUE CHECK SORVEGLIAVANO LA PROIEZIONE, CHE NON C'E' PIU'.
+   Il primo cercava la forma "prossimo atteso GG/MM/AAAA"; il secondo pretendeva che
+   ESISTESSE lo stato intermedio "atteso, non ancora arrivato, entro la tolleranza".
+   Entrambi difendevano un'aritmetica che il CEO ha vietato: le date non si proiettano piu'.
+   Non vengono cancellati e non vengono zittiti — diventano la RICEVUTA della rimozione, che
+   e' l'unica forma in cui una protezione sopravvive a un taglio: verificano che cio' che e'
+   stato tolto non rientri, e che al suo posto ci sia la dichiarazione onesta. */
+check("v396 · nessuna data pubblicata come 'prossima' cade nel passato", _esitoV363( suVeri(`
   const p = buildPrompt();
   const mData = p.match(/DATI AL (\\d{2})\\/(\\d{2})\\/(\\d{4})/);
   if (!mData) return no("il pacchetto non dichiara piu' la propria data: il confronto non e' possibile");
   const oggi = new Date(mData[3] + "-" + mData[2] + "-" + mData[1]);
-  /* ⚠ v395 — IL RILEVATORE GUARDAVA UNA FORMA SOLA e il pavimento di 3 occorrenze ha smesso
-     di essere raggiunto appena la maggioranza delle uscite e' passata al calendario ufficiale:
-     il check si e' dichiarato MUTO, correttamente. L'invariante non riguarda la parola
-     "atteso" ma la PRETESA: nessuna riga puo' annunciare come futura una data gia' passata,
-     che sia una stima o un appuntamento confermato. Ora copre entrambe le forme. */
-  const FORME = /(?:prossimo atteso|prossima uscita CONFERMATA il) (\\d{2})\\/(\\d{2})\\/(\\d{4})/g;
+  const FORME = /prossimo aggiornamento (\\d{2})\\/(\\d{2})\\/(\\d{4})/g;
   const passate = [];
   for (const m of p.matchAll(FORME)) {
     const d = new Date(m[3] + "-" + m[2] + "-" + m[1]);
     if (d < oggi) passate.push(m[0] + " (" + Math.round((oggi - d) / 86400000) + " giorni fa)");
   }
-  if (passate.length) return "\\"prossimo\\" detto di date passate: " + [...new Set(passate)].join(", ");
+  if (passate.length) return "date passate annunciate come prossime: " + [...new Set(passate)].join(", ");
   /* il detector deve aver visto qualcosa, altrimenti e' muto e si legge come una conferma */
   const quante = [...p.matchAll(FORME)].length;
-  if (quante < 3) return "solo " + quante + " righe sulla prossima uscita: il check non sta misurando";
+  if (quante < 3) return "solo " + quante + " righe con una data di prossimo aggiornamento: non sto misurando";
   return true;`)));
 
-/* Lo stato intermedio deve ESISTERE nel codice: senza, una data appena passata torna a
-   uscire come "prossimo", oppure — peggio — accende l'allarme dei dati mancanti su una
-   fonte puntuale, che e' l'errore che v266 e v271 hanno gia' pagato due volte. */
-check("v363 · esiste lo stato 'atteso, non ancora arrivato, entro la tolleranza'", (() => {
-  const b = bloccoDa(src, "function rigaCadenza", { max: 2500 });
-  if (!/c\.passata/.test(b)) return no("sparito il ramo dello stato intermedio");
-  if (!/NON È ARRIVATO/.test(b)) return no("sparito l'allarme dei dati davvero mancanti");
-  if (/prossimo atteso \$\{it\(c\.prossimo\)\} ⚠/.test(b))
-    return no("l'allarme torna a dire \"prossimo atteso\" davanti a una data gia' passata");
-  const iAll = b.indexOf("NON È ARRIVATO"), iMedio = b.indexOf("c.passata");
-  if (iMedio < iAll) return no("lo stato intermedio viene prima dell'allarme: coprirebbe i ritardi veri");
-  /* ⚠ v395 — QUESTA RIGA CERCAVA LA STRINGA `passata: p < oggi` NEL SORGENTE, ed e' andata
-     rossa su codice piu' corretto di prima: v395 ci ha messo davanti il ramo del calendario
-     confermato (`_confermata ? false : p < oggi`), quindi la forma e' cambiata e il fatto no.
-     E' la QUINDICESIMA volta in questo progetto che un check ancorato a una stringa letterale
-     si rompe su una riformulazione senza che manchi niente. Ora il ramo si ESERCITA: si toglie
-     il calendario ufficiale (cosi' si passa dalla proiezione, che e' il caso da coprire) e si
-     chiede a `cadenzaDato` una rilevazione abbastanza vecchia perche' la stima cada nel
-     passato. Se `passata` non puo' piu' accendersi, questo mente e il check lo dice. */
-  const provaPassata = suVeri(`
-    const salva = DATA.macro.calendario_uscite;
-    delete DATA.macro.calendario_uscite;
-    const v = new Date(); v.setMonth(v.getMonth() - 6);
-    const iso = v.getFullYear() + "-" + String(v.getMonth() + 1).padStart(2, "0") + "-01";
-    const c = cadenzaDato("cpi", iso);
-    DATA.macro.calendario_uscite = salva;
-    return !!(c && c.passata === true && c.confermato === false);`);
-  if (provaPassata !== true)
-    return no("senza calendario ufficiale 'passata' non si accende piu': il ramo intermedio e' morto");
+check("v396 · la proiezione e' rimossa e al suo posto c'e' la dichiarazione, non un buco", (() => {
+  const b = bloccoDa(src, "function rigaCadenza", { max: 3000 });
+  const senzaCommenti = b.replace(/\/\*[\s\S]*?\*\//g, "");
+  if (/prossimo atteso/.test(senzaCommenti)) return no("la forma proiettata e' rientrata");
+  if (/NON È ARRIVATO|tolleranza/.test(senzaCommenti)) return no("l'allarme sulla data inventata e' rientrato");
+  if (!/dato non disponibile/.test(senzaCommenti) && !/ND/.test(senzaCommenti))
+    return no("tolta la proiezione, la riga tace invece di dichiarare che non sa");
+  const c = bloccoDa(src, "function cadenzaDato", { max: 7000 }).replace(/\/\*[\s\S]*?\*\//g, "");
+  if (/giorniLag|mesiRitardo/.test(c)) return no("cadenzaDato torna a costruirsi le date da se'");
   return true;
 })());
 
@@ -5707,14 +5782,17 @@ check("v389 disciplina: dichiara di riusare le misure del libro, per non farle c
 check("v390 EDGAR: il deposito passato e' un FATTO, la data futura resta una stima", suVeri(`
   const salvato = DATA.macro.sec_calendario;
   DATA.macro.sec_calendario = { per_titolo: { MU: {
-    ultimo_deposito: "2026-06-24", n_depositi: 36, cadenza_gg: 91, attesa_da_cadenza: "2026-09-23" } },
+    ultimo_deposito: "2026-06-24", n_depositi: 36, cadenza_gg: 91 } },
     senza_8k: [], senza_cik: [], fonte: "SEC EDGAR" };
   const p = buildPromptTicker("MU");
   DATA.macro.sec_calendario = salvato;
-  /* la distinzione che il blocco esiste per fare: il deposito e' accaduto, l'attesa no */
+  /* ⚠ v396 — la SECONDA STIMA (ultimo deposito + cadenza mediana) era una proiezione nostra ed
+     e' stata tolta. L'invariante si rovescia e diventa piu' netto: il deposito passato e la
+     cadenza misurata si pubblicano come FATTI, e da essi NON deve uscire nessuna data futura. */
   return /ULTIMO DEPOSITO DEI RISULTATI[^\\n]*e' un FATTO, non una stima[^\\n]*2026-06-24/.test(p)
-      && /SECONDA stima della prossima uscita: 2026-09-23/.test(p)
-      && /STIMA di yfinance, non una data confermata/.test(p);`));
+      && /cadenza dei suoi ultimi 36 depositi e' di 91 giorni/.test(p)
+      && /non una previsione, e il sistema non ne ricava una data/.test(p)
+      && p.indexOf("2026-09-23") < 0;`));
 
 check("v390 EDGAR: una cadenza irregolare NON produce una data", suVeri(`
   const salvato = DATA.macro.sec_calendario;
@@ -5957,7 +6035,11 @@ check("v392 l'eta' in giorni resta attaccata alla PUBBLICAZIONE, che e' cio' che
      che e' esattamente il contrario del vero (v343: eta = giorni dall'uscita). Correggendo
      un'ambiguita' avevo introdotto un'affermazione falsa. */
   const senzaCommenti = b.replace(/\/\*[\s\S]*?\*\//g, "");
-  return /pubblicato ~\$\{it\(c\.pubblicato\)\} \(\$\{c\.eta\} giorni fa\)/.test(senzaCommenti)
+  /* ⚠ v396 — la forma e' cambiata (la pubblicazione ora e' un FATTO preso dal calendario, non
+     piu' una stima col "~"), il fatto no: l'eta' in giorni sta attaccata alla data di uscita e
+     non al periodo misurato. Ancorarsi al testo esatto sarebbe la classe gia' pagata quindici
+     volte; ci si ancora alla vicinanza fra `c.pubblicato` e `c.eta` nella stessa espressione. */
+  return /ultima uscita \$\{c\.pubblicato[\s\S]{0,120}c\.eta\} giorni fa/.test(senzaCommenti)
       && !/NON dalla pubblicazione/.test(senzaCommenti);
 })());
 
@@ -5997,64 +6079,55 @@ check("v395 dove il calendario ufficiale esiste, la data vince sulla proiezione"
             && c.calendario === "Consumer Price Index"
             && stima && stima.confermato === false && stima.prossimo !== c.prossimo);`));
 
-check("v395 la riga dice QUALE delle due cose sta guardando, e non le confonde", suVeri(_INIETTA_CAL + `
-  const conf = rigaCadenza("cpi", DATA.macro.indicators.find(i => i.key === "cpi").date);
-  const salva = DATA.macro.calendario_uscite; delete DATA.macro.calendario_uscite;
-  const stim = rigaCadenza("cpi", DATA.macro.indicators.find(i => i.key === "cpi").date);
-  DATA.macro.calendario_uscite = salva;
-  return conf.indexOf("CONFERMATA") >= 0 && conf.indexOf("calendario ufficiale") >= 0
-      && stim.indexOf("CONFERMATA") < 0 && stim.indexOf("STIMA") >= 0;`));
+/* ⚠⚠ v396 — QUESTI QUATTRO CHECK NASCEVANO IERI E SONO GIA' CAMBIATI, per una ragione che
+   vale la pena scrivere: in v395 il pacchetto marcava ogni uscita [CONFERMATA] o [STIMATA],
+   cioe' pubblicava ANCHE le date che ci calcolavamo da soli, dichiarandole. Il CEO ha deciso
+   che dichiararle non basta — "meglio non avere dati che avere dati non corretti" — e le date
+   proiettate sono uscite del tutto. Quindi non c'e' piu' una dualita' da sorvegliare: c'e' un
+   insieme solo (gli appuntamenti veri) e un ELENCO DI ESCLUSI che va nominato, perche' togliere
+   righe in silenzio e' peggio del difetto che si sta correggendo. */
+check("v396 la riga di cadenza porta i tre fatti e nessuna stima", suVeri(`
+  const k = (DATA.macro.calendario_uscite.per_chiave.cpi ? "cpi" : null);
+  if (!k) return false;
+  const r = rigaCadenza("cpi", DATA.macro.indicators.find(i => i.key === "cpi").date);
+  return r.indexOf("riferito a ") >= 0
+      && r.indexOf("acquisito il ") >= 0
+      && r.indexOf("prossimo aggiornamento ") >= 0
+      && r.indexOf("calendario ufficiale") >= 0
+      && r.indexOf("STIMA") < 0 && r.indexOf("prossimo atteso") < 0;`));
 
-/* ⚠ `stimata` era SCRITTO A MANO come costante `true` su ogni evento: restava vero anche
-   quando la data era confermata. Un campo che non puo' essere smentito dai fatti non e'
-   un'informazione — stessa famiglia del gate circolare di v393. */
-check("v395 il segno 'stimata' segue la fonte della data, non e' una costante", suVeri(_INIETTA_CAL + `
+check("v396 senza calendario la riga dice 'non disponibile' invece di calcolarsela", suVeri(`
+  const salva = DATA.macro.calendario_uscite;
+  delete DATA.macro.calendario_uscite;
+  const r = rigaCadenza("cpi", DATA.macro.indicators.find(i => i.key === "cpi").date);
+  const c = cadenzaDato("cpi", DATA.macro.indicators.find(i => i.key === "cpi").date);
+  DATA.macro.calendario_uscite = salva;
+  return r.indexOf("prossimo aggiornamento dato non disponibile") >= 0
+      && c.prossimo === null && c.confermato === false
+      && !/prossimo aggiornamento [0-9]{2}\\//.test(r);`));
+
+check("v396 nel calendario entrano SOLO gli appuntamenti confermati", suVeri(`
+  const cal = DATA.macro.calendario_uscite.per_chiave || {};
   const ev = prossimiEventi(400).eventi.filter(e => e.tipo === "macro");
   if (!ev.length) return false;
-  const cpi = ev.find(e => /CPI/i.test(e.nome));
-  const altri = ev.filter(e => !/CPI/i.test(e.nome));
-  /* il CPI ha il calendario iniettato → confermato; gli altri no → stimati. Se il campo
-     fosse ancora costante, una delle due meta' sarebbe sbagliata. */
-  return !!cpi && cpi.stimata === false && altri.length > 0 && altri.every(e => e.stimata === true);`));
+  const perNome = {};
+  for (const i of DATA.macro.indicators || []) perNome[i.label] = i.key;
+  return ev.every(e => e.stimata === false && !!cal[perNome[e.nome]]);`));
 
-/* ⚠⚠ QUINTA VOLTA CHE UN GATE TROVA SE' STESSO, e stavolta mi ha smascherato un check
-   CIRCOLARE. La prima stesura cercava "[CONFERMATA]" dentro tutta la riga — ma la LEGENDA che
-   spiega il marcatore lo contiene per forza ("[CONFERMATA] e' l'appuntamento dichiarato
-   dall'ente"). Quindi il check positivo era verde ANCHE con zero date confermate, e quello
-   negativo rosso su codice giusto. Gia' pagata in v213, v240 e v393: chi cerca la PRESENZA o
-   l'ASSENZA di un marcatore deve guardare la regione dei DATI, non la prosa che lo definisce.
-   Ora si legge il contatore che la riga stessa pubblica — "N su M confermati" — e i marcatori
-   si cercano solo dopo "dati macro (", cioe' dove stanno gli eventi. */
-const _CONTA_USCITE = `
-  const _rigaUscite = () => (buildPrompt().split(String.fromCharCode(10))
-      .find(x => x.indexOf("IN USCITA NELLE PROSSIME") >= 0) || "");
-  const _conteggio = (r) => { const m = r.match(/dati macro \\((\\d+) su (\\d+) confermati\\)/);
-      return m ? { conf: +m[1], tot: +m[2], eventi: r.slice(r.indexOf("dati macro (")) } : null; };
-`;
-
-check("v395 il pacchetto marca ogni uscita, invece di dichiararle tutte stimate",
-      suVeri(_INIETTA_CAL + _CONTA_USCITE + `
-  const r = _rigaUscite();
+/* ⚠ gli esclusi si NOMINANO: chi legge non deve confondere "nessuna uscita prevista" con "il
+   sistema non sa quando esce". E' la classe delle notizie contate e poi nascoste (v393). */
+check("v396 il pacchetto nomina gli indicatori per cui la data non e' disponibile", suVeri(`
+  const p = buildPrompt();
+  const r = p.split(String.fromCharCode(10)).find(x => x.indexOf("IN USCITA NELLE PROSSIME") >= 0);
   if (!r) return false;
-  const c = _conteggio(r);
-  /* la vecchia formula diceva "TUTTE DATE STIMATE": era vera prima, ed e' falsa da quando
-     esiste il calendario. Deve essere sparita, e al suo posto il segno per riga. */
+  const senza = (DATA.macro.indicators || [])
+    .filter(i => { const c = cadenzaDato(i.key, i.date); return c && !c.prossimo; })
+    .map(i => i.label);
+  if (!senza.length) return false;                      // il check non starebbe misurando
   return r.indexOf("TUTTE DATE STIMATE") < 0
-      && r.indexOf("le sposta l'emittente") >= 0
-      && !!c && c.conf >= 1 && c.tot > c.conf          // convivono confermate e stimate
-      && c.eventi.indexOf("[CONFERMATA]") >= 0
-      && c.eventi.indexOf("[STIMATA]") >= 0;`));
-
-check("v395 senza calendario nessuna uscita macro si dichiara confermata",
-      suVeri(_CONTA_USCITE + `
-  delete DATA.macro.calendario_uscite;
-  const r = _rigaUscite();
-  if (!r) return false;
-  const c = _conteggio(r);
-  const ev = prossimiEventi(400).eventi.filter(e => e.tipo === "macro");
-  return !!c && c.conf === 0 && c.tot >= 1
-      && c.eventi.indexOf("[CONFERMATA]") < 0
-      && ev.length >= 1 && ev.every(e => e.stimata === true);`));
+      && r.indexOf("APPUNTAMENTI CONFERMATI") >= 0
+      && r.indexOf("NON E' DISPONIBILE") >= 0
+      && senza.every(n => r.indexOf(n) >= 0);`));
 
 let fail = 0;
 for (const [name, ok] of T) {
