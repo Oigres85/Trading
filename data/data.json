@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-09-02T08:27:51Z",
- "eurusd": 1.1583,
+ "updated_at": "2026-09-02T09:10:41Z",
+ "eurusd": 1.1579,
  "totals": {
   "usd_value": 0,
   "usd_gain": 0,
@@ -10,8 +10,8 @@
   "eur_gain_pct": 2.43,
   "tax_est": 121.67,
   "eur_gain_net": 851.73,
-  "portfolio_sharpe_ratio": 1.64,
-  "portfolio_sortino_ratio": 2.4,
+  "portfolio_sharpe_ratio": 1.7,
+  "portfolio_sortino_ratio": 2.5,
   "risk_free_rate": 0.0363,
   "portfolio_beta_ndx": 2.09,
   "avg_pairwise_corr": 0.35,
@@ -955,10 +955,10 @@
    "sortino_6m": 3.0,
    "prepost": {
     "label": "pre",
-    "price": 925.55,
-    "change_pct": -0.85
+    "price": 923.8,
+    "change_pct": -1.03
    },
-   "prezzo_limite_aggiustato": 925.55,
+   "prezzo_limite_aggiustato": 923.8,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -984,8 +984,8 @@
     "target_mean": 1513.409,
     "fcf": 7639499776.0,
     "gross_margin": 0.7257,
-    "enterprise_value": 1034506993664.0,
-    "ev_ebitda": 15.164,
+    "enterprise_value": 1034574757888.0,
+    "ev_ebitda": 15.165,
     "peg": 0.14,
     "roa": 0.3487,
     "short_float": 0.0266,
@@ -1738,7 +1738,7 @@
      "m6": 145.99,
      "ytd": 196.11,
      "a1": 685.6,
-     "a3": 1249.55,
+     "a3": 1249.54,
      "a5": 1198.83,
      "a10": 5704.97
     },
@@ -1768,7 +1768,7 @@
       "positivi_pct": 52,
       "campione": 42,
       "peggio": -20.6,
-      "meglio": 31.2
+      "meglio": 31.3
      },
      {
       "mese": 4,
@@ -1876,20 +1876,20 @@
      "tassi": {
       "strumento": "TLT",
       "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
-      "beta": 0.54,
+      "beta": 0.53,
       "r2": 0.004,
       "corr": 0.06,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -2.11,
-      "r2": 0.021,
-      "corr": -0.15,
-      "campione": 251,
+      "beta": -2.07,
+      "r2": 0.02,
+      "corr": -0.14,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -1937,18 +1937,18 @@
      }
     ]
    },
-   "rs_1m": 13.8,
+   "rs_1m": 12.7,
    "rs_bench": "sox",
-   "rs_ndx_1m": 11.5,
+   "rs_ndx_1m": 9.7,
    "qta": 70,
    "pmc": 87.63,
    "controvalore": 65340.8,
    "gain_pct_pos": 965.21,
    "beta_ndx": 2.87,
-   "avg_corr": 0.39,
+   "avg_corr": 0.4,
    "max_corr": 0.71,
    "max_corr_with": "WDC",
-   "risk_contrib_pct": 34.5
+   "risk_contrib_pct": 34.6
   },
   {
    "ticker": "AMD",
@@ -2815,7 +2815,7 @@
     "eps_ora": 15.4507,
     "eps_90g_fa": 12.9595,
     "revisione_90g_pct": 19.22,
-    "revisione_7g_pct": -0.06,
+    "revisione_7g_pct": -0.18,
     "su_30g": 33,
     "giu_30g": 2,
     "eps_min": 10.77,
@@ -2834,10 +2834,10 @@
    "sortino_6m": 3.93,
    "prepost": {
     "label": "pre",
-    "price": 457.0,
-    "change_pct": -0.57
+    "price": 455.67,
+    "change_pct": -0.86
    },
-   "prezzo_limite_aggiustato": 457.0,
+   "prezzo_limite_aggiustato": 455.67,
    "risk_reward": "1:1.3",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -2865,7 +2865,7 @@
     "gross_margin": 0.5572,
     "enterprise_value": 741466832896.0,
     "ev_ebitda": 77.543,
-    "peg": 1.02,
+    "peg": 1.0,
     "roa": 0.0513,
     "short_float": 0.0246,
     "buyback_yield": 0.0026,
@@ -3755,20 +3755,20 @@
      "tassi": {
       "strumento": "TLT",
       "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
-      "beta": 0.45,
+      "beta": 0.43,
       "r2": 0.003,
       "corr": 0.06,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -1.78,
-      "r2": 0.019,
+      "beta": -1.73,
+      "r2": 0.018,
       "corr": -0.14,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -3816,9 +3816,9 @@
      }
     ]
    },
-   "rs_1m": -3.9,
+   "rs_1m": -5.0,
    "rs_bench": "sox",
-   "rs_ndx_1m": -6.2,
+   "rs_ndx_1m": -8.0,
    "qta": 100,
    "pmc": 153.916,
    "controvalore": 45961.0,
@@ -3827,7 +3827,7 @@
    "avg_corr": 0.39,
    "max_corr": 0.58,
    "max_corr_with": "MU",
-   "risk_contrib_pct": 19.7
+   "risk_contrib_pct": 19.8
   },
   {
    "ticker": "NVDA",
@@ -4523,10 +4523,10 @@
     "upside_pct": 48.7
    },
    "analisti": {
-    "eps_ora": 15.306,
+    "eps_ora": 15.3567,
     "eps_90g_fa": 12.6011,
-    "revisione_90g_pct": 21.47,
-    "revisione_7g_pct": 17.65,
+    "revisione_90g_pct": 21.87,
+    "revisione_7g_pct": 17.76,
     "su_30g": 4,
     "giu_30g": 0,
     "eps_min": 9.8,
@@ -4545,10 +4545,10 @@
    "sortino_6m": 1.31,
    "prepost": {
     "label": "pre",
-    "price": 217.16,
-    "change_pct": -0.13
+    "price": 216.85,
+    "change_pct": -0.27
    },
-   "prezzo_limite_aggiustato": 217.16,
+   "prezzo_limite_aggiustato": 216.85,
    "risk_reward": "1:0.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -4576,15 +4576,12 @@
     "gross_margin": 0.7467,
     "enterprise_value": 5216694960128.0,
     "ev_ebitda": 25.919,
-    "peg": 0.63,
+    "peg": 0.56,
     "roa": 0.5357,
     "short_float": 0.0123,
     "buyback_yield": 0.0076,
     "ps": 17.33,
-    "ev_s": 17.22,
-    "altman_z": 13.22,
-    "altman_missing": 0,
-    "altman_model": "Z''"
+    "ev_s": 17.22
    },
    "combustione": {
     "cassa": 13237000000.0,
@@ -5467,20 +5464,20 @@
      "tassi": {
       "strumento": "TLT",
       "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
-      "beta": 0.19,
+      "beta": 0.17,
       "r2": 0.002,
-      "corr": 0.05,
-      "campione": 251,
+      "corr": 0.04,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -0.68,
-      "r2": 0.01,
-      "corr": -0.1,
-      "campione": 251,
+      "beta": -0.58,
+      "r2": 0.007,
+      "corr": -0.09,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -5528,18 +5525,18 @@
      }
     ]
    },
-   "rs_1m": 6.5,
+   "rs_1m": 5.4,
    "rs_bench": "sox",
-   "rs_ndx_1m": 4.2,
+   "rs_ndx_1m": 2.4,
    "qta": 270,
    "pmc": 87.1667,
    "controvalore": 58708.8,
    "gain_pct_pos": 149.45,
-   "beta_ndx": 1.32,
+   "beta_ndx": 1.31,
    "avg_corr": 0.38,
    "max_corr": 0.52,
    "max_corr_with": "CRWV",
-   "risk_contrib_pct": 11.9
+   "risk_contrib_pct": 11.8
   },
   {
    "ticker": "GOOGL",
@@ -6168,10 +6165,10 @@
     "upside_pct": 27.8
    },
    "analisti": {
-    "eps_ora": 14.8547,
-    "eps_90g_fa": 14.4522,
-    "revisione_90g_pct": 2.79,
-    "revisione_7g_pct": 0.12,
+    "eps_ora": 14.8393,
+    "eps_90g_fa": 14.4573,
+    "revisione_90g_pct": 2.64,
+    "revisione_7g_pct": 0.01,
     "su_30g": 33,
     "giu_30g": 12,
     "eps_min": 13.5,
@@ -6190,10 +6187,10 @@
    "sortino_6m": 0.7,
    "prepost": {
     "label": "pre",
-    "price": 337.33,
-    "change_pct": 0.69
+    "price": 336.97,
+    "change_pct": 0.58
    },
-   "prezzo_limite_aggiustato": 337.33,
+   "prezzo_limite_aggiustato": 336.97,
    "risk_reward": "1:2.8",
    "risk_reward_base": "prezzo esteso",
    "sector": "Communication Services",
@@ -6221,7 +6218,7 @@
     "gross_margin": 0.609,
     "enterprise_value": 3993634603008.0,
     "ev_ebitda": 23.063,
-    "peg": 0.92,
+    "peg": 0.94,
     "roa": 0.1296,
     "short_float": 0.0124,
     "buyback_yield": 0.0112,
@@ -7103,20 +7100,20 @@
      "tassi": {
       "strumento": "TLT",
       "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
-      "beta": 0.55,
-      "r2": 0.025,
+      "beta": 0.56,
+      "r2": 0.026,
       "corr": 0.16,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -1.3,
-      "r2": 0.049,
-      "corr": -0.22,
-      "campione": 251,
+      "beta": -1.37,
+      "r2": 0.055,
+      "corr": -0.24,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -7164,18 +7161,18 @@
      }
     ]
    },
-   "rs_1m": -11.3,
+   "rs_1m": -13.1,
    "rs_bench": "ndx",
-   "rs_ndx_1m": -11.3,
+   "rs_ndx_1m": -13.1,
    "qta": 50,
    "pmc": 340.2,
    "controvalore": 16751.0,
    "gain_pct_pos": -1.52,
-   "beta_ndx": 0.79,
+   "beta_ndx": 0.8,
    "avg_corr": 0.2,
    "max_corr": 0.28,
    "max_corr_with": "WDC",
-   "risk_contrib_pct": 1.3
+   "risk_contrib_pct": 1.4
   },
   {
    "ticker": "PLTR",
@@ -7633,10 +7630,10 @@
    "sortino_6m": 0.97,
    "prepost": {
     "label": "pre",
-    "price": 178.05,
-    "change_pct": -1.04
+    "price": 177.61,
+    "change_pct": -1.28
    },
-   "prezzo_limite_aggiustato": 178.05,
+   "prezzo_limite_aggiustato": 177.61,
    "risk_reward": "1:0.7",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -8434,17 +8431,17 @@
       "beta": 0.29,
       "r2": 0.002,
       "corr": 0.05,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -1.04,
-      "r2": 0.009,
+      "beta": -1.05,
+      "r2": 0.01,
       "corr": -0.1,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -8492,9 +8489,9 @@
      }
     ]
    },
-   "rs_1m": 42.1,
+   "rs_1m": 40.4,
    "rs_bench": "ndx",
-   "rs_ndx_1m": 42.1,
+   "rs_ndx_1m": 40.4,
    "qta": 100,
    "pmc": 113.5,
    "controvalore": 17992.0,
@@ -9375,10 +9372,10 @@
    "sortino_6m": -0.32,
    "prepost": {
     "label": "pre",
-    "price": 139.78,
-    "change_pct": -1.09
+    "price": 139.67,
+    "change_pct": -1.17
    },
-   "prezzo_limite_aggiustato": 139.78,
+   "prezzo_limite_aggiustato": 139.67,
    "risk_reward": "1:1.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -9406,7 +9403,7 @@
     "gross_margin": 0.6582,
     "enterprise_value": 548108173312.0,
     "ev_ebitda": 17.974,
-    "peg": 0.86,
+    "peg": 0.85,
     "roa": 0.065,
     "short_float": 0.0278,
     "buyback_yield": -0.0152,
@@ -10300,17 +10297,17 @@
       "beta": 0.79,
       "r2": 0.012,
       "corr": 0.11,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -1.57,
-      "r2": 0.017,
+      "beta": -1.6,
+      "r2": 0.018,
       "corr": -0.13,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -10358,9 +10355,9 @@
      }
     ]
    },
-   "rs_1m": -0.8,
+   "rs_1m": -2.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -1.4,
+   "rs_ndx_1m": -3.2,
    "qta": 70,
    "pmc": 143.0,
    "controvalore": 9892.4,
@@ -10384,8 +10381,8 @@
    "pe": 16.8,
    "ath": 799.87,
    "ath_dist_pct": -43.7,
-   "sma200_dist_pct": 22.3,
-   "sma50_dist_pct": -13.3,
+   "sma200_dist_pct": 22.8,
+   "sma50_dist_pct": -14.2,
    "w52_high": 799.87,
    "w52_low": 77.69,
    "w52_dist_pct": -43.7,
@@ -10393,22 +10390,23 @@
    "day_low": 439.28,
    "support": 407.48,
    "resistance": 564.66,
-   "rsi": 43.7,
+   "rsi": 43.8,
    "volume": 5480600,
-   "vol_ratio": 0.72,
-   "atr_14": 35.38,
-   "atr_pct": 7.85,
+   "vol_ratio": 0.71,
+   "atr_14": 36.77,
+   "atr_pct": 8.16,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
     "w1": [
+     450.75,
      468.88,
      462.0,
-     459.45,
      450.55,
      450.44
     ],
     "m6": [
+     250.42,
      261.11,
      258.96,
      245.19,
@@ -10532,7 +10530,6 @@
      450.75,
      468.88,
      462.0,
-     459.45,
      450.55,
      450.44
     ],
@@ -11114,6 +11111,7 @@
      450.55
     ],
     "m1": [
+     544.84,
      527.22,
      548.56,
      519.17,
@@ -11133,11 +11131,11 @@
      450.75,
      468.88,
      462.0,
-     459.45,
      450.55,
      450.44
     ],
     "m3": [
+     531.04,
      531.07,
      546.06,
      562.95,
@@ -11201,7 +11199,6 @@
      450.75,
      468.88,
      462.0,
-     459.45,
      450.55,
      450.44
     ],
@@ -11256,7 +11253,7 @@
      438.34,
      536.01,
      435.38,
-     450.55
+     450.44
     ],
     "d1": [
      452.0,
@@ -11325,16 +11322,16 @@
    "eps": 26.89,
    "beta": 2.22,
    "sharpe_1y": 2.11,
-   "sortino_1y": 3.24,
-   "sharpe_6m": 1.32,
-   "sortino_6m": 1.91,
+   "sortino_1y": 3.25,
+   "sharpe_6m": 1.14,
+   "sortino_6m": 1.64,
    "prepost": {
     "label": "pre",
-    "price": 445.55,
-    "change_pct": -1.09
+    "price": 443.8,
+    "change_pct": -1.47
    },
-   "prezzo_limite_aggiustato": 445.55,
-   "risk_reward": "1:1.7",
+   "prezzo_limite_aggiustato": 443.8,
+   "risk_reward": "1:1.6",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -11355,13 +11352,13 @@
     "roe": 1.3085,
     "debt_to_equity": 13.436,
     "dividend_yield": 0.0013,
-    "price_to_book": 21.5367,
+    "price_to_book": null,
     "target_mean": 664.9167,
     "fcf": 2268750080.0,
     "gross_margin": 0.4885,
     "enterprise_value": 162014068736.0,
     "ev_ebitda": 32.39,
-    "peg": 0.88,
+    "peg": 0.87,
     "roa": 0.2076,
     "short_float": 0.0631,
     "buyback_yield": 0.016,
@@ -11473,14 +11470,14 @@
    },
    "tech_by_range": {
     "w1": {
-     "support": 439.28,
+     "support": 430.34,
      "resistance": 479.85,
-     "change_pct": -3.93
+     "change_pct": -0.07
     },
     "m1": {
      "support": 407.48,
-     "resistance": 564.66,
-     "change_pct": -14.56
+     "resistance": 580.0,
+     "change_pct": -17.33
     },
     "m3": {
      "support": 407.48,
@@ -11545,75 +11542,82 @@
      "prezzo": 450.44,
      "medie": {
       "sma10": {
-       "liv": 456.8,
-       "dist_pct": -1.39
-      },
-      "ema10": {
-       "liv": 460.48,
+       "liv": 460.47,
        "dist_pct": -2.18
       },
+      "ema10": {
+       "liv": 461.37,
+       "dist_pct": -2.37
+      },
       "sma20": {
-       "liv": 466.58,
-       "dist_pct": -3.46
+       "liv": 471.04,
+       "dist_pct": -4.37
       },
       "ema20": {
-       "liv": 472.41,
-       "dist_pct": -4.65
+       "liv": 473.95,
+       "dist_pct": -4.96
       },
       "sma30": {
-       "liv": 484.78,
-       "dist_pct": -7.08
+       "liv": 487.75,
+       "dist_pct": -7.65
       },
       "ema30": {
-       "liv": 483.76,
-       "dist_pct": -6.89
+       "liv": 485.51,
+       "dist_pct": -7.22
       },
       "sma50": {
-       "liv": 519.62,
-       "dist_pct": -13.31
+       "liv": 525.08,
+       "dist_pct": -14.22
       },
       "ema50": {
-       "liv": 494.32,
-       "dist_pct": -8.88
+       "liv": 495.78,
+       "dist_pct": -9.14
       },
       "sma100": {
-       "liv": 503.7,
-       "dist_pct": -10.57
+       "liv": 502.49,
+       "dist_pct": -10.36
       },
       "ema100": {
-       "liv": 471.17,
-       "dist_pct": -4.4
+       "liv": 471.41,
+       "dist_pct": -4.45
       },
       "sma200": {
-       "liv": 368.31,
-       "dist_pct": 22.3
+       "liv": 366.84,
+       "dist_pct": 22.79
       },
       "ema200": {
-       "liv": 391.9,
-       "dist_pct": 14.94
+       "liv": 391.23,
+       "dist_pct": 15.14
       }
      },
      "medie_battute": 2,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 43.7,
+      "rsi14": 43.8,
       "macd": {
-       "linea": -16.82,
-       "segnale": -17.35,
-       "istogramma": 0.53
+       "linea": -17.47,
+       "segnale": -17.71,
+       "istogramma": 0.23
       },
       "stoch_k": 23.9,
-      "stoch_d": 26.3,
+      "stoch_d": 27.0,
       "williams_r": -76.1,
-      "cci20": -38.2,
-      "adx14": 15.9,
-      "di_su": 23.2,
-      "di_giu": 31.9,
-      "momentum10": -45.72
+      "cci20": -46.0,
+      "adx14": 15.8,
+      "di_su": 24.0,
+      "di_giu": 31.0,
+      "momentum10": -85.57
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
+     {
+      "d": "2026-05-21",
+      "o": 458.81,
+      "h": 487.16,
+      "l": 458.75,
+      "c": 486.33
+     },
      {
       "d": "2026-05-22",
       "o": 488.3,
@@ -12084,13 +12088,6 @@
       "c": 462.0
      },
      {
-      "d": "2026-08-28",
-      "o": 462.25,
-      "h": 475.01,
-      "l": 455.07,
-      "c": 459.45
-     },
-     {
       "d": "2026-08-31",
       "o": 456.9,
       "h": 459.45,
@@ -12106,10 +12103,10 @@
      }
     ],
     "performance": {
-     "s1": -0.07,
-     "m1": -17.33,
-     "m3": -15.18,
-     "m6": 79.87,
+     "s1": 3.46,
+     "m1": -15.5,
+     "m3": -15.09,
+     "m6": 66.9,
      "ytd": 140.16,
      "a1": 462.19,
      "a3": 1230.36,
@@ -12231,19 +12228,19 @@
       "strumento": "QQQ",
       "canale": "il mercato: quanta parte del movimento e' semplicemente indice",
       "beta": 2.49,
-      "r2": 0.371,
+      "r2": 0.37,
       "corr": 0.61,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "settore": {
       "strumento": "SOXX",
       "canale": "il comparto: quanto e' scommessa sul settore invece che sulla societa'",
-      "beta": 1.23,
-      "r2": 0.486,
+      "beta": 1.24,
+      "r2": 0.487,
       "corr": 0.7,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
@@ -12253,17 +12250,17 @@
       "beta": 0.35,
       "r2": 0.002,
       "corr": 0.04,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -2.63,
-      "r2": 0.034,
-      "corr": -0.18,
-      "campione": 251,
+      "beta": -2.68,
+      "r2": 0.035,
+      "corr": -0.19,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -12311,9 +12308,9 @@
      }
     ]
    },
-   "rs_1m": -15.0,
+   "rs_1m": -19.2,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -15.6,
+   "rs_ndx_1m": -20.2,
    "qta": 25,
    "pmc": 458.0,
    "controvalore": 11261.0,
@@ -12997,14 +12994,14 @@
    "rating": {
     "key": "strong_buy",
     "n": 41,
-    "target": 278.89,
-    "upside_pct": 32.6
+    "target": 279.62,
+    "upside_pct": 32.9
    },
    "analisti": {
-    "eps_ora": 6.6444,
+    "eps_ora": 6.6634,
     "eps_90g_fa": 6.0752,
-    "revisione_90g_pct": 9.37,
-    "revisione_7g_pct": 5.69,
+    "revisione_90g_pct": 9.68,
+    "revisione_7g_pct": 6.0,
     "su_30g": 4,
     "giu_30g": 0,
     "eps_min": 5.34,
@@ -13012,7 +13009,7 @@
     "eps_n": 40,
     "target_min": 126.0,
     "target_max": 400.0,
-    "target_mediana": 275.0
+    "target_mediana": 276.0
    },
    "health": 63,
    "eps": 3.01,
@@ -13023,11 +13020,11 @@
    "sortino_6m": 3.24,
    "prepost": {
     "label": "pre",
-    "price": 206.13,
-    "change_pct": -2.02
+    "price": 204.6,
+    "change_pct": -2.75
    },
-   "prezzo_limite_aggiustato": 206.13,
-   "risk_reward": "1:1.4",
+   "prezzo_limite_aggiustato": 204.6,
+   "risk_reward": "1:1.5",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
    "stats": {
@@ -13049,12 +13046,12 @@
     "debt_to_equity": 28.525,
     "dividend_yield": 0.0011,
     "price_to_book": 10.113,
-    "target_mean": 278.8919,
+    "target_mean": 279.6236,
     "fcf": 2408049920.0,
     "gross_margin": 0.5222,
     "enterprise_value": 185844285440.0,
     "ev_ebitda": 65.202,
-    "peg": 1.43,
+    "peg": 1.28,
     "roa": 0.0413,
     "short_float": 0.0379,
     "buyback_yield": 0.0108,
@@ -13943,20 +13940,20 @@
      "tassi": {
       "strumento": "TLT",
       "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
-      "beta": 0.84,
+      "beta": 0.81,
       "r2": 0.01,
       "corr": 0.1,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -2.46,
-      "r2": 0.031,
-      "corr": -0.18,
-      "campione": 251,
+      "beta": -2.34,
+      "r2": 0.028,
+      "corr": -0.17,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -14004,18 +14001,18 @@
      }
     ]
    },
-   "rs_1m": 9.8,
+   "rs_1m": 8.8,
    "rs_bench": "sox",
-   "rs_ndx_1m": 7.5,
+   "rs_ndx_1m": 5.7,
    "qta": 42,
    "pmc": 214.08,
    "controvalore": 8836.38,
    "gain_pct_pos": -1.72,
-   "beta_ndx": 2.47,
+   "beta_ndx": 2.45,
    "avg_corr": 0.36,
    "max_corr": 0.53,
    "max_corr_with": "MU",
-   "risk_contrib_pct": 3.4
+   "risk_contrib_pct": 3.3
   },
   {
    "ticker": "RGTI",
@@ -14461,10 +14458,10 @@
    "sortino_6m": -0.44,
    "prepost": {
     "label": "pre",
-    "price": 14.78,
-    "change_pct": -1.4
+    "price": 14.72,
+    "change_pct": -1.8
    },
-   "prezzo_limite_aggiustato": 14.78,
+   "prezzo_limite_aggiustato": 14.72,
    "risk_reward": "1:2.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -15264,20 +15261,20 @@
      "tassi": {
       "strumento": "TLT",
       "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
-      "beta": 0.34,
+      "beta": 0.32,
       "r2": 0.001,
       "corr": 0.03,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -1.61,
-      "r2": 0.007,
+      "beta": -1.52,
+      "r2": 0.006,
       "corr": -0.08,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -15325,14 +15322,14 @@
      }
     ]
    },
-   "rs_1m": -5.2,
+   "rs_1m": -6.2,
    "rs_bench": "sox",
-   "rs_ndx_1m": -7.5,
+   "rs_ndx_1m": -9.3,
    "qta": 463,
    "pmc": 26.5048,
    "controvalore": 6940.37,
    "gain_pct_pos": -43.44,
-   "beta_ndx": 2.69,
+   "beta_ndx": 2.68,
    "avg_corr": 0.36,
    "max_corr": 0.45,
    "max_corr_with": "MSTR",
@@ -15820,10 +15817,10 @@
    "sortino_6m": 0.83,
    "prepost": {
     "label": "pre",
-    "price": 210.49,
-    "change_pct": -1.47
+    "price": 210.21,
+    "change_pct": -1.6
    },
-   "prezzo_limite_aggiustato": 210.49,
+   "prezzo_limite_aggiustato": 210.21,
    "risk_reward": "1:1.1",
    "risk_reward_base": "prezzo esteso",
    "sector": "Industrials",
@@ -15851,7 +15848,7 @@
     "gross_margin": 0.3165,
     "enterprise_value": 63046713344.0,
     "ev_ebitda": 150.656,
-    "peg": 0.91,
+    "peg": 0.88,
     "roa": 0.056,
     "short_float": 0.0706,
     "buyback_yield": -0.0009,
@@ -16744,7 +16741,7 @@
       "beta": 0.24,
       "r2": 0.0,
       "corr": 0.02,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
@@ -16754,7 +16751,7 @@
       "beta": -2.06,
       "r2": 0.01,
       "corr": -0.1,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -16802,9 +16799,9 @@
      }
     ]
    },
-   "rs_1m": -2.6,
+   "rs_1m": -4.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -3.2,
+   "rs_ndx_1m": -5.0,
    "qta": 40,
    "pmc": 214.0,
    "controvalore": 8545.2,
@@ -17048,10 +17045,10 @@
    "sortino_6m": null,
    "prepost": {
     "label": "pre",
-    "price": 158.95,
-    "change_pct": -1.14
+    "price": 158.57,
+    "change_pct": -1.37
    },
-   "prezzo_limite_aggiustato": 158.95,
+   "prezzo_limite_aggiustato": 158.57,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -17607,9 +17604,9 @@
      }
     ]
    },
-   "rs_1m": 12.2,
+   "rs_1m": 10.8,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 11.6,
+   "rs_ndx_1m": 9.8,
    "qta": 45,
    "pmc": 139.0,
    "controvalore": 7235.1,
@@ -18338,10 +18335,10 @@
    "sortino_6m": -0.3,
    "prepost": {
     "label": "pre",
-    "price": 124.32,
-    "change_pct": -0.45
+    "price": 123.35,
+    "change_pct": -1.23
    },
-   "prezzo_limite_aggiustato": 124.32,
+   "prezzo_limite_aggiustato": 123.35,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -19260,20 +19257,20 @@
      "tassi": {
       "strumento": "TLT",
       "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
-      "beta": 0.6,
+      "beta": 0.56,
       "r2": 0.005,
       "corr": 0.07,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -3.21,
-      "r2": 0.054,
-      "corr": -0.23,
-      "campione": 251,
+      "beta": -3.03,
+      "r2": 0.048,
+      "corr": -0.22,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -19321,14 +19318,14 @@
      }
     ]
    },
-   "rs_1m": 30.6,
+   "rs_1m": 28.8,
    "rs_bench": "ndx",
-   "rs_ndx_1m": 30.6,
+   "rs_ndx_1m": 28.8,
    "qta": 173,
    "pmc": 173.3045,
    "controvalore": 21604.24,
    "gain_pct_pos": -27.94,
-   "beta_ndx": 1.83,
+   "beta_ndx": 1.81,
    "avg_corr": 0.3,
    "max_corr": 0.45,
    "max_corr_with": "RGTI",
@@ -19736,10 +19733,10 @@
    "sortino_6m": 0.28,
    "prepost": {
     "label": "pre",
-    "price": 80.45,
-    "change_pct": -1.71
+    "price": 80.36,
+    "change_pct": -1.82
    },
-   "prezzo_limite_aggiustato": 80.45,
+   "prezzo_limite_aggiustato": 80.36,
    "risk_reward": "1:2.9",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -20545,20 +20542,20 @@
      "tassi": {
       "strumento": "TLT",
       "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
-      "beta": 0.13,
+      "beta": 0.12,
       "r2": 0.0,
       "corr": 0.01,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -2.53,
-      "r2": 0.022,
-      "corr": -0.15,
-      "campione": 251,
+      "beta": -2.49,
+      "r2": 0.021,
+      "corr": -0.14,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -20606,14 +20603,14 @@
      }
     ]
    },
-   "rs_1m": -5.0,
+   "rs_1m": -6.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -5.6,
+   "rs_ndx_1m": -7.4,
    "qta": 105,
    "pmc": 97.199,
    "controvalore": 8594.25,
    "gain_pct_pos": -15.79,
-   "beta_ndx": 2.39,
+   "beta_ndx": 2.38,
    "avg_corr": 0.41,
    "max_corr": 0.59,
    "max_corr_with": "ORCL",
@@ -20624,28 +20621,28 @@
    "name": "BTC-USD",
    "currency": "USD",
    "price_src": "yahoo",
-   "price": 77264.11,
+   "price": 76957.38,
    "price_asof": "2026-09-02",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.18,
+   "change_pct": -0.58,
    "pe": null,
    "ath": 126198.07,
-   "ath_dist_pct": -38.8,
-   "sma200_dist_pct": 11.2,
-   "sma50_dist_pct": 13.4,
+   "ath_dist_pct": -39.0,
+   "sma200_dist_pct": 10.7,
+   "sma50_dist_pct": 13.0,
    "w52_high": 126198.07,
    "w52_low": 57747.77,
-   "w52_dist_pct": -38.8,
+   "w52_dist_pct": -39.0,
    "day_high": 77719.54,
-   "day_low": 76777.59,
+   "day_low": 76773.65,
    "support": 62487.7,
    "resistance": 81346.95,
-   "rsi": 65.1,
-   "volume": 30045749248,
+   "rsi": 63.7,
+   "volume": 29698668544,
    "vol_ratio": 1.1,
-   "atr_14": 2210.35,
-   "atr_pct": 2.86,
+   "atr_14": 2210.64,
+   "atr_pct": 2.87,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
@@ -20654,7 +20651,7 @@
      77667.57,
      78548.63,
      77403.62,
-     77264.11
+     76957.38
     ],
     "m6": [
      76304.32,
@@ -20782,7 +20779,7 @@
      77667.57,
      78548.63,
      77403.62,
-     77264.11
+     76957.38
     ],
     "all": [
      386.94,
@@ -20929,7 +20926,7 @@
      58558.86,
      62813.75,
      78548.63,
-     77264.11
+     76957.38
     ],
     "m1": [
      63402.43,
@@ -20953,7 +20950,7 @@
      77667.57,
      78548.63,
      77403.62,
-     77264.11
+     76957.38
     ],
     "m3": [
      60138.38,
@@ -21021,7 +21018,7 @@
      77667.57,
      78548.63,
      77403.62,
-     77264.11
+     76957.38
     ],
     "y1": [
      111200.59,
@@ -21097,7 +21094,7 @@
      64680.71,
      77755.27,
      77830.29,
-     77264.11
+     76957.38
     ],
     "d1": [
      77406.38,
@@ -21110,9 +21107,9 @@
      77301.48,
      77287.38,
      77020.01,
-     76832.64,
+     76832.72,
      76769.41,
-     76945.25,
+     76945.24,
      77027.42,
      77199.45,
      77222.22,
@@ -21130,27 +21127,31 @@
      77466.85,
      77550.72,
      77507.81,
-     77443.06,
+     77443.09,
      77563.64,
      77705.82,
      77630.79,
-     77654.03,
+     77654.04,
      77673.25,
      77643.23,
      77541.63,
-     77549.87,
-     77481.06,
+     77549.88,
+     77482.62,
      77582.71,
      77487.56,
-     77592.48,
+     77592.47,
      77637.54,
      77610.8,
      77543.91,
      77519.27,
-     77469.46,
+     77469.47,
      77449.94,
-     77378.77,
-     77280.31
+     77381.26,
+     77280.31,
+     77084.28,
+     76927.48,
+     76747.63,
+     76948.23
     ]
    },
    "earnings_date": null,
@@ -21159,13 +21160,13 @@
    "health": 78,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.78,
-   "sortino_1y": -1.05,
-   "sharpe_6m": 0.01,
-   "sortino_6m": 0.02,
+   "sharpe_1y": -0.79,
+   "sortino_1y": -1.06,
+   "sharpe_6m": -0.02,
+   "sortino_6m": -0.02,
    "prepost": null,
-   "prezzo_limite_aggiustato": 77264.11,
-   "risk_reward": "1:0.9",
+   "prezzo_limite_aggiustato": 76957.38,
+   "risk_reward": "1:1.0",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -21177,22 +21178,22 @@
     "w1": {
      "support": 76399.06,
      "resistance": 79373.18,
-     "change_pct": -1.25
+     "change_pct": -1.65
     },
     "m1": {
      "support": 62487.7,
      "resistance": 81346.95,
-     "change_pct": 21.86
+     "change_pct": 21.38
     },
     "m3": {
      "support": 57747.77,
      "resistance": 81346.95,
-     "change_pct": 28.48
+     "change_pct": 27.97
     },
     "y1": {
      "support": 57747.77,
      "resistance": 97860.6,
-     "change_pct": -11.43
+     "change_pct": -11.78
     }
    },
    "financials": [],
@@ -21219,74 +21220,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 77264.11,
+     "prezzo": 76957.38,
      "medie": {
       "sma10": {
-       "liv": 78377.45,
-       "dist_pct": -1.42
+       "liv": 78346.77,
+       "dist_pct": -1.77
       },
       "ema10": {
-       "liv": 77159.61,
-       "dist_pct": 0.14
+       "liv": 77103.84,
+       "dist_pct": -0.19
       },
       "sma20": {
-       "liv": 73862.64,
-       "dist_pct": 4.61
+       "liv": 73847.3,
+       "dist_pct": 4.21
       },
       "ema20": {
-       "liv": 74625.4,
-       "dist_pct": 3.54
+       "liv": 74596.19,
+       "dist_pct": 3.17
       },
       "sma30": {
-       "liv": 70635.51,
-       "dist_pct": 9.38
+       "liv": 70625.28,
+       "dist_pct": 8.97
       },
       "ema30": {
-       "liv": 72575.55,
-       "dist_pct": 6.46
+       "liv": 72555.77,
+       "dist_pct": 6.07
       },
       "sma50": {
-       "liv": 68126.7,
-       "dist_pct": 13.41
+       "liv": 68120.56,
+       "dist_pct": 12.97
       },
       "ema50": {
-       "liv": 70261.77,
-       "dist_pct": 9.97
+       "liv": 70249.75,
+       "dist_pct": 9.55
       },
       "sma100": {
-       "liv": 66230.79,
-       "dist_pct": 16.66
+       "liv": 66227.72,
+       "dist_pct": 16.2
       },
       "ema100": {
-       "liv": 69191.02,
-       "dist_pct": 11.67
+       "liv": 69184.94,
+       "dist_pct": 11.23
       },
       "sma200": {
-       "liv": 69505.6,
-       "dist_pct": 11.16
+       "liv": 69504.07,
+       "dist_pct": 10.72
       },
       "ema200": {
-       "liv": 72512.11,
-       "dist_pct": 6.55
+       "liv": 72509.06,
+       "dist_pct": 6.13
       }
      },
-     "medie_battute": 11,
+     "medie_battute": 10,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 65.1,
+      "rsi14": 63.7,
       "macd": {
-       "linea": 3375.82,
-       "segnale": 3475.08,
-       "istogramma": -99.26
+       "linea": 3351.35,
+       "segnale": 3470.18,
+       "istogramma": -118.83
       },
-      "stoch_k": 67.3,
-      "stoch_d": 76.1,
-      "williams_r": -32.7,
-      "cci20": 37.6,
+      "stoch_k": 64.8,
+      "stoch_d": 75.3,
+      "williams_r": -35.2,
+      "cci20": 36.6,
       "adx14": 43.4,
       "di_su": 33.2,
       "di_giu": 12.1,
-      "momentum10": -491.16
+      "momentum10": -797.88
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -21778,20 +21779,20 @@
       "d": "2026-09-02",
       "o": 77395.89,
       "h": 77719.54,
-      "l": 76777.59,
-      "c": 77264.11
+      "l": 76773.65,
+      "c": 76957.38
      }
     ],
     "performance": {
-     "s1": -0.73,
-     "m1": 21.58,
-     "m3": 29.79,
-     "m6": 1.96,
-     "a1": -11.81,
-     "ytd": -12.92,
-     "a3": 186.5,
-     "a5": 76.44,
-     "a10": 12571.75
+     "s1": -1.12,
+     "m1": 21.09,
+     "m3": 29.27,
+     "m6": 1.56,
+     "a1": -12.16,
+     "ytd": -13.27,
+     "a3": 185.37,
+     "a5": 75.74,
+     "a10": 12521.45
     },
     "stagionalita": [
      {
@@ -21868,8 +21869,8 @@
      },
      {
       "mese": 9,
-      "media": -1.81,
-      "mediana": -2.36,
+      "media": -1.84,
+      "mediana": -2.55,
       "positivi_pct": 42,
       "campione": 12,
       "peggio": -13.9,
@@ -21904,10 +21905,10 @@
      }
     ]
    },
-   "rs_1m": 21.5,
+   "rs_1m": 19.5,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 20.8,
-   "beta_ndx": 0.78,
+   "rs_ndx_1m": 18.5,
+   "beta_ndx": 0.77,
    "avg_corr": 0.29,
    "max_corr": 0.78,
    "max_corr_with": "MSTR"
@@ -21917,39 +21918,40 @@
    "name": "^VIX",
    "currency": "PTS",
    "price_src": "yahoo",
-   "price": 16.4,
+   "price": 16.75,
    "price_asof": "2026-09-02",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.37,
+   "change_pct": 2.51,
    "pe": null,
    "ath": 89.53,
-   "ath_dist_pct": -81.7,
-   "sma200_dist_pct": -10.6,
-   "sma50_dist_pct": 0.0,
+   "ath_dist_pct": -81.3,
+   "sma200_dist_pct": -8.9,
+   "sma50_dist_pct": 1.5,
    "w52_high": 35.3,
    "w52_low": 13.38,
-   "w52_dist_pct": -53.5,
-   "day_high": 16.51,
+   "w52_dist_pct": -52.5,
+   "day_high": 16.75,
    "day_low": 16.34,
-   "support": 14.13,
-   "resistance": 16.8,
-   "rsi": 53.6,
+   "support": 14.18,
+   "resistance": 18.43,
+   "rsi": 54.6,
    "volume": 0,
    "vol_ratio": null,
-   "atr_14": 1.18,
-   "atr_pct": 7.18,
+   "atr_14": 1.22,
+   "atr_pct": 7.29,
    "signal": "Sopra SMA50",
    "signal_class": "good",
    "sparks": {
     "w1": [
+     15.21,
      14.51,
-     14.43,
      14.92,
      16.34,
-     16.4
+     16.75
     ],
     "m6": [
+     23.75,
      29.49,
      25.5,
      24.93,
@@ -22072,10 +22074,9 @@
      15.45,
      15.21,
      14.51,
-     14.43,
      14.92,
      16.34,
-     16.4
+     16.75
     ],
     "all": [
      25.36,
@@ -22518,9 +22519,10 @@
      16.45,
      15.99,
      14.92,
-     16.4
+     16.75
     ],
     "m1": [
+     15.86,
      16.5,
      15.81,
      15.15,
@@ -22539,12 +22541,12 @@
      15.45,
      15.21,
      14.51,
-     14.43,
      14.92,
      16.34,
-     16.4
+     16.75
     ],
     "m3": [
+     15.32,
      16.05,
      15.77,
      16.06,
@@ -22607,10 +22609,9 @@
      15.45,
      15.21,
      14.51,
-     14.43,
      14.92,
      16.34,
-     16.4
+     16.75
     ],
     "y1": [
      17.17,
@@ -22663,7 +22664,7 @@
      14.9,
      14.25,
      15.13,
-     14.43
+     14.92
     ],
     "d1": [
      16.34,
@@ -22671,22 +22672,26 @@
      16.43,
      16.47,
      16.46,
-     16.44
+     16.44,
+     16.46,
+     16.48,
+     16.46,
+     16.52
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 57,
+   "health": 68,
    "eps": null,
    "beta": null,
-   "sharpe_1y": -0.07,
-   "sortino_1y": -0.1,
-   "sharpe_6m": -0.65,
-   "sortino_6m": -0.96,
+   "sharpe_1y": -0.05,
+   "sortino_1y": -0.08,
+   "sharpe_6m": -0.41,
+   "sortino_6m": -0.62,
    "prepost": null,
-   "prezzo_limite_aggiustato": 16.4,
-   "risk_reward": "1:0.2",
+   "prezzo_limite_aggiustato": 16.75,
+   "risk_reward": "1:0.7",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -22696,34 +22701,34 @@
    "short_flusso": null,
    "tech_by_range": {
     "w1": {
-     "support": 14.13,
+     "support": 14.42,
      "resistance": 16.8,
-     "change_pct": 13.03
+     "change_pct": 10.12
     },
     "m1": {
-     "support": 14.13,
+     "support": 14.18,
      "resistance": 18.43,
-     "change_pct": -0.61
+     "change_pct": 5.61
     },
     "m3": {
-     "support": 14.13,
+     "support": 14.18,
      "resistance": 23.34,
-     "change_pct": 2.18
+     "change_pct": 9.33
     },
     "y1": {
      "support": 13.38,
      "resistance": 35.3,
-     "change_pct": 7.19
+     "change_pct": 2.45
     }
    },
    "financials": [],
    "fin_health": null,
    "smc": {
-    "bias": 72,
+    "bias": 68,
     "label": "Accumulazione",
     "structure": "laterale",
     "bos": "rialzista",
-    "bull_fvg": 2,
+    "bull_fvg": 1,
     "bear_fvg": 0,
     "last_fvg": {
      "dir": "rialzista",
@@ -22731,7 +22736,7 @@
      "hi": 16.34
     },
     "liq_above": 17.56,
-    "liq_below": 16.18,
+    "liq_below": 16.64,
     "order_block": {
      "dir": "rialzista",
      "lo": 14.92,
@@ -22740,78 +22745,85 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 16.4,
+     "prezzo": 16.75,
      "medie": {
       "sma10": {
-       "liv": 15.43,
-       "dist_pct": 6.32
+       "liv": 15.51,
+       "dist_pct": 8.02
       },
       "ema10": {
-       "liv": 15.5,
-       "dist_pct": 5.82
+       "liv": 15.64,
+       "dist_pct": 7.07
       },
       "sma20": {
-       "liv": 15.22,
-       "dist_pct": 7.76
+       "liv": 15.31,
+       "dist_pct": 9.43
       },
       "ema20": {
-       "liv": 15.59,
-       "dist_pct": 5.17
+       "liv": 15.71,
+       "dist_pct": 6.63
       },
       "sma30": {
-       "liv": 16.02,
-       "dist_pct": 2.4
+       "liv": 16.1,
+       "dist_pct": 4.03
       },
       "ema30": {
-       "liv": 15.82,
-       "dist_pct": 3.63
+       "liv": 15.92,
+       "dist_pct": 5.18
       },
       "sma50": {
-       "liv": 16.4,
-       "dist_pct": 0.02
+       "liv": 16.51,
+       "dist_pct": 1.48
       },
       "ema50": {
-       "liv": 16.29,
-       "dist_pct": 0.68
+       "liv": 16.37,
+       "dist_pct": 2.3
       },
       "sma100": {
-       "liv": 17.08,
-       "dist_pct": -3.97
+       "liv": 17.13,
+       "dist_pct": -2.21
       },
       "ema100": {
-       "liv": 17.15,
-       "dist_pct": -4.38
+       "liv": 17.21,
+       "dist_pct": -2.68
       },
       "sma200": {
-       "liv": 18.35,
-       "dist_pct": -10.62
+       "liv": 18.38,
+       "dist_pct": -8.86
       },
       "ema200": {
-       "liv": 17.73,
-       "dist_pct": -7.5
+       "liv": 17.77,
+       "dist_pct": -5.72
       }
      },
      "medie_battute": 8,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 53.6,
+      "rsi14": 54.6,
       "macd": {
-       "linea": -0.24,
-       "segnale": -0.42,
-       "istogramma": 0.18
+       "linea": -0.21,
+       "segnale": -0.41,
+       "istogramma": 0.2
       },
-      "stoch_k": 85.0,
-      "stoch_d": 68.1,
-      "williams_r": -15.0,
-      "cci20": 62.3,
-      "adx14": 21.1,
-      "di_su": 27.1,
-      "di_giu": 17.2,
-      "momentum10": 1.51
+      "stoch_k": 98.1,
+      "stoch_d": 71.8,
+      "williams_r": -1.9,
+      "cci20": 66.9,
+      "adx14": 22.2,
+      "di_su": 25.9,
+      "di_giu": 16.4,
+      "momentum10": 0.91
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
+     {
+      "d": "2026-05-25",
+      "o": 16.81,
+      "h": 16.87,
+      "l": 16.53,
+      "c": 16.59
+     },
      {
       "d": "2026-05-26",
       "o": 16.92,
@@ -23275,13 +23287,6 @@
       "c": 14.51
      },
      {
-      "d": "2026-08-28",
-      "o": 14.57,
-      "h": 14.84,
-      "l": 14.13,
-      "c": 14.43
-     },
-     {
       "d": "2026-08-31",
       "o": 15.24,
       "h": 15.48,
@@ -23298,21 +23303,21 @@
      {
       "d": "2026-09-02",
       "o": 16.39,
-      "h": 16.51,
+      "h": 16.75,
       "l": 16.34,
-      "c": 16.4
+      "c": 16.75
      }
     ],
     "performance": {
-     "s1": 7.82,
-     "m1": 3.4,
-     "m3": 7.05,
-     "m6": -30.95,
-     "a1": 0.31,
-     "ytd": 13.03,
-     "a3": -6.39,
-     "a5": -29.13,
-     "a10": 23.4
+     "s1": 8.41,
+     "m1": 4.75,
+     "m3": 6.42,
+     "m6": -20.8,
+     "a1": -2.45,
+     "ytd": 15.44,
+     "a3": -4.39,
+     "a5": -27.61,
+     "a10": 26.03
     },
     "stagionalita": [
      {
@@ -23389,7 +23394,7 @@
      },
      {
       "mese": 9,
-      "media": 8.18,
+      "media": 8.24,
       "mediana": 3.93,
       "positivi_pct": 51,
       "campione": 37,
@@ -23425,10 +23430,10 @@
      }
     ]
    },
-   "rs_1m": -1.0,
+   "rs_1m": 3.7,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -1.7,
-   "beta_ndx": -4.54,
+   "rs_ndx_1m": 2.8,
+   "beta_ndx": -4.55,
    "avg_corr": -0.37,
    "max_corr": -0.22,
    "max_corr_with": "PLTR"
@@ -23438,28 +23443,28 @@
    "name": "NQ=F",
    "currency": "PTS",
    "price_src": "yahoo",
-   "price": 29077.0,
+   "price": 28972.5,
    "price_asof": "2026-09-02",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.17,
+   "change_pct": -0.53,
    "pe": null,
    "ath": 30968.0,
-   "ath_dist_pct": -6.1,
-   "sma200_dist_pct": 7.3,
-   "sma50_dist_pct": -1.0,
+   "ath_dist_pct": -6.4,
+   "sma200_dist_pct": 6.9,
+   "sma50_dist_pct": -1.3,
    "w52_high": 30968.0,
    "w52_low": 22961.5,
-   "w52_dist_pct": -6.1,
+   "w52_dist_pct": -6.4,
    "day_high": 29170.0,
-   "day_low": 29016.5,
+   "day_low": 28954.5,
    "support": 28946.75,
    "resistance": 30343.0,
-   "rsi": 45.1,
-   "volume": 58878,
+   "rsi": 43.7,
+   "volume": 64903,
    "vol_ratio": 0.86,
-   "atr_14": 462.51,
-   "atr_pct": 1.59,
+   "atr_14": 466.94,
+   "atr_pct": 1.61,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
@@ -23468,7 +23473,7 @@
      29491.75,
      29513.0,
      29125.5,
-     29077.0
+     28972.5
     ],
     "m6": [
      25049.5,
@@ -23596,7 +23601,7 @@
      29491.75,
      29513.0,
      29125.5,
-     29077.0
+     28972.5
     ],
     "all": [
      3621.0,
@@ -23865,7 +23870,7 @@
      30523.5,
      28404.25,
      29513.0,
-     29077.0
+     28972.5
     ],
     "m1": [
      29863.5,
@@ -23889,7 +23894,7 @@
      29491.75,
      29513.0,
      29125.5,
-     29077.0
+     28972.5
     ],
     "m3": [
      30566.25,
@@ -23957,7 +23962,7 @@
      29491.75,
      29513.0,
      29125.5,
-     29077.0
+     28972.5
     ],
     "y1": [
      23275.0,
@@ -24038,22 +24043,26 @@
      29063.75,
      29061.75,
      29075.0,
-     29077.0
+     29056.75,
+     29053.5,
+     29048.25,
+     29023.0,
+     28972.5
     ]
    },
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 44,
+   "health": 43,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.96,
-   "sortino_1y": 1.38,
-   "sharpe_6m": 1.17,
-   "sortino_6m": 1.74,
+   "sharpe_1y": 0.94,
+   "sortino_1y": 1.36,
+   "sharpe_6m": 1.13,
+   "sortino_6m": 1.69,
    "prepost": null,
-   "prezzo_limite_aggiustato": 29077.0,
-   "risk_reward": "1:1.4",
+   "prezzo_limite_aggiustato": 28972.5,
+   "risk_reward": "1:1.5",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -24063,24 +24072,24 @@
    "short_flusso": null,
    "tech_by_range": {
     "w1": {
-     "support": 29002.0,
+     "support": 28954.5,
      "resistance": 29811.5,
-     "change_pct": -2.08
+     "change_pct": -2.44
     },
     "m1": {
      "support": 28831.75,
      "resistance": 30343.0,
-     "change_pct": -2.63
+     "change_pct": -2.98
     },
     "m3": {
      "support": 27201.5,
      "resistance": 30968.0,
-     "change_pct": -4.87
+     "change_pct": -5.21
     },
     "y1": {
      "support": 22961.5,
      "resistance": 30968.0,
-     "change_pct": 24.0
+     "change_pct": 23.56
     }
    },
    "financials": [],
@@ -24107,74 +24116,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 29077.0,
+     "prezzo": 28972.5,
      "medie": {
       "sma10": {
-       "liv": 29326.33,
-       "dist_pct": -0.85
+       "liv": 29315.88,
+       "dist_pct": -1.17
       },
       "ema10": {
-       "liv": 29354.52,
-       "dist_pct": -0.95
+       "liv": 29335.52,
+       "dist_pct": -1.24
       },
       "sma20": {
-       "liv": 29566.38,
-       "dist_pct": -1.66
+       "liv": 29561.15,
+       "dist_pct": -1.99
       },
       "ema20": {
-       "liv": 29386.83,
-       "dist_pct": -1.05
+       "liv": 29376.88,
+       "dist_pct": -1.38
       },
       "sma30": {
-       "liv": 29223.22,
-       "dist_pct": -0.5
+       "liv": 29219.74,
+       "dist_pct": -0.85
       },
       "ema30": {
-       "liv": 29376.68,
-       "dist_pct": -1.02
+       "liv": 29369.94,
+       "dist_pct": -1.35
       },
       "sma50": {
-       "liv": 29370.7,
-       "dist_pct": -1.0
+       "liv": 29368.61,
+       "dist_pct": -1.35
       },
       "ema50": {
-       "liv": 29279.37,
-       "dist_pct": -0.69
+       "liv": 29275.28,
+       "dist_pct": -1.03
       },
       "sma100": {
-       "liv": 29073.45,
-       "dist_pct": 0.01
+       "liv": 29072.41,
+       "dist_pct": -0.34
       },
       "ema100": {
-       "liv": 28691.67,
-       "dist_pct": 1.34
+       "liv": 28689.6,
+       "dist_pct": 0.99
       },
       "sma200": {
-       "liv": 27097.64,
-       "dist_pct": 7.3
+       "liv": 27097.12,
+       "dist_pct": 6.92
       },
       "ema200": {
-       "liv": 27527.68,
-       "dist_pct": 5.63
+       "liv": 27526.64,
+       "dist_pct": 5.25
       }
      },
-     "medie_battute": 4,
+     "medie_battute": 3,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 45.1,
+      "rsi14": 43.7,
       "macd": {
-       "linea": -11.98,
-       "segnale": 43.31,
-       "istogramma": -55.29
+       "linea": -20.32,
+       "segnale": 41.64,
+       "istogramma": -61.96
       },
-      "stoch_k": 9.3,
-      "stoch_d": 20.9,
-      "williams_r": -90.7,
-      "cci20": -67.2,
-      "adx14": 15.1,
-      "di_su": 16.3,
-      "di_giu": 24.1,
-      "momentum10": -435.75
+      "stoch_k": 1.8,
+      "stoch_d": 18.4,
+      "williams_r": -98.2,
+      "cci20": -73.9,
+      "adx14": 15.2,
+      "di_su": 16.2,
+      "di_giu": 24.6,
+      "momentum10": -540.25
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -24666,20 +24675,20 @@
       "d": "2026-09-02",
       "o": 29136.5,
       "h": 29170.0,
-      "l": 29016.5,
-      "c": 29077.0
+      "l": 28954.5,
+      "c": 28972.5
      }
     ],
     "performance": {
-     "s1": -0.73,
-     "m1": 0.64,
-     "m3": -4.37,
-     "m6": 15.71,
-     "a1": 24.93,
-     "ytd": 14.54,
-     "a3": 118.6,
-     "a5": 125.66,
-     "a10": 586.95
+     "s1": -1.08,
+     "m1": 0.28,
+     "m3": -4.71,
+     "m6": 15.3,
+     "a1": 24.48,
+     "ytd": 14.13,
+     "a3": 117.81,
+     "a5": 124.85,
+     "a10": 584.48
     },
     "stagionalita": [
      {
@@ -24756,7 +24765,7 @@
      },
      {
       "mese": 9,
-      "media": -1.53,
+      "media": -1.54,
       "mediana": -0.53,
       "positivi_pct": 41,
       "campione": 22,
@@ -24792,9 +24801,9 @@
      }
     ]
    },
-   "rs_1m": -3.0,
+   "rs_1m": -4.9,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -3.7,
+   "rs_ndx_1m": -5.8,
    "beta_ndx": 0.98,
    "avg_corr": 0.55,
    "max_corr": 0.7,
@@ -24813,31 +24822,32 @@
    "pe": null,
    "ath": 9385.59,
    "ath_dist_pct": -30.1,
-   "sma200_dist_pct": 8.7,
-   "sma50_dist_pct": -6.5,
+   "sma200_dist_pct": 9.0,
+   "sma50_dist_pct": -7.1,
    "w52_high": 9385.59,
    "w52_low": 3151.93,
    "w52_dist_pct": -30.1,
    "day_high": 6694.57,
    "day_low": 6558.3,
-   "support": 6158.73,
+   "support": 6080.25,
    "resistance": 7216.62,
-   "rsi": 45.8,
+   "rsi": 46.0,
    "volume": 321161,
-   "vol_ratio": 0.8,
-   "atr_14": 318.28,
-   "atr_pct": 4.85,
+   "vol_ratio": 0.79,
+   "atr_14": 336.85,
+   "atr_pct": 5.13,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
     "w1": [
+     6808.21,
      6912.37,
-     6788.88,
      6820.02,
      6835.8,
      6562.72
     ],
     "m6": [
+     6244.13,
      5791.91,
      5093.54,
      5583.9,
@@ -24960,7 +24970,6 @@
      6742.74,
      6808.21,
      6912.37,
-     6788.88,
      6820.02,
      6835.8,
      6562.72
@@ -25326,6 +25335,7 @@
      6562.72
     ],
     "m1": [
+     6595.45,
      6257.45,
      6358.95,
      6598.26,
@@ -25344,12 +25354,12 @@
      6742.74,
      6808.21,
      6912.37,
-     6788.88,
      6820.02,
      6835.8,
      6562.72
     ],
     "m3": [
+     8185.29,
      8476.15,
      8788.38,
      8801.49,
@@ -25412,7 +25422,6 @@
      6742.74,
      6808.21,
      6912.37,
-     6788.88,
      6820.02,
      6835.8,
      6562.72
@@ -25466,7 +25475,7 @@
      6296.38,
      6813.34,
      6912.95,
-     6788.88
+     6820.02
     ],
     "d1": [
      6632.33,
@@ -25510,13 +25519,13 @@
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 57,
+   "health": 48,
    "eps": null,
    "beta": null,
    "sharpe_1y": 1.33,
    "sortino_1y": 1.85,
-   "sharpe_6m": 0.09,
-   "sortino_6m": 0.12,
+   "sharpe_6m": 0.06,
+   "sortino_6m": 0.08,
    "prepost": null,
    "prezzo_limite_aggiustato": 6562.72,
    "risk_reward": "1:1.0",
@@ -25531,17 +25540,17 @@
     "w1": {
      "support": 6547.76,
      "resistance": 6996.12,
-     "change_pct": -5.06
+     "change_pct": -3.61
     },
     "m1": {
-     "support": 6080.25,
+     "support": 5629.76,
      "resistance": 7216.62,
-     "change_pct": 4.88
+     "change_pct": -0.5
     },
     "m3": {
      "support": 5262.77,
      "resistance": 9385.59,
-     "change_pct": -22.57
+     "change_pct": -19.82
     },
     "y1": {
      "support": 3151.93,
@@ -25567,8 +25576,8 @@
     "liq_below": 6547.76,
     "order_block": {
      "dir": "rialzista",
-     "lo": 6788.88,
-     "hi": 6846.54
+     "lo": 6912.37,
+     "hi": 6996.12
     }
    },
    "tv": {
@@ -25576,75 +25585,82 @@
      "prezzo": 6562.72,
      "medie": {
       "sma10": {
-       "liv": 6793.32,
-       "dist_pct": -3.39
+       "liv": 6761.55,
+       "dist_pct": -2.94
       },
       "ema10": {
-       "liv": 6743.6,
-       "dist_pct": -2.68
+       "liv": 6740.29,
+       "dist_pct": -2.63
       },
       "sma20": {
-       "liv": 6672.16,
-       "dist_pct": -1.64
+       "liv": 6650.66,
+       "dist_pct": -1.32
       },
       "ema20": {
-       "liv": 6731.74,
-       "dist_pct": -2.51
+       "liv": 6727.31,
+       "dist_pct": -2.45
       },
       "sma30": {
-       "liv": 6575.88,
-       "dist_pct": -0.2
+       "liv": 6574.52,
+       "dist_pct": -0.18
       },
       "ema30": {
-       "liv": 6787.52,
-       "dist_pct": -3.31
+       "liv": 6788.12,
+       "dist_pct": -3.32
       },
       "sma50": {
-       "liv": 7019.18,
-       "dist_pct": -6.5
+       "liv": 7065.69,
+       "dist_pct": -7.12
       },
       "ema50": {
-       "liv": 6906.22,
-       "dist_pct": -4.97
+       "liv": 6911.25,
+       "dist_pct": -5.04
       },
       "sma100": {
-       "liv": 7229.25,
-       "dist_pct": -9.22
+       "liv": 7216.31,
+       "dist_pct": -9.06
       },
       "ema100": {
-       "liv": 6814.25,
-       "dist_pct": -3.69
+       "liv": 6814.82,
+       "dist_pct": -3.7
       },
       "sma200": {
-       "liv": 6037.38,
-       "dist_pct": 8.7
+       "liv": 6023.21,
+       "dist_pct": 8.96
       },
       "ema200": {
-       "liv": 6161.78,
-       "dist_pct": 6.51
+       "liv": 6155.49,
+       "dist_pct": 6.62
       }
      },
      "medie_battute": 2,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 45.8,
+      "rsi14": 46.0,
       "macd": {
-       "linea": -23.45,
-       "segnale": -55.0,
-       "istogramma": 31.55
+       "linea": -26.95,
+       "segnale": -65.93,
+       "istogramma": 38.97
       },
       "stoch_k": 19.8,
-      "stoch_d": 44.5,
+      "stoch_d": 47.4,
       "williams_r": -80.2,
-      "cci20": -17.2,
-      "adx14": 15.0,
-      "di_su": 24.1,
+      "cci20": -9.2,
+      "adx14": 15.5,
+      "di_su": 24.5,
       "di_giu": 33.7,
-      "momentum10": 91.55
+      "momentum10": -307.11
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
+     {
+      "d": "2026-05-21",
+      "o": 7486.37,
+      "h": 7819.23,
+      "l": 7486.37,
+      "c": 7815.59
+     },
      {
       "d": "2026-05-22",
       "o": 7873.12,
@@ -26108,13 +26124,6 @@
       "c": 6912.37
      },
      {
-      "d": "2026-08-28",
-      "o": 6846.54,
-      "h": 6901.78,
-      "l": 6780.13,
-      "c": 6788.88
-     },
-     {
       "d": "2026-08-31",
       "o": 6613.58,
       "h": 6820.1,
@@ -26137,10 +26146,10 @@
      }
     ],
     "performance": {
-     "s1": -3.61,
-     "m1": -0.5,
-     "m3": -19.82,
-     "m6": 5.1,
+     "s1": -2.67,
+     "m1": 17.33,
+     "m3": -20.25,
+     "m6": 4.05,
      "ytd": 52.28,
      "a1": 91.63,
      "a3": 166.23,
@@ -26258,10 +26267,10 @@
      }
     ]
    },
-   "rs_1m": 4.5,
+   "rs_1m": -2.4,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 3.8,
-   "beta_ndx": 0.54,
+   "rs_ndx_1m": -3.3,
+   "beta_ndx": 0.53,
    "avg_corr": 0.15,
    "max_corr": 0.33,
    "max_corr_with": "WDC"
@@ -26279,8 +26288,8 @@
    "pe": null,
    "ath": 14655.29,
    "ath_dist_pct": -23.0,
-   "sma200_dist_pct": 15.5,
-   "sma50_dist_pct": -7.6,
+   "sma200_dist_pct": 15.8,
+   "sma50_dist_pct": -8.1,
    "w52_high": 14655.29,
    "w52_low": 5503.12,
    "w52_dist_pct": -23.0,
@@ -26288,22 +26297,23 @@
    "day_low": 11172.9,
    "support": 11172.9,
    "resistance": 12770.71,
-   "rsi": 41.2,
+   "rsi": 41.1,
    "volume": 0,
    "vol_ratio": null,
-   "atr_14": 421.93,
-   "atr_pct": 3.74,
+   "atr_14": 441.61,
+   "atr_pct": 3.91,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
     "w1": [
+     11588.04,
      11611.24,
      11882.17,
-     11469.66,
      11535.05,
      11288.61
     ],
     "m6": [
+     7764.88,
      7914.48,
      7821.76,
      7514.74,
@@ -26427,7 +26437,6 @@
      11588.04,
      11611.24,
      11882.17,
-     11469.66,
      11535.05,
      11288.61
     ],
@@ -26822,6 +26831,7 @@
      11535.05
     ],
     "m1": [
+     11311.08,
      11430.35,
      12179.26,
      12008.88,
@@ -26841,11 +26851,11 @@
      11588.04,
      11611.24,
      11882.17,
-     11469.66,
      11535.05,
      11288.61
     ],
     "m3": [
+     12829.14,
      12829.38,
      12965.65,
      13726.27,
@@ -26909,7 +26919,6 @@
      11588.04,
      11611.24,
      11882.17,
-     11469.66,
      11535.05,
      11288.61
     ],
@@ -26964,7 +26973,7 @@
      11993.86,
      12621.0,
      11423.17,
-     11535.05
+     11288.61
     ],
     "d1": [
      11280.35,
@@ -27011,16 +27020,16 @@
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 45,
+   "health": 47,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 1.49,
-   "sortino_1y": 2.13,
-   "sharpe_6m": 1.34,
-   "sortino_6m": 1.9,
+   "sharpe_1y": 1.5,
+   "sortino_1y": 2.14,
+   "sharpe_6m": 1.15,
+   "sortino_6m": 1.63,
    "prepost": null,
    "prezzo_limite_aggiustato": 11288.61,
-   "risk_reward": "1:1.8",
+   "risk_reward": "1:1.7",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -27032,12 +27041,12 @@
     "w1": {
      "support": 11172.9,
      "resistance": 11910.03,
-     "change_pct": -2.78
+     "change_pct": -2.58
     },
     "m1": {
      "support": 10922.31,
      "resistance": 12770.71,
-     "change_pct": -1.24
+     "change_pct": -0.2
     },
     "m3": {
      "support": 10445.44,
@@ -27058,11 +27067,11 @@
     "structure": "ribassista",
     "bos": null,
     "bull_fvg": 0,
-    "bear_fvg": 4,
+    "bear_fvg": 3,
     "last_fvg": {
      "dir": "ribassista",
      "lo": 11389.62,
-     "hi": 11435.7
+     "hi": 11690.19
     },
     "liq_above": 11910.03,
     "liq_below": 11263.58,
@@ -27077,75 +27086,82 @@
      "prezzo": 11288.61,
      "medie": {
       "sma10": {
-       "liv": 11607.66,
-       "dist_pct": -2.75
+       "liv": 11659.94,
+       "dist_pct": -3.18
       },
       "ema10": {
-       "liv": 11634.17,
-       "dist_pct": -2.97
+       "liv": 11675.89,
+       "dist_pct": -3.32
       },
       "sma20": {
-       "liv": 11923.46,
-       "dist_pct": -5.32
+       "liv": 11958.94,
+       "dist_pct": -5.61
       },
       "ema20": {
-       "liv": 11785.1,
-       "dist_pct": -4.21
+       "liv": 11819.53,
+       "dist_pct": -4.49
       },
       "sma30": {
-       "liv": 11810.14,
-       "dist_pct": -4.42
+       "liv": 11839.69,
+       "dist_pct": -4.65
       },
       "ema30": {
-       "liv": 11891.02,
-       "dist_pct": -5.07
+       "liv": 11920.61,
+       "dist_pct": -5.3
       },
       "sma50": {
-       "liv": 12221.57,
-       "dist_pct": -7.63
+       "liv": 12284.87,
+       "dist_pct": -8.11
       },
       "ema50": {
-       "liv": 11949.4,
-       "dist_pct": -5.53
+       "liv": 11969.18,
+       "dist_pct": -5.69
       },
       "sma100": {
-       "liv": 11937.55,
-       "dist_pct": -5.44
+       "liv": 11909.75,
+       "dist_pct": -5.22
       },
       "ema100": {
-       "liv": 11470.21,
+       "liv": 11470.27,
        "dist_pct": -1.58
       },
       "sma200": {
-       "liv": 9773.52,
-       "dist_pct": 15.5
+       "liv": 9751.58,
+       "dist_pct": 15.76
       },
       "ema200": {
-       "liv": 10218.83,
-       "dist_pct": 10.47
+       "liv": 10206.27,
+       "dist_pct": 10.6
       }
      },
      "medie_battute": 2,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 41.2,
+      "rsi14": 41.1,
       "macd": {
-       "linea": -181.23,
-       "segnale": -135.71,
-       "istogramma": -45.53
+       "linea": -172.32,
+       "segnale": -126.62,
+       "istogramma": -45.71
       },
       "stoch_k": 7.2,
-      "stoch_d": 13.0,
+      "stoch_d": 22.1,
       "williams_r": -92.8,
-      "cci20": -128.8,
-      "adx14": 16.1,
-      "di_su": 22.4,
-      "di_giu": 34.4,
-      "momentum10": -703.85
+      "cci20": -139.6,
+      "adx14": 16.2,
+      "di_su": 23.1,
+      "di_giu": 34.9,
+      "momentum10": -1332.39
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
+     {
+      "d": "2026-05-21",
+      "o": 11826.09,
+      "h": 12003.01,
+      "l": 11739.81,
+      "c": 11964.08
+     },
      {
       "d": "2026-05-22",
       "o": 12070.17,
@@ -27616,13 +27632,6 @@
       "c": 11882.17
      },
      {
-      "d": "2026-08-28",
-      "o": 11731.58,
-      "h": 11794.28,
-      "l": 11435.7,
-      "c": 11469.66
-     },
-     {
       "d": "2026-08-31",
       "o": 11529.16,
       "h": 11587.26,
@@ -27638,10 +27647,10 @@
      }
     ],
     "performance": {
-     "s1": -2.58,
-     "m1": -0.2,
-     "m3": -12.01,
-     "m6": 45.38,
+     "s1": -1.18,
+     "m1": -0.13,
+     "m3": -11.13,
+     "m6": 38.73,
      "ytd": 53.22,
      "a1": 99.13,
      "a3": 207.51,
@@ -27759,12 +27768,12 @@
      }
     ]
    },
-   "rs_1m": -1.6,
+   "rs_1m": -2.1,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -2.3,
+   "rs_ndx_1m": -3.0,
    "beta_ndx": 2.02,
-   "avg_corr": 0.54,
-   "max_corr": 0.82,
+   "avg_corr": 0.53,
+   "max_corr": 0.81,
    "max_corr_with": "MU"
   },
   {
@@ -27780,8 +27789,8 @@
    "pe": null,
    "ath": 3069.71,
    "ath_dist_pct": -4.9,
-   "sma200_dist_pct": 6.7,
-   "sma50_dist_pct": -2.3,
+   "sma200_dist_pct": 6.8,
+   "sma50_dist_pct": -2.4,
    "w52_high": 3069.71,
    "w52_low": 2303.46,
    "w52_dist_pct": -4.9,
@@ -27789,22 +27798,23 @@
    "day_low": 2916.84,
    "support": 2916.84,
    "resistance": 3069.71,
-   "rsi": 37.8,
+   "rsi": 38.2,
    "volume": 4858180000,
    "vol_ratio": 0.98,
-   "atr_14": 31.87,
-   "atr_pct": 1.09,
+   "atr_14": 33.78,
+   "atr_pct": 1.16,
    "signal": "Neutrale",
    "signal_class": "neutral",
    "sparks": {
     "w1": [
+     3010.02,
      3005.9,
      3014.34,
-     2972.37,
      2956.45,
      2920.13
     ],
     "m6": [
+     2608.36,
      2636.01,
      2585.57,
      2525.3,
@@ -27928,7 +27938,6 @@
      3010.02,
      3005.9,
      3014.34,
-     2972.37,
      2956.45,
      2920.13
     ],
@@ -28403,6 +28412,7 @@
      2956.45
     ],
     "m1": [
+     2931.34,
      2981.91,
      3036.98,
      3019.19,
@@ -28422,11 +28432,11 @@
      3010.02,
      3005.9,
      3014.34,
-     2972.37,
      2956.45,
      2920.13
     ],
     "m3": [
+     2936.57,
      2919.34,
      2905.76,
      2931.96,
@@ -28490,7 +28500,6 @@
      3010.02,
      3005.9,
      3014.34,
-     2972.37,
      2956.45,
      2920.13
     ],
@@ -28545,7 +28554,7 @@
      3017.4,
      3057.54,
      2995.08,
-     2956.45
+     2920.13
     ],
     "d1": [
      2938.55,
@@ -28592,16 +28601,16 @@
    "earnings_date": null,
    "rating": null,
    "analisti": null,
-   "health": 42,
+   "health": 45,
    "eps": null,
    "beta": null,
    "sharpe_1y": 0.96,
    "sortino_1y": 1.42,
-   "sharpe_6m": 1.0,
-   "sortino_6m": 1.49,
+   "sharpe_6m": 0.8,
+   "sortino_6m": 1.17,
    "prepost": null,
    "prezzo_limite_aggiustato": 2920.13,
-   "risk_reward": "1:2.3",
+   "risk_reward": "1:2.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -28613,17 +28622,17 @@
     "w1": {
      "support": 2916.84,
      "resistance": 3019.4,
-     "change_pct": -2.85
+     "change_pct": -2.99
     },
     "m1": {
-     "support": 2916.84,
+     "support": 2902.47,
      "resistance": 3069.71,
-     "change_pct": -2.07
+     "change_pct": -0.38
     },
     "m3": {
      "support": 2795.48,
      "resistance": 3069.71,
-     "change_pct": 0.03
+     "change_pct": -0.56
     },
     "y1": {
      "support": 2303.46,
@@ -28643,7 +28652,7 @@
     "last_fvg": {
      "dir": "ribassista",
      "lo": 2943.43,
-     "hi": 2972.37
+     "hi": 3000.91
     },
     "liq_above": 2942.61,
     "liq_below": 2910.96,
@@ -28658,75 +28667,82 @@
      "prezzo": 2920.13,
      "medie": {
       "sma10": {
-       "liv": 2991.75,
-       "dist_pct": -2.39
+       "liv": 2996.3,
+       "dist_pct": -2.54
       },
       "ema10": {
-       "liv": 2983.42,
-       "dist_pct": -2.12
+       "liv": 2988.51,
+       "dist_pct": -2.29
       },
       "sma20": {
-       "liv": 3012.97,
-       "dist_pct": -3.08
+       "liv": 3016.2,
+       "dist_pct": -3.19
       },
       "ema20": {
-       "liv": 2993.56,
-       "dist_pct": -2.45
+       "liv": 2996.46,
+       "dist_pct": -2.55
       },
       "sma30": {
-       "liv": 2993.13,
-       "dist_pct": -2.44
+       "liv": 2993.64,
+       "dist_pct": -2.46
       },
       "ema30": {
-       "liv": 2990.93,
-       "dist_pct": -2.37
+       "liv": 2992.5,
+       "dist_pct": -2.42
       },
       "sma50": {
-       "liv": 2989.94,
-       "dist_pct": -2.33
+       "liv": 2990.58,
+       "dist_pct": -2.36
       },
       "ema50": {
-       "liv": 2971.94,
-       "dist_pct": -1.74
+       "liv": 2972.03,
+       "dist_pct": -1.75
       },
       "sma100": {
-       "liv": 2914.36,
-       "dist_pct": 0.2
+       "liv": 2911.0,
+       "dist_pct": 0.31
       },
       "ema100": {
-       "liv": 2900.37,
-       "dist_pct": 0.68
+       "liv": 2898.95,
+       "dist_pct": 0.73
       },
       "sma200": {
-       "liv": 2735.85,
-       "dist_pct": 6.74
+       "liv": 2733.25,
+       "dist_pct": 6.84
       },
       "ema200": {
-       "liv": 2776.51,
-       "dist_pct": 5.17
+       "liv": 2774.55,
+       "dist_pct": 5.25
       }
      },
      "medie_battute": 4,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 37.8,
+      "rsi14": 38.2,
       "macd": {
-       "linea": -5.24,
-       "segnale": 7.38,
-       "istogramma": -12.62
+       "linea": -2.67,
+       "segnale": 9.55,
+       "istogramma": -12.22
       },
       "stoch_k": 2.2,
-      "stoch_d": 3.9,
+      "stoch_d": 14.3,
       "williams_r": -97.8,
-      "cci20": -139.0,
-      "adx14": 19.5,
-      "di_su": 12.9,
-      "di_giu": 34.3,
-      "momentum10": -97.76
+      "cci20": -136.9,
+      "adx14": 18.6,
+      "di_su": 13.1,
+      "di_giu": 34.0,
+      "momentum10": -137.41
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
     "ohlc": [
+     {
+      "d": "2026-05-21",
+      "o": 2802.36,
+      "h": 2850.62,
+      "l": 2798.25,
+      "c": 2843.45
+     },
      {
       "d": "2026-05-22",
       "o": 2855.12,
@@ -29197,13 +29213,6 @@
       "c": 3014.34
      },
      {
-      "d": "2026-08-28",
-      "o": 3014.15,
-      "h": 3017.04,
-      "l": 2972.37,
-      "c": 2972.37
-     },
-     {
       "d": "2026-08-31",
       "o": 2967.43,
       "h": 2967.43,
@@ -29219,10 +29228,10 @@
      }
     ],
     "performance": {
-     "s1": -2.99,
-     "m1": -0.38,
-     "m3": -0.56,
-     "m6": 11.95,
+     "s1": -2.5,
+     "m1": -0.88,
+     "m3": 0.01,
+     "m6": 9.95,
      "ytd": 16.42,
      "a1": 23.4,
      "a3": 53.72,
@@ -29340,12 +29349,12 @@
      }
     ]
    },
-   "rs_1m": -2.5,
+   "rs_1m": -2.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -3.1,
+   "rs_ndx_1m": -3.2,
    "beta_ndx": 0.72,
    "avg_corr": 0.44,
-   "max_corr": 0.58,
+   "max_corr": 0.57,
    "max_corr_with": "RGTI"
   },
   {
@@ -29357,12 +29366,12 @@
    "price_asof": "2026-09-02",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.29,
+   "change_pct": -0.34,
    "pe": null,
    "ath": 1.6,
-   "ath_dist_pct": -27.7,
-   "sma200_dist_pct": -0.4,
-   "sma50_dist_pct": 0.8,
+   "ath_dist_pct": -27.8,
+   "sma200_dist_pct": -0.5,
+   "sma50_dist_pct": 0.7,
    "w52_high": 1.2,
    "w52_low": 1.13,
    "w52_dist_pct": -3.7,
@@ -29370,7 +29379,7 @@
    "day_low": 1.16,
    "support": 1.15,
    "resistance": 1.17,
-   "rsi": 50.8,
+   "rsi": 50.0,
    "volume": 0,
    "vol_ratio": null,
    "atr_14": 0.01,
@@ -29992,6 +30001,10 @@
      1.16,
      1.16,
      1.16,
+     1.16,
+     1.16,
+     1.16,
+     1.16,
      1.16
     ]
    },
@@ -30002,9 +30015,9 @@
    "eps": null,
    "beta": null,
    "sharpe_1y": -0.83,
-   "sortino_1y": -1.19,
-   "sharpe_6m": -0.75,
-   "sortino_6m": -1.09,
+   "sortino_1y": -1.2,
+   "sharpe_6m": -0.76,
+   "sortino_6m": -1.11,
    "prepost": null,
    "prezzo_limite_aggiustato": 1.16,
    "risk_reward": "1:1.1",
@@ -30019,22 +30032,22 @@
     "w1": {
      "support": 1.16,
      "resistance": 1.17,
-     "change_pct": -0.61
+     "change_pct": -0.66
     },
     "m1": {
      "support": 1.15,
      "resistance": 1.17,
-     "change_pct": 0.66
+     "change_pct": 0.61
     },
     "m3": {
      "support": 1.13,
      "resistance": 1.17,
-     "change_pct": -0.33
+     "change_pct": -0.38
     },
     "y1": {
      "support": 1.13,
      "resistance": 1.2,
-     "change_pct": -1.29
+     "change_pct": -1.33
     }
    },
    "financials": [],
@@ -30065,70 +30078,70 @@
      "medie": {
       "sma10": {
        "liv": 1.16,
-       "dist_pct": -0.56
+       "dist_pct": -0.6
       },
       "ema10": {
        "liv": 1.16,
-       "dist_pct": -0.31
+       "dist_pct": -0.35
       },
       "sma20": {
        "liv": 1.16,
-       "dist_pct": -0.15
+       "dist_pct": -0.19
       },
       "ema20": {
        "liv": 1.16,
-       "dist_pct": -0.1
+       "dist_pct": -0.14
       },
       "sma30": {
        "liv": 1.16,
-       "dist_pct": 0.28
+       "dist_pct": 0.24
       },
       "ema30": {
        "liv": 1.16,
-       "dist_pct": 0.09
+       "dist_pct": 0.05
       },
       "sma50": {
        "liv": 1.15,
-       "dist_pct": 0.76
+       "dist_pct": 0.72
       },
       "ema50": {
        "liv": 1.16,
-       "dist_pct": 0.26
+       "dist_pct": 0.21
       },
       "sma100": {
        "liv": 1.16,
-       "dist_pct": 0.11
+       "dist_pct": 0.07
       },
       "ema100": {
        "liv": 1.16,
-       "dist_pct": 0.16
+       "dist_pct": 0.12
       },
       "sma200": {
        "liv": 1.16,
-       "dist_pct": -0.42
+       "dist_pct": -0.47
       },
       "ema200": {
        "liv": 1.16,
-       "dist_pct": -0.17
+       "dist_pct": -0.21
       }
      },
      "medie_battute": 6,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 50.8,
+      "rsi14": 50.0,
       "macd": {
        "linea": 0.0,
        "segnale": 0.0,
        "istogramma": -0.0
       },
-      "stoch_k": 28.3,
-      "stoch_d": 39.7,
-      "williams_r": -71.7,
-      "cci20": -14.6,
+      "stoch_k": 25.3,
+      "stoch_d": 38.7,
+      "williams_r": -74.7,
+      "cci20": -16.0,
       "adx14": 31.4,
       "di_su": 19.8,
       "di_giu": 16.4,
-      "momentum10": 0.0
+      "momentum10": -0.0
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -30625,15 +30638,15 @@
      }
     ],
     "performance": {
-     "s1": -0.78,
-     "m1": 0.34,
-     "m3": -0.45,
-     "m6": -0.29,
-     "a1": -1.03,
-     "ytd": -1.42,
-     "a3": 9.41,
-     "a5": -0.16,
-     "a10": 3.24
+     "s1": -0.83,
+     "m1": 0.3,
+     "m3": -0.49,
+     "m6": -0.34,
+     "a1": -1.07,
+     "ytd": -1.47,
+     "a3": 9.36,
+     "a5": -0.2,
+     "a10": 3.2
     },
     "stagionalita": [
      {
@@ -30746,9 +30759,9 @@
      }
     ]
    },
-   "rs_1m": 0.5,
+   "rs_1m": -1.0,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -0.2,
+   "rs_ndx_1m": -2.0,
    "beta_ndx": 0.01,
    "avg_corr": 0.03,
    "max_corr": 0.09,
@@ -30759,25 +30772,25 @@
    "name": "HG=F",
    "currency": "PTS",
    "price_src": "yahoo",
-   "price": 6.55,
+   "price": 6.53,
    "price_asof": "2026-09-02",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": 0.67,
+   "change_pct": 0.35,
    "pe": null,
    "ath": 6.75,
-   "ath_dist_pct": -3.0,
-   "sma200_dist_pct": 9.7,
-   "sma50_dist_pct": 2.3,
+   "ath_dist_pct": -3.3,
+   "sma200_dist_pct": 9.4,
+   "sma50_dist_pct": 2.0,
    "w52_high": 6.75,
    "w52_low": 4.47,
-   "w52_dist_pct": -3.0,
+   "w52_dist_pct": -3.3,
    "day_high": 6.56,
    "day_low": 6.51,
    "support": 6.41,
    "resistance": 6.75,
-   "rsi": 51.7,
-   "volume": 10931,
+   "rsi": 50.3,
+   "volume": 12061,
    "vol_ratio": 1.2,
    "atr_14": 0.09,
    "atr_pct": 1.43,
@@ -30789,7 +30802,7 @@
      6.56,
      6.59,
      6.51,
-     6.55
+     6.53
     ],
     "m6": [
      5.75,
@@ -30917,7 +30930,7 @@
      6.56,
      6.59,
      6.51,
-     6.55
+     6.53
     ],
     "all": [
      0.88,
@@ -31187,7 +31200,7 @@
      6.19,
      6.44,
      6.59,
-     6.55
+     6.53
     ],
     "m1": [
      6.62,
@@ -31211,7 +31224,7 @@
      6.56,
      6.59,
      6.51,
-     6.55
+     6.53
     ],
     "m3": [
      6.52,
@@ -31279,7 +31292,7 @@
      6.56,
      6.59,
      6.51,
-     6.55
+     6.53
     ],
     "y1": [
      4.57,
@@ -31360,7 +31373,11 @@
      6.55,
      6.54,
      6.55,
-     6.55
+     6.55,
+     6.55,
+     6.54,
+     6.54,
+     6.53
     ]
    },
    "earnings_date": null,
@@ -31369,13 +31386,13 @@
    "health": 65,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 1.17,
-   "sortino_1y": 1.74,
-   "sharpe_6m": 0.76,
-   "sortino_6m": 1.1,
+   "sharpe_1y": 1.16,
+   "sortino_1y": 1.73,
+   "sharpe_6m": 0.74,
+   "sortino_6m": 1.06,
    "prepost": null,
-   "prezzo_limite_aggiustato": 6.55,
-   "risk_reward": "1:1.1",
+   "prezzo_limite_aggiustato": 6.53,
+   "risk_reward": "1:1.2",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
    "stats": null,
@@ -31387,22 +31404,22 @@
     "w1": {
      "support": 6.43,
      "resistance": 6.64,
-     "change_pct": -0.56
+     "change_pct": -0.87
     },
     "m1": {
      "support": 6.41,
      "resistance": 6.75,
-     "change_pct": -1.03
+     "change_pct": -1.34
     },
     "m3": {
      "support": 5.93,
      "resistance": 6.75,
-     "change_pct": 0.4
+     "change_pct": 0.08
     },
     "y1": {
      "support": 4.47,
      "resistance": 6.75,
-     "change_pct": 43.69
+     "change_pct": 43.24
     }
    },
    "financials": [],
@@ -31429,74 +31446,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 6.55,
+     "prezzo": 6.53,
      "medie": {
       "sma10": {
        "liv": 6.57,
-       "dist_pct": -0.37
+       "dist_pct": -0.65
       },
       "ema10": {
        "liv": 6.56,
-       "dist_pct": -0.23
+       "dist_pct": -0.48
       },
       "sma20": {
        "liv": 6.58,
-       "dist_pct": -0.43
+       "dist_pct": -0.73
       },
       "ema20": {
        "liv": 6.55,
-       "dist_pct": 0.03
+       "dist_pct": -0.25
       },
       "sma30": {
        "liv": 6.53,
-       "dist_pct": 0.33
+       "dist_pct": 0.03
       },
       "ema30": {
        "liv": 6.52,
-       "dist_pct": 0.51
+       "dist_pct": 0.22
       },
       "sma50": {
        "liv": 6.4,
-       "dist_pct": 2.34
+       "dist_pct": 2.03
       },
       "ema50": {
        "liv": 6.45,
-       "dist_pct": 1.53
+       "dist_pct": 1.23
       },
       "sma100": {
        "liv": 6.32,
-       "dist_pct": 3.66
+       "dist_pct": 3.33
       },
       "ema100": {
        "liv": 6.29,
-       "dist_pct": 4.17
+       "dist_pct": 3.85
       },
       "sma200": {
        "liv": 5.97,
-       "dist_pct": 9.73
+       "dist_pct": 9.38
       },
       "ema200": {
        "liv": 5.97,
-       "dist_pct": 9.66
+       "dist_pct": 9.32
       }
      },
-     "medie_battute": 9,
+     "medie_battute": 8,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 51.7,
+      "rsi14": 50.3,
       "macd": {
        "linea": 0.03,
        "segnale": 0.05,
        "istogramma": -0.02
       },
-      "stoch_k": 41.9,
-      "stoch_d": 41.9,
-      "williams_r": -58.1,
-      "cci20": -29.8,
+      "stoch_k": 35.9,
+      "stoch_d": 39.9,
+      "williams_r": -64.1,
+      "cci20": -34.2,
       "adx14": 10.0,
       "di_su": 27.6,
       "di_giu": 31.2,
-      "momentum10": 0.06
+      "momentum10": 0.04
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -31989,19 +32006,19 @@
       "o": 6.54,
       "h": 6.56,
       "l": 6.51,
-      "c": 6.55
+      "c": 6.53
      }
     ],
     "performance": {
-     "s1": -0.67,
-     "m1": 0.55,
-     "m3": 3.0,
-     "m6": 11.87,
-     "a1": 43.34,
-     "ytd": 16.13,
-     "a3": 59.58,
-     "a5": 86.4,
-     "a10": 130.76
+     "s1": -0.99,
+     "m1": 0.24,
+     "m3": 2.67,
+     "m6": 11.52,
+     "a1": 42.89,
+     "ytd": 15.77,
+     "a3": 59.08,
+     "a5": 85.81,
+     "a10": 130.03
     },
     "stagionalita": [
      {
@@ -32078,7 +32095,7 @@
      },
      {
       "mese": 9,
-      "media": -0.24,
+      "media": -0.25,
       "mediana": 0.04,
       "positivi_pct": 52,
       "campione": 23,
@@ -32114,11 +32131,11 @@
      }
     ]
    },
-   "rs_1m": -1.5,
+   "rs_1m": -3.3,
    "rs_bench": "sp500",
-   "rs_ndx_1m": -2.1,
+   "rs_ndx_1m": -4.2,
    "beta_ndx": 0.67,
-   "avg_corr": 0.28,
+   "avg_corr": 0.27,
    "max_corr": 0.36,
    "max_corr_with": "AMD"
   },
@@ -32127,25 +32144,25 @@
    "name": "CL=F",
    "currency": "PTS",
    "price_src": "yahoo",
-   "price": 90.12,
+   "price": 90.17,
    "price_asof": "2026-09-02",
    "price_asof_arretrata_da": null,
    "price_live": false,
-   "change_pct": -0.11,
+   "change_pct": -0.06,
    "pe": null,
    "ath": 147.27,
    "ath_dist_pct": -38.8,
-   "sma200_dist_pct": 14.8,
+   "sma200_dist_pct": 14.9,
    "sma50_dist_pct": 12.5,
    "w52_high": 119.48,
    "w52_low": 54.98,
-   "w52_dist_pct": -24.6,
+   "w52_dist_pct": -24.5,
    "day_high": 92.29,
    "day_low": 89.92,
    "support": 74.57,
    "resistance": 92.29,
-   "rsi": 63.2,
-   "volume": 61161,
+   "rsi": 63.3,
+   "volume": 67787,
    "vol_ratio": 0.9,
    "atr_14": 3.55,
    "atr_pct": 3.94,
@@ -32157,7 +32174,7 @@
      83.4,
      85.76,
      90.22,
-     90.12
+     90.17
     ],
     "m6": [
      81.01,
@@ -32285,7 +32302,7 @@
      83.4,
      85.76,
      90.22,
-     90.12
+     90.17
     ],
     "all": [
      33.1,
@@ -32555,7 +32572,7 @@
      69.5,
      84.67,
      85.76,
-     90.12
+     90.16
     ],
     "m1": [
      75.77,
@@ -32579,7 +32596,7 @@
      83.4,
      85.76,
      90.22,
-     90.12
+     90.17
     ],
     "m3": [
      92.16,
@@ -32647,7 +32664,7 @@
      83.4,
      85.76,
      90.22,
-     90.12
+     90.17
     ],
     "y1": [
      65.59,
@@ -32728,7 +32745,11 @@
      90.07,
      90.19,
      89.95,
-     90.09
+     90.09,
+     90.39,
+     90.21,
+     90.33,
+     90.38
     ]
    },
    "earnings_date": null,
@@ -32737,12 +32758,12 @@
    "health": 88,
    "eps": null,
    "beta": null,
-   "sharpe_1y": 0.51,
+   "sharpe_1y": 0.52,
    "sortino_1y": 0.7,
    "sharpe_6m": 0.48,
    "sortino_6m": 0.64,
    "prepost": null,
-   "prezzo_limite_aggiustato": 90.12,
+   "prezzo_limite_aggiustato": 90.17,
    "risk_reward": "1:0.3",
    "risk_reward_base": "ultima chiusura",
    "sector": "Altro",
@@ -32755,22 +32776,22 @@
     "w1": {
      "support": 80.65,
      "resistance": 92.29,
-     "change_pct": 7.89
+     "change_pct": 7.95
     },
     "m1": {
      "support": 74.24,
      "resistance": 92.29,
-     "change_pct": 18.94
+     "change_pct": 19.0
     },
     "m3": {
      "support": 67.04,
      "resistance": 97.0,
-     "change_pct": -2.21
+     "change_pct": -2.16
     },
     "y1": {
      "support": 54.98,
      "resistance": 119.48,
-     "change_pct": 40.88
+     "change_pct": 40.96
     }
    },
    "financials": [],
@@ -32797,74 +32818,74 @@
    },
    "tv": {
     "tecnica": {
-     "prezzo": 90.12,
+     "prezzo": 90.17,
      "medie": {
       "sma10": {
-       "liv": 85.75,
-       "dist_pct": 5.09
+       "liv": 85.76,
+       "dist_pct": 5.15
       },
       "ema10": {
        "liv": 86.1,
-       "dist_pct": 4.67
+       "dist_pct": 4.72
       },
       "sma20": {
        "liv": 84.03,
-       "dist_pct": 7.25
+       "dist_pct": 7.31
       },
       "ema20": {
        "liv": 84.62,
-       "dist_pct": 6.5
+       "dist_pct": 6.56
       },
       "sma30": {
        "liv": 83.6,
-       "dist_pct": 7.8
+       "dist_pct": 7.86
       },
       "ema30": {
-       "liv": 83.81,
-       "dist_pct": 7.52
+       "liv": 83.82,
+       "dist_pct": 7.58
       },
       "sma50": {
        "liv": 80.13,
-       "dist_pct": 12.47
+       "dist_pct": 12.53
       },
       "ema50": {
        "liv": 83.48,
-       "dist_pct": 7.95
+       "dist_pct": 8.01
       },
       "sma100": {
        "liv": 86.76,
-       "dist_pct": 3.87
+       "dist_pct": 3.93
       },
       "ema100": {
-       "liv": 83.19,
-       "dist_pct": 8.32
+       "liv": 83.2,
+       "dist_pct": 8.38
       },
       "sma200": {
        "liv": 78.5,
-       "dist_pct": 14.81
+       "dist_pct": 14.87
       },
       "ema200": {
        "liv": 79.85,
-       "dist_pct": 12.87
+       "dist_pct": 12.93
       }
      },
      "medie_battute": 12,
      "medie_totali": 12,
      "oscillatori": {
-      "rsi14": 63.2,
+      "rsi14": 63.3,
       "macd": {
        "linea": 1.66,
        "segnale": 1.14,
-       "istogramma": 0.51
+       "istogramma": 0.52
       },
-      "stoch_k": 82.9,
-      "stoch_d": 80.6,
-      "williams_r": -17.1,
-      "cci20": 180.1,
+      "stoch_k": 83.3,
+      "stoch_d": 80.7,
+      "williams_r": -16.7,
+      "cci20": 180.5,
       "adx14": 15.6,
       "di_su": 33.3,
       "di_giu": 17.5,
-      "momentum10": 4.29
+      "momentum10": 4.34
      },
      "_come": "medie e oscillatori calcolati da noi sulla barra giornaliera Yahoo (auto_adjust=True) con le formule standard: RSI e ADX di Wilder, MACD 12/26/9, stocastico 14/3, CCI 20, Williams %R 14"
     },
@@ -33357,19 +33378,19 @@
       "o": 90.65,
       "h": 92.29,
       "l": 89.92,
-      "c": 90.12
+      "c": 90.17
      }
     ],
     "performance": {
-     "s1": 9.6,
-     "m1": 12.17,
-     "m3": 3.16,
-     "m6": 20.71,
-     "a1": 37.4,
-     "ytd": 57.22,
-     "a3": 19.1,
-     "a5": 85.74,
-     "a10": 69.18
+     "s1": 9.66,
+     "m1": 12.24,
+     "m3": 3.22,
+     "m6": 20.77,
+     "a1": 37.48,
+     "ytd": 57.31,
+     "a3": 19.16,
+     "a5": 85.84,
+     "a10": 69.27
     },
     "stagionalita": [
      {
@@ -33446,7 +33467,7 @@
      },
      {
       "mese": 9,
-      "media": -1.75,
+      "media": -1.74,
       "mediana": -3.92,
       "positivi_pct": 43,
       "campione": 23,
@@ -33482,9 +33503,9 @@
      }
     ]
    },
-   "rs_1m": 18.5,
+   "rs_1m": 17.1,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 17.9,
+   "rs_ndx_1m": 16.2,
    "beta_ndx": -0.73,
    "avg_corr": -0.1,
    "max_corr": -0.02,
@@ -34216,10 +34237,10 @@
    "sortino_6m": 0.95,
    "prepost": {
     "label": "pre",
-    "price": 412.73,
-    "change_pct": -0.31
+    "price": 410.84,
+    "change_pct": -0.76
    },
-   "prezzo_limite_aggiustato": 412.73,
+   "prezzo_limite_aggiustato": 410.84,
    "risk_reward": "1:1.0",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -34247,7 +34268,7 @@
     "gross_margin": 0.6423,
     "enterprise_value": null,
     "ev_ebitda": null,
-    "peg": 1.02,
+    "peg": 1.0,
     "roa": 0.19,
     "short_float": 0.0062,
     "buyback_yield": -0.0,
@@ -35133,20 +35154,20 @@
      "tassi": {
       "strumento": "TLT",
       "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
-      "beta": 0.65,
+      "beta": 0.64,
       "r2": 0.023,
       "corr": 0.15,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -1.41,
-      "r2": 0.039,
-      "corr": -0.2,
-      "campione": 251,
+      "beta": -1.39,
+      "r2": 0.037,
+      "corr": -0.19,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -35194,9 +35215,9 @@
      }
     ]
    },
-   "rs_1m": 1.5,
+   "rs_1m": 0.1,
    "rs_bench": "sp500",
-   "rs_ndx_1m": 0.9,
+   "rs_ndx_1m": -0.9,
    "beta_ndx": 1.56,
    "avg_corr": 0.47,
    "max_corr": 0.64,
@@ -35791,10 +35812,10 @@
    "sortino_6m": 0.85,
    "prepost": {
     "label": "pre",
-    "price": 369.68,
-    "change_pct": 0.0
+    "price": 368.73,
+    "change_pct": -0.26
    },
-   "prezzo_limite_aggiustato": 369.68,
+   "prezzo_limite_aggiustato": 368.73,
    "risk_reward": "1:2.4",
    "risk_reward_base": "prezzo esteso",
    "sector": "Technology",
@@ -35822,7 +35843,7 @@
     "gross_margin": 0.7628,
     "enterprise_value": 1804061245440.0,
     "ev_ebitda": 42.868,
-    "peg": 0.42,
+    "peg": 0.41,
     "roa": 0.1212,
     "short_float": 0.012,
     "buyback_yield": 0.0035,
@@ -36712,20 +36733,20 @@
      "tassi": {
       "strumento": "TLT",
       "canale": "i tassi a lunga (TLT sale quando il rendimento scende): il costo del capitale",
-      "beta": 0.92,
+      "beta": 0.91,
       "r2": 0.032,
       "corr": 0.18,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      },
      "dollaro": {
       "strumento": "UUP",
       "canale": "il dollaro: ricavi esteri e costi in valuta",
-      "beta": -1.16,
+      "beta": -1.14,
       "r2": 0.018,
       "corr": -0.13,
-      "campione": 251,
+      "campione": 250,
       "da": "2025-09-03",
       "a": "2026-09-01"
      }
@@ -36773,9 +36794,9 @@
      }
     ]
    },
-   "rs_1m": -4.5,
+   "rs_1m": -5.6,
    "rs_bench": "sox",
-   "rs_ndx_1m": -6.8,
+   "rs_ndx_1m": -8.6,
    "beta_ndx": 1.61,
    "avg_corr": 0.41,
    "max_corr": 0.51,
@@ -36840,8 +36861,8 @@
    "fomo_label": "Nessuna FOMO"
   },
   "vix": {
-   "value": 16.42,
-   "change_pct": 0.49,
+   "value": 16.78,
+   "change_pct": 2.69,
    "spark": [
     18.7,
     18.58,
@@ -36872,7 +36893,7 @@
     14.43,
     14.92,
     16.34,
-    16.42
+    16.78
    ],
    "asof": "2026-09-02"
   },
@@ -43824,15 +43845,15 @@
    {
     "key": "EURUSD=X",
     "label": "EUR/USD",
-    "value": "1.1583",
-    "change_pct": -0.29,
+    "value": "1.1579",
+    "change_pct": -0.33,
     "suffix": "%"
    },
    {
     "key": "EURJPY=X",
     "label": "EUR/JPY",
-    "value": "184.87",
-    "change_pct": -0.38,
+    "value": "185.02",
+    "change_pct": -0.3,
     "suffix": "%"
    }
   ],
@@ -44349,10 +44370,6 @@
       "v": 11882.17
      },
      {
-      "d": "2026-08-31",
-      "v": 11535.05
-     },
-     {
       "d": "2026-09-01",
       "v": 11288.61
      }
@@ -44362,10 +44379,10 @@
     "symbol": "HG=F",
     "label": "Rame",
     "unita": "$/lb",
-    "value": 6.55,
-    "change_pct": 0.67,
-    "var_1y": 43.3,
-    "pos_range_1y": 92.8,
+    "value": 6.529,
+    "change_pct": 0.34,
+    "var_1y": 42.9,
+    "pos_range_1y": 91.9,
     "min_1y": 4.483,
     "max_1y": 6.709,
     "history": [
@@ -44875,7 +44892,7 @@
      },
      {
       "d": "2026-09-02",
-      "v": 6.55
+      "v": 6.529
      }
     ]
    },
@@ -44883,10 +44900,10 @@
     "symbol": "CL=F",
     "label": "Petrolio WTI",
     "unita": "$",
-    "value": 90.09,
-    "change_pct": -0.14,
-    "var_1y": 37.4,
-    "pos_range_1y": 60.4,
+    "value": 90.22,
+    "change_pct": 0.0,
+    "var_1y": 37.6,
+    "pos_range_1y": 60.6,
     "min_1y": 55.27,
     "max_1y": 112.95,
     "history": [
@@ -45396,7 +45413,7 @@
      },
      {
       "d": "2026-09-02",
-      "v": 90.09
+      "v": 90.22
      }
     ]
    },
@@ -45404,10 +45421,10 @@
     "symbol": "GC=F",
     "label": "Oro",
     "unita": "$/oz",
-    "value": 4373,
-    "change_pct": 0.57,
-    "var_1y": 23.2,
-    "pos_range_1y": 46.5,
+    "value": 4360,
+    "change_pct": 0.27,
+    "var_1y": 22.8,
+    "pos_range_1y": 45.8,
     "min_1y": 3549,
     "max_1y": 5318,
     "history": [
@@ -45917,7 +45934,7 @@
      },
      {
       "d": "2026-09-02",
-      "v": 4372.6
+      "v": 4359.7
      }
     ]
    }
@@ -45965,34 +45982,6 @@
      "fonte": "Bloomberg",
      "quando": "2026-09-02T06:15:39Z",
      "url": "https://www.bloomberg.com/news/articles/2026-09-02/global-bonds-are-slumping-but-it-s-nothing-like-the-2022-wipeout"
-    },
-    {
-     "titolo": "Vietnam’s Vingroup Plans Debut Won Bond After Shares Hit Record",
-     "riassunto": "Vietnamese conglomerate Vingroup JSC is in discussions with brokerages about selling its first bond denominated in the Korean won, according to people familiar with the matter, as the company seeks to broaden its investor base after its shares hit a record.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-02T06:12:18Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-02/vietnam-s-vingroup-plans-debut-won-bond-after-shares-hit-record"
-    },
-    {
-     "titolo": "FTSE 100 Live: European Bonds Fall Again as Oil Continues Climb",
-     "riassunto": "",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-02T05:47:14Z",
-     "url": "https://www.bloomberg.com/news/live-blog/2026-09-02/ftse-100-live-updates-pound-gilts-bonds-gdp-iran-us-war-trump-oil-prices-hormuz-what-s-moving-uk-markets-right-now-markets-today-mtjoc77i"
-    },
-    {
-     "titolo": "Stocks, Bonds Extend Losses as Oil Gains on Iran: Markets Wrap",
-     "riassunto": "Stocks remained under pressure while a selloff in bonds showed few signs of letting up as a sustained advance in oil prices fueled speculation that global policymakers will be forced to raise interest rates.",
-     "fonte": "Bloomberg",
-     "quando": "2026-09-01T22:07:33Z",
-     "url": "https://www.bloomberg.com/news/articles/2026-09-01/stock-market-today-dow-s-p-live-updates"
-    },
-    {
-     "titolo": "This could be the 10-year Treasury’s tipping point into the danger zone",
-     "riassunto": "An unrelenting rout has global bond yields touching their highest levels since 2008, driving up borrowing costs for households, businesses and world governments.",
-     "fonte": "MarketWatch",
-     "quando": "2026-09-01T20:36:00Z",
-     "url": "https://www.marketwatch.com/story/this-could-be-the-10-year-treasurys-tipping-point-into-the-danger-zone-891cd45d?mod=mw_rss_topstories"
     },
     {
      "titolo": "Euro zone inflation is back above 3%. Higher interest rates are likely to follow",
@@ -46049,6 +46038,34 @@
      "fonte": "CNBC Economia",
      "quando": "2026-08-27T17:31:09Z",
      "url": "https://www.cnbc.com/2026/08/27/feds-hammack-says-now-is-the-time-to-act-on-raising-interest-rates.html"
+    },
+    {
+     "titolo": "Fed’s preferred inflation gauge shows core prices rose 3.3% annually in July",
+     "riassunto": "The personal consumption expenditures price index was expected to rise 0.1% monthly and 3.6% on a 12-month basis, according to economists surveyed by Dow Jones.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-26T13:35:50Z",
+     "url": "https://www.cnbc.com/2026/08/26/feds-preferred-inflation-gauge-shows-core-prices-rose-3point3percent-annually-in-july.html"
+    },
+    {
+     "titolo": "Stanley Druckenmiller leads doubters who think Bessent's bond ploys will fail",
+     "riassunto": "The bond market interventions have generated a modest decline in yields along with a growing chorus of derision.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-25T17:15:50Z",
+     "url": "https://www.cnbc.com/2026/08/25/stanley-druckenmiller-leads-doubters-who-think-bessents-bond-ploys-will-fail.html"
+    },
+    {
+     "titolo": "China needs U.S. dollars but is building a hedge against Washington’s sanctions",
+     "riassunto": "The U.S. can pressure Chinese banks over Iran through access to its financial system, while Beijing is building alternatives such as CIPS.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-25T16:00:40Z",
+     "url": "https://www.cnbc.com/2026/08/25/china-iran-us-sanctions-banks-cips.html"
+    },
+    {
+     "titolo": "'They asked too much': Canadian dollar slides as Ottawa and Washington head for all-out trade war",
+     "riassunto": "\"As a smaller, more open economy, Canada has more to lose from this,\" ING strategists said Monday.",
+     "fonte": "CNBC Economia",
+     "quando": "2026-08-24T13:35:08Z",
+     "url": "https://www.cnbc.com/2026/08/24/canada-us-trade-war-deal.html"
     }
    ],
    "fonti": [
@@ -50781,8 +50798,8 @@
    "us10": 4.8,
    "jp10": 2.99,
    "spread": 1.81,
-   "usdjpy": 159.65,
-   "usdjpy_chg_1m": 1.31,
+   "usdjpy": 159.84,
+   "usdjpy_chg_1m": 1.43,
    "boj_rate": null,
    "boj_rate_date": "2023-12-01",
    "boj_meetings": [
@@ -50801,7 +50818,7 @@
    "calls": 734929
   },
   "risk_sentiment": {
-   "score": 44,
+   "score": 43,
    "label": "Neutrale",
    "components": [
     {
@@ -50810,7 +50827,7 @@
     },
     {
      "label": "VIX",
-     "score": 81
+     "score": 79
     },
     {
      "label": "Put/Call",
@@ -50818,7 +50835,7 @@
     },
     {
      "label": "Bitcoin",
-     "score": 48
+     "score": 44
     },
     {
      "label": "Treasury 10A",
@@ -50963,7 +50980,7 @@
       "qqq": 94.5
      }
     },
-    "azioni_in_circolazione": 69700000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-01",
     "price": 210.82,
     "d1": 0.85,
@@ -50999,49 +51016,132 @@
     "score": 93
    },
    {
+    "ticker": "SKYY",
+    "name": "Cloud",
+    "group": "Tematici",
+    "medie": {
+     "ma20": {
+      "valore": 160.39,
+      "dist_pct": 0.2,
+      "pendenza_pct": 16.7
+     },
+     "ma50": {
+      "valore": 145.75,
+      "dist_pct": 10.3,
+      "pendenza_pct": 6.74
+     },
+     "ma100": {
+      "valore": 136.97,
+      "dist_pct": 17.3,
+      "pendenza_pct": 8.04
+     },
+     "ma200": {
+      "valore": 128.97,
+      "dist_pct": 24.6,
+      "pendenza_pct": 1.84
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 46.3,
+      "spy": 11.8,
+      "qqq": 16.1
+     },
+     "a1": {
+      "settore": 26.0,
+      "spy": 20.3,
+      "qqq": 25.7
+     },
+     "a2": {
+      "settore": 65.7,
+      "spy": 39.7,
+      "qqq": 51.7
+     },
+     "a5": {
+      "settore": 50.4,
+      "spy": 81.6,
+      "qqq": 94.5
+     }
+    },
+    "azioni_in_circolazione": null,
+    "asof": "2026-09-01",
+    "price": 160.72,
+    "d1": -2.79,
+    "m1": 12.4,
+    "m3": 19.0,
+    "prime": [
+     {
+      "tk": "NTNX",
+      "nome": "Nutanix Inc Class A",
+      "peso": 4.3
+     },
+     {
+      "tk": "ANET",
+      "nome": "Arista Networks Inc",
+      "peso": 4.0
+     },
+     {
+      "tk": "MSFT",
+      "nome": "Microsoft Corp",
+      "peso": 3.8
+     },
+     {
+      "tk": "P",
+      "nome": "Everpure Inc Class A",
+      "peso": 3.6
+     },
+     {
+      "tk": "GOOGL",
+      "nome": "Alphabet Inc Class A",
+      "peso": 3.3
+     }
+    ],
+    "score": 88
+   },
+   {
     "ticker": "XBI",
     "name": "Biotech",
     "group": "Tematici",
     "medie": {
      "ma20": {
-      "valore": 161.56,
-      "dist_pct": 1.1,
-      "pendenza_pct": 4.98
+      "valore": 161.03,
+      "dist_pct": 1.5,
+      "pendenza_pct": 4.19
      },
      "ma50": {
-      "valore": 157.18,
-      "dist_pct": 4.0,
+      "valore": 156.85,
+      "dist_pct": 4.2,
       "pendenza_pct": 7.89
      },
      "ma100": {
-      "valore": 145.36,
-      "dist_pct": 12.4,
-      "pendenza_pct": 5.59
+      "valore": 145.05,
+      "dist_pct": 12.6,
+      "pendenza_pct": 5.52
      },
      "ma200": {
-      "valore": 134.46,
-      "dist_pct": 21.5,
-      "pendenza_pct": 4.2
+      "valore": 134.22,
+      "dist_pct": 21.7,
+      "pendenza_pct": 4.18
      }
     },
     "relativa": {
      "m6": {
-      "settore": 29.4,
+      "settore": 32.4,
       "spy": 11.8,
       "qqq": 16.1
      },
      "a1": {
-      "settore": 76.7,
+      "settore": 82.7,
       "spy": 20.3,
       "qqq": 25.7
      },
      "a2": {
-      "settore": 63.3,
+      "settore": 62.5,
       "spy": 39.7,
       "qqq": 51.7
      },
      "a5": {
-      "settore": 27.3,
+      "settore": 28.7,
       "spy": 81.6,
       "qqq": 94.5
      }
@@ -51050,8 +51150,8 @@
     "asof": "2026-09-01",
     "price": 163.4,
     "d1": 0.55,
-    "m1": 10.9,
-    "m3": 19.7,
+    "m1": 11.1,
+    "m3": 20.3,
     "prime": [
      {
       "tk": "APGE",
@@ -51079,7 +51179,7 @@
       "peso": 1.4
      }
     ],
-    "score": 86
+    "score": 87
    },
    {
     "ticker": "XLE",
@@ -51212,7 +51312,7 @@
       "qqq": 94.5
      }
     },
-    "azioni_in_circolazione": 197415008,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-01",
     "price": 171.67,
     "d1": 0.66,
@@ -51248,127 +51348,44 @@
     "score": 74
    },
    {
-    "ticker": "SKYY",
-    "name": "Cloud",
-    "group": "Tematici",
-    "medie": {
-     "ma20": {
-      "valore": 160.98,
-      "dist_pct": -0.2,
-      "pendenza_pct": 16.69
-     },
-     "ma50": {
-      "valore": 146.46,
-      "dist_pct": 9.7,
-      "pendenza_pct": 6.97
-     },
-     "ma100": {
-      "valore": 137.54,
-      "dist_pct": 16.9,
-      "pendenza_pct": 8.19
-     },
-     "ma200": {
-      "valore": 129.12,
-      "dist_pct": 24.5,
-      "pendenza_pct": 1.89
-     }
-    },
-    "relativa": {
-     "m6": {
-      "settore": 44.0,
-      "spy": 11.8,
-      "qqq": 16.1
-     },
-     "a1": {
-      "settore": 27.4,
-      "spy": 20.3,
-      "qqq": 25.7
-     },
-     "a2": {
-      "settore": 67.9,
-      "spy": 39.7,
-      "qqq": 51.7
-     },
-     "a5": {
-      "settore": 49.5,
-      "spy": 81.6,
-      "qqq": 94.5
-     }
-    },
-    "azioni_in_circolazione": null,
-    "asof": "2026-09-01",
-    "price": 160.72,
-    "d1": -2.79,
-    "m1": 8.6,
-    "m3": 11.2,
-    "prime": [
-     {
-      "tk": "NTNX",
-      "nome": "Nutanix Inc Class A",
-      "peso": 4.3
-     },
-     {
-      "tk": "ANET",
-      "nome": "Arista Networks Inc",
-      "peso": 4.0
-     },
-     {
-      "tk": "MSFT",
-      "nome": "Microsoft Corp",
-      "peso": 3.8
-     },
-     {
-      "tk": "P",
-      "nome": "Everpure Inc Class A",
-      "peso": 3.6
-     },
-     {
-      "tk": "GOOGL",
-      "nome": "Alphabet Inc Class A",
-      "peso": 3.3
-     }
-    ],
-    "score": 74
-   },
-   {
     "ticker": "ARKK",
     "name": "Innovazione",
     "group": "Tematici",
     "medie": {
      "ma20": {
-      "valore": 82.39,
-      "dist_pct": 0.8,
-      "pendenza_pct": 8.41
+      "valore": 82.0,
+      "dist_pct": 1.3,
+      "pendenza_pct": 7.18
      },
      "ma50": {
-      "valore": 79.22,
-      "dist_pct": 4.9,
-      "pendenza_pct": 2.29
+      "valore": 79.09,
+      "dist_pct": 5.0,
+      "pendenza_pct": 2.07
      },
      "ma100": {
-      "valore": 78.19,
-      "dist_pct": 6.3,
-      "pendenza_pct": 3.54
+      "valore": 78.03,
+      "dist_pct": 6.5,
+      "pendenza_pct": 3.34
      },
      "ma200": {
-      "valore": 76.79,
+      "valore": 76.77,
       "dist_pct": 8.2,
-      "pendenza_pct": -0.56
+      "pendenza_pct": -0.67
      }
     },
     "relativa": {
      "m6": {
-      "settore": 10.9,
+      "settore": 15.0,
       "spy": 11.8,
       "qqq": 16.1
      },
      "a1": {
-      "settore": 11.7,
+      "settore": 10.8,
       "spy": 20.3,
       "qqq": 25.7
      },
      "a2": {
-      "settore": 87.7,
+      "settore": 82.9,
       "spy": 39.7,
       "qqq": 51.7
      },
@@ -51382,8 +51399,8 @@
     "asof": "2026-09-01",
     "price": 83.08,
     "d1": -2.91,
-    "m1": 13.0,
-    "m3": 1.4,
+    "m1": 16.6,
+    "m3": 2.6,
     "prime": [
      {
       "tk": "TSLA",
@@ -51411,7 +51428,7 @@
       "peso": 4.3
      }
     ],
-    "score": 71
+    "score": 77
    },
    {
     "ticker": "IGV",
@@ -51585,24 +51602,24 @@
     "group": "Settori",
     "medie": {
      "ma20": {
-      "valore": 52.8,
-      "dist_pct": -1.4,
-      "pendenza_pct": 3.84
+      "valore": 52.74,
+      "dist_pct": -1.3,
+      "pendenza_pct": 3.62
      },
      "ma50": {
-      "valore": 51.74,
-      "dist_pct": 0.6,
-      "pendenza_pct": 1.42
+      "valore": 51.71,
+      "dist_pct": 0.7,
+      "pendenza_pct": 1.41
      },
      "ma100": {
-      "valore": 51.46,
+      "valore": 51.44,
       "dist_pct": 1.2,
       "pendenza_pct": 1.49
      },
      "ma200": {
-      "valore": 49.67,
-      "dist_pct": 4.8,
-      "pendenza_pct": 2.09
+      "valore": 49.62,
+      "dist_pct": 4.9,
+      "pendenza_pct": 2.06
      }
     },
     "relativa": {
@@ -51612,17 +51629,17 @@
       "qqq": 16.1
      },
      "a1": {
-      "settore": 15.8,
+      "settore": 14.9,
       "spy": 20.3,
       "qqq": 25.7
      },
      "a2": {
-      "settore": 16.6,
+      "settore": 16.1,
       "spy": 39.7,
       "qqq": 51.7
      },
      "a5": {
-      "settore": 34.6,
+      "settore": 35.2,
       "spy": 81.6,
       "qqq": 94.5
      }
@@ -51631,8 +51648,8 @@
     "asof": "2026-09-01",
     "price": 52.07,
     "d1": -1.18,
-    "m1": 2.1,
-    "m3": 2.2,
+    "m1": 3.3,
+    "m3": 1.8,
     "prime": [
      {
       "tk": "LIN",
@@ -51660,6 +51677,89 @@
       "peso": 4.7
      }
     ],
+    "score": 57
+   },
+   {
+    "ticker": "XLK",
+    "name": "Tecnologia",
+    "group": "Settori",
+    "medie": {
+     "ma20": {
+      "valore": 185.88,
+      "dist_pct": -1.2,
+      "pendenza_pct": 4.16
+     },
+     "ma50": {
+      "valore": 182.64,
+      "dist_pct": 0.5,
+      "pendenza_pct": -0.13
+     },
+     "ma100": {
+      "valore": 177.27,
+      "dist_pct": 3.6,
+      "pendenza_pct": 6.21
+     },
+     "ma200": {
+      "valore": 159.28,
+      "dist_pct": 15.3,
+      "pendenza_pct": 2.7
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 33.9,
+      "spy": 11.8,
+      "qqq": 16.1
+     },
+     "a1": {
+      "settore": 40.7,
+      "spy": 20.3,
+      "qqq": 25.7
+     },
+     "a2": {
+      "settore": 67.1,
+      "spy": 39.7,
+      "qqq": 51.7
+     },
+     "a5": {
+      "settore": 142.0,
+      "spy": 81.6,
+      "qqq": 94.5
+     }
+    },
+    "azioni_in_circolazione": null,
+    "asof": "2026-09-01",
+    "price": 183.64,
+    "d1": -1.53,
+    "m1": 4.7,
+    "m3": -1.6,
+    "prime": [
+     {
+      "tk": "NVDA",
+      "nome": "NVIDIA Corp",
+      "peso": 13.8
+     },
+     {
+      "tk": "AAPL",
+      "nome": "Apple Inc",
+      "peso": 12.9
+     },
+     {
+      "tk": "MSFT",
+      "nome": "Microsoft Corp",
+      "peso": 9.8
+     },
+     {
+      "tk": "AVGO",
+      "nome": "Broadcom Inc",
+      "peso": 5.2
+     },
+     {
+      "tk": "AMD",
+      "nome": "Advanced Micro Devices Inc",
+      "peso": 4.2
+     }
+    ],
     "score": 55
    },
    {
@@ -51670,42 +51770,42 @@
      "ma20": {
       "valore": 85.57,
       "dist_pct": -0.4,
-      "pendenza_pct": 0.98
+      "pendenza_pct": 1.02
      },
      "ma50": {
-      "valore": 84.97,
-      "dist_pct": 0.3,
-      "pendenza_pct": 1.14
+      "valore": 84.9,
+      "dist_pct": 0.4,
+      "pendenza_pct": 1.06
      },
      "ma100": {
-      "valore": 84.0,
+      "valore": 83.98,
       "dist_pct": 1.5,
-      "pendenza_pct": 0.95
+      "pendenza_pct": 0.92
      },
      "ma200": {
-      "valore": 82.5,
-      "dist_pct": 3.3,
-      "pendenza_pct": 1.21
+      "valore": 82.45,
+      "dist_pct": 3.4,
+      "pendenza_pct": 1.2
      }
     },
     "relativa": {
      "m6": {
-      "settore": -1.0,
+      "settore": -1.6,
       "spy": 11.8,
       "qqq": 16.1
      },
      "a1": {
-      "settore": 8.6,
+      "settore": 8.5,
       "spy": 20.3,
       "qqq": 25.7
      },
      "a2": {
-      "settore": 9.2,
+      "settore": 8.7,
       "spy": 39.7,
       "qqq": 51.7
      },
      "a5": {
-      "settore": 35.4,
+      "settore": 35.2,
       "spy": 81.6,
       "qqq": 94.5
      }
@@ -51714,8 +51814,8 @@
     "asof": "2026-09-01",
     "price": 85.25,
     "d1": 0.32,
-    "m1": 0.5,
-    "m3": 3.5,
+    "m1": 0.2,
+    "m3": 1.7,
     "prime": [
      {
       "tk": "WMT",
@@ -51743,7 +51843,7 @@
       "peso": 6.3
      }
     ],
-    "score": 54
+    "score": 52
    },
    {
     "ticker": "GLD",
@@ -51801,89 +51901,6 @@
     "m3": -4.9,
     "prime": [],
     "score": 55
-   },
-   {
-    "ticker": "XLK",
-    "name": "Tecnologia",
-    "group": "Settori",
-    "medie": {
-     "ma20": {
-      "valore": 185.82,
-      "dist_pct": -1.2,
-      "pendenza_pct": 4.29
-     },
-     "ma50": {
-      "valore": 182.51,
-      "dist_pct": 0.6,
-      "pendenza_pct": -0.21
-     },
-     "ma100": {
-      "valore": 177.71,
-      "dist_pct": 3.3,
-      "pendenza_pct": 6.22
-     },
-     "ma200": {
-      "valore": 159.48,
-      "dist_pct": 15.2,
-      "pendenza_pct": 2.7
-     }
-    },
-    "relativa": {
-     "m6": {
-      "settore": 31.6,
-      "spy": 11.8,
-      "qqq": 16.1
-     },
-     "a1": {
-      "settore": 42.1,
-      "spy": 20.3,
-      "qqq": 25.7
-     },
-     "a2": {
-      "settore": 69.4,
-      "spy": 39.7,
-      "qqq": 51.7
-     },
-     "a5": {
-      "settore": 142.1,
-      "spy": 81.6,
-      "qqq": 94.5
-     }
-    },
-    "azioni_in_circolazione": 272056000,
-    "asof": "2026-09-01",
-    "price": 183.64,
-    "d1": -1.53,
-    "m1": 3.1,
-    "m3": -3.7,
-    "prime": [
-     {
-      "tk": "NVDA",
-      "nome": "NVIDIA Corp",
-      "peso": 13.8
-     },
-     {
-      "tk": "AAPL",
-      "nome": "Apple Inc",
-      "peso": 12.9
-     },
-     {
-      "tk": "MSFT",
-      "nome": "Microsoft Corp",
-      "peso": 9.8
-     },
-     {
-      "tk": "AVGO",
-      "nome": "Broadcom Inc",
-      "peso": 5.2
-     },
-     {
-      "tk": "AMD",
-      "nome": "Advanced Micro Devices Inc",
-      "peso": 4.2
-     }
-    ],
-    "score": 51
    },
    {
     "ticker": "XLRE",
@@ -51974,44 +51991,44 @@
     "group": "Settori",
     "medie": {
      "ma20": {
-      "valore": 111.59,
+      "valore": 111.54,
       "dist_pct": -0.6,
-      "pendenza_pct": 1.58
+      "pendenza_pct": 1.59
      },
      "ma50": {
-      "valore": 110.22,
-      "dist_pct": 0.6,
-      "pendenza_pct": -0.35
+      "valore": 110.1,
+      "dist_pct": 0.7,
+      "pendenza_pct": -0.54
      },
      "ma100": {
-      "valore": 112.47,
+      "valore": 112.48,
       "dist_pct": -1.4,
-      "pendenza_pct": -0.07
+      "pendenza_pct": -0.11
      },
      "ma200": {
-      "valore": 113.58,
+      "valore": 113.57,
       "dist_pct": -2.4,
-      "pendenza_pct": -0.19
+      "pendenza_pct": -0.2
      }
     },
     "relativa": {
      "m6": {
-      "settore": -6.1,
+      "settore": -5.5,
       "spy": 11.8,
       "qqq": 16.1
      },
      "a1": {
-      "settore": 1.0,
+      "settore": 0.8,
       "spy": 20.3,
       "qqq": 25.7
      },
      "a2": {
-      "settore": 30.6,
+      "settore": 29.7,
       "spy": 39.7,
       "qqq": 51.7
      },
      "a5": {
-      "settore": 38.8,
+      "settore": 39.0,
       "spy": 81.6,
       "qqq": 94.5
      }
@@ -52020,8 +52037,8 @@
     "asof": "2026-09-01",
     "price": 110.88,
     "d1": -0.52,
-    "m1": -0.4,
-    "m3": -3.9,
+    "m1": 2.4,
+    "m3": -4.7,
     "prime": [
      {
       "tk": "META",
@@ -52049,7 +52066,7 @@
       "peso": 4.8
      }
     ],
-    "score": 45
+    "score": 49
    },
    {
     "ticker": "IYT",
@@ -52057,24 +52074,24 @@
     "group": "Tematici",
     "medie": {
      "ma20": {
-      "valore": 86.61,
+      "valore": 86.69,
       "dist_pct": -4.3,
       "pendenza_pct": -0.96
      },
      "ma50": {
-      "valore": 86.99,
-      "dist_pct": -4.7,
-      "pendenza_pct": 1.21
+      "valore": 86.95,
+      "dist_pct": -4.6,
+      "pendenza_pct": 1.27
      },
      "ma100": {
-      "valore": 84.41,
-      "dist_pct": -1.8,
-      "pendenza_pct": 3.16
+      "valore": 84.32,
+      "dist_pct": -1.7,
+      "pendenza_pct": 3.18
      },
      "ma200": {
-      "valore": 80.17,
-      "dist_pct": 3.4,
-      "pendenza_pct": 2.09
+      "valore": 80.1,
+      "dist_pct": 3.5,
+      "pendenza_pct": 2.11
      }
     },
     "relativa": {
@@ -52084,27 +52101,27 @@
       "qqq": 16.1
      },
      "a1": {
-      "settore": 18.7,
+      "settore": 17.5,
       "spy": 20.3,
       "qqq": 25.7
      },
      "a2": {
-      "settore": 27.9,
+      "settore": 27.8,
       "spy": 39.7,
       "qqq": 51.7
      },
      "a5": {
-      "settore": 37.3,
+      "settore": 38.2,
       "spy": 81.6,
       "qqq": 94.5
      }
     },
-    "azioni_in_circolazione": 2800000,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-01",
     "price": 82.93,
     "d1": -2.6,
-    "m1": -3.4,
-    "m3": -0.9,
+    "m1": -2.3,
+    "m3": -1.1,
     "prime": [
      {
       "tk": "UNP",
@@ -52132,7 +52149,7 @@
       "peso": 4.9
      }
     ],
-    "score": 44
+    "score": 45
    },
    {
     "ticker": "XLI",
@@ -52140,34 +52157,34 @@
     "group": "Settori",
     "medie": {
      "ma20": {
-      "valore": 181.91,
-      "dist_pct": -5.0,
-      "pendenza_pct": 0.77
+      "valore": 182.37,
+      "dist_pct": -5.3,
+      "pendenza_pct": 0.96
      },
      "ma50": {
-      "valore": 181.59,
+      "valore": 181.68,
       "dist_pct": -4.9,
-      "pendenza_pct": 1.72
+      "pendenza_pct": 1.92
      },
      "ma100": {
-      "valore": 177.41,
+      "valore": 177.36,
       "dist_pct": -2.6,
-      "pendenza_pct": 2.21
+      "pendenza_pct": 2.26
      },
      "ma200": {
-      "valore": 169.84,
-      "dist_pct": 1.7,
-      "pendenza_pct": 1.86
+      "valore": 169.72,
+      "dist_pct": 1.8,
+      "pendenza_pct": 1.89
      }
     },
     "relativa": {
      "m6": {
-      "settore": -1.3,
+      "settore": -1.0,
       "spy": 11.8,
       "qqq": 16.1
      },
      "a1": {
-      "settore": 16.2,
+      "settore": 15.1,
       "spy": 20.3,
       "qqq": 25.7
      },
@@ -52177,7 +52194,7 @@
       "qqq": 51.7
      },
      "a5": {
-      "settore": 78.0,
+      "settore": 79.1,
       "spy": 81.6,
       "qqq": 94.5
      }
@@ -52186,8 +52203,8 @@
     "asof": "2026-09-01",
     "price": 172.73,
     "d1": -1.37,
-    "m1": -5.7,
-    "m3": 0.0,
+    "m1": -4.0,
+    "m3": -0.4,
     "prime": [
      {
       "tk": "GE",
@@ -52215,7 +52232,90 @@
       "peso": 3.1
      }
     ],
-    "score": 41
+    "score": 44
+   },
+   {
+    "ticker": "XLY",
+    "name": "Consumi discr.",
+    "group": "Settori",
+    "medie": {
+     "ma20": {
+      "valore": 117.76,
+      "dist_pct": -2.7,
+      "pendenza_pct": 2.78
+     },
+     "ma50": {
+      "valore": 116.12,
+      "dist_pct": -1.3,
+      "pendenza_pct": 0.11
+     },
+     "ma100": {
+      "valore": 116.8,
+      "dist_pct": -1.9,
+      "pendenza_pct": 1.48
+     },
+     "ma200": {
+      "valore": 116.67,
+      "dist_pct": -1.8,
+      "pendenza_pct": -0.03
+     }
+    },
+    "relativa": {
+     "m6": {
+      "settore": 0.6,
+      "spy": 11.8,
+      "qqq": 16.1
+     },
+     "a1": {
+      "settore": -0.3,
+      "spy": 20.3,
+      "qqq": 25.7
+     },
+     "a2": {
+      "settore": 25.3,
+      "spy": 39.7,
+      "qqq": 51.7
+     },
+     "a5": {
+      "settore": 31.8,
+      "spy": 81.6,
+      "qqq": 94.5
+     }
+    },
+    "azioni_in_circolazione": null,
+    "asof": "2026-09-01",
+    "price": 114.59,
+    "d1": -1.72,
+    "m1": -1.3,
+    "m3": -5.9,
+    "prime": [
+     {
+      "tk": "AMZN",
+      "nome": "Amazon.com Inc",
+      "peso": 25.6
+     },
+     {
+      "tk": "TSLA",
+      "nome": "Tesla Inc",
+      "peso": 14.7
+     },
+     {
+      "tk": "HD",
+      "nome": "The Home Depot Inc",
+      "peso": 5.5
+     },
+     {
+      "tk": "MCD",
+      "nome": "McDonald's Corp",
+      "peso": 4.2
+     },
+     {
+      "tk": "TJX",
+      "nome": "TJX Companies Inc",
+      "peso": 4.1
+     }
+    ],
+    "score": 42
    },
    {
     "ticker": "XLU",
@@ -52223,34 +52323,34 @@
     "group": "Settori",
     "medie": {
      "ma20": {
-      "valore": 43.46,
-      "dist_pct": -2.1,
-      "pendenza_pct": -4.14
+      "valore": 43.52,
+      "dist_pct": -2.2,
+      "pendenza_pct": -4.09
      },
      "ma50": {
-      "valore": 44.59,
+      "valore": 44.63,
       "dist_pct": -4.6,
-      "pendenza_pct": -0.62
+      "pendenza_pct": -0.52
      },
      "ma100": {
-      "valore": 44.71,
-      "dist_pct": -4.8,
-      "pendenza_pct": -1.03
+      "valore": 44.75,
+      "dist_pct": -4.9,
+      "pendenza_pct": -0.98
      },
      "ma200": {
-      "valore": 44.3,
+      "valore": 44.31,
       "dist_pct": -3.9,
-      "pendenza_pct": -0.17
+      "pendenza_pct": -0.16
      }
     },
     "relativa": {
      "m6": {
-      "settore": -8.8,
+      "settore": -8.4,
       "spy": 11.8,
       "qqq": 16.1
      },
      "a1": {
-      "settore": 4.1,
+      "settore": 3.8,
       "spy": 20.3,
       "qqq": 25.7
      },
@@ -52260,7 +52360,7 @@
       "qqq": 51.7
      },
      "a5": {
-      "settore": 44.0,
+      "settore": 44.3,
       "spy": 81.6,
       "qqq": 94.5
      }
@@ -52269,8 +52369,8 @@
     "asof": "2026-09-01",
     "price": 42.56,
     "d1": 0.78,
-    "m1": -4.1,
-    "m3": -3.6,
+    "m1": -4.0,
+    "m3": -4.0,
     "prime": [
      {
       "tk": "NEE",
@@ -52301,142 +52401,59 @@
     "score": 40
    },
    {
-    "ticker": "XLY",
-    "name": "Consumi discr.",
-    "group": "Settori",
-    "medie": {
-     "ma20": {
-      "valore": 117.71,
-      "dist_pct": -2.6,
-      "pendenza_pct": 2.72
-     },
-     "ma50": {
-      "valore": 116.17,
-      "dist_pct": -1.4,
-      "pendenza_pct": 0.14
-     },
-     "ma100": {
-      "valore": 116.85,
-      "dist_pct": -1.9,
-      "pendenza_pct": 1.48
-     },
-     "ma200": {
-      "valore": 116.66,
-      "dist_pct": -1.8,
-      "pendenza_pct": -0.04
-     }
-    },
-    "relativa": {
-     "m6": {
-      "settore": -1.2,
-      "spy": 11.8,
-      "qqq": 16.1
-     },
-     "a1": {
-      "settore": 0.4,
-      "spy": 20.3,
-      "qqq": 25.7
-     },
-     "a2": {
-      "settore": 26.6,
-      "spy": 39.7,
-      "qqq": 51.7
-     },
-     "a5": {
-      "settore": 31.3,
-      "spy": 81.6,
-      "qqq": 94.5
-     }
-    },
-    "azioni_in_circolazione": 120253000,
-    "asof": "2026-09-01",
-    "price": 114.59,
-    "d1": -1.72,
-    "m1": -3.1,
-    "m3": -5.0,
-    "prime": [
-     {
-      "tk": "AMZN",
-      "nome": "Amazon.com Inc",
-      "peso": 25.6
-     },
-     {
-      "tk": "TSLA",
-      "nome": "Tesla Inc",
-      "peso": 14.7
-     },
-     {
-      "tk": "HD",
-      "nome": "The Home Depot Inc",
-      "peso": 5.5
-     },
-     {
-      "tk": "MCD",
-      "nome": "McDonald's Corp",
-      "peso": 4.2
-     },
-     {
-      "tk": "TJX",
-      "nome": "TJX Companies Inc",
-      "peso": 4.1
-     }
-    ],
-    "score": 40
-   },
-   {
     "ticker": "SMH",
     "name": "Semiconduttori",
     "group": "Tematici",
     "medie": {
      "ma20": {
-      "valore": 568.11,
-      "dist_pct": -4.0,
-      "pendenza_pct": -0.1
+      "valore": 569.24,
+      "dist_pct": -4.2,
+      "pendenza_pct": -0.42
      },
      "ma50": {
-      "valore": 578.12,
-      "dist_pct": -5.7,
-      "pendenza_pct": -2.96
+      "valore": 580.44,
+      "dist_pct": -6.1,
+      "pendenza_pct": -2.64
      },
      "ma100": {
-      "valore": 565.24,
-      "dist_pct": -3.5,
-      "pendenza_pct": 6.96
+      "valore": 564.01,
+      "dist_pct": -3.3,
+      "pendenza_pct": 7.03
      },
      "ma200": {
-      "valore": 474.05,
-      "dist_pct": 15.0,
-      "pendenza_pct": 5.03
+      "valore": 473.06,
+      "dist_pct": 15.3,
+      "pendenza_pct": 5.06
      }
     },
     "relativa": {
      "m6": {
-      "settore": 36.6,
+      "settore": 39.4,
       "spy": 11.8,
       "qqq": 16.1
      },
      "a1": {
-      "settore": 90.9,
+      "settore": 88.4,
       "spy": 20.3,
       "qqq": 25.7
      },
      "a2": {
-      "settore": 128.0,
+      "settore": 124.2,
       "spy": 39.7,
       "qqq": 51.7
      },
      "a5": {
-      "settore": 321.2,
+      "settore": 325.8,
       "spy": 81.6,
       "qqq": 94.5
      }
     },
-    "azioni_in_circolazione": 11670900,
+    "azioni_in_circolazione": null,
     "asof": "2026-09-01",
     "price": 545.22,
     "d1": -2.05,
-    "m1": -0.0,
-    "m3": -9.0,
+    "m1": 0.9,
+    "m3": -9.1,
     "prime": [
      {
       "tk": "NVDA",
@@ -52464,7 +52481,7 @@
       "peso": 5.2
      }
     ],
-    "score": 41
+    "score": 42
    },
    {
     "ticker": "ITA",
@@ -52472,29 +52489,29 @@
     "group": "Tematici",
     "medie": {
      "ma20": {
-      "valore": 243.0,
-      "dist_pct": -7.2,
-      "pendenza_pct": 2.33
+      "valore": 243.89,
+      "dist_pct": -7.6,
+      "pendenza_pct": 2.6
      },
      "ma50": {
-      "valore": 240.61,
+      "valore": 240.66,
       "dist_pct": -6.3,
-      "pendenza_pct": 2.06
+      "pendenza_pct": 2.28
      },
      "ma100": {
-      "valore": 233.56,
+      "valore": 233.54,
       "dist_pct": -3.5,
-      "pendenza_pct": 1.62
+      "pendenza_pct": 1.64
      },
      "ma200": {
-      "valore": 228.97,
+      "valore": 228.85,
       "dist_pct": -1.5,
-      "pendenza_pct": 1.47
+      "pendenza_pct": 1.49
      }
     },
     "relativa": {
      "m6": {
-      "settore": -8.6,
+      "settore": -7.8,
       "spy": 11.8,
       "qqq": 16.1
      },
@@ -52504,12 +52521,12 @@
       "qqq": 25.7
      },
      "a2": {
-      "settore": 57.1,
+      "settore": 57.7,
       "spy": 39.7,
       "qqq": 51.7
      },
      "a5": {
-      "settore": 120.6,
+      "settore": 121.0,
       "spy": 81.6,
       "qqq": 94.5
      }
@@ -52518,7 +52535,7 @@
     "asof": "2026-09-01",
     "price": 225.46,
     "d1": -1.27,
-    "m1": -8.4,
+    "m1": -5.9,
     "m3": -4.2,
     "prime": [
      {
@@ -52547,7 +52564,7 @@
       "peso": 4.8
      }
     ],
-    "score": 33
+    "score": 37
    },
    {
     "ticker": "TAN",
@@ -52555,44 +52572,44 @@
     "group": "Tematici",
     "medie": {
      "ma20": {
-      "valore": 50.28,
-      "dist_pct": -6.8,
-      "pendenza_pct": -4.59
+      "valore": 50.52,
+      "dist_pct": -7.2,
+      "pendenza_pct": -4.71
      },
      "ma50": {
-      "valore": 52.66,
-      "dist_pct": -11.0,
-      "pendenza_pct": -10.79
+      "valore": 52.91,
+      "dist_pct": -11.4,
+      "pendenza_pct": -10.73
      },
      "ma100": {
-      "valore": 57.21,
-      "dist_pct": -18.1,
-      "pendenza_pct": -1.8
+      "valore": 57.27,
+      "dist_pct": -18.2,
+      "pendenza_pct": -1.75
      },
      "ma200": {
-      "valore": 55.11,
+      "valore": 55.12,
       "dist_pct": -15.0,
-      "pendenza_pct": 0.31
+      "pendenza_pct": 0.37
      }
     },
     "relativa": {
      "m6": {
-      "settore": -14.6,
+      "settore": -14.0,
       "spy": 11.8,
       "qqq": 16.1
      },
      "a1": {
-      "settore": 14.3,
+      "settore": 12.8,
       "spy": 20.3,
       "qqq": 25.7
      },
      "a2": {
-      "settore": 15.1,
+      "settore": 13.4,
       "spy": 39.7,
       "qqq": 51.7
      },
      "a5": {
-      "settore": -43.5,
+      "settore": -42.8,
       "spy": 81.6,
       "qqq": 94.5
      }
@@ -52601,8 +52618,8 @@
     "asof": "2026-09-01",
     "price": 46.86,
     "d1": -1.49,
-    "m1": -8.5,
-    "m3": -36.6,
+    "m1": -5.0,
+    "m3": -34.9,
     "prime": [
      {
       "tk": "FSLR",
@@ -52630,7 +52647,7 @@
       "peso": 4.6
      }
     ],
-    "score": 1
+    "score": 8
    }
   ],
   "witching": {
@@ -55320,22 +55337,22 @@
    "fetched_at": "2026-09-02"
   },
   "smart_money": {
-   "score": 49,
+   "score": 47,
    "label": "Neutrale",
    "smc_indices": {
     "sp500": {
-     "bias": 22,
+     "bias": 18,
      "label": "Distribuzione",
      "structure": "ribassista",
      "bos": "ribassista",
      "bull_fvg": 3,
-     "bear_fvg": 2,
+     "bear_fvg": 3,
      "last_fvg": {
       "dir": "ribassista",
       "lo": 7663.63,
-      "hi": 7700.91
+      "hi": 7689.89
      },
-     "liq_above": 7771.48,
+     "liq_above": 7741.27,
      "liq_below": 7431.26,
      "order_block": {
       "dir": "rialzista",
@@ -55354,7 +55371,7 @@
      "last_fvg": {
       "dir": "ribassista",
       "lo": 29267.42,
-      "hi": 29383.92
+      "hi": 29366.42
      },
      "liq_above": 29192.29,
      "liq_below": 28890.74,
@@ -55366,21 +55383,21 @@
      "label_idx": "Nasdaq 100"
     }
    },
-   "smc_avg": 27,
+   "smc_avg": 25,
    "vix3m": 18.3,
-   "vix_term_ratio": 0.896,
+   "vix_term_ratio": 0.915,
    "ig_spread": 0.98,
    "hy_ig_ratio": 2.68,
-   "divergence": -18,
+   "divergence": -16,
    "divergence_label": "Smart money ottimista / Retail pessimista",
    "components": [
     {
      "label": "Struttura SMC indici (S&P 500 + Nasdaq)",
-     "score": 27
+     "score": 25
     },
     {
      "label": "Struttura VIX (contango/backw.)",
-     "score": 87
+     "score": 81
     },
     {
      "label": "Spread HY/IG (fuga qualità)",
@@ -55462,7 +55479,7 @@
     },
     {
      "label": "Volatilità (VIX)",
-     "score": 67
+     "score": 66
     },
     {
      "label": "Rischio Credito (HY)",
@@ -55470,7 +55487,7 @@
     },
     {
      "label": "Smart Money (VIX+HY/IG+P/C)",
-     "score": 49
+     "score": 47
     }
    ],
    "note": "Riproduzione trasparente stile BCA MacroQuant dai fattori macro pubblici (il MacroQuant ufficiale di BCA Research è proprietario e a pagamento)."
@@ -55664,22 +55681,22 @@
    "proxy": true
   },
   "dollar_ruler": {
-   "value": 99.73,
-   "chg_3m_pct": 0.32,
+   "value": 99.79,
+   "chg_3m_pct": 0.27,
    "flag": null,
    "src": "DXY"
   },
   "momentum": {
    "sp500": {
     "price": 7631.47,
-    "sma125": 7286.3,
-    "dist_pct": 4.74,
+    "sma125": 7279.56,
+    "dist_pct": 4.83,
     "asof": "2026-09-01"
    },
    "ndx": {
     "price": 29077.22,
-    "sma125": 27988.45,
-    "dist_pct": 3.89,
+    "sma125": 27953.74,
+    "dist_pct": 4.02,
     "asof": "2026-09-01"
    }
   },
@@ -55687,14 +55704,14 @@
    "nasdaq": {
     "symbol": "NQ=F",
     "label": "Futures Nasdaq 100",
-    "price": 29070.0,
-    "change_pct": -0.02
+    "price": 28987.0,
+    "change_pct": -0.23
    },
    "sp500": {
     "symbol": "ES=F",
     "label": "Futures S&P 500",
-    "price": 7639.5,
-    "change_pct": 0.0
+    "price": 7628.5,
+    "change_pct": -0.09
    }
   },
   "froth": {
@@ -55714,8 +55731,8 @@
   },
   "breadth": {
    "spy_1m_pct": 0.54,
-   "rsp_1m_pct": 0.22,
-   "divergence_pp": 0.32,
+   "rsp_1m_pct": 1.2,
+   "divergence_pp": -0.66,
    "alert": false,
    "asof": "2026-09-01"
   },
@@ -55787,7 +55804,7 @@
   },
   {
    "question": "Will the price of Bitcoin be above $76,000 on September 2?",
-   "yes": 94,
+   "yes": 90,
    "link": "https://polymarket.com/event/bitcoin-above-76k-on-september-2-2026"
   },
   {
@@ -64394,7 +64411,7 @@
      ],
      "call_wall": 119.0,
      "put_wall": 65.0,
-     "opt_volume": 41041
+     "opt_volume": 41040
     }
    ]
   },
@@ -73012,7 +73029,7 @@
   },
   "WDC": {
    "spot": 450.44,
-   "avg_volume": 7588335,
+   "avg_volume": 7762775,
    "expiries": [
     {
      "date": "2026-09-04",
@@ -74242,7 +74259,7 @@
      ],
      "call_wall": 430.0,
      "put_wall": 230.0,
-     "opt_volume": 8263
+     "opt_volume": 8267
     }
    ]
   }
@@ -76631,20 +76648,20 @@
   },
   {
    "date": "2026-09-02",
-   "sharpe": 1.64,
+   "sharpe": 1.7,
    "gain_pct": 2.43,
    "eur_value": 40973.4,
-   "vix": 16.42,
-   "vix_term": 0.896,
+   "vix": 16.78,
+   "vix_term": 0.915,
    "titles": {},
    "macro_scores": {
     "fear_greed": 31,
-    "risk_sentiment": 44,
+    "risk_sentiment": 43,
     "credit": 80,
     "systemic_risk": 80,
     "corp_profit": 71,
     "sp500_pe": 51,
-    "smart_money": 49,
+    "smart_money": 47,
     "macroquant": 52,
     "seasonality": 37,
     "in:cpi": 58,
@@ -76769,7 +76786,7 @@
     "age_days": 0,
     "max_age": 2,
     "status": "ok",
-    "note": "18 voci, la piu' recente di 1 ore"
+    "note": "18 voci, la piu' recente di 2 ore"
    },
    {
     "key": "sec_calendario",
@@ -76805,6 +76822,6 @@
    }
   ],
   "alerts": [],
-  "generated_at": "2026-09-02T08:27:51Z"
+  "generated_at": "2026-09-02T09:10:42Z"
  }
 }
