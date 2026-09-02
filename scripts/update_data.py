@@ -739,6 +739,40 @@ def stagionalita_titolo(monthly, min_anni=8):
     return fuori or None
 
 
+# ═══ v401 — LA FINESTRA CORTA, E IL PAVIMENTO CHE LA RENDE LEGGIBILE ════════════════════════
+# 60 sedute: un trimestre di borsa. E' la finestra piu' corta su cui una regressione semplice
+# dica ancora qualcosa, ed e' quella su cui un canale che si accende diventa visibile.
+_FINESTRA_BREVE = 60
+
+
+def r2_rumore(n):
+    """L'R2 che il PURO CASO supera nel 5% dei campioni, a questa numerosita'.
+
+    ⚠⚠ NASCE DA UNA SOGLIA CHE NON REGGEVA IL CAMBIO DI FINESTRA. Il sistema dichiarava
+    "canale presente" sopra R2 0,05 — una CONVENZIONE, non una misura, e nel v240 questo
+    progetto ha gia' pagato che ogni soglia disegnata e' un'AFFERMAZIONE. Con una finestra sola
+    la convenzione era innocua perche' conservativa; con due finestre diventa falsa, e in
+    direzioni opposte:
+      · su 251 osservazioni il caso supera R2 0,015 nel 5% dei campioni → 0,05 e' PRUDENTE
+      · su  60 osservazioni la stessa cifra e' 0,065 → 0,05 accenderebbe canali dal NULLA
+    Cioe' la finestra corta, con la vecchia soglia, avrebbe fabbricato esattamente il segnale
+    che deve rilevare. Qui la soglia si CALCOLA dal campione invece di essere scelta.
+
+    R2 critico = t2 / (t2 + df), con df = n - 2 e t il quantile 97,5% di Student — cioe' il
+    punto in cui una regressione semplice diventa significativa al 5% bilaterale.
+    L'approssimazione di Cornish-Fisher su t e' esatta a ~1e-5 per df >= 30 (verificata contro
+    i valori tabulati: df=58 → 2,00171 contro 2,00172; df=249 → 1,96954 contro 1,96959), e
+    sotto df 30 NON si restituisce niente invece di restituire un numero peggiore del silenzio.
+    """
+    df = int(n) - 2
+    if df < 30:
+        return None
+    z = 1.959964                      # quantile 97,5% della normale
+    t = z + 2.37243 / df + 2.82264 / (df * df)
+    t2 = t * t
+    return t2 / (t2 + df)
+
+
 def sensibilita_macro(closes, serie_bench):
     """IL PONTE MACRO -> TITOLO, MISURATO. Il CEO ha chiesto una sezione su come i dati macro
     incidono sul titolo. L'unica forma che non sia un oroscopo e' questa: la REGRESSIONE dei
@@ -764,6 +798,21 @@ def sensibilita_macro(closes, serie_bench):
     ret = closes.pct_change().dropna() * 100
     if len(ret) < 60:
         return None
+
+    def _misura(a, b):
+        """beta, R2 e il PAVIMENTO DEL RUMORE su una coppia di serie gia' allineate."""
+        var = float(b.var())
+        if not var:
+            return None
+        corr = float(a.corr(b))
+        soglia = r2_rumore(len(a))
+        r2 = corr * corr
+        return {"beta": round(float(a.cov(b) / var), 2), "r2": round(r2, 3),
+                "corr": round(corr, 2), "campione": int(len(a)),
+                "da": str(a.index[0].date()), "a": str(a.index[-1].date()),
+                "r2_soglia": round(soglia, 3) if soglia is not None else None,
+                "acceso": bool(soglia is not None and r2 >= soglia)}
+
     fuori = {}
     for nome, (sym, canale, s) in serie_bench.items():
         if s is None or len(s) < 60:
@@ -772,14 +821,25 @@ def sensibilita_macro(closes, serie_bench):
         a, b = ret.align(rb, join="inner")     # finestra COMUNE per date, mai per posizione
         if len(a) < 60:
             continue
-        var = float(b.var())
-        if not var:
+        lungo = _misura(a, b)
+        if lungo is None:
             continue
-        beta = float(a.cov(b) / var)
-        corr = float(a.corr(b))
-        fuori[nome] = {"strumento": sym, "canale": canale, "beta": round(beta, 2),
-                       "r2": round(corr * corr, 3), "corr": round(corr, 2),
-                       "campione": int(len(a)), "da": str(a.index[0].date()), "a": str(a.index[-1].date())}
+        # ═══ v401 — DUE FINESTRE, PERCHE' UNA MEDIA SU UN ANNO SPEGNE UN CANALE APPENA ACCESO.
+        # Misurato leggendo il pacchetto CRWV come il modello che lo riceve: il canale TASSI
+        # usciva con R2 0,00 su 251 sedute e "nessuna relazione misurabile", mentre il titolo
+        # perdeva il 7% nella seduta in cui il decennale toccava il 4,7% e la stampa lo chiamava
+        # "the most leveraged AI landlord". Due analisti su due hanno dovuto scrivere che
+        # andavano CONTRO la misura. Quando succede, la finestra e' sbagliata, non il lettore:
+        # una sensibilita' RECENTE e CONDIZIONALE non si vede in dodici mesi di media.
+        # ⚠ La finestra corta NON sostituisce quella lunga e non e' un beta piu' vero: serve a
+        # vedere se un canale si e' ACCESO o SPENTO. Si pubblica solo quando c'e' abbastanza
+        # storia in piu' da renderla un'altra misura (>= 90 osservazioni): con 60 sarebbe la
+        # stessa finestra stampata due volte.
+        breve = None
+        if len(a) >= 90:
+            ab, bb = a.iloc[-_FINESTRA_BREVE:], b.iloc[-_FINESTRA_BREVE:]
+            breve = _misura(ab, bb)
+        fuori[nome] = {"strumento": sym, "canale": canale, **lungo, "breve": breve}
     return fuori or None
 
 

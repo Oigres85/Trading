@@ -2459,6 +2459,100 @@ quella tabella è una ricerca web, e il budget di ricerca è finito quanto quell
 ⚠ **Ventesima rottura di un check ancorato a una stringa letterale**: v257 pretendeva
 `quota di mercato` ed è andato rosso quando la colonna è diventata più precisa.
 
+## 🔭 v401 — IL CANALE CHE IL SISTEMA DICHIARAVA SPENTO ERA QUELLO CHE MUOVEVA IL TITOLO
+
+Su CRWV il pacchetto misurava i tassi con **TLT su 251 sedute: R² 0,00 → "nessuna relazione
+misurabile"**. Nello stesso pacchetto, due righe più in là: ORCL **−5,4% il 01/09 per il selloff
+obbligazionario**, e la stampa che chiama CoreWeave *"the most leveraged AI landlord"*.
+**Due analisti su due — io e il modello del CEO — hanno dovuto scrivere che andavano CONTRO la
+misura.** Quando succede, la finestra è sbagliata, non il lettore.
+
+E la riga in fondo a quel blocco lo diceva **da versioni**: *"un canale può accendersi (una
+società che si indebita diventa sensibile ai tassi in un trimestre)"*. Il commento descriveva il
+fenomeno e **nessuna riga di codice lo cercava** — la classe v326, dove il commento della
+pipeline diceva il vero e non l'avevo letto.
+
+Ora ogni canale porta **due finestre**: quella lunga (~251 sedute) e quella corta (60, un
+trimestre di borsa), e la transizione si chiama per nome — *IL CANALE SI È ACCESO* / *SI È
+SPENTO*. La finestra corta non è un beta più vero: serve a vedere un cambio di regime.
+
+### ⚠⚠ E LA SOGLIA NON POTEVA RESTARE UNA CONVENZIONE
+Il sistema diceva "canale presente" sopra **R² 0,05**, scelto. Con una finestra sola era innocuo
+perché prudente; con due diventa **falso in direzioni opposte**:
+
+| campione | R² che il puro caso supera nel 5% dei campioni | lo 0,05 fisso |
+|---|---|---|
+| 251 sedute | **0,015** | prudente |
+| 60 sedute | **0,065** | **permissivo: accenderebbe canali dal NULLA** |
+
+Cioè la finestra corta, con la vecchia soglia, avrebbe **fabbricato proprio il segnale che deve
+rilevare**. Ora `r2_rumore(n)` calcola il pavimento dal campione — `t²/(t²+df)`, con `t`
+quantile 97,5% di Student — ed è verificato **contro i valori tabulati**, non contro sé stesso
+(v326: un check che conferma la propria formula non è un check).
+
+⚠ **Costruire il caso di prova ha insegnato un limite della modifica, e va scritto**: con 259
+osservazioni il pavimento è 0,015, cioè bassissimo — una relazione recente e *forte* si vede
+quasi sempre anche sull'anno. La finestra corta serve quando l'anno **diluisce**: titolo con
+storia propria molto rumorosa che solo di recente passa a muoversi col canale. La prima stesura
+del check costruiva un accoppiamento troppo forte e l'anno lo vedeva lo stesso: **il check era
+rosso e aveva ragione.**
+
+⚠ **HYG NON è stato aggiunto**, ed è una scelta motivata: è una serie di prezzo guidata in larga
+parte dalla propensione al rischio azionaria, quindi il suo beta ri-esprimerebbe il canale QQQ —
+lo stesso segnale scritto due volte, che questo progetto tratta come difetto. Il canale credito
+c'è già nel quadro macro come **livello** (HY OAS, SLOOS, NFCI), che è la domanda giusta: non
+"co-varia col credito" ma "la finestra di finanziamento è aperta".
+
+⚠ **La fetch non è esercitabile da qui** (Yahoo risponde vuoto dall'ambiente di sviluppo): la
+logica è provata su serie sintetiche costruite perché il fenomeno ci sia, i numeri veri arrivano
+col run del CI. È la trappola v203, dichiarata prima invece che dopo.
+
+## 🔗 v402 — IL BLOCCO CHE INCROCIA, CHIESTO DAL CEO
+
+Istruzione: *"Voglio una presenza maggiore di analisi e di correlazioni tra portafoglio, dati
+tecnici/fondamentali, dati macro e soprattutto ultime news … e questo deve essere presente anche
+quando genero l'analisi di un solo titolo … l'LLM deve analizzare tutto ciò che c'è nel sistema e
+indirizzarmi su come muovermi per il portafoglio, in ottica di ottimizzazione di un fondo growth
+privato e analisi di risk management."*
+
+⚠ **Il pacchetto aveva GIÀ tutti i pezzi** — macro, libro, tecnica, fondamentali, notizie sul
+nome e sul gruppo correlato, disciplina di rischio — e li chiedeva **uno per uno in nove blocchi
+separati**. Quello che mancava non erano dati: era la richiesta di **giungerli**. *Nove elenchi
+accanto non fanno un'analisi*, e un modello che risponde per blocchi non incrocia mai di propria
+iniziativa.
+
+Il blocco 9 chiede quattro giunzioni, ognuna impossibile con una fonte sola:
+**NOTIZIA → CANALE → LIBRO** (attraverso quale sensibilità misurata arriva, e quali posizioni del
+gruppo colpisce — vale per il peso del GRUPPO) · **MACRO → CONTO ECONOMICO** (quale riga di questo
+bilancio, non "i tassi sono alti") · **TECNICA ↔ FONDAMENTALE** (il caso che conta è il
+disaccordo) · **E QUINDI, PER IL LIBRO** (priorità e livelli).
+
+> ⚠⚠ **La regola che tiene il blocco onesto: ogni riga deve unire ALMENO DUE fonti.** Una riga che
+> ne usa una sola è un blocco precedente riscritto — la duplicazione che questo progetto misura e
+> taglia dalla v184. Senza quel vincolo un blocco "di sintesi" diventa il riassunto che la testata
+> vieta.
+
+⚠ **Il divieto di dimensionare è ripetuto DENTRO il blocco**, perché è quello in cui è più facile
+scivolare: direzione e priorità sì, quantità mai. Un fondo growth privato non si ottimizza
+riducendo il rischio — si ottimizza sapendo *quale* rischio sta correndo.
+
+⚠ **Il tetto sale da 2.300 a 2.800 parole** perché è stata aggiunta una consegna. Un tetto fermo
+mentre cresce il lavoro costringe a comprimere gli **ultimi** blocchi, che è dove un modello a
+corto di spazio sostituisce le prove con affermazioni (misurato in v398). La clausola
+anti-riempimento resta ed è la protezione vera.
+
+### 🧪 Quattro inciampi di metodo, tutti già scritti in questo file
+- **Ventunesima rottura di un check ancorato alla FORMA**: v316 pretendeva una riga per canale e
+  la resa ora ne usa tre. Riagganciato all'invariante (*ogni beta viaggia col suo R², campione e
+  finestra*) ed è diventato **più forte**: ora vale per entrambe le finestre.
+- **Un taglio lasciato a metà**: sostituendo il corpo di quel check è rimasta la coda che citava
+  `righe`, variabile non più esistente. `node --check` passa — è dentro un template — e l'ha preso
+  il runtime, che ha marcato il check **MALFORMATO** invece di lasciarlo passare a vuoto.
+- **Quinta incarnazione dell'ancoraggio aperto**: il gate nuovo cercava la sottostringa `giudizi`,
+  che compare legittimamente altrove (`giudizio` nella tesi contraria). Chiuso su `\d+ giudizi`.
+- **C9 ha preso un mio imperativo nella coda** (*"e leggerli come uno solo è l'errore facile"*) —
+  quarta volta (v156, v179, v180, v389). Riscritto come fatto.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
