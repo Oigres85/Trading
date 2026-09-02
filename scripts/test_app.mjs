@@ -2624,8 +2624,14 @@ const TV_FINTO = {
              _come: "formule standard" },
   performance: { s1: 10.7, m1: 7.5, a1: 717.8, a3: 1304.8 },
   stagionalita: [{ mese: 8, media: 0.41, mediana: -0.26, positivi_pct: 43, campione: 42, peggio: -31.7, meglio: 26.6 }],
-  sensibilita: { settore: { strumento: "SOXX", canale: "il comparto", beta: 1.46, r2: 0.657, corr: 0.81, campione: 250, da: "2025-08-18", a: "2026-08-14" },
-                 tassi: { strumento: "TLT", canale: "i tassi a lunga", beta: 0.75, r2: 0.007, corr: 0.08, campione: 250, da: "2025-08-18", a: "2026-08-14" } },
+  /* v401 — la fixture porta le DUE finestre e il pavimento misurato: senza, i check girerebbero
+     su dati privi del fenomeno che devono misurare, che e' la trappola gia' pagata quattro volte.
+     Il canale "tassi" e' il caso che ha motivato la modifica: spento sull'anno (R² 0,007 sotto il
+     pavimento 0,015) e ACCESO sull'ultimo trimestre (0,180 sopra 0,065). */
+  sensibilita: { settore: { strumento: "SOXX", canale: "il comparto", beta: 1.46, r2: 0.657, corr: 0.81, campione: 250, da: "2025-08-18", a: "2026-08-14", r2_soglia: 0.015, acceso: true,
+                            breve: { beta: 1.5, r2: 0.62, corr: 0.79, campione: 60, da: "2026-05-20", a: "2026-08-14", r2_soglia: 0.065, acceso: true } },
+                 tassi: { strumento: "TLT", canale: "i tassi a lunga", beta: 0.75, r2: 0.007, corr: 0.08, campione: 250, da: "2025-08-18", a: "2026-08-14", r2_soglia: 0.015, acceso: false,
+                          breve: { beta: 1.9, r2: 0.18, corr: 0.42, campione: 60, da: "2026-05-20", a: "2026-08-14", r2_soglia: 0.065, acceso: true } } },
   conto_trim: [{ trim: "2026-05-31", ricavi: 41460000000, utile: 28243000000, operativo: 33318000000, margine: 68.1, margine_op: 80.4 }],
 };
 
@@ -3909,11 +3915,23 @@ check("v316 sensibilita': ogni beta viaggia col suo R², col campione e con la f
   recomputeTotals();
   try {
     const p = buildPromptTicker("MU");
-    const righe = p.split(String.fromCharCode(10)).filter(x => /^- (settore|tassi) \\(/.test(x));
-    return righe.length === 2
-        && righe.every(x => /beta [+-]?[\\d.]+/.test(x) && /R² [\\d.]+/.test(x) && /Campione \\d+ sedute comuni/.test(x))
-        && /NESSUNA relazione misurabile/.test(righe.find(x => x.startsWith("- tassi")))
-        && /canale DOMINANTE/.test(righe.find(x => x.startsWith("- settore")));
+    /* ⚠ v401 — VENTUNESIMA ROTTURA DI UN CHECK ANCORATO ALLA FORMA: pretendeva una riga sola per
+       canale, e la resa ora ne usa tre (intestazione + due finestre). L'invariante NON e' il
+       numero di righe: e' che OGNI beta pubblicato viaggi col suo R², col campione e con la
+       finestra. Riagganciato a quello, ed e' diventato piu' FORTE — ora deve valere per
+       entrambe le finestre, non per una. */
+    const misure = p.split(String.fromCharCode(10)).filter(x => /finestra (lunga|corta) — beta/.test(x));
+    return misure.length === 4
+        && misure.every(x => /beta [+-]?[\\d.]+/.test(x) && /R² [\\d.]+/.test(x)
+                          && /pavimento del rumore di [\\d.]+/.test(x)
+                          && /\\d+ sedute comuni, dal \\d{4}-\\d{2}-\\d{2} al \\d{4}-\\d{2}-\\d{2}/.test(x))
+        && /sotto il pavimento del rumore: NESSUNA relazione misurabile/.test(
+             misure.find(x => x.indexOf("finestra lunga") >= 0 && x.indexOf("+0.75") >= 0) || "")
+        && /canale DOMINANTE/.test(
+             misure.find(x => x.indexOf("finestra lunga") >= 0 && x.indexOf("+1.46") >= 0) || "")
+        /* il canale che si ACCENDE fra le due finestre e' il caso che ha motivato la modifica:
+           deve essere nominato, non lasciato dedurre dal confronto di due R². */
+        && p.indexOf("IL CANALE SI E' ACCESO") >= 0;
   } finally { DATA = _s; recomputeTotals(); }`));
 
 check("v316 titolo: senza i dati della pipeline il blocco non esiste e non si inventa un ripiego", suVeri(`
@@ -6372,6 +6390,109 @@ check("v400 la tabella dei concorrenti pretende il denominatore della quota", su
   return p.indexOf("DI QUALE MERCATO") >= 0
       && p.indexOf("stesso DENOMINATORE") >= 0
       && p.indexOf("NON incolonnarle") >= 0;`));
+
+/* ═══ v401 — DATI DI UN RUN VECCHIO: SI DICHIARA, NON SI TACE ══════════════════════════════
+   Il campo `breve` lo scrive la pipeline. Fra il rilascio e il primo giro del CI i dati non
+   ce l'hanno: la finestra corta non puo' esserci, e il pacchetto deve DIRLO invece di
+   pubblicare solo l'anno come se fosse tutto. E' la regola gia' pagata in v187 e v400. */
+check("v401 senza la finestra corta nei dati il pacchetto lo dichiara invece di tacere", run(`
+  const _s = DATA;
+  DATA = JSON.parse(JSON.stringify(REALE));
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
+  if (!r) { DATA = _s; return true; }
+  const tv = JSON.parse(JSON.stringify(${JSON.stringify(TV_FINTO)}));
+  Object.values(tv.sensibilita).forEach(v => { delete v.breve; delete v.r2_soglia; delete v.acceso; });
+  r.tv = tv;
+  recomputeTotals();
+  try {
+    const p = buildPromptTicker("MU");
+    return p.indexOf("finestra corta — non ancora presente in questo run") >= 0
+        && p.indexOf("bande di CONVENZIONE") >= 0
+        && p.indexOf("IL CANALE SI E' ACCESO") < 0;
+  } finally { DATA = _s; recomputeTotals(); }`));
+
+/* ⚠ il caso opposto del canale che si accende: uno che si SPEGNE va nominato con la stessa
+   forza, altrimenti il gate proverebbe una condizione e non una funzione (v400). */
+check("v401 un canale che si SPEGNE viene nominato come quello che si accende", run(`
+  const _s = DATA;
+  DATA = JSON.parse(JSON.stringify(REALE));
+  const r = (DATA.watchlist || []).find(x => x && x.ticker === "MU");
+  if (!r) { DATA = _s; return true; }
+  const tv = JSON.parse(JSON.stringify(${JSON.stringify(TV_FINTO)}));
+  tv.sensibilita.tassi.acceso = true;  tv.sensibilita.tassi.r2 = 0.31;
+  tv.sensibilita.tassi.breve.acceso = false; tv.sensibilita.tassi.breve.r2 = 0.01;
+  r.tv = tv;
+  recomputeTotals();
+  try {
+    const p = buildPromptTicker("MU");
+    return p.indexOf("IL CANALE SI E' SPENTO") >= 0
+        && p.indexOf("IL CANALE SI E' ACCESO") < 0;
+  } finally { DATA = _s; recomputeTotals(); }`));
+
+/* ═══ v401 — IL BLOCCO CHE INCROCIA, CHIESTO DAL CEO ═══════════════════════════════════════
+   "correlazioni tra portafoglio, dati tecnici e fondamentali, dati macro e ultime news ...
+   anche quando genero l'analisi di un solo titolo". Il gate sorveglia le quattro giunzioni e
+   la regola che tiene il blocco onesto (ogni riga unisce almeno due fonti). */
+check("v401 il pacchetto chiede un blocco che INCROCIA le fonti, non un nono elenco", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("L'INCROCIO") >= 0
+      && p.indexOf("unire ALMENO DUE fonti") >= 0
+      && p.indexOf("NOTIZIA → CANALE → LIBRO") >= 0
+      && p.indexOf("MACRO → CONTO ECONOMICO") >= 0
+      && p.indexOf("TECNICA ↔ FONDAMENTALE") >= 0
+      && p.indexOf("E QUINDI, PER IL LIBRO") >= 0;`));
+
+/* ⚠⚠ il blocco nuovo e' quello in cui e' PIU' facile scivolare nel dimensionamento, perche'
+   chiede di indirizzare sul libro. Il divieto deve valere anche li', esplicitamente. */
+check("v401 il blocco dell'incrocio ripete il divieto di dimensionare", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  const i = p.indexOf("E QUINDI, PER IL LIBRO");
+  const j = p.indexOf("LA TESI CONTRARIA");
+  if (i < 0 || j < 0 || j < i) return false;
+  const blocco = p.slice(i, j);
+  return blocco.indexOf("quantita' MAI") >= 0
+      && blocco.indexOf("nessuna percentuale") >= 0;`));
+
+/* ⚠ la tesi contraria resta l'ULTIMA consegna: rinumerandola da 9 a 10 il gate storico va
+   riverificato, non dato per buono. */
+check("v401 la tesi contraria e' ancora l'ultimo blocco richiesto", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  const testa = p.slice(0, p.indexOf("QUADRO MACRO DI RIFERIMENTO"));
+  const num = (testa.match(/^\\d+\\) [A-Z]/gm) || []).map(x => parseInt(x, 10));
+  if (!num.length) return false;
+  const ultimo = Math.max.apply(null, num);
+  return testa.indexOf(ultimo + ") LA TESI CONTRARIA") >= 0;`));
+
+/* ⚠ le ultime 48 ore devono coprire anche i NOMI CORRELATI: e' la meta' del join che il
+   modello non puo' fare da solo, perche' non conosce il libro. */
+check("v401 la ricerca delle 48 ore copre anche il gruppo correlato", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("ANCHE SUI NOMI DEL GRUPPO CORRELATO") >= 0
+      && p.indexOf("rende possibile il blocco 9") >= 0;`));
+
+/* ⚠ il tetto sale perche' e' stata AGGIUNTA una consegna: resta un tetto, e la clausola
+   anti-riempimento resta la protezione vera (v398). */
+check("v401 il tetto e' salito con la consegna nuova e la clausola resta", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return /BUDGET: al massimo 2\\.800 parole/.test(p)
+      && p.indexOf("non allungare MAI un blocco") >= 0
+      && p.indexOf("non esiste una") >= 0;`));
+
+/* ═══ v401 — I DUE CONTEGGI DI ANALISTI CONTANO POPOLAZIONI DIVERSE ════════════════════════
+   Il pacchetto scriveva "35 giudizi" accanto al target medio, e la fonte che pubblica lo
+   stesso target ne conta 38: non e' una contraddizione, e' che il conteggio e' di chi pubblica
+   una raccomandazione e il target medio di chi pubblica un obiettivo di prezzo. Un divario
+   taciuto costringe chi legge a segnalarlo a ogni run. */
+check("v401 il conteggio degli analisti dichiara che cosa conta", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("analisti pubblicano una RACCOMANDAZIONE") >= 0
+      && p.indexOf("CONTANO POPOLAZIONI DIVERSE") >= 0
+      && p.indexOf("non e' una contraddizione: e' l'altra popolazione") >= 0
+      /* ⚠ ANCORAGGIO CHIUSO: "giudizio" compare legittimamente nelle istruzioni (la tesi
+         contraria, il collaudo). La prima stesura cercava la sottostringa nuda ed era rossa su
+         codice giusto — quinta incarnazione dell'ancoraggio aperto in questo progetto. Quello
+         che non deve tornare e' il CONTEGGIO NUDO accanto al target. */
+      && !/\\d+ giudizi/.test(p);`));
 
 let fail = 0;
 for (const [name, ok] of T) {

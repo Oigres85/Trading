@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "388";
+const BUILD_VERSION = "389";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -11584,11 +11584,55 @@ function tvBlocchi(tk) {
     F.push(`Regressione dei rendimenti GIORNALIERI del titolo su quelli di uno strumento quotato che `
       + `rappresenta il canale. Il beta dice di quanto si muove il titolo per ogni punto del canale; `
       + `l'R² dice QUANTA della sua variabilita' quel canale spiega davvero.`);
+    /* ═══ v401 — DUE FINESTRE, E UNA SOGLIA MISURATA INVECE DI UNA SCELTA ══════════════════
+       La riga in fondo a questo blocco diceva gia' da versioni che "un canale puo' accendersi
+       (una societa' che si indebita diventa sensibile ai tassi in un trimestre)" — e niente lo
+       misurava. Il commento descriveva il fenomeno e nessuna riga di codice lo cercava: la
+       stessa classe della v326, dove il commento della pipeline diceva il vero e non l'avevo
+       letto. Ora il canale porta la propria finestra corta accanto a quella lunga, e la
+       transizione fra le due si chiama per nome.
+       ⚠ IL PAVIMENTO NON E' PIU' UNA CONVENZIONE: `r2_soglia` e' l'R² che il puro caso supera
+       nel 5% dei campioni a QUELLA numerosita' (0,015 su 251 sedute, 0,065 su 60). Il vecchio
+       0,05 fisso era prudente sulla finestra lunga e sarebbe stato PERMISSIVO su quella corta,
+       cioe' avrebbe fabbricato proprio il segnale che la finestra corta deve rilevare. */
+    const _leggi = (m) => {
+      if (!m) return null;
+      if (!Number.isFinite(numero(m.r2_soglia))) {
+        /* dati di un run precedente: il pavimento misurato non c'e' ancora. Si dichiara che la
+           lettura e' una convenzione, invece di ricalcolarlo qui — due implementazioni della
+           stessa formula divergono al primo ritocco (v161/v207). */
+        const b = m.r2 >= 0.4 ? "canale DOMINANTE" : m.r2 >= 0.15 ? "canale presente"
+          : m.r2 >= 0.05 ? "canale debole" : "NESSUNA relazione misurabile su questa finestra";
+        return `beta ${m.beta > 0 ? "+" : ""}${m.beta}, R² ${m.r2} → ${b} [bande di CONVENZIONE: `
+          + `il pavimento del rumore non e' ancora nei dati di questo run]`;
+      }
+      const forza = m.acceso
+        ? (m.r2 >= 0.4 ? "canale DOMINANTE" : m.r2 >= 0.15 ? "canale presente" : "canale debole ma REALE")
+        : "sotto il pavimento del rumore: NESSUNA relazione misurabile su questa finestra";
+      return `beta ${m.beta > 0 ? "+" : ""}${m.beta}, R² ${m.r2} contro un pavimento del rumore di `
+        + `${m.r2_soglia} → ${forza}. ${m.campione} sedute comuni, dal ${m.da} al ${m.a}`;
+    };
     Object.entries(tv.sensibilita).forEach(([nome, v]) => {
-      const forza = v.r2 >= 0.4 ? "canale DOMINANTE" : v.r2 >= 0.15 ? "canale presente"
-        : v.r2 >= 0.05 ? "canale debole" : "NESSUNA relazione misurabile su questa finestra";
-      F.push(`- ${nome} (${v.strumento}) — ${v.canale}: beta ${v.beta > 0 ? "+" : ""}${v.beta}, `
-        + `R² ${v.r2} → ${forza}. Campione ${v.campione} sedute comuni, dal ${v.da} al ${v.a}.`);
+      F.push(`- ${nome} (${v.strumento}) — ${v.canale}:`);
+      F.push(`  · finestra lunga — ${_leggi(v)}.`);
+      if (v.breve) {
+        F.push(`  · finestra corta — ${_leggi(v.breve)}.`);
+        if (typeof v.acceso === "boolean" && typeof v.breve.acceso === "boolean") {
+          const t = v.acceso === v.breve.acceso
+            ? (v.acceso ? `  ⚠ Canale STABILE: acceso su entrambe le finestre.`
+                        : `  ⚠ Spento su entrambe le finestre: su questo titolo il canale non si vede, ne' sull'anno ne' sull'ultimo trimestre.`)
+            : (v.breve.acceso
+                ? `  ⚠⚠ IL CANALE SI E' ACCESO: spento sulla finestra lunga, acceso sull'ultimo trimestre. `
+                  + `La media su un anno lo nasconde — e' esattamente il caso in cui il numero annuale, letto da solo, `
+                  + `manda a scrivere "nessuna relazione" su un canale che sta muovendo il titolo adesso.`
+                : `  ⚠⚠ IL CANALE SI E' SPENTO: acceso sulla finestra lunga, non piu' sull'ultimo trimestre. `
+                  + `Il numero annuale descrive un regime che e' finito.`);
+          F.push(t);
+        }
+      } else {
+        F.push(`  · finestra corta — non ancora presente in questo run dei dati (il campo e' nato con questa `
+          + `versione e lo scrive la pipeline): finche' non c'e', il canale si legge solo sull'anno.`);
+      }
     });
     F.push(`⚠⚠ UN BETA SENZA IL SUO R² E' MEZZO NUMERO. Un beta di 1,8 sui tassi con R² 0,01 non `
       + `significa "molto sensibile ai tassi": significa che su questa finestra i tassi non spiegano `
@@ -11876,9 +11920,17 @@ function datiNostriDelTitolo(tk) {
       const tg = numero(t.rating.target), up = numero(t.rating.upside_pct);
       L.push(`- CONSENSO DEGLI ANALISTI (dal sistema, non da cercare): target medio ${fmtNum.format(tg)}`
         + `${Number.isFinite(up) ? ` (${signTxt(up)} dal riferimento)` : ""}`
-        + `${Number.isFinite(numero(t.rating.n)) ? ` · ${numero(t.rating.n)} giudizi` : ""}`
+        + `${Number.isFinite(numero(t.rating.n)) ? ` · ${numero(t.rating.n)} analisti pubblicano una RACCOMANDAZIONE` : ""}`
         + `${t.rating.key ? ` · giudizio prevalente ${String(t.rating.key).replace(/_/g, " ")}` : ""}`
-        + `. ⚠ E' una MEDIA e porta la data del suo ultimo aggiornamento, che il sistema non conosce: `
+        /* ⚠ v401 — C9 HA PRESO QUESTA RIGA ALLA PRIMA STESURA: diceva "e leggerli come uno solo
+           e' l'errore facile", cioe' un'ISTRUZIONE dentro la coda. E' la quarta volta in questo
+           progetto (v156, v179, v180, v389) e la regola non cambia: la coda porta FATTI, gli
+           ordini vivono nella testata. Il fatto qui e' che le due cifre contano due insiemi. */
+        + `. ⚠⚠ I DUE NUMERI CONTANO POPOLAZIONI DIVERSE: il conteggio e' di chi pubblica un giudizio `
+        + `compra/mantieni/vendi, il target medio e' calcolato su chi pubblica un OBIETTIVO DI PREZZO — `
+        + `di solito piu' numerosi, e la fonte non ne dichiara il numero. Un conteggio diverso trovato `
+        + `altrove accanto allo stesso target medio non e' una contraddizione: e' l'altra popolazione. `
+        + `⚠ E' una MEDIA e porta la data del suo ultimo aggiornamento, che il sistema non conosce: `
         + `la DISPERSIONE fra target minimo e massimo e le revisioni recenti NON sono qui e vanno cercate.`);
     }
     if (t.analisti) {
@@ -12311,6 +12363,9 @@ function datiNostriDelTitolo(tk) {
 `  non articoli letti. Se non trovi nulla di recente, scrivilo: "nessuna notizia rilevante nelle`,
 `  ultime 48 ore" e' un'informazione. ⚠ E se il blocco dichiara dei titoli NON LETTI (la fonte ha`,
 `  strozzato le richieste), per quelli l'assenza qui non e' un dato: e' un buco della raccolta.`,
+`  ⚠ CERCA LE ULTIME 48 ORE ANCHE SUI NOMI DEL GRUPPO CORRELATO che trovi nel blocco del libro,`,
+`  non solo su ${tk}: sono la stessa scommessa scritta piu' volte, e una notizia su uno di loro e'`,
+`  una notizia su questa posizione. E' la ricerca che rende possibile il blocco 9 (L'INCROCIO).`,
 `  ⚠ E INCROCIALE COL LIBRO, non solo col titolo analizzato: una notizia che colpisce il fattore`,
 `  condiviso — il gruppo di posizioni correlate che trovi nel blocco del libro — vale per tutte`,
 `  quelle posizioni insieme, non per una. E' la differenza fra una notizia su un nome e una`,
@@ -12435,9 +12490,14 @@ function buildPromptTicker(tkGrezzo) {
    Per questo il minimo e' SPARITO — un intervallo con un pavimento e' un invito a riempire — e
    al suo posto c'e' la clausola che chiude il varco vero: non si allunga mai un blocco con
    affermazioni che non si possono sostenere. */
-`BUDGET: al massimo 2.300 parole IN TUTTO. E' un TETTO, non un bersaglio: non esiste una`,
-`lunghezza minima e un referto di 1.400 parole tutte sostenute vale piu' di uno di 2.300 con`,
-`duecento parole di riempimento. Un blocco che non ha nulla da dire si chiude in una riga.`,
+/* v401 — il tetto sale da 2.300 a 2.800 perche' e' stato AGGIUNTO un blocco obbligatorio
+   (l'INCROCIO). Alzarlo non e' un permesso di riempire: la clausola qui sotto resta ed e' la
+   protezione vera. Un tetto lasciato fermo mentre si aggiunge una consegna e' peggio di uno
+   alto — costringe a comprimere gli ULTIMI blocchi, che e' dove un modello a corto di spazio
+   sostituisce le prove con affermazioni (misurato in v398). */
+`BUDGET: al massimo 2.800 parole IN TUTTO. E' un TETTO, non un bersaglio: non esiste una`,
+`lunghezza minima e un referto di 1.700 parole tutte sostenute vale piu' di uno di 2.800 con`,
+`trecento parole di riempimento. Un blocco che non ha nulla da dire si chiude in una riga.`,
 `⚠⚠ E LA REGOLA CHE CONTA: non allungare MAI un blocco aggiungendo affermazioni che non puoi`,
 `sostenere con un numero di questo pacchetto o con una fonte che hai aperto. Se ti accorgi di`,
 `star scrivendo per arrivare a una lunghezza, fermati: quello e' il punto esatto in cui un`,
@@ -12567,7 +12627,44 @@ function buildPromptTicker(tkGrezzo) {
 `nessuno stop in euro. Il divieto delle REGOLE vale qui piu' che altrove, perche' e' il blocco`,
 `in cui e' piu' facile scivolare da "questo e' il rischio" a "quindi riduci".`,
 ``,
-`9) LA TESI CONTRARIA — massimo 10 righe, ed e' obbligatoria.`,
+/* ═══ v401 — IL BLOCCO CHE INCROCIA, CHIESTO DAL CEO ═══════════════════════════════════════
+   "Voglio una presenza maggiore di analisi e di correlazioni tra portafoglio, dati tecnici e
+   fondamentali, dati macro e soprattutto ultime news ... e questo deve essere presente anche
+   quando genero l'analisi di un solo titolo."
+   ⚠ Il pacchetto aveva GIA' tutti i pezzi — macro, libro, tecnica, fondamentali, notizie sul
+   nome e sul gruppo correlato, disciplina di rischio — e li chiedeva UNO PER UNO in nove
+   blocchi separati. Quello che mancava non erano dati: era la richiesta di GIUNGERLI. Nove
+   elenchi accanto non fanno un'analisi, e un modello che risponde per blocchi non incrocia mai
+   di sua iniziativa.
+   ⚠⚠ E LA REGOLA CHE TIENE IL BLOCCO ONESTO: ogni riga deve unire ALMENO DUE fonti. Una riga
+   che ne usa una sola e' un blocco precedente riscritto, cioe' la duplicazione che questo
+   progetto misura e taglia dalla v184. Senza quel vincolo un blocco "di sintesi" diventa il
+   riassunto che la testata vieta da sempre. */
+`9) L'INCROCIO — la parte che nessuno degli altri blocchi puo' dare, ed e' obbligatoria.`,
+`Fin qui hai descritto il titolo per pezzi. Qui li GIUNGI. ⚠ REGOLA DEL BLOCCO: ogni riga deve`,
+`unire ALMENO DUE fonti diverse fra notizie, macro, tecnica, fondamentali e libro. Una riga che`,
+`ne usa una sola e' un blocco precedente riscritto: toglila.`,
+`· NOTIZIA → CANALE → LIBRO. Prendi le notizie piu' RECENTI che hai (le tue delle ultime 48 ore`,
+`  prima di tutto, poi quelle in coda). Per ciascuna che conta: attraverso quale canale MISURATO`,
+`  arriva (mercato, comparto, tassi, dollaro — col suo R² e la sua finestra), e quali posizioni`,
+`  del gruppo correlato colpisce. Una notizia che colpisce il FATTORE vale per il peso del`,
+`  GRUPPO, non del nome: e' l'unico collegamento che tu da solo non puoi fare, perche' la ricerca`,
+`  online non sa che libro hai davanti.`,
+`· MACRO → CONTO ECONOMICO. Quale numero del quadro macro arriva davvero al bilancio di ${tk}, e`,
+`  su quale RIGA: costo del debito, domanda finale, prezzo degli input, cambio sui ricavi esteri.`,
+`  Non "i tassi sono alti" — quale riga di questo conto economico, e di quanto.`,
+`· TECNICA ↔ FONDAMENTALE: concordano o si contraddicono? Il caso che conta e' il disaccordo —`,
+`  prezzo che cede mentre le stime salgono, o prezzo che tiene mentre le stime vengono tagliate.`,
+`  Quando concordano sono UN segnale, non due prove; quando divergono, la divergenza e' il fatto.`,
+`· E QUINDI, PER IL LIBRO. Da quanto hai appena scritto: quale posizione e' piu' esposta a questo`,
+`  quadro, in che ordine di priorita', e quale livello o quale data cambierebbe la risposta. Un`,
+`  fondo growth privato non si ottimizza riducendo il rischio: si ottimizza sapendo QUALE rischio`,
+`  sta correndo e se e' quello che ha scelto di correre. ⚠ Vale qui il divieto del blocco 8:`,
+`  direzione e priorita' si', quantita' MAI — nessuna quota, nessuna percentuale, nessuno stop in`,
+`  euro. Il sistema non conosce liquidita' ne' fisco, e un numero senza quei due e' un consiglio`,
+`  travestito da calcolo.`,
+``,
+`10) LA TESI CONTRARIA — massimo 10 righe, ed e' obbligatoria.`,
 `Hai appena scritto un giudizio. Ora scrivi il caso di chi la pensa all'opposto, e scrivilo`,
 (giaDentro
   ? `bene: se sei arrivato a "tenere" o "aggiungere", argomenta perche' ${tk} scendera' e perche'`

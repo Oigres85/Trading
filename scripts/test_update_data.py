@@ -1150,6 +1150,69 @@ check("v398 la raccolta e' AGGANCIATA al gate, e prima che il gate giri",
       _i_agg > 0 and _i_val > 0 and _i_agg < _i_val
       and "news_titoli(_tk_pos)" in _SRC_UD_CODICE)
 
+# ═══ v401 — LA SOGLIA DEL RUMORE, E LE DUE FINESTRE ════════════════════════════════════════
+# Il pavimento "R2 >= 0,05" era una CONVENZIONE che reggeva finche' la finestra era una sola.
+# Con due finestre diventa falsa in direzioni opposte, e il check lo misura invece di crederci.
+_r2r = ud.r2_rumore
+
+# valori tabulati di Student al 97,5%: l'approssimazione va verificata contro di loro, non
+# contro se stessa — un check che conferma la propria formula non e' un check (v326).
+for _n, _t_tab in ((60, 2.00172), (90, 1.98729), (251, 1.96959)):
+    _df = _n - 2
+    _atteso = _t_tab * _t_tab / (_t_tab * _t_tab + _df)
+    check("v401 il pavimento del rumore a n=%d coincide col valore tabulato" % _n,
+          _r2r(_n) is not None and abs(_r2r(_n) - _atteso) < 1e-4)
+
+check("v401 il pavimento e' PIU' ALTO sulla finestra corta che su quella lunga",
+      _r2r(60) > _r2r(251) and _r2r(60) > 0.06 and _r2r(251) < 0.02)
+
+# ⚠ E' IL PUNTO DELLA MODIFICA: con la vecchia soglia fissa la finestra corta avrebbe acceso
+# canali dal nulla, cioe' avrebbe fabbricato proprio il segnale che deve rilevare.
+check("v401 la vecchia soglia fissa 0,05 sarebbe PERMISSIVA sulla finestra corta",
+      0.05 < _r2r(60))
+
+check("v401 sotto df 30 non si restituisce un numero peggiore del silenzio",
+      _r2r(31) is None and _r2r(32) is not None)
+
+# ── le due finestre, su serie costruite perche' il fenomeno ci sia ──
+# ⚠⚠ COSTRUIRE QUESTO CASO HA INSEGNATO QUALCOSA SUL METODO, e va scritto: con 259
+# osservazioni il pavimento del rumore vale 0,015, cioe' e' BASSISSIMO — una relazione recente
+# e forte si vede quasi sempre anche sull'anno, perche' il pooled R2 la raccoglie. La finestra
+# corta non serve a trovare un canale forte: serve a trovarne uno che l'anno DILUISCE, cioe'
+# quando il titolo ha avuto una storia propria molto rumorosa e solo di recente e' passato a
+# muoversi col canale. La prima stesura del check ne costruiva uno troppo forte e l'anno lo
+# vedeva lo stesso: il check era rosso e aveva ragione. Qui il titolo ha volatilita' propria al
+# 3% per l'anno e nell'ultimo trimestre segue il canale con rumore allo 0,3%.
+_idx = pd.bdate_range("2025-01-01", periods=260)
+_rng = np.random.default_rng(11)
+_rb = _rng.normal(0, 0.01, 260)
+_b = pd.Series(100 * np.cumprod(1 + _rb), index=_idx)
+_r_titolo = _rng.normal(0, 0.03, 260)                                # storia propria, rumorosa
+_r_titolo[-60:] = 1.0 * _rb[-60:] + _rng.normal(0, 0.003, 60)        # poi comanda il canale
+_c = pd.Series(100 * np.cumprod(1 + _r_titolo), index=_idx)
+_sens = ud.sensibilita_macro(_c, {"tassi": ("TLT", "i tassi", _b)})
+
+check("v401 sensibilita': la finestra corta viene pubblicata accanto a quella lunga",
+      _sens is not None and _sens["tassi"].get("breve") is not None)
+
+check("v401 sensibilita': la finestra corta misura DAVVERO le ultime 60 sedute",
+      _sens["tassi"]["breve"]["campione"] == 60
+      and _sens["tassi"]["breve"]["a"] == _sens["tassi"]["a"]
+      and _sens["tassi"]["breve"]["da"] > _sens["tassi"]["da"])
+
+# il fenomeno costruito: spento sull'anno, acceso sull'ultimo trimestre
+check("v401 sensibilita': un canale acceso solo di recente risulta acceso SOLO sul breve",
+      _sens["tassi"]["acceso"] is False and _sens["tassi"]["breve"]["acceso"] is True)
+
+check("v401 sensibilita': ogni finestra porta la propria soglia, non una condivisa",
+      _sens["tassi"]["r2_soglia"] < _sens["tassi"]["breve"]["r2_soglia"])
+
+# ⚠ con meno di 90 osservazioni le due finestre coinciderebbero: stampare due volte lo stesso
+# numero e' peggio che non stamparlo (v184, la ridondanza misurata e tolta).
+_corta = ud.sensibilita_macro(_c.iloc[-80:], {"tassi": ("TLT", "i tassi", _b.iloc[-80:])})
+check("v401 sensibilita': sotto 90 osservazioni la finestra corta NON si pubblica",
+      _corta is not None and _corta["tassi"].get("breve") is None)
+
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,
       _TOT >= N_CHECKS_MINIMO)
