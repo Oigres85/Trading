@@ -122,6 +122,34 @@ metà.
 contengono la sequenza di apertura come DATO. Si tolgono i commenti e si esclude il proprio
 blocco (v213, v240, v393).
 
+## 🔬 v397 — QUATTRO BUCHI TROVATI LEGGENDO IL PACCHETTO COME IL SUO DESTINATARIO
+
+Esercizio del CEO su CRWV. Tutti e quattro hanno la stessa forma: **il sistema AVEVA il dato e
+non lo consegnava**, oppure lo consegnava con un'etichetta che affermava più del dato.
+
+| difetto | misura |
+|---|---|
+| il **nome della società** non compare mai | il PASSO 0 ordina di cercare online e non dice come si chiama l'azienda: `name` era in `data.json` da sempre |
+| *"Variazione di **oggi**: −3,58%"* | la barra era del **giorno prima** — classe v193/v229, nella riga che si legge per prima |
+| il **massimo storico** non usciva | MSTR sta **49%** sopra il proprio massimo a 52 settimane, CRWV **22%**: "massimo dell'anno" e "massimo di sempre" descrivono due mondi |
+| l'avviso "tabella trimestri ferma" | poggiava sulla data **attesa** (stima dell'emittente) **avendo nello stesso pacchetto** il deposito 8-K dell'11/08: arrivava alla conclusione giusta dal segnale più debole |
+
+⚠ Il massimo storico si pubblica **solo se dice altro** dal massimo a 52 settimane (oltre il 2%
+sopra): altrimenti è lo stesso fatto scritto due volte, la ridondanza che v184 ha misurato e tolto.
+
+⚠ **La gerarchia introdotta da v396 vale anche per le DIAGNOSI, non solo per i dati**: prima il
+fatto, la stima solo se il fatto non c'è. Col deposito la diagnosi passa da *"manca forse un
+trimestre"* a *"ne è stato depositato uno che qui non compare"*, e il pacchetto lo dice.
+
+⚠ **Diciassettesima rottura di un check ancorato a una stringa letterale**: v357 pretendeva
+`POTREBBE NON ESSERE AGGIORNATA` ed è andato rosso perché la diagnosi era diventata più FORTE.
+
+### 🎲 E un mio check poteva cadere per caso
+Il gate v395 sul raggruppamento per comunicato costruiva gli id finti con `abs(hash(sid))`, e
+`hash()` in Python è **randomizzato per processo**: un'altra serie poteva collidere con l'id 50 e
+far fallire il check senza che nulla fosse rotto. Terza incarnazione della classe v233/v349 —
+*un check che dipende dal caso invece che dalla proprietà va rosso da solo*. Ora è deterministico.
+
 ## 🚦 FLUSSO DI CONSEGNA — si lavora su `main`, e la PR si unisce sempre
 
 Istruzione permanente del CEO (02/09/2026), testuale: *"Unisci sempre la pr e lavora

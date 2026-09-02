@@ -945,7 +945,12 @@ def _fred_finta(url, **kw):
         sid = url.split("series_id=")[1].split("&")[0]
         # NFP e disoccupazione escono dallo STESSO comunicato: e' il caso che prova il
         # raggruppamento. Se si perdesse, la pipeline farebbe il doppio delle chiamate.
-        rid = 50 if sid in ("PAYEMS", "UNRATE") else abs(hash(sid)) % 900 + 100
+        # ⚠ v397 — QUI C'ERA `abs(hash(sid))`, e hash() in Python e' RANDOMIZZATO per processo
+        # (PYTHONHASHSEED): un'altra serie poteva collidere con 50 e far cadere il check sul
+        # raggruppamento senza che nulla fosse rotto. E' la classe gia' pagata in v233 e v349 —
+        # un check che dipende dal caso invece che dalla proprieta' va rosso da solo. Ora l'id
+        # e' una funzione DETERMINISTICA del nome della serie.
+        rid = 50 if sid in ("PAYEMS", "UNRATE") else 100 + sum(ord(c) for c in sid) % 800
         return _RispostaFinta({"releases": [{"id": rid, "name": f"Comunicato {rid}"}]})
     if "/fred/release/dates" in url:
         _ieri = (date.today() - timedelta(days=1)).isoformat()

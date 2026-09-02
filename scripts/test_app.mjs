@@ -4680,9 +4680,15 @@ check("v357 trimestri: una tabella ferma non permette di affermare il verso dell
   const p = buildPromptTicker("CRWV");
   /* ultimo trimestre 2026-03-31, prossima uscita 2026-11-11: sette mesi. "ACCELERA" era
      affermato in maiuscolo su una serie che poteva non contenere l'ultimo trimestre */
-  if (mesi <= 5) return true;
-  return /LA TABELLA DEI TRIMESTRI POTREBBE NON ESSERE AGGIORNATA/.test(p)
-      && /NON AFFERMABILE/.test(p) && !/l'ultimo trimestre ACCELERA/.test(p);`));
+  /* ⚠ v397 — DICIASSETTESIMA rottura di un check ancorato a una stringa letterale: pretendeva
+     "POTREBBE NON ESSERE AGGIORNATA" ed e' andato rosso quando la diagnosi e' diventata piu'
+     FORTE (dal deposito SEC invece che dalla data attesa, quindi "NON E' AGGIORNATA - E' UN
+     FATTO"). L'invariante non e' la formula: e' che la tabella ferma venga dichiarata e che il
+     verso della crescita non venga affermato lo stesso. */
+  const dichiara = /LA TABELLA DEI TRIMESTRI (POTREBBE NON ESSERE|NON E') AGGIORNATA/.test(p);
+  const secCrwv = ((DATA.macro.sec_calendario || {}).per_titolo || {}).CRWV;
+  if (mesi <= 5 && !(secCrwv && secCrwv.ultimo_deposito)) return true;
+  return dichiara && /NON AFFERMABILE/.test(p) && !/l'ultimo trimestre ACCELERA/.test(p);`));
 
 check("v357 crescita: il margine incrementale dice quanto costa, non solo quanto e' veloce", suVeri(`
   const ct = ((((DATA.watchlist || []).find(x => x && x.ticker === "CRWV") || {}).tv) || {}).conto_trim || [];
@@ -6128,6 +6134,57 @@ check("v396 il pacchetto nomina gli indicatori per cui la data non e' disponibil
       && r.indexOf("APPUNTAMENTI CONFERMATI") >= 0
       && r.indexOf("NON E' DISPONIBILE") >= 0
       && senza.every(n => r.indexOf(n) >= 0);`));
+
+/* ═══ v397 — QUATTRO BUCHI TROVATI LEGGENDO IL PACCHETTO DI CRWV COME IL SUO DESTINATARIO ══
+   Tutti e quattro hanno la stessa forma: il sistema AVEVA il dato e non lo consegnava, oppure
+   lo consegnava con un'etichetta che affermava piu' di quanto il dato sostenesse. */
+
+check("v397 il pacchetto dice come si chiama la societa', non solo il ticker", suVeri(`
+  /* il PASSO 0 ordina di cercare online: senza il nome legale, chi legge deve indovinarlo per
+     aprire il sito investor relations o EDGAR. Il campo era in data.json e non usciva. */
+  const p = buildPromptTicker("CRWV");
+  const r = ((DATA.portfolio || []).concat(DATA.watchlist || []))
+    .find(x => String(x.ticker).toUpperCase() === "CRWV");
+  if (!r || !r.name) return false;
+  return p.split(String.fromCharCode(10))[0].indexOf(r.name) >= 0;`));
+
+check("v397 la variazione di seduta dichiara DI QUALE seduta parla", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  const nl = String.fromCharCode(10);
+  const r = p.split(nl).find(x => x.indexOf("Variazione della seduta") >= 0);
+  if (!r) return false;
+  /* la vecchia forma diceva "di oggi" su una barra che poteva essere di ieri: e' la classe
+     v193/v229, stato del mercato e freschezza del dato sono due cose diverse. */
+  return p.indexOf("Variazione di oggi") < 0
+      && /Variazione della seduta del [0-9]{2}\\/[0-9]{2}\\/[0-9]{4}/.test(r);`));
+
+check("v397 il massimo storico si pubblica quando dice altro dal massimo a 52 settimane", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  const r = ((DATA.portfolio || []).concat(DATA.watchlist || []))
+    .find(x => String(x.ticker).toUpperCase() === "CRWV");
+  if (!r || !r.ath || !r.w52_high || r.ath <= r.w52_high * 1.02) return false;  // muto
+  const haStorico = p.indexOf("Massimo storico") >= 0 && p.indexOf(String(r.ath)) >= 0;
+  /* e NON si pubblica quando coinciderebbe col massimo dell'anno: sarebbe lo stesso fatto
+     scritto due volte, la ridondanza che v184 ha misurato e tolto. */
+  const salva = r.ath; r.ath = r.w52_high;
+  const senza = buildPromptTicker("CRWV").indexOf("Massimo storico") < 0;
+  r.ath = salva;
+  return haStorico && senza;`));
+
+check("v397 la tabella dei trimestri vecchia si diagnostica dal DEPOSITO, non dalla stima", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  const sec = ((DATA.macro.sec_calendario || {}).per_titolo || {}).CRWV;
+  if (!sec || !sec.ultimo_deposito) return false;          // muto: manca il fenomeno
+  if (p.indexOf("E' UN FATTO, NON UN SOSPETTO") < 0) return false;
+  if (p.indexOf(String(sec.ultimo_deposito)) < 0) return false;
+  /* togliendo il fatto si deve tornare all'indizio debole, DICHIARANDOLO tale */
+  const salva = DATA.macro.sec_calendario;
+  DATA.macro.sec_calendario = { per_titolo: {}, senza_8k: [], senza_cik: [], fonte: "x" };
+  const q = buildPromptTicker("CRWV");
+  DATA.macro.sec_calendario = salva;
+  return q.indexOf("E' UN FATTO, NON UN SOSPETTO") < 0
+      && q.indexOf("POTREBBE NON ESSERE AGGIORNATA") >= 0
+      && q.indexOf("poggia su una data ATTESA") >= 0;`));
 
 let fail = 0;
 for (const [name, ok] of T) {

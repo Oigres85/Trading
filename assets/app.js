@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "383";
+const BUILD_VERSION = "384";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10609,6 +10609,24 @@ function fattiTitolo(tk) {
         "un anno di barre" + et + conv, "il punto piu' alto degli ultimi dodici mesi");
     agg("Minimo 52 settimane", "del minimo dell'anno", daVivo ? storia.min52 : riga.w52_low,
         "un anno di barre" + et + conv, "il punto piu' basso degli ultimi dodici mesi");
+    /* ⚠⚠ v397 — IL MASSIMO STORICO MANCAVA, E SU UN TITOLO GIOVANE NON E' UN DETTAGLIO.
+       `ath` sta in data.json da sempre e non arrivava al pacchetto. Misurato sul libro vero:
+       MSTR ha il massimo storico il 49% SOPRA il proprio massimo a 52 settimane, CRWV il 22%.
+       Su una societa' quotata da poco o reduce da un crollo, "massimo dell'anno" e "massimo di
+       sempre" descrivono due mondi: chi legge solo il primo crede che il titolo sia vicino ai
+       propri estremi quando ne e' lontanissimo, e il potenziale di recupero cambia di misura.
+       Si pubblica SOLO quando dice qualcosa di diverso dal massimo a 52 settimane (oltre il 2%
+       sopra): altrimenti sarebbe la stessa informazione scritta due volte, che e' la classe
+       che v184 ha tolto dal payload misurandola. */
+    const _max52 = daVivo ? storia.max52 : riga.w52_high;
+    const _ath = numero(riga && riga.ath);
+    if (Number.isFinite(_ath) && Number.isFinite(_max52) && _ath > _max52 * 1.02) {
+      agg("Massimo storico", "del massimo di sempre", _ath,
+          "il punto piu' alto di tutta la serie disponibile" + conv,
+          "sta " + Math.round((_ath / _max52 - 1) * 100) + "% SOPRA il massimo a 52 settimane: "
+          + "il titolo e' lontano dai propri estremi molto piu' di quanto l'anno lasci vedere, "
+          + "e su una societa' quotata da poco l'anno non contiene il suo massimo");
+    }
   }
   /* ⚠ SOPRA O SOTTO SI MISURA, NON SI PRESUME (v266): il muro delle call di AMD stava sotto il
      prezzo e veniva dipinto come un tetto. */
@@ -11377,14 +11395,40 @@ function tvBlocchi(tk) {
     const validi = cres.filter(x => x != null);
     /* la serie e' aggiornata? due controlli indipendenti, entrambi sui dati gia' presenti */
     const ultimoTrim = tv.conto_trim[0] && String(tv.conto_trim[0].trim || "").slice(0, 10);
+    /* ⚠⚠ v397 — L'AVVISO POGGIAVA SULLA DATA STIMATA, AVENDO IL FATTO NELLO STESSO PACCHETTO.
+       Misurato su CRWV: la tabella si ferma al trimestre 2026-03-31, e il pacchetto stampa —
+       trenta righe piu' sotto — che la societa' ha DEPOSITATO i risultati l'11/08/2026 (8-K con
+       item 2.02 su SEC EDGAR, un fatto). Quel deposito riporta un trimestre che nella tabella
+       non c'e'. L'avviso invece si costruiva sulla data ATTESA della prossima trimestrale, che
+       e' una stima dell'emittente: arrivava alla conclusione giusta partendo dal segnale piu'
+       debole dei due. Dopo v396 la gerarchia e' esplicita — prima il fatto, la stima solo se il
+       fatto non c'e' — e qui il fatto rende la diagnosi certa invece che probabile: non "manca
+       forse un trimestre", ma "ne e' stato depositato uno che qui non compare". */
+    const _secTk = ((((DATA || {}).macro || {}).sec_calendario || {}).per_titolo || {})[String(tk).toUpperCase()];
+    const _dep = _secTk && _secTk.ultimo_deposito ? String(_secTk.ultimo_deposito).slice(0, 10) : null;
+    const _gg = (a, b) => Math.round((new Date(a) - new Date(b)) / 86400000);
+    /* un deposito arriva settimane DOPO la fine del trimestre che riporta: oltre i 60 giorni di
+       distanza dall'ultimo trimestre in tabella, il deposito parla di un trimestre successivo. */
+    const daDeposito = (ultimoTrim && _dep && _gg(_dep, ultimoTrim) > 60)
+      ? { gg: _gg(_dep, ultimoTrim), dep: _dep } : null;
     const prossima = r && r.earnings_date ? String(r.earnings_date).slice(0, 10) : null;
     const mesiVuoti = (ultimoTrim && prossima)
       ? Math.round((new Date(prossima) - new Date(ultimoTrim)) / 86400000 / 30.4) : null;
-    const serieFerma = Number.isFinite(mesiVuoti) && mesiVuoti > 5;
-    if (serieFerma) {
+    const serieFerma = !!daDeposito || (Number.isFinite(mesiVuoti) && mesiVuoti > 5);
+    if (daDeposito) {
+      F.push(`⚠⚠ LA TABELLA DEI TRIMESTRI NON E' AGGIORNATA — E' UN FATTO, NON UN SOSPETTO: `
+        + `l'ultimo trimestre qui sopra e' ${ultimoTrim}, ma questa societa' ha DEPOSITATO i propri `
+        + `risultati il ${daDeposito.dep} (SEC EDGAR, 8-K con item 2.02), ${daDeposito.gg} giorni dopo `
+        + `la chiusura di quel trimestre: quel deposito riporta un trimestre SUCCESSIVO, che qui non `
+        + `c'e'. ⚠ Quindi la direzione della crescita calcolata qui sotto NON e' affermabile — le manca `
+        + `il dato piu' recente, che e' esattamente quello che conta — e i conti di questo blocco sono `
+        + `piu' vecchi dell'ultima comunicazione della societa'. Cerca quel trimestre alla fonte.`);
+    } else if (serieFerma) {
       F.push(`⚠⚠ LA TABELLA DEI TRIMESTRI POTREBBE NON ESSERE AGGIORNATA: l'ultimo trimestre qui sopra e' `
         + `${ultimoTrim} e la prossima uscita e' attesa il ${prossima}, cioe' ${mesiVuoti} mesi dopo — piu' di un `
-        + `trimestre di distanza. O la societa' ha saltato una pubblicazione, o manca un trimestre gia' uscito. `
+        + `trimestre di distanza. ⚠ Questo indizio poggia su una data ATTESA, che la pubblica l'emittente `
+        + `come propria stima: e' piu' debole di un deposito, che per questo titolo non risulta. O la `
+        + `societa' ha saltato una pubblicazione, o manca un trimestre gia' uscito. `
         + `⚠ Finche' non e' chiarito, la direzione della crescita qui sotto NON e' affermabile: potrebbe essere `
         + `calcolata senza il dato piu' recente, che e' proprio quello che conta.`);
     }
@@ -11607,7 +11651,19 @@ function datiNostriDelTitolo(tk) {
         + (tec.eps < 0 ? ". ⚠ E' NEGATIVO: la societa' e' in perdita, e un P/E assente non e' un dato mancante ma la conseguenza." : ""));
     }
     if (Number.isFinite(tec.beta)) T2.push(`- Beta: ${tec.beta} — quanto amplifica i movimenti del mercato (1 = come l'indice)`);
-    if (Number.isFinite(tec.oggiPct)) T2.push(`- Variazione di oggi: ${signTxt(tec.oggiPct)}`);
+    /* ⚠⚠ v397 — DICEVA "DI OGGI" SU UNA BARRA CHE POTEVA ESSERE DI IERI. Misurato su CRWV il
+       02/09/2026: il prezzo di riferimento e' la barra del 01/09 e la riga annunciava
+       "Variazione di oggi: -3,58%", cioe' la seduta PRECEDENTE spacciata per quella in corso.
+       E' la classe v193/v229 — stato del mercato e freschezza del dato sono due cose diverse —
+       nella riga che un analista legge per prima. La variazione non cambia: cambia che ora
+       dichiara DI QUALE SEDUTA parla, prendendo la data dalla stessa barra del prezzo. */
+    if (Number.isFinite(tec.oggiPct)) {
+      const gg = (s) => String(s).slice(8, 10) + "/" + String(s).slice(5, 7) + "/" + String(s).slice(0, 4);
+      T2.push(`- Variazione della seduta${f.barraDel ? ` del ${gg(f.barraDel)}` : " piu' recente"}: `
+        + `${signTxt(tec.oggiPct)}`
+        + (f.barraDel && f.barraDel !== new Date().toISOString().slice(0, 10)
+            ? ` — ⚠ NON e' la seduta di oggi: e' la chiusura su cui poggia il prezzo di riferimento.` : ""));
+    }
     if (Number.isFinite(tec.volRel)) T2.push(`- Volume rispetto al suo tipico: ${tec.volRel}× (sotto 1 = seduta piu' fiacca del solito)`);
     if (Number.isFinite(tec.rs1m)) {
       T2.push(`- Forza relativa a 1 mese contro ${esc(String(tec.rsBench || "il suo indice").toUpperCase())}: ${signTxt(tec.rs1m, " pp")}`
@@ -12122,7 +12178,13 @@ function buildPromptTicker(tkGrezzo) {
     return Number.isFinite(q) && q >= 0 && q <= 60 ? { g: q, quando: String(d).slice(0, 10) } : null;
   })();
   const istruzioni = [
-`ANALISI DI ${tk} — ${oggi}`,
+/* ⚠ v397 — IL NOME DELLA SOCIETA' MANCAVA. Il pacchetto ordina di cercare online (PASSO 0,
+   obbligatorio) e non ha mai scritto come si chiama l'azienda: su un ticker ambiguo o poco
+   noto, chi legge deve indovinarlo per aprire il sito investor relations o EDGAR. Il dato e'
+   in `data.json` da sempre (`name`) e non arrivava al pacchetto. */
+`ANALISI DI ${tk}${(rigaLibro && rigaLibro.name && String(rigaLibro.name).trim()
+   && String(rigaLibro.name).toUpperCase() !== String(tk).toUpperCase())
+   ? " (" + String(rigaLibro.name).trim() + ")" : ""} — ${oggi}`,
 ``,
 `Sei un analista azionario senior. Devi produrre un'analisi operativa su ${tk}: tecnica, fondamentale, notizie, e il collegamento col quadro macro che trovi in coda.`,
 ``,
