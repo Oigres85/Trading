@@ -53,6 +53,33 @@
 > non sono ovvie dal codice e che, se ignorate, rompono il sistema. Aggiornalo quando prendi
 > una decisione strutturale nuova.
 
+## 🚦 FLUSSO DI CONSEGNA — si lavora su `main`, e la PR si unisce sempre
+
+Istruzione permanente del CEO (02/09/2026), testuale: *"Unisci sempre la pr e lavora
+direttamente sul ramo principale affinché le modifiche siano sempre committate e subito
+online"*. Nasce da un guasto concreto: il lavoro dalla v375 alla v379 era committato su un ramo
+di lavoro e **la pagina viva restava indietro**, perché GitHub Pages serve `main` e nessun altro
+ramo. *Un commit che non è su `main` non è online, per quanti gate abbia passato.*
+
+Quindi: si sviluppa e si committa **su `main`**, si pusha subito, e se per qualunque ragione
+nasce una PR **la si unisce** invece di lasciarla aperta.
+
+> ⚠⚠ **E QUINDI NON C'È PIÙ UN PUNTO DI CONTROLLO DOPO LA SCRITTURA.** Con la PR, la CI girava
+> *fra* il push e la pubblicazione. Su `main` il push **è** la pubblicazione: la CI trova gli
+> errori quando il CEO può già aver aperto la pagina. La rete che è caduta va ricostruita
+> **prima** del push, ed è tutta la lista di "✅ Prima di ogni commit" più il gate di render —
+> non un sottoinsieme scelto a occhio, perché la classe di difetto che uccide la pagina
+> (`allocGrafMode is not defined`, v238) passa `node --check` e 219 check su 220.
+>
+> È la stessa lezione del `.githooks/pre-commit`, che esiste proprio per chiudere la finestra
+> fra la modifica e il push: ora quella finestra dà **direttamente sulla produzione**.
+> Attivarlo, una volta per macchina: `git config core.hooksPath .githooks`
+
+⚠ `main` riceve anche i commit del CI (`Aggiornamento dati …`, ~ogni 30 minuti): **prima di
+ogni push** serve `git pull --rebase origin main`. Sui conflitti in `data/data.json` vince la
+versione remota fresca — i calcoli si rifanno al run successivo.
+
+
 ## 🔁 Esercizio ricorrente: "check del prompt AI applicato a te stesso"
 
 L'utente chiede periodicamente di generare il prompt reale e di ESEGUIRLO su di sé (simulare
