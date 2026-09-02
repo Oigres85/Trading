@@ -2057,6 +2057,76 @@ due volte: v192 (chip da 298px → documento a 598 su uno schermo da 375) e v209
 colonna del valore → 44px di scorrimento orizzontale su tutta la pagina). Col ritorno a capo la
 cella non scende comunque sotto la parola più lunga, che nella colonna esistente ci sta.
 
+## 📅 v395 — LE USCITE MACRO NON SONO PIÙ STIME: IL CALENDARIO UFFICIALE
+
+Il CEO ha proposto di far passare l'acquisizione dati da **investpy** o **investing-com-api-v2**.
+Verificato invece che ricordato: investpy è fermo al **2 ottobre 2022** e il suo README dice che
+non funziona; **investiny**, il sostituto che investpy stesso indica, è fermo al **18 ottobre
+2022** — è morto sedici giorni dopo essere nato; il terzo dichiara *"This version is no longer
+supported"* e userebbe Puppeteer. E i quattro ingressi di investing.com rispondono **403 in meno
+di mezzo secondo** da un IP di datacenter, che è la condizione in cui gira il CI.
+
+> **Convogliare tutto su una fonte sola è la forma sbagliata anche se funzionasse.** La pipeline
+> attinge a **25 domini indipendenti**: quando Yahoo blocca, il resto arriva lo stesso.
+> Investing.com è un sito dietro una policy Cloudflare: il giorno che la stringono non si degrada
+> un canale, si spegne tutto insieme. È letteralmente ciò che è successo a investpy.
+
+**La domanda utile non era "quale libreria" ma "cosa ci leggi che il sistema non ha".** Prezzi,
+sommario tecnico (calcolato in casa dalla v316), notizie, date delle trimestrali (EDGAR, v390) e
+target ci sono già. Il buco vero **il pacchetto lo confessava da solo**: *"IN USCITA NELLE
+PROSSIME 2 SETTIMANE — TUTTE DATE STIMATE"*, proiettate dal ritardo tipico della fonte.
+
+Ora `calendario_uscite_fred()` legge il calendario **ufficiale** da FRED — nessuna fonte nuova,
+la chiave era già nei secret — e dove c'è una data dichiarata **quella vince**. Non sono due
+derivazioni fra cui scegliere (v390, EDGAR contro yfinance): è un appuntamento dell'ente contro
+una nostra congettura.
+
+⚠⚠ **LE SERIE `PRIMARIA:` SONO SALTATE, e non è un dettaglio**: UMich lo leggiamo dalla fonte
+primaria e FRED lo ridistribuisce con 1-2 mesi di ritardo di licenza. Pubblicare il calendario
+FRED sotto quel dato sarebbe **esattamente il difetto della v393**, dove la riga UMich affermava
+tre cose e due erano false perché descriveva il ripiego.
+
+⚠ **Quando la data è confermata e futura, `scaduto`/`passata` sono falsi per costruzione** — un
+appuntamento di domani non può essere in ritardo. L'allarme "era atteso e NON È ARRIVATO" non è
+perso: vive in `validate_macro`, che confronta l'**età della rilevazione** con la cadenza attesa.
+Farli convivere sulle stesse chiavi farebbe rispondere **due basi diverse alla stessa domanda**,
+che qui è già costato tre volte (v161, v207, v230).
+
+⚠ **Il segno si porta PER RIGA, non nell'intestazione**: dentro lo stesso elenco convivono una
+macro confermata e una stimata. E `stimata: true` era **scritto a mano come costante** su ogni
+evento, quindi restava vero anche con la data confermata: *un campo che non può essere smentito
+dai fatti non è un'informazione.*
+
+### Cosa si può provare da qui e cosa no — detto prima, non dopo
+La **fetch** verso FRED vuole la chiave API, che vive nei secret di Actions: da qui non è
+esercitabile, ed è la trappola **v203** che è costata la rimozione di due blocchi interi. Quindi
+la logica si prova **tutta** con una `http_get` finta (raggruppamento per comunicato, scarto
+delle date passate, salto delle serie non-FRED, rifiuto senza chiave) e la fetch vera si esercita
+**nel run del CI**, leggendone il log e il `data.json` prodotto.
+
+**E il test ha ripagato subito**: `STORICO_IND` ha righe da **quattro** campi e la funzione ne
+spacchettava due — `ValueError` a ogni run, cioè il blocco sarebbe morto in CI. Trovato dalla
+`http_get` finta, non rileggendo il codice.
+
+### 🛑 Il gate positivo era CIRCOLARE, e me l'ha detto quello negativo
+Cercavo `[CONFERMATA]` dentro tutta la riga — ma **la legenda che spiega il marcatore lo contiene
+per forza**. Quindi il check positivo era verde anche con **zero** date confermate, e quello
+negativo rosso su codice giusto. **Quinta incarnazione del gate che trova sé stesso** (v213,
+v240, v393): chi cerca la presenza o l'assenza di un marcatore deve guardare la **regione dei
+dati**, non la prosa che lo definisce. Ora si legge il contatore che la riga stessa pubblica
+("N su M confermati") e i marcatori si cercano solo dopo `dati macro (`.
+
+⚠ E un'ottava iniezione **non mordeva**: il check chiedeva *"esiste un allarme?"* invece di
+*"l'assenza produce l'allarme giusto?"*, così scattava il ramo `stale` dell'`else` e si
+accontentava. Stretto sullo **stato** (`missing`), morde.
+
+⚠ **Quindicesima rottura di un check ancorato a una stringa letterale**: il gate v363 pretendeva
+`passata: p < oggi` alla lettera ed è andato rosso su codice più corretto. Ora **esercita** il
+ramo invece di leggerlo.
+
+⚠ E ho rifatto l'**ancoraggio aperto** già scritto tre volte in questo file: la guardia
+`"calendario_uscite" not in s` matcha anche `calendario_uscite_fred`.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

@@ -2000,6 +2000,77 @@ def fred_series(series_id, n=14, freq=None):
     return out[-n:]
 
 
+# ═══ v395 — IL CALENDARIO UFFICIALE DELLE USCITE, AL POSTO DELLA PROIEZIONE ═══════════════
+# Il pacchetto dichiarava da sempre "IN USCITA NELLE PROSSIME 2 SETTIMANE — TUTTE DATE STIMATE":
+# le uscite macro erano proiettate dal ritardo TIPICO della fonte (CADENZA_FONTE lato pagina),
+# cioe' una regola del pollice, non un appuntamento. Su un CPI la differenza fra il 13 e il 15
+# decide se un'analisi e' scritta prima o dopo il dato che la smentisce.
+#
+# FRED pubblica il calendario VERO, e la chiave che serve la pipeline ce l'ha gia': niente
+# fonte nuova, niente scraping, un'API che gia' interroghiamo per le osservazioni.
+#
+# ⚠ E' la stessa promozione fatta in v390 con SEC EDGAR, dove le date STIMATE di yfinance sono
+# state affiancate dai depositi 8-K veri. Qui pero' non c'e' da scegliere fra due derivazioni:
+# il calendario e' l'appuntamento dichiarato dall'ente, la proiezione e' una stima nostra —
+# quando c'e' il primo, il secondo non serve. Quando manca, la stima resta e SI DICHIARA tale.
+#
+# ⚠⚠ LE SERIE `PRIMARIA:` SONO SALTATE, e non e' un dettaglio. UMich lo leggiamo dalla fonte
+# primaria e FRED lo ridistribuisce con 1-2 mesi di ritardo di licenza: il calendario FRED
+# descriverebbe la RIDISTRIBUZIONE, non la pubblicazione. E' letteralmente il difetto di v393,
+# dove la riga UMich affermava tre cose e due erano false perche' descriveva il ripiego.
+def calendario_uscite_fred(voci, quante=3):
+    """Prossime date di pubblicazione DICHIARATE dal calendario FRED, per chiave indicatore.
+
+    `voci` sono coppie (chiave, serie) — di norma STORICO_IND, cioe' la stessa tabella da cui
+    esce lo storico: una corrispondenza sola, non due che possono divergere.
+    Le richieste sono raggruppate per RELEASE: NFP e disoccupazione escono dallo stesso
+    comunicato (Employment Situation) e le tre serie di tassi dallo stesso H.15, quindi una
+    chiamata serve piu' indicatori. Senza chiave API non si indovina: si alza l'eccezione.
+    """
+    key = os.environ.get("FRED_API_KEY")
+    if not key:
+        raise RuntimeError("FRED_API_KEY assente: il calendario ufficiale passa dall'API, "
+                           "il csv pubblico non lo espone")
+    oggi = datetime.now(timezone.utc).date().isoformat()
+    date_per_release, nome_release, out = {}, {}, {}
+    # ⚠ le righe di STORICO_IND hanno QUATTRO campi (chiave, serie, trasformazione, punti):
+    # qui servono i primi due. Spacchettarne due su una riga da quattro alza ValueError e
+    # avrebbe fatto morire il blocco in CI — trovato dal check con la http_get finta, non
+    # leggendo il codice. E' la ragione per cui la logica si prova anche quando la fetch no.
+    for riga in voci:
+        chiave, serie = riga[0], riga[1]
+        if str(serie).startswith("PRIMARIA:"):
+            continue                      # vedi la nota qui sopra: non e' FRED a pubblicarlo
+        try:
+            r = http_get("https://api.stlouisfed.org/fred/series/release"
+                         f"?series_id={serie}&api_key={key}&file_type=json")
+            rel = (r.json().get("releases") or [None])[0]
+            if not rel:
+                raise ValueError("nessuna release per la serie")
+            rid = int(rel["id"])
+            nome_release[rid] = str(rel.get("name") or "").strip()
+            if rid not in date_per_release:
+                # include_release_dates_with_no_data=true e' CIO' CHE RENDE VISIBILE IL FUTURO:
+                # senza, FRED restituisce solo le uscite gia' avvenute (quelle che portano dati).
+                d = http_get("https://api.stlouisfed.org/fred/release/dates"
+                             f"?release_id={rid}&api_key={key}&file_type=json"
+                             "&include_release_dates_with_no_data=true"
+                             f"&realtime_start={oggi}&sort_order=asc&limit={max(quante, 1) * 4}")
+                # ⚠ il filtro >= oggi si rifa' anche lato nostro: `realtime_start` e' il periodo
+                # di realtime dell'API, che NON e' la stessa cosa della data di uscita. Fidarsi
+                # del nome di un parametro e' come fidarsi di un commento invece del calcolo.
+                date_per_release[rid] = [x["date"] for x in d.json().get("release_dates", [])
+                                         if str(x.get("date", "")) >= oggi][:quante]
+                time.sleep(0.1)
+            if date_per_release[rid]:
+                out[chiave] = {"prossime": date_per_release[rid], "release": nome_release[rid],
+                               "release_id": rid, "serie": serie}
+            time.sleep(0.1)
+        except Exception as e:  # noqa: BLE001
+            print(f"!! calendario FRED per {chiave} ({serie}): {e}", file=sys.stderr)
+    return out
+
+
 def bls_series(series_id, n=14):
     """Fallback per le serie BLS (CPI, NFP, disoccupazione) — API pubblica v1, senza chiave."""
     r = http_get(f"https://api.bls.gov/publicAPI/v1/timeseries/data/{series_id}")
@@ -2158,6 +2229,39 @@ def series_fallback(label, primary, fallback=None):
         s = fallback()
         FONTE_SERVITA[label] = "ripiego"
         return s
+
+
+# ═══ v395 — LA TABELLA CHIAVE→SERIE VIVE UNA VOLTA SOLA ═══════════════════════════════════
+# Stava dentro fetch_macro() e serviva al solo storico. Il calendario ufficiale delle uscite
+# (v395) ha bisogno ESATTAMENTE della stessa corrispondenza: quale serie FRED sta dietro a
+# quale indicatore. Scriverne una seconda copia sarebbe la classe gia' pagata qui tre volte —
+# MACRO_CARD_BY_PANEL che copriva 7 pannelli su 37, il registro fisso di C10, gli indici 16/17
+# del red team: un elenco duplicato invecchia da solo e in silenzio.
+# ⚠ Il marcatore `PRIMARIA:` non e' decorativo: dice che quel valore NON viene da FRED, quindi
+# il calendario FRED descriverebbe la ridistribuzione e non la fonte — che e' precisamente
+# l'errore di v393 sulla riga UMich. Chi legge questa tabella deve saltarle.
+STORICO_IND = [
+    # chiave     serie FRED               trasformazione  quanti punti
+    ("cpi",      "CPIAUCNS",              "yoy",          60),   # grezza: lo storico segue il valore
+    ("pce",      "PCEPI",                 "yoy",          60),
+    ("gdp",      "A191RL1Q225SBEA",       "diretta",      24),
+    ("retail",   "RSAFS",                 "mom",          60),
+    ("nfp",      "PAYEMS",                "delta_k",      60),
+    ("unemp",    "UNRATE",                "diretta",      60),
+    ("umich",    "PRIMARIA:umich",        "diretta",      60),   # v292 — vedi nota sotto
+    ("philly",   "GACDFSA066MSFRBPHI",    "diretta",      60),
+    # ⚠ v295 — `curve` e `t30` NON prendono lo storico qui, ed e' un difetto che ho
+    # introdotto io in v292: quelle due serie il file le aveva GIA'.
+    #   · 10A-2A → `macro.curve_history` (501 punti), che `serieIndicatore` legge da un
+    #     `case` dedicato: il mio storico non veniva nemmeno disegnato, era peso morto puro.
+    #   · 30 anni → `macro.tassi.storico.a30` (369 punti), messo li' da v289.
+    # Erano ~14KB spediti a ogni caricamento per niente, e — peggio del peso — due copie
+    # della stessa serie che possono divergere quando una delle due fonti cambia finestra.
+    # Prima di aggiungere una serie: cercare se il file ce l'ha gia'.
+    ("curve3m",  "T10Y3M",                "diretta",     250),
+    ("real10",   "DFII10",                "diretta",     250),
+    ("breakeven","T10YIE",                "diretta",     250),
+]
 
 
 def fetch_macro():
@@ -2818,6 +2922,23 @@ def fetch_macro():
     except Exception as e:  # noqa: BLE001
         print(f"!! SEC EDGAR: {e}", file=sys.stderr)
 
+    # ── v395: il calendario UFFICIALE delle uscite macro (vedi calendario_uscite_fred) ──
+    # ⚠ Il fallimento e' RUMOROSO e sorvegliato da validate_macro: una fonte che nessun check
+    # guarda puo' morire il giorno in cui nasce, ed e' costato la vita intera alle news (v389).
+    try:
+        _cal = calendario_uscite_fred(STORICO_IND)
+        if _cal:
+            macro["calendario_uscite"] = {
+                "per_chiave": _cal,
+                "fonte": "FRED release calendar (api.stlouisfed.org/fred/release/dates)",
+                "letto_il": datetime.now(timezone.utc).date().isoformat(),
+            }
+            print(f"   calendario FRED: {len(_cal)} indicatori con data di uscita CONFERMATA")
+        else:
+            print("!! calendario FRED: nessuna data restituita, resta la proiezione", file=sys.stderr)
+    except Exception as e:  # noqa: BLE001
+        print(f"!! calendario FRED: {e} — le uscite restano stimate", file=sys.stderr)
+
     # ═══ v309 — STAGIONALITA' DEL NASDAQ 100 E CICLO ELETTORALE ═════════════════════════
     # Il CEO: "reinserisci scheda macro per stagionalita' mensile nasdaq100 e se puoi aggiungi
     # anche variabile in concomitanza di elezioni midterm (valuta tu come strutturarlo)".
@@ -2892,28 +3013,6 @@ def fetch_macro():
     #
     # ⚠ I punti sono OSSERVAZIONI pubblicate, come per la curva dei tassi: niente riempimenti,
     # niente interpolazioni. Dove la fonte non ha pubblicato, non c'e' punto.
-    STORICO_IND = [
-        # chiave     serie FRED               trasformazione  quanti punti
-        ("cpi",      "CPIAUCNS",              "yoy",          60),   # grezza: lo storico segue il valore
-        ("pce",      "PCEPI",                 "yoy",          60),
-        ("gdp",      "A191RL1Q225SBEA",       "diretta",      24),
-        ("retail",   "RSAFS",                 "mom",          60),
-        ("nfp",      "PAYEMS",                "delta_k",      60),
-        ("unemp",    "UNRATE",                "diretta",      60),
-        ("umich",    "PRIMARIA:umich",        "diretta",      60),   # v292 — vedi nota sotto
-        ("philly",   "GACDFSA066MSFRBPHI",    "diretta",      60),
-        # ⚠ v295 — `curve` e `t30` NON prendono lo storico qui, ed e' un difetto che ho
-        # introdotto io in v292: quelle due serie il file le aveva GIA'.
-        #   · 10A-2A → `macro.curve_history` (501 punti), che `serieIndicatore` legge da un
-        #     `case` dedicato: il mio storico non veniva nemmeno disegnato, era peso morto puro.
-        #   · 30 anni → `macro.tassi.storico.a30` (369 punti), messo li' da v289.
-        # Erano ~14KB spediti a ogni caricamento per niente, e — peggio del peso — due copie
-        # della stessa serie che possono divergere quando una delle due fonti cambia finestra.
-        # Prima di aggiungere una serie: cercare se il file ce l'ha gia'.
-        ("curve3m",  "T10Y3M",                "diretta",     250),
-        ("real10",   "DFII10",                "diretta",     250),
-        ("breakeven","T10YIE",                "diretta",     250),
-    ]
     per_chiave = {i.get("key"): i for i in indicators}
     for chiave, sid, modo, quanti in STORICO_IND:
         ind = per_chiave.get(chiave)
@@ -4150,6 +4249,27 @@ def validate_macro(macro):
         # ⚠ il tasso BCE cambia solo alle riunioni, ma la serie e' GIORNALIERA: se smette di
         # aggiornarsi il valore resta plausibile e non si nota. L'eta' e' l'unico segnale.
         add("bce", bce.get("data"), 10, "ok" if (_a is not None and _a <= 10) else "stale")
+
+    # --- v395: il calendario ufficiale delle uscite ------------------------------------
+    # ⚠ Il modo in cui questa fonte muore e' SILENZIOSO per costruzione: se FRED non risponde
+    # il pacchetto continua a pubblicare le date, solo tornano a essere stime — nessuna riga
+    # sparisce, nessun numero diventa assurdo. E' la forma di guasto peggiore di questo
+    # progetto (la seduta persa, le news morte alla nascita): un run degradato che si presenta
+    # come riuscito. L'unico segnale e' l'assenza, quindi va guardata l'assenza.
+    cu = macro.get("calendario_uscite") or {}
+    _pc = cu.get("per_chiave") or {}
+    if not _pc:
+        add("calendario_uscite", None, 2, "missing",
+            "FRED non ha dato il calendario: le uscite macro tornano PROIETTATE dal ritardo "
+            "tipico della fonte, non confermate")
+    else:
+        # una data nel passato significa calendario fermo: le uscite si consumano da sole.
+        _fut = [k for k, v in _pc.items()
+                if (v.get("prossime") or [""])[0] >= str(today)]
+        add("calendario_uscite", cu.get("letto_il"), 2,
+            "ok" if _fut else "stale",
+            f"{len(_pc)} indicatori con data confermata, {len(_fut)} con la prossima ancora futura"
+            + ("" if _fut else " — nessuna data futura: calendario fermo o finestra esaurita"))
 
     return {"checks": checks, "alerts": alerts,
             "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}

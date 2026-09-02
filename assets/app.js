@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "381";
+const BUILD_VERSION = "382";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -1842,6 +1842,34 @@ function cadenzaDato(chiave, dataRilevazione) {
      cioe' un allarme di dato mancante su un dato appena pubblicato. Sui mensili l'errore c'era
      lo stesso, solo meno visibile: uno scarto di un giorno su un ritardo di trenta. */
   const iso = (d2) => `${d2.getFullYear()}-${String(d2.getMonth() + 1).padStart(2, "0")}-${String(d2.getDate()).padStart(2, "0")}`;
+
+  /* ═══ v395 — LA DATA DICHIARATA DALL'ENTE BATTE LA PROIEZIONE ══════════════════════════
+     Fin qui `prossimo` era una STIMA: si sommava alla rilevazione un passo piu' il ritardo
+     TIPICO della fonte (`giorniLag`). E' una regola del pollice — utile, ma su un CPI la
+     differenza fra il 13 e il 15 decide se un'analisi e' scritta prima o dopo il dato che
+     potrebbe smentirla, ed e' esattamente cio' che il pacchetto dichiarava di non sapere
+     ("TUTTE DATE STIMATE, non appuntamenti confermati").
+     La pipeline ora legge il calendario UFFICIALE di FRED (`calendario_uscite_fred`) e lo
+     mette in `macro.calendario_uscite`. Dove c'e', vince: non sono due derivazioni fra cui
+     scegliere la migliore (v390, EDGAR contro yfinance) ma un appuntamento dichiarato contro
+     una nostra congettura.
+     ⚠⚠ QUANDO LA DATA E' CONFERMATA E FUTURA, `scaduto`/`passata` SONO FALSI PER COSTRUZIONE:
+     un appuntamento di domani non puo' essere in ritardo. L'allarme "era atteso e NON E'
+     ARRIVATO" non viene perso, si sposta dove e' misurato meglio — `validate_macro` in
+     pipeline confronta gia' l'ETA' della rilevazione con la cadenza attesa di ogni serie, e
+     quello e' un controllo sul dato, non sulla nostra aritmetica delle date. Farli convivere
+     sulle stesse chiavi vorrebbe dire far rispondere due basi diverse alla stessa domanda,
+     che in questo progetto e' gia' costato tre volte (v161, v207, v230). */
+  const _uff = ((DATA && DATA.macro && DATA.macro.calendario_uscite
+                 && DATA.macro.calendario_uscite.per_chiave) || {})[chiave];
+  const _confermata = (_uff && Array.isArray(_uff.prossime))
+    ? _uff.prossime
+        .map((x) => String(x).slice(0, 10))
+        .filter((x) => /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(x))
+        .find((x) => new Date(x + "T00:00:00") >= oggi)
+    : null;
+  const pFin = _confermata ? new Date(_confermata + "T00:00:00") : p;
+
   return {
     rilevato: String(dataRilevazione).slice(0, 10), eta,
     /* ⚠ v350 — LA DATA DI PUBBLICAZIONE STIMATA ESCE DALLA FUNZIONE, e non e' un dettaglio.
@@ -1855,7 +1883,12 @@ function cadenzaDato(chiave, dataRilevazione) {
        Ciascuna e' corretta — i ritardi di pubblicazione delle tre fonti sono diversi — ma la
        forma non lo diceva. Ora le due date si nominano e l'eta' sta attaccata alla sua. */
     pubblicato: iso(rif),
-    prossimo: iso(p),
+    prossimo: iso(pFin),
+    /* la riga che stampa deve poter dire QUALE delle due cose sta guardando: un appuntamento
+       o una stima. Senza questo campo tornerebbe a chiamarle tutte allo stesso modo, che e'
+       il difetto che v395 corregge. */
+    confermato: !!_confermata,
+    calendario: _confermata ? (_uff.release || "calendario FRED") : null,
     /* ⚠ v266 — LE SERIE GIORNALIERE HANNO DUE GIORNI DI GRAZIA. Il Treasury non pubblica nei
        giorni di festa americana, e senza tolleranza ogni 4 luglio o Thanksgiving avrebbe acceso
        "ERA ATTESO E NON E' ARRIVATO" su un dato regolarissimo. Un allarme che suona quando non
@@ -1866,8 +1899,9 @@ function cadenzaDato(chiave, dataRilevazione) {
        perche' i due giorni di grazia se li era mangiati il fine settimana. Un allarme che
        suona di lunedi' su ogni serie giornaliera insegna a ignorarlo, e allora non serve piu'
        il giorno che serve davvero. */
-    scaduto: c.passo === "giornaliero" ? sommaGiorniLavorativi(p, 2) < oggi : p < oggi,
-    passata: p < oggi,
+    scaduto: _confermata ? false
+      : (c.passo === "giornaliero" ? sommaGiorniLavorativi(p, 2) < oggi : p < oggi),
+    passata: _confermata ? false : p < oggi,
     passo: c.passo, fonte: c.nome, nota: c.nota,
   };
 }
@@ -1933,7 +1967,18 @@ function rigaCadenza(chiave, dataRilevazione) {
         : c.passata
           ? ` · era atteso il ${it(c.prossimo)} e non è ancora arrivato, ma è dentro la tolleranza `
             + `di ${c.passo === "giornaliero" ? "due giorni lavorativi" : "un giorno"}: nessun allarme`
-          : ` · prossimo atteso ${it(c.prossimo)}`)
+          /* ⚠ v395 — "atteso" e "confermato" non sono sinonimi, e la riga deve dirlo.
+             Prima erano tutte "attese", cioe' proiezioni dal ritardo tipico della fonte, e
+             l'LLM non aveva modo di distinguere un appuntamento dichiarato dall'ente da una
+             congettura nostra. Ora dove FRED pubblica il calendario si scrive che e'
+             confermato E da quale comunicato esce; dove non c'e', resta la stima e si dice
+             che e' una stima. Un appuntamento che sembra confermato senza esserlo e' la
+             classe di difetto peggiore di questo progetto — e valeva anche al contrario. */
+          : (c.confermato
+              ? ` · prossima uscita CONFERMATA il ${it(c.prossimo)} (calendario ufficiale`
+                + `${c.calendario ? ", " + c.calendario : ""}, via FRED)`
+              : ` · prossimo atteso ${it(c.prossimo)} (STIMA dal ritardo tipico della fonte,`
+                + ` non un appuntamento dichiarato)`))
     + ` · ${c.fonte}, ${c.passo}`;
 }
 
@@ -2766,7 +2811,12 @@ function prossimiEventi(giorni = 7) {
     ev.push({ giorno: c.prossimo, tipo: "macro", nome: i.label,
               fonte: c.fonte || "", passo: c.passo || "",
               /* il valore precedente e' un FATTO e serve a leggere il dato nuovo quando esce */
-              precedente: i.value, stimata: true });
+              precedente: i.value,
+              /* ⚠ v395 — `stimata: true` era SCRITTO A MANO su ogni evento, quindi restava
+                 vero anche quando la data veniva dal calendario ufficiale. Un campo costante
+                 non e' un'informazione: e' una dichiarazione che non puo' essere smentita
+                 dai fatti. Ora lo decide `cadenzaDato`, che sa da dove viene la data. */
+              stimata: !c.confermato, calendario: c.calendario || null });
   }
 
   /* TRIMESTRALI: i titoli che la pipeline segue e per cui ha una data. */
@@ -8752,12 +8802,30 @@ function buildPrompt() {
   if (typeof prossimiEventi === "function") {
     const pv = prossimiEventi(14);   // v290 — la stessa finestra della pagina: a 7 giorni era vuota
     if (pv && pv.eventi && pv.eventi.length) {
-      const macro = pv.eventi.filter(e => e.tipo === "macro")
-        .map(e => `${e.giorno} ${e.nome}${e.precedente != null ? ` (precedente ${e.precedente})` : ""}`);
+      /* ⚠⚠ v395 — LA RIGA DICHIARAVA STIMATE ANCHE LE DATE CONFERMATE. Finche' le uscite
+         macro erano tutte proiettate dal ritardo tipico della fonte, "TUTTE DATE STIMATE" era
+         vero. Da quando la pipeline legge il calendario ufficiale di FRED non lo e' piu': una
+         cautela che non distingue e' informazione buttata via, perche' chi legge tratta allo
+         stesso modo un appuntamento del BLS e una nostra congettura. E' la stessa classe della
+         riga che diffamava un dato fresco (v393) e del `stimata: true` costante qui sopra: una
+         dichiarazione che non puo' essere smentita dai fatti non e' una dichiarazione.
+         ⚠ Il segno si porta PER RIGA, non nell'intestazione: dentro lo stesso elenco possono
+         convivere una macro confermata e una stimata, e mettere l'avvertenza in cima
+         costringerebbe a sceglierne una per tutte. */
+      const segna = (e) => `${e.giorno} ${e.nome}`
+        + (e.precedente != null ? ` (precedente ${e.precedente})` : "")
+        + (e.stimata ? " [STIMATA]" : " [CONFERMATA]");
+      const evMacro = pv.eventi.filter(e => e.tipo === "macro");
+      const macro = evMacro.map(segna);
+      const nConf = evMacro.filter(e => !e.stimata).length;
       const utili = pv.eventi.filter(e => e.tipo === "utili").map(e => `${e.giorno} ${e.nome}`);
-      lines.push(`- IN USCITA NELLE PROSSIME 2 SETTIMANE — TUTTE DATE STIMATE, non appuntamenti confermati `
-        + `(le macro proiettate dal ritardo tipico della fonte, le trimestrali le sposta l'emittente): `
-        + (macro.length ? `dati macro: ${macro.join(" · ")}. ` : "nessun dato macro atteso. ")
+      lines.push(`- IN USCITA NELLE PROSSIME 2 SETTIMANE — ogni data porta il proprio segno: `
+        + `[CONFERMATA] e' l'appuntamento dichiarato dall'ente che pubblica (calendario ufficiale `
+        + `FRED), [STIMATA] e' proiettata dal ritardo tipico della fonte e puo' spostarsi di `
+        + `giorni. Le trimestrali sono TUTTE stime: le sposta l'emittente. `
+        + (macro.length
+            ? `dati macro (${nConf} su ${evMacro.length} confermati): ${macro.join(" · ")}. `
+            : "nessun dato macro atteso. ")
         + (utili.length ? `trimestrali dei titoli seguiti: ${utili.join(" · ")}.` : "nessuna trimestrale fra i titoli seguiti.")
         + ` Un'analisi scritta prima o dopo una di queste uscite non e' la stessa analisi.`);
     }

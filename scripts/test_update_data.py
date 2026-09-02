@@ -355,7 +355,7 @@ check("umich: la fonte primaria è più fresca di FRED (il ritardo di licenza è
 
 # v254 — la soglia minima resta come rete anti-regressione (se qualcuno cancella meta' suite
 # il numero crolla e si vede), ma il totale annunciato e' quello VERO, contato a runtime.
-N_CHECKS_MINIMO = 96   # +5 al merge di v383-v388 (il pavimento sale, mai scende)
+N_CHECKS_MINIMO = 104  # +8 col calendario ufficiale v395 (sale, mai scende)
 
 # ── v186: FedWatch, il ramo del RIALZO non deve essere schiacciato a zero ──────────────
 # Il difetto reale: cut_prob = max(0, (mid-implied)/0.25*100). Con implied SOPRA il punto medio
@@ -917,6 +917,115 @@ check("v393 il CPI a/a esce dalla serie NON destagionalizzata, come il titolo de
 
 check("v393 lo storico del CPI segue la stessa serie del valore",
       '("cpi",      "CPIAUCNS",' in _SRC_UD)
+
+# ══ v395 — IL CALENDARIO UFFICIALE DELLE USCITE ═══════════════════════════════════════════
+import os                              # v395: la chiave API si legge dall'ambiente
+from datetime import date              # v395: le date del calendario sono giorni, non istanti
+# ⚠⚠ COSA SI PUO' PROVARE DA QUI E COSA NO, DETTO PRIMA. La FETCH verso FRED richiede la
+# chiave API, che vive nei secret di GitHub Actions: da qui non e' esercitabile, ed e'
+# esattamente la trappola v203 (logica provata, fetch mai provata) che e' costata la rimozione
+# di due blocchi interi. Quindi: qui si prova TUTTA la logica con una http_get finta —
+# raggruppamento per release, scarto delle date passate, salto delle serie non-FRED, rifiuto
+# senza chiave — e la fetch vera si esercita nel run del CI, leggendone il log e il data.json
+# prodotto. Cio' che non e' osservabile da qui non viene affermato.
+class _RispostaFinta:
+    def __init__(self, payload):
+        self._p = payload
+
+    def json(self):
+        return self._p
+
+
+_URL_VISTI = []
+
+
+def _fred_finta(url, **kw):
+    _URL_VISTI.append(url)
+    if "/fred/series/release" in url:
+        sid = url.split("series_id=")[1].split("&")[0]
+        # NFP e disoccupazione escono dallo STESSO comunicato: e' il caso che prova il
+        # raggruppamento. Se si perdesse, la pipeline farebbe il doppio delle chiamate.
+        rid = 50 if sid in ("PAYEMS", "UNRATE") else abs(hash(sid)) % 900 + 100
+        return _RispostaFinta({"releases": [{"id": rid, "name": f"Comunicato {rid}"}]})
+    if "/fred/release/dates" in url:
+        _ieri = (date.today() - timedelta(days=1)).isoformat()
+        _domani = (date.today() + timedelta(days=1)).isoformat()
+        _poi = (date.today() + timedelta(days=30)).isoformat()
+        return _RispostaFinta({"release_dates": [
+            {"release_id": 1, "date": "1999-01-01"},   # vecchia: va scartata
+            {"release_id": 1, "date": _ieri},          # ieri: va scartata
+            {"release_id": 1, "date": _domani},
+            {"release_id": 1, "date": _poi}]})
+    raise AssertionError("url inatteso: " + url)
+
+
+_vero_get, _vero_sleep = ud.http_get, ud.time.sleep
+_vecchia_chiave = os.environ.get("FRED_API_KEY")
+try:
+    ud.http_get = _fred_finta
+    ud.time.sleep = lambda *_a, **_k: None
+
+    # senza chiave non si indovina: si alza. Un ripiego silenzioso qui vorrebbe dire
+    # pubblicare "confermata" una data che nessuno ha confermato.
+    os.environ.pop("FRED_API_KEY", None)
+    _alzata = False
+    try:
+        ud.calendario_uscite_fred([("cpi", "CPIAUCNS")])
+    except RuntimeError:
+        _alzata = True
+    check("v395 senza FRED_API_KEY il calendario si rifiuta invece di indovinare", _alzata)
+
+    os.environ["FRED_API_KEY"] = "a" * 32
+    _URL_VISTI.clear()
+    _cal = ud.calendario_uscite_fred(ud.STORICO_IND)
+
+    check("v395 il calendario esce dalla stessa tabella dello storico, non da una seconda copia",
+          "STORICO_IND" in _SRC_UD_CODICE
+          and _SRC_UD_CODICE.count("STORICO_IND = [") == 1
+          and "calendario_uscite_fred(STORICO_IND)" in _SRC_UD_CODICE)
+
+    # ⚠ la classe v393: descrivere il calendario del RIPIEGO sotto un dato che viene dalla
+    # fonte primaria. UMich e' marcata PRIMARIA: e non deve comparire.
+    check("v395 le serie non-FRED (PRIMARIA:) restano fuori dal calendario FRED",
+          "umich" not in _cal
+          and any(k == "umich" for k, s, _m, _q in ud.STORICO_IND if s.startswith("PRIMARIA:")))
+
+    check("v395 gli indicatori FRED prendono la data dal calendario",
+          "cpi" in _cal and "nfp" in _cal and _cal["cpi"]["release_id"]
+          and _cal["cpi"]["serie"] == "CPIAUCNS")
+
+    _domani = (date.today() + timedelta(days=1)).isoformat()
+    check("v395 le date gia' passate sono scartate: 'prossima' vuol dire prossima",
+          all(v["prossime"] and v["prossime"][0] == _domani
+              and all(d >= date.today().isoformat() for d in v["prossime"])
+              for v in _cal.values()))
+
+    # NFP e UNRATE condividono la release 50: una sola chiamata alle date, non due.
+    _n_date = len([u for u in _URL_VISTI if "/fred/release/dates" in u and "release_id=50" in u])
+    check("v395 gli indicatori dello stesso comunicato costano UNA chiamata, non una per serie",
+          _n_date == 1 and _cal["nfp"]["release_id"] == 50 and _cal["unemp"]["release_id"] == 50)
+
+    # una fonte che nessun check guarda muore il giorno in cui nasce (v389): qui si verifica
+    # che l'ASSENZA sia rumorosa, perche' e' l'unico modo in cui questa fonte puo' guastarsi.
+    # ⚠ la prima stesura chiedeva solo "esiste un allarme che comincia per calendario_uscite":
+    # troppo debole. Iniettando la perdita del ramo `missing` scattava comunque il ramo `stale`
+    # dell'else, l'allarme c'era lo stesso e IL CHECK NON MORDEVA. Ora si verifica lo STATO,
+    # che e' la cosa che distingue "non e' arrivato" da "e' arrivato vecchio".
+    _dq = ud.validate_macro({"calendario_uscite": {"per_chiave": {}}})
+    _voci = [c for c in _dq["checks"] if c["key"] == "calendario_uscite"]
+    check("v395 il calendario assente diventa un allarme ESPLICITO, non un silenzio",
+          len(_voci) == 1 and _voci[0]["status"] == "missing"
+          and any(a.startswith("calendario_uscite: missing") for a in _dq["alerts"]))
+    _dq2 = ud.validate_macro({"calendario_uscite": {
+        "per_chiave": {"cpi": {"prossime": [_domani]}}, "letto_il": date.today().isoformat()}})
+    check("v395 col calendario presente e futuro il check non suona",
+          not any(a.startswith("calendario_uscite:") for a in _dq2["alerts"]))
+finally:
+    ud.http_get, ud.time.sleep = _vero_get, _vero_sleep
+    if _vecchia_chiave is None:
+        os.environ.pop("FRED_API_KEY", None)
+    else:
+        os.environ["FRED_API_KEY"] = _vecchia_chiave
 
 _TOT = len(ESEGUITI)
 check("v254 la suite non ha perso check per strada (soglia minima %d)" % N_CHECKS_MINIMO,

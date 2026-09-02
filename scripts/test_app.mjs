@@ -5046,8 +5046,24 @@ check("v363 · esiste lo stato 'atteso, non ancora arrivato, entro la tolleranza
     return no("l'allarme torna a dire \"prossimo atteso\" davanti a una data gia' passata");
   const iAll = b.indexOf("NON È ARRIVATO"), iMedio = b.indexOf("c.passata");
   if (iMedio < iAll) return no("lo stato intermedio viene prima dell'allarme: coprirebbe i ritardi veri");
-  if (!/passata: p < oggi/.test(bloccoDa(src, "function cadenzaDato", { max: 6000 })))
-    return no("cadenzaDato non espone piu' 'passata': il ramo intermedio non puo' accendersi");
+  /* ⚠ v395 — QUESTA RIGA CERCAVA LA STRINGA `passata: p < oggi` NEL SORGENTE, ed e' andata
+     rossa su codice piu' corretto di prima: v395 ci ha messo davanti il ramo del calendario
+     confermato (`_confermata ? false : p < oggi`), quindi la forma e' cambiata e il fatto no.
+     E' la QUINDICESIMA volta in questo progetto che un check ancorato a una stringa letterale
+     si rompe su una riformulazione senza che manchi niente. Ora il ramo si ESERCITA: si toglie
+     il calendario ufficiale (cosi' si passa dalla proiezione, che e' il caso da coprire) e si
+     chiede a `cadenzaDato` una rilevazione abbastanza vecchia perche' la stima cada nel
+     passato. Se `passata` non puo' piu' accendersi, questo mente e il check lo dice. */
+  const provaPassata = suVeri(`
+    const salva = DATA.macro.calendario_uscite;
+    delete DATA.macro.calendario_uscite;
+    const v = new Date(); v.setMonth(v.getMonth() - 6);
+    const iso = v.getFullYear() + "-" + String(v.getMonth() + 1).padStart(2, "0") + "-01";
+    const c = cadenzaDato("cpi", iso);
+    DATA.macro.calendario_uscite = salva;
+    return !!(c && c.passata === true && c.confermato === false);`);
+  if (provaPassata !== true)
+    return no("senza calendario ufficiale 'passata' non si accende piu': il ramo intermedio e' morto");
   return true;
 })());
 
@@ -5917,6 +5933,91 @@ check("v392 i fondi monetari non dichiarano piu' un'eta' con un riferimento ambi
   return /riferito a [a-z]+ \\d{4}/.test(r)
       && !/rilevazione \\d{4}-\\d{2}-\\d{2}/.test(r)
       && /NON e' la data in cui FRED lo ha pubblicato/.test(r);`));
+
+/* ═══ v395 — IL CALENDARIO UFFICIALE DELLE USCITE ═════════════════════════════════════
+   ⚠ IL FENOMENO NON C'E' NEI DATI E VA INIETTATO. `data.json` non porta ancora
+   `macro.calendario_uscite` (lo scrive la pipeline al primo run col codice nuovo), quindi un
+   check che si limitasse a leggere i dati veri sarebbe VERDE PER ASSENZA DEL FENOMENO — la
+   trappola gia' pagata cinque volte in questo progetto. Qui il calendario si costruisce, e i
+   check misurano la differenza fra il ramo confermato e quello stimato. */
+const _INIETTA_CAL = `
+  const _d = new Date(); _d.setDate(_d.getDate() + 5);
+  const _iso = _d.getFullYear() + "-" + String(_d.getMonth() + 1).padStart(2, "0")
+             + "-" + String(_d.getDate()).padStart(2, "0");
+  DATA.macro.calendario_uscite = { per_chiave: {
+      cpi: { prossime: [_iso], release: "Consumer Price Index", release_id: 10, serie: "CPIAUCNS" }
+    }, fonte: "FRED release calendar", letto_il: _iso };
+`;
+
+check("v395 dove il calendario ufficiale esiste, la data vince sulla proiezione", suVeri(_INIETTA_CAL + `
+  const c = cadenzaDato("cpi", DATA.macro.indicators.find(i => i.key === "cpi").date);
+  /* la proiezione dello stesso indicatore, ottenuta togliendo il calendario: le due devono
+     essere DIVERSE, altrimenti il check non sta misurando niente */
+  const salva = DATA.macro.calendario_uscite; delete DATA.macro.calendario_uscite;
+  const stima = cadenzaDato("cpi", DATA.macro.indicators.find(i => i.key === "cpi").date);
+  DATA.macro.calendario_uscite = salva;
+  return !!(c && c.confermato === true && c.prossimo === _iso
+            && c.calendario === "Consumer Price Index"
+            && stima && stima.confermato === false && stima.prossimo !== c.prossimo);`));
+
+check("v395 la riga dice QUALE delle due cose sta guardando, e non le confonde", suVeri(_INIETTA_CAL + `
+  const conf = rigaCadenza("cpi", DATA.macro.indicators.find(i => i.key === "cpi").date);
+  const salva = DATA.macro.calendario_uscite; delete DATA.macro.calendario_uscite;
+  const stim = rigaCadenza("cpi", DATA.macro.indicators.find(i => i.key === "cpi").date);
+  DATA.macro.calendario_uscite = salva;
+  return conf.indexOf("CONFERMATA") >= 0 && conf.indexOf("calendario ufficiale") >= 0
+      && stim.indexOf("CONFERMATA") < 0 && stim.indexOf("STIMA") >= 0;`));
+
+/* ⚠ `stimata` era SCRITTO A MANO come costante `true` su ogni evento: restava vero anche
+   quando la data era confermata. Un campo che non puo' essere smentito dai fatti non e'
+   un'informazione — stessa famiglia del gate circolare di v393. */
+check("v395 il segno 'stimata' segue la fonte della data, non e' una costante", suVeri(_INIETTA_CAL + `
+  const ev = prossimiEventi(400).eventi.filter(e => e.tipo === "macro");
+  if (!ev.length) return false;
+  const cpi = ev.find(e => /CPI/i.test(e.nome));
+  const altri = ev.filter(e => !/CPI/i.test(e.nome));
+  /* il CPI ha il calendario iniettato → confermato; gli altri no → stimati. Se il campo
+     fosse ancora costante, una delle due meta' sarebbe sbagliata. */
+  return !!cpi && cpi.stimata === false && altri.length > 0 && altri.every(e => e.stimata === true);`));
+
+/* ⚠⚠ QUINTA VOLTA CHE UN GATE TROVA SE' STESSO, e stavolta mi ha smascherato un check
+   CIRCOLARE. La prima stesura cercava "[CONFERMATA]" dentro tutta la riga — ma la LEGENDA che
+   spiega il marcatore lo contiene per forza ("[CONFERMATA] e' l'appuntamento dichiarato
+   dall'ente"). Quindi il check positivo era verde ANCHE con zero date confermate, e quello
+   negativo rosso su codice giusto. Gia' pagata in v213, v240 e v393: chi cerca la PRESENZA o
+   l'ASSENZA di un marcatore deve guardare la regione dei DATI, non la prosa che lo definisce.
+   Ora si legge il contatore che la riga stessa pubblica — "N su M confermati" — e i marcatori
+   si cercano solo dopo "dati macro (", cioe' dove stanno gli eventi. */
+const _CONTA_USCITE = `
+  const _rigaUscite = () => (buildPrompt().split(String.fromCharCode(10))
+      .find(x => x.indexOf("IN USCITA NELLE PROSSIME") >= 0) || "");
+  const _conteggio = (r) => { const m = r.match(/dati macro \\((\\d+) su (\\d+) confermati\\)/);
+      return m ? { conf: +m[1], tot: +m[2], eventi: r.slice(r.indexOf("dati macro (")) } : null; };
+`;
+
+check("v395 il pacchetto marca ogni uscita, invece di dichiararle tutte stimate",
+      suVeri(_INIETTA_CAL + _CONTA_USCITE + `
+  const r = _rigaUscite();
+  if (!r) return false;
+  const c = _conteggio(r);
+  /* la vecchia formula diceva "TUTTE DATE STIMATE": era vera prima, ed e' falsa da quando
+     esiste il calendario. Deve essere sparita, e al suo posto il segno per riga. */
+  return r.indexOf("TUTTE DATE STIMATE") < 0
+      && r.indexOf("le sposta l'emittente") >= 0
+      && !!c && c.conf >= 1 && c.tot > c.conf          // convivono confermate e stimate
+      && c.eventi.indexOf("[CONFERMATA]") >= 0
+      && c.eventi.indexOf("[STIMATA]") >= 0;`));
+
+check("v395 senza calendario nessuna uscita macro si dichiara confermata",
+      suVeri(_CONTA_USCITE + `
+  delete DATA.macro.calendario_uscite;
+  const r = _rigaUscite();
+  if (!r) return false;
+  const c = _conteggio(r);
+  const ev = prossimiEventi(400).eventi.filter(e => e.tipo === "macro");
+  return !!c && c.conf === 0 && c.tot >= 1
+      && c.eventi.indexOf("[CONFERMATA]") < 0
+      && ev.length >= 1 && ev.every(e => e.stimata === true);`));
 
 let fail = 0;
 for (const [name, ok] of T) {
