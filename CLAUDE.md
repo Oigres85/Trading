@@ -2638,6 +2638,49 @@ mio, rossa sul loro.
 > giorno non è solo fragile — è un buco nella sola rete rimasta. Entrambi sono stati riscritti
 > perché **costruiscono lo stato** che misurano invece di trovarlo.
 
+## 🏦 v404 — IL GRUPPO CORRELATO NON È UN RISCHIO SOLO
+
+Il grappolo del libro si costruisce sulla correlazione dei rendimenti con l'ancora, e mette nella
+stessa fascia chi **genera** cassa (MU, NVDA, AMD) e chi la **prende a prestito** (ORCL, CRWV,
+MSTR, RGTI). Si muovono insieme nella giornata media — la correlazione lo misura ed è vera — ma
+**l'evento che colpisce i secondi non è quello che colpisce i primi**: un salto dei tassi
+riprezza il costo del piano di chi deve finanziarlo, e sugli altri agisce solo come fattore di
+sconto.
+
+Misurato sul libro: **16,2% dell'azionario** ha flusso di cassa libero negativo su dodici mesi
+(MSTR 7,4% · ORCL 3,5% · CRWV 2,9% · RGTI 2,4%), contro **83,8%** che si autofinanzia. Di quel
+16,2%, **8,8% sta dentro il gruppo correlato al 74%**. Un pacchetto che pubblica solo il 74% fa
+concludere che una stretta creditizia colpisca tre quarti del libro; la misura dice un'altra cosa.
+
+> È un taglio **trasversale** al grappolo, non un secondo raggruppamento dello stesso tipo: le
+> due misure rispondono a domande diverse e vanno lette insieme.
+
+⚠⚠ **SOLO SEGNI E RAPPORTI, MAI GRANDEZZE FRA TITOLI.** `fcf_ttm` è nella valuta di bilancio
+dell'emittente: **SKHY lo pubblica in won** (40.689 miliardi), ORCL in dollari. Ordinarli o
+sommarli sarebbe la classe che il gate valuta sorveglia dalla v183. Il **segno** del flusso e il
+**rapporto** di copertura non hanno valuta, ed è esattamente ciò che serve — un check verifica che
+nella riga non finisca nessun importo.
+
+⚠ **La soglia è una convenzione dichiarata** (v240), non un dato del file, e **non è un giudizio
+sulla società**: costruire a debito può essere la scommessa giusta — cambia il canale da cui il
+rischio arriva, non il merito della scommessa. Senza quella riga il blocco produce l'analisi
+facile ("il libro è troppo indebitato, riduci"), che è un ordine costruito su dati che il sistema
+non ha.
+
+⚠ **Il peso su cui il dato manca si dichiara** invece di finire fra gli autofinanziati: "genera
+cassa" e "non lo so" si leggono uguali e sono cose diverse.
+
+### 🕳️ E C9 ha preso un difetto della v403 che era invisibile fino al run successivo
+La riga del beta condizionato diceva *"Selezionare… selezionarle…"* — due imperativi dentro la
+coda, **quinta volta** in questo progetto (v156, v179, v180, v389, v402). Non era stato visto
+prima perché il blocco **non si rendeva**: `evento` lo scrive la pipeline, e al momento del merge
+il `data.json` non lo aveva ancora. **Ramo irraggiungibile per i DATI, non per l'orologio** — la
+classe v390, che torna con una causa nuova.
+
+> Quando si aggiunge un blocco che dipende da un campo che la pipeline deve ancora produrre, i
+> gate di coerenza non lo vedono al momento del merge: vanno rieseguiti dopo il primo run che
+> quel campo lo porta.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

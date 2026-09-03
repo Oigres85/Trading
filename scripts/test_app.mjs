@@ -6611,8 +6611,10 @@ check("v403 la riga dichiara che la selezione e' sul canale, non sul titolo", su
   if (!r) return false;
   r.tv = JSON.parse(JSON.stringify(${JSON.stringify(TV_FINTO)}));
   const p = buildPromptTicker("MU");
-  return p.indexOf("si sceglie sulla causa, non sull'effetto") >= 0
-      && p.indexOf("selezionarle sul movimento del") >= 0;`));
+  /* ⚠ riagganciato: la formulazione e' cambiata perche' C9 ha preso due imperativi nella coda.
+     L'invariante non e' la frase, e' che la riga dichiari SU COSA avviene la selezione. */
+  return p.indexOf("LA SELEZIONE E' SULL'ESCURSIONE DEL CANALE") >= 0
+      && p.indexOf("mai sul movimento del titolo") >= 0;`));
 
 check("v403 senza il terzo sguardo nei dati la riga non compare e non si inventa", suVeri(`
   const r = DATA.watchlist.find(x => x.ticker === "MU");
@@ -6623,6 +6625,70 @@ check("v403 senza il terzo sguardo nei dati la riga non compare e non si inventa
   const p = buildPromptTicker("MU");
   return p.indexOf("quando il canale si muove FORTE") < 0
       && p.indexOf("QUESTO R² NON SI CONFRONTA") < 0;`));
+
+/* ═══ v404 — IL GRUPPO CORRELATO NON E' UN RISCHIO SOLO ════════════════════════════════════
+   Il grappolo mette nella stessa fascia chi genera cassa e chi la prende a prestito: si muovono
+   insieme nella giornata media, ma una stretta del credito non li colpisce allo stesso modo.
+   Il gate verifica che il taglio esista, che dichiari di essere una CONVENZIONE, e che nomini
+   quali dei dipendenti stanno anche nel gruppo correlato — che e' l'informazione che nessuna
+   delle due misure da sola porta. */
+check("v404 il pacchetto pubblica la dipendenza dal mercato dei capitali", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("DIPENDENZA DAL MERCATO DEI CAPITALI") >= 0
+      && p.indexOf("flusso di cassa LIBERO NEGATIVO su dodici mesi") >= 0
+      && p.indexOf("[nel gruppo correlato]") >= 0;`));
+
+check("v404 la soglia si dichiara convenzione e non giudizio sulla societa'", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("CONVENZIONE DICHIARATA, non un dato del file") >= 0
+      && p.indexOf("non e' un giudizio sulla societa'") >= 0;`));
+
+/* ⚠⚠ IL VINCOLO DI VALUTA: `fcf_ttm` e' nella valuta di bilancio dell'emittente — SKHY lo
+   pubblica in won. Un ordinamento o una somma di quei numeri sarebbe la classe che il gate
+   valuta sorveglia dalla v183. Il check prova la PROPRIETA': nessun importo di flusso finisce
+   nella riga, che porta solo percentuali di peso e rapporti di copertura. */
+check("v404 nella riga non finisce nessun importo di flusso: solo pesi e rapporti", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  const i = p.indexOf("DIPENDENZA DAL MERCATO DEI CAPITALI");
+  if (i < 0) return false;
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  return riga.indexOf("mld") < 0 && riga.indexOf("milioni") < 0
+      && riga.indexOf("non sono commensurabili") >= 0;`));
+
+/* ⚠ il numero che il blocco esiste per dare: l'evento sul credito colpisce la parte che
+   dipende, NON il peso del gruppo correlato. Se i due coincidessero la riga non servirebbe. */
+check("v404 la riga contrappone il peso di chi dipende a quello del gruppo correlato", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("colpisce") >= 0
+      && p.indexOf("del libro, non il") >= 0
+      && p.indexOf("del gruppo") >= 0;`));
+
+/* ⚠ un titolo che genera cassa NON deve comparire fra i dipendenti, e uno che la brucia SI':
+   la classificazione si esercita costruendo lo stato, non sperando nei dati del giorno (v403). */
+check("v404 la classificazione segue il SEGNO del flusso, non il nome del titolo", suVeri(`
+  const nv = DATA.watchlist.find(x => x.ticker === "NVDA");
+  if (!nv || !nv.combustione) return false;
+  nv.combustione.fcf_ttm = -1;                       // NVDA diventa dipendente per costruzione
+  const p = buildPromptTicker("CRWV");
+  const i = p.indexOf("Chi dipende:");
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  return i >= 0 && riga.indexOf("NVDA") >= 0;`));
+
+/* ⚠ IL PESO SU CUI IL DATO MANCA SI DICHIARA, non sparisce dentro gli autofinanziati: chi legge
+   non distingue "genera cassa" da "non lo so", e sono due cose diverse. La prima stesura di
+   questo check toglieva il dato a TUTTI e usciva con un return true anticipato quando la riga
+   spariva — verde per assenza del fenomeno, e il meta-gate dei dormienti l'ha preso. Ora il dato
+   si toglie a UNA posizione sola, cosi' la riga c'e' per costruzione e il buco deve comparirci. */
+check("v404 il peso su cui il dato manca si dichiara invece di finire fra gli autonomi", suVeri(`
+  const mu = DATA.watchlist.find(x => x.ticker === "MU");
+  if (!mu || !mu.combustione) return false;
+  delete mu.combustione.fcf_ttm;
+  const p = buildPromptTicker("CRWV");
+  const i = p.indexOf("DIPENDENZA DAL MERCATO DEI CAPITALI");
+  if (i < 0) return false;
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  return riga.indexOf("su cui il dato manca") >= 0
+      && riga.indexOf("MU") < 0;`));
 
 let fail = 0;
 for (const [name, ok] of T) {

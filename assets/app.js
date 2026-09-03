@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "391";
+const BUILD_VERSION = "392";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -9543,6 +9543,55 @@ function profiliRischio() {
    ⚠ Il gruppo NON e' una lista di settore: e' chi ha correlazione dei rendimenti giornalieri
    sopra soglia con l'ancora, misurata sulle sedute in comune. Un'etichetta di settore direbbe
    che MSTR (bitcoin) e NVDA sono due scommesse diverse; la correlazione dice se lo sono. */
+/* ═══ v404 — IL GRUPPO CORRELATO NON E' UN RISCHIO SOLO ═════════════════════════════════════
+   Il grappolo del libro si costruisce sulla correlazione dei rendimenti con l'ancora, e mette
+   nella stessa fascia chi GENERA cassa (MU, NVDA, AMD) e chi la PRENDE A PRESTITO (ORCL, CRWV).
+   Si muovono insieme nella giornata media — la correlazione lo misura ed e' vera — ma l'evento
+   che colpisce i secondi non e' quello che colpisce i primi: un salto dei tassi riprezza il
+   costo del piano di chi deve finanziarlo, e per gli altri e' solo un fattore di sconto.
+   Misurato sul libro: dentro il gruppo correlato al 74% dell'azionario, la parte che dipende dal
+   mercato dei capitali vale meno di un nono. Un pacchetto che pubblica solo il 74% fa concludere
+   che una stretta creditizia colpisca tre quarti del libro; la misura dice un'altra cosa.
+
+   ⚠⚠ SOLO SEGNI E RAPPORTI, MAI GRANDEZZE CONFRONTATE FRA TITOLI. `fcf_ttm` e' nella valuta di
+   bilancio dell'emittente: SKHY lo pubblica in won (40.689 miliardi) e ORCL in dollari. Sommarli
+   o ordinarli sarebbe la classe che il gate valuta sorveglia da v183. Il segno del flusso e il
+   rapporto di copertura non hanno valuta, e sono esattamente cio' che serve.
+
+   ⚠ LA REGOLA E' UNA CONVENZIONE DICHIARATA, non un dato del file (v240): "dipende dal capitale
+   esterno" = flusso di cassa LIBERO negativo su dodici mesi, cioe' il piano corrente non si paga
+   con la cassa che genera. Non e' un giudizio sulla societa': una societa' che costruisce a
+   debito puo' essere la scommessa giusta — e' il modo in cui il rischio ARRIVA che cambia. */
+function dipendenzaFinanziaria(azionarie, totAz) {
+  const fuori = { dipende: [], autonome: [], ignote: [] };
+  for (const x of azionarie) {
+    const r = x.r || {};
+    const fcf = numero(((r.combustione || {}).fcf_ttm));
+    const cop = numero(((r.credito || {}).copertura));
+    const voce = { tk: r.ticker, peso: totAz > 0 ? x.v / totAz * 100 : null, copertura: Number.isFinite(cop) ? cop : null };
+    if (!Number.isFinite(fcf)) fuori.ignote.push(voce);
+    else if (fcf < 0) fuori.dipende.push(voce);
+    else fuori.autonome.push(voce);
+  }
+  const somma = (a) => a.reduce((t, x) => t + (Number.isFinite(x.peso) ? x.peso : 0), 0);
+  fuori.pesoDipende = somma(fuori.dipende);
+  fuori.pesoAutonome = somma(fuori.autonome);
+  fuori.pesoIgnote = somma(fuori.ignote);
+  fuori.dipende.sort((a, b) => (b.peso || 0) - (a.peso || 0));
+  return fuori;
+}
+
+/* La severita' dentro chi dipende: quanto pesa gia' il servizio del debito. Anche questa e' una
+   convenzione, e la banda si scrive accanto al numero invece di essere sottintesa. */
+function severitaCopertura(cop) {
+  if (!Number.isFinite(cop)) return "copertura degli interessi non disponibile";
+  if (cop < 1) return `copertura degli interessi ${fmtNum.format(cop)}× — la gestione operativa non li copre`;
+  if (cop < 5) return `copertura degli interessi ${fmtNum.format(cop)}× — li copre con poco margine`;
+  /* ⚠ si arrotonda solo sopra le dieci volte: a 5,25 stampare "5×" perde proprio la cifra che
+     colloca il valore rispetto alla banda che comincia li'. */
+  return `copertura degli interessi ${fmtNum.format(cop >= 10 ? Math.round(cop) : cop)}× — il servizio del debito non e' il vincolo, lo e' la dimensione del piano`;
+}
+
 function gruppoFattore(azionarie, totAz) {
   const rendGiorn = (t) => {
     const sp = (((azionarie.find(x => x.r.ticker === t) || {}).r || {}).sparks || {}).m6 || [];
@@ -10106,6 +10155,34 @@ function contestoPortafoglio(tkCorrente) {
     + `. ⚠ Titoli che condividono lo stesso fattore sono UNA scommessa scritta piu' volte, non `
     + `posizioni indipendenti: l'esposizione del libro a quel fattore e' la loro somma, `
     + `non il peso del singolo nome.`);
+  /* ═══ v404 — E DENTRO QUEL GRUPPO CI SONO DUE RISCHI, NON UNO ══════════════════════════════
+     Il grappolo misura la co-movimentazione nella giornata media, ed e' vera. Ma un salto dei
+     tassi o una stretta del credito non colpisce chi si autofinanzia e chi prende a prestito
+     allo stesso modo: per i primi e' un fattore di sconto, per i secondi e' il costo del piano.
+     Senza questa riga il pacchetto fa concludere che una stretta creditizia colpisca l'intero
+     peso del gruppo. */
+  const dip = dipendenzaFinanziaria(azionarie, totAz);
+  if (dip.dipende.length || dip.autonome.length) {
+    const nelGruppo = new Set(semi.map(x => x.r.ticker));
+    const elenco = dip.dipende.map(x => `${x.tk} ${x.peso.toFixed(1)}%`
+      + `${nelGruppo.has(x.tk) ? " [nel gruppo correlato]" : ""} (${severitaCopertura(x.copertura)})`).join(" · ");
+    L.push(`DIPENDENZA DAL MERCATO DEI CAPITALI (un taglio TRASVERSALE al gruppo qui sopra, non un `
+      + `secondo raggruppamento dello stesso tipo): ${dip.pesoDipende.toFixed(1)}% dell'azionario e' in `
+      + `societa' con flusso di cassa LIBERO NEGATIVO su dodici mesi — il piano corrente non si paga con `
+      + `la cassa che generano — contro ${dip.pesoAutonome.toFixed(1)}% che si autofinanzia`
+      + `${dip.pesoIgnote > 0.05 ? ` e ${dip.pesoIgnote.toFixed(1)}% su cui il dato manca` : ""}. `
+      + `${elenco ? `Chi dipende: ${elenco}. ` : ""}`
+      + `⚠⚠ E' LA DISTINZIONE CHE IL GRAPPOLO NON FA: quei nomi si muovono insieme agli altri nella `
+      + `giornata media, ma un rialzo dei tassi o una stretta del credito riprezza il COSTO DEL LORO `
+      + `PIANO, mentre sugli autofinanziati agisce solo come fattore di sconto. Un evento sul credito `
+      + `colpisce ${dip.pesoDipende.toFixed(1)}% del libro, non il ${pesoSemi.toFixed(0)}% del gruppo. `
+      + `⚠ CONVENZIONE DICHIARATA, non un dato del file: la soglia e' il SEGNO del flusso libero. E non `
+      + `e' un giudizio sulla societa' — costruire a debito puo' essere la scommessa giusta: cambia il `
+      + `CANALE da cui il rischio arriva, non il merito della scommessa. `
+      + `⚠ Nessun importo e nessun confronto di grandezze fra titoli: i flussi sono nella valuta di `
+      + `bilancio di ciascun emittente e non sono commensurabili. Qui si usano solo il segno e un `
+      + `rapporto, che valuta non ne hanno.`);
+  }
   /* il contributo al rischio, che e' un ordinamento DIVERSO dal peso */
   const conMcr = azionarie.filter(x => Number.isFinite(numero(x.r.risk_contrib_pct)))
     .map(x => ({ tk: x.r.ticker, peso: x.v / totAz * 100, mcr: numero(x.r.risk_contrib_pct) }))
@@ -11682,9 +11759,14 @@ function tvBlocchi(tk) {
           + `sottoinsieme scelto, quindi ha un DENOMINATORE diverso. Quello che si confronta e' il BETA`
           + `${scarto != null ? `, ed e' ${scarto > 0 ? `${scarto}% PIU' AMPIO` : `${-scarto}% piu' contenuto`} `
               + `di quello della finestra lunga` : ""}: dice come si comporta il canale nelle giornate che `
-          + `contano, che non sono la giornata media. ⚠ Selezionare le sedute sull'escursione del CANALE non `
-          + `distorce il beta (si sceglie sulla causa, non sull'effetto); selezionarle sul movimento del `
-          + `TITOLO lo distorcerebbe, e non e' quello che il sistema fa.`);
+          /* ⚠ v404 — C9 HA PRESO QUESTA RIGA, e solo quando la pipeline ha prodotto il campo:
+             il ramo era irraggiungibile PER I DATI, non per l'orologio (classe v390). Diceva
+             "Selezionare… selezionarle…", cioe' due imperativi dentro la coda — quinta volta in
+             questo progetto (v156, v179, v180, v389, v402). Il FATTO e' che la selezione avviene
+             sulla causa: si dichiara cosa fa il sistema, non cosa deve pensare chi legge. */
+          + `contano, che non sono la giornata media. ⚠ LA SELEZIONE E' SULL'ESCURSIONE DEL CANALE, mai sul `
+          + `movimento del titolo: una selezione sulla CAUSA lascia il beta corretto, una selezione `
+          + `sull'EFFETTO lo distorcerebbe.`);
       }
     });
     F.push(`⚠⚠ UN BETA SENZA IL SUO R² E' MEZZO NUMERO. Un beta di 1,8 sui tassi con R² 0,01 non `
