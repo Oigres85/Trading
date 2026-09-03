@@ -7271,6 +7271,87 @@ check("v412 il ramo d'ampiezza cita ogni grandezza UNA volta sola", suVeriEsito(
      direzione che i dati non portano */
   return riga.indexOf("rally") < 0 || "la nota reintroduce 'rally' su un mese che non lo e'";`));
 
+/* ═══ v413 — DUE DIFETTI CHE 501 CHECK NON VEDEVANO, TROVATI LEGGENDO IL PACCHETTO ══════
+   Il CEO ha incollato i due pacchetti chiedendo di eseguirli come il destinatario e di sanare
+   quello che emergeva. Nessuno dei due difetti faceva fallire un gate.
+   ⚠ Il primo e' la SESTA derivazione dei giorni alla trimestrale: la riga del pacchetto di
+   titolo contava ISTANTI (Date.now() meno la mezzanotte, arrotondato) mentre tutto il resto
+   passa da `giorniAllaTrimestrale`, che conta GIORNI DI CALENDARIO. Sul pacchetto CRWV del
+   03/09 alle 21:05: 68 contro 69, lo stesso evento con due numeri nello stesso pacchetto.
+   La v228 aveva chiuso questa classe e il suo commento dichiarava "chiunque chieda FRA QUANTO
+   RIPORTA passa da questa funzione": era vero per le cinque derivazioni trovate allora. */
+check("v413 i giorni alla trimestrale vengono da UNA sola derivazione", (() => {
+  /* ⚠ si guarda il CODICE senza commenti: quelli che spiegano il difetto contengono per forza
+     le formule che il gate cerca (v213, v240, v393, v409). */
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const artigianali = [];
+  /* qualunque differenza fra una data e "adesso" divisa per un giorno, fuori dalla funzione */
+  for (const m of codice.matchAll(/(Date\.now\(\)|new Date\(\))[^;\n]{0,80}?86400000/g)) {
+    const i = codice.lastIndexOf("function ", m.index);
+    const nome = codice.slice(i, codice.indexOf("(", i)).replace("function ", "").trim();
+    if (nome !== "giorniAllaTrimestrale") artigianali.push(nome + ": " + m[0].slice(0, 46));
+  }
+  /* ⚠ NON tutte sono sulla trimestrale — l'eta' di un dato e' un'altra grandezza. Si guarda
+     solo dentro il blocco che stampa la trimestrale del titolo. */
+  const i = codice.indexOf("Prossima trimestrale");
+  const intorno = codice.slice(Math.max(0, i - 900), i + 400);
+  if (/86400000/.test(intorno)) {
+    return no("la riga della prossima trimestrale calcola i giorni per conto proprio: " + intorno.slice(intorno.indexOf("86400000") - 70, intorno.indexOf("86400000") + 10));
+  }
+  return intorno.indexOf("giorniAllaTrimestrale") >= 0
+    || no("la riga della prossima trimestrale non passa dalla funzione unica");
+})());
+
+check("v413 lo stesso evento porta lo stesso numero di giorni in tutto il pacchetto", suVeriEsito(`
+  /* si COSTRUISCE lo stato invece di aspettare che i dati lo producano (v402) */
+  const oggi = new Date(); oggi.setDate(oggi.getDate() + 40);
+  const iso = oggi.getFullYear() + "-" + String(oggi.getMonth() + 1).padStart(2, "0")
+            + "-" + String(oggi.getDate()).padStart(2, "0");
+  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) {
+    if (r && String(r.ticker).toUpperCase() === "CRWV") r.earnings_date = iso;
+  }
+  const p = buildPromptTicker("CRWV");
+  const scheda = p.split(String.fromCharCode(10)).find(r => r.indexOf("Prossima trimestrale") >= 0);
+  const libro = p.split(String.fromCharCode(10)).find(r => r.indexOf("- CRWV: medie") >= 0);
+  if (!scheda || !libro) return "una delle due righe non compare: il check non misura niente";
+  const a = (scheda.match(/fra (\\d+) giorn/) || [])[1];
+  const b = (libro.match(/trimestrale fra (\\d+) giorni/) || [])[1];
+  if (!a || !b) return "giorni non estratti: scheda=" + scheda.slice(0, 60) + " libro=" + libro.slice(-40);
+  return a === b || ("stesso evento, due conteggi: la scheda dice " + a + " e il libro " + b);`));
+
+check("v413 il giorno stesso si scrive OGGI, non 'fra 0 giorni'", suVeriEsito(`
+  const d = new Date();
+  const iso = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")
+            + "-" + String(d.getDate()).padStart(2, "0");
+  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) {
+    if (r && String(r.ticker).toUpperCase() === "CRWV") r.earnings_date = iso;
+  }
+  const p = buildPromptTicker("CRWV");
+  if (p.indexOf("fra 0 giorni") >= 0) return "il giorno della trimestrale e' scritto 'fra 0 giorni'";
+  return p.indexOf("Prossima trimestrale OGGI") >= 0
+    || "il giorno stesso non e' dichiarato OGGI";`));
+
+/* ⚠⚠ Il secondo difetto era piu' grave del primo: l'intestazione del blocco del libro diceva
+   "contesto, NON richiesta di analisi del portafoglio" — scritta per il pacchetto di TITOLO,
+   dove e' vera, e resa identica in quello MACRO, dove la testata ordina l'opposto: [B6] impone
+   di portare ogni conclusione fino alle posizioni e [B7] chiede alleggerimenti, vendite e
+   incrementi come chiusura obbligatoria. Un modello che obbedisce alla coda rifiuta cio' che la
+   testata gli ha ordinato, ed e' la contraddizione che il collaudo B5 gli impone di segnalare —
+   prodotta dal pacchetto stesso. Classe v405: una riga scritta per un contesto, resa in due. */
+check("v413 il pacchetto macro non nega l'analisi del portafoglio che la sua testata ordina", suVeriEsito(`
+  const macro = buildCIOText();
+  const tit = buildPromptTicker("CRWV");
+  if (macro.indexOf("non richiesta di analisi del portafoglio") >= 0) {
+    return "il pacchetto macro dichiara che il libro non e' da analizzare, mentre [B6] e [B7] lo impongono";
+  }
+  /* nel pacchetto di TITOLO quella riga e' invece corretta e deve restare */
+  if (tit.indexOf("non richiesta di analisi del portafoglio") < 0) {
+    return "nel pacchetto di titolo il libro ha smesso di essere dichiarato contesto";
+  }
+  /* e il macro deve dire il contrario in modo esplicito */
+  return macro.indexOf("E' L'OGGETTO DELL'ANALISI") >= 0
+    || "il pacchetto macro non dichiara che il libro e' l'oggetto dell'analisi";`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
