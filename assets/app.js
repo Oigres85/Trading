@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "411";
+const BUILD_VERSION = "412";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8513,10 +8513,20 @@ function buildPrompt(opz) {
          Restano i FATTI, che sono quelli utili: di quanto i due indici divergono, cosa significa
          meccanicamente, e perche' riguarda QUESTO libro. La conseguenza la trae chi legge, che
          e' precisamente cio' che [B7] gli chiede. */
-      lines.push(`- ⚠ [AMPIEZZA IN DETERIORAMENTO] ${base}. ${br.note || ""} `
-        + `Il cap-pesato sta facendo meglio dell'equi-pesato di ${signTxt(br.divergence_pp, "pp")}: `
-        + `meccanicamente vuol dire che il movimento dell'indice e' retto da POCHI nomi grandi e `
-        + `non dall'azione media del mercato. ⚠ PERCHE' RIGUARDA QUESTO LIBRO IN PARTICOLARE: le `
+      /* ⚠⚠ `br.note` NON SI RIPUBBLICA, e non e' un taglio di un fatto: e' un taglio di una
+         RIPETIZIONE. La pipeline la scrive come "SPY +0.5% vs RSP -0.1% a 1M (spread +0.6pp):
+         il rally e' retto dalle megacap" — cioe' gli STESSI TRE NUMERI di `base`, arrotondati
+         piu' grossolanamente: 0,45 diventa 0,5 e 0,56 diventa 0,6. Affiancarli e' "stessa
+         grandezza con valori diversi", la classe che il collaudo B5 ordina al lettore di
+         segnalare e che un LLM reale ci ha appena segnalato sull'autonomia di cassa (v409).
+         ⚠ E la sua coda porta il difetto v405: chiama "rally" un mese in cui il cap-pesato fa
+         +0,45% e l'equi-pesato scende. Nessun fatto si perde — i tre numeri restano in `base`,
+         e l'interpretazione la fa la frase qui sotto, che dice il meccanismo senza affermare
+         una direzione che i dati non portano. */
+      lines.push(`- ⚠ [AMPIEZZA IN DETERIORAMENTO] ${base}: `
+        + `il cap-pesato sta facendo meglio dell'equi-pesato, e meccanicamente vuol dire che il `
+        + `movimento dell'indice e' retto da POCHI nomi grandi e non dall'azione media del `
+        + `mercato. ⚠ PERCHE' RIGUARDA QUESTO LIBRO IN PARTICOLARE: le `
         + `posizioni piu' pesanti sono megacap correlate fra loro (il gruppo di fattore misurato `
         + `nel blocco del libro), quindi il libro e' esposto proprio ai nomi che stanno reggendo `
         + `l'indice da soli — la stessa concentrazione che lo ha fatto salire e' quella che lo `
