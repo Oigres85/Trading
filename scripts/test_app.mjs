@@ -780,10 +780,16 @@ check("v164 de-ratchet: un candidato già detenuto dichiara che accumulare azzer
 {
   const html4 = readFileSync(join(ROOT, "index.html"), "utf8");
   const PORTANTI = [
-    'id="updated-at"', 'id="btn-cio"', 'id="btn-refresh"',
+    'id="updated-at"', 'id="btn-refresh"',
     /* v259 — 'id="tk-go"' NON e' piu' un elemento portante: il CEO ha chiesto UN SOLO bottone
        e i due sono stati fusi in #btn-cio, che decide dal contenuto del box. La guardia non e'
-       stata indebolita — l'invariante che conta e' che l'AZIONE esista, e #btn-cio la porta. */
+       stata indebolita — l'invariante che conta e' che l'AZIONE esista, e #btn-cio la porta.
+       ⚠ v407 — E ORA LE AZIONI SONO DUE, quindi le porte tornano due: #btn-libro e #btn-titolo.
+       L'invariante non e' cambiato ne' e' stato allentato — dice ancora "l'azione esiste" — ma
+       le azioni non sono piu' la stessa: il primo tasto guarda tutte le posizioni insieme, il
+       secondo scava su una sola con la coda macro potata. Un solo id qui dentro lascerebbe
+       sparire l'altro pacchetto senza che niente morda. */
+    'id="btn-libro"', 'id="btn-titolo"',
     'id="tk-input"', 'id="tk-esito"',                           // analisi spot del titolo
     'id="tv-chart"', 'id="tv-tf"', 'id="tv-nota"',              // v257 grafico TradingView
     /* ⚠ v275 — LA WATCHLIST NON E' PIU' PORTANTE PERCHE' NON C'E' PIU'. Richiesta del CEO:
@@ -6861,6 +6867,122 @@ check("v406 il pacchetto dichiara cosa la pagina mostra e lui non porta, con la 
   return p.indexOf("QUELLO CHE LA PAGINA MOSTRA E QUESTO PACCHETTO NON PORTA") >= 0
       && p.indexOf("si leggono uguali e sono cose diverse") >= 0
       && p.indexOf("stesso segnale contato due volte") >= 0;`));
+
+/* ═══ v407 — DUE TASTI, DUE STANZE, E IL SILENZIO CHE NON DEVE PIU' ESSERCI ═══════════════
+   Richiesta del CEO: due tasti distinti. Il difetto che la separazione toglie era misurabile:
+   con un bottone solo la scelta la faceva il contenuto del box del ticker, quindi chi voleva il
+   quadro macro col box ancora pieno riceveva IN SILENZIO l'analisi di un titolo, e viceversa.
+   ⚠ Il gate non guarda se i due bottoni ESISTONO — la guardia strutturale lo fa gia' — ma se
+   sono COLLEGATI a due teste diverse, che e' la classe v316/v399: il bottone del comparto
+   esisteva, `scegliSettore` esisteva, e i due non erano agganciati. */
+check("v407 i due tasti sono agganciati a due teste diverse dello stesso costruttore", (() => {
+  /* ⚠ i commenti si tolgono prima di leggere: una chiamata COMMENTATA farebbe passare il gate
+     mentre il bottone e' inerte (v213, v240, v389). */
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const libro = /#btn-libro[\s\S]{0,120}?copyCIOText\(\s*"libro"\s*\)/.test(codice);
+  const titolo = /#btn-titolo[\s\S]{0,120}?copyCIOText\(\s*"titolo"\s*\)/.test(codice);
+  /* e l'invio nel box del ticker deve fare quello che fa il tasto che gli sta accanto */
+  const invio = /#tk-input[\s\S]{0,160}?Enter[\s\S]{0,80}?copyCIOText\(\s*"titolo"\s*\)/.test(codice);
+  if (!libro || !titolo || !invio) {
+    return no(`aggancio mancante: libro=${libro} titolo=${titolo} invio=${invio}`);
+  }
+  return true;
+})());
+
+check("v407 col box vuoto il tasto del titolo NON consegna il pacchetto macro di nascosto", (() => {
+  /* si intercetta la consegna: quello che conta non e' cosa viene generato ma cosa ESCE. */
+  const q = ctx.document.querySelector;
+  const box = { value: "", focus() {} };
+  const esito = { textContent: "", innerHTML: "" };
+  const consegnato = [];
+  const vera = ctx.consegnaPacchetto;
+  try {
+    ctx.document.querySelector = (s) => s === "#tk-input" ? box
+      : s === "#tk-esito" ? esito : q.call(ctx.document, s);
+    ctx.consegnaPacchetto = (testo, che) => { consegnato.push(che); return Promise.resolve(true); };
+    ctx.copyCIOText("titolo");
+    if (consegnato.length) return no(`ha consegnato "${consegnato[0]}" con il box vuoto`);
+    /* ⚠ e non basta che taccia: deve DIRE cosa manca. Un tasto che non fa niente e non lo
+       dichiara si legge come un tasto rotto — v315, il comando che non si trova. */
+    if (!/ticker/i.test(esito.textContent)) return no(`nessuna spiegazione: "${esito.textContent}"`);
+    /* col ticker scritto, invece, consegna */
+    box.value = "MU";
+    ctx.copyCIOText("titolo");
+    if (consegnato.length !== 1 || !/MU/.test(consegnato[0])) {
+      return no(`col ticker scritto ha consegnato: ${JSON.stringify(consegnato)}`);
+    }
+    /* e il tasto del libro consegna SEMPRE, box pieno o vuoto: e' l'altra stanza */
+    ctx.copyCIOText("libro");
+    return consegnato.length === 2 && /portafoglio/i.test(consegnato[1]);
+  } finally { ctx.document.querySelector = q; ctx.consegnaPacchetto = vera; }
+})());
+
+/* ⚠⚠ v407 — `no()` NON ESISTE DENTRO IL VM. Vive nel runner, quindi un check scritto
+   con `suVeri` che lo chiama sul ramo di fallimento esplode invece di riportare la ragione: il
+   check FALLISCE lo stesso (l'eccezione torna una stringa, e `check()` rifiuta tutto cio' che
+   non e' un booleano), ma il messaggio dice "CHECK MALFORMATO" al posto del motivo — cioe' la
+   diagnosi si perde proprio quando serve. Per questo esiste `suVeriEsito`: il corpo torna `true`
+   o la RAGIONE come stringa, e la stampa la fa il runner. Trovato perche' un'iniezione ha morso
+   con il messaggio sbagliato: un gate che fallisce per il motivo giusto e lo racconta male e'
+   un gate che costera' un giro di debug a chi verra' dopo. */
+/* ═══ v407 — LA SCHEDA APPROFONDITA, E CHI LA PRENDE ═════════════════════════════════════
+   Il CEO ha scelto "compatta per tutte + approfondimento su chi ha un evento o una soglia
+   rotta". Il gate non verifica che il blocco esista — verifica che la SELEZIONE sia misurata:
+   un elenco di nomi scritto a mano invecchia da solo e in silenzio (C10, red team I6), e la
+   scheda piu' lunga diventerebbe una preferenza del sistema, cioe' il punteggio tolto in v200. */
+check("v407 la scheda approfondita va a chi soddisfa una condizione misurata, e la dichiara", suVeriEsito(`
+  const p = buildCIOText();
+  const i = p.indexOf("APPROFONDIMENTO SU ");
+  if (i < 0) return ("nessun blocco di approfondimento nel pacchetto");
+  const blocco = p.slice(i, p.indexOf("CONCENTRAZIONE:", i));
+  /* ogni scheda dichiara PERCHE' e' stata scelta: senza, la lunghezza si legge come giudizio */
+  const schede = blocco.split(String.fromCharCode(10)).filter(r => r.indexOf("SELEZIONATO PERCHE'") >= 0);
+  if (!schede.length) return ("nessuna scheda porta la propria ragione");
+  /* la ragione non e' una parola vuota: deve nominare una delle tre condizioni misurate */
+  const motivate = schede.filter(r => /trimestrale (OGGI|fra \\d+ giorni)/.test(r)
+    || r.indexOf("SOTTO tutte e") >= 0
+    || r.indexOf("flusso di cassa libero NEGATIVO") >= 0);
+  if (motivate.length !== schede.length) {
+    return ((schede.length - motivate.length) + " schede su " + schede.length + " senza condizione nominata");
+  }
+  /* e il conteggio dichiarato in intestazione deve coincidere con le schede stampate: un numero
+     annunciato e poi non mostrato e' la classe v393 (le notizie contate e poi nascoste) */
+  const m = blocco.match(/APPROFONDIMENTO SU (\\d+) POSIZIONI SU (\\d+)/);
+  if (!m) return ("l'intestazione non dichiara quante posizioni ha selezionato");
+  if (Number(m[1]) !== schede.length) return ("dichiara " + m[1] + " schede e ne stampa " + schede.length);
+  /* ⚠ e NON tutte: se selezionasse ogni posizione la selezione non selezionerebbe niente */
+  return Number(m[1]) < Number(m[2]);`));
+
+/* ⚠ e la selezione deve MUOVERSI COI DATI, non essere una lista fissa: si costruisce lo stato
+   — nessuna trimestrale vicina, nessun titolo sotto tutte le medie, nessun flusso negativo — e
+   il blocco deve dichiarare l'assenza invece di sparire (classe v389: "nessuna notizia" e "la
+   fonte non ha risposto" si leggono uguali). */
+check("v407 senza nessuna condizione soddisfatta il blocco dichiara l'esito invece di sparire", suVeriEsito(`
+  for (const r of [...(DATA.portfolio || []), ...(DATA.watchlist || [])]) {
+    if (!r) continue;
+    delete r.earnings_date;
+    delete r.combustione;
+    if (r.tv && r.tv.tecnica) r.tv.tecnica.medie_battute = r.tv.tecnica.medie_totali;
+  }
+  const p = buildCIOText();
+  if (p.indexOf("APPROFONDIMENTO SU ") >= 0) return ("ha selezionato qualcuno con le condizioni tolte");
+  return p.indexOf("Non e' un blocco mancante: e' l'esito del controllo") >= 0;`));
+
+check("v407 la media a 20 giorni, chiesta dal CEO, arriva su ogni posizione che ce l'ha", suVeriEsito(`
+  const p = buildCIOText();
+  const righe = p.split(String.fromCharCode(10)).filter(r => r.indexOf("medie: ") >= 0);
+  if (righe.length < 5) return ("solo " + righe.length + " righe di medie: il fenomeno non c'e'");
+  /* ⚠⚠ ANCORAGGIO CHIUSO: " dalla 200" CONTIENE " dalla 20", quindi la sottostringa nuda
+     rende il check verde anche con la media a 20 sparita — provato iniettandolo, e passava.
+     E' la quarta incarnazione della stessa trappola in questo progetto (mg-card/mg-card-head,
+     sc-fonte/sc-fonte-qualsiasi, calendario_uscite/calendario_uscite_fred): scritta tre volte
+     in CLAUDE.md e rifatta lo stesso. */
+  const con20 = righe.filter(r => / dalla 20(?![0-9])/.test(r));
+  if (!con20.length) return ("nessuna riga porta la media a 20");
+  /* ⚠ e le tre distanze devono venire dalla STESSA fonte: sono la stessa grandezza calcolata
+     sulle stesse barre, e mescolare due arrotondamenti nella stessa riga e' la classe v161. */
+  const conTutte = con20.filter(r => r.indexOf(" dalla 50") >= 0 && r.indexOf(" dalla 200") >= 0);
+  return conTutte.length >= 5;`));
 
 let fail = 0;
 for (const [name, ok] of T) {

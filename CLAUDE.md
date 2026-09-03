@@ -2798,6 +2798,96 @@ da tenere allineato (C10, `MACRO_CARD_BY_PANEL` che copriva 7 pannelli su 37).
 ⚠ E `indexOf` è **sensibile al maiuscolo**: una sonda scritta in minuscolo su una riga che
 comincia con la maiuscola è un check rosso su codice giusto.
 
+## 🔀 v407 — DUE TASTI, DUE STANZE, E LA SCHEDA CHE VA A CHI HA UN EVENTO
+
+Istruzione del CEO, testuale: *"crea due tasti differenti che generano prompt: 1 macro piu
+inserimento di analisi di tutti i titoli in portafoglio. 2 analisi singolo titolo con maggiore
+presenza analisi tecnica, fondamentali e news. Entrambe devono sempre avere correlazione con
+analisi tecnica, fondamentali, macro e news"*.
+
+⚠⚠ **NON È IL RITORNO DEI DUE BOTTONI DELLA v259.** Quelli producevano lo **stesso** quadro
+macro, una volta da solo e una volta dentro un'analisi: due porte per la stessa stanza, ed è per
+questo che erano stati fusi. Qui le stanze sono due davvero — il primo guarda **tutte** le
+posizioni insieme, il secondo scava su **una** — e il difetto che la separazione toglie era
+misurabile: con un bottone solo la scelta la faceva il contenuto del box del ticker, quindi chi
+voleva il macro col box ancora pieno riceveva **in silenzio** il pacchetto sbagliato.
+
+> Il gate non guarda se i due bottoni esistono — la guardia strutturale lo fa già — ma se sono
+> **collegati a due teste diverse**: è la classe v315/v316/v399, dove il bottone esisteva, la
+> funzione esisteva, e i due non erano agganciati.
+
+⚠ **Il payload resta UNO SOLO** (`buildPrompt`): i due tasti sono due modi di comporlo, non due
+costruttori. Due implementazioni della stessa domanda divergono al primo ritocco (v161, v207,
+v316). E l'**invio** dentro il box del ticker fa quello che fa il tasto che gli sta accanto: due
+comandi vicini che producono pacchetti diversi sono la sorpresa che questa versione toglie.
+
+### 📏 La media a 20 giorni: il sistema ce l'aveva e non la passava
+Rilievo del CEO: *"pochi passaggi su fondamentali e analisi tecnica (es. media mobile 20 giorni
+dei titoli sarebbe utile)"*. Aveva ragione, ed è la **v406 che si ripete su un altro dato**: la
+batteria tecnica completa (12 medie, MACD, ADX, stocastico) esiste dalla v316 **per ogni titolo
+seguito** e usciva solo nel pacchetto del singolo titolo. Il blocco del libro portava la 50 e la
+200 — il medio e il lungo periodo — e non il breve, che è l'orizzonte su cui si decide se una
+discesa è in corso adesso. Misurato: `MACD`, `ADX`, `stocastico`, `SMA20` comparivano **zero
+volte** nel pacchetto macro e due volte in quello di titolo.
+
+⚠ **Le tre distanze escono dalla stessa fonte**: `tv.tecnica` le calcola insieme sulle stesse
+barre, mentre `sma50_dist_pct` è la stessa grandezza arrotondata a una cifra invece che a due.
+Mescolarle darebbe due derivazioni nella stessa riga. Il ripiego sui campi di riga resta solo per
+le posizioni che la pipeline non ha mai visto.
+
+### 🎯 L'approfondimento, e su chi
+Forma scelta dal CEO: *compatta per tutte, approfondimento su chi ha un evento o una soglia
+rotta*. La scheda estesa costa spazio, e darla a tutti significa non darla a nessuno — con
+tredici schede lunghe la parte che conta finisce in fondo, dove un modello a corto di spazio
+sostituisce le prove con affermazioni (misurato in v398).
+
+**Il criterio è misurato e si muove col libro** — un registro fisso di nomi invecchia da solo e
+in silenzio (C10, red team I6). Tre condizioni, tutte grandezze che il sistema già calcola:
+
+| condizione | perché | quante oggi |
+|---|---|---|
+| trimestrale entro 30 giorni | riprezza la tesi | MU (27g), ORCL (7g) |
+| prezzo **sotto tutte** le proprie medie | ⚠ soglia misurata SUL TITOLO, non una percentuale: una percentuale segnalerebbe il nome sbagliato perché ogni titolo ha la propria ampiezza (lezione v210) | RGTI, CRWV |
+| flusso di cassa libero negativo | la dipendenza dal mercato dei capitali misurata in v404: è il nome su cui una stretta creditizia arriva prima | ORCL, RGTI, MSTR, CRWV |
+
+Unione: **5 posizioni su 13**. Non una, non tredici.
+
+⚠ **E LA RAGIONE SI SCRIVE ACCANTO.** Una scheda più lunga senza il perché si legge come una
+preferenza del sistema, cioè come il punteggio tolto in v200. Qui non c'è nessun giudizio: c'è una
+condizione dichiarata che il titolo soddisfa.
+
+⚠ **Quando nessuno la soddisfa, il blocco lo dichiara** invece di sparire: "nessuna notizia" e
+"la fonte non ha risposto" si leggono uguali (v389). Un gate percorre quel ramo costruendo lo
+stato, non aspettando che i dati lo producano.
+
+⚠ **Solo rapporti, mai importi**: `cassa`, `debito` e `fcf_ttm` sono nella valuta di bilancio
+dell'emittente — SKHY li pubblica in won. I mesi di investimento che la cassa copre e la
+percentuale di emissione netta non hanno valuta (v183, v404). E **la data del bilancio viaggia col
+numero**: è la lezione v400, dove *"la cassa copre 1,6 mesi"* stava su un bilancio già superato da
+un deposito più recente.
+
+⚠ **La convenzione dell'ADX si dichiara UNA VOLTA**, nell'intestazione. La prima stesura la
+ripeteva su ogni scheda: cinquecento caratteri che dicono cinque volte la stessa cosa, la
+ridondanza che questo progetto misura e taglia dalla v184.
+
+### 🧨 Due trappole rifatte, entrambe già scritte in questo file
+- ⚠⚠ **Quarta incarnazione dell'ANCORAGGIO APERTO**: il gate cercava `" dalla 20"`, che
+  `" dalla 200"` **contiene**. Iniettando la sparizione della media a 20 il check restava
+  **verde**. È scritta tre volte qui (`mg-card`/`mg-card-head`, `sc-fonte`/`sc-fonte-qualsiasi`,
+  `calendario_uscite`/`calendario_uscite_fred`) e l'ho rifatta lo stesso. Chiuso su
+  `/ dalla 20(?![0-9])/`.
+- ⚠⚠ **`no()` NON ESISTE DENTRO IL VM.** Vive nel runner, quindi un check scritto con `suVeri`
+  che lo chiama sul ramo di fallimento **esplode** invece di riportare la ragione: il check
+  fallisce lo stesso (l'eccezione torna una stringa e `check()` rifiuta tutto ciò che non è un
+  booleano), ma il messaggio dice *"CHECK MALFORMATO"* al posto del motivo — la diagnosi si perde
+  proprio quando serve. Per questo esiste `suVeriEsito`. Trovato perché un'iniezione ha morso
+  **con il messaggio sbagliato**: *un gate che fallisce per il motivo giusto e lo racconta male
+  costerà un giro di debug a chi verrà dopo.*
+
+**Costo misurato**: pacchetto macro 66.903 → 70.533 caratteri (+5,4%), pacchetto di titolo
+107.329 → 110.959. La riga compatta cresce di un elemento su tutte e tredici; le cinque schede
+estese valgono ~2.900 caratteri in tutto.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

@@ -18,7 +18,7 @@
 <title>Quadro macro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=406">
+<link rel="stylesheet" href="assets/style.css?v=407">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234c8dff'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='white' font-family='Arial'>T</text></svg>">
 </head>
 <body>
@@ -42,7 +42,18 @@
          → analisi di QUEL titolo (col quadro macro dentro); box vuoto → solo quadro macro.
          Non sono due pacchetti diversi: quello del titolo CONTIENE il macro, ed e' la ragione
          per cui i bottoni sono uno solo e non due (v259, "due porte per la stessa stanza"). -->
-    <button class="btn btn-primary" id="btn-cio" aria-label="Crea il prompt per l'LLM" title="Se hai scritto un ticker nel box qui sotto genera l'analisi di quel titolo, col quadro macro dentro; altrimenti il solo quadro macro">📋 Analisi titolo / macro</button>
+    <!-- v407 — DUE TASTI, PERCHE' ORA SONO DUE PRODOTTI DIVERSI. Il CEO: "crea due tasti
+         differenti che generano prompt: 1 macro piu inserimento di analisi di tutti i titoli in
+         portafoglio. 2 analisi singolo titolo con maggiore presenza analisi tecnica,
+         fondamentali e news".
+         ⚠ NON e' il ritorno dei due bottoni della v259, che producevano lo stesso quadro macro
+         una volta da solo e una volta dentro un'analisi — quelli erano due porte per la stessa
+         stanza. Qui le stanze sono due: il primo guarda TUTTE le posizioni insieme, il secondo
+         scava su UNA con la coda macro potata ai canali che la toccano.
+         ⚠ E il payload resta UNO SOLO (buildPrompt): questi sono due modi di comporlo, non due
+         costruttori paralleli — due implementazioni della stessa domanda divergono (v161, v207). -->
+    <button class="btn btn-primary" id="btn-libro" aria-label="Crea il prompt su macro e portafoglio" title="Quadro macro completo e tutte le posizioni del libro: scheda compatta per ognuna, approfondita per chi ha un evento vicino o una soglia rotta">📋 Macro + portafoglio</button>
+    <button class="btn btn-primary" id="btn-titolo" aria-label="Crea il prompt sul singolo titolo" title="Analisi di un titolo solo, con tecnica, fondamentali e notizie in primo piano e la coda macro ridotta ai canali che lo toccano. Scrivi il ticker nel box qui sotto">🔎 Analisi di un titolo</button>
     <button class="btn btn-ghost" id="btn-diary" aria-label="Diario delle operazioni" title="Le operazioni che hai eseguito davvero. Finiscono nel pacchetto per l'LLM; non modificano il portafoglio">📔 Diario</button>
     <button class="btn btn-ghost" id="btn-refresh" aria-label="Aggiorna tutti i dati" title="Aggiorna tutto: rigenerazione completa via pipeline (~2-3 min)">↻ Rigenera</button>
   </div>
@@ -377,6 +388,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=406"></script>
+<script src="assets/app.js?v=407"></script>
 </body>
 </html>
