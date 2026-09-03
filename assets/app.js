@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "406";
+const BUILD_VERSION = "407";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10201,9 +10201,26 @@ function contestoPortafoglio(tkCorrente) {
   const righeTec = ord.map(x => {
     const r = x.r, s = r.stats || {};
     const p = [];
-    const s50 = numero(r.sma50_dist_pct), s200 = numero(r.sma200_dist_pct);
-    if (Number.isFinite(s50) || Number.isFinite(s200)) {
-      p.push("medie: " + [Number.isFinite(s50) ? `${signTxt(s50)} dalla 50` : null,
+    /* ⚠ v407 — LA MEDIA A 20 GIORNI, CHIESTA DAL CEO ("es. media mobile 20 giorni dei titoli
+       sarebbe utile"). Il sistema la calcola per OGNI titolo seguito dalla v316 e la pubblicava
+       solo nel pacchetto del singolo titolo: qui c'erano la 50 e la 200, cioe' il medio e il
+       lungo periodo, e mancava il breve — che e' esattamente l'orizzonte su cui si decide se
+       una discesa e' in corso adesso.
+       ⚠ E LE TRE DISTANZE ESCONO TUTTE DALLO STESSO POSTO quando c'e': `tv.tecnica` le calcola
+       insieme sulle stesse barre, mentre `sma50_dist_pct` e' la stessa grandezza arrotondata a
+       una cifra invece che a due. Mescolarle darebbe due derivazioni nella stessa riga — la
+       classe v161/v207. Il ripiego sui campi di riga resta per le posizioni che la pipeline non
+       ha mai visto, ed e' l'unico caso in cui si usa. */
+    const _med = ((r.tv || {}).tecnica || {}).medie || {};
+    const _da = (n, campo) => {
+      const v = numero((_med[`sma${n}`] || {}).dist_pct);
+      return Number.isFinite(v) ? v : numero(r[campo]);
+    };
+    const s20 = numero((_med.sma20 || {}).dist_pct);
+    const s50 = _da(50, "sma50_dist_pct"), s200 = _da(200, "sma200_dist_pct");
+    if (Number.isFinite(s20) || Number.isFinite(s50) || Number.isFinite(s200)) {
+      p.push("medie: " + [Number.isFinite(s20) ? `${signTxt(s20)} dalla 20` : null,
+                          Number.isFinite(s50) ? `${signTxt(s50)} dalla 50` : null,
                           Number.isFinite(s200) ? `${signTxt(s200)} dalla 200` : null].filter(Boolean).join(", "));
     }
     const rsi = numero(r.rsi);
@@ -10239,6 +10256,108 @@ function contestoPortafoglio(tkCorrente) {
       + "in ciascuna riga, che cambia col titolo (il settore dove il sistema lo riconosce, "
       + "l'indice generale dove ripiega): il confronto fra due righe con riferimenti diversi non "
       + "e' omogeneo. ⚠ I fondamentali sono di fonte aggregatore, non del deposito ufficiale.");
+  }
+
+  /* ═══ v407 — L'APPROFONDIMENTO, E SU CHI ═════════════════════════════════════════════════
+     Il CEO ha scelto la forma: "compatta per tutte + approfondimento su chi ha un evento o una
+     soglia rotta". La riga compatta qui sopra sta su tutte e tredici; la scheda estesa costa
+     spazio, e darla a tutti significherebbe non darla a nessuno — con tredici schede lunghe la
+     parte che conta finisce in fondo, dove un modello a corto di spazio sostituisce le prove
+     con affermazioni (misurato in v398).
+     ⚠⚠ IL CRITERIO E' MISURATO E SI MUOVE COL LIBRO, non e' una lista scritta a mano: un
+     registro fisso di nomi invecchia da solo e in silenzio (C10, red team I6). Sono tre
+     condizioni, e ognuna e' gia' una grandezza che il sistema calcola:
+       · un EVENTO datato entro trenta giorni — la trimestrale, che riprezza la tesi;
+       · il prezzo SOTTO TUTTE le proprie medie. ⚠ E' una soglia misurata SUL TITOLO, non una
+         percentuale: una soglia percentuale segnalerebbe il nome sbagliato, perche' ogni titolo
+         ha la propria ampiezza — e' la lezione v210, dove -22,5% su WDC era rumore e -16,5% su
+         MSFT no;
+       · il flusso di cassa libero NEGATIVO, cioe' la dipendenza dal mercato dei capitali gia'
+         misurata in v404: e' il nome su cui una stretta creditizia arriva prima.
+     ⚠ E LA RAGIONE SI SCRIVE. Una scheda piu' lunga senza il perche' si legge come una
+     preferenza del sistema, cioe' come il punteggio tolto in v200: qui non c'e' nessun giudizio,
+     c'e' una condizione dichiarata che il titolo soddisfa. */
+  const _cardApprofondita = (r) => {
+    const t = ((r.tv || {}).tecnica) || {};
+    const osc = t.oscillatori || {};
+    const perche = [];
+    const gg = (typeof giorniAllaTrimestrale === "function") ? giorniAllaTrimestrale(r.earnings_date) : null;
+    if (Number.isFinite(gg) && gg >= 0 && gg <= 30) {
+      perche.push(gg === 0 ? "trimestrale OGGI" : `trimestrale fra ${gg} giorni`);
+    }
+    const bat = numero(t.medie_battute), tot = numero(t.medie_totali);
+    if (Number.isFinite(bat) && Number.isFinite(tot) && tot > 0 && bat === 0) {
+      perche.push(`il prezzo sta SOTTO tutte e ${tot} le proprie medie mobili`);
+    }
+    const fcf = numero((r.combustione || {}).fcf_ttm);
+    if (Number.isFinite(fcf) && fcf < 0) {
+      perche.push("flusso di cassa libero NEGATIVO su dodici mesi: dipende dal mercato dei capitali");
+    }
+    if (!perche.length) return null;
+
+    const v = [];
+    if (Number.isFinite(bat) && Number.isFinite(tot)) {
+      v.push(`prezzo sopra ${bat} medie su ${tot}`);
+    }
+    const macd = osc.macd || {};
+    const ist = numero(macd.istogramma);
+    /* ⚠ del MACD si pubblica il SEGNO dell'istogramma, che e' un fatto (la linea sta sopra o
+       sotto il proprio segnale), non "compra/vendi", che sarebbe un verdetto (v200). */
+    if (Number.isFinite(ist)) {
+      v.push(`MACD: la linea sta ${ist > 0 ? "SOPRA" : ist < 0 ? "SOTTO" : "SUL"} il proprio segnale (istogramma ${nRid(ist, 2)})`);
+    }
+    const adx = numero(osc.adx14);
+    /* ⚠ la fascia dell'ADX e' una CONVENZIONE di Wilder, non un dato del file, e si dichiara
+       (v240). Ma UNA VOLTA SOLA, nell'intestazione del blocco: ripeterla su ogni scheda erano
+       cinquecento caratteri che dicono cinque volte la stessa cosa — la ridondanza che questo
+       progetto misura e taglia dalla v184. */
+    if (Number.isFinite(adx)) v.push(`ADX ${nRid(adx)}`);
+    const k = numero(osc.stoch_k);
+    if (Number.isFinite(k)) v.push(`stocastico %K ${nRid(k)}`);
+    const sup = numero(r.support), res = numero(r.resistance), px = numero(r.price);
+    if (Number.isFinite(sup) && Number.isFinite(res) && Number.isFinite(px) && px > 0) {
+      v.push(`supporto ${fmtNum.format(sup)} (${signTxt((sup / px - 1) * 100)}) e resistenza ${fmtNum.format(res)} (${signTxt((res / px - 1) * 100)}) sul prezzo di ${fmtNum.format(px)}`);
+    }
+    /* ⚠⚠ SOLO RAPPORTI, MAI IMPORTI: `cassa`, `debito` e `fcf_ttm` sono nella valuta di
+       bilancio dell'emittente — SKHY li pubblica in won — e affiancarli fra titoli sarebbe la
+       classe che il gate valuta sorveglia dalla v183. I mesi di investimento che la cassa copre
+       e la percentuale di emissione netta non hanno valuta.
+       ⚠ E LA DATA DEL BILANCIO VIAGGIA COL NUMERO. E' la lezione v400: su CRWV il pacchetto
+       concludeva "la cassa copre 1,6 mesi di investimenti" su un bilancio gia' superato da un
+       deposito piu' recente, e la conclusione si leggeva come attuale mentre il dato non lo era. */
+    const cmb = r.combustione || {};
+    const mesi = numero(cmb.mesi_capex), al = String(cmb.bilancio_al || "").slice(0, 10);
+    if (Number.isFinite(mesi) && Number.isFinite(fcf) && fcf < 0) {
+      v.push(`la cassa copre ${nRid(mesi)} mesi di investimenti al ritmo attuale${al ? ` (bilancio al ${al}: se un deposito piu' recente esiste, questo numero e' vecchio)` : ""}`);
+    }
+    const emiss = numero(cmb.emissione_netta_pct);
+    if (Number.isFinite(emiss) && Number.isFinite(fcf) && fcf < 0) {
+      v.push(`azioni emesse al netto ${signTxt(emiss)} nell'ultimo esercizio — e' la diluizione con cui il piano si finanzia`);
+    }
+    if (!v.length) return null;
+    return `- ${r.ticker} — SELEZIONATO PERCHE': ${perche.join(" · ")}.\n  ${v.join(" · ")}`;
+  };
+  const schede = ord.map(x => _cardApprofondita(x.r)).filter(Boolean);
+  if (schede.length) {
+    L.push(`APPROFONDIMENTO SU ${schede.length} POSIZIONI SU ${ord.length}: quelle che hanno un evento `
+      + `datato vicino o una soglia rotta. ⚠ Le altre ${ord.length - schede.length} non sono meno `
+      + `importanti e non sono state giudicate: semplicemente nessuna delle tre condizioni le tocca `
+      + `oggi, e la condizione che le seleziona e' scritta accanto a ciascuna. ⚠ Questi numeri sono `
+      + `calcolati dal sistema sulle stesse barre giornaliere del blocco qui sopra: non vanno `
+      + `ricalcolati ne' cercati online. ⚠ COME SI LEGGONO LE DUE MISURE CHE HANNO UNA `
+      + `CONVENZIONE: dell'ADX, per la convenzione di Wilder — che e' del mestiere e non un dato `
+      + `di questo file — sotto 20 la tendenza e' debole e sopra 25 e' in atto; del MACD esce il `
+      + `SEGNO, cioe' se la linea sta sopra o sotto il proprio segnale, che e' un fatto, e non `
+      + `un'etichetta compra/vendi, che sarebbe un verdetto e i verdetti sono fuori da questo `
+      + `sistema dalla v200.`);
+    schede.forEach(s => L.push(s));
+  } else if (ord.length) {
+    /* ⚠ IL SILENZIO NON SI DISTINGUE DALL'ASSENZA. Senza questa riga, un run in cui nessuna
+       posizione soddisfa le condizioni si legge identico a un run in cui il blocco e' rotto —
+       e' la classe v389, "nessuna notizia" e "la fonte non ha risposto" che si leggono uguali. */
+    L.push(`APPROFONDIMENTO: nessuna delle ${ord.length} posizioni ha oggi una trimestrale entro `
+      + `trenta giorni, il prezzo sotto tutte le proprie medie o il flusso di cassa libero negativo. `
+      + `Non e' un blocco mancante: e' l'esito del controllo.`);
   }
   /* la concentrazione per FATTORE MISURATO, non per etichetta: e' cio' che si muove insieme.
      ⚠ v389 — IL CALCOLO E' USCITO DA QUI ed e' diventato `gruppoFattore()`, perche' ora serve
@@ -13064,36 +13183,43 @@ async function consegnaPacchetto(testo, che, esito) {
   }
 }
 
-async function copyCIOText() {
-  /* ⚠ v259 — UN SOLO BOTTONE. Ce n'erano due, "Copia analisi macro" in topbar e "Copia analisi
-     per l'AI" nel box del titolo, e il CEO ha chiesto di unirli: "ci dovrebbe essere un unico
-     pulsante che crea il prompt da copiare all'llm".
-     Aveva ragione anche per una ragione che non ha detto: il pacchetto del titolo CONTIENE gia'
-     tutto il quadro macro, quindi i due bottoni non producevano due cose diverse — producevano
-     lo stesso quadro macro, una volta da solo e una volta dentro un'analisi. Due porte per la
-     stessa stanza (la classe v209).
-     Ora la scelta la fa il contenuto del box: ticker scritto → analisi di quel titolo; box vuoto
-     → solo quadro macro. E lo dice, invece di lasciarlo indovinare. */
+/* ═══ v407 — DUE TASTI, DUE PRODOTTI, UNA SOLA STRADA DI CONSEGNA ═══════════════════
+   Il CEO ha chiesto due bottoni distinti. Fino alla v406 ce n'era uno e la scelta la faceva il
+   contenuto del box del ticker — una porta sola per due stanze, che aveva un difetto misurato:
+   chi voleva il quadro macro col box ancora pieno da un'analisi precedente riceveva in silenzio
+   il pacchetto sbagliato, e chi voleva un titolo col box vuoto riceveva il macro senza che
+   niente glielo dicesse.
+   ⚠⚠ IL PAYLOAD RESTA UNO SOLO. Questi sono due modi di COMPORRE `buildPrompt()`, non due
+   costruttori: due implementazioni della stessa domanda divergono al primo ritocco, ed e' gia'
+   costato tre volte in questo progetto (v161, v207, v316). Quello che cambia fra i due tasti e'
+   quali blocchi si chiedono e con quale testata, non da dove escono i numeri. */
+async function copyCIOText(quale) {
   if (!DATA) { toast("Dati non ancora caricati, riprova tra un attimo"); return; }
-  /* v347 — TORNANO I DUE ESITI. Il pacchetto del titolo CONTIENE il quadro macro: non sono
-     due prodotti diversi, e per questo il bottone resta uno solo (v259). */
   const tk = String($("#tk-input")?.value || "").trim().toUpperCase();
   const esito = $("#tk-esito");
-  let testo, che;
-  if (tk) {
+
+  /* ── TASTO 2: un titolo solo ── */
+  if (quale === "titolo") {
+    /* ⚠ SENZA TICKER NON SI CONSEGNA IL MACRO DI NASCOSTO. Un tasto che promette l'analisi di
+       un titolo e produce un altro pacchetto e' peggio di un tasto che non fa niente: chi legge
+       non ha modo di accorgersene finche' non ha gia' incollato. Si dice cosa manca. */
+    if (!tk) {
+      if (esito) esito.textContent = "Scrivi un ticker nel box qui sotto: questo tasto analizza UN titolo. Per il quadro macro con tutte le posizioni c'e' \u201cMacro + portafoglio\u201d.";
+      $("#tk-input")?.focus();
+      return;
+    }
     if (!/^[A-Z0-9][A-Z0-9.\-=^:]{0,15}$/.test(tk)) {
-      if (esito) esito.textContent = `"${tk}" non sembra un ticker. Svuota il campo per il solo quadro macro, o scrivilo come lo vedi sul mercato.`;
+      if (esito) esito.textContent = `"${tk}" non sembra un ticker: scrivilo come lo vedi sul mercato.`;
       $("#tk-input")?.focus();
       return;
     }
     montaGraficoTV(tk);
-    testo = buildPromptTicker(tk);
-    che = `Analisi di ${tk}`;
-  } else {
-    testo = buildCIOText();
-    che = "Quadro macro";
+    await consegnaPacchetto(buildPromptTicker(tk), `Analisi di ${tk}`, esito);
+    return;
   }
-  await consegnaPacchetto(testo, che, esito);
+
+  /* ── TASTO 1: macro + tutto il libro ── */
+  await consegnaPacchetto(buildCIOText(), "Macro + portafoglio", esito);
 }
 
 
@@ -13108,9 +13234,13 @@ async function copyCIOText() {
 
 /* ---------------- eventi ---------------- */
 $("#btn-refresh")?.addEventListener("click", refreshAll);
-$("#btn-cio")?.addEventListener("click", copyCIOText);
+$("#btn-libro")?.addEventListener("click", () => copyCIOText("libro"));
+$("#btn-titolo")?.addEventListener("click", () => copyCIOText("titolo"));
 $("#btn-diary")?.addEventListener("click", apriDiario);   // v348 — il diario torna raggiungibile
-$("#tk-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") copyCIOText(); });
+/* ⚠ Invio dentro il box del ticker vale come il tasto del TITOLO: e' il box del titolo, e la
+   scorciatoia deve fare quello che fa il tasto che gli sta accanto — due comandi vicini che
+   producono pacchetti diversi sono la sorpresa che la v407 esiste per togliere. */
+$("#tk-input")?.addEventListener("keydown", (e) => { if (e.key === "Enter") copyCIOText("titolo"); });
 
 function sellManuali() {
   try {
