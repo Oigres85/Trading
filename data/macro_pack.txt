@@ -1,4 +1,4 @@
-⟦ BUILD v407 · generato 03/09/2026 11:47 ⟧
+⟦ BUILD v408 · generato 03/09/2026 12:00 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -42,7 +42,7 @@ C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invec
 
 
 DATI AL 03/09/2026, 09:17:23 (prezzi: snapshot pipeline + refresh live lato client ogni 60s) [ATTENZIONE: snapshot di 3 ore fa — i prezzi potrebbero essere disallineati dal mercato live, e i livelli critici sono i primi a spostarsi]
-CONTESTO DI SESSIONE (ora ET 07:47, fase: PRE-MARKET — festività USA non considerate) · ANTICIPATORI: KOSPI +0,26% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,05% · Fut S&P +0,04% · BTC +0,73% [24/7] · SEI PRIMA DELLA CAMPANA (apertura tra ~1.7h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura.
+CONTESTO DI SESSIONE (ora ET 08:00, fase: PRE-MARKET — festività USA non considerate) · ANTICIPATORI: KOSPI +0,26% [ultima chiusura di Seoul, borsa ferma] · Fut NDX -0,05% · Fut S&P +0,04% · BTC +0,73% [24/7] · SEI PRIMA DELLA CAMPANA (apertura tra ~1.5h): KOSPI/Asia, futures USA e prezzi estesi (pre/after, "→ agg.") sono il dato più fresco — pesali come ANTICIPATORI nell'analisi; ogni ordine proposto vale per l'APERTURA della prossima seduta USA, limite sul "→ agg." quando presente, mai a mercato in apertura.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
 · DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 03/09/2026, 09:17:23, prossimo run 03/09/2026, 13:00:00. La barra giornaliera sotto quei numeri e' del 2026-09-03.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-02) · Curva 10A-3M (2026-09-02) · Treasury USA 30A (2026-09-01) · Tasso reale 10A (TIPS) (2026-09-01) · Inflazione attesa 10A (breakeven) (2026-09-02) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
@@ -83,9 +83,9 @@ QUADRO MACRO:
 - TITOLI MACRO — 10 dentro le ultime 8 ORE (fonti: CNBC Economia, Bloomberg, MarketWatch) · 12 pubblicate DOPO l'ultima chiusura USA del 2026-09-02, cioe' non ancora dentro il prezzo, e sono TUTTE elencate qui sotto. ⚠ SONO TITOLI, NON FATTI VERIFICATI: il sistema non ha letto gli articoli ne' controllato i numeri che contengono, e la selezione e' automatica (CNBC Economia entra per intero (e' gia' un feed di economia); Bloomberg e MarketWatch passano da un filtro per termine macro, imperfetto per costruzione). I riassunti sono quelli pubblicati dalla fonte nel feed, non riscritti dal sistema. Un titolo non ha data di rilevazione: ha solo la data di pubblicazione, che e' un'altra cosa. Servono a dirti di COSA si sta parlando adesso e da dove partire a cercare, non a sostituire la ricerca.
     · [MarketWatch, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Why alarming bond yields might drop sooner than investors think
       The surge in government bond yields that has alarmed investors may reverse itself has cyclical forces overwhelm fears over the sustainability of debt, one strategist argues on Thursday.
-    · [Bloomberg, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Global Bond Retreat Slows as Decade-High Yields Tempt Investors
+    · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Global Bond Retreat Slows as Decade-High Yields Tempt Investors
       Global bonds clawed back ground as yields near multi-decade highs proved hard for some investors to resist, even as energy prices keep markets on edge.
-    · [Bloomberg, 3h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] BOJ Is Said to Be Leaning Toward a Quarter-Point Hike
+    · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] BOJ Is Said to Be Leaning Toward a Quarter-Point Hike
       The Bank of Japan is leaning toward raising its benchmark interest rate by a quarter point this month in response to upward price risks, while leaving open the possibility of accelerating the pace of hikes thereafter, according to people familiar with the matter. Bloomberg's Skylar Montgomery Koning has more. (Source: 
     · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] What's Behind the Big Surge in US Government Bond Yields
       Global bond yields are at their highest level since 2008, with the 30-year US Treasury touching 5% just before Treasury Secretary Scott Bessent announced a surprise increase of his department's bond buyback program and Fed Chairman Kevin Warsh made his hawkish speech at Jackson Hole. So what's driving yields higher? An
@@ -122,7 +122,7 @@ QUADRO MACRO:
 - Disaccoppiamento S&P 500 vs PIL reale: gap +48 pp su una finestra di 2.8 anni (azionario +54,3% contro PIL reale +6,3% dal 2023-07-01). ⚠ COME SI LEGGE: è una differenza CUMULATA, quindi cresce meccanicamente con la lunghezza della finestra — la soglia dei "40 pp" citata in letteratura NON è confrontabile con finestre di durata diversa, e su 2.8 anni di mercato al rialzo viene superata quasi sempre. Serve come contesto di valutazione, NON come segnale di uscita.
 - Curva 10A-2A: +0.4 pp (rilevazione 2026-09-02, serie GIORNALIERA FRED T10Y2Y, ultima chiusura) — positiva da tempo — l'ultima inversione risale a 497 sedute fa, quindi NON è una dis-inversione in corso ma una curva normalizzata da tempo
 - Curva vs Recessione (modello storico FRED, stessa curva della riga qui sopra): 12m fa +0.56 pp (media mensile del modello), Curva normale. PIL reale YoY 2.1%, sussidi disocc. 205500. NB: la curva NON si sta irripidendo (oggi 0.4 contro 0.56 di 12 mesi fa): la regola "irripidimento post-inversione → recessione entro ~12 mesi" NON è attiva adesso, e va citata solo se e quando lo diventa.
-- FedWatch prossima riunione 2026-09-16 (fra 13 giorni) (dai futures sui Fed Funds a 30 giorni: tasso implicito 3.79% vs punto medio del range attuale): RIALZO 66% · invariato 34% · taglio 0% · POLYMARKET sulla stessa riunione: sull'INVARIATO Polymarket quota 50% contro il 34% dei futures (16 punti di divergenza) · sul RIALZO quota 48% contro il 66% (18 punti)
+- FedWatch prossima riunione 2026-09-16 (fra 12 giorni) (dai futures sui Fed Funds a 30 giorni: tasso implicito 3.79% vs punto medio del range attuale): RIALZO 66% · invariato 34% · taglio 0% · POLYMARKET sulla stessa riunione: sull'INVARIATO Polymarket quota 50% contro il 34% dei futures (16 punti di divergenza) · sul RIALZO quota 48% contro il 66% (18 punti)
 - STRUTTURA A TERMINE DELLE ATTESE FED (dai futures, riunioni successive): 28/10 invariato 22% · rialzo 78% · taglio 0% | 09/12 invariato 10% · rialzo 90% · taglio 0%. La FORMA conta piu' del primo punto: se la probabilita' di rialzo cresce con l'orizzonte, il mercato non sta dicendo "Fed ferma", sta dicendo "ferma per ora".
 
 ROTAZIONE SETTORIALE/TEMATICA USA (ETF, performance 1M e 3M):
@@ -241,11 +241,11 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsCipher Digital has a cost-effective business model for providing AI capacity to hyperscalers.
   [MRVL] · [Nasdaq, 21h fa] Credo Technology Reports Q1 Results: Should Investors Hold or Fold?
       CRDO's strong Q1 growth and AI demand face a key test as optical ramps, customer concentration and valuation raise risks.
-  [MU] · [Nasdaq, 4h fa] Tim Cook, Elon Musk, Andy Jassy, and Jensen Huang All Just Warned Investors About the Same Thing. Spoiler Alert: It's Fantastic News for Micron and Sandisk.
+  [MU] · [Nasdaq, 5h fa] Tim Cook, Elon Musk, Andy Jassy, and Jensen Huang All Just Warned Investors About the Same Thing. Spoiler Alert: It's Fantastic News for Micron and Sandisk.
       Key PointsHyperscalers are raising their capital expenditure budgets as prices for DRAM and high-bandwidth memory explode.
   [MU] · [Nasdaq, 7h fa] 3 AI Stocks Up 500% or More in the Past Year That Could Have More Room to Run
       Key PointsSandisk and Micron have benefited from supply shortages in the memory markets.
-  [NVDA] · [Nasdaq, 3h fa] If a Stock Market Crash Is Coming, History Says This Is the Smartest Move Investors Can Make
+  [NVDA] · [Nasdaq, 4h fa] If a Stock Market Crash Is Coming, History Says This Is the Smartest Move Investors Can Make
       Key PointsThe S&amp;P 500 has been climbing this year, even reaching record levels.
   [NVDA] · [Nasdaq, 4h fa] Should CoreWeave and Nebius Group Investors Be Worried About Circular Financing? Here's What the Numbers Say
       Key PointsCoreWeave and Nebius Group both have backstops from Nvidia.
