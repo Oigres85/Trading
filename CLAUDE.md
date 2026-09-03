@@ -3175,6 +3175,56 @@ Validato reintroducendo `br.note`: morde.
 > rileggere il codice, non i gate. Prima l'autonomia di cassa (un LLM reale), poi il conteggio
 > fisso nella testata, poi questo. L'esercizio ricorrente vale più della suite.
 
+## 🪞 v413 — DUE DIFETTI CHE 501 CHECK NON VEDEVANO, E LI HA TROVATI CHI LEGGE
+
+Il CEO ha incollato i due pacchetti chiedendo di eseguirli come il destinatario e di sanare
+quello che emergeva. **Nessuno dei due faceva fallire un gate**, e sono entrambi visibili a
+chiunque legga il testo.
+
+### 1. La SESTA derivazione dei giorni alla trimestrale
+La riga del pacchetto di titolo contava **istanti** — `Math.round((Date.now() − mezzanotte)/86400000)`
+— mentre tutto il resto passa da `giorniAllaTrimestrale`, che conta **giorni di calendario**.
+Sul pacchetto CRWV del 03/09 alle 21:05:
+
+| dove | numero |
+|---|---|
+| `- Prossima trimestrale attesa: 2026-11-11` | **fra 68 giorni** |
+| `- CRWV: … trimestrale fra …` (blocco del libro) | **69 giorni** |
+
+Lo stesso evento con due numeri, nello stesso pacchetto. È la classe che la **v228** aveva
+chiuso, e il suo commento dichiarava testualmente *"chiunque chieda FRA QUANTO RIPORTA passa da
+questa funzione"*: era vero per le **cinque** derivazioni trovate allora, e questa era la sesta.
+
+> **Una dichiarazione di unicità vale solo per le occorrenze che sono state cercate.** Ora c'è un
+> gate che le cerca da sé: nessun calcolo di giorni-alla-trimestrale fuori dalla funzione.
+
+⚠ **E un terzo difetto è uscito esercitando i rami**: il giorno stesso la riga scriveva *"fra 0
+giorni"* mentre il blocco del libro dice *"trimestrale OGGI"* — due formulazioni per lo stesso
+evento, e la più debole cadeva **sul giorno più urgente**, che è precisamente il caso per cui la
+v228 esiste.
+
+### 2. ⚠⚠ Il pacchetto macro NEGAVA l'analisi che la sua stessa testata ordina
+L'intestazione del blocco del libro diceva:
+
+> *"IL LIBRO IN CUI QUESTA POSIZIONE VIVE (contesto, **non richiesta di analisi del
+> portafoglio**)"*
+
+Scritta per il pacchetto di **titolo**, dove è vera, e resa identica in quello **macro**, dove
+`[B6]` impone di portare ogni conclusione fino alle posizioni e `[B7]` chiede alleggerimenti,
+vendite e incrementi come **chiusura obbligatoria**. E in un pacchetto senza titolo in esame,
+*"QUESTA POSIZIONE"* non ha nemmeno un referente.
+
+> **Un modello che obbedisce alla coda rifiuta ciò che la testata gli ha ordinato due schermate
+> prima** — ed è la contraddizione che il collaudo B5 gli impone di segnalare, prodotta dal
+> pacchetto stesso. È la classe v405 (una riga scritta per un contesto e resa in due), e la v410
+> l'ha resa peggiore senza accorgersene: `[B7]` è arrivato ieri, la negazione era lì da prima.
+
+### 🧭 La lezione, che a questo punto è una misura
+La suite è a 505 check e ha visto **zero** di questi tre difetti. Sorveglia il prodotto; questi
+erano difetti di **lettura** — un numero detto due volte, una riga che nega l'istruzione, una
+formulazione debole sul caso urgente. In due sessioni consecutive tutti i difetti materiali sono
+stati trovati eseguendo il pacchetto come il destinatario, e nessuno dai gate.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

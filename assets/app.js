@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "412";
+const BUILD_VERSION = "413";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -10339,7 +10339,17 @@ function contestoPortafoglio(tkCorrente) {
   const totAz = azionarie.reduce((s, x) => s + x.v, 0);
   if (!totAz) return "";
   const L = [];
-  L.push("=== IL LIBRO IN CUI QUESTA POSIZIONE VIVE (contesto, non richiesta di analisi del portafoglio) ===");
+  /* ⚠⚠ v413 — L'INTESTAZIONE NEGAVA QUELLO CHE LA TESTATA ORDINA. Era scritta per il pacchetto
+     di TITOLO, dove il libro e' davvero un contorno, ed e' resa identica anche nel pacchetto
+     "Macro + portafoglio", dove il libro E' l'oggetto: li' [B6] impone di portare ogni
+     conclusione macro fino alle posizioni e [B7] chiede alleggerimenti, vendite e incrementi
+     come chiusura OBBLIGATORIA. Un modello che obbedisce a questa riga rifiuta di fare cio' che
+     la testata gli ordina due schermate prima — ed e' precisamente la contraddizione che il
+     collaudo B5 gli impone di segnalare, prodotta dal pacchetto stesso.
+     ⚠ Stessa classe della v405: una riga scritta per UN contesto e resa in DUE. */
+  L.push(tkCorrente
+    ? "=== IL LIBRO IN CUI QUESTA POSIZIONE VIVE (contesto, non richiesta di analisi del portafoglio) ==="
+    : "=== IL LIBRO SU CUI QUESTO QUADRO MACRO ATTERRA — E' L'OGGETTO DELL'ANALISI, NON UN CONTORNO ===");
   const fuori = fuoriAzionarioEur();
   if (fuori) {
     const tot = totAz + fuori.totale;
@@ -12851,13 +12861,28 @@ function datiNostriDelTitolo(tk) {
     }
     if (t.settore) L.push(`- Settore secondo la nostra classificazione: ${t.settore}`);
     if (t.trimestrale) {
-      const dTrim = new Date(String(t.trimestrale).slice(0, 10));
-      const giorni = isNaN(dTrim) ? null : Math.round((Date.now() - dTrim.getTime()) / 86400000);
+      /* ⚠⚠ v413 — QUESTA ERA LA SESTA DERIVAZIONE, e divergeva di un giorno dalle altre.
+         `Math.round((Date.now() - mezzanotte)/86400000)` conta ISTANTI, non giorni di calendario:
+         sul pacchetto CRWV del 03/09 alle 21:05 dava 68 giorni mentre il blocco del libro, che
+         passa da `giorniAllaTrimestrale`, ne diceva 69 — lo stesso evento con due numeri, nello
+         stesso pacchetto. E' esattamente la classe che la v228 ha chiuso, con il suo commento
+         che dichiara "chiunque chieda FRA QUANTO RIPORTA passa da questa funzione": questa riga
+         non ci passava, e la dichiarazione era vera solo per le cinque che erano state trovate.
+         ⚠ Il segno si INVERTE rispetto a prima: `giorniAllaTrimestrale` conta i giorni MANCANTI
+         (positivo = futuro), la vecchia formula contava quelli TRASCORSI. */
+      const mancano = giorniAllaTrimestrale(t.trimestrale);
+      const giorni = mancano == null ? null : -mancano;
       L.push(giorni != null && giorni > 0
         ? `- ⚠ TRIMESTRALE GIA' USCITA: era attesa il ${t.trimestrale}, ${giorni} ${giorni === 1 ? "giorno" : "giorni"} fa. `
           + `Questo pacchetto e' stato generato DOPO: i risultati non sono qui e vanno cercati, e l'analisi `
           + `che scrivi e' un'analisi post-trimestrale, non l'attesa di un evento.`
-        : `- Prossima trimestrale attesa: ${t.trimestrale}${giorni != null ? ` (fra ${-giorni} ${giorni === -1 ? "giorno" : "giorni"})` : ""} [STIMA di yfinance, non una data confermata dalla societa']`);
+        /* ⚠ IL GIORNO STESSO NON SI SCRIVE "fra 0 giorni": e' il caso piu' urgente e la v228 esiste
+           perche' li' il sistema lo nascondeva. Il blocco del libro dice "trimestrale OGGI", e due
+           formulazioni per lo stesso evento sono la classe che questo pacchetto vieta. */
+        : `- Prossima trimestrale ${mancano === 0 ? "OGGI" : "attesa"}: ${t.trimestrale}`
+          + (mancano == null ? "" : mancano === 0 ? " — riporta OGGI: l'analisi che scrivi e' l'attesa di un evento che si risolve entro la giornata"
+             : ` (fra ${mancano} ${mancano === 1 ? "giorno" : "giorni"})`)
+          + ` [STIMA di yfinance, non una data confermata dalla societa']`);
     }
     /* ═══ v390 — L'ULTIMO DEPOSITO E' UN FATTO, LA PROSSIMA DATA NO ════════════════════
        EDGAR pubblica quando la societa' ha DAVVERO comunicato i risultati (8-K con item 2.02).
