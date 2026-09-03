@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "392";
+const BUILD_VERSION = "393";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8459,7 +8459,21 @@ function buildPrompt() {
     if (br.alert) {
       lines.push(`- ⚠ [BREADTH DIVERGENCE] Ampiezza di mercato in deterioramento: ${base}. ${br.note || ""} DIRETTIVA: il rally NON è confermato dall'azione media — prudenza sui nuovi ingressi (sizing ridotto o ingresso post-conferma), priorità ai candidati con RS propria e non trainata dall'indice; per il book già concentrato sulle megacap questo è il segnale d'allarme più specifico: verifica la distanza degli stop ratchet.`);
     } else {
-      lines.push(`- Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): ${base} — rally ${br.divergence_pp > 2 ? "trainato dalle megacap ma con partecipazione" : "con partecipazione ampia"} (alert se SPY+ con RSP− o spread >4pp).`);
+      /* ═══ v405 — L'ETICHETTA ASSUMEVA IL RALLY INVECE DI MISURARLO ══════════════════════
+         Diceva "rally con partecipazione ampia" anche quando ENTRAMBI gli indici erano in calo:
+         il 03/09/2026 SPY -0,8% e RSP -0,74% a un mese, e il pacchetto parlava di un rally che
+         non c'era. Il detector misura correttamente lo SPREAD fra i due — quello e' il suo
+         mestiere — ma il nome dello stato presupponeva un SEGNO che i dati non portano.
+         ⚠ La lettura giusta quando scendono insieme non e' "niente da dire": e' "discesa
+         UNIFORME", che e' un'informazione diversa e altrettanto utile (nessuna rotazione in
+         corso, il calo non e' concentrato). Il segno si legge dal cap-pesato, che e' l'indice
+         di riferimento; l'ampiezza resta la distanza fra i due. */
+      const _amp = br.divergence_pp > 2 ? "trainata dalle megacap" : "uniforme";
+      const _verso = numero(br.spy_1m_pct) > 0 ? "rally" : numero(br.spy_1m_pct) < 0 ? "discesa" : "mercato piatto";
+      lines.push(`- Ampiezza di mercato (SPY cap-pesato vs RSP equi-pesato, 1M): ${base} — ${_verso} `
+        + `con partecipazione ${_amp} (alert se SPY+ con RSP− o spread >4pp). ⚠ L'ampiezza misura la `
+        + `DISTANZA fra i due indici, non la direzione: qui il verso lo da' il cap-pesato, e con `
+        + `entrambi ${numero(br.spy_1m_pct) < 0 ? "in calo la discesa non e' concentrata su pochi nomi" : "in rialzo la salita e' partecipata"}.`);
     }
   }
   // EUR/JPY escluso dal payload (v138): ridondante — il rischio yen è già nel blocco Carry
@@ -8900,8 +8914,33 @@ function buildPrompt() {
        rigenera su cron: senza, il pacchetto porterebbe il numero vecchio per ore (v187/v205). */
     const scCred = punteggioDaZone(numero(m.credit.spread_hy), ZONE_CREDITO);
     const zCred = ZONE_CREDITO.find(z => numero(m.credit.spread_hy) >= z.da && numero(m.credit.spread_hy) <= z.a);
+    /* ═══ v405 — "RILASSATO" AL TERZO PERCENTILE E' LA PAROLA GIUSTA NELLA BANDA SBAGLIATA ═
+       La banda e' corretta (2,65% sta sotto il 4%) e dichiarata, ma il pacchetto pubblica poche
+       righe piu' sotto che quello stesso valore sta al 3° PERCENTILE del proprio anno, con la
+       nota "compressione estrema: il credito non prezza rischio". Due frasi opposte sullo
+       stesso numero: "rilassato" invita al conforto, il percentile e' un avviso.
+       ⚠ Il livello e la POSIZIONE NEL PROPRIO INTERVALLO sono due grandezze diverse — e' la
+       stessa distinzione che il pacchetto fa gia' sulle materie prime. Un valore basso in
+       assoluto E all'estremo della propria distribuzione non ha piu' spazio dalla parte buona:
+       e' un'informazione sul RISCHIO, non sulla calma.
+       ⚠ Il percentile si legge dalla STESSA funzione che lo pubblica nei digest storici
+       (dgPercentile sulla serie di credit.history): ricalcolarlo qui sarebbe la classe
+       v161/v207, due implementazioni che divergono al primo ritocco. */
+    const _crh = Array.isArray(m.credit.history)
+      ? m.credit.history.map(x => dgFin(x && x.v)).filter(x => x != null) : [];
+    const _crPct = _crh.length >= 5 ? dgPercentile(_crh, m.credit.spread_hy) : null;
+    const _estremo = _crPct != null && _crPct <= 5
+      ? ` ⚠⚠ MA STA AL ${Math.round(_crPct)}° PERCENTILE del proprio intervallo annuale: `
+        + `"rilassato" descrive il LIVELLO contro la banda, non la POSIZIONE nella distribuzione. `
+        + `Un compenso per il rischio all'estremo basso non ha piu' spazio dalla parte favorevole, `
+        + `ed e' il numero che si muove per primo quando le condizioni finanziarie si stringono: `
+        + `qui l'etichetta e il percentile dicono cose opposte, e il percentile e' il piu' informativo`
+      : _crPct != null && _crPct >= 95
+        ? ` ⚠⚠ E STA AL ${Math.round(_crPct)}° PERCENTILE del proprio intervallo annuale: il livello `
+          + `e' dentro la banda ma la posizione nella distribuzione e' estrema dalla parte del rischio`
+        : "";
     let crl = `- Rischio Credito (HY OAS, proxy CDS): ${m.credit.spread_hy}% — ${zCred ? zCred.nome : m.credit.label} `
-      + `(bande di lettura: sotto 4% rilassato, 4-5% attenzione, 5-7% stress, oltre 7% crisi)`;
+      + `(bande di lettura: sotto 4% rilassato, 4-5% attenzione, 5-7% stress, oltre 7% crisi)${_estremo}`;
     const ch = m.credit.history || [];
     const chM = dg1M(ch);
     if (chM) { const d = chM.pct * numero(m.credit.spread_hy) / (100 + chM.pct); crl += `; trend ~1 mese ${d > 0 ? "+" : ""}${fmtNum.format(Math.round(d * 100) / 100)} pp (${d > 0.15 ? "spread in allargamento = rischio in aumento" : d < -0.15 ? "spread in restringimento = rischio in calo" : "stabile"}, ${chM.da}→${chM.a})`; }
@@ -10324,13 +10363,26 @@ function contestoPortafoglio(tkCorrente) {
         + `che non sia successo niente: cercale comunque.`);
     }
     if (altre.length) {
-      /* ⚠ QUESTA E' LA RIGA PER CUI IL BLOCCO ESISTE. */
-      L.push(`⚠⚠ E QUESTE RIGUARDANO IL FATTORE, NON UN ALTRO TITOLO: i nomi qui sotto stanno nel `
-        + `gruppo correlato di ${TK} (${gfN.misurato ? "correlazione misurata sopra " + gfN.SOGLIA_FATTORE
-            : "classificazione di settore, correlazione non misurabile in questo run"}), cioe' si `
-        + `muovono insieme. Una notizia su di loro e' una notizia su questa posizione, e vale per `
-        + `il PESO DEL GRUPPO (${Math.round(gfN.pesoSemi)}% dell'azionario), non per un nome solo.`
-        + altre.map(({ t, v }) => `\n  [${t}]` + riga(v).replace(/^\n {4}/, " ")).join(""));
+      /* ⚠ QUESTA E' LA RIGA PER CUI IL BLOCCO ESISTE.
+         ═══ v405 — E IN CONTESTO MACRO IL NOME DEL TITOLO NON C'E' ═══════════════════════
+         `contestoPortafoglio` riceve il ticker analizzato solo dal pacchetto di titolo: nel
+         pacchetto MACRO nessun titolo e' in esame, quindi TK e' vuoto e questa riga usciva
+         come "stanno nel gruppo correlato di " — una frase mutilata proprio dove chi legge
+         cerca il riferimento. Non e' un dato mancante: e' una riga scritta per un contesto e
+         resa in due. Ora la frase cambia con il contesto invece di lasciare un buco. */
+      const _rif = TK
+        ? `⚠⚠ E QUESTE RIGUARDANO IL FATTORE, NON UN ALTRO TITOLO: i nomi qui sotto stanno nel `
+          + `gruppo correlato di ${TK} (${gfN.misurato ? "correlazione misurata sopra " + gfN.SOGLIA_FATTORE
+              : "classificazione di settore, correlazione non misurabile in questo run"}), cioe' si `
+          + `muovono insieme. Una notizia su di loro e' una notizia su questa posizione, e vale per `
+          + `il PESO DEL GRUPPO (${Math.round(gfN.pesoSemi)}% dell'azionario), non per un nome solo.`
+        : `⚠⚠ E QUESTE NON SONO NOTIZIE SU NOMI SEPARATI: i titoli del gruppo correlato `
+          + `(${gfN.misurato ? "correlazione misurata sopra " + gfN.SOGLIA_FATTORE
+              : "classificazione di settore, correlazione non misurabile in questo run"}) si muovono `
+          + `insieme, quindi una notizia su uno di loro vale per il PESO DEL GRUPPO `
+          + `(${Math.round(gfN.pesoSemi)}% dell'azionario) e non per il peso del nome che la porta. `
+          + `Chi sta nel gruppo e chi no e' scritto nel blocco CONCENTRAZIONE qui sopra.`;
+      L.push(_rif + altre.map(({ t, v }) => `\n  [${t}]` + riga(v).replace(/^\n {4}/, " ")).join(""));
     }
     if ((nt.non_letti || []).length) {
       L.push(`⚠ NON LETTI in questo run (nessuno dei canali ha risposto): `

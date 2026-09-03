@@ -6690,6 +6690,65 @@ check("v404 il peso su cui il dato manca si dichiara invece di finire fra gli au
   return riga.indexOf("su cui il dato manca") >= 0
       && riga.indexOf("MU") < 0;`));
 
+/* ═══ v405 — TRE ETICHETTE CHE DICEVANO PIU' (O ALTRO) DEL PROPRIO DATO ════════════════════
+   Trovate leggendo il pacchetto macro come il modello che lo riceve. Nessuna rompeva niente:
+   sono la classe dei difetti che non si rompono, e si vedono solo eseguendo il payload. */
+check("v405 l'ampiezza non chiama 'rally' un mese in cui entrambi gli indici scendono", suVeri(`
+  DATA.macro = DATA.macro || {};
+  DATA.macro.breadth = { spy_1m_pct: -0.8, rsp_1m_pct: -0.74, divergence_pp: -0.06, alert: false };
+  const p = buildPrompt();
+  return p.indexOf("discesa con partecipazione uniforme") >= 0
+      && p.indexOf("rally con partecipazione") < 0;`));
+
+check("v405 con entrambi in rialzo l'ampiezza torna a chiamarlo rally", suVeri(`
+  DATA.macro = DATA.macro || {};
+  DATA.macro.breadth = { spy_1m_pct: 2.1, rsp_1m_pct: 1.9, divergence_pp: 0.2, alert: false };
+  const p = buildPrompt();
+  return p.indexOf("rally con partecipazione uniforme") >= 0
+      && p.indexOf("discesa con partecipazione") < 0;`));
+
+/* ⚠ "rilassato" e' corretto contro la banda e falso contro la distribuzione: al 3° percentile
+   il compenso per il rischio non ha piu' spazio dalla parte favorevole. Le due letture stavano
+   nello stesso pacchetto e dicevano cose opposte sullo stesso numero. */
+check("v405 il credito all'estremo del proprio intervallo lo dichiara accanto all'etichetta", suVeri(`
+  DATA.macro = DATA.macro || {};
+  DATA.macro.credit = DATA.macro.credit || {};
+  /* ⚠ il percentile e' un MIDRANK: con sette osservazioni il minimo unico vale gia' 7°, sopra
+     la soglia del 5°. La prima fixture non mordeva perche' NON CONTENEVA il fenomeno, non
+     perche' il codice fosse rotto — venti osservazioni lo portano al 3°, che e' il caso reale. */
+  DATA.macro.credit.spread_hy = 2.6;
+  DATA.macro.credit.history = Array.from({length:20},(_,i)=>({v: i===0 ? 2.6 : 2.9 + i*0.03}));
+  const p = buildPrompt();
+  return p.indexOf("credito rilassato") >= 0
+      && p.indexOf("PERCENTILE del proprio intervallo annuale") >= 0
+      && p.indexOf("non ha piu' spazio dalla parte favorevole") >= 0;`));
+
+check("v405 a meta' del proprio intervallo il credito non aggiunge nessun avviso", suVeri(`
+  DATA.macro = DATA.macro || {};
+  DATA.macro.credit = DATA.macro.credit || {};
+  DATA.macro.credit.spread_hy = 3.1;
+  DATA.macro.credit.history = Array.from({length:20},(_,i)=>({v: 2.6 + i*0.05}));
+  const p = buildPrompt();
+  return p.indexOf("credito rilassato") >= 0
+      && p.indexOf("PERCENTILE del proprio intervallo annuale") < 0;`));
+
+/* ⚠ `contestoPortafoglio(tk)` riceve il ticker solo dal pacchetto di titolo: in quello MACRO
+   nessun titolo e' in esame, e la riga usciva come "gruppo correlato di " — mutilata proprio
+   dove chi legge cerca il riferimento. */
+check("v405 in contesto macro il blocco notizie non lascia il nome del titolo vuoto", suVeri(`
+  /* ⚠ il blocco delle notizie sta in buildCIOText(), non in buildPrompt(): e' il pacchetto che
+     il CEO incolla davvero. Un check sulla funzione sbagliata misura un'altra cosa. */
+  const p = buildCIOText();
+  if (p.indexOf("NOTIZIE SUI TITOLI DEL LIBRO") < 0) return false;   // il fenomeno deve esserci
+  return p.indexOf("gruppo correlato di (") < 0
+      && p.indexOf("gruppo correlato di  ") < 0
+      && p.indexOf("QUESTE NON SONO NOTIZIE SU NOMI SEPARATI") >= 0;`));
+
+check("v405 nel pacchetto di titolo la stessa riga nomina il titolo analizzato", suVeri(`
+  const p = buildPromptTicker("CRWV");
+  return p.indexOf("gruppo correlato di CRWV") >= 0
+      && p.indexOf("QUESTE NON SONO NOTIZIE SU NOMI SEPARATI") < 0;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
