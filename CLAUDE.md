@@ -2681,6 +2681,57 @@ classe v390, che torna con una causa nuova.
 > gate di coerenza non lo vedono al momento del merge: vanno rieseguiti dopo il primo run che
 > quel campo lo porta.
 
+## 🏷️ v405 — TRE ETICHETTE CHE DICEVANO PIÙ (O ALTRO) DEL PROPRIO DATO
+
+Trovate leggendo il pacchetto macro come il modello che lo riceve. Nessuna rompeva niente: sono
+la classe dei difetti che non si rompono, e si vedono solo eseguendo il payload.
+
+**"Rally con partecipazione ampia" su un mese in cui ENTRAMBI gli indici scendono.** Il
+03/09/2026 SPY −0,8% e RSP −0,74%, e il pacchetto parlava di un rally che non c'era. Il detector
+misura correttamente lo *spread* — quello è il suo mestiere — ma il nome dello stato presupponeva
+un **segno** che i dati non portano. Ora il verso lo dà il cap-pesato e l'ampiezza resta la
+distanza fra i due: con entrambi in calo si legge *"discesa con partecipazione uniforme"*, che è
+un'informazione diversa e altrettanto utile (il calo non è concentrato su pochi nomi).
+
+**"Credito rilassato" al 3° percentile.** La banda è corretta e dichiarata (2,65% sta sotto il
+4%), ma poche righe più sotto lo stesso pacchetto pubblica che quel valore è al **terzo
+percentile** del proprio anno con la nota *"compressione estrema: il credito non prezza rischio"*.
+Due frasi opposte sullo stesso numero. **Il livello e la posizione nella propria distribuzione
+sono due grandezze diverse** — la stessa distinzione che il pacchetto fa già sulle materie prime.
+Ora sotto il 5° percentile l'etichetta porta l'avviso accanto: un compenso per il rischio
+all'estremo basso non ha più spazio dalla parte favorevole.
+
+⚠ Il percentile si legge dalla **stessa** `dgPercentile` che lo pubblica nei digest storici:
+ricalcolarlo sarebbe la classe v161/v207.
+
+**Il nome del titolo vuoto nel blocco notizie.** `contestoPortafoglio(tk)` riceve il ticker solo
+dal pacchetto di titolo: in quello macro nessun titolo è in esame, e la riga usciva come
+*"stanno nel gruppo correlato di "* — mutilata proprio dove chi legge cerca il riferimento. Non
+era un dato mancante: era **una riga scritta per un contesto e resa in due**.
+
+### 🧪 Due fixture che non contenevano il fenomeno
+Il check sul credito iniettava sette osservazioni con 2,6 come minimo: `dgPercentile` usa la
+convenzione **midrank**, quindi il minimo unico su sette vale già **7°**, sopra la soglia del 5°.
+Il check era rosso perché la fixture non conteneva il caso, non perché il codice fosse rotto —
+venti osservazioni lo portano al 3°, che è il valore reale. E il check sulle notizie guardava
+`buildPrompt()`: **il blocco vive in `buildCIOText()`**, che è il pacchetto che il CEO incolla
+davvero. *Un check sulla funzione sbagliata misura un'altra cosa.*
+
+### 📋 E il rilievo del CEO sul pacchetto che non riassume la pagina, misurato
+*"Molte informazioni del sistema non ci sono nel prompt … il sistema non è un riassunto
+affidabile di ciò che posso vedere scorrendo la pagina."* Sui tre esempi citati (VIX, Fear &
+Greed, put/call) il pacchetto **li ha**. Ma la conclusione generale è corretta e ora ha una
+misura: `data.json` porta **42 blocchi macro**, la pagina ne apre **34**, e sette non arrivano
+mai al pacchetto — le **componenti** di Fear & Greed, **Buffett**, **risk_sentiment**,
+**smart_money**, **macroquant**, **Sharpe** e **alpha** del libro. EUR/JPY è invece
+un'esclusione decisa (v138, ridondante col blocco Carry).
+
+> Il difetto peggiore non è l'assenza: è che **il pacchetto non dichiara di non averli**. Chi
+> legge non distingue "il sistema non ha questo dato" da "ce l'ha e non te lo passa" — la classe
+> delle notizie contate e poi nascoste (v393). La correzione strutturale è un **gate nei due
+> versi**, come quello che la v387 ha fatto per `/aggiorna`: ogni indicatore che la pagina rende
+> deve essere o nel pacchetto o dichiarato fuori con la sua ragione scritta.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
