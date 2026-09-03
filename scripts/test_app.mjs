@@ -7241,6 +7241,36 @@ check("v411 [B8] non contraddice A1bis su chi cerca", (() => {
     || no("[B8] si dichiara l'unico blocco a fonte esterna, ma A1bis ordina gia' di cercare");
 })());
 
+/* ═══ v412 — LA STESSA GRANDEZZA TRE VOLTE, DUE ARROTONDAMENTI ═════════════════════════
+   Trovato rileggendo la riga che avevo appena riscritto in v411. Diceva lo spread TRE volte:
+   una in `base` (+0,56pp), una dentro `br.note` che la pipeline scrive con l'arrotondamento
+   grosso (+0.6pp), e una nella mia frase. E lo stesso per il rendimento di SPY: +0,45% e +0.5%.
+   ⚠ Due valori per la stessa grandezza sono esattamente cio' che il collaudo B5 ordina al
+   lettore di segnalare — e che un LLM reale ci ha segnalato lo stesso giorno sull'autonomia di
+   cassa (v409). Il pacchetto non deve produrre da solo i falsi positivi del proprio controllo
+   di qualita': quando succede, il collaudo si logora e chi legge smette di fidarsi.
+   ⚠ `br.note` porta anche il difetto v405: chiama "rally" un mese in cui il cap-pesato fa
+   +0,45% e l'equi-pesato scende. Non ripubblicarla non toglie nessun FATTO — i tre numeri
+   restano in `base` — toglie una ripetizione (v184). */
+check("v412 il ramo d'ampiezza cita ogni grandezza UNA volta sola", suVeriEsito(`
+  DATA.macro.breadth = { spy_1m_pct: 0.45, rsp_1m_pct: -0.1, divergence_pp: 0.56, alert: true,
+                         note: "SPY +0.5% vs RSP -0.1% a 1M (spread +0.6pp): il rally e' retto dalle megacap." };
+  const p = buildPrompt();
+  const i = p.indexOf("AMPIEZZA IN DETERIORAMENTO");
+  if (i < 0) return "il ramo d'allarme non si rende: il check non misura niente";
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  /* lo spread compare una volta sola, e nel formato del sistema: se comparisse anche quello
+     della nota sarebbero due valori (0,56 e 0,6) per la stessa grandezza */
+  const nostro = (riga.match(/0,56/g) || []).length;
+  const loro = (riga.match(/0\\.6|0,6pp/g) || []).length;
+  if (nostro !== 1) return "lo spread compare " + nostro + " volte invece di una";
+  if (loro) return "compare anche l'arrotondamento della nota: due valori per la stessa grandezza";
+  /* e il rendimento di SPY: 0,45 nostro, 0.5 della nota */
+  if ((riga.match(/0\\.5%/g) || []).length) return "il rendimento di SPY esce con due arrotondamenti";
+  /* ⚠ e la parola "rally" non deve rientrare da br.note: e' il difetto v405, che afferma una
+     direzione che i dati non portano */
+  return riga.indexOf("rally") < 0 || "la nota reintroduce 'rally' su un mese che non lo e'";`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

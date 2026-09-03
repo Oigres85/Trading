@@ -1,4 +1,4 @@
-⟦ BUILD v411 · generato 03/09/2026 18:05 ⟧
+⟦ BUILD v412 · generato 03/09/2026 18:14 ⟧
 
 Siete un team di analisti senior di Wall Street che lavora per un fondo GROWTH privato, e leggete tutto con l'occhio del risk management. Ricevete il quadro macro completo di un sistema che aggiorna i dati piu' volte al giorno, e in coda il LIBRO su cui quel macro atterra: pesi, concentrazione, contributo al rischio e la disciplina di rischio del fondo misurata riga per riga.
 La domanda non e' "come va l'economia": e' COSA QUESTO QUADRO MACRO FA A QUESTO LIBRO — attraverso quale canale, su quali posizioni, e con quale segno. Un'analisi macro che non arriva mai al libro e' un bollettino, e il libro ce l'avete davanti.
@@ -56,7 +56,7 @@ C3 — Se due parti del payload si contraddicono, segnalalo esplicitamente invec
 
 
 DATI AL 03/09/2026, 17:59:37 (prezzi: snapshot pipeline + refresh live lato client ogni 60s)
-CONTESTO DI SESSIONE (ora ET 14:05, fase: REGULAR — festività USA non considerate) · CONTESTO — NON anticipatori: la sessione USA e' aperta, quindi questi dati sono gia' dentro i prezzi live: KOSPI +0,26% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,01% · Fut S&P +0,96% · BTC +4,85% [24/7] · SESSIONE USA APERTA: i prezzi live hanno priorità; gli ordini limite sono eseguibili oggi.
+CONTESTO DI SESSIONE (ora ET 14:14, fase: REGULAR — festività USA non considerate) · CONTESTO — NON anticipatori: la sessione USA e' aperta, quindi questi dati sono gia' dentro i prezzi live: KOSPI +0,26% [ultima chiusura di Seoul, borsa ferma] · Fut NDX +1,01% · Fut S&P +0,96% · BTC +4,85% [24/7] · SESSIONE USA APERTA: i prezzi live hanno priorità; gli ordini limite sono eseguibili oggi.
 FRESCHEZZA DEI DATI DI QUESTO PACCHETTO — tre classi diverse, non una:
 · DATI DI MERCATO (VIX, put/call, ampiezza, futures, cambi, rotazione ETF, spread di credito, momentum): scaricati al run delle 03/09/2026, 17:59:37, prossimo run 03/09/2026, 19:00:00. La barra giornaliera sotto quei numeri e' del 2026-09-03.
 · STATISTICHE UFFICIALI (calendario di pubblicazione proprio, ritardo da giorni a mesi): Inflazione CPI (a/a) (2026-07-01) · Inflazione PCE (a/a) (2026-07-01) · PIL USA (t/t ann.) (2026-04-01) · Vendite al dettaglio (m/m) (2026-07-01) · Non-Farm Payrolls (2026-07-01) · Disoccupazione (2026-07-01) · Fiducia consumatori (UMich) (2026-08-01) · Curva 10A-2A (2026-09-02) · Curva 10A-3M (2026-09-02) · Treasury USA 30A (2026-09-01) · Tasso reale 10A (TIPS) (2026-09-01) · Inflazione attesa 10A (breakeven) (2026-09-02) · Manifattura Philly Fed (al posto dell'ISM) (2026-08-01). Ciascuna porta piu' sotto la propria rilevazione, l'eta' in giorni e il prossimo dato atteso.
@@ -77,7 +77,7 @@ QUADRO MACRO:
 - Momentum strutturale (prezzo vs SMA125 ≈ 6 mesi): S&P 500 7748,85 vs SMA125 7293,28 (+6,25%) · Nasdaq 100 29.498,6 vs SMA125 28.021,96 (+5,27%) — sopra = trend primario integro, sotto = deterioramento.
 - Futures USA LIVE: Nasdaq 100 (NQ) 29.526 (+1,01%) · S&P 500 (ES) 7755,75 (+0,96%) — la sessione e' GIA' APERTA, quindi non anticipano niente: servono a vedere se il movimento in corso e' coerente col resto o se il cash si sta staccando dai future.
 - Schiuma speculativa ETF leva 3x (proxy euforia retail): SOXL 3x semi RVol 0,69× (-13,73% 5g) · TQQQ 3x NDX RVol 0,67× (-1,59% 5g) — entro la norma (alert a RVol ≥ 2,5× con prezzo in salita a 5 sedute).
-- ⚠ [AMPIEZZA IN DETERIORAMENTO] SPY (cap-pesato) +0,45% vs RSP (equi-pesato) -0,1% a 1M · spread +0,56pp. SPY +0.5% vs RSP -0.1% a 1M (spread +0.6pp): il rally è retto dalle megacap, l'azione media non partecipa. Il cap-pesato sta facendo meglio dell'equi-pesato di +0,56pp: meccanicamente vuol dire che il movimento dell'indice e' retto da POCHI nomi grandi e non dall'azione media del mercato. ⚠ PERCHE' RIGUARDA QUESTO LIBRO IN PARTICOLARE: le posizioni piu' pesanti sono megacap correlate fra loro (il gruppo di fattore misurato nel blocco del libro), quindi il libro e' esposto proprio ai nomi che stanno reggendo l'indice da soli — la stessa concentrazione che lo ha fatto salire e' quella che lo espone se quei nomi si fermano.
+- ⚠ [AMPIEZZA IN DETERIORAMENTO] SPY (cap-pesato) +0,45% vs RSP (equi-pesato) -0,1% a 1M · spread +0,56pp: il cap-pesato sta facendo meglio dell'equi-pesato, e meccanicamente vuol dire che il movimento dell'indice e' retto da POCHI nomi grandi e non dall'azione media del mercato. ⚠ PERCHE' RIGUARDA QUESTO LIBRO IN PARTICOLARE: le posizioni piu' pesanti sono megacap correlate fra loro (il gruppo di fattore misurato nel blocco del libro), quindi il libro e' esposto proprio ai nomi che stanno reggendo l'indice da soli — la stessa concentrazione che lo ha fatto salire e' quella che lo espone se quei nomi si fermano.
 - Treasury USA 10A: 4.76% (-0,04 pp oggi) [^TNX, quotazione di mercato dell'ultima seduta. ⚠ Piu' sotto la CURVA DEI TASSI porta lo stesso decennale a 4,79% (FRED DGS10, osservazione del 2026-09-01): NON e' una contraddizione, sono due fonti e due momenti — la quotazione di mercato e l'osservazione ufficiale, che esce con qualche giorno di ritardo. Per confronti con le altre scadenze usa quella della curva, che e' omogenea con loro.]
 - EUR/USD: 1.1637 (+0,36% oggi)
 - PIL USA (t/t ann.): 1.5% (riferito al 2° trimestre 2026 (aprile-giugno) · acquisito il 03/09/2026 · ultima uscita 26/08/2026 (8 giorni fa) · prossimo aggiornamento 30/09/2026 (calendario ufficiale, Gross Domestic Product, via FRED) · BEA, trimestrale · serie TRIMESTRALE, il dato più recente disponibile)
@@ -115,7 +115,7 @@ Michael Darda, Chief Economist at Rot
       On this episode of the Odd Lots podcast, Stanford Professor Darrell Duffie joins Tracy Alloway and Joe Weisenthal to discuss what's driving the surge in US government bond yields and what the Fed could do to shrink its balance sheet. (Source: Bloomberg)
     · [CNBC Economia, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Fed Governor Waller indicates he will support holding rates steady at September meeting
       In remarks that seem to contrast with statements last week from Chairman Kevin Warsh, Waller expressed confidence in the current inflation trends.
-    · [Bloomberg, 4h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Treasuries Rise After Fed’s Waller Notes Inflation Progress
+    · [Bloomberg, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] Treasuries Rise After Fed’s Waller Notes Inflation Progress
       Treasuries rose after Federal Reserve Governor Christopher Waller said he’d be inclined to leave interest rates unchanged as long as inflation continues to slow.
     · [Bloomberg, 5h fa, DOPO l'ultima chiusura: il prezzo non l'ha ancora votata] S&P 500 Eyes Best Day in Month as Fedspeak Signals Rate Patience
       The S&P 500 Index rose Thursday, on track for its best day in a month, as investors weighed remarks from Federal Reserve Governor Christopher Waller, who offered optimism that inflation is showing some signs of slowing. Traders pared bets for interest-rate hikes in September.
@@ -253,9 +253,9 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsVertiv is buying Utility Innovations for up to $2.6 billion.
   [CRWV] · [Nasdaq, 9h fa] Nvidia Beat Earnings Estimates Again (15 Times Straight). History Says the Stock Will Do This Next.
       Key PointsDespite beating Wall Street's estimates, Nvidia stock dropped by an average of 4% during the month following the last eight quarterly reports.
-  [CRWV] · [Nasdaq, 10h fa] Should CoreWeave and Nebius Group Investors Be Worried About Circular Financing? Here's What the Numbers Say
+  [CRWV] · [Nasdaq, 11h fa] Should CoreWeave and Nebius Group Investors Be Worried About Circular Financing? Here's What the Numbers Say
       Key PointsCoreWeave and Nebius Group both have backstops from Nvidia.
-  [MRVL] · [Nasdaq, 3h fa] Can PENG Turn Integrated Memory Growth Into an Edge Over Competitors?
+  [MRVL] · [Nasdaq, 4h fa] Can PENG Turn Integrated Memory Growth Into an Edge Over Competitors?
       Penguin Solutions' Integrated Memory surge, CXL offerings and MemoryAI performance gains are sharpening its competitive position in AI infrastructure.
   [MRVL] · [Nasdaq, 4h fa] Will Credo's Neocloud Expansion Broaden Its AEC Growth Runway?
       CRDO's AEC growth runway is widening as hyperscaler penetration deepens, 1.6T transition advances and Neocloud demand broadens its customer base.
@@ -269,7 +269,7 @@ IL RISCHIO DEL LIBRO, E CON CHE COSA SI CONFRONTA (tutte le colonne misurate sul
       Key PointsTaiwan Semiconductor and Micron Technology continue to see huge demand.
   [ORCL] · [Nasdaq, 5h fa] Why Investors Need to Take Advantage of These 2 Computer and Technology Stocks Now
       Investors looking for ways to find stocks that are set to beat quarterly earnings estimates should check out the Zacks Earnings ESP.
-  [ORCL] · [Nasdaq, 5h fa] Where Will Oracle Stock Be in 5 Years?
+  [ORCL] · [Nasdaq, 6h fa] Where Will Oracle Stock Be in 5 Years?
       Key PointsOracle's backlog continues to grow significantly, even after announcing its landmark deal with OpenAI.
   [RGTI] · [Nasdaq, 3h fa] Rigetti's Massive $100M Quantum Opportunity Comes With a Critical Catch
       Rigetti Computing (NASDAQ: RGTI) is gaining strategic validation from government support and paying hardware customers, but the shareholder equation remains unsettled. The upside could grow substantially if those early signals become repeatable demand, provided capital requiremen

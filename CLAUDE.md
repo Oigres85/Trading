@@ -3141,6 +3141,40 @@ permanente* (v326). Riagganciato all'invariante: il ramo si accende solo quando 
 > dati nuovi, i gate di coerenza vanno **rieseguiti**, perché i rami che dipendono dai dati
 > possono essersi accesi per la prima volta.
 
+## 🔁 v412 — LA STESSA GRANDEZZA TRE VOLTE, DUE ARROTONDAMENTI
+
+Trovato rileggendo la riga che avevo appena riscritto **un'ora prima** in v411. Diceva lo spread
+**tre volte**: in `base` (`+0,56pp`), dentro `br.note` che la pipeline scrive con l'arrotondamento
+grosso (`+0.6pp`), e nella mia frase. Idem il rendimento di SPY: `+0,45%` e `+0.5%`.
+
+| | in `base` (nostro) | in `br.note` (pipeline) |
+|---|---|---|
+| rendimento SPY | +0,45% | **+0.5%** |
+| spread | +0,56pp | **+0.6pp** |
+
+> ⚠⚠ **Due valori per la stessa grandezza sono esattamente ciò che il collaudo B5 ordina al
+> lettore di segnalare** — e che un LLM reale ci ha segnalato **lo stesso giorno** sull'autonomia
+> di cassa (v409). Il pacchetto non deve produrre da solo i falsi positivi del proprio controllo
+> di qualità: quando succede, il collaudo si logora e chi legge smette di fidarsi anche del resto.
+
+⚠ E `br.note` porta anche il **difetto v405**: chiama *"rally"* un mese in cui il cap-pesato fa
++0,45% e l'equi-pesato **scende**. La correzione della v405 era stata applicata al ramo neutro e
+non a questo, perché questo ramo **non si rendeva** — è la stessa cecità che ha lasciato il
+fossile della v411 in vita per versioni.
+
+⚠ **Non ripubblicare la nota non toglie nessun FATTO**: i tre numeri restano in `base`, e
+l'interpretazione la fa la frase nostra, che dice il meccanismo senza affermare una direzione che
+i dati non portano. È un taglio di ridondanza (v184), non di informazione — quindi non richiede
+la dichiarazione che la v406 impone alle assenze.
+
+⚠ Il gate verifica che ogni grandezza compaia **una volta sola** e che "rally" non rientri.
+Validato reintroducendo `br.note`: morde.
+
+> **La lezione di giornata, ripetuta tre volte in poche ore**: i difetti peggiori di oggi li ho
+> introdotti io, e li ha trovati tutti e tre **leggere il pacchetto come chi lo riceve** — non
+> rileggere il codice, non i gate. Prima l'autonomia di cassa (un LLM reale), poi il conteggio
+> fisso nella testata, poi questo. L'esercizio ricorrente vale più della suite.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
