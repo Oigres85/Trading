@@ -8500,7 +8500,27 @@ function buildPrompt(opz) {
     const br = m.breadth;
     const base = `SPY (cap-pesato) ${signTxt(br.spy_1m_pct)} vs RSP (equi-pesato) ${signTxt(br.rsp_1m_pct)} a 1M · spread ${signTxt(br.divergence_pp, "pp")}`;
     if (br.alert) {
-      lines.push(`- ⚠ [BREADTH DIVERGENCE] Ampiezza di mercato in deterioramento: ${base}. ${br.note || ""} DIRETTIVA: il rally NON è confermato dall'azione media — prudenza sui nuovi ingressi (sizing ridotto o ingresso post-conferma), priorità ai candidati con RS propria e non trainata dall'indice; per il book già concentrato sulle megacap questo è il segnale d'allarme più specifico: verifica la distanza degli stop ratchet.`);
+      /* ═══ v411 — UN FOSSILE CON TRE DIFETTI, VISIBILE SOLO QUANDO L'AMPIEZZA DIVERGE ══════
+         Questo ramo si rende solo con `br.alert`, e i dati che lo accendono sono arrivati solo
+         ora: e' il ramo irraggiungibile PER I DATI della v390/v404, che i gate di coerenza non
+         vedono al momento del merge. Quando si e' acceso, C9 ha trovato dentro:
+           (a) una DIRETTIVA nella coda — ottava volta in questo progetto (v156, v179, v180,
+               v389, v402, v404, v406): le istruzioni vivono nella testata, il payload porta fatti;
+           (b) una prescrizione di DIMENSIONAMENTO ("sizing ridotto"), cioe' esattamente cio' che
+               la testata vieta e che la v410 ha appena rimesso al centro con [B7];
+           (c) un rimando allo "stop ratchet", RIMOSSO NELLA v256 — un rimando a un blocco che
+               non esiste piu', la classe che C10 sorveglia.
+         Restano i FATTI, che sono quelli utili: di quanto i due indici divergono, cosa significa
+         meccanicamente, e perche' riguarda QUESTO libro. La conseguenza la trae chi legge, che
+         e' precisamente cio' che [B7] gli chiede. */
+      lines.push(`- ⚠ [AMPIEZZA IN DETERIORAMENTO] ${base}. ${br.note || ""} `
+        + `Il cap-pesato sta facendo meglio dell'equi-pesato di ${signTxt(br.divergence_pp, "pp")}: `
+        + `meccanicamente vuol dire che il movimento dell'indice e' retto da POCHI nomi grandi e `
+        + `non dall'azione media del mercato. ⚠ PERCHE' RIGUARDA QUESTO LIBRO IN PARTICOLARE: le `
+        + `posizioni piu' pesanti sono megacap correlate fra loro (il gruppo di fattore misurato `
+        + `nel blocco del libro), quindi il libro e' esposto proprio ai nomi che stanno reggendo `
+        + `l'indice da soli — la stessa concentrazione che lo ha fatto salire e' quella che lo `
+        + `espone se quei nomi si fermano.`);
     } else {
       /* ═══ v405 — L'ETICHETTA ASSUMEVA IL RALLY INVECE DI MISURARLO ══════════════════════
          Diceva "rally con partecipazione ampia" anche quando ENTRAMBI gli indici erano in calo:

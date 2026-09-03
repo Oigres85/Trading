@@ -418,14 +418,30 @@ check("v354 il campo budget_operativo_spendibile non esiste piu'", (() => {
   /* nessuno lo leggeva, e con ES95 null valeva la cassa INTERA: la riserva di coda spariva */
   return !src.includes("budget_operativo_spendibile:");
 })());
-check("v126 breadth: divergenza SPY/RSP nel prompt con direttiva prudenza; forma neutra senza alert", run(`
+/* ⚠⚠ VENTICINQUESIMA rottura di un check ancorato a una stringa letterale, e questa PINNAVA IL
+   COMPORTAMENTO SBAGLIATO: pretendeva la frase "prudenza sui nuovi ingressi", cioe' proprio la
+   DIRETTIVA che C9 vieta nella coda e la prescrizione di dimensionamento che la testata proibisce.
+   Due gate in conflitto, e vince quello scritto per ultimo (v389) — ma la ragione vera e' che
+   un gate che pinna un difetto lo rende permanente (v326). L'invariante vero non e' la frase:
+   e' che il ramo d'allarme si accenda solo quando serve, pubblichi la MISURA, e non contenga
+   ne' ordini ne' quantita'. */
+check("v126 breadth: il ramo d'allarme pubblica la misura, senza direttive ne' quantita'", suVeriEsito(`
   DATA.macro.breadth = { spy_1m_pct: 2.6, rsp_1m_pct: -0.8, divergence_pp: 3.4, alert: true, note: "Rally retto dalle megacap." };
   const p1 = buildPrompt();
   DATA.macro.breadth = { spy_1m_pct: 2.6, rsp_1m_pct: 1.9, divergence_pp: 0.7, alert: false };
   const p2 = buildPrompt();
   delete DATA.macro.breadth;
-  return p1.includes("[BREADTH DIVERGENCE]") && p1.includes("prudenza sui nuovi ingressi") &&
-    !p2.includes("[BREADTH DIVERGENCE]") && p2.includes("Ampiezza di mercato")`));
+  if (p1.indexOf("AMPIEZZA IN DETERIORAMENTO") < 0) return "col flag alzato il ramo d'allarme non compare";
+  if (p2.indexOf("AMPIEZZA IN DETERIORAMENTO") >= 0) return "il ramo d'allarme compare anche senza allarme";
+  if (p2.indexOf("Ampiezza di mercato") < 0) return "senza allarme sparisce anche la riga neutra";
+  const riga = p1.slice(p1.indexOf("AMPIEZZA IN DETERIORAMENTO"));
+  const fine = riga.slice(0, riga.indexOf(String.fromCharCode(10)));
+  /* niente ordini e niente dimensionamento: sono le due regole che questa riga violava */
+  for (const vietato of ["DIRETTIVA", "prudenza", "sizing", "ratchet", "verifica"]) {
+    if (fine.toLowerCase().indexOf(vietato.toLowerCase()) >= 0) return "la riga contiene ancora: " + vietato;
+  }
+  /* e deve portare la MISURA, non solo l'etichetta */
+  return fine.indexOf("3,4pp") >= 0 || "la riga non pubblica lo spread misurato";`));
 
 /* ---------- v130: Analisi AI a bottone unico (buildCIOText + digest storici) ---------- */
 

@@ -3112,6 +3112,35 @@ svuota** (classe v400). Ora la riga si aggancia ad A1bis invece di negarla.
 ⚠ Entrambi i gate sono validati per iniezione, e guardano **file e fallback** — un obbligo che
 vive in una copia sola è la trappola v331.
 
+### 🦴 E il rebase ha acceso un fossile che nessuno aveva mai visto
+Rientrando dal conflitto con i dati freschi del CI, C9 ha trovato un imperativo in un ramo che
+**non si era mai reso**: `[BREADTH DIVERGENCE]`, che compare solo quando `br.alert` è vero — e i
+dati che lo accendono sono arrivati proprio con quel run. È il **ramo irraggiungibile per i DATI**
+di v390/v404, che i gate di coerenza non vedono al momento del merge.
+
+Quando si è acceso, dentro c'erano **tre difetti insieme**:
+
+| difetto | classe |
+|---|---|
+| una **DIRETTIVA** nella coda | C9, **ottava volta** (v156, v179, v180, v389, v402, v404, v406) |
+| una prescrizione di **dimensionamento** (*"sizing ridotto"*) | ciò che la testata vieta e che la v410 ha appena rimesso al centro con `[B7]` |
+| un rimando allo **"stop ratchet"**, rimosso nella v256 | rimando a un blocco che non esiste più (C10) |
+
+Restano i **fatti**, che sono quelli utili: di quanto i due indici divergono, cosa significa
+meccanicamente (il movimento è retto da pochi nomi grandi), e perché riguarda **questo** libro —
+le posizioni più pesanti sono proprio le megacap che stanno reggendo l'indice da sole. La
+conseguenza la trae chi legge, che è precisamente ciò che `[B7]` gli chiede.
+
+⚠⚠ **E il gate v126 PINNAVA IL COMPORTAMENTO SBAGLIATO**: pretendeva la stringa *"prudenza sui
+nuovi ingressi"*, cioè proprio la direttiva che C9 vieta. Venticinquesima rottura di un check
+ancorato a una stringa letterale, e la peggiore specie — *un gate che pinna un difetto lo rende
+permanente* (v326). Riagganciato all'invariante: il ramo si accende solo quando serve, pubblica la
+**misura**, e non contiene né ordini né quantità. Validato reintroducendo la direttiva: morde.
+
+> **La lezione operativa, già scritta in questo file e ripagata oggi**: dopo un rebase che porta
+> dati nuovi, i gate di coerenza vanno **rieseguiti**, perché i rami che dipendono dai dati
+> possono essersi accesi per la prima volta.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
