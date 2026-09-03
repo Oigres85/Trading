@@ -3028,6 +3028,62 @@ correttamente rifiutato di sommare CPI/PCE, curva 10A-2A e 10A-3M, VIX e Fear & 
 indipendenti — cioè ha applicato B3 senza che glielo si ricordasse. *Un collaudo che trova un
 difetto vero è la prova che il collaudo serve.*
 
+## 🎯 v410 — LE CONSEGUENZE OPERATIVE, E IL PERIMETRO DICHIARATO COL NUMERO
+
+Richiesta del CEO: *"far sì che il sistema suggerisca alleggerimenti, vendite, incrementi ed
+eventuali opportunità di ingresso su nuovi titoli (motivando il tutto)"*, e poi, sugli ingressi:
+*"lascia ricerca ad llm per nuovi titoli anche sulla base della rotazione dei settori o su altri
+parametri che ritiene (es. news)"*.
+
+**La separazione è quella di sempre**: l'ORDINE di concludere e di cercare vive nella TESTATA
+(`[B7]` e `[B8]`), il FATTO che l'universo dei candidati non esista vive nella CODA. Metterlo al
+contrario è la violazione C9 già pagata sette volte.
+
+### [B7] — la chiusura operativa
+Non cambia la natura del sistema, che resta di fatti: cambia che l'analisi deve **arrivare** a una
+conseguenza, altrimenti la ricava il CEO dai numeri — cioè fa il lavoro che ha chiesto all'LLM.
+Quattro vincoli, tutti già regole di questo progetto:
+- ogni indicazione **si ancora a una misura dichiarata** — le nove regole della disciplina portano
+  misura, soglia e provenienza della soglia — e la riga **nomina quale**;
+- ⚠⚠ **direzione e priorità sì, quantità mai**: il divieto di dimensionare viaggia DENTRO il blocco
+  che invita a concludere, che è dove è più facile scivolare (v389). I livelli di prezzo sì,
+  perché vengono dai dati;
+- ⚠ **"oltre la soglia" non significa "vendi"**: un fondo growth concentrato ci sta fuori per
+  costruzione. La domanda utile è se quella deviazione sia stata **decisa** o sia **successa da
+  sola** mentre i prezzi si muovevano;
+- ordinare per **urgenza**, non per dimensione.
+
+### [B8] — la ricerca è dell'LLM, e il sistema lo dice
+⚠⚠ **PERCHÉ LA DELEGA SIA ONESTA, CHI LEGGE DEVE SAPERE PERCHÉ.** Non è che il sistema abbia uno
+screening e non lo passi: non ce l'ha. La coda lo dichiara **col numero, contato a ogni run**:
+
+> *dei 25 simboli che la pipeline segue, 14 sono le posizioni del libro, 9 sono indici, cambi o
+> materie prime, e restano 2 titoli seguiti e non posseduti (TSM, AVGO). 2 nomi non sono uno
+> screening.*
+
+⚠ **Il numero si conta, non si scrive.** Un conteggio fisso in prosa invecchia da solo e in
+silenzio (C10, red team I6) — e infatti la mia prima stima a voce era sbagliata: avevo detto
+"11 benchmark e zero candidati", i benchmark sono **9** e i candidati **2**. Il gate lo valida
+aggiungendo un titolo e verificando che il numero si muova.
+
+⚠ Gli strumenti si riconoscono dalla **FORMA del simbolo** (`^`, `=`, `-USD`), non da un elenco di
+nomi da tenere allineato.
+
+⚠ E il blocco dice **da dove partire**: la rotazione sui 21 ETF — in particolare i comparti in cui
+il libro NON è presente, che è la lettura per cui quel blocco esiste (v206) — le notizie, e i
+canali macro misurati. Un ordine di cercare senza appigli è un ordine che produce nomi a caso.
+⚠ Ogni nome proposto è un'affermazione dell'LLM, non un dato del sistema, e vale la regola A1.
+⚠ E un nome nuovo dentro il gruppo correlato già misurato **non diversifica**: aggiunge alla
+stessa scommessa.
+
+### 🔒 I gate, e il primo è la v331
+`[B7]` e `[B8]` devono stare in **entrambe le testate** — il file remoto E `DEFAULT_PROMPT_HEADER`.
+*Un obbligo che dipende da una fetch non è un obbligo, è una speranza*, ed è già costata la vita
+di una funzionalità. Validato togliendo il blocco dal solo fallback: morde.
+
+**Costo misurato**: pacchetto macro 71.209 → 74.840 caratteri (+5,1%), di cui ~2.900 sono le due
+sezioni di testata e ~700 la riga del perimetro.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

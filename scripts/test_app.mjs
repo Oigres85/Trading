@@ -7117,6 +7117,69 @@ check("v409 la formulazione dell'autonomia viene da UN posto solo", (() => {
   return chiamate >= 4 || no("solo " + chiamate + " riferimenti: qualche punto di stampa non la usa");
 })());
 
+/* ═══ v410 — LE CONSEGUENZE OPERATIVE, E IL PERIMETRO DICHIARATO ═══════════════════════
+   Richiesta del CEO: "far si' che il sistema suggerisca alleggerimenti, vendite, incrementi ed
+   eventuali opportunita' di ingresso su nuovi titoli (motivando il tutto)", e poi, sugli
+   ingressi: "lascia ricerca ad llm per nuovi titoli anche sulla base della rotazione dei settori
+   o su altri parametri che ritiene (es. news)".
+   ⚠ LA SEPARAZIONE E' QUELLA DI SEMPRE: l'ORDINE di concludere e di cercare vive nella TESTATA
+   (B7 e B8), il FATTO che l'universo dei candidati non esista vive nella CODA. Metterlo al
+   contrario e' la violazione C9 che questo progetto ha gia' pagato sette volte. */
+check("v410 l'obbligo di concludere vive in ENTRAMBE le testate, non solo nel file remoto", (() => {
+  /* ⚠ v331: un obbligo che dipende da una fetch non e' un obbligo, e' una speranza. Il file
+     remoto puo' non arrivare, e allora vale DEFAULT_PROMPT_HEADER. */
+  const file = readFileSync(join(ROOT, "config", "prompt_header_macro.txt"), "utf8");
+  const m = src.match(/const DEFAULT_PROMPT_HEADER = `([\s\S]*?)`;/);
+  if (!m) return no("DEFAULT_PROMPT_HEADER non trovato");
+  const mancano = [];
+  for (const [dove, testo] of [["file", file], ["fallback", m[1]]]) {
+    if (testo.indexOf("[B7]") < 0) mancano.push(dove + ": manca la chiusura operativa");
+    if (testo.indexOf("[B8]") < 0) mancano.push(dove + ": manca la delega della ricerca");
+    /* il divieto di dimensionare deve viaggiare COL blocco che invita a concludere: e' li' che
+       e' piu' facile scivolare (v389) */
+    if (testo.indexOf("DIREZIONE E PRIORITA' SI', QUANTITA' MAI") < 0) {
+      mancano.push(dove + ": il divieto di dimensionare non e' dentro la chiusura operativa");
+    }
+    /* e l'invito a cercare deve dire DA DOVE partire, o e' un ordine senza appigli */
+    if (testo.indexOf("ROTAZIONE SETTORIALE") < 0) mancano.push(dove + ": la ricerca non dice da dove partire");
+  }
+  return mancano.length ? no(mancano.join(" · ")) : true;
+})());
+
+check("v410 il perimetro degli ingressi e' un FATTO nella coda, contato sui dati", suVeriEsito(`
+  const p = buildCIOText();
+  const i = p.indexOf("L'UNIVERSO DA CUI IL SISTEMA POTREBBE PESCARE");
+  if (i < 0) return "il pacchetto non dichiara di non avere un universo di candidati";
+  const riga = p.slice(i, p.indexOf(String.fromCharCode(10), i));
+  /* ⚠ IL NUMERO DEVE ESSERE CONTATO, NON SCRITTO A MANO: si aggiunge un titolo seguito e non
+     posseduto, e il conteggio deve muoversi. Un numero fisso in prosa invecchia da solo. */
+  const prima = riga.match(/restano (\\d+) titoli seguiti/);
+  DATA.watchlist.push({ ticker: "ZZTEST", name: "Prova", currency: "USD", price: 10,
+                        stats: {}, sparks: {}, financials: [] });
+  const dopo = buildCIOText().match(/restano (\\d+) titoli seguiti/);
+  if (!prima || !dopo) return "il conteggio dei titoli seguiti non compare nella riga";
+  if (Number(dopo[1]) !== Number(prima[1]) + 1) {
+    return "il numero non si muove coi dati: " + prima[1] + " -> " + dopo[1];
+  }
+  /* e la riga deve dire che non e' un blocco mancante ma il perimetro (regola v406) */
+  return riga.indexOf("perimetro del sistema") >= 0
+    || "non distingue un'assenza dichiarata da un blocco che manca";`));
+
+check("v410 l'ordine di cercare NON scende nella coda: resta un'istruzione", suVeriEsito(`
+  /* ⚠ la coda porta FATTI. L'istruzione "cerca tu i nomi nuovi" e' un ORDINE e vive nella
+     testata: ripeterla nel payload e' la duplicazione testata/coda gia' pagata sette volte
+     (v156, v179, v180, v389, v402, v404, v406). Qui si guarda la SOLA coda, tolta la testata. */
+  const p = buildPrompt();
+  const h = promptHeaderText();
+  const coda = p.startsWith(h) ? p.slice(h.length) : p;
+  if (coda.indexOf("L'UNIVERSO DA CUI IL SISTEMA POTREBBE PESCARE") < 0) {
+    return "il fatto sul perimetro non e' nella coda: il check misura la regione sbagliata";
+  }
+  for (const ordine of ["cerca tu", "proponi", "cercane", "individua"]) {
+    if (coda.toLowerCase().indexOf(ordine) >= 0) return "imperativo nella coda: " + ordine;
+  }
+  return true;`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;
