@@ -2956,6 +2956,78 @@ volte** nel file — una per la pagina, una per il pacchetto — e una sostituzi
 potato anche il riquadro della dashboard. La ricevuta scritta prima di tagliare, per la quinta
 volta in questo progetto.
 
+## 💧 v409 — L'AUTONOMIA DI CASSA AVEVA DUE DENOMINATORI, E NESSUNO DEI DUE ERA DETTO
+
+Trovato da un **LLM reale** che leggeva il pacchetto v408, testuale: *"MSTR ha cassa pari a 0,9
+mesi nel blocco tecnico e 'oltre 5 anni' nella disciplina; RGTI 12,4 e 5,5. Questi numeri non
+possono essere contemporaneamente veri … non userei nessuna delle stime di autonomia discordanti
+per governare il rischio."* Aveva ragione, e **il difetto era mio, introdotto nella v407**.
+
+**Sono due grandezze diverse con la stessa unità**, e la pipeline le calcola entrambe:
+
+| campo | formula | risponde a |
+|---|---|---|
+| `mesi_operativi` | cassa / perdita operativa | quanto dura la cassa se l'azienda **brucia** |
+| `mesi_capex` | cassa / investimenti | quanto dura se continua a **costruire** |
+
+Su MSTR il flusso operativo è negativo di pochissimo (denominatore quasi nullo → **1022,6 mesi**)
+mentre il capex vale 21,7 miliardi (→ **0,9 mesi**). Entrambi veri per il proprio denominatore;
+affiancati senza dirlo, si leggono come una contraddizione — ed è la classe che questo progetto
+chiama **denominatori non dichiarati**, sorvegliata da `coherence_check` DENTRO un blocco ma non
+**fra due blocchi che usano parole diverse per la stessa unità**.
+
+> ⚠⚠ **La correzione non è scegliere: sono due domande utili.** È che il numero non esce mai senza
+> il proprio denominatore, che dove ci sono entrambi il pacchetto **dichiara che non si
+> confrontano**, e che tutto passa da UNA funzione — `autonomiaCassa()`. Tre punti di stampa con
+> tre formulazioni è precisamente come è nato il difetto (v161, v207, v316).
+
+⚠ **E la data del bilancio viaggia col numero, ovunque** (v400): l'LLM ha chiesto esattamente
+quella (*"finché il sistema non chiarisce la provenienza temporale dei bilanci"*) e il blocco
+della disciplina la ometteva.
+
+### 🔥 Il fix ne ha esposto uno peggiore, nello stesso blocco
+`COMBUSTIONE DI CASSA` diceva *"La gestione ASSORBE cassa (-0 mld): la combustione viene dal
+**MESTIERE**, non dagli investimenti"* — su MSTR, che ha capex per **21,7 miliardi** stampati due
+parole prima. La condizione guardava il **segno** dell'OCF e dichiarava una **grandezza**: un
+segno non basta a stabilire da dove viene la combustione, serve il **confronto** fra le due. È la
+stessa classe del beta pubblicato senza il suo R² (v316) — mezza misura presentata come
+conclusione. Ora la riga confronta gli ordini di grandezza e nomina entrambi.
+
+⚠ E il terzo punto di stampa aveva **due difetti in più**: nessun cap (avrebbe scritto
+*"1.022,6 mesi"*, il numero aritmeticamente giusto e comunicativamente falso che la v389 aveva
+già tolto **altrove** — la correzione era rimasta locale invece di diventare la regola) e un
+`else if` che pubblicava **un denominatore solo**, facendo sparire il secondo proprio sul nome in
+cui i due divergono di più.
+
+### 🦴 Due gate rossi, entrambi avendo ragione a modo loro
+- ⚠ **Ventiquattresima rottura di un check ancorato a una stringa letterale**: v365 pretendeva
+  `mesi di investimenti al ritmo attuale` ed è andato rosso perché la formulazione nuova dice **di
+  più** — nomina il denominatore. Riagganciato al fatto.
+- ⚠⚠ **v389 era ancorato a una FINESTRA FISSA di 4000 caratteri** fra `contestoPortafoglio` e la
+  chiamata a `gruppoFattore`: inserendo `autonomiaCassa` fra le due, il gate è andato rosso su
+  codice corretto. **Una distanza non è una proprietà** — è la classe del pavimento numerico di
+  v208 e degli indici fissi del red team I6. Ora estrae il **corpo** della funzione e guarda
+  dentro.
+
+### 🧨 Tre trappole rifatte
+- ⚠ **`n1` è un helper LOCALE di `disciplinaRischio`**, non una funzione globale: usarlo dentro
+  `autonomiaCassa` faceva **morire il render** al primo titolo con combustione. L'harness l'ha
+  preso al primo giro — è la classe v238, dove la pagina è andata morta in produzione con 219 test
+  verdi.
+- ⚠ **Il meta-gate dei backslash mi ha ripreso**: `\b` dentro un template passato al vm diventa
+  un backspace vero. Sostituito con `indexOf`, che non ha niente da sfuggire (stessa correzione
+  della v400). *Lo strumento ha fatto il lavoro per cui esiste.*
+- ⚠ **Quinta incarnazione del gate che trova sé stesso**: il check "la formulazione viene da un
+  posto solo" cerca stringhe che i commenti che *spiegano* il difetto contengono per forza. Toglie
+  i commenti prima di leggere (v213, v240, v393).
+
+### 📋 Cosa il referto ha CONFERMATO, oltre a quello che ha trovato
+Il collaudo obbligatorio della v389 ha funzionato come progettato: il modello ha scritto le tre
+righe di esito, ha **usato la ricerca web** per aggiornare le parti macro vecchie, e ha
+correttamente rifiutato di sommare CPI/PCE, curva 10A-2A e 10A-3M, VIX e Fear & Greed come segnali
+indipendenti — cioè ha applicato B3 senza che glielo si ricordasse. *Un collaudo che trova un
+difetto vero è la prova che il collaudo serve.*
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

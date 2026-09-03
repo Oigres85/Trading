@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "408";
+const BUILD_VERSION = "409";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -9749,6 +9749,59 @@ function severitaCopertura(cop) {
   return `copertura degli interessi ${fmtNum.format(cop >= 10 ? Math.round(cop) : cop)}× — il servizio del debito non e' il vincolo, lo e' la dimensione del piano`;
 }
 
+/* ═══ v409 — L'AUTONOMIA DI CASSA HA DUE DENOMINATORI, E VANNO DETTI ENTRAMBI ════════════
+   Trovato da un LLM reale che leggeva il pacchetto v408: "MSTR 0,9 mesi nel blocco tecnico e
+   oltre 5 anni nella disciplina; RGTI 12,4 e 5,5. Questi numeri non possono essere
+   contemporaneamente veri". Aveva ragione, e il difetto era MIO, introdotto nella v407.
+   ⚠⚠ SONO DUE GRANDEZZE DIVERSE CON LA STESSA UNITA':
+     · `mesi_operativi` = cassa / PERDITA OPERATIVA — esiste SOLO se il flusso operativo e'
+       negativo, e risponde a "quanto dura la cassa se l'azienda continua a bruciare";
+     · `mesi_capex` = cassa / INVESTIMENTI — risponde a "quanto dura la cassa se continua a
+       costruire allo stesso ritmo", ed esiste anche per chi genera cassa dalla gestione.
+   Su MSTR il flusso operativo e' appena negativo (denominatore quasi nullo → 1022,6 mesi) mentre
+   il capex e' grande (→ 0,9 mesi). Entrambi veri per il proprio denominatore; affiancati senza
+   dirlo, si leggono come una contraddizione — ed e' esattamente la classe che questo progetto
+   chiama "denominatori non dichiarati" e che il gate di coerenza sorveglia DENTRO un blocco, ma
+   non fra due blocchi che usano parole diverse per la stessa unita'.
+   ⚠ La correzione non e' scegliere: sono due domande utili. E' che il numero non esce MAI senza
+   il proprio denominatore, che quando ci sono entrambi il pacchetto dice che NON sono
+   confrontabili, e che il tutto passa da UNA funzione — tre punti di stampa con tre formulazioni
+   e' precisamente come e' nato il difetto (v161, v207, v316).
+   ⚠ E LA DATA DEL BILANCIO VIAGGIA COL NUMERO, sempre (v400): l'LLM ha chiesto proprio quella
+   ("finche' il sistema non chiarisce la provenienza temporale dei bilanci"), e il blocco della
+   disciplina la ometteva. */
+function autonomiaCassa(cmb) {
+  const c = cmb || {};
+  const mOp = numero(c.mesi_operativi), mCx = numero(c.mesi_capex);
+  const al = String(c.bilancio_al || c.cashflow_al || "").slice(0, 10);
+  /* ⚠ oltre i cinque anni il numero non porta piu' informazione — dice solo "non e' un problema
+     di cassa" — e stampato per esteso ("1022,6 mesi") fa dubitare di tutto il blocco invece che
+     di quella riga. E' aritmeticamente giusto e comunicativamente falso (v389). */
+  /* ⚠ `n1` e' un helper LOCALE di disciplinaRischio, non una funzione globale: usarlo qui
+     faceva morire il render al primo titolo con combustione. L'arrotondamento si scrive qui. */
+  const quanto = (m) => m > 60 ? "oltre 5 anni" : `${fmtNum.format(Math.round(m * 10) / 10)} mesi`;
+  const voci = [];
+  if (Number.isFinite(mOp)) voci.push({ mesi: mOp, denominatore: "perdita operativa",
+    testo: `${quanto(mOp)} di PERDITA OPERATIVA (cassa diviso il flusso operativo negativo)` });
+  if (Number.isFinite(mCx)) voci.push({ mesi: mCx, denominatore: "investimenti",
+    /* ⚠ "al ritmo attuale" e' gia' implicito nel denominatore dichiarato fra parentesi, e i
+       chiamanti la premettono: scritta due volte nella stessa frase e' la ridondanza v184. */
+    testo: `${quanto(mCx)} di INVESTIMENTI (cassa diviso il capex)` });
+  if (!voci.length) return null;
+  /* ⚠⚠ CON ENTRAMBE, IL FATTO CHE NON SIANO CONFRONTABILI E' PARTE DEL DATO. Senza questa riga
+     due numeri lontanissimi sullo stesso nome si leggono come un errore del sistema, e chi legge
+     smette di fidarsi anche di quello giusto. */
+  const nota = voci.length > 1
+    ? " ⚠ I due numeri NON si confrontano: hanno denominatori diversi — uno divide la cassa per la "
+      + "perdita operativa, l'altro per gli investimenti. Un valore alto sul primo e basso sul "
+      + "secondo descrive una societa' che non brucia cassa dalla gestione ma sta costruendo molto."
+    : "";
+  return { voci, al, nota,
+    testo: `la cassa copre ${voci.map(v => v.testo).join(" · ")}`
+      + (al ? ` (bilancio al ${al}: se un deposito piu' recente esiste, questo numero e' vecchio)` : "")
+      + nota };
+}
+
 function gruppoFattore(azionarie, totAz) {
   const rendGiorn = (t) => {
     const sp = (((azionarie.find(x => x.r.ticker === t) || {}).r || {}).sparks || {}).m6 || [];
@@ -10024,17 +10077,17 @@ function disciplinaRischio() {
   const fragili = azionarie.map(x => {
     const c = x.r.credito || {}, b = x.r.combustione || {};
     return { tk: x.r.ticker, peso: peso(x), cop: numero(c.copertura),
-             fcf: numero(b.fcf_ttm), mesi: numero(b.mesi_operativi) };
+             fcf: numero(b.fcf_ttm), cmb: b, al: String(b.bilancio_al || "").slice(0, 10) };
   }).filter(o => (Number.isFinite(o.cop) && o.cop < 1) || (Number.isFinite(o.fcf) && o.fcf < 0));
   if (fragili.length) {
     const pesoFragili = fragili.reduce((s, o) => s + o.peso, 0);
-    /* ⚠ un'autonomia di "1022,6 mesi" e' aritmeticamente giusta e comunicativamente falsa: nasce
-       da una combustione operativa quasi nulla al denominatore, e stampata cosi' fa dubitare di
-       tutto il blocco invece che di quella riga. Oltre i cinque anni il numero non porta piu'
-       informazione — dice solo "non e' un problema di cassa" — e si scrive cosi'. */
-    const autonomia = (m) => !Number.isFinite(m) ? ""
-      : m > 60 ? ", cassa per oltre 5 anni ai ritmi attuali"
-      : `, ${n1(m)} mesi di autonomia`;
+    /* ⚠ v409 — "autonomia" SENZA IL SUO DENOMINATORE era meta' numero, e affiancata alla scheda
+       approfondita (che divide per gli investimenti) produceva due valori lontanissimi sullo
+       stesso nome. Ora passa dalla funzione unica, che il denominatore lo nomina sempre. */
+    const autonomia = (cmb) => {
+      const a = autonomiaCassa(cmb);
+      return a ? `, ${a.voci.map(v => v.testo).join(" e ")}` : "";
+    };
     R.push({
       nome: "Autofinanziamento delle partecipate",
       soglia: "nessuna posizione con flusso di cassa libero negativo E interessi non coperti dalla gestione",
@@ -10042,7 +10095,7 @@ function disciplinaRischio() {
         + "pagare la crescita, non di finanziarla col debito altrui. Le righe di bilancio sono nel file; la regola no.",
       misura: `${fragili.length} ${fragili.length === 1 ? "posizione" : "posizioni"} = ${n1(pesoFragili)}% dell'azionario: `
         + fragili.map(o => `${o.tk} (${Number.isFinite(o.cop) && o.cop < 1 ? (o.cop < 0 ? "EBIT negativo" : `copertura ${n1(o.cop)}×`) : "FCF negativo"}`
-            + `${autonomia(o.mesi)})`).join(", "),
+            + `${autonomia(o.cmb)}${o.al ? `, bilancio al ${o.al}` : ""})`).join(", "),
       valore: pesoFragili,
       unita: "pct_azionario", sogliaPct: 10,
       stato: pesoFragili > 20 ? "OLTRE" : pesoFragili > 10 ? "AL LIMITE" : "DENTRO",
@@ -10379,9 +10432,12 @@ function contestoPortafoglio(tkCorrente) {
        concludeva "la cassa copre 1,6 mesi di investimenti" su un bilancio gia' superato da un
        deposito piu' recente, e la conclusione si leggeva come attuale mentre il dato non lo era. */
     const cmb = r.combustione || {};
-    const mesi = numero(cmb.mesi_capex), al = String(cmb.bilancio_al || "").slice(0, 10);
-    if (Number.isFinite(mesi) && Number.isFinite(fcf) && fcf < 0) {
-      v.push(`la cassa copre ${nRid(mesi)} mesi di investimenti al ritmo attuale${al ? ` (bilancio al ${al}: se un deposito piu' recente esiste, questo numero e' vecchio)` : ""}`);
+    /* ⚠ v409 — la formulazione NON si scrive qui: la produce `autonomiaCassa`, che nomina il
+       denominatore e, quando ce ne sono due, dichiara che non si confrontano. Scriverla in
+       proprio e' come e' nato il difetto che un LLM reale ha trovato sul pacchetto v408. */
+    if (Number.isFinite(fcf) && fcf < 0) {
+      const a = autonomiaCassa(cmb);
+      if (a) v.push(a.testo);
     }
     const emiss = numero(cmb.emissione_netta_pct);
     if (Number.isFinite(emiss) && Number.isFinite(fcf) && fcf < 0) {
@@ -12536,19 +12592,43 @@ function datiNostriDelTitolo(tk) {
       /* la frase che cambia la lettura: da dove viene la combustione */
       let origine = "";
       if (c.ocf_ttm != null && c.fcf_ttm != null) {
-        origine = c.ocf_ttm > 0 && c.fcf_ttm < 0
+        /* ⚠⚠ v409 — LA CONDIZIONE GUARDAVA IL SEGNO E DICHIARAVA UNA GRANDEZZA. Su MSTR il flusso
+           operativo e' negativo di pochissimo (-0,0 mld) e il capex vale -21,7 mld: la riga
+           annunciava "la combustione viene dal MESTIERE, non dagli investimenti" avendo accanto
+           i due numeri che dicono l'opposto. Un segno non basta a stabilire da dove viene la
+           combustione: serve il CONFRONTO fra le due grandezze, ed e' la stessa classe del beta
+           pubblicato senza il suo R² (v316) — meta' misura presentata come conclusione. */
+        const _ocf = numero(c.ocf_ttm), _cap = Math.abs(numero(c.capex_ttm) || 0);
+        const _perdita = _ocf < 0 ? Math.abs(_ocf) : 0;
+        origine = _ocf > 0 && c.fcf_ttm < 0
           ? ` La gestione GENERA cassa (${M(c.ocf_ttm)}) e il flusso libero e' negativo solo per gli investimenti: `
             + `qui la combustione e' costruzione, non perdita operativa.`
-          : c.ocf_ttm <= 0
-            ? ` La gestione ASSORBE cassa (${M(c.ocf_ttm)}): la combustione viene dal mestiere, non dagli investimenti.`
+          : _ocf <= 0 && c.fcf_ttm < 0
+            ? ` La gestione ASSORBE cassa (${M(c.ocf_ttm)}) e gli investimenti valgono ${M(-_cap)}: `
+              + (_cap > _perdita * 3
+                 ? `la combustione viene in larga parte dagli INVESTIMENTI, non dalla perdita operativa, `
+                   + `che a confronto e' piccola.`
+                 : _perdita > _cap * 3
+                   ? `la combustione viene dal MESTIERE: gli investimenti a confronto sono piccoli.`
+                   : `le due fonti sono dello stesso ordine, quindi la combustione viene da entrambe.`)
             : ` Gestione e flusso libero sono entrambi positivi: non c'e' combustione.`;
       }
       let quanto = "";
-      if (c.mesi_operativi != null)
-        quanto = ` Al ritmo attuale la cassa da sola copre ${fmtNum.format(c.mesi_operativi)} mesi di PERDITA OPERATIVA.`;
-      else if (c.mesi_capex != null && c.fcf_ttm != null && c.fcf_ttm < 0)
-        quanto = ` La cassa da sola copre ${fmtNum.format(c.mesi_capex)} mesi di investimenti al ritmo attuale: `
-          + `il resto della costruzione e' finanziato da debito o da nuove azioni, non dalla cassa presente.`;
+      /* ⚠⚠ v409 — QUI C'ERANO DUE DIFETTI OLTRE ALLA FORMULAZIONE PROPRIA.
+         (a) Nessun cap: su MSTR avrebbe stampato "1.022,6 mesi di PERDITA OPERATIVA", il numero
+             aritmeticamente giusto e comunicativamente falso che la v389 aveva gia' tolto ALTROVE
+             — la correzione era rimasta locale invece di diventare la regola.
+         (b) Un `else if` che pubblicava UN denominatore solo: dove esistono entrambi, il secondo
+             spariva in silenzio proprio sul nome in cui i due divergono di piu'.
+         Ora la frase la produce `autonomiaCassa`, unica per tutto il sistema; qui resta solo la
+         clausola che dice CHI finanzia il resto, che e' un fatto in piu' e non una seconda resa
+         dello stesso numero. */
+      const _aut = autonomiaCassa(c);
+      if (_aut) {
+        quanto = ` Al ritmo attuale ${_aut.testo}.`
+          + (c.fcf_ttm != null && c.fcf_ttm < 0
+             ? ` Il resto e' finanziato da debito o da nuove azioni, non dalla cassa presente.` : "");
+      }
       else if (c.fcf_ttm != null && c.fcf_ttm > 0)
         quanto = ` Gli investimenti sono coperti dalla gestione, quindi la cassa non deve finanziarli: `
           + `l'autonomia non e' una domanda che si pone qui.`;
