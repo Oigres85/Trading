@@ -2732,6 +2732,72 @@ un'esclusione decisa (v138, ridondante col blocco Carry).
 > versi**, come quello che la v387 ha fatto per `/aggiorna`: ogni indicatore che la pagina rende
 > deve essere o nel pacchetto o dichiarato fuori con la sua ragione scritta.
 
+## 🪞 v406 — «IL SISTEMA NON È UN RIASSUNTO AFFIDABILE DI CIÒ CHE VEDO SCORRENDO LA PAGINA»
+
+Rilievo del CEO, testuale, con tre esempi: *"non mi dà informazioni per esempio sul vix sul fear
+and greed sulle put sulle call"*. **Misurato invece che dato per buono, e sui tre esempi il CEO
+aveva torto**: VIX, Fear & Greed e put/call erano già nel pacchetto — si leggono nel testo che lui
+stesso aveva incollato. Ma la sua conclusione era giusta lo stesso, perché **quattro fatti
+mancavano davvero** e nessuno se ne sarebbe accorto: il divario pagina↔pacchetto era cresciuto da
+solo, in silenzio, esattamente come il comando `/aggiorna` della v387.
+
+| fatto | la pagina lo mostra | il pacchetto |
+|---|---|---|
+| **Sharpe e Sortino del libro** | sì, in cima | assenti |
+| **Capitalizzazione/PIL (Buffett)** | scheda propria | assente |
+| **Struttura del prezzo sugli indici** (liquidità sopra/sotto, order block) | scheda propria | assente |
+| VIX · Fear & Greed · put/call | sì | **già presenti** — l'accusa era sbagliata |
+
+⚠ **E TRE DEI SETTE BUCHI ERANO RIMOZIONI DELIBERATE**, non dimenticanze: i compositi 0-100
+(sentiment, quadro macro sintetico) sono stati tolti in v200 **sui numeri del loro track record**,
+le componenti di Fear & Greed in v263, EUR/JPY in v138. Verificarne una per una la provenienza ha
+trasformato "sette buchi" in **quattro fatti mancanti e tre ricevute** — la differenza fra un
+sistema che dimentica e uno che ha deciso.
+
+> ⚠⚠ **Perciò il pacchetto ora DICHIARA cosa la pagina mostra e lui non porta, con la ragione.**
+> *"Il sistema non ha il dato"* e *"il sistema ce l'ha e non te lo passa"* si leggono uguali e sono
+> cose diverse (classe v393, le notizie contate e poi nascoste). Senza quella riga il CEO non aveva
+> modo di distinguerle, ed è precisamente per questo che ha scritto la frase da cui parte la v406.
+
+⚠ **I livelli sì, il punteggio no.** Della struttura di prezzo escono liquidità sopra, liquidità
+sotto e l'ultimo order block — **non** il punteggio 0-100 che la stessa chiave porta: quello è un
+composito nostro e cade sotto la v200 come gli altri. La stessa chiave può contenere un fatto
+pubblicabile e un giudizio da lasciare fuori.
+
+⚠ Il rapporto capitalizzazione/PIL esce **come RAPPORTO e non come punteggio**, e la sua lettura
+convenzionale (sotto 100% economico, 100-140% equo, oltre 140% caro) è dichiarata **convenzione
+del mestiere, non dato del file** — la regola v240 sulle tacche disegnate, applicata a una soglia
+di testo.
+
+### 🔁 Il gate è nei DUE VERSI, perché un gate che aggiunge e basta invecchia da solo
+Fra un mese la pipeline pubblica una chiave nuova, la pagina la disegna e il pacchetto resta
+indietro: sarebbe lo stesso guasto, un anno dopo. Quindi l'invariante è che **ogni indicatore che
+la PAGINA sa aprire sia O nel pacchetto O nel registro delle esclusioni con la sua ragione
+scritta**, e un meta-check impedisce che una chiave stia in tutti e due i registri — una ricevuta
+che si contraddice non è una ricevuta. Per le statistiche ufficiali la sonda si **ricava
+dall'etichetta di `MACRO_INFO`**, che è la stessa che il pacchetto stampa: niente secondo elenco
+da tenere allineato (C10, `MACRO_CARD_BY_PANEL` che copriva 7 pannelli su 37).
+
+### 🧨 Tre inciampi di metodo, tutti già scritti in questo file, tutti ripetuti
+- ⚠⚠ **Una VIRGOLETTA SFUGGITA dentro un template passato al vm.** `\"` arriva al vm come
+  virgoletta **nuda** e chiude la stringa a metà: errore di sintassi **dentro** il vm, cioè un
+  check morto in eccezione. `node --check` non lo vede — per lui è testo dentro un template — e il
+  rilevatore dei backslash guardava **solo** `\d \w \s \b` dentro template che contengono una
+  regex. Ora copre **tutti** i template passati al vm e anche le virgolette: non esiste nessuna
+  ragione legittima di scriverle lì dentro, quindi l'invariante non ha eccezioni. Validato per
+  iniezione. *È lo strumento a cambiare, non l'attenzione.*
+- ⚠ **Ventitreesima rottura di un check ancorato a una stringa letterale**: il gate v138
+  pretendeva che `EUR/JPY` **non comparisse** nel payload, ed è andato rosso perché la riga nuova
+  lo **nomina fra le esclusioni dichiarate**. Un nome citato per dire che manca è il contrario di
+  un dato pubblicato. Riagganciato al fatto: la **quotazione** non esce (valore iniettato assente)
+  e ogni riga che lo nomina è quella delle esclusioni. Validato riportando la quotazione nel
+  payload: morde.
+- ⚠ **C9 ha preso un mio imperativo nella coda** (`ripubblicarle`) — **settima** volta (v156,
+  v179, v180, v389, v402, v404). I clitici sono la forma in cui un ordine si traveste da fatto.
+
+⚠ E `indexOf` è **sensibile al maiuscolo**: una sonda scritta in minuscolo su una riga che
+comincia con la maiuscola è un check rosso su codice giusto.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i
