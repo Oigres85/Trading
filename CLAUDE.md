@@ -2888,6 +2888,74 @@ ridondanza che questo progetto misura e taglia dalla v184.
 107.329 → 110.959. La riga compatta cresce di un elemento su tutte e tredici; le cinque schede
 estese valgono ~2.900 caratteri in tutto.
 
+## ✂️ v408 — LA POTATURA CHIESTA VALEVA IL 3,6%, E LA MISURA HA CAMBIATO IL TAGLIO
+
+Ultimo pezzo della decisione del CEO: nel pacchetto del singolo titolo la macro resta *"potata ai
+canali che toccano quel titolo"*. Elenco concordato: via stagionalità NDX, i 21 ETF, i mercati di
+previsione non-Fed, i campanelli BofA, il disaccoppiamento pluriennale.
+
+**Misurato PRIMA di scrivere il codice, e la misura ha cambiato la forma del taglio:**
+
+| blocco candidato | caratteri | quota del pacchetto |
+|---|---|---|
+| 21 ETF (rotazione) | 884 | 0,82% |
+| stagionalità NDX | 788 | 0,73% |
+| mercati di previsione | 682 | 0,64% |
+| campanelli BofA | 559 | 0,52% |
+| profitti reali | 507 | 0,47% |
+| disaccoppiamento PIL | 468 | 0,44% |
+| **tutti insieme** | **3.888** | **3,6%** |
+
+> **Tagliarli non alleggerisce il pacchetto in modo percepibile.** La ragione del taglio quindi
+> non è lo spazio ma la **PERTINENZA**: un modello che ha davanti l'analisi di UNA società e legge
+> la valutazione pluriennale dell'indice spende su quella una parte della risposta che il CEO ha
+> chiesto sui fondamentali e sulla tecnica del titolo. È la v398 rovesciata — lì il rischio
+> nasceva dall'essere costretti a riempire, qui dall'avere davanti materiale che invita altrove.
+
+### ⚠⚠ Due dei sei tagli NON sono stati fatti, e la ragione è scritta nel pacchetto
+- **I 21 ETF della rotazione.** Per tenere "solo il comparto di questo titolo" servirebbe una
+  mappa settore→ETF **scritta a mano** — il registro fisso che invecchia da solo e che questo
+  progetto ha già pagato più volte (C10, red team I6, `MACRO_CARD_BY_PANEL` che copriva 7 pannelli
+  su 37). E `rs_bench` risolve **un comparto solo** (`sox`) su tre valori possibili: per diciotto
+  posizioni su ventuno il sistema non sa a quale ETF agganciarle. 884 caratteri non valgono una
+  mappa che si disallinea in silenzio — e la lettura che conta della rotazione è **"dove NON sei"**
+  (v206), che potando si perde.
+- **I mercati di previsione non-Fed.** Separarli richiederebbe di classificare il **testo** della
+  domanda, cioè di indovinare l'attribuzione: è precisamente l'euristica che la v399 ha rifiutato
+  scegliendo Nasdaq invece del feed multi-ticker di Yahoo. 682 caratteri.
+
+> **Una selezione indovinata è peggio di una selezione non fatta**, ed è il pacchetto stesso a
+> dirlo a chi legge, invece di lasciare che sembri una dimenticanza.
+
+Restano fuori solo i **quattro blocchi che si riconoscono per COSA SONO**, senza nessuna mappa:
+letture sulla valutazione pluriennale dell'INDICE, che non arrivano ai numeri di una singola
+società attraverso nessun canale misurabile.
+
+⚠⚠ **E IL PACCHETTO DICHIARA COSA HA TOLTO, dove quei blocchi si trovano, e cosa NON ha potato.**
+Regola v406: *"il sistema non ha il dato"* e *"il sistema ce l'ha e non te lo passa"* si leggono
+uguali. La dichiarazione costa ~820 caratteri sui 2.322 tagliati — il risparmio netto è **1.502
+caratteri, l'1,4%** — e vale il suo prezzo proprio perché il taglio non è per lo spazio.
+
+### 🔒 Il primo gate è la Regola Suprema
+`buildPrompt` ha preso un'opzione, e **senza argomento deve produrre esattamente quello di prima:
+identico al byte**, verificato su `buildPrompt()`, `buildPrompt({})` e `buildPrompt({perTitolo:""})`.
+Un costruttore che cambia comportamento anche solo un po' quando gli si aggiunge un parametro è il
+primo passo verso i due costruttori che divergono (v161, v207). Misurato: pacchetto macro 70.533
+caratteri prima e dopo.
+
+⚠ Il gate verifica anche che il taglio **non si allarghi al vicino** — rotazione e mercati di
+previsione devono restare INTERI — che è la classe v201-v204, tre volte in quattro versioni.
+
+⚠ **E l'invariante nei due versi della v406 ha morso da solo**: iniettando `perTitolo = true`
+sempre, il gate pagina↔pacchetto è andato rosso prima ancora di quelli nuovi, perché due
+indicatori che la pagina apre sparivano dal pacchetto macro. *Un gate scritto ieri che prende un
+difetto di oggi che non aveva in mente sta facendo il suo lavoro.*
+
+⚠ Un `assert` ha intercettato un'ancora **ambigua**: `if (m.stagionalita_ndx …` compare **due
+volte** nel file — una per la pagina, una per il pacchetto — e una sostituzione globale avrebbe
+potato anche il riquadro della dashboard. La ricevuta scritta prima di tagliare, per la quinta
+volta in questo progetto.
+
 ## 🧭 Convenzioni fisse (violarle = bug già vissuti)
 
 - `SORT_FIELDS` allineato 1:1 alle `<th>`; aggiungendo/togliendo una colonna aggiornare anche i

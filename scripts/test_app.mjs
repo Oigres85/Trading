@@ -6984,6 +6984,58 @@ check("v407 la media a 20 giorni, chiesta dal CEO, arriva su ogni posizione che 
   const conTutte = con20.filter(r => r.indexOf(" dalla 50") >= 0 && r.indexOf(" dalla 200") >= 0);
   return conTutte.length >= 5;`));
 
+/* ═══ v408 — LA POTATURA DELLA CODA MACRO NEL PACCHETTO DI TITOLO ═══════════════════════
+   ⚠⚠ IL PRIMO GATE E' LA REGOLA SUPREMA: `buildPrompt` ha preso un'opzione, e senza argomento
+   deve produrre ESATTAMENTE quello di prima. Non "quasi": identico al byte. Un costruttore che
+   cambia comportamento anche solo un po' quando gli si aggiunge un parametro e' il primo passo
+   verso i due costruttori che divergono (v161, v207). */
+check("v408 senza opzione buildPrompt e' identico al byte a buildPrompt({}) e al pacchetto macro", suVeriEsito(`
+  const a = buildPrompt();
+  const b = buildPrompt({});
+  const c = buildPrompt({ perTitolo: "" });
+  if (a !== b) return "buildPrompt({}) differisce di " + Math.abs(a.length - b.length) + " caratteri";
+  if (a !== c) return "un titolo vuoto pota lo stesso: differenza di " + Math.abs(a.length - c.length);
+  /* e con l'opzione attiva DEVE essere piu' corto: se fosse uguale la potatura non esiste */
+  const d = buildPrompt({ perTitolo: "MU" });
+  if (d === a) return "con perTitolo il payload e' identico: la potatura non ha effetto";
+  return true;`));
+
+check("v408 i quattro blocchi potati escono dal pacchetto di titolo e restano in quello macro", suVeriEsito(`
+  const macro = buildCIOText();
+  const tit = buildPromptTicker("MU");
+  const POTATI = ["STAGIONALITA' DEL NASDAQ", "BofA Bear-Market Signposts",
+                  "Disaccoppiamento S&P", "Profitti Aziendali Reali (FRED CP)"];
+  const guai = [];
+  for (const s of POTATI) {
+    /* ⚠ il fenomeno deve ESSERCI: se il blocco non e' nemmeno nel macro, il check sarebbe
+       verde per assenza di dati invece che per assenza di difetti (trappola gia' pagata
+       quattro volte in questo progetto). */
+    if (macro.indexOf(s) < 0) guai.push(s + ": assente anche dal pacchetto macro, il check non misura niente");
+    else if (tit.indexOf(s) >= 0) guai.push(s + ": ancora nel pacchetto di titolo");
+  }
+  /* ⚠ e i due che NON si potano devono restare INTERI: il taglio non deve allargarsi da solo
+     al vicino, che e' la classe v201-v204 (tre volte in quattro versioni). */
+  for (const s of ["ROTAZIONE SETTORIALE", "MERCATI DI PREVISIONE"]) {
+    if (tit.indexOf(s) < 0) guai.push(s + ": potato, e non doveva esserlo");
+  }
+  return guai.length ? guai.join(" · ") : true;`));
+
+check("v408 la potatura si DICHIARA: mai un blocco tolto in silenzio", suVeriEsito(`
+  const tit = buildPromptTicker("MU");
+  const i = tit.indexOf("COSA QUESTA CODA MACRO NON PORTA");
+  if (i < 0) return "il pacchetto pota e non lo dice: chi legge non distingue il taglio dal dato mancante";
+  const riga = tit.slice(i, tit.indexOf(String.fromCharCode(10), i));
+  /* la riga deve NOMINARE cio' che ha tolto, non annunciare genericamente una potatura */
+  if (riga.indexOf("stagionalita'") < 0 || riga.indexOf("campanelli BofA") < 0) {
+    return "la dichiarazione non nomina i blocchi tolti";
+  }
+  /* e deve dire dove si trovano: un taglio senza il rimando manda a cercare online una cosa
+     che il sistema ha (classe v393, la riga UMich che diffamava un proprio dato fresco) */
+  if (riga.indexOf("Macro + portafoglio") < 0) return "non dice in quale pacchetto quei blocchi ci sono";
+  /* ⚠ e il pacchetto macro NON deve portare la dichiarazione: li' non e' stato tolto niente */
+  return buildCIOText().indexOf("COSA QUESTA CODA MACRO NON PORTA") < 0
+    ? true : "il pacchetto macro dichiara una potatura che non ha fatto";`));
+
 let fail = 0;
 for (const [name, ok] of T) {
   if (!ok) fail++;

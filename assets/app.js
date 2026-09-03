@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "407";
+const BUILD_VERSION = "408";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8132,7 +8132,36 @@ function rigaLeva(m) {
     + (cad ? `[${cad}]` : "");
 }
 
-function buildPrompt() {
+/* ═══ v408 — LA CODA MACRO SI POTA QUANDO IL PACCHETTO PARLA DI UN TITOLO SOLO ═══════
+   Decisione del CEO: nel pacchetto del singolo titolo la macro resta "potata ai canali che
+   toccano quel titolo".
+   ⚠⚠ IL COSTO E' STATO MISURATO PRIMA, E HA CAMBIATO LA FORMA DEL TAGLIO. I sei blocchi
+   candidati valevano 3.888 caratteri su 107.329, cioe' il 3,6%: tagliarli non alleggerisce il
+   pacchetto in modo percepibile. La ragione del taglio quindi NON e' lo spazio ma la
+   PERTINENZA — un modello che ha davanti l'analisi di UNA societa' e legge la valutazione
+   pluriennale dell'indice spende su quella una parte della risposta che il CEO ha chiesto sui
+   fondamentali e sulla tecnica del titolo (v398: il rischio non nasce dall'avere piu' spazio,
+   nasce dall'essere costretti a riempirlo).
+   ⚠⚠ E DUE DEI SEI TAGLI NON SONO STATI FATTI, con la ragione scritta:
+     · i 21 ETF della rotazione — per tenere "solo il comparto di questo titolo" servirebbe una
+       mappa settore→ETF scritta a mano, cioe' il registro fisso che invecchia da solo e che
+       questo progetto ha gia' pagato piu' volte (C10, red team I6, MACRO_CARD_BY_PANEL). E
+       rs_bench risolve un comparto solo (sox) su tre valori. 884 caratteri non valgono una
+       mappa che si disallinea in silenzio; e la lettura che conta della rotazione e' "dove NON
+       sei" (v206), che si perde potando;
+     · i mercati di previsione non-Fed — separarli richiederebbe di classificare il TESTO della
+       domanda, cioe' di indovinare l'attribuzione: e' l'euristica che la v399 ha rifiutato
+       scegliendo Nasdaq invece del feed multi-ticker di Yahoo. 682 caratteri.
+   ⚠ Restano fuori solo i blocchi che si riconoscono per COSA SONO, senza nessuna mappa:
+   letture sulla valutazione pluriennale dell'INDICE, che non arrivano ai numeri di una singola
+   societa' attraverso nessun canale.
+   ⚠⚠ E IL PACCHETTO DICHIARA COSA HA TOLTO. E' la regola della v406: "il sistema non ha il
+   dato" e "il sistema ce l'ha e non te lo passa" si leggono uguali e sono cose diverse.
+   ⚠ Il default NON cambia niente: senza argomento il pacchetto macro esce identico al byte, e
+   un gate lo verifica. Questo e' UN costruttore con un'opzione, non due costruttori (v161). */
+function buildPrompt(opz) {
+  const perTitolo = !!(opz && opz.perTitolo);
+  const potati = [];
   const t = DATA.totals;
   const m = DATA.macro || {};
   const dqV = validateMacroData();   // data assertions: usata da indicatori, margin debt e report
@@ -8607,7 +8636,8 @@ function buildPrompt() {
      -8,7% a +18,9% non sono una previsione: se il payload desse la media senza l'intervallo,
      un LLM la userebbe come tale — ed e' esattamente il genere di numero che questo progetto
      ha gia' tolto una volta (v200, motore predittivo a hit-rate 29%). */
-  if (m.stagionalita_ndx && (m.stagionalita_ndx.mesi || []).length) {
+  if (perTitolo && m.stagionalita_ndx && (m.stagionalita_ndx.mesi || []).length) potati.push("la stagionalita' del Nasdaq 100 e il ciclo elettorale");
+  if (!perTitolo && m.stagionalita_ndx && (m.stagionalita_ndx.mesi || []).length) {
     const st = m.stagionalita_ndx;
     const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
                   "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
@@ -8817,7 +8847,8 @@ function buildPrompt() {
      delle soglie inventate di v240. Resta il conteggio, che e' il fatto, e i nomi di quelli
      accesi, che sono l'informazione vera: cinque campanelli sul credito non sono cinque
      campanelli sparsi. */
-  if (m.signposts) {
+  if (perTitolo && m.signposts) potati.push("i campanelli BofA di mercato orso");
+  if (!perTitolo && m.signposts) {
     /* ⚠ il campo e' `status`, non `active`: verificato sul file vero invece di indovinarlo —
        le chiavi vanno lette da data.json, non dedotte dal nome (lezione v207). */
     const items = m.signposts.items || [];
@@ -9066,7 +9097,8 @@ function buildPrompt() {
   }
   /* v259 — "Istituzionali VS Retail" fuori dal payload: stessa ragione del sentiment
      globale — e' una media di SMC indici, VIX term, HY/IG e put/call, tutti gia' pubblicati. */
-  if (m.decouple?.sp500?.length && m.decouple?.gdp?.length) {
+  if (perTitolo && m.decouple?.sp500?.length && m.decouple?.gdp?.length) potati.push("il disaccoppiamento pluriennale fra S&P 500 e PIL reale");
+  if (!perTitolo && m.decouple?.sp500?.length && m.decouple?.gdp?.length) {
     const gg = sovrapposizioneGiorni(m.decouple.sp500, m.decouple.gdp);
     if (gg) {
       const gap = Math.round(m.decouple.sp500.slice(-1)[0].v - m.decouple.gdp.slice(-1)[0].v);
@@ -9235,7 +9267,8 @@ function buildPrompt() {
     if (m.sp500_pe.nasdaq_pe) peLine += ` · Nasdaq 100 (QQQ) P/E: ${m.sp500_pe.nasdaq_pe}× (tech solitamente a premio; >35× = valutazioni tese)`;
     lines.push(peLine);
   }
-  if (m.corp_profit) {
+  if (perTitolo && m.corp_profit) potati.push("il confronto pluriennale fra indici e profitti aziendali reali");
+  if (!perTitolo && m.corp_profit) {
     const ggCp = sovrapposizioneGiorni(m.corp_profit.sp500, m.corp_profit.profits);
     let cpBp = ggCp
       ? `- S&P 500 & Nasdaq 100 vs Profitti Aziendali Reali (FRED CP): S&P gap ${m.corp_profit.gap > 0 ? "+" : ""}${m.corp_profit.gap} pp`
@@ -9292,6 +9325,26 @@ function buildPrompt() {
   // ripeterli in coda non li rafforzava: segnalava che il payload non si fida della testata, e
   // consumava l'attenzione finale del lettore su regole invece che su dati.
 
+  /* ⚠⚠ v408 — LA RICEVUTA DELLA POTATURA, dentro il pacchetto e non solo nel codice. Senza
+     questa riga chi legge non ha modo di distinguere "il sistema non misura la stagionalita'
+     dell'indice" da "la misura e l'ha lasciata fuori perche' non serve a questa domanda" — la
+     classe v406, e prima ancora v393 (le notizie contate e poi nascoste).
+     ⚠ E dichiara anche cosa NON e' stato potato pur essendo generale, cosi' la riga non si
+     legge come "qui c'e' solo roba sul titolo": la rotazione e i mercati di previsione ci sono
+     ancora, interi. */
+  if (perTitolo && potati.length) {
+    lines.push("");
+    lines.push(`⚠ COSA QUESTA CODA MACRO NON PORTA, perche' il pacchetto analizza UN titolo: `
+      + `${potati.join(" · ")}. Sono ${potati.length === 1 ? "una lettura" : "letture"} sulla `
+      + `valutazione pluriennale dell'INDICE: il sistema ${potati.length === 1 ? "la" : "le"} `
+      + `misura e ${potati.length === 1 ? "compare" : "compaiono"} per intero nel pacchetto `
+      + `"Macro + portafoglio", ma non arriva${potati.length === 1 ? "" : "no"} ai numeri di `
+      + `questa societa' attraverso nessun canale misurabile, e su una domanda su un nome solo `
+      + `occupa${potati.length === 1 ? "" : "no"} lo spazio dell'analisi. ⚠ La rotazione `
+      + `settoriale e i mercati di previsione restano invece INTERI: potarli avrebbe richiesto `
+      + `di indovinare quale comparto tocca questo titolo e quale domanda parla di tassi, e una `
+      + `selezione indovinata e' peggio di una selezione non fatta.`);
+  }
   return lines.join("\n");
 }
 
@@ -12777,7 +12830,7 @@ function buildPromptTicker(tkGrezzo) {
      che e' cambiato e' che ora glielo si chiede in modo che non possa scambiarlo per un divieto. */
   const tk = String(tkGrezzo || "").trim().toUpperCase();
   if (!tk) return "";
-  const macro = buildPrompt();
+  const macro = buildPrompt({ perTitolo: tk });
   const header = promptHeaderText();
   const soloDati = macro.startsWith(header) ? macro.slice(header.length).replace(/^\n+/, "") : macro;
   const storico = historicalDigestText();
