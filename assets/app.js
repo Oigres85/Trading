@@ -11,7 +11,7 @@ const REPO = "Oigres85/Trading";
    La causa e' la classe dei registri copiati a mano — la stessa di C10 e degli orari di run:
    il numero vive in DUE posti (qui e nel ?v= di index.html) e nessuno verificava che
    combaciassero. Ora un check li confronta e la CI si rompe se divergono. */
-const BUILD_VERSION = "409";
+const BUILD_VERSION = "410";
 let DATA = null;
 let sparkRange = localStorage.getItem("pref_range") || "m1";   // 1G | 1M | 1A (preferenza ricordata)
 
@@ -8041,6 +8041,20 @@ Congruita', affidabilita' e freschezza vanno VERIFICATE, non date per buone: que
 [B6] IL LIBRO E' IN CODA, E L'ANALISI DEVE ARRIVARCI.
 Il pacchetto porta le posizioni del fondo, la loro concentrazione, il contributo al rischio di ciascuna e la disciplina di rischio misurata riga per riga. Ogni conclusione macro va portata fino a li': quale canale, quali posizioni, quale segno. Le SOGLIE della disciplina sono CONVENZIONI del mestiere, dichiarate riga per riga, non regole del sistema: citandole, dillo. E una soglia superata NON e' un errore del libro — un fondo growth concentrato sta fuori da quasi tutte per costruzione: conta di quanto, e quali deviazioni sono state decise e quali sono successe da sole.
 
+[B7] E QUINDI, COSA FARE — LE CONSEGUENZE OPERATIVE, CHE SONO LA CHIUSURA OBBLIGATORIA.
+Richiesta esplicita del CEO: alleggerimenti, vendite, incrementi ed eventuali ingressi su titoli nuovi, MOTIVATI. Non e' un cambio di natura del sistema — resta un sistema di fatti — ma l'analisi deve arrivare a una conseguenza, altrimenti chi legge deve ricavarla da solo dai numeri, che e' precisamente il lavoro che ha chiesto a te.
+ · OGNI INDICAZIONE POGGIA SU UNA MISURA DICHIARATA. Le nove regole della DISCIPLINA DI RISCHIO in coda portano ciascuna la propria misura, la propria soglia e la provenienza di quella soglia: alleggerimenti e incrementi si ancorano a quelle, o a un fatto del blocco tecnico/fondamentale, e la riga NOMINA su quale. Un'indicazione senza la misura accanto e' un'opinione con l'aspetto di un calcolo.
+ · ⚠⚠ DIREZIONE E PRIORITA' SI', QUANTITA' MAI. Niente "quante quote", niente percentuali obiettivo, niente stop in euro: il sistema non conosce la tua liquidita', gli altri conti ne' la fiscalita', e una quantita' costruita senza quei tre dati e' un numero che sembra un consiglio. I LIVELLI DI PREZZO sono ammessi, perche' vengono dai dati; le quantita' no.
+ · ⚠ "OLTRE LA SOGLIA" NON SIGNIFICA "VENDI". Un fondo growth concentrato sta fuori da quasi tutte queste soglie per costruzione, ed e' scritto nel blocco stesso. La domanda utile non e' se una soglia sia superata ma se quella deviazione sia stata DECISA o sia successa da sola mentre i prezzi si muovevano: la prima e' una posizione, la seconda e' una deriva. Dillo, dove i dati permettono di distinguerlo.
+ · ORDINA PER URGENZA, non per dimensione: cosa cambia se non si fa niente questa settimana.
+
+[B8] GLI INGRESSI SU TITOLI NUOVI: LA RICERCA E' TUA, E IL SISTEMA TE LO DICE.
+Decisione del CEO. ⚠ Il sistema NON ha un universo di candidati da cui pescare: segue i titoli che il CEO possiede piu' due nomi soli, e il resto sono indici e benchmark — la coda lo dichiara con i numeri. Quindi le proposte di ingresso NON possono poggiare su dati di questo pacchetto, e questo e' l'unico blocco della tua risposta in cui la fonte sei tu.
+ · PARTI DA CIO' CHE IL PACCHETTO TI DA' PER ORIENTARTI, che non e' uno screening ma e' meglio di niente: la ROTAZIONE SETTORIALE sui 21 ETF — e in particolare i comparti in cui il libro NON e' presente, che e' la lettura per cui quel blocco esiste — le NOTIZIE, i canali macro misurati sulle posizioni, e i comparti da cui il quadro macro ti fa attendere pressione o sollievo.
+ · ⚠ OGNI NOME CHE PROPONI E' UNA TUA AFFERMAZIONE, non un dato del sistema: dillo, e porta la verifica con te (fonte e data). Vale la regola A1 come per ogni fatto esterno.
+ · ⚠ E VALE ANCHE QUI IL DIVIETO DI DIMENSIONARE, e la disciplina di rischio in coda: un nome nuovo che cade dentro il gruppo correlato gia' misurato NON diversifica, aggiunge alla stessa scommessa. Verificalo prima di proporlo, e se il pacchetto non permette di verificarlo, scrivilo.
+ · Se non trovi niente che regga, dillo: "nessun ingresso che superi l'esame" e' una risposta, e migliore di un nome messo li' per riempire il blocco.
+
 [C] FORMA
 C1 — Scrivi in italiano, in prosa, senza scalette rigide e senza ripetere il payload. Non ho bisogno che tu mi riassuma i numeri: li ho gia'. Ho bisogno di sapere cosa vogliono dire insieme.
 C2 — Niente domande in chiusura e niente offerte di approfondimento: quello che serve, dillo qui.
@@ -8991,6 +9005,36 @@ function buildPrompt(opz) {
   /* ⚠⚠ v406 — E QUELLO CHE RESTA FUORI SI DICHIARA, invece di lasciare al lettore un buco che
      non puo' distinguere da un dato mancante. E' la classe v393: dichiarare un numero e non
      mostrarne gli elementi e' peggio che tacere entrambi. */
+  /* ═══ v410 — L'UNIVERSO DEI CANDIDATI NON ESISTE, E SI DICE COL NUMERO ═════════════════
+     Il CEO ha chiesto che il sistema suggerisca anche ingressi su titoli nuovi, e ha deciso che
+     la ricerca la faccia l'LLM. Perche' quella delega sia onesta, chi legge deve sapere PERCHE':
+     non e' che il sistema abbia uno screening e non lo passi — non ce l'ha proprio.
+     ⚠ E' un FATTO, non un ordine: l'istruzione di cercare vive nella testata [B8]. Qui esce solo
+     la misura, contata sui dati veri a ogni run invece di essere scritta a mano — un numero
+     fisso in prosa invecchia da solo e in silenzio (C10, red team I6).
+     ⚠ Ed e' la regola v406 applicata a un'assenza: "il sistema non ha il dato" e "ce l'ha e non
+     te lo passa" si leggono uguali e sono cose diverse. */
+  {
+    const seguiti = [...((DATA && DATA.portfolio) || []), ...((DATA && DATA.watchlist) || [])]
+      .filter(r => r && r.ticker);
+    const tk = (r) => String(r.ticker).toUpperCase();
+    /* indici, cambi, future e materie prime NON sono candidati: si riconoscono dalla FORMA del
+       simbolo, non da un elenco di nomi da tenere allineato. */
+    const strumento = (r) => /^\^/.test(tk(r)) || tk(r).includes("=") || tk(r).endsWith("-USD");
+    const inPosizione = seguiti.filter(r => numero(r.qta ?? r.qty) > 0 && numero(r.pmc) > 0);
+    const benchmark = seguiti.filter(r => strumento(r) && !inPosizione.includes(r));
+    const soloSeguiti = seguiti.filter(r => !strumento(r) && !inPosizione.includes(r));
+    if (seguiti.length) {
+      lines.push(`- ⚠ L'UNIVERSO DA CUI IL SISTEMA POTREBBE PESCARE UN NOME NUOVO NON ESISTE, e il `
+        + `numero lo dice: dei ${seguiti.length} simboli che la pipeline segue, ${inPosizione.length} `
+        + `sono le posizioni del libro, ${benchmark.length} sono indici, cambi o materie prime`
+        + `${soloSeguiti.length ? `, e restano ${soloSeguiti.length} ${soloSeguiti.length === 1 ? "titolo seguito" : "titoli seguiti"} e non ${soloSeguiti.length === 1 ? "posseduto" : "posseduti"} (${soloSeguiti.map(tk).join(", ")})` : ", e non resta nessun altro titolo"}. `
+        + `${soloSeguiti.length ? `${soloSeguiti.length === 1 ? "Un nome" : `${soloSeguiti.length} nomi`} non ${soloSeguiti.length === 1 ? "e'" : "sono"} uno screening: ` : ""}`
+        + `il sistema non calcola ne' classifica candidati, e su questo punto non ha dati da offrire `
+        + `oltre alla rotazione settoriale e alle notizie che trovi qui sopra. ⚠ Non e' un blocco `
+        + `mancante: e' il perimetro del sistema, dichiarato.`);
+    }
+  }
   lines.push(`- ⚠ QUELLO CHE LA PAGINA MOSTRA E QUESTO PACCHETTO NON PORTA, con la ragione: `
     + `(a) i COMPOSITI 0-100 calcolati da noi — sentiment di rischio, quadro macro sintetico, `
     + `punteggio della struttura di prezzo: tolti dalla v200 sui numeri del loro track record, e la `
