@@ -5283,8 +5283,12 @@ check("v365 · combustione da INVESTIMENTI: la dice costruzione, e conta i mesi 
     if (!out.includes("COMBUSTIONE DI CASSA")) return no("il blocco non compare");
     if (!out.includes("combustione e' costruzione, non perdita operativa"))
       return no("flusso operativo positivo e FCF negativo, ma non dice che la combustione e' investimento");
-    if (!out.includes("mesi di investimenti al ritmo attuale"))
-      return no("manca l'autonomia sul capex, che qui e' la domanda vera");
+    /* ⚠ VENTIQUATTRESIMA rottura di un check ancorato a una STRINGA LETTERALE, e stavolta la
+       formulazione nuova dice DI PIU' di quella vecchia: la v409 nomina il denominatore. Il
+       fatto da difendere non e' la frase ma che l'autonomia sul CAPEX esca, e che esca col
+       proprio denominatore accanto — senza il quale erano due numeri incomparabili. */
+    if (!/mesi di INVESTIMENTI/.test(out)) return "manca l'autonomia sul capex, che qui e' la domanda vera";
+    if (!out.includes("cassa diviso il capex")) return "l'autonomia sul capex non dichiara il proprio denominatore";
     return true;`));
 
 check("v365 · combustione dalla GESTIONE: non la chiama costruzione",
@@ -5705,9 +5709,17 @@ check("v389 disciplina: pagina e pacchetto leggono LA STESSA misura, non due cal
 
 check("v389 disciplina: il gruppo di fattore si calcola in un posto solo", (() => {
   const src = readFileSync(join(ROOT, "assets", "app.js"), "utf8");
-  /* estratto da contestoPortafoglio in v389 proprio per non averne due copie */
-  return (src.match(/^function gruppoFattore\(/gm) || []).length === 1
-      && /contestoPortafoglio[\s\S]{0,4000}?gruppoFattore\(azionarie, totAz\)/.test(src);
+  /* ⚠ LA FINESTRA FISSA DI 4000 CARATTERI ERA UN REGISTRO CHE INVECCHIA DA SOLO: inserendo
+     `autonomiaCassa` fra `contestoPortafoglio` e la chiamata, il gate e' andato rosso su codice
+     corretto. E' la classe del pavimento numerico di v208 e degli indici fissi del red team I6 —
+     una DISTANZA non e' una proprieta'. Ora si estrae il CORPO della funzione e si guarda dentro,
+     che e' l'invariante vero: una sola definizione, e il chiamante la usa davvero. */
+  if ((src.match(/^function gruppoFattore\(/gm) || []).length !== 1) {
+    return no("gruppoFattore e' definita piu' di una volta: due copie divergono");
+  }
+  const corpo = bloccoDa(src, "function contestoPortafoglio(");
+  return corpo.includes("gruppoFattore(azionarie, totAz)")
+    || no("contestoPortafoglio non chiama piu' gruppoFattore");
 })());
 
 check("v389 disciplina: la sezione esiste in pagina e qualcuno la riempie", (() => {
@@ -7035,6 +7047,75 @@ check("v408 la potatura si DICHIARA: mai un blocco tolto in silenzio", suVeriEsi
   /* ⚠ e il pacchetto macro NON deve portare la dichiarazione: li' non e' stato tolto niente */
   return buildCIOText().indexOf("COSA QUESTA CODA MACRO NON PORTA") < 0
     ? true : "il pacchetto macro dichiara una potatura che non ha fatto";`));
+
+/* ═══ v409 — L'AUTONOMIA DI CASSA: DUE DENOMINATORI, MAI UNO NUDO ═══════════════════════
+   Il difetto l'ha trovato un LLM reale leggendo il pacchetto v408: "MSTR 0,9 mesi qui e oltre 5
+   anni là; RGTI 12,4 e 5,5. Non possono essere contemporaneamente veri". Erano due grandezze
+   diverse con la stessa unita' — cassa/perdita operativa e cassa/investimenti — e nessuna delle
+   due dichiarava il proprio denominatore.
+   ⚠ Il gate NON verifica che i numeri coincidano: non devono. Verifica che ogni numero di
+   autonomia ESCA COL PROPRIO DENOMINATORE, che dove ce ne sono due il pacchetto dica che non si
+   confrontano, e che la formulazione venga da UN posto solo. */
+check("v409 nessun numero di autonomia esce senza il proprio denominatore", suVeriEsito(`
+  const guai = [];
+  for (const p of [buildCIOText(), buildPromptTicker("MSTR")]) {
+    for (const riga of p.split(String.fromCharCode(10))) {
+      /* si cercano le rese di autonomia: "N mesi di ..." oppure "oltre 5 anni di ..." */
+      if (!/(mesi|oltre 5 anni) di (PERDITA OPERATIVA|INVESTIMENTI)/.test(riga)) continue;
+      if (riga.indexOf("cassa diviso") < 0) {
+        /* ⚠ si mostra l'INTORNO del punto incriminato, non l'inizio della riga: su una riga
+           lunga il messaggio finirebbe per descrivere tutt'altro, e un gate che fallisce per la
+           ragione giusta e lo racconta male costa un giro di debug a chi viene dopo (v407). */
+        const j = riga.search(/(mesi|oltre 5 anni) di (PERDITA OPERATIVA|INVESTIMENTI)/);
+        guai.push("autonomia senza denominatore: ..." + riga.slice(Math.max(0, j - 25), j + 60));
+      }
+    }
+  }
+  /* ⚠ il fenomeno deve esserci, o il check e' verde per assenza di dati (trappola gia' pagata
+     quattro volte in questo progetto) */
+  const macro = buildCIOText();
+  if (!/(mesi|oltre 5 anni) di (PERDITA OPERATIVA|INVESTIMENTI)/.test(macro)) {
+    return "nessuna autonomia nel pacchetto: il check non sta misurando niente";
+  }
+  return guai.length ? guai.join(" · ") : true;`));
+
+check("v409 dove i denominatori sono due, il pacchetto dice che non si confrontano", suVeriEsito(`
+  /* si COSTRUISCE il caso invece di aspettare che i dati lo producano (lezione v402): una
+     posizione con entrambi i campi deve far comparire la riga di non confrontabilita'. */
+  const r = [...(DATA.portfolio || []), ...(DATA.watchlist || [])].find(x => x && x.combustione);
+  if (!r) return "nessuna posizione con combustione: il fenomeno non c'e'";
+  r.combustione.mesi_operativi = 900;   // cassa/perdita operativa: enorme
+  r.combustione.mesi_capex = 0.8;       // cassa/investimenti: minuscola
+  r.combustione.fcf_ttm = -1e9;
+  const p = buildCIOText();
+  if (p.indexOf("I due numeri NON si confrontano") < 0) {
+    return "due denominatori sullo stesso nome e nessuna riga che lo dichiari";
+  }
+  /* e il valore fuori scala non si stampa per esteso: "900 mesi" e' giusto e illeggibile (v389) */
+  /* ⚠ NIENTE REGEX QUI: e' un template passato al vm, e la barra-b diventa un backspace vero.
+     indexOf non ha niente da sfuggire — stessa correzione gia' fatta in v400. */
+  if (p.indexOf("900 mesi") >= 0) return "un'autonomia oltre i cinque anni stampata per esteso";
+  return p.indexOf("oltre 5 anni") >= 0 || "il cap oltre i cinque anni non ha morso";`));
+
+check("v409 la formulazione dell'autonomia viene da UN posto solo", (() => {
+  /* ⚠ i commenti si tolgono: quelli che SPIEGANO il difetto contengono per forza le stringhe
+     che il gate cerca — quinta incarnazione del gate che trova se' stesso (v213, v240, v393). */
+  const codice = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  if ((codice.match(/^function autonomiaCassa\(/gm) || []).length !== 1) {
+    return no("autonomiaCassa non e' definita esattamente una volta");
+  }
+  /* nessun altro punto formatta i mesi di autonomia in proprio: e' cosi' che e' nato il difetto */
+  const fuori = [];
+  for (const m of codice.matchAll(/mesi di (PERDITA OPERATIVA|INVESTIMENTI|autonomia|investimenti)/g)) {
+    const i = codice.lastIndexOf("function ", m.index);
+    const nome = codice.slice(i, codice.indexOf("(", i));
+    if (!/autonomiaCassa/.test(nome)) fuori.push(nome.replace("function ", "").trim());
+  }
+  if (fuori.length) return no("formattano i mesi in proprio: " + [...new Set(fuori)].join(", "));
+  /* e i tre consumatori la chiamano davvero */
+  const chiamate = (codice.match(/autonomiaCassa\(/g) || []).length;
+  return chiamate >= 4 || no("solo " + chiamate + " riferimenti: qualche punto di stampa non la usa");
+})());
 
 let fail = 0;
 for (const [name, ok] of T) {
